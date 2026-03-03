@@ -32,6 +32,7 @@ internal sealed class CounterModel : IModel
     private bool _focused = true;
     private string _lastEvent = "none";
     private string _lastPaste = "(none)";
+    private string _typedText = string.Empty;
 
     public CounterModel(TeaSharp.Core.Terminal.ConsoleTerminalAdapter terminal)
     {
@@ -44,11 +45,11 @@ internal sealed class CounterModel : IModel
     {
         if (message is KeyPressMsg key)
         {
-            if (key.Code == KeyCode.Up || key.Text == "k")
+            if (key.Code == KeyCode.Up)
             {
                 _count++;
             }
-            else if (key.Code == KeyCode.Down || key.Text == "j")
+            else if (key.Code == KeyCode.Down)
             {
                 _count--;
             }
@@ -56,6 +57,18 @@ internal sealed class CounterModel : IModel
                      || ((key.Text == "c" || key.Text == "\u0003") && key.Modifiers.HasFlag(KeyModifiers.Ctrl)))
             {
                 return new UpdateResult(this, Tea.Cmd.Quit);
+            }
+            else if (key.Modifiers == KeyModifiers.None && key.Code == KeyCode.Character && !string.IsNullOrEmpty(key.Text))
+            {
+                _typedText += key.Text;
+            }
+            else if (key.Code == KeyCode.Backspace && _typedText.Length > 0)
+            {
+                _typedText = _typedText[..^1];
+            }
+            else if (key.Code == KeyCode.Enter)
+            {
+                _typedText += "\n";
             }
 
             _lastEvent = $"key: {key.Keystroke()}";
@@ -65,6 +78,7 @@ internal sealed class CounterModel : IModel
         if (message is PasteMsg paste)
         {
             _lastPaste = SanitizePastePreview(paste.Content);
+            _typedText += paste.Content;
             _lastEvent = $"paste: {paste.Content.Length} chars";
             return new UpdateResult(this, null);
         }
@@ -113,9 +127,11 @@ internal sealed class CounterModel : IModel
             $"Input backend: {(_terminal.IsRawModeActive ? "vt-bytes" : "console-keys-fallback")}\n" +
             $"Focus events: {(_terminal.IsRawModeActive ? "expected (if terminal supports ?1004)" : "not available in fallback mode")}\n" +
             $"Last event: {_lastEvent}\n" +
-            $"Last paste: {_lastPaste}\n\n" +
+            $"Last paste: {_lastPaste}\n" +
+            $"Typed text: {SanitizePastePreview(_typedText)}\n\n" +
             "Try live:\n" +
-            "- up/down or k/j to change count\n" +
+            "- up/down to change count\n" +
+            "- type text; backspace and enter work\n" +
             "- paste multi-line text (cmd+v/ctrl+v/right-click)\n" +
             "- switch terminal focus away/back\n" +
             "- resize terminal window\n" +
