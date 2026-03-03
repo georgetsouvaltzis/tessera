@@ -267,17 +267,25 @@ public sealed class ConsoleTerminalAdapter : ITerminalAdapter
 
     private static string? RunStty(string arguments, out string? error)
     {
+        var sttyExecutable = ResolveSttyExecutable();
         var explicitTtyArgs = OperatingSystem.IsMacOS()
             ? new[] { "-f", "/dev/tty" }
             : new[] { "-F", "/dev/tty" };
 
-        if (TryRunStty(arguments, explicitTtyArgs, out var output, out error))
+        if (TryRunStty(sttyExecutable, arguments, explicitTtyArgs, out var output, out error))
         {
             return output.Trim();
         }
 
         // Fallback: rely on inherited stdin if explicit tty flag is unsupported.
-        if (TryRunStty(arguments, null, out output, out var fallbackError))
+        if (TryRunStty(sttyExecutable, arguments, null, out output, out var fallbackError))
+        {
+            error = null;
+            return output.Trim();
+        }
+
+        // Last resort: shell redirection to controlling tty.
+        if (TryRunSttyWithShellRedirection(arguments, out output, out fallbackError))
         {
             error = null;
             return output.Trim();
@@ -317,7 +325,7 @@ public sealed class ConsoleTerminalAdapter : ITerminalAdapter
             && (probe.Contains("-icanon", StringComparison.Ordinal) || probe.Contains(" raw ", StringComparison.Ordinal));
     }
 
-    private static bool TryRunStty(string arguments, string[]? explicitTtyArgs, out string output, out string? error)
+    private static bool TryRunStty(string sttyExecutable, string arguments, string[]? explicitTtyArgs, out string output, out string? error)
     {
         output = string.Empty;
         error = null;
@@ -328,7 +336,7 @@ public sealed class ConsoleTerminalAdapter : ITerminalAdapter
             {
                 StartInfo = new ProcessStartInfo
                 {
-                    FileName = "stty",
+                    FileName = sttyExecutable,
                     UseShellExecute = false,
                     RedirectStandardOutput = true,
                     RedirectStandardError = true,
@@ -374,6 +382,69 @@ public sealed class ConsoleTerminalAdapter : ITerminalAdapter
             error = $"stty-exception: {ex.Message}";
             return false;
         }
+    }
+
+    private static bool TryRunSttyWithShellRedirection(string arguments, out string output, out string? error)
+    {
+        output = string.Empty;
+        error = null;
+
+        try
+        {
+            var escaped = arguments.Replace("'", "'\"'\"'", StringComparison.Ordinal);
+            using var process = new Process
+            {
+                StartInfo = new ProcessStartInfo
+                {
+                    FileName = "/bin/sh",
+                    ArgumentList = { "-lc", $"stty {escaped} < /dev/tty" },
+                    UseShellExecute = false,
+                    RedirectStandardOutput = true,
+                    RedirectStandardError = true,
+                    CreateNoWindow = true,
+                },
+            };
+
+            if (!process.Start())
+            {
+                error = "stty-shell-start-failed";
+                return false;
+            }
+
+            output = process.StandardOutput.ReadToEnd();
+            var stdErr = process.StandardError.ReadToEnd().Trim();
+            process.WaitForExit();
+
+            if (process.ExitCode != 0)
+            {
+                error = string.IsNullOrWhiteSpace(stdErr)
+                    ? $"stty-shell-exit-{process.ExitCode}"
+                    : $"stty-shell-exit-{process.ExitCode}: {stdErr}";
+                return false;
+            }
+
+            return true;
+        }
+        catch (Exception ex)
+        {
+            error = $"stty-shell-exception: {ex.Message}";
+            return false;
+        }
+    }
+
+    private static string ResolveSttyExecutable()
+    {
+        if (File.Exists("/bin/stty"))
+        {
+            return "/bin/stty";
+        }
+
+        if (File.Exists("/usr/bin/stty"))
+        {
+            return "/usr/bin/stty";
+        }
+
+        return "stty";
     }
 
     private static IMessage? MapConsoleKey(ConsoleKeyInfo key)
