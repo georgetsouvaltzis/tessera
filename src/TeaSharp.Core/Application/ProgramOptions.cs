@@ -20,6 +20,8 @@ public sealed class ProgramOptions
 
     public TimeSpan EscapeTimeout { get; init; } = TimeSpan.FromMilliseconds(50);
 
+    public TimeSpan ResizePollInterval { get; init; } = TimeSpan.FromMilliseconds(120);
+
     public IProgramRenderer? Renderer { get; init; }
 
     public ITerminalAdapter? Terminal { get; init; }

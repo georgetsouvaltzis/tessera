@@ -13,6 +13,7 @@ await RunTest("SendQuit_StopsProgram", SendQuit_StopsProgram, failures);
 await RunTest("Sequence_ProcessesInOrder", Sequence_ProcessesInOrder, failures);
 await RunTest("Batch_ProcessesAllCommands", Batch_ProcessesAllCommands, failures);
 await RunTest("Filter_CanBlockQuitMessage", Filter_CanBlockQuitMessage, failures);
+await RunTest("ResizeLoop_EmitsWindowSizeChanges", ResizeLoop_EmitsWindowSizeChanges, failures);
 await RunTest("EventDecoder_GoldenSequences", EventDecoder_GoldenSequences, failures);
 await RunTest("TerminalReader_AggregatesBracketedPaste", TerminalReader_AggregatesBracketedPaste, failures);
 
@@ -126,6 +127,31 @@ static async Task Filter_CanBlockQuitMessage()
 static Task EventDecoder_GoldenSequences() => EventDecoderGoldenTests.RunAsync();
 
 static Task TerminalReader_AggregatesBracketedPaste() => TerminalReaderBehaviorTests.RunAsync();
+
+static async Task ResizeLoop_EmitsWindowSizeChanges()
+{
+    var terminal = new ResizingFakeTerminal();
+    var model = new ResizeTrackingModel();
+    var program = new TeaProgram(model, new ProgramOptions
+    {
+        DisableRenderer = true,
+        DisableInput = true,
+        Terminal = terminal,
+        ResizePollInterval = TimeSpan.FromMilliseconds(10),
+    });
+
+    await program.RunAsync();
+
+    if (model.Seen.Count < 2)
+    {
+        throw new InvalidOperationException($"Expected at least 2 size events but got {model.Seen.Count}.");
+    }
+
+    if (model.Seen[0] != (80, 24) || model.Seen[1] != (100, 40))
+    {
+        throw new InvalidOperationException($"Unexpected resize sequence: {string.Join(", ", model.Seen.Select(s => $"{s.W}x{s.H}"))}");
+    }
+}
 
 static TeaProgram NewProgram(IModel model) =>
     new(model, new ProgramOptions
@@ -248,4 +274,63 @@ sealed class FakeTerminalAdapter : ITerminalAdapter
     }
 
     public ValueTask DisposeAsync() => ValueTask.CompletedTask;
+}
+
+sealed class ResizingFakeTerminal : ITerminalAdapter
+{
+    private int _callCount;
+
+    public Stream Input { get; } = new MemoryStream();
+
+    public Stream Output { get; } = new MemoryStream();
+
+    public bool IsInputInteractive => false;
+
+    public bool IsOutputInteractive => true;
+
+    public ValueTask PrepareAsync(CancellationToken cancellationToken)
+    {
+        _ = cancellationToken;
+        return ValueTask.CompletedTask;
+    }
+
+    public ValueTask RestoreAsync(CancellationToken cancellationToken)
+    {
+        _ = cancellationToken;
+        return ValueTask.CompletedTask;
+    }
+
+    public ValueTask<TerminalSize> GetSizeAsync(CancellationToken cancellationToken)
+    {
+        _ = cancellationToken;
+        var call = Interlocked.Increment(ref _callCount);
+        return call <= 1
+            ? ValueTask.FromResult(new TerminalSize(80, 24))
+            : ValueTask.FromResult(new TerminalSize(100, 40));
+    }
+
+    public ValueTask DisposeAsync() => ValueTask.CompletedTask;
+}
+
+sealed class ResizeTrackingModel : IModel
+{
+    public List<(int W, int H)> Seen { get; } = [];
+
+    public Command? Init() => null;
+
+    public UpdateResult Update(IMessage message)
+    {
+        if (message is WindowSizeMsg ws)
+        {
+            Seen.Add((ws.Width, ws.Height));
+            if (Seen.Count >= 2)
+            {
+                return new UpdateResult(this, Commands.Quit);
+            }
+        }
+
+        return new UpdateResult(this, null);
+    }
+
+    public ModelView View() => ModelView.From("resize");
 }

@@ -65,11 +65,13 @@ public sealed class TeaProgram
             await _terminal.PrepareAsync(token).ConfigureAwait(false);
             await _renderer.InitializeAsync(_terminal.Output, token).ConfigureAwait(false);
 
+            Task? resizeLoop = null;
             if (_terminal.IsOutputInteractive)
             {
                 var size = await _terminal.GetSizeAsync(token).ConfigureAwait(false);
                 _renderer.Resize(size.Width, size.Height);
                 Send(new WindowSizeMsg(size.Width, size.Height));
+                resizeLoop = StartResizeLoop(size, token);
             }
 
             var commandLoop = Task.Run(() => CommandLoopAsync(token), token);
@@ -100,7 +102,8 @@ public sealed class TeaProgram
                     if (filtered is QuitMsg)
                     {
                         await ShutdownAsync(kill: false, token).ConfigureAwait(false);
-                        await AwaitBackgroundLoops(commandLoop, inputLoop).ConfigureAwait(false);
+                        _cts?.Cancel();
+                        await AwaitBackgroundLoops(commandLoop, inputLoop, resizeLoop).ConfigureAwait(false);
                         return Model;
                     }
 
@@ -147,7 +150,8 @@ public sealed class TeaProgram
             }
 
             await ShutdownAsync(kill: false, token).ConfigureAwait(false);
-            await AwaitBackgroundLoops(commandLoop, inputLoop).ConfigureAwait(false);
+            _cts?.Cancel();
+            await AwaitBackgroundLoops(commandLoop, inputLoop, resizeLoop).ConfigureAwait(false);
             return Model;
         }
         finally
@@ -193,6 +197,44 @@ public sealed class TeaProgram
 
         _reader = new TerminalReader(_terminal.Input, new EventDecoder(), _options.EscapeTimeout);
         return Task.Run(() => _reader.StreamEventsAsync(token, Send), token);
+    }
+
+    private Task? StartResizeLoop(TerminalSize initialSize, CancellationToken token)
+    {
+        if (_terminal is null || !_terminal.IsOutputInteractive)
+        {
+            return null;
+        }
+
+        return Task.Run(async () =>
+        {
+            var last = initialSize;
+            var interval = _options.ResizePollInterval < TimeSpan.FromMilliseconds(16)
+                ? TimeSpan.FromMilliseconds(16)
+                : _options.ResizePollInterval;
+
+            while (!token.IsCancellationRequested)
+            {
+                try
+                {
+                    await Task.Delay(interval, token).ConfigureAwait(false);
+                    var current = await _terminal.GetSizeAsync(token).ConfigureAwait(false);
+                    if (current.Width != last.Width || current.Height != last.Height)
+                    {
+                        last = current;
+                        Send(new WindowSizeMsg(current.Width, current.Height));
+                    }
+                }
+                catch (OperationCanceledException)
+                {
+                    break;
+                }
+                catch
+                {
+                    // ignored: size polling best-effort.
+                }
+            }
+        }, token);
     }
 
     private async Task CommandLoopAsync(CancellationToken token)
@@ -270,7 +312,7 @@ public sealed class TeaProgram
         }
     }
 
-    private static async Task AwaitBackgroundLoops(Task commandLoop, Task? inputLoop)
+    private static async Task AwaitBackgroundLoops(Task commandLoop, Task? inputLoop, Task? resizeLoop)
     {
         try
         {
@@ -286,6 +328,18 @@ public sealed class TeaProgram
             try
             {
                 await inputLoop.ConfigureAwait(false);
+            }
+            catch
+            {
+                // ignored: shutdown path.
+            }
+        }
+
+        if (resizeLoop is not null)
+        {
+            try
+            {
+                await resizeLoop.ConfigureAwait(false);
             }
             catch
             {

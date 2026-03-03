@@ -111,6 +111,7 @@ internal sealed class CounterModel : IModel
             $"Raw mode probe: {SummarizeProbe(_terminal.RawModeDiagnostics)}\n" +
             $"Raw mode error: {SummarizeProbe(_terminal.RawModeError)}\n" +
             $"Input backend: {(_terminal.IsRawModeActive ? "vt-bytes" : "console-keys-fallback")}\n" +
+            $"Focus events: {(_terminal.IsRawModeActive ? "expected (if terminal supports ?1004)" : "not available in fallback mode")}\n" +
             $"Last event: {_lastEvent}\n" +
             $"Last paste: {_lastPaste}\n\n" +
             "Try live:\n" +

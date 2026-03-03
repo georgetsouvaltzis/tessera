@@ -66,9 +66,10 @@ Primary goal: deterministic message-driven TUI runtime with portable terminal be
 3. `model.Init()` command scheduled.
 4. Input reader emits decoded messages (or console key events via `Console.ReadKey` fallback).
 5. Event loop applies filter, handles internal control messages, calls `Update`.
-6. Returned command gets scheduled.
-7. `View` renders via active renderer.
-8. Shutdown restores terminal state.
+6. Background size polling emits `WindowSizeMsg` when dimensions change.
+7. Returned command gets scheduled.
+8. `View` renders via active renderer.
+9. Shutdown restores terminal state.
 
 ## 5. Concurrency Model
 
@@ -92,6 +93,7 @@ Primary goal: deterministic message-driven TUI runtime with portable terminal be
 - Enter `stty raw -echo` while the program runs, then restore the saved terminal state on shutdown.
 - Probe terminal mode after setup; fallback to explicit `-icanon min 1 time 0 -echo` if needed.
 - If raw mode is still unavailable, input path falls back to `Console.ReadKey(intercept: true)` for non-echo key handling.
+- Program includes interval-based terminal size polling for consistent cross-platform resize updates.
 
 ## 7. API Contracts (Phase 1)
 
