@@ -35,9 +35,9 @@ Legend: `done` = implemented, `partial` = usable but incomplete, `todo` = not im
 | VT control decode | CSI/SS3/OSC parsing | partial | Core cursor/edit keys, resize, OSC consumption implemented; full matrix still pending. |
 | Ctrl modifiers | control key combos | partial | Core ctrl path works; incomplete matrix parity. |
 | Alt/meta handling | alt key combos | partial | Escape-prefix + console modifiers supported; edge cases missing. |
-| Bracketed paste protocol | start/end/content handling | partial | Start/end messages exist; content aggregation missing. |
+| Bracketed paste protocol | start/end/content handling | done | Start/end decode and aggregated `PasteMsg` content are implemented. |
 | Mouse protocol | X10/SGR mouse messages | todo | View enum exists; parser/dispatch not implemented. |
-| Focus reporting | focus in/out messages | todo | View flag exists; protocol handling not implemented. |
+| Focus reporting | focus in/out messages | done | CSI focus in/out decode + render-mode toggle implemented. |
 | Resize updates | runtime terminal resize events | partial | Initial size + CSI parser support; no OS-level resize watcher parity. |
 
 ## Rendering
@@ -49,7 +49,7 @@ Legend: `done` = implemented, `partial` = usable but incomplete, `todo` = not im
 | Alt screen | alternate buffer enter/leave | done | `View.AltScreen` implemented. |
 | Cursor visibility/position | cursor control | partial | Show/hide + absolute position supported; no style/blink parity. |
 | Synchronized updates | synchronized paint | partial | Enable code emitted; disable/end semantics incomplete. |
-| Window title | OSC title | todo | `View.WindowTitle` not yet emitted. |
+| Window title | OSC title | done | `View.WindowTitle` now emits OSC title sequence. |
 | Style/render integration | lipgloss-like style composition | todo | No style system yet (out of scope currently). |
 
 ## Cross-Platform Runtime
@@ -66,13 +66,12 @@ Legend: `done` = implemented, `partial` = usable but incomplete, `todo` = not im
 | Area | Bubble Tea Capability | TeaSharp | Notes |
 |---|---|---|---|
 | Behavior tests | loop/command semantics | done | Core regression tests pass. |
-| Protocol decode tests | key/mouse/paste parser fixtures | partial | Golden fixture suite added for CSI/SS3/OSC + modifiers; mouse/focus fixtures pending. |
+| Protocol decode tests | key/mouse/paste parser fixtures | partial | Golden fixtures include CSI/SS3/OSC, modifiers, focus; mouse fixtures pending. |
 | Renderer snapshots | render diff correctness | todo | Needs deterministic snapshot tests. |
 
 ## Priority Gap Plan
 
-1. P0: VT parser state machine (`CSI/SS3/OSC`) with fixture tests.
-2. P0: Bracketed paste content aggregation and focus/mouse message types.
-3. P1: Cell-buffer renderer (row+cell diff) replacing line-only diff.
-4. P1: Runtime resize watcher parity across macOS/Linux/Windows.
-5. P2: Terminal capability probing and optional terminfo integration.
+1. P0: Mouse protocol parsing/dispatch (`SGR 1006`, button/wheel/motion) with fixtures.
+2. P1: Cell-buffer renderer (row+cell diff) replacing line-only diff.
+3. P1: Runtime resize watcher parity across macOS/Linux/Windows.
+4. P2: Terminal capability probing and optional terminfo integration.
