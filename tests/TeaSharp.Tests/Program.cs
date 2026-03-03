@@ -3,6 +3,7 @@ using TeaSharp.Core.Application;
 using TeaSharp.Core.Commands;
 using TeaSharp.Core.Messages;
 using TeaSharp.Core.Terminal;
+using TeaSharp.Tests;
 using ModelView = TeaSharp.Core.Abstractions.View;
 
 var failures = new List<string>();
@@ -12,6 +13,7 @@ await RunTest("SendQuit_StopsProgram", SendQuit_StopsProgram, failures);
 await RunTest("Sequence_ProcessesInOrder", Sequence_ProcessesInOrder, failures);
 await RunTest("Batch_ProcessesAllCommands", Batch_ProcessesAllCommands, failures);
 await RunTest("Filter_CanBlockQuitMessage", Filter_CanBlockQuitMessage, failures);
+await RunTest("EventDecoder_GoldenSequences", EventDecoder_GoldenSequences, failures);
 
 if (failures.Count > 0)
 {
@@ -119,6 +121,8 @@ static async Task Filter_CanBlockQuitMessage()
     program.Send(new QuitMsg());
     await runTask;
 }
+
+static Task EventDecoder_GoldenSequences() => EventDecoderGoldenTests.RunAsync();
 
 static TeaProgram NewProgram(IModel model) =>
     new(model, new ProgramOptions
