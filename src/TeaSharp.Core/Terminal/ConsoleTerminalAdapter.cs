@@ -1,5 +1,7 @@
 using System.Runtime.InteropServices;
 using System.Diagnostics;
+using TeaSharp.Core.Abstractions;
+using TeaSharp.Core.Messages;
 
 namespace TeaSharp.Core.Terminal;
 
@@ -130,6 +132,36 @@ public sealed class ConsoleTerminalAdapter : ITerminalAdapter
         }
     }
 
+    public async Task StreamConsoleKeyEventsAsync(CancellationToken cancellationToken, Action<IMessage> onEvent)
+    {
+        while (!cancellationToken.IsCancellationRequested)
+        {
+            try
+            {
+                if (!Console.KeyAvailable)
+                {
+                    await Task.Delay(10, cancellationToken).ConfigureAwait(false);
+                    continue;
+                }
+
+                var key = Console.ReadKey(intercept: true);
+                var message = MapConsoleKey(key);
+                if (message is not null)
+                {
+                    onEvent(message);
+                }
+            }
+            catch (OperationCanceledException)
+            {
+                break;
+            }
+            catch (InvalidOperationException)
+            {
+                break;
+            }
+        }
+    }
+
     private void TryEnableWindowsVtModes()
     {
         var inputHandle = GetStdHandle(StdInputHandle);
@@ -255,6 +287,48 @@ public sealed class ConsoleTerminalAdapter : ITerminalAdapter
     private static bool IsInvalidHandle(IntPtr handle)
     {
         return handle == IntPtr.Zero || handle == new IntPtr(-1);
+    }
+
+    private static IMessage? MapConsoleKey(ConsoleKeyInfo key)
+    {
+        var modifiers = KeyModifiers.None;
+        if ((key.Modifiers & ConsoleModifiers.Control) != 0)
+        {
+            modifiers |= KeyModifiers.Ctrl;
+        }
+
+        if ((key.Modifiers & ConsoleModifiers.Alt) != 0)
+        {
+            modifiers |= KeyModifiers.Alt;
+        }
+
+        if ((key.Modifiers & ConsoleModifiers.Shift) != 0)
+        {
+            modifiers |= KeyModifiers.Shift;
+        }
+
+        return key.Key switch
+        {
+            ConsoleKey.UpArrow => new KeyPressMsg(KeyCode.Up, "", modifiers),
+            ConsoleKey.DownArrow => new KeyPressMsg(KeyCode.Down, "", modifiers),
+            ConsoleKey.LeftArrow => new KeyPressMsg(KeyCode.Left, "", modifiers),
+            ConsoleKey.RightArrow => new KeyPressMsg(KeyCode.Right, "", modifiers),
+            ConsoleKey.Enter => new KeyPressMsg(KeyCode.Enter, "", modifiers),
+            ConsoleKey.Tab => new KeyPressMsg(KeyCode.Tab, "", modifiers),
+            ConsoleKey.Backspace => new KeyPressMsg(KeyCode.Backspace, "", modifiers),
+            ConsoleKey.Escape => new KeyPressMsg(KeyCode.Escape, "", modifiers),
+            _ => ToCharacterMessage(key, modifiers),
+        };
+    }
+
+    private static IMessage? ToCharacterMessage(ConsoleKeyInfo key, KeyModifiers modifiers)
+    {
+        if (key.KeyChar == '\0')
+        {
+            return null;
+        }
+
+        return new KeyPressMsg(KeyCode.Character, key.KeyChar.ToString(), modifiers);
     }
 
     [DllImport("kernel32.dll", SetLastError = true)]

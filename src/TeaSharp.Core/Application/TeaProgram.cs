@@ -185,6 +185,11 @@ public sealed class TeaProgram
             return null;
         }
 
+        if (_terminal is ConsoleTerminalAdapter consoleTerminal)
+        {
+            return Task.Run(() => consoleTerminal.StreamConsoleKeyEventsAsync(token, Send), token);
+        }
+
         _reader = new TerminalReader(_terminal.Input, new EventDecoder(), _options.EscapeTimeout);
         return Task.Run(() => _reader.StreamEventsAsync(token, Send), token);
     }

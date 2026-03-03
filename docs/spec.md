@@ -64,7 +64,7 @@ Primary goal: deterministic message-driven TUI runtime with portable terminal be
 1. Program starts and prepares terminal.
 2. Initial size message emitted.
 3. `model.Init()` command scheduled.
-4. Input reader emits decoded messages.
+4. Input reader emits decoded messages (or console key events via `Console.ReadKey` fallback).
 5. Event loop applies filter, handles internal control messages, calls `Update`.
 6. Returned command gets scheduled.
 7. `View` renders via active renderer.
