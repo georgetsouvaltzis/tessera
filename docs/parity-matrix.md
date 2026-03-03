@@ -32,6 +32,7 @@ Legend: `done` = implemented, `partial` = usable but incomplete, `todo` = not im
 |---|---|---|---|
 | Character input | UTF-8 keys | done | Rune decode + `Console.ReadKey` fallback. |
 | Navigation keys | arrows/tab/enter/backspace/esc | done | Core keys mapped. |
+| VT control decode | CSI/SS3/OSC parsing | partial | Core cursor/edit keys, resize, OSC consumption implemented; full matrix still pending. |
 | Ctrl modifiers | control key combos | partial | Core ctrl path works; incomplete matrix parity. |
 | Alt/meta handling | alt key combos | partial | Escape-prefix + console modifiers supported; edge cases missing. |
 | Bracketed paste protocol | start/end/content handling | partial | Start/end messages exist; content aggregation missing. |
@@ -65,7 +66,7 @@ Legend: `done` = implemented, `partial` = usable but incomplete, `todo` = not im
 | Area | Bubble Tea Capability | TeaSharp | Notes |
 |---|---|---|---|
 | Behavior tests | loop/command semantics | done | Core regression tests pass. |
-| Protocol decode tests | key/mouse/paste parser fixtures | todo | Needs golden fixture suite. |
+| Protocol decode tests | key/mouse/paste parser fixtures | partial | Golden fixture suite added for CSI/SS3/OSC + modifiers; mouse/focus fixtures pending. |
 | Renderer snapshots | render diff correctness | todo | Needs deterministic snapshot tests. |
 
 ## Priority Gap Plan
