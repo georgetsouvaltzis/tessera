@@ -355,13 +355,18 @@ public sealed class ConsoleTerminalAdapter : ITerminalAdapter
             return false;
         }
 
-        var hasNoEcho = probe.Contains("-echo", StringComparison.Ordinal);
-        var hasNonCanonical = probe.Contains("-icanon", StringComparison.Ordinal)
-            || probe.Contains(" raw ", StringComparison.Ordinal)
-            || probe.Contains(" cbreak ", StringComparison.Ordinal)
-            || probe.Contains("min = 1", StringComparison.Ordinal)
-            || probe.Contains("time = 0", StringComparison.Ordinal)
-            || (!probe.Contains("icanon", StringComparison.Ordinal) && probe.Contains("lflags", StringComparison.Ordinal));
+        var normalized = probe
+            .Replace(";", " ", StringComparison.Ordinal)
+            .Replace(":", " ", StringComparison.Ordinal)
+            .Replace("\r", " ", StringComparison.Ordinal)
+            .Replace("\n", " ", StringComparison.Ordinal);
+        var tokens = normalized.Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+
+        var hasNoEcho = tokens.Contains("-echo", StringComparer.Ordinal) && !tokens.Contains("echo", StringComparer.Ordinal);
+        var hasNonCanonical = tokens.Contains("-icanon", StringComparer.Ordinal)
+            || tokens.Contains("raw", StringComparer.Ordinal)
+            || tokens.Contains("cbreak", StringComparer.Ordinal)
+            || (normalized.Contains("min = 1", StringComparison.Ordinal) && normalized.Contains("time = 0", StringComparison.Ordinal));
 
         return hasNoEcho && hasNonCanonical;
     }
