@@ -17,6 +17,16 @@ public sealed class ConsoleTerminalAdapter : ITerminalAdapter
     private const uint EnableVirtualTerminalInput = 0x0200;
     private static readonly TimeSpan PasteBurstGap = TimeSpan.FromMilliseconds(28);
     private const int PasteBurstMinimumChars = 12;
+    private const int Tcsanow = 0;
+    private const int OpenReadWrite = 2;
+    private const uint LinuxEcho = 0x00000008;
+    private const uint LinuxICanon = 0x00000002;
+    private const uint DarwinEcho = 0x00000008;
+    private const uint DarwinICanon = 0x00000100;
+    private const int LinuxVTime = 5;
+    private const int LinuxVMin = 6;
+    private const int DarwinVMin = 16;
+    private const int DarwinVTime = 17;
 
     private readonly bool _treatControlAsInputOriginal;
     private readonly bool _ownsInput;
@@ -27,6 +37,10 @@ public sealed class ConsoleTerminalAdapter : ITerminalAdapter
     private string? _unixRawModeProbe;
     private string? _unixRawModeError;
     private bool _unixRawModeEnabled;
+    private int _unixTtyFd = -1;
+    private bool _unixTermiosPrepared;
+    private LinuxTermios _linuxOriginalTermios;
+    private DarwinTermios _darwinOriginalTermios;
     private bool _prepared;
 
     public ConsoleTerminalAdapter()
@@ -256,11 +270,19 @@ public sealed class ConsoleTerminalAdapter : ITerminalAdapter
             return;
         }
 
+        if (TryEnableUnixRawModeWithTermios(out var termiosProbe, out var termiosError))
+        {
+            _unixRawModeProbe = termiosProbe;
+            _unixRawModeError = termiosError ?? "none";
+            _unixRawModeEnabled = true;
+            return;
+        }
+
         _unixSttyState = RunStty("-g", out var stateError);
         if (string.IsNullOrWhiteSpace(_unixSttyState))
         {
             _unixRawModeProbe = "stty-state-unavailable";
-            _unixRawModeError = stateError ?? "state-read-failed";
+            _unixRawModeError = termiosError ?? stateError ?? "state-read-failed";
             return;
         }
 
@@ -288,6 +310,11 @@ public sealed class ConsoleTerminalAdapter : ITerminalAdapter
 
     private void TryRestoreUnixMode()
     {
+        if (_unixTermiosPrepared)
+        {
+            TryRestoreUnixTermios();
+        }
+
         if (string.IsNullOrWhiteSpace(_unixSttyState))
         {
             return;
@@ -297,6 +324,141 @@ public sealed class ConsoleTerminalAdapter : ITerminalAdapter
         _unixSttyState = null;
         _unixRawModeProbe = null;
         _unixRawModeError = null;
+    }
+
+    private bool TryEnableUnixRawModeWithTermios(out string probe, out string? error)
+    {
+        probe = "termios-unavailable";
+        error = null;
+
+        if (!OperatingSystem.IsMacOS() && !OperatingSystem.IsLinux())
+        {
+            error = "termios-unsupported-os";
+            return false;
+        }
+
+        _unixTtyFd = Open("/dev/tty", OpenReadWrite);
+        if (_unixTtyFd < 0)
+        {
+            error = "termios-open-failed";
+            _unixTtyFd = -1;
+            return false;
+        }
+
+        if (OperatingSystem.IsMacOS())
+        {
+            if (TcGetAttrDarwin(_unixTtyFd, out _darwinOriginalTermios) != 0)
+            {
+                error = "termios-tcgetattr-failed";
+                CloseUnixTty();
+                return false;
+            }
+
+            var current = _darwinOriginalTermios;
+            current.c_cc ??= new byte[20];
+            current.c_lflag &= ~(DarwinEcho | DarwinICanon);
+            current.c_cc[DarwinVMin] = 1;
+            current.c_cc[DarwinVTime] = 0;
+
+            if (TcSetAttrDarwin(_unixTtyFd, Tcsanow, ref current) != 0)
+            {
+                error = "termios-tcsetattr-failed";
+                CloseUnixTty();
+                return false;
+            }
+
+            if (TcGetAttrDarwin(_unixTtyFd, out var verify) != 0)
+            {
+                error = "termios-verify-failed";
+                CloseUnixTty();
+                return false;
+            }
+
+            var raw = (verify.c_lflag & (DarwinEcho | DarwinICanon)) == 0;
+            probe = $"termios darwin lflag=0x{verify.c_lflag:X} raw={(raw ? "yes" : "no")}";
+            if (!raw)
+            {
+                error = "termios-verify-not-raw";
+                CloseUnixTty();
+                return false;
+            }
+
+            _unixTermiosPrepared = true;
+            return true;
+        }
+        else
+        {
+            if (TcGetAttrLinux(_unixTtyFd, out _linuxOriginalTermios) != 0)
+            {
+                error = "termios-tcgetattr-failed";
+                CloseUnixTty();
+                return false;
+            }
+
+            var current = _linuxOriginalTermios;
+            current.c_cc ??= new byte[32];
+            current.c_lflag &= ~(LinuxEcho | LinuxICanon);
+            current.c_cc[LinuxVMin] = 1;
+            current.c_cc[LinuxVTime] = 0;
+
+            if (TcSetAttrLinux(_unixTtyFd, Tcsanow, ref current) != 0)
+            {
+                error = "termios-tcsetattr-failed";
+                CloseUnixTty();
+                return false;
+            }
+
+            if (TcGetAttrLinux(_unixTtyFd, out var verify) != 0)
+            {
+                error = "termios-verify-failed";
+                CloseUnixTty();
+                return false;
+            }
+
+            var raw = (verify.c_lflag & (LinuxEcho | LinuxICanon)) == 0;
+            probe = $"termios linux lflag=0x{verify.c_lflag:X} raw={(raw ? "yes" : "no")}";
+            if (!raw)
+            {
+                error = "termios-verify-not-raw";
+                CloseUnixTty();
+                return false;
+            }
+
+            _unixTermiosPrepared = true;
+            return true;
+        }
+    }
+
+    private void TryRestoreUnixTermios()
+    {
+        if (_unixTtyFd < 0)
+        {
+            _unixTermiosPrepared = false;
+            return;
+        }
+
+        if (OperatingSystem.IsMacOS())
+        {
+            var restore = _darwinOriginalTermios;
+            _ = TcSetAttrDarwin(_unixTtyFd, Tcsanow, ref restore);
+        }
+        else if (OperatingSystem.IsLinux())
+        {
+            var restore = _linuxOriginalTermios;
+            _ = TcSetAttrLinux(_unixTtyFd, Tcsanow, ref restore);
+        }
+
+        CloseUnixTty();
+        _unixTermiosPrepared = false;
+    }
+
+    private void CloseUnixTty()
+    {
+        if (_unixTtyFd >= 0)
+        {
+            _ = Close(_unixTtyFd);
+            _unixTtyFd = -1;
+        }
     }
 
     private static string? RunStty(string arguments, out string? error)
@@ -491,6 +653,33 @@ public sealed class ConsoleTerminalAdapter : ITerminalAdapter
         }
 
         return "stty";
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    private struct LinuxTermios
+    {
+        public uint c_iflag;
+        public uint c_oflag;
+        public uint c_cflag;
+        public uint c_lflag;
+        public byte c_line;
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 32)]
+        public byte[] c_cc;
+        public uint c_ispeed;
+        public uint c_ospeed;
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    private struct DarwinTermios
+    {
+        public uint c_iflag;
+        public uint c_oflag;
+        public uint c_cflag;
+        public uint c_lflag;
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 20)]
+        public byte[] c_cc;
+        public uint c_ispeed;
+        public uint c_ospeed;
     }
 
     private static IMessage? MapConsoleKey(ConsoleKeyInfo key)
@@ -731,4 +920,22 @@ public sealed class ConsoleTerminalAdapter : ITerminalAdapter
     [DllImport("kernel32.dll", SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)]
     private static extern bool SetConsoleMode(IntPtr hConsoleHandle, uint dwMode);
+
+    [DllImport("libc", EntryPoint = "open", SetLastError = true)]
+    private static extern int Open(string path, int flags);
+
+    [DllImport("libc", EntryPoint = "close", SetLastError = true)]
+    private static extern int Close(int fd);
+
+    [DllImport("libc", EntryPoint = "tcgetattr", SetLastError = true)]
+    private static extern int TcGetAttrLinux(int fd, out LinuxTermios termios);
+
+    [DllImport("libc", EntryPoint = "tcsetattr", SetLastError = true)]
+    private static extern int TcSetAttrLinux(int fd, int optionalActions, ref LinuxTermios termios);
+
+    [DllImport("libc", EntryPoint = "tcgetattr", SetLastError = true)]
+    private static extern int TcGetAttrDarwin(int fd, out DarwinTermios termios);
+
+    [DllImport("libc", EntryPoint = "tcsetattr", SetLastError = true)]
+    private static extern int TcSetAttrDarwin(int fd, int optionalActions, ref DarwinTermios termios);
 }
