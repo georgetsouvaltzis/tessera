@@ -50,7 +50,7 @@ public sealed class ConsoleTerminalAdapter : ITerminalAdapter
         var inputInteractive = !Console.IsInputRedirected;
         var outputInteractive = !Console.IsOutputRedirected;
 
-        if (!OperatingSystem.IsWindows() && Console.IsInputRedirected && TryOpenTty(FileAccess.ReadWrite, out var ttyIn))
+        if (!OperatingSystem.IsWindows() && TryOpenTty(FileAccess.ReadWrite, out var ttyIn))
         {
             stdIn = ttyIn;
             inputInteractive = true;
