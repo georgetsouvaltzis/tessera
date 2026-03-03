@@ -21,8 +21,8 @@ public sealed class ConsoleTerminalAdapter : ITerminalAdapter
     private const int OpenReadWrite = 2;
     private const uint LinuxEcho = 0x00000008;
     private const uint LinuxICanon = 0x00000002;
-    private const uint DarwinEcho = 0x00000008;
-    private const uint DarwinICanon = 0x00000100;
+    private const ulong DarwinEcho = 0x00000008;
+    private const ulong DarwinICanon = 0x00000100;
     private const int LinuxVTime = 5;
     private const int LinuxVMin = 6;
     private const int DarwinVMin = 16;
@@ -672,14 +672,14 @@ public sealed class ConsoleTerminalAdapter : ITerminalAdapter
     [StructLayout(LayoutKind.Sequential)]
     private struct DarwinTermios
     {
-        public uint c_iflag;
-        public uint c_oflag;
-        public uint c_cflag;
-        public uint c_lflag;
+        public ulong c_iflag;
+        public ulong c_oflag;
+        public ulong c_cflag;
+        public ulong c_lflag;
         [MarshalAs(UnmanagedType.ByValArray, SizeConst = 20)]
         public byte[] c_cc;
-        public uint c_ispeed;
-        public uint c_ospeed;
+        public ulong c_ispeed;
+        public ulong c_ospeed;
     }
 
     private static IMessage? MapConsoleKey(ConsoleKeyInfo key)
