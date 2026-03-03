@@ -138,3 +138,7 @@ Phase 3:
 - SDK pinned: `10.0.103` (`global.json`).
 - TFM: `net10.0` for all projects.
 - Solution entrypoint: `TeaSharp.slnx`.
+
+## 12. Parity Tracking
+
+- Bubble Tea parity tracking lives in `docs/parity-matrix.md`.
