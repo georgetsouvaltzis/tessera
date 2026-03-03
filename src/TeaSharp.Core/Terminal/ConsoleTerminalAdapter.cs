@@ -161,6 +161,15 @@ public sealed class ConsoleTerminalAdapter : ITerminalAdapter
                 }
 
                 var key = Console.ReadKey(intercept: true);
+                if (IsPasteShortcut(key) && TryReadClipboardText(out var clipboard) && !string.IsNullOrEmpty(clipboard))
+                {
+                    FlushPasteBurst(onEvent, burst);
+                    onEvent(new PasteStartMsg());
+                    onEvent(new PasteMsg(clipboard));
+                    onEvent(new PasteEndMsg());
+                    continue;
+                }
+
                 var message = MapConsoleKey(key);
                 if (message is KeyPressMsg keyPress && IsPasteBurstCandidate(keyPress))
                 {
@@ -346,8 +355,15 @@ public sealed class ConsoleTerminalAdapter : ITerminalAdapter
             return false;
         }
 
-        return probe.Contains("-echo", StringComparison.Ordinal)
-            && (probe.Contains("-icanon", StringComparison.Ordinal) || probe.Contains(" raw ", StringComparison.Ordinal));
+        var hasNoEcho = probe.Contains("-echo", StringComparison.Ordinal);
+        var hasNonCanonical = probe.Contains("-icanon", StringComparison.Ordinal)
+            || probe.Contains(" raw ", StringComparison.Ordinal)
+            || probe.Contains(" cbreak ", StringComparison.Ordinal)
+            || probe.Contains("min = 1", StringComparison.Ordinal)
+            || probe.Contains("time = 0", StringComparison.Ordinal)
+            || (!probe.Contains("icanon", StringComparison.Ordinal) && probe.Contains("lflags", StringComparison.Ordinal));
+
+        return hasNoEcho && hasNonCanonical;
     }
 
     private static bool TryRunStty(string sttyExecutable, string arguments, string[]? explicitTtyArgs, out string output, out string? error)
@@ -615,6 +631,89 @@ public sealed class ConsoleTerminalAdapter : ITerminalAdapter
         }
 
         return content.Length >= PasteBurstMinimumChars && distinctChars.Count >= 2;
+    }
+
+    private static bool IsPasteShortcut(ConsoleKeyInfo key)
+    {
+        var isCtrlV = key.Key == ConsoleKey.V && (key.Modifiers & ConsoleModifiers.Control) != 0;
+        var isShiftInsert = key.Key == ConsoleKey.Insert && (key.Modifiers & ConsoleModifiers.Shift) != 0;
+        return isCtrlV || isShiftInsert;
+    }
+
+    private static bool TryReadClipboardText(out string text)
+    {
+        if (OperatingSystem.IsMacOS())
+        {
+            return TryRunClipboardProcess("/usr/bin/pbpaste", [], out text)
+                || TryRunClipboardProcess("pbpaste", [], out text);
+        }
+
+        if (OperatingSystem.IsWindows())
+        {
+            return TryRunClipboardProcess("powershell", ["-NoProfile", "-Command", "Get-Clipboard -Raw"], out text)
+                || TryRunClipboardProcess("pwsh", ["-NoProfile", "-Command", "Get-Clipboard -Raw"], out text);
+        }
+
+        // Linux / Wayland / X11 fallbacks.
+        return TryRunClipboardProcess("wl-paste", ["-n"], out text)
+            || TryRunClipboardProcess("xclip", ["-selection", "clipboard", "-o"], out text)
+            || TryRunClipboardProcess("xsel", ["--clipboard", "--output"], out text);
+    }
+
+    private static bool TryRunClipboardProcess(string fileName, string[] args, out string text)
+    {
+        text = string.Empty;
+
+        try
+        {
+            using var process = new Process
+            {
+                StartInfo = new ProcessStartInfo
+                {
+                    FileName = fileName,
+                    UseShellExecute = false,
+                    RedirectStandardOutput = true,
+                    RedirectStandardError = true,
+                    CreateNoWindow = true,
+                },
+            };
+
+            foreach (var arg in args)
+            {
+                process.StartInfo.ArgumentList.Add(arg);
+            }
+
+            if (!process.Start())
+            {
+                return false;
+            }
+
+            if (!process.WaitForExit(350))
+            {
+                try
+                {
+                    process.Kill(entireProcessTree: true);
+                }
+                catch
+                {
+                    // ignored
+                }
+
+                return false;
+            }
+
+            if (process.ExitCode != 0)
+            {
+                return false;
+            }
+
+            text = process.StandardOutput.ReadToEnd();
+            return !string.IsNullOrEmpty(text);
+        }
+        catch
+        {
+            return false;
+        }
     }
 
     [DllImport("kernel32.dll", SetLastError = true)]

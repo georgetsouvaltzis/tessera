@@ -115,7 +115,7 @@ internal sealed class CounterModel : IModel
             $"Last paste: {_lastPaste}\n\n" +
             "Try live:\n" +
             "- up/down or k/j to change count\n" +
-            "- paste multi-line text\n" +
+            "- paste multi-line text (cmd+v/ctrl+v/right-click)\n" +
             "- switch terminal focus away/back\n" +
             "- resize terminal window\n" +
             "- q or ctrl+c to quit\n";
@@ -154,8 +154,8 @@ internal sealed class CounterModel : IModel
             .Replace("\n", " ", StringComparison.Ordinal)
             .Trim();
 
-        return compact.Length <= 64
+        return compact.Length <= 160
             ? compact
-            : compact[..64] + "...";
+            : compact[..160] + "...";
     }
 }
