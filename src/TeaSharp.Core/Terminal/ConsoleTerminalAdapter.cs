@@ -481,9 +481,20 @@ public sealed class ConsoleTerminalAdapter : ITerminalAdapter
 
     private static IMessage? ToCharacterMessage(ConsoleKeyInfo key, KeyModifiers modifiers)
     {
+        if (modifiers.HasFlag(KeyModifiers.Ctrl) && key.Key is >= ConsoleKey.A and <= ConsoleKey.Z)
+        {
+            var ch = (char)('a' + (key.Key - ConsoleKey.A));
+            return new KeyPressMsg(KeyCode.Character, ch.ToString(), modifiers);
+        }
+
         if (key.KeyChar == '\0')
         {
             return null;
+        }
+
+        if (key.KeyChar == '\u0003')
+        {
+            return new KeyPressMsg(KeyCode.Character, "c", modifiers | KeyModifiers.Ctrl);
         }
 
         return new KeyPressMsg(KeyCode.Character, key.KeyChar.ToString(), modifiers);

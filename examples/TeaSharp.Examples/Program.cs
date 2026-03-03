@@ -52,7 +52,8 @@ internal sealed class CounterModel : IModel
             {
                 _count--;
             }
-            else if (key.Text == "q" || (key.Text == "c" && key.Modifiers.HasFlag(KeyModifiers.Ctrl)))
+            else if (key.Text == "q"
+                     || ((key.Text == "c" || key.Text == "\u0003") && key.Modifiers.HasFlag(KeyModifiers.Ctrl)))
             {
                 return new UpdateResult(this, Tea.Cmd.Quit);
             }
