@@ -14,6 +14,7 @@ await RunTest("Sequence_ProcessesInOrder", Sequence_ProcessesInOrder, failures);
 await RunTest("Batch_ProcessesAllCommands", Batch_ProcessesAllCommands, failures);
 await RunTest("Filter_CanBlockQuitMessage", Filter_CanBlockQuitMessage, failures);
 await RunTest("EventDecoder_GoldenSequences", EventDecoder_GoldenSequences, failures);
+await RunTest("TerminalReader_AggregatesBracketedPaste", TerminalReader_AggregatesBracketedPaste, failures);
 
 if (failures.Count > 0)
 {
@@ -123,6 +124,8 @@ static async Task Filter_CanBlockQuitMessage()
 }
 
 static Task EventDecoder_GoldenSequences() => EventDecoderGoldenTests.RunAsync();
+
+static Task TerminalReader_AggregatesBracketedPaste() => TerminalReaderBehaviorTests.RunAsync();
 
 static TeaProgram NewProgram(IModel model) =>
     new(model, new ProgramOptions

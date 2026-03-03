@@ -13,6 +13,10 @@ public sealed class AnsiDiffRenderer : IProgramRenderer
     private View _currentView = View.From(string.Empty);
     private bool _initialized;
     private bool _altScreen;
+    private bool _bracketedPaste;
+    private bool _focusReporting;
+    private bool _synchronizedUpdates;
+    private string? _windowTitle;
 
     public ValueTask InitializeAsync(Stream output, CancellationToken cancellationToken)
     {
@@ -25,6 +29,10 @@ public sealed class AnsiDiffRenderer : IProgramRenderer
         _initialized = true;
         _previousLines = [];
         _altScreen = false;
+        _bracketedPaste = false;
+        _focusReporting = false;
+        _synchronizedUpdates = false;
+        _windowTitle = null;
 
         _ = cancellationToken;
         return ValueTask.CompletedTask;
@@ -56,6 +64,34 @@ public sealed class AnsiDiffRenderer : IProgramRenderer
             _previousLines.Clear();
         }
 
+        if (_currentView.EnableBracketedPaste != _bracketedPaste)
+        {
+            await _writer.WriteAsync(_currentView.EnableBracketedPaste ? "\u001b[?2004h" : "\u001b[?2004l").ConfigureAwait(false);
+            _bracketedPaste = _currentView.EnableBracketedPaste;
+        }
+
+        if (_currentView.EnableFocusReporting != _focusReporting)
+        {
+            await _writer.WriteAsync(_currentView.EnableFocusReporting ? "\u001b[?1004h" : "\u001b[?1004l").ConfigureAwait(false);
+            _focusReporting = _currentView.EnableFocusReporting;
+        }
+
+        if (_currentView.EnableSynchronizedUpdates != _synchronizedUpdates)
+        {
+            await _writer.WriteAsync(_currentView.EnableSynchronizedUpdates ? "\u001b[?2026h" : "\u001b[?2026l").ConfigureAwait(false);
+            _synchronizedUpdates = _currentView.EnableSynchronizedUpdates;
+        }
+
+        if (!string.Equals(_windowTitle, _currentView.WindowTitle, StringComparison.Ordinal))
+        {
+            if (_currentView.WindowTitle is not null)
+            {
+                await _writer.WriteAsync($"\u001b]2;{_currentView.WindowTitle}\u0007").ConfigureAwait(false);
+            }
+
+            _windowTitle = _currentView.WindowTitle;
+        }
+
         var lines = NormalizeLines(_currentView.Content);
         var max = Math.Max(lines.Count, _previousLines.Count);
 
@@ -84,11 +120,6 @@ public sealed class AnsiDiffRenderer : IProgramRenderer
             await _writer.WriteAsync("\u001b[?25l").ConfigureAwait(false);
         }
 
-        if (_currentView.EnableSynchronizedUpdates)
-        {
-            await _writer.WriteAsync("\u001b[?2026h").ConfigureAwait(false);
-        }
-
         await _writer.FlushAsync(cancellationToken).ConfigureAwait(false);
         _previousLines = lines;
 
@@ -109,6 +140,24 @@ public sealed class AnsiDiffRenderer : IProgramRenderer
         }
 
         await _writer.WriteAsync("\u001b[0m\u001b[?25h").ConfigureAwait(false);
+        if (_bracketedPaste)
+        {
+            await _writer.WriteAsync("\u001b[?2004l").ConfigureAwait(false);
+            _bracketedPaste = false;
+        }
+
+        if (_focusReporting)
+        {
+            await _writer.WriteAsync("\u001b[?1004l").ConfigureAwait(false);
+            _focusReporting = false;
+        }
+
+        if (_synchronizedUpdates)
+        {
+            await _writer.WriteAsync("\u001b[?2026l").ConfigureAwait(false);
+            _synchronizedUpdates = false;
+        }
+
         if (_altScreen)
         {
             await _writer.WriteAsync("\u001b[?1049l").ConfigureAwait(false);
@@ -144,4 +193,5 @@ public sealed class AnsiDiffRenderer : IProgramRenderer
         content = content.Replace("\r\n", "\n", StringComparison.Ordinal).Replace('\r', '\n');
         return [.. content.Split('\n')];
     }
+
 }

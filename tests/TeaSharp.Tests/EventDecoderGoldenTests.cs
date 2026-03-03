@@ -22,6 +22,8 @@ internal static class EventDecoderGoldenTests
 
         AssertMessageType<PasteStartMsg>(Decode("\u001b[200~"));
         AssertMessageType<PasteEndMsg>(Decode("\u001b[201~"));
+        AssertMessageType<FocusInMsg>(Decode("\u001b[I"));
+        AssertMessageType<FocusOutMsg>(Decode("\u001b[O"));
 
         var resize = Decode("\u001b[8;24;80t");
         AssertConsumed(resize, 10);

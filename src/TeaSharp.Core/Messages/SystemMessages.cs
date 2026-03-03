@@ -10,6 +10,10 @@ public sealed record WindowSizeMsg(int Width, int Height) : IMessage;
 
 public sealed record TickMsg(DateTimeOffset Timestamp) : IMessage;
 
+public sealed record FocusInMsg : IMessage;
+
+public sealed record FocusOutMsg : IMessage;
+
 public sealed record PasteStartMsg : IMessage;
 
 public sealed record PasteEndMsg : IMessage;

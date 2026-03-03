@@ -14,6 +14,8 @@ public sealed class ProgramOptions
 
     public bool DisableInput { get; init; }
 
+    public bool UseConsoleKeyEvents { get; init; } = true;
+
     public bool CatchCommandExceptions { get; init; } = true;
 
     public TimeSpan EscapeTimeout { get; init; } = TimeSpan.FromMilliseconds(50);

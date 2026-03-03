@@ -200,6 +200,11 @@ public sealed class EventDecoder
             return true;
         }
 
+        if (TryDecodeFocus(final, out message))
+        {
+            return true;
+        }
+
         if (CsiCursorFinals.Contains(final) && TryDecodeCsiCursorKey(final, parameters, out message))
         {
             return true;
@@ -246,6 +251,18 @@ public sealed class EventDecoder
 
         message = new WindowSizeMsg(cols, rows);
         return true;
+    }
+
+    private static bool TryDecodeFocus(char final, out IMessage? message)
+    {
+        message = final switch
+        {
+            'I' => new FocusInMsg(),
+            'O' => new FocusOutMsg(),
+            _ => null,
+        };
+
+        return message is not null;
     }
 
     private static bool TryDecodeCsiCursorKey(char final, IReadOnlyList<int?> parameters, out IMessage? message)
