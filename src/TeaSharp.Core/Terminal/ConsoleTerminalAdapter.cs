@@ -15,6 +15,8 @@ public sealed class ConsoleTerminalAdapter : ITerminalAdapter
     private const uint EnableVirtualTerminalInput = 0x0200;
 
     private readonly bool _treatControlAsInputOriginal;
+    private readonly bool _ownsInput;
+    private readonly bool _ownsOutput;
     private uint _originalInputMode;
     private uint _originalOutputMode;
     private string? _unixSttyState;
@@ -22,10 +24,29 @@ public sealed class ConsoleTerminalAdapter : ITerminalAdapter
 
     public ConsoleTerminalAdapter()
     {
-        Input = Console.OpenStandardInput();
-        Output = Console.OpenStandardOutput();
-        IsInputInteractive = !Console.IsInputRedirected;
-        IsOutputInteractive = !Console.IsOutputRedirected;
+        var stdIn = Console.OpenStandardInput();
+        var stdOut = Console.OpenStandardOutput();
+        var inputInteractive = !Console.IsInputRedirected;
+        var outputInteractive = !Console.IsOutputRedirected;
+
+        if (!OperatingSystem.IsWindows() && Console.IsInputRedirected && TryOpenTty(FileAccess.ReadWrite, out var ttyIn))
+        {
+            stdIn = ttyIn;
+            inputInteractive = true;
+            _ownsInput = true;
+        }
+
+        if (!OperatingSystem.IsWindows() && Console.IsOutputRedirected && TryOpenTty(FileAccess.Write, out var ttyOut))
+        {
+            stdOut = ttyOut;
+            outputInteractive = true;
+            _ownsOutput = true;
+        }
+
+        Input = stdIn;
+        Output = stdOut;
+        IsInputInteractive = inputInteractive;
+        IsOutputInteractive = outputInteractive;
         _treatControlAsInputOriginal = Console.TreatControlCAsInput;
     }
 
@@ -97,7 +118,16 @@ public sealed class ConsoleTerminalAdapter : ITerminalAdapter
     public async ValueTask DisposeAsync()
     {
         await RestoreAsync(CancellationToken.None).ConfigureAwait(false);
-        // Do not close process-wide standard streams.
+
+        if (_ownsInput)
+        {
+            await Input.DisposeAsync().ConfigureAwait(false);
+        }
+
+        if (_ownsOutput && !ReferenceEquals(Output, Input))
+        {
+            await Output.DisposeAsync().ConfigureAwait(false);
+        }
     }
 
     private void TryEnableWindowsVtModes()
@@ -172,12 +202,13 @@ public sealed class ConsoleTerminalAdapter : ITerminalAdapter
     {
         try
         {
+            var escaped = arguments.Replace("'", "'\"'\"'", StringComparison.Ordinal);
             using var process = new Process
             {
                 StartInfo = new ProcessStartInfo
                 {
-                    FileName = "stty",
-                    Arguments = arguments,
+                    FileName = "/bin/sh",
+                    Arguments = $"-c 'stty {escaped} < /dev/tty'",
                     UseShellExecute = false,
                     RedirectStandardOutput = true,
                     RedirectStandardError = true,
@@ -204,6 +235,20 @@ public sealed class ConsoleTerminalAdapter : ITerminalAdapter
         catch
         {
             return null;
+        }
+    }
+
+    private static bool TryOpenTty(FileAccess access, out Stream stream)
+    {
+        try
+        {
+            stream = new FileStream("/dev/tty", FileMode.Open, access, FileShare.ReadWrite);
+            return true;
+        }
+        catch
+        {
+            stream = Stream.Null;
+            return false;
         }
     }
 
