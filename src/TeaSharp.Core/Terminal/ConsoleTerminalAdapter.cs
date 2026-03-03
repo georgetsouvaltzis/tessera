@@ -1,4 +1,5 @@
 using System.Runtime.InteropServices;
+using System.Diagnostics;
 
 namespace TeaSharp.Core.Terminal;
 
@@ -6,6 +7,9 @@ public sealed class ConsoleTerminalAdapter : ITerminalAdapter
 {
     private const int StdInputHandle = -10;
     private const int StdOutputHandle = -11;
+    private const uint EnableProcessedInput = 0x0001;
+    private const uint EnableLineInput = 0x0002;
+    private const uint EnableEchoInput = 0x0004;
     private const uint EnableVirtualTerminalProcessing = 0x0004;
     private const uint DisableNewlineAutoReturn = 0x0008;
     private const uint EnableVirtualTerminalInput = 0x0200;
@@ -13,6 +17,7 @@ public sealed class ConsoleTerminalAdapter : ITerminalAdapter
     private readonly bool _treatControlAsInputOriginal;
     private uint _originalInputMode;
     private uint _originalOutputMode;
+    private string? _unixSttyState;
     private bool _prepared;
 
     public ConsoleTerminalAdapter()
@@ -47,6 +52,10 @@ public sealed class ConsoleTerminalAdapter : ITerminalAdapter
         {
             TryEnableWindowsVtModes();
         }
+        else
+        {
+            TryEnableUnixRawMode();
+        }
 
         _prepared = true;
         return ValueTask.CompletedTask;
@@ -61,6 +70,10 @@ public sealed class ConsoleTerminalAdapter : ITerminalAdapter
         if (OperatingSystem.IsWindows())
         {
             TryRestoreWindowsModes();
+        }
+        else
+        {
+            TryRestoreUnixMode();
         }
 
         _prepared = false;
@@ -100,7 +113,9 @@ public sealed class ConsoleTerminalAdapter : ITerminalAdapter
         if (GetConsoleMode(inputHandle, out var imode))
         {
             _originalInputMode = imode;
-            _ = SetConsoleMode(inputHandle, imode | EnableVirtualTerminalInput);
+            var nextInputMode = imode | EnableVirtualTerminalInput;
+            nextInputMode &= ~(EnableLineInput | EnableEchoInput | EnableProcessedInput);
+            _ = SetConsoleMode(inputHandle, nextInputMode);
         }
 
         if (GetConsoleMode(outputHandle, out var omode))
@@ -123,6 +138,72 @@ public sealed class ConsoleTerminalAdapter : ITerminalAdapter
         if (!IsInvalidHandle(outputHandle) && _originalOutputMode != 0)
         {
             _ = SetConsoleMode(outputHandle, _originalOutputMode);
+        }
+    }
+
+    private void TryEnableUnixRawMode()
+    {
+        if (!IsInputInteractive)
+        {
+            return;
+        }
+
+        _unixSttyState = RunStty("-g");
+        if (string.IsNullOrWhiteSpace(_unixSttyState))
+        {
+            return;
+        }
+
+        _ = RunStty("raw -echo");
+    }
+
+    private void TryRestoreUnixMode()
+    {
+        if (string.IsNullOrWhiteSpace(_unixSttyState))
+        {
+            return;
+        }
+
+        _ = RunStty(_unixSttyState);
+        _unixSttyState = null;
+    }
+
+    private static string? RunStty(string arguments)
+    {
+        try
+        {
+            using var process = new Process
+            {
+                StartInfo = new ProcessStartInfo
+                {
+                    FileName = "stty",
+                    Arguments = arguments,
+                    UseShellExecute = false,
+                    RedirectStandardOutput = true,
+                    RedirectStandardError = true,
+                    CreateNoWindow = true,
+                },
+            };
+
+            if (!process.Start())
+            {
+                return null;
+            }
+
+            var output = process.StandardOutput.ReadToEnd();
+            _ = process.StandardError.ReadToEnd();
+            process.WaitForExit();
+
+            if (process.ExitCode != 0)
+            {
+                return null;
+            }
+
+            return output.Trim();
+        }
+        catch
+        {
+            return null;
         }
     }
 
