@@ -15,6 +15,8 @@ public sealed class ConsoleTerminalAdapter : ITerminalAdapter
     private const uint EnableVirtualTerminalProcessing = 0x0004;
     private const uint DisableNewlineAutoReturn = 0x0008;
     private const uint EnableVirtualTerminalInput = 0x0200;
+    private static readonly TimeSpan PasteBurstGap = TimeSpan.FromMilliseconds(28);
+    private const int PasteBurstMinimumChars = 12;
 
     private readonly bool _treatControlAsInputOriginal;
     private readonly bool _ownsInput;
@@ -144,18 +146,37 @@ public sealed class ConsoleTerminalAdapter : ITerminalAdapter
 
     public async Task StreamConsoleKeyEventsAsync(CancellationToken cancellationToken, Action<IMessage> onEvent)
     {
+        var burst = new List<KeyPressMsg>(64);
+        DateTimeOffset lastBurstInputAt = DateTimeOffset.MinValue;
+
         while (!cancellationToken.IsCancellationRequested)
         {
             try
             {
                 if (!Console.KeyAvailable)
                 {
+                    FlushPasteBurstIfIdle(onEvent, burst, ref lastBurstInputAt);
                     await Task.Delay(10, cancellationToken).ConfigureAwait(false);
                     continue;
                 }
 
                 var key = Console.ReadKey(intercept: true);
                 var message = MapConsoleKey(key);
+                if (message is KeyPressMsg keyPress && IsPasteBurstCandidate(keyPress))
+                {
+                    var now = DateTimeOffset.UtcNow;
+                    if (burst.Count > 0 && (now - lastBurstInputAt) > PasteBurstGap)
+                    {
+                        FlushPasteBurst(onEvent, burst);
+                    }
+
+                    burst.Add(keyPress);
+                    lastBurstInputAt = now;
+                    continue;
+                }
+
+                FlushPasteBurst(onEvent, burst);
+
                 if (message is not null)
                 {
                     onEvent(message);
@@ -163,13 +184,17 @@ public sealed class ConsoleTerminalAdapter : ITerminalAdapter
             }
             catch (OperationCanceledException)
             {
+                FlushPasteBurst(onEvent, burst);
                 break;
             }
             catch (InvalidOperationException)
             {
+                FlushPasteBurst(onEvent, burst);
                 break;
             }
         }
+
+        FlushPasteBurst(onEvent, burst);
     }
 
     private void TryEnableWindowsVtModes()
@@ -498,6 +523,98 @@ public sealed class ConsoleTerminalAdapter : ITerminalAdapter
         }
 
         return new KeyPressMsg(KeyCode.Character, key.KeyChar.ToString(), modifiers);
+    }
+
+    private static void FlushPasteBurstIfIdle(Action<IMessage> onEvent, List<KeyPressMsg> burst, ref DateTimeOffset lastBurstInputAt)
+    {
+        if (burst.Count == 0)
+        {
+            return;
+        }
+
+        if ((DateTimeOffset.UtcNow - lastBurstInputAt) <= PasteBurstGap)
+        {
+            return;
+        }
+
+        FlushPasteBurst(onEvent, burst);
+        lastBurstInputAt = DateTimeOffset.MinValue;
+    }
+
+    private static void FlushPasteBurst(Action<IMessage> onEvent, List<KeyPressMsg> burst)
+    {
+        if (burst.Count == 0)
+        {
+            return;
+        }
+
+        if (TryConvertBurstToPaste(burst, out var paste))
+        {
+            onEvent(new PasteMsg(paste));
+        }
+        else
+        {
+            foreach (var key in burst)
+            {
+                onEvent(key);
+            }
+        }
+
+        burst.Clear();
+    }
+
+    private static bool IsPasteBurstCandidate(KeyPressMsg key)
+    {
+        if (key.Modifiers != KeyModifiers.None)
+        {
+            return false;
+        }
+
+        return key.Code is KeyCode.Character or KeyCode.Enter or KeyCode.Tab;
+    }
+
+    private static bool TryConvertBurstToPaste(IReadOnlyList<KeyPressMsg> burst, out string content)
+    {
+        var sb = new System.Text.StringBuilder();
+        var hasLineBreak = false;
+        var distinctChars = new HashSet<char>();
+
+        foreach (var key in burst)
+        {
+            switch (key.Code)
+            {
+                case KeyCode.Character:
+                    if (key.Text.Length > 0)
+                    {
+                        sb.Append(key.Text);
+                        foreach (var ch in key.Text)
+                        {
+                            distinctChars.Add(ch);
+                        }
+                    }
+                    break;
+                case KeyCode.Enter:
+                    sb.Append('\n');
+                    hasLineBreak = true;
+                    break;
+                case KeyCode.Tab:
+                    sb.Append('\t');
+                    break;
+            }
+        }
+
+        content = sb.ToString();
+        if (content.Length == 0)
+        {
+            return false;
+        }
+
+        if (hasLineBreak && content.Length >= 2)
+        {
+            return true;
+        }
+
+        return content.Length >= PasteBurstMinimumChars && distinctChars.Count >= 2;
     }
 
     [DllImport("kernel32.dll", SetLastError = true)]
