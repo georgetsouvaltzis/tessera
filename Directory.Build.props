@@ -1,0 +1,9 @@
+<Project>
+  <PropertyGroup>
+    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
+  </PropertyGroup>
+
+  <Target Name="EnforceNoUnsafeBlocks" BeforeTargets="CoreCompile">
+    <Error Condition="'$(AllowUnsafeBlocks)' == 'true'" Text="TeaSharp forbids unsafe code. Remove /unsafe or AllowUnsafeBlocks=true." />
+  </Target>
+</Project>

@@ -1,0 +1,70 @@
+using System.Text;
+using TeaSharp.Core.Abstractions;
+
+namespace TeaSharp.Core.Messages;
+
+[Flags]
+public enum KeyModifiers
+{
+    None = 0,
+    Shift = 1 << 0,
+    Alt = 1 << 1,
+    Ctrl = 1 << 2,
+    Meta = 1 << 3,
+}
+
+public enum KeyCode
+{
+    Unknown = 0,
+    Character,
+    Enter,
+    Tab,
+    Escape,
+    Backspace,
+    Up,
+    Down,
+    Left,
+    Right,
+    Home,
+    End,
+    PageUp,
+    PageDown,
+    Insert,
+    Delete,
+}
+
+public sealed record KeyPressMsg(
+    KeyCode Code,
+    string Text = "",
+    KeyModifiers Modifiers = KeyModifiers.None,
+    bool IsRepeat = false) : IMessage
+{
+    public string Keystroke()
+    {
+        var parts = new List<string>(4);
+        if (Modifiers.HasFlag(KeyModifiers.Ctrl)) parts.Add("ctrl");
+        if (Modifiers.HasFlag(KeyModifiers.Alt)) parts.Add("alt");
+        if (Modifiers.HasFlag(KeyModifiers.Shift)) parts.Add("shift");
+        if (Modifiers.HasFlag(KeyModifiers.Meta)) parts.Add("meta");
+
+        var key = Code == KeyCode.Character
+            ? Text
+            : Code.ToString().ToLowerInvariant();
+
+        parts.Add(string.IsNullOrEmpty(key) ? "unknown" : key);
+
+        var sb = new StringBuilder();
+        for (var i = 0; i < parts.Count; i++)
+        {
+            if (i > 0) sb.Append('+');
+            sb.Append(parts[i]);
+        }
+
+        return sb.ToString();
+    }
+}
+
+public sealed record KeyReleaseMsg(
+    KeyCode Code,
+    string Text = "",
+    KeyModifiers Modifiers = KeyModifiers.None) : IMessage;

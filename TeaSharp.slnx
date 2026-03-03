@@ -1,0 +1,12 @@
+<Solution>
+  <Folder Name="/examples/">
+    <Project Path="examples/TeaSharp.Examples/TeaSharp.Examples.csproj" />
+  </Folder>
+  <Folder Name="/src/">
+    <Project Path="src/TeaSharp.Core/TeaSharp.Core.csproj" />
+    <Project Path="src/TeaSharp/TeaSharp.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/TeaSharp.Tests/TeaSharp.Tests.csproj" />
+  </Folder>
+</Solution>
