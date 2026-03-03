@@ -4,10 +4,12 @@ using TeaSharp.Core.Application;
 using TeaSharp.Core.Messages;
 using ModelView = TeaSharp.Core.Abstractions.View;
 
-var model = new CounterModel();
+var terminal = new TeaSharp.Core.Terminal.ConsoleTerminalAdapter();
+var model = new CounterModel(terminal);
 var options = new ProgramOptions
 {
     UseConsoleKeyEvents = false,
+    Terminal = terminal,
 };
 var program = Tea.NewProgram(model, options);
 
@@ -22,12 +24,19 @@ catch (TeaProgramInterruptedException)
 
 internal sealed class CounterModel : IModel
 {
+    private readonly TeaSharp.Core.Terminal.ConsoleTerminalAdapter _terminal;
+
     private int _count;
     private int _width = 80;
     private int _height = 24;
     private bool _focused = true;
     private string _lastEvent = "none";
     private string _lastPaste = "(none)";
+
+    public CounterModel(TeaSharp.Core.Terminal.ConsoleTerminalAdapter terminal)
+    {
+        _terminal = terminal;
+    }
 
     public Command? Init() => null;
 
@@ -54,9 +63,7 @@ internal sealed class CounterModel : IModel
 
         if (message is PasteMsg paste)
         {
-            _lastPaste = paste.Content
-                .Replace("\n", "\\n", StringComparison.Ordinal)
-                .Replace("\t", "\\t", StringComparison.Ordinal);
+            _lastPaste = SanitizePastePreview(paste.Content);
             _lastEvent = $"paste: {paste.Content.Length} chars";
             return new UpdateResult(this, null);
         }
@@ -99,6 +106,8 @@ internal sealed class CounterModel : IModel
             $"Count: {_count}\n" +
             $"Focus: {(_focused ? "in" : "out")}\n" +
             $"Size: {_width}x{_height}\n" +
+            $"Raw mode active: {(_terminal.IsRawModeActive ? "yes" : "no")}\n" +
+            $"Raw mode probe: {SummarizeProbe(_terminal.RawModeDiagnostics)}\n" +
             $"Last event: {_lastEvent}\n" +
             $"Last paste: {_lastPaste}\n\n" +
             "Try live:\n" +
@@ -115,5 +124,35 @@ internal sealed class CounterModel : IModel
             EnableFocusReporting = true,
             WindowTitle = "TeaSharp Protocol Probe",
         };
+    }
+
+    private static string SanitizePastePreview(string content)
+    {
+        var sanitized = content
+            .Replace("\\", "\\\\", StringComparison.Ordinal)
+            .Replace("\r", "\\r", StringComparison.Ordinal)
+            .Replace("\n", "\\n", StringComparison.Ordinal)
+            .Replace("\t", "\\t", StringComparison.Ordinal);
+
+        return sanitized.Length <= 72
+            ? sanitized
+            : sanitized[..72] + "...";
+    }
+
+    private static string SummarizeProbe(string probe)
+    {
+        if (string.IsNullOrWhiteSpace(probe))
+        {
+            return "n/a";
+        }
+
+        var compact = probe
+            .Replace("\r", " ", StringComparison.Ordinal)
+            .Replace("\n", " ", StringComparison.Ordinal)
+            .Trim();
+
+        return compact.Length <= 64
+            ? compact
+            : compact[..64] + "...";
     }
 }

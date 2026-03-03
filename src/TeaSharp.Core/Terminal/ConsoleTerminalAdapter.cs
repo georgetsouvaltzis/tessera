@@ -22,6 +22,8 @@ public sealed class ConsoleTerminalAdapter : ITerminalAdapter
     private uint _originalInputMode;
     private uint _originalOutputMode;
     private string? _unixSttyState;
+    private string? _unixRawModeProbe;
+    private bool _unixRawModeEnabled;
     private bool _prepared;
 
     public ConsoleTerminalAdapter()
@@ -59,6 +61,10 @@ public sealed class ConsoleTerminalAdapter : ITerminalAdapter
     public bool IsInputInteractive { get; }
 
     public bool IsOutputInteractive { get; }
+
+    public bool IsRawModeActive => _unixRawModeEnabled;
+
+    public string RawModeDiagnostics => _unixRawModeProbe ?? "n/a";
 
     public ValueTask PrepareAsync(CancellationToken cancellationToken)
     {
@@ -99,6 +105,7 @@ public sealed class ConsoleTerminalAdapter : ITerminalAdapter
             TryRestoreUnixMode();
         }
 
+        _unixRawModeEnabled = false;
         _prepared = false;
         return ValueTask.CompletedTask;
     }
@@ -207,16 +214,28 @@ public sealed class ConsoleTerminalAdapter : ITerminalAdapter
     {
         if (!IsInputInteractive)
         {
+            _unixRawModeProbe = "input-not-interactive";
             return;
         }
 
         _unixSttyState = RunStty("-g");
         if (string.IsNullOrWhiteSpace(_unixSttyState))
         {
+            _unixRawModeProbe = "stty-state-unavailable";
             return;
         }
 
         _ = RunStty("raw -echo");
+        var probe = RunStty("-a");
+        if (!IsUnixRawProbeEnabled(probe))
+        {
+            // Fallback path for terminals where `raw` alias is not applied as expected.
+            _ = RunStty("-icanon min 1 time 0 -echo");
+            probe = RunStty("-a");
+        }
+
+        _unixRawModeProbe = string.IsNullOrWhiteSpace(probe) ? "probe-unavailable" : probe;
+        _unixRawModeEnabled = IsUnixRawProbeEnabled(probe);
     }
 
     private void TryRestoreUnixMode()
@@ -228,6 +247,7 @@ public sealed class ConsoleTerminalAdapter : ITerminalAdapter
 
         _ = RunStty(_unixSttyState);
         _unixSttyState = null;
+        _unixRawModeProbe = null;
     }
 
     private static string? RunStty(string arguments)
@@ -287,6 +307,17 @@ public sealed class ConsoleTerminalAdapter : ITerminalAdapter
     private static bool IsInvalidHandle(IntPtr handle)
     {
         return handle == IntPtr.Zero || handle == new IntPtr(-1);
+    }
+
+    private static bool IsUnixRawProbeEnabled(string? probe)
+    {
+        if (string.IsNullOrWhiteSpace(probe))
+        {
+            return false;
+        }
+
+        return probe.Contains("-echo", StringComparison.Ordinal)
+            && (probe.Contains("-icanon", StringComparison.Ordinal) || probe.Contains(" raw ", StringComparison.Ordinal));
     }
 
     private static IMessage? MapConsoleKey(ConsoleKeyInfo key)

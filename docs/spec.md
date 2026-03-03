@@ -90,6 +90,7 @@ Primary goal: deterministic message-driven TUI runtime with portable terminal be
 - Use standard input/output streams and console metadata.
 - If stdio is redirected but a controlling TTY exists, bind input/output to `/dev/tty`.
 - Enter `stty raw -echo` while the program runs, then restore the saved terminal state on shutdown.
+- Probe terminal mode after setup; fallback to explicit `-icanon min 1 time 0 -echo` if needed.
 
 ## 7. API Contracts (Phase 1)
 
