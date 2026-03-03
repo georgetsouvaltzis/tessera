@@ -23,6 +23,7 @@ public sealed class ConsoleTerminalAdapter : ITerminalAdapter
     private uint _originalOutputMode;
     private string? _unixSttyState;
     private string? _unixRawModeProbe;
+    private string? _unixRawModeError;
     private bool _unixRawModeEnabled;
     private bool _prepared;
 
@@ -65,6 +66,8 @@ public sealed class ConsoleTerminalAdapter : ITerminalAdapter
     public bool IsRawModeActive => _unixRawModeEnabled;
 
     public string RawModeDiagnostics => _unixRawModeProbe ?? "n/a";
+
+    public string RawModeError => _unixRawModeError ?? "none";
 
     public ValueTask PrepareAsync(CancellationToken cancellationToken)
     {
@@ -215,27 +218,38 @@ public sealed class ConsoleTerminalAdapter : ITerminalAdapter
         if (!IsInputInteractive)
         {
             _unixRawModeProbe = "input-not-interactive";
+            _unixRawModeError = "input-not-interactive";
             return;
         }
 
-        _unixSttyState = RunStty("-g");
+        _unixSttyState = RunStty("-g", out var stateError);
         if (string.IsNullOrWhiteSpace(_unixSttyState))
         {
             _unixRawModeProbe = "stty-state-unavailable";
+            _unixRawModeError = stateError ?? "state-read-failed";
             return;
         }
 
-        _ = RunStty("raw -echo");
-        var probe = RunStty("-a");
+        _ = RunStty("raw -echo", out var firstSetError);
+        var probe = RunStty("-a", out var probeError);
         if (!IsUnixRawProbeEnabled(probe))
         {
             // Fallback path for terminals where `raw` alias is not applied as expected.
-            _ = RunStty("-icanon min 1 time 0 -echo");
-            probe = RunStty("-a");
+            _ = RunStty("-icanon min 1 time 0 -echo", out var fallbackSetError);
+            probe = RunStty("-a", out probeError);
+            _unixRawModeError = fallbackSetError ?? firstSetError;
+        }
+        else
+        {
+            _unixRawModeError = firstSetError;
         }
 
         _unixRawModeProbe = string.IsNullOrWhiteSpace(probe) ? "probe-unavailable" : probe;
         _unixRawModeEnabled = IsUnixRawProbeEnabled(probe);
+        if (!_unixRawModeEnabled && string.IsNullOrWhiteSpace(_unixRawModeError))
+        {
+            _unixRawModeError = probeError ?? "probe-check-failed";
+        }
     }
 
     private void TryRestoreUnixMode()
@@ -245,49 +259,32 @@ public sealed class ConsoleTerminalAdapter : ITerminalAdapter
             return;
         }
 
-        _ = RunStty(_unixSttyState);
+        _ = RunStty(_unixSttyState, out _);
         _unixSttyState = null;
         _unixRawModeProbe = null;
+        _unixRawModeError = null;
     }
 
-    private static string? RunStty(string arguments)
+    private static string? RunStty(string arguments, out string? error)
     {
-        try
+        var explicitTtyArgs = OperatingSystem.IsMacOS()
+            ? new[] { "-f", "/dev/tty" }
+            : new[] { "-F", "/dev/tty" };
+
+        if (TryRunStty(arguments, explicitTtyArgs, out var output, out error))
         {
-            var escaped = arguments.Replace("'", "'\"'\"'", StringComparison.Ordinal);
-            using var process = new Process
-            {
-                StartInfo = new ProcessStartInfo
-                {
-                    FileName = "/bin/sh",
-                    Arguments = $"-c 'stty {escaped} < /dev/tty'",
-                    UseShellExecute = false,
-                    RedirectStandardOutput = true,
-                    RedirectStandardError = true,
-                    CreateNoWindow = true,
-                },
-            };
-
-            if (!process.Start())
-            {
-                return null;
-            }
-
-            var output = process.StandardOutput.ReadToEnd();
-            _ = process.StandardError.ReadToEnd();
-            process.WaitForExit();
-
-            if (process.ExitCode != 0)
-            {
-                return null;
-            }
-
             return output.Trim();
         }
-        catch
+
+        // Fallback: rely on inherited stdin if explicit tty flag is unsupported.
+        if (TryRunStty(arguments, null, out output, out var fallbackError))
         {
-            return null;
+            error = null;
+            return output.Trim();
         }
+
+        error = fallbackError ?? error;
+        return null;
     }
 
     private static bool TryOpenTty(FileAccess access, out Stream stream)
@@ -318,6 +315,65 @@ public sealed class ConsoleTerminalAdapter : ITerminalAdapter
 
         return probe.Contains("-echo", StringComparison.Ordinal)
             && (probe.Contains("-icanon", StringComparison.Ordinal) || probe.Contains(" raw ", StringComparison.Ordinal));
+    }
+
+    private static bool TryRunStty(string arguments, string[]? explicitTtyArgs, out string output, out string? error)
+    {
+        output = string.Empty;
+        error = null;
+
+        try
+        {
+            using var process = new Process
+            {
+                StartInfo = new ProcessStartInfo
+                {
+                    FileName = "stty",
+                    UseShellExecute = false,
+                    RedirectStandardOutput = true,
+                    RedirectStandardError = true,
+                    CreateNoWindow = true,
+                },
+            };
+
+            if (explicitTtyArgs is not null)
+            {
+                foreach (var arg in explicitTtyArgs)
+                {
+                    process.StartInfo.ArgumentList.Add(arg);
+                }
+            }
+
+            foreach (var arg in arguments.Split(' ', StringSplitOptions.RemoveEmptyEntries))
+            {
+                process.StartInfo.ArgumentList.Add(arg);
+            }
+
+            if (!process.Start())
+            {
+                error = "stty-start-failed";
+                return false;
+            }
+
+            output = process.StandardOutput.ReadToEnd();
+            var stdErr = process.StandardError.ReadToEnd().Trim();
+            process.WaitForExit();
+
+            if (process.ExitCode != 0)
+            {
+                error = string.IsNullOrWhiteSpace(stdErr)
+                    ? $"stty-exit-{process.ExitCode}"
+                    : $"stty-exit-{process.ExitCode}: {stdErr}";
+                return false;
+            }
+
+            return true;
+        }
+        catch (Exception ex)
+        {
+            error = $"stty-exception: {ex.Message}";
+            return false;
+        }
     }
 
     private static IMessage? MapConsoleKey(ConsoleKeyInfo key)

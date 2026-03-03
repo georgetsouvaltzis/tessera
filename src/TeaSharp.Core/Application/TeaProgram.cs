@@ -185,7 +185,8 @@ public sealed class TeaProgram
             return null;
         }
 
-        if (_terminal is ConsoleTerminalAdapter consoleTerminal && _options.UseConsoleKeyEvents)
+        if (_terminal is ConsoleTerminalAdapter consoleTerminal
+            && (_options.UseConsoleKeyEvents || !consoleTerminal.IsRawModeActive))
         {
             return Task.Run(() => consoleTerminal.StreamConsoleKeyEventsAsync(token, Send), token);
         }

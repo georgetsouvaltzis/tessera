@@ -108,6 +108,8 @@ internal sealed class CounterModel : IModel
             $"Size: {_width}x{_height}\n" +
             $"Raw mode active: {(_terminal.IsRawModeActive ? "yes" : "no")}\n" +
             $"Raw mode probe: {SummarizeProbe(_terminal.RawModeDiagnostics)}\n" +
+            $"Raw mode error: {SummarizeProbe(_terminal.RawModeError)}\n" +
+            $"Input backend: {(_terminal.IsRawModeActive ? "vt-bytes" : "console-keys-fallback")}\n" +
             $"Last event: {_lastEvent}\n" +
             $"Last paste: {_lastPaste}\n\n" +
             "Try live:\n" +
