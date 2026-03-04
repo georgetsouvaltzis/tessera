@@ -10,6 +10,7 @@ internal static class EventDecoderGoldenTests
     public static IEnumerable<TestCase> Cases()
     {
         yield return new TestCase("Decoder_ArrowAndNavigationKeys_Parse", ArrowAndNavigationSequences_ParseExpectedKeys);
+        yield return new TestCase("Decoder_EnhancedKeyboardSequences_Parse", EnhancedKeyboardSequences_ParseExpectedKeys);
         yield return new TestCase("Decoder_PasteBoundaryMarkers_Parse", PasteBoundaryMarkers_ParseExpectedMessages);
         yield return new TestCase("Decoder_FocusMarkers_Parse", FocusMarkers_ParseExpectedMessages);
         yield return new TestCase("Decoder_WindowResizeSequence_Parses", WindowResizeSequence_ParsesExpectedSize);
@@ -47,6 +48,27 @@ internal static class EventDecoderGoldenTests
         AssertKey(home, KeyCode.Home);
         AssertKey(end, KeyCode.End);
         AssertKey(altK, KeyCode.Character, KeyModifiers.Alt, "k");
+        return Task.CompletedTask;
+    }
+
+    private static Task EnhancedKeyboardSequences_ParseExpectedKeys()
+    {
+        // Arrange
+        var decoder = new EventDecoder();
+
+        // Act
+        var modifyOtherCtrlShiftA = Decode(decoder, "\u001b[27;6;97~");
+        var modifyOtherAltBracket = Decode(decoder, "\u001b[27;3;91~");
+        var csiUCtrlK = Decode(decoder, "\u001b[107;5u");
+        var csiUShiftTab = Decode(decoder, "\u001b[9;2u");
+        var csiUEscape = Decode(decoder, "\u001b[27;1u");
+
+        // Assert
+        AssertKey(modifyOtherCtrlShiftA, KeyCode.Character, KeyModifiers.Shift | KeyModifiers.Ctrl, "a");
+        AssertKey(modifyOtherAltBracket, KeyCode.Character, KeyModifiers.Alt, "[");
+        AssertKey(csiUCtrlK, KeyCode.Character, KeyModifiers.Ctrl, "k");
+        AssertKey(csiUShiftTab, KeyCode.Tab, KeyModifiers.Shift);
+        AssertKey(csiUEscape, KeyCode.Escape);
         return Task.CompletedTask;
     }
 

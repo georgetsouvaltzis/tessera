@@ -235,6 +235,11 @@ public sealed class EventDecoder
             return true;
         }
 
+        if (final == 'u' && TryDecodeCsiUnicodeKey(parameters, out message))
+        {
+            return true;
+        }
+
         if (CsiCursorFinals.Contains(final) && TryDecodeCsiCursorKey(final, parameters, out message))
         {
             return true;
@@ -424,6 +429,14 @@ public sealed class EventDecoder
             return false;
         }
 
+        if (code == 27 && parameters.Count >= 3 && parameters[2] is int modifyOtherKeyCodePoint)
+        {
+            return TryCreateKeyMessageFromCodePoint(
+                modifyOtherKeyCodePoint,
+                ParseModifiers(parameters[1]),
+                out message);
+        }
+
         var keyCode = code switch
         {
             1 or 7 => KeyCode.Home,
@@ -445,6 +458,45 @@ public sealed class EventDecoder
             : KeyModifiers.None;
 
         message = new KeyPressMsg(keyCode, string.Empty, modifiers);
+        return true;
+    }
+
+    private static bool TryDecodeCsiUnicodeKey(IReadOnlyList<int?> parameters, out IMessage? message)
+    {
+        message = null;
+        if (parameters.Count == 0 || parameters[0] is not int codePoint)
+        {
+            return false;
+        }
+
+        var modifiers = parameters.Count > 1
+            ? ParseModifiers(parameters[1])
+            : KeyModifiers.None;
+
+        return TryCreateKeyMessageFromCodePoint(codePoint, modifiers, out message);
+    }
+
+    private static bool TryCreateKeyMessageFromCodePoint(int codePoint, KeyModifiers modifiers, out IMessage? message)
+    {
+        message = null;
+        if (!Rune.IsValid(codePoint))
+        {
+            return false;
+        }
+
+        var keyCode = codePoint switch
+        {
+            9 => KeyCode.Tab,
+            10 or 13 => KeyCode.Enter,
+            27 => KeyCode.Escape,
+            127 => KeyCode.Backspace,
+            _ => KeyCode.Character,
+        };
+
+        message = keyCode == KeyCode.Character
+            ? new KeyPressMsg(KeyCode.Character, new Rune(codePoint).ToString(), modifiers)
+            : new KeyPressMsg(keyCode, string.Empty, modifiers);
+
         return true;
     }
 

@@ -186,6 +186,7 @@ internal sealed class CounterModel : IModel
             "- move/click mouse in terminal window\n" +
             "- press s to toggle render stress mode\n" +
             "- type text; backspace and enter work\n" +
+            "- try alt+letter or ctrl+shift+letter to verify enhanced key decode\n" +
             "- paste multi-line text (cmd+v/ctrl+v/right-click)\n" +
             "- hold a key or paste large text; events should stay responsive\n" +
             "- switch terminal focus away/back\n" +
