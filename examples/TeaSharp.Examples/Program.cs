@@ -248,7 +248,7 @@ internal sealed class CounterModel : IModel
         {
             _tickCount++;
             AppendSparkSample();
-            if (_stressMode && _tickCount % 20 == 0)
+            if (_stressMode && _tickCount % 80 == 0)
             {
                 AppendLog($"pulse {_tickCount}: count={_count} focus={(_focused ? "in" : "out")}");
             }
@@ -444,6 +444,7 @@ internal sealed class CounterModel : IModel
         if (string.Equals(command, "clear", StringComparison.OrdinalIgnoreCase))
         {
             _eventLog.Clear();
+            _logViewport.Clear();
             AppendLog("log cleared");
             return;
         }
@@ -465,13 +466,16 @@ internal sealed class CounterModel : IModel
 
     private void AppendLog(string line)
     {
-        _eventLog.Add($"[{DateTimeOffset.Now:HH:mm:ss}] {line}");
+        var entry = $"[{DateTimeOffset.Now:HH:mm:ss}] {line}";
+        _eventLog.Add(entry);
+        _logViewport.AppendLine(entry);
         if (_eventLog.Count > 240)
         {
-            _eventLog.RemoveAt(0);
+            var removeCount = _eventLog.Count - 240;
+            _eventLog.RemoveRange(0, removeCount);
+            _logViewport.SetContent(string.Join('\n', _eventLog));
         }
 
-        _logViewport.SetContent(string.Join('\n', _eventLog));
         _logViewport.ScrollToBottom();
     }
 
@@ -713,7 +717,7 @@ internal sealed class CounterModel : IModel
 
     private Command NextTickCommand(bool stressMode)
     {
-        var delay = stressMode ? TimeSpan.FromMilliseconds(30) : TimeSpan.FromMilliseconds(150);
+        var delay = stressMode ? TimeSpan.FromMilliseconds(45) : TimeSpan.FromMilliseconds(150);
         return Tea.Cmd.Tick(delay, _ => new DashboardTickMsg());
     }
 

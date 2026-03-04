@@ -55,6 +55,33 @@ public sealed class EventDecoder
 
     private static DecodeResult DecodeAltSequence(ReadOnlySpan<byte> buffer, bool timeoutExpired)
     {
+        if (buffer.Length >= 2)
+        {
+            var second = buffer[1];
+            if (second == 0x7F || second == 0x08)
+            {
+                return new DecodeResult(2, new KeyPressMsg(KeyCode.Backspace, string.Empty, KeyModifiers.Alt), false);
+            }
+
+            if (second == 0x09)
+            {
+                return new DecodeResult(2, new KeyPressMsg(KeyCode.Tab, string.Empty, KeyModifiers.Alt), false);
+            }
+
+            if (second is 0x0A or 0x0D)
+            {
+                return new DecodeResult(2, new KeyPressMsg(KeyCode.Enter, string.Empty, KeyModifiers.Alt), false);
+            }
+
+            if (TryDecodeControlByte(second, out var controlMessage) && controlMessage is KeyPressMsg controlKey)
+            {
+                return new DecodeResult(
+                    2,
+                    controlKey with { Modifiers = controlKey.Modifiers | KeyModifiers.Alt },
+                    false);
+            }
+        }
+
         if (TryDecodeRune(buffer[1..], out var ch, out var runeLen, out var needMoreData))
         {
             return new DecodeResult(1 + runeLen, new KeyPressMsg(KeyCode.Character, ch, KeyModifiers.Alt), false);

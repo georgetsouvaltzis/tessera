@@ -6,6 +6,9 @@ namespace TeaSharp.Widgets;
 public sealed class ViewportModel
 {
     private readonly List<string> _sourceLines = [];
+    private readonly List<string> _visualLinesCache = [];
+    private int _maxVisualWidth;
+    private bool _visualCacheDirty = true;
 
     public int Width { get; private set; } = 1;
 
@@ -19,14 +22,26 @@ public sealed class ViewportModel
 
     public void Resize(int width, int height)
     {
+        var previousWidth = Width;
         Width = Math.Max(1, width);
         Height = Math.Max(1, height);
+        if (Wrap && previousWidth != Width)
+        {
+            _visualCacheDirty = true;
+        }
+
         ClampOffsets();
     }
 
     public void SetWrap(bool wrap)
     {
+        if (Wrap == wrap)
+        {
+            return;
+        }
+
         Wrap = wrap;
+        _visualCacheDirty = true;
         ClampOffsets();
     }
 
@@ -37,18 +52,23 @@ public sealed class ViewportModel
             .Replace("\r\n", "\n", StringComparison.Ordinal)
             .Replace('\r', '\n');
         _sourceLines.AddRange(normalized.Split('\n'));
+        _visualCacheDirty = true;
         ClampOffsets();
     }
 
     public void AppendLine(string line)
     {
         _sourceLines.Add(line.Replace('\n', ' ').Replace('\r', ' '));
+        _visualCacheDirty = true;
         ClampOffsets();
     }
 
     public void Clear()
     {
         _sourceLines.Clear();
+        _visualLinesCache.Clear();
+        _maxVisualWidth = 0;
+        _visualCacheDirty = false;
         XOffset = 0;
         YOffset = 0;
     }
@@ -72,7 +92,7 @@ public sealed class ViewportModel
 
     public void ScrollToBottom()
     {
-        YOffset = Math.Max(0, BuildVisualLines().Count - Height);
+        YOffset = Math.Max(0, GetVisualLines().Count - Height);
         ClampOffsets();
     }
 
@@ -134,7 +154,7 @@ public sealed class ViewportModel
 
     public IReadOnlyList<string> RenderLines()
     {
-        var visualLines = BuildVisualLines();
+        var visualLines = GetVisualLines();
         if (visualLines.Count == 0)
         {
             return [string.Empty];
@@ -176,47 +196,69 @@ public sealed class ViewportModel
             return string.Empty;
         }
 
+        if (XOffset == 0 && line.Length <= Width)
+        {
+            return line;
+        }
+
         var remaining = line.Length - XOffset;
         var length = Math.Min(Width, remaining);
         return line.Substring(XOffset, length);
     }
 
-    private List<string> BuildVisualLines()
+    private IReadOnlyList<string> GetVisualLines()
     {
-        var lines = new List<string>(Math.Max(1, _sourceLines.Count));
+        if (!_visualCacheDirty)
+        {
+            return _visualLinesCache;
+        }
+
+        _visualLinesCache.Clear();
+        _maxVisualWidth = 0;
+
         if (_sourceLines.Count == 0)
         {
-            lines.Add(string.Empty);
-            return lines;
+            _visualLinesCache.Add(string.Empty);
+            _maxVisualWidth = 0;
+            _visualCacheDirty = false;
+            return _visualLinesCache;
         }
 
         if (!Wrap || Width <= 0)
         {
-            lines.AddRange(_sourceLines);
-            return lines;
+            foreach (var line in _sourceLines)
+            {
+                _visualLinesCache.Add(line);
+                _maxVisualWidth = Math.Max(_maxVisualWidth, line.Length);
+            }
+
+            _visualCacheDirty = false;
+            return _visualLinesCache;
         }
 
         foreach (var sourceLine in _sourceLines)
         {
             if (sourceLine.Length == 0)
             {
-                lines.Add(string.Empty);
+                _visualLinesCache.Add(string.Empty);
                 continue;
             }
 
             for (var i = 0; i < sourceLine.Length; i += Width)
             {
                 var length = Math.Min(Width, sourceLine.Length - i);
-                lines.Add(sourceLine.Substring(i, length));
+                _visualLinesCache.Add(sourceLine.Substring(i, length));
+                _maxVisualWidth = Math.Max(_maxVisualWidth, length);
             }
         }
 
-        return lines;
+        _visualCacheDirty = false;
+        return _visualLinesCache;
     }
 
     private void ClampOffsets()
     {
-        var lines = BuildVisualLines();
+        var lines = GetVisualLines();
         var maxY = Math.Max(0, lines.Count - Height);
         YOffset = Math.Clamp(YOffset, 0, maxY);
 
@@ -226,13 +268,7 @@ public sealed class ViewportModel
             return;
         }
 
-        var maxWidth = 0;
-        foreach (var line in lines)
-        {
-            maxWidth = Math.Max(maxWidth, line.Length);
-        }
-
-        var maxX = Math.Max(0, maxWidth - Width);
+        var maxX = Math.Max(0, _maxVisualWidth - Width);
         XOffset = Math.Clamp(XOffset, 0, maxX);
     }
 }

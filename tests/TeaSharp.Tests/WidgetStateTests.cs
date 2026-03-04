@@ -12,6 +12,7 @@ internal static class WidgetStateTests
         yield return new TestCase("Widgets_Viewport_ScrollAndHorizontalOffset", Viewport_ScrollAndHorizontalOffset);
         yield return new TestCase("Widgets_Viewport_WrapMode_SoftWrapsRows", Viewport_WrapMode_SoftWrapsRows);
         yield return new TestCase("Widgets_TextInput_EditWordAndSubmit", TextInput_EditWordAndSubmit);
+        yield return new TestCase("Widgets_TextInput_AltBindings_WorkForWordOps", TextInput_AltBindings_WorkForWordOps);
         yield return new TestCase("Widgets_TextInput_SelectAllThenPaste_ReplacesValue", TextInput_SelectAllThenPaste_ReplacesValue);
         yield return new TestCase("Widgets_List_FilterAndPaging_MaintainSelection", List_FilterAndPaging_MaintainSelection);
     }
@@ -125,6 +126,24 @@ internal static class WidgetStateTests
 
         // Assert
         TestAssert.Equal("z", input.Value, "Pasting with active selection should replace selected text.");
+        return Task.CompletedTask;
+    }
+
+    private static Task TextInput_AltBindings_WorkForWordOps()
+    {
+        // Arrange
+        var input = new TextInputModel();
+        var keyMap = TextInputKeyMap.Default;
+        input.SetValue("alpha beta gamma");
+        input.Update(new KeyPressMsg(KeyCode.End), keyMap);
+
+        // Act
+        input.Update(new KeyPressMsg(KeyCode.Character, "b", KeyModifiers.Alt), keyMap);
+        input.Update(new KeyPressMsg(KeyCode.Backspace, Modifiers: KeyModifiers.Alt), keyMap);
+        input.Update(new KeyPressMsg(KeyCode.Character, "d", KeyModifiers.Alt), keyMap);
+
+        // Assert
+        TestAssert.Equal("alpha ", input.Value, "Alt+b, alt+backspace and alt+d should navigate/delete by word.");
         return Task.CompletedTask;
     }
 

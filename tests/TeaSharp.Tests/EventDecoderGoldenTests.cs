@@ -12,6 +12,7 @@ internal static class EventDecoderGoldenTests
         yield return new TestCase("Decoder_ArrowAndNavigationKeys_Parse", ArrowAndNavigationSequences_ParseExpectedKeys);
         yield return new TestCase("Decoder_EnhancedKeyboardSequences_Parse", EnhancedKeyboardSequences_ParseExpectedKeys);
         yield return new TestCase("Decoder_ControlByteKeys_Parse", ControlByteKeys_ParseExpectedKeys);
+        yield return new TestCase("Decoder_AltControlSequences_Parse", AltControlSequences_ParseExpectedKeys);
         yield return new TestCase("Decoder_PasteBoundaryMarkers_Parse", PasteBoundaryMarkers_ParseExpectedMessages);
         yield return new TestCase("Decoder_FocusMarkers_Parse", FocusMarkers_ParseExpectedMessages);
         yield return new TestCase("Decoder_WindowResizeSequence_Parses", WindowResizeSequence_ParsesExpectedSize);
@@ -87,6 +88,25 @@ internal static class EventDecoderGoldenTests
         AssertKey(ctrlA, KeyCode.Character, KeyModifiers.Ctrl, "a");
         AssertKey(ctrlK, KeyCode.Character, KeyModifiers.Ctrl, "k");
         AssertKey(ctrlBracket, KeyCode.Character, KeyModifiers.Ctrl, "]");
+        return Task.CompletedTask;
+    }
+
+    private static Task AltControlSequences_ParseExpectedKeys()
+    {
+        // Arrange
+        var decoder = new EventDecoder();
+
+        // Act
+        var altBackspaceDel = decoder.Decode(new byte[] { 0x1B, 0x7F }, timeoutExpired: false);
+        var altBackspaceCtrlH = decoder.Decode(new byte[] { 0x1B, 0x08 }, timeoutExpired: false);
+        var altCtrlA = decoder.Decode(new byte[] { 0x1B, 0x01 }, timeoutExpired: false);
+        var altTab = decoder.Decode(new byte[] { 0x1B, 0x09 }, timeoutExpired: false);
+
+        // Assert
+        AssertKey(altBackspaceDel, KeyCode.Backspace, KeyModifiers.Alt);
+        AssertKey(altBackspaceCtrlH, KeyCode.Backspace, KeyModifiers.Alt);
+        AssertKey(altCtrlA, KeyCode.Character, KeyModifiers.Alt | KeyModifiers.Ctrl, "a");
+        AssertKey(altTab, KeyCode.Tab, KeyModifiers.Alt);
         return Task.CompletedTask;
     }
 
