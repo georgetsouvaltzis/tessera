@@ -45,7 +45,7 @@ Legend: `done` = implemented, `partial` = usable but incomplete, `todo` = not im
 | Area | Bubble Tea Capability | TeaSharp | Notes |
 |---|---|---|---|
 | ANSI output | VT rendering | done | ANSI renderer active. |
-| Diff rendering | efficient incremental updates | partial | Line-level diff only; no cell buffer parity. |
+| Diff rendering | efficient incremental updates | partial | Cell-run diff is implemented; full cell-buffer/style width parity still pending. |
 | Alt screen | alternate buffer enter/leave | done | `View.AltScreen` implemented. |
 | Cursor visibility/position | cursor control | partial | Show/hide + absolute position supported; no style/blink parity. |
 | Synchronized updates | synchronized paint | partial | Enable code emitted; disable/end semantics incomplete. |

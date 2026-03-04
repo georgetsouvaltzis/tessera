@@ -11,6 +11,9 @@ internal static class RendererBehaviorTests
         yield return new TestCase("Renderer_MouseModeCellMotion_EmitsEnableSequences", MouseModeCellMotion_EmitsEnableSequences);
         yield return new TestCase("Renderer_MouseModeAllMotion_EmitsEnableSequences", MouseModeAllMotion_EmitsEnableSequences);
         yield return new TestCase("Renderer_Reset_DisablesMouseModes", Reset_DisablesMouseModes);
+        yield return new TestCase("Renderer_CellDiff_UpdatesOnlyChangedCellRun", CellDiff_UpdatesOnlyChangedCellRun);
+        yield return new TestCase("Renderer_CellDiff_ClearsShortenedLineTail", CellDiff_ClearsShortenedLineTail);
+        yield return new TestCase("Renderer_Resize_ClipsToWidth", Resize_ClipsToWidth);
     }
 
     private static async Task MouseModeCellMotion_EmitsEnableSequences()
@@ -72,9 +75,79 @@ internal static class RendererBehaviorTests
         AssertContains(rendered, "\u001b[?1006l");
     }
 
+    private static async Task CellDiff_UpdatesOnlyChangedCellRun()
+    {
+        // Arrange
+        await using var renderer = new AnsiDiffRenderer();
+        await using var output = new MemoryStream();
+        await renderer.InitializeAsync(output, CancellationToken.None);
+        renderer.Render(View.From("abc"));
+        await renderer.FlushAsync(CancellationToken.None);
+        var marker = output.Length;
+
+        // Act
+        renderer.Render(View.From("axc"));
+        await renderer.FlushAsync(CancellationToken.None);
+        var patch = ReadUtf8(output, marker);
+
+        // Assert
+        AssertContains(patch, "\u001b[1;2H");
+        AssertContains(patch, "x");
+        AssertDoesNotContain(patch, "\u001b[1;1Haxc");
+    }
+
+    private static async Task CellDiff_ClearsShortenedLineTail()
+    {
+        // Arrange
+        await using var renderer = new AnsiDiffRenderer();
+        await using var output = new MemoryStream();
+        await renderer.InitializeAsync(output, CancellationToken.None);
+        renderer.Render(View.From("hello"));
+        await renderer.FlushAsync(CancellationToken.None);
+        var marker = output.Length;
+
+        // Act
+        renderer.Render(View.From("he"));
+        await renderer.FlushAsync(CancellationToken.None);
+        var patch = ReadUtf8(output, marker);
+
+        // Assert
+        AssertContains(patch, "\u001b[1;3H");
+        AssertContains(patch, "   ");
+    }
+
+    private static async Task Resize_ClipsToWidth()
+    {
+        // Arrange
+        await using var renderer = new AnsiDiffRenderer();
+        await using var output = new MemoryStream();
+        await renderer.InitializeAsync(output, CancellationToken.None);
+        renderer.Resize(width: 3, height: 5);
+
+        // Act
+        renderer.Render(View.From("abcdef"));
+        await renderer.FlushAsync(CancellationToken.None);
+        var rendered = ReadUtf8(output);
+
+        // Assert
+        AssertContains(rendered, "abc");
+        AssertDoesNotContain(rendered, "abcdef");
+    }
+
     private static string ReadUtf8(MemoryStream output)
     {
         return Encoding.UTF8.GetString(output.ToArray());
+    }
+
+    private static string ReadUtf8(MemoryStream output, long offset)
+    {
+        var bytes = output.ToArray();
+        if (offset >= bytes.Length)
+        {
+            return string.Empty;
+        }
+
+        return Encoding.UTF8.GetString(bytes.AsSpan((int)offset));
     }
 
     private static void AssertContains(string actual, string expectedFragment)
@@ -82,6 +155,14 @@ internal static class RendererBehaviorTests
         if (!actual.Contains(expectedFragment, StringComparison.Ordinal))
         {
             throw new InvalidOperationException($"Expected output to contain '{Escape(expectedFragment)}'.");
+        }
+    }
+
+    private static void AssertDoesNotContain(string actual, string fragment)
+    {
+        if (actual.Contains(fragment, StringComparison.Ordinal))
+        {
+            throw new InvalidOperationException($"Expected output to exclude '{Escape(fragment)}'.");
         }
     }
 

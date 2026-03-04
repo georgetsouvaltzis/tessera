@@ -18,6 +18,8 @@ public sealed class AnsiDiffRenderer : IProgramRenderer
     private bool _synchronizedUpdates;
     private MouseMode _mouseMode;
     private string? _windowTitle;
+    private int _width;
+    private int _height;
 
     public ValueTask InitializeAsync(Stream output, CancellationToken cancellationToken)
     {
@@ -35,6 +37,8 @@ public sealed class AnsiDiffRenderer : IProgramRenderer
         _synchronizedUpdates = false;
         _mouseMode = MouseMode.None;
         _windowTitle = null;
+        _width = 0;
+        _height = 0;
 
         _ = cancellationToken;
         return ValueTask.CompletedTask;
@@ -42,8 +46,8 @@ public sealed class AnsiDiffRenderer : IProgramRenderer
 
     public void Resize(int width, int height)
     {
-        _ = width;
-        _ = height;
+        _width = width;
+        _height = height;
     }
 
     public void Render(View view)
@@ -100,23 +104,8 @@ public sealed class AnsiDiffRenderer : IProgramRenderer
             _windowTitle = _currentView.WindowTitle;
         }
 
-        var lines = NormalizeLines(_currentView.Content);
-        var max = Math.Max(lines.Count, _previousLines.Count);
-
-        for (var i = 0; i < max; i++)
-        {
-            var next = i < lines.Count ? lines[i] : string.Empty;
-            var prev = i < _previousLines.Count ? _previousLines[i] : null;
-
-            if (prev is not null && string.Equals(prev, next, StringComparison.Ordinal))
-            {
-                continue;
-            }
-
-            await _writer.WriteAsync($"\u001b[{i + 1};1H").ConfigureAwait(false);
-            await _writer.WriteAsync(next).ConfigureAwait(false);
-            await _writer.WriteAsync("\u001b[K").ConfigureAwait(false);
-        }
+        var lines = PrepareLines(_currentView.Content);
+        await WriteFrameDiffAsync(lines).ConfigureAwait(false);
 
         if (_currentView.CursorX is int x && _currentView.CursorY is int y)
         {
@@ -206,6 +195,118 @@ public sealed class AnsiDiffRenderer : IProgramRenderer
 
         content = content.Replace("\r\n", "\n", StringComparison.Ordinal).Replace('\r', '\n');
         return [.. content.Split('\n')];
+    }
+
+    private List<string> PrepareLines(string content)
+    {
+        var lines = NormalizeLines(content);
+        if (_height > 0 && lines.Count > _height)
+        {
+            lines = lines.GetRange(0, _height);
+        }
+
+        if (_width <= 0)
+        {
+            return lines;
+        }
+
+        for (var i = 0; i < lines.Count; i++)
+        {
+            var line = lines[i];
+            if (line.Length > _width)
+            {
+                lines[i] = line[.._width];
+            }
+        }
+
+        return lines;
+    }
+
+    private async Task WriteFrameDiffAsync(List<string> nextLines)
+    {
+        if (_writer is null)
+        {
+            return;
+        }
+
+        var rowCount = Math.Max(_previousLines.Count, nextLines.Count);
+        if (_height > 0 && rowCount > _height)
+        {
+            rowCount = _height;
+        }
+
+        for (var row = 0; row < rowCount; row++)
+        {
+            var previousLine = row < _previousLines.Count ? _previousLines[row] : string.Empty;
+            var nextLine = row < nextLines.Count ? nextLines[row] : string.Empty;
+            if (string.Equals(previousLine, nextLine, StringComparison.Ordinal))
+            {
+                continue;
+            }
+
+            await WriteRowDiffAsync(row, previousLine, nextLine).ConfigureAwait(false);
+        }
+    }
+
+    private async Task WriteRowDiffAsync(int row, string previousLine, string nextLine)
+    {
+        if (_writer is null)
+        {
+            return;
+        }
+
+        var max = Math.Max(previousLine.Length, nextLine.Length);
+        var runStart = -1;
+
+        for (var column = 0; column < max; column++)
+        {
+            var previous = column < previousLine.Length ? previousLine[column] : ' ';
+            var next = column < nextLine.Length ? nextLine[column] : ' ';
+            var changed = previous != next;
+
+            if (changed && runStart < 0)
+            {
+                runStart = column;
+                continue;
+            }
+
+            if (!changed && runStart >= 0)
+            {
+                await WriteRunAsync(row, runStart, column, nextLine).ConfigureAwait(false);
+                runStart = -1;
+            }
+        }
+
+        if (runStart >= 0)
+        {
+            await WriteRunAsync(row, runStart, max, nextLine).ConfigureAwait(false);
+        }
+    }
+
+    private async Task WriteRunAsync(int row, int startColumn, int endColumn, string nextLine)
+    {
+        if (_writer is null)
+        {
+            return;
+        }
+
+        await _writer.WriteAsync($"\u001b[{row + 1};{startColumn + 1}H").ConfigureAwait(false);
+
+        if (startColumn < nextLine.Length)
+        {
+            var textLength = Math.Min(endColumn, nextLine.Length) - startColumn;
+            if (textLength > 0)
+            {
+                await _writer.WriteAsync(nextLine.AsMemory(startColumn, textLength)).ConfigureAwait(false);
+            }
+        }
+
+        var paddingStart = Math.Max(startColumn, nextLine.Length);
+        var padding = endColumn - paddingStart;
+        if (padding > 0)
+        {
+            await _writer.WriteAsync(new string(' ', padding)).ConfigureAwait(false);
+        }
     }
 
     private Task WriteMouseModeAsync(MouseMode mode)

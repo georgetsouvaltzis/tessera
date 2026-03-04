@@ -33,6 +33,8 @@ internal sealed class CounterModel : IModel
     private string _lastEvent = "none";
     private string _lastPaste = "(none)";
     private string _typedText = string.Empty;
+    private bool _stressMode;
+    private int _pulseCount;
 
     public CounterModel(TeaSharp.Core.Terminal.ConsoleTerminalAdapter terminal)
     {
@@ -57,6 +59,12 @@ internal sealed class CounterModel : IModel
                      || ((key.Text == "c" || key.Text == "\u0003") && key.Modifiers.HasFlag(KeyModifiers.Ctrl)))
             {
                 return new UpdateResult(this, Tea.Cmd.Quit);
+            }
+            else if (key.Text == "s" && key.Modifiers == KeyModifiers.None)
+            {
+                _stressMode = !_stressMode;
+                _lastEvent = $"stress: {(_stressMode ? "on" : "off")}";
+                return new UpdateResult(this, _stressMode ? NextPulseCommand() : null);
             }
             else if (key.Modifiers == KeyModifiers.None && key.Code == KeyCode.Character && !string.IsNullOrEmpty(key.Text))
             {
@@ -111,6 +119,17 @@ internal sealed class CounterModel : IModel
             return new UpdateResult(this, null);
         }
 
+        if (message is RenderPulseMsg)
+        {
+            if (!_stressMode)
+            {
+                return new UpdateResult(this, null);
+            }
+
+            _pulseCount++;
+            return new UpdateResult(this, NextPulseCommand());
+        }
+
         if (message is UnknownInputMsg unknown)
         {
             _lastEvent = $"unknown: {unknown.Raw}";
@@ -133,12 +152,14 @@ internal sealed class CounterModel : IModel
             $"Input backend: {(_terminal.IsRawModeActive ? "vt-bytes" : "console-keys-fallback")}\n" +
             $"Focus events: {(_terminal.IsRawModeActive ? "expected (if terminal supports ?1004)" : "not available in fallback mode")}\n" +
             $"Mouse events: {(_terminal.IsRawModeActive ? "expected (if terminal supports ?1006)" : "not available in fallback mode")}\n" +
+            $"Stress mode: {(_stressMode ? "on" : "off")} (pulses: {_pulseCount})\n" +
             $"Last event: {_lastEvent}\n" +
             $"Last paste: {_lastPaste}\n" +
             $"Typed text: {SanitizePastePreview(_typedText)}\n\n" +
             "Try live:\n" +
             "- up/down to change count\n" +
             "- move/click mouse in terminal window\n" +
+            "- press s to toggle render stress mode\n" +
             "- type text; backspace and enter work\n" +
             "- paste multi-line text (cmd+v/ctrl+v/right-click)\n" +
             "- switch terminal focus away/back\n" +
@@ -153,6 +174,11 @@ internal sealed class CounterModel : IModel
             MouseMode = MouseMode.AllMotion,
             WindowTitle = "TeaSharp Protocol Probe",
         };
+    }
+
+    private static Command NextPulseCommand()
+    {
+        return Tea.Cmd.Tick(TimeSpan.FromMilliseconds(35), _ => new RenderPulseMsg());
     }
 
     private static string SanitizePastePreview(string content)
@@ -185,3 +211,5 @@ internal sealed class CounterModel : IModel
             : compact[..160] + "...";
     }
 }
+
+internal sealed record RenderPulseMsg : IMessage;
