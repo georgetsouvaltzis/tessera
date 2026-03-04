@@ -1,6 +1,6 @@
 # TeaSharp Components
 
-TeaSharp now includes a lightweight component drawing API in `TeaSharp.Components` for deterministic terminal UI composition.
+TeaSharp includes a deterministic component drawing layer in `TeaSharp.Components` for building Bubble Tea-style terminal layouts.
 
 ## Motivation
 
@@ -17,6 +17,10 @@ The design follows patterns used in Bubble Tea examples:
   - `Set`, `Get`, `WriteText`
   - `DrawHorizontalLine`, `DrawVerticalLine`, `DrawBox`
   - `Render` (returns full frame string)
+- `Composition`:
+  - `ICanvasComponent`: render-only component contract.
+  - `IStatefulComponent`: component with `Update(IMessage)` for model-local state.
+  - `ComponentComposer`: slot-based composition (`Add`, `Clear`, `Update`, `Render`).
 - `Widgets`:
   - `DrawPanel`
   - `DrawProgressBar`
@@ -24,6 +28,11 @@ The design follows patterns used in Bubble Tea examples:
   - `DrawList`
   - `DrawCard`
   - `DrawTable`
+- `Charts`:
+  - `Charts.DrawLineChart(...)`
+  - `Charts.DrawBarChart(...)`
+  - `LineChartComponent` (bounded sample history)
+  - `BarChartComponent` (named value bars)
 
 ## Example Integration
 
@@ -31,10 +40,30 @@ The design follows patterns used in Bubble Tea examples:
 
 - system status panel
 - live progress bar
-- sparkline chart
+- line chart (throughput)
+- bar chart (status mix)
 - component summary card
 - action/state table
-- event footer
+- log viewport
+- command input footer
 
 The protocol probe page remains available (press `1`) for low-level VT debugging.
-The workspace now composes these components with stateful models from `TeaSharp.Widgets`.
+The dashboard composes chart components through `ComponentComposer` and uses stateful models from `TeaSharp.Widgets`.
+
+## Custom Components
+
+Create custom components by implementing `ICanvasComponent`:
+
+```csharp
+public sealed class ClockComponent : ICanvasComponent
+{
+    public void Render(Canvas canvas, Rect rect)
+    {
+        canvas.DrawBox(rect, "Clock");
+        var body = rect.Inset(1, 1);
+        canvas.WriteText(body.X, body.Y, DateTimeOffset.Now.ToString("HH:mm:ss"), body.Width);
+    }
+}
+```
+
+If the component owns local state and needs messages, implement `IStatefulComponent` and route messages through `ComponentComposer.Update(message)`.

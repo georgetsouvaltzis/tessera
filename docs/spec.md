@@ -61,7 +61,7 @@ Primary goal: deterministic message-driven TUI runtime with portable terminal be
 - `Commands` static helpers: `Quit`, `Interrupt`, `Batch`, `Sequence`, `Tick`, `Every`.
 
 7. `Components`
-- `TeaSharp.Components`: deterministic cell-canvas primitives (`Rect`, `Canvas`, `Widgets`) for building composable views.
+- `TeaSharp.Components`: deterministic cell-canvas primitives (`Rect`, `Canvas`, `Widgets`), component composition contracts (`ICanvasComponent`, `IStatefulComponent`, `ComponentComposer`), and chart primitives (`Charts`, `LineChartComponent`, `BarChartComponent`).
 
 8. `Styles`
 - `TeaSharp.Styles`: composable ANSI style model (`TeaStyle`, `AnsiColor`) for foreground/background and text attributes.
@@ -137,6 +137,7 @@ Behavior tests cover:
 - deterministic renderer snapshots (first frame control sequences, incremental patches, reset teardown).
 - styled rendering tests (SGR parsing, style-only diff patches).
 - stateful widget tests (viewport scroll/wrap, text input edits/submission, list filter/paging, keymap help rendering).
+- component tests (table/card primitives, chart rendering, component composer dispatch).
 
 ## 10. Iteration Roadmap
 

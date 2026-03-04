@@ -61,6 +61,13 @@ Legend: `done` = implemented, `partial` = usable but incomplete, `todo` = not im
 | List model | selectable/filterable list | partial | `ListModel<T>` added with paging, filtering, selection visibility, and wheel navigation. Missing richer delegates and async item loaders. |
 | Keymap/help model | reusable key bindings + help | partial | `KeyBinding`, widget keymaps, and compact help renderer added; no full-column/expanded help layout parity yet. |
 
+## Component Layer
+
+| Area | Bubble Tea Capability | TeaSharp | Notes |
+|---|---|---|---|
+| Composable components | reusable view components | done | `ICanvasComponent`, `IStatefulComponent`, and `ComponentComposer` support slot-based composition and stateful message routing. |
+| Chart primitives | sparkline/plot-style components | partial | `Charts.DrawLineChart`, `Charts.DrawBarChart`, `LineChartComponent`, and `BarChartComponent` are implemented; advanced axes/labels/zoom interactions are still pending. |
+
 ## Cross-Platform Runtime
 
 | Area | Bubble Tea Capability | TeaSharp | Notes |
