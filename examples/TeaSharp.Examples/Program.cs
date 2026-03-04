@@ -25,6 +25,7 @@ catch (TeaProgramInterruptedException)
 internal sealed class CounterModel : IModel
 {
     private readonly TeaSharp.Core.Terminal.ConsoleTerminalAdapter _terminal;
+    private readonly string _resizeBackend;
 
     private int _count;
     private int _width = 80;
@@ -39,6 +40,9 @@ internal sealed class CounterModel : IModel
     public CounterModel(TeaSharp.Core.Terminal.ConsoleTerminalAdapter terminal)
     {
         _terminal = terminal;
+        _resizeBackend = OperatingSystem.IsMacOS() || OperatingSystem.IsLinux()
+            ? "signal+poll"
+            : "poll";
     }
 
     public Command? Init() => null;
@@ -160,6 +164,7 @@ internal sealed class CounterModel : IModel
             $"Input backend: {(_terminal.IsRawModeActive ? "vt-bytes" : "console-keys-fallback")}\n" +
             $"Focus events: {(_terminal.IsRawModeActive ? "expected (if terminal supports ?1004)" : "not available in fallback mode")}\n" +
             $"Mouse events: {(_terminal.IsRawModeActive ? "expected (if terminal supports ?1006)" : "not available in fallback mode")}\n" +
+            $"Resize backend: {_resizeBackend}\n" +
             $"Stress mode: {(_stressMode ? "on" : "off")} (pulses: {_pulseCount})\n" +
             $"Last event: {_lastEvent}\n" +
             $"Last paste: {_lastPaste}\n" +

@@ -162,3 +162,61 @@ internal sealed class ResizingFakeTerminal : ITerminalAdapter
 
     public ValueTask DisposeAsync() => ValueTask.CompletedTask;
 }
+
+internal sealed class SignalDrivenFakeTerminal : ITerminalAdapter
+{
+    private readonly object _sync = new();
+    private TerminalSize _size;
+
+    public SignalDrivenFakeTerminal(TerminalSize initialSize)
+    {
+        _size = initialSize;
+    }
+
+    public Stream Input { get; } = new MemoryStream();
+
+    public Stream Output { get; } = new MemoryStream();
+
+    public bool IsInputInteractive => false;
+
+    public bool IsOutputInteractive => true;
+
+    public ValueTask PrepareAsync(CancellationToken cancellationToken)
+    {
+        _ = cancellationToken;
+        return ValueTask.CompletedTask;
+    }
+
+    public ValueTask RestoreAsync(CancellationToken cancellationToken)
+    {
+        _ = cancellationToken;
+        return ValueTask.CompletedTask;
+    }
+
+    public ValueTask<TerminalSize> GetSizeAsync(CancellationToken cancellationToken)
+    {
+        _ = cancellationToken;
+        lock (_sync)
+        {
+            return ValueTask.FromResult(_size);
+        }
+    }
+
+    public void SetSize(int width, int height)
+    {
+        lock (_sync)
+        {
+            _size = new TerminalSize(width, height);
+        }
+    }
+
+    public ValueTask DisposeAsync() => ValueTask.CompletedTask;
+}
+
+internal sealed class DelegateDisposable(Action dispose) : IDisposable
+{
+    public void Dispose()
+    {
+        dispose();
+    }
+}

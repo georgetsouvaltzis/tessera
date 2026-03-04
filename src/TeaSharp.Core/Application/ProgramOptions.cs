@@ -20,9 +20,13 @@ public sealed class ProgramOptions
 
     public TimeSpan EscapeTimeout { get; init; } = TimeSpan.FromMilliseconds(50);
 
+    public bool EnableResizeSignals { get; init; } = true;
+
     public TimeSpan ResizePollInterval { get; init; } = TimeSpan.FromMilliseconds(120);
 
     public IProgramRenderer? Renderer { get; init; }
 
     public ITerminalAdapter? Terminal { get; init; }
+
+    internal Func<Action, IDisposable?>? ResizeSignalRegistrationFactory { get; init; }
 }

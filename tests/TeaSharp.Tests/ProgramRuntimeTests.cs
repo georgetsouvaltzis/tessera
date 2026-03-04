@@ -15,6 +15,7 @@ internal static class ProgramRuntimeTests
         yield return new TestCase("Program_BatchCommands_ProcessAll", Batch_ProcessesAllCommands);
         yield return new TestCase("Program_FilterBlocksFirstQuit_AllowsSecond", Filter_CanBlockQuitMessage);
         yield return new TestCase("Program_ResizeLoop_EmitsWindowSizeChanges", ResizeLoop_EmitsWindowSizeChanges);
+        yield return new TestCase("Program_ResizeSignal_EmitsWindowSizeChanges", ResizeSignal_EmitsWindowSizeChanges);
     }
 
     private static async Task InitQuitCommand_ExitsProgram()
@@ -136,6 +137,39 @@ internal static class ProgramRuntimeTests
             $"Unexpected resize sequence: {string.Join(", ", model.Seen.Select(size => $"{size.W}x{size.H}"))}");
     }
 
+    private static async Task ResizeSignal_EmitsWindowSizeChanges()
+    {
+        // Arrange
+        var terminal = new SignalDrivenFakeTerminal(new TeaSharp.Core.Terminal.TerminalSize(80, 24));
+        var model = new ResizeTrackingModel();
+        Action? raiseSignal = null;
+        var program = new TeaProgram(model, new ProgramOptions
+        {
+            DisableRenderer = true,
+            DisableInput = true,
+            Terminal = terminal,
+            ResizePollInterval = TimeSpan.FromSeconds(2),
+            ResizeSignalRegistrationFactory = onResize =>
+            {
+                raiseSignal = onResize;
+                return new DelegateDisposable(() => { });
+            },
+        });
+
+        // Act
+        var runTask = program.RunAsync();
+        await WaitUntilAsync(() => raiseSignal is not null, TimeSpan.FromSeconds(1), "Resize signal registration was not initialized.");
+        terminal.SetSize(101, 41);
+        raiseSignal?.Invoke();
+        await runTask;
+
+        // Assert
+        TestAssert.True(model.Seen.Count >= 2, $"Expected at least 2 size events but got {model.Seen.Count}.");
+        TestAssert.True(
+            model.Seen[0] == (80, 24) && model.Seen[1] == (101, 41),
+            $"Unexpected resize sequence: {string.Join(", ", model.Seen.Select(size => $"{size.W}x{size.H}"))}");
+    }
+
     private static TeaProgram NewProgram(IModel model) =>
         new(model, new ProgramOptions
         {
@@ -143,4 +177,18 @@ internal static class ProgramRuntimeTests
             DisableInput = true,
             Terminal = new FakeTerminalAdapter(),
         });
+
+    private static async Task WaitUntilAsync(Func<bool> condition, TimeSpan timeout, string failureMessage)
+    {
+        var deadline = DateTimeOffset.UtcNow + timeout;
+        while (!condition())
+        {
+            if (DateTimeOffset.UtcNow >= deadline)
+            {
+                throw new InvalidOperationException(failureMessage);
+            }
+
+            await Task.Delay(10);
+        }
+    }
 }

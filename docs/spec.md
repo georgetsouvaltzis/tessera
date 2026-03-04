@@ -94,7 +94,7 @@ Primary goal: deterministic message-driven TUI runtime with portable terminal be
 - Enter `stty raw -echo` while the program runs, then restore the saved terminal state on shutdown.
 - Probe terminal mode after setup; fallback to explicit `-icanon min 1 time 0 -echo` if needed.
 - If raw mode is still unavailable, input path falls back to `Console.ReadKey(intercept: true)` for non-echo key handling.
-- Program includes interval-based terminal size polling for consistent cross-platform resize updates.
+- Program uses signal-assisted resize checks on Unix-like systems (`SIGWINCH`) plus interval-based polling as a cross-platform fallback.
 
 ## 7. API Contracts (Phase 1)
 

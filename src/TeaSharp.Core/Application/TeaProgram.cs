@@ -1,4 +1,5 @@
 using System.Threading.Channels;
+using System.Runtime.InteropServices;
 using TeaSharp.Core.Abstractions;
 using TeaSharp.Core.Input;
 using TeaSharp.Core.Messages;
@@ -42,6 +43,8 @@ public sealed class TeaProgram
 
     public async Task<IModel> RunAsync(CancellationToken cancellationToken = default)
     {
+        IDisposable? resizeSignalRegistration = null;
+
         lock (_stateLock)
         {
             if (_running)
@@ -71,7 +74,7 @@ public sealed class TeaProgram
                 var size = await _terminal.GetSizeAsync(token).ConfigureAwait(false);
                 _renderer.Resize(size.Width, size.Height);
                 Send(new WindowSizeMsg(size.Width, size.Height));
-                resizeLoop = StartResizeLoop(size, token);
+                (resizeLoop, resizeSignalRegistration) = StartResizeLoop(size, token);
             }
 
             var commandLoop = Task.Run(() => CommandLoopAsync(token), token);
@@ -156,6 +159,8 @@ public sealed class TeaProgram
         }
         finally
         {
+            resizeSignalRegistration?.Dispose();
+
             if (_terminal is not null || _renderer is not null)
             {
                 await ShutdownAsync(kill: true, CancellationToken.None).ConfigureAwait(false);
@@ -199,14 +204,22 @@ public sealed class TeaProgram
         return Task.Run(() => _reader.StreamEventsAsync(token, Send), token);
     }
 
-    private Task? StartResizeLoop(TerminalSize initialSize, CancellationToken token)
+    private (Task? Loop, IDisposable? SignalRegistration) StartResizeLoop(TerminalSize initialSize, CancellationToken token)
     {
         if (_terminal is null || !_terminal.IsOutputInteractive)
         {
-            return null;
+            return (null, null);
         }
 
-        return Task.Run(async () =>
+        var signalTicks = Channel.CreateUnbounded<bool>(new UnboundedChannelOptions
+        {
+            SingleReader = true,
+            SingleWriter = false,
+        });
+
+        var registration = TryRegisterResizeSignal(() => signalTicks.Writer.TryWrite(true));
+
+        var loop = Task.Run(async () =>
         {
             var last = initialSize;
             var interval = _options.ResizePollInterval < TimeSpan.FromMilliseconds(16)
@@ -217,7 +230,15 @@ public sealed class TeaProgram
             {
                 try
                 {
-                    await Task.Delay(interval, token).ConfigureAwait(false);
+                    var pollDelay = Task.Delay(interval, token);
+                    var signalWait = signalTicks.Reader.WaitToReadAsync(token).AsTask();
+                    await Task.WhenAny(pollDelay, signalWait).ConfigureAwait(false);
+
+                    while (signalTicks.Reader.TryRead(out _))
+                    {
+                        // Drain queued resize signals.
+                    }
+
                     var current = await _terminal.GetSizeAsync(token).ConfigureAwait(false);
                     if (current.Width != last.Width || current.Height != last.Height)
                     {
@@ -231,10 +252,44 @@ public sealed class TeaProgram
                 }
                 catch
                 {
-                    // ignored: size polling best-effort.
+                    // ignored: size monitoring best-effort.
                 }
             }
         }, token);
+
+        return (loop, registration);
+    }
+
+    private IDisposable? TryRegisterResizeSignal(Action onResize)
+    {
+        if (_options.ResizeSignalRegistrationFactory is not null)
+        {
+            return _options.ResizeSignalRegistrationFactory(onResize);
+        }
+
+        if (!_options.EnableResizeSignals || !(OperatingSystem.IsLinux() || OperatingSystem.IsMacOS()))
+        {
+            return null;
+        }
+
+        try
+        {
+            return PosixSignalRegistration.Create(PosixSignal.SIGWINCH, _ =>
+            {
+                try
+                {
+                    onResize();
+                }
+                catch
+                {
+                    // ignored: callback must not throw.
+                }
+            });
+        }
+        catch
+        {
+            return null;
+        }
     }
 
     private async Task CommandLoopAsync(CancellationToken token)
