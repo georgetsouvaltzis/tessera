@@ -25,6 +25,7 @@ internal static class RendererBehaviorTests
         yield return new TestCase("Renderer_Resize_WrapsLongLines", Resize_WrapsLongLines);
         yield return new TestCase("Renderer_Resize_WrapsWideRuneAtBoundary", Resize_WrapsWideRuneAtBoundary);
         yield return new TestCase("Renderer_CellDiff_CombiningGrapheme_PatchesSingleColumn", CellDiff_CombiningGrapheme_PatchesSingleColumn);
+        yield return new TestCase("Renderer_CellBuffer_ClearsWideContinuation_WhenReplacingWithNarrowCells", CellBuffer_ClearsWideContinuation_WhenReplacingWithNarrowCells);
     }
 
     private static async Task MouseModeCellMotion_EmitsEnableSequences()
@@ -362,6 +363,27 @@ internal static class RendererBehaviorTests
         // Assert
         AssertContains(patch, "\u001b[1;4H");
         AssertContains(patch, "e\u0300");
+    }
+
+    private static async Task CellBuffer_ClearsWideContinuation_WhenReplacingWithNarrowCells()
+    {
+        // Arrange
+        await using var renderer = new AnsiDiffRenderer();
+        await using var output = new MemoryStream();
+        await renderer.InitializeAsync(output, CancellationToken.None);
+        renderer.Resize(width: 3, height: 2);
+        renderer.Render(View.From("好x"));
+        await renderer.FlushAsync(CancellationToken.None);
+        var marker = output.Length;
+
+        // Act
+        renderer.Render(View.From("ab"));
+        await renderer.FlushAsync(CancellationToken.None);
+        var patch = ReadUtf8(output, marker);
+
+        // Assert
+        AssertContains(patch, "\u001b[1;1H");
+        AssertContains(patch, "ab ");
     }
 
     private static string ReadUtf8(MemoryStream output)
