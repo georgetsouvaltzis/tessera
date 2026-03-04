@@ -7,7 +7,7 @@ using ModelView = TeaSharp.Core.Abstractions.View;
 
 var terminal = new TeaSharp.Core.Terminal.ConsoleTerminalAdapter();
 var capabilities = TerminalCapabilityDetector.Detect();
-var model = new CounterModel(terminal, capabilities);
+var model = new CounterModel(terminal);
 var options = new ProgramOptions
 {
     UseConsoleKeyEvents = false,
@@ -28,7 +28,7 @@ catch (TeaProgramInterruptedException)
 internal sealed class CounterModel : IModel
 {
     private readonly TeaSharp.Core.Terminal.ConsoleTerminalAdapter _terminal;
-    private readonly TerminalCapabilityProfile _capabilities;
+    private TerminalCapabilityProfile _capabilities = TerminalCapabilityProfile.AllSupported;
     private readonly string _resizeBackend;
 
     private int _count;
@@ -43,11 +43,9 @@ internal sealed class CounterModel : IModel
     private readonly Dictionary<int, ModeReportState> _modeReports = [];
 
     public CounterModel(
-        TeaSharp.Core.Terminal.ConsoleTerminalAdapter terminal,
-        TerminalCapabilityProfile capabilities)
+        TeaSharp.Core.Terminal.ConsoleTerminalAdapter terminal)
     {
         _terminal = terminal;
-        _capabilities = capabilities;
         _resizeBackend = OperatingSystem.IsMacOS() || OperatingSystem.IsLinux()
             ? "signal+poll"
             : "poll";
@@ -143,6 +141,13 @@ internal sealed class CounterModel : IModel
         {
             _modeReports[modeReport.Mode] = modeReport.State;
             _lastEvent = $"mode-report: ?{modeReport.Mode}={modeReport.State.ToString().ToLowerInvariant()}";
+            return new UpdateResult(this, null);
+        }
+
+        if (message is TerminalCapabilitiesMsg capabilities)
+        {
+            _capabilities = capabilities.Profile;
+            _lastEvent = $"capabilities: {_capabilities.Source}";
             return new UpdateResult(this, null);
         }
 

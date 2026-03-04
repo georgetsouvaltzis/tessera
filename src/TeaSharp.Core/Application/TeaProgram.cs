@@ -68,6 +68,7 @@ public sealed class TeaProgram
 
             await _terminal.PrepareAsync(token).ConfigureAwait(false);
             await _renderer.InitializeAsync(_terminal.Output, token).ConfigureAwait(false);
+            Send(new TerminalCapabilitiesMsg(capabilities));
 
             Task? resizeLoop = null;
             if (_terminal.IsOutputInteractive)

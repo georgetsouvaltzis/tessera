@@ -94,6 +94,26 @@ internal sealed class ResizeTrackingModel : IModel
     public ModelView View() => ModelView.From("resize");
 }
 
+internal sealed class CapabilityTrackingModel : IModel
+{
+    public TerminalCapabilityProfile? Seen { get; private set; }
+
+    public Command? Init() => null;
+
+    public UpdateResult Update(IMessage message)
+    {
+        if (message is TerminalCapabilitiesMsg capabilities)
+        {
+            Seen = capabilities.Profile;
+            return new UpdateResult(this, Commands.Quit);
+        }
+
+        return new UpdateResult(this, null);
+    }
+
+    public ModelView View() => ModelView.From("capabilities");
+}
+
 internal sealed record NumberMsg(int Value) : IMessage;
 
 internal sealed class FakeTerminalAdapter : ITerminalAdapter

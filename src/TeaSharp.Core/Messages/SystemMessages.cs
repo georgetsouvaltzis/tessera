@@ -1,4 +1,5 @@
 using TeaSharp.Core.Abstractions;
+using TeaSharp.Core.Terminal;
 
 namespace TeaSharp.Core.Messages;
 
@@ -30,6 +31,8 @@ public enum ModeReportState
 }
 
 public sealed record ModeReportMsg(int Mode, ModeReportState State) : IMessage;
+
+public sealed record TerminalCapabilitiesMsg(TerminalCapabilityProfile Profile) : IMessage;
 
 public sealed record UnknownInputMsg(string Raw) : IMessage;
 

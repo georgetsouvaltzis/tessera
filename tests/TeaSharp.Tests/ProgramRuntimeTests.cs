@@ -2,6 +2,7 @@ using TeaSharp.Core.Abstractions;
 using TeaSharp.Core.Application;
 using TeaSharp.Core.Commands;
 using TeaSharp.Core.Messages;
+using TeaSharp.Core.Terminal;
 
 namespace TeaSharp.Tests;
 
@@ -14,6 +15,7 @@ internal static class ProgramRuntimeTests
         yield return new TestCase("Program_SequenceCommands_ProcessInOrder", Sequence_ProcessesInOrder);
         yield return new TestCase("Program_BatchCommands_ProcessAll", Batch_ProcessesAllCommands);
         yield return new TestCase("Program_FilterBlocksFirstQuit_AllowsSecond", Filter_CanBlockQuitMessage);
+        yield return new TestCase("Program_EmitsTerminalCapabilitiesMessage", EmitsTerminalCapabilitiesMessage);
         yield return new TestCase("Program_ResizeLoop_EmitsWindowSizeChanges", ResizeLoop_EmitsWindowSizeChanges);
         yield return new TestCase("Program_ResizeSignal_EmitsWindowSizeChanges", ResizeSignal_EmitsWindowSizeChanges);
     }
@@ -135,6 +137,33 @@ internal static class ProgramRuntimeTests
         TestAssert.True(
             model.Seen[0] == (80, 24) && model.Seen[1] == (100, 40),
             $"Unexpected resize sequence: {string.Join(", ", model.Seen.Select(size => $"{size.W}x{size.H}"))}");
+    }
+
+    private static async Task EmitsTerminalCapabilitiesMessage()
+    {
+        // Arrange
+        var expected = new TerminalCapabilityProfile(
+            FocusReporting: true,
+            MouseReporting: true,
+            BracketedPaste: true,
+            SynchronizedUpdates: false,
+            ModeReports: true,
+            Source: "test-override");
+        var model = new CapabilityTrackingModel();
+        var program = new TeaProgram(model, new ProgramOptions
+        {
+            DisableRenderer = true,
+            DisableInput = true,
+            Terminal = new FakeTerminalAdapter(),
+            TerminalCapabilities = expected,
+        });
+
+        // Act
+        await program.RunAsync();
+
+        // Assert
+        TestAssert.True(model.Seen is not null, "Program should emit TerminalCapabilitiesMsg.");
+        TestAssert.Equal(expected, model.Seen!, "Program should emit configured terminal capabilities.");
     }
 
     private static async Task ResizeSignal_EmitsWindowSizeChanges()
