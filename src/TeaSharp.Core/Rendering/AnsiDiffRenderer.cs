@@ -1,5 +1,6 @@
 using System.Text;
 using TeaSharp.Core.Abstractions;
+using TeaSharp.Core.Terminal;
 
 namespace TeaSharp.Core.Rendering;
 
@@ -21,6 +22,12 @@ public sealed class AnsiDiffRenderer : IProgramRenderer
     private int _width;
     private int _height;
     private bool _fullRepaintRequired;
+    private readonly TerminalCapabilityProfile _capabilities;
+
+    public AnsiDiffRenderer(TerminalCapabilityProfile? capabilities = null)
+    {
+        _capabilities = capabilities ?? TerminalCapabilityProfile.AllSupported;
+    }
 
     public ValueTask InitializeAsync(Stream output, CancellationToken cancellationToken)
     {
@@ -77,31 +84,43 @@ public sealed class AnsiDiffRenderer : IProgramRenderer
             _previousLines.Clear();
         }
 
-        if (_currentView.EnableBracketedPaste != _bracketedPaste)
+        var requestedBracketedPaste = _currentView.EnableBracketedPaste && _capabilities.BracketedPaste;
+        if (requestedBracketedPaste != _bracketedPaste)
         {
-            await _writer.WriteAsync(_currentView.EnableBracketedPaste ? "\u001b[?2004h" : "\u001b[?2004l").ConfigureAwait(false);
-            _bracketedPaste = _currentView.EnableBracketedPaste;
-            await QueryModeReportOnceAsync(2004).ConfigureAwait(false);
+            await _writer.WriteAsync(requestedBracketedPaste ? "\u001b[?2004h" : "\u001b[?2004l").ConfigureAwait(false);
+            _bracketedPaste = requestedBracketedPaste;
+            if (requestedBracketedPaste)
+            {
+                await QueryModeReportOnceAsync(2004).ConfigureAwait(false);
+            }
         }
 
-        if (_currentView.EnableFocusReporting != _focusReporting)
+        var requestedFocusReporting = _currentView.EnableFocusReporting && _capabilities.FocusReporting;
+        if (requestedFocusReporting != _focusReporting)
         {
-            await _writer.WriteAsync(_currentView.EnableFocusReporting ? "\u001b[?1004h" : "\u001b[?1004l").ConfigureAwait(false);
-            _focusReporting = _currentView.EnableFocusReporting;
-            await QueryModeReportOnceAsync(1004).ConfigureAwait(false);
+            await _writer.WriteAsync(requestedFocusReporting ? "\u001b[?1004h" : "\u001b[?1004l").ConfigureAwait(false);
+            _focusReporting = requestedFocusReporting;
+            if (requestedFocusReporting)
+            {
+                await QueryModeReportOnceAsync(1004).ConfigureAwait(false);
+            }
         }
 
-        if (_currentView.EnableSynchronizedUpdates)
+        var requestedSyncUpdates = _currentView.EnableSynchronizedUpdates && _capabilities.SynchronizedUpdates;
+        if (requestedSyncUpdates)
         {
             await _writer.WriteAsync("\u001b[?2026h").ConfigureAwait(false);
             await QueryModeReportOnceAsync(2026).ConfigureAwait(false);
         }
 
-        if (_currentView.MouseMode != _mouseMode)
+        var requestedMouseMode = _capabilities.MouseReporting
+            ? _currentView.MouseMode
+            : MouseMode.None;
+        if (requestedMouseMode != _mouseMode)
         {
-            await WriteMouseModeAsync(_currentView.MouseMode).ConfigureAwait(false);
-            _mouseMode = _currentView.MouseMode;
-            if (_currentView.MouseMode != MouseMode.None)
+            await WriteMouseModeAsync(requestedMouseMode).ConfigureAwait(false);
+            _mouseMode = requestedMouseMode;
+            if (requestedMouseMode != MouseMode.None)
             {
                 await QueryModeReportOnceAsync(1006).ConfigureAwait(false);
             }
@@ -137,7 +156,7 @@ public sealed class AnsiDiffRenderer : IProgramRenderer
             await _writer.WriteAsync("\u001b[?25l").ConfigureAwait(false);
         }
 
-        if (_currentView.EnableSynchronizedUpdates)
+        if (requestedSyncUpdates)
         {
             await _writer.WriteAsync("\u001b[?2026l").ConfigureAwait(false);
         }
@@ -367,7 +386,7 @@ public sealed class AnsiDiffRenderer : IProgramRenderer
 
     private Task QueryModeReportOnceAsync(int mode)
     {
-        if (_writer is null || !_queriedModes.Add(mode))
+        if (_writer is null || !_capabilities.ModeReports || !_queriedModes.Add(mode))
         {
             return Task.CompletedTask;
         }

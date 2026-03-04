@@ -61,9 +61,10 @@ public sealed class TeaProgram
         try
         {
             _terminal = _options.Terminal ?? new ConsoleTerminalAdapter();
+            var capabilities = _options.TerminalCapabilities ?? TerminalCapabilityDetector.Detect();
             _renderer = _options.DisableRenderer
                 ? new NullRenderer()
-                : _options.Renderer ?? new AnsiDiffRenderer();
+                : _options.Renderer ?? new AnsiDiffRenderer(capabilities);
 
             await _terminal.PrepareAsync(token).ConfigureAwait(false);
             await _renderer.InitializeAsync(_terminal.Output, token).ConfigureAwait(false);

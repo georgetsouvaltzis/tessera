@@ -2,14 +2,17 @@ using TeaSharp;
 using TeaSharp.Core.Abstractions;
 using TeaSharp.Core.Application;
 using TeaSharp.Core.Messages;
+using TeaSharp.Core.Terminal;
 using ModelView = TeaSharp.Core.Abstractions.View;
 
 var terminal = new TeaSharp.Core.Terminal.ConsoleTerminalAdapter();
-var model = new CounterModel(terminal);
+var capabilities = TerminalCapabilityDetector.Detect();
+var model = new CounterModel(terminal, capabilities);
 var options = new ProgramOptions
 {
     UseConsoleKeyEvents = false,
     Terminal = terminal,
+    TerminalCapabilities = capabilities,
 };
 var program = Tea.NewProgram(model, options);
 
@@ -25,6 +28,7 @@ catch (TeaProgramInterruptedException)
 internal sealed class CounterModel : IModel
 {
     private readonly TeaSharp.Core.Terminal.ConsoleTerminalAdapter _terminal;
+    private readonly TerminalCapabilityProfile _capabilities;
     private readonly string _resizeBackend;
 
     private int _count;
@@ -38,9 +42,12 @@ internal sealed class CounterModel : IModel
     private int _pulseCount;
     private readonly Dictionary<int, ModeReportState> _modeReports = [];
 
-    public CounterModel(TeaSharp.Core.Terminal.ConsoleTerminalAdapter terminal)
+    public CounterModel(
+        TeaSharp.Core.Terminal.ConsoleTerminalAdapter terminal,
+        TerminalCapabilityProfile capabilities)
     {
         _terminal = terminal;
+        _capabilities = capabilities;
         _resizeBackend = OperatingSystem.IsMacOS() || OperatingSystem.IsLinux()
             ? "signal+poll"
             : "poll";
@@ -170,6 +177,8 @@ internal sealed class CounterModel : IModel
             $"Raw mode probe: {SummarizeProbe(_terminal.RawModeDiagnostics)}\n" +
             $"Raw mode error: {SummarizeProbe(_terminal.RawModeError)}\n" +
             $"Input backend: {(_terminal.IsRawModeActive ? "vt-bytes" : "console-keys-fallback")}\n" +
+            $"Capabilities source: {_capabilities.Source}\n" +
+            $"Capabilities: focus={ToYesNo(_capabilities.FocusReporting)} mouse={ToYesNo(_capabilities.MouseReporting)} paste={ToYesNo(_capabilities.BracketedPaste)} sync={ToYesNo(_capabilities.SynchronizedUpdates)} decrpm={ToYesNo(_capabilities.ModeReports)}\n" +
             $"Focus events: {(_terminal.IsRawModeActive ? "expected (if terminal supports ?1004)" : "not available in fallback mode")}\n" +
             $"Mouse events: {(_terminal.IsRawModeActive ? "expected (if terminal supports ?1006)" : "not available in fallback mode")}\n" +
             "Synchronized updates: requested (?2026)\n" +
@@ -237,6 +246,11 @@ internal sealed class CounterModel : IModel
         return compact.Length <= 160
             ? compact
             : compact[..160] + "...";
+    }
+
+    private static string ToYesNo(bool value)
+    {
+        return value ? "yes" : "no";
     }
 
     private string FormatModeReports()

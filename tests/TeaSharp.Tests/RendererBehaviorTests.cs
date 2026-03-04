@@ -1,6 +1,7 @@
 using System.Text;
 using TeaSharp.Core.Abstractions;
 using TeaSharp.Core.Rendering;
+using TeaSharp.Core.Terminal;
 
 namespace TeaSharp.Tests;
 
@@ -11,8 +12,10 @@ internal static class RendererBehaviorTests
         yield return new TestCase("Renderer_MouseModeCellMotion_EmitsEnableSequences", MouseModeCellMotion_EmitsEnableSequences);
         yield return new TestCase("Renderer_MouseModeAllMotion_EmitsEnableSequences", MouseModeAllMotion_EmitsEnableSequences);
         yield return new TestCase("Renderer_Reset_DisablesMouseModes", Reset_DisablesMouseModes);
+        yield return new TestCase("Renderer_UnsupportedCapabilities_SuppressModeSequences", UnsupportedCapabilities_SuppressModeSequences);
         yield return new TestCase("Renderer_ModeReportQueries_EmittedForEnabledFeatures", ModeReportQueries_EmittedForEnabledFeatures);
         yield return new TestCase("Renderer_ModeReportQueries_EmittedOncePerMode", ModeReportQueries_EmittedOncePerMode);
+        yield return new TestCase("Renderer_ModeReportsDisabled_SkipsModeQueries", ModeReportsDisabled_SkipsModeQueries);
         yield return new TestCase("Renderer_SynchronizedUpdates_WrapFrameOutput", SynchronizedUpdates_WrapFrameOutput);
         yield return new TestCase("Renderer_SynchronizedUpdates_Disabled_DoesNotWrapFrameOutput", SynchronizedUpdates_Disabled_DoesNotWrapFrameOutput);
         yield return new TestCase("Renderer_CellDiff_UpdatesOnlyChangedCellRun", CellDiff_UpdatesOnlyChangedCellRun);
@@ -82,6 +85,42 @@ internal static class RendererBehaviorTests
         AssertContains(rendered, "\u001b[?1006l");
     }
 
+    private static async Task UnsupportedCapabilities_SuppressModeSequences()
+    {
+        // Arrange
+        await using var renderer = new AnsiDiffRenderer(new TerminalCapabilityProfile(
+            FocusReporting: false,
+            MouseReporting: false,
+            BracketedPaste: false,
+            SynchronizedUpdates: false,
+            ModeReports: false,
+            Source: "test"));
+        await using var output = new MemoryStream();
+        await renderer.InitializeAsync(output, CancellationToken.None);
+
+        // Act
+        renderer.Render(View.From("probe") with
+        {
+            EnableBracketedPaste = true,
+            EnableFocusReporting = true,
+            EnableSynchronizedUpdates = true,
+            MouseMode = MouseMode.AllMotion,
+        });
+        await renderer.FlushAsync(CancellationToken.None);
+        var rendered = ReadUtf8(output);
+
+        // Assert
+        AssertDoesNotContain(rendered, "\u001b[?2004h");
+        AssertDoesNotContain(rendered, "\u001b[?1004h");
+        AssertDoesNotContain(rendered, "\u001b[?1000h");
+        AssertDoesNotContain(rendered, "\u001b[?1006h");
+        AssertDoesNotContain(rendered, "\u001b[?2026h");
+        AssertDoesNotContain(rendered, "\u001b[?2004$p");
+        AssertDoesNotContain(rendered, "\u001b[?1004$p");
+        AssertDoesNotContain(rendered, "\u001b[?1006$p");
+        AssertDoesNotContain(rendered, "\u001b[?2026$p");
+    }
+
     private static async Task ModeReportQueries_EmittedForEnabledFeatures()
     {
         // Arrange
@@ -123,6 +162,33 @@ internal static class RendererBehaviorTests
 
         // Assert
         AssertCount(rendered, "\u001b[?1004$p", 1);
+    }
+
+    private static async Task ModeReportsDisabled_SkipsModeQueries()
+    {
+        // Arrange
+        await using var renderer = new AnsiDiffRenderer(
+            new TerminalCapabilityProfile(ModeReports: false, Source: "test"));
+        await using var output = new MemoryStream();
+        await renderer.InitializeAsync(output, CancellationToken.None);
+
+        // Act
+        renderer.Render(View.From("probe") with
+        {
+            EnableBracketedPaste = true,
+            EnableFocusReporting = true,
+            EnableSynchronizedUpdates = true,
+            MouseMode = MouseMode.AllMotion,
+        });
+        await renderer.FlushAsync(CancellationToken.None);
+        var rendered = ReadUtf8(output);
+
+        // Assert
+        AssertContains(rendered, "\u001b[?2004h");
+        AssertContains(rendered, "\u001b[?1004h");
+        AssertContains(rendered, "\u001b[?1006h");
+        AssertContains(rendered, "\u001b[?2026h");
+        AssertDoesNotContain(rendered, "$p");
     }
 
     private static async Task SynchronizedUpdates_WrapFrameOutput()

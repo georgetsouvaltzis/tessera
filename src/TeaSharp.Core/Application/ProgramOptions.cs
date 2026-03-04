@@ -28,5 +28,7 @@ public sealed class ProgramOptions
 
     public ITerminalAdapter? Terminal { get; init; }
 
+    public TerminalCapabilityProfile? TerminalCapabilities { get; init; }
+
     internal Func<Action, IDisposable?>? ResizeSignalRegistrationFactory { get; init; }
 }

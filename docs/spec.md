@@ -55,6 +55,7 @@ Primary goal: deterministic message-driven TUI runtime with portable terminal be
 5. `Terminal`
 - `ITerminalAdapter` abstraction.
 - `ConsoleTerminalAdapter`: OS integration and console mode management.
+- `TerminalCapabilityDetector` + `TerminalCapabilityProfile`: environment-driven feature gating for renderer VT modes.
 
 6. `Commands`
 - `Commands` static helpers: `Quit`, `Interrupt`, `Batch`, `Sequence`, `Tick`, `Every`.
@@ -95,6 +96,7 @@ Primary goal: deterministic message-driven TUI runtime with portable terminal be
 - Probe terminal mode after setup; fallback to explicit `-icanon min 1 time 0 -echo` if needed.
 - If raw mode is still unavailable, input path falls back to `Console.ReadKey(intercept: true)` for non-echo key handling.
 - Program uses signal-assisted resize checks on Unix-like systems (`SIGWINCH`) plus interval-based polling as a cross-platform fallback.
+- Renderer mode toggles (`focus`, `mouse`, `bracketed paste`, `synchronized updates`) are gated by a detected `TerminalCapabilityProfile` and can be overridden via `ProgramOptions.TerminalCapabilities`.
 
 ## 7. API Contracts (Phase 1)
 
