@@ -9,7 +9,7 @@ public sealed class AnsiDiffRenderer : IProgramRenderer
 
     private Stream? _output;
     private StreamWriter? _writer;
-    private List<string> _previousLines = [];
+    private List<DisplayLine> _previousLines = [];
     private View _currentView = View.From(string.Empty);
     private bool _initialized;
     private bool _altScreen;
@@ -197,7 +197,7 @@ public sealed class AnsiDiffRenderer : IProgramRenderer
         return [.. content.Split('\n')];
     }
 
-    private List<string> PrepareLines(string content)
+    private List<DisplayLine> PrepareLines(string content)
     {
         var lines = NormalizeLines(content);
         if (_height > 0 && lines.Count > _height)
@@ -205,24 +205,21 @@ public sealed class AnsiDiffRenderer : IProgramRenderer
             lines = lines.GetRange(0, _height);
         }
 
-        if (_width <= 0)
+        var rendered = new List<DisplayLine>(lines.Count);
+        foreach (var line in lines)
         {
-            return lines;
+            rendered.Add(DisplayLine.FromText(line, _width));
         }
 
-        for (var i = 0; i < lines.Count; i++)
+        if (rendered.Count == 0)
         {
-            var line = lines[i];
-            if (line.Length > _width)
-            {
-                lines[i] = line[.._width];
-            }
+            rendered.Add(DisplayLine.FromText(string.Empty, _width));
         }
 
-        return lines;
+        return rendered;
     }
 
-    private async Task WriteFrameDiffAsync(List<string> nextLines)
+    private async Task WriteFrameDiffAsync(List<DisplayLine> nextLines)
     {
         if (_writer is null)
         {
@@ -237,9 +234,9 @@ public sealed class AnsiDiffRenderer : IProgramRenderer
 
         for (var row = 0; row < rowCount; row++)
         {
-            var previousLine = row < _previousLines.Count ? _previousLines[row] : string.Empty;
-            var nextLine = row < nextLines.Count ? nextLines[row] : string.Empty;
-            if (string.Equals(previousLine, nextLine, StringComparison.Ordinal))
+            var previousLine = row < _previousLines.Count ? _previousLines[row] : DisplayLine.FromText(string.Empty, _width);
+            var nextLine = row < nextLines.Count ? nextLines[row] : DisplayLine.FromText(string.Empty, _width);
+            if (LinesEqual(previousLine, nextLine))
             {
                 continue;
             }
@@ -248,21 +245,36 @@ public sealed class AnsiDiffRenderer : IProgramRenderer
         }
     }
 
-    private async Task WriteRowDiffAsync(int row, string previousLine, string nextLine)
+    private static bool LinesEqual(DisplayLine previousLine, DisplayLine nextLine)
+    {
+        var maxColumns = Math.Max(previousLine.ColumnCount, nextLine.ColumnCount);
+        for (var column = 0; column < maxColumns; column++)
+        {
+            if (!string.Equals(previousLine.SignatureAt(column), nextLine.SignatureAt(column), StringComparison.Ordinal))
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    private async Task WriteRowDiffAsync(int row, DisplayLine previousLine, DisplayLine nextLine)
     {
         if (_writer is null)
         {
             return;
         }
 
-        var max = Math.Max(previousLine.Length, nextLine.Length);
+        var max = Math.Max(previousLine.ColumnCount, nextLine.ColumnCount);
         var runStart = -1;
 
         for (var column = 0; column < max; column++)
         {
-            var previous = column < previousLine.Length ? previousLine[column] : ' ';
-            var next = column < nextLine.Length ? nextLine[column] : ' ';
-            var changed = previous != next;
+            var changed = !string.Equals(
+                previousLine.SignatureAt(column),
+                nextLine.SignatureAt(column),
+                StringComparison.Ordinal);
 
             if (changed && runStart < 0)
             {
@@ -283,7 +295,7 @@ public sealed class AnsiDiffRenderer : IProgramRenderer
         }
     }
 
-    private async Task WriteRunAsync(int row, int startColumn, int endColumn, string nextLine)
+    private async Task WriteRunAsync(int row, int startColumn, int endColumn, DisplayLine nextLine)
     {
         if (_writer is null)
         {
@@ -291,21 +303,26 @@ public sealed class AnsiDiffRenderer : IProgramRenderer
         }
 
         await _writer.WriteAsync($"\u001b[{row + 1};{startColumn + 1}H").ConfigureAwait(false);
-
-        if (startColumn < nextLine.Length)
+        for (var column = startColumn; column < endColumn;)
         {
-            var textLength = Math.Min(endColumn, nextLine.Length) - startColumn;
-            if (textLength > 0)
+            var cell = nextLine.CellAt(column);
+            if (cell is null)
             {
-                await _writer.WriteAsync(nextLine.AsMemory(startColumn, textLength)).ConfigureAwait(false);
+                await _writer.WriteAsync(" ").ConfigureAwait(false);
+                column++;
+                continue;
             }
-        }
 
-        var paddingStart = Math.Max(startColumn, nextLine.Length);
-        var padding = endColumn - paddingStart;
-        if (padding > 0)
-        {
-            await _writer.WriteAsync(new string(' ', padding)).ConfigureAwait(false);
+            var cellWidth = nextLine.CellWidthAt(column);
+            if (cellWidth == 2 && column + 1 >= endColumn)
+            {
+                await _writer.WriteAsync(" ").ConfigureAwait(false);
+                column++;
+                continue;
+            }
+
+            await _writer.WriteAsync(cell).ConfigureAwait(false);
+            column += cellWidth;
         }
     }
 

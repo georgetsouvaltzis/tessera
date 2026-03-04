@@ -14,6 +14,8 @@ internal static class RendererBehaviorTests
         yield return new TestCase("Renderer_CellDiff_UpdatesOnlyChangedCellRun", CellDiff_UpdatesOnlyChangedCellRun);
         yield return new TestCase("Renderer_CellDiff_ClearsShortenedLineTail", CellDiff_ClearsShortenedLineTail);
         yield return new TestCase("Renderer_Resize_ClipsToWidth", Resize_ClipsToWidth);
+        yield return new TestCase("Renderer_Resize_DropsWideRuneAtBoundary", Resize_DropsWideRuneAtBoundary);
+        yield return new TestCase("Renderer_CellDiff_CombiningGrapheme_PatchesSingleColumn", CellDiff_CombiningGrapheme_PatchesSingleColumn);
     }
 
     private static async Task MouseModeCellMotion_EmitsEnableSequences()
@@ -132,6 +134,44 @@ internal static class RendererBehaviorTests
         // Assert
         AssertContains(rendered, "abc");
         AssertDoesNotContain(rendered, "abcdef");
+    }
+
+    private static async Task Resize_DropsWideRuneAtBoundary()
+    {
+        // Arrange
+        await using var renderer = new AnsiDiffRenderer();
+        await using var output = new MemoryStream();
+        await renderer.InitializeAsync(output, CancellationToken.None);
+        renderer.Resize(width: 3, height: 5);
+
+        // Act
+        renderer.Render(View.From("ab好"));
+        await renderer.FlushAsync(CancellationToken.None);
+        var rendered = ReadUtf8(output);
+
+        // Assert
+        AssertContains(rendered, "ab");
+        AssertDoesNotContain(rendered, "好");
+    }
+
+    private static async Task CellDiff_CombiningGrapheme_PatchesSingleColumn()
+    {
+        // Arrange
+        await using var renderer = new AnsiDiffRenderer();
+        await using var output = new MemoryStream();
+        await renderer.InitializeAsync(output, CancellationToken.None);
+        renderer.Render(View.From("Cafe\u0301"));
+        await renderer.FlushAsync(CancellationToken.None);
+        var marker = output.Length;
+
+        // Act
+        renderer.Render(View.From("Cafe\u0300"));
+        await renderer.FlushAsync(CancellationToken.None);
+        var patch = ReadUtf8(output, marker);
+
+        // Assert
+        AssertContains(patch, "\u001b[1;4H");
+        AssertContains(patch, "e\u0300");
     }
 
     private static string ReadUtf8(MemoryStream output)
