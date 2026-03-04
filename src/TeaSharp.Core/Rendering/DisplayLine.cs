@@ -8,10 +8,12 @@ internal sealed class DisplayLine
 {
     private const string ContinuationMarker = "\u0000";
     private readonly string?[] _cells;
+    private readonly string?[] _styles;
 
-    public DisplayLine(string?[] cells)
+    public DisplayLine(string?[] cells, string?[] styles)
     {
         _cells = cells;
+        _styles = styles;
     }
 
     public int ColumnCount => _cells.Length;
@@ -25,15 +27,26 @@ internal sealed class DisplayLine
 
         if (string.IsNullOrEmpty(text))
         {
-            return [new DisplayLine([])];
+            return [new DisplayLine([], [])];
         }
 
         var lines = new List<DisplayLine>();
         var current = new List<string?>(Math.Min(text.Length, maxColumns));
-        var enumerator = StringInfo.GetTextElementEnumerator(text);
-        while (enumerator.MoveNext())
+        var currentStyles = new List<string?>(Math.Min(text.Length, maxColumns));
+        var sgrState = SgrStyleState.Default;
+        var activeStyle = string.Empty;
+        var index = 0;
+
+        while (index < text.Length)
         {
-            var element = enumerator.GetTextElement();
+            if (TryReadSgr(text, ref index, ref sgrState, out var updatedStyle))
+            {
+                activeStyle = updatedStyle;
+                continue;
+            }
+
+            var element = StringInfo.GetNextTextElement(text, index);
+            index += element.Length;
             var width = DisplayWidth.MeasureTextElementWidth(element);
             if (width <= 0)
             {
@@ -50,8 +63,9 @@ internal sealed class DisplayLine
             {
                 if (current.Count > 0)
                 {
-                    lines.Add(new DisplayLine([.. current]));
+                    lines.Add(new DisplayLine([.. current], [.. currentStyles]));
                     current.Clear();
+                    currentStyles.Clear();
                 }
 
                 if (width > maxColumns)
@@ -61,20 +75,22 @@ internal sealed class DisplayLine
             }
 
             current.Add(element);
+            currentStyles.Add(activeStyle);
             if (width == 2)
             {
                 current.Add(null);
+                currentStyles.Add(null);
             }
         }
 
         if (current.Count > 0)
         {
-            lines.Add(new DisplayLine([.. current]));
+            lines.Add(new DisplayLine([.. current], [.. currentStyles]));
         }
 
         if (lines.Count == 0)
         {
-            lines.Add(new DisplayLine([]));
+            lines.Add(new DisplayLine([], []));
         }
 
         return lines;
@@ -84,14 +100,25 @@ internal sealed class DisplayLine
     {
         if (string.IsNullOrEmpty(text))
         {
-            return new DisplayLine([]);
+            return new DisplayLine([], []);
         }
 
         var cells = new List<string?>(text.Length);
-        var enumerator = StringInfo.GetTextElementEnumerator(text);
-        while (enumerator.MoveNext())
+        var styles = new List<string?>(text.Length);
+        var sgrState = SgrStyleState.Default;
+        var activeStyle = string.Empty;
+        var index = 0;
+
+        while (index < text.Length)
         {
-            var element = enumerator.GetTextElement();
+            if (TryReadSgr(text, ref index, ref sgrState, out var updatedStyle))
+            {
+                activeStyle = updatedStyle;
+                continue;
+            }
+
+            var element = StringInfo.GetNextTextElement(text, index);
+            index += element.Length;
             var width = DisplayWidth.MeasureTextElementWidth(element);
             if (width <= 0)
             {
@@ -103,6 +130,7 @@ internal sealed class DisplayLine
                 else if (CanFit(cells.Count, 1, maxColumns))
                 {
                     cells.Add(element);
+                    styles.Add(activeStyle);
                 }
 
                 continue;
@@ -114,13 +142,15 @@ internal sealed class DisplayLine
             }
 
             cells.Add(element);
+            styles.Add(activeStyle);
             if (width == 2)
             {
                 cells.Add(null);
+                styles.Add(null);
             }
         }
 
-        return new DisplayLine([.. cells]);
+        return new DisplayLine([.. cells], [.. styles]);
     }
 
     public string SignatureAt(int column)
@@ -130,7 +160,15 @@ internal sealed class DisplayLine
             return string.Empty;
         }
 
-        return _cells[column] ?? ContinuationMarker;
+        if (_cells[column] is null)
+        {
+            return ContinuationMarker;
+        }
+
+        var style = _styles[column];
+        return string.IsNullOrEmpty(style)
+            ? _cells[column]!
+            : $"{style}\u001f{_cells[column]}";
     }
 
     public string? CellAt(int column)
@@ -160,6 +198,16 @@ internal sealed class DisplayLine
             : 1;
     }
 
+    public string StyleAt(int column)
+    {
+        if (column < 0 || column >= _styles.Length || _cells[column] is null)
+        {
+            return string.Empty;
+        }
+
+        return _styles[column] ?? string.Empty;
+    }
+
     private static bool CanFit(int currentColumns, int incomingWidth, int maxColumns)
     {
         if (maxColumns <= 0)
@@ -181,6 +229,253 @@ internal sealed class DisplayLine
         }
 
         return -1;
+    }
+
+    private static bool TryReadSgr(
+        string text,
+        ref int index,
+        ref SgrStyleState state,
+        out string currentStyle)
+    {
+        currentStyle = state.ToEscapeSequence();
+
+        if (text[index] != '\u001b')
+        {
+            return false;
+        }
+
+        if (index + 2 >= text.Length || text[index + 1] != '[')
+        {
+            return false;
+        }
+
+        var cursor = index + 2;
+        while (cursor < text.Length && text[cursor] != 'm')
+        {
+            var ch = text[cursor];
+            if (!char.IsDigit(ch) && ch != ';' && ch != ':')
+            {
+                return false;
+            }
+
+            cursor++;
+        }
+
+        if (cursor >= text.Length || text[cursor] != 'm')
+        {
+            return false;
+        }
+
+        var parameters = ParseSgrParameters(text.AsSpan(index + 2, cursor - (index + 2)));
+        state.Apply(parameters);
+        currentStyle = state.ToEscapeSequence();
+        index = cursor + 1;
+        return true;
+    }
+
+    private static int[] ParseSgrParameters(ReadOnlySpan<char> parameters)
+    {
+        if (parameters.Length == 0)
+        {
+            return [0];
+        }
+
+        var values = new List<int>(8);
+        var value = 0;
+        var hasValue = false;
+
+        foreach (var ch in parameters)
+        {
+            if (char.IsDigit(ch))
+            {
+                value = (value * 10) + (ch - '0');
+                hasValue = true;
+                continue;
+            }
+
+            if (ch is ';' or ':')
+            {
+                values.Add(hasValue ? value : 0);
+                value = 0;
+                hasValue = false;
+            }
+        }
+
+        values.Add(hasValue ? value : 0);
+        return [.. values];
+    }
+
+    private struct SgrStyleState
+    {
+        public static SgrStyleState Default => new();
+
+        private bool _bold;
+        private bool _dim;
+        private bool _italic;
+        private bool _underline;
+        private bool _inverse;
+        private string? _foreground;
+        private string? _background;
+
+        public void Apply(int[] codes)
+        {
+            if (codes.Length == 0)
+            {
+                Reset();
+                return;
+            }
+
+            for (var i = 0; i < codes.Length; i++)
+            {
+                var code = codes[i];
+                switch (code)
+                {
+                    case 0:
+                        Reset();
+                        break;
+                    case 1:
+                        _bold = true;
+                        break;
+                    case 2:
+                        _dim = true;
+                        break;
+                    case 3:
+                        _italic = true;
+                        break;
+                    case 4:
+                        _underline = true;
+                        break;
+                    case 7:
+                        _inverse = true;
+                        break;
+                    case 22:
+                        _bold = false;
+                        _dim = false;
+                        break;
+                    case 23:
+                        _italic = false;
+                        break;
+                    case 24:
+                        _underline = false;
+                        break;
+                    case 27:
+                        _inverse = false;
+                        break;
+                    case 39:
+                        _foreground = null;
+                        break;
+                    case 49:
+                        _background = null;
+                        break;
+                    default:
+                        if (code is >= 30 and <= 37 or >= 90 and <= 97)
+                        {
+                            _foreground = code.ToString(CultureInfo.InvariantCulture);
+                        }
+                        else if (code is >= 40 and <= 47 or >= 100 and <= 107)
+                        {
+                            _background = code.ToString(CultureInfo.InvariantCulture);
+                        }
+                        else if (code == 38)
+                        {
+                            _foreground = ParseExtendedColorParameter(codes, ref i, foreground: true);
+                        }
+                        else if (code == 48)
+                        {
+                            _background = ParseExtendedColorParameter(codes, ref i, foreground: false);
+                        }
+
+                        break;
+                }
+            }
+        }
+
+        public string ToEscapeSequence()
+        {
+            var parts = new List<string>(8);
+
+            if (_bold)
+            {
+                parts.Add("1");
+            }
+
+            if (_dim)
+            {
+                parts.Add("2");
+            }
+
+            if (_italic)
+            {
+                parts.Add("3");
+            }
+
+            if (_underline)
+            {
+                parts.Add("4");
+            }
+
+            if (_inverse)
+            {
+                parts.Add("7");
+            }
+
+            if (!string.IsNullOrEmpty(_foreground))
+            {
+                parts.Add(_foreground);
+            }
+
+            if (!string.IsNullOrEmpty(_background))
+            {
+                parts.Add(_background);
+            }
+
+            if (parts.Count == 0)
+            {
+                return string.Empty;
+            }
+
+            return $"\u001b[{string.Join(";", parts)}m";
+        }
+
+        private void Reset()
+        {
+            _bold = false;
+            _dim = false;
+            _italic = false;
+            _underline = false;
+            _inverse = false;
+            _foreground = null;
+            _background = null;
+        }
+
+        private static string? ParseExtendedColorParameter(int[] codes, ref int index, bool foreground)
+        {
+            if (index + 1 >= codes.Length)
+            {
+                return null;
+            }
+
+            var prefix = foreground ? 38 : 48;
+            var mode = codes[index + 1];
+
+            if (mode == 5 && index + 2 < codes.Length)
+            {
+                var colorIndex = Math.Clamp(codes[index + 2], 0, 255);
+                index += 2;
+                return $"{prefix};5;{colorIndex}";
+            }
+
+            if (mode == 2 && index + 4 < codes.Length)
+            {
+                var red = Math.Clamp(codes[index + 2], 0, 255);
+                var green = Math.Clamp(codes[index + 3], 0, 255);
+                var blue = Math.Clamp(codes[index + 4], 0, 255);
+                index += 4;
+                return $"{prefix};2;{red};{green};{blue}";
+            }
+
+            return null;
+        }
     }
 }
 

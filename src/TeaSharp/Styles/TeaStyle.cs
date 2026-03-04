@@ -1,0 +1,127 @@
+namespace TeaSharp.Styles;
+
+public readonly record struct TeaStyle
+{
+    public static TeaStyle Empty => default;
+
+    public bool? Bold { get; init; }
+    public bool? Dim { get; init; }
+    public bool? Italic { get; init; }
+    public bool? Underline { get; init; }
+    public bool? Inverse { get; init; }
+    public AnsiColor? Foreground { get; init; }
+    public AnsiColor? Background { get; init; }
+
+    public TeaStyle WithBold(bool enabled = true) => this with { Bold = enabled };
+    public TeaStyle WithDim(bool enabled = true) => this with { Dim = enabled };
+    public TeaStyle WithItalic(bool enabled = true) => this with { Italic = enabled };
+    public TeaStyle WithUnderline(bool enabled = true) => this with { Underline = enabled };
+    public TeaStyle WithInverse(bool enabled = true) => this with { Inverse = enabled };
+    public TeaStyle WithForeground(AnsiColor color) => this with { Foreground = color };
+    public TeaStyle WithBackground(AnsiColor color) => this with { Background = color };
+
+    public TeaStyle Merge(TeaStyle other)
+    {
+        return new TeaStyle
+        {
+            Bold = other.Bold ?? Bold,
+            Dim = other.Dim ?? Dim,
+            Italic = other.Italic ?? Italic,
+            Underline = other.Underline ?? Underline,
+            Inverse = other.Inverse ?? Inverse,
+            Foreground = other.Foreground ?? Foreground,
+            Background = other.Background ?? Background,
+        };
+    }
+
+    public bool IsEmpty =>
+        Bold is null &&
+        Dim is null &&
+        Italic is null &&
+        Underline is null &&
+        Inverse is null &&
+        Foreground is null &&
+        Background is null;
+
+    public string ToEscapeSequence()
+    {
+        if (IsEmpty)
+        {
+            return string.Empty;
+        }
+
+        var parts = new List<string>(8);
+
+        if (Bold is true)
+        {
+            parts.Add("1");
+        }
+        else if (Bold is false)
+        {
+            parts.Add("22");
+        }
+
+        if (Dim is true)
+        {
+            parts.Add("2");
+        }
+        else if (Dim is false)
+        {
+            parts.Add("22");
+        }
+
+        if (Italic is true)
+        {
+            parts.Add("3");
+        }
+        else if (Italic is false)
+        {
+            parts.Add("23");
+        }
+
+        if (Underline is true)
+        {
+            parts.Add("4");
+        }
+        else if (Underline is false)
+        {
+            parts.Add("24");
+        }
+
+        if (Inverse is true)
+        {
+            parts.Add("7");
+        }
+        else if (Inverse is false)
+        {
+            parts.Add("27");
+        }
+
+        if (Foreground is AnsiColor foreground)
+        {
+            parts.Add(foreground.ToForegroundParameter());
+        }
+
+        if (Background is AnsiColor background)
+        {
+            parts.Add(background.ToBackgroundParameter());
+        }
+
+        if (parts.Count == 0)
+        {
+            return string.Empty;
+        }
+
+        return $"\u001b[{string.Join(";", parts)}m";
+    }
+
+    public string Render(string text)
+    {
+        if (string.IsNullOrEmpty(text) || IsEmpty)
+        {
+            return text;
+        }
+
+        return $"{ToEscapeSequence()}{text}\u001b[0m";
+    }
+}

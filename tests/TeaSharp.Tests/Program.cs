@@ -6,6 +6,7 @@ runner.AddRange(EventDecoderGoldenTests.Cases());
 runner.AddRange(TerminalReaderBehaviorTests.Cases());
 runner.AddRange(RendererBehaviorTests.Cases());
 runner.AddRange(RendererSnapshotTests.Cases());
+runner.AddRange(StyleRenderingTests.Cases());
 runner.AddRange(TerminalCapabilityDetectorTests.Cases());
 runner.AddRange(ComponentRenderingTests.Cases());
 

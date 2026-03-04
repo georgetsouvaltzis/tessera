@@ -346,6 +346,7 @@ public sealed class AnsiDiffRenderer : IProgramRenderer
         }
 
         await _writer.WriteAsync($"\u001b[{row + 1};{startColumn + 1}H").ConfigureAwait(false);
+        var activeStyle = string.Empty;
         for (var column = startColumn; column < endColumn;)
         {
             var cell = nextLine.CellAt(column);
@@ -354,6 +355,22 @@ public sealed class AnsiDiffRenderer : IProgramRenderer
                 await _writer.WriteAsync(" ").ConfigureAwait(false);
                 column++;
                 continue;
+            }
+
+            var nextStyle = nextLine.StyleAt(column);
+            if (!string.Equals(activeStyle, nextStyle, StringComparison.Ordinal))
+            {
+                if (activeStyle.Length > 0)
+                {
+                    await _writer.WriteAsync("\u001b[0m").ConfigureAwait(false);
+                }
+
+                if (nextStyle.Length > 0)
+                {
+                    await _writer.WriteAsync(nextStyle).ConfigureAwait(false);
+                }
+
+                activeStyle = nextStyle;
             }
 
             var cellWidth = nextLine.CellWidthAt(column);
@@ -366,6 +383,11 @@ public sealed class AnsiDiffRenderer : IProgramRenderer
 
             await _writer.WriteAsync(cell).ConfigureAwait(false);
             column += cellWidth;
+        }
+
+        if (activeStyle.Length > 0)
+        {
+            await _writer.WriteAsync("\u001b[0m").ConfigureAwait(false);
         }
     }
 
