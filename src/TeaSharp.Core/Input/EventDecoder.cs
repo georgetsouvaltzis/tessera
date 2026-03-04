@@ -152,15 +152,54 @@ public sealed class EventDecoder
 
     private static DecodeResult DecodePlain(ReadOnlySpan<byte> buffer, bool timeoutExpired)
     {
-        return buffer[0] switch
+        var first = buffer[0];
+        if (TryDecodeControlByte(first, out var controlMessage))
         {
-            0x03 => new DecodeResult(1, new KeyPressMsg(KeyCode.Character, "c", KeyModifiers.Ctrl), false),
+            return new DecodeResult(1, controlMessage, false);
+        }
+
+        return first switch
+        {
             0x09 => new DecodeResult(1, new KeyPressMsg(KeyCode.Tab), false),
             0x0A => new DecodeResult(1, new KeyPressMsg(KeyCode.Enter), false),
             0x0D => new DecodeResult(1, new KeyPressMsg(KeyCode.Enter), false),
             0x7F => new DecodeResult(1, new KeyPressMsg(KeyCode.Backspace), false),
             _ => DecodeUtf8(buffer, timeoutExpired),
         };
+    }
+
+    private static bool TryDecodeControlByte(byte value, out IMessage? message)
+    {
+        message = null;
+        switch (value)
+        {
+            case 0x00:
+                message = new KeyPressMsg(KeyCode.Character, "@", KeyModifiers.Ctrl);
+                return true;
+            case >= 0x01 and <= 0x08:
+            case 0x0B:
+            case 0x0C:
+            case >= 0x0E and <= 0x1A:
+            {
+                var text = ((char)('a' + value - 1)).ToString();
+                message = new KeyPressMsg(KeyCode.Character, text, KeyModifiers.Ctrl);
+                return true;
+            }
+            case 0x1C:
+                message = new KeyPressMsg(KeyCode.Character, "\\", KeyModifiers.Ctrl);
+                return true;
+            case 0x1D:
+                message = new KeyPressMsg(KeyCode.Character, "]", KeyModifiers.Ctrl);
+                return true;
+            case 0x1E:
+                message = new KeyPressMsg(KeyCode.Character, "^", KeyModifiers.Ctrl);
+                return true;
+            case 0x1F:
+                message = new KeyPressMsg(KeyCode.Character, "_", KeyModifiers.Ctrl);
+                return true;
+            default:
+                return false;
+        }
     }
 
     private static DecodeResult DecodeUtf8(ReadOnlySpan<byte> buffer, bool timeoutExpired)

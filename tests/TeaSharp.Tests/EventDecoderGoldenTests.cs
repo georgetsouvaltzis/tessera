@@ -11,6 +11,7 @@ internal static class EventDecoderGoldenTests
     {
         yield return new TestCase("Decoder_ArrowAndNavigationKeys_Parse", ArrowAndNavigationSequences_ParseExpectedKeys);
         yield return new TestCase("Decoder_EnhancedKeyboardSequences_Parse", EnhancedKeyboardSequences_ParseExpectedKeys);
+        yield return new TestCase("Decoder_ControlByteKeys_Parse", ControlByteKeys_ParseExpectedKeys);
         yield return new TestCase("Decoder_PasteBoundaryMarkers_Parse", PasteBoundaryMarkers_ParseExpectedMessages);
         yield return new TestCase("Decoder_FocusMarkers_Parse", FocusMarkers_ParseExpectedMessages);
         yield return new TestCase("Decoder_WindowResizeSequence_Parses", WindowResizeSequence_ParsesExpectedSize);
@@ -69,6 +70,23 @@ internal static class EventDecoderGoldenTests
         AssertKey(csiUCtrlK, KeyCode.Character, KeyModifiers.Ctrl, "k");
         AssertKey(csiUShiftTab, KeyCode.Tab, KeyModifiers.Shift);
         AssertKey(csiUEscape, KeyCode.Escape);
+        return Task.CompletedTask;
+    }
+
+    private static Task ControlByteKeys_ParseExpectedKeys()
+    {
+        // Arrange
+        var decoder = new EventDecoder();
+
+        // Act
+        var ctrlA = decoder.Decode(new byte[] { 0x01 }, timeoutExpired: false);
+        var ctrlK = decoder.Decode(new byte[] { 0x0B }, timeoutExpired: false);
+        var ctrlBracket = decoder.Decode(new byte[] { 0x1D }, timeoutExpired: false);
+
+        // Assert
+        AssertKey(ctrlA, KeyCode.Character, KeyModifiers.Ctrl, "a");
+        AssertKey(ctrlK, KeyCode.Character, KeyModifiers.Ctrl, "k");
+        AssertKey(ctrlBracket, KeyCode.Character, KeyModifiers.Ctrl, "]");
         return Task.CompletedTask;
     }
 
