@@ -67,7 +67,7 @@ Legend: `done` = implemented, `partial` = usable but incomplete, `todo` = not im
 |---|---|---|---|
 | Behavior tests | loop/command semantics | done | Core regression tests pass. |
 | Protocol decode tests | key/mouse/paste parser fixtures | partial | Golden fixtures include CSI/SS3/OSC, modifiers, focus, and extended mouse buttons/modifier combinations; terminal-specific fixture breadth still pending. |
-| Renderer snapshots | render diff correctness | todo | Needs deterministic snapshot tests. |
+| Renderer snapshots | render diff correctness | done | Deterministic renderer snapshots now cover first-frame mode/title sequences, incremental diff patches, and reset teardown control sequences. |
 
 ## Priority Gap Plan
 

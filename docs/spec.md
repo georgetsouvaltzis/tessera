@@ -128,6 +128,7 @@ Behavior tests cover:
 - `Sequence` ordering.
 - command timer (`Tick`) path.
 - filter-based message suppression.
+- deterministic renderer snapshots (first frame control sequences, incremental patches, reset teardown).
 
 ## 10. Iteration Roadmap
 
