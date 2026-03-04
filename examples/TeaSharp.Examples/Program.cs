@@ -77,6 +77,18 @@ internal sealed class CounterModel : IModel
         new KeyBinding("q", "quit"),
     ];
     private readonly List<string> _eventLog = [];
+    private readonly LineChartComponent _throughputChart = new(capacity: 240)
+    {
+        Title = "Throughput",
+        MinValue = 0,
+        MaxValue = 100,
+    };
+    private readonly BarChartComponent _statusChart = new()
+    {
+        Title = "Status Mix",
+        MaxValue = 100,
+    };
+    private readonly ComponentComposer _workspaceComposer = new();
 
     private TerminalCapabilityProfile _capabilities = TerminalCapabilityProfile.AllSupported;
     private readonly Dictionary<int, ModeReportState> _modeReports = [];
@@ -108,6 +120,7 @@ internal sealed class CounterModel : IModel
 
         _logViewport.Resize(48, 12);
         _logViewport.SetWrap(false);
+        RefreshStatusBars();
         AppendLog("TeaSharp workspace initialized.");
         AppendLog("Use tab to move focus between actions, log, and command input.");
         AppendLog("Use ? to toggle full help and 1/2 to switch protocol/workspace.");
@@ -156,6 +169,7 @@ internal sealed class CounterModel : IModel
             if (key.Text == "s" && key.Modifiers == KeyModifiers.None)
             {
                 _stressMode = !_stressMode;
+                RefreshStatusBars();
                 _lastEvent = $"stress: {(_stressMode ? "on" : "off")}";
                 AppendLog(_lastEvent);
                 return new UpdateResult(this, NextTickCommand(_stressMode));
@@ -189,6 +203,7 @@ internal sealed class CounterModel : IModel
         if (message is FocusInMsg)
         {
             _focused = true;
+            RefreshStatusBars();
             _lastEvent = "focus: in";
             return new UpdateResult(this, null);
         }
@@ -196,6 +211,7 @@ internal sealed class CounterModel : IModel
         if (message is FocusOutMsg)
         {
             _focused = false;
+            RefreshStatusBars();
             _lastEvent = "focus: out";
             return new UpdateResult(this, null);
         }
@@ -239,6 +255,7 @@ internal sealed class CounterModel : IModel
         if (message is TerminalCapabilitiesMsg capabilities)
         {
             _capabilities = capabilities.Profile;
+            RefreshStatusBars();
             _lastEvent = $"capabilities: {_capabilities.Source}";
             AppendLog(_lastEvent);
             return new UpdateResult(this, null);
@@ -247,7 +264,9 @@ internal sealed class CounterModel : IModel
         if (message is DashboardTickMsg)
         {
             _tickCount++;
+            RefreshStatusBars();
             AppendSparkSample();
+            _throughputChart.Append(_sparkline[^1]);
             if (_stressMode && _tickCount % 80 == 0)
             {
                 AppendLog($"pulse {_tickCount}: count={_count} focus={(_focused ? "in" : "out")}");
@@ -294,10 +313,12 @@ internal sealed class CounterModel : IModel
         if (key.Code == KeyCode.Up)
         {
             _count++;
+            RefreshStatusBars();
         }
         else if (key.Code == KeyCode.Down)
         {
             _count--;
+            RefreshStatusBars();
         }
         else if (key.Modifiers == KeyModifiers.None && key.Code == KeyCode.Character && !string.IsNullOrEmpty(key.Text))
         {
@@ -364,22 +385,28 @@ internal sealed class CounterModel : IModel
         {
             case "Increment count":
                 _count++;
+                RefreshStatusBars();
                 AppendLog("action: increment count");
                 break;
             case "Decrement count":
                 _count--;
+                RefreshStatusBars();
                 AppendLog("action: decrement count");
                 break;
             case "Toggle stress":
                 _stressMode = !_stressMode;
+                RefreshStatusBars();
                 AppendLog($"action: stress {(_stressMode ? "on" : "off")}");
                 break;
             case "Reset count":
                 _count = 0;
+                RefreshStatusBars();
                 AppendLog("action: reset count");
                 break;
             case "Clear log":
                 _eventLog.Clear();
+                _logViewport.Clear();
+                RefreshStatusBars();
                 AppendLog("action: clear log");
                 break;
             case "Switch to protocol":
@@ -408,6 +435,7 @@ internal sealed class CounterModel : IModel
         if (string.Equals(command, "inc", StringComparison.OrdinalIgnoreCase))
         {
             _count++;
+            RefreshStatusBars();
             AppendLog($"count={_count}");
             return;
         }
@@ -415,6 +443,7 @@ internal sealed class CounterModel : IModel
         if (string.Equals(command, "dec", StringComparison.OrdinalIgnoreCase))
         {
             _count--;
+            RefreshStatusBars();
             AppendLog($"count={_count}");
             return;
         }
@@ -425,16 +454,19 @@ internal sealed class CounterModel : IModel
             if (string.Equals(arg, "on", StringComparison.OrdinalIgnoreCase))
             {
                 _stressMode = true;
+                RefreshStatusBars();
                 AppendLog("stress=on");
             }
             else if (string.Equals(arg, "off", StringComparison.OrdinalIgnoreCase))
             {
                 _stressMode = false;
+                RefreshStatusBars();
                 AppendLog("stress=off");
             }
             else
             {
                 _stressMode = !_stressMode;
+                RefreshStatusBars();
                 AppendLog($"stress toggled => {(_stressMode ? "on" : "off")}");
             }
 
@@ -445,6 +477,7 @@ internal sealed class CounterModel : IModel
         {
             _eventLog.Clear();
             _logViewport.Clear();
+            RefreshStatusBars();
             AppendLog("log cleared");
             return;
         }
@@ -536,20 +569,28 @@ internal sealed class CounterModel : IModel
         const int footerHeight = 5;
         var bodyTop = headerHeight;
         var bodyHeight = _height - headerHeight - footerHeight;
-        var leftWidth = Math.Max(30, _width / 3);
+        var leftWidth = Math.Max(34, (_width * 44) / 100);
         var rightWidth = _width - leftWidth;
 
         var headerMode = _workspaceMode ? "workspace" : "protocol";
         TWidgets.DrawPanel(
             canvas,
             new Rect(0, 0, _width, headerHeight),
-            "TeaSharp Workspace",
+            "TeaSharp Dashboard",
             [
                 $"count={_count} focus={(_focused ? "in" : "out")} size={_width}x{_height} mode={headerMode} source={_capabilities.Source}",
             ]);
 
         var leftRect = new Rect(0, bodyTop, leftWidth, bodyHeight);
         var rightRect = new Rect(leftWidth, bodyTop, rightWidth, bodyHeight);
+        var systemHeight = Math.Clamp(bodyHeight / 2, 8, 12);
+        if (bodyHeight - systemHeight < 6)
+        {
+            systemHeight = Math.Max(7, bodyHeight - 6);
+        }
+
+        var systemRect = new Rect(leftRect.X, leftRect.Y, leftRect.Width, systemHeight);
+        var actionsRect = new Rect(leftRect.X, leftRect.Y + systemHeight, leftRect.Width, leftRect.Height - systemHeight);
 
         var visibleRows = _actionList.VisibleRows();
         var tableRows = new List<IReadOnlyList<string>>(visibleRows.Count);
@@ -570,33 +611,59 @@ internal sealed class CounterModel : IModel
             ]);
         }
 
-        TWidgets.DrawTable(
-            canvas,
-            leftRect,
-            ["Action", "Key", "State"],
-            tableRows,
-            selectedPageRow,
-            _focus == WorkspaceFocus.Actions ? "Actions *" : "Actions");
-
-        Rect throughputRect;
-        Rect logRect;
-        if (rightRect.Height >= 10)
+        _workspaceComposer.Clear();
+        var statusChartRect = DrawSystemPanel(canvas, systemRect);
+        if (!statusChartRect.IsEmpty && statusChartRect.Height >= 3)
         {
-            throughputRect = new Rect(rightRect.X, rightRect.Y, rightRect.Width, 3);
-            logRect = new Rect(rightRect.X, rightRect.Y + 3, rightRect.Width, rightRect.Height - 3);
-            TWidgets.DrawPanel(canvas, throughputRect, "Throughput", [string.Empty]);
-            TWidgets.DrawSparkline(
+            _workspaceComposer.Add(_statusChart, statusChartRect);
+        }
+
+        if (actionsRect.Height >= 4)
+        {
+            TWidgets.DrawTable(
                 canvas,
-                new Rect(throughputRect.X + 2, throughputRect.Y + 1, Math.Max(8, throughputRect.Width - 4), 1),
-                _sparkline,
-                minValue: 0,
-                maxValue: 100);
+                actionsRect,
+                ["Action", "Key", "State"],
+                tableRows,
+                selectedPageRow,
+                _focus == WorkspaceFocus.Actions ? "Actions *" : "Actions");
         }
         else
         {
-            throughputRect = new Rect(0, 0, 0, 0);
-            logRect = rightRect;
+            TWidgets.DrawPanel(
+                canvas,
+                actionsRect,
+                _focus == WorkspaceFocus.Actions ? "Actions *" : "Actions",
+                ["expand terminal for actions table"]);
         }
+
+        var infoHeight = Math.Clamp(rightRect.Height / 5, 3, 5);
+        var throughputHeight = Math.Clamp(rightRect.Height / 3, 5, 9);
+        if (infoHeight + throughputHeight + 5 > rightRect.Height)
+        {
+            throughputHeight = Math.Max(4, rightRect.Height - infoHeight - 5);
+        }
+
+        var infoRect = new Rect(rightRect.X, rightRect.Y, rightRect.Width, infoHeight);
+        var throughputRect = new Rect(rightRect.X, infoRect.Bottom, rightRect.Width, throughputHeight);
+        var logRect = new Rect(rightRect.X, throughputRect.Bottom, rightRect.Width, rightRect.Bottom - throughputRect.Bottom);
+
+        TWidgets.DrawCard(
+            canvas,
+            infoRect,
+            "Components",
+            [
+                "styles, charts, cards, table",
+                "tab cycles action, log, command",
+                "1 protocol view, 2 dashboard view",
+            ]);
+
+        if (!throughputRect.IsEmpty && throughputRect.Height >= 4)
+        {
+            _workspaceComposer.Add(_throughputChart, throughputRect);
+        }
+
+        _workspaceComposer.Render(canvas);
 
         _logViewport.Resize(Math.Max(8, logRect.Width - 2), Math.Max(3, logRect.Height - 2));
         var logLines = _logViewport.RenderLines();
@@ -679,6 +746,55 @@ internal sealed class CounterModel : IModel
         return string.Join('\n', rows);
     }
 
+    private Rect DrawSystemPanel(Canvas canvas, Rect rect)
+    {
+        var clipped = Rect.Intersect(rect, canvas.Bounds);
+        if (clipped.IsEmpty)
+        {
+            return new Rect(0, 0, 0, 0);
+        }
+
+        canvas.DrawBox(clipped, "System");
+        var content = clipped.Inset(1, 1);
+        if (content.IsEmpty)
+        {
+            return new Rect(0, 0, 0, 0);
+        }
+
+        var systemLines = new[]
+        {
+            $"raw mode: {ToYesNo(_terminal.IsRawModeActive)}",
+            $"backend: {(_terminal.IsRawModeActive ? "vt-bytes" : "console-keys-fallback")}",
+            $"focus support: {ToYesNo(_capabilities.FocusReporting)}",
+            $"mouse support: {ToYesNo(_capabilities.MouseReporting)}",
+            $"paste support: {ToYesNo(_capabilities.BracketedPaste)}",
+            $"stress mode: {ToYesNo(_stressMode)} ({_tickCount} ticks)",
+            $"last event: {_lastEvent}",
+        };
+
+        var infoRows = Math.Min(systemLines.Length, Math.Max(1, content.Height - 3));
+        for (var i = 0; i < infoRows; i++)
+        {
+            canvas.WriteText(content.X, content.Y + i, systemLines[i], content.Width);
+        }
+
+        var barRow = content.Y + infoRows;
+        if (barRow < content.Bottom)
+        {
+            var gauge = Math.Clamp((_count + 50) / 100.0, 0, 1);
+            TWidgets.DrawProgressBar(canvas, new Rect(content.X, barRow, content.Width, 1), gauge);
+        }
+
+        var statusTop = Math.Min(content.Bottom, barRow + 1);
+        var statusHeight = content.Bottom - statusTop;
+        if (statusHeight < 3)
+        {
+            return new Rect(0, 0, 0, 0);
+        }
+
+        return new Rect(content.X, statusTop, content.Width, statusHeight);
+    }
+
     private string ActionState(ActionItem action)
     {
         return action.Name switch
@@ -698,11 +814,27 @@ internal sealed class CounterModel : IModel
         const int headerHeight = 3;
         const int footerHeight = 5;
         var bodyHeight = safeHeight - headerHeight - footerHeight;
-        var leftWidth = Math.Max(30, safeWidth / 3);
+        var leftWidth = Math.Max(34, (safeWidth * 44) / 100);
         var rightWidth = safeWidth - leftWidth;
 
-        _actionList.PageSize = Math.Max(1, bodyHeight - 3);
-        _logViewport.Resize(Math.Max(12, rightWidth - 2), Math.Max(4, bodyHeight - 2));
+        var systemHeight = Math.Clamp(bodyHeight / 2, 8, 12);
+        if (bodyHeight - systemHeight < 6)
+        {
+            systemHeight = Math.Max(7, bodyHeight - 6);
+        }
+
+        var actionHeight = Math.Max(4, bodyHeight - systemHeight);
+        _actionList.PageSize = Math.Max(1, actionHeight - 3);
+
+        var infoHeight = Math.Clamp(bodyHeight / 5, 3, 5);
+        var throughputHeight = Math.Clamp(bodyHeight / 3, 5, 9);
+        if (infoHeight + throughputHeight + 5 > bodyHeight)
+        {
+            throughputHeight = Math.Max(4, bodyHeight - infoHeight - 5);
+        }
+
+        var logHeight = Math.Max(4, bodyHeight - infoHeight - throughputHeight);
+        _logViewport.Resize(Math.Max(12, rightWidth - 2), Math.Max(3, logHeight - 2));
     }
 
     private void CycleFocus()
@@ -732,6 +864,23 @@ internal sealed class CounterModel : IModel
         {
             _sparkline.RemoveAt(0);
         }
+    }
+
+    private void RefreshStatusBars()
+    {
+        var normalizedCount = Math.Clamp(_count + 50, 0, 100);
+        var normalizedTicks = Math.Clamp(_tickCount % 100, 0, 100);
+
+        _statusChart.SetBars(
+        [
+            new BarDatum("raw", _terminal.IsRawModeActive ? 100 : 0),
+            new BarDatum("focus", _focused ? 100 : 0),
+            new BarDatum("mouse", _capabilities.MouseReporting ? 100 : 0),
+            new BarDatum("paste", _capabilities.BracketedPaste ? 100 : 0),
+            new BarDatum("stress", _stressMode ? 100 : 0),
+            new BarDatum("count", normalizedCount),
+            new BarDatum("pulse", normalizedTicks),
+        ]);
     }
 
     private static string ToYesNo(bool value) => value ? "yes" : "no";
