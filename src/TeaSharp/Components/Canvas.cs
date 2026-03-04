@@ -1,16 +1,35 @@
 using System.Text;
+using System.Globalization;
 
 namespace TeaSharp.Components;
 
+public enum CanvasTextMode
+{
+    Fast = 0,
+    GraphemeAware = 1,
+}
+
 public sealed class Canvas
 {
-    private readonly char[] _cells;
+    private readonly char[]? _cells;
+    private readonly string?[]? _graphemeCells;
+    private readonly bool[]? _graphemeContinuation;
 
-    public Canvas(int width, int height)
+    public Canvas(int width, int height, CanvasTextMode textMode = CanvasTextMode.Fast)
     {
         Width = Math.Max(1, width);
         Height = Math.Max(1, height);
-        _cells = new char[Width * Height];
+        TextMode = textMode;
+        if (TextMode == CanvasTextMode.Fast)
+        {
+            _cells = new char[Width * Height];
+        }
+        else
+        {
+            _graphemeCells = new string?[Width * Height];
+            _graphemeContinuation = new bool[Width * Height];
+        }
+
         Clear();
     }
 
@@ -18,11 +37,28 @@ public sealed class Canvas
 
     public int Height { get; }
 
+    public CanvasTextMode TextMode { get; }
+
     public Rect Bounds => new(0, 0, Width, Height);
 
     public void Clear(char fill = ' ')
     {
-        Array.Fill(_cells, fill);
+        if (TextMode == CanvasTextMode.Fast)
+        {
+            Array.Fill(_cells!, fill);
+            return;
+        }
+
+        Array.Clear(_graphemeCells!, 0, _graphemeCells!.Length);
+        Array.Clear(_graphemeContinuation!, 0, _graphemeContinuation!.Length);
+        if (fill != ' ')
+        {
+            var text = fill.ToString();
+            for (var i = 0; i < _graphemeCells.Length; i++)
+            {
+                _graphemeCells[i] = text;
+            }
+        }
     }
 
     public void Set(int x, int y, char value)
@@ -32,7 +68,13 @@ public sealed class Canvas
             return;
         }
 
-        _cells[(y * Width) + x] = value;
+        if (TextMode == CanvasTextMode.Fast)
+        {
+            _cells![(y * Width) + x] = value;
+            return;
+        }
+
+        SetGraphemeCell(x, y, value.ToString(), width: 1);
     }
 
     public char Get(int x, int y)
@@ -42,7 +84,18 @@ public sealed class Canvas
             return '\0';
         }
 
-        return _cells[(y * Width) + x];
+        var index = (y * Width) + x;
+        if (TextMode == CanvasTextMode.Fast)
+        {
+            return _cells![index];
+        }
+
+        if (_graphemeContinuation![index] || _graphemeCells![index] is not string element || element.Length == 0)
+        {
+            return '\0';
+        }
+
+        return element[0];
     }
 
     public void WriteText(int x, int y, string text, int maxWidth = int.MaxValue)
@@ -52,6 +105,17 @@ public sealed class Canvas
             return;
         }
 
+        if (TextMode == CanvasTextMode.Fast)
+        {
+            WriteTextFast(x, y, text, maxWidth);
+            return;
+        }
+
+        WriteTextGrapheme(x, y, text, maxWidth);
+    }
+
+    private void WriteTextFast(int x, int y, string text, int maxWidth)
+    {
         var cx = x;
         var written = 0;
         foreach (var ch in text)
@@ -69,6 +133,65 @@ public sealed class Canvas
             Set(cx, y, ch);
             cx++;
             written++;
+        }
+    }
+
+    private void WriteTextGrapheme(int x, int y, string text, int maxWidth)
+    {
+        var cx = x;
+        var written = 0;
+        var index = 0;
+        var lastColumn = -1;
+
+        while (index < text.Length)
+        {
+            var element = StringInfo.GetNextTextElement(text, index);
+            index += element.Length;
+
+            if (element is "\r" or "\n")
+            {
+                break;
+            }
+
+            var elementWidth = TextElementWidth.Measure(element);
+            if (elementWidth <= 0)
+            {
+                if (lastColumn >= 0)
+                {
+                    var previousIndex = (y * Width) + lastColumn;
+                    if (_graphemeCells![previousIndex] is string previous)
+                    {
+                        _graphemeCells[previousIndex] = previous + element;
+                    }
+                }
+
+                continue;
+            }
+
+            if (written + elementWidth > maxWidth)
+            {
+                break;
+            }
+
+            if (cx >= 0 && cx < Width)
+            {
+                if (elementWidth == 1 || cx + 1 < Width)
+                {
+                    SetGraphemeCell(cx, y, element, elementWidth);
+                    lastColumn = cx;
+                }
+                else
+                {
+                    break;
+                }
+            }
+            else
+            {
+                lastColumn = -1;
+            }
+
+            cx += elementWidth;
+            written += elementWidth;
         }
     }
 
@@ -129,6 +252,16 @@ public sealed class Canvas
 
     public string Render()
     {
+        if (TextMode == CanvasTextMode.Fast)
+        {
+            return RenderFast();
+        }
+
+        return RenderGrapheme();
+    }
+
+    private string RenderFast()
+    {
         var sb = new StringBuilder((Width + 1) * Height);
         for (var y = 0; y < Height; y++)
         {
@@ -137,9 +270,105 @@ public sealed class Canvas
                 sb.Append('\n');
             }
 
-            sb.Append(_cells, y * Width, Width);
+            sb.Append(_cells!, y * Width, Width);
         }
 
         return sb.ToString();
+    }
+
+    private string RenderGrapheme()
+    {
+        var sb = new StringBuilder((Width + 1) * Height);
+        for (var y = 0; y < Height; y++)
+        {
+            if (y > 0)
+            {
+                sb.Append('\n');
+            }
+
+            var rowStart = y * Width;
+            for (var x = 0; x < Width; x++)
+            {
+                var index = rowStart + x;
+                if (_graphemeContinuation![index])
+                {
+                    continue;
+                }
+
+                var cell = _graphemeCells![index];
+                if (cell is null)
+                {
+                    sb.Append(' ');
+                }
+                else
+                {
+                    sb.Append(cell);
+                }
+            }
+        }
+
+        return sb.ToString();
+    }
+
+    private void SetGraphemeCell(int x, int y, string value, int width)
+    {
+        if (x < 0 || y < 0 || x >= Width || y >= Height || width <= 0)
+        {
+            return;
+        }
+
+        var index = (y * Width) + x;
+        ClearGraphemeCell(index);
+        _graphemeCells![index] = value;
+        _graphemeContinuation![index] = false;
+
+        if (width > 1)
+        {
+            var nextColumn = x + 1;
+            if (nextColumn >= Width)
+            {
+                return;
+            }
+
+            var nextIndex = (y * Width) + nextColumn;
+            ClearGraphemeCell(nextIndex);
+            _graphemeCells[nextIndex] = null;
+            _graphemeContinuation[nextIndex] = true;
+        }
+    }
+
+    private void ClearGraphemeCell(int index)
+    {
+        if (_graphemeCells is null || _graphemeContinuation is null)
+        {
+            return;
+        }
+
+        if (_graphemeContinuation[index])
+        {
+            var previous = index - 1;
+            if (previous >= 0 && (previous / Width) == (index / Width))
+            {
+                _graphemeCells[previous] = null;
+                _graphemeContinuation[previous] = false;
+            }
+
+            _graphemeContinuation[index] = false;
+            _graphemeCells[index] = null;
+            return;
+        }
+
+        if (_graphemeCells[index] is string existing && TextElementWidth.Measure(existing) > 1)
+        {
+            var next = index + 1;
+            if (next < _graphemeCells.Length && (next / Width) == (index / Width) && _graphemeContinuation[next])
+            {
+                _graphemeContinuation[next] = false;
+                _graphemeCells[next] = null;
+            }
+        }
+
+        _graphemeCells[index] = null;
+        _graphemeContinuation[index] = false;
     }
 }

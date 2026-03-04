@@ -88,6 +88,20 @@ internal sealed class CounterModel : IModel
         Title = "Status Mix",
         MaxValue = 100,
     };
+    private readonly GaugeComponent _countGauge = new()
+    {
+        Title = "Count Gauge",
+        MinValue = -10,
+        MaxValue = 10,
+    };
+    private readonly StatsCardComponent _capabilityCard = new()
+    {
+        Title = "Capabilities",
+    };
+    private readonly MiniLogComponent _miniLog = new(capacity: 180)
+    {
+        Title = "Live Event",
+    };
     private readonly ComponentComposer _workspaceComposer = new();
 
     private TerminalCapabilityProfile _capabilities = TerminalCapabilityProfile.AllSupported;
@@ -405,6 +419,7 @@ internal sealed class CounterModel : IModel
                 break;
             case "Clear log":
                 _eventLog.Clear();
+                _miniLog.Clear();
                 _logViewport.Clear();
                 RefreshStatusBars();
                 AppendLog("action: clear log");
@@ -476,6 +491,7 @@ internal sealed class CounterModel : IModel
         if (string.Equals(command, "clear", StringComparison.OrdinalIgnoreCase))
         {
             _eventLog.Clear();
+            _miniLog.Clear();
             _logViewport.Clear();
             RefreshStatusBars();
             AppendLog("log cleared");
@@ -501,6 +517,7 @@ internal sealed class CounterModel : IModel
     {
         var entry = $"[{DateTimeOffset.Now:HH:mm:ss}] {line}";
         _eventLog.Add(entry);
+        _miniLog.Append(entry);
         _logViewport.AppendLine(entry);
         if (_eventLog.Count > 240)
         {
@@ -637,39 +654,60 @@ internal sealed class CounterModel : IModel
                 ["expand terminal for actions table"]);
         }
 
-        var infoHeight = Math.Clamp(rightRect.Height / 5, 3, 5);
-        var throughputHeight = Math.Clamp(rightRect.Height / 3, 5, 9);
-        if (infoHeight + throughputHeight + 5 > rightRect.Height)
+        var infoHeight = Math.Clamp(rightRect.Height / 3, 7, 10);
+        var throughputHeight = Math.Clamp(rightRect.Height / 4, 5, 8);
+        if (infoHeight + throughputHeight + 6 > rightRect.Height)
         {
-            throughputHeight = Math.Max(4, rightRect.Height - infoHeight - 5);
+            throughputHeight = Math.Max(4, rightRect.Height - infoHeight - 6);
+        }
+
+        if (infoHeight + throughputHeight + 4 > rightRect.Height)
+        {
+            infoHeight = Math.Max(5, rightRect.Height - throughputHeight - 4);
         }
 
         var infoRect = new Rect(rightRect.X, rightRect.Y, rightRect.Width, infoHeight);
         var throughputRect = new Rect(rightRect.X, infoRect.Bottom, rightRect.Width, throughputHeight);
         var logRect = new Rect(rightRect.X, throughputRect.Bottom, rightRect.Width, rightRect.Bottom - throughputRect.Bottom);
 
-        TWidgets.DrawCard(
-            canvas,
-            infoRect,
-            "Components",
-            [
-                "styles, charts, cards, table",
-                "tab cycles action, log, command",
-                "1 protocol view, 2 dashboard view",
-            ]);
+        if (!infoRect.IsEmpty && infoRect.Height >= 4)
+        {
+            var capabilityHeight = Math.Max(4, infoRect.Height - 3);
+            var capabilityRect = new Rect(infoRect.X, infoRect.Y, infoRect.Width, capabilityHeight);
+            _workspaceComposer.Add(_capabilityCard, capabilityRect);
+
+            var gaugeRect = new Rect(infoRect.X, capabilityRect.Bottom, infoRect.Width, infoRect.Bottom - capabilityRect.Bottom);
+            if (!gaugeRect.IsEmpty && gaugeRect.Height >= 3)
+            {
+                _workspaceComposer.Add(_countGauge, gaugeRect);
+            }
+        }
 
         if (!throughputRect.IsEmpty && throughputRect.Height >= 4)
         {
             _workspaceComposer.Add(_throughputChart, throughputRect);
         }
 
+        Rect viewportLogRect;
+        if (logRect.Height >= 9)
+        {
+            const int miniLogHeight = 4;
+            var miniLogRect = new Rect(logRect.X, logRect.Y, logRect.Width, miniLogHeight);
+            _workspaceComposer.Add(_miniLog, miniLogRect);
+            viewportLogRect = new Rect(logRect.X, miniLogRect.Bottom, logRect.Width, logRect.Bottom - miniLogRect.Bottom);
+        }
+        else
+        {
+            viewportLogRect = logRect;
+        }
+
         _workspaceComposer.Render(canvas);
 
-        _logViewport.Resize(Math.Max(8, logRect.Width - 2), Math.Max(3, logRect.Height - 2));
+        _logViewport.Resize(Math.Max(8, viewportLogRect.Width - 2), Math.Max(3, viewportLogRect.Height - 2));
         var logLines = _logViewport.RenderLines();
         TWidgets.DrawPanel(
             canvas,
-            logRect,
+            viewportLogRect,
             _focus == WorkspaceFocus.Log ? "Log *" : "Log",
             [.. logLines]);
 
@@ -772,20 +810,13 @@ internal sealed class CounterModel : IModel
             $"last event: {_lastEvent}",
         };
 
-        var infoRows = Math.Min(systemLines.Length, Math.Max(1, content.Height - 3));
+        var infoRows = Math.Min(systemLines.Length, Math.Max(1, content.Height - 4));
         for (var i = 0; i < infoRows; i++)
         {
             canvas.WriteText(content.X, content.Y + i, systemLines[i], content.Width);
         }
 
-        var barRow = content.Y + infoRows;
-        if (barRow < content.Bottom)
-        {
-            var gauge = Math.Clamp((_count + 50) / 100.0, 0, 1);
-            TWidgets.DrawProgressBar(canvas, new Rect(content.X, barRow, content.Width, 1), gauge);
-        }
-
-        var statusTop = Math.Min(content.Bottom, barRow + 1);
+        var statusTop = Math.Min(content.Bottom, content.Y + infoRows);
         var statusHeight = content.Bottom - statusTop;
         if (statusHeight < 3)
         {
@@ -826,15 +857,23 @@ internal sealed class CounterModel : IModel
         var actionHeight = Math.Max(4, bodyHeight - systemHeight);
         _actionList.PageSize = Math.Max(1, actionHeight - 3);
 
-        var infoHeight = Math.Clamp(bodyHeight / 5, 3, 5);
-        var throughputHeight = Math.Clamp(bodyHeight / 3, 5, 9);
-        if (infoHeight + throughputHeight + 5 > bodyHeight)
+        var infoHeight = Math.Clamp(bodyHeight / 3, 7, 10);
+        var throughputHeight = Math.Clamp(bodyHeight / 4, 5, 8);
+        if (infoHeight + throughputHeight + 6 > bodyHeight)
         {
-            throughputHeight = Math.Max(4, bodyHeight - infoHeight - 5);
+            throughputHeight = Math.Max(4, bodyHeight - infoHeight - 6);
+        }
+
+        if (infoHeight + throughputHeight + 4 > bodyHeight)
+        {
+            infoHeight = Math.Max(5, bodyHeight - throughputHeight - 4);
         }
 
         var logHeight = Math.Max(4, bodyHeight - infoHeight - throughputHeight);
-        _logViewport.Resize(Math.Max(12, rightWidth - 2), Math.Max(3, logHeight - 2));
+        var viewportHeight = logHeight >= 9
+            ? Math.Max(4, logHeight - 4)
+            : logHeight;
+        _logViewport.Resize(Math.Max(12, rightWidth - 2), Math.Max(3, viewportHeight - 2));
     }
 
     private void CycleFocus()
@@ -870,6 +909,7 @@ internal sealed class CounterModel : IModel
     {
         var normalizedCount = Math.Clamp(_count + 50, 0, 100);
         var normalizedTicks = Math.Clamp(_tickCount % 100, 0, 100);
+        var absBound = Math.Max(10, Math.Abs(_count));
 
         _statusChart.SetBars(
         [
@@ -880,6 +920,23 @@ internal sealed class CounterModel : IModel
             new BarDatum("stress", _stressMode ? 100 : 0),
             new BarDatum("count", normalizedCount),
             new BarDatum("pulse", normalizedTicks),
+        ]);
+
+        _countGauge.MinValue = -absBound;
+        _countGauge.MaxValue = absBound;
+        _countGauge.Value = _count;
+        _countGauge.Label = $"count {_count} range ±{absBound}";
+
+        _capabilityCard.SetItems(
+        [
+            new StatsCardItem("raw", ToYesNo(_terminal.IsRawModeActive)),
+            new StatsCardItem("backend", _terminal.IsRawModeActive ? "vt-bytes" : "console"),
+            new StatsCardItem("focus", ToYesNo(_capabilities.FocusReporting)),
+            new StatsCardItem("mouse", ToYesNo(_capabilities.MouseReporting)),
+            new StatsCardItem("paste", ToYesNo(_capabilities.BracketedPaste)),
+            new StatsCardItem("sync", ToYesNo(_capabilities.SynchronizedUpdates)),
+            new StatsCardItem("stress", ToYesNo(_stressMode)),
+            new StatsCardItem("source", _capabilities.Source),
         ]);
     }
 
