@@ -55,6 +55,7 @@ The design follows patterns used in Bubble Tea examples:
 - command input footer
 
 The protocol probe page remains available (press `1`) for low-level VT debugging.
+Capability showcase page is available on `3` and demonstrates grapheme-aware canvas rendering plus custom component composition (`UnicodeShowcaseComponent`).
 The dashboard composes chart components through `ComponentComposer` and uses stateful models from `TeaSharp.Widgets`.
 
 ## Custom Components
