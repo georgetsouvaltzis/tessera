@@ -52,6 +52,15 @@ Legend: `done` = implemented, `partial` = usable but incomplete, `todo` = not im
 | Window title | OSC title | done | `View.WindowTitle` now emits OSC title sequence. |
 | Style/render integration | lipgloss-like style composition | partial | Added composable ANSI style API (`TeaStyle`, `AnsiColor`) with renderer SGR parsing/diff support, plus richer component primitives (`DrawCard`, `DrawTable`). Full lipgloss-level layout/style parity still pending. |
 
+## Widget Layer
+
+| Area | Bubble Tea Capability | TeaSharp | Notes |
+|---|---|---|---|
+| Viewport model | scrollable content model | partial | `ViewportModel` added with vertical/horizontal scrolling, mouse wheel handling, and optional soft-wrap. Missing full gutter/highlight parity. |
+| Text input model | editable input model | partial | `TextInputModel` added with cursor movement, selection basics, submit handling, and word-level delete/navigation. Missing full IME/multiline parity. |
+| List model | selectable/filterable list | partial | `ListModel<T>` added with paging, filtering, selection visibility, and wheel navigation. Missing richer delegates and async item loaders. |
+| Keymap/help model | reusable key bindings + help | partial | `KeyBinding`, widget keymaps, and compact help renderer added; no full-column/expanded help layout parity yet. |
+
 ## Cross-Platform Runtime
 
 | Area | Bubble Tea Capability | TeaSharp | Notes |

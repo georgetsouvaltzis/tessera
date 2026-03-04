@@ -37,3 +37,4 @@ The design follows patterns used in Bubble Tea examples:
 - event footer
 
 The protocol probe page remains available (press `1`) for low-level VT debugging.
+The workspace now composes these components with stateful models from `TeaSharp.Widgets`.
