@@ -173,7 +173,8 @@ internal sealed class CounterModel : IModel
             $"Focus events: {(_terminal.IsRawModeActive ? "expected (if terminal supports ?1004)" : "not available in fallback mode")}\n" +
             $"Mouse events: {(_terminal.IsRawModeActive ? "expected (if terminal supports ?1006)" : "not available in fallback mode")}\n" +
             "Synchronized updates: requested (?2026)\n" +
-            $"Mode reports: {FormatModeReports()}\n" +
+            "Mode reports (DECRPM current-state):\n" +
+            $"{FormatModeReports()}\n" +
             $"Resize backend: {_resizeBackend}\n" +
             $"Stress mode: {(_stressMode ? "on" : "off")} (pulses: {_pulseCount})\n" +
             $"Last event: {_lastEvent}\n" +
@@ -238,10 +239,10 @@ internal sealed class CounterModel : IModel
     private string FormatModeReports()
     {
         return
-            $"?1004={FormatModeState(1004)} " +
-            $"?1006={FormatModeState(1006)} " +
-            $"?2004={FormatModeState(2004)} " +
-            $"?2026={FormatModeState(2026)}";
+            $"  ?1004={FormatModeState(1004)}\n" +
+            $"  ?1006={FormatModeState(1006)}\n" +
+            $"  ?2004={FormatModeState(2004)}\n" +
+            $"  ?2026={FormatModeState(2026)}";
     }
 
     private string FormatModeState(int mode)

@@ -79,32 +79,32 @@ public sealed class AnsiDiffRenderer : IProgramRenderer
 
         if (_currentView.EnableBracketedPaste != _bracketedPaste)
         {
-            await QueryModeReportOnceAsync(2004).ConfigureAwait(false);
             await _writer.WriteAsync(_currentView.EnableBracketedPaste ? "\u001b[?2004h" : "\u001b[?2004l").ConfigureAwait(false);
             _bracketedPaste = _currentView.EnableBracketedPaste;
+            await QueryModeReportOnceAsync(2004).ConfigureAwait(false);
         }
 
         if (_currentView.EnableFocusReporting != _focusReporting)
         {
-            await QueryModeReportOnceAsync(1004).ConfigureAwait(false);
             await _writer.WriteAsync(_currentView.EnableFocusReporting ? "\u001b[?1004h" : "\u001b[?1004l").ConfigureAwait(false);
             _focusReporting = _currentView.EnableFocusReporting;
+            await QueryModeReportOnceAsync(1004).ConfigureAwait(false);
         }
 
         if (_currentView.EnableSynchronizedUpdates)
         {
-            await QueryModeReportOnceAsync(2026).ConfigureAwait(false);
             await _writer.WriteAsync("\u001b[?2026h").ConfigureAwait(false);
+            await QueryModeReportOnceAsync(2026).ConfigureAwait(false);
         }
 
         if (_currentView.MouseMode != _mouseMode)
         {
+            await WriteMouseModeAsync(_currentView.MouseMode).ConfigureAwait(false);
+            _mouseMode = _currentView.MouseMode;
             if (_currentView.MouseMode != MouseMode.None)
             {
                 await QueryModeReportOnceAsync(1006).ConfigureAwait(false);
             }
-            await WriteMouseModeAsync(_currentView.MouseMode).ConfigureAwait(false);
-            _mouseMode = _currentView.MouseMode;
         }
 
         if (!string.Equals(_windowTitle, _currentView.WindowTitle, StringComparison.Ordinal))
