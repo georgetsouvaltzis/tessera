@@ -115,7 +115,15 @@ internal sealed class CounterModel : IModel
 
         if (message is MouseMsg mouse)
         {
-            _lastEvent = $"mouse: {mouse.EventType.ToString().ToLowerInvariant()} {mouse.Button.ToString().ToLowerInvariant()} @ {mouse.X},{mouse.Y} mod={mouse.Modifiers}";
+            var category = message switch
+            {
+                MouseClickMsg => "click",
+                MouseReleaseMsg => "release",
+                MouseMotionMsg => "motion",
+                MouseWheelMsg => "wheel",
+                _ => mouse.EventType.ToString().ToLowerInvariant(),
+            };
+            _lastEvent = $"mouse: {category} {mouse.Button.ToString().ToLowerInvariant()} @ {mouse.X},{mouse.Y} mod={mouse.Modifiers}";
             return new UpdateResult(this, null);
         }
 

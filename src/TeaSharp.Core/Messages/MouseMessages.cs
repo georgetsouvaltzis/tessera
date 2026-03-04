@@ -26,9 +26,47 @@ public enum MouseButton
     Button11 = 11,
 }
 
-public sealed record MouseMsg(
-    MouseEventType EventType,
+public abstract record MouseMsg(
     MouseButton Button,
     int X,
     int Y,
-    KeyModifiers Modifiers = KeyModifiers.None) : IMessage;
+    KeyModifiers Modifiers = KeyModifiers.None) : IMessage
+{
+    public abstract MouseEventType EventType { get; }
+}
+
+public sealed record MouseClickMsg(
+    MouseButton Button,
+    int X,
+    int Y,
+    KeyModifiers Modifiers = KeyModifiers.None) : MouseMsg(Button, X, Y, Modifiers)
+{
+    public override MouseEventType EventType => MouseEventType.Press;
+}
+
+public sealed record MouseReleaseMsg(
+    MouseButton Button,
+    int X,
+    int Y,
+    KeyModifiers Modifiers = KeyModifiers.None) : MouseMsg(Button, X, Y, Modifiers)
+{
+    public override MouseEventType EventType => MouseEventType.Release;
+}
+
+public sealed record MouseMotionMsg(
+    MouseButton Button,
+    int X,
+    int Y,
+    KeyModifiers Modifiers = KeyModifiers.None) : MouseMsg(Button, X, Y, Modifiers)
+{
+    public override MouseEventType EventType => MouseEventType.Motion;
+}
+
+public sealed record MouseWheelMsg(
+    MouseButton Button,
+    int X,
+    int Y,
+    KeyModifiers Modifiers = KeyModifiers.None) : MouseMsg(Button, X, Y, Modifiers)
+{
+    public override MouseEventType EventType => MouseEventType.Wheel;
+}

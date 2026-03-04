@@ -106,16 +106,18 @@ internal static class EventDecoderGoldenTests
         var sgrRelease = Decode(decoder, "\u001b[<0;11;7m");
         var sgrMotion = Decode(decoder, "\u001b[<35;11;7M");
         var sgrWheel = Decode(decoder, "\u001b[<65;11;7M");
+        var sgrCtrlClick = Decode(decoder, "\u001b[<16;11;7M");
 
         var x10Bytes = new byte[] { 0x1B, (byte)'[', (byte)'M', (byte)' ', (byte)'+', (byte)'&' };
         var x10Press = decoder.Decode(x10Bytes, timeoutExpired: false);
 
         // Assert
-        AssertMouse(sgrPress, MouseEventType.Press, MouseButton.Left, 10, 6, KeyModifiers.None);
-        AssertMouse(sgrRelease, MouseEventType.Release, MouseButton.Left, 10, 6, KeyModifiers.None);
-        AssertMouse(sgrMotion, MouseEventType.Motion, MouseButton.None, 10, 6, KeyModifiers.None);
-        AssertMouse(sgrWheel, MouseEventType.Wheel, MouseButton.WheelDown, 10, 6, KeyModifiers.None);
-        AssertMouse(x10Press, MouseEventType.Press, MouseButton.Left, 10, 5, KeyModifiers.None);
+        AssertMouse<MouseClickMsg>(sgrPress, MouseEventType.Press, MouseButton.Left, 10, 6, KeyModifiers.None);
+        AssertMouse<MouseReleaseMsg>(sgrRelease, MouseEventType.Release, MouseButton.Left, 10, 6, KeyModifiers.None);
+        AssertMouse<MouseMotionMsg>(sgrMotion, MouseEventType.Motion, MouseButton.None, 10, 6, KeyModifiers.None);
+        AssertMouse<MouseWheelMsg>(sgrWheel, MouseEventType.Wheel, MouseButton.WheelDown, 10, 6, KeyModifiers.None);
+        AssertMouse<MouseClickMsg>(sgrCtrlClick, MouseEventType.Press, MouseButton.Left, 10, 6, KeyModifiers.Ctrl);
+        AssertMouse<MouseClickMsg>(x10Press, MouseEventType.Press, MouseButton.Left, 10, 5, KeyModifiers.None);
 
         return Task.CompletedTask;
     }
@@ -246,17 +248,18 @@ internal static class EventDecoderGoldenTests
         }
     }
 
-    private static void AssertMouse(
+    private static void AssertMouse<TMouse>(
         DecodeResult result,
         MouseEventType eventType,
         MouseButton button,
         int x,
         int y,
         KeyModifiers modifiers)
+        where TMouse : MouseMsg
     {
-        if (result.Message is not MouseMsg mouse)
+        if (result.Message is not TMouse mouse)
         {
-            throw new InvalidOperationException($"Expected MouseMsg but got {result.Message?.GetType().Name ?? "null"}.");
+            throw new InvalidOperationException($"Expected {typeof(TMouse).Name} but got {result.Message?.GetType().Name ?? "null"}.");
         }
 
         if (mouse.EventType != eventType

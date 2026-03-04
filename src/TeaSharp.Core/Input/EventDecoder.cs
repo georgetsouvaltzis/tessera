@@ -273,7 +273,7 @@ public sealed class EventDecoder
                     ? MouseEventType.Release
                     : MouseEventType.Press;
 
-        var message = new MouseMsg(
+        var message = CreateMouseMessage(
             eventType,
             DecodeMouseButton(cb, isWheel),
             cx - 1,
@@ -342,7 +342,7 @@ public sealed class EventDecoder
                     ? MouseEventType.Release
                     : MouseEventType.Press;
 
-        message = new MouseMsg(
+        message = CreateMouseMessage(
             eventType,
             DecodeMouseButton(cb, isWheel),
             cx - 1,
@@ -526,6 +526,23 @@ public sealed class EventDecoder
             1 => MouseButton.Middle,
             2 => MouseButton.Right,
             _ => MouseButton.None,
+        };
+    }
+
+    private static MouseMsg CreateMouseMessage(
+        MouseEventType eventType,
+        MouseButton button,
+        int x,
+        int y,
+        KeyModifiers modifiers)
+    {
+        return eventType switch
+        {
+            MouseEventType.Press => new MouseClickMsg(button, x, y, modifiers),
+            MouseEventType.Release => new MouseReleaseMsg(button, x, y, modifiers),
+            MouseEventType.Motion => new MouseMotionMsg(button, x, y, modifiers),
+            MouseEventType.Wheel => new MouseWheelMsg(button, x, y, modifiers),
+            _ => new MouseMotionMsg(button, x, y, modifiers),
         };
     }
 
