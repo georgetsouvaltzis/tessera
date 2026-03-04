@@ -4,19 +4,19 @@ namespace TeaSharp.Tests;
 
 internal static class TerminalCapabilityDetectorTests
 {
-    private static readonly object EnvLock = new();
-
     public static IEnumerable<TestCase> Cases()
     {
         yield return new TestCase("CapabilityDetector_TERM_Dumb_DisablesAdvancedModes", TermDumb_DisablesAdvancedModes);
         yield return new TestCase("CapabilityDetector_AppleTerminal_DisablesSyncUpdates", AppleTerminal_DisablesSyncUpdates);
         yield return new TestCase("CapabilityDetector_Xterm_EnablesAllModes", Xterm_EnablesAllModes);
+        yield return new TestCase("CapabilityDetector_TerminfoEnrichesLinuxMouse", TerminfoEnrichesLinuxMouse);
+        yield return new TestCase("CapabilityDetector_TerminfoEnrichesVt100Extensions", TerminfoEnrichesVt100Extensions);
     }
 
     private static Task TermDumb_DisablesAdvancedModes()
     {
         // Arrange + Act
-        var profile = DetectWithEnvironment(("TERM", "dumb"), ("TERM_PROGRAM", null), ("WT_SESSION", null));
+        var profile = Detect(("TERM", "dumb"));
 
         // Assert
         TestAssert.True(!profile.FocusReporting, "TERM=dumb should disable focus reporting.");
@@ -30,7 +30,7 @@ internal static class TerminalCapabilityDetectorTests
     private static Task AppleTerminal_DisablesSyncUpdates()
     {
         // Arrange + Act
-        var profile = DetectWithEnvironment(
+        var profile = Detect(
             ("TERM", "xterm-256color"),
             ("TERM_PROGRAM", "Apple_Terminal"),
             ("WT_SESSION", null));
@@ -47,7 +47,7 @@ internal static class TerminalCapabilityDetectorTests
     private static Task Xterm_EnablesAllModes()
     {
         // Arrange + Act
-        var profile = DetectWithEnvironment(("TERM", "xterm-256color"), ("TERM_PROGRAM", null), ("WT_SESSION", null));
+        var profile = Detect(("TERM", "xterm-256color"));
 
         // Assert
         TestAssert.True(profile.FocusReporting, "xterm should enable focus reporting.");
@@ -58,32 +58,60 @@ internal static class TerminalCapabilityDetectorTests
         return Task.CompletedTask;
     }
 
-    private static TerminalCapabilityProfile DetectWithEnvironment(params (string Name, string? Value)[] values)
+    private static Task TerminfoEnrichesLinuxMouse()
     {
-        lock (EnvLock)
+        // Arrange + Act
+        var profile = Detect(
+            terminfo: "linux|linux console, kmous=\\E[M,",
+            ("TERM", "linux"));
+
+        // Assert
+        TestAssert.True(!profile.FocusReporting, "linux should keep focus reporting disabled.");
+        TestAssert.True(profile.MouseReporting, "terminfo kmous should enable mouse reporting for linux.");
+        TestAssert.True(!profile.BracketedPaste, "linux should keep bracketed paste disabled.");
+        TestAssert.True(!profile.SynchronizedUpdates, "linux should keep synchronized updates disabled.");
+        TestAssert.True(!profile.ModeReports, "linux should keep mode reports disabled.");
+        TestAssert.True(
+            profile.Source.Contains("terminfo:linux", StringComparison.Ordinal),
+            "Source should include terminfo enrichment marker.");
+        return Task.CompletedTask;
+    }
+
+    private static Task TerminfoEnrichesVt100Extensions()
+    {
+        // Arrange + Act
+        var profile = Detect(
+            terminfo: "vt100|vt100, XT,",
+            ("TERM", "vt100"));
+
+        // Assert
+        TestAssert.True(profile.FocusReporting, "terminfo XT should enable focus reporting.");
+        TestAssert.True(!profile.MouseReporting, "vt100 should keep mouse reporting disabled without kmous.");
+        TestAssert.True(profile.BracketedPaste, "terminfo XT should enable bracketed paste.");
+        TestAssert.True(!profile.SynchronizedUpdates, "vt100 should keep synchronized updates disabled without Sync.");
+        TestAssert.True(profile.ModeReports, "terminfo XT should enable mode reports.");
+        return Task.CompletedTask;
+    }
+
+    private static TerminalCapabilityProfile Detect(
+        params (string Name, string? Value)[] values)
+    {
+        return Detect(null, values);
+    }
+
+    private static TerminalCapabilityProfile Detect(
+        string? terminfo,
+        params (string Name, string? Value)[] values)
+    {
+        var env = new Dictionary<string, string?>(StringComparer.Ordinal);
+        foreach (var (name, value) in values)
         {
-            var originals = new Dictionary<string, string?>(StringComparer.Ordinal);
-            foreach (var (name, _) in values)
-            {
-                originals[name] = Environment.GetEnvironmentVariable(name);
-            }
-
-            try
-            {
-                foreach (var (name, value) in values)
-                {
-                    Environment.SetEnvironmentVariable(name, value);
-                }
-
-                return TerminalCapabilityDetector.Detect();
-            }
-            finally
-            {
-                foreach (var original in originals)
-                {
-                    Environment.SetEnvironmentVariable(original.Key, original.Value);
-                }
-            }
+            env[name] = value;
         }
+
+        return TerminalCapabilityDetector.Detect(
+            name => env.TryGetValue(name, out var value) ? value : null,
+            _ => terminfo,
+            isWindows: false);
     }
 }
