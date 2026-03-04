@@ -10,7 +10,7 @@ public sealed class TerminalReader(Stream input, EventDecoder decoder, TimeSpan 
 
     public async Task StreamEventsAsync(CancellationToken cancellationToken, Action<IMessage> onEvent)
     {
-        var pending = new List<byte>(DefaultReadBufferSize);
+        var pending = new PendingByteBuffer(DefaultReadBufferSize);
         var readBuffer = new byte[DefaultReadBufferSize];
         var state = new PasteState();
 
@@ -24,7 +24,7 @@ public sealed class TerminalReader(Stream input, EventDecoder decoder, TimeSpan 
                 break;
             }
 
-            pending.AddRange(readBuffer.AsSpan(0, read).ToArray());
+            pending.Append(readBuffer.AsSpan(0, read));
             Drain(pending, onEvent, state, timeoutExpired: false);
         }
 
@@ -35,11 +35,11 @@ public sealed class TerminalReader(Stream input, EventDecoder decoder, TimeSpan 
         }
     }
 
-    private void Drain(List<byte> pending, Action<IMessage> onEvent, PasteState state, bool timeoutExpired)
+    private void Drain(PendingByteBuffer pending, Action<IMessage> onEvent, PasteState state, bool timeoutExpired)
     {
         while (pending.Count > 0)
         {
-            var result = decoder.Decode(pending.ToArray().AsSpan(), timeoutExpired);
+            var result = decoder.Decode(pending.AsSpan(), timeoutExpired);
             if (result.NeedMoreData || result.Consumed <= 0)
             {
                 return;
@@ -74,7 +74,7 @@ public sealed class TerminalReader(Stream input, EventDecoder decoder, TimeSpan 
                 }
             }
 
-            pending.RemoveRange(0, result.Consumed);
+            pending.Consume(result.Consumed);
         }
     }
 
@@ -114,5 +114,110 @@ public sealed class TerminalReader(Stream input, EventDecoder decoder, TimeSpan 
         public bool IsInPaste { get; set; }
 
         public StringBuilder Buffer { get; } = new();
+    }
+
+    private sealed class PendingByteBuffer
+    {
+        private byte[] _buffer;
+        private int _start;
+        private int _end;
+
+        public PendingByteBuffer(int initialCapacity)
+        {
+            _buffer = new byte[Math.Max(initialCapacity, 64)];
+            _start = 0;
+            _end = 0;
+        }
+
+        public int Count => _end - _start;
+
+        public ReadOnlySpan<byte> AsSpan()
+        {
+            return _buffer.AsSpan(_start, Count);
+        }
+
+        public void Append(ReadOnlySpan<byte> bytes)
+        {
+            if (bytes.IsEmpty)
+            {
+                return;
+            }
+
+            EnsureAppendCapacity(bytes.Length);
+            bytes.CopyTo(_buffer.AsSpan(_end));
+            _end += bytes.Length;
+        }
+
+        public void Consume(int count)
+        {
+            if (count <= 0)
+            {
+                return;
+            }
+
+            if (count >= Count)
+            {
+                _start = 0;
+                _end = 0;
+                return;
+            }
+
+            _start += count;
+
+            if (_start >= _buffer.Length / 2)
+            {
+                Compact();
+            }
+        }
+
+        private void EnsureAppendCapacity(int appendCount)
+        {
+            var currentCount = Count;
+            var required = currentCount + appendCount;
+            if (required <= _buffer.Length)
+            {
+                if (_end + appendCount > _buffer.Length)
+                {
+                    Compact();
+                }
+
+                return;
+            }
+
+            var newSize = _buffer.Length;
+            while (newSize < required)
+            {
+                newSize *= 2;
+            }
+
+            var next = new byte[newSize];
+            if (currentCount > 0)
+            {
+                _buffer.AsSpan(_start, currentCount).CopyTo(next);
+            }
+
+            _buffer = next;
+            _start = 0;
+            _end = currentCount;
+        }
+
+        private void Compact()
+        {
+            var currentCount = Count;
+            if (_start == 0 || currentCount == 0)
+            {
+                if (currentCount == 0)
+                {
+                    _start = 0;
+                    _end = 0;
+                }
+
+                return;
+            }
+
+            _buffer.AsSpan(_start, currentCount).CopyTo(_buffer);
+            _start = 0;
+            _end = currentCount;
+        }
     }
 }

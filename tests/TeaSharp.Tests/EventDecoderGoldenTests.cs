@@ -15,6 +15,7 @@ internal static class EventDecoderGoldenTests
         yield return new TestCase("Decoder_WindowResizeSequence_Parses", WindowResizeSequence_ParsesExpectedSize);
         yield return new TestCase("Decoder_ModeReportSequence_Parses", ModeReportSequence_ParsesExpectedMessage);
         yield return new TestCase("Decoder_MouseSequences_Parse", MouseSequences_ParseExpectedMessages);
+        yield return new TestCase("Decoder_MouseExtendedSequences_Parse", MouseExtendedSequences_ParseExpectedMessages);
         yield return new TestCase("Decoder_OscSequences_AreConsumedWithoutMessages", OscSequences_AreConsumedWithoutMessages);
         yield return new TestCase("Decoder_PartialCsi_RequestsMoreDataUntilTimeout", PartialCsi_RequestsMoreDataUntilTimeout);
         yield return new TestCase("Decoder_Utf8Rune_ParsesWithoutReplacement", Utf8Rune_ParsesWithoutReplacement);
@@ -135,6 +136,41 @@ internal static class EventDecoderGoldenTests
         AssertMouse<MouseClickMsg>(sgrCtrlClick, MouseEventType.Press, MouseButton.Left, 10, 6, KeyModifiers.Ctrl);
         AssertMouse<MouseClickMsg>(x10Press, MouseEventType.Press, MouseButton.Left, 10, 5, KeyModifiers.None);
 
+        return Task.CompletedTask;
+    }
+
+    private static Task MouseExtendedSequences_ParseExpectedMessages()
+    {
+        // Arrange
+        var decoder = new EventDecoder();
+
+        // Act
+        var wheelLeft = Decode(decoder, "\u001b[<66;11;7M");
+        var wheelRight = Decode(decoder, "\u001b[<67;11;7M");
+        var backward = Decode(decoder, "\u001b[<128;11;7M");
+        var forward = Decode(decoder, "\u001b[<129;11;7M");
+        var button10 = Decode(decoder, "\u001b[<130;11;7M");
+        var button11 = Decode(decoder, "\u001b[<131;11;7M");
+        var dragBackward = Decode(decoder, "\u001b[<160;11;7M");
+        var shiftAltRight = Decode(decoder, "\u001b[<14;11;7M");
+        var allModsWheelDown = Decode(decoder, "\u001b[<93;11;7M");
+        var motionReportedAsRelease = Decode(decoder, "\u001b[<35;11;7m");
+
+        var x10ReleaseBytes = new byte[] { 0x1B, (byte)'[', (byte)'M', (byte)'#', (byte)'2', (byte)'(' };
+        var x10Release = decoder.Decode(x10ReleaseBytes, timeoutExpired: false);
+
+        // Assert
+        AssertMouse<MouseWheelMsg>(wheelLeft, MouseEventType.Wheel, MouseButton.WheelLeft, 10, 6, KeyModifiers.None);
+        AssertMouse<MouseWheelMsg>(wheelRight, MouseEventType.Wheel, MouseButton.WheelRight, 10, 6, KeyModifiers.None);
+        AssertMouse<MouseClickMsg>(backward, MouseEventType.Press, MouseButton.Backward, 10, 6, KeyModifiers.None);
+        AssertMouse<MouseClickMsg>(forward, MouseEventType.Press, MouseButton.Forward, 10, 6, KeyModifiers.None);
+        AssertMouse<MouseClickMsg>(button10, MouseEventType.Press, MouseButton.Button10, 10, 6, KeyModifiers.None);
+        AssertMouse<MouseClickMsg>(button11, MouseEventType.Press, MouseButton.Button11, 10, 6, KeyModifiers.None);
+        AssertMouse<MouseMotionMsg>(dragBackward, MouseEventType.Motion, MouseButton.Backward, 10, 6, KeyModifiers.None);
+        AssertMouse<MouseClickMsg>(shiftAltRight, MouseEventType.Press, MouseButton.Right, 10, 6, KeyModifiers.Shift | KeyModifiers.Alt);
+        AssertMouse<MouseWheelMsg>(allModsWheelDown, MouseEventType.Wheel, MouseButton.WheelDown, 10, 6, KeyModifiers.Shift | KeyModifiers.Alt | KeyModifiers.Ctrl);
+        AssertMouse<MouseMotionMsg>(motionReportedAsRelease, MouseEventType.Motion, MouseButton.None, 10, 6, KeyModifiers.None);
+        AssertMouse<MouseReleaseMsg>(x10Release, MouseEventType.Release, MouseButton.None, 17, 7, KeyModifiers.None);
         return Task.CompletedTask;
     }
 

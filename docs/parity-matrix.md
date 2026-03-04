@@ -66,7 +66,7 @@ Legend: `done` = implemented, `partial` = usable but incomplete, `todo` = not im
 | Area | Bubble Tea Capability | TeaSharp | Notes |
 |---|---|---|---|
 | Behavior tests | loop/command semantics | done | Core regression tests pass. |
-| Protocol decode tests | key/mouse/paste parser fixtures | partial | Golden fixtures include CSI/SS3/OSC, modifiers, focus; mouse fixtures pending. |
+| Protocol decode tests | key/mouse/paste parser fixtures | partial | Golden fixtures include CSI/SS3/OSC, modifiers, focus, and extended mouse buttons/modifier combinations; terminal-specific fixture breadth still pending. |
 | Renderer snapshots | render diff correctness | todo | Needs deterministic snapshot tests. |
 
 ## Priority Gap Plan

@@ -179,6 +179,7 @@ internal sealed class CounterModel : IModel
             $"Stress mode: {(_stressMode ? "on" : "off")} (pulses: {_pulseCount})\n" +
             $"Last event: {_lastEvent}\n" +
             $"Last paste: {_lastPaste}\n" +
+            $"Typed length: {_typedText.Length}\n" +
             $"Typed text: {SanitizePastePreview(_typedText)}\n\n" +
             "Try live:\n" +
             "- up/down to change count\n" +
@@ -186,6 +187,7 @@ internal sealed class CounterModel : IModel
             "- press s to toggle render stress mode\n" +
             "- type text; backspace and enter work\n" +
             "- paste multi-line text (cmd+v/ctrl+v/right-click)\n" +
+            "- hold a key or paste large text; events should stay responsive\n" +
             "- switch terminal focus away/back\n" +
             "- resize terminal window\n" +
             "- q or ctrl+c to quit\n";
