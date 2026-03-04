@@ -1,4 +1,5 @@
 using TeaSharp;
+using TeaSharp.Components;
 using TeaSharp.Core.Abstractions;
 using TeaSharp.Core.Application;
 using TeaSharp.Core.Messages;
@@ -30,6 +31,14 @@ internal sealed class CounterModel : IModel
     private readonly TeaSharp.Core.Terminal.ConsoleTerminalAdapter _terminal;
     private TerminalCapabilityProfile _capabilities = TerminalCapabilityProfile.AllSupported;
     private readonly string _resizeBackend;
+    private readonly List<int> _sparkline = [];
+    private readonly string[] _actions =
+    [
+        "Inspect capabilities",
+        "Toggle stress mode",
+        "Switch page",
+        "Quit",
+    ];
 
     private int _count;
     private int _width = 80;
@@ -39,7 +48,9 @@ internal sealed class CounterModel : IModel
     private string _lastPaste = "(none)";
     private string _typedText = string.Empty;
     private bool _stressMode;
-    private int _pulseCount;
+    private int _tickCount;
+    private int _selectedAction;
+    private bool _dashboardMode = true;
     private readonly Dictionary<int, ModeReportState> _modeReports = [];
 
     public CounterModel(
@@ -51,7 +62,7 @@ internal sealed class CounterModel : IModel
             : "poll";
     }
 
-    public Command? Init() => null;
+    public Command? Init() => NextTickCommand(_stressMode);
 
     public UpdateResult Update(IMessage message)
     {
@@ -65,16 +76,32 @@ internal sealed class CounterModel : IModel
             {
                 _count--;
             }
+            else if (key.Code == KeyCode.Tab)
+            {
+                _selectedAction = (_selectedAction + 1) % _actions.Length;
+            }
+            else if (key.Code == KeyCode.Enter && _dashboardMode)
+            {
+                return ExecuteSelectedAction();
+            }
             else if (key.Text == "q"
                      || ((key.Text == "c" || key.Text == "\u0003") && key.Modifiers.HasFlag(KeyModifiers.Ctrl)))
             {
                 return new UpdateResult(this, Tea.Cmd.Quit);
             }
+            else if (key.Text == "1")
+            {
+                _dashboardMode = false;
+            }
+            else if (key.Text == "2")
+            {
+                _dashboardMode = true;
+            }
             else if (key.Text == "s" && key.Modifiers == KeyModifiers.None)
             {
                 _stressMode = !_stressMode;
                 _lastEvent = $"stress: {(_stressMode ? "on" : "off")}";
-                return new UpdateResult(this, _stressMode ? NextPulseCommand() : null);
+                return new UpdateResult(this, NextTickCommand(_stressMode));
             }
             else if (key.Modifiers == KeyModifiers.None && key.Code == KeyCode.Character && !string.IsNullOrEmpty(key.Text))
             {
@@ -151,15 +178,11 @@ internal sealed class CounterModel : IModel
             return new UpdateResult(this, null);
         }
 
-        if (message is RenderPulseMsg)
+        if (message is DashboardTickMsg)
         {
-            if (!_stressMode)
-            {
-                return new UpdateResult(this, null);
-            }
-
-            _pulseCount++;
-            return new UpdateResult(this, NextPulseCommand());
+            _tickCount++;
+            AppendSparkSample();
+            return new UpdateResult(this, NextTickCommand(_stressMode));
         }
 
         if (message is UnknownInputMsg unknown)
@@ -173,7 +196,26 @@ internal sealed class CounterModel : IModel
 
     public ModelView View()
     {
-        var content =
+        var content = _dashboardMode
+            ? BuildDashboardView()
+            : BuildProbeView();
+
+        return ModelView.From(content) with
+        {
+            AltScreen = true,
+            EnableBracketedPaste = true,
+            EnableFocusReporting = true,
+            EnableSynchronizedUpdates = true,
+            MouseMode = MouseMode.AllMotion,
+            WindowTitle = _dashboardMode
+                ? "TeaSharp Component Dashboard"
+                : "TeaSharp Protocol Probe",
+        };
+    }
+
+    private string BuildProbeView()
+    {
+        return
             "TeaSharp Protocol Probe\n\n" +
             $"Count: {_count}\n" +
             $"Focus: {(_focused ? "in" : "out")}\n" +
@@ -190,12 +232,13 @@ internal sealed class CounterModel : IModel
             "Mode reports (DECRPM current-state):\n" +
             $"{FormatModeReports()}\n" +
             $"Resize backend: {_resizeBackend}\n" +
-            $"Stress mode: {(_stressMode ? "on" : "off")} (pulses: {_pulseCount})\n" +
+            $"Stress mode: {(_stressMode ? "on" : "off")} (ticks: {_tickCount})\n" +
             $"Last event: {_lastEvent}\n" +
             $"Last paste: {_lastPaste}\n" +
             $"Typed length: {_typedText.Length}\n" +
             $"Typed text: {SanitizePastePreview(_typedText)}\n\n" +
             "Try live:\n" +
+            "- press 2 to open dashboard view\n" +
             "- up/down to change count\n" +
             "- move/click mouse in terminal window\n" +
             "- press s to toggle render stress mode\n" +
@@ -206,21 +249,132 @@ internal sealed class CounterModel : IModel
             "- switch terminal focus away/back\n" +
             "- resize terminal window\n" +
             "- q or ctrl+c to quit\n";
-
-        return ModelView.From(content) with
-        {
-            AltScreen = true,
-            EnableBracketedPaste = true,
-            EnableFocusReporting = true,
-            EnableSynchronizedUpdates = true,
-            MouseMode = MouseMode.AllMotion,
-            WindowTitle = "TeaSharp Protocol Probe",
-        };
     }
 
-    private static Command NextPulseCommand()
+    private string BuildDashboardView()
     {
-        return Tea.Cmd.Tick(TimeSpan.FromMilliseconds(35), _ => new RenderPulseMsg());
+        if (_width < 40 || _height < 16)
+        {
+            return
+                "TeaSharp Component Dashboard\n\n" +
+                "Terminal too small for dashboard components.\n" +
+                "Resize to at least 40x16.\n\n" +
+                "Press 1 for protocol view or q to quit.";
+        }
+
+        var canvas = new Canvas(_width, _height);
+        var headerHeight = 3;
+        var footerHeight = 4;
+        var bodyTop = headerHeight;
+        var bodyHeight = _height - headerHeight - footerHeight;
+        var leftWidth = Math.Max(24, _width / 2);
+        var rightWidth = _width - leftWidth;
+
+        Widgets.DrawPanel(
+            canvas,
+            new Rect(0, 0, _width, headerHeight),
+            "TeaSharp Dashboard",
+            [
+                $"count={_count} focus={(_focused ? "in" : "out")} size={_width}x{_height}  mode={( _dashboardMode ? "dashboard" : "probe")}  source={_capabilities.Source}",
+            ]);
+
+        Widgets.DrawPanel(
+            canvas,
+            new Rect(0, bodyTop, leftWidth, bodyHeight),
+            "System",
+            [
+                $"raw mode: {ToYesNo(_terminal.IsRawModeActive)}",
+                $"backend: {(_terminal.IsRawModeActive ? "vt-bytes" : "console-fallback")}",
+                $"focus support: {ToYesNo(_capabilities.FocusReporting)}",
+                $"mouse support: {ToYesNo(_capabilities.MouseReporting)}",
+                $"paste support: {ToYesNo(_capabilities.BracketedPaste)}",
+                $"sync support: {ToYesNo(_capabilities.SynchronizedUpdates)}",
+                $"mode reports: {ToYesNo(_capabilities.ModeReports)}",
+                $"stress mode: {ToYesNo(_stressMode)} ({_tickCount} ticks)",
+                $"last event: {Truncate(_lastEvent, Math.Max(6, leftWidth - 4))}",
+            ]);
+
+        var gauge = Math.Clamp((_count + 20) / 40.0, 0.0, 1.0);
+        Widgets.DrawProgressBar(
+            canvas,
+            new Rect(2, bodyTop + 10, Math.Max(10, leftWidth - 4), 2),
+            gauge,
+            $"count gauge: {_count}");
+
+        Widgets.DrawPanel(
+            canvas,
+            new Rect(leftWidth, bodyTop, rightWidth, bodyHeight),
+            "Components",
+            [
+                "sparkline, list, box panels",
+                "tab cycles action, enter executes",
+                "1 protocol view  2 dashboard view",
+            ]);
+
+        Widgets.DrawSparkline(
+            canvas,
+            new Rect(leftWidth + 2, bodyTop + 5, Math.Max(8, rightWidth - 4), 1),
+            _sparkline,
+            minValue: 0,
+            maxValue: 100);
+
+        Widgets.DrawList(
+            canvas,
+            new Rect(leftWidth + 2, bodyTop + 7, Math.Max(12, rightWidth - 4), Math.Max(3, bodyHeight - 9)),
+            _actions,
+            _selectedAction);
+
+        Widgets.DrawPanel(
+            canvas,
+            new Rect(0, _height - footerHeight, _width, footerHeight),
+            "Live Event",
+            [
+                $"last: {Truncate(_lastEvent, Math.Max(8, _width - 8))}",
+                $"paste: {Truncate(_lastPaste, Math.Max(8, _width - 8))}",
+            ]);
+
+        return canvas.Render();
+    }
+
+    private UpdateResult ExecuteSelectedAction()
+    {
+        switch (_selectedAction)
+        {
+            case 0:
+                _lastEvent = $"capabilities: {_capabilities.Source}";
+                return new UpdateResult(this, null);
+            case 1:
+                _stressMode = !_stressMode;
+                _lastEvent = $"stress: {(_stressMode ? "on" : "off")}";
+                return new UpdateResult(this, NextTickCommand(_stressMode));
+            case 2:
+                _dashboardMode = !_dashboardMode;
+                _lastEvent = $"view: {(_dashboardMode ? "dashboard" : "probe")}";
+                return new UpdateResult(this, null);
+            case 3:
+                return new UpdateResult(this, Tea.Cmd.Quit);
+            default:
+                return new UpdateResult(this, null);
+        }
+    }
+
+    private Command NextTickCommand(bool stressMode)
+    {
+        var delay = stressMode ? TimeSpan.FromMilliseconds(35) : TimeSpan.FromMilliseconds(160);
+        return Tea.Cmd.Tick(delay, _ => new DashboardTickMsg());
+    }
+
+    private void AppendSparkSample()
+    {
+        var normalizedCount = Math.Clamp(_count + 20, 0, 40);
+        var wave = 50 + (int)Math.Round(45 * Math.Sin(_tickCount / 8.0), MidpointRounding.AwayFromZero);
+        var sample = (wave + ((normalizedCount * 100) / 40)) / 2;
+        _sparkline.Add(Math.Clamp(sample, 0, 100));
+        var maxSamples = Math.Max(12, _width - 8);
+        if (_sparkline.Count > maxSamples)
+        {
+            _sparkline.RemoveAt(0);
+        }
     }
 
     private static string SanitizePastePreview(string content)
@@ -231,9 +385,9 @@ internal sealed class CounterModel : IModel
             .Replace("\n", "\\n", StringComparison.Ordinal)
             .Replace("\t", "\\t", StringComparison.Ordinal);
 
-        return sanitized.Length <= 72
+        return sanitized.Length <= 96
             ? sanitized
-            : sanitized[..72] + "...";
+            : sanitized[..96] + "...";
     }
 
     private static string SummarizeProbe(string probe)
@@ -258,6 +412,18 @@ internal sealed class CounterModel : IModel
         return value ? "yes" : "no";
     }
 
+    private static string Truncate(string value, int maxLength)
+    {
+        if (string.IsNullOrEmpty(value) || maxLength <= 0)
+        {
+            return string.Empty;
+        }
+
+        return value.Length <= maxLength
+            ? value
+            : value[..maxLength] + "...";
+    }
+
     private string FormatModeReports()
     {
         return
@@ -275,4 +441,4 @@ internal sealed class CounterModel : IModel
     }
 }
 
-internal sealed record RenderPulseMsg : IMessage;
+internal sealed record DashboardTickMsg : IMessage;

@@ -60,6 +60,9 @@ Primary goal: deterministic message-driven TUI runtime with portable terminal be
 6. `Commands`
 - `Commands` static helpers: `Quit`, `Interrupt`, `Batch`, `Sequence`, `Tick`, `Every`.
 
+7. `Components`
+- `TeaSharp.Components`: deterministic cell-canvas primitives (`Rect`, `Canvas`, `Widgets`) for building composable views.
+
 ### 4.2 Core Data Flow
 
 1. Program starts and prepares terminal.
@@ -150,3 +153,4 @@ Phase 3:
 ## 12. Parity Tracking
 
 - Bubble Tea parity tracking lives in `docs/parity-matrix.md`.
+- Component drawing notes live in `docs/components.md`.

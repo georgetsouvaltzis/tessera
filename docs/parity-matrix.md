@@ -50,7 +50,7 @@ Legend: `done` = implemented, `partial` = usable but incomplete, `todo` = not im
 | Cursor visibility/position | cursor control | partial | Show/hide + absolute position supported; no style/blink parity. |
 | Synchronized updates | synchronized paint | partial | Frame output is wrapped with `?2026h`/`?2026l`; `DECRPM` mode queries/reports are now surfaced, but terminal support is still best-effort. |
 | Window title | OSC title | done | `View.WindowTitle` now emits OSC title sequence. |
-| Style/render integration | lipgloss-like style composition | todo | No style system yet (out of scope currently). |
+| Style/render integration | lipgloss-like style composition | partial | Basic component drawing API (`Rect`, `Canvas`, `Widgets`) added for deterministic panels/progress/sparkline/list composition; no ANSI style engine/lipgloss-equivalent yet. |
 
 ## Cross-Platform Runtime
 
