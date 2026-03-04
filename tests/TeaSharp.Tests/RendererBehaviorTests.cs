@@ -11,6 +11,8 @@ internal static class RendererBehaviorTests
         yield return new TestCase("Renderer_MouseModeCellMotion_EmitsEnableSequences", MouseModeCellMotion_EmitsEnableSequences);
         yield return new TestCase("Renderer_MouseModeAllMotion_EmitsEnableSequences", MouseModeAllMotion_EmitsEnableSequences);
         yield return new TestCase("Renderer_Reset_DisablesMouseModes", Reset_DisablesMouseModes);
+        yield return new TestCase("Renderer_SynchronizedUpdates_WrapFrameOutput", SynchronizedUpdates_WrapFrameOutput);
+        yield return new TestCase("Renderer_SynchronizedUpdates_Disabled_DoesNotWrapFrameOutput", SynchronizedUpdates_Disabled_DoesNotWrapFrameOutput);
         yield return new TestCase("Renderer_CellDiff_UpdatesOnlyChangedCellRun", CellDiff_UpdatesOnlyChangedCellRun);
         yield return new TestCase("Renderer_CellDiff_ClearsShortenedLineTail", CellDiff_ClearsShortenedLineTail);
         yield return new TestCase("Renderer_Resize_ClipsToWidth", Resize_ClipsToWidth);
@@ -76,6 +78,41 @@ internal static class RendererBehaviorTests
         AssertContains(rendered, "\u001b[?1002l");
         AssertContains(rendered, "\u001b[?1003l");
         AssertContains(rendered, "\u001b[?1006l");
+    }
+
+    private static async Task SynchronizedUpdates_WrapFrameOutput()
+    {
+        // Arrange
+        await using var renderer = new AnsiDiffRenderer();
+        await using var output = new MemoryStream();
+        await renderer.InitializeAsync(output, CancellationToken.None);
+
+        // Act
+        renderer.Render(View.From("sync") with { EnableSynchronizedUpdates = true });
+        await renderer.FlushAsync(CancellationToken.None);
+        var rendered = ReadUtf8(output);
+
+        // Assert
+        AssertContains(rendered, "\u001b[?2026h");
+        AssertContains(rendered, "\u001b[?2026l");
+        AssertBefore(rendered, "\u001b[?2026h", "\u001b[?2026l");
+    }
+
+    private static async Task SynchronizedUpdates_Disabled_DoesNotWrapFrameOutput()
+    {
+        // Arrange
+        await using var renderer = new AnsiDiffRenderer();
+        await using var output = new MemoryStream();
+        await renderer.InitializeAsync(output, CancellationToken.None);
+
+        // Act
+        renderer.Render(View.From("nosync") with { EnableSynchronizedUpdates = false });
+        await renderer.FlushAsync(CancellationToken.None);
+        var rendered = ReadUtf8(output);
+
+        // Assert
+        AssertDoesNotContain(rendered, "\u001b[?2026h");
+        AssertDoesNotContain(rendered, "\u001b[?2026l");
     }
 
     private static async Task CellDiff_UpdatesOnlyChangedCellRun()
@@ -225,6 +262,17 @@ internal static class RendererBehaviorTests
         if (actual.Contains(fragment, StringComparison.Ordinal))
         {
             throw new InvalidOperationException($"Expected output to exclude '{Escape(fragment)}'.");
+        }
+    }
+
+    private static void AssertBefore(string actual, string first, string second)
+    {
+        var firstIndex = actual.IndexOf(first, StringComparison.Ordinal);
+        var secondIndex = actual.IndexOf(second, StringComparison.Ordinal);
+        if (firstIndex < 0 || secondIndex < 0 || firstIndex >= secondIndex)
+        {
+            throw new InvalidOperationException(
+                $"Expected '{Escape(first)}' before '{Escape(second)}'.");
         }
     }
 

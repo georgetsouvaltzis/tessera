@@ -15,7 +15,6 @@ public sealed class AnsiDiffRenderer : IProgramRenderer
     private bool _altScreen;
     private bool _bracketedPaste;
     private bool _focusReporting;
-    private bool _synchronizedUpdates;
     private MouseMode _mouseMode;
     private string? _windowTitle;
     private int _width;
@@ -35,7 +34,6 @@ public sealed class AnsiDiffRenderer : IProgramRenderer
         _altScreen = false;
         _bracketedPaste = false;
         _focusReporting = false;
-        _synchronizedUpdates = false;
         _mouseMode = MouseMode.None;
         _windowTitle = null;
         _width = 0;
@@ -89,10 +87,9 @@ public sealed class AnsiDiffRenderer : IProgramRenderer
             _focusReporting = _currentView.EnableFocusReporting;
         }
 
-        if (_currentView.EnableSynchronizedUpdates != _synchronizedUpdates)
+        if (_currentView.EnableSynchronizedUpdates)
         {
-            await _writer.WriteAsync(_currentView.EnableSynchronizedUpdates ? "\u001b[?2026h" : "\u001b[?2026l").ConfigureAwait(false);
-            _synchronizedUpdates = _currentView.EnableSynchronizedUpdates;
+            await _writer.WriteAsync("\u001b[?2026h").ConfigureAwait(false);
         }
 
         if (_currentView.MouseMode != _mouseMode)
@@ -131,6 +128,11 @@ public sealed class AnsiDiffRenderer : IProgramRenderer
             await _writer.WriteAsync("\u001b[?25l").ConfigureAwait(false);
         }
 
+        if (_currentView.EnableSynchronizedUpdates)
+        {
+            await _writer.WriteAsync("\u001b[?2026l").ConfigureAwait(false);
+        }
+
         await _writer.FlushAsync(cancellationToken).ConfigureAwait(false);
         _previousLines = lines;
 
@@ -161,12 +163,6 @@ public sealed class AnsiDiffRenderer : IProgramRenderer
         {
             await _writer.WriteAsync("\u001b[?1004l").ConfigureAwait(false);
             _focusReporting = false;
-        }
-
-        if (_synchronizedUpdates)
-        {
-            await _writer.WriteAsync("\u001b[?2026l").ConfigureAwait(false);
-            _synchronizedUpdates = false;
         }
 
         if (_mouseMode != MouseMode.None)

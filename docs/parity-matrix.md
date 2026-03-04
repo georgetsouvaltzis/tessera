@@ -48,7 +48,7 @@ Legend: `done` = implemented, `partial` = usable but incomplete, `todo` = not im
 | Diff rendering | efficient incremental updates | partial | Cell-run diff with grapheme/wide-char width handling is implemented; full style/cell-attribute parity still pending. |
 | Alt screen | alternate buffer enter/leave | done | `View.AltScreen` implemented. |
 | Cursor visibility/position | cursor control | partial | Show/hide + absolute position supported; no style/blink parity. |
-| Synchronized updates | synchronized paint | partial | Enable code emitted; disable/end semantics incomplete. |
+| Synchronized updates | synchronized paint | partial | Frame output is wrapped with `?2026h`/`?2026l`; terminal capability detection remains best-effort. |
 | Window title | OSC title | done | `View.WindowTitle` now emits OSC title sequence. |
 | Style/render integration | lipgloss-like style composition | todo | No style system yet (out of scope currently). |
 

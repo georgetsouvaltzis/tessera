@@ -164,6 +164,7 @@ internal sealed class CounterModel : IModel
             $"Input backend: {(_terminal.IsRawModeActive ? "vt-bytes" : "console-keys-fallback")}\n" +
             $"Focus events: {(_terminal.IsRawModeActive ? "expected (if terminal supports ?1004)" : "not available in fallback mode")}\n" +
             $"Mouse events: {(_terminal.IsRawModeActive ? "expected (if terminal supports ?1006)" : "not available in fallback mode")}\n" +
+            "Synchronized updates: requested (?2026)\n" +
             $"Resize backend: {_resizeBackend}\n" +
             $"Stress mode: {(_stressMode ? "on" : "off")} (pulses: {_pulseCount})\n" +
             $"Last event: {_lastEvent}\n" +
@@ -184,6 +185,7 @@ internal sealed class CounterModel : IModel
             AltScreen = true,
             EnableBracketedPaste = true,
             EnableFocusReporting = true,
+            EnableSynchronizedUpdates = true,
             MouseMode = MouseMode.AllMotion,
             WindowTitle = "TeaSharp Protocol Probe",
         };
