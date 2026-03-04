@@ -1,0 +1,238 @@
+using TeaSharp.Core.Abstractions;
+using TeaSharp.Core.Messages;
+
+namespace TeaSharp.Widgets;
+
+public sealed class ViewportModel
+{
+    private readonly List<string> _sourceLines = [];
+
+    public int Width { get; private set; } = 1;
+
+    public int Height { get; private set; } = 1;
+
+    public int XOffset { get; private set; }
+
+    public int YOffset { get; private set; }
+
+    public bool Wrap { get; private set; }
+
+    public void Resize(int width, int height)
+    {
+        Width = Math.Max(1, width);
+        Height = Math.Max(1, height);
+        ClampOffsets();
+    }
+
+    public void SetWrap(bool wrap)
+    {
+        Wrap = wrap;
+        ClampOffsets();
+    }
+
+    public void SetContent(string content)
+    {
+        _sourceLines.Clear();
+        var normalized = content
+            .Replace("\r\n", "\n", StringComparison.Ordinal)
+            .Replace('\r', '\n');
+        _sourceLines.AddRange(normalized.Split('\n'));
+        ClampOffsets();
+    }
+
+    public void AppendLine(string line)
+    {
+        _sourceLines.Add(line.Replace('\n', ' ').Replace('\r', ' '));
+        ClampOffsets();
+    }
+
+    public void Clear()
+    {
+        _sourceLines.Clear();
+        XOffset = 0;
+        YOffset = 0;
+    }
+
+    public void ScrollBy(int deltaY, int deltaX = 0)
+    {
+        YOffset += deltaY;
+        if (!Wrap)
+        {
+            XOffset += deltaX;
+        }
+
+        ClampOffsets();
+    }
+
+    public void ScrollToTop()
+    {
+        YOffset = 0;
+        ClampOffsets();
+    }
+
+    public void ScrollToBottom()
+    {
+        YOffset = Math.Max(0, BuildVisualLines().Count - Height);
+        ClampOffsets();
+    }
+
+    public bool Update(IMessage message, ViewportKeyMap? keyMap = null)
+    {
+        keyMap ??= ViewportKeyMap.Default;
+        var beforeX = XOffset;
+        var beforeY = YOffset;
+
+        if (message is KeyPressMsg key)
+        {
+            if (keyMap.Up.Matches(key))
+            {
+                ScrollBy(-1);
+            }
+            else if (keyMap.Down.Matches(key))
+            {
+                ScrollBy(1);
+            }
+            else if (keyMap.PageUp.Matches(key))
+            {
+                ScrollBy(-Height);
+            }
+            else if (keyMap.PageDown.Matches(key))
+            {
+                ScrollBy(Height);
+            }
+            else if (keyMap.Home.Matches(key))
+            {
+                ScrollToTop();
+            }
+            else if (keyMap.End.Matches(key))
+            {
+                ScrollToBottom();
+            }
+            else if (keyMap.Left.Matches(key))
+            {
+                ScrollBy(0, -2);
+            }
+            else if (keyMap.Right.Matches(key))
+            {
+                ScrollBy(0, 2);
+            }
+        }
+        else if (message is MouseWheelMsg wheel)
+        {
+            if (wheel.Button == MouseButton.WheelUp)
+            {
+                ScrollBy(-3);
+            }
+            else if (wheel.Button == MouseButton.WheelDown)
+            {
+                ScrollBy(3);
+            }
+        }
+
+        return beforeX != XOffset || beforeY != YOffset;
+    }
+
+    public IReadOnlyList<string> RenderLines()
+    {
+        var visualLines = BuildVisualLines();
+        if (visualLines.Count == 0)
+        {
+            return [string.Empty];
+        }
+
+        var start = Math.Clamp(YOffset, 0, Math.Max(0, visualLines.Count - 1));
+        var max = Math.Min(Height, visualLines.Count - start);
+        if (max <= 0)
+        {
+            return [string.Empty];
+        }
+
+        var rendered = new List<string>(max);
+        for (var i = 0; i < max; i++)
+        {
+            var line = visualLines[start + i];
+            rendered.Add(ClipLine(line));
+        }
+
+        return rendered;
+    }
+
+    private string ClipLine(string line)
+    {
+        if (Width <= 0)
+        {
+            return string.Empty;
+        }
+
+        if (Wrap)
+        {
+            return line.Length <= Width
+                ? line
+                : line[..Width];
+        }
+
+        if (XOffset >= line.Length)
+        {
+            return string.Empty;
+        }
+
+        var remaining = line.Length - XOffset;
+        var length = Math.Min(Width, remaining);
+        return line.Substring(XOffset, length);
+    }
+
+    private List<string> BuildVisualLines()
+    {
+        var lines = new List<string>(Math.Max(1, _sourceLines.Count));
+        if (_sourceLines.Count == 0)
+        {
+            lines.Add(string.Empty);
+            return lines;
+        }
+
+        if (!Wrap || Width <= 0)
+        {
+            lines.AddRange(_sourceLines);
+            return lines;
+        }
+
+        foreach (var sourceLine in _sourceLines)
+        {
+            if (sourceLine.Length == 0)
+            {
+                lines.Add(string.Empty);
+                continue;
+            }
+
+            for (var i = 0; i < sourceLine.Length; i += Width)
+            {
+                var length = Math.Min(Width, sourceLine.Length - i);
+                lines.Add(sourceLine.Substring(i, length));
+            }
+        }
+
+        return lines;
+    }
+
+    private void ClampOffsets()
+    {
+        var lines = BuildVisualLines();
+        var maxY = Math.Max(0, lines.Count - Height);
+        YOffset = Math.Clamp(YOffset, 0, maxY);
+
+        if (Wrap)
+        {
+            XOffset = 0;
+            return;
+        }
+
+        var maxWidth = 0;
+        foreach (var line in lines)
+        {
+            maxWidth = Math.Max(maxWidth, line.Length);
+        }
+
+        var maxX = Math.Max(0, maxWidth - Width);
+        XOffset = Math.Clamp(XOffset, 0, maxX);
+    }
+}

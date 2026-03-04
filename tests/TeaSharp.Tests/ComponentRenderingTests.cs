@@ -1,4 +1,5 @@
 using TeaSharp.Components;
+using TWidgets = TeaSharp.Components.Widgets;
 
 namespace TeaSharp.Tests;
 
@@ -36,7 +37,7 @@ internal static class ComponentRenderingTests
         var canvas = new Canvas(14, 2);
 
         // Act
-        Widgets.DrawProgressBar(canvas, new Rect(1, 0, 12, 2), 0.5, "50%");
+        TWidgets.DrawProgressBar(canvas, new Rect(1, 0, 12, 2), 0.5, "50%");
         var lines = canvas.Render().Split('\n');
 
         // Assert
@@ -54,7 +55,7 @@ internal static class ComponentRenderingTests
         var values = new[] { 0, 14, 28, 42, 57, 71, 85, 100 };
 
         // Act
-        Widgets.DrawSparkline(canvas, new Rect(0, 0, 8, 1), values, minValue: 0, maxValue: 100);
+        TWidgets.DrawSparkline(canvas, new Rect(0, 0, 8, 1), values, minValue: 0, maxValue: 100);
         var output = canvas.Render();
 
         // Assert
@@ -69,7 +70,7 @@ internal static class ComponentRenderingTests
         var items = new[] { "alpha", "beta", "gamma" };
 
         // Act
-        Widgets.DrawList(canvas, new Rect(0, 0, 18, 3), items, selectedIndex: 1);
+        TWidgets.DrawList(canvas, new Rect(0, 0, 18, 3), items, selectedIndex: 1);
         var lines = canvas.Render().Split('\n');
 
         // Assert
@@ -85,7 +86,7 @@ internal static class ComponentRenderingTests
         var canvas = new Canvas(24, 6);
 
         // Act
-        Widgets.DrawCard(
+        TWidgets.DrawCard(
             canvas,
             new Rect(0, 0, 24, 6),
             "Card",
@@ -112,7 +113,7 @@ internal static class ComponentRenderingTests
         ];
 
         // Act
-        Widgets.DrawTable(canvas, new Rect(0, 0, 34, 8), headers, rows, selectedRow: 1, title: "Stats");
+        TWidgets.DrawTable(canvas, new Rect(0, 0, 34, 8), headers, rows, selectedRow: 1, title: "Stats");
         var output = canvas.Render();
 
         // Assert
