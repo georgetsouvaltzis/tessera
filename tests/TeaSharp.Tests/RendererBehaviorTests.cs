@@ -14,7 +14,8 @@ internal static class RendererBehaviorTests
         yield return new TestCase("Renderer_CellDiff_UpdatesOnlyChangedCellRun", CellDiff_UpdatesOnlyChangedCellRun);
         yield return new TestCase("Renderer_CellDiff_ClearsShortenedLineTail", CellDiff_ClearsShortenedLineTail);
         yield return new TestCase("Renderer_Resize_ClipsToWidth", Resize_ClipsToWidth);
-        yield return new TestCase("Renderer_Resize_DropsWideRuneAtBoundary", Resize_DropsWideRuneAtBoundary);
+        yield return new TestCase("Renderer_Resize_WrapsLongLines", Resize_WrapsLongLines);
+        yield return new TestCase("Renderer_Resize_WrapsWideRuneAtBoundary", Resize_WrapsWideRuneAtBoundary);
         yield return new TestCase("Renderer_CellDiff_CombiningGrapheme_PatchesSingleColumn", CellDiff_CombiningGrapheme_PatchesSingleColumn);
     }
 
@@ -136,7 +137,27 @@ internal static class RendererBehaviorTests
         AssertDoesNotContain(rendered, "abcdef");
     }
 
-    private static async Task Resize_DropsWideRuneAtBoundary()
+    private static async Task Resize_WrapsLongLines()
+    {
+        // Arrange
+        await using var renderer = new AnsiDiffRenderer();
+        await using var output = new MemoryStream();
+        await renderer.InitializeAsync(output, CancellationToken.None);
+        renderer.Resize(width: 4, height: 5);
+
+        // Act
+        renderer.Render(View.From("abcdefgh"));
+        await renderer.FlushAsync(CancellationToken.None);
+        var rendered = ReadUtf8(output);
+
+        // Assert
+        AssertContains(rendered, "\u001b[1;1H");
+        AssertContains(rendered, "abcd");
+        AssertContains(rendered, "\u001b[2;1H");
+        AssertContains(rendered, "efgh");
+    }
+
+    private static async Task Resize_WrapsWideRuneAtBoundary()
     {
         // Arrange
         await using var renderer = new AnsiDiffRenderer();
@@ -151,7 +172,8 @@ internal static class RendererBehaviorTests
 
         // Assert
         AssertContains(rendered, "ab");
-        AssertDoesNotContain(rendered, "好");
+        AssertContains(rendered, "\u001b[2;1H");
+        AssertContains(rendered, "好");
     }
 
     private static async Task CellDiff_CombiningGrapheme_PatchesSingleColumn()

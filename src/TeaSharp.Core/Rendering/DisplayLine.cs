@@ -16,6 +16,70 @@ internal sealed class DisplayLine
 
     public int ColumnCount => _cells.Length;
 
+    public static IReadOnlyList<DisplayLine> WrapText(string text, int maxColumns)
+    {
+        if (maxColumns <= 0)
+        {
+            return [FromText(text, maxColumns)];
+        }
+
+        if (string.IsNullOrEmpty(text))
+        {
+            return [new DisplayLine([])];
+        }
+
+        var lines = new List<DisplayLine>();
+        var current = new List<string?>(Math.Min(text.Length, maxColumns));
+        var enumerator = StringInfo.GetTextElementEnumerator(text);
+        while (enumerator.MoveNext())
+        {
+            var element = enumerator.GetTextElement();
+            var width = DisplayWidth.MeasureTextElementWidth(element);
+            if (width <= 0)
+            {
+                var attachIndex = FindPreviousBaseCell(current);
+                if (attachIndex >= 0)
+                {
+                    current[attachIndex] += element;
+                }
+
+                continue;
+            }
+
+            if (!CanFit(current.Count, width, maxColumns))
+            {
+                if (current.Count > 0)
+                {
+                    lines.Add(new DisplayLine([.. current]));
+                    current.Clear();
+                }
+
+                if (width > maxColumns)
+                {
+                    continue;
+                }
+            }
+
+            current.Add(element);
+            if (width == 2)
+            {
+                current.Add(null);
+            }
+        }
+
+        if (current.Count > 0)
+        {
+            lines.Add(new DisplayLine([.. current]));
+        }
+
+        if (lines.Count == 0)
+        {
+            lines.Add(new DisplayLine([]));
+        }
+
+        return lines;
+    }
+
     public static DisplayLine FromText(string text, int maxColumns)
     {
         if (string.IsNullOrEmpty(text))

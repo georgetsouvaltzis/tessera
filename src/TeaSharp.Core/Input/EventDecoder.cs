@@ -1,3 +1,4 @@
+using System.Buffers;
 using System.Text;
 using TeaSharp.Core.Abstractions;
 using TeaSharp.Core.Messages;
@@ -28,7 +29,7 @@ public sealed class EventDecoder
             return DecodeEscape(buffer, timeoutExpired);
         }
 
-        return DecodePlain(buffer);
+        return DecodePlain(buffer, timeoutExpired);
     }
 
     private static DecodeResult DecodeEscape(ReadOnlySpan<byte> buffer, bool timeoutExpired)
@@ -54,10 +55,14 @@ public sealed class EventDecoder
 
     private static DecodeResult DecodeAltSequence(ReadOnlySpan<byte> buffer, bool timeoutExpired)
     {
-        var ch = DecodeRune(buffer[1..], out var runeLen);
-        if (ch is not null)
+        if (TryDecodeRune(buffer[1..], out var ch, out var runeLen, out var needMoreData))
         {
             return new DecodeResult(1 + runeLen, new KeyPressMsg(KeyCode.Character, ch, KeyModifiers.Alt), false);
+        }
+
+        if (needMoreData && !timeoutExpired)
+        {
+            return new DecodeResult(0, null, true);
         }
 
         if (!timeoutExpired)
@@ -145,7 +150,7 @@ public sealed class EventDecoder
         return new DecodeResult(1, new KeyPressMsg(KeyCode.Escape), false);
     }
 
-    private static DecodeResult DecodePlain(ReadOnlySpan<byte> buffer)
+    private static DecodeResult DecodePlain(ReadOnlySpan<byte> buffer, bool timeoutExpired)
     {
         return buffer[0] switch
         {
@@ -154,47 +159,51 @@ public sealed class EventDecoder
             0x0A => new DecodeResult(1, new KeyPressMsg(KeyCode.Enter), false),
             0x0D => new DecodeResult(1, new KeyPressMsg(KeyCode.Enter), false),
             0x7F => new DecodeResult(1, new KeyPressMsg(KeyCode.Backspace), false),
-            _ => DecodeUtf8(buffer),
+            _ => DecodeUtf8(buffer, timeoutExpired),
         };
     }
 
-    private static DecodeResult DecodeUtf8(ReadOnlySpan<byte> buffer)
+    private static DecodeResult DecodeUtf8(ReadOnlySpan<byte> buffer, bool timeoutExpired)
     {
-        var str = DecodeRune(buffer, out var len);
-        if (str is null)
+        if (TryDecodeRune(buffer, out var str, out var len, out var needMoreData))
         {
-            return new DecodeResult(1, new UnknownInputMsg($"0x{buffer[0]:X2}"), false);
+            return new DecodeResult(len, new KeyPressMsg(KeyCode.Character, str), false);
         }
 
-        return new DecodeResult(len, new KeyPressMsg(KeyCode.Character, str), false);
+        if (needMoreData && !timeoutExpired)
+        {
+            return new DecodeResult(0, null, true);
+        }
+
+        return new DecodeResult(1, new UnknownInputMsg($"0x{buffer[0]:X2}"), false);
     }
 
-    private static string? DecodeRune(ReadOnlySpan<byte> buffer, out int len)
+    private static bool TryDecodeRune(ReadOnlySpan<byte> buffer, out string value, out int len, out bool needMoreData)
     {
+        value = string.Empty;
         len = 0;
+        needMoreData = false;
+
         if (buffer.IsEmpty)
         {
-            return null;
+            needMoreData = true;
+            return false;
         }
 
-        for (var count = 1; count <= Math.Min(4, buffer.Length); count++)
+        var status = Rune.DecodeFromUtf8(buffer, out var rune, out len);
+        if (status == OperationStatus.Done)
         {
-            try
-            {
-                var text = Encoding.UTF8.GetString(buffer[..count]);
-                if (!string.IsNullOrEmpty(text))
-                {
-                    len = count;
-                    return text;
-                }
-            }
-            catch (DecoderFallbackException)
-            {
-                // Continue trying until max UTF-8 rune size.
-            }
+            value = rune.ToString();
+            return true;
         }
 
-        return null;
+        if (status == OperationStatus.NeedMoreData)
+        {
+            needMoreData = true;
+            return false;
+        }
+
+        return false;
     }
 
     private static bool TryDecodeCsiMessage(char final, IReadOnlyList<int?> parameters, out IMessage? message)

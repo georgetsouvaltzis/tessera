@@ -20,6 +20,7 @@ public sealed class AnsiDiffRenderer : IProgramRenderer
     private string? _windowTitle;
     private int _width;
     private int _height;
+    private bool _fullRepaintRequired;
 
     public ValueTask InitializeAsync(Stream output, CancellationToken cancellationToken)
     {
@@ -39,6 +40,7 @@ public sealed class AnsiDiffRenderer : IProgramRenderer
         _windowTitle = null;
         _width = 0;
         _height = 0;
+        _fullRepaintRequired = true;
 
         _ = cancellationToken;
         return ValueTask.CompletedTask;
@@ -46,6 +48,11 @@ public sealed class AnsiDiffRenderer : IProgramRenderer
 
     public void Resize(int width, int height)
     {
+        if (width != _width || height != _height)
+        {
+            _fullRepaintRequired = true;
+        }
+
         _width = width;
         _height = height;
     }
@@ -102,6 +109,13 @@ public sealed class AnsiDiffRenderer : IProgramRenderer
             }
 
             _windowTitle = _currentView.WindowTitle;
+        }
+
+        if (_fullRepaintRequired)
+        {
+            await _writer.WriteAsync("\u001b[2J\u001b[H").ConfigureAwait(false);
+            _previousLines.Clear();
+            _fullRepaintRequired = false;
         }
 
         var lines = PrepareLines(_currentView.Content);
@@ -169,6 +183,7 @@ public sealed class AnsiDiffRenderer : IProgramRenderer
 
         await _writer.FlushAsync(cancellationToken).ConfigureAwait(false);
         _previousLines.Clear();
+        _fullRepaintRequired = true;
     }
 
     public async ValueTask DisposeAsync()
@@ -199,16 +214,16 @@ public sealed class AnsiDiffRenderer : IProgramRenderer
 
     private List<DisplayLine> PrepareLines(string content)
     {
-        var lines = NormalizeLines(content);
-        if (_height > 0 && lines.Count > _height)
+        var normalized = NormalizeLines(content);
+        var rendered = new List<DisplayLine>(normalized.Count);
+        foreach (var line in normalized)
         {
-            lines = lines.GetRange(0, _height);
+            rendered.AddRange(DisplayLine.WrapText(line, _width));
         }
 
-        var rendered = new List<DisplayLine>(lines.Count);
-        foreach (var line in lines)
+        if (_height > 0 && rendered.Count > _height)
         {
-            rendered.Add(DisplayLine.FromText(line, _width));
+            rendered = rendered.GetRange(0, _height);
         }
 
         if (rendered.Count == 0)
@@ -267,6 +282,10 @@ public sealed class AnsiDiffRenderer : IProgramRenderer
         }
 
         var max = Math.Max(previousLine.ColumnCount, nextLine.ColumnCount);
+        if (_width > 0 && max > _width)
+        {
+            max = _width;
+        }
         var runStart = -1;
 
         for (var column = 0; column < max; column++)

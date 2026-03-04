@@ -16,6 +16,8 @@ internal static class EventDecoderGoldenTests
         yield return new TestCase("Decoder_MouseSequences_Parse", MouseSequences_ParseExpectedMessages);
         yield return new TestCase("Decoder_OscSequences_AreConsumedWithoutMessages", OscSequences_AreConsumedWithoutMessages);
         yield return new TestCase("Decoder_PartialCsi_RequestsMoreDataUntilTimeout", PartialCsi_RequestsMoreDataUntilTimeout);
+        yield return new TestCase("Decoder_Utf8Rune_ParsesWithoutReplacement", Utf8Rune_ParsesWithoutReplacement);
+        yield return new TestCase("Decoder_Utf8Partial_RequestsMoreData", Utf8Partial_RequestsMoreData);
         yield return new TestCase("Decoder_UnknownSequence_ProducesUnknownMessage", UnknownSequence_ProducesUnknownMessage);
     }
 
@@ -167,6 +169,36 @@ internal static class EventDecoderGoldenTests
 
         // Assert
         AssertMessageType<UnknownInputMsg>(unknown);
+        return Task.CompletedTask;
+    }
+
+    private static Task Utf8Rune_ParsesWithoutReplacement()
+    {
+        // Arrange
+        var decoder = new EventDecoder();
+
+        // Act
+        var result = Decode(decoder, "გ");
+
+        // Assert
+        AssertKey(result, KeyCode.Character, KeyModifiers.None, "გ");
+        return Task.CompletedTask;
+    }
+
+    private static Task Utf8Partial_RequestsMoreData()
+    {
+        // Arrange
+        var decoder = new EventDecoder();
+        var full = Encoding.UTF8.GetBytes("გ");
+
+        // Act
+        var partial = decoder.Decode(full.AsSpan(0, 2), timeoutExpired: false);
+        var complete = decoder.Decode(full, timeoutExpired: false);
+
+        // Assert
+        TestAssert.True(partial.NeedMoreData, "Partial UTF-8 rune should request more data.");
+        AssertConsumed(partial, 0);
+        AssertKey(complete, KeyCode.Character, KeyModifiers.None, "გ");
         return Task.CompletedTask;
     }
 
