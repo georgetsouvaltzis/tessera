@@ -20,6 +20,17 @@ public sealed record PasteEndMsg : IMessage;
 
 public sealed record PasteMsg(string Content) : IMessage;
 
+public enum ModeReportState
+{
+    Unknown = 0,
+    Set = 1,
+    Reset = 2,
+    PermanentlySet = 3,
+    PermanentlyReset = 4,
+}
+
+public sealed record ModeReportMsg(int Mode, ModeReportState State) : IMessage;
+
 public sealed record UnknownInputMsg(string Raw) : IMessage;
 
 public sealed record CommandErrorMsg(Exception Exception) : IMessage;

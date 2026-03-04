@@ -225,6 +225,11 @@ public sealed class EventDecoder
             return true;
         }
 
+        if (final == 'y' && TryDecodeModeReport(parameters, out message))
+        {
+            return true;
+        }
+
         if (TryDecodeFocus(final, out message))
         {
             return true;
@@ -315,6 +320,29 @@ public sealed class EventDecoder
         }
 
         message = new WindowSizeMsg(cols, rows);
+        return true;
+    }
+
+    private static bool TryDecodeModeReport(IReadOnlyList<int?> parameters, out IMessage? message)
+    {
+        message = null;
+        if (parameters.Count < 2
+            || parameters[0] is not int mode
+            || parameters[1] is not int stateRaw)
+        {
+            return false;
+        }
+
+        var state = stateRaw switch
+        {
+            1 => ModeReportState.Set,
+            2 => ModeReportState.Reset,
+            3 => ModeReportState.PermanentlySet,
+            4 => ModeReportState.PermanentlyReset,
+            _ => ModeReportState.Unknown,
+        };
+
+        message = new ModeReportMsg(mode, state);
         return true;
     }
 
@@ -592,7 +620,13 @@ public sealed class EventDecoder
                 continue;
             }
 
-            if (int.TryParse(segment[start..], out var value))
+            var end = start;
+            while (end < segment.Length && char.IsDigit(segment[end]))
+            {
+                end++;
+            }
+
+            if (int.TryParse(segment[start..end], out var value))
             {
                 values.Add(value);
             }

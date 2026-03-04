@@ -13,6 +13,7 @@ internal static class EventDecoderGoldenTests
         yield return new TestCase("Decoder_PasteBoundaryMarkers_Parse", PasteBoundaryMarkers_ParseExpectedMessages);
         yield return new TestCase("Decoder_FocusMarkers_Parse", FocusMarkers_ParseExpectedMessages);
         yield return new TestCase("Decoder_WindowResizeSequence_Parses", WindowResizeSequence_ParsesExpectedSize);
+        yield return new TestCase("Decoder_ModeReportSequence_Parses", ModeReportSequence_ParsesExpectedMessage);
         yield return new TestCase("Decoder_MouseSequences_Parse", MouseSequences_ParseExpectedMessages);
         yield return new TestCase("Decoder_OscSequences_AreConsumedWithoutMessages", OscSequences_AreConsumedWithoutMessages);
         yield return new TestCase("Decoder_PartialCsi_RequestsMoreDataUntilTimeout", PartialCsi_RequestsMoreDataUntilTimeout);
@@ -93,6 +94,21 @@ internal static class EventDecoderGoldenTests
             throw new InvalidOperationException("Expected WindowSizeMsg(80,24).");
         }
 
+        return Task.CompletedTask;
+    }
+
+    private static Task ModeReportSequence_ParsesExpectedMessage()
+    {
+        // Arrange
+        var decoder = new EventDecoder();
+
+        // Act
+        var syncEnabled = Decode(decoder, "\u001b[?2026;1$y");
+        var mouseUnsupported = Decode(decoder, "\u001b[?1006;0$y");
+
+        // Assert
+        AssertModeReport(syncEnabled, 2026, ModeReportState.Set);
+        AssertModeReport(mouseUnsupported, 1006, ModeReportState.Unknown);
         return Task.CompletedTask;
     }
 
@@ -271,6 +287,20 @@ internal static class EventDecoderGoldenTests
             throw new InvalidOperationException(
                 $"Expected mouse(type={eventType}, button={button}, x={x}, y={y}, modifiers={modifiers}) " +
                 $"but got mouse(type={mouse.EventType}, button={mouse.Button}, x={mouse.X}, y={mouse.Y}, modifiers={mouse.Modifiers}).");
+        }
+    }
+
+    private static void AssertModeReport(DecodeResult result, int mode, ModeReportState state)
+    {
+        if (result.Message is not ModeReportMsg report)
+        {
+            throw new InvalidOperationException($"Expected ModeReportMsg but got {result.Message?.GetType().Name ?? "null"}.");
+        }
+
+        if (report.Mode != mode || report.State != state)
+        {
+            throw new InvalidOperationException(
+                $"Expected mode-report(mode={mode}, state={state}) but got mode-report(mode={report.Mode}, state={report.State}).");
         }
     }
 }

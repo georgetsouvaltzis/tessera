@@ -11,6 +11,8 @@ internal static class RendererBehaviorTests
         yield return new TestCase("Renderer_MouseModeCellMotion_EmitsEnableSequences", MouseModeCellMotion_EmitsEnableSequences);
         yield return new TestCase("Renderer_MouseModeAllMotion_EmitsEnableSequences", MouseModeAllMotion_EmitsEnableSequences);
         yield return new TestCase("Renderer_Reset_DisablesMouseModes", Reset_DisablesMouseModes);
+        yield return new TestCase("Renderer_ModeReportQueries_EmittedForEnabledFeatures", ModeReportQueries_EmittedForEnabledFeatures);
+        yield return new TestCase("Renderer_ModeReportQueries_EmittedOncePerMode", ModeReportQueries_EmittedOncePerMode);
         yield return new TestCase("Renderer_SynchronizedUpdates_WrapFrameOutput", SynchronizedUpdates_WrapFrameOutput);
         yield return new TestCase("Renderer_SynchronizedUpdates_Disabled_DoesNotWrapFrameOutput", SynchronizedUpdates_Disabled_DoesNotWrapFrameOutput);
         yield return new TestCase("Renderer_CellDiff_UpdatesOnlyChangedCellRun", CellDiff_UpdatesOnlyChangedCellRun);
@@ -78,6 +80,49 @@ internal static class RendererBehaviorTests
         AssertContains(rendered, "\u001b[?1002l");
         AssertContains(rendered, "\u001b[?1003l");
         AssertContains(rendered, "\u001b[?1006l");
+    }
+
+    private static async Task ModeReportQueries_EmittedForEnabledFeatures()
+    {
+        // Arrange
+        await using var renderer = new AnsiDiffRenderer();
+        await using var output = new MemoryStream();
+        await renderer.InitializeAsync(output, CancellationToken.None);
+
+        // Act
+        renderer.Render(View.From("probe") with
+        {
+            EnableBracketedPaste = true,
+            EnableFocusReporting = true,
+            EnableSynchronizedUpdates = true,
+            MouseMode = MouseMode.AllMotion,
+        });
+        await renderer.FlushAsync(CancellationToken.None);
+        var rendered = ReadUtf8(output);
+
+        // Assert
+        AssertContains(rendered, "\u001b[?2004$p");
+        AssertContains(rendered, "\u001b[?1004$p");
+        AssertContains(rendered, "\u001b[?2026$p");
+        AssertContains(rendered, "\u001b[?1006$p");
+    }
+
+    private static async Task ModeReportQueries_EmittedOncePerMode()
+    {
+        // Arrange
+        await using var renderer = new AnsiDiffRenderer();
+        await using var output = new MemoryStream();
+        await renderer.InitializeAsync(output, CancellationToken.None);
+
+        // Act
+        renderer.Render(View.From("first") with { EnableFocusReporting = true });
+        await renderer.FlushAsync(CancellationToken.None);
+        renderer.Render(View.From("second") with { EnableFocusReporting = true });
+        await renderer.FlushAsync(CancellationToken.None);
+        var rendered = ReadUtf8(output);
+
+        // Assert
+        AssertCount(rendered, "\u001b[?1004$p", 1);
     }
 
     private static async Task SynchronizedUpdates_WrapFrameOutput()
@@ -273,6 +318,29 @@ internal static class RendererBehaviorTests
         {
             throw new InvalidOperationException(
                 $"Expected '{Escape(first)}' before '{Escape(second)}'.");
+        }
+    }
+
+    private static void AssertCount(string actual, string fragment, int expected)
+    {
+        var count = 0;
+        var index = 0;
+        while (true)
+        {
+            index = actual.IndexOf(fragment, index, StringComparison.Ordinal);
+            if (index < 0)
+            {
+                break;
+            }
+
+            count++;
+            index += fragment.Length;
+        }
+
+        if (count != expected)
+        {
+            throw new InvalidOperationException(
+                $"Expected '{Escape(fragment)}' count={expected} but got {count}.");
         }
     }
 

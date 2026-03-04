@@ -16,6 +16,7 @@ public sealed class AnsiDiffRenderer : IProgramRenderer
     private bool _bracketedPaste;
     private bool _focusReporting;
     private MouseMode _mouseMode;
+    private readonly HashSet<int> _queriedModes = [];
     private string? _windowTitle;
     private int _width;
     private int _height;
@@ -35,6 +36,7 @@ public sealed class AnsiDiffRenderer : IProgramRenderer
         _bracketedPaste = false;
         _focusReporting = false;
         _mouseMode = MouseMode.None;
+        _queriedModes.Clear();
         _windowTitle = null;
         _width = 0;
         _height = 0;
@@ -77,23 +79,30 @@ public sealed class AnsiDiffRenderer : IProgramRenderer
 
         if (_currentView.EnableBracketedPaste != _bracketedPaste)
         {
+            await QueryModeReportOnceAsync(2004).ConfigureAwait(false);
             await _writer.WriteAsync(_currentView.EnableBracketedPaste ? "\u001b[?2004h" : "\u001b[?2004l").ConfigureAwait(false);
             _bracketedPaste = _currentView.EnableBracketedPaste;
         }
 
         if (_currentView.EnableFocusReporting != _focusReporting)
         {
+            await QueryModeReportOnceAsync(1004).ConfigureAwait(false);
             await _writer.WriteAsync(_currentView.EnableFocusReporting ? "\u001b[?1004h" : "\u001b[?1004l").ConfigureAwait(false);
             _focusReporting = _currentView.EnableFocusReporting;
         }
 
         if (_currentView.EnableSynchronizedUpdates)
         {
+            await QueryModeReportOnceAsync(2026).ConfigureAwait(false);
             await _writer.WriteAsync("\u001b[?2026h").ConfigureAwait(false);
         }
 
         if (_currentView.MouseMode != _mouseMode)
         {
+            if (_currentView.MouseMode != MouseMode.None)
+            {
+                await QueryModeReportOnceAsync(1006).ConfigureAwait(false);
+            }
             await WriteMouseModeAsync(_currentView.MouseMode).ConfigureAwait(false);
             _mouseMode = _currentView.MouseMode;
         }
@@ -354,6 +363,16 @@ public sealed class AnsiDiffRenderer : IProgramRenderer
             MouseMode.AllMotion => _writer.WriteAsync("\u001b[?1000h\u001b[?1002l\u001b[?1003h\u001b[?1006h"),
             _ => _writer.WriteAsync("\u001b[?1000l\u001b[?1002l\u001b[?1003l\u001b[?1006l"),
         };
+    }
+
+    private Task QueryModeReportOnceAsync(int mode)
+    {
+        if (_writer is null || !_queriedModes.Add(mode))
+        {
+            return Task.CompletedTask;
+        }
+
+        return _writer.WriteAsync($"\u001b[?{mode}$p");
     }
 
 }

@@ -36,6 +36,7 @@ internal sealed class CounterModel : IModel
     private string _typedText = string.Empty;
     private bool _stressMode;
     private int _pulseCount;
+    private readonly Dictionary<int, ModeReportState> _modeReports = [];
 
     public CounterModel(TeaSharp.Core.Terminal.ConsoleTerminalAdapter terminal)
     {
@@ -131,6 +132,13 @@ internal sealed class CounterModel : IModel
             return new UpdateResult(this, null);
         }
 
+        if (message is ModeReportMsg modeReport)
+        {
+            _modeReports[modeReport.Mode] = modeReport.State;
+            _lastEvent = $"mode-report: ?{modeReport.Mode}={modeReport.State.ToString().ToLowerInvariant()}";
+            return new UpdateResult(this, null);
+        }
+
         if (message is RenderPulseMsg)
         {
             if (!_stressMode)
@@ -165,6 +173,7 @@ internal sealed class CounterModel : IModel
             $"Focus events: {(_terminal.IsRawModeActive ? "expected (if terminal supports ?1004)" : "not available in fallback mode")}\n" +
             $"Mouse events: {(_terminal.IsRawModeActive ? "expected (if terminal supports ?1006)" : "not available in fallback mode")}\n" +
             "Synchronized updates: requested (?2026)\n" +
+            $"Mode reports: {FormatModeReports()}\n" +
             $"Resize backend: {_resizeBackend}\n" +
             $"Stress mode: {(_stressMode ? "on" : "off")} (pulses: {_pulseCount})\n" +
             $"Last event: {_lastEvent}\n" +
@@ -224,6 +233,22 @@ internal sealed class CounterModel : IModel
         return compact.Length <= 160
             ? compact
             : compact[..160] + "...";
+    }
+
+    private string FormatModeReports()
+    {
+        return
+            $"?1004={FormatModeState(1004)} " +
+            $"?1006={FormatModeState(1006)} " +
+            $"?2004={FormatModeState(2004)} " +
+            $"?2026={FormatModeState(2026)}";
+    }
+
+    private string FormatModeState(int mode)
+    {
+        return _modeReports.TryGetValue(mode, out var state)
+            ? state.ToString().ToLowerInvariant()
+            : "pending";
     }
 }
 

@@ -48,7 +48,7 @@ Legend: `done` = implemented, `partial` = usable but incomplete, `todo` = not im
 | Diff rendering | efficient incremental updates | partial | Cell-run diff with grapheme/wide-char width handling is implemented; full style/cell-attribute parity still pending. |
 | Alt screen | alternate buffer enter/leave | done | `View.AltScreen` implemented. |
 | Cursor visibility/position | cursor control | partial | Show/hide + absolute position supported; no style/blink parity. |
-| Synchronized updates | synchronized paint | partial | Frame output is wrapped with `?2026h`/`?2026l`; terminal capability detection remains best-effort. |
+| Synchronized updates | synchronized paint | partial | Frame output is wrapped with `?2026h`/`?2026l`; `DECRPM` mode queries/reports are now surfaced, but terminal support is still best-effort. |
 | Window title | OSC title | done | `View.WindowTitle` now emits OSC title sequence. |
 | Style/render integration | lipgloss-like style composition | todo | No style system yet (out of scope currently). |
 
@@ -59,7 +59,7 @@ Legend: `done` = implemented, `partial` = usable but incomplete, `todo` = not im
 | Windows VT setup | console mode configuration | done | VT input/output setup + restore implemented. |
 | Unix raw mode | non-canonical no-echo mode | done | `stty raw -echo` with restore path. |
 | TTY fallback | interactive run under redirected stdio | done | `/dev/tty` binding + console-key fallback. |
-| Capability negotiation | terminal feature detection | todo | No terminfo/capability probing yet. |
+| Capability negotiation | terminal feature detection | partial | Renderer emits `DECRPM` queries for requested modes (`?1004`, `?1006`, `?2004`, `?2026`) and decodes mode reports; no terminfo integration yet. |
 
 ## Test Parity
 
