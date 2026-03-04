@@ -247,7 +247,7 @@ public sealed class AnsiDiffRenderer : IProgramRenderer
 
         if (_height > 0 && rendered.Count > _height)
         {
-            rendered = rendered.GetRange(0, _height);
+            rendered = rendered.GetRange(rendered.Count - _height, _height);
         }
 
         if (rendered.Count == 0)

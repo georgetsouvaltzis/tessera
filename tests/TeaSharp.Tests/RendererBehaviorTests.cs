@@ -21,6 +21,7 @@ internal static class RendererBehaviorTests
         yield return new TestCase("Renderer_CellDiff_UpdatesOnlyChangedCellRun", CellDiff_UpdatesOnlyChangedCellRun);
         yield return new TestCase("Renderer_CellDiff_ClearsShortenedLineTail", CellDiff_ClearsShortenedLineTail);
         yield return new TestCase("Renderer_Resize_ClipsToWidth", Resize_ClipsToWidth);
+        yield return new TestCase("Renderer_Resize_HeightClip_KeepsBottomRows", Resize_HeightClip_KeepsBottomRows);
         yield return new TestCase("Renderer_Resize_WrapsLongLines", Resize_WrapsLongLines);
         yield return new TestCase("Renderer_Resize_WrapsWideRuneAtBoundary", Resize_WrapsWideRuneAtBoundary);
         yield return new TestCase("Renderer_CellDiff_CombiningGrapheme_PatchesSingleColumn", CellDiff_CombiningGrapheme_PatchesSingleColumn);
@@ -283,6 +284,25 @@ internal static class RendererBehaviorTests
         // Assert
         AssertContains(rendered, "abc");
         AssertDoesNotContain(rendered, "abcdef");
+    }
+
+    private static async Task Resize_HeightClip_KeepsBottomRows()
+    {
+        // Arrange
+        await using var renderer = new AnsiDiffRenderer();
+        await using var output = new MemoryStream();
+        await renderer.InitializeAsync(output, CancellationToken.None);
+        renderer.Resize(width: 4, height: 2);
+
+        // Act
+        renderer.Render(View.From("row1\nrow2\nrow3"));
+        await renderer.FlushAsync(CancellationToken.None);
+        var rendered = ReadUtf8(output);
+
+        // Assert
+        AssertContains(rendered, "row2");
+        AssertContains(rendered, "row3");
+        AssertDoesNotContain(rendered, "row1");
     }
 
     private static async Task Resize_WrapsLongLines()
