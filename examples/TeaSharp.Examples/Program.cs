@@ -52,7 +52,7 @@ internal sealed class CounterModel : IModel
     private readonly ViewportModel _logViewport = new();
     private readonly TextInputModel _commandInput = new()
     {
-        Placeholder = "type command (help, inc, dec, stress on/off/toggle, filter <term>, clear)",
+        Placeholder = "type command (help, inc, dec, stress on/off/toggle, filter <term>, clear, protocol, dashboard, showcase)",
         MaxLength = 256,
     };
     private readonly List<ActionItem> _allActions =
@@ -62,6 +62,8 @@ internal sealed class CounterModel : IModel
         new ActionItem("Toggle stress", "enter"),
         new ActionItem("Reset count", "enter"),
         new ActionItem("Clear log", "enter"),
+        new ActionItem("Switch to dashboard", "enter"),
+        new ActionItem("Switch to showcase", "enter"),
         new ActionItem("Switch to protocol", "enter"),
     ];
 
@@ -73,7 +75,7 @@ internal sealed class CounterModel : IModel
     [
         new KeyBinding("tab", "cycle focus"),
         new KeyBinding("?", "toggle help"),
-        new KeyBinding("1/2", "switch page"),
+        new KeyBinding("1/2/3", "switch page"),
         new KeyBinding("q", "quit"),
     ];
     private readonly List<string> _eventLog = [];
@@ -102,6 +104,7 @@ internal sealed class CounterModel : IModel
     {
         Title = "Live Event",
     };
+    private readonly UnicodeShowcaseComponent _unicodeShowcase = new();
     private readonly ComponentComposer _workspaceComposer = new();
 
     private TerminalCapabilityProfile _capabilities = TerminalCapabilityProfile.AllSupported;
@@ -116,7 +119,7 @@ internal sealed class CounterModel : IModel
     private string _typedText = string.Empty;
     private bool _stressMode;
     private int _tickCount;
-    private bool _workspaceMode = true;
+    private AppPage _page = AppPage.Dashboard;
     private WorkspaceFocus _focus = WorkspaceFocus.Actions;
     private bool _showFullHelp;
 
@@ -137,10 +140,12 @@ internal sealed class CounterModel : IModel
         RefreshStatusBars();
         AppendLog("TeaSharp workspace initialized.");
         AppendLog("Use tab to move focus between actions, log, and command input.");
-        AppendLog("Use ? to toggle full help and 1/2 to switch protocol/workspace.");
+        AppendLog("Use ? to toggle full help and 1/2/3 to switch protocol/dashboard/showcase.");
     }
 
     public Command? Init() => NextTickCommand(_stressMode);
+
+    private bool IsWorkspacePage => _page is AppPage.Dashboard or AppPage.Showcase;
 
     public UpdateResult Update(IMessage message)
     {
@@ -154,26 +159,33 @@ internal sealed class CounterModel : IModel
 
             if (key.Text == "1")
             {
-                _workspaceMode = false;
+                _page = AppPage.Protocol;
                 _lastEvent = "view: protocol";
                 return new UpdateResult(this, null);
             }
 
             if (key.Text == "2")
             {
-                _workspaceMode = true;
-                _lastEvent = "view: workspace";
+                _page = AppPage.Dashboard;
+                _lastEvent = "view: dashboard";
                 return new UpdateResult(this, null);
             }
 
-            if (key.Text == "?" && key.Modifiers == KeyModifiers.None && _workspaceMode)
+            if (key.Text == "3")
+            {
+                _page = AppPage.Showcase;
+                _lastEvent = "view: showcase";
+                return new UpdateResult(this, null);
+            }
+
+            if (key.Text == "?" && key.Modifiers == KeyModifiers.None && IsWorkspacePage)
             {
                 _showFullHelp = !_showFullHelp;
                 _lastEvent = $"help: {(_showFullHelp ? "full" : "compact")}";
                 return new UpdateResult(this, null);
             }
 
-            if (key.Code == KeyCode.Tab && _workspaceMode)
+            if (key.Code == KeyCode.Tab && IsWorkspacePage)
             {
                 CycleFocus();
                 _lastEvent = $"focus: {_focus.ToString().ToLowerInvariant()}";
@@ -189,7 +201,7 @@ internal sealed class CounterModel : IModel
                 return new UpdateResult(this, NextTickCommand(_stressMode));
             }
 
-            if (_workspaceMode)
+            if (IsWorkspacePage)
             {
                 return HandleWorkspaceKey(key);
             }
@@ -200,7 +212,7 @@ internal sealed class CounterModel : IModel
         if (message is PasteMsg paste)
         {
             _lastPaste = SanitizePreview(paste.Content);
-            if (_workspaceMode && _focus == WorkspaceFocus.Command)
+            if (IsWorkspacePage && _focus == WorkspaceFocus.Command)
             {
                 _commandInput.Update(paste, _inputKeys);
                 _lastEvent = $"paste: {paste.Content.Length} chars into command";
@@ -250,7 +262,7 @@ internal sealed class CounterModel : IModel
                 _ => mouse.EventType.ToString().ToLowerInvariant(),
             };
 
-            if (_workspaceMode && (_focus == WorkspaceFocus.Log || mouse is MouseWheelMsg))
+            if (IsWorkspacePage && (_focus == WorkspaceFocus.Log || mouse is MouseWheelMsg))
             {
                 _logViewport.Update(mouse, _viewportKeys);
             }
@@ -303,9 +315,13 @@ internal sealed class CounterModel : IModel
         int? cursorX = null;
         int? cursorY = null;
 
-        var content = _workspaceMode
-            ? BuildWorkspaceView(out cursorX, out cursorY)
-            : BuildProbeView();
+        var content = _page switch
+        {
+            AppPage.Protocol => BuildProbeView(),
+            AppPage.Dashboard => BuildWorkspaceView(out cursorX, out cursorY),
+            AppPage.Showcase => BuildShowcaseView(out cursorX, out cursorY),
+            _ => BuildProbeView(),
+        };
 
         return ModelView.From(content) with
         {
@@ -316,9 +332,13 @@ internal sealed class CounterModel : IModel
             MouseMode = MouseMode.AllMotion,
             CursorX = cursorX,
             CursorY = cursorY,
-            WindowTitle = _workspaceMode
-                ? "TeaSharp Widget Workspace"
-                : "TeaSharp Protocol Probe",
+            WindowTitle = _page switch
+            {
+                AppPage.Protocol => "TeaSharp Protocol Probe",
+                AppPage.Dashboard => "TeaSharp Dashboard",
+                AppPage.Showcase => "TeaSharp Capability Showcase",
+                _ => "TeaSharp",
+            },
         };
     }
 
@@ -424,8 +444,16 @@ internal sealed class CounterModel : IModel
                 RefreshStatusBars();
                 AppendLog("action: clear log");
                 break;
+            case "Switch to dashboard":
+                _page = AppPage.Dashboard;
+                AppendLog("action: switch to dashboard");
+                break;
+            case "Switch to showcase":
+                _page = AppPage.Showcase;
+                AppendLog("action: switch to showcase");
+                break;
             case "Switch to protocol":
-                _workspaceMode = false;
+                _page = AppPage.Protocol;
                 AppendLog("action: switch to protocol");
                 break;
         }
@@ -443,7 +471,7 @@ internal sealed class CounterModel : IModel
 
         if (string.Equals(command, "help", StringComparison.OrdinalIgnoreCase))
         {
-            AppendLog("commands: help | inc | dec | stress on/off/toggle | filter <term> | clear");
+            AppendLog("commands: help | inc | dec | stress on/off/toggle | filter <term> | clear | protocol | dashboard | showcase");
             return;
         }
 
@@ -510,6 +538,27 @@ internal sealed class CounterModel : IModel
             return;
         }
 
+        if (string.Equals(command, "protocol", StringComparison.OrdinalIgnoreCase))
+        {
+            _page = AppPage.Protocol;
+            AppendLog("view=protocol");
+            return;
+        }
+
+        if (string.Equals(command, "dashboard", StringComparison.OrdinalIgnoreCase))
+        {
+            _page = AppPage.Dashboard;
+            AppendLog("view=dashboard");
+            return;
+        }
+
+        if (string.Equals(command, "showcase", StringComparison.OrdinalIgnoreCase))
+        {
+            _page = AppPage.Showcase;
+            AppendLog("view=showcase");
+            return;
+        }
+
         AppendLog($"unknown command: {command}");
     }
 
@@ -553,7 +602,7 @@ internal sealed class CounterModel : IModel
             $"{Label("Typed length:")} {_typedText.Length}\n" +
             $"{Label("Typed text:")} {SanitizePreview(_typedText)}\n\n" +
             $"{MutedStyle.Render("Try live:")}\n" +
-            "- press 2 to open widget workspace\n" +
+            "- press 2 for dashboard, 3 for showcase\n" +
             "- up/down to change count\n" +
             "- move/click mouse in terminal window\n" +
             "- press s to toggle render stress mode\n" +
@@ -572,10 +621,10 @@ internal sealed class CounterModel : IModel
         if (_width < 52 || _height < 18)
         {
             var compact =
-                "TeaSharp Widget Workspace\n\n" +
-                "Terminal too small for widget workspace.\n" +
+                "TeaSharp Dashboard\n\n" +
+                "Terminal too small for dashboard mode.\n" +
                 "Resize to at least 52x18.\n\n" +
-                "Press 1 for protocol view or q to quit.";
+                "Press 1 protocol, 2 dashboard, 3 showcase.";
             return WarningStyle.Render(compact);
         }
 
@@ -589,7 +638,7 @@ internal sealed class CounterModel : IModel
         var leftWidth = Math.Max(34, (_width * 44) / 100);
         var rightWidth = _width - leftWidth;
 
-        var headerMode = _workspaceMode ? "workspace" : "protocol";
+        var headerMode = "dashboard";
         TWidgets.DrawPanel(
             canvas,
             new Rect(0, 0, _width, headerHeight),
@@ -731,7 +780,185 @@ internal sealed class CounterModel : IModel
         var footerLines = new List<string>
         {
             inputLine,
-            $"focus={_focus.ToString().ToLowerInvariant()} filter='{_actionList.Filter}' stress={ToYesNo(_stressMode)}",
+            $"focus={_focus.ToString().ToLowerInvariant()} filter='{_actionList.Filter}' stress={ToYesNo(_stressMode)} page=dashboard",
+        };
+        footerLines.AddRange(helpText.Split('\n'));
+
+        TWidgets.DrawPanel(
+            canvas,
+            footerRect,
+            _focus == WorkspaceFocus.Command ? "Command *" : "Command",
+            footerLines);
+
+        if (_focus == WorkspaceFocus.Command)
+        {
+            cursorX = Math.Clamp(footerRect.X + 3 + inputFrame.CursorColumn, footerRect.X + 1, footerRect.Right - 2);
+            cursorY = Math.Clamp(footerRect.Y + 1, footerRect.Y + 1, footerRect.Bottom - 2);
+        }
+
+        var rendered = canvas.Render();
+        return ApplyWorkspaceStyles(rendered, footerRect.Y + 1, inputFrame.PlaceholderVisible);
+    }
+
+    private string BuildShowcaseView(out int? cursorX, out int? cursorY)
+    {
+        cursorX = null;
+        cursorY = null;
+
+        if (_width < 68 || _height < 20)
+        {
+            var compact =
+                "TeaSharp Capability Showcase\n\n" +
+                "Terminal too small for showcase mode.\n" +
+                "Resize to at least 68x20.\n\n" +
+                "Press 1 protocol, 2 dashboard, 3 showcase.";
+            return WarningStyle.Render(compact);
+        }
+
+        var canvas = new Canvas(_width, _height, CanvasTextMode.GraphemeAware);
+        const int headerHeight = 3;
+        const int footerHeight = 6;
+        var bodyTop = headerHeight;
+        var bodyHeight = _height - headerHeight - footerHeight;
+        var leftWidth = Math.Max(34, (_width * 36) / 100);
+        var rightWidth = _width - leftWidth;
+
+        TWidgets.DrawPanel(
+            canvas,
+            new Rect(0, 0, _width, headerHeight),
+            "TeaSharp Capability Showcase",
+            [
+                $"count={_count} focus={(_focused ? "in" : "out")} size={_width}x{_height} source={_capabilities.Source}",
+            ]);
+
+        var leftRect = new Rect(0, bodyTop, leftWidth, bodyHeight);
+        var rightRect = new Rect(leftWidth, bodyTop, rightWidth, bodyHeight);
+
+        var actionsHeight = Math.Max(7, bodyHeight / 2);
+        var actionsRect = new Rect(leftRect.X, leftRect.Y, leftRect.Width, actionsHeight);
+        var leftLowerRect = new Rect(leftRect.X, actionsRect.Bottom, leftRect.Width, leftRect.Bottom - actionsRect.Bottom);
+
+        var visibleRows = _actionList.VisibleRows();
+        var tableRows = new List<IReadOnlyList<string>>(visibleRows.Count);
+        var selectedPageRow = -1;
+        for (var i = 0; i < visibleRows.Count; i++)
+        {
+            var row = visibleRows[i];
+            if (row.Selected)
+            {
+                selectedPageRow = i;
+            }
+
+            tableRows.Add(
+            [
+                row.Item.Name,
+                row.Item.Shortcut,
+                ActionState(row.Item),
+            ]);
+        }
+
+        if (actionsRect.Height >= 4)
+        {
+            TWidgets.DrawTable(
+                canvas,
+                actionsRect,
+                ["Action", "Key", "State"],
+                tableRows,
+                selectedPageRow,
+                _focus == WorkspaceFocus.Actions ? "Actions *" : "Actions");
+        }
+
+        var capabilityHeight = Math.Max(4, leftLowerRect.Height - 3);
+        var capabilityRect = new Rect(leftLowerRect.X, leftLowerRect.Y, leftLowerRect.Width, capabilityHeight);
+        var gaugeRect = new Rect(leftLowerRect.X, capabilityRect.Bottom, leftLowerRect.Width, leftLowerRect.Bottom - capabilityRect.Bottom);
+
+        var unicodeHeight = Math.Clamp(bodyHeight / 4, 5, 8);
+        var throughputHeight = Math.Clamp(bodyHeight / 4, 5, 8);
+        var statusHeight = Math.Clamp(bodyHeight / 5, 4, 6);
+        if (unicodeHeight + throughputHeight + statusHeight + 6 > bodyHeight)
+        {
+            statusHeight = Math.Max(3, bodyHeight - unicodeHeight - throughputHeight - 6);
+        }
+
+        var unicodeRect = new Rect(rightRect.X, rightRect.Y, rightRect.Width, unicodeHeight);
+        var throughputRect = new Rect(rightRect.X, unicodeRect.Bottom, rightRect.Width, throughputHeight);
+        var statusRect = new Rect(rightRect.X, throughputRect.Bottom, rightRect.Width, statusHeight);
+        var logRect = new Rect(rightRect.X, statusRect.Bottom, rightRect.Width, rightRect.Bottom - statusRect.Bottom);
+
+        _workspaceComposer.Clear();
+        if (!capabilityRect.IsEmpty && capabilityRect.Height >= 4)
+        {
+            _workspaceComposer.Add(_capabilityCard, capabilityRect);
+        }
+
+        if (!gaugeRect.IsEmpty && gaugeRect.Height >= 3)
+        {
+            _workspaceComposer.Add(_countGauge, gaugeRect);
+        }
+
+        _unicodeShowcase.CapabilitySource = _capabilities.Source;
+        _unicodeShowcase.Focus = _focused;
+        _unicodeShowcase.LastPaste = _lastPaste;
+        _unicodeShowcase.TypedPreview = SanitizePreview(_typedText);
+        _unicodeShowcase.Count = _count;
+        if (!unicodeRect.IsEmpty && unicodeRect.Height >= 4)
+        {
+            _workspaceComposer.Add(_unicodeShowcase, unicodeRect);
+        }
+
+        if (!throughputRect.IsEmpty && throughputRect.Height >= 4)
+        {
+            _workspaceComposer.Add(_throughputChart, throughputRect);
+        }
+
+        if (!statusRect.IsEmpty && statusRect.Height >= 3)
+        {
+            _workspaceComposer.Add(_statusChart, statusRect);
+        }
+
+        Rect viewportLogRect;
+        if (logRect.Height >= 9)
+        {
+            var miniLogRect = new Rect(logRect.X, logRect.Y, logRect.Width, 4);
+            _workspaceComposer.Add(_miniLog, miniLogRect);
+            viewportLogRect = new Rect(logRect.X, miniLogRect.Bottom, logRect.Width, logRect.Bottom - miniLogRect.Bottom);
+        }
+        else
+        {
+            viewportLogRect = logRect;
+        }
+
+        _workspaceComposer.Render(canvas);
+
+        _logViewport.Resize(Math.Max(10, viewportLogRect.Width - 2), Math.Max(3, viewportLogRect.Height - 2));
+        var logLines = _logViewport.RenderLines();
+        TWidgets.DrawPanel(
+            canvas,
+            viewportLogRect,
+            _focus == WorkspaceFocus.Log ? "Log *" : "Log",
+            [.. logLines]);
+
+        var footerRect = new Rect(0, _height - footerHeight, _width, footerHeight);
+        var inputFrame = _commandInput.BuildFrame(Math.Max(12, _width - 6));
+        var inputLine = $"> {inputFrame.Text}";
+
+        var activeBindings = _focus switch
+        {
+            WorkspaceFocus.Actions => _listKeys.HelpBindings,
+            WorkspaceFocus.Log => _viewportKeys.HelpBindings,
+            WorkspaceFocus.Command => _inputKeys.HelpBindings,
+            _ => _inputKeys.HelpBindings,
+        };
+
+        var bindingSet = _showFullHelp
+            ? activeBindings.Concat(_globalHelp)
+            : activeBindings.Take(5).Concat(_globalHelp);
+        var helpText = HelpView.RenderCompact(bindingSet, Math.Max(10, _width - 4));
+
+        var footerLines = new List<string>
+        {
+            inputLine,
+            $"focus={_focus.ToString().ToLowerInvariant()} filter='{_actionList.Filter}' stress={ToYesNo(_stressMode)} page=showcase",
         };
         footerLines.AddRange(helpText.Split('\n'));
 
@@ -832,6 +1059,8 @@ internal sealed class CounterModel : IModel
         {
             "Toggle stress" => _stressMode ? "on" : "off",
             "Reset count" => $"{_count}",
+            "Switch to dashboard" => _page == AppPage.Dashboard ? "active" : "ready",
+            "Switch to showcase" => _page == AppPage.Showcase ? "active" : "ready",
             "Switch to protocol" => "ready",
             _ => "ready",
         };
@@ -992,6 +1221,13 @@ internal sealed class CounterModel : IModel
 internal sealed record DashboardTickMsg : IMessage;
 
 internal sealed record ActionItem(string Name, string Shortcut);
+
+internal enum AppPage
+{
+    Protocol = 0,
+    Dashboard = 1,
+    Showcase = 2,
+}
 
 internal enum WorkspaceFocus
 {
