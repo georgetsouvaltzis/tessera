@@ -16,6 +16,9 @@ The design follows patterns used in Bubble Tea examples:
 - `Canvas`: fixed-size character grid renderer.
   - `Set`, `Get`, `WriteText`
   - `DrawHorizontalLine`, `DrawVerticalLine`, `DrawBox`
+  - text modes:
+    - `CanvasTextMode.Fast` (default): char-cell fast path
+    - `CanvasTextMode.GraphemeAware`: wide/combining grapheme-aware text placement
   - `Render` (returns full frame string)
 - `Composition`:
   - `ICanvasComponent`: render-only component contract.
@@ -33,18 +36,22 @@ The design follows patterns used in Bubble Tea examples:
   - `Charts.DrawBarChart(...)`
   - `LineChartComponent` (bounded sample history)
   - `BarChartComponent` (named value bars)
+- dashboard-oriented components:
+  - `GaugeComponent`
+  - `StatsCardComponent` + `StatsCardItem`
+  - `MiniLogComponent`
 
 ## Example Integration
 
 `TeaSharp.Examples` now has a dashboard page (press `2`) that renders:
 
 - system status panel
-- live progress bar
+- count gauge
 - line chart (throughput)
 - bar chart (status mix)
-- component summary card
+- capability stats card
 - action/state table
-- log viewport
+- mini live-event log + scrollable log viewport
 - command input footer
 
 The protocol probe page remains available (press `1`) for low-level VT debugging.
@@ -67,3 +74,5 @@ public sealed class ClockComponent : ICanvasComponent
 ```
 
 If the component owns local state and needs messages, implement `IStatefulComponent` and route messages through `ComponentComposer.Update(message)`.
+
+For a fuller guide with a custom component walkthrough, see `docs/custom-components.md`.

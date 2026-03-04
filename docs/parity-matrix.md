@@ -51,6 +51,7 @@ Legend: `done` = implemented, `partial` = usable but incomplete, `todo` = not im
 | Synchronized updates | synchronized paint | partial | Frame output is wrapped with `?2026h`/`?2026l`; `DECRPM` mode queries/reports are now surfaced, but terminal support is still best-effort. |
 | Window title | OSC title | done | `View.WindowTitle` now emits OSC title sequence. |
 | Style/render integration | lipgloss-like style composition | partial | Added composable ANSI style API (`TeaStyle`, `AnsiColor`) with renderer SGR parsing/diff support, plus richer component primitives (`DrawCard`, `DrawTable`). Full lipgloss-level layout/style parity still pending. |
+| Component text pipeline | grapheme-safe component text rendering | partial | `Canvas` supports opt-in `CanvasTextMode.GraphemeAware` for wide/combining text placement while keeping `Fast` mode as default; full Unicode terminal-width parity still depends on host terminal behavior. |
 
 ## Widget Layer
 
@@ -83,6 +84,7 @@ Legend: `done` = implemented, `partial` = usable but incomplete, `todo` = not im
 |---|---|---|---|
 | Behavior tests | loop/command semantics | done | Core regression tests pass. |
 | Protocol decode tests | key/mouse/paste parser fixtures | partial | Golden fixtures include CSI/SS3/OSC, modifiers, focus, and extended mouse buttons/modifier combinations; terminal-specific fixture breadth still pending. |
+| Terminal behavior fixtures | emulator-specific key/paste/focus regressions | partial | Added fixture tests that mirror Ghostty modifyOtherKeys, iTerm2 CSI-u modifier combos, and Apple Terminal-style fallback alt/focus/paste paths; broader capture sets across more terminal versions still pending. |
 | Renderer snapshots | render diff correctness | done | Deterministic renderer snapshots now cover first-frame mode/title sequences, incremental diff patches, and reset teardown control sequences. |
 
 ## Priority Gap Plan
