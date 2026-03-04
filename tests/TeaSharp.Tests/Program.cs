@@ -9,6 +9,8 @@ runner.AddRange(RendererSnapshotTests.Cases());
 runner.AddRange(StyleRenderingTests.Cases());
 runner.AddRange(WidgetStateTests.Cases());
 runner.AddRange(ChartComponentTests.Cases());
+runner.AddRange(DashboardComponentTests.Cases());
+runner.AddRange(ProtocolFixtureTests.Cases());
 runner.AddRange(TerminalCapabilityDetectorTests.Cases());
 runner.AddRange(ComponentRenderingTests.Cases());
 
