@@ -45,7 +45,7 @@ Legend: `done` = implemented, `partial` = usable but incomplete, `todo` = not im
 | Area | Bubble Tea Capability | TeaSharp | Notes |
 |---|---|---|---|
 | ANSI output | VT rendering | done | ANSI renderer active. |
-| Diff rendering | efficient incremental updates | partial | Cell-run diff with grapheme/wide-char width handling is implemented, including bottom-row retention when frame height exceeds terminal height; full style/cell-attribute parity still pending. |
+| Diff rendering | efficient incremental updates | partial | Renderer now uses an explicit frame cell-buffer (`RenderFrameBuffer`) with row+cell run diffing, wide/combining-cell continuation safety, and bottom-row retention when frame height exceeds terminal height; full style/cell-attribute parity still pending. |
 | Alt screen | alternate buffer enter/leave | done | `View.AltScreen` implemented. |
 | Cursor visibility/position | cursor control | partial | Show/hide + absolute position supported; no style/blink parity. |
 | Synchronized updates | synchronized paint | partial | Frame output is wrapped with `?2026h`/`?2026l`; `DECRPM` mode queries/reports are now surfaced, but terminal support is still best-effort. |
@@ -89,7 +89,7 @@ Legend: `done` = implemented, `partial` = usable but incomplete, `todo` = not im
 
 ## Priority Gap Plan
 
-1. P1: Cell-buffer renderer (row+cell diff) replacing line-only diff.
-2. P1: Runtime resize watcher parity across macOS/Linux/Windows.
-3. P2: Deep capability probing (beyond env + basic `infocmp` enrichment).
-4. P2: Expand mouse parity for extended/high-button mappings and compatibility fixtures.
+1. P1: Runtime resize watcher parity across macOS/Linux/Windows.
+2. P2: Deep capability probing (beyond env + basic `infocmp` enrichment).
+3. P2: Expand mouse parity for extended/high-button mappings and compatibility fixtures.
+4. P2: Extend renderer style/cell-attribute parity over the new frame buffer engine.

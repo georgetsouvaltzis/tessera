@@ -49,7 +49,7 @@ Primary goal: deterministic message-driven TUI runtime with portable terminal be
 
 4. `Rendering`
 - `IProgramRenderer` abstraction.
-- `AnsiDiffRenderer`: minimal line-diff ANSI renderer.
+- `AnsiDiffRenderer`: frame cell-buffer ANSI renderer with row+cell run diffing.
 - `NullRenderer`: test/daemon mode.
 
 5. `Terminal`
