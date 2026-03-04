@@ -13,6 +13,7 @@ internal static class EventDecoderGoldenTests
         yield return new TestCase("Decoder_PasteBoundaryMarkers_Parse", PasteBoundaryMarkers_ParseExpectedMessages);
         yield return new TestCase("Decoder_FocusMarkers_Parse", FocusMarkers_ParseExpectedMessages);
         yield return new TestCase("Decoder_WindowResizeSequence_Parses", WindowResizeSequence_ParsesExpectedSize);
+        yield return new TestCase("Decoder_MouseSequences_Parse", MouseSequences_ParseExpectedMessages);
         yield return new TestCase("Decoder_OscSequences_AreConsumedWithoutMessages", OscSequences_AreConsumedWithoutMessages);
         yield return new TestCase("Decoder_PartialCsi_RequestsMoreDataUntilTimeout", PartialCsi_RequestsMoreDataUntilTimeout);
         yield return new TestCase("Decoder_UnknownSequence_ProducesUnknownMessage", UnknownSequence_ProducesUnknownMessage);
@@ -89,6 +90,30 @@ internal static class EventDecoderGoldenTests
         {
             throw new InvalidOperationException("Expected WindowSizeMsg(80,24).");
         }
+
+        return Task.CompletedTask;
+    }
+
+    private static Task MouseSequences_ParseExpectedMessages()
+    {
+        // Arrange
+        var decoder = new EventDecoder();
+
+        // Act
+        var sgrPress = Decode(decoder, "\u001b[<0;11;7M");
+        var sgrRelease = Decode(decoder, "\u001b[<0;11;7m");
+        var sgrMotion = Decode(decoder, "\u001b[<35;11;7M");
+        var sgrWheel = Decode(decoder, "\u001b[<65;11;7M");
+
+        var x10Bytes = new byte[] { 0x1B, (byte)'[', (byte)'M', (byte)' ', (byte)'+', (byte)'&' };
+        var x10Press = decoder.Decode(x10Bytes, timeoutExpired: false);
+
+        // Assert
+        AssertMouse(sgrPress, MouseEventType.Press, MouseButton.Left, 10, 6, KeyModifiers.None);
+        AssertMouse(sgrRelease, MouseEventType.Release, MouseButton.Left, 10, 6, KeyModifiers.None);
+        AssertMouse(sgrMotion, MouseEventType.Motion, MouseButton.None, 10, 6, KeyModifiers.None);
+        AssertMouse(sgrWheel, MouseEventType.Wheel, MouseButton.WheelDown, 10, 6, KeyModifiers.None);
+        AssertMouse(x10Press, MouseEventType.Press, MouseButton.Left, 10, 5, KeyModifiers.None);
 
         return Task.CompletedTask;
     }
@@ -186,6 +211,31 @@ internal static class EventDecoderGoldenTests
         {
             throw new InvalidOperationException(
                 $"Expected key(code={keyCode}, modifiers={modifiers}, text=\"{text}\") but got key(code={key.Code}, modifiers={key.Modifiers}, text=\"{key.Text}\").");
+        }
+    }
+
+    private static void AssertMouse(
+        DecodeResult result,
+        MouseEventType eventType,
+        MouseButton button,
+        int x,
+        int y,
+        KeyModifiers modifiers)
+    {
+        if (result.Message is not MouseMsg mouse)
+        {
+            throw new InvalidOperationException($"Expected MouseMsg but got {result.Message?.GetType().Name ?? "null"}.");
+        }
+
+        if (mouse.EventType != eventType
+            || mouse.Button != button
+            || mouse.X != x
+            || mouse.Y != y
+            || mouse.Modifiers != modifiers)
+        {
+            throw new InvalidOperationException(
+                $"Expected mouse(type={eventType}, button={button}, x={x}, y={y}, modifiers={modifiers}) " +
+                $"but got mouse(type={mouse.EventType}, button={mouse.Button}, x={mouse.X}, y={mouse.Y}, modifiers={mouse.Modifiers}).");
         }
     }
 }

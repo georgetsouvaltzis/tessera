@@ -105,6 +105,12 @@ internal sealed class CounterModel : IModel
             return new UpdateResult(this, null);
         }
 
+        if (message is MouseMsg mouse)
+        {
+            _lastEvent = $"mouse: {mouse.EventType.ToString().ToLowerInvariant()} {mouse.Button.ToString().ToLowerInvariant()} @ {mouse.X},{mouse.Y} mod={mouse.Modifiers}";
+            return new UpdateResult(this, null);
+        }
+
         if (message is UnknownInputMsg unknown)
         {
             _lastEvent = $"unknown: {unknown.Raw}";
@@ -126,11 +132,13 @@ internal sealed class CounterModel : IModel
             $"Raw mode error: {SummarizeProbe(_terminal.RawModeError)}\n" +
             $"Input backend: {(_terminal.IsRawModeActive ? "vt-bytes" : "console-keys-fallback")}\n" +
             $"Focus events: {(_terminal.IsRawModeActive ? "expected (if terminal supports ?1004)" : "not available in fallback mode")}\n" +
+            $"Mouse events: {(_terminal.IsRawModeActive ? "expected (if terminal supports ?1006)" : "not available in fallback mode")}\n" +
             $"Last event: {_lastEvent}\n" +
             $"Last paste: {_lastPaste}\n" +
             $"Typed text: {SanitizePastePreview(_typedText)}\n\n" +
             "Try live:\n" +
             "- up/down to change count\n" +
+            "- move/click mouse in terminal window\n" +
             "- type text; backspace and enter work\n" +
             "- paste multi-line text (cmd+v/ctrl+v/right-click)\n" +
             "- switch terminal focus away/back\n" +
@@ -142,6 +150,7 @@ internal sealed class CounterModel : IModel
             AltScreen = true,
             EnableBracketedPaste = true,
             EnableFocusReporting = true,
+            MouseMode = MouseMode.AllMotion,
             WindowTitle = "TeaSharp Protocol Probe",
         };
     }

@@ -16,6 +16,7 @@ public sealed class AnsiDiffRenderer : IProgramRenderer
     private bool _bracketedPaste;
     private bool _focusReporting;
     private bool _synchronizedUpdates;
+    private MouseMode _mouseMode;
     private string? _windowTitle;
 
     public ValueTask InitializeAsync(Stream output, CancellationToken cancellationToken)
@@ -32,6 +33,7 @@ public sealed class AnsiDiffRenderer : IProgramRenderer
         _bracketedPaste = false;
         _focusReporting = false;
         _synchronizedUpdates = false;
+        _mouseMode = MouseMode.None;
         _windowTitle = null;
 
         _ = cancellationToken;
@@ -80,6 +82,12 @@ public sealed class AnsiDiffRenderer : IProgramRenderer
         {
             await _writer.WriteAsync(_currentView.EnableSynchronizedUpdates ? "\u001b[?2026h" : "\u001b[?2026l").ConfigureAwait(false);
             _synchronizedUpdates = _currentView.EnableSynchronizedUpdates;
+        }
+
+        if (_currentView.MouseMode != _mouseMode)
+        {
+            await WriteMouseModeAsync(_currentView.MouseMode).ConfigureAwait(false);
+            _mouseMode = _currentView.MouseMode;
         }
 
         if (!string.Equals(_windowTitle, _currentView.WindowTitle, StringComparison.Ordinal))
@@ -158,6 +166,12 @@ public sealed class AnsiDiffRenderer : IProgramRenderer
             _synchronizedUpdates = false;
         }
 
+        if (_mouseMode != MouseMode.None)
+        {
+            await WriteMouseModeAsync(MouseMode.None).ConfigureAwait(false);
+            _mouseMode = MouseMode.None;
+        }
+
         if (_altScreen)
         {
             await _writer.WriteAsync("\u001b[?1049l").ConfigureAwait(false);
@@ -192,6 +206,21 @@ public sealed class AnsiDiffRenderer : IProgramRenderer
 
         content = content.Replace("\r\n", "\n", StringComparison.Ordinal).Replace('\r', '\n');
         return [.. content.Split('\n')];
+    }
+
+    private Task WriteMouseModeAsync(MouseMode mode)
+    {
+        if (_writer is null)
+        {
+            return Task.CompletedTask;
+        }
+
+        return mode switch
+        {
+            MouseMode.CellMotion => _writer.WriteAsync("\u001b[?1000h\u001b[?1002h\u001b[?1003l\u001b[?1006h"),
+            MouseMode.AllMotion => _writer.WriteAsync("\u001b[?1000h\u001b[?1002l\u001b[?1003h\u001b[?1006h"),
+            _ => _writer.WriteAsync("\u001b[?1000l\u001b[?1002l\u001b[?1003l\u001b[?1006l"),
+        };
     }
 
 }

@@ -36,7 +36,7 @@ Legend: `done` = implemented, `partial` = usable but incomplete, `todo` = not im
 | Ctrl modifiers | control key combos | partial | Core ctrl path works; incomplete matrix parity. |
 | Alt/meta handling | alt key combos | partial | Escape-prefix + console modifiers supported; edge cases missing. |
 | Bracketed paste protocol | start/end/content handling | done | Start/end decode and aggregated `PasteMsg` content are implemented. |
-| Mouse protocol | X10/SGR mouse messages | todo | View enum exists; parser/dispatch not implemented. |
+| Mouse protocol | X10/SGR mouse messages | partial | SGR 1006 + basic X10 decode implemented with `MouseMsg`; richer button edge cases and high-button parity still pending. |
 | Focus reporting | focus in/out messages | done | CSI focus in/out decode + render-mode toggle implemented. |
 | Resize updates | runtime terminal resize events | partial | Initial size + CSI parser support; no OS-level resize watcher parity. |
 
@@ -71,7 +71,7 @@ Legend: `done` = implemented, `partial` = usable but incomplete, `todo` = not im
 
 ## Priority Gap Plan
 
-1. P0: Mouse protocol parsing/dispatch (`SGR 1006`, button/wheel/motion) with fixtures.
-2. P1: Cell-buffer renderer (row+cell diff) replacing line-only diff.
-3. P1: Runtime resize watcher parity across macOS/Linux/Windows.
-4. P2: Terminal capability probing and optional terminfo integration.
+1. P1: Cell-buffer renderer (row+cell diff) replacing line-only diff.
+2. P1: Runtime resize watcher parity across macOS/Linux/Windows.
+3. P2: Terminal capability probing and optional terminfo integration.
+4. P2: Expand mouse parity for extended/high-button mappings and compatibility fixtures.
