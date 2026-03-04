@@ -106,7 +106,7 @@ Primary goal: deterministic message-driven TUI runtime with portable terminal be
 - Messages include:
   - lifecycle: `QuitMsg`, `InterruptMsg`, `CommandErrorMsg`.
   - terminal: `WindowSizeMsg`.
-  - input: `KeyPressMsg`, `KeyReleaseMsg`, `Paste*Msg`, `Focus*Msg`, `MouseMsg` + typed variants (`MouseClickMsg`, `MouseReleaseMsg`, `MouseMotionMsg`, `MouseWheelMsg`), `ModeReportMsg`, `TerminalCapabilitiesMsg`, `UnknownInputMsg`.
+  - input: `KeyPressMsg`, `KeyReleaseMsg`, `Paste*Msg`, `Focus*Msg`, `MouseMsg` + typed variants (`MouseClickMsg`, `MouseReleaseMsg`, `MouseMotionMsg`, `MouseWheelMsg`), `ModeReportMsg`, `TerminalCapabilitiesMsg` (startup + runtime refinements), `UnknownInputMsg`.
   - command meta: `BatchMsg`, `SequenceMsg`, `TickMsg`.
 
 ## 8. Error Handling

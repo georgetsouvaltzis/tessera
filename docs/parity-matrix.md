@@ -59,7 +59,7 @@ Legend: `done` = implemented, `partial` = usable but incomplete, `todo` = not im
 | Windows VT setup | console mode configuration | done | VT input/output setup + restore implemented. |
 | Unix raw mode | non-canonical no-echo mode | done | `stty raw -echo` with restore path. |
 | TTY fallback | interactive run under redirected stdio | done | `/dev/tty` binding + console-key fallback. |
-| Capability negotiation | terminal feature detection | partial | Environment-driven `TerminalCapabilityProfile` now gates focus/mouse/paste/sync toggles and `DECRPM` queries; startup `TerminalCapabilitiesMsg` is emitted to models; Unix-like detection is enriched via best-effort `infocmp -x` parsing. Full terminfo-database parity and deeper runtime probing are still pending. |
+| Capability negotiation | terminal feature detection | partial | Environment-driven `TerminalCapabilityProfile` now gates focus/mouse/paste/sync toggles and `DECRPM` queries; `TerminalCapabilitiesMsg` is emitted at startup and refined at runtime from `ModeReportMsg`; Unix-like detection is enriched via best-effort `infocmp -x` parsing. Full terminfo-database parity and deeper runtime probing are still pending. |
 
 ## Test Parity
 

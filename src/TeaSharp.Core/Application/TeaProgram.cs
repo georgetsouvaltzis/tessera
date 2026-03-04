@@ -20,6 +20,7 @@ public sealed class TeaProgram
     private TerminalReader? _reader;
     private CancellationTokenSource? _cts;
     private bool _running;
+    private TerminalCapabilityProfile _runtimeCapabilities = TerminalCapabilityProfile.AllSupported;
 
     public TeaProgram(IModel initialModel, ProgramOptions? options = null)
     {
@@ -62,6 +63,7 @@ public sealed class TeaProgram
         {
             _terminal = _options.Terminal ?? new ConsoleTerminalAdapter();
             var capabilities = _options.TerminalCapabilities ?? TerminalCapabilityDetector.Detect();
+            _runtimeCapabilities = capabilities;
             _renderer = _options.DisableRenderer
                 ? new NullRenderer()
                 : _options.Renderer ?? new AnsiDiffRenderer(capabilities);
@@ -115,6 +117,13 @@ public sealed class TeaProgram
                     if (filtered is InterruptMsg)
                     {
                         throw new TeaProgramInterruptedException();
+                    }
+
+                    if (filtered is ModeReportMsg modeReport
+                        && TryApplyModeReport(_runtimeCapabilities, modeReport, out var refinedCapabilities))
+                    {
+                        _runtimeCapabilities = refinedCapabilities;
+                        Send(new TerminalCapabilitiesMsg(refinedCapabilities));
                     }
 
                     switch (filtered)
@@ -402,6 +411,59 @@ public sealed class TeaProgram
             {
                 // ignored: shutdown path.
             }
+        }
+    }
+
+    private static bool TryApplyModeReport(
+        TerminalCapabilityProfile current,
+        ModeReportMsg report,
+        out TerminalCapabilityProfile next)
+    {
+        next = current;
+        if (!TryGetModeState(report.State, out var enabled))
+        {
+            return false;
+        }
+
+        var updated = report.Mode switch
+        {
+            1004 => current with { FocusReporting = enabled, ModeReports = true },
+            1006 => current with { MouseReporting = enabled, ModeReports = true },
+            2004 => current with { BracketedPaste = enabled, ModeReports = true },
+            2026 => current with { SynchronizedUpdates = enabled, ModeReports = true },
+            _ => current,
+        };
+
+        if (updated == current)
+        {
+            return false;
+        }
+
+        var source = updated.Source;
+        if (!source.Contains("+mode-report", StringComparison.Ordinal))
+        {
+            source += "+mode-report";
+        }
+
+        next = updated with { Source = source };
+        return true;
+    }
+
+    private static bool TryGetModeState(ModeReportState state, out bool enabled)
+    {
+        enabled = false;
+        switch (state)
+        {
+            case ModeReportState.Set:
+            case ModeReportState.PermanentlySet:
+                enabled = true;
+                return true;
+            case ModeReportState.Reset:
+            case ModeReportState.PermanentlyReset:
+                enabled = false;
+                return true;
+            default:
+                return false;
         }
     }
 }

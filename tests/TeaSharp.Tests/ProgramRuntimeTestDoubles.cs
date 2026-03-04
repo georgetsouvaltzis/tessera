@@ -114,6 +114,29 @@ internal sealed class CapabilityTrackingModel : IModel
     public ModelView View() => ModelView.From("capabilities");
 }
 
+internal sealed class CapabilityRefinementModel : IModel
+{
+    public List<TerminalCapabilityProfile> Seen { get; } = [];
+
+    public Command? Init() => Commands.FromMessage(new ModeReportMsg(2026, ModeReportState.Reset));
+
+    public UpdateResult Update(IMessage message)
+    {
+        if (message is TerminalCapabilitiesMsg capabilities)
+        {
+            Seen.Add(capabilities.Profile);
+            if (Seen.Count >= 2)
+            {
+                return new UpdateResult(this, Commands.Quit);
+            }
+        }
+
+        return new UpdateResult(this, null);
+    }
+
+    public ModelView View() => ModelView.From("capability-refinement");
+}
+
 internal sealed record NumberMsg(int Value) : IMessage;
 
 internal sealed class FakeTerminalAdapter : ITerminalAdapter

@@ -16,6 +16,7 @@ internal static class ProgramRuntimeTests
         yield return new TestCase("Program_BatchCommands_ProcessAll", Batch_ProcessesAllCommands);
         yield return new TestCase("Program_FilterBlocksFirstQuit_AllowsSecond", Filter_CanBlockQuitMessage);
         yield return new TestCase("Program_EmitsTerminalCapabilitiesMessage", EmitsTerminalCapabilitiesMessage);
+        yield return new TestCase("Program_ModeReport_RefinesTerminalCapabilities", ModeReport_RefinesTerminalCapabilities);
         yield return new TestCase("Program_ResizeLoop_EmitsWindowSizeChanges", ResizeLoop_EmitsWindowSizeChanges);
         yield return new TestCase("Program_ResizeSignal_EmitsWindowSizeChanges", ResizeSignal_EmitsWindowSizeChanges);
     }
@@ -164,6 +165,37 @@ internal static class ProgramRuntimeTests
         // Assert
         TestAssert.True(model.Seen is not null, "Program should emit TerminalCapabilitiesMsg.");
         TestAssert.Equal(expected, model.Seen!, "Program should emit configured terminal capabilities.");
+    }
+
+    private static async Task ModeReport_RefinesTerminalCapabilities()
+    {
+        // Arrange
+        var initial = new TerminalCapabilityProfile(
+            FocusReporting: true,
+            MouseReporting: true,
+            BracketedPaste: true,
+            SynchronizedUpdates: true,
+            ModeReports: true,
+            Source: "test-initial");
+        var model = new CapabilityRefinementModel();
+        var program = new TeaProgram(model, new ProgramOptions
+        {
+            DisableRenderer = true,
+            DisableInput = true,
+            Terminal = new FakeTerminalAdapter(),
+            TerminalCapabilities = initial,
+        });
+
+        // Act
+        await program.RunAsync();
+
+        // Assert
+        TestAssert.Equal(2, model.Seen.Count, "Program should emit initial and refined capability messages.");
+        TestAssert.True(model.Seen[0].SynchronizedUpdates, "Initial capabilities should keep synchronized updates enabled.");
+        TestAssert.True(!model.Seen[1].SynchronizedUpdates, "Mode report reset should disable synchronized updates.");
+        TestAssert.True(
+            model.Seen[1].Source.Contains("+mode-report", StringComparison.Ordinal),
+            "Refined capabilities should annotate source with mode-report.");
     }
 
     private static async Task ResizeSignal_EmitsWindowSizeChanges()
