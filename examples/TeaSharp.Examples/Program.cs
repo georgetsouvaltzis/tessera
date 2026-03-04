@@ -1,5 +1,6 @@
 using TeaSharp;
 using TeaSharp.Components;
+using TeaSharp.Styles;
 using TeaSharp.Core.Abstractions;
 using TeaSharp.Core.Application;
 using TeaSharp.Core.Messages;
@@ -28,6 +29,21 @@ catch (TeaProgramInterruptedException)
 
 internal sealed class CounterModel : IModel
 {
+    private static readonly TeaStyle HeaderStyle = TeaStyle.Empty
+        .WithBold()
+        .WithForeground(AnsiColor.BrightCyan);
+
+    private static readonly TeaStyle AccentStyle = TeaStyle.Empty
+        .WithBold()
+        .WithForeground(AnsiColor.BrightGreen);
+
+    private static readonly TeaStyle MutedStyle = TeaStyle.Empty
+        .WithForeground(AnsiColor.Indexed(245));
+
+    private static readonly TeaStyle WarningStyle = TeaStyle.Empty
+        .WithBold()
+        .WithForeground(AnsiColor.Indexed(214));
+
     private readonly TeaSharp.Core.Terminal.ConsoleTerminalAdapter _terminal;
     private TerminalCapabilityProfile _capabilities = TerminalCapabilityProfile.AllSupported;
     private readonly string _resizeBackend;
@@ -215,29 +231,32 @@ internal sealed class CounterModel : IModel
 
     private string BuildProbeView()
     {
+        static string Label(string text) => HeaderStyle.Render(text);
+        static string Hint(string text) => MutedStyle.Render(text);
+
         return
-            "TeaSharp Protocol Probe\n\n" +
-            $"Count: {_count}\n" +
-            $"Focus: {(_focused ? "in" : "out")}\n" +
-            $"Size: {_width}x{_height}\n" +
-            $"Raw mode active: {(_terminal.IsRawModeActive ? "yes" : "no")}\n" +
-            $"Raw mode probe: {SummarizeProbe(_terminal.RawModeDiagnostics)}\n" +
-            $"Raw mode error: {SummarizeProbe(_terminal.RawModeError)}\n" +
-            $"Input backend: {(_terminal.IsRawModeActive ? "vt-bytes" : "console-keys-fallback")}\n" +
-            $"Capabilities source: {_capabilities.Source}\n" +
-            $"Capabilities: focus={ToYesNo(_capabilities.FocusReporting)} mouse={ToYesNo(_capabilities.MouseReporting)} paste={ToYesNo(_capabilities.BracketedPaste)} sync={ToYesNo(_capabilities.SynchronizedUpdates)} decrpm={ToYesNo(_capabilities.ModeReports)}\n" +
-            $"Focus events: {(_terminal.IsRawModeActive ? "expected (if terminal supports ?1004)" : "not available in fallback mode")}\n" +
-            $"Mouse events: {(_terminal.IsRawModeActive ? "expected (if terminal supports ?1006)" : "not available in fallback mode")}\n" +
-            "Synchronized updates: requested (?2026)\n" +
-            "Mode reports (DECRPM current-state):\n" +
+            $"{HeaderStyle.WithForeground(AnsiColor.BrightWhite).Render("TeaSharp Protocol Probe")}\n\n" +
+            $"{Label("Count:")} {_count}\n" +
+            $"{Label("Focus:")} {(_focused ? "in" : "out")}\n" +
+            $"{Label("Size:")} {_width}x{_height}\n" +
+            $"{Label("Raw mode active:")} {(_terminal.IsRawModeActive ? "yes" : "no")}\n" +
+            $"{Label("Raw mode probe:")} {SummarizeProbe(_terminal.RawModeDiagnostics)}\n" +
+            $"{Label("Raw mode error:")} {SummarizeProbe(_terminal.RawModeError)}\n" +
+            $"{Label("Input backend:")} {(_terminal.IsRawModeActive ? "vt-bytes" : "console-keys-fallback")}\n" +
+            $"{Label("Capabilities source:")} {_capabilities.Source}\n" +
+            $"{Label("Capabilities:")} focus={ToYesNo(_capabilities.FocusReporting)} mouse={ToYesNo(_capabilities.MouseReporting)} paste={ToYesNo(_capabilities.BracketedPaste)} sync={ToYesNo(_capabilities.SynchronizedUpdates)} decrpm={ToYesNo(_capabilities.ModeReports)}\n" +
+            $"{Label("Focus events:")} {(_terminal.IsRawModeActive ? "expected (if terminal supports ?1004)" : "not available in fallback mode")}\n" +
+            $"{Label("Mouse events:")} {(_terminal.IsRawModeActive ? "expected (if terminal supports ?1006)" : "not available in fallback mode")}\n" +
+            $"{Label("Synchronized updates:")} requested (?2026)\n" +
+            $"{Label("Mode reports (DECRPM current-state):")}\n" +
             $"{FormatModeReports()}\n" +
-            $"Resize backend: {_resizeBackend}\n" +
-            $"Stress mode: {(_stressMode ? "on" : "off")} (ticks: {_tickCount})\n" +
-            $"Last event: {_lastEvent}\n" +
-            $"Last paste: {_lastPaste}\n" +
-            $"Typed length: {_typedText.Length}\n" +
-            $"Typed text: {SanitizePastePreview(_typedText)}\n\n" +
-            "Try live:\n" +
+            $"{Label("Resize backend:")} {_resizeBackend}\n" +
+            $"{Label("Stress mode:")} {(_stressMode ? "on" : "off")} (ticks: {_tickCount})\n" +
+            $"{Label("Last event:")} {_lastEvent}\n" +
+            $"{Label("Last paste:")} {_lastPaste}\n" +
+            $"{Label("Typed length:")} {_typedText.Length}\n" +
+            $"{Label("Typed text:")} {SanitizePastePreview(_typedText)}\n\n" +
+            $"{Hint("Try live:")}\n" +
             "- press 2 to open dashboard view\n" +
             "- up/down to change count\n" +
             "- move/click mouse in terminal window\n" +
@@ -255,11 +274,13 @@ internal sealed class CounterModel : IModel
     {
         if (_width < 40 || _height < 16)
         {
-            return
+            var compactView =
                 "TeaSharp Component Dashboard\n\n" +
                 "Terminal too small for dashboard components.\n" +
                 "Resize to at least 40x16.\n\n" +
                 "Press 1 for protocol view or q to quit.";
+
+            return WarningStyle.Render(compactView);
         }
 
         var canvas = new Canvas(_width, _height);
@@ -275,7 +296,7 @@ internal sealed class CounterModel : IModel
             new Rect(0, 0, _width, headerHeight),
             "TeaSharp Dashboard",
             [
-                $"count={_count} focus={(_focused ? "in" : "out")} size={_width}x{_height}  mode={( _dashboardMode ? "dashboard" : "probe")}  source={_capabilities.Source}",
+                $"count={_count} focus={(_focused ? "in" : "out")} size={_width}x{_height}  mode={(_dashboardMode ? "dashboard" : "probe")}  source={_capabilities.Source}",
             ]);
 
         Widgets.DrawPanel(
@@ -301,28 +322,57 @@ internal sealed class CounterModel : IModel
             gauge,
             $"count gauge: {_count}");
 
-        Widgets.DrawPanel(
+        var cardHeight = Math.Min(7, Math.Max(5, bodyHeight / 3));
+        var sparkHeight = 3;
+        var tableTop = bodyTop + cardHeight + sparkHeight;
+        var tableHeight = bodyTop + bodyHeight - tableTop;
+        if (tableHeight < 4)
+        {
+            tableTop = bodyTop + cardHeight + 2;
+            tableHeight = bodyTop + bodyHeight - tableTop;
+        }
+
+        Widgets.DrawCard(
             canvas,
-            new Rect(leftWidth, bodyTop, rightWidth, bodyHeight),
+            new Rect(leftWidth, bodyTop, rightWidth, cardHeight),
             "Components",
             [
-                "sparkline, list, box panels",
+                "styles, sparkline, cards, table",
                 "tab cycles action, enter executes",
-                "1 protocol view  2 dashboard view",
+                "1 protocol view, 2 dashboard view",
             ]);
+
+        Widgets.DrawPanel(
+            canvas,
+            new Rect(leftWidth, bodyTop + cardHeight, rightWidth, sparkHeight),
+            "Throughput",
+            [string.Empty]);
 
         Widgets.DrawSparkline(
             canvas,
-            new Rect(leftWidth + 2, bodyTop + 5, Math.Max(8, rightWidth - 4), 1),
+            new Rect(leftWidth + 2, bodyTop + cardHeight + 1, Math.Max(8, rightWidth - 4), 1),
             _sparkline,
             minValue: 0,
             maxValue: 100);
 
-        Widgets.DrawList(
-            canvas,
-            new Rect(leftWidth + 2, bodyTop + 7, Math.Max(12, rightWidth - 4), Math.Max(3, bodyHeight - 9)),
-            _actions,
-            _selectedAction);
+        if (tableHeight >= 4)
+        {
+            Widgets.DrawTable(
+                canvas,
+                new Rect(leftWidth, tableTop, rightWidth, tableHeight),
+                ["Action", "Key", "State"],
+                BuildActionRows(),
+                selectedRow: _selectedAction,
+                title: "Actions");
+        }
+        else
+        {
+            Widgets.DrawList(
+                canvas,
+                new Rect(leftWidth + 2, bodyTop + cardHeight + sparkHeight, Math.Max(12, rightWidth - 4), Math.Max(3, bodyHeight - cardHeight - sparkHeight - 2)),
+                _actions,
+                _selectedAction);
+        }
 
         Widgets.DrawPanel(
             canvas,
@@ -333,7 +383,7 @@ internal sealed class CounterModel : IModel
                 $"paste: {Truncate(_lastPaste, Math.Max(8, _width - 8))}",
             ]);
 
-        return canvas.Render();
+        return ApplyDashboardStyles(canvas.Render());
     }
 
     private UpdateResult ExecuteSelectedAction()
@@ -375,6 +425,44 @@ internal sealed class CounterModel : IModel
         {
             _sparkline.RemoveAt(0);
         }
+    }
+
+    private IReadOnlyList<IReadOnlyList<string>> BuildActionRows()
+    {
+        return
+        [
+            new[] { "Inspect capabilities", "tab/enter", _selectedAction == 0 ? "selected" : "ready" },
+            new[] { "Toggle stress mode", "s", _stressMode ? "on" : "off" },
+            new[] { "Switch page", "1/2", _dashboardMode ? "dashboard" : "probe" },
+            new[] { "Quit", "q/ctrl+c", "ready" },
+        ];
+    }
+
+    private static string ApplyDashboardStyles(string frame)
+    {
+        var rows = frame.Split('\n');
+        if (rows.Length == 0)
+        {
+            return frame;
+        }
+
+        rows[0] = HeaderStyle.WithForeground(AnsiColor.BrightWhite).Render(rows[0]);
+        rows[^1] = MutedStyle.Render(rows[^1]);
+
+        for (var i = 0; i < rows.Length; i++)
+        {
+            if (rows[i].Contains("› ", StringComparison.Ordinal))
+            {
+                rows[i] = AccentStyle.Render(rows[i]);
+            }
+
+            if (rows[i].Contains("raw mode: no", StringComparison.Ordinal))
+            {
+                rows[i] = WarningStyle.Render(rows[i]);
+            }
+        }
+
+        return string.Join('\n', rows);
     }
 
     private static string SanitizePastePreview(string content)

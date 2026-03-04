@@ -88,4 +88,127 @@ public static class Widgets
             canvas.WriteText(clipped.X, clipped.Y + row, prefix + items[row], clipped.Width);
         }
     }
+
+    public static void DrawCard(Canvas canvas, Rect rect, string title, IReadOnlyList<string> lines, char accent = '▌')
+    {
+        var clipped = Rect.Intersect(rect, canvas.Bounds);
+        if (clipped.IsEmpty || clipped.Width < 4 || clipped.Height < 3)
+        {
+            return;
+        }
+
+        canvas.DrawBox(clipped, title);
+        var contentRect = clipped.Inset(1, 1);
+        var maxRows = Math.Min(lines.Count, contentRect.Height);
+        for (var row = 0; row < maxRows; row++)
+        {
+            var y = contentRect.Y + row;
+            canvas.Set(contentRect.X, y, accent);
+            if (contentRect.Width > 2)
+            {
+                canvas.WriteText(contentRect.X + 2, y, lines[row], contentRect.Width - 2);
+            }
+        }
+    }
+
+    public static void DrawTable(
+        Canvas canvas,
+        Rect rect,
+        IReadOnlyList<string> headers,
+        IReadOnlyList<IReadOnlyList<string>> rows,
+        int selectedRow = -1,
+        string? title = null)
+    {
+        var clipped = Rect.Intersect(rect, canvas.Bounds);
+        if (clipped.IsEmpty || headers.Count == 0 || clipped.Width < (headers.Count * 2) + 1 || clipped.Height < 4)
+        {
+            return;
+        }
+
+        canvas.DrawBox(clipped, title);
+        var contentRect = clipped.Inset(1, 1);
+        if (contentRect.Height < 3)
+        {
+            return;
+        }
+
+        var separatorCount = headers.Count - 1;
+        var availableWidth = Math.Max(headers.Count, contentRect.Width - separatorCount);
+        var widths = ComputeColumnWidths(availableWidth, headers.Count);
+
+        DrawTableRow(canvas, contentRect.X, contentRect.Y, widths, headers, isSelected: false);
+
+        var dividerY = contentRect.Y + 1;
+        canvas.DrawHorizontalLine(contentRect.X, dividerY, contentRect.Width, '─');
+        var separatorX = contentRect.X;
+        for (var i = 0; i < widths.Length - 1; i++)
+        {
+            separatorX += widths[i];
+            canvas.Set(separatorX, dividerY, '┼');
+            separatorX++;
+        }
+
+        var maxRows = Math.Min(rows.Count, Math.Max(0, contentRect.Height - 2));
+        for (var i = 0; i < maxRows; i++)
+        {
+            var y = contentRect.Y + 2 + i;
+            DrawTableRow(canvas, contentRect.X, y, widths, rows[i], isSelected: i == selectedRow);
+        }
+    }
+
+    private static int[] ComputeColumnWidths(int width, int columns)
+    {
+        var widths = new int[columns];
+        var baseWidth = width / columns;
+        var remainder = width % columns;
+        for (var i = 0; i < columns; i++)
+        {
+            widths[i] = baseWidth + (i < remainder ? 1 : 0);
+        }
+
+        return widths;
+    }
+
+    private static void DrawTableRow(
+        Canvas canvas,
+        int x,
+        int y,
+        IReadOnlyList<int> widths,
+        IReadOnlyList<string> cells,
+        bool isSelected)
+    {
+        var cx = x;
+        for (var col = 0; col < widths.Count; col++)
+        {
+            var width = widths[col];
+            var value = col < cells.Count ? cells[col] : string.Empty;
+            if (isSelected && col == 0 && width >= 2)
+            {
+                value = "› " + value;
+            }
+
+            canvas.WriteText(cx, y, FitText(value, width), width);
+            cx += width;
+            if (col < widths.Count - 1)
+            {
+                canvas.Set(cx, y, '│');
+                cx++;
+            }
+        }
+    }
+
+    private static string FitText(string text, int width)
+    {
+        if (width <= 0)
+        {
+            return string.Empty;
+        }
+
+        if (text.Length >= width)
+        {
+            return text[..width];
+        }
+
+        return text.PadRight(width);
+    }
 }

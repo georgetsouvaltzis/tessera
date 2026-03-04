@@ -63,6 +63,9 @@ Primary goal: deterministic message-driven TUI runtime with portable terminal be
 7. `Components`
 - `TeaSharp.Components`: deterministic cell-canvas primitives (`Rect`, `Canvas`, `Widgets`) for building composable views.
 
+8. `Styles`
+- `TeaSharp.Styles`: composable ANSI style model (`TeaStyle`, `AnsiColor`) for foreground/background and text attributes.
+
 ### 4.2 Core Data Flow
 
 1. Program starts and prepares terminal.
@@ -129,6 +132,7 @@ Behavior tests cover:
 - command timer (`Tick`) path.
 - filter-based message suppression.
 - deterministic renderer snapshots (first frame control sequences, incremental patches, reset teardown).
+- styled rendering tests (SGR parsing, style-only diff patches).
 
 ## 10. Iteration Roadmap
 
@@ -155,3 +159,4 @@ Phase 3:
 
 - Bubble Tea parity tracking lives in `docs/parity-matrix.md`.
 - Component drawing notes live in `docs/components.md`.
+- ANSI style notes live in `docs/styles.md`.

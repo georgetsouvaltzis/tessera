@@ -22,6 +22,8 @@ The design follows patterns used in Bubble Tea examples:
   - `DrawProgressBar`
   - `DrawSparkline`
   - `DrawList`
+  - `DrawCard`
+  - `DrawTable`
 
 ## Example Integration
 
@@ -30,7 +32,8 @@ The design follows patterns used in Bubble Tea examples:
 - system status panel
 - live progress bar
 - sparkline chart
-- action list
+- component summary card
+- action/state table
 - event footer
 
 The protocol probe page remains available (press `1`) for low-level VT debugging.
