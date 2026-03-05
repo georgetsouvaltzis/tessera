@@ -80,7 +80,7 @@ internal sealed class CounterModel : IModel
     ];
     private readonly KeyBinding[] _showcaseHelp =
     [
-        new KeyBinding("p/P", "cycle pane"),
+        new KeyBinding("p/shift+p", "cycle pane"),
         new KeyBinding("left/right", "switch tab"),
         new KeyBinding("t", "toast"),
         new KeyBinding("m", "modal"),
@@ -516,6 +516,13 @@ internal sealed class CounterModel : IModel
     private UpdateResult HandleWorkspaceKey(KeyPressMsg key)
     {
         if (_page == AppPage.Showcase
+            && _focus != WorkspaceFocus.Command
+            && HandleShowcaseNavigationKey(key))
+        {
+            return new UpdateResult(this, null);
+        }
+
+        if (_page == AppPage.Showcase
             && _focus == WorkspaceFocus.Showcase
             && HandleShowcaseHotKey(key))
         {
@@ -556,30 +563,42 @@ internal sealed class CounterModel : IModel
         return new UpdateResult(this, null);
     }
 
+    private bool HandleShowcaseNavigationKey(KeyPressMsg key)
+    {
+        if (key.Text == "p" && key.Modifiers == KeyModifiers.None)
+        {
+            MoveShowcasePane(1);
+            _lastEvent = $"showcase: pane={ShowcasePaneLabel()}";
+            CaptureShowcaseSnapshot(_lastEvent);
+            AppendLog(_lastEvent);
+            return true;
+        }
+
+        if (string.Equals(key.Text, "p", StringComparison.OrdinalIgnoreCase) && key.Modifiers.HasFlag(KeyModifiers.Shift))
+        {
+            MoveShowcasePane(-1);
+            _lastEvent = $"showcase: pane={ShowcasePaneLabel()}";
+            CaptureShowcaseSnapshot(_lastEvent);
+            AppendLog(_lastEvent);
+            return true;
+        }
+
+        if (_showcaseTabs.Update(key))
+        {
+            EnsureShowcasePaneInRange();
+            _lastEvent = $"showcase: tab={_showcaseTabs.SelectedIndex + 1}";
+            CaptureShowcaseSnapshot(_lastEvent);
+            AppendLog(_lastEvent);
+            return true;
+        }
+
+        return false;
+    }
+
     private bool HandleShowcaseHotKey(KeyPressMsg key)
     {
         var changed = false;
         var action = string.Empty;
-
-        if (_showcaseTabs.Update(key))
-        {
-            changed = true;
-            EnsureShowcasePaneInRange();
-            action = $"tab={_showcaseTabs.SelectedIndex + 1}";
-        }
-
-        if (key.Text == "p" && key.Modifiers == KeyModifiers.None)
-        {
-            MoveShowcasePane(1);
-            changed = true;
-            action = $"pane={ShowcasePaneLabel()}";
-        }
-        else if (key.Text == "P" && key.Modifiers == KeyModifiers.None)
-        {
-            MoveShowcasePane(-1);
-            changed = true;
-            action = $"pane={ShowcasePaneLabel()}";
-        }
 
         if (key.Text == "t" && key.Modifiers == KeyModifiers.None)
         {
@@ -1452,11 +1471,7 @@ internal sealed class CounterModel : IModel
 
         for (var i = 0; i < rows.Length; i++)
         {
-            if (rows[i].Contains("› ", StringComparison.Ordinal))
-            {
-                rows[i] = AccentStyle.Render(rows[i]);
-                continue;
-            }
+            rows[i] = rows[i].Replace("› ", AccentStyle.Render("› "), StringComparison.Ordinal);
 
             if (placeholderVisible && i == inputRow)
             {
