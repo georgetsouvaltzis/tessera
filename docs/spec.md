@@ -61,7 +61,7 @@ Primary goal: deterministic message-driven TUI runtime with portable terminal be
 - `Commands` static helpers: `Quit`, `Interrupt`, `Batch`, `Sequence`, `Tick`, `Every`.
 
 7. `Components`
-- `TeaSharp.Components`: deterministic canvas primitives (`Rect`, `Canvas`, `Widgets`) with selectable text pipeline (`CanvasTextMode.Fast` / `CanvasTextMode.GraphemeAware`), component composition contracts (`ICanvasComponent`, `IStatefulComponent`, `ComponentComposer`), chart primitives (`Charts`, `LineChartComponent`, `BarChartComponent`), and dashboard widgets (`GaugeComponent`, `StatsCardComponent`, `MiniLogComponent`).
+- `TeaSharp.Components`: deterministic canvas primitives (`Rect`, `Canvas`, `Widgets`) with selectable text pipeline (`CanvasTextMode.Fast` / `CanvasTextMode.GraphemeAware`) and configurable border styles, component composition contracts (`ICanvasComponent`, `IStatefulComponent`, `ComponentComposer`), chart primitives (`Charts`, `LineChartComponent`, `BarChartComponent`) with optional axes/legend/scale options, dashboard widgets (`GaugeComponent`, `StatsCardComponent`, `MiniLogComponent`), and a reusable UI kit (`Layout`, `UiWidgets`, tabs/accordion/table/forms/toast/modal components).
 
 8. `Styles`
 - `TeaSharp.Styles`: composable ANSI style model (`TeaStyle`, `AnsiColor`) for foreground/background and text attributes.
@@ -138,6 +138,7 @@ Behavior tests cover:
 - styled rendering tests (SGR parsing, style-only diff patches).
 - stateful widget tests (viewport scroll/wrap, text input edits/submission, list filter/paging, keymap help rendering).
 - component tests (table/card primitives, chart rendering, component composer dispatch).
+- UI-kit tests (layout helpers, border variants, tabs/table/forms/modal interactions).
 - protocol fixture tests (terminal-behavior fixtures for Ghostty/iTerm2/Apple Terminal style key/paste/focus sequences).
 
 ## 10. Iteration Roadmap

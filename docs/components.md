@@ -16,6 +16,7 @@ The design follows patterns used in Bubble Tea examples:
 - `Canvas`: fixed-size character grid renderer.
   - `Set`, `Get`, `WriteText`
   - `DrawHorizontalLine`, `DrawVerticalLine`, `DrawBox`
+  - `DrawBox` supports `BorderStyle.Single|Rounded|Heavy|Ascii`
   - text modes:
     - `CanvasTextMode.Fast` (default): char-cell fast path
     - `CanvasTextMode.GraphemeAware`: wide/combining grapheme-aware text placement
@@ -34,12 +35,27 @@ The design follows patterns used in Bubble Tea examples:
 - `Charts`:
   - `Charts.DrawLineChart(...)`
   - `Charts.DrawBarChart(...)`
+  - optional options records:
+    - `LineChartOptions` (`ShowAxes`, `Legend`, `XLabel`, `YLabel`)
+    - `BarChartOptions` (`ShowScale`, `Legend`)
   - `LineChartComponent` (bounded sample history)
   - `BarChartComponent` (named value bars)
 - dashboard-oriented components:
   - `GaugeComponent`
   - `StatsCardComponent` + `StatsCardItem`
   - `MiniLogComponent`
+- UI kit components and layout helpers:
+  - `Layout` (`Classify`, `SplitVertical`, `SplitHorizontal`, `Grid`)
+  - `UiWidgets` (`DrawBreadcrumb`, `DrawStatusBar`, `DrawTimeline`, `DrawTree`, `DrawCalendar`, `DrawSkeleton`)
+  - stateful components:
+    - `TabsComponent`
+    - `AccordionComponent`
+    - `SortableTableComponent`
+    - `CheckboxListComponent`
+    - `RadioGroupComponent`
+    - `SelectComponent`
+    - `ToastCenterComponent`
+    - `ModalComponent`
 
 ## Example Integration
 
@@ -56,6 +72,11 @@ The design follows patterns used in Bubble Tea examples:
 
 The protocol probe page remains available (press `1`) for low-level VT debugging.
 Capability showcase page is available on `3` and demonstrates grapheme-aware canvas rendering plus custom component composition (`UnicodeShowcaseComponent`).
+Showcase page now cycles multiple UI surfaces with `left/right` tabs:
+- `Overview`: unicode/timeline/tree/calendar
+- `Data`: line/bar charts + sortable/paged table
+- `Forms`: accordion + checklist + radio/select + summary card
+Hotkeys in showcase mode: `t` toast, `m` modal, `a` accordion, `z` checklist, `r` theme, `f` density, `c` table column, `v` table sort, `[`/`]` table page.
 The dashboard composes chart components through `ComponentComposer` and uses stateful models from `TeaSharp.Widgets`.
 
 ## Custom Components

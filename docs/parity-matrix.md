@@ -68,6 +68,7 @@ Legend: `done` = implemented, `partial` = usable but incomplete, `todo` = not im
 |---|---|---|---|
 | Composable components | reusable view components | done | `ICanvasComponent`, `IStatefulComponent`, and `ComponentComposer` support slot-based composition and stateful message routing. |
 | Chart primitives | sparkline/plot-style components | partial | `Charts.DrawLineChart`, `Charts.DrawBarChart`, `LineChartComponent`, and `BarChartComponent` are implemented; advanced axes/labels/zoom interactions are still pending. |
+| UI-kit widgets/layout | reusable higher-level components | partial | Added `Layout` helpers plus tabs, accordion, sortable table, form controls, toast center, modal overlay, and timeline/tree/calendar/skeleton widgets; advanced theming/virtualization still pending. |
 
 ## Cross-Platform Runtime
 
