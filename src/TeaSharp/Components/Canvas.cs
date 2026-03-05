@@ -9,6 +9,14 @@ public enum CanvasTextMode
     GraphemeAware = 1,
 }
 
+public enum BorderStyle
+{
+    Single = 0,
+    Rounded = 1,
+    Heavy = 2,
+    Ascii = 3,
+}
+
 public sealed class Canvas
 {
     private readonly char[]? _cells;
@@ -225,7 +233,7 @@ public sealed class Canvas
         }
     }
 
-    public void DrawBox(Rect rect, string? title = null)
+    public void DrawBox(Rect rect, string? title = null, BorderStyle borderStyle = BorderStyle.Single)
     {
         var clipped = Rect.Intersect(rect, Bounds);
         if (clipped.IsEmpty || clipped.Width < 2 || clipped.Height < 2)
@@ -233,15 +241,23 @@ public sealed class Canvas
             return;
         }
 
-        DrawHorizontalLine(clipped.X + 1, clipped.Y, clipped.Width - 2);
-        DrawHorizontalLine(clipped.X + 1, clipped.Bottom - 1, clipped.Width - 2);
-        DrawVerticalLine(clipped.X, clipped.Y + 1, clipped.Height - 2);
-        DrawVerticalLine(clipped.Right - 1, clipped.Y + 1, clipped.Height - 2);
+        var (horizontal, vertical, topLeft, topRight, bottomLeft, bottomRight) = borderStyle switch
+        {
+            BorderStyle.Rounded => ('─', '│', '╭', '╮', '╰', '╯'),
+            BorderStyle.Heavy => ('━', '┃', '┏', '┓', '┗', '┛'),
+            BorderStyle.Ascii => ('-', '|', '+', '+', '+', '+'),
+            _ => ('─', '│', '┌', '┐', '└', '┘'),
+        };
 
-        Set(clipped.X, clipped.Y, '┌');
-        Set(clipped.Right - 1, clipped.Y, '┐');
-        Set(clipped.X, clipped.Bottom - 1, '└');
-        Set(clipped.Right - 1, clipped.Bottom - 1, '┘');
+        DrawHorizontalLine(clipped.X + 1, clipped.Y, clipped.Width - 2, horizontal);
+        DrawHorizontalLine(clipped.X + 1, clipped.Bottom - 1, clipped.Width - 2, horizontal);
+        DrawVerticalLine(clipped.X, clipped.Y + 1, clipped.Height - 2, vertical);
+        DrawVerticalLine(clipped.Right - 1, clipped.Y + 1, clipped.Height - 2, vertical);
+
+        Set(clipped.X, clipped.Y, topLeft);
+        Set(clipped.Right - 1, clipped.Y, topRight);
+        Set(clipped.X, clipped.Bottom - 1, bottomLeft);
+        Set(clipped.Right - 1, clipped.Bottom - 1, bottomRight);
 
         if (!string.IsNullOrWhiteSpace(title))
         {

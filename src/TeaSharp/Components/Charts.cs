@@ -1,6 +1,8 @@
 namespace TeaSharp.Components;
 
 public readonly record struct BarDatum(string Label, double Value);
+public readonly record struct LineChartOptions(bool ShowAxes = false, string? Legend = null, string? XLabel = null, string? YLabel = null);
+public readonly record struct BarChartOptions(bool ShowScale = false, string? Legend = null);
 
 public static class Charts
 {
@@ -10,7 +12,8 @@ public static class Charts
         IReadOnlyList<double> samples,
         string title = "Line Chart",
         double? minValue = null,
-        double? maxValue = null)
+        double? maxValue = null,
+        LineChartOptions? options = null)
     {
         var clipped = Rect.Intersect(rect, canvas.Bounds);
         if (clipped.IsEmpty || clipped.Width < 4 || clipped.Height < 4)
@@ -25,7 +28,22 @@ public static class Charts
             return;
         }
 
-        var count = Math.Min(content.Width, samples.Count);
+        var chartOptions = options ?? new LineChartOptions();
+        var plot = content;
+        if (chartOptions.ShowAxes && content.Width >= 6 && content.Height >= 4)
+        {
+            canvas.DrawVerticalLine(content.X, content.Y, content.Height, '│');
+            canvas.DrawHorizontalLine(content.X, content.Bottom - 1, content.Width, '─');
+            canvas.Set(content.X, content.Bottom - 1, '└');
+            plot = new Rect(content.X + 1, content.Y, content.Width - 1, content.Height - 1);
+        }
+
+        if (plot.IsEmpty)
+        {
+            return;
+        }
+
+        var count = Math.Min(plot.Width, samples.Count);
         var offset = Math.Max(0, samples.Count - count);
         var min = minValue ?? double.PositiveInfinity;
         var max = maxValue ?? double.NegativeInfinity;
@@ -51,8 +69,10 @@ public static class Charts
             max = min + 1;
         }
 
-        // baseline
-        canvas.DrawHorizontalLine(content.X, content.Bottom - 1, content.Width, '·');
+        if (!chartOptions.ShowAxes)
+        {
+            canvas.DrawHorizontalLine(plot.X, plot.Bottom - 1, plot.Width, '·');
+        }
 
         var prevX = -1;
         var prevY = -1;
@@ -60,8 +80,8 @@ public static class Charts
         {
             var value = samples[offset + i];
             var normalized = Math.Clamp((value - min) / (max - min), 0, 1);
-            var y = content.Bottom - 1 - (int)Math.Round(normalized * (content.Height - 1), MidpointRounding.AwayFromZero);
-            var x = content.X + i;
+            var y = plot.Bottom - 1 - (int)Math.Round(normalized * (plot.Height - 1), MidpointRounding.AwayFromZero);
+            var x = plot.X + i;
 
             if (prevX >= 0)
             {
@@ -75,6 +95,24 @@ public static class Charts
 
         var stats = $"min:{FormatStat(min)} max:{FormatStat(max)}";
         canvas.WriteText(content.X, content.Y, stats, content.Width);
+        if (!string.IsNullOrWhiteSpace(chartOptions.Legend))
+        {
+            var legend = chartOptions.Legend.Trim();
+            var legendX = Math.Max(content.X, content.Right - legend.Length);
+            canvas.WriteText(legendX, content.Y, legend, content.Right - legendX);
+        }
+
+        if (chartOptions.ShowAxes && !string.IsNullOrWhiteSpace(chartOptions.XLabel))
+        {
+            var xLabel = chartOptions.XLabel.Trim();
+            var xLabelX = Math.Max(content.X, content.Right - xLabel.Length);
+            canvas.WriteText(xLabelX, content.Bottom - 1, xLabel, content.Right - xLabelX);
+        }
+
+        if (chartOptions.ShowAxes && !string.IsNullOrWhiteSpace(chartOptions.YLabel))
+        {
+            canvas.WriteText(content.X, content.Y, chartOptions.YLabel.Trim(), Math.Min(content.Width, 4));
+        }
     }
 
     public static void DrawBarChart(
@@ -82,7 +120,8 @@ public static class Charts
         Rect rect,
         IReadOnlyList<BarDatum> bars,
         string title = "Bar Chart",
-        double? maxValue = null)
+        double? maxValue = null,
+        BarChartOptions? options = null)
     {
         var clipped = Rect.Intersect(rect, canvas.Bounds);
         if (clipped.IsEmpty || clipped.Width < 6 || clipped.Height < 3)
@@ -146,6 +185,21 @@ public static class Charts
                 canvas.Set(content.X + labelWidth + 1 + i, y, i < filled ? '█' : '░');
             }
         }
+
+        var chartOptions = options ?? new BarChartOptions();
+        if (chartOptions.ShowScale && content.Height > 0)
+        {
+            var scale = $"0..{FormatStat(max)}";
+            var scaleX = Math.Max(content.X, content.Right - scale.Length);
+            canvas.WriteText(scaleX, content.Bottom - 1, scale, content.Right - scaleX);
+        }
+
+        if (!string.IsNullOrWhiteSpace(chartOptions.Legend))
+        {
+            var legend = chartOptions.Legend.Trim();
+            var legendX = Math.Max(content.X, content.Right - legend.Length);
+            canvas.WriteText(legendX, content.Y, legend, content.Right - legendX);
+        }
     }
 
     private static void DrawConnection(Canvas canvas, int x0, int y0, int x1, int y1)
@@ -190,6 +244,8 @@ public sealed class LineChartComponent : ICanvasComponent
 
     public double? MaxValue { get; set; }
 
+    public LineChartOptions? Options { get; set; }
+
     public IReadOnlyList<double> Samples => _samples;
 
     public void SetSamples(IEnumerable<double> samples)
@@ -212,7 +268,7 @@ public sealed class LineChartComponent : ICanvasComponent
 
     public void Render(Canvas canvas, Rect rect)
     {
-        Charts.DrawLineChart(canvas, rect, _samples, Title, MinValue, MaxValue);
+        Charts.DrawLineChart(canvas, rect, _samples, Title, MinValue, MaxValue, Options);
     }
 }
 
@@ -223,6 +279,8 @@ public sealed class BarChartComponent : ICanvasComponent
     public string Title { get; set; } = "Bar Chart";
 
     public double? MaxValue { get; set; }
+
+    public BarChartOptions? Options { get; set; }
 
     public IReadOnlyList<BarDatum> Bars => _bars;
 
@@ -248,6 +306,6 @@ public sealed class BarChartComponent : ICanvasComponent
 
     public void Render(Canvas canvas, Rect rect)
     {
-        Charts.DrawBarChart(canvas, rect, _bars, Title, MaxValue);
+        Charts.DrawBarChart(canvas, rect, _bars, Title, MaxValue, Options);
     }
 }
