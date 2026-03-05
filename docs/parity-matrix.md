@@ -84,6 +84,7 @@ Legend: `done` = implemented, `partial` = usable but incomplete, `todo` = not im
 | Area | Bubble Tea Capability | TeaSharp | Notes |
 |---|---|---|---|
 | Behavior tests | loop/command semantics | done | Core regression tests pass. |
+| Integration tests | deterministic app-level UX behavior | partial | NUnit integration suite added for workspace mode routing and showcase modal/toast flows; PTY-backed end-to-end emulator runs still pending. |
 | Protocol decode tests | key/mouse/paste parser fixtures | partial | Golden fixtures include CSI/SS3/OSC, modifiers, focus, and extended mouse buttons/modifier combinations; terminal-specific fixture breadth still pending. |
 | Terminal behavior fixtures | emulator-specific key/paste/focus regressions | partial | Added fixture tests that mirror Ghostty modifyOtherKeys, iTerm2 CSI-u modifier combos, and Apple Terminal-style fallback alt/focus/paste paths; broader capture sets across more terminal versions still pending. |
 | Renderer snapshots | render diff correctness | done | Deterministic renderer snapshots now cover first-frame mode/title sequences, incremental diff patches, and reset teardown control sequences. |

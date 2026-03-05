@@ -74,14 +74,15 @@ internal sealed class CounterModel : IModel
     private readonly KeyBinding[] _globalHelp =
     [
         new KeyBinding("tab", "cycle focus"),
+        new KeyBinding(":", "enter command mode"),
+        new KeyBinding("esc", "exit command mode"),
         new KeyBinding("?", "toggle help"),
         new KeyBinding("1/2/3", "switch page"),
         new KeyBinding("q", "quit"),
     ];
     private readonly KeyBinding[] _showcaseHelp =
     [
-        new KeyBinding("esc", "toggle nav/cmd"),
-        new KeyBinding("p/shift+p", "cycle pane"),
+        new KeyBinding("p/P", "cycle pane"),
         new KeyBinding("left/right", "switch tab"),
         new KeyBinding("t", "toast"),
         new KeyBinding("m", "modal"),
@@ -169,11 +170,11 @@ internal sealed class CounterModel : IModel
     private int _tickCount;
     private AppPage _page = AppPage.Dashboard;
     private WorkspaceFocus _focus = WorkspaceFocus.Actions;
+    private WorkspaceFocus _focusBeforeCommand = WorkspaceFocus.Actions;
     private bool _showFullHelp;
     private ShowcasePane _showcasePane = ShowcasePane.OverviewUnicode;
-    private ShowcaseInputMode _showcaseInputMode = ShowcaseInputMode.Navigate;
+    private WorkspaceInputMode _workspaceInputMode = WorkspaceInputMode.Navigate;
     private DateTimeOffset _lastEscapePress = DateTimeOffset.MinValue;
-    private DateTimeOffset _lastShowcaseModeToggle = DateTimeOffset.MinValue;
     private string _showcaseLastEvent = "none";
     private int _showcaseTickSnapshot;
     private int _showcaseCountSnapshot;
@@ -256,6 +257,22 @@ internal sealed class CounterModel : IModel
                 return new UpdateResult(this, Tea.Cmd.Quit);
             }
 
+            if (IsWorkspacePage && IsCommandModeEnterKey(key))
+            {
+                EnterCommandMode();
+                return new UpdateResult(this, null);
+            }
+
+            if (IsWorkspacePage && key.Code == KeyCode.Escape)
+            {
+                if (_workspaceInputMode == WorkspaceInputMode.Command)
+                {
+                    ExitCommandMode();
+                }
+
+                return new UpdateResult(this, null);
+            }
+
             if (IsPlainChar(key, "1") && !WasRecentEscape())
             {
                 SwitchPage(AppPage.Protocol);
@@ -313,7 +330,9 @@ internal sealed class CounterModel : IModel
         if (message is PasteMsg paste)
         {
             _lastPaste = SanitizePreview(paste.Content);
-            if (IsWorkspacePage && _focus == WorkspaceFocus.Command)
+            if (IsWorkspacePage
+                && _focus == WorkspaceFocus.Command
+                && _workspaceInputMode == WorkspaceInputMode.Command)
             {
                 _commandInput.Update(paste, _inputKeys);
                 _lastEvent = $"paste: {paste.Content.Length} chars into command";
@@ -441,7 +460,8 @@ internal sealed class CounterModel : IModel
             AppPage.Protocol => WorkspaceFocus.Actions,
             _ => WorkspaceFocus.Actions,
         };
-        _showcaseInputMode = ShowcaseInputMode.Navigate;
+        _focusBeforeCommand = _focus;
+        _workspaceInputMode = WorkspaceInputMode.Navigate;
 
         if (page == AppPage.Showcase)
         {
@@ -527,24 +547,6 @@ internal sealed class CounterModel : IModel
 
     private UpdateResult HandleWorkspaceKey(KeyPressMsg key)
     {
-        if (_page == AppPage.Showcase && key.Code == KeyCode.Escape)
-        {
-            var now = DateTimeOffset.UtcNow;
-            if (key.IsRepeat || (now - _lastShowcaseModeToggle) <= TimeSpan.FromMilliseconds(220))
-            {
-                return new UpdateResult(this, null);
-            }
-
-            _lastShowcaseModeToggle = now;
-            _showcaseInputMode = _showcaseInputMode == ShowcaseInputMode.Navigate
-                ? ShowcaseInputMode.Command
-                : ShowcaseInputMode.Navigate;
-            _lastEvent = $"showcase: mode={ShowcaseModeLabel()}";
-            CaptureShowcaseSnapshot(_lastEvent);
-            AppendLog(_lastEvent);
-            return new UpdateResult(this, null);
-        }
-
         if (_page == AppPage.Showcase
             && _focus == WorkspaceFocus.Showcase
             && HandleShowcaseNavigationKey(key))
@@ -554,9 +556,16 @@ internal sealed class CounterModel : IModel
 
         if (_page == AppPage.Showcase
             && _focus == WorkspaceFocus.Showcase
-            && _showcaseInputMode == ShowcaseInputMode.Command
+            && _workspaceInputMode == WorkspaceInputMode.Command
             && HandleShowcaseHotKey(key))
         {
+            return new UpdateResult(this, null);
+        }
+
+        if (_focus == WorkspaceFocus.Command
+            && _workspaceInputMode != WorkspaceInputMode.Command)
+        {
+            _lastEvent = "command mode locked (press : to enter)";
             return new UpdateResult(this, null);
         }
 
@@ -628,9 +637,16 @@ internal sealed class CounterModel : IModel
 
     private string ShowcaseModeLabel()
     {
-        return _showcaseInputMode == ShowcaseInputMode.Command
+        return _workspaceInputMode == WorkspaceInputMode.Command
             ? "cmd"
             : "nav";
+    }
+
+    private string InputModeLabel()
+    {
+        return _workspaceInputMode == WorkspaceInputMode.Command
+            ? "CMD"
+            : "NAV";
     }
 
     private static bool IsPlainChar(KeyPressMsg key, string text)
@@ -643,8 +659,59 @@ internal sealed class CounterModel : IModel
     private static bool IsPlainShiftChar(KeyPressMsg key, string lower)
     {
         return key.Code == KeyCode.Character
-            && key.Modifiers == KeyModifiers.Shift
+            && (key.Modifiers == KeyModifiers.Shift
+                || (key.Modifiers == KeyModifiers.None
+                    && key.Text.Length == 1
+                    && char.IsUpper(key.Text[0])))
             && string.Equals(key.Text, lower, StringComparison.OrdinalIgnoreCase);
+    }
+
+    private static bool IsCommandModeEnterKey(KeyPressMsg key)
+    {
+        return key.Code == KeyCode.Character
+            && key.Text == ":"
+            && !key.Modifiers.HasFlag(KeyModifiers.Ctrl)
+            && !key.Modifiers.HasFlag(KeyModifiers.Alt)
+            && !key.Modifiers.HasFlag(KeyModifiers.Meta);
+    }
+
+    private void EnterCommandMode()
+    {
+        if (_workspaceInputMode == WorkspaceInputMode.Command)
+        {
+            return;
+        }
+
+        _focusBeforeCommand = _focus;
+        _workspaceInputMode = WorkspaceInputMode.Command;
+        _focus = WorkspaceFocus.Command;
+        _lastEvent = $"mode: {ShowcaseModeLabel()}";
+        AppendLog(_lastEvent);
+        if (_page == AppPage.Showcase)
+        {
+            CaptureShowcaseSnapshot(_lastEvent);
+        }
+    }
+
+    private void ExitCommandMode()
+    {
+        if (_workspaceInputMode != WorkspaceInputMode.Command)
+        {
+            return;
+        }
+
+        _workspaceInputMode = WorkspaceInputMode.Navigate;
+        _focus = _focusBeforeCommand switch
+        {
+            WorkspaceFocus.Command => WorkspaceFocus.Actions,
+            _ => _focusBeforeCommand,
+        };
+        _lastEvent = $"mode: {ShowcaseModeLabel()}";
+        AppendLog(_lastEvent);
+        if (_page == AppPage.Showcase)
+        {
+            CaptureShowcaseSnapshot(_lastEvent);
+        }
     }
 
     private bool WasRecentEscape()
@@ -1105,7 +1172,7 @@ internal sealed class CounterModel : IModel
             new Rect(0, 0, _width, headerHeight),
             "TeaSharp Dashboard",
             [
-                $"count={_count} focus={(_focused ? "in" : "out")} size={_width}x{_height} mode={headerMode} source={_capabilities.Source}",
+                $"count={_count} focus={(_focused ? "in" : "out")} size={_width}x{_height} mode={headerMode} input={InputModeLabel()} source={_capabilities.Source}",
             ]);
 
         var leftRect = new Rect(0, bodyTop, leftWidth, bodyHeight);
@@ -1241,14 +1308,14 @@ internal sealed class CounterModel : IModel
         var footerLines = new List<string>
         {
             inputLine,
-            $"focus={_focus.ToString().ToLowerInvariant()} filter='{_actionList.Filter}' stress={ToYesNo(_stressMode)} page=dashboard",
+            $"focus={_focus.ToString().ToLowerInvariant()} filter='{_actionList.Filter}' stress={ToYesNo(_stressMode)} page=dashboard input={InputModeLabel()}",
         };
         footerLines.AddRange(helpText.Split('\n'));
 
         TWidgets.DrawPanel(
             canvas,
             footerRect,
-            _focus == WorkspaceFocus.Command ? "Command *" : "Command",
+            _focus == WorkspaceFocus.Command ? $"Command * [{InputModeLabel()}]" : $"Command [{InputModeLabel()}]",
             footerLines);
 
         if (_focus == WorkspaceFocus.Command)
@@ -1283,7 +1350,7 @@ internal sealed class CounterModel : IModel
             canvas,
             new Rect(0, 0, _width, 1),
             "TeaSharp Capability Showcase",
-            $"tab={_showcaseTabs.SelectedIndex + 1} focus={_focus.ToString().ToLowerInvariant()} pane={ShowcasePaneLabel()} mode={ShowcaseModeLabel()}");
+            $"tab={_showcaseTabs.SelectedIndex + 1} focus={_focus.ToString().ToLowerInvariant()} pane={ShowcasePaneLabel()} mode={ShowcaseModeLabel()} input={InputModeLabel()}");
         UiWidgets.DrawBreadcrumb(
             canvas,
             new Rect(0, 1, _width, 1),
@@ -1366,14 +1433,14 @@ internal sealed class CounterModel : IModel
         var footerLines = new List<string>
         {
             inputLine,
-            $"focus={_focus.ToString().ToLowerInvariant()} filter='{_actionList.Filter}' stress={ToYesNo(_stressMode)} page=showcase class={Layout.Classify(_width).ToString().ToLowerInvariant()} mode={ShowcaseModeLabel()}",
+            $"focus={_focus.ToString().ToLowerInvariant()} filter='{_actionList.Filter}' stress={ToYesNo(_stressMode)} page=showcase class={Layout.Classify(_width).ToString().ToLowerInvariant()} mode={ShowcaseModeLabel()} input={InputModeLabel()}",
         };
         footerLines.AddRange(helpText.Split('\n'));
 
         TWidgets.DrawPanel(
             canvas,
             footerRect,
-            _focus == WorkspaceFocus.Command ? "Command *" : "Command",
+            _focus == WorkspaceFocus.Command ? $"Command * [{InputModeLabel()}]" : $"Command [{InputModeLabel()}]",
             footerLines);
 
         if (_focus == WorkspaceFocus.Command)
@@ -1974,7 +2041,7 @@ internal enum WorkspaceFocus
     Command = 3,
 }
 
-internal enum ShowcaseInputMode
+internal enum WorkspaceInputMode
 {
     Navigate = 0,
     Command = 1,

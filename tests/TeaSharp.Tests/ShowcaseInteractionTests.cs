@@ -9,31 +9,47 @@ internal static class ShowcaseInteractionTests
 {
     public static IEnumerable<TestCase> Cases()
     {
-        yield return new TestCase("Showcase_Escape_TogglesCommandModeOnce", Escape_TogglesCommandModeOnce);
+        yield return new TestCase("Showcase_Colon_EntersCommandMode", Colon_EntersCommandMode);
+        yield return new TestCase("Showcase_Escape_ExitsCommandMode", Escape_ExitsCommandMode);
         yield return new TestCase("Showcase_Escape_OneShortcutBurst_DoesNotSwitchPage", EscapeBurst_DoesNotSwitchPage);
-        yield return new TestCase("Showcase_PlainS_InCommandInput_DoesNotToggleStress", PlainS_InCommandInput_DoesNotToggleStress);
+        yield return new TestCase("Showcase_PlainS_InCommandMode_StaysInput", PlainS_InCommandMode_StaysInput);
         yield return new TestCase("Showcase_CtrlS_TogglesStress", CtrlS_TogglesStress);
         yield return new TestCase("Showcase_PaneNavigation_RequiresShowcaseFocus", PaneNavigation_RequiresShowcaseFocus);
+        yield return new TestCase("Showcase_UppercaseP_CyclesPaneBackward", UppercaseP_CyclesPaneBackward);
     }
 
-    private static async Task Escape_TogglesCommandModeOnce()
+    private static async Task Colon_EntersCommandMode()
+    {
+        // Arrange
+        await using var terminal = new ConsoleTerminalAdapter();
+        var model = new CounterModel(terminal);
+        GoToShowcase(model);
+
+        // Act
+        PressPlain(model, ":");
+        var view = model.View().Content;
+
+        // Assert
+        TestAssert.True(view.Contains("mode=cmd", StringComparison.Ordinal), "Colon should enter command mode.");
+        TestAssert.True(view.Contains("focus=command", StringComparison.Ordinal), "Colon should focus command input.");
+    }
+
+    private static async Task Escape_ExitsCommandMode()
     {
         // Arrange
         await using var terminal = new ConsoleTerminalAdapter();
         var model = new CounterModel(terminal);
         GoToShowcase(model);
         FocusShowcasePane(model);
+        PressPlain(model, ":");
 
         // Act
         PressEscape(model);
-        var once = model.View().Content;
-        PressEscape(model, isRepeat: true);
-        var repeated = model.View().Content;
+        var view = model.View().Content;
 
         // Assert
-        TestAssert.True(once.Contains("mode=cmd", StringComparison.Ordinal), "Escape should toggle showcase mode to command.");
-        TestAssert.True(repeated.Contains("mode=cmd", StringComparison.Ordinal), "Repeated escape should not toggle mode twice.");
-        TestAssert.True(repeated.Contains("page=showcase", StringComparison.Ordinal), "Escape handling should stay on showcase page.");
+        TestAssert.True(view.Contains("mode=nav", StringComparison.Ordinal), "Escape should exit command mode.");
+        TestAssert.True(view.Contains("focus=showcase", StringComparison.Ordinal), "Escape should restore prior focus.");
     }
 
     private static async Task EscapeBurst_DoesNotSwitchPage()
@@ -52,13 +68,13 @@ internal static class ShowcaseInteractionTests
         TestAssert.True(view.Contains("page=showcase", StringComparison.Ordinal), "Escape shortcut burst should not trigger page switch.");
     }
 
-    private static async Task PlainS_InCommandInput_DoesNotToggleStress()
+    private static async Task PlainS_InCommandMode_StaysInput()
     {
         // Arrange
         await using var terminal = new ConsoleTerminalAdapter();
         var model = new CounterModel(terminal);
         GoToShowcase(model);
-        FocusCommandInput(model);
+        PressPlain(model, ":");
 
         // Act
         PressPlain(model, "s");
@@ -112,6 +128,25 @@ internal static class ShowcaseInteractionTests
             "Pane should move when showcase pane has focus.");
     }
 
+    private static async Task UppercaseP_CyclesPaneBackward()
+    {
+        // Arrange
+        await using var terminal = new ConsoleTerminalAdapter();
+        var model = new CounterModel(terminal);
+        GoToShowcase(model);
+        FocusShowcasePane(model);
+        var before = ShowcasePaneToken(model.View().Content);
+
+        // Act
+        model.Update(new KeyPressMsg(KeyCode.Character, "P"));
+        var after = ShowcasePaneToken(model.View().Content);
+
+        // Assert
+        TestAssert.True(
+            !string.Equals(before, after, StringComparison.Ordinal),
+            "Uppercase P should cycle showcase pane backward.");
+    }
+
     private static void GoToShowcase(CounterModel model)
     {
         PressPlain(model, "3");
@@ -119,13 +154,6 @@ internal static class ShowcaseInteractionTests
 
     private static void FocusShowcasePane(CounterModel model)
     {
-        model.Update(new KeyPressMsg(KeyCode.Tab));
-    }
-
-    private static void FocusCommandInput(CounterModel model)
-    {
-        model.Update(new KeyPressMsg(KeyCode.Tab));
-        model.Update(new KeyPressMsg(KeyCode.Tab));
         model.Update(new KeyPressMsg(KeyCode.Tab));
     }
 

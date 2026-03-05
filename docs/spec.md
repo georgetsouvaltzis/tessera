@@ -8,7 +8,8 @@ Single repository. Layered packages:
 - `TeaSharp.Core`: terminal primitives + program runtime.
 - `TeaSharp`: ergonomic framework surface over core.
 - `TeaSharp.Examples`: runnable sample apps.
-- `TeaSharp.Tests`: behavioral regression suite.
+- `TeaSharp.Tests`: lightweight in-repo behavioral regression suite.
+- `TeaSharp.IntegrationTests`: NUnit integration tests (`dotnet test`) for UX contracts and end-to-end message routing.
 
 Primary goal: deterministic message-driven TUI runtime with portable terminal behavior on macOS, Linux, and Windows.
 
@@ -140,6 +141,7 @@ Behavior tests cover:
 - component tests (table/card primitives, chart rendering, component composer dispatch).
 - UI-kit tests (layout helpers, border variants, tabs/table/forms/modal interactions).
 - protocol fixture tests (terminal-behavior fixtures for Ghostty/iTerm2/Apple Terminal style key/paste/focus sequences).
+- integration tests (NUnit) for workspace UX contract (`:` enter command mode, `esc` exit, pane focus routing, and showcase modal/toast hotkeys).
 
 ## 10. Iteration Roadmap
 
