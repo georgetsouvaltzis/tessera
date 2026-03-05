@@ -14,5 +14,6 @@ runner.AddRange(ProtocolFixtureTests.Cases());
 runner.AddRange(TerminalCapabilityDetectorTests.Cases());
 runner.AddRange(ComponentRenderingTests.Cases());
 runner.AddRange(UiKitComponentTests.Cases());
+runner.AddRange(ShowcaseInteractionTests.Cases());
 
 return await runner.RunAsync();

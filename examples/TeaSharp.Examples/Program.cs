@@ -546,7 +546,7 @@ internal sealed class CounterModel : IModel
         }
 
         if (_page == AppPage.Showcase
-            && _focus != WorkspaceFocus.Command
+            && _focus == WorkspaceFocus.Showcase
             && HandleShowcaseNavigationKey(key))
         {
             return new UpdateResult(this, null);

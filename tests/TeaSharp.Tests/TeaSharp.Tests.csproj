@@ -10,6 +10,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\TeaSharp.Core\TeaSharp.Core.csproj" />
     <ProjectReference Include="..\..\src\TeaSharp\TeaSharp.csproj" />
+    <ProjectReference Include="..\..\examples\TeaSharp.Examples\TeaSharp.Examples.csproj" />
   </ItemGroup>
 
 </Project>
