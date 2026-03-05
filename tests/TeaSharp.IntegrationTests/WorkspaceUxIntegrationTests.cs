@@ -126,6 +126,20 @@ public sealed class WorkspaceUxIntegrationTests
         Assert.That(CommandInput(model).Value, Is.EqualTo("s"));
     }
 
+    [Test]
+    public async Task UnhandledShowcaseKey_DoesNotWriteIntoCommandInput()
+    {
+        await using var terminal = new ConsoleTerminalAdapter();
+        var model = new CounterModel(terminal);
+        GoToShowcase(model);
+        FocusShowcasePane(model);
+        CommandInput(model).Clear();
+
+        PressPlain(model, "x");
+
+        Assert.That(CommandInput(model).Value, Is.Empty);
+    }
+
     private static void GoToShowcase(CounterModel model)
     {
         PressPlain(model, "3");

@@ -18,6 +18,7 @@ internal static class ShowcaseInteractionTests
         yield return new TestCase("Showcase_CtrlS_TogglesStress", CtrlS_TogglesStress);
         yield return new TestCase("Showcase_PaneNavigation_RequiresShowcaseFocus", PaneNavigation_RequiresShowcaseFocus);
         yield return new TestCase("Showcase_UppercaseP_CyclesPaneBackward", UppercaseP_CyclesPaneBackward);
+        yield return new TestCase("Showcase_UnhandledKeyInShowcaseFocus_DoesNotTypeCommandInput", UnhandledKeyInShowcaseFocus_DoesNotTypeCommandInput);
     }
 
     private static async Task Colon_EntersCommandMode()
@@ -181,6 +182,23 @@ internal static class ShowcaseInteractionTests
         TestAssert.True(
             !string.Equals(before, after, StringComparison.Ordinal),
             "Uppercase P should cycle showcase pane backward.");
+    }
+
+    private static async Task UnhandledKeyInShowcaseFocus_DoesNotTypeCommandInput()
+    {
+        // Arrange
+        await using var terminal = new ConsoleTerminalAdapter();
+        var model = new CounterModel(terminal);
+        GoToShowcase(model);
+        FocusShowcasePane(model);
+        var input = CommandInput(model);
+        input.Clear();
+
+        // Act
+        PressPlain(model, "x");
+
+        // Assert
+        TestAssert.Equal(string.Empty, input.Value, "Unhandled showcase keys should not leak into command input.");
     }
 
     private static void GoToShowcase(CounterModel model)

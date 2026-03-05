@@ -94,6 +94,20 @@ public sealed class DecoderDrivenWorkspaceUxTests
         Assert.That(Modal(model).Visible, Is.True);
     }
 
+    [Test]
+    public async Task UnhandledShowcaseKey_FromDecodedBytes_DoesNotTypeIntoCommandInput()
+    {
+        await using var terminal = new ConsoleTerminalAdapter();
+        var model = new CounterModel(terminal);
+
+        ApplyDecoded(model, "3");
+        ApplyDecoded(model, "\t");
+        CommandInput(model).Clear();
+        ApplyDecoded(model, "x");
+
+        Assert.That(CommandInput(model).Value, Is.Empty);
+    }
+
     private static void ApplyDecoded(CounterModel model, string sequence)
     {
         var decoder = new EventDecoder();
@@ -173,5 +187,12 @@ public sealed class DecoderDrivenWorkspaceUxTests
         return toastsField?.GetValue(center) is System.Collections.ICollection collection
             ? collection.Count
             : 0;
+    }
+
+    private static TeaSharp.Widgets.TextInputModel CommandInput(CounterModel model)
+    {
+        var field = model.GetType().GetField("_commandInput", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
+        return field?.GetValue(model) as TeaSharp.Widgets.TextInputModel
+            ?? throw new InvalidOperationException("CounterModel._commandInput missing.");
     }
 }

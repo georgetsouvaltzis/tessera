@@ -562,6 +562,12 @@ internal sealed class CounterModel : IModel
             return new UpdateResult(this, null);
         }
 
+        if (_focus == WorkspaceFocus.Showcase)
+        {
+            _lastEvent = $"key: {key.Keystroke()}";
+            return new UpdateResult(this, null);
+        }
+
         if (_focus == WorkspaceFocus.Command
             && _workspaceInputMode != WorkspaceInputMode.Command)
         {
