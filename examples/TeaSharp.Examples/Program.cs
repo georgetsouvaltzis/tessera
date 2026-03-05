@@ -669,7 +669,8 @@ internal sealed class CounterModel : IModel
     private static bool IsCommandModeEnterKey(KeyPressMsg key)
     {
         return key.Code == KeyCode.Character
-            && key.Text == ":"
+            && (key.Text == ":"
+                || (key.Text == ";" && key.Modifiers.HasFlag(KeyModifiers.Shift)))
             && !key.Modifiers.HasFlag(KeyModifiers.Ctrl)
             && !key.Modifiers.HasFlag(KeyModifiers.Alt)
             && !key.Modifiers.HasFlag(KeyModifiers.Meta);
@@ -677,15 +678,32 @@ internal sealed class CounterModel : IModel
 
     private void EnterCommandMode()
     {
-        if (_workspaceInputMode == WorkspaceInputMode.Command)
+        if (_workspaceInputMode == WorkspaceInputMode.Navigate)
+        {
+            if (_focus != WorkspaceFocus.Command)
+            {
+                _focusBeforeCommand = _focus;
+            }
+
+            _workspaceInputMode = WorkspaceInputMode.Command;
+            _lastEvent = $"mode: {ShowcaseModeLabel()}";
+            AppendLog(_lastEvent);
+            if (_page == AppPage.Showcase)
+            {
+                CaptureShowcaseSnapshot(_lastEvent);
+            }
+
+            return;
+        }
+
+        if (_focus == WorkspaceFocus.Command)
         {
             return;
         }
 
         _focusBeforeCommand = _focus;
-        _workspaceInputMode = WorkspaceInputMode.Command;
         _focus = WorkspaceFocus.Command;
-        _lastEvent = $"mode: {ShowcaseModeLabel()}";
+        _lastEvent = "mode: cmd-input";
         AppendLog(_lastEvent);
         if (_page == AppPage.Showcase)
         {
@@ -701,11 +719,15 @@ internal sealed class CounterModel : IModel
         }
 
         _workspaceInputMode = WorkspaceInputMode.Navigate;
-        _focus = _focusBeforeCommand switch
+        if (_focus == WorkspaceFocus.Command)
         {
-            WorkspaceFocus.Command => WorkspaceFocus.Actions,
-            _ => _focusBeforeCommand,
-        };
+            _focus = _focusBeforeCommand switch
+            {
+                WorkspaceFocus.Command => WorkspaceFocus.Actions,
+                _ => _focusBeforeCommand,
+            };
+        }
+
         _lastEvent = $"mode: {ShowcaseModeLabel()}";
         AppendLog(_lastEvent);
         if (_page == AppPage.Showcase)

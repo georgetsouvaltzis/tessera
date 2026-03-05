@@ -11,7 +11,7 @@ namespace TeaSharp.IntegrationTests;
 public sealed class WorkspaceUxIntegrationTests
 {
     [Test]
-    public async Task ColonEntersCommandModeAndFocusesCommandInput()
+    public async Task ColonEntersCommandModeWithoutChangingFocus()
     {
         await using var terminal = new ConsoleTerminalAdapter();
         var model = new CounterModel(terminal);
@@ -21,7 +21,36 @@ public sealed class WorkspaceUxIntegrationTests
 
         var view = model.View().Content;
         Assert.That(view, Does.Contain("mode=cmd"));
+        Assert.That(view, Does.Contain("focus=actions"));
+    }
+
+    [Test]
+    public async Task ColonTwiceFocusesCommandInput()
+    {
+        await using var terminal = new ConsoleTerminalAdapter();
+        var model = new CounterModel(terminal);
+        GoToShowcase(model);
+        FocusShowcasePane(model);
+
+        PressPlain(model, ":");
+        PressPlain(model, ":");
+
+        var view = model.View().Content;
+        Assert.That(view, Does.Contain("mode=cmd"));
         Assert.That(view, Does.Contain("focus=command"));
+    }
+
+    [Test]
+    public async Task ShiftSemicolonAlsoEntersCommandMode()
+    {
+        await using var terminal = new ConsoleTerminalAdapter();
+        var model = new CounterModel(terminal);
+        GoToShowcase(model);
+
+        model.Update(new KeyPressMsg(KeyCode.Character, ";", KeyModifiers.Shift));
+
+        var view = model.View().Content;
+        Assert.That(view, Does.Contain("mode=cmd"));
     }
 
     [Test]
@@ -75,8 +104,6 @@ public sealed class WorkspaceUxIntegrationTests
 
         // command mode + showcase focus: hotkeys active
         PressPlain(model, ":");
-        model.Update(new KeyPressMsg(KeyCode.Tab));
-        model.Update(new KeyPressMsg(KeyCode.Tab));
         PressPlain(model, "t");
         PressPlain(model, "m");
 
@@ -90,6 +117,7 @@ public sealed class WorkspaceUxIntegrationTests
         await using var terminal = new ConsoleTerminalAdapter();
         var model = new CounterModel(terminal);
         GoToShowcase(model);
+        PressPlain(model, ":");
         PressPlain(model, ":");
 
         PressPlain(model, "s");
