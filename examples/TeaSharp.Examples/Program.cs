@@ -78,6 +78,15 @@ internal sealed class CounterModel : IModel
         new KeyBinding("1/2/3", "switch page"),
         new KeyBinding("q", "quit"),
     ];
+    private readonly KeyBinding[] _showcaseHelp =
+    [
+        new KeyBinding("p/P", "cycle pane"),
+        new KeyBinding("left/right", "switch tab"),
+        new KeyBinding("t", "toast"),
+        new KeyBinding("m", "modal"),
+        new KeyBinding("a/z/r/f", "pane actions"),
+        new KeyBinding("c/v/[/]", "table controls"),
+    ];
     private readonly List<string> _eventLog = [];
     private readonly LineChartComponent _throughputChart = new(capacity: 240)
     {
@@ -140,7 +149,7 @@ internal sealed class CounterModel : IModel
             "Hotkeys",
             "t toast  m modal  a accordion  z checklist",
             "r theme  f density  c column  v sort",
-            "[/ ] page table  left/right tab",
+            "[/ ] page table  left/right tab  p/P pane",
         ],
     };
     private readonly ComponentComposer _workspaceComposer = new();
@@ -160,6 +169,7 @@ internal sealed class CounterModel : IModel
     private AppPage _page = AppPage.Dashboard;
     private WorkspaceFocus _focus = WorkspaceFocus.Actions;
     private bool _showFullHelp;
+    private ShowcasePane _showcasePane = ShowcasePane.OverviewUnicode;
 
     public CounterModel(TeaSharp.Core.Terminal.ConsoleTerminalAdapter terminal)
     {
@@ -232,21 +242,21 @@ internal sealed class CounterModel : IModel
 
             if (key.Text == "1")
             {
-                _page = AppPage.Protocol;
+                SwitchPage(AppPage.Protocol);
                 _lastEvent = "view: protocol";
                 return new UpdateResult(this, null);
             }
 
             if (key.Text == "2")
             {
-                _page = AppPage.Dashboard;
+                SwitchPage(AppPage.Dashboard);
                 _lastEvent = "view: dashboard";
                 return new UpdateResult(this, null);
             }
 
             if (key.Text == "3")
             {
-                _page = AppPage.Showcase;
+                SwitchPage(AppPage.Showcase);
                 _lastEvent = "view: showcase";
                 return new UpdateResult(this, null);
             }
@@ -401,6 +411,21 @@ internal sealed class CounterModel : IModel
         ]);
     }
 
+    private void SwitchPage(AppPage page)
+    {
+        _page = page;
+        _focus = page switch
+        {
+            AppPage.Protocol => WorkspaceFocus.Actions,
+            _ => WorkspaceFocus.Actions,
+        };
+
+        if (page == AppPage.Showcase)
+        {
+            EnsureShowcasePaneInRange();
+        }
+    }
+
     public ModelView View()
     {
         int? cursorX = null;
@@ -465,7 +490,7 @@ internal sealed class CounterModel : IModel
     private UpdateResult HandleWorkspaceKey(KeyPressMsg key)
     {
         if (_page == AppPage.Showcase
-            && _focus != WorkspaceFocus.Command
+            && _focus == WorkspaceFocus.Showcase
             && HandleShowcaseHotKey(key))
         {
             return new UpdateResult(this, null);
@@ -513,7 +538,21 @@ internal sealed class CounterModel : IModel
         if (_showcaseTabs.Update(key))
         {
             changed = true;
+            EnsureShowcasePaneInRange();
             action = $"tab={_showcaseTabs.SelectedIndex + 1}";
+        }
+
+        if (key.Text == "p" && key.Modifiers == KeyModifiers.None)
+        {
+            MoveShowcasePane(1);
+            changed = true;
+            action = $"pane={ShowcasePaneLabel()}";
+        }
+        else if (key.Text == "P" && key.Modifiers == KeyModifiers.None)
+        {
+            MoveShowcasePane(-1);
+            changed = true;
+            action = $"pane={ShowcasePaneLabel()}";
         }
 
         if (key.Text == "t" && key.Modifiers == KeyModifiers.None)
@@ -528,49 +567,7 @@ internal sealed class CounterModel : IModel
             changed = true;
             action = _showcaseModal.Visible ? "modal=open" : "modal=close";
         }
-        else if (key.Text == "a" && key.Modifiers == KeyModifiers.None)
-        {
-            changed = _showcaseAccordion.Update(new KeyPressMsg(KeyCode.Enter)) || changed;
-            action = "accordion=toggle";
-        }
-        else if (key.Text == "z" && key.Modifiers == KeyModifiers.None)
-        {
-            changed = _showcaseChecklist.Update(new KeyPressMsg(KeyCode.Enter)) || changed;
-            action = "check=toggle";
-        }
-        else if (key.Text == "r" && key.Modifiers == KeyModifiers.None)
-        {
-            changed = _showcaseTheme.Update(new KeyPressMsg(KeyCode.Right)) || changed;
-            action = "theme=next";
-        }
-        else if (key.Text == "f" && key.Modifiers == KeyModifiers.None)
-        {
-            changed = _showcaseDensity.Update(new KeyPressMsg(KeyCode.Right)) || changed;
-            action = "density=next";
-        }
-        else if (key.Text == "c" && key.Modifiers == KeyModifiers.None)
-        {
-            changed = _showcaseTable.Update(key) || changed;
-            action = "table=column";
-        }
-        else if ((key.Text == "v" || key.Text == "[" || key.Text == "]") && key.Modifiers == KeyModifiers.None)
-        {
-            var mapped = key.Text == "v"
-                ? new KeyPressMsg(KeyCode.Character, "s")
-                : key;
-            changed = _showcaseTable.Update(mapped) || changed;
-            action = key.Text == "v"
-                ? "table=sort"
-                : "table=page";
-        }
-
-        if (key.Code == KeyCode.Up || key.Code == KeyCode.Down)
-        {
-            changed = _showcaseAccordion.Update(key) || changed;
-            changed = _showcaseChecklist.Update(key) || changed;
-            changed = _showcaseTheme.Update(key) || changed;
-            changed = _showcaseDensity.Update(key) || changed;
-        }
+        changed = HandleFocusedShowcasePaneKey(key, ref action) || changed;
 
         if (!changed)
         {
@@ -580,6 +577,144 @@ internal sealed class CounterModel : IModel
         _lastEvent = $"showcase: {(string.IsNullOrWhiteSpace(action) ? key.Keystroke() : action)}";
         AppendLog(_lastEvent);
         return true;
+    }
+
+    private bool HandleFocusedShowcasePaneKey(KeyPressMsg key, ref string action)
+    {
+        if (_showcaseTabs.SelectedIndex == 1 && _showcasePane == ShowcasePane.DataTable)
+        {
+            if (key.Text == "c" && key.Modifiers == KeyModifiers.None)
+            {
+                var changed = _showcaseTable.Update(key);
+                if (changed)
+                {
+                    action = "table=column";
+                }
+
+                return changed;
+            }
+
+            if ((key.Text == "v" || key.Text == "[" || key.Text == "]") && key.Modifiers == KeyModifiers.None)
+            {
+                var mapped = key.Text == "v"
+                    ? new KeyPressMsg(KeyCode.Character, "s")
+                    : key;
+                var changed = _showcaseTable.Update(mapped);
+                if (changed)
+                {
+                    action = key.Text == "v"
+                        ? "table=sort"
+                        : "table=page";
+                }
+
+                return changed;
+            }
+        }
+
+        if (_showcaseTabs.SelectedIndex == 2)
+        {
+            if (_showcasePane == ShowcasePane.FormsPlaybook)
+            {
+                if (key.Text == "a" && key.Modifiers == KeyModifiers.None)
+                {
+                    var toggled = _showcaseAccordion.Update(new KeyPressMsg(KeyCode.Enter));
+                    if (toggled)
+                    {
+                        action = "accordion=toggle";
+                    }
+
+                    return toggled;
+                }
+
+                if (key.Code == KeyCode.Up || key.Code == KeyCode.Down || key.Code == KeyCode.Enter || key.Text == " ")
+                {
+                    var changed = _showcaseAccordion.Update(key);
+                    if (changed)
+                    {
+                        action = "accordion=update";
+                    }
+
+                    return changed;
+                }
+            }
+
+            if (_showcasePane == ShowcasePane.FormsChecklist)
+            {
+                if (key.Text == "z" && key.Modifiers == KeyModifiers.None)
+                {
+                    var toggled = _showcaseChecklist.Update(new KeyPressMsg(KeyCode.Enter));
+                    if (toggled)
+                    {
+                        action = "check=toggle";
+                    }
+
+                    return toggled;
+                }
+
+                if (key.Code == KeyCode.Up || key.Code == KeyCode.Down || key.Code == KeyCode.Enter || key.Text == " ")
+                {
+                    var changed = _showcaseChecklist.Update(key);
+                    if (changed)
+                    {
+                        action = "check=update";
+                    }
+
+                    return changed;
+                }
+            }
+
+            if (_showcasePane == ShowcasePane.FormsTheme)
+            {
+                if (key.Text == "r" && key.Modifiers == KeyModifiers.None)
+                {
+                    var changed = _showcaseTheme.Update(new KeyPressMsg(KeyCode.Right));
+                    if (changed)
+                    {
+                        action = "theme=next";
+                    }
+
+                    return changed;
+                }
+
+                if (key.Code is KeyCode.Up or KeyCode.Down or KeyCode.Left or KeyCode.Right)
+                {
+                    var changed = _showcaseTheme.Update(key);
+                    if (changed)
+                    {
+                        action = "theme=update";
+                    }
+
+                    return changed;
+                }
+            }
+
+            if (_showcasePane == ShowcasePane.FormsDensity)
+            {
+                if (key.Text == "f" && key.Modifiers == KeyModifiers.None)
+                {
+                    var changed = _showcaseDensity.Update(new KeyPressMsg(KeyCode.Right));
+                    if (changed)
+                    {
+                        action = "density=next";
+                    }
+
+                    return changed;
+                }
+
+                if (key.Code is KeyCode.Up or KeyCode.Down or KeyCode.Left or KeyCode.Right)
+                {
+                    var changed = _showcaseDensity.Update(key);
+                    if (changed)
+                    {
+                        action = "density=update";
+                    }
+
+                    return changed;
+                }
+            }
+        }
+
+        return false;
     }
 
     private void ExecuteSelectedAction()
@@ -620,15 +755,15 @@ internal sealed class CounterModel : IModel
                 AppendLog("action: clear log");
                 break;
             case "Switch to dashboard":
-                _page = AppPage.Dashboard;
+                SwitchPage(AppPage.Dashboard);
                 AppendLog("action: switch to dashboard");
                 break;
             case "Switch to showcase":
-                _page = AppPage.Showcase;
+                SwitchPage(AppPage.Showcase);
                 AppendLog("action: switch to showcase");
                 break;
             case "Switch to protocol":
-                _page = AppPage.Protocol;
+                SwitchPage(AppPage.Protocol);
                 AppendLog("action: switch to protocol");
                 break;
         }
@@ -715,21 +850,21 @@ internal sealed class CounterModel : IModel
 
         if (string.Equals(command, "protocol", StringComparison.OrdinalIgnoreCase))
         {
-            _page = AppPage.Protocol;
+            SwitchPage(AppPage.Protocol);
             AppendLog("view=protocol");
             return;
         }
 
         if (string.Equals(command, "dashboard", StringComparison.OrdinalIgnoreCase))
         {
-            _page = AppPage.Dashboard;
+            SwitchPage(AppPage.Dashboard);
             AppendLog("view=dashboard");
             return;
         }
 
         if (string.Equals(command, "showcase", StringComparison.OrdinalIgnoreCase))
         {
-            _page = AppPage.Showcase;
+            SwitchPage(AppPage.Showcase);
             AppendLog("view=showcase");
             return;
         }
@@ -773,6 +908,7 @@ internal sealed class CounterModel : IModel
             if (int.TryParse(arg, out var index))
             {
                 _showcaseTabs.Select(index - 1);
+                EnsureShowcasePaneInRange();
                 AppendLog($"tab={_showcaseTabs.SelectedIndex + 1}");
                 return;
             }
@@ -1041,7 +1177,7 @@ internal sealed class CounterModel : IModel
             canvas,
             new Rect(0, 0, _width, 1),
             "TeaSharp Capability Showcase",
-            $"tab={_showcaseTabs.SelectedIndex + 1} focus={_focus.ToString().ToLowerInvariant()}");
+            $"tab={_showcaseTabs.SelectedIndex + 1} focus={_focus.ToString().ToLowerInvariant()} pane={ShowcasePaneLabel()}");
         UiWidgets.DrawBreadcrumb(
             canvas,
             new Rect(0, 1, _width, 1),
@@ -1069,13 +1205,13 @@ internal sealed class CounterModel : IModel
         switch (_showcaseTabs.SelectedIndex)
         {
             case 0:
-                RenderShowcaseOverview(canvas, rightBody);
+                RenderShowcaseOverview(canvas, rightBody, _focus == WorkspaceFocus.Showcase);
                 break;
             case 1:
-                RenderShowcaseData(canvas, rightBody);
+                RenderShowcaseData(canvas, rightBody, _focus == WorkspaceFocus.Showcase);
                 break;
             default:
-                RenderShowcaseForms(canvas, rightBody);
+                RenderShowcaseForms(canvas, rightBody, _focus == WorkspaceFocus.Showcase);
                 break;
         }
 
@@ -1092,6 +1228,7 @@ internal sealed class CounterModel : IModel
         {
             WorkspaceFocus.Actions => _listKeys.HelpBindings,
             WorkspaceFocus.Log => _viewportKeys.HelpBindings,
+            WorkspaceFocus.Showcase => _showcaseHelp,
             WorkspaceFocus.Command => _inputKeys.HelpBindings,
             _ => _inputKeys.HelpBindings,
         };
@@ -1161,7 +1298,7 @@ internal sealed class CounterModel : IModel
         _countGauge.Render(canvas, gaugeRect);
     }
 
-    private void RenderShowcaseOverview(Canvas canvas, Rect rect)
+    private void RenderShowcaseOverview(Canvas canvas, Rect rect, bool showcaseFocused)
     {
         if (rect.IsEmpty || rect.Height < 10)
         {
@@ -1177,6 +1314,9 @@ internal sealed class CounterModel : IModel
         _unicodeShowcase.LastPaste = _lastPaste;
         _unicodeShowcase.TypedPreview = SanitizePreview(_typedText);
         _unicodeShowcase.Count = _count;
+        _unicodeShowcase.Title = IsFocusedShowcasePane(showcaseFocused, ShowcasePane.OverviewUnicode)
+            ? "Unicode + Runtime *"
+            : "Unicode + Runtime";
         _unicodeShowcase.Render(canvas, unicodeRect);
 
         TimelineEntry[] timeline =
@@ -1186,9 +1326,17 @@ internal sealed class CounterModel : IModel
             new($"{_width}x{_height}", $"viewport {Layout.Classify(_width)}"),
             new("caps", $"src {_capabilities.Source}"),
         ];
-        UiWidgets.DrawTimeline(canvas, timelineRect, timeline, "Timeline");
+        UiWidgets.DrawTimeline(
+            canvas,
+            timelineRect,
+            timeline,
+            IsFocusedShowcasePane(showcaseFocused, ShowcasePane.OverviewTimeline) ? "Timeline *" : "Timeline");
 
-        UiWidgets.DrawCalendar(canvas, calendarRect, DateTime.Now, "Calendar");
+        UiWidgets.DrawCalendar(
+            canvas,
+            calendarRect,
+            DateTime.Now,
+            IsFocusedShowcasePane(showcaseFocused, ShowcasePane.OverviewCalendar) ? "Calendar *" : "Calendar");
         TreeNode[] nodes =
         [
             new("Core", 0),
@@ -1198,10 +1346,14 @@ internal sealed class CounterModel : IModel
             new("Widgets", 1),
             new("UiKit", 2, Selected: true),
         ];
-        UiWidgets.DrawTree(canvas, treeRect, nodes, "Architecture");
+        UiWidgets.DrawTree(
+            canvas,
+            treeRect,
+            nodes,
+            IsFocusedShowcasePane(showcaseFocused, ShowcasePane.OverviewArchitecture) ? "Architecture *" : "Architecture");
     }
 
-    private void RenderShowcaseData(Canvas canvas, Rect rect)
+    private void RenderShowcaseData(Canvas canvas, Rect rect, bool showcaseFocused)
     {
         if (rect.IsEmpty || rect.Height < 10)
         {
@@ -1212,14 +1364,20 @@ internal sealed class CounterModel : IModel
         var (lineRect, barRect) = Layout.SplitVertical(top, Math.Max(22, (top.Width * 62) / 100), minFirst: 20, minSecond: 14);
         var (tableRect, skeletonRect) = Layout.SplitVertical(bottom, Math.Max(24, (bottom.Width * 68) / 100), minFirst: 22, minSecond: 10);
 
+        _throughputChart.Title = IsFocusedShowcasePane(showcaseFocused, ShowcasePane.DataLineChart) ? "Throughput *" : "Throughput";
+        _statusChart.Title = IsFocusedShowcasePane(showcaseFocused, ShowcasePane.DataBarChart) ? "Status Mix *" : "Status Mix";
+        _showcaseTable.Title = IsFocusedShowcasePane(showcaseFocused, ShowcasePane.DataTable) ? "Metrics Table *" : "Metrics Table";
         _throughputChart.Render(canvas, lineRect);
         _statusChart.Render(canvas, barRect);
         _showcaseTable.PageSize = Math.Max(1, tableRect.Height - 3);
         _showcaseTable.Render(canvas, tableRect);
-        UiWidgets.DrawSkeleton(canvas, skeletonRect, "Frame Buffer");
+        UiWidgets.DrawSkeleton(
+            canvas,
+            skeletonRect,
+            IsFocusedShowcasePane(showcaseFocused, ShowcasePane.DataSkeleton) ? "Frame Buffer *" : "Frame Buffer");
     }
 
-    private void RenderShowcaseForms(Canvas canvas, Rect rect)
+    private void RenderShowcaseForms(Canvas canvas, Rect rect, bool showcaseFocused)
     {
         if (rect.IsEmpty || rect.Height < 10)
         {
@@ -1227,10 +1385,14 @@ internal sealed class CounterModel : IModel
         }
 
         var cells = Layout.Grid(rect, 2, 2);
+        _showcaseAccordion.Title = IsFocusedShowcasePane(showcaseFocused, ShowcasePane.FormsPlaybook) ? "Playbook *" : "Playbook";
+        _showcaseChecklist.Title = IsFocusedShowcasePane(showcaseFocused, ShowcasePane.FormsChecklist) ? "Checklist *" : "Checklist";
         _showcaseAccordion.Render(canvas, cells[0]);
         _showcaseChecklist.Render(canvas, cells[1]);
 
         var (radioRect, selectRect) = Layout.SplitHorizontal(cells[2], Math.Max(4, cells[2].Height - 4), minFirst: 4, minSecond: 3);
+        _showcaseTheme.Title = IsFocusedShowcasePane(showcaseFocused, ShowcasePane.FormsTheme) ? "Theme *" : "Theme";
+        _showcaseDensity.Title = IsFocusedShowcasePane(showcaseFocused, ShowcasePane.FormsDensity) ? "Density *" : "Density";
         _showcaseTheme.Render(canvas, radioRect);
         _showcaseDensity.Render(canvas, selectRect);
 
@@ -1239,9 +1401,13 @@ internal sealed class CounterModel : IModel
             $"theme: {_showcaseTheme.SelectedIndex + 1}",
             $"density: {_showcaseDensity.SelectedIndex + 1}",
             $"table sort: {(_showcaseTable.SortDescending ? "desc" : "asc")}",
-            "hotkeys: t,m,a,z,r,f,c,v,[,],left,right",
+            "hotkeys: t,m,a,z,r,f,c,v,[,],left,right,p/P",
         };
-        TWidgets.DrawCard(canvas, cells[3], "Summary", summaryLines);
+        TWidgets.DrawCard(
+            canvas,
+            cells[3],
+            IsFocusedShowcasePane(showcaseFocused, ShowcasePane.FormsSummary) ? "Summary *" : "Summary",
+            summaryLines);
     }
 
     private string ApplyWorkspaceStyles(string frame, int inputRow, bool placeholderVisible)
@@ -1373,11 +1539,87 @@ internal sealed class CounterModel : IModel
 
     private void CycleFocus()
     {
-        _focus = _focus switch
+        _focus = _page == AppPage.Showcase
+            ? _focus switch
+            {
+                WorkspaceFocus.Actions => WorkspaceFocus.Showcase,
+                WorkspaceFocus.Showcase => WorkspaceFocus.Log,
+                WorkspaceFocus.Log => WorkspaceFocus.Command,
+                _ => WorkspaceFocus.Actions,
+            }
+            : _focus switch
+            {
+                WorkspaceFocus.Actions => WorkspaceFocus.Log,
+                WorkspaceFocus.Log => WorkspaceFocus.Command,
+                _ => WorkspaceFocus.Actions,
+            };
+    }
+
+    private bool IsFocusedShowcasePane(bool showcaseFocused, ShowcasePane pane)
+    {
+        return showcaseFocused && _showcasePane == pane;
+    }
+
+    private int ShowcasePaneCount()
+    {
+        return _showcaseTabs.SelectedIndex switch
         {
-            WorkspaceFocus.Actions => WorkspaceFocus.Log,
-            WorkspaceFocus.Log => WorkspaceFocus.Command,
-            _ => WorkspaceFocus.Actions,
+            0 => 4,
+            1 => 4,
+            _ => 5,
+        };
+    }
+
+    private void EnsureShowcasePaneInRange()
+    {
+        var max = ShowcasePaneCount() - 1;
+        var current = Math.Clamp((int)_showcasePane, 0, max);
+        _showcasePane = (ShowcasePane)current;
+    }
+
+    private void MoveShowcasePane(int delta)
+    {
+        var count = ShowcasePaneCount();
+        if (count <= 0)
+        {
+            return;
+        }
+
+        var index = ((int)_showcasePane + delta) % count;
+        if (index < 0)
+        {
+            index += count;
+        }
+
+        _showcasePane = (ShowcasePane)index;
+    }
+
+    private string ShowcasePaneLabel()
+    {
+        return _showcaseTabs.SelectedIndex switch
+        {
+            0 => _showcasePane switch
+            {
+                ShowcasePane.OverviewUnicode => "unicode",
+                ShowcasePane.OverviewTimeline => "timeline",
+                ShowcasePane.OverviewCalendar => "calendar",
+                _ => "architecture",
+            },
+            1 => _showcasePane switch
+            {
+                ShowcasePane.DataLineChart => "line-chart",
+                ShowcasePane.DataBarChart => "bar-chart",
+                ShowcasePane.DataTable => "table",
+                _ => "skeleton",
+            },
+            _ => _showcasePane switch
+            {
+                ShowcasePane.FormsPlaybook => "playbook",
+                ShowcasePane.FormsChecklist => "checklist",
+                ShowcasePane.FormsTheme => "theme",
+                ShowcasePane.FormsDensity => "density",
+                _ => "summary",
+            },
         };
     }
 
@@ -1499,5 +1741,23 @@ internal enum WorkspaceFocus
 {
     Actions = 0,
     Log = 1,
-    Command = 2,
+    Showcase = 2,
+    Command = 3,
+}
+
+internal enum ShowcasePane
+{
+    OverviewUnicode = 0,
+    OverviewTimeline = 1,
+    OverviewCalendar = 2,
+    OverviewArchitecture = 3,
+    DataLineChart = 0,
+    DataBarChart = 1,
+    DataTable = 2,
+    DataSkeleton = 3,
+    FormsPlaybook = 0,
+    FormsChecklist = 1,
+    FormsTheme = 2,
+    FormsDensity = 3,
+    FormsSummary = 4,
 }
