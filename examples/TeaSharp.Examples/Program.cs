@@ -52,7 +52,7 @@ internal sealed class CounterModel : IModel
     private readonly ViewportModel _logViewport = new();
     private readonly TextInputModel _commandInput = new()
     {
-        Placeholder = "type command (help, inc, dec, stress on/off/toggle, filter <term>, clear, protocol, dashboard, showcase)",
+        Placeholder = "type command (help, inc, dec, stress on/off/toggle, filter <term>, clear, protocol/dashboard/showcase, toast <text>, modal on/off/toggle, tab <n>)",
         MaxLength = 256,
     };
     private readonly List<ActionItem> _allActions =
@@ -105,6 +105,44 @@ internal sealed class CounterModel : IModel
         Title = "Live Event",
     };
     private readonly UnicodeShowcaseComponent _unicodeShowcase = new();
+    private readonly TabsComponent _showcaseTabs = new(["Overview", "Data", "Forms"]);
+    private readonly AccordionComponent _showcaseAccordion = new()
+    {
+        Title = "Playbook",
+    };
+    private readonly SortableTableComponent _showcaseTable = new(["Metric", "Value", "Trend"])
+    {
+        Title = "Metrics Table",
+        PageSize = 5,
+    };
+    private readonly CheckboxListComponent _showcaseChecklist = new()
+    {
+        Title = "Checklist",
+    };
+    private readonly RadioGroupComponent _showcaseTheme = new()
+    {
+        Title = "Theme",
+    };
+    private readonly SelectComponent _showcaseDensity = new()
+    {
+        Title = "Density",
+    };
+    private readonly ToastCenterComponent _showcaseToasts = new()
+    {
+        MaxToasts = 2,
+    };
+    private readonly ModalComponent _showcaseModal = new()
+    {
+        Title = "Showcase Help",
+        BorderStyle = BorderStyle.Heavy,
+        Lines =
+        [
+            "Hotkeys",
+            "t toast  m modal  a accordion  z checklist",
+            "r theme  f density  c column  v sort",
+            "[/ ] page table  left/right tab",
+        ],
+    };
     private readonly ComponentComposer _workspaceComposer = new();
 
     private TerminalCapabilityProfile _capabilities = TerminalCapabilityProfile.AllSupported;
@@ -137,6 +175,41 @@ internal sealed class CounterModel : IModel
 
         _logViewport.Resize(48, 12);
         _logViewport.SetWrap(false);
+        _throughputChart.Options = new LineChartOptions(
+            ShowAxes: true,
+            Legend: "ops/s",
+            XLabel: "t",
+            YLabel: "y");
+        _statusChart.Options = new BarChartOptions(
+            ShowScale: true,
+            Legend: "mix");
+        _showcaseAccordion.SetSections(
+        [
+            new AccordionSection("Input", ["keyboard, mouse, focus, paste", "enhanced VT decode"], Expanded: true),
+            new AccordionSection("Render", ["frame buffer diff", "grapheme-aware canvas", "component composer"]),
+            new AccordionSection("Runtime", ["commands + ticks", "capability detection", "cross-platform terminal adapter"]),
+        ]);
+        _showcaseTable.SetRows(
+        [
+            ["throughput", "86", "up"],
+            ["latency", "24ms", "flat"],
+            ["errors", "0.1%", "down"],
+            ["sessions", "312", "up"],
+            ["queue", "18", "flat"],
+            ["cpu", "33%", "up"],
+            ["memory", "58%", "flat"],
+            ["drop-rate", "0.02%", "down"],
+        ]);
+        _showcaseChecklist.SetItems(
+        [
+            ("raw mode", true),
+            ("focus events", true),
+            ("mouse events", true),
+            ("paste capture", true),
+            ("decrpm reports", true),
+        ]);
+        _showcaseTheme.SetItems(["classic", "ocean", "amber"]);
+        _showcaseDensity.SetItems(["compact", "cozy", "comfortable"]);
         RefreshStatusBars();
         AppendLog("TeaSharp workspace initialized.");
         AppendLog("Use tab to move focus between actions, log, and command input.");
@@ -293,6 +366,8 @@ internal sealed class CounterModel : IModel
             RefreshStatusBars();
             AppendSparkSample();
             _throughputChart.Append(_sparkline[^1]);
+            _showcaseToasts.Update(new TickMsg(DateTimeOffset.Now));
+            RefreshShowcaseData();
             if (_stressMode && _tickCount % 80 == 0)
             {
                 AppendLog($"pulse {_tickCount}: count={_count} focus={(_focused ? "in" : "out")}");
@@ -308,6 +383,22 @@ internal sealed class CounterModel : IModel
         }
 
         return new UpdateResult(this, null);
+    }
+
+    private void RefreshShowcaseData()
+    {
+        var throughput = _sparkline.Count == 0 ? 0 : _sparkline[^1];
+        _showcaseTable.SetRows(
+        [
+            ["throughput", throughput.ToString(System.Globalization.CultureInfo.InvariantCulture), throughput > 55 ? "up" : "flat"],
+            ["latency", $"{Math.Max(1, 160 - throughput)}ms", throughput > 70 ? "down" : "flat"],
+            ["errors", $"{Math.Max(0.0, (100 - throughput) / 800.0):0.00}%", throughput > 80 ? "down" : "up"],
+            ["sessions", (120 + (_tickCount % 260)).ToString(System.Globalization.CultureInfo.InvariantCulture), _focused ? "up" : "flat"],
+            ["queue", Math.Max(0, 90 - throughput).ToString(System.Globalization.CultureInfo.InvariantCulture), throughput > 60 ? "down" : "up"],
+            ["cpu", $"{Math.Clamp((throughput * 7) / 10, 0, 100)}%", _stressMode ? "up" : "flat"],
+            ["memory", $"{Math.Clamp(30 + ((_tickCount * 3) % 55), 0, 100)}%", "flat"],
+            ["drop-rate", $"{Math.Max(0.0, (55 - throughput) / 1200.0):0.000}%", throughput > 65 ? "down" : "flat"],
+        ]);
     }
 
     public ModelView View()
@@ -373,6 +464,13 @@ internal sealed class CounterModel : IModel
 
     private UpdateResult HandleWorkspaceKey(KeyPressMsg key)
     {
+        if (_page == AppPage.Showcase
+            && _focus != WorkspaceFocus.Command
+            && HandleShowcaseHotKey(key))
+        {
+            return new UpdateResult(this, null);
+        }
+
         if (_focus == WorkspaceFocus.Actions)
         {
             if (key.Code == KeyCode.Enter)
@@ -405,6 +503,83 @@ internal sealed class CounterModel : IModel
 
         _lastEvent = $"key: {key.Keystroke()}";
         return new UpdateResult(this, null);
+    }
+
+    private bool HandleShowcaseHotKey(KeyPressMsg key)
+    {
+        var changed = false;
+        var action = string.Empty;
+
+        if (_showcaseTabs.Update(key))
+        {
+            changed = true;
+            action = $"tab={_showcaseTabs.SelectedIndex + 1}";
+        }
+
+        if (key.Text == "t" && key.Modifiers == KeyModifiers.None)
+        {
+            _showcaseToasts.Push(new ToastMessage($"tick={_tickCount} count={_count}", TtlTicks: 70, Severity: ToastSeverity.Info));
+            changed = true;
+            action = "toast";
+        }
+        else if (key.Text == "m" && key.Modifiers == KeyModifiers.None)
+        {
+            _showcaseModal.Visible = !_showcaseModal.Visible;
+            changed = true;
+            action = _showcaseModal.Visible ? "modal=open" : "modal=close";
+        }
+        else if (key.Text == "a" && key.Modifiers == KeyModifiers.None)
+        {
+            changed = _showcaseAccordion.Update(new KeyPressMsg(KeyCode.Enter)) || changed;
+            action = "accordion=toggle";
+        }
+        else if (key.Text == "z" && key.Modifiers == KeyModifiers.None)
+        {
+            changed = _showcaseChecklist.Update(new KeyPressMsg(KeyCode.Enter)) || changed;
+            action = "check=toggle";
+        }
+        else if (key.Text == "r" && key.Modifiers == KeyModifiers.None)
+        {
+            changed = _showcaseTheme.Update(new KeyPressMsg(KeyCode.Right)) || changed;
+            action = "theme=next";
+        }
+        else if (key.Text == "f" && key.Modifiers == KeyModifiers.None)
+        {
+            changed = _showcaseDensity.Update(new KeyPressMsg(KeyCode.Right)) || changed;
+            action = "density=next";
+        }
+        else if (key.Text == "c" && key.Modifiers == KeyModifiers.None)
+        {
+            changed = _showcaseTable.Update(key) || changed;
+            action = "table=column";
+        }
+        else if ((key.Text == "v" || key.Text == "[" || key.Text == "]") && key.Modifiers == KeyModifiers.None)
+        {
+            var mapped = key.Text == "v"
+                ? new KeyPressMsg(KeyCode.Character, "s")
+                : key;
+            changed = _showcaseTable.Update(mapped) || changed;
+            action = key.Text == "v"
+                ? "table=sort"
+                : "table=page";
+        }
+
+        if (key.Code == KeyCode.Up || key.Code == KeyCode.Down)
+        {
+            changed = _showcaseAccordion.Update(key) || changed;
+            changed = _showcaseChecklist.Update(key) || changed;
+            changed = _showcaseTheme.Update(key) || changed;
+            changed = _showcaseDensity.Update(key) || changed;
+        }
+
+        if (!changed)
+        {
+            return false;
+        }
+
+        _lastEvent = $"showcase: {(string.IsNullOrWhiteSpace(action) ? key.Keystroke() : action)}";
+        AppendLog(_lastEvent);
+        return true;
     }
 
     private void ExecuteSelectedAction()
@@ -471,7 +646,7 @@ internal sealed class CounterModel : IModel
 
         if (string.Equals(command, "help", StringComparison.OrdinalIgnoreCase))
         {
-            AppendLog("commands: help | inc | dec | stress on/off/toggle | filter <term> | clear | protocol | dashboard | showcase");
+            AppendLog("commands: help | inc | dec | stress on/off/toggle | filter <term> | clear | protocol | dashboard | showcase | toast <text> | modal on/off/toggle | tab <n>");
             return;
         }
 
@@ -557,6 +732,50 @@ internal sealed class CounterModel : IModel
             _page = AppPage.Showcase;
             AppendLog("view=showcase");
             return;
+        }
+
+        if (command.StartsWith("toast ", StringComparison.OrdinalIgnoreCase))
+        {
+            var payload = command[6..].Trim();
+            if (payload.Length == 0)
+            {
+                payload = "hello from command";
+            }
+
+            _showcaseToasts.Push(new ToastMessage(payload, TtlTicks: 90, Severity: ToastSeverity.Success));
+            AppendLog("toast queued");
+            return;
+        }
+
+        if (command.StartsWith("modal ", StringComparison.OrdinalIgnoreCase))
+        {
+            var arg = command[6..].Trim();
+            if (string.Equals(arg, "on", StringComparison.OrdinalIgnoreCase))
+            {
+                _showcaseModal.Visible = true;
+            }
+            else if (string.Equals(arg, "off", StringComparison.OrdinalIgnoreCase))
+            {
+                _showcaseModal.Visible = false;
+            }
+            else
+            {
+                _showcaseModal.Visible = !_showcaseModal.Visible;
+            }
+
+            AppendLog($"modal={(_showcaseModal.Visible ? "on" : "off")}");
+            return;
+        }
+
+        if (command.StartsWith("tab ", StringComparison.OrdinalIgnoreCase))
+        {
+            var arg = command[4..].Trim();
+            if (int.TryParse(arg, out var index))
+            {
+                _showcaseTabs.Select(index - 1);
+                AppendLog($"tab={_showcaseTabs.SelectedIndex + 1}");
+                return;
+            }
         }
 
         AppendLog($"unknown command: {command}");
@@ -805,12 +1024,12 @@ internal sealed class CounterModel : IModel
         cursorX = null;
         cursorY = null;
 
-        if (_width < 68 || _height < 20)
+        if (_width < 76 || _height < 22)
         {
             var compact =
                 "TeaSharp Capability Showcase\n\n" +
                 "Terminal too small for showcase mode.\n" +
-                "Resize to at least 68x20.\n\n" +
+                "Resize to at least 76x22.\n\n" +
                 "Press 1 protocol, 2 dashboard, 3 showcase.";
             return WarningStyle.Render(compact);
         }
@@ -818,125 +1037,52 @@ internal sealed class CounterModel : IModel
         var canvas = new Canvas(_width, _height, CanvasTextMode.GraphemeAware);
         const int headerHeight = 3;
         const int footerHeight = 6;
-        var bodyTop = headerHeight;
-        var bodyHeight = _height - headerHeight - footerHeight;
-        var leftWidth = Math.Max(34, (_width * 36) / 100);
-        var rightWidth = _width - leftWidth;
-
-        TWidgets.DrawPanel(
+        UiWidgets.DrawStatusBar(
             canvas,
-            new Rect(0, 0, _width, headerHeight),
+            new Rect(0, 0, _width, 1),
             "TeaSharp Capability Showcase",
-            [
-                $"count={_count} focus={(_focused ? "in" : "out")} size={_width}x{_height} source={_capabilities.Source}",
-            ]);
+            $"tab={_showcaseTabs.SelectedIndex + 1} focus={_focus.ToString().ToLowerInvariant()}");
+        UiWidgets.DrawBreadcrumb(
+            canvas,
+            new Rect(0, 1, _width, 1),
+            ["TeaSharp", "Showcase", _showcaseTabs.Tabs[_showcaseTabs.SelectedIndex]]);
+        canvas.DrawHorizontalLine(0, 2, _width, '─');
 
-        var leftRect = new Rect(0, bodyTop, leftWidth, bodyHeight);
-        var rightRect = new Rect(leftWidth, bodyTop, rightWidth, bodyHeight);
+        var bodyRect = new Rect(0, headerHeight, _width, _height - headerHeight - footerHeight);
+        var (leftRect, rightRect) = Layout.SplitVertical(bodyRect, Math.Max(34, (bodyRect.Width * 40) / 100), minFirst: 28, minSecond: 34);
+        var (leftTopRect, leftBottomRect) = Layout.SplitHorizontal(leftRect, Math.Max(12, (leftRect.Height * 62) / 100), minFirst: 10, minSecond: 7);
+        var (actionsRect, leftStatusRect) = Layout.SplitHorizontal(leftTopRect, Math.Max(8, leftTopRect.Height - 9), minFirst: 6, minSecond: 5);
 
-        var actionsHeight = Math.Max(7, bodyHeight / 2);
-        var actionsRect = new Rect(leftRect.X, leftRect.Y, leftRect.Width, actionsHeight);
-        var leftLowerRect = new Rect(leftRect.X, actionsRect.Bottom, leftRect.Width, leftRect.Bottom - actionsRect.Bottom);
+        RenderActionsTable(canvas, actionsRect, _focus == WorkspaceFocus.Actions ? "Actions *" : "Actions");
+        RenderShowcaseLeftStatus(canvas, leftStatusRect);
 
-        var visibleRows = _actionList.VisibleRows();
-        var tableRows = new List<IReadOnlyList<string>>(visibleRows.Count);
-        var selectedPageRow = -1;
-        for (var i = 0; i < visibleRows.Count; i++)
-        {
-            var row = visibleRows[i];
-            if (row.Selected)
-            {
-                selectedPageRow = i;
-            }
-
-            tableRows.Add(
-            [
-                row.Item.Name,
-                row.Item.Shortcut,
-                ActionState(row.Item),
-            ]);
-        }
-
-        if (actionsRect.Height >= 4)
-        {
-            TWidgets.DrawTable(
-                canvas,
-                actionsRect,
-                ["Action", "Key", "State"],
-                tableRows,
-                selectedPageRow,
-                _focus == WorkspaceFocus.Actions ? "Actions *" : "Actions");
-        }
-
-        var capabilityHeight = Math.Max(4, leftLowerRect.Height - 3);
-        var capabilityRect = new Rect(leftLowerRect.X, leftLowerRect.Y, leftLowerRect.Width, capabilityHeight);
-        var gaugeRect = new Rect(leftLowerRect.X, capabilityRect.Bottom, leftLowerRect.Width, leftLowerRect.Bottom - capabilityRect.Bottom);
-
-        var unicodeHeight = Math.Clamp(bodyHeight / 4, 5, 8);
-        var throughputHeight = Math.Clamp(bodyHeight / 4, 5, 8);
-        var statusHeight = Math.Clamp(bodyHeight / 5, 4, 6);
-        if (unicodeHeight + throughputHeight + statusHeight + 6 > bodyHeight)
-        {
-            statusHeight = Math.Max(3, bodyHeight - unicodeHeight - throughputHeight - 6);
-        }
-
-        var unicodeRect = new Rect(rightRect.X, rightRect.Y, rightRect.Width, unicodeHeight);
-        var throughputRect = new Rect(rightRect.X, unicodeRect.Bottom, rightRect.Width, throughputHeight);
-        var statusRect = new Rect(rightRect.X, throughputRect.Bottom, rightRect.Width, statusHeight);
-        var logRect = new Rect(rightRect.X, statusRect.Bottom, rightRect.Width, rightRect.Bottom - statusRect.Bottom);
-
-        _workspaceComposer.Clear();
-        if (!capabilityRect.IsEmpty && capabilityRect.Height >= 4)
-        {
-            _workspaceComposer.Add(_capabilityCard, capabilityRect);
-        }
-
-        if (!gaugeRect.IsEmpty && gaugeRect.Height >= 3)
-        {
-            _workspaceComposer.Add(_countGauge, gaugeRect);
-        }
-
-        _unicodeShowcase.CapabilitySource = _capabilities.Source;
-        _unicodeShowcase.Focus = _focused;
-        _unicodeShowcase.LastPaste = _lastPaste;
-        _unicodeShowcase.TypedPreview = SanitizePreview(_typedText);
-        _unicodeShowcase.Count = _count;
-        if (!unicodeRect.IsEmpty && unicodeRect.Height >= 4)
-        {
-            _workspaceComposer.Add(_unicodeShowcase, unicodeRect);
-        }
-
-        if (!throughputRect.IsEmpty && throughputRect.Height >= 4)
-        {
-            _workspaceComposer.Add(_throughputChart, throughputRect);
-        }
-
-        if (!statusRect.IsEmpty && statusRect.Height >= 3)
-        {
-            _workspaceComposer.Add(_statusChart, statusRect);
-        }
-
-        Rect viewportLogRect;
-        if (logRect.Height >= 9)
-        {
-            var miniLogRect = new Rect(logRect.X, logRect.Y, logRect.Width, 4);
-            _workspaceComposer.Add(_miniLog, miniLogRect);
-            viewportLogRect = new Rect(logRect.X, miniLogRect.Bottom, logRect.Width, logRect.Bottom - miniLogRect.Bottom);
-        }
-        else
-        {
-            viewportLogRect = logRect;
-        }
-
-        _workspaceComposer.Render(canvas);
-
-        _logViewport.Resize(Math.Max(10, viewportLogRect.Width - 2), Math.Max(3, viewportLogRect.Height - 2));
+        _logViewport.Resize(Math.Max(12, leftBottomRect.Width - 2), Math.Max(3, leftBottomRect.Height - 2));
         var logLines = _logViewport.RenderLines();
         TWidgets.DrawPanel(
             canvas,
-            viewportLogRect,
+            leftBottomRect,
             _focus == WorkspaceFocus.Log ? "Log *" : "Log",
             [.. logLines]);
+
+        _showcaseTabs.Render(canvas, new Rect(rightRect.X, rightRect.Y, rightRect.Width, 1));
+        var rightBody = new Rect(rightRect.X, rightRect.Y + 1, rightRect.Width, Math.Max(0, rightRect.Height - 1));
+        switch (_showcaseTabs.SelectedIndex)
+        {
+            case 0:
+                RenderShowcaseOverview(canvas, rightBody);
+                break;
+            case 1:
+                RenderShowcaseData(canvas, rightBody);
+                break;
+            default:
+                RenderShowcaseForms(canvas, rightBody);
+                break;
+        }
+
+        var toastWidth = Math.Min(42, rightBody.Width);
+        var toastRect = new Rect(rightBody.Right - toastWidth, rightBody.Y, toastWidth, Math.Min(9, rightBody.Height));
+        _showcaseToasts.Render(canvas, toastRect);
+        _showcaseModal.Render(canvas, bodyRect);
 
         var footerRect = new Rect(0, _height - footerHeight, _width, footerHeight);
         var inputFrame = _commandInput.BuildFrame(Math.Max(12, _width - 6));
@@ -958,7 +1104,7 @@ internal sealed class CounterModel : IModel
         var footerLines = new List<string>
         {
             inputLine,
-            $"focus={_focus.ToString().ToLowerInvariant()} filter='{_actionList.Filter}' stress={ToYesNo(_stressMode)} page=showcase",
+            $"focus={_focus.ToString().ToLowerInvariant()} filter='{_actionList.Filter}' stress={ToYesNo(_stressMode)} page=showcase class={Layout.Classify(_width).ToString().ToLowerInvariant()}",
         };
         footerLines.AddRange(helpText.Split('\n'));
 
@@ -976,6 +1122,126 @@ internal sealed class CounterModel : IModel
 
         var rendered = canvas.Render();
         return ApplyWorkspaceStyles(rendered, footerRect.Y + 1, inputFrame.PlaceholderVisible);
+    }
+
+    private void RenderActionsTable(Canvas canvas, Rect rect, string title)
+    {
+        if (rect.IsEmpty || rect.Height < 4)
+        {
+            return;
+        }
+
+        var visibleRows = _actionList.VisibleRows();
+        var rows = new List<IReadOnlyList<string>>(visibleRows.Count);
+        var selected = -1;
+        for (var i = 0; i < visibleRows.Count; i++)
+        {
+            var row = visibleRows[i];
+            if (row.Selected)
+            {
+                selected = i;
+            }
+
+            rows.Add([row.Item.Name, row.Item.Shortcut, ActionState(row.Item)]);
+        }
+
+        TWidgets.DrawTable(canvas, rect, ["Action", "Key", "State"], rows, selected, title);
+    }
+
+    private void RenderShowcaseLeftStatus(Canvas canvas, Rect rect)
+    {
+        if (rect.IsEmpty)
+        {
+            return;
+        }
+
+        var split = Math.Max(4, rect.Height - 3);
+        var (capRect, gaugeRect) = Layout.SplitHorizontal(rect, split, minFirst: 4, minSecond: 3);
+        _capabilityCard.Render(canvas, capRect);
+        _countGauge.Render(canvas, gaugeRect);
+    }
+
+    private void RenderShowcaseOverview(Canvas canvas, Rect rect)
+    {
+        if (rect.IsEmpty || rect.Height < 10)
+        {
+            return;
+        }
+
+        var (top, bottom) = Layout.SplitHorizontal(rect, Math.Max(7, rect.Height / 2), minFirst: 6, minSecond: 4);
+        var (unicodeRect, timelineRect) = Layout.SplitVertical(top, Math.Max(20, top.Width / 2), minFirst: 18, minSecond: 16);
+        var (calendarRect, treeRect) = Layout.SplitVertical(bottom, Math.Max(20, bottom.Width / 2), minFirst: 18, minSecond: 16);
+
+        _unicodeShowcase.CapabilitySource = _capabilities.Source;
+        _unicodeShowcase.Focus = _focused;
+        _unicodeShowcase.LastPaste = _lastPaste;
+        _unicodeShowcase.TypedPreview = SanitizePreview(_typedText);
+        _unicodeShowcase.Count = _count;
+        _unicodeShowcase.Render(canvas, unicodeRect);
+
+        TimelineEntry[] timeline =
+        [
+            new($"{_tickCount:0000}", $"event {_lastEvent}"),
+            new($"{_count:+#;-#;0}", $"count now {_count}"),
+            new($"{_width}x{_height}", $"viewport {Layout.Classify(_width)}"),
+            new("caps", $"src {_capabilities.Source}"),
+        ];
+        UiWidgets.DrawTimeline(canvas, timelineRect, timeline, "Timeline");
+
+        UiWidgets.DrawCalendar(canvas, calendarRect, DateTime.Now, "Calendar");
+        TreeNode[] nodes =
+        [
+            new("Core", 0),
+            new("Runtime", 1),
+            new("Input Decoder", 2),
+            new("Renderer", 2),
+            new("Widgets", 1),
+            new("UiKit", 2, Selected: true),
+        ];
+        UiWidgets.DrawTree(canvas, treeRect, nodes, "Architecture");
+    }
+
+    private void RenderShowcaseData(Canvas canvas, Rect rect)
+    {
+        if (rect.IsEmpty || rect.Height < 10)
+        {
+            return;
+        }
+
+        var (top, bottom) = Layout.SplitHorizontal(rect, Math.Max(7, (rect.Height * 42) / 100), minFirst: 6, minSecond: 4);
+        var (lineRect, barRect) = Layout.SplitVertical(top, Math.Max(22, (top.Width * 62) / 100), minFirst: 20, minSecond: 14);
+        var (tableRect, skeletonRect) = Layout.SplitVertical(bottom, Math.Max(24, (bottom.Width * 68) / 100), minFirst: 22, minSecond: 10);
+
+        _throughputChart.Render(canvas, lineRect);
+        _statusChart.Render(canvas, barRect);
+        _showcaseTable.PageSize = Math.Max(1, tableRect.Height - 3);
+        _showcaseTable.Render(canvas, tableRect);
+        UiWidgets.DrawSkeleton(canvas, skeletonRect, "Frame Buffer");
+    }
+
+    private void RenderShowcaseForms(Canvas canvas, Rect rect)
+    {
+        if (rect.IsEmpty || rect.Height < 10)
+        {
+            return;
+        }
+
+        var cells = Layout.Grid(rect, 2, 2);
+        _showcaseAccordion.Render(canvas, cells[0]);
+        _showcaseChecklist.Render(canvas, cells[1]);
+
+        var (radioRect, selectRect) = Layout.SplitHorizontal(cells[2], Math.Max(4, cells[2].Height - 4), minFirst: 4, minSecond: 3);
+        _showcaseTheme.Render(canvas, radioRect);
+        _showcaseDensity.Render(canvas, selectRect);
+
+        var summaryLines = new List<string>
+        {
+            $"theme: {_showcaseTheme.SelectedIndex + 1}",
+            $"density: {_showcaseDensity.SelectedIndex + 1}",
+            $"table sort: {(_showcaseTable.SortDescending ? "desc" : "asc")}",
+            "hotkeys: t,m,a,z,r,f,c,v,[,],left,right",
+        };
+        TWidgets.DrawCard(canvas, cells[3], "Summary", summaryLines);
     }
 
     private string ApplyWorkspaceStyles(string frame, int inputRow, bool placeholderVisible)
