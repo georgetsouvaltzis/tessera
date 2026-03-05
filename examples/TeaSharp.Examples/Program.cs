@@ -172,6 +172,7 @@ internal sealed class CounterModel : IModel
     private bool _showFullHelp;
     private ShowcasePane _showcasePane = ShowcasePane.OverviewUnicode;
     private ShowcaseInputMode _showcaseInputMode = ShowcaseInputMode.Navigate;
+    private DateTimeOffset _lastEscapePress = DateTimeOffset.MinValue;
     private string _showcaseLastEvent = "none";
     private int _showcaseTickSnapshot;
     private int _showcaseCountSnapshot;
@@ -243,27 +244,32 @@ internal sealed class CounterModel : IModel
     {
         if (message is KeyPressMsg key)
         {
+            if (key.Code == KeyCode.Escape)
+            {
+                _lastEscapePress = DateTimeOffset.UtcNow;
+            }
+
             if (IsPlainChar(key, "q")
                 || ((key.Text == "c" || key.Text == "\u0003") && key.Modifiers.HasFlag(KeyModifiers.Ctrl)))
             {
                 return new UpdateResult(this, Tea.Cmd.Quit);
             }
 
-            if (IsPlainChar(key, "1"))
+            if (IsPlainChar(key, "1") && !WasRecentEscape())
             {
                 SwitchPage(AppPage.Protocol);
                 _lastEvent = "view: protocol";
                 return new UpdateResult(this, null);
             }
 
-            if (IsPlainChar(key, "2"))
+            if (IsPlainChar(key, "2") && !WasRecentEscape())
             {
                 SwitchPage(AppPage.Dashboard);
                 _lastEvent = "view: dashboard";
                 return new UpdateResult(this, null);
             }
 
-            if (IsPlainChar(key, "3"))
+            if (IsPlainChar(key, "3") && !WasRecentEscape())
             {
                 SwitchPage(AppPage.Showcase);
                 _lastEvent = "view: showcase";
@@ -631,6 +637,11 @@ internal sealed class CounterModel : IModel
         return key.Code == KeyCode.Character
             && key.Modifiers == KeyModifiers.Shift
             && string.Equals(key.Text, lower, StringComparison.OrdinalIgnoreCase);
+    }
+
+    private bool WasRecentEscape()
+    {
+        return (DateTimeOffset.UtcNow - _lastEscapePress) <= TimeSpan.FromMilliseconds(220);
     }
 
     private bool HandleShowcaseHotKey(KeyPressMsg key)
