@@ -170,6 +170,12 @@ internal sealed class CounterModel : IModel
     private WorkspaceFocus _focus = WorkspaceFocus.Actions;
     private bool _showFullHelp;
     private ShowcasePane _showcasePane = ShowcasePane.OverviewUnicode;
+    private string _showcaseLastEvent = "none";
+    private int _showcaseTickSnapshot;
+    private int _showcaseCountSnapshot;
+    private int _showcaseWidthSnapshot = 80;
+    private int _showcaseHeightSnapshot = 24;
+    private string _showcaseSourceSnapshot = "unknown";
 
     public CounterModel(TeaSharp.Core.Terminal.ConsoleTerminalAdapter terminal)
     {
@@ -221,6 +227,7 @@ internal sealed class CounterModel : IModel
         _showcaseTheme.SetItems(["classic", "ocean", "amber"]);
         _showcaseDensity.SetItems(["compact", "cozy", "comfortable"]);
         RefreshStatusBars();
+        CaptureShowcaseSnapshot();
         AppendLog("TeaSharp workspace initialized.");
         AppendLog("Use tab to move focus between actions, log, and command input.");
         AppendLog("Use ? to toggle full help and 1/2/3 to switch protocol/dashboard/showcase.");
@@ -378,6 +385,10 @@ internal sealed class CounterModel : IModel
             _throughputChart.Append(_sparkline[^1]);
             _showcaseToasts.Update(new TickMsg(DateTimeOffset.Now));
             RefreshShowcaseData();
+            if (_page == AppPage.Showcase && _focus == WorkspaceFocus.Showcase)
+            {
+                CaptureShowcaseSnapshot();
+            }
             if (_stressMode && _tickCount % 80 == 0)
             {
                 AppendLog($"pulse {_tickCount}: count={_count} focus={(_focused ? "in" : "out")}");
@@ -423,7 +434,22 @@ internal sealed class CounterModel : IModel
         if (page == AppPage.Showcase)
         {
             EnsureShowcasePaneInRange();
+            CaptureShowcaseSnapshot();
         }
+    }
+
+    private void CaptureShowcaseSnapshot(string? showcaseEvent = null)
+    {
+        if (!string.IsNullOrWhiteSpace(showcaseEvent))
+        {
+            _showcaseLastEvent = showcaseEvent.Trim();
+        }
+
+        _showcaseTickSnapshot = _tickCount;
+        _showcaseCountSnapshot = _count;
+        _showcaseWidthSnapshot = _width;
+        _showcaseHeightSnapshot = _height;
+        _showcaseSourceSnapshot = _capabilities.Source;
     }
 
     public ModelView View()
@@ -575,6 +601,7 @@ internal sealed class CounterModel : IModel
         }
 
         _lastEvent = $"showcase: {(string.IsNullOrWhiteSpace(action) ? key.Keystroke() : action)}";
+        CaptureShowcaseSnapshot(_lastEvent);
         AppendLog(_lastEvent);
         return true;
     }
@@ -878,6 +905,7 @@ internal sealed class CounterModel : IModel
             }
 
             _showcaseToasts.Push(new ToastMessage(payload, TtlTicks: 90, Severity: ToastSeverity.Success));
+            CaptureShowcaseSnapshot("showcase: toast");
             AppendLog("toast queued");
             return;
         }
@@ -898,6 +926,7 @@ internal sealed class CounterModel : IModel
                 _showcaseModal.Visible = !_showcaseModal.Visible;
             }
 
+            CaptureShowcaseSnapshot($"showcase: modal={(_showcaseModal.Visible ? "on" : "off")}");
             AppendLog($"modal={(_showcaseModal.Visible ? "on" : "off")}");
             return;
         }
@@ -909,6 +938,7 @@ internal sealed class CounterModel : IModel
             {
                 _showcaseTabs.Select(index - 1);
                 EnsureShowcasePaneInRange();
+                CaptureShowcaseSnapshot($"showcase: tab={_showcaseTabs.SelectedIndex + 1}");
                 AppendLog($"tab={_showcaseTabs.SelectedIndex + 1}");
                 return;
             }
@@ -1309,11 +1339,11 @@ internal sealed class CounterModel : IModel
         var (unicodeRect, timelineRect) = Layout.SplitVertical(top, Math.Max(20, top.Width / 2), minFirst: 18, minSecond: 16);
         var (calendarRect, treeRect) = Layout.SplitVertical(bottom, Math.Max(20, bottom.Width / 2), minFirst: 18, minSecond: 16);
 
-        _unicodeShowcase.CapabilitySource = _capabilities.Source;
+        _unicodeShowcase.CapabilitySource = _showcaseSourceSnapshot;
         _unicodeShowcase.Focus = _focused;
         _unicodeShowcase.LastPaste = _lastPaste;
         _unicodeShowcase.TypedPreview = SanitizePreview(_typedText);
-        _unicodeShowcase.Count = _count;
+        _unicodeShowcase.Count = _showcaseCountSnapshot;
         _unicodeShowcase.Title = IsFocusedShowcasePane(showcaseFocused, ShowcasePane.OverviewUnicode)
             ? "Unicode + Runtime *"
             : "Unicode + Runtime";
@@ -1321,10 +1351,10 @@ internal sealed class CounterModel : IModel
 
         TimelineEntry[] timeline =
         [
-            new($"{_tickCount:0000}", $"event {_lastEvent}"),
-            new($"{_count:+#;-#;0}", $"count now {_count}"),
-            new($"{_width}x{_height}", $"viewport {Layout.Classify(_width)}"),
-            new("caps", $"src {_capabilities.Source}"),
+            new($"{_showcaseTickSnapshot:0000}", $"event {_showcaseLastEvent}"),
+            new($"{_showcaseCountSnapshot:+#;-#;0}", $"count now {_showcaseCountSnapshot}"),
+            new($"{_showcaseWidthSnapshot}x{_showcaseHeightSnapshot}", $"viewport {Layout.Classify(_showcaseWidthSnapshot)}"),
+            new("caps", $"src {_showcaseSourceSnapshot}"),
         ];
         UiWidgets.DrawTimeline(
             canvas,
