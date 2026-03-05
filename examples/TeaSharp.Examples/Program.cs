@@ -243,27 +243,27 @@ internal sealed class CounterModel : IModel
     {
         if (message is KeyPressMsg key)
         {
-            if (key.Text == "q"
+            if (IsPlainChar(key, "q")
                 || ((key.Text == "c" || key.Text == "\u0003") && key.Modifiers.HasFlag(KeyModifiers.Ctrl)))
             {
                 return new UpdateResult(this, Tea.Cmd.Quit);
             }
 
-            if (key.Text == "1")
+            if (IsPlainChar(key, "1"))
             {
                 SwitchPage(AppPage.Protocol);
                 _lastEvent = "view: protocol";
                 return new UpdateResult(this, null);
             }
 
-            if (key.Text == "2")
+            if (IsPlainChar(key, "2"))
             {
                 SwitchPage(AppPage.Dashboard);
                 _lastEvent = "view: dashboard";
                 return new UpdateResult(this, null);
             }
 
-            if (key.Text == "3")
+            if (IsPlainChar(key, "3"))
             {
                 SwitchPage(AppPage.Showcase);
                 _lastEvent = "view: showcase";
@@ -284,16 +284,9 @@ internal sealed class CounterModel : IModel
                 return new UpdateResult(this, null);
             }
 
-            if (key.Text == "s" && key.Modifiers == KeyModifiers.None)
+            if (key.Code == KeyCode.F2
+                || (IsPlainChar(key, "s") && key.Modifiers.HasFlag(KeyModifiers.Ctrl)))
             {
-                if (_page == AppPage.Showcase
-                    && _focus != WorkspaceFocus.Command
-                    && _showcaseInputMode == ShowcaseInputMode.Navigate)
-                {
-                    _lastEvent = "showcase: ignored 's' in NAV mode";
-                    return new UpdateResult(this, null);
-                }
-
                 _stressMode = !_stressMode;
                 RefreshStatusBars();
                 _lastEvent = $"stress: {(_stressMode ? "on" : "off")}";
@@ -588,7 +581,7 @@ internal sealed class CounterModel : IModel
 
     private bool HandleShowcaseNavigationKey(KeyPressMsg key)
     {
-        if (key.Text == "p" && key.Modifiers == KeyModifiers.None)
+        if (IsPlainChar(key, "p"))
         {
             MoveShowcasePane(1);
             _lastEvent = $"showcase: pane={ShowcasePaneLabel()}";
@@ -597,7 +590,7 @@ internal sealed class CounterModel : IModel
             return true;
         }
 
-        if (string.Equals(key.Text, "p", StringComparison.OrdinalIgnoreCase) && key.Modifiers.HasFlag(KeyModifiers.Shift))
+        if (IsPlainShiftChar(key, "p"))
         {
             MoveShowcasePane(-1);
             _lastEvent = $"showcase: pane={ShowcasePaneLabel()}";
@@ -623,6 +616,20 @@ internal sealed class CounterModel : IModel
         return _showcaseInputMode == ShowcaseInputMode.Command
             ? "cmd"
             : "nav";
+    }
+
+    private static bool IsPlainChar(KeyPressMsg key, string text)
+    {
+        return key.Code == KeyCode.Character
+            && key.Modifiers == KeyModifiers.None
+            && string.Equals(key.Text, text, StringComparison.Ordinal);
+    }
+
+    private static bool IsPlainShiftChar(KeyPressMsg key, string lower)
+    {
+        return key.Code == KeyCode.Character
+            && key.Modifiers == KeyModifiers.Shift
+            && string.Equals(key.Text, lower, StringComparison.OrdinalIgnoreCase);
     }
 
     private bool HandleShowcaseHotKey(KeyPressMsg key)
@@ -1039,7 +1046,7 @@ internal sealed class CounterModel : IModel
             "- press 2 for dashboard, 3 for showcase\n" +
             "- up/down to change count\n" +
             "- move/click mouse in terminal window\n" +
-            "- press s to toggle render stress mode\n" +
+            "- press ctrl+s (or F2) to toggle render stress mode\n" +
             "- type text; backspace and enter work\n" +
             "- paste multi-line text\n" +
             "- switch terminal focus away/back\n" +
