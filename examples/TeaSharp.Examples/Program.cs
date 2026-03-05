@@ -173,6 +173,7 @@ internal sealed class CounterModel : IModel
     private ShowcasePane _showcasePane = ShowcasePane.OverviewUnicode;
     private ShowcaseInputMode _showcaseInputMode = ShowcaseInputMode.Navigate;
     private DateTimeOffset _lastEscapePress = DateTimeOffset.MinValue;
+    private DateTimeOffset _lastShowcaseModeToggle = DateTimeOffset.MinValue;
     private string _showcaseLastEvent = "none";
     private int _showcaseTickSnapshot;
     private int _showcaseCountSnapshot;
@@ -528,6 +529,13 @@ internal sealed class CounterModel : IModel
     {
         if (_page == AppPage.Showcase && key.Code == KeyCode.Escape)
         {
+            var now = DateTimeOffset.UtcNow;
+            if (key.IsRepeat || (now - _lastShowcaseModeToggle) <= TimeSpan.FromMilliseconds(220))
+            {
+                return new UpdateResult(this, null);
+            }
+
+            _lastShowcaseModeToggle = now;
             _showcaseInputMode = _showcaseInputMode == ShowcaseInputMode.Navigate
                 ? ShowcaseInputMode.Command
                 : ShowcaseInputMode.Navigate;
