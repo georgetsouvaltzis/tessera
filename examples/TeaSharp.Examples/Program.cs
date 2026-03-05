@@ -1947,6 +1947,12 @@ internal enum WorkspaceFocus
     Command = 3,
 }
 
+internal enum ShowcaseInputMode
+{
+    Navigate = 0,
+    Command = 1,
+}
+
 internal enum ShowcasePane
 {
     OverviewUnicode = 0,
