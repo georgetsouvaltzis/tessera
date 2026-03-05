@@ -284,8 +284,9 @@ internal sealed class CounterModel : IModel
                 return new UpdateResult(this, null);
             }
 
-            if (key.Code == KeyCode.F2
-                || (IsPlainChar(key, "s") && key.Modifiers.HasFlag(KeyModifiers.Ctrl)))
+            if (key.Code == KeyCode.Character
+                && string.Equals(key.Text, "s", StringComparison.OrdinalIgnoreCase)
+                && key.Modifiers.HasFlag(KeyModifiers.Ctrl))
             {
                 _stressMode = !_stressMode;
                 RefreshStatusBars();
@@ -1046,7 +1047,7 @@ internal sealed class CounterModel : IModel
             "- press 2 for dashboard, 3 for showcase\n" +
             "- up/down to change count\n" +
             "- move/click mouse in terminal window\n" +
-            "- press ctrl+s (or F2) to toggle render stress mode\n" +
+            "- press ctrl+s to toggle render stress mode\n" +
             "- type text; backspace and enter work\n" +
             "- paste multi-line text\n" +
             "- switch terminal focus away/back\n" +
