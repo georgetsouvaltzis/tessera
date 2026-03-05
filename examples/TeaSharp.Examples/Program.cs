@@ -80,6 +80,7 @@ internal sealed class CounterModel : IModel
     ];
     private readonly KeyBinding[] _showcaseHelp =
     [
+        new KeyBinding("esc", "toggle nav/cmd"),
         new KeyBinding("p/shift+p", "cycle pane"),
         new KeyBinding("left/right", "switch tab"),
         new KeyBinding("t", "toast"),
@@ -170,6 +171,7 @@ internal sealed class CounterModel : IModel
     private WorkspaceFocus _focus = WorkspaceFocus.Actions;
     private bool _showFullHelp;
     private ShowcasePane _showcasePane = ShowcasePane.OverviewUnicode;
+    private ShowcaseInputMode _showcaseInputMode = ShowcaseInputMode.Navigate;
     private string _showcaseLastEvent = "none";
     private int _showcaseTickSnapshot;
     private int _showcaseCountSnapshot;
@@ -284,6 +286,14 @@ internal sealed class CounterModel : IModel
 
             if (key.Text == "s" && key.Modifiers == KeyModifiers.None)
             {
+                if (_page == AppPage.Showcase
+                    && _focus != WorkspaceFocus.Command
+                    && _showcaseInputMode == ShowcaseInputMode.Navigate)
+                {
+                    _lastEvent = "showcase: ignored 's' in NAV mode";
+                    return new UpdateResult(this, null);
+                }
+
                 _stressMode = !_stressMode;
                 RefreshStatusBars();
                 _lastEvent = $"stress: {(_stressMode ? "on" : "off")}";
@@ -430,6 +440,7 @@ internal sealed class CounterModel : IModel
             AppPage.Protocol => WorkspaceFocus.Actions,
             _ => WorkspaceFocus.Actions,
         };
+        _showcaseInputMode = ShowcaseInputMode.Navigate;
 
         if (page == AppPage.Showcase)
         {
@@ -515,6 +526,17 @@ internal sealed class CounterModel : IModel
 
     private UpdateResult HandleWorkspaceKey(KeyPressMsg key)
     {
+        if (_page == AppPage.Showcase && key.Code == KeyCode.Escape)
+        {
+            _showcaseInputMode = _showcaseInputMode == ShowcaseInputMode.Navigate
+                ? ShowcaseInputMode.Command
+                : ShowcaseInputMode.Navigate;
+            _lastEvent = $"showcase: mode={ShowcaseModeLabel()}";
+            CaptureShowcaseSnapshot(_lastEvent);
+            AppendLog(_lastEvent);
+            return new UpdateResult(this, null);
+        }
+
         if (_page == AppPage.Showcase
             && _focus != WorkspaceFocus.Command
             && HandleShowcaseNavigationKey(key))
@@ -524,6 +546,7 @@ internal sealed class CounterModel : IModel
 
         if (_page == AppPage.Showcase
             && _focus == WorkspaceFocus.Showcase
+            && _showcaseInputMode == ShowcaseInputMode.Command
             && HandleShowcaseHotKey(key))
         {
             return new UpdateResult(this, null);
@@ -593,6 +616,13 @@ internal sealed class CounterModel : IModel
         }
 
         return false;
+    }
+
+    private string ShowcaseModeLabel()
+    {
+        return _showcaseInputMode == ShowcaseInputMode.Command
+            ? "cmd"
+            : "nav";
     }
 
     private bool HandleShowcaseHotKey(KeyPressMsg key)
@@ -1226,7 +1256,7 @@ internal sealed class CounterModel : IModel
             canvas,
             new Rect(0, 0, _width, 1),
             "TeaSharp Capability Showcase",
-            $"tab={_showcaseTabs.SelectedIndex + 1} focus={_focus.ToString().ToLowerInvariant()} pane={ShowcasePaneLabel()}");
+            $"tab={_showcaseTabs.SelectedIndex + 1} focus={_focus.ToString().ToLowerInvariant()} pane={ShowcasePaneLabel()} mode={ShowcaseModeLabel()}");
         UiWidgets.DrawBreadcrumb(
             canvas,
             new Rect(0, 1, _width, 1),
@@ -1238,7 +1268,7 @@ internal sealed class CounterModel : IModel
         var (leftTopRect, leftBottomRect) = Layout.SplitHorizontal(leftRect, Math.Max(12, (leftRect.Height * 62) / 100), minFirst: 10, minSecond: 7);
         var (actionsRect, leftStatusRect) = Layout.SplitHorizontal(leftTopRect, Math.Max(8, leftTopRect.Height - 9), minFirst: 6, minSecond: 5);
 
-        RenderActionsTable(canvas, actionsRect, _focus == WorkspaceFocus.Actions ? "Actions *" : "Actions");
+        var selectedActionLine = RenderActionsTable(canvas, actionsRect, _focus == WorkspaceFocus.Actions ? "Actions *" : "Actions");
         RenderShowcaseLeftStatus(canvas, leftStatusRect);
 
         _logViewport.Resize(Math.Max(12, leftBottomRect.Width - 2), Math.Max(3, leftBottomRect.Height - 2));
@@ -1269,6 +1299,25 @@ internal sealed class CounterModel : IModel
         _showcaseToasts.Render(canvas, toastRect);
         _showcaseModal.Render(canvas, bodyRect);
 
+        if (_focus == WorkspaceFocus.Actions)
+        {
+            DrawFocusChrome(canvas, actionsRect);
+            if (selectedActionLine.HasValue)
+            {
+                DrawSelectedRowMarkers(canvas, actionsRect, selectedActionLine.Value);
+            }
+        }
+        else if (_focus == WorkspaceFocus.Log)
+        {
+            DrawFocusChrome(canvas, leftBottomRect);
+        }
+        else if (_focus == WorkspaceFocus.Showcase)
+        {
+            DrawFocusChrome(canvas, rightRect);
+            var paneRect = ActiveShowcasePaneRect(rightBody);
+            DrawFocusChrome(canvas, paneRect);
+        }
+
         var footerRect = new Rect(0, _height - footerHeight, _width, footerHeight);
         var inputFrame = _commandInput.BuildFrame(Math.Max(12, _width - 6));
         var inputLine = $"> {inputFrame.Text}";
@@ -1290,7 +1339,7 @@ internal sealed class CounterModel : IModel
         var footerLines = new List<string>
         {
             inputLine,
-            $"focus={_focus.ToString().ToLowerInvariant()} filter='{_actionList.Filter}' stress={ToYesNo(_stressMode)} page=showcase class={Layout.Classify(_width).ToString().ToLowerInvariant()}",
+            $"focus={_focus.ToString().ToLowerInvariant()} filter='{_actionList.Filter}' stress={ToYesNo(_stressMode)} page=showcase class={Layout.Classify(_width).ToString().ToLowerInvariant()} mode={ShowcaseModeLabel()}",
         };
         footerLines.AddRange(helpText.Split('\n'));
 
@@ -1302,6 +1351,11 @@ internal sealed class CounterModel : IModel
 
         if (_focus == WorkspaceFocus.Command)
         {
+            DrawFocusChrome(canvas, footerRect);
+        }
+
+        if (_focus == WorkspaceFocus.Command)
+        {
             cursorX = Math.Clamp(footerRect.X + 3 + inputFrame.CursorColumn, footerRect.X + 1, footerRect.Right - 2);
             cursorY = Math.Clamp(footerRect.Y + 1, footerRect.Y + 1, footerRect.Bottom - 2);
         }
@@ -1310,11 +1364,11 @@ internal sealed class CounterModel : IModel
         return ApplyWorkspaceStyles(rendered, footerRect.Y + 1, inputFrame.PlaceholderVisible);
     }
 
-    private void RenderActionsTable(Canvas canvas, Rect rect, string title)
+    private int? RenderActionsTable(Canvas canvas, Rect rect, string title)
     {
         if (rect.IsEmpty || rect.Height < 4)
         {
-            return;
+            return null;
         }
 
         var visibleRows = _actionList.VisibleRows();
@@ -1332,6 +1386,18 @@ internal sealed class CounterModel : IModel
         }
 
         TWidgets.DrawTable(canvas, rect, ["Action", "Key", "State"], rows, selected, title);
+        if (selected < 0)
+        {
+            return null;
+        }
+
+        var selectedY = rect.Y + 3 + selected;
+        if (selectedY >= rect.Bottom - 1)
+        {
+            return null;
+        }
+
+        return selectedY;
     }
 
     private void RenderShowcaseLeftStatus(Canvas canvas, Rect rect)
@@ -1457,6 +1523,97 @@ internal sealed class CounterModel : IModel
             cells[3],
             IsFocusedShowcasePane(showcaseFocused, ShowcasePane.FormsSummary) ? "Summary *" : "Summary",
             summaryLines);
+    }
+
+    private Rect ActiveShowcasePaneRect(Rect rightBody)
+    {
+        if (rightBody.IsEmpty || rightBody.Height < 3)
+        {
+            return new Rect(0, 0, 0, 0);
+        }
+
+        return _showcaseTabs.SelectedIndex switch
+        {
+            0 => ActiveOverviewPaneRect(rightBody),
+            1 => ActiveDataPaneRect(rightBody),
+            _ => ActiveFormsPaneRect(rightBody),
+        };
+    }
+
+    private Rect ActiveOverviewPaneRect(Rect rect)
+    {
+        var (top, bottom) = Layout.SplitHorizontal(rect, Math.Max(7, rect.Height / 2), minFirst: 6, minSecond: 4);
+        var (unicodeRect, timelineRect) = Layout.SplitVertical(top, Math.Max(20, top.Width / 2), minFirst: 18, minSecond: 16);
+        var (calendarRect, treeRect) = Layout.SplitVertical(bottom, Math.Max(20, bottom.Width / 2), minFirst: 18, minSecond: 16);
+        return _showcasePane switch
+        {
+            ShowcasePane.OverviewUnicode => unicodeRect,
+            ShowcasePane.OverviewTimeline => timelineRect,
+            ShowcasePane.OverviewCalendar => calendarRect,
+            _ => treeRect,
+        };
+    }
+
+    private Rect ActiveDataPaneRect(Rect rect)
+    {
+        var (top, bottom) = Layout.SplitHorizontal(rect, Math.Max(7, (rect.Height * 42) / 100), minFirst: 6, minSecond: 4);
+        var (lineRect, barRect) = Layout.SplitVertical(top, Math.Max(22, (top.Width * 62) / 100), minFirst: 20, minSecond: 14);
+        var (tableRect, skeletonRect) = Layout.SplitVertical(bottom, Math.Max(24, (bottom.Width * 68) / 100), minFirst: 22, minSecond: 10);
+        return _showcasePane switch
+        {
+            ShowcasePane.DataLineChart => lineRect,
+            ShowcasePane.DataBarChart => barRect,
+            ShowcasePane.DataTable => tableRect,
+            _ => skeletonRect,
+        };
+    }
+
+    private Rect ActiveFormsPaneRect(Rect rect)
+    {
+        var cells = Layout.Grid(rect, 2, 2);
+        var (radioRect, selectRect) = Layout.SplitHorizontal(cells[2], Math.Max(4, cells[2].Height - 4), minFirst: 4, minSecond: 3);
+        return _showcasePane switch
+        {
+            ShowcasePane.FormsPlaybook => cells[0],
+            ShowcasePane.FormsChecklist => cells[1],
+            ShowcasePane.FormsTheme => radioRect,
+            ShowcasePane.FormsDensity => selectRect,
+            _ => cells[3],
+        };
+    }
+
+    private static void DrawFocusChrome(Canvas canvas, Rect rect)
+    {
+        var clipped = Rect.Intersect(rect, canvas.Bounds);
+        if (clipped.IsEmpty || clipped.Width < 4 || clipped.Height < 3)
+        {
+            return;
+        }
+
+        var innerLeft = clipped.X + 1;
+        var innerRight = clipped.Right - 2;
+        for (var y = clipped.Y + 1; y < clipped.Bottom - 1; y++)
+        {
+            canvas.Set(innerLeft, y, '▌');
+            canvas.Set(innerRight, y, '▐');
+        }
+
+        canvas.Set(clipped.X + 2, clipped.Y, '◆');
+    }
+
+    private static void DrawSelectedRowMarkers(Canvas canvas, Rect rect, int rowY)
+    {
+        var clipped = Rect.Intersect(rect, canvas.Bounds);
+        if (clipped.IsEmpty || rowY <= clipped.Y || rowY >= clipped.Bottom - 1)
+        {
+            return;
+        }
+
+        if (clipped.Width >= 4)
+        {
+            canvas.Set(clipped.X + 1, rowY, '▶');
+            canvas.Set(clipped.Right - 2, rowY, '◀');
+        }
     }
 
     private string ApplyWorkspaceStyles(string frame, int inputRow, bool placeholderVisible)

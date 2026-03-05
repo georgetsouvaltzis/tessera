@@ -77,7 +77,10 @@ Showcase page now cycles multiple UI surfaces with `left/right` tabs:
 - `Data`: line/bar charts + sortable/paged table
 - `Forms`: accordion + checklist + radio/select + summary card
 Showcase routes keyboard to one focused pane at a time. Use `tab` to move focus to the showcase region, then `p`/`shift+p` to cycle pane focus.
-Hotkeys in showcase mode: `t` toast, `m` modal, `a` accordion, `z` checklist, `r` theme, `f` density, `c` table column, `v` table sort, `[`/`]` table page, `p`/`shift+p` pane cycle.
+Showcase has explicit input modes toggled by `esc`:
+- `nav`: safe navigation mode (no single-letter side effects)
+- `cmd`: command-hotkey mode for showcase actions
+Hotkeys in showcase `cmd` mode: `t` toast, `m` modal, `a` accordion, `z` checklist, `r` theme, `f` density, `c` table column, `v` table sort, `[`/`]` table page, `p`/`shift+p` pane cycle.
 The dashboard composes chart components through `ComponentComposer` and uses stateful models from `TeaSharp.Widgets`.
 
 ## Custom Components
