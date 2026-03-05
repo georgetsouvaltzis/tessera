@@ -9,7 +9,9 @@ internal static class ChartComponentTests
     public static IEnumerable<TestCase> Cases()
     {
         yield return new TestCase("Charts_LineChart_RendersPointsAndStats", LineChart_RendersPointsAndStats);
+        yield return new TestCase("Charts_LineChart_WithAxesAndLegend_RendersAxisElements", LineChart_WithAxesAndLegend_RendersAxisElements);
         yield return new TestCase("Charts_BarChart_RendersLabelsAndBars", BarChart_RendersLabelsAndBars);
+        yield return new TestCase("Charts_BarChart_WithScaleAndLegend_RendersScaleText", BarChart_WithScaleAndLegend_RendersScaleText);
         yield return new TestCase("Charts_LineChartComponent_HonorsCapacity", LineChartComponent_HonorsCapacity);
         yield return new TestCase("Components_Composer_DispatchesStatefulUpdates", Composer_DispatchesStatefulUpdates);
     }
@@ -50,6 +52,62 @@ internal static class ChartComponentTests
         TestAssert.True(output.Contains(" Status ", StringComparison.Ordinal), "Bar chart should render title.");
         TestAssert.True(output.Contains("ok", StringComparison.Ordinal), "Bar chart should render labels.");
         TestAssert.True(output.Contains("█", StringComparison.Ordinal), "Bar chart should render filled bars.");
+        return Task.CompletedTask;
+    }
+
+    private static Task LineChart_WithAxesAndLegend_RendersAxisElements()
+    {
+        // Arrange
+        var canvas = new Canvas(34, 12);
+        var samples = new[] { 20.0, 30.0, 10.0, 50.0, 40.0, 60.0 };
+
+        // Act
+        Charts.DrawLineChart(
+            canvas,
+            new Rect(0, 0, 34, 12),
+            samples,
+            title: "Latency",
+            options: new LineChartOptions(
+                ShowAxes: true,
+                Legend: "p95",
+                XLabel: "time",
+                YLabel: "ms"));
+        var output = canvas.Render();
+
+        // Assert
+        TestAssert.True(output.Contains(" Latency ", StringComparison.Ordinal), "Line chart should render title with options.");
+        TestAssert.True(output.Contains("└", StringComparison.Ordinal), "Line chart with axes should render axis corner.");
+        TestAssert.True(output.Contains("p95", StringComparison.Ordinal), "Line chart should render legend text.");
+        TestAssert.True(output.Contains("time", StringComparison.Ordinal), "Line chart should render x-axis label.");
+        return Task.CompletedTask;
+    }
+
+    private static Task BarChart_WithScaleAndLegend_RendersScaleText()
+    {
+        // Arrange
+        var canvas = new Canvas(36, 8);
+        IReadOnlyList<BarDatum> bars =
+        [
+            new("ok", 90),
+            new("warn", 35),
+            new("crit", 10),
+        ];
+
+        // Act
+        Charts.DrawBarChart(
+            canvas,
+            new Rect(0, 0, 36, 8),
+            bars,
+            title: "Health",
+            options: new BarChartOptions(
+                ShowScale: true,
+                Legend: "req/s"));
+        var output = canvas.Render();
+
+        // Assert
+        TestAssert.True(output.Contains(" Health ", StringComparison.Ordinal), "Bar chart should render title.");
+        TestAssert.True(output.Contains("req/s", StringComparison.Ordinal), "Bar chart should render legend.");
+        TestAssert.True(output.Contains("0..", StringComparison.Ordinal), "Bar chart should render scale range text.");
         return Task.CompletedTask;
     }
 
