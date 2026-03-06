@@ -120,6 +120,22 @@ public sealed class WorkspaceUxIntegrationTests
     }
 
     [Test]
+    public async Task PlainQInCommandInput_DoesNotQuit()
+    {
+        await using var terminal = new ConsoleTerminalAdapter();
+        var model = new CounterModel(terminal);
+        GoToShowcase(model);
+        PressPlain(model, ":");
+        PressPlain(model, ":");
+
+        var result = model.Update(new KeyPressMsg(KeyCode.Character, "q"));
+
+        Assert.That(result.Command, Is.Null);
+        Assert.That(CommandInput(model).Value, Is.EqualTo("q"));
+        Assert.That(model.View().Content, Does.Contain("mode=cmd"));
+    }
+
+    [Test]
     public async Task UnhandledShowcaseKey_DoesNotWriteIntoCommandInput()
     {
         await using var terminal = new ConsoleTerminalAdapter();

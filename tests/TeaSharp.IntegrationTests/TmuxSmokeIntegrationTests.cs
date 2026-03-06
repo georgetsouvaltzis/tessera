@@ -47,6 +47,26 @@ public sealed class TmuxSmokeIntegrationTests
 
             Assert.That(PaneHasExamplesChildProcess(session), Is.True, "App process should be active before quit check.");
 
+            SendKeys(session, ":");
+            await Task.Delay(240);
+            var cmdAgain = CapturePane(session);
+            StringAssert.Contains("mode=cmd", cmdAgain, "Colon should re-enter command mode before q-input check.");
+
+            SendKeys(session, "q");
+            await Task.Delay(360);
+            Assert.That(
+                PaneHasExamplesChildProcess(session),
+                Is.True,
+                "Plain 'q' in command mode should stay in app and not trigger global quit.");
+            var cmdWithQ = CapturePane(session);
+            StringAssert.Contains("mode=cmd", cmdWithQ, "Command mode should remain active after plain 'q'.");
+            StringAssert.Contains("Command * [CMD]", cmdWithQ, "Command pane should stay focused after plain 'q'.");
+
+            SendKeys(session, "C-[");
+            await Task.Delay(240);
+            var navAgain = CapturePane(session);
+            StringAssert.Contains("mode=nav", navAgain, "Esc should return to navigation mode before quit key.");
+
             SendKeys(session, "q");
             await Task.Delay(600);
             Assert.That(PaneHasExamplesChildProcess(session), Is.False, "Single 'q' should terminate example process without extra keys.");

@@ -251,8 +251,8 @@ internal sealed class CounterModel : IModel
                 _lastEscapePress = DateTimeOffset.UtcNow;
             }
 
-            if (IsPlainChar(key, "q")
-                || ((key.Text == "c" || key.Text == "\u0003") && key.Modifiers.HasFlag(KeyModifiers.Ctrl)))
+            if (((key.Text == "c" || key.Text == "\u0003") && key.Modifiers.HasFlag(KeyModifiers.Ctrl))
+                || (IsPlainChar(key, "q") && !IsCommandInputActive()))
             {
                 return new UpdateResult(this, Tea.Cmd.Quit);
             }
@@ -652,6 +652,11 @@ internal sealed class CounterModel : IModel
         return _workspaceInputMode == WorkspaceInputMode.Command
             ? "CMD"
             : "NAV";
+    }
+
+    private bool IsCommandInputActive()
+    {
+        return IsWorkspacePage && _workspaceInputMode == WorkspaceInputMode.Command;
     }
 
     private static bool IsPlainChar(KeyPressMsg key, string text)

@@ -15,6 +15,7 @@ internal static class ShowcaseInteractionTests
         yield return new TestCase("Showcase_Escape_ExitsCommandMode", Escape_ExitsCommandMode);
         yield return new TestCase("Showcase_Escape_OneShortcutBurst_DoesNotSwitchPage", EscapeBurst_DoesNotSwitchPage);
         yield return new TestCase("Showcase_PlainS_InCommandMode_StaysInput", PlainS_InCommandMode_StaysInput);
+        yield return new TestCase("Showcase_PlainQ_InCommandMode_StaysInputAndDoesNotQuit", PlainQ_InCommandMode_StaysInputAndDoesNotQuit);
         yield return new TestCase("Showcase_CtrlS_TogglesStress", CtrlS_TogglesStress);
         yield return new TestCase("Showcase_PaneNavigation_RequiresShowcaseFocus", PaneNavigation_RequiresShowcaseFocus);
         yield return new TestCase("Showcase_UppercaseP_CyclesPaneBackward", UppercaseP_CyclesPaneBackward);
@@ -121,6 +122,26 @@ internal static class ShowcaseInteractionTests
         // Assert
         TestAssert.True(!stressMode, "Plain 's' should not toggle stress mode.");
         TestAssert.Equal("s", input.Value, "Plain 's' should route into command input.");
+    }
+
+    private static async Task PlainQ_InCommandMode_StaysInputAndDoesNotQuit()
+    {
+        // Arrange
+        await using var terminal = new ConsoleTerminalAdapter();
+        var model = new CounterModel(terminal);
+        GoToShowcase(model);
+        PressPlain(model, ":");
+        PressPlain(model, ":");
+
+        // Act
+        var result = model.Update(new KeyPressMsg(KeyCode.Character, "q"));
+        var input = CommandInput(model);
+        var view = model.View().Content;
+
+        // Assert
+        TestAssert.True(result.Command is null, "Plain 'q' in command mode should not emit quit command.");
+        TestAssert.Equal("q", input.Value, "Plain 'q' should route into command input.");
+        TestAssert.True(view.Contains("mode=cmd", StringComparison.Ordinal), "Command mode should remain active.");
     }
 
     private static async Task CtrlS_TogglesStress()
