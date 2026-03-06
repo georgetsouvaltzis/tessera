@@ -5,3 +5,5 @@ obj/
 .DS_Store
 *.user
 *.suo
+.artifacts/
+coord/
