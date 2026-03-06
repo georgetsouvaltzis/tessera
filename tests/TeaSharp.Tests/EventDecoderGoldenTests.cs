@@ -101,12 +101,19 @@ internal static class EventDecoderGoldenTests
         var altBackspaceCtrlH = decoder.Decode(new byte[] { 0x1B, 0x08 }, timeoutExpired: false);
         var altCtrlA = decoder.Decode(new byte[] { 0x1B, 0x01 }, timeoutExpired: false);
         var altTab = decoder.Decode(new byte[] { 0x1B, 0x09 }, timeoutExpired: false);
+        var altEscapePending = decoder.Decode(new byte[] { 0x1B, 0x1B }, timeoutExpired: false);
+        var altEscape = decoder.Decode(new byte[] { 0x1B, 0x1B }, timeoutExpired: true);
+        var altUp = decoder.Decode(new byte[] { 0x1B, 0x1B, (byte)'[', (byte)'A' }, timeoutExpired: false);
 
         // Assert
         AssertKey(altBackspaceDel, KeyCode.Backspace, KeyModifiers.Alt);
         AssertKey(altBackspaceCtrlH, KeyCode.Backspace, KeyModifiers.Alt);
         AssertKey(altCtrlA, KeyCode.Character, KeyModifiers.Alt | KeyModifiers.Ctrl, "a");
         AssertKey(altTab, KeyCode.Tab, KeyModifiers.Alt);
+        TestAssert.True(altEscapePending.NeedMoreData, "Double escape should wait for timeout before resolving to alt+escape.");
+        AssertConsumed(altEscapePending, 0);
+        AssertKey(altEscape, KeyCode.Escape, KeyModifiers.Alt);
+        AssertKey(altUp, KeyCode.Up, KeyModifiers.Alt);
         return Task.CompletedTask;
     }
 

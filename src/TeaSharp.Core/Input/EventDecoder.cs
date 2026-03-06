@@ -55,6 +55,36 @@ public sealed class EventDecoder
 
     private static DecodeResult DecodeAltSequence(ReadOnlySpan<byte> buffer, bool timeoutExpired)
     {
+        if (buffer.Length >= 2 && buffer[1] == 0x1B)
+        {
+            var nested = DecodeEscape(buffer[1..], timeoutExpired);
+            if (nested.NeedMoreData && nested.Consumed == 0)
+            {
+                return new DecodeResult(0, null, true);
+            }
+
+            if (nested.Message is KeyPressMsg nestedKey)
+            {
+                return new DecodeResult(
+                    1 + nested.Consumed,
+                    nestedKey with { Modifiers = nestedKey.Modifiers | KeyModifiers.Alt },
+                    false);
+            }
+
+            if (nested.Message is KeyReleaseMsg nestedRelease)
+            {
+                return new DecodeResult(
+                    1 + nested.Consumed,
+                    nestedRelease with { Modifiers = nestedRelease.Modifiers | KeyModifiers.Alt },
+                    false);
+            }
+
+            if (nested.Consumed > 0)
+            {
+                return new DecodeResult(1 + nested.Consumed, nested.Message, false);
+            }
+        }
+
         if (buffer.Length >= 2)
         {
             var second = buffer[1];

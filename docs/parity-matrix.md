@@ -34,7 +34,7 @@ Legend: `done` = implemented, `partial` = usable but incomplete, `todo` = not im
 | Navigation keys | arrows/tab/enter/backspace/esc | done | Core keys mapped. |
 | VT control decode | CSI/SS3/OSC parsing | partial | Core cursor/edit keys, resize, OSC consumption implemented; full matrix still pending. |
 | Ctrl modifiers | control key combos | partial | Core ctrl path plus CSI `u` / modifyOtherKeys (`CSI 27;...~`) decode supported; full key matrix parity still pending. |
-| Alt/meta handling | alt key combos | partial | Escape-prefix + console modifiers + CSI enhanced key modifiers supported; edge cases missing. |
+| Alt/meta handling | alt key combos | partial | Escape-prefix + console modifiers + CSI enhanced key modifiers are supported, including nested escape-prefix forms (`ESC ESC` and `ESC` + escaped cursor sequences) for fallback alt behavior; some emulator-specific edge cases are still missing. |
 | Bracketed paste protocol | start/end/content handling | done | Start/end decode and aggregated `PasteMsg` content are implemented. |
 | Mouse protocol | X10/SGR mouse messages | partial | SGR 1006 + basic X10 decode implemented with base `MouseMsg` plus typed variants (`MouseClickMsg`, `MouseReleaseMsg`, `MouseMotionMsg`, `MouseWheelMsg`); richer button edge cases and high-button parity still pending. |
 | Focus reporting | focus in/out messages | done | CSI focus in/out decode + render-mode toggle implemented. |
