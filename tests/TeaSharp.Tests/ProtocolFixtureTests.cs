@@ -11,6 +11,7 @@ internal static class ProtocolFixtureTests
     {
         yield return new TestCase("ProtocolFixture_Ghostty_ModifyOtherKeys_DecodesModifiers", Ghostty_ModifyOtherKeys_DecodesModifiers);
         yield return new TestCase("ProtocolFixture_ITerm2_CsiU_DecodesModifierCombos", ITerm2_CsiU_DecodesModifierCombos);
+        yield return new TestCase("ProtocolFixture_Tmux_CsiCursorModifiers_Decode", Tmux_CsiCursorModifiers_Decode);
         yield return new TestCase("ProtocolFixture_TerminalReader_FocusPasteRoundTrip", TerminalReader_FocusPasteRoundTrip);
         yield return new TestCase("ProtocolFixture_AppleTerminal_AltFallback_Decodes", AppleTerminal_AltFallback_Decodes);
     }
@@ -44,6 +45,23 @@ internal static class ProtocolFixtureTests
         AssertKey(ctrlShiftTab, KeyCode.Tab, KeyModifiers.Shift | KeyModifiers.Ctrl);
         AssertKey(altB, KeyCode.Character, KeyModifiers.Alt, "b");
         AssertKey(altBackspace, KeyCode.Backspace, KeyModifiers.Alt);
+        return Task.CompletedTask;
+    }
+
+    private static Task Tmux_CsiCursorModifiers_Decode()
+    {
+        // Arrange
+        var decoder = new EventDecoder();
+
+        // Act
+        var altUp = Decode(decoder, "\u001b[1;3A");
+        var shiftCtrlLeft = Decode(decoder, "\u001b[1;6D");
+        var ctrlRight = Decode(decoder, "\u001b[1;5C");
+
+        // Assert
+        AssertKey(altUp, KeyCode.Up, KeyModifiers.Alt);
+        AssertKey(shiftCtrlLeft, KeyCode.Left, KeyModifiers.Shift | KeyModifiers.Ctrl);
+        AssertKey(ctrlRight, KeyCode.Right, KeyModifiers.Ctrl);
         return Task.CompletedTask;
     }
 
