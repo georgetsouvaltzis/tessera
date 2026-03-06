@@ -15,6 +15,8 @@ internal static class ProgramRuntimeTests
         yield return new TestCase("Program_SequenceCommands_ProcessInOrder", Sequence_ProcessesInOrder);
         yield return new TestCase("Program_BatchCommands_ProcessAll", Batch_ProcessesAllCommands);
         yield return new TestCase("Program_FilterBlocksFirstQuit_AllowsSecond", Filter_CanBlockQuitMessage);
+        yield return new TestCase("Program_CommandException_WithCatch_EmitsCommandErrorMsg", CommandException_WithCatch_EmitsCommandErrorMsg);
+        yield return new TestCase("Program_CommandException_WithoutCatch_Propagates", CommandException_WithoutCatch_Propagates);
         yield return new TestCase("Program_EmitsTerminalCapabilitiesMessage", EmitsTerminalCapabilitiesMessage);
         yield return new TestCase("Program_ModeReport_RefinesTerminalCapabilities", ModeReport_RefinesTerminalCapabilities);
         yield return new TestCase("Program_ResizeLoop_EmitsWindowSizeChanges", ResizeLoop_EmitsWindowSizeChanges);
@@ -116,6 +118,54 @@ internal static class ProgramRuntimeTests
 
         // Assert
         TestAssert.True(runTask.IsCompletedSuccessfully, "Program should stop after second QuitMsg.");
+    }
+
+    private static async Task CommandException_WithCatch_EmitsCommandErrorMsg()
+    {
+        // Arrange
+        var model = new CommandErrorCaptureModel();
+        var program = new TeaProgram(model, new ProgramOptions
+        {
+            DisableRenderer = true,
+            DisableInput = true,
+            Terminal = new FakeTerminalAdapter(),
+            CatchCommandExceptions = true,
+        });
+
+        // Act
+        await program.RunAsync();
+
+        // Assert
+        TestAssert.True(model.CapturedError is InvalidOperationException, "CommandErrorMsg should capture command exception.");
+        TestAssert.True(
+            string.Equals(model.CapturedError?.Message, CommandFaultModel.FailureMessage, StringComparison.Ordinal),
+            "Captured command exception message should match source failure.");
+    }
+
+    private static async Task CommandException_WithoutCatch_Propagates()
+    {
+        // Arrange
+        var model = new CommandFaultModel();
+        var program = new TeaProgram(model, new ProgramOptions
+        {
+            DisableRenderer = true,
+            DisableInput = true,
+            Terminal = new FakeTerminalAdapter(),
+            CatchCommandExceptions = false,
+        });
+
+        // Act / Assert
+        try
+        {
+            await program.RunAsync();
+            throw new InvalidOperationException("Expected command exception to propagate.");
+        }
+        catch (InvalidOperationException ex)
+        {
+            TestAssert.True(
+                string.Equals(ex.Message, CommandFaultModel.FailureMessage, StringComparison.Ordinal),
+                $"Unexpected propagated exception message: {ex.Message}");
+        }
     }
 
     private static async Task ResizeLoop_EmitsWindowSizeChanges()

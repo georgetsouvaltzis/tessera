@@ -1,5 +1,6 @@
 using System.Threading.Channels;
 using System.Runtime.InteropServices;
+using System.Runtime.ExceptionServices;
 using TeaSharp.Core.Abstractions;
 using TeaSharp.Core.Input;
 using TeaSharp.Core.Messages;
@@ -21,6 +22,7 @@ public sealed class TeaProgram
     private CancellationTokenSource? _cts;
     private bool _running;
     private TerminalCapabilityProfile _runtimeCapabilities = TerminalCapabilityProfile.AllSupported;
+    private ExceptionDispatchInfo? _unhandledCommandException;
 
     public TeaProgram(IModel initialModel, ProgramOptions? options = null)
     {
@@ -55,6 +57,7 @@ public sealed class TeaProgram
 
             _running = true;
             _cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+            _unhandledCommandException = null;
         }
 
         var token = _cts.Token;
@@ -116,6 +119,12 @@ public sealed class TeaProgram
 
                     if (filtered is InterruptMsg)
                     {
+                        var unhandledCommandException = Interlocked.Exchange(ref _unhandledCommandException, null);
+                        if (unhandledCommandException is not null)
+                        {
+                            unhandledCommandException.Throw();
+                        }
+
                         throw new TeaProgramInterruptedException();
                     }
 
@@ -324,9 +333,23 @@ public sealed class TeaProgram
                 Send(message);
             }
         }
-        catch (Exception ex) when (_options.CatchCommandExceptions)
+        catch (OperationCanceledException) when (token.IsCancellationRequested)
         {
-            Send(new CommandErrorMsg(ex));
+            // ignored: command canceled during shutdown.
+        }
+        catch (Exception ex)
+        {
+            if (_options.CatchCommandExceptions)
+            {
+                Send(new CommandErrorMsg(ex));
+                return;
+            }
+
+            _ = Interlocked.CompareExchange(
+                ref _unhandledCommandException,
+                ExceptionDispatchInfo.Capture(ex),
+                comparand: null);
+            Send(new InterruptMsg());
         }
     }
 

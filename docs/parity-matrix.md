@@ -24,7 +24,7 @@ Legend: `done` = implemented, `partial` = usable but incomplete, `todo` = not im
 | Batch commands | `tea.Batch` | done | Concurrent scheduling via command loop. |
 | Sequence commands | `tea.Sequence` | done | Serial execution path implemented. |
 | Timers | `Tick / Every` | done | Supported in `Commands`. |
-| Command error handling | panic/error propagation policy | partial | Optional exception wrapping via `CommandErrorMsg`; no panic/recover policy parity yet. |
+| Command error handling | panic/error propagation policy | partial | `CatchCommandExceptions=true` wraps failures into `CommandErrorMsg`; `CatchCommandExceptions=false` now propagates command exceptions deterministically to the main run loop. Full panic/recover parity is still pending. |
 
 ## Input/Terminal Protocol
 

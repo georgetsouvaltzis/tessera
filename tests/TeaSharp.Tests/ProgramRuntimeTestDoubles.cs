@@ -71,6 +71,39 @@ internal sealed class BatchModel : IModel
     public ModelView View() => ModelView.From("batch");
 }
 
+internal sealed class CommandErrorCaptureModel : IModel
+{
+    private const string CommandFailureMessage = "command-failure-for-tests";
+
+    public Exception? CapturedError { get; private set; }
+
+    public Command? Init() => _ => throw new InvalidOperationException(CommandFailureMessage);
+
+    public UpdateResult Update(IMessage message)
+    {
+        if (message is CommandErrorMsg error)
+        {
+            CapturedError = error.Exception;
+            return new UpdateResult(this, Commands.Quit);
+        }
+
+        return new UpdateResult(this, null);
+    }
+
+    public ModelView View() => ModelView.From("command-error-capture");
+}
+
+internal sealed class CommandFaultModel : IModel
+{
+    public const string FailureMessage = "command-failure-for-tests";
+
+    public Command? Init() => _ => throw new InvalidOperationException(FailureMessage);
+
+    public UpdateResult Update(IMessage message) => new(this, null);
+
+    public ModelView View() => ModelView.From("command-fault");
+}
+
 internal sealed class ResizeTrackingModel : IModel
 {
     public List<(int W, int H)> Seen { get; } = [];
