@@ -80,8 +80,8 @@ Showcase routes keyboard to one focused pane at a time. Use `tab` to move focus 
 Workspace pages have explicit input modes:
 - `nav`: safe navigation mode (no single-letter side effects)
 - `cmd`: command/hotkey mode
-Press `:` to enter `cmd` mode while keeping current focus so pane hotkeys remain usable. Press `:` again to focus command input. Press `esc` to return to `nav` mode.
-Hotkeys in showcase `cmd` mode (with showcase pane focused): `t` toast, `m` modal, `a` accordion, `z` checklist, `r` theme, `f` density, `c` table column, `v` table sort, `[`/`]` table page, `p`/`P` pane cycle.
+Press `:` to enter `cmd` mode and focus command input immediately. Press `esc` to return to `nav` mode and restore prior non-command focus.
+Showcase pane hotkeys are available when showcase pane focus is active (including `nav` mode): `t` toast, `m` modal, `a` accordion, `z` checklist, `r` theme, `f` density, `c` table column, `v` table sort, `[`/`]` table page, `p`/`P` pane cycle.
 The dashboard composes chart components through `ComponentComposer` and uses stateful models from `TeaSharp.Widgets`.
 
 ## Custom Components

@@ -55,14 +55,13 @@ public sealed class DecoderDrivenWorkspaceUxTests
     }
 
     [Test]
-    public async Task UppercaseP_FromUtf8AndCsiU_CyclesPaneBackward()
+    public async Task UppercaseP_FromUtf8AndCsiU_CyclesPaneBackwardFromShowcaseFocus()
     {
         await using var terminal = new ConsoleTerminalAdapter();
         var model = new CounterModel(terminal);
 
         ApplyDecoded(model, "3");
         ApplyDecoded(model, "\t");
-        ApplyDecoded(model, "\u001b[58;2u");
         var before = ShowcasePaneToken(model.View().Content);
 
         ApplyDecoded(model, "P");
@@ -75,19 +74,13 @@ public sealed class DecoderDrivenWorkspaceUxTests
     }
 
     [Test]
-    public async Task CommandModeAndShowcaseFocus_EnableTAndMHotkeys_FromDecodedBytes()
+    public async Task ShowcaseFocus_EnableTAndMHotkeys_FromDecodedBytes()
     {
         await using var terminal = new ConsoleTerminalAdapter();
         var model = new CounterModel(terminal);
 
         ApplyDecoded(model, "3");
         ApplyDecoded(model, "\t");
-        ApplyDecoded(model, "t");
-        ApplyDecoded(model, "m");
-        Assert.That(ToastCount(model), Is.EqualTo(0));
-        Assert.That(Modal(model).Visible, Is.False);
-
-        ApplyDecoded(model, "\u001b[58;2u");
         ApplyDecoded(model, "t");
         ApplyDecoded(model, "m");
         Assert.That(ToastCount(model), Is.EqualTo(1));

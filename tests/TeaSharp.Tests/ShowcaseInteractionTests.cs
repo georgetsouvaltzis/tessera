@@ -9,7 +9,7 @@ internal static class ShowcaseInteractionTests
 {
     public static IEnumerable<TestCase> Cases()
     {
-        yield return new TestCase("Showcase_Colon_EntersCommandMode", Colon_EntersCommandMode);
+        yield return new TestCase("Showcase_Colon_EntersCommandModeAndFocusesInput", Colon_EntersCommandModeAndFocusesInput);
         yield return new TestCase("Showcase_ShiftSemicolon_EntersCommandMode", ShiftSemicolon_EntersCommandMode);
         yield return new TestCase("Showcase_ColonTwice_FocusesCommandInput", ColonTwice_FocusesCommandInput);
         yield return new TestCase("Showcase_Escape_ExitsCommandMode", Escape_ExitsCommandMode);
@@ -21,7 +21,7 @@ internal static class ShowcaseInteractionTests
         yield return new TestCase("Showcase_UnhandledKeyInShowcaseFocus_DoesNotTypeCommandInput", UnhandledKeyInShowcaseFocus_DoesNotTypeCommandInput);
     }
 
-    private static async Task Colon_EntersCommandMode()
+    private static async Task Colon_EntersCommandModeAndFocusesInput()
     {
         // Arrange
         await using var terminal = new ConsoleTerminalAdapter();
@@ -34,7 +34,7 @@ internal static class ShowcaseInteractionTests
 
         // Assert
         TestAssert.True(view.Contains("mode=cmd", StringComparison.Ordinal), "Colon should enter command mode.");
-        TestAssert.True(view.Contains("focus=actions", StringComparison.Ordinal), "Single colon should keep current focus.");
+        TestAssert.True(view.Contains("focus=command", StringComparison.Ordinal), "Single colon should focus command input.");
     }
 
     private static async Task Escape_ExitsCommandMode()

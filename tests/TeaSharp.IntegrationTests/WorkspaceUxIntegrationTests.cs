@@ -11,7 +11,7 @@ namespace TeaSharp.IntegrationTests;
 public sealed class WorkspaceUxIntegrationTests
 {
     [Test]
-    public async Task ColonEntersCommandModeWithoutChangingFocus()
+    public async Task ColonEntersCommandModeAndFocusesCommandInput()
     {
         await using var terminal = new ConsoleTerminalAdapter();
         var model = new CounterModel(terminal);
@@ -21,11 +21,11 @@ public sealed class WorkspaceUxIntegrationTests
 
         var view = model.View().Content;
         Assert.That(view, Does.Contain("mode=cmd"));
-        Assert.That(view, Does.Contain("focus=actions"));
+        Assert.That(view, Does.Contain("focus=command"));
     }
 
     [Test]
-    public async Task ColonTwiceFocusesCommandInput()
+    public async Task ColonTwiceKeepsCommandInputFocus()
     {
         await using var terminal = new ConsoleTerminalAdapter();
         var model = new CounterModel(terminal);
@@ -89,21 +89,14 @@ public sealed class WorkspaceUxIntegrationTests
     }
 
     [Test]
-    public async Task ShowcaseHotkeys_ModifyToastAndModalOnlyInCommandMode()
+    public async Task ShowcaseHotkeys_ModifyToastAndModalInNavigateMode()
     {
         await using var terminal = new ConsoleTerminalAdapter();
         var model = new CounterModel(terminal);
         GoToShowcase(model);
         FocusShowcasePane(model);
 
-        // nav mode: no single-letter side effects
-        PressPlain(model, "t");
-        PressPlain(model, "m");
-        Assert.That(ToastCount(model), Is.EqualTo(0));
-        Assert.That(Modal(model).Visible, Is.False);
-
-        // command mode + showcase focus: hotkeys active
-        PressPlain(model, ":");
+        // nav mode: showcase hotkeys are active while showcase pane is focused.
         PressPlain(model, "t");
         PressPlain(model, "m");
 

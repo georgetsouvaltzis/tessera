@@ -108,9 +108,9 @@ public sealed class TeaProgram
 
                     if (filtered is QuitMsg)
                     {
-                        await ShutdownAsync(kill: false, token).ConfigureAwait(false);
                         _cts?.Cancel();
                         await AwaitBackgroundLoops(commandLoop, inputLoop, resizeLoop).ConfigureAwait(false);
+                        await ShutdownAsync(kill: false, CancellationToken.None).ConfigureAwait(false);
                         return Model;
                     }
 
@@ -163,9 +163,9 @@ public sealed class TeaProgram
                 }
             }
 
-            await ShutdownAsync(kill: false, token).ConfigureAwait(false);
             _cts?.Cancel();
             await AwaitBackgroundLoops(commandLoop, inputLoop, resizeLoop).ConfigureAwait(false);
+            await ShutdownAsync(kill: false, CancellationToken.None).ConfigureAwait(false);
             return Model;
         }
         finally

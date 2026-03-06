@@ -13,11 +13,36 @@ public sealed class TerminalReader(Stream input, EventDecoder decoder, TimeSpan 
         var pending = new PendingByteBuffer(DefaultReadBufferSize);
         var readBuffer = new byte[DefaultReadBufferSize];
         var state = new PasteState();
+        var readTask = input.ReadAsync(readBuffer.AsMemory(0, readBuffer.Length), cancellationToken).AsTask();
 
         while (!cancellationToken.IsCancellationRequested)
         {
-            var read = await input.ReadAsync(readBuffer.AsMemory(0, readBuffer.Length), cancellationToken)
-                .ConfigureAwait(false);
+            if (pending.Count > 0)
+            {
+                var completed = await Task.WhenAny(
+                        readTask,
+                        Task.Delay(escapeTimeout, cancellationToken))
+                    .ConfigureAwait(false);
+                if (!ReferenceEquals(completed, readTask))
+                {
+                    Drain(pending, onEvent, state, timeoutExpired: true);
+                    continue;
+                }
+            }
+
+            int read;
+            try
+            {
+                read = await readTask.WaitAsync(cancellationToken).ConfigureAwait(false);
+            }
+            catch (OperationCanceledException)
+            {
+                break;
+            }
+            catch (ObjectDisposedException)
+            {
+                break;
+            }
 
             if (read <= 0)
             {
@@ -26,6 +51,7 @@ public sealed class TerminalReader(Stream input, EventDecoder decoder, TimeSpan 
 
             pending.Append(readBuffer.AsSpan(0, read));
             Drain(pending, onEvent, state, timeoutExpired: false);
+            readTask = input.ReadAsync(readBuffer.AsMemory(0, readBuffer.Length), cancellationToken).AsTask();
         }
 
         if (pending.Count > 0)

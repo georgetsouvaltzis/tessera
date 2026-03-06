@@ -149,12 +149,29 @@ public sealed class ConsoleTerminalAdapter : ITerminalAdapter
 
         if (_ownsInput)
         {
-            await Input.DisposeAsync().ConfigureAwait(false);
+            await TryDisposeOwnedStreamAsync(Input).ConfigureAwait(false);
         }
 
         if (_ownsOutput && !ReferenceEquals(Output, Input))
         {
-            await Output.DisposeAsync().ConfigureAwait(false);
+            await TryDisposeOwnedStreamAsync(Output).ConfigureAwait(false);
+        }
+    }
+
+    private static async Task TryDisposeOwnedStreamAsync(Stream stream)
+    {
+        try
+        {
+            var disposeTask = stream.DisposeAsync().AsTask();
+            var completed = await Task.WhenAny(disposeTask, Task.Delay(120)).ConfigureAwait(false);
+            if (ReferenceEquals(completed, disposeTask))
+            {
+                await disposeTask.ConfigureAwait(false);
+            }
+        }
+        catch
+        {
+            // ignored: best-effort cleanup on process shutdown
         }
     }
 

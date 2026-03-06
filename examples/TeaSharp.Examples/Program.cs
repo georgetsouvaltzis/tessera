@@ -246,7 +246,7 @@ internal sealed class CounterModel : IModel
     {
         if (message is KeyPressMsg key)
         {
-            if (key.Code == KeyCode.Escape)
+            if (IsEscapeKey(key))
             {
                 _lastEscapePress = DateTimeOffset.UtcNow;
             }
@@ -263,7 +263,7 @@ internal sealed class CounterModel : IModel
                 return new UpdateResult(this, null);
             }
 
-            if (IsWorkspacePage && key.Code == KeyCode.Escape)
+            if (IsWorkspacePage && IsEscapeKey(key))
             {
                 if (_workspaceInputMode == WorkspaceInputMode.Command)
                 {
@@ -556,7 +556,6 @@ internal sealed class CounterModel : IModel
 
         if (_page == AppPage.Showcase
             && _focus == WorkspaceFocus.Showcase
-            && _workspaceInputMode == WorkspaceInputMode.Command
             && HandleShowcaseHotKey(key))
         {
             return new UpdateResult(this, null);
@@ -682,32 +681,21 @@ internal sealed class CounterModel : IModel
             && !key.Modifiers.HasFlag(KeyModifiers.Meta);
     }
 
+    private static bool IsEscapeKey(KeyPressMsg key)
+    {
+        return key.Code == KeyCode.Escape
+            || (key.Code == KeyCode.Character
+                && string.Equals(key.Text, "\u001b", StringComparison.Ordinal));
+    }
+
     private void EnterCommandMode()
     {
-        if (_workspaceInputMode == WorkspaceInputMode.Navigate)
+        if (_focus != WorkspaceFocus.Command)
         {
-            if (_focus != WorkspaceFocus.Command)
-            {
-                _focusBeforeCommand = _focus;
-            }
-
-            _workspaceInputMode = WorkspaceInputMode.Command;
-            _lastEvent = $"mode: {ShowcaseModeLabel()}";
-            AppendLog(_lastEvent);
-            if (_page == AppPage.Showcase)
-            {
-                CaptureShowcaseSnapshot(_lastEvent);
-            }
-
-            return;
+            _focusBeforeCommand = _focus;
         }
 
-        if (_focus == WorkspaceFocus.Command)
-        {
-            return;
-        }
-
-        _focusBeforeCommand = _focus;
+        _workspaceInputMode = WorkspaceInputMode.Command;
         _focus = WorkspaceFocus.Command;
         _lastEvent = "mode: cmd-input";
         AppendLog(_lastEvent);

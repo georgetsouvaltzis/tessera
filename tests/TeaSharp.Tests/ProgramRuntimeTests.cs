@@ -19,6 +19,7 @@ internal static class ProgramRuntimeTests
         yield return new TestCase("Program_ModeReport_RefinesTerminalCapabilities", ModeReport_RefinesTerminalCapabilities);
         yield return new TestCase("Program_ResizeLoop_EmitsWindowSizeChanges", ResizeLoop_EmitsWindowSizeChanges);
         yield return new TestCase("Program_ResizeSignal_EmitsWindowSizeChanges", ResizeSignal_EmitsWindowSizeChanges);
+        yield return new TestCase("Program_QuitFromInput_CancelsBeforeTerminalDispose", QuitFromInput_CancelsBeforeTerminalDispose);
     }
 
     private static async Task InitQuitCommand_ExitsProgram()
@@ -229,6 +230,25 @@ internal static class ProgramRuntimeTests
         TestAssert.True(
             model.Seen[0] == (80, 24) && model.Seen[1] == (101, 41),
             $"Unexpected resize sequence: {string.Join(", ", model.Seen.Select(size => $"{size.W}x{size.H}"))}");
+    }
+
+    private static async Task QuitFromInput_CancelsBeforeTerminalDispose()
+    {
+        // Arrange
+        var terminal = new DisposeOrderingTerminalAdapter();
+        var model = new QuitOnQModel();
+        var program = new TeaProgram(model, new ProgramOptions
+        {
+            DisableRenderer = true,
+            Terminal = terminal,
+            EscapeTimeout = TimeSpan.FromMilliseconds(10),
+        });
+
+        // Act
+        await program.RunAsync().WaitAsync(TimeSpan.FromSeconds(1));
+
+        // Assert
+        TestAssert.True(terminal.DisposeObservedCancellation, "Program should cancel input processing before terminal dispose.");
     }
 
     private static TeaProgram NewProgram(IModel model) =>

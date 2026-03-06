@@ -139,6 +139,131 @@ internal sealed class CapabilityRefinementModel : IModel
 
 internal sealed record NumberMsg(int Value) : IMessage;
 
+internal sealed class QuitOnQModel : IModel
+{
+    public Command? Init() => null;
+
+    public UpdateResult Update(IMessage message)
+    {
+        if (message is KeyPressMsg key
+            && key.Code == KeyCode.Character
+            && string.Equals(key.Text, "q", StringComparison.Ordinal))
+        {
+            return new UpdateResult(this, Commands.Quit);
+        }
+
+        return new UpdateResult(this, null);
+    }
+
+    public ModelView View() => ModelView.From("quit-on-q");
+}
+
+internal sealed class DisposeOrderingTerminalAdapter : ITerminalAdapter
+{
+    private readonly CancelAwareInputStream _input = new();
+
+    public Stream Input => _input;
+
+    public Stream Output { get; } = new MemoryStream();
+
+    public bool IsInputInteractive => true;
+
+    public bool IsOutputInteractive => false;
+
+    public bool DisposeObservedCancellation { get; private set; }
+
+    public ValueTask PrepareAsync(CancellationToken cancellationToken)
+    {
+        _ = cancellationToken;
+        return ValueTask.CompletedTask;
+    }
+
+    public ValueTask RestoreAsync(CancellationToken cancellationToken)
+    {
+        _ = cancellationToken;
+        return ValueTask.CompletedTask;
+    }
+
+    public ValueTask<TerminalSize> GetSizeAsync(CancellationToken cancellationToken)
+    {
+        _ = cancellationToken;
+        return ValueTask.FromResult(new TerminalSize(80, 24));
+    }
+
+    public ValueTask DisposeAsync()
+    {
+        DisposeObservedCancellation = _input.CancellationObserved;
+        if (!DisposeObservedCancellation)
+        {
+            throw new InvalidOperationException("Terminal disposed before input cancellation was observed.");
+        }
+
+        return ValueTask.CompletedTask;
+    }
+
+    private sealed class CancelAwareInputStream : Stream
+    {
+        private int _readCount;
+        public bool CancellationObserved { get; private set; }
+
+        public override bool CanRead => true;
+
+        public override bool CanSeek => false;
+
+        public override bool CanWrite => false;
+
+        public override long Length => throw new NotSupportedException();
+
+        public override long Position
+        {
+            get => throw new NotSupportedException();
+            set => throw new NotSupportedException();
+        }
+
+        public override int Read(byte[] buffer, int offset, int count)
+        {
+            throw new NotSupportedException();
+        }
+
+        public override ValueTask<int> ReadAsync(Memory<byte> buffer, CancellationToken cancellationToken = default)
+        {
+            if (_readCount == 0)
+            {
+                _readCount++;
+                buffer.Span[0] = (byte)'q';
+                return ValueTask.FromResult(1);
+            }
+
+            var completion = new TaskCompletionSource<int>(TaskCreationOptions.RunContinuationsAsynchronously);
+            cancellationToken.Register(() =>
+            {
+                CancellationObserved = true;
+                completion.TrySetCanceled(cancellationToken);
+            });
+            return new ValueTask<int>(completion.Task);
+        }
+
+        public override void Flush()
+        {
+        }
+
+        public override long Seek(long offset, SeekOrigin origin)
+        {
+            throw new NotSupportedException();
+        }
+
+        public override void SetLength(long value)
+        {
+            throw new NotSupportedException();
+        }
+
+        public override void Write(byte[] buffer, int offset, int count)
+        {
+            throw new NotSupportedException();
+        }
+    }
+}
+
 internal sealed class FakeTerminalAdapter : ITerminalAdapter
 {
     public Stream Input { get; } = new MemoryStream();
