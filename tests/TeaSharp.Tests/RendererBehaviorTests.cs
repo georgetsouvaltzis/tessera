@@ -18,6 +18,9 @@ internal static class RendererBehaviorTests
         yield return new TestCase("Renderer_ModeReportsDisabled_SkipsModeQueries", ModeReportsDisabled_SkipsModeQueries);
         yield return new TestCase("Renderer_SynchronizedUpdates_WrapFrameOutput", SynchronizedUpdates_WrapFrameOutput);
         yield return new TestCase("Renderer_SynchronizedUpdates_Disabled_DoesNotWrapFrameOutput", SynchronizedUpdates_Disabled_DoesNotWrapFrameOutput);
+        yield return new TestCase("Renderer_CursorStyle_EmitsDecscusrWhenCursorVisible", CursorStyle_EmitsDecscusrWhenCursorVisible);
+        yield return new TestCase("Renderer_CursorStyle_Unchanged_DoesNotRepeatSequence", CursorStyle_Unchanged_DoesNotRepeatSequence);
+        yield return new TestCase("Renderer_Reset_RestoresDefaultCursorStyle", Reset_RestoresDefaultCursorStyle);
         yield return new TestCase("Renderer_CellDiff_UpdatesOnlyChangedCellRun", CellDiff_UpdatesOnlyChangedCellRun);
         yield return new TestCase("Renderer_CellDiff_ClearsShortenedLineTail", CellDiff_ClearsShortenedLineTail);
         yield return new TestCase("Renderer_Resize_ClipsToWidth", Resize_ClipsToWidth);
@@ -226,6 +229,76 @@ internal static class RendererBehaviorTests
         // Assert
         AssertDoesNotContain(rendered, "\u001b[?2026h");
         AssertDoesNotContain(rendered, "\u001b[?2026l");
+    }
+
+    private static async Task CursorStyle_EmitsDecscusrWhenCursorVisible()
+    {
+        // Arrange
+        await using var renderer = new AnsiDiffRenderer();
+        await using var output = new MemoryStream();
+        await renderer.InitializeAsync(output, CancellationToken.None);
+
+        // Act
+        renderer.Render(View.From("cursor") with
+        {
+            CursorX = 2,
+            CursorY = 1,
+            CursorStyle = CursorStyle.SteadyBar,
+        });
+        await renderer.FlushAsync(CancellationToken.None);
+        var rendered = ReadUtf8(output);
+
+        // Assert
+        AssertContains(rendered, "\u001b[6 q");
+        AssertContains(rendered, "\u001b[?25h");
+        AssertContains(rendered, "\u001b[2;3H");
+    }
+
+    private static async Task CursorStyle_Unchanged_DoesNotRepeatSequence()
+    {
+        // Arrange
+        await using var renderer = new AnsiDiffRenderer();
+        await using var output = new MemoryStream();
+        await renderer.InitializeAsync(output, CancellationToken.None);
+
+        // Act
+        var view = View.From("cursor") with
+        {
+            CursorX = 0,
+            CursorY = 0,
+            CursorStyle = CursorStyle.BlinkingUnderline,
+        };
+        renderer.Render(view);
+        await renderer.FlushAsync(CancellationToken.None);
+        renderer.Render(view with { Content = "cursor2" });
+        await renderer.FlushAsync(CancellationToken.None);
+        var rendered = ReadUtf8(output);
+
+        // Assert
+        AssertCount(rendered, "\u001b[3 q", 1);
+    }
+
+    private static async Task Reset_RestoresDefaultCursorStyle()
+    {
+        // Arrange
+        await using var renderer = new AnsiDiffRenderer();
+        await using var output = new MemoryStream();
+        await renderer.InitializeAsync(output, CancellationToken.None);
+        renderer.Render(View.From("cursor") with
+        {
+            CursorX = 0,
+            CursorY = 0,
+            CursorStyle = CursorStyle.SteadyUnderline,
+        });
+        await renderer.FlushAsync(CancellationToken.None);
+
+        // Act
+        await renderer.ResetAsync(CancellationToken.None);
+        var rendered = ReadUtf8(output);
+
+        // Assert
+        AssertContains(rendered, "\u001b[4 q");
+        AssertContains(rendered, "\u001b[0 q");
     }
 
     private static async Task CellDiff_UpdatesOnlyChangedCellRun()

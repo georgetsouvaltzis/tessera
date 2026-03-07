@@ -22,6 +22,16 @@ public enum MouseMode
     AllMotion = 2,
 }
 
+public enum CursorStyle
+{
+    BlinkingBlock = 1,
+    SteadyBlock = 2,
+    BlinkingUnderline = 3,
+    SteadyUnderline = 4,
+    BlinkingBar = 5,
+    SteadyBar = 6,
+}
+
 public readonly record struct View(string Content)
 {
     public bool AltScreen { get; init; }
@@ -31,6 +41,7 @@ public readonly record struct View(string Content)
     public MouseMode MouseMode { get; init; }
     public int? CursorX { get; init; }
     public int? CursorY { get; init; }
+    public CursorStyle? CursorStyle { get; init; }
     public string? WindowTitle { get; init; }
 
     public static View From(string content) => new(content);

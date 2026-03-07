@@ -17,6 +17,7 @@ public sealed class AnsiDiffRenderer : IProgramRenderer
     private bool _bracketedPaste;
     private bool _focusReporting;
     private MouseMode _mouseMode;
+    private CursorStyle? _cursorStyle;
     private readonly HashSet<int> _queriedModes = [];
     private string? _windowTitle;
     private int _width;
@@ -43,6 +44,7 @@ public sealed class AnsiDiffRenderer : IProgramRenderer
         _bracketedPaste = false;
         _focusReporting = false;
         _mouseMode = MouseMode.None;
+        _cursorStyle = null;
         _queriedModes.Clear();
         _windowTitle = null;
         _width = 0;
@@ -148,6 +150,13 @@ public sealed class AnsiDiffRenderer : IProgramRenderer
 
         if (_currentView.CursorX is int x && _currentView.CursorY is int y)
         {
+            if (_currentView.CursorStyle is CursorStyle requestedCursorStyle
+                && requestedCursorStyle != _cursorStyle)
+            {
+                await WriteCursorStyleAsync(requestedCursorStyle).ConfigureAwait(false);
+                _cursorStyle = requestedCursorStyle;
+            }
+
             await _writer.WriteAsync("\u001b[?25h").ConfigureAwait(false);
             await _writer.WriteAsync($"\u001b[{y + 1};{x + 1}H").ConfigureAwait(false);
         }
@@ -181,6 +190,12 @@ public sealed class AnsiDiffRenderer : IProgramRenderer
         }
 
         await _writer.WriteAsync("\u001b[0m\u001b[?25h").ConfigureAwait(false);
+        if (_cursorStyle is not null)
+        {
+            await _writer.WriteAsync("\u001b[0 q").ConfigureAwait(false);
+            _cursorStyle = null;
+        }
+
         if (_bracketedPaste)
         {
             await _writer.WriteAsync("\u001b[?2004l").ConfigureAwait(false);
@@ -355,6 +370,27 @@ public sealed class AnsiDiffRenderer : IProgramRenderer
             MouseMode.AllMotion => _writer.WriteAsync("\u001b[?1000h\u001b[?1002l\u001b[?1003h\u001b[?1006h"),
             _ => _writer.WriteAsync("\u001b[?1000l\u001b[?1002l\u001b[?1003l\u001b[?1006l"),
         };
+    }
+
+    private Task WriteCursorStyleAsync(CursorStyle style)
+    {
+        if (_writer is null)
+        {
+            return Task.CompletedTask;
+        }
+
+        var parameter = style switch
+        {
+            CursorStyle.BlinkingBlock => 1,
+            CursorStyle.SteadyBlock => 2,
+            CursorStyle.BlinkingUnderline => 3,
+            CursorStyle.SteadyUnderline => 4,
+            CursorStyle.BlinkingBar => 5,
+            CursorStyle.SteadyBar => 6,
+            _ => 0,
+        };
+
+        return _writer.WriteAsync($"\u001b[{parameter} q");
     }
 
     private Task QueryModeReportOnceAsync(int mode)
