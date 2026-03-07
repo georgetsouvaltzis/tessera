@@ -38,7 +38,7 @@ Legend: `done` = implemented, `partial` = usable but incomplete, `todo` = not im
 | Bracketed paste protocol | start/end/content handling | done | Start/end decode and aggregated `PasteMsg` content are implemented. |
 | Mouse protocol | X10/SGR mouse messages | partial | SGR 1006 + X10 decode implemented with base `MouseMsg` plus typed variants (`MouseClickMsg`, `MouseReleaseMsg`, `MouseMotionMsg`, `MouseWheelMsg`), including extended button mapping through `MouseButton.Button24` and compatibility fixtures for higher-button press/drag paths; richer terminal-specific edge cases remain. |
 | Focus reporting | focus in/out messages | done | CSI focus in/out decode + render-mode toggle implemented. |
-| Resize updates | runtime terminal resize events | partial | Initial size + CSI parser support, Unix `SIGWINCH`-assisted checks with polling fallback, and Windows console-input resize signal registration (`WINDOW_BUFFER_SIZE_EVENT`) are implemented; polling remains as best-effort fallback. |
+| Resize updates | runtime terminal resize events | partial | Initial size + CSI parser support, Unix `SIGWINCH`-assisted checks with polling fallback, and Windows console-input resize signal registration (`WINDOW_BUFFER_SIZE_EVENT`) are implemented; signal registration now respects `EnableResizeSignals` and safely falls back to polling if registration fails. |
 
 ## Rendering
 

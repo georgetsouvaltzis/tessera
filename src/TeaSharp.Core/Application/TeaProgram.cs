@@ -297,13 +297,24 @@ public sealed class TeaProgram
 
     private IDisposable? TryRegisterResizeSignal(Action onResize)
     {
-        if (_options.ResizeSignalRegistrationFactory is not null)
+        if (!_options.EnableResizeSignals)
         {
-            return _options.ResizeSignalRegistrationFactory(onResize);
+            return null;
         }
 
-        if (_options.EnableResizeSignals
-            && _terminal is ConsoleTerminalAdapter consoleTerminal)
+        if (_options.ResizeSignalRegistrationFactory is not null)
+        {
+            try
+            {
+                return _options.ResizeSignalRegistrationFactory(onResize);
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
+        if (_terminal is ConsoleTerminalAdapter consoleTerminal)
         {
             var windowsRegistration = consoleTerminal.TryRegisterResizeSignal(onResize);
             if (windowsRegistration is not null)
@@ -312,7 +323,7 @@ public sealed class TeaProgram
             }
         }
 
-        if (!_options.EnableResizeSignals || !(OperatingSystem.IsLinux() || OperatingSystem.IsMacOS()))
+        if (!(OperatingSystem.IsLinux() || OperatingSystem.IsMacOS()))
         {
             return null;
         }

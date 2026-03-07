@@ -25,6 +25,8 @@ internal static class ProgramRuntimeTests
         yield return new TestCase("Program_ModeReport_RefinesTerminalCapabilities", ModeReport_RefinesTerminalCapabilities);
         yield return new TestCase("Program_ModeReport_UnknownStateDisablesCapability", ModeReport_UnknownStateDisablesCapability);
         yield return new TestCase("Program_ResizeLoop_EmitsWindowSizeChanges", ResizeLoop_EmitsWindowSizeChanges);
+        yield return new TestCase("Program_ResizeSignalsDisabled_SkipsSignalRegistration", ResizeSignalsDisabled_SkipsSignalRegistration);
+        yield return new TestCase("Program_ResizeSignalFactoryFailure_FallsBackToPolling", ResizeSignalFactoryFailure_FallsBackToPolling);
         yield return new TestCase("Program_ResizeSignal_EmitsWindowSizeChanges", ResizeSignal_EmitsWindowSizeChanges);
         yield return new TestCase("Program_QuitFromInput_CancelsBeforeTerminalDispose", QuitFromInput_CancelsBeforeTerminalDispose);
     }
@@ -473,6 +475,56 @@ internal static class ProgramRuntimeTests
         TestAssert.True(
             model.Seen[0] == (80, 24) && model.Seen[1] == (101, 41),
             $"Unexpected resize sequence: {string.Join(", ", model.Seen.Select(size => $"{size.W}x{size.H}"))}");
+    }
+
+    private static async Task ResizeSignalsDisabled_SkipsSignalRegistration()
+    {
+        // Arrange
+        var terminal = new ResizingFakeTerminal();
+        var model = new ResizeTrackingModel();
+        var registrationCalls = 0;
+        var program = new TeaProgram(model, new ProgramOptions
+        {
+            DisableRenderer = true,
+            DisableInput = true,
+            Terminal = terminal,
+            EnableResizeSignals = false,
+            ResizePollInterval = TimeSpan.FromMilliseconds(10),
+            ResizeSignalRegistrationFactory = _ =>
+            {
+                registrationCalls++;
+                return new DelegateDisposable(() => { });
+            },
+        });
+
+        // Act
+        await program.RunAsync();
+
+        // Assert
+        TestAssert.Equal(0, registrationCalls, "Signal registration should be skipped when resize signals are disabled.");
+        TestAssert.True(model.Seen.Count >= 2, "Polling fallback should still emit resize updates.");
+    }
+
+    private static async Task ResizeSignalFactoryFailure_FallsBackToPolling()
+    {
+        // Arrange
+        var terminal = new ResizingFakeTerminal();
+        var model = new ResizeTrackingModel();
+        var program = new TeaProgram(model, new ProgramOptions
+        {
+            DisableRenderer = true,
+            DisableInput = true,
+            Terminal = terminal,
+            EnableResizeSignals = true,
+            ResizePollInterval = TimeSpan.FromMilliseconds(10),
+            ResizeSignalRegistrationFactory = _ => throw new InvalidOperationException("boom"),
+        });
+
+        // Act
+        await program.RunAsync();
+
+        // Assert
+        TestAssert.True(model.Seen.Count >= 2, "Resize polling should continue if signal registration throws.");
     }
 
     private static async Task QuitFromInput_CancelsBeforeTerminalDispose()
