@@ -203,16 +203,26 @@ internal sealed class CapabilityProbeTimeoutModel : IModel
 internal sealed class CapabilityProbeResponseModel : IModel
 {
     private readonly TimeSpan _quitDelay;
+    private readonly IReadOnlyList<ModeReportMsg> _reports;
     public List<TerminalCapabilityProfile> Seen { get; } = [];
 
-    public CapabilityProbeResponseModel(TimeSpan quitDelay)
+    public CapabilityProbeResponseModel(TimeSpan quitDelay, IReadOnlyList<ModeReportMsg> reports)
     {
         _quitDelay = quitDelay;
+        _reports = reports;
     }
 
-    public Command? Init() => Commands.Sequence(
-        Commands.FromMessage(new ModeReportMsg(2026, ModeReportState.Reset)),
-        Commands.Tick(_quitDelay, _ => new QuitMsg()));
+    public Command? Init()
+    {
+        var commands = new List<Command?>(_reports.Count + 1);
+        foreach (var report in _reports)
+        {
+            commands.Add(Commands.FromMessage(report));
+        }
+
+        commands.Add(Commands.Tick(_quitDelay, _ => new QuitMsg()));
+        return Commands.Sequence([.. commands]);
+    }
 
     public UpdateResult Update(IMessage message)
     {

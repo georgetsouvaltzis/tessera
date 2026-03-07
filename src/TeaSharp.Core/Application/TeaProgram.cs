@@ -607,23 +607,55 @@ public sealed class TeaProgram
         }
 
         var sawAnyResponse = _capabilityProbe.SawAnyResponse;
+        var unresolvedModes = _capabilityProbe.PendingModes.ToArray();
         _capabilityProbe = null;
-        if (sawAnyResponse || !_runtimeCapabilities.ModeReports)
+        if (!sawAnyResponse)
+        {
+            if (!_runtimeCapabilities.ModeReports)
+            {
+                return;
+            }
+
+            var source = _runtimeCapabilities.Source;
+            if (!source.Contains("+probe-timeout", StringComparison.Ordinal))
+            {
+                source += "+probe-timeout";
+            }
+
+            _runtimeCapabilities = _runtimeCapabilities with
+            {
+                ModeReports = false,
+                Source = source,
+            };
+            Send(new TerminalCapabilitiesMsg(_runtimeCapabilities));
+            return;
+        }
+
+        var next = _runtimeCapabilities;
+        foreach (var unresolvedMode in unresolvedModes)
+        {
+            next = unresolvedMode switch
+            {
+                1004 => next with { FocusReporting = false },
+                1006 => next with { MouseReporting = false },
+                2004 => next with { BracketedPaste = false },
+                2026 => next with { SynchronizedUpdates = false },
+                _ => next,
+            };
+        }
+
+        if (next == _runtimeCapabilities)
         {
             return;
         }
 
-        var source = _runtimeCapabilities.Source;
-        if (!source.Contains("+probe-timeout", StringComparison.Ordinal))
+        var nextSource = next.Source;
+        if (!nextSource.Contains("+probe-partial-timeout", StringComparison.Ordinal))
         {
-            source += "+probe-timeout";
+            nextSource += "+probe-partial-timeout";
         }
 
-        _runtimeCapabilities = _runtimeCapabilities with
-        {
-            ModeReports = false,
-            Source = source,
-        };
+        _runtimeCapabilities = next with { Source = nextSource };
         Send(new TerminalCapabilitiesMsg(_runtimeCapabilities));
     }
 

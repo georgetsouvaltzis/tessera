@@ -20,7 +20,8 @@ internal static class ProgramRuntimeTests
         yield return new TestCase("Program_EmitsTerminalCapabilitiesMessage", EmitsTerminalCapabilitiesMessage);
         yield return new TestCase("Program_CapabilityProbe_WritesModeQueries", CapabilityProbe_WritesModeQueries);
         yield return new TestCase("Program_CapabilityProbe_TimeoutDisablesModeReportsWhenNoResponses", CapabilityProbe_TimeoutDisablesModeReportsWhenNoResponses);
-        yield return new TestCase("Program_CapabilityProbe_ModeReportResponsePreventsTimeoutDowngrade", CapabilityProbe_ModeReportResponsePreventsTimeoutDowngrade);
+        yield return new TestCase("Program_CapabilityProbe_PartialResponseDisablesUnresolvedModes", CapabilityProbe_PartialResponseDisablesUnresolvedModes);
+        yield return new TestCase("Program_CapabilityProbe_AllResponsesPreventTimeoutFallback", CapabilityProbe_AllResponsesPreventTimeoutFallback);
         yield return new TestCase("Program_ModeReport_RefinesTerminalCapabilities", ModeReport_RefinesTerminalCapabilities);
         yield return new TestCase("Program_ResizeLoop_EmitsWindowSizeChanges", ResizeLoop_EmitsWindowSizeChanges);
         yield return new TestCase("Program_ResizeSignal_EmitsWindowSizeChanges", ResizeSignal_EmitsWindowSizeChanges);
@@ -287,11 +288,13 @@ internal static class ProgramRuntimeTests
             "Timeout-refined capabilities should annotate source with probe-timeout.");
     }
 
-    private static async Task CapabilityProbe_ModeReportResponsePreventsTimeoutDowngrade()
+    private static async Task CapabilityProbe_PartialResponseDisablesUnresolvedModes()
     {
         // Arrange
         var terminal = new InteractiveProbeTerminalAdapter();
-        var model = new CapabilityProbeResponseModel(TimeSpan.FromMilliseconds(120));
+        var model = new CapabilityProbeResponseModel(
+            TimeSpan.FromMilliseconds(140),
+            [new ModeReportMsg(2026, ModeReportState.Reset)]);
         var initial = new TerminalCapabilityProfile(
             FocusReporting: true,
             MouseReporting: true,
@@ -313,12 +316,62 @@ internal static class ProgramRuntimeTests
         await program.RunAsync().WaitAsync(TimeSpan.FromSeconds(2));
 
         // Assert
-        TestAssert.True(model.Seen.Count >= 2, "Mode report response should still refine capability profile.");
+        TestAssert.True(model.Seen.Count >= 3, "Partial probe responses should emit both mode-report and probe-timeout refinements.");
         var final = model.Seen[^1];
         TestAssert.True(final.ModeReports, "Any probe response should keep mode reports enabled.");
         TestAssert.True(
-            !final.Source.Contains("+probe-timeout", StringComparison.Ordinal),
-            "Probe timeout downgrade should be skipped after successful probe response.");
+            final.Source.Contains("+probe-partial-timeout", StringComparison.Ordinal),
+            "Partial probe timeout should annotate source.");
+        TestAssert.True(!final.FocusReporting, "Unresolved focus probe should downgrade focus reporting.");
+        TestAssert.True(!final.MouseReporting, "Unresolved mouse probe should downgrade mouse reporting.");
+        TestAssert.True(!final.BracketedPaste, "Unresolved paste probe should downgrade bracketed paste support.");
+        TestAssert.True(!final.SynchronizedUpdates, "Mode report response reset should keep synchronized updates disabled.");
+    }
+
+    private static async Task CapabilityProbe_AllResponsesPreventTimeoutFallback()
+    {
+        // Arrange
+        var terminal = new InteractiveProbeTerminalAdapter();
+        var model = new CapabilityProbeResponseModel(
+            TimeSpan.FromMilliseconds(220),
+            [
+                new ModeReportMsg(1004, ModeReportState.Set),
+                new ModeReportMsg(1006, ModeReportState.Set),
+                new ModeReportMsg(2004, ModeReportState.Set),
+                new ModeReportMsg(2026, ModeReportState.Reset),
+            ]);
+        var initial = new TerminalCapabilityProfile(
+            FocusReporting: true,
+            MouseReporting: true,
+            BracketedPaste: true,
+            SynchronizedUpdates: true,
+            ModeReports: true,
+            Source: "probe-all-responses-test");
+        var program = new TeaProgram(model, new ProgramOptions
+        {
+            DisableRenderer = true,
+            DisableInput = false,
+            Terminal = terminal,
+            TerminalCapabilities = initial,
+            EnableCapabilityProbe = true,
+            CapabilityProbeTimeout = TimeSpan.FromMilliseconds(120),
+        });
+
+        // Act
+        await program.RunAsync().WaitAsync(TimeSpan.FromSeconds(2));
+
+        // Assert
+        TestAssert.True(model.Seen.Count >= 2, "All probe responses should still refine capability profile.");
+        var final = model.Seen[^1];
+        TestAssert.True(final.ModeReports, "All probe responses should keep mode reports enabled.");
+        TestAssert.True(final.FocusReporting, "Probe set response should keep focus reporting enabled.");
+        TestAssert.True(final.MouseReporting, "Probe set response should keep mouse reporting enabled.");
+        TestAssert.True(final.BracketedPaste, "Probe set response should keep bracketed paste enabled.");
+        TestAssert.True(!final.SynchronizedUpdates, "Mode report reset should disable synchronized updates.");
+        TestAssert.True(
+            !final.Source.Contains("+probe-timeout", StringComparison.Ordinal)
+            && !final.Source.Contains("+probe-partial-timeout", StringComparison.Ordinal),
+            "Full probe responses should avoid timeout fallback annotations.");
     }
 
     private static async Task ModeReport_RefinesTerminalCapabilities()
