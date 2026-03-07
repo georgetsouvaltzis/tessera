@@ -16,6 +16,7 @@ internal static class ShowcaseInteractionTests
         yield return new TestCase("Showcase_Escape_OneShortcutBurst_DoesNotSwitchPage", EscapeBurst_DoesNotSwitchPage);
         yield return new TestCase("Showcase_PlainS_InCommandMode_StaysInput", PlainS_InCommandMode_StaysInput);
         yield return new TestCase("Showcase_PlainQ_InCommandMode_StaysInputAndDoesNotQuit", PlainQ_InCommandMode_StaysInputAndDoesNotQuit);
+        yield return new TestCase("Showcase_ThemeSelection_ChangesRenderedPalette", ThemeSelection_ChangesRenderedPalette);
         yield return new TestCase("Showcase_CtrlS_TogglesStress", CtrlS_TogglesStress);
         yield return new TestCase("Showcase_PaneNavigation_RequiresShowcaseFocus", PaneNavigation_RequiresShowcaseFocus);
         yield return new TestCase("Showcase_UppercaseP_CyclesPaneBackward", UppercaseP_CyclesPaneBackward);
@@ -144,6 +145,29 @@ internal static class ShowcaseInteractionTests
         TestAssert.True(view.Contains("mode=cmd", StringComparison.Ordinal), "Command mode should remain active.");
     }
 
+    private static async Task ThemeSelection_ChangesRenderedPalette()
+    {
+        // Arrange
+        await using var terminal = new ConsoleTerminalAdapter();
+        var model = new CounterModel(terminal);
+        GoToShowcase(model);
+        FocusShowcasePane(model);
+        model.Update(new KeyPressMsg(KeyCode.Right)); // data
+        model.Update(new KeyPressMsg(KeyCode.Right)); // forms
+        PressPlain(model, "p");
+        PressPlain(model, "p"); // forms theme pane
+        var before = HeaderStylePrefix(model.View().Content);
+
+        // Act
+        PressPlain(model, "r");
+        var after = HeaderStylePrefix(model.View().Content);
+
+        // Assert
+        TestAssert.True(
+            !string.Equals(before, after, StringComparison.Ordinal),
+            "Theme change should alter rendered header palette.");
+    }
+
     private static async Task CtrlS_TogglesStress()
     {
         // Arrange
@@ -259,6 +283,18 @@ internal static class ShowcaseInteractionTests
         }
 
         return content[idx..end];
+    }
+
+    private static string HeaderStylePrefix(string content)
+    {
+        const string title = "TeaSharp Capability Showcase";
+        var index = content.IndexOf(title, StringComparison.Ordinal);
+        if (index <= 0)
+        {
+            return string.Empty;
+        }
+
+        return content[..index];
     }
 
     private static bool StressMode(CounterModel model)

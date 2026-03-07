@@ -31,20 +31,23 @@ catch (TeaProgramInterruptedException)
 
 internal sealed class CounterModel : IModel
 {
-    private static readonly TeaStyle HeaderStyle = TeaStyle.Empty
-        .WithBold()
-        .WithForeground(AnsiColor.BrightWhite);
+    private static readonly ThemePalette ClassicPalette = new(
+        TeaStyle.Empty.WithBold().WithForeground(AnsiColor.BrightWhite),
+        TeaStyle.Empty.WithBold().WithForeground(AnsiColor.BrightCyan),
+        TeaStyle.Empty.WithForeground(AnsiColor.Indexed(245)),
+        TeaStyle.Empty.WithBold().WithForeground(AnsiColor.Indexed(214)));
 
-    private static readonly TeaStyle AccentStyle = TeaStyle.Empty
-        .WithBold()
-        .WithForeground(AnsiColor.BrightCyan);
+    private static readonly ThemePalette OceanPalette = new(
+        TeaStyle.Empty.WithBold().WithForeground(AnsiColor.BrightCyan),
+        TeaStyle.Empty.WithBold().WithForeground(AnsiColor.BrightBlue),
+        TeaStyle.Empty.WithForeground(AnsiColor.Indexed(110)),
+        TeaStyle.Empty.WithBold().WithForeground(AnsiColor.BrightMagenta));
 
-    private static readonly TeaStyle MutedStyle = TeaStyle.Empty
-        .WithForeground(AnsiColor.Indexed(245));
-
-    private static readonly TeaStyle WarningStyle = TeaStyle.Empty
-        .WithBold()
-        .WithForeground(AnsiColor.Indexed(214));
+    private static readonly ThemePalette AmberPalette = new(
+        TeaStyle.Empty.WithBold().WithForeground(AnsiColor.BrightYellow),
+        TeaStyle.Empty.WithBold().WithForeground(AnsiColor.Indexed(214)),
+        TeaStyle.Empty.WithForeground(AnsiColor.Indexed(180)),
+        TeaStyle.Empty.WithBold().WithForeground(AnsiColor.BrightRed));
 
     private readonly TeaSharp.Core.Terminal.ConsoleTerminalAdapter _terminal;
     private readonly string _resizeBackend;
@@ -181,6 +184,16 @@ internal sealed class CounterModel : IModel
     private int _showcaseWidthSnapshot = 80;
     private int _showcaseHeightSnapshot = 24;
     private string _showcaseSourceSnapshot = "unknown";
+    private ThemePalette ActivePalette => _showcaseTheme.SelectedIndex switch
+    {
+        1 => OceanPalette,
+        2 => AmberPalette,
+        _ => ClassicPalette,
+    };
+    private TeaStyle HeaderStyle => ActivePalette.Header;
+    private TeaStyle AccentStyle => ActivePalette.Accent;
+    private TeaStyle MutedStyle => ActivePalette.Muted;
+    private TeaStyle WarningStyle => ActivePalette.Warning;
 
     public CounterModel(TeaSharp.Core.Terminal.ConsoleTerminalAdapter terminal)
     {
@@ -231,6 +244,7 @@ internal sealed class CounterModel : IModel
         ]);
         _showcaseTheme.SetItems(["classic", "ocean", "amber"]);
         _showcaseDensity.SetItems(["compact", "cozy", "comfortable"]);
+        ApplyThemeChrome();
         RefreshStatusBars();
         CaptureShowcaseSnapshot();
         AppendLog("TeaSharp workspace initialized.");
@@ -861,6 +875,7 @@ internal sealed class CounterModel : IModel
                     var changed = _showcaseTheme.Update(new KeyPressMsg(KeyCode.Right));
                     if (changed)
                     {
+                        ApplyThemeChrome();
                         action = "theme=next";
                     }
 
@@ -872,6 +887,7 @@ internal sealed class CounterModel : IModel
                     var changed = _showcaseTheme.Update(key);
                     if (changed)
                     {
+                        ApplyThemeChrome();
                         action = "theme=update";
                     }
 
@@ -906,6 +922,26 @@ internal sealed class CounterModel : IModel
         }
 
         return false;
+    }
+
+    private void ApplyThemeChrome()
+    {
+        _showcaseModal.BorderStyle = _showcaseTheme.SelectedIndex switch
+        {
+            1 => BorderStyle.Rounded,
+            2 => BorderStyle.Ascii,
+            _ => BorderStyle.Heavy,
+        };
+    }
+
+    private string ShowcaseThemeLabel()
+    {
+        return _showcaseTheme.SelectedIndex switch
+        {
+            1 => "ocean",
+            2 => "amber",
+            _ => "classic",
+        };
     }
 
     private void ExecuteSelectedAction()
@@ -1129,7 +1165,7 @@ internal sealed class CounterModel : IModel
 
     private string BuildProbeView()
     {
-        static string Label(string text) => HeaderStyle.WithForeground(AnsiColor.BrightCyan).Render(text);
+        string Label(string text) => AccentStyle.Render(text);
 
         return
             $"{HeaderStyle.Render("TeaSharp Protocol Probe")}\n\n" +
@@ -1628,7 +1664,7 @@ internal sealed class CounterModel : IModel
 
         var summaryLines = new List<string>
         {
-            $"theme: {_showcaseTheme.SelectedIndex + 1}",
+            $"theme: {ShowcaseThemeLabel()}",
             $"density: {_showcaseDensity.SelectedIndex + 1}",
             $"table sort: {(_showcaseTable.SortDescending ? "desc" : "asc")}",
             "hotkeys: t,m,a,z,r,f,c,v,[,],left,right,p/P",
@@ -2046,6 +2082,12 @@ internal sealed class CounterModel : IModel
 internal sealed record DashboardTickMsg : IMessage;
 
 internal sealed record ActionItem(string Name, string Shortcut);
+
+internal readonly record struct ThemePalette(
+    TeaStyle Header,
+    TeaStyle Accent,
+    TeaStyle Muted,
+    TeaStyle Warning);
 
 internal enum AppPage
 {
