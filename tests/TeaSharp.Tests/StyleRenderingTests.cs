@@ -10,9 +10,11 @@ internal static class StyleRenderingTests
     public static IEnumerable<TestCase> Cases()
     {
         yield return new TestCase("Style_Merge_ComposesAttributes", Style_Merge_ComposesAttributes);
+        yield return new TestCase("Style_Render_BlinkAndStrikethrough_EmitsSgr", Style_Render_BlinkAndStrikethrough_EmitsSgr);
         yield return new TestCase("Style_Render_EmptyStyle_Passthrough", Style_Render_EmptyStyle_Passthrough);
         yield return new TestCase("Renderer_StyledContent_EmitsSgrSequences", Renderer_StyledContent_EmitsSgrSequences);
         yield return new TestCase("Renderer_StyleOnlyChange_TriggersDiffPatch", Renderer_StyleOnlyChange_TriggersDiffPatch);
+        yield return new TestCase("Renderer_BlinkStrikethroughChange_TriggersDiffPatch", Renderer_BlinkStrikethroughChange_TriggersDiffPatch);
     }
 
     private static Task Style_Merge_ComposesAttributes()
@@ -50,6 +52,25 @@ internal static class StyleRenderingTests
         return Task.CompletedTask;
     }
 
+    private static Task Style_Render_BlinkAndStrikethrough_EmitsSgr()
+    {
+        // Arrange
+        var style = TeaStyle.Empty
+            .WithBlink()
+            .WithStrikethrough()
+            .WithForeground(AnsiColor.BrightYellow);
+
+        // Act
+        var rendered = style.Render("warn");
+
+        // Assert
+        TestAssert.Equal(
+            "\u001b[5;9;38;5;11mwarn\u001b[0m",
+            rendered,
+            "Blink + strikethrough should be encoded in SGR output.");
+        return Task.CompletedTask;
+    }
+
     private static async Task Renderer_StyledContent_EmitsSgrSequences()
     {
         // Arrange
@@ -67,6 +88,30 @@ internal static class StyleRenderingTests
         AssertContains(rendered, "\u001b[1;38;5;10m");
         AssertContains(rendered, "ok");
         AssertContains(rendered, "\u001b[0m");
+    }
+
+    private static async Task Renderer_BlinkStrikethroughChange_TriggersDiffPatch()
+    {
+        // Arrange
+        await using var renderer = new AnsiDiffRenderer();
+        await using var output = new MemoryStream();
+        await renderer.InitializeAsync(output, CancellationToken.None);
+        var plain = TeaStyle.Empty.WithForeground(AnsiColor.BrightYellow);
+        var emphasized = TeaStyle.Empty.WithBlink().WithStrikethrough().WithForeground(AnsiColor.BrightYellow);
+        renderer.Render(View.From(plain.Render("!")));
+        await renderer.FlushAsync(CancellationToken.None);
+        var marker = output.Length;
+
+        // Act
+        renderer.Render(View.From(emphasized.Render("!")));
+        await renderer.FlushAsync(CancellationToken.None);
+        var patch = ReadUtf8(output, marker);
+
+        // Assert
+        AssertContains(patch, "\u001b[1;1H");
+        AssertContains(patch, "\u001b[5;9;38;5;11m");
+        AssertContains(patch, "!");
+        AssertContains(patch, "\u001b[0m");
     }
 
     private static async Task Renderer_StyleOnlyChange_TriggersDiffPatch()

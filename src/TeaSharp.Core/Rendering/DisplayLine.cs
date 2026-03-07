@@ -313,6 +313,8 @@ internal sealed class DisplayLine
         private bool _dim;
         private bool _italic;
         private bool _underline;
+        private bool _blink;
+        private bool _strikethrough;
         private bool _inverse;
         private string? _foreground;
         private string? _background;
@@ -345,6 +347,13 @@ internal sealed class DisplayLine
                     case 4:
                         _underline = true;
                         break;
+                    case 5:
+                    case 6:
+                        _blink = true;
+                        break;
+                    case 9:
+                        _strikethrough = true;
+                        break;
                     case 7:
                         _inverse = true;
                         break;
@@ -357,6 +366,12 @@ internal sealed class DisplayLine
                         break;
                     case 24:
                         _underline = false;
+                        break;
+                    case 25:
+                        _blink = false;
+                        break;
+                    case 29:
+                        _strikethrough = false;
                         break;
                     case 27:
                         _inverse = false;
@@ -414,6 +429,16 @@ internal sealed class DisplayLine
                 parts.Add("4");
             }
 
+            if (_blink)
+            {
+                parts.Add("5");
+            }
+
+            if (_strikethrough)
+            {
+                parts.Add("9");
+            }
+
             if (_inverse)
             {
                 parts.Add("7");
@@ -443,6 +468,8 @@ internal sealed class DisplayLine
             _dim = false;
             _italic = false;
             _underline = false;
+            _blink = false;
+            _strikethrough = false;
             _inverse = false;
             _foreground = null;
             _background = null;

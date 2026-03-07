@@ -8,6 +8,8 @@ public readonly record struct TeaStyle
     public bool? Dim { get; init; }
     public bool? Italic { get; init; }
     public bool? Underline { get; init; }
+    public bool? Blink { get; init; }
+    public bool? Strikethrough { get; init; }
     public bool? Inverse { get; init; }
     public AnsiColor? Foreground { get; init; }
     public AnsiColor? Background { get; init; }
@@ -16,6 +18,8 @@ public readonly record struct TeaStyle
     public TeaStyle WithDim(bool enabled = true) => this with { Dim = enabled };
     public TeaStyle WithItalic(bool enabled = true) => this with { Italic = enabled };
     public TeaStyle WithUnderline(bool enabled = true) => this with { Underline = enabled };
+    public TeaStyle WithBlink(bool enabled = true) => this with { Blink = enabled };
+    public TeaStyle WithStrikethrough(bool enabled = true) => this with { Strikethrough = enabled };
     public TeaStyle WithInverse(bool enabled = true) => this with { Inverse = enabled };
     public TeaStyle WithForeground(AnsiColor color) => this with { Foreground = color };
     public TeaStyle WithBackground(AnsiColor color) => this with { Background = color };
@@ -28,6 +32,8 @@ public readonly record struct TeaStyle
             Dim = other.Dim ?? Dim,
             Italic = other.Italic ?? Italic,
             Underline = other.Underline ?? Underline,
+            Blink = other.Blink ?? Blink,
+            Strikethrough = other.Strikethrough ?? Strikethrough,
             Inverse = other.Inverse ?? Inverse,
             Foreground = other.Foreground ?? Foreground,
             Background = other.Background ?? Background,
@@ -39,6 +45,8 @@ public readonly record struct TeaStyle
         Dim is null &&
         Italic is null &&
         Underline is null &&
+        Blink is null &&
+        Strikethrough is null &&
         Inverse is null &&
         Foreground is null &&
         Background is null;
@@ -86,6 +94,24 @@ public readonly record struct TeaStyle
         else if (Underline is false)
         {
             parts.Add("24");
+        }
+
+        if (Blink is true)
+        {
+            parts.Add("5");
+        }
+        else if (Blink is false)
+        {
+            parts.Add("25");
+        }
+
+        if (Strikethrough is true)
+        {
+            parts.Add("9");
+        }
+        else if (Strikethrough is false)
+        {
+            parts.Add("29");
         }
 
         if (Inverse is true)
