@@ -158,7 +158,7 @@ public sealed class TeaProgram
                     switch (filtered)
                     {
                         case WindowSizeMsg ws:
-                            _renderer.Resize(ws.Width, ws.Height);
+                            _renderer?.Resize(ws.Width, ws.Height);
                             break;
                         case BatchMsg batch:
                             foreach (var command in batch.Commands)
