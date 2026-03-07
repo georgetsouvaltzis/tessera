@@ -16,6 +16,8 @@ internal static class ShowcaseInteractionTests
         yield return new TestCase("Showcase_Escape_OneShortcutBurst_DoesNotSwitchPage", EscapeBurst_DoesNotSwitchPage);
         yield return new TestCase("Showcase_PlainS_InCommandMode_StaysInput", PlainS_InCommandMode_StaysInput);
         yield return new TestCase("Showcase_PlainQ_InCommandMode_StaysInputAndDoesNotQuit", PlainQ_InCommandMode_StaysInputAndDoesNotQuit);
+        yield return new TestCase("Showcase_PlainDigits_InCommandMode_StayInInputAndDoNotSwitchPage", PlainDigits_InCommandMode_StayInInputAndDoNotSwitchPage);
+        yield return new TestCase("Showcase_CommandTabSwitch_ChangesShowcaseTab", CommandTabSwitch_ChangesShowcaseTab);
         yield return new TestCase("Showcase_ThemeSelection_ChangesRenderedPalette", ThemeSelection_ChangesRenderedPalette);
         yield return new TestCase("Showcase_CtrlS_TogglesStress", CtrlS_TogglesStress);
         yield return new TestCase("Showcase_PaneNavigation_RequiresShowcaseFocus", PaneNavigation_RequiresShowcaseFocus);
@@ -143,6 +145,53 @@ internal static class ShowcaseInteractionTests
         TestAssert.True(result.Command is null, "Plain 'q' in command mode should not emit quit command.");
         TestAssert.Equal("q", input.Value, "Plain 'q' should route into command input.");
         TestAssert.True(view.Contains("mode=cmd", StringComparison.Ordinal), "Command mode should remain active.");
+    }
+
+    private static async Task PlainDigits_InCommandMode_StayInInputAndDoNotSwitchPage()
+    {
+        // Arrange
+        await using var terminal = new ConsoleTerminalAdapter();
+        var model = new CounterModel(terminal);
+        GoToShowcase(model);
+        PressPlain(model, ":");
+        var before = model.View().Content;
+
+        // Act
+        PressPlain(model, "1");
+        PressPlain(model, "2");
+        PressPlain(model, "3");
+        var after = model.View().Content;
+        var input = CommandInput(model);
+
+        // Assert
+        TestAssert.True(before.Contains("page=showcase", StringComparison.Ordinal), "Setup should begin on showcase page.");
+        TestAssert.True(after.Contains("page=showcase", StringComparison.Ordinal), "Digits in command mode should not switch pages.");
+        TestAssert.True(after.Contains("mode=cmd", StringComparison.Ordinal), "Command mode should stay active.");
+        TestAssert.Equal("123", input.Value, "Digits should route into command input.");
+    }
+
+    private static async Task CommandTabSwitch_ChangesShowcaseTab()
+    {
+        // Arrange
+        await using var terminal = new ConsoleTerminalAdapter();
+        var model = new CounterModel(terminal);
+        GoToShowcase(model);
+        PressPlain(model, ":");
+        var input = CommandInput(model);
+
+        // Act
+        foreach (var ch in "tab 2")
+        {
+            PressPlain(model, ch.ToString());
+        }
+
+        model.Update(new KeyPressMsg(KeyCode.Enter));
+        var view = model.View().Content;
+
+        // Assert
+        TestAssert.Equal(string.Empty, input.Value, "Submitted command should clear command input.");
+        TestAssert.True(view.Contains("tab=2", StringComparison.Ordinal), "Command 'tab 2' should switch to showcase tab 2.");
+        TestAssert.True(view.Contains("mode=cmd", StringComparison.Ordinal), "Command mode should remain active after submission.");
     }
 
     private static async Task ThemeSelection_ChangesRenderedPalette()

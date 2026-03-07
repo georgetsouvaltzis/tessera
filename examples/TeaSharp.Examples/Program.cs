@@ -287,6 +287,13 @@ internal sealed class CounterModel : IModel
                 return new UpdateResult(this, null);
             }
 
+            // Keep command mode isolated: printable/global workspace hotkeys should route
+            // into command input until command mode is explicitly exited.
+            if (IsCommandInputActive())
+            {
+                return HandleWorkspaceKey(key);
+            }
+
             if (IsPlainChar(key, "1") && !WasRecentEscape())
             {
                 SwitchPage(AppPage.Protocol);
