@@ -8,10 +8,13 @@ public readonly record struct TeaStyle
     public bool? Dim { get; init; }
     public bool? Italic { get; init; }
     public bool? Underline { get; init; }
+    public bool? DoubleUnderline { get; init; }
     public bool? Blink { get; init; }
     public bool? Strikethrough { get; init; }
     public bool? Conceal { get; init; }
     public bool? Overline { get; init; }
+    public bool? Framed { get; init; }
+    public bool? Encircled { get; init; }
     public bool? Inverse { get; init; }
     public AnsiColor? Foreground { get; init; }
     public AnsiColor? Background { get; init; }
@@ -20,10 +23,13 @@ public readonly record struct TeaStyle
     public TeaStyle WithDim(bool enabled = true) => this with { Dim = enabled };
     public TeaStyle WithItalic(bool enabled = true) => this with { Italic = enabled };
     public TeaStyle WithUnderline(bool enabled = true) => this with { Underline = enabled };
+    public TeaStyle WithDoubleUnderline(bool enabled = true) => this with { DoubleUnderline = enabled };
     public TeaStyle WithBlink(bool enabled = true) => this with { Blink = enabled };
     public TeaStyle WithStrikethrough(bool enabled = true) => this with { Strikethrough = enabled };
     public TeaStyle WithConceal(bool enabled = true) => this with { Conceal = enabled };
     public TeaStyle WithOverline(bool enabled = true) => this with { Overline = enabled };
+    public TeaStyle WithFramed(bool enabled = true) => this with { Framed = enabled };
+    public TeaStyle WithEncircled(bool enabled = true) => this with { Encircled = enabled };
     public TeaStyle WithInverse(bool enabled = true) => this with { Inverse = enabled };
     public TeaStyle WithForeground(AnsiColor color) => this with { Foreground = color };
     public TeaStyle WithBackground(AnsiColor color) => this with { Background = color };
@@ -36,10 +42,13 @@ public readonly record struct TeaStyle
             Dim = other.Dim ?? Dim,
             Italic = other.Italic ?? Italic,
             Underline = other.Underline ?? Underline,
+            DoubleUnderline = other.DoubleUnderline ?? DoubleUnderline,
             Blink = other.Blink ?? Blink,
             Strikethrough = other.Strikethrough ?? Strikethrough,
             Conceal = other.Conceal ?? Conceal,
             Overline = other.Overline ?? Overline,
+            Framed = other.Framed ?? Framed,
+            Encircled = other.Encircled ?? Encircled,
             Inverse = other.Inverse ?? Inverse,
             Foreground = other.Foreground ?? Foreground,
             Background = other.Background ?? Background,
@@ -51,10 +60,13 @@ public readonly record struct TeaStyle
         Dim is null &&
         Italic is null &&
         Underline is null &&
+        DoubleUnderline is null &&
         Blink is null &&
         Strikethrough is null &&
         Conceal is null &&
         Overline is null &&
+        Framed is null &&
+        Encircled is null &&
         Inverse is null &&
         Foreground is null &&
         Background is null;
@@ -95,11 +107,16 @@ public readonly record struct TeaStyle
             parts.Add("23");
         }
 
-        if (Underline is true)
+        if (DoubleUnderline is true)
+        {
+            parts.Add("21");
+        }
+        else if (Underline is true)
         {
             parts.Add("4");
         }
-        else if (Underline is false)
+
+        if (Underline is false || (DoubleUnderline is false && Underline is not true))
         {
             parts.Add("24");
         }
@@ -138,6 +155,20 @@ public readonly record struct TeaStyle
         else if (Overline is false)
         {
             parts.Add("55");
+        }
+
+        if (Encircled is true)
+        {
+            parts.Add("52");
+        }
+        else if (Framed is true)
+        {
+            parts.Add("51");
+        }
+
+        if ((Framed is false || Encircled is false) && Framed is not true && Encircled is not true)
+        {
+            parts.Add("54");
         }
 
         if (Inverse is true)

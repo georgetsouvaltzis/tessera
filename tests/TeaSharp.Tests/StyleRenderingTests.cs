@@ -12,11 +12,13 @@ internal static class StyleRenderingTests
         yield return new TestCase("Style_Merge_ComposesAttributes", Style_Merge_ComposesAttributes);
         yield return new TestCase("Style_Render_BlinkAndStrikethrough_EmitsSgr", Style_Render_BlinkAndStrikethrough_EmitsSgr);
         yield return new TestCase("Style_Render_ConcealAndOverline_EmitsSgr", Style_Render_ConcealAndOverline_EmitsSgr);
+        yield return new TestCase("Style_Render_DoubleUnderlineAndFrame_EmitsSgr", Style_Render_DoubleUnderlineAndFrame_EmitsSgr);
         yield return new TestCase("Style_Render_EmptyStyle_Passthrough", Style_Render_EmptyStyle_Passthrough);
         yield return new TestCase("Renderer_StyledContent_EmitsSgrSequences", Renderer_StyledContent_EmitsSgrSequences);
         yield return new TestCase("Renderer_StyleOnlyChange_TriggersDiffPatch", Renderer_StyleOnlyChange_TriggersDiffPatch);
         yield return new TestCase("Renderer_BlinkStrikethroughChange_TriggersDiffPatch", Renderer_BlinkStrikethroughChange_TriggersDiffPatch);
         yield return new TestCase("Renderer_ConcealOverlineChange_TriggersDiffPatch", Renderer_ConcealOverlineChange_TriggersDiffPatch);
+        yield return new TestCase("Renderer_DoubleUnderlineFrameChange_TriggersDiffPatch", Renderer_DoubleUnderlineFrameChange_TriggersDiffPatch);
     }
 
     private static Task Style_Merge_ComposesAttributes()
@@ -92,6 +94,25 @@ internal static class StyleRenderingTests
         return Task.CompletedTask;
     }
 
+    private static Task Style_Render_DoubleUnderlineAndFrame_EmitsSgr()
+    {
+        // Arrange
+        var style = TeaStyle.Empty
+            .WithDoubleUnderline()
+            .WithFramed()
+            .WithForeground(AnsiColor.BrightMagenta);
+
+        // Act
+        var rendered = style.Render("boxed");
+
+        // Assert
+        TestAssert.Equal(
+            "\u001b[21;51;38;5;13mboxed\u001b[0m",
+            rendered,
+            "Double underline + frame should be encoded in SGR output.");
+        return Task.CompletedTask;
+    }
+
     private static async Task Renderer_StyledContent_EmitsSgrSequences()
     {
         // Arrange
@@ -156,6 +177,30 @@ internal static class StyleRenderingTests
         AssertContains(patch, "\u001b[1;1H");
         AssertContains(patch, "\u001b[8;53;38;5;14m");
         AssertContains(patch, "x");
+        AssertContains(patch, "\u001b[0m");
+    }
+
+    private static async Task Renderer_DoubleUnderlineFrameChange_TriggersDiffPatch()
+    {
+        // Arrange
+        await using var renderer = new AnsiDiffRenderer();
+        await using var output = new MemoryStream();
+        await renderer.InitializeAsync(output, CancellationToken.None);
+        var plain = TeaStyle.Empty.WithForeground(AnsiColor.BrightMagenta);
+        var emphasized = TeaStyle.Empty.WithDoubleUnderline().WithFramed().WithForeground(AnsiColor.BrightMagenta);
+        renderer.Render(View.From(plain.Render("b")));
+        await renderer.FlushAsync(CancellationToken.None);
+        var marker = output.Length;
+
+        // Act
+        renderer.Render(View.From(emphasized.Render("b")));
+        await renderer.FlushAsync(CancellationToken.None);
+        var patch = ReadUtf8(output, marker);
+
+        // Assert
+        AssertContains(patch, "\u001b[1;1H");
+        AssertContains(patch, "\u001b[21;51;38;5;13m");
+        AssertContains(patch, "b");
         AssertContains(patch, "\u001b[0m");
     }
 

@@ -313,10 +313,13 @@ internal sealed class DisplayLine
         private bool _dim;
         private bool _italic;
         private bool _underline;
+        private bool _doubleUnderline;
         private bool _blink;
         private bool _strikethrough;
         private bool _conceal;
         private bool _overline;
+        private bool _framed;
+        private bool _encircled;
         private bool _inverse;
         private string? _foreground;
         private string? _background;
@@ -348,6 +351,11 @@ internal sealed class DisplayLine
                         break;
                     case 4:
                         _underline = true;
+                        _doubleUnderline = false;
+                        break;
+                    case 21:
+                        _doubleUnderline = true;
+                        _underline = false;
                         break;
                     case 5:
                     case 6:
@@ -362,6 +370,14 @@ internal sealed class DisplayLine
                     case 53:
                         _overline = true;
                         break;
+                    case 51:
+                        _framed = true;
+                        _encircled = false;
+                        break;
+                    case 52:
+                        _encircled = true;
+                        _framed = false;
+                        break;
                     case 7:
                         _inverse = true;
                         break;
@@ -374,6 +390,7 @@ internal sealed class DisplayLine
                         break;
                     case 24:
                         _underline = false;
+                        _doubleUnderline = false;
                         break;
                     case 25:
                         _blink = false;
@@ -386,6 +403,10 @@ internal sealed class DisplayLine
                         break;
                     case 55:
                         _overline = false;
+                        break;
+                    case 54:
+                        _framed = false;
+                        _encircled = false;
                         break;
                     case 27:
                         _inverse = false;
@@ -438,7 +459,11 @@ internal sealed class DisplayLine
                 parts.Add("3");
             }
 
-            if (_underline)
+            if (_doubleUnderline)
+            {
+                parts.Add("21");
+            }
+            else if (_underline)
             {
                 parts.Add("4");
             }
@@ -461,6 +486,15 @@ internal sealed class DisplayLine
             if (_overline)
             {
                 parts.Add("53");
+            }
+
+            if (_encircled)
+            {
+                parts.Add("52");
+            }
+            else if (_framed)
+            {
+                parts.Add("51");
             }
 
             if (_inverse)
@@ -492,10 +526,13 @@ internal sealed class DisplayLine
             _dim = false;
             _italic = false;
             _underline = false;
+            _doubleUnderline = false;
             _blink = false;
             _strikethrough = false;
             _conceal = false;
             _overline = false;
+            _framed = false;
+            _encircled = false;
             _inverse = false;
             _foreground = null;
             _background = null;
