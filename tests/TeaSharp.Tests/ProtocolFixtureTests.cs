@@ -99,11 +99,15 @@ internal static class ProtocolFixtureTests
         var ctrlEnter = Decode(decoder, "\u001b[13;5u");
         var shiftAltTab = Decode(decoder, "\u001b[9;4u");
         var ctrlAltBackspace = Decode(decoder, "\u001b[127;7u");
+        var repeatCtrlK = Decode(decoder, "\u001b[107;5;2u");
+        var releaseCtrlK = Decode(decoder, "\u001b[107;5:3u");
 
         // Assert
         AssertKey(ctrlEnter, KeyCode.Enter, KeyModifiers.Ctrl);
         AssertKey(shiftAltTab, KeyCode.Tab, KeyModifiers.Shift | KeyModifiers.Alt);
         AssertKey(ctrlAltBackspace, KeyCode.Backspace, KeyModifiers.Alt | KeyModifiers.Ctrl);
+        AssertKey(repeatCtrlK, KeyCode.Character, KeyModifiers.Ctrl, "k", isRepeat: true);
+        AssertKeyRelease(releaseCtrlK, KeyCode.Character, KeyModifiers.Ctrl, "k");
         return Task.CompletedTask;
     }
 
@@ -185,17 +189,45 @@ internal static class ProtocolFixtureTests
         return decoder.Decode(Encoding.UTF8.GetBytes(sequence), timeoutExpired: false);
     }
 
-    private static void AssertKey(DecodeResult result, KeyCode code, KeyModifiers modifiers = KeyModifiers.None, string text = "")
+    private static void AssertKey(
+        DecodeResult result,
+        KeyCode code,
+        KeyModifiers modifiers = KeyModifiers.None,
+        string text = "",
+        bool isRepeat = false)
     {
         if (result.Message is not KeyPressMsg key)
         {
             throw new InvalidOperationException($"Expected KeyPressMsg but got {result.Message?.GetType().Name ?? "null"}.");
         }
 
+        if (key.Code != code
+            || key.Modifiers != modifiers
+            || !string.Equals(key.Text, text, StringComparison.Ordinal)
+            || key.IsRepeat != isRepeat)
+        {
+            throw new InvalidOperationException(
+                $"Expected key(code={code}, modifiers={modifiers}, text=\"{text}\", repeat={isRepeat}) " +
+                $"but got key(code={key.Code}, modifiers={key.Modifiers}, text=\"{key.Text}\", repeat={key.IsRepeat}).");
+        }
+    }
+
+    private static void AssertKeyRelease(
+        DecodeResult result,
+        KeyCode code,
+        KeyModifiers modifiers = KeyModifiers.None,
+        string text = "")
+    {
+        if (result.Message is not KeyReleaseMsg key)
+        {
+            throw new InvalidOperationException($"Expected KeyReleaseMsg but got {result.Message?.GetType().Name ?? "null"}.");
+        }
+
         if (key.Code != code || key.Modifiers != modifiers || !string.Equals(key.Text, text, StringComparison.Ordinal))
         {
             throw new InvalidOperationException(
-                $"Expected key(code={code}, modifiers={modifiers}, text=\"{text}\") but got key(code={key.Code}, modifiers={key.Modifiers}, text=\"{key.Text}\").");
+                $"Expected release(code={code}, modifiers={modifiers}, text=\"{text}\") " +
+                $"but got release(code={key.Code}, modifiers={key.Modifiers}, text=\"{key.Text}\").");
         }
     }
 

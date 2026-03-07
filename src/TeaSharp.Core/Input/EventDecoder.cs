@@ -538,6 +538,7 @@ public sealed class EventDecoder
             return TryCreateKeyMessageFromCodePoint(
                 modifyOtherKeyCodePoint,
                 ParseModifiers(parameters[1]),
+                eventType: null,
                 out message);
         }
 
@@ -588,8 +589,9 @@ public sealed class EventDecoder
         var modifiers = parameters.Count > 1
             ? ParseModifiers(parameters[1])
             : KeyModifiers.None;
+        var eventType = parameters.Count > 2 ? parameters[2] : null;
 
-        return TryCreateKeyMessageFromCodePoint(codePoint, modifiers, out message);
+        return TryCreateKeyMessageFromCodePoint(codePoint, modifiers, eventType, out message);
     }
 
     private static bool TryDecodeCsiBackTab(IReadOnlyList<int?> parameters, out IMessage? message)
@@ -603,7 +605,11 @@ public sealed class EventDecoder
         return true;
     }
 
-    private static bool TryCreateKeyMessageFromCodePoint(int codePoint, KeyModifiers modifiers, out IMessage? message)
+    private static bool TryCreateKeyMessageFromCodePoint(
+        int codePoint,
+        KeyModifiers modifiers,
+        int? eventType,
+        out IMessage? message)
     {
         message = null;
         if (!Rune.IsValid(codePoint))
@@ -620,9 +626,18 @@ public sealed class EventDecoder
             _ => KeyCode.Character,
         };
 
-        message = keyCode == KeyCode.Character
-            ? new KeyPressMsg(KeyCode.Character, new Rune(codePoint).ToString(), modifiers)
-            : new KeyPressMsg(keyCode, string.Empty, modifiers);
+        var text = keyCode == KeyCode.Character
+            ? new Rune(codePoint).ToString()
+            : string.Empty;
+
+        if (eventType == 3)
+        {
+            message = new KeyReleaseMsg(keyCode, text, modifiers);
+            return true;
+        }
+
+        var isRepeat = eventType == 2;
+        message = new KeyPressMsg(keyCode, text, modifiers, IsRepeat: isRepeat);
 
         return true;
     }
@@ -824,7 +839,7 @@ public sealed class EventDecoder
         }
 
         var text = ToAscii(bytes);
-        var parts = text.Split(';');
+        var parts = text.Split([';', ':']);
         foreach (var part in parts)
         {
             if (string.IsNullOrWhiteSpace(part))
