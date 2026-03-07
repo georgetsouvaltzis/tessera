@@ -10,6 +10,8 @@ public readonly record struct TeaStyle
     public bool? Underline { get; init; }
     public bool? Blink { get; init; }
     public bool? Strikethrough { get; init; }
+    public bool? Conceal { get; init; }
+    public bool? Overline { get; init; }
     public bool? Inverse { get; init; }
     public AnsiColor? Foreground { get; init; }
     public AnsiColor? Background { get; init; }
@@ -20,6 +22,8 @@ public readonly record struct TeaStyle
     public TeaStyle WithUnderline(bool enabled = true) => this with { Underline = enabled };
     public TeaStyle WithBlink(bool enabled = true) => this with { Blink = enabled };
     public TeaStyle WithStrikethrough(bool enabled = true) => this with { Strikethrough = enabled };
+    public TeaStyle WithConceal(bool enabled = true) => this with { Conceal = enabled };
+    public TeaStyle WithOverline(bool enabled = true) => this with { Overline = enabled };
     public TeaStyle WithInverse(bool enabled = true) => this with { Inverse = enabled };
     public TeaStyle WithForeground(AnsiColor color) => this with { Foreground = color };
     public TeaStyle WithBackground(AnsiColor color) => this with { Background = color };
@@ -34,6 +38,8 @@ public readonly record struct TeaStyle
             Underline = other.Underline ?? Underline,
             Blink = other.Blink ?? Blink,
             Strikethrough = other.Strikethrough ?? Strikethrough,
+            Conceal = other.Conceal ?? Conceal,
+            Overline = other.Overline ?? Overline,
             Inverse = other.Inverse ?? Inverse,
             Foreground = other.Foreground ?? Foreground,
             Background = other.Background ?? Background,
@@ -47,6 +53,8 @@ public readonly record struct TeaStyle
         Underline is null &&
         Blink is null &&
         Strikethrough is null &&
+        Conceal is null &&
+        Overline is null &&
         Inverse is null &&
         Foreground is null &&
         Background is null;
@@ -112,6 +120,24 @@ public readonly record struct TeaStyle
         else if (Strikethrough is false)
         {
             parts.Add("29");
+        }
+
+        if (Conceal is true)
+        {
+            parts.Add("8");
+        }
+        else if (Conceal is false)
+        {
+            parts.Add("28");
+        }
+
+        if (Overline is true)
+        {
+            parts.Add("53");
+        }
+        else if (Overline is false)
+        {
+            parts.Add("55");
         }
 
         if (Inverse is true)
