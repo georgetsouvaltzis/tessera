@@ -287,6 +287,16 @@ public sealed class TeaProgram
             return _options.ResizeSignalRegistrationFactory(onResize);
         }
 
+        if (_options.EnableResizeSignals
+            && _terminal is ConsoleTerminalAdapter consoleTerminal)
+        {
+            var windowsRegistration = consoleTerminal.TryRegisterResizeSignal(onResize);
+            if (windowsRegistration is not null)
+            {
+                return windowsRegistration;
+            }
+        }
+
         if (!_options.EnableResizeSignals || !(OperatingSystem.IsLinux() || OperatingSystem.IsMacOS()))
         {
             return null;

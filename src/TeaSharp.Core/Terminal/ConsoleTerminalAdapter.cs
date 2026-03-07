@@ -14,7 +14,12 @@ public sealed class ConsoleTerminalAdapter : ITerminalAdapter
     private const uint EnableEchoInput = 0x0004;
     private const uint EnableVirtualTerminalProcessing = 0x0004;
     private const uint DisableNewlineAutoReturn = 0x0008;
+    private const uint EnableWindowInput = 0x0008;
     private const uint EnableVirtualTerminalInput = 0x0200;
+    private const ushort WindowBufferSizeEventType = 0x0004;
+    private const uint WaitObject0 = 0x00000000;
+    private const uint WaitTimeout = 0x00000102;
+    private const uint WaitFailed = 0xFFFFFFFF;
     private static readonly TimeSpan PasteBurstGap = TimeSpan.FromMilliseconds(28);
     private const int PasteBurstMinimumChars = 12;
     private const int Tcsanow = 0;
@@ -235,6 +240,106 @@ public sealed class ConsoleTerminalAdapter : ITerminalAdapter
         }
 
         FlushPasteBurst(onEvent, burst);
+    }
+
+    internal IDisposable? TryRegisterResizeSignal(Action onResize)
+    {
+        if (!OperatingSystem.IsWindows() || !IsInputInteractive)
+        {
+            return null;
+        }
+
+        var inputHandle = GetStdHandle(StdInputHandle);
+        if (IsInvalidHandle(inputHandle))
+        {
+            return null;
+        }
+
+        if (GetConsoleMode(inputHandle, out var mode))
+        {
+            // Enable window-size events in the console input stream.
+            _ = SetConsoleMode(inputHandle, mode | EnableWindowInput);
+        }
+
+        var cts = new CancellationTokenSource();
+        var watcher = Task.Run(() => WatchWindowsResizeSignals(inputHandle, onResize, cts.Token), CancellationToken.None);
+        return new DelegateDisposable(() =>
+        {
+            cts.Cancel();
+            try
+            {
+                _ = watcher.Wait(180);
+            }
+            catch
+            {
+                // ignored: shutdown path.
+            }
+
+            cts.Dispose();
+        });
+    }
+
+    private static void WatchWindowsResizeSignals(IntPtr inputHandle, Action onResize, CancellationToken cancellationToken)
+    {
+        var records = new InputRecord[16];
+        Coord? lastReportedSize = null;
+
+        while (!cancellationToken.IsCancellationRequested)
+        {
+            var wait = WaitForSingleObject(inputHandle, 120);
+            if (wait == WaitFailed)
+            {
+                break;
+            }
+
+            if (wait == WaitTimeout || wait != WaitObject0)
+            {
+                continue;
+            }
+
+            if (!GetNumberOfConsoleInputEvents(inputHandle, out var eventCount) || eventCount == 0)
+            {
+                continue;
+            }
+
+            if (!PeekConsoleInput(inputHandle, records, (uint)records.Length, out var read) || read == 0)
+            {
+                continue;
+            }
+
+            for (var i = 0; i < read; i++)
+            {
+                if (records[i].EventType != WindowBufferSizeEventType)
+                {
+                    continue;
+                }
+
+                var size = records[i].WindowBufferSizeEvent.Size;
+                if (size.X <= 0 || size.Y <= 0)
+                {
+                    continue;
+                }
+
+                if (lastReportedSize is { } previous
+                    && previous.X == size.X
+                    && previous.Y == size.Y)
+                {
+                    continue;
+                }
+
+                lastReportedSize = size;
+                try
+                {
+                    onResize();
+                }
+                catch
+                {
+                    // ignored: callback path must stay resilient.
+                }
+
+                break;
+            }
+        }
     }
 
     private void TryEnableWindowsVtModes()
@@ -673,6 +778,29 @@ public sealed class ConsoleTerminalAdapter : ITerminalAdapter
     }
 
     [StructLayout(LayoutKind.Sequential)]
+    private struct Coord
+    {
+        public short X;
+        public short Y;
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    private struct WindowBufferSizeRecord
+    {
+        public Coord Size;
+    }
+
+    [StructLayout(LayoutKind.Explicit)]
+    private struct InputRecord
+    {
+        [FieldOffset(0)]
+        public ushort EventType;
+
+        [FieldOffset(4)]
+        public WindowBufferSizeRecord WindowBufferSizeEvent;
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
     private struct LinuxTermios
     {
         public uint c_iflag;
@@ -938,6 +1066,17 @@ public sealed class ConsoleTerminalAdapter : ITerminalAdapter
     [return: MarshalAs(UnmanagedType.Bool)]
     private static extern bool SetConsoleMode(IntPtr hConsoleHandle, uint dwMode);
 
+    [DllImport("kernel32.dll", SetLastError = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    private static extern bool GetNumberOfConsoleInputEvents(IntPtr hConsoleInput, out uint lpcNumberOfEvents);
+
+    [DllImport("kernel32.dll", SetLastError = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    private static extern bool PeekConsoleInput(IntPtr hConsoleInput, [Out] InputRecord[] lpBuffer, uint nLength, out uint lpNumberOfEventsRead);
+
+    [DllImport("kernel32.dll", SetLastError = true)]
+    private static extern uint WaitForSingleObject(IntPtr hHandle, uint dwMilliseconds);
+
     [DllImport("libc", EntryPoint = "open", SetLastError = true)]
     private static extern int Open(string path, int flags);
 
@@ -955,4 +1094,12 @@ public sealed class ConsoleTerminalAdapter : ITerminalAdapter
 
     [DllImport("libc", EntryPoint = "tcsetattr", SetLastError = true)]
     private static extern int TcSetAttrDarwin(int fd, int optionalActions, ref DarwinTermios termios);
+
+    private sealed class DelegateDisposable(Action dispose) : IDisposable
+    {
+        public void Dispose()
+        {
+            dispose();
+        }
+    }
 }

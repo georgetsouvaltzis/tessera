@@ -38,7 +38,7 @@ Legend: `done` = implemented, `partial` = usable but incomplete, `todo` = not im
 | Bracketed paste protocol | start/end/content handling | done | Start/end decode and aggregated `PasteMsg` content are implemented. |
 | Mouse protocol | X10/SGR mouse messages | partial | SGR 1006 + basic X10 decode implemented with base `MouseMsg` plus typed variants (`MouseClickMsg`, `MouseReleaseMsg`, `MouseMotionMsg`, `MouseWheelMsg`); richer button edge cases and high-button parity still pending. |
 | Focus reporting | focus in/out messages | done | CSI focus in/out decode + render-mode toggle implemented. |
-| Resize updates | runtime terminal resize events | partial | Initial size + CSI parser support, plus Unix `SIGWINCH`-assisted checks with polling fallback; Windows still relies on polling. |
+| Resize updates | runtime terminal resize events | partial | Initial size + CSI parser support, Unix `SIGWINCH`-assisted checks with polling fallback, and Windows console-input resize signal registration (`WINDOW_BUFFER_SIZE_EVENT`) are implemented; polling remains as best-effort fallback. |
 
 ## Rendering
 
@@ -91,7 +91,7 @@ Legend: `done` = implemented, `partial` = usable but incomplete, `todo` = not im
 
 ## Priority Gap Plan
 
-1. P1: Runtime resize watcher parity across macOS/Linux/Windows.
-2. P2: Deep capability probing (beyond env + basic `infocmp` enrichment).
-3. P2: Expand mouse parity for extended/high-button mappings and compatibility fixtures.
-4. P2: Extend renderer style/cell-attribute parity over the new frame buffer engine.
+1. P2: Deep capability probing (beyond env + basic `infocmp` enrichment).
+2. P2: Expand mouse parity for extended/high-button mappings and compatibility fixtures.
+3. P2: Extend renderer style/cell-attribute parity over the new frame buffer engine.
+4. P3: Broaden Windows-specific runtime coverage for resize/input interplay under CI.

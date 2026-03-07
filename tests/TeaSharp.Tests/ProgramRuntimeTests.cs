@@ -271,6 +271,10 @@ internal static class ProgramRuntimeTests
         // Act
         var runTask = program.RunAsync();
         await WaitUntilAsync(() => raiseSignal is not null, TimeSpan.FromSeconds(1), "Resize signal registration was not initialized.");
+        raiseSignal?.Invoke();
+        raiseSignal?.Invoke();
+        await Task.Delay(30);
+        TestAssert.Equal(1, model.Seen.Count, "Resize signals without size change should not emit duplicate WindowSizeMsg events.");
         terminal.SetSize(101, 41);
         raiseSignal?.Invoke();
         await runTask;
