@@ -13,6 +13,9 @@ internal static class ProtocolFixtureTests
         yield return new TestCase("ProtocolFixture_ITerm2_CsiU_DecodesModifierCombos", ITerm2_CsiU_DecodesModifierCombos);
         yield return new TestCase("ProtocolFixture_Tmux_CsiCursorModifiers_Decode", Tmux_CsiCursorModifiers_Decode);
         yield return new TestCase("ProtocolFixture_Xterm_FunctionKeys_Decode", Xterm_FunctionKeys_Decode);
+        yield return new TestCase("ProtocolFixture_Kitty_CsiUCombos_Decode", Kitty_CsiUCombos_Decode);
+        yield return new TestCase("ProtocolFixture_WezTerm_ModifyOtherKeys_Decode", WezTerm_ModifyOtherKeys_Decode);
+        yield return new TestCase("ProtocolFixture_Alacritty_AltFallback_Decode", Alacritty_AltFallback_Decode);
         yield return new TestCase("ProtocolFixture_TerminalReader_FocusPasteRoundTrip", TerminalReader_FocusPasteRoundTrip);
         yield return new TestCase("ProtocolFixture_AppleTerminal_AltFallback_Decodes", AppleTerminal_AltFallback_Decodes);
     }
@@ -84,6 +87,57 @@ internal static class ProtocolFixtureTests
         AssertKey(csiF8, KeyCode.F8);
         AssertKey(shiftF11, KeyCode.F11, KeyModifiers.Shift);
         AssertKey(ctrlAltF12, KeyCode.F12, KeyModifiers.Alt | KeyModifiers.Ctrl);
+        return Task.CompletedTask;
+    }
+
+    private static Task Kitty_CsiUCombos_Decode()
+    {
+        // Arrange
+        var decoder = new EventDecoder();
+
+        // Act
+        var ctrlEnter = Decode(decoder, "\u001b[13;5u");
+        var shiftAltTab = Decode(decoder, "\u001b[9;4u");
+        var ctrlAltBackspace = Decode(decoder, "\u001b[127;7u");
+
+        // Assert
+        AssertKey(ctrlEnter, KeyCode.Enter, KeyModifiers.Ctrl);
+        AssertKey(shiftAltTab, KeyCode.Tab, KeyModifiers.Shift | KeyModifiers.Alt);
+        AssertKey(ctrlAltBackspace, KeyCode.Backspace, KeyModifiers.Alt | KeyModifiers.Ctrl);
+        return Task.CompletedTask;
+    }
+
+    private static Task WezTerm_ModifyOtherKeys_Decode()
+    {
+        // Arrange
+        var decoder = new EventDecoder();
+
+        // Act
+        var altSlash = Decode(decoder, "\u001b[27;3;47~");
+        var ctrlSemicolon = Decode(decoder, "\u001b[27;5;59~");
+        var shiftCtrlK = Decode(decoder, "\u001b[27;6;107~");
+
+        // Assert
+        AssertKey(altSlash, KeyCode.Character, KeyModifiers.Alt, "/");
+        AssertKey(ctrlSemicolon, KeyCode.Character, KeyModifiers.Ctrl, ";");
+        AssertKey(shiftCtrlK, KeyCode.Character, KeyModifiers.Shift | KeyModifiers.Ctrl, "k");
+        return Task.CompletedTask;
+    }
+
+    private static Task Alacritty_AltFallback_Decode()
+    {
+        // Arrange
+        var decoder = new EventDecoder();
+
+        // Act
+        var altLeft = decoder.Decode([0x1B, 0x1B, (byte)'[', (byte)'D'], timeoutExpired: false);
+        var altRight = decoder.Decode([0x1B, 0x1B, (byte)'[', (byte)'C'], timeoutExpired: false);
+        var altEnter = decoder.Decode([0x1B, 0x0D], timeoutExpired: false);
+
+        // Assert
+        AssertKey(altLeft, KeyCode.Left, KeyModifiers.Alt);
+        AssertKey(altRight, KeyCode.Right, KeyModifiers.Alt);
+        AssertKey(altEnter, KeyCode.Enter, KeyModifiers.Alt);
         return Task.CompletedTask;
     }
 
