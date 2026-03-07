@@ -855,6 +855,18 @@ public sealed class ConsoleTerminalAdapter : ITerminalAdapter
             ConsoleKey.Tab => new KeyPressMsg(KeyCode.Tab, "", modifiers),
             ConsoleKey.Backspace => new KeyPressMsg(KeyCode.Backspace, "", modifiers),
             ConsoleKey.Escape => new KeyPressMsg(KeyCode.Escape, "", modifiers),
+            ConsoleKey.F1 => new KeyPressMsg(KeyCode.F1, "", modifiers),
+            ConsoleKey.F2 => new KeyPressMsg(KeyCode.F2, "", modifiers),
+            ConsoleKey.F3 => new KeyPressMsg(KeyCode.F3, "", modifiers),
+            ConsoleKey.F4 => new KeyPressMsg(KeyCode.F4, "", modifiers),
+            ConsoleKey.F5 => new KeyPressMsg(KeyCode.F5, "", modifiers),
+            ConsoleKey.F6 => new KeyPressMsg(KeyCode.F6, "", modifiers),
+            ConsoleKey.F7 => new KeyPressMsg(KeyCode.F7, "", modifiers),
+            ConsoleKey.F8 => new KeyPressMsg(KeyCode.F8, "", modifiers),
+            ConsoleKey.F9 => new KeyPressMsg(KeyCode.F9, "", modifiers),
+            ConsoleKey.F10 => new KeyPressMsg(KeyCode.F10, "", modifiers),
+            ConsoleKey.F11 => new KeyPressMsg(KeyCode.F11, "", modifiers),
+            ConsoleKey.F12 => new KeyPressMsg(KeyCode.F12, "", modifiers),
             _ => ToCharacterMessage(key, modifiers),
         };
     }

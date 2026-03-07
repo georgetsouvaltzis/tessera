@@ -31,7 +31,7 @@ Legend: `done` = implemented, `partial` = usable but incomplete, `todo` = not im
 | Area | Bubble Tea Capability | TeaSharp | Notes |
 |---|---|---|---|
 | Character input | UTF-8 keys | done | Rune decode + `Console.ReadKey` fallback. |
-| Navigation keys | arrows/tab/enter/backspace/esc | done | Core keys mapped. |
+| Navigation keys | arrows/tab/enter/backspace/esc | done | Core keys mapped, including SS3/CSI function-key variants (`F1`-`F12`). |
 | VT control decode | CSI/SS3/OSC parsing | partial | Core cursor/edit keys, resize, OSC consumption implemented; full matrix still pending. |
 | Ctrl modifiers | control key combos | partial | Core ctrl path plus CSI `u` / modifyOtherKeys (`CSI 27;...~`) decode supported; full key matrix parity still pending. |
 | Alt/meta handling | alt key combos | partial | Escape-prefix + console modifiers + CSI enhanced key modifiers are supported, including nested escape-prefix forms (`ESC ESC` and `ESC` + escaped cursor sequences) for fallback alt behavior; some emulator-specific edge cases are still missing. |
@@ -85,8 +85,8 @@ Legend: `done` = implemented, `partial` = usable but incomplete, `todo` = not im
 |---|---|---|---|
 | Behavior tests | loop/command semantics | done | Core regression tests pass. |
 | Integration tests | deterministic app-level UX behavior | partial | NUnit integration suite covers workspace mode routing/showcase flows and now includes a tmux-backed smoke path for command-mode + quit semantics; broader PTY scenario matrix is still pending. |
-| Protocol decode tests | key/mouse/paste parser fixtures | partial | Golden fixtures include CSI/SS3/OSC, modifiers, focus, and extended mouse buttons/modifier combinations; terminal-specific fixture breadth still pending. |
-| Terminal behavior fixtures | emulator-specific key/paste/focus regressions | partial | Added fixture tests that mirror Ghostty modifyOtherKeys, iTerm2 CSI-u modifier combos, tmux/xterm cursor-modifier sequences, and Apple Terminal-style fallback alt/focus/paste paths; broader capture sets across more terminal versions still pending. |
+| Protocol decode tests | key/mouse/paste parser fixtures | partial | Golden fixtures include CSI/SS3/OSC, modifiers, focus, extended mouse buttons/modifier combinations, and SS3/CSI function-key fixtures; terminal-specific fixture breadth still pending. |
+| Terminal behavior fixtures | emulator-specific key/paste/focus regressions | partial | Added fixture tests that mirror Ghostty modifyOtherKeys, iTerm2 CSI-u modifier combos, tmux/xterm cursor-modifier sequences, xterm function-key variants, and Apple Terminal-style fallback alt/focus/paste paths; broader capture sets across more terminal versions still pending. |
 | Renderer snapshots | render diff correctness | done | Deterministic renderer snapshots now cover first-frame mode/title sequences, incremental diff patches, and reset teardown control sequences. |
 
 ## Priority Gap Plan

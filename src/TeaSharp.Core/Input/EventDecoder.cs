@@ -543,6 +543,18 @@ public sealed class EventDecoder
             4 or 8 => KeyCode.End,
             5 => KeyCode.PageUp,
             6 => KeyCode.PageDown,
+            11 => KeyCode.F1,
+            12 => KeyCode.F2,
+            13 => KeyCode.F3,
+            14 => KeyCode.F4,
+            15 => KeyCode.F5,
+            17 => KeyCode.F6,
+            18 => KeyCode.F7,
+            19 => KeyCode.F8,
+            20 => KeyCode.F9,
+            21 => KeyCode.F10,
+            23 => KeyCode.F11,
+            24 => KeyCode.F12,
             _ => KeyCode.Unknown,
         };
 
@@ -610,6 +622,10 @@ public sealed class EventDecoder
             'D' => KeyCode.Left,
             'H' => KeyCode.Home,
             'F' => KeyCode.End,
+            'P' => KeyCode.F1,
+            'Q' => KeyCode.F2,
+            'R' => KeyCode.F3,
+            'S' => KeyCode.F4,
             _ => KeyCode.Unknown,
         };
 

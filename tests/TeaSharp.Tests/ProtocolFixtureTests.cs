@@ -12,6 +12,7 @@ internal static class ProtocolFixtureTests
         yield return new TestCase("ProtocolFixture_Ghostty_ModifyOtherKeys_DecodesModifiers", Ghostty_ModifyOtherKeys_DecodesModifiers);
         yield return new TestCase("ProtocolFixture_ITerm2_CsiU_DecodesModifierCombos", ITerm2_CsiU_DecodesModifierCombos);
         yield return new TestCase("ProtocolFixture_Tmux_CsiCursorModifiers_Decode", Tmux_CsiCursorModifiers_Decode);
+        yield return new TestCase("ProtocolFixture_Xterm_FunctionKeys_Decode", Xterm_FunctionKeys_Decode);
         yield return new TestCase("ProtocolFixture_TerminalReader_FocusPasteRoundTrip", TerminalReader_FocusPasteRoundTrip);
         yield return new TestCase("ProtocolFixture_AppleTerminal_AltFallback_Decodes", AppleTerminal_AltFallback_Decodes);
     }
@@ -62,6 +63,27 @@ internal static class ProtocolFixtureTests
         AssertKey(altUp, KeyCode.Up, KeyModifiers.Alt);
         AssertKey(shiftCtrlLeft, KeyCode.Left, KeyModifiers.Shift | KeyModifiers.Ctrl);
         AssertKey(ctrlRight, KeyCode.Right, KeyModifiers.Ctrl);
+        return Task.CompletedTask;
+    }
+
+    private static Task Xterm_FunctionKeys_Decode()
+    {
+        // Arrange
+        var decoder = new EventDecoder();
+
+        // Act
+        var ss3F1 = Decode(decoder, "\u001bOP");
+        var ss3F4 = Decode(decoder, "\u001bOS");
+        var csiF8 = Decode(decoder, "\u001b[19~");
+        var shiftF11 = Decode(decoder, "\u001b[23;2~");
+        var ctrlAltF12 = Decode(decoder, "\u001b[24;7~");
+
+        // Assert
+        AssertKey(ss3F1, KeyCode.F1);
+        AssertKey(ss3F4, KeyCode.F4);
+        AssertKey(csiF8, KeyCode.F8);
+        AssertKey(shiftF11, KeyCode.F11, KeyModifiers.Shift);
+        AssertKey(ctrlAltF12, KeyCode.F12, KeyModifiers.Alt | KeyModifiers.Ctrl);
         return Task.CompletedTask;
     }
 
