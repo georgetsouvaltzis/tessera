@@ -91,7 +91,7 @@ Legend: `done` = implemented, `partial` = usable but incomplete, `todo` = not im
 
 ## Priority Gap Plan
 
-1. P2: Deep capability probing follow-ups (broader mode matrix + richer no-response heuristics).
-2. P2: Expand mouse parity for extended/high-button mappings and compatibility fixtures.
-3. P2: Extend renderer style/cell-attribute parity over the new frame buffer engine.
-4. P3: Broaden Windows-specific runtime coverage for resize/input interplay under CI.
+1. P2: Deep capability probing follow-ups (broader mode matrix + stronger support-vs-state heuristics).
+2. P2: Expand terminal behavior fixtures with additional emulator/version captures (kitty/wezterm/alacritty variants).
+3. P2: Extend remaining renderer cell-attribute parity (e.g., framed/encircled/double-underline edge cases).
+4. P3: Broaden Windows-specific runtime coverage under CI for console input/resize interplay.
