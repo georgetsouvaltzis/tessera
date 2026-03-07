@@ -23,6 +23,7 @@ internal static class ProgramRuntimeTests
         yield return new TestCase("Program_CapabilityProbe_PartialResponseDisablesUnresolvedModes", CapabilityProbe_PartialResponseDisablesUnresolvedModes);
         yield return new TestCase("Program_CapabilityProbe_AllResponsesPreventTimeoutFallback", CapabilityProbe_AllResponsesPreventTimeoutFallback);
         yield return new TestCase("Program_ModeReport_RefinesTerminalCapabilities", ModeReport_RefinesTerminalCapabilities);
+        yield return new TestCase("Program_ModeReport_UnknownStateDisablesCapability", ModeReport_UnknownStateDisablesCapability);
         yield return new TestCase("Program_ResizeLoop_EmitsWindowSizeChanges", ResizeLoop_EmitsWindowSizeChanges);
         yield return new TestCase("Program_ResizeSignal_EmitsWindowSizeChanges", ResizeSignal_EmitsWindowSizeChanges);
         yield return new TestCase("Program_QuitFromInput_CancelsBeforeTerminalDispose", QuitFromInput_CancelsBeforeTerminalDispose);
@@ -403,6 +404,38 @@ internal static class ProgramRuntimeTests
         TestAssert.True(
             model.Seen[1].Source.Contains("+mode-report", StringComparison.Ordinal),
             "Refined capabilities should annotate source with mode-report.");
+    }
+
+    private static async Task ModeReport_UnknownStateDisablesCapability()
+    {
+        // Arrange
+        var initial = new TerminalCapabilityProfile(
+            FocusReporting: true,
+            MouseReporting: true,
+            BracketedPaste: true,
+            SynchronizedUpdates: true,
+            ModeReports: true,
+            Source: "test-unknown");
+        var model = new UnknownModeReportRefinementModel();
+        var program = new TeaProgram(model, new ProgramOptions
+        {
+            DisableRenderer = true,
+            DisableInput = true,
+            Terminal = new FakeTerminalAdapter(),
+            TerminalCapabilities = initial,
+        });
+
+        // Act
+        await program.RunAsync();
+
+        // Assert
+        TestAssert.Equal(2, model.Seen.Count, "Program should emit initial and refined capability messages.");
+        var refined = model.Seen[1];
+        TestAssert.True(!refined.MouseReporting, "Unknown mode-report state should downgrade mouse reporting.");
+        TestAssert.True(
+            refined.Source.Contains("+mode-report", StringComparison.Ordinal)
+            && refined.Source.Contains("+mode-report-unknown", StringComparison.Ordinal),
+            "Unknown mode-report refinement should annotate source.");
     }
 
     private static async Task ResizeSignal_EmitsWindowSizeChanges()

@@ -468,9 +468,15 @@ public sealed class TeaProgram
         out TerminalCapabilityProfile next)
     {
         next = current;
-        if (!TryGetModeState(report.State, out var enabled))
+        var unknownState = report.State == ModeReportState.Unknown;
+        if (!TryGetModeState(report.State, out var enabled) && !unknownState)
         {
             return false;
+        }
+
+        if (unknownState)
+        {
+            enabled = false;
         }
 
         var updated = report.Mode switch
@@ -491,6 +497,11 @@ public sealed class TeaProgram
         if (!source.Contains("+mode-report", StringComparison.Ordinal))
         {
             source += "+mode-report";
+        }
+
+        if (unknownState && !source.Contains("+mode-report-unknown", StringComparison.Ordinal))
+        {
+            source += "+mode-report-unknown";
         }
 
         next = updated with { Source = source };

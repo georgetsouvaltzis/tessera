@@ -171,6 +171,29 @@ internal sealed class CapabilityRefinementModel : IModel
     public ModelView View() => ModelView.From("capability-refinement");
 }
 
+internal sealed class UnknownModeReportRefinementModel : IModel
+{
+    public List<TerminalCapabilityProfile> Seen { get; } = [];
+
+    public Command? Init() => Commands.FromMessage(new ModeReportMsg(1006, ModeReportState.Unknown));
+
+    public UpdateResult Update(IMessage message)
+    {
+        if (message is TerminalCapabilitiesMsg capabilities)
+        {
+            Seen.Add(capabilities.Profile);
+            if (Seen.Count >= 2)
+            {
+                return new UpdateResult(this, Commands.Quit);
+            }
+        }
+
+        return new UpdateResult(this, null);
+    }
+
+    public ModelView View() => ModelView.From("capability-unknown-refinement");
+}
+
 internal sealed class CapabilityProbeTimeoutModel : IModel
 {
     private readonly TimeSpan _safetyQuitDelay;
