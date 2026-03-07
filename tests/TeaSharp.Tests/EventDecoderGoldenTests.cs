@@ -39,6 +39,7 @@ internal static class EventDecoderGoldenTests
         var pageDown = Decode(decoder, "\u001b[6~");
         var home = Decode(decoder, "\u001bOH");
         var end = Decode(decoder, "\u001bOF");
+        var backTab = Decode(decoder, "\u001b[Z");
         var f1 = Decode(decoder, "\u001bOP");
         var f4 = Decode(decoder, "\u001bOS");
         var f5 = Decode(decoder, "\u001b[15~");
@@ -54,6 +55,7 @@ internal static class EventDecoderGoldenTests
         AssertKey(pageDown, KeyCode.PageDown);
         AssertKey(home, KeyCode.Home);
         AssertKey(end, KeyCode.End);
+        AssertKey(backTab, KeyCode.Tab, KeyModifiers.Shift);
         AssertKey(f1, KeyCode.F1);
         AssertKey(f4, KeyCode.F4);
         AssertKey(f5, KeyCode.F5);

@@ -336,6 +336,11 @@ public sealed class EventDecoder
             return true;
         }
 
+        if (final == 'Z' && TryDecodeCsiBackTab(parameters, out message))
+        {
+            return true;
+        }
+
         if (CsiCursorFinals.Contains(final) && TryDecodeCsiCursorKey(final, parameters, out message))
         {
             return true;
@@ -585,6 +590,17 @@ public sealed class EventDecoder
             : KeyModifiers.None;
 
         return TryCreateKeyMessageFromCodePoint(codePoint, modifiers, out message);
+    }
+
+    private static bool TryDecodeCsiBackTab(IReadOnlyList<int?> parameters, out IMessage? message)
+    {
+        var modifier = GetCsiModifierParameter(parameters, 'Z');
+        var modifiers = modifier is null
+            ? KeyModifiers.Shift
+            : ParseModifiers(modifier) | KeyModifiers.Shift;
+
+        message = new KeyPressMsg(KeyCode.Tab, string.Empty, modifiers);
+        return true;
     }
 
     private static bool TryCreateKeyMessageFromCodePoint(int codePoint, KeyModifiers modifiers, out IMessage? message)

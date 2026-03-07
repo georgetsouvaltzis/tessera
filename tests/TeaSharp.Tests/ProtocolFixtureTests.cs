@@ -133,11 +133,13 @@ internal static class ProtocolFixtureTests
         var altLeft = decoder.Decode([0x1B, 0x1B, (byte)'[', (byte)'D'], timeoutExpired: false);
         var altRight = decoder.Decode([0x1B, 0x1B, (byte)'[', (byte)'C'], timeoutExpired: false);
         var altEnter = decoder.Decode([0x1B, 0x0D], timeoutExpired: false);
+        var backTab = Decode(decoder, "\u001b[Z");
 
         // Assert
         AssertKey(altLeft, KeyCode.Left, KeyModifiers.Alt);
         AssertKey(altRight, KeyCode.Right, KeyModifiers.Alt);
         AssertKey(altEnter, KeyCode.Enter, KeyModifiers.Alt);
+        AssertKey(backTab, KeyCode.Tab, KeyModifiers.Shift);
         return Task.CompletedTask;
     }
 
