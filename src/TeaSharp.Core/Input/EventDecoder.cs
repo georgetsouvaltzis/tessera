@@ -378,13 +378,14 @@ public sealed class EventDecoder
                 : (cb & 0b11) == 0b11
                     ? MouseEventType.Release
                     : MouseEventType.Press;
+        var (button, modifiers) = DecodeMouseButtonAndModifiers(cb, isWheel);
 
         var message = CreateMouseMessage(
             eventType,
-            DecodeMouseButton(cb, isWheel),
+            button,
             cx - 1,
             cy - 1,
-            ParseMouseModifiers(cb));
+            modifiers);
 
         return new DecodeResult(6, message, false);
     }
@@ -470,13 +471,14 @@ public sealed class EventDecoder
                 : final == 'm'
                     ? MouseEventType.Release
                     : MouseEventType.Press;
+        var (button, modifiers) = DecodeMouseButtonAndModifiers(cb, isWheel);
 
         message = CreateMouseMessage(
             eventType,
-            DecodeMouseButton(cb, isWheel),
+            button,
             cx - 1,
             cy - 1,
-            ParseMouseModifiers(cb));
+            modifiers);
         return true;
     }
 
@@ -686,14 +688,8 @@ public sealed class EventDecoder
 
         if ((encoded & MouseExtendedButtonsMask) != 0)
         {
-            return low switch
-            {
-                0 => MouseButton.Backward,
-                1 => MouseButton.Forward,
-                2 => MouseButton.Button10,
-                3 => MouseButton.Button11,
-                _ => MouseButton.None,
-            };
+            var extendedButtonIndex = (encoded & ~(MouseWheelMask | MouseMotionMask)) - MouseExtendedButtonsMask;
+            return DecodeExtendedMouseButton(extendedButtonIndex);
         }
 
         return low switch
@@ -701,6 +697,55 @@ public sealed class EventDecoder
             0 => MouseButton.Left,
             1 => MouseButton.Middle,
             2 => MouseButton.Right,
+            _ => MouseButton.None,
+        };
+    }
+
+    private static (MouseButton Button, KeyModifiers Modifiers) DecodeMouseButtonAndModifiers(int encoded, bool isWheel)
+    {
+        var button = DecodeMouseButton(encoded, isWheel);
+        if (isWheel || button is MouseButton.None)
+        {
+            return (button, ParseMouseModifiers(encoded));
+        }
+
+        if ((encoded & MouseExtendedButtonsMask) == 0)
+        {
+            return (button, ParseMouseModifiers(encoded));
+        }
+
+        var extendedButtonIndex = (encoded & ~(MouseWheelMask | MouseMotionMask)) - MouseExtendedButtonsMask;
+        if (extendedButtonIndex <= 3)
+        {
+            return (button, ParseMouseModifiers(encoded));
+        }
+
+        // Higher extended button indices overlap with modifier bits in the legacy encoding.
+        // Prefer stable high-button mapping and drop ambiguous modifier flags.
+        return (button, KeyModifiers.None);
+    }
+
+    private static MouseButton DecodeExtendedMouseButton(int extendedButtonIndex)
+    {
+        return extendedButtonIndex switch
+        {
+            0 => MouseButton.Backward,
+            1 => MouseButton.Forward,
+            2 => MouseButton.Button10,
+            3 => MouseButton.Button11,
+            4 => MouseButton.Button12,
+            5 => MouseButton.Button13,
+            6 => MouseButton.Button14,
+            7 => MouseButton.Button15,
+            8 => MouseButton.Button16,
+            9 => MouseButton.Button17,
+            10 => MouseButton.Button18,
+            11 => MouseButton.Button19,
+            12 => MouseButton.Button20,
+            13 => MouseButton.Button21,
+            14 => MouseButton.Button22,
+            15 => MouseButton.Button23,
+            16 => MouseButton.Button24,
             _ => MouseButton.None,
         };
     }

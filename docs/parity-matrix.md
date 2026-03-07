@@ -36,7 +36,7 @@ Legend: `done` = implemented, `partial` = usable but incomplete, `todo` = not im
 | Ctrl modifiers | control key combos | partial | Core ctrl path plus CSI `u` / modifyOtherKeys (`CSI 27;...~`) decode supported; full key matrix parity still pending. |
 | Alt/meta handling | alt key combos | partial | Escape-prefix + console modifiers + CSI enhanced key modifiers are supported, including nested escape-prefix forms (`ESC ESC` and `ESC` + escaped cursor sequences) for fallback alt behavior; some emulator-specific edge cases are still missing. |
 | Bracketed paste protocol | start/end/content handling | done | Start/end decode and aggregated `PasteMsg` content are implemented. |
-| Mouse protocol | X10/SGR mouse messages | partial | SGR 1006 + basic X10 decode implemented with base `MouseMsg` plus typed variants (`MouseClickMsg`, `MouseReleaseMsg`, `MouseMotionMsg`, `MouseWheelMsg`); richer button edge cases and high-button parity still pending. |
+| Mouse protocol | X10/SGR mouse messages | partial | SGR 1006 + X10 decode implemented with base `MouseMsg` plus typed variants (`MouseClickMsg`, `MouseReleaseMsg`, `MouseMotionMsg`, `MouseWheelMsg`), including extended button mapping through `MouseButton.Button24` and compatibility fixtures for higher-button press/drag paths; richer terminal-specific edge cases remain. |
 | Focus reporting | focus in/out messages | done | CSI focus in/out decode + render-mode toggle implemented. |
 | Resize updates | runtime terminal resize events | partial | Initial size + CSI parser support, Unix `SIGWINCH`-assisted checks with polling fallback, and Windows console-input resize signal registration (`WINDOW_BUFFER_SIZE_EVENT`) are implemented; polling remains as best-effort fallback. |
 
