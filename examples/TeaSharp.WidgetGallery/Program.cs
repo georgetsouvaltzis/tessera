@@ -3,10 +3,19 @@ using TeaSharp.Components;
 using TeaSharp.Core.Abstractions;
 using TeaSharp.Core.Application;
 using TeaSharp.Core.Messages;
+using TeaSharp.Core.Terminal;
 using ModelView = TeaSharp.Core.Abstractions.View;
 
 var model = new WidgetGalleryModel();
-var program = Tea.NewProgram(model);
+var terminal = new ConsoleTerminalAdapter();
+var capabilities = TerminalCapabilityDetector.Detect();
+var options = new ProgramOptions
+{
+    UseConsoleKeyEvents = false,
+    Terminal = terminal,
+    TerminalCapabilities = capabilities,
+};
+var program = Tea.NewProgram(model, options);
 try
 {
     await program.RunAsync();
@@ -171,6 +180,18 @@ internal sealed class WidgetGalleryModel : IModel
                 return new UpdateResult(this, Tea.Cmd.Quit);
             }
 
+            if (_dialog.Visible)
+            {
+                _focus = GalleryFocus.Dialog;
+                var dialogChanged = RouteFocusedInput(key);
+                if (dialogChanged)
+                {
+                    _lastEvent = key.Keystroke();
+                }
+
+                return new UpdateResult(this, null);
+            }
+
             if (key.Code == KeyCode.Tab)
             {
                 CycleFocus();
@@ -178,7 +199,7 @@ internal sealed class WidgetGalleryModel : IModel
                 return new UpdateResult(this, null);
             }
 
-            if (TryHandleTabShortcut(key))
+            if (_focus == GalleryFocus.Tabs && TryHandleTabShortcut(key))
             {
                 _focus = GalleryFocus.Tabs;
                 _lastEvent = $"tab:{_tabs.SelectedIndex + 1}";
