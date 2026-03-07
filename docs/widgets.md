@@ -24,6 +24,7 @@ TeaSharp now ships a stateful widget layer in `TeaSharp.Widgets` modeled after B
 - `KeyBinding`: normalized chord matcher and help label.
 - `ViewportKeyMap`, `TextInputKeyMap`, `ListKeyMap`: default bindings per widget.
 - `HelpView.RenderCompact(...)`: deterministic compact/multi-line help rendering with width wrapping.
+- `HelpView.RenderColumns(...)`: deterministic expanded help rendering with width-aware columns.
 
 ## Decoder Notes
 

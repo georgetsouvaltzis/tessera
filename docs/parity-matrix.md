@@ -33,7 +33,7 @@ Legend: `done` = implemented, `partial` = usable but incomplete, `todo` = not im
 | Character input | UTF-8 keys | done | Rune decode + `Console.ReadKey` fallback. |
 | Navigation keys | arrows/tab/enter/backspace/esc | done | Core keys mapped, including SS3/CSI function-key variants (`F1`-`F12`). |
 | VT control decode | CSI/SS3/OSC parsing | partial | Core cursor/edit keys, resize, OSC consumption implemented; full matrix still pending. |
-| Ctrl modifiers | control key combos | partial | Core ctrl path plus CSI `u` / modifyOtherKeys (`CSI 27;...~`) decode supported; full key matrix parity still pending. |
+| Ctrl modifiers | control key combos | partial | Core ctrl path plus CSI `u` / modifyOtherKeys (`CSI 27;...~`) decode supported, including CSI-u event typing for repeat/release (`;2`/`;3` and `:3` forms); full key matrix parity still pending. |
 | Alt/meta handling | alt key combos | partial | Escape-prefix + console modifiers + CSI enhanced key modifiers are supported, including nested escape-prefix forms (`ESC ESC` and `ESC` + escaped cursor sequences) for fallback alt behavior; some emulator-specific edge cases are still missing. |
 | Bracketed paste protocol | start/end/content handling | done | Start/end decode and aggregated `PasteMsg` content are implemented. |
 | Mouse protocol | X10/SGR mouse messages | partial | SGR 1006 + X10 decode implemented with base `MouseMsg` plus typed variants (`MouseClickMsg`, `MouseReleaseMsg`, `MouseMotionMsg`, `MouseWheelMsg`), including extended button mapping through `MouseButton.Button24` and compatibility fixtures for higher-button press/drag paths; richer terminal-specific edge cases remain. |
@@ -60,7 +60,7 @@ Legend: `done` = implemented, `partial` = usable but incomplete, `todo` = not im
 | Viewport model | scrollable content model | partial | `ViewportModel` added with vertical/horizontal scrolling, mouse wheel handling, and optional soft-wrap. Missing full gutter/highlight parity. |
 | Text input model | editable input model | partial | `TextInputModel` added with cursor movement, selection basics, submit handling, and word-level delete/navigation. Missing full IME/multiline parity. |
 | List model | selectable/filterable list | partial | `ListModel<T>` added with paging, filtering, selection visibility, wheel navigation, and async item loading helpers (`SetItemsAsync`, `AppendItemsAsync`). Missing richer delegates and advanced loader orchestration. |
-| Keymap/help model | reusable key bindings + help | partial | `KeyBinding`, widget keymaps, and compact help renderer added; no full-column/expanded help layout parity yet. |
+| Keymap/help model | reusable key bindings + help | done | `KeyBinding`, widget keymaps, compact help wrapping, and expanded column help layout (`HelpView.RenderColumns`) are implemented. |
 
 ## Component Layer
 

@@ -9,6 +9,7 @@ internal static class WidgetStateTests
     {
         yield return new TestCase("Widgets_KeyBinding_MatchesCtrlChord", KeyBinding_MatchesCtrlChord);
         yield return new TestCase("Widgets_HelpView_RenderCompact_WrapsByWidth", HelpView_RenderCompact_WrapsByWidth);
+        yield return new TestCase("Widgets_HelpView_RenderColumns_UsesExpandedLayout", HelpView_RenderColumns_UsesExpandedLayout);
         yield return new TestCase("Widgets_Viewport_ScrollAndHorizontalOffset", Viewport_ScrollAndHorizontalOffset);
         yield return new TestCase("Widgets_Viewport_WrapMode_SoftWrapsRows", Viewport_WrapMode_SoftWrapsRows);
         yield return new TestCase("Widgets_TextInput_EditWordAndSubmit", TextInput_EditWordAndSubmit);
@@ -48,6 +49,28 @@ internal static class WidgetStateTests
         // Assert
         TestAssert.True(help.Contains('\n'), "Help output should wrap when width is constrained.");
         TestAssert.True(help.Contains("up/k move up", StringComparison.Ordinal), "Help output should include first binding.");
+        return Task.CompletedTask;
+    }
+
+    private static Task HelpView_RenderColumns_UsesExpandedLayout()
+    {
+        // Arrange
+        var bindings = new[]
+        {
+            new KeyBinding("up/k", "move up"),
+            new KeyBinding("down/j", "move down"),
+            new KeyBinding("q", "quit"),
+            new KeyBinding("?", "help"),
+        };
+
+        // Act
+        var help = HelpView.RenderColumns(bindings, maxWidth: 56);
+
+        // Assert
+        var lines = help.Split('\n');
+        TestAssert.True(lines.Length >= 2, "Expanded help should wrap to multiple rows.");
+        TestAssert.True(lines[0].Contains("up/k move up", StringComparison.Ordinal), "First row should include first binding.");
+        TestAssert.True(lines[0].Contains("q quit", StringComparison.Ordinal), "First row should include second column binding.");
         return Task.CompletedTask;
     }
 

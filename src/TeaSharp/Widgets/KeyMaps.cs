@@ -85,6 +85,72 @@ public sealed class ListKeyMap : IWidgetKeyMap
 
 public static class HelpView
 {
+    public static string RenderColumns(
+        IEnumerable<KeyBinding> bindings,
+        int maxWidth,
+        int minColumnWidth = 24,
+        int columnGap = 3)
+    {
+        var chunks = bindings
+            .Select(binding => $"{binding.Keys} {binding.Description}")
+            .ToArray();
+        if (chunks.Length == 0)
+        {
+            return string.Empty;
+        }
+
+        if (maxWidth <= 0)
+        {
+            return string.Join('\n', chunks);
+        }
+
+        var contentWidth = Math.Max(minColumnWidth, chunks.Max(chunk => chunk.Length));
+        var perColumn = contentWidth + Math.Max(1, columnGap);
+        var columns = Math.Max(1, (maxWidth + Math.Max(1, columnGap)) / perColumn);
+        if (columns <= 1)
+        {
+            return string.Join('\n', chunks.Select(chunk => chunk.Length <= maxWidth ? chunk : chunk[..maxWidth]));
+        }
+
+        var rows = (int)Math.Ceiling(chunks.Length / (double)columns);
+        var lines = new List<string>(rows);
+        for (var row = 0; row < rows; row++)
+        {
+            var line = new System.Text.StringBuilder(maxWidth);
+            for (var column = 0; column < columns; column++)
+            {
+                var index = row + (column * rows);
+                if (index >= chunks.Length)
+                {
+                    continue;
+                }
+
+                var chunk = chunks[index];
+                var rendered = chunk.Length <= contentWidth
+                    ? chunk
+                    : chunk[..contentWidth];
+
+                if (line.Length > 0)
+                {
+                    line.Append(' ', Math.Max(1, columnGap));
+                }
+
+                if (column == columns - 1)
+                {
+                    line.Append(rendered);
+                }
+                else
+                {
+                    line.Append(rendered.PadRight(contentWidth));
+                }
+            }
+
+            lines.Add(line.ToString().TrimEnd());
+        }
+
+        return string.Join('\n', lines);
+    }
+
     public static string RenderCompact(IEnumerable<KeyBinding> bindings, int maxWidth = 0)
     {
         var chunks = bindings
