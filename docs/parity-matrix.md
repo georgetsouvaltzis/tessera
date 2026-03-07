@@ -59,7 +59,7 @@ Legend: `done` = implemented, `partial` = usable but incomplete, `todo` = not im
 |---|---|---|---|
 | Viewport model | scrollable content model | partial | `ViewportModel` added with vertical/horizontal scrolling, mouse wheel handling, and optional soft-wrap. Missing full gutter/highlight parity. |
 | Text input model | editable input model | partial | `TextInputModel` added with cursor movement, selection basics, submit handling, and word-level delete/navigation. Missing full IME/multiline parity. |
-| List model | selectable/filterable list | partial | `ListModel<T>` added with paging, filtering, selection visibility, and wheel navigation. Missing richer delegates and async item loaders. |
+| List model | selectable/filterable list | partial | `ListModel<T>` added with paging, filtering, selection visibility, wheel navigation, and async item loading helpers (`SetItemsAsync`, `AppendItemsAsync`). Missing richer delegates and advanced loader orchestration. |
 | Keymap/help model | reusable key bindings + help | partial | `KeyBinding`, widget keymaps, and compact help renderer added; no full-column/expanded help layout parity yet. |
 
 ## Component Layer

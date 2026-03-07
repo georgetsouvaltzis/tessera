@@ -39,6 +39,21 @@ public sealed class ListModel<T>
         ApplyFilter();
     }
 
+    public async ValueTask SetItemsAsync(IAsyncEnumerable<T> items, CancellationToken cancellationToken = default)
+    {
+        _allItems.Clear();
+        await AppendItemsCoreAsync(items, cancellationToken).ConfigureAwait(false);
+        ApplyFilter();
+    }
+
+    public async ValueTask<int> AppendItemsAsync(IAsyncEnumerable<T> items, CancellationToken cancellationToken = default)
+    {
+        var before = _allItems.Count;
+        await AppendItemsCoreAsync(items, cancellationToken).ConfigureAwait(false);
+        ApplyFilter();
+        return _allItems.Count - before;
+    }
+
     public void SetFilter(string filter)
     {
         Filter = filter ?? string.Empty;
@@ -194,5 +209,14 @@ public sealed class ListModel<T>
 
         SelectedIndex = Math.Clamp(SelectedIndex, 0, _filteredIndexes.Count - 1);
         EnsureSelectionVisible();
+    }
+
+    private async ValueTask AppendItemsCoreAsync(IAsyncEnumerable<T> items, CancellationToken cancellationToken)
+    {
+        await foreach (var item in items.ConfigureAwait(false))
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            _allItems.Add(item);
+        }
     }
 }

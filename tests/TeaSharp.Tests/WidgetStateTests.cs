@@ -15,6 +15,7 @@ internal static class WidgetStateTests
         yield return new TestCase("Widgets_TextInput_AltBindings_WorkForWordOps", TextInput_AltBindings_WorkForWordOps);
         yield return new TestCase("Widgets_TextInput_SelectAllThenPaste_ReplacesValue", TextInput_SelectAllThenPaste_ReplacesValue);
         yield return new TestCase("Widgets_List_FilterAndPaging_MaintainSelection", List_FilterAndPaging_MaintainSelection);
+        yield return new TestCase("Widgets_List_AsyncLoaders_ApplyFilterAndSelection", List_AsyncLoaders_ApplyFilterAndSelection);
     }
 
     private static Task KeyBinding_MatchesCtrlChord()
@@ -174,5 +175,38 @@ internal static class WidgetStateTests
         TestAssert.True(rowsAfterFilter.Count > 0, "Filtered list should keep matching rows.");
         TestAssert.True(rowsAfterFilter[0].Item.Contains("ta", StringComparison.Ordinal), "Filtered rows should match filter text.");
         return Task.CompletedTask;
+    }
+
+    private static async Task List_AsyncLoaders_ApplyFilterAndSelection()
+    {
+        // Arrange
+        var list = new ListModel<string>([], item => item)
+        {
+            PageSize = 2,
+        };
+        list.SetFilter("ta");
+
+        // Act
+        await list.SetItemsAsync(Stream("alpha", "beta", "gamma"));
+        var initialRows = list.VisibleRows();
+        var appended = await list.AppendItemsAsync(Stream("delta", "theta"));
+        var rows = list.VisibleRows();
+
+        // Assert
+        TestAssert.Equal(1, initialRows.Count, "Initial async set should keep filtered matches.");
+        TestAssert.Equal("beta", initialRows[0].Item, "Initial filtered item should match expected order.");
+        TestAssert.Equal(2, appended, "Async append should report number of appended items.");
+        TestAssert.Equal(3, list.Count, "Filter should include appended matching rows.");
+        TestAssert.Equal("beta", rows[0].Item, "Selection should remain stable after async append.");
+        return;
+
+        static async IAsyncEnumerable<string> Stream(params string[] values)
+        {
+            foreach (var value in values)
+            {
+                await Task.Yield();
+                yield return value;
+            }
+        }
     }
 }
