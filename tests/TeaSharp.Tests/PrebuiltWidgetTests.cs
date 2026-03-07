@@ -1,0 +1,239 @@
+using TeaSharp.Components;
+using TeaSharp.Core.Messages;
+
+namespace TeaSharp.Tests;
+
+internal static class PrebuiltWidgetTests
+{
+    public static IEnumerable<TestCase> Cases()
+    {
+        yield return new TestCase("Prebuilt_LabelComponent_RendersText", LabelComponent_RendersText);
+        yield return new TestCase("Prebuilt_ButtonComponent_ActivatesWhenFocused", ButtonComponent_ActivatesWhenFocused);
+        yield return new TestCase("Prebuilt_TextInputComponent_SubmitsValue", TextInputComponent_SubmitsValue);
+        yield return new TestCase("Prebuilt_TextAreaComponent_RendersMultilineContent", TextAreaComponent_RendersMultilineContent);
+        yield return new TestCase("Prebuilt_TextAreaComponent_EnterInsertsNewline", TextAreaComponent_EnterInsertsNewline);
+        yield return new TestCase("Prebuilt_ListComponent_NavigatesSelection", ListComponent_NavigatesSelection);
+        yield return new TestCase("Prebuilt_TableComponent_ForwardsSortHotkeys", TableComponent_ForwardsSortHotkeys);
+        yield return new TestCase("Prebuilt_ProgressBarComponent_AdjustsValue", ProgressBarComponent_AdjustsValue);
+        yield return new TestCase("Prebuilt_StatusBarComponent_RendersLeftAndRightText", StatusBarComponent_RendersLeftAndRightText);
+        yield return new TestCase("Prebuilt_LogViewerComponent_AppendsAndFilters", LogViewerComponent_AppendsAndFilters);
+        yield return new TestCase("Prebuilt_DialogComponent_AcceptsAndDismisses", DialogComponent_AcceptsAndDismisses);
+        yield return new TestCase("Prebuilt_LayoutContainerComponent_RendersChildren", LayoutContainerComponent_RendersChildren);
+    }
+
+    private static Task LabelComponent_RendersText()
+    {
+        var label = new LabelComponent
+        {
+            Title = "L",
+            Text = "hello\nworld",
+        };
+        var canvas = new Canvas(20, 6);
+
+        label.Render(canvas, new Rect(0, 0, 20, 6));
+        var output = canvas.Render();
+
+        TestAssert.True(output.Contains("hello", StringComparison.Ordinal), "Label should render first line.");
+        TestAssert.True(output.Contains("world", StringComparison.Ordinal), "Label should render second line.");
+        return Task.CompletedTask;
+    }
+
+    private static Task ButtonComponent_ActivatesWhenFocused()
+    {
+        var button = new ButtonComponent
+        {
+            Label = "Go",
+            Focused = true,
+        };
+
+        var changed = button.Update(new KeyPressMsg(KeyCode.Enter));
+
+        TestAssert.True(changed, "Focused button should handle enter.");
+        TestAssert.Equal(1, button.PressCount, "Button press count should increment.");
+        return Task.CompletedTask;
+    }
+
+    private static Task TextInputComponent_SubmitsValue()
+    {
+        var input = new TextInputComponent
+        {
+            ClearOnSubmit = true,
+        };
+
+        input.Update(new KeyPressMsg(KeyCode.Character, "a"));
+        input.Update(new KeyPressMsg(KeyCode.Character, "b"));
+        input.Update(new KeyPressMsg(KeyCode.Enter));
+
+        TestAssert.Equal("ab", input.LastSubmittedValue, "Text input should capture submitted value.");
+        TestAssert.Equal(1, input.SubmitCount, "Text input should count submissions.");
+        TestAssert.Equal(string.Empty, input.Input.Value, "Text input should clear after submit when configured.");
+        return Task.CompletedTask;
+    }
+
+    private static Task TextAreaComponent_RendersMultilineContent()
+    {
+        var area = new TextAreaComponent
+        {
+            ShowLineNumbers = true,
+        };
+        area.Input.SetValue("a\nb\nc");
+        var canvas = new Canvas(24, 8);
+
+        area.Render(canvas, new Rect(0, 0, 24, 8));
+        var output = canvas.Render();
+
+        TestAssert.True(output.Contains("1", StringComparison.Ordinal), "Text area should render line numbers when enabled.");
+        TestAssert.True(output.Contains("a", StringComparison.Ordinal), "Text area should render text content.");
+        return Task.CompletedTask;
+    }
+
+    private static Task TextAreaComponent_EnterInsertsNewline()
+    {
+        var area = new TextAreaComponent
+        {
+            Focused = true,
+        };
+
+        area.Update(new KeyPressMsg(KeyCode.Character, "l"));
+        area.Update(new KeyPressMsg(KeyCode.Character, "i"));
+        area.Update(new KeyPressMsg(KeyCode.Character, "n"));
+        area.Update(new KeyPressMsg(KeyCode.Character, "e"));
+        area.Update(new KeyPressMsg(KeyCode.Character, "A"));
+        area.Update(new KeyPressMsg(KeyCode.Enter));
+        area.Update(new KeyPressMsg(KeyCode.Character, "l"));
+        area.Update(new KeyPressMsg(KeyCode.Character, "i"));
+        area.Update(new KeyPressMsg(KeyCode.Character, "n"));
+        area.Update(new KeyPressMsg(KeyCode.Character, "e"));
+        area.Update(new KeyPressMsg(KeyCode.Character, "B"));
+
+        TestAssert.True(area.Input.Value.Contains('\n'), "Text area Enter should insert newline.");
+        TestAssert.True(area.Input.Value.StartsWith("lineA\nlineB", StringComparison.Ordinal), "Text area should keep content on separate lines.");
+        return Task.CompletedTask;
+    }
+
+    private static Task ListComponent_NavigatesSelection()
+    {
+        var list = new ListComponent<string>(["one", "two", "three"], x => x)
+        {
+            Focused = true,
+        };
+
+        list.Update(new KeyPressMsg(KeyCode.Down));
+        var selected = list.Model.SelectedItem;
+
+        TestAssert.Equal("two", selected ?? string.Empty, "List down key should advance selection.");
+        return Task.CompletedTask;
+    }
+
+    private static Task TableComponent_ForwardsSortHotkeys()
+    {
+        var table = new TableComponent(["A", "B"])
+        {
+            Focused = true,
+            Title = "T",
+        };
+        table.SetRows(
+        [
+            ["x", "2"],
+            ["y", "1"],
+        ]);
+
+        table.Update(new KeyPressMsg(KeyCode.Character, "c"));
+        table.Update(new KeyPressMsg(KeyCode.Character, "s"));
+        TestAssert.Equal(1, table.Inner.SortColumn, "Table should change sort column from hotkey.");
+        TestAssert.True(table.Inner.SortDescending, "Table should toggle sort direction from hotkey.");
+        return Task.CompletedTask;
+    }
+
+    private static Task ProgressBarComponent_AdjustsValue()
+    {
+        var progress = new ProgressBarComponent
+        {
+            Focused = true,
+            Step = 0.25,
+        };
+
+        progress.Update(new KeyPressMsg(KeyCode.Right));
+        progress.Update(new KeyPressMsg(KeyCode.Right));
+        progress.Update(new KeyPressMsg(KeyCode.Left));
+
+        TestAssert.True(Math.Abs(progress.Value - 0.25) < 0.0001, "Progress should settle at 25% after two increments and one decrement.");
+        return Task.CompletedTask;
+    }
+
+    private static Task StatusBarComponent_RendersLeftAndRightText()
+    {
+        var status = new StatusBarComponent
+        {
+            LeftText = "left",
+            RightText = "right",
+        };
+        var canvas = new Canvas(24, 1);
+
+        status.Render(canvas, new Rect(0, 0, 24, 1));
+        var output = canvas.Render();
+
+        TestAssert.True(output.StartsWith("left", StringComparison.Ordinal), "Status bar should render left text at start.");
+        TestAssert.True(output.EndsWith("right", StringComparison.Ordinal), "Status bar should render right text at end.");
+        return Task.CompletedTask;
+    }
+
+    private static Task LogViewerComponent_AppendsAndFilters()
+    {
+        var logs = new LogViewerComponent
+        {
+            Focused = true,
+        };
+        logs.Append("alpha");
+        logs.Append("beta");
+        logs.SetFilter("alp");
+        var canvas = new Canvas(26, 8);
+
+        logs.Render(canvas, new Rect(0, 0, 26, 8));
+        var output = canvas.Render();
+
+        TestAssert.True(output.Contains("alpha", StringComparison.Ordinal), "Filtered log view should keep matching entries.");
+        TestAssert.True(!output.Contains("beta", StringComparison.Ordinal), "Filtered log view should hide non-matching entries.");
+        return Task.CompletedTask;
+    }
+
+    private static Task DialogComponent_AcceptsAndDismisses()
+    {
+        var dialog = new DialogComponent
+        {
+            Visible = true,
+            Focused = true,
+        };
+
+        var accepted = dialog.Update(new KeyPressMsg(KeyCode.Enter));
+        TestAssert.True(accepted, "Dialog should accept on enter.");
+        TestAssert.True(dialog.LastResult == DialogResult.Accepted, "Dialog should record accepted result.");
+
+        dialog.Visible = true;
+        dialog.Focused = true;
+        var dismissed = dialog.Update(new KeyPressMsg(KeyCode.Escape));
+        TestAssert.True(dismissed, "Dialog should dismiss on escape.");
+        TestAssert.True(dialog.LastResult == DialogResult.Dismissed, "Dialog should record dismissed result.");
+        return Task.CompletedTask;
+    }
+
+    private static Task LayoutContainerComponent_RendersChildren()
+    {
+        var layout = new LayoutContainerComponent
+        {
+            Mode = LayoutContainerMode.Grid,
+            GridRows = 1,
+            GridColumns = 2,
+        };
+        layout.Add(new LabelComponent { DrawBorder = false, Text = "left" });
+        layout.Add(new LabelComponent { DrawBorder = false, Text = "right" });
+
+        var canvas = new Canvas(20, 3);
+        layout.Render(canvas, new Rect(0, 0, 20, 3));
+        var output = canvas.Render();
+
+        TestAssert.True(output.Contains("left", StringComparison.Ordinal), "Layout container should render first child.");
+        TestAssert.True(output.Contains("right", StringComparison.Ordinal), "Layout container should render second child.");
+        return Task.CompletedTask;
+    }
+}

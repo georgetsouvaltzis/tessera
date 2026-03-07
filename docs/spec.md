@@ -65,7 +65,7 @@ Primary goal: deterministic message-driven TUI runtime with portable terminal be
 - `Commands` static helpers: `Quit`, `Interrupt`, `Batch`, `Sequence`, `Tick`, `Every`.
 
 7. `Components`
-- `TeaSharp.Components`: deterministic canvas primitives (`Rect`, `Canvas`, `Widgets`) with selectable text pipeline (`CanvasTextMode.Fast` / `CanvasTextMode.GraphemeAware`) and configurable border styles, component composition contracts (`ICanvasComponent`, `IStatefulComponent`, `ComponentComposer`), chart primitives (`Charts`, `LineChartComponent`, `BarChartComponent`) with optional axes/legend/scale options, dashboard widgets (`GaugeComponent`, `StatsCardComponent`, `MiniLogComponent`), and a reusable UI kit (`Layout`, `UiWidgets`, tabs/accordion/table/forms/toast/modal components).
+- `TeaSharp.Components`: deterministic canvas primitives (`Rect`, `Canvas`, `Widgets`) with selectable text pipeline (`CanvasTextMode.Fast` / `CanvasTextMode.GraphemeAware`) and configurable border styles, component composition contracts (`ICanvasComponent`, `IStatefulComponent`, `ComponentComposer`), chart primitives (`Charts`, `LineChartComponent`, `BarChartComponent`) with optional axes/legend/scale options, dashboard widgets (`GaugeComponent`, `StatsCardComponent`, `MiniLogComponent`), reusable UI kit (`Layout`, `UiWidgets`, tabs/accordion/table/forms/toast/modal components), and a prebuilt widget layer (`Label`, `Button`, `TextInput`, `TextArea`, `List`, `Table`, `ProgressBar`, `Tabs`, `Modal/Dialog`, `StatusBar`, `LogViewer`, `LayoutContainer`).
 
 8. `Styles`
 - `TeaSharp.Styles`: composable ANSI style model (`TeaStyle`, `AnsiColor`) for foreground/background and text attributes.
@@ -146,6 +146,7 @@ Behavior tests cover:
 - stateful widget tests (viewport scroll/wrap, text input edits/submission, list filter/paging, keymap help rendering).
 - component tests (table/card primitives, chart rendering, component composer dispatch).
 - UI-kit tests (layout helpers, border variants, tabs/table/forms/modal interactions).
+- prebuilt widget tests (render + interaction contracts for label/button/input/textarea/list/table/progress/status/log/dialog/layout).
 - protocol fixture tests (terminal-behavior fixtures for Ghostty/iTerm2/Apple Terminal style key/paste/focus sequences).
 - integration tests (NUnit) for workspace UX contract (`:` enter command mode, `esc` exit, pane focus routing, and showcase modal/toast hotkeys).
 

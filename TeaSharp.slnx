@@ -1,6 +1,7 @@
 <Solution>
   <Folder Name="/examples/">
     <Project Path="examples/TeaSharp.Examples/TeaSharp.Examples.csproj" />
+    <Project Path="examples/TeaSharp.WidgetGallery/TeaSharp.WidgetGallery.csproj" />
   </Folder>
   <Folder Name="/src/">
     <Project Path="src/TeaSharp.Core/TeaSharp.Core.csproj" />

@@ -59,6 +59,18 @@ The design follows patterns used in Bubble Tea examples:
     - `SelectComponent`
     - `ToastCenterComponent`
     - `ModalComponent`
+  - prebuilt widget components (`PrebuiltWidgets`):
+    - `LabelComponent`
+    - `ButtonComponent`
+    - `TextInputComponent`
+    - `TextAreaComponent`
+    - `ListComponent<T>`
+    - `TableComponent`
+    - `ProgressBarComponent`
+    - `StatusBarComponent`
+    - `LogViewerComponent`
+    - `DialogComponent`
+    - `LayoutContainerComponent`
 
 ## Example Integration
 
@@ -86,6 +98,14 @@ Workspace pages have explicit input modes:
 Press `:` to enter `cmd` mode and focus command input immediately. Press `esc` to return to `nav` mode and restore prior non-command focus.
 Showcase pane hotkeys are available when showcase pane focus is active (including `nav` mode): `t` toast, `m` modal, `a` accordion, `z` checklist, `r` theme, `f` density, `c` table column, `v` table sort, `[`/`]` table page, `p`/`P` pane cycle.
 The dashboard composes chart components through `ComponentComposer` and uses stateful models from `TeaSharp.Widgets`.
+
+## Widget Gallery App
+
+A dedicated app now exists for the prebuilt widget set:
+
+- project: `examples/TeaSharp.WidgetGallery`
+- run: `dotnet run --project examples/TeaSharp.WidgetGallery/TeaSharp.WidgetGallery.csproj`
+- docs: `docs/prebuilt-widgets.md`
 
 ## Custom Components
 
