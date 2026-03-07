@@ -12,6 +12,9 @@ namespace TeaSharp.Core.Application;
 
 public sealed class TeaProgram
 {
+    private static readonly int[] DefaultCapabilityProbeModes = [1000, 1002, 1003, 1004, 1006, 2004, 2026];
+    private static readonly int[] CapabilityProbeRepresentativeModes = [1004, 1006, 2004, 2026];
+
     private readonly ProgramOptions _options;
     private readonly Channel<IMessage> _messages;
     private readonly Channel<Command> _commands;
@@ -479,30 +482,25 @@ public sealed class TeaProgram
         out TerminalCapabilityProfile next)
     {
         next = current;
-        var unknownState = report.State == ModeReportState.Unknown;
-        if (!TryGetModeState(report.State, out var enabled) && !unknownState)
+        if (!TryClassifyModeReportState(report.State, out var supported, out var enabled))
         {
             return false;
         }
 
-        if (unknownState)
+        var isTrackedMode = report.Mode is 1004 or 1006 or 2004 or 2026;
+        if (!isTrackedMode)
         {
-            enabled = false;
+            return false;
         }
 
         var updated = report.Mode switch
         {
-            1004 => current with { FocusReporting = enabled, ModeReports = true },
-            1006 => current with { MouseReporting = enabled, ModeReports = true },
-            2004 => current with { BracketedPaste = enabled, ModeReports = true },
-            2026 => current with { SynchronizedUpdates = enabled, ModeReports = true },
+            1004 => current with { FocusReporting = supported, ModeReports = true },
+            1006 => current with { MouseReporting = supported, ModeReports = true },
+            2004 => current with { BracketedPaste = supported, ModeReports = true },
+            2026 => current with { SynchronizedUpdates = supported, ModeReports = true },
             _ => current,
         };
-
-        if (updated == current)
-        {
-            return false;
-        }
 
         var source = updated.Source;
         if (!source.Contains("+mode-report", StringComparison.Ordinal))
@@ -510,26 +508,37 @@ public sealed class TeaProgram
             source += "+mode-report";
         }
 
-        if (unknownState && !source.Contains("+mode-report-unknown", StringComparison.Ordinal))
+        if (!supported && !source.Contains("+mode-report-unsupported", StringComparison.Ordinal))
         {
-            source += "+mode-report-unknown";
+            source += "+mode-report-unsupported";
+        }
+        else if (supported && !enabled && !source.Contains("+mode-report-reset", StringComparison.Ordinal))
+        {
+            source += "+mode-report-reset";
         }
 
         next = updated with { Source = source };
-        return true;
+        return next != current;
     }
 
-    private static bool TryGetModeState(ModeReportState state, out bool enabled)
+    private static bool TryClassifyModeReportState(ModeReportState state, out bool supported, out bool enabled)
     {
+        supported = false;
         enabled = false;
         switch (state)
         {
+            case ModeReportState.Unsupported:
+                supported = false;
+                enabled = false;
+                return true;
             case ModeReportState.Set:
             case ModeReportState.PermanentlySet:
+                supported = true;
                 enabled = true;
                 return true;
             case ModeReportState.Reset:
             case ModeReportState.PermanentlyReset:
+                supported = true;
                 enabled = false;
                 return true;
             default:
@@ -551,7 +560,7 @@ public sealed class TeaProgram
 
         var modes = _options.CapabilityProbeModes is { Count: > 0 }
             ? _options.CapabilityProbeModes
-            : [1004, 1006, 2004, 2026];
+            : DefaultCapabilityProbeModes;
         if (modes.Count == 0)
         {
             return;
@@ -629,7 +638,9 @@ public sealed class TeaProgram
         }
 
         var sawAnyResponse = _capabilityProbe.SawAnyResponse;
-        var unresolvedModes = _capabilityProbe.PendingModes.ToArray();
+        var unresolvedModes = _capabilityProbe.PendingModes
+            .Where(IsCapabilityRepresentativeProbeMode)
+            .ToArray();
         _capabilityProbe = null;
         if (!sawAnyResponse)
         {
@@ -679,6 +690,19 @@ public sealed class TeaProgram
 
         _runtimeCapabilities = next with { Source = nextSource };
         Send(new TerminalCapabilitiesMsg(_runtimeCapabilities));
+    }
+
+    private static bool IsCapabilityRepresentativeProbeMode(int mode)
+    {
+        for (var i = 0; i < CapabilityProbeRepresentativeModes.Length; i++)
+        {
+            if (CapabilityProbeRepresentativeModes[i] == mode)
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private sealed class CapabilityProbeState

@@ -23,7 +23,7 @@ internal static class ProgramRuntimeTests
         yield return new TestCase("Program_CapabilityProbe_PartialResponseDisablesUnresolvedModes", CapabilityProbe_PartialResponseDisablesUnresolvedModes);
         yield return new TestCase("Program_CapabilityProbe_AllResponsesPreventTimeoutFallback", CapabilityProbe_AllResponsesPreventTimeoutFallback);
         yield return new TestCase("Program_ModeReport_RefinesTerminalCapabilities", ModeReport_RefinesTerminalCapabilities);
-        yield return new TestCase("Program_ModeReport_UnknownStateDisablesCapability", ModeReport_UnknownStateDisablesCapability);
+        yield return new TestCase("Program_ModeReport_UnsupportedDisablesCapability", ModeReport_UnsupportedDisablesCapability);
         yield return new TestCase("Program_ResizeLoop_EmitsWindowSizeChanges", ResizeLoop_EmitsWindowSizeChanges);
         yield return new TestCase("Program_ResizeSignalsDisabled_SkipsSignalRegistration", ResizeSignalsDisabled_SkipsSignalRegistration);
         yield return new TestCase("Program_ResizeSignalFactoryFailure_FallsBackToPolling", ResizeSignalFactoryFailure_FallsBackToPolling);
@@ -251,6 +251,9 @@ internal static class ProgramRuntimeTests
 
         // Assert
         var output = terminal.OutputText;
+        TestAssert.True(output.Contains("\u001b[?1000$p", StringComparison.Ordinal), "Startup capability probe should query mode 1000.");
+        TestAssert.True(output.Contains("\u001b[?1002$p", StringComparison.Ordinal), "Startup capability probe should query mode 1002.");
+        TestAssert.True(output.Contains("\u001b[?1003$p", StringComparison.Ordinal), "Startup capability probe should query mode 1003.");
         TestAssert.True(output.Contains("\u001b[?1004$p", StringComparison.Ordinal), "Startup capability probe should query mode 1004.");
         TestAssert.True(output.Contains("\u001b[?1006$p", StringComparison.Ordinal), "Startup capability probe should query mode 1006.");
         TestAssert.True(output.Contains("\u001b[?2004$p", StringComparison.Ordinal), "Startup capability probe should query mode 2004.");
@@ -328,7 +331,7 @@ internal static class ProgramRuntimeTests
         TestAssert.True(!final.FocusReporting, "Unresolved focus probe should downgrade focus reporting.");
         TestAssert.True(!final.MouseReporting, "Unresolved mouse probe should downgrade mouse reporting.");
         TestAssert.True(!final.BracketedPaste, "Unresolved paste probe should downgrade bracketed paste support.");
-        TestAssert.True(!final.SynchronizedUpdates, "Mode report response reset should keep synchronized updates disabled.");
+        TestAssert.True(final.SynchronizedUpdates, "Mode report reset should retain synchronized update support while reporting current reset state.");
     }
 
     private static async Task CapabilityProbe_AllResponsesPreventTimeoutFallback()
@@ -370,7 +373,7 @@ internal static class ProgramRuntimeTests
         TestAssert.True(final.FocusReporting, "Probe set response should keep focus reporting enabled.");
         TestAssert.True(final.MouseReporting, "Probe set response should keep mouse reporting enabled.");
         TestAssert.True(final.BracketedPaste, "Probe set response should keep bracketed paste enabled.");
-        TestAssert.True(!final.SynchronizedUpdates, "Mode report reset should disable synchronized updates.");
+        TestAssert.True(final.SynchronizedUpdates, "Mode report reset should retain synchronized update support.");
         TestAssert.True(
             !final.Source.Contains("+probe-timeout", StringComparison.Ordinal)
             && !final.Source.Contains("+probe-partial-timeout", StringComparison.Ordinal),
@@ -402,13 +405,14 @@ internal static class ProgramRuntimeTests
         // Assert
         TestAssert.Equal(2, model.Seen.Count, "Program should emit initial and refined capability messages.");
         TestAssert.True(model.Seen[0].SynchronizedUpdates, "Initial capabilities should keep synchronized updates enabled.");
-        TestAssert.True(!model.Seen[1].SynchronizedUpdates, "Mode report reset should disable synchronized updates.");
+        TestAssert.True(model.Seen[1].SynchronizedUpdates, "Mode report reset should retain synchronized update support.");
         TestAssert.True(
-            model.Seen[1].Source.Contains("+mode-report", StringComparison.Ordinal),
-            "Refined capabilities should annotate source with mode-report.");
+            model.Seen[1].Source.Contains("+mode-report", StringComparison.Ordinal)
+            && model.Seen[1].Source.Contains("+mode-report-reset", StringComparison.Ordinal),
+            "Refined capabilities should annotate source with mode-report reset state.");
     }
 
-    private static async Task ModeReport_UnknownStateDisablesCapability()
+    private static async Task ModeReport_UnsupportedDisablesCapability()
     {
         // Arrange
         var initial = new TerminalCapabilityProfile(
@@ -417,8 +421,8 @@ internal static class ProgramRuntimeTests
             BracketedPaste: true,
             SynchronizedUpdates: true,
             ModeReports: true,
-            Source: "test-unknown");
-        var model = new UnknownModeReportRefinementModel();
+            Source: "test-unsupported");
+        var model = new UnsupportedModeReportRefinementModel();
         var program = new TeaProgram(model, new ProgramOptions
         {
             DisableRenderer = true,
@@ -433,11 +437,11 @@ internal static class ProgramRuntimeTests
         // Assert
         TestAssert.Equal(2, model.Seen.Count, "Program should emit initial and refined capability messages.");
         var refined = model.Seen[1];
-        TestAssert.True(!refined.MouseReporting, "Unknown mode-report state should downgrade mouse reporting.");
+        TestAssert.True(!refined.MouseReporting, "Unsupported mode-report state should downgrade mouse reporting.");
         TestAssert.True(
             refined.Source.Contains("+mode-report", StringComparison.Ordinal)
-            && refined.Source.Contains("+mode-report-unknown", StringComparison.Ordinal),
-            "Unknown mode-report refinement should annotate source.");
+            && refined.Source.Contains("+mode-report-unsupported", StringComparison.Ordinal),
+            "Unsupported mode-report refinement should annotate source.");
     }
 
     private static async Task ResizeSignal_EmitsWindowSizeChanges()

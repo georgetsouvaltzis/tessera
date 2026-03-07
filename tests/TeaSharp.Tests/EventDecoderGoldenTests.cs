@@ -186,7 +186,7 @@ internal static class EventDecoderGoldenTests
 
         // Assert
         AssertModeReport(syncEnabled, 2026, ModeReportState.Set);
-        AssertModeReport(mouseUnsupported, 1006, ModeReportState.Unknown);
+        AssertModeReport(mouseUnsupported, 1006, ModeReportState.Unsupported);
         return Task.CompletedTask;
     }
 

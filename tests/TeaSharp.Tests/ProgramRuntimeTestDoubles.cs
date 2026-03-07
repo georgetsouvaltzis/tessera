@@ -171,11 +171,11 @@ internal sealed class CapabilityRefinementModel : IModel
     public ModelView View() => ModelView.From("capability-refinement");
 }
 
-internal sealed class UnknownModeReportRefinementModel : IModel
+internal sealed class UnsupportedModeReportRefinementModel : IModel
 {
     public List<TerminalCapabilityProfile> Seen { get; } = [];
 
-    public Command? Init() => Commands.FromMessage(new ModeReportMsg(1006, ModeReportState.Unknown));
+    public Command? Init() => Commands.FromMessage(new ModeReportMsg(1006, ModeReportState.Unsupported));
 
     public UpdateResult Update(IMessage message)
     {
@@ -191,7 +191,7 @@ internal sealed class UnknownModeReportRefinementModel : IModel
         return new UpdateResult(this, null);
     }
 
-    public ModelView View() => ModelView.From("capability-unknown-refinement");
+    public ModelView View() => ModelView.From("capability-unsupported-refinement");
 }
 
 internal sealed class CapabilityProbeTimeoutModel : IModel

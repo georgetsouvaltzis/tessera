@@ -437,6 +437,7 @@ public sealed class EventDecoder
 
         var state = stateRaw switch
         {
+            0 => ModeReportState.Unsupported,
             1 => ModeReportState.Set,
             2 => ModeReportState.Reset,
             3 => ModeReportState.PermanentlySet,

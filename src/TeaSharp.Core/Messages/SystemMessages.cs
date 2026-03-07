@@ -23,7 +23,8 @@ public sealed record PasteMsg(string Content) : IMessage;
 
 public enum ModeReportState
 {
-    Unknown = 0,
+    Unknown = -1,
+    Unsupported = 0,
     Set = 1,
     Reset = 2,
     PermanentlySet = 3,
