@@ -14,6 +14,7 @@ public sealed class TeaProgram
 {
     private static readonly int[] DefaultCapabilityProbeModes = [1000, 1002, 1003, 1004, 1006, 2004, 2026];
     private static readonly int[] CapabilityProbeRepresentativeModes = [1004, 1006, 2004, 2026];
+    private static readonly int[] LegacyMouseProbeModes = [1000, 1002, 1003];
 
     private readonly ProgramOptions _options;
     private readonly Channel<IMessage> _messages;
@@ -489,14 +490,20 @@ public sealed class TeaProgram
             return false;
         }
 
-        var isTrackedMode = report.Mode is 1004 or 1006 or 2004 or 2026;
+        var isTrackedMode = report.Mode is 1000 or 1002 or 1003 or 1004 or 1006 or 2004 or 2026;
         if (!isTrackedMode)
+        {
+            return false;
+        }
+
+        if (report.Mode is 1000 or 1002 or 1003 && !supported)
         {
             return false;
         }
 
         var updated = report.Mode switch
         {
+            1000 or 1002 or 1003 => current with { MouseReporting = true, ModeReports = true },
             1004 => current with { FocusReporting = supported, ModeReports = true },
             1006 => current with { MouseReporting = supported, ModeReports = true },
             2004 => current with { BracketedPaste = supported, ModeReports = true },
@@ -517,6 +524,13 @@ public sealed class TeaProgram
         else if (supported && !enabled && !source.Contains("+mode-report-reset", StringComparison.Ordinal))
         {
             source += "+mode-report-reset";
+        }
+
+        if (report.Mode is 1000 or 1002 or 1003
+            && supported
+            && !source.Contains("+mode-report-mouse-legacy", StringComparison.Ordinal))
+        {
+            source += "+mode-report-mouse-legacy";
         }
 
         next = updated with { Source = source };
@@ -626,6 +640,12 @@ public sealed class TeaProgram
         }
 
         _capabilityProbe.SawAnyResponse = true;
+        if (TryClassifyModeReportState(report.State, out var supported, out _)
+            && supported)
+        {
+            _capabilityProbe.SupportedModes.Add(report.Mode);
+        }
+
         if (_capabilityProbe.PendingModes.Count == 0)
         {
             _capabilityProbe = null;
@@ -643,6 +663,7 @@ public sealed class TeaProgram
         var unresolvedModes = _capabilityProbe.PendingModes
             .Where(IsCapabilityRepresentativeProbeMode)
             .ToArray();
+        var hasLegacyMouseSupport = _capabilityProbe.SupportedModes.Any(IsLegacyMouseProbeMode);
         _capabilityProbe = null;
         if (!sawAnyResponse)
         {
@@ -673,6 +694,7 @@ public sealed class TeaProgram
             next = unresolvedMode switch
             {
                 1004 => next with { FocusReporting = false },
+                1006 when hasLegacyMouseSupport => next,
                 1006 => next with { MouseReporting = false },
                 2004 => next with { BracketedPaste = false },
                 2026 => next with { SynchronizedUpdates = false },
@@ -709,17 +731,33 @@ public sealed class TeaProgram
         return false;
     }
 
+    private static bool IsLegacyMouseProbeMode(int mode)
+    {
+        for (var i = 0; i < LegacyMouseProbeModes.Length; i++)
+        {
+            if (LegacyMouseProbeModes[i] == mode)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     private sealed class CapabilityProbeState
     {
         public CapabilityProbeState(Guid id, IReadOnlyList<int> modes)
         {
             Id = id;
             PendingModes = new HashSet<int>(modes);
+            SupportedModes = new HashSet<int>();
         }
 
         public Guid Id { get; }
 
         public HashSet<int> PendingModes { get; }
+
+        public HashSet<int> SupportedModes { get; }
 
         public bool SawAnyResponse { get; set; }
     }

@@ -21,8 +21,10 @@ internal static class ProgramRuntimeTests
         yield return new TestCase("Program_CapabilityProbe_WritesModeQueries", CapabilityProbe_WritesModeQueries);
         yield return new TestCase("Program_CapabilityProbe_TimeoutDisablesModeReportsWhenNoResponses", CapabilityProbe_TimeoutDisablesModeReportsWhenNoResponses);
         yield return new TestCase("Program_CapabilityProbe_PartialResponseDisablesUnresolvedModes", CapabilityProbe_PartialResponseDisablesUnresolvedModes);
+        yield return new TestCase("Program_CapabilityProbe_LegacyMouseResponsePreservesMouseCapability", CapabilityProbe_LegacyMouseResponsePreservesMouseCapability);
         yield return new TestCase("Program_CapabilityProbe_AllResponsesPreventTimeoutFallback", CapabilityProbe_AllResponsesPreventTimeoutFallback);
         yield return new TestCase("Program_ModeReport_RefinesTerminalCapabilities", ModeReport_RefinesTerminalCapabilities);
+        yield return new TestCase("Program_ModeReport_LegacyMouseSetEnablesCapability", ModeReport_LegacyMouseSetEnablesCapability);
         yield return new TestCase("Program_ModeReport_UnsupportedDisablesCapability", ModeReport_UnsupportedDisablesCapability);
         yield return new TestCase("Program_ModeReport_PropagatesCapabilitiesToRenderer", ModeReport_PropagatesCapabilitiesToRenderer);
         yield return new TestCase("Program_ResizeLoop_EmitsWindowSizeChanges", ResizeLoop_EmitsWindowSizeChanges);
@@ -335,6 +337,47 @@ internal static class ProgramRuntimeTests
         TestAssert.True(final.SynchronizedUpdates, "Mode report reset should retain synchronized update support while reporting current reset state.");
     }
 
+    private static async Task CapabilityProbe_LegacyMouseResponsePreservesMouseCapability()
+    {
+        // Arrange
+        var terminal = new InteractiveProbeTerminalAdapter();
+        var model = new CapabilityProbeResponseModel(
+            TimeSpan.FromMilliseconds(180),
+            [
+                new ModeReportMsg(1000, ModeReportState.Set),
+                new ModeReportMsg(2026, ModeReportState.Reset),
+            ]);
+        var initial = new TerminalCapabilityProfile(
+            FocusReporting: true,
+            MouseReporting: true,
+            BracketedPaste: true,
+            SynchronizedUpdates: true,
+            ModeReports: true,
+            Source: "probe-legacy-mouse-test");
+        var program = new TeaProgram(model, new ProgramOptions
+        {
+            DisableRenderer = true,
+            DisableInput = false,
+            Terminal = terminal,
+            TerminalCapabilities = initial,
+            EnableCapabilityProbe = true,
+            CapabilityProbeTimeout = TimeSpan.FromMilliseconds(30),
+        });
+
+        // Act
+        await program.RunAsync().WaitAsync(TimeSpan.FromSeconds(2));
+
+        // Assert
+        TestAssert.True(model.Seen.Count >= 3, "Legacy mouse + sync probe responses should emit refined capability updates.");
+        var final = model.Seen[^1];
+        TestAssert.True(
+            final.Source.Contains("+probe-partial-timeout", StringComparison.Ordinal),
+            "Partial timeout should still annotate unresolved representative modes.");
+        TestAssert.True(final.MouseReporting, "Legacy mouse mode support should preserve mouse capability when 1006 stays unresolved.");
+        TestAssert.True(!final.FocusReporting, "Unresolved focus probe should downgrade focus reporting.");
+        TestAssert.True(!final.BracketedPaste, "Unresolved paste probe should downgrade bracketed paste support.");
+    }
+
     private static async Task CapabilityProbe_AllResponsesPreventTimeoutFallback()
     {
         // Arrange
@@ -411,6 +454,40 @@ internal static class ProgramRuntimeTests
             model.Seen[1].Source.Contains("+mode-report", StringComparison.Ordinal)
             && model.Seen[1].Source.Contains("+mode-report-reset", StringComparison.Ordinal),
             "Refined capabilities should annotate source with mode-report reset state.");
+    }
+
+    private static async Task ModeReport_LegacyMouseSetEnablesCapability()
+    {
+        // Arrange
+        var initial = new TerminalCapabilityProfile(
+            FocusReporting: true,
+            MouseReporting: false,
+            BracketedPaste: true,
+            SynchronizedUpdates: true,
+            ModeReports: true,
+            Source: "legacy-mode-report-test");
+        var model = new CapabilityProbeResponseModel(
+            TimeSpan.FromMilliseconds(120),
+            [new ModeReportMsg(1000, ModeReportState.Set)]);
+        var program = new TeaProgram(model, new ProgramOptions
+        {
+            DisableRenderer = true,
+            DisableInput = true,
+            Terminal = new FakeTerminalAdapter(),
+            TerminalCapabilities = initial,
+        });
+
+        // Act
+        await program.RunAsync().WaitAsync(TimeSpan.FromSeconds(2));
+
+        // Assert
+        TestAssert.True(model.Seen.Count >= 2, "Legacy mouse mode report should emit refined capabilities.");
+        var refined = model.Seen[^1];
+        TestAssert.True(refined.MouseReporting, "Legacy mouse mode report set-state should enable mouse capability.");
+        TestAssert.True(
+            refined.Source.Contains("+mode-report", StringComparison.Ordinal)
+            && refined.Source.Contains("+mode-report-mouse-legacy", StringComparison.Ordinal),
+            "Legacy mouse refinement should annotate source.");
     }
 
     private static async Task ModeReport_UnsupportedDisablesCapability()

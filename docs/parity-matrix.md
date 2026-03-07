@@ -77,7 +77,7 @@ Legend: `done` = implemented, `partial` = usable but incomplete, `todo` = not im
 | Windows VT setup | console mode configuration | done | VT input/output setup + restore implemented. |
 | Unix raw mode | non-canonical no-echo mode | done | `stty raw -echo` with restore path. |
 | TTY fallback | interactive run under redirected stdio | done | `/dev/tty` binding + console-key fallback. |
-| Capability negotiation | terminal feature detection | partial | Environment-driven `TerminalCapabilityProfile` gates focus/mouse/paste/sync toggles and `DECRPM` queries; startup performs bounded active `DECRPM` probes over an expanded mode set (`?1000/?1002/?1003/?1004/?1006/?2004/?2026`) and refines runtime gating from `ModeReportMsg` responses with timeout heuristics (`+probe-timeout` for no responses, representative-mode `+probe-partial-timeout` downgrade for unresolved capability modes). Mode reports now distinguish unsupported (`Ps=0`) from current reset state (`Ps=2/4`) via source annotations (`+mode-report-unsupported`, `+mode-report-reset`) while keeping support/state semantics separate. Unix-like detection is enriched via best-effort `infocmp -x` parsing. Full terminfo-database parity and deeper runtime probing are still pending. |
+| Capability negotiation | terminal feature detection | partial | Environment-driven `TerminalCapabilityProfile` gates focus/mouse/paste/sync toggles and `DECRPM` queries; startup performs bounded active `DECRPM` probes over an expanded mode set (`?1000/?1002/?1003/?1004/?1006/?2004/?2026`) and refines runtime gating from `ModeReportMsg` responses with timeout heuristics (`+probe-timeout` for no responses, representative-mode `+probe-partial-timeout` downgrade for unresolved capability modes). Legacy mouse probe responses (`?1000/?1002/?1003`) now preserve mouse capability if `?1006` remains unresolved, and legacy set-state reports are annotated (`+mode-report-mouse-legacy`). Mode reports distinguish unsupported (`Ps=0`) from current reset state (`Ps=2/4`) via source annotations (`+mode-report-unsupported`, `+mode-report-reset`) while keeping support/state semantics separate. Unix-like detection is enriched via best-effort `infocmp -x` parsing. Full terminfo-database parity and deeper runtime probing are still pending. |
 
 ## Test Parity
 
@@ -91,7 +91,7 @@ Legend: `done` = implemented, `partial` = usable but incomplete, `todo` = not im
 
 ## Priority Gap Plan
 
-1. P2: Deep capability probing follow-ups (broader mode matrix + stronger support-vs-state heuristics).
+1. P2: Continue capability probing heuristics for non-representative mode inference and terminal-family overrides.
 2. P2: Expand terminal behavior fixtures with additional emulator/version captures (kitty/wezterm/alacritty variants).
-3. P2: Extend remaining renderer cell-attribute parity (e.g., framed/encircled/double-underline edge cases).
+3. P2: Extend remaining renderer cell-attribute parity edge cases beyond current style set.
 4. P3: Broaden Windows-specific runtime coverage under CI for console input/resize interplay.
