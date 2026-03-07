@@ -18,6 +18,9 @@ internal static class ProgramRuntimeTests
         yield return new TestCase("Program_CommandException_WithCatch_EmitsCommandErrorMsg", CommandException_WithCatch_EmitsCommandErrorMsg);
         yield return new TestCase("Program_CommandException_WithoutCatch_Propagates", CommandException_WithoutCatch_Propagates);
         yield return new TestCase("Program_EmitsTerminalCapabilitiesMessage", EmitsTerminalCapabilitiesMessage);
+        yield return new TestCase("Program_CapabilityProbe_WritesModeQueries", CapabilityProbe_WritesModeQueries);
+        yield return new TestCase("Program_CapabilityProbe_TimeoutDisablesModeReportsWhenNoResponses", CapabilityProbe_TimeoutDisablesModeReportsWhenNoResponses);
+        yield return new TestCase("Program_CapabilityProbe_ModeReportResponsePreventsTimeoutDowngrade", CapabilityProbe_ModeReportResponsePreventsTimeoutDowngrade);
         yield return new TestCase("Program_ModeReport_RefinesTerminalCapabilities", ModeReport_RefinesTerminalCapabilities);
         yield return new TestCase("Program_ResizeLoop_EmitsWindowSizeChanges", ResizeLoop_EmitsWindowSizeChanges);
         yield return new TestCase("Program_ResizeSignal_EmitsWindowSizeChanges", ResizeSignal_EmitsWindowSizeChanges);
@@ -216,6 +219,106 @@ internal static class ProgramRuntimeTests
         // Assert
         TestAssert.True(model.Seen is not null, "Program should emit TerminalCapabilitiesMsg.");
         TestAssert.Equal(expected, model.Seen!, "Program should emit configured terminal capabilities.");
+    }
+
+    private static async Task CapabilityProbe_WritesModeQueries()
+    {
+        // Arrange
+        var terminal = new InteractiveProbeTerminalAdapter();
+        var model = new TimedQuitModel(TimeSpan.FromMilliseconds(90));
+        var program = new TeaProgram(model, new ProgramOptions
+        {
+            DisableRenderer = true,
+            DisableInput = false,
+            Terminal = terminal,
+            TerminalCapabilities = new TerminalCapabilityProfile(
+                FocusReporting: true,
+                MouseReporting: true,
+                BracketedPaste: true,
+                SynchronizedUpdates: true,
+                ModeReports: true,
+                Source: "probe-test"),
+            EnableCapabilityProbe = true,
+            CapabilityProbeTimeout = TimeSpan.FromMilliseconds(800),
+        });
+
+        // Act
+        await program.RunAsync().WaitAsync(TimeSpan.FromSeconds(2));
+
+        // Assert
+        var output = terminal.OutputText;
+        TestAssert.True(output.Contains("\u001b[?1004$p", StringComparison.Ordinal), "Startup capability probe should query mode 1004.");
+        TestAssert.True(output.Contains("\u001b[?1006$p", StringComparison.Ordinal), "Startup capability probe should query mode 1006.");
+        TestAssert.True(output.Contains("\u001b[?2004$p", StringComparison.Ordinal), "Startup capability probe should query mode 2004.");
+        TestAssert.True(output.Contains("\u001b[?2026$p", StringComparison.Ordinal), "Startup capability probe should query mode 2026.");
+    }
+
+    private static async Task CapabilityProbe_TimeoutDisablesModeReportsWhenNoResponses()
+    {
+        // Arrange
+        var terminal = new InteractiveProbeTerminalAdapter();
+        var model = new CapabilityProbeTimeoutModel(TimeSpan.FromMilliseconds(260));
+        var initial = new TerminalCapabilityProfile(
+            FocusReporting: true,
+            MouseReporting: true,
+            BracketedPaste: true,
+            SynchronizedUpdates: true,
+            ModeReports: true,
+            Source: "probe-timeout-test");
+        var program = new TeaProgram(model, new ProgramOptions
+        {
+            DisableRenderer = true,
+            DisableInput = false,
+            Terminal = terminal,
+            TerminalCapabilities = initial,
+            EnableCapabilityProbe = true,
+            CapabilityProbeTimeout = TimeSpan.FromMilliseconds(35),
+        });
+
+        // Act
+        await program.RunAsync().WaitAsync(TimeSpan.FromSeconds(2));
+
+        // Assert
+        TestAssert.True(model.Seen.Count >= 2, "Probe timeout path should emit a refined capability profile.");
+        var refined = model.Seen[^1];
+        TestAssert.True(!refined.ModeReports, "No probe responses should disable mode reports for runtime gating.");
+        TestAssert.True(
+            refined.Source.Contains("+probe-timeout", StringComparison.Ordinal),
+            "Timeout-refined capabilities should annotate source with probe-timeout.");
+    }
+
+    private static async Task CapabilityProbe_ModeReportResponsePreventsTimeoutDowngrade()
+    {
+        // Arrange
+        var terminal = new InteractiveProbeTerminalAdapter();
+        var model = new CapabilityProbeResponseModel(TimeSpan.FromMilliseconds(120));
+        var initial = new TerminalCapabilityProfile(
+            FocusReporting: true,
+            MouseReporting: true,
+            BracketedPaste: true,
+            SynchronizedUpdates: true,
+            ModeReports: true,
+            Source: "probe-response-test");
+        var program = new TeaProgram(model, new ProgramOptions
+        {
+            DisableRenderer = true,
+            DisableInput = false,
+            Terminal = terminal,
+            TerminalCapabilities = initial,
+            EnableCapabilityProbe = true,
+            CapabilityProbeTimeout = TimeSpan.FromMilliseconds(30),
+        });
+
+        // Act
+        await program.RunAsync().WaitAsync(TimeSpan.FromSeconds(2));
+
+        // Assert
+        TestAssert.True(model.Seen.Count >= 2, "Mode report response should still refine capability profile.");
+        var final = model.Seen[^1];
+        TestAssert.True(final.ModeReports, "Any probe response should keep mode reports enabled.");
+        TestAssert.True(
+            !final.Source.Contains("+probe-timeout", StringComparison.Ordinal),
+            "Probe timeout downgrade should be skipped after successful probe response.");
     }
 
     private static async Task ModeReport_RefinesTerminalCapabilities()

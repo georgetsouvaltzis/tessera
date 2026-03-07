@@ -1,3 +1,4 @@
+using System.Text;
 using TeaSharp.Core.Abstractions;
 using TeaSharp.Core.Commands;
 using TeaSharp.Core.Messages;
@@ -168,6 +169,78 @@ internal sealed class CapabilityRefinementModel : IModel
     }
 
     public ModelView View() => ModelView.From("capability-refinement");
+}
+
+internal sealed class CapabilityProbeTimeoutModel : IModel
+{
+    private readonly TimeSpan _safetyQuitDelay;
+    public List<TerminalCapabilityProfile> Seen { get; } = [];
+
+    public CapabilityProbeTimeoutModel(TimeSpan safetyQuitDelay)
+    {
+        _safetyQuitDelay = safetyQuitDelay;
+    }
+
+    public Command? Init() => Commands.Tick(_safetyQuitDelay, _ => new QuitMsg());
+
+    public UpdateResult Update(IMessage message)
+    {
+        if (message is TerminalCapabilitiesMsg capabilities)
+        {
+            Seen.Add(capabilities.Profile);
+            if (capabilities.Profile.Source.Contains("+probe-timeout", StringComparison.Ordinal))
+            {
+                return new UpdateResult(this, Commands.Quit);
+            }
+        }
+
+        return new UpdateResult(this, null);
+    }
+
+    public ModelView View() => ModelView.From("capability-probe-timeout");
+}
+
+internal sealed class CapabilityProbeResponseModel : IModel
+{
+    private readonly TimeSpan _quitDelay;
+    public List<TerminalCapabilityProfile> Seen { get; } = [];
+
+    public CapabilityProbeResponseModel(TimeSpan quitDelay)
+    {
+        _quitDelay = quitDelay;
+    }
+
+    public Command? Init() => Commands.Sequence(
+        Commands.FromMessage(new ModeReportMsg(2026, ModeReportState.Reset)),
+        Commands.Tick(_quitDelay, _ => new QuitMsg()));
+
+    public UpdateResult Update(IMessage message)
+    {
+        if (message is TerminalCapabilitiesMsg capabilities)
+        {
+            Seen.Add(capabilities.Profile);
+        }
+
+        return new UpdateResult(this, null);
+    }
+
+    public ModelView View() => ModelView.From("capability-probe-response");
+}
+
+internal sealed class TimedQuitModel : IModel
+{
+    private readonly TimeSpan _delay;
+
+    public TimedQuitModel(TimeSpan delay)
+    {
+        _delay = delay;
+    }
+
+    public Command? Init() => Commands.Tick(_delay, _ => new QuitMsg());
+
+    public UpdateResult Update(IMessage message) => new(this, null);
+
+    public ModelView View() => ModelView.From("timed-quit");
 }
 
 internal sealed record NumberMsg(int Value) : IMessage;
@@ -409,6 +482,41 @@ internal sealed class SignalDrivenFakeTerminal : ITerminalAdapter
         {
             _size = new TerminalSize(width, height);
         }
+    }
+
+    public ValueTask DisposeAsync() => ValueTask.CompletedTask;
+}
+
+internal sealed class InteractiveProbeTerminalAdapter : ITerminalAdapter
+{
+    private readonly MemoryStream _output = new();
+
+    public Stream Input { get; } = new MemoryStream();
+
+    public Stream Output => _output;
+
+    public bool IsInputInteractive => true;
+
+    public bool IsOutputInteractive => true;
+
+    public string OutputText => Encoding.UTF8.GetString(_output.ToArray());
+
+    public ValueTask PrepareAsync(CancellationToken cancellationToken)
+    {
+        _ = cancellationToken;
+        return ValueTask.CompletedTask;
+    }
+
+    public ValueTask RestoreAsync(CancellationToken cancellationToken)
+    {
+        _ = cancellationToken;
+        return ValueTask.CompletedTask;
+    }
+
+    public ValueTask<TerminalSize> GetSizeAsync(CancellationToken cancellationToken)
+    {
+        _ = cancellationToken;
+        return ValueTask.FromResult(new TerminalSize(80, 24));
     }
 
     public ValueTask DisposeAsync() => ValueTask.CompletedTask;

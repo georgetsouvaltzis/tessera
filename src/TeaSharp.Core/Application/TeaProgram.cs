@@ -1,6 +1,7 @@
 using System.Threading.Channels;
 using System.Runtime.InteropServices;
 using System.Runtime.ExceptionServices;
+using System.Text;
 using TeaSharp.Core.Abstractions;
 using TeaSharp.Core.Input;
 using TeaSharp.Core.Messages;
@@ -21,6 +22,7 @@ public sealed class TeaProgram
     private TerminalReader? _reader;
     private CancellationTokenSource? _cts;
     private bool _running;
+    private CapabilityProbeState? _capabilityProbe;
     private TerminalCapabilityProfile _runtimeCapabilities = TerminalCapabilityProfile.AllSupported;
     private ExceptionDispatchInfo? _unhandledCommandException;
 
@@ -58,6 +60,7 @@ public sealed class TeaProgram
             _running = true;
             _cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
             _unhandledCommandException = null;
+            _capabilityProbe = null;
         }
 
         var token = _cts.Token;
@@ -86,6 +89,7 @@ public sealed class TeaProgram
 
             var commandLoop = Task.Run(() => CommandLoopAsync(token), token);
             var inputLoop = StartInputLoop(token);
+            await StartCapabilityProbeAsync(token).ConfigureAwait(false);
 
             if (Model.Init() is { } initCommand)
             {
@@ -101,6 +105,17 @@ public sealed class TeaProgram
             {
                 while (_messages.Reader.TryRead(out var message))
                 {
+                    if (message is CapabilityProbeTimeoutMsg probeTimeout)
+                    {
+                        HandleCapabilityProbeTimeout(probeTimeout);
+                        continue;
+                    }
+
+                    if (message is ModeReportMsg probeModeReport)
+                    {
+                        ObserveCapabilityProbeResponse(probeModeReport);
+                    }
+
                     var filtered = _options.Filter is null
                         ? message
                         : _options.Filter(Model, message);
@@ -499,4 +514,133 @@ public sealed class TeaProgram
                 return false;
         }
     }
+
+    private async Task StartCapabilityProbeAsync(CancellationToken token)
+    {
+        if (_terminal is null
+            || _options.DisableInput
+            || !_options.EnableCapabilityProbe
+            || !_terminal.IsInputInteractive
+            || !_terminal.IsOutputInteractive
+            || !_runtimeCapabilities.ModeReports)
+        {
+            return;
+        }
+
+        var modes = _options.CapabilityProbeModes is { Count: > 0 }
+            ? _options.CapabilityProbeModes
+            : [1004, 1006, 2004, 2026];
+        if (modes.Count == 0)
+        {
+            return;
+        }
+
+        var probe = new CapabilityProbeState(Guid.NewGuid(), modes);
+        _capabilityProbe = probe;
+        await SendCapabilityProbeQueriesAsync(modes, token).ConfigureAwait(false);
+
+        _ = Task.Run(async () =>
+        {
+            try
+            {
+                await Task.Delay(_options.CapabilityProbeTimeout, token).ConfigureAwait(false);
+                Send(new CapabilityProbeTimeoutMsg(probe.Id));
+            }
+            catch (OperationCanceledException)
+            {
+                // ignored: normal shutdown path.
+            }
+        }, CancellationToken.None);
+    }
+
+    private async Task SendCapabilityProbeQueriesAsync(IReadOnlyList<int> modes, CancellationToken token)
+    {
+        if (_terminal is null || modes.Count == 0)
+        {
+            return;
+        }
+
+        var sequence = new StringBuilder(modes.Count * 10);
+        foreach (var mode in modes)
+        {
+            sequence.Append("\u001b[?");
+            sequence.Append(mode);
+            sequence.Append("$p");
+        }
+
+        try
+        {
+            var bytes = Encoding.ASCII.GetBytes(sequence.ToString());
+            await _terminal.Output.WriteAsync(bytes, token).ConfigureAwait(false);
+            await _terminal.Output.FlushAsync(token).ConfigureAwait(false);
+        }
+        catch
+        {
+            // ignored: probe is best-effort.
+        }
+    }
+
+    private void ObserveCapabilityProbeResponse(ModeReportMsg report)
+    {
+        if (_capabilityProbe is null)
+        {
+            return;
+        }
+
+        if (!_capabilityProbe.PendingModes.Remove(report.Mode))
+        {
+            return;
+        }
+
+        _capabilityProbe.SawAnyResponse = true;
+        if (_capabilityProbe.PendingModes.Count == 0)
+        {
+            _capabilityProbe = null;
+        }
+    }
+
+    private void HandleCapabilityProbeTimeout(CapabilityProbeTimeoutMsg timeout)
+    {
+        if (_capabilityProbe is null || _capabilityProbe.Id != timeout.ProbeId)
+        {
+            return;
+        }
+
+        var sawAnyResponse = _capabilityProbe.SawAnyResponse;
+        _capabilityProbe = null;
+        if (sawAnyResponse || !_runtimeCapabilities.ModeReports)
+        {
+            return;
+        }
+
+        var source = _runtimeCapabilities.Source;
+        if (!source.Contains("+probe-timeout", StringComparison.Ordinal))
+        {
+            source += "+probe-timeout";
+        }
+
+        _runtimeCapabilities = _runtimeCapabilities with
+        {
+            ModeReports = false,
+            Source = source,
+        };
+        Send(new TerminalCapabilitiesMsg(_runtimeCapabilities));
+    }
+
+    private sealed class CapabilityProbeState
+    {
+        public CapabilityProbeState(Guid id, IReadOnlyList<int> modes)
+        {
+            Id = id;
+            PendingModes = new HashSet<int>(modes);
+        }
+
+        public Guid Id { get; }
+
+        public HashSet<int> PendingModes { get; }
+
+        public bool SawAnyResponse { get; set; }
+    }
+
+    private sealed record CapabilityProbeTimeoutMsg(Guid ProbeId) : IMessage;
 }

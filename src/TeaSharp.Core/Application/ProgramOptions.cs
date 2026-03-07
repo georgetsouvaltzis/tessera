@@ -24,6 +24,10 @@ public sealed class ProgramOptions
 
     public TimeSpan ResizePollInterval { get; init; } = TimeSpan.FromMilliseconds(120);
 
+    public bool EnableCapabilityProbe { get; init; } = true;
+
+    public TimeSpan CapabilityProbeTimeout { get; init; } = TimeSpan.FromMilliseconds(260);
+
     public IProgramRenderer? Renderer { get; init; }
 
     public ITerminalAdapter? Terminal { get; init; }
@@ -31,4 +35,6 @@ public sealed class ProgramOptions
     public TerminalCapabilityProfile? TerminalCapabilities { get; init; }
 
     internal Func<Action, IDisposable?>? ResizeSignalRegistrationFactory { get; init; }
+
+    internal IReadOnlyList<int>? CapabilityProbeModes { get; init; }
 }

@@ -77,7 +77,7 @@ Legend: `done` = implemented, `partial` = usable but incomplete, `todo` = not im
 | Windows VT setup | console mode configuration | done | VT input/output setup + restore implemented. |
 | Unix raw mode | non-canonical no-echo mode | done | `stty raw -echo` with restore path. |
 | TTY fallback | interactive run under redirected stdio | done | `/dev/tty` binding + console-key fallback. |
-| Capability negotiation | terminal feature detection | partial | Environment-driven `TerminalCapabilityProfile` now gates focus/mouse/paste/sync toggles and `DECRPM` queries; `TerminalCapabilitiesMsg` is emitted at startup and refined at runtime from `ModeReportMsg`; Unix-like detection is enriched via best-effort `infocmp -x` parsing. Full terminfo-database parity and deeper runtime probing are still pending. |
+| Capability negotiation | terminal feature detection | partial | Environment-driven `TerminalCapabilityProfile` gates focus/mouse/paste/sync toggles and `DECRPM` queries; startup now performs bounded active `DECRPM` probes (`?1004/?1006/?2004/?2026`) and refines runtime gating from `ModeReportMsg` responses (with timeout fallback for no-response environments); Unix-like detection is enriched via best-effort `infocmp -x` parsing. Full terminfo-database parity and deeper runtime probing are still pending. |
 
 ## Test Parity
 
@@ -91,7 +91,7 @@ Legend: `done` = implemented, `partial` = usable but incomplete, `todo` = not im
 
 ## Priority Gap Plan
 
-1. P2: Deep capability probing (beyond env + basic `infocmp` enrichment).
+1. P2: Deep capability probing follow-ups (broader mode matrix + richer no-response heuristics).
 2. P2: Expand mouse parity for extended/high-button mappings and compatibility fixtures.
 3. P2: Extend renderer style/cell-attribute parity over the new frame buffer engine.
 4. P3: Broaden Windows-specific runtime coverage for resize/input interplay under CI.
