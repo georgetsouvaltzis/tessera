@@ -76,6 +76,7 @@ public sealed class TeaProgram
             _renderer = _options.DisableRenderer
                 ? new NullRenderer()
                 : _options.Renderer ?? new AnsiDiffRenderer(capabilities);
+            _renderer.UpdateCapabilities(capabilities);
 
             await _terminal.PrepareAsync(token).ConfigureAwait(false);
             await _renderer.InitializeAsync(_terminal.Output, token).ConfigureAwait(false);
@@ -150,6 +151,7 @@ public sealed class TeaProgram
                         && TryApplyModeReport(_runtimeCapabilities, modeReport, out var refinedCapabilities))
                     {
                         _runtimeCapabilities = refinedCapabilities;
+                        _renderer?.UpdateCapabilities(refinedCapabilities);
                         Send(new TerminalCapabilitiesMsg(refinedCapabilities));
                     }
 
@@ -660,6 +662,7 @@ public sealed class TeaProgram
                 ModeReports = false,
                 Source = source,
             };
+            _renderer?.UpdateCapabilities(_runtimeCapabilities);
             Send(new TerminalCapabilitiesMsg(_runtimeCapabilities));
             return;
         }
@@ -689,6 +692,7 @@ public sealed class TeaProgram
         }
 
         _runtimeCapabilities = next with { Source = nextSource };
+        _renderer?.UpdateCapabilities(_runtimeCapabilities);
         Send(new TerminalCapabilitiesMsg(_runtimeCapabilities));
     }
 

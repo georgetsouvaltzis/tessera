@@ -1,4 +1,5 @@
 using TeaSharp.Core.Abstractions;
+using TeaSharp.Core.Terminal;
 
 namespace TeaSharp.Core.Rendering;
 
@@ -10,6 +11,11 @@ public sealed class NullRenderer : IProgramRenderer
     {
         _ = width;
         _ = height;
+    }
+
+    public void UpdateCapabilities(TerminalCapabilityProfile capabilities)
+    {
+        _ = capabilities;
     }
 
     public void Render(View view)

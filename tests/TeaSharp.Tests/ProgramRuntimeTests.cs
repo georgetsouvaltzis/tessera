@@ -24,6 +24,7 @@ internal static class ProgramRuntimeTests
         yield return new TestCase("Program_CapabilityProbe_AllResponsesPreventTimeoutFallback", CapabilityProbe_AllResponsesPreventTimeoutFallback);
         yield return new TestCase("Program_ModeReport_RefinesTerminalCapabilities", ModeReport_RefinesTerminalCapabilities);
         yield return new TestCase("Program_ModeReport_UnsupportedDisablesCapability", ModeReport_UnsupportedDisablesCapability);
+        yield return new TestCase("Program_ModeReport_PropagatesCapabilitiesToRenderer", ModeReport_PropagatesCapabilitiesToRenderer);
         yield return new TestCase("Program_ResizeLoop_EmitsWindowSizeChanges", ResizeLoop_EmitsWindowSizeChanges);
         yield return new TestCase("Program_ResizeSignalsDisabled_SkipsSignalRegistration", ResizeSignalsDisabled_SkipsSignalRegistration);
         yield return new TestCase("Program_ResizeSignalFactoryFailure_FallsBackToPolling", ResizeSignalFactoryFailure_FallsBackToPolling);
@@ -442,6 +443,34 @@ internal static class ProgramRuntimeTests
             refined.Source.Contains("+mode-report", StringComparison.Ordinal)
             && refined.Source.Contains("+mode-report-unsupported", StringComparison.Ordinal),
             "Unsupported mode-report refinement should annotate source.");
+    }
+
+    private static async Task ModeReport_PropagatesCapabilitiesToRenderer()
+    {
+        // Arrange
+        var initial = new TerminalCapabilityProfile(
+            FocusReporting: true,
+            MouseReporting: true,
+            BracketedPaste: true,
+            SynchronizedUpdates: true,
+            ModeReports: true,
+            Source: "test-renderer-propagation");
+        var model = new UnsupportedModeReportRefinementModel();
+        await using var renderer = new CapabilityAwareRendererSpy();
+        var program = new TeaProgram(model, new ProgramOptions
+        {
+            DisableInput = true,
+            Renderer = renderer,
+            Terminal = new FakeTerminalAdapter(),
+            TerminalCapabilities = initial,
+        });
+
+        // Act
+        await program.RunAsync();
+
+        // Assert
+        TestAssert.True(renderer.Updates.Count >= 2, "Renderer should receive initial and refined capability updates.");
+        TestAssert.True(!renderer.Updates[^1].MouseReporting, "Renderer should receive refined unsupported mouse capability state.");
     }
 
     private static async Task ResizeSignal_EmitsWindowSizeChanges()

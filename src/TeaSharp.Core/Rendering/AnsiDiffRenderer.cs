@@ -23,7 +23,7 @@ public sealed class AnsiDiffRenderer : IProgramRenderer
     private int _width;
     private int _height;
     private bool _fullRepaintRequired;
-    private readonly TerminalCapabilityProfile _capabilities;
+    private TerminalCapabilityProfile _capabilities;
 
     public AnsiDiffRenderer(TerminalCapabilityProfile? capabilities = null)
     {
@@ -64,6 +64,11 @@ public sealed class AnsiDiffRenderer : IProgramRenderer
 
         _width = width;
         _height = height;
+    }
+
+    public void UpdateCapabilities(TerminalCapabilityProfile capabilities)
+    {
+        _capabilities = capabilities;
     }
 
     public void Render(View view)

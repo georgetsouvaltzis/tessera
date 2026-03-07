@@ -2,6 +2,7 @@ using System.Text;
 using TeaSharp.Core.Abstractions;
 using TeaSharp.Core.Commands;
 using TeaSharp.Core.Messages;
+using TeaSharp.Core.Rendering;
 using TeaSharp.Core.Terminal;
 using ModelView = TeaSharp.Core.Abstractions.View;
 
@@ -274,6 +275,51 @@ internal sealed class TimedQuitModel : IModel
     public UpdateResult Update(IMessage message) => new(this, null);
 
     public ModelView View() => ModelView.From("timed-quit");
+}
+
+internal sealed class CapabilityAwareRendererSpy : IProgramRenderer
+{
+    public List<TerminalCapabilityProfile> Updates { get; } = [];
+
+    public ValueTask InitializeAsync(Stream output, CancellationToken cancellationToken)
+    {
+        _ = output;
+        _ = cancellationToken;
+        return ValueTask.CompletedTask;
+    }
+
+    public void Resize(int width, int height)
+    {
+        _ = width;
+        _ = height;
+    }
+
+    public void UpdateCapabilities(TerminalCapabilityProfile capabilities)
+    {
+        Updates.Add(capabilities);
+    }
+
+    public void Render(ModelView view)
+    {
+        _ = view;
+    }
+
+    public ValueTask FlushAsync(CancellationToken cancellationToken)
+    {
+        _ = cancellationToken;
+        return ValueTask.CompletedTask;
+    }
+
+    public ValueTask ResetAsync(CancellationToken cancellationToken)
+    {
+        _ = cancellationToken;
+        return ValueTask.CompletedTask;
+    }
+
+    public ValueTask DisposeAsync()
+    {
+        return ValueTask.CompletedTask;
+    }
 }
 
 internal sealed record NumberMsg(int Value) : IMessage;
