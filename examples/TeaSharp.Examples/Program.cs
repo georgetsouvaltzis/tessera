@@ -315,10 +315,15 @@ internal sealed class CounterModel : IModel
                 return new UpdateResult(this, null);
             }
 
-            if (key.Text == "?" && key.Modifiers == KeyModifiers.None && IsWorkspacePage)
+            if (IsWorkspacePage && IsHelpToggleKey(key))
             {
                 _showFullHelp = !_showFullHelp;
                 _lastEvent = $"help: {(_showFullHelp ? "full" : "compact")}";
+                AppendLog(_lastEvent);
+                if (_page == AppPage.Showcase)
+                {
+                    CaptureShowcaseSnapshot(_lastEvent);
+                }
                 return new UpdateResult(this, null);
             }
 
@@ -705,6 +710,24 @@ internal sealed class CounterModel : IModel
             && !key.Modifiers.HasFlag(KeyModifiers.Ctrl)
             && !key.Modifiers.HasFlag(KeyModifiers.Alt)
             && !key.Modifiers.HasFlag(KeyModifiers.Meta);
+    }
+
+    private static bool IsHelpToggleKey(KeyPressMsg key)
+    {
+        if (key.Code != KeyCode.Character)
+        {
+            return false;
+        }
+
+        if (key.Modifiers.HasFlag(KeyModifiers.Ctrl)
+            || key.Modifiers.HasFlag(KeyModifiers.Alt)
+            || key.Modifiers.HasFlag(KeyModifiers.Meta))
+        {
+            return false;
+        }
+
+        return key.Text == "?"
+            || key.Text == "/";
     }
 
     private static bool IsEscapeKey(KeyPressMsg key)
@@ -1372,7 +1395,7 @@ internal sealed class CounterModel : IModel
         var footerLines = new List<string>
         {
             inputLine,
-            $"focus={_focus.ToString().ToLowerInvariant()} filter='{_actionList.Filter}' stress={ToYesNo(_stressMode)} page=dashboard input={InputModeLabel()}",
+            $"focus={_focus.ToString().ToLowerInvariant()} filter='{_actionList.Filter}' stress={ToYesNo(_stressMode)} page=dashboard input={InputModeLabel()} help={(_showFullHelp ? "full" : "compact")}",
         };
         footerLines.AddRange(helpText.Split('\n'));
 
@@ -1497,7 +1520,7 @@ internal sealed class CounterModel : IModel
         var footerLines = new List<string>
         {
             inputLine,
-            $"focus={_focus.ToString().ToLowerInvariant()} filter='{_actionList.Filter}' stress={ToYesNo(_stressMode)} page=showcase class={Layout.Classify(_width).ToString().ToLowerInvariant()} mode={ShowcaseModeLabel()} input={InputModeLabel()}",
+            $"focus={_focus.ToString().ToLowerInvariant()} filter='{_actionList.Filter}' stress={ToYesNo(_stressMode)} page=showcase class={Layout.Classify(_width).ToString().ToLowerInvariant()} mode={ShowcaseModeLabel()} input={InputModeLabel()} help={(_showFullHelp ? "full" : "compact")}",
         };
         footerLines.AddRange(helpText.Split('\n'));
 

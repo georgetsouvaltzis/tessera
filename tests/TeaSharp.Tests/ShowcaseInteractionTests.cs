@@ -18,6 +18,9 @@ internal static class ShowcaseInteractionTests
         yield return new TestCase("Showcase_PlainQ_InCommandMode_StaysInputAndDoesNotQuit", PlainQ_InCommandMode_StaysInputAndDoesNotQuit);
         yield return new TestCase("Showcase_PlainDigits_InCommandMode_StayInInputAndDoNotSwitchPage", PlainDigits_InCommandMode_StayInInputAndDoNotSwitchPage);
         yield return new TestCase("Showcase_CommandTabSwitch_ChangesShowcaseTab", CommandTabSwitch_ChangesShowcaseTab);
+        yield return new TestCase("Showcase_QuestionMark_TogglesHelpMode", QuestionMark_TogglesHelpMode);
+        yield return new TestCase("Showcase_ShiftSlash_TogglesHelpMode", ShiftSlash_TogglesHelpMode);
+        yield return new TestCase("Showcase_PlainSlash_TogglesHelpMode", PlainSlash_TogglesHelpMode);
         yield return new TestCase("Showcase_ThemeSelection_ChangesRenderedPalette", ThemeSelection_ChangesRenderedPalette);
         yield return new TestCase("Showcase_CtrlS_TogglesStress", CtrlS_TogglesStress);
         yield return new TestCase("Showcase_PaneNavigation_RequiresShowcaseFocus", PaneNavigation_RequiresShowcaseFocus);
@@ -194,6 +197,54 @@ internal static class ShowcaseInteractionTests
         TestAssert.True(view.Contains("mode=cmd", StringComparison.Ordinal), "Command mode should remain active after submission.");
     }
 
+    private static async Task ShiftSlash_TogglesHelpMode()
+    {
+        // Arrange
+        await using var terminal = new ConsoleTerminalAdapter();
+        var model = new CounterModel(terminal);
+        GoToShowcase(model);
+        var before = ShowFullHelp(model);
+
+        // Act
+        model.Update(new KeyPressMsg(KeyCode.Character, "/", KeyModifiers.Shift));
+        var after = ShowFullHelp(model);
+
+        // Assert
+        TestAssert.True(before != after, "Shift+/ should toggle workspace help mode.");
+    }
+
+    private static async Task QuestionMark_TogglesHelpMode()
+    {
+        // Arrange
+        await using var terminal = new ConsoleTerminalAdapter();
+        var model = new CounterModel(terminal);
+        GoToShowcase(model);
+        var before = ShowFullHelp(model);
+
+        // Act
+        model.Update(new KeyPressMsg(KeyCode.Character, "?"));
+        var after = ShowFullHelp(model);
+
+        // Assert
+        TestAssert.True(before != after, "'?' should toggle workspace help mode.");
+    }
+
+    private static async Task PlainSlash_TogglesHelpMode()
+    {
+        // Arrange
+        await using var terminal = new ConsoleTerminalAdapter();
+        var model = new CounterModel(terminal);
+        GoToShowcase(model);
+        var before = ShowFullHelp(model);
+
+        // Act
+        model.Update(new KeyPressMsg(KeyCode.Character, "/"));
+        var after = ShowFullHelp(model);
+
+        // Assert
+        TestAssert.True(before != after, "Plain '/' should toggle workspace help mode.");
+    }
+
     private static async Task ThemeSelection_ChangesRenderedPalette()
     {
         // Arrange
@@ -349,6 +400,11 @@ internal static class ShowcaseInteractionTests
     private static bool StressMode(CounterModel model)
     {
         return (bool)(GetPrivateField(nameof(CounterModel), model, "_stressMode") ?? false);
+    }
+
+    private static bool ShowFullHelp(CounterModel model)
+    {
+        return (bool)(GetPrivateField(nameof(CounterModel), model, "_showFullHelp") ?? false);
     }
 
     private static TextInputModel CommandInput(CounterModel model)
