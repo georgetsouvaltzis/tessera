@@ -13,6 +13,7 @@ internal static class ChartComponentTests
         yield return new TestCase("Charts_BarChart_RendersLabelsAndBars", BarChart_RendersLabelsAndBars);
         yield return new TestCase("Charts_BarChart_WithScaleAndLegend_RendersScaleText", BarChart_WithScaleAndLegend_RendersScaleText);
         yield return new TestCase("Charts_LineChartComponent_HonorsCapacity", LineChartComponent_HonorsCapacity);
+        yield return new TestCase("Charts_LineChart_WithZoomAndOffset_ShiftsWindow", LineChart_WithZoomAndOffset_ShiftsWindow);
         yield return new TestCase("Components_Composer_DispatchesStatefulUpdates", Composer_DispatchesStatefulUpdates);
     }
 
@@ -127,6 +128,36 @@ internal static class ChartComponentTests
         TestAssert.Equal(4, component.Samples.Count, "Line chart component should keep only the latest samples.");
         TestAssert.Equal(2d, component.Samples[0], "Oldest sample should be dropped once capacity is exceeded.");
         TestAssert.Equal(5d, component.Samples[^1], "Newest sample should be retained.");
+        return Task.CompletedTask;
+    }
+
+    private static Task LineChart_WithZoomAndOffset_ShiftsWindow()
+    {
+        // Arrange
+        var samples = Enumerable.Range(0, 20).Select(i => (double)i).ToArray();
+        var baseCanvas = new Canvas(32, 10);
+        var zoomedCanvas = new Canvas(32, 10);
+
+        // Act
+        Charts.DrawLineChart(
+            baseCanvas,
+            new Rect(0, 0, 32, 10),
+            samples,
+            title: "Zoom",
+            options: new LineChartOptions(Zoom: 1.0, Offset: 0));
+        Charts.DrawLineChart(
+            zoomedCanvas,
+            new Rect(0, 0, 32, 10),
+            samples,
+            title: "Zoom",
+            options: new LineChartOptions(Zoom: 2.0, Offset: 6));
+        var baseline = baseCanvas.Render();
+        var zoomed = zoomedCanvas.Render();
+
+        // Assert
+        TestAssert.True(baseline.Contains("min:0.0", StringComparison.Ordinal), "Baseline chart should include first sample in stats.");
+        TestAssert.True(!zoomed.Contains("min:0.0", StringComparison.Ordinal), "Zoom+offset chart should shift visible window away from zero baseline.");
+        TestAssert.True(zoomed.Contains("max:", StringComparison.Ordinal), "Zoom+offset chart should keep stats rendering.");
         return Task.CompletedTask;
     }
 

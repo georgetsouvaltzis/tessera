@@ -36,9 +36,10 @@ The design follows patterns used in Bubble Tea examples:
   - `Charts.DrawLineChart(...)`
   - `Charts.DrawBarChart(...)`
   - optional options records:
-    - `LineChartOptions` (`ShowAxes`, `Legend`, `XLabel`, `YLabel`)
+    - `LineChartOptions` (`ShowAxes`, `Legend`, `XLabel`, `YLabel`, `Zoom`, `Offset`)
     - `BarChartOptions` (`ShowScale`, `Legend`)
   - `LineChartComponent` (bounded sample history)
+    - interactive helpers: `ZoomIn`, `ZoomOut`, `Pan`
   - `BarChartComponent` (named value bars)
 - dashboard-oriented components:
   - `GaugeComponent`
@@ -46,11 +47,13 @@ The design follows patterns used in Bubble Tea examples:
   - `MiniLogComponent`
 - UI kit components and layout helpers:
   - `Layout` (`Classify`, `SplitVertical`, `SplitHorizontal`, `Grid`)
-  - `UiWidgets` (`DrawBreadcrumb`, `DrawStatusBar`, `DrawTimeline`, `DrawTree`, `DrawCalendar`, `DrawSkeleton`)
+  - `UiTheme` (status fill, skeleton fill, modal backdrop)
+  - `UiWidgets` (`DrawBreadcrumb`, `DrawStatusBar`, `DrawTimeline`, `DrawTree`, `DrawCalendar`, `DrawSkeleton`) with optional theme overloads
   - stateful components:
     - `TabsComponent`
     - `AccordionComponent`
     - `SortableTableComponent`
+      - optional virtual window rendering (`EnableVirtualization`, `SetVirtualWindow`)
     - `CheckboxListComponent`
     - `RadioGroupComponent`
     - `SelectComponent`

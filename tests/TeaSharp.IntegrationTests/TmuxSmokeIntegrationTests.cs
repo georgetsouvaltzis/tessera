@@ -77,6 +77,49 @@ public sealed class TmuxSmokeIntegrationTests
         }
     }
 
+    [Test]
+    public async Task TmuxSmoke_ShowcaseHotkeysAndPaneCycling_WorkAsExpected()
+    {
+        if (!CommandSucceeds("tmux", "-V"))
+        {
+            Assert.Ignore("tmux is not available in this environment.");
+            return;
+        }
+
+        var session = $"teasharp_showcase_{Guid.NewGuid():N}".Substring(0, 24);
+        try
+        {
+            RunChecked("tmux", $"new-session -d -s {session} /bin/zsh -lc \"{AppRunCommand}\"");
+            await Task.Delay(1600);
+
+            SendKeys(session, "3");
+            await Task.Delay(240);
+            var showcase = CapturePane(session);
+            StringAssert.Contains("page=showcase", showcase, "Showcase page should render after key '3'.");
+
+            SendKeys(session, "Tab");
+            SendKeys(session, "t");
+            SendKeys(session, "m");
+            SendKeys(session, "p");
+            SendKeys(session, "P");
+            await Task.Delay(400);
+            var afterHotkeys = CapturePane(session);
+
+            StringAssert.Contains("mode=nav", afterHotkeys, "Showcase hotkeys should keep navigation mode active.");
+            StringAssert.Contains("pane=", afterHotkeys, "Pane label should remain visible after cycling hotkeys.");
+            StringAssert.Contains("page=showcase", afterHotkeys, "App should remain on showcase page after hotkeys.");
+            Assert.That(PaneHasExamplesChildProcess(session), Is.True, "App process should remain alive after showcase hotkeys.");
+
+            SendKeys(session, "q");
+            await Task.Delay(600);
+            Assert.That(PaneHasExamplesChildProcess(session), Is.False, "Single 'q' from navigation mode should terminate app.");
+        }
+        finally
+        {
+            _ = RunBestEffort("tmux", $"kill-session -t {session}");
+        }
+    }
+
     private static void SendKeys(string session, string keys)
     {
         RunChecked("tmux", $"send-keys -t {session} {keys}");

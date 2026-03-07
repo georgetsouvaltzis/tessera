@@ -11,6 +11,7 @@ internal static class TerminalCapabilityDetectorTests
         yield return new TestCase("CapabilityDetector_Xterm_EnablesAllModes", Xterm_EnablesAllModes);
         yield return new TestCase("CapabilityDetector_TerminfoEnrichesLinuxMouse", TerminfoEnrichesLinuxMouse);
         yield return new TestCase("CapabilityDetector_TerminfoEnrichesVt100Extensions", TerminfoEnrichesVt100Extensions);
+        yield return new TestCase("CapabilityDetector_EnvOverride_AppliesCaps", EnvOverride_AppliesCaps);
     }
 
     private static Task TermDumb_DisablesAdvancedModes()
@@ -90,6 +91,25 @@ internal static class TerminalCapabilityDetectorTests
         TestAssert.True(profile.BracketedPaste, "terminfo XT should enable bracketed paste.");
         TestAssert.True(!profile.SynchronizedUpdates, "vt100 should keep synchronized updates disabled without Sync.");
         TestAssert.True(profile.ModeReports, "terminfo XT should enable mode reports.");
+        return Task.CompletedTask;
+    }
+
+    private static Task EnvOverride_AppliesCaps()
+    {
+        // Arrange + Act
+        var profile = Detect(
+            ("TERM", "xterm-256color"),
+            ("TEASHARP_CAPS", "focus=0,mouse=0,paste=1,sync=0,decrpm=0"));
+
+        // Assert
+        TestAssert.True(!profile.FocusReporting, "Override should disable focus reporting.");
+        TestAssert.True(!profile.MouseReporting, "Override should disable mouse reporting.");
+        TestAssert.True(profile.BracketedPaste, "Override should allow enabling bracketed paste.");
+        TestAssert.True(!profile.SynchronizedUpdates, "Override should disable synchronized updates.");
+        TestAssert.True(!profile.ModeReports, "Override should disable mode reports.");
+        TestAssert.True(
+            profile.Source.Contains("+override", StringComparison.Ordinal),
+            "Source should include override marker when TEASHARP_CAPS applies.");
         return Task.CompletedTask;
     }
 

@@ -11,8 +11,10 @@ internal static class UiKitComponentTests
         yield return new TestCase("UiKit_Layout_SplitVertical_StaysWithinBounds", Layout_SplitVertical_StaysWithinBounds);
         yield return new TestCase("UiKit_Layout_Grid_DistributesRemainderAcrossCells", Layout_Grid_DistributesRemainderAcrossCells);
         yield return new TestCase("UiKit_Widgets_DrawStatusBar_PlacesLeftAndRightText", Widgets_DrawStatusBar_PlacesLeftAndRightText);
+        yield return new TestCase("UiKit_Widgets_DrawStatusBar_UsesThemeFill", Widgets_DrawStatusBar_UsesThemeFill);
         yield return new TestCase("UiKit_TabsComponent_CyclesAndSelectsByNumber", TabsComponent_CyclesAndSelectsByNumber);
         yield return new TestCase("UiKit_SortableTableComponent_UpdatesSortAndPaging", SortableTableComponent_UpdatesSortAndPaging);
+        yield return new TestCase("UiKit_SortableTableComponent_VirtualizationWindow_RendersSlice", SortableTableComponent_VirtualizationWindow_RendersSlice);
         yield return new TestCase("UiKit_FormComponents_RespondToInput", FormComponents_RespondToInput);
         yield return new TestCase("UiKit_ModalComponent_VisibleStateControlsRendering", ModalComponent_VisibleStateControlsRendering);
     }
@@ -83,6 +85,20 @@ internal static class UiKitComponentTests
         return Task.CompletedTask;
     }
 
+    private static Task Widgets_DrawStatusBar_UsesThemeFill()
+    {
+        // Arrange
+        var canvas = new Canvas(16, 1);
+
+        // Act
+        UiWidgets.DrawStatusBar(canvas, new Rect(0, 0, 16, 1), "L", "R", new UiTheme(StatusFill: '.'));
+        var output = canvas.Render();
+
+        // Assert
+        TestAssert.True(output.Contains(".", StringComparison.Ordinal), "Status bar should use theme fill character.");
+        return Task.CompletedTask;
+    }
+
     private static Task TabsComponent_CyclesAndSelectsByNumber()
     {
         // Arrange
@@ -124,6 +140,36 @@ internal static class UiKitComponentTests
         return Task.CompletedTask;
     }
 
+    private static Task SortableTableComponent_VirtualizationWindow_RendersSlice()
+    {
+        // Arrange
+        var table = new SortableTableComponent(["Metric", "Value"])
+        {
+            EnableVirtualization = true,
+            Title = "Virtual",
+        };
+        table.SetRows(
+        [
+            ["a", "1"],
+            ["b", "2"],
+            ["c", "3"],
+            ["d", "4"],
+            ["e", "5"],
+        ]);
+        table.SetVirtualWindow(startIndex: 2, windowSize: 2);
+
+        // Act
+        var canvas = new Canvas(32, 8);
+        table.Render(canvas, new Rect(0, 0, 32, 8));
+        var output = canvas.Render();
+
+        // Assert
+        TestAssert.True(output.Contains("v3+2", StringComparison.Ordinal), "Virtualized table title should report active window.");
+        TestAssert.True(output.Contains("c", StringComparison.Ordinal), "Virtualized slice should include starting row.");
+        TestAssert.True(output.Contains("d", StringComparison.Ordinal), "Virtualized slice should include following row.");
+        return Task.CompletedTask;
+    }
+
     private static Task FormComponents_RespondToInput()
     {
         // Arrange
@@ -158,6 +204,7 @@ internal static class UiKitComponentTests
         {
             Title = "Help",
             Lines = ["line one", "line two"],
+            Theme = new UiTheme(ModalBackdropFill: ':'),
         };
 
         // Act
@@ -173,6 +220,7 @@ internal static class UiKitComponentTests
         TestAssert.True(!hidden.Contains("line one", StringComparison.Ordinal), "Hidden modal should not draw modal content.");
         TestAssert.True(shown.Contains(" Help ", StringComparison.Ordinal), "Visible modal should render title.");
         TestAssert.True(shown.Contains("line one", StringComparison.Ordinal), "Visible modal should render body lines.");
+        TestAssert.True(shown.Contains(":", StringComparison.Ordinal), "Visible modal should apply themed backdrop fill.");
         return Task.CompletedTask;
     }
 }

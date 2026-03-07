@@ -16,7 +16,10 @@ internal static class ProgramRuntimeTests
         yield return new TestCase("Program_BatchCommands_ProcessAll", Batch_ProcessesAllCommands);
         yield return new TestCase("Program_FilterBlocksFirstQuit_AllowsSecond", Filter_CanBlockQuitMessage);
         yield return new TestCase("Program_CommandException_WithCatch_EmitsCommandErrorMsg", CommandException_WithCatch_EmitsCommandErrorMsg);
+        yield return new TestCase("Program_CommandException_WithRecovery_EmitsRecoveredMessage", CommandException_WithRecovery_EmitsRecoveredMessage);
+        yield return new TestCase("Program_CommandException_RecoveryFailure_EmitsCommandErrorMsg", CommandException_RecoveryFailure_EmitsCommandErrorMsg);
         yield return new TestCase("Program_CommandException_WithoutCatch_Propagates", CommandException_WithoutCatch_Propagates);
+        yield return new TestCase("Program_AdaptiveFramePacing_BatchesBurstRenders", AdaptiveFramePacing_BatchesBurstRenders);
         yield return new TestCase("Program_EmitsTerminalCapabilitiesMessage", EmitsTerminalCapabilitiesMessage);
         yield return new TestCase("Program_CapabilityProbe_WritesModeQueries", CapabilityProbe_WritesModeQueries);
         yield return new TestCase("Program_CapabilityProbe_TimeoutDisablesModeReportsWhenNoResponses", CapabilityProbe_TimeoutDisablesModeReportsWhenNoResponses);
@@ -176,6 +179,84 @@ internal static class ProgramRuntimeTests
                 string.Equals(ex.Message, CommandFaultModel.FailureMessage, StringComparison.Ordinal),
                 $"Unexpected propagated exception message: {ex.Message}");
         }
+    }
+
+    private static async Task CommandException_WithRecovery_EmitsRecoveredMessage()
+    {
+        // Arrange
+        var model = new CommandRecoveryModel();
+        var program = new TeaProgram(model, new ProgramOptions
+        {
+            DisableRenderer = true,
+            DisableInput = true,
+            Terminal = new FakeTerminalAdapter(),
+            CatchCommandExceptions = true,
+            RecoverCommandException = _ => new NumberMsg(42),
+        });
+
+        // Act
+        await program.RunAsync();
+
+        // Assert
+        TestAssert.True(model.RecoveredValue == 42, "Recovery hook should transform command exception into a replacement message.");
+    }
+
+    private static async Task CommandException_RecoveryFailure_EmitsCommandErrorMsg()
+    {
+        // Arrange
+        var model = new CommandErrorCaptureModel();
+        var program = new TeaProgram(model, new ProgramOptions
+        {
+            DisableRenderer = true,
+            DisableInput = true,
+            Terminal = new FakeTerminalAdapter(),
+            CatchCommandExceptions = true,
+            RecoverCommandException = _ => throw new InvalidOperationException("recovery-failure"),
+        });
+
+        // Act
+        await program.RunAsync();
+
+        // Assert
+        TestAssert.True(model.CapturedError is InvalidOperationException, "Recovery hook failures should be surfaced as command errors.");
+        TestAssert.True(
+            string.Equals(model.CapturedError?.Message, "recovery-failure", StringComparison.Ordinal),
+            "Recovery hook exception message should be preserved.");
+    }
+
+    private static async Task AdaptiveFramePacing_BatchesBurstRenders()
+    {
+        // Arrange
+        var nonAdaptiveModel = new BurstUpdateModel(targetCount: 8);
+        await using var nonAdaptiveRenderer = new RenderCountingRendererSpy();
+        var nonAdaptiveProgram = new TeaProgram(nonAdaptiveModel, new ProgramOptions
+        {
+            DisableInput = true,
+            Renderer = nonAdaptiveRenderer,
+            Terminal = new FakeTerminalAdapter(),
+            MaxFps = 120,
+            AdaptiveFramePacing = false,
+        });
+
+        var adaptiveModel = new BurstUpdateModel(targetCount: 8);
+        await using var adaptiveRenderer = new RenderCountingRendererSpy();
+        var adaptiveProgram = new TeaProgram(adaptiveModel, new ProgramOptions
+        {
+            DisableInput = true,
+            Renderer = adaptiveRenderer,
+            Terminal = new FakeTerminalAdapter(),
+            MaxFps = 120,
+            AdaptiveFramePacing = true,
+        });
+
+        // Act
+        await nonAdaptiveProgram.RunAsync();
+        await adaptiveProgram.RunAsync();
+
+        // Assert
+        TestAssert.True(
+            adaptiveRenderer.FlushCalls <= nonAdaptiveRenderer.FlushCalls,
+            $"Adaptive pacing should not exceed non-adaptive flush count (nonAdaptive={nonAdaptiveRenderer.FlushCalls}, adaptive={adaptiveRenderer.FlushCalls}).");
     }
 
     private static async Task ResizeLoop_EmitsWindowSizeChanges()

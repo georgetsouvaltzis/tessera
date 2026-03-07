@@ -24,20 +24,21 @@ public static class TerminalCapabilityDetector
         var termProgram = (readEnv("TERM_PROGRAM") ?? string.Empty).Trim();
         var termProgramLower = termProgram.ToLowerInvariant();
         var wtSession = readEnv("WT_SESSION");
+        var overrideRaw = readEnv("TEASHARP_CAPS");
         var profile = DetectFromEnvironment(termLower, termProgramLower, wtSession);
 
         if (isWindows || readTerminfo is null || string.IsNullOrWhiteSpace(termLower))
         {
-            return profile;
+            return ApplyOverrides(profile, overrideRaw);
         }
 
         var terminfo = readTerminfo(termLower);
         if (string.IsNullOrWhiteSpace(terminfo))
         {
-            return profile;
+            return ApplyOverrides(profile, overrideRaw);
         }
 
-        return EnrichWithTerminfo(profile, termLower, terminfo);
+        return ApplyOverrides(EnrichWithTerminfo(profile, termLower, terminfo), overrideRaw);
     }
 
     private static TerminalCapabilityProfile DetectFromEnvironment(
@@ -134,6 +135,50 @@ public static class TerminalCapabilityDetector
         }
 
         return next with { Source = $"{profile.Source}+terminfo:{term}" };
+    }
+
+    private static TerminalCapabilityProfile ApplyOverrides(TerminalCapabilityProfile profile, string? raw)
+    {
+        if (string.IsNullOrWhiteSpace(raw))
+        {
+            return profile;
+        }
+
+        var next = profile;
+        foreach (var token in raw.Split([',', ';'], StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries))
+        {
+            var separator = token.IndexOf('=');
+            if (separator <= 0 || separator >= token.Length - 1)
+            {
+                continue;
+            }
+
+            var key = token[..separator].Trim().ToLowerInvariant();
+            var value = token[(separator + 1)..].Trim().ToLowerInvariant();
+            var enabled = value is "1" or "true" or "yes" or "on";
+            var disabled = value is "0" or "false" or "no" or "off";
+            if (!enabled && !disabled)
+            {
+                continue;
+            }
+
+            next = key switch
+            {
+                "focus" => next with { FocusReporting = enabled },
+                "mouse" => next with { MouseReporting = enabled },
+                "paste" => next with { BracketedPaste = enabled },
+                "sync" => next with { SynchronizedUpdates = enabled },
+                "decrpm" or "mode_reports" or "mode-reports" => next with { ModeReports = enabled },
+                _ => next,
+            };
+        }
+
+        if (next == profile)
+        {
+            return profile;
+        }
+
+        return next with { Source = $"{profile.Source}+override" };
     }
 
     private static HashSet<string> ParseCapabilityNames(string infocmp)

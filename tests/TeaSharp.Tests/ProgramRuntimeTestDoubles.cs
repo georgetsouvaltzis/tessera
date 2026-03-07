@@ -106,6 +106,70 @@ internal sealed class CommandFaultModel : IModel
     public ModelView View() => ModelView.From("command-fault");
 }
 
+internal sealed class CommandRecoveryModel : IModel
+{
+    public int? RecoveredValue { get; private set; }
+
+    public Command? Init() => _ => throw new InvalidOperationException(CommandFaultModel.FailureMessage);
+
+    public UpdateResult Update(IMessage message)
+    {
+        if (message is NumberMsg number)
+        {
+            RecoveredValue = number.Value;
+            return new UpdateResult(this, Commands.Quit);
+        }
+
+        if (message is CommandErrorMsg)
+        {
+            return new UpdateResult(this, Commands.Quit);
+        }
+
+        return new UpdateResult(this, null);
+    }
+
+    public ModelView View() => ModelView.From("command-recovery");
+}
+
+internal sealed class BurstUpdateModel : IModel
+{
+    private readonly int _targetCount;
+
+    public BurstUpdateModel(int targetCount)
+    {
+        _targetCount = Math.Max(1, targetCount);
+    }
+
+    public int Count { get; private set; }
+
+    public Command? Init()
+    {
+        var commands = new List<Command?>(_targetCount);
+        for (var i = 0; i < _targetCount; i++)
+        {
+            commands.Add(Commands.FromMessage(new NumberMsg(i + 1)));
+        }
+
+        return Commands.Batch([.. commands]);
+    }
+
+    public UpdateResult Update(IMessage message)
+    {
+        if (message is NumberMsg)
+        {
+            Count++;
+            if (Count >= _targetCount)
+            {
+                return new UpdateResult(this, Commands.Quit);
+            }
+        }
+
+        return new UpdateResult(this, null);
+    }
+
+    public ModelView View() => ModelView.From($"burst-{Count}");
+}
+
 internal sealed class ResizeTrackingModel : IModel
 {
     public List<(int W, int H)> Seen { get; } = [];
@@ -307,6 +371,55 @@ internal sealed class CapabilityAwareRendererSpy : IProgramRenderer
     public ValueTask FlushAsync(CancellationToken cancellationToken)
     {
         _ = cancellationToken;
+        return ValueTask.CompletedTask;
+    }
+
+    public ValueTask ResetAsync(CancellationToken cancellationToken)
+    {
+        _ = cancellationToken;
+        return ValueTask.CompletedTask;
+    }
+
+    public ValueTask DisposeAsync()
+    {
+        return ValueTask.CompletedTask;
+    }
+}
+
+internal sealed class RenderCountingRendererSpy : IProgramRenderer
+{
+    public int RenderCalls { get; private set; }
+
+    public int FlushCalls { get; private set; }
+
+    public ValueTask InitializeAsync(Stream output, CancellationToken cancellationToken)
+    {
+        _ = output;
+        _ = cancellationToken;
+        return ValueTask.CompletedTask;
+    }
+
+    public void Resize(int width, int height)
+    {
+        _ = width;
+        _ = height;
+    }
+
+    public void UpdateCapabilities(TerminalCapabilityProfile capabilities)
+    {
+        _ = capabilities;
+    }
+
+    public void Render(ModelView view)
+    {
+        _ = view;
+        RenderCalls++;
+    }
+
+    public ValueTask FlushAsync(CancellationToken cancellationToken)
+    {
+        _ = cancellationToken;
+        FlushCalls++;
         return ValueTask.CompletedTask;
     }
 

@@ -1,7 +1,13 @@
 namespace TeaSharp.Components;
 
 public readonly record struct BarDatum(string Label, double Value);
-public readonly record struct LineChartOptions(bool ShowAxes = false, string? Legend = null, string? XLabel = null, string? YLabel = null);
+public readonly record struct LineChartOptions(
+    bool ShowAxes = false,
+    string? Legend = null,
+    string? XLabel = null,
+    string? YLabel = null,
+    double Zoom = 1.0,
+    int Offset = 0);
 public readonly record struct BarChartOptions(bool ShowScale = false, string? Legend = null);
 
 public static class Charts
@@ -43,8 +49,12 @@ public static class Charts
             return;
         }
 
-        var count = Math.Min(plot.Width, samples.Count);
-        var offset = Math.Max(0, samples.Count - count);
+        var zoom = double.IsFinite(chartOptions.Zoom)
+            ? Math.Clamp(chartOptions.Zoom, 0.1, 8.0)
+            : 1.0;
+        var count = Math.Clamp((int)Math.Round(plot.Width / zoom, MidpointRounding.AwayFromZero), 1, samples.Count);
+        var maxOffset = Math.Max(0, samples.Count - count);
+        var offset = Math.Clamp(chartOptions.Offset, 0, maxOffset);
         var min = minValue ?? double.PositiveInfinity;
         var max = maxValue ?? double.NegativeInfinity;
         if (!minValue.HasValue || !maxValue.HasValue)
@@ -81,7 +91,11 @@ public static class Charts
             var value = samples[offset + i];
             var normalized = Math.Clamp((value - min) / (max - min), 0, 1);
             var y = plot.Bottom - 1 - (int)Math.Round(normalized * (plot.Height - 1), MidpointRounding.AwayFromZero);
-            var x = plot.X + i;
+            var x = count <= 1
+                ? plot.X
+                : plot.X + (int)Math.Round(
+                    i * (plot.Width - 1) / (double)(count - 1),
+                    MidpointRounding.AwayFromZero);
 
             if (prevX >= 0)
             {
@@ -246,6 +260,10 @@ public sealed class LineChartComponent : ICanvasComponent
 
     public LineChartOptions? Options { get; set; }
 
+    public double Zoom { get; set; } = 1.0;
+
+    public int Offset { get; set; }
+
     public IReadOnlyList<double> Samples => _samples;
 
     public void SetSamples(IEnumerable<double> samples)
@@ -268,7 +286,27 @@ public sealed class LineChartComponent : ICanvasComponent
 
     public void Render(Canvas canvas, Rect rect)
     {
-        Charts.DrawLineChart(canvas, rect, _samples, Title, MinValue, MaxValue, Options);
+        var options = (Options ?? new LineChartOptions()) with
+        {
+            Zoom = Zoom,
+            Offset = Offset,
+        };
+        Charts.DrawLineChart(canvas, rect, _samples, Title, MinValue, MaxValue, options);
+    }
+
+    public void ZoomIn(double step = 0.25)
+    {
+        Zoom = Math.Clamp(Zoom + Math.Max(0.01, step), 0.1, 8.0);
+    }
+
+    public void ZoomOut(double step = 0.25)
+    {
+        Zoom = Math.Clamp(Zoom - Math.Max(0.01, step), 0.1, 8.0);
+    }
+
+    public void Pan(int delta)
+    {
+        Offset = Math.Max(0, Offset + delta);
     }
 }
 

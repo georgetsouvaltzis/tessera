@@ -43,6 +43,8 @@ Primary goal: deterministic message-driven TUI runtime with portable terminal be
 
 2. `Application`
 - `TeaProgram` event loop, command scheduling, filtering, rendering orchestration.
+  - adaptive frame pacing (`ProgramOptions.AdaptiveFramePacing`) for burst message coalescing.
+  - recoverable command exception hook (`ProgramOptions.RecoverCommandException`) before `CommandErrorMsg` fallback.
 
 3. `Input`
 - `EventDecoder`: bytes -> typed messages.
@@ -57,6 +59,7 @@ Primary goal: deterministic message-driven TUI runtime with portable terminal be
 - `ITerminalAdapter` abstraction.
 - `ConsoleTerminalAdapter`: OS integration and console mode management.
 - `TerminalCapabilityDetector` + `TerminalCapabilityProfile`: environment + `infocmp`-enriched feature gating for renderer VT modes.
+  - explicit capability overrides via `TEASHARP_CAPS` (`focus|mouse|paste|sync|decrpm` boolean flags).
 
 6. `Commands`
 - `Commands` static helpers: `Quit`, `Interrupt`, `Batch`, `Sequence`, `Tick`, `Every`.
@@ -69,6 +72,9 @@ Primary goal: deterministic message-driven TUI runtime with portable terminal be
 
 9. `Widgets`
 - `TeaSharp.Widgets`: stateful widget models (`ViewportModel`, `TextInputModel`, `ListModel<T>`) with reusable keymaps/help.
+  - viewport gutter/highlight support (`ShowLineNumbers`, `HighlightVisualLine`).
+  - text input multiline editing mode.
+  - tracked async list loader orchestration (`ReloadAsync`, `AppendAsync`) with stale-load cancellation.
 
 ### 4.2 Core Data Flow
 

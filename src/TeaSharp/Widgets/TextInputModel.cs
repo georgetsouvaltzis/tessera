@@ -23,6 +23,8 @@ public sealed class TextInputModel
 
     public char MaskCharacter { get; set; } = '*';
 
+    public bool Multiline { get; set; }
+
     public bool HasSelection => SelectionAnchor is int anchor && anchor != Cursor;
 
     public void SetValue(string value)
@@ -58,6 +60,14 @@ public sealed class TextInputModel
 
         if (keyMap.Submit.Matches(key))
         {
+            if (Multiline
+                && !key.Modifiers.HasFlag(KeyModifiers.Ctrl)
+                && !key.Modifiers.HasFlag(KeyModifiers.Meta))
+            {
+                var changed = InsertText("\n");
+                return new TextInputUpdateResult(changed, Submitted: false);
+            }
+
             return new TextInputUpdateResult(Changed: false, Submitted: true);
         }
 
@@ -91,6 +101,18 @@ public sealed class TextInputModel
         if (keyMap.Right.Matches(key))
         {
             MoveCursor(Cursor + 1, extendSelection);
+            return default;
+        }
+
+        if (Multiline && key.Code == KeyCode.Up)
+        {
+            MoveCursor(MoveVerticalLine(-1), extendSelection);
+            return default;
+        }
+
+        if (Multiline && key.Code == KeyCode.Down)
+        {
+            MoveCursor(MoveVerticalLine(1), extendSelection);
             return default;
         }
 
@@ -157,10 +179,22 @@ public sealed class TextInputModel
         var visible = MaskInput && !isPlaceholder
             ? new string(MaskCharacter, raw.Length)
             : raw;
+        var currentLineRange = (Start: 0, End: visible.Length);
+
+        if (Multiline && !isPlaceholder)
+        {
+            currentLineRange = CurrentLineRange();
+            visible = visible[currentLineRange.Start..currentLineRange.End];
+        }
 
         var cursor = isPlaceholder
             ? 0
-            : Math.Clamp(Cursor, 0, visible.Length);
+            : Math.Clamp(
+                Multiline
+                    ? Cursor - currentLineRange.Start
+                    : Cursor,
+                0,
+                visible.Length);
 
         var start = 0;
         if (cursor >= width)
@@ -346,6 +380,76 @@ public sealed class TextInputModel
         }
 
         return i;
+    }
+
+    private int MoveVerticalLine(int direction)
+    {
+        var (lineStart, lineEnd) = CurrentLineRange();
+        var column = Cursor - lineStart;
+
+        if (direction < 0)
+        {
+            if (lineStart == 0)
+            {
+                return Cursor;
+            }
+
+            var previousLineEnd = lineStart - 1;
+            var previousLineStart = Value.LastIndexOf('\n', Math.Max(0, previousLineEnd - 1));
+            if (previousLineStart < 0)
+            {
+                previousLineStart = 0;
+            }
+            else
+            {
+                previousLineStart++;
+            }
+
+            var previousLength = previousLineEnd - previousLineStart;
+            return previousLineStart + Math.Min(column, Math.Max(0, previousLength));
+        }
+
+        if (lineEnd >= Value.Length)
+        {
+            return Cursor;
+        }
+
+        var nextLineStart = lineEnd + 1;
+        var nextLineEnd = Value.IndexOf('\n', nextLineStart);
+        if (nextLineEnd < 0)
+        {
+            nextLineEnd = Value.Length;
+        }
+
+        var nextLength = nextLineEnd - nextLineStart;
+        return nextLineStart + Math.Min(column, Math.Max(0, nextLength));
+    }
+
+    private (int Start, int End) CurrentLineRange()
+    {
+        if (Value.Length == 0)
+        {
+            return (0, 0);
+        }
+
+        var cursor = Math.Clamp(Cursor, 0, Value.Length);
+        var start = Value.LastIndexOf('\n', Math.Max(0, cursor - 1));
+        if (start < 0)
+        {
+            start = 0;
+        }
+        else
+        {
+            start++;
+        }
+
+        var end = Value.IndexOf('\n', cursor);
+        if (end < 0)
+        {
+            end = Value.Length;
+        }
+
+        return (start, end);
     }
 
     private static bool IsWordChar(char value)

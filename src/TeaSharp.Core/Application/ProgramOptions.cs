@@ -10,6 +10,8 @@ public sealed class ProgramOptions
 
     public int MaxFps { get; init; } = 60;
 
+    public bool AdaptiveFramePacing { get; init; } = true;
+
     public bool DisableRenderer { get; init; }
 
     public bool DisableInput { get; init; }
@@ -17,6 +19,8 @@ public sealed class ProgramOptions
     public bool UseConsoleKeyEvents { get; init; } = true;
 
     public bool CatchCommandExceptions { get; init; } = true;
+
+    public Func<Exception, IMessage?>? RecoverCommandException { get; init; }
 
     public TimeSpan EscapeTimeout { get; init; } = TimeSpan.FromMilliseconds(50);
 

@@ -15,6 +15,8 @@ internal static class ProtocolFixtureTests
         yield return new TestCase("ProtocolFixture_Xterm_FunctionKeys_Decode", Xterm_FunctionKeys_Decode);
         yield return new TestCase("ProtocolFixture_Kitty_CsiUCombos_Decode", Kitty_CsiUCombos_Decode);
         yield return new TestCase("ProtocolFixture_WezTerm_ModifyOtherKeys_Decode", WezTerm_ModifyOtherKeys_Decode);
+        yield return new TestCase("ProtocolFixture_Konsole_MetaCursorAndCsiU_Decode", Konsole_MetaCursorAndCsiU_Decode);
+        yield return new TestCase("ProtocolFixture_Urxvt1015_Mouse_Decode", Urxvt1015_Mouse_Decode);
         yield return new TestCase("ProtocolFixture_Alacritty_AltFallback_Decode", Alacritty_AltFallback_Decode);
         yield return new TestCase("ProtocolFixture_TerminalReader_FocusPasteRoundTrip", TerminalReader_FocusPasteRoundTrip);
         yield return new TestCase("ProtocolFixture_AppleTerminal_AltFallback_Decodes", AppleTerminal_AltFallback_Decodes);
@@ -128,6 +130,38 @@ internal static class ProtocolFixtureTests
         return Task.CompletedTask;
     }
 
+    private static Task Konsole_MetaCursorAndCsiU_Decode()
+    {
+        // Arrange
+        var decoder = new EventDecoder();
+
+        // Act
+        var metaLeft = Decode(decoder, "\u001b[1;9D");
+        var metaB = Decode(decoder, "\u001b[98;9u");
+        var ctrlMetaB = Decode(decoder, "\u001b[98;13u");
+
+        // Assert
+        AssertKey(metaLeft, KeyCode.Left, KeyModifiers.Meta);
+        AssertKey(metaB, KeyCode.Character, KeyModifiers.Meta, "b");
+        AssertKey(ctrlMetaB, KeyCode.Character, KeyModifiers.Ctrl | KeyModifiers.Meta, "b");
+        return Task.CompletedTask;
+    }
+
+    private static Task Urxvt1015_Mouse_Decode()
+    {
+        // Arrange
+        var decoder = new EventDecoder();
+
+        // Act
+        var press = Decode(decoder, "\u001b[0;11;7M");
+        var motion = Decode(decoder, "\u001b[35;11;7M");
+
+        // Assert
+        AssertMouse<MouseClickMsg>(press, MouseEventType.Press, MouseButton.Left, 10, 6, KeyModifiers.None);
+        AssertMouse<MouseMotionMsg>(motion, MouseEventType.Motion, MouseButton.None, 10, 6, KeyModifiers.None);
+        return Task.CompletedTask;
+    }
+
     private static Task Alacritty_AltFallback_Decode()
     {
         // Arrange
@@ -228,6 +262,32 @@ internal static class ProtocolFixtureTests
             throw new InvalidOperationException(
                 $"Expected release(code={code}, modifiers={modifiers}, text=\"{text}\") " +
                 $"but got release(code={key.Code}, modifiers={key.Modifiers}, text=\"{key.Text}\").");
+        }
+    }
+
+    private static void AssertMouse<TMouse>(
+        DecodeResult result,
+        MouseEventType eventType,
+        MouseButton button,
+        int x,
+        int y,
+        KeyModifiers modifiers)
+        where TMouse : MouseMsg
+    {
+        if (result.Message is not TMouse mouse)
+        {
+            throw new InvalidOperationException($"Expected {typeof(TMouse).Name} but got {result.Message?.GetType().Name ?? "null"}.");
+        }
+
+        if (mouse.EventType != eventType
+            || mouse.Button != button
+            || mouse.X != x
+            || mouse.Y != y
+            || mouse.Modifiers != modifiers)
+        {
+            throw new InvalidOperationException(
+                $"Expected mouse(type={eventType}, button={button}, x={x}, y={y}, modifiers={modifiers}) " +
+                $"but got mouse(type={mouse.EventType}, button={mouse.Button}, x={mouse.X}, y={mouse.Y}, modifiers={mouse.Modifiers}).");
         }
     }
 

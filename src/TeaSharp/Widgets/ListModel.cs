@@ -10,7 +10,10 @@ public sealed class ListModel<T>
     private readonly Func<T, string> _toText;
     private readonly List<T> _allItems = [];
     private readonly List<int> _filteredIndexes = [];
+    private readonly object _loadGate = new();
     private int _offset;
+    private int _loadVersion;
+    private CancellationTokenSource? _activeLoadCts;
 
     public ListModel(IEnumerable<T> items, Func<T, string> toText)
     {
@@ -23,6 +26,10 @@ public sealed class ListModel<T>
     public int PageSize { get; set; } = 8;
 
     public string Filter { get; private set; } = string.Empty;
+
+    public StringComparison FilterComparison { get; set; } = StringComparison.OrdinalIgnoreCase;
+
+    public Comparison<T>? SortComparison { get; set; }
 
     public bool HasSelection => SelectedIndex >= 0 && SelectedIndex < _filteredIndexes.Count;
 
@@ -52,6 +59,59 @@ public sealed class ListModel<T>
         await AppendItemsCoreAsync(items, cancellationToken).ConfigureAwait(false);
         ApplyFilter();
         return _allItems.Count - before;
+    }
+
+    public async ValueTask<int> ReloadAsync(
+        Func<CancellationToken, IAsyncEnumerable<T>> loader,
+        CancellationToken cancellationToken = default)
+    {
+        var (version, linkedToken, disposer) = BeginTrackedLoad(cancellationToken);
+        try
+        {
+            var loaded = await MaterializeAsync(loader(linkedToken), linkedToken).ConfigureAwait(false);
+            if (!IsCurrentLoad(version))
+            {
+                return 0;
+            }
+
+            SetItems(loaded);
+            return _allItems.Count;
+        }
+        catch (OperationCanceledException) when (!cancellationToken.IsCancellationRequested && !IsCurrentLoad(version))
+        {
+            return 0;
+        }
+        finally
+        {
+            disposer();
+        }
+    }
+
+    public async ValueTask<int> AppendAsync(
+        Func<CancellationToken, IAsyncEnumerable<T>> loader,
+        CancellationToken cancellationToken = default)
+    {
+        var (version, linkedToken, disposer) = BeginTrackedLoad(cancellationToken);
+        try
+        {
+            var loaded = await MaterializeAsync(loader(linkedToken), linkedToken).ConfigureAwait(false);
+            if (!IsCurrentLoad(version))
+            {
+                return 0;
+            }
+
+            _allItems.AddRange(loaded);
+            ApplyFilter();
+            return loaded.Count;
+        }
+        catch (OperationCanceledException) when (!cancellationToken.IsCancellationRequested && !IsCurrentLoad(version))
+        {
+            return 0;
+        }
+        finally
+        {
+            disposer();
+        }
     }
 
     public void SetFilter(string filter)
@@ -189,10 +249,15 @@ public sealed class ListModel<T>
         for (var i = 0; i < _allItems.Count; i++)
         {
             var label = _toText(_allItems[i]);
-            if (Filter.Length == 0 || label.Contains(Filter, StringComparison.OrdinalIgnoreCase))
+            if (Filter.Length == 0 || label.Contains(Filter, FilterComparison))
             {
                 _filteredIndexes.Add(i);
             }
+        }
+
+        if (SortComparison is not null && _filteredIndexes.Count > 1)
+        {
+            _filteredIndexes.Sort((left, right) => SortComparison(_allItems[left], _allItems[right]));
         }
 
         if (_filteredIndexes.Count == 0)
@@ -217,6 +282,56 @@ public sealed class ListModel<T>
         {
             cancellationToken.ThrowIfCancellationRequested();
             _allItems.Add(item);
+        }
+    }
+
+    private static async ValueTask<List<T>> MaterializeAsync(IAsyncEnumerable<T> items, CancellationToken cancellationToken)
+    {
+        var result = new List<T>();
+        await foreach (var item in items.ConfigureAwait(false))
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            result.Add(item);
+        }
+
+        return result;
+    }
+
+    private (int Version, CancellationToken Token, Action Dispose) BeginTrackedLoad(CancellationToken cancellationToken)
+    {
+        CancellationTokenSource linkedCts;
+        int version;
+        lock (_loadGate)
+        {
+            _activeLoadCts?.Cancel();
+            _activeLoadCts?.Dispose();
+            _activeLoadCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+            linkedCts = _activeLoadCts;
+            version = ++_loadVersion;
+        }
+
+        return (version, linkedCts.Token, () =>
+        {
+            lock (_loadGate)
+            {
+                if (ReferenceEquals(_activeLoadCts, linkedCts))
+                {
+                    _activeLoadCts.Dispose();
+                    _activeLoadCts = null;
+                }
+                else
+                {
+                    linkedCts.Dispose();
+                }
+            }
+        });
+    }
+
+    private bool IsCurrentLoad(int version)
+    {
+        lock (_loadGate)
+        {
+            return version == _loadVersion;
         }
     }
 }

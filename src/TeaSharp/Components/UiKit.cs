@@ -28,6 +28,12 @@ public readonly record struct ToastMessage(string Text, int TtlTicks = 80, Toast
 
 public readonly record struct AccordionSection(string Title, IReadOnlyList<string> Lines, bool Expanded = false);
 
+public readonly record struct UiTheme(
+    char StatusFill = ' ',
+    char SkeletonEvenFill = '░',
+    char SkeletonOddFill = '▒',
+    char ModalBackdropFill = '·');
+
 public static class Layout
 {
     public static ViewportClass Classify(int width)
@@ -124,13 +130,18 @@ public static class UiWidgets
 
     public static void DrawStatusBar(Canvas canvas, Rect rect, string leftText, string rightText)
     {
+        DrawStatusBar(canvas, rect, leftText, rightText, new UiTheme());
+    }
+
+    public static void DrawStatusBar(Canvas canvas, Rect rect, string leftText, string rightText, UiTheme theme)
+    {
         var clipped = Rect.Intersect(rect, canvas.Bounds);
         if (clipped.IsEmpty || clipped.Height < 1)
         {
             return;
         }
 
-        var row = new string(' ', Math.Max(0, clipped.Width)).ToCharArray();
+        var row = new string(theme.StatusFill, Math.Max(0, clipped.Width)).ToCharArray();
         CopyToRow(row, 0, leftText);
         var rightStart = Math.Max(0, clipped.Width - rightText.Length);
         CopyToRow(row, rightStart, rightText);
@@ -223,6 +234,11 @@ public static class UiWidgets
 
     public static void DrawSkeleton(Canvas canvas, Rect rect, string title = "Loading")
     {
+        DrawSkeleton(canvas, rect, title, new UiTheme());
+    }
+
+    public static void DrawSkeleton(Canvas canvas, Rect rect, string title, UiTheme theme)
+    {
         canvas.DrawBox(rect, title);
         var content = rect.Inset(1, 1);
         if (content.IsEmpty)
@@ -232,7 +248,7 @@ public static class UiWidgets
 
         for (var row = 0; row < content.Height; row++)
         {
-            var ch = row % 2 == 0 ? '░' : '▒';
+            var ch = row % 2 == 0 ? theme.SkeletonEvenFill : theme.SkeletonOddFill;
             canvas.DrawHorizontalLine(content.X, content.Y + row, content.Width, ch);
         }
     }
@@ -501,6 +517,12 @@ public sealed class SortableTableComponent : IStatefulComponent
 
     public string Title { get; set; } = "Table";
 
+    public bool EnableVirtualization { get; set; }
+
+    public int VirtualStartIndex { get; private set; }
+
+    public int VirtualWindowSize { get; private set; } = 32;
+
     public void SetRows(IEnumerable<IReadOnlyList<string>> rows)
     {
         _rows.Clear();
@@ -540,7 +562,25 @@ public sealed class SortableTableComponent : IStatefulComponent
             return true;
         }
 
+        if (EnableVirtualization && key.Text == "v")
+        {
+            VirtualStartIndex = Math.Max(0, VirtualStartIndex + Math.Max(1, VirtualWindowSize / 2));
+            return true;
+        }
+
+        if (EnableVirtualization && key.Text == "V")
+        {
+            VirtualStartIndex = Math.Max(0, VirtualStartIndex - Math.Max(1, VirtualWindowSize / 2));
+            return true;
+        }
+
         return false;
+    }
+
+    public void SetVirtualWindow(int startIndex, int windowSize)
+    {
+        VirtualStartIndex = Math.Max(0, startIndex);
+        VirtualWindowSize = Math.Max(1, windowSize);
     }
 
     public void Render(Canvas canvas, Rect rect)
@@ -558,6 +598,12 @@ public sealed class SortableTableComponent : IStatefulComponent
         var page = Math.Clamp(PageIndex, 0, pageCount - 1);
         var offset = page * safePageSize;
         var visibleRows = sorted.Skip(offset).Take(safePageSize).ToList();
+        if (EnableVirtualization)
+        {
+            var virtualOffset = Math.Clamp(VirtualStartIndex, 0, Math.Max(0, sorted.Count - 1));
+            var safeWindow = Math.Max(1, VirtualWindowSize);
+            visibleRows = sorted.Skip(virtualOffset).Take(safeWindow).ToList();
+        }
 
         Widgets.DrawTable(
             canvas,
@@ -565,7 +611,9 @@ public sealed class SortableTableComponent : IStatefulComponent
             Headers,
             visibleRows,
             selectedRow: -1,
-            title: $"{Title} p{page + 1}/{pageCount} sort:{Headers[Math.Min(SortColumn, Headers.Count - 1)]} {(SortDescending ? "desc" : "asc")}");
+            title: EnableVirtualization
+                ? $"{Title} v{VirtualStartIndex + 1}+{Math.Max(1, VirtualWindowSize)} sort:{Headers[Math.Min(SortColumn, Headers.Count - 1)]} {(SortDescending ? "desc" : "asc")}"
+                : $"{Title} p{page + 1}/{pageCount} sort:{Headers[Math.Min(SortColumn, Headers.Count - 1)]} {(SortDescending ? "desc" : "asc")}");
     }
 
     private void NormalizePage()
@@ -777,6 +825,8 @@ public sealed class ModalComponent : ICanvasComponent
 
     public IReadOnlyList<string> Lines { get; set; } = ["(empty)"];
 
+    public UiTheme Theme { get; set; } = new();
+
     public void Render(Canvas canvas, Rect rect)
     {
         if (!Visible)
@@ -796,7 +846,7 @@ public sealed class ModalComponent : ICanvasComponent
             {
                 if ((x + y) % 2 == 0 && canvas.Get(x, y) == ' ')
                 {
-                    canvas.Set(x, y, '·');
+                    canvas.Set(x, y, Theme.ModalBackdropFill);
                 }
             }
         }

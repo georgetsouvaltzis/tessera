@@ -104,7 +104,8 @@ public sealed class TeaProgram
             await RenderAsync(Model.View(), token).ConfigureAwait(false);
 
             var minFrame = TimeSpan.FromSeconds(1.0 / Math.Clamp(_options.MaxFps, 1, 120));
-            var lastRender = DateTimeOffset.MinValue;
+            var lastRender = DateTimeOffset.UtcNow;
+            var pendingRender = false;
 
             while (await _messages.Reader.WaitToReadAsync(token).ConfigureAwait(false))
             {
@@ -180,6 +181,33 @@ public sealed class TeaProgram
                         await _commands.Writer.WriteAsync(update.Command, token).ConfigureAwait(false);
                     }
 
+                    pendingRender = true;
+                    var now = DateTimeOffset.UtcNow;
+                    var elapsed = now - lastRender;
+                    if (!_options.AdaptiveFramePacing)
+                    {
+                        if (elapsed < minFrame)
+                        {
+                            var delay = minFrame - elapsed;
+                            await Task.Delay(delay, token).ConfigureAwait(false);
+                        }
+
+                        await RenderAsync(Model.View(), token).ConfigureAwait(false);
+                        lastRender = DateTimeOffset.UtcNow;
+                        pendingRender = false;
+                        continue;
+                    }
+
+                    if (elapsed >= minFrame)
+                    {
+                        await RenderAsync(Model.View(), token).ConfigureAwait(false);
+                        lastRender = DateTimeOffset.UtcNow;
+                        pendingRender = false;
+                    }
+                }
+
+                if (_options.AdaptiveFramePacing && pendingRender)
+                {
                     var now = DateTimeOffset.UtcNow;
                     var elapsed = now - lastRender;
                     if (elapsed < minFrame)
@@ -190,6 +218,7 @@ public sealed class TeaProgram
 
                     await RenderAsync(Model.View(), token).ConfigureAwait(false);
                     lastRender = DateTimeOffset.UtcNow;
+                    pendingRender = false;
                 }
             }
 
@@ -383,6 +412,24 @@ public sealed class TeaProgram
         {
             if (_options.CatchCommandExceptions)
             {
+                if (_options.RecoverCommandException is { } recover)
+                {
+                    try
+                    {
+                        var recoveryMessage = recover(ex);
+                        if (recoveryMessage is not null)
+                        {
+                            Send(recoveryMessage);
+                            return;
+                        }
+                    }
+                    catch (Exception recoveryException)
+                    {
+                        Send(new CommandErrorMsg(recoveryException));
+                        return;
+                    }
+                }
+
                 Send(new CommandErrorMsg(ex));
                 return;
             }

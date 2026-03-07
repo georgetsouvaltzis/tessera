@@ -7,9 +7,11 @@ TeaSharp now ships a stateful widget layer in `TeaSharp.Widgets` modeled after B
 - `ViewportModel`
   - vertical and horizontal scrolling
   - optional soft-wrap mode
+  - optional gutter line numbers (`ShowLineNumbers`) and highlighted visual row (`HighlightVisualLine`)
   - key and mouse-wheel updates via `ViewportKeyMap`
 - `TextInputModel`
   - cursor movement (char + word)
+  - optional multiline mode (`Multiline`) with `enter` newline insertion and up/down line navigation
   - selection basics (`ctrl+a`, shift-extend)
   - delete variants (char/word forward/backward)
   - submit event and placeholder/mask support
@@ -17,6 +19,8 @@ TeaSharp now ships a stateful widget layer in `TeaSharp.Widgets` modeled after B
 - `ListModel<T>`
   - selection and paging
   - filtering (`SetFilter`)
+  - tracked async loader orchestration (`ReloadAsync`, `AppendAsync`) with stale-load cancellation
+  - optional custom sorting via `SortComparison`
   - key and mouse-wheel updates via `ListKeyMap`
 
 ## Keymaps + Help

@@ -20,6 +20,10 @@ public sealed class ViewportModel
 
     public bool Wrap { get; private set; }
 
+    public bool ShowLineNumbers { get; set; }
+
+    public int? HighlightVisualLine { get; set; }
+
     public void Resize(int width, int height)
     {
         var previousWidth = Width;
@@ -168,27 +172,35 @@ public sealed class ViewportModel
         }
 
         var rendered = new List<string>(max);
+        var lineNumberWidth = ShowLineNumbers
+            ? Math.Max(2, (visualLines.Count + 1).ToString(System.Globalization.CultureInfo.InvariantCulture).Length)
+            : 0;
         for (var i = 0; i < max; i++)
         {
-            var line = visualLines[start + i];
-            rendered.Add(ClipLine(line));
+            var visualIndex = start + i;
+            var line = visualLines[visualIndex];
+            var clipped = ClipLine(line, lineNumberWidth);
+            rendered.Add(DecorateLine(clipped, visualIndex, lineNumberWidth));
         }
 
         return rendered;
     }
 
-    private string ClipLine(string line)
+    private string ClipLine(string line, int lineNumberWidth)
     {
-        if (Width <= 0)
+        var availableWidth = ShowLineNumbers
+            ? Math.Max(0, Width - (lineNumberWidth + 2))
+            : Width;
+        if (availableWidth <= 0)
         {
             return string.Empty;
         }
 
         if (Wrap)
         {
-            return line.Length <= Width
+            return line.Length <= availableWidth
                 ? line
-                : line[..Width];
+                : line[..availableWidth];
         }
 
         if (XOffset >= line.Length)
@@ -196,14 +208,43 @@ public sealed class ViewportModel
             return string.Empty;
         }
 
-        if (XOffset == 0 && line.Length <= Width)
+        if (XOffset == 0 && line.Length <= availableWidth)
         {
             return line;
         }
 
         var remaining = line.Length - XOffset;
-        var length = Math.Min(Width, remaining);
+        var length = Math.Min(availableWidth, remaining);
         return line.Substring(XOffset, length);
+    }
+
+    private string DecorateLine(string line, int visualIndex, int lineNumberWidth)
+    {
+        if (!ShowLineNumbers && HighlightVisualLine != visualIndex)
+        {
+            return line;
+        }
+
+        if (!ShowLineNumbers)
+        {
+            return HighlightVisualLine == visualIndex
+                ? $"> {line}"
+                : $"  {line}";
+        }
+
+        var lineNumber = (visualIndex + 1).ToString(System.Globalization.CultureInfo.InvariantCulture).PadLeft(lineNumberWidth);
+        var marker = HighlightVisualLine == visualIndex ? ">" : " ";
+        var prefix = $"{lineNumber}{marker} ";
+        if (prefix.Length >= Width)
+        {
+            return prefix[..Width];
+        }
+
+        var available = Width - prefix.Length;
+        var clipped = line.Length <= available
+            ? line
+            : line[..available];
+        return prefix + clipped;
     }
 
     private IReadOnlyList<string> GetVisualLines()
@@ -268,7 +309,13 @@ public sealed class ViewportModel
             return;
         }
 
-        var maxX = Math.Max(0, _maxVisualWidth - Width);
+        var lineNumberWidth = ShowLineNumbers
+            ? Math.Max(2, (lines.Count + 1).ToString(System.Globalization.CultureInfo.InvariantCulture).Length)
+            : 0;
+        var visibleWidth = ShowLineNumbers
+            ? Math.Max(0, Width - (lineNumberWidth + 2))
+            : Width;
+        var maxX = Math.Max(0, _maxVisualWidth - visibleWidth);
         XOffset = Math.Clamp(XOffset, 0, maxX);
     }
 }
