@@ -117,16 +117,42 @@ public static class Widgets
         IReadOnlyList<string> headers,
         IReadOnlyList<IReadOnlyList<string>> rows,
         int selectedRow = -1,
-        string? title = null)
+        string? title = null,
+        bool showBorder = true)
     {
         var clipped = Rect.Intersect(rect, canvas.Bounds);
-        if (clipped.IsEmpty || headers.Count == 0 || clipped.Width < (headers.Count * 2) + 1 || clipped.Height < 4)
+        if (clipped.IsEmpty || headers.Count == 0)
         {
             return;
         }
 
-        canvas.DrawBox(clipped, title);
-        var contentRect = clipped.Inset(1, 1);
+        var minHeight = showBorder
+            ? 4
+            : string.IsNullOrWhiteSpace(title) ? 3 : 4;
+        var minWidth = showBorder
+            ? (headers.Count * 2) + 1
+            : (headers.Count * 2) - 1;
+        if (clipped.Width < minWidth || clipped.Height < minHeight)
+        {
+            return;
+        }
+
+        Rect contentRect;
+        if (showBorder)
+        {
+            canvas.DrawBox(clipped, title);
+            contentRect = clipped.Inset(1, 1);
+        }
+        else
+        {
+            contentRect = clipped;
+            if (!string.IsNullOrWhiteSpace(title))
+            {
+                canvas.WriteText(contentRect.X, contentRect.Y, title!, contentRect.Width);
+                contentRect = new Rect(contentRect.X, contentRect.Y + 1, contentRect.Width, contentRect.Height - 1);
+            }
+        }
+
         if (contentRect.Height < 3)
         {
             return;

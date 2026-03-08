@@ -28,6 +28,7 @@ TeaSharp provides a prebuilt widget layer in `TeaSharp.Components.PrebuiltWidget
 - `ComboboxComponent` combines text filtering with keyboard-driven option selection.
 - `LogViewerComponent` supports append, filter, pause, clear, and scrolling.
 - `LayoutContainerComponent` supports `Vertical`, `Horizontal`, and `Grid` layout modes.
+- Most prebuilt widgets expose `ShowBorder` (`true` by default) for minimal/borderless layouts.
 
 ## Gallery Example
 

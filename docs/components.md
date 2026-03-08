@@ -84,6 +84,7 @@ The design follows patterns used in Bubble Tea examples:
       - `LogViewerComponent.ViewportKeyMap`, `TogglePauseKey`, `ClearKey`
       - `ProgressBarComponent.IncreaseKey` / `DecreaseKey`
       - `DialogComponent.AcceptKey` / `DismissKey`
+      - `ShowBorder` toggle for minimalist rendering on border-capable prebuilt widgets
 
 ## Example Integration
 

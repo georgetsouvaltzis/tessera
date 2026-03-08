@@ -10,10 +10,12 @@ internal static class PrebuiltWidgetTests
         yield return new TestCase("Prebuilt_LabelComponent_RendersText", LabelComponent_RendersText);
         yield return new TestCase("Prebuilt_ButtonComponent_ActivatesWhenFocused", ButtonComponent_ActivatesWhenFocused);
         yield return new TestCase("Prebuilt_TextInputComponent_SubmitsValue", TextInputComponent_SubmitsValue);
+        yield return new TestCase("Prebuilt_TextInputComponent_HidesBorderWhenConfigured", TextInputComponent_HidesBorderWhenConfigured);
         yield return new TestCase("Prebuilt_TextAreaComponent_RendersMultilineContent", TextAreaComponent_RendersMultilineContent);
         yield return new TestCase("Prebuilt_TextAreaComponent_EnterInsertsNewline", TextAreaComponent_EnterInsertsNewline);
         yield return new TestCase("Prebuilt_ListComponent_NavigatesSelection", ListComponent_NavigatesSelection);
         yield return new TestCase("Prebuilt_DropdownComponent_SelectsOpenMenuItem", DropdownComponent_SelectsOpenMenuItem);
+        yield return new TestCase("Prebuilt_DropdownComponent_HidesBorderWhenConfigured", DropdownComponent_HidesBorderWhenConfigured);
         yield return new TestCase("Prebuilt_ComboboxComponent_FiltersAndSelects", ComboboxComponent_FiltersAndSelects);
         yield return new TestCase("Prebuilt_TableComponent_ForwardsSortHotkeys", TableComponent_ForwardsSortHotkeys);
         yield return new TestCase("Prebuilt_ProgressBarComponent_AdjustsValue", ProgressBarComponent_AdjustsValue);
@@ -69,6 +71,23 @@ internal static class PrebuiltWidgetTests
         TestAssert.Equal("ab", input.LastSubmittedValue, "Text input should capture submitted value.");
         TestAssert.Equal(1, input.SubmitCount, "Text input should count submissions.");
         TestAssert.Equal(string.Empty, input.Input.Value, "Text input should clear after submit when configured.");
+        return Task.CompletedTask;
+    }
+
+    private static Task TextInputComponent_HidesBorderWhenConfigured()
+    {
+        var input = new TextInputComponent
+        {
+            ShowBorder = false,
+        };
+        input.Input.SetValue("plain");
+        var canvas = new Canvas(20, 2);
+
+        input.Render(canvas, new Rect(0, 0, 20, 2));
+        var output = canvas.Render();
+
+        TestAssert.True(output.Contains("plain", StringComparison.Ordinal), "Text input should render content in borderless mode.");
+        TestAssert.True(!output.Contains("┌", StringComparison.Ordinal), "Text input should not draw border when disabled.");
         return Task.CompletedTask;
     }
 
@@ -142,6 +161,24 @@ internal static class PrebuiltWidgetTests
 
         TestAssert.True(!dropdown.IsOpen, "Dropdown should close after selecting an item.");
         TestAssert.Equal("beta", dropdown.SelectedItem, "Dropdown should select highlighted item.");
+        return Task.CompletedTask;
+    }
+
+    private static Task DropdownComponent_HidesBorderWhenConfigured()
+    {
+        var dropdown = new DropdownComponent
+        {
+            Focused = true,
+            ShowBorder = false,
+        };
+        dropdown.SetItems(["alpha", "beta", "gamma"]);
+        var canvas = new Canvas(24, 5);
+
+        dropdown.Render(canvas, new Rect(0, 0, 24, 5));
+        var output = canvas.Render();
+
+        TestAssert.True(output.Contains("v alpha", StringComparison.Ordinal), "Dropdown should render selected item in borderless mode.");
+        TestAssert.True(!output.Contains("┌", StringComparison.Ordinal), "Dropdown should not draw border when disabled.");
         return Task.CompletedTask;
     }
 

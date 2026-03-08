@@ -533,6 +533,8 @@ public sealed class SortableTableComponent : IStatefulComponent
 
     public string Title { get; set; } = "Table";
 
+    public bool ShowBorder { get; set; } = true;
+
     public bool EnableVirtualization { get; set; }
 
     public int VirtualStartIndex { get; private set; }
@@ -641,7 +643,8 @@ public sealed class SortableTableComponent : IStatefulComponent
             selectedRow: -1,
             title: EnableVirtualization
                 ? $"{Title} v{VirtualStartIndex + 1}+{Math.Max(1, VirtualWindowSize)} sort:{Headers[Math.Min(SortColumn, Headers.Count - 1)]} {(SortDescending ? "desc" : "asc")}"
-                : $"{Title} p{page + 1}/{pageCount} sort:{Headers[Math.Min(SortColumn, Headers.Count - 1)]} {(SortDescending ? "desc" : "asc")}");
+                : $"{Title} p{page + 1}/{pageCount} sort:{Headers[Math.Min(SortColumn, Headers.Count - 1)]} {(SortDescending ? "desc" : "asc")}",
+            showBorder: ShowBorder);
     }
 
     private void NormalizePage()

@@ -24,7 +24,13 @@ public sealed class LabelComponent : ICanvasComponent
 
     public string? Title { get; set; }
 
-    public bool DrawBorder { get; set; } = true;
+    public bool ShowBorder { get; set; } = true;
+
+    public bool DrawBorder
+    {
+        get => ShowBorder;
+        set => ShowBorder = value;
+    }
 
     public void Render(Canvas canvas, Rect rect)
     {
@@ -34,7 +40,7 @@ public sealed class LabelComponent : ICanvasComponent
             return;
         }
 
-        if (DrawBorder)
+        if (ShowBorder)
         {
             canvas.DrawBox(clipped, Title ?? "Label");
             var content = clipped.Inset(1, 1);
@@ -128,6 +134,8 @@ public sealed class TextInputComponent : IStatefulComponent
 
     public bool Focused { get; set; }
 
+    public bool ShowBorder { get; set; } = true;
+
     public bool ClearOnSubmit { get; set; }
 
     public string LastSubmittedValue { get; private set; } = string.Empty;
@@ -160,8 +168,17 @@ public sealed class TextInputComponent : IStatefulComponent
             return;
         }
 
-        canvas.DrawBox(clipped, Focused ? $"{Title} *" : Title);
-        var content = clipped.Inset(1, 1);
+        Rect content;
+        if (ShowBorder)
+        {
+            canvas.DrawBox(clipped, Focused ? $"{Title} *" : Title);
+            content = clipped.Inset(1, 1);
+        }
+        else
+        {
+            content = clipped;
+        }
+
         if (content.IsEmpty)
         {
             return;
@@ -197,6 +214,8 @@ public sealed class TextAreaComponent : IStatefulComponent
     public string Title { get; set; } = "Text Area";
 
     public bool Focused { get; set; }
+
+    public bool ShowBorder { get; set; } = true;
 
     public bool ShowLineNumbers
     {
@@ -237,8 +256,17 @@ public sealed class TextAreaComponent : IStatefulComponent
             return;
         }
 
-        canvas.DrawBox(clipped, Focused ? $"{Title} *" : Title);
-        var content = clipped.Inset(1, 1);
+        Rect content;
+        if (ShowBorder)
+        {
+            canvas.DrawBox(clipped, Focused ? $"{Title} *" : Title);
+            content = clipped.Inset(1, 1);
+        }
+        else
+        {
+            content = clipped;
+        }
+
         if (content.IsEmpty)
         {
             return;
@@ -295,6 +323,8 @@ public sealed class ListComponent<T> : IStatefulComponent
 
     public bool Focused { get; set; }
 
+    public bool ShowBorder { get; set; } = true;
+
     public ListKeyMap KeyMap { get; set; } = ListKeyMap.Default;
 
     public bool Update(IMessage message)
@@ -310,8 +340,17 @@ public sealed class ListComponent<T> : IStatefulComponent
             return;
         }
 
-        canvas.DrawBox(clipped, Focused ? $"{Title} *" : Title);
-        var content = clipped.Inset(1, 1);
+        Rect content;
+        if (ShowBorder)
+        {
+            canvas.DrawBox(clipped, Focused ? $"{Title} *" : Title);
+            content = clipped.Inset(1, 1);
+        }
+        else
+        {
+            content = clipped;
+        }
+
         if (content.IsEmpty)
         {
             return;
@@ -337,6 +376,8 @@ public sealed class DropdownComponent : IStatefulComponent
     public string Title { get; set; } = "Dropdown";
 
     public bool Focused { get; set; }
+
+    public bool ShowBorder { get; set; } = true;
 
     public bool IsOpen { get; private set; }
 
@@ -435,8 +476,17 @@ public sealed class DropdownComponent : IStatefulComponent
             return;
         }
 
-        canvas.DrawBox(clipped, Focused ? $"{Title} *" : Title);
-        var content = clipped.Inset(1, 1);
+        Rect content;
+        if (ShowBorder)
+        {
+            canvas.DrawBox(clipped, Focused ? $"{Title} *" : Title);
+            content = clipped.Inset(1, 1);
+        }
+        else
+        {
+            content = clipped;
+        }
+
         if (content.IsEmpty)
         {
             return;
@@ -500,6 +550,8 @@ public sealed class ComboboxComponent : IStatefulComponent
     public string Title { get; set; } = "Combobox";
 
     public bool Focused { get; set; }
+
+    public bool ShowBorder { get; set; } = true;
 
     public bool IsOpen { get; private set; }
 
@@ -601,8 +653,17 @@ public sealed class ComboboxComponent : IStatefulComponent
             return;
         }
 
-        canvas.DrawBox(clipped, Focused ? $"{Title} *" : Title);
-        var content = clipped.Inset(1, 1);
+        Rect content;
+        if (ShowBorder)
+        {
+            canvas.DrawBox(clipped, Focused ? $"{Title} *" : Title);
+            content = clipped.Inset(1, 1);
+        }
+        else
+        {
+            content = clipped;
+        }
+
         if (content.IsEmpty)
         {
             return;
@@ -720,6 +781,12 @@ public sealed class TableComponent : IStatefulComponent
 
     public bool Focused { get; set; }
 
+    public bool ShowBorder
+    {
+        get => Inner.ShowBorder;
+        set => Inner.ShowBorder = value;
+    }
+
     public string Title
     {
         get => Inner.Title;
@@ -752,6 +819,8 @@ public sealed class ProgressBarComponent : IStatefulComponent
     public string Title { get; set; } = "Progress";
 
     public bool Focused { get; set; }
+
+    public bool ShowBorder { get; set; } = true;
 
     public double Step { get; set; } = 0.05;
 
@@ -794,8 +863,17 @@ public sealed class ProgressBarComponent : IStatefulComponent
             return;
         }
 
-        canvas.DrawBox(clipped, Focused ? $"{Title} *" : Title);
-        var content = clipped.Inset(1, 1);
+        Rect content;
+        if (ShowBorder)
+        {
+            canvas.DrawBox(clipped, Focused ? $"{Title} *" : Title);
+            content = clipped.Inset(1, 1);
+        }
+        else
+        {
+            content = clipped;
+        }
+
         if (content.IsEmpty)
         {
             return;
@@ -833,6 +911,8 @@ public sealed class LogViewerComponent : IStatefulComponent
     public string Title { get; set; } = "Logs";
 
     public bool Focused { get; set; }
+
+    public bool ShowBorder { get; set; } = true;
 
     public bool AutoScroll { get; set; } = true;
 
@@ -911,8 +991,17 @@ public sealed class LogViewerComponent : IStatefulComponent
             title += " [paused]";
         }
 
-        canvas.DrawBox(clipped, title);
-        var content = clipped.Inset(1, 1);
+        Rect content;
+        if (ShowBorder)
+        {
+            canvas.DrawBox(clipped, title);
+            content = clipped.Inset(1, 1);
+        }
+        else
+        {
+            content = clipped;
+        }
+
         if (content.IsEmpty)
         {
             return;
