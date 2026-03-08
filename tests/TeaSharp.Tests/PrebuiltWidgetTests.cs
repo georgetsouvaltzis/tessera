@@ -10,6 +10,7 @@ internal static class PrebuiltWidgetTests
         yield return new TestCase("Prebuilt_LabelComponent_RendersText", LabelComponent_RendersText);
         yield return new TestCase("Prebuilt_ButtonComponent_ActivatesWhenFocused", ButtonComponent_ActivatesWhenFocused);
         yield return new TestCase("Prebuilt_TextInputComponent_SubmitsValue", TextInputComponent_SubmitsValue);
+        yield return new TestCase("Prebuilt_TextInputComponent_CancelSignalsAndCanClear", TextInputComponent_CancelSignalsAndCanClear);
         yield return new TestCase("Prebuilt_TextInputComponent_HidesBorderWhenConfigured", TextInputComponent_HidesBorderWhenConfigured);
         yield return new TestCase("Prebuilt_TextAreaComponent_RendersMultilineContent", TextAreaComponent_RendersMultilineContent);
         yield return new TestCase("Prebuilt_TextAreaComponent_EnterInsertsNewline", TextAreaComponent_EnterInsertsNewline);
@@ -90,6 +91,25 @@ internal static class PrebuiltWidgetTests
 
         TestAssert.True(output.Contains("plain", StringComparison.Ordinal), "Text input should render content in borderless mode.");
         TestAssert.True(!output.Contains("┌", StringComparison.Ordinal), "Text input should not draw border when disabled.");
+        return Task.CompletedTask;
+    }
+
+    private static Task TextInputComponent_CancelSignalsAndCanClear()
+    {
+        var input = new TextInputComponent
+        {
+            ClearOnCancel = true,
+        };
+
+        input.Update(new KeyPressMsg(KeyCode.Character, "a"));
+        input.Update(new KeyPressMsg(KeyCode.Character, "b"));
+        var changed = input.Update(new KeyPressMsg(KeyCode.Escape));
+
+        TestAssert.True(changed, "Text input escape should signal a handled cancel action.");
+        TestAssert.True(input.WasCancelled, "Text input should expose cancellation signal after escape.");
+        TestAssert.Equal("ab", input.LastCancelledValue, "Text input should capture cancelled value.");
+        TestAssert.Equal(1, input.CancelCount, "Text input should count cancel actions.");
+        TestAssert.Equal(string.Empty, input.Input.Value, "Text input should clear value on cancel when configured.");
         return Task.CompletedTask;
     }
 

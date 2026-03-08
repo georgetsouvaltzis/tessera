@@ -33,7 +33,7 @@ TeaSharp provides a prebuilt widget layer in `TeaSharp.Components.PrebuiltWidget
 
 ## Notes
 
-- `TextInputComponent` wraps `TextInputModel` (single-line flow).
+- `TextInputComponent` wraps `TextInputModel` (single-line flow) and supports cancel semantics via `CancelKey` (`esc` default), `CancelCount`, `WasCancelled`, and `LastCancelledValue`.
 - `TextAreaComponent` uses multiline editing and viewport rendering with optional line numbers.
 - `ListComponent<T>` wraps `ListModel<T>` including filtering and paging behaviors.
 - `TableComponent` wraps `SortableTableComponent` for sort/page interactions.

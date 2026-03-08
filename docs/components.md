@@ -90,6 +90,7 @@ The design follows patterns used in Bubble Tea examples:
     - `MarkdownViewerComponent`
     - prebuilt widgets now allow key behavior injection:
       - `TextInputComponent.KeyMap`
+      - `TextInputComponent.CancelKey` (`esc` default), plus cancellation observability (`CancelCount`, `WasCancelled`, `LastCancelledValue`)
       - `TextAreaComponent.InputKeyMap` / `TextAreaComponent.ViewportKeyMap`
       - `ListComponent<T>.KeyMap`
       - `DropdownComponent.ToggleOpenKey`, `OpenKey`, `CloseKey`, `NextItemKey`, `PreviousItemKey`, `ConfirmSelectionKey`

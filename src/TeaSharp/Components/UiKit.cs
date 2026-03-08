@@ -889,10 +889,9 @@ public sealed class ModalComponent : ICanvasComponent
         {
             for (var x = clipped.X; x < clipped.Right; x++)
             {
-                if ((x + y) % 2 == 0 && canvas.Get(x, y) == ' ')
-                {
-                    canvas.Set(x, y, Theme.ModalBackdropFill);
-                }
+                // Modal backdrop must fully occlude underlying UI. Drawing only over
+                // whitespace leaks previously rendered borders/text through the overlay.
+                canvas.Set(x, y, (x + y) % 2 == 0 ? Theme.ModalBackdropFill : ' ');
             }
         }
 

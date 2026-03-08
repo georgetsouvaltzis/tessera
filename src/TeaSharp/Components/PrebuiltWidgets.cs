@@ -130,6 +130,8 @@ public sealed class TextInputComponent : IStatefulComponent
 
     public TextInputKeyMap KeyMap { get; set; } = TextInputKeyMap.Default;
 
+    public KeyBinding CancelKey { get; set; } = new("esc", "cancel", "escape");
+
     public string Title { get; set; } = "Text Input";
 
     public bool Focused { get; set; }
@@ -138,12 +140,34 @@ public sealed class TextInputComponent : IStatefulComponent
 
     public bool ClearOnSubmit { get; set; }
 
+    public bool ClearOnCancel { get; set; }
+
     public string LastSubmittedValue { get; private set; } = string.Empty;
+
+    public string LastCancelledValue { get; private set; } = string.Empty;
 
     public int SubmitCount { get; private set; }
 
+    public int CancelCount { get; private set; }
+
+    public bool WasCancelled { get; private set; }
+
     public bool Update(IMessage message)
     {
+        WasCancelled = false;
+        if (message is KeyPressMsg key && CancelKey.Matches(key))
+        {
+            WasCancelled = true;
+            LastCancelledValue = Input.Value;
+            CancelCount++;
+            if (ClearOnCancel)
+            {
+                Input.Clear();
+            }
+
+            return true;
+        }
+
         var result = Input.Update(message, KeyMap);
         if (!result.Submitted)
         {

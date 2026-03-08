@@ -150,9 +150,32 @@ public sealed class Canvas
         var written = 0;
         var index = 0;
         var lastColumn = -1;
+        var pendingZeroWidth = string.Empty;
+        var sawAnsi = false;
+        var truncated = false;
 
         while (index < text.Length)
         {
+            if (TryReadAnsiEscape(text, index, out var ansiSequence, out var consumed))
+            {
+                sawAnsi = true;
+                if (lastColumn >= 0)
+                {
+                    var previousIndex = (y * Width) + lastColumn;
+                    if (_graphemeCells![previousIndex] is string previous)
+                    {
+                        _graphemeCells[previousIndex] = previous + ansiSequence;
+                    }
+                }
+                else
+                {
+                    pendingZeroWidth += ansiSequence;
+                }
+
+                index += consumed;
+                continue;
+            }
+
             var element = StringInfo.GetNextTextElement(text, index);
             index += element.Length;
 
@@ -172,12 +195,17 @@ public sealed class Canvas
                         _graphemeCells[previousIndex] = previous + element;
                     }
                 }
+                else
+                {
+                    pendingZeroWidth += element;
+                }
 
                 continue;
             }
 
             if (written + elementWidth > maxWidth)
             {
+                truncated = true;
                 break;
             }
 
@@ -185,11 +213,16 @@ public sealed class Canvas
             {
                 if (elementWidth == 1 || cx + 1 < Width)
                 {
-                    SetGraphemeCell(cx, y, element, elementWidth);
+                    var value = pendingZeroWidth.Length == 0
+                        ? element
+                        : pendingZeroWidth + element;
+                    pendingZeroWidth = string.Empty;
+                    SetGraphemeCell(cx, y, value, elementWidth);
                     lastColumn = cx;
                 }
                 else
                 {
+                    truncated = true;
                     break;
                 }
             }
@@ -201,6 +234,71 @@ public sealed class Canvas
             cx += elementWidth;
             written += elementWidth;
         }
+
+        // If styled content was truncated, force a local reset to avoid style bleed
+        // into adjacent cells/components.
+        if (truncated && sawAnsi)
+        {
+            if (lastColumn >= 0)
+            {
+                var previousIndex = (y * Width) + lastColumn;
+                if (_graphemeCells![previousIndex] is string previous && !previous.EndsWith("\u001b[0m", StringComparison.Ordinal))
+                {
+                    _graphemeCells[previousIndex] = previous + "\u001b[0m";
+                }
+            }
+            else
+            {
+                pendingZeroWidth += "\u001b[0m";
+            }
+        }
+
+        // Preserve any remaining zero-width payload (for example, trailing resets)
+        // by attaching it to the last rendered cell when possible.
+        if (pendingZeroWidth.Length > 0 && lastColumn >= 0)
+        {
+            var previousIndex = (y * Width) + lastColumn;
+            if (_graphemeCells![previousIndex] is string previous)
+            {
+                _graphemeCells[previousIndex] = previous + pendingZeroWidth;
+            }
+        }
+    }
+
+    private static bool TryReadAnsiEscape(string text, int start, out string sequence, out int consumed)
+    {
+        sequence = string.Empty;
+        consumed = 0;
+        if (start < 0 || start >= text.Length || text[start] != '\u001b' || start + 1 >= text.Length)
+        {
+            return false;
+        }
+
+        if (text[start + 1] != '[')
+        {
+            return false;
+        }
+
+        var cursor = start + 2;
+        while (cursor < text.Length)
+        {
+            var ch = text[cursor];
+            if (ch >= '@' && ch <= '~')
+            {
+                consumed = (cursor - start) + 1;
+                sequence = text.Substring(start, consumed);
+                return true;
+            }
+
+            if (ch < '\u0020')
+            {
+                return false;
+            }
+
+            cursor++;
+        }
+
+        return false;
     }
 
     public void DrawHorizontalLine(int x, int y, int width, char value = '─')

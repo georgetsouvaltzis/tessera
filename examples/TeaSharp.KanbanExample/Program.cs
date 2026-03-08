@@ -155,6 +155,7 @@ internal sealed class KanbanModel : IModel
     {
         Title = "New Card",
         ClearOnSubmit = true,
+        ClearOnCancel = true,
     };
 
     private readonly LabelComponent _details = new()
@@ -185,6 +186,7 @@ internal sealed class KanbanModel : IModel
     };
 
     private KanbanFocus _focus = KanbanFocus.Todo;
+    private KanbanFocus _focusBeforeComposer = KanbanFocus.Todo;
     private int _width = 128;
     private int _height = 40;
     private string _lastEvent = "ready";
@@ -241,6 +243,33 @@ internal sealed class KanbanModel : IModel
             return new UpdateResult(this, null);
         }
 
+        if (key.Is(KeyCode.Tab, KeyModifiers.None))
+        {
+            CycleFocus(1);
+            _lastEvent = $"focus:{_focus.ToString().ToLowerInvariant()}";
+            return new UpdateResult(this, null);
+        }
+
+        if (key.Is(KeyCode.Tab, KeyModifiers.Shift))
+        {
+            CycleFocus(-1);
+            _lastEvent = $"focus:{_focus.ToString().ToLowerInvariant()}";
+            return new UpdateResult(this, null);
+        }
+
+        // When in composer focus, keep key handling local (including digits, letters,
+        // and escape cancel) so global board/lane hotkeys do not fire while typing.
+        if (_focus == KanbanFocus.Composer)
+        {
+            var composerChanged = RouteFocusedInput(key, out var composerEvent);
+            if (composerChanged)
+            {
+                _lastEvent = composerEvent ?? key.Keystroke();
+            }
+
+            return new UpdateResult(this, null);
+        }
+
         if (key.TryGetDigit(out var oneBased)
             && oneBased >= 1
             && oneBased <= _boardTabs.Tabs.Count)
@@ -257,23 +286,9 @@ internal sealed class KanbanModel : IModel
             return new UpdateResult(this, null);
         }
 
-        if (key.Is(KeyCode.Tab, KeyModifiers.None))
-        {
-            CycleFocus(1);
-            _lastEvent = $"focus:{_focus.ToString().ToLowerInvariant()}";
-            return new UpdateResult(this, null);
-        }
-
-        if (key.Is(KeyCode.Tab, KeyModifiers.Shift))
-        {
-            CycleFocus(-1);
-            _lastEvent = $"focus:{_focus.ToString().ToLowerInvariant()}";
-            return new UpdateResult(this, null);
-        }
-
         if (key.IsCharacter('n', KeyModifiers.None))
         {
-            _focus = KanbanFocus.Composer;
+            EnterComposerFocus();
             _lastEvent = "focus:composer";
             return new UpdateResult(this, null);
         }
@@ -314,13 +329,27 @@ internal sealed class KanbanModel : IModel
             return new UpdateResult(this, null);
         }
 
-        if (IsLaneFocus() && (key.Is(KeyCode.Right, KeyModifiers.None) || key.IsCharacter('l', KeyModifiers.None)))
+        if (IsLaneFocus() && key.Is(KeyCode.Right, KeyModifiers.None))
+        {
+            FocusLane(1);
+            _lastEvent = $"focus:{_focus.ToString().ToLowerInvariant()}";
+            return new UpdateResult(this, null);
+        }
+
+        if (IsLaneFocus() && key.Is(KeyCode.Left, KeyModifiers.None))
+        {
+            FocusLane(-1);
+            _lastEvent = $"focus:{_focus.ToString().ToLowerInvariant()}";
+            return new UpdateResult(this, null);
+        }
+
+        if (IsLaneFocus() && key.IsCharacter('l', KeyModifiers.None))
         {
             MoveSelectedCard(1);
             return new UpdateResult(this, null);
         }
 
-        if (IsLaneFocus() && (key.Is(KeyCode.Left, KeyModifiers.None) || key.IsCharacter('h', KeyModifiers.None)))
+        if (IsLaneFocus() && key.IsCharacter('h', KeyModifiers.None))
         {
             MoveSelectedCard(-1);
             return new UpdateResult(this, null);
@@ -357,7 +386,7 @@ internal sealed class KanbanModel : IModel
 
         var body = frame.Inset(1, 1);
         _boardTabs.Render(canvas, new Rect(body.X, body.Y, body.Width, 1));
-        canvas.WriteText(body.X, body.Y + 1, "tab focus | h/l move | b block | p priority | u assign | n new | x delete | q quit", body.Width);
+        canvas.WriteText(body.X, body.Y + 1, "tab focus | ←/→ lane focus | h/l move | b block | p priority | u assign | n new | x delete | q quit", body.Width);
 
         var content = new Rect(body.X, body.Y + 2, body.Width, body.Height - 3);
         var (boardRect, sideRect) = Layout.SplitVertical(content, Math.Max(56, content.Width * 2 / 3), minFirst: 54, minSecond: 28);
@@ -411,7 +440,15 @@ internal sealed class KanbanModel : IModel
         if (_focus == KanbanFocus.Composer)
         {
             var beforeSubmit = _composer.SubmitCount;
+            var beforeCancel = _composer.CancelCount;
             var changed = _composer.Update(key);
+            if (_composer.CancelCount != beforeCancel)
+            {
+                _focus = _focusBeforeComposer;
+                eventOverride = $"focus:{_focus.ToString().ToLowerInvariant()}";
+                return true;
+            }
+
             if (_composer.SubmitCount != beforeSubmit)
             {
                 CreateCardFromComposer();
@@ -692,13 +729,6 @@ internal sealed class KanbanModel : IModel
         LaneItems(target).Add(selected);
         RefreshColumns();
 
-        _focus = target switch
-        {
-            KanbanLane.Todo => KanbanFocus.Todo,
-            KanbanLane.Doing => KanbanFocus.Doing,
-            _ => KanbanFocus.Done,
-        };
-
         _lastEvent = $"move:{selected.Id}:{lane.ToString().ToLowerInvariant()}->{target.ToString().ToLowerInvariant()}";
         PushSuccess($"moved #{selected.Id} to {target.ToString().ToLowerInvariant()}");
     }
@@ -837,9 +867,36 @@ internal sealed class KanbanModel : IModel
         _focus = values[next];
     }
 
+    private void EnterComposerFocus()
+    {
+        if (_focus != KanbanFocus.Composer)
+        {
+            _focusBeforeComposer = _focus;
+        }
+
+        _focus = KanbanFocus.Composer;
+    }
+
     private bool IsLaneFocus()
     {
         return _focus is KanbanFocus.Todo or KanbanFocus.Doing or KanbanFocus.Done;
+    }
+
+    private void FocusLane(int delta)
+    {
+        if (!IsLaneFocus())
+        {
+            return;
+        }
+
+        _focus = (delta, _focus) switch
+        {
+            (< 0, KanbanFocus.Doing) => KanbanFocus.Todo,
+            (< 0, KanbanFocus.Done) => KanbanFocus.Doing,
+            (> 0, KanbanFocus.Todo) => KanbanFocus.Doing,
+            (> 0, KanbanFocus.Doing) => KanbanFocus.Done,
+            _ => _focus,
+        };
     }
 
     private void UpdateDetails()

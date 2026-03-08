@@ -7,6 +7,8 @@ internal static class DashboardComponentTests
     public static IEnumerable<TestCase> Cases()
     {
         yield return new TestCase("Components_Canvas_GraphemeAware_RendersWideAndCombiningText", Canvas_GraphemeAware_RendersWideAndCombiningText);
+        yield return new TestCase("Components_Canvas_GraphemeAware_PreservesLeadingAnsiEscape", Canvas_GraphemeAware_PreservesLeadingAnsiEscape);
+        yield return new TestCase("Components_Canvas_GraphemeAware_TruncatedStyledText_ResetsStyleBeforeFollowingCells", Canvas_GraphemeAware_TruncatedStyledText_ResetsStyleBeforeFollowingCells);
         yield return new TestCase("Components_Gauge_RendersValueAndLabel", Gauge_RendersValueAndLabel);
         yield return new TestCase("Components_StatsCard_RendersEntries", StatsCard_RendersEntries);
         yield return new TestCase("Components_MiniLog_RespectsCapacityAndShowsLatest", MiniLog_RespectsCapacityAndShowsLatest);
@@ -23,6 +25,38 @@ internal static class DashboardComponentTests
 
         // Assert
         TestAssert.Equal("A😀e\u0301B ", output, "Grapheme-aware mode should preserve wide and combining text while keeping layout width.");
+        return Task.CompletedTask;
+    }
+
+    private static Task Canvas_GraphemeAware_PreservesLeadingAnsiEscape()
+    {
+        // Arrange
+        var canvas = new Canvas(8, 1, CanvasTextMode.GraphemeAware);
+        var styled = "\u001b[4;7;38;5;11mX\u001b[0m";
+
+        // Act
+        canvas.WriteText(0, 0, styled, 8);
+        var output = canvas.Render();
+
+        // Assert
+        TestAssert.True(output.StartsWith("\u001b[4;7;38;5;11mX\u001b[0m", StringComparison.Ordinal), "Grapheme-aware mode should preserve leading ANSI escape sequences.");
+        TestAssert.True(!output.StartsWith("[4;7;38;5;11m", StringComparison.Ordinal), "ANSI payload should not be rendered as literal text.");
+        return Task.CompletedTask;
+    }
+
+    private static Task Canvas_GraphemeAware_TruncatedStyledText_ResetsStyleBeforeFollowingCells()
+    {
+        // Arrange
+        var canvas = new Canvas(6, 1, CanvasTextMode.GraphemeAware);
+        var styled = "\u001b[7;38;5;11mABCDE\u001b[0m";
+
+        // Act
+        canvas.WriteText(0, 0, styled, 3); // truncate styled content
+        canvas.WriteText(3, 0, "X", 1); // following plain text should not inherit style
+        var output = canvas.Render();
+
+        // Assert
+        TestAssert.True(output.Contains("\u001b[0mX", StringComparison.Ordinal), "Truncated styled segments should emit reset before following plain cells.");
         return Task.CompletedTask;
     }
 
