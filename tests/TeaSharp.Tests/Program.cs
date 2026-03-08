@@ -19,5 +19,6 @@ runner.AddRange(PrebuiltWidgetTests.Cases());
 runner.AddRange(WidgetStatePaletteTests.Cases());
 runner.AddRange(AdvancedPrebuiltWidgetTests.Cases());
 runner.AddRange(KeyBindingTests.Cases());
+runner.AddRange(ProductivityPrebuiltWidgetTests.Cases());
 
 return await runner.RunAsync();

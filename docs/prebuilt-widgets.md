@@ -24,6 +24,12 @@ TeaSharp provides a prebuilt widget layer in `TeaSharp.Components.PrebuiltWidget
 18. `CommandPaletteComponent`
 19. `TreeViewComponent`
 20. `NotificationCenterComponent`
+21. `MenuBarComponent`
+22. `ContextMenuComponent`
+23. `NumberInputComponent`
+24. `DatePickerComponent`
+25. `TimePickerComponent`
+26. `MarkdownViewerComponent`
 
 ## Notes
 
@@ -40,6 +46,9 @@ TeaSharp provides a prebuilt widget layer in `TeaSharp.Components.PrebuiltWidget
 - `NotificationCenterComponent` provides persistent event feed, read/dismiss, and severity-based styling.
 - `ToggleSwitchComponent`, `SliderComponent`, and `SpinnerComponent` provide interactive control primitives.
 - `BadgeComponent` provides compact state/health labeling.
+- `MenuBarComponent` and `ContextMenuComponent` provide top-level and contextual action surfaces.
+- `NumberInputComponent`, `DatePickerComponent`, and `TimePickerComponent` provide structured value entry.
+- `MarkdownViewerComponent` provides scrollable markdown rendering for docs/help panes.
 - Most prebuilt widgets expose `ShowBorder` (`true` by default) for minimal/borderless layouts.
 - `ListComponent<T>`, `DropdownComponent`, and `ComboboxComponent` support state-driven styling through:
   - `WidgetVisualState`
@@ -85,6 +94,7 @@ Dedicated widget-focused demos are also available:
 dotnet run --project examples/TeaSharp.DropdownExample/TeaSharp.DropdownExample.csproj
 dotnet run --project examples/TeaSharp.ComboBoxExample/TeaSharp.ComboBoxExample.csproj
 dotnet run --project examples/TeaSharp.AdvancedWidgetsExample/TeaSharp.AdvancedWidgetsExample.csproj
+dotnet run --project examples/TeaSharp.ProductivityWidgetsExample/TeaSharp.ProductivityWidgetsExample.csproj
 ```
 
 Core gallery hotkeys:
