@@ -4,7 +4,7 @@ using TeaSharp.Core.Messages;
 
 namespace TeaSharp.Core.Input;
 
-public sealed class TerminalReader(Stream input, EventDecoder decoder, TimeSpan escapeTimeout)
+public sealed class TerminalReader(Stream input, IEventDecoder decoder, TimeSpan escapeTimeout)
 {
     private const int DefaultReadBufferSize = 4096;
 

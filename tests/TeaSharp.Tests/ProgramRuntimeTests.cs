@@ -2,6 +2,7 @@ using TeaSharp.Core.Abstractions;
 using TeaSharp.Core.Application;
 using TeaSharp.Core.Commands;
 using TeaSharp.Core.Messages;
+using TeaSharp.Core.Rendering;
 using TeaSharp.Core.Terminal;
 
 namespace TeaSharp.Tests;
@@ -24,6 +25,7 @@ internal static class ProgramRuntimeTests
         yield return new TestCase("Program_MouseOnViewInterceptor_EnqueuesCommand", MouseOnViewInterceptor_EnqueuesCommand);
         yield return new TestCase("Program_EmitsTerminalCapabilitiesMessage", EmitsTerminalCapabilitiesMessage);
         yield return new TestCase("Program_EmitsColorProfileMessage", EmitsColorProfileMessage);
+        yield return new TestCase("Program_AnsiRendererOptions_DisableModeQueries", AnsiRendererOptions_DisableModeQueries);
         yield return new TestCase("Program_CapabilityProbe_WritesModeQueries", CapabilityProbe_WritesModeQueries);
         yield return new TestCase("Program_CapabilityProbe_TimeoutDisablesModeReportsWhenNoResponses", CapabilityProbe_TimeoutDisablesModeReportsWhenNoResponses);
         yield return new TestCase("Program_CapabilityProbe_PartialResponseDisablesUnresolvedModes", CapabilityProbe_PartialResponseDisablesUnresolvedModes);
@@ -373,6 +375,41 @@ internal static class ProgramRuntimeTests
         TestAssert.True(
             model.Seen == TerminalColorProfile.Ansi256,
             $"Program should emit configured color profile Ansi256, got {model.Seen}.");
+    }
+
+    private static async Task AnsiRendererOptions_DisableModeQueries()
+    {
+        // Arrange
+        var terminal = new InteractiveProbeTerminalAdapter();
+        var model = new TimedQuitProbeViewModel(TimeSpan.FromMilliseconds(60));
+        var program = new TeaProgram(model, new ProgramOptions
+        {
+            DisableInput = true,
+            Terminal = terminal,
+            EnableCapabilityProbe = false,
+            TerminalCapabilities = new TerminalCapabilityProfile(
+                FocusReporting: true,
+                MouseReporting: true,
+                BracketedPaste: true,
+                SynchronizedUpdates: true,
+                ModeReports: true,
+                Source: "ansi-renderer-options-test"),
+            AnsiRendererOptions = new AnsiRendererOptions
+            {
+                QueryModeReports = false,
+            },
+        });
+
+        // Act
+        await program.RunAsync().WaitAsync(TimeSpan.FromSeconds(2));
+
+        // Assert
+        var output = terminal.OutputText;
+        TestAssert.True(output.Contains("\u001b[?2004h", StringComparison.Ordinal), "Runtime should still enable bracketed paste.");
+        TestAssert.True(output.Contains("\u001b[?1004h", StringComparison.Ordinal), "Runtime should still enable focus reporting.");
+        TestAssert.True(output.Contains("\u001b[?1006h", StringComparison.Ordinal), "Runtime should still enable mouse reporting.");
+        TestAssert.True(output.Contains("\u001b[?2026h", StringComparison.Ordinal), "Runtime should still enable synchronized updates.");
+        TestAssert.True(!output.Contains("$p", StringComparison.Ordinal), "Renderer mode-report queries should be disabled by options.");
     }
 
     private static async Task CapabilityProbe_WritesModeQueries()

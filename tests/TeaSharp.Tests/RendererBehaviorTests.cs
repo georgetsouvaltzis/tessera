@@ -15,6 +15,8 @@ internal static class RendererBehaviorTests
         yield return new TestCase("Renderer_UnsupportedCapabilities_SuppressModeSequences", UnsupportedCapabilities_SuppressModeSequences);
         yield return new TestCase("Renderer_ModeReportQueries_EmittedForEnabledFeatures", ModeReportQueries_EmittedForEnabledFeatures);
         yield return new TestCase("Renderer_ModeReportQueries_EmittedOncePerMode", ModeReportQueries_EmittedOncePerMode);
+        yield return new TestCase("Renderer_ModeReportQueries_ConfigurableDisable_SkipsModeQueries", ModeReportQueries_ConfigurableDisable_SkipsModeQueries);
+        yield return new TestCase("Renderer_ModeReportQueries_RepeatWhenOncePerModeDisabled", ModeReportQueries_RepeatWhenOncePerModeDisabled);
         yield return new TestCase("Renderer_ModeReportsDisabled_SkipsModeQueries", ModeReportsDisabled_SkipsModeQueries);
         yield return new TestCase("Renderer_SynchronizedUpdates_WrapFrameOutput", SynchronizedUpdates_WrapFrameOutput);
         yield return new TestCase("Renderer_SynchronizedUpdates_Disabled_DoesNotWrapFrameOutput", SynchronizedUpdates_Disabled_DoesNotWrapFrameOutput);
@@ -24,6 +26,7 @@ internal static class RendererBehaviorTests
         yield return new TestCase("Renderer_TerminalColors_EmitsOscColorSequences", TerminalColors_EmitsOscColorSequences);
         yield return new TestCase("Renderer_Progress_EmitsOscProgressSequences", Progress_EmitsOscProgressSequences);
         yield return new TestCase("Renderer_KeyboardEnhancements_EmitsKittySequence", KeyboardEnhancements_EmitsKittySequence);
+        yield return new TestCase("Renderer_KeyboardEnhancements_CanDisableKittyBaseFlag", KeyboardEnhancements_CanDisableKittyBaseFlag);
         yield return new TestCase("Renderer_CellDiff_UpdatesOnlyChangedCellRun", CellDiff_UpdatesOnlyChangedCellRun);
         yield return new TestCase("Renderer_CellDiff_ClearsShortenedLineTail", CellDiff_ClearsShortenedLineTail);
         yield return new TestCase("Renderer_Resize_ClipsToWidth", Resize_ClipsToWidth);
@@ -170,6 +173,58 @@ internal static class RendererBehaviorTests
 
         // Assert
         AssertCount(rendered, "\u001b[?1004$p", 1);
+    }
+
+    private static async Task ModeReportQueries_ConfigurableDisable_SkipsModeQueries()
+    {
+        // Arrange
+        await using var renderer = new AnsiDiffRenderer(
+            options: new AnsiRendererOptions
+            {
+                QueryModeReports = false,
+            });
+        await using var output = new MemoryStream();
+        await renderer.InitializeAsync(output, CancellationToken.None);
+
+        // Act
+        renderer.Render(View.From("probe") with
+        {
+            EnableBracketedPaste = true,
+            EnableFocusReporting = true,
+            EnableSynchronizedUpdates = true,
+            MouseMode = MouseMode.AllMotion,
+        });
+        await renderer.FlushAsync(CancellationToken.None);
+        var rendered = ReadUtf8(output);
+
+        // Assert
+        AssertContains(rendered, "\u001b[?2004h");
+        AssertContains(rendered, "\u001b[?1004h");
+        AssertContains(rendered, "\u001b[?1006h");
+        AssertContains(rendered, "\u001b[?2026h");
+        AssertDoesNotContain(rendered, "$p");
+    }
+
+    private static async Task ModeReportQueries_RepeatWhenOncePerModeDisabled()
+    {
+        // Arrange
+        await using var renderer = new AnsiDiffRenderer(
+            options: new AnsiRendererOptions
+            {
+                QueryModeReportsOncePerMode = false,
+            });
+        await using var output = new MemoryStream();
+        await renderer.InitializeAsync(output, CancellationToken.None);
+
+        // Act
+        renderer.Render(View.From("sync-a") with { EnableSynchronizedUpdates = true });
+        await renderer.FlushAsync(CancellationToken.None);
+        renderer.Render(View.From("sync-b") with { EnableSynchronizedUpdates = true });
+        await renderer.FlushAsync(CancellationToken.None);
+        var rendered = ReadUtf8(output);
+
+        // Assert
+        AssertCount(rendered, "\u001b[?2026$p", 2);
     }
 
     private static async Task ModeReportsDisabled_SkipsModeQueries()
@@ -377,6 +432,32 @@ internal static class RendererBehaviorTests
         // Assert
         AssertContains(rendered, "\u001b[>3u");
         AssertContains(rendered, "\u001b[>0u");
+    }
+
+    private static async Task KeyboardEnhancements_CanDisableKittyBaseFlag()
+    {
+        // Arrange
+        await using var renderer = new AnsiDiffRenderer(
+            options: new AnsiRendererOptions
+            {
+                IncludeKittyKeyboardBaseFlag = false,
+            });
+        await using var output = new MemoryStream();
+        await renderer.InitializeAsync(output, CancellationToken.None);
+
+        // Act
+        renderer.Render(View.From("keys") with
+        {
+            KeyboardEnhancements = new KeyboardEnhancementOptions { ReportEventTypes = true },
+        });
+        await renderer.FlushAsync(CancellationToken.None);
+        await renderer.ResetAsync(CancellationToken.None);
+        var rendered = ReadUtf8(output);
+
+        // Assert
+        AssertContains(rendered, "\u001b[>2u");
+        AssertContains(rendered, "\u001b[>0u");
+        AssertDoesNotContain(rendered, "\u001b[>3u");
     }
 
     private static async Task CellDiff_UpdatesOnlyChangedCellRun()

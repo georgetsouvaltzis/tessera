@@ -20,11 +20,14 @@ public sealed class TeaProgram
     private readonly Channel<IMessage> _messages;
     private readonly Channel<Command> _commands;
     private readonly object _stateLock = new();
+    private readonly object _commandTaskLock = new();
+    private readonly HashSet<Task> _commandTasks = [];
 
     private ITerminalAdapter? _terminal;
     private IProgramRenderer? _renderer;
     private TerminalReader? _reader;
     private CancellationTokenSource? _cts;
+    private SemaphoreSlim? _commandConcurrencyGate;
     private bool _running;
     private CapabilityProbeState? _capabilityProbe;
     private TerminalCapabilityProfile _runtimeCapabilities = TerminalCapabilityProfile.AllSupported;
@@ -74,13 +77,21 @@ public sealed class TeaProgram
         try
         {
             _terminal = _options.Terminal ?? new ConsoleTerminalAdapter();
-            var capabilities = _options.TerminalCapabilities ?? TerminalCapabilityDetector.Detect();
+            var capabilities = _options.TerminalCapabilities
+                ?? _options.TerminalCapabilityDetector?.Invoke()
+                ?? TerminalCapabilityDetector.Detect();
             _runtimeCapabilities = capabilities;
-            _runtimeColorProfile = _options.ColorProfile ?? TerminalColorProfileDetector.Detect();
+            _runtimeColorProfile = _options.ColorProfile
+                ?? _options.ColorProfileDetector?.Invoke()
+                ?? TerminalColorProfileDetector.Detect();
             _renderer = _options.DisableRenderer
                 ? new NullRenderer()
-                : _options.Renderer ?? new AnsiDiffRenderer(capabilities);
+                : _options.Renderer ?? new AnsiDiffRenderer(capabilities, _options.AnsiRendererOptions);
             _renderer.UpdateCapabilities(capabilities);
+            var maxConcurrentCommands = Math.Max(0, _options.MaxConcurrentCommands);
+            _commandConcurrencyGate = maxConcurrentCommands == 0
+                ? null
+                : new SemaphoreSlim(maxConcurrentCommands, maxConcurrentCommands);
 
             await _terminal.PrepareAsync(token).ConfigureAwait(false);
             await _renderer.InitializeAsync(_terminal.Output, token).ConfigureAwait(false);
@@ -270,6 +281,12 @@ public sealed class TeaProgram
 
             _cts?.Dispose();
             _cts = null;
+            _commandConcurrencyGate?.Dispose();
+            _commandConcurrencyGate = null;
+            lock (_commandTaskLock)
+            {
+                _commandTasks.Clear();
+            }
         }
     }
 
@@ -297,7 +314,7 @@ public sealed class TeaProgram
             return Task.Run(() => consoleTerminal.StreamConsoleKeyEventsAsync(token, Send), token);
         }
 
-        _reader = new TerminalReader(_terminal.Input, new EventDecoder(), _options.EscapeTimeout);
+        _reader = new TerminalReader(_terminal.Input, _options.EventDecoder ?? new EventDecoder(), _options.EscapeTimeout);
         return Task.Run(() => _reader.StreamEventsAsync(token, Send), token);
     }
 
@@ -319,8 +336,11 @@ public sealed class TeaProgram
         var loop = Task.Run(async () =>
         {
             var last = initialSize;
-            var interval = _options.ResizePollInterval < TimeSpan.FromMilliseconds(16)
-                ? TimeSpan.FromMilliseconds(16)
+            var minInterval = _options.MinResizePollInterval <= TimeSpan.Zero
+                ? TimeSpan.FromMilliseconds(1)
+                : _options.MinResizePollInterval;
+            var interval = _options.ResizePollInterval < minInterval
+                ? minInterval
                 : _options.ResizePollInterval;
 
             while (!token.IsCancellationRequested)
@@ -416,9 +436,23 @@ public sealed class TeaProgram
         {
             while (_commands.Reader.TryRead(out var command))
             {
-                _ = Task.Run(() => ExecuteCommandAsync(command, token), token);
+                if (_commandConcurrencyGate is not null)
+                {
+                    try
+                    {
+                        await _commandConcurrencyGate.WaitAsync(token).ConfigureAwait(false);
+                    }
+                    catch (OperationCanceledException)
+                    {
+                        break;
+                    }
+                }
+
+                StartTrackedCommand(command, token);
             }
         }
+
+        await WaitForTrackedCommandsAsync().ConfigureAwait(false);
     }
 
     private async Task ExecuteCommandAsync(Command command, CancellationToken token)
@@ -479,6 +513,70 @@ public sealed class TeaProgram
             }
 
             await ExecuteCommandAsync(command, token).ConfigureAwait(false);
+        }
+    }
+
+    private void StartTrackedCommand(Command command, CancellationToken token)
+    {
+        var task = Task.Run(async () =>
+        {
+            try
+            {
+                await ExecuteCommandAsync(command, token).ConfigureAwait(false);
+            }
+            finally
+            {
+                _commandConcurrencyGate?.Release();
+            }
+        }, CancellationToken.None);
+
+        lock (_commandTaskLock)
+        {
+            _commandTasks.Add(task);
+        }
+
+        _ = task.ContinueWith(
+            static (completed, state) =>
+            {
+                if (state is not TeaProgram program)
+                {
+                    return;
+                }
+
+                lock (program._commandTaskLock)
+                {
+                    program._commandTasks.Remove(completed);
+                }
+            },
+            this,
+            CancellationToken.None,
+            TaskContinuationOptions.ExecuteSynchronously,
+            TaskScheduler.Default);
+    }
+
+    private async Task WaitForTrackedCommandsAsync()
+    {
+        while (true)
+        {
+            Task[] snapshot;
+            lock (_commandTaskLock)
+            {
+                if (_commandTasks.Count == 0)
+                {
+                    return;
+                }
+
+                snapshot = [.. _commandTasks];
+            }
+
+            try
+            {
+                await Task.WhenAll(snapshot).ConfigureAwait(false);
+            }
+            catch
+            {
+                // ignored: command exceptions are handled by runtime policy.
+            }
         }
     }
 

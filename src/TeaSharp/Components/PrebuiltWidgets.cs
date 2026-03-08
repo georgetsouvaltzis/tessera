@@ -120,6 +120,8 @@ public sealed class TextInputComponent : IStatefulComponent
 {
     public TextInputModel Input { get; } = new();
 
+    public TextInputKeyMap KeyMap { get; set; } = TextInputKeyMap.Default;
+
     public string Title { get; set; } = "Text Input";
 
     public bool Focused { get; set; }
@@ -132,7 +134,7 @@ public sealed class TextInputComponent : IStatefulComponent
 
     public bool Update(IMessage message)
     {
-        var result = Input.Update(message);
+        var result = Input.Update(message, KeyMap);
         if (!result.Submitted)
         {
             return result.Changed;
@@ -186,6 +188,10 @@ public sealed class TextAreaComponent : IStatefulComponent
 
     public TextInputModel Input { get; } = new() { Multiline = true };
 
+    public TextInputKeyMap InputKeyMap { get; set; } = TextInputKeyMap.Default;
+
+    public ViewportKeyMap ViewportKeyMap { get; set; } = ViewportKeyMap.Default;
+
     public string Title { get; set; } = "Text Area";
 
     public bool Focused { get; set; }
@@ -205,14 +211,14 @@ public sealed class TextAreaComponent : IStatefulComponent
     public bool Update(IMessage message)
     {
         var changed = false;
-        var update = Input.Update(message);
+        var update = Input.Update(message, InputKeyMap);
         if (update.Changed)
         {
             SyncViewport();
             changed = true;
         }
 
-        if (_viewport.Update(message, ViewportKeyMap.Default))
+        if (_viewport.Update(message, ViewportKeyMap))
         {
             changed = true;
         }
@@ -287,9 +293,11 @@ public sealed class ListComponent<T> : IStatefulComponent
 
     public bool Focused { get; set; }
 
+    public ListKeyMap KeyMap { get; set; } = ListKeyMap.Default;
+
     public bool Update(IMessage message)
     {
-        return Model.Update(message);
+        return Model.Update(message, KeyMap);
     }
 
     public void Render(Canvas canvas, Rect rect)
@@ -365,6 +373,10 @@ public sealed class ProgressBarComponent : IStatefulComponent
 
     public double Step { get; set; } = 0.05;
 
+    public KeyBinding DecreaseKey { get; set; } = new("left/-", "decrease", "left", "-");
+
+    public KeyBinding IncreaseKey { get; set; } = new("right/+", "increase", "right", "+");
+
     public bool Update(IMessage message)
     {
         if (message is not KeyPressMsg key || !Focused)
@@ -372,13 +384,13 @@ public sealed class ProgressBarComponent : IStatefulComponent
             return false;
         }
 
-        if (key.Code is KeyCode.Left || key.Text == "-")
+        if (DecreaseKey.Matches(key))
         {
             SetValue(Value - Step);
             return true;
         }
 
-        if (key.Code is KeyCode.Right || key.Text == "+")
+        if (IncreaseKey.Matches(key))
         {
             SetValue(Value + Step);
             return true;
@@ -446,6 +458,12 @@ public sealed class LogViewerComponent : IStatefulComponent
 
     public string Filter { get; private set; } = string.Empty;
 
+    public ViewportKeyMap ViewportKeyMap { get; set; } = ViewportKeyMap.Default;
+
+    public KeyBinding TogglePauseKey { get; set; } = new("p", "toggle pause", "p");
+
+    public KeyBinding ClearKey { get; set; } = new("c", "clear", "c");
+
     public int Count => _entries.Count;
 
     public void Append(string line)
@@ -479,20 +497,20 @@ public sealed class LogViewerComponent : IStatefulComponent
     {
         if (message is KeyPressMsg key)
         {
-            if (key.Text == "p" && key.Modifiers == KeyModifiers.None)
+            if (TogglePauseKey.Matches(key))
             {
                 Paused = !Paused;
                 return true;
             }
 
-            if (key.Text == "c" && key.Modifiers == KeyModifiers.None)
+            if (ClearKey.Matches(key))
             {
                 Clear();
                 return true;
             }
         }
 
-        return _viewport.Update(message, ViewportKeyMap.Default);
+        return _viewport.Update(message, ViewportKeyMap);
     }
 
     public void Render(Canvas canvas, Rect rect)
@@ -552,6 +570,10 @@ public sealed class DialogComponent : IStatefulComponent
 
     public DialogResult LastResult { get; private set; }
 
+    public KeyBinding AcceptKey { get; set; } = new("enter/space", "accept", "enter", "space");
+
+    public KeyBinding DismissKey { get; set; } = new("esc", "dismiss", "escape");
+
     public bool Update(IMessage message)
     {
         if (!Visible || !Focused || message is not KeyPressMsg key)
@@ -559,14 +581,14 @@ public sealed class DialogComponent : IStatefulComponent
             return false;
         }
 
-        if (key.Code == KeyCode.Escape)
+        if (DismissKey.Matches(key))
         {
             Visible = false;
             LastResult = DialogResult.Dismissed;
             return true;
         }
 
-        if (key.Code == KeyCode.Enter || key.Text == " ")
+        if (AcceptKey.Matches(key))
         {
             Visible = false;
             LastResult = DialogResult.Accepted;

@@ -1,5 +1,6 @@
 using TeaSharp.Core.Abstractions;
 using TeaSharp.Core.Messages;
+using TeaSharp.Widgets;
 
 namespace TeaSharp.Components;
 
@@ -281,6 +282,12 @@ public sealed class TabsComponent : IStatefulComponent
 
     public IReadOnlyList<string> Tabs => _tabs;
 
+    public KeyBinding NextTabKey { get; set; } = new("right", "next tab", "right");
+
+    public KeyBinding PreviousTabKey { get; set; } = new("left", "previous tab", "left");
+
+    public bool EnableNumericShortcuts { get; set; } = true;
+
     public bool Update(IMessage message)
     {
         if (_tabs.Count == 0 || message is not KeyPressMsg key)
@@ -288,19 +295,22 @@ public sealed class TabsComponent : IStatefulComponent
             return false;
         }
 
-        if (key.Code == KeyCode.Right)
+        if (NextTabKey.Matches(key))
         {
             SelectedIndex = (SelectedIndex + 1) % _tabs.Count;
             return true;
         }
 
-        if (key.Code == KeyCode.Left)
+        if (PreviousTabKey.Matches(key))
         {
             SelectedIndex = (SelectedIndex + _tabs.Count - 1) % _tabs.Count;
             return true;
         }
 
-        if (int.TryParse(key.Text, out var oneBased) && oneBased >= 1 && oneBased <= _tabs.Count)
+        if (EnableNumericShortcuts
+            && int.TryParse(key.Text, out var oneBased)
+            && oneBased >= 1
+            && oneBased <= _tabs.Count)
         {
             SelectedIndex = oneBased - 1;
             return true;
@@ -349,6 +359,12 @@ public sealed class AccordionComponent : IStatefulComponent
 
     public string Title { get; set; } = "Accordion";
 
+    public KeyBinding NextSectionKey { get; set; } = new("down", "next section", "down");
+
+    public KeyBinding PreviousSectionKey { get; set; } = new("up", "previous section", "up");
+
+    public KeyBinding ToggleSectionKey { get; set; } = new("enter/space", "toggle section", "enter", "space");
+
     public void SetSections(IEnumerable<AccordionSection> sections)
     {
         _sections.Clear();
@@ -366,19 +382,19 @@ public sealed class AccordionComponent : IStatefulComponent
             return false;
         }
 
-        if (key.Code == KeyCode.Down)
+        if (NextSectionKey.Matches(key))
         {
             SelectedIndex = Math.Min(_sections.Count - 1, SelectedIndex + 1);
             return true;
         }
 
-        if (key.Code == KeyCode.Up)
+        if (PreviousSectionKey.Matches(key))
         {
             SelectedIndex = Math.Max(0, SelectedIndex - 1);
             return true;
         }
 
-        if (key.Code == KeyCode.Enter || key.Text == " ")
+        if (ToggleSectionKey.Matches(key))
         {
             var section = _sections[SelectedIndex];
             _sections[SelectedIndex] = section with { Expanded = !section.Expanded };
@@ -523,6 +539,18 @@ public sealed class SortableTableComponent : IStatefulComponent
 
     public int VirtualWindowSize { get; private set; } = 32;
 
+    public KeyBinding NextPageKey { get; set; } = new("]", "next page", "]");
+
+    public KeyBinding PreviousPageKey { get; set; } = new("[", "previous page", "[");
+
+    public KeyBinding ToggleSortDirectionKey { get; set; } = new("s", "toggle sort direction", "s");
+
+    public KeyBinding NextSortColumnKey { get; set; } = new("c", "next sort column", "c");
+
+    public KeyBinding VirtualForwardKey { get; set; } = new("v", "virtual forward", "v");
+
+    public KeyBinding VirtualBackwardKey { get; set; } = new("shift+v", "virtual backward", "V");
+
     public void SetRows(IEnumerable<IReadOnlyList<string>> rows)
     {
         _rows.Clear();
@@ -537,38 +565,38 @@ public sealed class SortableTableComponent : IStatefulComponent
             return false;
         }
 
-        if (key.Text == "]")
+        if (NextPageKey.Matches(key))
         {
             PageIndex++;
             NormalizePage();
             return true;
         }
 
-        if (key.Text == "[")
+        if (PreviousPageKey.Matches(key))
         {
             PageIndex = Math.Max(0, PageIndex - 1);
             return true;
         }
 
-        if (key.Text == "s")
+        if (ToggleSortDirectionKey.Matches(key))
         {
             SortDescending = !SortDescending;
             return true;
         }
 
-        if (key.Text == "c")
+        if (NextSortColumnKey.Matches(key))
         {
             SortColumn = (SortColumn + 1) % Headers.Count;
             return true;
         }
 
-        if (EnableVirtualization && key.Text == "v")
+        if (EnableVirtualization && VirtualForwardKey.Matches(key))
         {
             VirtualStartIndex = Math.Max(0, VirtualStartIndex + Math.Max(1, VirtualWindowSize / 2));
             return true;
         }
 
-        if (EnableVirtualization && key.Text == "V")
+        if (EnableVirtualization && VirtualBackwardKey.Matches(key))
         {
             VirtualStartIndex = Math.Max(0, VirtualStartIndex - Math.Max(1, VirtualWindowSize / 2));
             return true;
@@ -642,6 +670,12 @@ public sealed class CheckboxListComponent : IStatefulComponent
 
     public string Title { get; set; } = "Checklist";
 
+    public KeyBinding NextItemKey { get; set; } = new("down", "next item", "down");
+
+    public KeyBinding PreviousItemKey { get; set; } = new("up", "previous item", "up");
+
+    public KeyBinding ToggleItemKey { get; set; } = new("enter/space", "toggle item", "enter", "space");
+
     public void SetItems(IEnumerable<(string Label, bool Checked)> items)
     {
         _items.Clear();
@@ -661,19 +695,19 @@ public sealed class CheckboxListComponent : IStatefulComponent
             return false;
         }
 
-        if (key.Code == KeyCode.Down)
+        if (NextItemKey.Matches(key))
         {
             SelectedIndex = Math.Min(_items.Count - 1, SelectedIndex + 1);
             return true;
         }
 
-        if (key.Code == KeyCode.Up)
+        if (PreviousItemKey.Matches(key))
         {
             SelectedIndex = Math.Max(0, SelectedIndex - 1);
             return true;
         }
 
-        if (key.Text == " " || key.Code == KeyCode.Enter)
+        if (ToggleItemKey.Matches(key))
         {
             var item = _items[SelectedIndex];
             _items[SelectedIndex] = (item.Label, !item.Checked);
@@ -711,6 +745,10 @@ public sealed class RadioGroupComponent : IStatefulComponent
 
     public string Title { get; set; } = "Radio";
 
+    public KeyBinding NextItemKey { get; set; } = new("down/right", "next item", "down", "right");
+
+    public KeyBinding PreviousItemKey { get; set; } = new("up/left", "previous item", "up", "left");
+
     public void SetItems(IEnumerable<string> items)
     {
         _items.Clear();
@@ -728,13 +766,13 @@ public sealed class RadioGroupComponent : IStatefulComponent
             return false;
         }
 
-        if (key.Code == KeyCode.Down || key.Code == KeyCode.Right)
+        if (NextItemKey.Matches(key))
         {
             SelectedIndex = (SelectedIndex + 1) % _items.Count;
             return true;
         }
 
-        if (key.Code == KeyCode.Up || key.Code == KeyCode.Left)
+        if (PreviousItemKey.Matches(key))
         {
             SelectedIndex = (SelectedIndex + _items.Count - 1) % _items.Count;
             return true;
@@ -769,6 +807,10 @@ public sealed class SelectComponent : IStatefulComponent
 
     public string Title { get; set; } = "Select";
 
+    public KeyBinding NextItemKey { get; set; } = new("down/right", "next item", "down", "right");
+
+    public KeyBinding PreviousItemKey { get; set; } = new("up/left", "previous item", "up", "left");
+
     public void SetItems(IEnumerable<string> items)
     {
         _items.Clear();
@@ -786,13 +828,13 @@ public sealed class SelectComponent : IStatefulComponent
             return false;
         }
 
-        if (key.Code == KeyCode.Right || key.Code == KeyCode.Down)
+        if (NextItemKey.Matches(key))
         {
             SelectedIndex = (SelectedIndex + 1) % _items.Count;
             return true;
         }
 
-        if (key.Code == KeyCode.Left || key.Code == KeyCode.Up)
+        if (PreviousItemKey.Matches(key))
         {
             SelectedIndex = (SelectedIndex + _items.Count - 1) % _items.Count;
             return true;

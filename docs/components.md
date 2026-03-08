@@ -54,11 +54,13 @@ The design follows patterns used in Bubble Tea examples:
     - `AccordionComponent`
     - `SortableTableComponent`
       - optional virtual window rendering (`EnableVirtualization`, `SetVirtualWindow`)
+      - configurable key bindings (`NextPageKey`, `PreviousPageKey`, `ToggleSortDirectionKey`, `NextSortColumnKey`, `VirtualForwardKey`, `VirtualBackwardKey`)
     - `CheckboxListComponent`
     - `RadioGroupComponent`
     - `SelectComponent`
     - `ToastCenterComponent`
     - `ModalComponent`
+    - UI-kit controls expose configurable key bindings for navigation/toggle actions (instead of fixed hardcoded keys).
   - prebuilt widget components (`PrebuiltWidgets`):
     - `LabelComponent`
     - `ButtonComponent`
@@ -71,6 +73,13 @@ The design follows patterns used in Bubble Tea examples:
     - `LogViewerComponent`
     - `DialogComponent`
     - `LayoutContainerComponent`
+    - prebuilt widgets now allow key behavior injection:
+      - `TextInputComponent.KeyMap`
+      - `TextAreaComponent.InputKeyMap` / `TextAreaComponent.ViewportKeyMap`
+      - `ListComponent<T>.KeyMap`
+      - `LogViewerComponent.ViewportKeyMap`, `TogglePauseKey`, `ClearKey`
+      - `ProgressBarComponent.IncreaseKey` / `DecreaseKey`
+      - `DialogComponent.AcceptKey` / `DismissKey`
 
 ## Example Integration
 

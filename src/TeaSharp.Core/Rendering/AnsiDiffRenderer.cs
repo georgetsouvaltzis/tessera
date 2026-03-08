@@ -6,8 +6,7 @@ namespace TeaSharp.Core.Rendering;
 
 public sealed class AnsiDiffRenderer : IProgramRenderer
 {
-    private static readonly TimeSpan DefaultFlushTimeout = TimeSpan.FromSeconds(2);
-
+    private readonly AnsiRendererOptions _options;
     private Stream? _output;
     private StreamWriter? _writer;
     private RenderFrameBuffer _previousFrame = RenderFrameBuffer.Empty;
@@ -30,9 +29,12 @@ public sealed class AnsiDiffRenderer : IProgramRenderer
     private bool _fullRepaintRequired;
     private TerminalCapabilityProfile _capabilities;
 
-    public AnsiDiffRenderer(TerminalCapabilityProfile? capabilities = null)
+    public AnsiDiffRenderer(
+        TerminalCapabilityProfile? capabilities = null,
+        AnsiRendererOptions? options = null)
     {
         _capabilities = capabilities ?? TerminalCapabilityProfile.AllSupported;
+        _options = options ?? new AnsiRendererOptions();
     }
 
     public ValueTask InitializeAsync(Stream output, CancellationToken cancellationToken)
@@ -113,7 +115,7 @@ public sealed class AnsiDiffRenderer : IProgramRenderer
             _bracketedPaste = requestedBracketedPaste;
             if (requestedBracketedPaste)
             {
-                await QueryModeReportOnceAsync(2004).ConfigureAwait(false);
+                await QueryModeReportAsync(2004).ConfigureAwait(false);
             }
         }
 
@@ -124,7 +126,7 @@ public sealed class AnsiDiffRenderer : IProgramRenderer
             _focusReporting = requestedFocusReporting;
             if (requestedFocusReporting)
             {
-                await QueryModeReportOnceAsync(1004).ConfigureAwait(false);
+                await QueryModeReportAsync(1004).ConfigureAwait(false);
             }
         }
 
@@ -132,7 +134,7 @@ public sealed class AnsiDiffRenderer : IProgramRenderer
         if (requestedSyncUpdates)
         {
             await _writer.WriteAsync("\u001b[?2026h").ConfigureAwait(false);
-            await QueryModeReportOnceAsync(2026).ConfigureAwait(false);
+            await QueryModeReportAsync(2026).ConfigureAwait(false);
         }
 
         var requestedMouseMode = _capabilities.MouseReporting
@@ -144,7 +146,7 @@ public sealed class AnsiDiffRenderer : IProgramRenderer
             _mouseMode = requestedMouseMode;
             if (requestedMouseMode != MouseMode.None)
             {
-                await QueryModeReportOnceAsync(1006).ConfigureAwait(false);
+                await QueryModeReportAsync(1006).ConfigureAwait(false);
             }
         }
 
@@ -227,9 +229,9 @@ public sealed class AnsiDiffRenderer : IProgramRenderer
         await _writer.FlushAsync(cancellationToken).ConfigureAwait(false);
         _previousFrame = nextFrame;
 
-        if (cancellationToken.CanBeCanceled)
+        if (cancellationToken.CanBeCanceled && _options.FlushTimeout > TimeSpan.Zero)
         {
-            using var timeoutCts = new CancellationTokenSource(DefaultFlushTimeout);
+            using var timeoutCts = new CancellationTokenSource(_options.FlushTimeout);
             using var linked = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, timeoutCts.Token);
             await Task.Yield();
             linked.Token.ThrowIfCancellationRequested();
@@ -541,9 +543,14 @@ public sealed class AnsiDiffRenderer : IProgramRenderer
         return _writer.WriteAsync($"\u001b[{parameter} q");
     }
 
-    private Task QueryModeReportOnceAsync(int mode)
+    private Task QueryModeReportAsync(int mode)
     {
-        if (_writer is null || !_capabilities.ModeReports || !_queriedModes.Add(mode))
+        if (_writer is null || !_capabilities.ModeReports || !_options.QueryModeReports)
+        {
+            return Task.CompletedTask;
+        }
+
+        if (_options.QueryModeReportsOncePerMode && !_queriedModes.Add(mode))
         {
             return Task.CompletedTask;
         }
@@ -551,9 +558,9 @@ public sealed class AnsiDiffRenderer : IProgramRenderer
         return _writer.WriteAsync($"\u001b[?{mode}$p");
     }
 
-    private static int GetKeyboardEnhancementFlags(KeyboardEnhancementOptions options)
+    private int GetKeyboardEnhancementFlags(KeyboardEnhancementOptions options)
     {
-        var flags = 0b1;
+        var flags = _options.IncludeKittyKeyboardBaseFlag ? 0b1 : 0;
         if (options.ReportEventTypes)
         {
             flags |= 0b10;

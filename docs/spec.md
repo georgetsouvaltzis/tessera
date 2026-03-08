@@ -46,10 +46,12 @@ Primary goal: deterministic message-driven TUI runtime with portable terminal be
 - `TeaProgram` event loop, command scheduling, filtering, rendering orchestration.
   - adaptive frame pacing (`ProgramOptions.AdaptiveFramePacing`) for burst message coalescing.
   - recoverable command exception hook (`ProgramOptions.RecoverCommandException`) before `CommandErrorMsg` fallback.
+  - configurable command concurrency (`ProgramOptions.MaxConcurrentCommands`).
 
 3. `Input`
 - `EventDecoder`: bytes -> typed messages.
 - `TerminalReader`: stream pump + decoder loop.
+  - injectable decoder via `ProgramOptions.EventDecoder`.
 
 4. `Rendering`
 - `IProgramRenderer` abstraction.
@@ -61,6 +63,7 @@ Primary goal: deterministic message-driven TUI runtime with portable terminal be
 - `ConsoleTerminalAdapter`: OS integration and console mode management.
 - `TerminalCapabilityDetector` + `TerminalCapabilityProfile`: environment + `infocmp`-enriched feature gating for renderer VT modes.
   - explicit capability overrides via `TEASHARP_CAPS` (`focus|mouse|paste|sync|decrpm` boolean flags).
+  - detector override hooks via `ProgramOptions.TerminalCapabilityDetector` and `ProgramOptions.ColorProfileDetector`.
 
 6. `Commands`
 - `Commands` static helpers: `Quit`, `Interrupt`, `Batch`, `Sequence`, `Tick`, `Every`.
@@ -113,6 +116,7 @@ Primary goal: deterministic message-driven TUI runtime with portable terminal be
 - Probe terminal mode after setup; fallback to explicit `-icanon min 1 time 0 -echo` if needed.
 - If raw mode is still unavailable, input path falls back to `Console.ReadKey(intercept: true)` for non-echo key handling.
 - Program uses signal-assisted resize checks on Unix-like systems (`SIGWINCH`) plus interval-based polling as a cross-platform fallback.
+- Resize polling interval floor is configurable (`ProgramOptions.MinResizePollInterval`), in addition to `ResizePollInterval`.
 - Renderer mode toggles (`focus`, `mouse`, `bracketed paste`, `synchronized updates`) are gated by a detected `TerminalCapabilityProfile` and can be overridden via `ProgramOptions.TerminalCapabilities`.
 - On Unix-like systems, `TerminalCapabilityDetector` enriches environment heuristics with best-effort `infocmp -x` capability probing.
 
@@ -121,6 +125,13 @@ Primary goal: deterministic message-driven TUI runtime with portable terminal be
 - `IModel Init/Update/View`.
 - `Command` returns optional `IMessage`.
 - `View` terminal controls now include colors (`ForegroundColor`, `BackgroundColor`, `CursorColor`), native progress (`TerminalProgress`), keyboard enhancement requests (`KeyboardEnhancementOptions`), and optional mouse interception callback (`OnMouse`).
+- `ProgramOptions` now includes runtime extension points:
+  - capability probe mode list (`CapabilityProbeModes`)
+  - decoder injection (`EventDecoder`)
+  - capability/color detector delegates (`TerminalCapabilityDetector`, `ColorProfileDetector`)
+  - command concurrency policy (`MaxConcurrentCommands`)
+  - resize interval floor (`MinResizePollInterval`)
+  - ANSI renderer policy (`AnsiRendererOptions`: mode-report query policy, kitty keyboard base flag behavior, flush timeout)
 - Messages include:
   - lifecycle: `QuitMsg`, `InterruptMsg`, `CommandErrorMsg`.
   - terminal: `WindowSizeMsg`.

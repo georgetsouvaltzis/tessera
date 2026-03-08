@@ -1,4 +1,5 @@
 using TeaSharp.Core.Abstractions;
+using TeaSharp.Core.Input;
 using TeaSharp.Core.Rendering;
 using TeaSharp.Core.Terminal;
 
@@ -28,19 +29,31 @@ public sealed class ProgramOptions
 
     public TimeSpan ResizePollInterval { get; init; } = TimeSpan.FromMilliseconds(120);
 
+    public TimeSpan MinResizePollInterval { get; init; } = TimeSpan.FromMilliseconds(16);
+
     public bool EnableCapabilityProbe { get; init; } = true;
 
     public TimeSpan CapabilityProbeTimeout { get; init; } = TimeSpan.FromMilliseconds(260);
 
+    public int MaxConcurrentCommands { get; init; }
+
     public IProgramRenderer? Renderer { get; init; }
+
+    public AnsiRendererOptions? AnsiRendererOptions { get; init; }
 
     public ITerminalAdapter? Terminal { get; init; }
 
     public TerminalCapabilityProfile? TerminalCapabilities { get; init; }
 
+    public Func<TerminalCapabilityProfile>? TerminalCapabilityDetector { get; init; }
+
     public TerminalColorProfile? ColorProfile { get; init; }
+
+    public Func<TerminalColorProfile>? ColorProfileDetector { get; init; }
+
+    public IEventDecoder? EventDecoder { get; init; }
 
     internal Func<Action, IDisposable?>? ResizeSignalRegistrationFactory { get; init; }
 
-    internal IReadOnlyList<int>? CapabilityProbeModes { get; init; }
+    public IReadOnlyList<int>? CapabilityProbeModes { get; init; }
 }

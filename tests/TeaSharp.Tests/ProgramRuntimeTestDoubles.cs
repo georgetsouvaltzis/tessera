@@ -361,6 +361,28 @@ internal sealed class TimedQuitModel : IModel
     public ModelView View() => ModelView.From("timed-quit");
 }
 
+internal sealed class TimedQuitProbeViewModel : IModel
+{
+    private readonly TimeSpan _delay;
+
+    public TimedQuitProbeViewModel(TimeSpan delay)
+    {
+        _delay = delay;
+    }
+
+    public Command? Init() => Commands.Tick(_delay, _ => new QuitMsg());
+
+    public UpdateResult Update(IMessage message) => new(this, null);
+
+    public ModelView View() => ModelView.From("timed-probe-view") with
+    {
+        EnableBracketedPaste = true,
+        EnableFocusReporting = true,
+        EnableSynchronizedUpdates = true,
+        MouseMode = MouseMode.AllMotion,
+    };
+}
+
 internal sealed class RawOutputInitModel : IModel
 {
     public Command? Init() => Commands.Sequence(

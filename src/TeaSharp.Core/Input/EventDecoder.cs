@@ -7,7 +7,12 @@ namespace TeaSharp.Core.Input;
 
 public readonly record struct DecodeResult(int Consumed, IMessage? Message, bool NeedMoreData);
 
-public sealed class EventDecoder
+public interface IEventDecoder
+{
+    DecodeResult Decode(ReadOnlySpan<byte> buffer, bool timeoutExpired);
+}
+
+public sealed class EventDecoder : IEventDecoder
 {
     private static ReadOnlySpan<char> CsiCursorFinals => "ABCDHF";
     private const int MouseModifierShiftMask = 0b0000_0100;
