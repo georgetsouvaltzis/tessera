@@ -7,6 +7,7 @@ Single repository. Layered packages:
 
 - `TeaSharp.Core`: terminal primitives + program runtime.
 - `TeaSharp`: ergonomic framework surface over core.
+- `TeaSharp.Cli`: developer tooling (`teasharp wizard`) for scaffold generation.
 - `TeaSharp.Examples`: runnable sample apps.
 - `TeaSharp.Tests`: lightweight in-repo behavioral regression suite.
 - `TeaSharp.IntegrationTests`: NUnit integration tests (`dotnet test`) for UX contracts and end-to-end message routing.
@@ -178,3 +179,4 @@ Phase 3:
 - Custom extension guide lives in `docs/custom-components.md`.
 - ANSI style notes live in `docs/styles.md`.
 - Stateful widget notes live in `docs/widgets.md`.
+- Wizard scaffolding usage lives in `docs/wizard.md`.
