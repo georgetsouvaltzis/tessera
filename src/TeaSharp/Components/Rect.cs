@@ -8,6 +8,11 @@ public readonly record struct Rect(int X, int Y, int Width, int Height)
 
     public bool IsEmpty => Width <= 0 || Height <= 0;
 
+    public bool Contains(int x, int y)
+    {
+        return !IsEmpty && x >= X && x < Right && y >= Y && y < Bottom;
+    }
+
     public Rect Inset(int horizontal, int vertical)
     {
         return new Rect(

@@ -15,6 +15,8 @@ internal static class ChartComponentTests
         yield return new TestCase("Charts_LineChartComponent_HonorsCapacity", LineChartComponent_HonorsCapacity);
         yield return new TestCase("Charts_LineChart_WithZoomAndOffset_ShiftsWindow", LineChart_WithZoomAndOffset_ShiftsWindow);
         yield return new TestCase("Components_Composer_DispatchesStatefulUpdates", Composer_DispatchesStatefulUpdates);
+        yield return new TestCase("Components_Composer_MouseClickFocusesTargetSlot", Composer_MouseClickFocusesTargetSlot);
+        yield return new TestCase("Components_Composer_MouseWheelFallsBackToFocusedSlot", Composer_MouseWheelFallsBackToFocusedSlot);
     }
 
     private static Task LineChart_RendersPointsAndStats()
@@ -180,6 +182,36 @@ internal static class ChartComponentTests
         return Task.CompletedTask;
     }
 
+    private static Task Composer_MouseClickFocusesTargetSlot()
+    {
+        var composer = new ComponentComposer();
+        var first = new MouseProbeComponent { Focused = true };
+        var second = new MouseProbeComponent { Focused = false };
+        composer.Add(first, new Rect(0, 0, 10, 4));
+        composer.Add(second, new Rect(10, 0, 10, 4));
+
+        var changed = composer.Update(new MouseClickMsg(MouseButton.Left, 12, 1));
+
+        TestAssert.True(changed, "Mouse click should update focus and route event.");
+        TestAssert.True(!first.Focused, "First slot should lose focus.");
+        TestAssert.True(second.Focused, "Clicked slot should gain focus.");
+        TestAssert.Equal(1, second.MouseUpdates, "Clicked slot should receive mouse message.");
+        return Task.CompletedTask;
+    }
+
+    private static Task Composer_MouseWheelFallsBackToFocusedSlot()
+    {
+        var composer = new ComponentComposer();
+        var focused = new MouseProbeComponent { Focused = true };
+        composer.Add(focused, new Rect(0, 0, 10, 4));
+
+        var changed = composer.Update(new MouseWheelMsg(MouseButton.WheelDown, 200, 200));
+
+        TestAssert.True(changed, "Wheel outside bounds should still route to focused slot.");
+        TestAssert.Equal(1, focused.MouseUpdates, "Focused slot should receive wheel event.");
+        return Task.CompletedTask;
+    }
+
     private sealed class CounterComponent : IStatefulComponent
     {
         private int _count;
@@ -200,6 +232,26 @@ internal static class ChartComponentTests
             canvas.DrawBox(rect, "Counter");
             var body = rect.Inset(1, 1);
             canvas.WriteText(body.X, body.Y, $"count={_count}", body.Width);
+        }
+    }
+
+    private sealed class MouseProbeComponent : IStatefulComponent, IMouseStatefulComponent
+    {
+        public bool Focused { get; set; }
+
+        public int MouseUpdates { get; private set; }
+
+        public bool Update(IMessage message) => false;
+
+        public bool UpdateMouse(MouseMsg message, Rect bounds)
+        {
+            MouseUpdates++;
+            return true;
+        }
+
+        public void Render(Canvas canvas, Rect rect)
+        {
+            canvas.WriteText(rect.X, rect.Y, Focused ? "focused" : "idle", rect.Width);
         }
     }
 }

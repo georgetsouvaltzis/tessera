@@ -334,8 +334,10 @@ public sealed class TextAreaComponent : IStatefulComponent
     }
 }
 
-public sealed class ListComponent<T> : IStatefulComponent
+public sealed class ListComponent<T> : IStatefulComponent, IMouseStatefulComponent
 {
+    private int? _hoveredFilteredIndex;
+
     public ListComponent(IEnumerable<T> items, Func<T, string> toText)
     {
         Model = new ListModel<T>(items, toText);
@@ -367,6 +369,69 @@ public sealed class ListComponent<T> : IStatefulComponent
         }
 
         return Model.Update(message, KeyMap);
+    }
+
+    public bool UpdateMouse(MouseMsg message, Rect bounds)
+    {
+        if (Disabled)
+        {
+            return false;
+        }
+
+        var content = ResolveContentRect(bounds);
+        if (content.IsEmpty)
+        {
+            return false;
+        }
+
+        if (!content.Contains(message.X, message.Y) && message is not MouseWheelMsg)
+        {
+            if (message is MouseMotionMsg or MouseClickMsg)
+            {
+                return SetHoveredFilteredIndex(null);
+            }
+
+            return false;
+        }
+
+        Model.PageSize = Math.Max(1, content.Height);
+        var hoverChanged = message is MouseMotionMsg or MouseClickMsg
+            ? SetHoveredByPointer(message.X, message.Y, content)
+            : false;
+
+        if (message is MouseMotionMsg)
+        {
+            return hoverChanged;
+        }
+
+        if (message is MouseWheelMsg wheel)
+        {
+            return hoverChanged | Model.Update(wheel, KeyMap);
+        }
+
+        if (message is not MouseClickMsg { Button: MouseButton.Left } click)
+        {
+            return false;
+        }
+
+        if (!content.Contains(click.X, click.Y))
+        {
+            return false;
+        }
+
+        var row = click.Y - content.Y;
+        if (row < 0 || row >= content.Height)
+        {
+            return false;
+        }
+
+        var visibleRows = Model.VisibleRows();
+        if (row >= visibleRows.Count)
+        {
+            return false;
+        }
+
+        return hoverChanged | Model.SelectFilteredIndex(visibleRows[row].Index);
     }
 
     public void Render(Canvas canvas, Rect rect)
@@ -404,7 +469,9 @@ public sealed class ListComponent<T> : IStatefulComponent
         for (var row = 0; row < rows.Count && row < content.Height; row++)
         {
             var visible = rows[row];
-            var marker = visible.Selected ? "›" : " ";
+            var marker = visible.Selected
+                ? "›"
+                : _hoveredFilteredIndex == visible.Index ? "▸" : " ";
             var text = $"{marker} {Model.LabelFor(visible.Item)}";
             canvas.WriteText(content.X, content.Y + row, ItemStatePalette.Render(text, ResolveRowStates(visible)), content.Width);
         }
@@ -446,12 +513,60 @@ public sealed class ListComponent<T> : IStatefulComponent
             states.Add(WidgetVisualState.Selected);
         }
 
+        if (_hoveredFilteredIndex == visible.Index)
+        {
+            states.Add(WidgetVisualState.Hovered);
+        }
+
         if (ItemStateResolver?.Invoke(visible.Item) is { } custom)
         {
             states.AddRange(custom);
         }
 
         return states;
+    }
+
+    private Rect ResolveContentRect(Rect rect)
+    {
+        if (ShowBorder)
+        {
+            return rect.Inset(1, 1);
+        }
+
+        return rect;
+    }
+
+    private bool SetHoveredByPointer(int x, int y, Rect content)
+    {
+        if (!content.Contains(x, y))
+        {
+            return SetHoveredFilteredIndex(null);
+        }
+
+        var row = y - content.Y;
+        if (row < 0 || row >= content.Height)
+        {
+            return SetHoveredFilteredIndex(null);
+        }
+
+        var rows = Model.VisibleRows();
+        if (row >= rows.Count)
+        {
+            return SetHoveredFilteredIndex(null);
+        }
+
+        return SetHoveredFilteredIndex(rows[row].Index);
+    }
+
+    private bool SetHoveredFilteredIndex(int? filteredIndex)
+    {
+        if (_hoveredFilteredIndex == filteredIndex)
+        {
+            return false;
+        }
+
+        _hoveredFilteredIndex = filteredIndex;
+        return true;
     }
 }
 
@@ -1311,9 +1426,10 @@ public sealed class DialogComponent : IStatefulComponent
     }
 }
 
-public sealed class LayoutContainerComponent : ICanvasComponent
+public sealed class LayoutContainerComponent : IStatefulComponent, IMouseStatefulComponent
 {
     private readonly List<(ICanvasComponent Component, int Weight)> _children = [];
+    private bool _draggingSplit;
 
     public LayoutContainerMode Mode { get; set; } = LayoutContainerMode.Vertical;
 
@@ -1321,16 +1437,96 @@ public sealed class LayoutContainerComponent : ICanvasComponent
 
     public int GridColumns { get; set; } = 1;
 
+    public bool EnableMouseInteractions { get; set; } = true;
+
+    public bool ClickToFocusChildren { get; set; } = true;
+
+    public bool EnableMouseResize { get; set; } = true;
+
+    public int SplitterHitThickness { get; set; } = 1;
+
+    public int MinPrimarySize { get; set; } = 8;
+
+    public int MinSecondarySize { get; set; } = 8;
+
+    public int? PrimarySize { get; private set; }
+
     public IReadOnlyList<(ICanvasComponent Component, int Weight)> Children => _children;
 
     public void Clear()
     {
         _children.Clear();
+        _draggingSplit = false;
+        PrimarySize = null;
     }
 
     public void Add(ICanvasComponent component, int weight = 1)
     {
         _children.Add((component, Math.Max(1, weight)));
+    }
+
+    public void SetPrimarySize(int size)
+    {
+        PrimarySize = Math.Max(0, size);
+    }
+
+    public void ClearPrimarySize()
+    {
+        PrimarySize = null;
+    }
+
+    public bool Update(IMessage message)
+    {
+        var changed = false;
+        foreach (var child in _children)
+        {
+            if (child.Component is IStatefulComponent stateful)
+            {
+                changed |= stateful.Update(message);
+            }
+        }
+
+        return changed;
+    }
+
+    public bool UpdateMouse(MouseMsg message, Rect bounds)
+    {
+        if (!EnableMouseInteractions || _children.Count == 0 || bounds.IsEmpty)
+        {
+            return false;
+        }
+
+        var rects = BuildChildRects(bounds);
+        var changed = HandleSplitMouse(message, bounds, rects, out var splitConsumed);
+        if (splitConsumed)
+        {
+            return changed;
+        }
+
+        var targetIndex = FindTopMostChild(rects, message.X, message.Y);
+        if (targetIndex < 0 || targetIndex >= _children.Count)
+        {
+            return changed;
+        }
+
+        if (ClickToFocusChildren && message is MouseClickMsg { Button: MouseButton.Left })
+        {
+            changed |= SetFocusedChild(targetIndex);
+        }
+
+        var child = _children[targetIndex].Component;
+        if (child is IMouseStatefulComponent mouseStateful)
+        {
+            changed |= mouseStateful.UpdateMouse(message, rects[targetIndex]);
+            return changed;
+        }
+
+        if (child is IStatefulComponent stateful)
+        {
+            changed |= stateful.Update(message);
+        }
+
+        return changed;
     }
 
     public void Render(Canvas canvas, Rect rect)
@@ -1346,22 +1542,44 @@ public sealed class LayoutContainerComponent : ICanvasComponent
             return;
         }
 
-        switch (Mode)
+        var rects = BuildChildRects(clipped);
+        var count = Math.Min(_children.Count, rects.Count);
+        for (var i = 0; i < count; i++)
         {
-            case LayoutContainerMode.Horizontal:
-                RenderHorizontal(canvas, clipped);
-                break;
-            case LayoutContainerMode.Grid:
-                RenderGrid(canvas, clipped);
-                break;
-            default:
-                RenderVertical(canvas, clipped);
-                break;
+            _children[i].Component.Render(canvas, rects[i]);
         }
     }
 
-    private void RenderVertical(Canvas canvas, Rect rect)
+    private List<Rect> BuildChildRects(Rect rect)
     {
+        return Mode switch
+        {
+            LayoutContainerMode.Horizontal => BuildHorizontalRects(rect),
+            LayoutContainerMode.Grid => BuildGridRects(rect),
+            _ => BuildVerticalRects(rect),
+        };
+    }
+
+    private List<Rect> BuildVerticalRects(Rect rect)
+    {
+        var rects = new List<Rect>(_children.Count);
+        if (_children.Count == 0)
+        {
+            return rects;
+        }
+
+        if (_children.Count == 2 && PrimarySize.HasValue)
+        {
+            var (first, second) = Layout.SplitHorizontal(
+                rect,
+                PrimarySize.Value,
+                minFirst: Math.Max(0, MinPrimarySize),
+                minSecond: Math.Max(0, MinSecondarySize));
+            rects.Add(first);
+            rects.Add(second);
+            return rects;
+        }
+
         var totalWeight = _children.Sum(entry => entry.Weight);
         var y = rect.Y;
         var consumed = 0;
@@ -1377,15 +1595,34 @@ public sealed class LayoutContainerComponent : ICanvasComponent
                 ? remainingHeight
                 : Math.Max(1, (rect.Height * _children[i].Weight) / Math.Max(1, totalWeight));
             var h = Math.Min(remainingHeight, planned);
-            var childRect = new Rect(rect.X, y, rect.Width, h);
-            _children[i].Component.Render(canvas, childRect);
+            rects.Add(new Rect(rect.X, y, rect.Width, h));
             y += h;
             consumed += h;
         }
+
+        return rects;
     }
 
-    private void RenderHorizontal(Canvas canvas, Rect rect)
+    private List<Rect> BuildHorizontalRects(Rect rect)
     {
+        var rects = new List<Rect>(_children.Count);
+        if (_children.Count == 0)
+        {
+            return rects;
+        }
+
+        if (_children.Count == 2 && PrimarySize.HasValue)
+        {
+            var (first, second) = Layout.SplitVertical(
+                rect,
+                PrimarySize.Value,
+                minFirst: Math.Max(0, MinPrimarySize),
+                minSecond: Math.Max(0, MinSecondarySize));
+            rects.Add(first);
+            rects.Add(second);
+            return rects;
+        }
+
         var totalWeight = _children.Sum(entry => entry.Weight);
         var x = rect.X;
         var consumed = 0;
@@ -1401,22 +1638,154 @@ public sealed class LayoutContainerComponent : ICanvasComponent
                 ? remainingWidth
                 : Math.Max(1, (rect.Width * _children[i].Weight) / Math.Max(1, totalWeight));
             var w = Math.Min(remainingWidth, planned);
-            var childRect = new Rect(x, rect.Y, w, rect.Height);
-            _children[i].Component.Render(canvas, childRect);
+            rects.Add(new Rect(x, rect.Y, w, rect.Height));
             x += w;
             consumed += w;
         }
+
+        return rects;
     }
 
-    private void RenderGrid(Canvas canvas, Rect rect)
+    private List<Rect> BuildGridRects(Rect rect)
     {
         var rows = Math.Max(1, GridRows);
         var columns = Math.Max(1, GridColumns);
         var cells = Layout.Grid(rect, rows, columns);
         var count = Math.Min(cells.Length, _children.Count);
+        var rects = new List<Rect>(count);
         for (var i = 0; i < count; i++)
         {
-            _children[i].Component.Render(canvas, cells[i]);
+            rects.Add(cells[i]);
         }
+
+        return rects;
+    }
+
+    private bool HandleSplitMouse(MouseMsg message, Rect bounds, IReadOnlyList<Rect> rects, out bool consumed)
+    {
+        consumed = false;
+        if (!EnableMouseResize || Mode == LayoutContainerMode.Grid || _children.Count != 2 || rects.Count < 2)
+        {
+            return false;
+        }
+
+        if (message is MouseReleaseMsg { Button: MouseButton.Left } && _draggingSplit)
+        {
+            _draggingSplit = false;
+            consumed = true;
+            return true;
+        }
+
+        if (!TryGetSplitterHitRect(bounds, rects[0], out var splitterHit))
+        {
+            return false;
+        }
+
+        if (message is MouseClickMsg { Button: MouseButton.Left } click
+            && splitterHit.Contains(click.X, click.Y))
+        {
+            _draggingSplit = true;
+            consumed = true;
+            return true;
+        }
+
+        if (message is MouseMotionMsg motion && _draggingSplit)
+        {
+            consumed = true;
+            return ApplyDraggedPrimarySize(bounds, motion.X, motion.Y);
+        }
+
+        return false;
+    }
+
+    private bool ApplyDraggedPrimarySize(Rect bounds, int x, int y)
+    {
+        var totalSize = Mode == LayoutContainerMode.Horizontal
+            ? bounds.Width
+            : bounds.Height;
+        if (totalSize <= 0)
+        {
+            return false;
+        }
+
+        var requested = Mode == LayoutContainerMode.Horizontal
+            ? x - bounds.X
+            : y - bounds.Y;
+        var minFirst = Math.Clamp(MinPrimarySize, 0, totalSize);
+        var maxSecond = Math.Max(0, totalSize - minFirst);
+        var minSecond = Math.Clamp(MinSecondarySize, 0, maxSecond);
+        var clamped = Math.Clamp(requested, minFirst, totalSize - minSecond);
+
+        if (PrimarySize == clamped)
+        {
+            return false;
+        }
+
+        PrimarySize = clamped;
+        return true;
+    }
+
+    private bool TryGetSplitterHitRect(Rect bounds, Rect firstRect, out Rect splitterHit)
+    {
+        splitterHit = default;
+        var thickness = Math.Max(1, SplitterHitThickness);
+        if (Mode == LayoutContainerMode.Horizontal)
+        {
+            var center = firstRect.Right;
+            var start = center - (thickness / 2);
+            splitterHit = Rect.Intersect(new Rect(start, bounds.Y, thickness, bounds.Height), bounds);
+            return !splitterHit.IsEmpty;
+        }
+
+        if (Mode == LayoutContainerMode.Vertical)
+        {
+            var center = firstRect.Bottom;
+            var start = center - (thickness / 2);
+            splitterHit = Rect.Intersect(new Rect(bounds.X, start, bounds.Width, thickness), bounds);
+            return !splitterHit.IsEmpty;
+        }
+
+        return false;
+    }
+
+    private static int FindTopMostChild(IReadOnlyList<Rect> rects, int x, int y)
+    {
+        for (var i = rects.Count - 1; i >= 0; i--)
+        {
+            if (rects[i].Contains(x, y))
+            {
+                return i;
+            }
+        }
+
+        return -1;
+    }
+
+    private bool SetFocusedChild(int index)
+    {
+        var changed = false;
+        for (var i = 0; i < _children.Count; i++)
+        {
+            changed |= TrySetFocused(_children[i].Component, i == index);
+        }
+
+        return changed;
+    }
+
+    private static bool TrySetFocused(ICanvasComponent component, bool focused)
+    {
+        var property = component.GetType().GetProperty("Focused");
+        if (property is null || property.PropertyType != typeof(bool) || !property.CanWrite)
+        {
+            return false;
+        }
+
+        if (property.GetValue(component) is bool current && current == focused)
+        {
+            return false;
+        }
+
+        property.SetValue(component, focused);
+        return true;
     }
 }

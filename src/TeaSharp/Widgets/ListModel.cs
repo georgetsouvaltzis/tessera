@@ -39,6 +39,8 @@ public sealed class ListModel<T>
 
     public int Count => _filteredIndexes.Count;
 
+    public int ViewOffset => _offset;
+
     public void SetItems(IEnumerable<T> items)
     {
         _allItems.Clear();
@@ -189,6 +191,19 @@ public sealed class ListModel<T>
     }
 
     public string LabelFor(T item) => _toText(item);
+
+    public bool SelectFilteredIndex(int filteredIndex)
+    {
+        if (_filteredIndexes.Count == 0)
+        {
+            return false;
+        }
+
+        var beforeSelection = SelectedIndex;
+        var beforeOffset = _offset;
+        Select(filteredIndex);
+        return beforeSelection != SelectedIndex || beforeOffset != _offset;
+    }
 
     private void MoveSelection(int delta)
     {

@@ -12,7 +12,7 @@ The design follows patterns used in Bubble Tea examples:
 
 ## API
 
-- `Rect`: immutable geometry helper with `Inset` and `Intersect`.
+- `Rect`: immutable geometry helper with `Inset`, `Intersect`, and `Contains(x, y)` hit testing.
 - `Canvas`: fixed-size character grid renderer.
   - `Set`, `Get`, `WriteText`
   - `DrawHorizontalLine`, `DrawVerticalLine`, `DrawBox`
@@ -24,7 +24,11 @@ The design follows patterns used in Bubble Tea examples:
 - `Composition`:
   - `ICanvasComponent`: render-only component contract.
   - `IStatefulComponent`: component with `Update(IMessage)` for model-local state.
+  - `IMouseStatefulComponent`: component with bounds-aware mouse handling (`UpdateMouse(MouseMsg, Rect)`).
   - `ComponentComposer`: slot-based composition (`Add`, `Clear`, `Update`, `Render`).
+    - mouse routing via slot hit-testing
+    - optional click-to-focus (`Focused` bool convention)
+    - wheel fallback to focused slot when pointer is outside any slot
 - `Widgets`:
   - `DrawPanel`
   - `DrawProgressBar`
@@ -101,6 +105,9 @@ The design follows patterns used in Bubble Tea examples:
       - `ShowBorder` toggle for minimalist rendering on border-capable prebuilt widgets
       - state styling primitives for child items (`WidgetVisualState`, `WidgetStatePalette`, `ItemStateResolver`/`OptionStateResolver`)
       - state palette inheritance (`WidgetStatePalette.Parent` / `InheritFrom(...)`)
+      - mouse interactions:
+        - `ListComponent<T>` row hover preview (motion), click selection, and wheel navigation
+        - `LayoutContainerComponent` child mouse routing + optional drag-resize split (`PrimarySize`, `SetPrimarySize`, `ClearPrimarySize`)
 
 ## Example Integration
 

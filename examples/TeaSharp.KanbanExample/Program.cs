@@ -91,6 +91,11 @@ internal sealed record PendingDelete(KanbanLane Lane, int CardId, string Title);
 
 internal sealed class KanbanModel : IModel
 {
+    private const int MinimumWidth = 92;
+    private const int MinimumHeight = 26;
+    private const int MinimumBoardWidth = 54;
+    private const int MinimumSidebarWidth = 28;
+
     private readonly TabsComponent _boardTabs = new(["Platform", "Mobile", "Docs"]);
 
     private readonly List<KanbanBoardState> _boards =
@@ -191,6 +196,8 @@ internal sealed class KanbanModel : IModel
     private int _height = 40;
     private string _lastEvent = "ready";
     private PendingDelete? _pendingDelete;
+    private int? _boardSplitWidth;
+    private bool _draggingBoardSplit;
 
     public KanbanModel()
     {
@@ -211,6 +218,12 @@ internal sealed class KanbanModel : IModel
             _width = ws.Width;
             _height = ws.Height;
             _lastEvent = $"resize:{_width}x{_height}";
+            return new UpdateResult(this, null);
+        }
+
+        if (message is MouseMsg mouse)
+        {
+            HandleMouse(mouse);
             return new UpdateResult(this, null);
         }
 
@@ -367,9 +380,9 @@ internal sealed class KanbanModel : IModel
 
     public ModelView View()
     {
-        var width = Math.Max(92, _width);
-        var height = Math.Max(26, _height);
-        if (_width < 92 || _height < 26)
+        var width = Math.Max(MinimumWidth, _width);
+        var height = Math.Max(MinimumHeight, _height);
+        if (_width < MinimumWidth || _height < MinimumHeight)
         {
             return ModelView.From("TeaSharp Kanban Example\n\nTerminal too small. Expand to at least 92x26.");
         }
@@ -377,24 +390,23 @@ internal sealed class KanbanModel : IModel
         ApplyFocusFlags();
         UpdateDetails();
         UpdateCompletion();
+        var layout = ComputeLayout(width, height);
 
         var canvas = new Canvas(width, height, CanvasTextMode.GraphemeAware);
         canvas.Clear();
 
-        var frame = new Rect(0, 0, width, height);
-        canvas.DrawBox(frame, "TeaSharp Kanban Board", BorderStyle.Rounded);
+        canvas.DrawBox(layout.Frame, "TeaSharp Kanban Board", BorderStyle.Rounded);
+        _boardTabs.Render(canvas, layout.TabsRect);
+        canvas.WriteText(
+            layout.HelpRect.X,
+            layout.HelpRect.Y,
+            "click select | wheel scroll | drag split | ←/→ lane focus | h/l move | b block | p priority | u assign | n new | x delete | q quit",
+            layout.HelpRect.Width);
 
-        var body = frame.Inset(1, 1);
-        _boardTabs.Render(canvas, new Rect(body.X, body.Y, body.Width, 1));
-        canvas.WriteText(body.X, body.Y + 1, "tab focus | ←/→ lane focus | h/l move | b block | p priority | u assign | n new | x delete | q quit", body.Width);
+        RenderBoardColumns(canvas, layout);
+        RenderSidebar(canvas, layout);
 
-        var content = new Rect(body.X, body.Y + 2, body.Width, body.Height - 3);
-        var (boardRect, sideRect) = Layout.SplitVertical(content, Math.Max(56, content.Width * 2 / 3), minFirst: 54, minSecond: 28);
-
-        RenderBoardColumns(canvas, boardRect);
-        RenderSidebar(canvas, sideRect);
-
-        _deleteDialog.Render(canvas, content);
+        _deleteDialog.Render(canvas, layout.ContentRect);
 
         _status.LeftText = $"board={ActiveBoard.Name.ToLowerInvariant()} focus={_focus.ToString().ToLowerInvariant()} todo={ActiveBoard.Todo.Count} doing={ActiveBoard.Doing.Count} done={ActiveBoard.Done.Count}";
         _status.RightText = $"event={_lastEvent}";
@@ -414,6 +426,274 @@ internal sealed class KanbanModel : IModel
     }
 
     private KanbanBoardState ActiveBoard => _boards[_boardTabs.SelectedIndex];
+
+    private readonly record struct KanbanLayout(
+        Rect Frame,
+        Rect TabsRect,
+        Rect HelpRect,
+        Rect ContentRect,
+        Rect BoardRect,
+        Rect SideRect,
+        Rect TodoRect,
+        Rect DoingRect,
+        Rect DoneRect,
+        Rect ProgressRect,
+        Rect DetailsRect,
+        Rect ComposerRect,
+        Rect ActivityRect);
+
+    private KanbanLayout ComputeLayout(int width, int height)
+    {
+        var frame = new Rect(0, 0, width, height);
+        var body = frame.Inset(1, 1);
+        var tabsRect = new Rect(body.X, body.Y, body.Width, 1);
+        var helpRect = new Rect(body.X, body.Y + 1, body.Width, 1);
+        var contentRect = new Rect(body.X, body.Y + 2, body.Width, body.Height - 3);
+
+        var splitWidth = _boardSplitWidth ?? Math.Max(56, contentRect.Width * 2 / 3);
+        var (boardRect, sideRect) = Layout.SplitVertical(contentRect, splitWidth, minFirst: MinimumBoardWidth, minSecond: MinimumSidebarWidth);
+
+        var firstWidth = Math.Max(18, boardRect.Width / 3);
+        var (todoRect, laneRest) = Layout.SplitVertical(boardRect, firstWidth, minFirst: 18, minSecond: 36);
+        var (doingRect, doneRect) = Layout.SplitVertical(laneRest, Math.Max(18, laneRest.Width / 2), minFirst: 18, minSecond: 18);
+
+        var (progressRect, remainAfterProgress) = Layout.SplitHorizontal(sideRect, 3, minFirst: 3, minSecond: 8);
+        var (detailsRect, remainAfterDetails) = Layout.SplitHorizontal(remainAfterProgress, 8, minFirst: 6, minSecond: 8);
+        var (composerRect, activityRect) = Layout.SplitHorizontal(remainAfterDetails, 4, minFirst: 4, minSecond: 4);
+
+        return new KanbanLayout(
+            Frame: frame,
+            TabsRect: tabsRect,
+            HelpRect: helpRect,
+            ContentRect: contentRect,
+            BoardRect: boardRect,
+            SideRect: sideRect,
+            TodoRect: todoRect,
+            DoingRect: doingRect,
+            DoneRect: doneRect,
+            ProgressRect: progressRect,
+            DetailsRect: detailsRect,
+            ComposerRect: composerRect,
+            ActivityRect: activityRect);
+    }
+
+    private bool HandleMouse(MouseMsg mouse)
+    {
+        if (_deleteDialog.Visible)
+        {
+            if (mouse is MouseReleaseMsg { Button: MouseButton.Left })
+            {
+                _draggingBoardSplit = false;
+            }
+
+            return false;
+        }
+
+        if (_width < MinimumWidth || _height < MinimumHeight)
+        {
+            return false;
+        }
+
+        var layout = ComputeLayout(Math.Max(MinimumWidth, _width), Math.Max(MinimumHeight, _height));
+        if (HandleBoardSplitterMouse(mouse, layout))
+        {
+            return true;
+        }
+
+        if (mouse is MouseMotionMsg motion)
+        {
+            var changed = false;
+            changed |= _todo.UpdateMouse(motion, layout.TodoRect);
+            changed |= _doing.UpdateMouse(motion, layout.DoingRect);
+            changed |= _done.UpdateMouse(motion, layout.DoneRect);
+            return changed;
+        }
+
+        if (layout.TodoRect.Contains(mouse.X, mouse.Y))
+        {
+            return HandleLaneMouse(mouse, _todo, layout.TodoRect, KanbanFocus.Todo, "todo");
+        }
+
+        if (layout.DoingRect.Contains(mouse.X, mouse.Y))
+        {
+            return HandleLaneMouse(mouse, _doing, layout.DoingRect, KanbanFocus.Doing, "doing");
+        }
+
+        if (layout.DoneRect.Contains(mouse.X, mouse.Y))
+        {
+            return HandleLaneMouse(mouse, _done, layout.DoneRect, KanbanFocus.Done, "done");
+        }
+
+        if (mouse is MouseClickMsg { Button: MouseButton.Left } click)
+        {
+            if (layout.TabsRect.Contains(click.X, click.Y))
+            {
+                return TrySelectBoardTabFromMouse(click.X, layout);
+            }
+
+            if (layout.ComposerRect.Contains(click.X, click.Y))
+            {
+                EnterComposerFocus();
+                _lastEvent = "focus:composer";
+                return true;
+            }
+
+            if (layout.ActivityRect.Contains(click.X, click.Y))
+            {
+                var changed = _focus != KanbanFocus.Activity;
+                _focus = KanbanFocus.Activity;
+                if (changed)
+                {
+                    _lastEvent = "focus:activity";
+                }
+
+                return changed;
+            }
+        }
+
+        if (mouse is MouseWheelMsg wheel && IsLaneFocus())
+        {
+            return RouteWheelToFocusedLane(wheel, layout);
+        }
+
+        return false;
+    }
+
+    private bool HandleBoardSplitterMouse(MouseMsg mouse, in KanbanLayout layout)
+    {
+        if (mouse is MouseReleaseMsg { Button: MouseButton.Left } && _draggingBoardSplit)
+        {
+            _draggingBoardSplit = false;
+            _lastEvent = $"split:{_boardSplitWidth ?? layout.BoardRect.Width}";
+            return true;
+        }
+
+        if (mouse is MouseClickMsg { Button: MouseButton.Left } click && IsSplitterHit(click.X, click.Y, layout))
+        {
+            _draggingBoardSplit = true;
+            _lastEvent = "split:drag";
+            return true;
+        }
+
+        if (mouse is not MouseMotionMsg motion || !_draggingBoardSplit)
+        {
+            return false;
+        }
+
+        var requested = motion.X - layout.ContentRect.X;
+        var (boardRect, _) = Layout.SplitVertical(layout.ContentRect, requested, minFirst: MinimumBoardWidth, minSecond: MinimumSidebarWidth);
+        var changed = _boardSplitWidth != boardRect.Width;
+        _boardSplitWidth = boardRect.Width;
+        if (changed)
+        {
+            _lastEvent = $"split:{boardRect.Width}";
+        }
+
+        return true;
+    }
+
+    private bool TrySelectBoardTabFromMouse(int x, in KanbanLayout layout)
+    {
+        var cursor = layout.TabsRect.X;
+        for (var i = 0; i < _boardTabs.Tabs.Count && cursor < layout.TabsRect.Right; i++)
+        {
+            var active = i == _boardTabs.SelectedIndex;
+            var label = active
+                ? $"[{i + 1}:{_boardTabs.Tabs[i]}]"
+                : $" {i + 1}:{_boardTabs.Tabs[i]} ";
+            var end = cursor + label.Length;
+            if (x >= cursor && x < end)
+            {
+                var changed = _focus != KanbanFocus.Tabs;
+                _focus = KanbanFocus.Tabs;
+
+                var before = _boardTabs.SelectedIndex;
+                _boardTabs.Select(i);
+                if (before != _boardTabs.SelectedIndex)
+                {
+                    RefreshColumns();
+                    PushInfo($"board:{ActiveBoard.Name.ToLowerInvariant()}");
+                    changed = true;
+                }
+
+                if (changed)
+                {
+                    _lastEvent = $"board:{_boardTabs.SelectedIndex + 1}";
+                }
+
+                return changed;
+            }
+
+            cursor = end + 1;
+        }
+
+        var focusChanged = _focus != KanbanFocus.Tabs;
+        _focus = KanbanFocus.Tabs;
+        if (focusChanged)
+        {
+            _lastEvent = "focus:tabs";
+        }
+
+        return focusChanged;
+    }
+
+    private bool HandleLaneMouse(
+        MouseMsg mouse,
+        ListComponent<KanbanCard> lane,
+        Rect laneRect,
+        KanbanFocus laneFocus,
+        string laneName)
+    {
+        if (mouse is MouseWheelMsg)
+        {
+            lane.UpdateMouse(mouse, laneRect);
+            _lastEvent = $"mouse:scroll:{laneName}";
+            return true;
+        }
+
+        var changed = false;
+        if (mouse is MouseClickMsg { Button: MouseButton.Left })
+        {
+            changed = _focus != laneFocus;
+            _focus = laneFocus;
+        }
+
+        var laneChanged = lane.UpdateMouse(mouse, laneRect);
+        changed |= laneChanged;
+
+        if (mouse is MouseClickMsg { Button: MouseButton.Left })
+        {
+            _lastEvent = mouse switch
+            {
+                MouseClickMsg => $"mouse:select:{laneName}",
+                _ => $"mouse:{laneName}",
+            };
+        }
+
+        return changed;
+    }
+
+    private bool RouteWheelToFocusedLane(MouseWheelMsg wheel, in KanbanLayout layout)
+    {
+        var changed = _focus switch
+        {
+            KanbanFocus.Todo => _todo.UpdateMouse(wheel, layout.TodoRect),
+            KanbanFocus.Doing => _doing.UpdateMouse(wheel, layout.DoingRect),
+            KanbanFocus.Done => _done.UpdateMouse(wheel, layout.DoneRect),
+            _ => false,
+        };
+        if (changed)
+        {
+            _lastEvent = $"mouse:scroll:{_focus.ToString().ToLowerInvariant()}";
+        }
+
+        return changed;
+    }
+
+    private static bool IsSplitterHit(int x, int y, in KanbanLayout layout)
+    {
+        return layout.ContentRect.Contains(x, y) && x == layout.SideRect.X;
+    }
 
     private bool RouteFocusedInput(KeyPressMsg key, out string? eventOverride)
     {
@@ -498,28 +778,19 @@ internal sealed class KanbanModel : IModel
         return true;
     }
 
-    private void RenderBoardColumns(Canvas canvas, Rect rect)
+    private void RenderBoardColumns(Canvas canvas, in KanbanLayout layout)
     {
-        var firstWidth = Math.Max(18, rect.Width / 3);
-        var (todoRect, rest) = Layout.SplitVertical(rect, firstWidth, minFirst: 18, minSecond: 36);
-        var (doingRect, doneRect) = Layout.SplitVertical(rest, Math.Max(18, rest.Width / 2), minFirst: 18, minSecond: 18);
-
-        _todo.Render(canvas, todoRect);
-        _doing.Render(canvas, doingRect);
-        _done.Render(canvas, doneRect);
+        _todo.Render(canvas, layout.TodoRect);
+        _doing.Render(canvas, layout.DoingRect);
+        _done.Render(canvas, layout.DoneRect);
     }
 
-    private void RenderSidebar(Canvas canvas, Rect rect)
+    private void RenderSidebar(Canvas canvas, in KanbanLayout layout)
     {
-        var (progressRect, remainAfterProgress) = Layout.SplitHorizontal(rect, 3, minFirst: 3, minSecond: 8);
-        _completion.Render(canvas, progressRect);
-
-        var (detailsRect, remainAfterDetails) = Layout.SplitHorizontal(remainAfterProgress, 8, minFirst: 6, minSecond: 8);
-        _details.Render(canvas, detailsRect);
-
-        var (composerRect, activityRect) = Layout.SplitHorizontal(remainAfterDetails, 4, minFirst: 4, minSecond: 4);
-        _composer.Render(canvas, composerRect);
-        _activity.Render(canvas, activityRect);
+        _completion.Render(canvas, layout.ProgressRect);
+        _details.Render(canvas, layout.DetailsRect);
+        _composer.Render(canvas, layout.ComposerRect);
+        _activity.Render(canvas, layout.ActivityRect);
     }
 
     private void RefreshColumns()

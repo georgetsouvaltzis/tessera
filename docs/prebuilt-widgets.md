@@ -36,11 +36,13 @@ TeaSharp provides a prebuilt widget layer in `TeaSharp.Components.PrebuiltWidget
 - `TextInputComponent` wraps `TextInputModel` (single-line flow) and supports cancel semantics via `CancelKey` (`esc` default), `CancelCount`, `WasCancelled`, and `LastCancelledValue`.
 - `TextAreaComponent` uses multiline editing and viewport rendering with optional line numbers.
 - `ListComponent<T>` wraps `ListModel<T>` including filtering and paging behaviors.
+  - Mouse support: motion previews row hover (`▸` marker), left click selects a visible row, wheel scroll navigates selection.
 - `TableComponent` wraps `SortableTableComponent` for sort/page interactions.
 - `DropdownComponent` provides open/close menu selection with configurable key bindings.
 - `ComboboxComponent` combines text filtering with keyboard-driven option selection.
 - `LogViewerComponent` supports append, filter, pause, clear, and scrolling.
 - `LayoutContainerComponent` supports `Vertical`, `Horizontal`, and `Grid` layout modes.
+  - Mouse support: child hit-test routing and optional drag-resize split for 2-pane horizontal/vertical layouts (`PrimarySize`, `SetPrimarySize`, `ClearPrimarySize`).
 - `CommandPaletteComponent` provides fuzzy command filtering and execution (`ctrl+p` default open key).
 - `TreeViewComponent` provides hierarchical expand/collapse navigation with keyboard controls.
 - `NotificationCenterComponent` provides persistent event feed, read/dismiss, and severity-based styling.

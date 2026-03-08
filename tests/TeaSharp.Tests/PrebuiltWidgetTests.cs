@@ -15,6 +15,8 @@ internal static class PrebuiltWidgetTests
         yield return new TestCase("Prebuilt_TextAreaComponent_RendersMultilineContent", TextAreaComponent_RendersMultilineContent);
         yield return new TestCase("Prebuilt_TextAreaComponent_EnterInsertsNewline", TextAreaComponent_EnterInsertsNewline);
         yield return new TestCase("Prebuilt_ListComponent_NavigatesSelection", ListComponent_NavigatesSelection);
+        yield return new TestCase("Prebuilt_ListComponent_MouseClickSelectsRow", ListComponent_MouseClickSelectsRow);
+        yield return new TestCase("Prebuilt_ListComponent_MouseMotionShowsHoverMarker", ListComponent_MouseMotionShowsHoverMarker);
         yield return new TestCase("Prebuilt_ListComponent_AppliesCustomItemStateStyles", ListComponent_AppliesCustomItemStateStyles);
         yield return new TestCase("Prebuilt_DropdownComponent_SelectsOpenMenuItem", DropdownComponent_SelectsOpenMenuItem);
         yield return new TestCase("Prebuilt_DropdownComponent_HidesBorderWhenConfigured", DropdownComponent_HidesBorderWhenConfigured);
@@ -26,6 +28,8 @@ internal static class PrebuiltWidgetTests
         yield return new TestCase("Prebuilt_LogViewerComponent_AppendsAndFilters", LogViewerComponent_AppendsAndFilters);
         yield return new TestCase("Prebuilt_DialogComponent_AcceptsAndDismisses", DialogComponent_AcceptsAndDismisses);
         yield return new TestCase("Prebuilt_LayoutContainerComponent_RendersChildren", LayoutContainerComponent_RendersChildren);
+        yield return new TestCase("Prebuilt_LayoutContainerComponent_MouseResizeAdjustsPrimarySize", LayoutContainerComponent_MouseResizeAdjustsPrimarySize);
+        yield return new TestCase("Prebuilt_LayoutContainerComponent_MouseRoutesToTargetChild", LayoutContainerComponent_MouseRoutesToTargetChild);
     }
 
     private static Task LabelComponent_RendersText()
@@ -186,6 +190,37 @@ internal static class PrebuiltWidgetTests
 
         TestAssert.True(output.Contains("[x] ", StringComparison.Ordinal), "List should render completed item prefix when state resolver marks it.");
         TestAssert.True(output.Contains("\u001b[9m", StringComparison.Ordinal), "Completed item should use strikethrough style.");
+        return Task.CompletedTask;
+    }
+
+    private static Task ListComponent_MouseClickSelectsRow()
+    {
+        var list = new ListComponent<string>(["one", "two", "three"], x => x)
+        {
+            ShowBorder = false,
+        };
+
+        var changed = list.UpdateMouse(new MouseClickMsg(MouseButton.Left, 0, 1), new Rect(0, 0, 20, 3));
+
+        TestAssert.True(changed, "List mouse click should report selection changes.");
+        TestAssert.Equal("two", list.Model.SelectedItem ?? string.Empty, "List mouse click should select clicked row.");
+        return Task.CompletedTask;
+    }
+
+    private static Task ListComponent_MouseMotionShowsHoverMarker()
+    {
+        var list = new ListComponent<string>(["one", "two", "three"], x => x)
+        {
+            ShowBorder = false,
+        };
+        var changed = list.UpdateMouse(new MouseMotionMsg(MouseButton.None, 0, 1), new Rect(0, 0, 20, 3));
+        var canvas = new Canvas(20, 3);
+
+        list.Render(canvas, new Rect(0, 0, 20, 3));
+        var output = canvas.Render();
+
+        TestAssert.True(changed, "Mouse motion inside list should update hover state.");
+        TestAssert.True(output.Contains("▸ two", StringComparison.Ordinal), "Hovered row should render the hover marker.");
         return Task.CompletedTask;
     }
 
@@ -376,5 +411,68 @@ internal static class PrebuiltWidgetTests
         TestAssert.True(output.Contains("left", StringComparison.Ordinal), "Layout container should render first child.");
         TestAssert.True(output.Contains("right", StringComparison.Ordinal), "Layout container should render second child.");
         return Task.CompletedTask;
+    }
+
+    private static Task LayoutContainerComponent_MouseResizeAdjustsPrimarySize()
+    {
+        var layout = new LayoutContainerComponent
+        {
+            Mode = LayoutContainerMode.Horizontal,
+            MinPrimarySize = 4,
+            MinSecondarySize = 4,
+        };
+        layout.Add(new LabelComponent { DrawBorder = false, Text = "left" });
+        layout.Add(new LabelComponent { DrawBorder = false, Text = "right" });
+        layout.SetPrimarySize(12);
+
+        var bounds = new Rect(0, 0, 30, 6);
+        layout.UpdateMouse(new MouseClickMsg(MouseButton.Left, 12, 1), bounds);
+        var changed = layout.UpdateMouse(new MouseMotionMsg(MouseButton.Left, 20, 1), bounds);
+        layout.UpdateMouse(new MouseReleaseMsg(MouseButton.Left, 20, 1), bounds);
+
+        TestAssert.True(changed, "Dragging split should update primary size.");
+        TestAssert.Equal(20, layout.PrimarySize ?? -1, "Drag motion should move split to pointer position.");
+        return Task.CompletedTask;
+    }
+
+    private static Task LayoutContainerComponent_MouseRoutesToTargetChild()
+    {
+        var first = new MouseProbeComponent();
+        var second = new MouseProbeComponent();
+        var layout = new LayoutContainerComponent
+        {
+            Mode = LayoutContainerMode.Horizontal,
+        };
+        layout.Add(first);
+        layout.Add(second);
+
+        var changed = layout.UpdateMouse(new MouseClickMsg(MouseButton.Left, 16, 1), new Rect(0, 0, 20, 4));
+
+        TestAssert.True(changed, "Mouse click should be routed and focus updated.");
+        TestAssert.Equal(0, first.MouseEvents, "First child should not receive click outside its bounds.");
+        TestAssert.Equal(1, second.MouseEvents, "Second child should receive routed mouse click.");
+        TestAssert.True(!first.Focused, "First child focus should be cleared.");
+        TestAssert.True(second.Focused, "Target child should become focused.");
+        return Task.CompletedTask;
+    }
+
+    private sealed class MouseProbeComponent : IStatefulComponent, IMouseStatefulComponent
+    {
+        public bool Focused { get; set; }
+
+        public int MouseEvents { get; private set; }
+
+        public bool Update(TeaSharp.Core.Abstractions.IMessage message) => false;
+
+        public bool UpdateMouse(MouseMsg message, Rect bounds)
+        {
+            MouseEvents++;
+            return true;
+        }
+
+        public void Render(Canvas canvas, Rect rect)
+        {
+            canvas.WriteText(rect.X, rect.Y, Focused ? "focused" : "idle", rect.Width);
+        }
     }
 }

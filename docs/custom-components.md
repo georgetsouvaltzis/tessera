@@ -4,6 +4,7 @@ TeaSharp custom components are built around three contracts:
 
 - `ICanvasComponent`: render-only component.
 - `IStatefulComponent`: render + local `Update(IMessage)` state transitions.
+- `IMouseStatefulComponent`: optional bounds-aware mouse transitions via `UpdateMouse(MouseMsg, Rect)`.
 - `ComponentComposer`: deterministic slot composition and optional update routing.
 
 ## Minimal Render-Only Component
@@ -72,6 +73,7 @@ return canvas.Render();
 ## Practical Notes
 
 - Keep components deterministic: all state transitions via `Update`.
+- For mouse-aware widgets, keep bounds checks inside `UpdateMouse` and treat coordinates as canvas-space.
 - Keep render pure: no side effects from `Render`.
 - If you need full Unicode layout fidelity in component text, use `CanvasTextMode.GraphemeAware`.
 - Use composer slots as an explicit layout graph; avoid hidden global state.
