@@ -21,7 +21,7 @@ static void PrintUsage()
     Console.WriteLine("TeaSharp CLI");
     Console.WriteLine();
     Console.WriteLine("Usage:");
-    Console.WriteLine("  teasharp wizard");
+    Console.WriteLine("  dotnet run --project src/TeaSharp.Cli -- wizard");
     Console.WriteLine();
     Console.WriteLine("Interactive scaffold generator for TeaSharp apps.");
 }

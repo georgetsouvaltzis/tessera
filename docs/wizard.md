@@ -1,16 +1,10 @@
 # TeaSharp Wizard
 
-`teasharp wizard` scaffolds a runnable TeaSharp app with selectable template, theme preset, and input bindings.
+`dotnet run --project src/TeaSharp.Cli -- wizard` scaffolds a runnable TeaSharp app with selectable template, theme preset, and input bindings.
 
 ## Run
 
 From repo root:
-
-```bash
-./teasharp wizard
-```
-
-Or:
 
 ```bash
 dotnet run --project src/TeaSharp.Cli -- wizard
