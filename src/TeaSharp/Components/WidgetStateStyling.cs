@@ -46,8 +46,19 @@ public sealed class WidgetStateAppearance
 public sealed class WidgetStatePalette
 {
     private readonly Dictionary<WidgetVisualState, WidgetStateAppearance> _appearances = [];
+    private WidgetStatePalette? _parent;
 
     public IReadOnlyList<WidgetVisualState> Priority { get; set; } = DefaultPriority;
+
+    public WidgetStatePalette? Parent
+    {
+        get => _parent;
+        set
+        {
+            EnsureNoCycle(value);
+            _parent = value;
+        }
+    }
 
     public static IReadOnlyList<WidgetVisualState> DefaultPriority { get; } =
     [
@@ -98,6 +109,12 @@ public sealed class WidgetStatePalette
         return _appearances.TryGetValue(state, out appearance!);
     }
 
+    public bool TryGetInherited(WidgetVisualState state, out WidgetStateAppearance appearance)
+    {
+        var hierarchy = BuildHierarchyRootFirst();
+        return TryResolveAppearance(state, hierarchy, out appearance);
+    }
+
     public void Set(WidgetVisualState state, WidgetStateAppearance appearance)
     {
         _appearances[state] = appearance ?? new WidgetStateAppearance();
@@ -106,6 +123,12 @@ public sealed class WidgetStatePalette
     public void Clear(WidgetVisualState state)
     {
         _appearances.Remove(state);
+    }
+
+    public WidgetStatePalette InheritFrom(WidgetStatePalette? parent)
+    {
+        Parent = parent;
+        return this;
     }
 
     public string Render(string text, params WidgetVisualState[] activeStates)
@@ -117,13 +140,14 @@ public sealed class WidgetStatePalette
     {
         var source = text ?? string.Empty;
         var active = new HashSet<WidgetVisualState>(activeStates);
+        var hierarchy = BuildHierarchyRootFirst();
 
         var style = TeaStyle.Empty;
         var upper = false;
         var prefix = string.Empty;
         var suffix = string.Empty;
 
-        if (_appearances.TryGetValue(WidgetVisualState.Default, out var defaults))
+        if (TryResolveAppearance(WidgetVisualState.Default, hierarchy, out var defaults))
         {
             style = style.Merge(defaults.TextStyle);
             upper |= defaults.Uppercase;
@@ -145,7 +169,7 @@ public sealed class WidgetStatePalette
                 continue;
             }
 
-            if (!_appearances.TryGetValue(state, out var appearance))
+            if (!TryResolveAppearance(state, hierarchy, out var appearance))
             {
                 continue;
             }
@@ -170,6 +194,89 @@ public sealed class WidgetStatePalette
 
         var composed = $"{prefix}{source}{suffix}";
         return style.Render(composed);
+    }
+
+    private static bool TryResolveAppearance(
+        WidgetVisualState state,
+        IReadOnlyList<WidgetStatePalette> hierarchy,
+        out WidgetStateAppearance appearance)
+    {
+        var found = false;
+        var style = TeaStyle.Empty;
+        var upper = false;
+        var prefix = string.Empty;
+        var suffix = string.Empty;
+
+        for (var i = 0; i < hierarchy.Count; i++)
+        {
+            if (!hierarchy[i]._appearances.TryGetValue(state, out var local))
+            {
+                continue;
+            }
+
+            found = true;
+            style = style.Merge(local.TextStyle);
+            upper |= local.Uppercase;
+            if (!string.IsNullOrEmpty(local.Prefix))
+            {
+                prefix = local.Prefix;
+            }
+
+            if (!string.IsNullOrEmpty(local.Suffix))
+            {
+                suffix = local.Suffix;
+            }
+        }
+
+        if (!found)
+        {
+            appearance = null!;
+            return false;
+        }
+
+        appearance = new WidgetStateAppearance
+        {
+            TextStyle = style,
+            Uppercase = upper,
+            Prefix = prefix,
+            Suffix = suffix,
+        };
+        return true;
+    }
+
+    private IReadOnlyList<WidgetStatePalette> BuildHierarchyRootFirst()
+    {
+        var chain = new List<WidgetStatePalette>(4);
+        var seen = new HashSet<WidgetStatePalette>();
+
+        var current = this;
+        while (current is not null)
+        {
+            if (!seen.Add(current))
+            {
+                throw new InvalidOperationException("WidgetStatePalette parent cycle detected.");
+            }
+
+            chain.Add(current);
+            current = current._parent;
+        }
+
+        chain.Reverse();
+        return chain;
+    }
+
+    private void EnsureNoCycle(WidgetStatePalette? candidateParent)
+    {
+        var current = candidateParent;
+        while (current is not null)
+        {
+            if (ReferenceEquals(current, this))
+            {
+                throw new InvalidOperationException("WidgetStatePalette cannot inherit from itself (cycle detected).");
+            }
+
+            current = current._parent;
+        }
     }
 
     public static WidgetStatePalette CreateDefault()

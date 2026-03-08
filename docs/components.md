@@ -86,6 +86,7 @@ The design follows patterns used in Bubble Tea examples:
       - `DialogComponent.AcceptKey` / `DismissKey`
       - `ShowBorder` toggle for minimalist rendering on border-capable prebuilt widgets
       - state styling primitives for child items (`WidgetVisualState`, `WidgetStatePalette`, `ItemStateResolver`/`OptionStateResolver`)
+      - state palette inheritance (`WidgetStatePalette.Parent` / `InheritFrom(...)`)
 
 ## Example Integration
 

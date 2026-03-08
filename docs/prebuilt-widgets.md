@@ -33,6 +33,7 @@ TeaSharp provides a prebuilt widget layer in `TeaSharp.Components.PrebuiltWidget
   - `WidgetVisualState`
   - `WidgetStatePalette`
   - item resolvers (`ItemStateResolver` / `OptionStateResolver`)
+  - palette inheritance (`Parent` / `InheritFrom(...)`)
 
 ### State Styling Example
 
@@ -52,6 +53,10 @@ list.ItemStatePalette[WidgetVisualState.Completed] = new WidgetStateAppearance
     TextStyle = TeaStyle.Empty.WithStrikethrough().WithForeground(AnsiColor.BrightGreen),
     Prefix = "[x] ",
 };
+
+// Share app-level defaults through inheritance.
+var appPalette = WidgetStatePalette.CreateDefault();
+list.ItemStatePalette.InheritFrom(appPalette);
 ```
 
 ## Gallery Example
