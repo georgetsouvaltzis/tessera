@@ -14,8 +14,10 @@ internal static class PrebuiltWidgetTests
         yield return new TestCase("Prebuilt_TextAreaComponent_RendersMultilineContent", TextAreaComponent_RendersMultilineContent);
         yield return new TestCase("Prebuilt_TextAreaComponent_EnterInsertsNewline", TextAreaComponent_EnterInsertsNewline);
         yield return new TestCase("Prebuilt_ListComponent_NavigatesSelection", ListComponent_NavigatesSelection);
+        yield return new TestCase("Prebuilt_ListComponent_AppliesCustomItemStateStyles", ListComponent_AppliesCustomItemStateStyles);
         yield return new TestCase("Prebuilt_DropdownComponent_SelectsOpenMenuItem", DropdownComponent_SelectsOpenMenuItem);
         yield return new TestCase("Prebuilt_DropdownComponent_HidesBorderWhenConfigured", DropdownComponent_HidesBorderWhenConfigured);
+        yield return new TestCase("Prebuilt_DropdownComponent_AppliesOptionStateStyles", DropdownComponent_AppliesOptionStateStyles);
         yield return new TestCase("Prebuilt_ComboboxComponent_FiltersAndSelects", ComboboxComponent_FiltersAndSelects);
         yield return new TestCase("Prebuilt_TableComponent_ForwardsSortHotkeys", TableComponent_ForwardsSortHotkeys);
         yield return new TestCase("Prebuilt_ProgressBarComponent_AdjustsValue", ProgressBarComponent_AdjustsValue);
@@ -146,6 +148,27 @@ internal static class PrebuiltWidgetTests
         return Task.CompletedTask;
     }
 
+    private static Task ListComponent_AppliesCustomItemStateStyles()
+    {
+        var list = new ListComponent<string>(["todo", "done"], x => x)
+        {
+            Focused = true,
+            ShowBorder = false,
+            ItemStateResolver = item => string.Equals(item, "done", StringComparison.Ordinal)
+                ? [WidgetVisualState.Completed]
+                : [],
+        };
+        list.Update(new KeyPressMsg(KeyCode.Down));
+        var canvas = new Canvas(28, 3);
+
+        list.Render(canvas, new Rect(0, 0, 28, 3));
+        var output = canvas.Render();
+
+        TestAssert.True(output.Contains("[x] ", StringComparison.Ordinal), "List should render completed item prefix when state resolver marks it.");
+        TestAssert.True(output.Contains("\u001b[9m", StringComparison.Ordinal), "Completed item should use strikethrough style.");
+        return Task.CompletedTask;
+    }
+
     private static Task DropdownComponent_SelectsOpenMenuItem()
     {
         var dropdown = new DropdownComponent
@@ -179,6 +202,29 @@ internal static class PrebuiltWidgetTests
 
         TestAssert.True(output.Contains("v alpha", StringComparison.Ordinal), "Dropdown should render selected item in borderless mode.");
         TestAssert.True(!output.Contains("┌", StringComparison.Ordinal), "Dropdown should not draw border when disabled.");
+        return Task.CompletedTask;
+    }
+
+    private static Task DropdownComponent_AppliesOptionStateStyles()
+    {
+        var dropdown = new DropdownComponent
+        {
+            Focused = true,
+            ShowBorder = false,
+            OptionStateResolver = (item, _) => string.Equals(item, "beta", StringComparison.Ordinal)
+                ? [WidgetVisualState.Completed]
+                : [],
+        };
+        dropdown.SetItems(["alpha", "beta", "gamma"]);
+        dropdown.Update(new KeyPressMsg(KeyCode.Enter));
+        dropdown.Update(new KeyPressMsg(KeyCode.Down));
+        var canvas = new Canvas(30, 6);
+
+        dropdown.Render(canvas, new Rect(0, 0, 30, 6));
+        var output = canvas.Render();
+
+        TestAssert.True(output.Contains("[x] ", StringComparison.Ordinal), "Dropdown should render completed prefix for resolved state.");
+        TestAssert.True(output.Contains("\u001b[9m", StringComparison.Ordinal), "Dropdown completed state should use strikethrough style.");
         return Task.CompletedTask;
     }
 

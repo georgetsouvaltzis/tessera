@@ -29,6 +29,30 @@ TeaSharp provides a prebuilt widget layer in `TeaSharp.Components.PrebuiltWidget
 - `LogViewerComponent` supports append, filter, pause, clear, and scrolling.
 - `LayoutContainerComponent` supports `Vertical`, `Horizontal`, and `Grid` layout modes.
 - Most prebuilt widgets expose `ShowBorder` (`true` by default) for minimal/borderless layouts.
+- `ListComponent<T>`, `DropdownComponent`, and `ComboboxComponent` support state-driven styling through:
+  - `WidgetVisualState`
+  - `WidgetStatePalette`
+  - item resolvers (`ItemStateResolver` / `OptionStateResolver`)
+
+### State Styling Example
+
+```csharp
+var list = new ListComponent<string>(["todo", "done"], x => x)
+{
+    ShowBorder = false,
+    Focused = true,
+    ItemStateResolver = item => item == "done"
+        ? [WidgetVisualState.Completed]
+        : [],
+};
+
+// Override the default completed style.
+list.ItemStatePalette[WidgetVisualState.Completed] = new WidgetStateAppearance
+{
+    TextStyle = TeaStyle.Empty.WithStrikethrough().WithForeground(AnsiColor.BrightGreen),
+    Prefix = "[x] ",
+};
+```
 
 ## Gallery Example
 

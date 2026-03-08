@@ -323,12 +323,25 @@ public sealed class ListComponent<T> : IStatefulComponent
 
     public bool Focused { get; set; }
 
+    public bool Disabled { get; set; }
+
+    public bool ReadOnly { get; set; }
+
     public bool ShowBorder { get; set; } = true;
+
+    public WidgetStatePalette ItemStatePalette { get; } = WidgetStatePalette.CreateDefault();
+
+    public Func<T, IReadOnlyCollection<WidgetVisualState>?>? ItemStateResolver { get; set; }
 
     public ListKeyMap KeyMap { get; set; } = ListKeyMap.Default;
 
     public bool Update(IMessage message)
     {
+        if (Disabled)
+        {
+            return false;
+        }
+
         return Model.Update(message, KeyMap);
     }
 
@@ -358,13 +371,63 @@ public sealed class ListComponent<T> : IStatefulComponent
 
         Model.PageSize = Math.Max(1, content.Height);
         var rows = Model.VisibleRows();
+        if (rows.Count == 0 && content.Height > 0)
+        {
+            canvas.WriteText(content.X, content.Y, ItemStatePalette.Render("(empty)", ResolveBaseStates(isEmpty: true)), content.Width);
+            return;
+        }
+
         for (var row = 0; row < rows.Count && row < content.Height; row++)
         {
             var visible = rows[row];
             var marker = visible.Selected ? "›" : " ";
             var text = $"{marker} {Model.LabelFor(visible.Item)}";
-            canvas.WriteText(content.X, content.Y + row, text, content.Width);
+            canvas.WriteText(content.X, content.Y + row, ItemStatePalette.Render(text, ResolveRowStates(visible)), content.Width);
         }
+    }
+
+    private IReadOnlyCollection<WidgetVisualState> ResolveBaseStates(bool isEmpty = false)
+    {
+        var states = new List<WidgetVisualState>(4);
+        if (Focused)
+        {
+            states.Add(WidgetVisualState.Focused);
+        }
+
+        if (Disabled)
+        {
+            states.Add(WidgetVisualState.Disabled);
+        }
+
+        if (ReadOnly)
+        {
+            states.Add(WidgetVisualState.ReadOnly);
+        }
+
+        if (isEmpty)
+        {
+            states.Add(WidgetVisualState.Empty);
+        }
+
+        return states;
+    }
+
+    private IReadOnlyCollection<WidgetVisualState> ResolveRowStates(ListRow<T> visible)
+    {
+        var states = new List<WidgetVisualState>(6);
+        states.AddRange(ResolveBaseStates());
+        if (visible.Selected)
+        {
+            states.Add(WidgetVisualState.Cursor);
+            states.Add(WidgetVisualState.Selected);
+        }
+
+        if (ItemStateResolver?.Invoke(visible.Item) is { } custom)
+        {
+            states.AddRange(custom);
+        }
+
+        return states;
     }
 }
 
@@ -377,7 +440,17 @@ public sealed class DropdownComponent : IStatefulComponent
 
     public bool Focused { get; set; }
 
+    public bool Disabled { get; set; }
+
+    public bool ReadOnly { get; set; }
+
     public bool ShowBorder { get; set; } = true;
+
+    public WidgetStatePalette FieldStatePalette { get; } = WidgetStatePalette.CreateDefault();
+
+    public WidgetStatePalette OptionStatePalette { get; } = WidgetStatePalette.CreateDefault();
+
+    public Func<string, int, IReadOnlyCollection<WidgetVisualState>?>? OptionStateResolver { get; set; }
 
     public bool IsOpen { get; private set; }
 
@@ -423,7 +496,7 @@ public sealed class DropdownComponent : IStatefulComponent
 
     public bool Update(IMessage message)
     {
-        if (!Focused || message is not KeyPressMsg key || _items.Count == 0)
+        if (!Focused || Disabled || ReadOnly || message is not KeyPressMsg key || _items.Count == 0)
         {
             return false;
         }
@@ -494,7 +567,7 @@ public sealed class DropdownComponent : IStatefulComponent
 
         var indicator = IsOpen ? "^" : "v";
         var selected = _items.Count == 0 ? "(empty)" : SelectedItem;
-        canvas.WriteText(content.X, content.Y, $"{indicator} {selected}", content.Width);
+        canvas.WriteText(content.X, content.Y, FieldStatePalette.Render($"{indicator} {selected}", ResolveFieldStates()), content.Width);
 
         if (!IsOpen || content.Height <= 1 || _items.Count == 0)
         {
@@ -509,8 +582,57 @@ public sealed class DropdownComponent : IStatefulComponent
         {
             var highlight = index == _highlightedIndex ? ">" : " ";
             var selectedMarker = index == SelectedIndex ? "*" : " ";
-            canvas.WriteText(content.X, content.Y + 1 + row, $"{highlight}{selectedMarker} {_items[index]}", content.Width);
+            var text = $"{highlight}{selectedMarker} {_items[index]}";
+            canvas.WriteText(content.X, content.Y + 1 + row, OptionStatePalette.Render(text, ResolveOptionStates(index)), content.Width);
         }
+    }
+
+    private IReadOnlyCollection<WidgetVisualState> ResolveFieldStates()
+    {
+        var states = new List<WidgetVisualState>(5);
+        if (Focused)
+        {
+            states.Add(WidgetVisualState.Focused);
+        }
+
+        if (Disabled)
+        {
+            states.Add(WidgetVisualState.Disabled);
+        }
+
+        if (ReadOnly)
+        {
+            states.Add(WidgetVisualState.ReadOnly);
+        }
+
+        if (_items.Count == 0)
+        {
+            states.Add(WidgetVisualState.Empty);
+        }
+
+        return states;
+    }
+
+    private IReadOnlyCollection<WidgetVisualState> ResolveOptionStates(int index)
+    {
+        var states = new List<WidgetVisualState>(7);
+        states.AddRange(ResolveFieldStates());
+        if (index == _highlightedIndex)
+        {
+            states.Add(WidgetVisualState.Cursor);
+        }
+
+        if (index == SelectedIndex)
+        {
+            states.Add(WidgetVisualState.Selected);
+        }
+
+        if (OptionStateResolver?.Invoke(_items[index], index) is { } custom)
+        {
+            states.AddRange(custom);
+        }
+
+        return states;
     }
 
     private static int ComputeWindowStart(int highlightedIndex, int rows, int count)
@@ -551,7 +673,17 @@ public sealed class ComboboxComponent : IStatefulComponent
 
     public bool Focused { get; set; }
 
+    public bool Disabled { get; set; }
+
+    public bool ReadOnly { get; set; }
+
     public bool ShowBorder { get; set; } = true;
+
+    public WidgetStatePalette FieldStatePalette { get; } = WidgetStatePalette.CreateDefault();
+
+    public WidgetStatePalette OptionStatePalette { get; } = WidgetStatePalette.CreateDefault();
+
+    public Func<string, int, IReadOnlyCollection<WidgetVisualState>?>? OptionStateResolver { get; set; }
 
     public bool IsOpen { get; private set; }
 
@@ -587,7 +719,7 @@ public sealed class ComboboxComponent : IStatefulComponent
 
     public bool Update(IMessage message)
     {
-        if (!Focused)
+        if (!Focused || Disabled || ReadOnly)
         {
             return false;
         }
@@ -671,7 +803,7 @@ public sealed class ComboboxComponent : IStatefulComponent
 
         var frameWidth = Math.Max(1, content.Width - 2);
         var frame = Input.BuildFrame(frameWidth);
-        canvas.WriteText(content.X, content.Y, $"{(IsOpen ? "^" : "v")} {frame.Text}", content.Width);
+        canvas.WriteText(content.X, content.Y, FieldStatePalette.Render($"{(IsOpen ? "^" : "v")} {frame.Text}", ResolveFieldStates()), content.Width);
 
         if (!IsOpen || content.Height <= 1)
         {
@@ -680,7 +812,7 @@ public sealed class ComboboxComponent : IStatefulComponent
 
         if (_filteredIndices.Count == 0)
         {
-            canvas.WriteText(content.X, content.Y + 1, "(no matches)", content.Width);
+            canvas.WriteText(content.X, content.Y + 1, OptionStatePalette.Render("(no matches)", ResolveNoMatchStates()), content.Width);
             return;
         }
 
@@ -693,8 +825,75 @@ public sealed class ComboboxComponent : IStatefulComponent
             var itemIndex = _filteredIndices[i];
             var highlight = i == _highlightedFilteredIndex ? ">" : " ";
             var selectedMarker = itemIndex == SelectedIndex ? "*" : " ";
-            canvas.WriteText(content.X, content.Y + 1 + row, $"{highlight}{selectedMarker} {_items[itemIndex]}", content.Width);
+            var text = $"{highlight}{selectedMarker} {_items[itemIndex]}";
+            canvas.WriteText(content.X, content.Y + 1 + row, OptionStatePalette.Render(text, ResolveOptionStates(i, itemIndex)), content.Width);
         }
+    }
+
+    private IReadOnlyCollection<WidgetVisualState> ResolveFieldStates()
+    {
+        var states = new List<WidgetVisualState>(5);
+        if (Focused)
+        {
+            states.Add(WidgetVisualState.Focused);
+        }
+
+        if (Disabled)
+        {
+            states.Add(WidgetVisualState.Disabled);
+        }
+
+        if (ReadOnly)
+        {
+            states.Add(WidgetVisualState.ReadOnly);
+        }
+
+        if (_items.Count == 0)
+        {
+            states.Add(WidgetVisualState.Empty);
+        }
+
+        if (!string.IsNullOrEmpty(Input.Value))
+        {
+            states.Add(WidgetVisualState.Editing);
+        }
+
+        return states;
+    }
+
+    private IReadOnlyCollection<WidgetVisualState> ResolveNoMatchStates()
+    {
+        var states = new List<WidgetVisualState>(6);
+        states.AddRange(ResolveFieldStates());
+        states.Add(WidgetVisualState.Empty);
+        if (!string.IsNullOrWhiteSpace(Input.Value))
+        {
+            states.Add(WidgetVisualState.FilteredOut);
+        }
+
+        return states;
+    }
+
+    private IReadOnlyCollection<WidgetVisualState> ResolveOptionStates(int filteredIndex, int itemIndex)
+    {
+        var states = new List<WidgetVisualState>(7);
+        states.AddRange(ResolveFieldStates());
+        if (filteredIndex == _highlightedFilteredIndex)
+        {
+            states.Add(WidgetVisualState.Cursor);
+        }
+
+        if (itemIndex == SelectedIndex)
+        {
+            states.Add(WidgetVisualState.Selected);
+        }
+
+        if (OptionStateResolver?.Invoke(_items[itemIndex], itemIndex) is { } custom)
+        {
+            states.AddRange(custom);
+        }
+
+        return states;
     }
 
     private bool SelectHighlighted()

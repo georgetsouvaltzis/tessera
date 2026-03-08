@@ -85,6 +85,7 @@ The design follows patterns used in Bubble Tea examples:
       - `ProgressBarComponent.IncreaseKey` / `DecreaseKey`
       - `DialogComponent.AcceptKey` / `DismissKey`
       - `ShowBorder` toggle for minimalist rendering on border-capable prebuilt widgets
+      - state styling primitives for child items (`WidgetVisualState`, `WidgetStatePalette`, `ItemStateResolver`/`OptionStateResolver`)
 
 ## Example Integration
 
