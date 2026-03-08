@@ -1,6 +1,7 @@
 using System.Text;
 using TeaSharp.Core.Abstractions;
 using TeaSharp.Core.Commands;
+using TeaSharp.Core.Input;
 using TeaSharp.Core.Messages;
 using TeaSharp.Core.Rendering;
 using TeaSharp.Core.Terminal;
@@ -381,6 +382,81 @@ internal sealed class TimedQuitProbeViewModel : IModel
         EnableSynchronizedUpdates = true,
         MouseMode = MouseMode.AllMotion,
     };
+}
+
+internal sealed class ConcurrencyTrackingModel : IModel
+{
+    private readonly int _commandCount;
+    private readonly TimeSpan _delay;
+    private int _activeCommands;
+    private int _maxActiveCommands;
+    private int _receivedMessages;
+
+    public ConcurrencyTrackingModel(int commandCount, TimeSpan delay)
+    {
+        _commandCount = Math.Max(1, commandCount);
+        _delay = delay;
+    }
+
+    public int MaxActiveCommands => Volatile.Read(ref _maxActiveCommands);
+
+    public Command? Init()
+    {
+        var commands = new Command?[_commandCount];
+        for (var i = 0; i < _commandCount; i++)
+        {
+            commands[i] = async cancellationToken =>
+            {
+                var active = Interlocked.Increment(ref _activeCommands);
+                TrackMax(active);
+                try
+                {
+                    await Task.Delay(_delay, cancellationToken).ConfigureAwait(false);
+                }
+                finally
+                {
+                    Interlocked.Decrement(ref _activeCommands);
+                }
+
+                return new NumberMsg(1);
+            };
+        }
+
+        return Commands.Batch(commands);
+    }
+
+    public UpdateResult Update(IMessage message)
+    {
+        if (message is NumberMsg)
+        {
+            var received = Interlocked.Increment(ref _receivedMessages);
+            if (received >= _commandCount)
+            {
+                return new UpdateResult(this, Commands.Quit);
+            }
+        }
+
+        return new UpdateResult(this, null);
+    }
+
+    public ModelView View() => ModelView.From("concurrency-tracking");
+
+    private void TrackMax(int active)
+    {
+        while (true)
+        {
+            var currentMax = Volatile.Read(ref _maxActiveCommands);
+            if (active <= currentMax)
+            {
+                return;
+            }
+
+            if (Interlocked.CompareExchange(ref _maxActiveCommands, active, currentMax) == currentMax)
+            {
+                return;
+            }
+        }
+    }
 }
 
 internal sealed class RawOutputInitModel : IModel
@@ -805,6 +881,65 @@ internal sealed class InteractiveProbeTerminalAdapter : ITerminalAdapter
     }
 
     public ValueTask DisposeAsync() => ValueTask.CompletedTask;
+}
+
+internal sealed class InteractiveInputTerminalAdapter : ITerminalAdapter
+{
+    private readonly MemoryStream _input;
+
+    public InteractiveInputTerminalAdapter(string input)
+    {
+        _input = new MemoryStream(Encoding.UTF8.GetBytes(input ?? string.Empty));
+    }
+
+    public Stream Input => _input;
+
+    public Stream Output { get; } = new MemoryStream();
+
+    public bool IsInputInteractive => true;
+
+    public bool IsOutputInteractive => false;
+
+    public ValueTask PrepareAsync(CancellationToken cancellationToken)
+    {
+        _ = cancellationToken;
+        return ValueTask.CompletedTask;
+    }
+
+    public ValueTask RestoreAsync(CancellationToken cancellationToken)
+    {
+        _ = cancellationToken;
+        return ValueTask.CompletedTask;
+    }
+
+    public ValueTask<TerminalSize> GetSizeAsync(CancellationToken cancellationToken)
+    {
+        _ = cancellationToken;
+        return ValueTask.FromResult(new TerminalSize(80, 24));
+    }
+
+    public ValueTask DisposeAsync()
+    {
+        _input.Dispose();
+        return ValueTask.CompletedTask;
+    }
+}
+
+internal sealed class QuitOnFirstByteDecoder : IEventDecoder
+{
+    public int Calls { get; private set; }
+
+    public DecodeResult Decode(ReadOnlySpan<byte> buffer, bool timeoutExpired)
+    {
+        _ = timeoutExpired;
+        Calls++;
+        if (buffer.IsEmpty)
+        {
+            return new DecodeResult(0, null, false);
+        }
+
+        return new DecodeResult(1, new QuitMsg(), false);
+    }
 }
 
 internal sealed class DelegateDisposable(Action dispose) : IDisposable

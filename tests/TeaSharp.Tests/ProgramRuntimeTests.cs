@@ -25,6 +25,11 @@ internal static class ProgramRuntimeTests
         yield return new TestCase("Program_MouseOnViewInterceptor_EnqueuesCommand", MouseOnViewInterceptor_EnqueuesCommand);
         yield return new TestCase("Program_EmitsTerminalCapabilitiesMessage", EmitsTerminalCapabilitiesMessage);
         yield return new TestCase("Program_EmitsColorProfileMessage", EmitsColorProfileMessage);
+        yield return new TestCase("Program_TerminalCapabilityDetectorDelegate_OverridesDetection", TerminalCapabilityDetectorDelegate_OverridesDetection);
+        yield return new TestCase("Program_ColorProfileDetectorDelegate_OverridesDetection", ColorProfileDetectorDelegate_OverridesDetection);
+        yield return new TestCase("Program_CapabilityProbe_CustomModeList_WritesOnlyConfiguredQueries", CapabilityProbe_CustomModeList_WritesOnlyConfiguredQueries);
+        yield return new TestCase("Program_EventDecoderOverride_IsUsedForInputLoop", EventDecoderOverride_IsUsedForInputLoop);
+        yield return new TestCase("Program_MaxConcurrentCommands_OneSerializesExecution", MaxConcurrentCommands_OneSerializesExecution);
         yield return new TestCase("Program_AnsiRendererOptions_DisableModeQueries", AnsiRendererOptions_DisableModeQueries);
         yield return new TestCase("Program_CapabilityProbe_WritesModeQueries", CapabilityProbe_WritesModeQueries);
         yield return new TestCase("Program_CapabilityProbe_TimeoutDisablesModeReportsWhenNoResponses", CapabilityProbe_TimeoutDisablesModeReportsWhenNoResponses);
@@ -375,6 +380,125 @@ internal static class ProgramRuntimeTests
         TestAssert.True(
             model.Seen == TerminalColorProfile.Ansi256,
             $"Program should emit configured color profile Ansi256, got {model.Seen}.");
+    }
+
+    private static async Task TerminalCapabilityDetectorDelegate_OverridesDetection()
+    {
+        // Arrange
+        var expected = new TerminalCapabilityProfile(
+            FocusReporting: false,
+            MouseReporting: true,
+            BracketedPaste: false,
+            SynchronizedUpdates: false,
+            ModeReports: false,
+            Source: "capability-detector-delegate");
+        var model = new CapabilityTrackingModel();
+        var program = new TeaProgram(model, new ProgramOptions
+        {
+            DisableRenderer = true,
+            DisableInput = true,
+            Terminal = new FakeTerminalAdapter(),
+            TerminalCapabilityDetector = () => expected,
+        });
+
+        // Act
+        await program.RunAsync();
+
+        // Assert
+        TestAssert.Equal(expected, model.Seen!, "Terminal capability detector delegate should override default detection.");
+    }
+
+    private static async Task ColorProfileDetectorDelegate_OverridesDetection()
+    {
+        // Arrange
+        var model = new ColorProfileTrackingModel();
+        var program = new TeaProgram(model, new ProgramOptions
+        {
+            DisableRenderer = true,
+            DisableInput = true,
+            Terminal = new FakeTerminalAdapter(),
+            ColorProfileDetector = () => TerminalColorProfile.TrueColor,
+        });
+
+        // Act
+        await program.RunAsync();
+
+        // Assert
+        TestAssert.True(
+            model.Seen == TerminalColorProfile.TrueColor,
+            $"Color profile detector delegate should override default detection, got {model.Seen}.");
+    }
+
+    private static async Task CapabilityProbe_CustomModeList_WritesOnlyConfiguredQueries()
+    {
+        // Arrange
+        var terminal = new InteractiveProbeTerminalAdapter();
+        var model = new TimedQuitModel(TimeSpan.FromMilliseconds(90));
+        var program = new TeaProgram(model, new ProgramOptions
+        {
+            DisableRenderer = true,
+            DisableInput = false,
+            Terminal = terminal,
+            EnableCapabilityProbe = true,
+            CapabilityProbeModes = [2026],
+            TerminalCapabilities = new TerminalCapabilityProfile(
+                FocusReporting: true,
+                MouseReporting: true,
+                BracketedPaste: true,
+                SynchronizedUpdates: true,
+                ModeReports: true,
+                Source: "custom-probe-modes"),
+            CapabilityProbeTimeout = TimeSpan.FromMilliseconds(700),
+        });
+
+        // Act
+        await program.RunAsync().WaitAsync(TimeSpan.FromSeconds(2));
+
+        // Assert
+        var output = terminal.OutputText;
+        TestAssert.True(output.Contains("\u001b[?2026$p", StringComparison.Ordinal), "Probe should query configured mode 2026.");
+        TestAssert.True(!output.Contains("\u001b[?1004$p", StringComparison.Ordinal), "Probe should not query mode 1004 when excluded.");
+        TestAssert.True(!output.Contains("\u001b[?1006$p", StringComparison.Ordinal), "Probe should not query mode 1006 when excluded.");
+        TestAssert.True(!output.Contains("\u001b[?2004$p", StringComparison.Ordinal), "Probe should not query mode 2004 when excluded.");
+    }
+
+    private static async Task EventDecoderOverride_IsUsedForInputLoop()
+    {
+        // Arrange
+        var terminal = new InteractiveInputTerminalAdapter("x");
+        var decoder = new QuitOnFirstByteDecoder();
+        var program = new TeaProgram(new IdleModel(), new ProgramOptions
+        {
+            DisableRenderer = true,
+            DisableInput = false,
+            Terminal = terminal,
+            EventDecoder = decoder,
+        });
+
+        // Act
+        await program.RunAsync().WaitAsync(TimeSpan.FromSeconds(2));
+
+        // Assert
+        TestAssert.True(decoder.Calls > 0, "Injected event decoder should be invoked by input loop.");
+    }
+
+    private static async Task MaxConcurrentCommands_OneSerializesExecution()
+    {
+        // Arrange
+        var model = new ConcurrencyTrackingModel(commandCount: 6, delay: TimeSpan.FromMilliseconds(25));
+        var program = new TeaProgram(model, new ProgramOptions
+        {
+            DisableRenderer = true,
+            DisableInput = true,
+            Terminal = new FakeTerminalAdapter(),
+            MaxConcurrentCommands = 1,
+        });
+
+        // Act
+        await program.RunAsync().WaitAsync(TimeSpan.FromSeconds(2));
+
+        // Assert
+        TestAssert.Equal(1, model.MaxActiveCommands, "MaxConcurrentCommands=1 should serialize command execution.");
     }
 
     private static async Task AnsiRendererOptions_DisableModeQueries()
