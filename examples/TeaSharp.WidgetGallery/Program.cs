@@ -175,7 +175,8 @@ internal sealed class WidgetGalleryModel : IModel
 
         if (message is KeyPressMsg key)
         {
-            if (((key.Text == "c" || key.Text == "\u0003") && key.Modifiers.HasFlag(KeyModifiers.Ctrl)) || key.Text == "q")
+            if ((key.Modifiers.HasFlag(KeyModifiers.Ctrl) && (key.IsCharacter('c') || key.IsCharacter('\u0003', ignoreCase: false)))
+                || key.IsCharacter('q', KeyModifiers.None))
             {
                 return new UpdateResult(this, Tea.Cmd.Quit);
             }
@@ -192,7 +193,7 @@ internal sealed class WidgetGalleryModel : IModel
                 return new UpdateResult(this, null);
             }
 
-            if (key.Code == KeyCode.Tab)
+            if (key.Is(KeyCode.Tab, KeyModifiers.None))
             {
                 CycleFocus();
                 _lastEvent = $"focus:{_focus.ToString().ToLowerInvariant()}";
@@ -206,7 +207,7 @@ internal sealed class WidgetGalleryModel : IModel
                 return new UpdateResult(this, null);
             }
 
-            if (key.Text == "d" && _tabs.SelectedIndex == 3)
+            if (key.IsCharacter('d', KeyModifiers.None) && _tabs.SelectedIndex == 3)
             {
                 _dialog.Visible = !_dialog.Visible;
                 _focus = _dialog.Visible ? GalleryFocus.Dialog : GalleryFocus.Tabs;
@@ -399,8 +400,8 @@ internal sealed class WidgetGalleryModel : IModel
     private static KeyPressMsg NormalizeInputKey(KeyPressMsg key)
     {
         if (key.Code == KeyCode.Character
-            && (key.Text == "\r"
-                || key.Text == "\n"
+            && (key.IsCharacter('\r', ignoreCase: false)
+                || key.IsCharacter('\n', ignoreCase: false)
                 || string.IsNullOrEmpty(key.Text)))
         {
             return new KeyPressMsg(KeyCode.Enter, string.Empty, key.Modifiers, key.IsRepeat);
@@ -411,18 +412,18 @@ internal sealed class WidgetGalleryModel : IModel
 
     private static bool IsEnterIntent(KeyPressMsg key)
     {
-        return key.Code == KeyCode.Enter
-            || key.Text == "\r"
-            || key.Text == "\n"
+        return key.Is(KeyCode.Enter, key.Modifiers)
+            || key.IsCharacter('\r', ignoreCase: false)
+            || key.IsCharacter('\n', ignoreCase: false)
             || (key.Modifiers.HasFlag(KeyModifiers.Ctrl)
-                && (string.Equals(key.Text, "m", StringComparison.OrdinalIgnoreCase)
-                    || string.Equals(key.Text, "j", StringComparison.OrdinalIgnoreCase)))
+                && (key.IsCharacter('m')
+                    || key.IsCharacter('j')))
             || (key.Code == KeyCode.Unknown && string.IsNullOrEmpty(key.Text));
     }
 
     private bool TryHandleTabShortcut(KeyPressMsg key)
     {
-        if (key.Code != KeyCode.Character || !int.TryParse(key.Text, out var oneBased))
+        if (!key.TryGetDigit(out var oneBased))
         {
             return false;
         }

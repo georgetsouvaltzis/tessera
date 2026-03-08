@@ -308,7 +308,7 @@ public sealed class TabsComponent : IStatefulComponent
         }
 
         if (EnableNumericShortcuts
-            && int.TryParse(key.Text, out var oneBased)
+            && key.TryGetDigit(out var oneBased)
             && oneBased >= 1
             && oneBased <= _tabs.Count)
         {

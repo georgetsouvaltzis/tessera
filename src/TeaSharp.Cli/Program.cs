@@ -329,7 +329,8 @@ internal sealed class PomodoroModel : IModel
 
     private UpdateResult HandleKey(KeyPressMsg key)
     {
-        if ((key.Text == "c" || key.Text == "\u0003") && key.Modifiers.HasFlag(KeyModifiers.Ctrl))
+        if (key.Modifiers.HasFlag(KeyModifiers.Ctrl)
+            && (key.IsCharacter('c') || key.IsCharacter('\u0003', ignoreCase: false)))
         {
             return new UpdateResult(this, Tea.Cmd.Quit);
         }
@@ -572,10 +573,11 @@ internal sealed class PomodoroModel : IModel
 
         return normalized switch
         {
-            "esc" or "escape" => key.Code == KeyCode.Escape,
-            "enter" => key.Code == KeyCode.Enter,
-            "space" => key.Text == " ",
-            _ => key.Code == KeyCode.Character && string.Equals(key.Text, normalized, StringComparison.OrdinalIgnoreCase),
+            "esc" or "escape" => key.Is(KeyCode.Escape, KeyModifiers.None),
+            "enter" => key.Is(KeyCode.Enter, KeyModifiers.None),
+            "space" => key.IsCharacter(' ', KeyModifiers.None, ignoreCase: false),
+            _ when normalized.Length == 1 => key.IsCharacter(normalized[0], KeyModifiers.None),
+            _ => false,
         };
     }
 
@@ -697,7 +699,8 @@ internal sealed class DashboardModel : IModel
                 return new UpdateResult(this, null);
 
             case KeyPressMsg key:
-                if ((key.Text == "c" || key.Text == "\u0003") && key.Modifiers.HasFlag(KeyModifiers.Ctrl))
+                if (key.Modifiers.HasFlag(KeyModifiers.Ctrl)
+                    && (key.IsCharacter('c') || key.IsCharacter('\u0003', ignoreCase: false)))
                 {
                     return new UpdateResult(this, Tea.Cmd.Quit);
                 }
@@ -819,10 +822,11 @@ internal sealed class DashboardModel : IModel
 
         return normalized switch
         {
-            "esc" or "escape" => key.Code == KeyCode.Escape,
-            "enter" => key.Code == KeyCode.Enter,
-            "space" => key.Text == " ",
-            _ => key.Code == KeyCode.Character && string.Equals(key.Text, normalized, StringComparison.OrdinalIgnoreCase),
+            "esc" or "escape" => key.Is(KeyCode.Escape, KeyModifiers.None),
+            "enter" => key.Is(KeyCode.Enter, KeyModifiers.None),
+            "space" => key.IsCharacter(' ', KeyModifiers.None, ignoreCase: false),
+            _ when normalized.Length == 1 => key.IsCharacter(normalized[0], KeyModifiers.None),
+            _ => false,
         };
     }
 }

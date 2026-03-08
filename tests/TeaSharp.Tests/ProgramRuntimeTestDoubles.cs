@@ -613,8 +613,7 @@ internal sealed class QuitOnQModel : IModel
     public UpdateResult Update(IMessage message)
     {
         if (message is KeyPressMsg key
-            && key.Code == KeyCode.Character
-            && string.Equals(key.Text, "q", StringComparison.Ordinal))
+            && key.IsCharacter('q', KeyModifiers.None))
         {
             return new UpdateResult(this, Commands.Quit);
         }

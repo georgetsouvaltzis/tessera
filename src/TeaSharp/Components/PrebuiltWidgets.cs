@@ -67,6 +67,8 @@ public sealed class LabelComponent : ICanvasComponent
 
 public sealed class ButtonComponent : IStatefulComponent
 {
+    private static readonly KeyBinding ActivateKey = new("enter/space", "activate", "enter", "space");
+
     public string Label { get; set; } = "Button";
 
     public string? Description { get; set; }
@@ -87,7 +89,7 @@ public sealed class ButtonComponent : IStatefulComponent
             return false;
         }
 
-        if (key.Code != KeyCode.Enter && key.Text != " ")
+        if (!ActivateKey.Matches(key))
         {
             return false;
         }
