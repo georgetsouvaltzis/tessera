@@ -9,6 +9,7 @@ public interface IProgramRenderer : IAsyncDisposable
     void Resize(int width, int height);
     void UpdateCapabilities(TerminalCapabilityProfile capabilities);
     void Render(View view);
+    ValueTask WriteRawAsync(string content, CancellationToken cancellationToken);
     ValueTask FlushAsync(CancellationToken cancellationToken);
     ValueTask ResetAsync(CancellationToken cancellationToken);
 }

@@ -23,6 +23,13 @@ public sealed class NullRenderer : IProgramRenderer
         _ = view;
     }
 
+    public ValueTask WriteRawAsync(string content, CancellationToken cancellationToken)
+    {
+        _ = content;
+        _ = cancellationToken;
+        return ValueTask.CompletedTask;
+    }
+
     public ValueTask FlushAsync(CancellationToken cancellationToken) => ValueTask.CompletedTask;
 
     public ValueTask ResetAsync(CancellationToken cancellationToken) => ValueTask.CompletedTask;

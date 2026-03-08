@@ -20,7 +20,10 @@ internal static class ProgramRuntimeTests
         yield return new TestCase("Program_CommandException_RecoveryFailure_EmitsCommandErrorMsg", CommandException_RecoveryFailure_EmitsCommandErrorMsg);
         yield return new TestCase("Program_CommandException_WithoutCatch_Propagates", CommandException_WithoutCatch_Propagates);
         yield return new TestCase("Program_AdaptiveFramePacing_BatchesBurstRenders", AdaptiveFramePacing_BatchesBurstRenders);
+        yield return new TestCase("Program_RawOutputMsg_WritesDirectlyToRenderer", RawOutputMsg_WritesDirectlyToRenderer);
+        yield return new TestCase("Program_MouseOnViewInterceptor_EnqueuesCommand", MouseOnViewInterceptor_EnqueuesCommand);
         yield return new TestCase("Program_EmitsTerminalCapabilitiesMessage", EmitsTerminalCapabilitiesMessage);
+        yield return new TestCase("Program_EmitsColorProfileMessage", EmitsColorProfileMessage);
         yield return new TestCase("Program_CapabilityProbe_WritesModeQueries", CapabilityProbe_WritesModeQueries);
         yield return new TestCase("Program_CapabilityProbe_TimeoutDisablesModeReportsWhenNoResponses", CapabilityProbe_TimeoutDisablesModeReportsWhenNoResponses);
         yield return new TestCase("Program_CapabilityProbe_PartialResponseDisablesUnresolvedModes", CapabilityProbe_PartialResponseDisablesUnresolvedModes);
@@ -259,6 +262,48 @@ internal static class ProgramRuntimeTests
             $"Adaptive pacing should not exceed non-adaptive flush count (nonAdaptive={nonAdaptiveRenderer.FlushCalls}, adaptive={adaptiveRenderer.FlushCalls}).");
     }
 
+    private static async Task RawOutputMsg_WritesDirectlyToRenderer()
+    {
+        // Arrange
+        var model = new RawOutputInitModel();
+        await using var renderer = new RenderCountingRendererSpy();
+        var program = new TeaProgram(model, new ProgramOptions
+        {
+            DisableInput = true,
+            Renderer = renderer,
+            Terminal = new FakeTerminalAdapter(),
+        });
+
+        // Act
+        await program.RunAsync();
+
+        // Assert
+        TestAssert.True(
+            renderer.RawWrites.Count == 1 && renderer.RawWrites[0] == "raw-sequence",
+            $"Expected a single raw renderer write, got [{string.Join(", ", renderer.RawWrites)}].");
+    }
+
+    private static async Task MouseOnViewInterceptor_EnqueuesCommand()
+    {
+        // Arrange
+        var model = new MouseInterceptModel();
+        var program = new TeaProgram(model, new ProgramOptions
+        {
+            DisableRenderer = true,
+            DisableInput = true,
+            Terminal = new FakeTerminalAdapter(),
+        });
+
+        // Act
+        var runTask = program.RunAsync();
+        await Task.Delay(20);
+        program.Send(new MouseClickMsg(MouseButton.Left, 1, 1));
+        await runTask;
+
+        // Assert
+        TestAssert.Equal(1, model.Intercepted, "OnMouse callback should enqueue and execute command.");
+    }
+
     private static async Task ResizeLoop_EmitsWindowSizeChanges()
     {
         // Arrange
@@ -307,6 +352,27 @@ internal static class ProgramRuntimeTests
         // Assert
         TestAssert.True(model.Seen is not null, "Program should emit TerminalCapabilitiesMsg.");
         TestAssert.Equal(expected, model.Seen!, "Program should emit configured terminal capabilities.");
+    }
+
+    private static async Task EmitsColorProfileMessage()
+    {
+        // Arrange
+        var model = new ColorProfileTrackingModel();
+        var program = new TeaProgram(model, new ProgramOptions
+        {
+            DisableRenderer = true,
+            DisableInput = true,
+            Terminal = new FakeTerminalAdapter(),
+            ColorProfile = TerminalColorProfile.Ansi256,
+        });
+
+        // Act
+        await program.RunAsync();
+
+        // Assert
+        TestAssert.True(
+            model.Seen == TerminalColorProfile.Ansi256,
+            $"Program should emit configured color profile Ansi256, got {model.Seen}.");
     }
 
     private static async Task CapabilityProbe_WritesModeQueries()

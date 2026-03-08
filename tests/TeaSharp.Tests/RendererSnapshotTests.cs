@@ -38,7 +38,7 @@ internal static class RendererSnapshotTests
         const string expected =
             "<ESC>[?1049h<ESC>[?2004h<ESC>[?2004$p<ESC>[?1004h<ESC>[?1004$p" +
             "<ESC>[?2026h<ESC>[?2026$p<ESC>[?1000h<ESC>[?1002l<ESC>[?1003h<ESC>[?1006h<ESC>[?1006$p" +
-            "<ESC>]2;Snap<BEL><ESC>[2J<ESC>[H<ESC>[1;1Hab<ESC>[2;1Hcd<ESC>[?25l<ESC>[?2026l";
+            "<ESC>]2;Snap<BEL><ESC>[>1u<ESC>[2J<ESC>[H<ESC>[1;1Hab<ESC>[2;1Hcd<ESC>[?25l<ESC>[?2026l";
         TestAssert.Equal(expected, rendered, "First frame snapshot should match deterministic control sequence order.");
     }
 
@@ -89,7 +89,7 @@ internal static class RendererSnapshotTests
 
         // Assert
         const string expected =
-            "<ESC>[0m<ESC>[?25h<ESC>[?2004l<ESC>[?1004l<ESC>[?1000l<ESC>[?1002l<ESC>[?1003l<ESC>[?1006l<ESC>[?1049l";
+            "<ESC>[0m<ESC>[?25h<ESC>[>0u<ESC>[?2004l<ESC>[?1004l<ESC>[?1000l<ESC>[?1002l<ESC>[?1003l<ESC>[?1006l<ESC>[?1049l";
         TestAssert.Equal(expected, reset, "Reset snapshot should disable all enabled terminal modes.");
     }
 

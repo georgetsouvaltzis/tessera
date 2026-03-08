@@ -21,6 +21,9 @@ internal static class RendererBehaviorTests
         yield return new TestCase("Renderer_CursorStyle_EmitsDecscusrWhenCursorVisible", CursorStyle_EmitsDecscusrWhenCursorVisible);
         yield return new TestCase("Renderer_CursorStyle_Unchanged_DoesNotRepeatSequence", CursorStyle_Unchanged_DoesNotRepeatSequence);
         yield return new TestCase("Renderer_Reset_RestoresDefaultCursorStyle", Reset_RestoresDefaultCursorStyle);
+        yield return new TestCase("Renderer_TerminalColors_EmitsOscColorSequences", TerminalColors_EmitsOscColorSequences);
+        yield return new TestCase("Renderer_Progress_EmitsOscProgressSequences", Progress_EmitsOscProgressSequences);
+        yield return new TestCase("Renderer_KeyboardEnhancements_EmitsKittySequence", KeyboardEnhancements_EmitsKittySequence);
         yield return new TestCase("Renderer_CellDiff_UpdatesOnlyChangedCellRun", CellDiff_UpdatesOnlyChangedCellRun);
         yield return new TestCase("Renderer_CellDiff_ClearsShortenedLineTail", CellDiff_ClearsShortenedLineTail);
         yield return new TestCase("Renderer_Resize_ClipsToWidth", Resize_ClipsToWidth);
@@ -299,6 +302,81 @@ internal static class RendererBehaviorTests
         // Assert
         AssertContains(rendered, "\u001b[4 q");
         AssertContains(rendered, "\u001b[0 q");
+    }
+
+    private static async Task TerminalColors_EmitsOscColorSequences()
+    {
+        // Arrange
+        await using var renderer = new AnsiDiffRenderer();
+        await using var output = new MemoryStream();
+        await renderer.InitializeAsync(output, CancellationToken.None);
+
+        // Act
+        renderer.Render(View.From("colors") with
+        {
+            ForegroundColor = "#112233",
+            BackgroundColor = "rgb:44/55/66",
+            CursorColor = "#abcdef",
+        });
+        await renderer.FlushAsync(CancellationToken.None);
+        await renderer.ResetAsync(CancellationToken.None);
+        var rendered = ReadUtf8(output);
+
+        // Assert
+        AssertContains(rendered, "\u001b]10;#112233\u001b\\");
+        AssertContains(rendered, "\u001b]11;#445566\u001b\\");
+        AssertContains(rendered, "\u001b]12;#ABCDEF\u001b\\");
+        AssertContains(rendered, "\u001b]110;\u001b\\");
+        AssertContains(rendered, "\u001b]111;\u001b\\");
+        AssertContains(rendered, "\u001b]112;\u001b\\");
+    }
+
+    private static async Task Progress_EmitsOscProgressSequences()
+    {
+        // Arrange
+        await using var renderer = new AnsiDiffRenderer();
+        await using var output = new MemoryStream();
+        await renderer.InitializeAsync(output, CancellationToken.None);
+
+        // Act
+        renderer.Render(View.From("progress") with
+        {
+            Progress = new TerminalProgress(TerminalProgressState.Warning, 61),
+        });
+        await renderer.FlushAsync(CancellationToken.None);
+        renderer.Render(View.From("progress") with
+        {
+            Progress = new TerminalProgress(TerminalProgressState.Indeterminate, 0),
+        });
+        await renderer.FlushAsync(CancellationToken.None);
+        await renderer.ResetAsync(CancellationToken.None);
+        var rendered = ReadUtf8(output);
+
+        // Assert
+        AssertContains(rendered, "\u001b]9;4;4;61\u001b\\");
+        AssertContains(rendered, "\u001b]9;4;3\u001b\\");
+        AssertContains(rendered, "\u001b]9;4;0\u001b\\");
+    }
+
+    private static async Task KeyboardEnhancements_EmitsKittySequence()
+    {
+        // Arrange
+        await using var renderer = new AnsiDiffRenderer();
+        await using var output = new MemoryStream();
+        await renderer.InitializeAsync(output, CancellationToken.None);
+
+        // Act
+        renderer.Render(View.From("keys") with
+        {
+            KeyboardEnhancements = new KeyboardEnhancementOptions { ReportEventTypes = true },
+        });
+        await renderer.FlushAsync(CancellationToken.None);
+        await renderer.ResetAsync(CancellationToken.None);
+        var rendered = ReadUtf8(output);
+
+        // Assert
+        AssertContains(rendered, "\u001b[>3u");
+        AssertContains(rendered, "\u001b[>0u");
     }
 
     private static async Task CellDiff_UpdatesOnlyChangedCellRun()

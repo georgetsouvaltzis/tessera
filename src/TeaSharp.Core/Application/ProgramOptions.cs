@@ -38,6 +38,8 @@ public sealed class ProgramOptions
 
     public TerminalCapabilityProfile? TerminalCapabilities { get; init; }
 
+    public TerminalColorProfile? ColorProfile { get; init; }
+
     internal Func<Action, IDisposable?>? ResizeSignalRegistrationFactory { get; init; }
 
     internal IReadOnlyList<int>? CapabilityProbeModes { get; init; }

@@ -28,6 +28,8 @@ public sealed class TeaProgram
     private bool _running;
     private CapabilityProbeState? _capabilityProbe;
     private TerminalCapabilityProfile _runtimeCapabilities = TerminalCapabilityProfile.AllSupported;
+    private TerminalColorProfile _runtimeColorProfile = TerminalColorProfile.Unknown;
+    private View _lastRenderedView = View.From(string.Empty);
     private ExceptionDispatchInfo? _unhandledCommandException;
 
     public TeaProgram(IModel initialModel, ProgramOptions? options = null)
@@ -74,6 +76,7 @@ public sealed class TeaProgram
             _terminal = _options.Terminal ?? new ConsoleTerminalAdapter();
             var capabilities = _options.TerminalCapabilities ?? TerminalCapabilityDetector.Detect();
             _runtimeCapabilities = capabilities;
+            _runtimeColorProfile = _options.ColorProfile ?? TerminalColorProfileDetector.Detect();
             _renderer = _options.DisableRenderer
                 ? new NullRenderer()
                 : _options.Renderer ?? new AnsiDiffRenderer(capabilities);
@@ -82,6 +85,7 @@ public sealed class TeaProgram
             await _terminal.PrepareAsync(token).ConfigureAwait(false);
             await _renderer.InitializeAsync(_terminal.Output, token).ConfigureAwait(false);
             Send(new TerminalCapabilitiesMsg(capabilities));
+            Send(new ColorProfileMsg(_runtimeColorProfile));
 
             Task? resizeLoop = null;
             if (_terminal.IsOutputInteractive)
@@ -159,6 +163,13 @@ public sealed class TeaProgram
 
                     switch (filtered)
                     {
+                        case RawOutputMsg rawOutput:
+                            if (_renderer is not null)
+                            {
+                                await _renderer.WriteRawAsync(rawOutput.Content, token).ConfigureAwait(false);
+                            }
+
+                            continue;
                         case WindowSizeMsg ws:
                             _renderer?.Resize(ws.Width, ws.Height);
                             break;
@@ -171,6 +182,22 @@ public sealed class TeaProgram
                         case SequenceMsg sequence:
                             _ = Task.Run(() => RunSequenceAsync(sequence.Commands, token), token);
                             continue;
+                    }
+
+                    if (filtered is CapabilityMsg capability
+                        && TryRefineColorProfile(_runtimeColorProfile, capability, out var refinedColorProfile))
+                    {
+                        _runtimeColorProfile = refinedColorProfile;
+                        Send(new ColorProfileMsg(refinedColorProfile));
+                    }
+
+                    if (filtered is MouseMsg mouse && _lastRenderedView.OnMouse is { } onMouse)
+                    {
+                        var callbackCommand = onMouse(mouse);
+                        if (callbackCommand is not null)
+                        {
+                            await _commands.Writer.WriteAsync(callbackCommand, token).ConfigureAwait(false);
+                        }
                     }
 
                     var update = Model.Update(filtered);
@@ -462,6 +489,7 @@ public sealed class TeaProgram
             return;
         }
 
+        _lastRenderedView = view;
         _renderer.Render(view);
         await _renderer.FlushAsync(token).ConfigureAwait(false);
     }
@@ -607,6 +635,38 @@ public sealed class TeaProgram
             default:
                 return false;
         }
+    }
+
+    private static bool TryRefineColorProfile(
+        TerminalColorProfile current,
+        CapabilityMsg capability,
+        out TerminalColorProfile next)
+    {
+        next = current;
+        if (!string.Equals(capability.Name, "RGB", StringComparison.OrdinalIgnoreCase)
+            && !string.Equals(capability.Name, "Tc", StringComparison.OrdinalIgnoreCase))
+        {
+            return false;
+        }
+
+        var value = (capability.Value ?? string.Empty).Trim();
+        var enabled = value.Length == 0
+            || value == "1"
+            || value.Equals("true", StringComparison.OrdinalIgnoreCase)
+            || value.Equals("yes", StringComparison.OrdinalIgnoreCase)
+            || value.Equals("on", StringComparison.OrdinalIgnoreCase);
+        if (!enabled)
+        {
+            return false;
+        }
+
+        if (current == TerminalColorProfile.TrueColor)
+        {
+            return false;
+        }
+
+        next = TerminalColorProfile.TrueColor;
+        return true;
     }
 
     private async Task StartCapabilityProbeAsync(CancellationToken token)

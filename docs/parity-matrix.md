@@ -24,6 +24,8 @@ Legend: `done` = implemented, `todo` = not implemented.
 | Batch commands | `tea.Batch` | done | Concurrent scheduling via command loop. |
 | Sequence commands | `tea.Sequence` | done | Serial execution path implemented. |
 | Timers | `Tick / Every` | done | Supported in `Commands`. |
+| Raw terminal writes | `tea.Raw(...)` | done | `RawOutputMsg` + `Tea.Cmd.Raw(...)` write unmanaged terminal sequences through renderer. |
+| Capability/OSC query commands | `RequestCapability` + color/clipboard requests | done | `Tea.Cmd.RequestCapability`, clipboard OSC52 commands, and color query commands are implemented and decoder-backed. |
 | Command error handling | panic/error propagation policy | done | `CatchCommandExceptions=true` emits `CommandErrorMsg` by default and supports recover hooks via `RecoverCommandException`; `CatchCommandExceptions=false` deterministically propagates command failures through the run loop interrupt path. |
 
 ## Input/Terminal Protocol
@@ -33,6 +35,7 @@ Legend: `done` = implemented, `todo` = not implemented.
 | Character input | UTF-8 keys | done | Rune decode + `Console.ReadKey` fallback. |
 | Navigation keys | arrows/tab/enter/backspace/esc | done | Core keys mapped, including SS3/CSI function-key variants (`F1`-`F12`). |
 | VT control decode | CSI/SS3/OSC parsing | done | CSI/SS3/OSC decode coverage includes cursor/edit/function keys, enhanced CSI-u typing (press/repeat/release), resize, focus, paste, mode reports, and unknown-sequence fallback handling. |
+| DCS capability decode | XTGETTCAP response parsing | done | DCS `ESC P ... ESC \\` capability responses decode to `CapabilityMsg` for runtime/profile refinement and app-level handling. |
 | Ctrl modifiers | control key combos | done | Control-path decode covers control bytes, CSI `u`, modifyOtherKeys (`CSI 27;...~`), and event typing (`;2`/`;3` and `:3` forms). |
 | Alt/meta handling | alt key combos | done | Escape-prefix fallbacks, console modifiers, nested escape forms, and enhanced CSI modifier decoding (including meta combinations) are implemented and fixture-covered. |
 | Bracketed paste protocol | start/end/content handling | done | Start/end decode and aggregated `PasteMsg` content are implemented. |
@@ -48,8 +51,12 @@ Legend: `done` = implemented, `todo` = not implemented.
 | Diff rendering | efficient incremental updates | done | Renderer uses an explicit frame cell-buffer (`RenderFrameBuffer`) with row+cell run diffing, wide/combining continuation safety, bottom-row retention on overflow, and style-aware patching across supported SGR attributes. |
 | Alt screen | alternate buffer enter/leave | done | `View.AltScreen` implemented. |
 | Cursor visibility/position | cursor control | done | Show/hide, absolute positioning, and optional cursor-shape/blink control via DECSCUSR (`CSI Ps SP q`) are integrated into render lifecycle and teardown. |
+| Terminal color controls | foreground/background/cursor color | done | `View.ForegroundColor`, `View.BackgroundColor`, and `View.CursorColor` emit OSC color set/reset sequences (`10/11/12`, `110/111/112`). |
+| Native terminal progress | terminal progress bar channel | done | `View.Progress` emits OSC `9;4` progress state/value sequences (default/error/warning/indeterminate/reset). |
 | Synchronized updates | synchronized paint | done | Frame output supports synchronized update wrapping (`?2026h`/`?2026l`) with capability gating and mode-report-driven runtime refinement. |
 | Window title | OSC title | done | `View.WindowTitle` now emits OSC title sequence. |
+| Keyboard enhancement request | kitty key enhancement negotiation | done | `View.KeyboardEnhancements` emits kitty keyboard flag sequences and decodes enhancement reports via `KeyboardEnhancementsMsg`. |
+| Mouse interception hook | view-level mouse callback | done | `View.OnMouse` can emit a command from last-rendered view context before normal model update flow. |
 | Style/render integration | lipgloss-like style composition | done | Composable ANSI style API (`TeaStyle`, `AnsiColor`) is integrated with renderer SGR parsing/diff patching and component primitives for style-safe composition. |
 | Component text pipeline | grapheme-safe component text rendering | done | `Canvas` provides deterministic fast and grapheme-aware text paths for wide/combining glyph placement, with compatibility behavior validated in component tests. |
 
@@ -78,6 +85,7 @@ Legend: `done` = implemented, `todo` = not implemented.
 | Unix raw mode | non-canonical no-echo mode | done | `stty raw -echo` with restore path. |
 | TTY fallback | interactive run under redirected stdio | done | `/dev/tty` binding + console-key fallback. |
 | Capability negotiation | terminal feature detection | done | Environment + terminfo + bounded active `DECRPM` probing drive capability gating and runtime refinement (`+probe-timeout` / `+probe-partial-timeout`), with legacy mouse preservation heuristics and explicit `TEASHARP_CAPS` overrides. |
+| Color profile signaling | profile detection + runtime update | done | Startup emits `ColorProfileMsg` from env/profile detection (overridable via `ProgramOptions.ColorProfile`), with capability-response refinement support. |
 
 ## Test Parity
 

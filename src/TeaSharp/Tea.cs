@@ -17,5 +17,14 @@ public static class Tea
         public static Command Every(TimeSpan delay, Func<DateTimeOffset, IMessage> factory) => Commands.Every(delay, factory);
         public static Command? Batch(params Command?[] commands) => Commands.Batch(commands);
         public static Command? Sequence(params Command?[] commands) => Commands.Sequence(commands);
+        public static Command Raw(string content) => Commands.Raw(content);
+        public static Command RequestCapability(string name) => Commands.RequestCapability(name);
+        public static Command SetClipboard(string content) => Commands.SetClipboard(content);
+        public static Command ReadClipboard() => Commands.ReadClipboard();
+        public static Command SetPrimaryClipboard(string content) => Commands.SetPrimaryClipboard(content);
+        public static Command ReadPrimaryClipboard() => Commands.ReadPrimaryClipboard();
+        public static Command RequestForegroundColor() => Commands.RequestForegroundColor();
+        public static Command RequestBackgroundColor() => Commands.RequestBackgroundColor();
+        public static Command RequestCursorColor() => Commands.RequestCursorColor();
     }
 }

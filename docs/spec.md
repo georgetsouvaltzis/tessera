@@ -120,11 +120,14 @@ Primary goal: deterministic message-driven TUI runtime with portable terminal be
 
 - `IModel Init/Update/View`.
 - `Command` returns optional `IMessage`.
+- `View` terminal controls now include colors (`ForegroundColor`, `BackgroundColor`, `CursorColor`), native progress (`TerminalProgress`), keyboard enhancement requests (`KeyboardEnhancementOptions`), and optional mouse interception callback (`OnMouse`).
 - Messages include:
   - lifecycle: `QuitMsg`, `InterruptMsg`, `CommandErrorMsg`.
   - terminal: `WindowSizeMsg`.
-  - input: `KeyPressMsg`, `KeyReleaseMsg`, `Paste*Msg`, `Focus*Msg`, `MouseMsg` + typed variants (`MouseClickMsg`, `MouseReleaseMsg`, `MouseMotionMsg`, `MouseWheelMsg`), `ModeReportMsg`, `TerminalCapabilitiesMsg` (startup + runtime refinements), `UnknownInputMsg`.
+  - input: `KeyPressMsg`, `KeyReleaseMsg`, `Paste*Msg`, `Focus*Msg`, `MouseMsg` + typed variants (`MouseClickMsg`, `MouseReleaseMsg`, `MouseMotionMsg`, `MouseWheelMsg`), `ModeReportMsg`, `KeyboardEnhancementsMsg`, `UnknownInputMsg`.
+  - terminal capability/state: `TerminalCapabilitiesMsg`, `ColorProfileMsg`, `CapabilityMsg`, `ClipboardMsg`, `ForegroundColorMsg`, `BackgroundColorMsg`, `CursorColorMsg`.
   - command meta: `BatchMsg`, `SequenceMsg`, `TickMsg`.
+  - raw terminal output: `RawOutputMsg`.
 
 ## 8. Error Handling
 

@@ -82,6 +82,37 @@ public static class Commands
         };
     }
 
+    public static Command Raw(string content) =>
+        _ => ValueTask.FromResult<IMessage?>(new RawOutputMsg(content));
+
+    public static Command RequestCapability(string capabilityName)
+    {
+        var name = capabilityName?.Trim() ?? string.Empty;
+        var payload = string.Concat(name.Select(static ch => ((int)ch).ToString("X2")));
+        return Raw($"\u001bP+q{payload}\u001b\\");
+    }
+
+    public static Command SetClipboard(string content) =>
+        Raw(BuildClipboardWriteSequence(content, selection: 'c'));
+
+    public static Command ReadClipboard() =>
+        Raw(BuildClipboardReadSequence(selection: 'c'));
+
+    public static Command SetPrimaryClipboard(string content) =>
+        Raw(BuildClipboardWriteSequence(content, selection: 'p'));
+
+    public static Command ReadPrimaryClipboard() =>
+        Raw(BuildClipboardReadSequence(selection: 'p'));
+
+    public static Command RequestForegroundColor() =>
+        Raw("\u001b]10;?\u001b\\");
+
+    public static Command RequestBackgroundColor() =>
+        Raw("\u001b]11;?\u001b\\");
+
+    public static Command RequestCursorColor() =>
+        Raw("\u001b]12;?\u001b\\");
+
     private static IReadOnlyList<Command> GetValid(IEnumerable<Command?> commands)
     {
         var valid = new List<Command>();
@@ -94,5 +125,17 @@ public static class Commands
         }
 
         return valid;
+    }
+
+    private static string BuildClipboardWriteSequence(string content, char selection)
+    {
+        var bytes = System.Text.Encoding.UTF8.GetBytes(content ?? string.Empty);
+        var encoded = Convert.ToBase64String(bytes);
+        return $"\u001b]52;{selection};{encoded}\u001b\\";
+    }
+
+    private static string BuildClipboardReadSequence(char selection)
+    {
+        return $"\u001b]52;{selection};?\u001b\\";
     }
 }

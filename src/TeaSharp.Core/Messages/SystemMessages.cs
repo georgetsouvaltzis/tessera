@@ -21,6 +21,27 @@ public sealed record PasteEndMsg : IMessage;
 
 public sealed record PasteMsg(string Content) : IMessage;
 
+public sealed record RawOutputMsg(string Content) : IMessage;
+
+public sealed record CapabilityMsg(string Name, string? Value, string Raw) : IMessage;
+
+public sealed record ClipboardMsg(string Content, char Selection = 'c') : IMessage;
+
+public sealed record ForegroundColorMsg(string Color) : IMessage;
+
+public sealed record BackgroundColorMsg(string Color) : IMessage;
+
+public sealed record CursorColorMsg(string Color) : IMessage;
+
+public sealed record ColorProfileMsg(TerminalColorProfile Profile) : IMessage;
+
+public sealed record KeyboardEnhancementsMsg(int Flags) : IMessage
+{
+    public bool SupportsKeyDisambiguation() => Flags > 0;
+
+    public bool SupportsEventTypes() => (Flags & 0b10) != 0;
+}
+
 public enum ModeReportState
 {
     Unknown = -1,

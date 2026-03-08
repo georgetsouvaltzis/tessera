@@ -19,7 +19,9 @@ internal static class EventDecoderGoldenTests
         yield return new TestCase("Decoder_ModeReportSequence_Parses", ModeReportSequence_ParsesExpectedMessage);
         yield return new TestCase("Decoder_MouseSequences_Parse", MouseSequences_ParseExpectedMessages);
         yield return new TestCase("Decoder_MouseExtendedSequences_Parse", MouseExtendedSequences_ParseExpectedMessages);
-        yield return new TestCase("Decoder_OscSequences_AreConsumedWithoutMessages", OscSequences_AreConsumedWithoutMessages);
+        yield return new TestCase("Decoder_OscSequences_ParseKnownCapabilityMessages", OscSequences_ParseKnownCapabilityMessages);
+        yield return new TestCase("Decoder_DcsCapabilityResponse_Parses", DcsCapabilityResponse_Parses);
+        yield return new TestCase("Decoder_KeyboardEnhancementReport_Parses", KeyboardEnhancementReport_Parses);
         yield return new TestCase("Decoder_PartialCsi_RequestsMoreDataUntilTimeout", PartialCsi_RequestsMoreDataUntilTimeout);
         yield return new TestCase("Decoder_Utf8Rune_ParsesWithoutReplacement", Utf8Rune_ParsesWithoutReplacement);
         yield return new TestCase("Decoder_Utf8Partial_RequestsMoreData", Utf8Partial_RequestsMoreData);
@@ -277,25 +279,80 @@ internal static class EventDecoderGoldenTests
         return Task.CompletedTask;
     }
 
-    private static Task OscSequences_AreConsumedWithoutMessages()
+    private static Task OscSequences_ParseKnownCapabilityMessages()
     {
         // Arrange
         var decoder = new EventDecoder();
 
         // Act
-        var oscBel = decoder.Decode(
-            [0x1B, (byte)']', (byte)'0', (byte)';', (byte)'t', (byte)'i', (byte)'t', (byte)'l', (byte)'e', 0x07],
+        var clipboard = decoder.Decode(
+            [0x1B, (byte)']', (byte)'5', (byte)'2', (byte)';', (byte)'c', (byte)';', (byte)'a', (byte)'G', (byte)'V', (byte)'s', (byte)'b', (byte)'G', (byte)'8', (byte)'=', 0x07],
             timeoutExpired: false);
 
-        var oscSt = decoder.Decode(
-            [0x1B, (byte)']', (byte)'2', (byte)';', (byte)'x', 0x1B, (byte)'\\'],
+        var foreground = decoder.Decode(
+            [0x1B, (byte)']', (byte)'1', (byte)'0', (byte)';', (byte)'r', (byte)'g', (byte)'b', (byte)':', (byte)'a', (byte)'a', (byte)'/', (byte)'b', (byte)'b', (byte)'/', (byte)'c', (byte)'c', 0x1B, (byte)'\\'],
+            timeoutExpired: false);
+
+        var background = decoder.Decode(
+            [0x1B, (byte)']', (byte)'1', (byte)'1', (byte)';', (byte)'#', (byte)'1', (byte)'1', (byte)'2', (byte)'2', (byte)'3', (byte)'3', 0x07],
             timeoutExpired: false);
 
         // Assert
-        AssertConsumed(oscBel, 10);
-        AssertNoMessage(oscBel);
-        AssertConsumed(oscSt, 7);
-        AssertNoMessage(oscSt);
+        AssertConsumed(clipboard, 16);
+        if (clipboard.Message is not ClipboardMsg { Content: "hello", Selection: 'c' })
+        {
+            throw new InvalidOperationException("Expected ClipboardMsg(content=hello, selection=c).");
+        }
+
+        AssertConsumed(foreground, 19);
+        if (foreground.Message is not ForegroundColorMsg { Color: "#AABBCC" })
+        {
+            throw new InvalidOperationException("Expected ForegroundColorMsg(#AABBCC).");
+        }
+
+        AssertConsumed(background, 13);
+        if (background.Message is not BackgroundColorMsg { Color: "#112233" })
+        {
+            throw new InvalidOperationException("Expected BackgroundColorMsg(#112233).");
+        }
+
+        return Task.CompletedTask;
+    }
+
+    private static Task DcsCapabilityResponse_Parses()
+    {
+        // Arrange
+        var decoder = new EventDecoder();
+
+        // Act
+        var result = decoder.Decode(
+            [0x1B, (byte)'P', (byte)'1', (byte)'+', (byte)'r', (byte)'5', (byte)'4', (byte)'6', (byte)'3', (byte)'=', (byte)'3', (byte)'1', 0x1B, (byte)'\\'],
+            timeoutExpired: false);
+
+        // Assert
+        AssertConsumed(result, 14);
+        if (result.Message is not CapabilityMsg { Name: "Tc", Value: "1" })
+        {
+            throw new InvalidOperationException("Expected CapabilityMsg(Tc=1).");
+        }
+
+        return Task.CompletedTask;
+    }
+
+    private static Task KeyboardEnhancementReport_Parses()
+    {
+        // Arrange
+        var decoder = new EventDecoder();
+
+        // Act
+        var result = Decode(decoder, "\u001b[?3u");
+
+        // Assert
+        if (result.Message is not KeyboardEnhancementsMsg keyboard || keyboard.Flags != 3)
+        {
+            throw new InvalidOperationException("Expected KeyboardEnhancementsMsg flags=3.");
+        }
+
         return Task.CompletedTask;
     }
 

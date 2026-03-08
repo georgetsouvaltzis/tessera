@@ -213,6 +213,26 @@ internal sealed class CapabilityTrackingModel : IModel
     public ModelView View() => ModelView.From("capabilities");
 }
 
+internal sealed class ColorProfileTrackingModel : IModel
+{
+    public TerminalColorProfile Seen { get; private set; } = TerminalColorProfile.Unknown;
+
+    public Command? Init() => null;
+
+    public UpdateResult Update(IMessage message)
+    {
+        if (message is ColorProfileMsg colorProfile)
+        {
+            Seen = colorProfile.Profile;
+            return new UpdateResult(this, Commands.Quit);
+        }
+
+        return new UpdateResult(this, null);
+    }
+
+    public ModelView View() => ModelView.From("color-profile");
+}
+
 internal sealed class CapabilityRefinementModel : IModel
 {
     public List<TerminalCapabilityProfile> Seen { get; } = [];
@@ -341,6 +361,40 @@ internal sealed class TimedQuitModel : IModel
     public ModelView View() => ModelView.From("timed-quit");
 }
 
+internal sealed class RawOutputInitModel : IModel
+{
+    public Command? Init() => Commands.Sequence(
+        Commands.Raw("raw-sequence"),
+        Commands.Quit);
+
+    public UpdateResult Update(IMessage message) => new(this, null);
+
+    public ModelView View() => ModelView.From("raw-output");
+}
+
+internal sealed class MouseInterceptModel : IModel
+{
+    public int Intercepted { get; private set; }
+
+    public Command? Init() => null;
+
+    public UpdateResult Update(IMessage message)
+    {
+        if (message is NumberMsg)
+        {
+            Intercepted++;
+            return new UpdateResult(this, Commands.Quit);
+        }
+
+        return new UpdateResult(this, null);
+    }
+
+    public ModelView View() => ModelView.From("mouse-intercept") with
+    {
+        OnMouse = _ => Commands.FromMessage(new NumberMsg(7)),
+    };
+}
+
 internal sealed class CapabilityAwareRendererSpy : IProgramRenderer
 {
     public List<TerminalCapabilityProfile> Updates { get; } = [];
@@ -368,6 +422,13 @@ internal sealed class CapabilityAwareRendererSpy : IProgramRenderer
         _ = view;
     }
 
+    public ValueTask WriteRawAsync(string content, CancellationToken cancellationToken)
+    {
+        _ = content;
+        _ = cancellationToken;
+        return ValueTask.CompletedTask;
+    }
+
     public ValueTask FlushAsync(CancellationToken cancellationToken)
     {
         _ = cancellationToken;
@@ -392,6 +453,8 @@ internal sealed class RenderCountingRendererSpy : IProgramRenderer
 
     public int FlushCalls { get; private set; }
 
+    public List<string> RawWrites { get; } = [];
+
     public ValueTask InitializeAsync(Stream output, CancellationToken cancellationToken)
     {
         _ = output;
@@ -414,6 +477,14 @@ internal sealed class RenderCountingRendererSpy : IProgramRenderer
     {
         _ = view;
         RenderCalls++;
+    }
+
+    public ValueTask WriteRawAsync(string content, CancellationToken cancellationToken)
+    {
+        _ = content;
+        _ = cancellationToken;
+        RawWrites.Add(content);
+        return ValueTask.CompletedTask;
     }
 
     public ValueTask FlushAsync(CancellationToken cancellationToken)

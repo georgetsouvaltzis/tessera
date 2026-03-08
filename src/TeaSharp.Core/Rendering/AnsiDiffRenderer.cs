@@ -18,6 +18,11 @@ public sealed class AnsiDiffRenderer : IProgramRenderer
     private bool _focusReporting;
     private MouseMode _mouseMode;
     private CursorStyle? _cursorStyle;
+    private string? _cursorColor;
+    private string? _foregroundColor;
+    private string? _backgroundColor;
+    private TerminalProgress? _progress;
+    private int _keyboardEnhancementFlags;
     private readonly HashSet<int> _queriedModes = [];
     private string? _windowTitle;
     private int _width;
@@ -45,6 +50,11 @@ public sealed class AnsiDiffRenderer : IProgramRenderer
         _focusReporting = false;
         _mouseMode = MouseMode.None;
         _cursorStyle = null;
+        _cursorColor = null;
+        _foregroundColor = null;
+        _backgroundColor = null;
+        _progress = null;
+        _keyboardEnhancementFlags = 0;
         _queriedModes.Clear();
         _windowTitle = null;
         _width = 0;
@@ -89,6 +99,11 @@ public sealed class AnsiDiffRenderer : IProgramRenderer
                 .ConfigureAwait(false);
             _altScreen = _currentView.AltScreen;
             _previousFrame = RenderFrameBuffer.Empty;
+            if (_keyboardEnhancementFlags != 0)
+            {
+                await _writer.WriteAsync("\u001b[>0u").ConfigureAwait(false);
+                _keyboardEnhancementFlags = 0;
+            }
         }
 
         var requestedBracketedPaste = _currentView.EnableBracketedPaste && _capabilities.BracketedPaste;
@@ -141,6 +156,40 @@ public sealed class AnsiDiffRenderer : IProgramRenderer
             }
 
             _windowTitle = _currentView.WindowTitle;
+        }
+
+        var requestedKeyboardFlags = GetKeyboardEnhancementFlags(_currentView.KeyboardEnhancements);
+        if (requestedKeyboardFlags != _keyboardEnhancementFlags)
+        {
+            await _writer.WriteAsync($"\u001b[>{requestedKeyboardFlags}u").ConfigureAwait(false);
+            _keyboardEnhancementFlags = requestedKeyboardFlags;
+        }
+
+        var requestedForegroundColor = NormalizeColorHex(_currentView.ForegroundColor);
+        if (!string.Equals(_foregroundColor, requestedForegroundColor, StringComparison.Ordinal))
+        {
+            await WriteTerminalColorAsync(10, 110, requestedForegroundColor).ConfigureAwait(false);
+            _foregroundColor = requestedForegroundColor;
+        }
+
+        var requestedBackgroundColor = NormalizeColorHex(_currentView.BackgroundColor);
+        if (!string.Equals(_backgroundColor, requestedBackgroundColor, StringComparison.Ordinal))
+        {
+            await WriteTerminalColorAsync(11, 111, requestedBackgroundColor).ConfigureAwait(false);
+            _backgroundColor = requestedBackgroundColor;
+        }
+
+        var requestedCursorColor = NormalizeColorHex(_currentView.CursorColor);
+        if (!string.Equals(_cursorColor, requestedCursorColor, StringComparison.Ordinal))
+        {
+            await WriteTerminalColorAsync(12, 112, requestedCursorColor).ConfigureAwait(false);
+            _cursorColor = requestedCursorColor;
+        }
+
+        if (_progress != _currentView.Progress)
+        {
+            await WriteProgressAsync(_currentView.Progress).ConfigureAwait(false);
+            _progress = _currentView.Progress;
         }
 
         if (_fullRepaintRequired)
@@ -201,6 +250,36 @@ public sealed class AnsiDiffRenderer : IProgramRenderer
             _cursorStyle = null;
         }
 
+        if (_keyboardEnhancementFlags != 0)
+        {
+            await _writer.WriteAsync("\u001b[>0u").ConfigureAwait(false);
+            _keyboardEnhancementFlags = 0;
+        }
+
+        if (_foregroundColor is not null)
+        {
+            await _writer.WriteAsync("\u001b]110;\u001b\\").ConfigureAwait(false);
+            _foregroundColor = null;
+        }
+
+        if (_backgroundColor is not null)
+        {
+            await _writer.WriteAsync("\u001b]111;\u001b\\").ConfigureAwait(false);
+            _backgroundColor = null;
+        }
+
+        if (_cursorColor is not null)
+        {
+            await _writer.WriteAsync("\u001b]112;\u001b\\").ConfigureAwait(false);
+            _cursorColor = null;
+        }
+
+        if (_progress is not null && _progress.Value.State != TerminalProgressState.None)
+        {
+            await _writer.WriteAsync("\u001b]9;4;0\u001b\\").ConfigureAwait(false);
+            _progress = null;
+        }
+
         if (_bracketedPaste)
         {
             await _writer.WriteAsync("\u001b[?2004l").ConfigureAwait(false);
@@ -243,6 +322,17 @@ public sealed class AnsiDiffRenderer : IProgramRenderer
         }
 
         _initialized = false;
+    }
+
+    public async ValueTask WriteRawAsync(string content, CancellationToken cancellationToken)
+    {
+        if (!_initialized || _writer is null || string.IsNullOrEmpty(content))
+        {
+            return;
+        }
+
+        await _writer.WriteAsync(content).ConfigureAwait(false);
+        await _writer.FlushAsync(cancellationToken).ConfigureAwait(false);
     }
 
     private async Task WriteFrameDiffAsync(RenderFrameBuffer nextFrame)
@@ -377,6 +467,59 @@ public sealed class AnsiDiffRenderer : IProgramRenderer
         };
     }
 
+    private async Task WriteTerminalColorAsync(int setCode, int resetCode, string? color)
+    {
+        if (_writer is null)
+        {
+            return;
+        }
+
+        if (color is null)
+        {
+            await _writer.WriteAsync($"\u001b]{resetCode};\u001b\\").ConfigureAwait(false);
+            return;
+        }
+
+        await _writer.WriteAsync($"\u001b]{setCode};{color}\u001b\\").ConfigureAwait(false);
+    }
+
+    private async Task WriteProgressAsync(TerminalProgress? progress)
+    {
+        if (_writer is null)
+        {
+            return;
+        }
+
+        if (progress is not TerminalProgress current || current.State == TerminalProgressState.None)
+        {
+            await _writer.WriteAsync("\u001b]9;4;0\u001b\\").ConfigureAwait(false);
+            return;
+        }
+
+        if (current.State == TerminalProgressState.Indeterminate)
+        {
+            await _writer.WriteAsync("\u001b]9;4;3\u001b\\").ConfigureAwait(false);
+            return;
+        }
+
+        var clamped = Math.Clamp(current.Value, 0, 100);
+        var state = current.State switch
+        {
+            TerminalProgressState.Default => 1,
+            TerminalProgressState.Error => 2,
+            TerminalProgressState.Warning => 4,
+            _ => 0,
+        };
+
+        if (state == 0)
+        {
+            await _writer.WriteAsync("\u001b]9;4;0\u001b\\").ConfigureAwait(false);
+            return;
+        }
+
+        await _writer.WriteAsync($"\u001b]9;4;{state};{clamped}\u001b\\").ConfigureAwait(false);
+    }
+
     private Task WriteCursorStyleAsync(CursorStyle style)
     {
         if (_writer is null)
@@ -406,6 +549,92 @@ public sealed class AnsiDiffRenderer : IProgramRenderer
         }
 
         return _writer.WriteAsync($"\u001b[?{mode}$p");
+    }
+
+    private static int GetKeyboardEnhancementFlags(KeyboardEnhancementOptions options)
+    {
+        var flags = 0b1;
+        if (options.ReportEventTypes)
+        {
+            flags |= 0b10;
+        }
+
+        return flags;
+    }
+
+    private static string? NormalizeColorHex(string? input)
+    {
+        if (string.IsNullOrWhiteSpace(input))
+        {
+            return null;
+        }
+
+        var value = input.Trim();
+        if (value.StartsWith("rgb:", StringComparison.OrdinalIgnoreCase))
+        {
+            var channels = value[4..].Split('/');
+            if (channels.Length != 3)
+            {
+                return null;
+            }
+
+            if (!TryParseRgbChannel(channels[0], out var r)
+                || !TryParseRgbChannel(channels[1], out var g)
+                || !TryParseRgbChannel(channels[2], out var b))
+            {
+                return null;
+            }
+
+            return $"#{r:X2}{g:X2}{b:X2}";
+        }
+
+        if (value[0] == '#')
+        {
+            value = value[1..];
+        }
+
+        if (value.Length == 3
+            && byte.TryParse(new string(value[0], 2), System.Globalization.NumberStyles.HexNumber, null, out var shortR)
+            && byte.TryParse(new string(value[1], 2), System.Globalization.NumberStyles.HexNumber, null, out var shortG)
+            && byte.TryParse(new string(value[2], 2), System.Globalization.NumberStyles.HexNumber, null, out var shortB))
+        {
+            return $"#{shortR:X2}{shortG:X2}{shortB:X2}";
+        }
+
+        if (value.Length == 6
+            && byte.TryParse(value[..2], System.Globalization.NumberStyles.HexNumber, null, out var r6)
+            && byte.TryParse(value[2..4], System.Globalization.NumberStyles.HexNumber, null, out var g6)
+            && byte.TryParse(value[4..], System.Globalization.NumberStyles.HexNumber, null, out var b6))
+        {
+            return $"#{r6:X2}{g6:X2}{b6:X2}";
+        }
+
+        return null;
+    }
+
+    private static bool TryParseRgbChannel(string value, out byte result)
+    {
+        result = 0;
+        var normalized = value.Trim();
+        if (normalized.Length is < 1 or > 4)
+        {
+            return false;
+        }
+
+        if (!ushort.TryParse(normalized, System.Globalization.NumberStyles.HexNumber, null, out var parsed))
+        {
+            return false;
+        }
+
+        if (normalized.Length <= 2)
+        {
+            result = (byte)parsed;
+            return true;
+        }
+
+        var max = normalized.Length == 3 ? 0x0FFFu : 0xFFFFu;
+        result = (byte)Math.Round((parsed / (double)max) * 255d, MidpointRounding.AwayFromZero);
+        return true;
     }
 
 }

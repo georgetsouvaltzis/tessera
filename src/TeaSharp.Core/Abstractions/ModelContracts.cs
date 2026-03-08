@@ -32,6 +32,24 @@ public enum CursorStyle
     SteadyBar = 6,
 }
 
+public readonly record struct KeyboardEnhancementOptions
+{
+    public bool ReportEventTypes { get; init; }
+}
+
+public enum TerminalProgressState
+{
+    None = 0,
+    Default = 1,
+    Error = 2,
+    Indeterminate = 3,
+    Warning = 4,
+}
+
+public readonly record struct TerminalProgress(
+    TerminalProgressState State,
+    int Value);
+
 public readonly record struct View(string Content)
 {
     public bool AltScreen { get; init; }
@@ -39,9 +57,15 @@ public readonly record struct View(string Content)
     public bool EnableFocusReporting { get; init; }
     public bool EnableSynchronizedUpdates { get; init; }
     public MouseMode MouseMode { get; init; }
+    public Func<MouseMsg, Command?>? OnMouse { get; init; }
+    public KeyboardEnhancementOptions KeyboardEnhancements { get; init; }
     public int? CursorX { get; init; }
     public int? CursorY { get; init; }
     public CursorStyle? CursorStyle { get; init; }
+    public string? CursorColor { get; init; }
+    public string? ForegroundColor { get; init; }
+    public string? BackgroundColor { get; init; }
+    public TerminalProgress? Progress { get; init; }
     public string? WindowTitle { get; init; }
 
     public static View From(string content) => new(content);
