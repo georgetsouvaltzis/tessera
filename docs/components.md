@@ -67,6 +67,8 @@ The design follows patterns used in Bubble Tea examples:
     - `TextInputComponent`
     - `TextAreaComponent`
     - `ListComponent<T>`
+    - `DropdownComponent`
+    - `ComboboxComponent`
     - `TableComponent`
     - `ProgressBarComponent`
     - `StatusBarComponent`
@@ -77,6 +79,8 @@ The design follows patterns used in Bubble Tea examples:
       - `TextInputComponent.KeyMap`
       - `TextAreaComponent.InputKeyMap` / `TextAreaComponent.ViewportKeyMap`
       - `ListComponent<T>.KeyMap`
+      - `DropdownComponent.ToggleOpenKey`, `OpenKey`, `CloseKey`, `NextItemKey`, `PreviousItemKey`, `ConfirmSelectionKey`
+      - `ComboboxComponent.InputKeyMap`, `OpenKey`, `CloseKey`, `NextItemKey`, `PreviousItemKey`, `ConfirmSelectionKey`
       - `LogViewerComponent.ViewportKeyMap`, `TogglePauseKey`, `ClearKey`
       - `ProgressBarComponent.IncreaseKey` / `DecreaseKey`
       - `DialogComponent.AcceptKey` / `DismissKey`

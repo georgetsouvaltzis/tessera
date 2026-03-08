@@ -13,6 +13,8 @@ internal static class PrebuiltWidgetTests
         yield return new TestCase("Prebuilt_TextAreaComponent_RendersMultilineContent", TextAreaComponent_RendersMultilineContent);
         yield return new TestCase("Prebuilt_TextAreaComponent_EnterInsertsNewline", TextAreaComponent_EnterInsertsNewline);
         yield return new TestCase("Prebuilt_ListComponent_NavigatesSelection", ListComponent_NavigatesSelection);
+        yield return new TestCase("Prebuilt_DropdownComponent_SelectsOpenMenuItem", DropdownComponent_SelectsOpenMenuItem);
+        yield return new TestCase("Prebuilt_ComboboxComponent_FiltersAndSelects", ComboboxComponent_FiltersAndSelects);
         yield return new TestCase("Prebuilt_TableComponent_ForwardsSortHotkeys", TableComponent_ForwardsSortHotkeys);
         yield return new TestCase("Prebuilt_ProgressBarComponent_AdjustsValue", ProgressBarComponent_AdjustsValue);
         yield return new TestCase("Prebuilt_StatusBarComponent_RendersLeftAndRightText", StatusBarComponent_RendersLeftAndRightText);
@@ -122,6 +124,42 @@ internal static class PrebuiltWidgetTests
         var selected = list.Model.SelectedItem;
 
         TestAssert.Equal("two", selected ?? string.Empty, "List down key should advance selection.");
+        return Task.CompletedTask;
+    }
+
+    private static Task DropdownComponent_SelectsOpenMenuItem()
+    {
+        var dropdown = new DropdownComponent
+        {
+            Focused = true,
+            Title = "D",
+        };
+        dropdown.SetItems(["alpha", "beta", "gamma"]);
+
+        dropdown.Update(new KeyPressMsg(KeyCode.Enter));
+        dropdown.Update(new KeyPressMsg(KeyCode.Down));
+        dropdown.Update(new KeyPressMsg(KeyCode.Enter));
+
+        TestAssert.True(!dropdown.IsOpen, "Dropdown should close after selecting an item.");
+        TestAssert.Equal("beta", dropdown.SelectedItem, "Dropdown should select highlighted item.");
+        return Task.CompletedTask;
+    }
+
+    private static Task ComboboxComponent_FiltersAndSelects()
+    {
+        var combobox = new ComboboxComponent
+        {
+            Focused = true,
+            Title = "C",
+        };
+        combobox.SetItems(["alpha", "beta", "gamma"]);
+
+        combobox.Update(new KeyPressMsg(KeyCode.Character, "g"));
+        combobox.Update(new KeyPressMsg(KeyCode.Enter));
+
+        TestAssert.True(!combobox.IsOpen, "Combobox should close after selection.");
+        TestAssert.Equal("gamma", combobox.SelectedItem, "Combobox should select the filtered match.");
+        TestAssert.Equal("gamma", combobox.Input.Value, "Combobox input should sync to selected item.");
         return Task.CompletedTask;
     }
 

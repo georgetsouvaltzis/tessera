@@ -329,6 +329,386 @@ public sealed class ListComponent<T> : IStatefulComponent
     }
 }
 
+public sealed class DropdownComponent : IStatefulComponent
+{
+    private readonly List<string> _items = [];
+    private int _highlightedIndex;
+
+    public string Title { get; set; } = "Dropdown";
+
+    public bool Focused { get; set; }
+
+    public bool IsOpen { get; private set; }
+
+    public int SelectedIndex { get; private set; } = -1;
+
+    public int MaxVisibleItems { get; set; } = 6;
+
+    public KeyBinding ToggleOpenKey { get; set; } = new("enter/space", "toggle", "enter", "space");
+
+    public KeyBinding OpenKey { get; set; } = new("down", "open", "down");
+
+    public KeyBinding CloseKey { get; set; } = new("esc", "close", "escape");
+
+    public KeyBinding NextItemKey { get; set; } = new("down/j", "next item", "down", "j");
+
+    public KeyBinding PreviousItemKey { get; set; } = new("up/k", "previous item", "up", "k");
+
+    public KeyBinding ConfirmSelectionKey { get; set; } = new("enter/space", "select", "enter", "space");
+
+    public string SelectedItem => SelectedIndex >= 0 && SelectedIndex < _items.Count
+        ? _items[SelectedIndex]
+        : string.Empty;
+
+    public void SetItems(IEnumerable<string> items)
+    {
+        _items.Clear();
+        _items.AddRange(items);
+        if (_items.Count == 0)
+        {
+            SelectedIndex = -1;
+            _highlightedIndex = 0;
+            IsOpen = false;
+            return;
+        }
+
+        if (SelectedIndex < 0 || SelectedIndex >= _items.Count)
+        {
+            SelectedIndex = 0;
+        }
+
+        _highlightedIndex = SelectedIndex;
+    }
+
+    public bool Update(IMessage message)
+    {
+        if (!Focused || message is not KeyPressMsg key || _items.Count == 0)
+        {
+            return false;
+        }
+
+        if (!IsOpen)
+        {
+            if (ToggleOpenKey.Matches(key) || OpenKey.Matches(key))
+            {
+                IsOpen = true;
+                _highlightedIndex = Math.Clamp(SelectedIndex, 0, _items.Count - 1);
+                return true;
+            }
+
+            return false;
+        }
+
+        if (CloseKey.Matches(key))
+        {
+            IsOpen = false;
+            return true;
+        }
+
+        if (NextItemKey.Matches(key))
+        {
+            _highlightedIndex = (_highlightedIndex + 1) % _items.Count;
+            return true;
+        }
+
+        if (PreviousItemKey.Matches(key))
+        {
+            _highlightedIndex = (_highlightedIndex + _items.Count - 1) % _items.Count;
+            return true;
+        }
+
+        if (ConfirmSelectionKey.Matches(key))
+        {
+            SelectedIndex = _highlightedIndex;
+            IsOpen = false;
+            return true;
+        }
+
+        return false;
+    }
+
+    public void Render(Canvas canvas, Rect rect)
+    {
+        var clipped = Rect.Intersect(rect, canvas.Bounds);
+        if (clipped.IsEmpty)
+        {
+            return;
+        }
+
+        canvas.DrawBox(clipped, Focused ? $"{Title} *" : Title);
+        var content = clipped.Inset(1, 1);
+        if (content.IsEmpty)
+        {
+            return;
+        }
+
+        var indicator = IsOpen ? "^" : "v";
+        var selected = _items.Count == 0 ? "(empty)" : SelectedItem;
+        canvas.WriteText(content.X, content.Y, $"{indicator} {selected}", content.Width);
+
+        if (!IsOpen || content.Height <= 1 || _items.Count == 0)
+        {
+            return;
+        }
+
+        var visibleRows = Math.Min(Math.Max(1, MaxVisibleItems), content.Height - 1);
+        var start = ComputeWindowStart(_highlightedIndex, visibleRows, _items.Count);
+        var end = Math.Min(_items.Count, start + visibleRows);
+        var row = 0;
+        for (var index = start; index < end; index++, row++)
+        {
+            var highlight = index == _highlightedIndex ? ">" : " ";
+            var selectedMarker = index == SelectedIndex ? "*" : " ";
+            canvas.WriteText(content.X, content.Y + 1 + row, $"{highlight}{selectedMarker} {_items[index]}", content.Width);
+        }
+    }
+
+    private static int ComputeWindowStart(int highlightedIndex, int rows, int count)
+    {
+        if (count <= rows)
+        {
+            return 0;
+        }
+
+        var half = rows / 2;
+        var start = highlightedIndex - half;
+        if (start < 0)
+        {
+            return 0;
+        }
+
+        var maxStart = count - rows;
+        if (start > maxStart)
+        {
+            return maxStart;
+        }
+
+        return start;
+    }
+}
+
+public sealed class ComboboxComponent : IStatefulComponent
+{
+    private readonly List<string> _items = [];
+    private readonly List<int> _filteredIndices = [];
+    private int _highlightedFilteredIndex;
+
+    public TextInputModel Input { get; } = new();
+
+    public TextInputKeyMap InputKeyMap { get; set; } = TextInputKeyMap.Default;
+
+    public string Title { get; set; } = "Combobox";
+
+    public bool Focused { get; set; }
+
+    public bool IsOpen { get; private set; }
+
+    public int SelectedIndex { get; private set; } = -1;
+
+    public int MaxVisibleItems { get; set; } = 6;
+
+    public KeyBinding OpenKey { get; set; } = new("down", "open", "down");
+
+    public KeyBinding CloseKey { get; set; } = new("esc", "close", "escape");
+
+    public KeyBinding NextItemKey { get; set; } = new("down/j", "next item", "down", "j");
+
+    public KeyBinding PreviousItemKey { get; set; } = new("up/k", "previous item", "up", "k");
+
+    public KeyBinding ConfirmSelectionKey { get; set; } = new("enter", "select", "enter");
+
+    public string SelectedItem => SelectedIndex >= 0 && SelectedIndex < _items.Count
+        ? _items[SelectedIndex]
+        : string.Empty;
+
+    public void SetItems(IEnumerable<string> items)
+    {
+        _items.Clear();
+        _items.AddRange(items);
+        if (SelectedIndex >= _items.Count)
+        {
+            SelectedIndex = -1;
+        }
+
+        RefreshFilteredIndices();
+    }
+
+    public bool Update(IMessage message)
+    {
+        if (!Focused)
+        {
+            return false;
+        }
+
+        if (message is KeyPressMsg key)
+        {
+            if (IsOpen && CloseKey.Matches(key))
+            {
+                IsOpen = false;
+                return true;
+            }
+
+            if (IsOpen && NextItemKey.Matches(key) && _filteredIndices.Count > 0)
+            {
+                _highlightedFilteredIndex = (_highlightedFilteredIndex + 1) % _filteredIndices.Count;
+                return true;
+            }
+
+            if (IsOpen && PreviousItemKey.Matches(key) && _filteredIndices.Count > 0)
+            {
+                _highlightedFilteredIndex = (_highlightedFilteredIndex + _filteredIndices.Count - 1) % _filteredIndices.Count;
+                return true;
+            }
+
+            if (IsOpen && ConfirmSelectionKey.Matches(key))
+            {
+                return SelectHighlighted();
+            }
+
+            if (!IsOpen && OpenKey.Matches(key))
+            {
+                IsOpen = true;
+                if (_filteredIndices.Count > 0)
+                {
+                    _highlightedFilteredIndex = 0;
+                }
+
+                return true;
+            }
+        }
+
+        var inputResult = Input.Update(message, InputKeyMap);
+        if (inputResult.Changed)
+        {
+            RefreshFilteredIndices();
+            IsOpen = true;
+            return true;
+        }
+
+        if (inputResult.Submitted && IsOpen && _filteredIndices.Count > 0)
+        {
+            return SelectHighlighted();
+        }
+
+        return inputResult.Submitted;
+    }
+
+    public void Render(Canvas canvas, Rect rect)
+    {
+        var clipped = Rect.Intersect(rect, canvas.Bounds);
+        if (clipped.IsEmpty)
+        {
+            return;
+        }
+
+        canvas.DrawBox(clipped, Focused ? $"{Title} *" : Title);
+        var content = clipped.Inset(1, 1);
+        if (content.IsEmpty)
+        {
+            return;
+        }
+
+        var frameWidth = Math.Max(1, content.Width - 2);
+        var frame = Input.BuildFrame(frameWidth);
+        canvas.WriteText(content.X, content.Y, $"{(IsOpen ? "^" : "v")} {frame.Text}", content.Width);
+
+        if (!IsOpen || content.Height <= 1)
+        {
+            return;
+        }
+
+        if (_filteredIndices.Count == 0)
+        {
+            canvas.WriteText(content.X, content.Y + 1, "(no matches)", content.Width);
+            return;
+        }
+
+        var visibleRows = Math.Min(Math.Max(1, MaxVisibleItems), content.Height - 1);
+        var start = ComputeWindowStart(_highlightedFilteredIndex, visibleRows, _filteredIndices.Count);
+        var end = Math.Min(_filteredIndices.Count, start + visibleRows);
+        var row = 0;
+        for (var i = start; i < end; i++, row++)
+        {
+            var itemIndex = _filteredIndices[i];
+            var highlight = i == _highlightedFilteredIndex ? ">" : " ";
+            var selectedMarker = itemIndex == SelectedIndex ? "*" : " ";
+            canvas.WriteText(content.X, content.Y + 1 + row, $"{highlight}{selectedMarker} {_items[itemIndex]}", content.Width);
+        }
+    }
+
+    private bool SelectHighlighted()
+    {
+        if (_filteredIndices.Count == 0)
+        {
+            IsOpen = false;
+            return true;
+        }
+
+        var selectedFiltered = Math.Clamp(_highlightedFilteredIndex, 0, _filteredIndices.Count - 1);
+        SelectedIndex = _filteredIndices[selectedFiltered];
+        Input.SetValue(_items[SelectedIndex]);
+        RefreshFilteredIndices();
+        IsOpen = false;
+        return true;
+    }
+
+    private void RefreshFilteredIndices()
+    {
+        _filteredIndices.Clear();
+        var filter = Input.Value.Trim();
+        for (var i = 0; i < _items.Count; i++)
+        {
+            var include = filter.Length == 0
+                || _items[i].Contains(filter, StringComparison.OrdinalIgnoreCase);
+            if (include)
+            {
+                _filteredIndices.Add(i);
+            }
+        }
+
+        if (_filteredIndices.Count == 0)
+        {
+            _highlightedFilteredIndex = 0;
+            return;
+        }
+
+        if (SelectedIndex >= 0)
+        {
+            var selectedFilteredIndex = _filteredIndices.IndexOf(SelectedIndex);
+            if (selectedFilteredIndex >= 0)
+            {
+                _highlightedFilteredIndex = selectedFilteredIndex;
+                return;
+            }
+        }
+
+        _highlightedFilteredIndex = Math.Clamp(_highlightedFilteredIndex, 0, _filteredIndices.Count - 1);
+    }
+
+    private static int ComputeWindowStart(int highlightedIndex, int rows, int count)
+    {
+        if (count <= rows)
+        {
+            return 0;
+        }
+
+        var half = rows / 2;
+        var start = highlightedIndex - half;
+        if (start < 0)
+        {
+            return 0;
+        }
+
+        var maxStart = count - rows;
+        if (start > maxStart)
+        {
+            return maxStart;
+        }
+
+        return start;
+    }
+}
+
 public sealed class TableComponent : IStatefulComponent
 {
     public TableComponent(IReadOnlyList<string> headers)
