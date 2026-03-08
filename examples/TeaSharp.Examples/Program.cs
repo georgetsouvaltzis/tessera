@@ -55,7 +55,7 @@ internal sealed class CounterModel : IModel
     private readonly ViewportModel _logViewport = new();
     private readonly TextInputModel _commandInput = new()
     {
-        Placeholder = "type command (help, inc, dec, stress on/off/toggle, filter <term>, clear, protocol/dashboard/showcase, toast <text>, modal on/off/toggle, tab <n>)",
+        Placeholder = "type command (help, inc, dec, stress on/off/toggle, filter <term>, clear, protocol/dashboard/showcase/lab, toast <text>, modal on/off/toggle, tab <n>, cap <name>, clip read/write <text>)",
         MaxLength = 256,
     };
     private readonly List<ActionItem> _allActions =
@@ -80,7 +80,7 @@ internal sealed class CounterModel : IModel
         new KeyBinding(":", "enter command mode"),
         new KeyBinding("esc", "exit command mode"),
         new KeyBinding("?", "toggle help"),
-        new KeyBinding("1/2/3", "switch page"),
+        new KeyBinding("1/2/3/4", "switch page"),
         new KeyBinding("q", "quit"),
     ];
     private readonly KeyBinding[] _showcaseHelp =
@@ -91,6 +91,16 @@ internal sealed class CounterModel : IModel
         new KeyBinding("m", "modal"),
         new KeyBinding("a/z/r/f", "pane actions"),
         new KeyBinding("c/v/[/]", "table controls"),
+    ];
+    private readonly KeyBinding[] _labHelp =
+    [
+        new KeyBinding("f/b/u", "toggle fg/bg/cursor color"),
+        new KeyBinding("p/[ / ]", "cycle progress / adjust value"),
+        new KeyBinding("k", "toggle key event-type reporting"),
+        new KeyBinding("m", "toggle OnMouse callback"),
+        new KeyBinding("r/c", "query RGB/Tc capability"),
+        new KeyBinding("g/h/j", "query fg/bg/cursor color"),
+        new KeyBinding("y/o", "write/read clipboard"),
     ];
     private readonly List<string> _eventLog = [];
     private readonly LineChartComponent _throughputChart = new(capacity: 240)
@@ -160,6 +170,7 @@ internal sealed class CounterModel : IModel
     private readonly ComponentComposer _workspaceComposer = new();
 
     private TerminalCapabilityProfile _capabilities = TerminalCapabilityProfile.AllSupported;
+    private TerminalColorProfile _colorProfile = TerminalColorProfile.Unknown;
     private readonly Dictionary<int, ModeReportState> _modeReports = [];
 
     private int _count;
@@ -184,6 +195,20 @@ internal sealed class CounterModel : IModel
     private int _showcaseWidthSnapshot = 80;
     private int _showcaseHeightSnapshot = 24;
     private string _showcaseSourceSnapshot = "unknown";
+    private bool _labForegroundEnabled;
+    private bool _labBackgroundEnabled;
+    private bool _labCursorEnabled;
+    private bool _labKeyboardEventTypes;
+    private bool _labMouseInterceptorEnabled;
+    private TerminalProgressState _labProgressState = TerminalProgressState.Default;
+    private int _labProgressValue = 35;
+    private int _labMouseInterceptCount;
+    private string _labLastCapability = "none";
+    private string _labLastClipboard = "none";
+    private string _labForegroundColor = "n/a";
+    private string _labBackgroundColor = "n/a";
+    private string _labCursorColor = "n/a";
+    private int _labKeyboardFlags;
     private ThemePalette ActivePalette => _showcaseTheme.SelectedIndex switch
     {
         1 => OceanPalette,
@@ -249,12 +274,12 @@ internal sealed class CounterModel : IModel
         CaptureShowcaseSnapshot();
         AppendLog("TeaSharp workspace initialized.");
         AppendLog("Use tab to move focus between actions, log, and command input.");
-        AppendLog("Use ? to toggle full help and 1/2/3 to switch protocol/dashboard/showcase.");
+        AppendLog("Use ? to toggle full help and 1/2/3/4 to switch protocol/dashboard/showcase/lab.");
     }
 
     public Command? Init() => NextTickCommand(_stressMode);
 
-    private bool IsWorkspacePage => _page is AppPage.Dashboard or AppPage.Showcase;
+    private bool IsWorkspacePage => _page is AppPage.Dashboard or AppPage.Showcase or AppPage.CapabilityLab;
 
     public UpdateResult Update(IMessage message)
     {
@@ -312,6 +337,13 @@ internal sealed class CounterModel : IModel
             {
                 SwitchPage(AppPage.Showcase);
                 _lastEvent = "view: showcase";
+                return new UpdateResult(this, null);
+            }
+
+            if (IsPlainChar(key, "4") && !WasRecentEscape())
+            {
+                SwitchPage(AppPage.CapabilityLab);
+                _lastEvent = "view: lab";
                 return new UpdateResult(this, null);
             }
 
@@ -433,6 +465,71 @@ internal sealed class CounterModel : IModel
             return new UpdateResult(this, null);
         }
 
+        if (message is ColorProfileMsg colorProfile)
+        {
+            _colorProfile = colorProfile.Profile;
+            _lastEvent = $"color-profile: {_colorProfile}";
+            AppendLog(_lastEvent);
+            return new UpdateResult(this, null);
+        }
+
+        if (message is CapabilityMsg capability)
+        {
+            _labLastCapability = capability.Value is null
+                ? capability.Name
+                : $"{capability.Name}={capability.Value}";
+            _lastEvent = $"capability: {_labLastCapability}";
+            AppendLog(_lastEvent);
+            return new UpdateResult(this, null);
+        }
+
+        if (message is ClipboardMsg clipboard)
+        {
+            _labLastClipboard = $"sel={clipboard.Selection} text='{SanitizePreview(clipboard.Content)}'";
+            _lastEvent = "clipboard: read";
+            AppendLog(_labLastClipboard);
+            return new UpdateResult(this, null);
+        }
+
+        if (message is ForegroundColorMsg fgColor)
+        {
+            _labForegroundColor = fgColor.Color;
+            _lastEvent = $"fg-color: {fgColor.Color}";
+            AppendLog(_lastEvent);
+            return new UpdateResult(this, null);
+        }
+
+        if (message is BackgroundColorMsg bgColor)
+        {
+            _labBackgroundColor = bgColor.Color;
+            _lastEvent = $"bg-color: {bgColor.Color}";
+            AppendLog(_lastEvent);
+            return new UpdateResult(this, null);
+        }
+
+        if (message is CursorColorMsg cursorColor)
+        {
+            _labCursorColor = cursorColor.Color;
+            _lastEvent = $"cursor-color: {cursorColor.Color}";
+            AppendLog(_lastEvent);
+            return new UpdateResult(this, null);
+        }
+
+        if (message is KeyboardEnhancementsMsg enhancements)
+        {
+            _labKeyboardFlags = enhancements.Flags;
+            _lastEvent = $"keyboard-enhancements: flags={enhancements.Flags}";
+            AppendLog(_lastEvent);
+            return new UpdateResult(this, null);
+        }
+
+        if (message is CapabilityLabMouseInterceptMsg intercept)
+        {
+            _labMouseInterceptCount++;
+            _lastEvent = $"lab-mouse: {intercept.EventType} {intercept.Button} @ {intercept.X},{intercept.Y}";
+            return new UpdateResult(this, null);
+        }
+
         if (message is DashboardTickMsg)
         {
             _tickCount++;
@@ -520,8 +617,31 @@ internal sealed class CounterModel : IModel
             AppPage.Protocol => BuildProbeView(),
             AppPage.Dashboard => BuildWorkspaceView(out cursorX, out cursorY),
             AppPage.Showcase => BuildShowcaseView(out cursorX, out cursorY),
+            AppPage.CapabilityLab => BuildCapabilityLabView(out cursorX, out cursorY),
             _ => BuildProbeView(),
         };
+
+        var foregroundColor = _page == AppPage.CapabilityLab && _labForegroundEnabled
+            ? "#6B50FF"
+            : null;
+        var backgroundColor = _page == AppPage.CapabilityLab && _labBackgroundEnabled
+            ? "#101426"
+            : null;
+        var cursorColor = _page == AppPage.CapabilityLab && _labCursorEnabled
+            ? "#FFB86C"
+            : null;
+        TerminalProgress? progress = null;
+        if (_page == AppPage.CapabilityLab && _labProgressState != TerminalProgressState.None)
+        {
+            progress = new TerminalProgress(_labProgressState, _labProgressValue);
+        }
+
+        Func<MouseMsg, Command?>? onMouse = null;
+        if (_page == AppPage.CapabilityLab && _labMouseInterceptorEnabled)
+        {
+            onMouse = static mouse => _ => ValueTask.FromResult<IMessage?>(
+                new CapabilityLabMouseInterceptMsg(mouse.EventType, mouse.Button, mouse.X, mouse.Y, mouse.Modifiers));
+        }
 
         return ModelView.From(content) with
         {
@@ -530,13 +650,23 @@ internal sealed class CounterModel : IModel
             EnableFocusReporting = true,
             EnableSynchronizedUpdates = true,
             MouseMode = MouseMode.AllMotion,
+            KeyboardEnhancements = new KeyboardEnhancementOptions
+            {
+                ReportEventTypes = _page == AppPage.CapabilityLab && _labKeyboardEventTypes,
+            },
+            OnMouse = onMouse,
             CursorX = cursorX,
             CursorY = cursorY,
+            ForegroundColor = foregroundColor,
+            BackgroundColor = backgroundColor,
+            CursorColor = cursorColor,
+            Progress = progress,
             WindowTitle = _page switch
             {
                 AppPage.Protocol => "TeaSharp Protocol Probe",
                 AppPage.Dashboard => "TeaSharp Dashboard",
                 AppPage.Showcase => "TeaSharp Capability Showcase",
+                AppPage.CapabilityLab => "TeaSharp Capability Lab",
                 _ => "TeaSharp",
             },
         };
@@ -573,6 +703,11 @@ internal sealed class CounterModel : IModel
 
     private UpdateResult HandleWorkspaceKey(KeyPressMsg key)
     {
+        if (_page == AppPage.CapabilityLab)
+        {
+            return HandleCapabilityLabKey(key);
+        }
+
         if (_page == AppPage.Showcase
             && _focus == WorkspaceFocus.Showcase
             && HandleShowcaseNavigationKey(key))
@@ -626,12 +761,126 @@ internal sealed class CounterModel : IModel
         {
             var command = _commandInput.Value.Trim();
             _commandInput.Clear();
-            ExecuteCommand(command);
-            return new UpdateResult(this, null);
+            var commandEffect = ExecuteCommand(command);
+            return new UpdateResult(this, commandEffect);
         }
 
         _lastEvent = $"key: {key.Keystroke()}";
         return new UpdateResult(this, null);
+    }
+
+    private UpdateResult HandleCapabilityLabKey(KeyPressMsg key)
+    {
+        if (_focus == WorkspaceFocus.Command
+            && _workspaceInputMode != WorkspaceInputMode.Command)
+        {
+            _lastEvent = "command mode locked (press : to enter)";
+            return new UpdateResult(this, null);
+        }
+
+        if (_focus == WorkspaceFocus.Command)
+        {
+            var result = _commandInput.Update(key, _inputKeys);
+            if (result.Submitted)
+            {
+                var command = _commandInput.Value.Trim();
+                _commandInput.Clear();
+                var commandEffect = ExecuteCommand(command);
+                return new UpdateResult(this, commandEffect);
+            }
+
+            _lastEvent = $"key: {key.Keystroke()}";
+            return new UpdateResult(this, null);
+        }
+
+        Command? effect = null;
+        string? action = null;
+
+        if (IsPlainChar(key, "f"))
+        {
+            _labForegroundEnabled = !_labForegroundEnabled;
+            action = $"lab: foreground={ToYesNo(_labForegroundEnabled)}";
+        }
+        else if (IsPlainChar(key, "b"))
+        {
+            _labBackgroundEnabled = !_labBackgroundEnabled;
+            action = $"lab: background={ToYesNo(_labBackgroundEnabled)}";
+        }
+        else if (IsPlainChar(key, "u"))
+        {
+            _labCursorEnabled = !_labCursorEnabled;
+            action = $"lab: cursor-color={ToYesNo(_labCursorEnabled)}";
+        }
+        else if (IsPlainChar(key, "k"))
+        {
+            _labKeyboardEventTypes = !_labKeyboardEventTypes;
+            action = $"lab: key-event-types={ToYesNo(_labKeyboardEventTypes)}";
+        }
+        else if (IsPlainChar(key, "m"))
+        {
+            _labMouseInterceptorEnabled = !_labMouseInterceptorEnabled;
+            action = $"lab: onmouse={ToYesNo(_labMouseInterceptorEnabled)}";
+        }
+        else if (IsPlainChar(key, "p"))
+        {
+            CycleLabProgressState();
+            action = $"lab: progress-state={_labProgressState.ToString().ToLowerInvariant()}";
+        }
+        else if (IsPlainChar(key, "["))
+        {
+            _labProgressValue = Math.Max(0, _labProgressValue - 5);
+            action = $"lab: progress-value={_labProgressValue}";
+        }
+        else if (IsPlainChar(key, "]"))
+        {
+            _labProgressValue = Math.Min(100, _labProgressValue + 5);
+            action = $"lab: progress-value={_labProgressValue}";
+        }
+        else if (IsPlainChar(key, "r"))
+        {
+            effect = Tea.Cmd.RequestCapability("RGB");
+            action = "lab: query capability RGB";
+        }
+        else if (IsPlainChar(key, "c"))
+        {
+            effect = Tea.Cmd.RequestCapability("Tc");
+            action = "lab: query capability Tc";
+        }
+        else if (IsPlainChar(key, "g"))
+        {
+            effect = Tea.Cmd.RequestForegroundColor();
+            action = "lab: query foreground color";
+        }
+        else if (IsPlainChar(key, "h"))
+        {
+            effect = Tea.Cmd.RequestBackgroundColor();
+            action = "lab: query background color";
+        }
+        else if (IsPlainChar(key, "j"))
+        {
+            effect = Tea.Cmd.RequestCursorColor();
+            action = "lab: query cursor color";
+        }
+        else if (IsPlainChar(key, "y"))
+        {
+            effect = Tea.Cmd.SetClipboard($"TeaSharp lab clipboard {_tickCount}");
+            action = "lab: write clipboard";
+        }
+        else if (IsPlainChar(key, "o"))
+        {
+            effect = Tea.Cmd.ReadClipboard();
+            action = "lab: read clipboard";
+        }
+
+        if (action is null)
+        {
+            _lastEvent = $"key: {key.Keystroke()}";
+            return new UpdateResult(this, null);
+        }
+
+        _lastEvent = action;
+        AppendLog(action);
+        return new UpdateResult(this, effect);
     }
 
     private bool HandleShowcaseNavigationKey(KeyPressMsg key)
@@ -1026,20 +1275,20 @@ internal sealed class CounterModel : IModel
         }
     }
 
-    private void ExecuteCommand(string command)
+    private Command? ExecuteCommand(string command)
     {
         if (string.IsNullOrWhiteSpace(command))
         {
             AppendLog("cmd: (empty)");
-            return;
+            return null;
         }
 
         AppendLog($"cmd> {command}");
 
         if (string.Equals(command, "help", StringComparison.OrdinalIgnoreCase))
         {
-            AppendLog("commands: help | inc | dec | stress on/off/toggle | filter <term> | clear | protocol | dashboard | showcase | toast <text> | modal on/off/toggle | tab <n>");
-            return;
+            AppendLog("commands: help | inc | dec | stress on/off/toggle | filter <term> | clear | protocol | dashboard | showcase | lab | toast <text> | modal on/off/toggle | tab <n> | cap <name> | clip read | clip write <text> | color fg/bg/cursor");
+            return null;
         }
 
         if (string.Equals(command, "inc", StringComparison.OrdinalIgnoreCase))
@@ -1047,7 +1296,7 @@ internal sealed class CounterModel : IModel
             _count++;
             RefreshStatusBars();
             AppendLog($"count={_count}");
-            return;
+            return null;
         }
 
         if (string.Equals(command, "dec", StringComparison.OrdinalIgnoreCase))
@@ -1055,7 +1304,7 @@ internal sealed class CounterModel : IModel
             _count--;
             RefreshStatusBars();
             AppendLog($"count={_count}");
-            return;
+            return null;
         }
 
         if (command.StartsWith("stress ", StringComparison.OrdinalIgnoreCase))
@@ -1080,7 +1329,7 @@ internal sealed class CounterModel : IModel
                 AppendLog($"stress toggled => {(_stressMode ? "on" : "off")}");
             }
 
-            return;
+            return null;
         }
 
         if (string.Equals(command, "clear", StringComparison.OrdinalIgnoreCase))
@@ -1090,7 +1339,7 @@ internal sealed class CounterModel : IModel
             _logViewport.Clear();
             RefreshStatusBars();
             AppendLog("log cleared");
-            return;
+            return null;
         }
 
         if (command.StartsWith("filter", StringComparison.OrdinalIgnoreCase))
@@ -1102,28 +1351,35 @@ internal sealed class CounterModel : IModel
             AppendLog(term.Length == 0
                 ? "action filter reset"
                 : $"action filter='{term}'");
-            return;
+            return null;
         }
 
         if (string.Equals(command, "protocol", StringComparison.OrdinalIgnoreCase))
         {
             SwitchPage(AppPage.Protocol);
             AppendLog("view=protocol");
-            return;
+            return null;
         }
 
         if (string.Equals(command, "dashboard", StringComparison.OrdinalIgnoreCase))
         {
             SwitchPage(AppPage.Dashboard);
             AppendLog("view=dashboard");
-            return;
+            return null;
         }
 
         if (string.Equals(command, "showcase", StringComparison.OrdinalIgnoreCase))
         {
             SwitchPage(AppPage.Showcase);
             AppendLog("view=showcase");
-            return;
+            return null;
+        }
+
+        if (string.Equals(command, "lab", StringComparison.OrdinalIgnoreCase))
+        {
+            SwitchPage(AppPage.CapabilityLab);
+            AppendLog("view=lab");
+            return null;
         }
 
         if (command.StartsWith("toast ", StringComparison.OrdinalIgnoreCase))
@@ -1137,7 +1393,7 @@ internal sealed class CounterModel : IModel
             _showcaseToasts.Push(new ToastMessage(payload, TtlTicks: 90, Severity: ToastSeverity.Success));
             CaptureShowcaseSnapshot("showcase: toast");
             AppendLog("toast queued");
-            return;
+            return null;
         }
 
         if (command.StartsWith("modal ", StringComparison.OrdinalIgnoreCase))
@@ -1158,7 +1414,7 @@ internal sealed class CounterModel : IModel
 
             CaptureShowcaseSnapshot($"showcase: modal={(_showcaseModal.Visible ? "on" : "off")}");
             AppendLog($"modal={(_showcaseModal.Visible ? "on" : "off")}");
-            return;
+            return null;
         }
 
         if (command.StartsWith("tab ", StringComparison.OrdinalIgnoreCase))
@@ -1170,11 +1426,61 @@ internal sealed class CounterModel : IModel
                 EnsureShowcasePaneInRange();
                 CaptureShowcaseSnapshot($"showcase: tab={_showcaseTabs.SelectedIndex + 1}");
                 AppendLog($"tab={_showcaseTabs.SelectedIndex + 1}");
-                return;
+                return null;
             }
         }
 
+        if (command.StartsWith("cap ", StringComparison.OrdinalIgnoreCase))
+        {
+            var capability = command[4..].Trim();
+            if (capability.Length == 0)
+            {
+                AppendLog("capability name required");
+                return null;
+            }
+
+            AppendLog($"query capability={capability}");
+            return Tea.Cmd.RequestCapability(capability);
+        }
+
+        if (string.Equals(command, "clip read", StringComparison.OrdinalIgnoreCase))
+        {
+            AppendLog("query clipboard read");
+            return Tea.Cmd.ReadClipboard();
+        }
+
+        if (command.StartsWith("clip write ", StringComparison.OrdinalIgnoreCase))
+        {
+            var content = command[11..];
+            if (string.IsNullOrWhiteSpace(content))
+            {
+                content = "TeaSharp clipboard sample";
+            }
+
+            AppendLog("clipboard write issued");
+            return Tea.Cmd.SetClipboard(content);
+        }
+
+        if (string.Equals(command, "color fg", StringComparison.OrdinalIgnoreCase))
+        {
+            AppendLog("query foreground color");
+            return Tea.Cmd.RequestForegroundColor();
+        }
+
+        if (string.Equals(command, "color bg", StringComparison.OrdinalIgnoreCase))
+        {
+            AppendLog("query background color");
+            return Tea.Cmd.RequestBackgroundColor();
+        }
+
+        if (string.Equals(command, "color cursor", StringComparison.OrdinalIgnoreCase))
+        {
+            AppendLog("query cursor color");
+            return Tea.Cmd.RequestCursorColor();
+        }
+
         AppendLog($"unknown command: {command}");
+        return null;
     }
 
     private void AppendLog(string line)
@@ -1217,7 +1523,7 @@ internal sealed class CounterModel : IModel
             $"{Label("Typed length:")} {_typedText.Length}\n" +
             $"{Label("Typed text:")} {SanitizePreview(_typedText)}\n\n" +
             $"{MutedStyle.Render("Try live:")}\n" +
-            "- press 2 for dashboard, 3 for showcase\n" +
+            "- press 2 for dashboard, 3 for showcase, 4 for capability lab\n" +
             "- up/down to change count\n" +
             "- move/click mouse in terminal window\n" +
             "- press ctrl+s to toggle render stress mode\n" +
@@ -1239,7 +1545,7 @@ internal sealed class CounterModel : IModel
                 "TeaSharp Dashboard\n\n" +
                 "Terminal too small for dashboard mode.\n" +
                 "Resize to at least 52x18.\n\n" +
-                "Press 1 protocol, 2 dashboard, 3 showcase.";
+                "Press 1 protocol, 2 dashboard, 3 showcase, 4 lab.";
             return WarningStyle.Render(compact);
         }
 
@@ -1426,7 +1732,7 @@ internal sealed class CounterModel : IModel
                 "TeaSharp Capability Showcase\n\n" +
                 "Terminal too small for showcase mode.\n" +
                 "Resize to at least 76x22.\n\n" +
-                "Press 1 protocol, 2 dashboard, 3 showcase.";
+                "Press 1 protocol, 2 dashboard, 3 showcase, 4 lab.";
             return WarningStyle.Render(compact);
         }
 
@@ -1537,6 +1843,143 @@ internal sealed class CounterModel : IModel
 
         if (_focus == WorkspaceFocus.Command)
         {
+            cursorX = Math.Clamp(footerRect.X + 3 + inputFrame.CursorColumn, footerRect.X + 1, footerRect.Right - 2);
+            cursorY = Math.Clamp(footerRect.Y + 1, footerRect.Y + 1, footerRect.Bottom - 2);
+        }
+
+        var rendered = canvas.Render();
+        return ApplyWorkspaceStyles(rendered, footerRect.Y + 1, inputFrame.PlaceholderVisible);
+    }
+
+    private string BuildCapabilityLabView(out int? cursorX, out int? cursorY)
+    {
+        cursorX = null;
+        cursorY = null;
+
+        if (_width < 76 || _height < 22)
+        {
+            var compact =
+                "TeaSharp Capability Lab\n\n" +
+                "Terminal too small for capability lab mode.\n" +
+                "Resize to at least 76x22.\n\n" +
+                "Press 1 protocol, 2 dashboard, 3 showcase, 4 lab.";
+            return WarningStyle.Render(compact);
+        }
+
+        var canvas = new Canvas(_width, _height, CanvasTextMode.GraphemeAware);
+        const int headerHeight = 3;
+        const int footerHeight = 6;
+        UiWidgets.DrawStatusBar(
+            canvas,
+            new Rect(0, 0, _width, 1),
+            "TeaSharp Capability Lab",
+            $"focus={_focus.ToString().ToLowerInvariant()} input={InputModeLabel()} profile={_colorProfile.ToString().ToLowerInvariant()}");
+        UiWidgets.DrawBreadcrumb(
+            canvas,
+            new Rect(0, 1, _width, 1),
+            ["TeaSharp", "Lab", "Terminal Capabilities"]);
+        canvas.DrawHorizontalLine(0, 2, _width, '─');
+
+        var bodyRect = new Rect(0, headerHeight, _width, _height - headerHeight - footerHeight);
+        var (leftRect, rightRect) = Layout.SplitVertical(bodyRect, Math.Max(34, (bodyRect.Width * 43) / 100), minFirst: 28, minSecond: 32);
+        var (controlsRect, quickActionsRect) = Layout.SplitHorizontal(leftRect, Math.Max(10, leftRect.Height - 8), minFirst: 9, minSecond: 6);
+        var (diagRect, logRect) = Layout.SplitHorizontal(rightRect, Math.Max(10, (rightRect.Height * 56) / 100), minFirst: 8, minSecond: 6);
+
+        var controlsTitle = _focus == WorkspaceFocus.Actions ? "Controls *" : "Controls";
+        var controlsLines = new List<string>
+        {
+            "render toggles:",
+            $"  f foreground color   : {ToYesNo(_labForegroundEnabled)}",
+            $"  b background color   : {ToYesNo(_labBackgroundEnabled)}",
+            $"  u cursor color       : {ToYesNo(_labCursorEnabled)}",
+            $"  p progress state     : {_labProgressState.ToString().ToLowerInvariant()}",
+            $"  [ / ] progress value : {_labProgressValue}%",
+            "",
+            "input toggles:",
+            $"  k key event types    : {ToYesNo(_labKeyboardEventTypes)}",
+            $"  m OnMouse callback   : {ToYesNo(_labMouseInterceptorEnabled)}",
+            $"  mouse intercepts     : {_labMouseInterceptCount}",
+        };
+        TWidgets.DrawPanel(canvas, controlsRect, controlsTitle, controlsLines);
+
+        var quickActionsLines = new List<string>
+        {
+            "query actions:",
+            "  r capability RGB",
+            "  c capability Tc",
+            "  g/h/j request fg/bg/cursor color",
+            "  y write clipboard sample",
+            "  o read clipboard",
+            "",
+            "command mode:",
+            "  : enter, esc exit, help for full command list",
+        };
+        TWidgets.DrawPanel(canvas, quickActionsRect, "Quick Actions", quickActionsLines);
+
+        var progressLabel = _labProgressState == TerminalProgressState.None
+            ? "disabled"
+            : $"{_labProgressState.ToString().ToLowerInvariant()} {_labProgressValue}%";
+        var diagnosticsLines = new List<string>
+        {
+            $"color profile: {_colorProfile}",
+            $"last capability: {_labLastCapability}",
+            $"last clipboard: {_labLastClipboard}",
+            $"fg color reply: {_labForegroundColor}",
+            $"bg color reply: {_labBackgroundColor}",
+            $"cursor color reply: {_labCursorColor}",
+            $"keyboard flags: {_labKeyboardFlags}",
+            $"progress: {progressLabel}",
+            $"last event: {_lastEvent}",
+        };
+        TWidgets.DrawPanel(canvas, diagRect, "Diagnostics", diagnosticsLines);
+
+        _logViewport.Resize(Math.Max(12, logRect.Width - 2), Math.Max(3, logRect.Height - 2));
+        var logLines = _logViewport.RenderLines();
+        TWidgets.DrawPanel(
+            canvas,
+            logRect,
+            _focus == WorkspaceFocus.Log ? "Log *" : "Log",
+            [.. logLines]);
+
+        if (_focus == WorkspaceFocus.Actions)
+        {
+            DrawFocusChrome(canvas, controlsRect);
+        }
+        else if (_focus == WorkspaceFocus.Log)
+        {
+            DrawFocusChrome(canvas, logRect);
+        }
+
+        var footerRect = new Rect(0, _height - footerHeight, _width, footerHeight);
+        var inputFrame = _commandInput.BuildFrame(Math.Max(12, _width - 6));
+        var inputLine = $"> {inputFrame.Text}";
+
+        var activeBindings = _focus switch
+        {
+            WorkspaceFocus.Log => _viewportKeys.HelpBindings,
+            WorkspaceFocus.Command => _inputKeys.HelpBindings,
+            _ => _labHelp,
+        };
+        var bindingSet = _showFullHelp
+            ? activeBindings.Concat(_globalHelp)
+            : activeBindings.Take(5).Concat(_globalHelp);
+        var helpText = HelpView.RenderCompact(bindingSet, Math.Max(10, _width - 4));
+
+        var footerLines = new List<string>
+        {
+            inputLine,
+            $"focus={_focus.ToString().ToLowerInvariant()} page=lab input={InputModeLabel()} help={(_showFullHelp ? "full" : "compact")} mode={ShowcaseModeLabel()}",
+        };
+        footerLines.AddRange(helpText.Split('\n'));
+
+        TWidgets.DrawPanel(
+            canvas,
+            footerRect,
+            _focus == WorkspaceFocus.Command ? $"Command * [{InputModeLabel()}]" : $"Command [{InputModeLabel()}]",
+            footerLines);
+        if (_focus == WorkspaceFocus.Command)
+        {
+            DrawFocusChrome(canvas, footerRect);
             cursorX = Math.Clamp(footerRect.X + 3 + inputFrame.CursorColumn, footerRect.X + 1, footerRect.Right - 2);
             cursorY = Math.Clamp(footerRect.Y + 1, footerRect.Y + 1, footerRect.Bottom - 2);
         }
@@ -1932,10 +2375,23 @@ internal sealed class CounterModel : IModel
             }
             : _focus switch
             {
+                WorkspaceFocus.Showcase => WorkspaceFocus.Actions,
                 WorkspaceFocus.Actions => WorkspaceFocus.Log,
                 WorkspaceFocus.Log => WorkspaceFocus.Command,
                 _ => WorkspaceFocus.Actions,
             };
+    }
+
+    private void CycleLabProgressState()
+    {
+        _labProgressState = _labProgressState switch
+        {
+            TerminalProgressState.Default => TerminalProgressState.Warning,
+            TerminalProgressState.Warning => TerminalProgressState.Error,
+            TerminalProgressState.Error => TerminalProgressState.Indeterminate,
+            TerminalProgressState.Indeterminate => TerminalProgressState.None,
+            _ => TerminalProgressState.Default,
+        };
     }
 
     private bool IsFocusedShowcasePane(bool showcaseFocused, ShowcasePane pane)
@@ -2110,6 +2566,12 @@ internal sealed class CounterModel : IModel
 }
 
 internal sealed record DashboardTickMsg : IMessage;
+internal sealed record CapabilityLabMouseInterceptMsg(
+    MouseEventType EventType,
+    MouseButton Button,
+    int X,
+    int Y,
+    KeyModifiers Modifiers) : IMessage;
 
 internal sealed record ActionItem(string Name, string Shortcut);
 
@@ -2124,6 +2586,7 @@ internal enum AppPage
     Protocol = 0,
     Dashboard = 1,
     Showcase = 2,
+    CapabilityLab = 3,
 }
 
 internal enum WorkspaceFocus
