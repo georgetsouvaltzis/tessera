@@ -4,6 +4,7 @@
     <Project Path="examples/TeaSharp.ComboBoxExample/TeaSharp.ComboBoxExample.csproj" />
     <Project Path="examples/TeaSharp.DropdownExample/TeaSharp.DropdownExample.csproj" />
     <Project Path="examples/TeaSharp.Examples/TeaSharp.Examples.csproj" />
+    <Project Path="examples/TeaSharp.KanbanExample/TeaSharp.KanbanExample.csproj" />
     <Project Path="examples/TeaSharp.ProductivityWidgetsExample/TeaSharp.ProductivityWidgetsExample.csproj" />
     <Project Path="examples/TeaSharp.WidgetGallery/TeaSharp.WidgetGallery.csproj" />
   </Folder>

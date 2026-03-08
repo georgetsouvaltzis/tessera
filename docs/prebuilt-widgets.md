@@ -95,6 +95,7 @@ dotnet run --project examples/TeaSharp.DropdownExample/TeaSharp.DropdownExample.
 dotnet run --project examples/TeaSharp.ComboBoxExample/TeaSharp.ComboBoxExample.csproj
 dotnet run --project examples/TeaSharp.AdvancedWidgetsExample/TeaSharp.AdvancedWidgetsExample.csproj
 dotnet run --project examples/TeaSharp.ProductivityWidgetsExample/TeaSharp.ProductivityWidgetsExample.csproj
+dotnet run --project examples/TeaSharp.KanbanExample/TeaSharp.KanbanExample.csproj
 ```
 
 Core gallery hotkeys:

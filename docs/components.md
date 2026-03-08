@@ -136,6 +136,12 @@ A dedicated app now exists for the prebuilt widget set:
 - run: `dotnet run --project examples/TeaSharp.WidgetGallery/TeaSharp.WidgetGallery.csproj`
 - docs: `docs/prebuilt-widgets.md`
 
+Scenario app example:
+
+- project: `examples/TeaSharp.KanbanExample`
+- run: `dotnet run --project examples/TeaSharp.KanbanExample/TeaSharp.KanbanExample.csproj`
+- flow: multi-board Kanban with lane movement, quick card creation, delete confirmation dialog, and activity feed.
+
 ## Custom Components
 
 Create custom components by implementing `ICanvasComponent`:
