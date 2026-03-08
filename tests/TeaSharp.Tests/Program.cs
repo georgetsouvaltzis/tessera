@@ -17,5 +17,7 @@ runner.AddRange(UiKitComponentTests.Cases());
 runner.AddRange(ShowcaseInteractionTests.Cases());
 runner.AddRange(PrebuiltWidgetTests.Cases());
 runner.AddRange(WidgetStatePaletteTests.Cases());
+runner.AddRange(AdvancedPrebuiltWidgetTests.Cases());
+runner.AddRange(KeyBindingTests.Cases());
 
 return await runner.RunAsync();

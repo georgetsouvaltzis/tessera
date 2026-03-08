@@ -75,6 +75,13 @@ The design follows patterns used in Bubble Tea examples:
     - `LogViewerComponent`
     - `DialogComponent`
     - `LayoutContainerComponent`
+    - `BadgeComponent`
+    - `ToggleSwitchComponent`
+    - `SliderComponent`
+    - `SpinnerComponent`
+    - `CommandPaletteComponent`
+    - `TreeViewComponent`
+    - `NotificationCenterComponent`
     - prebuilt widgets now allow key behavior injection:
       - `TextInputComponent.KeyMap`
       - `TextAreaComponent.InputKeyMap` / `TextAreaComponent.ViewportKeyMap`

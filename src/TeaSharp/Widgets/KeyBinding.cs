@@ -87,6 +87,12 @@ public sealed class KeyBinding
                 return false;
             }
 
+            if (string.Equals(chord, "+", StringComparison.Ordinal))
+            {
+                parsed = new KeyChord(KeyCode.Character, '+', KeyModifiers.None);
+                return true;
+            }
+
             var modifiers = KeyModifiers.None;
             string? keyToken = null;
             var segments = chord.Split('+', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
@@ -173,6 +179,7 @@ public sealed class KeyBinding
                 "f11" => KeyCode.F11,
                 "f12" => KeyCode.F12,
                 "space" => KeyCode.Character,
+                "plus" => KeyCode.Character,
                 _ => KeyCode.Unknown,
             };
 
@@ -184,6 +191,10 @@ public sealed class KeyBinding
             if (keyCode == KeyCode.Character && token == "space")
             {
                 character = ' ';
+            }
+            else if (keyCode == KeyCode.Character && token == "plus")
+            {
+                character = '+';
             }
 
             return true;

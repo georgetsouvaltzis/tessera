@@ -1,5 +1,6 @@
 <Solution>
   <Folder Name="/examples/">
+    <Project Path="examples/TeaSharp.AdvancedWidgetsExample/TeaSharp.AdvancedWidgetsExample.csproj" />
     <Project Path="examples/TeaSharp.ComboBoxExample/TeaSharp.ComboBoxExample.csproj" />
     <Project Path="examples/TeaSharp.DropdownExample/TeaSharp.DropdownExample.csproj" />
     <Project Path="examples/TeaSharp.Examples/TeaSharp.Examples.csproj" />

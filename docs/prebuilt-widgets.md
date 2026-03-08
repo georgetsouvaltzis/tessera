@@ -17,6 +17,13 @@ TeaSharp provides a prebuilt widget layer in `TeaSharp.Components.PrebuiltWidget
 11. `StatusBarComponent`
 12. `LogViewerComponent`
 13. `LayoutContainerComponent`
+14. `BadgeComponent`
+15. `ToggleSwitchComponent`
+16. `SliderComponent`
+17. `SpinnerComponent`
+18. `CommandPaletteComponent`
+19. `TreeViewComponent`
+20. `NotificationCenterComponent`
 
 ## Notes
 
@@ -28,6 +35,11 @@ TeaSharp provides a prebuilt widget layer in `TeaSharp.Components.PrebuiltWidget
 - `ComboboxComponent` combines text filtering with keyboard-driven option selection.
 - `LogViewerComponent` supports append, filter, pause, clear, and scrolling.
 - `LayoutContainerComponent` supports `Vertical`, `Horizontal`, and `Grid` layout modes.
+- `CommandPaletteComponent` provides fuzzy command filtering and execution (`ctrl+p` default open key).
+- `TreeViewComponent` provides hierarchical expand/collapse navigation with keyboard controls.
+- `NotificationCenterComponent` provides persistent event feed, read/dismiss, and severity-based styling.
+- `ToggleSwitchComponent`, `SliderComponent`, and `SpinnerComponent` provide interactive control primitives.
+- `BadgeComponent` provides compact state/health labeling.
 - Most prebuilt widgets expose `ShowBorder` (`true` by default) for minimal/borderless layouts.
 - `ListComponent<T>`, `DropdownComponent`, and `ComboboxComponent` support state-driven styling through:
   - `WidgetVisualState`
@@ -72,6 +84,7 @@ Dedicated widget-focused demos are also available:
 ```bash
 dotnet run --project examples/TeaSharp.DropdownExample/TeaSharp.DropdownExample.csproj
 dotnet run --project examples/TeaSharp.ComboBoxExample/TeaSharp.ComboBoxExample.csproj
+dotnet run --project examples/TeaSharp.AdvancedWidgetsExample/TeaSharp.AdvancedWidgetsExample.csproj
 ```
 
 Core gallery hotkeys:
