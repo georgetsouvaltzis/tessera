@@ -4,19 +4,11 @@ namespace TeaSharp.Tests;
 
 internal static class ApiErgonomicsTests
 {
-    private enum FocusTarget
-    {
-        Button = 0,
-        Input = 1,
-        Progress = 2,
-    }
-
     public static IEnumerable<TestCase> Cases()
     {
         yield return new TestCase("ApiErgonomics_TextInputOptions_ConfigureComponentWithoutNestedInputAccess", TextInputOptions_ConfigureComponentWithoutNestedInputAccess);
         yield return new TestCase("ApiErgonomics_TextAreaOptions_ConfigureComponentWithoutNestedInputAccess", TextAreaOptions_ConfigureComponentWithoutNestedInputAccess);
         yield return new TestCase("ApiErgonomics_TableOptions_ExposePageSizeWithoutInnerAccess", TableOptions_ExposePageSizeWithoutInnerAccess);
-        yield return new TestCase("ApiErgonomics_FocusGroup_AppliesSingleFocusedComponent", FocusGroup_AppliesSingleFocusedComponent);
     }
 
     private static Task TextInputOptions_ConfigureComponentWithoutNestedInputAccess()
@@ -64,25 +56,6 @@ internal static class ApiErgonomicsTests
 
         TestAssert.Equal("Deployments", table.Title, "Table options should set title.");
         TestAssert.Equal(6, table.PageSize, "Table options should set page size.");
-        return Task.CompletedTask;
-    }
-
-    private static Task FocusGroup_AppliesSingleFocusedComponent()
-    {
-        var button = new ButtonComponent();
-        var input = new TextInputComponent();
-        var progress = new ProgressBarComponent();
-        var group = new FocusGroup<FocusTarget>()
-            .Register(FocusTarget.Button, button)
-            .Register(FocusTarget.Input, input)
-            .Register(FocusTarget.Progress, progress);
-
-        var changed = group.Apply(FocusTarget.Input);
-
-        TestAssert.True(changed, "Focus group should report focus changes.");
-        TestAssert.True(!button.Focused, "Unselected component should not be focused.");
-        TestAssert.True(input.Focused, "Selected component should be focused.");
-        TestAssert.True(!progress.Focused, "Other components should be unfocused.");
         return Task.CompletedTask;
     }
 }

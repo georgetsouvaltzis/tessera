@@ -94,8 +94,6 @@ internal sealed class WidgetGalleryModel : IModel
     private readonly LabelComponent _layoutCellB = new(new LabelOptions(Title: "Stack B", Text: "Nested\nregions"));
     private readonly LabelComponent _layoutCellC = new(new LabelOptions(Title: "Stack C", Text: "Responsive\nby rect math"));
     private readonly LabelComponent _layoutCellD = new(new LabelOptions(Title: "Stack D", Text: "Children\ncomposed"));
-    private readonly FocusGroup<GalleryFocus> _focusGroup = new();
-
     private GalleryFocus _focus = GalleryFocus.Tabs;
     private int _width = 120;
     private int _height = 36;
@@ -126,15 +124,7 @@ internal sealed class WidgetGalleryModel : IModel
         _logs.Append("1-5 switch tabs");
         _logs.Append("q quits");
 
-        _focusGroup
-            .Register(GalleryFocus.Button, _button)
-            .Register(GalleryFocus.Progress, _progress)
-            .Register(GalleryFocus.TextInput, _textInput)
-            .Register(GalleryFocus.TextArea, _textArea)
-            .Register(GalleryFocus.List, _list)
-            .Register(GalleryFocus.Table, _table)
-            .Register(GalleryFocus.LogViewer, _logs)
-            .Register(GalleryFocus.Dialog, _dialog);
+        SetFocus(GalleryFocus.Tabs);
     }
 
     public Command? Init() => NextTick();
@@ -183,7 +173,7 @@ internal sealed class WidgetGalleryModel : IModel
 
             if (_dialog.Visible)
             {
-                _focus = GalleryFocus.Dialog;
+                SetFocus(GalleryFocus.Dialog);
                 var dialogChanged = RouteFocusedInput(key);
                 if (dialogChanged)
                 {
@@ -202,7 +192,7 @@ internal sealed class WidgetGalleryModel : IModel
 
             if (_focus == GalleryFocus.Tabs && TryHandleTabShortcut(key))
             {
-                _focus = GalleryFocus.Tabs;
+                SetFocus(GalleryFocus.Tabs);
                 _lastEvent = $"tab:{_tabs.SelectedIndex + 1}";
                 return null;
             }
@@ -210,7 +200,7 @@ internal sealed class WidgetGalleryModel : IModel
             if (key.IsCharacter('d', KeyModifiers.None) && _tabs.SelectedIndex == 3)
             {
                 _dialog.Visible = !_dialog.Visible;
-                _focus = _dialog.Visible ? GalleryFocus.Dialog : GalleryFocus.Tabs;
+                SetFocus(_dialog.Visible ? GalleryFocus.Dialog : GalleryFocus.Tabs);
                 _lastEvent = _dialog.Visible ? "dialog:open" : "dialog:close";
                 _logs.Append(_lastEvent);
                 return null;
@@ -244,8 +234,6 @@ internal sealed class WidgetGalleryModel : IModel
         {
             return ModelView.From("TeaSharp Widget Gallery\n\nTerminal too small.\nExpand to at least 60x18.");
         }
-
-        ApplyFocusFlags();
 
         var canvas = new Canvas(_width, _height, CanvasTextMode.GraphemeAware);
         canvas.Clear();
@@ -362,7 +350,7 @@ internal sealed class WidgetGalleryModel : IModel
                 _logs.Append($"dialog:{_dialog.LastResult}");
                 if (!_dialog.Visible)
                 {
-                    _focus = GalleryFocus.Tabs;
+                    SetFocus(GalleryFocus.Tabs);
                 }
             }
 
@@ -451,7 +439,7 @@ internal sealed class WidgetGalleryModel : IModel
         var tabsRect = new Rect(0, 0, _width, 1);
         if (_tabs.UpdateMouse(mouse, tabsRect))
         {
-            _focus = GalleryFocus.Tabs;
+            SetFocus(GalleryFocus.Tabs);
             _lastEvent = $"mouse:tab:{_tabs.SelectedIndex + 1}";
             changed = true;
         }
@@ -469,17 +457,17 @@ internal sealed class WidgetGalleryModel : IModel
         {
             if (left.Contains(mouse.X, mouse.Y))
             {
-                _focus = GalleryFocus.List;
+                SetFocus(GalleryFocus.List);
                 changed = true;
             }
             else if (tableRect.Contains(mouse.X, mouse.Y))
             {
-                _focus = GalleryFocus.Table;
+                SetFocus(GalleryFocus.Table);
                 changed = true;
             }
             else if (logsRect.Contains(mouse.X, mouse.Y))
             {
-                _focus = GalleryFocus.LogViewer;
+                SetFocus(GalleryFocus.LogViewer);
                 changed = true;
             }
         }
@@ -505,22 +493,30 @@ internal sealed class WidgetGalleryModel : IModel
         return changed;
     }
 
-    private void ApplyFocusFlags()
-    {
-        _focusGroup.Apply(_focus);
-    }
-
     private void CycleFocus()
     {
         var ring = FocusRingForTab();
         var index = Array.IndexOf(ring, _focus);
         if (index < 0)
         {
-            _focus = ring[0];
+            SetFocus(ring[0]);
             return;
         }
 
-        _focus = ring[(index + 1) % ring.Length];
+        SetFocus(ring[(index + 1) % ring.Length]);
+    }
+
+    private void SetFocus(GalleryFocus focus)
+    {
+        _focus = focus;
+        _button.Focused = focus == GalleryFocus.Button;
+        _progress.Focused = focus == GalleryFocus.Progress;
+        _textInput.Focused = focus == GalleryFocus.TextInput;
+        _textArea.Focused = focus == GalleryFocus.TextArea;
+        _list.Focused = focus == GalleryFocus.List;
+        _table.Focused = focus == GalleryFocus.Table;
+        _logs.Focused = focus == GalleryFocus.LogViewer;
+        _dialog.Focused = _dialog.Visible && focus == GalleryFocus.Dialog;
     }
 
     private GalleryFocus[] FocusRingForTab()

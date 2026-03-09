@@ -108,7 +108,7 @@ The design follows patterns used in Bubble Tea examples:
       - `DialogComponent.AcceptKey` / `DismissKey`
       - options-based constructors (`LabelOptions`, `ButtonOptions`, `TextInputOptions`, `TextAreaOptions`, `ListOptions<T>`, `TableOptions`, `ProgressBarOptions`, `StatusBarOptions`, `DialogOptions`, `LayoutContainerOptions`, `TabsOptions`)
       - convenience wrappers for common nested state (`TextInputComponent.Value` / `Placeholder` / `MaxLength`, `TextAreaComponent.Value`, `TableComponent.PageSize`)
-      - `FocusGroup<TFocus>` for central focus assignment in application-level focus rings
+      - explicit app-level `SetFocus(...)` helpers or `ComponentComposer.SetFocusedSlot(...)` for central focus ownership
       - `ShowBorder` toggle for minimalist rendering on border-capable prebuilt widgets
       - state styling primitives for child items (`WidgetVisualState`, `WidgetStatePalette`, `ItemStateResolver`/`OptionStateResolver`)
       - state palette inheritance (`WidgetStatePalette.Parent` / `InheritFrom(...)`)

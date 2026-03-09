@@ -79,8 +79,6 @@ internal sealed class AdvancedWidgetsModel : IModel
 
     private readonly StatusBarComponent _status = new(new StatusBarOptions(
         Theme: new UiTheme(StatusFill: '·')));
-    private readonly FocusGroup<AdvancedFocus> _focusGroup = new();
-
     private AdvancedFocus _focus = AdvancedFocus.Toggle;
     private int _width = 120;
     private int _height = 40;
@@ -125,12 +123,7 @@ internal sealed class AdvancedWidgetsModel : IModel
             new CommandPaletteItem("notifications.clear", "Clear notifications", "Drops all events", [WidgetVisualState.Warning]),
         ]);
 
-        _focusGroup
-            .Register(AdvancedFocus.Toggle, _toggle)
-            .Register(AdvancedFocus.Slider, _slider)
-            .Register(AdvancedFocus.Spinner, _spinner)
-            .Register(AdvancedFocus.Tree, _tree)
-            .Register(AdvancedFocus.Notifications, _notifications);
+        SetFocus(AdvancedFocus.Toggle);
     }
 
     public Command? Init() => NextTick();
@@ -181,7 +174,7 @@ internal sealed class AdvancedWidgetsModel : IModel
                 mouseChanged |= _toggle.UpdateMouse(mouse, layout.ToggleRect);
                 if (mouse is MouseClickMsg { Button: MouseButton.Left })
                 {
-                    _focus = AdvancedFocus.Toggle;
+                    SetFocus(AdvancedFocus.Toggle);
                     mouseChanged = true;
                 }
             }
@@ -191,7 +184,7 @@ internal sealed class AdvancedWidgetsModel : IModel
                 mouseChanged |= _slider.UpdateMouse(mouse, layout.SliderRect);
                 if (mouse is MouseClickMsg { Button: MouseButton.Left })
                 {
-                    _focus = AdvancedFocus.Slider;
+                    SetFocus(AdvancedFocus.Slider);
                     mouseChanged = true;
                 }
             }
@@ -201,7 +194,7 @@ internal sealed class AdvancedWidgetsModel : IModel
                 mouseChanged |= _spinner.UpdateMouse(mouse, layout.SpinnerRect);
                 if (mouse is MouseClickMsg { Button: MouseButton.Left })
                 {
-                    _focus = AdvancedFocus.Spinner;
+                    SetFocus(AdvancedFocus.Spinner);
                     mouseChanged = true;
                 }
             }
@@ -211,7 +204,7 @@ internal sealed class AdvancedWidgetsModel : IModel
                 mouseChanged |= _tree.UpdateMouse(mouse, layout.TreeRect);
                 if (mouse is MouseClickMsg { Button: MouseButton.Left })
                 {
-                    _focus = AdvancedFocus.Tree;
+                    SetFocus(AdvancedFocus.Tree);
                     mouseChanged = true;
                 }
             }
@@ -221,7 +214,7 @@ internal sealed class AdvancedWidgetsModel : IModel
                 mouseChanged |= _notifications.UpdateMouse(mouse, layout.NotificationRect);
                 if (mouse is MouseClickMsg { Button: MouseButton.Left })
                 {
-                    _focus = AdvancedFocus.Notifications;
+                    SetFocus(AdvancedFocus.Notifications);
                     mouseChanged = true;
                 }
             }
@@ -281,7 +274,6 @@ internal sealed class AdvancedWidgetsModel : IModel
 
     public ModelView View()
     {
-        ApplyFocusFlags();
         UpdateBadgeState();
 
         var width = Math.Max(72, _width);
@@ -369,21 +361,26 @@ internal sealed class AdvancedWidgetsModel : IModel
         };
     }
 
-    private void ApplyFocusFlags()
-    {
-        _focusGroup.Apply(_focus);
-    }
-
     private void CycleFocus()
     {
-        _focus = _focus switch
+        SetFocus(_focus switch
         {
             AdvancedFocus.Toggle => AdvancedFocus.Slider,
             AdvancedFocus.Slider => AdvancedFocus.Spinner,
             AdvancedFocus.Spinner => AdvancedFocus.Tree,
             AdvancedFocus.Tree => AdvancedFocus.Notifications,
             _ => AdvancedFocus.Toggle,
-        };
+        });
+    }
+
+    private void SetFocus(AdvancedFocus focus)
+    {
+        _focus = focus;
+        _toggle.Focused = focus == AdvancedFocus.Toggle;
+        _slider.Focused = focus == AdvancedFocus.Slider;
+        _spinner.Focused = focus == AdvancedFocus.Spinner;
+        _tree.Focused = focus == AdvancedFocus.Tree;
+        _notifications.Focused = focus == AdvancedFocus.Notifications;
     }
 
     private void ExecutePaletteCommand(string? commandId)

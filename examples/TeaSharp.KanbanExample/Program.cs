@@ -170,8 +170,6 @@ internal sealed class KanbanModel : IModel
 
     private readonly StatusBarComponent _status = new(new StatusBarOptions(
         Theme: new UiTheme(StatusFill: '·')));
-    private readonly FocusGroup<KanbanFocus> _focusGroup = new();
-
     private KanbanFocus _focus = KanbanFocus.Todo;
     private KanbanFocus _focusBeforeComposer = KanbanFocus.Todo;
     private int _width = 128;
@@ -187,12 +185,7 @@ internal sealed class KanbanModel : IModel
         RefreshColumns();
         PushInfo("Kanban ready. Tab focus, h/l move cards, n add, x delete.");
 
-        _focusGroup
-            .Register(KanbanFocus.Todo, _todo)
-            .Register(KanbanFocus.Doing, _doing)
-            .Register(KanbanFocus.Done, _done)
-            .Register(KanbanFocus.Composer, _composer)
-            .Register(KanbanFocus.Activity, _activity);
+        SetFocus(KanbanFocus.Todo);
     }
 
     public Command? Init() => null;
@@ -236,6 +229,10 @@ internal sealed class KanbanModel : IModel
                 {
                     _pendingDelete = null;
                     _lastEvent = "delete:cancelled";
+                    if (!_deleteDialog.Visible)
+                    {
+                        _deleteDialog.Focused = false;
+                    }
                 }
             }
 
@@ -373,7 +370,6 @@ internal sealed class KanbanModel : IModel
             return ModelView.From("TeaSharp Kanban Example\n\nTerminal too small. Expand to at least 92x26.");
         }
 
-        ApplyFocusFlags();
         UpdateDetails();
         UpdateCompletion();
         var layout = ComputeLayout(width, height);
@@ -527,7 +523,7 @@ internal sealed class KanbanModel : IModel
             if (layout.ActivityRect.Contains(click.X, click.Y))
             {
                 var changed = _focus != KanbanFocus.Activity;
-                _focus = KanbanFocus.Activity;
+                SetFocus(KanbanFocus.Activity);
                 if (changed)
                 {
                     _lastEvent = "focus:activity";
@@ -591,7 +587,7 @@ internal sealed class KanbanModel : IModel
             if (x >= cursor && x < end)
             {
                 var changed = _focus != KanbanFocus.Tabs;
-                _focus = KanbanFocus.Tabs;
+                SetFocus(KanbanFocus.Tabs);
 
                 var before = _boardTabs.SelectedIndex;
                 _boardTabs.Select(i);
@@ -614,7 +610,7 @@ internal sealed class KanbanModel : IModel
         }
 
         var focusChanged = _focus != KanbanFocus.Tabs;
-        _focus = KanbanFocus.Tabs;
+        SetFocus(KanbanFocus.Tabs);
         if (focusChanged)
         {
             _lastEvent = "focus:tabs";
@@ -641,7 +637,7 @@ internal sealed class KanbanModel : IModel
         if (mouse is MouseClickMsg { Button: MouseButton.Left })
         {
             changed = _focus != laneFocus;
-            _focus = laneFocus;
+            SetFocus(laneFocus);
         }
 
         var laneChanged = lane.UpdateMouse(mouse, laneRect);
@@ -710,7 +706,7 @@ internal sealed class KanbanModel : IModel
             var changed = _composer.Update(key);
             if (_composer.CancelCount != beforeCancel)
             {
-                _focus = _focusBeforeComposer;
+                SetFocus(_focusBeforeComposer);
                 eventOverride = $"focus:{_focus.ToString().ToLowerInvariant()}";
                 return true;
             }
@@ -784,13 +780,6 @@ internal sealed class KanbanModel : IModel
         _todo.Model.SetItems(ActiveBoard.Todo);
         _doing.Model.SetItems(ActiveBoard.Doing);
         _done.Model.SetItems(ActiveBoard.Done);
-    }
-
-    private void ApplyFocusFlags()
-    {
-        _focusGroup.Apply(_focus);
-        _completion.Focused = false;
-        _deleteDialog.Focused = _deleteDialog.Visible;
     }
 
     private void ApplyListPalettes()
@@ -891,7 +880,7 @@ internal sealed class KanbanModel : IModel
         var card = ActiveBoard.CreateCard(raw, priority);
         ActiveBoard.Todo.Insert(0, card);
         RefreshColumns();
-        _focus = KanbanFocus.Composer;
+        SetFocus(KanbanFocus.Composer);
         _lastEvent = $"card:new:{card.Id}";
         PushSuccess($"added #{card.Id} to todo");
     }
@@ -1012,6 +1001,7 @@ internal sealed class KanbanModel : IModel
         if (_pendingDelete is null)
         {
             _deleteDialog.Visible = false;
+            _deleteDialog.Focused = false;
             return;
         }
 
@@ -1019,6 +1009,7 @@ internal sealed class KanbanModel : IModel
         RemoveCard(pending.Lane, pending.CardId);
         RefreshColumns();
         _deleteDialog.Visible = false;
+        _deleteDialog.Focused = false;
         _pendingDelete = null;
         _lastEvent = $"delete:{pending.CardId}";
         PushInfo($"deleted #{pending.CardId}");
@@ -1107,7 +1098,7 @@ internal sealed class KanbanModel : IModel
         var index = Array.IndexOf(values, _focus);
         if (index < 0)
         {
-            _focus = KanbanFocus.Todo;
+            SetFocus(KanbanFocus.Todo);
             return;
         }
 
@@ -1117,7 +1108,7 @@ internal sealed class KanbanModel : IModel
             next += values.Length;
         }
 
-        _focus = values[next];
+        SetFocus(values[next]);
     }
 
     private void EnterComposerFocus()
@@ -1127,7 +1118,7 @@ internal sealed class KanbanModel : IModel
             _focusBeforeComposer = _focus;
         }
 
-        _focus = KanbanFocus.Composer;
+        SetFocus(KanbanFocus.Composer);
     }
 
     private bool IsLaneFocus()
@@ -1142,14 +1133,29 @@ internal sealed class KanbanModel : IModel
             return;
         }
 
-        _focus = (delta, _focus) switch
+        SetFocus((delta, _focus) switch
         {
             (< 0, KanbanFocus.Doing) => KanbanFocus.Todo,
             (< 0, KanbanFocus.Done) => KanbanFocus.Doing,
             (> 0, KanbanFocus.Todo) => KanbanFocus.Doing,
             (> 0, KanbanFocus.Doing) => KanbanFocus.Done,
             _ => _focus,
-        };
+        });
+    }
+
+    private void SetFocus(KanbanFocus focus)
+    {
+        _focus = focus;
+        _todo.Focused = focus == KanbanFocus.Todo;
+        _doing.Focused = focus == KanbanFocus.Doing;
+        _done.Focused = focus == KanbanFocus.Done;
+        _composer.Focused = focus == KanbanFocus.Composer;
+        _activity.Focused = focus == KanbanFocus.Activity;
+        _completion.Focused = false;
+        if (!_deleteDialog.Visible)
+        {
+            _deleteDialog.Focused = false;
+        }
     }
 
     private void UpdateDetails()

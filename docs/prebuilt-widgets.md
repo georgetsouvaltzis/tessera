@@ -73,7 +73,7 @@ TeaSharp provides a prebuilt widget layer in `TeaSharp.Components.PrebuiltWidget
   - `DialogOptions`
   - `LayoutContainerOptions`
   - `TabsOptions`
-- `FocusGroup<TFocus>` centralizes focus assignment for app-level focus rings instead of toggling each component's `Focused` property manually.
+- keep a single focus owner per app surface, usually an explicit `SetFocus(...)` helper or `ComponentComposer.SetFocusedSlot(...)`.
 - `ListComponent<T>`, `DropdownComponent`, and `ComboboxComponent` support state-driven styling through:
   - `WidgetVisualState`
   - `WidgetStatePalette`
@@ -117,11 +117,13 @@ var progress = new ProgressBarComponent(new ProgressBarOptions(
     Title: "Deploy",
     Step: 0.1));
 
-var focus = new FocusGroup<int>()
-    .Register(0, input)
-    .Register(1, progress);
+void SetFocus(int active)
+{
+    input.Focused = active == 0;
+    progress.Focused = active == 1;
+}
 
-focus.Apply(0);
+SetFocus(0);
 ```
 
 ## Gallery Example

@@ -74,8 +74,6 @@ internal sealed class ProductivityModel : IModel
 
     private readonly StatusBarComponent _status = new(new StatusBarOptions(
         Theme: new UiTheme(StatusFill: '·')));
-    private readonly FocusGroup<ProductivityFocus> _focusGroup = new();
-
     private ProductivityFocus _focus = ProductivityFocus.Menu;
     private int _width = 120;
     private int _height = 36;
@@ -111,12 +109,7 @@ internal sealed class ProductivityModel : IModel
                 "dotnet run --project examples/TeaSharp.ProductivityWidgetsExample/TeaSharp.ProductivityWidgetsExample.csproj",
                 "```"));
 
-        _focusGroup
-            .Register(ProductivityFocus.Menu, _menu)
-            .Register(ProductivityFocus.Number, _number)
-            .Register(ProductivityFocus.Date, _date)
-            .Register(ProductivityFocus.Time, _time)
-            .Register(ProductivityFocus.Markdown, _markdown);
+        SetFocus(ProductivityFocus.Menu);
     }
 
     public Command? Init() => null;
@@ -139,6 +132,11 @@ internal sealed class ProductivityModel : IModel
             {
                 var beforeContext = _context.LastExecutedItemId;
                 mouseChanged |= _context.UpdateMouse(mouse, layout.ContentRect);
+                if (!_context.Visible)
+                {
+                    _context.Focused = false;
+                }
+
                 if (!string.Equals(beforeContext, _context.LastExecutedItemId, StringComparison.Ordinal))
                 {
                     ApplyContextAction(_context.LastExecutedItemId);
@@ -160,7 +158,7 @@ internal sealed class ProductivityModel : IModel
                 mouseChanged |= _menu.UpdateMouse(mouse, layout.MenuRect);
                 if (mouse is MouseClickMsg { Button: MouseButton.Left })
                 {
-                    _focus = ProductivityFocus.Menu;
+                    SetFocus(ProductivityFocus.Menu);
                     mouseChanged = true;
                 }
             }
@@ -170,7 +168,7 @@ internal sealed class ProductivityModel : IModel
                 mouseChanged |= _date.UpdateMouse(mouse, layout.DateRect);
                 if (mouse is MouseClickMsg { Button: MouseButton.Left })
                 {
-                    _focus = ProductivityFocus.Date;
+                    SetFocus(ProductivityFocus.Date);
                     mouseChanged = true;
                 }
             }
@@ -180,7 +178,7 @@ internal sealed class ProductivityModel : IModel
                 mouseChanged |= _time.UpdateMouse(mouse, layout.TimeRect);
                 if (mouse is MouseClickMsg { Button: MouseButton.Left })
                 {
-                    _focus = ProductivityFocus.Time;
+                    SetFocus(ProductivityFocus.Time);
                     mouseChanged = true;
                 }
             }
@@ -216,6 +214,11 @@ internal sealed class ProductivityModel : IModel
             var before = _context.LastExecutedItemId;
             if (_context.Update(key))
             {
+                if (!_context.Visible)
+                {
+                    _context.Focused = false;
+                }
+
                 _lastEvent = $"context:{key.Keystroke()}";
                 if (!string.Equals(before, _context.LastExecutedItemId, StringComparison.Ordinal))
                 {
@@ -263,8 +266,6 @@ internal sealed class ProductivityModel : IModel
     {
         var width = Math.Max(80, _width);
         var height = Math.Max(24, _height);
-
-        ApplyFocusFlags();
 
         var canvas = new Canvas(width, height, CanvasTextMode.GraphemeAware);
         canvas.Clear();
@@ -317,25 +318,30 @@ internal sealed class ProductivityModel : IModel
         };
     }
 
-    private void ApplyFocusFlags()
-    {
-        _focusGroup.Apply(_focus);
-        if (!_context.Visible)
-        {
-            _context.Focused = false;
-        }
-    }
-
     private void CycleFocus()
     {
-        _focus = _focus switch
+        SetFocus(_focus switch
         {
             ProductivityFocus.Menu => ProductivityFocus.Number,
             ProductivityFocus.Number => ProductivityFocus.Date,
             ProductivityFocus.Date => ProductivityFocus.Time,
             ProductivityFocus.Time => ProductivityFocus.Markdown,
             _ => ProductivityFocus.Menu,
-        };
+        });
+    }
+
+    private void SetFocus(ProductivityFocus focus)
+    {
+        _focus = focus;
+        _menu.Focused = focus == ProductivityFocus.Menu;
+        _number.Focused = focus == ProductivityFocus.Number;
+        _date.Focused = focus == ProductivityFocus.Date;
+        _time.Focused = focus == ProductivityFocus.Time;
+        _markdown.Focused = focus == ProductivityFocus.Markdown;
+        if (!_context.Visible)
+        {
+            _context.Focused = false;
+        }
     }
 
     private void ApplyMenuAction(string? menuId)
