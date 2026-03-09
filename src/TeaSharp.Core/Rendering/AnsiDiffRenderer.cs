@@ -1,5 +1,6 @@
 using System.Text;
 using TeaSharp.Core.Abstractions;
+using TeaSharp.Core.Rendering.Internal;
 using TeaSharp.Core.Terminal;
 
 namespace TeaSharp.Core.Rendering;
@@ -167,21 +168,21 @@ public sealed class AnsiDiffRenderer : IProgramRenderer
             _keyboardEnhancementFlags = requestedKeyboardFlags;
         }
 
-        var requestedForegroundColor = NormalizeColorHex(_currentView.ForegroundColor);
+        var requestedForegroundColor = AnsiColorNormalizer.NormalizeHex(_currentView.ForegroundColor);
         if (!string.Equals(_foregroundColor, requestedForegroundColor, StringComparison.Ordinal))
         {
             await WriteTerminalColorAsync(10, 110, requestedForegroundColor).ConfigureAwait(false);
             _foregroundColor = requestedForegroundColor;
         }
 
-        var requestedBackgroundColor = NormalizeColorHex(_currentView.BackgroundColor);
+        var requestedBackgroundColor = AnsiColorNormalizer.NormalizeHex(_currentView.BackgroundColor);
         if (!string.Equals(_backgroundColor, requestedBackgroundColor, StringComparison.Ordinal))
         {
             await WriteTerminalColorAsync(11, 111, requestedBackgroundColor).ConfigureAwait(false);
             _backgroundColor = requestedBackgroundColor;
         }
 
-        var requestedCursorColor = NormalizeColorHex(_currentView.CursorColor);
+        var requestedCursorColor = AnsiColorNormalizer.NormalizeHex(_currentView.CursorColor);
         if (!string.Equals(_cursorColor, requestedCursorColor, StringComparison.Ordinal))
         {
             await WriteTerminalColorAsync(12, 112, requestedCursorColor).ConfigureAwait(false);
@@ -343,115 +344,7 @@ public sealed class AnsiDiffRenderer : IProgramRenderer
         {
             return;
         }
-
-        var rowCount = Math.Max(_previousFrame.RowCount, nextFrame.RowCount);
-        if (_height > 0 && rowCount > _height)
-        {
-            rowCount = _height;
-        }
-
-        for (var row = 0; row < rowCount; row++)
-        {
-            if (nextFrame.RowEquals(_previousFrame, row))
-            {
-                continue;
-            }
-
-            await WriteRowDiffAsync(row, nextFrame).ConfigureAwait(false);
-        }
-    }
-
-    private async Task WriteRowDiffAsync(int row, RenderFrameBuffer nextFrame)
-    {
-        if (_writer is null)
-        {
-            return;
-        }
-
-        var max = Math.Max(_previousFrame.ColumnCountAt(row), nextFrame.ColumnCountAt(row));
-        if (_width > 0 && max > _width)
-        {
-            max = _width;
-        }
-        var runStart = -1;
-
-        for (var column = 0; column < max; column++)
-        {
-            var changed = !string.Equals(
-                _previousFrame.SignatureAt(row, column),
-                nextFrame.SignatureAt(row, column),
-                StringComparison.Ordinal);
-
-            if (changed && runStart < 0)
-            {
-                runStart = column;
-                continue;
-            }
-
-            if (!changed && runStart >= 0)
-            {
-                await WriteRunAsync(row, runStart, column, nextFrame).ConfigureAwait(false);
-                runStart = -1;
-            }
-        }
-
-        if (runStart >= 0)
-        {
-            await WriteRunAsync(row, runStart, max, nextFrame).ConfigureAwait(false);
-        }
-    }
-
-    private async Task WriteRunAsync(int row, int startColumn, int endColumn, RenderFrameBuffer nextFrame)
-    {
-        if (_writer is null)
-        {
-            return;
-        }
-
-        await _writer.WriteAsync($"\u001b[{row + 1};{startColumn + 1}H").ConfigureAwait(false);
-        var activeStyle = string.Empty;
-        for (var column = startColumn; column < endColumn;)
-        {
-            var cell = nextFrame.CellAt(row, column);
-            if (cell is null)
-            {
-                await _writer.WriteAsync(" ").ConfigureAwait(false);
-                column++;
-                continue;
-            }
-
-            var nextStyle = nextFrame.StyleAt(row, column);
-            if (!string.Equals(activeStyle, nextStyle, StringComparison.Ordinal))
-            {
-                if (activeStyle.Length > 0)
-                {
-                    await _writer.WriteAsync("\u001b[0m").ConfigureAwait(false);
-                }
-
-                if (nextStyle.Length > 0)
-                {
-                    await _writer.WriteAsync(nextStyle).ConfigureAwait(false);
-                }
-
-                activeStyle = nextStyle;
-            }
-
-            var cellWidth = nextFrame.CellWidthAt(row, column);
-            if (cellWidth == 2 && column + 1 >= endColumn)
-            {
-                await _writer.WriteAsync(" ").ConfigureAwait(false);
-                column++;
-                continue;
-            }
-
-            await _writer.WriteAsync(cell).ConfigureAwait(false);
-            column += cellWidth;
-        }
-
-        if (activeStyle.Length > 0)
-        {
-            await _writer.WriteAsync("\u001b[0m").ConfigureAwait(false);
-        }
+        await AnsiFrameDiffer.WriteAsync(_writer, _previousFrame, nextFrame, _width, _height).ConfigureAwait(false);
     }
 
     private Task WriteMouseModeAsync(MouseMode mode)
@@ -461,12 +354,7 @@ public sealed class AnsiDiffRenderer : IProgramRenderer
             return Task.CompletedTask;
         }
 
-        return mode switch
-        {
-            MouseMode.CellMotion => _writer.WriteAsync("\u001b[?1000h\u001b[?1002h\u001b[?1003l\u001b[?1006h"),
-            MouseMode.AllMotion => _writer.WriteAsync("\u001b[?1000h\u001b[?1002l\u001b[?1003h\u001b[?1006h"),
-            _ => _writer.WriteAsync("\u001b[?1000l\u001b[?1002l\u001b[?1003l\u001b[?1006l"),
-        };
+        return _writer.WriteAsync(AnsiEscapeSequences.SequenceForMouseMode(mode));
     }
 
     private async Task WriteTerminalColorAsync(int setCode, int resetCode, string? color)
@@ -476,13 +364,7 @@ public sealed class AnsiDiffRenderer : IProgramRenderer
             return;
         }
 
-        if (color is null)
-        {
-            await _writer.WriteAsync($"\u001b]{resetCode};\u001b\\").ConfigureAwait(false);
-            return;
-        }
-
-        await _writer.WriteAsync($"\u001b]{setCode};{color}\u001b\\").ConfigureAwait(false);
+        await _writer.WriteAsync(AnsiEscapeSequences.TerminalColor(setCode, resetCode, color)).ConfigureAwait(false);
     }
 
     private async Task WriteProgressAsync(TerminalProgress? progress)
@@ -492,34 +374,7 @@ public sealed class AnsiDiffRenderer : IProgramRenderer
             return;
         }
 
-        if (progress is not TerminalProgress current || current.State == TerminalProgressState.None)
-        {
-            await _writer.WriteAsync("\u001b]9;4;0\u001b\\").ConfigureAwait(false);
-            return;
-        }
-
-        if (current.State == TerminalProgressState.Indeterminate)
-        {
-            await _writer.WriteAsync("\u001b]9;4;3\u001b\\").ConfigureAwait(false);
-            return;
-        }
-
-        var clamped = Math.Clamp(current.Value, 0, 100);
-        var state = current.State switch
-        {
-            TerminalProgressState.Default => 1,
-            TerminalProgressState.Error => 2,
-            TerminalProgressState.Warning => 4,
-            _ => 0,
-        };
-
-        if (state == 0)
-        {
-            await _writer.WriteAsync("\u001b]9;4;0\u001b\\").ConfigureAwait(false);
-            return;
-        }
-
-        await _writer.WriteAsync($"\u001b]9;4;{state};{clamped}\u001b\\").ConfigureAwait(false);
+        await _writer.WriteAsync(AnsiEscapeSequences.Progress(progress)).ConfigureAwait(false);
     }
 
     private Task WriteCursorStyleAsync(CursorStyle style)
@@ -529,18 +384,7 @@ public sealed class AnsiDiffRenderer : IProgramRenderer
             return Task.CompletedTask;
         }
 
-        var parameter = style switch
-        {
-            CursorStyle.BlinkingBlock => 1,
-            CursorStyle.SteadyBlock => 2,
-            CursorStyle.BlinkingUnderline => 3,
-            CursorStyle.SteadyUnderline => 4,
-            CursorStyle.BlinkingBar => 5,
-            CursorStyle.SteadyBar => 6,
-            _ => 0,
-        };
-
-        return _writer.WriteAsync($"\u001b[{parameter} q");
+        return _writer.WriteAsync(AnsiEscapeSequences.SequenceForCursorStyle(style));
     }
 
     private Task QueryModeReportAsync(int mode)
@@ -560,88 +404,7 @@ public sealed class AnsiDiffRenderer : IProgramRenderer
 
     private int GetKeyboardEnhancementFlags(KeyboardEnhancementOptions options)
     {
-        var flags = _options.IncludeKittyKeyboardBaseFlag ? 0b1 : 0;
-        if (options.ReportEventTypes)
-        {
-            flags |= 0b10;
-        }
-
-        return flags;
-    }
-
-    private static string? NormalizeColorHex(string? input)
-    {
-        if (string.IsNullOrWhiteSpace(input))
-        {
-            return null;
-        }
-
-        var value = input.Trim();
-        if (value.StartsWith("rgb:", StringComparison.OrdinalIgnoreCase))
-        {
-            var channels = value[4..].Split('/');
-            if (channels.Length != 3)
-            {
-                return null;
-            }
-
-            if (!TryParseRgbChannel(channels[0], out var r)
-                || !TryParseRgbChannel(channels[1], out var g)
-                || !TryParseRgbChannel(channels[2], out var b))
-            {
-                return null;
-            }
-
-            return $"#{r:X2}{g:X2}{b:X2}";
-        }
-
-        if (value[0] == '#')
-        {
-            value = value[1..];
-        }
-
-        if (value.Length == 3
-            && byte.TryParse(new string(value[0], 2), System.Globalization.NumberStyles.HexNumber, null, out var shortR)
-            && byte.TryParse(new string(value[1], 2), System.Globalization.NumberStyles.HexNumber, null, out var shortG)
-            && byte.TryParse(new string(value[2], 2), System.Globalization.NumberStyles.HexNumber, null, out var shortB))
-        {
-            return $"#{shortR:X2}{shortG:X2}{shortB:X2}";
-        }
-
-        if (value.Length == 6
-            && byte.TryParse(value[..2], System.Globalization.NumberStyles.HexNumber, null, out var r6)
-            && byte.TryParse(value[2..4], System.Globalization.NumberStyles.HexNumber, null, out var g6)
-            && byte.TryParse(value[4..], System.Globalization.NumberStyles.HexNumber, null, out var b6))
-        {
-            return $"#{r6:X2}{g6:X2}{b6:X2}";
-        }
-
-        return null;
-    }
-
-    private static bool TryParseRgbChannel(string value, out byte result)
-    {
-        result = 0;
-        var normalized = value.Trim();
-        if (normalized.Length is < 1 or > 4)
-        {
-            return false;
-        }
-
-        if (!ushort.TryParse(normalized, System.Globalization.NumberStyles.HexNumber, null, out var parsed))
-        {
-            return false;
-        }
-
-        if (normalized.Length <= 2)
-        {
-            result = (byte)parsed;
-            return true;
-        }
-
-        var max = normalized.Length == 3 ? 0x0FFFu : 0xFFFFu;
-        result = (byte)Math.Round((parsed / (double)max) * 255d, MidpointRounding.AwayFromZero);
-        return true;
+        return AnsiEscapeSequences.KeyboardEnhancementFlags(options, _options.IncludeKittyKeyboardBaseFlag);
     }
 
 }

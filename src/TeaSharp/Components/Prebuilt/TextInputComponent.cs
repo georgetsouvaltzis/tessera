@@ -1,5 +1,6 @@
 using TeaSharp.Core.Abstractions;
 using TeaSharp.Core.Messages;
+using TeaSharp.Components.Internal;
 using TeaSharp.Widgets;
 
 namespace TeaSharp.Components;
@@ -93,68 +94,25 @@ public sealed class TextInputComponent : IStatefulComponent, IFocusableComponent
 
     public bool Update(IMessage message)
     {
-        WasCancelled = false;
-        if (message is KeyPressMsg key && CancelKey.Matches(key))
+        var result = TextInputInteractionHandler.Update(Input, message, KeyMap, CancelKey, ClearOnCancel, ClearOnSubmit);
+        WasCancelled = result.WasCancelled;
+        if (result.CancelCount > 0)
         {
-            WasCancelled = true;
-            LastCancelledValue = Input.Value;
-            CancelCount++;
-            if (ClearOnCancel)
-            {
-                Input.Clear();
-            }
-
-            return true;
+            LastCancelledValue = result.LastCancelledValue;
+            CancelCount += result.CancelCount;
         }
 
-        var result = Input.Update(message, KeyMap);
-        if (!result.Submitted)
+        if (result.SubmitCount > 0)
         {
-            return result.Changed;
+            LastSubmittedValue = result.LastSubmittedValue;
+            SubmitCount += result.SubmitCount;
         }
 
-        LastSubmittedValue = Input.Value;
-        SubmitCount++;
-        if (ClearOnSubmit)
-        {
-            Input.Clear();
-        }
-
-        return true;
+        return result.Handled;
     }
 
     public void Render(Canvas canvas, Rect rect)
     {
-        var clipped = Rect.Intersect(rect, canvas.Bounds);
-        if (clipped.IsEmpty)
-        {
-            return;
-        }
-
-        Rect content;
-        if (ShowBorder)
-        {
-            canvas.DrawBox(clipped, Focused ? $"{Title} *" : Title);
-            content = clipped.Inset(1, 1);
-        }
-        else
-        {
-            content = clipped;
-        }
-
-        if (content.IsEmpty)
-        {
-            return;
-        }
-
-        var frame = Input.BuildFrame(content.Width);
-        canvas.WriteText(content.X, content.Y, frame.Text, content.Width);
-        if (content.Height > 1)
-        {
-            var submitted = SubmitCount == 0
-                ? "submit: -"
-                : $"submit: {SubmitCount}";
-            canvas.WriteText(content.X, content.Y + 1, submitted, content.Width);
-        }
+        TextInputRenderer.Render(canvas, rect, Input, Title, Focused, ShowBorder, SubmitCount);
     }
 }

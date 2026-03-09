@@ -1,4 +1,5 @@
 using TeaSharp.Styles;
+using TeaSharp.Components.Internal;
 
 namespace TeaSharp.Components;
 
@@ -14,7 +15,7 @@ public sealed class WidgetStatePalette
         get => _parent;
         set
         {
-            EnsureNoCycle(value);
+            WidgetStatePaletteHierarchy.EnsureNoCycle(this, value);
             _parent = value;
         }
     }
@@ -70,8 +71,12 @@ public sealed class WidgetStatePalette
 
     public bool TryGetInherited(WidgetVisualState state, out WidgetStateAppearance appearance)
     {
-        var hierarchy = BuildHierarchyRootFirst();
-        return TryResolveAppearance(state, hierarchy, out appearance);
+        var hierarchy = WidgetStatePaletteHierarchy.BuildRootFirst(this);
+        return WidgetStatePaletteResolver.TryResolveAppearance(
+            state,
+            hierarchy,
+            static (palette, visualState) => palette.ResolveAppearance(visualState),
+            out appearance);
     }
 
     public void Set(WidgetVisualState state, WidgetStateAppearance appearance)
@@ -97,145 +102,13 @@ public sealed class WidgetStatePalette
 
     public string Render(string text, IEnumerable<WidgetVisualState> activeStates)
     {
-        var source = text ?? string.Empty;
-        var active = new HashSet<WidgetVisualState>(activeStates);
-        var hierarchy = BuildHierarchyRootFirst();
-
-        var style = TeaStyle.Empty;
-        var upper = false;
-        var prefix = string.Empty;
-        var suffix = string.Empty;
-
-        if (TryResolveAppearance(WidgetVisualState.Default, hierarchy, out var defaults))
-        {
-            style = style.Merge(defaults.TextStyle);
-            upper |= defaults.Uppercase;
-            if (!string.IsNullOrEmpty(defaults.Prefix))
-            {
-                prefix = defaults.Prefix;
-            }
-
-            if (!string.IsNullOrEmpty(defaults.Suffix))
-            {
-                suffix = defaults.Suffix;
-            }
-        }
-
-        foreach (var state in Priority)
-        {
-            if (!active.Contains(state))
-            {
-                continue;
-            }
-
-            if (!TryResolveAppearance(state, hierarchy, out var appearance))
-            {
-                continue;
-            }
-
-            style = style.Merge(appearance.TextStyle);
-            upper |= appearance.Uppercase;
-            if (string.IsNullOrEmpty(prefix) && !string.IsNullOrEmpty(appearance.Prefix))
-            {
-                prefix = appearance.Prefix;
-            }
-
-            if (string.IsNullOrEmpty(suffix) && !string.IsNullOrEmpty(appearance.Suffix))
-            {
-                suffix = appearance.Suffix;
-            }
-        }
-
-        if (upper)
-        {
-            source = source.ToUpperInvariant();
-        }
-
-        var composed = $"{prefix}{source}{suffix}";
-        return style.Render(composed);
-    }
-
-    private static bool TryResolveAppearance(
-        WidgetVisualState state,
-        IReadOnlyList<WidgetStatePalette> hierarchy,
-        out WidgetStateAppearance appearance)
-    {
-        var found = false;
-        var style = TeaStyle.Empty;
-        var upper = false;
-        var prefix = string.Empty;
-        var suffix = string.Empty;
-
-        for (var i = 0; i < hierarchy.Count; i++)
-        {
-            if (!hierarchy[i]._appearances.TryGetValue(state, out var local))
-            {
-                continue;
-            }
-
-            found = true;
-            style = style.Merge(local.TextStyle);
-            upper |= local.Uppercase;
-            if (!string.IsNullOrEmpty(local.Prefix))
-            {
-                prefix = local.Prefix;
-            }
-
-            if (!string.IsNullOrEmpty(local.Suffix))
-            {
-                suffix = local.Suffix;
-            }
-        }
-
-        if (!found)
-        {
-            appearance = null!;
-            return false;
-        }
-
-        appearance = new WidgetStateAppearance
-        {
-            TextStyle = style,
-            Uppercase = upper,
-            Prefix = prefix,
-            Suffix = suffix,
-        };
-        return true;
-    }
-
-    private IReadOnlyList<WidgetStatePalette> BuildHierarchyRootFirst()
-    {
-        var chain = new List<WidgetStatePalette>(4);
-        var seen = new HashSet<WidgetStatePalette>();
-
-        var current = this;
-        while (current is not null)
-        {
-            if (!seen.Add(current))
-            {
-                throw new InvalidOperationException("WidgetStatePalette parent cycle detected.");
-            }
-
-            chain.Add(current);
-            current = current._parent;
-        }
-
-        chain.Reverse();
-        return chain;
-    }
-
-    private void EnsureNoCycle(WidgetStatePalette? candidateParent)
-    {
-        var current = candidateParent;
-        while (current is not null)
-        {
-            if (ReferenceEquals(current, this))
-            {
-                throw new InvalidOperationException("WidgetStatePalette cannot inherit from itself (cycle detected).");
-            }
-
-            current = current._parent;
-        }
+        var hierarchy = WidgetStatePaletteHierarchy.BuildRootFirst(this);
+        return WidgetStatePaletteResolver.Render(
+            text,
+            activeStates,
+            Priority,
+            hierarchy,
+            static (palette, visualState) => palette.ResolveAppearance(visualState));
     }
 
     public static WidgetStatePalette CreateDefault()
@@ -306,5 +179,12 @@ public sealed class WidgetStatePalette
             Prefix = "⌛ ",
         });
         return palette;
+    }
+
+    internal WidgetStateAppearance? ResolveAppearance(WidgetVisualState state)
+    {
+        return _appearances.TryGetValue(state, out var appearance)
+            ? appearance
+            : null;
     }
 }
