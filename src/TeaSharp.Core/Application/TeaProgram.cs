@@ -1,7 +1,4 @@
 using System.Threading.Channels;
-using System.Runtime.InteropServices;
-using System.Runtime.ExceptionServices;
-using System.Text;
 using TeaSharp.Core.Abstractions;
 using TeaSharp.Core.Input;
 using TeaSharp.Core.Messages;
@@ -12,28 +9,21 @@ namespace TeaSharp.Core.Application;
 
 public sealed class TeaProgram
 {
-    private static readonly int[] DefaultCapabilityProbeModes = [1000, 1002, 1003, 1004, 1006, 2004, 2026];
-    private static readonly int[] CapabilityProbeRepresentativeModes = [1004, 1006, 2004, 2026];
-    private static readonly int[] LegacyMouseProbeModes = [1000, 1002, 1003];
-
     private readonly ProgramOptions _options;
     private readonly Channel<IMessage> _messages;
     private readonly Channel<Command> _commands;
     private readonly object _stateLock = new();
-    private readonly object _commandTaskLock = new();
-    private readonly HashSet<Task> _commandTasks = [];
+    private readonly TeaCapabilityProbe _capabilityProbe = new();
 
     private ITerminalAdapter? _terminal;
     private IProgramRenderer? _renderer;
     private TerminalReader? _reader;
     private CancellationTokenSource? _cts;
-    private SemaphoreSlim? _commandConcurrencyGate;
+    private TeaProgramCommandScheduler? _commandScheduler;
     private bool _running;
-    private CapabilityProbeState? _capabilityProbe;
     private TerminalCapabilityProfile _runtimeCapabilities = TerminalCapabilityProfile.AllSupported;
     private TerminalColorProfile _runtimeColorProfile = TerminalColorProfile.Unknown;
     private View _lastRenderedView = View.From(string.Empty);
-    private ExceptionDispatchInfo? _unhandledCommandException;
 
     public TeaProgram(IModel initialModel, ProgramOptions? options = null)
     {
@@ -47,12 +37,10 @@ public sealed class TeaProgram
 
     public void Send(IMessage message)
     {
-        if (message is null)
+        if (message is not null)
         {
-            return;
+            _messages.Writer.TryWrite(message);
         }
-
-        _messages.Writer.TryWrite(message);
     }
 
     public async Task<IModel> RunAsync(CancellationToken cancellationToken = default)
@@ -68,8 +56,6 @@ public sealed class TeaProgram
 
             _running = true;
             _cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
-            _unhandledCommandException = null;
-            _capabilityProbe = null;
         }
 
         var token = _cts.Token;
@@ -77,25 +63,21 @@ public sealed class TeaProgram
         try
         {
             _terminal = _options.Terminal ?? new ConsoleTerminalAdapter();
-            var capabilities = _options.TerminalCapabilities
+            _runtimeCapabilities = _options.TerminalCapabilities
                 ?? _options.TerminalCapabilityDetector?.Invoke()
                 ?? TerminalCapabilityDetector.Detect();
-            _runtimeCapabilities = capabilities;
             _runtimeColorProfile = _options.ColorProfile
                 ?? _options.ColorProfileDetector?.Invoke()
                 ?? TerminalColorProfileDetector.Detect();
             _renderer = _options.DisableRenderer
                 ? new NullRenderer()
-                : _options.Renderer ?? new AnsiDiffRenderer(capabilities, _options.AnsiRendererOptions);
-            _renderer.UpdateCapabilities(capabilities);
-            var maxConcurrentCommands = Math.Max(0, _options.MaxConcurrentCommands);
-            _commandConcurrencyGate = maxConcurrentCommands == 0
-                ? null
-                : new SemaphoreSlim(maxConcurrentCommands, maxConcurrentCommands);
+                : _options.Renderer ?? new AnsiDiffRenderer(_runtimeCapabilities, _options.AnsiRendererOptions);
+            _renderer.UpdateCapabilities(_runtimeCapabilities);
+            _commandScheduler = new TeaProgramCommandScheduler(_options, Send);
 
             await _terminal.PrepareAsync(token).ConfigureAwait(false);
             await _renderer.InitializeAsync(_terminal.Output, token).ConfigureAwait(false);
-            Send(new TerminalCapabilitiesMsg(capabilities));
+            Send(new TerminalCapabilitiesMsg(_runtimeCapabilities));
             Send(new ColorProfileMsg(_runtimeColorProfile));
 
             Task? resizeLoop = null;
@@ -104,12 +86,12 @@ public sealed class TeaProgram
                 var size = await _terminal.GetSizeAsync(token).ConfigureAwait(false);
                 _renderer.Resize(size.Width, size.Height);
                 Send(new WindowSizeMsg(size.Width, size.Height));
-                (resizeLoop, resizeSignalRegistration) = StartResizeLoop(size, token);
+                (resizeLoop, resizeSignalRegistration) = TeaProgramResizeMonitor.Start(_terminal, _options, size, Send, token);
             }
 
-            var commandLoop = Task.Run(() => CommandLoopAsync(token), token);
+            var commandLoop = Task.Run(() => _commandScheduler.RunLoopAsync(_commands.Reader, token), token);
             var inputLoop = StartInputLoop(token);
-            await StartCapabilityProbeAsync(token).ConfigureAwait(false);
+            await _capabilityProbe.StartAsync(_terminal, _options, _runtimeCapabilities, Send, token).ConfigureAwait(false);
 
             if (Model.Init() is { } initCommand)
             {
@@ -117,158 +99,12 @@ public sealed class TeaProgram
             }
 
             await RenderAsync(Model.View(), token).ConfigureAwait(false);
-
-            var minFrame = TimeSpan.FromSeconds(1.0 / Math.Clamp(_options.MaxFps, 1, 120));
-            var lastRender = DateTimeOffset.UtcNow;
-            var pendingRender = false;
-
-            while (await _messages.Reader.WaitToReadAsync(token).ConfigureAwait(false))
-            {
-                while (_messages.Reader.TryRead(out var message))
-                {
-                    if (message is CapabilityProbeTimeoutMsg probeTimeout)
-                    {
-                        HandleCapabilityProbeTimeout(probeTimeout);
-                        continue;
-                    }
-
-                    if (message is ModeReportMsg probeModeReport)
-                    {
-                        ObserveCapabilityProbeResponse(probeModeReport);
-                    }
-
-                    var filtered = _options.Filter is null
-                        ? message
-                        : _options.Filter(Model, message);
-                    if (filtered is null)
-                    {
-                        continue;
-                    }
-
-                    if (filtered is QuitMsg)
-                    {
-                        _cts?.Cancel();
-                        await AwaitBackgroundLoops(commandLoop, inputLoop, resizeLoop).ConfigureAwait(false);
-                        await ShutdownAsync(kill: false, CancellationToken.None).ConfigureAwait(false);
-                        return Model;
-                    }
-
-                    if (filtered is InterruptMsg)
-                    {
-                        var unhandledCommandException = Interlocked.Exchange(ref _unhandledCommandException, null);
-                        if (unhandledCommandException is not null)
-                        {
-                            unhandledCommandException.Throw();
-                        }
-
-                        throw new TeaProgramInterruptedException();
-                    }
-
-                    if (filtered is ModeReportMsg modeReport
-                        && TryApplyModeReport(_runtimeCapabilities, modeReport, out var refinedCapabilities))
-                    {
-                        _runtimeCapabilities = refinedCapabilities;
-                        _renderer?.UpdateCapabilities(refinedCapabilities);
-                        Send(new TerminalCapabilitiesMsg(refinedCapabilities));
-                    }
-
-                    switch (filtered)
-                    {
-                        case RawOutputMsg rawOutput:
-                            if (_renderer is not null)
-                            {
-                                await _renderer.WriteRawAsync(rawOutput.Content, token).ConfigureAwait(false);
-                            }
-
-                            continue;
-                        case WindowSizeMsg ws:
-                            _renderer?.Resize(ws.Width, ws.Height);
-                            break;
-                        case BatchMsg batch:
-                            foreach (var command in batch.Commands)
-                            {
-                                await _commands.Writer.WriteAsync(command, token).ConfigureAwait(false);
-                            }
-                            continue;
-                        case SequenceMsg sequence:
-                            _ = Task.Run(() => RunSequenceAsync(sequence.Commands, token), token);
-                            continue;
-                    }
-
-                    if (filtered is CapabilityMsg capability
-                        && TryRefineColorProfile(_runtimeColorProfile, capability, out var refinedColorProfile))
-                    {
-                        _runtimeColorProfile = refinedColorProfile;
-                        Send(new ColorProfileMsg(refinedColorProfile));
-                    }
-
-                    if (filtered is MouseMsg mouse && _lastRenderedView.OnMouse is { } onMouse)
-                    {
-                        var callbackCommand = onMouse(mouse);
-                        if (callbackCommand is not null)
-                        {
-                            await _commands.Writer.WriteAsync(callbackCommand, token).ConfigureAwait(false);
-                        }
-                    }
-
-                    var update = Model.Update(filtered);
-                    Model = update.Model;
-
-                    if (update.Command is not null)
-                    {
-                        await _commands.Writer.WriteAsync(update.Command, token).ConfigureAwait(false);
-                    }
-
-                    pendingRender = true;
-                    var now = DateTimeOffset.UtcNow;
-                    var elapsed = now - lastRender;
-                    if (!_options.AdaptiveFramePacing)
-                    {
-                        if (elapsed < minFrame)
-                        {
-                            var delay = minFrame - elapsed;
-                            await Task.Delay(delay, token).ConfigureAwait(false);
-                        }
-
-                        await RenderAsync(Model.View(), token).ConfigureAwait(false);
-                        lastRender = DateTimeOffset.UtcNow;
-                        pendingRender = false;
-                        continue;
-                    }
-
-                    if (elapsed >= minFrame)
-                    {
-                        await RenderAsync(Model.View(), token).ConfigureAwait(false);
-                        lastRender = DateTimeOffset.UtcNow;
-                        pendingRender = false;
-                    }
-                }
-
-                if (_options.AdaptiveFramePacing && pendingRender)
-                {
-                    var now = DateTimeOffset.UtcNow;
-                    var elapsed = now - lastRender;
-                    if (elapsed < minFrame)
-                    {
-                        var delay = minFrame - elapsed;
-                        await Task.Delay(delay, token).ConfigureAwait(false);
-                    }
-
-                    await RenderAsync(Model.View(), token).ConfigureAwait(false);
-                    lastRender = DateTimeOffset.UtcNow;
-                    pendingRender = false;
-                }
-            }
-
-            _cts?.Cancel();
-            await AwaitBackgroundLoops(commandLoop, inputLoop, resizeLoop).ConfigureAwait(false);
-            await ShutdownAsync(kill: false, CancellationToken.None).ConfigureAwait(false);
+            await ProcessMessageLoopAsync(commandLoop, inputLoop, resizeLoop, token).ConfigureAwait(false);
             return Model;
         }
         finally
         {
             resizeSignalRegistration?.Dispose();
-
             if (_terminal is not null || _renderer is not null)
             {
                 await ShutdownAsync(kill: true, CancellationToken.None).ConfigureAwait(false);
@@ -281,12 +117,8 @@ public sealed class TeaProgram
 
             _cts?.Dispose();
             _cts = null;
-            _commandConcurrencyGate?.Dispose();
-            _commandConcurrencyGate = null;
-            lock (_commandTaskLock)
-            {
-                _commandTasks.Clear();
-            }
+            _commandScheduler?.Dispose();
+            _commandScheduler = null;
         }
     }
 
@@ -299,6 +131,201 @@ public sealed class TeaProgram
 
         _cts.Cancel();
         await ShutdownAsync(kill, cancellationToken).ConfigureAwait(false);
+    }
+
+    private async Task ProcessMessageLoopAsync(Task commandLoop, Task? inputLoop, Task? resizeLoop, CancellationToken token)
+    {
+        var minFrame = TimeSpan.FromSeconds(1.0 / Math.Clamp(_options.MaxFps, 1, 120));
+        var lastRender = DateTimeOffset.UtcNow;
+        var pendingRender = false;
+
+        while (await _messages.Reader.WaitToReadAsync(token).ConfigureAwait(false))
+        {
+            while (_messages.Reader.TryRead(out var message))
+            {
+                if (message is TeaCapabilityProbe.CapabilityProbeTimeoutMsg probeTimeout)
+                {
+                    _capabilityProbe.HandleTimeout(probeTimeout, ref _runtimeCapabilities, _renderer, Send);
+                    continue;
+                }
+
+                if (message is ModeReportMsg probeModeReport)
+                {
+                    _capabilityProbe.Observe(probeModeReport);
+                }
+
+                var filtered = _options.Filter is null ? message : _options.Filter(Model, message);
+                if (filtered is null)
+                {
+                    continue;
+                }
+
+                if (filtered is QuitMsg)
+                {
+                    _cts?.Cancel();
+                    await AwaitBackgroundLoops(commandLoop, inputLoop, resizeLoop).ConfigureAwait(false);
+                    await ShutdownAsync(kill: false, CancellationToken.None).ConfigureAwait(false);
+                    return;
+                }
+
+                if (filtered is InterruptMsg)
+                {
+                    var unhandledCommandException = _commandScheduler?.ConsumeUnhandledException();
+                    if (unhandledCommandException is not null)
+                    {
+                        unhandledCommandException.Throw();
+                    }
+
+                    throw new TeaProgramInterruptedException();
+                }
+
+                if (await TryHandleCommandEnvelopeAsync(filtered, token).ConfigureAwait(false))
+                {
+                    continue;
+                }
+
+                if (filtered is ModeReportMsg modeReport
+                    && TeaCapabilityProbe.TryApplyModeReport(_runtimeCapabilities, modeReport, out var refinedCapabilities))
+                {
+                    _runtimeCapabilities = refinedCapabilities;
+                    _renderer?.UpdateCapabilities(refinedCapabilities);
+                    Send(new TerminalCapabilitiesMsg(refinedCapabilities));
+                }
+
+                if (await TryHandleMessageSideEffectsAsync(filtered, token).ConfigureAwait(false))
+                {
+                    continue;
+                }
+
+                var update = Model.Update(filtered);
+                Model = update.Model;
+
+                if (update.Command is not null)
+                {
+                    await _commands.Writer.WriteAsync(update.Command, token).ConfigureAwait(false);
+                }
+
+                pendingRender = true;
+                var renderAttempt = await TryRenderFrameAsync(minFrame, lastRender, pendingRender, token).ConfigureAwait(false);
+                lastRender = renderAttempt.LastRender;
+                pendingRender = renderAttempt.PendingRender;
+                if (renderAttempt.Rendered)
+                {
+                    continue;
+                }
+            }
+
+            if (_options.AdaptiveFramePacing && pendingRender)
+            {
+                var delayedRender = await DelayAndRenderAsync(minFrame, lastRender, token).ConfigureAwait(false);
+                lastRender = delayedRender.LastRender;
+                pendingRender = false;
+            }
+        }
+
+        _cts?.Cancel();
+        await AwaitBackgroundLoops(commandLoop, inputLoop, resizeLoop).ConfigureAwait(false);
+        await ShutdownAsync(kill: false, CancellationToken.None).ConfigureAwait(false);
+    }
+
+    private async Task<bool> TryHandleCommandEnvelopeAsync(IMessage filtered, CancellationToken token)
+    {
+        if (filtered is SequenceMsg sequence)
+        {
+            _ = Task.Run(() => _commandScheduler!.RunSequenceAsync(sequence.Commands, token), token);
+            return true;
+        }
+
+        if (filtered is BatchMsg batch)
+        {
+            foreach (var command in batch.Commands)
+            {
+                await _commands.Writer.WriteAsync(command, token).ConfigureAwait(false);
+            }
+
+            return true;
+        }
+
+        return false;
+    }
+
+    private async Task<bool> TryHandleMessageSideEffectsAsync(IMessage filtered, CancellationToken token)
+    {
+        switch (filtered)
+        {
+            case RawOutputMsg rawOutput:
+                if (_renderer is not null)
+                {
+                    await _renderer.WriteRawAsync(rawOutput.Content, token).ConfigureAwait(false);
+                }
+
+                return true;
+            case WindowSizeMsg ws:
+                _renderer?.Resize(ws.Width, ws.Height);
+                break;
+        }
+
+        if (filtered is CapabilityMsg capability
+            && TeaCapabilityProbe.TryRefineColorProfile(_runtimeColorProfile, capability, out var refinedColorProfile))
+        {
+            _runtimeColorProfile = refinedColorProfile;
+            Send(new ColorProfileMsg(refinedColorProfile));
+        }
+
+        if (filtered is MouseMsg mouse && _lastRenderedView.OnMouse is { } onMouse)
+        {
+            var callbackCommand = onMouse(mouse);
+            if (callbackCommand is not null)
+            {
+                await _commands.Writer.WriteAsync(callbackCommand, token).ConfigureAwait(false);
+            }
+        }
+
+        return false;
+    }
+
+    private async Task<(bool Rendered, DateTimeOffset LastRender, bool PendingRender)> TryRenderFrameAsync(
+        TimeSpan minFrame,
+        DateTimeOffset lastRender,
+        bool pendingRender,
+        CancellationToken token)
+    {
+        var now = DateTimeOffset.UtcNow;
+        var elapsed = now - lastRender;
+        if (!_options.AdaptiveFramePacing)
+        {
+            if (elapsed < minFrame)
+            {
+                await Task.Delay(minFrame - elapsed, token).ConfigureAwait(false);
+            }
+
+            await RenderAsync(Model.View(), token).ConfigureAwait(false);
+            return (true, DateTimeOffset.UtcNow, false);
+        }
+
+        if (elapsed >= minFrame)
+        {
+            await RenderAsync(Model.View(), token).ConfigureAwait(false);
+            return (true, DateTimeOffset.UtcNow, false);
+        }
+
+        return (false, lastRender, pendingRender);
+    }
+
+    private async Task<(DateTimeOffset LastRender, bool PendingRender)> DelayAndRenderAsync(
+        TimeSpan minFrame,
+        DateTimeOffset lastRender,
+        CancellationToken token)
+    {
+        var now = DateTimeOffset.UtcNow;
+        var elapsed = now - lastRender;
+        if (elapsed < minFrame)
+        {
+            await Task.Delay(minFrame - elapsed, token).ConfigureAwait(false);
+        }
+
+        await RenderAsync(Model.View(), token).ConfigureAwait(false);
+        return (DateTimeOffset.UtcNow, false);
     }
 
     private Task? StartInputLoop(CancellationToken token)
@@ -316,268 +343,6 @@ public sealed class TeaProgram
 
         _reader = new TerminalReader(_terminal.Input, _options.EventDecoder ?? new EventDecoder(), _options.EscapeTimeout);
         return Task.Run(() => _reader.StreamEventsAsync(token, Send), token);
-    }
-
-    private (Task? Loop, IDisposable? SignalRegistration) StartResizeLoop(TerminalSize initialSize, CancellationToken token)
-    {
-        if (_terminal is null || !_terminal.IsOutputInteractive)
-        {
-            return (null, null);
-        }
-
-        var signalTicks = Channel.CreateUnbounded<bool>(new UnboundedChannelOptions
-        {
-            SingleReader = true,
-            SingleWriter = false,
-        });
-
-        var registration = TryRegisterResizeSignal(() => signalTicks.Writer.TryWrite(true));
-
-        var loop = Task.Run(async () =>
-        {
-            var last = initialSize;
-            var minInterval = _options.MinResizePollInterval <= TimeSpan.Zero
-                ? TimeSpan.FromMilliseconds(1)
-                : _options.MinResizePollInterval;
-            var interval = _options.ResizePollInterval < minInterval
-                ? minInterval
-                : _options.ResizePollInterval;
-
-            while (!token.IsCancellationRequested)
-            {
-                try
-                {
-                    var pollDelay = Task.Delay(interval, token);
-                    var signalWait = signalTicks.Reader.WaitToReadAsync(token).AsTask();
-                    await Task.WhenAny(pollDelay, signalWait).ConfigureAwait(false);
-
-                    while (signalTicks.Reader.TryRead(out _))
-                    {
-                        // Drain queued resize signals.
-                    }
-
-                    var current = await _terminal.GetSizeAsync(token).ConfigureAwait(false);
-                    if (current.Width != last.Width || current.Height != last.Height)
-                    {
-                        last = current;
-                        Send(new WindowSizeMsg(current.Width, current.Height));
-                    }
-                }
-                catch (OperationCanceledException)
-                {
-                    break;
-                }
-                catch
-                {
-                    // ignored: size monitoring best-effort.
-                }
-            }
-        }, token);
-
-        return (loop, registration);
-    }
-
-    private IDisposable? TryRegisterResizeSignal(Action onResize)
-    {
-        if (!_options.EnableResizeSignals)
-        {
-            return null;
-        }
-
-        if (_options.ResizeSignalRegistrationFactory is not null)
-        {
-            try
-            {
-                return _options.ResizeSignalRegistrationFactory(onResize);
-            }
-            catch
-            {
-                return null;
-            }
-        }
-
-        if (_terminal is ConsoleTerminalAdapter consoleTerminal)
-        {
-            var windowsRegistration = consoleTerminal.TryRegisterResizeSignal(onResize);
-            if (windowsRegistration is not null)
-            {
-                return windowsRegistration;
-            }
-        }
-
-        if (!(OperatingSystem.IsLinux() || OperatingSystem.IsMacOS()))
-        {
-            return null;
-        }
-
-        try
-        {
-            return PosixSignalRegistration.Create(PosixSignal.SIGWINCH, _ =>
-            {
-                try
-                {
-                    onResize();
-                }
-                catch
-                {
-                    // ignored: callback must not throw.
-                }
-            });
-        }
-        catch
-        {
-            return null;
-        }
-    }
-
-    private async Task CommandLoopAsync(CancellationToken token)
-    {
-        while (await _commands.Reader.WaitToReadAsync(token).ConfigureAwait(false))
-        {
-            while (_commands.Reader.TryRead(out var command))
-            {
-                if (_commandConcurrencyGate is not null)
-                {
-                    try
-                    {
-                        await _commandConcurrencyGate.WaitAsync(token).ConfigureAwait(false);
-                    }
-                    catch (OperationCanceledException)
-                    {
-                        break;
-                    }
-                }
-
-                StartTrackedCommand(command, token);
-            }
-        }
-
-        await WaitForTrackedCommandsAsync().ConfigureAwait(false);
-    }
-
-    private async Task ExecuteCommandAsync(Command command, CancellationToken token)
-    {
-        try
-        {
-            var message = await command(token).ConfigureAwait(false);
-            if (message is not null)
-            {
-                Send(message);
-            }
-        }
-        catch (OperationCanceledException) when (token.IsCancellationRequested)
-        {
-            // ignored: command canceled during shutdown.
-        }
-        catch (Exception ex)
-        {
-            if (_options.CatchCommandExceptions)
-            {
-                if (_options.RecoverCommandException is { } recover)
-                {
-                    try
-                    {
-                        var recoveryMessage = recover(ex);
-                        if (recoveryMessage is not null)
-                        {
-                            Send(recoveryMessage);
-                            return;
-                        }
-                    }
-                    catch (Exception recoveryException)
-                    {
-                        Send(new CommandErrorMsg(recoveryException));
-                        return;
-                    }
-                }
-
-                Send(new CommandErrorMsg(ex));
-                return;
-            }
-
-            _ = Interlocked.CompareExchange(
-                ref _unhandledCommandException,
-                ExceptionDispatchInfo.Capture(ex),
-                comparand: null);
-            Send(new InterruptMsg());
-        }
-    }
-
-    private async Task RunSequenceAsync(IReadOnlyList<Command> commands, CancellationToken token)
-    {
-        foreach (var command in commands)
-        {
-            if (token.IsCancellationRequested)
-            {
-                return;
-            }
-
-            await ExecuteCommandAsync(command, token).ConfigureAwait(false);
-        }
-    }
-
-    private void StartTrackedCommand(Command command, CancellationToken token)
-    {
-        var task = Task.Run(async () =>
-        {
-            try
-            {
-                await ExecuteCommandAsync(command, token).ConfigureAwait(false);
-            }
-            finally
-            {
-                _commandConcurrencyGate?.Release();
-            }
-        }, CancellationToken.None);
-
-        lock (_commandTaskLock)
-        {
-            _commandTasks.Add(task);
-        }
-
-        _ = task.ContinueWith(
-            static (completed, state) =>
-            {
-                if (state is not TeaProgram program)
-                {
-                    return;
-                }
-
-                lock (program._commandTaskLock)
-                {
-                    program._commandTasks.Remove(completed);
-                }
-            },
-            this,
-            CancellationToken.None,
-            TaskContinuationOptions.ExecuteSynchronously,
-            TaskScheduler.Default);
-    }
-
-    private async Task WaitForTrackedCommandsAsync()
-    {
-        while (true)
-        {
-            Task[] snapshot;
-            lock (_commandTaskLock)
-            {
-                if (_commandTasks.Count == 0)
-                {
-                    return;
-                }
-
-                snapshot = [.. _commandTasks];
-            }
-
-            try
-            {
-                await Task.WhenAll(snapshot).ConfigureAwait(false);
-            }
-            catch
-            {
-                // ignored: command exceptions are handled by runtime policy.
-            }
-        }
     }
 
     private async Task RenderAsync(View view, CancellationToken token)
@@ -624,7 +389,6 @@ public sealed class TeaProgram
         }
         catch
         {
-            // ignored: shutdown path.
         }
 
         if (inputLoop is not null)
@@ -635,7 +399,6 @@ public sealed class TeaProgram
             }
             catch
             {
-                // ignored: shutdown path.
             }
         }
 
@@ -647,325 +410,7 @@ public sealed class TeaProgram
             }
             catch
             {
-                // ignored: shutdown path.
             }
         }
     }
-
-    private static bool TryApplyModeReport(
-        TerminalCapabilityProfile current,
-        ModeReportMsg report,
-        out TerminalCapabilityProfile next)
-    {
-        next = current;
-        if (!TryClassifyModeReportState(report.State, out var supported, out var enabled))
-        {
-            return false;
-        }
-
-        var isTrackedMode = report.Mode is 1000 or 1002 or 1003 or 1004 or 1006 or 2004 or 2026;
-        if (!isTrackedMode)
-        {
-            return false;
-        }
-
-        if (report.Mode is 1000 or 1002 or 1003 && !supported)
-        {
-            return false;
-        }
-
-        var updated = report.Mode switch
-        {
-            1000 or 1002 or 1003 => current with { MouseReporting = true, ModeReports = true },
-            1004 => current with { FocusReporting = supported, ModeReports = true },
-            1006 => current with { MouseReporting = supported, ModeReports = true },
-            2004 => current with { BracketedPaste = supported, ModeReports = true },
-            2026 => current with { SynchronizedUpdates = supported, ModeReports = true },
-            _ => current,
-        };
-
-        var source = updated.Source;
-        if (!source.Contains("+mode-report", StringComparison.Ordinal))
-        {
-            source += "+mode-report";
-        }
-
-        if (!supported && !source.Contains("+mode-report-unsupported", StringComparison.Ordinal))
-        {
-            source += "+mode-report-unsupported";
-        }
-        else if (supported && !enabled && !source.Contains("+mode-report-reset", StringComparison.Ordinal))
-        {
-            source += "+mode-report-reset";
-        }
-
-        if (report.Mode is 1000 or 1002 or 1003
-            && supported
-            && !source.Contains("+mode-report-mouse-legacy", StringComparison.Ordinal))
-        {
-            source += "+mode-report-mouse-legacy";
-        }
-
-        next = updated with { Source = source };
-        return next != current;
-    }
-
-    private static bool TryClassifyModeReportState(ModeReportState state, out bool supported, out bool enabled)
-    {
-        supported = false;
-        enabled = false;
-        switch (state)
-        {
-            case ModeReportState.Unsupported:
-                supported = false;
-                enabled = false;
-                return true;
-            case ModeReportState.Set:
-            case ModeReportState.PermanentlySet:
-                supported = true;
-                enabled = true;
-                return true;
-            case ModeReportState.Reset:
-            case ModeReportState.PermanentlyReset:
-                supported = true;
-                enabled = false;
-                return true;
-            default:
-                return false;
-        }
-    }
-
-    private static bool TryRefineColorProfile(
-        TerminalColorProfile current,
-        CapabilityMsg capability,
-        out TerminalColorProfile next)
-    {
-        next = current;
-        if (!string.Equals(capability.Name, "RGB", StringComparison.OrdinalIgnoreCase)
-            && !string.Equals(capability.Name, "Tc", StringComparison.OrdinalIgnoreCase))
-        {
-            return false;
-        }
-
-        var value = (capability.Value ?? string.Empty).Trim();
-        var enabled = value.Length == 0
-            || value == "1"
-            || value.Equals("true", StringComparison.OrdinalIgnoreCase)
-            || value.Equals("yes", StringComparison.OrdinalIgnoreCase)
-            || value.Equals("on", StringComparison.OrdinalIgnoreCase);
-        if (!enabled)
-        {
-            return false;
-        }
-
-        if (current == TerminalColorProfile.TrueColor)
-        {
-            return false;
-        }
-
-        next = TerminalColorProfile.TrueColor;
-        return true;
-    }
-
-    private async Task StartCapabilityProbeAsync(CancellationToken token)
-    {
-        if (_terminal is null
-            || _options.DisableInput
-            || !_options.EnableCapabilityProbe
-            || !_terminal.IsInputInteractive
-            || !_terminal.IsOutputInteractive
-            || !_runtimeCapabilities.ModeReports)
-        {
-            return;
-        }
-
-        var modes = _options.CapabilityProbeModes is { Count: > 0 }
-            ? _options.CapabilityProbeModes
-            : DefaultCapabilityProbeModes;
-        if (modes.Count == 0)
-        {
-            return;
-        }
-
-        var probe = new CapabilityProbeState(Guid.NewGuid(), modes);
-        _capabilityProbe = probe;
-        await SendCapabilityProbeQueriesAsync(modes, token).ConfigureAwait(false);
-
-        _ = Task.Run(async () =>
-        {
-            try
-            {
-                await Task.Delay(_options.CapabilityProbeTimeout, token).ConfigureAwait(false);
-                Send(new CapabilityProbeTimeoutMsg(probe.Id));
-            }
-            catch (OperationCanceledException)
-            {
-                // ignored: normal shutdown path.
-            }
-        }, CancellationToken.None);
-    }
-
-    private async Task SendCapabilityProbeQueriesAsync(IReadOnlyList<int> modes, CancellationToken token)
-    {
-        if (_terminal is null || modes.Count == 0)
-        {
-            return;
-        }
-
-        var sequence = new StringBuilder(modes.Count * 10);
-        foreach (var mode in modes)
-        {
-            sequence.Append("\u001b[?");
-            sequence.Append(mode);
-            sequence.Append("$p");
-        }
-
-        try
-        {
-            var bytes = Encoding.ASCII.GetBytes(sequence.ToString());
-            await _terminal.Output.WriteAsync(bytes, token).ConfigureAwait(false);
-            await _terminal.Output.FlushAsync(token).ConfigureAwait(false);
-        }
-        catch
-        {
-            // ignored: probe is best-effort.
-        }
-    }
-
-    private void ObserveCapabilityProbeResponse(ModeReportMsg report)
-    {
-        if (_capabilityProbe is null)
-        {
-            return;
-        }
-
-        if (!_capabilityProbe.PendingModes.Remove(report.Mode))
-        {
-            return;
-        }
-
-        _capabilityProbe.SawAnyResponse = true;
-        if (TryClassifyModeReportState(report.State, out var supported, out _)
-            && supported)
-        {
-            _capabilityProbe.SupportedModes.Add(report.Mode);
-        }
-
-        if (_capabilityProbe.PendingModes.Count == 0)
-        {
-            _capabilityProbe = null;
-        }
-    }
-
-    private void HandleCapabilityProbeTimeout(CapabilityProbeTimeoutMsg timeout)
-    {
-        if (_capabilityProbe is null || _capabilityProbe.Id != timeout.ProbeId)
-        {
-            return;
-        }
-
-        var sawAnyResponse = _capabilityProbe.SawAnyResponse;
-        var unresolvedModes = _capabilityProbe.PendingModes
-            .Where(IsCapabilityRepresentativeProbeMode)
-            .ToArray();
-        var hasLegacyMouseSupport = _capabilityProbe.SupportedModes.Any(IsLegacyMouseProbeMode);
-        _capabilityProbe = null;
-        if (!sawAnyResponse)
-        {
-            if (!_runtimeCapabilities.ModeReports)
-            {
-                return;
-            }
-
-            var source = _runtimeCapabilities.Source;
-            if (!source.Contains("+probe-timeout", StringComparison.Ordinal))
-            {
-                source += "+probe-timeout";
-            }
-
-            _runtimeCapabilities = _runtimeCapabilities with
-            {
-                ModeReports = false,
-                Source = source,
-            };
-            _renderer?.UpdateCapabilities(_runtimeCapabilities);
-            Send(new TerminalCapabilitiesMsg(_runtimeCapabilities));
-            return;
-        }
-
-        var next = _runtimeCapabilities;
-        foreach (var unresolvedMode in unresolvedModes)
-        {
-            next = unresolvedMode switch
-            {
-                1004 => next with { FocusReporting = false },
-                1006 when hasLegacyMouseSupport => next,
-                1006 => next with { MouseReporting = false },
-                2004 => next with { BracketedPaste = false },
-                2026 => next with { SynchronizedUpdates = false },
-                _ => next,
-            };
-        }
-
-        if (next == _runtimeCapabilities)
-        {
-            return;
-        }
-
-        var nextSource = next.Source;
-        if (!nextSource.Contains("+probe-partial-timeout", StringComparison.Ordinal))
-        {
-            nextSource += "+probe-partial-timeout";
-        }
-
-        _runtimeCapabilities = next with { Source = nextSource };
-        _renderer?.UpdateCapabilities(_runtimeCapabilities);
-        Send(new TerminalCapabilitiesMsg(_runtimeCapabilities));
-    }
-
-    private static bool IsCapabilityRepresentativeProbeMode(int mode)
-    {
-        for (var i = 0; i < CapabilityProbeRepresentativeModes.Length; i++)
-        {
-            if (CapabilityProbeRepresentativeModes[i] == mode)
-            {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    private static bool IsLegacyMouseProbeMode(int mode)
-    {
-        for (var i = 0; i < LegacyMouseProbeModes.Length; i++)
-        {
-            if (LegacyMouseProbeModes[i] == mode)
-            {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    private sealed class CapabilityProbeState
-    {
-        public CapabilityProbeState(Guid id, IReadOnlyList<int> modes)
-        {
-            Id = id;
-            PendingModes = new HashSet<int>(modes);
-            SupportedModes = new HashSet<int>();
-        }
-
-        public Guid Id { get; }
-
-        public HashSet<int> PendingModes { get; }
-
-        public HashSet<int> SupportedModes { get; }
-
-        public bool SawAnyResponse { get; set; }
-    }
-
-    private sealed record CapabilityProbeTimeoutMsg(Guid ProbeId) : IMessage;
 }

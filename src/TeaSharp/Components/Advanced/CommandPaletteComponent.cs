@@ -6,10 +6,7 @@ namespace TeaSharp.Components;
 
 public sealed class CommandPaletteComponent : IStatefulComponent, IMouseStatefulComponent, IFocusableComponent
 {
-    private readonly List<CommandPaletteItem> _items = [];
-    private readonly List<int> _filtered = [];
-    private int _selectedFilteredIndex;
-    private int _hoveredFilteredIndex = -1;
+    private readonly CommandPaletteController _controller = new();
 
     public TextInputModel Query { get; } = new();
 
@@ -41,9 +38,7 @@ public sealed class CommandPaletteComponent : IStatefulComponent, IMouseStateful
 
     public void SetItems(IEnumerable<CommandPaletteItem> items)
     {
-        _items.Clear();
-        _items.AddRange(items);
-        RefreshFiltered();
+        _controller.SetItems(items, Query.Value);
     }
 
     public void Open()
@@ -55,7 +50,7 @@ public sealed class CommandPaletteComponent : IStatefulComponent, IMouseStateful
 
         IsOpen = true;
         Query.Clear();
-        RefreshFiltered();
+        _controller.Refresh(Query.Value);
     }
 
     public void Close()
@@ -89,15 +84,15 @@ public sealed class CommandPaletteComponent : IStatefulComponent, IMouseStateful
                 return true;
             }
 
-            if (NextItemKey.Matches(key) && _filtered.Count > 0)
+            if (NextItemKey.Matches(key) && _controller.FilteredCount > 0)
             {
-                _selectedFilteredIndex = (_selectedFilteredIndex + 1) % _filtered.Count;
+                _controller.MoveNext();
                 return true;
             }
 
-            if (PreviousItemKey.Matches(key) && _filtered.Count > 0)
+            if (PreviousItemKey.Matches(key) && _controller.FilteredCount > 0)
             {
-                _selectedFilteredIndex = (_selectedFilteredIndex + _filtered.Count - 1) % _filtered.Count;
+                _controller.MovePrevious();
                 return true;
             }
 
@@ -110,21 +105,16 @@ public sealed class CommandPaletteComponent : IStatefulComponent, IMouseStateful
         var inputResult = Query.Update(message, QueryKeyMap);
         if (inputResult.Changed)
         {
-            RefreshFiltered();
+            _controller.Refresh(Query.Value);
             return true;
         }
 
-        if (inputResult.Submitted)
-        {
-            return ExecuteSelected();
-        }
-
-        return false;
+        return inputResult.Submitted && ExecuteSelected();
     }
 
     public bool UpdateMouse(MouseMsg message, Rect bounds)
     {
-        if (!IsOpen || !TryResolveModal(bounds, out var modal, out var content))
+        if (!IsOpen || !CommandPaletteLayout.TryResolveModal(bounds, out var modal, out var content))
         {
             return false;
         }
@@ -135,7 +125,7 @@ public sealed class CommandPaletteComponent : IStatefulComponent, IMouseStateful
         {
             if (message is MouseMotionMsg or MouseClickMsg)
             {
-                changed |= SetHoveredFilteredIndex(-1);
+                changed |= _controller.SetHovered(-1);
             }
 
             if (message is MouseClickMsg { Button: MouseButton.Left } && InteractionProfile.ActivateOnClick)
@@ -147,16 +137,16 @@ public sealed class CommandPaletteComponent : IStatefulComponent, IMouseStateful
             return changed;
         }
 
-        if (message is MouseWheelMsg wheel && InteractionProfile.NavigateOnWheel && _filtered.Count > 0)
+        if (message is MouseWheelMsg wheel && InteractionProfile.NavigateOnWheel && _controller.FilteredCount > 0)
         {
             if (wheel.Button == MouseButton.WheelDown)
             {
-                _selectedFilteredIndex = (_selectedFilteredIndex + 1) % _filtered.Count;
+                _controller.MoveNext();
                 changed = true;
             }
             else if (wheel.Button == MouseButton.WheelUp)
             {
-                _selectedFilteredIndex = (_selectedFilteredIndex + _filtered.Count - 1) % _filtered.Count;
+                _controller.MovePrevious();
                 changed = true;
             }
         }
@@ -165,7 +155,7 @@ public sealed class CommandPaletteComponent : IStatefulComponent, IMouseStateful
         {
             if (message is MouseMotionMsg or MouseClickMsg)
             {
-                changed |= SetHoveredFilteredIndex(-1);
+                changed |= _controller.SetHovered(-1);
             }
 
             return changed;
@@ -174,7 +164,7 @@ public sealed class CommandPaletteComponent : IStatefulComponent, IMouseStateful
         var hovered = RowToFilteredIndex(content, message.Y);
         if (message is MouseMotionMsg && InteractionProfile.HoverOnMotion)
         {
-            changed |= SetHoveredFilteredIndex(hovered);
+            changed |= _controller.SetHovered(hovered);
             return changed;
         }
 
@@ -182,12 +172,12 @@ public sealed class CommandPaletteComponent : IStatefulComponent, IMouseStateful
         {
             if (InteractionProfile.HoverOnClick)
             {
-                changed |= SetHoveredFilteredIndex(hovered);
+                changed |= _controller.SetHovered(hovered);
             }
 
             if (click.Button == MouseButton.Left && InteractionProfile.ActivateOnClick && hovered >= 0)
             {
-                _selectedFilteredIndex = hovered;
+                changed |= _controller.SetSelectedFilteredIndex(hovered);
                 changed |= ExecuteSelected();
             }
         }
@@ -203,23 +193,12 @@ public sealed class CommandPaletteComponent : IStatefulComponent, IMouseStateful
         }
 
         var clipped = Rect.Intersect(rect, canvas.Bounds);
-        if (clipped.IsEmpty || clipped.Width < 24 || clipped.Height < 6)
+        if (!CommandPaletteLayout.TryResolveModal(clipped, out var modal, out var content))
         {
             return;
         }
-
-        var modalWidth = Math.Min(clipped.Width - 2, Math.Max(24, clipped.Width * 2 / 3));
-        var modalHeight = Math.Min(clipped.Height - 2, Math.Max(8, clipped.Height * 2 / 3));
-        var modalX = clipped.X + (clipped.Width - modalWidth) / 2;
-        var modalY = clipped.Y + (clipped.Height - modalHeight) / 2;
-        var modal = new Rect(modalX, modalY, modalWidth, modalHeight);
 
         canvas.DrawBox(modal, Title, BorderStyle.Rounded);
-        var content = modal.Inset(1, 1);
-        if (content.IsEmpty)
-        {
-            return;
-        }
 
         var queryWidth = Math.Max(1, content.Width - 2);
         var frame = Query.BuildFrame(queryWidth);
@@ -229,170 +208,65 @@ public sealed class CommandPaletteComponent : IStatefulComponent, IMouseStateful
             return;
         }
 
-        if (_filtered.Count == 0)
+        if (_controller.FilteredCount == 0)
         {
             canvas.WriteText(content.X, content.Y + 1, ItemStatePalette.Render("(no commands)", WidgetVisualState.Empty), content.Width);
             return;
         }
 
         var visibleRows = Math.Min(Math.Max(1, MaxVisibleItems), content.Height - 1);
-        var start = ComputeWindowStart(_selectedFilteredIndex, visibleRows, _filtered.Count);
-        var end = Math.Min(_filtered.Count, start + visibleRows);
+        var start = OptionListViewport.ComputeWindowStart(_controller.SelectedFilteredIndex, visibleRows, _controller.FilteredCount);
+        var end = Math.Min(_controller.FilteredCount, start + visibleRows);
         var row = 0;
-        for (var i = start; i < end; i++, row++)
+        for (var filteredIndex = start; filteredIndex < end; filteredIndex++, row++)
         {
-            var index = _filtered[i];
-            var item = _items[index];
-            var marker = i == _selectedFilteredIndex ? ">" : " ";
+            var item = _controller.GetFilteredItem(filteredIndex);
+            var marker = filteredIndex == _controller.SelectedFilteredIndex ? ">" : " ";
             var summary = string.IsNullOrWhiteSpace(item.Description)
                 ? item.Title
                 : $"{item.Title} - {item.Description}";
-
-            var states = new List<WidgetVisualState>(4);
-            if (i == _selectedFilteredIndex)
-            {
-                states.Add(WidgetVisualState.Cursor);
-                states.Add(WidgetVisualState.Selected);
-            }
-
-            if (i == _hoveredFilteredIndex)
-            {
-                states.Add(WidgetVisualState.Hovered);
-            }
-
-            if (item.States is not null)
-            {
-                states.AddRange(item.States);
-            }
-
-            canvas.WriteText(content.X, content.Y + 1 + row, ItemStatePalette.Render($"{marker} {summary}", states), content.Width);
+            canvas.WriteText(content.X, content.Y + 1 + row, ItemStatePalette.Render($"{marker} {summary}", ResolveStates(filteredIndex, item)), content.Width);
         }
+    }
+
+    private IReadOnlyCollection<WidgetVisualState> ResolveStates(int filteredIndex, CommandPaletteItem item)
+    {
+        var states = new List<WidgetVisualState>(4);
+        if (filteredIndex == _controller.SelectedFilteredIndex)
+        {
+            states.Add(WidgetVisualState.Cursor);
+            states.Add(WidgetVisualState.Selected);
+        }
+
+        if (filteredIndex == _controller.HoveredFilteredIndex)
+        {
+            states.Add(WidgetVisualState.Hovered);
+        }
+
+        if (item.States is not null)
+        {
+            states.AddRange(item.States);
+        }
+
+        return states;
     }
 
     private bool ExecuteSelected()
     {
-        if (_filtered.Count == 0)
+        var selected = _controller.GetSelectedItem();
+        if (selected is null)
         {
             Close();
             return true;
         }
 
-        var selected = Math.Clamp(_selectedFilteredIndex, 0, _filtered.Count - 1);
-        LastExecutedItemId = _items[_filtered[selected]].Id;
+        LastExecutedItemId = selected.Id;
         Close();
         return true;
     }
 
-    private void RefreshFiltered()
-    {
-        _filtered.Clear();
-        var filter = Query.Value.Trim();
-        for (var i = 0; i < _items.Count; i++)
-        {
-            var include = filter.Length == 0
-                || _items[i].Title.Contains(filter, StringComparison.OrdinalIgnoreCase)
-                || _items[i].Description.Contains(filter, StringComparison.OrdinalIgnoreCase)
-                || _items[i].Id.Contains(filter, StringComparison.OrdinalIgnoreCase);
-            if (include)
-            {
-                _filtered.Add(i);
-            }
-        }
-
-        if (_filtered.Count == 0)
-        {
-            _selectedFilteredIndex = 0;
-            _hoveredFilteredIndex = -1;
-            return;
-        }
-
-        _selectedFilteredIndex = Math.Clamp(_selectedFilteredIndex, 0, _filtered.Count - 1);
-        if (_hoveredFilteredIndex >= _filtered.Count)
-        {
-            _hoveredFilteredIndex = _filtered.Count - 1;
-        }
-    }
-
-    private static int ComputeWindowStart(int highlightedIndex, int rows, int count)
-    {
-        if (count <= rows)
-        {
-            return 0;
-        }
-
-        var half = rows / 2;
-        var start = highlightedIndex - half;
-        if (start < 0)
-        {
-            return 0;
-        }
-
-        var maxStart = count - rows;
-        if (start > maxStart)
-        {
-            return maxStart;
-        }
-
-        return start;
-    }
-
-    private bool TryResolveModal(Rect bounds, out Rect modal, out Rect content)
-    {
-        modal = default;
-        content = default;
-        var clipped = bounds;
-        if (clipped.IsEmpty || clipped.Width < 24 || clipped.Height < 6)
-        {
-            return false;
-        }
-
-        var modalWidth = Math.Min(clipped.Width - 2, Math.Max(24, clipped.Width * 2 / 3));
-        var modalHeight = Math.Min(clipped.Height - 2, Math.Max(8, clipped.Height * 2 / 3));
-        var modalX = clipped.X + (clipped.Width - modalWidth) / 2;
-        var modalY = clipped.Y + (clipped.Height - modalHeight) / 2;
-        modal = new Rect(modalX, modalY, modalWidth, modalHeight);
-        content = modal.Inset(1, 1);
-        return !content.IsEmpty;
-    }
-
     private int RowToFilteredIndex(Rect content, int y)
     {
-        if (_filtered.Count == 0)
-        {
-            return -1;
-        }
-
-        var row = y - (content.Y + 1);
-        if (row < 0)
-        {
-            return -1;
-        }
-
-        var visibleRows = Math.Min(Math.Max(1, MaxVisibleItems), Math.Max(0, content.Height - 1));
-        if (row >= visibleRows)
-        {
-            return -1;
-        }
-
-        var start = ComputeWindowStart(_selectedFilteredIndex, visibleRows, _filtered.Count);
-        var filtered = start + row;
-        if (filtered < 0 || filtered >= _filtered.Count)
-        {
-            return -1;
-        }
-
-        return filtered;
-    }
-
-    private bool SetHoveredFilteredIndex(int index)
-    {
-        if (_hoveredFilteredIndex == index)
-        {
-            return false;
-        }
-
-        _hoveredFilteredIndex = index;
-        return true;
+        return OptionListViewport.RowToVisibleIndex(content, y, MaxVisibleItems, _controller.FilteredCount, _controller.SelectedFilteredIndex);
     }
 }
-
