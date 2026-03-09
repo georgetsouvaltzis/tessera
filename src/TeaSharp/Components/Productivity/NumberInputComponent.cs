@@ -1,6 +1,6 @@
-using System.Globalization;
 using TeaSharp.Core.Abstractions;
 using TeaSharp.Core.Messages;
+using TeaSharp.Components.Internal;
 using TeaSharp.Widgets;
 
 namespace TeaSharp.Components;
@@ -45,7 +45,7 @@ public sealed class NumberInputComponent : IStatefulComponent, IFocusableCompone
 
     public void SetValue(double value)
     {
-        Value = Clamp(value);
+        Value = NumberInputFormatting.Clamp(value, Min, Max);
         SyncInput();
     }
 
@@ -61,24 +61,24 @@ public sealed class NumberInputComponent : IStatefulComponent, IFocusableCompone
             if (IncreaseKey.Matches(key))
             {
                 var before = Value;
-                Value = Clamp(Value + Step);
+                Value = NumberInputFormatting.Clamp(Value + Step, Min, Max);
                 SyncInput();
-                return !AreClose(before, Value);
+                return !NumberInputFormatting.AreClose(before, Value);
             }
 
             if (DecreaseKey.Matches(key))
             {
                 var before = Value;
-                Value = Clamp(Value - Step);
+                Value = NumberInputFormatting.Clamp(Value - Step, Min, Max);
                 SyncInput();
-                return !AreClose(before, Value);
+                return !NumberInputFormatting.AreClose(before, Value);
             }
 
             if (SubmitKey.Matches(key))
             {
                 if (TryParseInput(out var parsed))
                 {
-                    Value = Clamp(parsed);
+                    Value = NumberInputFormatting.Clamp(parsed, Min, Max);
                     LastSubmittedValue = Value;
                     SyncInput();
                 }
@@ -109,7 +109,7 @@ public sealed class NumberInputComponent : IStatefulComponent, IFocusableCompone
 
         if (result.Submitted && TryParseInput(out var submitted))
         {
-            Value = Clamp(submitted);
+            Value = NumberInputFormatting.Clamp(submitted, Min, Max);
             LastSubmittedValue = Value;
             SyncInput();
             return true;
@@ -117,7 +117,7 @@ public sealed class NumberInputComponent : IStatefulComponent, IFocusableCompone
 
         if (result.Changed && TryParseInput(out var edited))
         {
-            Value = Clamp(edited);
+            Value = NumberInputFormatting.Clamp(edited, Min, Max);
         }
 
         return result.Changed || result.Submitted;
@@ -125,100 +125,17 @@ public sealed class NumberInputComponent : IStatefulComponent, IFocusableCompone
 
     public void Render(Canvas canvas, Rect rect)
     {
-        var clipped = Rect.Intersect(rect, canvas.Bounds);
-        if (clipped.IsEmpty)
-        {
-            return;
-        }
-
-        Rect content;
-        if (ShowBorder)
-        {
-            canvas.DrawBox(clipped, Focused ? $"{Title} *" : Title);
-            content = clipped.Inset(1, 1);
-        }
-        else
-        {
-            content = clipped;
-        }
-
-        if (content.IsEmpty)
-        {
-            return;
-        }
-
-        var states = ResolveStates();
-        var frame = Input.BuildFrame(content.Width);
-        canvas.WriteText(content.X, content.Y, StatePalette.Render(frame.Text, states), content.Width);
-        if (content.Height > 1)
-        {
-            canvas.WriteText(content.X, content.Y + 1, StatePalette.Render($"value={FormatValue(Value)} range=[{FormatValue(Min)}, {FormatValue(Max)}]", states), content.Width);
-        }
-    }
-
-    private List<WidgetVisualState> ResolveStates()
-    {
-        var states = new List<WidgetVisualState>(4);
-        if (Focused)
-        {
-            states.Add(WidgetVisualState.Focused);
-        }
-
-        if (Disabled)
-        {
-            states.Add(WidgetVisualState.Disabled);
-        }
-
-        if (ReadOnly)
-        {
-            states.Add(WidgetVisualState.ReadOnly);
-        }
-
-        return states;
+        NumberInputRenderer.Render(canvas, rect, Input, StatePalette, Title, Focused, Disabled, ReadOnly, ShowBorder, Value, Min, Max, Precision);
     }
 
     private bool TryParseInput(out double value)
     {
-        var text = Input.Value.Trim();
-        if (double.TryParse(text, NumberStyles.Float, CultureInfo.InvariantCulture, out value))
-        {
-            return true;
-        }
-
-        if (double.TryParse(text, NumberStyles.Float, CultureInfo.CurrentCulture, out value))
-        {
-            return true;
-        }
-
-        text = text.Replace(',', '.');
-        return double.TryParse(text, NumberStyles.Float, CultureInfo.InvariantCulture, out value);
+        return NumberInputFormatting.TryParse(Input.Value, out value);
     }
 
     private void SyncInput()
     {
-        Input.SetValue(FormatValue(Value));
+        Input.SetValue(NumberInputFormatting.Format(Value, Precision));
         _replaceOnNextCharacter = true;
     }
-
-    private string FormatValue(double value)
-    {
-        var precision = Math.Clamp(Precision, 0, 8);
-        return value.ToString($"F{precision}", CultureInfo.InvariantCulture).TrimEnd('0').TrimEnd('.');
-    }
-
-    private double Clamp(double value)
-    {
-        if (Max <= Min)
-        {
-            return Min;
-        }
-
-        return Math.Clamp(value, Min, Max);
-    }
-
-    private static bool AreClose(double left, double right)
-    {
-        return Math.Abs(left - right) <= 0.000001;
-    }
 }
-

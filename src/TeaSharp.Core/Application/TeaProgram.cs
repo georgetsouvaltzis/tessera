@@ -14,16 +14,9 @@ public sealed class TeaProgram
     private readonly Channel<Command> _commands;
     private readonly object _stateLock = new();
     private readonly TeaCapabilityProbe _capabilityProbe = new();
-
-    private ITerminalAdapter? _terminal;
-    private IProgramRenderer? _renderer;
-    private TerminalReader? _reader;
+    private readonly TeaProgramRuntimeState _runtime = new();
     private CancellationTokenSource? _cts;
-    private TeaProgramCommandScheduler? _commandScheduler;
     private bool _running;
-    private TerminalCapabilityProfile _runtimeCapabilities = TerminalCapabilityProfile.AllSupported;
-    private TerminalColorProfile _runtimeColorProfile = TerminalColorProfile.Unknown;
-    private View _lastRenderedView = View.From(string.Empty);
 
     public TeaProgram(IModel initialModel, ProgramOptions? options = null)
     {
@@ -62,36 +55,36 @@ public sealed class TeaProgram
 
         try
         {
-            _terminal = _options.Terminal ?? new ConsoleTerminalAdapter();
-            _runtimeCapabilities = _options.TerminalCapabilities
+            _runtime.Terminal = _options.Terminal ?? new ConsoleTerminalAdapter();
+            _runtime.Capabilities = _options.TerminalCapabilities
                 ?? _options.TerminalCapabilityDetector?.Invoke()
                 ?? TerminalCapabilityDetector.Detect();
-            _runtimeColorProfile = _options.ColorProfile
+            _runtime.ColorProfile = _options.ColorProfile
                 ?? _options.ColorProfileDetector?.Invoke()
                 ?? TerminalColorProfileDetector.Detect();
-            _renderer = _options.DisableRenderer
+            _runtime.Renderer = _options.DisableRenderer
                 ? new NullRenderer()
-                : _options.Renderer ?? new AnsiDiffRenderer(_runtimeCapabilities, _options.AnsiRendererOptions);
-            _renderer.UpdateCapabilities(_runtimeCapabilities);
-            _commandScheduler = new TeaProgramCommandScheduler(_options, Send);
+                : _options.Renderer ?? new AnsiDiffRenderer(_runtime.Capabilities, _options.AnsiRendererOptions);
+            _runtime.Renderer.UpdateCapabilities(_runtime.Capabilities);
+            _runtime.CommandScheduler = new TeaProgramCommandScheduler(_options, Send);
 
-            await _terminal.PrepareAsync(token).ConfigureAwait(false);
-            await _renderer.InitializeAsync(_terminal.Output, token).ConfigureAwait(false);
-            Send(new TerminalCapabilitiesMsg(_runtimeCapabilities));
-            Send(new ColorProfileMsg(_runtimeColorProfile));
+            await _runtime.Terminal.PrepareAsync(token).ConfigureAwait(false);
+            await _runtime.Renderer.InitializeAsync(_runtime.Terminal.Output, token).ConfigureAwait(false);
+            Send(new TerminalCapabilitiesMsg(_runtime.Capabilities));
+            Send(new ColorProfileMsg(_runtime.ColorProfile));
 
             Task? resizeLoop = null;
-            if (_terminal.IsOutputInteractive)
+            if (_runtime.Terminal.IsOutputInteractive)
             {
-                var size = await _terminal.GetSizeAsync(token).ConfigureAwait(false);
-                _renderer.Resize(size.Width, size.Height);
+                var size = await _runtime.Terminal.GetSizeAsync(token).ConfigureAwait(false);
+                _runtime.Renderer.Resize(size.Width, size.Height);
                 Send(new WindowSizeMsg(size.Width, size.Height));
-                (resizeLoop, resizeSignalRegistration) = TeaProgramResizeMonitor.Start(_terminal, _options, size, Send, token);
+                (resizeLoop, resizeSignalRegistration) = TeaProgramResizeMonitor.Start(_runtime.Terminal, _options, size, Send, token);
             }
 
-            var commandLoop = Task.Run(() => _commandScheduler.RunLoopAsync(_commands.Reader, token), token);
+            var commandLoop = Task.Run(() => _runtime.CommandScheduler!.RunLoopAsync(_commands.Reader, token), token);
             var inputLoop = StartInputLoop(token);
-            await _capabilityProbe.StartAsync(_terminal, _options, _runtimeCapabilities, Send, token).ConfigureAwait(false);
+            await _capabilityProbe.StartAsync(_runtime.Terminal, _options, _runtime.Capabilities, Send, token).ConfigureAwait(false);
 
             if (Model.Init() is { } initCommand)
             {
@@ -105,7 +98,7 @@ public sealed class TeaProgram
         finally
         {
             resizeSignalRegistration?.Dispose();
-            if (_terminal is not null || _renderer is not null)
+            if (_runtime.Terminal is not null || _runtime.Renderer is not null)
             {
                 await ShutdownAsync(kill: true, CancellationToken.None).ConfigureAwait(false);
             }
@@ -117,8 +110,8 @@ public sealed class TeaProgram
 
             _cts?.Dispose();
             _cts = null;
-            _commandScheduler?.Dispose();
-            _commandScheduler = null;
+            _runtime.CommandScheduler?.Dispose();
+            _runtime.CommandScheduler = null;
         }
     }
 
@@ -145,7 +138,9 @@ public sealed class TeaProgram
             {
                 if (message is TeaCapabilityProbe.CapabilityProbeTimeoutMsg probeTimeout)
                 {
-                    _capabilityProbe.HandleTimeout(probeTimeout, ref _runtimeCapabilities, _renderer, Send);
+                    var capabilities = _runtime.Capabilities;
+                    _capabilityProbe.HandleTimeout(probeTimeout, ref capabilities, _runtime.Renderer, Send);
+                    _runtime.Capabilities = capabilities;
                     continue;
                 }
 
@@ -170,7 +165,7 @@ public sealed class TeaProgram
 
                 if (filtered is InterruptMsg)
                 {
-                    var unhandledCommandException = _commandScheduler?.ConsumeUnhandledException();
+                    var unhandledCommandException = _runtime.CommandScheduler?.ConsumeUnhandledException();
                     if (unhandledCommandException is not null)
                     {
                         unhandledCommandException.Throw();
@@ -185,10 +180,10 @@ public sealed class TeaProgram
                 }
 
                 if (filtered is ModeReportMsg modeReport
-                    && TeaCapabilityProbe.TryApplyModeReport(_runtimeCapabilities, modeReport, out var refinedCapabilities))
+                    && TeaCapabilityProbe.TryApplyModeReport(_runtime.Capabilities, modeReport, out var refinedCapabilities))
                 {
-                    _runtimeCapabilities = refinedCapabilities;
-                    _renderer?.UpdateCapabilities(refinedCapabilities);
+                    _runtime.Capabilities = refinedCapabilities;
+                    _runtime.Renderer?.UpdateCapabilities(refinedCapabilities);
                     Send(new TerminalCapabilitiesMsg(refinedCapabilities));
                 }
 
@@ -232,7 +227,7 @@ public sealed class TeaProgram
     {
         if (filtered is SequenceMsg sequence)
         {
-            _ = Task.Run(() => _commandScheduler!.RunSequenceAsync(sequence.Commands, token), token);
+            _ = Task.Run(() => _runtime.CommandScheduler!.RunSequenceAsync(sequence.Commands, token), token);
             return true;
         }
 
@@ -254,25 +249,25 @@ public sealed class TeaProgram
         switch (filtered)
         {
             case RawOutputMsg rawOutput:
-                if (_renderer is not null)
+                if (_runtime.Renderer is not null)
                 {
-                    await _renderer.WriteRawAsync(rawOutput.Content, token).ConfigureAwait(false);
+                    await _runtime.Renderer.WriteRawAsync(rawOutput.Content, token).ConfigureAwait(false);
                 }
 
                 return true;
             case WindowSizeMsg ws:
-                _renderer?.Resize(ws.Width, ws.Height);
+                _runtime.Renderer?.Resize(ws.Width, ws.Height);
                 break;
         }
 
         if (filtered is CapabilityMsg capability
-            && TeaCapabilityProbe.TryRefineColorProfile(_runtimeColorProfile, capability, out var refinedColorProfile))
+            && TeaCapabilityProbe.TryRefineColorProfile(_runtime.ColorProfile, capability, out var refinedColorProfile))
         {
-            _runtimeColorProfile = refinedColorProfile;
+            _runtime.ColorProfile = refinedColorProfile;
             Send(new ColorProfileMsg(refinedColorProfile));
         }
 
-        if (filtered is MouseMsg mouse && _lastRenderedView.OnMouse is { } onMouse)
+        if (filtered is MouseMsg mouse && _runtime.LastRenderedView.OnMouse is { } onMouse)
         {
             var callbackCommand = onMouse(mouse);
             if (callbackCommand is not null)
@@ -330,31 +325,31 @@ public sealed class TeaProgram
 
     private Task? StartInputLoop(CancellationToken token)
     {
-        if (_options.DisableInput || _terminal is null || !_terminal.IsInputInteractive)
+        if (_options.DisableInput || _runtime.Terminal is null || !_runtime.Terminal.IsInputInteractive)
         {
             return null;
         }
 
-        if (_terminal is ConsoleTerminalAdapter consoleTerminal
+        if (_runtime.Terminal is ConsoleTerminalAdapter consoleTerminal
             && (_options.UseConsoleKeyEvents || !consoleTerminal.IsRawModeActive))
         {
             return Task.Run(() => consoleTerminal.StreamConsoleKeyEventsAsync(token, Send), token);
         }
 
-        _reader = new TerminalReader(_terminal.Input, _options.EventDecoder ?? new EventDecoder(), _options.EscapeTimeout);
-        return Task.Run(() => _reader.StreamEventsAsync(token, Send), token);
+        _runtime.Reader = new TerminalReader(_runtime.Terminal.Input, _options.EventDecoder ?? new EventDecoder(), _options.EscapeTimeout);
+        return Task.Run(() => _runtime.Reader.StreamEventsAsync(token, Send), token);
     }
 
     private async Task RenderAsync(View view, CancellationToken token)
     {
-        if (_renderer is null)
+        if (_runtime.Renderer is null)
         {
             return;
         }
 
-        _lastRenderedView = view;
-        _renderer.Render(view);
-        await _renderer.FlushAsync(token).ConfigureAwait(false);
+        _runtime.LastRenderedView = view;
+        _runtime.Renderer.Render(view);
+        await _runtime.Renderer.FlushAsync(token).ConfigureAwait(false);
     }
 
     private async Task ShutdownAsync(bool kill, CancellationToken token)
@@ -362,23 +357,26 @@ public sealed class TeaProgram
         _commands.Writer.TryComplete();
         _messages.Writer.TryComplete();
 
-        if (_renderer is not null)
+        if (_runtime.Renderer is not null)
         {
             if (!kill)
             {
-                await _renderer.ResetAsync(token).ConfigureAwait(false);
+                await _runtime.Renderer.ResetAsync(token).ConfigureAwait(false);
             }
 
-            await _renderer.DisposeAsync().ConfigureAwait(false);
-            _renderer = null;
+            await _runtime.Renderer.DisposeAsync().ConfigureAwait(false);
+            _runtime.Renderer = null;
         }
 
-        if (_terminal is not null)
+        if (_runtime.Terminal is not null)
         {
-            await _terminal.RestoreAsync(token).ConfigureAwait(false);
-            await _terminal.DisposeAsync().ConfigureAwait(false);
-            _terminal = null;
+            await _runtime.Terminal.RestoreAsync(token).ConfigureAwait(false);
+            await _runtime.Terminal.DisposeAsync().ConfigureAwait(false);
+            _runtime.Terminal = null;
         }
+
+        _runtime.Reader = null;
+        _runtime.LastRenderedView = View.From(string.Empty);
     }
 
     private static async Task AwaitBackgroundLoops(Task commandLoop, Task? inputLoop, Task? resizeLoop)
