@@ -11,9 +11,10 @@ public sealed record MenuBarItem(
     char Shortcut = '\0',
     IReadOnlyCollection<WidgetVisualState>? States = null);
 
-public sealed class MenuBarComponent : IStatefulComponent
+public sealed class MenuBarComponent : IStatefulComponent, IMouseStatefulComponent
 {
     private readonly List<MenuBarItem> _items = [];
+    private int _hoveredIndex = -1;
 
     public int SelectedIndex { get; private set; }
 
@@ -34,6 +35,8 @@ public sealed class MenuBarComponent : IStatefulComponent
     public KeyBinding ActivateKey { get; set; } = new("enter/space", "activate", "enter", "space");
 
     public WidgetStatePalette ItemStatePalette { get; } = WidgetStatePalette.CreateDefault();
+
+    public WidgetInteractionProfile InteractionProfile { get; set; } = WidgetInteractionProfile.Default.Clone();
 
     public IReadOnlyList<MenuBarItem> Items => _items;
 
@@ -96,6 +99,73 @@ public sealed class MenuBarComponent : IStatefulComponent
         return false;
     }
 
+    public bool UpdateMouse(MouseMsg message, Rect bounds)
+    {
+        if (Disabled || _items.Count == 0 || bounds.IsEmpty)
+        {
+            return false;
+        }
+
+        var inRow = bounds.Contains(message.X, message.Y) && message.Y == bounds.Y;
+        var changed = false;
+        if (!inRow)
+        {
+            if (message is MouseMotionMsg or MouseClickMsg)
+            {
+                changed |= SetHoveredIndex(-1);
+            }
+
+            return changed;
+        }
+
+        if (message is MouseWheelMsg wheel && InteractionProfile.NavigateOnWheel)
+        {
+            if (wheel.Button == MouseButton.WheelDown)
+            {
+                SelectedIndex = (SelectedIndex + 1) % _items.Count;
+                changed = true;
+            }
+            else if (wheel.Button == MouseButton.WheelUp)
+            {
+                SelectedIndex = (SelectedIndex + _items.Count - 1) % _items.Count;
+                changed = true;
+            }
+        }
+
+        var hovered = HitTestItemIndex(message.X, bounds);
+        if (message is MouseMotionMsg && InteractionProfile.HoverOnMotion)
+        {
+            changed |= SetHoveredIndex(hovered);
+            return changed;
+        }
+
+        if (message is MouseClickMsg click)
+        {
+            if (InteractionProfile.HoverOnClick)
+            {
+                changed |= SetHoveredIndex(hovered);
+            }
+
+            if (click.Button == MouseButton.Left && InteractionProfile.ActivateOnClick && hovered >= 0)
+            {
+                if (SelectedIndex != hovered)
+                {
+                    SelectedIndex = hovered;
+                    changed = true;
+                }
+
+                if (!ReadOnly)
+                {
+                    LastActivatedItemId = _items[SelectedIndex].Id;
+                    ActivationVersion++;
+                    changed = true;
+                }
+            }
+        }
+
+        return changed;
+    }
+
     public void Render(Canvas canvas, Rect rect)
     {
         var clipped = Rect.Intersect(rect, canvas.Bounds);
@@ -133,6 +203,11 @@ public sealed class MenuBarComponent : IStatefulComponent
                 states.Add(WidgetVisualState.Selected);
             }
 
+            if (i == _hoveredIndex)
+            {
+                states.Add(WidgetVisualState.Hovered);
+            }
+
             var itemStates = _items[i].States;
             if (itemStates is not null)
             {
@@ -144,6 +219,37 @@ public sealed class MenuBarComponent : IStatefulComponent
             x += label.Length + 1;
         }
     }
+
+    private int HitTestItemIndex(int x, Rect bounds)
+    {
+        var cursor = bounds.X;
+        for (var i = 0; i < _items.Count && cursor < bounds.Right; i++)
+        {
+            var label = _items[i].Shortcut == '\0'
+                ? $" {_items[i].Title} "
+                : $" {_items[i].Title}({_items[i].Shortcut}) ";
+            var end = cursor + label.Length;
+            if (x >= cursor && x < end)
+            {
+                return i;
+            }
+
+            cursor = end + 1;
+        }
+
+        return -1;
+    }
+
+    private bool SetHoveredIndex(int index)
+    {
+        if (_hoveredIndex == index)
+        {
+            return false;
+        }
+
+        _hoveredIndex = index;
+        return true;
+    }
 }
 
 public sealed record ContextMenuItem(
@@ -151,10 +257,11 @@ public sealed record ContextMenuItem(
     string Title,
     IReadOnlyCollection<WidgetVisualState>? States = null);
 
-public sealed class ContextMenuComponent : IStatefulComponent
+public sealed class ContextMenuComponent : IStatefulComponent, IMouseStatefulComponent
 {
     private readonly List<ContextMenuItem> _items = [];
     private int _selectedIndex;
+    private int _hoveredIndex = -1;
 
     public string Title { get; set; } = "Context";
 
@@ -183,6 +290,8 @@ public sealed class ContextMenuComponent : IStatefulComponent
     public KeyBinding CloseKey { get; set; } = new("esc", "close", "escape");
 
     public WidgetStatePalette ItemStatePalette { get; } = WidgetStatePalette.CreateDefault();
+
+    public WidgetInteractionProfile InteractionProfile { get; set; } = WidgetInteractionProfile.Default.Clone();
 
     public IReadOnlyList<ContextMenuItem> Items => _items;
 
@@ -244,6 +353,103 @@ public sealed class ContextMenuComponent : IStatefulComponent
         }
 
         return false;
+    }
+
+    public bool UpdateMouse(MouseMsg message, Rect bounds)
+    {
+        if (!Visible || Disabled || !TryResolveMenuBounds(bounds, out var menuBounds, out var content))
+        {
+            return false;
+        }
+
+        var insideMenu = ContainsWithRightTolerance(menuBounds, message.X, message.Y);
+        var changed = false;
+        if (!insideMenu)
+        {
+            if (message is MouseMotionMsg or MouseClickMsg)
+            {
+                changed |= SetHoveredIndex(-1);
+            }
+
+            if (message is MouseClickMsg or MouseReleaseMsg && InteractionProfile.ActivateOnClick)
+            {
+                Close();
+                changed = true;
+            }
+
+            return changed;
+        }
+
+        if (_items.Count == 0)
+        {
+            return changed;
+        }
+
+        if (message is MouseWheelMsg wheel && InteractionProfile.NavigateOnWheel)
+        {
+            if (wheel.Button == MouseButton.WheelDown)
+            {
+                _selectedIndex = (_selectedIndex + 1) % _items.Count;
+                changed = true;
+            }
+            else if (wheel.Button == MouseButton.WheelUp)
+            {
+                _selectedIndex = (_selectedIndex + _items.Count - 1) % _items.Count;
+                changed = true;
+            }
+        }
+
+        if (!ContainsWithRightTolerance(content, message.X, message.Y))
+        {
+            if (message is MouseMotionMsg or MouseClickMsg)
+            {
+                changed |= SetHoveredIndex(-1);
+            }
+
+            return changed;
+        }
+
+        var hovered = RowFromPointer(content, message.Y);
+        if (message is MouseMotionMsg && InteractionProfile.HoverOnMotion)
+        {
+            changed |= SetHoveredIndex(hovered);
+            return changed;
+        }
+
+        if (message is MouseClickMsg or MouseReleaseMsg)
+        {
+            if (InteractionProfile.HoverOnClick)
+            {
+                changed |= SetHoveredIndex(hovered);
+            }
+
+            var leftActivate = message.Button == MouseButton.Left || message is MouseReleaseMsg;
+            if (leftActivate && InteractionProfile.ActivateOnClick)
+            {
+                var target = hovered >= 0
+                    ? hovered
+                    : _selectedIndex;
+                if (target < 0 || target >= _items.Count)
+                {
+                    return changed;
+                }
+
+                if (_selectedIndex != target)
+                {
+                    _selectedIndex = target;
+                    changed = true;
+                }
+
+                if (!ReadOnly)
+                {
+                    LastExecutedItemId = _items[_selectedIndex].Id;
+                    Close();
+                    changed = true;
+                }
+            }
+        }
+
+        return changed;
     }
 
     public void Render(Canvas canvas, Rect rect)
@@ -316,6 +522,11 @@ public sealed class ContextMenuComponent : IStatefulComponent
                 states.Add(WidgetVisualState.Selected);
             }
 
+            if (i == _hoveredIndex)
+            {
+                states.Add(WidgetVisualState.Hovered);
+            }
+
             var itemStates = _items[i].States;
             if (itemStates is not null)
             {
@@ -325,6 +536,62 @@ public sealed class ContextMenuComponent : IStatefulComponent
             var cursor = i == _selectedIndex ? ">" : " ";
             canvas.WriteText(content.X, content.Y + i, ItemStatePalette.Render($"{cursor} {_items[i].Title}", states), content.Width);
         }
+    }
+
+    private bool TryResolveMenuBounds(Rect bounds, out Rect menuBounds, out Rect content)
+    {
+        menuBounds = default;
+        content = default;
+
+        var clipped = bounds;
+        if (clipped.IsEmpty)
+        {
+            return false;
+        }
+
+        var itemWidth = _items.Count == 0
+            ? 12
+            : Math.Max(12, _items.Max(item => item.Title.Length + 4));
+        var width = Math.Min(itemWidth, clipped.Width);
+        var height = Math.Min(Math.Max(3, _items.Count + 2), clipped.Height);
+
+        var x = Math.Clamp(AnchorX, clipped.X, Math.Max(clipped.X, clipped.Right - width));
+        var y = Math.Clamp(AnchorY, clipped.Y, Math.Max(clipped.Y, clipped.Bottom - height));
+        menuBounds = new Rect(x, y, width, height);
+        content = ShowBorder
+            ? menuBounds.Inset(1, 1)
+            : menuBounds;
+        return !content.IsEmpty;
+    }
+
+    private int RowFromPointer(Rect content, int y)
+    {
+        var row = y - content.Y;
+        if (row < 0 || row >= Math.Min(content.Height, _items.Count))
+        {
+            return -1;
+        }
+
+        return row;
+    }
+
+    private bool SetHoveredIndex(int index)
+    {
+        if (_hoveredIndex == index)
+        {
+            return false;
+        }
+
+        _hoveredIndex = index;
+        return true;
+    }
+
+    private static bool ContainsWithRightTolerance(Rect rect, int x, int y)
+    {
+        return y >= rect.Y
+            && y < rect.Bottom
+            && x >= rect.X
+            && x <= rect.Right;
     }
 }
 
@@ -545,8 +812,10 @@ public sealed class NumberInputComponent : IStatefulComponent
     }
 }
 
-public sealed class DatePickerComponent : IStatefulComponent
+public sealed class DatePickerComponent : IStatefulComponent, IMouseStatefulComponent
 {
+    private DateOnly? _hoveredDate;
+
     public string Title { get; set; } = "Date Picker";
 
     public bool Focused { get; set; }
@@ -578,6 +847,8 @@ public sealed class DatePickerComponent : IStatefulComponent
     public KeyBinding CommitKey { get; set; } = new("enter/space", "commit date", "enter", "space");
 
     public WidgetStatePalette DayStatePalette { get; } = WidgetStatePalette.CreateDefault();
+
+    public WidgetInteractionProfile InteractionProfile { get; set; } = WidgetInteractionProfile.Default.Clone();
 
     public void SetDate(DateOnly date)
     {
@@ -635,6 +906,78 @@ public sealed class DatePickerComponent : IStatefulComponent
         }
 
         return false;
+    }
+
+    public bool UpdateMouse(MouseMsg message, Rect bounds)
+    {
+        if (Disabled || ReadOnly)
+        {
+            return false;
+        }
+
+        var content = ResolveContentRect(bounds);
+        if (content.IsEmpty)
+        {
+            return false;
+        }
+
+        var inside = content.Contains(message.X, message.Y);
+        var changed = false;
+        if (!inside)
+        {
+            if (message is MouseMotionMsg or MouseClickMsg)
+            {
+                changed |= SetHoveredDate(null);
+            }
+
+            return changed;
+        }
+
+        if (message is MouseWheelMsg wheel && InteractionProfile.NavigateOnWheel)
+        {
+            if (wheel.Button == MouseButton.WheelUp)
+            {
+                SetDate(SelectedDate.AddMonths(-1));
+                changed = true;
+            }
+            else if (wheel.Button == MouseButton.WheelDown)
+            {
+                SetDate(SelectedDate.AddMonths(1));
+                changed = true;
+            }
+        }
+
+        if (!TryGetDateAtPointer(content, message.X, message.Y, out var hovered))
+        {
+            if (message is MouseMotionMsg or MouseClickMsg)
+            {
+                changed |= SetHoveredDate(null);
+            }
+
+            return changed;
+        }
+
+        if (message is MouseMotionMsg && InteractionProfile.HoverOnMotion)
+        {
+            changed |= SetHoveredDate(hovered);
+            return changed;
+        }
+
+        if (message is MouseClickMsg click)
+        {
+            if (InteractionProfile.HoverOnClick)
+            {
+                changed |= SetHoveredDate(hovered);
+            }
+
+            if (click.Button == MouseButton.Left && InteractionProfile.ActivateOnClick && hovered != SelectedDate)
+            {
+                SetDate(hovered);
+                changed = true;
+            }
+        }
+
+        return changed;
     }
 
     public void Render(Canvas canvas, Rect rect)
@@ -696,18 +1039,80 @@ public sealed class DatePickerComponent : IStatefulComponent
 
                 var text = day.ToString().PadLeft(2, ' ');
                 var date = new DateOnly(CurrentMonth.Year, CurrentMonth.Month, day);
-                var states = date == SelectedDate
-                    ? new[]
-                    {
-                        WidgetVisualState.Selected,
-                        WidgetVisualState.Cursor,
-                        Focused ? WidgetVisualState.Focused : WidgetVisualState.Default
-                    }
-                    : new[] { WidgetVisualState.Default };
+                var states = new List<WidgetVisualState>(5);
+                if (date == SelectedDate)
+                {
+                    states.Add(WidgetVisualState.Selected);
+                    states.Add(WidgetVisualState.Cursor);
+                }
+
+                if (Focused)
+                {
+                    states.Add(WidgetVisualState.Focused);
+                }
+
+                if (_hoveredDate.HasValue && _hoveredDate.Value == date)
+                {
+                    states.Add(WidgetVisualState.Hovered);
+                }
+
                 canvas.WriteText(x, content.Y + 2 + row, DayStatePalette.Render(text, states), Math.Min(2, content.Right - x));
                 day++;
             }
         }
+    }
+
+    private Rect ResolveContentRect(Rect bounds)
+    {
+        return ShowBorder
+            ? bounds.Inset(1, 1)
+            : bounds;
+    }
+
+    private bool TryGetDateAtPointer(Rect content, int x, int y, out DateOnly date)
+    {
+        date = default;
+        var row = y - (content.Y + 2);
+        if (row < 0 || row >= 6)
+        {
+            return false;
+        }
+
+        var relativeX = x - content.X;
+        if (relativeX < 0)
+        {
+            return false;
+        }
+
+        var col = relativeX / 3;
+        if (col < 0 || col > 6)
+        {
+            return false;
+        }
+
+        var first = new DateOnly(CurrentMonth.Year, CurrentMonth.Month, 1);
+        var startOffset = ((int)first.DayOfWeek + 6) % 7;
+        var daysInMonth = DateTime.DaysInMonth(CurrentMonth.Year, CurrentMonth.Month);
+        var cell = (row * 7) + col;
+        var day = cell - startOffset + 1;
+        if (day < 1 || day > daysInMonth)
+        {
+            return false;
+        }
+
+        date = new DateOnly(CurrentMonth.Year, CurrentMonth.Month, day);
+        return true;
+    }
+
+    private bool SetHoveredDate(DateOnly? date)
+    {
+        if (_hoveredDate == date)
+        {
+            return false;
+        }
+
+        _hoveredDate = date;
+        return true;
     }
 }
 
@@ -718,8 +1123,10 @@ public enum TimePickerField
     Second = 2,
 }
 
-public sealed class TimePickerComponent : IStatefulComponent
+public sealed class TimePickerComponent : IStatefulComponent, IMouseStatefulComponent
 {
+    private TimePickerField? _hoveredField;
+
     public string Title { get; set; } = "Time Picker";
 
     public bool Focused { get; set; }
@@ -753,6 +1160,8 @@ public sealed class TimePickerComponent : IStatefulComponent
     public KeyBinding CommitKey { get; set; } = new("enter/space", "commit time", "enter", "space");
 
     public WidgetStatePalette FieldStatePalette { get; } = WidgetStatePalette.CreateDefault();
+
+    public WidgetInteractionProfile InteractionProfile { get; set; } = WidgetInteractionProfile.Default.Clone();
 
     public void SetValue(TimeOnly time)
     {
@@ -797,6 +1206,78 @@ public sealed class TimePickerComponent : IStatefulComponent
         }
 
         return false;
+    }
+
+    public bool UpdateMouse(MouseMsg message, Rect bounds)
+    {
+        if (Disabled || ReadOnly)
+        {
+            return false;
+        }
+
+        var content = ResolveContentRect(bounds);
+        if (content.IsEmpty)
+        {
+            return false;
+        }
+
+        var inside = content.Contains(message.X, message.Y);
+        var changed = false;
+        if (!inside)
+        {
+            if (message is MouseMotionMsg or MouseClickMsg)
+            {
+                changed |= SetHoveredField(null);
+            }
+
+            return changed;
+        }
+
+        var field = FieldFromPointer(content, message.X, message.Y);
+        if (message is MouseMotionMsg && InteractionProfile.HoverOnMotion)
+        {
+            changed |= SetHoveredField(field);
+            return changed;
+        }
+
+        if (message is MouseClickMsg or MouseReleaseMsg)
+        {
+            if (InteractionProfile.HoverOnClick)
+            {
+                changed |= SetHoveredField(field);
+            }
+
+            if (message.Button == MouseButton.Left && InteractionProfile.ActivateOnClick && field.HasValue)
+            {
+                if (ActiveField != field.Value)
+                {
+                    ActiveField = field.Value;
+                    changed = true;
+                }
+            }
+        }
+
+        if (message is MouseWheelMsg wheel && InteractionProfile.NavigateOnWheel)
+        {
+            if (field.HasValue && ActiveField != field.Value)
+            {
+                ActiveField = field.Value;
+                changed = true;
+            }
+
+            if (wheel.Button == MouseButton.WheelUp)
+            {
+                Adjust(1);
+                changed = true;
+            }
+            else if (wheel.Button == MouseButton.WheelDown)
+            {
+                Adjust(-1);
+                changed = true;
+            }
+        }
+
+        return changed;
     }
 
     public void Render(Canvas canvas, Rect rect)
@@ -853,6 +1334,11 @@ public sealed class TimePickerComponent : IStatefulComponent
             states.Add(WidgetVisualState.Selected);
         }
 
+        if (_hoveredField.HasValue && _hoveredField.Value == field)
+        {
+            states.Add(WidgetVisualState.Hovered);
+        }
+
         return FieldStatePalette.Render(value, states);
     }
 
@@ -865,6 +1351,46 @@ public sealed class TimePickerComponent : IStatefulComponent
             _ => TimeSpan.FromSeconds(SecondStep * direction),
         };
         Value = Value.Add(delta);
+    }
+
+    private Rect ResolveContentRect(Rect bounds)
+    {
+        return ShowBorder
+            ? bounds.Inset(1, 1)
+            : bounds;
+    }
+
+    private static TimePickerField? FieldFromPointer(Rect content, int x, int y)
+    {
+        if (y < content.Y || y >= content.Bottom)
+        {
+            return null;
+        }
+
+        var index = x - content.X;
+        if (index < 0)
+        {
+            return null;
+        }
+
+        return index switch
+        {
+            <= 2 => TimePickerField.Hour,
+            <= 5 => TimePickerField.Minute,
+            <= 8 => TimePickerField.Second,
+            _ => null,
+        };
+    }
+
+    private bool SetHoveredField(TimePickerField? field)
+    {
+        if (_hoveredField == field)
+        {
+            return false;
+        }
+
+        _hoveredField = field;
+        return true;
     }
 }
 

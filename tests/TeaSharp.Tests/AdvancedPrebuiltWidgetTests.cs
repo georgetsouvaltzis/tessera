@@ -9,11 +9,17 @@ internal static class AdvancedPrebuiltWidgetTests
     {
         yield return new TestCase("Advanced_BadgeComponent_RendersLabel", BadgeComponent_RendersLabel);
         yield return new TestCase("Advanced_ToggleSwitchComponent_TogglesValue", ToggleSwitchComponent_TogglesValue);
+        yield return new TestCase("Advanced_ToggleSwitchComponent_MouseClickTogglesValue", ToggleSwitchComponent_MouseClickTogglesValue);
         yield return new TestCase("Advanced_SliderComponent_AdjustsValue", SliderComponent_AdjustsValue);
+        yield return new TestCase("Advanced_SliderComponent_MouseClickSetsValue", SliderComponent_MouseClickSetsValue);
         yield return new TestCase("Advanced_SpinnerComponent_AdvancesFrame", SpinnerComponent_AdvancesFrame);
+        yield return new TestCase("Advanced_SpinnerComponent_MouseWheelAdvancesFrame", SpinnerComponent_MouseWheelAdvancesFrame);
         yield return new TestCase("Advanced_CommandPaletteComponent_FiltersAndExecutes", CommandPaletteComponent_FiltersAndExecutes);
+        yield return new TestCase("Advanced_CommandPaletteComponent_MouseClickExecutesSelection", CommandPaletteComponent_MouseClickExecutesSelection);
         yield return new TestCase("Advanced_TreeViewComponent_TogglesExpansion", TreeViewComponent_TogglesExpansion);
+        yield return new TestCase("Advanced_TreeViewComponent_MouseClickSelectsVisibleNode", TreeViewComponent_MouseClickSelectsVisibleNode);
         yield return new TestCase("Advanced_NotificationCenterComponent_DismissesEntries", NotificationCenterComponent_DismissesEntries);
+        yield return new TestCase("Advanced_NotificationCenterComponent_MouseWheelMovesSelection", NotificationCenterComponent_MouseWheelMovesSelection);
     }
 
     private static Task BadgeComponent_RendersLabel()
@@ -46,6 +52,20 @@ internal static class AdvancedPrebuiltWidgetTests
         return Task.CompletedTask;
     }
 
+    private static Task ToggleSwitchComponent_MouseClickTogglesValue()
+    {
+        var toggle = new ToggleSwitchComponent
+        {
+            ShowBorder = false,
+        };
+
+        var changed = toggle.UpdateMouse(new MouseClickMsg(MouseButton.Left, 0, 0), new Rect(0, 0, 10, 1));
+
+        TestAssert.True(changed, "Toggle mouse click should report state change.");
+        TestAssert.True(toggle.Value, "Toggle mouse click should enable value.");
+        return Task.CompletedTask;
+    }
+
     private static Task SliderComponent_AdjustsValue()
     {
         var slider = new SliderComponent
@@ -67,6 +87,23 @@ internal static class AdvancedPrebuiltWidgetTests
         return Task.CompletedTask;
     }
 
+    private static Task SliderComponent_MouseClickSetsValue()
+    {
+        var slider = new SliderComponent
+        {
+            ShowBorder = false,
+            Min = 0,
+            Max = 10,
+            Step = 1,
+        };
+
+        var changed = slider.UpdateMouse(new MouseClickMsg(MouseButton.Left, 19, 1), new Rect(0, 0, 20, 2));
+
+        TestAssert.True(changed, "Slider mouse click should update slider value.");
+        TestAssert.True(Math.Abs(slider.Value - 10) < 0.0001, "Slider click at far-right should move value to max.");
+        return Task.CompletedTask;
+    }
+
     private static Task SpinnerComponent_AdvancesFrame()
     {
         var spinner = new SpinnerComponent
@@ -79,6 +116,21 @@ internal static class AdvancedPrebuiltWidgetTests
         TestAssert.True(spinner.FrameIndex != before, "Spinner should advance when running.");
         spinner.Update(new KeyPressMsg(KeyCode.Enter));
         TestAssert.True(!spinner.Running, "Spinner should stop when toggled.");
+        return Task.CompletedTask;
+    }
+
+    private static Task SpinnerComponent_MouseWheelAdvancesFrame()
+    {
+        var spinner = new SpinnerComponent
+        {
+            ShowBorder = false,
+        };
+
+        var before = spinner.FrameIndex;
+        var changed = spinner.UpdateMouse(new MouseWheelMsg(MouseButton.WheelDown, 0, 0), new Rect(0, 0, 16, 1));
+
+        TestAssert.True(changed, "Spinner wheel should advance frame while running.");
+        TestAssert.True(spinner.FrameIndex != before, "Spinner wheel should move frame index.");
         return Task.CompletedTask;
     }
 
@@ -100,6 +152,27 @@ internal static class AdvancedPrebuiltWidgetTests
 
         TestAssert.Equal("rollback", palette.LastExecutedItemId ?? string.Empty, "Command palette should execute filtered item.");
         TestAssert.True(!palette.IsOpen, "Palette should close after execute.");
+        return Task.CompletedTask;
+    }
+
+    private static Task CommandPaletteComponent_MouseClickExecutesSelection()
+    {
+        var palette = new CommandPaletteComponent
+        {
+            Focused = true,
+        };
+        palette.SetItems(
+        [
+            new CommandPaletteItem("deploy", "Deploy", "publish release"),
+            new CommandPaletteItem("rollback", "Rollback", "restore previous"),
+        ]);
+        palette.Open();
+
+        var changed = palette.UpdateMouse(new MouseClickMsg(MouseButton.Left, 12, 5), new Rect(0, 0, 60, 20));
+
+        TestAssert.True(changed, "Command palette click should execute selected command.");
+        TestAssert.Equal("deploy", palette.LastExecutedItemId ?? string.Empty, "Palette click should execute clicked row.");
+        TestAssert.True(!palette.IsOpen, "Palette should close after click execute.");
         return Task.CompletedTask;
     }
 
@@ -131,6 +204,27 @@ internal static class AdvancedPrebuiltWidgetTests
         return Task.CompletedTask;
     }
 
+    private static Task TreeViewComponent_MouseClickSelectsVisibleNode()
+    {
+        var tree = new TreeViewComponent
+        {
+            ShowBorder = false,
+        };
+        tree.SetRoots(
+        [
+            new TreeItemNode("root", "Root",
+            [
+                new TreeItemNode("child", "Child"),
+            ]),
+        ]);
+
+        var changed = tree.UpdateMouse(new MouseClickMsg(MouseButton.Left, 0, 1), new Rect(0, 0, 30, 4));
+
+        TestAssert.True(changed, "Tree click should update selected node.");
+        TestAssert.Equal("child", tree.SelectedNodeId ?? string.Empty, "Tree click should select visible row under pointer.");
+        return Task.CompletedTask;
+    }
+
     private static Task NotificationCenterComponent_DismissesEntries()
     {
         var center = new NotificationCenterComponent
@@ -145,6 +239,27 @@ internal static class AdvancedPrebuiltWidgetTests
 
         TestAssert.Equal(1, center.Entries.Count, "Notification center should dismiss selected entry.");
         TestAssert.Equal("a", center.Entries[0].Id, "Remaining entry should be the non-selected one.");
+        return Task.CompletedTask;
+    }
+
+    private static Task NotificationCenterComponent_MouseWheelMovesSelection()
+    {
+        var center = new NotificationCenterComponent
+        {
+            Focused = true,
+            ShowBorder = false,
+        };
+        center.Push("first", NotificationSeverity.Info, id: "a");
+        center.Push("second", NotificationSeverity.Info, id: "b");
+        center.Push("third", NotificationSeverity.Info, id: "c");
+
+        var changed = center.UpdateMouse(new MouseWheelMsg(MouseButton.WheelUp, 0, 1), new Rect(0, 0, 32, 6));
+        center.Update(new KeyPressMsg(KeyCode.Character, "d"));
+
+        TestAssert.True(changed, "Notification center wheel should move selected entry.");
+        TestAssert.Equal(2, center.Entries.Count, "Dismiss should remove wheel-selected entry.");
+        TestAssert.True(center.Entries.Any(entry => entry.Id == "c"), "Newest entry should remain after moving selection up.");
+        TestAssert.True(center.Entries.Any(entry => entry.Id == "a"), "Oldest entry should remain after removing middle entry.");
         return Task.CompletedTask;
     }
 }

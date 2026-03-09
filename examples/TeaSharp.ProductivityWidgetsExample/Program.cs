@@ -125,6 +125,74 @@ internal sealed class ProductivityModel : IModel
             return new UpdateResult(this, null);
         }
 
+        if (message is MouseMsg mouse)
+        {
+            var layout = GetInteractionRects();
+            var mouseChanged = false;
+            if (_context.Visible)
+            {
+                var beforeContext = _context.LastExecutedItemId;
+                mouseChanged |= _context.UpdateMouse(mouse, layout.ContentRect);
+                if (!string.Equals(beforeContext, _context.LastExecutedItemId, StringComparison.Ordinal))
+                {
+                    ApplyContextAction(_context.LastExecutedItemId);
+                    mouseChanged = true;
+                }
+
+                if (mouseChanged)
+                {
+                    _lastEvent = $"mouse:{mouse.EventType.ToString().ToLowerInvariant()}";
+                }
+
+                return new UpdateResult(this, null);
+            }
+
+            var mouseBeforeMenuActivation = _menu.ActivationVersion;
+            if (layout.MenuRect.Contains(mouse.X, mouse.Y)
+                || (mouse is MouseWheelMsg && _focus == ProductivityFocus.Menu))
+            {
+                mouseChanged |= _menu.UpdateMouse(mouse, layout.MenuRect);
+                if (mouse is MouseClickMsg { Button: MouseButton.Left })
+                {
+                    _focus = ProductivityFocus.Menu;
+                    mouseChanged = true;
+                }
+            }
+            else if (layout.DateRect.Contains(mouse.X, mouse.Y)
+                || (mouse is MouseWheelMsg && _focus == ProductivityFocus.Date))
+            {
+                mouseChanged |= _date.UpdateMouse(mouse, layout.DateRect);
+                if (mouse is MouseClickMsg { Button: MouseButton.Left })
+                {
+                    _focus = ProductivityFocus.Date;
+                    mouseChanged = true;
+                }
+            }
+            else if (layout.TimeRect.Contains(mouse.X, mouse.Y)
+                || (mouse is MouseWheelMsg && _focus == ProductivityFocus.Time))
+            {
+                mouseChanged |= _time.UpdateMouse(mouse, layout.TimeRect);
+                if (mouse is MouseClickMsg { Button: MouseButton.Left })
+                {
+                    _focus = ProductivityFocus.Time;
+                    mouseChanged = true;
+                }
+            }
+
+            if (mouseBeforeMenuActivation != _menu.ActivationVersion)
+            {
+                ApplyMenuAction(_menu.LastActivatedItemId);
+                mouseChanged = true;
+            }
+
+            if (mouseChanged)
+            {
+                _lastEvent = $"mouse:{mouse.EventType.ToString().ToLowerInvariant()}";
+            }
+
+            return new UpdateResult(this, null);
+        }
+
         if (message is not KeyPressMsg key)
         {
             return new UpdateResult(this, null);
@@ -367,4 +435,24 @@ internal sealed class ProductivityModel : IModel
 
         return builder.ToString();
     }
+
+    private InteractionRects GetInteractionRects()
+    {
+        var width = Math.Max(80, _width);
+        var height = Math.Max(24, _height);
+        var frame = new Rect(0, 0, width, height);
+        var body = frame.Inset(1, 1);
+        var menuRect = new Rect(body.X, body.Y, body.Width, 1);
+        var content = new Rect(body.X, body.Y + 1, body.Width, body.Height - 2);
+        var (left, _) = Layout.SplitVertical(content, Math.Max(36, content.Width / 3), minFirst: 28, minSecond: 30);
+        var (_, bottomLeft) = Layout.SplitHorizontal(left, Math.Max(8, left.Height / 3), minFirst: 7, minSecond: 10);
+        var (dateRect, timeRect) = Layout.SplitHorizontal(bottomLeft, Math.Max(10, bottomLeft.Height / 2), minFirst: 9, minSecond: 7);
+        return new InteractionRects(menuRect, content, dateRect, timeRect);
+    }
+
+    private readonly record struct InteractionRects(
+        Rect MenuRect,
+        Rect ContentRect,
+        Rect DateRect,
+        Rect TimeRect);
 }

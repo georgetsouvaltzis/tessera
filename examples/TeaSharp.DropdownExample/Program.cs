@@ -63,6 +63,33 @@ internal sealed class DropdownDemoModel : IModel
             return new UpdateResult(this, null);
         }
 
+        if (message is MouseMsg mouse)
+        {
+            var mouseWasOpen = _dropdown.IsOpen;
+            var mousePrevious = _dropdown.SelectedItem;
+            if (_dropdown.UpdateMouse(mouse, GetDropdownRect()))
+            {
+                if (!string.Equals(mousePrevious, _dropdown.SelectedItem, StringComparison.Ordinal))
+                {
+                    _lastEvent = $"selected:{_dropdown.SelectedItem}";
+                }
+                else if (!mouseWasOpen && _dropdown.IsOpen)
+                {
+                    _lastEvent = "mouse:open";
+                }
+                else if (mouseWasOpen && !_dropdown.IsOpen)
+                {
+                    _lastEvent = "mouse:close";
+                }
+                else
+                {
+                    _lastEvent = $"mouse:{mouse.EventType.ToString().ToLowerInvariant()}";
+                }
+            }
+
+            return new UpdateResult(this, null);
+        }
+
         if (message is not KeyPressMsg key)
         {
             return new UpdateResult(this, null);
@@ -111,9 +138,9 @@ internal sealed class DropdownDemoModel : IModel
         canvas.DrawBox(frame, "TeaSharp Dropdown Example", BorderStyle.Rounded);
 
         var body = frame.Inset(2, 2);
-        canvas.WriteText(body.X, body.Y, "Controls: enter/space open+select, up/down navigate, esc close, q quit", body.Width);
+        canvas.WriteText(body.X, body.Y, "Controls: enter/space open+select, up/down navigate, esc close, mouse click+wheel, q quit", body.Width);
 
-        var dropdownRect = new Rect(body.X, body.Y + 2, body.Width, Math.Min(10, body.Height - 6));
+        var dropdownRect = GetDropdownRect();
         _dropdown.Render(canvas, dropdownRect);
 
         canvas.WriteText(body.X, body.Bottom - 3, $"Current: {_dropdown.SelectedItem}", body.Width);
@@ -138,5 +165,14 @@ internal sealed class DropdownDemoModel : IModel
             CursorColor = "#F5C2E7",
             WindowTitle = "TeaSharp Dropdown Example",
         };
+    }
+
+    private Rect GetDropdownRect()
+    {
+        var width = Math.Max(56, _width);
+        var height = Math.Max(18, _height);
+        var frame = new Rect(0, 0, width, height);
+        var body = frame.Inset(2, 2);
+        return new Rect(body.X, body.Y + 2, body.Width, Math.Min(10, body.Height - 6));
     }
 }

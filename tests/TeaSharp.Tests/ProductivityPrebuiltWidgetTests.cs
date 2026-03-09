@@ -8,10 +8,15 @@ internal static class ProductivityPrebuiltWidgetTests
     public static IEnumerable<TestCase> Cases()
     {
         yield return new TestCase("Productivity_MenuBarComponent_ActivatesShortcut", MenuBarComponent_ActivatesShortcut);
+        yield return new TestCase("Productivity_MenuBarComponent_MouseClickActivatesItem", MenuBarComponent_MouseClickActivatesItem);
         yield return new TestCase("Productivity_ContextMenuComponent_ExecutesAndCloses", ContextMenuComponent_ExecutesAndCloses);
+        yield return new TestCase("Productivity_ContextMenuComponent_MouseClickExecutesAndCloses", ContextMenuComponent_MouseClickExecutesAndCloses);
+        yield return new TestCase("Productivity_ContextMenuComponent_MouseReleaseExecutesAndCloses", ContextMenuComponent_MouseReleaseExecutesAndCloses);
         yield return new TestCase("Productivity_NumberInputComponent_AdjustsAndSubmits", NumberInputComponent_AdjustsAndSubmits);
         yield return new TestCase("Productivity_DatePickerComponent_MovesDate", DatePickerComponent_MovesDate);
+        yield return new TestCase("Productivity_DatePickerComponent_MouseClickSelectsDate", DatePickerComponent_MouseClickSelectsDate);
         yield return new TestCase("Productivity_TimePickerComponent_AdjustsField", TimePickerComponent_AdjustsField);
+        yield return new TestCase("Productivity_TimePickerComponent_MouseWheelAdjustsField", TimePickerComponent_MouseWheelAdjustsField);
         yield return new TestCase("Productivity_MarkdownViewerComponent_RendersMarkdown", MarkdownViewerComponent_RendersMarkdown);
     }
 
@@ -39,6 +44,23 @@ internal static class ProductivityPrebuiltWidgetTests
         return Task.CompletedTask;
     }
 
+    private static Task MenuBarComponent_MouseClickActivatesItem()
+    {
+        var menu = new MenuBarComponent();
+        menu.SetItems(
+        [
+            new MenuBarItem("file", "File", 'f'),
+            new MenuBarItem("edit", "Edit", 'e'),
+            new MenuBarItem("help", "Help", 'h'),
+        ]);
+
+        var changed = menu.UpdateMouse(new MouseClickMsg(MouseButton.Left, 12, 0), new Rect(0, 0, 40, 1));
+
+        TestAssert.True(changed, "Menu mouse click should trigger selection/activation.");
+        TestAssert.Equal("edit", menu.LastActivatedItemId ?? string.Empty, "Menu mouse click should activate clicked item.");
+        return Task.CompletedTask;
+    }
+
     private static Task ContextMenuComponent_ExecutesAndCloses()
     {
         var menu = new ContextMenuComponent
@@ -56,6 +78,48 @@ internal static class ProductivityPrebuiltWidgetTests
 
         TestAssert.Equal("paste", menu.LastExecutedItemId ?? string.Empty, "Context menu should execute selected action.");
         TestAssert.True(!menu.Visible, "Context menu should close after execute.");
+        return Task.CompletedTask;
+    }
+
+    private static Task ContextMenuComponent_MouseClickExecutesAndCloses()
+    {
+        var menu = new ContextMenuComponent
+        {
+            ShowBorder = false,
+        };
+        menu.SetItems(
+        [
+            new ContextMenuItem("copy", "Copy"),
+            new ContextMenuItem("paste", "Paste"),
+        ]);
+        menu.OpenAt(0, 0);
+
+        var changed = menu.UpdateMouse(new MouseClickMsg(MouseButton.Left, 0, 1), new Rect(0, 0, 20, 6));
+
+        TestAssert.True(changed, "Context menu click should execute row action.");
+        TestAssert.Equal("paste", menu.LastExecutedItemId ?? string.Empty, "Context menu click should execute clicked item.");
+        TestAssert.True(!menu.Visible, "Context menu should close after mouse execute.");
+        return Task.CompletedTask;
+    }
+
+    private static Task ContextMenuComponent_MouseReleaseExecutesAndCloses()
+    {
+        var menu = new ContextMenuComponent
+        {
+            ShowBorder = false,
+        };
+        menu.SetItems(
+        [
+            new ContextMenuItem("copy", "Copy"),
+            new ContextMenuItem("paste", "Paste"),
+        ]);
+        menu.OpenAt(0, 0);
+
+        var changed = menu.UpdateMouse(new MouseReleaseMsg(MouseButton.None, 0, 1), new Rect(0, 0, 20, 6));
+
+        TestAssert.True(changed, "Context menu mouse release should execute row action.");
+        TestAssert.Equal("paste", menu.LastExecutedItemId ?? string.Empty, "Context menu release should execute hovered item.");
+        TestAssert.True(!menu.Visible, "Context menu should close after mouse release execute.");
         return Task.CompletedTask;
     }
 
@@ -101,6 +165,21 @@ internal static class ProductivityPrebuiltWidgetTests
         return Task.CompletedTask;
     }
 
+    private static Task DatePickerComponent_MouseClickSelectsDate()
+    {
+        var picker = new DatePickerComponent
+        {
+            ShowBorder = false,
+        };
+        picker.SetDate(new DateOnly(2026, 3, 8));
+
+        var changed = picker.UpdateMouse(new MouseClickMsg(MouseButton.Left, 0, 4), new Rect(0, 0, 24, 10));
+
+        TestAssert.True(changed, "Date picker click should select day under pointer.");
+        TestAssert.Equal(new DateOnly(2026, 3, 9), picker.SelectedDate, "Date picker click should select correct calendar date.");
+        return Task.CompletedTask;
+    }
+
     private static Task TimePickerComponent_AdjustsField()
     {
         var picker = new TimePickerComponent
@@ -113,6 +192,23 @@ internal static class ProductivityPrebuiltWidgetTests
         picker.Update(new KeyPressMsg(KeyCode.Up));
 
         TestAssert.Equal(new TimeOnly(10, 5, 0), picker.Value, "Time picker should adjust minute field.");
+        return Task.CompletedTask;
+    }
+
+    private static Task TimePickerComponent_MouseWheelAdjustsField()
+    {
+        var picker = new TimePickerComponent
+        {
+            ShowBorder = false,
+            MinuteStep = 5,
+        };
+        picker.SetValue(new TimeOnly(10, 0, 0));
+
+        picker.UpdateMouse(new MouseClickMsg(MouseButton.Left, 3, 0), new Rect(0, 0, 12, 1));
+        var changed = picker.UpdateMouse(new MouseWheelMsg(MouseButton.WheelUp, 3, 0), new Rect(0, 0, 12, 1));
+
+        TestAssert.True(changed, "Time picker wheel should adjust hovered/active field.");
+        TestAssert.Equal(new TimeOnly(10, 5, 0), picker.Value, "Time picker wheel should increase minute field by configured step.");
         return Task.CompletedTask;
     }
 

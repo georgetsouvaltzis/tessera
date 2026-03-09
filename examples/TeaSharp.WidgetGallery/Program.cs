@@ -173,6 +173,16 @@ internal sealed class WidgetGalleryModel : IModel
             return new UpdateResult(this, null);
         }
 
+        if (message is MouseMsg mouse)
+        {
+            if (HandleMouse(mouse))
+            {
+                return new UpdateResult(this, null);
+            }
+
+            return new UpdateResult(this, null);
+        }
+
         if (message is KeyPressMsg key)
         {
             if ((key.Modifiers.HasFlag(KeyModifiers.Ctrl) && (key.IsCharacter('c') || key.IsCharacter('\u0003', ignoreCase: false)))
@@ -286,6 +296,9 @@ internal sealed class WidgetGalleryModel : IModel
             EnableBracketedPaste = true,
             EnableFocusReporting = true,
             MouseMode = MouseMode.AllMotion,
+            ForegroundColor = "#CDD6F4",
+            BackgroundColor = "#1E1E2E",
+            CursorColor = "#F5C2E7",
             WindowTitle = "TeaSharp Widget Gallery",
         };
     }
@@ -435,6 +448,71 @@ internal sealed class WidgetGalleryModel : IModel
 
         _tabs.Select(oneBased - 1);
         return true;
+    }
+
+    private bool HandleMouse(MouseMsg mouse)
+    {
+        if (_width < 60 || _height < 18)
+        {
+            return false;
+        }
+
+        var changed = false;
+        var tabsRect = new Rect(0, 0, _width, 1);
+        if (_tabs.UpdateMouse(mouse, tabsRect))
+        {
+            _focus = GalleryFocus.Tabs;
+            _lastEvent = $"mouse:tab:{_tabs.SelectedIndex + 1}";
+            changed = true;
+        }
+
+        if (_tabs.SelectedIndex != 2)
+        {
+            return changed;
+        }
+
+        var bodyRect = new Rect(0, 1, _width, _height - 2);
+        var (left, right) = Layout.SplitVertical(bodyRect, Math.Max(28, bodyRect.Width / 3));
+        var (tableRect, logsRect) = Layout.SplitHorizontal(right, Math.Max(10, right.Height / 2));
+
+        if (mouse is MouseClickMsg { Button: MouseButton.Left })
+        {
+            if (left.Contains(mouse.X, mouse.Y))
+            {
+                _focus = GalleryFocus.List;
+                changed = true;
+            }
+            else if (tableRect.Contains(mouse.X, mouse.Y))
+            {
+                _focus = GalleryFocus.Table;
+                changed = true;
+            }
+            else if (logsRect.Contains(mouse.X, mouse.Y))
+            {
+                _focus = GalleryFocus.LogViewer;
+                changed = true;
+            }
+        }
+
+        if (left.Contains(mouse.X, mouse.Y) || (mouse is MouseWheelMsg && _focus == GalleryFocus.List))
+        {
+            if (_list.UpdateMouse(mouse, left))
+            {
+                _lastEvent = "mouse:list";
+                changed = true;
+            }
+        }
+
+        if (tableRect.Contains(mouse.X, mouse.Y) || (mouse is MouseWheelMsg && _focus == GalleryFocus.Table))
+        {
+            if (_table.UpdateMouse(mouse, tableRect))
+            {
+                _lastEvent = "mouse:table";
+                changed = true;
+            }
+        }
+
+        return changed;
     }
 
     private void ApplyFocusFlags()

@@ -155,6 +155,79 @@ internal sealed class AdvancedWidgetsModel : IModel
             return new UpdateResult(this, null);
         }
 
+        if (message is MouseMsg mouse)
+        {
+            var layout = GetInteractionRects();
+            var mouseChanged = false;
+            if (_palette.IsOpen)
+            {
+                var beforeCommand = _palette.LastExecutedItemId;
+                mouseChanged |= _palette.UpdateMouse(mouse, layout.ContentRect);
+                if (!string.Equals(beforeCommand, _palette.LastExecutedItemId, StringComparison.Ordinal))
+                {
+                    ExecutePaletteCommand(_palette.LastExecutedItemId);
+                    mouseChanged = true;
+                }
+            }
+            else if (layout.ToggleRect.Contains(mouse.X, mouse.Y)
+                || (mouse is MouseWheelMsg && _focus == AdvancedFocus.Toggle))
+            {
+                mouseChanged |= _toggle.UpdateMouse(mouse, layout.ToggleRect);
+                if (mouse is MouseClickMsg { Button: MouseButton.Left })
+                {
+                    _focus = AdvancedFocus.Toggle;
+                    mouseChanged = true;
+                }
+            }
+            else if (layout.SliderRect.Contains(mouse.X, mouse.Y)
+                || (mouse is MouseWheelMsg && _focus == AdvancedFocus.Slider))
+            {
+                mouseChanged |= _slider.UpdateMouse(mouse, layout.SliderRect);
+                if (mouse is MouseClickMsg { Button: MouseButton.Left })
+                {
+                    _focus = AdvancedFocus.Slider;
+                    mouseChanged = true;
+                }
+            }
+            else if (layout.SpinnerRect.Contains(mouse.X, mouse.Y)
+                || (mouse is MouseWheelMsg && _focus == AdvancedFocus.Spinner))
+            {
+                mouseChanged |= _spinner.UpdateMouse(mouse, layout.SpinnerRect);
+                if (mouse is MouseClickMsg { Button: MouseButton.Left })
+                {
+                    _focus = AdvancedFocus.Spinner;
+                    mouseChanged = true;
+                }
+            }
+            else if (layout.TreeRect.Contains(mouse.X, mouse.Y)
+                || (mouse is MouseWheelMsg && _focus == AdvancedFocus.Tree))
+            {
+                mouseChanged |= _tree.UpdateMouse(mouse, layout.TreeRect);
+                if (mouse is MouseClickMsg { Button: MouseButton.Left })
+                {
+                    _focus = AdvancedFocus.Tree;
+                    mouseChanged = true;
+                }
+            }
+            else if (layout.NotificationRect.Contains(mouse.X, mouse.Y)
+                || (mouse is MouseWheelMsg && _focus == AdvancedFocus.Notifications))
+            {
+                mouseChanged |= _notifications.UpdateMouse(mouse, layout.NotificationRect);
+                if (mouse is MouseClickMsg { Button: MouseButton.Left })
+                {
+                    _focus = AdvancedFocus.Notifications;
+                    mouseChanged = true;
+                }
+            }
+
+            if (mouseChanged)
+            {
+                _lastEvent = $"mouse:{mouse.EventType.ToString().ToLowerInvariant()}";
+            }
+
+            return new UpdateResult(this, null);
+        }
+
         if (message is not KeyPressMsg key)
         {
             return new UpdateResult(this, null);
@@ -214,7 +287,7 @@ internal sealed class AdvancedWidgetsModel : IModel
         canvas.DrawBox(frame, "TeaSharp Advanced Widgets", BorderStyle.Rounded);
 
         var body = frame.Inset(1, 1);
-        canvas.WriteText(body.X, body.Y, "tab=focus ctrl+p=palette q=quit", body.Width);
+        canvas.WriteText(body.X, body.Y, "tab=focus ctrl+p=palette q=quit mouse:click+wheel tree/notifications", body.Width);
 
         var content = new Rect(body.X, body.Y + 1, body.Width, body.Height - 2);
         var (left, right) = Layout.SplitVertical(content, Math.Max(34, content.Width / 3), minFirst: 24, minSecond: 28);
@@ -373,6 +446,30 @@ internal sealed class AdvancedWidgetsModel : IModel
         _badge.Text = "healthy";
         _badge.State = WidgetVisualState.Success;
     }
+
+    private InteractionRects GetInteractionRects()
+    {
+        var width = Math.Max(72, _width);
+        var height = Math.Max(24, _height);
+        var frame = new Rect(0, 0, width, height);
+        var body = frame.Inset(1, 1);
+        var content = new Rect(body.X, body.Y + 1, body.Width, body.Height - 2);
+        var (left, right) = Layout.SplitVertical(content, Math.Max(34, content.Width / 3), minFirst: 24, minSecond: 28);
+        var (treeRect, notifyRect) = Layout.SplitHorizontal(left, Math.Max(10, left.Height / 2), minFirst: 8, minSecond: 8);
+        var (controlsRect, _) = Layout.SplitHorizontal(right, 10, minFirst: 8, minSecond: 8);
+        var toggleRect = new Rect(controlsRect.X, controlsRect.Y, controlsRect.Width, 3);
+        var sliderRect = new Rect(controlsRect.X, controlsRect.Y + 3, controlsRect.Width, 4);
+        var spinnerRect = new Rect(controlsRect.X, controlsRect.Y + 7, controlsRect.Width, Math.Max(2, controlsRect.Height - 7));
+        return new InteractionRects(content, treeRect, notifyRect, toggleRect, sliderRect, spinnerRect);
+    }
+
+    private readonly record struct InteractionRects(
+        Rect ContentRect,
+        Rect TreeRect,
+        Rect NotificationRect,
+        Rect ToggleRect,
+        Rect SliderRect,
+        Rect SpinnerRect);
 
     private static Command NextTick() => Tea.Cmd.Every(TimeSpan.FromMilliseconds(200), at => new AdvancedTickMsg(at));
 }

@@ -29,8 +29,10 @@ public sealed class BadgeComponent : ICanvasComponent
     }
 }
 
-public sealed class ToggleSwitchComponent : IStatefulComponent
+public sealed class ToggleSwitchComponent : IStatefulComponent, IMouseStatefulComponent
 {
+    private bool _hovered;
+
     public string Title { get; set; } = "Toggle";
 
     public string OnText { get; set; } = "ON";
@@ -54,6 +56,8 @@ public sealed class ToggleSwitchComponent : IStatefulComponent
     public KeyBinding TurnOffKey { get; set; } = new("left", "off", "left");
 
     public WidgetStatePalette StatePalette { get; } = WidgetStatePalette.CreateDefault();
+
+    public WidgetInteractionProfile InteractionProfile { get; set; } = WidgetInteractionProfile.Default.Clone();
 
     public void SetValue(bool value)
     {
@@ -88,6 +92,67 @@ public sealed class ToggleSwitchComponent : IStatefulComponent
         }
 
         return false;
+    }
+
+    public bool UpdateMouse(MouseMsg message, Rect bounds)
+    {
+        if (Disabled || ReadOnly)
+        {
+            return false;
+        }
+
+        var content = ResolveContentRect(bounds);
+        if (content.IsEmpty)
+        {
+            return false;
+        }
+
+        var inside = content.Contains(message.X, message.Y);
+        var changed = false;
+        if (!inside)
+        {
+            if (message is MouseMotionMsg or MouseClickMsg)
+            {
+                changed |= SetHovered(false);
+            }
+
+            return changed;
+        }
+
+        if (message is MouseMotionMsg && InteractionProfile.HoverOnMotion)
+        {
+            changed |= SetHovered(true);
+            return changed;
+        }
+
+        if (message is MouseClickMsg && InteractionProfile.HoverOnClick)
+        {
+            changed |= SetHovered(true);
+        }
+
+        if (message is MouseWheelMsg wheel && InteractionProfile.NavigateOnWheel)
+        {
+            if (wheel.Button == MouseButton.WheelUp)
+            {
+                var was = Value;
+                Value = true;
+                changed |= !was;
+            }
+            else if (wheel.Button == MouseButton.WheelDown)
+            {
+                var was = Value;
+                Value = false;
+                changed |= was;
+            }
+        }
+
+        if (message is MouseClickMsg { Button: MouseButton.Left } && InteractionProfile.ActivateOnClick)
+        {
+            Value = !Value;
+            changed = true;
+        }
+
+        return changed;
     }
 
     public void Render(Canvas canvas, Rect rect)
@@ -147,12 +212,38 @@ public sealed class ToggleSwitchComponent : IStatefulComponent
             states.Add(WidgetVisualState.ReadOnly);
         }
 
+        if (_hovered)
+        {
+            states.Add(WidgetVisualState.Hovered);
+        }
+
         return states;
+    }
+
+    private Rect ResolveContentRect(Rect bounds)
+    {
+        return ShowBorder
+            ? bounds.Inset(1, 1)
+            : bounds;
+    }
+
+    private bool SetHovered(bool hovered)
+    {
+        if (_hovered == hovered)
+        {
+            return false;
+        }
+
+        _hovered = hovered;
+        return true;
     }
 }
 
-public sealed class SliderComponent : IStatefulComponent
+public sealed class SliderComponent : IStatefulComponent, IMouseStatefulComponent
 {
+    private bool _hovered;
+    private bool _dragging;
+
     public string Title { get; set; } = "Slider";
 
     public double Min { get; set; } = 0.0;
@@ -176,6 +267,8 @@ public sealed class SliderComponent : IStatefulComponent
     public KeyBinding IncreaseKey { get; set; } = new("right/+", "increase", "right", "+");
 
     public WidgetStatePalette StatePalette { get; } = WidgetStatePalette.CreateDefault();
+
+    public WidgetInteractionProfile InteractionProfile { get; set; } = WidgetInteractionProfile.Default.Clone();
 
     public void SetValue(double value)
     {
@@ -204,6 +297,83 @@ public sealed class SliderComponent : IStatefulComponent
         }
 
         return false;
+    }
+
+    public bool UpdateMouse(MouseMsg message, Rect bounds)
+    {
+        if (Disabled || ReadOnly)
+        {
+            return false;
+        }
+
+        var content = ResolveContentRect(bounds);
+        if (content.IsEmpty)
+        {
+            return false;
+        }
+
+        var changed = false;
+        if (message is MouseReleaseMsg { Button: MouseButton.Left })
+        {
+            var wasDragging = _dragging;
+            _dragging = false;
+            changed |= SetHovered(content.Contains(message.X, message.Y));
+            return changed || wasDragging;
+        }
+
+        if (message is MouseMotionMsg motion && _dragging && motion.Button == MouseButton.Left)
+        {
+            changed |= SetHovered(content.Contains(motion.X, motion.Y));
+            changed |= SetValueFromPointer(motion.X, content);
+            return changed;
+        }
+
+        var inside = content.Contains(message.X, message.Y);
+        if (!inside)
+        {
+            if (message is MouseMotionMsg or MouseClickMsg)
+            {
+                changed |= SetHovered(false);
+            }
+
+            return changed;
+        }
+
+        if (message is MouseMotionMsg && InteractionProfile.HoverOnMotion)
+        {
+            changed |= SetHovered(true);
+            return changed;
+        }
+
+        if (message is MouseClickMsg && InteractionProfile.HoverOnClick)
+        {
+            changed |= SetHovered(true);
+        }
+
+        if (message is MouseWheelMsg wheel && InteractionProfile.NavigateOnWheel)
+        {
+            var before = Value;
+            if (wheel.Button == MouseButton.WheelUp)
+            {
+                Value = Clamp(Value + Step);
+            }
+            else if (wheel.Button == MouseButton.WheelDown)
+            {
+                Value = Clamp(Value - Step);
+            }
+
+            changed |= !AreClose(before, Value);
+        }
+
+        if (message is MouseClickMsg { Button: MouseButton.Left } click
+            && InteractionProfile.ActivateOnClick
+            && IsPointerOnBarRow(content, click.Y))
+        {
+            _dragging = true;
+            changed |= SetValueFromPointer(click.X, content);
+        }
+
+        return changed;
     }
 
     public void Render(Canvas canvas, Rect rect)
@@ -258,6 +428,11 @@ public sealed class SliderComponent : IStatefulComponent
             states.Add(WidgetVisualState.ReadOnly);
         }
 
+        if (_hovered)
+        {
+            states.Add(WidgetVisualState.Hovered);
+        }
+
         return states;
     }
 
@@ -286,11 +461,56 @@ public sealed class SliderComponent : IStatefulComponent
     {
         return Math.Abs(left - right) <= 0.000001;
     }
+
+    private Rect ResolveContentRect(Rect bounds)
+    {
+        return ShowBorder
+            ? bounds.Inset(1, 1)
+            : bounds;
+    }
+
+    private static bool IsPointerOnBarRow(Rect content, int y)
+    {
+        var barY = content.Height > 1
+            ? content.Y + 1
+            : content.Y;
+        return y == barY;
+    }
+
+    private bool SetValueFromPointer(int x, Rect content)
+    {
+        if (Max <= Min)
+        {
+            return false;
+        }
+
+        var barX = content.X + 1;
+        var barWidth = Math.Max(1, content.Width - 2);
+        var clampedX = Math.Clamp(x, barX, barX + barWidth - 1);
+        var normalized = barWidth == 1
+            ? 1.0
+            : (double)(clampedX - barX) / Math.Max(1, barWidth - 1);
+        var before = Value;
+        Value = Clamp(Min + ((Max - Min) * normalized));
+        return !AreClose(before, Value);
+    }
+
+    private bool SetHovered(bool hovered)
+    {
+        if (_hovered == hovered)
+        {
+            return false;
+        }
+
+        _hovered = hovered;
+        return true;
+    }
 }
 
-public sealed class SpinnerComponent : IStatefulComponent
+public sealed class SpinnerComponent : IStatefulComponent, IMouseStatefulComponent
 {
     private IReadOnlyList<string> _frames = ["|", "/", "-", "\\"];
+    private bool _hovered;
 
     public string Title { get; set; } = "Spinner";
 
@@ -309,6 +529,8 @@ public sealed class SpinnerComponent : IStatefulComponent
     public KeyBinding ToggleRunKey { get; set; } = new("enter", "toggle running", "enter");
 
     public WidgetStatePalette StatePalette { get; } = WidgetStatePalette.CreateDefault();
+
+    public WidgetInteractionProfile InteractionProfile { get; set; } = WidgetInteractionProfile.Default.Clone();
 
     public void SetFrames(IEnumerable<string> frames)
     {
@@ -364,6 +586,55 @@ public sealed class SpinnerComponent : IStatefulComponent
         return false;
     }
 
+    public bool UpdateMouse(MouseMsg message, Rect bounds)
+    {
+        var content = ResolveContentRect(bounds);
+        if (_frames.Count == 0 || content.IsEmpty)
+        {
+            return false;
+        }
+
+        var inside = content.Contains(message.X, message.Y);
+        var changed = false;
+        if (!inside)
+        {
+            if (message is MouseMotionMsg or MouseClickMsg)
+            {
+                changed |= SetHovered(false);
+            }
+
+            return changed;
+        }
+
+        if (message is MouseMotionMsg && InteractionProfile.HoverOnMotion)
+        {
+            changed |= SetHovered(true);
+            return changed;
+        }
+
+        if (message is MouseClickMsg && InteractionProfile.HoverOnClick)
+        {
+            changed |= SetHovered(true);
+        }
+
+        if (message is MouseWheelMsg wheel && InteractionProfile.NavigateOnWheel && Running)
+        {
+            if (wheel.Button is MouseButton.WheelUp or MouseButton.WheelDown)
+            {
+                Advance();
+                changed = true;
+            }
+        }
+
+        if (message is MouseClickMsg { Button: MouseButton.Left } && InteractionProfile.ActivateOnClick)
+        {
+            Running = !Running;
+            changed = true;
+        }
+
+        return changed;
+    }
+
     public void Render(Canvas canvas, Rect rect)
     {
         var clipped = Rect.Intersect(rect, canvas.Bounds);
@@ -403,7 +674,30 @@ public sealed class SpinnerComponent : IStatefulComponent
             states.Add(WidgetVisualState.ReadOnly);
         }
 
+        if (_hovered)
+        {
+            states.Add(WidgetVisualState.Hovered);
+        }
+
         canvas.WriteText(content.X, content.Y, StatePalette.Render($"{_frames[FrameIndex]} {Label}", states), content.Width);
+    }
+
+    private Rect ResolveContentRect(Rect bounds)
+    {
+        return ShowBorder
+            ? bounds.Inset(1, 1)
+            : bounds;
+    }
+
+    private bool SetHovered(bool hovered)
+    {
+        if (_hovered == hovered)
+        {
+            return false;
+        }
+
+        _hovered = hovered;
+        return true;
     }
 }
 
@@ -413,11 +707,12 @@ public sealed record CommandPaletteItem(
     string Description = "",
     IReadOnlyCollection<WidgetVisualState>? States = null);
 
-public sealed class CommandPaletteComponent : IStatefulComponent
+public sealed class CommandPaletteComponent : IStatefulComponent, IMouseStatefulComponent
 {
     private readonly List<CommandPaletteItem> _items = [];
     private readonly List<int> _filtered = [];
     private int _selectedFilteredIndex;
+    private int _hoveredFilteredIndex = -1;
 
     public TextInputModel Query { get; } = new();
 
@@ -444,6 +739,8 @@ public sealed class CommandPaletteComponent : IStatefulComponent
     public KeyBinding ExecuteKey { get; set; } = new("enter", "execute", "enter");
 
     public WidgetStatePalette ItemStatePalette { get; } = WidgetStatePalette.CreateDefault();
+
+    public WidgetInteractionProfile InteractionProfile { get; set; } = WidgetInteractionProfile.Default.Clone();
 
     public void SetItems(IEnumerable<CommandPaletteItem> items)
     {
@@ -528,6 +825,79 @@ public sealed class CommandPaletteComponent : IStatefulComponent
         return false;
     }
 
+    public bool UpdateMouse(MouseMsg message, Rect bounds)
+    {
+        if (!IsOpen || !TryResolveModal(bounds, out var modal, out var content))
+        {
+            return false;
+        }
+
+        var insideModal = modal.Contains(message.X, message.Y);
+        var changed = false;
+        if (!insideModal)
+        {
+            if (message is MouseMotionMsg or MouseClickMsg)
+            {
+                changed |= SetHoveredFilteredIndex(-1);
+            }
+
+            if (message is MouseClickMsg { Button: MouseButton.Left } && InteractionProfile.ActivateOnClick)
+            {
+                Close();
+                changed = true;
+            }
+
+            return changed;
+        }
+
+        if (message is MouseWheelMsg wheel && InteractionProfile.NavigateOnWheel && _filtered.Count > 0)
+        {
+            if (wheel.Button == MouseButton.WheelDown)
+            {
+                _selectedFilteredIndex = (_selectedFilteredIndex + 1) % _filtered.Count;
+                changed = true;
+            }
+            else if (wheel.Button == MouseButton.WheelUp)
+            {
+                _selectedFilteredIndex = (_selectedFilteredIndex + _filtered.Count - 1) % _filtered.Count;
+                changed = true;
+            }
+        }
+
+        if (!content.Contains(message.X, message.Y))
+        {
+            if (message is MouseMotionMsg or MouseClickMsg)
+            {
+                changed |= SetHoveredFilteredIndex(-1);
+            }
+
+            return changed;
+        }
+
+        var hovered = RowToFilteredIndex(content, message.Y);
+        if (message is MouseMotionMsg && InteractionProfile.HoverOnMotion)
+        {
+            changed |= SetHoveredFilteredIndex(hovered);
+            return changed;
+        }
+
+        if (message is MouseClickMsg click)
+        {
+            if (InteractionProfile.HoverOnClick)
+            {
+                changed |= SetHoveredFilteredIndex(hovered);
+            }
+
+            if (click.Button == MouseButton.Left && InteractionProfile.ActivateOnClick && hovered >= 0)
+            {
+                _selectedFilteredIndex = hovered;
+                changed |= ExecuteSelected();
+            }
+        }
+
+        return changed;
+    }
+
     public void Render(Canvas canvas, Rect rect)
     {
         if (!IsOpen)
@@ -588,6 +958,11 @@ public sealed class CommandPaletteComponent : IStatefulComponent
                 states.Add(WidgetVisualState.Selected);
             }
 
+            if (i == _hoveredFilteredIndex)
+            {
+                states.Add(WidgetVisualState.Hovered);
+            }
+
             if (item.States is not null)
             {
                 states.AddRange(item.States);
@@ -630,10 +1005,15 @@ public sealed class CommandPaletteComponent : IStatefulComponent
         if (_filtered.Count == 0)
         {
             _selectedFilteredIndex = 0;
+            _hoveredFilteredIndex = -1;
             return;
         }
 
         _selectedFilteredIndex = Math.Clamp(_selectedFilteredIndex, 0, _filtered.Count - 1);
+        if (_hoveredFilteredIndex >= _filtered.Count)
+        {
+            _hoveredFilteredIndex = _filtered.Count - 1;
+        }
     }
 
     private static int ComputeWindowStart(int highlightedIndex, int rows, int count)
@@ -657,6 +1037,65 @@ public sealed class CommandPaletteComponent : IStatefulComponent
         }
 
         return start;
+    }
+
+    private bool TryResolveModal(Rect bounds, out Rect modal, out Rect content)
+    {
+        modal = default;
+        content = default;
+        var clipped = bounds;
+        if (clipped.IsEmpty || clipped.Width < 24 || clipped.Height < 6)
+        {
+            return false;
+        }
+
+        var modalWidth = Math.Min(clipped.Width - 2, Math.Max(24, clipped.Width * 2 / 3));
+        var modalHeight = Math.Min(clipped.Height - 2, Math.Max(8, clipped.Height * 2 / 3));
+        var modalX = clipped.X + (clipped.Width - modalWidth) / 2;
+        var modalY = clipped.Y + (clipped.Height - modalHeight) / 2;
+        modal = new Rect(modalX, modalY, modalWidth, modalHeight);
+        content = modal.Inset(1, 1);
+        return !content.IsEmpty;
+    }
+
+    private int RowToFilteredIndex(Rect content, int y)
+    {
+        if (_filtered.Count == 0)
+        {
+            return -1;
+        }
+
+        var row = y - (content.Y + 1);
+        if (row < 0)
+        {
+            return -1;
+        }
+
+        var visibleRows = Math.Min(Math.Max(1, MaxVisibleItems), Math.Max(0, content.Height - 1));
+        if (row >= visibleRows)
+        {
+            return -1;
+        }
+
+        var start = ComputeWindowStart(_selectedFilteredIndex, visibleRows, _filtered.Count);
+        var filtered = start + row;
+        if (filtered < 0 || filtered >= _filtered.Count)
+        {
+            return -1;
+        }
+
+        return filtered;
+    }
+
+    private bool SetHoveredFilteredIndex(int index)
+    {
+        if (_hoveredFilteredIndex == index)
+        {
+            return false;
+        }
+
+        _hoveredFilteredIndex = index;
+        return true;
     }
 }
 
@@ -690,11 +1129,12 @@ public sealed class TreeItemNode
     }
 }
 
-public sealed class TreeViewComponent : IStatefulComponent
+public sealed class TreeViewComponent : IStatefulComponent, IMouseStatefulComponent
 {
     private readonly List<TreeItemNode> _roots = [];
     private readonly List<(TreeItemNode Node, int Depth, int? ParentVisibleIndex)> _visible = [];
     private int _selectedIndex;
+    private int _hoveredIndex = -1;
 
     public string Title { get; set; } = "Tree";
 
@@ -717,6 +1157,8 @@ public sealed class TreeViewComponent : IStatefulComponent
     public KeyBinding ToggleExpandKey { get; set; } = new("enter/space", "toggle", "enter", "space");
 
     public WidgetStatePalette NodeStatePalette { get; } = WidgetStatePalette.CreateDefault();
+
+    public WidgetInteractionProfile InteractionProfile { get; set; } = WidgetInteractionProfile.Default.Clone();
 
     public string? SelectedNodeId => _selectedIndex >= 0 && _selectedIndex < _visible.Count
         ? _visible[_selectedIndex].Node.Id
@@ -781,6 +1223,88 @@ public sealed class TreeViewComponent : IStatefulComponent
         return false;
     }
 
+    public bool UpdateMouse(MouseMsg message, Rect bounds)
+    {
+        if (Disabled || ReadOnly || _visible.Count == 0)
+        {
+            return false;
+        }
+
+        var content = ResolveContentRect(bounds);
+        if (content.IsEmpty)
+        {
+            return false;
+        }
+
+        var inside = content.Contains(message.X, message.Y);
+        var changed = false;
+        if (!inside)
+        {
+            if (message is MouseMotionMsg or MouseClickMsg)
+            {
+                changed |= SetHoveredIndex(-1);
+            }
+
+            if (message is not MouseWheelMsg)
+            {
+                return changed;
+            }
+        }
+
+        if (message is MouseWheelMsg wheel && InteractionProfile.NavigateOnWheel)
+        {
+            if (wheel.Button == MouseButton.WheelDown)
+            {
+                var previous = _selectedIndex;
+                _selectedIndex = Math.Min(_visible.Count - 1, _selectedIndex + 1);
+                changed |= _selectedIndex != previous;
+            }
+            else if (wheel.Button == MouseButton.WheelUp)
+            {
+                var previous = _selectedIndex;
+                _selectedIndex = Math.Max(0, _selectedIndex - 1);
+                changed |= _selectedIndex != previous;
+            }
+        }
+
+        if (!inside)
+        {
+            return changed;
+        }
+
+        var start = ComputeWindowStart(content.Height);
+        var hovered = start + (message.Y - content.Y);
+        if (hovered < 0 || hovered >= _visible.Count)
+        {
+            hovered = -1;
+        }
+
+        if (message is MouseMotionMsg && InteractionProfile.HoverOnMotion)
+        {
+            changed |= SetHoveredIndex(hovered);
+            return changed;
+        }
+
+        if (message is MouseClickMsg click)
+        {
+            if (InteractionProfile.HoverOnClick)
+            {
+                changed |= SetHoveredIndex(hovered);
+            }
+
+            if (click.Button == MouseButton.Left && InteractionProfile.ActivateOnClick && hovered >= 0)
+            {
+                if (_selectedIndex != hovered)
+                {
+                    _selectedIndex = hovered;
+                    changed = true;
+                }
+            }
+        }
+
+        return changed;
+    }
+
     public void Render(Canvas canvas, Rect rect)
     {
         var clipped = Rect.Intersect(rect, canvas.Bounds);
@@ -811,7 +1335,7 @@ public sealed class TreeViewComponent : IStatefulComponent
             return;
         }
 
-        var start = Math.Clamp(_selectedIndex - (content.Height / 2), 0, Math.Max(0, _visible.Count - content.Height));
+        var start = ComputeWindowStart(content.Height);
         var end = Math.Min(_visible.Count, start + content.Height);
         var row = 0;
         for (var i = start; i < end; i++, row++)
@@ -843,6 +1367,11 @@ public sealed class TreeViewComponent : IStatefulComponent
             {
                 states.Add(WidgetVisualState.Cursor);
                 states.Add(WidgetVisualState.Selected);
+            }
+
+            if (i == _hoveredIndex)
+            {
+                states.Add(WidgetVisualState.Hovered);
             }
 
             states.AddRange(node.States);
@@ -925,6 +1454,29 @@ public sealed class TreeViewComponent : IStatefulComponent
             AppendVisible(node.Children[i], depth + 1, visibleIndex);
         }
     }
+
+    private int ComputeWindowStart(int contentHeight)
+    {
+        return Math.Clamp(_selectedIndex - (contentHeight / 2), 0, Math.Max(0, _visible.Count - contentHeight));
+    }
+
+    private Rect ResolveContentRect(Rect bounds)
+    {
+        return ShowBorder
+            ? bounds.Inset(1, 1)
+            : bounds;
+    }
+
+    private bool SetHoveredIndex(int index)
+    {
+        if (_hoveredIndex == index)
+        {
+            return false;
+        }
+
+        _hoveredIndex = index;
+        return true;
+    }
 }
 
 public enum NotificationSeverity
@@ -942,10 +1494,11 @@ public sealed record NotificationEntry(
     DateTimeOffset CreatedAt,
     bool IsRead = false);
 
-public sealed class NotificationCenterComponent : IStatefulComponent
+public sealed class NotificationCenterComponent : IStatefulComponent, IMouseStatefulComponent
 {
     private readonly List<NotificationEntry> _entries = [];
     private int _selectedIndex;
+    private int _hoveredIndex = -1;
 
     public string Title { get; set; } = "Notifications";
 
@@ -974,6 +1527,8 @@ public sealed class NotificationCenterComponent : IStatefulComponent
     public KeyBinding ClearAllKey { get; set; } = new("c", "clear all", "c");
 
     public WidgetStatePalette EntryStatePalette { get; } = WidgetStatePalette.CreateDefault();
+
+    public WidgetInteractionProfile InteractionProfile { get; set; } = WidgetInteractionProfile.Default.Clone();
 
     public IReadOnlyList<NotificationEntry> Entries => _entries;
 
@@ -1066,6 +1621,88 @@ public sealed class NotificationCenterComponent : IStatefulComponent
         return false;
     }
 
+    public bool UpdateMouse(MouseMsg message, Rect bounds)
+    {
+        if (Disabled || ReadOnly)
+        {
+            return false;
+        }
+
+        var content = ResolveContentRect(bounds);
+        if (content.IsEmpty)
+        {
+            return false;
+        }
+
+        var inside = content.Contains(message.X, message.Y);
+        var changed = false;
+        if (!inside)
+        {
+            if (message is MouseMotionMsg or MouseClickMsg)
+            {
+                changed |= SetHoveredIndex(-1);
+            }
+
+            if (message is not MouseWheelMsg)
+            {
+                return changed;
+            }
+        }
+
+        if (message is MouseWheelMsg wheel && InteractionProfile.NavigateOnWheel && _entries.Count > 0)
+        {
+            if (wheel.Button == MouseButton.WheelDown)
+            {
+                var previous = _selectedIndex;
+                _selectedIndex = Math.Min(_entries.Count - 1, _selectedIndex + 1);
+                changed |= _selectedIndex != previous;
+            }
+            else if (wheel.Button == MouseButton.WheelUp)
+            {
+                var previous = _selectedIndex;
+                _selectedIndex = Math.Max(0, _selectedIndex - 1);
+                changed |= _selectedIndex != previous;
+            }
+        }
+
+        if (!inside || _entries.Count == 0)
+        {
+            return changed;
+        }
+
+        var start = ComputeWindowStart(content.Height);
+        var hovered = start + (message.Y - content.Y);
+        if (hovered < 0 || hovered >= _entries.Count)
+        {
+            hovered = -1;
+        }
+
+        if (message is MouseMotionMsg && InteractionProfile.HoverOnMotion)
+        {
+            changed |= SetHoveredIndex(hovered);
+            return changed;
+        }
+
+        if (message is MouseClickMsg click)
+        {
+            if (InteractionProfile.HoverOnClick)
+            {
+                changed |= SetHoveredIndex(hovered);
+            }
+
+            if (click.Button == MouseButton.Left && InteractionProfile.ActivateOnClick && hovered >= 0)
+            {
+                if (_selectedIndex != hovered)
+                {
+                    _selectedIndex = hovered;
+                    changed = true;
+                }
+            }
+        }
+
+        return changed;
+    }
+
     public void Render(Canvas canvas, Rect rect)
     {
         var clipped = Rect.Intersect(rect, canvas.Bounds);
@@ -1096,7 +1733,7 @@ public sealed class NotificationCenterComponent : IStatefulComponent
             return;
         }
 
-        var start = Math.Clamp(_selectedIndex - (content.Height / 2), 0, Math.Max(0, _entries.Count - content.Height));
+        var start = ComputeWindowStart(content.Height);
         var end = Math.Min(_entries.Count, start + content.Height);
         var row = 0;
         for (var i = start; i < end; i++, row++)
@@ -1106,12 +1743,12 @@ public sealed class NotificationCenterComponent : IStatefulComponent
             var readMark = entry.IsRead ? " " : "•";
             var timestamp = ShowTimestamp ? $"{entry.CreatedAt:HH:mm:ss} " : string.Empty;
             var line = $"{cursor}{readMark} {timestamp}{entry.Message}";
-            var states = ResolveEntryStates(entry, i == _selectedIndex);
+            var states = ResolveEntryStates(entry, i == _selectedIndex, i == _hoveredIndex);
             canvas.WriteText(content.X, content.Y + row, EntryStatePalette.Render(line, states), content.Width);
         }
     }
 
-    private IReadOnlyCollection<WidgetVisualState> ResolveEntryStates(NotificationEntry entry, bool selected)
+    private IReadOnlyCollection<WidgetVisualState> ResolveEntryStates(NotificationEntry entry, bool selected, bool hovered)
     {
         var states = new List<WidgetVisualState>(7);
         if (Focused)
@@ -1135,6 +1772,11 @@ public sealed class NotificationCenterComponent : IStatefulComponent
             states.Add(WidgetVisualState.Selected);
         }
 
+        if (hovered)
+        {
+            states.Add(WidgetVisualState.Hovered);
+        }
+
         if (!entry.IsRead)
         {
             states.Add(WidgetVisualState.New);
@@ -1148,5 +1790,28 @@ public sealed class NotificationCenterComponent : IStatefulComponent
             _ => WidgetVisualState.Default,
         });
         return states;
+    }
+
+    private int ComputeWindowStart(int contentHeight)
+    {
+        return Math.Clamp(_selectedIndex - (contentHeight / 2), 0, Math.Max(0, _entries.Count - contentHeight));
+    }
+
+    private Rect ResolveContentRect(Rect bounds)
+    {
+        return ShowBorder
+            ? bounds.Inset(1, 1)
+            : bounds;
+    }
+
+    private bool SetHoveredIndex(int index)
+    {
+        if (_hoveredIndex == index)
+        {
+            return false;
+        }
+
+        _hoveredIndex = index;
+        return true;
     }
 }

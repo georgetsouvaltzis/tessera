@@ -21,7 +21,9 @@ internal static class PrebuiltWidgetTests
         yield return new TestCase("Prebuilt_DropdownComponent_SelectsOpenMenuItem", DropdownComponent_SelectsOpenMenuItem);
         yield return new TestCase("Prebuilt_DropdownComponent_HidesBorderWhenConfigured", DropdownComponent_HidesBorderWhenConfigured);
         yield return new TestCase("Prebuilt_DropdownComponent_AppliesOptionStateStyles", DropdownComponent_AppliesOptionStateStyles);
+        yield return new TestCase("Prebuilt_DropdownComponent_MouseClickOpensAndSelects", DropdownComponent_MouseClickOpensAndSelects);
         yield return new TestCase("Prebuilt_ComboboxComponent_FiltersAndSelects", ComboboxComponent_FiltersAndSelects);
+        yield return new TestCase("Prebuilt_ComboboxComponent_MouseWheelNavigatesAndSelects", ComboboxComponent_MouseWheelNavigatesAndSelects);
         yield return new TestCase("Prebuilt_TableComponent_ForwardsSortHotkeys", TableComponent_ForwardsSortHotkeys);
         yield return new TestCase("Prebuilt_ProgressBarComponent_AdjustsValue", ProgressBarComponent_AdjustsValue);
         yield return new TestCase("Prebuilt_StatusBarComponent_RendersLeftAndRightText", StatusBarComponent_RendersLeftAndRightText);
@@ -283,6 +285,26 @@ internal static class PrebuiltWidgetTests
         return Task.CompletedTask;
     }
 
+    private static Task DropdownComponent_MouseClickOpensAndSelects()
+    {
+        var dropdown = new DropdownComponent
+        {
+            Focused = true,
+            ShowBorder = false,
+        };
+        dropdown.SetItems(["alpha", "beta", "gamma"]);
+        var bounds = new Rect(0, 0, 24, 6);
+
+        var openChanged = dropdown.UpdateMouse(new MouseClickMsg(MouseButton.Left, 0, 0), bounds);
+        var selectChanged = dropdown.UpdateMouse(new MouseClickMsg(MouseButton.Left, 0, 2), bounds);
+
+        TestAssert.True(openChanged, "Field click should open dropdown when click activation is enabled.");
+        TestAssert.True(selectChanged, "Option click should select highlighted dropdown row.");
+        TestAssert.True(!dropdown.IsOpen, "Dropdown should close after click-select.");
+        TestAssert.Equal("beta", dropdown.SelectedItem, "Dropdown click-select should pick the clicked option.");
+        return Task.CompletedTask;
+    }
+
     private static Task ComboboxComponent_FiltersAndSelects()
     {
         var combobox = new ComboboxComponent
@@ -298,6 +320,28 @@ internal static class PrebuiltWidgetTests
         TestAssert.True(!combobox.IsOpen, "Combobox should close after selection.");
         TestAssert.Equal("gamma", combobox.SelectedItem, "Combobox should select the filtered match.");
         TestAssert.Equal("gamma", combobox.Input.Value, "Combobox input should sync to selected item.");
+        return Task.CompletedTask;
+    }
+
+    private static Task ComboboxComponent_MouseWheelNavigatesAndSelects()
+    {
+        var combobox = new ComboboxComponent
+        {
+            Focused = true,
+            ShowBorder = false,
+        };
+        combobox.SetItems(["alpha", "beta", "gamma"]);
+        var bounds = new Rect(0, 0, 24, 6);
+
+        var openChanged = combobox.UpdateMouse(new MouseClickMsg(MouseButton.Left, 0, 0), bounds);
+        var wheelChanged = combobox.UpdateMouse(new MouseWheelMsg(MouseButton.WheelDown, 0, 2), bounds);
+        var selectChanged = combobox.UpdateMouse(new MouseClickMsg(MouseButton.Left, 0, 3), bounds);
+
+        TestAssert.True(openChanged, "Field click should open combobox list.");
+        TestAssert.True(wheelChanged, "Wheel input should move combobox highlight when list is open.");
+        TestAssert.True(selectChanged, "Option click should select highlighted combobox row.");
+        TestAssert.True(!combobox.IsOpen, "Combobox should close after click-select.");
+        TestAssert.Equal("gamma", combobox.SelectedItem, "Combobox selection should reflect wheel-adjusted highlighted option.");
         return Task.CompletedTask;
     }
 

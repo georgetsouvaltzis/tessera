@@ -290,6 +290,10 @@ public sealed class WidgetStatePalette
         {
             TextStyle = TeaStyle.Empty.WithInverse(),
         });
+        palette.Set(WidgetVisualState.Hovered, new WidgetStateAppearance
+        {
+            TextStyle = TeaStyle.Empty.WithUnderline(),
+        });
         palette.Set(WidgetVisualState.Selected, new WidgetStateAppearance
         {
             TextStyle = TeaStyle.Empty.WithUnderline(),

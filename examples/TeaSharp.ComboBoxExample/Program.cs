@@ -67,6 +67,24 @@ internal sealed class ComboBoxDemoModel : IModel
             return new UpdateResult(this, null);
         }
 
+        if (message is MouseMsg mouse)
+        {
+            var mousePrevious = _combobox.SelectedItem;
+            if (_combobox.UpdateMouse(mouse, GetComboboxRect()))
+            {
+                if (!string.Equals(mousePrevious, _combobox.SelectedItem, StringComparison.Ordinal))
+                {
+                    _lastEvent = $"selected:{_combobox.SelectedItem}";
+                }
+                else
+                {
+                    _lastEvent = $"mouse:{mouse.EventType.ToString().ToLowerInvariant()}";
+                }
+            }
+
+            return new UpdateResult(this, null);
+        }
+
         if (message is not KeyPressMsg key)
         {
             var changed = _combobox.Update(message);
@@ -112,9 +130,9 @@ internal sealed class ComboBoxDemoModel : IModel
         canvas.DrawBox(frame, "TeaSharp Combobox Example", BorderStyle.Rounded);
 
         var body = frame.Inset(2, 2);
-        canvas.WriteText(body.X, body.Y, "Controls: type filter, enter select, up/down navigate, esc close, q quit", body.Width);
+        canvas.WriteText(body.X, body.Y, "Controls: type filter, enter select, up/down navigate, esc close, mouse click+wheel, q quit", body.Width);
 
-        var comboRect = new Rect(body.X, body.Y + 2, body.Width, Math.Min(12, body.Height - 7));
+        var comboRect = GetComboboxRect();
         _combobox.Render(canvas, comboRect);
 
         canvas.WriteText(body.X, body.Bottom - 4, $"Filter: {_combobox.Input.Value}", body.Width);
@@ -140,5 +158,14 @@ internal sealed class ComboBoxDemoModel : IModel
             CursorColor = "#F5C2E7",
             WindowTitle = "TeaSharp Combobox Example",
         };
+    }
+
+    private Rect GetComboboxRect()
+    {
+        var width = Math.Max(56, _width);
+        var height = Math.Max(18, _height);
+        var frame = new Rect(0, 0, width, height);
+        var body = frame.Inset(2, 2);
+        return new Rect(body.X, body.Y + 2, body.Width, Math.Min(12, body.Height - 7));
     }
 }

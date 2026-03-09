@@ -13,8 +13,10 @@ internal static class UiKitComponentTests
         yield return new TestCase("UiKit_Widgets_DrawStatusBar_PlacesLeftAndRightText", Widgets_DrawStatusBar_PlacesLeftAndRightText);
         yield return new TestCase("UiKit_Widgets_DrawStatusBar_UsesThemeFill", Widgets_DrawStatusBar_UsesThemeFill);
         yield return new TestCase("UiKit_TabsComponent_CyclesAndSelectsByNumber", TabsComponent_CyclesAndSelectsByNumber);
+        yield return new TestCase("UiKit_TabsComponent_MouseClickSelectsTab", TabsComponent_MouseClickSelectsTab);
         yield return new TestCase("UiKit_SortableTableComponent_UpdatesSortAndPaging", SortableTableComponent_UpdatesSortAndPaging);
         yield return new TestCase("UiKit_SortableTableComponent_VirtualizationWindow_RendersSlice", SortableTableComponent_VirtualizationWindow_RendersSlice);
+        yield return new TestCase("UiKit_SortableTableComponent_MouseClickSelectsVisibleRow", SortableTableComponent_MouseClickSelectsVisibleRow);
         yield return new TestCase("UiKit_FormComponents_RespondToInput", FormComponents_RespondToInput);
         yield return new TestCase("UiKit_ModalComponent_VisibleStateControlsRendering", ModalComponent_VisibleStateControlsRendering);
         yield return new TestCase("UiKit_ModalComponent_BackdropOccludesUnderlyingContent", ModalComponent_BackdropOccludesUnderlyingContent);
@@ -114,6 +116,20 @@ internal static class UiKitComponentTests
         return Task.CompletedTask;
     }
 
+    private static Task TabsComponent_MouseClickSelectsTab()
+    {
+        // Arrange
+        var tabs = new TabsComponent(["Overview", "Data", "Forms"]);
+
+        // Act
+        var changed = tabs.UpdateMouse(new MouseClickMsg(MouseButton.Left, 15, 0), new Rect(0, 0, 40, 1));
+
+        // Assert
+        TestAssert.True(changed, "Mouse click inside tab row should update selected tab.");
+        TestAssert.Equal(1, tabs.SelectedIndex, "Tab click should select the clicked tab.");
+        return Task.CompletedTask;
+    }
+
     private static Task SortableTableComponent_UpdatesSortAndPaging()
     {
         // Arrange
@@ -168,6 +184,34 @@ internal static class UiKitComponentTests
         TestAssert.True(output.Contains("v3+2", StringComparison.Ordinal), "Virtualized table title should report active window.");
         TestAssert.True(output.Contains("c", StringComparison.Ordinal), "Virtualized slice should include starting row.");
         TestAssert.True(output.Contains("d", StringComparison.Ordinal), "Virtualized slice should include following row.");
+        return Task.CompletedTask;
+    }
+
+    private static Task SortableTableComponent_MouseClickSelectsVisibleRow()
+    {
+        // Arrange
+        var table = new SortableTableComponent(["Metric", "Value"])
+        {
+            ShowBorder = false,
+            Title = "Sample",
+        };
+        table.SetRows(
+        [
+            ["cpu", "33"],
+            ["mem", "60"],
+            ["io", "18"],
+        ]);
+        var bounds = new Rect(0, 0, 40, 6);
+
+        // Act
+        var changed = table.UpdateMouse(new MouseClickMsg(MouseButton.Left, 2, 4), bounds);
+        var canvas = new Canvas(40, 6);
+        table.Render(canvas, bounds);
+        var output = canvas.Render();
+
+        // Assert
+        TestAssert.True(changed, "Mouse click on table row should update visible selection.");
+        TestAssert.True(output.Contains("› mem", StringComparison.Ordinal), "Clicked row should render with selected marker.");
         return Task.CompletedTask;
     }
 

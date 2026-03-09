@@ -269,9 +269,10 @@ public static class UiWidgets
     }
 }
 
-public sealed class TabsComponent : IStatefulComponent
+public sealed class TabsComponent : IStatefulComponent, IMouseStatefulComponent
 {
     private readonly List<string> _tabs = [];
+    private int _hoveredIndex = -1;
 
     public TabsComponent(IEnumerable<string> tabs)
     {
@@ -281,6 +282,12 @@ public sealed class TabsComponent : IStatefulComponent
     public int SelectedIndex { get; private set; }
 
     public IReadOnlyList<string> Tabs => _tabs;
+
+    public bool Focused { get; set; }
+
+    public WidgetStatePalette TabStatePalette { get; } = WidgetStatePalette.CreateDefault();
+
+    public WidgetInteractionProfile InteractionProfile { get; set; } = WidgetInteractionProfile.Default.Clone();
 
     public KeyBinding NextTabKey { get; set; } = new("right", "next tab", "right");
 
@@ -319,6 +326,64 @@ public sealed class TabsComponent : IStatefulComponent
         return false;
     }
 
+    public bool UpdateMouse(MouseMsg message, Rect bounds)
+    {
+        if (_tabs.Count == 0 || bounds.IsEmpty)
+        {
+            return false;
+        }
+
+        if (message is MouseWheelMsg wheel
+            && InteractionProfile.NavigateOnWheel
+            && bounds.Contains(wheel.X, wheel.Y))
+        {
+            if (wheel.Button == MouseButton.WheelDown)
+            {
+                SelectedIndex = (SelectedIndex + 1) % _tabs.Count;
+                return true;
+            }
+
+            if (wheel.Button == MouseButton.WheelUp)
+            {
+                SelectedIndex = (SelectedIndex + _tabs.Count - 1) % _tabs.Count;
+                return true;
+            }
+        }
+
+        if (!bounds.Contains(message.X, message.Y) || message.Y != bounds.Y)
+        {
+            if (message is MouseMotionMsg or MouseClickMsg)
+            {
+                return SetHoveredIndex(-1);
+            }
+
+            return false;
+        }
+
+        var changed = false;
+        var hovered = HitTestTabIndex(message.X, bounds);
+        if (message is MouseMotionMsg && InteractionProfile.HoverOnMotion)
+        {
+            changed |= SetHoveredIndex(hovered);
+        }
+        else if (message is MouseClickMsg && InteractionProfile.HoverOnClick)
+        {
+            changed |= SetHoveredIndex(hovered);
+        }
+
+        if (message is MouseClickMsg { Button: MouseButton.Left }
+            && InteractionProfile.ActivateOnClick
+            && hovered >= 0
+            && hovered < _tabs.Count
+            && hovered != SelectedIndex)
+        {
+            SelectedIndex = hovered;
+            changed = true;
+        }
+
+        return changed;
+    }
+
     public void Select(int index)
     {
         if (_tabs.Count == 0)
@@ -345,9 +410,63 @@ public sealed class TabsComponent : IStatefulComponent
             var label = active
                 ? $"[{i + 1}:{_tabs[i]}]"
                 : $" {i + 1}:{_tabs[i]} ";
-            canvas.WriteText(x, clipped.Y, label, clipped.Right - x);
+            var states = ResolveTabStates(i, active);
+            canvas.WriteText(x, clipped.Y, TabStatePalette.Render(label, states), clipped.Right - x);
             x += label.Length + 1;
         }
+    }
+
+    private IReadOnlyCollection<WidgetVisualState> ResolveTabStates(int index, bool active)
+    {
+        var states = new List<WidgetVisualState>(4);
+        if (Focused)
+        {
+            states.Add(WidgetVisualState.Focused);
+        }
+
+        if (active)
+        {
+            states.Add(WidgetVisualState.Cursor);
+            states.Add(WidgetVisualState.Selected);
+        }
+
+        if (index == _hoveredIndex)
+        {
+            states.Add(WidgetVisualState.Hovered);
+        }
+
+        return states;
+    }
+
+    private int HitTestTabIndex(int x, Rect bounds)
+    {
+        var cursor = bounds.X;
+        for (var i = 0; i < _tabs.Count && cursor < bounds.Right; i++)
+        {
+            var label = i == SelectedIndex
+                ? $"[{i + 1}:{_tabs[i]}]"
+                : $" {i + 1}:{_tabs[i]} ";
+            var end = cursor + label.Length;
+            if (x >= cursor && x < end)
+            {
+                return i;
+            }
+
+            cursor = end + 1;
+        }
+
+        return -1;
+    }
+
+    private bool SetHoveredIndex(int index)
+    {
+        if (_hoveredIndex == index)
+        {
+            return false;
+        }
+
+        _hoveredIndex = index;
+        return true;
     }
 }
 
@@ -512,9 +631,11 @@ public sealed class ToastCenterComponent : IStatefulComponent
     }
 }
 
-public sealed class SortableTableComponent : IStatefulComponent
+public sealed class SortableTableComponent : IStatefulComponent, IMouseStatefulComponent
 {
     private readonly List<IReadOnlyList<string>> _rows = [];
+    private int _hoveredVisibleRow = -1;
+    private int _selectedVisibleRow = -1;
 
     public SortableTableComponent(IReadOnlyList<string> headers)
     {
@@ -540,6 +661,8 @@ public sealed class SortableTableComponent : IStatefulComponent
     public int VirtualStartIndex { get; private set; }
 
     public int VirtualWindowSize { get; private set; } = 32;
+
+    public WidgetInteractionProfile InteractionProfile { get; set; } = WidgetInteractionProfile.Default.Clone();
 
     public KeyBinding NextPageKey { get; set; } = new("]", "next page", "]");
 
@@ -607,6 +730,68 @@ public sealed class SortableTableComponent : IStatefulComponent
         return false;
     }
 
+    public bool UpdateMouse(MouseMsg message, Rect bounds)
+    {
+        if (Headers.Count == 0 || _rows.Count == 0 || bounds.IsEmpty)
+        {
+            return false;
+        }
+
+        var state = BuildRenderState();
+        var content = ResolveTableContentRect(bounds, state.Title);
+        if (content.IsEmpty || content.Height < 3)
+        {
+            return false;
+        }
+
+        var inside = content.Contains(message.X, message.Y);
+        var changed = false;
+
+        if (!inside)
+        {
+            if (message is MouseMotionMsg or MouseClickMsg)
+            {
+                changed |= SetHoveredVisibleRow(-1);
+            }
+
+            if (message is not MouseWheelMsg)
+            {
+                return changed;
+            }
+        }
+
+        if (message is MouseWheelMsg wheel && InteractionProfile.NavigateOnWheel)
+        {
+            changed |= HandleWheelNavigation(wheel);
+        }
+
+        if (!inside)
+        {
+            return changed;
+        }
+
+        if (message is MouseMotionMsg && InteractionProfile.HoverOnMotion)
+        {
+            changed |= SetHoveredVisibleRow(RowFromPointer(content, message.Y, state.VisibleRows.Count));
+            return changed;
+        }
+
+        if (message is MouseClickMsg click)
+        {
+            if (InteractionProfile.HoverOnClick)
+            {
+                changed |= SetHoveredVisibleRow(RowFromPointer(content, click.Y, state.VisibleRows.Count));
+            }
+
+            if (click.Button == MouseButton.Left && InteractionProfile.ActivateOnClick)
+            {
+                changed |= HandlePointerActivation(click.X, click.Y, content, state);
+            }
+        }
+
+        return changed;
+    }
+
     public void SetVirtualWindow(int startIndex, int windowSize)
     {
         VirtualStartIndex = Math.Max(0, startIndex);
@@ -614,6 +799,200 @@ public sealed class SortableTableComponent : IStatefulComponent
     }
 
     public void Render(Canvas canvas, Rect rect)
+    {
+        var state = BuildRenderState();
+        NormalizeVisibleRowPointers(state.VisibleRows.Count);
+
+        Widgets.DrawTable(
+            canvas,
+            rect,
+            Headers,
+            state.VisibleRows,
+            selectedRow: _selectedVisibleRow >= 0
+                ? _selectedVisibleRow
+                : _hoveredVisibleRow,
+            title: state.Title,
+            showBorder: ShowBorder);
+    }
+
+    private void NormalizePage()
+    {
+        var safePageSize = Math.Max(1, PageSize);
+        var pageCount = Math.Max(1, (_rows.Count + safePageSize - 1) / safePageSize);
+        PageIndex = Math.Clamp(PageIndex, 0, pageCount - 1);
+    }
+
+    private static string ValueAt(IReadOnlyList<string> row, int column)
+    {
+        if (column < 0 || column >= row.Count)
+        {
+            return string.Empty;
+        }
+
+        return row[column];
+    }
+
+    private bool HandleWheelNavigation(MouseWheelMsg wheel)
+    {
+        if (EnableVirtualization)
+        {
+            var previous = VirtualStartIndex;
+            var maxStart = Math.Max(0, _rows.Count - Math.Max(1, VirtualWindowSize));
+            if (wheel.Button == MouseButton.WheelDown)
+            {
+                VirtualStartIndex = Math.Min(maxStart, VirtualStartIndex + 1);
+            }
+            else if (wheel.Button == MouseButton.WheelUp)
+            {
+                VirtualStartIndex = Math.Max(0, VirtualStartIndex - 1);
+            }
+            else
+            {
+                return false;
+            }
+
+            NormalizeVisibleRowPointers(Math.Max(1, Math.Min(Math.Max(1, VirtualWindowSize), _rows.Count)));
+            return VirtualStartIndex != previous;
+        }
+
+        var previousPage = PageIndex;
+        if (wheel.Button == MouseButton.WheelDown)
+        {
+            PageIndex++;
+            NormalizePage();
+        }
+        else if (wheel.Button == MouseButton.WheelUp)
+        {
+            PageIndex = Math.Max(0, PageIndex - 1);
+        }
+        else
+        {
+            return false;
+        }
+
+        NormalizeVisibleRowPointers(Math.Max(1, Math.Min(Math.Max(1, PageSize), _rows.Count)));
+        return PageIndex != previousPage;
+    }
+
+    private bool HandlePointerActivation(int x, int y, Rect content, TableRenderState state)
+    {
+        if (y == content.Y)
+        {
+            var column = HeaderColumnFromPointer(x, content);
+            if (column < 0)
+            {
+                return false;
+            }
+
+            if (column == SortColumn)
+            {
+                SortDescending = !SortDescending;
+            }
+            else
+            {
+                SortColumn = column;
+                SortDescending = false;
+            }
+
+            return true;
+        }
+
+        var row = RowFromPointer(content, y, state.VisibleRows.Count);
+        if (row < 0)
+        {
+            return false;
+        }
+
+        if (_selectedVisibleRow == row)
+        {
+            return false;
+        }
+
+        _selectedVisibleRow = row;
+        return true;
+    }
+
+    private int HeaderColumnFromPointer(int x, Rect content)
+    {
+        var separatorCount = Headers.Count - 1;
+        var availableWidth = Math.Max(Headers.Count, content.Width - separatorCount);
+        var widths = ComputeColumnWidths(availableWidth, Headers.Count);
+
+        var cursor = content.X;
+        for (var i = 0; i < widths.Length; i++)
+        {
+            var end = cursor + widths[i];
+            if (x >= cursor && x < end)
+            {
+                return i;
+            }
+
+            cursor = end;
+            if (i < widths.Length - 1)
+            {
+                cursor++;
+            }
+        }
+
+        return -1;
+    }
+
+    private static int[] ComputeColumnWidths(int width, int columns)
+    {
+        var widths = new int[columns];
+        var baseWidth = width / columns;
+        var remainder = width % columns;
+        for (var i = 0; i < columns; i++)
+        {
+            widths[i] = baseWidth + (i < remainder ? 1 : 0);
+        }
+
+        return widths;
+    }
+
+    private static int RowFromPointer(Rect content, int y, int visibleRows)
+    {
+        var row = y - (content.Y + 2);
+        if (row < 0 || row >= visibleRows)
+        {
+            return -1;
+        }
+
+        return row;
+    }
+
+    private bool SetHoveredVisibleRow(int row)
+    {
+        if (_hoveredVisibleRow == row)
+        {
+            return false;
+        }
+
+        _hoveredVisibleRow = row;
+        return true;
+    }
+
+    private void NormalizeVisibleRowPointers(int visibleRows)
+    {
+        if (visibleRows <= 0)
+        {
+            _hoveredVisibleRow = -1;
+            _selectedVisibleRow = -1;
+            return;
+        }
+
+        if (_hoveredVisibleRow >= visibleRows)
+        {
+            _hoveredVisibleRow = visibleRows - 1;
+        }
+
+        if (_selectedVisibleRow >= visibleRows)
+        {
+            _selectedVisibleRow = visibleRows - 1;
+        }
+    }
+
+    private TableRenderState BuildRenderState()
     {
         var sorted = _rows
             .OrderBy(row => ValueAt(row, SortColumn), StringComparer.OrdinalIgnoreCase)
@@ -635,34 +1014,33 @@ public sealed class SortableTableComponent : IStatefulComponent
             visibleRows = sorted.Skip(virtualOffset).Take(safeWindow).ToList();
         }
 
-        Widgets.DrawTable(
-            canvas,
-            rect,
-            Headers,
-            visibleRows,
-            selectedRow: -1,
-            title: EnableVirtualization
-                ? $"{Title} v{VirtualStartIndex + 1}+{Math.Max(1, VirtualWindowSize)} sort:{Headers[Math.Min(SortColumn, Headers.Count - 1)]} {(SortDescending ? "desc" : "asc")}"
-                : $"{Title} p{page + 1}/{pageCount} sort:{Headers[Math.Min(SortColumn, Headers.Count - 1)]} {(SortDescending ? "desc" : "asc")}",
-            showBorder: ShowBorder);
+        return new TableRenderState(visibleRows, BuildTitle(page, pageCount));
     }
 
-    private void NormalizePage()
+    private string BuildTitle(int page, int pageCount)
     {
-        var safePageSize = Math.Max(1, PageSize);
-        var pageCount = Math.Max(1, (_rows.Count + safePageSize - 1) / safePageSize);
-        PageIndex = Math.Clamp(PageIndex, 0, pageCount - 1);
+        return EnableVirtualization
+            ? $"{Title} v{VirtualStartIndex + 1}+{Math.Max(1, VirtualWindowSize)} sort:{Headers[Math.Min(SortColumn, Headers.Count - 1)]} {(SortDescending ? "desc" : "asc")}"
+            : $"{Title} p{page + 1}/{pageCount} sort:{Headers[Math.Min(SortColumn, Headers.Count - 1)]} {(SortDescending ? "desc" : "asc")}";
     }
 
-    private static string ValueAt(IReadOnlyList<string> row, int column)
+    private Rect ResolveTableContentRect(Rect bounds, string title)
     {
-        if (column < 0 || column >= row.Count)
+        if (ShowBorder)
         {
-            return string.Empty;
+            return bounds.Inset(1, 1);
         }
 
-        return row[column];
+        var content = bounds;
+        if (!string.IsNullOrWhiteSpace(title))
+        {
+            content = new Rect(content.X, content.Y + 1, content.Width, Math.Max(0, content.Height - 1));
+        }
+
+        return content;
     }
+
+    private sealed record TableRenderState(IReadOnlyList<IReadOnlyList<string>> VisibleRows, string Title);
 }
 
 public sealed class CheckboxListComponent : IStatefulComponent

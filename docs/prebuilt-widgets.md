@@ -39,17 +39,25 @@ TeaSharp provides a prebuilt widget layer in `TeaSharp.Components.PrebuiltWidget
   - Mouse support: motion previews row hover (`▸` marker), left click selects a visible row, wheel scroll navigates selection.
 - `TableComponent` wraps `SortableTableComponent` for sort/page interactions.
 - `DropdownComponent` provides open/close menu selection with configurable key bindings.
+  - Mouse support: field click open/close, option click selection, wheel-driven highlight navigation when open.
 - `ComboboxComponent` combines text filtering with keyboard-driven option selection.
+  - Mouse support: field click open/close, option click selection, wheel-driven highlight navigation when open.
 - `LogViewerComponent` supports append, filter, pause, clear, and scrolling.
 - `LayoutContainerComponent` supports `Vertical`, `Horizontal`, and `Grid` layout modes.
   - Mouse support: child hit-test routing and optional drag-resize split for 2-pane horizontal/vertical layouts (`PrimarySize`, `SetPrimarySize`, `ClearPrimarySize`).
 - `CommandPaletteComponent` provides fuzzy command filtering and execution (`ctrl+p` default open key).
+  - Mouse support: motion hover preview, wheel navigation, click execute, and outside-click close when open.
 - `TreeViewComponent` provides hierarchical expand/collapse navigation with keyboard controls.
+  - Mouse support: motion hover preview, click row selection, wheel navigation.
 - `NotificationCenterComponent` provides persistent event feed, read/dismiss, and severity-based styling.
+  - Mouse support: motion hover preview, click row selection, wheel navigation.
 - `ToggleSwitchComponent`, `SliderComponent`, and `SpinnerComponent` provide interactive control primitives.
+  - Mouse support: click activation and wheel interactions (toggle on/off, slider adjust, spinner advance).
 - `BadgeComponent` provides compact state/health labeling.
 - `MenuBarComponent` and `ContextMenuComponent` provide top-level and contextual action surfaces.
+  - Mouse support: hover preview, click selection/execute, and wheel navigation.
 - `NumberInputComponent`, `DatePickerComponent`, and `TimePickerComponent` provide structured value entry.
+  - Mouse support (`DatePickerComponent`, `TimePickerComponent`): day/field selection on click and wheel adjustment/navigation.
 - `MarkdownViewerComponent` provides scrollable markdown rendering for docs/help panes.
 - Most prebuilt widgets expose `ShowBorder` (`true` by default) for minimal/borderless layouts.
 - `ListComponent<T>`, `DropdownComponent`, and `ComboboxComponent` support state-driven styling through:
@@ -57,6 +65,7 @@ TeaSharp provides a prebuilt widget layer in `TeaSharp.Components.PrebuiltWidget
   - `WidgetStatePalette`
   - item resolvers (`ItemStateResolver` / `OptionStateResolver`)
   - palette inheritance (`Parent` / `InheritFrom(...)`)
+- Interactive prebuilt widgets expose `WidgetInteractionProfile` for unified hover/click/wheel behavior configuration.
 
 ### State Styling Example
 

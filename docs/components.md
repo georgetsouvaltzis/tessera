@@ -105,8 +105,17 @@ The design follows patterns used in Bubble Tea examples:
       - `ShowBorder` toggle for minimalist rendering on border-capable prebuilt widgets
       - state styling primitives for child items (`WidgetVisualState`, `WidgetStatePalette`, `ItemStateResolver`/`OptionStateResolver`)
       - state palette inheritance (`WidgetStatePalette.Parent` / `InheritFrom(...)`)
+      - shared interaction behavior profile (`WidgetInteractionProfile`) for hover/click/wheel semantics
       - mouse interactions:
         - `ListComponent<T>` row hover preview (motion), click selection, and wheel navigation
+        - `TabsComponent` motion hover preview, click tab activation, and wheel tab cycling
+        - `SortableTableComponent` motion row preview, click row selection/header sort toggle, and wheel page/window navigation
+        - `DropdownComponent` and `ComboboxComponent` field click-open, option click-select, and wheel highlight navigation
+        - `TreeViewComponent` and `NotificationCenterComponent` motion hover preview, click row selection, and wheel navigation
+        - `CommandPaletteComponent` motion hover preview, wheel navigation, click execute, and outside-click close
+        - `ToggleSwitchComponent`, `SliderComponent`, and `SpinnerComponent` click activation + wheel interactions
+        - `MenuBarComponent` and `ContextMenuComponent` motion hover preview, click activation, and wheel navigation
+        - `DatePickerComponent` and `TimePickerComponent` click day/field selection plus wheel adjustments
         - `LayoutContainerComponent` child mouse routing + optional drag-resize split (`PrimarySize`, `SetPrimarySize`, `ClearPrimarySize`)
 
 ## Example Integration
