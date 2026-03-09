@@ -1,0 +1,78 @@
+using TeaSharp.Core.Abstractions;
+using TeaSharp.Core.Messages;
+using TeaSharp.Widgets;
+
+namespace TeaSharp.Components;
+
+public sealed class ProgressBarComponent : IStatefulComponent, IFocusableComponent
+{
+    public double Value { get; private set; }
+
+    public string Title { get; set; } = "Progress";
+
+    public bool Focused { get; set; }
+
+    public bool ShowBorder { get; set; } = true;
+
+    public double Step { get; set; } = 0.05;
+
+    public KeyBinding DecreaseKey { get; set; } = new("left/-", "decrease", "left", "-");
+
+    public KeyBinding IncreaseKey { get; set; } = new("right/+", "increase", "right", "+");
+
+    public bool Update(IMessage message)
+    {
+        if (message is not KeyPressMsg key || !Focused)
+        {
+            return false;
+        }
+
+        if (DecreaseKey.Matches(key))
+        {
+            SetValue(Value - Step);
+            return true;
+        }
+
+        if (IncreaseKey.Matches(key))
+        {
+            SetValue(Value + Step);
+            return true;
+        }
+
+        return false;
+    }
+
+    public void SetValue(double value)
+    {
+        Value = Math.Clamp(value, 0.0, 1.0);
+    }
+
+    public void Render(Canvas canvas, Rect rect)
+    {
+        var clipped = Rect.Intersect(rect, canvas.Bounds);
+        if (clipped.IsEmpty)
+        {
+            return;
+        }
+
+        Rect content;
+        if (ShowBorder)
+        {
+            canvas.DrawBox(clipped, Focused ? $"{Title} *" : Title);
+            content = clipped.Inset(1, 1);
+        }
+        else
+        {
+            content = clipped;
+        }
+
+        if (content.IsEmpty)
+        {
+            return;
+        }
+
+        var percent = (int)Math.Round(Value * 100, MidpointRounding.AwayFromZero);
+        Widgets.DrawProgressBar(canvas, new Rect(content.X, content.Y, content.Width, 1), Value, $"{percent}%");
+    }
+}
+

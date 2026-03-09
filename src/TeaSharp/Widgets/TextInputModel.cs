@@ -3,10 +3,6 @@ using TeaSharp.Core.Messages;
 
 namespace TeaSharp.Widgets;
 
-public readonly record struct TextInputFrame(string Text, int CursorColumn, bool PlaceholderVisible);
-
-public readonly record struct TextInputUpdateResult(bool Changed, bool Submitted);
-
 public sealed class TextInputModel
 {
     public string Value { get; private set; } = string.Empty;

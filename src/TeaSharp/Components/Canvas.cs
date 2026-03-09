@@ -3,20 +3,6 @@ using System.Globalization;
 
 namespace TeaSharp.Components;
 
-public enum CanvasTextMode
-{
-    Fast = 0,
-    GraphemeAware = 1,
-}
-
-public enum BorderStyle
-{
-    Single = 0,
-    Rounded = 1,
-    Heavy = 2,
-    Ascii = 3,
-}
-
 public sealed class Canvas
 {
     private readonly char[]? _cells;

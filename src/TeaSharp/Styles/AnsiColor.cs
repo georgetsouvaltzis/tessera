@@ -1,12 +1,5 @@
 namespace TeaSharp.Styles;
 
-public enum AnsiColorMode
-{
-    Default = 0,
-    Indexed = 1,
-    Rgb = 2,
-}
-
 public readonly record struct AnsiColor
 {
     private AnsiColor(AnsiColorMode mode, byte red, byte green, byte blue, int index)

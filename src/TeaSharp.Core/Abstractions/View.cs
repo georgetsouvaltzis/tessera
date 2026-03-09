@@ -1,0 +1,24 @@
+using TeaSharp.Core.Messages;
+
+namespace TeaSharp.Core.Abstractions;
+
+public readonly record struct View(string Content)
+{
+    public bool AltScreen { get; init; }
+    public bool EnableBracketedPaste { get; init; }
+    public bool EnableFocusReporting { get; init; }
+    public bool EnableSynchronizedUpdates { get; init; }
+    public MouseMode MouseMode { get; init; }
+    public Func<MouseMsg, Command?>? OnMouse { get; init; }
+    public KeyboardEnhancementOptions KeyboardEnhancements { get; init; }
+    public int? CursorX { get; init; }
+    public int? CursorY { get; init; }
+    public CursorStyle? CursorStyle { get; init; }
+    public string? CursorColor { get; init; }
+    public string? ForegroundColor { get; init; }
+    public string? BackgroundColor { get; init; }
+    public TerminalProgress? Progress { get; init; }
+    public string? WindowTitle { get; init; }
+
+    public static View From(string content) => new(content);
+}
