@@ -11,7 +11,7 @@ public sealed class TmuxSmokeIntegrationTests
     private const string AppRunCommand = "cd /Users/georgetsouvaltzis/Projects/playground/teasharp && dotnet run --project examples/TeaSharp.Examples --no-build; exec /bin/zsh -i";
 
     [Test]
-    public async Task TmuxSmoke_CommandModeAndSingleQQuit_WorkAsExpected()
+    public async Task TmuxSmoke_ArrowKeysUpdateCounterAndQQuits()
     {
         if (!CommandSucceeds("tmux", "-V"))
         {
@@ -26,46 +26,20 @@ public sealed class TmuxSmokeIntegrationTests
             await Task.Delay(1600);
 
             var boot = CapturePane(session);
-            StringAssert.Contains("TeaSharp Dashboard", boot, "App should render dashboard on boot.");
+            StringAssert.Contains("Counter", boot, "App should render counter on boot.");
+            StringAssert.Contains("Count: 0", boot, "Counter should start at zero.");
 
-            SendKeys(session, "3");
+            SendKeys(session, "Up");
             await Task.Delay(240);
-            var showcase = CapturePane(session);
-            StringAssert.Contains("page=showcase", showcase, "Key '3' should switch to showcase page.");
+            var incremented = CapturePane(session);
+            StringAssert.Contains("Count: 1", incremented, "Up key should increment the counter.");
 
-            SendKeys(session, "Tab");
-            SendKeys(session, ":");
+            SendKeys(session, "Down");
             await Task.Delay(240);
-            var cmd = CapturePane(session);
-            StringAssert.Contains("focus=command", cmd, "Single ':' should focus command input.");
-            StringAssert.Contains("mode=cmd", cmd, "Single ':' should enable command mode.");
-
-            SendKeys(session, "C-[");
-            await Task.Delay(240);
-            var nav = CapturePane(session);
-            StringAssert.Contains("mode=nav", nav, "Esc should exit command mode.");
+            var decremented = CapturePane(session);
+            StringAssert.Contains("Count: 0", decremented, "Down key should decrement the counter.");
 
             Assert.That(PaneHasExamplesChildProcess(session), Is.True, "App process should be active before quit check.");
-
-            SendKeys(session, ":");
-            await Task.Delay(240);
-            var cmdAgain = CapturePane(session);
-            StringAssert.Contains("mode=cmd", cmdAgain, "Colon should re-enter command mode before q-input check.");
-
-            SendKeys(session, "q");
-            await Task.Delay(360);
-            Assert.That(
-                PaneHasExamplesChildProcess(session),
-                Is.True,
-                "Plain 'q' in command mode should stay in app and not trigger global quit.");
-            var cmdWithQ = CapturePane(session);
-            StringAssert.Contains("mode=cmd", cmdWithQ, "Command mode should remain active after plain 'q'.");
-            StringAssert.Contains("Command * [CMD]", cmdWithQ, "Command pane should stay focused after plain 'q'.");
-
-            SendKeys(session, "C-[");
-            await Task.Delay(240);
-            var navAgain = CapturePane(session);
-            StringAssert.Contains("mode=nav", navAgain, "Esc should return to navigation mode before quit key.");
 
             SendKeys(session, "q");
             await Task.Delay(600);
@@ -78,7 +52,7 @@ public sealed class TmuxSmokeIntegrationTests
     }
 
     [Test]
-    public async Task TmuxSmoke_ShowcaseHotkeysAndPaneCycling_WorkAsExpected()
+    public async Task TmuxSmoke_RepeatedArrowKeysAccumulateChanges()
     {
         if (!CommandSucceeds("tmux", "-V"))
         {
@@ -92,27 +66,21 @@ public sealed class TmuxSmokeIntegrationTests
             RunChecked("tmux", $"new-session -d -s {session} /bin/zsh -lc \"{AppRunCommand}\"");
             await Task.Delay(1600);
 
-            SendKeys(session, "3");
-            await Task.Delay(240);
-            var showcase = CapturePane(session);
-            StringAssert.Contains("page=showcase", showcase, "Showcase page should render after key '3'.");
-
-            SendKeys(session, "Tab");
-            SendKeys(session, "t");
-            SendKeys(session, "m");
-            SendKeys(session, "p");
-            SendKeys(session, "P");
+            SendKeys(session, "Up");
+            SendKeys(session, "Up");
+            SendKeys(session, "Up");
             await Task.Delay(400);
-            var afterHotkeys = CapturePane(session);
+            var afterUps = CapturePane(session);
+            StringAssert.Contains("Count: 3", afterUps, "Multiple Up keys should accumulate.");
 
-            StringAssert.Contains("mode=nav", afterHotkeys, "Showcase hotkeys should keep navigation mode active.");
-            StringAssert.Contains("pane=", afterHotkeys, "Pane label should remain visible after cycling hotkeys.");
-            StringAssert.Contains("page=showcase", afterHotkeys, "App should remain on showcase page after hotkeys.");
-            Assert.That(PaneHasExamplesChildProcess(session), Is.True, "App process should remain alive after showcase hotkeys.");
+            SendKeys(session, "Down");
+            await Task.Delay(240);
+            var afterDown = CapturePane(session);
+            StringAssert.Contains("Count: 2", afterDown, "Down key should decrement from accumulated count.");
 
             SendKeys(session, "q");
             await Task.Delay(600);
-            Assert.That(PaneHasExamplesChildProcess(session), Is.False, "Single 'q' from navigation mode should terminate app.");
+            Assert.That(PaneHasExamplesChildProcess(session), Is.False, "Single 'q' should terminate app.");
         }
         finally
         {

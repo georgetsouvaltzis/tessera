@@ -15,6 +15,8 @@ internal static class ChartComponentTests
         yield return new TestCase("Charts_LineChartComponent_HonorsCapacity", LineChartComponent_HonorsCapacity);
         yield return new TestCase("Charts_LineChart_WithZoomAndOffset_ShiftsWindow", LineChart_WithZoomAndOffset_ShiftsWindow);
         yield return new TestCase("Components_Composer_DispatchesStatefulUpdates", Composer_DispatchesStatefulUpdates);
+        yield return new TestCase("Components_Composer_FocusedRoutingTargetsFocusedSlotOnly", Composer_FocusedRoutingTargetsFocusedSlotOnly);
+        yield return new TestCase("Components_Composer_BroadcastRoutingUpdatesAllSlots", Composer_BroadcastRoutingUpdatesAllSlots);
         yield return new TestCase("Components_Composer_MouseClickFocusesTargetSlot", Composer_MouseClickFocusesTargetSlot);
         yield return new TestCase("Components_Composer_MouseWheelFallsBackToFocusedSlot", Composer_MouseWheelFallsBackToFocusedSlot);
     }
@@ -182,6 +184,41 @@ internal static class ChartComponentTests
         return Task.CompletedTask;
     }
 
+    private static Task Composer_FocusedRoutingTargetsFocusedSlotOnly()
+    {
+        var composer = new ComponentComposer();
+        var first = new KeyProbeComponent { Focused = true };
+        var second = new KeyProbeComponent();
+        composer.Add(first, new Rect(0, 0, 10, 4));
+        composer.Add(second, new Rect(10, 0, 10, 4));
+
+        var changed = composer.Update(new KeyPressMsg(KeyCode.Character, "x"));
+
+        TestAssert.True(changed, "Focused routing should report handled key updates.");
+        TestAssert.Equal(1, first.KeyUpdates, "Focused slot should receive keyboard input.");
+        TestAssert.Equal(0, second.KeyUpdates, "Non-focused slot should not receive keyboard input.");
+        return Task.CompletedTask;
+    }
+
+    private static Task Composer_BroadcastRoutingUpdatesAllSlots()
+    {
+        var composer = new ComponentComposer
+        {
+            KeyboardRoutingMode = KeyboardRoutingMode.Broadcast,
+        };
+        var first = new KeyProbeComponent { Focused = true };
+        var second = new KeyProbeComponent();
+        composer.Add(first, new Rect(0, 0, 10, 4));
+        composer.Add(second, new Rect(10, 0, 10, 4));
+
+        var changed = composer.Update(new KeyPressMsg(KeyCode.Character, "x"));
+
+        TestAssert.True(changed, "Broadcast routing should report handled key updates.");
+        TestAssert.Equal(1, first.KeyUpdates, "First slot should receive keyboard input.");
+        TestAssert.Equal(1, second.KeyUpdates, "Broadcast mode should also update non-focused slots.");
+        return Task.CompletedTask;
+    }
+
     private static Task Composer_MouseClickFocusesTargetSlot()
     {
         var composer = new ComponentComposer();
@@ -235,7 +272,30 @@ internal static class ChartComponentTests
         }
     }
 
-    private sealed class MouseProbeComponent : IStatefulComponent, IMouseStatefulComponent
+    private sealed class KeyProbeComponent : IStatefulComponent, IFocusableComponent
+    {
+        public bool Focused { get; set; }
+
+        public int KeyUpdates { get; private set; }
+
+        public bool Update(IMessage message)
+        {
+            if (message is not KeyPressMsg)
+            {
+                return false;
+            }
+
+            KeyUpdates++;
+            return true;
+        }
+
+        public void Render(Canvas canvas, Rect rect)
+        {
+            canvas.WriteText(rect.X, rect.Y, KeyUpdates.ToString(), rect.Width);
+        }
+    }
+
+    private sealed class MouseProbeComponent : IStatefulComponent, IMouseStatefulComponent, IFocusableComponent
     {
         public bool Focused { get; set; }
 

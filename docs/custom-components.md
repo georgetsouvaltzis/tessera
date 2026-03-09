@@ -5,7 +5,10 @@ TeaSharp custom components are built around three contracts:
 - `ICanvasComponent`: render-only component.
 - `IStatefulComponent`: render + local `Update(IMessage)` state transitions.
 - `IMouseStatefulComponent`: optional bounds-aware mouse transitions via `UpdateMouse(MouseMsg, Rect)`.
+- `IFocusableComponent`: explicit `Focused` state for keyboard-routing participation.
 - `ComponentComposer`: deterministic slot composition and optional update routing.
+  - default keyboard mode is focused-slot only
+  - switch to `KeyboardRoutingMode.Broadcast` when a container should fan out input
 
 ## Minimal Render-Only Component
 
@@ -30,13 +33,15 @@ using TeaSharp.Components;
 using TeaSharp.Core.Abstractions;
 using TeaSharp.Core.Messages;
 
-public sealed class CounterChip : IStatefulComponent
+public sealed class CounterChip : IStatefulComponent, IFocusableComponent
 {
     private int _count;
 
+    public bool Focused { get; set; }
+
     public bool Update(IMessage message)
     {
-        if (message is KeyPressMsg { Text: "+" })
+        if (message is KeyPressMsg key && key.IsCharacter('+', KeyModifiers.None, ignoreCase: false))
         {
             _count++;
             return true;
@@ -63,7 +68,7 @@ var composer = new ComponentComposer();
 composer.Add(new ClockComponent(), new Rect(0, 0, 24, 3));
 composer.Add(new CounterChip(), new Rect(24, 0, 24, 3));
 
-// optional for stateful components:
+// default keyboard routing targets the focused slot:
 composer.Update(message);
 
 composer.Render(canvas);
@@ -74,6 +79,7 @@ return canvas.Render();
 
 - Keep components deterministic: all state transitions via `Update`.
 - For mouse-aware widgets, keep bounds checks inside `UpdateMouse` and treat coordinates as canvas-space.
+- Use `IFocusableComponent` instead of relying on naming conventions or reflection.
 - Keep render pure: no side effects from `Render`.
 - If you need full Unicode layout fidelity in component text, use `CanvasTextMode.GraphemeAware`.
 - Use composer slots as an explicit layout graph; avoid hidden global state.

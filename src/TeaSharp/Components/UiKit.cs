@@ -269,7 +269,7 @@ public static class UiWidgets
     }
 }
 
-public sealed class TabsComponent : IStatefulComponent, IMouseStatefulComponent
+public sealed class TabsComponent : IStatefulComponent, IMouseStatefulComponent, IFocusableComponent
 {
     private readonly List<string> _tabs = [];
     private int _hoveredIndex = -1;
@@ -631,7 +631,7 @@ public sealed class ToastCenterComponent : IStatefulComponent
     }
 }
 
-public sealed class SortableTableComponent : IStatefulComponent, IMouseStatefulComponent
+public sealed class SortableTableComponent : IStatefulComponent, IMouseStatefulComponent, IFocusableComponent
 {
     private readonly List<IReadOnlyList<string>> _rows = [];
     private int _hoveredVisibleRow = -1;
@@ -653,6 +653,8 @@ public sealed class SortableTableComponent : IStatefulComponent, IMouseStatefulC
     public int PageIndex { get; private set; }
 
     public string Title { get; set; } = "Table";
+
+    public bool Focused { get; set; }
 
     public bool ShowBorder { get; set; } = true;
 

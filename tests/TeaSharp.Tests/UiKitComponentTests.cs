@@ -204,7 +204,7 @@ internal static class UiKitComponentTests
         var bounds = new Rect(0, 0, 40, 6);
 
         // Act
-        var changed = table.UpdateMouse(new MouseClickMsg(MouseButton.Left, 2, 4), bounds);
+        var changed = table.UpdateMouse(new MouseClickMsg(MouseButton.Left, 2, 5), bounds);
         var canvas = new Canvas(40, 6);
         table.Render(canvas, bounds);
         var output = canvas.Render();

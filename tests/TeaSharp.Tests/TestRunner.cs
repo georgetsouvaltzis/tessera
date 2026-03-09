@@ -1,6 +1,6 @@
 namespace TeaSharp.Tests;
 
-internal sealed record TestCase(string Name, Func<Task> Execute);
+public sealed record TestCase(string Name, Func<Task> Execute);
 
 internal sealed class TestRunner
 {

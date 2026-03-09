@@ -25,9 +25,13 @@ The design follows patterns used in Bubble Tea examples:
   - `ICanvasComponent`: render-only component contract.
   - `IStatefulComponent`: component with `Update(IMessage)` for model-local state.
   - `IMouseStatefulComponent`: component with bounds-aware mouse handling (`UpdateMouse(MouseMsg, Rect)`).
+  - `IFocusableComponent`: explicit focus contract for components that participate in keyboard focus.
+  - `IInteractiveComponent`: convenience contract for focusable stateful mouse-aware components.
+  - `KeyboardRoutingMode`: `FocusedOnly` (default) or `Broadcast`.
   - `ComponentComposer`: slot-based composition (`Add`, `Clear`, `Update`, `Render`).
     - mouse routing via slot hit-testing
-    - optional click-to-focus (`Focused` bool convention)
+    - explicit click-to-focus through `IFocusableComponent`
+    - focused-slot keyboard routing by default
     - wheel fallback to focused slot when pointer is outside any slot
 - `Widgets`:
   - `DrawPanel`
@@ -176,5 +180,6 @@ public sealed class ClockComponent : ICanvasComponent
 ```
 
 If the component owns local state and needs messages, implement `IStatefulComponent` and route messages through `ComponentComposer.Update(message)`.
+If it should take focus inside composed layouts, also implement `IFocusableComponent`.
 
 For a fuller guide with a custom component walkthrough, see `docs/custom-components.md`.

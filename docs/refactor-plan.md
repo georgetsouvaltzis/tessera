@@ -1,0 +1,54 @@
+# TeaSharp Refactor Plan
+
+## Goals
+
+- make component composition explicit and testable
+- remove reflection-driven behavior from public interaction paths
+- split oversized modules by responsibility instead of by historical growth
+- keep library consumers on a smaller, clearer surface area
+
+## Phase 1: Interaction Contracts
+
+Status: done
+
+- introduce `IFocusableComponent`
+- introduce `IInteractiveComponent`
+- introduce `KeyboardRoutingMode`
+- change `ComponentComposer` to focused-slot keyboard routing by default
+- remove reflection-based focus discovery and focus mutation
+- move `LayoutContainerComponent` into its own file and align its routing model with `ComponentComposer`
+
+## Phase 2: Test Infrastructure
+
+Status: done
+
+- convert `tests/TeaSharp.Tests` from a custom executable harness into a real NUnit test project
+- preserve existing case-based tests through a thin NUnit adapter
+- remove unstable example-app coupling from the unit-test project
+- add routing regressions for focused-only vs broadcast keyboard dispatch
+
+## Phase 3: File Splitting
+
+Status: next
+
+- split `PrebuiltWidgets.cs` into one widget per file
+- split `UiKit.cs` into layout, primitives, tables, forms, overlays
+- split `AdvancedPrebuiltWidgets.cs` and `ProductivityPrebuiltWidgets.cs` by widget family
+- keep the public namespace stable while reducing per-file responsibility
+
+## Phase 4: API Simplification
+
+Status: next
+
+- add `*Options` records for high-churn widgets
+- prefer small constructor overloads or static factory methods for common setups
+- standardize shared knobs: focus, borders, interaction profile, key bindings, state palette
+- move example-only composition code out of library-facing docs
+
+## Phase 5: Stable Integration Fixtures
+
+Status: next
+
+- replace tests coupled to mutable showcase/example programs with dedicated fixture apps
+- keep integration fixtures intentionally small and stable
+- let examples optimize for demonstration while fixtures optimize for regression coverage

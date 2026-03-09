@@ -11,7 +11,7 @@ public sealed record MenuBarItem(
     char Shortcut = '\0',
     IReadOnlyCollection<WidgetVisualState>? States = null);
 
-public sealed class MenuBarComponent : IStatefulComponent, IMouseStatefulComponent
+public sealed class MenuBarComponent : IStatefulComponent, IMouseStatefulComponent, IFocusableComponent
 {
     private readonly List<MenuBarItem> _items = [];
     private int _hoveredIndex = -1;
@@ -257,7 +257,7 @@ public sealed record ContextMenuItem(
     string Title,
     IReadOnlyCollection<WidgetVisualState>? States = null);
 
-public sealed class ContextMenuComponent : IStatefulComponent, IMouseStatefulComponent
+public sealed class ContextMenuComponent : IStatefulComponent, IMouseStatefulComponent, IFocusableComponent
 {
     private readonly List<ContextMenuItem> _items = [];
     private int _selectedIndex;
@@ -595,7 +595,7 @@ public sealed class ContextMenuComponent : IStatefulComponent, IMouseStatefulCom
     }
 }
 
-public sealed class NumberInputComponent : IStatefulComponent
+public sealed class NumberInputComponent : IStatefulComponent, IFocusableComponent
 {
     private bool _replaceOnNextCharacter = true;
 
@@ -812,7 +812,7 @@ public sealed class NumberInputComponent : IStatefulComponent
     }
 }
 
-public sealed class DatePickerComponent : IStatefulComponent, IMouseStatefulComponent
+public sealed class DatePickerComponent : IStatefulComponent, IMouseStatefulComponent, IFocusableComponent
 {
     private DateOnly? _hoveredDate;
 
@@ -1123,7 +1123,7 @@ public enum TimePickerField
     Second = 2,
 }
 
-public sealed class TimePickerComponent : IStatefulComponent, IMouseStatefulComponent
+public sealed class TimePickerComponent : IStatefulComponent, IMouseStatefulComponent, IFocusableComponent
 {
     private TimePickerField? _hoveredField;
 
@@ -1394,7 +1394,7 @@ public sealed class TimePickerComponent : IStatefulComponent, IMouseStatefulComp
     }
 }
 
-public sealed class MarkdownViewerComponent : IStatefulComponent
+public sealed class MarkdownViewerComponent : IStatefulComponent, IFocusableComponent
 {
     private readonly ViewportModel _viewport = new();
     private string _markdown = string.Empty;

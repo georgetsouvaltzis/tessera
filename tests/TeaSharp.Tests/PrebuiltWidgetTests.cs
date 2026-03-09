@@ -30,6 +30,7 @@ internal static class PrebuiltWidgetTests
         yield return new TestCase("Prebuilt_LogViewerComponent_AppendsAndFilters", LogViewerComponent_AppendsAndFilters);
         yield return new TestCase("Prebuilt_DialogComponent_AcceptsAndDismisses", DialogComponent_AcceptsAndDismisses);
         yield return new TestCase("Prebuilt_LayoutContainerComponent_RendersChildren", LayoutContainerComponent_RendersChildren);
+        yield return new TestCase("Prebuilt_LayoutContainerComponent_KeyboardRoutesToFocusedChildOnly", LayoutContainerComponent_KeyboardRoutesToFocusedChildOnly);
         yield return new TestCase("Prebuilt_LayoutContainerComponent_MouseResizeAdjustsPrimarySize", LayoutContainerComponent_MouseResizeAdjustsPrimarySize);
         yield return new TestCase("Prebuilt_LayoutContainerComponent_MouseRoutesToTargetChild", LayoutContainerComponent_MouseRoutesToTargetChild);
     }
@@ -191,7 +192,7 @@ internal static class PrebuiltWidgetTests
         var output = canvas.Render();
 
         TestAssert.True(output.Contains("[x] ", StringComparison.Ordinal), "List should render completed item prefix when state resolver marks it.");
-        TestAssert.True(output.Contains("\u001b[9m", StringComparison.Ordinal), "Completed item should use strikethrough style.");
+        TestAssert.True(ContainsStrikethroughSgr(output), "Completed item should use strikethrough style.");
         return Task.CompletedTask;
     }
 
@@ -281,7 +282,7 @@ internal static class PrebuiltWidgetTests
         var output = canvas.Render();
 
         TestAssert.True(output.Contains("[x] ", StringComparison.Ordinal), "Dropdown should render completed prefix for resolved state.");
-        TestAssert.True(output.Contains("\u001b[9m", StringComparison.Ordinal), "Dropdown completed state should use strikethrough style.");
+        TestAssert.True(ContainsStrikethroughSgr(output), "Dropdown completed state should use strikethrough style.");
         return Task.CompletedTask;
     }
 
@@ -479,6 +480,25 @@ internal static class PrebuiltWidgetTests
         return Task.CompletedTask;
     }
 
+    private static Task LayoutContainerComponent_KeyboardRoutesToFocusedChildOnly()
+    {
+        var first = new KeyProbeComponent { Focused = true };
+        var second = new KeyProbeComponent();
+        var layout = new LayoutContainerComponent
+        {
+            Mode = LayoutContainerMode.Horizontal,
+        };
+        layout.Add(first);
+        layout.Add(second);
+
+        var changed = layout.Update(new KeyPressMsg(KeyCode.Character, "x"));
+
+        TestAssert.True(changed, "Focused child should handle keyboard input.");
+        TestAssert.Equal(1, first.KeyEvents, "Focused child should receive keyboard input.");
+        TestAssert.Equal(0, second.KeyEvents, "Non-focused child should not receive keyboard input.");
+        return Task.CompletedTask;
+    }
+
     private static Task LayoutContainerComponent_MouseRoutesToTargetChild()
     {
         var first = new MouseProbeComponent();
@@ -500,7 +520,30 @@ internal static class PrebuiltWidgetTests
         return Task.CompletedTask;
     }
 
-    private sealed class MouseProbeComponent : IStatefulComponent, IMouseStatefulComponent
+    private sealed class KeyProbeComponent : IStatefulComponent, IFocusableComponent
+    {
+        public bool Focused { get; set; }
+
+        public int KeyEvents { get; private set; }
+
+        public bool Update(TeaSharp.Core.Abstractions.IMessage message)
+        {
+            if (message is not KeyPressMsg)
+            {
+                return false;
+            }
+
+            KeyEvents++;
+            return true;
+        }
+
+        public void Render(Canvas canvas, Rect rect)
+        {
+            canvas.WriteText(rect.X, rect.Y, KeyEvents.ToString(), rect.Width);
+        }
+    }
+
+    private sealed class MouseProbeComponent : IStatefulComponent, IMouseStatefulComponent, IFocusableComponent
     {
         public bool Focused { get; set; }
 
@@ -518,5 +561,14 @@ internal static class PrebuiltWidgetTests
         {
             canvas.WriteText(rect.X, rect.Y, Focused ? "focused" : "idle", rect.Width);
         }
+    }
+
+    private static bool ContainsStrikethroughSgr(string value)
+    {
+        return value.Contains("\u001b[9m", StringComparison.Ordinal)
+            || value.Contains("\u001b[2;9m", StringComparison.Ordinal)
+            || value.Contains(";9m", StringComparison.Ordinal)
+            || value.Contains(";9;", StringComparison.Ordinal)
+            || value.Contains("[9;", StringComparison.Ordinal);
     }
 }

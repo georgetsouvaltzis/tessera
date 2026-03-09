@@ -29,7 +29,7 @@ public sealed class BadgeComponent : ICanvasComponent
     }
 }
 
-public sealed class ToggleSwitchComponent : IStatefulComponent, IMouseStatefulComponent
+public sealed class ToggleSwitchComponent : IStatefulComponent, IMouseStatefulComponent, IFocusableComponent
 {
     private bool _hovered;
 
@@ -239,7 +239,7 @@ public sealed class ToggleSwitchComponent : IStatefulComponent, IMouseStatefulCo
     }
 }
 
-public sealed class SliderComponent : IStatefulComponent, IMouseStatefulComponent
+public sealed class SliderComponent : IStatefulComponent, IMouseStatefulComponent, IFocusableComponent
 {
     private bool _hovered;
     private bool _dragging;
@@ -507,7 +507,7 @@ public sealed class SliderComponent : IStatefulComponent, IMouseStatefulComponen
     }
 }
 
-public sealed class SpinnerComponent : IStatefulComponent, IMouseStatefulComponent
+public sealed class SpinnerComponent : IStatefulComponent, IMouseStatefulComponent, IFocusableComponent
 {
     private IReadOnlyList<string> _frames = ["|", "/", "-", "\\"];
     private bool _hovered;
@@ -707,7 +707,7 @@ public sealed record CommandPaletteItem(
     string Description = "",
     IReadOnlyCollection<WidgetVisualState>? States = null);
 
-public sealed class CommandPaletteComponent : IStatefulComponent, IMouseStatefulComponent
+public sealed class CommandPaletteComponent : IStatefulComponent, IMouseStatefulComponent, IFocusableComponent
 {
     private readonly List<CommandPaletteItem> _items = [];
     private readonly List<int> _filtered = [];
@@ -1129,7 +1129,7 @@ public sealed class TreeItemNode
     }
 }
 
-public sealed class TreeViewComponent : IStatefulComponent, IMouseStatefulComponent
+public sealed class TreeViewComponent : IStatefulComponent, IMouseStatefulComponent, IFocusableComponent
 {
     private readonly List<TreeItemNode> _roots = [];
     private readonly List<(TreeItemNode Node, int Depth, int? ParentVisibleIndex)> _visible = [];
@@ -1494,7 +1494,7 @@ public sealed record NotificationEntry(
     DateTimeOffset CreatedAt,
     bool IsRead = false);
 
-public sealed class NotificationCenterComponent : IStatefulComponent, IMouseStatefulComponent
+public sealed class NotificationCenterComponent : IStatefulComponent, IMouseStatefulComponent, IFocusableComponent
 {
     private readonly List<NotificationEntry> _entries = [];
     private int _selectedIndex;

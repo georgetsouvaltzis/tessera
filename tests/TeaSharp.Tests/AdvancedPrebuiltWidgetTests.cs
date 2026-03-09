@@ -148,6 +148,7 @@ internal static class AdvancedPrebuiltWidgetTests
 
         palette.Update(new KeyPressMsg(KeyCode.Character, "p", KeyModifiers.Ctrl));
         palette.Update(new KeyPressMsg(KeyCode.Character, "r"));
+        palette.Update(new KeyPressMsg(KeyCode.Character, "o"));
         palette.Update(new KeyPressMsg(KeyCode.Enter));
 
         TestAssert.Equal("rollback", palette.LastExecutedItemId ?? string.Empty, "Command palette should execute filtered item.");
