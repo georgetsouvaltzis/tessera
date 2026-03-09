@@ -1,5 +1,6 @@
 using TeaSharp.Core.Abstractions;
 using TeaSharp.Core.Messages;
+using TeaSharp.Widgets.Internal;
 
 namespace TeaSharp.Widgets;
 
@@ -25,11 +26,7 @@ public sealed class TextInputModel
 
     public void SetValue(string value)
     {
-        Value = value.Length <= MaxLength
-            ? value
-            : value[..MaxLength];
-        Cursor = Math.Clamp(Cursor, 0, Value.Length);
-        SelectionAnchor = null;
+        Apply(TextInputBuffer.SetValue(State, value, MaxLength));
     }
 
     public void Clear()
@@ -45,8 +42,7 @@ public sealed class TextInputModel
 
         if (message is PasteMsg paste)
         {
-            var changed = InsertText(paste.Content);
-            return new TextInputUpdateResult(changed, Submitted: false);
+            return Apply(TextInputBuffer.InsertText(State, paste.Content, MaxLength));
         }
 
         if (message is not KeyPressMsg key)
@@ -60,8 +56,7 @@ public sealed class TextInputModel
                 && !key.Modifiers.HasFlag(KeyModifiers.Ctrl)
                 && !key.Modifiers.HasFlag(KeyModifiers.Meta))
             {
-                var changed = InsertText("\n");
-                return new TextInputUpdateResult(changed, Submitted: false);
+                return Apply(TextInputBuffer.InsertText(State, "\n", MaxLength));
             }
 
             return new TextInputUpdateResult(Changed: false, Submitted: true);
@@ -78,74 +73,70 @@ public sealed class TextInputModel
 
         if (keyMap.WordLeft.Matches(key))
         {
-            MoveCursor(FindWordBoundaryLeft(), extendSelection);
+            Apply(TextInputSelection.MoveCursor(State, TextInputSelection.FindWordBoundaryLeft(Value, Cursor), extendSelection));
             return default;
         }
 
         if (keyMap.WordRight.Matches(key))
         {
-            MoveCursor(FindWordBoundaryRight(), extendSelection);
+            Apply(TextInputSelection.MoveCursor(State, TextInputSelection.FindWordBoundaryRight(Value, Cursor), extendSelection));
             return default;
         }
 
         if (keyMap.Left.Matches(key))
         {
-            MoveCursor(Cursor - 1, extendSelection);
+            Apply(TextInputSelection.MoveCursor(State, Cursor - 1, extendSelection));
             return default;
         }
 
         if (keyMap.Right.Matches(key))
         {
-            MoveCursor(Cursor + 1, extendSelection);
+            Apply(TextInputSelection.MoveCursor(State, Cursor + 1, extendSelection));
             return default;
         }
 
         if (Multiline && key.Code == KeyCode.Up)
         {
-            MoveCursor(MoveVerticalLine(-1), extendSelection);
+            Apply(TextInputSelection.MoveCursor(State, TextInputSelection.MoveVerticalLine(Value, Cursor, -1), extendSelection));
             return default;
         }
 
         if (Multiline && key.Code == KeyCode.Down)
         {
-            MoveCursor(MoveVerticalLine(1), extendSelection);
+            Apply(TextInputSelection.MoveCursor(State, TextInputSelection.MoveVerticalLine(Value, Cursor, 1), extendSelection));
             return default;
         }
 
         if (keyMap.Home.Matches(key))
         {
-            MoveCursor(0, extendSelection);
+            Apply(TextInputSelection.MoveCursor(State, 0, extendSelection));
             return default;
         }
 
         if (keyMap.End.Matches(key))
         {
-            MoveCursor(Value.Length, extendSelection);
+            Apply(TextInputSelection.MoveCursor(State, Value.Length, extendSelection));
             return default;
         }
 
         if (keyMap.DeleteWordBackward.Matches(key))
         {
-            var changed = DeleteWordBackward();
-            return new TextInputUpdateResult(changed, Submitted: false);
+            return Apply(TextInputBuffer.DeleteWordBackward(State));
         }
 
         if (keyMap.DeleteWordForward.Matches(key))
         {
-            var changed = DeleteWordForward();
-            return new TextInputUpdateResult(changed, Submitted: false);
+            return Apply(TextInputBuffer.DeleteWordForward(State));
         }
 
         if (keyMap.DeleteBackward.Matches(key))
         {
-            var changed = DeleteBackward();
-            return new TextInputUpdateResult(changed, Submitted: false);
+            return Apply(TextInputBuffer.DeleteBackward(State));
         }
 
         if (keyMap.DeleteForward.Matches(key))
         {
-            var changed = DeleteForward();
-            return new TextInputUpdateResult(changed, Submitted: false);
+            return Apply(TextInputBuffer.DeleteForward(State));
         }
 
         if (key.Code == KeyCode.Character
@@ -154,8 +145,7 @@ public sealed class TextInputModel
             && !key.Modifiers.HasFlag(KeyModifiers.Alt)
             && !key.Modifiers.HasFlag(KeyModifiers.Meta))
         {
-            var changed = InsertText(key.Text);
-            return new TextInputUpdateResult(changed, Submitted: false);
+            return Apply(TextInputBuffer.InsertText(State, key.Text, MaxLength));
         }
 
         return default;
@@ -163,293 +153,21 @@ public sealed class TextInputModel
 
     public TextInputFrame BuildFrame(int width)
     {
-        if (width <= 0)
-        {
-            return new TextInputFrame(string.Empty, 0, PlaceholderVisible: false);
-        }
-
-        var isPlaceholder = Value.Length == 0;
-        var raw = isPlaceholder
-            ? Placeholder
-            : Value;
-        var visible = MaskInput && !isPlaceholder
-            ? new string(MaskCharacter, raw.Length)
-            : raw;
-        var currentLineRange = (Start: 0, End: visible.Length);
-
-        if (Multiline && !isPlaceholder)
-        {
-            currentLineRange = CurrentLineRange();
-            visible = visible[currentLineRange.Start..currentLineRange.End];
-        }
-
-        var cursor = isPlaceholder
-            ? 0
-            : Math.Clamp(
-                Multiline
-                    ? Cursor - currentLineRange.Start
-                    : Cursor,
-                0,
-                visible.Length);
-
-        var start = 0;
-        if (cursor >= width)
-        {
-            start = cursor - width + 1;
-        }
-        else if (visible.Length > width)
-        {
-            start = Math.Max(0, visible.Length - width);
-        }
-
-        start = Math.Clamp(start, 0, Math.Max(0, visible.Length - 1));
-
-        var text = start >= visible.Length
-            ? string.Empty
-            : visible.Substring(start, Math.Min(width, visible.Length - start));
-        if (text.Length < width)
-        {
-            text = text.PadRight(width);
-        }
-
-        var cursorColumn = Math.Clamp(cursor - start, 0, Math.Max(0, width - 1));
-        return new TextInputFrame(text, cursorColumn, isPlaceholder);
+        return TextInputFrameBuilder.Build(Value, Placeholder, Multiline, MaskInput, MaskCharacter, Cursor, width);
     }
 
-    private void MoveCursor(int target, bool extendSelection)
-    {
-        var clamped = Math.Clamp(target, 0, Value.Length);
-        if (extendSelection)
-        {
-            SelectionAnchor ??= Cursor;
-        }
-        else
-        {
-            SelectionAnchor = null;
-        }
+    private TextInputBufferState State => new(Value, Cursor, SelectionAnchor);
 
-        Cursor = clamped;
+    private void Apply(TextInputBufferState state)
+    {
+        Value = state.Value;
+        Cursor = state.Cursor;
+        SelectionAnchor = state.SelectionAnchor;
     }
 
-    private bool InsertText(string text)
+    private TextInputUpdateResult Apply((TextInputBufferState State, bool Changed) result)
     {
-        if (string.IsNullOrEmpty(text))
-        {
-            return false;
-        }
-
-        DeleteSelectionIfAny();
-
-        var available = Math.Max(0, MaxLength - Value.Length);
-        if (available <= 0)
-        {
-            return false;
-        }
-
-        if (text.Length > available)
-        {
-            text = text[..available];
-        }
-
-        Value = Value.Insert(Cursor, text);
-        Cursor += text.Length;
-        SelectionAnchor = null;
-        return text.Length > 0;
-    }
-
-    private bool DeleteBackward()
-    {
-        if (DeleteSelectionIfAny())
-        {
-            return true;
-        }
-
-        if (Cursor <= 0 || Value.Length == 0)
-        {
-            return false;
-        }
-
-        Value = Value.Remove(Cursor - 1, 1);
-        Cursor--;
-        return true;
-    }
-
-    private bool DeleteForward()
-    {
-        if (DeleteSelectionIfAny())
-        {
-            return true;
-        }
-
-        if (Cursor >= Value.Length || Value.Length == 0)
-        {
-            return false;
-        }
-
-        Value = Value.Remove(Cursor, 1);
-        return true;
-    }
-
-    private bool DeleteWordBackward()
-    {
-        if (DeleteSelectionIfAny())
-        {
-            return true;
-        }
-
-        var start = FindWordBoundaryLeft();
-        if (start == Cursor)
-        {
-            return false;
-        }
-
-        var length = Cursor - start;
-        Value = Value.Remove(start, length);
-        Cursor = start;
-        return true;
-    }
-
-    private bool DeleteWordForward()
-    {
-        if (DeleteSelectionIfAny())
-        {
-            return true;
-        }
-
-        var end = FindWordBoundaryRight();
-        if (end == Cursor)
-        {
-            return false;
-        }
-
-        Value = Value.Remove(Cursor, end - Cursor);
-        return true;
-    }
-
-    private bool DeleteSelectionIfAny()
-    {
-        if (!HasSelection)
-        {
-            return false;
-        }
-
-        var (start, end) = SelectionRange();
-        Value = Value.Remove(start, end - start);
-        Cursor = start;
-        SelectionAnchor = null;
-        return true;
-    }
-
-    private (int Start, int End) SelectionRange()
-    {
-        var anchor = SelectionAnchor ?? Cursor;
-        return (Math.Min(anchor, Cursor), Math.Max(anchor, Cursor));
-    }
-
-    private int FindWordBoundaryLeft()
-    {
-        var i = Math.Clamp(Cursor, 0, Value.Length);
-        while (i > 0 && !IsWordChar(Value[i - 1]))
-        {
-            i--;
-        }
-
-        while (i > 0 && IsWordChar(Value[i - 1]))
-        {
-            i--;
-        }
-
-        return i;
-    }
-
-    private int FindWordBoundaryRight()
-    {
-        var i = Math.Clamp(Cursor, 0, Value.Length);
-        while (i < Value.Length && !IsWordChar(Value[i]))
-        {
-            i++;
-        }
-
-        while (i < Value.Length && IsWordChar(Value[i]))
-        {
-            i++;
-        }
-
-        return i;
-    }
-
-    private int MoveVerticalLine(int direction)
-    {
-        var (lineStart, lineEnd) = CurrentLineRange();
-        var column = Cursor - lineStart;
-
-        if (direction < 0)
-        {
-            if (lineStart == 0)
-            {
-                return Cursor;
-            }
-
-            var previousLineEnd = lineStart - 1;
-            var previousLineStart = Value.LastIndexOf('\n', Math.Max(0, previousLineEnd - 1));
-            if (previousLineStart < 0)
-            {
-                previousLineStart = 0;
-            }
-            else
-            {
-                previousLineStart++;
-            }
-
-            var previousLength = previousLineEnd - previousLineStart;
-            return previousLineStart + Math.Min(column, Math.Max(0, previousLength));
-        }
-
-        if (lineEnd >= Value.Length)
-        {
-            return Cursor;
-        }
-
-        var nextLineStart = lineEnd + 1;
-        var nextLineEnd = Value.IndexOf('\n', nextLineStart);
-        if (nextLineEnd < 0)
-        {
-            nextLineEnd = Value.Length;
-        }
-
-        var nextLength = nextLineEnd - nextLineStart;
-        return nextLineStart + Math.Min(column, Math.Max(0, nextLength));
-    }
-
-    private (int Start, int End) CurrentLineRange()
-    {
-        if (Value.Length == 0)
-        {
-            return (0, 0);
-        }
-
-        var cursor = Math.Clamp(Cursor, 0, Value.Length);
-        var start = Value.LastIndexOf('\n', Math.Max(0, cursor - 1));
-        if (start < 0)
-        {
-            start = 0;
-        }
-        else
-        {
-            start++;
-        }
-
-        var end = Value.IndexOf('\n', cursor);
-        if (end < 0)
-        {
-            end = Value.Length;
-        }
-
-        return (start, end);
-    }
-
-    private static bool IsWordChar(char value)
-    {
-        return char.IsLetterOrDigit(value) || value == '_';
+        Apply(result.State);
+        return new TextInputUpdateResult(result.Changed, Submitted: false);
     }
 }
