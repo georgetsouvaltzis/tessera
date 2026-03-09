@@ -1,5 +1,6 @@
 using TeaSharp.Core.Abstractions;
 using TeaSharp.Core.Messages;
+using TeaSharp.Widgets.Internal;
 
 namespace TeaSharp.Widgets;
 
@@ -10,10 +11,8 @@ public sealed class ListModel<T>
     private readonly Func<T, string> _toText;
     private readonly List<T> _allItems = [];
     private readonly List<int> _filteredIndexes = [];
-    private readonly object _loadGate = new();
+    private readonly ListModelLoadCoordinator _loadCoordinator = new();
     private int _offset;
-    private int _loadVersion;
-    private CancellationTokenSource? _activeLoadCts;
 
     public ListModel(IEnumerable<T> items, Func<T, string> toText)
     {
@@ -49,25 +48,25 @@ public sealed class ListModel<T>
     public async ValueTask SetItemsAsync(IAsyncEnumerable<T> items, CancellationToken cancellationToken = default)
     {
         _allItems.Clear();
-        await AppendItemsCoreAsync(items, cancellationToken).ConfigureAwait(false);
+        await ListModelAsyncLoader.AppendItemsAsync(_allItems, items, cancellationToken).ConfigureAwait(false);
         ApplyFilter();
     }
 
     public async ValueTask<int> AppendItemsAsync(IAsyncEnumerable<T> items, CancellationToken cancellationToken = default)
     {
         var before = _allItems.Count;
-        await AppendItemsCoreAsync(items, cancellationToken).ConfigureAwait(false);
+        await ListModelAsyncLoader.AppendItemsAsync(_allItems, items, cancellationToken).ConfigureAwait(false);
         ApplyFilter();
         return _allItems.Count - before;
     }
 
     public async ValueTask<int> ReloadAsync(Func<CancellationToken, IAsyncEnumerable<T>> loader, CancellationToken cancellationToken = default)
     {
-        var (version, linkedToken, disposer) = BeginTrackedLoad(cancellationToken);
+        var (version, linkedToken, disposer) = _loadCoordinator.Begin(cancellationToken);
         try
         {
-            var loaded = await MaterializeAsync(loader(linkedToken), linkedToken).ConfigureAwait(false);
-            if (!IsCurrentLoad(version))
+            var loaded = await ListModelAsyncLoader.MaterializeAsync(loader(linkedToken), linkedToken).ConfigureAwait(false);
+            if (!_loadCoordinator.IsCurrent(version))
             {
                 return 0;
             }
@@ -75,7 +74,7 @@ public sealed class ListModel<T>
             SetItems(loaded);
             return _allItems.Count;
         }
-        catch (OperationCanceledException) when (!cancellationToken.IsCancellationRequested && !IsCurrentLoad(version))
+        catch (OperationCanceledException) when (!cancellationToken.IsCancellationRequested && !_loadCoordinator.IsCurrent(version))
         {
             return 0;
         }
@@ -87,11 +86,11 @@ public sealed class ListModel<T>
 
     public async ValueTask<int> AppendAsync(Func<CancellationToken, IAsyncEnumerable<T>> loader, CancellationToken cancellationToken = default)
     {
-        var (version, linkedToken, disposer) = BeginTrackedLoad(cancellationToken);
+        var (version, linkedToken, disposer) = _loadCoordinator.Begin(cancellationToken);
         try
         {
-            var loaded = await MaterializeAsync(loader(linkedToken), linkedToken).ConfigureAwait(false);
-            if (!IsCurrentLoad(version))
+            var loaded = await ListModelAsyncLoader.MaterializeAsync(loader(linkedToken), linkedToken).ConfigureAwait(false);
+            if (!_loadCoordinator.IsCurrent(version))
             {
                 return 0;
             }
@@ -100,7 +99,7 @@ public sealed class ListModel<T>
             ApplyFilter();
             return loaded.Count;
         }
-        catch (OperationCanceledException) when (!cancellationToken.IsCancellationRequested && !IsCurrentLoad(version))
+        catch (OperationCanceledException) when (!cancellationToken.IsCancellationRequested && !_loadCoordinator.IsCurrent(version))
         {
             return 0;
         }
@@ -204,62 +203,4 @@ public sealed class ListModel<T>
         ListModelWindowing.EnsureSelectionVisible(SelectedIndex, _filteredIndexes.Count, PageSize, ref _offset);
     }
 
-    private async ValueTask AppendItemsCoreAsync(IAsyncEnumerable<T> items, CancellationToken cancellationToken)
-    {
-        await foreach (var item in items.ConfigureAwait(false))
-        {
-            cancellationToken.ThrowIfCancellationRequested();
-            _allItems.Add(item);
-        }
-    }
-
-    private static async ValueTask<List<T>> MaterializeAsync(IAsyncEnumerable<T> items, CancellationToken cancellationToken)
-    {
-        var result = new List<T>();
-        await foreach (var item in items.ConfigureAwait(false))
-        {
-            cancellationToken.ThrowIfCancellationRequested();
-            result.Add(item);
-        }
-
-        return result;
-    }
-
-    private (int Version, CancellationToken Token, Action Dispose) BeginTrackedLoad(CancellationToken cancellationToken)
-    {
-        CancellationTokenSource linkedCts;
-        int version;
-        lock (_loadGate)
-        {
-            _activeLoadCts?.Cancel();
-            _activeLoadCts?.Dispose();
-            _activeLoadCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
-            linkedCts = _activeLoadCts;
-            version = ++_loadVersion;
-        }
-
-        return (version, linkedCts.Token, () =>
-        {
-            lock (_loadGate)
-            {
-                if (ReferenceEquals(_activeLoadCts, linkedCts))
-                {
-                    _activeLoadCts.Dispose();
-                    _activeLoadCts = null;
-                }
-                else
-                {
-                    linkedCts.Dispose();
-                }
-            }
-        });
-    }
-
-    private bool IsCurrentLoad(int version)
-    {
-        lock (_loadGate)
-        {
-            return version == _loadVersion;
-        }
-    }
 }

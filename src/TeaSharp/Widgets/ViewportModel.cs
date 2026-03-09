@@ -1,5 +1,6 @@
 using TeaSharp.Core.Abstractions;
 using TeaSharp.Core.Messages;
+using TeaSharp.Widgets.Internal;
 
 namespace TeaSharp.Widgets;
 
@@ -135,30 +136,7 @@ public sealed class ViewportModel
 
     public IReadOnlyList<string> RenderLines()
     {
-        var visualLines = GetVisualLines();
-        if (visualLines.Count == 0)
-        {
-            return [string.Empty];
-        }
-
-        var start = Math.Clamp(YOffset, 0, Math.Max(0, visualLines.Count - 1));
-        var max = Math.Min(Height, visualLines.Count - start);
-        if (max <= 0)
-        {
-            return [string.Empty];
-        }
-
-        var rendered = new List<string>(max);
-        var lineNumberWidth = ViewportLineFormatter.ComputeLineNumberWidth(ShowLineNumbers, visualLines.Count);
-        for (var i = 0; i < max; i++)
-        {
-            var visualIndex = start + i;
-            var line = visualLines[visualIndex];
-            var clipped = ViewportLineFormatter.ClipLine(line, Wrap, Width, XOffset, ShowLineNumbers, lineNumberWidth);
-            rendered.Add(ViewportLineFormatter.DecorateLine(clipped, ShowLineNumbers, HighlightVisualLine, visualIndex, lineNumberWidth, Width));
-        }
-
-        return rendered;
+        return ViewportRenderer.RenderLines(GetVisualLines(), Width, Height, XOffset, YOffset, Wrap, ShowLineNumbers, HighlightVisualLine);
     }
 
     private IReadOnlyList<string> GetVisualLines()
@@ -175,18 +153,7 @@ public sealed class ViewportModel
     private void ClampOffsets()
     {
         var lines = GetVisualLines();
-        var maxY = Math.Max(0, lines.Count - Height);
-        YOffset = Math.Clamp(YOffset, 0, maxY);
-
-        if (Wrap)
-        {
-            XOffset = 0;
-            return;
-        }
-
-        var lineNumberWidth = ViewportLineFormatter.ComputeLineNumberWidth(ShowLineNumbers, lines.Count);
-        var visibleWidth = ShowLineNumbers ? Math.Max(0, Width - (lineNumberWidth + 2)) : Width;
-        var maxX = Math.Max(0, _maxVisualWidth - visibleWidth);
-        XOffset = Math.Clamp(XOffset, 0, maxX);
+        YOffset = ViewportOffsets.ClampY(YOffset, lines.Count, Height);
+        XOffset = ViewportOffsets.ClampX(Wrap, ShowLineNumbers, XOffset, Width, lines.Count, _maxVisualWidth);
     }
 }
