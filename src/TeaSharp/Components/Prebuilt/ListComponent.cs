@@ -13,6 +13,17 @@ public sealed class ListComponent<T> : IStatefulComponent, IMouseStatefulCompone
         Model = new ListModel<T>(items, toText);
     }
 
+    public ListComponent(ListOptions<T> options)
+        : this(options.Items, options.ToText)
+    {
+        Title = options.Title;
+        Focused = options.Focused;
+        Disabled = options.Disabled;
+        ReadOnly = options.ReadOnly;
+        ShowBorder = options.ShowBorder;
+        KeyMap = options.KeyMap ?? ListKeyMap.Default;
+    }
+
     public ListModel<T> Model { get; }
 
     public string Title { get; set; } = "List";
@@ -239,4 +250,3 @@ public sealed class ListComponent<T> : IStatefulComponent, IMouseStatefulCompone
         return true;
     }
 }
-

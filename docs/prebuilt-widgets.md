@@ -61,6 +61,19 @@ TeaSharp provides a prebuilt widget layer in `TeaSharp.Components.PrebuiltWidget
   - Mouse support (`DatePickerComponent`, `TimePickerComponent`): day/field selection on click and wheel adjustment/navigation.
 - `MarkdownViewerComponent` provides scrollable markdown rendering for docs/help panes.
 - Most prebuilt widgets expose `ShowBorder` (`true` by default) for minimal/borderless layouts.
+- Common widgets also expose options-based constructors for one-shot setup:
+  - `LabelOptions`
+  - `ButtonOptions`
+  - `TextInputOptions`
+  - `TextAreaOptions`
+  - `ListOptions<T>`
+  - `TableOptions`
+  - `ProgressBarOptions`
+  - `StatusBarOptions`
+  - `DialogOptions`
+  - `LayoutContainerOptions`
+  - `TabsOptions`
+- `FocusGroup<TFocus>` centralizes focus assignment for app-level focus rings instead of toggling each component's `Focused` property manually.
 - `ListComponent<T>`, `DropdownComponent`, and `ComboboxComponent` support state-driven styling through:
   - `WidgetVisualState`
   - `WidgetStatePalette`
@@ -90,6 +103,25 @@ list.ItemStatePalette[WidgetVisualState.Completed] = new WidgetStateAppearance
 // Share app-level defaults through inheritance.
 var appPalette = WidgetStatePalette.CreateDefault();
 list.ItemStatePalette.InheritFrom(appPalette);
+```
+
+### Options + Focus Example
+
+```csharp
+var input = new TextInputComponent(new TextInputOptions(
+    Title: "Command",
+    Placeholder: "type and press enter",
+    ClearOnSubmit: true));
+
+var progress = new ProgressBarComponent(new ProgressBarOptions(
+    Title: "Deploy",
+    Step: 0.1));
+
+var focus = new FocusGroup<int>()
+    .Register(0, input)
+    .Register(1, progress);
+
+focus.Apply(0);
 ```
 
 ## Gallery Example

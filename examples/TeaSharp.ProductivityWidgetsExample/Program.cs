@@ -72,10 +72,9 @@ internal sealed class ProductivityModel : IModel
         ShowLineNumbers = true,
     };
 
-    private readonly StatusBarComponent _status = new()
-    {
-        Theme = new UiTheme(StatusFill: '·'),
-    };
+    private readonly StatusBarComponent _status = new(new StatusBarOptions(
+        Theme: new UiTheme(StatusFill: '·')));
+    private readonly FocusGroup<ProductivityFocus> _focusGroup = new();
 
     private ProductivityFocus _focus = ProductivityFocus.Menu;
     private int _width = 120;
@@ -111,6 +110,13 @@ internal sealed class ProductivityModel : IModel
                 "```bash",
                 "dotnet run --project examples/TeaSharp.ProductivityWidgetsExample/TeaSharp.ProductivityWidgetsExample.csproj",
                 "```"));
+
+        _focusGroup
+            .Register(ProductivityFocus.Menu, _menu)
+            .Register(ProductivityFocus.Number, _number)
+            .Register(ProductivityFocus.Date, _date)
+            .Register(ProductivityFocus.Time, _time)
+            .Register(ProductivityFocus.Markdown, _markdown);
     }
 
     public Command? Init() => null;
@@ -313,11 +319,7 @@ internal sealed class ProductivityModel : IModel
 
     private void ApplyFocusFlags()
     {
-        _menu.Focused = _focus == ProductivityFocus.Menu;
-        _number.Focused = _focus == ProductivityFocus.Number;
-        _date.Focused = _focus == ProductivityFocus.Date;
-        _time.Focused = _focus == ProductivityFocus.Time;
-        _markdown.Focused = _focus == ProductivityFocus.Markdown;
+        _focusGroup.Apply(_focus);
         if (!_context.Visible)
         {
             _context.Focused = false;

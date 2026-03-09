@@ -8,6 +8,25 @@ public sealed class LayoutContainerComponent : IStatefulComponent, IMouseStatefu
     private readonly List<(ICanvasComponent Component, int Weight)> _children = [];
     private bool _draggingSplit;
 
+    public LayoutContainerComponent()
+    {
+    }
+
+    public LayoutContainerComponent(LayoutContainerOptions options)
+    {
+        Mode = options.Mode;
+        GridRows = options.GridRows;
+        GridColumns = options.GridColumns;
+        EnableMouseInteractions = options.EnableMouseInteractions;
+        ClickToFocusChildren = options.ClickToFocusChildren;
+        EnableMouseResize = options.EnableMouseResize;
+        SplitterHitThickness = options.SplitterHitThickness;
+        MinPrimarySize = options.MinPrimarySize;
+        MinSecondarySize = options.MinSecondarySize;
+        KeyboardRoutingMode = options.KeyboardRoutingMode;
+        PrimarySize = options.PrimarySize;
+    }
+
     public LayoutContainerMode Mode { get; set; } = LayoutContainerMode.Vertical;
 
     public int GridRows { get; set; } = 1;

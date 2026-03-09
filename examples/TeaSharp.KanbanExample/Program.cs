@@ -96,7 +96,7 @@ internal sealed class KanbanModel : IModel
     private const int MinimumBoardWidth = 54;
     private const int MinimumSidebarWidth = 28;
 
-    private readonly TabsComponent _boardTabs = new(["Platform", "Mobile", "Docs"]);
+    private readonly TabsComponent _boardTabs = new(new TabsOptions(["Platform", "Mobile", "Docs"]));
 
     private readonly List<KanbanBoardState> _boards =
     [
@@ -141,33 +141,22 @@ internal sealed class KanbanModel : IModel
             ]),
     ];
 
-    private readonly ListComponent<KanbanCard> _todo = new([], CardLabel)
-    {
-        Title = "Todo",
-    };
+    private readonly ListComponent<KanbanCard> _todo = new(new ListOptions<KanbanCard>([], CardLabel, Title: "Todo"));
 
-    private readonly ListComponent<KanbanCard> _doing = new([], CardLabel)
-    {
-        Title = "In Progress",
-    };
+    private readonly ListComponent<KanbanCard> _doing = new(new ListOptions<KanbanCard>([], CardLabel, Title: "In Progress"));
 
-    private readonly ListComponent<KanbanCard> _done = new([], CardLabel)
-    {
-        Title = "Done",
-    };
+    private readonly ListComponent<KanbanCard> _done = new(new ListOptions<KanbanCard>([], CardLabel, Title: "Done"));
 
-    private readonly TextInputComponent _composer = new()
-    {
-        Title = "New Card",
-        ClearOnSubmit = true,
-        ClearOnCancel = true,
-    };
+    private readonly TextInputComponent _composer = new(new TextInputOptions(
+        Title: "New Card",
+        Placeholder: "Enter title and press Enter (prefix ! high, ~ low)",
+        ClearOnSubmit: true,
+        ClearOnCancel: true,
+        MaxLength: 120));
 
-    private readonly LabelComponent _details = new()
-    {
-        Title = "Selected Card",
-        DrawBorder = true,
-    };
+    private readonly LabelComponent _details = new(new LabelOptions(
+        Title: "Selected Card",
+        ShowBorder: true));
 
     private readonly NotificationCenterComponent _activity = new()
     {
@@ -175,20 +164,13 @@ internal sealed class KanbanModel : IModel
         MaxEntries = 64,
     };
 
-    private readonly ProgressBarComponent _completion = new()
-    {
-        Title = "Completion",
-    };
+    private readonly ProgressBarComponent _completion = new(new ProgressBarOptions(Title: "Completion"));
 
-    private readonly DialogComponent _deleteDialog = new()
-    {
-        Title = "Delete Card",
-    };
+    private readonly DialogComponent _deleteDialog = new(new DialogOptions(Title: "Delete Card"));
 
-    private readonly StatusBarComponent _status = new()
-    {
-        Theme = new UiTheme(StatusFill: '·'),
-    };
+    private readonly StatusBarComponent _status = new(new StatusBarOptions(
+        Theme: new UiTheme(StatusFill: '·')));
+    private readonly FocusGroup<KanbanFocus> _focusGroup = new();
 
     private KanbanFocus _focus = KanbanFocus.Todo;
     private KanbanFocus _focusBeforeComposer = KanbanFocus.Todo;
@@ -201,12 +183,16 @@ internal sealed class KanbanModel : IModel
 
     public KanbanModel()
     {
-        _composer.Input.Placeholder = "Enter title and press Enter (prefix ! high, ~ low)";
-        _composer.Input.MaxLength = 120;
-
         ApplyListPalettes();
         RefreshColumns();
         PushInfo("Kanban ready. Tab focus, h/l move cards, n add, x delete.");
+
+        _focusGroup
+            .Register(KanbanFocus.Todo, _todo)
+            .Register(KanbanFocus.Doing, _doing)
+            .Register(KanbanFocus.Done, _done)
+            .Register(KanbanFocus.Composer, _composer)
+            .Register(KanbanFocus.Activity, _activity);
     }
 
     public Command? Init() => null;
@@ -802,11 +788,7 @@ internal sealed class KanbanModel : IModel
 
     private void ApplyFocusFlags()
     {
-        _todo.Focused = _focus == KanbanFocus.Todo;
-        _doing.Focused = _focus == KanbanFocus.Doing;
-        _done.Focused = _focus == KanbanFocus.Done;
-        _composer.Focused = _focus == KanbanFocus.Composer;
-        _activity.Focused = _focus == KanbanFocus.Activity;
+        _focusGroup.Apply(_focus);
         _completion.Focused = false;
         _deleteDialog.Focused = _deleteDialog.Visible;
     }

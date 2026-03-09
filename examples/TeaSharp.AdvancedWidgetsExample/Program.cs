@@ -77,10 +77,9 @@ internal sealed class AdvancedWidgetsModel : IModel
         Focused = true,
     };
 
-    private readonly StatusBarComponent _status = new()
-    {
-        Theme = new UiTheme(StatusFill: '·'),
-    };
+    private readonly StatusBarComponent _status = new(new StatusBarOptions(
+        Theme: new UiTheme(StatusFill: '·')));
+    private readonly FocusGroup<AdvancedFocus> _focusGroup = new();
 
     private AdvancedFocus _focus = AdvancedFocus.Toggle;
     private int _width = 120;
@@ -125,6 +124,13 @@ internal sealed class AdvancedWidgetsModel : IModel
             new CommandPaletteItem("tree.expand", "Expand selected tree node", "Acts like Right"),
             new CommandPaletteItem("notifications.clear", "Clear notifications", "Drops all events", [WidgetVisualState.Warning]),
         ]);
+
+        _focusGroup
+            .Register(AdvancedFocus.Toggle, _toggle)
+            .Register(AdvancedFocus.Slider, _slider)
+            .Register(AdvancedFocus.Spinner, _spinner)
+            .Register(AdvancedFocus.Tree, _tree)
+            .Register(AdvancedFocus.Notifications, _notifications);
     }
 
     public Command? Init() => NextTick();
@@ -365,11 +371,7 @@ internal sealed class AdvancedWidgetsModel : IModel
 
     private void ApplyFocusFlags()
     {
-        _toggle.Focused = _focus == AdvancedFocus.Toggle;
-        _slider.Focused = _focus == AdvancedFocus.Slider;
-        _spinner.Focused = _focus == AdvancedFocus.Spinner;
-        _tree.Focused = _focus == AdvancedFocus.Tree;
-        _notifications.Focused = _focus == AdvancedFocus.Notifications;
+        _focusGroup.Apply(_focus);
     }
 
     private void CycleFocus()

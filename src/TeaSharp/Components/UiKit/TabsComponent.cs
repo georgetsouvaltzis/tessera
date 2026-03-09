@@ -14,6 +14,16 @@ public sealed class TabsComponent : IStatefulComponent, IMouseStatefulComponent,
         _tabs.AddRange(tabs);
     }
 
+    public TabsComponent(TabsOptions options)
+        : this(options.Tabs)
+    {
+        Focused = options.Focused;
+        EnableNumericShortcuts = options.EnableNumericShortcuts;
+        NextTabKey = options.NextTabKey ?? new KeyBinding("right", "next tab", "right");
+        PreviousTabKey = options.PreviousTabKey ?? new KeyBinding("left", "previous tab", "left");
+        InteractionProfile = options.InteractionProfile?.Clone() ?? WidgetInteractionProfile.Default.Clone();
+    }
+
     public int SelectedIndex { get; private set; }
 
     public IReadOnlyList<string> Tabs => _tabs;
@@ -204,4 +214,3 @@ public sealed class TabsComponent : IStatefulComponent, IMouseStatefulComponent,
         return true;
     }
 }
-

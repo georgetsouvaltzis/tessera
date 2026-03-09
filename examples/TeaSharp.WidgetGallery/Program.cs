@@ -43,74 +43,58 @@ internal enum GalleryFocus
 
 internal sealed class WidgetGalleryModel : IModel
 {
-    private readonly TabsComponent _tabs = new(["Basics", "Inputs", "Data", "Overlay", "Layout"]);
-    private readonly LabelComponent _label = new()
-    {
-        Title = "Label",
-        Text = "TeaSharp Widget Gallery\n\nRead-only text.\nTitles, captions, help, and status lines."
-    };
-    private readonly ButtonComponent _button = new()
-    {
-        Label = "Deploy",
-        Description = "enter/space to trigger"
-    };
-    private readonly TextInputComponent _textInput = new()
-    {
-        Title = "Text Input",
-        ClearOnSubmit = true,
-    };
-    private readonly TextAreaComponent _textArea = new()
-    {
-        Title = "Text Area",
-        ShowLineNumbers = true,
-        Wrap = true,
-    };
-    private readonly ListComponent<string> _list = new(
-    [
-        "alpha", "beta", "gamma", "delta", "epsilon", "zeta", "eta", "theta", "iota", "kappa", "lambda", "mu"
-    ],
-    item => item)
-    {
-        Title = "List"
-    };
-    private readonly TableComponent _table = new(["Service", "Status", "P95"])
-    {
-        Title = "Table"
-    };
-    private readonly ProgressBarComponent _progress = new()
-    {
-        Title = "Progress Bar",
-        Step = 0.08,
-    };
-    private readonly StatusBarComponent _status = new()
-    {
-        Theme = new UiTheme(StatusFill: '·')
-    };
+    private readonly TabsComponent _tabs = new(new TabsOptions(["Basics", "Inputs", "Data", "Overlay", "Layout"]));
+    private readonly LabelComponent _label = new(new LabelOptions(
+        Title: "Label",
+        Text: "TeaSharp Widget Gallery\n\nRead-only text.\nTitles, captions, help, and status lines."));
+    private readonly ButtonComponent _button = new(new ButtonOptions(
+        Label: "Deploy",
+        Description: "enter/space to trigger"));
+    private readonly TextInputComponent _textInput = new(new TextInputOptions(
+        Title: "Text Input",
+        Placeholder: "type and press enter",
+        ClearOnSubmit: true));
+    private readonly TextAreaComponent _textArea = new(new TextAreaOptions(
+        Title: "Text Area",
+        ShowLineNumbers: true,
+        Wrap: true));
+    private readonly ListComponent<string> _list = new(new ListOptions<string>(
+        [
+            "alpha", "beta", "gamma", "delta", "epsilon", "zeta", "eta", "theta", "iota", "kappa", "lambda", "mu"
+        ],
+        item => item,
+        Title: "List"));
+    private readonly TableComponent _table = new(new TableOptions(
+        ["Service", "Status", "P95"],
+        Title: "Table",
+        PageSize: 4));
+    private readonly ProgressBarComponent _progress = new(new ProgressBarOptions(
+        Title: "Progress Bar",
+        Step: 0.08));
+    private readonly StatusBarComponent _status = new(new StatusBarOptions(
+        Theme: new UiTheme(StatusFill: '·')));
     private readonly LogViewerComponent _logs = new()
     {
         Title = "Log Viewer",
     };
-    private readonly DialogComponent _dialog = new()
-    {
-        Title = "Confirm",
-        Lines =
+    private readonly DialogComponent _dialog = new(new DialogOptions(
+        Title: "Confirm",
+        Lines:
         [
             "Publish widget package?",
             "Enter/Space = accept",
             "Esc = cancel"
-        ],
-    };
-    private readonly LayoutContainerComponent _layoutDemo = new()
-    {
-        Mode = LayoutContainerMode.Grid,
-        GridRows = 2,
-        GridColumns = 2,
-    };
+        ]));
+    private readonly LayoutContainerComponent _layoutDemo = new(new LayoutContainerOptions(
+        Mode: LayoutContainerMode.Grid,
+        GridRows: 2,
+        GridColumns: 2));
 
-    private readonly LabelComponent _layoutCellA = new() { DrawBorder = true, Title = "Stack A", Text = "Vertical\nHorizontal\nGrid" };
-    private readonly LabelComponent _layoutCellB = new() { DrawBorder = true, Title = "Stack B", Text = "Nested\nregions" };
-    private readonly LabelComponent _layoutCellC = new() { DrawBorder = true, Title = "Stack C", Text = "Responsive\nby rect math" };
-    private readonly LabelComponent _layoutCellD = new() { DrawBorder = true, Title = "Stack D", Text = "Children\ncomposed" };
+    private readonly LabelComponent _layoutCellA = new(new LabelOptions(Title: "Stack A", Text: "Vertical\nHorizontal\nGrid"));
+    private readonly LabelComponent _layoutCellB = new(new LabelOptions(Title: "Stack B", Text: "Nested\nregions"));
+    private readonly LabelComponent _layoutCellC = new(new LabelOptions(Title: "Stack C", Text: "Responsive\nby rect math"));
+    private readonly LabelComponent _layoutCellD = new(new LabelOptions(Title: "Stack D", Text: "Children\ncomposed"));
+    private readonly FocusGroup<GalleryFocus> _focusGroup = new();
 
     private GalleryFocus _focus = GalleryFocus.Tabs;
     private int _width = 120;
@@ -120,10 +104,6 @@ internal sealed class WidgetGalleryModel : IModel
 
     public WidgetGalleryModel()
     {
-        _textInput.Input.Placeholder = "type and press enter";
-        _textArea.Input.SetValue(string.Empty);
-        _table.Inner.PageSize = 4;
-
         _table.SetRows(
         [
             ["api", "ok", "21ms"],
@@ -145,6 +125,16 @@ internal sealed class WidgetGalleryModel : IModel
         _logs.Append("tab to cycle focus");
         _logs.Append("1-5 switch tabs");
         _logs.Append("q quits");
+
+        _focusGroup
+            .Register(GalleryFocus.Button, _button)
+            .Register(GalleryFocus.Progress, _progress)
+            .Register(GalleryFocus.TextInput, _textInput)
+            .Register(GalleryFocus.TextArea, _textArea)
+            .Register(GalleryFocus.List, _list)
+            .Register(GalleryFocus.Table, _table)
+            .Register(GalleryFocus.LogViewer, _logs)
+            .Register(GalleryFocus.Dialog, _dialog);
     }
 
     public Command? Init() => NextTick();
@@ -517,14 +507,7 @@ internal sealed class WidgetGalleryModel : IModel
 
     private void ApplyFocusFlags()
     {
-        _button.Focused = _focus == GalleryFocus.Button;
-        _progress.Focused = _focus == GalleryFocus.Progress;
-        _textInput.Focused = _focus == GalleryFocus.TextInput;
-        _textArea.Focused = _focus == GalleryFocus.TextArea;
-        _list.Focused = _focus == GalleryFocus.List;
-        _table.Focused = _focus == GalleryFocus.Table;
-        _logs.Focused = _focus == GalleryFocus.LogViewer;
-        _dialog.Focused = _focus == GalleryFocus.Dialog;
+        _focusGroup.Apply(_focus);
     }
 
     private void CycleFocus()

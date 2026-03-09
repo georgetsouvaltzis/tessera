@@ -6,6 +6,17 @@ namespace TeaSharp.Components;
 
 public sealed class StatusBarComponent : ICanvasComponent
 {
+    public StatusBarComponent()
+    {
+    }
+
+    public StatusBarComponent(StatusBarOptions options)
+    {
+        LeftText = options.LeftText;
+        RightText = options.RightText;
+        Theme = options.Theme ?? new UiTheme();
+    }
+
     public string LeftText { get; set; } = string.Empty;
 
     public string RightText { get; set; } = string.Empty;
@@ -17,4 +28,3 @@ public sealed class StatusBarComponent : ICanvasComponent
         UiWidgets.DrawStatusBar(canvas, rect, LeftText, RightText, Theme);
     }
 }
-

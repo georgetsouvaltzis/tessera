@@ -13,6 +13,22 @@ public sealed class TextAreaComponent : IStatefulComponent, IFocusableComponent
         Input.Multiline = true;
     }
 
+    public TextAreaComponent(TextAreaOptions options)
+        : this()
+    {
+        Title = options.Title;
+        Focused = options.Focused;
+        ShowBorder = options.ShowBorder;
+        ShowLineNumbers = options.ShowLineNumbers;
+        Wrap = options.Wrap;
+        InputKeyMap = options.InputKeyMap ?? TextInputKeyMap.Default;
+        ViewportKeyMap = options.ViewportKeyMap ?? ViewportKeyMap.Default;
+        if (!string.IsNullOrEmpty(options.InitialValue))
+        {
+            SetValue(options.InitialValue);
+        }
+    }
+
     public TextInputModel Input { get; } = new() { Multiline = true };
 
     public TextInputKeyMap InputKeyMap { get; set; } = TextInputKeyMap.Default;
@@ -35,6 +51,20 @@ public sealed class TextAreaComponent : IStatefulComponent, IFocusableComponent
     {
         get => _viewport.Wrap;
         set => _viewport.SetWrap(value);
+    }
+
+    public string Value => Input.Value;
+
+    public void SetValue(string value)
+    {
+        Input.SetValue(value);
+        SyncViewport();
+    }
+
+    public void Clear()
+    {
+        Input.Clear();
+        SyncViewport();
     }
 
     public bool Update(IMessage message)
@@ -117,4 +147,3 @@ public sealed class TextAreaComponent : IStatefulComponent, IFocusableComponent
         return lines;
     }
 }
-

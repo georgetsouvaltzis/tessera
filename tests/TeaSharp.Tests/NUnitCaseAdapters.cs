@@ -26,6 +26,7 @@ public sealed class NUnitCaseAdapters
         foreach (var testCase in AdvancedPrebuiltWidgetTests.Cases()) yield return ToCaseData(testCase);
         foreach (var testCase in KeyBindingTests.Cases()) yield return ToCaseData(testCase);
         foreach (var testCase in ProductivityPrebuiltWidgetTests.Cases()) yield return ToCaseData(testCase);
+        foreach (var testCase in ApiErgonomicsTests.Cases()) yield return ToCaseData(testCase);
     }
 
     [TestCaseSource(nameof(Cases))]

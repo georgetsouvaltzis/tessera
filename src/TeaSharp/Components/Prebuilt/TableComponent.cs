@@ -11,6 +11,18 @@ public sealed class TableComponent : IStatefulComponent, IMouseStatefulComponent
         Inner = new SortableTableComponent(headers);
     }
 
+    public TableComponent(TableOptions options)
+        : this(options.Headers)
+    {
+        Title = options.Title;
+        Focused = options.Focused;
+        ShowBorder = options.ShowBorder;
+        if (options.PageSize.HasValue)
+        {
+            PageSize = options.PageSize.Value;
+        }
+    }
+
     public SortableTableComponent Inner { get; }
 
     public bool Focused { get; set; }
@@ -25,6 +37,12 @@ public sealed class TableComponent : IStatefulComponent, IMouseStatefulComponent
     {
         get => Inner.Title;
         set => Inner.Title = value;
+    }
+
+    public int PageSize
+    {
+        get => Inner.PageSize;
+        set => Inner.PageSize = value;
     }
 
     public void SetRows(IEnumerable<IReadOnlyList<string>> rows)
@@ -50,4 +68,3 @@ public sealed class TableComponent : IStatefulComponent, IMouseStatefulComponent
         Inner.Title = original;
     }
 }
-

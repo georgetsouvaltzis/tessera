@@ -8,6 +8,18 @@ public sealed class ButtonComponent : IStatefulComponent, IFocusableComponent
 {
     private static readonly KeyBinding ActivateKey = new("enter/space", "activate", "enter", "space");
 
+    public ButtonComponent()
+    {
+    }
+
+    public ButtonComponent(ButtonOptions options)
+    {
+        Label = options.Label;
+        Description = options.Description;
+        Focused = options.Focused;
+        Enabled = options.Enabled;
+    }
+
     public string Label { get; set; } = "Button";
 
     public string? Description { get; set; }
@@ -56,4 +68,3 @@ public sealed class ButtonComponent : IStatefulComponent, IFocusableComponent
         }
     }
 }
-

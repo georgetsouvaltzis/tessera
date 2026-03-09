@@ -8,6 +8,29 @@ public sealed class TextInputComponent : IStatefulComponent, IFocusableComponent
 {
     public TextInputModel Input { get; } = new();
 
+    public TextInputComponent()
+    {
+    }
+
+    public TextInputComponent(TextInputOptions options)
+    {
+        Title = options.Title;
+        Focused = options.Focused;
+        ShowBorder = options.ShowBorder;
+        ClearOnSubmit = options.ClearOnSubmit;
+        ClearOnCancel = options.ClearOnCancel;
+        KeyMap = options.KeyMap ?? TextInputKeyMap.Default;
+        CancelKey = options.CancelKey ?? new KeyBinding("esc", "cancel", "escape");
+        Placeholder = options.Placeholder;
+        MaxLength = options.MaxLength;
+        MaskInput = options.MaskInput;
+        MaskCharacter = options.MaskCharacter;
+        if (!string.IsNullOrEmpty(options.InitialValue))
+        {
+            SetValue(options.InitialValue);
+        }
+    }
+
     public TextInputKeyMap KeyMap { get; set; } = TextInputKeyMap.Default;
 
     public KeyBinding CancelKey { get; set; } = new("esc", "cancel", "escape");
@@ -31,6 +54,42 @@ public sealed class TextInputComponent : IStatefulComponent, IFocusableComponent
     public int CancelCount { get; private set; }
 
     public bool WasCancelled { get; private set; }
+
+    public string Value => Input.Value;
+
+    public string Placeholder
+    {
+        get => Input.Placeholder;
+        set => Input.Placeholder = value;
+    }
+
+    public int MaxLength
+    {
+        get => Input.MaxLength;
+        set => Input.MaxLength = value;
+    }
+
+    public bool MaskInput
+    {
+        get => Input.MaskInput;
+        set => Input.MaskInput = value;
+    }
+
+    public char MaskCharacter
+    {
+        get => Input.MaskCharacter;
+        set => Input.MaskCharacter = value;
+    }
+
+    public void SetValue(string value)
+    {
+        Input.SetValue(value);
+    }
+
+    public void Clear()
+    {
+        Input.Clear();
+    }
 
     public bool Update(IMessage message)
     {
@@ -99,4 +158,3 @@ public sealed class TextInputComponent : IStatefulComponent, IFocusableComponent
         }
     }
 }
-

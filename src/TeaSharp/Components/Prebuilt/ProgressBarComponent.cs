@@ -6,6 +6,21 @@ namespace TeaSharp.Components;
 
 public sealed class ProgressBarComponent : IStatefulComponent, IFocusableComponent
 {
+    public ProgressBarComponent()
+    {
+    }
+
+    public ProgressBarComponent(ProgressBarOptions options)
+    {
+        Title = options.Title;
+        Focused = options.Focused;
+        ShowBorder = options.ShowBorder;
+        Step = options.Step;
+        DecreaseKey = options.DecreaseKey ?? new KeyBinding("left/-", "decrease", "left", "-");
+        IncreaseKey = options.IncreaseKey ?? new KeyBinding("right/+", "increase", "right", "+");
+        SetValue(options.InitialValue);
+    }
+
     public double Value { get; private set; }
 
     public string Title { get; set; } = "Progress";
@@ -75,4 +90,3 @@ public sealed class ProgressBarComponent : IStatefulComponent, IFocusableCompone
         Widgets.DrawProgressBar(canvas, new Rect(content.X, content.Y, content.Width, 1), Value, $"{percent}%");
     }
 }
-

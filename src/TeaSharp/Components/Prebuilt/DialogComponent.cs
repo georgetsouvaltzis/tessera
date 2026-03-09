@@ -6,6 +6,22 @@ namespace TeaSharp.Components;
 
 public sealed class DialogComponent : IStatefulComponent, IFocusableComponent
 {
+    public DialogComponent()
+    {
+    }
+
+    public DialogComponent(DialogOptions options)
+    {
+        Title = options.Title;
+        Lines = options.Lines ?? ["Confirm?"];
+        Visible = options.Visible;
+        Focused = options.Focused;
+        BorderStyle = options.BorderStyle;
+        Theme = options.Theme ?? new UiTheme();
+        AcceptKey = options.AcceptKey ?? new KeyBinding("enter/space", "accept", "enter", "space");
+        DismissKey = options.DismissKey ?? new KeyBinding("esc", "dismiss", "escape");
+    }
+
     public string Title { get; set; } = "Dialog";
 
     public IReadOnlyList<string> Lines { get; set; } = ["Confirm?"];

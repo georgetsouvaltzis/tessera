@@ -6,6 +6,17 @@ namespace TeaSharp.Components;
 
 public sealed class LabelComponent : ICanvasComponent
 {
+    public LabelComponent()
+    {
+    }
+
+    public LabelComponent(LabelOptions options)
+    {
+        Text = options.Text;
+        Title = options.Title;
+        ShowBorder = options.ShowBorder;
+    }
+
     public string Text { get; set; } = string.Empty;
 
     public string? Title { get; set; }
@@ -56,4 +67,3 @@ public sealed class LabelComponent : ICanvasComponent
         }
     }
 }
-
