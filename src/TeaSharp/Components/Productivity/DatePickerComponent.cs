@@ -1,6 +1,6 @@
-using System.Globalization;
 using TeaSharp.Core.Abstractions;
 using TeaSharp.Core.Messages;
+using TeaSharp.Components.Internal;
 using TeaSharp.Widgets;
 
 namespace TeaSharp.Components;
@@ -108,7 +108,7 @@ public sealed class DatePickerComponent : IStatefulComponent, IMouseStatefulComp
             return false;
         }
 
-        var content = ResolveContentRect(bounds);
+        var content = DatePickerCalendar.ResolveContentRect(bounds, ShowBorder);
         if (content.IsEmpty)
         {
             return false;
@@ -140,7 +140,7 @@ public sealed class DatePickerComponent : IStatefulComponent, IMouseStatefulComp
             }
         }
 
-        if (!TryGetDateAtPointer(content, message.X, message.Y, out var hovered))
+        if (!DatePickerCalendar.TryGetDateAtPointer(CurrentMonth, content, message.X, message.Y, out var hovered))
         {
             if (message is MouseMotionMsg or MouseClickMsg)
             {
@@ -175,126 +175,7 @@ public sealed class DatePickerComponent : IStatefulComponent, IMouseStatefulComp
 
     public void Render(Canvas canvas, Rect rect)
     {
-        var clipped = Rect.Intersect(rect, canvas.Bounds);
-        if (clipped.IsEmpty)
-        {
-            return;
-        }
-
-        Rect content;
-        if (ShowBorder)
-        {
-            canvas.DrawBox(clipped, Focused ? $"{Title} *" : Title);
-            content = clipped.Inset(1, 1);
-        }
-        else
-        {
-            content = clipped;
-        }
-
-        if (content.IsEmpty || content.Height < 3)
-        {
-            return;
-        }
-
-        var monthLabel = $"{CurrentMonth:yyyy-MM}";
-        canvas.WriteText(content.X, content.Y, monthLabel, content.Width);
-        if (content.Height == 1)
-        {
-            return;
-        }
-
-        canvas.WriteText(content.X, content.Y + 1, "Mo Tu We Th Fr Sa Su", content.Width);
-        if (content.Height < 3)
-        {
-            return;
-        }
-
-        var first = new DateOnly(CurrentMonth.Year, CurrentMonth.Month, 1);
-        var startOffset = ((int)first.DayOfWeek + 6) % 7;
-        var daysInMonth = DateTime.DaysInMonth(CurrentMonth.Year, CurrentMonth.Month);
-        var day = 1;
-        for (var row = 0; row < 6 && (content.Y + 2 + row) < content.Bottom; row++)
-        {
-            for (var col = 0; col < 7; col++)
-            {
-                var cell = row * 7 + col;
-                if (cell < startOffset || day > daysInMonth)
-                {
-                    continue;
-                }
-
-                var x = content.X + (col * 3);
-                if (x + 1 >= content.Right)
-                {
-                    continue;
-                }
-
-                var text = day.ToString().PadLeft(2, ' ');
-                var date = new DateOnly(CurrentMonth.Year, CurrentMonth.Month, day);
-                var states = new List<WidgetVisualState>(5);
-                if (date == SelectedDate)
-                {
-                    states.Add(WidgetVisualState.Selected);
-                    states.Add(WidgetVisualState.Cursor);
-                }
-
-                if (Focused)
-                {
-                    states.Add(WidgetVisualState.Focused);
-                }
-
-                if (_hoveredDate.HasValue && _hoveredDate.Value == date)
-                {
-                    states.Add(WidgetVisualState.Hovered);
-                }
-
-                canvas.WriteText(x, content.Y + 2 + row, DayStatePalette.Render(text, states), Math.Min(2, content.Right - x));
-                day++;
-            }
-        }
-    }
-
-    private Rect ResolveContentRect(Rect bounds)
-    {
-        return ShowBorder
-            ? bounds.Inset(1, 1)
-            : bounds;
-    }
-
-    private bool TryGetDateAtPointer(Rect content, int x, int y, out DateOnly date)
-    {
-        date = default;
-        var row = y - (content.Y + 2);
-        if (row < 0 || row >= 6)
-        {
-            return false;
-        }
-
-        var relativeX = x - content.X;
-        if (relativeX < 0)
-        {
-            return false;
-        }
-
-        var col = relativeX / 3;
-        if (col < 0 || col > 6)
-        {
-            return false;
-        }
-
-        var first = new DateOnly(CurrentMonth.Year, CurrentMonth.Month, 1);
-        var startOffset = ((int)first.DayOfWeek + 6) % 7;
-        var daysInMonth = DateTime.DaysInMonth(CurrentMonth.Year, CurrentMonth.Month);
-        var cell = (row * 7) + col;
-        var day = cell - startOffset + 1;
-        if (day < 1 || day > daysInMonth)
-        {
-            return false;
-        }
-
-        date = new DateOnly(CurrentMonth.Year, CurrentMonth.Month, day);
-        return true;
+        DatePickerRenderer.Render(canvas, rect, Title, Focused, ShowBorder, CurrentMonth, SelectedDate, _hoveredDate, DayStatePalette);
     }
 
     private bool SetHoveredDate(DateOnly? date)
@@ -308,4 +189,3 @@ public sealed class DatePickerComponent : IStatefulComponent, IMouseStatefulComp
         return true;
     }
 }
-

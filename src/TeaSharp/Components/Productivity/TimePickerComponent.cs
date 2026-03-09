@@ -1,6 +1,6 @@
-using System.Globalization;
 using TeaSharp.Core.Abstractions;
 using TeaSharp.Core.Messages;
+using TeaSharp.Components.Internal;
 using TeaSharp.Widgets;
 
 namespace TeaSharp.Components;
@@ -59,25 +59,25 @@ public sealed class TimePickerComponent : IStatefulComponent, IMouseStatefulComp
 
         if (NextFieldKey.Matches(key))
         {
-            ActiveField = (TimePickerField)(((int)ActiveField + 1) % 3);
+            ActiveField = TimePickerFields.Next(ActiveField);
             return true;
         }
 
         if (PreviousFieldKey.Matches(key))
         {
-            ActiveField = (TimePickerField)(((int)ActiveField + 2) % 3);
+            ActiveField = TimePickerFields.Previous(ActiveField);
             return true;
         }
 
         if (IncreaseKey.Matches(key))
         {
-            Adjust(1);
+            Value = TimePickerFields.Adjust(Value, ActiveField, HourStep, MinuteStep, SecondStep, 1);
             return true;
         }
 
         if (DecreaseKey.Matches(key))
         {
-            Adjust(-1);
+            Value = TimePickerFields.Adjust(Value, ActiveField, HourStep, MinuteStep, SecondStep, -1);
             return true;
         }
 
@@ -97,7 +97,7 @@ public sealed class TimePickerComponent : IStatefulComponent, IMouseStatefulComp
             return false;
         }
 
-        var content = ResolveContentRect(bounds);
+        var content = ShowBorder ? bounds.Inset(1, 1) : bounds;
         if (content.IsEmpty)
         {
             return false;
@@ -115,7 +115,7 @@ public sealed class TimePickerComponent : IStatefulComponent, IMouseStatefulComp
             return changed;
         }
 
-        var field = FieldFromPointer(content, message.X, message.Y);
+        var field = TimePickerFields.FieldFromPointer(content, message.X, message.Y);
         if (message is MouseMotionMsg && InteractionProfile.HoverOnMotion)
         {
             changed |= SetHoveredField(field);
@@ -149,12 +149,12 @@ public sealed class TimePickerComponent : IStatefulComponent, IMouseStatefulComp
 
             if (wheel.Button == MouseButton.WheelUp)
             {
-                Adjust(1);
+                Value = TimePickerFields.Adjust(Value, ActiveField, HourStep, MinuteStep, SecondStep, 1);
                 changed = true;
             }
             else if (wheel.Button == MouseButton.WheelDown)
             {
-                Adjust(-1);
+                Value = TimePickerFields.Adjust(Value, ActiveField, HourStep, MinuteStep, SecondStep, -1);
                 changed = true;
             }
         }
@@ -164,104 +164,7 @@ public sealed class TimePickerComponent : IStatefulComponent, IMouseStatefulComp
 
     public void Render(Canvas canvas, Rect rect)
     {
-        var clipped = Rect.Intersect(rect, canvas.Bounds);
-        if (clipped.IsEmpty)
-        {
-            return;
-        }
-
-        Rect content;
-        if (ShowBorder)
-        {
-            canvas.DrawBox(clipped, Focused ? $"{Title} *" : Title);
-            content = clipped.Inset(1, 1);
-        }
-        else
-        {
-            content = clipped;
-        }
-
-        if (content.IsEmpty || content.Height < 1)
-        {
-            return;
-        }
-
-        var hour = RenderField(Value.Hour.ToString("D2"), TimePickerField.Hour);
-        var minute = RenderField(Value.Minute.ToString("D2"), TimePickerField.Minute);
-        var second = RenderField(Value.Second.ToString("D2"), TimePickerField.Second);
-        canvas.WriteText(content.X, content.Y, $"{hour}:{minute}:{second}", content.Width);
-    }
-
-    private string RenderField(string value, TimePickerField field)
-    {
-        var states = new List<WidgetVisualState>(4);
-        if (Focused)
-        {
-            states.Add(WidgetVisualState.Focused);
-        }
-
-        if (Disabled)
-        {
-            states.Add(WidgetVisualState.Disabled);
-        }
-
-        if (ReadOnly)
-        {
-            states.Add(WidgetVisualState.ReadOnly);
-        }
-
-        if (field == ActiveField)
-        {
-            states.Add(WidgetVisualState.Cursor);
-            states.Add(WidgetVisualState.Selected);
-        }
-
-        if (_hoveredField.HasValue && _hoveredField.Value == field)
-        {
-            states.Add(WidgetVisualState.Hovered);
-        }
-
-        return FieldStatePalette.Render(value, states);
-    }
-
-    private void Adjust(int direction)
-    {
-        var delta = ActiveField switch
-        {
-            TimePickerField.Hour => TimeSpan.FromHours(HourStep * direction),
-            TimePickerField.Minute => TimeSpan.FromMinutes(MinuteStep * direction),
-            _ => TimeSpan.FromSeconds(SecondStep * direction),
-        };
-        Value = Value.Add(delta);
-    }
-
-    private Rect ResolveContentRect(Rect bounds)
-    {
-        return ShowBorder
-            ? bounds.Inset(1, 1)
-            : bounds;
-    }
-
-    private static TimePickerField? FieldFromPointer(Rect content, int x, int y)
-    {
-        if (y < content.Y || y >= content.Bottom)
-        {
-            return null;
-        }
-
-        var index = x - content.X;
-        if (index < 0)
-        {
-            return null;
-        }
-
-        return index switch
-        {
-            <= 2 => TimePickerField.Hour,
-            <= 5 => TimePickerField.Minute,
-            <= 8 => TimePickerField.Second,
-            _ => null,
-        };
+        TimePickerRenderer.Render(canvas, rect, Title, Focused, Disabled, ReadOnly, ShowBorder, Value, ActiveField, _hoveredField, FieldStatePalette);
     }
 
     private bool SetHoveredField(TimePickerField? field)
@@ -275,4 +178,3 @@ public sealed class TimePickerComponent : IStatefulComponent, IMouseStatefulComp
         return true;
     }
 }
-

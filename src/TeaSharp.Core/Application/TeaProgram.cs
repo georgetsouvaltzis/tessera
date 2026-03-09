@@ -158,7 +158,7 @@ public sealed class TeaProgram
                 if (filtered is QuitMsg)
                 {
                     _cts?.Cancel();
-                    await AwaitBackgroundLoops(commandLoop, inputLoop, resizeLoop).ConfigureAwait(false);
+                    await TeaProgramBackgroundLoops.AwaitAsync(commandLoop, inputLoop, resizeLoop).ConfigureAwait(false);
                     await ShutdownAsync(kill: false, CancellationToken.None).ConfigureAwait(false);
                     return;
                 }
@@ -201,7 +201,7 @@ public sealed class TeaProgram
                 }
 
                 pendingRender = true;
-                var renderAttempt = await TryRenderFrameAsync(minFrame, lastRender, pendingRender, token).ConfigureAwait(false);
+                var renderAttempt = await TeaProgramFramePacer.TryRenderAsync(_options.AdaptiveFramePacing, minFrame, lastRender, pendingRender, () => RenderAsync(Model.View(), token), token).ConfigureAwait(false);
                 lastRender = renderAttempt.LastRender;
                 pendingRender = renderAttempt.PendingRender;
                 if (renderAttempt.Rendered)
@@ -212,14 +212,14 @@ public sealed class TeaProgram
 
             if (_options.AdaptiveFramePacing && pendingRender)
             {
-                var delayedRender = await DelayAndRenderAsync(minFrame, lastRender, token).ConfigureAwait(false);
+                var delayedRender = await TeaProgramFramePacer.DelayAndRenderAsync(minFrame, lastRender, () => RenderAsync(Model.View(), token), token).ConfigureAwait(false);
                 lastRender = delayedRender.LastRender;
                 pendingRender = false;
             }
         }
 
         _cts?.Cancel();
-        await AwaitBackgroundLoops(commandLoop, inputLoop, resizeLoop).ConfigureAwait(false);
+        await TeaProgramBackgroundLoops.AwaitAsync(commandLoop, inputLoop, resizeLoop).ConfigureAwait(false);
         await ShutdownAsync(kill: false, CancellationToken.None).ConfigureAwait(false);
     }
 
@@ -279,50 +279,6 @@ public sealed class TeaProgram
         return false;
     }
 
-    private async Task<(bool Rendered, DateTimeOffset LastRender, bool PendingRender)> TryRenderFrameAsync(
-        TimeSpan minFrame,
-        DateTimeOffset lastRender,
-        bool pendingRender,
-        CancellationToken token)
-    {
-        var now = DateTimeOffset.UtcNow;
-        var elapsed = now - lastRender;
-        if (!_options.AdaptiveFramePacing)
-        {
-            if (elapsed < minFrame)
-            {
-                await Task.Delay(minFrame - elapsed, token).ConfigureAwait(false);
-            }
-
-            await RenderAsync(Model.View(), token).ConfigureAwait(false);
-            return (true, DateTimeOffset.UtcNow, false);
-        }
-
-        if (elapsed >= minFrame)
-        {
-            await RenderAsync(Model.View(), token).ConfigureAwait(false);
-            return (true, DateTimeOffset.UtcNow, false);
-        }
-
-        return (false, lastRender, pendingRender);
-    }
-
-    private async Task<(DateTimeOffset LastRender, bool PendingRender)> DelayAndRenderAsync(
-        TimeSpan minFrame,
-        DateTimeOffset lastRender,
-        CancellationToken token)
-    {
-        var now = DateTimeOffset.UtcNow;
-        var elapsed = now - lastRender;
-        if (elapsed < minFrame)
-        {
-            await Task.Delay(minFrame - elapsed, token).ConfigureAwait(false);
-        }
-
-        await RenderAsync(Model.View(), token).ConfigureAwait(false);
-        return (DateTimeOffset.UtcNow, false);
-    }
-
     private Task? StartInputLoop(CancellationToken token)
     {
         if (_options.DisableInput || _runtime.Terminal is null || !_runtime.Terminal.IsInputInteractive)
@@ -379,36 +335,4 @@ public sealed class TeaProgram
         _runtime.LastRenderedView = View.From(string.Empty);
     }
 
-    private static async Task AwaitBackgroundLoops(Task commandLoop, Task? inputLoop, Task? resizeLoop)
-    {
-        try
-        {
-            await commandLoop.ConfigureAwait(false);
-        }
-        catch
-        {
-        }
-
-        if (inputLoop is not null)
-        {
-            try
-            {
-                await inputLoop.ConfigureAwait(false);
-            }
-            catch
-            {
-            }
-        }
-
-        if (resizeLoop is not null)
-        {
-            try
-            {
-                await resizeLoop.ConfigureAwait(false);
-            }
-            catch
-            {
-            }
-        }
-    }
 }
