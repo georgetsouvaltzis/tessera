@@ -1,51 +1,16 @@
-using System.Runtime.InteropServices;
-using System.Diagnostics;
+namespace TeaSharp.Core.Terminal;
+
 using TeaSharp.Core.Abstractions;
 using TeaSharp.Core.Messages;
 
-namespace TeaSharp.Core.Terminal;
-
 public sealed class ConsoleTerminalAdapter : ITerminalAdapter
 {
-    private const int StdInputHandle = -10;
-    private const int StdOutputHandle = -11;
-    private const uint EnableProcessedInput = 0x0001;
-    private const uint EnableLineInput = 0x0002;
-    private const uint EnableEchoInput = 0x0004;
-    private const uint EnableVirtualTerminalProcessing = 0x0004;
-    private const uint DisableNewlineAutoReturn = 0x0008;
-    private const uint EnableWindowInput = 0x0008;
-    private const uint EnableVirtualTerminalInput = 0x0200;
-    private const ushort WindowBufferSizeEventType = 0x0004;
-    private const uint WaitObject0 = 0x00000000;
-    private const uint WaitTimeout = 0x00000102;
-    private const uint WaitFailed = 0xFFFFFFFF;
-    private static readonly TimeSpan PasteBurstGap = TimeSpan.FromMilliseconds(28);
-    private const int PasteBurstMinimumChars = 12;
-    private const int Tcsanow = 0;
-    private const int OpenReadWrite = 2;
-    private const uint LinuxEcho = 0x00000008;
-    private const uint LinuxICanon = 0x00000002;
-    private const ulong DarwinEcho = 0x00000008;
-    private const ulong DarwinICanon = 0x00000100;
-    private const int LinuxVTime = 5;
-    private const int LinuxVMin = 6;
-    private const int DarwinVMin = 16;
-    private const int DarwinVTime = 17;
-
     private readonly bool _treatControlAsInputOriginal;
     private readonly bool _ownsInput;
     private readonly bool _ownsOutput;
+    private readonly UnixRawModeSession _unixRawMode = new();
     private uint _originalInputMode;
     private uint _originalOutputMode;
-    private string? _unixSttyState;
-    private string? _unixRawModeProbe;
-    private string? _unixRawModeError;
-    private bool _unixRawModeEnabled;
-    private int _unixTtyFd = -1;
-    private bool _unixTermiosPrepared;
-    private LinuxTermios _linuxOriginalTermios;
-    private DarwinTermios _darwinOriginalTermios;
     private bool _prepared;
 
     public ConsoleTerminalAdapter()
@@ -84,11 +49,11 @@ public sealed class ConsoleTerminalAdapter : ITerminalAdapter
 
     public bool IsOutputInteractive { get; }
 
-    public bool IsRawModeActive => _unixRawModeEnabled;
+    public bool IsRawModeActive => _unixRawMode.IsRawModeActive;
 
-    public string RawModeDiagnostics => _unixRawModeProbe ?? "n/a";
+    public string RawModeDiagnostics => _unixRawMode.RawModeDiagnostics;
 
-    public string RawModeError => _unixRawModeError ?? "none";
+    public string RawModeError => _unixRawMode.RawModeError;
 
     public ValueTask PrepareAsync(CancellationToken cancellationToken)
     {
@@ -100,14 +65,13 @@ public sealed class ConsoleTerminalAdapter : ITerminalAdapter
         }
 
         Console.TreatControlCAsInput = true;
-
         if (OperatingSystem.IsWindows())
         {
-            TryEnableWindowsVtModes();
+            WindowsConsoleSession.TryEnableVirtualTerminalModes(ref _originalInputMode, ref _originalOutputMode);
         }
         else
         {
-            TryEnableUnixRawMode();
+            _unixRawMode.TryEnable(IsInputInteractive);
         }
 
         _prepared = true;
@@ -119,17 +83,15 @@ public sealed class ConsoleTerminalAdapter : ITerminalAdapter
         _ = cancellationToken;
 
         Console.TreatControlCAsInput = _treatControlAsInputOriginal;
-
         if (OperatingSystem.IsWindows())
         {
-            TryRestoreWindowsModes();
+            WindowsConsoleSession.TryRestoreModes(_originalInputMode, _originalOutputMode);
         }
         else
         {
-            TryRestoreUnixMode();
+            _unixRawMode.Restore();
         }
 
-        _unixRawModeEnabled = false;
         _prepared = false;
         return ValueTask.CompletedTask;
     }
@@ -163,6 +125,65 @@ public sealed class ConsoleTerminalAdapter : ITerminalAdapter
         }
     }
 
+    public async Task StreamConsoleKeyEventsAsync(CancellationToken cancellationToken, Action<IMessage> onEvent)
+    {
+        var burst = new ConsolePasteBurstBuffer();
+
+        while (!cancellationToken.IsCancellationRequested)
+        {
+            try
+            {
+                if (!Console.KeyAvailable)
+                {
+                    burst.FlushIfIdle(onEvent);
+                    await Task.Delay(10, cancellationToken).ConfigureAwait(false);
+                    continue;
+                }
+
+                var key = Console.ReadKey(intercept: true);
+                if (ConsoleClipboardReader.IsPasteShortcut(key)
+                    && ConsoleClipboardReader.TryReadText(out var clipboard)
+                    && !string.IsNullOrEmpty(clipboard))
+                {
+                    burst.Flush(onEvent);
+                    onEvent(new PasteStartMsg());
+                    onEvent(new PasteMsg(clipboard));
+                    onEvent(new PasteEndMsg());
+                    continue;
+                }
+
+                var message = ConsoleKeyMessageMapper.Map(key);
+                if (burst.TryBuffer(message, onEvent))
+                {
+                    continue;
+                }
+
+                burst.Flush(onEvent);
+                if (message is not null)
+                {
+                    onEvent(message);
+                }
+            }
+            catch (OperationCanceledException)
+            {
+                burst.Flush(onEvent);
+                break;
+            }
+            catch (InvalidOperationException)
+            {
+                burst.Flush(onEvent);
+                break;
+            }
+        }
+
+        burst.Flush(onEvent);
+    }
+
+    internal IDisposable? TryRegisterResizeSignal(Action onResize)
+    {
+        return WindowsConsoleSession.TryRegisterResizeSignal(IsInputInteractive, onResize);
+    }
+
     private static async Task TryDisposeOwnedStreamAsync(Stream stream)
     {
         try
@@ -176,441 +197,7 @@ public sealed class ConsoleTerminalAdapter : ITerminalAdapter
         }
         catch
         {
-            // ignored: best-effort cleanup on process shutdown
         }
-    }
-
-    public async Task StreamConsoleKeyEventsAsync(CancellationToken cancellationToken, Action<IMessage> onEvent)
-    {
-        var burst = new List<KeyPressMsg>(64);
-        DateTimeOffset lastBurstInputAt = DateTimeOffset.MinValue;
-
-        while (!cancellationToken.IsCancellationRequested)
-        {
-            try
-            {
-                if (!Console.KeyAvailable)
-                {
-                    FlushPasteBurstIfIdle(onEvent, burst, ref lastBurstInputAt);
-                    await Task.Delay(10, cancellationToken).ConfigureAwait(false);
-                    continue;
-                }
-
-                var key = Console.ReadKey(intercept: true);
-                if (IsPasteShortcut(key) && TryReadClipboardText(out var clipboard) && !string.IsNullOrEmpty(clipboard))
-                {
-                    FlushPasteBurst(onEvent, burst);
-                    onEvent(new PasteStartMsg());
-                    onEvent(new PasteMsg(clipboard));
-                    onEvent(new PasteEndMsg());
-                    continue;
-                }
-
-                var message = MapConsoleKey(key);
-                if (message is KeyPressMsg keyPress && IsPasteBurstCandidate(keyPress))
-                {
-                    var now = DateTimeOffset.UtcNow;
-                    if (burst.Count > 0 && (now - lastBurstInputAt) > PasteBurstGap)
-                    {
-                        FlushPasteBurst(onEvent, burst);
-                    }
-
-                    burst.Add(keyPress);
-                    lastBurstInputAt = now;
-                    continue;
-                }
-
-                FlushPasteBurst(onEvent, burst);
-
-                if (message is not null)
-                {
-                    onEvent(message);
-                }
-            }
-            catch (OperationCanceledException)
-            {
-                FlushPasteBurst(onEvent, burst);
-                break;
-            }
-            catch (InvalidOperationException)
-            {
-                FlushPasteBurst(onEvent, burst);
-                break;
-            }
-        }
-
-        FlushPasteBurst(onEvent, burst);
-    }
-
-    internal IDisposable? TryRegisterResizeSignal(Action onResize)
-    {
-        if (!OperatingSystem.IsWindows() || !IsInputInteractive)
-        {
-            return null;
-        }
-
-        var inputHandle = GetStdHandle(StdInputHandle);
-        if (IsInvalidHandle(inputHandle))
-        {
-            return null;
-        }
-
-        if (GetConsoleMode(inputHandle, out var mode))
-        {
-            // Enable window-size events in the console input stream.
-            _ = SetConsoleMode(inputHandle, mode | EnableWindowInput);
-        }
-
-        var cts = new CancellationTokenSource();
-        var watcher = Task.Run(() => WatchWindowsResizeSignals(inputHandle, onResize, cts.Token), CancellationToken.None);
-        return new DelegateDisposable(() =>
-        {
-            cts.Cancel();
-            try
-            {
-                _ = watcher.Wait(180);
-            }
-            catch
-            {
-                // ignored: shutdown path.
-            }
-
-            cts.Dispose();
-        });
-    }
-
-    private static void WatchWindowsResizeSignals(IntPtr inputHandle, Action onResize, CancellationToken cancellationToken)
-    {
-        var records = new InputRecord[16];
-        Coord? lastReportedSize = null;
-
-        while (!cancellationToken.IsCancellationRequested)
-        {
-            var wait = WaitForSingleObject(inputHandle, 120);
-            if (wait == WaitFailed)
-            {
-                break;
-            }
-
-            if (wait == WaitTimeout || wait != WaitObject0)
-            {
-                continue;
-            }
-
-            if (!GetNumberOfConsoleInputEvents(inputHandle, out var eventCount) || eventCount == 0)
-            {
-                continue;
-            }
-
-            if (!PeekConsoleInput(inputHandle, records, (uint)records.Length, out var read) || read == 0)
-            {
-                continue;
-            }
-
-            for (var i = 0; i < read; i++)
-            {
-                if (records[i].EventType != WindowBufferSizeEventType)
-                {
-                    continue;
-                }
-
-                var size = records[i].WindowBufferSizeEvent.Size;
-                if (size.X <= 0 || size.Y <= 0)
-                {
-                    continue;
-                }
-
-                if (lastReportedSize is { } previous
-                    && previous.X == size.X
-                    && previous.Y == size.Y)
-                {
-                    continue;
-                }
-
-                lastReportedSize = size;
-                try
-                {
-                    onResize();
-                }
-                catch
-                {
-                    // ignored: callback path must stay resilient.
-                }
-
-                break;
-            }
-        }
-    }
-
-    private void TryEnableWindowsVtModes()
-    {
-        var inputHandle = GetStdHandle(StdInputHandle);
-        var outputHandle = GetStdHandle(StdOutputHandle);
-
-        if (IsInvalidHandle(inputHandle) || IsInvalidHandle(outputHandle))
-        {
-            return;
-        }
-
-        if (GetConsoleMode(inputHandle, out var imode))
-        {
-            _originalInputMode = imode;
-            var nextInputMode = imode | EnableVirtualTerminalInput;
-            nextInputMode &= ~(EnableLineInput | EnableEchoInput | EnableProcessedInput);
-            _ = SetConsoleMode(inputHandle, nextInputMode);
-        }
-
-        if (GetConsoleMode(outputHandle, out var omode))
-        {
-            _originalOutputMode = omode;
-            _ = SetConsoleMode(outputHandle, omode | EnableVirtualTerminalProcessing | DisableNewlineAutoReturn);
-        }
-    }
-
-    private void TryRestoreWindowsModes()
-    {
-        var inputHandle = GetStdHandle(StdInputHandle);
-        var outputHandle = GetStdHandle(StdOutputHandle);
-
-        if (!IsInvalidHandle(inputHandle) && _originalInputMode != 0)
-        {
-            _ = SetConsoleMode(inputHandle, _originalInputMode);
-        }
-
-        if (!IsInvalidHandle(outputHandle) && _originalOutputMode != 0)
-        {
-            _ = SetConsoleMode(outputHandle, _originalOutputMode);
-        }
-    }
-
-    private void TryEnableUnixRawMode()
-    {
-        if (!IsInputInteractive)
-        {
-            _unixRawModeProbe = "input-not-interactive";
-            _unixRawModeError = "input-not-interactive";
-            return;
-        }
-
-        if (TryEnableUnixRawModeWithTermios(out var termiosProbe, out var termiosError))
-        {
-            _unixRawModeProbe = termiosProbe;
-            _unixRawModeError = termiosError ?? "none";
-            _unixRawModeEnabled = true;
-            return;
-        }
-
-        _unixSttyState = RunStty("-g", out var stateError);
-        if (string.IsNullOrWhiteSpace(_unixSttyState))
-        {
-            _unixRawModeProbe = "stty-state-unavailable";
-            _unixRawModeError = termiosError ?? stateError ?? "state-read-failed";
-            return;
-        }
-
-        _ = RunStty("raw -echo", out var firstSetError);
-        var probe = RunStty("-a", out var probeError);
-        if (!IsUnixRawProbeEnabled(probe))
-        {
-            // Fallback path for terminals where `raw` alias is not applied as expected.
-            _ = RunStty("-icanon min 1 time 0 -echo", out var fallbackSetError);
-            probe = RunStty("-a", out probeError);
-            _unixRawModeError = fallbackSetError ?? firstSetError;
-        }
-        else
-        {
-            _unixRawModeError = firstSetError;
-        }
-
-        _unixRawModeProbe = string.IsNullOrWhiteSpace(probe) ? "probe-unavailable" : probe;
-        _unixRawModeEnabled = IsUnixRawProbeEnabled(probe);
-        if (!_unixRawModeEnabled && string.IsNullOrWhiteSpace(_unixRawModeError))
-        {
-            _unixRawModeError = probeError ?? "probe-check-failed";
-        }
-    }
-
-    private void TryRestoreUnixMode()
-    {
-        if (_unixTermiosPrepared)
-        {
-            TryRestoreUnixTermios();
-        }
-
-        if (string.IsNullOrWhiteSpace(_unixSttyState))
-        {
-            return;
-        }
-
-        _ = RunStty(_unixSttyState, out _);
-        _unixSttyState = null;
-        _unixRawModeProbe = null;
-        _unixRawModeError = null;
-    }
-
-    private bool TryEnableUnixRawModeWithTermios(out string probe, out string? error)
-    {
-        probe = "termios-unavailable";
-        error = null;
-
-        if (!OperatingSystem.IsMacOS() && !OperatingSystem.IsLinux())
-        {
-            error = "termios-unsupported-os";
-            return false;
-        }
-
-        _unixTtyFd = Open("/dev/tty", OpenReadWrite);
-        if (_unixTtyFd < 0)
-        {
-            error = "termios-open-failed";
-            _unixTtyFd = -1;
-            return false;
-        }
-
-        if (OperatingSystem.IsMacOS())
-        {
-            if (TcGetAttrDarwin(_unixTtyFd, out _darwinOriginalTermios) != 0)
-            {
-                error = "termios-tcgetattr-failed";
-                CloseUnixTty();
-                return false;
-            }
-
-            var current = _darwinOriginalTermios;
-            current.c_cc ??= new byte[20];
-            current.c_lflag &= ~(DarwinEcho | DarwinICanon);
-            current.c_cc[DarwinVMin] = 1;
-            current.c_cc[DarwinVTime] = 0;
-
-            if (TcSetAttrDarwin(_unixTtyFd, Tcsanow, ref current) != 0)
-            {
-                error = "termios-tcsetattr-failed";
-                CloseUnixTty();
-                return false;
-            }
-
-            if (TcGetAttrDarwin(_unixTtyFd, out var verify) != 0)
-            {
-                error = "termios-verify-failed";
-                CloseUnixTty();
-                return false;
-            }
-
-            var raw = (verify.c_lflag & (DarwinEcho | DarwinICanon)) == 0;
-            probe = $"termios darwin lflag=0x{verify.c_lflag:X} raw={(raw ? "yes" : "no")}";
-            if (!raw)
-            {
-                error = "termios-verify-not-raw";
-                CloseUnixTty();
-                return false;
-            }
-
-            _unixTermiosPrepared = true;
-            return true;
-        }
-        else
-        {
-            if (TcGetAttrLinux(_unixTtyFd, out _linuxOriginalTermios) != 0)
-            {
-                error = "termios-tcgetattr-failed";
-                CloseUnixTty();
-                return false;
-            }
-
-            var current = _linuxOriginalTermios;
-            current.c_cc ??= new byte[32];
-            current.c_lflag &= ~(LinuxEcho | LinuxICanon);
-            current.c_cc[LinuxVMin] = 1;
-            current.c_cc[LinuxVTime] = 0;
-
-            if (TcSetAttrLinux(_unixTtyFd, Tcsanow, ref current) != 0)
-            {
-                error = "termios-tcsetattr-failed";
-                CloseUnixTty();
-                return false;
-            }
-
-            if (TcGetAttrLinux(_unixTtyFd, out var verify) != 0)
-            {
-                error = "termios-verify-failed";
-                CloseUnixTty();
-                return false;
-            }
-
-            var raw = (verify.c_lflag & (LinuxEcho | LinuxICanon)) == 0;
-            probe = $"termios linux lflag=0x{verify.c_lflag:X} raw={(raw ? "yes" : "no")}";
-            if (!raw)
-            {
-                error = "termios-verify-not-raw";
-                CloseUnixTty();
-                return false;
-            }
-
-            _unixTermiosPrepared = true;
-            return true;
-        }
-    }
-
-    private void TryRestoreUnixTermios()
-    {
-        if (_unixTtyFd < 0)
-        {
-            _unixTermiosPrepared = false;
-            return;
-        }
-
-        if (OperatingSystem.IsMacOS())
-        {
-            var restore = _darwinOriginalTermios;
-            _ = TcSetAttrDarwin(_unixTtyFd, Tcsanow, ref restore);
-        }
-        else if (OperatingSystem.IsLinux())
-        {
-            var restore = _linuxOriginalTermios;
-            _ = TcSetAttrLinux(_unixTtyFd, Tcsanow, ref restore);
-        }
-
-        CloseUnixTty();
-        _unixTermiosPrepared = false;
-    }
-
-    private void CloseUnixTty()
-    {
-        if (_unixTtyFd >= 0)
-        {
-            _ = Close(_unixTtyFd);
-            _unixTtyFd = -1;
-        }
-    }
-
-    private static string? RunStty(string arguments, out string? error)
-    {
-        var sttyExecutable = ResolveSttyExecutable();
-        var explicitTtyArgs = OperatingSystem.IsMacOS()
-            ? new[] { "-f", "/dev/tty" }
-            : new[] { "-F", "/dev/tty" };
-
-        if (TryRunStty(sttyExecutable, arguments, explicitTtyArgs, out var output, out error))
-        {
-            return output.Trim();
-        }
-
-        // Fallback: rely on inherited stdin if explicit tty flag is unsupported.
-        if (TryRunStty(sttyExecutable, arguments, null, out output, out var fallbackError))
-        {
-            error = null;
-            return output.Trim();
-        }
-
-        // Last resort: shell redirection to controlling tty.
-        if (TryRunSttyWithShellRedirection(arguments, out output, out fallbackError))
-        {
-            error = null;
-            return output.Trim();
-        }
-
-        error = fallbackError ?? error;
-        return null;
     }
 
     private static bool TryOpenTty(FileAccess access, out Stream stream)
@@ -624,494 +211,6 @@ public sealed class ConsoleTerminalAdapter : ITerminalAdapter
         {
             stream = Stream.Null;
             return false;
-        }
-    }
-
-    private static bool IsInvalidHandle(IntPtr handle)
-    {
-        return handle == IntPtr.Zero || handle == new IntPtr(-1);
-    }
-
-    private static bool IsUnixRawProbeEnabled(string? probe)
-    {
-        if (string.IsNullOrWhiteSpace(probe))
-        {
-            return false;
-        }
-
-        var normalized = probe
-            .Replace(";", " ", StringComparison.Ordinal)
-            .Replace(":", " ", StringComparison.Ordinal)
-            .Replace("\r", " ", StringComparison.Ordinal)
-            .Replace("\n", " ", StringComparison.Ordinal);
-        var tokens = normalized.Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
-
-        var hasNoEcho = tokens.Contains("-echo", StringComparer.Ordinal) && !tokens.Contains("echo", StringComparer.Ordinal);
-        var hasNonCanonical = tokens.Contains("-icanon", StringComparer.Ordinal)
-            || tokens.Contains("raw", StringComparer.Ordinal)
-            || tokens.Contains("cbreak", StringComparer.Ordinal)
-            || (normalized.Contains("min = 1", StringComparison.Ordinal) && normalized.Contains("time = 0", StringComparison.Ordinal));
-
-        return hasNoEcho && hasNonCanonical;
-    }
-
-    private static bool TryRunStty(string sttyExecutable, string arguments, string[]? explicitTtyArgs, out string output, out string? error)
-    {
-        output = string.Empty;
-        error = null;
-
-        try
-        {
-            using var process = new Process
-            {
-                StartInfo = new ProcessStartInfo
-                {
-                    FileName = sttyExecutable,
-                    UseShellExecute = false,
-                    RedirectStandardOutput = true,
-                    RedirectStandardError = true,
-                    CreateNoWindow = true,
-                },
-            };
-
-            if (explicitTtyArgs is not null)
-            {
-                foreach (var arg in explicitTtyArgs)
-                {
-                    process.StartInfo.ArgumentList.Add(arg);
-                }
-            }
-
-            foreach (var arg in arguments.Split(' ', StringSplitOptions.RemoveEmptyEntries))
-            {
-                process.StartInfo.ArgumentList.Add(arg);
-            }
-
-            if (!process.Start())
-            {
-                error = "stty-start-failed";
-                return false;
-            }
-
-            output = process.StandardOutput.ReadToEnd();
-            var stdErr = process.StandardError.ReadToEnd().Trim();
-            process.WaitForExit();
-
-            if (process.ExitCode != 0)
-            {
-                error = string.IsNullOrWhiteSpace(stdErr)
-                    ? $"stty-exit-{process.ExitCode}"
-                    : $"stty-exit-{process.ExitCode}: {stdErr}";
-                return false;
-            }
-
-            return true;
-        }
-        catch (Exception ex)
-        {
-            error = $"stty-exception: {ex.Message}";
-            return false;
-        }
-    }
-
-    private static bool TryRunSttyWithShellRedirection(string arguments, out string output, out string? error)
-    {
-        output = string.Empty;
-        error = null;
-
-        try
-        {
-            var escaped = arguments.Replace("'", "'\"'\"'", StringComparison.Ordinal);
-            using var process = new Process
-            {
-                StartInfo = new ProcessStartInfo
-                {
-                    FileName = "/bin/sh",
-                    ArgumentList = { "-lc", $"stty {escaped} < /dev/tty" },
-                    UseShellExecute = false,
-                    RedirectStandardOutput = true,
-                    RedirectStandardError = true,
-                    CreateNoWindow = true,
-                },
-            };
-
-            if (!process.Start())
-            {
-                error = "stty-shell-start-failed";
-                return false;
-            }
-
-            output = process.StandardOutput.ReadToEnd();
-            var stdErr = process.StandardError.ReadToEnd().Trim();
-            process.WaitForExit();
-
-            if (process.ExitCode != 0)
-            {
-                error = string.IsNullOrWhiteSpace(stdErr)
-                    ? $"stty-shell-exit-{process.ExitCode}"
-                    : $"stty-shell-exit-{process.ExitCode}: {stdErr}";
-                return false;
-            }
-
-            return true;
-        }
-        catch (Exception ex)
-        {
-            error = $"stty-shell-exception: {ex.Message}";
-            return false;
-        }
-    }
-
-    private static string ResolveSttyExecutable()
-    {
-        if (File.Exists("/bin/stty"))
-        {
-            return "/bin/stty";
-        }
-
-        if (File.Exists("/usr/bin/stty"))
-        {
-            return "/usr/bin/stty";
-        }
-
-        return "stty";
-    }
-
-    [StructLayout(LayoutKind.Sequential)]
-    private struct Coord
-    {
-        public short X;
-        public short Y;
-    }
-
-    [StructLayout(LayoutKind.Sequential)]
-    private struct WindowBufferSizeRecord
-    {
-        public Coord Size;
-    }
-
-    [StructLayout(LayoutKind.Explicit)]
-    private struct InputRecord
-    {
-        [FieldOffset(0)]
-        public ushort EventType;
-
-        [FieldOffset(4)]
-        public WindowBufferSizeRecord WindowBufferSizeEvent;
-    }
-
-    [StructLayout(LayoutKind.Sequential)]
-    private struct LinuxTermios
-    {
-        public uint c_iflag;
-        public uint c_oflag;
-        public uint c_cflag;
-        public uint c_lflag;
-        public byte c_line;
-        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 32)]
-        public byte[] c_cc;
-        public uint c_ispeed;
-        public uint c_ospeed;
-    }
-
-    [StructLayout(LayoutKind.Sequential)]
-    private struct DarwinTermios
-    {
-        public ulong c_iflag;
-        public ulong c_oflag;
-        public ulong c_cflag;
-        public ulong c_lflag;
-        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 20)]
-        public byte[] c_cc;
-        public ulong c_ispeed;
-        public ulong c_ospeed;
-    }
-
-    private static IMessage? MapConsoleKey(ConsoleKeyInfo key)
-    {
-        var modifiers = KeyModifiers.None;
-        if ((key.Modifiers & ConsoleModifiers.Control) != 0)
-        {
-            modifiers |= KeyModifiers.Ctrl;
-        }
-
-        if ((key.Modifiers & ConsoleModifiers.Alt) != 0)
-        {
-            modifiers |= KeyModifiers.Alt;
-        }
-
-        if ((key.Modifiers & ConsoleModifiers.Shift) != 0)
-        {
-            modifiers |= KeyModifiers.Shift;
-        }
-
-        return key.Key switch
-        {
-            ConsoleKey.UpArrow => new KeyPressMsg(KeyCode.Up, "", modifiers),
-            ConsoleKey.DownArrow => new KeyPressMsg(KeyCode.Down, "", modifiers),
-            ConsoleKey.LeftArrow => new KeyPressMsg(KeyCode.Left, "", modifiers),
-            ConsoleKey.RightArrow => new KeyPressMsg(KeyCode.Right, "", modifiers),
-            ConsoleKey.Enter => new KeyPressMsg(KeyCode.Enter, "", modifiers),
-            ConsoleKey.Tab => new KeyPressMsg(KeyCode.Tab, "", modifiers),
-            ConsoleKey.Backspace => new KeyPressMsg(KeyCode.Backspace, "", modifiers),
-            ConsoleKey.Escape => new KeyPressMsg(KeyCode.Escape, "", modifiers),
-            ConsoleKey.F1 => new KeyPressMsg(KeyCode.F1, "", modifiers),
-            ConsoleKey.F2 => new KeyPressMsg(KeyCode.F2, "", modifiers),
-            ConsoleKey.F3 => new KeyPressMsg(KeyCode.F3, "", modifiers),
-            ConsoleKey.F4 => new KeyPressMsg(KeyCode.F4, "", modifiers),
-            ConsoleKey.F5 => new KeyPressMsg(KeyCode.F5, "", modifiers),
-            ConsoleKey.F6 => new KeyPressMsg(KeyCode.F6, "", modifiers),
-            ConsoleKey.F7 => new KeyPressMsg(KeyCode.F7, "", modifiers),
-            ConsoleKey.F8 => new KeyPressMsg(KeyCode.F8, "", modifiers),
-            ConsoleKey.F9 => new KeyPressMsg(KeyCode.F9, "", modifiers),
-            ConsoleKey.F10 => new KeyPressMsg(KeyCode.F10, "", modifiers),
-            ConsoleKey.F11 => new KeyPressMsg(KeyCode.F11, "", modifiers),
-            ConsoleKey.F12 => new KeyPressMsg(KeyCode.F12, "", modifiers),
-            _ => ToCharacterMessage(key, modifiers),
-        };
-    }
-
-    private static IMessage? ToCharacterMessage(ConsoleKeyInfo key, KeyModifiers modifiers)
-    {
-        if (modifiers.HasFlag(KeyModifiers.Ctrl) && key.Key is >= ConsoleKey.A and <= ConsoleKey.Z)
-        {
-            var ch = (char)('a' + (key.Key - ConsoleKey.A));
-            return new KeyPressMsg(KeyCode.Character, ch.ToString(), modifiers);
-        }
-
-        if (key.KeyChar == '\0')
-        {
-            return null;
-        }
-
-        if (key.KeyChar == '\u0003')
-        {
-            return new KeyPressMsg(KeyCode.Character, "c", modifiers | KeyModifiers.Ctrl);
-        }
-
-        return new KeyPressMsg(KeyCode.Character, key.KeyChar.ToString(), modifiers);
-    }
-
-    private static void FlushPasteBurstIfIdle(Action<IMessage> onEvent, List<KeyPressMsg> burst, ref DateTimeOffset lastBurstInputAt)
-    {
-        if (burst.Count == 0)
-        {
-            return;
-        }
-
-        if ((DateTimeOffset.UtcNow - lastBurstInputAt) <= PasteBurstGap)
-        {
-            return;
-        }
-
-        FlushPasteBurst(onEvent, burst);
-        lastBurstInputAt = DateTimeOffset.MinValue;
-    }
-
-    private static void FlushPasteBurst(Action<IMessage> onEvent, List<KeyPressMsg> burst)
-    {
-        if (burst.Count == 0)
-        {
-            return;
-        }
-
-        if (TryConvertBurstToPaste(burst, out var paste))
-        {
-            onEvent(new PasteMsg(paste));
-        }
-        else
-        {
-            foreach (var key in burst)
-            {
-                onEvent(key);
-            }
-        }
-
-        burst.Clear();
-    }
-
-    private static bool IsPasteBurstCandidate(KeyPressMsg key)
-    {
-        if (key.Modifiers != KeyModifiers.None)
-        {
-            return false;
-        }
-
-        return key.Code is KeyCode.Character or KeyCode.Enter or KeyCode.Tab;
-    }
-
-    private static bool TryConvertBurstToPaste(IReadOnlyList<KeyPressMsg> burst, out string content)
-    {
-        var sb = new System.Text.StringBuilder();
-        var hasLineBreak = false;
-        var distinctChars = new HashSet<char>();
-
-        foreach (var key in burst)
-        {
-            switch (key.Code)
-            {
-                case KeyCode.Character:
-                    if (key.Text.Length > 0)
-                    {
-                        sb.Append(key.Text);
-                        foreach (var ch in key.Text)
-                        {
-                            distinctChars.Add(ch);
-                        }
-                    }
-                    break;
-                case KeyCode.Enter:
-                    sb.Append('\n');
-                    hasLineBreak = true;
-                    break;
-                case KeyCode.Tab:
-                    sb.Append('\t');
-                    break;
-            }
-        }
-
-        content = sb.ToString();
-        if (content.Length == 0)
-        {
-            return false;
-        }
-
-        if (hasLineBreak && content.Length >= 2)
-        {
-            return true;
-        }
-
-        return content.Length >= PasteBurstMinimumChars && distinctChars.Count >= 2;
-    }
-
-    private static bool IsPasteShortcut(ConsoleKeyInfo key)
-    {
-        var isCtrlV = key.Key == ConsoleKey.V && (key.Modifiers & ConsoleModifiers.Control) != 0;
-        var isShiftInsert = key.Key == ConsoleKey.Insert && (key.Modifiers & ConsoleModifiers.Shift) != 0;
-        return isCtrlV || isShiftInsert;
-    }
-
-    private static bool TryReadClipboardText(out string text)
-    {
-        if (OperatingSystem.IsMacOS())
-        {
-            return TryRunClipboardProcess("/usr/bin/pbpaste", [], out text)
-                || TryRunClipboardProcess("pbpaste", [], out text);
-        }
-
-        if (OperatingSystem.IsWindows())
-        {
-            return TryRunClipboardProcess("powershell", ["-NoProfile", "-Command", "Get-Clipboard -Raw"], out text)
-                || TryRunClipboardProcess("pwsh", ["-NoProfile", "-Command", "Get-Clipboard -Raw"], out text);
-        }
-
-        // Linux / Wayland / X11 fallbacks.
-        return TryRunClipboardProcess("wl-paste", ["-n"], out text)
-            || TryRunClipboardProcess("xclip", ["-selection", "clipboard", "-o"], out text)
-            || TryRunClipboardProcess("xsel", ["--clipboard", "--output"], out text);
-    }
-
-    private static bool TryRunClipboardProcess(string fileName, string[] args, out string text)
-    {
-        text = string.Empty;
-
-        try
-        {
-            using var process = new Process
-            {
-                StartInfo = new ProcessStartInfo
-                {
-                    FileName = fileName,
-                    UseShellExecute = false,
-                    RedirectStandardOutput = true,
-                    RedirectStandardError = true,
-                    CreateNoWindow = true,
-                },
-            };
-
-            foreach (var arg in args)
-            {
-                process.StartInfo.ArgumentList.Add(arg);
-            }
-
-            if (!process.Start())
-            {
-                return false;
-            }
-
-            if (!process.WaitForExit(350))
-            {
-                try
-                {
-                    process.Kill(entireProcessTree: true);
-                }
-                catch
-                {
-                    // ignored
-                }
-
-                return false;
-            }
-
-            if (process.ExitCode != 0)
-            {
-                return false;
-            }
-
-            text = process.StandardOutput.ReadToEnd();
-            return !string.IsNullOrEmpty(text);
-        }
-        catch
-        {
-            return false;
-        }
-    }
-
-    [DllImport("kernel32.dll", SetLastError = true)]
-    private static extern IntPtr GetStdHandle(int nStdHandle);
-
-    [DllImport("kernel32.dll", SetLastError = true)]
-    [return: MarshalAs(UnmanagedType.Bool)]
-    private static extern bool GetConsoleMode(IntPtr hConsoleHandle, out uint lpMode);
-
-    [DllImport("kernel32.dll", SetLastError = true)]
-    [return: MarshalAs(UnmanagedType.Bool)]
-    private static extern bool SetConsoleMode(IntPtr hConsoleHandle, uint dwMode);
-
-    [DllImport("kernel32.dll", SetLastError = true)]
-    [return: MarshalAs(UnmanagedType.Bool)]
-    private static extern bool GetNumberOfConsoleInputEvents(IntPtr hConsoleInput, out uint lpcNumberOfEvents);
-
-    [DllImport("kernel32.dll", SetLastError = true)]
-    [return: MarshalAs(UnmanagedType.Bool)]
-    private static extern bool PeekConsoleInput(IntPtr hConsoleInput, [Out] InputRecord[] lpBuffer, uint nLength, out uint lpNumberOfEventsRead);
-
-    [DllImport("kernel32.dll", SetLastError = true)]
-    private static extern uint WaitForSingleObject(IntPtr hHandle, uint dwMilliseconds);
-
-    [DllImport("libc", EntryPoint = "open", SetLastError = true)]
-    private static extern int Open(string path, int flags);
-
-    [DllImport("libc", EntryPoint = "close", SetLastError = true)]
-    private static extern int Close(int fd);
-
-    [DllImport("libc", EntryPoint = "tcgetattr", SetLastError = true)]
-    private static extern int TcGetAttrLinux(int fd, out LinuxTermios termios);
-
-    [DllImport("libc", EntryPoint = "tcsetattr", SetLastError = true)]
-    private static extern int TcSetAttrLinux(int fd, int optionalActions, ref LinuxTermios termios);
-
-    [DllImport("libc", EntryPoint = "tcgetattr", SetLastError = true)]
-    private static extern int TcGetAttrDarwin(int fd, out DarwinTermios termios);
-
-    [DllImport("libc", EntryPoint = "tcsetattr", SetLastError = true)]
-    private static extern int TcSetAttrDarwin(int fd, int optionalActions, ref DarwinTermios termios);
-
-    private sealed class DelegateDisposable(Action dispose) : IDisposable
-    {
-        public void Dispose()
-        {
-            dispose();
         }
     }
 }

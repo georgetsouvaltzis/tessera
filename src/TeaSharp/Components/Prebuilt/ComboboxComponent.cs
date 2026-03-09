@@ -6,10 +6,7 @@ namespace TeaSharp.Components;
 
 public sealed class ComboboxComponent : IStatefulComponent, IMouseStatefulComponent, IFocusableComponent
 {
-    private readonly List<string> _items = [];
-    private readonly List<int> _filteredIndices = [];
-    private int _highlightedFilteredIndex;
-    private int _hoveredFilteredIndex = -1;
+    private readonly OptionListController _options = new();
     private bool _fieldHovered;
 
     public TextInputModel Input { get; } = new();
@@ -34,7 +31,7 @@ public sealed class ComboboxComponent : IStatefulComponent, IMouseStatefulCompon
 
     public bool IsOpen { get; private set; }
 
-    public int SelectedIndex { get; private set; } = -1;
+    public int SelectedIndex => _options.SelectedIndex;
 
     public int MaxVisibleItems { get; set; } = 6;
 
@@ -50,20 +47,12 @@ public sealed class ComboboxComponent : IStatefulComponent, IMouseStatefulCompon
 
     public KeyBinding ConfirmSelectionKey { get; set; } = new("enter", "select", "enter");
 
-    public string SelectedItem => SelectedIndex >= 0 && SelectedIndex < _items.Count
-        ? _items[SelectedIndex]
-        : string.Empty;
+    public string SelectedItem => _options.SelectedItem;
 
     public void SetItems(IEnumerable<string> items)
     {
-        _items.Clear();
-        _items.AddRange(items);
-        if (SelectedIndex >= _items.Count)
-        {
-            SelectedIndex = -1;
-        }
-
-        RefreshFilteredIndices();
+        _options.SetItems(items, selectFirstItemWhenUnset: false);
+        _options.ApplyFilter(Input.Value);
     }
 
     public bool Update(IMessage message)
@@ -81,15 +70,15 @@ public sealed class ComboboxComponent : IStatefulComponent, IMouseStatefulCompon
                 return true;
             }
 
-            if (IsOpen && NextItemKey.Matches(key) && _filteredIndices.Count > 0)
+            if (IsOpen && NextItemKey.Matches(key) && _options.VisibleCount > 0)
             {
-                _highlightedFilteredIndex = (_highlightedFilteredIndex + 1) % _filteredIndices.Count;
+                _options.MoveNextVisible();
                 return true;
             }
 
-            if (IsOpen && PreviousItemKey.Matches(key) && _filteredIndices.Count > 0)
+            if (IsOpen && PreviousItemKey.Matches(key) && _options.VisibleCount > 0)
             {
-                _highlightedFilteredIndex = (_highlightedFilteredIndex + _filteredIndices.Count - 1) % _filteredIndices.Count;
+                _options.MovePreviousVisible();
                 return true;
             }
 
@@ -101,11 +90,7 @@ public sealed class ComboboxComponent : IStatefulComponent, IMouseStatefulCompon
             if (!IsOpen && OpenKey.Matches(key))
             {
                 IsOpen = true;
-                if (_filteredIndices.Count > 0)
-                {
-                    _highlightedFilteredIndex = 0;
-                }
-
+                _options.AlignHighlightToSelectionOrStart();
                 return true;
             }
         }
@@ -113,12 +98,12 @@ public sealed class ComboboxComponent : IStatefulComponent, IMouseStatefulCompon
         var inputResult = Input.Update(message, InputKeyMap);
         if (inputResult.Changed)
         {
-            RefreshFilteredIndices();
+            _options.ApplyFilter(Input.Value);
             IsOpen = true;
             return true;
         }
 
-        if (inputResult.Submitted && IsOpen && _filteredIndices.Count > 0)
+        if (inputResult.Submitted && IsOpen && _options.VisibleCount > 0)
         {
             return SelectHighlighted();
         }
@@ -147,7 +132,7 @@ public sealed class ComboboxComponent : IStatefulComponent, IMouseStatefulCompon
             if (message is MouseMotionMsg or MouseClickMsg)
             {
                 changed |= SetFieldHovered(false);
-                changed |= SetHoveredFilteredIndex(-1);
+                changed |= _options.SetHoveredVisibleIndex(-1);
             }
 
             if (message is not MouseWheelMsg)
@@ -156,16 +141,16 @@ public sealed class ComboboxComponent : IStatefulComponent, IMouseStatefulCompon
             }
         }
 
-        if (message is MouseWheelMsg wheel && InteractionProfile.NavigateOnWheel && IsOpen && _filteredIndices.Count > 0)
+        if (message is MouseWheelMsg wheel && InteractionProfile.NavigateOnWheel && IsOpen && _options.VisibleCount > 0)
         {
             if (wheel.Button == MouseButton.WheelDown)
             {
-                _highlightedFilteredIndex = (_highlightedFilteredIndex + 1) % _filteredIndices.Count;
+                _options.MoveNextVisible();
                 changed = true;
             }
             else if (wheel.Button == MouseButton.WheelUp)
             {
-                _highlightedFilteredIndex = (_highlightedFilteredIndex + _filteredIndices.Count - 1) % _filteredIndices.Count;
+                _options.MovePreviousVisible();
                 changed = true;
             }
         }
@@ -176,14 +161,14 @@ public sealed class ComboboxComponent : IStatefulComponent, IMouseStatefulCompon
         }
 
         var hoveredField = message.Y == content.Y;
-        var hoveredOption = RowToFilteredIndex(content, message.Y);
+        var hoveredOption = RowToVisibleIndex(content, message.Y);
         if (message is MouseMotionMsg && InteractionProfile.HoverOnMotion)
         {
             changed |= SetFieldHovered(hoveredField);
-            changed |= SetHoveredFilteredIndex(hoveredOption);
+            changed |= _options.SetHoveredVisibleIndex(hoveredOption);
             if (hoveredOption >= 0)
             {
-                _highlightedFilteredIndex = hoveredOption;
+                SetHighlightedVisibleIndex(hoveredOption);
             }
 
             return changed;
@@ -194,7 +179,7 @@ public sealed class ComboboxComponent : IStatefulComponent, IMouseStatefulCompon
             if (InteractionProfile.HoverOnClick)
             {
                 changed |= SetFieldHovered(hoveredField);
-                changed |= SetHoveredFilteredIndex(hoveredOption);
+                changed |= _options.SetHoveredVisibleIndex(hoveredOption);
             }
 
             if (click.Button == MouseButton.Left && InteractionProfile.ActivateOnClick)
@@ -204,11 +189,7 @@ public sealed class ComboboxComponent : IStatefulComponent, IMouseStatefulCompon
                     if (!IsOpen && InteractionProfile.OpenOnClick)
                     {
                         IsOpen = true;
-                        if (_filteredIndices.Count > 0)
-                        {
-                            _highlightedFilteredIndex = Math.Clamp(_highlightedFilteredIndex, 0, _filteredIndices.Count - 1);
-                        }
-
+                        _options.AlignHighlightToSelectionOrStart();
                         changed = true;
                     }
                     else if (IsOpen)
@@ -219,7 +200,7 @@ public sealed class ComboboxComponent : IStatefulComponent, IMouseStatefulCompon
                 }
                 else if (IsOpen && hoveredOption >= 0)
                 {
-                    _highlightedFilteredIndex = hoveredOption;
+                    changed |= SetHighlightedVisibleIndex(hoveredOption);
                     changed |= SelectHighlighted();
                 }
             }
@@ -261,29 +242,29 @@ public sealed class ComboboxComponent : IStatefulComponent, IMouseStatefulCompon
             return;
         }
 
-        if (_filteredIndices.Count == 0)
+        if (_options.VisibleCount == 0)
         {
             canvas.WriteText(content.X, content.Y + 1, OptionStatePalette.Render("(no matches)", ResolveNoMatchStates()), content.Width);
             return;
         }
 
         var visibleRows = Math.Min(Math.Max(1, MaxVisibleItems), content.Height - 1);
-        var start = ComputeWindowStart(_highlightedFilteredIndex, visibleRows, _filteredIndices.Count);
-        var end = Math.Min(_filteredIndices.Count, start + visibleRows);
+        var start = OptionListViewport.ComputeWindowStart(_options.HighlightedVisibleIndex, visibleRows, _options.VisibleCount);
+        var end = Math.Min(_options.VisibleCount, start + visibleRows);
         var row = 0;
-        for (var i = start; i < end; i++, row++)
+        for (var visibleIndex = start; visibleIndex < end; visibleIndex++, row++)
         {
-            var itemIndex = _filteredIndices[i];
-            var highlight = i == _highlightedFilteredIndex ? ">" : " ";
-            var selectedMarker = itemIndex == SelectedIndex ? "*" : " ";
-            var text = $"{highlight}{selectedMarker} {_items[itemIndex]}";
-            canvas.WriteText(content.X, content.Y + 1 + row, OptionStatePalette.Render(text, ResolveOptionStates(i, itemIndex)), content.Width);
+            var itemIndex = _options.VisibleItemIndexAt(visibleIndex);
+            var highlight = visibleIndex == _options.HighlightedVisibleIndex ? ">" : " ";
+            var selectedMarker = itemIndex == _options.SelectedIndex ? "*" : " ";
+            var text = $"{highlight}{selectedMarker} {_options.Items[itemIndex]}";
+            canvas.WriteText(content.X, content.Y + 1 + row, OptionStatePalette.Render(text, ResolveOptionStates(visibleIndex, itemIndex)), content.Width);
         }
     }
 
     private IReadOnlyCollection<WidgetVisualState> ResolveFieldStates()
     {
-        var states = new List<WidgetVisualState>(5);
+        var states = new List<WidgetVisualState>(6);
         if (Focused)
         {
             states.Add(WidgetVisualState.Focused);
@@ -299,7 +280,7 @@ public sealed class ComboboxComponent : IStatefulComponent, IMouseStatefulCompon
             states.Add(WidgetVisualState.ReadOnly);
         }
 
-        if (_items.Count == 0)
+        if (_options.Count == 0)
         {
             states.Add(WidgetVisualState.Empty);
         }
@@ -330,26 +311,26 @@ public sealed class ComboboxComponent : IStatefulComponent, IMouseStatefulCompon
         return states;
     }
 
-    private IReadOnlyCollection<WidgetVisualState> ResolveOptionStates(int filteredIndex, int itemIndex)
+    private IReadOnlyCollection<WidgetVisualState> ResolveOptionStates(int visibleIndex, int itemIndex)
     {
         var states = new List<WidgetVisualState>(7);
         states.AddRange(ResolveFieldStates());
-        if (filteredIndex == _highlightedFilteredIndex)
+        if (visibleIndex == _options.HighlightedVisibleIndex)
         {
             states.Add(WidgetVisualState.Cursor);
         }
 
-        if (itemIndex == SelectedIndex)
+        if (itemIndex == _options.SelectedIndex)
         {
             states.Add(WidgetVisualState.Selected);
         }
 
-        if (filteredIndex == _hoveredFilteredIndex)
+        if (visibleIndex == _options.HoveredVisibleIndex)
         {
             states.Add(WidgetVisualState.Hovered);
         }
 
-        if (OptionStateResolver?.Invoke(_items[itemIndex], itemIndex) is { } custom)
+        if (OptionStateResolver?.Invoke(_options.Items[itemIndex], itemIndex) is { } custom)
         {
             states.AddRange(custom);
         }
@@ -359,121 +340,28 @@ public sealed class ComboboxComponent : IStatefulComponent, IMouseStatefulCompon
 
     private bool SelectHighlighted()
     {
-        if (_filteredIndices.Count == 0)
+        if (!_options.TrySelectHighlighted(out var selectedIndex))
         {
             IsOpen = false;
             return true;
         }
 
-        var selectedFiltered = Math.Clamp(_highlightedFilteredIndex, 0, _filteredIndices.Count - 1);
-        SelectedIndex = _filteredIndices[selectedFiltered];
-        Input.SetValue(_items[SelectedIndex]);
-        RefreshFilteredIndices();
+        Input.SetValue(_options.Items[selectedIndex]);
+        _options.ApplyFilter(Input.Value);
         IsOpen = false;
         return true;
     }
 
-    private void RefreshFilteredIndices()
-    {
-        _filteredIndices.Clear();
-        var filter = Input.Value.Trim();
-        for (var i = 0; i < _items.Count; i++)
-        {
-            var include = filter.Length == 0
-                || _items[i].Contains(filter, StringComparison.OrdinalIgnoreCase);
-            if (include)
-            {
-                _filteredIndices.Add(i);
-            }
-        }
-
-        if (_filteredIndices.Count == 0)
-        {
-            _highlightedFilteredIndex = 0;
-            _hoveredFilteredIndex = -1;
-            return;
-        }
-
-        if (SelectedIndex >= 0)
-        {
-            var selectedFilteredIndex = _filteredIndices.IndexOf(SelectedIndex);
-            if (selectedFilteredIndex >= 0)
-            {
-                _highlightedFilteredIndex = selectedFilteredIndex;
-                return;
-            }
-        }
-
-        _highlightedFilteredIndex = Math.Clamp(_highlightedFilteredIndex, 0, _filteredIndices.Count - 1);
-        if (_hoveredFilteredIndex >= _filteredIndices.Count)
-        {
-            _hoveredFilteredIndex = _filteredIndices.Count - 1;
-        }
-    }
-
-    private static int ComputeWindowStart(int highlightedIndex, int rows, int count)
-    {
-        if (count <= rows)
-        {
-            return 0;
-        }
-
-        var half = rows / 2;
-        var start = highlightedIndex - half;
-        if (start < 0)
-        {
-            return 0;
-        }
-
-        var maxStart = count - rows;
-        if (start > maxStart)
-        {
-            return maxStart;
-        }
-
-        return start;
-    }
-
     private Rect ResolveContentRect(Rect bounds)
     {
-        return ShowBorder
-            ? bounds.Inset(1, 1)
-            : bounds;
+        return ShowBorder ? bounds.Inset(1, 1) : bounds;
     }
 
-    private int RowToFilteredIndex(Rect content, int y)
+    private int RowToVisibleIndex(Rect content, int y)
     {
-        if (!IsOpen || content.Height <= 1 || _filteredIndices.Count == 0)
-        {
-            return -1;
-        }
-
-        var row = y - (content.Y + 1);
-        if (row < 0 || row >= Math.Min(Math.Max(1, MaxVisibleItems), content.Height - 1))
-        {
-            return -1;
-        }
-
-        var visibleRows = Math.Min(Math.Max(1, MaxVisibleItems), content.Height - 1);
-        var start = ComputeWindowStart(_highlightedFilteredIndex, visibleRows, _filteredIndices.Count);
-        var filtered = start + row;
-        if (filtered < 0 || filtered >= _filteredIndices.Count)
-        {
-            return -1;
-        }
-
-        return filtered;
-    }
-
-    private bool SetHoveredFilteredIndex(int index)
-    {
-        if (_hoveredFilteredIndex == index)
-        {
-            return false;
-        }
-
-        _hoveredFilteredIndex = index;
-        return true;
+        return IsOpen
+            ? OptionListViewport.RowToVisibleIndex(content, y, MaxVisibleItems, _options.VisibleCount, _options.HighlightedVisibleIndex)
+            : -1;
     }
 
     private bool SetFieldHovered(bool hovered)
@@ -486,5 +374,26 @@ public sealed class ComboboxComponent : IStatefulComponent, IMouseStatefulCompon
         _fieldHovered = hovered;
         return true;
     }
-}
 
+    private bool SetHighlightedVisibleIndex(int index)
+    {
+        if (index < 0 || index >= _options.VisibleCount || index == _options.HighlightedVisibleIndex)
+        {
+            return false;
+        }
+
+        while (_options.HighlightedVisibleIndex != index)
+        {
+            if (_options.HighlightedVisibleIndex < index)
+            {
+                _options.MoveNextVisible();
+            }
+            else
+            {
+                _options.MovePreviousVisible();
+            }
+        }
+
+        return true;
+    }
+}

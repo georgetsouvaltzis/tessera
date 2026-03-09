@@ -113,7 +113,7 @@ public sealed class SortableTableComponent : IStatefulComponent, IMouseStatefulC
         }
 
         var state = BuildRenderState();
-        var content = ResolveTableContentRect(bounds, state.Title);
+        var content = SortableTablePointerHelper.ResolveContentRect(bounds, ShowBorder, state.Title);
         if (content.IsEmpty || content.Height < 3)
         {
             return false;
@@ -147,7 +147,7 @@ public sealed class SortableTableComponent : IStatefulComponent, IMouseStatefulC
 
         if (message is MouseMotionMsg && InteractionProfile.HoverOnMotion)
         {
-            changed |= SetHoveredVisibleRow(RowFromPointer(content, message.Y, state.VisibleRows.Count));
+            changed |= SetHoveredVisibleRow(SortableTablePointerHelper.RowFromPointer(content, message.Y, state.VisibleRowCount));
             return changed;
         }
 
@@ -155,7 +155,7 @@ public sealed class SortableTableComponent : IStatefulComponent, IMouseStatefulC
         {
             if (InteractionProfile.HoverOnClick)
             {
-                changed |= SetHoveredVisibleRow(RowFromPointer(content, click.Y, state.VisibleRows.Count));
+                changed |= SetHoveredVisibleRow(SortableTablePointerHelper.RowFromPointer(content, click.Y, state.VisibleRowCount));
             }
 
             if (click.Button == MouseButton.Left && InteractionProfile.ActivateOnClick)
@@ -176,16 +176,14 @@ public sealed class SortableTableComponent : IStatefulComponent, IMouseStatefulC
     public void Render(Canvas canvas, Rect rect)
     {
         var state = BuildRenderState();
-        NormalizeVisibleRowPointers(state.VisibleRows.Count);
+        NormalizeVisibleRowPointers(state.VisibleRowCount);
 
         Widgets.DrawTable(
             canvas,
             rect,
             Headers,
             state.VisibleRows,
-            selectedRow: _selectedVisibleRow >= 0
-                ? _selectedVisibleRow
-                : _hoveredVisibleRow,
+            selectedRow: _selectedVisibleRow >= 0 ? _selectedVisibleRow : _hoveredVisibleRow,
             title: state.Title,
             showBorder: ShowBorder);
     }
@@ -195,16 +193,6 @@ public sealed class SortableTableComponent : IStatefulComponent, IMouseStatefulC
         var safePageSize = Math.Max(1, PageSize);
         var pageCount = Math.Max(1, (_rows.Count + safePageSize - 1) / safePageSize);
         PageIndex = Math.Clamp(PageIndex, 0, pageCount - 1);
-    }
-
-    private static string ValueAt(IReadOnlyList<string> row, int column)
-    {
-        if (column < 0 || column >= row.Count)
-        {
-            return string.Empty;
-        }
-
-        return row[column];
     }
 
     private bool HandleWheelNavigation(MouseWheelMsg wheel)
@@ -249,11 +237,11 @@ public sealed class SortableTableComponent : IStatefulComponent, IMouseStatefulC
         return PageIndex != previousPage;
     }
 
-    private bool HandlePointerActivation(int x, int y, Rect content, TableRenderState state)
+    private bool HandlePointerActivation(int x, int y, Rect content, SortableTableRenderState state)
     {
         if (y == content.Y)
         {
-            var column = HeaderColumnFromPointer(x, content);
+            var column = SortableTablePointerHelper.HeaderColumnFromPointer(x, content, Headers.Count);
             if (column < 0)
             {
                 return false;
@@ -272,68 +260,14 @@ public sealed class SortableTableComponent : IStatefulComponent, IMouseStatefulC
             return true;
         }
 
-        var row = RowFromPointer(content, y, state.VisibleRows.Count);
-        if (row < 0)
-        {
-            return false;
-        }
-
-        if (_selectedVisibleRow == row)
+        var row = SortableTablePointerHelper.RowFromPointer(content, y, state.VisibleRowCount);
+        if (row < 0 || _selectedVisibleRow == row)
         {
             return false;
         }
 
         _selectedVisibleRow = row;
         return true;
-    }
-
-    private int HeaderColumnFromPointer(int x, Rect content)
-    {
-        var separatorCount = Headers.Count - 1;
-        var availableWidth = Math.Max(Headers.Count, content.Width - separatorCount);
-        var widths = ComputeColumnWidths(availableWidth, Headers.Count);
-
-        var cursor = content.X;
-        for (var i = 0; i < widths.Length; i++)
-        {
-            var end = cursor + widths[i];
-            if (x >= cursor && x < end)
-            {
-                return i;
-            }
-
-            cursor = end;
-            if (i < widths.Length - 1)
-            {
-                cursor++;
-            }
-        }
-
-        return -1;
-    }
-
-    private static int[] ComputeColumnWidths(int width, int columns)
-    {
-        var widths = new int[columns];
-        var baseWidth = width / columns;
-        var remainder = width % columns;
-        for (var i = 0; i < columns; i++)
-        {
-            widths[i] = baseWidth + (i < remainder ? 1 : 0);
-        }
-
-        return widths;
-    }
-
-    private static int RowFromPointer(Rect content, int y, int visibleRows)
-    {
-        var row = y - (content.Y + 2);
-        if (row < 0 || row >= visibleRows)
-        {
-            return -1;
-        }
-
-        return row;
     }
 
     private bool SetHoveredVisibleRow(int row)
@@ -349,72 +283,24 @@ public sealed class SortableTableComponent : IStatefulComponent, IMouseStatefulC
 
     private void NormalizeVisibleRowPointers(int visibleRows)
     {
-        if (visibleRows <= 0)
-        {
-            _hoveredVisibleRow = -1;
-            _selectedVisibleRow = -1;
-            return;
-        }
-
-        if (_hoveredVisibleRow >= visibleRows)
-        {
-            _hoveredVisibleRow = visibleRows - 1;
-        }
-
-        if (_selectedVisibleRow >= visibleRows)
-        {
-            _selectedVisibleRow = visibleRows - 1;
-        }
+        (_hoveredVisibleRow, _selectedVisibleRow) = SortableTablePointerHelper.NormalizeVisibleRowPointers(
+            _hoveredVisibleRow,
+            _selectedVisibleRow,
+            visibleRows);
     }
 
-    private TableRenderState BuildRenderState()
+    private SortableTableRenderState BuildRenderState()
     {
-        var sorted = _rows
-            .OrderBy(row => ValueAt(row, SortColumn), StringComparer.OrdinalIgnoreCase)
-            .ToList();
-        if (SortDescending)
-        {
-            sorted.Reverse();
-        }
-
-        var safePageSize = Math.Max(1, PageSize);
-        var pageCount = Math.Max(1, (sorted.Count + safePageSize - 1) / safePageSize);
-        var page = Math.Clamp(PageIndex, 0, pageCount - 1);
-        var offset = page * safePageSize;
-        var visibleRows = sorted.Skip(offset).Take(safePageSize).ToList();
-        if (EnableVirtualization)
-        {
-            var virtualOffset = Math.Clamp(VirtualStartIndex, 0, Math.Max(0, sorted.Count - 1));
-            var safeWindow = Math.Max(1, VirtualWindowSize);
-            visibleRows = sorted.Skip(virtualOffset).Take(safeWindow).ToList();
-        }
-
-        return new TableRenderState(visibleRows, BuildTitle(page, pageCount));
+        return SortableTableRenderStateBuilder.Build(
+            _rows,
+            Headers,
+            Title,
+            SortColumn,
+            SortDescending,
+            PageSize,
+            PageIndex,
+            EnableVirtualization,
+            VirtualStartIndex,
+            VirtualWindowSize);
     }
-
-    private string BuildTitle(int page, int pageCount)
-    {
-        return EnableVirtualization
-            ? $"{Title} v{VirtualStartIndex + 1}+{Math.Max(1, VirtualWindowSize)} sort:{Headers[Math.Min(SortColumn, Headers.Count - 1)]} {(SortDescending ? "desc" : "asc")}"
-            : $"{Title} p{page + 1}/{pageCount} sort:{Headers[Math.Min(SortColumn, Headers.Count - 1)]} {(SortDescending ? "desc" : "asc")}";
-    }
-
-    private Rect ResolveTableContentRect(Rect bounds, string title)
-    {
-        if (ShowBorder)
-        {
-            return bounds.Inset(1, 1);
-        }
-
-        var content = bounds;
-        if (!string.IsNullOrWhiteSpace(title))
-        {
-            content = new Rect(content.X, content.Y + 1, content.Width, Math.Max(0, content.Height - 1));
-        }
-
-        return content;
-    }
-
-    private sealed record TableRenderState(IReadOnlyList<IReadOnlyList<string>> VisibleRows, string Title);
 }
-

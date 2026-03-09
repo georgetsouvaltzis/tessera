@@ -6,9 +6,7 @@ namespace TeaSharp.Components;
 
 public sealed class DropdownComponent : IStatefulComponent, IMouseStatefulComponent, IFocusableComponent
 {
-    private readonly List<string> _items = [];
-    private int _highlightedIndex;
-    private int _hoveredIndex = -1;
+    private readonly OptionListController _options = new();
     private bool _fieldHovered;
 
     public string Title { get; set; } = "Dropdown";
@@ -29,7 +27,7 @@ public sealed class DropdownComponent : IStatefulComponent, IMouseStatefulCompon
 
     public bool IsOpen { get; private set; }
 
-    public int SelectedIndex { get; private set; } = -1;
+    public int SelectedIndex => _options.SelectedIndex;
 
     public int MaxVisibleItems { get; set; } = 6;
 
@@ -47,35 +45,21 @@ public sealed class DropdownComponent : IStatefulComponent, IMouseStatefulCompon
 
     public KeyBinding ConfirmSelectionKey { get; set; } = new("enter/space", "select", "enter", "space");
 
-    public string SelectedItem => SelectedIndex >= 0 && SelectedIndex < _items.Count
-        ? _items[SelectedIndex]
-        : string.Empty;
+    public string SelectedItem => _options.SelectedItem;
 
     public void SetItems(IEnumerable<string> items)
     {
-        _items.Clear();
-        _items.AddRange(items);
-        if (_items.Count == 0)
+        _options.SetItems(items, selectFirstItemWhenUnset: true);
+        _fieldHovered = false;
+        if (_options.Count == 0)
         {
-            SelectedIndex = -1;
-            _highlightedIndex = 0;
-            _hoveredIndex = -1;
-            _fieldHovered = false;
             IsOpen = false;
-            return;
         }
-
-        if (SelectedIndex < 0 || SelectedIndex >= _items.Count)
-        {
-            SelectedIndex = 0;
-        }
-
-        _highlightedIndex = SelectedIndex;
     }
 
     public bool Update(IMessage message)
     {
-        if (!Focused || Disabled || ReadOnly || message is not KeyPressMsg key || _items.Count == 0)
+        if (!Focused || Disabled || ReadOnly || message is not KeyPressMsg key || _options.Count == 0)
         {
             return false;
         }
@@ -85,7 +69,7 @@ public sealed class DropdownComponent : IStatefulComponent, IMouseStatefulCompon
             if (ToggleOpenKey.Matches(key) || OpenKey.Matches(key))
             {
                 IsOpen = true;
-                _highlightedIndex = Math.Clamp(SelectedIndex, 0, _items.Count - 1);
+                _options.AlignHighlightToSelectionOrStart();
                 return true;
             }
 
@@ -100,21 +84,21 @@ public sealed class DropdownComponent : IStatefulComponent, IMouseStatefulCompon
 
         if (NextItemKey.Matches(key))
         {
-            _highlightedIndex = (_highlightedIndex + 1) % _items.Count;
+            _options.MoveNextVisible();
             return true;
         }
 
         if (PreviousItemKey.Matches(key))
         {
-            _highlightedIndex = (_highlightedIndex + _items.Count - 1) % _items.Count;
+            _options.MovePreviousVisible();
             return true;
         }
 
         if (ConfirmSelectionKey.Matches(key))
         {
-            SelectedIndex = _highlightedIndex;
+            var changed = _options.TrySelectHighlighted(out _);
             IsOpen = false;
-            return true;
+            return changed || true;
         }
 
         return false;
@@ -122,7 +106,7 @@ public sealed class DropdownComponent : IStatefulComponent, IMouseStatefulCompon
 
     public bool UpdateMouse(MouseMsg message, Rect bounds)
     {
-        if (Disabled || ReadOnly || _items.Count == 0)
+        if (Disabled || ReadOnly || _options.Count == 0)
         {
             return false;
         }
@@ -141,7 +125,7 @@ public sealed class DropdownComponent : IStatefulComponent, IMouseStatefulCompon
             if (message is MouseMotionMsg or MouseClickMsg)
             {
                 changed |= SetFieldHovered(false);
-                changed |= SetHoveredOptionIndex(-1);
+                changed |= _options.SetHoveredVisibleIndex(-1);
             }
 
             if (message is not MouseWheelMsg)
@@ -154,12 +138,12 @@ public sealed class DropdownComponent : IStatefulComponent, IMouseStatefulCompon
         {
             if (wheel.Button == MouseButton.WheelDown)
             {
-                _highlightedIndex = (_highlightedIndex + 1) % _items.Count;
+                _options.MoveNextVisible();
                 changed = true;
             }
             else if (wheel.Button == MouseButton.WheelUp)
             {
-                _highlightedIndex = (_highlightedIndex + _items.Count - 1) % _items.Count;
+                _options.MovePreviousVisible();
                 changed = true;
             }
         }
@@ -170,14 +154,14 @@ public sealed class DropdownComponent : IStatefulComponent, IMouseStatefulCompon
         }
 
         var hoveredField = message.Y == content.Y;
-        var hoveredOptionIndex = RowToItemIndex(content, message.Y);
+        var hoveredOptionIndex = RowToVisibleIndex(content, message.Y);
         if (message is MouseMotionMsg && InteractionProfile.HoverOnMotion)
         {
             changed |= SetFieldHovered(hoveredField);
-            changed |= SetHoveredOptionIndex(hoveredOptionIndex);
+            changed |= _options.SetHoveredVisibleIndex(hoveredOptionIndex);
             if (hoveredOptionIndex >= 0)
             {
-                _highlightedIndex = hoveredOptionIndex;
+                changed |= SetHighlightedVisibleIndex(hoveredOptionIndex);
             }
 
             return changed;
@@ -188,7 +172,7 @@ public sealed class DropdownComponent : IStatefulComponent, IMouseStatefulCompon
             if (InteractionProfile.HoverOnClick)
             {
                 changed |= SetFieldHovered(hoveredField);
-                changed |= SetHoveredOptionIndex(hoveredOptionIndex);
+                changed |= _options.SetHoveredVisibleIndex(hoveredOptionIndex);
             }
 
             if (click.Button == MouseButton.Left && InteractionProfile.ActivateOnClick)
@@ -198,7 +182,7 @@ public sealed class DropdownComponent : IStatefulComponent, IMouseStatefulCompon
                     if (!IsOpen && InteractionProfile.OpenOnClick)
                     {
                         IsOpen = true;
-                        _highlightedIndex = Math.Clamp(SelectedIndex, 0, _items.Count - 1);
+                        _options.AlignHighlightToSelectionOrStart();
                         changed = true;
                     }
                     else if (IsOpen)
@@ -209,18 +193,9 @@ public sealed class DropdownComponent : IStatefulComponent, IMouseStatefulCompon
                 }
                 else if (IsOpen && hoveredOptionIndex >= 0)
                 {
-                    _highlightedIndex = hoveredOptionIndex;
-                    if (SelectedIndex != hoveredOptionIndex)
-                    {
-                        SelectedIndex = hoveredOptionIndex;
-                        changed = true;
-                    }
-
-                    if (IsOpen)
-                    {
-                        IsOpen = false;
-                        changed = true;
-                    }
+                    changed |= SelectVisible(hoveredOptionIndex);
+                    IsOpen = false;
+                    changed = true;
                 }
             }
         }
@@ -236,41 +211,34 @@ public sealed class DropdownComponent : IStatefulComponent, IMouseStatefulCompon
             return;
         }
 
-        Rect content;
-        if (ShowBorder)
-        {
-            canvas.DrawBox(clipped, Focused ? $"{Title} *" : Title);
-            content = clipped.Inset(1, 1);
-        }
-        else
-        {
-            content = clipped;
-        }
-
+        var content = ShowBorder
+            ? DrawBorderAndResolveContent(canvas, clipped)
+            : clipped;
         if (content.IsEmpty)
         {
             return;
         }
 
         var indicator = IsOpen ? "^" : "v";
-        var selected = _items.Count == 0 ? "(empty)" : SelectedItem;
+        var selected = _options.Count == 0 ? "(empty)" : SelectedItem;
         canvas.WriteText(content.X, content.Y, FieldStatePalette.Render($"{indicator} {selected}", ResolveFieldStates()), content.Width);
 
-        if (!IsOpen || content.Height <= 1 || _items.Count == 0)
+        if (!IsOpen || content.Height <= 1 || _options.Count == 0)
         {
             return;
         }
 
         var visibleRows = Math.Min(Math.Max(1, MaxVisibleItems), content.Height - 1);
-        var start = ComputeWindowStart(_highlightedIndex, visibleRows, _items.Count);
-        var end = Math.Min(_items.Count, start + visibleRows);
+        var start = OptionListViewport.ComputeWindowStart(_options.HighlightedVisibleIndex, visibleRows, _options.VisibleCount);
+        var end = Math.Min(_options.VisibleCount, start + visibleRows);
         var row = 0;
-        for (var index = start; index < end; index++, row++)
+        for (var visibleIndex = start; visibleIndex < end; visibleIndex++, row++)
         {
-            var highlight = index == _highlightedIndex ? ">" : " ";
-            var selectedMarker = index == SelectedIndex ? "*" : " ";
-            var text = $"{highlight}{selectedMarker} {_items[index]}";
-            canvas.WriteText(content.X, content.Y + 1 + row, OptionStatePalette.Render(text, ResolveOptionStates(index)), content.Width);
+            var itemIndex = _options.VisibleItemIndexAt(visibleIndex);
+            var highlight = visibleIndex == _options.HighlightedVisibleIndex ? ">" : " ";
+            var selectedMarker = itemIndex == _options.SelectedIndex ? "*" : " ";
+            var text = $"{highlight}{selectedMarker} {_options.Items[itemIndex]}";
+            canvas.WriteText(content.X, content.Y + 1 + row, OptionStatePalette.Render(text, ResolveOptionStates(visibleIndex, itemIndex)), content.Width);
         }
     }
 
@@ -292,7 +260,7 @@ public sealed class DropdownComponent : IStatefulComponent, IMouseStatefulCompon
             states.Add(WidgetVisualState.ReadOnly);
         }
 
-        if (_items.Count == 0)
+        if (_options.Count == 0)
         {
             states.Add(WidgetVisualState.Empty);
         }
@@ -305,26 +273,26 @@ public sealed class DropdownComponent : IStatefulComponent, IMouseStatefulCompon
         return states;
     }
 
-    private IReadOnlyCollection<WidgetVisualState> ResolveOptionStates(int index)
+    private IReadOnlyCollection<WidgetVisualState> ResolveOptionStates(int visibleIndex, int itemIndex)
     {
         var states = new List<WidgetVisualState>(7);
         states.AddRange(ResolveFieldStates());
-        if (index == _highlightedIndex)
+        if (visibleIndex == _options.HighlightedVisibleIndex)
         {
             states.Add(WidgetVisualState.Cursor);
         }
 
-        if (index == SelectedIndex)
+        if (itemIndex == _options.SelectedIndex)
         {
             states.Add(WidgetVisualState.Selected);
         }
 
-        if (index == _hoveredIndex)
+        if (visibleIndex == _options.HoveredVisibleIndex)
         {
             states.Add(WidgetVisualState.Hovered);
         }
 
-        if (OptionStateResolver?.Invoke(_items[index], index) is { } custom)
+        if (OptionStateResolver?.Invoke(_options.Items[itemIndex], itemIndex) is { } custom)
         {
             states.AddRange(custom);
         }
@@ -332,68 +300,54 @@ public sealed class DropdownComponent : IStatefulComponent, IMouseStatefulCompon
         return states;
     }
 
-    private static int ComputeWindowStart(int highlightedIndex, int rows, int count)
+    private Rect DrawBorderAndResolveContent(Canvas canvas, Rect clipped)
     {
-        if (count <= rows)
-        {
-            return 0;
-        }
-
-        var half = rows / 2;
-        var start = highlightedIndex - half;
-        if (start < 0)
-        {
-            return 0;
-        }
-
-        var maxStart = count - rows;
-        if (start > maxStart)
-        {
-            return maxStart;
-        }
-
-        return start;
+        canvas.DrawBox(clipped, Focused ? $"{Title} *" : Title);
+        return clipped.Inset(1, 1);
     }
 
     private Rect ResolveContentRect(Rect bounds)
     {
-        return ShowBorder
-            ? bounds.Inset(1, 1)
-            : bounds;
+        return ShowBorder ? bounds.Inset(1, 1) : bounds;
     }
 
-    private int RowToItemIndex(Rect content, int y)
+    private int RowToVisibleIndex(Rect content, int y)
     {
-        if (!IsOpen || content.Height <= 1)
-        {
-            return -1;
-        }
-
-        var row = y - (content.Y + 1);
-        if (row < 0 || row >= Math.Min(Math.Max(1, MaxVisibleItems), content.Height - 1))
-        {
-            return -1;
-        }
-
-        var visibleRows = Math.Min(Math.Max(1, MaxVisibleItems), content.Height - 1);
-        var start = ComputeWindowStart(_highlightedIndex, visibleRows, _items.Count);
-        var index = start + row;
-        if (index < 0 || index >= _items.Count)
-        {
-            return -1;
-        }
-
-        return index;
+        return IsOpen
+            ? OptionListViewport.RowToVisibleIndex(content, y, MaxVisibleItems, _options.VisibleCount, _options.HighlightedVisibleIndex)
+            : -1;
     }
 
-    private bool SetHoveredOptionIndex(int index)
+    private bool SelectVisible(int visibleIndex)
     {
-        if (_hoveredIndex == index)
+        if (visibleIndex < 0 || visibleIndex >= _options.VisibleCount)
         {
             return false;
         }
 
-        _hoveredIndex = index;
+        return _options.SetSelectedIndex(_options.VisibleItemIndexAt(visibleIndex));
+    }
+
+
+    private bool SetHighlightedVisibleIndex(int index)
+    {
+        if (index < 0 || index >= _options.VisibleCount || index == _options.HighlightedVisibleIndex)
+        {
+            return false;
+        }
+
+        while (_options.HighlightedVisibleIndex != index)
+        {
+            if (_options.HighlightedVisibleIndex < index)
+            {
+                _options.MoveNextVisible();
+            }
+            else
+            {
+                _options.MovePreviousVisible();
+            }
+        }
+
         return true;
     }
 
@@ -408,4 +362,3 @@ public sealed class DropdownComponent : IStatefulComponent, IMouseStatefulCompon
         return true;
     }
 }
-
