@@ -89,25 +89,15 @@ public sealed class LogViewerComponent : IStatefulComponent, IFocusableComponent
             return;
         }
 
-        var title = Focused
-            ? $"{Title} *"
-            : Title;
+        var title = Focused ? $"{Title} *" : Title;
         if (Paused)
         {
             title += " [paused]";
         }
 
-        Rect content;
-        if (ShowBorder)
-        {
-            canvas.DrawBox(clipped, title);
-            content = clipped.Inset(1, 1);
-        }
-        else
-        {
-            content = clipped;
-        }
-
+        var content = ShowBorder
+            ? DrawBorderAndResolveContent(canvas, clipped, title)
+            : clipped;
         if (content.IsEmpty)
         {
             return;
@@ -122,12 +112,14 @@ public sealed class LogViewerComponent : IStatefulComponent, IFocusableComponent
         }
     }
 
+    private Rect DrawBorderAndResolveContent(Canvas canvas, Rect clipped, string title)
+    {
+        canvas.DrawBox(clipped, title);
+        return clipped.Inset(1, 1);
+    }
+
     private void RefreshViewport()
     {
-        var visible = string.IsNullOrWhiteSpace(Filter)
-            ? _entries
-            : _entries.Where(line => line.Contains(Filter, StringComparison.OrdinalIgnoreCase)).ToList();
-        _viewport.SetContent(string.Join("\n", visible));
+        _viewport.SetLines(LogViewerContent.Filter(_entries, Filter));
     }
 }
-

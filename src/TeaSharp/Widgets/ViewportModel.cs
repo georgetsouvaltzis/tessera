@@ -51,11 +51,18 @@ public sealed class ViewportModel
 
     public void SetContent(string content)
     {
+        SetLines(ViewportLineFormatter.NormalizeContentLines(content));
+    }
+
+    public void SetLines(IEnumerable<string> lines)
+    {
         _sourceLines.Clear();
-        var normalized = content
-            .Replace("\r\n", "\n", StringComparison.Ordinal)
-            .Replace('\r', '\n');
-        _sourceLines.AddRange(normalized.Split('\n'));
+        _sourceLines.AddRange(lines);
+        if (_sourceLines.Count == 0)
+        {
+            _sourceLines.Add(string.Empty);
+        }
+
         _visualCacheDirty = true;
         ClampOffsets();
     }
@@ -108,49 +115,19 @@ public sealed class ViewportModel
 
         if (message is KeyPressMsg key)
         {
-            if (keyMap.Up.Matches(key))
-            {
-                ScrollBy(-1);
-            }
-            else if (keyMap.Down.Matches(key))
-            {
-                ScrollBy(1);
-            }
-            else if (keyMap.PageUp.Matches(key))
-            {
-                ScrollBy(-Height);
-            }
-            else if (keyMap.PageDown.Matches(key))
-            {
-                ScrollBy(Height);
-            }
-            else if (keyMap.Home.Matches(key))
-            {
-                ScrollToTop();
-            }
-            else if (keyMap.End.Matches(key))
-            {
-                ScrollToBottom();
-            }
-            else if (keyMap.Left.Matches(key))
-            {
-                ScrollBy(0, -2);
-            }
-            else if (keyMap.Right.Matches(key))
-            {
-                ScrollBy(0, 2);
-            }
+            if (keyMap.Up.Matches(key)) ScrollBy(-1);
+            else if (keyMap.Down.Matches(key)) ScrollBy(1);
+            else if (keyMap.PageUp.Matches(key)) ScrollBy(-Height);
+            else if (keyMap.PageDown.Matches(key)) ScrollBy(Height);
+            else if (keyMap.Home.Matches(key)) ScrollToTop();
+            else if (keyMap.End.Matches(key)) ScrollToBottom();
+            else if (keyMap.Left.Matches(key)) ScrollBy(0, -2);
+            else if (keyMap.Right.Matches(key)) ScrollBy(0, 2);
         }
         else if (message is MouseWheelMsg wheel)
         {
-            if (wheel.Button == MouseButton.WheelUp)
-            {
-                ScrollBy(-3);
-            }
-            else if (wheel.Button == MouseButton.WheelDown)
-            {
-                ScrollBy(3);
-            }
+            if (wheel.Button == MouseButton.WheelUp) ScrollBy(-3);
+            else if (wheel.Button == MouseButton.WheelDown) ScrollBy(3);
         }
 
         return beforeX != XOffset || beforeY != YOffset;
@@ -172,128 +149,26 @@ public sealed class ViewportModel
         }
 
         var rendered = new List<string>(max);
-        var lineNumberWidth = ShowLineNumbers
-            ? Math.Max(2, (visualLines.Count + 1).ToString(System.Globalization.CultureInfo.InvariantCulture).Length)
-            : 0;
+        var lineNumberWidth = ViewportLineFormatter.ComputeLineNumberWidth(ShowLineNumbers, visualLines.Count);
         for (var i = 0; i < max; i++)
         {
             var visualIndex = start + i;
             var line = visualLines[visualIndex];
-            var clipped = ClipLine(line, lineNumberWidth);
-            rendered.Add(DecorateLine(clipped, visualIndex, lineNumberWidth));
+            var clipped = ViewportLineFormatter.ClipLine(line, Wrap, Width, XOffset, ShowLineNumbers, lineNumberWidth);
+            rendered.Add(ViewportLineFormatter.DecorateLine(clipped, ShowLineNumbers, HighlightVisualLine, visualIndex, lineNumberWidth, Width));
         }
 
         return rendered;
     }
 
-    private string ClipLine(string line, int lineNumberWidth)
-    {
-        var availableWidth = ShowLineNumbers
-            ? Math.Max(0, Width - (lineNumberWidth + 2))
-            : Width;
-        if (availableWidth <= 0)
-        {
-            return string.Empty;
-        }
-
-        if (Wrap)
-        {
-            return line.Length <= availableWidth
-                ? line
-                : line[..availableWidth];
-        }
-
-        if (XOffset >= line.Length)
-        {
-            return string.Empty;
-        }
-
-        if (XOffset == 0 && line.Length <= availableWidth)
-        {
-            return line;
-        }
-
-        var remaining = line.Length - XOffset;
-        var length = Math.Min(availableWidth, remaining);
-        return line.Substring(XOffset, length);
-    }
-
-    private string DecorateLine(string line, int visualIndex, int lineNumberWidth)
-    {
-        if (!ShowLineNumbers && HighlightVisualLine != visualIndex)
-        {
-            return line;
-        }
-
-        if (!ShowLineNumbers)
-        {
-            return HighlightVisualLine == visualIndex
-                ? $"> {line}"
-                : $"  {line}";
-        }
-
-        var lineNumber = (visualIndex + 1).ToString(System.Globalization.CultureInfo.InvariantCulture).PadLeft(lineNumberWidth);
-        var marker = HighlightVisualLine == visualIndex ? ">" : " ";
-        var prefix = $"{lineNumber}{marker} ";
-        if (prefix.Length >= Width)
-        {
-            return prefix[..Width];
-        }
-
-        var available = Width - prefix.Length;
-        var clipped = line.Length <= available
-            ? line
-            : line[..available];
-        return prefix + clipped;
-    }
-
     private IReadOnlyList<string> GetVisualLines()
     {
-        if (!_visualCacheDirty)
+        if (_visualCacheDirty)
         {
-            return _visualLinesCache;
-        }
-
-        _visualLinesCache.Clear();
-        _maxVisualWidth = 0;
-
-        if (_sourceLines.Count == 0)
-        {
-            _visualLinesCache.Add(string.Empty);
-            _maxVisualWidth = 0;
+            ViewportVisualLineBuilder.Build(_sourceLines, Wrap, Width, _visualLinesCache, out _maxVisualWidth);
             _visualCacheDirty = false;
-            return _visualLinesCache;
         }
 
-        if (!Wrap || Width <= 0)
-        {
-            foreach (var line in _sourceLines)
-            {
-                _visualLinesCache.Add(line);
-                _maxVisualWidth = Math.Max(_maxVisualWidth, line.Length);
-            }
-
-            _visualCacheDirty = false;
-            return _visualLinesCache;
-        }
-
-        foreach (var sourceLine in _sourceLines)
-        {
-            if (sourceLine.Length == 0)
-            {
-                _visualLinesCache.Add(string.Empty);
-                continue;
-            }
-
-            for (var i = 0; i < sourceLine.Length; i += Width)
-            {
-                var length = Math.Min(Width, sourceLine.Length - i);
-                _visualLinesCache.Add(sourceLine.Substring(i, length));
-                _maxVisualWidth = Math.Max(_maxVisualWidth, length);
-            }
-        }
-
-        _visualCacheDirty = false;
         return _visualLinesCache;
     }
 
@@ -309,12 +184,8 @@ public sealed class ViewportModel
             return;
         }
 
-        var lineNumberWidth = ShowLineNumbers
-            ? Math.Max(2, (lines.Count + 1).ToString(System.Globalization.CultureInfo.InvariantCulture).Length)
-            : 0;
-        var visibleWidth = ShowLineNumbers
-            ? Math.Max(0, Width - (lineNumberWidth + 2))
-            : Width;
+        var lineNumberWidth = ViewportLineFormatter.ComputeLineNumberWidth(ShowLineNumbers, lines.Count);
+        var visibleWidth = ShowLineNumbers ? Math.Max(0, Width - (lineNumberWidth + 2)) : Width;
         var maxX = Math.Max(0, _maxVisualWidth - visibleWidth);
         XOffset = Math.Clamp(XOffset, 0, maxX);
     }
