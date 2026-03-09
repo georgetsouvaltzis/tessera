@@ -247,7 +247,7 @@ internal sealed class PomodoroModel : IModel
 
     public Command? Init() => NextTick();
 
-    public UpdateResult Update(IMessage message)
+    public Command? Update(IMessage message)
     {
         switch (message)
         {
@@ -267,19 +267,19 @@ internal sealed class PomodoroModel : IModel
                     }
                 }
 
-                return new UpdateResult(this, NextTick());
+                return NextTick();
 
             case WindowSizeMsg ws:
                 _width = ws.Width;
                 _height = ws.Height;
                 _lastEvent = $"resize:{_width}x{_height}";
-                return new UpdateResult(this, null);
+                return null;
 
             case KeyPressMsg key:
                 return HandleKey(key);
 
             default:
-                return new UpdateResult(this, null);
+                return null;
         }
     }
 
@@ -327,12 +327,12 @@ internal sealed class PomodoroModel : IModel
         };
     }
 
-    private UpdateResult HandleKey(KeyPressMsg key)
+    private Command? HandleKey(KeyPressMsg key)
     {
         if (key.Modifiers.HasFlag(KeyModifiers.Ctrl)
             && (key.IsCharacter('c') || key.IsCharacter('\u0003', ignoreCase: false)))
         {
-            return new UpdateResult(this, Tea.Cmd.Quit);
+            return Tea.Cmd.Quit;
         }
 
         if (_resetDialog.Visible)
@@ -349,7 +349,7 @@ internal sealed class PomodoroModel : IModel
                 _lastEvent = $"dialog:{_resetDialog.LastResult.ToString().ToLowerInvariant()}";
             }
 
-            return new UpdateResult(this, null);
+            return null;
         }
 
         if (_mode == InputMode.Command)
@@ -358,49 +358,49 @@ internal sealed class PomodoroModel : IModel
             {
                 _mode = InputMode.Navigate;
                 _lastEvent = "mode:nav";
-                return new UpdateResult(this, null);
+                return null;
             }
 
             var changed = _commandInput.Update(key);
             if (!changed)
             {
-                return new UpdateResult(this, null);
+                return null;
             }
 
             if (_commandInput.SubmitCount == 0)
             {
-                return new UpdateResult(this, null);
+                return null;
             }
 
             var command = _commandInput.LastSubmittedValue.Trim();
             if (string.IsNullOrWhiteSpace(command))
             {
-                return new UpdateResult(this, null);
+                return null;
             }
 
             var cmd = ExecuteCommand(command);
-            return new UpdateResult(this, cmd);
+            return cmd;
         }
 
         if (MatchesBinding(key, CommandModeKey))
         {
             _mode = InputMode.Command;
             _lastEvent = "mode:cmd";
-            return new UpdateResult(this, null);
+            return null;
         }
 
         if (MatchesBinding(key, ModalKey))
         {
             _resetDialog.Visible = !_resetDialog.Visible;
             _lastEvent = _resetDialog.Visible ? "dialog:open" : "dialog:close";
-            return new UpdateResult(this, null);
+            return null;
         }
 
         if (MatchesBinding(key, ToastKey))
         {
             _toasts.Push(new ToastMessage($"{(_isBreak ? "break" : "focus")} {FormatClock(_remainingSeconds)}", 70, ToastSeverity.Info));
             _lastEvent = "toast";
-            return new UpdateResult(this, null);
+            return null;
         }
 
         if (MatchesBinding(key, "space") || MatchesBinding(key, "enter"))
@@ -408,7 +408,7 @@ internal sealed class PomodoroModel : IModel
             _running = !_running;
             _lastEvent = _running ? "running:on" : "running:off";
             _logs.Append(_lastEvent);
-            return new UpdateResult(this, null);
+            return null;
         }
 
         if (MatchesBinding(key, "r"))
@@ -416,22 +416,22 @@ internal sealed class PomodoroModel : IModel
             ResetCurrentPhase();
             _lastEvent = "reset";
             _logs.Append(_lastEvent);
-            return new UpdateResult(this, null);
+            return null;
         }
 
         if (MatchesBinding(key, "n"))
         {
             AdvancePhase(logTransition: true);
             _lastEvent = "skip";
-            return new UpdateResult(this, null);
+            return null;
         }
 
         if (MatchesBinding(key, "q"))
         {
-            return new UpdateResult(this, Tea.Cmd.Quit);
+            return Tea.Cmd.Quit;
         }
 
-        return new UpdateResult(this, null);
+        return null;
     }
 
     private Command? ExecuteCommand(string command)
@@ -677,7 +677,7 @@ internal sealed class DashboardModel : IModel
 
     public Command? Init() => Tea.Cmd.Every(TimeSpan.FromMilliseconds(900), at => new DashboardTickMsg(at));
 
-    public UpdateResult Update(IMessage message)
+    public Command? Update(IMessage message)
     {
         switch (message)
         {
@@ -690,19 +690,19 @@ internal sealed class DashboardModel : IModel
                 }
 
                 _toasts.Update(new TickMsg(tick.At));
-                return new UpdateResult(this, Tea.Cmd.Every(TimeSpan.FromMilliseconds(900), at => new DashboardTickMsg(at)));
+                return Tea.Cmd.Every(TimeSpan.FromMilliseconds(900), at => new DashboardTickMsg(at));
 
             case WindowSizeMsg ws:
                 _width = ws.Width;
                 _height = ws.Height;
                 _lastEvent = $"resize:{_width}x{_height}";
-                return new UpdateResult(this, null);
+                return null;
 
             case KeyPressMsg key:
                 if (key.Modifiers.HasFlag(KeyModifiers.Ctrl)
                     && (key.IsCharacter('c') || key.IsCharacter('\u0003', ignoreCase: false)))
                 {
-                    return new UpdateResult(this, Tea.Cmd.Quit);
+                    return Tea.Cmd.Quit;
                 }
 
                 if (_modal.Visible)
@@ -713,33 +713,33 @@ internal sealed class DashboardModel : IModel
                         _lastEvent = $"modal:{_modal.LastResult.ToString().ToLowerInvariant()}";
                     }
 
-                    return new UpdateResult(this, null);
+                    return null;
                 }
 
                 if (MatchesBinding(key, CommandModeKey))
                 {
                     _tabs.Select((_tabs.SelectedIndex + 1) % _tabs.Tabs.Count);
                     _lastEvent = $"tab:{_tabs.SelectedIndex + 1}";
-                    return new UpdateResult(this, null);
+                    return null;
                 }
 
                 if (MatchesBinding(key, ToastKey))
                 {
                     _toasts.Push(new ToastMessage($"capacity {(_tick % 100)}%", 70, ToastSeverity.Info));
                     _lastEvent = "toast";
-                    return new UpdateResult(this, null);
+                    return null;
                 }
 
                 if (MatchesBinding(key, ModalKey))
                 {
                     _modal.Visible = !_modal.Visible;
                     _lastEvent = _modal.Visible ? "modal:open" : "modal:close";
-                    return new UpdateResult(this, null);
+                    return null;
                 }
 
                 if (MatchesBinding(key, "q"))
                 {
-                    return new UpdateResult(this, Tea.Cmd.Quit);
+                    return Tea.Cmd.Quit;
                 }
 
                 if (_tabs.Update(key))
@@ -757,10 +757,10 @@ internal sealed class DashboardModel : IModel
                     _logs.Update(key);
                 }
 
-                return new UpdateResult(this, null);
+                return null;
 
             default:
-                return new UpdateResult(this, null);
+                return null;
         }
     }
 

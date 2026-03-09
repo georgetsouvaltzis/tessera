@@ -40,7 +40,7 @@ Primary goal: deterministic message-driven TUI runtime with portable terminal be
 ### 4.1 Layers
 
 1. `Abstractions`
-- `IModel`, `IMessage`, `View`, `UpdateResult`, `Command`.
+- `IModel`, `IMessage`, `View`, `Command`.
 
 2. `Application`
 - `TeaProgram` event loop, command scheduling, filtering, rendering orchestration.
@@ -122,7 +122,7 @@ Primary goal: deterministic message-driven TUI runtime with portable terminal be
 
 ## 7. API Contracts (Phase 1)
 
-- `IModel Init/Update/View`.
+- `IModel Init/Update/View`, where `Update` mutates model state in place and returns an optional `Command`.
 - `Command` returns optional `IMessage`.
 - `View` terminal controls now include colors (`ForegroundColor`, `BackgroundColor`, `CursorColor`), native progress (`TerminalProgress`), keyboard enhancement requests (`KeyboardEnhancementOptions`), and optional mouse interception callback (`OnMouse`).
 - `ProgramOptions` now includes runtime extension points:

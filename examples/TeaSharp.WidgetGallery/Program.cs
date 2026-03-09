@@ -139,7 +139,7 @@ internal sealed class WidgetGalleryModel : IModel
 
     public Command? Init() => NextTick();
 
-    public UpdateResult Update(IMessage message)
+    public Command? Update(IMessage message)
     {
         if (message is GalleryTickMsg tick)
         {
@@ -152,7 +152,7 @@ internal sealed class WidgetGalleryModel : IModel
             }
 
             _lastEvent = $"tick:{_tick}";
-            return new UpdateResult(this, NextTick());
+            return NextTick();
         }
 
         if (message is WindowSizeMsg ws)
@@ -160,17 +160,17 @@ internal sealed class WidgetGalleryModel : IModel
             _width = ws.Width;
             _height = ws.Height;
             _lastEvent = $"resize:{_width}x{_height}";
-            return new UpdateResult(this, null);
+            return null;
         }
 
         if (message is MouseMsg mouse)
         {
             if (HandleMouse(mouse))
             {
-                return new UpdateResult(this, null);
+                return null;
             }
 
-            return new UpdateResult(this, null);
+            return null;
         }
 
         if (message is KeyPressMsg key)
@@ -178,7 +178,7 @@ internal sealed class WidgetGalleryModel : IModel
             if ((key.Modifiers.HasFlag(KeyModifiers.Ctrl) && (key.IsCharacter('c') || key.IsCharacter('\u0003', ignoreCase: false)))
                 || key.IsCharacter('q', KeyModifiers.None))
             {
-                return new UpdateResult(this, Tea.Cmd.Quit);
+                return Tea.Cmd.Quit;
             }
 
             if (_dialog.Visible)
@@ -190,21 +190,21 @@ internal sealed class WidgetGalleryModel : IModel
                     _lastEvent = key.Keystroke();
                 }
 
-                return new UpdateResult(this, null);
+                return null;
             }
 
             if (key.Is(KeyCode.Tab, KeyModifiers.None))
             {
                 CycleFocus();
                 _lastEvent = $"focus:{_focus.ToString().ToLowerInvariant()}";
-                return new UpdateResult(this, null);
+                return null;
             }
 
             if (_focus == GalleryFocus.Tabs && TryHandleTabShortcut(key))
             {
                 _focus = GalleryFocus.Tabs;
                 _lastEvent = $"tab:{_tabs.SelectedIndex + 1}";
-                return new UpdateResult(this, null);
+                return null;
             }
 
             if (key.IsCharacter('d', KeyModifiers.None) && _tabs.SelectedIndex == 3)
@@ -213,7 +213,7 @@ internal sealed class WidgetGalleryModel : IModel
                 _focus = _dialog.Visible ? GalleryFocus.Dialog : GalleryFocus.Tabs;
                 _lastEvent = _dialog.Visible ? "dialog:open" : "dialog:close";
                 _logs.Append(_lastEvent);
-                return new UpdateResult(this, null);
+                return null;
             }
 
             if (_focus == GalleryFocus.Tabs)
@@ -223,7 +223,7 @@ internal sealed class WidgetGalleryModel : IModel
                     _lastEvent = $"tab:{_tabs.SelectedIndex + 1}";
                 }
 
-                return new UpdateResult(this, null);
+                return null;
             }
 
             var changed = RouteFocusedInput(key);
@@ -232,10 +232,10 @@ internal sealed class WidgetGalleryModel : IModel
                 _lastEvent = key.Keystroke();
             }
 
-            return new UpdateResult(this, null);
+            return null;
         }
 
-        return new UpdateResult(this, null);
+        return null;
     }
 
     public ModelView View()

@@ -135,7 +135,7 @@ internal sealed class AdvancedWidgetsModel : IModel
 
     public Command? Init() => NextTick();
 
-    public UpdateResult Update(IMessage message)
+    public Command? Update(IMessage message)
     {
         if (message is AdvancedTickMsg)
         {
@@ -150,7 +150,7 @@ internal sealed class AdvancedWidgetsModel : IModel
                 _notifications.Push("heartbeat", NotificationSeverity.Info);
             }
 
-            return new UpdateResult(this, NextTick());
+            return NextTick();
         }
 
         if (message is WindowSizeMsg ws)
@@ -158,7 +158,7 @@ internal sealed class AdvancedWidgetsModel : IModel
             _width = ws.Width;
             _height = ws.Height;
             _lastEvent = $"resize:{_width}x{_height}";
-            return new UpdateResult(this, null);
+            return null;
         }
 
         if (message is MouseMsg mouse)
@@ -231,25 +231,25 @@ internal sealed class AdvancedWidgetsModel : IModel
                 _lastEvent = $"mouse:{mouse.EventType.ToString().ToLowerInvariant()}";
             }
 
-            return new UpdateResult(this, null);
+            return null;
         }
 
         if (message is not KeyPressMsg key)
         {
-            return new UpdateResult(this, null);
+            return null;
         }
 
         if ((key.Modifiers.HasFlag(KeyModifiers.Ctrl) && key.IsCharacter('c'))
             || key.IsCharacter('q', KeyModifiers.None))
         {
-            return new UpdateResult(this, Tea.Cmd.Quit);
+            return Tea.Cmd.Quit;
         }
 
         if (key.Is(KeyCode.Tab, KeyModifiers.None))
         {
             CycleFocus();
             _lastEvent = $"focus:{_focus.ToString().ToLowerInvariant()}";
-            return new UpdateResult(this, null);
+            return null;
         }
 
         var previousCommand = _palette.LastExecutedItemId;
@@ -257,7 +257,7 @@ internal sealed class AdvancedWidgetsModel : IModel
         if (!string.Equals(previousCommand, _palette.LastExecutedItemId, StringComparison.Ordinal))
         {
             ExecutePaletteCommand(_palette.LastExecutedItemId);
-            return new UpdateResult(this, null);
+            return null;
         }
 
         if (_palette.IsOpen)
@@ -267,7 +267,7 @@ internal sealed class AdvancedWidgetsModel : IModel
                 _lastEvent = key.Keystroke();
             }
 
-            return new UpdateResult(this, null);
+            return null;
         }
 
         var changed = RouteFocusedInput(key);
@@ -276,7 +276,7 @@ internal sealed class AdvancedWidgetsModel : IModel
             _lastEvent = key.Keystroke();
         }
 
-        return new UpdateResult(this, null);
+        return null;
     }
 
     public ModelView View()

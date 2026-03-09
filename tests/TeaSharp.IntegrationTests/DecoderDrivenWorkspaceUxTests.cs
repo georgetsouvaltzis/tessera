@@ -36,7 +36,7 @@ public sealed class DecoderDrivenWorkspaceUxTests
 
         var result = ApplyDecoded(model, "q");
 
-        Assert.That(result.Command, Is.EqualTo(TeaSharp.Tea.Cmd.Quit));
+        Assert.That(result, Is.EqualTo(TeaSharp.Tea.Cmd.Quit));
     }
 
     [Test]
@@ -49,12 +49,12 @@ public sealed class DecoderDrivenWorkspaceUxTests
         Assert.That(model.View().Content, Does.Contain("Count: 1"));
     }
 
-    private static UpdateResult ApplyDecoded(CounterModel model, string sequence)
+    private static Command? ApplyDecoded(CounterModel model, string sequence)
     {
         var decoder = new EventDecoder();
         var bytes = Encoding.UTF8.GetBytes(sequence);
         var index = 0;
-        var last = new UpdateResult(model, null);
+        Command? last = null;
 
         while (index < bytes.Length)
         {

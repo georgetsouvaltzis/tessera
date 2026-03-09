@@ -44,6 +44,6 @@ public sealed class WorkspaceUxIntegrationTests
 
         var result = model.Update(new KeyPressMsg(KeyCode.Character, "q"));
 
-        Assert.That(result.Command, Is.EqualTo(TeaSharp.Tea.Cmd.Quit));
+        Assert.That(result, Is.EqualTo(TeaSharp.Tea.Cmd.Quit));
     }
 }

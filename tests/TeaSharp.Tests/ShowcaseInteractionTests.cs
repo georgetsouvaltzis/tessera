@@ -145,7 +145,7 @@ internal static class ShowcaseInteractionTests
         var view = model.View().Content;
 
         // Assert
-        TestAssert.True(result.Command is null, "Plain 'q' in command mode should not emit quit command.");
+        TestAssert.True(result is null, "Plain 'q' in command mode should not emit quit command.");
         TestAssert.Equal("q", input.Value, "Plain 'q' should route into command input.");
         TestAssert.True(view.Contains("mode=cmd", StringComparison.Ordinal), "Command mode should remain active.");
     }

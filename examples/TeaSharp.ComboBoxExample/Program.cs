@@ -57,14 +57,14 @@ internal sealed class ComboBoxDemoModel : IModel
 
     public Command? Init() => null;
 
-    public UpdateResult Update(IMessage message)
+    public Command? Update(IMessage message)
     {
         if (message is WindowSizeMsg ws)
         {
             _width = ws.Width;
             _height = ws.Height;
             _lastEvent = $"resize:{_width}x{_height}";
-            return new UpdateResult(this, null);
+            return null;
         }
 
         if (message is MouseMsg mouse)
@@ -82,7 +82,7 @@ internal sealed class ComboBoxDemoModel : IModel
                 }
             }
 
-            return new UpdateResult(this, null);
+            return null;
         }
 
         if (message is not KeyPressMsg key)
@@ -93,13 +93,13 @@ internal sealed class ComboBoxDemoModel : IModel
                 _lastEvent = "input:update";
             }
 
-            return new UpdateResult(this, null);
+            return null;
         }
 
         if ((key.Modifiers.HasFlag(KeyModifiers.Ctrl) && key.IsCharacter('c'))
             || key.IsCharacter('q', KeyModifiers.None))
         {
-            return new UpdateResult(this, Tea.Cmd.Quit);
+            return Tea.Cmd.Quit;
         }
 
         var previous = _combobox.SelectedItem;
@@ -115,7 +115,7 @@ internal sealed class ComboBoxDemoModel : IModel
             }
         }
 
-        return new UpdateResult(this, null);
+        return null;
     }
 
     public ModelView View()

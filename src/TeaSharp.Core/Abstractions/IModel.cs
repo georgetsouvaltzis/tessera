@@ -3,6 +3,6 @@ namespace TeaSharp.Core.Abstractions;
 public interface IModel
 {
     Command? Init();
-    UpdateResult Update(IMessage message);
+    Command? Update(IMessage message);
     View View();
 }

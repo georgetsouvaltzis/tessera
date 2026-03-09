@@ -197,31 +197,31 @@ internal sealed class KanbanModel : IModel
 
     public Command? Init() => null;
 
-    public UpdateResult Update(IMessage message)
+    public Command? Update(IMessage message)
     {
         if (message is WindowSizeMsg ws)
         {
             _width = ws.Width;
             _height = ws.Height;
             _lastEvent = $"resize:{_width}x{_height}";
-            return new UpdateResult(this, null);
+            return null;
         }
 
         if (message is MouseMsg mouse)
         {
             HandleMouse(mouse);
-            return new UpdateResult(this, null);
+            return null;
         }
 
         if (message is not KeyPressMsg key)
         {
-            return new UpdateResult(this, null);
+            return null;
         }
 
         if ((key.Modifiers.HasFlag(KeyModifiers.Ctrl) && key.IsCharacter('c'))
             || key.IsCharacter('q', KeyModifiers.None))
         {
-            return new UpdateResult(this, Tea.Cmd.Quit);
+            return Tea.Cmd.Quit;
         }
 
         if (_deleteDialog.Visible)
@@ -239,21 +239,21 @@ internal sealed class KanbanModel : IModel
                 }
             }
 
-            return new UpdateResult(this, null);
+            return null;
         }
 
         if (key.Is(KeyCode.Tab, KeyModifiers.None))
         {
             CycleFocus(1);
             _lastEvent = $"focus:{_focus.ToString().ToLowerInvariant()}";
-            return new UpdateResult(this, null);
+            return null;
         }
 
         if (key.Is(KeyCode.Tab, KeyModifiers.Shift))
         {
             CycleFocus(-1);
             _lastEvent = $"focus:{_focus.ToString().ToLowerInvariant()}";
-            return new UpdateResult(this, null);
+            return null;
         }
 
         // When in composer focus, keep key handling local (including digits, letters,
@@ -266,7 +266,7 @@ internal sealed class KanbanModel : IModel
                 _lastEvent = composerEvent ?? key.Keystroke();
             }
 
-            return new UpdateResult(this, null);
+            return null;
         }
 
         if (key.TryGetDigit(out var oneBased)
@@ -282,20 +282,20 @@ internal sealed class KanbanModel : IModel
             }
 
             _lastEvent = $"board:{_boardTabs.SelectedIndex + 1}";
-            return new UpdateResult(this, null);
+            return null;
         }
 
         if (key.IsCharacter('n', KeyModifiers.None))
         {
             EnterComposerFocus();
             _lastEvent = "focus:composer";
-            return new UpdateResult(this, null);
+            return null;
         }
 
         if (IsLaneFocus() && key.IsCharacter('x', KeyModifiers.None))
         {
             OpenDeleteDialog();
-            return new UpdateResult(this, null);
+            return null;
         }
 
         if (IsLaneFocus() && key.IsCharacter('b', KeyModifiers.None))
@@ -305,7 +305,7 @@ internal sealed class KanbanModel : IModel
                 _lastEvent = "card:block";
             }
 
-            return new UpdateResult(this, null);
+            return null;
         }
 
         if (IsLaneFocus() && key.IsCharacter('p', KeyModifiers.None))
@@ -315,7 +315,7 @@ internal sealed class KanbanModel : IModel
                 _lastEvent = "card:priority";
             }
 
-            return new UpdateResult(this, null);
+            return null;
         }
 
         if (IsLaneFocus() && key.IsCharacter('u', KeyModifiers.None))
@@ -325,33 +325,33 @@ internal sealed class KanbanModel : IModel
                 _lastEvent = "card:assign";
             }
 
-            return new UpdateResult(this, null);
+            return null;
         }
 
         if (IsLaneFocus() && key.Is(KeyCode.Right, KeyModifiers.None))
         {
             FocusLane(1);
             _lastEvent = $"focus:{_focus.ToString().ToLowerInvariant()}";
-            return new UpdateResult(this, null);
+            return null;
         }
 
         if (IsLaneFocus() && key.Is(KeyCode.Left, KeyModifiers.None))
         {
             FocusLane(-1);
             _lastEvent = $"focus:{_focus.ToString().ToLowerInvariant()}";
-            return new UpdateResult(this, null);
+            return null;
         }
 
         if (IsLaneFocus() && key.IsCharacter('l', KeyModifiers.None))
         {
             MoveSelectedCard(1);
-            return new UpdateResult(this, null);
+            return null;
         }
 
         if (IsLaneFocus() && key.IsCharacter('h', KeyModifiers.None))
         {
             MoveSelectedCard(-1);
-            return new UpdateResult(this, null);
+            return null;
         }
 
         var changed = RouteFocusedInput(key, out var eventOverride);
@@ -361,7 +361,7 @@ internal sealed class KanbanModel : IModel
             _lastEvent = eventOverride ?? key.Keystroke();
         }
 
-        return new UpdateResult(this, null);
+        return null;
     }
 
     public ModelView View()

@@ -121,14 +121,14 @@ internal sealed class ProductivityModel : IModel
 
     public Command? Init() => null;
 
-    public UpdateResult Update(IMessage message)
+    public Command? Update(IMessage message)
     {
         if (message is WindowSizeMsg ws)
         {
             _width = ws.Width;
             _height = ws.Height;
             _lastEvent = $"resize:{_width}x{_height}";
-            return new UpdateResult(this, null);
+            return null;
         }
 
         if (message is MouseMsg mouse)
@@ -150,7 +150,7 @@ internal sealed class ProductivityModel : IModel
                     _lastEvent = $"mouse:{mouse.EventType.ToString().ToLowerInvariant()}";
                 }
 
-                return new UpdateResult(this, null);
+                return null;
             }
 
             var mouseBeforeMenuActivation = _menu.ActivationVersion;
@@ -196,18 +196,18 @@ internal sealed class ProductivityModel : IModel
                 _lastEvent = $"mouse:{mouse.EventType.ToString().ToLowerInvariant()}";
             }
 
-            return new UpdateResult(this, null);
+            return null;
         }
 
         if (message is not KeyPressMsg key)
         {
-            return new UpdateResult(this, null);
+            return null;
         }
 
         if ((key.Modifiers.HasFlag(KeyModifiers.Ctrl) && key.IsCharacter('c'))
             || key.IsCharacter('q', KeyModifiers.None))
         {
-            return new UpdateResult(this, Tea.Cmd.Quit);
+            return Tea.Cmd.Quit;
         }
 
         if (_context.Visible)
@@ -223,14 +223,14 @@ internal sealed class ProductivityModel : IModel
                 }
             }
 
-            return new UpdateResult(this, null);
+            return null;
         }
 
         if (key.Is(KeyCode.Tab, KeyModifiers.None))
         {
             CycleFocus();
             _lastEvent = $"focus:{_focus.ToString().ToLowerInvariant()}";
-            return new UpdateResult(this, null);
+            return null;
         }
 
         if (key.IsCharacter('m', KeyModifiers.None))
@@ -238,7 +238,7 @@ internal sealed class ProductivityModel : IModel
             _context.OpenAt(Math.Max(0, (_width / 2) - 12), Math.Max(2, (_height / 2) - 3));
             _context.Focused = true;
             _lastEvent = "context:open";
-            return new UpdateResult(this, null);
+            return null;
         }
 
         var beforeMenuActivation = _menu.ActivationVersion;
@@ -256,7 +256,7 @@ internal sealed class ProductivityModel : IModel
             _lastEvent = key.Keystroke();
         }
 
-        return new UpdateResult(this, null);
+        return null;
     }
 
     public ModelView View()

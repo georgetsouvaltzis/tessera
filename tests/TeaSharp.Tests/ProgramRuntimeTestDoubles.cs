@@ -13,7 +13,7 @@ internal sealed class InitQuitModel : IModel
 {
     public Command? Init() => Commands.Quit;
 
-    public UpdateResult Update(IMessage message) => new(this, null);
+    public Command? Update(IMessage message) => null;
 
     public ModelView View() => ModelView.From("quit");
 }
@@ -22,7 +22,7 @@ internal sealed class IdleModel : IModel
 {
     public Command? Init() => null;
 
-    public UpdateResult Update(IMessage message) => new(this, null);
+    public Command? Update(IMessage message) => null;
 
     public ModelView View() => ModelView.From("idle");
 }
@@ -36,14 +36,14 @@ internal sealed class SequenceModel : IModel
         Commands.FromMessage(new NumberMsg(2)),
         Commands.Quit);
 
-    public UpdateResult Update(IMessage message)
+    public Command? Update(IMessage message)
     {
         if (message is NumberMsg number)
         {
             Values.Add(number.Value);
         }
 
-        return new(this, null);
+        return null;
     }
 
     public ModelView View() => ModelView.From("sequence");
@@ -57,18 +57,18 @@ internal sealed class BatchModel : IModel
         Commands.FromMessage(new NumberMsg(1)),
         Commands.FromMessage(new NumberMsg(2)));
 
-    public UpdateResult Update(IMessage message)
+    public Command? Update(IMessage message)
     {
         if (message is NumberMsg)
         {
             Count++;
             if (Count == 2)
             {
-                return new(this, Commands.Quit);
+                return Commands.Quit;
             }
         }
 
-        return new(this, null);
+        return null;
     }
 
     public ModelView View() => ModelView.From("batch");
@@ -82,15 +82,15 @@ internal sealed class CommandErrorCaptureModel : IModel
 
     public Command? Init() => _ => throw new InvalidOperationException(CommandFailureMessage);
 
-    public UpdateResult Update(IMessage message)
+    public Command? Update(IMessage message)
     {
         if (message is CommandErrorMsg error)
         {
             CapturedError = error.Exception;
-            return new UpdateResult(this, Commands.Quit);
+            return Commands.Quit;
         }
 
-        return new UpdateResult(this, null);
+        return null;
     }
 
     public ModelView View() => ModelView.From("command-error-capture");
@@ -102,7 +102,7 @@ internal sealed class CommandFaultModel : IModel
 
     public Command? Init() => _ => throw new InvalidOperationException(FailureMessage);
 
-    public UpdateResult Update(IMessage message) => new(this, null);
+    public Command? Update(IMessage message) => null;
 
     public ModelView View() => ModelView.From("command-fault");
 }
@@ -113,20 +113,20 @@ internal sealed class CommandRecoveryModel : IModel
 
     public Command? Init() => _ => throw new InvalidOperationException(CommandFaultModel.FailureMessage);
 
-    public UpdateResult Update(IMessage message)
+    public Command? Update(IMessage message)
     {
         if (message is NumberMsg number)
         {
             RecoveredValue = number.Value;
-            return new UpdateResult(this, Commands.Quit);
+            return Commands.Quit;
         }
 
         if (message is CommandErrorMsg)
         {
-            return new UpdateResult(this, Commands.Quit);
+            return Commands.Quit;
         }
 
-        return new UpdateResult(this, null);
+        return null;
     }
 
     public ModelView View() => ModelView.From("command-recovery");
@@ -154,18 +154,18 @@ internal sealed class BurstUpdateModel : IModel
         return Commands.Batch([.. commands]);
     }
 
-    public UpdateResult Update(IMessage message)
+    public Command? Update(IMessage message)
     {
         if (message is NumberMsg)
         {
             Count++;
             if (Count >= _targetCount)
             {
-                return new UpdateResult(this, Commands.Quit);
+                return Commands.Quit;
             }
         }
 
-        return new UpdateResult(this, null);
+        return null;
     }
 
     public ModelView View() => ModelView.From($"burst-{Count}");
@@ -177,18 +177,18 @@ internal sealed class ResizeTrackingModel : IModel
 
     public Command? Init() => null;
 
-    public UpdateResult Update(IMessage message)
+    public Command? Update(IMessage message)
     {
         if (message is WindowSizeMsg ws)
         {
             Seen.Add((ws.Width, ws.Height));
             if (Seen.Count >= 2)
             {
-                return new UpdateResult(this, Commands.Quit);
+                return Commands.Quit;
             }
         }
 
-        return new UpdateResult(this, null);
+        return null;
     }
 
     public ModelView View() => ModelView.From("resize");
@@ -200,15 +200,15 @@ internal sealed class CapabilityTrackingModel : IModel
 
     public Command? Init() => null;
 
-    public UpdateResult Update(IMessage message)
+    public Command? Update(IMessage message)
     {
         if (message is TerminalCapabilitiesMsg capabilities)
         {
             Seen = capabilities.Profile;
-            return new UpdateResult(this, Commands.Quit);
+            return Commands.Quit;
         }
 
-        return new UpdateResult(this, null);
+        return null;
     }
 
     public ModelView View() => ModelView.From("capabilities");
@@ -220,15 +220,15 @@ internal sealed class ColorProfileTrackingModel : IModel
 
     public Command? Init() => null;
 
-    public UpdateResult Update(IMessage message)
+    public Command? Update(IMessage message)
     {
         if (message is ColorProfileMsg colorProfile)
         {
             Seen = colorProfile.Profile;
-            return new UpdateResult(this, Commands.Quit);
+            return Commands.Quit;
         }
 
-        return new UpdateResult(this, null);
+        return null;
     }
 
     public ModelView View() => ModelView.From("color-profile");
@@ -240,18 +240,18 @@ internal sealed class CapabilityRefinementModel : IModel
 
     public Command? Init() => Commands.FromMessage(new ModeReportMsg(2026, ModeReportState.Reset));
 
-    public UpdateResult Update(IMessage message)
+    public Command? Update(IMessage message)
     {
         if (message is TerminalCapabilitiesMsg capabilities)
         {
             Seen.Add(capabilities.Profile);
             if (Seen.Count >= 2)
             {
-                return new UpdateResult(this, Commands.Quit);
+                return Commands.Quit;
             }
         }
 
-        return new UpdateResult(this, null);
+        return null;
     }
 
     public ModelView View() => ModelView.From("capability-refinement");
@@ -263,18 +263,18 @@ internal sealed class UnsupportedModeReportRefinementModel : IModel
 
     public Command? Init() => Commands.FromMessage(new ModeReportMsg(1006, ModeReportState.Unsupported));
 
-    public UpdateResult Update(IMessage message)
+    public Command? Update(IMessage message)
     {
         if (message is TerminalCapabilitiesMsg capabilities)
         {
             Seen.Add(capabilities.Profile);
             if (Seen.Count >= 2)
             {
-                return new UpdateResult(this, Commands.Quit);
+                return Commands.Quit;
             }
         }
 
-        return new UpdateResult(this, null);
+        return null;
     }
 
     public ModelView View() => ModelView.From("capability-unsupported-refinement");
@@ -292,18 +292,18 @@ internal sealed class CapabilityProbeTimeoutModel : IModel
 
     public Command? Init() => Commands.Tick(_safetyQuitDelay, _ => new QuitMsg());
 
-    public UpdateResult Update(IMessage message)
+    public Command? Update(IMessage message)
     {
         if (message is TerminalCapabilitiesMsg capabilities)
         {
             Seen.Add(capabilities.Profile);
             if (capabilities.Profile.Source.Contains("+probe-timeout", StringComparison.Ordinal))
             {
-                return new UpdateResult(this, Commands.Quit);
+                return Commands.Quit;
             }
         }
 
-        return new UpdateResult(this, null);
+        return null;
     }
 
     public ModelView View() => ModelView.From("capability-probe-timeout");
@@ -333,14 +333,14 @@ internal sealed class CapabilityProbeResponseModel : IModel
         return Commands.Sequence([.. commands]);
     }
 
-    public UpdateResult Update(IMessage message)
+    public Command? Update(IMessage message)
     {
         if (message is TerminalCapabilitiesMsg capabilities)
         {
             Seen.Add(capabilities.Profile);
         }
 
-        return new UpdateResult(this, null);
+        return null;
     }
 
     public ModelView View() => ModelView.From("capability-probe-response");
@@ -357,7 +357,7 @@ internal sealed class TimedQuitModel : IModel
 
     public Command? Init() => Commands.Tick(_delay, _ => new QuitMsg());
 
-    public UpdateResult Update(IMessage message) => new(this, null);
+    public Command? Update(IMessage message) => null;
 
     public ModelView View() => ModelView.From("timed-quit");
 }
@@ -373,7 +373,7 @@ internal sealed class TimedQuitProbeViewModel : IModel
 
     public Command? Init() => Commands.Tick(_delay, _ => new QuitMsg());
 
-    public UpdateResult Update(IMessage message) => new(this, null);
+    public Command? Update(IMessage message) => null;
 
     public ModelView View() => ModelView.From("timed-probe-view") with
     {
@@ -425,18 +425,18 @@ internal sealed class ConcurrencyTrackingModel : IModel
         return Commands.Batch(commands);
     }
 
-    public UpdateResult Update(IMessage message)
+    public Command? Update(IMessage message)
     {
         if (message is NumberMsg)
         {
             var received = Interlocked.Increment(ref _receivedMessages);
             if (received >= _commandCount)
             {
-                return new UpdateResult(this, Commands.Quit);
+                return Commands.Quit;
             }
         }
 
-        return new UpdateResult(this, null);
+        return null;
     }
 
     public ModelView View() => ModelView.From("concurrency-tracking");
@@ -465,7 +465,7 @@ internal sealed class RawOutputInitModel : IModel
         Commands.Raw("raw-sequence"),
         Commands.Quit);
 
-    public UpdateResult Update(IMessage message) => new(this, null);
+    public Command? Update(IMessage message) => null;
 
     public ModelView View() => ModelView.From("raw-output");
 }
@@ -476,15 +476,15 @@ internal sealed class MouseInterceptModel : IModel
 
     public Command? Init() => null;
 
-    public UpdateResult Update(IMessage message)
+    public Command? Update(IMessage message)
     {
         if (message is NumberMsg)
         {
             Intercepted++;
-            return new UpdateResult(this, Commands.Quit);
+            return Commands.Quit;
         }
 
-        return new UpdateResult(this, null);
+        return null;
     }
 
     public ModelView View() => ModelView.From("mouse-intercept") with
@@ -610,15 +610,15 @@ internal sealed class QuitOnQModel : IModel
 {
     public Command? Init() => null;
 
-    public UpdateResult Update(IMessage message)
+    public Command? Update(IMessage message)
     {
         if (message is KeyPressMsg key
             && key.IsCharacter('q', KeyModifiers.None))
         {
-            return new UpdateResult(this, Commands.Quit);
+            return Commands.Quit;
         }
 
-        return new UpdateResult(this, null);
+        return null;
     }
 
     public ModelView View() => ModelView.From("quit-on-q");

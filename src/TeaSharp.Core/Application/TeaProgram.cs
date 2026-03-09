@@ -192,12 +192,11 @@ public sealed class TeaProgram
                     continue;
                 }
 
-                var update = Model.Update(filtered);
-                Model = update.Model;
+                var command = Model.Update(filtered);
 
-                if (update.Command is not null)
+                if (command is not null)
                 {
-                    await _commands.Writer.WriteAsync(update.Command, token).ConfigureAwait(false);
+                    await _commands.Writer.WriteAsync(command, token).ConfigureAwait(false);
                 }
 
                 pendingRender = true;
