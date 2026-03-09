@@ -124,7 +124,7 @@ public sealed class TextAreaComponent : IStatefulComponent, IFocusableComponent
 
     private void SyncViewport()
     {
-        _viewport.SetContent(Input.Value);
+        _viewport.SetLines(Input.Value.Replace("\r\n", "\n", StringComparison.Ordinal).Replace('\r', '\n').Split('\n'));
     }
 
     private int CursorLineIndex()

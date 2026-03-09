@@ -33,9 +33,7 @@ public sealed class ListModel<T>
 
     public bool HasSelection => SelectedIndex >= 0 && SelectedIndex < _filteredIndexes.Count;
 
-    public T? SelectedItem => HasSelection
-        ? _allItems[_filteredIndexes[SelectedIndex]]
-        : default;
+    public T? SelectedItem => HasSelection ? _allItems[_filteredIndexes[SelectedIndex]] : default;
 
     public int Count => _filteredIndexes.Count;
 
@@ -63,9 +61,7 @@ public sealed class ListModel<T>
         return _allItems.Count - before;
     }
 
-    public async ValueTask<int> ReloadAsync(
-        Func<CancellationToken, IAsyncEnumerable<T>> loader,
-        CancellationToken cancellationToken = default)
+    public async ValueTask<int> ReloadAsync(Func<CancellationToken, IAsyncEnumerable<T>> loader, CancellationToken cancellationToken = default)
     {
         var (version, linkedToken, disposer) = BeginTrackedLoad(cancellationToken);
         try
@@ -89,9 +85,7 @@ public sealed class ListModel<T>
         }
     }
 
-    public async ValueTask<int> AppendAsync(
-        Func<CancellationToken, IAsyncEnumerable<T>> loader,
-        CancellationToken cancellationToken = default)
+    public async ValueTask<int> AppendAsync(Func<CancellationToken, IAsyncEnumerable<T>> loader, CancellationToken cancellationToken = default)
     {
         var (version, linkedToken, disposer) = BeginTrackedLoad(cancellationToken);
         try
@@ -130,41 +124,17 @@ public sealed class ListModel<T>
 
         if (message is KeyPressMsg key)
         {
-            if (keyMap.Up.Matches(key))
-            {
-                MoveSelection(-1);
-            }
-            else if (keyMap.Down.Matches(key))
-            {
-                MoveSelection(1);
-            }
-            else if (keyMap.PageUp.Matches(key))
-            {
-                MoveSelection(-Math.Max(1, PageSize));
-            }
-            else if (keyMap.PageDown.Matches(key))
-            {
-                MoveSelection(Math.Max(1, PageSize));
-            }
-            else if (keyMap.Home.Matches(key))
-            {
-                Select(0);
-            }
-            else if (keyMap.End.Matches(key))
-            {
-                Select(Math.Max(0, _filteredIndexes.Count - 1));
-            }
+            if (keyMap.Up.Matches(key)) MoveSelection(-1);
+            else if (keyMap.Down.Matches(key)) MoveSelection(1);
+            else if (keyMap.PageUp.Matches(key)) MoveSelection(-Math.Max(1, PageSize));
+            else if (keyMap.PageDown.Matches(key)) MoveSelection(Math.Max(1, PageSize));
+            else if (keyMap.Home.Matches(key)) Select(0);
+            else if (keyMap.End.Matches(key)) Select(Math.Max(0, _filteredIndexes.Count - 1));
         }
         else if (message is MouseWheelMsg wheel)
         {
-            if (wheel.Button == MouseButton.WheelUp)
-            {
-                MoveSelection(-1);
-            }
-            else if (wheel.Button == MouseButton.WheelDown)
-            {
-                MoveSelection(1);
-            }
+            if (wheel.Button == MouseButton.WheelUp) MoveSelection(-1);
+            else if (wheel.Button == MouseButton.WheelDown) MoveSelection(1);
         }
 
         return beforeSelection != SelectedIndex || beforeOffset != _offset;
@@ -172,22 +142,7 @@ public sealed class ListModel<T>
 
     public IReadOnlyList<ListRow<T>> VisibleRows()
     {
-        var rows = new List<ListRow<T>>(Math.Max(1, PageSize));
-        if (_filteredIndexes.Count == 0 || PageSize <= 0)
-        {
-            return rows;
-        }
-
-        var start = Math.Clamp(_offset, 0, Math.Max(0, _filteredIndexes.Count - 1));
-        var max = Math.Min(PageSize, _filteredIndexes.Count - start);
-        for (var i = 0; i < max; i++)
-        {
-            var filteredIndex = start + i;
-            var sourceIndex = _filteredIndexes[filteredIndex];
-            rows.Add(new ListRow<T>(_allItems[sourceIndex], filteredIndex, filteredIndex == SelectedIndex));
-        }
-
-        return rows;
+        return ListModelWindowing.VisibleRows(_allItems, _filteredIndexes, _offset, PageSize, SelectedIndex);
     }
 
     public string LabelFor(T item) => _toText(item);
@@ -214,13 +169,7 @@ public sealed class ListModel<T>
             return;
         }
 
-        if (SelectedIndex < 0)
-        {
-            Select(0);
-            return;
-        }
-
-        Select(SelectedIndex + delta);
+        Select(SelectedIndex < 0 ? 0 : SelectedIndex + delta);
     }
 
     private void Select(int index)
@@ -233,48 +182,12 @@ public sealed class ListModel<T>
         }
 
         SelectedIndex = Math.Clamp(index, 0, _filteredIndexes.Count - 1);
-        EnsureSelectionVisible();
-    }
-
-    private void EnsureSelectionVisible()
-    {
-        if (!HasSelection)
-        {
-            _offset = 0;
-            return;
-        }
-
-        var page = Math.Max(1, PageSize);
-        if (SelectedIndex < _offset)
-        {
-            _offset = SelectedIndex;
-        }
-        else if (SelectedIndex >= _offset + page)
-        {
-            _offset = SelectedIndex - page + 1;
-        }
-
-        var maxOffset = Math.Max(0, _filteredIndexes.Count - page);
-        _offset = Math.Clamp(_offset, 0, maxOffset);
+        ListModelWindowing.EnsureSelectionVisible(SelectedIndex, _filteredIndexes.Count, PageSize, ref _offset);
     }
 
     private void ApplyFilter()
     {
-        _filteredIndexes.Clear();
-        for (var i = 0; i < _allItems.Count; i++)
-        {
-            var label = _toText(_allItems[i]);
-            if (Filter.Length == 0 || label.Contains(Filter, FilterComparison))
-            {
-                _filteredIndexes.Add(i);
-            }
-        }
-
-        if (SortComparison is not null && _filteredIndexes.Count > 1)
-        {
-            _filteredIndexes.Sort((left, right) => SortComparison(_allItems[left], _allItems[right]));
-        }
-
+        ListModelFilter.Apply(_allItems, _toText, Filter, FilterComparison, SortComparison, _filteredIndexes);
         if (_filteredIndexes.Count == 0)
         {
             SelectedIndex = -1;
@@ -288,7 +201,7 @@ public sealed class ListModel<T>
         }
 
         SelectedIndex = Math.Clamp(SelectedIndex, 0, _filteredIndexes.Count - 1);
-        EnsureSelectionVisible();
+        ListModelWindowing.EnsureSelectionVisible(SelectedIndex, _filteredIndexes.Count, PageSize, ref _offset);
     }
 
     private async ValueTask AppendItemsCoreAsync(IAsyncEnumerable<T> items, CancellationToken cancellationToken)
