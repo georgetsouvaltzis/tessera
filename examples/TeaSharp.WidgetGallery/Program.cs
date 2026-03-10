@@ -286,7 +286,7 @@ internal sealed class WidgetGalleryModel : IModel
 
         if (_dialog.Visible)
         {
-            _screen.AddComponent(DialogRegionId, bodyRect, _dialog, layer: 100);
+            _screen.AddModalComponent(DialogRegionId, bodyRect, _dialog);
         }
 
         _screen.CompleteFrame(PreferredFocusRegionId());

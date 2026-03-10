@@ -31,10 +31,11 @@ public sealed class ScreenComposer
         Func<MouseMsg, Rect, bool>? updateMouse = null,
         bool focusable = false,
         bool focusOnClick = true,
-        int layer = 0,
+        bool interceptsPointer = true,
+        int layer = (int)ScreenLayer.Base,
         Action? onFocus = null)
     {
-        var region = new ScreenRegion(id, bounds, render, update, updateMouse, focusable, focusOnClick, layer, focusTarget: null, onFocus);
+        var region = new ScreenRegion(id, bounds, render, update, updateMouse, focusable, focusOnClick, interceptsPointer, layer, focusTarget: null, onFocus);
         AddRegion(region);
         return region;
     }
@@ -45,7 +46,8 @@ public sealed class ScreenComposer
         ICanvasComponent component,
         bool? focusable = null,
         bool focusOnClick = true,
-        int layer = 0,
+        bool interceptsPointer = true,
+        int layer = (int)ScreenLayer.Base,
         Action? onFocus = null)
     {
         var stateful = component as IStatefulComponent;
@@ -65,11 +67,68 @@ public sealed class ScreenComposer
             updateMouse,
             focusable ?? focusTarget is not null,
             focusOnClick,
+            interceptsPointer,
             layer,
             focusTarget,
             onFocus);
         AddRegion(region);
         return region;
+    }
+
+    public ScreenRegion AddOverlayRegion(
+        string id,
+        Rect bounds,
+        Action<Canvas, Rect> render,
+        Func<IMessage, bool>? update = null,
+        Func<MouseMsg, Rect, bool>? updateMouse = null,
+        bool focusable = false,
+        bool focusOnClick = true,
+        bool interceptsPointer = true,
+        ScreenLayer layer = ScreenLayer.Overlay,
+        Action? onFocus = null)
+    {
+        return AddRegion(id, bounds, render, update, updateMouse, focusable, focusOnClick, interceptsPointer, (int)layer, onFocus);
+    }
+
+    public ScreenRegion AddOverlayComponent(
+        string id,
+        Rect bounds,
+        ICanvasComponent component,
+        bool? focusable = null,
+        bool focusOnClick = true,
+        bool interceptsPointer = true,
+        ScreenLayer layer = ScreenLayer.Overlay,
+        Action? onFocus = null)
+    {
+        return AddComponent(id, bounds, component, focusable, focusOnClick, interceptsPointer, (int)layer, onFocus);
+    }
+
+    public ScreenRegion AddModalComponent(
+        string id,
+        Rect bounds,
+        ICanvasComponent component,
+        bool? focusable = null,
+        Action? onFocus = null)
+    {
+        return AddOverlayComponent(id, bounds, component, focusable, focusOnClick: true, interceptsPointer: true, layer: ScreenLayer.Modal, onFocus);
+    }
+
+    public ScreenRegion AddPaletteComponent(
+        string id,
+        Rect bounds,
+        ICanvasComponent component,
+        bool? focusable = null,
+        Action? onFocus = null)
+    {
+        return AddOverlayComponent(id, bounds, component, focusable, focusOnClick: true, interceptsPointer: true, layer: ScreenLayer.Palette, onFocus);
+    }
+
+    public ScreenRegion AddToastOverlay(
+        string id,
+        Rect bounds,
+        ICanvasComponent component)
+    {
+        return AddOverlayComponent(id, bounds, component, focusable: false, focusOnClick: false, interceptsPointer: false, layer: ScreenLayer.Toast);
     }
 
     public void CompleteFrame(string? preferredFocusRegionId = null)
@@ -254,7 +313,7 @@ public sealed class ScreenComposer
         for (var i = 0; i < _regions.Count; i++)
         {
             var region = _regions[i];
-            if (!region.Bounds.Contains(x, y))
+            if (!region.Bounds.Contains(x, y) || !region.InterceptsPointer)
             {
                 continue;
             }

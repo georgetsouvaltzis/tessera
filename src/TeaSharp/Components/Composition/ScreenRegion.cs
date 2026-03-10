@@ -19,6 +19,7 @@ public sealed class ScreenRegion
         Func<MouseMsg, Rect, bool>? updateMouse,
         bool focusable,
         bool focusOnClick,
+        bool interceptsPointer,
         int layer,
         IFocusableComponent? focusTarget,
         Action? onFocus)
@@ -30,6 +31,7 @@ public sealed class ScreenRegion
         _updateMouse = updateMouse;
         Focusable = focusable;
         FocusOnClick = focusOnClick;
+        InterceptsPointer = interceptsPointer;
         Layer = layer;
         _focusTarget = focusTarget;
         _onFocus = onFocus;
@@ -42,6 +44,8 @@ public sealed class ScreenRegion
     public bool Focusable { get; }
 
     public bool FocusOnClick { get; }
+
+    public bool InterceptsPointer { get; }
 
     public int Layer { get; }
 

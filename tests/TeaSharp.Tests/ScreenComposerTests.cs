@@ -11,6 +11,8 @@ internal static class ScreenComposerTests
         yield return new TestCase("Components_ScreenComposer_MouseClickFocusesAndRoutesToRegisteredRegion", ScreenComposer_MouseClickFocusesAndRoutesToRegisteredRegion);
         yield return new TestCase("Components_ScreenComposer_FocusNextCyclesAcrossFocusableRegions", ScreenComposer_FocusNextCyclesAcrossFocusableRegions);
         yield return new TestCase("Components_ScreenComposer_CompleteFrameAppliesPreferredFocus", ScreenComposer_CompleteFrameAppliesPreferredFocus);
+        yield return new TestCase("Components_ScreenComposer_PassiveToastOverlayDoesNotInterceptMouse", ScreenComposer_PassiveToastOverlayDoesNotInterceptMouse);
+        yield return new TestCase("Components_ScreenComposer_ModalOverlayInterceptsUnderlyingMouse", ScreenComposer_ModalOverlayInterceptsUnderlyingMouse);
     }
 
     private static Task ScreenComposer_MouseClickFocusesAndRoutesToRegisteredRegion()
@@ -66,6 +68,41 @@ internal static class ScreenComposerTests
         return Task.CompletedTask;
     }
 
+    private static Task ScreenComposer_PassiveToastOverlayDoesNotInterceptMouse()
+    {
+        var composer = new ScreenComposer();
+        var button = new MouseProbeComponent();
+        composer.BeginFrame();
+        composer.AddComponent("button", new Rect(0, 0, 12, 4), button);
+        composer.AddToastOverlay("toast", new Rect(0, 0, 12, 4), new RenderOnlyProbeComponent());
+        composer.CompleteFrame("button");
+
+        var changed = composer.Update(new MouseClickMsg(MouseButton.Left, 2, 1));
+
+        TestAssert.True(changed, "Underlying interactive region should still receive mouse through passive overlay.");
+        TestAssert.True(button.MouseEvents == 1, "Passive toast overlay should not steal the click.");
+        return Task.CompletedTask;
+    }
+
+    private static Task ScreenComposer_ModalOverlayInterceptsUnderlyingMouse()
+    {
+        var composer = new ScreenComposer();
+        var button = new MouseProbeComponent();
+        var modal = new MouseProbeComponent();
+        composer.BeginFrame();
+        composer.AddComponent("button", new Rect(0, 0, 12, 4), button);
+        composer.AddModalComponent("modal", new Rect(0, 0, 12, 4), modal);
+        composer.CompleteFrame("modal");
+
+        var changed = composer.Update(new MouseClickMsg(MouseButton.Left, 2, 1));
+
+        TestAssert.True(changed, "Modal overlay should handle clicks inside its region.");
+        TestAssert.True(button.MouseEvents == 0, "Underlying region should not receive clicks under modal overlay.");
+        TestAssert.True(modal.MouseEvents == 1, "Modal overlay should receive the click.");
+        TestAssert.True(modal.Focused, "Modal overlay should keep focus.");
+        return Task.CompletedTask;
+    }
+
     private sealed class MouseProbeComponent : IStatefulComponent, IMouseStatefulComponent, IFocusableComponent
     {
         public bool Focused { get; set; }
@@ -86,6 +123,14 @@ internal static class ScreenComposerTests
         public void Render(Canvas canvas, Rect rect)
         {
             canvas.WriteText(rect.X, rect.Y, Focused ? "focused" : "idle", rect.Width);
+        }
+    }
+
+    private sealed class RenderOnlyProbeComponent : ICanvasComponent
+    {
+        public void Render(Canvas canvas, Rect rect)
+        {
+            canvas.WriteText(rect.X, rect.Y, "toast", rect.Width);
         }
     }
 }

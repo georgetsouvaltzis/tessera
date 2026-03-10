@@ -11,6 +11,7 @@ TeaSharp custom components are built around three contracts:
   - switch to `KeyboardRoutingMode.Broadcast` when a container should fan out input
   - use it for slot-based component trees
 - `ScreenComposer`: named screen regions with frame snapshots, focus ownership, and mouse routing for larger app surfaces
+  - overlay helpers handle blocking modals/palettes and passive toast overlays without extra app-level hit-testing
 
 ## Minimal Render-Only Component
 

@@ -39,6 +39,7 @@ The design follows patterns used in Bubble Tea examples:
     - focus ownership APIs: `SetFocus`, `FocusNext`, `FocusPrevious`
     - mouse routing by registered region bounds instead of repeated app-local rect math
     - preferred-focus selection via `CompleteFrame(...)`
+    - overlay helpers: `AddOverlayComponent`, `AddModalComponent`, `AddPaletteComponent`, `AddToastOverlay`
 - `Widgets`:
   - `DrawPanel`
   - `DrawProgressBar`

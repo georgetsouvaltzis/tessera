@@ -311,13 +311,6 @@ internal sealed class PomodoroModel : IModel
         BuildScreen(bodyRect);
         _screen.Render(canvas);
 
-        var toastHost = _screen.TryGetBounds(LogRegionId, out var logRect)
-            ? logRect
-            : bodyRect;
-        var toastWidth = Math.Min(42, toastHost.Width);
-        var toastRect = new Rect(toastHost.Right - toastWidth, toastHost.Y, toastWidth, Math.Min(9, toastHost.Height));
-        _toasts.Render(canvas, toastRect);
-
         var statusLeft = $"{(_isBreak ? "break" : "focus")} {FormatClock(_remainingSeconds)} running={YesNo(_running)} mode={(_mode == InputMode.Command ? "cmd" : "nav")}";
         var statusRight = $"cmd={CommandModeKey} toast={ToastKey} modal={ModalKey} event={_lastEvent}";
         _status.LeftText = statusLeft;
@@ -594,9 +587,13 @@ internal sealed class PomodoroModel : IModel
         _screen.AddComponent(CommandRegionId, commandRect, _commandInput, onFocus: () => _mode = InputMode.Command);
         _screen.AddComponent(LogRegionId, right, _logs, onFocus: () => _mode = InputMode.Navigate);
 
+        var toastWidth = Math.Min(42, right.Width);
+        var toastRect = new Rect(right.Right - toastWidth, right.Y, toastWidth, Math.Min(9, right.Height));
+        _screen.AddToastOverlay("pomodoro.toasts", toastRect, _toasts);
+
         if (_resetDialog.Visible)
         {
-            _screen.AddComponent(DialogRegionId, bodyRect, _resetDialog, layer: 100);
+            _screen.AddModalComponent(DialogRegionId, bodyRect, _resetDialog);
         }
 
         var preferredFocus = _resetDialog.Visible
