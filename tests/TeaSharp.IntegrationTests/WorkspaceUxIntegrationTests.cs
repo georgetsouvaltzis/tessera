@@ -1,4 +1,5 @@
 using NUnit.Framework;
+using TeaSharp.TestFixtures;
 using TeaSharp.Core.Messages;
 
 namespace TeaSharp.IntegrationTests;
@@ -9,7 +10,7 @@ public sealed class WorkspaceUxIntegrationTests
     [Test]
     public void UpKeyIncrementsCounter()
     {
-        var model = new CounterModel();
+        var model = new CounterFixtureModel();
 
         model.Update(new KeyPressMsg(KeyCode.Up));
 
@@ -19,7 +20,7 @@ public sealed class WorkspaceUxIntegrationTests
     [Test]
     public void DownKeyDecrementsCounter()
     {
-        var model = new CounterModel();
+        var model = new CounterFixtureModel();
 
         model.Update(new KeyPressMsg(KeyCode.Down));
 
@@ -29,7 +30,7 @@ public sealed class WorkspaceUxIntegrationTests
     [Test]
     public void UpThenDownReturnsCounterToZero()
     {
-        var model = new CounterModel();
+        var model = new CounterFixtureModel();
 
         model.Update(new KeyPressMsg(KeyCode.Up));
         model.Update(new KeyPressMsg(KeyCode.Down));
@@ -40,7 +41,7 @@ public sealed class WorkspaceUxIntegrationTests
     [Test]
     public void LowercaseQReturnsQuitCommand()
     {
-        var model = new CounterModel();
+        var model = new CounterFixtureModel();
 
         var result = model.Update(new KeyPressMsg(KeyCode.Character, "q"));
 

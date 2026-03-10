@@ -15,7 +15,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\examples\TeaSharp.Examples\TeaSharp.Examples.csproj" />
+    <ProjectReference Include="..\TeaSharp.IntegrationFixtureApp\TeaSharp.IntegrationFixtureApp.csproj" />
+    <ProjectReference Include="..\..\src\TeaSharp\TeaSharp.csproj" />
     <ProjectReference Include="..\..\src\TeaSharp.Core\TeaSharp.Core.csproj" />
   </ItemGroup>
 

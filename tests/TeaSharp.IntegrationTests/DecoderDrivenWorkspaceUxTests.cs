@@ -1,5 +1,6 @@
 using System.Text;
 using NUnit.Framework;
+using TeaSharp.TestFixtures;
 using TeaSharp.Core.Abstractions;
 using TeaSharp.Core.Input;
 using TeaSharp.Core.Messages;
@@ -12,7 +13,7 @@ public sealed class DecoderDrivenWorkspaceUxTests
     [Test]
     public void CsiArrowUpSequenceIncrementsCounter()
     {
-        var model = new CounterModel();
+        var model = new CounterFixtureModel();
 
         ApplyDecoded(model, "\u001b[A");
 
@@ -22,7 +23,7 @@ public sealed class DecoderDrivenWorkspaceUxTests
     [Test]
     public void CsiArrowDownSequenceDecrementsCounter()
     {
-        var model = new CounterModel();
+        var model = new CounterFixtureModel();
 
         ApplyDecoded(model, "\u001b[B");
 
@@ -32,7 +33,7 @@ public sealed class DecoderDrivenWorkspaceUxTests
     [Test]
     public void Utf8QSequenceReturnsQuitCommand()
     {
-        var model = new CounterModel();
+        var model = new CounterFixtureModel();
 
         var result = ApplyDecoded(model, "q");
 
@@ -42,14 +43,14 @@ public sealed class DecoderDrivenWorkspaceUxTests
     [Test]
     public void Ss3ArrowUpSequenceAlsoIncrementsCounter()
     {
-        var model = new CounterModel();
+        var model = new CounterFixtureModel();
 
         ApplyDecoded(model, "\u001bOA");
 
         Assert.That(model.View().Frame.Content, Does.Contain("Count: 1"));
     }
 
-    private static Command? ApplyDecoded(CounterModel model, string sequence)
+    private static Command? ApplyDecoded(CounterFixtureModel model, string sequence)
     {
         var decoder = new EventDecoder();
         var bytes = Encoding.UTF8.GetBytes(sequence);

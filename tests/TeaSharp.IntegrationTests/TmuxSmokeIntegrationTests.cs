@@ -7,8 +7,9 @@ namespace TeaSharp.IntegrationTests;
 [TestFixture]
 public sealed class TmuxSmokeIntegrationTests
 {
-    private const string RepoRoot = "/Users/georgetsouvaltzis/Projects/playground/teasharp";
-    private const string AppRunCommand = "cd /Users/georgetsouvaltzis/Projects/playground/teasharp && dotnet run --project examples/TeaSharp.Examples --no-build; exec /bin/zsh -i";
+    private static readonly string RepoRoot = ResolveRepoRoot();
+    private static readonly string FixtureProjectPath = Path.Combine("tests", "TeaSharp.IntegrationFixtureApp");
+    private const string FixtureProcessName = "TeaSharp.IntegrationFixtureApp";
 
     [Test]
     public async Task TmuxSmoke_ArrowKeysUpdateCounterAndQQuits()
@@ -22,7 +23,7 @@ public sealed class TmuxSmokeIntegrationTests
         var session = $"teasharp_smoke_{Guid.NewGuid():N}".Substring(0, 24);
         try
         {
-            RunChecked("tmux", $"new-session -d -s {session} /bin/zsh -lc \"{AppRunCommand}\"");
+            RunChecked("tmux", $"new-session -d -s {session} /bin/zsh -lc \"{BuildAppRunCommand()}\"");
             await Task.Delay(1600);
 
             var boot = CapturePane(session);
@@ -63,7 +64,7 @@ public sealed class TmuxSmokeIntegrationTests
         var session = $"teasharp_showcase_{Guid.NewGuid():N}".Substring(0, 24);
         try
         {
-            RunChecked("tmux", $"new-session -d -s {session} /bin/zsh -lc \"{AppRunCommand}\"");
+            RunChecked("tmux", $"new-session -d -s {session} /bin/zsh -lc \"{BuildAppRunCommand()}\"");
             await Task.Delay(1600);
 
             SendKeys(session, "Up");
@@ -114,7 +115,7 @@ public sealed class TmuxSmokeIntegrationTests
     private static bool PaneHasExamplesChildProcess(string session)
     {
         var panePid = PanePid(session);
-        return CommandSucceeds("pgrep", $"-P {panePid} -f TeaSharp.Examples");
+        return CommandSucceeds("pgrep", $"-P {panePid} -f {FixtureProcessName}");
     }
 
     private static bool SessionExists(string session)
@@ -158,6 +159,35 @@ public sealed class TmuxSmokeIntegrationTests
         var stdErr = process.StandardError.ReadToEnd();
         process.WaitForExit();
         return new CommandResult(process.ExitCode, stdOut, stdErr);
+    }
+
+    private static string BuildAppRunCommand()
+    {
+        var command = $"cd {QuoteForShell(RepoRoot)} && dotnet run --project {QuoteForShell(FixtureProjectPath)} --no-build; exec /bin/zsh -i";
+        return command.Replace("\\", "\\\\", StringComparison.Ordinal).Replace("\"", "\\\"", StringComparison.Ordinal);
+    }
+
+    private static string QuoteForShell(string value)
+    {
+        return value.Contains(' ', StringComparison.Ordinal)
+            ? $"\"{value}\""
+            : value;
+    }
+
+    private static string ResolveRepoRoot()
+    {
+        var current = new DirectoryInfo(AppContext.BaseDirectory);
+        while (current is not null)
+        {
+            if (File.Exists(Path.Combine(current.FullName, "TeaSharp.slnx")))
+            {
+                return current.FullName;
+            }
+
+            current = current.Parent;
+        }
+
+        throw new InvalidOperationException("Could not locate TeaSharp.slnx from the integration test output directory.");
     }
 
     private sealed record CommandResult(int ExitCode, string StdOut, string StdErr);
