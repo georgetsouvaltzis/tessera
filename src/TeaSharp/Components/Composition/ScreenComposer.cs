@@ -9,7 +9,9 @@ public sealed class ScreenComposer
 
     public IReadOnlyList<ScreenRegion> Regions => _regions;
 
-    public string? FocusedRegionId { get; private set; }
+    public ScreenRegionKey? FocusedRegionKey { get; private set; }
+
+    public string? FocusedRegionId => FocusedRegionKey?.Value;
 
     public bool RouteMouseWheelToFocusedRegion { get; set; } = true;
 
@@ -24,7 +26,7 @@ public sealed class ScreenComposer
     }
 
     public ScreenRegion AddRegion(
-        string id,
+        ScreenRegionKey id,
         Rect bounds,
         Action<Canvas, Rect> render,
         Func<IMessage, bool>? update = null,
@@ -41,7 +43,7 @@ public sealed class ScreenComposer
     }
 
     public ScreenRegion AddComponent(
-        string id,
+        ScreenRegionKey id,
         Rect bounds,
         ICanvasComponent component,
         bool? focusable = null,
@@ -76,7 +78,7 @@ public sealed class ScreenComposer
     }
 
     public ScreenRegion AddOverlayRegion(
-        string id,
+        ScreenRegionKey id,
         Rect bounds,
         Action<Canvas, Rect> render,
         Func<IMessage, bool>? update = null,
@@ -91,7 +93,7 @@ public sealed class ScreenComposer
     }
 
     public ScreenRegion AddOverlayComponent(
-        string id,
+        ScreenRegionKey id,
         Rect bounds,
         ICanvasComponent component,
         bool? focusable = null,
@@ -104,7 +106,7 @@ public sealed class ScreenComposer
     }
 
     public ScreenRegion AddModalComponent(
-        string id,
+        ScreenRegionKey id,
         Rect bounds,
         ICanvasComponent component,
         bool? focusable = null,
@@ -114,7 +116,7 @@ public sealed class ScreenComposer
     }
 
     public ScreenRegion AddPaletteComponent(
-        string id,
+        ScreenRegionKey id,
         Rect bounds,
         ICanvasComponent component,
         bool? focusable = null,
@@ -124,27 +126,27 @@ public sealed class ScreenComposer
     }
 
     public ScreenRegion AddToastOverlay(
-        string id,
+        ScreenRegionKey id,
         Rect bounds,
         ICanvasComponent component)
     {
         return AddOverlayComponent(id, bounds, component, focusable: false, focusOnClick: false, interceptsPointer: false, layer: ScreenLayer.Toast);
     }
 
-    public void CompleteFrame(string? preferredFocusRegionId = null)
+    public void CompleteFrame(ScreenRegionKey? preferredFocusRegionKey = null)
     {
         if (_regions.Count == 0)
         {
-            FocusedRegionId = null;
+            FocusedRegionKey = null;
             return;
         }
 
-        if (!string.IsNullOrWhiteSpace(preferredFocusRegionId) && ApplyFocus(preferredFocusRegionId!, invokeFocus: false))
+        if (preferredFocusRegionKey is { } preferredKey && ApplyFocus(preferredKey, invokeFocus: false))
         {
             return;
         }
 
-        if (!string.IsNullOrWhiteSpace(FocusedRegionId) && ApplyFocus(FocusedRegionId!, invokeFocus: false))
+        if (FocusedRegionKey is { } focusedKey && ApplyFocus(focusedKey, invokeFocus: false))
         {
             return;
         }
@@ -156,7 +158,7 @@ public sealed class ScreenComposer
             return;
         }
 
-        FocusedRegionId = null;
+        FocusedRegionKey = null;
     }
 
     public bool Update(IMessage message)
@@ -198,9 +200,9 @@ public sealed class ScreenComposer
         return changed;
     }
 
-    public bool SetFocus(string regionId)
+    public bool SetFocus(ScreenRegionKey regionKey)
     {
-        return ApplyFocus(regionId, invokeFocus: true);
+        return ApplyFocus(regionKey, invokeFocus: true);
     }
 
     public bool FocusNext()
@@ -221,11 +223,11 @@ public sealed class ScreenComposer
         return targetIndex >= 0 && ApplyFocus(_regions[targetIndex].Id, invokeFocus: true);
     }
 
-    public bool TryGetBounds(string regionId, out Rect bounds)
+    public bool TryGetBounds(ScreenRegionKey regionKey, out Rect bounds)
     {
         foreach (var region in _regions)
         {
-            if (!string.Equals(region.Id, regionId, StringComparison.Ordinal))
+            if (region.Id != regionKey)
             {
                 continue;
             }
@@ -249,7 +251,7 @@ public sealed class ScreenComposer
     private void AddRegion(ScreenRegion region)
     {
         _regions.Add(region);
-        if (string.Equals(region.Id, FocusedRegionId, StringComparison.Ordinal))
+        if (region.Id == FocusedRegionKey)
         {
             region.ApplyFocus(true, invokeFocus: false);
         }
@@ -259,19 +261,19 @@ public sealed class ScreenComposer
         }
     }
 
-    private bool ApplyFocus(string regionId, bool invokeFocus)
+    private bool ApplyFocus(ScreenRegionKey regionKey, bool invokeFocus)
     {
         var matched = false;
         foreach (var region in _regions)
         {
-            var shouldFocus = region.Focusable && string.Equals(region.Id, regionId, StringComparison.Ordinal);
+            var shouldFocus = region.Focusable && region.Id == regionKey;
             region.ApplyFocus(shouldFocus, invokeFocus && shouldFocus);
             matched |= shouldFocus;
         }
 
         if (matched)
         {
-            FocusedRegionId = regionId;
+            FocusedRegionKey = regionKey;
             return true;
         }
 
@@ -343,14 +345,14 @@ public sealed class ScreenComposer
     private bool TryGetFocusedRegionIndex(out int focusedIndex)
     {
         focusedIndex = -1;
-        if (string.IsNullOrWhiteSpace(FocusedRegionId))
+        if (FocusedRegionKey is null)
         {
             return false;
         }
 
         for (var i = 0; i < _regions.Count; i++)
         {
-            if (!string.Equals(_regions[i].Id, FocusedRegionId, StringComparison.Ordinal))
+            if (_regions[i].Id != FocusedRegionKey)
             {
                 continue;
             }
@@ -360,5 +362,106 @@ public sealed class ScreenComposer
         }
 
         return false;
+    }
+
+    public ScreenRegion AddRegion(
+        string id,
+        Rect bounds,
+        Action<Canvas, Rect> render,
+        Func<IMessage, bool>? update = null,
+        Func<MouseMsg, Rect, bool>? updateMouse = null,
+        bool focusable = false,
+        bool focusOnClick = true,
+        bool interceptsPointer = true,
+        int layer = (int)ScreenLayer.Base,
+        Action? onFocus = null)
+    {
+        return AddRegion(new ScreenRegionKey(id), bounds, render, update, updateMouse, focusable, focusOnClick, interceptsPointer, layer, onFocus);
+    }
+
+    public ScreenRegion AddComponent(
+        string id,
+        Rect bounds,
+        ICanvasComponent component,
+        bool? focusable = null,
+        bool focusOnClick = true,
+        bool interceptsPointer = true,
+        int layer = (int)ScreenLayer.Base,
+        Action? onFocus = null)
+    {
+        return AddComponent(new ScreenRegionKey(id), bounds, component, focusable, focusOnClick, interceptsPointer, layer, onFocus);
+    }
+
+    public ScreenRegion AddOverlayRegion(
+        string id,
+        Rect bounds,
+        Action<Canvas, Rect> render,
+        Func<IMessage, bool>? update = null,
+        Func<MouseMsg, Rect, bool>? updateMouse = null,
+        bool focusable = false,
+        bool focusOnClick = true,
+        bool interceptsPointer = true,
+        ScreenLayer layer = ScreenLayer.Overlay,
+        Action? onFocus = null)
+    {
+        return AddOverlayRegion(new ScreenRegionKey(id), bounds, render, update, updateMouse, focusable, focusOnClick, interceptsPointer, layer, onFocus);
+    }
+
+    public ScreenRegion AddOverlayComponent(
+        string id,
+        Rect bounds,
+        ICanvasComponent component,
+        bool? focusable = null,
+        bool focusOnClick = true,
+        bool interceptsPointer = true,
+        ScreenLayer layer = ScreenLayer.Overlay,
+        Action? onFocus = null)
+    {
+        return AddOverlayComponent(new ScreenRegionKey(id), bounds, component, focusable, focusOnClick, interceptsPointer, layer, onFocus);
+    }
+
+    public ScreenRegion AddModalComponent(
+        string id,
+        Rect bounds,
+        ICanvasComponent component,
+        bool? focusable = null,
+        Action? onFocus = null)
+    {
+        return AddModalComponent(new ScreenRegionKey(id), bounds, component, focusable, onFocus);
+    }
+
+    public ScreenRegion AddPaletteComponent(
+        string id,
+        Rect bounds,
+        ICanvasComponent component,
+        bool? focusable = null,
+        Action? onFocus = null)
+    {
+        return AddPaletteComponent(new ScreenRegionKey(id), bounds, component, focusable, onFocus);
+    }
+
+    public ScreenRegion AddToastOverlay(
+        string id,
+        Rect bounds,
+        ICanvasComponent component)
+    {
+        return AddToastOverlay(new ScreenRegionKey(id), bounds, component);
+    }
+
+    public bool SetFocus(string regionId)
+    {
+        return SetFocus(new ScreenRegionKey(regionId));
+    }
+
+    public bool TryGetBounds(string regionId, out Rect bounds)
+    {
+        return TryGetBounds(new ScreenRegionKey(regionId), out bounds);
+    }
+
+    public void CompleteFrame(string? preferredFocusRegionId)
+    {
+        CompleteFrame(string.IsNullOrWhiteSpace(preferredFocusRegionId)
+            ? (ScreenRegionKey?)null
+            : new ScreenRegionKey(preferredFocusRegionId));
     }
 }

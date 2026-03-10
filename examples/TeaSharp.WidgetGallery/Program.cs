@@ -28,20 +28,22 @@ catch (TeaProgramInterruptedException)
 
 internal sealed record GalleryTickMsg(DateTimeOffset At) : IMessage;
 
-internal sealed class WidgetGalleryModel : IModel
+internal sealed class WidgetGalleryModel : InteractiveScreenModel
 {
-    private const string TabsRegionId = "gallery.tabs";
-    private const string ButtonRegionId = "gallery.button";
-    private const string ProgressRegionId = "gallery.progress";
-    private const string TextInputRegionId = "gallery.textInput";
-    private const string TextAreaRegionId = "gallery.textArea";
-    private const string ListRegionId = "gallery.list";
-    private const string TableRegionId = "gallery.table";
-    private const string LogViewerRegionId = "gallery.logs";
-    private const string DialogRegionId = "gallery.dialog";
+    private static readonly ScreenRegionKey TabsRegionId = new("gallery.tabs");
+    private static readonly ScreenRegionKey ButtonRegionId = new("gallery.button");
+    private static readonly ScreenRegionKey ProgressRegionId = new("gallery.progress");
+    private static readonly ScreenRegionKey TextInputRegionId = new("gallery.textInput");
+    private static readonly ScreenRegionKey TextAreaRegionId = new("gallery.textArea");
+    private static readonly ScreenRegionKey ListRegionId = new("gallery.list");
+    private static readonly ScreenRegionKey TableRegionId = new("gallery.table");
+    private static readonly ScreenRegionKey LogViewerRegionId = new("gallery.logs");
+    private static readonly ScreenRegionKey DialogRegionId = new("gallery.dialog");
+    private static readonly ScreenRegionKey LayoutRegionId = new("gallery.layout");
+    private static readonly ScreenRegionKey BasicsLabelRegionId = new("gallery.basics.label");
+    private static readonly ScreenRegionKey BasicsInfoRegionId = new("gallery.basics.info");
+    private static readonly ScreenRegionKey OverlayPanelRegionId = new("gallery.overlay.panel");
 
-    private readonly InputRouter _inputRouter = new();
-    private readonly ScreenComposer _screen = new();
     private readonly TabsComponent _tabs = new(new TabsOptions(["Basics", "Inputs", "Data", "Overlay", "Layout"]));
     private readonly LabelComponent _label = new(new LabelOptions(
         Title: "Label",
@@ -126,9 +128,9 @@ internal sealed class WidgetGalleryModel : IModel
         _logs.Append("q quits");
     }
 
-    public Command? Init() => NextTick();
+    public override Command? Init() => NextTick();
 
-    public Command? Update(IMessage message)
+    public override Command? Update(IMessage message)
     {
         if (message is GalleryTickMsg tick)
         {
@@ -164,15 +166,13 @@ internal sealed class WidgetGalleryModel : IModel
 
         if (message is KeyPressMsg key)
         {
-            EnsureScreen();
-            var routed = _inputRouter.Route(key);
-            return routed.Handled ? routed.Command : null;
+            return RouteKey(key);
         }
 
         return null;
     }
 
-    public ModelView View()
+    public override ModelView View()
     {
         if (_width < 60 || _height < 18)
         {
@@ -182,9 +182,7 @@ internal sealed class WidgetGalleryModel : IModel
         var canvas = new Canvas(_width, _height, CanvasTextMode.GraphemeAware);
         canvas.Clear();
 
-        var bodyRect = new Rect(0, 1, _width, _height - 2);
-        BuildScreen(bodyRect);
-        _screen.Render(canvas);
+        RenderScreen(canvas);
 
         var statusRect = new Rect(0, _height - 1, _width, 1);
         _status.LeftText = $"tab={_tabs.SelectedIndex + 1}:{_tabs.Tabs[_tabs.SelectedIndex]} focus={FocusLabel()}";
@@ -207,10 +205,36 @@ internal sealed class WidgetGalleryModel : IModel
         };
     }
 
-    private void BuildScreen(Rect bodyRect)
+    protected override Rect GetBodyRect()
     {
-        _screen.BeginFrame();
-        _screen.AddComponent(TabsRegionId, new Rect(0, 0, _width, 1), _tabs);
+        return new Rect(0, 1, _width, _height - 2);
+    }
+
+    protected override ScreenRegionKey? PreferredFocusRegionKey
+    {
+        get
+        {
+            if (_dialog.Visible)
+            {
+                return DialogRegionId;
+            }
+
+            return _tabs.SelectedIndex switch
+            {
+                0 => FocusedRegionKey is { } key && (key == ButtonRegionId || key == ProgressRegionId) ? key : TabsRegionId,
+                1 => FocusedRegionKey is { } key && (key == TextInputRegionId || key == TextAreaRegionId) ? key : TabsRegionId,
+                2 => FocusedRegionKey is { } key && (key == ListRegionId || key == TableRegionId || key == LogViewerRegionId) ? key : TabsRegionId,
+                3 => TabsRegionId,
+                _ => TabsRegionId,
+            };
+        }
+    }
+
+    protected override bool CanBuildScreen => _width >= 60 && _height >= 18;
+
+    protected override void ComposeScreen(Rect bodyRect)
+    {
+        Screen.AddComponent(TabsRegionId, new Rect(0, 0, _width, 1), _tabs);
 
         switch (_tabs.SelectedIndex)
         {
@@ -227,27 +251,25 @@ internal sealed class WidgetGalleryModel : IModel
                 RegisterOverlayRegions(bodyRect);
                 break;
             default:
-                _screen.AddComponent("gallery.layout", bodyRect, _layoutDemo, focusable: false);
+                Screen.AddComponent(LayoutRegionId, bodyRect, _layoutDemo, focusable: false);
                 break;
         }
 
         if (_dialog.Visible)
         {
-            _screen.AddModalComponent(DialogRegionId, bodyRect, _dialog);
+            Screen.AddModalComponent(DialogRegionId, bodyRect, _dialog);
         }
-
-        _screen.CompleteFrame(PreferredFocusRegionId());
     }
 
     private void RegisterBasicsRegions(Rect rect)
     {
         var (top, bottom) = Layout.SplitHorizontal(rect, Math.Max(8, rect.Height / 2));
         var (left, right) = Layout.SplitVertical(top, Math.Max(36, top.Width / 2));
-        _screen.AddComponent("gallery.basics.label", left, _label, focusable: false);
-        _screen.AddComponent(ButtonRegionId, new Rect(right.X, right.Y, right.Width, 3), _button);
-        _screen.AddComponent(ProgressRegionId, new Rect(right.X, right.Y + 4, right.Width, 4), _progress);
-        _screen.AddRegion(
-            "gallery.basics.info",
+        Screen.AddComponent(BasicsLabelRegionId, left, _label, focusable: false);
+        Screen.AddComponent(ButtonRegionId, new Rect(right.X, right.Y, right.Width, 3), _button);
+        Screen.AddComponent(ProgressRegionId, new Rect(right.X, right.Y + 4, right.Width, 4), _progress);
+        Screen.AddRegion(
+            BasicsInfoRegionId,
             bottom,
             (canvas, bounds) =>
             {
@@ -266,24 +288,24 @@ internal sealed class WidgetGalleryModel : IModel
     private void RegisterInputRegions(Rect rect)
     {
         var (inputRect, areaRect) = Layout.SplitHorizontal(rect, 5, minFirst: 5, minSecond: 8);
-        _screen.AddRegion(TextInputRegionId, inputRect, _textInput.Render, UpdateTextInputRegion, focusable: true);
-        _screen.AddRegion(TextAreaRegionId, areaRect, _textArea.Render, UpdateTextAreaRegion, focusable: true);
+        Screen.AddRegion(TextInputRegionId, inputRect, _textInput.Render, UpdateTextInputRegion, focusable: true);
+        Screen.AddRegion(TextAreaRegionId, areaRect, _textArea.Render, UpdateTextAreaRegion, focusable: true);
     }
 
     private void RegisterDataRegions(Rect rect)
     {
         var (left, right) = Layout.SplitVertical(rect, Math.Max(28, rect.Width / 3));
-        _screen.AddComponent(ListRegionId, left, _list);
+        Screen.AddComponent(ListRegionId, left, _list);
 
         var (tableRect, logsRect) = Layout.SplitHorizontal(right, Math.Max(10, right.Height / 2));
-        _screen.AddComponent(TableRegionId, tableRect, _table);
-        _screen.AddComponent(LogViewerRegionId, logsRect, _logs);
+        Screen.AddComponent(TableRegionId, tableRect, _table);
+        Screen.AddComponent(LogViewerRegionId, logsRect, _logs);
     }
 
     private void RegisterOverlayRegions(Rect rect)
     {
-        _screen.AddRegion(
-            "gallery.overlay.panel",
+        Screen.AddRegion(
+            OverlayPanelRegionId,
             rect,
             (canvas, bounds) =>
             {
@@ -301,13 +323,13 @@ internal sealed class WidgetGalleryModel : IModel
 
     private void ConfigureInputRouter()
     {
-        _inputRouter
+        InputRouter
             .AddScope("gallery.system", InputScopeKind.System, static () => true, HandleSystemKey)
             .AddScope("gallery.modal", InputScopeKind.Modal, () => _dialog.Visible, HandleDialogKey, InputScopeBehavior.CaptureWhileActive)
             .AddScope(
                 "gallery.focused",
                 InputScopeKind.FocusedRegion,
-                () => !_dialog.Visible && !string.IsNullOrWhiteSpace(_screen.FocusedRegionId),
+                () => !_dialog.Visible && FocusedRegionKey is not null,
                 HandleFocusedRegionKey,
                 blocksGlobalShortcuts: ShouldBlockGlobalShortcuts)
             .AddScope("gallery.global", InputScopeKind.Global, static () => true, HandleGlobalKey);
@@ -343,7 +365,7 @@ internal sealed class WidgetGalleryModel : IModel
 
         if (key.Is(KeyCode.Tab, KeyModifiers.None))
         {
-            _screen.FocusNext();
+            Screen.FocusNext();
             _lastEvent = $"focus:{FocusLabel()}";
             return InputRouteResult.HandledWithoutCommand;
         }
@@ -353,11 +375,11 @@ internal sealed class WidgetGalleryModel : IModel
             _dialog.Visible = !_dialog.Visible;
             if (_dialog.Visible)
             {
-                _screen.SetFocus(DialogRegionId);
+                Screen.SetFocus(DialogRegionId);
             }
             else
             {
-                _screen.SetFocus(TabsRegionId);
+                Screen.SetFocus(TabsRegionId);
             }
 
             _lastEvent = _dialog.Visible ? "dialog:open" : "dialog:close";
@@ -370,7 +392,8 @@ internal sealed class WidgetGalleryModel : IModel
 
     private bool ShouldBlockGlobalShortcuts(KeyPressMsg key)
     {
-        return _screen.FocusedRegionId is TextInputRegionId or TextAreaRegionId
+        return FocusedRegionKey is { } focusedKey
+            && (focusedKey == TextInputRegionId || focusedKey == TextAreaRegionId)
             && key.Modifiers == KeyModifiers.None
             && key.Code == KeyCode.Character;
     }
@@ -379,26 +402,26 @@ internal sealed class WidgetGalleryModel : IModel
     {
         var previousSubmitCount = _textInput.SubmitCount;
         var previousDialogResult = _dialog.LastResult;
-        var changed = _screen.Update(NormalizeInputKey(key));
+        var changed = Screen.Update(NormalizeInputKey(key));
         if (!changed)
         {
             return InputRouteResult.NotHandled;
         }
 
-        if (_screen.FocusedRegionId == DialogRegionId && previousDialogResult != _dialog.LastResult)
+        if (FocusedRegionKey == DialogRegionId && previousDialogResult != _dialog.LastResult)
         {
-            _screen.SetFocus(TabsRegionId);
+            Screen.SetFocus(TabsRegionId);
             _logs.Append($"dialog:{_dialog.LastResult}");
             _lastEvent = $"dialog:{_dialog.LastResult.ToString().ToLowerInvariant()}";
             return InputRouteResult.HandledWithoutCommand;
         }
 
-        if (_screen.FocusedRegionId == TextInputRegionId && _textInput.SubmitCount > previousSubmitCount)
+        if (FocusedRegionKey == TextInputRegionId && _textInput.SubmitCount > previousSubmitCount)
         {
             _logs.Append($"input:{_textInput.LastSubmittedValue}");
         }
 
-        _lastEvent = _screen.FocusedRegionId == TabsRegionId
+        _lastEvent = FocusedRegionKey == TabsRegionId
             ? $"tab:{_tabs.SelectedIndex + 1}"
             : key.Keystroke();
         return InputRouteResult.HandledWithoutCommand;
@@ -435,20 +458,19 @@ internal sealed class WidgetGalleryModel : IModel
             return false;
         }
 
-        EnsureScreen();
-        var changed = _screen.Update(mouse);
+        var changed = RouteMouse(mouse);
         if (!changed)
         {
             return false;
         }
 
-        _lastEvent = _screen.FocusedRegionId switch
+        _lastEvent = FocusedRegionKey switch
         {
-            TabsRegionId => $"mouse:tab:{_tabs.SelectedIndex + 1}",
-            ButtonRegionId => _button.WasPressed ? "button:press" : "button:hover",
-            ListRegionId => "mouse:list",
-            TableRegionId => "mouse:table",
-            DialogRegionId => $"dialog:{_dialog.LastResult}",
+            var key when key == TabsRegionId => $"mouse:tab:{_tabs.SelectedIndex + 1}",
+            var key when key == ButtonRegionId => _button.WasPressed ? "button:press" : "button:hover",
+            var key when key == ListRegionId => "mouse:list",
+            var key when key == TableRegionId => "mouse:table",
+            var key when key == DialogRegionId => $"dialog:{_dialog.LastResult}",
             _ => $"mouse:{FocusLabel()}",
         };
         return true;
@@ -456,44 +478,19 @@ internal sealed class WidgetGalleryModel : IModel
 
     private string FocusLabel()
     {
-        return _screen.FocusedRegionId switch
+        return FocusedRegionKey switch
         {
-            TabsRegionId => "tabs",
-            ButtonRegionId => "button",
-            ProgressRegionId => "progress",
-            TextInputRegionId => "text-input",
-            TextAreaRegionId => "text-area",
-            ListRegionId => "list",
-            TableRegionId => "table",
-            LogViewerRegionId => "logs",
-            DialogRegionId => "dialog",
+            var key when key == TabsRegionId => "tabs",
+            var key when key == ButtonRegionId => "button",
+            var key when key == ProgressRegionId => "progress",
+            var key when key == TextInputRegionId => "text-input",
+            var key when key == TextAreaRegionId => "text-area",
+            var key when key == ListRegionId => "list",
+            var key when key == TableRegionId => "table",
+            var key when key == LogViewerRegionId => "logs",
+            var key when key == DialogRegionId => "dialog",
             _ => "none",
         };
-    }
-
-    private string? PreferredFocusRegionId()
-    {
-        if (_dialog.Visible)
-        {
-            return DialogRegionId;
-        }
-
-        return _tabs.SelectedIndex switch
-        {
-            0 => _screen.FocusedRegionId is ButtonRegionId or ProgressRegionId ? _screen.FocusedRegionId : TabsRegionId,
-            1 => _screen.FocusedRegionId is TextInputRegionId or TextAreaRegionId ? _screen.FocusedRegionId : TabsRegionId,
-            2 => _screen.FocusedRegionId is ListRegionId or TableRegionId or LogViewerRegionId ? _screen.FocusedRegionId : TabsRegionId,
-            3 => TabsRegionId,
-            _ => TabsRegionId,
-        };
-    }
-
-    private void EnsureScreen()
-    {
-        if (_screen.Regions.Count == 0 && _width >= 60 && _height >= 18)
-        {
-            BuildScreen(new Rect(0, 1, _width, _height - 2));
-        }
     }
 
     private bool UpdateTextInputRegion(IMessage message)

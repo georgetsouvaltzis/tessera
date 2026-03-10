@@ -35,8 +35,10 @@ The design follows patterns used in Bubble Tea examples:
     - focused-slot keyboard routing by default
     - wheel fallback to focused slot when pointer is outside any slot
   - `ScreenComposer`: named interactive regions for screen-scale layout snapshots.
+    - region identity uses `ScreenRegionKey`; string overloads remain as a convenience bridge
     - build once per frame, route later from the stored snapshot
     - focus ownership APIs: `SetFocus`, `FocusNext`, `FocusPrevious`
+    - typed focus state via `FocusedRegionKey`
     - mouse routing by registered region bounds instead of repeated app-local rect math
     - preferred-focus selection via `CompleteFrame(...)`
     - overlay helpers: `AddOverlayComponent`, `AddModalComponent`, `AddPaletteComponent`, `AddToastOverlay`
@@ -44,6 +46,9 @@ The design follows patterns used in Bubble Tea examples:
     - ordered scopes: `System`, `Modal`, `Palette`, `Command`, `FocusedRegion`, `Global`
     - scope behaviors: `ContinueWhenUnhandled` or `CaptureWhileActive`
     - optional `blocksGlobalShortcuts` guard for text-entry regions so plain character shortcuts do not leak into app-global handlers
+  - `InteractiveScreenModel`: app-shell base for screen-oriented models.
+    - owns `Screen`, `InputRouter`, lazy `EnsureScreen`, and per-frame `RenderScreen(...)`
+    - app models implement `ComposeScreen(...)`, `GetBodyRect()`, and optional `PreferredFocusRegionKey`
 - `Widgets`:
   - `DrawPanel`
   - `DrawProgressBar`
@@ -119,7 +124,7 @@ The design follows patterns used in Bubble Tea examples:
       - `DialogComponent.AcceptKey` / `DismissKey`
       - options-based constructors (`LabelOptions`, `ButtonOptions`, `TextInputOptions`, `TextAreaOptions`, `ListOptions<T>`, `TableOptions`, `ProgressBarOptions`, `StatusBarOptions`, `DialogOptions`, `LayoutContainerOptions`, `TabsOptions`)
       - component-level state accessors instead of raw nested models (`TextInputComponent.Value` / `Placeholder` / `MaxLength`, `TextAreaComponent.Value`, `ListComponent<T>.SelectedItem` / `SetItems(...)`, `ComboboxComponent.FilterText` / `Placeholder`, `TableComponent.PageSize` / `SortColumn` / `SortDescending`, `NumberInputComponent.Text`, `ButtonComponent.WasPressed` / `PressCount` / `Hovered` / `Pressed`)
-      - use `ScreenComposer` for screen-scale region orchestration, `InputRouter` for mode/global key precedence, and `ComponentComposer` for slot-based component trees
+      - use `ScreenComposer` + `ScreenRegionKey` for screen-scale region orchestration, `InputRouter` for mode/global key precedence, and `InteractiveScreenModel` when an app follows the standard screen-shell pattern
       - `ShowBorder` toggle for minimalist rendering on border-capable prebuilt widgets
       - state styling primitives for child items (`WidgetVisualState`, `WidgetStatePalette`, `ItemStateResolver`/`OptionStateResolver`)
       - state palette inheritance (`WidgetStatePalette.Parent` / `InheritFrom(...)`)

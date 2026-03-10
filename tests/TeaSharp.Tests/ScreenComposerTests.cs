@@ -19,8 +19,9 @@ internal static class ScreenComposerTests
     {
         var composer = new ScreenComposer();
         var button = new MouseProbeComponent();
+        var buttonKey = new ScreenRegionKey("button");
         composer.BeginFrame();
-        composer.AddComponent("button", new Rect(0, 0, 12, 4), button);
+        composer.AddComponent(buttonKey, new Rect(0, 0, 12, 4), button);
         composer.CompleteFrame();
 
         var changed = composer.Update(new MouseClickMsg(MouseButton.Left, 2, 1));
@@ -28,7 +29,7 @@ internal static class ScreenComposerTests
         TestAssert.True(changed, "Mouse click should route to the registered region.");
         TestAssert.True(button.MouseEvents == 1, "Mouse region should receive the click.");
         TestAssert.True(button.Focused, "Clickable focusable region should become focused.");
-        TestAssert.True(composer.FocusedRegionId == "button", "Composer should track focused region by id.");
+        TestAssert.True(composer.FocusedRegionKey == buttonKey, "Composer should track focused region by typed key.");
         return Task.CompletedTask;
     }
 
@@ -37,18 +38,20 @@ internal static class ScreenComposerTests
         var composer = new ScreenComposer();
         var first = new MouseProbeComponent();
         var second = new MouseProbeComponent();
+        var firstKey = new ScreenRegionKey("first");
+        var secondKey = new ScreenRegionKey("second");
         composer.BeginFrame();
         composer.AddRegion("static", new Rect(0, 0, 4, 1), static (_, _) => { });
-        composer.AddComponent("first", new Rect(0, 1, 12, 4), first);
-        composer.AddComponent("second", new Rect(12, 1, 12, 4), second);
-        composer.CompleteFrame("first");
+        composer.AddComponent(firstKey, new Rect(0, 1, 12, 4), first);
+        composer.AddComponent(secondKey, new Rect(12, 1, 12, 4), second);
+        composer.CompleteFrame(firstKey);
 
         var changed = composer.FocusNext();
 
         TestAssert.True(changed, "FocusNext should advance focus across interactive regions.");
         TestAssert.True(!first.Focused, "Previous region should lose focus.");
         TestAssert.True(second.Focused, "Next focusable region should gain focus.");
-        TestAssert.True(composer.FocusedRegionId == "second", "Focused region id should advance.");
+        TestAssert.True(composer.FocusedRegionKey == secondKey, "Focused region key should advance.");
         return Task.CompletedTask;
     }
 
@@ -56,14 +59,15 @@ internal static class ScreenComposerTests
     {
         var composer = new ScreenComposer();
         var command = new MouseProbeComponent();
+        var commandKey = new ScreenRegionKey("command");
         var focusCount = 0;
         composer.BeginFrame();
         composer.AddComponent("button", new Rect(0, 0, 12, 4), new MouseProbeComponent());
-        composer.AddComponent("command", new Rect(0, 5, 12, 4), command, onFocus: () => focusCount++);
-        composer.CompleteFrame("command");
+        composer.AddComponent(commandKey, new Rect(0, 5, 12, 4), command, onFocus: () => focusCount++);
+        composer.CompleteFrame(commandKey);
 
         TestAssert.True(command.Focused, "Preferred region should be focused after frame completion.");
-        TestAssert.True(composer.FocusedRegionId == "command", "Preferred focus id should be preserved.");
+        TestAssert.True(composer.FocusedRegionKey == commandKey, "Preferred focus key should be preserved.");
         TestAssert.Equal(0, focusCount, "Frame completion should not fire focus callbacks just for snapshot rebuilds.");
         return Task.CompletedTask;
     }

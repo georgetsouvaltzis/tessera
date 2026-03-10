@@ -12,7 +12,7 @@ public sealed class ScreenRegion
     private readonly Action? _onFocus;
 
     internal ScreenRegion(
-        string id,
+        ScreenRegionKey id,
         Rect bounds,
         Action<Canvas, Rect> render,
         Func<IMessage, bool>? update,
@@ -37,7 +37,7 @@ public sealed class ScreenRegion
         _onFocus = onFocus;
     }
 
-    public string Id { get; }
+    public ScreenRegionKey Id { get; }
 
     public Rect Bounds { get; }
 

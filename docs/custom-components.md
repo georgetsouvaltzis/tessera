@@ -11,11 +11,14 @@ TeaSharp custom components are built around three contracts:
   - switch to `KeyboardRoutingMode.Broadcast` when a container should fan out input
   - use it for slot-based component trees
 - `ScreenComposer`: named screen regions with frame snapshots, focus ownership, and mouse routing for larger app surfaces
+  - prefer `ScreenRegionKey` fields over ad hoc string constants once a screen grows beyond a toy example
   - overlay helpers handle blocking modals/palettes and passive toast overlays without extra app-level hit-testing
 - `InputRouter`: app-level key precedence across overlays, command bars, focused regions, and global shortcuts
   - typical scope order: `System` -> `Modal` -> `Palette` -> `Command` -> `FocusedRegion` -> `Global`
   - use `CaptureWhileActive` for modal/palette/command scopes so lower handlers cannot accidentally run
   - use `blocksGlobalShortcuts` on text-entry scopes to suppress plain-character globals while editing
+- `InteractiveScreenModel`: reusable screen shell for apps that compose a `ScreenComposer` + `InputRouter`
+  - call `RouteKey(...)`, `RouteMouse(...)`, and `RenderScreen(...)` instead of hand-rolling `EnsureScreen` / `BeginFrame` / `CompleteFrame` glue
 
 ## Minimal Render-Only Component
 
@@ -91,3 +94,4 @@ return canvas.Render();
 - If you need full Unicode layout fidelity in component text, use `CanvasTextMode.GraphemeAware`.
 - Use composer slots as an explicit layout graph; avoid hidden global state.
 - For screen-scale apps, keep one owner per concern: `ScreenComposer` for regions/focus/mouse, `InputRouter` for key precedence.
+- If your model is “one screen + some overlays + scoped shortcuts”, derive from `InteractiveScreenModel` and keep region keys as `static readonly ScreenRegionKey` fields.
