@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using TeaSharp.Core.Abstractions;
 using TeaSharp.Core.Application;
 using TeaSharp.Core.Commands;
@@ -15,6 +16,7 @@ public static class Tea
     /// <param name="model">The initial application model.</param>
     /// <param name="options">Advanced runtime options for terminal, renderer, and host customization.</param>
     /// <returns>A program ready to run.</returns>
+    [EditorBrowsable(EditorBrowsableState.Advanced)]
     public static TeaProgram NewProgram(IModel model, ProgramOptions? options = null) =>
         new(model, options);
 
