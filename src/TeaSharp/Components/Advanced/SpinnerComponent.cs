@@ -7,6 +7,7 @@ namespace TeaSharp.Components;
 public sealed class SpinnerComponent : IStatefulComponent, IMouseStatefulComponent, IFocusableComponent
 {
     private IReadOnlyList<string> _frames = ["|", "/", "-", "\\"];
+    private WidgetInteractionProfile _interactionProfile = WidgetInteractionProfile.Default.Clone();
     private bool _hovered;
 
     public string Title { get; set; } = "Spinner";
@@ -27,7 +28,11 @@ public sealed class SpinnerComponent : IStatefulComponent, IMouseStatefulCompone
 
     public WidgetStatePalette StatePalette { get; } = WidgetStatePalette.CreateDefault();
 
-    public WidgetInteractionProfile InteractionProfile { get; set; } = WidgetInteractionProfile.Default.Clone();
+    public WidgetInteractionProfile InteractionProfile
+    {
+        get => _interactionProfile;
+        set => _interactionProfile = WidgetInteractionProfile.CloneOrDefault(value);
+    }
 
     public void SetFrames(IEnumerable<string> frames)
     {
@@ -197,4 +202,3 @@ public sealed class SpinnerComponent : IStatefulComponent, IMouseStatefulCompone
         return true;
     }
 }
-

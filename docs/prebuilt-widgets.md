@@ -84,6 +84,7 @@ TeaSharp provides a prebuilt widget layer in `TeaSharp.Components.PrebuiltWidget
   - item resolvers (`ItemStateResolver` / `OptionStateResolver`)
   - palette inheritance (`Parent` / `InheritFrom(...)`)
 - Interactive prebuilt widgets expose `WidgetInteractionProfile` for unified hover/click/wheel behavior configuration.
+- Components clone assigned `WidgetInteractionProfile` instances on ingress, so shared defaults can be reused safely without cross-component mutation.
 
 ### State Styling Example
 

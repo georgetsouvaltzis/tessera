@@ -8,6 +8,7 @@ namespace TeaSharp.Components;
 public sealed class ButtonComponent : IStatefulComponent, IMouseStatefulComponent, IFocusableComponent
 {
     private static readonly KeyBinding ActivateKey = new("enter/space", "activate", "enter", "space");
+    private WidgetInteractionProfile _interactionProfile = WidgetInteractionProfile.Default.Clone();
     private bool _hovered;
     private bool _pressed;
 
@@ -27,7 +28,7 @@ public sealed class ButtonComponent : IStatefulComponent, IMouseStatefulComponen
         Focused = options.Focused;
         Enabled = options.Enabled;
         ShowBorder = options.ShowBorder;
-        InteractionProfile = options.InteractionProfile?.Clone() ?? WidgetInteractionProfile.Default.Clone();
+        InteractionProfile = options.InteractionProfile ?? WidgetInteractionProfile.Default;
     }
 
     public string Label { get; set; } = "Button";
@@ -50,7 +51,11 @@ public sealed class ButtonComponent : IStatefulComponent, IMouseStatefulComponen
 
     public WidgetStatePalette StatePalette { get; } = WidgetStatePalette.CreateDefault();
 
-    public WidgetInteractionProfile InteractionProfile { get; set; } = WidgetInteractionProfile.Default.Clone();
+    public WidgetInteractionProfile InteractionProfile
+    {
+        get => _interactionProfile;
+        set => _interactionProfile = WidgetInteractionProfile.CloneOrDefault(value);
+    }
 
     public bool Update(IMessage message)
     {

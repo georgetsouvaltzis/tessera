@@ -8,6 +8,7 @@ public sealed class TreeViewComponent : IStatefulComponent, IMouseStatefulCompon
 {
     private readonly List<TreeItemNode> _roots = [];
     private readonly List<(TreeItemNode Node, int Depth, int? ParentVisibleIndex)> _visible = [];
+    private WidgetInteractionProfile _interactionProfile = WidgetInteractionProfile.Default.Clone();
     private int _selectedIndex;
     private int _hoveredIndex = -1;
 
@@ -33,7 +34,11 @@ public sealed class TreeViewComponent : IStatefulComponent, IMouseStatefulCompon
 
     public WidgetStatePalette NodeStatePalette { get; } = WidgetStatePalette.CreateDefault();
 
-    public WidgetInteractionProfile InteractionProfile { get; set; } = WidgetInteractionProfile.Default.Clone();
+    public WidgetInteractionProfile InteractionProfile
+    {
+        get => _interactionProfile;
+        set => _interactionProfile = WidgetInteractionProfile.CloneOrDefault(value);
+    }
 
     public string? SelectedNodeId => _selectedIndex >= 0 && _selectedIndex < _visible.Count
         ? _visible[_selectedIndex].Node.Id
@@ -353,4 +358,3 @@ public sealed class TreeViewComponent : IStatefulComponent, IMouseStatefulCompon
         return true;
     }
 }
-

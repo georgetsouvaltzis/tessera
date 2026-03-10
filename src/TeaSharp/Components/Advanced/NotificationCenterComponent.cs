@@ -7,6 +7,7 @@ namespace TeaSharp.Components;
 public sealed class NotificationCenterComponent : IStatefulComponent, IMouseStatefulComponent, IFocusableComponent
 {
     private readonly List<NotificationEntry> _entries = [];
+    private WidgetInteractionProfile _interactionProfile = WidgetInteractionProfile.Default.Clone();
     private int _selectedIndex;
     private int _hoveredIndex = -1;
 
@@ -38,7 +39,11 @@ public sealed class NotificationCenterComponent : IStatefulComponent, IMouseStat
 
     public WidgetStatePalette EntryStatePalette { get; } = WidgetStatePalette.CreateDefault();
 
-    public WidgetInteractionProfile InteractionProfile { get; set; } = WidgetInteractionProfile.Default.Clone();
+    public WidgetInteractionProfile InteractionProfile
+    {
+        get => _interactionProfile;
+        set => _interactionProfile = WidgetInteractionProfile.CloneOrDefault(value);
+    }
 
     public IReadOnlyList<NotificationEntry> Entries => _entries;
 

@@ -6,6 +6,7 @@ namespace TeaSharp.Components;
 
 public sealed class SliderComponent : IStatefulComponent, IMouseStatefulComponent, IFocusableComponent
 {
+    private WidgetInteractionProfile _interactionProfile = WidgetInteractionProfile.Default.Clone();
     private bool _hovered;
     private bool _dragging;
 
@@ -33,7 +34,11 @@ public sealed class SliderComponent : IStatefulComponent, IMouseStatefulComponen
 
     public WidgetStatePalette StatePalette { get; } = WidgetStatePalette.CreateDefault();
 
-    public WidgetInteractionProfile InteractionProfile { get; set; } = WidgetInteractionProfile.Default.Clone();
+    public WidgetInteractionProfile InteractionProfile
+    {
+        get => _interactionProfile;
+        set => _interactionProfile = WidgetInteractionProfile.CloneOrDefault(value);
+    }
 
     public void SetValue(double value)
     {
@@ -271,4 +276,3 @@ public sealed class SliderComponent : IStatefulComponent, IMouseStatefulComponen
         return true;
     }
 }
-

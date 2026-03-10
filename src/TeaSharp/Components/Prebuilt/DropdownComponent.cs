@@ -7,6 +7,7 @@ namespace TeaSharp.Components;
 public sealed class DropdownComponent : IStatefulComponent, IMouseStatefulComponent, IFocusableComponent
 {
     private readonly OptionListController _options = new();
+    private WidgetInteractionProfile _interactionProfile = WidgetInteractionProfile.Default.Clone();
     private bool _fieldHovered;
 
     public DropdownComponent()
@@ -21,7 +22,7 @@ public sealed class DropdownComponent : IStatefulComponent, IMouseStatefulCompon
         ReadOnly = options.ReadOnly;
         ShowBorder = options.ShowBorder;
         MaxVisibleItems = options.MaxVisibleItems;
-        InteractionProfile = options.InteractionProfile?.Clone() ?? WidgetInteractionProfile.Default.Clone();
+        InteractionProfile = options.InteractionProfile ?? WidgetInteractionProfile.Default;
         ToggleOpenKey = options.ToggleOpenKey ?? new KeyBinding("enter/space", "toggle", "enter", "space");
         OpenKey = options.OpenKey ?? new KeyBinding("down", "open", "down");
         CloseKey = options.CloseKey ?? new KeyBinding("esc", "close", "escape");
@@ -56,7 +57,11 @@ public sealed class DropdownComponent : IStatefulComponent, IMouseStatefulCompon
 
     public int MaxVisibleItems { get; set; } = 6;
 
-    public WidgetInteractionProfile InteractionProfile { get; set; } = WidgetInteractionProfile.Default.Clone();
+    public WidgetInteractionProfile InteractionProfile
+    {
+        get => _interactionProfile;
+        set => _interactionProfile = WidgetInteractionProfile.CloneOrDefault(value);
+    }
 
     public KeyBinding ToggleOpenKey { get; set; } = new("enter/space", "toggle", "enter", "space");
 

@@ -8,6 +8,7 @@ namespace TeaSharp.Components;
 public sealed class MenuBarComponent : IStatefulComponent, IMouseStatefulComponent, IFocusableComponent
 {
     private readonly List<MenuBarItem> _items = [];
+    private WidgetInteractionProfile _interactionProfile = WidgetInteractionProfile.Default.Clone();
     private int _hoveredIndex = -1;
 
     public int SelectedIndex { get; private set; }
@@ -30,7 +31,11 @@ public sealed class MenuBarComponent : IStatefulComponent, IMouseStatefulCompone
 
     public WidgetStatePalette ItemStatePalette { get; } = WidgetStatePalette.CreateDefault();
 
-    public WidgetInteractionProfile InteractionProfile { get; set; } = WidgetInteractionProfile.Default.Clone();
+    public WidgetInteractionProfile InteractionProfile
+    {
+        get => _interactionProfile;
+        set => _interactionProfile = WidgetInteractionProfile.CloneOrDefault(value);
+    }
 
     public IReadOnlyList<MenuBarItem> Items => _items;
 
@@ -245,4 +250,3 @@ public sealed class MenuBarComponent : IStatefulComponent, IMouseStatefulCompone
         return true;
     }
 }
-

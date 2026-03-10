@@ -7,6 +7,7 @@ namespace TeaSharp.Components;
 public sealed class SortableTableComponent : IStatefulComponent, IMouseStatefulComponent, IFocusableComponent
 {
     private readonly List<IReadOnlyList<string>> _rows = [];
+    private WidgetInteractionProfile _interactionProfile = WidgetInteractionProfile.Default.Clone();
     private int _hoveredVisibleRow = -1;
     private int _selectedVisibleRow = -1;
 
@@ -37,7 +38,11 @@ public sealed class SortableTableComponent : IStatefulComponent, IMouseStatefulC
 
     public int VirtualWindowSize { get; private set; } = 32;
 
-    public WidgetInteractionProfile InteractionProfile { get; set; } = WidgetInteractionProfile.Default.Clone();
+    public WidgetInteractionProfile InteractionProfile
+    {
+        get => _interactionProfile;
+        set => _interactionProfile = WidgetInteractionProfile.CloneOrDefault(value);
+    }
 
     public KeyBinding NextPageKey { get; set; } = new("]", "next page", "]");
 

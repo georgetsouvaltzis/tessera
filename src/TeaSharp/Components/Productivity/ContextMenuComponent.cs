@@ -8,6 +8,7 @@ namespace TeaSharp.Components;
 public sealed class ContextMenuComponent : IStatefulComponent, IMouseStatefulComponent, IFocusableComponent
 {
     private readonly List<ContextMenuItem> _items = [];
+    private WidgetInteractionProfile _interactionProfile = WidgetInteractionProfile.Default.Clone();
     private int _selectedIndex;
     private int _hoveredIndex = -1;
 
@@ -39,7 +40,11 @@ public sealed class ContextMenuComponent : IStatefulComponent, IMouseStatefulCom
 
     public WidgetStatePalette ItemStatePalette { get; } = WidgetStatePalette.CreateDefault();
 
-    public WidgetInteractionProfile InteractionProfile { get; set; } = WidgetInteractionProfile.Default.Clone();
+    public WidgetInteractionProfile InteractionProfile
+    {
+        get => _interactionProfile;
+        set => _interactionProfile = WidgetInteractionProfile.CloneOrDefault(value);
+    }
 
     public IReadOnlyList<ContextMenuItem> Items => _items;
 
@@ -342,4 +347,3 @@ public sealed class ContextMenuComponent : IStatefulComponent, IMouseStatefulCom
             && x <= rect.Right;
     }
 }
-

@@ -14,6 +14,7 @@ internal static class ApiErgonomicsTests
         yield return new TestCase("ApiErgonomics_ComboboxComponent_ExposesFilterWithoutNestedInputAccess", ComboboxComponent_ExposesFilterWithoutNestedInputAccess);
         yield return new TestCase("ApiErgonomics_TableOptions_ExposePageSizeWithoutInnerAccess", TableOptions_ExposePageSizeWithoutInnerAccess);
         yield return new TestCase("ApiErgonomics_TableComponent_ExposesSortStateWithoutInnerAccess", TableComponent_ExposesSortStateWithoutInnerAccess);
+        yield return new TestCase("ApiErgonomics_InteractionProfiles_AreClonedOnAssignment", InteractionProfiles_AreClonedOnAssignment);
     }
 
     private static Task TextInputOptions_ConfigureComponentWithoutNestedInputAccess()
@@ -151,6 +152,26 @@ internal static class ApiErgonomicsTests
 
         TestAssert.Equal(1, table.SortColumn, "Table should expose sort column at component level.");
         TestAssert.True(table.SortDescending, "Table should expose sort direction at component level.");
+        return Task.CompletedTask;
+    }
+
+    private static Task InteractionProfiles_AreClonedOnAssignment()
+    {
+        var shared = WidgetInteractionProfile.KeyboardOnly;
+        var button = new ButtonComponent
+        {
+            InteractionProfile = shared,
+        };
+        var tabs = new TabsComponent(["Overview", "Logs"])
+        {
+            InteractionProfile = shared,
+        };
+
+        button.InteractionProfile.NavigateOnWheel = true;
+
+        TestAssert.True(!shared.NavigateOnWheel, "Shared profile instances should not be mutated through component assignment.");
+        TestAssert.True(!tabs.InteractionProfile.NavigateOnWheel, "Components should not share the same interaction profile instance.");
+        TestAssert.True(button.InteractionProfile.NavigateOnWheel, "Component-local profile mutation should still work after cloning.");
         return Task.CompletedTask;
     }
 }

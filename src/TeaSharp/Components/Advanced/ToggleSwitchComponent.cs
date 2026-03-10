@@ -6,6 +6,7 @@ namespace TeaSharp.Components;
 
 public sealed class ToggleSwitchComponent : IStatefulComponent, IMouseStatefulComponent, IFocusableComponent
 {
+    private WidgetInteractionProfile _interactionProfile = WidgetInteractionProfile.Default.Clone();
     private bool _hovered;
 
     public string Title { get; set; } = "Toggle";
@@ -32,7 +33,11 @@ public sealed class ToggleSwitchComponent : IStatefulComponent, IMouseStatefulCo
 
     public WidgetStatePalette StatePalette { get; } = WidgetStatePalette.CreateDefault();
 
-    public WidgetInteractionProfile InteractionProfile { get; set; } = WidgetInteractionProfile.Default.Clone();
+    public WidgetInteractionProfile InteractionProfile
+    {
+        get => _interactionProfile;
+        set => _interactionProfile = WidgetInteractionProfile.CloneOrDefault(value);
+    }
 
     public void SetValue(bool value)
     {
@@ -213,4 +218,3 @@ public sealed class ToggleSwitchComponent : IStatefulComponent, IMouseStatefulCo
         return true;
     }
 }
-

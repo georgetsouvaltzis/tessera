@@ -7,6 +7,7 @@ namespace TeaSharp.Components;
 
 public sealed class DatePickerComponent : IStatefulComponent, IMouseStatefulComponent, IFocusableComponent
 {
+    private WidgetInteractionProfile _interactionProfile = WidgetInteractionProfile.Default.Clone();
     private DateOnly? _hoveredDate;
 
     public string Title { get; set; } = "Date Picker";
@@ -41,7 +42,11 @@ public sealed class DatePickerComponent : IStatefulComponent, IMouseStatefulComp
 
     public WidgetStatePalette DayStatePalette { get; } = WidgetStatePalette.CreateDefault();
 
-    public WidgetInteractionProfile InteractionProfile { get; set; } = WidgetInteractionProfile.Default.Clone();
+    public WidgetInteractionProfile InteractionProfile
+    {
+        get => _interactionProfile;
+        set => _interactionProfile = WidgetInteractionProfile.CloneOrDefault(value);
+    }
 
     public void SetDate(DateOnly date)
     {

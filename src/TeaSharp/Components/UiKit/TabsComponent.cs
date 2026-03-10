@@ -7,6 +7,7 @@ namespace TeaSharp.Components;
 public sealed class TabsComponent : IStatefulComponent, IMouseStatefulComponent, IFocusableComponent
 {
     private readonly List<string> _tabs = [];
+    private WidgetInteractionProfile _interactionProfile = WidgetInteractionProfile.Default.Clone();
     private int _hoveredIndex = -1;
 
     public TabsComponent(IEnumerable<string> tabs)
@@ -21,7 +22,7 @@ public sealed class TabsComponent : IStatefulComponent, IMouseStatefulComponent,
         EnableNumericShortcuts = options.EnableNumericShortcuts;
         NextTabKey = options.NextTabKey ?? new KeyBinding("right", "next tab", "right");
         PreviousTabKey = options.PreviousTabKey ?? new KeyBinding("left", "previous tab", "left");
-        InteractionProfile = options.InteractionProfile?.Clone() ?? WidgetInteractionProfile.Default.Clone();
+        InteractionProfile = options.InteractionProfile ?? WidgetInteractionProfile.Default;
     }
 
     public int SelectedIndex { get; private set; }
@@ -32,7 +33,11 @@ public sealed class TabsComponent : IStatefulComponent, IMouseStatefulComponent,
 
     public WidgetStatePalette TabStatePalette { get; } = WidgetStatePalette.CreateDefault();
 
-    public WidgetInteractionProfile InteractionProfile { get; set; } = WidgetInteractionProfile.Default.Clone();
+    public WidgetInteractionProfile InteractionProfile
+    {
+        get => _interactionProfile;
+        set => _interactionProfile = WidgetInteractionProfile.CloneOrDefault(value);
+    }
 
     public KeyBinding NextTabKey { get; set; } = new("right", "next tab", "right");
 

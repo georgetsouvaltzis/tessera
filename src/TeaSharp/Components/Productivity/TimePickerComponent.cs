@@ -7,6 +7,7 @@ namespace TeaSharp.Components;
 
 public sealed class TimePickerComponent : IStatefulComponent, IMouseStatefulComponent, IFocusableComponent
 {
+    private WidgetInteractionProfile _interactionProfile = WidgetInteractionProfile.Default.Clone();
     private TimePickerField? _hoveredField;
 
     public string Title { get; set; } = "Time Picker";
@@ -43,7 +44,11 @@ public sealed class TimePickerComponent : IStatefulComponent, IMouseStatefulComp
 
     public WidgetStatePalette FieldStatePalette { get; } = WidgetStatePalette.CreateDefault();
 
-    public WidgetInteractionProfile InteractionProfile { get; set; } = WidgetInteractionProfile.Default.Clone();
+    public WidgetInteractionProfile InteractionProfile
+    {
+        get => _interactionProfile;
+        set => _interactionProfile = WidgetInteractionProfile.CloneOrDefault(value);
+    }
 
     public void SetValue(TimeOnly time)
     {

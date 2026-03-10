@@ -23,6 +23,11 @@ public sealed class WidgetInteractionProfile
 
     public bool OpenOnClick { get; set; } = true;
 
+    internal static WidgetInteractionProfile CloneOrDefault(WidgetInteractionProfile? profile)
+    {
+        return profile?.Clone() ?? Default.Clone();
+    }
+
     public WidgetInteractionProfile Clone()
     {
         return new WidgetInteractionProfile

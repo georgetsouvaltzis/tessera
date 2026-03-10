@@ -54,6 +54,7 @@ Status: in progress
 - standardize shared knobs: focus, borders, interaction profile, key bindings, state palette
 - move example-only composition code out of library-facing docs
 - added `DropdownOptions` and `ComboboxOptions` plus example/test coverage to start normalizing constructor-driven setup
+- clone `WidgetInteractionProfile` on component assignment/constructor ingress so shared defaults are safe and component state stays isolated
 
 ## Phase 5: Stable Integration Fixtures
 

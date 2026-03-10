@@ -8,6 +8,7 @@ public sealed class ComboboxComponent : IStatefulComponent, IMouseStatefulCompon
 {
     private readonly OptionListController _options = new();
     private readonly TextInputModel _input = new();
+    private WidgetInteractionProfile _interactionProfile = WidgetInteractionProfile.Default.Clone();
     private bool _fieldHovered;
 
     public ComboboxComponent()
@@ -24,7 +25,7 @@ public sealed class ComboboxComponent : IStatefulComponent, IMouseStatefulCompon
         ShowBorder = options.ShowBorder;
         MaxVisibleItems = options.MaxVisibleItems;
         InputKeyMap = options.InputKeyMap ?? TextInputKeyMap.Default;
-        InteractionProfile = options.InteractionProfile?.Clone() ?? WidgetInteractionProfile.Default.Clone();
+        InteractionProfile = options.InteractionProfile ?? WidgetInteractionProfile.Default;
         OpenKey = options.OpenKey ?? new KeyBinding("down", "open", "down");
         CloseKey = options.CloseKey ?? new KeyBinding("esc", "close", "escape");
         NextItemKey = options.NextItemKey ?? new KeyBinding("down/j", "next item", "down", "j");
@@ -65,7 +66,11 @@ public sealed class ComboboxComponent : IStatefulComponent, IMouseStatefulCompon
 
     public int MaxVisibleItems { get; set; } = 6;
 
-    public WidgetInteractionProfile InteractionProfile { get; set; } = WidgetInteractionProfile.Default.Clone();
+    public WidgetInteractionProfile InteractionProfile
+    {
+        get => _interactionProfile;
+        set => _interactionProfile = WidgetInteractionProfile.CloneOrDefault(value);
+    }
 
     public KeyBinding OpenKey { get; set; } = new("down", "open", "down");
 
