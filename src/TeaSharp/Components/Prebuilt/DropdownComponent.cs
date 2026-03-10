@@ -9,6 +9,31 @@ public sealed class DropdownComponent : IStatefulComponent, IMouseStatefulCompon
     private readonly OptionListController _options = new();
     private bool _fieldHovered;
 
+    public DropdownComponent()
+    {
+    }
+
+    public DropdownComponent(DropdownOptions options)
+    {
+        Title = options.Title;
+        Focused = options.Focused;
+        Disabled = options.Disabled;
+        ReadOnly = options.ReadOnly;
+        ShowBorder = options.ShowBorder;
+        MaxVisibleItems = options.MaxVisibleItems;
+        InteractionProfile = options.InteractionProfile?.Clone() ?? WidgetInteractionProfile.Default.Clone();
+        ToggleOpenKey = options.ToggleOpenKey ?? new KeyBinding("enter/space", "toggle", "enter", "space");
+        OpenKey = options.OpenKey ?? new KeyBinding("down", "open", "down");
+        CloseKey = options.CloseKey ?? new KeyBinding("esc", "close", "escape");
+        NextItemKey = options.NextItemKey ?? new KeyBinding("down/j", "next item", "down", "j");
+        PreviousItemKey = options.PreviousItemKey ?? new KeyBinding("up/k", "previous item", "up", "k");
+        ConfirmSelectionKey = options.ConfirmSelectionKey ?? new KeyBinding("enter/space", "select", "enter", "space");
+        if (options.Items is { Count: > 0 } items)
+        {
+            SetItems(items);
+        }
+    }
+
     public string Title { get; set; } = "Dropdown";
 
     public bool Focused { get; set; }

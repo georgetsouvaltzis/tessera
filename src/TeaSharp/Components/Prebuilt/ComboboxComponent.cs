@@ -10,6 +10,37 @@ public sealed class ComboboxComponent : IStatefulComponent, IMouseStatefulCompon
     private readonly TextInputModel _input = new();
     private bool _fieldHovered;
 
+    public ComboboxComponent()
+    {
+    }
+
+    public ComboboxComponent(ComboboxOptions options)
+    {
+        Title = options.Title;
+        Placeholder = options.Placeholder;
+        Focused = options.Focused;
+        Disabled = options.Disabled;
+        ReadOnly = options.ReadOnly;
+        ShowBorder = options.ShowBorder;
+        MaxVisibleItems = options.MaxVisibleItems;
+        InputKeyMap = options.InputKeyMap ?? TextInputKeyMap.Default;
+        InteractionProfile = options.InteractionProfile?.Clone() ?? WidgetInteractionProfile.Default.Clone();
+        OpenKey = options.OpenKey ?? new KeyBinding("down", "open", "down");
+        CloseKey = options.CloseKey ?? new KeyBinding("esc", "close", "escape");
+        NextItemKey = options.NextItemKey ?? new KeyBinding("down/j", "next item", "down", "j");
+        PreviousItemKey = options.PreviousItemKey ?? new KeyBinding("up/k", "previous item", "up", "k");
+        ConfirmSelectionKey = options.ConfirmSelectionKey ?? new KeyBinding("enter", "select", "enter");
+        if (options.Items is { Count: > 0 } items)
+        {
+            SetItems(items);
+        }
+
+        if (!string.IsNullOrEmpty(options.InitialFilter))
+        {
+            SetFilterText(options.InitialFilter);
+        }
+    }
+
     public TextInputKeyMap InputKeyMap { get; set; } = TextInputKeyMap.Default;
 
     public string Title { get; set; } = "Combobox";

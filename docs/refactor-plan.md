@@ -38,12 +38,13 @@ Status: next
 
 ## Phase 4: API Simplification
 
-Status: next
+Status: in progress
 
 - add `*Options` records for high-churn widgets
 - prefer small constructor overloads or static factory methods for common setups
 - standardize shared knobs: focus, borders, interaction profile, key bindings, state palette
 - move example-only composition code out of library-facing docs
+- added `DropdownOptions` and `ComboboxOptions` plus example/test coverage to start normalizing constructor-driven setup
 
 ## Phase 5: Stable Integration Fixtures
 

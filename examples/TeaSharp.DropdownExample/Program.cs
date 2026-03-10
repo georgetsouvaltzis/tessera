@@ -25,20 +25,8 @@ catch (TeaProgramInterruptedException)
 
 internal sealed class DropdownDemoModel : IModel
 {
-    private readonly DropdownComponent _dropdown = new()
-    {
-        Title = "Environment",
-        Focused = true,
-        MaxVisibleItems = 6,
-    };
-
-    private int _width = 90;
-    private int _height = 28;
-    private string _lastEvent = "ready";
-
-    public DropdownDemoModel()
-    {
-        _dropdown.SetItems(
+    private readonly DropdownComponent _dropdown = new(new DropdownOptions(
+        Items:
         [
             "Development",
             "Staging",
@@ -48,7 +36,17 @@ internal sealed class DropdownDemoModel : IModel
             "Benchmark",
             "QA",
             "Sandbox",
-        ]);
+        ],
+        Title: "Environment",
+        Focused: true,
+        MaxVisibleItems: 6));
+
+    private int _width = 90;
+    private int _height = 28;
+    private string _lastEvent = "ready";
+
+    public DropdownDemoModel()
+    {
     }
 
     public Command? Init() => null;

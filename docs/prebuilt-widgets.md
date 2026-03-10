@@ -42,9 +42,9 @@ TeaSharp provides a prebuilt widget layer in `TeaSharp.Components.PrebuiltWidget
 - `ListComponent<T>` provides filtering, selection, paging, and item replacement through component-level APIs (`SetItems`, `SetFilter`, `SelectedItem`, `SelectedIndex`, `PageSize`).
   - Mouse support: motion previews row hover (`▸` marker), left click selects a visible row, wheel scroll navigates selection.
 - `TableComponent` exposes sort/page interactions directly (`PageSize`, `SortColumn`, `SortDescending`, `SetRows`, `SetVirtualWindow`) without leaking the lower-level table primitive.
-- `DropdownComponent` provides open/close menu selection with configurable key bindings.
+- `DropdownComponent` provides open/close menu selection with configurable key bindings and a `DropdownOptions` constructor for common setup.
   - Mouse support: field click open/close, option click selection, wheel-driven highlight navigation when open.
-- `ComboboxComponent` combines text filtering with keyboard-driven option selection through component-level filter access (`FilterText`, `Placeholder`, `SetFilterText`).
+- `ComboboxComponent` combines text filtering with keyboard-driven option selection through component-level filter access (`FilterText`, `Placeholder`, `SetFilterText`) and a `ComboboxOptions` constructor for common setup.
   - Mouse support: field click open/close, option click selection, wheel-driven highlight navigation when open.
 - `LogViewerComponent` supports append, filter, pause, clear, and scrolling.
 - `LayoutContainerComponent` supports `Vertical`, `Horizontal`, and `Grid` layout modes.

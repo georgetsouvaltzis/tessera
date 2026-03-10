@@ -9,6 +9,8 @@ internal static class ApiErgonomicsTests
         yield return new TestCase("ApiErgonomics_TextInputOptions_ConfigureComponentWithoutNestedInputAccess", TextInputOptions_ConfigureComponentWithoutNestedInputAccess);
         yield return new TestCase("ApiErgonomics_TextAreaOptions_ConfigureComponentWithoutNestedInputAccess", TextAreaOptions_ConfigureComponentWithoutNestedInputAccess);
         yield return new TestCase("ApiErgonomics_ListComponent_ExposesSelectionWithoutModelAccess", ListComponent_ExposesSelectionWithoutModelAccess);
+        yield return new TestCase("ApiErgonomics_DropdownOptions_ConfigureComponentWithoutPostConstructionMutation", DropdownOptions_ConfigureComponentWithoutPostConstructionMutation);
+        yield return new TestCase("ApiErgonomics_ComboboxOptions_ConfigureComponentWithoutPostConstructionMutation", ComboboxOptions_ConfigureComponentWithoutPostConstructionMutation);
         yield return new TestCase("ApiErgonomics_ComboboxComponent_ExposesFilterWithoutNestedInputAccess", ComboboxComponent_ExposesFilterWithoutNestedInputAccess);
         yield return new TestCase("ApiErgonomics_TableOptions_ExposePageSizeWithoutInnerAccess", TableOptions_ExposePageSizeWithoutInnerAccess);
         yield return new TestCase("ApiErgonomics_TableComponent_ExposesSortStateWithoutInnerAccess", TableComponent_ExposesSortStateWithoutInnerAccess);
@@ -73,6 +75,47 @@ internal static class ApiErgonomicsTests
 
         TestAssert.Equal("two", list.SelectedItem ?? string.Empty, "List should expose selection at component level.");
         TestAssert.Equal(1, list.SelectedIndex, "List should expose selected index at component level.");
+        return Task.CompletedTask;
+    }
+
+    private static Task DropdownOptions_ConfigureComponentWithoutPostConstructionMutation()
+    {
+        var options = new DropdownOptions(
+            Items: ["Development", "Production"],
+            Title: "Environment",
+            Focused: true,
+            ShowBorder: false,
+            MaxVisibleItems: 4,
+            InteractionProfile: WidgetInteractionProfile.KeyboardOnly);
+        var dropdown = new DropdownComponent(options);
+
+        TestAssert.Equal("Environment", dropdown.Title, "Dropdown options should set title.");
+        TestAssert.True(dropdown.Focused, "Dropdown options should set focus.");
+        TestAssert.True(!dropdown.ShowBorder, "Dropdown options should set border visibility.");
+        TestAssert.Equal(4, dropdown.MaxVisibleItems, "Dropdown options should set max visible items.");
+        TestAssert.Equal("Development", dropdown.SelectedItem, "Dropdown options should preload items.");
+        TestAssert.True(!ReferenceEquals(options.InteractionProfile, dropdown.InteractionProfile), "Dropdown should clone interaction profile instead of sharing mutable state.");
+        return Task.CompletedTask;
+    }
+
+    private static Task ComboboxOptions_ConfigureComponentWithoutPostConstructionMutation()
+    {
+        var options = new ComboboxOptions(
+            Items: ["alpha", "beta"],
+            Title: "Region",
+            Placeholder: "type here",
+            InitialFilter: "be",
+            Focused: true,
+            MaxVisibleItems: 5,
+            InteractionProfile: WidgetInteractionProfile.KeyboardOnly);
+        var combobox = new ComboboxComponent(options);
+
+        TestAssert.Equal("Region", combobox.Title, "Combobox options should set title.");
+        TestAssert.Equal("type here", combobox.Placeholder, "Combobox options should set placeholder.");
+        TestAssert.Equal("be", combobox.FilterText, "Combobox options should set initial filter text.");
+        TestAssert.True(combobox.Focused, "Combobox options should set focus.");
+        TestAssert.Equal(5, combobox.MaxVisibleItems, "Combobox options should set max visible items.");
+        TestAssert.True(!ReferenceEquals(options.InteractionProfile, combobox.InteractionProfile), "Combobox should clone interaction profile instead of sharing mutable state.");
         return Task.CompletedTask;
     }
 

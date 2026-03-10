@@ -25,21 +25,8 @@ catch (TeaProgramInterruptedException)
 
 internal sealed class ComboBoxDemoModel : IModel
 {
-    private readonly ComboboxComponent _combobox = new()
-    {
-        Title = "Region",
-        Focused = true,
-        MaxVisibleItems = 7,
-    };
-
-    private int _width = 90;
-    private int _height = 28;
-    private string _lastEvent = "ready";
-
-    public ComboBoxDemoModel()
-    {
-        _combobox.Placeholder = "type to filter regions";
-        _combobox.SetItems(
+    private readonly ComboboxComponent _combobox = new(new ComboboxOptions(
+        Items:
         [
             "us-east-1",
             "us-east-2",
@@ -52,7 +39,18 @@ internal sealed class ComboBoxDemoModel : IModel
             "ap-southeast-2",
             "ap-northeast-1",
             "sa-east-1",
-        ]);
+        ],
+        Title: "Region",
+        Placeholder: "type to filter regions",
+        Focused: true,
+        MaxVisibleItems: 7));
+
+    private int _width = 90;
+    private int _height = 28;
+    private string _lastEvent = "ready";
+
+    public ComboBoxDemoModel()
+    {
     }
 
     public Command? Init() => null;
