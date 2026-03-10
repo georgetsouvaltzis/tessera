@@ -24,12 +24,15 @@ internal static class RendererSnapshotTests
         // Act
         renderer.Render(View.From("ab\ncd") with
         {
-            AltScreen = true,
-            EnableBracketedPaste = true,
-            EnableFocusReporting = true,
-            EnableSynchronizedUpdates = true,
-            MouseMode = MouseMode.AllMotion,
-            WindowTitle = "Snap",
+            Terminal = new ViewTerminal
+            {
+                AltScreen = true,
+                EnableBracketedPaste = true,
+                EnableFocusReporting = true,
+                EnableSynchronizedUpdates = true,
+                MouseMode = MouseMode.AllMotion,
+                WindowTitle = "Snap",
+            },
         });
         await renderer.FlushAsync(CancellationToken.None);
         var rendered = NormalizeOutput(ReadUtf8(output));
@@ -51,14 +54,17 @@ internal static class RendererSnapshotTests
         renderer.Resize(width: 6, height: 3);
         var baseView = View.From("ab\ncd") with
         {
-            EnableSynchronizedUpdates = true,
+            Terminal = new ViewTerminal
+            {
+                EnableSynchronizedUpdates = true,
+            },
         };
         renderer.Render(baseView);
         await renderer.FlushAsync(CancellationToken.None);
         var marker = output.Length;
 
         // Act
-        renderer.Render(baseView with { Content = "az\ncd" });
+        renderer.Render(baseView.WithContent("az\ncd"));
         await renderer.FlushAsync(CancellationToken.None);
         var patch = NormalizeOutput(ReadUtf8(output, marker));
 
@@ -75,10 +81,13 @@ internal static class RendererSnapshotTests
         await renderer.InitializeAsync(output, CancellationToken.None);
         renderer.Render(View.From("snap") with
         {
-            AltScreen = true,
-            EnableBracketedPaste = true,
-            EnableFocusReporting = true,
-            MouseMode = MouseMode.AllMotion,
+            Terminal = new ViewTerminal
+            {
+                AltScreen = true,
+                EnableBracketedPaste = true,
+                EnableFocusReporting = true,
+                MouseMode = MouseMode.AllMotion,
+            },
         });
         await renderer.FlushAsync(CancellationToken.None);
         var marker = output.Length;

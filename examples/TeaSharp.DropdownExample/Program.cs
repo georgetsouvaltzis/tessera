@@ -156,14 +156,17 @@ internal sealed class DropdownDemoModel : IModel
 
         return ModelView.From(canvas.Render()) with
         {
-            AltScreen = true,
-            EnableBracketedPaste = true,
-            EnableFocusReporting = true,
-            MouseMode = MouseMode.AllMotion,
-            ForegroundColor = "#CDD6F4",
-            BackgroundColor = "#1E1E2E",
-            CursorColor = "#F5C2E7",
-            WindowTitle = "TeaSharp Dropdown Example",
+            Terminal = new ViewTerminal
+            {
+                AltScreen = true,
+                EnableBracketedPaste = true,
+                EnableFocusReporting = true,
+                MouseMode = MouseMode.AllMotion,
+                ForegroundColor = "#CDD6F4",
+                BackgroundColor = "#1E1E2E",
+                CursorColor = "#F5C2E7",
+                WindowTitle = "TeaSharp Dropdown Example",
+            },
         };
     }
 

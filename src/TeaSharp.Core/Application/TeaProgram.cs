@@ -266,7 +266,7 @@ public sealed class TeaProgram
             Send(new ColorProfileMsg(refinedColorProfile));
         }
 
-        if (filtered is MouseMsg mouse && _runtime.LastRenderedView.OnMouse is { } onMouse)
+        if (filtered is MouseMsg mouse && _runtime.LastRenderedView.Input.OnMouse is { } onMouse)
         {
             var callbackCommand = onMouse(mouse);
             if (callbackCommand is not null)

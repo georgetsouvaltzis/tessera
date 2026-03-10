@@ -377,10 +377,13 @@ internal sealed class TimedQuitProbeViewModel : IModel
 
     public ModelView View() => ModelView.From("timed-probe-view") with
     {
-        EnableBracketedPaste = true,
-        EnableFocusReporting = true,
-        EnableSynchronizedUpdates = true,
-        MouseMode = MouseMode.AllMotion,
+        Terminal = new ViewTerminal
+        {
+            EnableBracketedPaste = true,
+            EnableFocusReporting = true,
+            EnableSynchronizedUpdates = true,
+            MouseMode = MouseMode.AllMotion,
+        },
     };
 }
 
@@ -489,7 +492,10 @@ internal sealed class MouseInterceptModel : IModel
 
     public ModelView View() => ModelView.From("mouse-intercept") with
     {
-        OnMouse = _ => Commands.FromMessage(new NumberMsg(7)),
+        Input = new ViewInput
+        {
+            OnMouse = _ => Commands.FromMessage(new NumberMsg(7)),
+        },
     };
 }
 

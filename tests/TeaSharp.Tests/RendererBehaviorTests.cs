@@ -45,7 +45,13 @@ internal static class RendererBehaviorTests
         await renderer.InitializeAsync(output, CancellationToken.None);
 
         // Act
-        renderer.Render(View.From("mouse") with { MouseMode = MouseMode.CellMotion });
+        renderer.Render(View.From("mouse") with
+        {
+            Terminal = new ViewTerminal
+            {
+                MouseMode = MouseMode.CellMotion,
+            },
+        });
         await renderer.FlushAsync(CancellationToken.None);
         var rendered = ReadUtf8(output);
 
@@ -64,7 +70,13 @@ internal static class RendererBehaviorTests
         await renderer.InitializeAsync(output, CancellationToken.None);
 
         // Act
-        renderer.Render(View.From("mouse") with { MouseMode = MouseMode.AllMotion });
+        renderer.Render(View.From("mouse") with
+        {
+            Terminal = new ViewTerminal
+            {
+                MouseMode = MouseMode.AllMotion,
+            },
+        });
         await renderer.FlushAsync(CancellationToken.None);
         var rendered = ReadUtf8(output);
 
@@ -82,7 +94,13 @@ internal static class RendererBehaviorTests
         await using var output = new MemoryStream();
         await renderer.InitializeAsync(output, CancellationToken.None);
 
-        renderer.Render(View.From("mouse") with { MouseMode = MouseMode.AllMotion });
+        renderer.Render(View.From("mouse") with
+        {
+            Terminal = new ViewTerminal
+            {
+                MouseMode = MouseMode.AllMotion,
+            },
+        });
         await renderer.FlushAsync(CancellationToken.None);
 
         // Act
@@ -112,10 +130,13 @@ internal static class RendererBehaviorTests
         // Act
         renderer.Render(View.From("probe") with
         {
-            EnableBracketedPaste = true,
-            EnableFocusReporting = true,
-            EnableSynchronizedUpdates = true,
-            MouseMode = MouseMode.AllMotion,
+            Terminal = new ViewTerminal
+            {
+                EnableBracketedPaste = true,
+                EnableFocusReporting = true,
+                EnableSynchronizedUpdates = true,
+                MouseMode = MouseMode.AllMotion,
+            },
         });
         await renderer.FlushAsync(CancellationToken.None);
         var rendered = ReadUtf8(output);
@@ -142,10 +163,13 @@ internal static class RendererBehaviorTests
         // Act
         renderer.Render(View.From("probe") with
         {
-            EnableBracketedPaste = true,
-            EnableFocusReporting = true,
-            EnableSynchronizedUpdates = true,
-            MouseMode = MouseMode.AllMotion,
+            Terminal = new ViewTerminal
+            {
+                EnableBracketedPaste = true,
+                EnableFocusReporting = true,
+                EnableSynchronizedUpdates = true,
+                MouseMode = MouseMode.AllMotion,
+            },
         });
         await renderer.FlushAsync(CancellationToken.None);
         var rendered = ReadUtf8(output);
@@ -165,9 +189,21 @@ internal static class RendererBehaviorTests
         await renderer.InitializeAsync(output, CancellationToken.None);
 
         // Act
-        renderer.Render(View.From("first") with { EnableFocusReporting = true });
+        renderer.Render(View.From("first") with
+        {
+            Terminal = new ViewTerminal
+            {
+                EnableFocusReporting = true,
+            },
+        });
         await renderer.FlushAsync(CancellationToken.None);
-        renderer.Render(View.From("second") with { EnableFocusReporting = true });
+        renderer.Render(View.From("second") with
+        {
+            Terminal = new ViewTerminal
+            {
+                EnableFocusReporting = true,
+            },
+        });
         await renderer.FlushAsync(CancellationToken.None);
         var rendered = ReadUtf8(output);
 
@@ -189,10 +225,13 @@ internal static class RendererBehaviorTests
         // Act
         renderer.Render(View.From("probe") with
         {
-            EnableBracketedPaste = true,
-            EnableFocusReporting = true,
-            EnableSynchronizedUpdates = true,
-            MouseMode = MouseMode.AllMotion,
+            Terminal = new ViewTerminal
+            {
+                EnableBracketedPaste = true,
+                EnableFocusReporting = true,
+                EnableSynchronizedUpdates = true,
+                MouseMode = MouseMode.AllMotion,
+            },
         });
         await renderer.FlushAsync(CancellationToken.None);
         var rendered = ReadUtf8(output);
@@ -217,9 +256,21 @@ internal static class RendererBehaviorTests
         await renderer.InitializeAsync(output, CancellationToken.None);
 
         // Act
-        renderer.Render(View.From("sync-a") with { EnableSynchronizedUpdates = true });
+        renderer.Render(View.From("sync-a") with
+        {
+            Terminal = new ViewTerminal
+            {
+                EnableSynchronizedUpdates = true,
+            },
+        });
         await renderer.FlushAsync(CancellationToken.None);
-        renderer.Render(View.From("sync-b") with { EnableSynchronizedUpdates = true });
+        renderer.Render(View.From("sync-b") with
+        {
+            Terminal = new ViewTerminal
+            {
+                EnableSynchronizedUpdates = true,
+            },
+        });
         await renderer.FlushAsync(CancellationToken.None);
         var rendered = ReadUtf8(output);
 
@@ -238,10 +289,13 @@ internal static class RendererBehaviorTests
         // Act
         renderer.Render(View.From("probe") with
         {
-            EnableBracketedPaste = true,
-            EnableFocusReporting = true,
-            EnableSynchronizedUpdates = true,
-            MouseMode = MouseMode.AllMotion,
+            Terminal = new ViewTerminal
+            {
+                EnableBracketedPaste = true,
+                EnableFocusReporting = true,
+                EnableSynchronizedUpdates = true,
+                MouseMode = MouseMode.AllMotion,
+            },
         });
         await renderer.FlushAsync(CancellationToken.None);
         var rendered = ReadUtf8(output);
@@ -262,7 +316,13 @@ internal static class RendererBehaviorTests
         await renderer.InitializeAsync(output, CancellationToken.None);
 
         // Act
-        renderer.Render(View.From("sync") with { EnableSynchronizedUpdates = true });
+        renderer.Render(View.From("sync") with
+        {
+            Terminal = new ViewTerminal
+            {
+                EnableSynchronizedUpdates = true,
+            },
+        });
         await renderer.FlushAsync(CancellationToken.None);
         var rendered = ReadUtf8(output);
 
@@ -280,7 +340,13 @@ internal static class RendererBehaviorTests
         await renderer.InitializeAsync(output, CancellationToken.None);
 
         // Act
-        renderer.Render(View.From("nosync") with { EnableSynchronizedUpdates = false });
+        renderer.Render(View.From("nosync") with
+        {
+            Terminal = new ViewTerminal
+            {
+                EnableSynchronizedUpdates = false,
+            },
+        });
         await renderer.FlushAsync(CancellationToken.None);
         var rendered = ReadUtf8(output);
 
@@ -299,9 +365,12 @@ internal static class RendererBehaviorTests
         // Act
         renderer.Render(View.From("cursor") with
         {
-            CursorX = 2,
-            CursorY = 1,
-            CursorStyle = CursorStyle.SteadyBar,
+            Frame = ViewFrame.From("cursor") with
+            {
+                CursorX = 2,
+                CursorY = 1,
+                CursorStyle = CursorStyle.SteadyBar,
+            },
         });
         await renderer.FlushAsync(CancellationToken.None);
         var rendered = ReadUtf8(output);
@@ -322,13 +391,16 @@ internal static class RendererBehaviorTests
         // Act
         var view = View.From("cursor") with
         {
-            CursorX = 0,
-            CursorY = 0,
-            CursorStyle = CursorStyle.BlinkingUnderline,
+            Frame = ViewFrame.From("cursor") with
+            {
+                CursorX = 0,
+                CursorY = 0,
+                CursorStyle = CursorStyle.BlinkingUnderline,
+            },
         };
         renderer.Render(view);
         await renderer.FlushAsync(CancellationToken.None);
-        renderer.Render(view with { Content = "cursor2" });
+        renderer.Render(view.WithContent("cursor2"));
         await renderer.FlushAsync(CancellationToken.None);
         var rendered = ReadUtf8(output);
 
@@ -344,9 +416,12 @@ internal static class RendererBehaviorTests
         await renderer.InitializeAsync(output, CancellationToken.None);
         renderer.Render(View.From("cursor") with
         {
-            CursorX = 0,
-            CursorY = 0,
-            CursorStyle = CursorStyle.SteadyUnderline,
+            Frame = ViewFrame.From("cursor") with
+            {
+                CursorX = 0,
+                CursorY = 0,
+                CursorStyle = CursorStyle.SteadyUnderline,
+            },
         });
         await renderer.FlushAsync(CancellationToken.None);
 
@@ -369,9 +444,12 @@ internal static class RendererBehaviorTests
         // Act
         renderer.Render(View.From("colors") with
         {
-            ForegroundColor = "#112233",
-            BackgroundColor = "rgb:44/55/66",
-            CursorColor = "#abcdef",
+            Terminal = new ViewTerminal
+            {
+                ForegroundColor = "#112233",
+                BackgroundColor = "rgb:44/55/66",
+                CursorColor = "#abcdef",
+            },
         });
         await renderer.FlushAsync(CancellationToken.None);
         await renderer.ResetAsync(CancellationToken.None);
@@ -396,12 +474,18 @@ internal static class RendererBehaviorTests
         // Act
         renderer.Render(View.From("progress") with
         {
-            Progress = new TerminalProgress(TerminalProgressState.Warning, 61),
+            Terminal = new ViewTerminal
+            {
+                Progress = new TerminalProgress(TerminalProgressState.Warning, 61),
+            },
         });
         await renderer.FlushAsync(CancellationToken.None);
         renderer.Render(View.From("progress") with
         {
-            Progress = new TerminalProgress(TerminalProgressState.Indeterminate, 0),
+            Terminal = new ViewTerminal
+            {
+                Progress = new TerminalProgress(TerminalProgressState.Indeterminate, 0),
+            },
         });
         await renderer.FlushAsync(CancellationToken.None);
         await renderer.ResetAsync(CancellationToken.None);
@@ -423,7 +507,10 @@ internal static class RendererBehaviorTests
         // Act
         renderer.Render(View.From("keys") with
         {
-            KeyboardEnhancements = new KeyboardEnhancementOptions { ReportEventTypes = true },
+            Terminal = new ViewTerminal
+            {
+                KeyboardEnhancements = new KeyboardEnhancementOptions { ReportEventTypes = true },
+            },
         });
         await renderer.FlushAsync(CancellationToken.None);
         await renderer.ResetAsync(CancellationToken.None);
@@ -448,7 +535,10 @@ internal static class RendererBehaviorTests
         // Act
         renderer.Render(View.From("keys") with
         {
-            KeyboardEnhancements = new KeyboardEnhancementOptions { ReportEventTypes = true },
+            Terminal = new ViewTerminal
+            {
+                KeyboardEnhancements = new KeyboardEnhancementOptions { ReportEventTypes = true },
+            },
         });
         await renderer.FlushAsync(CancellationToken.None);
         await renderer.ResetAsync(CancellationToken.None);

@@ -319,11 +319,14 @@ internal sealed class PomodoroModel : IModel
 
         return ModelView.From(canvas.Render()) with
         {
-            AltScreen = true,
-            EnableBracketedPaste = true,
-            EnableFocusReporting = true,
-            MouseMode = MouseMode.AllMotion,
-            WindowTitle = "{{EscapeForString(appName)}}",
+            Terminal = new ViewTerminal
+            {
+                AltScreen = true,
+                EnableBracketedPaste = true,
+                EnableFocusReporting = true,
+                MouseMode = MouseMode.AllMotion,
+                WindowTitle = "{{EscapeForString(appName)}}",
+            },
         };
     }
 
@@ -797,11 +800,14 @@ internal sealed class DashboardModel : IModel
 
         return ModelView.From(canvas.Render()) with
         {
-            AltScreen = true,
-            EnableBracketedPaste = true,
-            EnableFocusReporting = true,
-            MouseMode = MouseMode.AllMotion,
-            WindowTitle = "{{EscapeForString(appName)}}",
+            Terminal = new ViewTerminal
+            {
+                AltScreen = true,
+                EnableBracketedPaste = true,
+                EnableFocusReporting = true,
+                MouseMode = MouseMode.AllMotion,
+                WindowTitle = "{{EscapeForString(appName)}}",
+            },
         };
     }
 

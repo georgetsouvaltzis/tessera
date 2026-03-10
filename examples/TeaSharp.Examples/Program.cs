@@ -2686,11 +2686,14 @@ internal sealed class CounterModel : IModel
 
         return ModelView.From($"{title}\n\n{body}\n\n{help}") with
         {
-            AltScreen = true,
-            ForegroundColor = "#CDD6F4", // text
-            BackgroundColor = "#1E1E2E", // base
-            CursorColor = "#F5C2E7",     // pink
-            WindowTitle = "TeaSharp - Catppuccin Counter",
+            Terminal = new ViewTerminal
+            {
+                AltScreen = true,
+                ForegroundColor = "#CDD6F4", // text
+                BackgroundColor = "#1E1E2E", // base
+                CursorColor = "#F5C2E7",     // pink
+                WindowTitle = "TeaSharp - Catppuccin Counter",
+            },
         };
     }
 }

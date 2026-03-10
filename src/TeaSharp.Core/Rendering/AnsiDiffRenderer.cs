@@ -96,11 +96,14 @@ public sealed class AnsiDiffRenderer : IProgramRenderer
             return;
         }
 
-        if (_currentView.AltScreen != _altScreen)
+        var terminal = _currentView.Terminal;
+        var frame = _currentView.Frame;
+
+        if (terminal.AltScreen != _altScreen)
         {
-            await _writer.WriteAsync(_currentView.AltScreen ? "\u001b[?1049h" : "\u001b[?1049l")
+            await _writer.WriteAsync(terminal.AltScreen ? "\u001b[?1049h" : "\u001b[?1049l")
                 .ConfigureAwait(false);
-            _altScreen = _currentView.AltScreen;
+            _altScreen = terminal.AltScreen;
             _previousFrame = RenderFrameBuffer.Empty;
             if (_keyboardEnhancementFlags != 0)
             {
@@ -109,7 +112,7 @@ public sealed class AnsiDiffRenderer : IProgramRenderer
             }
         }
 
-        var requestedBracketedPaste = _currentView.EnableBracketedPaste && _capabilities.BracketedPaste;
+        var requestedBracketedPaste = terminal.EnableBracketedPaste && _capabilities.BracketedPaste;
         if (requestedBracketedPaste != _bracketedPaste)
         {
             await _writer.WriteAsync(requestedBracketedPaste ? "\u001b[?2004h" : "\u001b[?2004l").ConfigureAwait(false);
@@ -120,7 +123,7 @@ public sealed class AnsiDiffRenderer : IProgramRenderer
             }
         }
 
-        var requestedFocusReporting = _currentView.EnableFocusReporting && _capabilities.FocusReporting;
+        var requestedFocusReporting = terminal.EnableFocusReporting && _capabilities.FocusReporting;
         if (requestedFocusReporting != _focusReporting)
         {
             await _writer.WriteAsync(requestedFocusReporting ? "\u001b[?1004h" : "\u001b[?1004l").ConfigureAwait(false);
@@ -131,7 +134,7 @@ public sealed class AnsiDiffRenderer : IProgramRenderer
             }
         }
 
-        var requestedSyncUpdates = _currentView.EnableSynchronizedUpdates && _capabilities.SynchronizedUpdates;
+        var requestedSyncUpdates = terminal.EnableSynchronizedUpdates && _capabilities.SynchronizedUpdates;
         if (requestedSyncUpdates)
         {
             await _writer.WriteAsync("\u001b[?2026h").ConfigureAwait(false);
@@ -139,7 +142,7 @@ public sealed class AnsiDiffRenderer : IProgramRenderer
         }
 
         var requestedMouseMode = _capabilities.MouseReporting
-            ? _currentView.MouseMode
+            ? terminal.MouseMode
             : MouseMode.None;
         if (requestedMouseMode != _mouseMode)
         {
@@ -151,48 +154,48 @@ public sealed class AnsiDiffRenderer : IProgramRenderer
             }
         }
 
-        if (!string.Equals(_windowTitle, _currentView.WindowTitle, StringComparison.Ordinal))
+        if (!string.Equals(_windowTitle, terminal.WindowTitle, StringComparison.Ordinal))
         {
-            if (_currentView.WindowTitle is not null)
+            if (terminal.WindowTitle is not null)
             {
-                await _writer.WriteAsync($"\u001b]2;{_currentView.WindowTitle}\u0007").ConfigureAwait(false);
+                await _writer.WriteAsync($"\u001b]2;{terminal.WindowTitle}\u0007").ConfigureAwait(false);
             }
 
-            _windowTitle = _currentView.WindowTitle;
+            _windowTitle = terminal.WindowTitle;
         }
 
-        var requestedKeyboardFlags = GetKeyboardEnhancementFlags(_currentView.KeyboardEnhancements);
+        var requestedKeyboardFlags = GetKeyboardEnhancementFlags(terminal.KeyboardEnhancements);
         if (requestedKeyboardFlags != _keyboardEnhancementFlags)
         {
             await _writer.WriteAsync($"\u001b[>{requestedKeyboardFlags}u").ConfigureAwait(false);
             _keyboardEnhancementFlags = requestedKeyboardFlags;
         }
 
-        var requestedForegroundColor = AnsiColorNormalizer.NormalizeHex(_currentView.ForegroundColor);
+        var requestedForegroundColor = AnsiColorNormalizer.NormalizeHex(terminal.ForegroundColor);
         if (!string.Equals(_foregroundColor, requestedForegroundColor, StringComparison.Ordinal))
         {
             await WriteTerminalColorAsync(10, 110, requestedForegroundColor).ConfigureAwait(false);
             _foregroundColor = requestedForegroundColor;
         }
 
-        var requestedBackgroundColor = AnsiColorNormalizer.NormalizeHex(_currentView.BackgroundColor);
+        var requestedBackgroundColor = AnsiColorNormalizer.NormalizeHex(terminal.BackgroundColor);
         if (!string.Equals(_backgroundColor, requestedBackgroundColor, StringComparison.Ordinal))
         {
             await WriteTerminalColorAsync(11, 111, requestedBackgroundColor).ConfigureAwait(false);
             _backgroundColor = requestedBackgroundColor;
         }
 
-        var requestedCursorColor = AnsiColorNormalizer.NormalizeHex(_currentView.CursorColor);
+        var requestedCursorColor = AnsiColorNormalizer.NormalizeHex(terminal.CursorColor);
         if (!string.Equals(_cursorColor, requestedCursorColor, StringComparison.Ordinal))
         {
             await WriteTerminalColorAsync(12, 112, requestedCursorColor).ConfigureAwait(false);
             _cursorColor = requestedCursorColor;
         }
 
-        if (_progress != _currentView.Progress)
+        if (_progress != terminal.Progress)
         {
-            await WriteProgressAsync(_currentView.Progress).ConfigureAwait(false);
-            _progress = _currentView.Progress;
+            await WriteProgressAsync(terminal.Progress).ConfigureAwait(false);
+            _progress = terminal.Progress;
         }
 
         if (_fullRepaintRequired)
@@ -202,12 +205,12 @@ public sealed class AnsiDiffRenderer : IProgramRenderer
             _fullRepaintRequired = false;
         }
 
-        var nextFrame = RenderFrameBuffer.FromContent(_currentView.Content, _width, _height);
+        var nextFrame = RenderFrameBuffer.FromContent(frame.Content, _width, _height);
         await WriteFrameDiffAsync(nextFrame).ConfigureAwait(false);
 
-        if (_currentView.CursorX is int x && _currentView.CursorY is int y)
+        if (frame.CursorX is int x && frame.CursorY is int y)
         {
-            if (_currentView.CursorStyle is CursorStyle requestedCursorStyle
+            if (frame.CursorStyle is CursorStyle requestedCursorStyle
                 && requestedCursorStyle != _cursorStyle)
             {
                 await WriteCursorStyleAsync(requestedCursorStyle).ConfigureAwait(false);

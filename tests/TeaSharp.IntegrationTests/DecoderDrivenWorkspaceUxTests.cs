@@ -16,7 +16,7 @@ public sealed class DecoderDrivenWorkspaceUxTests
 
         ApplyDecoded(model, "\u001b[A");
 
-        Assert.That(model.View().Content, Does.Contain("Count: 1"));
+        Assert.That(model.View().Frame.Content, Does.Contain("Count: 1"));
     }
 
     [Test]
@@ -26,7 +26,7 @@ public sealed class DecoderDrivenWorkspaceUxTests
 
         ApplyDecoded(model, "\u001b[B");
 
-        Assert.That(model.View().Content, Does.Contain("Count: -1"));
+        Assert.That(model.View().Frame.Content, Does.Contain("Count: -1"));
     }
 
     [Test]
@@ -46,7 +46,7 @@ public sealed class DecoderDrivenWorkspaceUxTests
 
         ApplyDecoded(model, "\u001bOA");
 
-        Assert.That(model.View().Content, Does.Contain("Count: 1"));
+        Assert.That(model.View().Frame.Content, Does.Contain("Count: 1"));
     }
 
     private static Command? ApplyDecoded(CounterModel model, string sequence)

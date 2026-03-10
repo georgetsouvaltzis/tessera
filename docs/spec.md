@@ -124,7 +124,7 @@ Primary goal: deterministic message-driven TUI runtime with portable terminal be
 
 - `IModel Init/Update/View`, where `Update` mutates model state in place and returns an optional `Command`.
 - `Command` returns optional `IMessage`.
-- `View` terminal controls now include colors (`ForegroundColor`, `BackgroundColor`, `CursorColor`), native progress (`TerminalProgress`), keyboard enhancement requests (`KeyboardEnhancementOptions`), and optional mouse interception callback (`OnMouse`).
+- `View` is now grouped into `ViewFrame` (content + cursor placement/style), `ViewTerminal` (alt-screen, mode toggles, colors, progress, title, keyboard enhancements), and `ViewInput` (optional mouse interception callback).
 - `ProgramOptions` now includes runtime extension points:
   - capability probe mode list (`CapabilityProbeModes`)
   - decoder injection (`EventDecoder`)

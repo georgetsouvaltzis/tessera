@@ -49,14 +49,14 @@ Legend: `done` = implemented, `todo` = not implemented.
 |---|---|---|---|
 | ANSI output | VT rendering | done | ANSI renderer active. |
 | Diff rendering | efficient incremental updates | done | Renderer uses an explicit frame cell-buffer (`RenderFrameBuffer`) with row+cell run diffing, wide/combining continuation safety, bottom-row retention on overflow, and style-aware patching across supported SGR attributes. |
-| Alt screen | alternate buffer enter/leave | done | `View.AltScreen` implemented. |
+| Alt screen | alternate buffer enter/leave | done | `View.Terminal.AltScreen` implemented. |
 | Cursor visibility/position | cursor control | done | Show/hide, absolute positioning, and optional cursor-shape/blink control via DECSCUSR (`CSI Ps SP q`) are integrated into render lifecycle and teardown. |
-| Terminal color controls | foreground/background/cursor color | done | `View.ForegroundColor`, `View.BackgroundColor`, and `View.CursorColor` emit OSC color set/reset sequences (`10/11/12`, `110/111/112`). |
-| Native terminal progress | terminal progress bar channel | done | `View.Progress` emits OSC `9;4` progress state/value sequences (default/error/warning/indeterminate/reset). |
+| Terminal color controls | foreground/background/cursor color | done | `View.Terminal.ForegroundColor`, `View.Terminal.BackgroundColor`, and `View.Terminal.CursorColor` emit OSC color set/reset sequences (`10/11/12`, `110/111/112`). |
+| Native terminal progress | terminal progress bar channel | done | `View.Terminal.Progress` emits OSC `9;4` progress state/value sequences (default/error/warning/indeterminate/reset). |
 | Synchronized updates | synchronized paint | done | Frame output supports synchronized update wrapping (`?2026h`/`?2026l`) with capability gating and mode-report-driven runtime refinement. |
-| Window title | OSC title | done | `View.WindowTitle` now emits OSC title sequence. |
-| Keyboard enhancement request | kitty key enhancement negotiation | done | `View.KeyboardEnhancements` emits kitty keyboard flag sequences and decodes enhancement reports via `KeyboardEnhancementsMsg`. |
-| Mouse interception hook | view-level mouse callback | done | `View.OnMouse` can emit a command from last-rendered view context before normal model update flow. |
+| Window title | OSC title | done | `View.Terminal.WindowTitle` now emits OSC title sequence. |
+| Keyboard enhancement request | kitty key enhancement negotiation | done | `View.Terminal.KeyboardEnhancements` emits kitty keyboard flag sequences and decodes enhancement reports via `KeyboardEnhancementsMsg`. |
+| Mouse interception hook | view-level mouse callback | done | `View.Input.OnMouse` can emit a command from last-rendered view context before normal model update flow. |
 | Style/render integration | lipgloss-like style composition | done | Composable ANSI style API (`TeaStyle`, `AnsiColor`) is integrated with renderer SGR parsing/diff patching and component primitives for style-safe composition. |
 | Component text pipeline | grapheme-safe component text rendering | done | `Canvas` provides deterministic fast and grapheme-aware text paths for wide/combining glyph placement, with compatibility behavior validated in component tests. |
 
