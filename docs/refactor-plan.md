@@ -64,3 +64,12 @@ Status: in progress
 - keep integration fixtures intentionally small and stable
 - let examples optimize for demonstration while fixtures optimize for regression coverage
 - added a dedicated counter fixture app under `tests/` and rewired integration coverage away from `examples/TeaSharp.Examples`
+
+## Phase 6: Package Quality
+
+Status: in progress
+
+- add package metadata for the shipping library projects
+- emit XML documentation files for the public library surface
+- document the stable entrypoints first so IntelliSense teaches the recommended path
+- keep CLI/test projects out of pack output unless they are intentionally published

@@ -7,6 +7,9 @@ using TeaSharp.Core.Terminal;
 
 namespace TeaSharp.Core.Application;
 
+/// <summary>
+/// Runs a TeaSharp model inside the runtime event loop.
+/// </summary>
 public sealed class TeaProgram
 {
     private readonly ProgramOptions _options;
@@ -18,6 +21,11 @@ public sealed class TeaProgram
     private CancellationTokenSource? _cts;
     private bool _running;
 
+    /// <summary>
+    /// Initializes a program for the provided model.
+    /// </summary>
+    /// <param name="initialModel">The initial application model.</param>
+    /// <param name="options">Advanced runtime options.</param>
     public TeaProgram(IModel initialModel, ProgramOptions? options = null)
     {
         Model = initialModel ?? throw new ArgumentNullException(nameof(initialModel));
@@ -26,8 +34,15 @@ public sealed class TeaProgram
         _commands = Channel.CreateUnbounded<Command>();
     }
 
+    /// <summary>
+    /// Gets the current application model.
+    /// </summary>
     public IModel Model { get; private set; }
 
+    /// <summary>
+    /// Enqueues a message for delivery to the running program.
+    /// </summary>
+    /// <param name="message">The message to enqueue.</param>
     public void Send(IMessage message)
     {
         if (message is not null)
@@ -36,6 +51,11 @@ public sealed class TeaProgram
         }
     }
 
+    /// <summary>
+    /// Runs the program until it exits or the provided token is canceled.
+    /// </summary>
+    /// <param name="cancellationToken">A token that cancels program execution.</param>
+    /// <returns>The final application model.</returns>
     public async Task<IModel> RunAsync(CancellationToken cancellationToken = default)
     {
         IDisposable? resizeSignalRegistration = null;
@@ -115,6 +135,11 @@ public sealed class TeaProgram
         }
     }
 
+    /// <summary>
+    /// Requests program shutdown and waits for runtime cleanup to complete.
+    /// </summary>
+    /// <param name="kill">When <see langword="true"/>, forces terminal teardown without a graceful quit message.</param>
+    /// <param name="cancellationToken">A token that cancels the stop operation.</param>
     public async Task StopAsync(bool kill = false, CancellationToken cancellationToken = default)
     {
         if (_cts is null)
