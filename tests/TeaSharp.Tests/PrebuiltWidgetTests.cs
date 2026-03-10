@@ -9,6 +9,8 @@ internal static class PrebuiltWidgetTests
     {
         yield return new TestCase("Prebuilt_LabelComponent_RendersText", LabelComponent_RendersText);
         yield return new TestCase("Prebuilt_ButtonComponent_ActivatesWhenFocused", ButtonComponent_ActivatesWhenFocused);
+        yield return new TestCase("Prebuilt_ButtonComponent_MouseClickActivatesAndTracksState", ButtonComponent_MouseClickActivatesAndTracksState);
+        yield return new TestCase("Prebuilt_ButtonComponent_RendersBorderedState", ButtonComponent_RendersBorderedState);
         yield return new TestCase("Prebuilt_TextInputComponent_SubmitsValue", TextInputComponent_SubmitsValue);
         yield return new TestCase("Prebuilt_TextInputComponent_CancelSignalsAndCanClear", TextInputComponent_CancelSignalsAndCanClear);
         yield return new TestCase("Prebuilt_TextInputComponent_HidesBorderWhenConfigured", TextInputComponent_HidesBorderWhenConfigured);
@@ -64,6 +66,43 @@ internal static class PrebuiltWidgetTests
 
         TestAssert.True(changed, "Focused button should handle enter.");
         TestAssert.Equal(1, button.PressCount, "Button press count should increment.");
+        return Task.CompletedTask;
+    }
+
+    private static Task ButtonComponent_MouseClickActivatesAndTracksState()
+    {
+        var button = new ButtonComponent(new ButtonOptions(
+            Label: "Deploy",
+            ShowBorder: true));
+        var bounds = new Rect(0, 0, 18, 5);
+
+        var hoverChanged = button.UpdateMouse(new MouseMotionMsg(MouseButton.None, 4, 2), bounds);
+        var clickChanged = button.UpdateMouse(new MouseClickMsg(MouseButton.Left, 4, 2), bounds);
+        var releaseChanged = button.UpdateMouse(new MouseReleaseMsg(MouseButton.Left, 4, 2), bounds);
+
+        TestAssert.True(hoverChanged, "Mouse motion inside button should update hover state.");
+        TestAssert.True(clickChanged, "Mouse click should activate the button.");
+        TestAssert.True(releaseChanged, "Mouse release should clear the pressed state.");
+        TestAssert.True(button.Hovered, "Button should remain hovered while pointer is inside.");
+        TestAssert.True(!button.Pressed, "Button should clear pressed state on release.");
+        TestAssert.True(button.PressCount == 1, "Mouse click should increment press count.");
+        TestAssert.True(!button.WasPressed, "Release should clear the one-frame pressed signal.");
+        return Task.CompletedTask;
+    }
+
+    private static Task ButtonComponent_RendersBorderedState()
+    {
+        var button = new ButtonComponent(new ButtonOptions(
+            Label: "Start",
+            Description: "click or press enter",
+            ShowBorder: true));
+        var canvas = new Canvas(24, 5);
+
+        button.Render(canvas, new Rect(0, 0, 24, 5));
+        var output = canvas.Render();
+
+        TestAssert.True(output.Contains("[Start]", StringComparison.Ordinal), "Bordered button should render its label.");
+        TestAssert.True(output.Contains("click or press enter", StringComparison.Ordinal), "Bordered button should render its description.");
         return Task.CompletedTask;
     }
 

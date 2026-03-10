@@ -222,6 +222,10 @@ internal sealed class PomodoroModel : IModel
         ],
         Theme = new UiTheme(ModalBackdropFill: '{{theme.ModalFill}}'),
     };
+    private readonly ButtonComponent _toggleButton = new(new ButtonOptions(
+        Label: "Start Focus",
+        Description: "click, enter, or space",
+        ShowBorder: true));
     private readonly ToastCenterComponent _toasts = new() { MaxToasts = 2 };
 
     private int _width = 100;
@@ -243,6 +247,7 @@ internal sealed class PomodoroModel : IModel
         _logs.Append("Pomodoro scaffold ready");
         _logs.Append($"Theme: {{theme.DisplayName}}");
         _logs.Append($"Command={{EscapeForString(commandKey)}}, toast={{EscapeForString(toastKey)}}, modal={{EscapeForString(modalKey)}}");
+        _logs.Append("click the center button or press enter/space to start");
     }
 
     public Command? Init() => NextTick();
@@ -275,6 +280,9 @@ internal sealed class PomodoroModel : IModel
                 _lastEvent = $"resize:{_width}x{_height}";
                 return null;
 
+            case MouseMsg mouse:
+                return HandleMouse(mouse);
+
             case KeyPressMsg key:
                 return HandleKey(key);
 
@@ -296,13 +304,12 @@ internal sealed class PomodoroModel : IModel
         var bodyRect = new Rect(0, 0, _width, _height - 1);
         var (left, right) = Layout.SplitVertical(bodyRect, Math.Max(34, bodyRect.Width / 2));
         var (sessionRect, commandRect) = Layout.SplitHorizontal(left, Math.Max(10, left.Height - 6), minFirst: 8, minSecond: 4);
+        SyncFocus();
 
         RenderSession(canvas, sessionRect);
 
-        _commandInput.Focused = _mode == InputMode.Command;
         _commandInput.Render(canvas, commandRect);
 
-        _logs.Focused = _mode == InputMode.Navigate;
         _logs.Render(canvas, right);
 
         var toastWidth = Math.Min(42, right.Width);
@@ -332,6 +339,7 @@ internal sealed class PomodoroModel : IModel
 
     private Command? HandleKey(KeyPressMsg key)
     {
+        SyncFocus();
         if (key.Modifiers.HasFlag(KeyModifiers.Ctrl)
             && (key.IsCharacter('c') || key.IsCharacter('\u0003', ignoreCase: false)))
         {
@@ -406,11 +414,9 @@ internal sealed class PomodoroModel : IModel
             return null;
         }
 
-        if (MatchesBinding(key, "space") || MatchesBinding(key, "enter"))
+        if (_toggleButton.Update(key))
         {
-            _running = !_running;
-            _lastEvent = _running ? "running:on" : "running:off";
-            _logs.Append(_lastEvent);
+            ToggleRunning();
             return null;
         }
 
@@ -434,6 +440,53 @@ internal sealed class PomodoroModel : IModel
             return Tea.Cmd.Quit;
         }
 
+        return null;
+    }
+
+    private Command? HandleMouse(MouseMsg mouse)
+    {
+        SyncFocus();
+        if (_width < 70 || _height < 16 || _resetDialog.Visible)
+        {
+            return null;
+        }
+
+        var bodyRect = new Rect(0, 0, _width, _height - 1);
+        var (left, _) = Layout.SplitVertical(bodyRect, Math.Max(34, bodyRect.Width / 2));
+        var (sessionRect, commandRect) = Layout.SplitHorizontal(left, Math.Max(10, left.Height - 6), minFirst: 8, minSecond: 4);
+
+        if (mouse is MouseClickMsg { Button: MouseButton.Left } && commandRect.Contains(mouse.X, mouse.Y))
+        {
+            _mode = InputMode.Command;
+            SyncFocus();
+            _lastEvent = "mode:cmd";
+            return null;
+        }
+
+        if (_mode == InputMode.Command)
+        {
+            return null;
+        }
+
+        var buttonRect = ResolveToggleButtonRect(sessionRect);
+        if (!_toggleButton.UpdateMouse(mouse, buttonRect))
+        {
+            return null;
+        }
+
+        if (mouse is MouseClickMsg { Button: MouseButton.Left })
+        {
+            _mode = InputMode.Navigate;
+            SyncFocus();
+        }
+
+        if (_toggleButton.WasPressed)
+        {
+            ToggleRunning();
+            return null;
+        }
+
+        _lastEvent = "button:hover";
         return null;
     }
 
@@ -518,13 +571,54 @@ internal sealed class PomodoroModel : IModel
         if (content.Height > 3) canvas.WriteText(content.X, content.Y + 3, cycleLine, content.Width);
         if (content.Height > 4) canvas.WriteText(content.X, content.Y + 4, clockLine, content.Width);
 
+        _toggleButton.Label = _running
+            ? "Pause Session"
+            : _isBreak
+                ? "Start Break"
+                : "Start Focus";
+        _toggleButton.Description = "click, enter, or space";
+        var buttonRect = ResolveToggleButtonRect(rect);
+        _toggleButton.Render(canvas, buttonRect);
+
         var total = Math.Max(1, (_isBreak ? _breakMinutes : _focusMinutes) * 60);
         var progressValue = 1.0 - ((double)_remainingSeconds / total);
         _progress.SetValue(progressValue);
 
-        var progressRect = new Rect(content.X, Math.Max(content.Y + 6, content.Bottom - 3), content.Width, Math.Min(3, content.Height));
+        var progressY = Math.Min(content.Bottom - 2, buttonRect.Bottom + 2);
+        var progressHeight = Math.Max(1, content.Bottom - progressY + 1);
+        var progressRect = new Rect(content.X, progressY, content.Width, Math.Min(3, progressHeight));
         _progress.Focused = false;
         _progress.Render(canvas, progressRect);
+    }
+
+    private void SyncFocus()
+    {
+        _resetDialog.Focused = _resetDialog.Visible;
+        _commandInput.Focused = !_resetDialog.Visible && _mode == InputMode.Command;
+        _toggleButton.Focused = !_resetDialog.Visible && _mode == InputMode.Navigate;
+        _logs.Focused = false;
+    }
+
+    private Rect ResolveToggleButtonRect(Rect sessionRect)
+    {
+        var content = sessionRect.Inset(1, 1);
+        if (content.IsEmpty)
+        {
+            return sessionRect;
+        }
+
+        var width = Math.Min(28, content.Width);
+        var height = Math.Min(4, Math.Max(3, content.Height - 8));
+        var x = content.X + Math.Max(0, (content.Width - width) / 2);
+        var y = Math.Min(content.Y + 6, Math.Max(content.Y, content.Bottom - height - 3));
+        return new Rect(x, y, width, height);
+    }
+
+    private void ToggleRunning()
+    {
+        _running = !_running;
+        _lastEvent = _running ? "running:on" : "running:off";
+        _logs.Append(_lastEvent);
     }
 
     private void ResetCurrentPhase()

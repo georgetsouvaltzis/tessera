@@ -49,7 +49,8 @@ internal sealed class WidgetGalleryModel : IModel
         Text: "TeaSharp Widget Gallery\n\nRead-only text.\nTitles, captions, help, and status lines."));
     private readonly ButtonComponent _button = new(new ButtonOptions(
         Label: "Deploy",
-        Description: "enter/space to trigger"));
+        Description: "click, enter, or space",
+        ShowBorder: true));
     private readonly TextInputComponent _textInput = new(new TextInputOptions(
         Title: "Text Input",
         Placeholder: "type and press enter",
@@ -302,7 +303,7 @@ internal sealed class WidgetGalleryModel : IModel
             Text =
                 $"button presses: {_button.PressCount}\n" +
                 $"input submits: {_textInput.SubmitCount}\n" +
-                "keys: tab focus, enter/space button, left/right progress, 1-5 tabs",
+                "keys: tab focus, click/enter/space button, left/right progress, 1-5 tabs",
         };
         info.Render(canvas, bottom);
     }
@@ -449,6 +450,28 @@ internal sealed class WidgetGalleryModel : IModel
 
         if (_tabs.SelectedIndex != 2)
         {
+            if (_tabs.SelectedIndex == 0)
+            {
+                var basicsBodyRect = new Rect(0, 1, _width, _height - 2);
+                var (basicsTop, _) = Layout.SplitHorizontal(basicsBodyRect, Math.Max(8, basicsBodyRect.Height / 2));
+                var (_, basicsRight) = Layout.SplitVertical(basicsTop, Math.Max(36, basicsTop.Width / 2));
+                var buttonRect = new Rect(basicsRight.X, basicsRight.Y, basicsRight.Width, 3);
+                if (buttonRect.Contains(mouse.X, mouse.Y)
+                    || (_focus == GalleryFocus.Button && (mouse is MouseMotionMsg or MouseClickMsg or MouseReleaseMsg)))
+                {
+                    if (mouse is MouseClickMsg { Button: MouseButton.Left })
+                    {
+                        SetFocus(GalleryFocus.Button);
+                    }
+
+                    if (_button.UpdateMouse(mouse, buttonRect))
+                    {
+                        _lastEvent = _button.WasPressed ? "button:press" : "button:hover";
+                        changed = true;
+                    }
+                }
+            }
+
             return changed;
         }
 

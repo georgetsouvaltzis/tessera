@@ -1,23 +1,33 @@
 using TeaSharp.Core.Abstractions;
 using TeaSharp.Core.Messages;
+using TeaSharp.Styles;
 using TeaSharp.Widgets;
 
 namespace TeaSharp.Components;
 
-public sealed class ButtonComponent : IStatefulComponent, IFocusableComponent
+public sealed class ButtonComponent : IStatefulComponent, IMouseStatefulComponent, IFocusableComponent
 {
     private static readonly KeyBinding ActivateKey = new("enter/space", "activate", "enter", "space");
+    private bool _hovered;
+    private bool _pressed;
 
     public ButtonComponent()
     {
+        StatePalette.Set(WidgetVisualState.Active, new WidgetStateAppearance
+        {
+            TextStyle = TeaStyle.Empty.WithInverse().WithBold(),
+        });
     }
 
     public ButtonComponent(ButtonOptions options)
+        : this()
     {
         Label = options.Label;
         Description = options.Description;
         Focused = options.Focused;
         Enabled = options.Enabled;
+        ShowBorder = options.ShowBorder;
+        InteractionProfile = options.InteractionProfile?.Clone() ?? WidgetInteractionProfile.Default.Clone();
     }
 
     public string Label { get; set; } = "Button";
@@ -28,9 +38,19 @@ public sealed class ButtonComponent : IStatefulComponent, IFocusableComponent
 
     public bool Enabled { get; set; } = true;
 
+    public bool ShowBorder { get; set; }
+
+    public bool Hovered => _hovered;
+
+    public bool Pressed => _pressed;
+
     public int PressCount { get; private set; }
 
     public bool WasPressed { get; private set; }
+
+    public WidgetStatePalette StatePalette { get; } = WidgetStatePalette.CreateDefault();
+
+    public WidgetInteractionProfile InteractionProfile { get; set; } = WidgetInteractionProfile.Default.Clone();
 
     public bool Update(IMessage message)
     {
@@ -45,9 +65,59 @@ public sealed class ButtonComponent : IStatefulComponent, IFocusableComponent
             return false;
         }
 
-        PressCount++;
-        WasPressed = true;
-        return true;
+        return Activate(pressed: false);
+    }
+
+    public bool UpdateMouse(MouseMsg message, Rect bounds)
+    {
+        WasPressed = false;
+        if (!Enabled)
+        {
+            return false;
+        }
+
+        var content = ResolveContentRect(bounds);
+        if (content.IsEmpty)
+        {
+            return false;
+        }
+
+        var inside = content.Contains(message.X, message.Y);
+        var changed = false;
+        if (!inside)
+        {
+            if (message is MouseMotionMsg or MouseClickMsg or MouseReleaseMsg)
+            {
+                changed |= SetHovered(false);
+                changed |= SetPressed(false);
+            }
+
+            return changed;
+        }
+
+        if (message is MouseMotionMsg && InteractionProfile.HoverOnMotion)
+        {
+            changed |= SetHovered(true);
+            return changed;
+        }
+
+        if (message is MouseClickMsg && InteractionProfile.HoverOnClick)
+        {
+            changed |= SetHovered(true);
+        }
+
+        if (message is MouseClickMsg { Button: MouseButton.Left } && InteractionProfile.ActivateOnClick)
+        {
+            changed |= Activate(pressed: true);
+            return changed;
+        }
+
+        if (message is MouseReleaseMsg { Button: MouseButton.Left })
+        {
+            changed |= SetPressed(false);
+        }
+
+        return changed;
     }
 
     public void Render(Canvas canvas, Rect rect)
@@ -58,13 +128,117 @@ public sealed class ButtonComponent : IStatefulComponent, IFocusableComponent
             return;
         }
 
-        var prefix = Focused ? "›" : " ";
-        var state = Enabled ? string.Empty : " (disabled)";
-        var text = $"{prefix} [{Label}]{state}";
-        canvas.WriteText(clipped.X, clipped.Y, text, clipped.Width);
-        if (!string.IsNullOrWhiteSpace(Description) && clipped.Height > 1)
+        Rect content;
+        if (ShowBorder)
         {
-            canvas.WriteText(clipped.X, clipped.Y + 1, Description!, clipped.Width);
+            canvas.DrawBox(clipped, string.Empty);
+            content = clipped.Inset(1, 1);
         }
+        else
+        {
+            content = clipped;
+        }
+
+        if (content.IsEmpty || content.Height < 1)
+        {
+            return;
+        }
+
+        var states = ResolveStates();
+        var suffix = Enabled ? string.Empty : " (disabled)";
+        var plainText = $"[{Label}]{suffix}";
+        var text = StatePalette.Render(plainText, states);
+        var plainDescription = string.IsNullOrWhiteSpace(Description) ? null : Description!;
+        var description = plainDescription is null ? null : StatePalette.Render(plainDescription, states);
+
+        var rowCount = description is null || content.Height < 2 ? 1 : 2;
+        var top = content.Y + Math.Max(0, (content.Height - rowCount) / 2);
+        WriteCentered(canvas, content, top, plainText.Length, text);
+        if (description is not null && rowCount > 1)
+        {
+            WriteCentered(canvas, content, top + 1, plainDescription!.Length, description);
+        }
+    }
+
+    private bool Activate(bool pressed)
+    {
+        PressCount++;
+        WasPressed = true;
+        SetPressed(pressed);
+        return true;
+    }
+
+    private List<WidgetVisualState> ResolveStates()
+    {
+        var states = new List<WidgetVisualState>(4);
+        if (Focused)
+        {
+            states.Add(WidgetVisualState.Focused);
+        }
+
+        if (!Enabled)
+        {
+            states.Add(WidgetVisualState.Disabled);
+        }
+
+        if (_hovered)
+        {
+            states.Add(WidgetVisualState.Hovered);
+        }
+
+        if (_pressed)
+        {
+            states.Add(WidgetVisualState.Active);
+        }
+
+        return states;
+    }
+
+    private Rect ResolveContentRect(Rect bounds)
+    {
+        return ShowBorder
+            ? bounds.Inset(1, 1)
+            : bounds;
+    }
+
+    private bool SetHovered(bool hovered)
+    {
+        if (_hovered == hovered)
+        {
+            return false;
+        }
+
+        _hovered = hovered;
+        return true;
+    }
+
+    private bool SetPressed(bool pressed)
+    {
+        if (_pressed == pressed)
+        {
+            return false;
+        }
+
+        _pressed = pressed;
+        return true;
+    }
+
+    private static void WriteCentered(Canvas canvas, Rect content, int y, int displayWidth, string text)
+    {
+        if (y < content.Y || y > content.Bottom)
+        {
+            return;
+        }
+
+        var x = content.X;
+        var width = content.Width;
+        if (displayWidth < content.Width)
+        {
+            var offset = (content.Width - displayWidth) / 2;
+            x += offset;
+            width -= offset;
+        }
+
+        canvas.WriteText(x, y, text, width);
     }
 }
