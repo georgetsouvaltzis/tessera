@@ -8,10 +8,11 @@ namespace TeaSharp.Components;
 public sealed class ListComponent<T> : IStatefulComponent, IMouseStatefulComponent, IFocusableComponent
 {
     private int? _hoveredFilteredIndex;
+    private readonly ListModel<T> _model;
 
     public ListComponent(IEnumerable<T> items, Func<T, string> toText)
     {
-        Model = new ListModel<T>(items, toText);
+        _model = new ListModel<T>(items, toText);
     }
 
     public ListComponent(ListOptions<T> options)
@@ -25,8 +26,6 @@ public sealed class ListComponent<T> : IStatefulComponent, IMouseStatefulCompone
         KeyMap = options.KeyMap ?? ListKeyMap.Default;
     }
 
-    public ListModel<T> Model { get; }
-
     public string Title { get; set; } = "List";
 
     public bool Focused { get; set; }
@@ -37,11 +36,66 @@ public sealed class ListComponent<T> : IStatefulComponent, IMouseStatefulCompone
 
     public bool ShowBorder { get; set; } = true;
 
+    public int SelectedIndex => _model.SelectedIndex;
+
+    public bool HasSelection => _model.HasSelection;
+
+    public T? SelectedItem => _model.SelectedItem;
+
+    public int Count => _model.Count;
+
+    public int ViewOffset => _model.ViewOffset;
+
+    public int PageSize
+    {
+        get => _model.PageSize;
+        set => _model.PageSize = value;
+    }
+
+    public string Filter => _model.Filter;
+
     public WidgetStatePalette ItemStatePalette { get; } = WidgetStatePalette.CreateDefault();
 
     public Func<T, IReadOnlyCollection<WidgetVisualState>?>? ItemStateResolver { get; set; }
 
     public ListKeyMap KeyMap { get; set; } = ListKeyMap.Default;
+
+    public void SetItems(IEnumerable<T> items)
+    {
+        _model.SetItems(items);
+    }
+
+    public ValueTask SetItemsAsync(IAsyncEnumerable<T> items, CancellationToken cancellationToken = default)
+    {
+        return _model.SetItemsAsync(items, cancellationToken);
+    }
+
+    public ValueTask<int> AppendItemsAsync(IAsyncEnumerable<T> items, CancellationToken cancellationToken = default)
+    {
+        return _model.AppendItemsAsync(items, cancellationToken);
+    }
+
+    public ValueTask<int> ReloadAsync(Func<CancellationToken, IAsyncEnumerable<T>> loader, CancellationToken cancellationToken = default)
+    {
+        return _model.ReloadAsync(loader, cancellationToken);
+    }
+
+    public ValueTask<int> AppendAsync(Func<CancellationToken, IAsyncEnumerable<T>> loader, CancellationToken cancellationToken = default)
+    {
+        return _model.AppendAsync(loader, cancellationToken);
+    }
+
+    public void SetFilter(string filter)
+    {
+        _model.SetFilter(filter);
+    }
+
+    public IReadOnlyList<ListRow<T>> VisibleRows()
+    {
+        return _model.VisibleRows();
+    }
+
+    public string LabelFor(T item) => _model.LabelFor(item);
 
     public bool Update(IMessage message)
     {
@@ -50,7 +104,7 @@ public sealed class ListComponent<T> : IStatefulComponent, IMouseStatefulCompone
             return false;
         }
 
-        return Model.Update(message, KeyMap);
+        return _model.Update(message, KeyMap);
     }
 
     public bool UpdateMouse(MouseMsg message, Rect bounds)
@@ -59,7 +113,7 @@ public sealed class ListComponent<T> : IStatefulComponent, IMouseStatefulCompone
         {
             return false;
         }
-        return ListComponentMouseRouter.Update(message, bounds, ShowBorder, Model, SetHoveredFilteredIndex);
+        return ListComponentMouseRouter.Update(message, bounds, ShowBorder, _model, SetHoveredFilteredIndex);
     }
 
     public void Render(Canvas canvas, Rect rect)
@@ -67,7 +121,7 @@ public sealed class ListComponent<T> : IStatefulComponent, IMouseStatefulCompone
         ListComponentRenderer.Render(
             canvas,
             rect,
-            Model,
+            _model,
             Title,
             Focused,
             Disabled,

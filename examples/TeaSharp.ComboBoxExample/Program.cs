@@ -38,7 +38,7 @@ internal sealed class ComboBoxDemoModel : IModel
 
     public ComboBoxDemoModel()
     {
-        _combobox.Input.Placeholder = "type to filter regions";
+        _combobox.Placeholder = "type to filter regions";
         _combobox.SetItems(
         [
             "us-east-1",
@@ -111,7 +111,7 @@ internal sealed class ComboBoxDemoModel : IModel
             }
             else
             {
-                _lastEvent = $"filter:{_combobox.Input.Value}";
+                _lastEvent = $"filter:{_combobox.FilterText}";
             }
         }
 
@@ -135,7 +135,7 @@ internal sealed class ComboBoxDemoModel : IModel
         var comboRect = GetComboboxRect();
         _combobox.Render(canvas, comboRect);
 
-        canvas.WriteText(body.X, body.Bottom - 4, $"Filter: {_combobox.Input.Value}", body.Width);
+        canvas.WriteText(body.X, body.Bottom - 4, $"Filter: {_combobox.FilterText}", body.Width);
         canvas.WriteText(body.X, body.Bottom - 3, $"Selected: {_combobox.SelectedItem}", body.Width);
         canvas.WriteText(body.X, body.Bottom - 2, $"Open: {(_combobox.IsOpen ? "yes" : "no")}", body.Width);
 

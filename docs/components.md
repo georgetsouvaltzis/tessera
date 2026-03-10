@@ -107,7 +107,7 @@ The design follows patterns used in Bubble Tea examples:
       - `ProgressBarComponent.IncreaseKey` / `DecreaseKey`
       - `DialogComponent.AcceptKey` / `DismissKey`
       - options-based constructors (`LabelOptions`, `ButtonOptions`, `TextInputOptions`, `TextAreaOptions`, `ListOptions<T>`, `TableOptions`, `ProgressBarOptions`, `StatusBarOptions`, `DialogOptions`, `LayoutContainerOptions`, `TabsOptions`)
-      - convenience wrappers for common nested state (`TextInputComponent.Value` / `Placeholder` / `MaxLength`, `TextAreaComponent.Value`, `TableComponent.PageSize`)
+      - component-level state accessors instead of raw nested models (`TextInputComponent.Value` / `Placeholder` / `MaxLength`, `TextAreaComponent.Value`, `ListComponent<T>.SelectedItem` / `SetItems(...)`, `ComboboxComponent.FilterText` / `Placeholder`, `TableComponent.PageSize` / `SortColumn` / `SortDescending`, `NumberInputComponent.Text`)
       - explicit app-level `SetFocus(...)` helpers or `ComponentComposer.SetFocusedSlot(...)` for central focus ownership
       - `ShowBorder` toggle for minimalist rendering on border-capable prebuilt widgets
       - state styling primitives for child items (`WidgetVisualState`, `WidgetStatePalette`, `ItemStateResolver`/`OptionStateResolver`)

@@ -239,7 +239,7 @@ internal sealed class PomodoroModel : IModel
 
     public PomodoroModel()
     {
-        _commandInput.Input.Placeholder = "help | start | pause | reset | skip | focus <min> | break <min> | quit";
+        _commandInput.Placeholder = "help | start | pause | reset | skip | focus <min> | break <min> | quit";
         _logs.Append("Pomodoro scaffold ready");
         _logs.Append($"Theme: {{theme.DisplayName}}");
         _logs.Append($"Command={{EscapeForString(commandKey)}}, toast={{EscapeForString(toastKey)}}, modal={{EscapeForString(modalKey)}}");
@@ -673,7 +673,7 @@ internal sealed class DashboardModel : IModel
             ["metrics", "ok", "20ms"],
             ["auth", "ok", "29ms"],
         ]);
-        _table.Inner.PageSize = 4;
+        _table.PageSize = 4;
         _logs.Append("dashboard scaffold ready");
         _logs.Append($"Theme: {{theme.DisplayName}}");
     }

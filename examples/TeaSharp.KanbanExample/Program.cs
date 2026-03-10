@@ -780,9 +780,9 @@ internal sealed class KanbanModel : IModel
 
     private void RefreshColumns()
     {
-        _todo.Model.SetItems(ActiveBoard.Todo);
-        _doing.Model.SetItems(ActiveBoard.Doing);
-        _done.Model.SetItems(ActiveBoard.Done);
+        _todo.SetItems(ActiveBoard.Todo);
+        _doing.SetItems(ActiveBoard.Doing);
+        _done.SetItems(ActiveBoard.Done);
     }
 
     private void ApplyListPalettes()
@@ -1025,7 +1025,7 @@ internal sealed class KanbanModel : IModel
 
         if (_focus == KanbanFocus.Todo)
         {
-            var selected = _todo.Model.SelectedItem;
+            var selected = _todo.SelectedItem;
             if (selected is null)
             {
                 return false;
@@ -1038,7 +1038,7 @@ internal sealed class KanbanModel : IModel
 
         if (_focus == KanbanFocus.Doing)
         {
-            var selected = _doing.Model.SelectedItem;
+            var selected = _doing.SelectedItem;
             if (selected is null)
             {
                 return false;
@@ -1051,7 +1051,7 @@ internal sealed class KanbanModel : IModel
 
         if (_focus == KanbanFocus.Done)
         {
-            var selected = _done.Model.SelectedItem;
+            var selected = _done.SelectedItem;
             if (selected is null)
             {
                 return false;
@@ -1187,9 +1187,9 @@ internal sealed class KanbanModel : IModel
             return selected;
         }
 
-        return _todo.Model.SelectedItem
-            ?? _doing.Model.SelectedItem
-            ?? _done.Model.SelectedItem;
+        return _todo.SelectedItem
+            ?? _doing.SelectedItem
+            ?? _done.SelectedItem;
     }
 
     private void UpdateCompletion()

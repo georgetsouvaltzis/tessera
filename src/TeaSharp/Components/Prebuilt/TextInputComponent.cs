@@ -7,7 +7,7 @@ namespace TeaSharp.Components;
 
 public sealed class TextInputComponent : IStatefulComponent, IFocusableComponent
 {
-    public TextInputModel Input { get; } = new();
+    private readonly TextInputModel _input = new();
 
     public TextInputComponent()
     {
@@ -94,7 +94,7 @@ public sealed class TextInputComponent : IStatefulComponent, IFocusableComponent
 
     public bool Update(IMessage message)
     {
-        var result = TextInputInteractionHandler.Update(Input, message, KeyMap, CancelKey, ClearOnCancel, ClearOnSubmit);
+        var result = TextInputInteractionHandler.Update(_input, message, KeyMap, CancelKey, ClearOnCancel, ClearOnSubmit);
         WasCancelled = result.WasCancelled;
         if (result.CancelCount > 0)
         {
@@ -113,6 +113,8 @@ public sealed class TextInputComponent : IStatefulComponent, IFocusableComponent
 
     public void Render(Canvas canvas, Rect rect)
     {
-        TextInputRenderer.Render(canvas, rect, Input, Title, Focused, ShowBorder, SubmitCount);
+        TextInputRenderer.Render(canvas, rect, _input, Title, Focused, ShowBorder, SubmitCount);
     }
+
+    private TextInputModel Input => _input;
 }

@@ -6,9 +6,11 @@ namespace TeaSharp.Components;
 
 public sealed class TableComponent : IStatefulComponent, IMouseStatefulComponent, IFocusableComponent
 {
+    private readonly SortableTableComponent _inner;
+
     public TableComponent(IReadOnlyList<string> headers)
     {
-        Inner = new SortableTableComponent(headers);
+        _inner = new SortableTableComponent(headers);
     }
 
     public TableComponent(TableOptions options)
@@ -23,48 +25,109 @@ public sealed class TableComponent : IStatefulComponent, IMouseStatefulComponent
         }
     }
 
-    public SortableTableComponent Inner { get; }
-
     public bool Focused { get; set; }
 
     public bool ShowBorder
     {
-        get => Inner.ShowBorder;
-        set => Inner.ShowBorder = value;
+        get => _inner.ShowBorder;
+        set => _inner.ShowBorder = value;
     }
 
     public string Title
     {
-        get => Inner.Title;
-        set => Inner.Title = value;
+        get => _inner.Title;
+        set => _inner.Title = value;
     }
 
     public int PageSize
     {
-        get => Inner.PageSize;
-        set => Inner.PageSize = value;
+        get => _inner.PageSize;
+        set => _inner.PageSize = value;
+    }
+
+    public int PageIndex => _inner.PageIndex;
+
+    public int SortColumn => _inner.SortColumn;
+
+    public bool SortDescending => _inner.SortDescending;
+
+    public bool EnableVirtualization
+    {
+        get => _inner.EnableVirtualization;
+        set => _inner.EnableVirtualization = value;
+    }
+
+    public int VirtualStartIndex => _inner.VirtualStartIndex;
+
+    public int VirtualWindowSize => _inner.VirtualWindowSize;
+
+    public WidgetInteractionProfile InteractionProfile
+    {
+        get => _inner.InteractionProfile;
+        set => _inner.InteractionProfile = value;
+    }
+
+    public KeyBinding NextPageKey
+    {
+        get => _inner.NextPageKey;
+        set => _inner.NextPageKey = value;
+    }
+
+    public KeyBinding PreviousPageKey
+    {
+        get => _inner.PreviousPageKey;
+        set => _inner.PreviousPageKey = value;
+    }
+
+    public KeyBinding ToggleSortDirectionKey
+    {
+        get => _inner.ToggleSortDirectionKey;
+        set => _inner.ToggleSortDirectionKey = value;
+    }
+
+    public KeyBinding NextSortColumnKey
+    {
+        get => _inner.NextSortColumnKey;
+        set => _inner.NextSortColumnKey = value;
+    }
+
+    public KeyBinding VirtualForwardKey
+    {
+        get => _inner.VirtualForwardKey;
+        set => _inner.VirtualForwardKey = value;
+    }
+
+    public KeyBinding VirtualBackwardKey
+    {
+        get => _inner.VirtualBackwardKey;
+        set => _inner.VirtualBackwardKey = value;
     }
 
     public void SetRows(IEnumerable<IReadOnlyList<string>> rows)
     {
-        Inner.SetRows(rows);
+        _inner.SetRows(rows);
+    }
+
+    public void SetVirtualWindow(int startIndex, int windowSize)
+    {
+        _inner.SetVirtualWindow(startIndex, windowSize);
     }
 
     public bool Update(IMessage message)
     {
-        return Inner.Update(message);
+        return _inner.Update(message);
     }
 
     public bool UpdateMouse(MouseMsg message, Rect bounds)
     {
-        return Inner.UpdateMouse(message, bounds);
+        return _inner.UpdateMouse(message, bounds);
     }
 
     public void Render(Canvas canvas, Rect rect)
     {
-        var original = Inner.Title;
-        Inner.Title = Focused ? $"{original} *" : original.Replace(" *", string.Empty, StringComparison.Ordinal);
-        Inner.Render(canvas, rect);
-        Inner.Title = original;
+        var original = _inner.Title;
+        _inner.Title = Focused ? $"{original} *" : original.Replace(" *", string.Empty, StringComparison.Ordinal);
+        _inner.Render(canvas, rect);
+        _inner.Title = original;
     }
 }

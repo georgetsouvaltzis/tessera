@@ -80,7 +80,7 @@ internal static class PrebuiltWidgetTests
 
         TestAssert.Equal("ab", input.LastSubmittedValue, "Text input should capture submitted value.");
         TestAssert.Equal(1, input.SubmitCount, "Text input should count submissions.");
-        TestAssert.Equal(string.Empty, input.Input.Value, "Text input should clear after submit when configured.");
+        TestAssert.Equal(string.Empty, input.Value, "Text input should clear after submit when configured.");
         return Task.CompletedTask;
     }
 
@@ -90,7 +90,7 @@ internal static class PrebuiltWidgetTests
         {
             ShowBorder = false,
         };
-        input.Input.SetValue("plain");
+        input.SetValue("plain");
         var canvas = new Canvas(20, 2);
 
         input.Render(canvas, new Rect(0, 0, 20, 2));
@@ -116,7 +116,7 @@ internal static class PrebuiltWidgetTests
         TestAssert.True(input.WasCancelled, "Text input should expose cancellation signal after escape.");
         TestAssert.Equal("ab", input.LastCancelledValue, "Text input should capture cancelled value.");
         TestAssert.Equal(1, input.CancelCount, "Text input should count cancel actions.");
-        TestAssert.Equal(string.Empty, input.Input.Value, "Text input should clear value on cancel when configured.");
+        TestAssert.Equal(string.Empty, input.Value, "Text input should clear value on cancel when configured.");
         return Task.CompletedTask;
     }
 
@@ -126,7 +126,7 @@ internal static class PrebuiltWidgetTests
         {
             ShowLineNumbers = true,
         };
-        area.Input.SetValue("a\nb\nc");
+        area.SetValue("a\nb\nc");
         var canvas = new Canvas(24, 8);
 
         area.Render(canvas, new Rect(0, 0, 24, 8));
@@ -156,8 +156,8 @@ internal static class PrebuiltWidgetTests
         area.Update(new KeyPressMsg(KeyCode.Character, "e"));
         area.Update(new KeyPressMsg(KeyCode.Character, "B"));
 
-        TestAssert.True(area.Input.Value.Contains('\n'), "Text area Enter should insert newline.");
-        TestAssert.True(area.Input.Value.StartsWith("lineA\nlineB", StringComparison.Ordinal), "Text area should keep content on separate lines.");
+        TestAssert.True(area.Value.Contains('\n'), "Text area Enter should insert newline.");
+        TestAssert.True(area.Value.StartsWith("lineA\nlineB", StringComparison.Ordinal), "Text area should keep content on separate lines.");
         return Task.CompletedTask;
     }
 
@@ -169,7 +169,7 @@ internal static class PrebuiltWidgetTests
         };
 
         list.Update(new KeyPressMsg(KeyCode.Down));
-        var selected = list.Model.SelectedItem;
+        var selected = list.SelectedItem;
 
         TestAssert.Equal("two", selected ?? string.Empty, "List down key should advance selection.");
         return Task.CompletedTask;
@@ -206,7 +206,7 @@ internal static class PrebuiltWidgetTests
         var changed = list.UpdateMouse(new MouseClickMsg(MouseButton.Left, 0, 1), new Rect(0, 0, 20, 3));
 
         TestAssert.True(changed, "List mouse click should report selection changes.");
-        TestAssert.Equal("two", list.Model.SelectedItem ?? string.Empty, "List mouse click should select clicked row.");
+        TestAssert.Equal("two", list.SelectedItem ?? string.Empty, "List mouse click should select clicked row.");
         return Task.CompletedTask;
     }
 
@@ -320,7 +320,7 @@ internal static class PrebuiltWidgetTests
 
         TestAssert.True(!combobox.IsOpen, "Combobox should close after selection.");
         TestAssert.Equal("gamma", combobox.SelectedItem, "Combobox should select the filtered match.");
-        TestAssert.Equal("gamma", combobox.Input.Value, "Combobox input should sync to selected item.");
+        TestAssert.Equal("gamma", combobox.FilterText, "Combobox filter text should sync to selected item.");
         return Task.CompletedTask;
     }
 
@@ -361,8 +361,8 @@ internal static class PrebuiltWidgetTests
 
         table.Update(new KeyPressMsg(KeyCode.Character, "c"));
         table.Update(new KeyPressMsg(KeyCode.Character, "s"));
-        TestAssert.Equal(1, table.Inner.SortColumn, "Table should change sort column from hotkey.");
-        TestAssert.True(table.Inner.SortDescending, "Table should toggle sort direction from hotkey.");
+        TestAssert.Equal(1, table.SortColumn, "Table should change sort column from hotkey.");
+        TestAssert.True(table.SortDescending, "Table should toggle sort direction from hotkey.");
         return Task.CompletedTask;
     }
 

@@ -7,9 +7,8 @@ namespace TeaSharp.Components;
 public sealed class ComboboxComponent : IStatefulComponent, IMouseStatefulComponent, IFocusableComponent
 {
     private readonly OptionListController _options = new();
+    private readonly TextInputModel _input = new();
     private bool _fieldHovered;
-
-    public TextInputModel Input { get; } = new();
 
     public TextInputKeyMap InputKeyMap { get; set; } = TextInputKeyMap.Default;
 
@@ -49,10 +48,24 @@ public sealed class ComboboxComponent : IStatefulComponent, IMouseStatefulCompon
 
     public string SelectedItem => _options.SelectedItem;
 
+    public string FilterText => _input.Value;
+
+    public string Placeholder
+    {
+        get => _input.Placeholder;
+        set => _input.Placeholder = value;
+    }
+
+    public void SetFilterText(string value)
+    {
+        _input.SetValue(value);
+        _options.ApplyFilter(_input.Value);
+    }
+
     public void SetItems(IEnumerable<string> items)
     {
         _options.SetItems(items, selectFirstItemWhenUnset: false);
-        _options.ApplyFilter(Input.Value);
+        _options.ApplyFilter(_input.Value);
     }
 
     public bool Update(IMessage message)
@@ -95,10 +108,10 @@ public sealed class ComboboxComponent : IStatefulComponent, IMouseStatefulCompon
             }
         }
 
-        var inputResult = Input.Update(message, InputKeyMap);
+        var inputResult = _input.Update(message, InputKeyMap);
         if (inputResult.Changed)
         {
-            _options.ApplyFilter(Input.Value);
+            _options.ApplyFilter(_input.Value);
             IsOpen = true;
             return true;
         }
@@ -234,7 +247,7 @@ public sealed class ComboboxComponent : IStatefulComponent, IMouseStatefulCompon
         }
 
         var frameWidth = Math.Max(1, content.Width - 2);
-        var frame = Input.BuildFrame(frameWidth);
+        var frame = _input.BuildFrame(frameWidth);
         canvas.WriteText(content.X, content.Y, FieldStatePalette.Render($"{(IsOpen ? "^" : "v")} {frame.Text}", ResolveFieldStates()), content.Width);
 
         if (!IsOpen || content.Height <= 1)
@@ -285,7 +298,7 @@ public sealed class ComboboxComponent : IStatefulComponent, IMouseStatefulCompon
             states.Add(WidgetVisualState.Empty);
         }
 
-        if (!string.IsNullOrEmpty(Input.Value))
+        if (!string.IsNullOrEmpty(_input.Value))
         {
             states.Add(WidgetVisualState.Editing);
         }
@@ -303,7 +316,7 @@ public sealed class ComboboxComponent : IStatefulComponent, IMouseStatefulCompon
         var states = new List<WidgetVisualState>(6);
         states.AddRange(ResolveFieldStates());
         states.Add(WidgetVisualState.Empty);
-        if (!string.IsNullOrWhiteSpace(Input.Value))
+        if (!string.IsNullOrWhiteSpace(_input.Value))
         {
             states.Add(WidgetVisualState.FilteredOut);
         }
@@ -346,8 +359,8 @@ public sealed class ComboboxComponent : IStatefulComponent, IMouseStatefulCompon
             return true;
         }
 
-        Input.SetValue(_options.Items[selectedIndex]);
-        _options.ApplyFilter(Input.Value);
+        _input.SetValue(_options.Items[selectedIndex]);
+        _options.ApplyFilter(_input.Value);
         IsOpen = false;
         return true;
     }

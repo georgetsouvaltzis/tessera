@@ -8,8 +8,7 @@ namespace TeaSharp.Components;
 public sealed class NumberInputComponent : IStatefulComponent, IFocusableComponent
 {
     private bool _replaceOnNextCharacter = true;
-
-    public TextInputModel Input { get; } = new();
+    private readonly TextInputModel _input = new();
 
     public TextInputKeyMap InputKeyMap { get; set; } = TextInputKeyMap.Default;
 
@@ -32,6 +31,8 @@ public sealed class NumberInputComponent : IStatefulComponent, IFocusableCompone
     public int Precision { get; set; } = 2;
 
     public double Value { get; private set; }
+
+    public string Text => _input.Value;
 
     public double? LastSubmittedValue { get; private set; }
 
@@ -91,12 +92,12 @@ public sealed class NumberInputComponent : IStatefulComponent, IFocusableCompone
                 && key.Modifiers == KeyModifiers.None
                 && key.Text.Length == 1)
             {
-                Input.SetValue(string.Empty);
+                _input.SetValue(string.Empty);
                 _replaceOnNextCharacter = false;
             }
         }
 
-        var result = Input.Update(message, InputKeyMap);
+        var result = _input.Update(message, InputKeyMap);
         if (result.Changed)
         {
             _replaceOnNextCharacter = false;
@@ -125,17 +126,17 @@ public sealed class NumberInputComponent : IStatefulComponent, IFocusableCompone
 
     public void Render(Canvas canvas, Rect rect)
     {
-        NumberInputRenderer.Render(canvas, rect, Input, StatePalette, Title, Focused, Disabled, ReadOnly, ShowBorder, Value, Min, Max, Precision);
+        NumberInputRenderer.Render(canvas, rect, _input, StatePalette, Title, Focused, Disabled, ReadOnly, ShowBorder, Value, Min, Max, Precision);
     }
 
     private bool TryParseInput(out double value)
     {
-        return NumberInputFormatting.TryParse(Input.Value, out value);
+        return NumberInputFormatting.TryParse(_input.Value, out value);
     }
 
     private void SyncInput()
     {
-        Input.SetValue(NumberInputFormatting.Format(Value, Precision));
+        _input.SetValue(NumberInputFormatting.Format(Value, Precision));
         _replaceOnNextCharacter = true;
     }
 }

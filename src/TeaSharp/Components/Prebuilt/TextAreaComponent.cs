@@ -7,10 +7,10 @@ namespace TeaSharp.Components;
 public sealed class TextAreaComponent : IStatefulComponent, IFocusableComponent
 {
     private readonly ViewportModel _viewport = new();
+    private readonly TextInputModel _input = new() { Multiline = true };
 
     public TextAreaComponent()
     {
-        Input.Multiline = true;
     }
 
     public TextAreaComponent(TextAreaOptions options)
@@ -28,8 +28,6 @@ public sealed class TextAreaComponent : IStatefulComponent, IFocusableComponent
             SetValue(options.InitialValue);
         }
     }
-
-    public TextInputModel Input { get; } = new() { Multiline = true };
 
     public TextInputKeyMap InputKeyMap { get; set; } = TextInputKeyMap.Default;
 
@@ -70,7 +68,7 @@ public sealed class TextAreaComponent : IStatefulComponent, IFocusableComponent
     public bool Update(IMessage message)
     {
         var changed = false;
-        var update = Input.Update(message, InputKeyMap);
+        var update = _input.Update(message, InputKeyMap);
         if (update.Changed)
         {
             SyncViewport();
@@ -124,21 +122,21 @@ public sealed class TextAreaComponent : IStatefulComponent, IFocusableComponent
 
     private void SyncViewport()
     {
-        _viewport.SetLines(Input.Value.Replace("\r\n", "\n", StringComparison.Ordinal).Replace('\r', '\n').Split('\n'));
+        _viewport.SetLines(_input.Value.Replace("\r\n", "\n", StringComparison.Ordinal).Replace('\r', '\n').Split('\n'));
     }
 
     private int CursorLineIndex()
     {
-        if (Input.Cursor <= 0)
+        if (_input.Cursor <= 0)
         {
             return 0;
         }
 
-        var cursor = Math.Min(Input.Cursor, Input.Value.Length);
+        var cursor = Math.Min(_input.Cursor, _input.Value.Length);
         var lines = 0;
         for (var i = 0; i < cursor; i++)
         {
-            if (Input.Value[i] == '\n')
+            if (_input.Value[i] == '\n')
             {
                 lines++;
             }
@@ -146,4 +144,6 @@ public sealed class TextAreaComponent : IStatefulComponent, IFocusableComponent
 
         return lines;
     }
+
+    private TextInputModel Input => _input;
 }
