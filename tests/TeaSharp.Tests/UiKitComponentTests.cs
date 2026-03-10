@@ -35,9 +35,9 @@ internal static class UiKitComponentTests
         var asciiOutput = ascii.Render();
 
         // Assert
-        TestAssert.True(roundedOutput.Contains("╭", StringComparison.Ordinal), "Rounded border should render rounded top-left corner.");
-        TestAssert.True(roundedOutput.Contains("╯", StringComparison.Ordinal), "Rounded border should render rounded bottom-right corner.");
-        TestAssert.True(asciiOutput.Contains("+", StringComparison.Ordinal), "ASCII border should render plus corners.");
+        TestAssert.True(roundedOutput.Contains('╭'), "Rounded border should render rounded top-left corner.");
+        TestAssert.True(roundedOutput.Contains('╯'), "Rounded border should render rounded bottom-right corner.");
+        TestAssert.True(asciiOutput.Contains('+'), "ASCII border should render plus corners.");
         return Task.CompletedTask;
     }
 
@@ -98,7 +98,7 @@ internal static class UiKitComponentTests
         var output = canvas.Render();
 
         // Assert
-        TestAssert.True(output.Contains(".", StringComparison.Ordinal), "Status bar should use theme fill character.");
+        TestAssert.True(output.Contains('.'), "Status bar should use theme fill character.");
         return Task.CompletedTask;
     }
 
@@ -182,8 +182,8 @@ internal static class UiKitComponentTests
 
         // Assert
         TestAssert.True(output.Contains("v3+2", StringComparison.Ordinal), "Virtualized table title should report active window.");
-        TestAssert.True(output.Contains("c", StringComparison.Ordinal), "Virtualized slice should include starting row.");
-        TestAssert.True(output.Contains("d", StringComparison.Ordinal), "Virtualized slice should include following row.");
+        TestAssert.True(output.Contains('c'), "Virtualized slice should include starting row.");
+        TestAssert.True(output.Contains('d'), "Virtualized slice should include following row.");
         return Task.CompletedTask;
     }
 
@@ -265,7 +265,7 @@ internal static class UiKitComponentTests
         TestAssert.True(!hidden.Contains("line one", StringComparison.Ordinal), "Hidden modal should not draw modal content.");
         TestAssert.True(shown.Contains(" Help ", StringComparison.Ordinal), "Visible modal should render title.");
         TestAssert.True(shown.Contains("line one", StringComparison.Ordinal), "Visible modal should render body lines.");
-        TestAssert.True(shown.Contains(":", StringComparison.Ordinal), "Visible modal should apply themed backdrop fill.");
+        TestAssert.True(shown.Contains(':'), "Visible modal should apply themed backdrop fill.");
         return Task.CompletedTask;
     }
 

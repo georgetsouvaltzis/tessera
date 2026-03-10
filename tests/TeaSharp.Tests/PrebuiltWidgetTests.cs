@@ -1,3 +1,4 @@
+using System.Globalization;
 using TeaSharp.Components;
 using TeaSharp.Core.Messages;
 
@@ -136,7 +137,7 @@ internal static class PrebuiltWidgetTests
         var output = canvas.Render();
 
         TestAssert.True(output.Contains("plain", StringComparison.Ordinal), "Text input should render content in borderless mode.");
-        TestAssert.True(!output.Contains("┌", StringComparison.Ordinal), "Text input should not draw border when disabled.");
+        TestAssert.True(!output.Contains('┌'), "Text input should not draw border when disabled.");
         return Task.CompletedTask;
     }
 
@@ -171,8 +172,8 @@ internal static class PrebuiltWidgetTests
         area.Render(canvas, new Rect(0, 0, 24, 8));
         var output = canvas.Render();
 
-        TestAssert.True(output.Contains("1", StringComparison.Ordinal), "Text area should render line numbers when enabled.");
-        TestAssert.True(output.Contains("a", StringComparison.Ordinal), "Text area should render text content.");
+        TestAssert.True(output.Contains('1'), "Text area should render line numbers when enabled.");
+        TestAssert.True(output.Contains('a'), "Text area should render text content.");
         return Task.CompletedTask;
     }
 
@@ -298,7 +299,7 @@ internal static class PrebuiltWidgetTests
         var output = canvas.Render();
 
         TestAssert.True(output.Contains("v alpha", StringComparison.Ordinal), "Dropdown should render selected item in borderless mode.");
-        TestAssert.True(!output.Contains("┌", StringComparison.Ordinal), "Dropdown should not draw border when disabled.");
+        TestAssert.True(!output.Contains('┌'), "Dropdown should not draw border when disabled.");
         return Task.CompletedTask;
     }
 
@@ -578,7 +579,7 @@ internal static class PrebuiltWidgetTests
 
         public void Render(Canvas canvas, Rect rect)
         {
-            canvas.WriteText(rect.X, rect.Y, KeyEvents.ToString(), rect.Width);
+            canvas.WriteText(rect.X, rect.Y, KeyEvents.ToString(CultureInfo.InvariantCulture), rect.Width);
         }
     }
 

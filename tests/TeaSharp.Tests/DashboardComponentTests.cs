@@ -80,7 +80,7 @@ internal static class DashboardComponentTests
         // Assert
         TestAssert.True(output.Contains(" Load ", StringComparison.Ordinal), "Gauge should render title.");
         TestAssert.True(output.Contains("66%", StringComparison.Ordinal), "Gauge should render label.");
-        TestAssert.True(output.Contains("█", StringComparison.Ordinal), "Gauge should render filled bar cells.");
+        TestAssert.True(output.Contains('█'), "Gauge should render filled bar cells.");
         return Task.CompletedTask;
     }
 

@@ -25,8 +25,8 @@ internal static class ComponentRenderingTests
         var output = canvas.Render();
 
         // Assert
-        TestAssert.True(output.Contains("┌", StringComparison.Ordinal), "Box should include top-left corner.");
-        TestAssert.True(output.Contains("┘", StringComparison.Ordinal), "Box should include bottom-right corner.");
+        TestAssert.True(output.Contains('┌'), "Box should include top-left corner.");
+        TestAssert.True(output.Contains('┘'), "Box should include bottom-right corner.");
         TestAssert.True(output.Contains(" Panel ", StringComparison.Ordinal), "Box should render title in top border.");
         return Task.CompletedTask;
     }
@@ -95,7 +95,7 @@ internal static class ComponentRenderingTests
 
         // Assert
         TestAssert.True(output.Contains(" Card ", StringComparison.Ordinal), "Card should render title in border.");
-        TestAssert.True(output.Contains("▌", StringComparison.Ordinal), "Card should render accent marker.");
+        TestAssert.True(output.Contains('▌'), "Card should render accent marker.");
         TestAssert.True(output.Contains("line one", StringComparison.Ordinal), "Card should render body text.");
         return Task.CompletedTask;
     }
@@ -119,7 +119,7 @@ internal static class ComponentRenderingTests
         // Assert
         TestAssert.True(output.Contains(" Stats ", StringComparison.Ordinal), "Table should render title.");
         TestAssert.True(output.Contains("Metric", StringComparison.Ordinal), "Table should render header row.");
-        TestAssert.True(output.Contains("┼", StringComparison.Ordinal), "Table should render header divider intersections.");
+        TestAssert.True(output.Contains('┼'), "Table should render header divider intersections.");
         TestAssert.True(output.Contains("› Mem", StringComparison.Ordinal), "Selected row should include selection prefix.");
         return Task.CompletedTask;
     }

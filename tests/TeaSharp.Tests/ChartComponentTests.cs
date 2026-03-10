@@ -1,3 +1,4 @@
+using System.Globalization;
 using TeaSharp.Components;
 using TeaSharp.Core.Abstractions;
 using TeaSharp.Core.Messages;
@@ -36,7 +37,7 @@ internal static class ChartComponentTests
 
         // Assert
         TestAssert.True(output.Contains(" CPU ", StringComparison.Ordinal), "Line chart should render title.");
-        TestAssert.True(output.Contains("●", StringComparison.Ordinal), "Line chart should render points.");
+        TestAssert.True(output.Contains('●'), "Line chart should render points.");
         TestAssert.True(output.Contains("min:", StringComparison.Ordinal), "Line chart should render min/max stats.");
         return Task.CompletedTask;
     }
@@ -59,7 +60,7 @@ internal static class ChartComponentTests
         // Assert
         TestAssert.True(output.Contains(" Status ", StringComparison.Ordinal), "Bar chart should render title.");
         TestAssert.True(output.Contains("ok", StringComparison.Ordinal), "Bar chart should render labels.");
-        TestAssert.True(output.Contains("█", StringComparison.Ordinal), "Bar chart should render filled bars.");
+        TestAssert.True(output.Contains('█'), "Bar chart should render filled bars.");
         return Task.CompletedTask;
     }
 
@@ -84,7 +85,7 @@ internal static class ChartComponentTests
 
         // Assert
         TestAssert.True(output.Contains(" Latency ", StringComparison.Ordinal), "Line chart should render title with options.");
-        TestAssert.True(output.Contains("└", StringComparison.Ordinal), "Line chart with axes should render axis corner.");
+        TestAssert.True(output.Contains('└'), "Line chart with axes should render axis corner.");
         TestAssert.True(output.Contains("p95", StringComparison.Ordinal), "Line chart should render legend text.");
         TestAssert.True(output.Contains("time", StringComparison.Ordinal), "Line chart should render x-axis label.");
         return Task.CompletedTask;
@@ -348,7 +349,7 @@ internal static class ChartComponentTests
 
         public void Render(Canvas canvas, Rect rect)
         {
-            canvas.WriteText(rect.X, rect.Y, KeyUpdates.ToString(), rect.Width);
+            canvas.WriteText(rect.X, rect.Y, KeyUpdates.ToString(CultureInfo.InvariantCulture), rect.Width);
         }
     }
 
