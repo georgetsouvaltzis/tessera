@@ -1,8 +1,10 @@
 namespace TeaSharp.Core.Terminal;
 
+using System.ComponentModel;
 using TeaSharp.Core.Abstractions;
 using TeaSharp.Core.Messages;
 
+[EditorBrowsable(EditorBrowsableState.Advanced)]
 public sealed class ConsoleTerminalAdapter : ITerminalAdapter
 {
     private readonly bool _treatControlAsInputOriginal;

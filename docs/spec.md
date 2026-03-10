@@ -52,11 +52,13 @@ Primary goal: deterministic message-driven TUI runtime with portable terminal be
 - `EventDecoder`: bytes -> typed messages.
 - `TerminalReader`: stream pump + decoder loop.
   - injectable decoder via `ProgramOptions.EventDecoder`.
+  - these seams remain public for advanced hosting/tests, but are now marked `EditorBrowsable(Advanced)`.
 
 4. `Rendering`
 - `IProgramRenderer` abstraction.
 - `AnsiDiffRenderer`: frame cell-buffer ANSI renderer with row+cell run diffing.
 - `NullRenderer`: test/daemon mode.
+  - rendering seams remain public for advanced hosting/tests, but are now marked `EditorBrowsable(Advanced)`.
 
 5. `Terminal`
 - `ITerminalAdapter` abstraction.
@@ -64,6 +66,7 @@ Primary goal: deterministic message-driven TUI runtime with portable terminal be
 - `TerminalCapabilityDetector` + `TerminalCapabilityProfile`: environment + `infocmp`-enriched feature gating for renderer VT modes.
   - explicit capability overrides via `TEASHARP_CAPS` (`focus|mouse|paste|sync|decrpm` boolean flags).
   - detector override hooks via `ProgramOptions.TerminalCapabilityDetector` and `ProgramOptions.ColorProfileDetector`.
+  - terminal seams remain public for advanced hosting/tests, but are now marked `EditorBrowsable(Advanced)`.
 
 6. `Commands`
 - `Commands` static helpers: `Quit`, `Interrupt`, `Batch`, `Sequence`, `Tick`, `Every`.

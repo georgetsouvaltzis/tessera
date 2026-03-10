@@ -1,5 +1,8 @@
+using System.ComponentModel;
+
 namespace TeaSharp.Core.Terminal;
 
+[EditorBrowsable(EditorBrowsableState.Advanced)]
 public sealed record TerminalCapabilityProfile(
     bool FocusReporting = true,
     bool MouseReporting = true,

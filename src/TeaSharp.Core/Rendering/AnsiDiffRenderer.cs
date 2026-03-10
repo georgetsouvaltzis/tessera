@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using System.Text;
 using TeaSharp.Core.Abstractions;
 using TeaSharp.Core.Rendering.Internal;
@@ -5,6 +6,7 @@ using TeaSharp.Core.Terminal;
 
 namespace TeaSharp.Core.Rendering;
 
+[EditorBrowsable(EditorBrowsableState.Advanced)]
 public sealed class AnsiDiffRenderer : IProgramRenderer
 {
     private readonly AnsiRendererOptions _options;

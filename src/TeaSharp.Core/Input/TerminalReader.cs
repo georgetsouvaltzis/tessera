@@ -1,9 +1,11 @@
+using System.ComponentModel;
 using System.Text;
 using TeaSharp.Core.Abstractions;
 using TeaSharp.Core.Messages;
 
 namespace TeaSharp.Core.Input;
 
+[EditorBrowsable(EditorBrowsableState.Advanced)]
 public sealed class TerminalReader(Stream input, IEventDecoder decoder, TimeSpan escapeTimeout)
 {
     private const int DefaultReadBufferSize = 4096;

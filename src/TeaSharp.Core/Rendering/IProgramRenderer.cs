@@ -1,8 +1,10 @@
+using System.ComponentModel;
 using TeaSharp.Core.Abstractions;
 using TeaSharp.Core.Terminal;
 
 namespace TeaSharp.Core.Rendering;
 
+[EditorBrowsable(EditorBrowsableState.Advanced)]
 public interface IProgramRenderer : IAsyncDisposable
 {
     ValueTask InitializeAsync(Stream output, CancellationToken cancellationToken);

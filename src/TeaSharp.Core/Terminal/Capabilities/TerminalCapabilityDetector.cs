@@ -1,9 +1,11 @@
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.ComponentModel;
 
 namespace TeaSharp.Core.Terminal;
 
+[EditorBrowsable(EditorBrowsableState.Advanced)]
 public static class TerminalCapabilityDetector
 {
     public static TerminalCapabilityProfile Detect()

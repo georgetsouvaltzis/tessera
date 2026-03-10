@@ -1,5 +1,8 @@
+using System.ComponentModel;
+
 namespace TeaSharp.Core.Terminal;
 
+[EditorBrowsable(EditorBrowsableState.Advanced)]
 public interface ITerminalAdapter : IAsyncDisposable
 {
     Stream Input { get; }
