@@ -8,11 +8,14 @@ namespace TeaSharp.Components;
 public sealed class CommandPaletteComponent : IStatefulComponent, IMouseStatefulComponent, IFocusableComponent
 {
     private readonly CommandPaletteController _controller = new();
+    private WidgetInteractionProfile _interactionProfile = WidgetInteractionProfile.Default.Clone();
 
     [EditorBrowsable(EditorBrowsableState.Advanced)]
     public TextInputModel Query { get; } = new();
 
     public TextInputKeyMap QueryKeyMap { get; set; } = TextInputKeyMap.Default;
+
+    public string QueryText => Query.Value;
 
     public string Title { get; set; } = "Command Palette";
 
@@ -36,11 +39,26 @@ public sealed class CommandPaletteComponent : IStatefulComponent, IMouseStateful
 
     public WidgetStatePalette ItemStatePalette { get; } = WidgetStatePalette.CreateDefault();
 
-    public WidgetInteractionProfile InteractionProfile { get; set; } = WidgetInteractionProfile.Default.Clone();
+    public WidgetInteractionProfile InteractionProfile
+    {
+        get => _interactionProfile;
+        set => _interactionProfile = WidgetInteractionProfile.CloneOrDefault(value);
+    }
 
     public void SetItems(IEnumerable<CommandPaletteItem> items)
     {
         _controller.SetItems(items, Query.Value);
+    }
+
+    public void SetQueryText(string query)
+    {
+        Query.SetValue(query ?? string.Empty);
+        _controller.Refresh(Query.Value);
+    }
+
+    public void ClearQuery()
+    {
+        SetQueryText(string.Empty);
     }
 
     public void Open()
@@ -51,8 +69,7 @@ public sealed class CommandPaletteComponent : IStatefulComponent, IMouseStateful
         }
 
         IsOpen = true;
-        Query.Clear();
-        _controller.Refresh(Query.Value);
+        ClearQuery();
     }
 
     public void Close()

@@ -16,6 +16,7 @@ internal static class AdvancedPrebuiltWidgetTests
         yield return new TestCase("Advanced_SpinnerComponent_MouseWheelAdvancesFrame", SpinnerComponent_MouseWheelAdvancesFrame);
         yield return new TestCase("Advanced_CommandPaletteComponent_FiltersAndExecutes", CommandPaletteComponent_FiltersAndExecutes);
         yield return new TestCase("Advanced_CommandPaletteComponent_MouseClickExecutesSelection", CommandPaletteComponent_MouseClickExecutesSelection);
+        yield return new TestCase("Advanced_CommandPaletteComponent_ExposesQueryAccessors", CommandPaletteComponent_ExposesQueryAccessors);
         yield return new TestCase("Advanced_TreeViewComponent_TogglesExpansion", TreeViewComponent_TogglesExpansion);
         yield return new TestCase("Advanced_TreeViewComponent_MouseClickSelectsVisibleNode", TreeViewComponent_MouseClickSelectsVisibleNode);
         yield return new TestCase("Advanced_NotificationCenterComponent_DismissesEntries", NotificationCenterComponent_DismissesEntries);
@@ -174,6 +175,25 @@ internal static class AdvancedPrebuiltWidgetTests
         TestAssert.True(changed, "Command palette click should execute selected command.");
         TestAssert.Equal("deploy", palette.LastExecutedItemId ?? string.Empty, "Palette click should execute clicked row.");
         TestAssert.True(!palette.IsOpen, "Palette should close after click execute.");
+        return Task.CompletedTask;
+    }
+
+    private static Task CommandPaletteComponent_ExposesQueryAccessors()
+    {
+        var palette = new CommandPaletteComponent();
+        palette.SetItems(
+        [
+            new CommandPaletteItem("deploy", "Deploy", "publish release"),
+            new CommandPaletteItem("rollback", "Rollback", "restore previous"),
+        ]);
+
+        palette.SetQueryText("roll");
+
+        TestAssert.Equal("roll", palette.QueryText, "Command palette should expose the current query text without requiring the raw text-input model.");
+
+        palette.ClearQuery();
+
+        TestAssert.Equal(string.Empty, palette.QueryText, "Command palette should clear the query through the component-level API.");
         return Task.CompletedTask;
     }
 

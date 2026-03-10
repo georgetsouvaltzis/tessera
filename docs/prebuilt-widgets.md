@@ -50,7 +50,7 @@ TeaSharp provides a prebuilt widget layer in `TeaSharp.Components.PrebuiltWidget
 - `LayoutContainerComponent` supports `Vertical`, `Horizontal`, and `Grid` layout modes.
   - Mouse support: child hit-test routing and optional drag-resize split for 2-pane horizontal/vertical layouts (`PrimarySize`, `SetPrimarySize`, `ClearPrimarySize`).
   - Use `ComponentComposer` as the focus/routing owner when a layout container participates in a larger interactive screen.
-- `CommandPaletteComponent` provides fuzzy command filtering and execution (`ctrl+p` default open key).
+- `CommandPaletteComponent` provides fuzzy command filtering and execution (`ctrl+p` default open key) with component-level query accessors (`QueryText`, `SetQueryText(...)`, `ClearQuery()`).
   - Mouse support: motion hover preview, wheel navigation, click execute, and outside-click close when open.
 - `TreeViewComponent` provides hierarchical expand/collapse navigation with keyboard controls.
   - Mouse support: motion hover preview, click row selection, wheel navigation.
