@@ -365,7 +365,7 @@ internal sealed class WidgetGalleryModel : InteractiveScreenModel
 
         if (key.Is(KeyCode.Tab, KeyModifiers.None))
         {
-            Screen.FocusNext();
+            FocusNext();
             _lastEvent = $"focus:{FocusLabel()}";
             return InputRouteResult.HandledWithoutCommand;
         }
@@ -375,11 +375,11 @@ internal sealed class WidgetGalleryModel : InteractiveScreenModel
             _dialog.Visible = !_dialog.Visible;
             if (_dialog.Visible)
             {
-                Screen.SetFocus(DialogRegionId);
+                SetFocus(DialogRegionId);
             }
             else
             {
-                Screen.SetFocus(TabsRegionId);
+                SetFocus(TabsRegionId);
             }
 
             _lastEvent = _dialog.Visible ? "dialog:open" : "dialog:close";
@@ -410,7 +410,7 @@ internal sealed class WidgetGalleryModel : InteractiveScreenModel
 
         if (FocusedRegionKey == DialogRegionId && previousDialogResult != _dialog.LastResult)
         {
-            Screen.SetFocus(TabsRegionId);
+            SetFocus(TabsRegionId);
             _logs.Append($"dialog:{_dialog.LastResult}");
             _lastEvent = $"dialog:{_dialog.LastResult.ToString().ToLowerInvariant()}";
             return InputRouteResult.HandledWithoutCommand;

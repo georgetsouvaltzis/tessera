@@ -2,6 +2,8 @@
 
 TeaSharp includes a deterministic component drawing layer in `TeaSharp.Components` for building Bubble Tea-style terminal layouts.
 
+Recommended app shape: `docs/app-pattern.md`.
+
 ## Motivation
 
 The design follows patterns used in Bubble Tea examples:
@@ -203,3 +205,4 @@ If the component owns local state and needs messages, implement `IStatefulCompon
 If it should take focus inside composed layouts, also implement `IFocusableComponent`.
 
 For a fuller guide with a custom component walkthrough, see `docs/custom-components.md`.
+For the recommended multi-pane app shell, see `docs/app-pattern.md`.

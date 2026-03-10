@@ -1,5 +1,7 @@
 # TeaSharp Custom Components
 
+For the recommended full-app shell, see `docs/app-pattern.md`.
+
 TeaSharp custom components are built around three contracts:
 
 - `ICanvasComponent`: render-only component.

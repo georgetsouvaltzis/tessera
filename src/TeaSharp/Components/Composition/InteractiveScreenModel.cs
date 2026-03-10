@@ -11,6 +11,8 @@ public abstract class InteractiveScreenModel : IModel
 
     protected ScreenRegionKey? FocusedRegionKey => Screen.FocusedRegionKey;
 
+    protected bool HasScreen => Screen.Regions.Count > 0;
+
     protected abstract Rect GetBodyRect();
 
     protected abstract void ComposeScreen(Rect bodyRect);
@@ -52,10 +54,46 @@ public abstract class InteractiveScreenModel : IModel
         return CanBuildScreen && Screen.Update(mouse);
     }
 
+    protected bool RouteFocusedMessage(IMessage message)
+    {
+        EnsureScreen();
+        return CanBuildScreen && Screen.Update(message);
+    }
+
     protected void RenderScreen(Canvas canvas)
     {
         RebuildScreen();
         Screen.Render(canvas);
+    }
+
+    protected bool SetFocus(ScreenRegionKey regionKey)
+    {
+        EnsureScreen();
+        return CanBuildScreen && Screen.SetFocus(regionKey);
+    }
+
+    protected bool FocusNext()
+    {
+        EnsureScreen();
+        return CanBuildScreen && Screen.FocusNext();
+    }
+
+    protected bool FocusPrevious()
+    {
+        EnsureScreen();
+        return CanBuildScreen && Screen.FocusPrevious();
+    }
+
+    protected bool TryGetBounds(ScreenRegionKey regionKey, out Rect bounds)
+    {
+        EnsureScreen();
+        if (!CanBuildScreen)
+        {
+            bounds = default;
+            return false;
+        }
+
+        return Screen.TryGetBounds(regionKey, out bounds);
     }
 
     public abstract Command? Init();

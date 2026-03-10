@@ -355,7 +355,7 @@ internal sealed class PomodoroModel : InteractiveScreenModel
         if (MatchesBinding(key, "esc"))
         {
             _mode = InputMode.Navigate;
-            Screen.SetFocus(ToggleButtonRegionId);
+            SetFocus(ToggleButtonRegionId);
             _lastEvent = "mode:nav";
             return InputRouteResult.HandledWithoutCommand;
         }
@@ -368,7 +368,7 @@ internal sealed class PomodoroModel : InteractiveScreenModel
         if (MatchesBinding(key, ModalKey))
         {
             _resetDialog.Visible = false;
-            Screen.SetFocus(ToggleButtonRegionId);
+            SetFocus(ToggleButtonRegionId);
             _lastEvent = "dialog:close";
             return InputRouteResult.HandledWithoutCommand;
         }
@@ -386,7 +386,7 @@ internal sealed class PomodoroModel : InteractiveScreenModel
         if (!_resetDialog.Visible && MatchesBinding(key, CommandModeKey))
         {
             _mode = InputMode.Command;
-            Screen.SetFocus(CommandRegionId);
+            SetFocus(CommandRegionId);
             _lastEvent = "mode:cmd";
             return InputRouteResult.HandledWithoutCommand;
         }
@@ -394,7 +394,7 @@ internal sealed class PomodoroModel : InteractiveScreenModel
         if (MatchesBinding(key, ModalKey))
         {
             _resetDialog.Visible = !_resetDialog.Visible;
-            Screen.SetFocus(_resetDialog.Visible ? DialogRegionId : ToggleButtonRegionId);
+            SetFocus(_resetDialog.Visible ? DialogRegionId : ToggleButtonRegionId);
             _lastEvent = _resetDialog.Visible ? "dialog:open" : "dialog:close";
             return InputRouteResult.HandledWithoutCommand;
         }
@@ -541,7 +541,7 @@ internal sealed class PomodoroModel : InteractiveScreenModel
             }
 
             _lastEvent = $"dialog:{_resetDialog.LastResult.ToString().ToLowerInvariant()}";
-            Screen.SetFocus(_mode == InputMode.Command ? CommandRegionId : ToggleButtonRegionId);
+            SetFocus(_mode == InputMode.Command ? CommandRegionId : ToggleButtonRegionId);
             return InputRouteResult.HandledWithoutCommand;
         }
 
