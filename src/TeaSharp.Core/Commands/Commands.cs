@@ -1,3 +1,4 @@
+using System.Globalization;
 using TeaSharp.Core.Abstractions;
 using TeaSharp.Core.Messages;
 
@@ -88,7 +89,7 @@ public static class Commands
     public static Command RequestCapability(string capabilityName)
     {
         var name = capabilityName?.Trim() ?? string.Empty;
-        var payload = string.Concat(name.Select(static ch => ((int)ch).ToString("X2")));
+        var payload = string.Concat(name.Select(static ch => ((int)ch).ToString("X2", CultureInfo.InvariantCulture)));
         return Raw($"\u001bP+q{payload}\u001b\\");
     }
 
@@ -113,7 +114,7 @@ public static class Commands
     public static Command RequestCursorColor() =>
         Raw("\u001b]12;?\u001b\\");
 
-    private static IReadOnlyList<Command> GetValid(IEnumerable<Command?> commands)
+    private static List<Command> GetValid(IEnumerable<Command?> commands)
     {
         var valid = new List<Command>();
         foreach (var command in commands)

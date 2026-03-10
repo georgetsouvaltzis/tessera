@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
 
 namespace TeaSharp.Core.Terminal;
@@ -428,7 +429,11 @@ internal sealed class UnixRawModeSession
         public ulong c_ospeed;
     }
 
-    [DllImport("libc", EntryPoint = "open", SetLastError = true)]
+    [SuppressMessage(
+        "Interoperability",
+        "CA2101:Specify marshaling for P/Invoke string arguments",
+        Justification = "libc open consumes a POSIX path on Unix platforms; analyzer-compliant LibraryImport alternatives require unsafe code, which TeaSharp forbids.")]
+    [DllImport("libc", EntryPoint = "open", SetLastError = true, CharSet = CharSet.Ansi)]
     private static extern int Open(string path, int flags);
 
     [DllImport("libc", EntryPoint = "close", SetLastError = true)]

@@ -127,7 +127,7 @@ public sealed class ConsoleTerminalAdapter : ITerminalAdapter
         }
     }
 
-    public async Task StreamConsoleKeyEventsAsync(CancellationToken cancellationToken, Action<IMessage> onEvent)
+    public static async Task StreamConsoleKeyEventsAsync(Action<IMessage> onEvent, CancellationToken cancellationToken)
     {
         var burst = new ConsolePasteBurstBuffer();
 

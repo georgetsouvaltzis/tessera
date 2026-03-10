@@ -25,7 +25,7 @@ internal static class TerminalReaderBehaviorTests
         var events = new List<IMessage>();
 
         // Act
-        await reader.StreamEventsAsync(CancellationToken.None, events.Add);
+        await reader.StreamEventsAsync(events.Add, CancellationToken.None);
 
         // Assert
         TestAssert.Equal(3, events.Count, "Reader should emit exactly three messages for bracketed paste");
@@ -43,7 +43,7 @@ internal static class TerminalReaderBehaviorTests
         var events = new List<IMessage>();
 
         // Act
-        await reader.StreamEventsAsync(CancellationToken.None, events.Add);
+        await reader.StreamEventsAsync(events.Add, CancellationToken.None);
 
         // Assert
         TestAssert.Equal(5, events.Count, "Chunked stream should decode all expected messages.");
@@ -70,7 +70,7 @@ internal static class TerminalReaderBehaviorTests
         var events = new List<IMessage>();
 
         // Act
-        await reader.StreamEventsAsync(CancellationToken.None, events.Add);
+        await reader.StreamEventsAsync(events.Add, CancellationToken.None);
 
         // Assert
         TestAssert.Equal(1, events.Count, "Trailing ESC should emit one key event after timeout.");
@@ -88,7 +88,7 @@ internal static class TerminalReaderBehaviorTests
         var events = new List<IMessage>();
 
         // Act
-        await reader.StreamEventsAsync(CancellationToken.None, events.Add);
+        await reader.StreamEventsAsync(events.Add, CancellationToken.None);
 
         // Assert
         TestAssert.Equal(2, events.Count, "Delayed post-ESC input should produce Escape and then plain character.");
@@ -107,7 +107,7 @@ internal static class TerminalReaderBehaviorTests
         var events = new List<IMessage>();
 
         // Act
-        await reader.StreamEventsAsync(CancellationToken.None, events.Add);
+        await reader.StreamEventsAsync(events.Add, CancellationToken.None);
 
         // Assert
         TestAssert.Equal(1, events.Count, "Immediate post-ESC input should decode as one Alt-modified character.");
@@ -124,7 +124,7 @@ internal static class TerminalReaderBehaviorTests
         using var cts = new CancellationTokenSource(TimeSpan.FromMilliseconds(20));
 
         // Act
-        var run = reader.StreamEventsAsync(cts.Token, _ => { });
+        var run = reader.StreamEventsAsync(_ => { }, cts.Token);
         await run.WaitAsync(TimeSpan.FromSeconds(1)).ConfigureAwait(false);
 
         // Assert

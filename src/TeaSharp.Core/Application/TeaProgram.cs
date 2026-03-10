@@ -313,11 +313,11 @@ public sealed class TeaProgram
         if (_runtime.Terminal is ConsoleTerminalAdapter consoleTerminal
             && (_options.UseConsoleKeyEvents || !consoleTerminal.IsRawModeActive))
         {
-            return Task.Run(() => consoleTerminal.StreamConsoleKeyEventsAsync(token, Send), token);
+            return Task.Run(() => ConsoleTerminalAdapter.StreamConsoleKeyEventsAsync(Send, token), token);
         }
 
         _runtime.Reader = new TerminalReader(_runtime.Terminal.Input, _options.EventDecoder ?? new EventDecoder(), _options.EscapeTimeout);
-        return Task.Run(() => _runtime.Reader.StreamEventsAsync(token, Send), token);
+        return Task.Run(() => _runtime.Reader.StreamEventsAsync(Send, token), token);
     }
 
     private async Task RenderAsync(View view, CancellationToken token)

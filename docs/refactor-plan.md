@@ -73,3 +73,4 @@ Status: in progress
 - emit XML documentation files for the public library surface
 - document the stable entrypoints first so IntelliSense teaches the recommended path
 - keep CLI/test projects out of pack output unless they are intentionally published
+- make deterministic build/analyzer policy explicit, keep compiler/package warnings strict, and stage analyzer enforcement incrementally instead of flipping the full backlog to errors at once

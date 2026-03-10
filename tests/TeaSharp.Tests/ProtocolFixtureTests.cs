@@ -190,7 +190,7 @@ internal static class ProtocolFixtureTests
         var events = new List<IMessage>();
 
         // Act
-        await reader.StreamEventsAsync(CancellationToken.None, events.Add);
+        await reader.StreamEventsAsync(events.Add, CancellationToken.None);
 
         // Assert
         TestAssert.Equal(5, events.Count, "Fixture stream should decode focus + paste roundtrip.");

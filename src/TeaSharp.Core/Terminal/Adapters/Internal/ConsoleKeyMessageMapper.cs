@@ -49,7 +49,7 @@ internal static class ConsoleKeyMessageMapper
         };
     }
 
-    private static IMessage? ToCharacterMessage(ConsoleKeyInfo key, KeyModifiers modifiers)
+    private static KeyPressMsg? ToCharacterMessage(ConsoleKeyInfo key, KeyModifiers modifiers)
     {
         if (modifiers.HasFlag(KeyModifiers.Ctrl) && key.Key is >= ConsoleKey.A and <= ConsoleKey.Z)
         {

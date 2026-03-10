@@ -10,7 +10,7 @@ public sealed class TerminalReader(Stream input, IEventDecoder decoder, TimeSpan
 {
     private const int DefaultReadBufferSize = 4096;
 
-    public async Task StreamEventsAsync(CancellationToken cancellationToken, Action<IMessage> onEvent)
+    public async Task StreamEventsAsync(Action<IMessage> onEvent, CancellationToken cancellationToken = default)
     {
         var pending = new PendingByteBuffer(DefaultReadBufferSize);
         var readBuffer = new byte[DefaultReadBufferSize];
