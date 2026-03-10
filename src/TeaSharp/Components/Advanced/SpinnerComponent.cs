@@ -6,7 +6,7 @@ namespace TeaSharp.Components;
 
 public sealed class SpinnerComponent : IStatefulComponent, IMouseStatefulComponent, IFocusableComponent
 {
-    private IReadOnlyList<string> _frames = ["|", "/", "-", "\\"];
+    private List<string> _frames = ["|", "/", "-", "\\"];
     private WidgetInteractionProfile _interactionProfile = WidgetInteractionProfile.Default.Clone();
     private bool _hovered;
 

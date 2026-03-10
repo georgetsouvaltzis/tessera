@@ -113,7 +113,7 @@ public sealed class LayoutContainerComponent : IStatefulComponent, IMouseStatefu
         }
     }
 
-    private ComponentComposer CreateComposer(IReadOnlyList<Rect>? rects = null)
+    private ComponentComposer CreateComposer(List<Rect>? rects = null)
     {
         var composer = new ComponentComposer
         {
@@ -132,7 +132,7 @@ public sealed class LayoutContainerComponent : IStatefulComponent, IMouseStatefu
         return composer;
     }
 
-    private IReadOnlyList<Rect> CreatePlaceholderRects()
+    private List<Rect> CreatePlaceholderRects()
     {
         var rects = new List<Rect>(_children.Count);
         for (var i = 0; i < _children.Count; i++)
@@ -254,7 +254,7 @@ public sealed class LayoutContainerComponent : IStatefulComponent, IMouseStatefu
         return rects;
     }
 
-    private bool HandleSplitMouse(MouseMsg message, Rect bounds, IReadOnlyList<Rect> rects, out bool consumed)
+    private bool HandleSplitMouse(MouseMsg message, Rect bounds, List<Rect> rects, out bool consumed)
     {
         consumed = false;
         if (!EnableMouseResize || Mode == LayoutContainerMode.Grid || _children.Count != 2 || rects.Count < 2)

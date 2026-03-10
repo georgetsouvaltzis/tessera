@@ -311,7 +311,7 @@ public sealed class ComboboxComponent : IStatefulComponent, IMouseStatefulCompon
         }
     }
 
-    private IReadOnlyCollection<WidgetVisualState> ResolveFieldStates()
+    private List<WidgetVisualState> ResolveFieldStates()
     {
         var states = new List<WidgetVisualState>(6);
         if (Focused)
@@ -347,7 +347,7 @@ public sealed class ComboboxComponent : IStatefulComponent, IMouseStatefulCompon
         return states;
     }
 
-    private IReadOnlyCollection<WidgetVisualState> ResolveNoMatchStates()
+    private List<WidgetVisualState> ResolveNoMatchStates()
     {
         var states = new List<WidgetVisualState>(6);
         states.AddRange(ResolveFieldStates());
@@ -360,7 +360,7 @@ public sealed class ComboboxComponent : IStatefulComponent, IMouseStatefulCompon
         return states;
     }
 
-    private IReadOnlyCollection<WidgetVisualState> ResolveOptionStates(int visibleIndex, int itemIndex)
+    private List<WidgetVisualState> ResolveOptionStates(int visibleIndex, int itemIndex)
     {
         var states = new List<WidgetVisualState>(7);
         states.AddRange(ResolveFieldStates());

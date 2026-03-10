@@ -199,12 +199,12 @@ public static class Widgets
         Canvas canvas,
         int x,
         int y,
-        IReadOnlyList<int> widths,
+        int[] widths,
         IReadOnlyList<string> cells,
         bool isSelected)
     {
         var cx = x;
-        for (var col = 0; col < widths.Count; col++)
+        for (var col = 0; col < widths.Length; col++)
         {
             var width = widths[col];
             var value = col < cells.Count ? cells[col] : string.Empty;
@@ -215,7 +215,7 @@ public static class Widgets
 
             canvas.WriteText(cx, y, FitText(value, width), width);
             cx += width;
-            if (col < widths.Count - 1)
+            if (col < widths.Length - 1)
             {
                 canvas.Set(cx, y, '│');
                 cx++;

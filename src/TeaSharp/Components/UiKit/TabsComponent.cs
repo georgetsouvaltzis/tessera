@@ -166,7 +166,7 @@ public sealed class TabsComponent : IStatefulComponent, IMouseStatefulComponent,
         }
     }
 
-    private IReadOnlyCollection<WidgetVisualState> ResolveTabStates(int index, bool active)
+    private List<WidgetVisualState> ResolveTabStates(int index, bool active)
     {
         var states = new List<WidgetVisualState>(4);
         if (Focused)

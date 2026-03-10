@@ -248,7 +248,7 @@ public sealed class CommandPaletteComponent : IStatefulComponent, IMouseStateful
         }
     }
 
-    private IReadOnlyCollection<WidgetVisualState> ResolveStates(int filteredIndex, CommandPaletteItem item)
+    private List<WidgetVisualState> ResolveStates(int filteredIndex, CommandPaletteItem item)
     {
         var states = new List<WidgetVisualState>(4);
         if (filteredIndex == _controller.SelectedFilteredIndex)

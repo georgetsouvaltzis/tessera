@@ -263,7 +263,7 @@ public sealed class NotificationCenterComponent : IStatefulComponent, IMouseStat
         }
     }
 
-    private IReadOnlyCollection<WidgetVisualState> ResolveEntryStates(NotificationEntry entry, bool selected, bool hovered)
+    private List<WidgetVisualState> ResolveEntryStates(NotificationEntry entry, bool selected, bool hovered)
     {
         var states = new List<WidgetVisualState>(7);
         if (Focused)

@@ -141,7 +141,7 @@ public sealed class ViewportModel
         return ViewportRenderer.RenderLines(GetVisualLines(), Width, Height, XOffset, YOffset, Wrap, ShowLineNumbers, HighlightVisualLine);
     }
 
-    private IReadOnlyList<string> GetVisualLines()
+    private List<string> GetVisualLines()
     {
         if (_visualCacheDirty)
         {

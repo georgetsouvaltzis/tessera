@@ -18,7 +18,7 @@ public static class HelpView
         return HelpViewLayout.RenderCompact(ToChunks(bindings), maxWidth);
     }
 
-    private static IReadOnlyList<string> ToChunks(IEnumerable<KeyBinding> bindings)
+    private static string[] ToChunks(IEnumerable<KeyBinding> bindings)
     {
         return bindings.Select(static binding => $"{binding.Keys} {binding.Description}").ToArray();
     }

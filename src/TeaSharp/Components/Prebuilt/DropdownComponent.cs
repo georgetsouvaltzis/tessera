@@ -272,7 +272,7 @@ public sealed class DropdownComponent : IStatefulComponent, IMouseStatefulCompon
         }
     }
 
-    private IReadOnlyCollection<WidgetVisualState> ResolveFieldStates()
+    private List<WidgetVisualState> ResolveFieldStates()
     {
         var states = new List<WidgetVisualState>(5);
         if (Focused)
@@ -303,7 +303,7 @@ public sealed class DropdownComponent : IStatefulComponent, IMouseStatefulCompon
         return states;
     }
 
-    private IReadOnlyCollection<WidgetVisualState> ResolveOptionStates(int visibleIndex, int itemIndex)
+    private List<WidgetVisualState> ResolveOptionStates(int visibleIndex, int itemIndex)
     {
         var states = new List<WidgetVisualState>(7);
         states.AddRange(ResolveFieldStates());
