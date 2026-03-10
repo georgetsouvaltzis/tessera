@@ -45,7 +45,7 @@ TeaSharp provides a prebuilt widget layer in `TeaSharp.Components.PrebuiltWidget
 - `LogViewerComponent` supports append, filter, pause, clear, and scrolling.
 - `LayoutContainerComponent` supports `Vertical`, `Horizontal`, and `Grid` layout modes.
   - Mouse support: child hit-test routing and optional drag-resize split for 2-pane horizontal/vertical layouts (`PrimarySize`, `SetPrimarySize`, `ClearPrimarySize`).
-  - Keyboard routing now defaults to the focused child (`KeyboardRoutingMode.FocusedOnly`), with `Broadcast` available for legacy fan-out behavior.
+  - Use `ComponentComposer` as the focus/routing owner when a layout container participates in a larger interactive screen.
 - `CommandPaletteComponent` provides fuzzy command filtering and execution (`ctrl+p` default open key).
   - Mouse support: motion hover preview, wheel navigation, click execute, and outside-click close when open.
 - `TreeViewComponent` provides hierarchical expand/collapse navigation with keyboard controls.
@@ -73,7 +73,7 @@ TeaSharp provides a prebuilt widget layer in `TeaSharp.Components.PrebuiltWidget
   - `DialogOptions`
   - `LayoutContainerOptions`
   - `TabsOptions`
-- keep a single focus owner per app surface, usually an explicit `SetFocus(...)` helper or `ComponentComposer.SetFocusedSlot(...)`.
+- keep a single focus owner per interactive surface; for multi-pane screens that owner should be `ComponentComposer`.
 - `ListComponent<T>`, `DropdownComponent`, and `ComboboxComponent` support state-driven styling through:
   - `WidgetVisualState`
   - `WidgetStatePalette`

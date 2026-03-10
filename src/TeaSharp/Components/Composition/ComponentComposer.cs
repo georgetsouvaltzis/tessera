@@ -71,6 +71,35 @@ public sealed class ComponentComposer
         return ApplyFocus(index);
     }
 
+    public bool FocusFirst()
+    {
+        var targetIndex = FindFocusableSlot(startIndex: -1, step: 1);
+        return targetIndex >= 0 && ApplyFocus(targetIndex);
+    }
+
+    public bool FocusNext()
+    {
+        var targetIndex = FindFocusableSlot(FocusedSlotIndex, 1);
+        if (targetIndex < 0)
+        {
+            return false;
+        }
+
+        return ApplyFocus(targetIndex);
+    }
+
+    public bool FocusPrevious()
+    {
+        var startIndex = FocusedSlotIndex >= 0 ? FocusedSlotIndex : _slots.Count;
+        var targetIndex = FindFocusableSlot(startIndex, -1);
+        if (targetIndex < 0)
+        {
+            return false;
+        }
+
+        return ApplyFocus(targetIndex);
+    }
+
     public bool ClearFocus()
     {
         var changed = false;
@@ -132,6 +161,34 @@ public sealed class ComponentComposer
         }
 
         return changed;
+    }
+
+    private int FindFocusableSlot(int startIndex, int step)
+    {
+        if (_slots.Count == 0)
+        {
+            return -1;
+        }
+
+        for (var offset = 1; offset <= _slots.Count; offset++)
+        {
+            var index = startIndex + (offset * step);
+            if (index < 0)
+            {
+                index += _slots.Count;
+            }
+            else if (index >= _slots.Count)
+            {
+                index -= _slots.Count;
+            }
+
+            if (_slots[index].Component is IFocusableComponent)
+            {
+                return index;
+            }
+        }
+
+        return -1;
     }
 
     private bool TryGetFocusedStateful(out IStatefulComponent stateful)

@@ -17,6 +17,9 @@ internal static class ChartComponentTests
         yield return new TestCase("Components_Composer_DispatchesStatefulUpdates", Composer_DispatchesStatefulUpdates);
         yield return new TestCase("Components_Composer_FocusedRoutingTargetsFocusedSlotOnly", Composer_FocusedRoutingTargetsFocusedSlotOnly);
         yield return new TestCase("Components_Composer_BroadcastRoutingUpdatesAllSlots", Composer_BroadcastRoutingUpdatesAllSlots);
+        yield return new TestCase("Components_Composer_FocusFirstTargetsFirstFocusableSlot", Composer_FocusFirstTargetsFirstFocusableSlot);
+        yield return new TestCase("Components_Composer_FocusNextCyclesAcrossFocusableSlots", Composer_FocusNextCyclesAcrossFocusableSlots);
+        yield return new TestCase("Components_Composer_FocusPreviousCyclesBackwardAcrossFocusableSlots", Composer_FocusPreviousCyclesBackwardAcrossFocusableSlots);
         yield return new TestCase("Components_Composer_MouseClickFocusesTargetSlot", Composer_MouseClickFocusesTargetSlot);
         yield return new TestCase("Components_Composer_MouseWheelFallsBackToFocusedSlot", Composer_MouseWheelFallsBackToFocusedSlot);
     }
@@ -216,6 +219,60 @@ internal static class ChartComponentTests
         TestAssert.True(changed, "Broadcast routing should report handled key updates.");
         TestAssert.Equal(1, first.KeyUpdates, "First slot should receive keyboard input.");
         TestAssert.Equal(1, second.KeyUpdates, "Broadcast mode should also update non-focused slots.");
+        return Task.CompletedTask;
+    }
+
+    private static Task Composer_FocusFirstTargetsFirstFocusableSlot()
+    {
+        var composer = new ComponentComposer();
+        var first = new CounterComponent();
+        var second = new KeyProbeComponent();
+        composer.Add(first, new Rect(0, 0, 10, 4));
+        composer.Add(second, new Rect(10, 0, 10, 4));
+
+        var changed = composer.FocusFirst();
+
+        TestAssert.True(changed, "FocusFirst should focus the first focusable slot.");
+        TestAssert.Equal(1, composer.FocusedSlotIndex, "FocusFirst should skip non-focusable slots.");
+        TestAssert.True(second.Focused, "First focusable slot should become focused.");
+        return Task.CompletedTask;
+    }
+
+    private static Task Composer_FocusNextCyclesAcrossFocusableSlots()
+    {
+        var composer = new ComponentComposer();
+        var first = new KeyProbeComponent { Focused = true };
+        var second = new CounterComponent();
+        var third = new KeyProbeComponent();
+        composer.Add(first, new Rect(0, 0, 10, 4));
+        composer.Add(second, new Rect(10, 0, 10, 4));
+        composer.Add(third, new Rect(20, 0, 10, 4));
+
+        var changed = composer.FocusNext();
+
+        TestAssert.True(changed, "FocusNext should advance focus.");
+        TestAssert.True(!first.Focused, "Current focused slot should lose focus.");
+        TestAssert.True(third.Focused, "FocusNext should skip non-focusable slots.");
+        TestAssert.Equal(2, composer.FocusedSlotIndex, "Focused slot index should move to the next focusable slot.");
+        return Task.CompletedTask;
+    }
+
+    private static Task Composer_FocusPreviousCyclesBackwardAcrossFocusableSlots()
+    {
+        var composer = new ComponentComposer();
+        var first = new KeyProbeComponent();
+        var second = new CounterComponent();
+        var third = new KeyProbeComponent { Focused = true };
+        composer.Add(first, new Rect(0, 0, 10, 4));
+        composer.Add(second, new Rect(10, 0, 10, 4));
+        composer.Add(third, new Rect(20, 0, 10, 4));
+
+        var changed = composer.FocusPrevious();
+
+        TestAssert.True(changed, "FocusPrevious should move focus backward.");
+        TestAssert.True(first.Focused, "FocusPrevious should wrap to the previous focusable slot.");
+        TestAssert.True(!third.Focused, "Previous focused slot should lose focus.");
+        TestAssert.Equal(0, composer.FocusedSlotIndex, "Focused slot index should wrap backward.");
         return Task.CompletedTask;
     }
 

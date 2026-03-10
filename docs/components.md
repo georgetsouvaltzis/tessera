@@ -29,6 +29,7 @@ The design follows patterns used in Bubble Tea examples:
   - `IInteractiveComponent`: convenience contract for focusable stateful mouse-aware components.
   - `KeyboardRoutingMode`: `FocusedOnly` (default) or `Broadcast`.
   - `ComponentComposer`: slot-based composition (`Add`, `Clear`, `Update`, `Render`).
+    - focus ownership APIs: `SetFocusedSlot`, `FocusFirst`, `FocusNext`, `FocusPrevious`, `ClearFocus`
     - mouse routing via slot hit-testing
     - explicit click-to-focus through `IFocusableComponent`
     - focused-slot keyboard routing by default
@@ -108,7 +109,7 @@ The design follows patterns used in Bubble Tea examples:
       - `DialogComponent.AcceptKey` / `DismissKey`
       - options-based constructors (`LabelOptions`, `ButtonOptions`, `TextInputOptions`, `TextAreaOptions`, `ListOptions<T>`, `TableOptions`, `ProgressBarOptions`, `StatusBarOptions`, `DialogOptions`, `LayoutContainerOptions`, `TabsOptions`)
       - component-level state accessors instead of raw nested models (`TextInputComponent.Value` / `Placeholder` / `MaxLength`, `TextAreaComponent.Value`, `ListComponent<T>.SelectedItem` / `SetItems(...)`, `ComboboxComponent.FilterText` / `Placeholder`, `TableComponent.PageSize` / `SortColumn` / `SortDescending`, `NumberInputComponent.Text`)
-      - explicit app-level `SetFocus(...)` helpers or `ComponentComposer.SetFocusedSlot(...)` for central focus ownership
+      - use `ComponentComposer` as the focus/routing owner for multi-pane surfaces; keep app-local focus enums for whole-screen or mode switches only
       - `ShowBorder` toggle for minimalist rendering on border-capable prebuilt widgets
       - state styling primitives for child items (`WidgetVisualState`, `WidgetStatePalette`, `ItemStateResolver`/`OptionStateResolver`)
       - state palette inheritance (`WidgetStatePalette.Parent` / `InheritFrom(...)`)

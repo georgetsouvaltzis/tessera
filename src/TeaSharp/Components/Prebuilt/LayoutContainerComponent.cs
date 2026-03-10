@@ -18,12 +18,10 @@ public sealed class LayoutContainerComponent : IStatefulComponent, IMouseStatefu
         GridRows = options.GridRows;
         GridColumns = options.GridColumns;
         EnableMouseInteractions = options.EnableMouseInteractions;
-        ClickToFocusChildren = options.ClickToFocusChildren;
         EnableMouseResize = options.EnableMouseResize;
         SplitterHitThickness = options.SplitterHitThickness;
         MinPrimarySize = options.MinPrimarySize;
         MinSecondarySize = options.MinSecondarySize;
-        KeyboardRoutingMode = options.KeyboardRoutingMode;
         PrimarySize = options.PrimarySize;
     }
 
@@ -35,8 +33,6 @@ public sealed class LayoutContainerComponent : IStatefulComponent, IMouseStatefu
 
     public bool EnableMouseInteractions { get; set; } = true;
 
-    public bool ClickToFocusChildren { get; set; } = true;
-
     public bool EnableMouseResize { get; set; } = true;
 
     public int SplitterHitThickness { get; set; } = 1;
@@ -45,11 +41,7 @@ public sealed class LayoutContainerComponent : IStatefulComponent, IMouseStatefu
 
     public int MinSecondarySize { get; set; } = 8;
 
-    public KeyboardRoutingMode KeyboardRoutingMode { get; set; } = KeyboardRoutingMode.FocusedOnly;
-
     public int? PrimarySize { get; private set; }
-
-    public int FocusedChildIndex { get; private set; } = -1;
 
     public IReadOnlyList<(ICanvasComponent Component, int Weight)> Children => _children;
 
@@ -58,16 +50,11 @@ public sealed class LayoutContainerComponent : IStatefulComponent, IMouseStatefu
         _children.Clear();
         _draggingSplit = false;
         PrimarySize = null;
-        FocusedChildIndex = -1;
     }
 
     public void Add(ICanvasComponent component, int weight = 1)
     {
         _children.Add((component, Math.Max(1, weight)));
-        if (component is IFocusableComponent { Focused: true })
-        {
-            FocusedChildIndex = _children.Count - 1;
-        }
     }
 
     public void SetPrimarySize(int size)
@@ -80,57 +67,10 @@ public sealed class LayoutContainerComponent : IStatefulComponent, IMouseStatefu
         PrimarySize = null;
     }
 
-    public bool SetFocusedChild(int index)
-    {
-        if (index < 0 || index >= _children.Count)
-        {
-            return false;
-        }
-
-        if (_children[index].Component is not IFocusableComponent)
-        {
-            return false;
-        }
-
-        var changed = false;
-        for (var i = 0; i < _children.Count; i++)
-        {
-            if (_children[i].Component is not IFocusableComponent focusable)
-            {
-                continue;
-            }
-
-            var shouldFocus = i == index;
-            if (focusable.Focused == shouldFocus)
-            {
-                continue;
-            }
-
-            focusable.Focused = shouldFocus;
-            changed = true;
-        }
-
-        FocusedChildIndex = index;
-        return changed;
-    }
-
     public bool Update(IMessage message)
     {
-        if (KeyboardRoutingMode == KeyboardRoutingMode.FocusedOnly && TryGetFocusedStateful(out var focusedStateful))
-        {
-            return focusedStateful.Update(message);
-        }
-
-        var changed = false;
-        foreach (var child in _children)
-        {
-            if (child.Component is IStatefulComponent stateful)
-            {
-                changed |= stateful.Update(message);
-            }
-        }
-
-        return changed;
+        var composer = CreateComposer();
+        return composer.Update(message);
     }
 
     public bool UpdateMouse(MouseMsg message, Rect bounds)
@@ -147,29 +87,8 @@ public sealed class LayoutContainerComponent : IStatefulComponent, IMouseStatefu
             return changed;
         }
 
-        var targetIndex = FindTopMostChild(rects, message.X, message.Y);
-        if (targetIndex < 0 || targetIndex >= _children.Count)
-        {
-            return changed;
-        }
-
-        if (ClickToFocusChildren && message is MouseClickMsg { Button: MouseButton.Left } && _children[targetIndex].Component is IFocusableComponent)
-        {
-            changed |= SetFocusedChild(targetIndex);
-        }
-
-        var child = _children[targetIndex].Component;
-        if (child is IMouseStatefulComponent mouseStateful)
-        {
-            changed |= mouseStateful.UpdateMouse(message, rects[targetIndex]);
-            return changed;
-        }
-
-        if (child is IStatefulComponent stateful)
-        {
-            changed |= stateful.Update(message);
-        }
-
+        var composer = CreateComposer(rects);
+        changed |= composer.Update(message);
         return changed;
     }
 
@@ -194,21 +113,34 @@ public sealed class LayoutContainerComponent : IStatefulComponent, IMouseStatefu
         }
     }
 
-    private bool TryGetFocusedStateful(out IStatefulComponent stateful)
+    private ComponentComposer CreateComposer(IReadOnlyList<Rect>? rects = null)
     {
-        stateful = default!;
-        if (FocusedChildIndex < 0 || FocusedChildIndex >= _children.Count)
+        var composer = new ComponentComposer
         {
-            return false;
+            ClickToFocusEnabled = true,
+            RouteMouseWheelToFocusedSlot = true,
+            KeyboardRoutingMode = KeyboardRoutingMode.FocusedOnly,
+        };
+
+        var childRects = rects ?? CreatePlaceholderRects();
+        var count = Math.Min(_children.Count, childRects.Count);
+        for (var i = 0; i < count; i++)
+        {
+            composer.Add(_children[i].Component, childRects[i]);
         }
 
-        if (_children[FocusedChildIndex].Component is not IStatefulComponent focusedStateful)
+        return composer;
+    }
+
+    private IReadOnlyList<Rect> CreatePlaceholderRects()
+    {
+        var rects = new List<Rect>(_children.Count);
+        for (var i = 0; i < _children.Count; i++)
         {
-            return false;
+            rects.Add(default);
         }
 
-        stateful = focusedStateful;
-        return true;
+        return rects;
     }
 
     private List<Rect> BuildChildRects(Rect rect)
@@ -407,18 +339,5 @@ public sealed class LayoutContainerComponent : IStatefulComponent, IMouseStatefu
         }
 
         return false;
-    }
-
-    private static int FindTopMostChild(IReadOnlyList<Rect> rects, int x, int y)
-    {
-        for (var i = rects.Count - 1; i >= 0; i--)
-        {
-            if (rects[i].Contains(x, y))
-            {
-                return i;
-            }
-        }
-
-        return -1;
     }
 }

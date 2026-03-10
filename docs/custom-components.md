@@ -9,6 +9,7 @@ TeaSharp custom components are built around three contracts:
 - `ComponentComposer`: deterministic slot composition and optional update routing.
   - default keyboard mode is focused-slot only
   - switch to `KeyboardRoutingMode.Broadcast` when a container should fan out input
+  - use it as the single focus owner for multi-pane interactive surfaces
 
 ## Minimal Render-Only Component
 
