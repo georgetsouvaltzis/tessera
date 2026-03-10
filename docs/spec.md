@@ -69,7 +69,7 @@ Primary goal: deterministic message-driven TUI runtime with portable terminal be
 - `Commands` static helpers: `Quit`, `Interrupt`, `Batch`, `Sequence`, `Tick`, `Every`.
 
 7. `Components`
-- `TeaSharp.Components`: deterministic canvas primitives (`Rect`, `Canvas`, `Widgets`) with selectable text pipeline (`CanvasTextMode.Fast` / `CanvasTextMode.GraphemeAware`) and configurable border styles, component composition contracts (`ICanvasComponent`, `IStatefulComponent`, `ComponentComposer`, `ScreenComposer`) including overlay helpers for modals/palettes/toasts, chart primitives (`Charts`, `LineChartComponent`, `BarChartComponent`) with optional axes/legend/scale options, dashboard widgets (`GaugeComponent`, `StatsCardComponent`, `MiniLogComponent`), reusable UI kit (`Layout`, `UiWidgets`, tabs/accordion/table/forms/toast/modal components), and a prebuilt widget layer (`Label`, `Button`, `TextInput`, `TextArea`, `List`, `Table`, `ProgressBar`, `Tabs`, `Modal/Dialog`, `StatusBar`, `LogViewer`, `LayoutContainer`).
+- `TeaSharp.Components`: deterministic canvas primitives (`Rect`, `Canvas`, `Widgets`) with selectable text pipeline (`CanvasTextMode.Fast` / `CanvasTextMode.GraphemeAware`) and configurable border styles, component composition contracts (`ICanvasComponent`, `IStatefulComponent`, `ComponentComposer`, `ScreenComposer`, `InputRouter`) including overlay helpers for modals/palettes/toasts and scoped key precedence (`System` -> `Modal` -> `Palette` -> `Command` -> `FocusedRegion` -> `Global`), chart primitives (`Charts`, `LineChartComponent`, `BarChartComponent`) with optional axes/legend/scale options, dashboard widgets (`GaugeComponent`, `StatsCardComponent`, `MiniLogComponent`), reusable UI kit (`Layout`, `UiWidgets`, tabs/accordion/table/forms/toast/modal components), and a prebuilt widget layer (`Label`, `Button`, `TextInput`, `TextArea`, `List`, `Table`, `ProgressBar`, `Tabs`, `Modal/Dialog`, `StatusBar`, `LogViewer`, `LayoutContainer`).
 
 8. `Styles`
 - `TeaSharp.Styles`: composable ANSI style model (`TeaStyle`, `AnsiColor`) for foreground/background and text attributes.
@@ -125,6 +125,7 @@ Primary goal: deterministic message-driven TUI runtime with portable terminal be
 - `IModel Init/Update/View`, where `Update` mutates model state in place and returns an optional `Command`.
 - `Command` returns optional `IMessage`.
 - `View` is now grouped into `ViewFrame` (content + cursor placement/style), `ViewTerminal` (alt-screen, mode toggles, colors, progress, title, keyboard enhancements), and `ViewInput` (optional mouse interception callback).
+- Multi-pane apps should pair `ScreenComposer` (region layout, focus, mouse hit routing) with `InputRouter` (overlay/mode/global key precedence) instead of re-deriving layout rectangles in app-local key handlers.
 - `ProgramOptions` now includes runtime extension points:
   - capability probe mode list (`CapabilityProbeModes`)
   - decoder injection (`EventDecoder`)

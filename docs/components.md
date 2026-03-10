@@ -40,6 +40,10 @@ The design follows patterns used in Bubble Tea examples:
     - mouse routing by registered region bounds instead of repeated app-local rect math
     - preferred-focus selection via `CompleteFrame(...)`
     - overlay helpers: `AddOverlayComponent`, `AddModalComponent`, `AddPaletteComponent`, `AddToastOverlay`
+  - `InputRouter`: app-level key precedence for multi-mode screens.
+    - ordered scopes: `System`, `Modal`, `Palette`, `Command`, `FocusedRegion`, `Global`
+    - scope behaviors: `ContinueWhenUnhandled` or `CaptureWhileActive`
+    - optional `blocksGlobalShortcuts` guard for text-entry regions so plain character shortcuts do not leak into app-global handlers
 - `Widgets`:
   - `DrawPanel`
   - `DrawProgressBar`
@@ -115,7 +119,7 @@ The design follows patterns used in Bubble Tea examples:
       - `DialogComponent.AcceptKey` / `DismissKey`
       - options-based constructors (`LabelOptions`, `ButtonOptions`, `TextInputOptions`, `TextAreaOptions`, `ListOptions<T>`, `TableOptions`, `ProgressBarOptions`, `StatusBarOptions`, `DialogOptions`, `LayoutContainerOptions`, `TabsOptions`)
       - component-level state accessors instead of raw nested models (`TextInputComponent.Value` / `Placeholder` / `MaxLength`, `TextAreaComponent.Value`, `ListComponent<T>.SelectedItem` / `SetItems(...)`, `ComboboxComponent.FilterText` / `Placeholder`, `TableComponent.PageSize` / `SortColumn` / `SortDescending`, `NumberInputComponent.Text`, `ButtonComponent.WasPressed` / `PressCount` / `Hovered` / `Pressed`)
-      - use `ScreenComposer` for screen-scale region orchestration and `ComponentComposer` for slot-based component trees
+      - use `ScreenComposer` for screen-scale region orchestration, `InputRouter` for mode/global key precedence, and `ComponentComposer` for slot-based component trees
       - `ShowBorder` toggle for minimalist rendering on border-capable prebuilt widgets
       - state styling primitives for child items (`WidgetVisualState`, `WidgetStatePalette`, `ItemStateResolver`/`OptionStateResolver`)
       - state palette inheritance (`WidgetStatePalette.Parent` / `InheritFrom(...)`)

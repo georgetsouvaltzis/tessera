@@ -40,6 +40,7 @@ internal sealed class WidgetGalleryModel : IModel
     private const string LogViewerRegionId = "gallery.logs";
     private const string DialogRegionId = "gallery.dialog";
 
+    private readonly InputRouter _inputRouter = new();
     private readonly ScreenComposer _screen = new();
     private readonly TabsComponent _tabs = new(new TabsOptions(["Basics", "Inputs", "Data", "Overlay", "Layout"]));
     private readonly LabelComponent _label = new(new LabelOptions(
@@ -100,6 +101,8 @@ internal sealed class WidgetGalleryModel : IModel
 
     public WidgetGalleryModel()
     {
+        ConfigureInputRouter();
+
         _table.SetRows(
         [
             ["api", "ok", "21ms"],
@@ -162,64 +165,8 @@ internal sealed class WidgetGalleryModel : IModel
         if (message is KeyPressMsg key)
         {
             EnsureScreen();
-            if ((key.Modifiers.HasFlag(KeyModifiers.Ctrl) && (key.IsCharacter('c') || key.IsCharacter('\u0003', ignoreCase: false)))
-                || key.IsCharacter('q', KeyModifiers.None))
-            {
-                return Tea.Cmd.Quit;
-            }
-
-            if (_dialog.Visible)
-            {
-                var dialogChanged = HandleScreenKey(key);
-                if (dialogChanged)
-                {
-                    _lastEvent = key.Keystroke();
-                }
-
-                return null;
-            }
-
-            if (key.Is(KeyCode.Tab, KeyModifiers.None))
-            {
-                _screen.FocusNext();
-                _lastEvent = $"focus:{FocusLabel()}";
-                return null;
-            }
-
-            if (key.IsCharacter('d', KeyModifiers.None) && _tabs.SelectedIndex == 3)
-            {
-                _dialog.Visible = !_dialog.Visible;
-                if (_dialog.Visible)
-                {
-                    _screen.SetFocus(DialogRegionId);
-                }
-                else
-                {
-                    _screen.SetFocus(TabsRegionId);
-                }
-
-                _lastEvent = _dialog.Visible ? "dialog:open" : "dialog:close";
-                _logs.Append(_lastEvent);
-                return null;
-            }
-
-            if (_screen.FocusedRegionId == TabsRegionId)
-            {
-                if (HandleScreenKey(key))
-                {
-                    _lastEvent = $"tab:{_tabs.SelectedIndex + 1}";
-                }
-
-                return null;
-            }
-
-            var changed = HandleScreenKey(key);
-            if (changed)
-            {
-                _lastEvent = key.Keystroke();
-            }
-
-            return null;
+            var routed = _inputRouter.Route(key);
+            return routed.Handled ? routed.Command : null;
         }
 
         return null;
@@ -352,20 +299,98 @@ internal sealed class WidgetGalleryModel : IModel
             });
     }
 
-    private bool HandleScreenKey(KeyPressMsg key)
+    private void ConfigureInputRouter()
+    {
+        _inputRouter
+            .AddScope("gallery.system", InputScopeKind.System, static () => true, HandleSystemKey)
+            .AddScope("gallery.modal", InputScopeKind.Modal, () => _dialog.Visible, HandleDialogKey, InputScopeBehavior.CaptureWhileActive)
+            .AddScope(
+                "gallery.focused",
+                InputScopeKind.FocusedRegion,
+                () => !_dialog.Visible && !string.IsNullOrWhiteSpace(_screen.FocusedRegionId),
+                HandleFocusedRegionKey,
+                blocksGlobalShortcuts: ShouldBlockGlobalShortcuts)
+            .AddScope("gallery.global", InputScopeKind.Global, static () => true, HandleGlobalKey);
+    }
+
+    private InputRouteResult HandleSystemKey(KeyPressMsg key)
+    {
+        if (key.Modifiers.HasFlag(KeyModifiers.Ctrl)
+            && (key.IsCharacter('c') || key.IsCharacter('\u0003', ignoreCase: false)))
+        {
+            return InputRouteResult.FromCommand(Tea.Cmd.Quit);
+        }
+
+        return InputRouteResult.NotHandled;
+    }
+
+    private InputRouteResult HandleDialogKey(KeyPressMsg key)
+    {
+        return HandleScreenKey(key);
+    }
+
+    private InputRouteResult HandleFocusedRegionKey(KeyPressMsg key)
+    {
+        return HandleScreenKey(key);
+    }
+
+    private InputRouteResult HandleGlobalKey(KeyPressMsg key)
+    {
+        if (key.IsCharacter('q', KeyModifiers.None))
+        {
+            return InputRouteResult.FromCommand(Tea.Cmd.Quit);
+        }
+
+        if (key.Is(KeyCode.Tab, KeyModifiers.None))
+        {
+            _screen.FocusNext();
+            _lastEvent = $"focus:{FocusLabel()}";
+            return InputRouteResult.HandledWithoutCommand;
+        }
+
+        if (key.IsCharacter('d', KeyModifiers.None) && _tabs.SelectedIndex == 3)
+        {
+            _dialog.Visible = !_dialog.Visible;
+            if (_dialog.Visible)
+            {
+                _screen.SetFocus(DialogRegionId);
+            }
+            else
+            {
+                _screen.SetFocus(TabsRegionId);
+            }
+
+            _lastEvent = _dialog.Visible ? "dialog:open" : "dialog:close";
+            _logs.Append(_lastEvent);
+            return InputRouteResult.HandledWithoutCommand;
+        }
+
+        return InputRouteResult.NotHandled;
+    }
+
+    private bool ShouldBlockGlobalShortcuts(KeyPressMsg key)
+    {
+        return _screen.FocusedRegionId is TextInputRegionId or TextAreaRegionId
+            && key.Modifiers == KeyModifiers.None
+            && key.Code == KeyCode.Character;
+    }
+
+    private InputRouteResult HandleScreenKey(KeyPressMsg key)
     {
         var previousSubmitCount = _textInput.SubmitCount;
         var previousDialogResult = _dialog.LastResult;
         var changed = _screen.Update(NormalizeInputKey(key));
         if (!changed)
         {
-            return false;
+            return InputRouteResult.NotHandled;
         }
 
         if (_screen.FocusedRegionId == DialogRegionId && previousDialogResult != _dialog.LastResult)
         {
+            _screen.SetFocus(TabsRegionId);
             _logs.Append($"dialog:{_dialog.LastResult}");
-            return true;
+            _lastEvent = $"dialog:{_dialog.LastResult.ToString().ToLowerInvariant()}";
+            return InputRouteResult.HandledWithoutCommand;
         }
 
         if (_screen.FocusedRegionId == TextInputRegionId && _textInput.SubmitCount > previousSubmitCount)
@@ -373,7 +398,10 @@ internal sealed class WidgetGalleryModel : IModel
             _logs.Append($"input:{_textInput.LastSubmittedValue}");
         }
 
-        return true;
+        _lastEvent = _screen.FocusedRegionId == TabsRegionId
+            ? $"tab:{_tabs.SelectedIndex + 1}"
+            : key.Keystroke();
+        return InputRouteResult.HandledWithoutCommand;
     }
 
     private static KeyPressMsg NormalizeInputKey(KeyPressMsg key)

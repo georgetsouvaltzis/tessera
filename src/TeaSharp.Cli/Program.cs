@@ -205,6 +205,7 @@ internal sealed class PomodoroModel : IModel
     private readonly TeaStyle _accentStyle = TeaStyle.Empty.WithBold().WithForeground(AnsiColor.Rgb({{accentR}}, {{accentG}}, {{accentB}}));
     private readonly TeaStyle _mutedStyle = TeaStyle.Empty.WithForeground(AnsiColor.Rgb({{mutedR}}, {{mutedG}}, {{mutedB}}));
 
+    private readonly InputRouter _inputRouter = new();
     private readonly ScreenComposer _screen = new();
     private readonly ProgressBarComponent _progress = new() { Title = "Session Progress", Step = 0.05 };
     private readonly StatusBarComponent _status = new()
@@ -249,6 +250,7 @@ internal sealed class PomodoroModel : IModel
 
     public PomodoroModel()
     {
+        ConfigureInputRouter();
         _commandInput.Placeholder = "help | start | pause | reset | skip | focus <min> | break <min> | quit";
         _logs.Append("Pomodoro scaffold ready");
         _logs.Append($"Theme: {{theme.DisplayName}}");
@@ -290,7 +292,9 @@ internal sealed class PomodoroModel : IModel
                 return HandleMouse(mouse);
 
             case KeyPressMsg key:
-                return HandleKey(key);
+                EnsureScreen();
+                var routed = _inputRouter.Route(key);
+                return routed.Handled ? routed.Command : null;
 
             default:
                 return null;
@@ -330,53 +334,81 @@ internal sealed class PomodoroModel : IModel
         };
     }
 
-    private Command? HandleKey(KeyPressMsg key)
+    private void ConfigureInputRouter()
     {
-        EnsureScreen();
+        _inputRouter
+            .AddScope("pomodoro.system", InputScopeKind.System, static () => true, HandleSystemKey)
+            .AddScope("pomodoro.modal", InputScopeKind.Modal, () => _resetDialog.Visible, HandleDialogKey, InputScopeBehavior.CaptureWhileActive)
+            .AddScope("pomodoro.command", InputScopeKind.Command, () => _mode == InputMode.Command, HandleCommandModeKey, InputScopeBehavior.CaptureWhileActive)
+            .AddScope("pomodoro.focused", InputScopeKind.FocusedRegion, () => !_resetDialog.Visible && _mode != InputMode.Command && !string.IsNullOrWhiteSpace(_screen.FocusedRegionId), HandleFocusedRegionKey)
+            .AddScope("pomodoro.global", InputScopeKind.Global, static () => true, HandleGlobalKey);
+    }
+
+    private InputRouteResult HandleSystemKey(KeyPressMsg key)
+    {
         if (key.Modifiers.HasFlag(KeyModifiers.Ctrl)
             && (key.IsCharacter('c') || key.IsCharacter('\u0003', ignoreCase: false)))
         {
-            return Tea.Cmd.Quit;
+            return InputRouteResult.FromCommand(Tea.Cmd.Quit);
         }
 
-        if (_mode == InputMode.Command)
+        return InputRouteResult.NotHandled;
+    }
+
+    private InputRouteResult HandleCommandModeKey(KeyPressMsg key)
+    {
+        if (MatchesBinding(key, "esc"))
         {
-            if (MatchesBinding(key, "esc"))
-            {
-                _mode = InputMode.Navigate;
-                _screen.SetFocus(ToggleButtonRegionId);
-                _lastEvent = "mode:nav";
-                return null;
-            }
-
-            return HandleScreenKey(key);
+            _mode = InputMode.Navigate;
+            _screen.SetFocus(ToggleButtonRegionId);
+            _lastEvent = "mode:nav";
+            return InputRouteResult.HandledWithoutCommand;
         }
 
-        if (_resetDialog.Visible)
+        return HandleScreenKey(key);
+    }
+
+    private InputRouteResult HandleDialogKey(KeyPressMsg key)
+    {
+        if (MatchesBinding(key, ModalKey))
         {
-            return HandleScreenKey(key);
+            _resetDialog.Visible = false;
+            _screen.SetFocus(ToggleButtonRegionId);
+            _lastEvent = "dialog:close";
+            return InputRouteResult.HandledWithoutCommand;
         }
 
+        return HandleScreenKey(key);
+    }
+
+    private InputRouteResult HandleFocusedRegionKey(KeyPressMsg key)
+    {
+        return HandleScreenKey(key);
+    }
+
+    private InputRouteResult HandleGlobalKey(KeyPressMsg key)
+    {
         if (!_resetDialog.Visible && MatchesBinding(key, CommandModeKey))
         {
             _mode = InputMode.Command;
             _screen.SetFocus(CommandRegionId);
             _lastEvent = "mode:cmd";
-            return null;
+            return InputRouteResult.HandledWithoutCommand;
         }
 
         if (MatchesBinding(key, ModalKey))
         {
             _resetDialog.Visible = !_resetDialog.Visible;
+            _screen.SetFocus(_resetDialog.Visible ? DialogRegionId : ToggleButtonRegionId);
             _lastEvent = _resetDialog.Visible ? "dialog:open" : "dialog:close";
-            return null;
+            return InputRouteResult.HandledWithoutCommand;
         }
 
         if (MatchesBinding(key, ToastKey))
         {
             _toasts.Push(new ToastMessage($"{(_isBreak ? "break" : "focus")} {FormatClock(_remainingSeconds)}", 70, ToastSeverity.Info));
             _lastEvent = "toast";
-            return null;
+            return InputRouteResult.HandledWithoutCommand;
         }
 
         if (MatchesBinding(key, "r"))
@@ -384,22 +416,22 @@ internal sealed class PomodoroModel : IModel
             ResetCurrentPhase();
             _lastEvent = "reset";
             _logs.Append(_lastEvent);
-            return null;
+            return InputRouteResult.HandledWithoutCommand;
         }
 
         if (MatchesBinding(key, "n"))
         {
             AdvancePhase(logTransition: true);
             _lastEvent = "skip";
-            return null;
+            return InputRouteResult.HandledWithoutCommand;
         }
 
         if (MatchesBinding(key, "q"))
         {
-            return Tea.Cmd.Quit;
+            return InputRouteResult.FromCommand(Tea.Cmd.Quit);
         }
 
-        return HandleScreenKey(key);
+        return InputRouteResult.NotHandled;
     }
 
     private Command? HandleMouse(MouseMsg mouse)
@@ -491,19 +523,19 @@ internal sealed class PomodoroModel : IModel
         return null;
     }
 
-    private Command? HandleScreenKey(KeyPressMsg key)
+    private InputRouteResult HandleScreenKey(KeyPressMsg key)
     {
         var previousSubmitCount = _commandInput.SubmitCount;
         var handled = _screen.Update(key);
         if (!handled)
         {
-            return null;
+            return InputRouteResult.NotHandled;
         }
 
         if (_toggleButton.WasPressed)
         {
             ToggleRunning();
-            return null;
+            return InputRouteResult.HandledWithoutCommand;
         }
 
         if (_resetDialog.LastResult != DialogResult.None)
@@ -515,7 +547,8 @@ internal sealed class PomodoroModel : IModel
             }
 
             _lastEvent = $"dialog:{_resetDialog.LastResult.ToString().ToLowerInvariant()}";
-            return null;
+            _screen.SetFocus(_mode == InputMode.Command ? CommandRegionId : ToggleButtonRegionId);
+            return InputRouteResult.HandledWithoutCommand;
         }
 
         if (_commandInput.SubmitCount > previousSubmitCount)
@@ -523,14 +556,14 @@ internal sealed class PomodoroModel : IModel
             var command = _commandInput.LastSubmittedValue.Trim();
             if (string.IsNullOrWhiteSpace(command))
             {
-                return null;
+                return InputRouteResult.HandledWithoutCommand;
             }
 
-            return ExecuteCommand(command);
+            return InputRouteResult.FromCommand(ExecuteCommand(command));
         }
 
         _lastEvent = key.Keystroke();
-        return null;
+        return InputRouteResult.HandledWithoutCommand;
     }
 
     private void RenderSessionPanel(Canvas canvas, Rect rect)

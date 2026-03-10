@@ -12,6 +12,10 @@ TeaSharp custom components are built around three contracts:
   - use it for slot-based component trees
 - `ScreenComposer`: named screen regions with frame snapshots, focus ownership, and mouse routing for larger app surfaces
   - overlay helpers handle blocking modals/palettes and passive toast overlays without extra app-level hit-testing
+- `InputRouter`: app-level key precedence across overlays, command bars, focused regions, and global shortcuts
+  - typical scope order: `System` -> `Modal` -> `Palette` -> `Command` -> `FocusedRegion` -> `Global`
+  - use `CaptureWhileActive` for modal/palette/command scopes so lower handlers cannot accidentally run
+  - use `blocksGlobalShortcuts` on text-entry scopes to suppress plain-character globals while editing
 
 ## Minimal Render-Only Component
 
@@ -86,3 +90,4 @@ return canvas.Render();
 - Keep render pure: no side effects from `Render`.
 - If you need full Unicode layout fidelity in component text, use `CanvasTextMode.GraphemeAware`.
 - Use composer slots as an explicit layout graph; avoid hidden global state.
+- For screen-scale apps, keep one owner per concern: `ScreenComposer` for regions/focus/mouse, `InputRouter` for key precedence.
