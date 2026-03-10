@@ -1,5 +1,8 @@
+using System.ComponentModel;
+
 namespace TeaSharp.Widgets;
 
+[EditorBrowsable(EditorBrowsableState.Advanced)]
 public sealed class ViewportKeyMap : IWidgetKeyMap
 {
     public static ViewportKeyMap Default { get; } = new();

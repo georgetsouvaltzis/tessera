@@ -1,9 +1,11 @@
+using System.ComponentModel;
 using TeaSharp.Core.Abstractions;
 using TeaSharp.Core.Messages;
 using TeaSharp.Widgets.Internal;
 
 namespace TeaSharp.Widgets;
 
+[EditorBrowsable(EditorBrowsableState.Advanced)]
 public sealed class ViewportModel
 {
     private readonly List<string> _sourceLines = [];

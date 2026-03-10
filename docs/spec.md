@@ -78,10 +78,11 @@ Primary goal: deterministic message-driven TUI runtime with portable terminal be
 - `TeaSharp.Styles`: composable ANSI style model (`TeaStyle`, `AnsiColor`) for foreground/background and text attributes.
 
 9. `Widgets`
-- `TeaSharp.Widgets`: stateful widget models (`ViewportModel`, `TextInputModel`, `ListModel<T>`) with reusable keymaps/help.
+- `TeaSharp.Widgets`: lower-level stateful widget models (`ViewportModel`, `TextInputModel`, `ListModel<T>`) with reusable keymaps/help.
   - viewport gutter/highlight support (`ShowLineNumbers`, `HighlightVisualLine`).
   - text input multiline editing mode.
   - tracked async list loader orchestration (`ReloadAsync`, `AppendAsync`) with stale-load cancellation.
+  - widget models and `*KeyMap` types remain public for advanced composition, but are now marked `EditorBrowsable(Advanced)`.
 
 ### 4.2 Core Data Flow
 

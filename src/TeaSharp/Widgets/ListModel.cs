@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using TeaSharp.Core.Abstractions;
 using TeaSharp.Core.Messages;
 using TeaSharp.Widgets.Internal;
@@ -6,6 +7,7 @@ namespace TeaSharp.Widgets;
 
 public readonly record struct ListRow<T>(T Item, int Index, bool Selected);
 
+[EditorBrowsable(EditorBrowsableState.Advanced)]
 public sealed class ListModel<T>
 {
     private readonly Func<T, string> _toText;

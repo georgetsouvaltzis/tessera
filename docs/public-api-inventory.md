@@ -28,6 +28,9 @@ This document defines the current public API tiers in TeaSharp so refactors can 
 - `ComponentComposer`
 - `IProgramRenderer`
 - `ITerminalAdapter`
+- `IEventDecoder`
+- rendering/input host seams (`AnsiDiffRenderer`, `AnsiRendererOptions`, `NullRenderer`, `TerminalReader`)
+- lower-level widget infrastructure (`TextInputModel`, `ViewportModel`, `ListModel<T>`, `IWidgetKeyMap`, `*KeyMap`)
 - terminal capability detection types
 - specialized rendering/input infrastructure for advanced host customization
 
@@ -65,6 +68,7 @@ This document defines the current public API tiers in TeaSharp so refactors can 
 
 - rendering, terminal, capability, and decoding seams can stay public where they offer real extension value.
 - advanced seams should move behind clearer documentation and naming so they do not look like the primary path for all consumers.
+- `KeyBinding` remains discoverable for now because higher-level component customization still depends on it directly.
 
 ### Internalization targets
 

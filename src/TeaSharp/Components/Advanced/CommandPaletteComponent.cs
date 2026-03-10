@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using TeaSharp.Core.Abstractions;
 using TeaSharp.Core.Messages;
 using TeaSharp.Widgets;
@@ -8,6 +9,7 @@ public sealed class CommandPaletteComponent : IStatefulComponent, IMouseStateful
 {
     private readonly CommandPaletteController _controller = new();
 
+    [EditorBrowsable(EditorBrowsableState.Advanced)]
     public TextInputModel Query { get; } = new();
 
     public TextInputKeyMap QueryKeyMap { get; set; } = TextInputKeyMap.Default;
