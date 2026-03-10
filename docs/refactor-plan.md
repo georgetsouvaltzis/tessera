@@ -7,6 +7,14 @@
 - split oversized modules by responsibility instead of by historical growth
 - keep library consumers on a smaller, clearer surface area
 
+## Phase 0: Baseline and API Inventory
+
+Status: in progress
+
+- inventory the public API into stable, advanced, and engine-detail tiers
+- document the target stable surface before deeper package-boundary changes
+- use the inventory to drive later internalization and namespace cleanup
+
 ## Phase 1: Interaction Contracts
 
 Status: done
