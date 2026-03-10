@@ -77,7 +77,7 @@ TeaSharp provides a prebuilt widget layer in `TeaSharp.Components.PrebuiltWidget
   - `DialogOptions`
   - `LayoutContainerOptions`
   - `TabsOptions`
-- keep a single focus owner per interactive surface; for multi-pane screens that owner should be `ComponentComposer`.
+- keep a single focus owner per interactive surface; for multi-pane screens that owner should be `ScreenComposer`, with `ComponentComposer` reserved for component subtrees.
 - `ListComponent<T>`, `DropdownComponent`, and `ComboboxComponent` support state-driven styling through:
   - `WidgetVisualState`
   - `WidgetStatePalette`

@@ -20,6 +20,7 @@ public sealed class NUnitCaseAdapters
         foreach (var testCase in ProtocolFixtureTests.Cases()) yield return ToCaseData(testCase);
         foreach (var testCase in TerminalCapabilityDetectorTests.Cases()) yield return ToCaseData(testCase);
         foreach (var testCase in ComponentRenderingTests.Cases()) yield return ToCaseData(testCase);
+        foreach (var testCase in ScreenComposerTests.Cases()) yield return ToCaseData(testCase);
         foreach (var testCase in UiKitComponentTests.Cases()) yield return ToCaseData(testCase);
         foreach (var testCase in PrebuiltWidgetTests.Cases()) yield return ToCaseData(testCase);
         foreach (var testCase in WidgetStatePaletteTests.Cases()) yield return ToCaseData(testCase);

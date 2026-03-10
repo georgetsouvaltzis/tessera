@@ -34,6 +34,11 @@ The design follows patterns used in Bubble Tea examples:
     - explicit click-to-focus through `IFocusableComponent`
     - focused-slot keyboard routing by default
     - wheel fallback to focused slot when pointer is outside any slot
+  - `ScreenComposer`: named interactive regions for screen-scale layout snapshots.
+    - build once per frame, route later from the stored snapshot
+    - focus ownership APIs: `SetFocus`, `FocusNext`, `FocusPrevious`
+    - mouse routing by registered region bounds instead of repeated app-local rect math
+    - preferred-focus selection via `CompleteFrame(...)`
 - `Widgets`:
   - `DrawPanel`
   - `DrawProgressBar`
@@ -109,7 +114,7 @@ The design follows patterns used in Bubble Tea examples:
       - `DialogComponent.AcceptKey` / `DismissKey`
       - options-based constructors (`LabelOptions`, `ButtonOptions`, `TextInputOptions`, `TextAreaOptions`, `ListOptions<T>`, `TableOptions`, `ProgressBarOptions`, `StatusBarOptions`, `DialogOptions`, `LayoutContainerOptions`, `TabsOptions`)
       - component-level state accessors instead of raw nested models (`TextInputComponent.Value` / `Placeholder` / `MaxLength`, `TextAreaComponent.Value`, `ListComponent<T>.SelectedItem` / `SetItems(...)`, `ComboboxComponent.FilterText` / `Placeholder`, `TableComponent.PageSize` / `SortColumn` / `SortDescending`, `NumberInputComponent.Text`, `ButtonComponent.WasPressed` / `PressCount` / `Hovered` / `Pressed`)
-      - use `ComponentComposer` as the focus/routing owner for multi-pane surfaces; keep app-local focus enums for whole-screen or mode switches only
+      - use `ScreenComposer` for screen-scale region orchestration and `ComponentComposer` for slot-based component trees
       - `ShowBorder` toggle for minimalist rendering on border-capable prebuilt widgets
       - state styling primitives for child items (`WidgetVisualState`, `WidgetStatePalette`, `ItemStateResolver`/`OptionStateResolver`)
       - state palette inheritance (`WidgetStatePalette.Parent` / `InheritFrom(...)`)
