@@ -6,6 +6,11 @@ namespace TeaSharp.Components;
 
 public sealed class ModalComponent : ICanvasComponent
 {
+    public ModalComponent()
+    {
+        Theme = new UiTheme();
+    }
+
     public string Title { get; set; } = "Modal";
 
     public bool Visible { get; set; }
@@ -14,7 +19,7 @@ public sealed class ModalComponent : ICanvasComponent
 
     public IReadOnlyList<string> Lines { get; set; } = ["(empty)"];
 
-    public UiTheme Theme { get; set; } = new();
+    public UiTheme Theme { get; set; }
 
     public void Render(Canvas canvas, Rect rect)
     {

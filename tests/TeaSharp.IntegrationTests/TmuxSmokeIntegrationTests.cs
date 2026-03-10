@@ -12,7 +12,7 @@ public sealed class TmuxSmokeIntegrationTests
     private const string FixtureProcessName = "TeaSharp.IntegrationFixtureApp";
 
     [Test]
-    public async Task TmuxSmoke_ArrowKeysUpdateCounterAndQQuits()
+    public async Task TmuxSmokeArrowKeysUpdateCounterAndQQuits()
     {
         if (!CommandSucceeds("tmux", "-V"))
         {
@@ -53,7 +53,7 @@ public sealed class TmuxSmokeIntegrationTests
     }
 
     [Test]
-    public async Task TmuxSmoke_RepeatedArrowKeysAccumulateChanges()
+    public async Task TmuxSmokeRepeatedArrowKeysAccumulateChanges()
     {
         if (!CommandSucceeds("tmux", "-V"))
         {

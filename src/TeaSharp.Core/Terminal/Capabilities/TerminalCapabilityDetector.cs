@@ -149,7 +149,7 @@ public static class TerminalCapabilityDetector
         var next = profile;
         foreach (var token in raw.Split([',', ';'], StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries))
         {
-            var separator = token.IndexOf('=');
+            var separator = token.IndexOf('=', StringComparison.Ordinal);
             if (separator <= 0 || separator >= token.Length - 1)
             {
                 continue;

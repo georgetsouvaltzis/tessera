@@ -6,7 +6,7 @@ public sealed class GaugeComponent : ICanvasComponent
 
     public double Value { get; set; }
 
-    public double MinValue { get; set; } = 0;
+    public double MinValue { get; set; }
 
     public double MaxValue { get; set; } = 100;
 
@@ -36,4 +36,3 @@ public sealed class GaugeComponent : ICanvasComponent
         Widgets.DrawProgressBar(canvas, new Rect(content.X, content.Y, content.Width, barHeight), normalized, label);
     }
 }
-

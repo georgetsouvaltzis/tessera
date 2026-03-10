@@ -1,3 +1,4 @@
+using System;
 using System.Text;
 using TeaSharp.Core.Messages;
 
@@ -43,7 +44,7 @@ internal static class OscDcsSequenceDecoder
     private static DecodeResult ParseOscResult(ReadOnlySpan<byte> payloadBytes, int consumed)
     {
         var payload = DecoderCommon.ToAscii(payloadBytes);
-        var separator = payload.IndexOf(';');
+        var separator = payload.IndexOf(';', StringComparison.Ordinal);
         if (separator <= 0 || !int.TryParse(payload[..separator], out var code))
         {
             return new DecodeResult(consumed, null, false);
@@ -107,7 +108,7 @@ internal static class OscDcsSequenceDecoder
         }
 
         var capabilityPayload = payload[3..];
-        var separator = capabilityPayload.IndexOf('=');
+        var separator = capabilityPayload.IndexOf('=', StringComparison.Ordinal);
         var encodedName = separator >= 0
             ? capabilityPayload[..separator]
             : capabilityPayload;

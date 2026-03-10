@@ -12,7 +12,7 @@ public sealed class SliderComponent : IStatefulComponent, IMouseStatefulComponen
 
     public string Title { get; set; } = "Slider";
 
-    public double Min { get; set; } = 0.0;
+    public double Min { get; set; }
 
     public double Max { get; set; } = 100.0;
 

@@ -8,6 +8,7 @@ public sealed class StatusBarComponent : ICanvasComponent
 {
     public StatusBarComponent()
     {
+        Theme = new UiTheme();
     }
 
     public StatusBarComponent(StatusBarOptions options)
@@ -21,7 +22,7 @@ public sealed class StatusBarComponent : ICanvasComponent
 
     public string RightText { get; set; } = string.Empty;
 
-    public UiTheme Theme { get; set; } = new();
+    public UiTheme Theme { get; set; }
 
     public void Render(Canvas canvas, Rect rect)
     {

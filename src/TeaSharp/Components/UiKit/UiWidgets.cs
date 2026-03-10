@@ -1,3 +1,4 @@
+using System.Globalization;
 using TeaSharp.Core.Abstractions;
 using TeaSharp.Core.Messages;
 using TeaSharp.Widgets;
@@ -89,7 +90,7 @@ public static class UiWidgets
         var startOffset = ((int)first.DayOfWeek + 6) % 7;
         var days = DateTime.DaysInMonth(date.Year, date.Month);
 
-        canvas.WriteText(content.X, content.Y, first.ToString("MMMM yyyy"), content.Width);
+        canvas.WriteText(content.X, content.Y, first.ToString("MMMM yyyy", CultureInfo.InvariantCulture), content.Width);
         canvas.WriteText(content.X, content.Y + 1, "Mo Tu We Th Fr Sa Su", content.Width);
 
         var day = 1;
@@ -111,7 +112,7 @@ public static class UiWidgets
                     break;
                 }
 
-                var text = day.ToString().PadLeft(2);
+                var text = day.ToString(CultureInfo.InvariantCulture).PadLeft(2);
                 line[index] = text[0];
                 line[index + 1] = text[1];
                 day++;
@@ -157,4 +158,3 @@ public static class UiWidgets
         }
     }
 }
-

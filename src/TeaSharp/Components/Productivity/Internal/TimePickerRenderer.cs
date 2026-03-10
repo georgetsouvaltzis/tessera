@@ -1,3 +1,5 @@
+using System.Globalization;
+
 namespace TeaSharp.Components.Internal;
 
 internal static class TimePickerRenderer
@@ -37,9 +39,9 @@ internal static class TimePickerRenderer
             return;
         }
 
-        var hour = RenderField(value.Hour.ToString("D2"), TimePickerField.Hour, focused, disabled, readOnly, activeField, hoveredField, fieldStatePalette);
-        var minute = RenderField(value.Minute.ToString("D2"), TimePickerField.Minute, focused, disabled, readOnly, activeField, hoveredField, fieldStatePalette);
-        var second = RenderField(value.Second.ToString("D2"), TimePickerField.Second, focused, disabled, readOnly, activeField, hoveredField, fieldStatePalette);
+        var hour = RenderField(value.Hour.ToString("D2", CultureInfo.InvariantCulture), TimePickerField.Hour, focused, disabled, readOnly, activeField, hoveredField, fieldStatePalette);
+        var minute = RenderField(value.Minute.ToString("D2", CultureInfo.InvariantCulture), TimePickerField.Minute, focused, disabled, readOnly, activeField, hoveredField, fieldStatePalette);
+        var second = RenderField(value.Second.ToString("D2", CultureInfo.InvariantCulture), TimePickerField.Second, focused, disabled, readOnly, activeField, hoveredField, fieldStatePalette);
         canvas.WriteText(content.X, content.Y, $"{hour}:{minute}:{second}", content.Width);
     }
 

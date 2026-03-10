@@ -22,7 +22,7 @@ public sealed class NumberInputComponent : IStatefulComponent, IFocusableCompone
 
     public bool ShowBorder { get; set; } = true;
 
-    public double Min { get; set; } = 0.0;
+    public double Min { get; set; }
 
     public double Max { get; set; } = 100.0;
 

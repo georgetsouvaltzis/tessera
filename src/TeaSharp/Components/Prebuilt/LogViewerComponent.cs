@@ -112,7 +112,7 @@ public sealed class LogViewerComponent : IStatefulComponent, IFocusableComponent
         }
     }
 
-    private Rect DrawBorderAndResolveContent(Canvas canvas, Rect clipped, string title)
+    private static Rect DrawBorderAndResolveContent(Canvas canvas, Rect clipped, string title)
     {
         canvas.DrawBox(clipped, title);
         return clipped.Inset(1, 1);

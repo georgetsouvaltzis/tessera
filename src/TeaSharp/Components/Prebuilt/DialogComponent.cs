@@ -8,6 +8,7 @@ public sealed class DialogComponent : IStatefulComponent, IFocusableComponent
 {
     public DialogComponent()
     {
+        Theme = new UiTheme();
     }
 
     public DialogComponent(DialogOptions options)
@@ -32,7 +33,7 @@ public sealed class DialogComponent : IStatefulComponent, IFocusableComponent
 
     public BorderStyle BorderStyle { get; set; } = BorderStyle.Rounded;
 
-    public UiTheme Theme { get; set; } = new();
+    public UiTheme Theme { get; set; }
 
     public DialogResult LastResult { get; private set; }
 

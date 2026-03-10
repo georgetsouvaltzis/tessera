@@ -1,3 +1,5 @@
+using System.Globalization;
+
 namespace TeaSharp.Components.Internal;
 
 internal static class DatePickerRenderer
@@ -72,7 +74,7 @@ internal static class DatePickerRenderer
                 canvas.WriteText(
                     x,
                     content.Y + 2 + row,
-                    dayStatePalette.Render(day.ToString().PadLeft(2, ' '), states),
+                    dayStatePalette.Render(day.ToString(CultureInfo.InvariantCulture).PadLeft(2, ' '), states),
                     Math.Min(2, content.Right - x));
                 day++;
             }
