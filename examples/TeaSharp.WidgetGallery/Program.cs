@@ -3,17 +3,12 @@ using TeaSharp.Components;
 using TeaSharp.Core.Abstractions;
 using TeaSharp.Core.Application;
 using TeaSharp.Core.Messages;
-using TeaSharp.Core.Terminal;
 using ModelView = TeaSharp.Core.Abstractions.View;
 
 var model = new WidgetGalleryModel();
-var terminal = new ConsoleTerminalAdapter();
-var capabilities = TerminalCapabilityDetector.Detect();
-var options = new ProgramOptions
+var options = new TeaProgramOptions
 {
     UseConsoleKeyEvents = false,
-    Terminal = terminal,
-    TerminalCapabilities = capabilities,
 };
 var program = Tea.NewProgram(model, options);
 try

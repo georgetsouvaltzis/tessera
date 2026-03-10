@@ -3,14 +3,11 @@ using TeaSharp.Components;
 using TeaSharp.Core.Abstractions;
 using TeaSharp.Core.Application;
 using TeaSharp.Core.Messages;
-using TeaSharp.Core.Terminal;
 using TeaSharp.Styles;
 using ModelView = TeaSharp.Core.Abstractions.View;
 
-var terminal = new ConsoleTerminalAdapter();
-var program = Tea.NewProgram(new KanbanModel(), new ProgramOptions
+var program = Tea.NewProgram(new KanbanModel(), new TeaProgramOptions
 {
-    Terminal = terminal,
     UseConsoleKeyEvents = false,
 });
 

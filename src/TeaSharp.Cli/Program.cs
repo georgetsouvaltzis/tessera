@@ -162,12 +162,9 @@ using TeaSharp.Core.Terminal;
 using TeaSharp.Styles;
 using ModelView = TeaSharp.Core.Abstractions.View;
 
-var terminal = new ConsoleTerminalAdapter();
-var options = new ProgramOptions
+var options = new TeaProgramOptions
 {
     UseConsoleKeyEvents = false,
-    Terminal = terminal,
-    TerminalCapabilities = TerminalCapabilityDetector.Detect(),
 };
 
 var program = Tea.NewProgram(new PomodoroModel(), options);
@@ -746,12 +743,9 @@ using TeaSharp.Core.Terminal;
 using TeaSharp.Styles;
 using ModelView = TeaSharp.Core.Abstractions.View;
 
-var terminal = new ConsoleTerminalAdapter();
-var options = new ProgramOptions
+var options = new TeaProgramOptions
 {
     UseConsoleKeyEvents = false,
-    Terminal = terminal,
-    TerminalCapabilities = TerminalCapabilityDetector.Detect(),
 };
 
 var program = Tea.NewProgram(new DashboardModel(), options);

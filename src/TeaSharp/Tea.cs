@@ -9,6 +9,9 @@ public static class Tea
     public static TeaProgram NewProgram(IModel model, ProgramOptions? options = null) =>
         new(model, options);
 
+    public static TeaProgram NewProgram(IModel model, TeaProgramOptions options) =>
+        new(model, options?.ToProgramOptions());
+
     public static class Cmd
     {
         public static Command Quit => Commands.Quit;

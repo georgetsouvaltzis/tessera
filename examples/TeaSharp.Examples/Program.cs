@@ -2629,11 +2629,9 @@ using TeaSharp.Core.Terminal;
 using TeaSharp.Styles;
 using ModelView = TeaSharp.Core.Abstractions.View;
 
-var terminal = new ConsoleTerminalAdapter();
-var program = Tea.NewProgram(new CounterModel(), new ProgramOptions
+var program = Tea.NewProgram(new CounterModel(), new TeaProgramOptions
 {
-    Terminal = terminal,
-    UseConsoleKeyEvents =false,
+    UseConsoleKeyEvents = false,
 });
 
 await program.RunAsync();

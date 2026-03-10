@@ -9,6 +9,7 @@ This document defines the current public API tiers in TeaSharp so refactors can 
 ### Tier 1: Consumer-facing APIs worth keeping stable
 
 - `TeaSharp.Tea`
+- `TeaSharp.TeaProgramOptions`
 - `TeaSharp.Components.*` component types intended for application authors
 - `TeaSharp.Styles.*`
 - high-level model/message contracts required to build applications:
@@ -53,6 +54,7 @@ This document defines the current public API tiers in TeaSharp so refactors can 
   - `TeaSharp`
   - `TeaSharp.Components`
   - `TeaSharp.Styles`
+- app hosting should prefer `TeaProgramOptions`, with `ProgramOptions` reserved for advanced/runtime customization.
 - common component setup should flow through `*Options` records and small constructor overloads.
 - examples and docs should demonstrate the stable path first.
 

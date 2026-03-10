@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using TeaSharp.Core.Abstractions;
 using TeaSharp.Core.Input;
 using TeaSharp.Core.Rendering;
@@ -5,6 +6,7 @@ using TeaSharp.Core.Terminal;
 
 namespace TeaSharp.Core.Application;
 
+[EditorBrowsable(EditorBrowsableState.Advanced)]
 public sealed class ProgramOptions
 {
     public Func<IModel, IMessage, IMessage?>? Filter { get; init; }
@@ -31,29 +33,41 @@ public sealed class ProgramOptions
 
     public TimeSpan MinResizePollInterval { get; init; } = TimeSpan.FromMilliseconds(16);
 
+    [EditorBrowsable(EditorBrowsableState.Advanced)]
     public bool EnableCapabilityProbe { get; init; } = true;
 
+    [EditorBrowsable(EditorBrowsableState.Advanced)]
     public TimeSpan CapabilityProbeTimeout { get; init; } = TimeSpan.FromMilliseconds(260);
 
+    [EditorBrowsable(EditorBrowsableState.Advanced)]
     public int MaxConcurrentCommands { get; init; }
 
+    [EditorBrowsable(EditorBrowsableState.Advanced)]
     public IProgramRenderer? Renderer { get; init; }
 
+    [EditorBrowsable(EditorBrowsableState.Advanced)]
     public AnsiRendererOptions? AnsiRendererOptions { get; init; }
 
+    [EditorBrowsable(EditorBrowsableState.Advanced)]
     public ITerminalAdapter? Terminal { get; init; }
 
+    [EditorBrowsable(EditorBrowsableState.Advanced)]
     public TerminalCapabilityProfile? TerminalCapabilities { get; init; }
 
+    [EditorBrowsable(EditorBrowsableState.Advanced)]
     public Func<TerminalCapabilityProfile>? TerminalCapabilityDetector { get; init; }
 
+    [EditorBrowsable(EditorBrowsableState.Advanced)]
     public TerminalColorProfile? ColorProfile { get; init; }
 
+    [EditorBrowsable(EditorBrowsableState.Advanced)]
     public Func<TerminalColorProfile>? ColorProfileDetector { get; init; }
 
+    [EditorBrowsable(EditorBrowsableState.Advanced)]
     public IEventDecoder? EventDecoder { get; init; }
 
     internal Func<Action, IDisposable?>? ResizeSignalRegistrationFactory { get; init; }
 
+    [EditorBrowsable(EditorBrowsableState.Advanced)]
     public IReadOnlyList<int>? CapabilityProbeModes { get; init; }
 }
