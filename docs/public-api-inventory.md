@@ -25,6 +25,7 @@ This document defines the current public API tiers in TeaSharp so refactors can 
 
 - `ProgramOptions`
 - `TeaProgram`
+- `ComponentComposer`
 - `IProgramRenderer`
 - `ITerminalAdapter`
 - terminal capability detection types
@@ -45,6 +46,7 @@ This document defines the current public API tiers in TeaSharp so refactors can 
 - components do not follow one consistent constructor/options pattern.
 - low-level widget types are visible in places where consumer-facing components should be enough.
 - composition is split between `ComponentComposer` and `ScreenComposer`.
+- `ScreenComposer` + `InputRouter` + `InteractiveScreenModel` is now the documented default path; `ComponentComposer` is being pushed toward lower-level subtree use.
 
 ## Target Public Surface
 

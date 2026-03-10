@@ -1,8 +1,10 @@
+using System.ComponentModel;
 using TeaSharp.Core.Abstractions;
 using TeaSharp.Core.Messages;
 
 namespace TeaSharp.Components;
 
+[EditorBrowsable(EditorBrowsableState.Advanced)]
 public sealed class ComponentComposer
 {
     private readonly List<ComponentSlot> _slots = [];

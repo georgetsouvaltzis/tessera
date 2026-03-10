@@ -73,7 +73,7 @@ Legend: `done` = implemented, `todo` = not implemented.
 
 | Area | Bubble Tea Capability | TeaSharp | Notes |
 |---|---|---|---|
-| Composable components | reusable view components | done | `ICanvasComponent`, `IStatefulComponent`, and `ComponentComposer` support slot-based composition and stateful message routing. |
+| Composable components | reusable view components | done | `ICanvasComponent`, `IStatefulComponent`, and `ComponentComposer` support slot-based subtree composition and stateful message routing; `ScreenComposer` + `InputRouter` is the recommended screen-scale shell. |
 | Chart primitives | sparkline/plot-style components | done | `Charts.DrawLineChart`, `Charts.DrawBarChart`, `LineChartComponent`, and `BarChartComponent` are implemented with axes/labels/legend, plus zoom+offset windowing (`LineChartOptions.Zoom/Offset`) and component helpers (`ZoomIn`, `ZoomOut`, `Pan`). |
 | UI-kit widgets/layout | reusable higher-level components | done | `Layout` helpers, tabs/accordion/table/forms/toast/modal/timeline/tree/calendar/skeleton are implemented with theming (`UiTheme`) and sortable-table virtual window rendering (`EnableVirtualization`, `SetVirtualWindow`). A prebuilt 1.0-focused widget layer now also ships (`Label`, `Button`, `TextInput`, `TextArea`, `List`, `Table`, `ProgressBar`, `Tabs`, `Modal/Dialog`, `StatusBar`, `LogViewer`, `LayoutContainer`) with dedicated gallery app coverage. |
 

@@ -30,12 +30,13 @@ The design follows patterns used in Bubble Tea examples:
   - `IFocusableComponent`: explicit focus contract for components that participate in keyboard focus.
   - `IInteractiveComponent`: convenience contract for focusable stateful mouse-aware components.
   - `KeyboardRoutingMode`: `FocusedOnly` (default) or `Broadcast`.
-  - `ComponentComposer`: slot-based composition (`Add`, `Clear`, `Update`, `Render`).
+  - `ComponentComposer`: lower-level slot-based subtree composition (`Add`, `Clear`, `Update`, `Render`).
     - focus ownership APIs: `SetFocusedSlot`, `FocusFirst`, `FocusNext`, `FocusPrevious`, `ClearFocus`
     - mouse routing via slot hit-testing
     - explicit click-to-focus through `IFocusableComponent`
     - focused-slot keyboard routing by default
     - wheel fallback to focused slot when pointer is outside any slot
+    - reserve this for local component trees and sub-layouts, not as the default full-app shell
   - `ScreenComposer`: named interactive regions for screen-scale layout snapshots.
     - region identity uses `ScreenRegionKey`; string overloads remain as a convenience bridge
     - build once per frame, route later from the stored snapshot
@@ -44,6 +45,7 @@ The design follows patterns used in Bubble Tea examples:
     - mouse routing by registered region bounds instead of repeated app-local rect math
     - preferred-focus selection via `CompleteFrame(...)`
     - overlay helpers: `AddOverlayComponent`, `AddModalComponent`, `AddPaletteComponent`, `AddToastOverlay`
+    - this is the recommended full-app composition surface
   - `InputRouter`: app-level key precedence for multi-mode screens.
     - ordered scopes: `System`, `Modal`, `Palette`, `Command`, `FocusedRegion`, `Global`
     - scope behaviors: `ContinueWhenUnhandled` or `CaptureWhileActive`
@@ -201,7 +203,7 @@ public sealed class ClockComponent : ICanvasComponent
 }
 ```
 
-If the component owns local state and needs messages, implement `IStatefulComponent` and route messages through `ComponentComposer.Update(message)`.
+If the component owns local state and needs messages, implement `IStatefulComponent` and route messages through `ComponentComposer.Update(message)` only when building a local component subtree.
 If it should take focus inside composed layouts, also implement `IFocusableComponent`.
 
 For a fuller guide with a custom component walkthrough, see `docs/custom-components.md`.

@@ -8,10 +8,10 @@ TeaSharp custom components are built around three contracts:
 - `IStatefulComponent`: render + local `Update(IMessage)` state transitions.
 - `IMouseStatefulComponent`: optional bounds-aware mouse transitions via `UpdateMouse(MouseMsg, Rect)`.
 - `IFocusableComponent`: explicit `Focused` state for keyboard-routing participation.
-- `ComponentComposer`: deterministic slot composition and optional update routing.
+- `ComponentComposer`: deterministic slot composition and optional update routing for lower-level component subtrees.
   - default keyboard mode is focused-slot only
   - switch to `KeyboardRoutingMode.Broadcast` when a container should fan out input
-  - use it for slot-based component trees
+  - use it for slot-based component trees inside a larger app shell
 - `ScreenComposer`: named screen regions with frame snapshots, focus ownership, and mouse routing for larger app surfaces
   - prefer `ScreenRegionKey` fields over ad hoc string constants once a screen grows beyond a toy example
   - overlay helpers handle blocking modals/palettes and passive toast overlays without extra app-level hit-testing
@@ -71,7 +71,7 @@ public sealed class CounterChip : IStatefulComponent, IFocusableComponent
 }
 ```
 
-## Compose In a Model View
+## Compose In a Local Component Subtree
 
 ```csharp
 var canvas = new Canvas(width, height, CanvasTextMode.GraphemeAware);
@@ -97,3 +97,4 @@ return canvas.Render();
 - Use composer slots as an explicit layout graph; avoid hidden global state.
 - For screen-scale apps, keep one owner per concern: `ScreenComposer` for regions/focus/mouse, `InputRouter` for key precedence.
 - If your model is “one screen + some overlays + scoped shortcuts”, derive from `InteractiveScreenModel` and keep region keys as `static readonly ScreenRegionKey` fields.
+- Treat `ComponentComposer` as a lower-level subtree helper, not the default top-level app shell.
