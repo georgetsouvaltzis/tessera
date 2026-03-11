@@ -11,6 +11,25 @@ public sealed class MenuBarComponent : IStatefulComponent, IMouseStatefulCompone
     private WidgetInteractionProfile _interactionProfile = WidgetInteractionProfile.Default.Clone();
     private int _hoveredIndex = -1;
 
+    public MenuBarComponent()
+    {
+    }
+
+    public MenuBarComponent(MenuBarOptions options)
+    {
+        Focused = options.Focused;
+        Disabled = options.Disabled;
+        ReadOnly = options.ReadOnly;
+        NextItemKey = options.NextItemKey ?? NextItemKey;
+        PreviousItemKey = options.PreviousItemKey ?? PreviousItemKey;
+        ActivateKey = options.ActivateKey ?? ActivateKey;
+        InteractionProfile = options.InteractionProfile ?? WidgetInteractionProfile.Default;
+        if (options.Items is not null)
+        {
+            SetItems(options.Items);
+        }
+    }
+
     public int SelectedIndex { get; private set; }
 
     public bool Focused { get; set; }
@@ -38,6 +57,11 @@ public sealed class MenuBarComponent : IStatefulComponent, IMouseStatefulCompone
     }
 
     public IReadOnlyList<MenuBarItem> Items => _items;
+
+    public void SetItems(params MenuBarItem[] items)
+    {
+        SetItems((IEnumerable<MenuBarItem>)items);
+    }
 
     public void SetItems(IEnumerable<MenuBarItem> items)
     {

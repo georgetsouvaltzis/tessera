@@ -127,7 +127,7 @@ The design follows patterns used in Bubble Tea examples:
       - `LogViewerComponent.ViewportKeyMap`, `TogglePauseKey`, `ClearKey`
       - `ProgressBarComponent.IncreaseKey` / `DecreaseKey`
       - `DialogComponent.AcceptKey` / `DismissKey`
-      - options-based constructors (`LabelOptions`, `ButtonOptions`, `TextInputOptions`, `TextAreaOptions`, `ListOptions<T>`, `TableOptions`, `ProgressBarOptions`, `StatusBarOptions`, `DialogOptions`, `LayoutContainerOptions`, `TabsOptions`)
+      - options-based constructors (`LabelOptions`, `ButtonOptions`, `TextInputOptions`, `TextAreaOptions`, `ListOptions<T>`, `TableOptions`, `ProgressBarOptions`, `StatusBarOptions`, `DialogOptions`, `LayoutContainerOptions`, `TabsOptions`, `MenuBarOptions`, `ContextMenuOptions`)
       - component-level state accessors instead of raw nested models (`TextInputComponent.Value` / `Placeholder` / `MaxLength`, `TextAreaComponent.Value`, `ListComponent<T>.SelectedItem` / `SetItems(...)`, `ComboboxComponent.FilterText` / `Placeholder`, `CommandPaletteComponent.QueryText` / `SetQueryText(...)` / `ClearQuery()`, `TableComponent.PageSize` / `SortColumn` / `SortDescending`, `NumberInputComponent.Text`, `ButtonComponent.WasPressed` / `PressCount` / `Hovered` / `Pressed`)
       - use `ScreenComposer` + `ScreenRegionKey` for screen-scale region orchestration, `InputRouter` for mode/global key precedence, and `InteractiveScreenModel` when an app follows the standard screen-shell pattern
       - `ShowBorder` toggle for minimalist rendering on border-capable prebuilt widgets
@@ -143,7 +143,7 @@ The design follows patterns used in Bubble Tea examples:
         - `TreeViewComponent` and `NotificationCenterComponent` motion hover preview, click row selection, and wheel navigation
         - `CommandPaletteComponent` motion hover preview, wheel navigation, click execute, and outside-click close
         - `ToggleSwitchComponent`, `SliderComponent`, and `SpinnerComponent` click activation + wheel interactions
-        - `MenuBarComponent` and `ContextMenuComponent` motion hover preview, click activation, and wheel navigation
+        - `MenuBarComponent` and `ContextMenuComponent` motion hover preview, click activation, wheel navigation, and options-first item setup
         - `DatePickerComponent` and `TimePickerComponent` click day/field selection plus wheel adjustments
         - `LayoutContainerComponent` child mouse routing + optional drag-resize split (`PrimarySize`, `SetPrimarySize`, `ClearPrimarySize`)
 

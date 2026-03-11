@@ -11,6 +11,28 @@ public sealed partial class ContextMenuComponent : IStatefulComponent, IMouseSta
     private int _selectedIndex;
     private int _hoveredIndex = -1;
 
+    public ContextMenuComponent()
+    {
+    }
+
+    public ContextMenuComponent(ContextMenuOptions options)
+    {
+        Title = options.Title;
+        Focused = options.Focused;
+        Disabled = options.Disabled;
+        ReadOnly = options.ReadOnly;
+        ShowBorder = options.ShowBorder;
+        NextItemKey = options.NextItemKey ?? NextItemKey;
+        PreviousItemKey = options.PreviousItemKey ?? PreviousItemKey;
+        ExecuteKey = options.ExecuteKey ?? ExecuteKey;
+        CloseKey = options.CloseKey ?? CloseKey;
+        InteractionProfile = options.InteractionProfile ?? WidgetInteractionProfile.Default;
+        if (options.Items is not null)
+        {
+            SetItems(options.Items);
+        }
+    }
+
     public string Title { get; set; } = "Context";
 
     public bool Visible { get; private set; }
@@ -46,6 +68,11 @@ public sealed partial class ContextMenuComponent : IStatefulComponent, IMouseSta
     }
 
     public IReadOnlyList<ContextMenuItem> Items => _items;
+
+    public void SetItems(params ContextMenuItem[] items)
+    {
+        SetItems((IEnumerable<ContextMenuItem>)items);
+    }
 
     public void SetItems(IEnumerable<ContextMenuItem> items)
     {

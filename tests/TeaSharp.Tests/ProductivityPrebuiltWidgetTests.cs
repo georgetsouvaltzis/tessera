@@ -9,9 +9,11 @@ internal static class ProductivityPrebuiltWidgetTests
     {
         yield return new TestCase("Productivity_MenuBarComponent_ActivatesShortcut", MenuBarComponent_ActivatesShortcut);
         yield return new TestCase("Productivity_MenuBarComponent_MouseClickActivatesItem", MenuBarComponent_MouseClickActivatesItem);
+        yield return new TestCase("Productivity_MenuBarComponent_ParamsSetterReplacesItems", MenuBarComponent_ParamsSetterReplacesItems);
         yield return new TestCase("Productivity_ContextMenuComponent_ExecutesAndCloses", ContextMenuComponent_ExecutesAndCloses);
         yield return new TestCase("Productivity_ContextMenuComponent_MouseClickExecutesAndCloses", ContextMenuComponent_MouseClickExecutesAndCloses);
         yield return new TestCase("Productivity_ContextMenuComponent_MouseReleaseExecutesAndCloses", ContextMenuComponent_MouseReleaseExecutesAndCloses);
+        yield return new TestCase("Productivity_ContextMenuComponent_ParamsSetterReplacesItems", ContextMenuComponent_ParamsSetterReplacesItems);
         yield return new TestCase("Productivity_NumberInputComponent_AdjustsAndSubmits", NumberInputComponent_AdjustsAndSubmits);
         yield return new TestCase("Productivity_DatePickerComponent_MovesDate", DatePickerComponent_MovesDate);
         yield return new TestCase("Productivity_DatePickerComponent_MouseClickSelectsDate", DatePickerComponent_MouseClickSelectsDate);
@@ -22,16 +24,14 @@ internal static class ProductivityPrebuiltWidgetTests
 
     private static Task MenuBarComponent_ActivatesShortcut()
     {
-        var menu = new MenuBarComponent
-        {
-            Focused = true,
-        };
-        menu.SetItems(
-        [
-            new MenuBarItem("file", "File", 'f'),
-            new MenuBarItem("edit", "Edit", 'e'),
-            new MenuBarItem("help", "Help", 'h'),
-        ]);
+        var menu = new MenuBarComponent(new MenuBarOptions(
+            Items:
+            [
+                new MenuBarItem("file", "File", 'f'),
+                new MenuBarItem("edit", "Edit", 'e'),
+                new MenuBarItem("help", "Help", 'h'),
+            ],
+            Focused: true));
 
         menu.Update(new KeyPressMsg(KeyCode.Character, "e"));
         menu.Update(new KeyPressMsg(KeyCode.Character, "h"));
@@ -63,15 +63,13 @@ internal static class ProductivityPrebuiltWidgetTests
 
     private static Task ContextMenuComponent_ExecutesAndCloses()
     {
-        var menu = new ContextMenuComponent
-        {
-            Focused = true,
-        };
-        menu.SetItems(
-        [
-            new ContextMenuItem("copy", "Copy"),
-            new ContextMenuItem("paste", "Paste"),
-        ]);
+        var menu = new ContextMenuComponent(new ContextMenuOptions(
+            Items:
+            [
+                new ContextMenuItem("copy", "Copy"),
+                new ContextMenuItem("paste", "Paste"),
+            ],
+            Focused: true));
         menu.OpenAt(4, 2);
         menu.Update(new KeyPressMsg(KeyCode.Down));
         menu.Update(new KeyPressMsg(KeyCode.Enter));
@@ -83,15 +81,13 @@ internal static class ProductivityPrebuiltWidgetTests
 
     private static Task ContextMenuComponent_MouseClickExecutesAndCloses()
     {
-        var menu = new ContextMenuComponent
-        {
-            ShowBorder = false,
-        };
-        menu.SetItems(
-        [
-            new ContextMenuItem("copy", "Copy"),
-            new ContextMenuItem("paste", "Paste"),
-        ]);
+        var menu = new ContextMenuComponent(new ContextMenuOptions(
+            Items:
+            [
+                new ContextMenuItem("copy", "Copy"),
+                new ContextMenuItem("paste", "Paste"),
+            ],
+            ShowBorder: false));
         menu.OpenAt(0, 0);
 
         var changed = menu.UpdateMouse(new MouseClickMsg(MouseButton.Left, 0, 1), new Rect(0, 0, 20, 6));
@@ -104,15 +100,13 @@ internal static class ProductivityPrebuiltWidgetTests
 
     private static Task ContextMenuComponent_MouseReleaseExecutesAndCloses()
     {
-        var menu = new ContextMenuComponent
-        {
-            ShowBorder = false,
-        };
-        menu.SetItems(
-        [
-            new ContextMenuItem("copy", "Copy"),
-            new ContextMenuItem("paste", "Paste"),
-        ]);
+        var menu = new ContextMenuComponent(new ContextMenuOptions(
+            Items:
+            [
+                new ContextMenuItem("copy", "Copy"),
+                new ContextMenuItem("paste", "Paste"),
+            ],
+            ShowBorder: false));
         menu.OpenAt(0, 0);
 
         var changed = menu.UpdateMouse(new MouseReleaseMsg(MouseButton.None, 0, 1), new Rect(0, 0, 20, 6));
@@ -120,6 +114,32 @@ internal static class ProductivityPrebuiltWidgetTests
         TestAssert.True(changed, "Context menu mouse release should execute row action.");
         TestAssert.Equal("paste", menu.LastExecutedItemId ?? string.Empty, "Context menu release should execute hovered item.");
         TestAssert.True(!menu.Visible, "Context menu should close after mouse release execute.");
+        return Task.CompletedTask;
+    }
+
+    private static Task MenuBarComponent_ParamsSetterReplacesItems()
+    {
+        var menu = new MenuBarComponent();
+
+        menu.SetItems(
+            new MenuBarItem("file", "File", 'f'),
+            new MenuBarItem("help", "Help", 'h'));
+
+        TestAssert.Equal(2, menu.Items.Count, "Params-based menu bar setup should populate items.");
+        TestAssert.Equal("file", menu.Items[0].Id, "Params-based menu bar setup should keep item order.");
+        return Task.CompletedTask;
+    }
+
+    private static Task ContextMenuComponent_ParamsSetterReplacesItems()
+    {
+        var menu = new ContextMenuComponent();
+
+        menu.SetItems(
+            new ContextMenuItem("copy", "Copy"),
+            new ContextMenuItem("paste", "Paste"));
+
+        TestAssert.Equal(2, menu.Items.Count, "Params-based context menu setup should populate items.");
+        TestAssert.Equal("paste", menu.Items[1].Id, "Params-based context menu setup should keep item order.");
         return Task.CompletedTask;
     }
 

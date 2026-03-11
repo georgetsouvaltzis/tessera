@@ -61,6 +61,7 @@ TeaSharp provides a prebuilt widget layer in `TeaSharp.Components.PrebuiltWidget
 - `BadgeComponent` provides compact state/health labeling.
 - `MenuBarComponent` and `ContextMenuComponent` provide top-level and contextual action surfaces.
   - Mouse support: hover preview, click selection/execute, and wheel navigation.
+  - Friendly setup paths: `MenuBarOptions`, `ContextMenuOptions`, and `SetItems(params ...)`.
 - `NumberInputComponent`, `DatePickerComponent`, and `TimePickerComponent` provide structured value entry, with `NumberInputComponent.Text` exposing the rendered numeric text without leaking the text-input model.
   - Mouse support (`DatePickerComponent`, `TimePickerComponent`): day/field selection on click and wheel adjustment/navigation.
 - `MarkdownViewerComponent` provides scrollable markdown rendering for docs/help panes.
@@ -77,6 +78,8 @@ TeaSharp provides a prebuilt widget layer in `TeaSharp.Components.PrebuiltWidget
   - `DialogOptions`
   - `LayoutContainerOptions`
   - `TabsOptions`
+  - `MenuBarOptions`
+  - `ContextMenuOptions`
 - keep a single focus owner per interactive surface; for multi-pane screens that owner should be `ScreenComposer`, with `ComponentComposer` reserved for component subtrees.
 - `ListComponent<T>`, `DropdownComponent`, and `ComboboxComponent` support state-driven styling through:
   - `WidgetVisualState`
