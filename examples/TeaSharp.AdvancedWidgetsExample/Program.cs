@@ -339,7 +339,7 @@ internal sealed class AdvancedWidgetsModel : IModel
 
         var info = new LabelComponent
         {
-            ShowBorder = true,
+            Border = BorderStyle.SingleLine,
             Title = "Hints",
             Text =
                 "Palette commands:\n" +

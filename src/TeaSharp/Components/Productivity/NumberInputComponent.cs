@@ -28,7 +28,8 @@ public sealed class NumberInputComponent : IStatefulComponent, IFocusableCompone
         Focused = options.Focused;
         Disabled = options.Disabled;
         ReadOnly = options.ReadOnly;
-        ShowBorder = options.ShowBorder;
+        Border = options.Border;
+        Padding = options.Padding;
         Min = options.Min;
         Max = options.Max;
         Step = options.Step;
@@ -51,7 +52,9 @@ public sealed class NumberInputComponent : IStatefulComponent, IFocusableCompone
 
     public bool ReadOnly { get; set; }
 
-    public bool ShowBorder { get; set; } = true;
+    public BorderStyle Border { get; set; } = BorderStyle.SingleLine;
+
+    public Thickness Padding { get; set; }
 
     public double Min { get; set; }
 
@@ -158,7 +161,7 @@ public sealed class NumberInputComponent : IStatefulComponent, IFocusableCompone
 
     public void Render(Canvas canvas, Rect rect)
     {
-        NumberInputRenderer.Render(canvas, rect, _input, StatePalette, Title, Focused, Disabled, ReadOnly, ShowBorder, Value, Min, Max, Precision);
+        NumberInputRenderer.Render(canvas, rect, _input, StatePalette, Title, Focused, Disabled, ReadOnly, Border, Padding, Value, Min, Max, Precision);
     }
 
     private bool TryParseInput(out double value)

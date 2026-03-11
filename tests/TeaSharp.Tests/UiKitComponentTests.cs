@@ -201,7 +201,7 @@ internal static class UiKitComponentTests
         // Arrange
         var table = new SortableTableComponent(["Metric", "Value"])
         {
-            ShowBorder = false,
+            Border = BorderStyle.None,
             Title = "Sample",
         };
         table.SetRows(

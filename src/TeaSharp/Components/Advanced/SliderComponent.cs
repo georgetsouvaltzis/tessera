@@ -2,6 +2,7 @@ using TeaSharp.Components.Advanced.Internal;
 using TeaSharp.Components.Composition;
 using TeaSharp.Components.Interaction;
 using TeaSharp.Components.Primitives;
+using TeaSharp.Components.Primitives.Internal;
 using TeaSharp.Components.Styling;
 using TeaSharp.Core.Abstractions;
 using TeaSharp.Core.Messages;
@@ -31,7 +32,9 @@ public sealed class SliderComponent : IStatefulComponent, IMouseStatefulComponen
 
     public bool ReadOnly { get; set; }
 
-    public bool ShowBorder { get; set; } = true;
+    public BorderStyle Border { get; set; } = BorderStyle.SingleLine;
+
+    public Thickness Padding { get; set; }
 
     public KeyBinding DecreaseKey { get; set; } = new("left/-", "decrease", "left", "-");
 
@@ -159,16 +162,12 @@ public sealed class SliderComponent : IStatefulComponent, IMouseStatefulComponen
             return;
         }
 
-        Rect content;
-        if (ShowBorder)
-        {
-            canvas.DrawBox(clipped, Focused ? $"{Title} *" : Title);
-            content = clipped.Inset(1, 1);
-        }
-        else
-        {
-            content = clipped;
-        }
+        var content = FrameLayout.DrawFrameAndResolveContent(
+            canvas,
+            clipped,
+            Border == BorderStyle.None ? null : Focused ? $"{Title} *" : Title,
+            Border,
+            Padding);
 
         if (content.IsEmpty)
         {
@@ -239,9 +238,7 @@ public sealed class SliderComponent : IStatefulComponent, IMouseStatefulComponen
 
     private Rect ResolveContentRect(Rect bounds)
     {
-        return ShowBorder
-            ? bounds.Inset(1, 1)
-            : bounds;
+        return FrameLayout.ResolveContentRect(bounds, Border, Padding);
     }
 
     private static bool IsPointerOnBarRow(Rect content, int y)

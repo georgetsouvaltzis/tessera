@@ -3,6 +3,7 @@ using TeaSharp.Components.Composition;
 using TeaSharp.Components.Interaction;
 using TeaSharp.Components.Prebuilt.Internal;
 using TeaSharp.Components.Primitives;
+using TeaSharp.Components.Primitives.Internal;
 using TeaSharp.Components.Styling;
 using System.ComponentModel;
 using TeaSharp.Core.Abstractions;
@@ -25,7 +26,8 @@ public sealed class TextAreaComponent : IStatefulComponent, IFocusableComponent
     {
         Title = options.Title;
         Focused = options.Focused;
-        ShowBorder = options.ShowBorder;
+        Border = options.Border;
+        Padding = options.Padding;
         ShowLineNumbers = options.ShowLineNumbers;
         Wrap = options.Wrap;
         InputKeyMap = options.InputKeyMap ?? TextInputKeyMap.Default;
@@ -46,7 +48,9 @@ public sealed class TextAreaComponent : IStatefulComponent, IFocusableComponent
 
     public bool Focused { get; set; }
 
-    public bool ShowBorder { get; set; } = true;
+    public BorderStyle Border { get; set; } = BorderStyle.SingleLine;
+
+    public Thickness Padding { get; set; }
 
     public bool ShowLineNumbers
     {
@@ -101,16 +105,12 @@ public sealed class TextAreaComponent : IStatefulComponent, IFocusableComponent
             return;
         }
 
-        Rect content;
-        if (ShowBorder)
-        {
-            canvas.DrawBox(clipped, Focused ? $"{Title} *" : Title);
-            content = clipped.Inset(1, 1);
-        }
-        else
-        {
-            content = clipped;
-        }
+        var content = FrameLayout.DrawFrameAndResolveContent(
+            canvas,
+            clipped,
+            Border == BorderStyle.None ? null : Focused ? $"{Title} *" : Title,
+            Border,
+            Padding);
 
         if (content.IsEmpty)
         {

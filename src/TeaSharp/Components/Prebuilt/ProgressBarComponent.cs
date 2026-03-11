@@ -3,6 +3,7 @@ using TeaSharp.Components.Composition;
 using TeaSharp.Components.Interaction;
 using TeaSharp.Components.Prebuilt.Internal;
 using TeaSharp.Components.Primitives;
+using TeaSharp.Components.Primitives.Internal;
 using TeaSharp.Components.Styling;
 using TeaSharp.Core.Abstractions;
 using TeaSharp.Core.Messages;
@@ -20,7 +21,8 @@ public sealed class ProgressBarComponent : IStatefulComponent, IFocusableCompone
     {
         Title = options.Title;
         Focused = options.Focused;
-        ShowBorder = options.ShowBorder;
+        Border = options.Border;
+        Padding = options.Padding;
         Step = options.Step;
         DecreaseKey = options.DecreaseKey ?? new KeyBinding("left/-", "decrease", "left", "-");
         IncreaseKey = options.IncreaseKey ?? new KeyBinding("right/+", "increase", "right", "+");
@@ -33,7 +35,9 @@ public sealed class ProgressBarComponent : IStatefulComponent, IFocusableCompone
 
     public bool Focused { get; set; }
 
-    public bool ShowBorder { get; set; } = true;
+    public BorderStyle Border { get; set; } = BorderStyle.SingleLine;
+
+    public Thickness Padding { get; set; }
 
     public double Step { get; set; } = 0.05;
 
@@ -76,16 +80,12 @@ public sealed class ProgressBarComponent : IStatefulComponent, IFocusableCompone
             return;
         }
 
-        Rect content;
-        if (ShowBorder)
-        {
-            canvas.DrawBox(clipped, Focused ? $"{Title} *" : Title);
-            content = clipped.Inset(1, 1);
-        }
-        else
-        {
-            content = clipped;
-        }
+        var content = FrameLayout.DrawFrameAndResolveContent(
+            canvas,
+            clipped,
+            Border == BorderStyle.None ? null : Focused ? $"{Title} *" : Title,
+            Border,
+            Padding);
 
         if (content.IsEmpty)
         {

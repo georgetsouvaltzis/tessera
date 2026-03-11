@@ -2,6 +2,7 @@ using TeaSharp.Components.Advanced.Internal;
 using TeaSharp.Components.Composition;
 using TeaSharp.Components.Interaction;
 using TeaSharp.Components.Primitives;
+using TeaSharp.Components.Primitives.Internal;
 using TeaSharp.Components.Styling;
 using TeaSharp.Core.Abstractions;
 using TeaSharp.Core.Messages;
@@ -25,7 +26,9 @@ public sealed partial class TreeViewComponent : IStatefulComponent, IMouseStatef
 
     public bool ReadOnly { get; set; }
 
-    public bool ShowBorder { get; set; } = true;
+    public BorderStyle Border { get; set; } = BorderStyle.SingleLine;
+
+    public Thickness Padding { get; set; }
 
     public KeyBinding NextItemKey { get; set; } = new("down/j", "next item", "down", "j");
 
@@ -287,9 +290,7 @@ public sealed partial class TreeViewComponent : IStatefulComponent, IMouseStatef
         Math.Clamp(_selectedIndex - (contentHeight / 2), 0, Math.Max(0, _visible.Count - contentHeight));
 
     private Rect ResolveContentRect(Rect bounds) =>
-        ShowBorder
-            ? bounds.Inset(1, 1)
-            : bounds;
+        FrameLayout.ResolveContentRect(bounds, Border, Padding);
 
     private bool SetHoveredIndex(int index)
     {

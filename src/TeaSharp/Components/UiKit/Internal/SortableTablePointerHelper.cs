@@ -1,17 +1,18 @@
 using TeaSharp.Components.Primitives;
+using TeaSharp.Components.Primitives.Internal;
 using TeaSharp.Components.UiKit;
 namespace TeaSharp.Components.UiKit.Internal;
 
 internal static class SortableTablePointerHelper
 {
-    public static Rect ResolveContentRect(Rect bounds, bool showBorder, string title)
+    public static Rect ResolveContentRect(Rect bounds, BorderStyle border, Thickness padding, string title)
     {
-        if (showBorder)
+        if (border != BorderStyle.None)
         {
-            return bounds.Inset(1, 1);
+            return FrameLayout.ResolveContentRect(bounds, border, padding);
         }
 
-        var content = bounds;
+        var content = bounds.Inset(padding);
         if (!string.IsNullOrWhiteSpace(title))
         {
             content = new Rect(content.X, content.Y + 1, content.Width, Math.Max(0, content.Height - 1));

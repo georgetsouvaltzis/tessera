@@ -1,6 +1,7 @@
 using TeaSharp.Components.UiKit;
 using TeaSharp.Components.Prebuilt;
 using TeaSharp.Components.Primitives;
+using TeaSharp.Components.Primitives.Internal;
 using TeaSharp.Components.Styling;
 using TeaSharp.Core.Messages;
 using TeaSharp.Widgets;
@@ -12,11 +13,12 @@ internal static class ListComponentMouseRouter
     public static bool Update<T>(
         MouseMsg message,
         Rect bounds,
-        bool showBorder,
+        BorderStyle border,
+        Thickness padding,
         ListModel<T> model,
         Func<int?, bool> setHoveredFilteredIndex)
     {
-        var content = showBorder ? bounds.Inset(1, 1) : bounds;
+        var content = FrameLayout.ResolveContentRect(bounds, border, padding);
         if (content.IsEmpty)
         {
             return false;

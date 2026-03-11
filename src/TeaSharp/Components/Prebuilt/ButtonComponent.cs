@@ -3,6 +3,7 @@ using TeaSharp.Components.Composition;
 using TeaSharp.Components.Interaction;
 using TeaSharp.Components.Prebuilt.Internal;
 using TeaSharp.Components.Primitives;
+using TeaSharp.Components.Primitives.Internal;
 using TeaSharp.Components.Styling;
 using System.ComponentModel;
 using TeaSharp.Core.Abstractions;
@@ -34,7 +35,8 @@ public sealed class ButtonComponent : IStatefulComponent, IMouseStatefulComponen
         Description = options.Description;
         Focused = options.Focused;
         Enabled = options.Enabled;
-        ShowBorder = options.ShowBorder;
+        Border = options.Border;
+        Padding = options.Padding;
         InteractionProfile = options.InteractionProfile ?? WidgetInteractionProfile.Default;
     }
 
@@ -46,7 +48,9 @@ public sealed class ButtonComponent : IStatefulComponent, IMouseStatefulComponen
 
     public bool Enabled { get; set; } = true;
 
-    public bool ShowBorder { get; set; }
+    public BorderStyle Border { get; set; } = BorderStyle.None;
+
+    public Thickness Padding { get; set; }
 
     public bool Hovered => _hovered;
 
@@ -142,16 +146,7 @@ public sealed class ButtonComponent : IStatefulComponent, IMouseStatefulComponen
             return;
         }
 
-        Rect content;
-        if (ShowBorder)
-        {
-            canvas.DrawBox(clipped, string.Empty);
-            content = clipped.Inset(1, 1);
-        }
-        else
-        {
-            content = clipped;
-        }
+        var content = FrameLayout.DrawFrameAndResolveContent(canvas, clipped, null, Border, Padding);
 
         if (content.IsEmpty || content.Height < 1)
         {
@@ -210,9 +205,7 @@ public sealed class ButtonComponent : IStatefulComponent, IMouseStatefulComponen
 
     private Rect ResolveContentRect(Rect bounds)
     {
-        return ShowBorder
-            ? bounds.Inset(1, 1)
-            : bounds;
+        return FrameLayout.ResolveContentRect(bounds, Border, Padding);
     }
 
     private bool SetHovered(bool hovered)

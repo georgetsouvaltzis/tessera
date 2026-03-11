@@ -157,7 +157,7 @@ internal sealed class KanbanModel : IModel
 
     private readonly LabelComponent _details = new(new LabelOptions(
         Title: "Selected Card",
-        ShowBorder: true));
+        Border: BorderStyle.SingleLine));
 
     private readonly NotificationCenterComponent _activity = new()
     {

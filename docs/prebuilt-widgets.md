@@ -35,7 +35,7 @@ TeaSharp provides a prebuilt widget layer in `TeaSharp.Components.Prebuilt` aime
 
 - `ButtonComponent` is now a first-class action control with unified keyboard + mouse activation.
   - Keyboard support: `enter` / `space` when focused.
-  - Mouse support: hover tracking, left-click activation, pressed-state tracking, optional bordered rendering via `ButtonOptions.ShowBorder`, and configurable interaction behavior via `WidgetInteractionProfile`.
+  - Mouse support: hover tracking, left-click activation, pressed-state tracking, optional bordered rendering via `ButtonOptions.Border`, and configurable interaction behavior via `WidgetInteractionProfile`.
   - Component-level action state: `WasPressed`, `PressCount`, `Hovered`, `Pressed`.
 - `TextInputComponent` provides single-line text entry with component-level accessors (`Value`, `SetValue`, `Placeholder`, `MaxLength`) plus cancel semantics via `CancelKey` (`esc` default), `CancelCount`, `WasCancelled`, and `LastCancelledValue`.
 - `TextAreaComponent` provides multiline editing with component-level text access (`Value`, `SetValue`, `Clear`) and optional line numbers.
@@ -68,7 +68,7 @@ TeaSharp provides a prebuilt widget layer in `TeaSharp.Components.Prebuilt` aime
   - Friendly setup paths: `NumberInputOptions`, `DatePickerOptions`, `TimePickerOptions`.
 - `MarkdownViewerComponent` provides scrollable markdown rendering for docs/help panes.
   - Friendly setup path: `MarkdownViewerOptions`.
-- Most prebuilt widgets expose `ShowBorder` (`true` by default) for minimal/borderless layouts.
+- Most border-capable widgets expose `Border` (`BorderStyle`) and `Padding` (`Thickness`) for explicit frame and inner-spacing control.
 - Common widgets also expose options-based constructors for one-shot setup:
   - `LabelOptions`
   - `ButtonOptions`
@@ -108,7 +108,7 @@ TeaSharp provides a prebuilt widget layer in `TeaSharp.Components.Prebuilt` aime
 ```csharp
 var list = new ListComponent<string>(["todo", "done"], x => x)
 {
-    ShowBorder = false,
+    Border = BorderStyle.None,
     Focused = true,
     ItemStateResolver = item => item == "done"
         ? [WidgetVisualState.Completed]

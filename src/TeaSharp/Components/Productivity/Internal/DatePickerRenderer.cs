@@ -1,4 +1,5 @@
 using TeaSharp.Components.Primitives;
+using TeaSharp.Components.Primitives.Internal;
 using TeaSharp.Components.Productivity;
 using TeaSharp.Components.Styling;
 using System.Globalization;
@@ -12,7 +13,8 @@ internal static class DatePickerRenderer
         Rect rect,
         string title,
         bool focused,
-        bool showBorder,
+        BorderStyle border,
+        Thickness padding,
         DateOnly currentMonth,
         DateOnly selectedDate,
         DateOnly? hoveredDate,
@@ -24,16 +26,12 @@ internal static class DatePickerRenderer
             return;
         }
 
-        Rect content;
-        if (showBorder)
-        {
-            canvas.DrawBox(clipped, focused ? $"{title} *" : title);
-            content = clipped.Inset(1, 1);
-        }
-        else
-        {
-            content = clipped;
-        }
+        var content = FrameLayout.DrawFrameAndResolveContent(
+            canvas,
+            clipped,
+            border == BorderStyle.None ? null : focused ? $"{title} *" : title,
+            border,
+            padding);
 
         if (content.IsEmpty || content.Height < 3)
         {

@@ -35,7 +35,9 @@ public sealed class SortableTableComponent : IStatefulComponent, IMouseStatefulC
 
     public bool Focused { get; set; }
 
-    public bool ShowBorder { get; set; } = true;
+    public BorderStyle Border { get; set; } = BorderStyle.SingleLine;
+
+    public Thickness Padding { get; set; }
 
     public bool EnableVirtualization { get; set; }
 
@@ -123,7 +125,7 @@ public sealed class SortableTableComponent : IStatefulComponent, IMouseStatefulC
         }
 
         var state = BuildRenderState();
-        var content = SortableTablePointerHelper.ResolveContentRect(bounds, ShowBorder, state.Title);
+        var content = SortableTablePointerHelper.ResolveContentRect(bounds, Border, Padding, state.Title);
         if (content.IsEmpty || content.Height < 3)
         {
             return false;
@@ -195,7 +197,8 @@ public sealed class SortableTableComponent : IStatefulComponent, IMouseStatefulC
             state.VisibleRows,
             selectedRow: _selectedVisibleRow >= 0 ? _selectedVisibleRow : _hoveredVisibleRow,
             title: state.Title,
-            showBorder: ShowBorder);
+            border: Border,
+            padding: Padding);
     }
 
     private void NormalizePage()

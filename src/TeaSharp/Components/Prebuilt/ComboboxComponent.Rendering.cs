@@ -3,6 +3,7 @@ using TeaSharp.Components.Composition;
 using TeaSharp.Components.Interaction;
 using TeaSharp.Components.Prebuilt.Internal;
 using TeaSharp.Components.Primitives;
+using TeaSharp.Components.Primitives.Internal;
 using TeaSharp.Components.Styling;
 namespace TeaSharp.Components.Prebuilt;
 
@@ -10,13 +11,12 @@ public sealed partial class ComboboxComponent
 {
     private Rect ResolveRenderContentRect(Canvas canvas, Rect clipped)
     {
-        if (!ShowBorder)
-        {
-            return clipped;
-        }
-
-        canvas.DrawBox(clipped, Focused ? $"{Title} *" : Title);
-        return clipped.Inset(1, 1);
+        return FrameLayout.DrawFrameAndResolveContent(
+            canvas,
+            clipped,
+            Border == BorderStyle.None ? null : Focused ? $"{Title} *" : Title,
+            Border,
+            Padding);
     }
 
     private void RenderField(Canvas canvas, Rect content)

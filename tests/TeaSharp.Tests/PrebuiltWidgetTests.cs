@@ -83,7 +83,7 @@ internal static class PrebuiltWidgetTests
     {
         var button = new ButtonComponent(new ButtonOptions(
             Label: "Deploy",
-            ShowBorder: true));
+            Border: BorderStyle.SingleLine));
         var bounds = new Rect(0, 0, 18, 5);
 
         var hoverChanged = button.UpdateMouse(new MouseMotionMsg(MouseButton.None, 4, 2), bounds);
@@ -105,7 +105,7 @@ internal static class PrebuiltWidgetTests
         var button = new ButtonComponent(new ButtonOptions(
             Label: "Start",
             Description: "click or press enter",
-            ShowBorder: true));
+            Border: BorderStyle.SingleLine));
         var canvas = new Canvas(24, 5);
 
         button.Render(canvas, new Rect(0, 0, 24, 5));
@@ -137,7 +137,7 @@ internal static class PrebuiltWidgetTests
     {
         var input = new TextInputComponent
         {
-            ShowBorder = false,
+            Border = BorderStyle.None,
         };
         input.SetValue("plain");
         var canvas = new Canvas(20, 2);
@@ -229,7 +229,7 @@ internal static class PrebuiltWidgetTests
         var list = new ListComponent<string>(["todo", "done"], x => x)
         {
             Focused = true,
-            ShowBorder = false,
+            Border = BorderStyle.None,
             ItemStateResolver = item => string.Equals(item, "done", StringComparison.Ordinal)
                 ? [WidgetVisualState.Completed]
                 : [],
@@ -249,7 +249,7 @@ internal static class PrebuiltWidgetTests
     {
         var list = new ListComponent<string>(["one", "two", "three"], x => x)
         {
-            ShowBorder = false,
+            Border = BorderStyle.None,
         };
 
         var changed = list.UpdateMouse(new MouseClickMsg(MouseButton.Left, 0, 1), new Rect(0, 0, 20, 3));
@@ -263,7 +263,7 @@ internal static class PrebuiltWidgetTests
     {
         var list = new ListComponent<string>(["one", "two", "three"], x => x)
         {
-            ShowBorder = false,
+            Border = BorderStyle.None,
         };
         var changed = list.UpdateMouse(new MouseMotionMsg(MouseButton.None, 0, 1), new Rect(0, 0, 20, 3));
         var canvas = new Canvas(20, 3);
@@ -299,7 +299,7 @@ internal static class PrebuiltWidgetTests
         var dropdown = new DropdownComponent
         {
             Focused = true,
-            ShowBorder = false,
+            Border = BorderStyle.None,
         };
         dropdown.SetItems(["alpha", "beta", "gamma"]);
         var canvas = new Canvas(24, 5);
@@ -317,7 +317,7 @@ internal static class PrebuiltWidgetTests
         var dropdown = new DropdownComponent
         {
             Focused = true,
-            ShowBorder = false,
+            Border = BorderStyle.None,
             OptionStateResolver = (item, _) => string.Equals(item, "beta", StringComparison.Ordinal)
                 ? [WidgetVisualState.Completed]
                 : [],
@@ -340,7 +340,7 @@ internal static class PrebuiltWidgetTests
         var dropdown = new DropdownComponent
         {
             Focused = true,
-            ShowBorder = false,
+            Border = BorderStyle.None,
         };
         dropdown.SetItems(["alpha", "beta", "gamma"]);
         var bounds = new Rect(0, 0, 24, 6);
@@ -378,7 +378,7 @@ internal static class PrebuiltWidgetTests
         var combobox = new ComboboxComponent
         {
             Focused = true,
-            ShowBorder = false,
+            Border = BorderStyle.None,
         };
         combobox.SetItems(["alpha", "beta", "gamma"]);
         var bounds = new Rect(0, 0, 24, 6);
@@ -492,8 +492,8 @@ internal static class PrebuiltWidgetTests
             GridRows = 1,
             GridColumns = 2,
         };
-        layout.Add(new LabelComponent { DrawBorder = false, Text = "left" });
-        layout.Add(new LabelComponent { DrawBorder = false, Text = "right" });
+        layout.Add(new LabelComponent { Border = BorderStyle.None, Text = "left" });
+        layout.Add(new LabelComponent { Border = BorderStyle.None, Text = "right" });
 
         var canvas = new Canvas(20, 3);
         layout.Render(canvas, new Rect(0, 0, 20, 3));
@@ -512,8 +512,8 @@ internal static class PrebuiltWidgetTests
             MinPrimarySize = 4,
             MinSecondarySize = 4,
         };
-        layout.Add(new LabelComponent { DrawBorder = false, Text = "left" });
-        layout.Add(new LabelComponent { DrawBorder = false, Text = "right" });
+        layout.Add(new LabelComponent { Border = BorderStyle.None, Text = "left" });
+        layout.Add(new LabelComponent { Border = BorderStyle.None, Text = "right" });
         layout.SetPrimarySize(12);
 
         var bounds = new Rect(0, 0, 30, 6);

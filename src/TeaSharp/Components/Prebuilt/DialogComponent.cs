@@ -23,7 +23,8 @@ public sealed class DialogComponent : IStatefulComponent, IFocusableComponent
         Lines = options.Lines ?? ["Confirm?"];
         Visible = options.Visible;
         Focused = options.Focused;
-        BorderStyle = options.BorderStyle;
+        Border = options.Border;
+        Padding = options.Padding;
         Theme = options.Theme ?? new UiTheme();
         AcceptKey = options.AcceptKey ?? new KeyBinding("enter/space", "accept", "enter", "space");
         DismissKey = options.DismissKey ?? new KeyBinding("esc", "dismiss", "escape");
@@ -37,7 +38,9 @@ public sealed class DialogComponent : IStatefulComponent, IFocusableComponent
 
     public bool Focused { get; set; }
 
-    public BorderStyle BorderStyle { get; set; } = BorderStyle.Rounded;
+    public BorderStyle Border { get; set; } = BorderStyle.Rounded;
+
+    public Thickness Padding { get; set; }
 
     public UiTheme Theme { get; set; }
 
@@ -83,7 +86,8 @@ public sealed class DialogComponent : IStatefulComponent, IFocusableComponent
             Visible = true,
             Title = Title,
             Lines = Lines,
-            BorderStyle = BorderStyle,
+            Border = Border,
+            Padding = Padding,
             Theme = Theme,
         };
         modal.Render(canvas, rect);

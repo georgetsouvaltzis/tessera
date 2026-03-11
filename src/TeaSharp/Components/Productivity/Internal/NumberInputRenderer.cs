@@ -1,4 +1,5 @@
 using TeaSharp.Components.Primitives;
+using TeaSharp.Components.Primitives.Internal;
 using TeaSharp.Components.Productivity;
 using TeaSharp.Components.Styling;
 using TeaSharp.Widgets;
@@ -16,7 +17,8 @@ internal static class NumberInputRenderer
         bool focused,
         bool disabled,
         bool readOnly,
-        bool showBorder,
+        BorderStyle border,
+        Thickness padding,
         double value,
         double min,
         double max,
@@ -28,16 +30,12 @@ internal static class NumberInputRenderer
             return;
         }
 
-        Rect content;
-        if (showBorder)
-        {
-            canvas.DrawBox(clipped, focused ? $"{title} *" : title);
-            content = clipped.Inset(1, 1);
-        }
-        else
-        {
-            content = clipped;
-        }
+        var content = FrameLayout.DrawFrameAndResolveContent(
+            canvas,
+            clipped,
+            border == BorderStyle.None ? null : focused ? $"{title} *" : title,
+            border,
+            padding);
 
         if (content.IsEmpty)
         {

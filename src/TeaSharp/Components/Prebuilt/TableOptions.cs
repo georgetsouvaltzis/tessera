@@ -13,5 +13,6 @@ public sealed record TableOptions(
     IReadOnlyList<string> Headers,
     string Title = "Table",
     bool Focused = false,
-    bool ShowBorder = true,
+    BorderStyle Border = BorderStyle.SingleLine,
+    Thickness Padding = default,
     int? PageSize = null);

@@ -1,6 +1,7 @@
 using TeaSharp.Components.Composition;
 using TeaSharp.Components.Interaction;
 using TeaSharp.Components.Primitives;
+using TeaSharp.Components.Primitives.Internal;
 using TeaSharp.Components.Productivity.Internal;
 using TeaSharp.Components.Styling;
 using System.ComponentModel;
@@ -27,7 +28,8 @@ public sealed class MarkdownViewerComponent : IStatefulComponent, IFocusableComp
     {
         Title = options.Title;
         Focused = options.Focused;
-        ShowBorder = options.ShowBorder;
+        Border = options.Border;
+        Padding = options.Padding;
         Wrap = options.Wrap;
         ShowLineNumbers = options.ShowLineNumbers;
         ViewportKeyMap = options.ViewportKeyMap ?? ViewportKeyMap.Default;
@@ -41,7 +43,9 @@ public sealed class MarkdownViewerComponent : IStatefulComponent, IFocusableComp
 
     public bool Focused { get; set; }
 
-    public bool ShowBorder { get; set; } = true;
+    public BorderStyle Border { get; set; } = BorderStyle.SingleLine;
+
+    public Thickness Padding { get; set; }
 
     public bool Wrap
     {
@@ -77,16 +81,12 @@ public sealed class MarkdownViewerComponent : IStatefulComponent, IFocusableComp
             return;
         }
 
-        Rect content;
-        if (ShowBorder)
-        {
-            canvas.DrawBox(clipped, Focused ? $"{Title} *" : Title);
-            content = clipped.Inset(1, 1);
-        }
-        else
-        {
-            content = clipped;
-        }
+        var content = FrameLayout.DrawFrameAndResolveContent(
+            canvas,
+            clipped,
+            Border == BorderStyle.None ? null : Focused ? $"{Title} *" : Title,
+            Border,
+            Padding);
 
         if (content.IsEmpty)
         {

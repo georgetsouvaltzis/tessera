@@ -11,11 +11,12 @@ namespace TeaSharp.Components.Productivity;
 /// Defines the one-shot configuration used to construct a <see cref="ContextMenuComponent"/>.
 /// </summary>
 /// <param name="Items">Initial context-menu items.</param>
-/// <param name="Title">Border title shown when the menu renders with a border.</param>
+/// <param name="Title">Frame title shown when the menu renders with a border.</param>
 /// <param name="Focused">Whether the menu starts focused.</param>
 /// <param name="Disabled">Whether the menu starts disabled.</param>
 /// <param name="ReadOnly">Whether the menu can navigate without executing actions.</param>
-/// <param name="ShowBorder">Whether the menu renders with a border.</param>
+/// <param name="Border">Frame border style. Use <see cref="BorderStyle.None"/> for no border.</param>
+/// <param name="Padding">Inner spacing applied after the frame is resolved.</param>
 /// <param name="NextItemKey">Optional key binding used to move to the next item.</param>
 /// <param name="PreviousItemKey">Optional key binding used to move to the previous item.</param>
 /// <param name="ExecuteKey">Optional key binding used to execute the selected item.</param>
@@ -27,7 +28,8 @@ public sealed record ContextMenuOptions(
     bool Focused = false,
     bool Disabled = false,
     bool ReadOnly = false,
-    bool ShowBorder = true,
+    BorderStyle Border = BorderStyle.Rounded,
+    Thickness Padding = default,
     KeyBinding? NextItemKey = null,
     KeyBinding? PreviousItemKey = null,
     KeyBinding? ExecuteKey = null,

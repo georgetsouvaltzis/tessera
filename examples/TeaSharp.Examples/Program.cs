@@ -159,7 +159,7 @@
 //     private readonly ModalComponent _showcaseModal = new()
 //     {
 //         Title = "Showcase Help",
-//         BorderStyle = BorderStyle.Heavy,
+//         Border = BorderStyle.Heavy,
 //         Lines =
 //         [
 //             "Hotkeys",
@@ -1206,7 +1206,7 @@
 //
 //     private void ApplyThemeChrome()
 //     {
-//         _showcaseModal.BorderStyle = _showcaseTheme.SelectedIndex switch
+//         _showcaseModal.Border = _showcaseTheme.SelectedIndex switch
 //         {
 //             1 => BorderStyle.Rounded,
 //             2 => BorderStyle.Ascii,

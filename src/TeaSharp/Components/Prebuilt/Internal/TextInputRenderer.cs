@@ -1,6 +1,7 @@
 using TeaSharp.Components.UiKit;
 using TeaSharp.Components.Prebuilt;
 using TeaSharp.Components.Primitives;
+using TeaSharp.Components.Primitives.Internal;
 using TeaSharp.Components.Styling;
 using TeaSharp.Widgets;
 
@@ -14,7 +15,8 @@ internal static class TextInputRenderer
         TextInputModel input,
         string title,
         bool focused,
-        bool showBorder,
+        BorderStyle border,
+        Thickness padding,
         int submitCount)
     {
         var clipped = Rect.Intersect(rect, canvas.Bounds);
@@ -23,16 +25,12 @@ internal static class TextInputRenderer
             return;
         }
 
-        Rect content;
-        if (showBorder)
-        {
-            canvas.DrawBox(clipped, focused ? $"{title} *" : title);
-            content = clipped.Inset(1, 1);
-        }
-        else
-        {
-            content = clipped;
-        }
+        var content = FrameLayout.DrawFrameAndResolveContent(
+            canvas,
+            clipped,
+            border == BorderStyle.None ? null : focused ? $"{title} *" : title,
+            border,
+            padding);
 
         if (content.IsEmpty)
         {

@@ -1,6 +1,7 @@
 using TeaSharp.Components.Composition;
 using TeaSharp.Components.Interaction;
 using TeaSharp.Components.Primitives;
+using TeaSharp.Components.Primitives.Internal;
 using TeaSharp.Components.Styling;
 using TeaSharp.Components.UiKit.Internal;
 using TeaSharp.Core.Abstractions;
@@ -23,7 +24,8 @@ public sealed class ModalComponent : ICanvasComponent
     {
         Title = options.Title;
         Visible = options.Visible;
-        BorderStyle = options.BorderStyle;
+        Border = options.Border;
+        Padding = options.Padding;
         Lines = options.Lines ?? ["(empty)"];
         Theme = options.Theme ?? new UiTheme();
     }
@@ -32,7 +34,9 @@ public sealed class ModalComponent : ICanvasComponent
 
     public bool Visible { get; set; }
 
-    public BorderStyle BorderStyle { get; set; } = BorderStyle.Rounded;
+    public BorderStyle Border { get; set; } = BorderStyle.Rounded;
+
+    public Thickness Padding { get; set; }
 
     public IReadOnlyList<string> Lines { get; set; } = ["(empty)"];
 
@@ -72,8 +76,7 @@ public sealed class ModalComponent : ICanvasComponent
         var modalY = clipped.Y + (clipped.Height - modalHeight) / 2;
         var modal = new Rect(modalX, modalY, modalWidth, modalHeight);
 
-        canvas.DrawBox(modal, Title, BorderStyle);
-        var body = modal.Inset(1, 1);
+        var body = FrameLayout.DrawFrameAndResolveContent(canvas, modal, Title, Border, Padding);
         if (body.IsEmpty)
         {
             return;

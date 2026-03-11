@@ -16,5 +16,6 @@ public sealed record ButtonOptions(
     string? Description = null,
     bool Focused = false,
     bool Enabled = true,
-    bool ShowBorder = false,
+    BorderStyle Border = BorderStyle.None,
+    Thickness Padding = default,
     WidgetInteractionProfile? InteractionProfile = null);

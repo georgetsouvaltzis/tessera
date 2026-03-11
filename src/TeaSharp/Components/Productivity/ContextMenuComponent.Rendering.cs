@@ -1,6 +1,7 @@
 using TeaSharp.Components.Composition;
 using TeaSharp.Components.Interaction;
 using TeaSharp.Components.Primitives;
+using TeaSharp.Components.Primitives.Internal;
 using TeaSharp.Components.Productivity.Internal;
 using TeaSharp.Components.Styling;
 using TeaSharp.Widgets;
@@ -11,9 +12,9 @@ public sealed partial class ContextMenuComponent
 {
     private void RenderMenu(Canvas canvas, Rect menuBounds, Rect content)
     {
-        if (ShowBorder)
+        if (Border != BorderStyle.None)
         {
-            canvas.DrawBox(menuBounds, Title, BorderStyle.Rounded);
+            canvas.DrawBox(menuBounds, Title, Border);
         }
 
         if (_items.Count == 0)
@@ -88,9 +89,7 @@ public sealed partial class ContextMenuComponent
         var x = Math.Clamp(AnchorX, bounds.X, Math.Max(bounds.X, bounds.Right - width));
         var y = Math.Clamp(AnchorY, bounds.Y, Math.Max(bounds.Y, bounds.Bottom - height));
         menuBounds = new Rect(x, y, width, height);
-        content = ShowBorder
-            ? menuBounds.Inset(1, 1)
-            : menuBounds;
+        content = FrameLayout.ResolveContentRect(menuBounds, Border, Padding);
         return !content.IsEmpty;
     }
 }

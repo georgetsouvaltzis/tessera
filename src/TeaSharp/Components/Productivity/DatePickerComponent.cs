@@ -28,7 +28,8 @@ public sealed class DatePickerComponent : IStatefulComponent, IMouseStatefulComp
         Focused = options.Focused;
         Disabled = options.Disabled;
         ReadOnly = options.ReadOnly;
-        ShowBorder = options.ShowBorder;
+        Border = options.Border;
+        Padding = options.Padding;
         PreviousDayKey = options.PreviousDayKey ?? PreviousDayKey;
         NextDayKey = options.NextDayKey ?? NextDayKey;
         PreviousWeekKey = options.PreviousWeekKey ?? PreviousWeekKey;
@@ -51,7 +52,9 @@ public sealed class DatePickerComponent : IStatefulComponent, IMouseStatefulComp
 
     public bool ReadOnly { get; set; }
 
-    public bool ShowBorder { get; set; } = true;
+    public BorderStyle Border { get; set; } = BorderStyle.SingleLine;
+
+    public Thickness Padding { get; set; }
 
     public DateOnly SelectedDate { get; private set; } = DateOnly.FromDateTime(DateTime.UtcNow.Date);
 
@@ -148,7 +151,7 @@ public sealed class DatePickerComponent : IStatefulComponent, IMouseStatefulComp
             return false;
         }
 
-        var content = DatePickerCalendar.ResolveContentRect(bounds, ShowBorder);
+        var content = DatePickerCalendar.ResolveContentRect(bounds, Border, Padding);
         if (content.IsEmpty)
         {
             return false;
@@ -215,7 +218,7 @@ public sealed class DatePickerComponent : IStatefulComponent, IMouseStatefulComp
 
     public void Render(Canvas canvas, Rect rect)
     {
-        DatePickerRenderer.Render(canvas, rect, Title, Focused, ShowBorder, CurrentMonth, SelectedDate, _hoveredDate, DayStatePalette);
+        DatePickerRenderer.Render(canvas, rect, Title, Focused, Border, Padding, CurrentMonth, SelectedDate, _hoveredDate, DayStatePalette);
     }
 
     private bool SetHoveredDate(DateOnly? date)

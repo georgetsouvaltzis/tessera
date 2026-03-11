@@ -3,6 +3,7 @@ using TeaSharp.Components.Composition;
 using TeaSharp.Components.Interaction;
 using TeaSharp.Components.Prebuilt.Internal;
 using TeaSharp.Components.Primitives;
+using TeaSharp.Components.Primitives.Internal;
 using TeaSharp.Components.Styling;
 using System.ComponentModel;
 using TeaSharp.Core.Abstractions;
@@ -29,7 +30,8 @@ public sealed class LogViewerComponent : IStatefulComponent, IFocusableComponent
     {
         Title = options.Title;
         Focused = options.Focused;
-        ShowBorder = options.ShowBorder;
+        Border = options.Border;
+        Padding = options.Padding;
         AutoScroll = options.AutoScroll;
         ViewportKeyMap = options.ViewportKeyMap ?? ViewportKeyMap.Default;
         TogglePauseKey = options.TogglePauseKey ?? TogglePauseKey;
@@ -58,7 +60,9 @@ public sealed class LogViewerComponent : IStatefulComponent, IFocusableComponent
 
     public bool Focused { get; set; }
 
-    public bool ShowBorder { get; set; } = true;
+    public BorderStyle Border { get; set; } = BorderStyle.SingleLine;
+
+    public Thickness Padding { get; set; }
 
     public bool AutoScroll { get; set; } = true;
 
@@ -136,9 +140,12 @@ public sealed class LogViewerComponent : IStatefulComponent, IFocusableComponent
             title += " [paused]";
         }
 
-        var content = ShowBorder
-            ? DrawBorderAndResolveContent(canvas, clipped, title)
-            : clipped;
+        var content = FrameLayout.DrawFrameAndResolveContent(
+            canvas,
+            clipped,
+            Border == BorderStyle.None ? null : title,
+            Border,
+            Padding);
         if (content.IsEmpty)
         {
             return;
@@ -152,13 +159,6 @@ public sealed class LogViewerComponent : IStatefulComponent, IFocusableComponent
             canvas.WriteText(content.X, content.Y + row, lines[row], content.Width);
         }
     }
-
-    private static Rect DrawBorderAndResolveContent(Canvas canvas, Rect clipped, string title)
-    {
-        canvas.DrawBox(clipped, title);
-        return clipped.Inset(1, 1);
-    }
-
     private void RefreshViewport()
     {
         _viewport.SetLines(LogViewerContent.Filter(_entries, Filter));

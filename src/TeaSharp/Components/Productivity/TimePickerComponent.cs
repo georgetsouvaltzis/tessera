@@ -1,6 +1,7 @@
 using TeaSharp.Components.Composition;
 using TeaSharp.Components.Interaction;
 using TeaSharp.Components.Primitives;
+using TeaSharp.Components.Primitives.Internal;
 using TeaSharp.Components.Productivity.Internal;
 using TeaSharp.Components.Styling;
 using System.ComponentModel;
@@ -28,7 +29,8 @@ public sealed class TimePickerComponent : IStatefulComponent, IMouseStatefulComp
         Focused = options.Focused;
         Disabled = options.Disabled;
         ReadOnly = options.ReadOnly;
-        ShowBorder = options.ShowBorder;
+        Border = options.Border;
+        Padding = options.Padding;
         ActiveField = options.ActiveField;
         HourStep = options.HourStep;
         MinuteStep = options.MinuteStep;
@@ -53,7 +55,9 @@ public sealed class TimePickerComponent : IStatefulComponent, IMouseStatefulComp
 
     public bool ReadOnly { get; set; }
 
-    public bool ShowBorder { get; set; } = true;
+    public BorderStyle Border { get; set; } = BorderStyle.SingleLine;
+
+    public Thickness Padding { get; set; }
 
     public TimeOnly Value { get; private set; } = TimeOnly.FromDateTime(DateTime.UtcNow);
 
@@ -139,7 +143,7 @@ public sealed class TimePickerComponent : IStatefulComponent, IMouseStatefulComp
             return false;
         }
 
-        var content = ShowBorder ? bounds.Inset(1, 1) : bounds;
+        var content = FrameLayout.ResolveContentRect(bounds, Border, Padding);
         if (content.IsEmpty)
         {
             return false;
@@ -206,7 +210,7 @@ public sealed class TimePickerComponent : IStatefulComponent, IMouseStatefulComp
 
     public void Render(Canvas canvas, Rect rect)
     {
-        TimePickerRenderer.Render(canvas, rect, Title, Focused, Disabled, ReadOnly, ShowBorder, Value, ActiveField, _hoveredField, FieldStatePalette);
+        TimePickerRenderer.Render(canvas, rect, Title, Focused, Disabled, ReadOnly, Border, Padding, Value, ActiveField, _hoveredField, FieldStatePalette);
     }
 
     private bool SetHoveredField(TimePickerField? field)

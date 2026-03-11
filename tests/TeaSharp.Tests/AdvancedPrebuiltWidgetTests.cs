@@ -66,7 +66,7 @@ internal static class AdvancedPrebuiltWidgetTests
     {
         var toggle = new ToggleSwitchComponent
         {
-            ShowBorder = false,
+            Border = BorderStyle.None,
         };
 
         var changed = toggle.UpdateMouse(new MouseClickMsg(MouseButton.Left, 0, 0), new Rect(0, 0, 10, 1));
@@ -101,7 +101,7 @@ internal static class AdvancedPrebuiltWidgetTests
     {
         var slider = new SliderComponent
         {
-            ShowBorder = false,
+            Border = BorderStyle.None,
             Min = 0,
             Max = 10,
             Step = 1,
@@ -133,7 +133,7 @@ internal static class AdvancedPrebuiltWidgetTests
     {
         var spinner = new SpinnerComponent
         {
-            ShowBorder = false,
+            Border = BorderStyle.None,
         };
 
         var before = spinner.FrameIndex;
@@ -211,7 +211,7 @@ internal static class AdvancedPrebuiltWidgetTests
         var tree = new TreeViewComponent
         {
             Focused = true,
-            ShowBorder = false,
+            Border = BorderStyle.None,
         };
         tree.SetRoots(
         [
@@ -238,7 +238,7 @@ internal static class AdvancedPrebuiltWidgetTests
     {
         var tree = new TreeViewComponent
         {
-            ShowBorder = false,
+            Border = BorderStyle.None,
         };
         tree.SetRoots(
         [
@@ -277,7 +277,7 @@ internal static class AdvancedPrebuiltWidgetTests
         var center = new NotificationCenterComponent
         {
             Focused = true,
-            ShowBorder = false,
+            Border = BorderStyle.None,
         };
         center.Push("first", NotificationSeverity.Info, id: "a");
         center.Push("second", NotificationSeverity.Info, id: "b");

@@ -28,7 +28,8 @@ public sealed class ListComponent<T> : IStatefulComponent, IMouseStatefulCompone
         Focused = options.Focused;
         Disabled = options.Disabled;
         ReadOnly = options.ReadOnly;
-        ShowBorder = options.ShowBorder;
+        Border = options.Border;
+        Padding = options.Padding;
         KeyMap = options.KeyMap ?? ListKeyMap.Default;
     }
 
@@ -40,7 +41,9 @@ public sealed class ListComponent<T> : IStatefulComponent, IMouseStatefulCompone
 
     public bool ReadOnly { get; set; }
 
-    public bool ShowBorder { get; set; } = true;
+    public BorderStyle Border { get; set; } = BorderStyle.SingleLine;
+
+    public Thickness Padding { get; set; }
 
     public int SelectedIndex => _model.SelectedIndex;
 
@@ -121,7 +124,7 @@ public sealed class ListComponent<T> : IStatefulComponent, IMouseStatefulCompone
         {
             return false;
         }
-        return ListComponentMouseRouter.Update(message, bounds, ShowBorder, _model, SetHoveredFilteredIndex);
+        return ListComponentMouseRouter.Update(message, bounds, Border, Padding, _model, SetHoveredFilteredIndex);
     }
 
     public void Render(Canvas canvas, Rect rect)
@@ -134,7 +137,8 @@ public sealed class ListComponent<T> : IStatefulComponent, IMouseStatefulCompone
             Focused,
             Disabled,
             ReadOnly,
-            ShowBorder,
+            Border,
+            Padding,
             _hoveredFilteredIndex,
             ItemStatePalette,
             ItemStateResolver);

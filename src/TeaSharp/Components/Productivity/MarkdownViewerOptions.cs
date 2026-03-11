@@ -14,7 +14,8 @@ public sealed record MarkdownViewerOptions(
     string Title = "Markdown",
     string InitialMarkdown = "",
     bool Focused = false,
-    bool ShowBorder = true,
+    BorderStyle Border = BorderStyle.SingleLine,
+    Thickness Padding = default,
     bool Wrap = false,
     bool ShowLineNumbers = false,
     ViewportKeyMap? ViewportKeyMap = null);

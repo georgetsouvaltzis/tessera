@@ -2,6 +2,7 @@ using TeaSharp.Components.Advanced.Internal;
 using TeaSharp.Components.Composition;
 using TeaSharp.Components.Interaction;
 using TeaSharp.Components.Primitives;
+using TeaSharp.Components.Primitives.Internal;
 using TeaSharp.Components.Styling;
 using TeaSharp.Core.Abstractions;
 using TeaSharp.Core.Messages;
@@ -24,7 +25,9 @@ public sealed partial class NotificationCenterComponent : IStatefulComponent, IM
 
     public bool ReadOnly { get; set; }
 
-    public bool ShowBorder { get; set; } = true;
+    public BorderStyle Border { get; set; } = BorderStyle.SingleLine;
+
+    public Thickness Padding { get; set; }
 
     public int MaxEntries { get; set; } = 128;
 
@@ -244,9 +247,7 @@ public sealed partial class NotificationCenterComponent : IStatefulComponent, IM
         Math.Clamp(_selectedIndex - (contentHeight / 2), 0, Math.Max(0, _entries.Count - contentHeight));
 
     private Rect ResolveContentRect(Rect bounds) =>
-        ShowBorder
-            ? bounds.Inset(1, 1)
-            : bounds;
+        FrameLayout.ResolveContentRect(bounds, Border, Padding);
 
     private bool SetHoveredIndex(int index)
     {

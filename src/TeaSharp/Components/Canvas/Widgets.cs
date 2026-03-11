@@ -119,7 +119,8 @@ public static class Widgets
         IReadOnlyList<IReadOnlyList<string>> rows,
         int selectedRow = -1,
         string? title = null,
-        bool showBorder = true)
+        BorderStyle border = BorderStyle.SingleLine,
+        Thickness padding = default)
     {
         var clipped = Rect.Intersect(rect, canvas.Bounds);
         if (clipped.IsEmpty || headers.Count == 0)
@@ -127,6 +128,7 @@ public static class Widgets
             return;
         }
 
+        var showBorder = border != BorderStyle.None;
         var minHeight = showBorder
             ? 4
             : string.IsNullOrWhiteSpace(title) ? 3 : 4;
@@ -141,12 +143,12 @@ public static class Widgets
         Rect contentRect;
         if (showBorder)
         {
-            canvas.DrawBox(clipped, title);
-            contentRect = clipped.Inset(1, 1);
+            canvas.DrawBox(clipped, title, border);
+            contentRect = clipped.Inset(1, 1).Inset(padding);
         }
         else
         {
-            contentRect = clipped;
+            contentRect = clipped.Inset(padding);
             if (!string.IsNullOrWhiteSpace(title))
             {
                 canvas.WriteText(contentRect.X, contentRect.Y, title!, contentRect.Width);

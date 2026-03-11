@@ -23,6 +23,15 @@ public readonly record struct Rect(int X, int Y, int Width, int Height)
             Height - (vertical * 2));
     }
 
+    public Rect Inset(Thickness thickness)
+    {
+        return new Rect(
+            X + thickness.Left,
+            Y + thickness.Top,
+            Width - thickness.Horizontal,
+            Height - thickness.Vertical);
+    }
+
     public static Rect Intersect(Rect a, Rect b)
     {
         var x = Math.Max(a.X, b.X);

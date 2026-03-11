@@ -15,7 +15,8 @@ public sealed record ProgressBarOptions(
     string Title = "Progress",
     double InitialValue = 0.0,
     bool Focused = false,
-    bool ShowBorder = true,
+    BorderStyle Border = BorderStyle.SingleLine,
+    Thickness Padding = default,
     double Step = 0.05,
     KeyBinding? DecreaseKey = null,
     KeyBinding? IncreaseKey = null);

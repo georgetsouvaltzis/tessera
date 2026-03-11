@@ -140,6 +140,11 @@ public sealed class Canvas
 
     public void DrawBox(Rect rect, string? title = null, BorderStyle borderStyle = BorderStyle.SingleLine)
     {
+        if (borderStyle == BorderStyle.None)
+        {
+            return;
+        }
+
         var clipped = Rect.Intersect(rect, Bounds);
         if (clipped.IsEmpty || clipped.Width < 2 || clipped.Height < 2)
         {

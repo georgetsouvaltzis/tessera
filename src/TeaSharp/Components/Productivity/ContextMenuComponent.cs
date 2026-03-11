@@ -30,7 +30,8 @@ public sealed partial class ContextMenuComponent : IStatefulComponent, IMouseSta
         Focused = options.Focused;
         Disabled = options.Disabled;
         ReadOnly = options.ReadOnly;
-        ShowBorder = options.ShowBorder;
+        Border = options.Border;
+        Padding = options.Padding;
         NextItemKey = options.NextItemKey ?? NextItemKey;
         PreviousItemKey = options.PreviousItemKey ?? PreviousItemKey;
         ExecuteKey = options.ExecuteKey ?? ExecuteKey;
@@ -52,7 +53,9 @@ public sealed partial class ContextMenuComponent : IStatefulComponent, IMouseSta
 
     public bool ReadOnly { get; set; }
 
-    public bool ShowBorder { get; set; } = true;
+    public BorderStyle Border { get; set; } = BorderStyle.Rounded;
+
+    public Thickness Padding { get; set; }
 
     public int AnchorX { get; private set; }
 

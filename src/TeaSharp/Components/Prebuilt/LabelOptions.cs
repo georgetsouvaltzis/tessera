@@ -9,4 +9,5 @@ namespace TeaSharp.Components.Prebuilt;
 public sealed record LabelOptions(
     string Text = "",
     string? Title = null,
-    bool ShowBorder = true);
+    BorderStyle Border = BorderStyle.SingleLine,
+    Thickness Padding = default);

@@ -3,6 +3,7 @@ using TeaSharp.Components.Composition;
 using TeaSharp.Components.Interaction;
 using TeaSharp.Components.Prebuilt.Internal;
 using TeaSharp.Components.Primitives;
+using TeaSharp.Components.Primitives.Internal;
 using TeaSharp.Components.Styling;
 using System.ComponentModel;
 using TeaSharp.Core.Abstractions;
@@ -27,7 +28,8 @@ public sealed partial class DropdownComponent : IStatefulComponent, IMouseStatef
         Focused = options.Focused;
         Disabled = options.Disabled;
         ReadOnly = options.ReadOnly;
-        ShowBorder = options.ShowBorder;
+        Border = options.Border;
+        Padding = options.Padding;
         MaxVisibleItems = options.MaxVisibleItems;
         InteractionProfile = options.InteractionProfile ?? WidgetInteractionProfile.Default;
         ToggleOpenKey = options.ToggleOpenKey ?? new KeyBinding("enter/space", "toggle", "enter", "space");
@@ -50,7 +52,9 @@ public sealed partial class DropdownComponent : IStatefulComponent, IMouseStatef
 
     public bool ReadOnly { get; set; }
 
-    public bool ShowBorder { get; set; } = true;
+    public BorderStyle Border { get; set; } = BorderStyle.SingleLine;
+
+    public Thickness Padding { get; set; }
 
     [EditorBrowsable(EditorBrowsableState.Advanced)]
     public WidgetStatePalette FieldStatePalette { get; } = WidgetStatePalette.CreateDefault();
@@ -262,7 +266,7 @@ public sealed partial class DropdownComponent : IStatefulComponent, IMouseStatef
     }
 
     private Rect ResolveContentRect(Rect bounds) =>
-        ShowBorder ? bounds.Inset(1, 1) : bounds;
+        FrameLayout.ResolveContentRect(bounds, Border, Padding);
 
     private int RowToVisibleIndex(Rect content, int y) =>
         IsOpen

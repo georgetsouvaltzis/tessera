@@ -23,7 +23,8 @@ public sealed class TextInputComponent : IStatefulComponent, IFocusableComponent
     {
         Title = options.Title;
         Focused = options.Focused;
-        ShowBorder = options.ShowBorder;
+        Border = options.Border;
+        Padding = options.Padding;
         ClearOnSubmit = options.ClearOnSubmit;
         ClearOnCancel = options.ClearOnCancel;
         KeyMap = options.KeyMap ?? TextInputKeyMap.Default;
@@ -47,7 +48,9 @@ public sealed class TextInputComponent : IStatefulComponent, IFocusableComponent
 
     public bool Focused { get; set; }
 
-    public bool ShowBorder { get; set; } = true;
+    public BorderStyle Border { get; set; } = BorderStyle.SingleLine;
+
+    public Thickness Padding { get; set; }
 
     public bool ClearOnSubmit { get; set; }
 
@@ -120,7 +123,7 @@ public sealed class TextInputComponent : IStatefulComponent, IFocusableComponent
 
     public void Render(Canvas canvas, Rect rect)
     {
-        TextInputRenderer.Render(canvas, rect, _input, Title, Focused, ShowBorder, SubmitCount);
+        TextInputRenderer.Render(canvas, rect, _input, Title, Focused, Border, Padding, SubmitCount);
     }
 
     private TextInputModel Input => _input;

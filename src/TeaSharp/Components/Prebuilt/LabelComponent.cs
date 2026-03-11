@@ -3,6 +3,7 @@ using TeaSharp.Components.Composition;
 using TeaSharp.Components.Interaction;
 using TeaSharp.Components.Prebuilt.Internal;
 using TeaSharp.Components.Primitives;
+using TeaSharp.Components.Primitives.Internal;
 using TeaSharp.Components.Styling;
 using TeaSharp.Core.Abstractions;
 using TeaSharp.Core.Messages;
@@ -20,20 +21,17 @@ public sealed class LabelComponent : ICanvasComponent
     {
         Text = options.Text;
         Title = options.Title;
-        ShowBorder = options.ShowBorder;
+        Border = options.Border;
+        Padding = options.Padding;
     }
 
     public string Text { get; set; } = string.Empty;
 
     public string? Title { get; set; }
 
-    public bool ShowBorder { get; set; } = true;
+    public BorderStyle Border { get; set; } = BorderStyle.SingleLine;
 
-    public bool DrawBorder
-    {
-        get => ShowBorder;
-        set => ShowBorder = value;
-    }
+    public Thickness Padding { get; set; }
 
     public void Render(Canvas canvas, Rect rect)
     {
@@ -43,20 +41,18 @@ public sealed class LabelComponent : ICanvasComponent
             return;
         }
 
-        if (ShowBorder)
+        var content = FrameLayout.DrawFrameAndResolveContent(
+            canvas,
+            clipped,
+            Border == BorderStyle.None ? null : Title ?? "Label",
+            Border,
+            Padding);
+        if (content.IsEmpty)
         {
-            canvas.DrawBox(clipped, Title ?? "Label");
-            var content = clipped.Inset(1, 1);
-            if (content.IsEmpty)
-            {
-                return;
-            }
-
-            DrawLines(canvas, content);
             return;
         }
 
-        DrawLines(canvas, clipped);
+        DrawLines(canvas, content);
     }
 
     private void DrawLines(Canvas canvas, Rect rect)

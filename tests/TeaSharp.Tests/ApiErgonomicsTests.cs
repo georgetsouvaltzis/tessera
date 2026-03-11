@@ -15,6 +15,7 @@ internal static class ApiErgonomicsTests
 {
     public static IEnumerable<TestCase> Cases()
     {
+        yield return new TestCase("ApiErgonomics_Thickness_UsesStandardSpacingVocabulary", Thickness_UsesStandardSpacingVocabulary);
         yield return new TestCase("ApiErgonomics_TextInputOptions_ConfigureComponentWithoutNestedInputAccess", TextInputOptions_ConfigureComponentWithoutNestedInputAccess);
         yield return new TestCase("ApiErgonomics_TextAreaOptions_ConfigureComponentWithoutNestedInputAccess", TextAreaOptions_ConfigureComponentWithoutNestedInputAccess);
         yield return new TestCase("ApiErgonomics_ListComponent_ExposesSelectionWithoutModelAccess", ListComponent_ExposesSelectionWithoutModelAccess);
@@ -26,7 +27,22 @@ internal static class ApiErgonomicsTests
         yield return new TestCase("ApiErgonomics_InteractionProfiles_AreClonedOnAssignment", InteractionProfiles_AreClonedOnAssignment);
         yield return new TestCase("ApiErgonomics_PrebuiltCatalog_CreatesConfiguredTextInput", PrebuiltCatalog_CreatesConfiguredTextInput);
         yield return new TestCase("ApiErgonomics_ProductivityCatalog_CreatesConfiguredMenuBar", ProductivityCatalog_CreatesConfiguredMenuBar);
+        yield return new TestCase("ApiErgonomics_DialogOptions_ConfigureFrameWithoutLegacyBorderStyleName", DialogOptions_ConfigureFrameWithoutLegacyBorderStyleName);
         yield return new TestCase("ApiErgonomics_UiKitCatalog_CreatesConfiguredModal", UiKitCatalog_CreatesConfiguredModal);
+        yield return new TestCase("ApiErgonomics_ModalOptions_ConfigureFrameWithoutLegacyBorderStyleName", ModalOptions_ConfigureFrameWithoutLegacyBorderStyleName);
+    }
+
+    private static Task Thickness_UsesStandardSpacingVocabulary()
+    {
+        var spacing = Thickness.Symmetric(horizontal: 2, vertical: 1);
+
+        TestAssert.Equal(2, spacing.Left, "Thickness should expose left spacing.");
+        TestAssert.Equal(2, spacing.Right, "Thickness should expose right spacing.");
+        TestAssert.Equal(1, spacing.Top, "Thickness should expose top spacing.");
+        TestAssert.Equal(1, spacing.Bottom, "Thickness should expose bottom spacing.");
+        TestAssert.Equal(4, spacing.Horizontal, "Thickness should expose aggregate horizontal spacing.");
+        TestAssert.Equal(2, spacing.Vertical, "Thickness should expose aggregate vertical spacing.");
+        return Task.CompletedTask;
     }
 
     private static Task TextInputOptions_ConfigureComponentWithoutNestedInputAccess()
@@ -97,14 +113,14 @@ internal static class ApiErgonomicsTests
             Items: ["Development", "Production"],
             Title: "Environment",
             Focused: true,
-            ShowBorder: false,
+            Border: BorderStyle.None,
             MaxVisibleItems: 4,
             InteractionProfile: WidgetInteractionProfile.KeyboardOnly);
         var dropdown = new DropdownComponent(options);
 
         TestAssert.Equal("Environment", dropdown.Title, "Dropdown options should set title.");
         TestAssert.True(dropdown.Focused, "Dropdown options should set focus.");
-        TestAssert.True(!dropdown.ShowBorder, "Dropdown options should set border visibility.");
+        TestAssert.True(dropdown.Border == BorderStyle.None, "Dropdown options should set border style.");
         TestAssert.Equal(4, dropdown.MaxVisibleItems, "Dropdown options should set max visible items.");
         TestAssert.Equal("Development", dropdown.SelectedItem, "Dropdown options should preload items.");
         TestAssert.True(!ReferenceEquals(options.InteractionProfile, dropdown.InteractionProfile), "Dropdown should clone interaction profile instead of sharing mutable state.");
@@ -213,6 +229,22 @@ internal static class ApiErgonomicsTests
         return Task.CompletedTask;
     }
 
+    private static Task DialogOptions_ConfigureFrameWithoutLegacyBorderStyleName()
+    {
+        var dialog = new DialogComponent(new DialogOptions(
+            Title: "Confirm delete",
+            Visible: true,
+            Border: BorderStyle.Heavy,
+            Padding: Thickness.All(1),
+            Lines: ["Delete item?"]));
+
+        TestAssert.True(dialog.Visible, "Dialog options should set visibility.");
+        TestAssert.True(dialog.Border == BorderStyle.Heavy, "Dialog options should set border style through Border.");
+        TestAssert.Equal(1, dialog.Padding.Left, "Dialog options should set padding through Thickness.");
+        TestAssert.Equal("Delete item?", dialog.Lines[0], "Dialog options should preserve content lines.");
+        return Task.CompletedTask;
+    }
+
     private static Task UiKitCatalog_CreatesConfiguredModal()
     {
         var modal = TeaSharp.Components.UiKit.UiKitCatalog.Modal(new ModalOptions(
@@ -223,6 +255,22 @@ internal static class ApiErgonomicsTests
         TestAssert.True(modal.Visible, "UI-kit catalog should create configured modal surfaces.");
         TestAssert.Equal("Confirm", modal.Title, "UI-kit catalog should pass options through to the component.");
         TestAssert.Equal(1, modal.Lines.Count, "UI-kit catalog should preserve configured modal content.");
+        return Task.CompletedTask;
+    }
+
+    private static Task ModalOptions_ConfigureFrameWithoutLegacyBorderStyleName()
+    {
+        var modal = new ModalComponent(new ModalOptions(
+            Title: "Confirm",
+            Visible: true,
+            Border: BorderStyle.Ascii,
+            Padding: Thickness.Symmetric(horizontal: 2, vertical: 1),
+            Lines: ["ready"]));
+
+        TestAssert.True(modal.Visible, "Modal options should set visibility.");
+        TestAssert.True(modal.Border == BorderStyle.Ascii, "Modal options should set border style through Border.");
+        TestAssert.Equal(2, modal.Padding.Left, "Modal options should set left padding.");
+        TestAssert.Equal(1, modal.Padding.Top, "Modal options should set top padding.");
         return Task.CompletedTask;
     }
 }

@@ -1,4 +1,5 @@
 using TeaSharp.Components.Primitives;
+using TeaSharp.Components.Primitives.Internal;
 using TeaSharp.Components.Productivity;
 using TeaSharp.Components.Styling;
 using System.Globalization;
@@ -14,7 +15,8 @@ internal static class TimePickerRenderer
         bool focused,
         bool disabled,
         bool readOnly,
-        bool showBorder,
+        BorderStyle border,
+        Thickness padding,
         TimeOnly value,
         TimePickerField activeField,
         TimePickerField? hoveredField,
@@ -26,16 +28,12 @@ internal static class TimePickerRenderer
             return;
         }
 
-        Rect content;
-        if (showBorder)
-        {
-            canvas.DrawBox(clipped, focused ? $"{title} *" : title);
-            content = clipped.Inset(1, 1);
-        }
-        else
-        {
-            content = clipped;
-        }
+        var content = FrameLayout.DrawFrameAndResolveContent(
+            canvas,
+            clipped,
+            border == BorderStyle.None ? null : focused ? $"{title} *" : title,
+            border,
+            padding);
 
         if (content.IsEmpty || content.Height < 1)
         {

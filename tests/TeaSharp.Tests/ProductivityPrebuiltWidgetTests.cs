@@ -96,7 +96,7 @@ internal static class ProductivityPrebuiltWidgetTests
                 new ContextMenuItem("copy", "Copy"),
                 new ContextMenuItem("paste", "Paste"),
             ],
-            ShowBorder: false));
+            Border: BorderStyle.None));
         menu.OpenAt(0, 0);
 
         var changed = menu.UpdateMouse(new MouseClickMsg(MouseButton.Left, 0, 1), new Rect(0, 0, 20, 6));
@@ -115,7 +115,7 @@ internal static class ProductivityPrebuiltWidgetTests
                 new ContextMenuItem("copy", "Copy"),
                 new ContextMenuItem("paste", "Paste"),
             ],
-            ShowBorder: false));
+            Border: BorderStyle.None));
         menu.OpenAt(0, 0);
 
         var changed = menu.UpdateMouse(new MouseReleaseMsg(MouseButton.None, 0, 1), new Rect(0, 0, 20, 6));
@@ -193,7 +193,7 @@ internal static class ProductivityPrebuiltWidgetTests
     private static Task DatePickerComponent_MouseClickSelectsDate()
     {
         var picker = new DatePickerComponent(new DatePickerOptions(
-            ShowBorder: false,
+            Border: BorderStyle.None,
             InitialDate: new DateOnly(2026, 3, 8)));
 
         var changed = picker.UpdateMouse(new MouseClickMsg(MouseButton.Left, 0, 4), new Rect(0, 0, 24, 10));
@@ -219,7 +219,7 @@ internal static class ProductivityPrebuiltWidgetTests
     private static Task TimePickerComponent_MouseWheelAdjustsField()
     {
         var picker = new TimePickerComponent(new TimePickerOptions(
-            ShowBorder: false,
+            Border: BorderStyle.None,
             MinuteStep: 5,
             InitialValue: new TimeOnly(10, 0, 0)));
 
@@ -234,7 +234,7 @@ internal static class ProductivityPrebuiltWidgetTests
     private static Task MarkdownViewerComponent_RendersMarkdown()
     {
         var viewer = new MarkdownViewerComponent(new MarkdownViewerOptions(
-            ShowBorder: false,
+            Border: BorderStyle.None,
             InitialMarkdown: "# title\n- one\n```\ncode\n```"));
         var canvas = new Canvas(40, 8);
 

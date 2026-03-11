@@ -24,7 +24,8 @@ public sealed class TableComponent : IStatefulComponent, IMouseStatefulComponent
     {
         Title = options.Title;
         Focused = options.Focused;
-        ShowBorder = options.ShowBorder;
+        Border = options.Border;
+        Padding = options.Padding;
         if (options.PageSize.HasValue)
         {
             PageSize = options.PageSize.Value;
@@ -33,10 +34,16 @@ public sealed class TableComponent : IStatefulComponent, IMouseStatefulComponent
 
     public bool Focused { get; set; }
 
-    public bool ShowBorder
+    public BorderStyle Border
     {
-        get => _inner.ShowBorder;
-        set => _inner.ShowBorder = value;
+        get => _inner.Border;
+        set => _inner.Border = value;
+    }
+
+    public Thickness Padding
+    {
+        get => _inner.Padding;
+        set => _inner.Padding = value;
     }
 
     public string Title

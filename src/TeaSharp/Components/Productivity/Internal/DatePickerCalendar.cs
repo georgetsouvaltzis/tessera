@@ -1,13 +1,14 @@
 using TeaSharp.Components.Primitives;
+using TeaSharp.Components.Primitives.Internal;
 using TeaSharp.Components.Productivity;
 using TeaSharp.Components.Styling;
 namespace TeaSharp.Components.Productivity.Internal;
 
 internal static class DatePickerCalendar
 {
-    public static Rect ResolveContentRect(Rect bounds, bool showBorder)
+    public static Rect ResolveContentRect(Rect bounds, BorderStyle border, Thickness padding)
     {
-        return showBorder ? bounds.Inset(1, 1) : bounds;
+        return FrameLayout.ResolveContentRect(bounds, border, padding);
     }
 
     public static bool TryGetDateAtPointer(DateOnly currentMonth, Rect content, int x, int y, out DateOnly date)

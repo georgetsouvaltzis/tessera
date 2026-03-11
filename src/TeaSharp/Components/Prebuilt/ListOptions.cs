@@ -18,5 +18,6 @@ public sealed record ListOptions<T>(
     bool Focused = false,
     bool Disabled = false,
     bool ReadOnly = false,
-    bool ShowBorder = true,
+    BorderStyle Border = BorderStyle.SingleLine,
+    Thickness Padding = default,
     ListKeyMap? KeyMap = null);

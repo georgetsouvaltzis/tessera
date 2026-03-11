@@ -49,7 +49,7 @@ internal sealed class WidgetGalleryModel : InteractiveScreenModel
     private readonly ButtonComponent _button = new(new ButtonOptions(
         Label: "Deploy",
         Description: "click, enter, or space",
-        ShowBorder: true));
+        Border: BorderStyle.SingleLine));
     private readonly TextInputComponent _textInput = new(new TextInputOptions(
         Title: "Text Input",
         Placeholder: "type and press enter",
