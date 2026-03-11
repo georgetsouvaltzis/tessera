@@ -50,6 +50,7 @@ Status: in progress
 - split `ComboboxComponent` and `DropdownComponent` so render/state-resolution helpers are separated from update/configuration logic
 - split `TreeViewComponent` and `NotificationCenterComponent` so rendering/state styling helpers are separated from interaction logic
 - split `ContextMenuComponent` so menu bounds/rendering helpers are separated from input handling/state transitions
+- split `LayoutContainerComponent` so child-layout geometry helpers are separated from runtime routing/mouse handling
 
 ## Phase 4: API Simplification
 
