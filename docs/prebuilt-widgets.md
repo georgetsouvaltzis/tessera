@@ -167,6 +167,7 @@ dotnet run --project examples/TeaSharp.WidgetGallery/TeaSharp.WidgetGallery.cspr
 - uses `Form(...)` for the input tab
 - uses `Dashboard(...)` for the data tab
 - uses `CreateDialogWorkflow(...)` for the overlay dialog flow
+- should be treated as the primary starter reference for the current public app API
 
 Dedicated widget-focused demos are also available:
 
@@ -177,6 +178,8 @@ dotnet run --project examples/TeaSharp.AdvancedWidgetsExample/TeaSharp.AdvancedW
 dotnet run --project examples/TeaSharp.ProductivityWidgetsExample/TeaSharp.ProductivityWidgetsExample.csproj
 dotnet run --project examples/TeaSharp.KanbanExample/TeaSharp.KanbanExample.csproj
 ```
+
+`TeaSharp.KanbanExample` and `TeaSharp.ProductivityWidgetsExample` are still useful, but they currently demonstrate more manual app composition patterns than `TeaSharp.WidgetGallery`.
 
 Core gallery hotkeys:
 

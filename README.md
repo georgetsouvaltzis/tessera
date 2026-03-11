@@ -16,6 +16,15 @@ It keeps the default app path small:
   - `TeaSharp.Components.Primitives`
 - migration details: [docs/namespace-migration.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/namespace-migration.md)
 
+If you want the canonical starter example for the current public app API, start with `examples/TeaSharp.WidgetGallery`.
+That sample demonstrates the intended path:
+
+- `InteractiveScreenModel`
+- `ScreenComposer`
+- `Dashboard(...)`, `Form(...)`, and `MasterDetail(...)`
+- `CreateDialogWorkflow(...)`
+- options-first components and event-driven integration
+
 ## Quick Start
 
 ```csharp

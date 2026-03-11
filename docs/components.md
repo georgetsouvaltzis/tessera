@@ -208,12 +208,14 @@ A dedicated app now exists for the prebuilt widget set:
 - project: `examples/TeaSharp.WidgetGallery`
 - run: `dotnet run --project examples/TeaSharp.WidgetGallery/TeaSharp.WidgetGallery.csproj`
 - docs: `docs/prebuilt-widgets.md`
+- this is the recommended copy/paste starter for the current public app API surface
 
 Scenario app example:
 
 - project: `examples/TeaSharp.KanbanExample`
 - run: `dotnet run --project examples/TeaSharp.KanbanExample/TeaSharp.KanbanExample.csproj`
 - flow: multi-board Kanban with lane movement, quick card creation, delete confirmation dialog, and activity feed.
+- note: this app still uses a more manual `IModel` composition style and should be treated as an advanced example, not the default starter template
 
 ## Custom Components
 

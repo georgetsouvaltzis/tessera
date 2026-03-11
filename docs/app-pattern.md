@@ -315,3 +315,17 @@ Skip this pattern if the app is:
 - a small component experiment using only `ComponentComposer`
 
 For everything else, this should be the default starting point.
+
+## Starter Guidance
+
+If you want a real runnable reference for this pattern, start with `examples/TeaSharp.WidgetGallery`.
+
+It already demonstrates:
+
+- `InteractiveScreenModel`
+- `Dashboard(...)`
+- `Form(...)`
+- `CreateDialogWorkflow(...)`
+- event-driven widget integration
+
+Other example apps may still use more manual `IModel`-level composition and should be treated as advanced examples, not the default starting point.
