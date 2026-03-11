@@ -10,6 +10,24 @@ public sealed class MarkdownViewerComponent : IStatefulComponent, IFocusableComp
     private readonly ViewportModel _viewport = new();
     private string _markdown = string.Empty;
 
+    public MarkdownViewerComponent()
+    {
+    }
+
+    public MarkdownViewerComponent(MarkdownViewerOptions options)
+    {
+        Title = options.Title;
+        Focused = options.Focused;
+        ShowBorder = options.ShowBorder;
+        Wrap = options.Wrap;
+        ShowLineNumbers = options.ShowLineNumbers;
+        ViewportKeyMap = options.ViewportKeyMap ?? ViewportKeyMap.Default;
+        if (!string.IsNullOrEmpty(options.InitialMarkdown))
+        {
+            SetMarkdown(options.InitialMarkdown);
+        }
+    }
+
     public string Title { get; set; } = "Markdown";
 
     public bool Focused { get; set; }
@@ -73,5 +91,4 @@ public sealed class MarkdownViewerComponent : IStatefulComponent, IFocusableComp
             canvas.WriteText(content.X, content.Y + row, lines[row], content.Width);
         }
     }
-
 }

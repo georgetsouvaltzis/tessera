@@ -127,7 +127,7 @@ The design follows patterns used in Bubble Tea examples:
       - `LogViewerComponent.ViewportKeyMap`, `TogglePauseKey`, `ClearKey`
       - `ProgressBarComponent.IncreaseKey` / `DecreaseKey`
       - `DialogComponent.AcceptKey` / `DismissKey`
-      - options-based constructors (`LabelOptions`, `ButtonOptions`, `TextInputOptions`, `TextAreaOptions`, `ListOptions<T>`, `TableOptions`, `ProgressBarOptions`, `StatusBarOptions`, `DialogOptions`, `LayoutContainerOptions`, `TabsOptions`, `MenuBarOptions`, `ContextMenuOptions`)
+      - options-based constructors (`LabelOptions`, `ButtonOptions`, `TextInputOptions`, `TextAreaOptions`, `ListOptions<T>`, `TableOptions`, `ProgressBarOptions`, `StatusBarOptions`, `DialogOptions`, `LayoutContainerOptions`, `TabsOptions`, `MenuBarOptions`, `ContextMenuOptions`, `NumberInputOptions`, `DatePickerOptions`, `TimePickerOptions`, `MarkdownViewerOptions`, `LogViewerOptions`, `ModalOptions`)
       - component-level state accessors instead of raw nested models (`TextInputComponent.Value` / `Placeholder` / `MaxLength`, `TextAreaComponent.Value`, `ListComponent<T>.SelectedItem` / `SetItems(...)`, `ComboboxComponent.FilterText` / `Placeholder`, `CommandPaletteComponent.QueryText` / `SetQueryText(...)` / `ClearQuery()`, `TableComponent.PageSize` / `SortColumn` / `SortDescending`, `NumberInputComponent.Text`, `ButtonComponent.WasPressed` / `PressCount` / `Hovered` / `Pressed`)
       - use `ScreenComposer` + `ScreenRegionKey` for screen-scale region orchestration, `InputRouter` for mode/global key precedence, and `InteractiveScreenModel` when an app follows the standard screen-shell pattern
       - `ShowBorder` toggle for minimalist rendering on border-capable prebuilt widgets

@@ -14,6 +14,36 @@ public sealed class LogViewerComponent : IStatefulComponent, IFocusableComponent
         _viewport.SetWrap(false);
     }
 
+    public LogViewerComponent(LogViewerOptions options)
+        : this()
+    {
+        Title = options.Title;
+        Focused = options.Focused;
+        ShowBorder = options.ShowBorder;
+        AutoScroll = options.AutoScroll;
+        ViewportKeyMap = options.ViewportKeyMap ?? ViewportKeyMap.Default;
+        TogglePauseKey = options.TogglePauseKey ?? TogglePauseKey;
+        ClearKey = options.ClearKey ?? ClearKey;
+        if (options.InitialEntries is not null)
+        {
+            foreach (var entry in options.InitialEntries)
+            {
+                _entries.Add(entry);
+            }
+        }
+
+        if (!string.IsNullOrEmpty(options.InitialFilter))
+        {
+            Filter = options.InitialFilter;
+        }
+
+        RefreshViewport();
+        if (AutoScroll)
+        {
+            _viewport.ScrollToBottom();
+        }
+    }
+
     public string Title { get; set; } = "Logs";
 
     public bool Focused { get; set; }

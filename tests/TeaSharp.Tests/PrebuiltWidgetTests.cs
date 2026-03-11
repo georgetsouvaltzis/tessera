@@ -441,13 +441,10 @@ internal static class PrebuiltWidgetTests
 
     private static Task LogViewerComponent_AppendsAndFilters()
     {
-        var logs = new LogViewerComponent
-        {
-            Focused = true,
-        };
-        logs.Append("alpha");
-        logs.Append("beta");
-        logs.SetFilter("alp");
+        var logs = new LogViewerComponent(new LogViewerOptions(
+            Focused: true,
+            InitialEntries: ["alpha", "beta"],
+            InitialFilter: "alp"));
         var canvas = new Canvas(26, 8);
 
         logs.Render(canvas, new Rect(0, 0, 26, 8));

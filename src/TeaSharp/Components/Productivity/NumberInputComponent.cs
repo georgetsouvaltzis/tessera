@@ -10,6 +10,28 @@ public sealed class NumberInputComponent : IStatefulComponent, IFocusableCompone
     private bool _replaceOnNextCharacter = true;
     private readonly TextInputModel _input = new();
 
+    public NumberInputComponent()
+    {
+    }
+
+    public NumberInputComponent(NumberInputOptions options)
+    {
+        Title = options.Title;
+        Focused = options.Focused;
+        Disabled = options.Disabled;
+        ReadOnly = options.ReadOnly;
+        ShowBorder = options.ShowBorder;
+        Min = options.Min;
+        Max = options.Max;
+        Step = options.Step;
+        Precision = options.Precision;
+        InputKeyMap = options.InputKeyMap ?? TextInputKeyMap.Default;
+        IncreaseKey = options.IncreaseKey ?? IncreaseKey;
+        DecreaseKey = options.DecreaseKey ?? DecreaseKey;
+        SubmitKey = options.SubmitKey ?? SubmitKey;
+        SetValue(options.InitialValue);
+    }
+
     public TextInputKeyMap InputKeyMap { get; set; } = TextInputKeyMap.Default;
 
     public string Title { get; set; } = "Number Input";

@@ -11,6 +11,15 @@ public sealed class ModalComponent : ICanvasComponent
         Theme = new UiTheme();
     }
 
+    public ModalComponent(ModalOptions options)
+    {
+        Title = options.Title;
+        Visible = options.Visible;
+        BorderStyle = options.BorderStyle;
+        Lines = options.Lines ?? ["(empty)"];
+        Theme = options.Theme ?? new UiTheme();
+    }
+
     public string Title { get; set; } = "Modal";
 
     public bool Visible { get; set; }

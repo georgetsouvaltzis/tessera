@@ -145,14 +145,12 @@ internal static class ProductivityPrebuiltWidgetTests
 
     private static Task NumberInputComponent_AdjustsAndSubmits()
     {
-        var input = new NumberInputComponent
-        {
-            Focused = true,
-            Min = 0,
-            Max = 10,
-            Step = 2,
-        };
-        input.SetValue(2);
+        var input = new NumberInputComponent(new NumberInputOptions(
+            Focused: true,
+            Min: 0,
+            Max: 10,
+            Step: 2,
+            InitialValue: 2));
         input.Update(new KeyPressMsg(KeyCode.Up));
         input.Update(new KeyPressMsg(KeyCode.Up));
         input.Update(new KeyPressMsg(KeyCode.Enter));
@@ -173,11 +171,9 @@ internal static class ProductivityPrebuiltWidgetTests
 
     private static Task DatePickerComponent_MovesDate()
     {
-        var picker = new DatePickerComponent
-        {
-            Focused = true,
-        };
-        picker.SetDate(new DateOnly(2026, 3, 8));
+        var picker = new DatePickerComponent(new DatePickerOptions(
+            Focused: true,
+            InitialDate: new DateOnly(2026, 3, 8)));
         picker.Update(new KeyPressMsg(KeyCode.Right));
         picker.Update(new KeyPressMsg(KeyCode.Down));
 
@@ -187,11 +183,9 @@ internal static class ProductivityPrebuiltWidgetTests
 
     private static Task DatePickerComponent_MouseClickSelectsDate()
     {
-        var picker = new DatePickerComponent
-        {
-            ShowBorder = false,
-        };
-        picker.SetDate(new DateOnly(2026, 3, 8));
+        var picker = new DatePickerComponent(new DatePickerOptions(
+            ShowBorder: false,
+            InitialDate: new DateOnly(2026, 3, 8)));
 
         var changed = picker.UpdateMouse(new MouseClickMsg(MouseButton.Left, 0, 4), new Rect(0, 0, 24, 10));
 
@@ -202,12 +196,10 @@ internal static class ProductivityPrebuiltWidgetTests
 
     private static Task TimePickerComponent_AdjustsField()
     {
-        var picker = new TimePickerComponent
-        {
-            Focused = true,
-            MinuteStep = 5,
-        };
-        picker.SetValue(new TimeOnly(10, 0, 0));
+        var picker = new TimePickerComponent(new TimePickerOptions(
+            Focused: true,
+            MinuteStep: 5,
+            InitialValue: new TimeOnly(10, 0, 0)));
         picker.Update(new KeyPressMsg(KeyCode.Right));
         picker.Update(new KeyPressMsg(KeyCode.Up));
 
@@ -217,12 +209,10 @@ internal static class ProductivityPrebuiltWidgetTests
 
     private static Task TimePickerComponent_MouseWheelAdjustsField()
     {
-        var picker = new TimePickerComponent
-        {
-            ShowBorder = false,
-            MinuteStep = 5,
-        };
-        picker.SetValue(new TimeOnly(10, 0, 0));
+        var picker = new TimePickerComponent(new TimePickerOptions(
+            ShowBorder: false,
+            MinuteStep: 5,
+            InitialValue: new TimeOnly(10, 0, 0)));
 
         picker.UpdateMouse(new MouseClickMsg(MouseButton.Left, 3, 0), new Rect(0, 0, 12, 1));
         var changed = picker.UpdateMouse(new MouseWheelMsg(MouseButton.WheelUp, 3, 0), new Rect(0, 0, 12, 1));
@@ -234,11 +224,9 @@ internal static class ProductivityPrebuiltWidgetTests
 
     private static Task MarkdownViewerComponent_RendersMarkdown()
     {
-        var viewer = new MarkdownViewerComponent
-        {
-            ShowBorder = false,
-        };
-        viewer.SetMarkdown("# title\n- one\n```\ncode\n```");
+        var viewer = new MarkdownViewerComponent(new MarkdownViewerOptions(
+            ShowBorder: false,
+            InitialMarkdown: "# title\n- one\n```\ncode\n```"));
         var canvas = new Canvas(40, 8);
 
         viewer.Render(canvas, new Rect(0, 0, 40, 8));

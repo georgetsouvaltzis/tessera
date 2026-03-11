@@ -47,6 +47,7 @@ TeaSharp provides a prebuilt widget layer in `TeaSharp.Components.PrebuiltWidget
 - `ComboboxComponent` combines text filtering with keyboard-driven option selection through component-level filter access (`FilterText`, `Placeholder`, `SetFilterText`) and a `ComboboxOptions` constructor for common setup.
   - Mouse support: field click open/close, option click selection, wheel-driven highlight navigation when open.
 - `LogViewerComponent` supports append, filter, pause, clear, and scrolling.
+  - Friendly setup path: `LogViewerOptions`.
 - `LayoutContainerComponent` supports `Vertical`, `Horizontal`, and `Grid` layout modes.
   - Mouse support: child hit-test routing and optional drag-resize split for 2-pane horizontal/vertical layouts (`PrimarySize`, `SetPrimarySize`, `ClearPrimarySize`).
   - Use `ComponentComposer` as the focus/routing owner when a layout container participates in a larger interactive screen.
@@ -64,7 +65,9 @@ TeaSharp provides a prebuilt widget layer in `TeaSharp.Components.PrebuiltWidget
   - Friendly setup paths: `MenuBarOptions`, `ContextMenuOptions`, and `SetItems(params ...)`.
 - `NumberInputComponent`, `DatePickerComponent`, and `TimePickerComponent` provide structured value entry, with `NumberInputComponent.Text` exposing the rendered numeric text without leaking the text-input model.
   - Mouse support (`DatePickerComponent`, `TimePickerComponent`): day/field selection on click and wheel adjustment/navigation.
+  - Friendly setup paths: `NumberInputOptions`, `DatePickerOptions`, `TimePickerOptions`.
 - `MarkdownViewerComponent` provides scrollable markdown rendering for docs/help panes.
+  - Friendly setup path: `MarkdownViewerOptions`.
 - Most prebuilt widgets expose `ShowBorder` (`true` by default) for minimal/borderless layouts.
 - Common widgets also expose options-based constructors for one-shot setup:
   - `LabelOptions`
@@ -80,6 +83,12 @@ TeaSharp provides a prebuilt widget layer in `TeaSharp.Components.PrebuiltWidget
   - `TabsOptions`
   - `MenuBarOptions`
   - `ContextMenuOptions`
+  - `NumberInputOptions`
+  - `DatePickerOptions`
+  - `TimePickerOptions`
+  - `MarkdownViewerOptions`
+  - `LogViewerOptions`
+  - `ModalOptions`
 - keep a single focus owner per interactive surface; for multi-pane screens that owner should be `ScreenComposer`, with `ComponentComposer` reserved for component subtrees.
 - `ListComponent<T>`, `DropdownComponent`, and `ComboboxComponent` support state-driven styling through:
   - `WidgetVisualState`

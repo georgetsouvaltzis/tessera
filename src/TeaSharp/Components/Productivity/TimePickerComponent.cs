@@ -10,6 +10,33 @@ public sealed class TimePickerComponent : IStatefulComponent, IMouseStatefulComp
     private WidgetInteractionProfile _interactionProfile = WidgetInteractionProfile.Default.Clone();
     private TimePickerField? _hoveredField;
 
+    public TimePickerComponent()
+    {
+    }
+
+    public TimePickerComponent(TimePickerOptions options)
+    {
+        Title = options.Title;
+        Focused = options.Focused;
+        Disabled = options.Disabled;
+        ReadOnly = options.ReadOnly;
+        ShowBorder = options.ShowBorder;
+        ActiveField = options.ActiveField;
+        HourStep = options.HourStep;
+        MinuteStep = options.MinuteStep;
+        SecondStep = options.SecondStep;
+        NextFieldKey = options.NextFieldKey ?? NextFieldKey;
+        PreviousFieldKey = options.PreviousFieldKey ?? PreviousFieldKey;
+        IncreaseKey = options.IncreaseKey ?? IncreaseKey;
+        DecreaseKey = options.DecreaseKey ?? DecreaseKey;
+        CommitKey = options.CommitKey ?? CommitKey;
+        InteractionProfile = options.InteractionProfile ?? WidgetInteractionProfile.Default;
+        if (options.InitialValue is { } initialTime)
+        {
+            SetValue(initialTime);
+        }
+    }
+
     public string Title { get; set; } = "Time Picker";
 
     public bool Focused { get; set; }

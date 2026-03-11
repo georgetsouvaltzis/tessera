@@ -52,6 +52,7 @@ Status: in progress
 - split `ContextMenuComponent` so menu bounds/rendering helpers are separated from input handling/state transitions
 - split `LayoutContainerComponent` so child-layout geometry helpers are separated from runtime routing/mouse handling
 - add `MenuBarOptions` and `ContextMenuOptions` so action surfaces follow the same options-first setup pattern as the rest of the friendly prebuilt API
+- add options-first constructors for `NumberInputComponent`, `DatePickerComponent`, `TimePickerComponent`, `MarkdownViewerComponent`, `LogViewerComponent`, and `ModalComponent`
 
 ## Phase 4: API Simplification
 

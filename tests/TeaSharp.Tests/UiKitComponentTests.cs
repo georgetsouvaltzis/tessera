@@ -245,12 +245,10 @@ internal static class UiKitComponentTests
         // Arrange
         var hiddenCanvas = new Canvas(30, 10);
         var shownCanvas = new Canvas(30, 10);
-        var modal = new ModalComponent
-        {
-            Title = "Help",
-            Lines = ["line one", "line two"],
-            Theme = new UiTheme(ModalBackdropFill: ':'),
-        };
+        var modal = new ModalComponent(new ModalOptions(
+            Title: "Help",
+            Lines: ["line one", "line two"],
+            Theme: new UiTheme(ModalBackdropFill: ':')));
 
         // Act
         modal.Visible = false;
@@ -276,13 +274,11 @@ internal static class UiKitComponentTests
         canvas.WriteText(0, 0, "UNDERLAY-TEXT", 40);
         canvas.DrawBox(new Rect(0, 1, 40, 10), "underlay");
 
-        var modal = new ModalComponent
-        {
-            Visible = true,
-            Title = "Dialog",
-            Lines = ["confirm action"],
-            Theme = new UiTheme(ModalBackdropFill: ':'),
-        };
+        var modal = new ModalComponent(new ModalOptions(
+            Visible: true,
+            Title: "Dialog",
+            Lines: ["confirm action"],
+            Theme: new UiTheme(ModalBackdropFill: ':')));
 
         // Act
         modal.Render(canvas, new Rect(0, 0, 40, 12));

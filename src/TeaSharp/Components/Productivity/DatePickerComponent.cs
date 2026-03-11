@@ -10,6 +10,31 @@ public sealed class DatePickerComponent : IStatefulComponent, IMouseStatefulComp
     private WidgetInteractionProfile _interactionProfile = WidgetInteractionProfile.Default.Clone();
     private DateOnly? _hoveredDate;
 
+    public DatePickerComponent()
+    {
+    }
+
+    public DatePickerComponent(DatePickerOptions options)
+    {
+        Title = options.Title;
+        Focused = options.Focused;
+        Disabled = options.Disabled;
+        ReadOnly = options.ReadOnly;
+        ShowBorder = options.ShowBorder;
+        PreviousDayKey = options.PreviousDayKey ?? PreviousDayKey;
+        NextDayKey = options.NextDayKey ?? NextDayKey;
+        PreviousWeekKey = options.PreviousWeekKey ?? PreviousWeekKey;
+        NextWeekKey = options.NextWeekKey ?? NextWeekKey;
+        PreviousMonthKey = options.PreviousMonthKey ?? PreviousMonthKey;
+        NextMonthKey = options.NextMonthKey ?? NextMonthKey;
+        CommitKey = options.CommitKey ?? CommitKey;
+        InteractionProfile = options.InteractionProfile ?? WidgetInteractionProfile.Default;
+        if (options.InitialDate is { } initialDate)
+        {
+            SetDate(initialDate);
+        }
+    }
+
     public string Title { get; set; } = "Date Picker";
 
     public bool Focused { get; set; }
