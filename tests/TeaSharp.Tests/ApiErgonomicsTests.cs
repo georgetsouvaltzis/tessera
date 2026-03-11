@@ -19,6 +19,7 @@ internal static class ApiErgonomicsTests
         yield return new TestCase("ApiErgonomics_ScreenFrameLayout_ReducesScreenRectBookkeeping", ScreenFrameLayout_ReducesScreenRectBookkeeping);
         yield return new TestCase("ApiErgonomics_MasterDetailScreen_ReducesShellBookkeeping", MasterDetailScreen_ReducesShellBookkeeping);
         yield return new TestCase("ApiErgonomics_DashboardScreen_ReducesShellBookkeeping", DashboardScreen_ReducesShellBookkeeping);
+        yield return new TestCase("ApiErgonomics_FormScreen_ReducesShellBookkeeping", FormScreen_ReducesShellBookkeeping);
         yield return new TestCase("ApiErgonomics_TextInputOptions_ConfigureComponentWithoutNestedInputAccess", TextInputOptions_ConfigureComponentWithoutNestedInputAccess);
         yield return new TestCase("ApiErgonomics_TextAreaOptions_ConfigureComponentWithoutNestedInputAccess", TextAreaOptions_ConfigureComponentWithoutNestedInputAccess);
         yield return new TestCase("ApiErgonomics_ListComponent_ExposesSelectionWithoutModelAccess", ListComponent_ExposesSelectionWithoutModelAccess);
@@ -105,6 +106,28 @@ internal static class ApiErgonomicsTests
         TestAssert.Equal(new Rect(20, 1, 80, 27), scaffold.Main, "Dashboard scaffold should expose main bounds directly.");
         TestAssert.True(changed, "Dashboard scaffold should build a reusable focus chain from added regions.");
         TestAssert.True(screen.FocusedRegionKey == new ScreenRegionKey("sidebar"), "Scaffold focus chain should respect helper-add order.");
+        return Task.CompletedTask;
+    }
+
+    private static Task FormScreen_ReducesShellBookkeeping()
+    {
+        var screen = new ScreenComposer();
+        var scaffold = screen.Form(new Rect(0, 0, 100, 30), actionsHeight: 2, headerHeight: 1, footerHeight: 2);
+        var body = new ButtonComponent();
+        var actions = new ButtonComponent();
+
+        screen.BeginFrame();
+        scaffold.AddBody("body", body);
+        scaffold.AddActions("actions", actions);
+        screen.CompleteFrame();
+
+        var focusChain = scaffold.CreateFocusChain();
+        var changed = screen.FocusFirst(focusChain);
+
+        TestAssert.Equal(new Rect(0, 1, 100, 25), scaffold.Body, "Form scaffold should expose body bounds directly.");
+        TestAssert.Equal(new Rect(0, 26, 100, 2), scaffold.Actions, "Form scaffold should expose action bounds directly.");
+        TestAssert.True(changed, "Form scaffold should build a reusable focus chain from added regions.");
+        TestAssert.True(screen.FocusedRegionKey == new ScreenRegionKey("body"), "Scaffold focus chain should respect helper-add order.");
         return Task.CompletedTask;
     }
 

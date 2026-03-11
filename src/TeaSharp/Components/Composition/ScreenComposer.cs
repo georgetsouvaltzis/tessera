@@ -87,6 +87,29 @@ public sealed partial class ScreenComposer
         return new DashboardScreen(this, frame, sidebar, main);
     }
 
+    /// <summary>
+    /// Creates a form-style screen scaffold with optional header and footer plus body and action regions.
+    /// </summary>
+    /// <param name="bounds">The full screen bounds to partition.</param>
+    /// <param name="actionsHeight">Requested height for the action bar.</param>
+    /// <param name="headerHeight">Header height in rows.</param>
+    /// <param name="footerHeight">Footer height in rows.</param>
+    /// <param name="minBodyHeight">Minimum height for the main form body.</param>
+    /// <param name="minActionsHeight">Minimum height for the action bar.</param>
+    public FormScreen Form(
+        Rect bounds,
+        int actionsHeight,
+        int headerHeight = 0,
+        int footerHeight = 0,
+        int minBodyHeight = 0,
+        int minActionsHeight = 0)
+    {
+        var frame = Frame(bounds, headerHeight, footerHeight);
+        var bodyHeight = Math.Max(0, frame.Body.Height - actionsHeight);
+        var (body, actions) = frame.SplitBodyRows(bodyHeight, minBodyHeight, minActionsHeight);
+        return new FormScreen(this, frame, body, actions);
+    }
+
     public void BeginFrame()
     {
         foreach (var region in _regions)

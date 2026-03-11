@@ -22,6 +22,8 @@ internal static class ScreenComposerTests
         yield return new TestCase("Components_MasterDetailScreen_CreateFocusChainTracksAddedRegions", MasterDetailScreen_CreateFocusChainTracksAddedRegions);
         yield return new TestCase("Components_ScreenComposer_DashboardCreatesExpectedRegions", ScreenComposer_DashboardCreatesExpectedRegions);
         yield return new TestCase("Components_DashboardScreen_CreateFocusChainTracksAddedRegions", DashboardScreen_CreateFocusChainTracksAddedRegions);
+        yield return new TestCase("Components_ScreenComposer_FormCreatesExpectedRegions", ScreenComposer_FormCreatesExpectedRegions);
+        yield return new TestCase("Components_FormScreen_CreateFocusChainTracksAddedRegions", FormScreen_CreateFocusChainTracksAddedRegions);
         yield return new TestCase("Components_ScreenComposer_MouseClickFocusesAndRoutesToRegisteredRegion", ScreenComposer_MouseClickFocusesAndRoutesToRegisteredRegion);
         yield return new TestCase("Components_ScreenComposer_FocusNextCyclesAcrossFocusableRegions", ScreenComposer_FocusNextCyclesAcrossFocusableRegions);
         yield return new TestCase("Components_ScreenComposer_FocusFirstTargetsFirstFocusableRegion", ScreenComposer_FocusFirstTargetsFirstFocusableRegion);
@@ -130,6 +132,48 @@ internal static class ScreenComposerTests
         TestAssert.True(firstChanged, "Dashboard focus chain should focus the first added focusable region.");
         TestAssert.True(nextChanged, "Dashboard focus chain should advance through tracked regions.");
         TestAssert.True(composer.FocusedRegionKey == sidebarKey, "Focus chain should preserve header-sidebar-main-footer order.");
+        return Task.CompletedTask;
+    }
+
+    private static Task ScreenComposer_FormCreatesExpectedRegions()
+    {
+        var composer = new ScreenComposer();
+        var scaffold = composer.Form(new Rect(0, 0, 100, 30), actionsHeight: 3, headerHeight: 2, footerHeight: 1);
+
+        TestAssert.Equal(new Rect(0, 0, 100, 2), scaffold.Header, "Form scaffold should expose header bounds.");
+        TestAssert.Equal(new Rect(0, 2, 100, 24), scaffold.Body, "Form scaffold should expose main body bounds.");
+        TestAssert.Equal(new Rect(0, 26, 100, 3), scaffold.Actions, "Form scaffold should expose action-bar bounds.");
+        TestAssert.Equal(new Rect(0, 29, 100, 1), scaffold.Footer, "Form scaffold should expose footer bounds.");
+        return Task.CompletedTask;
+    }
+
+    private static Task FormScreen_CreateFocusChainTracksAddedRegions()
+    {
+        var composer = new ScreenComposer();
+        var scaffold = composer.Form(new Rect(0, 0, 100, 24), actionsHeight: 2, headerHeight: 1, footerHeight: 1);
+        var header = new MouseProbeComponent();
+        var body = new MouseProbeComponent();
+        var actions = new MouseProbeComponent();
+        var footer = new MouseProbeComponent();
+        var headerKey = new ScreenRegionKey("header");
+        var bodyKey = new ScreenRegionKey("body");
+        var actionsKey = new ScreenRegionKey("actions");
+        var footerKey = new ScreenRegionKey("footer");
+
+        composer.BeginFrame();
+        scaffold.AddHeader(headerKey, header);
+        scaffold.AddBody(bodyKey, body);
+        scaffold.AddActions(actionsKey, actions);
+        scaffold.AddFooter(footerKey, footer);
+        composer.CompleteFrame();
+        var focusChain = scaffold.CreateFocusChain();
+
+        var firstChanged = composer.FocusFirst(focusChain);
+        var nextChanged = composer.FocusNext(focusChain);
+
+        TestAssert.True(firstChanged, "Form focus chain should focus the first added focusable region.");
+        TestAssert.True(nextChanged, "Form focus chain should advance through tracked regions.");
+        TestAssert.True(composer.FocusedRegionKey == bodyKey, "Focus chain should preserve header-body-actions-footer order.");
         return Task.CompletedTask;
     }
 

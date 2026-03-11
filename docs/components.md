@@ -154,6 +154,7 @@ The design follows patterns used in Bubble Tea examples:
       - use `ScreenComposer` + `ScreenRegionKey` for screen-scale region orchestration, `InputRouter` for mode/global key precedence, and `InteractiveScreenModel` when an app follows the standard screen-shell pattern
       - use `ScreenComposer.MasterDetail(...)` or `InteractiveScreenModel.MasterDetail(...)` for the common header + master + detail + footer shell instead of rebuilding pane math per app
       - use `ScreenComposer.Dashboard(...)` or `InteractiveScreenModel.Dashboard(...)` for the common header + sidebar + main + footer shell
+      - use `ScreenComposer.Form(...)` or `InteractiveScreenModel.Form(...)` for the common header + body + actions + footer shell
       - focus helpers for app shells (`CreateFocusChain(...)`, `HandleTabNavigation(...)`, `CaptureFocus()`, `RestoreFocus(...)`, `FocusFirstInteractive()`)
       - border-capable widgets now expose `Border` (`BorderStyle`) plus `Padding` (`Thickness`) so frame appearance and inner spacing use standard UI terms
       - state styling primitives for child items (`WidgetVisualState`, `WidgetStatePalette`, `ItemStateResolver`/`OptionStateResolver`)

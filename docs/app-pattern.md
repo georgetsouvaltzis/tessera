@@ -225,6 +225,22 @@ protected override void ComposeScreen(Rect bodyRect)
 
 This keeps the common `header + sidebar + main + footer` shell as a first-class API.
 
+For form-style apps, use the built-in form scaffold so action bars stop being ad-hoc row math:
+
+```csharp
+protected override void ComposeScreen(Rect bodyRect)
+{
+    var shell = Form(bodyRect, actionsHeight: 2, headerHeight: 1, footerHeight: 1);
+
+    shell.AddHeader(HeaderRegion, _titleBar);
+    shell.AddBody(FormRegion, _editor);
+    shell.AddActions(ActionsRegion, _actionBar);
+    shell.AddFooter(StatusRegion, _statusBar);
+}
+```
+
+This keeps the common `header + body + actions + footer` workflow shell as a first-class API.
+
 ## Scope Order
 
 Use this order unless you have a clear reason not to:

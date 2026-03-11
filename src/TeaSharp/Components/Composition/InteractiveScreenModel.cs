@@ -107,6 +107,24 @@ public abstract class InteractiveScreenModel : IModel
         int minMainWidth = 0) =>
         Screen.Dashboard(bounds, sidebarWidth, headerHeight, footerHeight, minSidebarWidth, minMainWidth);
 
+    /// <summary>
+    /// Creates a form-style screen scaffold with optional header and footer plus body and action regions.
+    /// </summary>
+    /// <param name="bounds">The full screen bounds to partition.</param>
+    /// <param name="actionsHeight">Requested height for the action bar.</param>
+    /// <param name="headerHeight">Header height in rows.</param>
+    /// <param name="footerHeight">Footer height in rows.</param>
+    /// <param name="minBodyHeight">Minimum height for the main form body.</param>
+    /// <param name="minActionsHeight">Minimum height for the action bar.</param>
+    protected FormScreen Form(
+        Rect bounds,
+        int actionsHeight,
+        int headerHeight = 0,
+        int footerHeight = 0,
+        int minBodyHeight = 0,
+        int minActionsHeight = 0) =>
+        Screen.Form(bounds, actionsHeight, headerHeight, footerHeight, minBodyHeight, minActionsHeight);
+
     protected bool SetFocus(ScreenRegionKey regionKey)
     {
         EnsureScreen();
