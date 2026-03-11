@@ -241,6 +241,38 @@ protected override void ComposeScreen(Rect bodyRect)
 
 This keeps the common `header + body + actions + footer` workflow shell as a first-class API.
 
+For confirm flows, prefer a dialog workflow over manual `Visible` toggles plus `CaptureFocus()` / `RestoreFocus(...)` plumbing:
+
+```csharp
+private readonly DialogComponent _deleteDialog = new(new DialogOptions(Title: "Delete"));
+private readonly DialogWorkflow _deleteWorkflow;
+
+public WorkspaceModel()
+{
+    _deleteWorkflow = CreateDialogWorkflow(_deleteDialog, DeleteDialogRegion, _focusChain);
+    _deleteDialog.Accepted += (_, _) => DeleteItem();
+}
+
+protected override void ComposeScreen(Rect bodyRect)
+{
+    // other regions
+    _deleteWorkflow.Compose(bodyRect);
+}
+
+private InputRouteResult HandleGlobalKey(KeyPressMsg key)
+{
+    if (key.IsCharacter('x'))
+    {
+        _deleteWorkflow.Show("Delete item", ["Delete the selected item?"]);
+        return InputRouteResult.HandledWithoutCommand;
+    }
+
+    return InputRouteResult.NotHandled;
+}
+```
+
+This keeps modal registration, open/close state, and focus restoration in one place.
+
 ## Scope Order
 
 Use this order unless you have a clear reason not to:

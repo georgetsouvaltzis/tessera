@@ -24,6 +24,8 @@ internal static class ScreenComposerTests
         yield return new TestCase("Components_DashboardScreen_CreateFocusChainTracksAddedRegions", DashboardScreen_CreateFocusChainTracksAddedRegions);
         yield return new TestCase("Components_ScreenComposer_FormCreatesExpectedRegions", ScreenComposer_FormCreatesExpectedRegions);
         yield return new TestCase("Components_FormScreen_CreateFocusChainTracksAddedRegions", FormScreen_CreateFocusChainTracksAddedRegions);
+        yield return new TestCase("Components_DialogWorkflow_ShowAndCompose_FocusesDialogRegion", DialogWorkflow_ShowAndCompose_FocusesDialogRegion);
+        yield return new TestCase("Components_DialogWorkflow_Dismiss_RestoresPriorFocus", DialogWorkflow_Dismiss_RestoresPriorFocus);
         yield return new TestCase("Components_ScreenComposer_MouseClickFocusesAndRoutesToRegisteredRegion", ScreenComposer_MouseClickFocusesAndRoutesToRegisteredRegion);
         yield return new TestCase("Components_ScreenComposer_FocusNextCyclesAcrossFocusableRegions", ScreenComposer_FocusNextCyclesAcrossFocusableRegions);
         yield return new TestCase("Components_ScreenComposer_FocusFirstTargetsFirstFocusableRegion", ScreenComposer_FocusFirstTargetsFirstFocusableRegion);
@@ -174,6 +176,62 @@ internal static class ScreenComposerTests
         TestAssert.True(firstChanged, "Form focus chain should focus the first added focusable region.");
         TestAssert.True(nextChanged, "Form focus chain should advance through tracked regions.");
         TestAssert.True(composer.FocusedRegionKey == bodyKey, "Focus chain should preserve header-body-actions-footer order.");
+        return Task.CompletedTask;
+    }
+
+    private static Task DialogWorkflow_ShowAndCompose_FocusesDialogRegion()
+    {
+        var composer = new ScreenComposer();
+        var dialog = new DialogComponent(new DialogOptions(Title: "Confirm"));
+        var baseKey = new ScreenRegionKey("base");
+        var dialogKey = new ScreenRegionKey("dialog");
+        var workflow = composer.CreateDialogWorkflow(dialog, dialogKey, new ScreenFocusChain([baseKey]));
+
+        composer.BeginFrame();
+        composer.AddComponent(baseKey, new Rect(0, 0, 20, 6), new MouseProbeComponent());
+        composer.CompleteFrame(baseKey);
+
+        workflow.Show("Confirm delete", ["Delete card?"]);
+
+        composer.BeginFrame();
+        composer.AddComponent(baseKey, new Rect(0, 0, 20, 6), new MouseProbeComponent());
+        workflow.Compose(new Rect(0, 0, 20, 6));
+        composer.CompleteFrame();
+
+        TestAssert.True(dialog.Visible, "Dialog workflow should open the dialog.");
+        TestAssert.True(dialog.Focused, "Dialog workflow should focus the dialog region after composition.");
+        TestAssert.True(composer.FocusedRegionKey == dialogKey, "Dialog workflow should move screen focus to the dialog region.");
+        TestAssert.Equal("Confirm delete", dialog.Title, "Dialog workflow should apply title updates.");
+        TestAssert.Equal("Delete card?", dialog.Lines[0], "Dialog workflow should apply content updates.");
+        return Task.CompletedTask;
+    }
+
+    private static Task DialogWorkflow_Dismiss_RestoresPriorFocus()
+    {
+        var composer = new ScreenComposer();
+        var dialog = new DialogComponent(new DialogOptions(Title: "Confirm"));
+        var baseComponent = new MouseProbeComponent();
+        var baseKey = new ScreenRegionKey("base");
+        var dialogKey = new ScreenRegionKey("dialog");
+        var workflow = composer.CreateDialogWorkflow(dialog, dialogKey, new ScreenFocusChain([baseKey]));
+
+        composer.BeginFrame();
+        composer.AddComponent(baseKey, new Rect(0, 0, 20, 6), baseComponent);
+        composer.CompleteFrame(baseKey);
+
+        workflow.Show();
+
+        composer.BeginFrame();
+        composer.AddComponent(baseKey, new Rect(0, 0, 20, 6), baseComponent);
+        workflow.Compose(new Rect(0, 0, 20, 6));
+        composer.CompleteFrame();
+
+        var changed = composer.Update(new KeyPressMsg(KeyCode.Escape));
+
+        TestAssert.True(changed, "Focused dialog should handle dismiss input.");
+        TestAssert.True(!dialog.Visible, "Dialog workflow should allow the dialog to close.");
+        TestAssert.True(composer.FocusedRegionKey == baseKey, "Dialog workflow should restore focus to the previously focused region.");
+        TestAssert.True(baseComponent.Focused, "Prior focus target should regain focus after dialog dismissal.");
         return Task.CompletedTask;
     }
 

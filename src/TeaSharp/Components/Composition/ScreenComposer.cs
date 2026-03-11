@@ -8,6 +8,7 @@ namespace TeaSharp.Components.Composition;
 public sealed partial class ScreenComposer
 {
     private readonly List<ScreenRegion> _regions = [];
+    private bool _frameFocusOverrideRequested;
 
     public IReadOnlyList<ScreenRegion> Regions => _regions;
 
@@ -88,6 +89,29 @@ public sealed partial class ScreenComposer
     }
 
     /// <summary>
+    /// Creates a dialog workflow that handles modal composition plus focus capture and restoration.
+    /// </summary>
+    /// <param name="dialog">The dialog controlled by the workflow.</param>
+    /// <param name="regionKey">The screen region key used for the modal dialog overlay.</param>
+    /// <param name="fallbackFocusChain">Fallback focus order when the captured focus target no longer exists.</param>
+    public DialogWorkflow CreateDialogWorkflow(
+        TeaSharp.Components.Prebuilt.DialogComponent dialog,
+        ScreenRegionKey regionKey,
+        ScreenFocusChain? fallbackFocusChain = null)
+    {
+        var workflow = new DialogWorkflow(
+            dialog,
+            regionKey,
+            CaptureFocus,
+            RestoreFocus,
+            RestoreFocus,
+            SetFocus,
+            bounds => AddModalComponent(regionKey, bounds, dialog));
+        workflow.FallbackFocusChain = fallbackFocusChain;
+        return workflow;
+    }
+
+    /// <summary>
     /// Creates a form-style screen scaffold with optional header and footer plus body and action regions.
     /// </summary>
     /// <param name="bounds">The full screen bounds to partition.</param>
@@ -112,6 +136,7 @@ public sealed partial class ScreenComposer
 
     public void BeginFrame()
     {
+        _frameFocusOverrideRequested = false;
         foreach (var region in _regions)
         {
             region.ApplyFocus(false, invokeFocus: false);
@@ -234,8 +259,12 @@ public sealed partial class ScreenComposer
     public bool Update(IMessage message) =>
         UpdateTyped(message);
 
-    public bool SetFocus(ScreenRegionKey regionKey) =>
-        ApplyFocus(regionKey, invokeFocus: true);
+    public bool SetFocus(ScreenRegionKey regionKey)
+    {
+        var changed = ApplyFocus(regionKey, invokeFocus: true);
+        _frameFocusOverrideRequested |= changed;
+        return changed;
+    }
 
     public bool FocusNext() =>
         FocusRelative(1);

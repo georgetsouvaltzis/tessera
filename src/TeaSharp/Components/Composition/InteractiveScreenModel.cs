@@ -108,6 +108,18 @@ public abstract class InteractiveScreenModel : IModel
         Screen.Dashboard(bounds, sidebarWidth, headerHeight, footerHeight, minSidebarWidth, minMainWidth);
 
     /// <summary>
+    /// Creates a dialog workflow that handles modal composition plus focus capture and restoration.
+    /// </summary>
+    /// <param name="dialog">The dialog controlled by the workflow.</param>
+    /// <param name="regionKey">The screen region key used for the modal dialog overlay.</param>
+    /// <param name="fallbackFocusChain">Fallback focus order when the captured focus target no longer exists.</param>
+    protected DialogWorkflow CreateDialogWorkflow(
+        TeaSharp.Components.Prebuilt.DialogComponent dialog,
+        ScreenRegionKey regionKey,
+        ScreenFocusChain? fallbackFocusChain = null) =>
+        Screen.CreateDialogWorkflow(dialog, regionKey, fallbackFocusChain);
+
+    /// <summary>
     /// Creates a form-style screen scaffold with optional header and footer plus body and action regions.
     /// </summary>
     /// <param name="bounds">The full screen bounds to partition.</param>

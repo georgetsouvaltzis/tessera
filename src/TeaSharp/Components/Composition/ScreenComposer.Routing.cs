@@ -14,6 +14,11 @@ public sealed partial class ScreenComposer
             return;
         }
 
+        if (_frameFocusOverrideRequested && FocusedRegionKey is { } requestedFocusKey && ApplyFocus(requestedFocusKey, invokeFocus: false))
+        {
+            return;
+        }
+
         if (preferredFocusRegionKey is { } preferredKey && ApplyFocus(preferredKey, invokeFocus: false))
         {
             return;

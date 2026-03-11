@@ -21,6 +21,7 @@ internal static class InteractiveScreenModelTests
         yield return new TestCase("Application_InteractiveScreenModel_MasterDetailHelper_ComposesShell", InteractiveScreenModel_MasterDetailHelper_ComposesShell);
         yield return new TestCase("Application_InteractiveScreenModel_DashboardHelper_ComposesShell", InteractiveScreenModel_DashboardHelper_ComposesShell);
         yield return new TestCase("Application_InteractiveScreenModel_FormHelper_ComposesShell", InteractiveScreenModel_FormHelper_ComposesShell);
+        yield return new TestCase("Application_InteractiveScreenModel_CreateDialogWorkflow_OpensAndRestoresFocus", InteractiveScreenModel_CreateDialogWorkflow_OpensAndRestoresFocus);
         yield return new TestCase("Application_InteractiveScreenModel_HandleTabNavigation_UsesFocusChainOrder", InteractiveScreenModel_HandleTabNavigation_UsesFocusChainOrder);
         yield return new TestCase("Application_InteractiveScreenModel_RestoreFocus_UsesCapturedSnapshot", InteractiveScreenModel_RestoreFocus_UsesCapturedSnapshot);
     }
@@ -86,6 +87,21 @@ internal static class InteractiveScreenModelTests
         TestAssert.Equal(new Rect(0, 1, 40, 8), model.BodyBounds, "Interactive model helper should expose body bounds through the form scaffold.");
         TestAssert.Equal(new Rect(0, 9, 40, 2), model.ActionsBounds, "Interactive model helper should expose action bounds through the form scaffold.");
         TestAssert.Equal(new Rect(0, 11, 40, 1), model.FooterBounds, "Interactive model helper should expose footer bounds through the form scaffold.");
+        return Task.CompletedTask;
+    }
+
+    private static Task InteractiveScreenModel_CreateDialogWorkflow_OpensAndRestoresFocus()
+    {
+        var model = new ProbeDialogWorkflowModel();
+
+        model.OpenDialog();
+        _ = model.View();
+
+        TestAssert.True(model.CurrentFocusedRegionKey == ProbeDialogWorkflowModel.DialogRegionId, "Dialog workflow helper should move focus to the dialog region after composition.");
+
+        model.DismissDialog();
+
+        TestAssert.True(model.CurrentFocusedRegionKey == ProbeDialogWorkflowModel.PrimaryRegionId, "Dialog workflow helper should restore focus after dialog dismissal.");
         return Task.CompletedTask;
     }
 
@@ -297,6 +313,62 @@ internal static class InteractiveScreenModelTests
             scaffold.AddBody("probe.form.body", _body);
             scaffold.AddActions("probe.form.actions", _actions);
             scaffold.AddFooter("probe.form.footer", new StatusBarComponent(new StatusBarOptions(LeftText: "Footer")));
+        }
+    }
+
+    private sealed class ProbeDialogWorkflowModel : InteractiveScreenModel
+    {
+        public static readonly ScreenRegionKey PrimaryRegionId = new("probe.dialog.primary");
+        public static readonly ScreenRegionKey DialogRegionId = new("probe.dialog.overlay");
+
+        private readonly ProbeButton _primary = new();
+        private readonly DialogComponent _dialog = new(new DialogOptions(Title: "Delete"));
+        private readonly DialogWorkflow _workflow;
+        private readonly ScreenFocusChain _focusChain;
+
+        public ProbeDialogWorkflowModel()
+        {
+            _focusChain = CreateFocusChain(PrimaryRegionId);
+            _workflow = CreateDialogWorkflow(_dialog, DialogRegionId, _focusChain);
+        }
+
+        public ScreenRegionKey? CurrentFocusedRegionKey => FocusedRegionKey;
+
+        public override Command? Init() => null;
+
+        public override Command? Update(IMessage message)
+        {
+            return message is KeyPressMsg key
+                ? RouteKey(key)
+                : null;
+        }
+
+        public override View View()
+        {
+            var canvas = new Canvas(30, 8);
+            RenderScreen(canvas);
+            return TeaSharp.Core.Abstractions.View.From(canvas.Render());
+        }
+
+        protected override Rect GetBodyRect() => new(0, 0, 30, 8);
+
+        protected override ScreenRegionKey? PreferredFocusRegionKey => PrimaryRegionId;
+
+        protected override void ComposeScreen(Rect bodyRect)
+        {
+            Screen.AddComponent(PrimaryRegionId, bodyRect, _primary);
+            _workflow.Compose(bodyRect);
+        }
+
+        public void OpenDialog()
+        {
+            _workflow.Show("Delete", ["Delete item?"]);
+        }
+
+        public void DismissDialog()
+        {
+            _dialog.Focused = true;
+            _dialog.Update(new KeyPressMsg(KeyCode.Escape));
         }
     }
 

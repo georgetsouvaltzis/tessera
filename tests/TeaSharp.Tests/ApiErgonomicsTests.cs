@@ -20,6 +20,7 @@ internal static class ApiErgonomicsTests
         yield return new TestCase("ApiErgonomics_MasterDetailScreen_ReducesShellBookkeeping", MasterDetailScreen_ReducesShellBookkeeping);
         yield return new TestCase("ApiErgonomics_DashboardScreen_ReducesShellBookkeeping", DashboardScreen_ReducesShellBookkeeping);
         yield return new TestCase("ApiErgonomics_FormScreen_ReducesShellBookkeeping", FormScreen_ReducesShellBookkeeping);
+        yield return new TestCase("ApiErgonomics_DialogWorkflow_ReducesOpenCloseBoilerplate", DialogWorkflow_ReducesOpenCloseBoilerplate);
         yield return new TestCase("ApiErgonomics_TextInputOptions_ConfigureComponentWithoutNestedInputAccess", TextInputOptions_ConfigureComponentWithoutNestedInputAccess);
         yield return new TestCase("ApiErgonomics_TextAreaOptions_ConfigureComponentWithoutNestedInputAccess", TextAreaOptions_ConfigureComponentWithoutNestedInputAccess);
         yield return new TestCase("ApiErgonomics_ListComponent_ExposesSelectionWithoutModelAccess", ListComponent_ExposesSelectionWithoutModelAccess);
@@ -128,6 +129,35 @@ internal static class ApiErgonomicsTests
         TestAssert.Equal(new Rect(0, 26, 100, 2), scaffold.Actions, "Form scaffold should expose action bounds directly.");
         TestAssert.True(changed, "Form scaffold should build a reusable focus chain from added regions.");
         TestAssert.True(screen.FocusedRegionKey == new ScreenRegionKey("body"), "Scaffold focus chain should respect helper-add order.");
+        return Task.CompletedTask;
+    }
+
+    private static Task DialogWorkflow_ReducesOpenCloseBoilerplate()
+    {
+        var screen = new ScreenComposer();
+        var dialog = new DialogComponent(new DialogOptions(Title: "Confirm"));
+        var editor = new ButtonComponent();
+        var editorKey = new ScreenRegionKey("editor");
+        var dialogKey = new ScreenRegionKey("dialog");
+        var workflow = screen.CreateDialogWorkflow(dialog, dialogKey, new ScreenFocusChain([editorKey]));
+
+        screen.BeginFrame();
+        screen.AddComponent(editorKey, new Rect(0, 0, 20, 6), editor);
+        screen.CompleteFrame(editorKey);
+
+        workflow.Show("Confirm delete", ["Delete item?"]);
+
+        screen.BeginFrame();
+        screen.AddComponent(editorKey, new Rect(0, 0, 20, 6), editor);
+        workflow.Compose(new Rect(0, 0, 20, 6));
+        screen.CompleteFrame();
+
+        TestAssert.True(screen.FocusedRegionKey == dialogKey, "Dialog workflow should move focus to the dialog without manual focus bookkeeping.");
+
+        var restored = workflow.Hide();
+
+        TestAssert.True(restored, "Dialog workflow should restore prior focus when hidden programmatically.");
+        TestAssert.True(screen.FocusedRegionKey == editorKey, "Dialog workflow should return focus to the previously active region.");
         return Task.CompletedTask;
     }
 
