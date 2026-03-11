@@ -8,6 +8,7 @@ namespace TeaSharp.Components;
 public sealed class ComponentComposer
 {
     private readonly List<ComponentSlot> _slots = [];
+    private int _focusedSlotIndex = -1;
 
     public IReadOnlyList<ComponentSlot> Slots => _slots;
 
@@ -17,12 +18,12 @@ public sealed class ComponentComposer
 
     public KeyboardRoutingMode KeyboardRoutingMode { get; set; } = KeyboardRoutingMode.FocusedOnly;
 
-    public int FocusedSlotIndex { get; private set; } = -1;
+    public int FocusedSlotIndex => _focusedSlotIndex;
 
     public void Clear()
     {
         _slots.Clear();
-        FocusedSlotIndex = -1;
+        _focusedSlotIndex = -1;
     }
 
     public void Add(ICanvasComponent component, Rect bounds)
@@ -30,94 +31,44 @@ public sealed class ComponentComposer
         _slots.Add(new ComponentSlot(component, bounds));
         if (component is IFocusableComponent { Focused: true })
         {
-            FocusedSlotIndex = _slots.Count - 1;
+            _focusedSlotIndex = _slots.Count - 1;
         }
     }
 
     public bool Update(IMessage message)
     {
-        if (message is MouseMsg mouse)
-        {
-            return UpdateMouse(mouse);
-        }
-
-        if (KeyboardRoutingMode == KeyboardRoutingMode.FocusedOnly && TryGetFocusedStateful(out var focusedStateful))
-        {
-            return focusedStateful.Update(message);
-        }
-
-        var changed = false;
-        foreach (var slot in _slots)
-        {
-            if (slot.Component is IStatefulComponent stateful)
-            {
-                changed |= stateful.Update(message);
-            }
-        }
-
-        return changed;
+        return ComponentRouting.Update(
+            _slots,
+            message,
+            ClickToFocusEnabled,
+            RouteMouseWheelToFocusedSlot,
+            KeyboardRoutingMode,
+            ref _focusedSlotIndex);
     }
 
     public bool SetFocusedSlot(int index)
     {
-        if (index < 0 || index >= _slots.Count)
-        {
-            return false;
-        }
-
-        if (_slots[index].Component is not IFocusableComponent)
-        {
-            return false;
-        }
-
-        return ApplyFocus(index);
+        return ComponentRouting.SetFocusedSlot(_slots, index, ref _focusedSlotIndex);
     }
 
     public bool FocusFirst()
     {
-        var targetIndex = FindFocusableSlot(startIndex: -1, step: 1);
-        return targetIndex >= 0 && ApplyFocus(targetIndex);
+        return ComponentRouting.FocusFirst(_slots, ref _focusedSlotIndex);
     }
 
     public bool FocusNext()
     {
-        var targetIndex = FindFocusableSlot(FocusedSlotIndex, 1);
-        if (targetIndex < 0)
-        {
-            return false;
-        }
-
-        return ApplyFocus(targetIndex);
+        return ComponentRouting.FocusNext(_slots, ref _focusedSlotIndex);
     }
 
     public bool FocusPrevious()
     {
-        var startIndex = FocusedSlotIndex >= 0 ? FocusedSlotIndex : _slots.Count;
-        var targetIndex = FindFocusableSlot(startIndex, -1);
-        if (targetIndex < 0)
-        {
-            return false;
-        }
-
-        return ApplyFocus(targetIndex);
+        return ComponentRouting.FocusPrevious(_slots, ref _focusedSlotIndex);
     }
 
     public bool ClearFocus()
     {
-        var changed = false;
-        foreach (var slot in _slots)
-        {
-            if (slot.Component is not IFocusableComponent focusable || !focusable.Focused)
-            {
-                continue;
-            }
-
-            focusable.Focused = false;
-            changed = true;
-        }
-
-        FocusedSlotIndex = -1;
-        return changed;
+        return ComponentRouting.ClearFocus(_slots, ref _focusedSlotIndex);
     }
 
     public void Render(Canvas canvas)
@@ -126,124 +77,5 @@ public sealed class ComponentComposer
         {
             slot.Component.Render(canvas, slot.Bounds);
         }
-    }
-
-    private bool UpdateMouse(MouseMsg mouse)
-    {
-        var changed = false;
-        var targetIndex = FindTopMostSlot(mouse.X, mouse.Y);
-        if (targetIndex < 0 && RouteMouseWheelToFocusedSlot && mouse is MouseWheelMsg && FocusedSlotIndex >= 0)
-        {
-            targetIndex = FocusedSlotIndex;
-        }
-
-        if (targetIndex >= 0
-            && ClickToFocusEnabled
-            && mouse is MouseClickMsg { Button: MouseButton.Left }
-            && _slots[targetIndex].Component is IFocusableComponent)
-        {
-            changed |= ApplyFocus(targetIndex);
-        }
-
-        if (targetIndex < 0)
-        {
-            return changed;
-        }
-
-        var slot = _slots[targetIndex];
-        if (slot.Component is IMouseStatefulComponent mouseStateful)
-        {
-            changed |= mouseStateful.UpdateMouse(mouse, slot.Bounds);
-            return changed;
-        }
-
-        if (slot.Component is IStatefulComponent stateful)
-        {
-            changed |= stateful.Update(mouse);
-        }
-
-        return changed;
-    }
-
-    private int FindFocusableSlot(int startIndex, int step)
-    {
-        if (_slots.Count == 0)
-        {
-            return -1;
-        }
-
-        for (var offset = 1; offset <= _slots.Count; offset++)
-        {
-            var index = startIndex + (offset * step);
-            if (index < 0)
-            {
-                index += _slots.Count;
-            }
-            else if (index >= _slots.Count)
-            {
-                index -= _slots.Count;
-            }
-
-            if (_slots[index].Component is IFocusableComponent)
-            {
-                return index;
-            }
-        }
-
-        return -1;
-    }
-
-    private bool TryGetFocusedStateful(out IStatefulComponent stateful)
-    {
-        stateful = default!;
-        if (FocusedSlotIndex < 0 || FocusedSlotIndex >= _slots.Count)
-        {
-            return false;
-        }
-
-        if (_slots[FocusedSlotIndex].Component is not IStatefulComponent focusedStateful)
-        {
-            return false;
-        }
-
-        stateful = focusedStateful;
-        return true;
-    }
-
-    private int FindTopMostSlot(int x, int y)
-    {
-        for (var i = _slots.Count - 1; i >= 0; i--)
-        {
-            if (_slots[i].Bounds.Contains(x, y))
-            {
-                return i;
-            }
-        }
-
-        return -1;
-    }
-
-    private bool ApplyFocus(int index)
-    {
-        var changed = false;
-        for (var i = 0; i < _slots.Count; i++)
-        {
-            if (_slots[i].Component is not IFocusableComponent focusable)
-            {
-                continue;
-            }
-
-            var shouldFocus = i == index;
-            if (focusable.Focused == shouldFocus)
-            {
-                continue;
-            }
-
-            focusable.Focused = shouldFocus;
-            changed = true;
-        }
-
-        FocusedSlotIndex = index;
-        return changed;
     }
 }

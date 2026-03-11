@@ -69,8 +69,15 @@ public sealed class LayoutContainerComponent : IStatefulComponent, IMouseStatefu
 
     public bool Update(IMessage message)
     {
-        var composer = CreateComposer();
-        return composer.Update(message);
+        var slots = CreateSlots();
+        var focusedSlotIndex = ComponentRouting.DetectFocusedSlotIndex(slots);
+        return ComponentRouting.Update(
+            slots,
+            message,
+            true,
+            true,
+            KeyboardRoutingMode.FocusedOnly,
+            ref focusedSlotIndex);
     }
 
     public bool UpdateMouse(MouseMsg message, Rect bounds)
@@ -87,8 +94,15 @@ public sealed class LayoutContainerComponent : IStatefulComponent, IMouseStatefu
             return changed;
         }
 
-        var composer = CreateComposer(rects);
-        changed |= composer.Update(message);
+        var slots = CreateSlots(rects);
+        var focusedSlotIndex = ComponentRouting.DetectFocusedSlotIndex(slots);
+        changed |= ComponentRouting.Update(
+            slots,
+            message,
+            true,
+            true,
+            KeyboardRoutingMode.FocusedOnly,
+            ref focusedSlotIndex);
         return changed;
     }
 
@@ -113,23 +127,17 @@ public sealed class LayoutContainerComponent : IStatefulComponent, IMouseStatefu
         }
     }
 
-    private ComponentComposer CreateComposer(List<Rect>? rects = null)
+    private List<ComponentSlot> CreateSlots(List<Rect>? rects = null)
     {
-        var composer = new ComponentComposer
-        {
-            ClickToFocusEnabled = true,
-            RouteMouseWheelToFocusedSlot = true,
-            KeyboardRoutingMode = KeyboardRoutingMode.FocusedOnly,
-        };
-
         var childRects = rects ?? CreatePlaceholderRects();
         var count = Math.Min(_children.Count, childRects.Count);
+        var slots = new List<ComponentSlot>(count);
         for (var i = 0; i < count; i++)
         {
-            composer.Add(_children[i].Component, childRects[i]);
+            slots.Add(new ComponentSlot(_children[i].Component, childRects[i]));
         }
 
-        return composer;
+        return slots;
     }
 
     private List<Rect> CreatePlaceholderRects()

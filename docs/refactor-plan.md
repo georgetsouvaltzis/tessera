@@ -26,6 +26,7 @@ Status: done
 - change `ComponentComposer` to focused-slot keyboard routing by default
 - remove reflection-based focus discovery and focus mutation
 - move `LayoutContainerComponent` into its own file and align its routing model with `ComponentComposer`
+- extract shared internal component-routing logic so library internals can reuse the routing semantics without depending on the public advanced composer type
 
 ## Phase 2: Test Infrastructure
 
