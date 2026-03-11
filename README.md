@@ -49,12 +49,6 @@ await program.RunAsync();
 
 ## Build
 
-Use the repo build scripts for deterministic CLI builds:
-
-- `./scripts/build-main.sh`
-- `./scripts/build-examples.sh`
-- `./scripts/build-all.sh`
-
 The solution files remain useful for IDE navigation:
 
 - `TeaSharp.slnx`

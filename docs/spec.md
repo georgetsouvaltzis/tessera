@@ -196,7 +196,6 @@ Phase 3:
 - TFM: `net10.0` for all projects.
 - Main solution entrypoint for IDE navigation: `TeaSharp.slnx`.
 - Example solution entrypoint for IDE navigation: `TeaSharp.Examples.slnx`.
-- Deterministic CLI builds: `./scripts/build-main.sh`, `./scripts/build-examples.sh`, `./scripts/build-all.sh`.
 
 ## 12. Parity Tracking
 

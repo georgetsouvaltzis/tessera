@@ -33,6 +33,7 @@ internal static class PrebuiltWidgetTests
         yield return new TestCase("Prebuilt_ListComponent_NavigatesSelection", ListComponent_NavigatesSelection);
         yield return new TestCase("Prebuilt_ListComponent_SelectionChangedEvent_ReportsTransition", ListComponent_SelectionChangedEvent_ReportsTransition);
         yield return new TestCase("Prebuilt_ListComponent_MouseClickSelectsRow", ListComponent_MouseClickSelectsRow);
+        yield return new TestCase("Prebuilt_ListComponent_MouseClickOutsideLabel_DoesNotSelectRow", ListComponent_MouseClickOutsideLabel_DoesNotSelectRow);
         yield return new TestCase("Prebuilt_ListComponent_MouseMotionShowsHoverMarker", ListComponent_MouseMotionShowsHoverMarker);
         yield return new TestCase("Prebuilt_ListComponent_AppliesCustomItemStateStyles", ListComponent_AppliesCustomItemStateStyles);
         yield return new TestCase("Prebuilt_DropdownComponent_SelectsOpenMenuItem", DropdownComponent_SelectsOpenMenuItem);
@@ -358,6 +359,21 @@ internal static class PrebuiltWidgetTests
 
         TestAssert.True(changed, "List mouse click should report selection changes.");
         TestAssert.Equal("two", list.SelectedItem ?? string.Empty, "List mouse click should select clicked row.");
+        return Task.CompletedTask;
+    }
+
+    private static Task ListComponent_MouseClickOutsideLabel_DoesNotSelectRow()
+    {
+        var list = new ListComponent<string>(["one", "two", "three"], x => x)
+        {
+            Border = BorderStyle.None,
+        };
+
+        list.Update(new KeyPressMsg(KeyCode.Down));
+        var changed = list.UpdateMouse(new MouseClickMsg(MouseButton.Left, 18, 1), new Rect(0, 0, 20, 3));
+
+        TestAssert.True(!changed, "List mouse click in trailing whitespace should not report a selection change.");
+        TestAssert.Equal("two", list.SelectedItem ?? string.Empty, "List mouse click in trailing whitespace should preserve the current selection.");
         return Task.CompletedTask;
     }
 

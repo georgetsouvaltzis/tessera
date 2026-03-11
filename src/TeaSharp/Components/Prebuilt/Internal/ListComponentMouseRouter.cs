@@ -1,3 +1,4 @@
+using System.Globalization;
 using TeaSharp.Components.UiKit;
 using TeaSharp.Components.Prebuilt;
 using TeaSharp.Components.Primitives;
@@ -66,6 +67,11 @@ internal static class ListComponentMouseRouter
             return false;
         }
 
+        if (!IsPointerWithinRowLabel(click.X, content.X, content.Width, model.LabelFor(visibleRows[row].Item)))
+        {
+            return hoverChanged;
+        }
+
         return hoverChanged | model.SelectFilteredIndex(visibleRows[row].Index);
     }
 
@@ -93,6 +99,31 @@ internal static class ListComponentMouseRouter
             return setHoveredFilteredIndex(null);
         }
 
+        if (!IsPointerWithinRowLabel(x, content.X, content.Width, model.LabelFor(rows[row].Item)))
+        {
+            return setHoveredFilteredIndex(null);
+        }
+
         return setHoveredFilteredIndex(rows[row].Index);
+    }
+
+    private static bool IsPointerWithinRowLabel(int pointerX, int contentX, int contentWidth, string label)
+    {
+        var hitWidth = Math.Min(contentWidth, 2 + MeasureDisplayWidth(label));
+        return pointerX >= contentX && pointerX < contentX + hitWidth;
+    }
+
+    private static int MeasureDisplayWidth(string text)
+    {
+        var width = 0;
+        var index = 0;
+        while (index < text.Length)
+        {
+            var textElement = StringInfo.GetNextTextElement(text, index);
+            width += TextElementWidth.Measure(textElement);
+            index += textElement.Length;
+        }
+
+        return width;
     }
 }
