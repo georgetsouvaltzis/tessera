@@ -52,6 +52,7 @@ The design follows patterns used in Bubble Tea examples:
   - `ScreenComposer`: named interactive regions for screen-scale layout snapshots.
     - region identity uses `ScreenRegionKey`; raw string overloads remain only as advanced convenience bridges
     - build once per frame, route later from the stored snapshot
+    - `Frame(...)` creates a standard header/body/footer shell for common app layouts
     - focus ownership APIs: `SetFocus`, `FocusNext`, `FocusPrevious`
     - typed focus state via `FocusedRegionKey`
     - mouse routing by registered region bounds instead of repeated app-local rect math
@@ -146,6 +147,7 @@ The design follows patterns used in Bubble Tea examples:
       - options-based constructors (`LabelOptions`, `ButtonOptions`, `TextInputOptions`, `TextAreaOptions`, `ListOptions<T>`, `TableOptions`, `ProgressBarOptions`, `StatusBarOptions`, `DialogOptions`, `LayoutContainerOptions`, `TabsOptions`, `MenuBarOptions`, `ContextMenuOptions`, `NumberInputOptions`, `DatePickerOptions`, `TimePickerOptions`, `MarkdownViewerOptions`, `LogViewerOptions`, `ModalOptions`)
       - optional catalog entrypoints (`PrebuiltCatalog`, `ProductivityCatalog`, `UiKitCatalog`) for namespace-scoped discovery
       - component-level state accessors instead of raw nested models (`TextInputComponent.Value` / `Placeholder` / `MaxLength`, `TextAreaComponent.Value`, `ListComponent<T>.SelectedItem` / `SetItems(...)`, `ComboboxComponent.FilterText` / `Placeholder`, `CommandPaletteComponent.QueryText` / `SetQueryText(...)` / `ClearQuery()`, `TableComponent.PageSize` / `SortColumn` / `SortDescending`, `NumberInputComponent.Text`, `ButtonComponent.WasPressed` / `PressCount` / `Hovered` / `Pressed`)
+      - one-shot interaction consumption helpers for app code (`ButtonComponent.TryConsumePress()`, `TextInputComponent.TryConsumeSubmit(...)` / `TryConsumeCancel(...)`, `DialogComponent.TryConsumeResult(...)`, `NumberInputComponent.TryConsumeSubmit(...)`, `MenuBarComponent.TryConsumeActivation(...)`, `ContextMenuComponent.TryConsumeExecution(...)`, `CommandPaletteComponent.TryConsumeExecution(...)`)
       - low-level key-map / interaction-profile properties are still available, but now marked advanced so default IntelliSense emphasizes the common setup path
       - use `ScreenComposer` + `ScreenRegionKey` for screen-scale region orchestration, `InputRouter` for mode/global key precedence, and `InteractiveScreenModel` when an app follows the standard screen-shell pattern
       - border-capable widgets now expose `Border` (`BorderStyle`) plus `Padding` (`Thickness`) so frame appearance and inner spacing use standard UI terms

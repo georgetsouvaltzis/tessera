@@ -17,11 +17,29 @@ internal static class ScreenComposerTests
 {
     public static IEnumerable<TestCase> Cases()
     {
+        yield return new TestCase("Components_ScreenComposer_FrameCreatesHeaderBodyFooterRegions", ScreenComposer_FrameCreatesHeaderBodyFooterRegions);
         yield return new TestCase("Components_ScreenComposer_MouseClickFocusesAndRoutesToRegisteredRegion", ScreenComposer_MouseClickFocusesAndRoutesToRegisteredRegion);
         yield return new TestCase("Components_ScreenComposer_FocusNextCyclesAcrossFocusableRegions", ScreenComposer_FocusNextCyclesAcrossFocusableRegions);
         yield return new TestCase("Components_ScreenComposer_CompleteFrameAppliesPreferredFocus", ScreenComposer_CompleteFrameAppliesPreferredFocus);
         yield return new TestCase("Components_ScreenComposer_PassiveToastOverlayDoesNotInterceptMouse", ScreenComposer_PassiveToastOverlayDoesNotInterceptMouse);
         yield return new TestCase("Components_ScreenComposer_ModalOverlayInterceptsUnderlyingMouse", ScreenComposer_ModalOverlayInterceptsUnderlyingMouse);
+    }
+
+    private static Task ScreenComposer_FrameCreatesHeaderBodyFooterRegions()
+    {
+        var composer = new ScreenComposer();
+        var frame = composer.Frame(new Rect(0, 0, 80, 24), headerHeight: 2, footerHeight: 1);
+        var (left, right) = frame.SplitBodyColumns(24);
+        var (top, bottom) = frame.SplitBodyRows(10);
+
+        TestAssert.Equal(new Rect(0, 0, 80, 2), frame.Header, "Frame should reserve requested header height.");
+        TestAssert.Equal(new Rect(0, 2, 80, 21), frame.Body, "Frame should allocate body between header and footer.");
+        TestAssert.Equal(new Rect(0, 23, 80, 1), frame.Footer, "Frame should reserve requested footer height.");
+        TestAssert.Equal(24, left.Width, "Body column split should preserve requested left width when possible.");
+        TestAssert.Equal(56, right.Width, "Body column split should preserve remaining width.");
+        TestAssert.Equal(10, top.Height, "Body row split should preserve requested top height when possible.");
+        TestAssert.Equal(11, bottom.Height, "Body row split should preserve remaining height.");
+        return Task.CompletedTask;
     }
 
     private static Task ScreenComposer_MouseClickFocusesAndRoutesToRegisteredRegion()

@@ -161,11 +161,10 @@ internal sealed class AdvancedWidgetsModel : IModel
             var mouseChanged = false;
             if (_palette.IsOpen)
             {
-                var beforeCommand = _palette.LastExecutedItemId;
                 mouseChanged |= _palette.UpdateMouse(mouse, layout.ContentRect);
-                if (!string.Equals(beforeCommand, _palette.LastExecutedItemId, StringComparison.Ordinal))
+                if (_palette.TryConsumeExecution(out var commandId))
                 {
-                    ExecutePaletteCommand(_palette.LastExecutedItemId);
+                    ExecutePaletteCommand(commandId);
                     mouseChanged = true;
                 }
             }
@@ -246,11 +245,10 @@ internal sealed class AdvancedWidgetsModel : IModel
             return null;
         }
 
-        var previousCommand = _palette.LastExecutedItemId;
         var paletteChanged = _palette.Update(key);
-        if (!string.Equals(previousCommand, _palette.LastExecutedItemId, StringComparison.Ordinal))
+        if (_palette.TryConsumeExecution(out var commandId))
         {
-            ExecutePaletteCommand(_palette.LastExecutedItemId);
+            ExecutePaletteCommand(commandId);
             return null;
         }
 

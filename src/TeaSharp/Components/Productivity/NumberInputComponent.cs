@@ -17,6 +17,8 @@ public sealed class NumberInputComponent : IStatefulComponent, IFocusableCompone
 {
     private bool _replaceOnNextCharacter = true;
     private readonly TextInputModel _input = new();
+    private long _submitVersion;
+    private long _consumedSubmitVersion;
 
     public NumberInputComponent()
     {
@@ -85,6 +87,22 @@ public sealed class NumberInputComponent : IStatefulComponent, IFocusableCompone
         SyncInput();
     }
 
+    /// <summary>
+    /// Consumes the latest submitted numeric value exactly once.
+    /// </summary>
+    public bool TryConsumeSubmit(out double value)
+    {
+        if (_submitVersion == _consumedSubmitVersion || LastSubmittedValue is not double submitted)
+        {
+            value = default;
+            return false;
+        }
+
+        _consumedSubmitVersion = _submitVersion;
+        value = submitted;
+        return true;
+    }
+
     public bool Update(IMessage message)
     {
         if (!Focused || Disabled || ReadOnly)
@@ -116,6 +134,7 @@ public sealed class NumberInputComponent : IStatefulComponent, IFocusableCompone
                 {
                     Value = NumberInputFormatting.Clamp(parsed, Min, Max);
                     LastSubmittedValue = Value;
+                    _submitVersion++;
                     SyncInput();
                 }
 
@@ -147,6 +166,7 @@ public sealed class NumberInputComponent : IStatefulComponent, IFocusableCompone
         {
             Value = NumberInputFormatting.Clamp(submitted, Min, Max);
             LastSubmittedValue = Value;
+            _submitVersion++;
             SyncInput();
             return true;
         }

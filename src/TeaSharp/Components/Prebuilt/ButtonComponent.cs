@@ -60,6 +60,20 @@ public sealed class ButtonComponent : IStatefulComponent, IMouseStatefulComponen
 
     public bool WasPressed { get; private set; }
 
+    /// <summary>
+    /// Consumes the latest button press notification exactly once.
+    /// </summary>
+    public bool TryConsumePress()
+    {
+        if (!WasPressed)
+        {
+            return false;
+        }
+
+        WasPressed = false;
+        return true;
+    }
+
     [EditorBrowsable(EditorBrowsableState.Advanced)]
     public WidgetStatePalette StatePalette { get; } = WidgetStatePalette.CreateDefault();
 

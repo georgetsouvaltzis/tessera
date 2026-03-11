@@ -1,6 +1,7 @@
 using TeaSharp.Components.Primitives;
 using TeaSharp.Core.Abstractions;
 using TeaSharp.Core.Messages;
+using System.Diagnostics.CodeAnalysis;
 
 namespace TeaSharp.Components.Composition;
 
@@ -15,6 +16,32 @@ public sealed partial class ScreenComposer
     public string? FocusedRegionId => FocusedRegionKey?.Value;
 
     public bool RouteMouseWheelToFocusedRegion { get; set; } = true;
+
+    /// <summary>
+    /// Creates a common screen shell split into header, body, and footer regions.
+    /// </summary>
+    /// <param name="bounds">The full screen bounds to partition.</param>
+    /// <param name="headerHeight">Header height in rows.</param>
+    /// <param name="footerHeight">Footer height in rows.</param>
+    [SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "Instance call keeps the fluent screen-composition entrypoint on ScreenComposer.")]
+    public ScreenFrameLayout Frame(Rect bounds, int headerHeight = 0, int footerHeight = 0)
+    {
+        var totalHeight = Math.Max(0, bounds.Height);
+        var safeHeaderHeight = Math.Clamp(headerHeight, 0, totalHeight);
+        var remainingAfterHeader = Math.Max(0, totalHeight - safeHeaderHeight);
+        var safeFooterHeight = Math.Clamp(footerHeight, 0, remainingAfterHeader);
+        var bodyHeight = Math.Max(0, totalHeight - safeHeaderHeight - safeFooterHeight);
+
+        var header = safeHeaderHeight == 0
+            ? new Rect(bounds.X, bounds.Y, bounds.Width, 0)
+            : new Rect(bounds.X, bounds.Y, bounds.Width, safeHeaderHeight);
+        var body = new Rect(bounds.X, bounds.Y + safeHeaderHeight, bounds.Width, bodyHeight);
+        var footer = safeFooterHeight == 0
+            ? new Rect(bounds.X, body.Bottom, bounds.Width, 0)
+            : new Rect(bounds.X, body.Bottom, bounds.Width, safeFooterHeight);
+
+        return new ScreenFrameLayout(bounds, header, body, footer);
+    }
 
     public void BeginFrame()
     {

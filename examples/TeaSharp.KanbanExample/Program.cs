@@ -222,7 +222,7 @@ internal sealed class KanbanModel : IModel
         {
             if (_deleteDialog.Update(key))
             {
-                if (_deleteDialog.LastResult == DialogResult.Accepted)
+                if (_deleteDialog.TryConsumeResult(out var result) && result == DialogResult.Accepted)
                 {
                     CommitDelete();
                 }
@@ -705,19 +705,17 @@ internal sealed class KanbanModel : IModel
 
         if (_focus == KanbanFocus.Composer)
         {
-            var beforeSubmit = _composer.SubmitCount;
-            var beforeCancel = _composer.CancelCount;
             var changed = _composer.Update(key);
-            if (_composer.CancelCount != beforeCancel)
+            if (_composer.TryConsumeCancel(out _))
             {
                 SetFocus(_focusBeforeComposer);
                 eventOverride = $"focus:{_focus.ToString().ToLowerInvariant()}";
                 return true;
             }
 
-            if (_composer.SubmitCount != beforeSubmit)
+            if (_composer.TryConsumeSubmit(out var submitted))
             {
-                CreateCardFromComposer();
+                CreateCardFromComposer(submitted);
                 eventOverride = _lastEvent;
                 return true;
             }
@@ -855,9 +853,9 @@ internal sealed class KanbanModel : IModel
         return $"#{card.Id} [{priority}] {blocked}{card.Title}";
     }
 
-    private void CreateCardFromComposer()
+    private void CreateCardFromComposer(string submittedValue)
     {
-        var raw = _composer.LastSubmittedValue.Trim();
+        var raw = submittedValue.Trim();
         if (string.IsNullOrWhiteSpace(raw))
         {
             return;

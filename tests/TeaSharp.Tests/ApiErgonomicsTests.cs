@@ -16,6 +16,7 @@ internal static class ApiErgonomicsTests
     public static IEnumerable<TestCase> Cases()
     {
         yield return new TestCase("ApiErgonomics_Thickness_UsesStandardSpacingVocabulary", Thickness_UsesStandardSpacingVocabulary);
+        yield return new TestCase("ApiErgonomics_ScreenFrameLayout_ReducesScreenRectBookkeeping", ScreenFrameLayout_ReducesScreenRectBookkeeping);
         yield return new TestCase("ApiErgonomics_TextInputOptions_ConfigureComponentWithoutNestedInputAccess", TextInputOptions_ConfigureComponentWithoutNestedInputAccess);
         yield return new TestCase("ApiErgonomics_TextAreaOptions_ConfigureComponentWithoutNestedInputAccess", TextAreaOptions_ConfigureComponentWithoutNestedInputAccess);
         yield return new TestCase("ApiErgonomics_ListComponent_ExposesSelectionWithoutModelAccess", ListComponent_ExposesSelectionWithoutModelAccess);
@@ -25,6 +26,7 @@ internal static class ApiErgonomicsTests
         yield return new TestCase("ApiErgonomics_TableOptions_ExposePageSizeWithoutInnerAccess", TableOptions_ExposePageSizeWithoutInnerAccess);
         yield return new TestCase("ApiErgonomics_TableComponent_ExposesSortStateWithoutInnerAccess", TableComponent_ExposesSortStateWithoutInnerAccess);
         yield return new TestCase("ApiErgonomics_InteractionProfiles_AreClonedOnAssignment", InteractionProfiles_AreClonedOnAssignment);
+        yield return new TestCase("ApiErgonomics_ConsumeMethods_ExposeOneShotInteractionResults", ConsumeMethods_ExposeOneShotInteractionResults);
         yield return new TestCase("ApiErgonomics_PrebuiltCatalog_CreatesConfiguredTextInput", PrebuiltCatalog_CreatesConfiguredTextInput);
         yield return new TestCase("ApiErgonomics_ProductivityCatalog_CreatesConfiguredMenuBar", ProductivityCatalog_CreatesConfiguredMenuBar);
         yield return new TestCase("ApiErgonomics_DialogOptions_ConfigureFrameWithoutLegacyBorderStyleName", DialogOptions_ConfigureFrameWithoutLegacyBorderStyleName);
@@ -42,6 +44,20 @@ internal static class ApiErgonomicsTests
         TestAssert.Equal(1, spacing.Bottom, "Thickness should expose bottom spacing.");
         TestAssert.Equal(4, spacing.Horizontal, "Thickness should expose aggregate horizontal spacing.");
         TestAssert.Equal(2, spacing.Vertical, "Thickness should expose aggregate vertical spacing.");
+        return Task.CompletedTask;
+    }
+
+    private static Task ScreenFrameLayout_ReducesScreenRectBookkeeping()
+    {
+        var screen = new ScreenComposer();
+        var frame = screen.Frame(new Rect(0, 0, 100, 30), headerHeight: 1, footerHeight: 2);
+        var (left, right) = frame.SplitBodyColumns(28);
+
+        TestAssert.Equal(new Rect(0, 0, 100, 1), frame.Header, "Screen frame should expose header bounds directly.");
+        TestAssert.Equal(new Rect(0, 1, 100, 27), frame.Body, "Screen frame should expose body bounds directly.");
+        TestAssert.Equal(new Rect(0, 28, 100, 2), frame.Footer, "Screen frame should expose footer bounds directly.");
+        TestAssert.Equal(28, left.Width, "Screen frame body split should preserve requested left width.");
+        TestAssert.Equal(72, right.Width, "Screen frame body split should preserve remaining width.");
         return Task.CompletedTask;
     }
 
@@ -200,6 +216,27 @@ internal static class ApiErgonomicsTests
         TestAssert.True(!shared.NavigateOnWheel, "Shared profile instances should not be mutated through component assignment.");
         TestAssert.True(!tabs.InteractionProfile.NavigateOnWheel, "Components should not share the same interaction profile instance.");
         TestAssert.True(button.InteractionProfile.NavigateOnWheel, "Component-local profile mutation should still work after cloning.");
+        return Task.CompletedTask;
+    }
+
+    private static Task ConsumeMethods_ExposeOneShotInteractionResults()
+    {
+        var button = new ButtonComponent
+        {
+            Focused = true,
+        };
+        button.Update(new TeaSharp.Core.Messages.KeyPressMsg(TeaSharp.Core.Messages.KeyCode.Enter));
+
+        var input = new TextInputComponent
+        {
+            Focused = true,
+        };
+        input.Update(new TeaSharp.Core.Messages.KeyPressMsg(TeaSharp.Core.Messages.KeyCode.Character, "x"));
+        input.Update(new TeaSharp.Core.Messages.KeyPressMsg(TeaSharp.Core.Messages.KeyCode.Enter));
+
+        TestAssert.True(button.TryConsumePress(), "Button should expose one-shot press consumption instead of requiring poll-style flags.");
+        TestAssert.True(input.TryConsumeSubmit(out var submitted), "Text input should expose one-shot submit consumption.");
+        TestAssert.Equal("x", submitted, "Consumed submit should preserve submitted text.");
         return Task.CompletedTask;
     }
 

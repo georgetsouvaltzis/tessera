@@ -19,6 +19,8 @@ public sealed partial class ContextMenuComponent : IStatefulComponent, IMouseSta
     private WidgetInteractionProfile _interactionProfile = WidgetInteractionProfile.Default.Clone();
     private int _selectedIndex;
     private int _hoveredIndex = -1;
+    private long _executionVersion;
+    private long _consumedExecutionVersion;
 
     public ContextMenuComponent()
     {
@@ -62,6 +64,22 @@ public sealed partial class ContextMenuComponent : IStatefulComponent, IMouseSta
     public int AnchorY { get; private set; }
 
     public string? LastExecutedItemId { get; private set; }
+
+    /// <summary>
+    /// Consumes the latest context-menu execution exactly once.
+    /// </summary>
+    public bool TryConsumeExecution(out string itemId)
+    {
+        if (_executionVersion == _consumedExecutionVersion || string.IsNullOrEmpty(LastExecutedItemId))
+        {
+            itemId = string.Empty;
+            return false;
+        }
+
+        _consumedExecutionVersion = _executionVersion;
+        itemId = LastExecutedItemId;
+        return true;
+    }
 
     public KeyBinding NextItemKey { get; set; } = new("down/j", "next item", "down", "j");
 
@@ -141,6 +159,7 @@ public sealed partial class ContextMenuComponent : IStatefulComponent, IMouseSta
         if (!ReadOnly && ExecuteKey.Matches(key))
         {
             LastExecutedItemId = _items[_selectedIndex].Id;
+            _executionVersion++;
             Close();
             return true;
         }
@@ -236,6 +255,7 @@ public sealed partial class ContextMenuComponent : IStatefulComponent, IMouseSta
                 if (!ReadOnly)
                 {
                     LastExecutedItemId = _items[_selectedIndex].Id;
+                    _executionVersion++;
                     Close();
                     changed = true;
                 }

@@ -106,9 +106,9 @@ internal sealed class DemoModel : InteractiveScreenModel
 
     protected override void ComposeScreen(Rect bodyRect)
     {
-        var (top, bottom) = Layout.SplitHorizontal(bodyRect, 1);
-        Screen.AddComponent(TabsRegion, top, _tabs);
-        Screen.AddRegion(EditorRegion, bottom, _editor.Render, _editor.Update, focusable: true);
+        var frame = Frame(bodyRect, headerHeight: 1);
+        Screen.AddComponent(TabsRegion, frame.Header, _tabs);
+        Screen.AddRegion(EditorRegion, frame.Body, _editor.Render, _editor.Update, focusable: true);
 
         if (_dialog.Visible)
         {
@@ -129,9 +129,19 @@ internal sealed class DemoModel : InteractiveScreenModel
             : InputRouteResult.NotHandled;
 
     private InputRouteResult HandleDialogKey(KeyPressMsg key)
-        => RouteFocusedMessage(key)
-            ? InputRouteResult.HandledWithoutCommand
-            : InputRouteResult.NotHandled;
+    {
+        if (!RouteFocusedMessage(key))
+        {
+            return InputRouteResult.NotHandled;
+        }
+
+        if (_dialog.TryConsumeResult(out var result))
+        {
+            SetFocus(EditorRegion);
+        }
+
+        return InputRouteResult.HandledWithoutCommand;
+    }
 
     private InputRouteResult HandleFocusedKey(KeyPressMsg key)
         => RouteFocusedMessage(key)
@@ -182,8 +192,10 @@ Meaning:
 
 - Keep region keys as `static readonly ScreenRegionKey` fields.
 - Let `ScreenComposer` own region focus and pointer hit-testing.
+- Use `Frame(...)` for the common header/body/footer shell before dropping into custom rect math.
 - Let `InputRouter` own key precedence.
 - Let `InteractiveScreenModel` own screen rebuild timing.
+- Prefer component consume APIs such as `TryConsumeSubmit(...)`, `TryConsumePress()`, and `TryConsumeResult(...)` over manual before/after state comparisons.
 - Use `blocksGlobalShortcuts` for plain character suppression while text input is active.
 - Prefer `SetFocus(...)`, `FocusNext()`, and `FocusPrevious()` from `InteractiveScreenModel` instead of reaching into `Screen` directly.
 - Put terminal capability toggles in `ViewTerminal`, not in app-local routing code.

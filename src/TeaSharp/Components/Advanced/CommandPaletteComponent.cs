@@ -15,6 +15,8 @@ public sealed class CommandPaletteComponent : IStatefulComponent, IMouseStateful
 {
     private readonly CommandPaletteController _controller = new();
     private WidgetInteractionProfile _interactionProfile = WidgetInteractionProfile.Default.Clone();
+    private long _executionVersion;
+    private long _consumedExecutionVersion;
 
     [EditorBrowsable(EditorBrowsableState.Advanced)]
     public TextInputModel Query { get; } = new();
@@ -49,6 +51,22 @@ public sealed class CommandPaletteComponent : IStatefulComponent, IMouseStateful
     {
         get => _interactionProfile;
         set => _interactionProfile = WidgetInteractionProfile.CloneOrDefault(value);
+    }
+
+    /// <summary>
+    /// Consumes the latest command execution exactly once.
+    /// </summary>
+    public bool TryConsumeExecution(out string itemId)
+    {
+        if (_executionVersion == _consumedExecutionVersion || string.IsNullOrEmpty(LastExecutedItemId))
+        {
+            itemId = string.Empty;
+            return false;
+        }
+
+        _consumedExecutionVersion = _executionVersion;
+        itemId = LastExecutedItemId;
+        return true;
     }
 
     public void SetItems(IEnumerable<CommandPaletteItem> items)
@@ -286,6 +304,7 @@ public sealed class CommandPaletteComponent : IStatefulComponent, IMouseStateful
         }
 
         LastExecutedItemId = selected.Id;
+        _executionVersion++;
         Close();
         return true;
     }

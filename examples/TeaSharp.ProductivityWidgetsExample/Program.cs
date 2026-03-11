@@ -131,16 +131,15 @@ internal sealed class ProductivityModel : IModel
             var mouseChanged = false;
             if (_context.Visible)
             {
-                var beforeContext = _context.LastExecutedItemId;
                 mouseChanged |= _context.UpdateMouse(mouse, layout.ContentRect);
                 if (!_context.Visible)
                 {
                     _context.Focused = false;
                 }
 
-                if (!string.Equals(beforeContext, _context.LastExecutedItemId, StringComparison.Ordinal))
+                if (_context.TryConsumeExecution(out var contextItemId))
                 {
-                    ApplyContextAction(_context.LastExecutedItemId);
+                    ApplyContextAction(contextItemId);
                     mouseChanged = true;
                 }
 
@@ -152,7 +151,6 @@ internal sealed class ProductivityModel : IModel
                 return null;
             }
 
-            var mouseBeforeMenuActivation = _menu.ActivationVersion;
             if (layout.MenuRect.Contains(mouse.X, mouse.Y)
                 || (mouse is MouseWheelMsg && _focus == ProductivityFocus.Menu))
             {
@@ -184,9 +182,9 @@ internal sealed class ProductivityModel : IModel
                 }
             }
 
-            if (mouseBeforeMenuActivation != _menu.ActivationVersion)
+            if (_menu.TryConsumeActivation(out var menuItemId))
             {
-                ApplyMenuAction(_menu.LastActivatedItemId);
+                ApplyMenuAction(menuItemId);
                 mouseChanged = true;
             }
 
@@ -212,7 +210,6 @@ internal sealed class ProductivityModel : IModel
         if (_context.Visible)
         {
             _context.Focused = true;
-            var before = _context.LastExecutedItemId;
             if (_context.Update(key))
             {
                 if (!_context.Visible)
@@ -221,9 +218,9 @@ internal sealed class ProductivityModel : IModel
                 }
 
                 _lastEvent = $"context:{key.Keystroke()}";
-                if (!string.Equals(before, _context.LastExecutedItemId, StringComparison.Ordinal))
+                if (_context.TryConsumeExecution(out var contextItemId))
                 {
-                    ApplyContextAction(_context.LastExecutedItemId);
+                    ApplyContextAction(contextItemId);
                 }
             }
 
@@ -245,12 +242,11 @@ internal sealed class ProductivityModel : IModel
             return null;
         }
 
-        var beforeMenuActivation = _menu.ActivationVersion;
         var changed = RouteFocusedInput(key);
         var menuActionHandled = false;
-        if (beforeMenuActivation != _menu.ActivationVersion)
+        if (_menu.TryConsumeActivation(out var menuItemId))
         {
-            ApplyMenuAction(_menu.LastActivatedItemId);
+            ApplyMenuAction(menuItemId);
             changed = true;
             menuActionHandled = true;
         }

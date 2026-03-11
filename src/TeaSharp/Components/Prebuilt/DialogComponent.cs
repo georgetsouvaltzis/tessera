@@ -12,6 +12,9 @@ namespace TeaSharp.Components.Prebuilt;
 
 public sealed class DialogComponent : IStatefulComponent, IFocusableComponent
 {
+    private long _resultVersion;
+    private long _consumedResultVersion;
+
     public DialogComponent()
     {
         Theme = new UiTheme();
@@ -50,6 +53,22 @@ public sealed class DialogComponent : IStatefulComponent, IFocusableComponent
 
     public KeyBinding DismissKey { get; set; } = new("esc", "dismiss", "escape");
 
+    /// <summary>
+    /// Consumes the latest dialog result exactly once.
+    /// </summary>
+    public bool TryConsumeResult(out DialogResult result)
+    {
+        if (_resultVersion == _consumedResultVersion)
+        {
+            result = DialogResult.None;
+            return false;
+        }
+
+        _consumedResultVersion = _resultVersion;
+        result = LastResult;
+        return true;
+    }
+
     public bool Update(IMessage message)
     {
         if (!Visible || !Focused || message is not KeyPressMsg key)
@@ -61,6 +80,7 @@ public sealed class DialogComponent : IStatefulComponent, IFocusableComponent
         {
             Visible = false;
             LastResult = DialogResult.Dismissed;
+            _resultVersion++;
             return true;
         }
 
@@ -68,6 +88,7 @@ public sealed class DialogComponent : IStatefulComponent, IFocusableComponent
         {
             Visible = false;
             LastResult = DialogResult.Accepted;
+            _resultVersion++;
             return true;
         }
 

@@ -67,6 +67,9 @@ public abstract class InteractiveScreenModel : IModel
         Screen.Render(canvas);
     }
 
+    protected ScreenFrameLayout Frame(Rect bounds, int headerHeight = 0, int footerHeight = 0) =>
+        Screen.Frame(bounds, headerHeight, footerHeight);
+
     protected bool SetFocus(ScreenRegionKey regionKey)
     {
         EnsureScreen();

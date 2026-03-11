@@ -20,8 +20,10 @@ internal static class PrebuiltWidgetTests
         yield return new TestCase("Prebuilt_LabelComponent_RendersText", LabelComponent_RendersText);
         yield return new TestCase("Prebuilt_ButtonComponent_ActivatesWhenFocused", ButtonComponent_ActivatesWhenFocused);
         yield return new TestCase("Prebuilt_ButtonComponent_MouseClickActivatesAndTracksState", ButtonComponent_MouseClickActivatesAndTracksState);
+        yield return new TestCase("Prebuilt_ButtonComponent_TryConsumePress_IsSingleUse", ButtonComponent_TryConsumePress_IsSingleUse);
         yield return new TestCase("Prebuilt_ButtonComponent_RendersBorderedState", ButtonComponent_RendersBorderedState);
         yield return new TestCase("Prebuilt_TextInputComponent_SubmitsValue", TextInputComponent_SubmitsValue);
+        yield return new TestCase("Prebuilt_TextInputComponent_TryConsumeSubmitAndCancel_AreSingleUse", TextInputComponent_TryConsumeSubmitAndCancel_AreSingleUse);
         yield return new TestCase("Prebuilt_TextInputComponent_CancelSignalsAndCanClear", TextInputComponent_CancelSignalsAndCanClear);
         yield return new TestCase("Prebuilt_TextInputComponent_HidesBorderWhenConfigured", TextInputComponent_HidesBorderWhenConfigured);
         yield return new TestCase("Prebuilt_TextAreaComponent_RendersMultilineContent", TextAreaComponent_RendersMultilineContent);
@@ -41,6 +43,7 @@ internal static class PrebuiltWidgetTests
         yield return new TestCase("Prebuilt_StatusBarComponent_RendersLeftAndRightText", StatusBarComponent_RendersLeftAndRightText);
         yield return new TestCase("Prebuilt_LogViewerComponent_AppendsAndFilters", LogViewerComponent_AppendsAndFilters);
         yield return new TestCase("Prebuilt_DialogComponent_AcceptsAndDismisses", DialogComponent_AcceptsAndDismisses);
+        yield return new TestCase("Prebuilt_DialogComponent_TryConsumeResult_IsSingleUse", DialogComponent_TryConsumeResult_IsSingleUse);
         yield return new TestCase("Prebuilt_LayoutContainerComponent_RendersChildren", LayoutContainerComponent_RendersChildren);
         yield return new TestCase("Prebuilt_LayoutContainerComponent_KeyboardRoutesToFocusedChildOnly", LayoutContainerComponent_KeyboardRoutesToFocusedChildOnly);
         yield return new TestCase("Prebuilt_LayoutContainerComponent_MouseResizeAdjustsPrimarySize", LayoutContainerComponent_MouseResizeAdjustsPrimarySize);
@@ -97,6 +100,20 @@ internal static class PrebuiltWidgetTests
         TestAssert.True(!button.Pressed, "Button should clear pressed state on release.");
         TestAssert.True(button.PressCount == 1, "Mouse click should increment press count.");
         TestAssert.True(!button.WasPressed, "Release should clear the one-frame pressed signal.");
+        return Task.CompletedTask;
+    }
+
+    private static Task ButtonComponent_TryConsumePress_IsSingleUse()
+    {
+        var button = new ButtonComponent
+        {
+            Focused = true,
+        };
+
+        button.Update(new KeyPressMsg(KeyCode.Enter));
+
+        TestAssert.True(button.TryConsumePress(), "Button should expose one-shot press consumption.");
+        TestAssert.True(!button.TryConsumePress(), "Button should not report the same press twice.");
         return Task.CompletedTask;
     }
 
@@ -166,6 +183,29 @@ internal static class PrebuiltWidgetTests
         TestAssert.Equal("ab", input.LastCancelledValue, "Text input should capture cancelled value.");
         TestAssert.Equal(1, input.CancelCount, "Text input should count cancel actions.");
         TestAssert.Equal(string.Empty, input.Value, "Text input should clear value on cancel when configured.");
+        return Task.CompletedTask;
+    }
+
+    private static Task TextInputComponent_TryConsumeSubmitAndCancel_AreSingleUse()
+    {
+        var input = new TextInputComponent
+        {
+            Focused = true,
+        };
+
+        input.Update(new KeyPressMsg(KeyCode.Character, "a"));
+        input.Update(new KeyPressMsg(KeyCode.Enter));
+
+        TestAssert.True(input.TryConsumeSubmit(out var submitted), "Text input should expose one-shot submit consumption.");
+        TestAssert.Equal("a", submitted, "Consumed submit should preserve submitted value.");
+        TestAssert.True(!input.TryConsumeSubmit(out _), "Submit consumption should be single-use per submit.");
+
+        input.Update(new KeyPressMsg(KeyCode.Character, "b"));
+        input.Update(new KeyPressMsg(KeyCode.Escape));
+
+        TestAssert.True(input.TryConsumeCancel(out var cancelled), "Text input should expose one-shot cancel consumption.");
+        TestAssert.Equal("ab", cancelled, "Consumed cancel should preserve cancelled value.");
+        TestAssert.True(!input.TryConsumeCancel(out _), "Cancel consumption should be single-use per cancel.");
         return Task.CompletedTask;
     }
 
@@ -481,6 +521,22 @@ internal static class PrebuiltWidgetTests
         var dismissed = dialog.Update(new KeyPressMsg(KeyCode.Escape));
         TestAssert.True(dismissed, "Dialog should dismiss on escape.");
         TestAssert.True(dialog.LastResult == DialogResult.Dismissed, "Dialog should record dismissed result.");
+        return Task.CompletedTask;
+    }
+
+    private static Task DialogComponent_TryConsumeResult_IsSingleUse()
+    {
+        var dialog = new DialogComponent
+        {
+            Visible = true,
+            Focused = true,
+        };
+
+        dialog.Update(new KeyPressMsg(KeyCode.Enter));
+
+        TestAssert.True(dialog.TryConsumeResult(out var result), "Dialog should expose one-shot result consumption.");
+        TestAssert.True(result == DialogResult.Accepted, "Dialog should consume accepted result.");
+        TestAssert.True(!dialog.TryConsumeResult(out _), "Dialog result consumption should be single-use per decision.");
         return Task.CompletedTask;
     }
 

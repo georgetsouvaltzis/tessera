@@ -205,7 +205,7 @@ internal sealed class WidgetGalleryModel : InteractiveScreenModel
 
     protected override Rect GetBodyRect()
     {
-        return new Rect(0, 1, _width, _height - 2);
+        return new Rect(0, 0, _width, _height - 1);
     }
 
     protected override ScreenRegionKey? PreferredFocusRegionKey
@@ -232,24 +232,25 @@ internal sealed class WidgetGalleryModel : InteractiveScreenModel
 
     protected override void ComposeScreen(Rect bodyRect)
     {
-        Screen.AddComponent(TabsRegionId, new Rect(0, 0, _width, 1), _tabs);
+        var frame = Frame(bodyRect, headerHeight: 1);
+        Screen.AddComponent(TabsRegionId, frame.Header, _tabs);
 
         switch (_tabs.SelectedIndex)
         {
             case 0:
-                RegisterBasicsRegions(bodyRect);
+                RegisterBasicsRegions(frame.Body);
                 break;
             case 1:
-                RegisterInputRegions(bodyRect);
+                RegisterInputRegions(frame.Body);
                 break;
             case 2:
-                RegisterDataRegions(bodyRect);
+                RegisterDataRegions(frame.Body);
                 break;
             case 3:
-                RegisterOverlayRegions(bodyRect);
+                RegisterOverlayRegions(frame.Body);
                 break;
             default:
-                Screen.AddComponent(LayoutRegionId, bodyRect, _layoutDemo, focusable: false);
+                Screen.AddComponent(LayoutRegionId, frame.Body, _layoutDemo, focusable: false);
                 break;
         }
 
@@ -398,25 +399,23 @@ internal sealed class WidgetGalleryModel : InteractiveScreenModel
 
     private InputRouteResult HandleScreenKey(KeyPressMsg key)
     {
-        var previousSubmitCount = _textInput.SubmitCount;
-        var previousDialogResult = _dialog.LastResult;
         var changed = Screen.Update(NormalizeInputKey(key));
         if (!changed)
         {
             return InputRouteResult.NotHandled;
         }
 
-        if (FocusedRegionKey == DialogRegionId && previousDialogResult != _dialog.LastResult)
+        if (_dialog.TryConsumeResult(out var dialogResult))
         {
             SetFocus(TabsRegionId);
-            _logs.Append($"dialog:{_dialog.LastResult}");
-            _lastEvent = $"dialog:{_dialog.LastResult.ToString().ToLowerInvariant()}";
+            _logs.Append($"dialog:{dialogResult}");
+            _lastEvent = $"dialog:{dialogResult.ToString().ToLowerInvariant()}";
             return InputRouteResult.HandledWithoutCommand;
         }
 
-        if (FocusedRegionKey == TextInputRegionId && _textInput.SubmitCount > previousSubmitCount)
+        if (_textInput.TryConsumeSubmit(out var submitted))
         {
-            _logs.Append($"input:{_textInput.LastSubmittedValue}");
+            _logs.Append($"input:{submitted}");
         }
 
         _lastEvent = FocusedRegionKey == TabsRegionId
@@ -465,7 +464,7 @@ internal sealed class WidgetGalleryModel : InteractiveScreenModel
         _lastEvent = FocusedRegionKey switch
         {
             var key when key == TabsRegionId => $"mouse:tab:{_tabs.SelectedIndex + 1}",
-            var key when key == ButtonRegionId => _button.WasPressed ? "button:press" : "button:hover",
+            var key when key == ButtonRegionId => _button.TryConsumePress() ? "button:press" : "button:hover",
             var key when key == ListRegionId => "mouse:list",
             var key when key == TableRegionId => "mouse:table",
             var key when key == DialogRegionId => $"dialog:{_dialog.LastResult}",

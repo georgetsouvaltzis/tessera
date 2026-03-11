@@ -14,6 +14,8 @@ namespace TeaSharp.Components.Prebuilt;
 public sealed class TextInputComponent : IStatefulComponent, IFocusableComponent
 {
     private readonly TextInputModel _input = new();
+    private int _consumedSubmitCount;
+    private int _consumedCancelCount;
 
     public TextInputComponent()
     {
@@ -100,6 +102,39 @@ public sealed class TextInputComponent : IStatefulComponent, IFocusableComponent
     public void Clear()
     {
         Input.Clear();
+    }
+
+    /// <summary>
+    /// Consumes the latest submitted text exactly once.
+    /// </summary>
+    public bool TryConsumeSubmit(out string value)
+    {
+        if (SubmitCount == _consumedSubmitCount)
+        {
+            value = string.Empty;
+            return false;
+        }
+
+        _consumedSubmitCount = SubmitCount;
+        value = LastSubmittedValue;
+        return true;
+    }
+
+    /// <summary>
+    /// Consumes the latest cancelled text exactly once.
+    /// </summary>
+    public bool TryConsumeCancel(out string value)
+    {
+        if (CancelCount == _consumedCancelCount)
+        {
+            value = string.Empty;
+            return false;
+        }
+
+        _consumedCancelCount = CancelCount;
+        WasCancelled = false;
+        value = LastCancelledValue;
+        return true;
     }
 
     public bool Update(IMessage message)

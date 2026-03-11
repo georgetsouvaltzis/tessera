@@ -19,6 +19,7 @@ public sealed class MenuBarComponent : IStatefulComponent, IMouseStatefulCompone
     private readonly List<MenuBarItem> _items = [];
     private WidgetInteractionProfile _interactionProfile = WidgetInteractionProfile.Default.Clone();
     private int _hoveredIndex = -1;
+    private long _consumedActivationVersion;
 
     public MenuBarComponent()
     {
@@ -68,6 +69,22 @@ public sealed class MenuBarComponent : IStatefulComponent, IMouseStatefulCompone
     }
 
     public IReadOnlyList<MenuBarItem> Items => _items;
+
+    /// <summary>
+    /// Consumes the latest menu activation exactly once.
+    /// </summary>
+    public bool TryConsumeActivation(out string itemId)
+    {
+        if (ActivationVersion == _consumedActivationVersion || string.IsNullOrEmpty(LastActivatedItemId))
+        {
+            itemId = string.Empty;
+            return false;
+        }
+
+        _consumedActivationVersion = ActivationVersion;
+        itemId = LastActivatedItemId;
+        return true;
+    }
 
     public void SetItems(params MenuBarItem[] items)
     {
