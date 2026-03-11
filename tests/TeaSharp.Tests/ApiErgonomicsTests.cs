@@ -26,6 +26,7 @@ internal static class ApiErgonomicsTests
         yield return new TestCase("ApiErgonomics_TableOptions_ExposePageSizeWithoutInnerAccess", TableOptions_ExposePageSizeWithoutInnerAccess);
         yield return new TestCase("ApiErgonomics_TableComponent_ExposesSortStateWithoutInnerAccess", TableComponent_ExposesSortStateWithoutInnerAccess);
         yield return new TestCase("ApiErgonomics_InteractionProfiles_AreClonedOnAssignment", InteractionProfiles_AreClonedOnAssignment);
+        yield return new TestCase("ApiErgonomics_ActionEvents_EnableEventDrivenIntegration", ActionEvents_EnableEventDrivenIntegration);
         yield return new TestCase("ApiErgonomics_ConsumeMethods_ExposeOneShotInteractionResults", ConsumeMethods_ExposeOneShotInteractionResults);
         yield return new TestCase("ApiErgonomics_PrebuiltCatalog_CreatesConfiguredTextInput", PrebuiltCatalog_CreatesConfiguredTextInput);
         yield return new TestCase("ApiErgonomics_ProductivityCatalog_CreatesConfiguredMenuBar", ProductivityCatalog_CreatesConfiguredMenuBar);
@@ -237,6 +238,30 @@ internal static class ApiErgonomicsTests
         TestAssert.True(button.TryConsumePress(), "Button should expose one-shot press consumption instead of requiring poll-style flags.");
         TestAssert.True(input.TryConsumeSubmit(out var submitted), "Text input should expose one-shot submit consumption.");
         TestAssert.Equal("x", submitted, "Consumed submit should preserve submitted text.");
+        return Task.CompletedTask;
+    }
+
+    private static Task ActionEvents_EnableEventDrivenIntegration()
+    {
+        var button = new ButtonComponent
+        {
+            Focused = true,
+        };
+        var input = new TextInputComponent
+        {
+            Focused = true,
+        };
+        var buttonPressed = 0;
+        string? submitted = null;
+        button.Pressed += (_, _) => buttonPressed++;
+        input.Submitted += (_, args) => submitted = args.Value;
+
+        button.Update(new TeaSharp.Core.Messages.KeyPressMsg(TeaSharp.Core.Messages.KeyCode.Enter));
+        input.Update(new TeaSharp.Core.Messages.KeyPressMsg(TeaSharp.Core.Messages.KeyCode.Character, "x"));
+        input.Update(new TeaSharp.Core.Messages.KeyPressMsg(TeaSharp.Core.Messages.KeyCode.Enter));
+
+        TestAssert.Equal(1, buttonPressed, "Button should expose an event-driven activation hook.");
+        TestAssert.Equal("x", submitted ?? string.Empty, "Text input should expose submitted text through an event payload.");
         return Task.CompletedTask;
     }
 

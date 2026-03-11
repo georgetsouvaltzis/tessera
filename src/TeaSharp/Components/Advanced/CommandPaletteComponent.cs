@@ -35,6 +35,11 @@ public sealed class CommandPaletteComponent : IStatefulComponent, IMouseStateful
 
     public string? LastExecutedItemId { get; private set; }
 
+    /// <summary>
+    /// Raised when a command-palette item is executed.
+    /// </summary>
+    public event EventHandler<CommandPaletteItemExecutedEventArgs>? ItemExecuted;
+
     public KeyBinding OpenKey { get; set; } = new("ctrl+p", "open", "ctrl+p");
 
     public KeyBinding CloseKey { get; set; } = new("esc", "close", "escape");
@@ -305,6 +310,7 @@ public sealed class CommandPaletteComponent : IStatefulComponent, IMouseStateful
 
         LastExecutedItemId = selected.Id;
         _executionVersion++;
+        ItemExecuted?.Invoke(this, new CommandPaletteItemExecutedEventArgs(selected));
         Close();
         return true;
     }

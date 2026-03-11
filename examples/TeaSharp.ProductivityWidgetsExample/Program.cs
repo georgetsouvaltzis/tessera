@@ -79,6 +79,7 @@ internal sealed class ProductivityModel : IModel
     private int _width = 120;
     private int _height = 36;
     private string _lastEvent = "ready";
+    private string? _pendingActionEvent;
 
     public ProductivityModel()
     {
@@ -110,6 +111,18 @@ internal sealed class ProductivityModel : IModel
                 "dotnet run --project examples/TeaSharp.ProductivityWidgetsExample/TeaSharp.ProductivityWidgetsExample.csproj",
                 "```"));
 
+        _menu.ItemActivated += (_, args) =>
+        {
+            ApplyMenuAction(args.ItemId);
+            SetPendingActionEvent($"menu:{args.ItemId}");
+        };
+
+        _context.ItemExecuted += (_, args) =>
+        {
+            ApplyContextAction(args.ItemId);
+            SetPendingActionEvent($"context:{args.ItemId}");
+        };
+
         SetFocus(ProductivityFocus.Menu);
     }
 
@@ -137,15 +150,11 @@ internal sealed class ProductivityModel : IModel
                     _context.Focused = false;
                 }
 
-                if (_context.TryConsumeExecution(out var contextItemId))
-                {
-                    ApplyContextAction(contextItemId);
-                    mouseChanged = true;
-                }
-
                 if (mouseChanged)
                 {
-                    _lastEvent = $"mouse:{mouse.EventType.ToString().ToLowerInvariant()}";
+                    _lastEvent = TryConsumePendingActionEvent(out var actionEvent)
+                        ? actionEvent
+                        : $"mouse:{mouse.EventType.ToString().ToLowerInvariant()}";
                 }
 
                 return null;
@@ -182,15 +191,11 @@ internal sealed class ProductivityModel : IModel
                 }
             }
 
-            if (_menu.TryConsumeActivation(out var menuItemId))
-            {
-                ApplyMenuAction(menuItemId);
-                mouseChanged = true;
-            }
-
             if (mouseChanged)
             {
-                _lastEvent = $"mouse:{mouse.EventType.ToString().ToLowerInvariant()}";
+                _lastEvent = TryConsumePendingActionEvent(out var actionEvent)
+                    ? actionEvent
+                    : $"mouse:{mouse.EventType.ToString().ToLowerInvariant()}";
             }
 
             return null;
@@ -217,11 +222,9 @@ internal sealed class ProductivityModel : IModel
                     _context.Focused = false;
                 }
 
-                _lastEvent = $"context:{key.Keystroke()}";
-                if (_context.TryConsumeExecution(out var contextItemId))
-                {
-                    ApplyContextAction(contextItemId);
-                }
+                _lastEvent = TryConsumePendingActionEvent(out var actionEvent)
+                    ? actionEvent
+                    : $"context:{key.Keystroke()}";
             }
 
             return null;
@@ -243,15 +246,12 @@ internal sealed class ProductivityModel : IModel
         }
 
         var changed = RouteFocusedInput(key);
-        var menuActionHandled = false;
-        if (_menu.TryConsumeActivation(out var menuItemId))
+        if (TryConsumePendingActionEvent(out var pendingActionEvent))
         {
-            ApplyMenuAction(menuItemId);
+            _lastEvent = pendingActionEvent;
             changed = true;
-            menuActionHandled = true;
         }
-
-        if (changed && !menuActionHandled)
+        else if (changed)
         {
             _lastEvent = key.Keystroke();
         }
@@ -456,6 +456,25 @@ internal sealed class ProductivityModel : IModel
         var (_, bottomLeft) = Layout.SplitHorizontal(left, Math.Max(8, left.Height / 3), minFirst: 7, minSecond: 10);
         var (dateRect, timeRect) = Layout.SplitHorizontal(bottomLeft, Math.Max(10, bottomLeft.Height / 2), minFirst: 9, minSecond: 7);
         return new InteractionRects(menuRect, content, dateRect, timeRect);
+    }
+
+    private void SetPendingActionEvent(string value)
+    {
+        _pendingActionEvent = value;
+        _lastEvent = value;
+    }
+
+    private bool TryConsumePendingActionEvent(out string value)
+    {
+        if (string.IsNullOrEmpty(_pendingActionEvent))
+        {
+            value = string.Empty;
+            return false;
+        }
+
+        value = _pendingActionEvent;
+        _pendingActionEvent = null;
+        return true;
     }
 
     private readonly record struct InteractionRects(

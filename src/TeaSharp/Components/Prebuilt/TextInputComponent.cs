@@ -68,6 +68,16 @@ public sealed class TextInputComponent : IStatefulComponent, IFocusableComponent
 
     public bool WasCancelled { get; private set; }
 
+    /// <summary>
+    /// Raised when the input submits a value.
+    /// </summary>
+    public event EventHandler<TextInputSubmittedEventArgs>? Submitted;
+
+    /// <summary>
+    /// Raised when the input cancels editing.
+    /// </summary>
+    public event EventHandler<TextInputCancelledEventArgs>? Cancelled;
+
     public string Value => Input.Value;
 
     public string Placeholder
@@ -145,12 +155,14 @@ public sealed class TextInputComponent : IStatefulComponent, IFocusableComponent
         {
             LastCancelledValue = result.LastCancelledValue;
             CancelCount += result.CancelCount;
+            Cancelled?.Invoke(this, new TextInputCancelledEventArgs(LastCancelledValue));
         }
 
         if (result.SubmitCount > 0)
         {
             LastSubmittedValue = result.LastSubmittedValue;
             SubmitCount += result.SubmitCount;
+            Submitted?.Invoke(this, new TextInputSubmittedEventArgs(LastSubmittedValue));
         }
 
         return result.Handled;

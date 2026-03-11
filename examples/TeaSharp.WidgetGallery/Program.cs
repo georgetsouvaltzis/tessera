@@ -98,6 +98,7 @@ internal sealed class WidgetGalleryModel : InteractiveScreenModel
     private int _height = 36;
     private int _tick;
     private string _lastEvent = "ready";
+    private string? _pendingActionEvent;
 
     public WidgetGalleryModel()
     {
@@ -119,6 +120,17 @@ internal sealed class WidgetGalleryModel : InteractiveScreenModel
         _layoutDemo.Add(_layoutCellB);
         _layoutDemo.Add(_layoutCellC);
         _layoutDemo.Add(_layoutCellD);
+
+        _button.Pressed += (_, _) =>
+        {
+            _logs.Append("button:press");
+            SetPendingActionEvent("button:press");
+        };
+
+        _textInput.Submitted += (_, args) => _logs.Append($"input:{args.Value}");
+
+        _dialog.Accepted += (_, _) => HandleDialogDecision(DialogResult.Accepted);
+        _dialog.Dismissed += (_, _) => HandleDialogDecision(DialogResult.Dismissed);
 
         _logs.Append("gallery booted");
         _logs.Append("tab to cycle focus");
@@ -405,17 +417,10 @@ internal sealed class WidgetGalleryModel : InteractiveScreenModel
             return InputRouteResult.NotHandled;
         }
 
-        if (_dialog.TryConsumeResult(out var dialogResult))
+        if (TryConsumePendingActionEvent(out var actionEvent))
         {
-            SetFocus(TabsRegionId);
-            _logs.Append($"dialog:{dialogResult}");
-            _lastEvent = $"dialog:{dialogResult.ToString().ToLowerInvariant()}";
+            _lastEvent = actionEvent;
             return InputRouteResult.HandledWithoutCommand;
-        }
-
-        if (_textInput.TryConsumeSubmit(out var submitted))
-        {
-            _logs.Append($"input:{submitted}");
         }
 
         _lastEvent = FocusedRegionKey == TabsRegionId
@@ -461,10 +466,16 @@ internal sealed class WidgetGalleryModel : InteractiveScreenModel
             return false;
         }
 
+        if (TryConsumePendingActionEvent(out var actionEvent))
+        {
+            _lastEvent = actionEvent;
+            return true;
+        }
+
         _lastEvent = FocusedRegionKey switch
         {
             var key when key == TabsRegionId => $"mouse:tab:{_tabs.SelectedIndex + 1}",
-            var key when key == ButtonRegionId => _button.TryConsumePress() ? "button:press" : "button:hover",
+            var key when key == ButtonRegionId => "button:hover",
             var key when key == ListRegionId => "mouse:list",
             var key when key == TableRegionId => "mouse:table",
             var key when key == DialogRegionId => $"dialog:{_dialog.LastResult}",
@@ -507,4 +518,31 @@ internal sealed class WidgetGalleryModel : InteractiveScreenModel
     }
 
     private static Command NextTick() => Tea.Cmd.Every(TimeSpan.FromMilliseconds(250), at => new GalleryTickMsg(at));
+
+    private void HandleDialogDecision(DialogResult result)
+    {
+        SetFocus(TabsRegionId);
+        var resultText = result.ToString().ToLowerInvariant();
+        _logs.Append($"dialog:{resultText}");
+        SetPendingActionEvent($"dialog:{resultText}");
+    }
+
+    private void SetPendingActionEvent(string value)
+    {
+        _pendingActionEvent = value;
+        _lastEvent = value;
+    }
+
+    private bool TryConsumePendingActionEvent(out string value)
+    {
+        if (string.IsNullOrEmpty(_pendingActionEvent))
+        {
+            value = string.Empty;
+            return false;
+        }
+
+        value = _pendingActionEvent;
+        _pendingActionEvent = null;
+        return true;
+    }
 }

@@ -85,6 +85,7 @@ internal sealed class AdvancedWidgetsModel : IModel
     private int _height = 40;
     private int _tickCount;
     private string _lastEvent = "ready";
+    private string? _pendingActionEvent;
 
     public AdvancedWidgetsModel()
     {
@@ -124,6 +125,12 @@ internal sealed class AdvancedWidgetsModel : IModel
             new CommandPaletteItem("notifications.clear", "Clear notifications", "Drops all events", [WidgetVisualState.Warning]),
         ]);
 
+        _palette.ItemExecuted += (_, args) =>
+        {
+            ExecutePaletteCommand(args.ItemId);
+            SetPendingActionEvent($"palette:{args.ItemId}");
+        };
+
         SetFocus(AdvancedFocus.Toggle);
     }
 
@@ -162,11 +169,6 @@ internal sealed class AdvancedWidgetsModel : IModel
             if (_palette.IsOpen)
             {
                 mouseChanged |= _palette.UpdateMouse(mouse, layout.ContentRect);
-                if (_palette.TryConsumeExecution(out var commandId))
-                {
-                    ExecutePaletteCommand(commandId);
-                    mouseChanged = true;
-                }
             }
             else if (layout.ToggleRect.Contains(mouse.X, mouse.Y)
                 || (mouse is MouseWheelMsg && _focus == AdvancedFocus.Toggle))
@@ -221,7 +223,9 @@ internal sealed class AdvancedWidgetsModel : IModel
 
             if (mouseChanged)
             {
-                _lastEvent = $"mouse:{mouse.EventType.ToString().ToLowerInvariant()}";
+                _lastEvent = TryConsumePendingActionEvent(out var actionEvent)
+                    ? actionEvent
+                    : $"mouse:{mouse.EventType.ToString().ToLowerInvariant()}";
             }
 
             return null;
@@ -246,9 +250,9 @@ internal sealed class AdvancedWidgetsModel : IModel
         }
 
         var paletteChanged = _palette.Update(key);
-        if (_palette.TryConsumeExecution(out var commandId))
+        if (TryConsumePendingActionEvent(out var paletteEvent))
         {
-            ExecutePaletteCommand(commandId);
+            _lastEvent = paletteEvent;
             return null;
         }
 
@@ -473,4 +477,23 @@ internal sealed class AdvancedWidgetsModel : IModel
         Rect SpinnerRect);
 
     private static Command NextTick() => Tea.Cmd.Every(TimeSpan.FromMilliseconds(200), at => new AdvancedTickMsg(at));
+
+    private void SetPendingActionEvent(string value)
+    {
+        _pendingActionEvent = value;
+        _lastEvent = value;
+    }
+
+    private bool TryConsumePendingActionEvent(out string value)
+    {
+        if (string.IsNullOrEmpty(_pendingActionEvent))
+        {
+            value = string.Empty;
+            return false;
+        }
+
+        value = _pendingActionEvent;
+        _pendingActionEvent = null;
+        return true;
+    }
 }

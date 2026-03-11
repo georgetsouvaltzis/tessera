@@ -54,11 +54,16 @@ public sealed class ButtonComponent : IStatefulComponent, IMouseStatefulComponen
 
     public bool Hovered => _hovered;
 
-    public bool Pressed => _pressed;
+    public bool IsPressed => _pressed;
 
     public int PressCount { get; private set; }
 
     public bool WasPressed { get; private set; }
+
+    /// <summary>
+    /// Raised when the button is activated by keyboard or mouse input.
+    /// </summary>
+    public event EventHandler? Pressed;
 
     /// <summary>
     /// Consumes the latest button press notification exactly once.
@@ -187,6 +192,7 @@ public sealed class ButtonComponent : IStatefulComponent, IMouseStatefulComponen
     {
         PressCount++;
         WasPressed = true;
+        Pressed?.Invoke(this, EventArgs.Empty);
         SetPressed(pressed);
         return true;
     }

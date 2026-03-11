@@ -135,11 +135,6 @@ internal sealed class DemoModel : InteractiveScreenModel
             return InputRouteResult.NotHandled;
         }
 
-        if (_dialog.TryConsumeResult(out var result))
-        {
-            SetFocus(EditorRegion);
-        }
-
         return InputRouteResult.HandledWithoutCommand;
     }
 
@@ -168,6 +163,8 @@ internal sealed class DemoModel : InteractiveScreenModel
 }
 ```
 
+Wire modal decisions and submit-style actions through component events in the model constructor, for example `_dialog.Accepted += ...`, `_dialog.Dismissed += ...`, and `_input.Submitted += ...`, so the update loop stays focused on routing instead of action polling.
+
 ## Scope Order
 
 Use this order unless you have a clear reason not to:
@@ -195,7 +192,7 @@ Meaning:
 - Use `Frame(...)` for the common header/body/footer shell before dropping into custom rect math.
 - Let `InputRouter` own key precedence.
 - Let `InteractiveScreenModel` own screen rebuild timing.
-- Prefer component consume APIs such as `TryConsumeSubmit(...)`, `TryConsumePress()`, and `TryConsumeResult(...)` over manual before/after state comparisons.
+- Prefer component action events for discrete user actions; keep `TryConsume...` helpers for pull-style update loops that want explicit consumption.
 - Use `blocksGlobalShortcuts` for plain character suppression while text input is active.
 - Prefer `SetFocus(...)`, `FocusNext()`, and `FocusPrevious()` from `InteractiveScreenModel` instead of reaching into `Screen` directly.
 - Put terminal capability toggles in `ViewTerminal`, not in app-local routing code.

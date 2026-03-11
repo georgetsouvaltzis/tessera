@@ -24,6 +24,7 @@ internal static class AdvancedPrebuiltWidgetTests
         yield return new TestCase("Advanced_SpinnerComponent_AdvancesFrame", SpinnerComponent_AdvancesFrame);
         yield return new TestCase("Advanced_SpinnerComponent_MouseWheelAdvancesFrame", SpinnerComponent_MouseWheelAdvancesFrame);
         yield return new TestCase("Advanced_CommandPaletteComponent_FiltersAndExecutes", CommandPaletteComponent_FiltersAndExecutes);
+        yield return new TestCase("Advanced_CommandPaletteComponent_ItemExecutedEvent_ReportsItem", CommandPaletteComponent_ItemExecutedEvent_ReportsItem);
         yield return new TestCase("Advanced_CommandPaletteComponent_TryConsumeExecution_IsSingleUse", CommandPaletteComponent_TryConsumeExecution_IsSingleUse);
         yield return new TestCase("Advanced_CommandPaletteComponent_MouseClickExecutesSelection", CommandPaletteComponent_MouseClickExecutesSelection);
         yield return new TestCase("Advanced_CommandPaletteComponent_ExposesQueryAccessors", CommandPaletteComponent_ExposesQueryAccessors);
@@ -206,6 +207,27 @@ internal static class AdvancedPrebuiltWidgetTests
         TestAssert.True(palette.TryConsumeExecution(out var itemId), "Command palette should expose one-shot execution consumption.");
         TestAssert.Equal("deploy", itemId, "Command palette should consume the executed item id.");
         TestAssert.True(!palette.TryConsumeExecution(out _), "Command palette should not report the same execution twice.");
+        return Task.CompletedTask;
+    }
+
+    private static Task CommandPaletteComponent_ItemExecutedEvent_ReportsItem()
+    {
+        var palette = new CommandPaletteComponent
+        {
+            Focused = true,
+        };
+        string? executed = null;
+        palette.ItemExecuted += (_, args) => executed = args.ItemId;
+        palette.SetItems(
+        [
+            new CommandPaletteItem("deploy", "Deploy", "publish release"),
+            new CommandPaletteItem("rollback", "Rollback", "restore previous"),
+        ]);
+
+        palette.Update(new KeyPressMsg(KeyCode.Character, "p", KeyModifiers.Ctrl));
+        palette.Update(new KeyPressMsg(KeyCode.Enter));
+
+        TestAssert.Equal("deploy", executed ?? string.Empty, "Command palette execution event should expose the executed command id.");
         return Task.CompletedTask;
     }
 

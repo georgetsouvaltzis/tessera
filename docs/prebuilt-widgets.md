@@ -36,8 +36,8 @@ TeaSharp provides a prebuilt widget layer in `TeaSharp.Components.Prebuilt` aime
 - `ButtonComponent` is now a first-class action control with unified keyboard + mouse activation.
   - Keyboard support: `enter` / `space` when focused.
   - Mouse support: hover tracking, left-click activation, pressed-state tracking, optional bordered rendering via `ButtonOptions.Border`, and configurable interaction behavior via `WidgetInteractionProfile`.
-  - Component-level action state: `WasPressed`, `PressCount`, `Hovered`, `Pressed`, and `TryConsumePress()`.
-- `TextInputComponent` provides single-line text entry with component-level accessors (`Value`, `SetValue`, `Placeholder`, `MaxLength`) plus cancel semantics via `CancelKey` (`esc` default), `CancelCount`, `WasCancelled`, `LastCancelledValue`, `TryConsumeSubmit(...)`, and `TryConsumeCancel(...)`.
+  - App hooks: `Pressed` event plus `WasPressed`, `PressCount`, `Hovered`, `IsPressed`, and `TryConsumePress()`.
+- `TextInputComponent` provides single-line text entry with component-level accessors (`Value`, `SetValue`, `Placeholder`, `MaxLength`) plus cancel semantics via `CancelKey` (`esc` default), `CancelCount`, `WasCancelled`, `LastCancelledValue`, `Submitted`, `Cancelled`, `TryConsumeSubmit(...)`, and `TryConsumeCancel(...)`.
 - `TextAreaComponent` provides multiline editing with component-level text access (`Value`, `SetValue`, `Clear`) and optional line numbers.
 - `ListComponent<T>` provides filtering, selection, paging, and item replacement through component-level APIs (`SetItems`, `SetFilter`, `SelectedItem`, `SelectedIndex`, `PageSize`).
   - Mouse support: motion previews row hover (`▸` marker), left click selects a visible row, wheel scroll navigates selection.
@@ -52,7 +52,7 @@ TeaSharp provides a prebuilt widget layer in `TeaSharp.Components.Prebuilt` aime
   - Mouse support: child hit-test routing and optional drag-resize split for 2-pane horizontal/vertical layouts (`PrimarySize`, `SetPrimarySize`, `ClearPrimarySize`).
   - Use `ComponentComposer` as the focus/routing owner when a layout container participates in a larger interactive screen.
 - `CommandPaletteComponent` provides fuzzy command filtering and execution (`ctrl+p` default open key) with component-level query accessors (`QueryText`, `SetQueryText(...)`, `ClearQuery()`).
-  - App-friendly execution hook: `TryConsumeExecution(...)`.
+  - App-friendly execution hooks: `ItemExecuted` and `TryConsumeExecution(...)`.
   - Mouse support: motion hover preview, wheel navigation, click execute, and outside-click close when open.
 - `TreeViewComponent` provides hierarchical expand/collapse navigation with keyboard controls.
   - Mouse support: motion hover preview, click row selection, wheel navigation.
@@ -64,9 +64,9 @@ TeaSharp provides a prebuilt widget layer in `TeaSharp.Components.Prebuilt` aime
 - `MenuBarComponent` and `ContextMenuComponent` provide top-level and contextual action surfaces.
   - Mouse support: hover preview, click selection/execute, and wheel navigation.
   - Friendly setup paths: `MenuBarOptions`, `ContextMenuOptions`, and `SetItems(params ...)`.
-  - App-friendly execution hooks: `TryConsumeActivation(...)`, `TryConsumeExecution(...)`.
+  - App-friendly execution hooks: `ItemActivated`, `ItemExecuted`, `TryConsumeActivation(...)`, and `TryConsumeExecution(...)`.
 - `NumberInputComponent`, `DatePickerComponent`, and `TimePickerComponent` provide structured value entry, with `NumberInputComponent.Text` exposing the rendered numeric text without leaking the text-input model.
-  - App-friendly submit hook: `NumberInputComponent.TryConsumeSubmit(...)`.
+  - App-friendly submit hooks: `NumberInputComponent.Submitted` and `TryConsumeSubmit(...)`.
   - Mouse support (`DatePickerComponent`, `TimePickerComponent`): day/field selection on click and wheel adjustment/navigation.
   - Friendly setup paths: `NumberInputOptions`, `DatePickerOptions`, `TimePickerOptions`.
 - `MarkdownViewerComponent` provides scrollable markdown rendering for docs/help panes.

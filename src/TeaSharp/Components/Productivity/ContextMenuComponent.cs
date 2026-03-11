@@ -66,6 +66,11 @@ public sealed partial class ContextMenuComponent : IStatefulComponent, IMouseSta
     public string? LastExecutedItemId { get; private set; }
 
     /// <summary>
+    /// Raised when a context-menu item is executed.
+    /// </summary>
+    public event EventHandler<ContextMenuItemExecutedEventArgs>? ItemExecuted;
+
+    /// <summary>
     /// Consumes the latest context-menu execution exactly once.
     /// </summary>
     public bool TryConsumeExecution(out string itemId)
@@ -158,9 +163,7 @@ public sealed partial class ContextMenuComponent : IStatefulComponent, IMouseSta
 
         if (!ReadOnly && ExecuteKey.Matches(key))
         {
-            LastExecutedItemId = _items[_selectedIndex].Id;
-            _executionVersion++;
-            Close();
+            ExecuteItem(_selectedIndex);
             return true;
         }
 
@@ -254,9 +257,7 @@ public sealed partial class ContextMenuComponent : IStatefulComponent, IMouseSta
 
                 if (!ReadOnly)
                 {
-                    LastExecutedItemId = _items[_selectedIndex].Id;
-                    _executionVersion++;
-                    Close();
+                    ExecuteItem(_selectedIndex);
                     changed = true;
                 }
             }
@@ -314,5 +315,14 @@ public sealed partial class ContextMenuComponent : IStatefulComponent, IMouseSta
             && y < rect.Bottom
             && x >= rect.X
             && x <= rect.Right;
+    }
+
+    private void ExecuteItem(int index)
+    {
+        var item = _items[index];
+        LastExecutedItemId = item.Id;
+        _executionVersion++;
+        ItemExecuted?.Invoke(this, new ContextMenuItemExecutedEventArgs(item));
+        Close();
     }
 }

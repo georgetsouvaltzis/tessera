@@ -17,15 +17,18 @@ internal static class ProductivityPrebuiltWidgetTests
     public static IEnumerable<TestCase> Cases()
     {
         yield return new TestCase("Productivity_MenuBarComponent_ActivatesShortcut", MenuBarComponent_ActivatesShortcut);
+        yield return new TestCase("Productivity_MenuBarComponent_ItemActivatedEvent_ReportsItem", MenuBarComponent_ItemActivatedEvent_ReportsItem);
         yield return new TestCase("Productivity_MenuBarComponent_TryConsumeActivation_IsSingleUse", MenuBarComponent_TryConsumeActivation_IsSingleUse);
         yield return new TestCase("Productivity_MenuBarComponent_MouseClickActivatesItem", MenuBarComponent_MouseClickActivatesItem);
         yield return new TestCase("Productivity_MenuBarComponent_ParamsSetterReplacesItems", MenuBarComponent_ParamsSetterReplacesItems);
         yield return new TestCase("Productivity_ContextMenuComponent_ExecutesAndCloses", ContextMenuComponent_ExecutesAndCloses);
+        yield return new TestCase("Productivity_ContextMenuComponent_ItemExecutedEvent_ReportsItem", ContextMenuComponent_ItemExecutedEvent_ReportsItem);
         yield return new TestCase("Productivity_ContextMenuComponent_TryConsumeExecution_IsSingleUse", ContextMenuComponent_TryConsumeExecution_IsSingleUse);
         yield return new TestCase("Productivity_ContextMenuComponent_MouseClickExecutesAndCloses", ContextMenuComponent_MouseClickExecutesAndCloses);
         yield return new TestCase("Productivity_ContextMenuComponent_MouseReleaseExecutesAndCloses", ContextMenuComponent_MouseReleaseExecutesAndCloses);
         yield return new TestCase("Productivity_ContextMenuComponent_ParamsSetterReplacesItems", ContextMenuComponent_ParamsSetterReplacesItems);
         yield return new TestCase("Productivity_NumberInputComponent_AdjustsAndSubmits", NumberInputComponent_AdjustsAndSubmits);
+        yield return new TestCase("Productivity_NumberInputComponent_SubmittedEvent_ReportsValue", NumberInputComponent_SubmittedEvent_ReportsValue);
         yield return new TestCase("Productivity_NumberInputComponent_TryConsumeSubmit_IsSingleUse", NumberInputComponent_TryConsumeSubmit_IsSingleUse);
         yield return new TestCase("Productivity_DatePickerComponent_MovesDate", DatePickerComponent_MovesDate);
         yield return new TestCase("Productivity_DatePickerComponent_MouseClickSelectsDate", DatePickerComponent_MouseClickSelectsDate);
@@ -91,6 +94,24 @@ internal static class ProductivityPrebuiltWidgetTests
         return Task.CompletedTask;
     }
 
+    private static Task MenuBarComponent_ItemActivatedEvent_ReportsItem()
+    {
+        var menu = new MenuBarComponent(new MenuBarOptions(
+            Items:
+            [
+                new MenuBarItem("file", "File", 'f'),
+                new MenuBarItem("help", "Help", 'h'),
+            ],
+            Focused: true));
+        string? activated = null;
+        menu.ItemActivated += (_, args) => activated = args.ItemId;
+
+        menu.Update(new KeyPressMsg(KeyCode.Enter));
+
+        TestAssert.Equal("file", activated ?? string.Empty, "Menu bar activation event should expose the selected item id.");
+        return Task.CompletedTask;
+    }
+
     private static Task ContextMenuComponent_ExecutesAndCloses()
     {
         var menu = new ContextMenuComponent(new ContextMenuOptions(
@@ -143,6 +164,26 @@ internal static class ProductivityPrebuiltWidgetTests
         TestAssert.True(menu.TryConsumeExecution(out var itemId), "Context menu should expose one-shot execution consumption.");
         TestAssert.Equal("copy", itemId, "Context menu should consume the executed item id.");
         TestAssert.True(!menu.TryConsumeExecution(out _), "Context menu should not report the same execution twice.");
+        return Task.CompletedTask;
+    }
+
+    private static Task ContextMenuComponent_ItemExecutedEvent_ReportsItem()
+    {
+        var menu = new ContextMenuComponent(new ContextMenuOptions(
+            Items:
+            [
+                new ContextMenuItem("copy", "Copy"),
+                new ContextMenuItem("paste", "Paste"),
+            ],
+            Focused: true));
+        string? executed = null;
+        menu.ItemExecuted += (_, args) => executed = args.ItemId;
+        menu.OpenAt(4, 2);
+
+        menu.Update(new KeyPressMsg(KeyCode.Down));
+        menu.Update(new KeyPressMsg(KeyCode.Enter));
+
+        TestAssert.Equal("paste", executed ?? string.Empty, "Context menu execution event should expose the executed item id.");
         return Task.CompletedTask;
     }
 
@@ -228,6 +269,20 @@ internal static class ProductivityPrebuiltWidgetTests
         TestAssert.True(input.TryConsumeSubmit(out var submitted), "Number input should expose one-shot submit consumption.");
         TestAssert.True(Math.Abs(submitted - 3) < 0.0001, "Number input should consume the submitted numeric value.");
         TestAssert.True(!input.TryConsumeSubmit(out _), "Number input should not report the same submit twice.");
+        return Task.CompletedTask;
+    }
+
+    private static Task NumberInputComponent_SubmittedEvent_ReportsValue()
+    {
+        var input = new NumberInputComponent(new NumberInputOptions(
+            Focused: true,
+            InitialValue: 3));
+        double submitted = -1;
+        input.Submitted += (_, args) => submitted = args.Value;
+
+        input.Update(new KeyPressMsg(KeyCode.Enter));
+
+        TestAssert.True(Math.Abs(submitted - 3) < 0.0001, "Number input submit event should expose the submitted numeric value.");
         return Task.CompletedTask;
     }
 

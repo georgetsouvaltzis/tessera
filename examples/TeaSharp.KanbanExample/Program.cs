@@ -179,12 +179,37 @@ internal sealed class KanbanModel : IModel
     private PendingDelete? _pendingDelete;
     private int? _boardSplitWidth;
     private bool _draggingBoardSplit;
+    private string? _pendingActionEvent;
 
     public KanbanModel()
     {
         ApplyListPalettes();
         RefreshColumns();
         PushInfo("Kanban ready. Tab focus, h/l move cards, n add, x delete.");
+
+        _composer.Submitted += (_, args) =>
+        {
+            CreateCardFromComposer(args.Value);
+            SetPendingActionEvent(_lastEvent);
+        };
+
+        _composer.Cancelled += (_, _) =>
+        {
+            SetFocus(_focusBeforeComposer);
+            SetPendingActionEvent($"focus:{_focus.ToString().ToLowerInvariant()}");
+        };
+
+        _deleteDialog.Accepted += (_, _) =>
+        {
+            CommitDelete();
+            SetPendingActionEvent(_lastEvent);
+        };
+
+        _deleteDialog.Dismissed += (_, _) =>
+        {
+            CancelDelete();
+            SetPendingActionEvent(_lastEvent);
+        };
 
         SetFocus(KanbanFocus.Todo);
     }
@@ -222,18 +247,9 @@ internal sealed class KanbanModel : IModel
         {
             if (_deleteDialog.Update(key))
             {
-                if (_deleteDialog.TryConsumeResult(out var result) && result == DialogResult.Accepted)
+                if (TryConsumePendingActionEvent(out var dialogEvent))
                 {
-                    CommitDelete();
-                }
-                else
-                {
-                    _pendingDelete = null;
-                    _lastEvent = "delete:cancelled";
-                    if (!_deleteDialog.Visible)
-                    {
-                        _deleteDialog.Focused = false;
-                    }
+                    _lastEvent = dialogEvent;
                 }
             }
 
@@ -706,18 +722,9 @@ internal sealed class KanbanModel : IModel
         if (_focus == KanbanFocus.Composer)
         {
             var changed = _composer.Update(key);
-            if (_composer.TryConsumeCancel(out _))
+            if (TryConsumePendingActionEvent(out var actionEvent))
             {
-                SetFocus(_focusBeforeComposer);
-                eventOverride = $"focus:{_focus.ToString().ToLowerInvariant()}";
-                return true;
-            }
-
-            if (_composer.TryConsumeSubmit(out var submitted))
-            {
-                CreateCardFromComposer(submitted);
-                eventOverride = _lastEvent;
-                return true;
+                eventOverride = actionEvent;
             }
 
             return changed;
@@ -1017,6 +1024,14 @@ internal sealed class KanbanModel : IModel
         PushInfo($"deleted #{pending.CardId}");
     }
 
+    private void CancelDelete()
+    {
+        _pendingDelete = null;
+        _deleteDialog.Visible = false;
+        _deleteDialog.Focused = false;
+        _lastEvent = "delete:cancelled";
+    }
+
     private bool TryGetSelected(out KanbanLane lane, out KanbanCard card)
     {
         lane = KanbanLane.Todo;
@@ -1216,5 +1231,24 @@ internal sealed class KanbanModel : IModel
     private void PushWarning(string message)
     {
         _activity.Push(message, NotificationSeverity.Warning);
+    }
+
+    private void SetPendingActionEvent(string value)
+    {
+        _pendingActionEvent = value;
+        _lastEvent = value;
+    }
+
+    private bool TryConsumePendingActionEvent(out string value)
+    {
+        if (string.IsNullOrEmpty(_pendingActionEvent))
+        {
+            value = string.Empty;
+            return false;
+        }
+
+        value = _pendingActionEvent;
+        _pendingActionEvent = null;
+        return true;
     }
 }

@@ -52,6 +52,11 @@ public sealed class MenuBarComponent : IStatefulComponent, IMouseStatefulCompone
 
     public long ActivationVersion { get; private set; }
 
+    /// <summary>
+    /// Raised when a menu item is activated by shortcut, keyboard selection, or mouse click.
+    /// </summary>
+    public event EventHandler<MenuBarItemActivatedEventArgs>? ItemActivated;
+
     public KeyBinding NextItemKey { get; set; } = new("right/l", "next item", "right", "l");
 
     public KeyBinding PreviousItemKey { get; set; } = new("left/h", "previous item", "left", "h");
@@ -122,8 +127,7 @@ public sealed class MenuBarComponent : IStatefulComponent, IMouseStatefulCompone
                 }
 
                 SelectedIndex = i;
-                LastActivatedItemId = _items[i].Id;
-                ActivationVersion++;
+                ActivateItem(_items[i]);
                 return true;
             }
         }
@@ -142,8 +146,7 @@ public sealed class MenuBarComponent : IStatefulComponent, IMouseStatefulCompone
 
         if (!ReadOnly && ActivateKey.Matches(key))
         {
-            LastActivatedItemId = _items[SelectedIndex].Id;
-            ActivationVersion++;
+            ActivateSelectedItem();
             return true;
         }
 
@@ -207,8 +210,7 @@ public sealed class MenuBarComponent : IStatefulComponent, IMouseStatefulCompone
 
                 if (!ReadOnly)
                 {
-                    LastActivatedItemId = _items[SelectedIndex].Id;
-                    ActivationVersion++;
+                    ActivateSelectedItem();
                     changed = true;
                 }
             }
@@ -300,5 +302,17 @@ public sealed class MenuBarComponent : IStatefulComponent, IMouseStatefulCompone
 
         _hoveredIndex = index;
         return true;
+    }
+
+    private void ActivateSelectedItem()
+    {
+        ActivateItem(_items[SelectedIndex]);
+    }
+
+    private void ActivateItem(MenuBarItem item)
+    {
+        LastActivatedItemId = item.Id;
+        ActivationVersion++;
+        ItemActivated?.Invoke(this, new MenuBarItemActivatedEventArgs(item));
     }
 }

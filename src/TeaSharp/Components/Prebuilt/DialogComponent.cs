@@ -54,6 +54,16 @@ public sealed class DialogComponent : IStatefulComponent, IFocusableComponent
     public KeyBinding DismissKey { get; set; } = new("esc", "dismiss", "escape");
 
     /// <summary>
+    /// Raised when the dialog is accepted.
+    /// </summary>
+    public event EventHandler? Accepted;
+
+    /// <summary>
+    /// Raised when the dialog is dismissed.
+    /// </summary>
+    public event EventHandler? Dismissed;
+
+    /// <summary>
     /// Consumes the latest dialog result exactly once.
     /// </summary>
     public bool TryConsumeResult(out DialogResult result)
@@ -78,18 +88,12 @@ public sealed class DialogComponent : IStatefulComponent, IFocusableComponent
 
         if (DismissKey.Matches(key))
         {
-            Visible = false;
-            LastResult = DialogResult.Dismissed;
-            _resultVersion++;
-            return true;
+            return ApplyResult(DialogResult.Dismissed);
         }
 
         if (AcceptKey.Matches(key))
         {
-            Visible = false;
-            LastResult = DialogResult.Accepted;
-            _resultVersion++;
-            return true;
+            return ApplyResult(DialogResult.Accepted);
         }
 
         return false;
@@ -112,5 +116,22 @@ public sealed class DialogComponent : IStatefulComponent, IFocusableComponent
             Theme = Theme,
         };
         modal.Render(canvas, rect);
+    }
+
+    private bool ApplyResult(DialogResult result)
+    {
+        Visible = false;
+        LastResult = result;
+        _resultVersion++;
+        if (result == DialogResult.Accepted)
+        {
+            Accepted?.Invoke(this, EventArgs.Empty);
+        }
+        else if (result == DialogResult.Dismissed)
+        {
+            Dismissed?.Invoke(this, EventArgs.Empty);
+        }
+
+        return true;
     }
 }

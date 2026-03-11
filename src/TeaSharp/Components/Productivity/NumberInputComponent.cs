@@ -72,6 +72,11 @@ public sealed class NumberInputComponent : IStatefulComponent, IFocusableCompone
 
     public double? LastSubmittedValue { get; private set; }
 
+    /// <summary>
+    /// Raised when the input submits a numeric value.
+    /// </summary>
+    public event EventHandler<NumberInputSubmittedEventArgs>? Submitted;
+
     public KeyBinding IncreaseKey { get; set; } = new("up/+", "increase", "up", "+");
 
     public KeyBinding DecreaseKey { get; set; } = new("down/-", "decrease", "down", "-");
@@ -132,10 +137,7 @@ public sealed class NumberInputComponent : IStatefulComponent, IFocusableCompone
             {
                 if (TryParseInput(out var parsed))
                 {
-                    Value = NumberInputFormatting.Clamp(parsed, Min, Max);
-                    LastSubmittedValue = Value;
-                    _submitVersion++;
-                    SyncInput();
+                    SubmitValue(parsed);
                 }
 
                 return true;
@@ -164,10 +166,7 @@ public sealed class NumberInputComponent : IStatefulComponent, IFocusableCompone
 
         if (result.Submitted && TryParseInput(out var submitted))
         {
-            Value = NumberInputFormatting.Clamp(submitted, Min, Max);
-            LastSubmittedValue = Value;
-            _submitVersion++;
-            SyncInput();
+            SubmitValue(submitted);
             return true;
         }
 
@@ -193,5 +192,14 @@ public sealed class NumberInputComponent : IStatefulComponent, IFocusableCompone
     {
         _input.SetValue(NumberInputFormatting.Format(Value, Precision));
         _replaceOnNextCharacter = true;
+    }
+
+    private void SubmitValue(double parsed)
+    {
+        Value = NumberInputFormatting.Clamp(parsed, Min, Max);
+        LastSubmittedValue = Value;
+        _submitVersion++;
+        Submitted?.Invoke(this, new NumberInputSubmittedEventArgs(Value));
+        SyncInput();
     }
 }
