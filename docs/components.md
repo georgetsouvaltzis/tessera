@@ -176,7 +176,7 @@ The design follows patterns used in Bubble Tea examples:
 
 ## Example Integration
 
-`TeaSharp.Examples` now has a dashboard page (press `2`) that renders:
+`Showcase` now has a dashboard page (press `2`) that renders:
 
 - system status panel
 - count gauge
@@ -205,15 +205,15 @@ The dashboard composes chart components through `ComponentComposer` and uses sta
 
 A dedicated app now exists for the prebuilt widget set:
 
-- project: `examples/TeaSharp.WidgetGallery`
-- run: `dotnet run --project examples/TeaSharp.WidgetGallery/TeaSharp.WidgetGallery.csproj`
+- project: `examples/WidgetGallery`
+- run: `dotnet run --project examples/WidgetGallery/WidgetGallery.csproj`
 - docs: `docs/prebuilt-widgets.md`
 - this is the recommended copy/paste starter for the current public app API surface
 
 Scenario app example:
 
-- project: `examples/TeaSharp.KanbanExample`
-- run: `dotnet run --project examples/TeaSharp.KanbanExample/TeaSharp.KanbanExample.csproj`
+- project: `examples/Kanban`
+- run: `dotnet run --project examples/Kanban/Kanban.csproj`
 - flow: multi-board Kanban with lane movement, quick card creation, delete confirmation dialog, and activity feed.
 - note: this app still uses a more manual `IModel` composition style and should be treated as an advanced example, not the default starter template
 

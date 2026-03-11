@@ -160,26 +160,31 @@ SetFocus(0);
 A dedicated widget demo app is available:
 
 ```bash
-dotnet run --project examples/TeaSharp.WidgetGallery/TeaSharp.WidgetGallery.csproj
+dotnet run --project examples/WidgetGallery/WidgetGallery.csproj
 ```
 
-`TeaSharp.WidgetGallery` now doubles as the happy-path composition sample:
+`WidgetGallery` now doubles as the happy-path composition sample:
 - uses `Form(...)` for the input tab
 - uses `Dashboard(...)` for the data tab
 - uses `CreateDialogWorkflow(...)` for the overlay dialog flow
 - should be treated as the primary starter reference for the current public app API
 
+`ProductivityWidgets` is also on the scaffold path now:
+- uses `InteractiveScreenModel`
+- uses `Dashboard(...)` for the main shell
+- uses palette-style screen composition for the context menu
+
 Dedicated widget-focused demos are also available:
 
 ```bash
-dotnet run --project examples/TeaSharp.DropdownExample/TeaSharp.DropdownExample.csproj
-dotnet run --project examples/TeaSharp.ComboBoxExample/TeaSharp.ComboBoxExample.csproj
-dotnet run --project examples/TeaSharp.AdvancedWidgetsExample/TeaSharp.AdvancedWidgetsExample.csproj
-dotnet run --project examples/TeaSharp.ProductivityWidgetsExample/TeaSharp.ProductivityWidgetsExample.csproj
-dotnet run --project examples/TeaSharp.KanbanExample/TeaSharp.KanbanExample.csproj
+dotnet run --project examples/Dropdown/Dropdown.csproj
+dotnet run --project examples/ComboBox/ComboBox.csproj
+dotnet run --project examples/AdvancedWidgets/AdvancedWidgets.csproj
+dotnet run --project examples/ProductivityWidgets/ProductivityWidgets.csproj
+dotnet run --project examples/Kanban/Kanban.csproj
 ```
 
-`TeaSharp.KanbanExample` and `TeaSharp.ProductivityWidgetsExample` are still useful, but they currently demonstrate more manual app composition patterns than `TeaSharp.WidgetGallery`.
+`Kanban` is still useful, but it currently demonstrates a more manual app composition pattern than `WidgetGallery` and `ProductivityWidgets`.
 
 Core gallery hotkeys:
 

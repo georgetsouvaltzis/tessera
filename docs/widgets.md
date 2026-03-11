@@ -42,7 +42,7 @@ These types remain public for advanced composition and custom controls, but the 
 
 ## Example Integration
 
-`TeaSharp.Examples` workspace page (`2`) now composes:
+`Showcase` workspace page (`2`) now composes:
 
 - actions table backed by `ListModel<ActionItem>`
 - scrollable log panel backed by `ViewportModel`

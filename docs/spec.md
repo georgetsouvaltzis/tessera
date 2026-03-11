@@ -7,7 +7,7 @@ Single repository. Layered packages:
 
 - `TeaSharp.Core`: terminal primitives + program runtime.
 - `TeaSharp`: ergonomic framework surface over core.
-- `TeaSharp.Examples`: runnable sample apps.
+- `Showcase`: runnable sample app workspace.
 - `TeaSharp.Tests`: lightweight in-repo behavioral regression suite.
 - `TeaSharp.IntegrationTests`: NUnit integration tests (`dotnet test`) for UX contracts and end-to-end message routing.
 

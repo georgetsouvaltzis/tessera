@@ -45,7 +45,7 @@ internal sealed class WidgetGalleryModel : InteractiveScreenModel
     private readonly TabsComponent _tabs = new(new TabsOptions(["Basics", "Inputs", "Data", "Overlay", "Layout"]));
     private readonly LabelComponent _label = new(new LabelOptions(
         Title: "Label",
-        Text: "TeaSharp Widget Gallery\n\nRead-only text.\nTitles, captions, help, and status lines."));
+        Text: "Widget Gallery\n\nRead-only text.\nTitles, captions, help, and status lines."));
     private readonly ButtonComponent _button = new(new ButtonOptions(
         Label: "Deploy",
         Description: "click, enter, or space",
@@ -188,7 +188,7 @@ internal sealed class WidgetGalleryModel : InteractiveScreenModel
     {
         if (_width < 60 || _height < 18)
         {
-            return ModelView.From("TeaSharp Widget Gallery\n\nTerminal too small.\nExpand to at least 60x18.");
+            return ModelView.From("Widget Gallery\n\nTerminal too small.\nExpand to at least 60x18.");
         }
 
         var canvas = new Canvas(_width, _height, CanvasTextMode.GraphemeAware);
@@ -212,7 +212,7 @@ internal sealed class WidgetGalleryModel : InteractiveScreenModel
                 ForegroundColor = "#CDD6F4",
                 BackgroundColor = "#1E1E2E",
                 CursorColor = "#F5C2E7",
-                WindowTitle = "TeaSharp Widget Gallery",
+                WindowTitle = "Widget Gallery",
             },
         };
     }

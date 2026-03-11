@@ -384,7 +384,7 @@ internal sealed class KanbanModel : IModel
         var height = Math.Max(MinimumHeight, _height);
         if (_width < MinimumWidth || _height < MinimumHeight)
         {
-            return ModelView.From("TeaSharp Kanban Example\n\nTerminal too small. Expand to at least 92x26.");
+            return ModelView.From("Kanban\n\nTerminal too small. Expand to at least 92x26.");
         }
 
         UpdateDetails();
@@ -422,7 +422,7 @@ internal sealed class KanbanModel : IModel
                 ForegroundColor = "#CDD6F4",
                 BackgroundColor = "#1E1E2E",
                 CursorColor = "#F5C2E7",
-                WindowTitle = "TeaSharp Kanban Example",
+                WindowTitle = "Kanban",
             },
         };
     }

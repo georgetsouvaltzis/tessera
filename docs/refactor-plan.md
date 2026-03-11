@@ -73,7 +73,7 @@ Status: in progress
 - replace tests coupled to mutable showcase/example programs with dedicated fixture apps
 - keep integration fixtures intentionally small and stable
 - let examples optimize for demonstration while fixtures optimize for regression coverage
-- added a dedicated counter fixture app under `tests/` and rewired integration coverage away from `examples/TeaSharp.Examples`
+- added a dedicated counter fixture app under `tests/` and rewired integration coverage away from `examples/Showcase`
 
 ## Phase 6: Package Quality
 

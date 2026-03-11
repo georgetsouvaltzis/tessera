@@ -318,7 +318,7 @@ For everything else, this should be the default starting point.
 
 ## Starter Guidance
 
-If you want a real runnable reference for this pattern, start with `examples/TeaSharp.WidgetGallery`.
+If you want a real runnable reference for this pattern, start with `examples/WidgetGallery`.
 
 It already demonstrates:
 
