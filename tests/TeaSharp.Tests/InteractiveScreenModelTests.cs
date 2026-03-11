@@ -18,6 +18,7 @@ internal static class InteractiveScreenModelTests
     public static IEnumerable<TestCase> Cases()
     {
         yield return new TestCase("Application_InteractiveScreenModel_RoutesKeyWithoutManualEnsureScreen", InteractiveScreenModel_RoutesKeyWithoutManualEnsureScreen);
+        yield return new TestCase("Application_InteractiveScreenModel_MasterDetailHelper_ComposesShell", InteractiveScreenModel_MasterDetailHelper_ComposesShell);
         yield return new TestCase("Application_InteractiveScreenModel_HandleTabNavigation_UsesFocusChainOrder", InteractiveScreenModel_HandleTabNavigation_UsesFocusChainOrder);
         yield return new TestCase("Application_InteractiveScreenModel_RestoreFocus_UsesCapturedSnapshot", InteractiveScreenModel_RestoreFocus_UsesCapturedSnapshot);
     }
@@ -44,6 +45,19 @@ internal static class InteractiveScreenModelTests
 
         TestAssert.True(model.CurrentFocusedRegionKey == ProbeScreenModel.ButtonRegionId, "Focus chain tab handling should cycle through the configured chain.");
         TestAssert.True(model.ButtonPresses == 0, "Tab navigation helper should not route the tab key into the focused component.");
+        return Task.CompletedTask;
+    }
+
+    private static Task InteractiveScreenModel_MasterDetailHelper_ComposesShell()
+    {
+        var model = new ProbeMasterDetailScreenModel();
+
+        _ = model.View();
+
+        TestAssert.Equal(new Rect(0, 0, 40, 1), model.HeaderBounds, "Interactive model helper should expose header bounds through the master-detail scaffold.");
+        TestAssert.Equal(new Rect(0, 1, 14, 10), model.MasterBounds, "Interactive model helper should expose master bounds through the master-detail scaffold.");
+        TestAssert.Equal(new Rect(14, 1, 26, 10), model.DetailBounds, "Interactive model helper should expose detail bounds through the master-detail scaffold.");
+        TestAssert.Equal(new Rect(0, 11, 40, 1), model.FooterBounds, "Interactive model helper should expose footer bounds through the master-detail scaffold.");
         return Task.CompletedTask;
     }
 
@@ -132,6 +146,47 @@ internal static class InteractiveScreenModelTests
         public bool RestoreSecondaryFocus()
         {
             return RestoreFocus(_secondaryFocus, _focusChain);
+        }
+    }
+
+    private sealed class ProbeMasterDetailScreenModel : InteractiveScreenModel
+    {
+        private readonly ProbeButton _master = new();
+        private readonly ProbeButton _detail = new();
+
+        public Rect HeaderBounds { get; private set; }
+
+        public Rect MasterBounds { get; private set; }
+
+        public Rect DetailBounds { get; private set; }
+
+        public Rect FooterBounds { get; private set; }
+
+        public override Command? Init() => null;
+
+        public override Command? Update(IMessage message) => null;
+
+        public override View View()
+        {
+            var canvas = new Canvas(40, 12);
+            RenderScreen(canvas);
+            return TeaSharp.Core.Abstractions.View.From(canvas.Render());
+        }
+
+        protected override Rect GetBodyRect() => new(0, 0, 40, 12);
+
+        protected override void ComposeScreen(Rect bodyRect)
+        {
+            var scaffold = MasterDetail(bodyRect, masterWidth: 14, headerHeight: 1, footerHeight: 1);
+            HeaderBounds = scaffold.Header;
+            MasterBounds = scaffold.Master;
+            DetailBounds = scaffold.Detail;
+            FooterBounds = scaffold.Footer;
+
+            scaffold.AddHeader("probe.header", new StatusBarComponent(new StatusBarOptions(LeftText: "Header")));
+            scaffold.AddMaster("probe.master", _master);
+            scaffold.AddDetail("probe.detail", _detail);
+            scaffold.AddFooter("probe.footer", new StatusBarComponent(new StatusBarOptions(LeftText: "Footer")));
         }
     }
 

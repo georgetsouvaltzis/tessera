@@ -17,6 +17,7 @@ internal static class ApiErgonomicsTests
     {
         yield return new TestCase("ApiErgonomics_Thickness_UsesStandardSpacingVocabulary", Thickness_UsesStandardSpacingVocabulary);
         yield return new TestCase("ApiErgonomics_ScreenFrameLayout_ReducesScreenRectBookkeeping", ScreenFrameLayout_ReducesScreenRectBookkeeping);
+        yield return new TestCase("ApiErgonomics_MasterDetailScreen_ReducesShellBookkeeping", MasterDetailScreen_ReducesShellBookkeeping);
         yield return new TestCase("ApiErgonomics_TextInputOptions_ConfigureComponentWithoutNestedInputAccess", TextInputOptions_ConfigureComponentWithoutNestedInputAccess);
         yield return new TestCase("ApiErgonomics_TextAreaOptions_ConfigureComponentWithoutNestedInputAccess", TextAreaOptions_ConfigureComponentWithoutNestedInputAccess);
         yield return new TestCase("ApiErgonomics_ListComponent_ExposesSelectionWithoutModelAccess", ListComponent_ExposesSelectionWithoutModelAccess);
@@ -59,6 +60,28 @@ internal static class ApiErgonomicsTests
         TestAssert.Equal(new Rect(0, 28, 100, 2), frame.Footer, "Screen frame should expose footer bounds directly.");
         TestAssert.Equal(28, left.Width, "Screen frame body split should preserve requested left width.");
         TestAssert.Equal(72, right.Width, "Screen frame body split should preserve remaining width.");
+        return Task.CompletedTask;
+    }
+
+    private static Task MasterDetailScreen_ReducesShellBookkeeping()
+    {
+        var screen = new ScreenComposer();
+        var scaffold = screen.MasterDetail(new Rect(0, 0, 100, 30), masterWidth: 28, headerHeight: 1, footerHeight: 2);
+        var master = new ButtonComponent();
+        var detail = new ButtonComponent();
+
+        screen.BeginFrame();
+        scaffold.AddMaster("master", master);
+        scaffold.AddDetail("detail", detail);
+        screen.CompleteFrame();
+
+        var focusChain = scaffold.CreateFocusChain();
+        var changed = screen.FocusFirst(focusChain);
+
+        TestAssert.Equal(new Rect(0, 1, 28, 27), scaffold.Master, "Master-detail scaffold should expose master bounds directly.");
+        TestAssert.Equal(new Rect(28, 1, 72, 27), scaffold.Detail, "Master-detail scaffold should expose detail bounds directly.");
+        TestAssert.True(changed, "Master-detail scaffold should build a reusable focus chain from added regions.");
+        TestAssert.True(screen.FocusedRegionKey == new ScreenRegionKey("master"), "Scaffold focus chain should respect helper-add order.");
         return Task.CompletedTask;
     }
 

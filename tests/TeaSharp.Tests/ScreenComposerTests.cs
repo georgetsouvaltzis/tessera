@@ -18,6 +18,8 @@ internal static class ScreenComposerTests
     public static IEnumerable<TestCase> Cases()
     {
         yield return new TestCase("Components_ScreenComposer_FrameCreatesHeaderBodyFooterRegions", ScreenComposer_FrameCreatesHeaderBodyFooterRegions);
+        yield return new TestCase("Components_ScreenComposer_MasterDetailCreatesExpectedRegions", ScreenComposer_MasterDetailCreatesExpectedRegions);
+        yield return new TestCase("Components_MasterDetailScreen_CreateFocusChainTracksAddedRegions", MasterDetailScreen_CreateFocusChainTracksAddedRegions);
         yield return new TestCase("Components_ScreenComposer_MouseClickFocusesAndRoutesToRegisteredRegion", ScreenComposer_MouseClickFocusesAndRoutesToRegisteredRegion);
         yield return new TestCase("Components_ScreenComposer_FocusNextCyclesAcrossFocusableRegions", ScreenComposer_FocusNextCyclesAcrossFocusableRegions);
         yield return new TestCase("Components_ScreenComposer_FocusFirstTargetsFirstFocusableRegion", ScreenComposer_FocusFirstTargetsFirstFocusableRegion);
@@ -42,6 +44,48 @@ internal static class ScreenComposerTests
         TestAssert.Equal(56, right.Width, "Body column split should preserve remaining width.");
         TestAssert.Equal(10, top.Height, "Body row split should preserve requested top height when possible.");
         TestAssert.Equal(11, bottom.Height, "Body row split should preserve remaining height.");
+        return Task.CompletedTask;
+    }
+
+    private static Task ScreenComposer_MasterDetailCreatesExpectedRegions()
+    {
+        var composer = new ScreenComposer();
+        var scaffold = composer.MasterDetail(new Rect(0, 0, 100, 30), masterWidth: 32, headerHeight: 2, footerHeight: 1);
+
+        TestAssert.Equal(new Rect(0, 0, 100, 2), scaffold.Header, "Master-detail scaffold should expose header bounds.");
+        TestAssert.Equal(new Rect(0, 2, 32, 27), scaffold.Master, "Master-detail scaffold should expose master-pane bounds.");
+        TestAssert.Equal(new Rect(32, 2, 68, 27), scaffold.Detail, "Master-detail scaffold should expose detail-pane bounds.");
+        TestAssert.Equal(new Rect(0, 29, 100, 1), scaffold.Footer, "Master-detail scaffold should expose footer bounds.");
+        return Task.CompletedTask;
+    }
+
+    private static Task MasterDetailScreen_CreateFocusChainTracksAddedRegions()
+    {
+        var composer = new ScreenComposer();
+        var scaffold = composer.MasterDetail(new Rect(0, 0, 100, 24), masterWidth: 28, headerHeight: 1, footerHeight: 1);
+        var header = new MouseProbeComponent();
+        var master = new MouseProbeComponent();
+        var detail = new MouseProbeComponent();
+        var footer = new MouseProbeComponent();
+        var headerKey = new ScreenRegionKey("header");
+        var masterKey = new ScreenRegionKey("master");
+        var detailKey = new ScreenRegionKey("detail");
+        var footerKey = new ScreenRegionKey("footer");
+
+        composer.BeginFrame();
+        scaffold.AddHeader(headerKey, header);
+        scaffold.AddMaster(masterKey, master);
+        scaffold.AddDetail(detailKey, detail);
+        scaffold.AddFooter(footerKey, footer);
+        composer.CompleteFrame();
+        var focusChain = scaffold.CreateFocusChain();
+
+        var firstChanged = composer.FocusFirst(focusChain);
+        var nextChanged = composer.FocusNext(focusChain);
+
+        TestAssert.True(firstChanged, "Scaffold focus chain should focus the first added focusable region.");
+        TestAssert.True(nextChanged, "Scaffold focus chain should advance through tracked regions.");
+        TestAssert.True(composer.FocusedRegionKey == masterKey, "Focus chain should preserve header-master-detail-footer order.");
         return Task.CompletedTask;
     }
 

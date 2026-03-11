@@ -71,6 +71,24 @@ public abstract class InteractiveScreenModel : IModel
     protected ScreenFrameLayout Frame(Rect bounds, int headerHeight = 0, int footerHeight = 0) =>
         Screen.Frame(bounds, headerHeight, footerHeight);
 
+    /// <summary>
+    /// Creates a master-detail screen scaffold with optional header and footer regions.
+    /// </summary>
+    /// <param name="bounds">The full screen bounds to partition.</param>
+    /// <param name="masterWidth">Requested width for the master pane.</param>
+    /// <param name="headerHeight">Header height in rows.</param>
+    /// <param name="footerHeight">Footer height in rows.</param>
+    /// <param name="minMasterWidth">Minimum width for the master pane.</param>
+    /// <param name="minDetailWidth">Minimum width for the detail pane.</param>
+    protected MasterDetailScreen MasterDetail(
+        Rect bounds,
+        int masterWidth,
+        int headerHeight = 0,
+        int footerHeight = 0,
+        int minMasterWidth = 0,
+        int minDetailWidth = 0) =>
+        Screen.MasterDetail(bounds, masterWidth, headerHeight, footerHeight, minMasterWidth, minDetailWidth);
+
     protected bool SetFocus(ScreenRegionKey regionKey)
     {
         EnsureScreen();

@@ -188,6 +188,27 @@ private InputRouteResult HandleGlobalKey(KeyPressMsg key)
 
 Use `CaptureFocus()` before opening a modal or palette and `RestoreFocus(...)` when it closes if you want automatic return-to-previous-region behavior.
 
+For the common two-pane app shape, prefer the built-in master-detail scaffold over manual body splitting:
+
+```csharp
+protected override void ComposeScreen(Rect bodyRect)
+{
+    var shell = MasterDetail(bodyRect, masterWidth: 28, headerHeight: 1, footerHeight: 1);
+
+    shell.AddHeader(HeaderRegion, _menuBar);
+    shell.AddMaster(ListRegion, _items);
+    shell.AddDetail(DetailsRegion, _details);
+    shell.AddFooter(StatusRegion, _statusBar);
+
+    if (FocusFirst(shell.CreateFocusChain()))
+    {
+        return;
+    }
+}
+```
+
+This keeps shell layout, region registration, and focus order in one place.
+
 ## Scope Order
 
 Use this order unless you have a clear reason not to:
