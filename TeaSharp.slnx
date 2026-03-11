@@ -9,7 +9,6 @@
     <Project Path="examples/TeaSharp.WidgetGallery/TeaSharp.WidgetGallery.csproj" />
   </Folder>
   <Folder Name="/src/">
-    <Project Path="src/TeaSharp.Cli/TeaSharp.Cli.csproj" />
     <Project Path="src/TeaSharp.Core/TeaSharp.Core.csproj" />
     <Project Path="src/TeaSharp/TeaSharp.csproj" />
   </Folder>

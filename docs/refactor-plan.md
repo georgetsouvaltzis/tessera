@@ -39,12 +39,14 @@ Status: done
 
 ## Phase 3: File Splitting
 
-Status: next
+Status: in progress
 
 - split `PrebuiltWidgets.cs` into one widget per file
 - split `UiKit.cs` into layout, primitives, tables, forms, overlays
 - split `AdvancedPrebuiltWidgets.cs` and `ProductivityPrebuiltWidgets.cs` by widget family
 - keep the public namespace stable while reducing per-file responsibility
+- split `TeaProgram` lifecycle/message-loop/runtime responsibilities into dedicated files without changing the public API
+- split `ScreenComposer` typed API, routing logic, and legacy string bridges into dedicated files
 
 ## Phase 4: API Simplification
 
@@ -75,3 +77,4 @@ Status: in progress
 - document the stable entrypoints first so IntelliSense teaches the recommended path
 - keep CLI/test projects out of pack output unless they are intentionally published
 - make deterministic build/analyzer policy explicit, keep compiler/package warnings strict, and stage analyzer enforcement incrementally instead of flipping the full backlog to errors at once
+- removed the first-party `TeaSharp.Cli` project for now so the repo surface stays focused on the library, examples, and tests
