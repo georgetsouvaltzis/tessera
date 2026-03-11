@@ -4,7 +4,7 @@ using TeaSharp.Widgets;
 
 namespace TeaSharp.Components;
 
-public sealed class DropdownComponent : IStatefulComponent, IMouseStatefulComponent, IFocusableComponent
+public sealed partial class DropdownComponent : IStatefulComponent, IMouseStatefulComponent, IFocusableComponent
 {
     private readonly OptionListController _options = new();
     private WidgetInteractionProfile _interactionProfile = WidgetInteractionProfile.Default.Clone();
@@ -241,112 +241,23 @@ public sealed class DropdownComponent : IStatefulComponent, IMouseStatefulCompon
             return;
         }
 
-        var content = ShowBorder
-            ? DrawBorderAndResolveContent(canvas, clipped)
-            : clipped;
+        var content = ResolveRenderContentRect(canvas, clipped);
         if (content.IsEmpty)
         {
             return;
         }
 
-        var indicator = IsOpen ? "^" : "v";
-        var selected = _options.Count == 0 ? "(empty)" : SelectedItem;
-        canvas.WriteText(content.X, content.Y, FieldStatePalette.Render($"{indicator} {selected}", ResolveFieldStates()), content.Width);
-
-        if (!IsOpen || content.Height <= 1 || _options.Count == 0)
-        {
-            return;
-        }
-
-        var visibleRows = Math.Min(Math.Max(1, MaxVisibleItems), content.Height - 1);
-        var start = OptionListViewport.ComputeWindowStart(_options.HighlightedVisibleIndex, visibleRows, _options.VisibleCount);
-        var end = Math.Min(_options.VisibleCount, start + visibleRows);
-        var row = 0;
-        for (var visibleIndex = start; visibleIndex < end; visibleIndex++, row++)
-        {
-            var itemIndex = _options.VisibleItemIndexAt(visibleIndex);
-            var highlight = visibleIndex == _options.HighlightedVisibleIndex ? ">" : " ";
-            var selectedMarker = itemIndex == _options.SelectedIndex ? "*" : " ";
-            var text = $"{highlight}{selectedMarker} {_options.Items[itemIndex]}";
-            canvas.WriteText(content.X, content.Y + 1 + row, OptionStatePalette.Render(text, ResolveOptionStates(visibleIndex, itemIndex)), content.Width);
-        }
+        RenderField(canvas, content);
+        RenderOpenOptions(canvas, content);
     }
 
-    private List<WidgetVisualState> ResolveFieldStates()
-    {
-        var states = new List<WidgetVisualState>(5);
-        if (Focused)
-        {
-            states.Add(WidgetVisualState.Focused);
-        }
+    private Rect ResolveContentRect(Rect bounds) =>
+        ShowBorder ? bounds.Inset(1, 1) : bounds;
 
-        if (Disabled)
-        {
-            states.Add(WidgetVisualState.Disabled);
-        }
-
-        if (ReadOnly)
-        {
-            states.Add(WidgetVisualState.ReadOnly);
-        }
-
-        if (_options.Count == 0)
-        {
-            states.Add(WidgetVisualState.Empty);
-        }
-
-        if (_fieldHovered)
-        {
-            states.Add(WidgetVisualState.Hovered);
-        }
-
-        return states;
-    }
-
-    private List<WidgetVisualState> ResolveOptionStates(int visibleIndex, int itemIndex)
-    {
-        var states = new List<WidgetVisualState>(7);
-        states.AddRange(ResolveFieldStates());
-        if (visibleIndex == _options.HighlightedVisibleIndex)
-        {
-            states.Add(WidgetVisualState.Cursor);
-        }
-
-        if (itemIndex == _options.SelectedIndex)
-        {
-            states.Add(WidgetVisualState.Selected);
-        }
-
-        if (visibleIndex == _options.HoveredVisibleIndex)
-        {
-            states.Add(WidgetVisualState.Hovered);
-        }
-
-        if (OptionStateResolver?.Invoke(_options.Items[itemIndex], itemIndex) is { } custom)
-        {
-            states.AddRange(custom);
-        }
-
-        return states;
-    }
-
-    private Rect DrawBorderAndResolveContent(Canvas canvas, Rect clipped)
-    {
-        canvas.DrawBox(clipped, Focused ? $"{Title} *" : Title);
-        return clipped.Inset(1, 1);
-    }
-
-    private Rect ResolveContentRect(Rect bounds)
-    {
-        return ShowBorder ? bounds.Inset(1, 1) : bounds;
-    }
-
-    private int RowToVisibleIndex(Rect content, int y)
-    {
-        return IsOpen
+    private int RowToVisibleIndex(Rect content, int y) =>
+        IsOpen
             ? OptionListViewport.RowToVisibleIndex(content, y, MaxVisibleItems, _options.VisibleCount, _options.HighlightedVisibleIndex)
             : -1;
-    }
 
     private bool SelectVisible(int visibleIndex)
     {
@@ -357,7 +268,6 @@ public sealed class DropdownComponent : IStatefulComponent, IMouseStatefulCompon
 
         return _options.SetSelectedIndex(_options.VisibleItemIndexAt(visibleIndex));
     }
-
 
     private bool SetHighlightedVisibleIndex(int index)
     {

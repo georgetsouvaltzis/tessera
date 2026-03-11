@@ -47,6 +47,7 @@ Status: in progress
 - keep the public namespace stable while reducing per-file responsibility
 - split `TeaProgram` lifecycle/message-loop/runtime responsibilities into dedicated files without changing the public API
 - split `ScreenComposer` typed API, routing logic, and legacy string bridges into dedicated files
+- split `ComboboxComponent` and `DropdownComponent` so render/state-resolution helpers are separated from update/configuration logic
 
 ## Phase 4: API Simplification
 
