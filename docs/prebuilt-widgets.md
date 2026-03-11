@@ -163,6 +163,11 @@ A dedicated widget demo app is available:
 dotnet run --project examples/TeaSharp.WidgetGallery/TeaSharp.WidgetGallery.csproj
 ```
 
+`TeaSharp.WidgetGallery` now doubles as the happy-path composition sample:
+- uses `Form(...)` for the input tab
+- uses `Dashboard(...)` for the data tab
+- uses `CreateDialogWorkflow(...)` for the overlay dialog flow
+
 Dedicated widget-focused demos are also available:
 
 ```bash

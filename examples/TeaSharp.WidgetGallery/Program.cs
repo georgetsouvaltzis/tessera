@@ -85,6 +85,7 @@ internal sealed class WidgetGalleryModel : InteractiveScreenModel
             "Enter/Space = accept",
             "Esc = cancel"
         ]));
+    private readonly DialogWorkflow _dialogWorkflow;
     private readonly LayoutContainerComponent _layoutDemo = new(new LayoutContainerOptions(
         Mode: LayoutContainerMode.Grid,
         GridRows: 2,
@@ -103,6 +104,7 @@ internal sealed class WidgetGalleryModel : InteractiveScreenModel
     public WidgetGalleryModel()
     {
         ConfigureInputRouter();
+        _dialogWorkflow = CreateDialogWorkflow(_dialog, DialogRegionId, CreateFocusChain(TabsRegionId));
 
         _table.SetRows(
         [
@@ -266,10 +268,7 @@ internal sealed class WidgetGalleryModel : InteractiveScreenModel
                 break;
         }
 
-        if (_dialog.Visible)
-        {
-            Screen.AddModalComponent(DialogRegionId, bodyRect, _dialog);
-        }
+        _dialogWorkflow.Compose(bodyRect);
     }
 
     private void RegisterBasicsRegions(Rect rect)
@@ -298,17 +297,17 @@ internal sealed class WidgetGalleryModel : InteractiveScreenModel
 
     private void RegisterInputRegions(Rect rect)
     {
-        var (inputRect, areaRect) = Layout.SplitHorizontal(rect, 5, minFirst: 5, minSecond: 8);
-        Screen.AddRegion(TextInputRegionId, inputRect, _textInput.Render, UpdateTextInputRegion, focusable: true);
-        Screen.AddRegion(TextAreaRegionId, areaRect, _textArea.Render, UpdateTextAreaRegion, focusable: true);
+        var shell = Form(rect, actionsHeight: 5);
+        Screen.AddRegion(TextInputRegionId, shell.Actions, _textInput.Render, UpdateTextInputRegion, focusable: true);
+        Screen.AddRegion(TextAreaRegionId, shell.Body, _textArea.Render, UpdateTextAreaRegion, focusable: true);
     }
 
     private void RegisterDataRegions(Rect rect)
     {
-        var (left, right) = Layout.SplitVertical(rect, Math.Max(28, rect.Width / 3));
-        Screen.AddComponent(ListRegionId, left, _list);
+        var shell = Dashboard(rect, sidebarWidth: Math.Max(28, rect.Width / 3));
+        Screen.AddComponent(ListRegionId, shell.Sidebar, _list);
 
-        var (tableRect, logsRect) = Layout.SplitHorizontal(right, Math.Max(10, right.Height / 2));
+        var (tableRect, logsRect) = Layout.SplitHorizontal(shell.Main, Math.Max(10, shell.Main.Height / 2));
         Screen.AddComponent(TableRegionId, tableRect, _table);
         Screen.AddComponent(LogViewerRegionId, logsRect, _logs);
     }
@@ -383,14 +382,13 @@ internal sealed class WidgetGalleryModel : InteractiveScreenModel
 
         if (key.IsCharacter('d', KeyModifiers.None) && _tabs.SelectedIndex == 3)
         {
-            _dialog.Visible = !_dialog.Visible;
             if (_dialog.Visible)
             {
-                SetFocus(DialogRegionId);
+                _dialogWorkflow.Hide();
             }
             else
             {
-                SetFocus(TabsRegionId);
+                _dialogWorkflow.Show();
             }
 
             _lastEvent = _dialog.Visible ? "dialog:open" : "dialog:close";
@@ -521,7 +519,6 @@ internal sealed class WidgetGalleryModel : InteractiveScreenModel
 
     private void HandleDialogDecision(DialogResult result)
     {
-        SetFocus(TabsRegionId);
         var resultText = result.ToString().ToLowerInvariant();
         _logs.Append($"dialog:{resultText}");
         SetPendingActionEvent($"dialog:{resultText}");
