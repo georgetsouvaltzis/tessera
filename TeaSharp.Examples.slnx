@@ -1,0 +1,15 @@
+<Solution>
+  <Folder Name="/examples/">
+    <Project Path="examples/AdvancedWidgets/AdvancedWidgets.csproj" />
+    <Project Path="examples/ComboBox/ComboBox.csproj" />
+    <Project Path="examples/Dropdown/Dropdown.csproj" />
+    <Project Path="examples/Showcase/Showcase.csproj" />
+    <Project Path="examples/Kanban/Kanban.csproj" />
+    <Project Path="examples/ProductivityWidgets/ProductivityWidgets.csproj" />
+    <Project Path="examples/WidgetGallery/WidgetGallery.csproj" />
+  </Folder>
+  <Folder Name="/src/">
+    <Project Path="src/TeaSharp.Core/TeaSharp.Core.csproj" />
+    <Project Path="src/TeaSharp/TeaSharp.csproj" />
+  </Folder>
+</Solution>

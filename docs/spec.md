@@ -194,7 +194,9 @@ Phase 3:
 
 - SDK pinned: `10.0.103` (`global.json`).
 - TFM: `net10.0` for all projects.
-- Solution entrypoint: `TeaSharp.slnx`.
+- Main solution entrypoint for IDE navigation: `TeaSharp.slnx`.
+- Example solution entrypoint for IDE navigation: `TeaSharp.Examples.slnx`.
+- Deterministic CLI builds: `./scripts/build-main.sh`, `./scripts/build-examples.sh`, `./scripts/build-all.sh`.
 
 ## 12. Parity Tracking
 

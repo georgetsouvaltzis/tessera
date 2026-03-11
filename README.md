@@ -46,3 +46,16 @@ await program.RunAsync();
 - components: `docs/components.md`
 - prebuilt widgets: `docs/prebuilt-widgets.md`
 - lower-level widgets: `docs/widgets.md`
+
+## Build
+
+Use the repo build scripts for deterministic CLI builds:
+
+- `./scripts/build-main.sh`
+- `./scripts/build-examples.sh`
+- `./scripts/build-all.sh`
+
+The solution files remain useful for IDE navigation:
+
+- `TeaSharp.slnx`
+- `TeaSharp.Examples.slnx`

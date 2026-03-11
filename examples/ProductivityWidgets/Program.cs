@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Text;
 using TeaSharp;
 using TeaSharp.Components.Composition;
@@ -393,7 +394,7 @@ internal sealed class ProductivityWidgetsModel : InteractiveScreenModel
         builder.AppendLine("## Activity Log");
         for (var i = 1; i <= 40; i++)
         {
-            builder.Append("- log ").Append(i.ToString("00")).Append(": sample entry").Append('\n');
+            builder.Append("- log ").Append(i.ToString("00", CultureInfo.InvariantCulture)).Append(": sample entry").Append('\n');
         }
 
         return builder.ToString();

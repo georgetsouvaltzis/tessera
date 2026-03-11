@@ -823,7 +823,7 @@ internal sealed class KanbanModel : IModel
         _done.ItemStateResolver = card => ResolveCardStates(card, KanbanLane.Done);
     }
 
-    private static IReadOnlyCollection<WidgetVisualState> ResolveCardStates(KanbanCard card, KanbanLane lane)
+    private static List<WidgetVisualState> ResolveCardStates(KanbanCard card, KanbanLane lane)
     {
         var states = new List<WidgetVisualState>(5);
         if (lane == KanbanLane.Done)
@@ -1111,7 +1111,7 @@ internal sealed class KanbanModel : IModel
 
     private void CycleFocus(int delta)
     {
-        var values = (KanbanFocus[])Enum.GetValues(typeof(KanbanFocus));
+        var values = Enum.GetValues<KanbanFocus>();
         var index = Array.IndexOf(values, _focus);
         if (index < 0)
         {
