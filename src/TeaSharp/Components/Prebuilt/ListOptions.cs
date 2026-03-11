@@ -15,9 +15,9 @@ public sealed record ListOptions<T>(
     IEnumerable<T> Items,
     Func<T, string> ToText,
     string Title = "List",
-    bool Focused = false,
-    bool Disabled = false,
-    bool ReadOnly = false,
+    bool IsFocused = false,
+    bool IsDisabled = false,
+    bool IsReadOnly = false,
     BorderStyle Border = BorderStyle.SingleLine,
     Thickness Padding = default,
     ListKeyMap? KeyMap = null);

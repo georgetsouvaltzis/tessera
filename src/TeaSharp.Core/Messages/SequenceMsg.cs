@@ -3,4 +3,4 @@ using TeaSharp.Core.Terminal;
 
 namespace TeaSharp.Core.Messages;
 
-public sealed record SequenceMsg(IReadOnlyList<Command> Commands) : IMessage;
+public sealed record SequenceMsg(IReadOnlyList<Effect> Effects) : IMessage;

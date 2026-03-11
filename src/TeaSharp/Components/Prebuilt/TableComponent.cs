@@ -23,7 +23,7 @@ public sealed class TableComponent : IStatefulComponent, IMouseStatefulComponent
         : this(options.Headers)
     {
         Title = options.Title;
-        Focused = options.Focused;
+        IsFocused = options.IsFocused;
         Border = options.Border;
         Padding = options.Padding;
         if (options.PageSize.HasValue)
@@ -32,7 +32,7 @@ public sealed class TableComponent : IStatefulComponent, IMouseStatefulComponent
         }
     }
 
-    public bool Focused { get; set; }
+    public bool IsFocused { get; set; }
 
     public BorderStyle Border
     {
@@ -139,7 +139,7 @@ public sealed class TableComponent : IStatefulComponent, IMouseStatefulComponent
     public void Render(Canvas canvas, Rect rect)
     {
         var original = _inner.Title;
-        _inner.Title = Focused ? $"{original} *" : original.Replace(" *", string.Empty, StringComparison.Ordinal);
+        _inner.Title = IsFocused ? $"{original} *" : original.Replace(" *", string.Empty, StringComparison.Ordinal);
         _inner.Render(canvas, rect);
         _inner.Title = original;
     }

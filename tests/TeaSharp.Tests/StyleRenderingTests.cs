@@ -132,7 +132,7 @@ internal static class StyleRenderingTests
         var style = TeaStyle.Empty.WithBold().WithForeground(AnsiColor.BrightGreen);
 
         // Act
-        renderer.Render(View.From(style.Render("ok")));
+        renderer.Render(ScreenOutput.From(style.Render("ok")));
         await renderer.FlushAsync(CancellationToken.None);
         var rendered = ReadUtf8(output);
 
@@ -150,12 +150,12 @@ internal static class StyleRenderingTests
         await renderer.InitializeAsync(output, CancellationToken.None);
         var plain = TeaStyle.Empty.WithForeground(AnsiColor.BrightYellow);
         var emphasized = TeaStyle.Empty.WithBlink().WithStrikethrough().WithForeground(AnsiColor.BrightYellow);
-        renderer.Render(View.From(plain.Render("!")));
+        renderer.Render(ScreenOutput.From(plain.Render("!")));
         await renderer.FlushAsync(CancellationToken.None);
         var marker = output.Length;
 
         // Act
-        renderer.Render(View.From(emphasized.Render("!")));
+        renderer.Render(ScreenOutput.From(emphasized.Render("!")));
         await renderer.FlushAsync(CancellationToken.None);
         var patch = ReadUtf8(output, marker);
 
@@ -174,12 +174,12 @@ internal static class StyleRenderingTests
         await renderer.InitializeAsync(output, CancellationToken.None);
         var plain = TeaStyle.Empty.WithForeground(AnsiColor.BrightCyan);
         var emphasized = TeaStyle.Empty.WithConceal().WithOverline().WithForeground(AnsiColor.BrightCyan);
-        renderer.Render(View.From(plain.Render("x")));
+        renderer.Render(ScreenOutput.From(plain.Render("x")));
         await renderer.FlushAsync(CancellationToken.None);
         var marker = output.Length;
 
         // Act
-        renderer.Render(View.From(emphasized.Render("x")));
+        renderer.Render(ScreenOutput.From(emphasized.Render("x")));
         await renderer.FlushAsync(CancellationToken.None);
         var patch = ReadUtf8(output, marker);
 
@@ -198,12 +198,12 @@ internal static class StyleRenderingTests
         await renderer.InitializeAsync(output, CancellationToken.None);
         var plain = TeaStyle.Empty.WithForeground(AnsiColor.BrightMagenta);
         var emphasized = TeaStyle.Empty.WithDoubleUnderline().WithFramed().WithForeground(AnsiColor.BrightMagenta);
-        renderer.Render(View.From(plain.Render("b")));
+        renderer.Render(ScreenOutput.From(plain.Render("b")));
         await renderer.FlushAsync(CancellationToken.None);
         var marker = output.Length;
 
         // Act
-        renderer.Render(View.From(emphasized.Render("b")));
+        renderer.Render(ScreenOutput.From(emphasized.Render("b")));
         await renderer.FlushAsync(CancellationToken.None);
         var patch = ReadUtf8(output, marker);
 
@@ -222,12 +222,12 @@ internal static class StyleRenderingTests
         await renderer.InitializeAsync(output, CancellationToken.None);
         var red = TeaStyle.Empty.WithForeground(AnsiColor.BrightRed);
         var green = TeaStyle.Empty.WithForeground(AnsiColor.BrightGreen);
-        renderer.Render(View.From(red.Render("A")));
+        renderer.Render(ScreenOutput.From(red.Render("A")));
         await renderer.FlushAsync(CancellationToken.None);
         var marker = output.Length;
 
         // Act
-        renderer.Render(View.From(green.Render("A")));
+        renderer.Render(ScreenOutput.From(green.Render("A")));
         await renderer.FlushAsync(CancellationToken.None);
         var patch = ReadUtf8(output, marker);
 

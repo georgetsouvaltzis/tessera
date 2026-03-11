@@ -35,17 +35,17 @@ public sealed partial class ContextMenuComponent
     private List<WidgetVisualState> ResolveItemStates(int index)
     {
         var states = new List<WidgetVisualState>(6);
-        if (Focused)
+        if (IsFocused)
         {
             states.Add(WidgetVisualState.Focused);
         }
 
-        if (Disabled)
+        if (IsDisabled)
         {
             states.Add(WidgetVisualState.Disabled);
         }
 
-        if (ReadOnly)
+        if (IsReadOnly)
         {
             states.Add(WidgetVisualState.ReadOnly);
         }

@@ -38,8 +38,8 @@ public sealed partial class LayoutContainerComponent
     {
         return Mode switch
         {
-            LayoutContainerMode.Horizontal => BuildHorizontalRects(rect),
-            LayoutContainerMode.Grid => BuildGridRects(rect),
+            LayoutFlow.Columns => BuildHorizontalRects(rect),
+            LayoutFlow.Grid => BuildGridRects(rect),
             _ => BuildVerticalRects(rect),
         };
     }

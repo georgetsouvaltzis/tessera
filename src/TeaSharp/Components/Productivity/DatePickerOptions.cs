@@ -13,9 +13,9 @@ namespace TeaSharp.Components.Productivity;
 public sealed record DatePickerOptions(
     string Title = "Date Picker",
     DateOnly? InitialDate = null,
-    bool Focused = false,
-    bool Disabled = false,
-    bool ReadOnly = false,
+    bool IsFocused = false,
+    bool IsDisabled = false,
+    bool IsReadOnly = false,
     BorderStyle Border = BorderStyle.SingleLine,
     Thickness Padding = default,
     KeyBinding? PreviousDayKey = null,

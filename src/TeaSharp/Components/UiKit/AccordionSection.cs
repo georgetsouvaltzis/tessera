@@ -5,4 +5,4 @@ using TeaSharp.Components.Styling;
 using TeaSharp.Components.UiKit.Internal;
 namespace TeaSharp.Components.UiKit;
 
-public readonly record struct AccordionSection(string Title, IReadOnlyList<string> Lines, bool Expanded = false);
+public readonly record struct AccordionSection(string Title, IReadOnlyList<string> BodyLines, bool Expanded = false);

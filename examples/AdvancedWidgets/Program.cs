@@ -7,9 +7,9 @@ using TeaSharp;
 using TeaSharp.Core.Abstractions;
 using TeaSharp.Core.Application;
 using TeaSharp.Core.Messages;
-using ModelView = TeaSharp.Core.Abstractions.View;
+using ModelView = TeaSharp.Core.Abstractions.ScreenOutput;
 
-var program = Tea.NewProgram(new AdvancedWidgetsModel(), new TeaProgramOptions
+var program = Tea.CreateProgram(new AdvancedWidgetsModel(), new TeaProgramOptions
 {
     UseConsoleKeyEvents = false,
 });
@@ -35,7 +35,7 @@ internal enum AdvancedFocus
     Notifications = 4,
 }
 
-internal sealed class AdvancedWidgetsModel : IModel
+internal sealed class AdvancedWidgetsModel : IScreen
 {
     private readonly ToggleSwitchComponent _toggle = new()
     {
@@ -75,7 +75,7 @@ internal sealed class AdvancedWidgetsModel : IModel
     {
         Title = "Command Palette",
         MaxVisibleItems = 9,
-        Focused = true,
+        IsFocused = true,
     };
 
     private readonly StatusBarComponent _status = new(new StatusBarOptions(
@@ -134,9 +134,9 @@ internal sealed class AdvancedWidgetsModel : IModel
         SetFocus(AdvancedFocus.Toggle);
     }
 
-    public Command? Init() => NextTick();
+    public Effect? Init() => NextTick();
 
-    public Command? Update(IMessage message)
+    public Effect? Update(IMessage message)
     {
         if (message is AdvancedTickMsg)
         {
@@ -239,7 +239,7 @@ internal sealed class AdvancedWidgetsModel : IModel
         if ((key.Modifiers.HasFlag(KeyModifiers.Ctrl) && key.IsCharacter('c'))
             || key.IsCharacter('q', KeyModifiers.None))
         {
-            return Tea.Cmd.Quit;
+            return Tea.Effects.Quit;
         }
 
         if (key.Is(KeyCode.Tab, KeyModifiers.None))
@@ -275,7 +275,7 @@ internal sealed class AdvancedWidgetsModel : IModel
         return null;
     }
 
-    public ModelView View()
+    public ModelView Render()
     {
         UpdateBadgeState();
 
@@ -308,7 +308,7 @@ internal sealed class AdvancedWidgetsModel : IModel
 
         return ModelView.From(canvas.Render()) with
         {
-            Terminal = new ViewTerminal
+            Terminal = new TerminalOutput
             {
                 AltScreen = true,
                 EnableBracketedPaste = true,
@@ -339,7 +339,7 @@ internal sealed class AdvancedWidgetsModel : IModel
         var badgeRect = new Rect(rect.X, rect.Y, rect.Width, 1);
         _badge.Render(canvas, badgeRect);
 
-        var info = new LabelComponent
+        var info = new TextBlockComponent
         {
             Border = BorderStyle.SingleLine,
             Title = "Hints",
@@ -382,11 +382,11 @@ internal sealed class AdvancedWidgetsModel : IModel
     private void SetFocus(AdvancedFocus focus)
     {
         _focus = focus;
-        _toggle.Focused = focus == AdvancedFocus.Toggle;
-        _slider.Focused = focus == AdvancedFocus.Slider;
-        _spinner.Focused = focus == AdvancedFocus.Spinner;
-        _tree.Focused = focus == AdvancedFocus.Tree;
-        _notifications.Focused = focus == AdvancedFocus.Notifications;
+        _toggle.IsFocused = focus == AdvancedFocus.Toggle;
+        _slider.IsFocused = focus == AdvancedFocus.Slider;
+        _spinner.IsFocused = focus == AdvancedFocus.Spinner;
+        _tree.IsFocused = focus == AdvancedFocus.Tree;
+        _notifications.IsFocused = focus == AdvancedFocus.Notifications;
     }
 
     private void ExecutePaletteCommand(string? commandId)
@@ -417,11 +417,11 @@ internal sealed class AdvancedWidgetsModel : IModel
                 _slider.SetValue(_slider.Max);
                 break;
             case "tree.collapse":
-                _tree.Focused = true;
+                _tree.IsFocused = true;
                 _tree.Update(new KeyPressMsg(KeyCode.Left));
                 break;
             case "tree.expand":
-                _tree.Focused = true;
+                _tree.IsFocused = true;
                 _tree.Update(new KeyPressMsg(KeyCode.Right));
                 break;
             case "notifications.clear":
@@ -476,7 +476,7 @@ internal sealed class AdvancedWidgetsModel : IModel
         Rect SliderRect,
         Rect SpinnerRect);
 
-    private static Command NextTick() => Tea.Cmd.Every(TimeSpan.FromMilliseconds(200), at => new AdvancedTickMsg(at));
+    private static Effect NextTick() => Tea.Effects.Every(TimeSpan.FromMilliseconds(200), at => new AdvancedTickMsg(at));
 
     private void SetPendingActionEvent(string value)
     {

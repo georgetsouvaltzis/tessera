@@ -25,9 +25,9 @@ public sealed class ListComponent<T> : IStatefulComponent, IMouseStatefulCompone
         : this(options.Items, options.ToText)
     {
         Title = options.Title;
-        Focused = options.Focused;
-        Disabled = options.Disabled;
-        ReadOnly = options.ReadOnly;
+        IsFocused = options.IsFocused;
+        IsDisabled = options.IsDisabled;
+        IsReadOnly = options.IsReadOnly;
         Border = options.Border;
         Padding = options.Padding;
         KeyMap = options.KeyMap ?? ListKeyMap.Default;
@@ -35,11 +35,11 @@ public sealed class ListComponent<T> : IStatefulComponent, IMouseStatefulCompone
 
     public string Title { get; set; } = "List";
 
-    public bool Focused { get; set; }
+    public bool IsFocused { get; set; }
 
-    public bool Disabled { get; set; }
+    public bool IsDisabled { get; set; }
 
-    public bool ReadOnly { get; set; }
+    public bool IsReadOnly { get; set; }
 
     public BorderStyle Border { get; set; } = BorderStyle.SingleLine;
 
@@ -136,7 +136,7 @@ public sealed class ListComponent<T> : IStatefulComponent, IMouseStatefulCompone
 
     public bool Update(IMessage message)
     {
-        if (Disabled)
+        if (IsDisabled)
         {
             return false;
         }
@@ -150,7 +150,7 @@ public sealed class ListComponent<T> : IStatefulComponent, IMouseStatefulCompone
 
     public bool UpdateMouse(MouseMsg message, Rect bounds)
     {
-        if (Disabled)
+        if (IsDisabled)
         {
             return false;
         }
@@ -169,9 +169,9 @@ public sealed class ListComponent<T> : IStatefulComponent, IMouseStatefulCompone
             rect,
             _model,
             Title,
-            Focused,
-            Disabled,
-            ReadOnly,
+            IsFocused,
+            IsDisabled,
+            IsReadOnly,
             Border,
             Padding,
             _hoveredFilteredIndex,

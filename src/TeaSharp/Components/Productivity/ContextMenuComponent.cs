@@ -29,9 +29,9 @@ public sealed partial class ContextMenuComponent : IStatefulComponent, IMouseSta
     public ContextMenuComponent(ContextMenuOptions options)
     {
         Title = options.Title;
-        Focused = options.Focused;
-        Disabled = options.Disabled;
-        ReadOnly = options.ReadOnly;
+        IsFocused = options.IsFocused;
+        IsDisabled = options.IsDisabled;
+        IsReadOnly = options.IsReadOnly;
         Border = options.Border;
         Padding = options.Padding;
         NextItemKey = options.NextItemKey ?? NextItemKey;
@@ -47,13 +47,13 @@ public sealed partial class ContextMenuComponent : IStatefulComponent, IMouseSta
 
     public string Title { get; set; } = "Context";
 
-    public bool Visible { get; private set; }
+    public bool IsVisible { get; private set; }
 
-    public bool Focused { get; set; }
+    public bool IsFocused { get; set; }
 
-    public bool Disabled { get; set; }
+    public bool IsDisabled { get; set; }
 
-    public bool ReadOnly { get; set; }
+    public bool IsReadOnly { get; set; }
 
     public BorderStyle Border { get; set; } = BorderStyle.Rounded;
 
@@ -120,7 +120,7 @@ public sealed partial class ContextMenuComponent : IStatefulComponent, IMouseSta
 
     public void OpenAt(int x, int y)
     {
-        Visible = true;
+        IsVisible = true;
         AnchorX = Math.Max(0, x);
         AnchorY = Math.Max(0, y);
         _selectedIndex = Math.Clamp(_selectedIndex, 0, Math.Max(0, _items.Count - 1));
@@ -128,12 +128,12 @@ public sealed partial class ContextMenuComponent : IStatefulComponent, IMouseSta
 
     public void Close()
     {
-        Visible = false;
+        IsVisible = false;
     }
 
     public bool Update(IMessage message)
     {
-        if (!Visible || !Focused || Disabled || message is not KeyPressMsg key)
+        if (!IsVisible || !IsFocused || IsDisabled || message is not KeyPressMsg key)
         {
             return false;
         }
@@ -161,7 +161,7 @@ public sealed partial class ContextMenuComponent : IStatefulComponent, IMouseSta
             return true;
         }
 
-        if (!ReadOnly && ExecuteKey.Matches(key))
+        if (!IsReadOnly && ExecuteKey.Matches(key))
         {
             ExecuteItem(_selectedIndex);
             return true;
@@ -172,7 +172,7 @@ public sealed partial class ContextMenuComponent : IStatefulComponent, IMouseSta
 
     public bool UpdateMouse(MouseMsg message, Rect bounds)
     {
-        if (!Visible || Disabled || !TryResolveMenuBounds(bounds, out var menuBounds, out var content))
+        if (!IsVisible || IsDisabled || !TryResolveMenuBounds(bounds, out var menuBounds, out var content))
         {
             return false;
         }
@@ -255,7 +255,7 @@ public sealed partial class ContextMenuComponent : IStatefulComponent, IMouseSta
                     changed = true;
                 }
 
-                if (!ReadOnly)
+                if (!IsReadOnly)
                 {
                     ExecuteItem(_selectedIndex);
                     changed = true;
@@ -268,7 +268,7 @@ public sealed partial class ContextMenuComponent : IStatefulComponent, IMouseSta
 
     public void Render(Canvas canvas, Rect rect)
     {
-        if (!Visible)
+        if (!IsVisible)
         {
             return;
         }

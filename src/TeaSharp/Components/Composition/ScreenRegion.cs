@@ -69,7 +69,7 @@ public sealed class ScreenRegion
     {
         if (_focusTarget is not null)
         {
-            _focusTarget.Focused = focused;
+            _focusTarget.IsFocused = focused;
         }
 
         if (focused && invokeFocus)

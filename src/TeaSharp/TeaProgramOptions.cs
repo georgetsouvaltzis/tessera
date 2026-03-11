@@ -4,14 +4,14 @@ using TeaSharp.Core.Application;
 namespace TeaSharp;
 
 /// <summary>
-/// Defines the stable application-facing runtime options used by <see cref="Tea.NewProgram(IModel)"/> and <see cref="Tea.NewProgram(IModel, TeaProgramOptions)"/>.
+/// Defines the stable application-facing runtime options used by <see cref="Tea.CreateProgram(IScreen)"/> and <see cref="Tea.CreateProgram(IScreen, TeaProgramOptions)"/>.
 /// </summary>
 public sealed class TeaProgramOptions
 {
     /// <summary>
-    /// Filters incoming messages before they reach the application model.
+    /// Filters incoming messages before they reach the application screen.
     /// </summary>
-    public Func<IModel, IMessage, IMessage?>? Filter { get; init; }
+    public Func<IScreen, IMessage, IMessage?>? MessageFilter { get; init; }
 
     /// <summary>
     /// Sets the maximum render frame rate for the program loop.
@@ -39,14 +39,14 @@ public sealed class TeaProgramOptions
     public bool UseConsoleKeyEvents { get; init; } = true;
 
     /// <summary>
-    /// Converts command exceptions into messages instead of letting them tear down the program.
+    /// Converts effect exceptions into messages instead of letting them tear down the program.
     /// </summary>
-    public bool CatchCommandExceptions { get; init; } = true;
+    public bool CatchEffectExceptions { get; init; } = true;
 
     /// <summary>
-    /// Maps a command exception to an application message when command exception recovery is enabled.
+    /// Maps an effect exception to an application message when effect exception recovery is enabled.
     /// </summary>
-    public Func<Exception, IMessage?>? RecoverCommandException { get; init; }
+    public Func<Exception, IMessage?>? MapEffectException { get; init; }
 
     /// <summary>
     /// Controls how long the input loop waits before treating a trailing escape byte as standalone.
@@ -72,14 +72,14 @@ public sealed class TeaProgramOptions
     {
         return new ProgramOptions
         {
-            Filter = Filter,
+            MessageFilter = MessageFilter,
             MaxFps = MaxFps,
             AdaptiveFramePacing = AdaptiveFramePacing,
             DisableRenderer = DisableRenderer,
             DisableInput = DisableInput,
             UseConsoleKeyEvents = UseConsoleKeyEvents,
-            CatchCommandExceptions = CatchCommandExceptions,
-            RecoverCommandException = RecoverCommandException,
+            CatchEffectExceptions = CatchEffectExceptions,
+            MapEffectException = MapEffectException,
             EscapeTimeout = EscapeTimeout,
             EnableResizeSignals = EnableResizeSignals,
             ResizePollInterval = ResizePollInterval,

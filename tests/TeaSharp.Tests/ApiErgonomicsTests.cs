@@ -213,7 +213,7 @@ internal static class ApiErgonomicsTests
     {
         var list = new ListComponent<string>(["one", "two", "three"], item => item)
         {
-            Focused = true,
+            IsFocused = true,
         };
 
         list.Update(new TeaSharp.Core.Messages.KeyPressMsg(TeaSharp.Core.Messages.KeyCode.Down));
@@ -228,14 +228,14 @@ internal static class ApiErgonomicsTests
         var options = new DropdownOptions(
             Items: ["Development", "Production"],
             Title: "Environment",
-            Focused: true,
+            IsFocused: true,
             Border: BorderStyle.None,
             MaxVisibleItems: 4,
             InteractionProfile: WidgetInteractionProfile.KeyboardOnly);
         var dropdown = new DropdownComponent(options);
 
         TestAssert.Equal("Environment", dropdown.Title, "Dropdown options should set title.");
-        TestAssert.True(dropdown.Focused, "Dropdown options should set focus.");
+        TestAssert.True(dropdown.IsFocused, "Dropdown options should set focus.");
         TestAssert.True(dropdown.Border == BorderStyle.None, "Dropdown options should set border style.");
         TestAssert.Equal(4, dropdown.MaxVisibleItems, "Dropdown options should set max visible items.");
         TestAssert.Equal("Development", dropdown.SelectedItem, "Dropdown options should preload items.");
@@ -250,7 +250,7 @@ internal static class ApiErgonomicsTests
             Title: "Region",
             Placeholder: "type here",
             InitialFilter: "be",
-            Focused: true,
+            IsFocused: true,
             MaxVisibleItems: 5,
             InteractionProfile: WidgetInteractionProfile.KeyboardOnly);
         var combobox = new ComboboxComponent(options);
@@ -258,7 +258,7 @@ internal static class ApiErgonomicsTests
         TestAssert.Equal("Region", combobox.Title, "Combobox options should set title.");
         TestAssert.Equal("type here", combobox.Placeholder, "Combobox options should set placeholder.");
         TestAssert.Equal("be", combobox.FilterText, "Combobox options should set initial filter text.");
-        TestAssert.True(combobox.Focused, "Combobox options should set focus.");
+        TestAssert.True(combobox.IsFocused, "Combobox options should set focus.");
         TestAssert.Equal(5, combobox.MaxVisibleItems, "Combobox options should set max visible items.");
         TestAssert.True(!ReferenceEquals(options.InteractionProfile, combobox.InteractionProfile), "Combobox should clone interaction profile instead of sharing mutable state.");
         return Task.CompletedTask;
@@ -283,7 +283,7 @@ internal static class ApiErgonomicsTests
     {
         var table = new TableComponent(["Name", "Status"])
         {
-            Focused = true,
+            IsFocused = true,
         };
         table.SetRows(
         [
@@ -323,13 +323,13 @@ internal static class ApiErgonomicsTests
     {
         var button = new ButtonComponent
         {
-            Focused = true,
+            IsFocused = true,
         };
         button.Update(new TeaSharp.Core.Messages.KeyPressMsg(TeaSharp.Core.Messages.KeyCode.Enter));
 
         var input = new TextInputComponent
         {
-            Focused = true,
+            IsFocused = true,
         };
         input.Update(new TeaSharp.Core.Messages.KeyPressMsg(TeaSharp.Core.Messages.KeyCode.Character, "x"));
         input.Update(new TeaSharp.Core.Messages.KeyPressMsg(TeaSharp.Core.Messages.KeyCode.Enter));
@@ -344,11 +344,11 @@ internal static class ApiErgonomicsTests
     {
         var button = new ButtonComponent
         {
-            Focused = true,
+            IsFocused = true,
         };
         var input = new TextInputComponent
         {
-            Focused = true,
+            IsFocused = true,
         };
         var buttonPressed = 0;
         string? submitted = null;
@@ -383,9 +383,9 @@ internal static class ApiErgonomicsTests
                 new MenuBarItem("file", "File", 'f'),
                 new MenuBarItem("help", "Help", 'h'),
             ],
-            Focused: true));
+            IsFocused: true));
 
-        TestAssert.True(menu.Focused, "Productivity catalog should create configured menu surfaces.");
+        TestAssert.True(menu.IsFocused, "Productivity catalog should create configured menu surfaces.");
         TestAssert.Equal(2, menu.Items.Count, "Productivity catalog should pass items through to the component.");
         return Task.CompletedTask;
     }
@@ -394,15 +394,15 @@ internal static class ApiErgonomicsTests
     {
         var dialog = new DialogComponent(new DialogOptions(
             Title: "Confirm delete",
-            Visible: true,
+            IsVisible: true,
             Border: BorderStyle.Heavy,
             Padding: Thickness.All(1),
-            Lines: ["Delete item?"]));
+            BodyLines: ["Delete item?"]));
 
-        TestAssert.True(dialog.Visible, "Dialog options should set visibility.");
+        TestAssert.True(dialog.IsVisible, "Dialog options should set visibility.");
         TestAssert.True(dialog.Border == BorderStyle.Heavy, "Dialog options should set border style through Border.");
         TestAssert.Equal(1, dialog.Padding.Left, "Dialog options should set padding through Thickness.");
-        TestAssert.Equal("Delete item?", dialog.Lines[0], "Dialog options should preserve content lines.");
+        TestAssert.Equal("Delete item?", dialog.BodyLines[0], "Dialog options should preserve content lines.");
         return Task.CompletedTask;
     }
 
@@ -410,12 +410,12 @@ internal static class ApiErgonomicsTests
     {
         var modal = TeaSharp.Components.UiKit.UiKitCatalog.Modal(new ModalOptions(
             Title: "Confirm",
-            Visible: true,
-            Lines: ["ready"]));
+            IsVisible: true,
+            BodyLines: ["ready"]));
 
-        TestAssert.True(modal.Visible, "UI-kit catalog should create configured modal surfaces.");
+        TestAssert.True(modal.IsVisible, "UI-kit catalog should create configured modal surfaces.");
         TestAssert.Equal("Confirm", modal.Title, "UI-kit catalog should pass options through to the component.");
-        TestAssert.Equal(1, modal.Lines.Count, "UI-kit catalog should preserve configured modal content.");
+        TestAssert.Equal(1, modal.BodyLines.Count, "UI-kit catalog should preserve configured modal content.");
         return Task.CompletedTask;
     }
 
@@ -423,12 +423,12 @@ internal static class ApiErgonomicsTests
     {
         var modal = new ModalComponent(new ModalOptions(
             Title: "Confirm",
-            Visible: true,
+            IsVisible: true,
             Border: BorderStyle.Ascii,
             Padding: Thickness.Symmetric(horizontal: 2, vertical: 1),
-            Lines: ["ready"]));
+            BodyLines: ["ready"]));
 
-        TestAssert.True(modal.Visible, "Modal options should set visibility.");
+        TestAssert.True(modal.IsVisible, "Modal options should set visibility.");
         TestAssert.True(modal.Border == BorderStyle.Ascii, "Modal options should set border style through Border.");
         TestAssert.Equal(2, modal.Padding.Left, "Modal options should set left padding.");
         TestAssert.Equal(1, modal.Padding.Top, "Modal options should set top padding.");

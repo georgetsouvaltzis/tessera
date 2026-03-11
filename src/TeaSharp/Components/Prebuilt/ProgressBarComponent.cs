@@ -20,7 +20,7 @@ public sealed class ProgressBarComponent : IStatefulComponent, IFocusableCompone
     public ProgressBarComponent(ProgressBarOptions options)
     {
         Title = options.Title;
-        Focused = options.Focused;
+        IsFocused = options.IsFocused;
         Border = options.Border;
         Padding = options.Padding;
         Step = options.Step;
@@ -33,7 +33,7 @@ public sealed class ProgressBarComponent : IStatefulComponent, IFocusableCompone
 
     public string Title { get; set; } = "Progress";
 
-    public bool Focused { get; set; }
+    public bool IsFocused { get; set; }
 
     public BorderStyle Border { get; set; } = BorderStyle.SingleLine;
 
@@ -47,7 +47,7 @@ public sealed class ProgressBarComponent : IStatefulComponent, IFocusableCompone
 
     public bool Update(IMessage message)
     {
-        if (message is not KeyPressMsg key || !Focused)
+        if (message is not KeyPressMsg key || !IsFocused)
         {
             return false;
         }
@@ -83,7 +83,7 @@ public sealed class ProgressBarComponent : IStatefulComponent, IFocusableCompone
         var content = FrameLayout.DrawFrameAndResolveContent(
             canvas,
             clipped,
-            Border == BorderStyle.None ? null : Focused ? $"{Title} *" : Title,
+            Border == BorderStyle.None ? null : IsFocused ? $"{Title} *" : Title,
             Border,
             Padding);
 

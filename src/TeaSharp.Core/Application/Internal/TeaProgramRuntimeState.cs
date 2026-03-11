@@ -13,11 +13,11 @@ internal sealed class TeaProgramRuntimeState
 
     public TerminalReader? Reader { get; set; }
 
-    public TeaProgramCommandScheduler? CommandScheduler { get; set; }
+    public TeaProgramEffectScheduler? EffectScheduler { get; set; }
 
     public TerminalCapabilityProfile Capabilities { get; set; } = TerminalCapabilityProfile.AllSupported;
 
     public TerminalColorProfile ColorProfile { get; set; } = TerminalColorProfile.Unknown;
 
-    public View LastRenderedView { get; set; } = View.From(string.Empty);
+    public ScreenOutput LastRenderedOutput { get; set; } = ScreenOutput.From(string.Empty);
 }

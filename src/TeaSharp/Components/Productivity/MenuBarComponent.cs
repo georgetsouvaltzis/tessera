@@ -27,9 +27,9 @@ public sealed class MenuBarComponent : IStatefulComponent, IMouseStatefulCompone
 
     public MenuBarComponent(MenuBarOptions options)
     {
-        Focused = options.Focused;
-        Disabled = options.Disabled;
-        ReadOnly = options.ReadOnly;
+        IsFocused = options.IsFocused;
+        IsDisabled = options.IsDisabled;
+        IsReadOnly = options.IsReadOnly;
         NextItemKey = options.NextItemKey ?? NextItemKey;
         PreviousItemKey = options.PreviousItemKey ?? PreviousItemKey;
         ActivateKey = options.ActivateKey ?? ActivateKey;
@@ -42,11 +42,11 @@ public sealed class MenuBarComponent : IStatefulComponent, IMouseStatefulCompone
 
     public int SelectedIndex { get; private set; }
 
-    public bool Focused { get; set; }
+    public bool IsFocused { get; set; }
 
-    public bool Disabled { get; set; }
+    public bool IsDisabled { get; set; }
 
-    public bool ReadOnly { get; set; }
+    public bool IsReadOnly { get; set; }
 
     public string? LastActivatedItemId { get; private set; }
 
@@ -111,12 +111,12 @@ public sealed class MenuBarComponent : IStatefulComponent, IMouseStatefulCompone
 
     public bool Update(IMessage message)
     {
-        if (!Focused || Disabled || message is not KeyPressMsg key || _items.Count == 0)
+        if (!IsFocused || IsDisabled || message is not KeyPressMsg key || _items.Count == 0)
         {
             return false;
         }
 
-        if (!ReadOnly && key.Code == KeyCode.Character && key.Text.Length == 1 && key.Modifiers == KeyModifiers.None)
+        if (!IsReadOnly && key.Code == KeyCode.Character && key.Text.Length == 1 && key.Modifiers == KeyModifiers.None)
         {
             var c = char.ToLowerInvariant(key.Text[0]);
             for (var i = 0; i < _items.Count; i++)
@@ -144,7 +144,7 @@ public sealed class MenuBarComponent : IStatefulComponent, IMouseStatefulCompone
             return true;
         }
 
-        if (!ReadOnly && ActivateKey.Matches(key))
+        if (!IsReadOnly && ActivateKey.Matches(key))
         {
             ActivateSelectedItem();
             return true;
@@ -155,7 +155,7 @@ public sealed class MenuBarComponent : IStatefulComponent, IMouseStatefulCompone
 
     public bool UpdateMouse(MouseMsg message, Rect bounds)
     {
-        if (Disabled || _items.Count == 0 || bounds.IsEmpty)
+        if (IsDisabled || _items.Count == 0 || bounds.IsEmpty)
         {
             return false;
         }
@@ -208,7 +208,7 @@ public sealed class MenuBarComponent : IStatefulComponent, IMouseStatefulCompone
                     changed = true;
                 }
 
-                if (!ReadOnly)
+                if (!IsReadOnly)
                 {
                     ActivateSelectedItem();
                     changed = true;
@@ -235,17 +235,17 @@ public sealed class MenuBarComponent : IStatefulComponent, IMouseStatefulCompone
                 : $" {_items[i].Title}({_items[i].Shortcut}) ";
 
             var states = new List<WidgetVisualState>(6);
-            if (Focused)
+            if (IsFocused)
             {
                 states.Add(WidgetVisualState.Focused);
             }
 
-            if (Disabled)
+            if (IsDisabled)
             {
                 states.Add(WidgetVisualState.Disabled);
             }
 
-            if (ReadOnly)
+            if (IsReadOnly)
             {
                 states.Add(WidgetVisualState.ReadOnly);
             }

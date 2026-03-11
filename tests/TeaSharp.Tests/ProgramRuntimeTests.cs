@@ -39,7 +39,7 @@ internal static class ProgramRuntimeTests
         yield return new TestCase("Program_ColorProfileDetectorDelegate_OverridesDetection", ColorProfileDetectorDelegate_OverridesDetection);
         yield return new TestCase("Program_CapabilityProbe_CustomModeList_WritesOnlyConfiguredQueries", CapabilityProbe_CustomModeList_WritesOnlyConfiguredQueries);
         yield return new TestCase("Program_EventDecoderOverride_IsUsedForInputLoop", EventDecoderOverride_IsUsedForInputLoop);
-        yield return new TestCase("Program_MaxConcurrentCommands_OneSerializesExecution", MaxConcurrentCommands_OneSerializesExecution);
+        yield return new TestCase("Program_MaxConcurrentEffects_OneSerializesExecution", MaxConcurrentEffects_OneSerializesExecution);
         yield return new TestCase("Program_AnsiRendererOptions_DisableModeQueries", AnsiRendererOptions_DisableModeQueries);
         yield return new TestCase("Program_CapabilityProbe_WritesModeQueries", CapabilityProbe_WritesModeQueries);
         yield return new TestCase("Program_CapabilityProbe_TimeoutDisablesModeReportsWhenNoResponses", CapabilityProbe_TimeoutDisablesModeReportsWhenNoResponses);
@@ -124,7 +124,7 @@ internal static class ProgramRuntimeTests
             DisableRenderer = true,
             DisableInput = true,
             Terminal = new FakeTerminalAdapter(),
-            Filter = (_, msg) =>
+            MessageFilter = (_, msg) =>
             {
                 if (blocked && msg is QuitMsg)
                 {
@@ -162,14 +162,14 @@ internal static class ProgramRuntimeTests
             DisableRenderer = true,
             DisableInput = true,
             Terminal = new FakeTerminalAdapter(),
-            CatchCommandExceptions = true,
+            CatchEffectExceptions = true,
         });
 
         // Act
         await program.RunAsync();
 
         // Assert
-        TestAssert.True(model.CapturedError is InvalidOperationException, "CommandErrorMsg should capture command exception.");
+        TestAssert.True(model.CapturedError is InvalidOperationException, "EffectErrorMsg should capture command exception.");
         TestAssert.True(
             string.Equals(model.CapturedError?.Message, CommandFaultModel.FailureMessage, StringComparison.Ordinal),
             "Captured command exception message should match source failure.");
@@ -184,7 +184,7 @@ internal static class ProgramRuntimeTests
             DisableRenderer = true,
             DisableInput = true,
             Terminal = new FakeTerminalAdapter(),
-            CatchCommandExceptions = false,
+            CatchEffectExceptions = false,
         });
 
         // Act / Assert
@@ -210,8 +210,8 @@ internal static class ProgramRuntimeTests
             DisableRenderer = true,
             DisableInput = true,
             Terminal = new FakeTerminalAdapter(),
-            CatchCommandExceptions = true,
-            RecoverCommandException = _ => new NumberMsg(42),
+            CatchEffectExceptions = true,
+            MapEffectException = _ => new NumberMsg(42),
         });
 
         // Act
@@ -230,8 +230,8 @@ internal static class ProgramRuntimeTests
             DisableRenderer = true,
             DisableInput = true,
             Terminal = new FakeTerminalAdapter(),
-            CatchCommandExceptions = true,
-            RecoverCommandException = _ => throw new InvalidOperationException("recovery-failure"),
+            CatchEffectExceptions = true,
+            MapEffectException = _ => throw new InvalidOperationException("recovery-failure"),
         });
 
         // Act
@@ -492,7 +492,7 @@ internal static class ProgramRuntimeTests
         TestAssert.True(decoder.Calls > 0, "Injected event decoder should be invoked by input loop.");
     }
 
-    private static async Task MaxConcurrentCommands_OneSerializesExecution()
+    private static async Task MaxConcurrentEffects_OneSerializesExecution()
     {
         // Arrange
         var model = new ConcurrencyTrackingModel(commandCount: 6, delay: TimeSpan.FromMilliseconds(25));
@@ -501,14 +501,14 @@ internal static class ProgramRuntimeTests
             DisableRenderer = true,
             DisableInput = true,
             Terminal = new FakeTerminalAdapter(),
-            MaxConcurrentCommands = 1,
+            MaxConcurrentEffects = 1,
         });
 
         // Act
         await program.RunAsync().WaitAsync(TimeSpan.FromSeconds(2));
 
         // Assert
-        TestAssert.Equal(1, model.MaxActiveCommands, "MaxConcurrentCommands=1 should serialize command execution.");
+        TestAssert.Equal(1, model.MaxActiveCommands, "MaxConcurrentEffects=1 should serialize command execution.");
     }
 
     private static async Task AnsiRendererOptions_DisableModeQueries()
@@ -974,7 +974,7 @@ internal static class ProgramRuntimeTests
         TestAssert.True(terminal.DisposeObservedCancellation, "Program should cancel input processing before terminal dispose.");
     }
 
-    private static TeaProgram NewProgram(IModel model) =>
+    private static TeaProgram NewProgram(IScreen model) =>
         new(model, new ProgramOptions
         {
             DisableRenderer = true,

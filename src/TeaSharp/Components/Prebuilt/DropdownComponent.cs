@@ -25,9 +25,9 @@ public sealed partial class DropdownComponent : IStatefulComponent, IMouseStatef
     public DropdownComponent(DropdownOptions options)
     {
         Title = options.Title;
-        Focused = options.Focused;
-        Disabled = options.Disabled;
-        ReadOnly = options.ReadOnly;
+        IsFocused = options.IsFocused;
+        IsDisabled = options.IsDisabled;
+        IsReadOnly = options.IsReadOnly;
         Border = options.Border;
         Padding = options.Padding;
         MaxVisibleItems = options.MaxVisibleItems;
@@ -46,11 +46,11 @@ public sealed partial class DropdownComponent : IStatefulComponent, IMouseStatef
 
     public string Title { get; set; } = "Dropdown";
 
-    public bool Focused { get; set; }
+    public bool IsFocused { get; set; }
 
-    public bool Disabled { get; set; }
+    public bool IsDisabled { get; set; }
 
-    public bool ReadOnly { get; set; }
+    public bool IsReadOnly { get; set; }
 
     public BorderStyle Border { get; set; } = BorderStyle.SingleLine;
 
@@ -112,7 +112,7 @@ public sealed partial class DropdownComponent : IStatefulComponent, IMouseStatef
 
     public bool Update(IMessage message)
     {
-        if (!Focused || Disabled || ReadOnly || message is not KeyPressMsg key || _options.Count == 0)
+        if (!IsFocused || IsDisabled || IsReadOnly || message is not KeyPressMsg key || _options.Count == 0)
         {
             return false;
         }
@@ -159,7 +159,7 @@ public sealed partial class DropdownComponent : IStatefulComponent, IMouseStatef
 
     public bool UpdateMouse(MouseMsg message, Rect bounds)
     {
-        if (Disabled || ReadOnly || _options.Count == 0)
+        if (IsDisabled || IsReadOnly || _options.Count == 0)
         {
             return false;
         }

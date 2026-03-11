@@ -200,15 +200,15 @@ internal static class ChartComponentTests
     private static Task Composer_FocusedRoutingTargetsFocusedSlotOnly()
     {
         var composer = new ComponentComposer();
-        var first = new KeyProbeComponent { Focused = true };
+        var first = new KeyProbeComponent { IsFocused = true };
         var second = new KeyProbeComponent();
         composer.Add(first, new Rect(0, 0, 10, 4));
         composer.Add(second, new Rect(10, 0, 10, 4));
 
         var changed = composer.Update(new KeyPressMsg(KeyCode.Character, "x"));
 
-        TestAssert.True(changed, "Focused routing should report handled key updates.");
-        TestAssert.Equal(1, first.KeyUpdates, "Focused slot should receive keyboard input.");
+        TestAssert.True(changed, "IsFocused routing should report handled key updates.");
+        TestAssert.Equal(1, first.KeyUpdates, "IsFocused slot should receive keyboard input.");
         TestAssert.Equal(0, second.KeyUpdates, "Non-focused slot should not receive keyboard input.");
         return Task.CompletedTask;
     }
@@ -219,7 +219,7 @@ internal static class ChartComponentTests
         {
             KeyboardRoutingMode = KeyboardRoutingMode.Broadcast,
         };
-        var first = new KeyProbeComponent { Focused = true };
+        var first = new KeyProbeComponent { IsFocused = true };
         var second = new KeyProbeComponent();
         composer.Add(first, new Rect(0, 0, 10, 4));
         composer.Add(second, new Rect(10, 0, 10, 4));
@@ -244,14 +244,14 @@ internal static class ChartComponentTests
 
         TestAssert.True(changed, "FocusFirst should focus the first focusable slot.");
         TestAssert.Equal(1, composer.FocusedSlotIndex, "FocusFirst should skip non-focusable slots.");
-        TestAssert.True(second.Focused, "First focusable slot should become focused.");
+        TestAssert.True(second.IsFocused, "First focusable slot should become focused.");
         return Task.CompletedTask;
     }
 
     private static Task Composer_FocusNextCyclesAcrossFocusableSlots()
     {
         var composer = new ComponentComposer();
-        var first = new KeyProbeComponent { Focused = true };
+        var first = new KeyProbeComponent { IsFocused = true };
         var second = new CounterComponent();
         var third = new KeyProbeComponent();
         composer.Add(first, new Rect(0, 0, 10, 4));
@@ -261,9 +261,9 @@ internal static class ChartComponentTests
         var changed = composer.FocusNext();
 
         TestAssert.True(changed, "FocusNext should advance focus.");
-        TestAssert.True(!first.Focused, "Current focused slot should lose focus.");
-        TestAssert.True(third.Focused, "FocusNext should skip non-focusable slots.");
-        TestAssert.Equal(2, composer.FocusedSlotIndex, "Focused slot index should move to the next focusable slot.");
+        TestAssert.True(!first.IsFocused, "Current focused slot should lose focus.");
+        TestAssert.True(third.IsFocused, "FocusNext should skip non-focusable slots.");
+        TestAssert.Equal(2, composer.FocusedSlotIndex, "IsFocused slot index should move to the next focusable slot.");
         return Task.CompletedTask;
     }
 
@@ -272,7 +272,7 @@ internal static class ChartComponentTests
         var composer = new ComponentComposer();
         var first = new KeyProbeComponent();
         var second = new CounterComponent();
-        var third = new KeyProbeComponent { Focused = true };
+        var third = new KeyProbeComponent { IsFocused = true };
         composer.Add(first, new Rect(0, 0, 10, 4));
         composer.Add(second, new Rect(10, 0, 10, 4));
         composer.Add(third, new Rect(20, 0, 10, 4));
@@ -280,25 +280,25 @@ internal static class ChartComponentTests
         var changed = composer.FocusPrevious();
 
         TestAssert.True(changed, "FocusPrevious should move focus backward.");
-        TestAssert.True(first.Focused, "FocusPrevious should wrap to the previous focusable slot.");
-        TestAssert.True(!third.Focused, "Previous focused slot should lose focus.");
-        TestAssert.Equal(0, composer.FocusedSlotIndex, "Focused slot index should wrap backward.");
+        TestAssert.True(first.IsFocused, "FocusPrevious should wrap to the previous focusable slot.");
+        TestAssert.True(!third.IsFocused, "Previous focused slot should lose focus.");
+        TestAssert.Equal(0, composer.FocusedSlotIndex, "IsFocused slot index should wrap backward.");
         return Task.CompletedTask;
     }
 
     private static Task Composer_MouseClickFocusesTargetSlot()
     {
         var composer = new ComponentComposer();
-        var first = new MouseProbeComponent { Focused = true };
-        var second = new MouseProbeComponent { Focused = false };
+        var first = new MouseProbeComponent { IsFocused = true };
+        var second = new MouseProbeComponent { IsFocused = false };
         composer.Add(first, new Rect(0, 0, 10, 4));
         composer.Add(second, new Rect(10, 0, 10, 4));
 
         var changed = composer.Update(new MouseClickMsg(MouseButton.Left, 12, 1));
 
         TestAssert.True(changed, "Mouse click should update focus and route event.");
-        TestAssert.True(!first.Focused, "First slot should lose focus.");
-        TestAssert.True(second.Focused, "Clicked slot should gain focus.");
+        TestAssert.True(!first.IsFocused, "First slot should lose focus.");
+        TestAssert.True(second.IsFocused, "Clicked slot should gain focus.");
         TestAssert.Equal(1, second.MouseUpdates, "Clicked slot should receive mouse message.");
         return Task.CompletedTask;
     }
@@ -306,13 +306,13 @@ internal static class ChartComponentTests
     private static Task Composer_MouseWheelFallsBackToFocusedSlot()
     {
         var composer = new ComponentComposer();
-        var focused = new MouseProbeComponent { Focused = true };
+        var focused = new MouseProbeComponent { IsFocused = true };
         composer.Add(focused, new Rect(0, 0, 10, 4));
 
         var changed = composer.Update(new MouseWheelMsg(MouseButton.WheelDown, 200, 200));
 
         TestAssert.True(changed, "Wheel outside bounds should still route to focused slot.");
-        TestAssert.Equal(1, focused.MouseUpdates, "Focused slot should receive wheel event.");
+        TestAssert.Equal(1, focused.MouseUpdates, "IsFocused slot should receive wheel event.");
         return Task.CompletedTask;
     }
 
@@ -341,7 +341,7 @@ internal static class ChartComponentTests
 
     private sealed class KeyProbeComponent : IStatefulComponent, IFocusableComponent
     {
-        public bool Focused { get; set; }
+        public bool IsFocused { get; set; }
 
         public int KeyUpdates { get; private set; }
 
@@ -364,7 +364,7 @@ internal static class ChartComponentTests
 
     private sealed class MouseProbeComponent : IStatefulComponent, IMouseStatefulComponent, IFocusableComponent
     {
-        public bool Focused { get; set; }
+        public bool IsFocused { get; set; }
 
         public int MouseUpdates { get; private set; }
 
@@ -378,7 +378,7 @@ internal static class ChartComponentTests
 
         public void Render(Canvas canvas, Rect rect)
         {
-            canvas.WriteText(rect.X, rect.Y, Focused ? "focused" : "idle", rect.Width);
+            canvas.WriteText(rect.X, rect.Y, IsFocused ? "focused" : "idle", rect.Width);
         }
     }
 }

@@ -48,7 +48,7 @@ internal static class ProductivityPrebuiltWidgetTests
                 new MenuBarItem("edit", "Edit", 'e'),
                 new MenuBarItem("help", "Help", 'h'),
             ],
-            Focused: true));
+            IsFocused: true));
 
         menu.Update(new KeyPressMsg(KeyCode.Character, "e"));
         menu.Update(new KeyPressMsg(KeyCode.Character, "h"));
@@ -86,7 +86,7 @@ internal static class ProductivityPrebuiltWidgetTests
                 new MenuBarItem("file", "File", 'f'),
                 new MenuBarItem("help", "Help", 'h'),
             ],
-            Focused: true));
+            IsFocused: true));
 
         menu.Update(new KeyPressMsg(KeyCode.Enter));
 
@@ -104,7 +104,7 @@ internal static class ProductivityPrebuiltWidgetTests
                 new MenuBarItem("file", "File", 'f'),
                 new MenuBarItem("help", "Help", 'h'),
             ],
-            Focused: true));
+            IsFocused: true));
         string? activated = null;
         menu.ItemActivated += (_, args) => activated = args.ItemId;
 
@@ -122,13 +122,13 @@ internal static class ProductivityPrebuiltWidgetTests
                 new ContextMenuItem("copy", "Copy"),
                 new ContextMenuItem("paste", "Paste"),
             ],
-            Focused: true));
+            IsFocused: true));
         menu.OpenAt(4, 2);
         menu.Update(new KeyPressMsg(KeyCode.Down));
         menu.Update(new KeyPressMsg(KeyCode.Enter));
 
         TestAssert.Equal("paste", menu.LastExecutedItemId ?? string.Empty, "Context menu should execute selected action.");
-        TestAssert.True(!menu.Visible, "Context menu should close after execute.");
+        TestAssert.True(!menu.IsVisible, "Context menu should close after execute.");
         return Task.CompletedTask;
     }
 
@@ -147,7 +147,7 @@ internal static class ProductivityPrebuiltWidgetTests
 
         TestAssert.True(changed, "Context menu click should execute row action.");
         TestAssert.Equal("paste", menu.LastExecutedItemId ?? string.Empty, "Context menu click should execute clicked item.");
-        TestAssert.True(!menu.Visible, "Context menu should close after mouse execute.");
+        TestAssert.True(!menu.IsVisible, "Context menu should close after mouse execute.");
         return Task.CompletedTask;
     }
 
@@ -159,7 +159,7 @@ internal static class ProductivityPrebuiltWidgetTests
                 new ContextMenuItem("copy", "Copy"),
                 new ContextMenuItem("paste", "Paste"),
             ],
-            Focused: true));
+            IsFocused: true));
         menu.OpenAt(4, 2);
         menu.Update(new KeyPressMsg(KeyCode.Enter));
 
@@ -177,7 +177,7 @@ internal static class ProductivityPrebuiltWidgetTests
                 new ContextMenuItem("copy", "Copy"),
                 new ContextMenuItem("paste", "Paste"),
             ],
-            Focused: true));
+            IsFocused: true));
         string? executed = null;
         menu.ItemExecuted += (_, args) => executed = args.ItemId;
         menu.OpenAt(4, 2);
@@ -204,7 +204,7 @@ internal static class ProductivityPrebuiltWidgetTests
 
         TestAssert.True(changed, "Context menu mouse release should execute row action.");
         TestAssert.Equal("paste", menu.LastExecutedItemId ?? string.Empty, "Context menu release should execute hovered item.");
-        TestAssert.True(!menu.Visible, "Context menu should close after mouse release execute.");
+        TestAssert.True(!menu.IsVisible, "Context menu should close after mouse release execute.");
         return Task.CompletedTask;
     }
 
@@ -237,7 +237,7 @@ internal static class ProductivityPrebuiltWidgetTests
     private static Task NumberInputComponent_AdjustsAndSubmits()
     {
         var input = new NumberInputComponent(new NumberInputOptions(
-            Focused: true,
+            IsFocused: true,
             Min: 0,
             Max: 10,
             Step: 2,
@@ -263,7 +263,7 @@ internal static class ProductivityPrebuiltWidgetTests
     private static Task NumberInputComponent_TryConsumeSubmit_IsSingleUse()
     {
         var input = new NumberInputComponent(new NumberInputOptions(
-            Focused: true,
+            IsFocused: true,
             InitialValue: 3));
 
         input.Update(new KeyPressMsg(KeyCode.Enter));
@@ -277,7 +277,7 @@ internal static class ProductivityPrebuiltWidgetTests
     private static Task NumberInputComponent_SubmittedEvent_ReportsValue()
     {
         var input = new NumberInputComponent(new NumberInputOptions(
-            Focused: true,
+            IsFocused: true,
             InitialValue: 3));
         double submitted = -1;
         input.Submitted += (_, args) => submitted = args.Value;
@@ -291,7 +291,7 @@ internal static class ProductivityPrebuiltWidgetTests
     private static Task DatePickerComponent_MovesDate()
     {
         var picker = new DatePickerComponent(new DatePickerOptions(
-            Focused: true,
+            IsFocused: true,
             InitialDate: new DateOnly(2026, 3, 8)));
         picker.Update(new KeyPressMsg(KeyCode.Right));
         picker.Update(new KeyPressMsg(KeyCode.Down));
@@ -316,7 +316,7 @@ internal static class ProductivityPrebuiltWidgetTests
     private static Task DatePickerComponent_DateChangedEvent_ReportsTransition()
     {
         var picker = new DatePickerComponent(new DatePickerOptions(
-            Focused: true,
+            IsFocused: true,
             InitialDate: new DateOnly(2026, 3, 8)));
         DateChangedEventArgs? args = null;
         picker.DateChanged += (_, eventArgs) => args = eventArgs;
@@ -332,7 +332,7 @@ internal static class ProductivityPrebuiltWidgetTests
     private static Task TimePickerComponent_AdjustsField()
     {
         var picker = new TimePickerComponent(new TimePickerOptions(
-            Focused: true,
+            IsFocused: true,
             MinuteStep: 5,
             InitialValue: new TimeOnly(10, 0, 0)));
         picker.Update(new KeyPressMsg(KeyCode.Right));
@@ -360,7 +360,7 @@ internal static class ProductivityPrebuiltWidgetTests
     private static Task TimePickerComponent_ValueChangedEvent_ReportsTransition()
     {
         var picker = new TimePickerComponent(new TimePickerOptions(
-            Focused: true,
+            IsFocused: true,
             MinuteStep: 5,
             InitialValue: new TimeOnly(10, 0, 0)));
         TimeValueChangedEventArgs? args = null;

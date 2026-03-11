@@ -33,7 +33,7 @@ public sealed class ButtonComponent : IStatefulComponent, IMouseStatefulComponen
     {
         Label = options.Label;
         Description = options.Description;
-        Focused = options.Focused;
+        IsFocused = options.IsFocused;
         Enabled = options.Enabled;
         Border = options.Border;
         Padding = options.Padding;
@@ -44,7 +44,7 @@ public sealed class ButtonComponent : IStatefulComponent, IMouseStatefulComponen
 
     public string? Description { get; set; }
 
-    public bool Focused { get; set; }
+    public bool IsFocused { get; set; }
 
     public bool Enabled { get; set; } = true;
 
@@ -92,7 +92,7 @@ public sealed class ButtonComponent : IStatefulComponent, IMouseStatefulComponen
     public bool Update(IMessage message)
     {
         WasPressed = false;
-        if (!Enabled || !Focused || message is not KeyPressMsg key)
+        if (!Enabled || !IsFocused || message is not KeyPressMsg key)
         {
             return false;
         }
@@ -200,7 +200,7 @@ public sealed class ButtonComponent : IStatefulComponent, IMouseStatefulComponen
     private List<WidgetVisualState> ResolveStates()
     {
         var states = new List<WidgetVisualState>(4);
-        if (Focused)
+        if (IsFocused)
         {
             states.Add(WidgetVisualState.Focused);
         }

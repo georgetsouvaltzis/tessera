@@ -11,13 +11,13 @@ using TeaSharp.Widgets;
 
 namespace TeaSharp.Components.Prebuilt;
 
-public sealed class LabelComponent : ICanvasComponent
+public sealed class TextBlockComponent : ICanvasComponent
 {
-    public LabelComponent()
+    public TextBlockComponent()
     {
     }
 
-    public LabelComponent(LabelOptions options)
+    public TextBlockComponent(TextBlockOptions options)
     {
         Text = options.Text;
         Title = options.Title;
@@ -44,7 +44,7 @@ public sealed class LabelComponent : ICanvasComponent
         var content = FrameLayout.DrawFrameAndResolveContent(
             canvas,
             clipped,
-            Border == BorderStyle.None ? null : Title ?? "Label",
+            Border == BorderStyle.None ? null : Title ?? "Text",
             Border,
             Padding);
         if (content.IsEmpty)

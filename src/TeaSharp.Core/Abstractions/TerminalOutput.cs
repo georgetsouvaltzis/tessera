@@ -1,6 +1,6 @@
 namespace TeaSharp.Core.Abstractions;
 
-public readonly record struct ViewTerminal
+public readonly record struct TerminalOutput
 {
     public bool AltScreen { get; init; }
     public bool EnableBracketedPaste { get; init; }

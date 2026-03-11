@@ -16,8 +16,8 @@ Primary goal: deterministic message-driven TUI runtime with portable terminal be
 ## 2. Goals
 
 - Cross-platform runtime on `net10.0`.
-- Bubble Tea-like programming model: `Init -> Update -> View`.
-- Async effect model via commands (`Command`).
+- Bubble Tea-like programming model: `Init -> Update -> Render`.
+- Async effect model via effects (`Effect`).
 - Renderer with incremental redraw strategy and ANSI escape support.
 - Input pipeline that decodes terminal bytes into structured messages.
 - Testability without a real terminal (fake adapter + no-op renderer).
@@ -39,13 +39,13 @@ Primary goal: deterministic message-driven TUI runtime with portable terminal be
 ### 4.1 Layers
 
 1. `Abstractions`
-- `IModel`, `IMessage`, `View`, `Command`.
+- `IScreen`, `IMessage`, `ScreenOutput`, `Effect`.
 
 2. `Application`
 - `TeaProgram` event loop, command scheduling, filtering, rendering orchestration.
   - adaptive frame pacing (`ProgramOptions.AdaptiveFramePacing`) for burst message coalescing.
-  - recoverable command exception hook (`ProgramOptions.RecoverCommandException`) before `CommandErrorMsg` fallback.
-  - configurable command concurrency (`ProgramOptions.MaxConcurrentCommands`).
+  - recoverable effect exception hook (`ProgramOptions.MapEffectException`) before `EffectErrorMsg` fallback.
+  - configurable effect concurrency (`ProgramOptions.MaxConcurrentEffects`).
 
 3. `Input`
 - `EventDecoder`: bytes -> typed messages.
@@ -68,11 +68,11 @@ Primary goal: deterministic message-driven TUI runtime with portable terminal be
   - terminal seams remain public for advanced hosting/tests, but are now marked `EditorBrowsable(Advanced)`.
 
 6. `Commands`
-- `Commands` static helpers: `Quit`, `Interrupt`, `Batch`, `Sequence`, `Tick`, `Every`.
+- `Effects` static helpers: `Quit`, `Interrupt`, `Batch`, `Sequence`, `Tick`, `Every`.
 
 7. `Components`
 - `TeaSharp.Components.Primitives`: deterministic drawing primitives (`Rect`, `Canvas`, `Widgets`) with selectable text pipeline (`CanvasTextMode.Fast` / `CanvasTextMode.GraphemeAware`) and configurable border styles.
-- `TeaSharp.Components.Composition`: component composition contracts (`ICanvasComponent`, `IStatefulComponent`, lower-level `ComponentComposer`, screen-scale `ScreenComposer`, `ScreenRegionKey`, `InputRouter`, `InteractiveScreenModel`) including overlay helpers for modals/palettes/toasts, typed region identity, reusable screen-shell helpers, and scoped key precedence (`System` -> `Modal` -> `Palette` -> `Command` -> `FocusedRegion` -> `Global`).
+- `TeaSharp.Components.Composition`: component composition contracts (`ICanvasComponent`, `IStatefulComponent`, lower-level `ComponentComposer`, screen-scale `ScreenComposer`, `ScreenRegionKey`, `InputRouter`, `InteractiveScreenModel`) including overlay helpers for modals/palettes/toasts, typed region identity, reusable screen-shell helpers, and scoped key precedence (`System` -> `Modal` -> `Palette` -> `CommandBar` -> `FocusedRegion` -> `Global`).
 - `TeaSharp.Components.Charting` and `TeaSharp.Components.Dashboard`: chart primitives (`Charts`, `LineChartComponent`, `BarChartComponent`) with optional axes/legend/scale options plus dashboard widgets (`GaugeComponent`, `StatsCardComponent`, `MiniLogComponent`).
 - `TeaSharp.Components.UiKit`, `TeaSharp.Components.Prebuilt`, `TeaSharp.Components.Productivity`, and `TeaSharp.Components.Advanced`: reusable UI surfaces, controls, and higher-level widgets.
 
@@ -95,7 +95,7 @@ Primary goal: deterministic message-driven TUI runtime with portable terminal be
 5. Event loop applies filter, handles internal control messages, calls `Update`.
 6. Background size polling emits `WindowSizeMsg` when dimensions change.
 7. Returned command gets scheduled.
-8. `View` renders via active renderer.
+8. `ScreenOutput` renders via active renderer.
 9. Shutdown restores terminal state.
 
 ## 5. Concurrency Model
@@ -128,31 +128,31 @@ Primary goal: deterministic message-driven TUI runtime with portable terminal be
 
 ## 7. API Contracts (Phase 1)
 
-- `IModel Init/Update/View`, where `Update` mutates model state in place and returns an optional `Command`.
-- `Command` returns optional `IMessage`.
-- `View` is now grouped into `ViewFrame` (content + cursor placement/style), `ViewTerminal` (alt-screen, mode toggles, colors, progress, title, keyboard enhancements), and `ViewInput` (optional mouse interception callback).
-- app-facing hosting should prefer `Tea.NewProgram(model)` for stable defaults and `Tea.NewProgram(model, TeaProgramOptions)` for stable customization; `ProgramOptions` remains available for advanced runtime overrides and testing seams.
-- direct `new TeaProgram(...)` construction is treated as an advanced/testing seam; the recommended host entrypoint is `Tea.NewProgram(...)`.
+- `IScreen Init/Update/Render`, where `Update` mutates screen state in place and returns an optional `Effect`.
+- `Effect` returns optional `IMessage`.
+- `ScreenOutput` is now grouped into `ScreenFrame` (content + cursor placement/style), `TerminalOutput` (alt-screen, mode toggles, colors, progress, title, keyboard enhancements), and `InputHooks` (optional mouse interception callback).
+- app-facing hosting should prefer `Tea.CreateProgram(model)` for stable defaults and `Tea.CreateProgram(model, TeaProgramOptions)` for stable customization; `ProgramOptions` remains available for advanced runtime overrides and testing seams.
+- direct `new TeaProgram(...)` construction is treated as an advanced/testing seam; the recommended host entrypoint is `Tea.CreateProgram(...)`.
 - Multi-pane apps should pair `ScreenComposer` (region layout, focus, mouse hit routing) with `InputRouter` (overlay/mode/global key precedence), prefer `ScreenRegionKey` over raw string ids for region identity, and use `InteractiveScreenModel` when the app follows the standard “one screen + overlays + scoped input” shape.
 - `docs/app-pattern.md` is the canonical “recommended app pattern” reference for that shell.
 - `ProgramOptions` now includes runtime extension points:
   - capability probe mode list (`CapabilityProbeModes`)
   - decoder injection (`EventDecoder`)
   - capability/color detector delegates (`TerminalCapabilityDetector`, `ColorProfileDetector`)
-  - command concurrency policy (`MaxConcurrentCommands`)
+  - command concurrency policy (`MaxConcurrentEffects`)
   - resize interval floor (`MinResizePollInterval`)
   - ANSI renderer policy (`AnsiRendererOptions`: mode-report query policy, kitty keyboard base flag behavior, flush timeout)
 - Messages include:
-  - lifecycle: `QuitMsg`, `InterruptMsg`, `CommandErrorMsg`.
+  - lifecycle: `QuitMsg`, `InterruptMsg`, `EffectErrorMsg`.
   - terminal: `WindowSizeMsg`.
   - input: `KeyPressMsg`, `KeyReleaseMsg`, `Paste*Msg`, `Focus*Msg`, `MouseMsg` + typed variants (`MouseClickMsg`, `MouseReleaseMsg`, `MouseMotionMsg`, `MouseWheelMsg`), `ModeReportMsg`, `KeyboardEnhancementsMsg`, `UnknownInputMsg`.
   - terminal capability/state: `TerminalCapabilitiesMsg`, `ColorProfileMsg`, `CapabilityMsg`, `ClipboardMsg`, `ForegroundColorMsg`, `BackgroundColorMsg`, `CursorColorMsg`.
-  - command meta: `BatchMsg`, `SequenceMsg`, `TickMsg`.
+  - effect meta: `BatchMsg`, `SequenceMsg`, `TickMsg`.
   - raw terminal output: `RawOutputMsg`.
 
 ## 8. Error Handling
 
-- Command exceptions converted to `CommandErrorMsg` by default.
+- Effect exceptions converted to `EffectErrorMsg` by default.
 - Interrupts map to `TeaProgramInterruptedException`.
 - External cancellation maps to `OperationCanceledException`.
 

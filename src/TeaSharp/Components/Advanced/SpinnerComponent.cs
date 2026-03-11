@@ -18,7 +18,7 @@ public sealed class SpinnerComponent : IStatefulComponent, IMouseStatefulCompone
 
     public string Title { get; set; } = "Spinner";
 
-    public bool Focused { get; set; }
+    public bool IsFocused { get; set; }
 
     public bool Running { get; private set; } = true;
 
@@ -73,7 +73,7 @@ public sealed class SpinnerComponent : IStatefulComponent, IMouseStatefulCompone
 
     public bool Update(IMessage message)
     {
-        if (!Focused || message is not KeyPressMsg key)
+        if (!IsFocused || message is not KeyPressMsg key)
         {
             return false;
         }
@@ -156,7 +156,7 @@ public sealed class SpinnerComponent : IStatefulComponent, IMouseStatefulCompone
         var content = FrameLayout.DrawFrameAndResolveContent(
             canvas,
             clipped,
-            Border == BorderStyle.None ? null : Focused ? $"{Title} *" : Title,
+            Border == BorderStyle.None ? null : IsFocused ? $"{Title} *" : Title,
             Border,
             Padding);
 
@@ -166,7 +166,7 @@ public sealed class SpinnerComponent : IStatefulComponent, IMouseStatefulCompone
         }
 
         var states = new List<WidgetVisualState>(3);
-        if (Focused)
+        if (IsFocused)
         {
             states.Add(WidgetVisualState.Focused);
         }

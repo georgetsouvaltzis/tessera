@@ -56,19 +56,19 @@ public sealed class DialogWorkflow
     /// <summary>
     /// Gets a value indicating whether the dialog is currently open.
     /// </summary>
-    public bool IsOpen => Dialog.Visible;
+    public bool IsOpen => Dialog.IsVisible;
 
     /// <summary>
     /// Opens the dialog and schedules focus for its modal region.
     /// </summary>
     public void Show()
     {
-        if (!Dialog.Visible)
+        if (!Dialog.IsVisible)
         {
             _focusSnapshot = _captureFocus();
         }
 
-        Dialog.Visible = true;
+        Dialog.IsVisible = true;
         _focusRequested = true;
     }
 
@@ -90,7 +90,7 @@ public sealed class DialogWorkflow
     public void Show(string title, IReadOnlyList<string> lines)
     {
         Dialog.Title = title;
-        Dialog.Lines = lines ?? throw new ArgumentNullException(nameof(lines));
+        Dialog.BodyLines = lines ?? throw new ArgumentNullException(nameof(lines));
         Show();
     }
 
@@ -99,12 +99,12 @@ public sealed class DialogWorkflow
     /// </summary>
     public bool Hide()
     {
-        if (!Dialog.Visible)
+        if (!Dialog.IsVisible)
         {
             return false;
         }
 
-        Dialog.Visible = false;
+        Dialog.IsVisible = false;
         _focusRequested = false;
         return RestoreFocus();
     }
@@ -115,7 +115,7 @@ public sealed class DialogWorkflow
     /// <param name="bounds">The modal host bounds.</param>
     public ScreenRegion? Compose(Rect bounds)
     {
-        if (!Dialog.Visible)
+        if (!Dialog.IsVisible)
         {
             return null;
         }

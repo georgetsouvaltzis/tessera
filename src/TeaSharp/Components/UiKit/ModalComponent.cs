@@ -23,28 +23,28 @@ public sealed class ModalComponent : ICanvasComponent
     public ModalComponent(ModalOptions options)
     {
         Title = options.Title;
-        Visible = options.Visible;
+        IsVisible = options.IsVisible;
         Border = options.Border;
         Padding = options.Padding;
-        Lines = options.Lines ?? ["(empty)"];
+        BodyLines = options.BodyLines ?? ["(empty)"];
         Theme = options.Theme ?? new UiTheme();
     }
 
     public string Title { get; set; } = "Modal";
 
-    public bool Visible { get; set; }
+    public bool IsVisible { get; set; }
 
     public BorderStyle Border { get; set; } = BorderStyle.Rounded;
 
     public Thickness Padding { get; set; }
 
-    public IReadOnlyList<string> Lines { get; set; } = ["(empty)"];
+    public IReadOnlyList<string> BodyLines { get; set; } = ["(empty)"];
 
     public UiTheme Theme { get; set; }
 
     public void Render(Canvas canvas, Rect rect)
     {
-        if (!Visible)
+        if (!IsVisible)
         {
             return;
         }
@@ -82,10 +82,10 @@ public sealed class ModalComponent : ICanvasComponent
             return;
         }
 
-        var rows = Math.Min(body.Height, Lines.Count);
+        var rows = Math.Min(body.Height, BodyLines.Count);
         for (var row = 0; row < rows; row++)
         {
-            canvas.WriteText(body.X, body.Y + row, Lines[row], body.Width);
+            canvas.WriteText(body.X, body.Y + row, BodyLines[row], body.Width);
         }
     }
 

@@ -5,9 +5,9 @@ using TeaSharp;
 using TeaSharp.Core.Abstractions;
 using TeaSharp.Core.Application;
 using TeaSharp.Core.Messages;
-using ModelView = TeaSharp.Core.Abstractions.View;
+using ModelView = TeaSharp.Core.Abstractions.ScreenOutput;
 
-var program = Tea.NewProgram(new DropdownDemoModel(), new TeaProgramOptions
+var program = Tea.CreateProgram(new DropdownDemoModel(), new TeaProgramOptions
 {
     UseConsoleKeyEvents = false,
 });
@@ -22,7 +22,7 @@ catch (TeaProgramInterruptedException)
     return 130;
 }
 
-internal sealed class DropdownDemoModel : IModel
+internal sealed class DropdownDemoModel : IScreen
 {
     private readonly DropdownComponent _dropdown = new(new DropdownOptions(
         Items:
@@ -37,7 +37,7 @@ internal sealed class DropdownDemoModel : IModel
             "Sandbox",
         ],
         Title: "Environment",
-        Focused: true,
+        IsFocused: true,
         MaxVisibleItems: 6));
 
     private int _width = 90;
@@ -48,9 +48,9 @@ internal sealed class DropdownDemoModel : IModel
     {
     }
 
-    public Command? Init() => null;
+    public Effect? Init() => null;
 
-    public Command? Update(IMessage message)
+    public Effect? Update(IMessage message)
     {
         if (message is WindowSizeMsg ws)
         {
@@ -95,7 +95,7 @@ internal sealed class DropdownDemoModel : IModel
         if ((key.Modifiers.HasFlag(KeyModifiers.Ctrl) && key.IsCharacter('c'))
             || key.IsCharacter('q', KeyModifiers.None))
         {
-            return Tea.Cmd.Quit;
+            return Tea.Effects.Quit;
         }
 
         var wasOpen = _dropdown.IsOpen;
@@ -123,7 +123,7 @@ internal sealed class DropdownDemoModel : IModel
         return null;
     }
 
-    public ModelView View()
+    public ModelView Render()
     {
         var width = Math.Max(56, _width);
         var height = Math.Max(18, _height);
@@ -153,7 +153,7 @@ internal sealed class DropdownDemoModel : IModel
 
         return ModelView.From(canvas.Render()) with
         {
-            Terminal = new ViewTerminal
+            Terminal = new TerminalOutput
             {
                 AltScreen = true,
                 EnableBracketedPaste = true,

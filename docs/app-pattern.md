@@ -14,7 +14,7 @@ The intended shell is:
 2. `ScreenRegionKey`
 3. `ScreenComposer`
 4. `InputRouter`
-5. `ViewTerminal`
+5. `TerminalOutput`
 
 ## Default Shape
 
@@ -24,7 +24,7 @@ using TeaSharp.Components.Prebuilt;
 using TeaSharp.Components.Primitives;
 using TeaSharp.Core.Abstractions;
 using TeaSharp.Core.Messages;
-using ModelView = TeaSharp.Core.Abstractions.View;
+using ModelView = TeaSharp.Core.Abstractions.ScreenOutput;
 
 internal sealed class DemoModel : InteractiveScreenModel
 {
@@ -39,7 +39,7 @@ internal sealed class DemoModel : InteractiveScreenModel
         ClearOnSubmit: true));
     private readonly DialogComponent _dialog = new(new DialogOptions(
         Title: "Confirm",
-        Lines: ["Delete item?", "Enter/Space accept", "Esc cancel"]));
+        BodyLines: ["Delete item?", "Enter/Space accept", "Esc cancel"]));
 
     private int _width = 100;
     private int _height = 30;
@@ -48,7 +48,7 @@ internal sealed class DemoModel : InteractiveScreenModel
     {
         InputRouter
             .AddScope("system", InputScopeKind.System, static () => true, HandleSystemKey)
-            .AddScope("modal", InputScopeKind.Modal, () => _dialog.Visible, HandleDialogKey, InputScopeBehavior.CaptureWhileActive)
+            .AddScope("modal", InputScopeKind.Modal, () => _dialog.IsVisible, HandleDialogKey, InputScopeBehavior.CaptureWhileActive)
             .AddScope(
                 "focused",
                 InputScopeKind.FocusedRegion,
@@ -60,9 +60,9 @@ internal sealed class DemoModel : InteractiveScreenModel
             .AddScope("global", InputScopeKind.Global, static () => true, HandleGlobalKey);
     }
 
-    public override Command? Init() => null;
+    public override Effect? Init() => null;
 
-    public override Command? Update(IMessage message)
+    public override Effect? Update(IMessage message)
     {
         return message switch
         {
@@ -73,7 +73,7 @@ internal sealed class DemoModel : InteractiveScreenModel
         };
     }
 
-    public override ModelView View()
+    public override ModelView Render()
     {
         if (_width < 60 || _height < 18)
         {
@@ -86,7 +86,7 @@ internal sealed class DemoModel : InteractiveScreenModel
 
         return ModelView.From(canvas.Render()) with
         {
-            Terminal = new ViewTerminal
+            Terminal = new TerminalOutput
             {
                 AltScreen = true,
                 EnableBracketedPaste = true,
@@ -100,7 +100,7 @@ internal sealed class DemoModel : InteractiveScreenModel
     protected override Rect GetBodyRect() => new(0, 0, _width, _height);
 
     protected override ScreenRegionKey? PreferredFocusRegionKey
-        => _dialog.Visible ? DialogRegion : EditorRegion;
+        => _dialog.IsVisible ? DialogRegion : EditorRegion;
 
     protected override bool CanBuildScreen => _width >= 60 && _height >= 18;
 
@@ -110,13 +110,13 @@ internal sealed class DemoModel : InteractiveScreenModel
         Screen.AddComponent(TabsRegion, frame.Header, _tabs);
         Screen.AddRegion(EditorRegion, frame.Body, _editor.Render, _editor.Update, focusable: true);
 
-        if (_dialog.Visible)
+        if (_dialog.IsVisible)
         {
             Screen.AddModalComponent(DialogRegion, bodyRect, _dialog);
         }
     }
 
-    private Command? HandleResize(WindowSizeMsg ws)
+    private Effect? HandleResize(WindowSizeMsg ws)
     {
         _width = ws.Width;
         _height = ws.Height;
@@ -125,7 +125,7 @@ internal sealed class DemoModel : InteractiveScreenModel
 
     private InputRouteResult HandleSystemKey(KeyPressMsg key)
         => key.Modifiers.HasFlag(KeyModifiers.Ctrl) && key.IsCharacter('c')
-            ? InputRouteResult.FromCommand(Tea.Cmd.Quit)
+            ? InputRouteResult.FromEffect(Tea.Effects.Quit)
             : InputRouteResult.NotHandled;
 
     private InputRouteResult HandleDialogKey(KeyPressMsg key)
@@ -135,12 +135,12 @@ internal sealed class DemoModel : InteractiveScreenModel
             return InputRouteResult.NotHandled;
         }
 
-        return InputRouteResult.HandledWithoutCommand;
+        return InputRouteResult.HandledWithoutEffect;
     }
 
     private InputRouteResult HandleFocusedKey(KeyPressMsg key)
         => RouteFocusedMessage(key)
-            ? InputRouteResult.HandledWithoutCommand
+            ? InputRouteResult.HandledWithoutEffect
             : InputRouteResult.NotHandled;
 
     private InputRouteResult HandleGlobalKey(KeyPressMsg key)
@@ -148,14 +148,14 @@ internal sealed class DemoModel : InteractiveScreenModel
         if (key.Is(KeyCode.Tab))
         {
             FocusNext();
-            return InputRouteResult.HandledWithoutCommand;
+            return InputRouteResult.HandledWithoutEffect;
         }
 
         if (key.IsCharacter('d'))
         {
-            _dialog.Visible = !_dialog.Visible;
-            SetFocus(_dialog.Visible ? DialogRegion : EditorRegion);
-            return InputRouteResult.HandledWithoutCommand;
+            _dialog.IsVisible = !_dialog.IsVisible;
+            SetFocus(_dialog.IsVisible ? DialogRegion : EditorRegion);
+            return InputRouteResult.HandledWithoutEffect;
         }
 
         return InputRouteResult.NotHandled;
@@ -179,7 +179,7 @@ private InputRouteResult HandleGlobalKey(KeyPressMsg key)
 {
     if (HandleTabNavigation(key, _focusChain))
     {
-        return InputRouteResult.HandledWithoutCommand;
+        return InputRouteResult.HandledWithoutEffect;
     }
 
     return InputRouteResult.NotHandled;
@@ -241,7 +241,7 @@ protected override void ComposeScreen(Rect bodyRect)
 
 This keeps the common `header + body + actions + footer` workflow shell as a first-class API.
 
-For confirm flows, prefer a dialog workflow over manual `Visible` toggles plus `CaptureFocus()` / `RestoreFocus(...)` plumbing:
+For confirm flows, prefer a dialog workflow over manual `IsVisible` toggles plus `CaptureFocus()` / `RestoreFocus(...)` plumbing:
 
 ```csharp
 private readonly DialogComponent _deleteDialog = new(new DialogOptions(Title: "Delete"));
@@ -264,7 +264,7 @@ private InputRouteResult HandleGlobalKey(KeyPressMsg key)
     if (key.IsCharacter('x'))
     {
         _deleteWorkflow.Show("Delete item", ["Delete the selected item?"]);
-        return InputRouteResult.HandledWithoutCommand;
+        return InputRouteResult.HandledWithoutEffect;
     }
 
     return InputRouteResult.NotHandled;
@@ -280,7 +280,7 @@ Use this order unless you have a clear reason not to:
 1. `System`
 2. `Modal`
 3. `Palette`
-4. `Command`
+4. `Effect`
 5. `FocusedRegion`
 6. `Global`
 
@@ -289,7 +289,7 @@ Meaning:
 - `System`: emergency keys like `Ctrl+C`
 - `Modal`: delete/confirm dialogs
 - `Palette`: command palette overlays
-- `Command`: command bar / shell input
+- `CommandBar`: command bar / shell input
 - `FocusedRegion`: active pane or widget
 - `Global`: app-wide shortcuts
 
@@ -304,7 +304,7 @@ Meaning:
 - Prefer `CreateFocusChain(...)`, `HandleTabNavigation(...)`, `CaptureFocus()`, and `RestoreFocus(...)` over per-app focus enums for standard screen navigation.
 - Use `blocksGlobalShortcuts` for plain character suppression while text input is active.
 - Prefer `SetFocus(...)`, `FocusNext()`, and `FocusPrevious()` from `InteractiveScreenModel` instead of reaching into `Screen` directly.
-- Put terminal capability toggles in `ViewTerminal`, not in app-local routing code.
+- Put terminal capability toggles in `TerminalOutput`, not in app-local routing code.
 
 ## When Not To Use This
 
@@ -328,4 +328,4 @@ It already demonstrates:
 - `CreateDialogWorkflow(...)`
 - event-driven widget integration
 
-Other example apps may still use more manual `IModel`-level composition and should be treated as advanced examples, not the default starting point.
+Other example apps may still use more manual `IScreen`-level composition and should be treated as advanced examples, not the default starting point.

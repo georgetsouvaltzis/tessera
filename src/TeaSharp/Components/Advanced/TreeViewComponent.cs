@@ -20,11 +20,11 @@ public sealed partial class TreeViewComponent : IStatefulComponent, IMouseStatef
 
     public string Title { get; set; } = "Tree";
 
-    public bool Focused { get; set; }
+    public bool IsFocused { get; set; }
 
-    public bool Disabled { get; set; }
+    public bool IsDisabled { get; set; }
 
-    public bool ReadOnly { get; set; }
+    public bool IsReadOnly { get; set; }
 
     public BorderStyle Border { get; set; } = BorderStyle.SingleLine;
 
@@ -61,7 +61,7 @@ public sealed partial class TreeViewComponent : IStatefulComponent, IMouseStatef
 
     public bool Update(IMessage message)
     {
-        if (!Focused || Disabled || ReadOnly || message is not KeyPressMsg key)
+        if (!IsFocused || IsDisabled || IsReadOnly || message is not KeyPressMsg key)
         {
             return false;
         }
@@ -113,7 +113,7 @@ public sealed partial class TreeViewComponent : IStatefulComponent, IMouseStatef
 
     public bool UpdateMouse(MouseMsg message, Rect bounds)
     {
-        if (Disabled || ReadOnly || _visible.Count == 0)
+        if (IsDisabled || IsReadOnly || _visible.Count == 0)
         {
             return false;
         }

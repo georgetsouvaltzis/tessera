@@ -14,7 +14,7 @@ namespace TeaSharp.Components.Prebuilt;
 public sealed record TextAreaOptions(
     string Title = "Text Area",
     string InitialValue = "",
-    bool Focused = false,
+    bool IsFocused = false,
     BorderStyle Border = BorderStyle.SingleLine,
     Thickness Padding = default,
     bool ShowLineNumbers = false,

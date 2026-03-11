@@ -28,7 +28,7 @@ public sealed partial class TeaProgram
                     _capabilityProbe.Observe(probeModeReport);
                 }
 
-                var filtered = _options.Filter is null ? message : _options.Filter(Model, message);
+                var filtered = _options.MessageFilter is null ? message : _options.MessageFilter(Screen, message);
                 if (filtered is null)
                 {
                     continue;
@@ -44,7 +44,7 @@ public sealed partial class TeaProgram
 
                 if (filtered is InterruptMsg)
                 {
-                    var unhandledCommandException = _runtime.CommandScheduler?.ConsumeUnhandledException();
+                    var unhandledCommandException = _runtime.EffectScheduler?.ConsumeUnhandledException();
                     if (unhandledCommandException is not null)
                     {
                         unhandledCommandException.Throw();
@@ -71,11 +71,11 @@ public sealed partial class TeaProgram
                     continue;
                 }
 
-                var command = Model.Update(filtered);
+                var effect = Screen.Update(filtered);
 
-                if (command is not null)
+                if (effect is not null)
                 {
-                    await _commands.Writer.WriteAsync(command, token).ConfigureAwait(false);
+                    await _effects.Writer.WriteAsync(effect, token).ConfigureAwait(false);
                 }
 
                 pendingRender = true;
@@ -84,7 +84,7 @@ public sealed partial class TeaProgram
                     minFrame,
                     lastRender,
                     pendingRender,
-                    () => RenderAsync(Model.View(), token),
+                    () => RenderAsync(Screen.Render(), token),
                     token).ConfigureAwait(false);
                 lastRender = renderAttempt.LastRender;
                 pendingRender = renderAttempt.PendingRender;
@@ -99,7 +99,7 @@ public sealed partial class TeaProgram
                 var delayedRender = await TeaProgramFramePacer.DelayAndRenderAsync(
                     minFrame,
                     lastRender,
-                    () => RenderAsync(Model.View(), token),
+                    () => RenderAsync(Screen.Render(), token),
                     token).ConfigureAwait(false);
                 lastRender = delayedRender.LastRender;
                 pendingRender = false;
@@ -115,15 +115,15 @@ public sealed partial class TeaProgram
     {
         if (filtered is SequenceMsg sequence)
         {
-            _ = Task.Run(() => _runtime.CommandScheduler!.RunSequenceAsync(sequence.Commands, token), token);
+            _ = Task.Run(() => _runtime.EffectScheduler!.RunSequenceAsync(sequence.Effects, token), token);
             return true;
         }
 
         if (filtered is BatchMsg batch)
         {
-            foreach (var command in batch.Commands)
+            foreach (var effect in batch.Effects)
             {
-                await _commands.Writer.WriteAsync(command, token).ConfigureAwait(false);
+                await _effects.Writer.WriteAsync(effect, token).ConfigureAwait(false);
             }
 
             return true;
@@ -155,12 +155,12 @@ public sealed partial class TeaProgram
             Send(new ColorProfileMsg(refinedColorProfile));
         }
 
-        if (filtered is MouseMsg mouse && _runtime.LastRenderedView.Input.OnMouse is { } onMouse)
+        if (filtered is MouseMsg mouse && _runtime.LastRenderedOutput.Input.OnMouse is { } onMouse)
         {
-            var callbackCommand = onMouse(mouse);
-            if (callbackCommand is not null)
+            var callbackEffect = onMouse(mouse);
+            if (callbackEffect is not null)
             {
-                await _commands.Writer.WriteAsync(callbackCommand, token).ConfigureAwait(false);
+                await _effects.Writer.WriteAsync(callbackEffect, token).ConfigureAwait(false);
             }
         }
 

@@ -9,7 +9,7 @@ namespace TeaSharp.Core.Application;
 [EditorBrowsable(EditorBrowsableState.Advanced)]
 public sealed class ProgramOptions
 {
-    public Func<IModel, IMessage, IMessage?>? Filter { get; init; }
+    public Func<IScreen, IMessage, IMessage?>? MessageFilter { get; init; }
 
     public int MaxFps { get; init; } = 60;
 
@@ -21,9 +21,9 @@ public sealed class ProgramOptions
 
     public bool UseConsoleKeyEvents { get; init; } = true;
 
-    public bool CatchCommandExceptions { get; init; } = true;
+    public bool CatchEffectExceptions { get; init; } = true;
 
-    public Func<Exception, IMessage?>? RecoverCommandException { get; init; }
+    public Func<Exception, IMessage?>? MapEffectException { get; init; }
 
     public TimeSpan EscapeTimeout { get; init; } = TimeSpan.FromMilliseconds(50);
 
@@ -40,7 +40,7 @@ public sealed class ProgramOptions
     public TimeSpan CapabilityProbeTimeout { get; init; } = TimeSpan.FromMilliseconds(260);
 
     [EditorBrowsable(EditorBrowsableState.Advanced)]
-    public int MaxConcurrentCommands { get; init; }
+    public int MaxConcurrentEffects { get; init; }
 
     [EditorBrowsable(EditorBrowsableState.Advanced)]
     public IProgramRenderer? Renderer { get; init; }

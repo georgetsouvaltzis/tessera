@@ -32,9 +32,9 @@ internal static class RendererSnapshotTests
         renderer.Resize(width: 6, height: 3);
 
         // Act
-        renderer.Render(View.From("ab\ncd") with
+        renderer.Render(ScreenOutput.From("ab\ncd") with
         {
-            Terminal = new ViewTerminal
+            Terminal = new TerminalOutput
             {
                 AltScreen = true,
                 EnableBracketedPaste = true,
@@ -62,9 +62,9 @@ internal static class RendererSnapshotTests
         await using var output = new MemoryStream();
         await renderer.InitializeAsync(output, CancellationToken.None);
         renderer.Resize(width: 6, height: 3);
-        var baseView = View.From("ab\ncd") with
+        var baseView = ScreenOutput.From("ab\ncd") with
         {
-            Terminal = new ViewTerminal
+            Terminal = new TerminalOutput
             {
                 EnableSynchronizedUpdates = true,
             },
@@ -89,9 +89,9 @@ internal static class RendererSnapshotTests
         await using var renderer = new AnsiDiffRenderer();
         await using var output = new MemoryStream();
         await renderer.InitializeAsync(output, CancellationToken.None);
-        renderer.Render(View.From("snap") with
+        renderer.Render(ScreenOutput.From("snap") with
         {
-            Terminal = new ViewTerminal
+            Terminal = new TerminalOutput
             {
                 AltScreen = true,
                 EnableBracketedPaste = true,

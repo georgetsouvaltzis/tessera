@@ -7,13 +7,13 @@ using TeaSharp.Core.Terminal;
 namespace TeaSharp.Core.Application;
 
 /// <summary>
-/// Runs a TeaSharp model inside the runtime event loop.
+/// Runs a TeaSharp screen inside the runtime event loop.
 /// </summary>
 public sealed partial class TeaProgram
 {
     private readonly ProgramOptions _options;
     private readonly Channel<IMessage> _messages;
-    private readonly Channel<Command> _commands;
+    private readonly Channel<Effect> _effects;
     private readonly object _stateLock = new();
     private readonly TeaCapabilityProbe _capabilityProbe = new();
     private readonly TeaProgramRuntimeState _runtime = new();
@@ -21,23 +21,23 @@ public sealed partial class TeaProgram
     private bool _running;
 
     /// <summary>
-    /// Initializes a program for the provided model.
+    /// Initializes a program for the provided screen.
     /// </summary>
-    /// <param name="initialModel">The initial application model.</param>
+    /// <param name="initialScreen">The initial application screen.</param>
     /// <param name="options">Advanced runtime options.</param>
     [EditorBrowsable(EditorBrowsableState.Advanced)]
-    public TeaProgram(IModel initialModel, ProgramOptions? options = null)
+    public TeaProgram(IScreen initialScreen, ProgramOptions? options = null)
     {
-        Model = initialModel ?? throw new ArgumentNullException(nameof(initialModel));
+        Screen = initialScreen ?? throw new ArgumentNullException(nameof(initialScreen));
         _options = options ?? new ProgramOptions();
         _messages = Channel.CreateUnbounded<IMessage>();
-        _commands = Channel.CreateUnbounded<Command>();
+        _effects = Channel.CreateUnbounded<Effect>();
     }
 
     /// <summary>
-    /// Gets the current application model.
+    /// Gets the current application screen.
     /// </summary>
-    public IModel Model { get; private set; }
+    public IScreen Screen { get; private set; }
 
     /// <summary>
     /// Enqueues a message for delivery to the running program.
@@ -55,8 +55,8 @@ public sealed partial class TeaProgram
     /// Runs the program until it exits or the provided token is canceled.
     /// </summary>
     /// <param name="cancellationToken">A token that cancels program execution.</param>
-    /// <returns>The final application model.</returns>
-    public Task<IModel> RunAsync(CancellationToken cancellationToken = default) =>
+    /// <returns>The final application screen.</returns>
+    public Task<IScreen> RunAsync(CancellationToken cancellationToken = default) =>
         RunProgramAsync(cancellationToken);
 
     /// <summary>

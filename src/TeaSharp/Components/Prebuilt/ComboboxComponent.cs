@@ -27,9 +27,9 @@ public sealed partial class ComboboxComponent : IStatefulComponent, IMouseStatef
     {
         Title = options.Title;
         Placeholder = options.Placeholder;
-        Focused = options.Focused;
-        Disabled = options.Disabled;
-        ReadOnly = options.ReadOnly;
+        IsFocused = options.IsFocused;
+        IsDisabled = options.IsDisabled;
+        IsReadOnly = options.IsReadOnly;
         Border = options.Border;
         Padding = options.Padding;
         MaxVisibleItems = options.MaxVisibleItems;
@@ -56,11 +56,11 @@ public sealed partial class ComboboxComponent : IStatefulComponent, IMouseStatef
 
     public string Title { get; set; } = "Combobox";
 
-    public bool Focused { get; set; }
+    public bool IsFocused { get; set; }
 
-    public bool Disabled { get; set; }
+    public bool IsDisabled { get; set; }
 
-    public bool ReadOnly { get; set; }
+    public bool IsReadOnly { get; set; }
 
     public BorderStyle Border { get; set; } = BorderStyle.SingleLine;
 
@@ -129,7 +129,7 @@ public sealed partial class ComboboxComponent : IStatefulComponent, IMouseStatef
 
     public bool Update(IMessage message)
     {
-        if (!Focused || Disabled || ReadOnly)
+        if (!IsFocused || IsDisabled || IsReadOnly)
         {
             return false;
         }
@@ -185,7 +185,7 @@ public sealed partial class ComboboxComponent : IStatefulComponent, IMouseStatef
 
     public bool UpdateMouse(MouseMsg message, Rect bounds)
     {
-        if (Disabled || ReadOnly)
+        if (IsDisabled || IsReadOnly)
         {
             return false;
         }

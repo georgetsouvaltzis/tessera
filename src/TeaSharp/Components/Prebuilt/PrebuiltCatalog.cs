@@ -12,7 +12,7 @@ namespace TeaSharp.Components.Prebuilt;
 /// </summary>
 public static class PrebuiltCatalog
 {
-    public static LabelComponent Label(LabelOptions? options = null) => options is null ? new LabelComponent() : new LabelComponent(options);
+    public static TextBlockComponent Label(TextBlockOptions? options = null) => options is null ? new TextBlockComponent() : new TextBlockComponent(options);
 
     public static ButtonComponent Button(ButtonOptions? options = null) => options is null ? new ButtonComponent() : new ButtonComponent(options);
 

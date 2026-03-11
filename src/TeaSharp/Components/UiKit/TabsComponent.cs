@@ -23,7 +23,7 @@ public sealed class TabsComponent : IStatefulComponent, IMouseStatefulComponent,
     public TabsComponent(TabsOptions options)
         : this(options.Tabs)
     {
-        Focused = options.Focused;
+        IsFocused = options.IsFocused;
         EnableNumericShortcuts = options.EnableNumericShortcuts;
         NextTabKey = options.NextTabKey ?? new KeyBinding("right", "next tab", "right");
         PreviousTabKey = options.PreviousTabKey ?? new KeyBinding("left", "previous tab", "left");
@@ -34,7 +34,7 @@ public sealed class TabsComponent : IStatefulComponent, IMouseStatefulComponent,
 
     public IReadOnlyList<string> Tabs => _tabs;
 
-    public bool Focused { get; set; }
+    public bool IsFocused { get; set; }
 
     /// <summary>
     /// Raised when the selected tab changes.
@@ -173,7 +173,7 @@ public sealed class TabsComponent : IStatefulComponent, IMouseStatefulComponent,
     private List<WidgetVisualState> ResolveTabStates(int index, bool active)
     {
         var states = new List<WidgetVisualState>(4);
-        if (Focused)
+        if (IsFocused)
         {
             states.Add(WidgetVisualState.Focused);
         }

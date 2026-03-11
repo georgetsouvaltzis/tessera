@@ -29,7 +29,7 @@ public sealed class LogViewerComponent : IStatefulComponent, IFocusableComponent
         : this()
     {
         Title = options.Title;
-        Focused = options.Focused;
+        IsFocused = options.IsFocused;
         Border = options.Border;
         Padding = options.Padding;
         AutoScroll = options.AutoScroll;
@@ -58,7 +58,7 @@ public sealed class LogViewerComponent : IStatefulComponent, IFocusableComponent
 
     public string Title { get; set; } = "Logs";
 
-    public bool Focused { get; set; }
+    public bool IsFocused { get; set; }
 
     public BorderStyle Border { get; set; } = BorderStyle.SingleLine;
 
@@ -134,7 +134,7 @@ public sealed class LogViewerComponent : IStatefulComponent, IFocusableComponent
             return;
         }
 
-        var title = Focused ? $"{Title} *" : Title;
+        var title = IsFocused ? $"{Title} *" : Title;
         if (Paused)
         {
             title += " [paused]";

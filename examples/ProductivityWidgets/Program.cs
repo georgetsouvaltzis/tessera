@@ -10,9 +10,9 @@ using TeaSharp.Components.UiKit;
 using TeaSharp.Core.Abstractions;
 using TeaSharp.Core.Application;
 using TeaSharp.Core.Messages;
-using ModelView = TeaSharp.Core.Abstractions.View;
+using ModelView = TeaSharp.Core.Abstractions.ScreenOutput;
 
-var program = Tea.NewProgram(new ProductivityWidgetsModel(), new TeaProgramOptions
+var program = Tea.CreateProgram(new ProductivityWidgetsModel(), new TeaProgramOptions
 {
     UseConsoleKeyEvents = false,
 });
@@ -36,7 +36,7 @@ internal sealed class ProductivityWidgetsModel : InteractiveScreenModel
     private static readonly ScreenRegionKey MarkdownRegionId = new("productivity.markdown");
     private static readonly ScreenRegionKey ContextRegionId = new("productivity.context");
 
-    private readonly MenuBarComponent _menu = new(new MenuBarOptions(Focused: true));
+    private readonly MenuBarComponent _menu = new(new MenuBarOptions(IsFocused: true));
     private readonly ContextMenuComponent _context = new(new ContextMenuOptions(Title: "Actions"));
     private readonly NumberInputComponent _number = new(new NumberInputOptions(
         Title: "Estimate (hours)",
@@ -108,9 +108,9 @@ internal sealed class ProductivityWidgetsModel : InteractiveScreenModel
         };
     }
 
-    public override Command? Init() => null;
+    public override Effect? Init() => null;
 
-    public override Command? Update(IMessage message)
+    public override Effect? Update(IMessage message)
     {
         if (message is WindowSizeMsg ws)
         {
@@ -142,7 +142,7 @@ internal sealed class ProductivityWidgetsModel : InteractiveScreenModel
         return null;
     }
 
-    public override ModelView View()
+    public override ModelView Render()
     {
         if (_width < 80 || _height < 24)
         {
@@ -160,7 +160,7 @@ internal sealed class ProductivityWidgetsModel : InteractiveScreenModel
 
         return ModelView.From(canvas.Render()) with
         {
-            Terminal = new ViewTerminal
+            Terminal = new TerminalOutput
             {
                 AltScreen = true,
                 EnableBracketedPaste = true,
@@ -179,7 +179,7 @@ internal sealed class ProductivityWidgetsModel : InteractiveScreenModel
     protected override bool CanBuildScreen => _width >= 80 && _height >= 24;
 
     protected override ScreenRegionKey? PreferredFocusRegionKey =>
-        _context.Visible
+        _context.IsVisible
             ? ContextRegionId
             : FocusedRegionKey ?? MenuRegionId;
 
@@ -196,7 +196,7 @@ internal sealed class ProductivityWidgetsModel : InteractiveScreenModel
         Screen.AddComponent(TimeRegionId, timeRect, _time);
         shell.AddMain(MarkdownRegionId, _markdown);
 
-        if (_context.Visible)
+        if (_context.IsVisible)
         {
             Screen.AddPaletteComponent(ContextRegionId, shell.Frame.Body, _context);
             if (_pendingContextFocus)
@@ -211,8 +211,8 @@ internal sealed class ProductivityWidgetsModel : InteractiveScreenModel
     {
         InputRouter
             .AddScope("productivity.system", InputScopeKind.System, static () => true, HandleSystemKey)
-            .AddScope("productivity.palette", InputScopeKind.Palette, () => _context.Visible, HandleContextKey, InputScopeBehavior.CaptureWhileActive)
-            .AddScope("productivity.focused", InputScopeKind.FocusedRegion, () => !_context.Visible && FocusedRegionKey is not null, HandleFocusedKey)
+            .AddScope("productivity.palette", InputScopeKind.Palette, () => _context.IsVisible, HandleContextKey, InputScopeBehavior.CaptureWhileActive)
+            .AddScope("productivity.focused", InputScopeKind.FocusedRegion, () => !_context.IsVisible && FocusedRegionKey is not null, HandleFocusedKey)
             .AddScope("productivity.global", InputScopeKind.Global, static () => true, HandleGlobalKey);
     }
 
@@ -221,7 +221,7 @@ internal sealed class ProductivityWidgetsModel : InteractiveScreenModel
         if ((key.Modifiers.HasFlag(KeyModifiers.Ctrl) && key.IsCharacter('c'))
             || key.IsCharacter('q', KeyModifiers.None))
         {
-            return InputRouteResult.FromCommand(Tea.Cmd.Quit);
+            return InputRouteResult.FromEffect(Tea.Effects.Quit);
         }
 
         return InputRouteResult.NotHandled;
@@ -239,7 +239,7 @@ internal sealed class ProductivityWidgetsModel : InteractiveScreenModel
         _lastEvent = TryConsumePendingActionEvent(out var actionEvent)
             ? actionEvent
             : $"context:{key.Keystroke()}";
-        return InputRouteResult.HandledWithoutCommand;
+        return InputRouteResult.HandledWithoutEffect;
     }
 
     private InputRouteResult HandleFocusedKey(KeyPressMsg key)
@@ -253,7 +253,7 @@ internal sealed class ProductivityWidgetsModel : InteractiveScreenModel
         _lastEvent = TryConsumePendingActionEvent(out var actionEvent)
             ? actionEvent
             : key.Keystroke();
-        return InputRouteResult.HandledWithoutCommand;
+        return InputRouteResult.HandledWithoutEffect;
     }
 
     private InputRouteResult HandleGlobalKey(KeyPressMsg key)
@@ -261,13 +261,13 @@ internal sealed class ProductivityWidgetsModel : InteractiveScreenModel
         if (HandleTabNavigation(key, _focusChain))
         {
             _lastEvent = $"focus:{FocusLabel()}";
-            return InputRouteResult.HandledWithoutCommand;
+            return InputRouteResult.HandledWithoutEffect;
         }
 
         if (key.IsCharacter('m', KeyModifiers.None))
         {
             OpenContextMenu();
-            return InputRouteResult.HandledWithoutCommand;
+            return InputRouteResult.HandledWithoutEffect;
         }
 
         return InputRouteResult.NotHandled;
@@ -277,21 +277,21 @@ internal sealed class ProductivityWidgetsModel : InteractiveScreenModel
     {
         _contextFocusSnapshot = CaptureFocus();
         _context.OpenAt(Math.Max(0, (_width / 2) - 12), Math.Max(2, (_height / 2) - 3));
-        _context.Focused = true;
+        _context.IsFocused = true;
         _pendingContextFocus = true;
         _lastEvent = "context:open";
     }
 
     private void HandleContextLifecycle()
     {
-        if (_context.Visible)
+        if (_context.IsVisible)
         {
             return;
         }
 
         if (!_pendingContextFocus)
         {
-            _context.Focused = false;
+            _context.IsFocused = false;
         }
 
         if (_contextFocusSnapshot.RegionKey is null)

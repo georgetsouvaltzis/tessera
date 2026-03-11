@@ -30,7 +30,7 @@ internal static class InputRouterTests
             {
                 calls.Add("system");
                 return key.Modifiers.HasFlag(KeyModifiers.Ctrl)
-                    ? InputRouteResult.FromCommand(Tea.Cmd.Quit)
+                    ? InputRouteResult.FromEffect(Tea.Effects.Quit)
                     : InputRouteResult.NotHandled;
             })
             .AddScope("modal", InputScopeKind.Modal, static () => true, key =>
@@ -42,7 +42,7 @@ internal static class InputRouterTests
         var result = router.Route(new KeyPressMsg(KeyCode.Character, "c", KeyModifiers.Ctrl));
 
         TestAssert.True(result.Handled, "System scope should handle emergency shortcuts before modal capture.");
-        TestAssert.True(result.Command is not null, "System scope should be able to return a command.");
+        TestAssert.True(result.Effect is not null, "System scope should be able to return a command.");
         TestAssert.Equal(1, calls.Count, "Modal scope should not run after a system hit.");
         TestAssert.Equal("system", calls[0], "System scope should run first.");
         return Task.CompletedTask;
@@ -60,7 +60,7 @@ internal static class InputRouterTests
             .AddScope("global", InputScopeKind.Global, static () => true, key =>
             {
                 calls.Add("global");
-                return InputRouteResult.HandledWithoutCommand;
+                return InputRouteResult.HandledWithoutEffect;
             });
 
         var result = router.Route(new KeyPressMsg(KeyCode.Character, "q"));
@@ -88,14 +88,14 @@ internal static class InputRouterTests
             .AddScope("global", InputScopeKind.Global, static () => true, key =>
             {
                 calls.Add("global");
-                return InputRouteResult.HandledWithoutCommand;
+                return InputRouteResult.HandledWithoutEffect;
             });
 
         var result = router.Route(new KeyPressMsg(KeyCode.Character, "q"));
 
         TestAssert.True(!result.Handled, "Suppressed global character shortcuts should not fall through when focused text entry wants to keep them local.");
         TestAssert.Equal(1, calls.Count, "Global scope should be skipped when focused scope blocks character shortcuts.");
-        TestAssert.Equal("focused", calls[0], "Focused scope should evaluate before global shortcuts.");
+        TestAssert.Equal("focused", calls[0], "IsFocused scope should evaluate before global shortcuts.");
         return Task.CompletedTask;
     }
 
@@ -116,14 +116,14 @@ internal static class InputRouterTests
             .AddScope("global", InputScopeKind.Global, static () => true, key =>
             {
                 calls.Add("global");
-                return InputRouteResult.HandledWithoutCommand;
+                return InputRouteResult.HandledWithoutEffect;
             });
 
         var result = router.Route(new KeyPressMsg(KeyCode.Tab));
 
         TestAssert.True(result.Handled, "Navigation keys should still fall through to global policy when focused scope only blocks text shortcuts.");
         TestAssert.Equal(2, calls.Count, "Global scope should still run for non-blocked keys.");
-        TestAssert.Equal("focused", calls[0], "Focused scope should run before global scope.");
+        TestAssert.Equal("focused", calls[0], "IsFocused scope should run before global scope.");
         TestAssert.Equal("global", calls[1], "Global scope should receive non-blocked navigation keys.");
         return Task.CompletedTask;
     }

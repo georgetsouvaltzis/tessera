@@ -67,7 +67,7 @@ public sealed class InputRouter
 
             if (scope.Behavior == InputScopeBehavior.CaptureWhileActive)
             {
-                return InputRouteResult.HandledWithoutCommand;
+                return InputRouteResult.HandledWithoutEffect;
             }
         }
 

@@ -13,9 +13,9 @@ namespace TeaSharp.Components.Productivity;
 public sealed record NumberInputOptions(
     string Title = "Number Input",
     double InitialValue = 0.0,
-    bool Focused = false,
-    bool Disabled = false,
-    bool ReadOnly = false,
+    bool IsFocused = false,
+    bool IsDisabled = false,
+    bool IsReadOnly = false,
     BorderStyle Border = BorderStyle.SingleLine,
     Thickness Padding = default,
     double Min = 0.0,

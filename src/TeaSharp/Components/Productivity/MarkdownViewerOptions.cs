@@ -13,7 +13,7 @@ namespace TeaSharp.Components.Productivity;
 public sealed record MarkdownViewerOptions(
     string Title = "Markdown",
     string InitialMarkdown = "",
-    bool Focused = false,
+    bool IsFocused = false,
     BorderStyle Border = BorderStyle.SingleLine,
     Thickness Padding = default,
     bool Wrap = false,

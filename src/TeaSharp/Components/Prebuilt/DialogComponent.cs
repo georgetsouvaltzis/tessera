@@ -23,9 +23,9 @@ public sealed class DialogComponent : IStatefulComponent, IFocusableComponent
     public DialogComponent(DialogOptions options)
     {
         Title = options.Title;
-        Lines = options.Lines ?? ["Confirm?"];
-        Visible = options.Visible;
-        Focused = options.Focused;
+        BodyLines = options.BodyLines ?? ["Confirm?"];
+        IsVisible = options.IsVisible;
+        IsFocused = options.IsFocused;
         Border = options.Border;
         Padding = options.Padding;
         Theme = options.Theme ?? new UiTheme();
@@ -35,11 +35,11 @@ public sealed class DialogComponent : IStatefulComponent, IFocusableComponent
 
     public string Title { get; set; } = "Dialog";
 
-    public IReadOnlyList<string> Lines { get; set; } = ["Confirm?"];
+    public IReadOnlyList<string> BodyLines { get; set; } = ["Confirm?"];
 
-    public bool Visible { get; set; }
+    public bool IsVisible { get; set; }
 
-    public bool Focused { get; set; }
+    public bool IsFocused { get; set; }
 
     public BorderStyle Border { get; set; } = BorderStyle.Rounded;
 
@@ -81,7 +81,7 @@ public sealed class DialogComponent : IStatefulComponent, IFocusableComponent
 
     public bool Update(IMessage message)
     {
-        if (!Visible || !Focused || message is not KeyPressMsg key)
+        if (!IsVisible || !IsFocused || message is not KeyPressMsg key)
         {
             return false;
         }
@@ -101,16 +101,16 @@ public sealed class DialogComponent : IStatefulComponent, IFocusableComponent
 
     public void Render(Canvas canvas, Rect rect)
     {
-        if (!Visible)
+        if (!IsVisible)
         {
             return;
         }
 
         var modal = new ModalComponent
         {
-            Visible = true,
+            IsVisible = true,
             Title = Title,
-            Lines = Lines,
+            BodyLines = BodyLines,
             Border = Border,
             Padding = Padding,
             Theme = Theme,
@@ -120,7 +120,7 @@ public sealed class DialogComponent : IStatefulComponent, IFocusableComponent
 
     private bool ApplyResult(DialogResult result)
     {
-        Visible = false;
+        IsVisible = false;
         LastResult = result;
         _resultVersion++;
         if (result == DialogResult.Accepted)

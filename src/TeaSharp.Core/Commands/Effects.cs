@@ -4,27 +4,27 @@ using TeaSharp.Core.Messages;
 
 namespace TeaSharp.Core.Commands;
 
-public static class Commands
+public static class Effects
 {
-    public static Command? None => null;
+    public static Effect? None => null;
 
-    public static Command Quit =>
+    public static Effect Quit =>
         _ => ValueTask.FromResult<IMessage?>(new QuitMsg());
 
-    public static Command Interrupt =>
+    public static Effect Interrupt =>
         _ => ValueTask.FromResult<IMessage?>(new InterruptMsg());
 
-    public static Command FromMessage(IMessage message) =>
+    public static Effect FromMessage(IMessage message) =>
         _ => ValueTask.FromResult<IMessage?>(message);
 
-    public static Command? Compact(params Command?[] commands)
+    public static Effect? Compact(params Effect?[] effects)
     {
-        var valid = new List<Command>(commands.Length);
-        foreach (var command in commands)
+        var valid = new List<Effect>(effects.Length);
+        foreach (var effect in effects)
         {
-            if (command is not null)
+            if (effect is not null)
             {
-                valid.Add(command);
+                valid.Add(effect);
             }
         }
 
@@ -36,20 +36,20 @@ public static class Commands
         };
     }
 
-    public static Command? Batch(params Command?[] commands)
+    public static Effect? Batch(params Effect?[] effects)
     {
-        var compact = Compact(commands);
+        var compact = Compact(effects);
         if (compact is null)
         {
             return null;
         }
 
-        return _ => ValueTask.FromResult<IMessage?>(new BatchMsg(GetValid(commands)));
+        return _ => ValueTask.FromResult<IMessage?>(new BatchMsg(GetValid(effects)));
     }
 
-    public static Command? Sequence(params Command?[] commands)
+    public static Effect? Sequence(params Effect?[] effects)
     {
-        var valid = GetValid(commands);
+        var valid = GetValid(effects);
         return valid.Count switch
         {
             0 => null,
@@ -58,7 +58,7 @@ public static class Commands
         };
     }
 
-    public static Command Tick(TimeSpan delay, Func<DateTimeOffset, IMessage> factory)
+    public static Effect Tick(TimeSpan delay, Func<DateTimeOffset, IMessage> factory)
     {
         return async cancellationToken =>
         {
@@ -67,7 +67,7 @@ public static class Commands
         };
     }
 
-    public static Command Every(TimeSpan cadence, Func<DateTimeOffset, IMessage> factory)
+    public static Effect Every(TimeSpan cadence, Func<DateTimeOffset, IMessage> factory)
     {
         return async cancellationToken =>
         {
@@ -83,45 +83,45 @@ public static class Commands
         };
     }
 
-    public static Command Raw(string content) =>
+    public static Effect Raw(string content) =>
         _ => ValueTask.FromResult<IMessage?>(new RawOutputMsg(content));
 
-    public static Command RequestCapability(string capabilityName)
+    public static Effect RequestCapability(string capabilityName)
     {
         var name = capabilityName?.Trim() ?? string.Empty;
         var payload = string.Concat(name.Select(static ch => ((int)ch).ToString("X2", CultureInfo.InvariantCulture)));
         return Raw($"\u001bP+q{payload}\u001b\\");
     }
 
-    public static Command SetClipboard(string content) =>
+    public static Effect SetClipboard(string content) =>
         Raw(BuildClipboardWriteSequence(content, selection: 'c'));
 
-    public static Command ReadClipboard() =>
+    public static Effect ReadClipboard() =>
         Raw(BuildClipboardReadSequence(selection: 'c'));
 
-    public static Command SetPrimaryClipboard(string content) =>
+    public static Effect SetPrimaryClipboard(string content) =>
         Raw(BuildClipboardWriteSequence(content, selection: 'p'));
 
-    public static Command ReadPrimaryClipboard() =>
+    public static Effect ReadPrimaryClipboard() =>
         Raw(BuildClipboardReadSequence(selection: 'p'));
 
-    public static Command RequestForegroundColor() =>
+    public static Effect RequestForegroundColor() =>
         Raw("\u001b]10;?\u001b\\");
 
-    public static Command RequestBackgroundColor() =>
+    public static Effect RequestBackgroundColor() =>
         Raw("\u001b]11;?\u001b\\");
 
-    public static Command RequestCursorColor() =>
+    public static Effect RequestCursorColor() =>
         Raw("\u001b]12;?\u001b\\");
 
-    private static List<Command> GetValid(IEnumerable<Command?> commands)
+    private static List<Effect> GetValid(IEnumerable<Effect?> effects)
     {
-        var valid = new List<Command>();
-        foreach (var command in commands)
+        var valid = new List<Effect>();
+        foreach (var effect in effects)
         {
-            if (command is not null)
+            if (effect is not null)
             {
-                valid.Add(command);
+                valid.Add(effect);
             }
         }
 

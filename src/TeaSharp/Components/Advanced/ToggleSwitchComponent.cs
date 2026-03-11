@@ -23,11 +23,11 @@ public sealed class ToggleSwitchComponent : IStatefulComponent, IMouseStatefulCo
 
     public bool Value { get; private set; }
 
-    public bool Focused { get; set; }
+    public bool IsFocused { get; set; }
 
-    public bool Disabled { get; set; }
+    public bool IsDisabled { get; set; }
 
-    public bool ReadOnly { get; set; }
+    public bool IsReadOnly { get; set; }
 
     public BorderStyle Border { get; set; } = BorderStyle.SingleLine;
 
@@ -54,7 +54,7 @@ public sealed class ToggleSwitchComponent : IStatefulComponent, IMouseStatefulCo
 
     public bool Update(IMessage message)
     {
-        if (!Focused || Disabled || ReadOnly || message is not KeyPressMsg key)
+        if (!IsFocused || IsDisabled || IsReadOnly || message is not KeyPressMsg key)
         {
             return false;
         }
@@ -84,7 +84,7 @@ public sealed class ToggleSwitchComponent : IStatefulComponent, IMouseStatefulCo
 
     public bool UpdateMouse(MouseMsg message, Rect bounds)
     {
-        if (Disabled || ReadOnly)
+        if (IsDisabled || IsReadOnly)
         {
             return false;
         }
@@ -154,7 +154,7 @@ public sealed class ToggleSwitchComponent : IStatefulComponent, IMouseStatefulCo
         var content = FrameLayout.DrawFrameAndResolveContent(
             canvas,
             clipped,
-            Border == BorderStyle.None ? null : Focused ? $"{Title} *" : Title,
+            Border == BorderStyle.None ? null : IsFocused ? $"{Title} *" : Title,
             Border,
             Padding);
 
@@ -181,17 +181,17 @@ public sealed class ToggleSwitchComponent : IStatefulComponent, IMouseStatefulCo
     private List<WidgetVisualState> ResolveStates()
     {
         var states = new List<WidgetVisualState>(4);
-        if (Focused)
+        if (IsFocused)
         {
             states.Add(WidgetVisualState.Focused);
         }
 
-        if (Disabled)
+        if (IsDisabled)
         {
             states.Add(WidgetVisualState.Disabled);
         }
 
-        if (ReadOnly)
+        if (IsReadOnly)
         {
             states.Add(WidgetVisualState.ReadOnly);
         }

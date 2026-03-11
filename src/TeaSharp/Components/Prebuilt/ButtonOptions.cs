@@ -14,7 +14,7 @@ namespace TeaSharp.Components.Prebuilt;
 public sealed record ButtonOptions(
     string Label = "Button",
     string? Description = null,
-    bool Focused = false,
+    bool IsFocused = false,
     bool Enabled = true,
     BorderStyle Border = BorderStyle.None,
     Thickness Padding = default,

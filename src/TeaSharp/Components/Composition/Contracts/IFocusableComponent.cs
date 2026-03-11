@@ -6,6 +6,6 @@ namespace TeaSharp.Components.Composition;
 
 public interface IFocusableComponent : ICanvasComponent
 {
-    bool Focused { get; set; }
+    bool IsFocused { get; set; }
 }
 

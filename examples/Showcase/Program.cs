@@ -8,7 +8,7 @@
 // using TeaSharp.Core.Messages;
 // using TeaSharp.Core.Terminal;
 // using TWidgets = TeaSharp.Components.Primitives.Widgets;
-// using ModelView = TeaSharp.Core.Abstractions.View;
+// using ModelView = TeaSharp.Core.Abstractions.ScreenOutput;
 //
 // var terminal = new TeaSharp.Core.Terminal.ConsoleTerminalAdapter();
 // var capabilities = TerminalCapabilityDetector.Detect();
@@ -19,7 +19,7 @@
 //     Terminal = terminal,
 //     TerminalCapabilities = capabilities,
 // };
-// var program = Tea.NewProgram(model, options);
+// var program = Tea.CreateProgram(model, options);
 //
 // try
 // {
@@ -30,7 +30,7 @@
 //     // graceful interrupt path
 // }
 //
-// internal sealed class CounterModel : IModel
+// internal sealed class CounterModel : IScreen
 // {
 //     private static readonly ThemePalette ClassicPalette = new(
 //         TeaStyle.Empty.WithBold().WithForeground(AnsiColor.BrightWhite),
@@ -278,11 +278,11 @@
 //         AppendLog("Use ? to toggle full help and 1/2/3/4 to switch protocol/dashboard/showcase/lab.");
 //     }
 //
-//     public Command? Init() => NextTickCommand(_stressMode);
+//     public Effect? Init() => NextTickCommand(_stressMode);
 //
 //     private bool IsWorkspacePage => _page is AppPage.Dashboard or AppPage.Showcase or AppPage.CapabilityLab;
 //
-//     public Command? Update(IMessage message)
+//     public Effect? Update(IMessage message)
 //     {
 //         if (message is KeyPressMsg key)
 //         {
@@ -294,7 +294,7 @@
 //             if (((key.Text == "c" || key.Text == "\u0003") && key.Modifiers.HasFlag(KeyModifiers.Ctrl))
 //                 || (IsPlainChar(key, "q") && !IsCommandInputActive()))
 //             {
-//                 return Tea.Cmd.Quit;
+//                 return Tea.Effects.Quit;
 //             }
 //
 //             if (IsWorkspacePage && IsCommandModeEnterKey(key))
@@ -305,7 +305,7 @@
 //
 //             if (IsWorkspacePage && IsEscapeKey(key))
 //             {
-//                 if (_workspaceInputMode == WorkspaceInputMode.Command)
+//                 if (_workspaceInputMode == WorkspaceInputMode.Effect)
 //                 {
 //                     ExitCommandMode();
 //                 }
@@ -390,8 +390,8 @@
 //         {
 //             _lastPaste = SanitizePreview(paste.Content);
 //             if (IsWorkspacePage
-//                 && _focus == WorkspaceFocus.Command
-//                 && _workspaceInputMode == WorkspaceInputMode.Command)
+//                 && _focus == WorkspaceFocus.Effect
+//                 && _workspaceInputMode == WorkspaceInputMode.Effect)
 //             {
 //                 _commandInput.Update(paste, _inputKeys);
 //                 _lastEvent = $"paste: {paste.Content.Length} chars into command";
@@ -608,7 +608,7 @@
 //         _showcaseSourceSnapshot = _capabilities.Source;
 //     }
 //
-//     public ModelView View()
+//     public ModelView Render()
 //     {
 //         int? cursorX = null;
 //         int? cursorY = null;
@@ -637,7 +637,7 @@
 //             progress = new TerminalProgress(_labProgressState, _labProgressValue);
 //         }
 //
-//         Func<MouseMsg, Command?>? onMouse = null;
+//         Func<MouseMsg, Effect?>? onMouse = null;
 //         if (_page == AppPage.CapabilityLab && _labMouseInterceptorEnabled)
 //         {
 //             onMouse = static mouse => _ => ValueTask.FromResult<IMessage?>(
@@ -673,7 +673,7 @@
 //         };
 //     }
 //
-//     private Command? HandleProtocolKey(KeyPressMsg key)
+//     private Effect? HandleProtocolKey(KeyPressMsg key)
 //     {
 //         if (key.Code == KeyCode.Up)
 //         {
@@ -702,7 +702,7 @@
 //         return null;
 //     }
 //
-//     private Command? HandleWorkspaceKey(KeyPressMsg key)
+//     private Effect? HandleWorkspaceKey(KeyPressMsg key)
 //     {
 //         if (_page == AppPage.CapabilityLab)
 //         {
@@ -729,8 +729,8 @@
 //             return null;
 //         }
 //
-//         if (_focus == WorkspaceFocus.Command
-//             && _workspaceInputMode != WorkspaceInputMode.Command)
+//         if (_focus == WorkspaceFocus.Effect
+//             && _workspaceInputMode != WorkspaceInputMode.Effect)
 //         {
 //             _lastEvent = "command mode locked (press : to enter)";
 //             return null;
@@ -770,16 +770,16 @@
 //         return null;
 //     }
 //
-//     private Command? HandleCapabilityLabKey(KeyPressMsg key)
+//     private Effect? HandleCapabilityLabKey(KeyPressMsg key)
 //     {
-//         if (_focus == WorkspaceFocus.Command
-//             && _workspaceInputMode != WorkspaceInputMode.Command)
+//         if (_focus == WorkspaceFocus.Effect
+//             && _workspaceInputMode != WorkspaceInputMode.Effect)
 //         {
 //             _lastEvent = "command mode locked (press : to enter)";
 //             return null;
 //         }
 //
-//         if (_focus == WorkspaceFocus.Command)
+//         if (_focus == WorkspaceFocus.Effect)
 //         {
 //             var result = _commandInput.Update(key, _inputKeys);
 //             if (result.Submitted)
@@ -794,7 +794,7 @@
 //             return null;
 //         }
 //
-//         Command? effect = null;
+//         Effect? effect = null;
 //         string? action = null;
 //
 //         if (IsPlainChar(key, "f"))
@@ -839,37 +839,37 @@
 //         }
 //         else if (IsPlainChar(key, "r"))
 //         {
-//             effect = Tea.Cmd.RequestCapability("RGB");
+//             effect = Tea.Effects.RequestCapability("RGB");
 //             action = "lab: query capability RGB";
 //         }
 //         else if (IsPlainChar(key, "c"))
 //         {
-//             effect = Tea.Cmd.RequestCapability("Tc");
+//             effect = Tea.Effects.RequestCapability("Tc");
 //             action = "lab: query capability Tc";
 //         }
 //         else if (IsPlainChar(key, "g"))
 //         {
-//             effect = Tea.Cmd.RequestForegroundColor();
+//             effect = Tea.Effects.RequestForegroundColor();
 //             action = "lab: query foreground color";
 //         }
 //         else if (IsPlainChar(key, "h"))
 //         {
-//             effect = Tea.Cmd.RequestBackgroundColor();
+//             effect = Tea.Effects.RequestBackgroundColor();
 //             action = "lab: query background color";
 //         }
 //         else if (IsPlainChar(key, "j"))
 //         {
-//             effect = Tea.Cmd.RequestCursorColor();
+//             effect = Tea.Effects.RequestCursorColor();
 //             action = "lab: query cursor color";
 //         }
 //         else if (IsPlainChar(key, "y"))
 //         {
-//             effect = Tea.Cmd.SetClipboard($"TeaSharp lab clipboard {_tickCount}");
+//             effect = Tea.Effects.SetClipboard($"TeaSharp lab clipboard {_tickCount}");
 //             action = "lab: write clipboard";
 //         }
 //         else if (IsPlainChar(key, "o"))
 //         {
-//             effect = Tea.Cmd.ReadClipboard();
+//             effect = Tea.Effects.ReadClipboard();
 //             action = "lab: read clipboard";
 //         }
 //
@@ -918,21 +918,21 @@
 //
 //     private string ShowcaseModeLabel()
 //     {
-//         return _workspaceInputMode == WorkspaceInputMode.Command
+//         return _workspaceInputMode == WorkspaceInputMode.Effect
 //             ? "cmd"
 //             : "nav";
 //     }
 //
 //     private string InputModeLabel()
 //     {
-//         return _workspaceInputMode == WorkspaceInputMode.Command
+//         return _workspaceInputMode == WorkspaceInputMode.Effect
 //             ? "CMD"
 //             : "NAV";
 //     }
 //
 //     private bool IsCommandInputActive()
 //     {
-//         return IsWorkspacePage && _workspaceInputMode == WorkspaceInputMode.Command;
+//         return IsWorkspacePage && _workspaceInputMode == WorkspaceInputMode.Effect;
 //     }
 //
 //     private static bool IsPlainChar(KeyPressMsg key, string text)
@@ -989,13 +989,13 @@
 //
 //     private void EnterCommandMode()
 //     {
-//         if (_focus != WorkspaceFocus.Command)
+//         if (_focus != WorkspaceFocus.Effect)
 //         {
 //             _focusBeforeCommand = _focus;
 //         }
 //
-//         _workspaceInputMode = WorkspaceInputMode.Command;
-//         _focus = WorkspaceFocus.Command;
+//         _workspaceInputMode = WorkspaceInputMode.Effect;
+//         _focus = WorkspaceFocus.Effect;
 //         _lastEvent = "mode: cmd-input";
 //         AppendLog(_lastEvent);
 //         if (_page == AppPage.Showcase)
@@ -1006,17 +1006,17 @@
 //
 //     private void ExitCommandMode()
 //     {
-//         if (_workspaceInputMode != WorkspaceInputMode.Command)
+//         if (_workspaceInputMode != WorkspaceInputMode.Effect)
 //         {
 //             return;
 //         }
 //
 //         _workspaceInputMode = WorkspaceInputMode.Navigate;
-//         if (_focus == WorkspaceFocus.Command)
+//         if (_focus == WorkspaceFocus.Effect)
 //         {
 //             _focus = _focusBeforeCommand switch
 //             {
-//                 WorkspaceFocus.Command => WorkspaceFocus.Actions,
+//                 WorkspaceFocus.Effect => WorkspaceFocus.Actions,
 //                 _ => _focusBeforeCommand,
 //             };
 //         }
@@ -1047,9 +1047,9 @@
 //         }
 //         else if (key.Text == "m" && key.Modifiers == KeyModifiers.None)
 //         {
-//             _showcaseModal.Visible = !_showcaseModal.Visible;
+//             _showcaseModal.IsVisible = !_showcaseModal.IsVisible;
 //             changed = true;
-//             action = _showcaseModal.Visible ? "modal=open" : "modal=close";
+//             action = _showcaseModal.IsVisible ? "modal=open" : "modal=close";
 //         }
 //         changed = HandleFocusedShowcasePaneKey(key, ref action) || changed;
 //
@@ -1276,7 +1276,7 @@
 //         }
 //     }
 //
-//     private Command? ExecuteCommand(string command)
+//     private Effect? ExecuteCommand(string command)
 //     {
 //         if (string.IsNullOrWhiteSpace(command))
 //         {
@@ -1402,19 +1402,19 @@
 //             var arg = command[6..].Trim();
 //             if (string.Equals(arg, "on", StringComparison.OrdinalIgnoreCase))
 //             {
-//                 _showcaseModal.Visible = true;
+//                 _showcaseModal.IsVisible = true;
 //             }
 //             else if (string.Equals(arg, "off", StringComparison.OrdinalIgnoreCase))
 //             {
-//                 _showcaseModal.Visible = false;
+//                 _showcaseModal.IsVisible = false;
 //             }
 //             else
 //             {
-//                 _showcaseModal.Visible = !_showcaseModal.Visible;
+//                 _showcaseModal.IsVisible = !_showcaseModal.IsVisible;
 //             }
 //
-//             CaptureShowcaseSnapshot($"showcase: modal={(_showcaseModal.Visible ? "on" : "off")}");
-//             AppendLog($"modal={(_showcaseModal.Visible ? "on" : "off")}");
+//             CaptureShowcaseSnapshot($"showcase: modal={(_showcaseModal.IsVisible ? "on" : "off")}");
+//             AppendLog($"modal={(_showcaseModal.IsVisible ? "on" : "off")}");
 //             return null;
 //         }
 //
@@ -1441,13 +1441,13 @@
 //             }
 //
 //             AppendLog($"query capability={capability}");
-//             return Tea.Cmd.RequestCapability(capability);
+//             return Tea.Effects.RequestCapability(capability);
 //         }
 //
 //         if (string.Equals(command, "clip read", StringComparison.OrdinalIgnoreCase))
 //         {
 //             AppendLog("query clipboard read");
-//             return Tea.Cmd.ReadClipboard();
+//             return Tea.Effects.ReadClipboard();
 //         }
 //
 //         if (command.StartsWith("clip write ", StringComparison.OrdinalIgnoreCase))
@@ -1459,25 +1459,25 @@
 //             }
 //
 //             AppendLog("clipboard write issued");
-//             return Tea.Cmd.SetClipboard(content);
+//             return Tea.Effects.SetClipboard(content);
 //         }
 //
 //         if (string.Equals(command, "color fg", StringComparison.OrdinalIgnoreCase))
 //         {
 //             AppendLog("query foreground color");
-//             return Tea.Cmd.RequestForegroundColor();
+//             return Tea.Effects.RequestForegroundColor();
 //         }
 //
 //         if (string.Equals(command, "color bg", StringComparison.OrdinalIgnoreCase))
 //         {
 //             AppendLog("query background color");
-//             return Tea.Cmd.RequestBackgroundColor();
+//             return Tea.Effects.RequestBackgroundColor();
 //         }
 //
 //         if (string.Equals(command, "color cursor", StringComparison.OrdinalIgnoreCase))
 //         {
 //             AppendLog("query cursor color");
-//             return Tea.Cmd.RequestCursorColor();
+//             return Tea.Effects.RequestCursorColor();
 //         }
 //
 //         AppendLog($"unknown command: {command}");
@@ -1690,7 +1690,7 @@
 //         {
 //             WorkspaceFocus.Actions => _listKeys.HelpBindings,
 //             WorkspaceFocus.Log => _viewportKeys.HelpBindings,
-//             WorkspaceFocus.Command => _inputKeys.HelpBindings,
+//             WorkspaceFocus.Effect => _inputKeys.HelpBindings,
 //             _ => _inputKeys.HelpBindings,
 //         };
 //
@@ -1709,10 +1709,10 @@
 //         TWidgets.DrawPanel(
 //             canvas,
 //             footerRect,
-//             _focus == WorkspaceFocus.Command ? $"Command * [{InputModeLabel()}]" : $"Command [{InputModeLabel()}]",
+//             _focus == WorkspaceFocus.Effect ? $"Command * [{InputModeLabel()}]" : $"Command [{InputModeLabel()}]",
 //             footerLines);
 //
-//         if (_focus == WorkspaceFocus.Command)
+//         if (_focus == WorkspaceFocus.Effect)
 //         {
 //             cursorX = Math.Clamp(footerRect.X + 3 + inputFrame.CursorColumn, footerRect.X + 1, footerRect.Right - 2);
 //             cursorY = Math.Clamp(footerRect.Y + 1, footerRect.Y + 1, footerRect.Bottom - 2);
@@ -1815,7 +1815,7 @@
 //             WorkspaceFocus.Actions => _listKeys.HelpBindings,
 //             WorkspaceFocus.Log => _viewportKeys.HelpBindings,
 //             WorkspaceFocus.Showcase => _showcaseHelp,
-//             WorkspaceFocus.Command => _inputKeys.HelpBindings,
+//             WorkspaceFocus.Effect => _inputKeys.HelpBindings,
 //             _ => _inputKeys.HelpBindings,
 //         };
 //
@@ -1834,15 +1834,15 @@
 //         TWidgets.DrawPanel(
 //             canvas,
 //             footerRect,
-//             _focus == WorkspaceFocus.Command ? $"Command * [{InputModeLabel()}]" : $"Command [{InputModeLabel()}]",
+//             _focus == WorkspaceFocus.Effect ? $"Command * [{InputModeLabel()}]" : $"Command [{InputModeLabel()}]",
 //             footerLines);
 //
-//         if (_focus == WorkspaceFocus.Command)
+//         if (_focus == WorkspaceFocus.Effect)
 //         {
 //             DrawFocusChrome(canvas, footerRect);
 //         }
 //
-//         if (_focus == WorkspaceFocus.Command)
+//         if (_focus == WorkspaceFocus.Effect)
 //         {
 //             cursorX = Math.Clamp(footerRect.X + 3 + inputFrame.CursorColumn, footerRect.X + 1, footerRect.Right - 2);
 //             cursorY = Math.Clamp(footerRect.Y + 1, footerRect.Y + 1, footerRect.Bottom - 2);
@@ -1958,7 +1958,7 @@
 //         var activeBindings = _focus switch
 //         {
 //             WorkspaceFocus.Log => _viewportKeys.HelpBindings,
-//             WorkspaceFocus.Command => _inputKeys.HelpBindings,
+//             WorkspaceFocus.Effect => _inputKeys.HelpBindings,
 //             _ => _labHelp,
 //         };
 //         var bindingSet = _showFullHelp
@@ -1976,9 +1976,9 @@
 //         TWidgets.DrawPanel(
 //             canvas,
 //             footerRect,
-//             _focus == WorkspaceFocus.Command ? $"Command * [{InputModeLabel()}]" : $"Command [{InputModeLabel()}]",
+//             _focus == WorkspaceFocus.Effect ? $"Command * [{InputModeLabel()}]" : $"Command [{InputModeLabel()}]",
 //             footerLines);
-//         if (_focus == WorkspaceFocus.Command)
+//         if (_focus == WorkspaceFocus.Effect)
 //         {
 //             DrawFocusChrome(canvas, footerRect);
 //             cursorX = Math.Clamp(footerRect.X + 3 + inputFrame.CursorColumn, footerRect.X + 1, footerRect.Right - 2);
@@ -2371,14 +2371,14 @@
 //             {
 //                 WorkspaceFocus.Actions => WorkspaceFocus.Showcase,
 //                 WorkspaceFocus.Showcase => WorkspaceFocus.Log,
-//                 WorkspaceFocus.Log => WorkspaceFocus.Command,
+//                 WorkspaceFocus.Log => WorkspaceFocus.Effect,
 //                 _ => WorkspaceFocus.Actions,
 //             }
 //             : _focus switch
 //             {
 //                 WorkspaceFocus.Showcase => WorkspaceFocus.Actions,
 //                 WorkspaceFocus.Actions => WorkspaceFocus.Log,
-//                 WorkspaceFocus.Log => WorkspaceFocus.Command,
+//                 WorkspaceFocus.Log => WorkspaceFocus.Effect,
 //                 _ => WorkspaceFocus.Actions,
 //             };
 //     }
@@ -2463,10 +2463,10 @@
 //         };
 //     }
 //
-//     private Command NextTickCommand(bool stressMode)
+//     private Effect NextTickCommand(bool stressMode)
 //     {
 //         var delay = stressMode ? TimeSpan.FromMilliseconds(45) : TimeSpan.FromMilliseconds(150);
-//         return Tea.Cmd.Tick(delay, _ => new DashboardTickMsg());
+//         return Tea.Effects.Tick(delay, _ => new DashboardTickMsg());
 //     }
 //
 //     private void AppendSparkSample()
@@ -2628,9 +2628,9 @@ using TeaSharp.Core.Application;
 using TeaSharp.Core.Messages;
 using TeaSharp.Core.Terminal;
 using TeaSharp.Styles;
-using ModelView = TeaSharp.Core.Abstractions.View;
+using ModelView = TeaSharp.Core.Abstractions.ScreenOutput;
 
-var program = Tea.NewProgram(new CounterModel(), new TeaProgramOptions
+var program = Tea.CreateProgram(new CounterModel(), new TeaProgramOptions
 {
     UseConsoleKeyEvents = false,
 });
@@ -2638,13 +2638,13 @@ var program = Tea.NewProgram(new CounterModel(), new TeaProgramOptions
 await program.RunAsync();
 
 
-internal sealed class CounterModel : IModel
+internal sealed class CounterModel : IScreen
 {
     private int _count;
 
-    public Command? Init() => null;
+    public Effect? Init() => null;
 
-    public Command? Update(IMessage message)
+    public Effect? Update(IMessage message)
     {
         if (message is KeyPressMsg key)
         {
@@ -2658,7 +2658,7 @@ internal sealed class CounterModel : IModel
             }
             else if (key.IsCharacter('q', KeyModifiers.None))
             {
-                return Tea.Cmd.Quit;
+                return Tea.Effects.Quit;
             }
         }
 
@@ -2677,7 +2677,7 @@ internal sealed class CounterModel : IModel
     private readonly TeaStyle _help = TeaStyle.Empty
         .WithForeground(AnsiColor.Rgb(166, 173, 200)); // Catppuccin subtext0
 
-    public ModelView View()
+    public ModelView Render()
     {
         var title = _title.Render("Counter");
         var body = _countStyle.Render($"Count: {_count}");
@@ -2685,7 +2685,7 @@ internal sealed class CounterModel : IModel
 
         return ModelView.From($"{title}\n\n{body}\n\n{help}") with
         {
-            Terminal = new ViewTerminal
+            Terminal = new TerminalOutput
             {
                 AltScreen = true,
                 ForegroundColor = "#CDD6F4", // text

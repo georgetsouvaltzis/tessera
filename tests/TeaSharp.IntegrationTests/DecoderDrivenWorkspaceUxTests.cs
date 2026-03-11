@@ -27,7 +27,7 @@ public sealed class DecoderDrivenWorkspaceUxTests
 
         ApplyDecoded(model, "\u001b[A");
 
-        Assert.That(model.View().Frame.Content, Does.Contain("Count: 1"));
+        Assert.That(model.Render().Frame.Content, Does.Contain("Count: 1"));
     }
 
     [Test]
@@ -37,7 +37,7 @@ public sealed class DecoderDrivenWorkspaceUxTests
 
         ApplyDecoded(model, "\u001b[B");
 
-        Assert.That(model.View().Frame.Content, Does.Contain("Count: -1"));
+        Assert.That(model.Render().Frame.Content, Does.Contain("Count: -1"));
     }
 
     [Test]
@@ -47,7 +47,7 @@ public sealed class DecoderDrivenWorkspaceUxTests
 
         var result = ApplyDecoded(model, "q");
 
-        Assert.That(result, Is.EqualTo(TeaSharp.Tea.Cmd.Quit));
+        Assert.That(result, Is.EqualTo(TeaSharp.Tea.Effects.Quit));
     }
 
     [Test]
@@ -57,15 +57,15 @@ public sealed class DecoderDrivenWorkspaceUxTests
 
         ApplyDecoded(model, "\u001bOA");
 
-        Assert.That(model.View().Frame.Content, Does.Contain("Count: 1"));
+        Assert.That(model.Render().Frame.Content, Does.Contain("Count: 1"));
     }
 
-    private static Command? ApplyDecoded(CounterFixtureModel model, string sequence)
+    private static Effect? ApplyDecoded(CounterFixtureModel model, string sequence)
     {
         var decoder = new EventDecoder();
         var bytes = Encoding.UTF8.GetBytes(sequence);
         var index = 0;
-        Command? last = null;
+        Effect? last = null;
 
         while (index < bytes.Length)
         {

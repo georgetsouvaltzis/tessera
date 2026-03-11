@@ -11,7 +11,7 @@ using TeaSharp.Components.UiKit;
 using TeaSharp;
 using TeaSharp.TestFixtures;
 
-var program = Tea.NewProgram(new CounterFixtureModel(), new TeaProgramOptions
+var program = Tea.CreateProgram(new CounterFixtureModel(), new TeaProgramOptions
 {
     UseConsoleKeyEvents = false,
 });

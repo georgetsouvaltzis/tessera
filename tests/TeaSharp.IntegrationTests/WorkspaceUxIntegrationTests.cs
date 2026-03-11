@@ -24,7 +24,7 @@ public sealed class WorkspaceUxIntegrationTests
 
         model.Update(new KeyPressMsg(KeyCode.Up));
 
-        Assert.That(model.View().Frame.Content, Does.Contain("Count: 1"));
+        Assert.That(model.Render().Frame.Content, Does.Contain("Count: 1"));
     }
 
     [Test]
@@ -34,7 +34,7 @@ public sealed class WorkspaceUxIntegrationTests
 
         model.Update(new KeyPressMsg(KeyCode.Down));
 
-        Assert.That(model.View().Frame.Content, Does.Contain("Count: -1"));
+        Assert.That(model.Render().Frame.Content, Does.Contain("Count: -1"));
     }
 
     [Test]
@@ -45,7 +45,7 @@ public sealed class WorkspaceUxIntegrationTests
         model.Update(new KeyPressMsg(KeyCode.Up));
         model.Update(new KeyPressMsg(KeyCode.Down));
 
-        Assert.That(model.View().Frame.Content, Does.Contain("Count: 0"));
+        Assert.That(model.Render().Frame.Content, Does.Contain("Count: 0"));
     }
 
     [Test]
@@ -55,6 +55,6 @@ public sealed class WorkspaceUxIntegrationTests
 
         var result = model.Update(new KeyPressMsg(KeyCode.Character, "q"));
 
-        Assert.That(result, Is.EqualTo(TeaSharp.Tea.Cmd.Quit));
+        Assert.That(result, Is.EqualTo(TeaSharp.Tea.Effects.Quit));
     }
 }

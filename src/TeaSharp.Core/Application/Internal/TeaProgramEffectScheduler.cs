@@ -5,36 +5,36 @@ using TeaSharp.Core.Messages;
 
 namespace TeaSharp.Core.Application;
 
-internal sealed class TeaProgramCommandScheduler : IDisposable
+internal sealed class TeaProgramEffectScheduler : IDisposable
 {
     private readonly ProgramOptions _options;
     private readonly Action<IMessage> _send;
-    private readonly object _commandTaskLock = new();
-    private readonly HashSet<Task> _commandTasks = [];
-    private readonly SemaphoreSlim? _commandConcurrencyGate;
-    private ExceptionDispatchInfo? _unhandledCommandException;
+    private readonly object _effectTaskLock = new();
+    private readonly HashSet<Task> _effectTasks = [];
+    private readonly SemaphoreSlim? _effectConcurrencyGate;
+    private ExceptionDispatchInfo? _unhandledEffectException;
 
-    public TeaProgramCommandScheduler(ProgramOptions options, Action<IMessage> send)
+    public TeaProgramEffectScheduler(ProgramOptions options, Action<IMessage> send)
     {
         _options = options;
         _send = send;
-        var maxConcurrentCommands = Math.Max(0, options.MaxConcurrentCommands);
-        _commandConcurrencyGate = maxConcurrentCommands == 0
+        var maxConcurrentEffects = Math.Max(0, options.MaxConcurrentEffects);
+        _effectConcurrencyGate = maxConcurrentEffects == 0
             ? null
-            : new SemaphoreSlim(maxConcurrentCommands, maxConcurrentCommands);
+            : new SemaphoreSlim(maxConcurrentEffects, maxConcurrentEffects);
     }
 
-    public async Task RunLoopAsync(ChannelReader<Command> commands, CancellationToken token)
+    public async Task RunLoopAsync(ChannelReader<Effect> effects, CancellationToken token)
     {
-        while (await commands.WaitToReadAsync(token).ConfigureAwait(false))
+        while (await effects.WaitToReadAsync(token).ConfigureAwait(false))
         {
-            while (commands.TryRead(out var command))
+            while (effects.TryRead(out var effect))
             {
-                if (_commandConcurrencyGate is not null)
+                if (_effectConcurrencyGate is not null)
                 {
                     try
                     {
-                        await _commandConcurrencyGate.WaitAsync(token).ConfigureAwait(false);
+                        await _effectConcurrencyGate.WaitAsync(token).ConfigureAwait(false);
                     }
                     catch (OperationCanceledException)
                     {
@@ -42,36 +42,36 @@ internal sealed class TeaProgramCommandScheduler : IDisposable
                     }
                 }
 
-                StartTrackedCommand(command, token);
+                StartTrackedEffect(effect, token);
             }
         }
 
-        await WaitForTrackedCommandsAsync().ConfigureAwait(false);
+        await WaitForTrackedEffectsAsync().ConfigureAwait(false);
     }
 
     public ExceptionDispatchInfo? ConsumeUnhandledException()
     {
-        return Interlocked.Exchange(ref _unhandledCommandException, null);
+        return Interlocked.Exchange(ref _unhandledEffectException, null);
     }
 
-    public Task RunSequenceAsync(IReadOnlyList<Command> commands, CancellationToken token)
+    public Task RunSequenceAsync(IReadOnlyList<Effect> effects, CancellationToken token)
     {
-        return ExecuteSequenceAsync(commands, token);
+        return ExecuteSequenceAsync(effects, token);
     }
 
-    public async Task WaitForTrackedCommandsAsync()
+    public async Task WaitForTrackedEffectsAsync()
     {
         while (true)
         {
             Task[] snapshot;
-            lock (_commandTaskLock)
+            lock (_effectTaskLock)
             {
-                if (_commandTasks.Count == 0)
+                if (_effectTasks.Count == 0)
                 {
                     return;
                 }
 
-                snapshot = [.. _commandTasks];
+                snapshot = [.. _effectTasks];
             }
 
             try
@@ -86,18 +86,18 @@ internal sealed class TeaProgramCommandScheduler : IDisposable
 
     public void Dispose()
     {
-        _commandConcurrencyGate?.Dispose();
-        lock (_commandTaskLock)
+        _effectConcurrencyGate?.Dispose();
+        lock (_effectTaskLock)
         {
-            _commandTasks.Clear();
+            _effectTasks.Clear();
         }
     }
 
-    private async Task ExecuteCommandAsync(Command command, CancellationToken token)
+    private async Task ExecuteEffectAsync(Effect effect, CancellationToken token)
     {
         try
         {
-            var message = await command(token).ConfigureAwait(false);
+            var message = await effect(token).ConfigureAwait(false);
             if (message is not null)
             {
                 _send(message);
@@ -108,9 +108,9 @@ internal sealed class TeaProgramCommandScheduler : IDisposable
         }
         catch (Exception ex)
         {
-            if (_options.CatchCommandExceptions)
+            if (_options.CatchEffectExceptions)
             {
-                if (_options.RecoverCommandException is { } recover)
+                if (_options.MapEffectException is { } recover)
                 {
                     try
                     {
@@ -123,66 +123,66 @@ internal sealed class TeaProgramCommandScheduler : IDisposable
                     }
                     catch (Exception recoveryException)
                     {
-                        _send(new CommandErrorMsg(recoveryException));
+                        _send(new EffectErrorMsg(recoveryException));
                         return;
                     }
                 }
 
-                _send(new CommandErrorMsg(ex));
+                _send(new EffectErrorMsg(ex));
                 return;
             }
 
             _ = Interlocked.CompareExchange(
-                ref _unhandledCommandException,
+                ref _unhandledEffectException,
                 ExceptionDispatchInfo.Capture(ex),
                 comparand: null);
             _send(new InterruptMsg());
         }
     }
 
-    private async Task ExecuteSequenceAsync(IReadOnlyList<Command> commands, CancellationToken token)
+    private async Task ExecuteSequenceAsync(IReadOnlyList<Effect> effects, CancellationToken token)
     {
-        foreach (var command in commands)
+        foreach (var effect in effects)
         {
             if (token.IsCancellationRequested)
             {
                 return;
             }
 
-            await ExecuteCommandAsync(command, token).ConfigureAwait(false);
+            await ExecuteEffectAsync(effect, token).ConfigureAwait(false);
         }
     }
 
-    private void StartTrackedCommand(Command command, CancellationToken token)
+    private void StartTrackedEffect(Effect effect, CancellationToken token)
     {
         var task = Task.Run(async () =>
         {
             try
             {
-                await ExecuteCommandAsync(command, token).ConfigureAwait(false);
+                await ExecuteEffectAsync(effect, token).ConfigureAwait(false);
             }
             finally
             {
-                _commandConcurrencyGate?.Release();
+                _effectConcurrencyGate?.Release();
             }
         }, CancellationToken.None);
 
-        lock (_commandTaskLock)
+        lock (_effectTaskLock)
         {
-            _commandTasks.Add(task);
+            _effectTasks.Add(task);
         }
 
         _ = task.ContinueWith(
             static (completed, state) =>
             {
-                if (state is not TeaProgramCommandScheduler scheduler)
+                if (state is not TeaProgramEffectScheduler scheduler)
                 {
                     return;
                 }
 
-                lock (scheduler._commandTaskLock)
+                lock (scheduler._effectTaskLock)
                 {
-                    scheduler._commandTasks.Remove(completed);
+                    scheduler._effectTasks.Remove(completed);
                 }
             },
             this,

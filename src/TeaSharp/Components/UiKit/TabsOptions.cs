@@ -12,7 +12,7 @@ namespace TeaSharp.Components.UiKit;
 /// </summary>
 public sealed record TabsOptions(
     IEnumerable<string> Tabs,
-    bool Focused = false,
+    bool IsFocused = false,
     bool EnableNumericShortcuts = true,
     KeyBinding? NextTabKey = null,
     KeyBinding? PreviousTabKey = null,

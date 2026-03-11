@@ -14,13 +14,13 @@ using TeaSharp.Core.Messages;
 
 namespace TeaSharp.TestFixtures;
 
-public sealed class CounterFixtureModel : IModel
+public sealed class CounterFixtureModel : IScreen
 {
     private int _count;
 
-    public Command? Init() => null;
+    public Effect? Init() => null;
 
-    public Command? Update(IMessage message)
+    public Effect? Update(IMessage message)
     {
         if (message is not KeyPressMsg key)
         {
@@ -40,15 +40,15 @@ public sealed class CounterFixtureModel : IModel
         }
 
         return key.IsCharacter('q', KeyModifiers.None)
-            ? Tea.Cmd.Quit
+            ? Tea.Effects.Quit
             : null;
     }
 
-    public TeaSharp.Core.Abstractions.View View()
+    public TeaSharp.Core.Abstractions.ScreenOutput Render()
     {
-        return TeaSharp.Core.Abstractions.View.From($"Counter\n\nCount: {_count}\n\nUp/Down: change  q: quit") with
+        return TeaSharp.Core.Abstractions.ScreenOutput.From($"Counter\n\nCount: {_count}\n\nUp/Down: change  q: quit") with
         {
-            Terminal = new ViewTerminal
+            Terminal = new TerminalOutput
             {
                 AltScreen = true,
                 WindowTitle = "TeaSharp Counter Fixture",

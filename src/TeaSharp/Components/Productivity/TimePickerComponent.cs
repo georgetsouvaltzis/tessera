@@ -26,9 +26,9 @@ public sealed class TimePickerComponent : IStatefulComponent, IMouseStatefulComp
     public TimePickerComponent(TimePickerOptions options)
     {
         Title = options.Title;
-        Focused = options.Focused;
-        Disabled = options.Disabled;
-        ReadOnly = options.ReadOnly;
+        IsFocused = options.IsFocused;
+        IsDisabled = options.IsDisabled;
+        IsReadOnly = options.IsReadOnly;
         Border = options.Border;
         Padding = options.Padding;
         ActiveField = options.ActiveField;
@@ -49,11 +49,11 @@ public sealed class TimePickerComponent : IStatefulComponent, IMouseStatefulComp
 
     public string Title { get; set; } = "Time Picker";
 
-    public bool Focused { get; set; }
+    public bool IsFocused { get; set; }
 
-    public bool Disabled { get; set; }
+    public bool IsDisabled { get; set; }
 
-    public bool ReadOnly { get; set; }
+    public bool IsReadOnly { get; set; }
 
     public BorderStyle Border { get; set; } = BorderStyle.SingleLine;
 
@@ -108,7 +108,7 @@ public sealed class TimePickerComponent : IStatefulComponent, IMouseStatefulComp
 
     public bool Update(IMessage message)
     {
-        if (!Focused || Disabled || ReadOnly || message is not KeyPressMsg key)
+        if (!IsFocused || IsDisabled || IsReadOnly || message is not KeyPressMsg key)
         {
             return false;
         }
@@ -148,7 +148,7 @@ public sealed class TimePickerComponent : IStatefulComponent, IMouseStatefulComp
 
     public bool UpdateMouse(MouseMsg message, Rect bounds)
     {
-        if (Disabled || ReadOnly)
+        if (IsDisabled || IsReadOnly)
         {
             return false;
         }
@@ -220,7 +220,7 @@ public sealed class TimePickerComponent : IStatefulComponent, IMouseStatefulComp
 
     public void Render(Canvas canvas, Rect rect)
     {
-        TimePickerRenderer.Render(canvas, rect, Title, Focused, Disabled, ReadOnly, Border, Padding, Value, ActiveField, _hoveredField, FieldStatePalette);
+        TimePickerRenderer.Render(canvas, rect, Title, IsFocused, IsDisabled, IsReadOnly, Border, Padding, Value, ActiveField, _hoveredField, FieldStatePalette);
     }
 
     private bool SetHoveredField(TimePickerField? field)

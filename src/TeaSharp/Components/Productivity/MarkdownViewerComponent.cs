@@ -27,7 +27,7 @@ public sealed class MarkdownViewerComponent : IStatefulComponent, IFocusableComp
     public MarkdownViewerComponent(MarkdownViewerOptions options)
     {
         Title = options.Title;
-        Focused = options.Focused;
+        IsFocused = options.IsFocused;
         Border = options.Border;
         Padding = options.Padding;
         Wrap = options.Wrap;
@@ -41,7 +41,7 @@ public sealed class MarkdownViewerComponent : IStatefulComponent, IFocusableComp
 
     public string Title { get; set; } = "Markdown";
 
-    public bool Focused { get; set; }
+    public bool IsFocused { get; set; }
 
     public BorderStyle Border { get; set; } = BorderStyle.SingleLine;
 
@@ -84,7 +84,7 @@ public sealed class MarkdownViewerComponent : IStatefulComponent, IFocusableComp
         var content = FrameLayout.DrawFrameAndResolveContent(
             canvas,
             clipped,
-            Border == BorderStyle.None ? null : Focused ? $"{Title} *" : Title,
+            Border == BorderStyle.None ? null : IsFocused ? $"{Title} *" : Title,
             Border,
             Padding);
 

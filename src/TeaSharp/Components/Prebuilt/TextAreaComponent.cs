@@ -25,7 +25,7 @@ public sealed class TextAreaComponent : IStatefulComponent, IFocusableComponent
         : this()
     {
         Title = options.Title;
-        Focused = options.Focused;
+        IsFocused = options.IsFocused;
         Border = options.Border;
         Padding = options.Padding;
         ShowLineNumbers = options.ShowLineNumbers;
@@ -46,7 +46,7 @@ public sealed class TextAreaComponent : IStatefulComponent, IFocusableComponent
 
     public string Title { get; set; } = "Text Area";
 
-    public bool Focused { get; set; }
+    public bool IsFocused { get; set; }
 
     public BorderStyle Border { get; set; } = BorderStyle.SingleLine;
 
@@ -108,7 +108,7 @@ public sealed class TextAreaComponent : IStatefulComponent, IFocusableComponent
         var content = FrameLayout.DrawFrameAndResolveContent(
             canvas,
             clipped,
-            Border == BorderStyle.None ? null : Focused ? $"{Title} *" : Title,
+            Border == BorderStyle.None ? null : IsFocused ? $"{Title} *" : Title,
             Border,
             Padding);
 

@@ -7,7 +7,7 @@ TeaSharp custom components are built around three contracts:
 - `ICanvasComponent`: render-only component.
 - `IStatefulComponent`: render + local `Update(IMessage)` state transitions.
 - `IMouseStatefulComponent`: optional bounds-aware mouse transitions via `UpdateMouse(MouseMsg, Rect)`.
-- `IFocusableComponent`: explicit `Focused` state for keyboard-routing participation.
+- `IFocusableComponent`: explicit `IsFocused` state for keyboard-routing participation.
 - `ComponentComposer`: deterministic slot composition and optional update routing for lower-level component subtrees.
   - default keyboard mode is focused-slot only
   - switch to `KeyboardRoutingMode.Broadcast` when a container should fan out input
@@ -16,7 +16,7 @@ TeaSharp custom components are built around three contracts:
   - prefer `ScreenRegionKey` fields over ad hoc string constants once a screen grows beyond a toy example
   - overlay helpers handle blocking modals/palettes and passive toast overlays without extra app-level hit-testing
 - `InputRouter`: app-level key precedence across overlays, command bars, focused regions, and global shortcuts
-  - typical scope order: `System` -> `Modal` -> `Palette` -> `Command` -> `FocusedRegion` -> `Global`
+  - typical scope order: `System` -> `Modal` -> `Palette` -> `CommandBar` -> `FocusedRegion` -> `Global`
   - use `CaptureWhileActive` for modal/palette/command scopes so lower handlers cannot accidentally run
   - use `blocksGlobalShortcuts` on text-entry scopes to suppress plain-character globals while editing
 - `InteractiveScreenModel`: reusable screen shell for apps that compose a `ScreenComposer` + `InputRouter`
@@ -51,7 +51,7 @@ public sealed class CounterChip : IStatefulComponent, IFocusableComponent
 {
     private int _count;
 
-    public bool Focused { get; set; }
+    public bool IsFocused { get; set; }
 
     public bool Update(IMessage message)
     {

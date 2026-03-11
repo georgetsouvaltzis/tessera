@@ -59,7 +59,7 @@ internal static class PrebuiltWidgetTests
 
     private static Task LabelComponent_RendersText()
     {
-        var label = new LabelComponent
+        var label = new TextBlockComponent
         {
             Title = "L",
             Text = "hello\nworld",
@@ -79,12 +79,12 @@ internal static class PrebuiltWidgetTests
         var button = new ButtonComponent
         {
             Label = "Go",
-            Focused = true,
+            IsFocused = true,
         };
 
         var changed = button.Update(new KeyPressMsg(KeyCode.Enter));
 
-        TestAssert.True(changed, "Focused button should handle enter.");
+        TestAssert.True(changed, "IsFocused button should handle enter.");
         TestAssert.Equal(1, button.PressCount, "Button press count should increment.");
         return Task.CompletedTask;
     }
@@ -114,7 +114,7 @@ internal static class PrebuiltWidgetTests
     {
         var button = new ButtonComponent
         {
-            Focused = true,
+            IsFocused = true,
         };
 
         button.Update(new KeyPressMsg(KeyCode.Enter));
@@ -128,7 +128,7 @@ internal static class PrebuiltWidgetTests
     {
         var button = new ButtonComponent
         {
-            Focused = true,
+            IsFocused = true,
         };
         var pressCount = 0;
         button.Pressed += (_, _) => pressCount++;
@@ -213,7 +213,7 @@ internal static class PrebuiltWidgetTests
     {
         var input = new TextInputComponent
         {
-            Focused = true,
+            IsFocused = true,
         };
 
         input.Update(new KeyPressMsg(KeyCode.Character, "a"));
@@ -236,7 +236,7 @@ internal static class PrebuiltWidgetTests
     {
         var input = new TextInputComponent
         {
-            Focused = true,
+            IsFocused = true,
         };
         string? submitted = null;
         string? cancelled = null;
@@ -274,7 +274,7 @@ internal static class PrebuiltWidgetTests
     {
         var area = new TextAreaComponent
         {
-            Focused = true,
+            IsFocused = true,
         };
 
         area.Update(new KeyPressMsg(KeyCode.Character, "l"));
@@ -298,7 +298,7 @@ internal static class PrebuiltWidgetTests
     {
         var list = new ListComponent<string>(["one", "two", "three"], x => x)
         {
-            Focused = true,
+            IsFocused = true,
         };
 
         list.Update(new KeyPressMsg(KeyCode.Down));
@@ -312,7 +312,7 @@ internal static class PrebuiltWidgetTests
     {
         var list = new ListComponent<string>(["one", "two", "three"], x => x)
         {
-            Focused = true,
+            IsFocused = true,
         };
         ListSelectionChangedEventArgs<string>? args = null;
         list.SelectionChanged += (_, eventArgs) => args = eventArgs;
@@ -331,7 +331,7 @@ internal static class PrebuiltWidgetTests
     {
         var list = new ListComponent<string>(["todo", "done"], x => x)
         {
-            Focused = true,
+            IsFocused = true,
             Border = BorderStyle.None,
             ItemStateResolver = item => string.Equals(item, "done", StringComparison.Ordinal)
                 ? [WidgetVisualState.Completed]
@@ -398,7 +398,7 @@ internal static class PrebuiltWidgetTests
     {
         var dropdown = new DropdownComponent
         {
-            Focused = true,
+            IsFocused = true,
             Title = "D",
         };
         dropdown.SetItems(["alpha", "beta", "gamma"]);
@@ -416,7 +416,7 @@ internal static class PrebuiltWidgetTests
     {
         var dropdown = new DropdownComponent
         {
-            Focused = true,
+            IsFocused = true,
         };
         dropdown.SetItems(["alpha", "beta", "gamma"]);
         OptionSelectionChangedEventArgs? args = null;
@@ -436,7 +436,7 @@ internal static class PrebuiltWidgetTests
     {
         var dropdown = new DropdownComponent
         {
-            Focused = true,
+            IsFocused = true,
             Border = BorderStyle.None,
         };
         dropdown.SetItems(["alpha", "beta", "gamma"]);
@@ -454,7 +454,7 @@ internal static class PrebuiltWidgetTests
     {
         var dropdown = new DropdownComponent
         {
-            Focused = true,
+            IsFocused = true,
             Border = BorderStyle.None,
             OptionStateResolver = (item, _) => string.Equals(item, "beta", StringComparison.Ordinal)
                 ? [WidgetVisualState.Completed]
@@ -477,7 +477,7 @@ internal static class PrebuiltWidgetTests
     {
         var dropdown = new DropdownComponent
         {
-            Focused = true,
+            IsFocused = true,
             Border = BorderStyle.None,
         };
         dropdown.SetItems(["alpha", "beta", "gamma"]);
@@ -497,7 +497,7 @@ internal static class PrebuiltWidgetTests
     {
         var combobox = new ComboboxComponent
         {
-            Focused = true,
+            IsFocused = true,
             Title = "C",
         };
         combobox.SetItems(["alpha", "beta", "gamma"]);
@@ -515,7 +515,7 @@ internal static class PrebuiltWidgetTests
     {
         var combobox = new ComboboxComponent
         {
-            Focused = true,
+            IsFocused = true,
         };
         combobox.SetItems(["alpha", "beta", "gamma"]);
         OptionSelectionChangedEventArgs? args = null;
@@ -533,7 +533,7 @@ internal static class PrebuiltWidgetTests
     {
         var combobox = new ComboboxComponent
         {
-            Focused = true,
+            IsFocused = true,
             Border = BorderStyle.None,
         };
         combobox.SetItems(["alpha", "beta", "gamma"]);
@@ -555,7 +555,7 @@ internal static class PrebuiltWidgetTests
     {
         var table = new TableComponent(["A", "B"])
         {
-            Focused = true,
+            IsFocused = true,
             Title = "T",
         };
         table.SetRows(
@@ -575,7 +575,7 @@ internal static class PrebuiltWidgetTests
     {
         var progress = new ProgressBarComponent
         {
-            Focused = true,
+            IsFocused = true,
             Step = 0.25,
         };
 
@@ -607,7 +607,7 @@ internal static class PrebuiltWidgetTests
     private static Task LogViewerComponent_AppendsAndFilters()
     {
         var logs = new LogViewerComponent(new LogViewerOptions(
-            Focused: true,
+            IsFocused: true,
             InitialEntries: ["alpha", "beta"],
             InitialFilter: "alp"));
         var canvas = new Canvas(26, 8);
@@ -624,16 +624,16 @@ internal static class PrebuiltWidgetTests
     {
         var dialog = new DialogComponent
         {
-            Visible = true,
-            Focused = true,
+            IsVisible = true,
+            IsFocused = true,
         };
 
         var accepted = dialog.Update(new KeyPressMsg(KeyCode.Enter));
         TestAssert.True(accepted, "Dialog should accept on enter.");
         TestAssert.True(dialog.LastResult == DialogResult.Accepted, "Dialog should record accepted result.");
 
-        dialog.Visible = true;
-        dialog.Focused = true;
+        dialog.IsVisible = true;
+        dialog.IsFocused = true;
         var dismissed = dialog.Update(new KeyPressMsg(KeyCode.Escape));
         TestAssert.True(dismissed, "Dialog should dismiss on escape.");
         TestAssert.True(dialog.LastResult == DialogResult.Dismissed, "Dialog should record dismissed result.");
@@ -644,8 +644,8 @@ internal static class PrebuiltWidgetTests
     {
         var dialog = new DialogComponent
         {
-            Visible = true,
-            Focused = true,
+            IsVisible = true,
+            IsFocused = true,
         };
 
         dialog.Update(new KeyPressMsg(KeyCode.Enter));
@@ -660,8 +660,8 @@ internal static class PrebuiltWidgetTests
     {
         var dialog = new DialogComponent
         {
-            Visible = true,
-            Focused = true,
+            IsVisible = true,
+            IsFocused = true,
         };
         var accepted = 0;
         var dismissed = 0;
@@ -669,7 +669,7 @@ internal static class PrebuiltWidgetTests
         dialog.Dismissed += (_, _) => dismissed++;
 
         dialog.Update(new KeyPressMsg(KeyCode.Enter));
-        dialog.Visible = true;
+        dialog.IsVisible = true;
         dialog.Update(new KeyPressMsg(KeyCode.Escape));
 
         TestAssert.Equal(1, accepted, "Dialog should raise accepted exactly once for an accept decision.");
@@ -681,12 +681,12 @@ internal static class PrebuiltWidgetTests
     {
         var layout = new LayoutContainerComponent
         {
-            Mode = LayoutContainerMode.Grid,
+            Mode = LayoutFlow.Grid,
             GridRows = 1,
             GridColumns = 2,
         };
-        layout.Add(new LabelComponent { Border = BorderStyle.None, Text = "left" });
-        layout.Add(new LabelComponent { Border = BorderStyle.None, Text = "right" });
+        layout.Add(new TextBlockComponent { Border = BorderStyle.None, Text = "left" });
+        layout.Add(new TextBlockComponent { Border = BorderStyle.None, Text = "right" });
 
         var canvas = new Canvas(20, 3);
         layout.Render(canvas, new Rect(0, 0, 20, 3));
@@ -701,12 +701,12 @@ internal static class PrebuiltWidgetTests
     {
         var layout = new LayoutContainerComponent
         {
-            Mode = LayoutContainerMode.Horizontal,
+            Mode = LayoutFlow.Columns,
             MinPrimarySize = 4,
             MinSecondarySize = 4,
         };
-        layout.Add(new LabelComponent { Border = BorderStyle.None, Text = "left" });
-        layout.Add(new LabelComponent { Border = BorderStyle.None, Text = "right" });
+        layout.Add(new TextBlockComponent { Border = BorderStyle.None, Text = "left" });
+        layout.Add(new TextBlockComponent { Border = BorderStyle.None, Text = "right" });
         layout.SetPrimarySize(12);
 
         var bounds = new Rect(0, 0, 30, 6);
@@ -721,19 +721,19 @@ internal static class PrebuiltWidgetTests
 
     private static Task LayoutContainerComponent_KeyboardRoutesToFocusedChildOnly()
     {
-        var first = new KeyProbeComponent { Focused = true };
+        var first = new KeyProbeComponent { IsFocused = true };
         var second = new KeyProbeComponent();
         var layout = new LayoutContainerComponent
         {
-            Mode = LayoutContainerMode.Horizontal,
+            Mode = LayoutFlow.Columns,
         };
         layout.Add(first);
         layout.Add(second);
 
         var changed = layout.Update(new KeyPressMsg(KeyCode.Character, "x"));
 
-        TestAssert.True(changed, "Focused child should handle keyboard input.");
-        TestAssert.Equal(1, first.KeyEvents, "Focused child should receive keyboard input.");
+        TestAssert.True(changed, "IsFocused child should handle keyboard input.");
+        TestAssert.Equal(1, first.KeyEvents, "IsFocused child should receive keyboard input.");
         TestAssert.Equal(0, second.KeyEvents, "Non-focused child should not receive keyboard input.");
         return Task.CompletedTask;
     }
@@ -744,7 +744,7 @@ internal static class PrebuiltWidgetTests
         var second = new MouseProbeComponent();
         var layout = new LayoutContainerComponent
         {
-            Mode = LayoutContainerMode.Horizontal,
+            Mode = LayoutFlow.Columns,
         };
         layout.Add(first);
         layout.Add(second);
@@ -754,14 +754,14 @@ internal static class PrebuiltWidgetTests
         TestAssert.True(changed, "Mouse click should be routed and focus updated.");
         TestAssert.Equal(0, first.MouseEvents, "First child should not receive click outside its bounds.");
         TestAssert.Equal(1, second.MouseEvents, "Second child should receive routed mouse click.");
-        TestAssert.True(!first.Focused, "First child focus should be cleared.");
-        TestAssert.True(second.Focused, "Target child should become focused.");
+        TestAssert.True(!first.IsFocused, "First child focus should be cleared.");
+        TestAssert.True(second.IsFocused, "Target child should become focused.");
         return Task.CompletedTask;
     }
 
     private sealed class KeyProbeComponent : IStatefulComponent, IFocusableComponent
     {
-        public bool Focused { get; set; }
+        public bool IsFocused { get; set; }
 
         public int KeyEvents { get; private set; }
 
@@ -784,7 +784,7 @@ internal static class PrebuiltWidgetTests
 
     private sealed class MouseProbeComponent : IStatefulComponent, IMouseStatefulComponent, IFocusableComponent
     {
-        public bool Focused { get; set; }
+        public bool IsFocused { get; set; }
 
         public int MouseEvents { get; private set; }
 
@@ -798,7 +798,7 @@ internal static class PrebuiltWidgetTests
 
         public void Render(Canvas canvas, Rect rect)
         {
-            canvas.WriteText(rect.X, rect.Y, Focused ? "focused" : "idle", rect.Width);
+            canvas.WriteText(rect.X, rect.Y, IsFocused ? "focused" : "idle", rect.Width);
         }
     }
 

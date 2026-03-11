@@ -47,7 +47,7 @@ internal static class ShowcaseInteractionTests
 
         // Act
         PressPlain(model, ":");
-        var view = model.View().Frame.Content;
+        var view = model.Render().Frame.Content;
 
         // Assert
         TestAssert.True(view.Contains("mode=cmd", StringComparison.Ordinal), "Colon should enter command mode.");
@@ -65,7 +65,7 @@ internal static class ShowcaseInteractionTests
 
         // Act
         PressEscape(model);
-        var view = model.View().Frame.Content;
+        var view = model.Render().Frame.Content;
 
         // Assert
         TestAssert.True(view.Contains("mode=nav", StringComparison.Ordinal), "Escape should exit command mode.");
@@ -83,7 +83,7 @@ internal static class ShowcaseInteractionTests
         // Act
         PressPlain(model, ":");
         PressPlain(model, ":");
-        var view = model.View().Frame.Content;
+        var view = model.Render().Frame.Content;
 
         // Assert
         TestAssert.True(view.Contains("mode=cmd", StringComparison.Ordinal), "Command mode should stay enabled.");
@@ -99,7 +99,7 @@ internal static class ShowcaseInteractionTests
 
         // Act
         model.Update(new KeyPressMsg(KeyCode.Character, ";", KeyModifiers.Shift));
-        var view = model.View().Frame.Content;
+        var view = model.Render().Frame.Content;
 
         // Assert
         TestAssert.True(view.Contains("mode=cmd", StringComparison.Ordinal), "Shift+semicolon should enter command mode.");
@@ -115,7 +115,7 @@ internal static class ShowcaseInteractionTests
         // Act
         PressEscape(model);
         PressPlain(model, "1");
-        var view = model.View().Frame.Content;
+        var view = model.Render().Frame.Content;
 
         // Assert
         TestAssert.True(view.Contains("page=showcase", StringComparison.Ordinal), "Escape shortcut burst should not trigger page switch.");
@@ -152,7 +152,7 @@ internal static class ShowcaseInteractionTests
         // Act
         var result = model.Update(new KeyPressMsg(KeyCode.Character, "q"));
         var input = CommandInput(model);
-        var view = model.View().Frame.Content;
+        var view = model.Render().Frame.Content;
 
         // Assert
         TestAssert.True(result is null, "Plain 'q' in command mode should not emit quit command.");
@@ -167,13 +167,13 @@ internal static class ShowcaseInteractionTests
         var model = new CounterModel(terminal);
         GoToShowcase(model);
         PressPlain(model, ":");
-        var before = model.View().Frame.Content;
+        var before = model.Render().Frame.Content;
 
         // Act
         PressPlain(model, "1");
         PressPlain(model, "2");
         PressPlain(model, "3");
-        var after = model.View().Frame.Content;
+        var after = model.Render().Frame.Content;
         var input = CommandInput(model);
 
         // Assert
@@ -199,7 +199,7 @@ internal static class ShowcaseInteractionTests
         }
 
         model.Update(new KeyPressMsg(KeyCode.Enter));
-        var view = model.View().Frame.Content;
+        var view = model.Render().Frame.Content;
 
         // Assert
         TestAssert.Equal(string.Empty, input.Value, "Submitted command should clear command input.");
@@ -266,11 +266,11 @@ internal static class ShowcaseInteractionTests
         model.Update(new KeyPressMsg(KeyCode.Right)); // forms
         PressPlain(model, "p");
         PressPlain(model, "p"); // forms theme pane
-        var before = HeaderStylePrefix(model.View().Frame.Content);
+        var before = HeaderStylePrefix(model.Render().Frame.Content);
 
         // Act
         PressPlain(model, "r");
-        var after = HeaderStylePrefix(model.View().Frame.Content);
+        var after = HeaderStylePrefix(model.Render().Frame.Content);
 
         // Assert
         TestAssert.True(
@@ -299,20 +299,20 @@ internal static class ShowcaseInteractionTests
         await using var terminal = new ConsoleTerminalAdapter();
         var model = new CounterModel(terminal);
         GoToShowcase(model);
-        var beforeWithoutFocus = ShowcasePaneToken(model.View().Frame.Content);
+        var beforeWithoutFocus = ShowcasePaneToken(model.Render().Frame.Content);
 
         // Act
         PressPlain(model, "p");
-        var afterWithoutFocus = ShowcasePaneToken(model.View().Frame.Content);
+        var afterWithoutFocus = ShowcasePaneToken(model.Render().Frame.Content);
 
         // Assert
         TestAssert.Equal(beforeWithoutFocus, afterWithoutFocus, "Pane should not move while focus is outside showcase pane.");
 
         // Act
         FocusShowcasePane(model);
-        var beforeFocused = ShowcasePaneToken(model.View().Frame.Content);
+        var beforeFocused = ShowcasePaneToken(model.Render().Frame.Content);
         PressPlain(model, "p");
-        var afterFocused = ShowcasePaneToken(model.View().Frame.Content);
+        var afterFocused = ShowcasePaneToken(model.Render().Frame.Content);
 
         // Assert
         TestAssert.True(
@@ -327,11 +327,11 @@ internal static class ShowcaseInteractionTests
         var model = new CounterModel(terminal);
         GoToShowcase(model);
         FocusShowcasePane(model);
-        var before = ShowcasePaneToken(model.View().Frame.Content);
+        var before = ShowcasePaneToken(model.Render().Frame.Content);
 
         // Act
         model.Update(new KeyPressMsg(KeyCode.Character, "P"));
-        var after = ShowcasePaneToken(model.View().Frame.Content);
+        var after = ShowcasePaneToken(model.Render().Frame.Content);
 
         // Assert
         TestAssert.True(

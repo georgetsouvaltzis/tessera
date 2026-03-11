@@ -13,9 +13,9 @@ namespace TeaSharp.Components.Productivity;
 public sealed record TimePickerOptions(
     string Title = "Time Picker",
     TimeOnly? InitialValue = null,
-    bool Focused = false,
-    bool Disabled = false,
-    bool ReadOnly = false,
+    bool IsFocused = false,
+    bool IsDisabled = false,
+    bool IsReadOnly = false,
     BorderStyle Border = BorderStyle.SingleLine,
     Thickness Padding = default,
     TimePickerField ActiveField = TimePickerField.Hour,

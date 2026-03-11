@@ -198,11 +198,11 @@ internal static class ScreenComposerTests
         workflow.Compose(new Rect(0, 0, 20, 6));
         composer.CompleteFrame();
 
-        TestAssert.True(dialog.Visible, "Dialog workflow should open the dialog.");
-        TestAssert.True(dialog.Focused, "Dialog workflow should focus the dialog region after composition.");
+        TestAssert.True(dialog.IsVisible, "Dialog workflow should open the dialog.");
+        TestAssert.True(dialog.IsFocused, "Dialog workflow should focus the dialog region after composition.");
         TestAssert.True(composer.FocusedRegionKey == dialogKey, "Dialog workflow should move screen focus to the dialog region.");
         TestAssert.Equal("Confirm delete", dialog.Title, "Dialog workflow should apply title updates.");
-        TestAssert.Equal("Delete card?", dialog.Lines[0], "Dialog workflow should apply content updates.");
+        TestAssert.Equal("Delete card?", dialog.BodyLines[0], "Dialog workflow should apply content updates.");
         return Task.CompletedTask;
     }
 
@@ -228,10 +228,10 @@ internal static class ScreenComposerTests
 
         var changed = composer.Update(new KeyPressMsg(KeyCode.Escape));
 
-        TestAssert.True(changed, "Focused dialog should handle dismiss input.");
-        TestAssert.True(!dialog.Visible, "Dialog workflow should allow the dialog to close.");
+        TestAssert.True(changed, "IsFocused dialog should handle dismiss input.");
+        TestAssert.True(!dialog.IsVisible, "Dialog workflow should allow the dialog to close.");
         TestAssert.True(composer.FocusedRegionKey == baseKey, "Dialog workflow should restore focus to the previously focused region.");
-        TestAssert.True(baseComponent.Focused, "Prior focus target should regain focus after dialog dismissal.");
+        TestAssert.True(baseComponent.IsFocused, "Prior focus target should regain focus after dialog dismissal.");
         return Task.CompletedTask;
     }
 
@@ -248,7 +248,7 @@ internal static class ScreenComposerTests
 
         TestAssert.True(changed, "Mouse click should route to the registered region.");
         TestAssert.True(button.MouseEvents == 1, "Mouse region should receive the click.");
-        TestAssert.True(button.Focused, "Clickable focusable region should become focused.");
+        TestAssert.True(button.IsFocused, "Clickable focusable region should become focused.");
         TestAssert.True(composer.FocusedRegionKey == buttonKey, "Composer should track focused region by typed key.");
         return Task.CompletedTask;
     }
@@ -269,9 +269,9 @@ internal static class ScreenComposerTests
         var changed = composer.FocusNext();
 
         TestAssert.True(changed, "FocusNext should advance focus across interactive regions.");
-        TestAssert.True(!first.Focused, "Previous region should lose focus.");
-        TestAssert.True(second.Focused, "Next focusable region should gain focus.");
-        TestAssert.True(composer.FocusedRegionKey == secondKey, "Focused region key should advance.");
+        TestAssert.True(!first.IsFocused, "Previous region should lose focus.");
+        TestAssert.True(second.IsFocused, "Next focusable region should gain focus.");
+        TestAssert.True(composer.FocusedRegionKey == secondKey, "IsFocused region key should advance.");
         return Task.CompletedTask;
     }
 
@@ -288,7 +288,7 @@ internal static class ScreenComposerTests
         var changed = composer.FocusFirst();
 
         TestAssert.True(changed, "FocusFirst should focus the first available interactive region.");
-        TestAssert.True(first.Focused, "FocusFirst should focus the first focusable region.");
+        TestAssert.True(first.IsFocused, "FocusFirst should focus the first focusable region.");
         TestAssert.True(composer.FocusedRegionKey == new ScreenRegionKey("first"), "Composer should track the first focused region.");
         return Task.CompletedTask;
     }
@@ -349,7 +349,7 @@ internal static class ScreenComposerTests
         composer.AddComponent(commandKey, new Rect(0, 5, 12, 4), command, onFocus: () => focusCount++);
         composer.CompleteFrame(commandKey);
 
-        TestAssert.True(command.Focused, "Preferred region should be focused after frame completion.");
+        TestAssert.True(command.IsFocused, "Preferred region should be focused after frame completion.");
         TestAssert.True(composer.FocusedRegionKey == commandKey, "Preferred focus key should be preserved.");
         TestAssert.Equal(0, focusCount, "Frame completion should not fire focus callbacks just for snapshot rebuilds.");
         return Task.CompletedTask;
@@ -386,13 +386,13 @@ internal static class ScreenComposerTests
         TestAssert.True(changed, "Modal overlay should handle clicks inside its region.");
         TestAssert.True(button.MouseEvents == 0, "Underlying region should not receive clicks under modal overlay.");
         TestAssert.True(modal.MouseEvents == 1, "Modal overlay should receive the click.");
-        TestAssert.True(modal.Focused, "Modal overlay should keep focus.");
+        TestAssert.True(modal.IsFocused, "Modal overlay should keep focus.");
         return Task.CompletedTask;
     }
 
     private sealed class MouseProbeComponent : IStatefulComponent, IMouseStatefulComponent, IFocusableComponent
     {
-        public bool Focused { get; set; }
+        public bool IsFocused { get; set; }
 
         public int MouseEvents { get; private set; }
 
@@ -409,7 +409,7 @@ internal static class ScreenComposerTests
 
         public void Render(Canvas canvas, Rect rect)
         {
-            canvas.WriteText(rect.X, rect.Y, Focused ? "focused" : "idle", rect.Width);
+            canvas.WriteText(rect.X, rect.Y, IsFocused ? "focused" : "idle", rect.Width);
         }
     }
 

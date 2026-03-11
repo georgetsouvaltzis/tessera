@@ -5,9 +5,9 @@ using TeaSharp;
 using TeaSharp.Core.Abstractions;
 using TeaSharp.Core.Application;
 using TeaSharp.Core.Messages;
-using ModelView = TeaSharp.Core.Abstractions.View;
+using ModelView = TeaSharp.Core.Abstractions.ScreenOutput;
 
-var program = Tea.NewProgram(new ComboBoxDemoModel(), new TeaProgramOptions
+var program = Tea.CreateProgram(new ComboBoxDemoModel(), new TeaProgramOptions
 {
     UseConsoleKeyEvents = false,
 });
@@ -22,7 +22,7 @@ catch (TeaProgramInterruptedException)
     return 130;
 }
 
-internal sealed class ComboBoxDemoModel : IModel
+internal sealed class ComboBoxDemoModel : IScreen
 {
     private readonly ComboboxComponent _combobox = new(new ComboboxOptions(
         Items:
@@ -41,7 +41,7 @@ internal sealed class ComboBoxDemoModel : IModel
         ],
         Title: "Region",
         Placeholder: "type to filter regions",
-        Focused: true,
+        IsFocused: true,
         MaxVisibleItems: 7));
 
     private int _width = 90;
@@ -52,9 +52,9 @@ internal sealed class ComboBoxDemoModel : IModel
     {
     }
 
-    public Command? Init() => null;
+    public Effect? Init() => null;
 
-    public Command? Update(IMessage message)
+    public Effect? Update(IMessage message)
     {
         if (message is WindowSizeMsg ws)
         {
@@ -96,7 +96,7 @@ internal sealed class ComboBoxDemoModel : IModel
         if ((key.Modifiers.HasFlag(KeyModifiers.Ctrl) && key.IsCharacter('c'))
             || key.IsCharacter('q', KeyModifiers.None))
         {
-            return Tea.Cmd.Quit;
+            return Tea.Effects.Quit;
         }
 
         var previous = _combobox.SelectedItem;
@@ -115,7 +115,7 @@ internal sealed class ComboBoxDemoModel : IModel
         return null;
     }
 
-    public ModelView View()
+    public ModelView Render()
     {
         var width = Math.Max(56, _width);
         var height = Math.Max(18, _height);
@@ -146,7 +146,7 @@ internal sealed class ComboBoxDemoModel : IModel
 
         return ModelView.From(canvas.Render()) with
         {
-            Terminal = new ViewTerminal
+            Terminal = new TerminalOutput
             {
                 AltScreen = true,
                 EnableBracketedPaste = true,

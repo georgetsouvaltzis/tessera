@@ -13,13 +13,13 @@ This document defines the current public API tiers in TeaSharp so refactors can 
 - `TeaSharp.Components.Prebuilt.*`, `TeaSharp.Components.Productivity.*`, `TeaSharp.Components.UiKit.*`, `TeaSharp.Components.Advanced.*`, `TeaSharp.Components.Composition.*`, `TeaSharp.Components.Primitives.*`, `TeaSharp.Components.Charting.*`, and `TeaSharp.Components.Dashboard.*` types intended for application authors
 - `TeaSharp.Styles.*`
 - high-level model/message contracts required to build applications:
-  - `IModel`
+  - `IScreen`
   - `IMessage`
-  - `View`
-  - `ViewFrame`
-  - `ViewInput`
-  - `ViewTerminal`
-  - `Command`
+  - `ScreenOutput`
+  - `ScreenFrame`
+  - `InputHooks`
+  - `TerminalOutput`
+  - `Effect`
 
 ### Tier 2: Advanced seams that should remain available, but not dominate the default path
 
@@ -53,7 +53,7 @@ This document defines the current public API tiers in TeaSharp so refactors can 
 - composition is split between `ComponentComposer` and `ScreenComposer`.
 - `ScreenComposer` + `InputRouter` + `InteractiveScreenModel` is now the documented default path; `ComponentComposer` is being pushed toward lower-level subtree use.
 - `ScreenComposer` raw string region-id overloads remain for compatibility, but are now marked `EditorBrowsable(Advanced)` so typed `ScreenRegionKey` usage stays the default path.
-- runtime plumbing seams (`IProgramRenderer`, `ITerminalAdapter`, `EventDecoder`, `TerminalReader`, capability detectors/profiles) are now explicitly marked `EditorBrowsable(Advanced)` so the stable host path stays centered on `Tea.NewProgram(model)` / `Tea.NewProgram(model, TeaProgramOptions)`.
+- runtime plumbing seams (`IProgramRenderer`, `ITerminalAdapter`, `EventDecoder`, `TerminalReader`, capability detectors/profiles) are now explicitly marked `EditorBrowsable(Advanced)` so the stable host path stays centered on `Tea.CreateProgram(model)` / `Tea.CreateProgram(model, TeaProgramOptions)`.
 
 ## Target Public Surface
 
@@ -63,7 +63,7 @@ This document defines the current public API tiers in TeaSharp so refactors can 
   - `TeaSharp`
   - category-based component namespaces (`TeaSharp.Components.Prebuilt`, `TeaSharp.Components.Productivity`, `TeaSharp.Components.UiKit`, `TeaSharp.Components.Advanced`, `TeaSharp.Components.Composition`, `TeaSharp.Components.Primitives`, `TeaSharp.Components.Charting`, `TeaSharp.Components.Dashboard`)
   - `TeaSharp.Styles`
-- app hosting should prefer `Tea.NewProgram(model)` for defaults or `TeaProgramOptions` for stable customization, with `ProgramOptions` reserved for advanced/runtime customization.
+- app hosting should prefer `Tea.CreateProgram(model)` for defaults or `TeaProgramOptions` for stable customization, with `ProgramOptions` reserved for advanced/runtime customization.
 - common component setup should flow through `*Options` records and small constructor overloads.
 - examples and docs should demonstrate the stable path first.
 

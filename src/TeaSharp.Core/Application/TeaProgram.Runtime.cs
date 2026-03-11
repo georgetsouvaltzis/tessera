@@ -24,21 +24,21 @@ public sealed partial class TeaProgram
         return Task.Run(() => _runtime.Reader.StreamEventsAsync(Send, token), token);
     }
 
-    private async Task RenderAsync(View view, CancellationToken token)
+    private async Task RenderAsync(ScreenOutput output, CancellationToken token)
     {
         if (_runtime.Renderer is null)
         {
             return;
         }
 
-        _runtime.LastRenderedView = view;
-        _runtime.Renderer.Render(view);
+        _runtime.LastRenderedOutput = output;
+        _runtime.Renderer.Render(output);
         await _runtime.Renderer.FlushAsync(token).ConfigureAwait(false);
     }
 
     private async Task ShutdownAsync(bool kill, CancellationToken token)
     {
-        _commands.Writer.TryComplete();
+        _effects.Writer.TryComplete();
         _messages.Writer.TryComplete();
 
         if (_runtime.Renderer is not null)
@@ -60,6 +60,6 @@ public sealed partial class TeaProgram
         }
 
         _runtime.Reader = null;
-        _runtime.LastRenderedView = View.From(string.Empty);
+        _runtime.LastRenderedOutput = ScreenOutput.From(string.Empty);
     }
 }

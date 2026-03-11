@@ -14,7 +14,7 @@ namespace TeaSharp.Components.Prebuilt;
 public sealed record ProgressBarOptions(
     string Title = "Progress",
     double InitialValue = 0.0,
-    bool Focused = false,
+    bool IsFocused = false,
     BorderStyle Border = BorderStyle.SingleLine,
     Thickness Padding = default,
     double Step = 0.05,

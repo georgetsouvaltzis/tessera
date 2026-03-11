@@ -32,7 +32,7 @@ public sealed partial class LayoutContainerComponent : IStatefulComponent, IMous
         PrimarySize = options.PrimarySize;
     }
 
-    public LayoutContainerMode Mode { get; set; } = LayoutContainerMode.Vertical;
+    public LayoutFlow Mode { get; set; } = LayoutFlow.Rows;
 
     public int GridRows { get; set; } = 1;
 
@@ -137,7 +137,7 @@ public sealed partial class LayoutContainerComponent : IStatefulComponent, IMous
     private bool HandleSplitMouse(MouseMsg message, Rect bounds, List<Rect> rects, out bool consumed)
     {
         consumed = false;
-        if (!EnableMouseResize || Mode == LayoutContainerMode.Grid || _children.Count != 2 || rects.Count < 2)
+        if (!EnableMouseResize || Mode == LayoutFlow.Grid || _children.Count != 2 || rects.Count < 2)
         {
             return false;
         }
@@ -173,7 +173,7 @@ public sealed partial class LayoutContainerComponent : IStatefulComponent, IMous
 
     private bool ApplyDraggedPrimarySize(Rect bounds, int x, int y)
     {
-        var totalSize = Mode == LayoutContainerMode.Horizontal
+        var totalSize = Mode == LayoutFlow.Columns
             ? bounds.Width
             : bounds.Height;
         if (totalSize <= 0)
@@ -181,7 +181,7 @@ public sealed partial class LayoutContainerComponent : IStatefulComponent, IMous
             return false;
         }
 
-        var requested = Mode == LayoutContainerMode.Horizontal
+        var requested = Mode == LayoutFlow.Columns
             ? x - bounds.X
             : y - bounds.Y;
         var minFirst = Math.Clamp(MinPrimarySize, 0, totalSize);
@@ -202,7 +202,7 @@ public sealed partial class LayoutContainerComponent : IStatefulComponent, IMous
     {
         splitterHit = default;
         var thickness = Math.Max(1, SplitterHitThickness);
-        if (Mode == LayoutContainerMode.Horizontal)
+        if (Mode == LayoutFlow.Columns)
         {
             var center = firstRect.Right;
             var start = center - (thickness / 2);
@@ -210,7 +210,7 @@ public sealed partial class LayoutContainerComponent : IStatefulComponent, IMous
             return !splitterHit.IsEmpty;
         }
 
-        if (Mode == LayoutContainerMode.Vertical)
+        if (Mode == LayoutFlow.Rows)
         {
             var center = firstRect.Bottom;
             var start = center - (thickness / 2);

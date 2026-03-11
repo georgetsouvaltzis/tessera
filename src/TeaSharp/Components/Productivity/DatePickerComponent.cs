@@ -25,9 +25,9 @@ public sealed class DatePickerComponent : IStatefulComponent, IMouseStatefulComp
     public DatePickerComponent(DatePickerOptions options)
     {
         Title = options.Title;
-        Focused = options.Focused;
-        Disabled = options.Disabled;
-        ReadOnly = options.ReadOnly;
+        IsFocused = options.IsFocused;
+        IsDisabled = options.IsDisabled;
+        IsReadOnly = options.IsReadOnly;
         Border = options.Border;
         Padding = options.Padding;
         PreviousDayKey = options.PreviousDayKey ?? PreviousDayKey;
@@ -46,11 +46,11 @@ public sealed class DatePickerComponent : IStatefulComponent, IMouseStatefulComp
 
     public string Title { get; set; } = "Date Picker";
 
-    public bool Focused { get; set; }
+    public bool IsFocused { get; set; }
 
-    public bool Disabled { get; set; }
+    public bool IsDisabled { get; set; }
 
-    public bool ReadOnly { get; set; }
+    public bool IsReadOnly { get; set; }
 
     public BorderStyle Border { get; set; } = BorderStyle.SingleLine;
 
@@ -104,7 +104,7 @@ public sealed class DatePickerComponent : IStatefulComponent, IMouseStatefulComp
 
     public bool Update(IMessage message)
     {
-        if (!Focused || Disabled || ReadOnly || message is not KeyPressMsg key)
+        if (!IsFocused || IsDisabled || IsReadOnly || message is not KeyPressMsg key)
         {
             return false;
         }
@@ -156,7 +156,7 @@ public sealed class DatePickerComponent : IStatefulComponent, IMouseStatefulComp
 
     public bool UpdateMouse(MouseMsg message, Rect bounds)
     {
-        if (Disabled || ReadOnly)
+        if (IsDisabled || IsReadOnly)
         {
             return false;
         }
@@ -228,7 +228,7 @@ public sealed class DatePickerComponent : IStatefulComponent, IMouseStatefulComp
 
     public void Render(Canvas canvas, Rect rect)
     {
-        DatePickerRenderer.Render(canvas, rect, Title, Focused, Border, Padding, CurrentMonth, SelectedDate, _hoveredDate, DayStatePalette);
+        DatePickerRenderer.Render(canvas, rect, Title, IsFocused, Border, Padding, CurrentMonth, SelectedDate, _hoveredDate, DayStatePalette);
     }
 
     private bool SetHoveredDate(DateOnly? date)

@@ -60,7 +60,7 @@ The design follows patterns used in Bubble Tea examples:
     - overlay helpers: `AddOverlayComponent`, `AddModalComponent`, `AddPaletteComponent`, `AddToastOverlay`
     - this is the recommended full-app composition surface
   - `InputRouter`: app-level key precedence for multi-mode screens.
-    - ordered scopes: `System`, `Modal`, `Palette`, `Command`, `FocusedRegion`, `Global`
+    - ordered scopes: `System`, `Modal`, `Palette`, `Effect`, `FocusedRegion`, `Global`
     - scope behaviors: `ContinueWhenUnhandled` or `CaptureWhileActive`
     - optional `blocksGlobalShortcuts` guard for text-entry regions so plain character shortcuts do not leak into app-global handlers
   - `InteractiveScreenModel`: app-shell base for screen-oriented models.
@@ -108,7 +108,7 @@ The design follows patterns used in Bubble Tea examples:
     - `ModalComponent`
     - UI-kit controls expose configurable key bindings for navigation/toggle actions (instead of fixed hardcoded keys).
   - prebuilt widget components (`PrebuiltWidgets`):
-    - `LabelComponent`
+    - `TextBlockComponent`
     - `ButtonComponent`
     - `TextInputComponent`
     - `TextAreaComponent`
@@ -144,7 +144,7 @@ The design follows patterns used in Bubble Tea examples:
       - `LogViewerComponent.ViewportKeyMap`, `TogglePauseKey`, `ClearKey`
       - `ProgressBarComponent.IncreaseKey` / `DecreaseKey`
       - `DialogComponent.AcceptKey` / `DismissKey`
-      - options-based constructors (`LabelOptions`, `ButtonOptions`, `TextInputOptions`, `TextAreaOptions`, `ListOptions<T>`, `TableOptions`, `ProgressBarOptions`, `StatusBarOptions`, `DialogOptions`, `LayoutContainerOptions`, `TabsOptions`, `MenuBarOptions`, `ContextMenuOptions`, `NumberInputOptions`, `DatePickerOptions`, `TimePickerOptions`, `MarkdownViewerOptions`, `LogViewerOptions`, `ModalOptions`)
+      - options-based constructors (`TextBlockOptions`, `ButtonOptions`, `TextInputOptions`, `TextAreaOptions`, `ListOptions<T>`, `TableOptions`, `ProgressBarOptions`, `StatusBarOptions`, `DialogOptions`, `LayoutContainerOptions`, `TabsOptions`, `MenuBarOptions`, `ContextMenuOptions`, `NumberInputOptions`, `DatePickerOptions`, `TimePickerOptions`, `MarkdownViewerOptions`, `LogViewerOptions`, `ModalOptions`)
       - optional catalog entrypoints (`PrebuiltCatalog`, `ProductivityCatalog`, `UiKitCatalog`) for namespace-scoped discovery
       - component-level state accessors instead of raw nested models (`TextInputComponent.Value` / `Placeholder` / `MaxLength`, `TextAreaComponent.Value`, `ListComponent<T>.SelectedItem` / `SetItems(...)`, `ComboboxComponent.FilterText` / `Placeholder`, `CommandPaletteComponent.QueryText` / `SetQueryText(...)` / `ClearQuery()`, `TableComponent.PageSize` / `SortColumn` / `SortDescending`, `NumberInputComponent.Text`, `ButtonComponent.WasPressed` / `PressCount` / `Hovered` / `IsPressed`)
       - action events for event-driven app code (`ButtonComponent.Pressed`, `TextInputComponent.Submitted` / `Cancelled`, `DialogComponent.Accepted` / `Dismissed`, `NumberInputComponent.Submitted`, `MenuBarComponent.ItemActivated`, `ContextMenuComponent.ItemExecuted`, `CommandPaletteComponent.ItemExecuted`)
@@ -215,7 +215,7 @@ Scenario app example:
 - project: `examples/Kanban`
 - run: `dotnet run --project examples/Kanban/Kanban.csproj`
 - flow: multi-board Kanban with lane movement, quick card creation, delete confirmation dialog, and activity feed.
-- note: this app still uses a more manual `IModel` composition style and should be treated as an advanced example, not the default starter template
+- note: this app still uses a more manual `IScreen` composition style and should be treated as an advanced example, not the default starter template
 
 ## Custom Components
 

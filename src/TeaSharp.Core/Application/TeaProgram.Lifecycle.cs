@@ -7,7 +7,7 @@ namespace TeaSharp.Core.Application;
 
 public sealed partial class TeaProgram
 {
-    private async Task<IModel> RunProgramAsync(CancellationToken cancellationToken)
+    private async Task<IScreen> RunProgramAsync(CancellationToken cancellationToken)
     {
         IDisposable? resizeSignalRegistration = null;
 
@@ -37,7 +37,7 @@ public sealed partial class TeaProgram
                 ? new NullRenderer()
                 : _options.Renderer ?? new AnsiDiffRenderer(_runtime.Capabilities, _options.AnsiRendererOptions);
             _runtime.Renderer.UpdateCapabilities(_runtime.Capabilities);
-            _runtime.CommandScheduler = new TeaProgramCommandScheduler(_options, Send);
+            _runtime.EffectScheduler = new TeaProgramEffectScheduler(_options, Send);
 
             await _runtime.Terminal.PrepareAsync(token).ConfigureAwait(false);
             await _runtime.Renderer.InitializeAsync(_runtime.Terminal.Output, token).ConfigureAwait(false);
@@ -53,18 +53,18 @@ public sealed partial class TeaProgram
                 (resizeLoop, resizeSignalRegistration) = TeaProgramResizeMonitor.Start(_runtime.Terminal, _options, size, Send, token);
             }
 
-            var commandLoop = Task.Run(() => _runtime.CommandScheduler!.RunLoopAsync(_commands.Reader, token), token);
+            var commandLoop = Task.Run(() => _runtime.EffectScheduler!.RunLoopAsync(_effects.Reader, token), token);
             var inputLoop = StartInputLoop(token);
             await _capabilityProbe.StartAsync(_runtime.Terminal, _options, _runtime.Capabilities, Send, token).ConfigureAwait(false);
 
-            if (Model.Init() is { } initCommand)
+            if (Screen.Init() is { } initEffect)
             {
-                await _commands.Writer.WriteAsync(initCommand, token).ConfigureAwait(false);
+                await _effects.Writer.WriteAsync(initEffect, token).ConfigureAwait(false);
             }
 
-            await RenderAsync(Model.View(), token).ConfigureAwait(false);
+            await RenderAsync(Screen.Render(), token).ConfigureAwait(false);
             await ProcessMessageLoopAsync(commandLoop, inputLoop, resizeLoop, token).ConfigureAwait(false);
-            return Model;
+            return Screen;
         }
         finally
         {
@@ -81,8 +81,8 @@ public sealed partial class TeaProgram
 
             _cts?.Dispose();
             _cts = null;
-            _runtime.CommandScheduler?.Dispose();
-            _runtime.CommandScheduler = null;
+            _runtime.EffectScheduler?.Dispose();
+            _runtime.EffectScheduler = null;
         }
     }
 

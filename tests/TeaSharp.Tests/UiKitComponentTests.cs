@@ -274,23 +274,23 @@ internal static class UiKitComponentTests
         var shownCanvas = new Canvas(30, 10);
         var modal = new ModalComponent(new ModalOptions(
             Title: "Help",
-            Lines: ["line one", "line two"],
+            BodyLines: ["line one", "line two"],
             Theme: new UiTheme(ModalBackdropFill: ':')));
 
         // Act
-        modal.Visible = false;
+        modal.IsVisible = false;
         modal.Render(hiddenCanvas, new Rect(0, 0, 30, 10));
         var hidden = hiddenCanvas.Render();
 
-        modal.Visible = true;
+        modal.IsVisible = true;
         modal.Render(shownCanvas, new Rect(0, 0, 30, 10));
         var shown = shownCanvas.Render();
 
         // Assert
         TestAssert.True(!hidden.Contains("line one", StringComparison.Ordinal), "Hidden modal should not draw modal content.");
-        TestAssert.True(shown.Contains(" Help ", StringComparison.Ordinal), "Visible modal should render title.");
-        TestAssert.True(shown.Contains("line one", StringComparison.Ordinal), "Visible modal should render body lines.");
-        TestAssert.True(shown.Contains(':'), "Visible modal should apply themed backdrop fill.");
+        TestAssert.True(shown.Contains(" Help ", StringComparison.Ordinal), "IsVisible modal should render title.");
+        TestAssert.True(shown.Contains("line one", StringComparison.Ordinal), "IsVisible modal should render body lines.");
+        TestAssert.True(shown.Contains(':'), "IsVisible modal should apply themed backdrop fill.");
         return Task.CompletedTask;
     }
 
@@ -302,9 +302,9 @@ internal static class UiKitComponentTests
         canvas.DrawBox(new Rect(0, 1, 40, 10), "underlay");
 
         var modal = new ModalComponent(new ModalOptions(
-            Visible: true,
+            IsVisible: true,
             Title: "Dialog",
-            Lines: ["confirm action"],
+            BodyLines: ["confirm action"],
             Theme: new UiTheme(ModalBackdropFill: ':')));
 
         // Act
@@ -326,9 +326,9 @@ internal static class UiKitComponentTests
         canvas.DrawBox(new Rect(0, 1, 40, 10), "underlay");
 
         var modal = new ModalComponent(new ModalOptions(
-            Visible: true,
+            IsVisible: true,
             Title: "Dialog",
-            Lines: ["confirm action"],
+            BodyLines: ["confirm action"],
             Theme: new UiTheme(ModalBackdropFill: ':')));
 
         // Act

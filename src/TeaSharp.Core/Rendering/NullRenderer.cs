@@ -20,9 +20,9 @@ public sealed class NullRenderer : IProgramRenderer
         _ = capabilities;
     }
 
-    public void Render(View view)
+    public void Render(ScreenOutput output)
     {
-        _ = view;
+        _ = output;
     }
 
     public ValueTask WriteRawAsync(string content, CancellationToken cancellationToken)

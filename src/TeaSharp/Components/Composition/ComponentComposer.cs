@@ -31,7 +31,7 @@ public sealed class ComponentComposer
     public void Add(ICanvasComponent component, Rect bounds)
     {
         _slots.Add(new ComponentSlot(component, bounds));
-        if (component is IFocusableComponent { Focused: true })
+        if (component is IFocusableComponent { IsFocused: true })
         {
             _focusedSlotIndex = _slots.Count - 1;
         }

@@ -32,9 +32,9 @@ internal static class InteractiveScreenModelTests
 
         var command = model.Update(new KeyPressMsg(KeyCode.Enter));
 
-        TestAssert.True(command is null, "Focused region activation should not require a command.");
+        TestAssert.True(command is null, "IsFocused region activation should not require a command.");
         TestAssert.Equal(1, model.BuildCount, "Interactive screen base should lazily build the screen before key routing.");
-        TestAssert.True(model.ButtonPresses == 1, "Focused region should receive the key through the base routing helper.");
+        TestAssert.True(model.ButtonPresses == 1, "IsFocused region should receive the key through the base routing helper.");
         TestAssert.True(model.CurrentFocusedRegionKey == ProbeScreenModel.ButtonRegionId, "Preferred focus key should be applied through the shared shell.");
         return Task.CompletedTask;
     }
@@ -55,7 +55,7 @@ internal static class InteractiveScreenModelTests
     {
         var model = new ProbeMasterDetailScreenModel();
 
-        _ = model.View();
+        _ = model.Render();
 
         TestAssert.Equal(new Rect(0, 0, 40, 1), model.HeaderBounds, "Interactive model helper should expose header bounds through the master-detail scaffold.");
         TestAssert.Equal(new Rect(0, 1, 14, 10), model.MasterBounds, "Interactive model helper should expose master bounds through the master-detail scaffold.");
@@ -68,7 +68,7 @@ internal static class InteractiveScreenModelTests
     {
         var model = new ProbeDashboardScreenModel();
 
-        _ = model.View();
+        _ = model.Render();
 
         TestAssert.Equal(new Rect(0, 0, 40, 1), model.HeaderBounds, "Interactive model helper should expose header bounds through the dashboard scaffold.");
         TestAssert.Equal(new Rect(0, 1, 12, 10), model.SidebarBounds, "Interactive model helper should expose sidebar bounds through the dashboard scaffold.");
@@ -81,7 +81,7 @@ internal static class InteractiveScreenModelTests
     {
         var model = new ProbeFormScreenModel();
 
-        _ = model.View();
+        _ = model.Render();
 
         TestAssert.Equal(new Rect(0, 0, 40, 1), model.HeaderBounds, "Interactive model helper should expose header bounds through the form scaffold.");
         TestAssert.Equal(new Rect(0, 1, 40, 8), model.BodyBounds, "Interactive model helper should expose body bounds through the form scaffold.");
@@ -95,7 +95,7 @@ internal static class InteractiveScreenModelTests
         var model = new ProbeDialogWorkflowModel();
 
         model.OpenDialog();
-        _ = model.View();
+        _ = model.Render();
 
         TestAssert.True(model.CurrentFocusedRegionKey == ProbeDialogWorkflowModel.DialogRegionId, "Dialog workflow helper should move focus to the dialog region after composition.");
 
@@ -134,20 +134,20 @@ internal static class InteractiveScreenModelTests
 
         public ScreenRegionKey? CurrentFocusedRegionKey => FocusedRegionKey;
 
-        public override Command? Init() => null;
+        public override Effect? Init() => null;
 
-        public override Command? Update(IMessage message)
+        public override Effect? Update(IMessage message)
         {
             return message is KeyPressMsg key
                 ? RouteKey(key)
                 : null;
         }
 
-        public override View View()
+        public override ScreenOutput Render()
         {
             var canvas = new Canvas(20, 4);
             RenderScreen(canvas);
-            return TeaSharp.Core.Abstractions.View.From(canvas.Render());
+            return TeaSharp.Core.Abstractions.ScreenOutput.From(canvas.Render());
         }
 
         protected override Rect GetBodyRect() => new(0, 0, 20, 4);
@@ -170,9 +170,9 @@ internal static class InteractiveScreenModelTests
                 InputScopeKind.FocusedRegion,
                 () => FocusedRegionKey is not null,
                 key => HandleTabNavigation(key, _focusChain)
-                    ? InputRouteResult.HandledWithoutCommand
+                    ? InputRouteResult.HandledWithoutEffect
                     : Screen.Update(key)
-                    ? InputRouteResult.HandledWithoutCommand
+                    ? InputRouteResult.HandledWithoutEffect
                     : InputRouteResult.NotHandled);
         }
 
@@ -206,15 +206,15 @@ internal static class InteractiveScreenModelTests
 
         public Rect FooterBounds { get; private set; }
 
-        public override Command? Init() => null;
+        public override Effect? Init() => null;
 
-        public override Command? Update(IMessage message) => null;
+        public override Effect? Update(IMessage message) => null;
 
-        public override View View()
+        public override ScreenOutput Render()
         {
             var canvas = new Canvas(40, 12);
             RenderScreen(canvas);
-            return TeaSharp.Core.Abstractions.View.From(canvas.Render());
+            return TeaSharp.Core.Abstractions.ScreenOutput.From(canvas.Render());
         }
 
         protected override Rect GetBodyRect() => new(0, 0, 40, 12);
@@ -247,15 +247,15 @@ internal static class InteractiveScreenModelTests
 
         public Rect FooterBounds { get; private set; }
 
-        public override Command? Init() => null;
+        public override Effect? Init() => null;
 
-        public override Command? Update(IMessage message) => null;
+        public override Effect? Update(IMessage message) => null;
 
-        public override View View()
+        public override ScreenOutput Render()
         {
             var canvas = new Canvas(40, 12);
             RenderScreen(canvas);
-            return TeaSharp.Core.Abstractions.View.From(canvas.Render());
+            return TeaSharp.Core.Abstractions.ScreenOutput.From(canvas.Render());
         }
 
         protected override Rect GetBodyRect() => new(0, 0, 40, 12);
@@ -288,15 +288,15 @@ internal static class InteractiveScreenModelTests
 
         public Rect FooterBounds { get; private set; }
 
-        public override Command? Init() => null;
+        public override Effect? Init() => null;
 
-        public override Command? Update(IMessage message) => null;
+        public override Effect? Update(IMessage message) => null;
 
-        public override View View()
+        public override ScreenOutput Render()
         {
             var canvas = new Canvas(40, 12);
             RenderScreen(canvas);
-            return TeaSharp.Core.Abstractions.View.From(canvas.Render());
+            return TeaSharp.Core.Abstractions.ScreenOutput.From(canvas.Render());
         }
 
         protected override Rect GetBodyRect() => new(0, 0, 40, 12);
@@ -334,20 +334,20 @@ internal static class InteractiveScreenModelTests
 
         public ScreenRegionKey? CurrentFocusedRegionKey => FocusedRegionKey;
 
-        public override Command? Init() => null;
+        public override Effect? Init() => null;
 
-        public override Command? Update(IMessage message)
+        public override Effect? Update(IMessage message)
         {
             return message is KeyPressMsg key
                 ? RouteKey(key)
                 : null;
         }
 
-        public override View View()
+        public override ScreenOutput Render()
         {
             var canvas = new Canvas(30, 8);
             RenderScreen(canvas);
-            return TeaSharp.Core.Abstractions.View.From(canvas.Render());
+            return TeaSharp.Core.Abstractions.ScreenOutput.From(canvas.Render());
         }
 
         protected override Rect GetBodyRect() => new(0, 0, 30, 8);
@@ -367,20 +367,20 @@ internal static class InteractiveScreenModelTests
 
         public void DismissDialog()
         {
-            _dialog.Focused = true;
+            _dialog.IsFocused = true;
             _dialog.Update(new KeyPressMsg(KeyCode.Escape));
         }
     }
 
     private sealed class ProbeButton : IStatefulComponent, IFocusableComponent
     {
-        public bool Focused { get; set; }
+        public bool IsFocused { get; set; }
 
         public int PressCount { get; private set; }
 
         public bool Update(IMessage message)
         {
-            if (!Focused || message is not KeyPressMsg key || !key.Is(KeyCode.Enter))
+            if (!IsFocused || message is not KeyPressMsg key || !key.Is(KeyCode.Enter))
             {
                 return false;
             }
@@ -391,7 +391,7 @@ internal static class InteractiveScreenModelTests
 
         public void Render(Canvas canvas, Rect rect)
         {
-            canvas.WriteText(rect.X, rect.Y, Focused ? "focused" : "idle", rect.Width);
+            canvas.WriteText(rect.X, rect.Y, IsFocused ? "focused" : "idle", rect.Width);
         }
     }
 }

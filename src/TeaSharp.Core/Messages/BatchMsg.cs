@@ -3,5 +3,4 @@ using TeaSharp.Core.Terminal;
 
 namespace TeaSharp.Core.Messages;
 
-public sealed record BatchMsg(IReadOnlyList<Command> Commands) : IMessage;
-
+public sealed record BatchMsg(IReadOnlyList<Effect> Effects) : IMessage;

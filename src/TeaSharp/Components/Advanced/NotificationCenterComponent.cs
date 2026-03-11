@@ -19,11 +19,11 @@ public sealed partial class NotificationCenterComponent : IStatefulComponent, IM
 
     public string Title { get; set; } = "Notifications";
 
-    public bool Focused { get; set; }
+    public bool IsFocused { get; set; }
 
-    public bool Disabled { get; set; }
+    public bool IsDisabled { get; set; }
 
-    public bool ReadOnly { get; set; }
+    public bool IsReadOnly { get; set; }
 
     public BorderStyle Border { get; set; } = BorderStyle.SingleLine;
 
@@ -87,7 +87,7 @@ public sealed partial class NotificationCenterComponent : IStatefulComponent, IM
 
     public bool Update(IMessage message)
     {
-        if (!Focused || Disabled || ReadOnly || message is not KeyPressMsg key)
+        if (!IsFocused || IsDisabled || IsReadOnly || message is not KeyPressMsg key)
         {
             return false;
         }
@@ -146,7 +146,7 @@ public sealed partial class NotificationCenterComponent : IStatefulComponent, IM
 
     public bool UpdateMouse(MouseMsg message, Rect bounds)
     {
-        if (Disabled || ReadOnly)
+        if (IsDisabled || IsReadOnly)
         {
             return false;
         }

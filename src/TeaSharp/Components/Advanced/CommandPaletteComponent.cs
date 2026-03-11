@@ -27,7 +27,7 @@ public sealed class CommandPaletteComponent : IStatefulComponent, IMouseStateful
 
     public string Title { get; set; } = "Command Palette";
 
-    public bool Focused { get; set; }
+    public bool IsFocused { get; set; }
 
     public bool IsOpen { get; private set; }
 
@@ -108,7 +108,7 @@ public sealed class CommandPaletteComponent : IStatefulComponent, IMouseStateful
 
     public bool Update(IMessage message)
     {
-        if (!Focused)
+        if (!IsFocused)
         {
             return false;
         }

@@ -55,9 +55,9 @@ internal static class RendererBehaviorTests
         await renderer.InitializeAsync(output, CancellationToken.None);
 
         // Act
-        renderer.Render(View.From("mouse") with
+        renderer.Render(ScreenOutput.From("mouse") with
         {
-            Terminal = new ViewTerminal
+            Terminal = new TerminalOutput
             {
                 MouseMode = MouseMode.CellMotion,
             },
@@ -80,9 +80,9 @@ internal static class RendererBehaviorTests
         await renderer.InitializeAsync(output, CancellationToken.None);
 
         // Act
-        renderer.Render(View.From("mouse") with
+        renderer.Render(ScreenOutput.From("mouse") with
         {
-            Terminal = new ViewTerminal
+            Terminal = new TerminalOutput
             {
                 MouseMode = MouseMode.AllMotion,
             },
@@ -104,9 +104,9 @@ internal static class RendererBehaviorTests
         await using var output = new MemoryStream();
         await renderer.InitializeAsync(output, CancellationToken.None);
 
-        renderer.Render(View.From("mouse") with
+        renderer.Render(ScreenOutput.From("mouse") with
         {
-            Terminal = new ViewTerminal
+            Terminal = new TerminalOutput
             {
                 MouseMode = MouseMode.AllMotion,
             },
@@ -138,9 +138,9 @@ internal static class RendererBehaviorTests
         await renderer.InitializeAsync(output, CancellationToken.None);
 
         // Act
-        renderer.Render(View.From("probe") with
+        renderer.Render(ScreenOutput.From("probe") with
         {
-            Terminal = new ViewTerminal
+            Terminal = new TerminalOutput
             {
                 EnableBracketedPaste = true,
                 EnableFocusReporting = true,
@@ -171,9 +171,9 @@ internal static class RendererBehaviorTests
         await renderer.InitializeAsync(output, CancellationToken.None);
 
         // Act
-        renderer.Render(View.From("probe") with
+        renderer.Render(ScreenOutput.From("probe") with
         {
-            Terminal = new ViewTerminal
+            Terminal = new TerminalOutput
             {
                 EnableBracketedPaste = true,
                 EnableFocusReporting = true,
@@ -199,17 +199,17 @@ internal static class RendererBehaviorTests
         await renderer.InitializeAsync(output, CancellationToken.None);
 
         // Act
-        renderer.Render(View.From("first") with
+        renderer.Render(ScreenOutput.From("first") with
         {
-            Terminal = new ViewTerminal
+            Terminal = new TerminalOutput
             {
                 EnableFocusReporting = true,
             },
         });
         await renderer.FlushAsync(CancellationToken.None);
-        renderer.Render(View.From("second") with
+        renderer.Render(ScreenOutput.From("second") with
         {
-            Terminal = new ViewTerminal
+            Terminal = new TerminalOutput
             {
                 EnableFocusReporting = true,
             },
@@ -233,9 +233,9 @@ internal static class RendererBehaviorTests
         await renderer.InitializeAsync(output, CancellationToken.None);
 
         // Act
-        renderer.Render(View.From("probe") with
+        renderer.Render(ScreenOutput.From("probe") with
         {
-            Terminal = new ViewTerminal
+            Terminal = new TerminalOutput
             {
                 EnableBracketedPaste = true,
                 EnableFocusReporting = true,
@@ -266,17 +266,17 @@ internal static class RendererBehaviorTests
         await renderer.InitializeAsync(output, CancellationToken.None);
 
         // Act
-        renderer.Render(View.From("sync-a") with
+        renderer.Render(ScreenOutput.From("sync-a") with
         {
-            Terminal = new ViewTerminal
+            Terminal = new TerminalOutput
             {
                 EnableSynchronizedUpdates = true,
             },
         });
         await renderer.FlushAsync(CancellationToken.None);
-        renderer.Render(View.From("sync-b") with
+        renderer.Render(ScreenOutput.From("sync-b") with
         {
-            Terminal = new ViewTerminal
+            Terminal = new TerminalOutput
             {
                 EnableSynchronizedUpdates = true,
             },
@@ -297,9 +297,9 @@ internal static class RendererBehaviorTests
         await renderer.InitializeAsync(output, CancellationToken.None);
 
         // Act
-        renderer.Render(View.From("probe") with
+        renderer.Render(ScreenOutput.From("probe") with
         {
-            Terminal = new ViewTerminal
+            Terminal = new TerminalOutput
             {
                 EnableBracketedPaste = true,
                 EnableFocusReporting = true,
@@ -326,9 +326,9 @@ internal static class RendererBehaviorTests
         await renderer.InitializeAsync(output, CancellationToken.None);
 
         // Act
-        renderer.Render(View.From("sync") with
+        renderer.Render(ScreenOutput.From("sync") with
         {
-            Terminal = new ViewTerminal
+            Terminal = new TerminalOutput
             {
                 EnableSynchronizedUpdates = true,
             },
@@ -350,9 +350,9 @@ internal static class RendererBehaviorTests
         await renderer.InitializeAsync(output, CancellationToken.None);
 
         // Act
-        renderer.Render(View.From("nosync") with
+        renderer.Render(ScreenOutput.From("nosync") with
         {
-            Terminal = new ViewTerminal
+            Terminal = new TerminalOutput
             {
                 EnableSynchronizedUpdates = false,
             },
@@ -373,9 +373,9 @@ internal static class RendererBehaviorTests
         await renderer.InitializeAsync(output, CancellationToken.None);
 
         // Act
-        renderer.Render(View.From("cursor") with
+        renderer.Render(ScreenOutput.From("cursor") with
         {
-            Frame = ViewFrame.From("cursor") with
+            Frame = ScreenFrame.From("cursor") with
             {
                 CursorX = 2,
                 CursorY = 1,
@@ -399,9 +399,9 @@ internal static class RendererBehaviorTests
         await renderer.InitializeAsync(output, CancellationToken.None);
 
         // Act
-        var view = View.From("cursor") with
+        var view = ScreenOutput.From("cursor") with
         {
-            Frame = ViewFrame.From("cursor") with
+            Frame = ScreenFrame.From("cursor") with
             {
                 CursorX = 0,
                 CursorY = 0,
@@ -424,9 +424,9 @@ internal static class RendererBehaviorTests
         await using var renderer = new AnsiDiffRenderer();
         await using var output = new MemoryStream();
         await renderer.InitializeAsync(output, CancellationToken.None);
-        renderer.Render(View.From("cursor") with
+        renderer.Render(ScreenOutput.From("cursor") with
         {
-            Frame = ViewFrame.From("cursor") with
+            Frame = ScreenFrame.From("cursor") with
             {
                 CursorX = 0,
                 CursorY = 0,
@@ -452,9 +452,9 @@ internal static class RendererBehaviorTests
         await renderer.InitializeAsync(output, CancellationToken.None);
 
         // Act
-        renderer.Render(View.From("colors") with
+        renderer.Render(ScreenOutput.From("colors") with
         {
-            Terminal = new ViewTerminal
+            Terminal = new TerminalOutput
             {
                 ForegroundColor = "#112233",
                 BackgroundColor = "rgb:44/55/66",
@@ -482,17 +482,17 @@ internal static class RendererBehaviorTests
         await renderer.InitializeAsync(output, CancellationToken.None);
 
         // Act
-        renderer.Render(View.From("progress") with
+        renderer.Render(ScreenOutput.From("progress") with
         {
-            Terminal = new ViewTerminal
+            Terminal = new TerminalOutput
             {
                 Progress = new TerminalProgress(TerminalProgressState.Warning, 61),
             },
         });
         await renderer.FlushAsync(CancellationToken.None);
-        renderer.Render(View.From("progress") with
+        renderer.Render(ScreenOutput.From("progress") with
         {
-            Terminal = new ViewTerminal
+            Terminal = new TerminalOutput
             {
                 Progress = new TerminalProgress(TerminalProgressState.Indeterminate, 0),
             },
@@ -515,9 +515,9 @@ internal static class RendererBehaviorTests
         await renderer.InitializeAsync(output, CancellationToken.None);
 
         // Act
-        renderer.Render(View.From("keys") with
+        renderer.Render(ScreenOutput.From("keys") with
         {
-            Terminal = new ViewTerminal
+            Terminal = new TerminalOutput
             {
                 KeyboardEnhancements = new KeyboardEnhancementOptions { ReportEventTypes = true },
             },
@@ -543,9 +543,9 @@ internal static class RendererBehaviorTests
         await renderer.InitializeAsync(output, CancellationToken.None);
 
         // Act
-        renderer.Render(View.From("keys") with
+        renderer.Render(ScreenOutput.From("keys") with
         {
-            Terminal = new ViewTerminal
+            Terminal = new TerminalOutput
             {
                 KeyboardEnhancements = new KeyboardEnhancementOptions { ReportEventTypes = true },
             },
@@ -566,12 +566,12 @@ internal static class RendererBehaviorTests
         await using var renderer = new AnsiDiffRenderer();
         await using var output = new MemoryStream();
         await renderer.InitializeAsync(output, CancellationToken.None);
-        renderer.Render(View.From("abc"));
+        renderer.Render(ScreenOutput.From("abc"));
         await renderer.FlushAsync(CancellationToken.None);
         var marker = output.Length;
 
         // Act
-        renderer.Render(View.From("axc"));
+        renderer.Render(ScreenOutput.From("axc"));
         await renderer.FlushAsync(CancellationToken.None);
         var patch = ReadUtf8(output, marker);
 
@@ -587,12 +587,12 @@ internal static class RendererBehaviorTests
         await using var renderer = new AnsiDiffRenderer();
         await using var output = new MemoryStream();
         await renderer.InitializeAsync(output, CancellationToken.None);
-        renderer.Render(View.From("hello"));
+        renderer.Render(ScreenOutput.From("hello"));
         await renderer.FlushAsync(CancellationToken.None);
         var marker = output.Length;
 
         // Act
-        renderer.Render(View.From("he"));
+        renderer.Render(ScreenOutput.From("he"));
         await renderer.FlushAsync(CancellationToken.None);
         var patch = ReadUtf8(output, marker);
 
@@ -610,7 +610,7 @@ internal static class RendererBehaviorTests
         renderer.Resize(width: 3, height: 5);
 
         // Act
-        renderer.Render(View.From("abcdef"));
+        renderer.Render(ScreenOutput.From("abcdef"));
         await renderer.FlushAsync(CancellationToken.None);
         var rendered = ReadUtf8(output);
 
@@ -628,7 +628,7 @@ internal static class RendererBehaviorTests
         renderer.Resize(width: 4, height: 2);
 
         // Act
-        renderer.Render(View.From("row1\nrow2\nrow3"));
+        renderer.Render(ScreenOutput.From("row1\nrow2\nrow3"));
         await renderer.FlushAsync(CancellationToken.None);
         var rendered = ReadUtf8(output);
 
@@ -647,7 +647,7 @@ internal static class RendererBehaviorTests
         renderer.Resize(width: 4, height: 5);
 
         // Act
-        renderer.Render(View.From("abcdefgh"));
+        renderer.Render(ScreenOutput.From("abcdefgh"));
         await renderer.FlushAsync(CancellationToken.None);
         var rendered = ReadUtf8(output);
 
@@ -667,7 +667,7 @@ internal static class RendererBehaviorTests
         renderer.Resize(width: 3, height: 5);
 
         // Act
-        renderer.Render(View.From("ab好"));
+        renderer.Render(ScreenOutput.From("ab好"));
         await renderer.FlushAsync(CancellationToken.None);
         var rendered = ReadUtf8(output);
 
@@ -683,12 +683,12 @@ internal static class RendererBehaviorTests
         await using var renderer = new AnsiDiffRenderer();
         await using var output = new MemoryStream();
         await renderer.InitializeAsync(output, CancellationToken.None);
-        renderer.Render(View.From("Cafe\u0301"));
+        renderer.Render(ScreenOutput.From("Cafe\u0301"));
         await renderer.FlushAsync(CancellationToken.None);
         var marker = output.Length;
 
         // Act
-        renderer.Render(View.From("Cafe\u0300"));
+        renderer.Render(ScreenOutput.From("Cafe\u0300"));
         await renderer.FlushAsync(CancellationToken.None);
         var patch = ReadUtf8(output, marker);
 
@@ -704,12 +704,12 @@ internal static class RendererBehaviorTests
         await using var output = new MemoryStream();
         await renderer.InitializeAsync(output, CancellationToken.None);
         renderer.Resize(width: 3, height: 2);
-        renderer.Render(View.From("好x"));
+        renderer.Render(ScreenOutput.From("好x"));
         await renderer.FlushAsync(CancellationToken.None);
         var marker = output.Length;
 
         // Act
-        renderer.Render(View.From("ab"));
+        renderer.Render(ScreenOutput.From("ab"));
         await renderer.FlushAsync(CancellationToken.None);
         var patch = ReadUtf8(output, marker);
 

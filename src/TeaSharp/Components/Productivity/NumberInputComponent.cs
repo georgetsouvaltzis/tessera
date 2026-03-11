@@ -27,9 +27,9 @@ public sealed class NumberInputComponent : IStatefulComponent, IFocusableCompone
     public NumberInputComponent(NumberInputOptions options)
     {
         Title = options.Title;
-        Focused = options.Focused;
-        Disabled = options.Disabled;
-        ReadOnly = options.ReadOnly;
+        IsFocused = options.IsFocused;
+        IsDisabled = options.IsDisabled;
+        IsReadOnly = options.IsReadOnly;
         Border = options.Border;
         Padding = options.Padding;
         Min = options.Min;
@@ -48,11 +48,11 @@ public sealed class NumberInputComponent : IStatefulComponent, IFocusableCompone
 
     public string Title { get; set; } = "Number Input";
 
-    public bool Focused { get; set; }
+    public bool IsFocused { get; set; }
 
-    public bool Disabled { get; set; }
+    public bool IsDisabled { get; set; }
 
-    public bool ReadOnly { get; set; }
+    public bool IsReadOnly { get; set; }
 
     public BorderStyle Border { get; set; } = BorderStyle.SingleLine;
 
@@ -110,7 +110,7 @@ public sealed class NumberInputComponent : IStatefulComponent, IFocusableCompone
 
     public bool Update(IMessage message)
     {
-        if (!Focused || Disabled || ReadOnly)
+        if (!IsFocused || IsDisabled || IsReadOnly)
         {
             return false;
         }
@@ -180,7 +180,7 @@ public sealed class NumberInputComponent : IStatefulComponent, IFocusableCompone
 
     public void Render(Canvas canvas, Rect rect)
     {
-        NumberInputRenderer.Render(canvas, rect, _input, StatePalette, Title, Focused, Disabled, ReadOnly, Border, Padding, Value, Min, Max, Precision);
+        NumberInputRenderer.Render(canvas, rect, _input, StatePalette, Title, IsFocused, IsDisabled, IsReadOnly, Border, Padding, Value, Min, Max, Precision);
     }
 
     private bool TryParseInput(out double value)

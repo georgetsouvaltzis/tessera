@@ -54,7 +54,7 @@ internal static class AdvancedPrebuiltWidgetTests
     {
         var toggle = new ToggleSwitchComponent
         {
-            Focused = true,
+            IsFocused = true,
         };
 
         toggle.Update(new KeyPressMsg(KeyCode.Enter));
@@ -82,7 +82,7 @@ internal static class AdvancedPrebuiltWidgetTests
     {
         var slider = new SliderComponent
         {
-            Focused = true,
+            IsFocused = true,
             Min = 0,
             Max = 10,
             Step = 2,
@@ -120,7 +120,7 @@ internal static class AdvancedPrebuiltWidgetTests
     {
         var spinner = new SpinnerComponent
         {
-            Focused = true,
+            IsFocused = true,
         };
 
         var before = spinner.FrameIndex;
@@ -150,7 +150,7 @@ internal static class AdvancedPrebuiltWidgetTests
     {
         var palette = new CommandPaletteComponent
         {
-            Focused = true,
+            IsFocused = true,
         };
         palette.SetItems(
         [
@@ -172,7 +172,7 @@ internal static class AdvancedPrebuiltWidgetTests
     {
         var palette = new CommandPaletteComponent
         {
-            Focused = true,
+            IsFocused = true,
         };
         palette.SetItems(
         [
@@ -193,7 +193,7 @@ internal static class AdvancedPrebuiltWidgetTests
     {
         var palette = new CommandPaletteComponent
         {
-            Focused = true,
+            IsFocused = true,
         };
         palette.SetItems(
         [
@@ -214,7 +214,7 @@ internal static class AdvancedPrebuiltWidgetTests
     {
         var palette = new CommandPaletteComponent
         {
-            Focused = true,
+            IsFocused = true,
         };
         string? executed = null;
         palette.ItemExecuted += (_, args) => executed = args.ItemId;
@@ -254,7 +254,7 @@ internal static class AdvancedPrebuiltWidgetTests
     {
         var tree = new TreeViewComponent
         {
-            Focused = true,
+            IsFocused = true,
             Border = BorderStyle.None,
         };
         tree.SetRoots(
@@ -303,7 +303,7 @@ internal static class AdvancedPrebuiltWidgetTests
     {
         var center = new NotificationCenterComponent
         {
-            Focused = true,
+            IsFocused = true,
         };
         center.Push("hello", NotificationSeverity.Info, id: "a");
         center.Push("oops", NotificationSeverity.Error, id: "b");
@@ -320,7 +320,7 @@ internal static class AdvancedPrebuiltWidgetTests
     {
         var center = new NotificationCenterComponent
         {
-            Focused = true,
+            IsFocused = true,
             Border = BorderStyle.None,
         };
         center.Push("first", NotificationSeverity.Info, id: "a");

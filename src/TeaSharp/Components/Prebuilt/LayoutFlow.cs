@@ -4,10 +4,15 @@ using TeaSharp.Components.Interaction;
 using TeaSharp.Components.Prebuilt.Internal;
 using TeaSharp.Components.Primitives;
 using TeaSharp.Components.Styling;
+using TeaSharp.Core.Abstractions;
+using TeaSharp.Core.Messages;
+using TeaSharp.Widgets;
+
 namespace TeaSharp.Components.Prebuilt;
 
-public sealed record LabelOptions(
-    string Text = "",
-    string? Title = null,
-    BorderStyle Border = BorderStyle.SingleLine,
-    Thickness Padding = default);
+public enum LayoutFlow
+{
+    Rows = 0,
+    Columns = 1,
+    Grid = 2,
+}

@@ -14,7 +14,7 @@ namespace TeaSharp.Components.Prebuilt;
 public sealed record LogViewerOptions(
     string Title = "Logs",
     IEnumerable<string>? InitialEntries = null,
-    bool Focused = false,
+    bool IsFocused = false,
     BorderStyle Border = BorderStyle.SingleLine,
     Thickness Padding = default,
     bool AutoScroll = true,

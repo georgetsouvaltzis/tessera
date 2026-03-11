@@ -4,7 +4,7 @@ TeaSharp provides a prebuilt widget layer in `TeaSharp.Components.Prebuilt` aime
 
 ## Available Widgets
 
-1. `LabelComponent`
+1. `TextBlockComponent`
 2. `ButtonComponent`
 3. `TextInputComponent`
 4. `TextAreaComponent`
@@ -77,7 +77,7 @@ TeaSharp provides a prebuilt widget layer in `TeaSharp.Components.Prebuilt` aime
   - Friendly setup path: `MarkdownViewerOptions`.
 - Most border-capable widgets expose `Border` (`BorderStyle`) and `Padding` (`Thickness`) for explicit frame and inner-spacing control.
 - Common widgets also expose options-based constructors for one-shot setup:
-  - `LabelOptions`
+  - `TextBlockOptions`
   - `ButtonOptions`
   - `TextInputOptions`
   - `TextAreaOptions`
@@ -116,7 +116,7 @@ TeaSharp provides a prebuilt widget layer in `TeaSharp.Components.Prebuilt` aime
 var list = new ListComponent<string>(["todo", "done"], x => x)
 {
     Border = BorderStyle.None,
-    Focused = true,
+    IsFocused = true,
     ItemStateResolver = item => item == "done"
         ? [WidgetVisualState.Completed]
         : [],
@@ -148,8 +148,8 @@ var progress = new ProgressBarComponent(new ProgressBarOptions(
 
 void SetFocus(int active)
 {
-    input.Focused = active == 0;
-    progress.Focused = active == 1;
+    input.IsFocused = active == 0;
+    progress.IsFocused = active == 1;
 }
 
 SetFocus(0);

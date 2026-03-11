@@ -33,7 +33,7 @@ public sealed class SortableTableComponent : IStatefulComponent, IMouseStatefulC
 
     public string Title { get; set; } = "Table";
 
-    public bool Focused { get; set; }
+    public bool IsFocused { get; set; }
 
     public BorderStyle Border { get; set; } = BorderStyle.SingleLine;
 

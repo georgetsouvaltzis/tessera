@@ -12,9 +12,9 @@ namespace TeaSharp.Components.Productivity;
 /// </summary>
 /// <param name="Items">Initial context-menu items.</param>
 /// <param name="Title">Frame title shown when the menu renders with a border.</param>
-/// <param name="Focused">Whether the menu starts focused.</param>
-/// <param name="Disabled">Whether the menu starts disabled.</param>
-/// <param name="ReadOnly">Whether the menu can navigate without executing actions.</param>
+/// <param name="IsFocused">Whether the menu starts focused.</param>
+/// <param name="IsDisabled">Whether the menu starts disabled.</param>
+/// <param name="IsReadOnly">Whether the menu can navigate without executing actions.</param>
 /// <param name="Border">Frame border style. Use <see cref="BorderStyle.None"/> for no border.</param>
 /// <param name="Padding">Inner spacing applied after the frame is resolved.</param>
 /// <param name="NextItemKey">Optional key binding used to move to the next item.</param>
@@ -25,9 +25,9 @@ namespace TeaSharp.Components.Productivity;
 public sealed record ContextMenuOptions(
     IEnumerable<ContextMenuItem>? Items = null,
     string Title = "Context",
-    bool Focused = false,
-    bool Disabled = false,
-    bool ReadOnly = false,
+    bool IsFocused = false,
+    bool IsDisabled = false,
+    bool IsReadOnly = false,
     BorderStyle Border = BorderStyle.Rounded,
     Thickness Padding = default,
     KeyBinding? NextItemKey = null,

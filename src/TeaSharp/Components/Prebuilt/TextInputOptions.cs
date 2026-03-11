@@ -16,7 +16,7 @@ public sealed record TextInputOptions(
     string Placeholder = "",
     string InitialValue = "",
     int MaxLength = 512,
-    bool Focused = false,
+    bool IsFocused = false,
     BorderStyle Border = BorderStyle.SingleLine,
     Thickness Padding = default,
     bool ClearOnSubmit = false,

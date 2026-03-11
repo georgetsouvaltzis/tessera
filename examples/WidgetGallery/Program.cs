@@ -6,14 +6,14 @@ using TeaSharp;
 using TeaSharp.Core.Abstractions;
 using TeaSharp.Core.Application;
 using TeaSharp.Core.Messages;
-using ModelView = TeaSharp.Core.Abstractions.View;
+using ModelView = TeaSharp.Core.Abstractions.ScreenOutput;
 
 var model = new WidgetGalleryModel();
 var options = new TeaProgramOptions
 {
     UseConsoleKeyEvents = false,
 };
-var program = Tea.NewProgram(model, options);
+var program = Tea.CreateProgram(model, options);
 try
 {
     await program.RunAsync();
@@ -43,7 +43,7 @@ internal sealed class WidgetGalleryModel : InteractiveScreenModel
     private static readonly ScreenRegionKey OverlayPanelRegionId = new("gallery.overlay.panel");
 
     private readonly TabsComponent _tabs = new(new TabsOptions(["Basics", "Inputs", "Data", "Overlay", "Layout"]));
-    private readonly LabelComponent _label = new(new LabelOptions(
+    private readonly TextBlockComponent _label = new(new TextBlockOptions(
         Title: "Label",
         Text: "Widget Gallery\n\nRead-only text.\nTitles, captions, help, and status lines."));
     private readonly ButtonComponent _button = new(new ButtonOptions(
@@ -79,7 +79,7 @@ internal sealed class WidgetGalleryModel : InteractiveScreenModel
     };
     private readonly DialogComponent _dialog = new(new DialogOptions(
         Title: "Confirm",
-        Lines:
+        BodyLines:
         [
             "Publish widget package?",
             "Enter/Space = accept",
@@ -87,14 +87,14 @@ internal sealed class WidgetGalleryModel : InteractiveScreenModel
         ]));
     private readonly DialogWorkflow _dialogWorkflow;
     private readonly LayoutContainerComponent _layoutDemo = new(new LayoutContainerOptions(
-        Mode: LayoutContainerMode.Grid,
+        Mode: LayoutFlow.Grid,
         GridRows: 2,
         GridColumns: 2));
 
-    private readonly LabelComponent _layoutCellA = new(new LabelOptions(Title: "Stack A", Text: "Vertical\nHorizontal\nGrid"));
-    private readonly LabelComponent _layoutCellB = new(new LabelOptions(Title: "Stack B", Text: "Nested\nregions"));
-    private readonly LabelComponent _layoutCellC = new(new LabelOptions(Title: "Stack C", Text: "Responsive\nby rect math"));
-    private readonly LabelComponent _layoutCellD = new(new LabelOptions(Title: "Stack D", Text: "Children\ncomposed"));
+    private readonly TextBlockComponent _layoutCellA = new(new TextBlockOptions(Title: "Stack A", Text: "Vertical\nHorizontal\nGrid"));
+    private readonly TextBlockComponent _layoutCellB = new(new TextBlockOptions(Title: "Stack B", Text: "Nested\nregions"));
+    private readonly TextBlockComponent _layoutCellC = new(new TextBlockOptions(Title: "Stack C", Text: "Responsive\nby rect math"));
+    private readonly TextBlockComponent _layoutCellD = new(new TextBlockOptions(Title: "Stack D", Text: "Children\ncomposed"));
     private int _width = 120;
     private int _height = 36;
     private int _tick;
@@ -140,9 +140,9 @@ internal sealed class WidgetGalleryModel : InteractiveScreenModel
         _logs.Append("q quits");
     }
 
-    public override Command? Init() => NextTick();
+    public override Effect? Init() => NextTick();
 
-    public override Command? Update(IMessage message)
+    public override Effect? Update(IMessage message)
     {
         if (message is GalleryTickMsg tick)
         {
@@ -184,7 +184,7 @@ internal sealed class WidgetGalleryModel : InteractiveScreenModel
         return null;
     }
 
-    public override ModelView View()
+    public override ModelView Render()
     {
         if (_width < 60 || _height < 18)
         {
@@ -203,7 +203,7 @@ internal sealed class WidgetGalleryModel : InteractiveScreenModel
 
         return ModelView.From(canvas.Render()) with
         {
-            Terminal = new ViewTerminal
+            Terminal = new TerminalOutput
             {
                 AltScreen = true,
                 EnableBracketedPaste = true,
@@ -226,7 +226,7 @@ internal sealed class WidgetGalleryModel : InteractiveScreenModel
     {
         get
         {
-            if (_dialog.Visible)
+            if (_dialog.IsVisible)
             {
                 return DialogRegionId;
             }
@@ -283,7 +283,7 @@ internal sealed class WidgetGalleryModel : InteractiveScreenModel
             bottom,
             (canvas, bounds) =>
             {
-                var info = new LabelComponent
+                var info = new TextBlockComponent
                 {
                     Title = "Status",
                     Text =
@@ -319,7 +319,7 @@ internal sealed class WidgetGalleryModel : InteractiveScreenModel
             rect,
             (canvas, bounds) =>
             {
-                var panel = new LabelComponent
+                var panel = new TextBlockComponent
                 {
                     Title = "Modal / Dialog",
                     Text =
@@ -335,11 +335,11 @@ internal sealed class WidgetGalleryModel : InteractiveScreenModel
     {
         InputRouter
             .AddScope("gallery.system", InputScopeKind.System, static () => true, HandleSystemKey)
-            .AddScope("gallery.modal", InputScopeKind.Modal, () => _dialog.Visible, HandleDialogKey, InputScopeBehavior.CaptureWhileActive)
+            .AddScope("gallery.modal", InputScopeKind.Modal, () => _dialog.IsVisible, HandleDialogKey, InputScopeBehavior.CaptureWhileActive)
             .AddScope(
                 "gallery.focused",
                 InputScopeKind.FocusedRegion,
-                () => !_dialog.Visible && FocusedRegionKey is not null,
+                () => !_dialog.IsVisible && FocusedRegionKey is not null,
                 HandleFocusedRegionKey,
                 blocksGlobalShortcuts: ShouldBlockGlobalShortcuts)
             .AddScope("gallery.global", InputScopeKind.Global, static () => true, HandleGlobalKey);
@@ -350,7 +350,7 @@ internal sealed class WidgetGalleryModel : InteractiveScreenModel
         if (key.Modifiers.HasFlag(KeyModifiers.Ctrl)
             && (key.IsCharacter('c') || key.IsCharacter('\u0003', ignoreCase: false)))
         {
-            return InputRouteResult.FromCommand(Tea.Cmd.Quit);
+            return InputRouteResult.FromEffect(Tea.Effects.Quit);
         }
 
         return InputRouteResult.NotHandled;
@@ -370,19 +370,19 @@ internal sealed class WidgetGalleryModel : InteractiveScreenModel
     {
         if (key.IsCharacter('q', KeyModifiers.None))
         {
-            return InputRouteResult.FromCommand(Tea.Cmd.Quit);
+            return InputRouteResult.FromEffect(Tea.Effects.Quit);
         }
 
         if (key.Is(KeyCode.Tab, KeyModifiers.None))
         {
             FocusNext();
             _lastEvent = $"focus:{FocusLabel()}";
-            return InputRouteResult.HandledWithoutCommand;
+            return InputRouteResult.HandledWithoutEffect;
         }
 
         if (key.IsCharacter('d', KeyModifiers.None) && _tabs.SelectedIndex == 3)
         {
-            if (_dialog.Visible)
+            if (_dialog.IsVisible)
             {
                 _dialogWorkflow.Hide();
             }
@@ -391,9 +391,9 @@ internal sealed class WidgetGalleryModel : InteractiveScreenModel
                 _dialogWorkflow.Show();
             }
 
-            _lastEvent = _dialog.Visible ? "dialog:open" : "dialog:close";
+            _lastEvent = _dialog.IsVisible ? "dialog:open" : "dialog:close";
             _logs.Append(_lastEvent);
-            return InputRouteResult.HandledWithoutCommand;
+            return InputRouteResult.HandledWithoutEffect;
         }
 
         return InputRouteResult.NotHandled;
@@ -418,13 +418,13 @@ internal sealed class WidgetGalleryModel : InteractiveScreenModel
         if (TryConsumePendingActionEvent(out var actionEvent))
         {
             _lastEvent = actionEvent;
-            return InputRouteResult.HandledWithoutCommand;
+            return InputRouteResult.HandledWithoutEffect;
         }
 
         _lastEvent = FocusedRegionKey == TabsRegionId
             ? $"tab:{_tabs.SelectedIndex + 1}"
             : key.Keystroke();
-        return InputRouteResult.HandledWithoutCommand;
+        return InputRouteResult.HandledWithoutEffect;
     }
 
     private static KeyPressMsg NormalizeInputKey(KeyPressMsg key)
@@ -515,7 +515,7 @@ internal sealed class WidgetGalleryModel : InteractiveScreenModel
         return _textArea.Update(normalized);
     }
 
-    private static Command NextTick() => Tea.Cmd.Every(TimeSpan.FromMilliseconds(250), at => new GalleryTickMsg(at));
+    private static Effect NextTick() => Tea.Effects.Every(TimeSpan.FromMilliseconds(250), at => new GalleryTickMsg(at));
 
     private void HandleDialogDecision(DialogResult result)
     {

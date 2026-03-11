@@ -10,7 +10,7 @@ internal static class ComponentRouting
     {
         for (var i = 0; i < slots.Count; i++)
         {
-            if (slots[i].Component is IFocusableComponent { Focused: true })
+            if (slots[i].Component is IFocusableComponent { IsFocused: true })
             {
                 return i;
             }
@@ -89,12 +89,12 @@ internal static class ComponentRouting
         var changed = false;
         foreach (var slot in slots)
         {
-            if (slot.Component is not IFocusableComponent focusable || !focusable.Focused)
+            if (slot.Component is not IFocusableComponent focusable || !focusable.IsFocused)
             {
                 continue;
             }
 
-            focusable.Focused = false;
+            focusable.IsFocused = false;
             changed = true;
         }
 
@@ -213,12 +213,12 @@ internal static class ComponentRouting
             }
 
             var shouldFocus = i == index;
-            if (focusable.Focused == shouldFocus)
+            if (focusable.IsFocused == shouldFocus)
             {
                 continue;
             }
 
-            focusable.Focused = shouldFocus;
+            focusable.IsFocused = shouldFocus;
             changed = true;
         }
 

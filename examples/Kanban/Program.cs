@@ -8,9 +8,9 @@ using TeaSharp.Core.Abstractions;
 using TeaSharp.Core.Application;
 using TeaSharp.Core.Messages;
 using TeaSharp.Styles;
-using ModelView = TeaSharp.Core.Abstractions.View;
+using ModelView = TeaSharp.Core.Abstractions.ScreenOutput;
 
-var program = Tea.NewProgram(new KanbanModel(), new TeaProgramOptions
+var program = Tea.CreateProgram(new KanbanModel(), new TeaProgramOptions
 {
     UseConsoleKeyEvents = false,
 });
@@ -90,7 +90,7 @@ internal sealed class KanbanBoardState
 
 internal sealed record PendingDelete(KanbanLane Lane, int CardId, string Title);
 
-internal sealed class KanbanModel : IModel
+internal sealed class KanbanModel : IScreen
 {
     private const int MinimumWidth = 92;
     private const int MinimumHeight = 26;
@@ -155,7 +155,7 @@ internal sealed class KanbanModel : IModel
         ClearOnCancel: true,
         MaxLength: 120));
 
-    private readonly LabelComponent _details = new(new LabelOptions(
+    private readonly TextBlockComponent _details = new(new TextBlockOptions(
         Title: "Selected Card",
         Border: BorderStyle.SingleLine));
 
@@ -214,9 +214,9 @@ internal sealed class KanbanModel : IModel
         SetFocus(KanbanFocus.Todo);
     }
 
-    public Command? Init() => null;
+    public Effect? Init() => null;
 
-    public Command? Update(IMessage message)
+    public Effect? Update(IMessage message)
     {
         if (message is WindowSizeMsg ws)
         {
@@ -240,10 +240,10 @@ internal sealed class KanbanModel : IModel
         if ((key.Modifiers.HasFlag(KeyModifiers.Ctrl) && key.IsCharacter('c'))
             || key.IsCharacter('q', KeyModifiers.None))
         {
-            return Tea.Cmd.Quit;
+            return Tea.Effects.Quit;
         }
 
-        if (_deleteDialog.Visible)
+        if (_deleteDialog.IsVisible)
         {
             if (_deleteDialog.Update(key))
             {
@@ -378,7 +378,7 @@ internal sealed class KanbanModel : IModel
         return null;
     }
 
-    public ModelView View()
+    public ModelView Render()
     {
         var width = Math.Max(MinimumWidth, _width);
         var height = Math.Max(MinimumHeight, _height);
@@ -413,7 +413,7 @@ internal sealed class KanbanModel : IModel
 
         return ModelView.From(canvas.Render()) with
         {
-            Terminal = new ViewTerminal
+            Terminal = new TerminalOutput
             {
                 AltScreen = true,
                 EnableBracketedPaste = true,
@@ -481,7 +481,7 @@ internal sealed class KanbanModel : IModel
 
     private bool HandleMouse(MouseMsg mouse)
     {
-        if (_deleteDialog.Visible)
+        if (_deleteDialog.IsVisible)
         {
             if (mouse is MouseReleaseMsg { Button: MouseButton.Left })
             {
@@ -993,15 +993,15 @@ internal sealed class KanbanModel : IModel
         }
 
         _pendingDelete = new PendingDelete(lane, selected.Id, selected.Title);
-        _deleteDialog.Lines =
+        _deleteDialog.BodyLines =
         [
             $"Delete card #{selected.Id}?",
             selected.Title,
             "Enter/Space to confirm",
             "Esc to cancel",
         ];
-        _deleteDialog.Visible = true;
-        _deleteDialog.Focused = true;
+        _deleteDialog.IsVisible = true;
+        _deleteDialog.IsFocused = true;
         _lastEvent = "delete:confirm";
     }
 
@@ -1009,16 +1009,16 @@ internal sealed class KanbanModel : IModel
     {
         if (_pendingDelete is null)
         {
-            _deleteDialog.Visible = false;
-            _deleteDialog.Focused = false;
+            _deleteDialog.IsVisible = false;
+            _deleteDialog.IsFocused = false;
             return;
         }
 
         var pending = _pendingDelete;
         RemoveCard(pending.Lane, pending.CardId);
         RefreshColumns();
-        _deleteDialog.Visible = false;
-        _deleteDialog.Focused = false;
+        _deleteDialog.IsVisible = false;
+        _deleteDialog.IsFocused = false;
         _pendingDelete = null;
         _lastEvent = $"delete:{pending.CardId}";
         PushInfo($"deleted #{pending.CardId}");
@@ -1027,8 +1027,8 @@ internal sealed class KanbanModel : IModel
     private void CancelDelete()
     {
         _pendingDelete = null;
-        _deleteDialog.Visible = false;
-        _deleteDialog.Focused = false;
+        _deleteDialog.IsVisible = false;
+        _deleteDialog.IsFocused = false;
         _lastEvent = "delete:cancelled";
     }
 
@@ -1163,15 +1163,15 @@ internal sealed class KanbanModel : IModel
     private void SetFocus(KanbanFocus focus)
     {
         _focus = focus;
-        _todo.Focused = focus == KanbanFocus.Todo;
-        _doing.Focused = focus == KanbanFocus.Doing;
-        _done.Focused = focus == KanbanFocus.Done;
-        _composer.Focused = focus == KanbanFocus.Composer;
-        _activity.Focused = focus == KanbanFocus.Activity;
-        _completion.Focused = false;
-        if (!_deleteDialog.Visible)
+        _todo.IsFocused = focus == KanbanFocus.Todo;
+        _doing.IsFocused = focus == KanbanFocus.Doing;
+        _done.IsFocused = focus == KanbanFocus.Done;
+        _composer.IsFocused = focus == KanbanFocus.Composer;
+        _activity.IsFocused = focus == KanbanFocus.Activity;
+        _completion.IsFocused = false;
+        if (!_deleteDialog.IsVisible)
         {
-            _deleteDialog.Focused = false;
+            _deleteDialog.IsFocused = false;
         }
     }
 

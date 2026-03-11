@@ -5,7 +5,7 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace TeaSharp.Components.Composition;
 
-public abstract class InteractiveScreenModel : IModel
+public abstract class InteractiveScreenModel : IScreen
 {
     protected ScreenComposer Screen { get; } = new();
 
@@ -43,11 +43,11 @@ public abstract class InteractiveScreenModel : IModel
         Screen.CompleteFrame(PreferredFocusRegionKey);
     }
 
-    protected Command? RouteKey(KeyPressMsg key)
+    protected Effect? RouteKey(KeyPressMsg key)
     {
         EnsureScreen();
         var routed = InputRouter.Route(key);
-        return routed.Handled ? routed.Command : null;
+        return routed.Handled ? routed.Effect : null;
     }
 
     protected bool RouteMouse(MouseMsg mouse)
@@ -285,9 +285,9 @@ public abstract class InteractiveScreenModel : IModel
         return Screen.TryGetBounds(regionKey, out bounds);
     }
 
-    public abstract Command? Init();
+    public abstract Effect? Init();
 
-    public abstract Command? Update(IMessage message);
+    public abstract Effect? Update(IMessage message);
 
-    public abstract View View();
+    public abstract ScreenOutput Render();
 }

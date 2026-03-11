@@ -82,9 +82,9 @@ public sealed class AccordionComponent : IStatefulComponent
 
             if (section.Expanded)
             {
-                for (var j = 0; j < section.Lines.Count && row < content.Height; j++)
+                for (var j = 0; j < section.BodyLines.Count && row < content.Height; j++)
                 {
-                    canvas.WriteText(content.X + 2, content.Y + row, section.Lines[j], Math.Max(0, content.Width - 2));
+                    canvas.WriteText(content.X + 2, content.Y + row, section.BodyLines[j], Math.Max(0, content.Width - 2));
                     row++;
                 }
             }

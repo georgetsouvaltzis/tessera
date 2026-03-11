@@ -10,7 +10,7 @@ namespace TeaSharp.Components.Prebuilt;
 /// Defines the one-shot configuration used to construct a <see cref="LayoutContainerComponent"/>.
 /// </summary>
 public sealed record LayoutContainerOptions(
-    LayoutContainerMode Mode = LayoutContainerMode.Vertical,
+    LayoutFlow Mode = LayoutFlow.Rows,
     int GridRows = 1,
     int GridColumns = 1,
     bool EnableMouseInteractions = true,

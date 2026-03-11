@@ -13,7 +13,7 @@ public sealed class AnsiDiffRenderer : IProgramRenderer
     private Stream? _output;
     private StreamWriter? _writer;
     private RenderFrameBuffer _previousFrame = RenderFrameBuffer.Empty;
-    private View _currentView = View.From(string.Empty);
+    private ScreenOutput _currentOutput = ScreenOutput.From(string.Empty);
     private bool _initialized;
     private bool _altScreen;
     private bool _bracketedPaste;
@@ -86,9 +86,9 @@ public sealed class AnsiDiffRenderer : IProgramRenderer
         _capabilities = capabilities;
     }
 
-    public void Render(View view)
+    public void Render(ScreenOutput output)
     {
-        _currentView = view;
+        _currentOutput = output;
     }
 
     public async ValueTask FlushAsync(CancellationToken cancellationToken)
@@ -98,8 +98,8 @@ public sealed class AnsiDiffRenderer : IProgramRenderer
             return;
         }
 
-        var terminal = _currentView.Terminal;
-        var frame = _currentView.Frame;
+        var terminal = _currentOutput.Terminal;
+        var frame = _currentOutput.Frame;
 
         if (terminal.AltScreen != _altScreen)
         {

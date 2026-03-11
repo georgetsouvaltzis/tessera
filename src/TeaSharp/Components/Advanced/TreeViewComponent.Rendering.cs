@@ -13,7 +13,7 @@ public sealed partial class TreeViewComponent
         return FrameLayout.DrawFrameAndResolveContent(
             canvas,
             clipped,
-            Border == BorderStyle.None ? null : Focused ? $"{Title} *" : Title,
+            Border == BorderStyle.None ? null : IsFocused ? $"{Title} *" : Title,
             Border,
             Padding);
     }
@@ -45,17 +45,17 @@ public sealed partial class TreeViewComponent
     private List<WidgetVisualState> ResolveNodeStates(TreeItemNode node, bool selected, bool hovered)
     {
         var states = new List<WidgetVisualState>(6);
-        if (Focused)
+        if (IsFocused)
         {
             states.Add(WidgetVisualState.Focused);
         }
 
-        if (Disabled)
+        if (IsDisabled)
         {
             states.Add(WidgetVisualState.Disabled);
         }
 
-        if (ReadOnly)
+        if (IsReadOnly)
         {
             states.Add(WidgetVisualState.ReadOnly);
         }
