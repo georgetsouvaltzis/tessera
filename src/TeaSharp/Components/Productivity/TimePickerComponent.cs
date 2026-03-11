@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using TeaSharp.Core.Abstractions;
 using TeaSharp.Core.Messages;
 using TeaSharp.Components.Internal;
@@ -5,6 +6,9 @@ using TeaSharp.Widgets;
 
 namespace TeaSharp.Components;
 
+/// <summary>
+/// Provides field-based time selection with keyboard and mouse navigation.
+/// </summary>
 public sealed class TimePickerComponent : IStatefulComponent, IMouseStatefulComponent, IFocusableComponent
 {
     private WidgetInteractionProfile _interactionProfile = WidgetInteractionProfile.Default.Clone();
@@ -69,8 +73,10 @@ public sealed class TimePickerComponent : IStatefulComponent, IMouseStatefulComp
 
     public KeyBinding CommitKey { get; set; } = new("enter/space", "commit time", "enter", "space");
 
+    [EditorBrowsable(EditorBrowsableState.Advanced)]
     public WidgetStatePalette FieldStatePalette { get; } = WidgetStatePalette.CreateDefault();
 
+    [EditorBrowsable(EditorBrowsableState.Advanced)]
     public WidgetInteractionProfile InteractionProfile
     {
         get => _interactionProfile;

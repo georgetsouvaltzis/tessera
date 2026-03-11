@@ -2,6 +2,9 @@ using TeaSharp.Widgets;
 
 namespace TeaSharp.Components;
 
+/// <summary>
+/// Defines the one-shot configuration used to construct a <see cref="TabsComponent"/>.
+/// </summary>
 public sealed record TabsOptions(
     IEnumerable<string> Tabs,
     bool Focused = false,

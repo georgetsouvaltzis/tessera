@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using TeaSharp.Core.Abstractions;
 using TeaSharp.Core.Messages;
 using TeaSharp.Styles;
@@ -49,8 +50,10 @@ public sealed class ButtonComponent : IStatefulComponent, IMouseStatefulComponen
 
     public bool WasPressed { get; private set; }
 
+    [EditorBrowsable(EditorBrowsableState.Advanced)]
     public WidgetStatePalette StatePalette { get; } = WidgetStatePalette.CreateDefault();
 
+    [EditorBrowsable(EditorBrowsableState.Advanced)]
     public WidgetInteractionProfile InteractionProfile
     {
         get => _interactionProfile;

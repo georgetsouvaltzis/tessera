@@ -53,6 +53,7 @@ Status: in progress
 - split `LayoutContainerComponent` so child-layout geometry helpers are separated from runtime routing/mouse handling
 - add `MenuBarOptions` and `ContextMenuOptions` so action surfaces follow the same options-first setup pattern as the rest of the friendly prebuilt API
 - add options-first constructors for `NumberInputComponent`, `DatePickerComponent`, `TimePickerComponent`, `MarkdownViewerComponent`, `LogViewerComponent`, and `ModalComponent`
+- add non-breaking category catalogs (`PrebuiltCatalog`, `ProductivityCatalog`, `UiKitCatalog`) and mark low-level key-map / interaction-profile seams as advanced-only discovery
 
 ## Phase 4: API Simplification
 

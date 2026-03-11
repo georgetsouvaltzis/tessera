@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using TeaSharp.Core.Abstractions;
 using TeaSharp.Core.Messages;
 using TeaSharp.Components.Internal;
@@ -54,10 +55,12 @@ public sealed class ListComponent<T> : IStatefulComponent, IMouseStatefulCompone
 
     public string Filter => _model.Filter;
 
+    [EditorBrowsable(EditorBrowsableState.Advanced)]
     public WidgetStatePalette ItemStatePalette { get; } = WidgetStatePalette.CreateDefault();
 
     public Func<T, IReadOnlyCollection<WidgetVisualState>?>? ItemStateResolver { get; set; }
 
+    [EditorBrowsable(EditorBrowsableState.Advanced)]
     public ListKeyMap KeyMap { get; set; } = ListKeyMap.Default;
 
     public void SetItems(IEnumerable<T> items)

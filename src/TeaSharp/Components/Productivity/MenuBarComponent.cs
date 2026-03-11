@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using System.Globalization;
 using TeaSharp.Core.Abstractions;
 using TeaSharp.Core.Messages;
@@ -5,6 +6,9 @@ using TeaSharp.Widgets;
 
 namespace TeaSharp.Components;
 
+/// <summary>
+/// Renders and routes a single-row menu surface with keyboard shortcuts and mouse activation.
+/// </summary>
 public sealed class MenuBarComponent : IStatefulComponent, IMouseStatefulComponent, IFocusableComponent
 {
     private readonly List<MenuBarItem> _items = [];
@@ -48,8 +52,10 @@ public sealed class MenuBarComponent : IStatefulComponent, IMouseStatefulCompone
 
     public KeyBinding ActivateKey { get; set; } = new("enter/space", "activate", "enter", "space");
 
+    [EditorBrowsable(EditorBrowsableState.Advanced)]
     public WidgetStatePalette ItemStatePalette { get; } = WidgetStatePalette.CreateDefault();
 
+    [EditorBrowsable(EditorBrowsableState.Advanced)]
     public WidgetInteractionProfile InteractionProfile
     {
         get => _interactionProfile;

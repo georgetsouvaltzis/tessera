@@ -15,6 +15,9 @@ internal static class ApiErgonomicsTests
         yield return new TestCase("ApiErgonomics_TableOptions_ExposePageSizeWithoutInnerAccess", TableOptions_ExposePageSizeWithoutInnerAccess);
         yield return new TestCase("ApiErgonomics_TableComponent_ExposesSortStateWithoutInnerAccess", TableComponent_ExposesSortStateWithoutInnerAccess);
         yield return new TestCase("ApiErgonomics_InteractionProfiles_AreClonedOnAssignment", InteractionProfiles_AreClonedOnAssignment);
+        yield return new TestCase("ApiErgonomics_PrebuiltCatalog_CreatesConfiguredTextInput", PrebuiltCatalog_CreatesConfiguredTextInput);
+        yield return new TestCase("ApiErgonomics_ProductivityCatalog_CreatesConfiguredMenuBar", ProductivityCatalog_CreatesConfiguredMenuBar);
+        yield return new TestCase("ApiErgonomics_UiKitCatalog_CreatesConfiguredModal", UiKitCatalog_CreatesConfiguredModal);
     }
 
     private static Task TextInputOptions_ConfigureComponentWithoutNestedInputAccess()
@@ -172,6 +175,45 @@ internal static class ApiErgonomicsTests
         TestAssert.True(!shared.NavigateOnWheel, "Shared profile instances should not be mutated through component assignment.");
         TestAssert.True(!tabs.InteractionProfile.NavigateOnWheel, "Components should not share the same interaction profile instance.");
         TestAssert.True(button.InteractionProfile.NavigateOnWheel, "Component-local profile mutation should still work after cloning.");
+        return Task.CompletedTask;
+    }
+
+    private static Task PrebuiltCatalog_CreatesConfiguredTextInput()
+    {
+        var input = TeaSharp.Components.Prebuilt.PrebuiltCatalog.TextInput(new TextInputOptions(
+            Title: "Search",
+            InitialValue: "tea"));
+
+        TestAssert.Equal("Search", input.Title, "Prebuilt catalog should create configured text input instances.");
+        TestAssert.Equal("tea", input.Value, "Prebuilt catalog should pass options through to the component.");
+        return Task.CompletedTask;
+    }
+
+    private static Task ProductivityCatalog_CreatesConfiguredMenuBar()
+    {
+        var menu = TeaSharp.Components.Productivity.ProductivityCatalog.MenuBar(new MenuBarOptions(
+            Items:
+            [
+                new MenuBarItem("file", "File", 'f'),
+                new MenuBarItem("help", "Help", 'h'),
+            ],
+            Focused: true));
+
+        TestAssert.True(menu.Focused, "Productivity catalog should create configured menu surfaces.");
+        TestAssert.Equal(2, menu.Items.Count, "Productivity catalog should pass items through to the component.");
+        return Task.CompletedTask;
+    }
+
+    private static Task UiKitCatalog_CreatesConfiguredModal()
+    {
+        var modal = TeaSharp.Components.UiKit.UiKitCatalog.Modal(new ModalOptions(
+            Title: "Confirm",
+            Visible: true,
+            Lines: ["ready"]));
+
+        TestAssert.True(modal.Visible, "UI-kit catalog should create configured modal surfaces.");
+        TestAssert.Equal("Confirm", modal.Title, "UI-kit catalog should pass options through to the component.");
+        TestAssert.Equal(1, modal.Lines.Count, "UI-kit catalog should preserve configured modal content.");
         return Task.CompletedTask;
     }
 }

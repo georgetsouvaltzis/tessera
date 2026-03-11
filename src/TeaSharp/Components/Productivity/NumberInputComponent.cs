@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using TeaSharp.Core.Abstractions;
 using TeaSharp.Core.Messages;
 using TeaSharp.Components.Internal;
@@ -5,6 +6,9 @@ using TeaSharp.Widgets;
 
 namespace TeaSharp.Components;
 
+/// <summary>
+/// Provides structured numeric entry on top of a text-backed editing surface.
+/// </summary>
 public sealed class NumberInputComponent : IStatefulComponent, IFocusableComponent
 {
     private bool _replaceOnNextCharacter = true;
@@ -32,6 +36,7 @@ public sealed class NumberInputComponent : IStatefulComponent, IFocusableCompone
         SetValue(options.InitialValue);
     }
 
+    [EditorBrowsable(EditorBrowsableState.Advanced)]
     public TextInputKeyMap InputKeyMap { get; set; } = TextInputKeyMap.Default;
 
     public string Title { get; set; } = "Number Input";
@@ -64,6 +69,7 @@ public sealed class NumberInputComponent : IStatefulComponent, IFocusableCompone
 
     public KeyBinding SubmitKey { get; set; } = new("enter", "submit", "enter");
 
+    [EditorBrowsable(EditorBrowsableState.Advanced)]
     public WidgetStatePalette StatePalette { get; } = WidgetStatePalette.CreateDefault();
 
     public void SetValue(double value)

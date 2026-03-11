@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using TeaSharp.Core.Abstractions;
 using TeaSharp.Core.Messages;
 using TeaSharp.Components.Internal;
@@ -5,6 +6,9 @@ using TeaSharp.Widgets;
 
 namespace TeaSharp.Components;
 
+/// <summary>
+/// Provides calendar-based date selection with keyboard and mouse navigation.
+/// </summary>
 public sealed class DatePickerComponent : IStatefulComponent, IMouseStatefulComponent, IFocusableComponent
 {
     private WidgetInteractionProfile _interactionProfile = WidgetInteractionProfile.Default.Clone();
@@ -65,8 +69,10 @@ public sealed class DatePickerComponent : IStatefulComponent, IMouseStatefulComp
 
     public KeyBinding CommitKey { get; set; } = new("enter/space", "commit date", "enter", "space");
 
+    [EditorBrowsable(EditorBrowsableState.Advanced)]
     public WidgetStatePalette DayStatePalette { get; } = WidgetStatePalette.CreateDefault();
 
+    [EditorBrowsable(EditorBrowsableState.Advanced)]
     public WidgetInteractionProfile InteractionProfile
     {
         get => _interactionProfile;

@@ -2,6 +2,9 @@ using TeaSharp.Widgets;
 
 namespace TeaSharp.Components;
 
+/// <summary>
+/// Defines the one-shot configuration used to construct a <see cref="TextAreaComponent"/>.
+/// </summary>
 public sealed record TextAreaOptions(
     string Title = "Text Area",
     string InitialValue = "",

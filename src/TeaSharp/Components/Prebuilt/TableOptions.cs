@@ -1,5 +1,8 @@
 namespace TeaSharp.Components;
 
+/// <summary>
+/// Defines the one-shot configuration used to construct a <see cref="TableComponent"/>.
+/// </summary>
 public sealed record TableOptions(
     IReadOnlyList<string> Headers,
     string Title = "Table",

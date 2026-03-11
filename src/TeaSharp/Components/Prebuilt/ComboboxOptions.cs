@@ -2,6 +2,9 @@ using TeaSharp.Widgets;
 
 namespace TeaSharp.Components;
 
+/// <summary>
+/// Defines the one-shot configuration used to construct a <see cref="ComboboxComponent"/>.
+/// </summary>
 public sealed record ComboboxOptions(
     IReadOnlyList<string>? Items = null,
     string Title = "Combobox",

@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using System.Globalization;
 using TeaSharp.Core.Abstractions;
 using TeaSharp.Core.Messages;
@@ -5,6 +6,9 @@ using TeaSharp.Widgets;
 
 namespace TeaSharp.Components;
 
+/// <summary>
+/// Renders markdown into a scrollable viewport for help panes, docs, or inline references.
+/// </summary>
 public sealed class MarkdownViewerComponent : IStatefulComponent, IFocusableComponent
 {
     private readonly ViewportModel _viewport = new();
@@ -46,6 +50,7 @@ public sealed class MarkdownViewerComponent : IStatefulComponent, IFocusableComp
         set => _viewport.ShowLineNumbers = value;
     }
 
+    [EditorBrowsable(EditorBrowsableState.Advanced)]
     public ViewportKeyMap ViewportKeyMap { get; set; } = ViewportKeyMap.Default;
 
     public void SetMarkdown(string markdown)

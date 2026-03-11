@@ -2,6 +2,9 @@ using TeaSharp.Widgets;
 
 namespace TeaSharp.Components;
 
+/// <summary>
+/// Defines the one-shot configuration used to construct a <see cref="ButtonComponent"/>.
+/// </summary>
 public sealed record ButtonOptions(
     string Label = "Button",
     string? Description = null,

@@ -2,6 +2,9 @@ using TeaSharp.Widgets;
 
 namespace TeaSharp.Components;
 
+/// <summary>
+/// Defines the one-shot configuration used to construct a <see cref="DialogComponent"/>.
+/// </summary>
 public sealed record DialogOptions(
     string Title = "Dialog",
     IReadOnlyList<string>? Lines = null,

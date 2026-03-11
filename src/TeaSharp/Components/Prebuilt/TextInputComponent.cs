@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using TeaSharp.Core.Abstractions;
 using TeaSharp.Core.Messages;
 using TeaSharp.Components.Internal;
@@ -32,6 +33,7 @@ public sealed class TextInputComponent : IStatefulComponent, IFocusableComponent
         }
     }
 
+    [EditorBrowsable(EditorBrowsableState.Advanced)]
     public TextInputKeyMap KeyMap { get; set; } = TextInputKeyMap.Default;
 
     public KeyBinding CancelKey { get; set; } = new("esc", "cancel", "escape");

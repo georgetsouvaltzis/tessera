@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using TeaSharp.Core.Abstractions;
 using TeaSharp.Core.Messages;
 using TeaSharp.Widgets;
@@ -29,8 +30,10 @@ public sealed class TextAreaComponent : IStatefulComponent, IFocusableComponent
         }
     }
 
+    [EditorBrowsable(EditorBrowsableState.Advanced)]
     public TextInputKeyMap InputKeyMap { get; set; } = TextInputKeyMap.Default;
 
+    [EditorBrowsable(EditorBrowsableState.Advanced)]
     public ViewportKeyMap ViewportKeyMap { get; set; } = ViewportKeyMap.Default;
 
     public string Title { get; set; } = "Text Area";

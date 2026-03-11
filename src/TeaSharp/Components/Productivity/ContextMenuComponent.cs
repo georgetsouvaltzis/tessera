@@ -1,9 +1,13 @@
+using System.ComponentModel;
 using TeaSharp.Core.Abstractions;
 using TeaSharp.Core.Messages;
 using TeaSharp.Widgets;
 
 namespace TeaSharp.Components;
 
+/// <summary>
+/// Renders and routes a contextual action menu anchored to a screen position.
+/// </summary>
 public sealed partial class ContextMenuComponent : IStatefulComponent, IMouseStatefulComponent, IFocusableComponent
 {
     private readonly List<ContextMenuItem> _items = [];
@@ -59,8 +63,10 @@ public sealed partial class ContextMenuComponent : IStatefulComponent, IMouseSta
 
     public KeyBinding CloseKey { get; set; } = new("esc", "close", "escape");
 
+    [EditorBrowsable(EditorBrowsableState.Advanced)]
     public WidgetStatePalette ItemStatePalette { get; } = WidgetStatePalette.CreateDefault();
 
+    [EditorBrowsable(EditorBrowsableState.Advanced)]
     public WidgetInteractionProfile InteractionProfile
     {
         get => _interactionProfile;

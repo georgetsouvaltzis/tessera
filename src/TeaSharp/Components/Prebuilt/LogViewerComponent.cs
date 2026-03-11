@@ -1,9 +1,13 @@
+using System.ComponentModel;
 using TeaSharp.Core.Abstractions;
 using TeaSharp.Core.Messages;
 using TeaSharp.Widgets;
 
 namespace TeaSharp.Components;
 
+/// <summary>
+/// Provides a scrollable log surface with optional filtering, pause, and clear behavior.
+/// </summary>
 public sealed class LogViewerComponent : IStatefulComponent, IFocusableComponent
 {
     private readonly ViewportModel _viewport = new();
@@ -56,6 +60,7 @@ public sealed class LogViewerComponent : IStatefulComponent, IFocusableComponent
 
     public string Filter { get; private set; } = string.Empty;
 
+    [EditorBrowsable(EditorBrowsableState.Advanced)]
     public ViewportKeyMap ViewportKeyMap { get; set; } = ViewportKeyMap.Default;
 
     public KeyBinding TogglePauseKey { get; set; } = new("p", "toggle pause", "p");

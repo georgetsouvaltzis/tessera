@@ -4,6 +4,9 @@ using TeaSharp.Widgets;
 
 namespace TeaSharp.Components;
 
+/// <summary>
+/// Renders a centered modal surface with a backdrop that fully occludes the underlying frame.
+/// </summary>
 public sealed class ModalComponent : ICanvasComponent
 {
     public ModalComponent()

@@ -2,6 +2,9 @@ using TeaSharp.Widgets;
 
 namespace TeaSharp.Components;
 
+/// <summary>
+/// Defines the one-shot configuration used to construct a <see cref="ListComponent{T}"/>.
+/// </summary>
 public sealed record ListOptions<T>(
     IEnumerable<T> Items,
     Func<T, string> ToText,

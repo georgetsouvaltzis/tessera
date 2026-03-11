@@ -1,0 +1,21 @@
+using TeaSharp.Components;
+
+namespace TeaSharp.Components.Productivity;
+
+/// <summary>
+/// Provides discoverable factory methods for the stable productivity widget surface.
+/// </summary>
+public static class ProductivityCatalog
+{
+    public static MenuBarComponent MenuBar(MenuBarOptions? options = null) => options is null ? new MenuBarComponent() : new MenuBarComponent(options);
+
+    public static ContextMenuComponent ContextMenu(ContextMenuOptions? options = null) => options is null ? new ContextMenuComponent() : new ContextMenuComponent(options);
+
+    public static NumberInputComponent NumberInput(NumberInputOptions? options = null) => options is null ? new NumberInputComponent() : new NumberInputComponent(options);
+
+    public static DatePickerComponent DatePicker(DatePickerOptions? options = null) => options is null ? new DatePickerComponent() : new DatePickerComponent(options);
+
+    public static TimePickerComponent TimePicker(TimePickerOptions? options = null) => options is null ? new TimePickerComponent() : new TimePickerComponent(options);
+
+    public static MarkdownViewerComponent MarkdownViewer(MarkdownViewerOptions? options = null) => options is null ? new MarkdownViewerComponent() : new MarkdownViewerComponent(options);
+}

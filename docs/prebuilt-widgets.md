@@ -89,6 +89,11 @@ TeaSharp provides a prebuilt widget layer in `TeaSharp.Components.PrebuiltWidget
   - `MarkdownViewerOptions`
   - `LogViewerOptions`
   - `ModalOptions`
+- For narrower discovery, consumers can import the additive category catalogs:
+  - `TeaSharp.Components.Prebuilt.PrebuiltCatalog`
+  - `TeaSharp.Components.Productivity.ProductivityCatalog`
+  - `TeaSharp.Components.UiKit.UiKitCatalog`
+- Low-level key-map and interaction-profile properties remain supported, but are now marked advanced so the default surface stays focused on the common setup path.
 - keep a single focus owner per interactive surface; for multi-pane screens that owner should be `ScreenComposer`, with `ComponentComposer` reserved for component subtrees.
 - `ListComponent<T>`, `DropdownComponent`, and `ComboboxComponent` support state-driven styling through:
   - `WidgetVisualState`

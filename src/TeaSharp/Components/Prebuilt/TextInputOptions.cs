@@ -2,6 +2,9 @@ using TeaSharp.Widgets;
 
 namespace TeaSharp.Components;
 
+/// <summary>
+/// Defines the one-shot configuration used to construct a <see cref="TextInputComponent"/>.
+/// </summary>
 public sealed record TextInputOptions(
     string Title = "Text Input",
     string Placeholder = "",

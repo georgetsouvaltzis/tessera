@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using TeaSharp.Core.Abstractions;
 using TeaSharp.Core.Messages;
 using TeaSharp.Widgets;
@@ -45,8 +46,10 @@ public sealed partial class DropdownComponent : IStatefulComponent, IMouseStatef
 
     public bool ShowBorder { get; set; } = true;
 
+    [EditorBrowsable(EditorBrowsableState.Advanced)]
     public WidgetStatePalette FieldStatePalette { get; } = WidgetStatePalette.CreateDefault();
 
+    [EditorBrowsable(EditorBrowsableState.Advanced)]
     public WidgetStatePalette OptionStatePalette { get; } = WidgetStatePalette.CreateDefault();
 
     public Func<string, int, IReadOnlyCollection<WidgetVisualState>?>? OptionStateResolver { get; set; }
@@ -57,6 +60,7 @@ public sealed partial class DropdownComponent : IStatefulComponent, IMouseStatef
 
     public int MaxVisibleItems { get; set; } = 6;
 
+    [EditorBrowsable(EditorBrowsableState.Advanced)]
     public WidgetInteractionProfile InteractionProfile
     {
         get => _interactionProfile;
