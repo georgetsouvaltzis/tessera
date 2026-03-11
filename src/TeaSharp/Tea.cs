@@ -25,7 +25,7 @@ public static class Tea
     /// <param name="options">Advanced runtime options for terminal, renderer, and host customization.</param>
     /// <returns>A program ready to run.</returns>
     [EditorBrowsable(EditorBrowsableState.Advanced)]
-    public static TeaProgram NewProgram(IModel model, ProgramOptions? options = null) =>
+    public static TeaProgram NewProgram(IModel model, ProgramOptions? options) =>
         new(model, options);
 
     /// <summary>

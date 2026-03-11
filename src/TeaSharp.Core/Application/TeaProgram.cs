@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using System.Threading.Channels;
 using TeaSharp.Core.Abstractions;
 using TeaSharp.Core.Input;
@@ -26,6 +27,7 @@ public sealed class TeaProgram
     /// </summary>
     /// <param name="initialModel">The initial application model.</param>
     /// <param name="options">Advanced runtime options.</param>
+    [EditorBrowsable(EditorBrowsableState.Advanced)]
     public TeaProgram(IModel initialModel, ProgramOptions? options = null)
     {
         Model = initialModel ?? throw new ArgumentNullException(nameof(initialModel));

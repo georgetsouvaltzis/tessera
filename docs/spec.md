@@ -130,6 +130,7 @@ Primary goal: deterministic message-driven TUI runtime with portable terminal be
 - `Command` returns optional `IMessage`.
 - `View` is now grouped into `ViewFrame` (content + cursor placement/style), `ViewTerminal` (alt-screen, mode toggles, colors, progress, title, keyboard enhancements), and `ViewInput` (optional mouse interception callback).
 - app-facing hosting should prefer `Tea.NewProgram(model)` for stable defaults and `Tea.NewProgram(model, TeaProgramOptions)` for stable customization; `ProgramOptions` remains available for advanced runtime overrides and testing seams.
+- direct `new TeaProgram(...)` construction is treated as an advanced/testing seam; the recommended host entrypoint is `Tea.NewProgram(...)`.
 - Multi-pane apps should pair `ScreenComposer` (region layout, focus, mouse hit routing) with `InputRouter` (overlay/mode/global key precedence), prefer `ScreenRegionKey` over raw string ids for region identity, and use `InteractiveScreenModel` when the app follows the standard “one screen + overlays + scoped input” shape.
 - `docs/app-pattern.md` is the canonical “recommended app pattern” reference for that shell.
 - `ProgramOptions` now includes runtime extension points:

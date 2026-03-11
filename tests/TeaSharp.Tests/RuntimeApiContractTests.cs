@@ -45,6 +45,9 @@ internal static class RuntimeApiContractTests
         yield return new TestCase(
             "RuntimeApi_TeaProgramFactory_DefaultOverload_RemainsStableSurface",
             TeaProgramFactory_DefaultOverload_RemainsStableSurface);
+        yield return new TestCase(
+            "RuntimeApi_TeaProgramConstructor_IsMarkedAdvanced",
+            TeaProgramConstructor_IsMarkedAdvanced);
     }
 
     private static Task AssertMarkedAdvanced(Type type)
@@ -113,6 +116,23 @@ internal static class RuntimeApiContractTests
         var program = Tea.NewProgram(new NoOpModel());
 
         TestAssert.True(program is not null, "Tea.NewProgram(model) should create a program using stable host defaults.");
+        return Task.CompletedTask;
+    }
+
+    private static Task TeaProgramConstructor_IsMarkedAdvanced()
+    {
+        var constructor = typeof(TeaProgram).GetConstructor([typeof(IModel), typeof(ProgramOptions)]);
+
+        TestAssert.True(constructor is not null, "TeaProgram advanced constructor should exist.");
+
+        var attribute = (EditorBrowsableAttribute?)Attribute.GetCustomAttribute(
+            constructor!,
+            typeof(EditorBrowsableAttribute));
+
+        TestAssert.True(attribute is not null, "TeaProgram constructor should be marked as an advanced host seam.");
+        TestAssert.True(
+            attribute!.State == EditorBrowsableState.Advanced,
+            "TeaProgram constructor should be hidden from default discovery.");
         return Task.CompletedTask;
     }
 
