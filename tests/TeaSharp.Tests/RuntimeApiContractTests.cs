@@ -42,6 +42,9 @@ internal static class RuntimeApiContractTests
         yield return new TestCase(
             "RuntimeApi_TeaProgramFactoryOverloads_FavorStableSurface",
             TeaProgramFactoryOverloads_FavorStableSurface);
+        yield return new TestCase(
+            "RuntimeApi_TeaProgramFactory_DefaultOverload_RemainsStableSurface",
+            TeaProgramFactory_DefaultOverload_RemainsStableSurface);
     }
 
     private static Task AssertMarkedAdvanced(Type type)
@@ -69,6 +72,10 @@ internal static class RuntimeApiContractTests
 
     private static Task TeaProgramFactoryOverloads_FavorStableSurface()
     {
+        var defaultOverload = typeof(Tea).GetMethod(
+            nameof(Tea.NewProgram),
+            BindingFlags.Public | BindingFlags.Static,
+            [typeof(IModel)]);
         var advancedOverload = typeof(Tea).GetMethod(
             nameof(Tea.NewProgram),
             BindingFlags.Public | BindingFlags.Static,
@@ -78,9 +85,13 @@ internal static class RuntimeApiContractTests
             BindingFlags.Public | BindingFlags.Static,
             [typeof(IModel), typeof(TeaProgramOptions)]);
 
+        TestAssert.True(defaultOverload is not null, "The zero-config Tea.NewProgram overload should exist.");
         TestAssert.True(advancedOverload is not null, "The advanced Tea.NewProgram overload should exist.");
         TestAssert.True(stableOverload is not null, "The stable Tea.NewProgram overload should exist.");
 
+        var defaultAttribute = (EditorBrowsableAttribute?)Attribute.GetCustomAttribute(
+            defaultOverload!,
+            typeof(EditorBrowsableAttribute));
         var advancedAttribute = (EditorBrowsableAttribute?)Attribute.GetCustomAttribute(
             advancedOverload!,
             typeof(EditorBrowsableAttribute));
@@ -88,11 +99,29 @@ internal static class RuntimeApiContractTests
             stableOverload!,
             typeof(EditorBrowsableAttribute));
 
+        TestAssert.True(defaultAttribute is null, "The zero-config Tea.NewProgram overload should remain the default discoverable factory.");
         TestAssert.True(advancedAttribute is not null, "The ProgramOptions overload should be explicitly marked as advanced.");
         TestAssert.True(
             advancedAttribute!.State == EditorBrowsableState.Advanced,
             "The ProgramOptions overload should be hidden from default discovery.");
         TestAssert.True(stableAttribute is null, "The TeaProgramOptions overload should remain the default discoverable factory.");
         return Task.CompletedTask;
+    }
+
+    private static Task TeaProgramFactory_DefaultOverload_RemainsStableSurface()
+    {
+        var program = Tea.NewProgram(new NoOpModel());
+
+        TestAssert.True(program is not null, "Tea.NewProgram(model) should create a program using stable host defaults.");
+        return Task.CompletedTask;
+    }
+
+    private sealed class NoOpModel : IModel
+    {
+        public Command? Init() => null;
+
+        public Command? Update(IMessage message) => null;
+
+        public View View() => TeaSharp.Core.Abstractions.View.From(string.Empty);
     }
 }

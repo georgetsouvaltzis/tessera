@@ -50,7 +50,7 @@ This document defines the current public API tiers in TeaSharp so refactors can 
 - low-level widget types are visible in places where consumer-facing components should be enough.
 - composition is split between `ComponentComposer` and `ScreenComposer`.
 - `ScreenComposer` + `InputRouter` + `InteractiveScreenModel` is now the documented default path; `ComponentComposer` is being pushed toward lower-level subtree use.
-- runtime plumbing seams (`IProgramRenderer`, `ITerminalAdapter`, `EventDecoder`, `TerminalReader`, capability detectors/profiles) are now explicitly marked `EditorBrowsable(Advanced)` so the stable host path stays centered on `Tea.NewProgram(..., TeaProgramOptions)`.
+- runtime plumbing seams (`IProgramRenderer`, `ITerminalAdapter`, `EventDecoder`, `TerminalReader`, capability detectors/profiles) are now explicitly marked `EditorBrowsable(Advanced)` so the stable host path stays centered on `Tea.NewProgram(model)` / `Tea.NewProgram(model, TeaProgramOptions)`.
 
 ## Target Public Surface
 
@@ -60,7 +60,7 @@ This document defines the current public API tiers in TeaSharp so refactors can 
   - `TeaSharp`
   - `TeaSharp.Components`
   - `TeaSharp.Styles`
-- app hosting should prefer `TeaProgramOptions`, with `ProgramOptions` reserved for advanced/runtime customization.
+- app hosting should prefer `Tea.NewProgram(model)` for defaults or `TeaProgramOptions` for stable customization, with `ProgramOptions` reserved for advanced/runtime customization.
 - common component setup should flow through `*Options` records and small constructor overloads.
 - examples and docs should demonstrate the stable path first.
 

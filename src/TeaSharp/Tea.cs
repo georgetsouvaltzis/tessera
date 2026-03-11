@@ -11,6 +11,14 @@ namespace TeaSharp;
 public static class Tea
 {
     /// <summary>
+    /// Creates a program using the stable application-facing host defaults.
+    /// </summary>
+    /// <param name="model">The initial application model.</param>
+    /// <returns>A program ready to run.</returns>
+    public static TeaProgram NewProgram(IModel model) =>
+        new(model, new TeaProgramOptions().ToProgramOptions());
+
+    /// <summary>
     /// Creates a program using the advanced runtime configuration surface.
     /// </summary>
     /// <param name="model">The initial application model.</param>

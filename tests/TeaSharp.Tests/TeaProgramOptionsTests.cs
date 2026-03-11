@@ -10,6 +10,7 @@ internal static class TeaProgramOptionsTests
     {
         yield return new TestCase("TeaProgramOptions_Defaults_MapToStableProgramDefaults", Defaults_MapToStableProgramDefaults);
         yield return new TestCase("TeaProgramOptions_ConfiguredValues_MapToProgramOptions", ConfiguredValues_MapToProgramOptions);
+        yield return new TestCase("TeaProgramOptions_TeaFactoryAcceptsStableDefaults", TeaFactory_AcceptsStableDefaults);
         yield return new TestCase("TeaProgramOptions_TeaFactoryAcceptsStableHostOptions", TeaFactory_AcceptsStableHostOptions);
     }
 
@@ -71,6 +72,14 @@ internal static class TeaProgramOptionsTests
         });
 
         TestAssert.True(program is not null, "Tea factory should create a program from stable host options.");
+        return Task.CompletedTask;
+    }
+
+    private static Task TeaFactory_AcceptsStableDefaults()
+    {
+        var program = Tea.NewProgram(new NoOpModel());
+
+        TestAssert.True(program is not null, "Tea factory should create a program from stable default host options.");
         return Task.CompletedTask;
     }
 

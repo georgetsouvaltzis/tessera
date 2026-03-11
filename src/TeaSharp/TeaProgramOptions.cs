@@ -4,7 +4,7 @@ using TeaSharp.Core.Application;
 namespace TeaSharp;
 
 /// <summary>
-/// Defines the stable application-facing runtime options used by <see cref="Tea.NewProgram(IModel, TeaProgramOptions)"/>.
+/// Defines the stable application-facing runtime options used by <see cref="Tea.NewProgram(IModel)"/> and <see cref="Tea.NewProgram(IModel, TeaProgramOptions)"/>.
 /// </summary>
 public sealed class TeaProgramOptions
 {
