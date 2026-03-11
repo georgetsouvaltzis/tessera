@@ -4,7 +4,7 @@ using TeaSharp.Widgets;
 
 namespace TeaSharp.Components;
 
-public sealed class TreeViewComponent : IStatefulComponent, IMouseStatefulComponent, IFocusableComponent
+public sealed partial class TreeViewComponent : IStatefulComponent, IMouseStatefulComponent, IFocusableComponent
 {
     private readonly List<TreeItemNode> _roots = [];
     private readonly List<(TreeItemNode Node, int Depth, int? ParentVisibleIndex)> _visible = [];
@@ -193,70 +193,13 @@ public sealed class TreeViewComponent : IStatefulComponent, IMouseStatefulCompon
             return;
         }
 
-        Rect content;
-        if (ShowBorder)
-        {
-            canvas.DrawBox(clipped, Focused ? $"{Title} *" : Title);
-            content = clipped.Inset(1, 1);
-        }
-        else
-        {
-            content = clipped;
-        }
-
+        var content = ResolveRenderContentRect(canvas, clipped);
         if (content.IsEmpty)
         {
             return;
         }
 
-        if (_visible.Count == 0)
-        {
-            canvas.WriteText(content.X, content.Y, NodeStatePalette.Render("(empty)", WidgetVisualState.Empty), content.Width);
-            return;
-        }
-
-        var start = ComputeWindowStart(content.Height);
-        var end = Math.Min(_visible.Count, start + content.Height);
-        var row = 0;
-        for (var i = start; i < end; i++, row++)
-        {
-            var (node, depth, _) = _visible[i];
-            var indent = new string(' ', Math.Max(0, depth) * 2);
-            var marker = node.Children.Count == 0
-                ? "•"
-                : node.Expanded ? "▾" : "▸";
-            var cursor = i == _selectedIndex ? ">" : " ";
-
-            var states = new List<WidgetVisualState>(6);
-            if (Focused)
-            {
-                states.Add(WidgetVisualState.Focused);
-            }
-
-            if (Disabled)
-            {
-                states.Add(WidgetVisualState.Disabled);
-            }
-
-            if (ReadOnly)
-            {
-                states.Add(WidgetVisualState.ReadOnly);
-            }
-
-            if (i == _selectedIndex)
-            {
-                states.Add(WidgetVisualState.Cursor);
-                states.Add(WidgetVisualState.Selected);
-            }
-
-            if (i == _hoveredIndex)
-            {
-                states.Add(WidgetVisualState.Hovered);
-            }
-
-            states.AddRange(node.States);
-            canvas.WriteText(content.X, content.Y + row, NodeStatePalette.Render($"{cursor} {indent}{marker} {node.Label}", states), content.Width);
-        }
+        RenderVisibleNodes(canvas, content);
     }
 
     private bool ExpandOrMoveIntoChild()
@@ -335,17 +278,13 @@ public sealed class TreeViewComponent : IStatefulComponent, IMouseStatefulCompon
         }
     }
 
-    private int ComputeWindowStart(int contentHeight)
-    {
-        return Math.Clamp(_selectedIndex - (contentHeight / 2), 0, Math.Max(0, _visible.Count - contentHeight));
-    }
+    private int ComputeWindowStart(int contentHeight) =>
+        Math.Clamp(_selectedIndex - (contentHeight / 2), 0, Math.Max(0, _visible.Count - contentHeight));
 
-    private Rect ResolveContentRect(Rect bounds)
-    {
-        return ShowBorder
+    private Rect ResolveContentRect(Rect bounds) =>
+        ShowBorder
             ? bounds.Inset(1, 1)
             : bounds;
-    }
 
     private bool SetHoveredIndex(int index)
     {

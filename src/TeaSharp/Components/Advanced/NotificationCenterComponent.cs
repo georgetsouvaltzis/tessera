@@ -4,7 +4,7 @@ using TeaSharp.Widgets;
 
 namespace TeaSharp.Components;
 
-public sealed class NotificationCenterComponent : IStatefulComponent, IMouseStatefulComponent, IFocusableComponent
+public sealed partial class NotificationCenterComponent : IStatefulComponent, IMouseStatefulComponent, IFocusableComponent
 {
     private readonly List<NotificationEntry> _entries = [];
     private WidgetInteractionProfile _interactionProfile = WidgetInteractionProfile.Default.Clone();
@@ -226,98 +226,22 @@ public sealed class NotificationCenterComponent : IStatefulComponent, IMouseStat
             return;
         }
 
-        Rect content;
-        if (ShowBorder)
-        {
-            canvas.DrawBox(clipped, Focused ? $"{Title} *" : Title);
-            content = clipped.Inset(1, 1);
-        }
-        else
-        {
-            content = clipped;
-        }
-
+        var content = ResolveRenderContentRect(canvas, clipped);
         if (content.IsEmpty)
         {
             return;
         }
 
-        if (_entries.Count == 0)
-        {
-            canvas.WriteText(content.X, content.Y, EntryStatePalette.Render("(empty)", WidgetVisualState.Empty), content.Width);
-            return;
-        }
-
-        var start = ComputeWindowStart(content.Height);
-        var end = Math.Min(_entries.Count, start + content.Height);
-        var row = 0;
-        for (var i = start; i < end; i++, row++)
-        {
-            var entry = _entries[i];
-            var cursor = i == _selectedIndex ? ">" : " ";
-            var readMark = entry.IsRead ? " " : "•";
-            var timestamp = ShowTimestamp ? $"{entry.CreatedAt:HH:mm:ss} " : string.Empty;
-            var line = $"{cursor}{readMark} {timestamp}{entry.Message}";
-            var states = ResolveEntryStates(entry, i == _selectedIndex, i == _hoveredIndex);
-            canvas.WriteText(content.X, content.Y + row, EntryStatePalette.Render(line, states), content.Width);
-        }
+        RenderEntries(canvas, content);
     }
 
-    private List<WidgetVisualState> ResolveEntryStates(NotificationEntry entry, bool selected, bool hovered)
-    {
-        var states = new List<WidgetVisualState>(7);
-        if (Focused)
-        {
-            states.Add(WidgetVisualState.Focused);
-        }
+    private int ComputeWindowStart(int contentHeight) =>
+        Math.Clamp(_selectedIndex - (contentHeight / 2), 0, Math.Max(0, _entries.Count - contentHeight));
 
-        if (Disabled)
-        {
-            states.Add(WidgetVisualState.Disabled);
-        }
-
-        if (ReadOnly)
-        {
-            states.Add(WidgetVisualState.ReadOnly);
-        }
-
-        if (selected)
-        {
-            states.Add(WidgetVisualState.Cursor);
-            states.Add(WidgetVisualState.Selected);
-        }
-
-        if (hovered)
-        {
-            states.Add(WidgetVisualState.Hovered);
-        }
-
-        if (!entry.IsRead)
-        {
-            states.Add(WidgetVisualState.New);
-        }
-
-        states.Add(entry.Severity switch
-        {
-            NotificationSeverity.Success => WidgetVisualState.Success,
-            NotificationSeverity.Warning => WidgetVisualState.Warning,
-            NotificationSeverity.Error => WidgetVisualState.Error,
-            _ => WidgetVisualState.Default,
-        });
-        return states;
-    }
-
-    private int ComputeWindowStart(int contentHeight)
-    {
-        return Math.Clamp(_selectedIndex - (contentHeight / 2), 0, Math.Max(0, _entries.Count - contentHeight));
-    }
-
-    private Rect ResolveContentRect(Rect bounds)
-    {
-        return ShowBorder
+    private Rect ResolveContentRect(Rect bounds) =>
+        ShowBorder
             ? bounds.Inset(1, 1)
             : bounds;
-    }
 
     private bool SetHoveredIndex(int index)
     {

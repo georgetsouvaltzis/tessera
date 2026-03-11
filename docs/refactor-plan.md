@@ -48,6 +48,7 @@ Status: in progress
 - split `TeaProgram` lifecycle/message-loop/runtime responsibilities into dedicated files without changing the public API
 - split `ScreenComposer` typed API, routing logic, and legacy string bridges into dedicated files
 - split `ComboboxComponent` and `DropdownComponent` so render/state-resolution helpers are separated from update/configuration logic
+- split `TreeViewComponent` and `NotificationCenterComponent` so rendering/state styling helpers are separated from interaction logic
 
 ## Phase 4: API Simplification
 
