@@ -65,6 +65,28 @@ public sealed partial class ScreenComposer
         return new MasterDetailScreen(this, frame, master, detail);
     }
 
+    /// <summary>
+    /// Creates a dashboard-style screen scaffold with optional header and footer plus sidebar and main regions.
+    /// </summary>
+    /// <param name="bounds">The full screen bounds to partition.</param>
+    /// <param name="sidebarWidth">Requested width for the sidebar pane.</param>
+    /// <param name="headerHeight">Header height in rows.</param>
+    /// <param name="footerHeight">Footer height in rows.</param>
+    /// <param name="minSidebarWidth">Minimum width for the sidebar pane.</param>
+    /// <param name="minMainWidth">Minimum width for the main pane.</param>
+    public DashboardScreen Dashboard(
+        Rect bounds,
+        int sidebarWidth,
+        int headerHeight = 0,
+        int footerHeight = 0,
+        int minSidebarWidth = 0,
+        int minMainWidth = 0)
+    {
+        var frame = Frame(bounds, headerHeight, footerHeight);
+        var (sidebar, main) = frame.SplitBodyColumns(sidebarWidth, minSidebarWidth, minMainWidth);
+        return new DashboardScreen(this, frame, sidebar, main);
+    }
+
     public void BeginFrame()
     {
         foreach (var region in _regions)

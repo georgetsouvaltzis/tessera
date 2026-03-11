@@ -89,6 +89,24 @@ public abstract class InteractiveScreenModel : IModel
         int minDetailWidth = 0) =>
         Screen.MasterDetail(bounds, masterWidth, headerHeight, footerHeight, minMasterWidth, minDetailWidth);
 
+    /// <summary>
+    /// Creates a dashboard-style screen scaffold with optional header and footer plus sidebar and main regions.
+    /// </summary>
+    /// <param name="bounds">The full screen bounds to partition.</param>
+    /// <param name="sidebarWidth">Requested width for the sidebar pane.</param>
+    /// <param name="headerHeight">Header height in rows.</param>
+    /// <param name="footerHeight">Footer height in rows.</param>
+    /// <param name="minSidebarWidth">Minimum width for the sidebar pane.</param>
+    /// <param name="minMainWidth">Minimum width for the main pane.</param>
+    protected DashboardScreen Dashboard(
+        Rect bounds,
+        int sidebarWidth,
+        int headerHeight = 0,
+        int footerHeight = 0,
+        int minSidebarWidth = 0,
+        int minMainWidth = 0) =>
+        Screen.Dashboard(bounds, sidebarWidth, headerHeight, footerHeight, minSidebarWidth, minMainWidth);
+
     protected bool SetFocus(ScreenRegionKey regionKey)
     {
         EnsureScreen();

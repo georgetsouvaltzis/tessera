@@ -209,6 +209,22 @@ protected override void ComposeScreen(Rect bodyRect)
 
 This keeps shell layout, region registration, and focus order in one place.
 
+For dashboard-style apps, use the sidebar scaffold instead of manually splitting the body every time:
+
+```csharp
+protected override void ComposeScreen(Rect bodyRect)
+{
+    var shell = Dashboard(bodyRect, sidebarWidth: 24, headerHeight: 1, footerHeight: 1);
+
+    shell.AddHeader(HeaderRegion, _tabs);
+    shell.AddSidebar(FiltersRegion, _filters);
+    shell.AddMain(MainRegion, _table);
+    shell.AddFooter(StatusRegion, _statusBar);
+}
+```
+
+This keeps the common `header + sidebar + main + footer` shell as a first-class API.
+
 ## Scope Order
 
 Use this order unless you have a clear reason not to:

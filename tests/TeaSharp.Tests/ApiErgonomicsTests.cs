@@ -18,6 +18,7 @@ internal static class ApiErgonomicsTests
         yield return new TestCase("ApiErgonomics_Thickness_UsesStandardSpacingVocabulary", Thickness_UsesStandardSpacingVocabulary);
         yield return new TestCase("ApiErgonomics_ScreenFrameLayout_ReducesScreenRectBookkeeping", ScreenFrameLayout_ReducesScreenRectBookkeeping);
         yield return new TestCase("ApiErgonomics_MasterDetailScreen_ReducesShellBookkeeping", MasterDetailScreen_ReducesShellBookkeeping);
+        yield return new TestCase("ApiErgonomics_DashboardScreen_ReducesShellBookkeeping", DashboardScreen_ReducesShellBookkeeping);
         yield return new TestCase("ApiErgonomics_TextInputOptions_ConfigureComponentWithoutNestedInputAccess", TextInputOptions_ConfigureComponentWithoutNestedInputAccess);
         yield return new TestCase("ApiErgonomics_TextAreaOptions_ConfigureComponentWithoutNestedInputAccess", TextAreaOptions_ConfigureComponentWithoutNestedInputAccess);
         yield return new TestCase("ApiErgonomics_ListComponent_ExposesSelectionWithoutModelAccess", ListComponent_ExposesSelectionWithoutModelAccess);
@@ -82,6 +83,28 @@ internal static class ApiErgonomicsTests
         TestAssert.Equal(new Rect(28, 1, 72, 27), scaffold.Detail, "Master-detail scaffold should expose detail bounds directly.");
         TestAssert.True(changed, "Master-detail scaffold should build a reusable focus chain from added regions.");
         TestAssert.True(screen.FocusedRegionKey == new ScreenRegionKey("master"), "Scaffold focus chain should respect helper-add order.");
+        return Task.CompletedTask;
+    }
+
+    private static Task DashboardScreen_ReducesShellBookkeeping()
+    {
+        var screen = new ScreenComposer();
+        var scaffold = screen.Dashboard(new Rect(0, 0, 100, 30), sidebarWidth: 20, headerHeight: 1, footerHeight: 2);
+        var sidebar = new ButtonComponent();
+        var main = new ButtonComponent();
+
+        screen.BeginFrame();
+        scaffold.AddSidebar("sidebar", sidebar);
+        scaffold.AddMain("main", main);
+        screen.CompleteFrame();
+
+        var focusChain = scaffold.CreateFocusChain();
+        var changed = screen.FocusFirst(focusChain);
+
+        TestAssert.Equal(new Rect(0, 1, 20, 27), scaffold.Sidebar, "Dashboard scaffold should expose sidebar bounds directly.");
+        TestAssert.Equal(new Rect(20, 1, 80, 27), scaffold.Main, "Dashboard scaffold should expose main bounds directly.");
+        TestAssert.True(changed, "Dashboard scaffold should build a reusable focus chain from added regions.");
+        TestAssert.True(screen.FocusedRegionKey == new ScreenRegionKey("sidebar"), "Scaffold focus chain should respect helper-add order.");
         return Task.CompletedTask;
     }
 
