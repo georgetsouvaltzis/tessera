@@ -1,5 +1,8 @@
+using System.ComponentModel;
+using TeaSharp.Components.Styling;
 namespace TeaSharp.Components.Interaction;
 
+[EditorBrowsable(EditorBrowsableState.Advanced)]
 public sealed class WidgetInteractionProfile
 {
     public static WidgetInteractionProfile Default { get; } = new();

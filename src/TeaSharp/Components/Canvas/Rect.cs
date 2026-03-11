@@ -1,3 +1,4 @@
+using TeaSharp.Components.Primitives.Internal;
 namespace TeaSharp.Components.Primitives;
 
 public readonly record struct Rect(int X, int Y, int Width, int Height)

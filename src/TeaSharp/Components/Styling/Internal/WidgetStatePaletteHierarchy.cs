@@ -1,3 +1,4 @@
+using TeaSharp.Components.Styling;
 namespace TeaSharp.Components.Styling.Internal;
 
 internal static class WidgetStatePaletteHierarchy

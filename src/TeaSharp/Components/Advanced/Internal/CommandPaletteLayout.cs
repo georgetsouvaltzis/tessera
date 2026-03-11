@@ -1,3 +1,6 @@
+using TeaSharp.Components.Advanced;
+using TeaSharp.Components.Primitives;
+using TeaSharp.Components.Styling;
 namespace TeaSharp.Components.Advanced.Internal;
 
 internal static class CommandPaletteLayout

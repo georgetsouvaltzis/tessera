@@ -1,3 +1,5 @@
+using TeaSharp.Components.Primitives;
+using TeaSharp.Components.UiKit;
 namespace TeaSharp.Components.UiKit.Internal;
 
 internal static class SortableTablePointerHelper

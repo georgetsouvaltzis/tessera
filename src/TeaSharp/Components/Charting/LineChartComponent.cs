@@ -1,3 +1,5 @@
+using TeaSharp.Components.Composition;
+using TeaSharp.Components.Primitives;
 namespace TeaSharp.Components.Charting;
 
 public sealed class LineChartComponent : ICanvasComponent

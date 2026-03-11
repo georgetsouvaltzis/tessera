@@ -1,3 +1,4 @@
+// Legacy scratch example retained only as historical reference.
 // using TeaSharp;
 // using TeaSharp.Components.Primitives;
 // using TeaSharp.Styles;

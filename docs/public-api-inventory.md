@@ -26,6 +26,8 @@ This document defines the current public API tiers in TeaSharp so refactors can 
 - `ProgramOptions`
 - `TeaProgram`
 - `ComponentComposer`
+- `TeaSharp.Components.Styling.*`
+- `TeaSharp.Components.Interaction.*`
 - `IProgramRenderer`
 - `ITerminalAdapter`
 - `IEventDecoder`

@@ -1,3 +1,4 @@
+using TeaSharp.Components.Primitives;
 namespace TeaSharp.Components.Composition;
 
 public enum InputScopeKind

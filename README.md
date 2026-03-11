@@ -14,6 +14,7 @@ It keeps the default app path small:
   - `TeaSharp.Components.Advanced`
   - `TeaSharp.Components.Composition`
   - `TeaSharp.Components.Primitives`
+- migration details: [docs/namespace-migration.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/namespace-migration.md)
 
 ## Quick Start
 

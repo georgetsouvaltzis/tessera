@@ -1,3 +1,5 @@
+using TeaSharp.Components.Composition;
+using TeaSharp.Components.Primitives;
 
 internal sealed class UnicodeShowcaseComponent : ICanvasComponent
 {

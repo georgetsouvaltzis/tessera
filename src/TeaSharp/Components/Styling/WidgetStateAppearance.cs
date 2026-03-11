@@ -1,7 +1,10 @@
+using System.ComponentModel;
+using TeaSharp.Components.Styling.Internal;
 using TeaSharp.Styles;
 
 namespace TeaSharp.Components.Styling;
 
+[EditorBrowsable(EditorBrowsableState.Advanced)]
 public sealed class WidgetStateAppearance
 {
     public TeaStyle TextStyle { get; set; } = TeaStyle.Empty;
@@ -12,4 +15,3 @@ public sealed class WidgetStateAppearance
 
     public bool Uppercase { get; set; }
 }
-
