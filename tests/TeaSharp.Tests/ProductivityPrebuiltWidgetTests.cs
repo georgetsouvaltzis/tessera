@@ -31,8 +31,10 @@ internal static class ProductivityPrebuiltWidgetTests
         yield return new TestCase("Productivity_NumberInputComponent_SubmittedEvent_ReportsValue", NumberInputComponent_SubmittedEvent_ReportsValue);
         yield return new TestCase("Productivity_NumberInputComponent_TryConsumeSubmit_IsSingleUse", NumberInputComponent_TryConsumeSubmit_IsSingleUse);
         yield return new TestCase("Productivity_DatePickerComponent_MovesDate", DatePickerComponent_MovesDate);
+        yield return new TestCase("Productivity_DatePickerComponent_DateChangedEvent_ReportsTransition", DatePickerComponent_DateChangedEvent_ReportsTransition);
         yield return new TestCase("Productivity_DatePickerComponent_MouseClickSelectsDate", DatePickerComponent_MouseClickSelectsDate);
         yield return new TestCase("Productivity_TimePickerComponent_AdjustsField", TimePickerComponent_AdjustsField);
+        yield return new TestCase("Productivity_TimePickerComponent_ValueChangedEvent_ReportsTransition", TimePickerComponent_ValueChangedEvent_ReportsTransition);
         yield return new TestCase("Productivity_TimePickerComponent_MouseWheelAdjustsField", TimePickerComponent_MouseWheelAdjustsField);
         yield return new TestCase("Productivity_MarkdownViewerComponent_RendersMarkdown", MarkdownViewerComponent_RendersMarkdown);
     }
@@ -311,6 +313,22 @@ internal static class ProductivityPrebuiltWidgetTests
         return Task.CompletedTask;
     }
 
+    private static Task DatePickerComponent_DateChangedEvent_ReportsTransition()
+    {
+        var picker = new DatePickerComponent(new DatePickerOptions(
+            Focused: true,
+            InitialDate: new DateOnly(2026, 3, 8)));
+        DateChangedEventArgs? args = null;
+        picker.DateChanged += (_, eventArgs) => args = eventArgs;
+
+        picker.Update(new KeyPressMsg(KeyCode.Right));
+
+        TestAssert.True(args is not null, "Date picker should raise date changed when the selected date changes.");
+        TestAssert.Equal(new DateOnly(2026, 3, 8), args!.PreviousDate, "Date picker event should expose the previous date.");
+        TestAssert.Equal(new DateOnly(2026, 3, 9), args.SelectedDate, "Date picker event should expose the selected date.");
+        return Task.CompletedTask;
+    }
+
     private static Task TimePickerComponent_AdjustsField()
     {
         var picker = new TimePickerComponent(new TimePickerOptions(
@@ -336,6 +354,24 @@ internal static class ProductivityPrebuiltWidgetTests
 
         TestAssert.True(changed, "Time picker wheel should adjust hovered/active field.");
         TestAssert.Equal(new TimeOnly(10, 5, 0), picker.Value, "Time picker wheel should increase minute field by configured step.");
+        return Task.CompletedTask;
+    }
+
+    private static Task TimePickerComponent_ValueChangedEvent_ReportsTransition()
+    {
+        var picker = new TimePickerComponent(new TimePickerOptions(
+            Focused: true,
+            MinuteStep: 5,
+            InitialValue: new TimeOnly(10, 0, 0)));
+        TimeValueChangedEventArgs? args = null;
+        picker.ValueChanged += (_, eventArgs) => args = eventArgs;
+
+        picker.Update(new KeyPressMsg(KeyCode.Right));
+        picker.Update(new KeyPressMsg(KeyCode.Up));
+
+        TestAssert.True(args is not null, "Time picker should raise value changed when the selected time changes.");
+        TestAssert.Equal(new TimeOnly(10, 0, 0), args!.PreviousValue, "Time picker event should expose the previous value.");
+        TestAssert.Equal(new TimeOnly(10, 5, 0), args.Value, "Time picker event should expose the current value.");
         return Task.CompletedTask;
     }
 

@@ -36,6 +36,11 @@ public sealed class TabsComponent : IStatefulComponent, IMouseStatefulComponent,
 
     public bool Focused { get; set; }
 
+    /// <summary>
+    /// Raised when the selected tab changes.
+    /// </summary>
+    public event EventHandler<TabSelectionChangedEventArgs>? SelectionChanged;
+
     public WidgetStatePalette TabStatePalette { get; } = WidgetStatePalette.CreateDefault();
 
     public WidgetInteractionProfile InteractionProfile
@@ -59,14 +64,12 @@ public sealed class TabsComponent : IStatefulComponent, IMouseStatefulComponent,
 
         if (NextTabKey.Matches(key))
         {
-            SelectedIndex = (SelectedIndex + 1) % _tabs.Count;
-            return true;
+            return SetSelectedIndex((SelectedIndex + 1) % _tabs.Count);
         }
 
         if (PreviousTabKey.Matches(key))
         {
-            SelectedIndex = (SelectedIndex + _tabs.Count - 1) % _tabs.Count;
-            return true;
+            return SetSelectedIndex((SelectedIndex + _tabs.Count - 1) % _tabs.Count);
         }
 
         if (EnableNumericShortcuts
@@ -74,8 +77,7 @@ public sealed class TabsComponent : IStatefulComponent, IMouseStatefulComponent,
             && oneBased >= 1
             && oneBased <= _tabs.Count)
         {
-            SelectedIndex = oneBased - 1;
-            return true;
+            return SetSelectedIndex(oneBased - 1);
         }
 
         return false;
@@ -94,14 +96,12 @@ public sealed class TabsComponent : IStatefulComponent, IMouseStatefulComponent,
         {
             if (wheel.Button == MouseButton.WheelDown)
             {
-                SelectedIndex = (SelectedIndex + 1) % _tabs.Count;
-                return true;
+                return SetSelectedIndex((SelectedIndex + 1) % _tabs.Count);
             }
 
             if (wheel.Button == MouseButton.WheelUp)
             {
-                SelectedIndex = (SelectedIndex + _tabs.Count - 1) % _tabs.Count;
-                return true;
+                return SetSelectedIndex((SelectedIndex + _tabs.Count - 1) % _tabs.Count);
             }
         }
 
@@ -132,8 +132,7 @@ public sealed class TabsComponent : IStatefulComponent, IMouseStatefulComponent,
             && hovered < _tabs.Count
             && hovered != SelectedIndex)
         {
-            SelectedIndex = hovered;
-            changed = true;
+            changed |= SetSelectedIndex(hovered);
         }
 
         return changed;
@@ -147,7 +146,7 @@ public sealed class TabsComponent : IStatefulComponent, IMouseStatefulComponent,
             return;
         }
 
-        SelectedIndex = Math.Clamp(index, 0, _tabs.Count - 1);
+        SetSelectedIndex(Math.Clamp(index, 0, _tabs.Count - 1));
     }
 
     public void Render(Canvas canvas, Rect rect)
@@ -221,6 +220,27 @@ public sealed class TabsComponent : IStatefulComponent, IMouseStatefulComponent,
         }
 
         _hoveredIndex = index;
+        return true;
+    }
+
+    private bool SetSelectedIndex(int index)
+    {
+        if (_tabs.Count == 0)
+        {
+            SelectedIndex = 0;
+            return false;
+        }
+
+        var clamped = Math.Clamp(index, 0, _tabs.Count - 1);
+        if (clamped == SelectedIndex)
+        {
+            return false;
+        }
+
+        var previousIndex = SelectedIndex;
+        var previousTab = _tabs[previousIndex];
+        SelectedIndex = clamped;
+        SelectionChanged?.Invoke(this, new TabSelectionChangedEventArgs(previousIndex, SelectedIndex, previousTab, _tabs[SelectedIndex]));
         return true;
     }
 }

@@ -68,37 +68,63 @@ public sealed class ListComponent<T> : IStatefulComponent, IMouseStatefulCompone
 
     public Func<T, IReadOnlyCollection<WidgetVisualState>?>? ItemStateResolver { get; set; }
 
+    /// <summary>
+    /// Raised when the list selection changes.
+    /// </summary>
+    public event EventHandler<ListSelectionChangedEventArgs<T>>? SelectionChanged;
+
     [EditorBrowsable(EditorBrowsableState.Advanced)]
     public ListKeyMap KeyMap { get; set; } = ListKeyMap.Default;
 
     public void SetItems(IEnumerable<T> items)
     {
+        var previousIndex = SelectedIndex;
+        var previousItem = SelectedItem;
         _model.SetItems(items);
+        RaiseSelectionChangedIfNeeded(previousIndex, previousItem);
     }
 
-    public ValueTask SetItemsAsync(IAsyncEnumerable<T> items, CancellationToken cancellationToken = default)
+    public async ValueTask SetItemsAsync(IAsyncEnumerable<T> items, CancellationToken cancellationToken = default)
     {
-        return _model.SetItemsAsync(items, cancellationToken);
+        var previousIndex = SelectedIndex;
+        var previousItem = SelectedItem;
+        await _model.SetItemsAsync(items, cancellationToken);
+        RaiseSelectionChangedIfNeeded(previousIndex, previousItem);
     }
 
-    public ValueTask<int> AppendItemsAsync(IAsyncEnumerable<T> items, CancellationToken cancellationToken = default)
+    public async ValueTask<int> AppendItemsAsync(IAsyncEnumerable<T> items, CancellationToken cancellationToken = default)
     {
-        return _model.AppendItemsAsync(items, cancellationToken);
+        var previousIndex = SelectedIndex;
+        var previousItem = SelectedItem;
+        var appended = await _model.AppendItemsAsync(items, cancellationToken);
+        RaiseSelectionChangedIfNeeded(previousIndex, previousItem);
+        return appended;
     }
 
-    public ValueTask<int> ReloadAsync(Func<CancellationToken, IAsyncEnumerable<T>> loader, CancellationToken cancellationToken = default)
+    public async ValueTask<int> ReloadAsync(Func<CancellationToken, IAsyncEnumerable<T>> loader, CancellationToken cancellationToken = default)
     {
-        return _model.ReloadAsync(loader, cancellationToken);
+        var previousIndex = SelectedIndex;
+        var previousItem = SelectedItem;
+        var loaded = await _model.ReloadAsync(loader, cancellationToken);
+        RaiseSelectionChangedIfNeeded(previousIndex, previousItem);
+        return loaded;
     }
 
-    public ValueTask<int> AppendAsync(Func<CancellationToken, IAsyncEnumerable<T>> loader, CancellationToken cancellationToken = default)
+    public async ValueTask<int> AppendAsync(Func<CancellationToken, IAsyncEnumerable<T>> loader, CancellationToken cancellationToken = default)
     {
-        return _model.AppendAsync(loader, cancellationToken);
+        var previousIndex = SelectedIndex;
+        var previousItem = SelectedItem;
+        var appended = await _model.AppendAsync(loader, cancellationToken);
+        RaiseSelectionChangedIfNeeded(previousIndex, previousItem);
+        return appended;
     }
 
     public void SetFilter(string filter)
     {
+        var previousIndex = SelectedIndex;
+        var previousItem = SelectedItem;
         _model.SetFilter(filter);
+        RaiseSelectionChangedIfNeeded(previousIndex, previousItem);
     }
 
     public IReadOnlyList<ListRow<T>> VisibleRows()
@@ -115,7 +141,11 @@ public sealed class ListComponent<T> : IStatefulComponent, IMouseStatefulCompone
             return false;
         }
 
-        return _model.Update(message, KeyMap);
+        var previousIndex = SelectedIndex;
+        var previousItem = SelectedItem;
+        var changed = _model.Update(message, KeyMap);
+        RaiseSelectionChangedIfNeeded(previousIndex, previousItem);
+        return changed;
     }
 
     public bool UpdateMouse(MouseMsg message, Rect bounds)
@@ -124,7 +154,12 @@ public sealed class ListComponent<T> : IStatefulComponent, IMouseStatefulCompone
         {
             return false;
         }
-        return ListComponentMouseRouter.Update(message, bounds, Border, Padding, _model, SetHoveredFilteredIndex);
+
+        var previousIndex = SelectedIndex;
+        var previousItem = SelectedItem;
+        var changed = ListComponentMouseRouter.Update(message, bounds, Border, Padding, _model, SetHoveredFilteredIndex);
+        RaiseSelectionChangedIfNeeded(previousIndex, previousItem);
+        return changed;
     }
 
     public void Render(Canvas canvas, Rect rect)
@@ -153,5 +188,16 @@ public sealed class ListComponent<T> : IStatefulComponent, IMouseStatefulCompone
 
         _hoveredFilteredIndex = filteredIndex;
         return true;
+    }
+
+    private void RaiseSelectionChangedIfNeeded(int previousIndex, T? previousItem)
+    {
+        if (previousIndex == SelectedIndex
+            && EqualityComparer<T?>.Default.Equals(previousItem, SelectedItem))
+        {
+            return;
+        }
+
+        SelectionChanged?.Invoke(this, new ListSelectionChangedEventArgs<T>(previousIndex, SelectedIndex, previousItem, SelectedItem));
     }
 }

@@ -61,6 +61,11 @@ public sealed class TimePickerComponent : IStatefulComponent, IMouseStatefulComp
 
     public TimeOnly Value { get; private set; } = TimeOnly.FromDateTime(DateTime.UtcNow);
 
+    /// <summary>
+    /// Raised when the selected time value changes.
+    /// </summary>
+    public event EventHandler<TimeValueChangedEventArgs>? ValueChanged;
+
     public TimeOnly? LastCommittedTime { get; private set; }
 
     public TimePickerField ActiveField { get; private set; }
@@ -93,7 +98,12 @@ public sealed class TimePickerComponent : IStatefulComponent, IMouseStatefulComp
 
     public void SetValue(TimeOnly time)
     {
+        var previousValue = Value;
         Value = time;
+        if (previousValue != Value)
+        {
+            ValueChanged?.Invoke(this, new TimeValueChangedEventArgs(previousValue, Value));
+        }
     }
 
     public bool Update(IMessage message)
@@ -117,13 +127,13 @@ public sealed class TimePickerComponent : IStatefulComponent, IMouseStatefulComp
 
         if (IncreaseKey.Matches(key))
         {
-            Value = TimePickerFields.Adjust(Value, ActiveField, HourStep, MinuteStep, SecondStep, 1);
+            SetValue(TimePickerFields.Adjust(Value, ActiveField, HourStep, MinuteStep, SecondStep, 1));
             return true;
         }
 
         if (DecreaseKey.Matches(key))
         {
-            Value = TimePickerFields.Adjust(Value, ActiveField, HourStep, MinuteStep, SecondStep, -1);
+            SetValue(TimePickerFields.Adjust(Value, ActiveField, HourStep, MinuteStep, SecondStep, -1));
             return true;
         }
 
@@ -195,12 +205,12 @@ public sealed class TimePickerComponent : IStatefulComponent, IMouseStatefulComp
 
             if (wheel.Button == MouseButton.WheelUp)
             {
-                Value = TimePickerFields.Adjust(Value, ActiveField, HourStep, MinuteStep, SecondStep, 1);
+                SetValue(TimePickerFields.Adjust(Value, ActiveField, HourStep, MinuteStep, SecondStep, 1));
                 changed = true;
             }
             else if (wheel.Button == MouseButton.WheelDown)
             {
-                Value = TimePickerFields.Adjust(Value, ActiveField, HourStep, MinuteStep, SecondStep, -1);
+                SetValue(TimePickerFields.Adjust(Value, ActiveField, HourStep, MinuteStep, SecondStep, -1));
                 changed = true;
             }
         }

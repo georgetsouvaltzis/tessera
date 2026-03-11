@@ -40,11 +40,14 @@ TeaSharp provides a prebuilt widget layer in `TeaSharp.Components.Prebuilt` aime
 - `TextInputComponent` provides single-line text entry with component-level accessors (`Value`, `SetValue`, `Placeholder`, `MaxLength`) plus cancel semantics via `CancelKey` (`esc` default), `CancelCount`, `WasCancelled`, `LastCancelledValue`, `Submitted`, `Cancelled`, `TryConsumeSubmit(...)`, and `TryConsumeCancel(...)`.
 - `TextAreaComponent` provides multiline editing with component-level text access (`Value`, `SetValue`, `Clear`) and optional line numbers.
 - `ListComponent<T>` provides filtering, selection, paging, and item replacement through component-level APIs (`SetItems`, `SetFilter`, `SelectedItem`, `SelectedIndex`, `PageSize`).
+  - App-friendly selection hook: `SelectionChanged`.
   - Mouse support: motion previews row hover (`▸` marker), left click selects a visible row, wheel scroll navigates selection.
 - `TableComponent` exposes sort/page interactions directly (`PageSize`, `SortColumn`, `SortDescending`, `SetRows`, `SetVirtualWindow`) without leaking the lower-level table primitive.
 - `DropdownComponent` provides open/close menu selection with configurable key bindings and a `DropdownOptions` constructor for common setup.
+  - App-friendly selection hook: `SelectionChanged`.
   - Mouse support: field click open/close, option click selection, wheel-driven highlight navigation when open.
 - `ComboboxComponent` combines text filtering with keyboard-driven option selection through component-level filter access (`FilterText`, `Placeholder`, `SetFilterText`) and a `ComboboxOptions` constructor for common setup.
+  - App-friendly selection hook: `SelectionChanged`.
   - Mouse support: field click open/close, option click selection, wheel-driven highlight navigation when open.
 - `LogViewerComponent` supports append, filter, pause, clear, and scrolling.
   - Friendly setup path: `LogViewerOptions`.
@@ -67,6 +70,7 @@ TeaSharp provides a prebuilt widget layer in `TeaSharp.Components.Prebuilt` aime
   - App-friendly execution hooks: `ItemActivated`, `ItemExecuted`, `TryConsumeActivation(...)`, and `TryConsumeExecution(...)`.
 - `NumberInputComponent`, `DatePickerComponent`, and `TimePickerComponent` provide structured value entry, with `NumberInputComponent.Text` exposing the rendered numeric text without leaking the text-input model.
   - App-friendly submit hooks: `NumberInputComponent.Submitted` and `TryConsumeSubmit(...)`.
+  - App-friendly change hooks: `DatePickerComponent.DateChanged`, `TimePickerComponent.ValueChanged`.
   - Mouse support (`DatePickerComponent`, `TimePickerComponent`): day/field selection on click and wheel adjustment/navigation.
   - Friendly setup paths: `NumberInputOptions`, `DatePickerOptions`, `TimePickerOptions`.
 - `MarkdownViewerComponent` provides scrollable markdown rendering for docs/help panes.

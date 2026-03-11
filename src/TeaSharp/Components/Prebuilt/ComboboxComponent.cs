@@ -78,6 +78,11 @@ public sealed partial class ComboboxComponent : IStatefulComponent, IMouseStatef
 
     public int SelectedIndex => _options.SelectedIndex;
 
+    /// <summary>
+    /// Raised when the selected option changes.
+    /// </summary>
+    public event EventHandler<OptionSelectionChangedEventArgs>? SelectionChanged;
+
     public int MaxVisibleItems { get; set; } = 6;
 
     [EditorBrowsable(EditorBrowsableState.Advanced)]
@@ -115,8 +120,11 @@ public sealed partial class ComboboxComponent : IStatefulComponent, IMouseStatef
 
     public void SetItems(IEnumerable<string> items)
     {
+        var previousIndex = SelectedIndex;
+        var previousItem = SelectedItem;
         _options.SetItems(items, selectFirstItemWhenUnset: false);
         _options.ApplyFilter(_input.Value);
+        RaiseSelectionChangedIfNeeded(previousIndex, previousItem);
     }
 
     public bool Update(IMessage message)
@@ -293,6 +301,8 @@ public sealed partial class ComboboxComponent : IStatefulComponent, IMouseStatef
 
     private bool SelectHighlighted()
     {
+        var previousIndex = SelectedIndex;
+        var previousItem = SelectedItem;
         if (!_options.TrySelectHighlighted(out var selectedIndex))
         {
             IsOpen = false;
@@ -302,6 +312,7 @@ public sealed partial class ComboboxComponent : IStatefulComponent, IMouseStatef
         _input.SetValue(_options.Items[selectedIndex]);
         _options.ApplyFilter(_input.Value);
         IsOpen = false;
+        RaiseSelectionChangedIfNeeded(previousIndex, previousItem);
         return true;
     }
 
@@ -344,5 +355,15 @@ public sealed partial class ComboboxComponent : IStatefulComponent, IMouseStatef
         }
 
         return true;
+    }
+
+    private void RaiseSelectionChangedIfNeeded(int previousIndex, string previousItem)
+    {
+        if (previousIndex == SelectedIndex && string.Equals(previousItem, SelectedItem, StringComparison.Ordinal))
+        {
+            return;
+        }
+
+        SelectionChanged?.Invoke(this, new OptionSelectionChangedEventArgs(previousIndex, SelectedIndex, previousItem, SelectedItem));
     }
 }

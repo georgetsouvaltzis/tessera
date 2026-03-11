@@ -60,6 +60,11 @@ public sealed class DatePickerComponent : IStatefulComponent, IMouseStatefulComp
 
     public DateOnly CurrentMonth { get; private set; } = new(DateTime.UtcNow.Year, DateTime.UtcNow.Month, 1);
 
+    /// <summary>
+    /// Raised when the selected date changes.
+    /// </summary>
+    public event EventHandler<DateChangedEventArgs>? DateChanged;
+
     public DateOnly? LastCommittedDate { get; private set; }
 
     public KeyBinding PreviousDayKey { get; set; } = new("left/h", "previous day", "left", "h");
@@ -88,8 +93,13 @@ public sealed class DatePickerComponent : IStatefulComponent, IMouseStatefulComp
 
     public void SetDate(DateOnly date)
     {
+        var previousDate = SelectedDate;
         SelectedDate = date;
         CurrentMonth = new DateOnly(date.Year, date.Month, 1);
+        if (previousDate != SelectedDate)
+        {
+            DateChanged?.Invoke(this, new DateChangedEventArgs(previousDate, SelectedDate));
+        }
     }
 
     public bool Update(IMessage message)

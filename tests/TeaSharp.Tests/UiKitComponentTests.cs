@@ -22,6 +22,7 @@ internal static class UiKitComponentTests
         yield return new TestCase("UiKit_Widgets_DrawStatusBar_PlacesLeftAndRightText", Widgets_DrawStatusBar_PlacesLeftAndRightText);
         yield return new TestCase("UiKit_Widgets_DrawStatusBar_UsesThemeFill", Widgets_DrawStatusBar_UsesThemeFill);
         yield return new TestCase("UiKit_TabsComponent_CyclesAndSelectsByNumber", TabsComponent_CyclesAndSelectsByNumber);
+        yield return new TestCase("UiKit_TabsComponent_SelectionChangedEvent_ReportsTab", TabsComponent_SelectionChangedEvent_ReportsTab);
         yield return new TestCase("UiKit_TabsComponent_MouseClickSelectsTab", TabsComponent_MouseClickSelectsTab);
         yield return new TestCase("UiKit_SortableTableComponent_UpdatesSortAndPaging", SortableTableComponent_UpdatesSortAndPaging);
         yield return new TestCase("UiKit_SortableTableComponent_VirtualizationWindow_RendersSlice", SortableTableComponent_VirtualizationWindow_RendersSlice);
@@ -136,6 +137,22 @@ internal static class UiKitComponentTests
         // Assert
         TestAssert.True(changed, "Mouse click inside tab row should update selected tab.");
         TestAssert.Equal(1, tabs.SelectedIndex, "Tab click should select the clicked tab.");
+        return Task.CompletedTask;
+    }
+
+    private static Task TabsComponent_SelectionChangedEvent_ReportsTab()
+    {
+        var tabs = new TabsComponent(["Overview", "Data", "Forms"]);
+        TabSelectionChangedEventArgs? args = null;
+        tabs.SelectionChanged += (_, eventArgs) => args = eventArgs;
+
+        tabs.Update(new KeyPressMsg(KeyCode.Right));
+
+        TestAssert.True(args is not null, "Tabs should raise selection changed when the selected tab changes.");
+        TestAssert.Equal(0, args!.PreviousIndex, "Tabs event should expose the previous index.");
+        TestAssert.Equal(1, args.SelectedIndex, "Tabs event should expose the selected index.");
+        TestAssert.Equal("Overview", args.PreviousTab, "Tabs event should expose the previous tab label.");
+        TestAssert.Equal("Data", args.SelectedTab, "Tabs event should expose the selected tab label.");
         return Task.CompletedTask;
     }
 

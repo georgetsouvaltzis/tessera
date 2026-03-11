@@ -68,6 +68,11 @@ public sealed partial class DropdownComponent : IStatefulComponent, IMouseStatef
 
     public int SelectedIndex => _options.SelectedIndex;
 
+    /// <summary>
+    /// Raised when the selected option changes.
+    /// </summary>
+    public event EventHandler<OptionSelectionChangedEventArgs>? SelectionChanged;
+
     public int MaxVisibleItems { get; set; } = 6;
 
     [EditorBrowsable(EditorBrowsableState.Advanced)]
@@ -93,12 +98,16 @@ public sealed partial class DropdownComponent : IStatefulComponent, IMouseStatef
 
     public void SetItems(IEnumerable<string> items)
     {
+        var previousIndex = SelectedIndex;
+        var previousItem = SelectedItem;
         _options.SetItems(items, selectFirstItemWhenUnset: true);
         _fieldHovered = false;
         if (_options.Count == 0)
         {
             IsOpen = false;
         }
+
+        RaiseSelectionChangedIfNeeded(previousIndex, previousItem);
     }
 
     public bool Update(IMessage message)
@@ -140,7 +149,7 @@ public sealed partial class DropdownComponent : IStatefulComponent, IMouseStatef
 
         if (ConfirmSelectionKey.Matches(key))
         {
-            var changed = _options.TrySelectHighlighted(out _);
+            var changed = SelectHighlighted();
             IsOpen = false;
             return changed || true;
         }
@@ -280,7 +289,28 @@ public sealed partial class DropdownComponent : IStatefulComponent, IMouseStatef
             return false;
         }
 
-        return _options.SetSelectedIndex(_options.VisibleItemIndexAt(visibleIndex));
+        var previousIndex = SelectedIndex;
+        var previousItem = SelectedItem;
+        var changed = _options.SetSelectedIndex(_options.VisibleItemIndexAt(visibleIndex));
+        if (changed)
+        {
+            RaiseSelectionChanged(previousIndex, previousItem);
+        }
+
+        return changed;
+    }
+
+    private bool SelectHighlighted()
+    {
+        var previousIndex = SelectedIndex;
+        var previousItem = SelectedItem;
+        var changed = _options.TrySelectHighlighted(out _);
+        if (changed)
+        {
+            RaiseSelectionChanged(previousIndex, previousItem);
+        }
+
+        return changed;
     }
 
     private bool SetHighlightedVisibleIndex(int index)
@@ -314,5 +344,20 @@ public sealed partial class DropdownComponent : IStatefulComponent, IMouseStatef
 
         _fieldHovered = hovered;
         return true;
+    }
+
+    private void RaiseSelectionChangedIfNeeded(int previousIndex, string previousItem)
+    {
+        if (previousIndex == SelectedIndex && string.Equals(previousItem, SelectedItem, StringComparison.Ordinal))
+        {
+            return;
+        }
+
+        RaiseSelectionChanged(previousIndex, previousItem);
+    }
+
+    private void RaiseSelectionChanged(int previousIndex, string previousItem)
+    {
+        SelectionChanged?.Invoke(this, new OptionSelectionChangedEventArgs(previousIndex, SelectedIndex, previousItem, SelectedItem));
     }
 }
