@@ -137,7 +137,7 @@ public sealed class Canvas
         }
     }
 
-    public void DrawBox(Rect rect, string? title = null, BorderStyle borderStyle = BorderStyle.Single)
+    public void DrawBox(Rect rect, string? title = null, BorderStyle borderStyle = BorderStyle.SingleLine)
     {
         var clipped = Rect.Intersect(rect, Bounds);
         if (clipped.IsEmpty || clipped.Width < 2 || clipped.Height < 2)

@@ -18,7 +18,8 @@ The design follows patterns used in Bubble Tea examples:
 - `Canvas`: fixed-size character grid renderer.
   - `Set`, `Get`, `WriteText`
   - `DrawHorizontalLine`, `DrawVerticalLine`, `DrawBox`
-  - `DrawBox` supports `BorderStyle.Single|Rounded|Heavy|Ascii`
+  - `DrawBox` supports `BorderStyle.SingleLine|Rounded|Heavy|Ascii`
+  - `BorderStyle.Single` remains as a compatibility alias and is no longer the preferred spelling
   - text modes:
     - `CanvasTextMode.Fast` (default): char-cell fast path
     - `CanvasTextMode.GraphemeAware`: wide/combining grapheme-aware text placement
