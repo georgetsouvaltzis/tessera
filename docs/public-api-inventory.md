@@ -50,6 +50,7 @@ This document defines the current public API tiers in TeaSharp so refactors can 
 - low-level widget types are visible in places where consumer-facing components should be enough.
 - composition is split between `ComponentComposer` and `ScreenComposer`.
 - `ScreenComposer` + `InputRouter` + `InteractiveScreenModel` is now the documented default path; `ComponentComposer` is being pushed toward lower-level subtree use.
+- `ScreenComposer` raw string region-id overloads remain for compatibility, but are now marked `EditorBrowsable(Advanced)` so typed `ScreenRegionKey` usage stays the default path.
 - runtime plumbing seams (`IProgramRenderer`, `ITerminalAdapter`, `EventDecoder`, `TerminalReader`, capability detectors/profiles) are now explicitly marked `EditorBrowsable(Advanced)` so the stable host path stays centered on `Tea.NewProgram(model)` / `Tea.NewProgram(model, TeaProgramOptions)`.
 
 ## Target Public Surface

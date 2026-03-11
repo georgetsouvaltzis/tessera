@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using TeaSharp.Core.Abstractions;
 using TeaSharp.Core.Messages;
 
@@ -364,6 +365,7 @@ public sealed class ScreenComposer
         return false;
     }
 
+    [EditorBrowsable(EditorBrowsableState.Advanced)]
     public ScreenRegion AddRegion(
         string id,
         Rect bounds,
@@ -379,6 +381,7 @@ public sealed class ScreenComposer
         return AddRegion(new ScreenRegionKey(id), bounds, render, update, updateMouse, focusable, focusOnClick, interceptsPointer, layer, onFocus);
     }
 
+    [EditorBrowsable(EditorBrowsableState.Advanced)]
     public ScreenRegion AddComponent(
         string id,
         Rect bounds,
@@ -392,6 +395,7 @@ public sealed class ScreenComposer
         return AddComponent(new ScreenRegionKey(id), bounds, component, focusable, focusOnClick, interceptsPointer, layer, onFocus);
     }
 
+    [EditorBrowsable(EditorBrowsableState.Advanced)]
     public ScreenRegion AddOverlayRegion(
         string id,
         Rect bounds,
@@ -407,6 +411,7 @@ public sealed class ScreenComposer
         return AddOverlayRegion(new ScreenRegionKey(id), bounds, render, update, updateMouse, focusable, focusOnClick, interceptsPointer, layer, onFocus);
     }
 
+    [EditorBrowsable(EditorBrowsableState.Advanced)]
     public ScreenRegion AddOverlayComponent(
         string id,
         Rect bounds,
@@ -420,6 +425,7 @@ public sealed class ScreenComposer
         return AddOverlayComponent(new ScreenRegionKey(id), bounds, component, focusable, focusOnClick, interceptsPointer, layer, onFocus);
     }
 
+    [EditorBrowsable(EditorBrowsableState.Advanced)]
     public ScreenRegion AddModalComponent(
         string id,
         Rect bounds,
@@ -430,6 +436,7 @@ public sealed class ScreenComposer
         return AddModalComponent(new ScreenRegionKey(id), bounds, component, focusable, onFocus);
     }
 
+    [EditorBrowsable(EditorBrowsableState.Advanced)]
     public ScreenRegion AddPaletteComponent(
         string id,
         Rect bounds,
@@ -440,6 +447,7 @@ public sealed class ScreenComposer
         return AddPaletteComponent(new ScreenRegionKey(id), bounds, component, focusable, onFocus);
     }
 
+    [EditorBrowsable(EditorBrowsableState.Advanced)]
     public ScreenRegion AddToastOverlay(
         string id,
         Rect bounds,
@@ -448,16 +456,19 @@ public sealed class ScreenComposer
         return AddToastOverlay(new ScreenRegionKey(id), bounds, component);
     }
 
+    [EditorBrowsable(EditorBrowsableState.Advanced)]
     public bool SetFocus(string regionId)
     {
         return SetFocus(new ScreenRegionKey(regionId));
     }
 
+    [EditorBrowsable(EditorBrowsableState.Advanced)]
     public bool TryGetBounds(string regionId, out Rect bounds)
     {
         return TryGetBounds(new ScreenRegionKey(regionId), out bounds);
     }
 
+    [EditorBrowsable(EditorBrowsableState.Advanced)]
     public void CompleteFrame(string? preferredFocusRegionId)
     {
         CompleteFrame(string.IsNullOrWhiteSpace(preferredFocusRegionId)

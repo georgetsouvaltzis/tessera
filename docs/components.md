@@ -39,7 +39,7 @@ The design follows patterns used in Bubble Tea examples:
     - wheel fallback to focused slot when pointer is outside any slot
     - reserve this for local component trees and sub-layouts, not as the default full-app shell
   - `ScreenComposer`: named interactive regions for screen-scale layout snapshots.
-    - region identity uses `ScreenRegionKey`; string overloads remain as a convenience bridge
+    - region identity uses `ScreenRegionKey`; raw string overloads remain only as advanced convenience bridges
     - build once per frame, route later from the stored snapshot
     - focus ownership APIs: `SetFocus`, `FocusNext`, `FocusPrevious`
     - typed focus state via `FocusedRegionKey`
