@@ -10,6 +10,7 @@ using TeaSharp.Components.Styling;
 using TeaSharp.Components.UiKit;
 using TeaSharp.Core.Abstractions;
 using TeaSharp.Core.Messages;
+using UiLayout = TeaSharp.Components.UiKit.Layout;
 
 namespace TeaSharp.Tests;
 
@@ -157,7 +158,7 @@ internal static class InteractiveScreenModelTests
         protected override void ComposeScreen(Rect bodyRect)
         {
             BuildCount++;
-            var (left, right) = Layout.SplitVertical(bodyRect, Math.Max(10, bodyRect.Width / 2));
+            var (left, right) = UiLayout.SplitVertical(bodyRect, Math.Max(10, bodyRect.Width / 2));
             Screen.AddComponent(ButtonRegionId, left, _button);
             Screen.AddComponent(SecondaryRegionId, right, _secondary);
         }

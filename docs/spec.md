@@ -199,7 +199,7 @@ Phase 3:
 
 ## 12. Parity Tracking
 
-- Bubble Tea parity tracking lives in `docs/parity-matrix.md`.
+- Bubble Tea-inspired behavior is now captured directly in the public docs and examples rather than a separate parity matrix.
 - Component drawing notes live in `docs/components.md`.
 - Custom extension guide lives in `docs/custom-components.md`.
 - ANSI style notes live in `docs/styles.md`.

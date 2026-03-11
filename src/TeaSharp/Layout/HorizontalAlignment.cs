@@ -1,0 +1,12 @@
+namespace TeaSharp.Layout;
+
+/// <summary>
+/// Specifies horizontal placement within the available layout space.
+/// </summary>
+public enum HorizontalAlignment
+{
+    Left = 0,
+    Center = 1,
+    Right = 2,
+    Stretch = 3,
+}

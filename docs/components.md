@@ -10,6 +10,7 @@ TeaSharp includes a deterministic drawing and component layer split across categ
 - `TeaSharp.Components.Advanced`
 - `TeaSharp.Components.Charting`
 - `TeaSharp.Components.Dashboard`
+- `TeaSharp.Layout`
 
 Recommended app shape: `docs/app-pattern.md`.
 
@@ -66,6 +67,21 @@ The design follows patterns used in Bubble Tea examples:
   - `InteractiveScreenModel`: app-shell base for screen-oriented models.
     - owns `Screen`, `InputRouter`, lazy `EnsureScreen`, and per-frame `RenderScreen(...)`
     - app models implement `ComposeScreen(...)`, `GetBodyRect()`, and optional `PreferredFocusRegionKey`
+- `Layout`:
+  - intent-first layout facade built on top of the screen composer
+  - primary nouns:
+    - `Split.Columns(...)`, `Split.Rows(...)`
+    - `Stack.Row(...)`, `Stack.Column(...)`
+    - `Panel.Item(...)`, `Panel.Row(...)`, `Panel.Column(...)`
+    - `Center.Item(...)`, `Center.Text(...)`
+    - `Dock.Layout(...)`
+    - `Overlay.Items(...)`
+    - `Slot.Auto(...)`, `Slot.Fixed(...)`, `Slot.Fill(...)`, `Slot.Weighted(...)`
+  - goal:
+    - users express order, grouping, and sizing intent
+    - layout engine computes bounds
+    - common apps stop hand-writing `Rect` math
+  - `Center.Text(...)` is the smallest “hello world” path for centered splash-style text
 - Namespace-shaped catalogs:
   - `TeaSharp.Components.Prebuilt.PrebuiltCatalog`
   - `TeaSharp.Components.Productivity.ProductivityCatalog`
@@ -155,6 +171,7 @@ The design follows patterns used in Bubble Tea examples:
       - use `ScreenComposer.MasterDetail(...)` or `InteractiveScreenModel.MasterDetail(...)` for the common header + master + detail + footer shell instead of rebuilding pane math per app
       - use `ScreenComposer.Dashboard(...)` or `InteractiveScreenModel.Dashboard(...)` for the common header + sidebar + main + footer shell
       - use `ScreenComposer.Form(...)` or `InteractiveScreenModel.Form(...)` for the common header + body + actions + footer shell
+      - use `TeaSharp.Layout` when a screen is better expressed as nested splits, stacks, panels, centering, or docking
       - use `CreateDialogWorkflow(...)` when modal dialogs need open/close plus focus-restore behavior
       - focus helpers for app shells (`CreateFocusChain(...)`, `HandleTabNavigation(...)`, `CaptureFocus()`, `RestoreFocus(...)`, `FocusFirstInteractive()`)
       - border-capable widgets now expose `Border` (`BorderStyle`) plus `Padding` (`Thickness`) so frame appearance and inner spacing use standard UI terms

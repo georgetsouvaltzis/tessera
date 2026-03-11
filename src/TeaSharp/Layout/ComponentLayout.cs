@@ -1,0 +1,100 @@
+using TeaSharp.Components.Composition;
+using TeaSharp.Components.Primitives;
+
+namespace TeaSharp.Layout;
+
+/// <summary>
+/// Represents a layout leaf backed by a TeaSharp canvas component.
+/// </summary>
+public sealed class ComponentLayout : LayoutNode
+{
+    internal ComponentLayout(
+        ICanvasComponent component,
+        ScreenRegionKey? regionKey,
+        int? preferredWidth,
+        int? preferredHeight,
+        bool? focusable,
+        bool focusOnClick,
+        bool interceptsPointer,
+        int layer,
+        Action? onFocus)
+    {
+        Component = component ?? throw new ArgumentNullException(nameof(component));
+        RegionKey = regionKey;
+        PreferredWidth = preferredWidth;
+        PreferredHeight = preferredHeight;
+        Focusable = focusable;
+        FocusOnClick = focusOnClick;
+        InterceptsPointer = interceptsPointer;
+        Layer = layer;
+        OnFocus = onFocus;
+    }
+
+    /// <summary>
+    /// Gets the wrapped TeaSharp component.
+    /// </summary>
+    public ICanvasComponent Component { get; }
+
+    /// <summary>
+    /// Gets the optional stable region key used when the component participates in screen routing.
+    /// </summary>
+    public ScreenRegionKey? RegionKey { get; }
+
+    /// <summary>
+    /// Gets the preferred width used when the layout needs an intrinsic measurement.
+    /// </summary>
+    public int? PreferredWidth { get; }
+
+    /// <summary>
+    /// Gets the preferred height used when the layout needs an intrinsic measurement.
+    /// </summary>
+    public int? PreferredHeight { get; }
+
+    /// <summary>
+    /// Gets the explicit focusability override, if provided.
+    /// </summary>
+    public bool? Focusable { get; }
+
+    /// <summary>
+    /// Gets a value indicating whether mouse clicks should move focus into the component.
+    /// </summary>
+    public bool FocusOnClick { get; }
+
+    /// <summary>
+    /// Gets a value indicating whether the component should intercept pointer input.
+    /// </summary>
+    public bool InterceptsPointer { get; }
+
+    /// <summary>
+    /// Gets the target screen layer used for composition.
+    /// </summary>
+    public int Layer { get; }
+
+    /// <summary>
+    /// Gets the optional callback raised when the region receives focus.
+    /// </summary>
+    public Action? OnFocus { get; }
+
+    internal override LayoutMeasurement Measure(in Rect availableBounds)
+    {
+        if (PreferredWidth.HasValue || PreferredHeight.HasValue)
+        {
+            return new LayoutMeasurement(
+                Math.Clamp(PreferredWidth ?? availableBounds.Width, 0, availableBounds.Width),
+                Math.Clamp(PreferredHeight ?? availableBounds.Height, 0, availableBounds.Height));
+        }
+
+        return LayoutIntrinsicMeasurer.Measure(Component, availableBounds);
+    }
+
+    internal override void Compose(ScreenComposer screen, in Rect bounds, string path)
+    {
+        if (bounds.IsEmpty)
+        {
+            return;
+        }
+
+        var regionKey = RegionKey ?? LayoutRegionKeys.Generated(path, "component");
+        screen.AddComponent(regionKey, bounds, Component, Focusable, FocusOnClick, InterceptsPointer, Layer, OnFocus);
+    }
+}

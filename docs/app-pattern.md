@@ -13,8 +13,9 @@ The intended shell is:
 1. `InteractiveScreenModel`
 2. `ScreenRegionKey`
 3. `ScreenComposer`
-4. `InputRouter`
-5. `TerminalOutput`
+4. `TeaSharp.Layout`
+5. `InputRouter`
+6. `TerminalOutput`
 
 ## Default Shape
 
@@ -237,6 +238,41 @@ protected override void ComposeScreen(Rect bodyRect)
     shell.AddActions(ActionsRegion, _actionBar);
     shell.AddFooter(StatusRegion, _statusBar);
 }
+```
+
+When the screen is mostly structure rather than named shell regions, prefer the layout facade over manual `Rect` math:
+
+```csharp
+using TeaSharp.Layout;
+using TeaSharp.Styles;
+
+protected override void ComposeScreen(Rect bodyRect)
+{
+    Compose(
+        Dock.Layout(
+            top: Slot.Auto(_tabs, HeaderRegion, preferredHeight: 1),
+            fill: Slot.Fill(
+                Split.Columns(
+                    left: Slot.Fixed(24, _filters, FiltersRegion),
+                    right: Slot.Fill(
+                        Panel.Column(
+                            [
+                                Slot.Auto(_summary, SummaryRegion, preferredHeight: 3),
+                                Slot.Fill(_table, MainRegion),
+                            ],
+                            gap: 1,
+                            title: "Main",
+                            border: BorderStyle.Rounded,
+                            padding: Thickness.All(1)))))),
+        bodyRect);
+}
+```
+
+For centered splash screens or empty states, the one-line path is:
+
+```csharp
+var layout = Center.Text("Hello World", style: TeaStyle.Empty.WithBold());
+Compose(layout, bodyRect);
 ```
 
 This keeps the common `header + body + actions + footer` workflow shell as a first-class API.

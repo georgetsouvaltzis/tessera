@@ -7,6 +7,9 @@ using TeaSharp.Components.Primitives.Internal;
 using TeaSharp.Components.Styling;
 using TeaSharp.Core.Abstractions;
 using TeaSharp.Core.Messages;
+using TeaSharp.Layout;
+using TeaSharp.Styles;
+using System.Globalization;
 using TeaSharp.Widgets;
 
 namespace TeaSharp.Components.Prebuilt;
@@ -23,6 +26,9 @@ public sealed class TextBlockComponent : ICanvasComponent
         Title = options.Title;
         Border = options.Border;
         Padding = options.Padding;
+        TextStyle = options.TextStyle;
+        HorizontalAlignment = options.HorizontalAlignment;
+        VerticalAlignment = options.VerticalAlignment;
     }
 
     public string Text { get; set; } = string.Empty;
@@ -32,6 +38,12 @@ public sealed class TextBlockComponent : ICanvasComponent
     public BorderStyle Border { get; set; } = BorderStyle.SingleLine;
 
     public Thickness Padding { get; set; }
+
+    public TeaStyle TextStyle { get; set; } = TeaStyle.Empty;
+
+    public HorizontalAlignment HorizontalAlignment { get; set; }
+
+    public VerticalAlignment VerticalAlignment { get; set; }
 
     public void Render(Canvas canvas, Rect rect)
     {
@@ -63,9 +75,56 @@ public sealed class TextBlockComponent : ICanvasComponent
             .Split('\n');
 
         var rows = Math.Min(rect.Height, lines.Length);
+        var startY = rect.Y + ResolveVerticalOffset(rect.Height, lines.Length);
         for (var row = 0; row < rows; row++)
         {
-            canvas.WriteText(rect.X, rect.Y + row, lines[row], rect.Width);
+            var line = lines[row];
+            var rendered = TextStyle.IsEmpty ? line : TextStyle.Render(line);
+            var x = rect.X + ResolveHorizontalOffset(rect.Width, line);
+            canvas.WriteText(x, startY + row, rendered, Math.Max(0, rect.Right - x));
         }
+    }
+
+    private int ResolveHorizontalOffset(int availableWidth, string line)
+    {
+        return HorizontalAlignment switch
+        {
+            HorizontalAlignment.Center => Math.Max(0, (availableWidth - MeasureDisplayWidth(line)) / 2),
+            HorizontalAlignment.Right => Math.Max(0, availableWidth - MeasureDisplayWidth(line)),
+            _ => 0,
+        };
+    }
+
+    private int ResolveVerticalOffset(int availableHeight, int lineCount)
+    {
+        return VerticalAlignment switch
+        {
+            VerticalAlignment.Center => Math.Max(0, (availableHeight - Math.Min(availableHeight, lineCount)) / 2),
+            VerticalAlignment.Bottom => Math.Max(0, availableHeight - Math.Min(availableHeight, lineCount)),
+            _ => 0,
+        };
+    }
+
+    private static int MeasureDisplayWidth(string text)
+    {
+        if (string.IsNullOrEmpty(text))
+        {
+            return 0;
+        }
+
+        var width = 0;
+        var enumerator = StringInfo.GetTextElementEnumerator(text);
+        while (enumerator.MoveNext())
+        {
+            var element = enumerator.GetTextElement();
+            if (CanvasAnsiScanner.TryReadEscape(element, 0, out _, out _))
+            {
+                continue;
+            }
+
+            width += TextElementWidth.Measure(element);
+        }
+
+        return width;
     }
 }

@@ -10,6 +10,8 @@ using TeaSharp.Components.Styling;
 using TeaSharp.Components.UiKit;
 using TeaSharp.Core.Abstractions;
 using TeaSharp.Core.Messages;
+using TeaSharp.Styles;
+using TLayout = TeaSharp.Layout;
 
 namespace TeaSharp.Tests;
 
@@ -24,6 +26,9 @@ internal static class ScreenComposerTests
         yield return new TestCase("Components_DashboardScreen_CreateFocusChainTracksAddedRegions", DashboardScreen_CreateFocusChainTracksAddedRegions);
         yield return new TestCase("Components_ScreenComposer_FormCreatesExpectedRegions", ScreenComposer_FormCreatesExpectedRegions);
         yield return new TestCase("Components_FormScreen_CreateFocusChainTracksAddedRegions", FormScreen_CreateFocusChainTracksAddedRegions);
+        yield return new TestCase("Components_ScreenComposer_ComposeSplitColumns_UsesDeterministicSlotBounds", ScreenComposer_ComposeSplitColumns_UsesDeterministicSlotBounds);
+        yield return new TestCase("Components_ScreenComposer_ComposePanelRow_UsesGroupPaddingMarginAndBorder", ScreenComposer_ComposePanelRow_UsesGroupPaddingMarginAndBorder);
+        yield return new TestCase("Components_ScreenComposer_ComposeCenterText_RendersCenteredStyledText", ScreenComposer_ComposeCenterText_RendersCenteredStyledText);
         yield return new TestCase("Components_DialogWorkflow_ShowAndCompose_FocusesDialogRegion", DialogWorkflow_ShowAndCompose_FocusesDialogRegion);
         yield return new TestCase("Components_DialogWorkflow_Dismiss_RestoresPriorFocus", DialogWorkflow_Dismiss_RestoresPriorFocus);
         yield return new TestCase("Components_ScreenComposer_MouseClickFocusesAndRoutesToRegisteredRegion", ScreenComposer_MouseClickFocusesAndRoutesToRegisteredRegion);
@@ -176,6 +181,82 @@ internal static class ScreenComposerTests
         TestAssert.True(firstChanged, "Form focus chain should focus the first added focusable region.");
         TestAssert.True(nextChanged, "Form focus chain should advance through tracked regions.");
         TestAssert.True(composer.FocusedRegionKey == bodyKey, "Focus chain should preserve header-body-actions-footer order.");
+        return Task.CompletedTask;
+    }
+
+    private static Task ScreenComposer_ComposeSplitColumns_UsesDeterministicSlotBounds()
+    {
+        var composer = new ScreenComposer();
+        var leftComponent = new RenderLabelComponent("X");
+        var rightComponent = new RenderLabelComponent("Y");
+
+        composer.BeginFrame();
+        composer.Compose(
+            TLayout.Split.Columns(
+                left: TLayout.Slot.Fixed(8, leftComponent, regionKey: "left"),
+                right: TLayout.Slot.Fill(rightComponent, regionKey: "right")),
+            new Rect(0, 0, 30, 5));
+        composer.CompleteFrame();
+
+        var left = composer.Regions.Single(region => region.Id == new ScreenRegionKey("left"));
+        var right = composer.Regions.Single(region => region.Id == new ScreenRegionKey("right"));
+
+        TestAssert.Equal(new Rect(0, 0, 8, 5), left.Bounds, "Split.Columns should keep the left slot at the fixed width.");
+        TestAssert.Equal(new Rect(8, 0, 22, 5), right.Bounds, "Split.Columns should assign the remaining width to the fill slot.");
+        return Task.CompletedTask;
+    }
+
+    private static Task ScreenComposer_ComposePanelRow_UsesGroupPaddingMarginAndBorder()
+    {
+        var composer = new ScreenComposer();
+
+        composer.BeginFrame();
+        composer.Compose(
+            TLayout.Split.Columns(
+                left: TLayout.Slot.Auto(new RenderLabelComponent("X"), regionKey: "x", preferredWidth: 1, preferredHeight: 1),
+                right: TLayout.Slot.Fill(
+                    TLayout.Panel.Row(
+                        [
+                            TLayout.Slot.Auto(new RenderLabelComponent("Y"), regionKey: "y", preferredWidth: 1, preferredHeight: 1),
+                            TLayout.Slot.Auto(new RenderLabelComponent("Z"), regionKey: "z", preferredWidth: 1, preferredHeight: 1),
+                            TLayout.Slot.Auto(new RenderLabelComponent("J"), regionKey: "j", preferredWidth: 1, preferredHeight: 1),
+                        ],
+                        gap: 1,
+                        title: "Actions",
+                        border: BorderStyle.Rounded,
+                        padding: Thickness.All(1),
+                        margin: Thickness.Symmetric(horizontal: 2)))),
+            new Rect(0, 0, 30, 5));
+        composer.CompleteFrame();
+
+        var x = composer.Regions.Single(region => region.Id == new ScreenRegionKey("x"));
+        var y = composer.Regions.Single(region => region.Id == new ScreenRegionKey("y"));
+        var z = composer.Regions.Single(region => region.Id == new ScreenRegionKey("z"));
+        var j = composer.Regions.Single(region => region.Id == new ScreenRegionKey("j"));
+
+        TestAssert.Equal(new Rect(0, 0, 1, 5), x.Bounds, "Auto slot should use the preferred width while stretching across the split height.");
+        TestAssert.Equal(new Rect(5, 2, 1, 1), y.Bounds, "Panel row should account for outer margin, border, and padding before placing the first child.");
+        TestAssert.Equal(new Rect(7, 2, 1, 1), z.Bounds, "Panel row should respect the requested gap between children.");
+        TestAssert.Equal(new Rect(9, 2, 1, 1), j.Bounds, "Panel row should preserve stable item order inside the group.");
+        return Task.CompletedTask;
+    }
+
+    private static Task ScreenComposer_ComposeCenterText_RendersCenteredStyledText()
+    {
+        var composer = new ScreenComposer();
+        var style = TeaStyle.Empty.WithBold();
+        var expected = $"{new string(' ', 4)}{style.Render("Hello World")}";
+
+        composer.BeginFrame();
+        composer.Compose(TLayout.Center.Text("Hello World", style: style), new Rect(0, 0, 20, 5));
+        composer.CompleteFrame();
+
+        var canvas = new Canvas(20, 5, CanvasTextMode.GraphemeAware);
+        composer.Render(canvas);
+        var lines = canvas.Render().Split('\n');
+
+        TestAssert.Equal(5, lines.Length, "Centered text should render within the provided canvas height.");
+        TestAssert.True(lines[2].StartsWith(expected, StringComparison.Ordinal), "Center.Text should place styled text in the middle row without manual geometry math.");
         return Task.CompletedTask;
     }
 
@@ -418,6 +499,14 @@ internal static class ScreenComposerTests
         public void Render(Canvas canvas, Rect rect)
         {
             canvas.WriteText(rect.X, rect.Y, "toast", rect.Width);
+        }
+    }
+
+    private sealed class RenderLabelComponent(string text) : ICanvasComponent
+    {
+        public void Render(Canvas canvas, Rect rect)
+        {
+            canvas.WriteText(rect.X, rect.Y, text, rect.Width);
         }
     }
 }

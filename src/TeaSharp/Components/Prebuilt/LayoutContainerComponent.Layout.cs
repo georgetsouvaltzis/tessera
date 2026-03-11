@@ -5,6 +5,7 @@ using TeaSharp.Components.Prebuilt.Internal;
 using TeaSharp.Components.Primitives;
 using TeaSharp.Components.Styling;
 using TeaSharp.Core.Abstractions;
+using UiLayout = TeaSharp.Components.UiKit.Layout;
 
 namespace TeaSharp.Components.Prebuilt;
 
@@ -54,7 +55,7 @@ public sealed partial class LayoutContainerComponent
 
         if (_children.Count == 2 && PrimarySize.HasValue)
         {
-            var (first, second) = Layout.SplitHorizontal(
+            var (first, second) = UiLayout.SplitHorizontal(
                 rect,
                 PrimarySize.Value,
                 minFirst: Math.Max(0, MinPrimarySize),
@@ -97,7 +98,7 @@ public sealed partial class LayoutContainerComponent
 
         if (_children.Count == 2 && PrimarySize.HasValue)
         {
-            var (first, second) = Layout.SplitVertical(
+            var (first, second) = UiLayout.SplitVertical(
                 rect,
                 PrimarySize.Value,
                 minFirst: Math.Max(0, MinPrimarySize),
@@ -134,7 +135,7 @@ public sealed partial class LayoutContainerComponent
     {
         var rows = Math.Max(1, GridRows);
         var columns = Math.Max(1, GridColumns);
-        var cells = Layout.Grid(rect, rows, columns);
+        var cells = UiLayout.Grid(rect, rows, columns);
         var count = Math.Min(cells.Length, _children.Count);
         var rects = new List<Rect>(count);
         for (var i = 0; i < count; i++)

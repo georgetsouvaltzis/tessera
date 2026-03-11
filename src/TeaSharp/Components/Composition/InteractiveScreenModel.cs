@@ -2,6 +2,7 @@ using TeaSharp.Components.Primitives;
 using TeaSharp.Core.Abstractions;
 using TeaSharp.Core.Messages;
 using System.Diagnostics.CodeAnalysis;
+using TeaSharp.Layout;
 
 namespace TeaSharp.Components.Composition;
 
@@ -70,6 +71,14 @@ public abstract class InteractiveScreenModel : IScreen
 
     protected ScreenFrameLayout Frame(Rect bounds, int headerHeight = 0, int footerHeight = 0) =>
         Screen.Frame(bounds, headerHeight, footerHeight);
+
+    /// <summary>
+    /// Composes a public layout node into screen regions within the provided bounds.
+    /// </summary>
+    /// <param name="layout">The layout tree to compose.</param>
+    /// <param name="bounds">The layout bounds.</param>
+    protected void Compose(LayoutNode layout, Rect bounds) =>
+        Screen.Compose(layout, bounds);
 
     /// <summary>
     /// Creates a master-detail screen scaffold with optional header and footer regions.

@@ -9,6 +9,7 @@ using TeaSharp.Components.Productivity;
 using TeaSharp.Components.Styling;
 using TeaSharp.Components.UiKit;
 using TeaSharp.Core.Messages;
+using UiLayout = TeaSharp.Components.UiKit.Layout;
 
 namespace TeaSharp.Tests;
 
@@ -58,7 +59,7 @@ internal static class UiKitComponentTests
         var rect = new Rect(0, 0, 10, 4);
 
         // Act
-        var (first, second) = Layout.SplitVertical(rect, firstWidth: 50, minFirst: 8, minSecond: 8);
+        var (first, second) = UiLayout.SplitVertical(rect, firstWidth: 50, minFirst: 8, minSecond: 8);
 
         // Assert
         TestAssert.Equal(8, first.Width, "SplitVertical should clamp first segment to a safe width.");
@@ -73,7 +74,7 @@ internal static class UiKitComponentTests
         var rect = new Rect(0, 0, 5, 3);
 
         // Act
-        var cells = Layout.Grid(rect, rows: 2, columns: 2);
+        var cells = UiLayout.Grid(rect, rows: 2, columns: 2);
 
         // Assert
         TestAssert.Equal(4, cells.Length, "Grid should create one cell per row/column combination.");

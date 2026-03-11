@@ -2,6 +2,7 @@ using TeaSharp.Components.Primitives;
 using TeaSharp.Core.Abstractions;
 using TeaSharp.Core.Messages;
 using System.Diagnostics.CodeAnalysis;
+using TeaSharp.Layout;
 
 namespace TeaSharp.Components.Composition;
 
@@ -86,6 +87,17 @@ public sealed partial class ScreenComposer
         var frame = Frame(bounds, headerHeight, footerHeight);
         var (sidebar, main) = frame.SplitBodyColumns(sidebarWidth, minSidebarWidth, minMainWidth);
         return new DashboardScreen(this, frame, sidebar, main);
+    }
+
+    /// <summary>
+    /// Composes a public layout node into screen regions within the provided bounds.
+    /// </summary>
+    /// <param name="layout">The layout tree to compose.</param>
+    /// <param name="bounds">The layout bounds.</param>
+    public void Compose(LayoutNode layout, Rect bounds)
+    {
+        ArgumentNullException.ThrowIfNull(layout);
+        layout.Compose(this, bounds, "root");
     }
 
     /// <summary>
