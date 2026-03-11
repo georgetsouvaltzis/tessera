@@ -18,6 +18,8 @@ internal static class InteractiveScreenModelTests
     public static IEnumerable<TestCase> Cases()
     {
         yield return new TestCase("Application_InteractiveScreenModel_RoutesKeyWithoutManualEnsureScreen", InteractiveScreenModel_RoutesKeyWithoutManualEnsureScreen);
+        yield return new TestCase("Application_InteractiveScreenModel_HandleTabNavigation_UsesFocusChainOrder", InteractiveScreenModel_HandleTabNavigation_UsesFocusChainOrder);
+        yield return new TestCase("Application_InteractiveScreenModel_RestoreFocus_UsesCapturedSnapshot", InteractiveScreenModel_RestoreFocus_UsesCapturedSnapshot);
     }
 
     private static Task InteractiveScreenModel_RoutesKeyWithoutManualEnsureScreen()
@@ -33,11 +35,40 @@ internal static class InteractiveScreenModelTests
         return Task.CompletedTask;
     }
 
+    private static Task InteractiveScreenModel_HandleTabNavigation_UsesFocusChainOrder()
+    {
+        var model = new ProbeScreenModel();
+
+        model.Update(new KeyPressMsg(KeyCode.Tab));
+        model.Update(new KeyPressMsg(KeyCode.Tab));
+
+        TestAssert.True(model.CurrentFocusedRegionKey == ProbeScreenModel.ButtonRegionId, "Focus chain tab handling should cycle through the configured chain.");
+        TestAssert.True(model.ButtonPresses == 0, "Tab navigation helper should not route the tab key into the focused component.");
+        return Task.CompletedTask;
+    }
+
+    private static Task InteractiveScreenModel_RestoreFocus_UsesCapturedSnapshot()
+    {
+        var model = new ProbeScreenModel();
+
+        model.FocusSecondaryRegion();
+        model.FocusPrimaryRegion();
+        var restored = model.RestoreSecondaryFocus();
+
+        TestAssert.True(restored, "Captured focus snapshot should restore the prior focus target.");
+        TestAssert.True(model.CurrentFocusedRegionKey == ProbeScreenModel.SecondaryRegionId, "Restored focus should target the captured region.");
+        return Task.CompletedTask;
+    }
+
     private sealed class ProbeScreenModel : InteractiveScreenModel
     {
         public static readonly ScreenRegionKey ButtonRegionId = new("probe.button");
+        public static readonly ScreenRegionKey SecondaryRegionId = new("probe.secondary");
 
         private readonly ProbeButton _button = new();
+        private readonly ProbeButton _secondary = new();
+        private readonly ScreenFocusChain _focusChain;
+        private ScreenFocusSnapshot _secondaryFocus;
 
         public int BuildCount { get; private set; }
 
@@ -68,18 +99,39 @@ internal static class InteractiveScreenModelTests
         protected override void ComposeScreen(Rect bodyRect)
         {
             BuildCount++;
-            Screen.AddComponent(ButtonRegionId, bodyRect, _button);
+            var (left, right) = Layout.SplitVertical(bodyRect, Math.Max(10, bodyRect.Width / 2));
+            Screen.AddComponent(ButtonRegionId, left, _button);
+            Screen.AddComponent(SecondaryRegionId, right, _secondary);
         }
 
         public ProbeScreenModel()
         {
+            _focusChain = CreateFocusChain(ButtonRegionId, SecondaryRegionId);
             InputRouter.AddScope(
                 "probe.focused",
                 InputScopeKind.FocusedRegion,
                 () => FocusedRegionKey is not null,
-                key => Screen.Update(key)
+                key => HandleTabNavigation(key, _focusChain)
+                    ? InputRouteResult.HandledWithoutCommand
+                    : Screen.Update(key)
                     ? InputRouteResult.HandledWithoutCommand
                     : InputRouteResult.NotHandled);
+        }
+
+        public void FocusPrimaryRegion()
+        {
+            SetFocus(ButtonRegionId);
+        }
+
+        public void FocusSecondaryRegion()
+        {
+            SetFocus(SecondaryRegionId);
+            _secondaryFocus = CaptureFocus();
+        }
+
+        public bool RestoreSecondaryFocus()
+        {
+            return RestoreFocus(_secondaryFocus, _focusChain);
         }
     }
 

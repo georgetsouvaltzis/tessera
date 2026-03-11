@@ -20,6 +20,9 @@ internal static class ScreenComposerTests
         yield return new TestCase("Components_ScreenComposer_FrameCreatesHeaderBodyFooterRegions", ScreenComposer_FrameCreatesHeaderBodyFooterRegions);
         yield return new TestCase("Components_ScreenComposer_MouseClickFocusesAndRoutesToRegisteredRegion", ScreenComposer_MouseClickFocusesAndRoutesToRegisteredRegion);
         yield return new TestCase("Components_ScreenComposer_FocusNextCyclesAcrossFocusableRegions", ScreenComposer_FocusNextCyclesAcrossFocusableRegions);
+        yield return new TestCase("Components_ScreenComposer_FocusFirstTargetsFirstFocusableRegion", ScreenComposer_FocusFirstTargetsFirstFocusableRegion);
+        yield return new TestCase("Components_ScreenComposer_FocusChainControlsNavigationOrder", ScreenComposer_FocusChainControlsNavigationOrder);
+        yield return new TestCase("Components_ScreenComposer_RestoreFocusFallsBackToChain", ScreenComposer_RestoreFocusFallsBackToChain);
         yield return new TestCase("Components_ScreenComposer_CompleteFrameAppliesPreferredFocus", ScreenComposer_CompleteFrameAppliesPreferredFocus);
         yield return new TestCase("Components_ScreenComposer_PassiveToastOverlayDoesNotInterceptMouse", ScreenComposer_PassiveToastOverlayDoesNotInterceptMouse);
         yield return new TestCase("Components_ScreenComposer_ModalOverlayInterceptsUnderlyingMouse", ScreenComposer_ModalOverlayInterceptsUnderlyingMouse);
@@ -79,6 +82,69 @@ internal static class ScreenComposerTests
         TestAssert.True(!first.Focused, "Previous region should lose focus.");
         TestAssert.True(second.Focused, "Next focusable region should gain focus.");
         TestAssert.True(composer.FocusedRegionKey == secondKey, "Focused region key should advance.");
+        return Task.CompletedTask;
+    }
+
+    private static Task ScreenComposer_FocusFirstTargetsFirstFocusableRegion()
+    {
+        var composer = new ScreenComposer();
+        var first = new MouseProbeComponent();
+        composer.BeginFrame();
+        composer.AddRegion("static", new Rect(0, 0, 4, 1), static (_, _) => { });
+        composer.AddComponent("first", new Rect(0, 1, 12, 4), first);
+        composer.AddComponent("second", new Rect(12, 1, 12, 4), new MouseProbeComponent());
+        composer.CompleteFrame();
+
+        var changed = composer.FocusFirst();
+
+        TestAssert.True(changed, "FocusFirst should focus the first available interactive region.");
+        TestAssert.True(first.Focused, "FocusFirst should focus the first focusable region.");
+        TestAssert.True(composer.FocusedRegionKey == new ScreenRegionKey("first"), "Composer should track the first focused region.");
+        return Task.CompletedTask;
+    }
+
+    private static Task ScreenComposer_FocusChainControlsNavigationOrder()
+    {
+        var composer = new ScreenComposer();
+        var firstKey = new ScreenRegionKey("first");
+        var secondKey = new ScreenRegionKey("second");
+        var thirdKey = new ScreenRegionKey("third");
+        var chain = new ScreenFocusChain([thirdKey, firstKey]);
+        composer.BeginFrame();
+        composer.AddComponent(firstKey, new Rect(0, 0, 8, 3), new MouseProbeComponent());
+        composer.AddComponent(secondKey, new Rect(8, 0, 8, 3), new MouseProbeComponent());
+        composer.AddComponent(thirdKey, new Rect(16, 0, 8, 3), new MouseProbeComponent());
+        composer.CompleteFrame();
+
+        var firstChanged = composer.FocusFirst(chain);
+        var nextChanged = composer.FocusNext(chain);
+
+        TestAssert.True(firstChanged, "FocusFirst(chain) should focus the first region in the provided chain.");
+        TestAssert.True(nextChanged, "FocusNext(chain) should advance within the provided chain.");
+        TestAssert.True(composer.FocusedRegionKey == firstKey, "Focus chain should skip regions not listed in the chain.");
+        return Task.CompletedTask;
+    }
+
+    private static Task ScreenComposer_RestoreFocusFallsBackToChain()
+    {
+        var composer = new ScreenComposer();
+        var firstKey = new ScreenRegionKey("first");
+        var secondKey = new ScreenRegionKey("second");
+        var fallbackChain = new ScreenFocusChain([secondKey, firstKey]);
+        composer.BeginFrame();
+        composer.AddComponent(firstKey, new Rect(0, 0, 8, 3), new MouseProbeComponent());
+        composer.AddComponent(secondKey, new Rect(8, 0, 8, 3), new MouseProbeComponent());
+        composer.CompleteFrame(firstKey);
+        var snapshot = composer.CaptureFocus();
+
+        composer.BeginFrame();
+        composer.AddComponent(secondKey, new Rect(8, 0, 8, 3), new MouseProbeComponent());
+        composer.CompleteFrame();
+
+        var changed = composer.RestoreFocus(snapshot, fallbackChain);
+
+        TestAssert.True(changed, "RestoreFocus should fall back when the captured region no longer exists.");
+        TestAssert.True(composer.FocusedRegionKey == secondKey, "Fallback focus chain should restore focus to the first available fallback region.");
         return Task.CompletedTask;
     }
 

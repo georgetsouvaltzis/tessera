@@ -176,6 +176,61 @@ public sealed partial class ScreenComposer
     public bool FocusPrevious() =>
         FocusRelative(-1);
 
+    /// <summary>
+    /// Focuses the first focusable region in the composed screen.
+    /// </summary>
+    public bool FocusFirst() =>
+        FocusFirstTyped();
+
+    /// <summary>
+    /// Focuses the first available region in the provided focus chain.
+    /// </summary>
+    /// <param name="focusChain">The ordered focus chain to use.</param>
+    public bool FocusFirst(ScreenFocusChain focusChain) =>
+        FocusFirstTyped(focusChain?.RegionKeys);
+
+    /// <summary>
+    /// Advances focus using the provided focus chain.
+    /// </summary>
+    /// <param name="focusChain">The ordered focus chain to use.</param>
+    public bool FocusNext(ScreenFocusChain focusChain) =>
+        FocusRelativeTyped(focusChain?.RegionKeys, 1);
+
+    /// <summary>
+    /// Moves focus backward using the provided focus chain.
+    /// </summary>
+    /// <param name="focusChain">The ordered focus chain to use.</param>
+    public bool FocusPrevious(ScreenFocusChain focusChain) =>
+        FocusRelativeTyped(focusChain?.RegionKeys, -1);
+
+    /// <summary>
+    /// Captures the currently focused region for later restoration.
+    /// </summary>
+    public ScreenFocusSnapshot CaptureFocus() =>
+        new(FocusedRegionKey);
+
+    /// <summary>
+    /// Restores a previously captured focus snapshot if the region still exists.
+    /// </summary>
+    /// <param name="snapshot">The snapshot to restore.</param>
+    public bool RestoreFocus(ScreenFocusSnapshot snapshot) =>
+        snapshot.RegionKey is { } regionKey && ApplyFocus(regionKey, invokeFocus: true);
+
+    /// <summary>
+    /// Restores a previously captured focus snapshot, or falls back to the provided chain.
+    /// </summary>
+    /// <param name="snapshot">The snapshot to restore.</param>
+    /// <param name="fallbackFocusChain">Fallback focus order when the snapshot can no longer be restored.</param>
+    public bool RestoreFocus(ScreenFocusSnapshot snapshot, ScreenFocusChain fallbackFocusChain)
+    {
+        if (RestoreFocus(snapshot))
+        {
+            return true;
+        }
+
+        return FocusFirst(fallbackFocusChain);
+    }
+
     public bool TryGetBounds(ScreenRegionKey regionKey, out Rect bounds) =>
         TryGetTypedBounds(regionKey, out bounds);
 

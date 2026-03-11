@@ -165,6 +165,29 @@ internal sealed class DemoModel : InteractiveScreenModel
 
 Wire modal decisions and submit-style actions through component events in the model constructor, for example `_dialog.Accepted += ...`, `_dialog.Dismissed += ...`, and `_input.Submitted += ...`, so the update loop stays focused on routing instead of action polling.
 
+For focus-heavy screens, create an ordered focus chain once and reuse the built-in helpers:
+
+```csharp
+private readonly ScreenFocusChain _focusChain;
+
+public WorkspaceModel()
+{
+    _focusChain = CreateFocusChain(TabsRegion, EditorRegion, DetailsRegion);
+}
+
+private InputRouteResult HandleGlobalKey(KeyPressMsg key)
+{
+    if (HandleTabNavigation(key, _focusChain))
+    {
+        return InputRouteResult.HandledWithoutCommand;
+    }
+
+    return InputRouteResult.NotHandled;
+}
+```
+
+Use `CaptureFocus()` before opening a modal or palette and `RestoreFocus(...)` when it closes if you want automatic return-to-previous-region behavior.
+
 ## Scope Order
 
 Use this order unless you have a clear reason not to:
@@ -193,6 +216,7 @@ Meaning:
 - Let `InputRouter` own key precedence.
 - Let `InteractiveScreenModel` own screen rebuild timing.
 - Prefer component action events for discrete user actions; keep `TryConsume...` helpers for pull-style update loops that want explicit consumption.
+- Prefer `CreateFocusChain(...)`, `HandleTabNavigation(...)`, `CaptureFocus()`, and `RestoreFocus(...)` over per-app focus enums for standard screen navigation.
 - Use `blocksGlobalShortcuts` for plain character suppression while text input is active.
 - Prefer `SetFocus(...)`, `FocusNext()`, and `FocusPrevious()` from `InteractiveScreenModel` instead of reaching into `Screen` directly.
 - Put terminal capability toggles in `ViewTerminal`, not in app-local routing code.

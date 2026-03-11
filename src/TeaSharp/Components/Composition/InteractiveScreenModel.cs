@@ -1,6 +1,7 @@
 using TeaSharp.Components.Primitives;
 using TeaSharp.Core.Abstractions;
 using TeaSharp.Core.Messages;
+using System.Diagnostics.CodeAnalysis;
 
 namespace TeaSharp.Components.Composition;
 
@@ -86,6 +87,124 @@ public abstract class InteractiveScreenModel : IModel
     {
         EnsureScreen();
         return CanBuildScreen && Screen.FocusPrevious();
+    }
+
+    /// <summary>
+    /// Creates an ordered focus chain for app-level focus helpers.
+    /// </summary>
+    /// <param name="regionKeys">The region keys in preferred focus order.</param>
+    [SuppressMessage("Performance", "CA1822:Mark members as static", Justification = "Instance helper keeps focus-chain creation on the model API surface.")]
+    protected ScreenFocusChain CreateFocusChain(params ScreenRegionKey[] regionKeys) =>
+        new(regionKeys);
+
+    /// <summary>
+    /// Focuses the first available interactive region in the current screen.
+    /// </summary>
+    protected bool FocusFirstInteractive()
+    {
+        EnsureScreen();
+        return CanBuildScreen && Screen.FocusFirst();
+    }
+
+    /// <summary>
+    /// Focuses the first available region in the provided focus chain.
+    /// </summary>
+    /// <param name="focusChain">The ordered focus chain to use.</param>
+    protected bool FocusFirst(ScreenFocusChain focusChain)
+    {
+        EnsureScreen();
+        return CanBuildScreen && Screen.FocusFirst(focusChain);
+    }
+
+    /// <summary>
+    /// Advances focus through the provided focus chain.
+    /// </summary>
+    /// <param name="focusChain">The ordered focus chain to use.</param>
+    protected bool FocusNext(ScreenFocusChain focusChain)
+    {
+        EnsureScreen();
+        return CanBuildScreen && Screen.FocusNext(focusChain);
+    }
+
+    /// <summary>
+    /// Moves focus backward through the provided focus chain.
+    /// </summary>
+    /// <param name="focusChain">The ordered focus chain to use.</param>
+    protected bool FocusPrevious(ScreenFocusChain focusChain)
+    {
+        EnsureScreen();
+        return CanBuildScreen && Screen.FocusPrevious(focusChain);
+    }
+
+    /// <summary>
+    /// Handles `Tab` and `Shift+Tab` navigation using the current screen focus order.
+    /// </summary>
+    /// <param name="key">The key press to evaluate.</param>
+    protected bool HandleTabNavigation(KeyPressMsg key)
+    {
+        if (key.Is(KeyCode.Tab, KeyModifiers.None))
+        {
+            return FocusNext();
+        }
+
+        if (key.Is(KeyCode.Tab, KeyModifiers.Shift))
+        {
+            return FocusPrevious();
+        }
+
+        return false;
+    }
+
+    /// <summary>
+    /// Handles `Tab` and `Shift+Tab` navigation using the provided focus chain.
+    /// </summary>
+    /// <param name="key">The key press to evaluate.</param>
+    /// <param name="focusChain">The ordered focus chain to use.</param>
+    protected bool HandleTabNavigation(KeyPressMsg key, ScreenFocusChain focusChain)
+    {
+        if (key.Is(KeyCode.Tab, KeyModifiers.None))
+        {
+            return FocusNext(focusChain);
+        }
+
+        if (key.Is(KeyCode.Tab, KeyModifiers.Shift))
+        {
+            return FocusPrevious(focusChain);
+        }
+
+        return false;
+    }
+
+    /// <summary>
+    /// Captures the currently focused region for later restoration.
+    /// </summary>
+    protected ScreenFocusSnapshot CaptureFocus()
+    {
+        EnsureScreen();
+        return CanBuildScreen
+            ? Screen.CaptureFocus()
+            : default;
+    }
+
+    /// <summary>
+    /// Restores a previously captured focus snapshot if possible.
+    /// </summary>
+    /// <param name="snapshot">The snapshot to restore.</param>
+    protected bool RestoreFocus(ScreenFocusSnapshot snapshot)
+    {
+        EnsureScreen();
+        return CanBuildScreen && Screen.RestoreFocus(snapshot);
+    }
+
+    /// <summary>
+    /// Restores a previously captured focus snapshot or falls back to the provided focus chain.
+    /// </summary>
+    /// <param name="snapshot">The snapshot to restore.</param>
+    /// <param name="fallbackFocusChain">Fallback focus order when the snapshot can no longer be restored.</param>
+    protected bool RestoreFocus(ScreenFocusSnapshot snapshot, ScreenFocusChain fallbackFocusChain)
+    {
+        EnsureScreen();
+        return CanBuildScreen && Screen.RestoreFocus(snapshot, fallbackFocusChain);
     }
 
     protected bool TryGetBounds(ScreenRegionKey regionKey, out Rect bounds)

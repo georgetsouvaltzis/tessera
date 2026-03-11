@@ -82,6 +82,38 @@ public sealed partial class ScreenComposer
         return targetIndex >= 0 && ApplyFocus(_regions[targetIndex].Id, invokeFocus: true);
     }
 
+    private bool FocusFirstTyped() =>
+        FocusFirstTyped(regionKeys: null);
+
+    private bool FocusFirstTyped(IReadOnlyList<ScreenRegionKey>? regionKeys)
+    {
+        if (regionKeys is null)
+        {
+            var firstFocusableIndex = FindFocusableIndex(startIndex: -1, step: 1);
+            return firstFocusableIndex >= 0 && ApplyFocus(_regions[firstFocusableIndex].Id, invokeFocus: true);
+        }
+
+        var targetIndex = FindFocusableIndex(regionKeys, startPosition: -1, step: 1);
+        return targetIndex >= 0 && ApplyFocus(regionKeys[targetIndex], invokeFocus: true);
+    }
+
+    private bool FocusRelativeTyped(IReadOnlyList<ScreenRegionKey>? regionKeys, int step)
+    {
+        if (regionKeys is null)
+        {
+            return FocusRelative(step);
+        }
+
+        var startPosition = FindFocusPosition(regionKeys);
+        if (startPosition < 0)
+        {
+            startPosition = step > 0 ? -1 : regionKeys.Count;
+        }
+
+        var targetPosition = FindFocusableIndex(regionKeys, startPosition, step);
+        return targetPosition >= 0 && ApplyFocus(regionKeys[targetPosition], invokeFocus: true);
+    }
+
     private bool TryGetTypedBounds(ScreenRegionKey regionKey, out Rect bounds)
     {
         foreach (var region in _regions)
@@ -168,6 +200,52 @@ public sealed partial class ScreenComposer
         return bestIndex;
     }
 
+    private int FindFocusableIndex(IReadOnlyList<ScreenRegionKey> regionKeys, int startPosition, int step)
+    {
+        if (regionKeys.Count == 0)
+        {
+            return -1;
+        }
+
+        for (var offset = 1; offset <= regionKeys.Count; offset++)
+        {
+            var position = startPosition + (offset * step);
+            if (position < 0)
+            {
+                position += regionKeys.Count;
+            }
+            else if (position >= regionKeys.Count)
+            {
+                position -= regionKeys.Count;
+            }
+
+            if (TryGetFocusableRegionIndex(regionKeys[position], out _))
+            {
+                return position;
+            }
+        }
+
+        return -1;
+    }
+
+    private int FindFocusPosition(IReadOnlyList<ScreenRegionKey> regionKeys)
+    {
+        if (FocusedRegionKey is not { } focusedRegionKey)
+        {
+            return -1;
+        }
+
+        for (var i = 0; i < regionKeys.Count; i++)
+        {
+            if (regionKeys[i] == focusedRegionKey)
+            {
+                return i;
+            }
+        }
+
+        return -1;
+    }
+
     private bool TryGetFocusedRegion(out ScreenRegion region)
     {
         region = default!;
@@ -196,6 +274,23 @@ public sealed partial class ScreenComposer
             }
 
             focusedIndex = i;
+            return true;
+        }
+
+        return false;
+    }
+
+    private bool TryGetFocusableRegionIndex(ScreenRegionKey regionKey, out int regionIndex)
+    {
+        regionIndex = -1;
+        for (var i = 0; i < _regions.Count; i++)
+        {
+            if (_regions[i].Id != regionKey || !_regions[i].Focusable)
+            {
+                continue;
+            }
+
+            regionIndex = i;
             return true;
         }
 
