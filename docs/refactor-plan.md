@@ -49,6 +49,7 @@ Status: in progress
 - split `ScreenComposer` typed API, routing logic, and legacy string bridges into dedicated files
 - split `ComboboxComponent` and `DropdownComponent` so render/state-resolution helpers are separated from update/configuration logic
 - split `TreeViewComponent` and `NotificationCenterComponent` so rendering/state styling helpers are separated from interaction logic
+- split `ContextMenuComponent` so menu bounds/rendering helpers are separated from input handling/state transitions
 
 ## Phase 4: API Simplification
 

@@ -1,11 +1,10 @@
-using System.Globalization;
 using TeaSharp.Core.Abstractions;
 using TeaSharp.Core.Messages;
 using TeaSharp.Widgets;
 
 namespace TeaSharp.Components;
 
-public sealed class ContextMenuComponent : IStatefulComponent, IMouseStatefulComponent, IFocusableComponent
+public sealed partial class ContextMenuComponent : IStatefulComponent, IMouseStatefulComponent, IFocusableComponent
 {
     private readonly List<ContextMenuItem> _items = [];
     private WidgetInteractionProfile _interactionProfile = WidgetInteractionProfile.Default.Clone();
@@ -218,103 +217,12 @@ public sealed class ContextMenuComponent : IStatefulComponent, IMouseStatefulCom
             return;
         }
 
-        var itemWidth = _items.Count == 0
-            ? 12
-            : Math.Max(12, _items.Max(item => item.Title.Length + 4));
-        var width = Math.Min(itemWidth, clipped.Width);
-        var height = Math.Min(Math.Max(3, _items.Count + 2), clipped.Height);
-
-        var x = Math.Clamp(AnchorX, clipped.X, Math.Max(clipped.X, clipped.Right - width));
-        var y = Math.Clamp(AnchorY, clipped.Y, Math.Max(clipped.Y, clipped.Bottom - height));
-        var bounds = new Rect(x, y, width, height);
-
-        Rect content;
-        if (ShowBorder)
-        {
-            canvas.DrawBox(bounds, Title, BorderStyle.Rounded);
-            content = bounds.Inset(1, 1);
-        }
-        else
-        {
-            content = bounds;
-        }
-
-        if (content.IsEmpty)
+        if (!TryResolveMenuBounds(clipped, out var menuBounds, out var content))
         {
             return;
         }
 
-        if (_items.Count == 0)
-        {
-            canvas.WriteText(content.X, content.Y, ItemStatePalette.Render("(empty)", WidgetVisualState.Empty), content.Width);
-            return;
-        }
-
-        var rows = Math.Min(content.Height, _items.Count);
-        for (var i = 0; i < rows; i++)
-        {
-            var states = new List<WidgetVisualState>(6);
-            if (Focused)
-            {
-                states.Add(WidgetVisualState.Focused);
-            }
-
-            if (Disabled)
-            {
-                states.Add(WidgetVisualState.Disabled);
-            }
-
-            if (ReadOnly)
-            {
-                states.Add(WidgetVisualState.ReadOnly);
-            }
-
-            if (i == _selectedIndex)
-            {
-                states.Add(WidgetVisualState.Cursor);
-                states.Add(WidgetVisualState.Selected);
-            }
-
-            if (i == _hoveredIndex)
-            {
-                states.Add(WidgetVisualState.Hovered);
-            }
-
-            var itemStates = _items[i].States;
-            if (itemStates is not null)
-            {
-                states.AddRange(itemStates);
-            }
-
-            var cursor = i == _selectedIndex ? ">" : " ";
-            canvas.WriteText(content.X, content.Y + i, ItemStatePalette.Render($"{cursor} {_items[i].Title}", states), content.Width);
-        }
-    }
-
-    private bool TryResolveMenuBounds(Rect bounds, out Rect menuBounds, out Rect content)
-    {
-        menuBounds = default;
-        content = default;
-
-        var clipped = bounds;
-        if (clipped.IsEmpty)
-        {
-            return false;
-        }
-
-        var itemWidth = _items.Count == 0
-            ? 12
-            : Math.Max(12, _items.Max(item => item.Title.Length + 4));
-        var width = Math.Min(itemWidth, clipped.Width);
-        var height = Math.Min(Math.Max(3, _items.Count + 2), clipped.Height);
-
-        var x = Math.Clamp(AnchorX, clipped.X, Math.Max(clipped.X, clipped.Right - width));
-        var y = Math.Clamp(AnchorY, clipped.Y, Math.Max(clipped.Y, clipped.Bottom - height));
-        menuBounds = new Rect(x, y, width, height);
-        content = ShowBorder
-            ? menuBounds.Inset(1, 1)
-            : menuBounds;
-        return !content.IsEmpty;
+        RenderMenu(canvas, menuBounds, content);
     }
 
     private int RowFromPointer(Rect content, int y)
