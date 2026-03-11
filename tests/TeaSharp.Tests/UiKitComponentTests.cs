@@ -30,6 +30,7 @@ internal static class UiKitComponentTests
         yield return new TestCase("UiKit_FormComponents_RespondToInput", FormComponents_RespondToInput);
         yield return new TestCase("UiKit_ModalComponent_VisibleStateControlsRendering", ModalComponent_VisibleStateControlsRendering);
         yield return new TestCase("UiKit_ModalComponent_BackdropOccludesUnderlyingContent", ModalComponent_BackdropOccludesUnderlyingContent);
+        yield return new TestCase("UiKit_ModalComponent_BackdropOccludesUnderlyingContent_GraphemeAwareCanvas", ModalComponent_BackdropOccludesUnderlyingContent_GraphemeAwareCanvas);
     }
 
     private static Task Canvas_DrawBox_BorderStyles_RenderExpectedCorners()
@@ -314,6 +315,31 @@ internal static class UiKitComponentTests
         TestAssert.True(!output.Contains("UNDERLAY-TEXT", StringComparison.Ordinal), "Modal backdrop should hide pre-rendered base content.");
         TestAssert.True(!output.Contains("underlay", StringComparison.Ordinal), "Modal backdrop should hide underlay frame/title.");
         TestAssert.True(output.Contains(" Dialog ", StringComparison.Ordinal), "Modal title should be rendered above backdrop.");
+        return Task.CompletedTask;
+    }
+
+    private static Task ModalComponent_BackdropOccludesUnderlyingContent_GraphemeAwareCanvas()
+    {
+        // Arrange
+        var canvas = new Canvas(40, 12, CanvasTextMode.GraphemeAware);
+        canvas.WriteText(0, 0, "UNDERLAY-TEXT", 40);
+        canvas.DrawBox(new Rect(0, 1, 40, 10), "underlay");
+
+        var modal = new ModalComponent(new ModalOptions(
+            Visible: true,
+            Title: "Dialog",
+            Lines: ["confirm action"],
+            Theme: new UiTheme(ModalBackdropFill: ':')));
+
+        // Act
+        modal.Render(canvas, new Rect(0, 0, 40, 12));
+        var output = canvas.Render();
+
+        // Assert
+        TestAssert.True(!output.Contains("UNDERLAY-TEXT", StringComparison.Ordinal), "Modal backdrop should hide pre-rendered base content on grapheme-aware canvases.");
+        TestAssert.True(!output.Contains("underlay", StringComparison.Ordinal), "Modal backdrop should hide underlay frame/title on grapheme-aware canvases.");
+        TestAssert.True(output.Contains(" Dialog ", StringComparison.Ordinal), "Modal title should still render on grapheme-aware canvases.");
+        TestAssert.True(output.Contains("::", StringComparison.Ordinal), "Modal backdrop should render a solid visible fill.");
         return Task.CompletedTask;
     }
 }

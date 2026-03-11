@@ -59,9 +59,8 @@ public sealed class ModalComponent : ICanvasComponent
         {
             for (var x = clipped.X; x < clipped.Right; x++)
             {
-                // Modal backdrop must fully occlude underlying UI. Drawing only over
-                // whitespace leaks previously rendered borders/text through the overlay.
-                canvas.Set(x, y, (x + y) % 2 == 0 ? Theme.ModalBackdropFill : ' ');
+                // Modal backdrop must fully occlude underlying UI.
+                canvas.Set(x, y, Theme.ModalBackdropFill);
             }
         }
 
@@ -76,6 +75,7 @@ public sealed class ModalComponent : ICanvasComponent
         var modalY = clipped.Y + (clipped.Height - modalHeight) / 2;
         var modal = new Rect(modalX, modalY, modalWidth, modalHeight);
 
+        FillRect(canvas, modal, ' ');
         var body = FrameLayout.DrawFrameAndResolveContent(canvas, modal, Title, Border, Padding);
         if (body.IsEmpty)
         {
@@ -86,6 +86,23 @@ public sealed class ModalComponent : ICanvasComponent
         for (var row = 0; row < rows; row++)
         {
             canvas.WriteText(body.X, body.Y + row, Lines[row], body.Width);
+        }
+    }
+
+    private static void FillRect(Canvas canvas, Rect rect, char fill)
+    {
+        var clipped = Rect.Intersect(rect, canvas.Bounds);
+        if (clipped.IsEmpty)
+        {
+            return;
+        }
+
+        for (var y = clipped.Y; y < clipped.Bottom; y++)
+        {
+            for (var x = clipped.X; x < clipped.Right; x++)
+            {
+                canvas.Set(x, y, fill);
+            }
         }
     }
 }
