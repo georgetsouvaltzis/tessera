@@ -1,12 +1,12 @@
 // using TeaSharp;
-// using TeaSharp.Components;
+// using TeaSharp.Components.Primitives;
 // using TeaSharp.Styles;
 // using TeaSharp.Widgets;
 // using TeaSharp.Core.Abstractions;
 // using TeaSharp.Core.Application;
 // using TeaSharp.Core.Messages;
 // using TeaSharp.Core.Terminal;
-// using TWidgets = TeaSharp.Components.Widgets;
+// using TWidgets = TeaSharp.Components.Primitives.Widgets;
 // using ModelView = TeaSharp.Core.Abstractions.View;
 //
 // var terminal = new TeaSharp.Core.Terminal.ConsoleTerminalAdapter();

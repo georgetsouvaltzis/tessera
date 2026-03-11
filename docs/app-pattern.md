@@ -19,7 +19,9 @@ The intended shell is:
 ## Default Shape
 
 ```csharp
-using TeaSharp.Components;
+using TeaSharp.Components.Composition;
+using TeaSharp.Components.Prebuilt;
+using TeaSharp.Components.Primitives;
 using TeaSharp.Core.Abstractions;
 using TeaSharp.Core.Messages;
 using ModelView = TeaSharp.Core.Abstractions.View;

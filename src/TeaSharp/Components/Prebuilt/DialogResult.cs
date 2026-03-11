@@ -2,7 +2,7 @@ using TeaSharp.Core.Abstractions;
 using TeaSharp.Core.Messages;
 using TeaSharp.Widgets;
 
-namespace TeaSharp.Components;
+namespace TeaSharp.Components.Prebuilt;
 
 public enum DialogResult
 {

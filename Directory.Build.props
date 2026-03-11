@@ -8,6 +8,10 @@
     <ContinuousIntegrationBuild Condition="'$(CI)' == 'true'">true</ContinuousIntegrationBuild>
   </PropertyGroup>
 
+  <ItemGroup Condition="'$(MSBuildProjectName)' != 'TeaSharp.Core'">
+    <Compile Include="$(MSBuildThisFileDirectory)ComponentPublicGlobalUsings.cs" Link="GlobalUsings.Components.cs" />
+  </ItemGroup>
+
   <Target Name="EnforceNoUnsafeBlocks" BeforeTargets="CoreCompile">
     <Error Condition="'$(AllowUnsafeBlocks)' == 'true'" Text="TeaSharp forbids unsafe code. Remove /unsafe or AllowUnsafeBlocks=true." />
   </Target>

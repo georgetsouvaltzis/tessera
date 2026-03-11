@@ -1,6 +1,6 @@
 using System.Text;
 
-namespace TeaSharp.Components;
+namespace TeaSharp.Components.Primitives;
 
 public sealed class Canvas
 {

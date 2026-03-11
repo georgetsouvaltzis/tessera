@@ -1,4 +1,4 @@
-namespace TeaSharp.Components;
+namespace TeaSharp.Components.Charting;
 
 public readonly record struct LineChartOptions(
     bool ShowAxes = false,

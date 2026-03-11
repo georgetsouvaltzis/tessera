@@ -3,7 +3,7 @@ using TeaSharp.Core.Abstractions;
 using TeaSharp.Core.Messages;
 using TeaSharp.Widgets;
 
-namespace TeaSharp.Components;
+namespace TeaSharp.Components.Productivity;
 
 /// <summary>
 /// Renders and routes a contextual action menu anchored to a screen position.

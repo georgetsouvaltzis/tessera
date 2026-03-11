@@ -1,6 +1,15 @@
 # TeaSharp Components
 
-TeaSharp includes a deterministic component drawing layer in `TeaSharp.Components` for building Bubble Tea-style terminal layouts.
+TeaSharp includes a deterministic drawing and component layer split across category namespaces:
+
+- `TeaSharp.Components.Primitives`
+- `TeaSharp.Components.Composition`
+- `TeaSharp.Components.Prebuilt`
+- `TeaSharp.Components.Productivity`
+- `TeaSharp.Components.UiKit`
+- `TeaSharp.Components.Advanced`
+- `TeaSharp.Components.Charting`
+- `TeaSharp.Components.Dashboard`
 
 Recommended app shape: `docs/app-pattern.md`.
 
@@ -14,8 +23,9 @@ The design follows patterns used in Bubble Tea examples:
 
 ## API
 
-- `Rect`: immutable geometry helper with `Inset`, `Intersect`, and `Contains(x, y)` hit testing.
-- `Canvas`: fixed-size character grid renderer.
+- `Primitives`:
+  - `Rect`: immutable geometry helper with `Inset`, `Intersect`, and `Contains(x, y)` hit testing.
+  - `Canvas`: fixed-size character grid renderer.
   - `Set`, `Get`, `WriteText`
   - `DrawHorizontalLine`, `DrawVerticalLine`, `DrawBox`
   - `DrawBox` supports `BorderStyle.SingleLine|Rounded|Heavy|Ascii`

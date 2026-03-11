@@ -1,4 +1,4 @@
-namespace TeaSharp.Components;
+namespace TeaSharp.Components.Productivity.Internal;
 
 internal static class MarkdownLineRenderer
 {

@@ -1,6 +1,6 @@
 using TeaSharp.Styles;
 
-namespace TeaSharp.Components.Internal;
+namespace TeaSharp.Components.Styling.Internal;
 
 internal static class WidgetStatePaletteResolver
 {

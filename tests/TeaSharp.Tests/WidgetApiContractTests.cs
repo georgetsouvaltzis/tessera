@@ -1,5 +1,4 @@
 using System.ComponentModel;
-using TeaSharp.Components;
 using TeaSharp.Widgets;
 
 namespace TeaSharp.Tests;

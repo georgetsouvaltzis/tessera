@@ -1,6 +1,6 @@
 using TeaSharp.Core.Abstractions;
 using TeaSharp.Core.Messages;
 
-namespace TeaSharp.Components;
+namespace TeaSharp.Components.Composition;
 
 public readonly record struct ComponentSlot(ICanvasComponent Component, Rect Bounds);

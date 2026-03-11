@@ -2,7 +2,7 @@ using TeaSharp.Core.Abstractions;
 using TeaSharp.Core.Messages;
 using TeaSharp.Widgets;
 
-namespace TeaSharp.Components;
+namespace TeaSharp.Components.UiKit;
 
 /// <summary>
 /// Renders a centered modal surface with a backdrop that fully occludes the underlying frame.

@@ -2,7 +2,7 @@ using System.Buffers;
 using System.Globalization;
 using System.Text;
 
-namespace TeaSharp.Components;
+namespace TeaSharp.Components.Primitives;
 
 internal static class TextElementWidth
 {

@@ -4,7 +4,7 @@ using TeaSharp.Core.Messages;
 using TeaSharp.Styles;
 using TeaSharp.Widgets;
 
-namespace TeaSharp.Components;
+namespace TeaSharp.Components.Prebuilt;
 
 public sealed class ButtonComponent : IStatefulComponent, IMouseStatefulComponent, IFocusableComponent
 {

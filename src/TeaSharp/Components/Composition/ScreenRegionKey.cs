@@ -1,4 +1,4 @@
-namespace TeaSharp.Components;
+namespace TeaSharp.Components.Composition;
 
 public readonly record struct ScreenRegionKey
 {

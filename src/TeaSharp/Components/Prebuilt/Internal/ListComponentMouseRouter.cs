@@ -1,7 +1,7 @@
 using TeaSharp.Core.Messages;
 using TeaSharp.Widgets;
 
-namespace TeaSharp.Components.Internal;
+namespace TeaSharp.Components.Prebuilt.Internal;
 
 internal static class ListComponentMouseRouter
 {

@@ -4,7 +4,7 @@ using TeaSharp.Core.Abstractions;
 using TeaSharp.Core.Messages;
 using TeaSharp.Widgets;
 
-namespace TeaSharp.Components;
+namespace TeaSharp.Components.Productivity;
 
 /// <summary>
 /// Renders and routes a single-row menu surface with keyboard shortcuts and mouse activation.

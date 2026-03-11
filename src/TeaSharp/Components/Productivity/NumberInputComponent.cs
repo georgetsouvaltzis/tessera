@@ -1,10 +1,9 @@
 using System.ComponentModel;
 using TeaSharp.Core.Abstractions;
 using TeaSharp.Core.Messages;
-using TeaSharp.Components.Internal;
 using TeaSharp.Widgets;
 
-namespace TeaSharp.Components;
+namespace TeaSharp.Components.Productivity;
 
 /// <summary>
 /// Provides structured numeric entry on top of a text-backed editing surface.

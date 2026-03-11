@@ -2,7 +2,7 @@ using TeaSharp.Core.Abstractions;
 using TeaSharp.Core.Messages;
 using TeaSharp.Widgets;
 
-namespace TeaSharp.Components;
+namespace TeaSharp.Components.Advanced;
 
 public sealed class SliderComponent : IStatefulComponent, IMouseStatefulComponent, IFocusableComponent
 {
@@ -176,7 +176,7 @@ public sealed class SliderComponent : IStatefulComponent, IMouseStatefulComponen
         if (content.Height > 1)
         {
             var normalized = Normalize();
-            Widgets.DrawProgressBar(canvas, new Rect(content.X, content.Y + 1, content.Width, 1), normalized);
+            TeaSharp.Components.Primitives.Widgets.DrawProgressBar(canvas, new Rect(content.X, content.Y + 1, content.Width, 1), normalized);
         }
     }
 

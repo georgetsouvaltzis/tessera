@@ -10,7 +10,7 @@ This document defines the current public API tiers in TeaSharp so refactors can 
 
 - `TeaSharp.Tea`
 - `TeaSharp.TeaProgramOptions`
-- `TeaSharp.Components.*` component types intended for application authors
+- `TeaSharp.Components.Prebuilt.*`, `TeaSharp.Components.Productivity.*`, `TeaSharp.Components.UiKit.*`, `TeaSharp.Components.Advanced.*`, `TeaSharp.Components.Composition.*`, `TeaSharp.Components.Primitives.*`, `TeaSharp.Components.Charting.*`, and `TeaSharp.Components.Dashboard.*` types intended for application authors
 - `TeaSharp.Styles.*`
 - high-level model/message contracts required to build applications:
   - `IModel`
@@ -59,7 +59,7 @@ This document defines the current public API tiers in TeaSharp so refactors can 
 
 - application authors should be able to stay mostly in:
   - `TeaSharp`
-  - `TeaSharp.Components`
+  - category-based component namespaces (`TeaSharp.Components.Prebuilt`, `TeaSharp.Components.Productivity`, `TeaSharp.Components.UiKit`, `TeaSharp.Components.Advanced`, `TeaSharp.Components.Composition`, `TeaSharp.Components.Primitives`, `TeaSharp.Components.Charting`, `TeaSharp.Components.Dashboard`)
   - `TeaSharp.Styles`
 - app hosting should prefer `Tea.NewProgram(model)` for defaults or `TeaProgramOptions` for stable customization, with `ProgramOptions` reserved for advanced/runtime customization.
 - common component setup should flow through `*Options` records and small constructor overloads.

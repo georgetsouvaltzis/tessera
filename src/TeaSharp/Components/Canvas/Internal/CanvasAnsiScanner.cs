@@ -1,4 +1,4 @@
-namespace TeaSharp.Components;
+namespace TeaSharp.Components.Primitives.Internal;
 
 internal static class CanvasAnsiScanner
 {

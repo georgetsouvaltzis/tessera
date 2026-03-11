@@ -2,7 +2,7 @@ using System.ComponentModel;
 using TeaSharp.Core.Abstractions;
 using TeaSharp.Core.Messages;
 
-namespace TeaSharp.Components;
+namespace TeaSharp.Components.Composition;
 
 [EditorBrowsable(EditorBrowsableState.Advanced)]
 public sealed class ComponentComposer

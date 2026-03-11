@@ -1,6 +1,6 @@
 # TeaSharp Prebuilt Widgets
 
-TeaSharp provides a prebuilt widget layer in `TeaSharp.Components.PrebuiltWidgets` aimed at 1.0-ready app scaffolding.
+TeaSharp provides a prebuilt widget layer in `TeaSharp.Components.Prebuilt` aimed at 1.0-ready app scaffolding.
 
 ## Available Widgets
 

@@ -25,7 +25,8 @@ TeaSharp custom components are built around three contracts:
 ## Minimal Render-Only Component
 
 ```csharp
-using TeaSharp.Components;
+using TeaSharp.Components.Composition;
+using TeaSharp.Components.Primitives;
 
 public sealed class ClockComponent : ICanvasComponent
 {
@@ -41,7 +42,8 @@ public sealed class ClockComponent : ICanvasComponent
 ## Stateful Component
 
 ```csharp
-using TeaSharp.Components;
+using TeaSharp.Components.Composition;
+using TeaSharp.Components.Primitives;
 using TeaSharp.Core.Abstractions;
 using TeaSharp.Core.Messages;
 

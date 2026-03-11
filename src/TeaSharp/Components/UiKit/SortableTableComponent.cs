@@ -2,7 +2,7 @@ using TeaSharp.Core.Abstractions;
 using TeaSharp.Core.Messages;
 using TeaSharp.Widgets;
 
-namespace TeaSharp.Components;
+namespace TeaSharp.Components.UiKit;
 
 public sealed class SortableTableComponent : IStatefulComponent, IMouseStatefulComponent, IFocusableComponent
 {
@@ -183,7 +183,7 @@ public sealed class SortableTableComponent : IStatefulComponent, IMouseStatefulC
         var state = BuildRenderState();
         NormalizeVisibleRowPointers(state.VisibleRowCount);
 
-        Widgets.DrawTable(
+        TeaSharp.Components.Primitives.Widgets.DrawTable(
             canvas,
             rect,
             Headers,

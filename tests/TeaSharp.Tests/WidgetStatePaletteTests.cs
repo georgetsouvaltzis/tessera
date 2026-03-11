@@ -1,4 +1,3 @@
-using TeaSharp.Components;
 using TeaSharp.Styles;
 
 namespace TeaSharp.Tests;

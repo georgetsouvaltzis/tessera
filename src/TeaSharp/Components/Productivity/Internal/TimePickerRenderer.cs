@@ -1,6 +1,6 @@
 using System.Globalization;
 
-namespace TeaSharp.Components.Internal;
+namespace TeaSharp.Components.Productivity.Internal;
 
 internal static class TimePickerRenderer
 {

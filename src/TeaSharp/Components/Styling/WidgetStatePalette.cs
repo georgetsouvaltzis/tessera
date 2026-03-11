@@ -1,7 +1,6 @@
 using TeaSharp.Styles;
-using TeaSharp.Components.Internal;
 
-namespace TeaSharp.Components;
+namespace TeaSharp.Components.Styling;
 
 public sealed class WidgetStatePalette
 {

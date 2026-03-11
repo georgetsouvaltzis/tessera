@@ -1,6 +1,6 @@
 using TeaSharp.Core.Abstractions;
 
-namespace TeaSharp.Components;
+namespace TeaSharp.Components.Composition;
 
 public readonly record struct InputRouteResult(bool Handled, Command? Command = null)
 {

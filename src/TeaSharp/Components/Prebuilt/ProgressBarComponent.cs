@@ -2,7 +2,7 @@ using TeaSharp.Core.Abstractions;
 using TeaSharp.Core.Messages;
 using TeaSharp.Widgets;
 
-namespace TeaSharp.Components;
+namespace TeaSharp.Components.Prebuilt;
 
 public sealed class ProgressBarComponent : IStatefulComponent, IFocusableComponent
 {
@@ -87,6 +87,6 @@ public sealed class ProgressBarComponent : IStatefulComponent, IFocusableCompone
         }
 
         var percent = (int)Math.Round(Value * 100, MidpointRounding.AwayFromZero);
-        Widgets.DrawProgressBar(canvas, new Rect(content.X, content.Y, content.Width, 1), Value, $"{percent}%");
+        TeaSharp.Components.Primitives.Widgets.DrawProgressBar(canvas, new Rect(content.X, content.Y, content.Width, 1), Value, $"{percent}%");
     }
 }

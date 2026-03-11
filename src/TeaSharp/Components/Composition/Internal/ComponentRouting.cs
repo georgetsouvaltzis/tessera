@@ -1,7 +1,7 @@
 using TeaSharp.Core.Abstractions;
 using TeaSharp.Core.Messages;
 
-namespace TeaSharp.Components;
+namespace TeaSharp.Components.Composition.Internal;
 
 internal static class ComponentRouting
 {

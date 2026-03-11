@@ -1,5 +1,4 @@
-using TeaSharp.Components;
-using TWidgets = TeaSharp.Components.Widgets;
+using TWidgets = TeaSharp.Components.Primitives.Widgets;
 
 namespace TeaSharp.Tests;
 

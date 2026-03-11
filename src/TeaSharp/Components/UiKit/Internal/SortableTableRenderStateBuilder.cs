@@ -1,4 +1,4 @@
-namespace TeaSharp.Components;
+namespace TeaSharp.Components.UiKit.Internal;
 
 internal static class SortableTableRenderStateBuilder
 {

@@ -1,7 +1,7 @@
 using TeaSharp.Core.Abstractions;
 using TeaSharp.Core.Messages;
 
-namespace TeaSharp.Components;
+namespace TeaSharp.Components.Prebuilt;
 
 public sealed partial class LayoutContainerComponent : IStatefulComponent, IMouseStatefulComponent
 {

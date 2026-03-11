@@ -1,6 +1,6 @@
 using TeaSharp.Widgets;
 
-namespace TeaSharp.Components.Internal;
+namespace TeaSharp.Components.Productivity.Internal;
 
 internal static class NumberInputRenderer
 {

@@ -1,6 +1,6 @@
 using TeaSharp.Core.Abstractions;
 
-namespace TeaSharp.Components;
+namespace TeaSharp.Components.Prebuilt;
 
 public sealed partial class LayoutContainerComponent
 {

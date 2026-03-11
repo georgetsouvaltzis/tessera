@@ -1,6 +1,6 @@
 using TeaSharp.Widgets;
 
-namespace TeaSharp.Components;
+namespace TeaSharp.Components.Productivity;
 
 public sealed partial class ContextMenuComponent
 {

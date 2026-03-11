@@ -4,7 +4,7 @@ using TeaSharp.Core.Abstractions;
 using TeaSharp.Core.Messages;
 using TeaSharp.Widgets;
 
-namespace TeaSharp.Components;
+namespace TeaSharp.Components.Productivity;
 
 /// <summary>
 /// Renders markdown into a scrollable viewport for help panes, docs, or inline references.

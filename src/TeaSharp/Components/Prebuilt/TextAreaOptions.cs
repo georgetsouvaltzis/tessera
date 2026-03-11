@@ -1,6 +1,6 @@
 using TeaSharp.Widgets;
 
-namespace TeaSharp.Components;
+namespace TeaSharp.Components.Prebuilt;
 
 /// <summary>
 /// Defines the one-shot configuration used to construct a <see cref="TextAreaComponent"/>.

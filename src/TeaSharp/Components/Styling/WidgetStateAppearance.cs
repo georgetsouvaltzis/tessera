@@ -1,6 +1,6 @@
 using TeaSharp.Styles;
 
-namespace TeaSharp.Components;
+namespace TeaSharp.Components.Styling;
 
 public sealed class WidgetStateAppearance
 {

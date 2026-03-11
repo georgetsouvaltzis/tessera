@@ -7,7 +7,13 @@ It keeps the default app path small:
 - build apps around `Tea.NewProgram(...)`
 - configure runtime behavior with `TeaProgramOptions`
 - compose screens with `ScreenComposer`, `InputRouter`, and `InteractiveScreenModel`
-- use `TeaSharp.Components` for application-facing controls
+- use the category namespaces for application-facing controls:
+  - `TeaSharp.Components.Prebuilt`
+  - `TeaSharp.Components.Productivity`
+  - `TeaSharp.Components.UiKit`
+  - `TeaSharp.Components.Advanced`
+  - `TeaSharp.Components.Composition`
+  - `TeaSharp.Components.Primitives`
 
 ## Quick Start
 

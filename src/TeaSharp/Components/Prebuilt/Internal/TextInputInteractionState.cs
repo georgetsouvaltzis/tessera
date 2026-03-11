@@ -1,4 +1,4 @@
-namespace TeaSharp.Components.Internal;
+namespace TeaSharp.Components.Prebuilt.Internal;
 
 internal readonly record struct TextInputInteractionState(
     bool WasCancelled,

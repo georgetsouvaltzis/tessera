@@ -2,7 +2,7 @@
 
 TeaSharp now ships a lower-level stateful widget layer in `TeaSharp.Widgets` modeled after Bubble Tea's bubbles-style approach.
 
-These types remain public for advanced composition and custom controls, but the widget models and `*KeyMap` types are now marked `EditorBrowsable(Advanced)` so the default path stays centered on `TeaSharp.Components` and `TeaProgramOptions`.
+These types remain public for advanced composition and custom controls, but the widget models and `*KeyMap` types are now marked `EditorBrowsable(Advanced)` so the default path stays centered on the category component namespaces and `TeaProgramOptions`.
 
 ## Widgets
 

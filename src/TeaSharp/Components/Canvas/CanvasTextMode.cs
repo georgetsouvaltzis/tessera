@@ -1,7 +1,7 @@
 using System.Text;
 using System.Globalization;
 
-namespace TeaSharp.Components;
+namespace TeaSharp.Components.Primitives;
 
 public enum CanvasTextMode
 {

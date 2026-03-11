@@ -1,6 +1,6 @@
 using TeaSharp.Core.Messages;
 
-namespace TeaSharp.Components;
+namespace TeaSharp.Components.Composition;
 
 public sealed class InputScope
 {

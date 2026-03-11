@@ -3,7 +3,7 @@ using TeaSharp.Core.Abstractions;
 using TeaSharp.Core.Messages;
 using TeaSharp.Widgets;
 
-namespace TeaSharp.Components;
+namespace TeaSharp.Components.Prebuilt;
 
 /// <summary>
 /// Provides a scrollable log surface with optional filtering, pause, and clear behavior.

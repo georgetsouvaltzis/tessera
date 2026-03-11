@@ -1,0 +1,10 @@
+global using TeaSharp.Components.Advanced;
+global using TeaSharp.Components.Primitives;
+global using TeaSharp.Components.Charting;
+global using TeaSharp.Components.Composition;
+global using TeaSharp.Components.Dashboard;
+global using TeaSharp.Components.Interaction;
+global using TeaSharp.Components.Prebuilt;
+global using TeaSharp.Components.Productivity;
+global using TeaSharp.Components.Styling;
+global using TeaSharp.Components.UiKit;

@@ -1,4 +1,4 @@
-namespace TeaSharp.Components;
+namespace TeaSharp.Components.Interaction;
 
 public sealed class WidgetInteractionProfile
 {

@@ -1,7 +1,7 @@
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 
-namespace TeaSharp.Components;
+namespace TeaSharp.Components.Primitives;
 
 public enum BorderStyle
 {

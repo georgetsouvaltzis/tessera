@@ -1,7 +1,7 @@
 using System.Globalization;
 using System.Text;
 
-namespace TeaSharp.Components;
+namespace TeaSharp.Components.Primitives.Internal;
 
 internal sealed class CanvasGraphemeBuffer
 {

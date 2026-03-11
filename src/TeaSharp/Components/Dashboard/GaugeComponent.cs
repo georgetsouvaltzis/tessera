@@ -1,4 +1,4 @@
-namespace TeaSharp.Components;
+namespace TeaSharp.Components.Dashboard;
 
 public sealed class GaugeComponent : ICanvasComponent
 {
@@ -33,6 +33,6 @@ public sealed class GaugeComponent : ICanvasComponent
         var normalized = Math.Clamp((Value - MinValue) / span, 0, 1);
         var label = Label ?? Value.ToString("0.##", System.Globalization.CultureInfo.InvariantCulture);
         var barHeight = Math.Min(content.Height, 2);
-        Widgets.DrawProgressBar(canvas, new Rect(content.X, content.Y, content.Width, barHeight), normalized, label);
+        TeaSharp.Components.Primitives.Widgets.DrawProgressBar(canvas, new Rect(content.X, content.Y, content.Width, barHeight), normalized, label);
     }
 }
