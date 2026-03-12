@@ -69,7 +69,6 @@ So an app can stay on `TeaApp` + `Screen` + `Layout`, while still embedding an a
 
 ```csharp
 using TeaSharp;
-using TeaSharp.Components.Primitives;
 using TeaSharp.Controls;
 using TeaSharp.Layout;
 

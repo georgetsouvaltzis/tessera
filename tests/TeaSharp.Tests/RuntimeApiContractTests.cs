@@ -72,6 +72,9 @@ internal static class RuntimeApiContractTests
         yield return new TestCase(
             "RuntimeApi_TeaProgramConstructor_IsMarkedAdvanced",
             TeaProgramConstructor_IsMarkedAdvanced);
+        yield return new TestCase(
+            "RuntimeApi_DefaultSpacingAndBorderTypes_LiveAtRootNamespace",
+            DefaultSpacingAndBorderTypes_LiveAtRootNamespace);
     }
 
     private static Task AssertMarkedAdvanced(Type type)
@@ -244,6 +247,13 @@ internal static class RuntimeApiContractTests
         TestAssert.True(
             attribute!.State == EditorBrowsableState.Advanced,
             "TeaProgram constructor should be hidden from default discovery.");
+        return Task.CompletedTask;
+    }
+
+    private static Task DefaultSpacingAndBorderTypes_LiveAtRootNamespace()
+    {
+        TestAssert.True(typeof(BorderStyle).Namespace == "TeaSharp", "BorderStyle should live at the TeaSharp root namespace for default app code.");
+        TestAssert.True(typeof(Thickness).Namespace == "TeaSharp", "Thickness should live at the TeaSharp root namespace for default app code.");
         return Task.CompletedTask;
     }
 

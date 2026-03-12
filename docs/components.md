@@ -17,7 +17,7 @@ using TeaSharp.Controls;
 using TeaSharp.Layout;
 ```
 
-Add `TeaSharp.Components.Primitives` only when you need `BorderStyle`, `Thickness`, `Canvas`, or `Rect`.
+Add `TeaSharp` for `BorderStyle` and `Thickness`. Add `TeaSharp.Components.Primitives` only when you need lower-level drawing types like `Canvas` or `Rect`.
 
 ## Root Model
 
@@ -130,7 +130,6 @@ Use them only when you need lower-level orchestration than the root model provid
 
 ```csharp
 using TeaSharp;
-using TeaSharp.Components.Primitives;
 using TeaSharp.Controls;
 using TeaSharp.Layout;
 

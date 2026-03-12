@@ -1,4 +1,4 @@
-namespace TeaSharp.Components.Primitives;
+namespace TeaSharp;
 
 /// <summary>
 /// Represents four-sided spacing using familiar UI vocabulary.

@@ -29,8 +29,8 @@ internal sealed class ChoiceDemoApp : TeaApp
     private readonly Label _details = new()
     {
         Title = "Selection",
-        Border = TeaSharp.Components.Primitives.BorderStyle.SingleLine,
-        Padding = TeaSharp.Components.Primitives.Thickness.All(1),
+        Border = BorderStyle.SingleLine,
+        Padding = Thickness.All(1),
     };
 
     private readonly StatusBar _status = new();
@@ -82,11 +82,11 @@ internal sealed class ChoiceDemoApp : TeaApp
                 new PanelLayout(
                     content,
                     title: "TeaSharp Choice",
-                    border: TeaSharp.Components.Primitives.BorderStyle.Rounded,
-                    padding: TeaSharp.Components.Primitives.Thickness.All(1)),
+                    border: BorderStyle.Rounded,
+                    padding: Thickness.All(1)),
                 width: Math.Min(54, Math.Max(32, context.Width - 4)),
                 height: 16),
-            Padding = TeaSharp.Components.Primitives.Thickness.All(1),
+            Padding = Thickness.All(1),
         });
     }
 }

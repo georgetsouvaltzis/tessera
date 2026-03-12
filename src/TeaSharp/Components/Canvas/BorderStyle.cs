@@ -2,7 +2,7 @@ using TeaSharp.Components.Primitives.Internal;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 
-namespace TeaSharp.Components.Primitives;
+namespace TeaSharp;
 
 /// <summary>
 /// Defines the frame style used when a component renders a border.

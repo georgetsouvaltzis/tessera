@@ -12,9 +12,10 @@ using TeaSharp.Controls;
 using TeaSharp.Layout;
 ```
 
-Add primitives only when needed:
+Add drawing primitives only when needed:
 
 ```csharp
+using TeaSharp;
 using TeaSharp.Components.Primitives;
 ```
 
@@ -107,7 +108,6 @@ After:
 
 ```csharp
 using TeaSharp;
-using TeaSharp.Components.Primitives;
 using TeaSharp.Controls;
 using TeaSharp.Layout;
 
