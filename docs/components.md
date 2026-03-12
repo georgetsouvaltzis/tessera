@@ -106,11 +106,11 @@ Important advanced namespaces:
 Examples:
 
 - `ComboboxComponent`
-- `ProgressBarComponent`
-- `LogViewerComponent`
-- `CommandPaletteComponent`
-- `TreeViewComponent`
-- `NotificationCenterComponent`
+- `SortableTableComponent`
+- `ToastCenterComponent`
+- `ViewportClass`
+- `UiWidgets`
+- `Canvas`
 
 These can still be placed directly inside the new layout model through `ComponentLayout`, `PanelLayout`, `CenterLayout`, or `LayoutSlot`.
 

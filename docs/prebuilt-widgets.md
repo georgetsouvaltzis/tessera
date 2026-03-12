@@ -42,19 +42,17 @@ These live in `TeaSharp.Controls`.
 
 The older component catalog remains available when you need functionality that has not been promoted to the root catalog yet.
 
-Common advanced widgets:
+Common promoted advanced widgets:
 
-- `CommandPaletteComponent`
-- `ContextMenuComponent`
-- `BadgeComponent`
-- `ModalComponent`
-- `AccordionComponent`
+- `CommandPalette`
+- `ContextMenu`
+- `Badge`
+- `Modal`
+- `Accordion`
 
 These live under:
 
-- `TeaSharp.Components.Prebuilt`
-- `TeaSharp.Components.Productivity`
-- `TeaSharp.Components.Advanced`
+- `TeaSharp.Controls`
 
 ## How They Fit Together
 

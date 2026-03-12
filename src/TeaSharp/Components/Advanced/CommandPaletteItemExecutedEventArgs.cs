@@ -1,8 +1,11 @@
+using System.ComponentModel;
+
 namespace TeaSharp.Components.Advanced;
 
 /// <summary>
 /// Describes a command-palette item execution.
 /// </summary>
+[EditorBrowsable(EditorBrowsableState.Advanced)]
 public sealed class CommandPaletteItemExecutedEventArgs : EventArgs
 {
     /// <summary>

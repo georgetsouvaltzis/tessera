@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using TeaSharp.Components.Composition;
 using TeaSharp.Components.Interaction;
 using TeaSharp.Components.Primitives;
@@ -9,6 +10,7 @@ using TeaSharp.Widgets;
 
 namespace TeaSharp.Components.UiKit;
 
+[EditorBrowsable(EditorBrowsableState.Advanced)]
 public sealed class AccordionComponent : IStatefulComponent
 {
     private readonly List<AccordionSection> _sections = [];
@@ -91,4 +93,3 @@ public sealed class AccordionComponent : IStatefulComponent
         }
     }
 }
-

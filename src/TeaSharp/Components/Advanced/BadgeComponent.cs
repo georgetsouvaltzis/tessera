@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using TeaSharp.Components.Advanced.Internal;
 using TeaSharp.Components.Composition;
 using TeaSharp.Components.Interaction;
@@ -9,6 +10,7 @@ using TeaSharp.Widgets;
 
 namespace TeaSharp.Components.Advanced;
 
+[EditorBrowsable(EditorBrowsableState.Advanced)]
 public sealed class BadgeComponent : ICanvasComponent
 {
     public string Text { get; set; } = "Badge";
@@ -33,4 +35,3 @@ public sealed class BadgeComponent : ICanvasComponent
         canvas.WriteText(clipped.X, clipped.Y, Palette.Render(label, State), clipped.Width);
     }
 }
-

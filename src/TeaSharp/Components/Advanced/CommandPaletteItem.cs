@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using TeaSharp.Components.Advanced.Internal;
 using TeaSharp.Components.Composition;
 using TeaSharp.Components.Interaction;
@@ -9,9 +10,9 @@ using TeaSharp.Widgets;
 
 namespace TeaSharp.Components.Advanced;
 
+[EditorBrowsable(EditorBrowsableState.Advanced)]
 public sealed record CommandPaletteItem(
     string Id,
     string Title,
     string Description = "",
     IReadOnlyCollection<WidgetVisualState>? States = null);
-

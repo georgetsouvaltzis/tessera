@@ -2,6 +2,7 @@ using TeaSharp.Components.Composition;
 using TeaSharp.Components.Interaction;
 using TeaSharp.Components.Primitives;
 using TeaSharp.Components.Styling;
+using System.ComponentModel;
 using TeaSharp.Components.UiKit.Internal;
 namespace TeaSharp.Components.UiKit;
 
@@ -14,6 +15,7 @@ namespace TeaSharp.Components.UiKit;
 /// <param name="Padding">Inner spacing applied after the frame is resolved.</param>
 /// <param name="BodyLines">Body lines rendered inside the modal.</param>
 /// <param name="Theme">Optional UI theme override.</param>
+[EditorBrowsable(EditorBrowsableState.Advanced)]
 public sealed record ModalOptions(
     string Title = "Modal",
     bool IsVisible = false,

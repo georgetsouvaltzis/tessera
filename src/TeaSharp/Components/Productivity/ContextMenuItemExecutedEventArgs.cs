@@ -1,8 +1,11 @@
+using System.ComponentModel;
+
 namespace TeaSharp.Components.Productivity;
 
 /// <summary>
 /// Describes a context-menu item execution.
 /// </summary>
+[EditorBrowsable(EditorBrowsableState.Advanced)]
 public sealed class ContextMenuItemExecutedEventArgs : EventArgs
 {
     /// <summary>

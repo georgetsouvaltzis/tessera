@@ -3,6 +3,7 @@ using TeaSharp.Components.Interaction;
 using TeaSharp.Components.Primitives;
 using TeaSharp.Components.Productivity.Internal;
 using TeaSharp.Components.Styling;
+using System.ComponentModel;
 using TeaSharp.Widgets;
 
 namespace TeaSharp.Components.Productivity;
@@ -22,6 +23,7 @@ namespace TeaSharp.Components.Productivity;
 /// <param name="ExecuteKey">Optional key binding used to execute the selected item.</param>
 /// <param name="CloseKey">Optional key binding used to close the menu.</param>
 /// <param name="InteractionProfile">Optional mouse interaction profile.</param>
+[EditorBrowsable(EditorBrowsableState.Advanced)]
 public sealed record ContextMenuOptions(
     IEnumerable<ContextMenuItem>? Items = null,
     string Title = "Context",

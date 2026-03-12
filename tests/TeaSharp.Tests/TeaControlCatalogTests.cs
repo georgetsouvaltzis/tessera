@@ -1,9 +1,13 @@
 using System.ComponentModel;
 using TeaSharp.Components.Advanced;
 using TeaSharp.Components.Prebuilt;
+using TeaSharp.Components.Primitives;
 using TeaSharp.Components.Productivity;
 using TeaSharp.Components.UiKit;
 using TeaSharp.Controls;
+using RootAccordionSection = TeaSharp.Controls.AccordionSection;
+using RootCommandPaletteItem = TeaSharp.Controls.CommandPaletteItem;
+using RootContextMenuItem = TeaSharp.Controls.ContextMenuItem;
 
 namespace TeaSharp.Tests;
 
@@ -12,13 +16,22 @@ internal static class TeaControlCatalogTests
     private static readonly Type[] NewControlTypes =
     [
         typeof(Label),
+        typeof(Badge),
+        typeof(BadgeTone),
         typeof(Button),
+        typeof(Accordion),
+        typeof(RootAccordionSection),
         typeof(TextInput),
         typeof(TextArea),
         typeof(Choice),
         typeof(ComboBox),
+        typeof(CommandPalette),
+        typeof(RootCommandPaletteItem),
         typeof(Dialog),
+        typeof(ContextMenu),
+        typeof(RootContextMenuItem),
         typeof(LogView),
+        typeof(Modal),
         typeof(NotificationLevel),
         typeof(Notifications),
         typeof(ProgressBar),
@@ -83,6 +96,10 @@ internal static class TeaControlCatalogTests
         typeof(SpinnerComponent),
         typeof(TreeViewComponent),
         typeof(NotificationCenterComponent),
+        typeof(BadgeComponent),
+        typeof(CommandPaletteComponent),
+        typeof(global::TeaSharp.Components.Advanced.CommandPaletteItem),
+        typeof(global::TeaSharp.Components.Advanced.CommandPaletteItemExecutedEventArgs),
         typeof(NumberInputComponent),
         typeof(NumberInputOptions),
         typeof(global::TeaSharp.Components.Productivity.NumberInputSubmittedEventArgs),
@@ -97,6 +114,14 @@ internal static class TeaControlCatalogTests
         typeof(MarkdownViewerOptions),
         typeof(CheckboxListComponent),
         typeof(RadioGroupComponent),
+        typeof(ContextMenuComponent),
+        typeof(ContextMenuOptions),
+        typeof(global::TeaSharp.Components.Productivity.ContextMenuItem),
+        typeof(global::TeaSharp.Components.Productivity.ContextMenuItemExecutedEventArgs),
+        typeof(ModalComponent),
+        typeof(ModalOptions),
+        typeof(AccordionComponent),
+        typeof(global::TeaSharp.Components.UiKit.AccordionSection),
     ];
 
     public static IEnumerable<TestCase> Cases()
@@ -116,6 +141,9 @@ internal static class TeaControlCatalogTests
         yield return new TestCase(
             "TeaControlCatalog_TimePicker_UsesRootTimeFieldType",
             TimePicker_UsesRootTimeFieldType);
+        yield return new TestCase(
+            "TeaControlCatalog_PromotedAdvancedControls_WorkThroughRootWrappers",
+            PromotedAdvancedControls_WorkThroughRootWrappers);
     }
 
     private static Task NewControlTypes_RemainDiscoverable()
@@ -238,6 +266,82 @@ internal static class TeaControlCatalogTests
 
         TestAssert.True(property is not null, "TimePicker.ActiveField should exist.");
         TestAssert.True(property!.PropertyType == typeof(TimeField), "TimePicker.ActiveField should stay on the root control contract.");
+        return Task.CompletedTask;
+    }
+
+    private static Task PromotedAdvancedControls_WorkThroughRootWrappers()
+    {
+        var badge = new Badge
+        {
+            Text = "hot",
+            Tone = BadgeTone.Warning,
+        };
+        var badgeCanvas = new Canvas(16, 1);
+        badge.Render(badgeCanvas, new Rect(0, 0, 16, 1));
+
+        var accordion = new Accordion
+        {
+            Title = "Sections",
+            IsFocused = true,
+        };
+        accordion.SetSections(
+        [
+            new RootAccordionSection("Overview", ["alpha"]),
+            new RootAccordionSection("Deploy", ["ship it"]),
+        ]);
+        accordion.MoveNext();
+        accordion.ToggleSelected();
+        var accordionCanvas = new Canvas(24, 6);
+        accordion.Render(accordionCanvas, new Rect(0, 0, 24, 6));
+
+        var modal = new Modal
+        {
+            Title = "Dialog",
+            IsVisible = true,
+            BackdropFill = ':',
+        };
+        modal.SetBodyLines(["deploy ready"]);
+        var modalCanvas = new Canvas(30, 10);
+        modal.Render(modalCanvas, new Rect(0, 0, 30, 10));
+
+        var menu = new ContextMenu
+        {
+            IsFocused = true,
+        };
+        string? contextItemId = null;
+        menu.ItemExecuted += (_, args) => contextItemId = args.ItemId;
+        menu.SetItems(
+        [
+            new RootContextMenuItem("copy", "Copy"),
+            new RootContextMenuItem("paste", "Paste"),
+        ]);
+        menu.OpenAt(2, 2);
+        menu.Handle(new KeyPressed(Key.Enter));
+
+        var palette = new CommandPalette
+        {
+            IsFocused = true,
+        };
+        string? commandItemId = null;
+        palette.ItemExecuted += (_, args) => commandItemId = args.ItemId;
+        palette.SetItems(
+        [
+            new RootCommandPaletteItem("deploy", "Deploy", "publish release"),
+            new RootCommandPaletteItem("rollback", "Rollback", "restore previous"),
+        ]);
+        palette.Open();
+        palette.QueryText = "roll";
+        palette.Handle(new KeyPressed(Key.Enter));
+
+        TestAssert.True(badgeCanvas.Render().Contains("[hot]", StringComparison.Ordinal), "Badge should render through the root wrapper.");
+        TestAssert.Equal(1, accordion.SelectedIndex, "Accordion should move selection through the root wrapper.");
+        TestAssert.True(accordionCanvas.Render().Contains("ship it", StringComparison.Ordinal), "Accordion should expand sections through the root wrapper.");
+        TestAssert.True(modalCanvas.Render().Contains("deploy ready", StringComparison.Ordinal), "Modal should render body lines through the root wrapper.");
+        TestAssert.True(modalCanvas.Render().Contains("::", StringComparison.Ordinal), "Modal should expose backdrop fill through the root wrapper.");
+        TestAssert.True(contextItemId == "copy", "ContextMenu should execute items through the root wrapper.");
+        TestAssert.True(!menu.IsVisible, "ContextMenu should close after executing through the root wrapper.");
+        TestAssert.True(commandItemId == "rollback", "CommandPalette should filter and execute through the root wrapper.");
+        TestAssert.True(!palette.IsVisible, "CommandPalette should close after executing through the root wrapper.");
         return Task.CompletedTask;
     }
 }

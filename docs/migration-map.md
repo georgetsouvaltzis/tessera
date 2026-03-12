@@ -23,6 +23,7 @@ This is the working map from legacy pre-release APIs to the current default path
 - `ProgressBarComponent` -> `ProgressBar`
 - `LogViewerComponent` -> `LogView`
 - `NotificationCenterComponent` -> `Notifications`
+- `BadgeComponent` -> `Badge`
 - `ToggleSwitchComponent` -> `Toggle`
 - `SliderComponent` -> `Slider`
 - `SpinnerComponent` -> `Spinner`
@@ -34,6 +35,13 @@ This is the working map from legacy pre-release APIs to the current default path
 - `TreeItemNode` -> `TreeItem`
 - `MenuBarComponent` -> `MenuBar`
 - `MenuBarItem` -> `MenuItem`
+- `ModalComponent` -> `Modal`
+- `AccordionComponent` -> `Accordion`
+- `AccordionSection` -> `TeaSharp.Controls.AccordionSection`
+- `ContextMenuComponent` -> `ContextMenu`
+- `ContextMenuItem` -> `TeaSharp.Controls.ContextMenuItem`
+- `CommandPaletteComponent` -> `CommandPalette`
+- `CommandPaletteItem` -> `TeaSharp.Controls.CommandPaletteItem`
 
 ## Composition
 
@@ -46,4 +54,4 @@ This is the working map from legacy pre-release APIs to the current default path
 ## Notes
 
 - Legacy types are still available for now, but the ones with a root-level replacement are marked `EditorBrowsable(Advanced)`.
-- Advanced widgets and advanced screen composition still live under the older component namespaces until they are redesigned or promoted.
+- Advanced screen composition still lives under the older component namespaces. Widgets without a root wrapper should be treated as advanced.

@@ -22,11 +22,19 @@ These are the types new applications should discover first.
 - `TeaSharp.Layout.*` object-model types
 - `TeaSharp.Controls.Button`
 - `TeaSharp.Controls.Label`
+- `TeaSharp.Controls.Badge`
+- `TeaSharp.Controls.BadgeTone`
+- `TeaSharp.Controls.Accordion`
+- `TeaSharp.Controls.AccordionSection`
 - `TeaSharp.Controls.TextInput`
 - `TeaSharp.Controls.TextArea`
 - `TeaSharp.Controls.Choice`
 - `TeaSharp.Controls.ComboBox`
+- `TeaSharp.Controls.CommandPalette`
+- `TeaSharp.Controls.CommandPaletteItem`
 - `TeaSharp.Controls.Dialog`
+- `TeaSharp.Controls.ContextMenu`
+- `TeaSharp.Controls.ContextMenuItem`
 - `TeaSharp.Controls.ProgressBar`
 - `TeaSharp.Controls.NumberInput`
 - `TeaSharp.Controls.DatePicker`
@@ -35,6 +43,7 @@ These are the types new applications should discover first.
 - `TeaSharp.Controls.MultiSelect`
 - `TeaSharp.Controls.RadioGroup`
 - `TeaSharp.Controls.LogView`
+- `TeaSharp.Controls.Modal`
 - `TeaSharp.Controls.Notifications`
 - `TeaSharp.Controls.Toggle`
 - `TeaSharp.Controls.Slider`

@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using TeaSharp.Components.Composition;
 using TeaSharp.Components.Interaction;
 using TeaSharp.Components.Primitives;
@@ -13,6 +14,7 @@ namespace TeaSharp.Components.UiKit;
 /// <summary>
 /// Renders a centered modal surface with a backdrop that fully occludes the underlying frame.
 /// </summary>
+[EditorBrowsable(EditorBrowsableState.Advanced)]
 public sealed class ModalComponent : ICanvasComponent
 {
     public ModalComponent()

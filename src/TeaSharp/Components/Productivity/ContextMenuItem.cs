@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using TeaSharp.Components.Composition;
 using TeaSharp.Components.Interaction;
 using TeaSharp.Components.Primitives;
@@ -10,8 +11,8 @@ using TeaSharp.Widgets;
 
 namespace TeaSharp.Components.Productivity;
 
+[EditorBrowsable(EditorBrowsableState.Advanced)]
 public sealed record ContextMenuItem(
     string Id,
     string Title,
     IReadOnlyCollection<WidgetVisualState>? States = null);
-
