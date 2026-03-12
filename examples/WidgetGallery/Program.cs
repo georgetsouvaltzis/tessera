@@ -1,7 +1,6 @@
 using TeaSharp;
 using TeaSharp.Controls;
 using TeaSharp.Layout;
-using TeaSharp.Components.Primitives;
 
 var app = Tea.CreateBuilder()
     .UseApp<WidgetGalleryApp>()
