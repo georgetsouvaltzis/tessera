@@ -1,4 +1,6 @@
+using System.Globalization;
 using TeaSharp;
+using TeaSharp.Components.Primitives;
 using TeaSharp.Controls;
 using TeaSharp.Layout;
 
@@ -9,7 +11,7 @@ var app = Tea.CreateBuilder()
         runtime.Screen = new ScreenOptions
         {
             AltScreen = true,
-            WindowTitle = "TeaSharp Productivity Example",
+            WindowTitle = "TeaSharp Productivity Widgets",
             EnableFocusReporting = true,
             MouseTracking = MouseTrackingMode.AllMotion,
         };
@@ -21,32 +23,52 @@ await app.RunAsync();
 internal sealed class ProductivityApp : TeaApp
 {
     private readonly MenuBar _menu = new();
-    private readonly Tabs _tabs = new("Backlog", "Today", "Done");
-    private readonly ListView<string> _tasks = new();
-    private readonly Table _table = new("Metric", "Value");
-    private readonly TextInput _command = new()
+    private readonly MultiSelect _checklist = new()
     {
-        Title = "Quick Command",
-        Placeholder = "type refresh or help",
-        Border = TeaSharp.Components.Primitives.BorderStyle.SingleLine,
-        Padding = TeaSharp.Components.Primitives.Thickness.All(1),
-        ClearOnSubmit = true,
+        Title = "Checklist",
+    };
+    private readonly RadioGroup _priority = new()
+    {
+        Title = "Priority",
+    };
+    private readonly NumberInput _estimate = new()
+    {
+        Title = "Estimate (hrs)",
+        Border = BorderStyle.SingleLine,
+        Padding = Thickness.All(1),
+        Min = 0,
+        Max = 40,
+        Step = 1,
+        Precision = 0,
+    };
+    private readonly DatePicker _dueDate = new()
+    {
+        Title = "Due Date",
+        Border = BorderStyle.SingleLine,
+        Padding = Thickness.All(1),
+    };
+    private readonly TimePicker _dueTime = new()
+    {
+        Title = "Due Time",
+        Border = BorderStyle.SingleLine,
+        Padding = Thickness.All(1),
+    };
+    private readonly MarkdownView _runbook = new()
+    {
+        Title = "Runbook",
+        Border = BorderStyle.SingleLine,
+        Padding = Thickness.All(1),
+        Wrap = true,
     };
     private readonly StatusBar _status = new();
-
-    private readonly Dictionary<string, string[]> _taskSets = new(StringComparer.Ordinal)
-    {
-        ["Backlog"] = ["Review API names", "Replace legacy docs", "Add migration guide", "Audit examples"],
-        ["Today"] = ["Finalize composition wrappers", "Verify integrations", "Write control tests"],
-        ["Done"] = ["TeaApp foundation", "Showcase migration", "Legacy discoverability pass"],
-    };
+    private string _statusMessage = "Ready.";
 
     public ProductivityApp()
     {
         _menu.SetItems(
         [
             new MenuItem("refresh", "Refresh", 'r'),
-            new MenuItem("focus", "Focus Help", 'f'),
+            new MenuItem("help", "Help", 'h'),
             new MenuItem("quit", "Quit", 'q'),
         ]);
 
@@ -54,11 +76,11 @@ internal sealed class ProductivityApp : TeaApp
         {
             if (args.ItemId == "refresh")
             {
-                Refresh();
+                RefreshStatus("Refreshed plan state.");
             }
-            else if (args.ItemId == "focus")
+            else if (args.ItemId == "help")
             {
-                _status.RightText = "Use Tab / Shift+Tab to move focus.";
+                RefreshStatus("Tab through the widgets. Use arrows to edit date/time/priority.");
             }
             else if (args.ItemId == "quit")
             {
@@ -66,92 +88,89 @@ internal sealed class ProductivityApp : TeaApp
             }
         };
 
-        _tabs.SelectionChanged += (_, args) =>
-        {
-            LoadTasks(args.SelectedItem);
-        };
+        _priority.SetItems(["Low", "Normal", "High"]);
+        _priority.SelectionChanged += (_, _) => RefreshStatus("Priority updated.");
 
-        _command.Submitted += (_, args) =>
-        {
-            if (args.Value.Equals("refresh", StringComparison.OrdinalIgnoreCase))
-            {
-                Refresh();
-            }
-            else if (args.Value.Equals("help", StringComparison.OrdinalIgnoreCase))
-            {
-                _status.RightText = "Menu: r refresh   f focus help   q quit";
-            }
-            else
-            {
-                _status.RightText = $"Unknown command: {args.Value}";
-            }
-        };
+        _estimate.SetValue(6);
+        _estimate.Submitted += (_, args) => RefreshStatus($"Estimate submitted: {args.Value.ToString(CultureInfo.InvariantCulture)}h");
 
-        _tasks.Title = "Tasks";
-        _tasks.Border = TeaSharp.Components.Primitives.BorderStyle.SingleLine;
-        _tasks.Padding = TeaSharp.Components.Primitives.Thickness.All(1);
+        _dueDate.SetDate(new DateOnly(2026, 3, 20));
+        _dueDate.DateChanged += (_, _) => RefreshStatus("Due date updated.");
 
-        _table.Title = "Summary";
-        _table.Border = TeaSharp.Components.Primitives.BorderStyle.SingleLine;
-        _table.Padding = TeaSharp.Components.Primitives.Thickness.All(1);
-        _table.PageSize = 8;
+        _dueTime.SetValue(new TimeOnly(14, 30, 0));
+        _dueTime.ValueChanged += (_, _) => RefreshStatus("Due time updated.");
 
-        LoadTasks("Backlog");
-        Refresh();
+        _checklist.SetItems(
+        [
+            ("Review API naming", true),
+            ("Verify docs/examples", false),
+            ("Run test suite", true),
+            ("Audit root controls", false),
+        ]);
+
+        _runbook.SetMarkdown(
+            """
+            ## Productivity Flow
+
+            - Use the checklist to track rollout tasks.
+            - Adjust estimate, due date, and due time from the main pane.
+            - Switch priority with the radio group.
+            - `r` refreshes the status line.
+            - `q` quits the example.
+            """);
+
+        RefreshStatus("Ready.");
     }
 
-    public override TeaEffect? Update(Message message)
-        => message is KeyPressed key && key.IsCharacter('c', ModifierKeys.Ctrl)
+    public override TeaEffect? Update(Message message) =>
+        message is KeyPressed key && key.IsCharacter('c', ModifierKeys.Ctrl)
             ? TeaEffects.Quit
             : null;
 
     public override Screen Build(ScreenContext context)
     {
-        _status.LeftText = $"Tab={_tabs.Items[_tabs.SelectedIndex]}   Tasks={_tasks.Count}";
+        _status.LeftText =
+            $"{_priority.SelectedItem}  {_checklist.CheckedItems.Count}/{_checklistCheckedCount} done  " +
+            $"{_dueDate.SelectedDate:yyyy-MM-dd} {_dueTime.Value:HH\\:mm}";
+        _status.RightText = $"{_statusMessage}  Size {context.Width}x{context.Height}  Ctrl+C Quit";
 
-        var header = new ColumnLayout();
-        header.AddFixed(_menu, 1);
-        header.AddFixed(_tabs, 1);
-
-        var details = new ColumnLayout
+        var left = new ColumnLayout
         {
             Gap = 1,
         };
-        details.AddFill(_table);
-        details.AddFixed(_command, 5);
+        left.AddFill(_checklist);
+        left.AddFixed(_priority, 6);
+
+        var schedule = new RowLayout
+        {
+            Gap = 1,
+        };
+        schedule.AddFixed(_estimate, 24);
+        schedule.AddFixed(_dueDate, 30);
+        schedule.AddFill(_dueTime);
+
+        var body = new ColumnLayout
+        {
+            Gap = 1,
+        };
+        body.AddFixed(schedule, 10);
+        body.AddFill(_runbook);
 
         return Screen.From(new WindowLayout
         {
-            Header = LayoutSlot.Fixed(header, 2),
+            Header = LayoutSlot.Fixed(_menu, 1),
+            Left = LayoutSlot.Fixed(left, Math.Min(34, Math.Max(28, context.Width / 3))),
+            Body = body,
             Footer = LayoutSlot.Fixed(_status, 1),
-            Left = LayoutSlot.Fixed(_tasks, Math.Min(36, Math.Max(24, context.Width / 3))),
-            Body = details,
             Gap = 1,
-            Padding = TeaSharp.Components.Primitives.Thickness.All(1),
+            Padding = Thickness.All(1),
         });
     }
 
-    private void LoadTasks(string tab)
+    private int _checklistCheckedCount => _checklist.CheckedItems.Count;
+
+    private void RefreshStatus(string message)
     {
-        if (!_taskSets.TryGetValue(tab, out var tasks))
-        {
-            tasks = [];
-        }
-
-        _tasks.SetItems(tasks);
-        Refresh();
-    }
-
-    private void Refresh()
-    {
-        _table.SetRows(
-        [
-            ["Selected Tab", _tabs.Items[_tabs.SelectedIndex]],
-            ["Visible Tasks", _tasks.Count.ToString(System.Globalization.CultureInfo.InvariantCulture)],
-            ["Focused", Context.HasFocus ? "Yes" : "No"],
-            ["Updated", DateTimeOffset.Now.ToString("HH:mm:ss", System.Globalization.CultureInfo.InvariantCulture)],
-        ]);
-
-        _status.RightText = "r refresh   q quit";
+        _statusMessage = message;
     }
 }

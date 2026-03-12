@@ -1,8 +1,11 @@
+using System.ComponentModel;
+
 namespace TeaSharp.Components.Productivity;
 
 /// <summary>
 /// Describes a submitted numeric value.
 /// </summary>
+[EditorBrowsable(EditorBrowsableState.Advanced)]
 public sealed class NumberInputSubmittedEventArgs : EventArgs
 {
     /// <summary>

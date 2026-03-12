@@ -14,6 +14,7 @@ namespace TeaSharp.Components.Productivity;
 /// <summary>
 /// Provides field-based time selection with keyboard and mouse navigation.
 /// </summary>
+[EditorBrowsable(EditorBrowsableState.Advanced)]
 public sealed class TimePickerComponent : IStatefulComponent, IMouseStatefulComponent, IFocusableComponent
 {
     private WidgetInteractionProfile _interactionProfile = WidgetInteractionProfile.Default.Clone();

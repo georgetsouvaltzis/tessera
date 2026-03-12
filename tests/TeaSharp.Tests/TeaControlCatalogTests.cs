@@ -33,6 +33,13 @@ internal static class TeaControlCatalogTests
         typeof(TreeView),
         typeof(MenuBar),
         typeof(MenuItem),
+        typeof(NumberInput),
+        typeof(DatePicker),
+        typeof(TimePicker),
+        typeof(MarkdownView),
+        typeof(MultiSelect),
+        typeof(RadioGroup),
+        typeof(TimeField),
     ];
 
     private static readonly Type[] LegacyPromotedTypes =
@@ -76,6 +83,20 @@ internal static class TeaControlCatalogTests
         typeof(SpinnerComponent),
         typeof(TreeViewComponent),
         typeof(NotificationCenterComponent),
+        typeof(NumberInputComponent),
+        typeof(NumberInputOptions),
+        typeof(global::TeaSharp.Components.Productivity.NumberInputSubmittedEventArgs),
+        typeof(DatePickerComponent),
+        typeof(DatePickerOptions),
+        typeof(global::TeaSharp.Components.Productivity.DateChangedEventArgs),
+        typeof(TimePickerComponent),
+        typeof(TimePickerOptions),
+        typeof(global::TeaSharp.Components.Productivity.TimeValueChangedEventArgs),
+        typeof(global::TeaSharp.Components.Productivity.TimePickerField),
+        typeof(MarkdownViewerComponent),
+        typeof(MarkdownViewerOptions),
+        typeof(CheckboxListComponent),
+        typeof(RadioGroupComponent),
     ];
 
     public static IEnumerable<TestCase> Cases()
@@ -89,6 +110,12 @@ internal static class TeaControlCatalogTests
         yield return new TestCase(
             "TeaControlCatalog_LegacyPromotedTypes_AreMarkedAdvanced",
             LegacyPromotedTypes_AreMarkedAdvanced);
+        yield return new TestCase(
+            "TeaControlCatalog_PromotedFormControls_WorkThroughRootWrappers",
+            PromotedFormControls_WorkThroughRootWrappers);
+        yield return new TestCase(
+            "TeaControlCatalog_TimePicker_UsesRootTimeFieldType",
+            TimePicker_UsesRootTimeFieldType);
     }
 
     private static Task NewControlTypes_RemainDiscoverable()
@@ -143,6 +170,74 @@ internal static class TeaControlCatalogTests
                 $"{type.Name} should be hidden from default discovery now that a root-level control exists.");
         }
 
+        return Task.CompletedTask;
+    }
+
+    private static Task PromotedFormControls_WorkThroughRootWrappers()
+    {
+        var number = new NumberInput
+        {
+            IsFocused = true,
+        };
+        double? submittedNumber = null;
+        number.Submitted += (_, args) => submittedNumber = args.Value;
+        number.Handle(new KeyPressed(Key.Character, "4"));
+        number.Handle(new KeyPressed(Key.Enter));
+
+        var date = new DatePicker
+        {
+            IsFocused = true,
+        };
+        var initialDate = date.SelectedDate;
+        date.Handle(new KeyPressed(Key.Right));
+        date.Handle(new KeyPressed(Key.Enter));
+
+        var time = new TimePicker
+        {
+            IsFocused = true,
+        };
+        time.SetValue(new TimeOnly(10, 0, 0));
+        time.Handle(new KeyPressed(Key.Up));
+        time.Handle(new KeyPressed(Key.Enter));
+
+        var multi = new MultiSelect
+        {
+            IsFocused = true,
+        };
+        multi.SetItems(["Docs", "Tests"]);
+        multi.Handle(new KeyPressed(Key.Enter));
+        multi.Handle(new KeyPressed(Key.Down));
+        multi.Handle(new KeyPressed(Key.Enter));
+
+        var radio = new RadioGroup
+        {
+            IsFocused = true,
+        };
+        radio.SetItems(["Low", "High"]);
+        radio.Handle(new KeyPressed(Key.Right));
+
+        var markdown = new MarkdownView
+        {
+            IsFocused = true,
+        };
+        markdown.SetMarkdown("# Help\nUse arrows.");
+
+        TestAssert.Equal(4d, submittedNumber ?? -1d, "NumberInput should submit values through the root wrapper.");
+        TestAssert.Equal(initialDate.AddDays(1), date.SelectedDate, "DatePicker should move the selected date through the root wrapper.");
+        TestAssert.True(date.LastCommittedDate == date.SelectedDate, "DatePicker should expose the committed date through the root wrapper.");
+        TestAssert.True(time.Value.Hour == 11, "TimePicker should adjust the active field through the root wrapper.");
+        TestAssert.True(time.LastCommittedTime == time.Value, "TimePicker should expose the committed time through the root wrapper.");
+        TestAssert.Equal(2, multi.CheckedItems.Count, "MultiSelect should toggle checked items through the root wrapper.");
+        TestAssert.Equal("High", radio.SelectedItem, "RadioGroup should move selection through the root wrapper.");
+        return Task.CompletedTask;
+    }
+
+    private static Task TimePicker_UsesRootTimeFieldType()
+    {
+        var property = typeof(TimePicker).GetProperty(nameof(TimePicker.ActiveField));
+
+        TestAssert.True(property is not null, "TimePicker.ActiveField should exist.");
+        TestAssert.True(property!.PropertyType == typeof(TimeField), "TimePicker.ActiveField should stay on the root control contract.");
         return Task.CompletedTask;
     }
 }

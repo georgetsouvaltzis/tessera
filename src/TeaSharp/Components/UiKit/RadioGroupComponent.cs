@@ -3,12 +3,14 @@ using TeaSharp.Components.Interaction;
 using TeaSharp.Components.Primitives;
 using TeaSharp.Components.Styling;
 using TeaSharp.Components.UiKit.Internal;
+using System.ComponentModel;
 using TeaSharp.Core.Abstractions;
 using TeaSharp.Core.Messages;
 using TeaSharp.Widgets;
 
 namespace TeaSharp.Components.UiKit;
 
+[EditorBrowsable(EditorBrowsableState.Advanced)]
 public sealed class RadioGroupComponent : IStatefulComponent
 {
     private readonly List<string> _items = [];
@@ -70,4 +72,3 @@ public sealed class RadioGroupComponent : IStatefulComponent
         }
     }
 }
-

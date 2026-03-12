@@ -15,6 +15,7 @@ namespace TeaSharp.Components.Productivity;
 /// <summary>
 /// Renders markdown into a scrollable viewport for help panes, docs, or inline references.
 /// </summary>
+[EditorBrowsable(EditorBrowsableState.Advanced)]
 public sealed class MarkdownViewerComponent : IStatefulComponent, IFocusableComponent
 {
     private readonly ViewportModel _viewport = new();

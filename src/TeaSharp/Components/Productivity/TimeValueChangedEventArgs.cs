@@ -1,8 +1,11 @@
+using System.ComponentModel;
+
 namespace TeaSharp.Components.Productivity;
 
 /// <summary>
 /// Describes a time-value transition.
 /// </summary>
+[EditorBrowsable(EditorBrowsableState.Advanced)]
 public sealed class TimeValueChangedEventArgs : EventArgs
 {
     /// <summary>

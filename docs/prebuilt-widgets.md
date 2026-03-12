@@ -29,6 +29,12 @@ Preferred public catalog:
 18. `TreeItem`
 19. `TreeView`
 20. `MenuBar`
+21. `NumberInput`
+22. `DatePicker`
+23. `TimePicker`
+24. `MarkdownView`
+25. `MultiSelect`
+26. `RadioGroup`
 
 These live in `TeaSharp.Controls`.
 
@@ -40,9 +46,9 @@ Common advanced widgets:
 
 - `CommandPaletteComponent`
 - `ContextMenuComponent`
-- `DatePickerComponent`
-- `TimePickerComponent`
-- `MarkdownViewerComponent`
+- `BadgeComponent`
+- `ModalComponent`
+- `AccordionComponent`
 
 These live under:
 

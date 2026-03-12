@@ -28,6 +28,12 @@ These are the types new applications should discover first.
 - `TeaSharp.Controls.ComboBox`
 - `TeaSharp.Controls.Dialog`
 - `TeaSharp.Controls.ProgressBar`
+- `TeaSharp.Controls.NumberInput`
+- `TeaSharp.Controls.DatePicker`
+- `TeaSharp.Controls.TimePicker`
+- `TeaSharp.Controls.MarkdownView`
+- `TeaSharp.Controls.MultiSelect`
+- `TeaSharp.Controls.RadioGroup`
 - `TeaSharp.Controls.LogView`
 - `TeaSharp.Controls.Notifications`
 - `TeaSharp.Controls.Toggle`

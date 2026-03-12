@@ -13,6 +13,7 @@ namespace TeaSharp.Components.Productivity;
 /// <summary>
 /// Provides calendar-based date selection with keyboard and mouse navigation.
 /// </summary>
+[EditorBrowsable(EditorBrowsableState.Advanced)]
 public sealed class DatePickerComponent : IStatefulComponent, IMouseStatefulComponent, IFocusableComponent
 {
     private WidgetInteractionProfile _interactionProfile = WidgetInteractionProfile.Default.Clone();

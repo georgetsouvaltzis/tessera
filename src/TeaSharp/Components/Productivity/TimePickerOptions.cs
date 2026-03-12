@@ -3,6 +3,7 @@ using TeaSharp.Components.Interaction;
 using TeaSharp.Components.Primitives;
 using TeaSharp.Components.Productivity.Internal;
 using TeaSharp.Components.Styling;
+using System.ComponentModel;
 using TeaSharp.Widgets;
 
 namespace TeaSharp.Components.Productivity;
@@ -10,6 +11,7 @@ namespace TeaSharp.Components.Productivity;
 /// <summary>
 /// Defines the one-shot configuration used to construct a <see cref="TimePickerComponent"/>.
 /// </summary>
+[EditorBrowsable(EditorBrowsableState.Advanced)]
 public sealed record TimePickerOptions(
     string Title = "Time Picker",
     TimeOnly? InitialValue = null,

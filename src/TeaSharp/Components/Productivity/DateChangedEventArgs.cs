@@ -1,8 +1,11 @@
+using System.ComponentModel;
+
 namespace TeaSharp.Components.Productivity;
 
 /// <summary>
 /// Describes a date selection transition.
 /// </summary>
+[EditorBrowsable(EditorBrowsableState.Advanced)]
 public sealed class DateChangedEventArgs : EventArgs
 {
     /// <summary>
