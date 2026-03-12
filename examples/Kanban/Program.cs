@@ -187,11 +187,6 @@ internal sealed class KanbanApp : TeaApp
 
     public override TeaEffect? Update(Message message)
     {
-        if (InputHandled)
-        {
-            return null;
-        }
-
         if (message is not KeyPressed key)
         {
             return null;

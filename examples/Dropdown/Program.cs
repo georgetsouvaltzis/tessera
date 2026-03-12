@@ -60,16 +60,9 @@ internal sealed class ChoiceDemoApp : TeaApp
     }
 
     public override TeaEffect? Update(Message message)
-    {
-        if (InputHandled)
-        {
-            return null;
-        }
-
-        return message is KeyPressed key && (key.IsCharacter('q') || key.IsCharacter('c', ModifierKeys.Ctrl))
+        => message is KeyPressed key && (key.IsCharacter('q') || key.IsCharacter('c', ModifierKeys.Ctrl))
             ? TeaEffects.Quit
             : null;
-    }
 
     public override Screen Build(ScreenContext context)
     {

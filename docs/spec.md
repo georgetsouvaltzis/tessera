@@ -158,7 +158,8 @@ The old composition engine is still present internally, but it is no longer the 
 Default app code uses:
 
 - automatic control input dispatch before `TeaApp.Update(...)`
-- `InputHandled` when the app needs to suppress global shortcuts after control routing
+- `TeaApp.Update(...)` for unhandled input plus runtime messages
+- `RequestEffect(...)` when a control event needs to trigger runtime work
 - typed key messages such as `KeyPressed`
 - typed pointer messages such as `PointerInput`
 - `TeaEffects` for quit/tick/sequence/batch behavior

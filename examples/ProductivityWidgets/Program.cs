@@ -33,7 +33,6 @@ internal sealed class ProductivityApp : TeaApp
         ClearOnSubmit = true,
     };
     private readonly StatusBar _status = new();
-    private bool _quitRequested;
 
     private readonly Dictionary<string, string[]> _taskSets = new(StringComparer.Ordinal)
     {
@@ -63,7 +62,7 @@ internal sealed class ProductivityApp : TeaApp
             }
             else if (args.ItemId == "quit")
             {
-                _quitRequested = true;
+                RequestEffect(TeaEffects.Quit);
             }
         };
 
@@ -102,22 +101,9 @@ internal sealed class ProductivityApp : TeaApp
     }
 
     public override TeaEffect? Update(Message message)
-    {
-        if (_quitRequested)
-        {
-            _quitRequested = false;
-            return TeaEffects.Quit;
-        }
-
-        if (InputHandled)
-        {
-            return null;
-        }
-
-        return message is KeyPressed key && key.IsCharacter('c', ModifierKeys.Ctrl)
+        => message is KeyPressed key && key.IsCharacter('c', ModifierKeys.Ctrl)
             ? TeaEffects.Quit
             : null;
-    }
 
     public override Screen Build(ScreenContext context)
     {

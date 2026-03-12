@@ -69,27 +69,19 @@ internal sealed class ComboBoxDemoApp : TeaApp
     }
 
     public override TeaEffect? Update(Message message)
-    {
-        if (InputHandled)
-        {
-            _details.Text =
-                $"""
-                Selected: {_combobox.SelectedItem}
-                Filter: {_combobox.FilterText}
-                Open: {(_combobox.IsOpen ? "yes" : "no")}
-                """;
-
-            return null;
-        }
-
-        return message is KeyPressed key && (key.IsCharacter('q') || key.IsCharacter('c', ModifierKeys.Ctrl))
+        => message is KeyPressed key && (key.IsCharacter('q') || key.IsCharacter('c', ModifierKeys.Ctrl))
             ? TeaEffects.Quit
             : null;
-    }
 
     public override Screen Build(ScreenContext context)
     {
         _status.LeftText = "Type to filter   Enter select   Esc close   q quit";
+        _details.Text =
+            $"""
+            Selected: {_combobox.SelectedItem}
+            Filter: {_combobox.FilterText}
+            Open: {(_combobox.IsOpen ? "yes" : "no")}
+            """;
 
         var content = new ColumnLayout
         {

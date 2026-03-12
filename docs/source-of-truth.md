@@ -352,7 +352,7 @@ The root path is now materially clearer:
 
 - `TeaApp`
 - automatic control routing before `Update(...)`
-- `InputHandled`
+- `Update(...)` for unhandled input plus runtime messages
 - root controls
 - `WindowLayout` + `RowLayout` + `ColumnLayout`
 
@@ -363,13 +363,15 @@ But it must stay that way:
 - root polling methods must remain advanced-only
 - new wrappers should continue replacing old `*Component` nouns where justified
 
-### 3. Default Input Flow Is Acceptable, But Not Final
+### 3. Default Input Flow Is Better, But Still Not Final
 
 The old `HandleScreenInput(...)` plus post-routing probing story is no longer the default path.
 
-The remaining issue is `InputHandled`.
+The current model is:
 
-It is acceptable for now, but it is still a framework-global concept rather than the cleanest possible interaction model.
+- controls consume keyboard, pointer, and paste input first
+- `TeaApp.Update(...)` sees unhandled input plus runtime messages
+- `RequestEffect(...)` lets control events trigger runtime behavior
 
 Long-term goal:
 

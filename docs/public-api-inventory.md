@@ -47,7 +47,7 @@ The intended beginner path is:
 
 - build an app by deriving from `TeaApp`
 - run it with `Tea.RunAsync(...)` or `TeaApplicationBuilder`
-- rely on automatic control routing before `Update(...)`
+- rely on automatic control routing; `Update(...)` handles only unhandled input plus runtime messages
 - return `Screen` from `Build(ScreenContext)`
 - assemble screens with `WindowLayout`, `RowLayout`, and `ColumnLayout`
 - keep configuration in `TeaRuntimeOptions` and `ScreenOptions`

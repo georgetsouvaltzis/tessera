@@ -4,7 +4,7 @@ Use this pattern for normal apps:
 
 - derive from `TeaApp`
 - handle terminal input through `Message`
-- let controls route automatically before `Update(...)`
+- let controls route automatically; `Update(...)` handles unhandled input plus runtime messages
 - return a `Screen` from `Build(ScreenContext)`
 - run with `Tea.RunAsync(...)` or `TeaApplicationBuilder`
 - keep low-level composition APIs as advanced-only escape hatches
@@ -38,22 +38,12 @@ internal sealed class CounterApp : TeaApp
     private readonly Button _increment = new() { Text = "Increment" };
     private readonly StatusBar _status = new();
 
-    public CounterApp()
-    {
-        _increment.Activated += (_, _) => _count++;
-    }
+    public CounterApp() => _increment.Activated += (_, _) => _count++;
 
     public override TeaEffect? Update(Message message)
-    {
-        if (InputHandled)
-        {
-            return null;
-        }
-
-        return message is KeyPressed key && key.IsCharacter('c', ModifierKeys.Ctrl)
+        => message is KeyPressed key && key.IsCharacter('c', ModifierKeys.Ctrl)
             ? TeaEffects.Quit
             : null;
-    }
 
     public override Screen Build(ScreenContext context)
     {
@@ -75,11 +65,11 @@ internal sealed class CounterApp : TeaApp
 `TeaApp` is the default app contract.
 
 - `Initialize()` is optional startup work
-- `Update(Message)` handles input, terminal events, and custom messages
+- `Update(Message)` handles unhandled input, terminal events, and custom messages
 - `Build(ScreenContext)` creates the current frame
 - `DefaultScreenOptions` defines per-app terminal defaults
-- built-in controls route keyboard and pointer input automatically before `Update(Message)`
-- `InputHandled` is available when the app needs to suppress global shortcuts after a control already consumed input
+- built-in controls route keyboard, pointer, and paste input before `Update(Message)`
+- `RequestEffect(...)` is available when a control event needs to trigger runtime work such as `TeaEffects.Quit`
 
 `ScreenContext` already tracks terminal size and focus state, so normal apps do not need to manage `_width`, `_height`, or focus-reporting flags by hand.
 

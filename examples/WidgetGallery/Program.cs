@@ -219,11 +219,6 @@ internal sealed class WidgetGalleryApp : TeaApp
 
     public override TeaEffect? Update(Message message)
     {
-        if (InputHandled)
-        {
-            return null;
-        }
-
         if (message is GalleryTick tick)
         {
             _tick++;

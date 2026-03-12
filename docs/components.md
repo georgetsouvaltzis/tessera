@@ -147,16 +147,9 @@ internal sealed class SearchApp : TeaApp
     private readonly StatusBar _status = new();
 
     public override TeaEffect? Update(Message message)
-    {
-        if (InputHandled)
-        {
-            return null;
-        }
-
-        return message is KeyPressed key && key.IsCharacter('q')
+        => message is KeyPressed key && key.IsCharacter('q')
             ? TeaEffects.Quit
             : null;
-    }
 
     public override Screen Build(ScreenContext context)
     {

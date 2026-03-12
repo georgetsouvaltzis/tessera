@@ -37,7 +37,7 @@ This is the working map from legacy pre-release APIs to the current default path
 ## Composition
 
 - `ScreenComposer` -> build `Screen` from `TeaSharp.Layout` object-model types
-- `InteractiveScreenModel` -> `TeaApp` with automatic control routing before `Update(...)`
+- `InteractiveScreenModel` -> `TeaApp` with automatic control routing and `Update(...)` for unhandled input/runtime messages
 - `InputRouter` -> typed `Message` handling in `TeaApp.Update(...)`
 - `ScreenRegionKey` -> implicit tree order unless you are on the advanced path
 - `Stack` / `Split` / `Panel` / `Dock` / `Overlay` / `Center` / `Slot` static helper DSLs -> `WindowLayout`, `RowLayout`, `ColumnLayout`, `PanelLayout`, `CenterLayout`, `LayoutSlot`

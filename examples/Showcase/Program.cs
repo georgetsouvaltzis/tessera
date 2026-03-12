@@ -86,11 +86,6 @@ internal sealed class OrdersApp : TeaApp
 
     public override TeaEffect? Update(Message message)
     {
-        if (InputHandled)
-        {
-            return null;
-        }
-
         if (message is KeyPressed key && key.IsCharacter('c', ModifierKeys.Ctrl))
         {
             return TeaEffects.Quit;

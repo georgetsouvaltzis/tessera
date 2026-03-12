@@ -31,8 +31,11 @@ internal static class TeaAppCompositionTests
             "TeaAppComposition_AutomaticallyRoutesMenuBarActivation",
             AutomaticallyRoutesMenuBarActivation);
         yield return new TestCase(
-            "TeaAppComposition_InputHandled_ReportsWhenControlConsumedInput",
-            InputHandled_ReportsWhenControlConsumedInput);
+            "TeaAppComposition_HandledControlInput_DoesNotReachDefaultUpdate",
+            HandledControlInput_DoesNotReachDefaultUpdate);
+        yield return new TestCase(
+            "TeaAppComposition_RequestEffect_AllowsHandledControlInputToTriggerRuntimeEffect",
+            RequestEffect_AllowsHandledControlInputToTriggerRuntimeEffect);
         yield return new TestCase(
             "TeaAppComposition_LegacyLayoutHelpers_AreMarkedAdvanced",
             LegacyLayoutHelpers_AreMarkedAdvanced);
@@ -132,16 +135,31 @@ internal static class TeaAppCompositionTests
         TestAssert.Equal("refresh", app.LastActivatedItemId, "MenuBar activation should preserve the configured item id.");
     }
 
-    private static Task InputHandled_ReportsWhenControlConsumedInput()
+    private static Task HandledControlInput_DoesNotReachDefaultUpdate()
     {
-        var app = new InputHandledApp();
+        var app = new FilteredInputApp();
         var screen = (IScreen)app;
 
         screen.Update(new WindowSizeMsg(80, 24));
         screen.Render();
         screen.Update(new KeyPressMsg(KeyCode.Enter));
 
-        TestAssert.True(app.WasInputHandledDuringLastUpdate, "TeaApp should report when screen input was consumed automatically.");
+        TestAssert.Equal(0, app.KeyUpdateCount, "Handled control input should not flow into the default Update method.");
+        TestAssert.Equal(1, app.ActivationCount, "The control should still receive the handled key.");
+        return Task.CompletedTask;
+    }
+
+    private static Task RequestEffect_AllowsHandledControlInputToTriggerRuntimeEffect()
+    {
+        var app = new RequestedEffectApp();
+        var screen = (IScreen)app;
+
+        screen.Update(new WindowSizeMsg(80, 24));
+        screen.Render();
+        var effect = screen.Update(new KeyPressMsg(KeyCode.Enter));
+
+        TestAssert.True(effect is not null, "Handled control input should still be able to schedule runtime effects.");
+        TestAssert.Equal(0, app.KeyUpdateCount, "Handled control input should not reach the default Update method.");
         return Task.CompletedTask;
     }
 
@@ -374,15 +392,54 @@ internal static class TeaAppCompositionTests
             });
     }
 
-    private sealed class InputHandledApp : TeaApp
+    private sealed class FilteredInputApp : TeaApp
     {
         public Button Button { get; } = new() { Text = "Run" };
 
-        public bool WasInputHandledDuringLastUpdate { get; private set; }
+        public int ActivationCount { get; private set; }
+
+        public int KeyUpdateCount { get; private set; }
+
+        public FilteredInputApp()
+        {
+            Button.Activated += (_, _) => ActivationCount++;
+        }
 
         public override TeaEffect? Update(Message message)
         {
-            WasInputHandledDuringLastUpdate = InputHandled;
+            if (message is KeyPressed)
+            {
+                KeyUpdateCount++;
+            }
+
+            return null;
+        }
+
+        public override Screen Build(ScreenContext context) =>
+            Screen.From(new WindowLayout
+            {
+                Body = new CenterLayout(Button, width: 16, height: 3),
+            });
+    }
+
+    private sealed class RequestedEffectApp : TeaApp
+    {
+        public Button Button { get; } = new() { Text = "Quit" };
+
+        public int KeyUpdateCount { get; private set; }
+
+        public RequestedEffectApp()
+        {
+            Button.Activated += (_, _) => RequestEffect(TeaEffects.Quit);
+        }
+
+        public override TeaEffect? Update(Message message)
+        {
+            if (message is KeyPressed)
+            {
+                KeyUpdateCount++;
+            }
+
             return null;
         }
 

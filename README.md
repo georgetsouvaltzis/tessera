@@ -6,7 +6,7 @@ The default app path is intentionally small:
 
 - derive from `TeaApp`
 - run apps with `Tea.RunAsync(...)` or `TeaApplicationBuilder`
-- let built-in controls route automatically before `Update(...)`
+- let built-in controls route automatically; `Update(...)` handles unhandled input plus runtime messages
 - return `Screen` from `Build(ScreenContext)`
 - assemble screens with `WindowLayout`, `RowLayout`, and `ColumnLayout`
 - use first-class controls from `TeaSharp.Controls`
@@ -45,23 +45,12 @@ internal sealed class CounterApp : TeaApp
         Text = "Increment",
     };
     private readonly StatusBar _status = new();
-
-    public CounterApp()
-    {
-        _increment.Activated += (_, _) => _count++;
-    }
+    public CounterApp() => _increment.Activated += (_, _) => _count++;
 
     public override TeaEffect? Update(Message message)
-    {
-        if (InputHandled)
-        {
-            return null;
-        }
-
-        return message is KeyPressed key && key.IsCharacter('c', ModifierKeys.Ctrl)
+        => message is KeyPressed key && key.IsCharacter('c', ModifierKeys.Ctrl)
             ? TeaEffects.Quit
             : null;
-    }
 
     public override Screen Build(ScreenContext context)
     {

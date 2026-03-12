@@ -112,11 +112,6 @@ internal sealed class AdvancedWidgetsApp : TeaApp
 
     public override TeaEffect? Update(Message message)
     {
-        if (InputHandled)
-        {
-            return null;
-        }
-
         if (message is AdvancedTick tick)
         {
             _tick++;
