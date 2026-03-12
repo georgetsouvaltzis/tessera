@@ -1,82 +1,95 @@
 # Namespace Migration Guide
 
-TeaSharp now uses domain-based component namespaces instead of the old flat `TeaSharp.Components` surface.
+TeaSharp no longer wants normal apps to start from the old category-heavy component surface.
 
-## Recommended Imports
+## Default Imports
 
-Most applications should import only what they use:
+Prefer:
 
-- `TeaSharp.Components.Primitives`
+```csharp
+using TeaSharp;
+using TeaSharp.Controls;
+using TeaSharp.Layout;
+```
+
+Add primitives only when needed:
+
+```csharp
+using TeaSharp.Components.Primitives;
+```
+
+## Namespace Direction
+
+Old default mindset:
+
+- `TeaSharp.Core.*`
 - `TeaSharp.Components.Composition`
 - `TeaSharp.Components.Prebuilt`
 - `TeaSharp.Components.Productivity`
 - `TeaSharp.Components.UiKit`
 - `TeaSharp.Components.Advanced`
-- `TeaSharp.Components.Charting`
-- `TeaSharp.Components.Dashboard`
 
-Advanced customization namespaces still exist, but they are no longer the default path:
+New default mindset:
 
-- `TeaSharp.Components.Styling`
-- `TeaSharp.Components.Interaction`
+- `TeaSharp`
+- `TeaSharp.Controls`
+- `TeaSharp.Layout`
 
-## Before / After
+Advanced-only namespaces remain available, but they should be opt-in.
+
+## Common Type Moves
+
+### App Model
+
+- `IScreen` -> `TeaApp`
+- `Tea.CreateProgram(...)` -> `Tea.RunAsync(...)` or `Tea.CreateBuilder()`
+- `TeaProgramOptions` -> `TeaRuntimeOptions`
+- `ScreenOutput` / `TerminalOutput` default path -> `Screen` + `ScreenOptions`
+
+### Default Controls
+
+- `TextBlockComponent` -> `Label`
+- `ButtonComponent` -> `Button`
+- `TextInputComponent` -> `TextInput`
+- `TextAreaComponent` -> `TextArea`
+- `DropdownComponent` -> `Choice`
+- `DialogComponent` -> `Dialog`
+- `StatusBarComponent` -> `StatusBar`
+- `TabsComponent` -> `Tabs`
+- `ListComponent<T>` -> `ListView<T>`
+- `TableComponent` -> `Table`
+- `MenuBarComponent` -> `MenuBar`
+
+### Layout
+
+- `UiKit.Layout` -> `TeaSharp.Layout.*`
+- `Frame` / `Dashboard` / `Form` helpers -> explicit `DockLayout`, `SplitLayout`, `StackLayout`, `PanelLayout`, `OverlayLayout`
+
+## What Stayed Advanced
+
+These still exist, but they are not the first path:
+
+- `ScreenComposer`
+- `ComponentComposer`
+- `InteractiveScreenModel`
+- `InputRouter`
+- `ScreenRegionKey`
+- low-level widget models in `TeaSharp.Widgets`
+- advanced widgets that do not have root wrappers yet
+
+## Migration Example
 
 Before:
-
-```csharp
-using TeaSharp.Components;
-```
-
-After:
-
-```csharp
-using TeaSharp.Components.Composition;
-using TeaSharp.Components.Prebuilt;
-using TeaSharp.Components.Primitives;
-```
-
-## Common Moves
-
-- `Canvas`, `Rect`, `BorderStyle`, `Widgets`:
-  - from `TeaSharp.Components`
-  - to `TeaSharp.Components.Primitives`
-- `ICanvasComponent`, `IStatefulComponent`, `IFocusableComponent`, `ScreenComposer`, `ComponentComposer`, `InputRouter`, `InteractiveScreenModel`:
-  - to `TeaSharp.Components.Composition`
-- `ButtonComponent`, `TextInputComponent`, `DropdownComponent`, `ComboboxComponent`, `DialogComponent`, `LayoutContainerComponent`:
-  - to `TeaSharp.Components.Prebuilt`
-- `MenuBarComponent`, `ContextMenuComponent`, `NumberInputComponent`, `DatePickerComponent`, `TimePickerComponent`, `MarkdownViewerComponent`:
-  - to `TeaSharp.Components.Productivity`
-- `TabsComponent`, `ModalComponent`, `SortableTableComponent`, `UiTheme`, `Layout`:
-  - to `TeaSharp.Components.UiKit`
-- `CommandPaletteComponent`, `TreeViewComponent`, `NotificationCenterComponent`, `SliderComponent`, `SpinnerComponent`, `ToggleSwitchComponent`:
-  - to `TeaSharp.Components.Advanced`
-- `Charts`, `LineChartComponent`, `BarChartComponent`:
-  - to `TeaSharp.Components.Charting`
-- `GaugeComponent`, `StatsCardComponent`, `MiniLogComponent`:
-  - to `TeaSharp.Components.Dashboard`
-
-## Styling And Interaction
-
-`TeaSharp.Components.Styling` and `TeaSharp.Components.Interaction` remain public for customization, but they are now treated as advanced namespaces.
-
-Typical apps should only import them when they are actively customizing palettes or mouse/hover behavior.
-
-## Migration Pattern
-
-1. Replace `using TeaSharp.Components;`
-2. Add the specific category namespaces your file actually uses
-3. Only add `Styling` or `Interaction` when customizing component visuals or pointer behavior
-
-## Minimal Screen Example
 
 ```csharp
 using TeaSharp;
 using TeaSharp.Components.Composition;
 using TeaSharp.Components.Prebuilt;
 using TeaSharp.Components.Primitives;
+using TeaSharp.Core.Abstractions;
+using TeaSharp.Core.Messages;
 
-public sealed class SearchModel : InteractiveScreenModel
+internal sealed class SearchModel : InteractiveScreenModel
 {
     private readonly TextInputComponent _input = new(new TextInputOptions(
         Title: "Search",
@@ -88,3 +101,36 @@ public sealed class SearchModel : InteractiveScreenModel
     }
 }
 ```
+
+After:
+
+```csharp
+using TeaSharp;
+using TeaSharp.Components.Primitives;
+using TeaSharp.Controls;
+using TeaSharp.Layout;
+
+internal sealed class SearchApp : TeaApp
+{
+    private readonly TextInput _input = new()
+    {
+        Title = "Search",
+        Border = BorderStyle.SingleLine,
+        Padding = Thickness.All(1),
+        Placeholder = "type here",
+    };
+
+    public override TeaEffect? Update(Message message)
+    {
+        HandleScreenInput(message);
+        return null;
+    }
+
+    public override Screen Build(ScreenContext context) =>
+        Screen.From(new CenterLayout(_input, width: 48, height: 5));
+}
+```
+
+## Rule Of Thumb
+
+If a normal app needs to import `TeaSharp.Core.*` or manually coordinate screen regions, the app is probably using the wrong layer.

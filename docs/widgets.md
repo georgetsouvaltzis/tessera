@@ -1,50 +1,84 @@
-# TeaSharp Stateful Widgets
+# TeaSharp Widgets
 
-TeaSharp now ships a lower-level stateful widget layer in `TeaSharp.Widgets` modeled after Bubble Tea's bubbles-style approach.
+`TeaSharp.Widgets` is the low-level stateful widget layer.
 
-These types remain public for advanced composition and custom controls, but the widget models and `*KeyMap` types are now marked `EditorBrowsable(Advanced)` so the default path stays centered on the category component namespaces and `TeaProgramOptions`.
+It remains public for advanced composition and custom controls, but it is no longer the default app path.
 
-## Widgets
+## When To Use It
+
+Use `TeaSharp.Widgets` when you are:
+
+- building custom controls directly on widget models
+- reusing the low-level text input, viewport, or list behavior
+- implementing advanced component wrappers
+- writing experiments below the root control catalog
+
+Do not start normal apps here. Start with:
+
+- `TeaApp`
+- `TeaSharp.Controls`
+- `TeaSharp.Layout`
+
+## Widget Models
+
+Current advanced widget models include:
 
 - `ViewportModel`
-  - vertical and horizontal scrolling
-  - optional soft-wrap mode
-  - optional gutter line numbers (`ShowLineNumbers`) and highlighted visual row (`HighlightVisualLine`)
-  - key and mouse-wheel updates via `ViewportKeyMap`
 - `TextInputModel`
-  - cursor movement (char + word)
-  - optional multiline mode (`Multiline`) with `enter` newline insertion and up/down line navigation
-  - selection basics (`ctrl+a`, shift-extend)
-  - delete variants (char/word forward/backward)
-  - submit event and placeholder/mask support
-  - word aliases for terminals that emit meta characters (`alt+b`, `alt+f`, `alt+d`, `alt+h`) in addition to arrow/delete combos
 - `ListModel<T>`
-  - selection and paging
-  - filtering (`SetFilter`)
-  - tracked async loader orchestration (`ReloadAsync`, `AppendAsync`) with stale-load cancellation
-  - optional custom sorting via `SortComparison`
-  - key and mouse-wheel updates via `ListKeyMap`
 
-## Keymaps + Help
+These types provide lower-level behavior such as:
 
-- `KeyBinding`: normalized chord matcher and help label.
-- `ViewportKeyMap`, `TextInputKeyMap`, `ListKeyMap`: default bindings per widget.
-- `HelpView.RenderCompact(...)`: deterministic compact/multi-line help rendering with width wrapping.
-- `HelpView.RenderColumns(...)`: deterministic expanded help rendering with width-aware columns.
+- scrolling
+- filtering
+- paging
+- cursor movement
+- text editing
+- viewport rendering
 
-## Decoder Notes
+## Keymaps
 
-`EventDecoder` now explicitly handles alt-control escape forms including:
+Advanced widget keymaps remain available:
 
-- `ESC + DEL` / `ESC + ctrl+h` as `alt+backspace`
-- `ESC + TAB` as `alt+tab`
-- `ESC + control-byte` as combined `alt+ctrl+<key>`
+- `ViewportKeyMap`
+- `TextInputKeyMap`
+- `ListKeyMap`
+- `KeyBinding`
 
-## Example Integration
+These are intentionally not the main beginner-facing interaction model anymore.
 
-`Showcase` workspace page (`2`) now composes:
+## Design Position
 
-- actions table backed by `ListModel<ActionItem>`
-- scrollable log panel backed by `ViewportModel`
-- command input backed by `TextInputModel`
-- focus routing (`tab`) and dynamic help (`?`) driven by keymaps
+The root controls should cover the common app path.
+The widget layer exists so TeaSharp stays adaptable.
+
+That means:
+
+- root controls optimize for usability
+- widget models optimize for extensibility
+
+## Example
+
+```csharp
+using TeaSharp.Components.Primitives;
+using TeaSharp.Widgets;
+
+var viewport = new ViewportModel();
+viewport.SetLines(["alpha", "beta", "gamma"]);
+viewport.Resize(20, 3);
+
+foreach (var line in viewport.RenderLines())
+{
+    Console.WriteLine(line);
+}
+```
+
+For most apps, prefer the wrapped controls:
+
+- `TextInput` over `TextInputModel`
+- `ListView<T>` over `ListModel<T>`
+
+See also:
+
+- `docs/components.md`
+- `docs/custom-components.md`

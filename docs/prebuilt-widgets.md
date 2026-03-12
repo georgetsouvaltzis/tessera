@@ -1,196 +1,112 @@
-# TeaSharp Prebuilt Widgets
+# TeaSharp Controls And Advanced Widgets
 
-TeaSharp provides a prebuilt widget layer in `TeaSharp.Components.Prebuilt` aimed at 1.0-ready app scaffolding.
+TeaSharp now distinguishes between:
 
-## Available Widgets
+- root controls for the default app path
+- advanced `*Component` widgets for deeper customization
 
-1. `TextBlockComponent`
-2. `ButtonComponent`
-3. `TextInputComponent`
-4. `TextAreaComponent`
-5. `ListComponent<T>`
-6. `TableComponent`
-7. `ProgressBarComponent`
-8. `DropdownComponent`
-9. `ComboboxComponent`
-10. `DialogComponent`
-11. `StatusBarComponent`
-12. `LogViewerComponent`
-13. `LayoutContainerComponent`
-14. `BadgeComponent`
-15. `ToggleSwitchComponent`
-16. `SliderComponent`
-17. `SpinnerComponent`
-18. `CommandPaletteComponent`
-19. `TreeViewComponent`
-20. `NotificationCenterComponent`
-21. `MenuBarComponent`
-22. `ContextMenuComponent`
-23. `NumberInputComponent`
-24. `DatePickerComponent`
-25. `TimePickerComponent`
-26. `MarkdownViewerComponent`
+## Root Controls
 
-## Notes
+Preferred public catalog:
 
-- `ButtonComponent` is now a first-class action control with unified keyboard + mouse activation.
-  - Keyboard support: `enter` / `space` when focused.
-  - Mouse support: hover tracking, left-click activation, pressed-state tracking, optional bordered rendering via `ButtonOptions.Border`, and configurable interaction behavior via `WidgetInteractionProfile`.
-  - App hooks: `Pressed` event plus `WasPressed`, `PressCount`, `Hovered`, `IsPressed`, and `TryConsumePress()`.
-- `TextInputComponent` provides single-line text entry with component-level accessors (`Value`, `SetValue`, `Placeholder`, `MaxLength`) plus cancel semantics via `CancelKey` (`esc` default), `CancelCount`, `WasCancelled`, `LastCancelledValue`, `Submitted`, `Cancelled`, `TryConsumeSubmit(...)`, and `TryConsumeCancel(...)`.
-- `TextAreaComponent` provides multiline editing with component-level text access (`Value`, `SetValue`, `Clear`) and optional line numbers.
-- `ListComponent<T>` provides filtering, selection, paging, and item replacement through component-level APIs (`SetItems`, `SetFilter`, `SelectedItem`, `SelectedIndex`, `PageSize`).
-  - App-friendly selection hook: `SelectionChanged`.
-  - Mouse support: motion previews row hover (`▸` marker), left click selects a visible row, wheel scroll navigates selection.
-- `TableComponent` exposes sort/page interactions directly (`PageSize`, `SortColumn`, `SortDescending`, `SetRows`, `SetVirtualWindow`) without leaking the lower-level table primitive.
-- `DropdownComponent` provides open/close menu selection with configurable key bindings and a `DropdownOptions` constructor for common setup.
-  - App-friendly selection hook: `SelectionChanged`.
-  - Mouse support: field click open/close, option click selection, wheel-driven highlight navigation when open.
-- `ComboboxComponent` combines text filtering with keyboard-driven option selection through component-level filter access (`FilterText`, `Placeholder`, `SetFilterText`) and a `ComboboxOptions` constructor for common setup.
-  - App-friendly selection hook: `SelectionChanged`.
-  - Mouse support: field click open/close, option click selection, wheel-driven highlight navigation when open.
-- `LogViewerComponent` supports append, filter, pause, clear, and scrolling.
-  - Friendly setup path: `LogViewerOptions`.
-- `LayoutContainerComponent` supports `Vertical`, `Horizontal`, and `Grid` layout modes.
-  - Mouse support: child hit-test routing and optional drag-resize split for 2-pane horizontal/vertical layouts (`PrimarySize`, `SetPrimarySize`, `ClearPrimarySize`).
-  - Use `ComponentComposer` as the focus/routing owner when a layout container participates in a larger interactive screen.
-- `CommandPaletteComponent` provides fuzzy command filtering and execution (`ctrl+p` default open key) with component-level query accessors (`QueryText`, `SetQueryText(...)`, `ClearQuery()`).
-  - App-friendly execution hooks: `ItemExecuted` and `TryConsumeExecution(...)`.
-  - Mouse support: motion hover preview, wheel navigation, click execute, and outside-click close when open.
-- `TreeViewComponent` provides hierarchical expand/collapse navigation with keyboard controls.
-  - Mouse support: motion hover preview, click row selection, wheel navigation.
-- `NotificationCenterComponent` provides persistent event feed, read/dismiss, and severity-based styling.
-  - Mouse support: motion hover preview, click row selection, wheel navigation.
-- `ToggleSwitchComponent`, `SliderComponent`, and `SpinnerComponent` provide interactive control primitives.
-  - Mouse support: click activation and wheel interactions (toggle on/off, slider adjust, spinner advance).
-- `BadgeComponent` provides compact state/health labeling.
-- `MenuBarComponent` and `ContextMenuComponent` provide top-level and contextual action surfaces.
-  - Mouse support: hover preview, click selection/execute, and wheel navigation.
-  - Friendly setup paths: `MenuBarOptions`, `ContextMenuOptions`, and `SetItems(params ...)`.
-  - App-friendly execution hooks: `ItemActivated`, `ItemExecuted`, `TryConsumeActivation(...)`, and `TryConsumeExecution(...)`.
-- `NumberInputComponent`, `DatePickerComponent`, and `TimePickerComponent` provide structured value entry, with `NumberInputComponent.Text` exposing the rendered numeric text without leaking the text-input model.
-  - App-friendly submit hooks: `NumberInputComponent.Submitted` and `TryConsumeSubmit(...)`.
-  - App-friendly change hooks: `DatePickerComponent.DateChanged`, `TimePickerComponent.ValueChanged`.
-  - Mouse support (`DatePickerComponent`, `TimePickerComponent`): day/field selection on click and wheel adjustment/navigation.
-  - Friendly setup paths: `NumberInputOptions`, `DatePickerOptions`, `TimePickerOptions`.
-- `MarkdownViewerComponent` provides scrollable markdown rendering for docs/help panes.
-  - Friendly setup path: `MarkdownViewerOptions`.
-- Most border-capable widgets expose `Border` (`BorderStyle`) and `Padding` (`Thickness`) for explicit frame and inner-spacing control.
-- Common widgets also expose options-based constructors for one-shot setup:
-  - `TextBlockOptions`
-  - `ButtonOptions`
-  - `TextInputOptions`
-  - `TextAreaOptions`
-  - `ListOptions<T>`
-  - `TableOptions`
-  - `ProgressBarOptions`
-  - `StatusBarOptions`
-  - `DialogOptions`
-  - `LayoutContainerOptions`
-  - `TabsOptions`
-  - `MenuBarOptions`
-  - `ContextMenuOptions`
-  - `NumberInputOptions`
-  - `DatePickerOptions`
-  - `TimePickerOptions`
-  - `MarkdownViewerOptions`
-  - `LogViewerOptions`
-  - `ModalOptions`
-- For narrower discovery, consumers can import the additive category catalogs:
-  - `TeaSharp.Components.Prebuilt.PrebuiltCatalog`
-  - `TeaSharp.Components.Productivity.ProductivityCatalog`
-  - `TeaSharp.Components.UiKit.UiKitCatalog`
-- Low-level key-map and interaction-profile properties remain supported, but are now marked advanced so the default surface stays focused on the common setup path.
-- keep a single focus owner per interactive surface; for multi-pane screens that owner should be `ScreenComposer`, with `ComponentComposer` reserved for component subtrees.
-- `ListComponent<T>`, `DropdownComponent`, and `ComboboxComponent` support state-driven styling through:
-  - `WidgetVisualState`
-  - `WidgetStatePalette`
-  - item resolvers (`ItemStateResolver` / `OptionStateResolver`)
-  - palette inheritance (`Parent` / `InheritFrom(...)`)
-- Interactive prebuilt widgets expose `WidgetInteractionProfile` for unified hover/click/wheel behavior configuration.
-- Components clone assigned `WidgetInteractionProfile` instances on ingress, so shared defaults can be reused safely without cross-component mutation.
+1. `Label`
+2. `Button`
+3. `TextInput`
+4. `TextArea`
+5. `Choice`
+6. `Dialog`
+7. `StatusBar`
+8. `Tabs`
+9. `ListView<T>`
+10. `Table`
+11. `MenuBar`
 
-### State Styling Example
+These live in `TeaSharp.Controls`.
+
+## Advanced Widgets
+
+The older component catalog remains available when you need functionality that has not been promoted to the root catalog yet.
+
+Common advanced widgets:
+
+- `ComboboxComponent`
+- `ProgressBarComponent`
+- `LogViewerComponent`
+- `CommandPaletteComponent`
+- `TreeViewComponent`
+- `NotificationCenterComponent`
+- `ToggleSwitchComponent`
+- `SliderComponent`
+- `SpinnerComponent`
+- `ContextMenuComponent`
+- `DatePickerComponent`
+- `TimePickerComponent`
+- `MarkdownViewerComponent`
+
+These live under:
+
+- `TeaSharp.Components.Prebuilt`
+- `TeaSharp.Components.Productivity`
+- `TeaSharp.Components.Advanced`
+
+## How They Fit Together
+
+The new screen model accepts both:
+
+- root controls
+- advanced components
+
+So an app can stay on `TeaApp` + `Screen` + `Layout`, while still embedding an advanced widget directly inside a `LayoutSlot`, `PanelLayout`, or `CenterLayout`.
+
+## Example
 
 ```csharp
-var list = new ListComponent<string>(["todo", "done"], x => x)
+using TeaSharp;
+using TeaSharp.Components.Prebuilt;
+using TeaSharp.Components.Primitives;
+using TeaSharp.Layout;
+
+internal sealed class ComboApp : TeaApp
 {
-    Border = BorderStyle.None,
-    IsFocused = true,
-    ItemStateResolver = item => item == "done"
-        ? [WidgetVisualState.Completed]
-        : [],
-};
+    private readonly ComboboxComponent _combo = new(new ComboboxOptions(
+        Items: ["alpha", "beta", "gamma"],
+        Title: "Environment",
+        Border: BorderStyle.SingleLine,
+        Padding: Thickness.All(1)));
 
-// Override the default completed style.
-list.ItemStatePalette[WidgetVisualState.Completed] = new WidgetStateAppearance
-{
-    TextStyle = TeaStyle.Empty.WithStrikethrough().WithForeground(AnsiColor.BrightGreen),
-    Prefix = "[x] ",
-};
+    public override TeaEffect? Update(Message message)
+    {
+        HandleScreenInput(message);
+        return null;
+    }
 
-// Share app-level defaults through inheritance.
-var appPalette = WidgetStatePalette.CreateDefault();
-list.ItemStatePalette.InheritFrom(appPalette);
-```
-
-### Options + Focus Example
-
-```csharp
-var input = new TextInputComponent(new TextInputOptions(
-    Title: "Command",
-    Placeholder: "type and press enter",
-    ClearOnSubmit: true));
-
-var progress = new ProgressBarComponent(new ProgressBarOptions(
-    Title: "Deploy",
-    Step: 0.1));
-
-void SetFocus(int active)
-{
-    input.IsFocused = active == 0;
-    progress.IsFocused = active == 1;
+    public override Screen Build(ScreenContext context) =>
+        Screen.From(new CenterLayout(_combo, width: 48, height: 8));
 }
-
-SetFocus(0);
 ```
 
-## Gallery Example
+## Example Apps
 
-A dedicated widget demo app is available:
+Current example projects:
 
-```bash
-dotnet run --project examples/WidgetGallery/WidgetGallery.csproj
-```
+- `examples/Showcase`
+- `examples/Dropdown`
+- `examples/ComboBox`
+- `examples/ProductivityWidgets`
+- `examples/AdvancedWidgets`
+- `examples/Kanban`
+- `examples/WidgetGallery`
 
-`WidgetGallery` now doubles as the happy-path composition sample:
-- uses `Form(...)` for the input tab
-- uses `Dashboard(...)` for the data tab
-- uses `CreateDialogWorkflow(...)` for the overlay dialog flow
-- should be treated as the primary starter reference for the current public app API
+All of these now run on the new `TeaApp` startup/composition path, even when they demonstrate advanced widgets.
 
-`ProductivityWidgets` is also on the scaffold path now:
-- uses `InteractiveScreenModel`
-- uses `Dashboard(...)` for the main shell
-- uses palette-style screen composition for the context menu
+## Migration Guidance
 
-Dedicated widget-focused demos are also available:
+- Prefer root control names when available.
+- Treat older `*Component` names as advanced or transitional.
+- Keep `TeaSharp.Controls` and `TeaSharp.Layout` as the main app imports.
+- Reach for advanced namespaces only when the root catalog does not cover the scenario yet.
 
-```bash
-dotnet run --project examples/Dropdown/Dropdown.csproj
-dotnet run --project examples/ComboBox/ComboBox.csproj
-dotnet run --project examples/AdvancedWidgets/AdvancedWidgets.csproj
-dotnet run --project examples/ProductivityWidgets/ProductivityWidgets.csproj
-dotnet run --project examples/Kanban/Kanban.csproj
-```
+See also:
 
-`Kanban` is still useful, but it currently demonstrates a more manual app composition pattern than `WidgetGallery` and `ProductivityWidgets`.
-
-Core gallery hotkeys:
-
-- `1..5`: switch demo tabs
-- `tab`: cycle focus
-- `enter`/`space`: activate focused button/dialog
-- `left`/`right`: adjust progress when focused
-- `d`: toggle dialog on Overlay tab
-- `q` or `ctrl+c`: quit
+- `docs/migration-map.md`
+- `docs/namespace-migration.md`
