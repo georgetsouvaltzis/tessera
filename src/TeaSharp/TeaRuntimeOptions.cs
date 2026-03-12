@@ -3,12 +3,13 @@ using TeaSharp.Core.Application;
 using TeaSharp.Core.Input;
 using TeaSharp.Core.Rendering;
 using TeaSharp.Core.Terminal;
+using TeaSharp.Internal;
 
 namespace TeaSharp;
 
 public sealed class TeaRuntimeOptions
 {
-    public Func<global::TeaSharp.Core.Abstractions.IScreen, global::TeaSharp.Core.Abstractions.IMessage, global::TeaSharp.Core.Abstractions.IMessage?>? MessageFilter { get; set; }
+    public Func<TeaApp, Message, Message?>? MessageFilter { get; set; }
 
     public int MaxFps { get; set; } = 60;
 
@@ -22,7 +23,7 @@ public sealed class TeaRuntimeOptions
 
     public bool CatchEffectExceptions { get; set; } = true;
 
-    public Func<Exception, global::TeaSharp.Core.Abstractions.IMessage?>? MapEffectException { get; set; }
+    public Func<Exception, Message?>? MapEffectException { get; set; }
 
     public TimeSpan EscapeTimeout { get; set; } = TimeSpan.FromMilliseconds(50);
 
@@ -70,18 +71,32 @@ public sealed class TeaRuntimeOptions
     [EditorBrowsable(EditorBrowsableState.Advanced)]
     public IReadOnlyList<int>? CapabilityProbeModes { get; set; }
 
-    internal ProgramOptions ToProgramOptions()
+    internal ProgramOptions ToProgramOptions(TeaApp app)
     {
+        ArgumentNullException.ThrowIfNull(app);
+
         return new ProgramOptions
         {
-            MessageFilter = MessageFilter,
+            MessageFilter = MessageFilter is null
+                ? null
+                : (_, message) =>
+                {
+                    var filtered = MessageFilter(app, TeaMessageAdapter.ToPublic(message));
+                    return filtered is null ? null : TeaMessageAdapter.ToCore(filtered);
+                },
             MaxFps = MaxFps,
             AdaptiveFramePacing = AdaptiveFramePacing,
             DisableRenderer = DisableRenderer,
             DisableInput = DisableInput,
             UseConsoleKeyEvents = UseConsoleKeyEvents,
             CatchEffectExceptions = CatchEffectExceptions,
-            MapEffectException = MapEffectException,
+            MapEffectException = MapEffectException is null
+                ? null
+                : exception =>
+                {
+                    var mapped = MapEffectException(exception);
+                    return mapped is null ? null : TeaMessageAdapter.ToCore(mapped);
+                },
             EscapeTimeout = EscapeTimeout,
             EnableResizeSignals = EnableResizeSignals,
             ResizePollInterval = ResizePollInterval,

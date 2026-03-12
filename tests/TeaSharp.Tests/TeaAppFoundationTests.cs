@@ -1,7 +1,6 @@
 using TeaSharp.Controls;
 using TeaSharp.Components.Composition;
 using TeaSharp.Components.Primitives;
-using TeaSharp.Core.Abstractions;
 using TeaSharp.Core.Messages;
 
 namespace TeaSharp.Tests;
@@ -27,7 +26,7 @@ internal static class TeaAppFoundationTests
     private static Task TeaApp_ContextTracksResizeMessages()
     {
         var app = new ResizeAwareApp();
-        var screen = (IScreen)app;
+        var screen = app.RuntimeScreen;
 
         screen.Update(new WindowSizeMsg(120, 40));
         var rendered = screen.Render();
@@ -39,7 +38,7 @@ internal static class TeaAppFoundationTests
     private static async Task TeaApp_InitializeEffect_RoundTripsCustomMessages()
     {
         var app = new BootApp();
-        var screen = (IScreen)app;
+        var screen = app.RuntimeScreen;
 
         var init = screen.Init();
         TestAssert.True(init is not null, "TeaApp.Initialize should adapt to the legacy runtime effect contract.");

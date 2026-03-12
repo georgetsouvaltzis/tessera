@@ -9,6 +9,7 @@ using TeaSharp.Components.Productivity;
 using TeaSharp.Components.Styling;
 using TeaSharp.Components.UiKit;
 using TeaSharp;
+using TeaSharp.Hosting;
 using TeaSharp.Core.Abstractions;
 using TeaSharp.Core.Messages;
 
@@ -74,7 +75,7 @@ internal static class TeaProgramOptionsTests
     private static Task TeaFactory_AcceptsStableHostOptions()
     {
         var model = new NoOpModel();
-        var program = Tea.CreateProgram(model, new TeaProgramOptions
+        var program = TeaHost.CreateProgram(model, new TeaProgramOptions
         {
             DisableInput = true,
             DisableRenderer = true,
@@ -87,7 +88,7 @@ internal static class TeaProgramOptionsTests
 
     private static Task TeaFactory_AcceptsStableDefaults()
     {
-        var program = Tea.CreateProgram(new NoOpModel());
+        var program = TeaHost.CreateProgram(new NoOpModel());
 
         TestAssert.True(program is not null, "Tea factory should create a program from stable default host options.");
         return Task.CompletedTask;

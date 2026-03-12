@@ -379,14 +379,20 @@ Long-term goal:
 - less framework-global state in `Update(...)`
 - one even clearer default control story
 
-### 4. Custom Widget Story Still Shows Engine DNA
+### 4. Keep Core Bridges Off The Consumer Contract
 
-Current examples of drift:
+Recent progress:
 
-- `TeaApp : TeaSharp.Core.Abstractions.IScreen`
-- adapter-driven bridges visible in consumer-facing types
+- `TeaApp` no longer directly implements `TeaSharp.Core.Abstractions.IScreen`
+- the runtime bridge now sits behind internal adapter types
 
-This is acceptable internally for now, but it should not remain the long-term consumer story.
+Remaining drift:
+
+- advanced hosting/runtime seams still need continued narrowing
+- some deep hosting options may still need clearer public wrappers or relocation
+
+Internal bridging is acceptable.
+Consumer-facing contracts should keep moving away from core type exposure.
 
 ### 5. Root Catalog Is Incomplete
 

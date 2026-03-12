@@ -11,7 +11,7 @@ public sealed class TeaApplication
         _app = app ?? throw new ArgumentNullException(nameof(app));
         _options = options ?? new TeaRuntimeOptions();
         _app.ConfigureRuntimeScreen(_options.Screen);
-        _program = new global::TeaSharp.Core.Application.TeaProgram(_app, _options.ToProgramOptions());
+        _program = new global::TeaSharp.Core.Application.TeaProgram(_app.RuntimeScreen, _options.ToProgramOptions(_app));
     }
 
     public TeaApp App => _app;

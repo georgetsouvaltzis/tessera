@@ -3,13 +3,14 @@ using System.ComponentModel;
 
 namespace TeaSharp;
 
-public abstract class TeaApp : global::TeaSharp.Core.Abstractions.IScreen
+public abstract class TeaApp
 {
     private ScreenContext _context = new();
     private ScreenOptions _runtimeScreenOptions = ScreenOptions.Empty;
     private CompiledScreen? _interactiveScreen;
     private bool _inputHandled;
     private readonly List<TeaEffect> _pendingEffects = [];
+    private global::TeaSharp.Core.Abstractions.IScreen? _runtimeScreen;
 
     public ScreenContext Context => _context;
 
@@ -47,12 +48,13 @@ public abstract class TeaApp : global::TeaSharp.Core.Abstractions.IScreen
         _runtimeScreenOptions = screenOptions ?? ScreenOptions.Empty;
     }
 
-    global::TeaSharp.Core.Abstractions.Effect? global::TeaSharp.Core.Abstractions.IScreen.Init()
-    {
-        return TeaEffectAdapter.ToCore(Initialize());
-    }
+    internal global::TeaSharp.Core.Abstractions.IScreen RuntimeScreen =>
+        _runtimeScreen ??= new TeaAppRuntimeScreen(this);
 
-    global::TeaSharp.Core.Abstractions.Effect? global::TeaSharp.Core.Abstractions.IScreen.Update(global::TeaSharp.Core.Abstractions.IMessage message)
+    internal global::TeaSharp.Core.Abstractions.Effect? InitializeCore() =>
+        TeaEffectAdapter.ToCore(Initialize());
+
+    internal global::TeaSharp.Core.Abstractions.Effect? UpdateCore(global::TeaSharp.Core.Abstractions.IMessage message)
     {
         var mapped = TeaMessageAdapter.ToPublic(message);
         switch (mapped)
@@ -74,7 +76,7 @@ public abstract class TeaApp : global::TeaSharp.Core.Abstractions.IScreen
         return TeaEffectAdapter.ToCore(CombineEffects(effect, DrainRequestedEffects()));
     }
 
-    global::TeaSharp.Core.Abstractions.ScreenOutput global::TeaSharp.Core.Abstractions.IScreen.Render()
+    internal global::TeaSharp.Core.Abstractions.ScreenOutput RenderCore()
     {
         var rendered = Build(_context).Compile(_context, _runtimeScreenOptions.Merge(DefaultScreenOptions));
         _interactiveScreen = rendered.Interaction;

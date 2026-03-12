@@ -43,7 +43,8 @@ Advanced-only namespaces remain available, but they should be opt-in.
 
 - `IScreen` -> `TeaApp`
 - `Tea.CreateProgram(...)` -> `Tea.RunAsync(...)` or `Tea.CreateBuilder()`
-- `TeaProgramOptions` -> `TeaRuntimeOptions`
+- advanced program hosting moved to `TeaSharp.Hosting.TeaHost`
+- `TeaProgramOptions` -> `TeaRuntimeOptions` on the default path, or `TeaSharp.Hosting.TeaProgramOptions` on the advanced hosting path
 - `ScreenOutput` / `TerminalOutput` default path -> `Screen` + `ScreenOptions`
 
 ### Default Controls

@@ -56,7 +56,7 @@ The intended beginner path is:
 
 These APIs remain public because they still offer real value, but they should not dominate the default path.
 
-- `TeaProgramOptions`
+- `TeaSharp.Hosting.TeaProgramOptions`
 - `IScreen`
 - `ProgramOptions`
 - `TeaProgram`
@@ -85,8 +85,8 @@ These areas still expose more mechanism than the long-term public design should:
 
 TeaSharp is shifting from:
 
-- `Tea.CreateProgram(...)`
-- `TeaProgramOptions`
+- `TeaSharp.Hosting.TeaHost.CreateProgram(...)`
+- `TeaSharp.Hosting.TeaProgramOptions`
 - `InteractiveScreenModel`
 - `ScreenComposer`
 - `InputRouter`

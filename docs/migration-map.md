@@ -5,7 +5,8 @@ This is the working map from legacy pre-release APIs to the current default path
 ## Startup
 
 - `Tea.CreateProgram(model)` -> `Tea.RunAsync(app)` or `Tea.CreateBuilder().UseApp(...).Build().RunAsync()`
-- `TeaProgramOptions` -> `TeaRuntimeOptions`
+- advanced program hosting moved to `TeaSharp.Hosting.TeaHost`
+- `TeaProgramOptions` -> `TeaRuntimeOptions` on the default path, or `TeaSharp.Hosting.TeaProgramOptions` on the advanced hosting path
 - `IScreen` -> `TeaApp`
 - `Effect` helpers -> `TeaEffects`
 - `ScreenOutput` / `TerminalOutput` -> `Screen` / `ScreenOptions`

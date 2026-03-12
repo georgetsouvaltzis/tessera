@@ -2,7 +2,7 @@ using System.ComponentModel;
 using TeaSharp.Core.Abstractions;
 using TeaSharp.Core.Application;
 
-namespace TeaSharp;
+namespace TeaSharp.Hosting;
 
 /// <summary>
 /// Defines the legacy runtime options used by the advanced program-hosting surface.

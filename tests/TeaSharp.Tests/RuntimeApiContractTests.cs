@@ -11,6 +11,7 @@ using TeaSharp.Components.UiKit;
 using System.ComponentModel;
 using System.Reflection;
 using TeaSharp;
+using TeaSharp.Hosting;
 using TeaSharp.Core.Abstractions;
 using TeaSharp.Core.Application;
 using TeaSharp.Core.Input;
@@ -56,8 +57,11 @@ internal static class RuntimeApiContractTests
             "RuntimeApi_TeaStartupSurface_RemainsDefaultDiscovery",
             TeaStartupSurface_RemainsDefaultDiscovery);
         yield return new TestCase(
-            "RuntimeApi_TeaProgramFactoryOverloads_AreMarkedAdvanced",
-            TeaProgramFactoryOverloads_AreMarkedAdvanced);
+            "RuntimeApi_TeaHostFactoryOverloads_AreMarkedAdvanced",
+            TeaHostFactoryOverloads_AreMarkedAdvanced);
+        yield return new TestCase(
+            "RuntimeApi_TeaRuntimeOptions_UsePublicMessageContracts",
+            TeaRuntimeOptions_UsePublicMessageContracts);
         yield return new TestCase(
             "RuntimeApi_TeaProgramConstructor_IsMarkedAdvanced",
             TeaProgramConstructor_IsMarkedAdvanced);
@@ -112,31 +116,33 @@ internal static class RuntimeApiContractTests
         var builderAttribute = (EditorBrowsableAttribute?)Attribute.GetCustomAttribute(createBuilder!, typeof(EditorBrowsableAttribute));
         var applicationAttribute = (EditorBrowsableAttribute?)Attribute.GetCustomAttribute(createApplication!, typeof(EditorBrowsableAttribute));
         var runAttribute = (EditorBrowsableAttribute?)Attribute.GetCustomAttribute(runAsync!, typeof(EditorBrowsableAttribute));
+        var legacyFactory = typeof(Tea).GetMethod("CreateProgram", BindingFlags.Public | BindingFlags.Static);
 
         TestAssert.True(builderAttribute is null, "Tea.CreateBuilder should remain discoverable.");
         TestAssert.True(applicationAttribute is null, "Tea.CreateApplication should remain discoverable.");
         TestAssert.True(runAttribute is null, "Tea.RunAsync should remain discoverable.");
+        TestAssert.True(legacyFactory is null, "Tea should not expose advanced CreateProgram overloads on the root startup surface.");
         return Task.CompletedTask;
     }
 
-    private static Task TeaProgramFactoryOverloads_AreMarkedAdvanced()
+    private static Task TeaHostFactoryOverloads_AreMarkedAdvanced()
     {
-        var defaultOverload = typeof(Tea).GetMethod(
-            nameof(Tea.CreateProgram),
+        var defaultOverload = typeof(TeaHost).GetMethod(
+            nameof(TeaHost.CreateProgram),
             BindingFlags.Public | BindingFlags.Static,
             [typeof(IScreen)]);
-        var advancedOverload = typeof(Tea).GetMethod(
-            nameof(Tea.CreateProgram),
+        var advancedOverload = typeof(TeaHost).GetMethod(
+            nameof(TeaHost.CreateProgram),
             BindingFlags.Public | BindingFlags.Static,
             [typeof(IScreen), typeof(ProgramOptions)]);
-        var stableOverload = typeof(Tea).GetMethod(
-            nameof(Tea.CreateProgram),
+        var stableOverload = typeof(TeaHost).GetMethod(
+            nameof(TeaHost.CreateProgram),
             BindingFlags.Public | BindingFlags.Static,
             [typeof(IScreen), typeof(TeaProgramOptions)]);
 
-        TestAssert.True(defaultOverload is not null, "The zero-config Tea.CreateProgram overload should exist.");
-        TestAssert.True(advancedOverload is not null, "The advanced Tea.CreateProgram overload should exist.");
-        TestAssert.True(stableOverload is not null, "The stable Tea.CreateProgram overload should exist.");
+        TestAssert.True(defaultOverload is not null, "The zero-config TeaHost.CreateProgram overload should exist.");
+        TestAssert.True(advancedOverload is not null, "The advanced TeaHost.CreateProgram overload should exist.");
+        TestAssert.True(stableOverload is not null, "The stable TeaHost.CreateProgram overload should exist.");
 
         var defaultAttribute = (EditorBrowsableAttribute?)Attribute.GetCustomAttribute(
             defaultOverload!,
@@ -148,10 +154,10 @@ internal static class RuntimeApiContractTests
             stableOverload!,
             typeof(EditorBrowsableAttribute));
 
-        TestAssert.True(defaultAttribute is not null, "The zero-config Tea.CreateProgram overload should be explicitly marked as advanced.");
+        TestAssert.True(defaultAttribute is not null, "The zero-config TeaHost.CreateProgram overload should be explicitly marked as advanced.");
         TestAssert.True(
             defaultAttribute!.State == EditorBrowsableState.Advanced,
-            "The zero-config Tea.CreateProgram overload should be hidden from default discovery.");
+            "The zero-config TeaHost.CreateProgram overload should be hidden from default discovery.");
         TestAssert.True(advancedAttribute is not null, "The ProgramOptions overload should be explicitly marked as advanced.");
         TestAssert.True(
             advancedAttribute!.State == EditorBrowsableState.Advanced,
@@ -160,6 +166,18 @@ internal static class RuntimeApiContractTests
         TestAssert.True(
             stableAttribute!.State == EditorBrowsableState.Advanced,
             "The TeaProgramOptions overload should be hidden from default discovery.");
+        return Task.CompletedTask;
+    }
+
+    private static Task TeaRuntimeOptions_UsePublicMessageContracts()
+    {
+        var messageFilter = typeof(TeaRuntimeOptions).GetProperty(nameof(TeaRuntimeOptions.MessageFilter));
+        var mapEffectException = typeof(TeaRuntimeOptions).GetProperty(nameof(TeaRuntimeOptions.MapEffectException));
+
+        TestAssert.True(messageFilter is not null, "TeaRuntimeOptions.MessageFilter should exist.");
+        TestAssert.True(mapEffectException is not null, "TeaRuntimeOptions.MapEffectException should exist.");
+        TestAssert.True(messageFilter!.PropertyType == typeof(Func<TeaApp, Message, Message>), "TeaRuntimeOptions.MessageFilter should use TeaApp and Message, not core runtime types.");
+        TestAssert.True(mapEffectException!.PropertyType == typeof(Func<Exception, Message>), "TeaRuntimeOptions.MapEffectException should use public Message contracts.");
         return Task.CompletedTask;
     }
 

@@ -9,9 +9,10 @@ using TeaSharp.Components.Productivity;
 using TeaSharp.Components.Styling;
 using TeaSharp.Components.UiKit;
 using TeaSharp;
+using TeaSharp.Hosting;
 using TeaSharp.TestFixtures;
 
-var program = Tea.CreateProgram(new CounterFixtureModel(), new TeaProgramOptions
+var program = TeaHost.CreateProgram(new CounterFixtureModel(), new TeaProgramOptions
 {
     UseConsoleKeyEvents = false,
 });

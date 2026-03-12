@@ -2,7 +2,6 @@ using System.ComponentModel;
 using TeaSharp.Components.Composition;
 using TeaSharp.Components.Primitives;
 using TeaSharp.Controls;
-using TeaSharp.Core.Abstractions;
 using TeaSharp.Core.Messages;
 using TeaSharp.Layout;
 
@@ -56,7 +55,7 @@ internal static class TeaAppCompositionTests
     private static Task AutomaticallyRoutesButtonActivation()
     {
         var app = new ButtonApp();
-        var screen = (IScreen)app;
+        var screen = app.RuntimeScreen;
 
         screen.Update(new WindowSizeMsg(80, 24));
         screen.Render();
@@ -69,7 +68,7 @@ internal static class TeaAppCompositionTests
     private static Task AutomaticallyRoutesTabIntoTextInput()
     {
         var app = new FormApp();
-        var screen = (IScreen)app;
+        var screen = app.RuntimeScreen;
 
         screen.Update(new WindowSizeMsg(80, 24));
         screen.Render();
@@ -85,7 +84,7 @@ internal static class TeaAppCompositionTests
     private static Task AutomaticallyRoutesChoiceSelection()
     {
         var app = new ChoiceApp();
-        var screen = (IScreen)app;
+        var screen = app.RuntimeScreen;
 
         screen.Update(new WindowSizeMsg(80, 24));
         screen.Render();
@@ -100,7 +99,7 @@ internal static class TeaAppCompositionTests
     private static Task AutomaticallyRoutesComboBoxSelection()
     {
         var app = new ComboBoxApp();
-        var screen = (IScreen)app;
+        var screen = app.RuntimeScreen;
 
         screen.Update(new WindowSizeMsg(80, 24));
         screen.Render();
@@ -115,7 +114,7 @@ internal static class TeaAppCompositionTests
     private static Task AutomaticallyRoutesTabsSelection()
     {
         var app = new TabsApp();
-        var screen = (IScreen)app;
+        var screen = app.RuntimeScreen;
 
         screen.Update(new WindowSizeMsg(80, 24));
         screen.Render();
@@ -128,7 +127,7 @@ internal static class TeaAppCompositionTests
     private static async Task AutomaticallyRoutesMenuBarActivation()
     {
         var app = new MenuApp();
-        var screen = (IScreen)app;
+        var screen = app.RuntimeScreen;
 
         screen.Update(new WindowSizeMsg(80, 24));
         screen.Render();
@@ -141,7 +140,7 @@ internal static class TeaAppCompositionTests
     private static Task HandledControlInput_DoesNotReachDefaultUpdate()
     {
         var app = new FilteredInputApp();
-        var screen = (IScreen)app;
+        var screen = app.RuntimeScreen;
 
         screen.Update(new WindowSizeMsg(80, 24));
         screen.Render();
@@ -155,7 +154,7 @@ internal static class TeaAppCompositionTests
     private static Task RequestEffect_AllowsHandledControlInputToTriggerRuntimeEffect()
     {
         var app = new RequestedEffectApp();
-        var screen = (IScreen)app;
+        var screen = app.RuntimeScreen;
 
         screen.Update(new WindowSizeMsg(80, 24));
         screen.Render();

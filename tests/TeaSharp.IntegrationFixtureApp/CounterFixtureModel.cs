@@ -40,7 +40,7 @@ public sealed class CounterFixtureModel : IScreen
         }
 
         return key.IsCharacter('q', KeyModifiers.None)
-            ? Tea.Effects.Quit
+            ? TeaSharp.Core.Commands.Effects.Quit
             : null;
     }
 

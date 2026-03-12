@@ -47,7 +47,7 @@ public sealed class DecoderDrivenWorkspaceUxTests
 
         var result = ApplyDecoded(model, "q");
 
-        Assert.That(result, Is.EqualTo(TeaSharp.Tea.Effects.Quit));
+        Assert.That(result, Is.EqualTo(TeaSharp.Core.Commands.Effects.Quit));
     }
 
     [Test]

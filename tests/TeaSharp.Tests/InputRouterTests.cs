@@ -30,7 +30,7 @@ internal static class InputRouterTests
             {
                 calls.Add("system");
                 return key.Modifiers.HasFlag(KeyModifiers.Ctrl)
-                    ? InputRouteResult.FromEffect(Tea.Effects.Quit)
+                    ? InputRouteResult.FromEffect(TeaSharp.Core.Commands.Effects.Quit)
                     : InputRouteResult.NotHandled;
             })
             .AddScope("modal", InputScopeKind.Modal, static () => true, key =>
