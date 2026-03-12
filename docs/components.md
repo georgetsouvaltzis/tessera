@@ -60,6 +60,7 @@ The design follows patterns used in Bubble Tea examples:
     - preferred-focus selection via `CompleteFrame(...)`
     - overlay helpers: `AddOverlayComponent`, `AddModalComponent`, `AddPaletteComponent`, `AddToastOverlay`
     - this is the recommended full-app composition surface
+    - built-in scaffolds (`Frame`, `MasterDetail`, `Dashboard`, `Form`) now resolve through the same deterministic layout engine as `TeaSharp.Layout`
   - `InputRouter`: app-level key precedence for multi-mode screens.
     - ordered scopes: `System`, `Modal`, `Palette`, `Effect`, `FocusedRegion`, `Global`
     - scope behaviors: `ContinueWhenUnhandled` or `CaptureWhileActive`

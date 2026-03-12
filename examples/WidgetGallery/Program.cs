@@ -7,6 +7,7 @@ using TeaSharp.Core.Abstractions;
 using TeaSharp.Core.Application;
 using TeaSharp.Core.Messages;
 using ModelView = TeaSharp.Core.Abstractions.ScreenOutput;
+using TLayout = TeaSharp.Layout;
 
 var model = new WidgetGalleryModel();
 var options = new TeaProgramOptions
@@ -273,26 +274,27 @@ internal sealed class WidgetGalleryModel : InteractiveScreenModel
 
     private void RegisterBasicsRegions(Rect rect)
     {
-        var (top, bottom) = Layout.SplitHorizontal(rect, Math.Max(8, rect.Height / 2));
-        var (left, right) = Layout.SplitVertical(top, Math.Max(36, top.Width / 2));
-        Screen.AddComponent(BasicsLabelRegionId, left, _label, focusable: false);
-        Screen.AddComponent(ButtonRegionId, new Rect(right.X, right.Y, right.Width, 3), _button);
-        Screen.AddComponent(ProgressRegionId, new Rect(right.X, right.Y + 4, right.Width, 4), _progress);
-        Screen.AddRegion(
-            BasicsInfoRegionId,
-            bottom,
-            (canvas, bounds) =>
-            {
-                var info = new TextBlockComponent
-                {
-                    Title = "Status",
-                    Text =
-                        $"button presses: {_button.PressCount}\n" +
-                        $"input submits: {_textInput.SubmitCount}\n" +
-                        "keys: tab focus, click/enter/space button, left/right progress, 1-5 tabs",
-                };
-                info.Render(canvas, bounds);
-            });
+        var info = new TextBlockComponent(new TextBlockOptions(
+            Title: "Status",
+            Text:
+                $"button presses: {_button.PressCount}\n" +
+                $"input submits: {_textInput.SubmitCount}\n" +
+                "keys: tab focus, click/enter/space button, left/right progress, 1-5 tabs"));
+
+        Compose(
+            TLayout.Split.Rows(
+                top: TLayout.Slot.Fixed(
+                    Math.Max(8, rect.Height / 2),
+                    TLayout.Split.Columns(
+                        left: TLayout.Slot.Fixed(Math.Max(36, rect.Width / 2), _label, BasicsLabelRegionId, focusable: false),
+                        right: TLayout.Slot.Fill(
+                            TLayout.Stack.Column(
+                                1,
+                                default,
+                                TLayout.Slot.Fixed(3, _button, ButtonRegionId),
+                                TLayout.Slot.Fixed(4, _progress, ProgressRegionId))))),
+                bottom: TLayout.Slot.Fill(info, BasicsInfoRegionId, focusable: false)),
+            rect);
     }
 
     private void RegisterInputRegions(Rect rect)
@@ -306,10 +308,11 @@ internal sealed class WidgetGalleryModel : InteractiveScreenModel
     {
         var shell = Dashboard(rect, sidebarWidth: Math.Max(28, rect.Width / 3));
         Screen.AddComponent(ListRegionId, shell.Sidebar, _list);
-
-        var (tableRect, logsRect) = Layout.SplitHorizontal(shell.Main, Math.Max(10, shell.Main.Height / 2));
-        Screen.AddComponent(TableRegionId, tableRect, _table);
-        Screen.AddComponent(LogViewerRegionId, logsRect, _logs);
+        Compose(
+            TLayout.Split.Rows(
+                top: TLayout.Slot.Fixed(Math.Max(10, shell.Main.Height / 2), _table, TableRegionId),
+                bottom: TLayout.Slot.Fill(_logs, LogViewerRegionId)),
+            shell.Main);
     }
 
     private void RegisterOverlayRegions(Rect rect)

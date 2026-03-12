@@ -2,6 +2,7 @@ using TeaSharp.Components.Primitives;
 using TeaSharp.Core.Abstractions;
 using TeaSharp.Core.Messages;
 using System.Diagnostics.CodeAnalysis;
+using TeaSharp.Components.Composition.Internal;
 using TeaSharp.Layout;
 
 namespace TeaSharp.Components.Composition;
@@ -32,15 +33,29 @@ public sealed partial class ScreenComposer
         var safeHeaderHeight = Math.Clamp(headerHeight, 0, totalHeight);
         var remainingAfterHeader = Math.Max(0, totalHeight - safeHeaderHeight);
         var safeFooterHeight = Math.Clamp(footerHeight, 0, remainingAfterHeader);
-        var bodyHeight = Math.Max(0, totalHeight - safeHeaderHeight - safeFooterHeight);
+        var headerKey = new ScreenRegionKey("__frame.header");
+        var bodyKey = new ScreenRegionKey("__frame.body");
+        var footerKey = new ScreenRegionKey("__frame.footer");
+        var resolved = LayoutBoundsResolver.Resolve(
+            Dock.Layout(
+                top: safeHeaderHeight == 0
+                    ? null
+                    : Slot.Fixed(safeHeaderHeight, LayoutBoundsResolver.Placeholder(), regionKey: headerKey, preferredHeight: safeHeaderHeight, focusable: false, focusOnClick: false, interceptsPointer: false),
+                bottom: safeFooterHeight == 0
+                    ? null
+                    : Slot.Fixed(safeFooterHeight, LayoutBoundsResolver.Placeholder(), regionKey: footerKey, preferredHeight: safeFooterHeight, focusable: false, focusOnClick: false, interceptsPointer: false),
+                fill: Slot.Fill(LayoutBoundsResolver.Placeholder(), regionKey: bodyKey, focusable: false, focusOnClick: false, interceptsPointer: false)),
+            bounds);
 
-        var header = safeHeaderHeight == 0
-            ? new Rect(bounds.X, bounds.Y, bounds.Width, 0)
-            : new Rect(bounds.X, bounds.Y, bounds.Width, safeHeaderHeight);
-        var body = new Rect(bounds.X, bounds.Y + safeHeaderHeight, bounds.Width, bodyHeight);
-        var footer = safeFooterHeight == 0
-            ? new Rect(bounds.X, body.Bottom, bounds.Width, 0)
-            : new Rect(bounds.X, body.Bottom, bounds.Width, safeFooterHeight);
+        var header = resolved.TryGetValue(headerKey, out var headerBounds)
+            ? headerBounds
+            : new Rect(bounds.X, bounds.Y, bounds.Width, 0);
+        var body = resolved.TryGetValue(bodyKey, out var bodyBounds)
+            ? bodyBounds
+            : new Rect(bounds.X, bounds.Y + safeHeaderHeight, bounds.Width, Math.Max(0, totalHeight - safeHeaderHeight - safeFooterHeight));
+        var footer = resolved.TryGetValue(footerKey, out var footerBounds)
+            ? footerBounds
+            : new Rect(bounds.X, body.Bottom, bounds.Width, 0);
 
         return new ScreenFrameLayout(bounds, header, body, footer);
     }
@@ -63,7 +78,20 @@ public sealed partial class ScreenComposer
         int minDetailWidth = 0)
     {
         var frame = Frame(bounds, headerHeight, footerHeight);
-        var (master, detail) = frame.SplitBodyColumns(masterWidth, minMasterWidth, minDetailWidth);
+        var totalWidth = Math.Max(0, frame.Body.Width);
+        var safeMinMasterWidth = Math.Clamp(minMasterWidth, 0, totalWidth);
+        var maxDetailWidth = Math.Max(0, totalWidth - safeMinMasterWidth);
+        var safeMinDetailWidth = Math.Clamp(minDetailWidth, 0, maxDetailWidth);
+        var safeMasterWidth = Math.Clamp(masterWidth, safeMinMasterWidth, totalWidth - safeMinDetailWidth);
+        var masterKey = new ScreenRegionKey("__masterDetail.master");
+        var detailKey = new ScreenRegionKey("__masterDetail.detail");
+        var resolved = LayoutBoundsResolver.Resolve(
+            Split.Columns(
+                left: Slot.Fixed(safeMasterWidth, LayoutBoundsResolver.Placeholder(), regionKey: masterKey, preferredWidth: safeMasterWidth, focusable: false, focusOnClick: false, interceptsPointer: false),
+                right: Slot.Fill(LayoutBoundsResolver.Placeholder(), regionKey: detailKey, focusable: false, focusOnClick: false, interceptsPointer: false)),
+            frame.Body);
+        var master = resolved[masterKey];
+        var detail = resolved[detailKey];
         return new MasterDetailScreen(this, frame, master, detail);
     }
 
@@ -85,7 +113,20 @@ public sealed partial class ScreenComposer
         int minMainWidth = 0)
     {
         var frame = Frame(bounds, headerHeight, footerHeight);
-        var (sidebar, main) = frame.SplitBodyColumns(sidebarWidth, minSidebarWidth, minMainWidth);
+        var totalWidth = Math.Max(0, frame.Body.Width);
+        var safeMinSidebarWidth = Math.Clamp(minSidebarWidth, 0, totalWidth);
+        var maxMainWidth = Math.Max(0, totalWidth - safeMinSidebarWidth);
+        var safeMinMainWidth = Math.Clamp(minMainWidth, 0, maxMainWidth);
+        var safeSidebarWidth = Math.Clamp(sidebarWidth, safeMinSidebarWidth, totalWidth - safeMinMainWidth);
+        var sidebarKey = new ScreenRegionKey("__dashboard.sidebar");
+        var mainKey = new ScreenRegionKey("__dashboard.main");
+        var resolved = LayoutBoundsResolver.Resolve(
+            Split.Columns(
+                left: Slot.Fixed(safeSidebarWidth, LayoutBoundsResolver.Placeholder(), regionKey: sidebarKey, preferredWidth: safeSidebarWidth, focusable: false, focusOnClick: false, interceptsPointer: false),
+                right: Slot.Fill(LayoutBoundsResolver.Placeholder(), regionKey: mainKey, focusable: false, focusOnClick: false, interceptsPointer: false)),
+            frame.Body);
+        var sidebar = resolved[sidebarKey];
+        var main = resolved[mainKey];
         return new DashboardScreen(this, frame, sidebar, main);
     }
 
@@ -141,8 +182,21 @@ public sealed partial class ScreenComposer
         int minActionsHeight = 0)
     {
         var frame = Frame(bounds, headerHeight, footerHeight);
-        var bodyHeight = Math.Max(0, frame.Body.Height - actionsHeight);
-        var (body, actions) = frame.SplitBodyRows(bodyHeight, minBodyHeight, minActionsHeight);
+        var totalHeight = Math.Max(0, frame.Body.Height);
+        var requestedBodyHeight = Math.Max(0, totalHeight - actionsHeight);
+        var safeMinBodyHeight = Math.Clamp(minBodyHeight, 0, totalHeight);
+        var maxActionsHeight = Math.Max(0, totalHeight - safeMinBodyHeight);
+        var safeMinActionsHeight = Math.Clamp(minActionsHeight, 0, maxActionsHeight);
+        var safeBodyHeight = Math.Clamp(requestedBodyHeight, safeMinBodyHeight, totalHeight - safeMinActionsHeight);
+        var bodyKey = new ScreenRegionKey("__form.body");
+        var actionsKey = new ScreenRegionKey("__form.actions");
+        var resolved = LayoutBoundsResolver.Resolve(
+            Split.Rows(
+                top: Slot.Fixed(safeBodyHeight, LayoutBoundsResolver.Placeholder(), regionKey: bodyKey, preferredHeight: safeBodyHeight, focusable: false, focusOnClick: false, interceptsPointer: false),
+                bottom: Slot.Fill(LayoutBoundsResolver.Placeholder(), regionKey: actionsKey, focusable: false, focusOnClick: false, interceptsPointer: false)),
+            frame.Body);
+        var body = resolved[bodyKey];
+        var actions = resolved[actionsKey];
         return new FormScreen(this, frame, body, actions);
     }
 
