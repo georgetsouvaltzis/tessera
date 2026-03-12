@@ -1,7 +1,6 @@
 using TeaSharp;
 using TeaSharp.Controls;
 using TeaSharp.Layout;
-using TeaSharp.Components.Primitives;
 
 var app = Tea.CreateBuilder()
     .UseApp<AdvancedWidgetsApp>()
@@ -23,6 +22,12 @@ internal sealed record AdvancedTick(DateTimeOffset At) : Message;
 
 internal sealed class AdvancedWidgetsApp : TeaApp
 {
+    private readonly Badge _modeBadge = new()
+    {
+        Text = "stable",
+        Tone = BadgeTone.Success,
+    };
+
     private readonly Toggle _toggle = new()
     {
         Title = "Feature Flag",
@@ -61,6 +66,18 @@ internal sealed class AdvancedWidgetsApp : TeaApp
         Border = BorderStyle.SingleLine,
         Padding = Thickness.All(1),
         MaxItems = 48,
+    };
+
+    private readonly CommandPalette _palette = new()
+    {
+        Title = "Workspace Actions",
+        IsFocused = true,
+    };
+
+    private readonly ContextMenu _contextMenu = new()
+    {
+        Title = "Quick Actions",
+        IsFocused = true,
     };
 
     private readonly Label _summary = new()
@@ -106,6 +123,42 @@ internal sealed class AdvancedWidgetsApp : TeaApp
         _notifications.Push("advanced demo booted", NotificationLevel.Success);
         _notifications.Push("tab cycles focus", NotificationLevel.Info);
         _notifications.Push("n pushes a notification", NotificationLevel.Warning);
+        _notifications.Push("p opens command palette", NotificationLevel.Info);
+        _notifications.Push("x opens context menu", NotificationLevel.Info);
+
+        _palette.SetItems(
+        [
+            new CommandPaletteItem("refresh", "Refresh workspace", "poll files and redraw"),
+            new CommandPaletteItem("notify", "Push notification", "emit a manual notification"),
+            new CommandPaletteItem("pause", "Pause spinner", "toggle indexer activity"),
+        ]);
+        _palette.ItemExecuted += (_, args) =>
+        {
+            _notifications.Push($"palette: {args.Item.Title}", NotificationLevel.Success);
+            if (args.ItemId == "notify")
+            {
+                _notifications.Push($"manual event {_tick:000}", NotificationLevel.Warning);
+            }
+            else if (args.ItemId == "pause")
+            {
+                _spinner.SetRunning(!_spinner.Running);
+            }
+        };
+
+        _contextMenu.SetItems(
+        [
+            new ContextMenuItem("copy", "Copy summary"),
+            new ContextMenuItem("clear", "Clear notifications"),
+        ]);
+        _contextMenu.ItemExecuted += (_, args) =>
+        {
+            _notifications.Push($"menu: {args.Item.Title}", NotificationLevel.Info);
+            if (args.ItemId == "clear")
+            {
+                _notifications.Clear();
+                _notifications.Push("notifications cleared", NotificationLevel.Warning);
+            }
+        };
     }
 
     public override TeaEffect? Initialize() => TeaEffects.Tick(TimeSpan.FromMilliseconds(250), static now => new AdvancedTick(now));
@@ -141,6 +194,20 @@ internal sealed class AdvancedWidgetsApp : TeaApp
                 _status.RightText = "notification pushed";
                 return null;
             }
+
+            if (key.IsCharacter('p'))
+            {
+                _palette.Open();
+                _status.RightText = "palette open";
+                return null;
+            }
+
+            if (key.IsCharacter('x'))
+            {
+                _contextMenu.OpenAt(2, 2);
+                _status.RightText = "context menu open";
+                return null;
+            }
         }
 
         return null;
@@ -150,21 +217,28 @@ internal sealed class AdvancedWidgetsApp : TeaApp
     {
         _summary.Text =
             $"""
+            Mode: {_modeBadge.Text}
             Toggle: {(_toggle.Value ? "ON" : "OFF")}
             Concurrency: {_slider.Value:0}
             Spinner: {(_spinner.Running ? "running" : "paused")}
             Selected node: {_tree.SelectedId ?? "none"}
             Notifications: {_notifications.Count}
+            Palette: {(_palette.IsVisible ? "open" : "closed")}
+            Context menu: {(_contextMenu.IsVisible ? "open" : "closed")}
             Size: {context.Width}x{context.Height}
             """;
 
-        _status.LeftText = "Tab focus   Enter/Space activate   n notify   q quit";
+        _modeBadge.Text = _toggle.Value ? "live" : "stable";
+        _modeBadge.Tone = _toggle.Value ? BadgeTone.Warning : BadgeTone.Success;
+
+        _status.LeftText = "Tab focus   Enter/Space activate   n notify   p palette   x menu   q quit";
         _status.RightText = $"tick={_tick:0000}";
 
         var left = new ColumnLayout
         {
             Gap = 1,
         };
+        left.AddFixed(_modeBadge, 1);
         left.AddFixed(_toggle, 5);
         left.AddFixed(_slider, 6);
         left.AddFixed(_spinner, 5);
@@ -177,11 +251,24 @@ internal sealed class AdvancedWidgetsApp : TeaApp
         right.AddFill(_tree);
         right.AddFill(_notifications);
 
+        LayoutNode body = right;
+        if (_palette.IsVisible)
+        {
+            body = new CenterLayout(
+                _palette,
+                width: Math.Min(72, Math.Max(48, context.Width - 6)),
+                height: Math.Min(14, Math.Max(8, context.Height - 4)));
+        }
+        else if (_contextMenu.IsVisible)
+        {
+            body = new CenterLayout(_contextMenu, width: 32, height: 8);
+        }
+
         return Screen.From(new WindowLayout
         {
             Footer = LayoutSlot.Fixed(_status, 1),
             Left = LayoutSlot.Fixed(left, Math.Min(38, Math.Max(30, context.Width / 3))),
-            Body = right,
+            Body = body,
             Padding = Thickness.All(1),
             Gap = 1,
         });
