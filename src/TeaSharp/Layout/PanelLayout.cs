@@ -9,13 +9,36 @@ namespace TeaSharp.Layout;
 /// </summary>
 public sealed class PanelLayout : LayoutNode
 {
-    internal PanelLayout(LayoutNode content, string? title, BorderStyle border, Thickness padding, Thickness margin)
+    public PanelLayout(LayoutNode content, string? title = null, BorderStyle border = BorderStyle.None, Thickness padding = default, Thickness margin = default)
     {
         Content = content ?? throw new ArgumentNullException(nameof(content));
         Title = title;
         Border = border;
         Padding = padding;
         Margin = margin;
+    }
+
+    public PanelLayout(
+        ICanvasComponent component,
+        string? title = null,
+        BorderStyle border = BorderStyle.None,
+        Thickness padding = default,
+        Thickness margin = default,
+        ScreenRegionKey? regionKey = null,
+        int? preferredWidth = null,
+        int? preferredHeight = null,
+        bool? focusable = null,
+        bool focusOnClick = true,
+        bool interceptsPointer = true,
+        int layer = (int)ScreenLayer.Base,
+        Action? onFocus = null)
+        : this(
+            new ComponentLayout(component, regionKey, preferredWidth, preferredHeight, focusable, focusOnClick, interceptsPointer, layer, onFocus),
+            title,
+            border,
+            padding,
+            margin)
+    {
     }
 
     /// <summary>

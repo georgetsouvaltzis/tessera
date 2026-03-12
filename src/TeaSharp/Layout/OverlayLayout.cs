@@ -9,9 +9,14 @@ namespace TeaSharp.Layout;
 /// </summary>
 public sealed class OverlayLayout : LayoutNode
 {
-    internal OverlayLayout(IReadOnlyList<LayoutNode> items)
+    public OverlayLayout(IReadOnlyList<LayoutNode> items)
     {
         Items = items ?? throw new ArgumentNullException(nameof(items));
+    }
+
+    public OverlayLayout(params LayoutNode[] items)
+        : this((IReadOnlyList<LayoutNode>)items)
+    {
     }
 
     /// <summary>

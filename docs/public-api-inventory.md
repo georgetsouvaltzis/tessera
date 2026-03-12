@@ -19,12 +19,21 @@ These are the types new applications should discover first.
 - `Screen`
 - `ScreenContext`
 - `ScreenOptions`
+- `TeaSharp.Layout.*` object-model types
+- `TeaSharp.Controls.Button`
+- `TeaSharp.Controls.Label`
+- `TeaSharp.Controls.TextInput`
+- `TeaSharp.Controls.TextArea`
+- `TeaSharp.Controls.Choice`
+- `TeaSharp.Controls.Dialog`
+- `TeaSharp.Controls.StatusBar`
 - `TeaSharp.Controls.Control`
 
 The intended beginner path is:
 
 - build an app by deriving from `TeaApp`
 - run it with `Tea.RunAsync(...)` or `TeaApplicationBuilder`
+- route controls with `HandleScreenInput(...)`
 - return `Screen` from `Build(ScreenContext)`
 - keep configuration in `TeaRuntimeOptions` and `ScreenOptions`
 
@@ -55,6 +64,7 @@ These areas still expose more mechanism than the long-term public design should:
 - low-level widget models leaking through component configuration
 - runtime seams that most apps never need
 - duplicate terminology between root app types and older core/runtime types
+- older category-based component namespaces that still coexist with the new control names
 
 ## Current Direction
 
@@ -65,6 +75,7 @@ TeaSharp is shifting from:
 - `InteractiveScreenModel`
 - `ScreenComposer`
 - `InputRouter`
+- static layout helper DSLs
 
 to:
 
@@ -74,6 +85,8 @@ to:
 - `Screen`
 - `ScreenContext`
 - `TeaRuntimeOptions`
+- explicit layout objects
+- root `TeaSharp.Controls` wrappers
 
 The old stack remains available for now, but it is no longer the recommended starting point.
 

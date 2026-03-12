@@ -1,4 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
+using System.ComponentModel;
 using TeaSharp.Components.Primitives;
 
 namespace TeaSharp.Layout;
@@ -7,6 +8,7 @@ namespace TeaSharp.Layout;
 /// Creates ordered row and column layouts.
 /// </summary>
 [SuppressMessage("Naming", "CA1711:Identifiers should not have incorrect suffix", Justification = "Stack is the intentional public layout noun for ordered rows and columns.")]
+[EditorBrowsable(EditorBrowsableState.Advanced)]
 public static class Stack
 {
     /// <summary>

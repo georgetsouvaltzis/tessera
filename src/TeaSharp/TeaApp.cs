@@ -6,6 +6,7 @@ public abstract class TeaApp : global::TeaSharp.Core.Abstractions.IScreen
 {
     private ScreenContext _context = new();
     private ScreenOptions _runtimeScreenOptions = ScreenOptions.Empty;
+    private CompiledScreen? _interactiveScreen;
 
     public ScreenContext Context => _context;
 
@@ -16,6 +17,12 @@ public abstract class TeaApp : global::TeaSharp.Core.Abstractions.IScreen
     public abstract TeaEffect? Update(Message message);
 
     public abstract Screen Build(ScreenContext context);
+
+    protected bool HandleScreenInput(Message message)
+    {
+        ArgumentNullException.ThrowIfNull(message);
+        return _interactiveScreen?.Handle(message) ?? false;
+    }
 
     internal void ConfigureRuntimeScreen(ScreenOptions screenOptions)
     {
@@ -45,6 +52,8 @@ public abstract class TeaApp : global::TeaSharp.Core.Abstractions.IScreen
 
     global::TeaSharp.Core.Abstractions.ScreenOutput global::TeaSharp.Core.Abstractions.IScreen.Render()
     {
-        return Build(_context).ToCore(_runtimeScreenOptions.Merge(DefaultScreenOptions));
+        var rendered = Build(_context).Compile(_context, _runtimeScreenOptions.Merge(DefaultScreenOptions));
+        _interactiveScreen = rendered.Interaction;
+        return rendered.Output;
     }
 }

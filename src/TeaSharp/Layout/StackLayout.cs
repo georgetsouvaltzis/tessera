@@ -8,9 +8,22 @@ namespace TeaSharp.Layout;
 /// </summary>
 public sealed class StackLayout : LayoutNode
 {
+    public StackLayout(LayoutOrientation orientation, IReadOnlyList<LayoutSlot> children, int gap = 0, Thickness padding = default)
+    {
+        Orientation = orientation;
+        Children = children ?? throw new ArgumentNullException(nameof(children));
+        Gap = Math.Max(0, gap);
+        Padding = padding;
+    }
+
+    public StackLayout(LayoutOrientation orientation, int gap = 0, Thickness padding = default, params LayoutSlot[] children)
+        : this(orientation, (IReadOnlyList<LayoutSlot>)children, gap, padding)
+    {
+    }
+
     internal StackLayout(bool horizontal, IReadOnlyList<LayoutSlot> children, int gap, Thickness padding)
     {
-        IsHorizontal = horizontal;
+        Orientation = horizontal ? LayoutOrientation.Horizontal : LayoutOrientation.Vertical;
         Children = children ?? throw new ArgumentNullException(nameof(children));
         Gap = Math.Max(0, gap);
         Padding = padding;
@@ -19,7 +32,9 @@ public sealed class StackLayout : LayoutNode
     /// <summary>
     /// Gets a value indicating whether the stack flows horizontally or vertically.
     /// </summary>
-    public bool IsHorizontal { get; }
+    public LayoutOrientation Orientation { get; }
+
+    public bool IsHorizontal => Orientation == LayoutOrientation.Horizontal;
 
     /// <summary>
     /// Gets the stack children in layout order.

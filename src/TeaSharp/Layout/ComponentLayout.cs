@@ -8,7 +8,7 @@ namespace TeaSharp.Layout;
 /// </summary>
 public sealed class ComponentLayout : LayoutNode
 {
-    internal ComponentLayout(
+    public ComponentLayout(
         ICanvasComponent component,
         ScreenRegionKey? regionKey,
         int? preferredWidth,
@@ -28,6 +28,11 @@ public sealed class ComponentLayout : LayoutNode
         InterceptsPointer = interceptsPointer;
         Layer = layer;
         OnFocus = onFocus;
+    }
+
+    public ComponentLayout(ICanvasComponent component)
+        : this(component, null, null, null, null, focusOnClick: true, interceptsPointer: true, layer: (int)ScreenLayer.Base, onFocus: null)
+    {
     }
 
     /// <summary>

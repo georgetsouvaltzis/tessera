@@ -1,11 +1,13 @@
 using TeaSharp.Components.Composition;
 using TeaSharp.Components.Primitives;
+using System.ComponentModel;
 
 namespace TeaSharp.Layout;
 
 /// <summary>
 /// Creates deterministic layout slots without exposing geometry math to app code.
 /// </summary>
+[EditorBrowsable(EditorBrowsableState.Advanced)]
 public static class Slot
 {
     /// <summary>

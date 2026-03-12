@@ -62,7 +62,7 @@ internal static class TeaAppFoundationTests
                 options.MaxFps = 24;
                 options.Screen = new ScreenOptions
                 {
-                    UseAltScreen = true,
+                    AltScreen = true,
                     WindowTitle = "TeaSharp Test",
                 };
             })
@@ -70,7 +70,7 @@ internal static class TeaAppFoundationTests
 
         TestAssert.True(application.App is ResizeAwareApp, "Tea builder should create the configured app type.");
         TestAssert.Equal(24, application.Options.MaxFps, "Tea builder should preserve runtime options.");
-        TestAssert.True(application.Options.Screen.UseAltScreen == true, "Tea builder should preserve screen defaults.");
+        TestAssert.True(application.Options.Screen.AltScreen == true, "Tea builder should preserve screen defaults.");
         return Task.CompletedTask;
     }
 

@@ -35,6 +35,7 @@ public sealed class NUnitCaseAdapters
         foreach (var testCase in InteractiveScreenModelTests.Cases()) yield return ToCaseData(testCase);
         foreach (var testCase in CompositionApiContractTests.Cases()) yield return ToCaseData(testCase);
         foreach (var testCase in RuntimeApiContractTests.Cases()) yield return ToCaseData(testCase);
+        foreach (var testCase in TeaAppCompositionTests.Cases()) yield return ToCaseData(testCase);
         foreach (var testCase in TeaAppFoundationTests.Cases()) yield return ToCaseData(testCase);
         foreach (var testCase in WidgetApiContractTests.Cases()) yield return ToCaseData(testCase);
         foreach (var testCase in UiKitComponentTests.Cases()) yield return ToCaseData(testCase);

@@ -8,9 +8,18 @@ namespace TeaSharp.Layout;
 /// </summary>
 public sealed class SplitLayout : LayoutNode
 {
+    public SplitLayout(LayoutOrientation orientation, LayoutSlot first, LayoutSlot second, int gap = 0, Thickness padding = default)
+    {
+        Orientation = orientation;
+        First = first ?? throw new ArgumentNullException(nameof(first));
+        Second = second ?? throw new ArgumentNullException(nameof(second));
+        Gap = Math.Max(0, gap);
+        Padding = padding;
+    }
+
     internal SplitLayout(bool horizontal, LayoutSlot first, LayoutSlot second, int gap, Thickness padding)
     {
-        IsHorizontal = horizontal;
+        Orientation = horizontal ? LayoutOrientation.Horizontal : LayoutOrientation.Vertical;
         First = first ?? throw new ArgumentNullException(nameof(first));
         Second = second ?? throw new ArgumentNullException(nameof(second));
         Gap = Math.Max(0, gap);
@@ -20,7 +29,9 @@ public sealed class SplitLayout : LayoutNode
     /// <summary>
     /// Gets a value indicating whether the split flows horizontally (`left/right`) or vertically (`top/bottom`).
     /// </summary>
-    public bool IsHorizontal { get; }
+    public LayoutOrientation Orientation { get; }
+
+    public bool IsHorizontal => Orientation == LayoutOrientation.Horizontal;
 
     /// <summary>
     /// Gets the first slot.

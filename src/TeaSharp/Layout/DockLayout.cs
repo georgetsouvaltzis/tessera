@@ -8,14 +8,14 @@ namespace TeaSharp.Layout;
 /// </summary>
 public sealed class DockLayout : LayoutNode
 {
-    internal DockLayout(
-        LayoutSlot? top,
-        LayoutSlot? bottom,
-        LayoutSlot? left,
-        LayoutSlot? right,
-        LayoutSlot? fill,
-        int gap,
-        Thickness padding)
+    public DockLayout(
+        LayoutSlot? top = null,
+        LayoutSlot? bottom = null,
+        LayoutSlot? left = null,
+        LayoutSlot? right = null,
+        LayoutSlot? fill = null,
+        int gap = 0,
+        Thickness padding = default)
     {
         Top = top;
         Bottom = bottom;

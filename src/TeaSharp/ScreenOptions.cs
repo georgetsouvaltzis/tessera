@@ -4,7 +4,7 @@ public sealed class ScreenOptions
 {
     public static ScreenOptions Empty { get; } = new();
 
-    public bool? UseAltScreen { get; init; }
+    public bool? AltScreen { get; init; }
 
     public bool? EnableBracketedPaste { get; init; }
 
@@ -31,7 +31,7 @@ public sealed class ScreenOptions
 
         return new ScreenOptions
         {
-            UseAltScreen = overrides.UseAltScreen ?? UseAltScreen,
+            AltScreen = overrides.AltScreen ?? AltScreen,
             EnableBracketedPaste = overrides.EnableBracketedPaste ?? EnableBracketedPaste,
             EnableFocusReporting = overrides.EnableFocusReporting ?? EnableFocusReporting,
             EnableSynchronizedUpdates = overrides.EnableSynchronizedUpdates ?? EnableSynchronizedUpdates,
@@ -47,7 +47,7 @@ public sealed class ScreenOptions
     {
         return new global::TeaSharp.Core.Abstractions.TerminalOutput
         {
-            AltScreen = UseAltScreen ?? false,
+            AltScreen = AltScreen ?? false,
             EnableBracketedPaste = EnableBracketedPaste ?? false,
             EnableFocusReporting = EnableFocusReporting ?? false,
             EnableSynchronizedUpdates = EnableSynchronizedUpdates ?? false,

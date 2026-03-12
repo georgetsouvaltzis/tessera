@@ -8,12 +8,31 @@ namespace TeaSharp.Layout;
 /// </summary>
 public sealed class CenterLayout : LayoutNode
 {
-    internal CenterLayout(LayoutNode content, int? width, int? height, Thickness margin)
+    public CenterLayout(LayoutNode content, int? width = null, int? height = null, Thickness margin = default)
     {
         Content = content ?? throw new ArgumentNullException(nameof(content));
         Width = width;
         Height = height;
         Margin = margin;
+    }
+
+    public CenterLayout(
+        ICanvasComponent component,
+        int? width = null,
+        int? height = null,
+        Thickness margin = default,
+        ScreenRegionKey? regionKey = null,
+        bool? focusable = null,
+        bool focusOnClick = true,
+        bool interceptsPointer = true,
+        int layer = (int)ScreenLayer.Base,
+        Action? onFocus = null)
+        : this(
+            new ComponentLayout(component, regionKey, width, height, focusable, focusOnClick, interceptsPointer, layer, onFocus),
+            width,
+            height,
+            margin)
+    {
     }
 
     /// <summary>

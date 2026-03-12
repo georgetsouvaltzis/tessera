@@ -1,10 +1,12 @@
 using TeaSharp.Components.Primitives;
+using System.ComponentModel;
 
 namespace TeaSharp.Layout;
 
 /// <summary>
 /// Creates docked layouts for common shell compositions.
 /// </summary>
+[EditorBrowsable(EditorBrowsableState.Advanced)]
 public static class Dock
 {
     /// <summary>

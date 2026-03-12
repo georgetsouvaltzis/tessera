@@ -2,12 +2,14 @@ using TeaSharp.Components.Composition;
 using TeaSharp.Components.Prebuilt;
 using TeaSharp.Components.Primitives;
 using TeaSharp.Styles;
+using System.ComponentModel;
 
 namespace TeaSharp.Layout;
 
 /// <summary>
 /// Creates centered layouts without exposing manual geometry math.
 /// </summary>
+[EditorBrowsable(EditorBrowsableState.Advanced)]
 public static class Center
 {
     /// <summary>

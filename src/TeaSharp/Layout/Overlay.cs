@@ -1,8 +1,11 @@
+using System.ComponentModel;
+
 namespace TeaSharp.Layout;
 
 /// <summary>
 /// Creates overlay compositions using back-to-front layout items.
 /// </summary>
+[EditorBrowsable(EditorBrowsableState.Advanced)]
 public static class Overlay
 {
     /// <summary>

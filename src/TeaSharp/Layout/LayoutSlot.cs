@@ -1,4 +1,6 @@
 using TeaSharp.Components.Primitives;
+using TeaSharp.Core.Abstractions;
+using TeaSharp.Components.Composition;
 
 namespace TeaSharp.Layout;
 
@@ -7,6 +9,28 @@ namespace TeaSharp.Layout;
 /// </summary>
 public sealed record LayoutSlot
 {
+    /// <summary>
+    /// Creates a slot for the provided TeaSharp component.
+    /// </summary>
+    public LayoutSlot(
+        ICanvasComponent component,
+        LayoutLength length,
+        Thickness margin = default,
+        ScreenRegionKey? regionKey = null,
+        int? preferredWidth = null,
+        int? preferredHeight = null,
+        bool? focusable = null,
+        bool focusOnClick = true,
+        bool interceptsPointer = true,
+        int layer = (int)ScreenLayer.Base,
+        Action? onFocus = null)
+        : this(
+            new ComponentLayout(component, regionKey, preferredWidth, preferredHeight, focusable, focusOnClick, interceptsPointer, layer, onFocus),
+            length,
+            margin)
+    {
+    }
+
     /// <summary>
     /// Creates a slot for the provided content.
     /// </summary>

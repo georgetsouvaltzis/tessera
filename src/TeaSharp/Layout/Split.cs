@@ -1,10 +1,12 @@
 using TeaSharp.Components.Primitives;
+using System.ComponentModel;
 
 namespace TeaSharp.Layout;
 
 /// <summary>
 /// Creates deterministic two-pane splits.
 /// </summary>
+[EditorBrowsable(EditorBrowsableState.Advanced)]
 public static class Split
 {
     /// <summary>
