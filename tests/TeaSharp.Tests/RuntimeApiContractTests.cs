@@ -24,6 +24,7 @@ internal static class RuntimeApiContractTests
 {
     private static readonly (string Name, Type Type)[] AdvancedRuntimeTypes =
     [
+        ("TeaHostingOptions", typeof(TeaHostingOptions)),
         ("IProgramRenderer", typeof(IProgramRenderer)),
         ("NullRenderer", typeof(NullRenderer)),
         ("AnsiDiffRenderer", typeof(AnsiDiffRenderer)),
@@ -62,6 +63,9 @@ internal static class RuntimeApiContractTests
         yield return new TestCase(
             "RuntimeApi_TeaRuntimeOptions_UsePublicMessageContracts",
             TeaRuntimeOptions_UsePublicMessageContracts);
+        yield return new TestCase(
+            "RuntimeApi_TeaRuntimeOptions_ExposeSingleAdvancedHostingProperty",
+            TeaRuntimeOptions_ExposeSingleAdvancedHostingProperty);
         yield return new TestCase(
             "RuntimeApi_TeaProgramConstructor_IsMarkedAdvanced",
             TeaProgramConstructor_IsMarkedAdvanced);
@@ -178,6 +182,42 @@ internal static class RuntimeApiContractTests
         TestAssert.True(mapEffectException is not null, "TeaRuntimeOptions.MapEffectException should exist.");
         TestAssert.True(messageFilter!.PropertyType == typeof(Func<TeaApp, Message, Message>), "TeaRuntimeOptions.MessageFilter should use TeaApp and Message, not core runtime types.");
         TestAssert.True(mapEffectException!.PropertyType == typeof(Func<Exception, Message>), "TeaRuntimeOptions.MapEffectException should use public Message contracts.");
+        return Task.CompletedTask;
+    }
+
+    private static Task TeaRuntimeOptions_ExposeSingleAdvancedHostingProperty()
+    {
+        var hosting = typeof(TeaRuntimeOptions).GetProperty(nameof(TeaRuntimeOptions.Hosting));
+
+        TestAssert.True(hosting is not null, "TeaRuntimeOptions.Hosting should exist.");
+        TestAssert.True(hosting!.PropertyType == typeof(TeaHostingOptions), "TeaRuntimeOptions.Hosting should be the single hosting-specific escape hatch on the root runtime options type.");
+
+        var hostingAttribute = (EditorBrowsableAttribute?)Attribute.GetCustomAttribute(hosting, typeof(EditorBrowsableAttribute));
+        TestAssert.True(hostingAttribute is not null, "TeaRuntimeOptions.Hosting should be marked advanced.");
+        TestAssert.True(hostingAttribute!.State == EditorBrowsableState.Advanced, "TeaRuntimeOptions.Hosting should stay out of default discovery.");
+
+        string[] removedProperties =
+        [
+            "EnableCapabilityProbe",
+            "CapabilityProbeTimeout",
+            "MaxConcurrentEffects",
+            "Renderer",
+            "AnsiRendererOptions",
+            "Terminal",
+            "TerminalCapabilities",
+            "TerminalCapabilityDetector",
+            "ColorProfile",
+            "ColorProfileDetector",
+            "EventDecoder",
+            "CapabilityProbeModes",
+        ];
+
+        foreach (var propertyName in removedProperties)
+        {
+            var property = typeof(TeaRuntimeOptions).GetProperty(propertyName);
+            TestAssert.True(property is null, $"TeaRuntimeOptions should no longer expose {propertyName} directly.");
+        }
+
         return Task.CompletedTask;
     }
 

@@ -176,6 +176,8 @@ Common settings:
 - `EnableResizeSignals`
 - `Screen`
 
+`TeaRuntimeOptions.Hosting` owns the advanced hosting seams such as renderer, terminal adapter, event decoder, and capability probes.
+
 `ScreenOptions` owns terminal-facing frame options such as:
 
 - `AltScreen`
@@ -184,7 +186,7 @@ Common settings:
 - `EnableFocusReporting`
 - `MouseTracking`
 
-Advanced runtime seams like renderer, terminal adapter, event decoder, and capability probes remain available but are marked `EditorBrowsable(Advanced)`.
+Advanced runtime seams remain available, but they now sit behind `TeaRuntimeOptions.Hosting` and `TeaSharp.Hosting`, both marked `EditorBrowsable(Advanced)`.
 
 ## Advanced Escape Hatch
 

@@ -1,8 +1,6 @@
 using System.ComponentModel;
 using TeaSharp.Core.Application;
-using TeaSharp.Core.Input;
-using TeaSharp.Core.Rendering;
-using TeaSharp.Core.Terminal;
+using TeaSharp.Hosting;
 using TeaSharp.Internal;
 
 namespace TeaSharp;
@@ -36,44 +34,12 @@ public sealed class TeaRuntimeOptions
     public ScreenOptions Screen { get; set; } = ScreenOptions.Empty;
 
     [EditorBrowsable(EditorBrowsableState.Advanced)]
-    public bool EnableCapabilityProbe { get; set; } = true;
-
-    [EditorBrowsable(EditorBrowsableState.Advanced)]
-    public TimeSpan CapabilityProbeTimeout { get; set; } = TimeSpan.FromMilliseconds(260);
-
-    [EditorBrowsable(EditorBrowsableState.Advanced)]
-    public int MaxConcurrentEffects { get; set; }
-
-    [EditorBrowsable(EditorBrowsableState.Advanced)]
-    public IProgramRenderer? Renderer { get; set; }
-
-    [EditorBrowsable(EditorBrowsableState.Advanced)]
-    public AnsiRendererOptions? AnsiRendererOptions { get; set; }
-
-    [EditorBrowsable(EditorBrowsableState.Advanced)]
-    public ITerminalAdapter? Terminal { get; set; }
-
-    [EditorBrowsable(EditorBrowsableState.Advanced)]
-    public TerminalCapabilityProfile? TerminalCapabilities { get; set; }
-
-    [EditorBrowsable(EditorBrowsableState.Advanced)]
-    public Func<TerminalCapabilityProfile>? TerminalCapabilityDetector { get; set; }
-
-    [EditorBrowsable(EditorBrowsableState.Advanced)]
-    public TerminalColorProfile? ColorProfile { get; set; }
-
-    [EditorBrowsable(EditorBrowsableState.Advanced)]
-    public Func<TerminalColorProfile>? ColorProfileDetector { get; set; }
-
-    [EditorBrowsable(EditorBrowsableState.Advanced)]
-    public IEventDecoder? EventDecoder { get; set; }
-
-    [EditorBrowsable(EditorBrowsableState.Advanced)]
-    public IReadOnlyList<int>? CapabilityProbeModes { get; set; }
+    public TeaHostingOptions Hosting { get; set; } = new();
 
     internal ProgramOptions ToProgramOptions(TeaApp app)
     {
         ArgumentNullException.ThrowIfNull(app);
+        var hosting = Hosting;
 
         return new ProgramOptions
         {
@@ -101,18 +67,18 @@ public sealed class TeaRuntimeOptions
             EnableResizeSignals = EnableResizeSignals,
             ResizePollInterval = ResizePollInterval,
             MinResizePollInterval = MinResizePollInterval,
-            EnableCapabilityProbe = EnableCapabilityProbe,
-            CapabilityProbeTimeout = CapabilityProbeTimeout,
-            MaxConcurrentEffects = MaxConcurrentEffects,
-            Renderer = Renderer,
-            AnsiRendererOptions = AnsiRendererOptions,
-            Terminal = Terminal,
-            TerminalCapabilities = TerminalCapabilities,
-            TerminalCapabilityDetector = TerminalCapabilityDetector,
-            ColorProfile = ColorProfile,
-            ColorProfileDetector = ColorProfileDetector,
-            EventDecoder = EventDecoder,
-            CapabilityProbeModes = CapabilityProbeModes,
+            EnableCapabilityProbe = hosting?.EnableCapabilityProbe ?? true,
+            CapabilityProbeTimeout = hosting?.CapabilityProbeTimeout ?? TimeSpan.FromMilliseconds(260),
+            MaxConcurrentEffects = hosting?.MaxConcurrentEffects ?? 0,
+            Renderer = hosting?.Renderer,
+            AnsiRendererOptions = hosting?.AnsiRendererOptions,
+            Terminal = hosting?.Terminal,
+            TerminalCapabilities = hosting?.TerminalCapabilities,
+            TerminalCapabilityDetector = hosting?.TerminalCapabilityDetector,
+            ColorProfile = hosting?.ColorProfile,
+            ColorProfileDetector = hosting?.ColorProfileDetector,
+            EventDecoder = hosting?.EventDecoder,
+            CapabilityProbeModes = hosting?.CapabilityProbeModes,
         };
     }
 }
