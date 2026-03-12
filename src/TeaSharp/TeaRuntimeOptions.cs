@@ -1,14 +1,11 @@
 using System.ComponentModel;
 using TeaSharp.Core.Application;
-using TeaSharp.Hosting;
 using TeaSharp.Internal;
 
 namespace TeaSharp;
 
 public sealed class TeaRuntimeOptions
 {
-    public Func<TeaApp, Message, Message?>? MessageFilter { get; set; }
-
     public int MaxFps { get; set; } = 60;
 
     public bool AdaptiveFramePacing { get; set; } = true;
@@ -21,8 +18,6 @@ public sealed class TeaRuntimeOptions
 
     public bool CatchEffectExceptions { get; set; } = true;
 
-    public Func<Exception, Message?>? MapEffectException { get; set; }
-
     public TimeSpan EscapeTimeout { get; set; } = TimeSpan.FromMilliseconds(50);
 
     public bool EnableResizeSignals { get; set; } = true;
@@ -33,21 +28,17 @@ public sealed class TeaRuntimeOptions
 
     public ScreenOptions Screen { get; set; } = ScreenOptions.Empty;
 
-    [EditorBrowsable(EditorBrowsableState.Advanced)]
-    public TeaHostingOptions Hosting { get; set; } = new();
-
-    internal ProgramOptions ToProgramOptions(TeaApp app)
+    internal ProgramOptions ToProgramOptions(TeaApp app, TeaSharp.Hosting.TeaHostingOptions? hosting = null)
     {
         ArgumentNullException.ThrowIfNull(app);
-        var hosting = Hosting;
 
         return new ProgramOptions
         {
-            MessageFilter = MessageFilter is null
+            MessageFilter = hosting?.MessageFilter is null
                 ? null
                 : (_, message) =>
                 {
-                    var filtered = MessageFilter(app, TeaMessageAdapter.ToPublic(message));
+                    var filtered = hosting.MessageFilter(app, TeaMessageAdapter.ToPublic(message));
                     return filtered is null ? null : TeaMessageAdapter.ToCore(filtered);
                 },
             MaxFps = MaxFps,
@@ -56,11 +47,11 @@ public sealed class TeaRuntimeOptions
             DisableInput = DisableInput,
             UseConsoleKeyEvents = UseConsoleKeyEvents,
             CatchEffectExceptions = CatchEffectExceptions,
-            MapEffectException = MapEffectException is null
+            MapEffectException = hosting?.MapEffectException is null
                 ? null
                 : exception =>
                 {
-                    var mapped = MapEffectException(exception);
+                    var mapped = hosting.MapEffectException(exception);
                     return mapped is null ? null : TeaMessageAdapter.ToCore(mapped);
                 },
             EscapeTimeout = EscapeTimeout,

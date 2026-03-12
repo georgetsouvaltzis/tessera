@@ -61,11 +61,14 @@ internal static class RuntimeApiContractTests
             "RuntimeApi_TeaHostFactoryOverloads_AreMarkedAdvanced",
             TeaHostFactoryOverloads_AreMarkedAdvanced);
         yield return new TestCase(
-            "RuntimeApi_TeaRuntimeOptions_UsePublicMessageContracts",
-            TeaRuntimeOptions_UsePublicMessageContracts);
+            "RuntimeApi_TeaHostingOptions_UsePublicMessageContracts",
+            TeaHostingOptions_UsePublicMessageContracts);
         yield return new TestCase(
-            "RuntimeApi_TeaRuntimeOptions_ExposeSingleAdvancedHostingProperty",
-            TeaRuntimeOptions_ExposeSingleAdvancedHostingProperty);
+            "RuntimeApi_TeaRuntimeOptions_DoNotExposeHostingOrInterceptionHooks",
+            TeaRuntimeOptions_DoNotExposeHostingOrInterceptionHooks);
+        yield return new TestCase(
+            "RuntimeApi_TeaHostApplicationOverloads_AreMarkedAdvanced",
+            TeaHostApplicationOverloads_AreMarkedAdvanced);
         yield return new TestCase(
             "RuntimeApi_TeaProgramConstructor_IsMarkedAdvanced",
             TeaProgramConstructor_IsMarkedAdvanced);
@@ -173,43 +176,25 @@ internal static class RuntimeApiContractTests
         return Task.CompletedTask;
     }
 
-    private static Task TeaRuntimeOptions_UsePublicMessageContracts()
+    private static Task TeaHostingOptions_UsePublicMessageContracts()
     {
-        var messageFilter = typeof(TeaRuntimeOptions).GetProperty(nameof(TeaRuntimeOptions.MessageFilter));
-        var mapEffectException = typeof(TeaRuntimeOptions).GetProperty(nameof(TeaRuntimeOptions.MapEffectException));
+        var messageFilter = typeof(TeaHostingOptions).GetProperty(nameof(TeaHostingOptions.MessageFilter));
+        var mapEffectException = typeof(TeaHostingOptions).GetProperty(nameof(TeaHostingOptions.MapEffectException));
 
-        TestAssert.True(messageFilter is not null, "TeaRuntimeOptions.MessageFilter should exist.");
-        TestAssert.True(mapEffectException is not null, "TeaRuntimeOptions.MapEffectException should exist.");
-        TestAssert.True(messageFilter!.PropertyType == typeof(Func<TeaApp, Message, Message>), "TeaRuntimeOptions.MessageFilter should use TeaApp and Message, not core runtime types.");
-        TestAssert.True(mapEffectException!.PropertyType == typeof(Func<Exception, Message>), "TeaRuntimeOptions.MapEffectException should use public Message contracts.");
+        TestAssert.True(messageFilter is not null, "TeaHostingOptions.MessageFilter should exist.");
+        TestAssert.True(mapEffectException is not null, "TeaHostingOptions.MapEffectException should exist.");
+        TestAssert.True(messageFilter!.PropertyType == typeof(Func<TeaApp, Message, Message>), "TeaHostingOptions.MessageFilter should use TeaApp and Message, not core runtime types.");
+        TestAssert.True(mapEffectException!.PropertyType == typeof(Func<Exception, Message>), "TeaHostingOptions.MapEffectException should use public Message contracts.");
         return Task.CompletedTask;
     }
 
-    private static Task TeaRuntimeOptions_ExposeSingleAdvancedHostingProperty()
+    private static Task TeaRuntimeOptions_DoNotExposeHostingOrInterceptionHooks()
     {
-        var hosting = typeof(TeaRuntimeOptions).GetProperty(nameof(TeaRuntimeOptions.Hosting));
-
-        TestAssert.True(hosting is not null, "TeaRuntimeOptions.Hosting should exist.");
-        TestAssert.True(hosting!.PropertyType == typeof(TeaHostingOptions), "TeaRuntimeOptions.Hosting should be the single hosting-specific escape hatch on the root runtime options type.");
-
-        var hostingAttribute = (EditorBrowsableAttribute?)Attribute.GetCustomAttribute(hosting, typeof(EditorBrowsableAttribute));
-        TestAssert.True(hostingAttribute is not null, "TeaRuntimeOptions.Hosting should be marked advanced.");
-        TestAssert.True(hostingAttribute!.State == EditorBrowsableState.Advanced, "TeaRuntimeOptions.Hosting should stay out of default discovery.");
-
         string[] removedProperties =
         [
-            "EnableCapabilityProbe",
-            "CapabilityProbeTimeout",
-            "MaxConcurrentEffects",
-            "Renderer",
-            "AnsiRendererOptions",
-            "Terminal",
-            "TerminalCapabilities",
-            "TerminalCapabilityDetector",
-            "ColorProfile",
-            "ColorProfileDetector",
-            "EventDecoder",
-            "CapabilityProbeModes",
+            "MessageFilter",
+            "MapEffectException",
+            "Hosting",
         ];
 
         foreach (var propertyName in removedProperties)
@@ -218,6 +203,30 @@ internal static class RuntimeApiContractTests
             TestAssert.True(property is null, $"TeaRuntimeOptions should no longer expose {propertyName} directly.");
         }
 
+        return Task.CompletedTask;
+    }
+
+    private static Task TeaHostApplicationOverloads_AreMarkedAdvanced()
+    {
+        var createApplication = typeof(TeaHost).GetMethod(
+            nameof(TeaHost.CreateApplication),
+            BindingFlags.Public | BindingFlags.Static,
+            [typeof(TeaApp), typeof(TeaRuntimeOptions), typeof(TeaHostingOptions)]);
+        var runAsync = typeof(TeaHost).GetMethod(
+            nameof(TeaHost.RunAsync),
+            BindingFlags.Public | BindingFlags.Static,
+            [typeof(TeaApp), typeof(TeaRuntimeOptions), typeof(TeaHostingOptions), typeof(CancellationToken)]);
+
+        TestAssert.True(createApplication is not null, "TeaHost.CreateApplication should exist for advanced hosting.");
+        TestAssert.True(runAsync is not null, "TeaHost.RunAsync should exist for advanced hosting.");
+
+        var createAttribute = (EditorBrowsableAttribute?)Attribute.GetCustomAttribute(createApplication!, typeof(EditorBrowsableAttribute));
+        var runAttribute = (EditorBrowsableAttribute?)Attribute.GetCustomAttribute(runAsync!, typeof(EditorBrowsableAttribute));
+
+        TestAssert.True(createAttribute is not null, "TeaHost.CreateApplication should be marked advanced.");
+        TestAssert.True(createAttribute!.State == EditorBrowsableState.Advanced, "TeaHost.CreateApplication should stay out of default discovery.");
+        TestAssert.True(runAttribute is not null, "TeaHost.RunAsync should be marked advanced.");
+        TestAssert.True(runAttribute!.State == EditorBrowsableState.Advanced, "TeaHost.RunAsync should stay out of default discovery.");
         return Task.CompletedTask;
     }
 

@@ -13,7 +13,6 @@ These are the types new applications should discover first.
 - `TeaApplication`
 - `TeaApplicationBuilder`
 - `TeaRuntimeOptions`
-- `TeaRuntimeOptions.Hosting` only when you intentionally need advanced hosting seams
 - `TeaEffect`
 - `TeaEffects`
 - `Message` and the typed message records in `TeaSharp`
@@ -59,6 +58,8 @@ These APIs remain public because they still offer real value, but they should no
 
 - `TeaSharp.Hosting.TeaProgramOptions`
 - `TeaSharp.Hosting.TeaHostingOptions`
+- `TeaSharp.Hosting.TeaHost.CreateApplication(...)`
+- `TeaSharp.Hosting.TeaHost.RunAsync(...)`
 - `IScreen`
 - `ProgramOptions`
 - `TeaProgram`

@@ -12,6 +12,9 @@ namespace TeaSharp.Hosting;
 public sealed class TeaHostingOptions
 {
     [EditorBrowsable(EditorBrowsableState.Advanced)]
+    public Func<TeaApp, Message, Message?>? MessageFilter { get; set; }
+
+    [EditorBrowsable(EditorBrowsableState.Advanced)]
     public bool EnableCapabilityProbe { get; set; } = true;
 
     [EditorBrowsable(EditorBrowsableState.Advanced)]
@@ -46,4 +49,7 @@ public sealed class TeaHostingOptions
 
     [EditorBrowsable(EditorBrowsableState.Advanced)]
     public IReadOnlyList<int>? CapabilityProbeModes { get; set; }
+
+    [EditorBrowsable(EditorBrowsableState.Advanced)]
+    public Func<Exception, Message?>? MapEffectException { get; set; }
 }
