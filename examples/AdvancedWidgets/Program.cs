@@ -251,24 +251,25 @@ internal sealed class AdvancedWidgetsApp : TeaApp
         right.AddFill(_tree);
         right.AddFill(_notifications);
 
-        LayoutNode body = right;
+        LayoutNode? overlay = null;
         if (_palette.IsVisible)
         {
-            body = new CenterLayout(
+            overlay = new CenterLayout(
                 _palette,
                 width: Math.Min(72, Math.Max(48, context.Width - 6)),
                 height: Math.Min(14, Math.Max(8, context.Height - 4)));
         }
         else if (_contextMenu.IsVisible)
         {
-            body = new CenterLayout(_contextMenu, width: 32, height: 8);
+            overlay = new CenterLayout(_contextMenu, width: 32, height: 8);
         }
 
         return Screen.From(new WindowLayout
         {
             Footer = LayoutSlot.Fixed(_status, 1),
             Left = LayoutSlot.Fixed(left, Math.Min(38, Math.Max(30, context.Width / 3))),
-            Body = body,
+            Body = right,
+            Overlay = overlay,
             Padding = Thickness.All(1),
             Gap = 1,
         });

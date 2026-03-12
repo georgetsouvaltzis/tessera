@@ -36,6 +36,9 @@ internal static class TeaAppCompositionTests
             "TeaAppComposition_RequestEffect_AllowsHandledControlInputToTriggerRuntimeEffect",
             RequestEffect_AllowsHandledControlInputToTriggerRuntimeEffect);
         yield return new TestCase(
+            "TeaAppComposition_VisibleOverlayCanClaimFocusThroughRootLayouts",
+            VisibleOverlayCanClaimFocusThroughRootLayouts);
+        yield return new TestCase(
             "TeaAppComposition_LegacyLayoutHelpers_AreMarkedAdvanced",
             LegacyLayoutHelpers_AreMarkedAdvanced);
         yield return new TestCase(
@@ -162,6 +165,22 @@ internal static class TeaAppCompositionTests
 
         TestAssert.True(effect is not null, "Handled control input should still be able to schedule runtime effects.");
         TestAssert.Equal(0, app.KeyUpdateCount, "Handled control input should not reach the default Update method.");
+        return Task.CompletedTask;
+    }
+
+    private static Task VisibleOverlayCanClaimFocusThroughRootLayouts()
+    {
+        var app = new OverlayPaletteApp();
+        var screen = app.RuntimeScreen;
+
+        TestAssert.True(app.Palette.IsFocused, "Overlay test should start with the palette requesting focus.");
+        screen.Update(new WindowSizeMsg(80, 24));
+        screen.Render();
+        TestAssert.True(app.Palette.IsFocused, "Visible overlay should own focus after the screen is composed.");
+        screen.Update(new KeyPressMsg(KeyCode.Enter));
+
+        TestAssert.Equal("rollback", app.LastExecutedItemId, "Visible overlays should be able to claim focus through the root layout model.");
+        TestAssert.Equal(0, app.ButtonActivationCount, "Overlay focus should keep the underlying body control from activating.");
         return Task.CompletedTask;
     }
 
@@ -498,6 +517,43 @@ internal static class TeaAppCompositionTests
             Screen.From(new WindowLayout
             {
                 Body = new CenterLayout(Button, width: 16, height: 3),
+            });
+    }
+
+    private sealed class OverlayPaletteApp : TeaApp
+    {
+        public Button Button { get; } = new() { Text = "Base" };
+
+        public CommandPalette Palette { get; } = new()
+        {
+            Title = "Actions",
+            IsFocused = true,
+        };
+
+        public int ButtonActivationCount { get; private set; }
+
+        public string LastExecutedItemId { get; private set; } = string.Empty;
+
+        public OverlayPaletteApp()
+        {
+            Button.Activated += (_, _) => ButtonActivationCount++;
+            Palette.SetItems(
+            [
+                new global::TeaSharp.Controls.CommandPaletteItem("deploy", "Deploy", "publish release"),
+                new global::TeaSharp.Controls.CommandPaletteItem("rollback", "Rollback", "restore previous"),
+            ]);
+            Palette.ItemExecuted += (_, args) => LastExecutedItemId = args.ItemId;
+            Palette.Open();
+            Palette.QueryText = "roll";
+        }
+
+        public override TeaEffect? Update(Message message) => null;
+
+        public override Screen Build(ScreenContext context) =>
+            Screen.From(new WindowLayout
+            {
+                Body = new CenterLayout(Button, width: 16, height: 3),
+                Overlay = new CenterLayout(Palette, width: 48, height: 10),
             });
     }
 }
