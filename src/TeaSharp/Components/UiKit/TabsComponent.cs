@@ -5,10 +5,12 @@ using TeaSharp.Components.Styling;
 using TeaSharp.Components.UiKit.Internal;
 using TeaSharp.Core.Abstractions;
 using TeaSharp.Core.Messages;
+using System.ComponentModel;
 using TeaSharp.Widgets;
 
 namespace TeaSharp.Components.UiKit;
 
+[EditorBrowsable(EditorBrowsableState.Advanced)]
 public sealed class TabsComponent : IStatefulComponent, IMouseStatefulComponent, IFocusableComponent
 {
     private readonly List<string> _tabs = [];

@@ -19,6 +19,8 @@ Use `TeaSharp.Controls.Control` when you want a reusable interactive widget.
 
 This keeps custom widgets independent from `InputRouter`, `ScreenRegionKey`, and other screen-scale routing types.
 
+Custom controls also compose directly into the default layout model because `Control` still participates in the underlying component contracts.
+
 ## Minimal Custom Control
 
 ```csharp

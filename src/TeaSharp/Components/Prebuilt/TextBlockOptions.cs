@@ -5,8 +5,10 @@ using TeaSharp.Components.Prebuilt.Internal;
 using TeaSharp.Components.Primitives;
 using TeaSharp.Components.Styling;
 using TeaSharp.Layout;
+using System.ComponentModel;
 namespace TeaSharp.Components.Prebuilt;
 
+[EditorBrowsable(EditorBrowsableState.Advanced)]
 public sealed record TextBlockOptions(
     string Text = "",
     string? Title = null,

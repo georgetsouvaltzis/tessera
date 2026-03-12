@@ -1,31 +1,43 @@
-using TeaSharp.Components.Prebuilt;
-using TeaSharp.Components.Primitives;
-using TeaSharp.Components.UiKit;
 using TeaSharp;
-using TeaSharp.Core.Abstractions;
-using TeaSharp.Core.Application;
-using TeaSharp.Core.Messages;
-using ModelView = TeaSharp.Core.Abstractions.ScreenOutput;
+using TeaSharp.Controls;
+using TeaSharp.Layout;
 
-var program = Tea.CreateProgram(new DropdownDemoModel(), new TeaProgramOptions
-{
-    UseConsoleKeyEvents = false,
-});
+var app = Tea.CreateBuilder()
+    .UseApp<ChoiceDemoApp>()
+    .ConfigureRuntime(static runtime =>
+    {
+        runtime.Screen = new ScreenOptions
+        {
+            AltScreen = true,
+            WindowTitle = "TeaSharp Choice Example",
+            EnableFocusReporting = true,
+            MouseTracking = MouseTrackingMode.AllMotion,
+        };
+    })
+    .Build();
 
-try
-{
-    await program.RunAsync();
-    return 0;
-}
-catch (TeaProgramInterruptedException)
-{
-    return 130;
-}
+await app.RunAsync();
 
-internal sealed class DropdownDemoModel : IScreen
+internal sealed class ChoiceDemoApp : TeaApp
 {
-    private readonly DropdownComponent _dropdown = new(new DropdownOptions(
-        Items:
+    private readonly Choice _choice = new()
+    {
+        Title = "Environment",
+        MaxVisibleItems = 6,
+    };
+
+    private readonly Label _details = new()
+    {
+        Title = "Selection",
+        Border = TeaSharp.Components.Primitives.BorderStyle.SingleLine,
+        Padding = TeaSharp.Components.Primitives.Thickness.All(1),
+    };
+
+    private readonly StatusBar _status = new();
+
+    public ChoiceDemoApp()
+    {
+        _choice.SetItems(
         [
             "Development",
             "Staging",
@@ -35,144 +47,54 @@ internal sealed class DropdownDemoModel : IScreen
             "Benchmark",
             "QA",
             "Sandbox",
-        ],
-        Title: "Environment",
-        IsFocused: true,
-        MaxVisibleItems: 6));
+        ]);
 
-    private int _width = 90;
-    private int _height = 28;
-    private string _lastEvent = "ready";
-
-    public DropdownDemoModel()
-    {
-    }
-
-    public Effect? Init() => null;
-
-    public Effect? Update(IMessage message)
-    {
-        if (message is WindowSizeMsg ws)
+        _choice.SelectionChanged += (_, args) =>
         {
-            _width = ws.Width;
-            _height = ws.Height;
-            _lastEvent = $"resize:{_width}x{_height}";
-            return null;
-        }
-
-        if (message is MouseMsg mouse)
-        {
-            var mouseWasOpen = _dropdown.IsOpen;
-            var mousePrevious = _dropdown.SelectedItem;
-            if (_dropdown.UpdateMouse(mouse, GetDropdownRect()))
-            {
-                if (!string.Equals(mousePrevious, _dropdown.SelectedItem, StringComparison.Ordinal))
-                {
-                    _lastEvent = $"selected:{_dropdown.SelectedItem}";
-                }
-                else if (!mouseWasOpen && _dropdown.IsOpen)
-                {
-                    _lastEvent = "mouse:open";
-                }
-                else if (mouseWasOpen && !_dropdown.IsOpen)
-                {
-                    _lastEvent = "mouse:close";
-                }
-                else
-                {
-                    _lastEvent = $"mouse:{mouse.EventType.ToString().ToLowerInvariant()}";
-                }
-            }
-
-            return null;
-        }
-
-        if (message is not KeyPressMsg key)
-        {
-            return null;
-        }
-
-        if ((key.Modifiers.HasFlag(KeyModifiers.Ctrl) && key.IsCharacter('c'))
-            || key.IsCharacter('q', KeyModifiers.None))
-        {
-            return Tea.Effects.Quit;
-        }
-
-        var wasOpen = _dropdown.IsOpen;
-        var previous = _dropdown.SelectedItem;
-        if (_dropdown.Update(key))
-        {
-            if (!string.Equals(previous, _dropdown.SelectedItem, StringComparison.Ordinal))
-            {
-                _lastEvent = $"selected:{_dropdown.SelectedItem}";
-            }
-            else if (!wasOpen && _dropdown.IsOpen)
-            {
-                _lastEvent = "dropdown:open";
-            }
-            else if (wasOpen && !_dropdown.IsOpen)
-            {
-                _lastEvent = "dropdown:close";
-            }
-            else
-            {
-                _lastEvent = $"key:{key.Keystroke()}";
-            }
-        }
-
-        return null;
-    }
-
-    public ModelView Render()
-    {
-        var width = Math.Max(56, _width);
-        var height = Math.Max(18, _height);
-
-        var canvas = new Canvas(width, height, CanvasTextMode.GraphemeAware);
-        canvas.Clear();
-
-        var frame = new Rect(0, 0, width, height);
-        canvas.DrawBox(frame, "TeaSharp Dropdown Example", BorderStyle.Rounded);
-
-        var body = frame.Inset(2, 2);
-        canvas.WriteText(body.X, body.Y, "Controls: enter/space open+select, up/down navigate, esc close, mouse click+wheel, q quit", body.Width);
-
-        var dropdownRect = GetDropdownRect();
-        _dropdown.Render(canvas, dropdownRect);
-
-        canvas.WriteText(body.X, body.Bottom - 3, $"Current: {_dropdown.SelectedItem}", body.Width);
-        canvas.WriteText(body.X, body.Bottom - 2, $"Open: {(_dropdown.IsOpen ? "yes" : "no")}", body.Width);
-
-        var status = new StatusBarComponent
-        {
-            LeftText = "widget=dropdown mode=demo",
-            RightText = $"event={_lastEvent}",
-            Theme = new UiTheme(StatusFill: '·'),
+            _details.Text = $"Current: {args.SelectedItem}";
+            _status.RightText = $"selected={args.SelectedItem}";
         };
-        status.Render(canvas, new Rect(0, height - 1, width, 1));
 
-        return ModelView.From(canvas.Render()) with
-        {
-            Terminal = new TerminalOutput
-            {
-                AltScreen = true,
-                EnableBracketedPaste = true,
-                EnableFocusReporting = true,
-                MouseMode = MouseMode.AllMotion,
-                ForegroundColor = "#CDD6F4",
-                BackgroundColor = "#1E1E2E",
-                CursorColor = "#F5C2E7",
-                WindowTitle = "TeaSharp Dropdown Example",
-            },
-        };
+        _details.Text = $"Current: {_choice.SelectedItem}";
+        _status.RightText = "ready";
     }
 
-    private Rect GetDropdownRect()
+    public override TeaEffect? Update(Message message)
     {
-        var width = Math.Max(56, _width);
-        var height = Math.Max(18, _height);
-        var frame = new Rect(0, 0, width, height);
-        var body = frame.Inset(2, 2);
-        return new Rect(body.X, body.Y + 2, body.Width, Math.Min(10, body.Height - 6));
+        if (HandleScreenInput(message))
+        {
+            return null;
+        }
+
+        return message is KeyPressed key && (key.IsCharacter('q') || key.IsCharacter('c', ModifierKeys.Ctrl))
+            ? TeaEffects.Quit
+            : null;
+    }
+
+    public override Screen Build(ScreenContext context)
+    {
+        _status.LeftText = "Enter/Space open-select   Up/Down move   q quit";
+
+        return Screen.From(
+            new DockLayout(
+                bottom: new LayoutSlot(_status, LayoutLength.Fixed(1)),
+                fill: new LayoutSlot(
+                    new CenterLayout(
+                        new PanelLayout(
+                            new StackLayout(
+                                LayoutOrientation.Vertical,
+                                gap: 1,
+                                children:
+                                [
+                                    new LayoutSlot(_choice, LayoutLength.Fixed(8)),
+                                    new LayoutSlot(_details, LayoutLength.Fixed(5)),
+                                ]),
+                            title: "TeaSharp Choice",
+                            border: TeaSharp.Components.Primitives.BorderStyle.Rounded,
+                            padding: TeaSharp.Components.Primitives.Thickness.All(1)),
+                        width: Math.Min(54, Math.Max(32, context.Width - 4)),
+                        height: 16),
+                    LayoutLength.Fill()),
+                padding: TeaSharp.Components.Primitives.Thickness.All(1)));
     }
 }

@@ -5,12 +5,14 @@ using TeaSharp.Components.Prebuilt.Internal;
 using TeaSharp.Components.Primitives;
 using TeaSharp.Components.Styling;
 using TeaSharp.Widgets;
+using System.ComponentModel;
 
 namespace TeaSharp.Components.Prebuilt;
 
 /// <summary>
 /// Defines the one-shot configuration used to construct a <see cref="TextInputComponent"/>.
 /// </summary>
+[EditorBrowsable(EditorBrowsableState.Advanced)]
 public sealed record TextInputOptions(
     string Title = "Text Input",
     string Placeholder = "",

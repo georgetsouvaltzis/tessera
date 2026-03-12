@@ -1,8 +1,11 @@
+using System.ComponentModel;
+
 namespace TeaSharp.Components.Prebuilt;
 
 /// <summary>
 /// Describes a cancelled text-input value.
 /// </summary>
+[EditorBrowsable(EditorBrowsableState.Advanced)]
 public sealed class TextInputCancelledEventArgs : EventArgs
 {
     /// <summary>

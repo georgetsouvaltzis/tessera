@@ -5,12 +5,14 @@ using TeaSharp.Components.Prebuilt.Internal;
 using TeaSharp.Components.Primitives;
 using TeaSharp.Components.Styling;
 using TeaSharp.Widgets;
+using System.ComponentModel;
 
 namespace TeaSharp.Components.Prebuilt;
 
 /// <summary>
 /// Defines the one-shot configuration used to construct a <see cref="ButtonComponent"/>.
 /// </summary>
+[EditorBrowsable(EditorBrowsableState.Advanced)]
 public sealed record ButtonOptions(
     string Label = "Button",
     string? Description = null,

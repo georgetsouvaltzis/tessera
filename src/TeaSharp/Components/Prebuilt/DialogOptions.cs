@@ -5,6 +5,7 @@ using TeaSharp.Components.Prebuilt.Internal;
 using TeaSharp.Components.Primitives;
 using TeaSharp.Components.Styling;
 using TeaSharp.Widgets;
+using System.ComponentModel;
 
 namespace TeaSharp.Components.Prebuilt;
 
@@ -20,6 +21,7 @@ namespace TeaSharp.Components.Prebuilt;
 /// <param name="Theme">Optional UI theme override.</param>
 /// <param name="AcceptKey">Optional key binding used to accept the dialog.</param>
 /// <param name="DismissKey">Optional key binding used to dismiss the dialog.</param>
+[EditorBrowsable(EditorBrowsableState.Advanced)]
 public sealed record DialogOptions(
     string Title = "Dialog",
     IReadOnlyList<string>? BodyLines = null,

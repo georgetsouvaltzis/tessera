@@ -10,10 +10,12 @@ using TeaSharp.Core.Messages;
 using TeaSharp.Layout;
 using TeaSharp.Styles;
 using System.Globalization;
+using System.ComponentModel;
 using TeaSharp.Widgets;
 
 namespace TeaSharp.Components.Prebuilt;
 
+[EditorBrowsable(EditorBrowsableState.Advanced)]
 public sealed class TextBlockComponent : ICanvasComponent
 {
     public TextBlockComponent()

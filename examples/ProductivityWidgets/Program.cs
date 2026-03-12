@@ -1,402 +1,175 @@
-using System.Globalization;
-using System.Text;
 using TeaSharp;
-using TeaSharp.Components.Composition;
-using TeaSharp.Components.Prebuilt;
-using TeaSharp.Components.Primitives;
-using TeaSharp.Components.Productivity;
-using TeaSharp.Components.Styling;
-using TeaSharp.Components.UiKit;
-using TeaSharp.Core.Abstractions;
-using TeaSharp.Core.Application;
-using TeaSharp.Core.Messages;
-using ModelView = TeaSharp.Core.Abstractions.ScreenOutput;
+using TeaSharp.Controls;
+using TeaSharp.Layout;
 
-var program = Tea.CreateProgram(new ProductivityWidgetsModel(), new TeaProgramOptions
-{
-    UseConsoleKeyEvents = false,
-});
-
-try
-{
-    await program.RunAsync();
-    return 0;
-}
-catch (TeaProgramInterruptedException)
-{
-    return 130;
-}
-
-internal sealed class ProductivityWidgetsModel : InteractiveScreenModel
-{
-    private static readonly ScreenRegionKey MenuRegionId = new("productivity.menu");
-    private static readonly ScreenRegionKey NumberRegionId = new("productivity.number");
-    private static readonly ScreenRegionKey DateRegionId = new("productivity.date");
-    private static readonly ScreenRegionKey TimeRegionId = new("productivity.time");
-    private static readonly ScreenRegionKey MarkdownRegionId = new("productivity.markdown");
-    private static readonly ScreenRegionKey ContextRegionId = new("productivity.context");
-
-    private readonly MenuBarComponent _menu = new(new MenuBarOptions(IsFocused: true));
-    private readonly ContextMenuComponent _context = new(new ContextMenuOptions(Title: "Actions"));
-    private readonly NumberInputComponent _number = new(new NumberInputOptions(
-        Title: "Estimate (hours)",
-        Min: 0,
-        Max: 100,
-        Step: 0.5,
-        Precision: 1));
-    private readonly DatePickerComponent _date = new(new DatePickerOptions(Title: "Due Date"));
-    private readonly TimePickerComponent _time = new(new TimePickerOptions(
-        Title: "Reminder Time",
-        MinuteStep: 5,
-        SecondStep: 15));
-    private readonly MarkdownViewerComponent _markdown = new(new MarkdownViewerOptions(
-        Title: "Project Notes",
-        ShowLineNumbers: true));
-    private readonly StatusBarComponent _status = new(new StatusBarOptions(
-        Theme: new UiTheme(StatusFill: '·')));
-    private readonly ScreenFocusChain _focusChain;
-    private ScreenFocusSnapshot _contextFocusSnapshot;
-    private bool _pendingContextFocus;
-    private int _width = 120;
-    private int _height = 36;
-    private string _lastEvent = "ready";
-    private string? _pendingActionEvent;
-
-    public ProductivityWidgetsModel()
+var app = Tea.CreateBuilder()
+    .UseApp<ProductivityApp>()
+    .ConfigureRuntime(static runtime =>
     {
-        _focusChain = CreateFocusChain(MenuRegionId, NumberRegionId, DateRegionId, TimeRegionId, MarkdownRegionId);
-        ConfigureInputRouter();
+        runtime.Screen = new ScreenOptions
+        {
+            AltScreen = true,
+            WindowTitle = "TeaSharp Productivity Example",
+            EnableFocusReporting = true,
+            MouseTracking = MouseTrackingMode.AllMotion,
+        };
+    })
+    .Build();
 
+await app.RunAsync();
+
+internal sealed class ProductivityApp : TeaApp
+{
+    private readonly MenuBar _menu = new();
+    private readonly Tabs _tabs = new("Backlog", "Today", "Done");
+    private readonly ListView<string> _tasks = new();
+    private readonly Table _table = new("Metric", "Value");
+    private readonly TextInput _command = new()
+    {
+        Title = "Quick Command",
+        Placeholder = "type refresh or help",
+        Border = TeaSharp.Components.Primitives.BorderStyle.SingleLine,
+        Padding = TeaSharp.Components.Primitives.Thickness.All(1),
+        ClearOnSubmit = true,
+    };
+    private readonly StatusBar _status = new();
+
+    private readonly Dictionary<string, string[]> _taskSets = new(StringComparer.Ordinal)
+    {
+        ["Backlog"] = ["Review API names", "Replace legacy docs", "Add migration guide", "Audit examples"],
+        ["Today"] = ["Finalize composition wrappers", "Verify integrations", "Write control tests"],
+        ["Done"] = ["TeaApp foundation", "Showcase migration", "Legacy discoverability pass"],
+    };
+
+    public ProductivityApp()
+    {
         _menu.SetItems(
         [
-            new MenuBarItem("new", "New", 'n'),
-            new MenuBarItem("save", "Save", 's'),
-            new MenuBarItem("export", "Export", 'e'),
-            new MenuBarItem("help", "Help", 'h'),
+            new MenuItem("refresh", "Refresh", 'r'),
+            new MenuItem("focus", "Focus Help", 'f'),
+            new MenuItem("quit", "Quit", 'q'),
         ]);
-
-        _context.SetItems(
-        [
-            new ContextMenuItem("insert.todo", "Insert TODO", [WidgetVisualState.Warning]),
-            new ContextMenuItem("insert.done", "Insert DONE", [WidgetVisualState.Success]),
-            new ContextMenuItem("insert.error", "Insert ISSUE", [WidgetVisualState.Error]),
-        ]);
-
-        _number.SetValue(4.0);
-        _date.SetDate(new DateOnly(2026, 3, 8));
-        _time.SetValue(new TimeOnly(9, 0, 0));
-        _markdown.SetMarkdown(
-            BuildScrollableMarkdown(
-                "Sprint Plan",
-                "Finalize v1.0",
-                "Polish docs",
-                "Validate examples",
-                "```bash",
-                "dotnet run --project examples/ProductivityWidgets/ProductivityWidgets.csproj",
-                "```"));
 
         _menu.ItemActivated += (_, args) =>
         {
-            ApplyMenuAction(args.ItemId);
-            SetPendingActionEvent($"menu:{args.ItemId}");
+            if (args.ItemId == "refresh")
+            {
+                Refresh();
+            }
+            else if (args.ItemId == "focus")
+            {
+                _status.RightText = "Use Tab / Shift+Tab to move focus.";
+            }
         };
 
-        _context.ItemExecuted += (_, args) =>
+        _tabs.SelectionChanged += (_, args) =>
         {
-            ApplyContextAction(args.ItemId);
-            SetPendingActionEvent($"context:{args.ItemId}");
+            LoadTasks(args.SelectedItem);
         };
+
+        _command.Submitted += (_, args) =>
+        {
+            if (args.Value.Equals("refresh", StringComparison.OrdinalIgnoreCase))
+            {
+                Refresh();
+            }
+            else if (args.Value.Equals("help", StringComparison.OrdinalIgnoreCase))
+            {
+                _status.RightText = "Menu: r refresh   f focus help   q quit";
+            }
+            else
+            {
+                _status.RightText = $"Unknown command: {args.Value}";
+            }
+        };
+
+        _tasks.Title = "Tasks";
+        _tasks.Border = TeaSharp.Components.Primitives.BorderStyle.SingleLine;
+        _tasks.Padding = TeaSharp.Components.Primitives.Thickness.All(1);
+
+        _table.Title = "Summary";
+        _table.Border = TeaSharp.Components.Primitives.BorderStyle.SingleLine;
+        _table.Padding = TeaSharp.Components.Primitives.Thickness.All(1);
+        _table.PageSize = 8;
+
+        LoadTasks("Backlog");
+        Refresh();
     }
 
-    public override Effect? Init() => null;
-
-    public override Effect? Update(IMessage message)
+    public override TeaEffect? Update(Message message)
     {
-        if (message is WindowSizeMsg ws)
+        if (HandleScreenInput(message))
         {
-            _width = ws.Width;
-            _height = ws.Height;
-            _lastEvent = $"resize:{_width}x{_height}";
-            return null;
-        }
-
-        if (message is MouseMsg mouse)
-        {
-            var changed = RouteMouse(mouse);
-            HandleContextLifecycle();
-            if (changed)
+            if (_menu.TryConsumeActivation(out var itemId) && itemId == "quit")
             {
-                _lastEvent = TryConsumePendingActionEvent(out var actionEvent)
-                    ? actionEvent
-                    : $"mouse:{FocusLabel()}";
+                return TeaEffects.Quit;
             }
 
             return null;
         }
 
-        if (message is KeyPressMsg key)
-        {
-            return RouteKey(key);
-        }
-
-        return null;
+        return message is KeyPressed key && key.IsCharacter('c', ModifierKeys.Ctrl)
+            ? TeaEffects.Quit
+            : null;
     }
 
-    public override ModelView Render()
+    public override Screen Build(ScreenContext context)
     {
-        if (_width < 80 || _height < 24)
-        {
-            return ModelView.From("Productivity Widgets\n\nTerminal too small.\nExpand to at least 80x24.");
-        }
+        _status.LeftText = $"Tab={_tabs.Items[_tabs.SelectedIndex]}   Tasks={_tasks.Count}";
 
-        var canvas = new Canvas(_width, _height, CanvasTextMode.GraphemeAware);
-        canvas.Clear();
-
-        RenderScreen(canvas);
-
-        _status.LeftText = $"focus={FocusLabel()} value={_number.Value:0.0} due={_date.SelectedDate:yyyy-MM-dd} time={_time.Value:HH:mm:ss}";
-        _status.RightText = $"event={_lastEvent}";
-        _status.Render(canvas, new Rect(0, _height - 1, _width, 1));
-
-        return ModelView.From(canvas.Render()) with
-        {
-            Terminal = new TerminalOutput
-            {
-                AltScreen = true,
-                EnableBracketedPaste = true,
-                EnableFocusReporting = true,
-                MouseMode = MouseMode.AllMotion,
-                ForegroundColor = "#CDD6F4",
-                BackgroundColor = "#1E1E2E",
-                CursorColor = "#F5C2E7",
-                WindowTitle = "Productivity Widgets",
-            },
-        };
+        return Screen.From(
+            new DockLayout(
+                top: new LayoutSlot(
+                    new StackLayout(
+                        LayoutOrientation.Vertical,
+                        children:
+                        [
+                            new LayoutSlot(_menu, LayoutLength.Fixed(1)),
+                            new LayoutSlot(_tabs, LayoutLength.Fixed(1)),
+                        ]),
+                    LayoutLength.Fixed(2)),
+                bottom: new LayoutSlot(_status, LayoutLength.Fixed(1)),
+                fill: new LayoutSlot(
+                    new SplitLayout(
+                        LayoutOrientation.Horizontal,
+                        new LayoutSlot(_tasks, LayoutLength.Fixed(Math.Min(36, Math.Max(24, context.Width / 3)))),
+                        new LayoutSlot(
+                            new StackLayout(
+                                LayoutOrientation.Vertical,
+                                gap: 1,
+                                children:
+                                [
+                                    new LayoutSlot(_table, LayoutLength.Fill()),
+                                    new LayoutSlot(_command, LayoutLength.Fixed(5)),
+                                ]),
+                            LayoutLength.Fill()),
+                        gap: 1),
+                    LayoutLength.Fill()),
+                gap: 1,
+                padding: TeaSharp.Components.Primitives.Thickness.All(1)));
     }
 
-    protected override Rect GetBodyRect() => new(0, 0, _width, _height - 1);
-
-    protected override bool CanBuildScreen => _width >= 80 && _height >= 24;
-
-    protected override ScreenRegionKey? PreferredFocusRegionKey =>
-        _context.IsVisible
-            ? ContextRegionId
-            : FocusedRegionKey ?? MenuRegionId;
-
-    protected override void ComposeScreen(Rect bodyRect)
+    private void LoadTasks(string tab)
     {
-        var shell = Dashboard(bodyRect, sidebarWidth: Math.Max(36, bodyRect.Width / 3), headerHeight: 1);
-        shell.AddHeader(MenuRegionId, _menu);
-
-        var (numberRect, lowerLeftRect) = Layout.SplitHorizontal(shell.Sidebar, Math.Max(8, shell.Sidebar.Height / 3), minFirst: 7, minSecond: 10);
-        var (dateRect, timeRect) = Layout.SplitHorizontal(lowerLeftRect, Math.Max(10, lowerLeftRect.Height / 2), minFirst: 9, minSecond: 7);
-
-        Screen.AddComponent(NumberRegionId, numberRect, _number);
-        Screen.AddComponent(DateRegionId, dateRect, _date);
-        Screen.AddComponent(TimeRegionId, timeRect, _time);
-        shell.AddMain(MarkdownRegionId, _markdown);
-
-        if (_context.IsVisible)
+        if (!_taskSets.TryGetValue(tab, out var tasks))
         {
-            Screen.AddPaletteComponent(ContextRegionId, shell.Frame.Body, _context);
-            if (_pendingContextFocus)
-            {
-                Screen.SetFocus(ContextRegionId);
-                _pendingContextFocus = false;
-            }
+            tasks = [];
         }
+
+        _tasks.SetItems(tasks);
+        Refresh();
     }
 
-    private void ConfigureInputRouter()
+    private void Refresh()
     {
-        InputRouter
-            .AddScope("productivity.system", InputScopeKind.System, static () => true, HandleSystemKey)
-            .AddScope("productivity.palette", InputScopeKind.Palette, () => _context.IsVisible, HandleContextKey, InputScopeBehavior.CaptureWhileActive)
-            .AddScope("productivity.focused", InputScopeKind.FocusedRegion, () => !_context.IsVisible && FocusedRegionKey is not null, HandleFocusedKey)
-            .AddScope("productivity.global", InputScopeKind.Global, static () => true, HandleGlobalKey);
-    }
+        _table.SetRows(
+        [
+            ["Selected Tab", _tabs.Items[_tabs.SelectedIndex]],
+            ["Visible Tasks", _tasks.Count.ToString(System.Globalization.CultureInfo.InvariantCulture)],
+            ["Focused", Context.HasFocus ? "Yes" : "No"],
+            ["Updated", DateTimeOffset.Now.ToString("HH:mm:ss", System.Globalization.CultureInfo.InvariantCulture)],
+        ]);
 
-    private InputRouteResult HandleSystemKey(KeyPressMsg key)
-    {
-        if ((key.Modifiers.HasFlag(KeyModifiers.Ctrl) && key.IsCharacter('c'))
-            || key.IsCharacter('q', KeyModifiers.None))
-        {
-            return InputRouteResult.FromEffect(Tea.Effects.Quit);
-        }
-
-        return InputRouteResult.NotHandled;
-    }
-
-    private InputRouteResult HandleContextKey(KeyPressMsg key)
-    {
-        var changed = RouteFocusedMessage(key);
-        HandleContextLifecycle();
-        if (!changed)
-        {
-            return InputRouteResult.NotHandled;
-        }
-
-        _lastEvent = TryConsumePendingActionEvent(out var actionEvent)
-            ? actionEvent
-            : $"context:{key.Keystroke()}";
-        return InputRouteResult.HandledWithoutEffect;
-    }
-
-    private InputRouteResult HandleFocusedKey(KeyPressMsg key)
-    {
-        var changed = RouteFocusedMessage(key);
-        if (!changed)
-        {
-            return InputRouteResult.NotHandled;
-        }
-
-        _lastEvent = TryConsumePendingActionEvent(out var actionEvent)
-            ? actionEvent
-            : key.Keystroke();
-        return InputRouteResult.HandledWithoutEffect;
-    }
-
-    private InputRouteResult HandleGlobalKey(KeyPressMsg key)
-    {
-        if (HandleTabNavigation(key, _focusChain))
-        {
-            _lastEvent = $"focus:{FocusLabel()}";
-            return InputRouteResult.HandledWithoutEffect;
-        }
-
-        if (key.IsCharacter('m', KeyModifiers.None))
-        {
-            OpenContextMenu();
-            return InputRouteResult.HandledWithoutEffect;
-        }
-
-        return InputRouteResult.NotHandled;
-    }
-
-    private void OpenContextMenu()
-    {
-        _contextFocusSnapshot = CaptureFocus();
-        _context.OpenAt(Math.Max(0, (_width / 2) - 12), Math.Max(2, (_height / 2) - 3));
-        _context.IsFocused = true;
-        _pendingContextFocus = true;
-        _lastEvent = "context:open";
-    }
-
-    private void HandleContextLifecycle()
-    {
-        if (_context.IsVisible)
-        {
-            return;
-        }
-
-        if (!_pendingContextFocus)
-        {
-            _context.IsFocused = false;
-        }
-
-        if (_contextFocusSnapshot.RegionKey is null)
-        {
-            return;
-        }
-
-        RestoreFocus(_contextFocusSnapshot, _focusChain);
-        _contextFocusSnapshot = default;
-    }
-
-    private string FocusLabel()
-    {
-        return FocusedRegionKey switch
-        {
-            var key when key == MenuRegionId => "menu",
-            var key when key == NumberRegionId => "number",
-            var key when key == DateRegionId => "date",
-            var key when key == TimeRegionId => "time",
-            var key when key == MarkdownRegionId => "markdown",
-            var key when key == ContextRegionId => "context",
-            _ => "none",
-        };
-    }
-
-    private void ApplyMenuAction(string? menuId)
-    {
-        if (string.IsNullOrWhiteSpace(menuId))
-        {
-            return;
-        }
-
-        switch (menuId)
-        {
-            case "new":
-                _markdown.SetMarkdown(BuildScrollableMarkdown("New Note", "- item 1", "- item 2", "- item 3"));
-                break;
-            case "save":
-                _markdown.SetMarkdown(BuildScrollableMarkdown("Saved", "Content snapshot captured.", "Sync complete."));
-                break;
-            case "export":
-                _markdown.SetMarkdown(BuildScrollableMarkdown("Export", "`notes.md` emitted.", "Artifacts: notes.md, status.json"));
-                break;
-            case "help":
-                _markdown.SetMarkdown(BuildScrollableMarkdown("Help", "tab: cycle focus", "m: open context menu", "q: quit", "arrows/hjkl: adjust active control"));
-                break;
-        }
-    }
-
-    private void ApplyContextAction(string? actionId)
-    {
-        if (string.IsNullOrWhiteSpace(actionId))
-        {
-            return;
-        }
-
-        switch (actionId)
-        {
-            case "insert.todo":
-                _markdown.SetMarkdown(BuildScrollableMarkdown("TODO", "- [ ] follow up", "- [ ] verify regression", "- [ ] update release notes"));
-                break;
-            case "insert.done":
-                _markdown.SetMarkdown(BuildScrollableMarkdown("DONE", "- [x] task completed", "- [x] status reviewed"));
-                break;
-            case "insert.error":
-                _markdown.SetMarkdown(BuildScrollableMarkdown("ISSUE", "- blocker detected", "- owner: unassigned"));
-                break;
-        }
-    }
-
-    private void SetPendingActionEvent(string value)
-    {
-        _pendingActionEvent = value;
-        _lastEvent = value;
-    }
-
-    private bool TryConsumePendingActionEvent(out string value)
-    {
-        if (string.IsNullOrEmpty(_pendingActionEvent))
-        {
-            value = string.Empty;
-            return false;
-        }
-
-        value = _pendingActionEvent;
-        _pendingActionEvent = null;
-        return true;
-    }
-
-    private static string BuildScrollableMarkdown(string title, params string[] lines)
-    {
-        var builder = new StringBuilder();
-        builder.Append("# ").Append(title).Append('\n');
-        foreach (var line in lines)
-        {
-            builder.Append(line).Append('\n');
-        }
-
-        builder.AppendLine();
-        builder.AppendLine("## Activity Log");
-        for (var i = 1; i <= 40; i++)
-        {
-            builder.Append("- log ").Append(i.ToString("00", CultureInfo.InvariantCulture)).Append(": sample entry").Append('\n');
-        }
-
-        return builder.ToString();
+        _status.RightText = "r refresh   q quit";
     }
 }

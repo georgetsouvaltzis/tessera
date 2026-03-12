@@ -21,6 +21,12 @@ internal static class TeaAppCompositionTests
             "TeaAppComposition_HandleScreenInput_RoutesChoiceSelection",
             HandleScreenInput_RoutesChoiceSelection);
         yield return new TestCase(
+            "TeaAppComposition_HandleScreenInput_RoutesTabsSelection",
+            HandleScreenInput_RoutesTabsSelection);
+        yield return new TestCase(
+            "TeaAppComposition_HandleScreenInput_RoutesMenuBarActivation",
+            HandleScreenInput_RoutesMenuBarActivation);
+        yield return new TestCase(
             "TeaAppComposition_LegacyLayoutHelpers_AreMarkedAdvanced",
             LegacyLayoutHelpers_AreMarkedAdvanced);
     }
@@ -68,6 +74,33 @@ internal static class TeaAppCompositionTests
 
         TestAssert.Equal("History", app.Choice.SelectedItem, "Choice should route open, navigate, and confirm through the compiled screen.");
         return Task.CompletedTask;
+    }
+
+    private static Task HandleScreenInput_RoutesTabsSelection()
+    {
+        var app = new TabsApp();
+        var screen = (IScreen)app;
+
+        screen.Update(new WindowSizeMsg(80, 24));
+        screen.Render();
+        screen.Update(new KeyPressMsg(KeyCode.Character, "2"));
+
+        TestAssert.Equal(1, app.Tabs.SelectedIndex, "Tabs should route numeric shortcuts through the compiled screen.");
+        return Task.CompletedTask;
+    }
+
+    private static async Task HandleScreenInput_RoutesMenuBarActivation()
+    {
+        var app = new MenuApp();
+        var screen = (IScreen)app;
+
+        screen.Update(new WindowSizeMsg(80, 24));
+        screen.Render();
+        screen.Update(new KeyPressMsg(KeyCode.Character, "r"));
+
+        await Task.Yield();
+        TestAssert.True(app.Menu.TryConsumeActivation(out var itemId), "MenuBar should surface activation through the new wrapper.");
+        TestAssert.Equal("refresh", itemId, "MenuBar activation should preserve the configured item id.");
     }
 
     private static Task LegacyLayoutHelpers_AreMarkedAdvanced()
@@ -156,5 +189,38 @@ internal static class TeaAppCompositionTests
 
         public override Screen Build(ScreenContext context) =>
             Screen.From(new CenterLayout(Choice, width: 28, height: 6));
+    }
+
+    private sealed class TabsApp : TeaApp
+    {
+        public Tabs Tabs { get; } = new("Open", "History", "Archived");
+
+        public override TeaEffect? Update(Message message)
+        {
+            HandleScreenInput(message);
+            return null;
+        }
+
+        public override Screen Build(ScreenContext context) =>
+            Screen.From(new CenterLayout(Tabs, width: 36, height: 1));
+    }
+
+    private sealed class MenuApp : TeaApp
+    {
+        public MenuBar Menu { get; } = new();
+
+        public MenuApp()
+        {
+            Menu.SetItems([new MenuItem("refresh", "Refresh", 'r')]);
+        }
+
+        public override TeaEffect? Update(Message message)
+        {
+            HandleScreenInput(message);
+            return null;
+        }
+
+        public override Screen Build(ScreenContext context) =>
+            Screen.From(new CenterLayout(Menu, width: 24, height: 1));
     }
 }

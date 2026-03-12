@@ -101,6 +101,7 @@ internal sealed class HelloApp : TeaApp
 - app model and startup: [docs/app-pattern.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/app-pattern.md)
 - custom widgets: [docs/custom-components.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/custom-components.md)
 - public API tiers: [docs/public-api-inventory.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/public-api-inventory.md)
+- legacy-to-new map: [docs/migration-map.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/migration-map.md)
 - canonical example app: [examples/Showcase/Program.cs](/Users/georgetsouvaltzis/Projects/playground/teasharp/examples/Showcase/Program.cs)
 - engine and namespace notes: [docs/spec.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/spec.md), [docs/namespace-migration.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/namespace-migration.md)
 - existing widget catalogs: [docs/prebuilt-widgets.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/prebuilt-widgets.md), [docs/widgets.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/widgets.md)

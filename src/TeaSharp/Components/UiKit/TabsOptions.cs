@@ -4,12 +4,14 @@ using TeaSharp.Components.Primitives;
 using TeaSharp.Components.Styling;
 using TeaSharp.Components.UiKit.Internal;
 using TeaSharp.Widgets;
+using System.ComponentModel;
 
 namespace TeaSharp.Components.UiKit;
 
 /// <summary>
 /// Defines the one-shot configuration used to construct a <see cref="TabsComponent"/>.
 /// </summary>
+[EditorBrowsable(EditorBrowsableState.Advanced)]
 public sealed record TabsOptions(
     IEnumerable<string> Tabs,
     bool IsFocused = false,

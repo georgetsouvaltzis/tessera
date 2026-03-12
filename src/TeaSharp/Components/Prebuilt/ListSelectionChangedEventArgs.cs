@@ -1,9 +1,12 @@
+using System.ComponentModel;
+
 namespace TeaSharp.Components.Prebuilt;
 
 /// <summary>
 /// Describes a list selection transition.
 /// </summary>
 /// <typeparam name="T">The list item type.</typeparam>
+[EditorBrowsable(EditorBrowsableState.Advanced)]
 public sealed class ListSelectionChangedEventArgs<T> : EventArgs
 {
     /// <summary>

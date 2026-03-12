@@ -4,6 +4,7 @@ using TeaSharp.Components.Primitives;
 using TeaSharp.Components.Productivity.Internal;
 using TeaSharp.Components.Styling;
 using TeaSharp.Widgets;
+using System.ComponentModel;
 
 namespace TeaSharp.Components.Productivity;
 
@@ -18,6 +19,7 @@ namespace TeaSharp.Components.Productivity;
 /// <param name="PreviousItemKey">Optional key binding used to move to the previous item.</param>
 /// <param name="ActivateKey">Optional key binding used to activate the selected item.</param>
 /// <param name="InteractionProfile">Optional mouse interaction profile.</param>
+[EditorBrowsable(EditorBrowsableState.Advanced)]
 public sealed record MenuBarOptions(
     IEnumerable<MenuBarItem>? Items = null,
     bool IsFocused = false,

@@ -12,6 +12,7 @@ using TeaSharp.Widgets;
 
 namespace TeaSharp.Components.Prebuilt;
 
+[EditorBrowsable(EditorBrowsableState.Advanced)]
 public sealed class TextAreaComponent : IStatefulComponent, IFocusableComponent
 {
     private readonly ViewportModel _viewport = new();

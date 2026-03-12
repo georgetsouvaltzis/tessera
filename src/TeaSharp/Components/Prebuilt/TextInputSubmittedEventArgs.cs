@@ -1,8 +1,11 @@
+using System.ComponentModel;
+
 namespace TeaSharp.Components.Prebuilt;
 
 /// <summary>
 /// Describes a submitted text-input value.
 /// </summary>
+[EditorBrowsable(EditorBrowsableState.Advanced)]
 public sealed class TextInputSubmittedEventArgs : EventArgs
 {
     /// <summary>

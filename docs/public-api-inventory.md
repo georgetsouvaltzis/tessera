@@ -27,6 +27,11 @@ These are the types new applications should discover first.
 - `TeaSharp.Controls.Choice`
 - `TeaSharp.Controls.Dialog`
 - `TeaSharp.Controls.StatusBar`
+- `TeaSharp.Controls.Tabs`
+- `TeaSharp.Controls.ListView<T>`
+- `TeaSharp.Controls.Table`
+- `TeaSharp.Controls.MenuBar`
+- `TeaSharp.Controls.MenuItem`
 - `TeaSharp.Controls.Control`
 
 The intended beginner path is:

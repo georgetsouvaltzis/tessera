@@ -1,8 +1,11 @@
+using System.ComponentModel;
+
 namespace TeaSharp.Components.UiKit;
 
 /// <summary>
 /// Describes a tab selection transition.
 /// </summary>
+[EditorBrowsable(EditorBrowsableState.Advanced)]
 public sealed class TabSelectionChangedEventArgs : EventArgs
 {
     /// <summary>
