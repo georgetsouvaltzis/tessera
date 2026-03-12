@@ -1,30 +1,31 @@
-using TeaSharp.Components.Prebuilt;
+using TeaSharp.Components.Advanced;
 using TeaSharp.Components.Primitives;
-using System.ComponentModel;
 
 namespace TeaSharp.Controls;
 
-public sealed class Button : Control
+public sealed class Toggle : Control
 {
-    private readonly ButtonComponent _component = new();
+    private readonly ToggleSwitchComponent _component = new();
 
-    public event EventHandler? Activated
+    public string Title
     {
-        add => _component.Pressed += value;
-        remove => _component.Pressed -= value;
+        get => _component.Title;
+        set => _component.Title = value ?? string.Empty;
     }
 
-    public string Text
+    public string OnText
     {
-        get => _component.Label;
-        set => _component.Label = value ?? string.Empty;
+        get => _component.OnText;
+        set => _component.OnText = value ?? string.Empty;
     }
 
-    public string? Description
+    public string OffText
     {
-        get => _component.Description;
-        set => _component.Description = value;
+        get => _component.OffText;
+        set => _component.OffText = value ?? string.Empty;
     }
+
+    public bool Value => _component.Value;
 
     public BorderStyle Border
     {
@@ -38,10 +39,6 @@ public sealed class Button : Control
         set => _component.Padding = value;
     }
 
-    public int ActivationCount => _component.PressCount;
-
-    public bool IsPressed => _component.IsPressed;
-
     public override bool IsFocused
     {
         get => _component.IsFocused;
@@ -50,12 +47,17 @@ public sealed class Button : Control
 
     public override bool IsDisabled
     {
-        get => !_component.Enabled;
-        set => _component.Enabled = !value;
+        get => _component.IsDisabled;
+        set => _component.IsDisabled = value;
     }
 
-    [EditorBrowsable(EditorBrowsableState.Advanced)]
-    public bool TryConsumeActivation() => _component.TryConsumePress();
+    public override bool IsReadOnly
+    {
+        get => _component.IsReadOnly;
+        set => _component.IsReadOnly = value;
+    }
+
+    public void SetValue(bool value) => _component.SetValue(value);
 
     public override bool Handle(Message message)
     {

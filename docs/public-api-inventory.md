@@ -25,11 +25,20 @@ These are the types new applications should discover first.
 - `TeaSharp.Controls.TextInput`
 - `TeaSharp.Controls.TextArea`
 - `TeaSharp.Controls.Choice`
+- `TeaSharp.Controls.ComboBox`
 - `TeaSharp.Controls.Dialog`
+- `TeaSharp.Controls.ProgressBar`
+- `TeaSharp.Controls.LogView`
+- `TeaSharp.Controls.Notifications`
+- `TeaSharp.Controls.Toggle`
+- `TeaSharp.Controls.Slider`
+- `TeaSharp.Controls.Spinner`
 - `TeaSharp.Controls.StatusBar`
 - `TeaSharp.Controls.Tabs`
 - `TeaSharp.Controls.ListView<T>`
 - `TeaSharp.Controls.Table`
+- `TeaSharp.Controls.TreeItem`
+- `TeaSharp.Controls.TreeView`
 - `TeaSharp.Controls.MenuBar`
 - `TeaSharp.Controls.MenuItem`
 - `TeaSharp.Controls.Control`
@@ -38,8 +47,9 @@ The intended beginner path is:
 
 - build an app by deriving from `TeaApp`
 - run it with `Tea.RunAsync(...)` or `TeaApplicationBuilder`
-- route controls with `HandleScreenInput(...)`
+- rely on automatic control routing before `Update(...)`
 - return `Screen` from `Build(ScreenContext)`
+- assemble screens with `WindowLayout`, `RowLayout`, and `ColumnLayout`
 - keep configuration in `TeaRuntimeOptions` and `ScreenOptions`
 
 ## Tier 2: Advanced But Supported
@@ -90,10 +100,10 @@ to:
 - `Screen`
 - `ScreenContext`
 - `TeaRuntimeOptions`
-- explicit layout objects
+- `WindowLayout`, `RowLayout`, `ColumnLayout`, `PanelLayout`, `CenterLayout`, `LayoutSlot`
 - root `TeaSharp.Controls` wrappers
 
-The old stack remains available for now, but it is no longer the recommended starting point.
+The old tree-oriented stack remains available for now, but it is marked advanced and is no longer the recommended starting point.
 
 ## Design Constraints
 

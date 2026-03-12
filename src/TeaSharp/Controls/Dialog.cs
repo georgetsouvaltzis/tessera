@@ -1,5 +1,6 @@
 using TeaSharp.Components.Prebuilt;
 using TeaSharp.Components.Primitives;
+using System.ComponentModel;
 
 namespace TeaSharp.Controls;
 
@@ -67,6 +68,7 @@ public sealed class Dialog : Control
         IsVisible = false;
     }
 
+    [EditorBrowsable(EditorBrowsableState.Advanced)]
     public bool TryConsumeResult(out DialogResult result)
     {
         if (_component.TryConsumeResult(out var current))

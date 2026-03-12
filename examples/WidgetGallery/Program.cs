@@ -1,9 +1,7 @@
 using TeaSharp;
-using TeaSharp.Components.Advanced;
-using TeaSharp.Components.Prebuilt;
-using TeaSharp.Components.Primitives;
 using TeaSharp.Controls;
 using TeaSharp.Layout;
+using TeaSharp.Components.Primitives;
 
 var app = Tea.CreateBuilder()
     .UseApp<WidgetGalleryApp>()
@@ -43,11 +41,12 @@ internal sealed class WidgetGalleryApp : TeaApp
         Padding = Thickness.All(1),
     };
 
-    private readonly ProgressBarComponent _progress = new(new ProgressBarOptions(
-        Title: "Progress",
-        InitialValue: 0.25,
-        Border: BorderStyle.SingleLine,
-        Padding: Thickness.All(1)));
+    private readonly ProgressBar _progress = new()
+    {
+        Title = "Progress",
+        Border = BorderStyle.SingleLine,
+        Padding = Thickness.All(1),
+    };
 
     private readonly TextInput _textInput = new()
     {
@@ -90,10 +89,12 @@ internal sealed class WidgetGalleryApp : TeaApp
         PageSize = 5,
     };
 
-    private readonly LogViewerComponent _logs = new(new LogViewerOptions(
-        Title: "Logs",
-        Border: BorderStyle.SingleLine,
-        Padding: Thickness.All(1)));
+    private readonly LogView _logs = new()
+    {
+        Title = "Logs",
+        Border = BorderStyle.SingleLine,
+        Padding = Thickness.All(1),
+    };
 
     private readonly Dialog _dialog = new()
     {
@@ -106,19 +107,19 @@ internal sealed class WidgetGalleryApp : TeaApp
         ],
     };
 
-    private readonly TreeViewComponent _tree = new()
+    private readonly TreeView _tree = new()
     {
         Title = "Tree",
         Border = BorderStyle.SingleLine,
         Padding = Thickness.All(1),
     };
 
-    private readonly NotificationCenterComponent _notifications = new()
+    private readonly Notifications _notifications = new()
     {
         Title = "Notifications",
         Border = BorderStyle.SingleLine,
         Padding = Thickness.All(1),
-        MaxEntries = 32,
+        MaxItems = 32,
     };
 
     private readonly StatusBar _status = new();
@@ -129,6 +130,7 @@ internal sealed class WidgetGalleryApp : TeaApp
     public WidgetGalleryApp()
     {
         _choice.SetItems(["Development", "Staging", "Production", "Canary", "Benchmark"]);
+        _progress.SetValue(0.25);
         _choice.SelectionChanged += (_, args) =>
         {
             _statusText = $"selected {args.SelectedItem}";
@@ -158,29 +160,44 @@ internal sealed class WidgetGalleryApp : TeaApp
         _button.Activated += (_, _) =>
         {
             _logs.Append("button:deploy");
-            _notifications.Push("deploy triggered", NotificationSeverity.Success);
+            _notifications.Push("deploy triggered", NotificationLevel.Success);
             _statusText = "deploy triggered";
         };
+        _textInput.Submitted += (_, args) =>
+        {
+            _logs.Append($"input:{args.Value}");
+            _statusText = $"submitted {args.Value}";
+        };
+        _dialog.Accepted += (_, _) =>
+        {
+            _statusText = "dialog accepted";
+            _logs.Append("dialog:accepted");
+        };
+        _dialog.Dismissed += (_, _) =>
+        {
+            _statusText = "dialog cancelled";
+            _logs.Append("dialog:dismissed");
+        };
 
-        _tree.SetRoots(
+        _tree.SetItems(
         [
-            new TreeItemNode("root", "Controls")
+            new TreeItem("root", "Controls")
             {
                 Expanded = true,
             },
-            new TreeItemNode("root-catalog", "Root Catalog",
+            new TreeItem("root-catalog", "Root Catalog",
             [
-                new TreeItemNode("label", "Label"),
-                new TreeItemNode("input", "TextInput"),
-                new TreeItemNode("list", "ListView"),
+                new TreeItem("label", "Label"),
+                new TreeItem("input", "TextInput"),
+                new TreeItem("list", "ListView"),
             ])
             {
                 Expanded = true,
             },
-            new TreeItemNode("advanced", "Advanced",
+            new TreeItem("advanced", "Advanced",
             [
-                new TreeItemNode("tree", "TreeView"),
-                new TreeItemNode("notify", "NotificationCenter"),
+                new TreeItem("tree", "TreeView"),
+                new TreeItem("notify", "Notifications"),
             ])
             {
                 Expanded = true,
@@ -195,27 +212,15 @@ internal sealed class WidgetGalleryApp : TeaApp
             """);
 
         _logs.Append("gallery booted");
-        _notifications.Push("widget gallery ready", NotificationSeverity.Info);
+        _notifications.Push("widget gallery ready", NotificationLevel.Info);
     }
 
     public override TeaEffect? Initialize() => TeaEffects.Tick(TimeSpan.FromMilliseconds(300), static now => new GalleryTick(now));
 
     public override TeaEffect? Update(Message message)
     {
-        if (HandleScreenInput(message))
+        if (InputHandled)
         {
-            if (_textInput.TryConsumeSubmission(out var value))
-            {
-                _logs.Append($"input:{value}");
-                _statusText = $"submitted {value}";
-            }
-
-            if (_dialog.TryConsumeResult(out var result))
-            {
-                _statusText = result == TeaSharp.Controls.DialogResult.Accepted ? "dialog accepted" : "dialog cancelled";
-                _logs.Append($"dialog:{result}");
-            }
-
             return null;
         }
 
@@ -254,53 +259,24 @@ internal sealed class WidgetGalleryApp : TeaApp
         _status.LeftText = $"Tab={_tabs.Items[_tabs.SelectedIndex]}   Tick={_tick:0000}";
         _status.RightText = _statusText;
 
-        return Screen.From(
-            new OverlayLayout(
-                new DockLayout(
-                    top: new LayoutSlot(_tabs, LayoutLength.Fixed(1)),
-                    bottom: new LayoutSlot(_status, LayoutLength.Fixed(1)),
-                    fill: new LayoutSlot(BuildTabContent(context), LayoutLength.Fill()),
-                    gap: 1,
-                    padding: Thickness.All(1)),
-                new CenterLayout(_dialog, width: 42, height: 8)));
+        return Screen.From(new WindowLayout
+        {
+            Header = LayoutSlot.Fixed(_tabs, 1),
+            Footer = LayoutSlot.Fixed(_status, 1),
+            Body = BuildTabContent(context),
+            Overlay = new CenterLayout(_dialog, width: 42, height: 8),
+            Gap = 1,
+            Padding = Thickness.All(1),
+        });
     }
 
     private LayoutNode BuildTabContent(ScreenContext context)
     {
         return _tabs.SelectedIndex switch
         {
-            0 => new StackLayout(
-                LayoutOrientation.Vertical,
-                gap: 1,
-                children:
-                [
-                    new LayoutSlot(_label, LayoutLength.Fixed(6)),
-                    new LayoutSlot(_button, LayoutLength.Fixed(5)),
-                    new LayoutSlot(_progress, LayoutLength.Fixed(4)),
-                ]),
-            1 => new StackLayout(
-                LayoutOrientation.Vertical,
-                gap: 1,
-                children:
-                [
-                    new LayoutSlot(_textInput, LayoutLength.Fixed(5)),
-                    new LayoutSlot(_choice, LayoutLength.Fixed(8)),
-                    new LayoutSlot(_textArea, LayoutLength.Fill()),
-                ]),
-            2 => new SplitLayout(
-                LayoutOrientation.Horizontal,
-                new LayoutSlot(_list, LayoutLength.Fixed(Math.Min(28, Math.Max(22, context.Width / 4)))),
-                new LayoutSlot(
-                    new StackLayout(
-                        LayoutOrientation.Vertical,
-                        gap: 1,
-                        children:
-                        [
-                            new LayoutSlot(_table, LayoutLength.Fixed(10)),
-                            new LayoutSlot(_logs, LayoutLength.Fill()),
-                        ]),
-                    LayoutLength.Fill()),
-                gap: 1),
+            0 => CreateBasicsTab(),
+            1 => CreateInputsTab(),
+            2 => CreateDataTab(context),
             3 => new CenterLayout(
                 new Label
                 {
@@ -311,11 +287,59 @@ internal sealed class WidgetGalleryApp : TeaApp
                 },
                 width: Math.Min(64, Math.Max(36, context.Width - 6)),
                 height: 8),
-            _ => new SplitLayout(
-                LayoutOrientation.Horizontal,
-                new LayoutSlot(_tree, LayoutLength.Fill()),
-                new LayoutSlot(_notifications, LayoutLength.Fill()),
-                gap: 1),
+            _ => CreateAdvancedTab(),
         };
+    }
+
+    private ColumnLayout CreateBasicsTab()
+    {
+        var content = new ColumnLayout
+        {
+            Gap = 1,
+        };
+        content.AddFixed(_label, 6);
+        content.AddFixed(_button, 5);
+        content.AddFixed(_progress, 4);
+        return content;
+    }
+
+    private ColumnLayout CreateInputsTab()
+    {
+        var content = new ColumnLayout
+        {
+            Gap = 1,
+        };
+        content.AddFixed(_textInput, 5);
+        content.AddFixed(_choice, 8);
+        content.AddFill(_textArea);
+        return content;
+    }
+
+    private WindowLayout CreateDataTab(ScreenContext context)
+    {
+        var details = new ColumnLayout
+        {
+            Gap = 1,
+        };
+        details.AddFixed(_table, 10);
+        details.AddFill(_logs);
+
+        return new WindowLayout
+        {
+            Left = LayoutSlot.Fixed(_list, Math.Min(28, Math.Max(22, context.Width / 4))),
+            Body = details,
+            Gap = 1,
+        };
+    }
+
+    private RowLayout CreateAdvancedTab()
+    {
+        var content = new RowLayout
+        {
+            Gap = 1,
+        };
+        content.AddFill(_tree);
+        content.AddFill(_notifications);
+        return content;
     }
 }

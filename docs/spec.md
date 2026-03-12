@@ -68,25 +68,31 @@ App model shape:
 
 1. `Initialize()` optionally returns the first effect.
 2. `Update(Message)` handles typed input/runtime messages.
-3. `Build(ScreenContext)` returns the next screen tree.
+3. `Build(ScreenContext)` returns the next assembled screen.
 
 ### Composition Model
 
 TeaSharp uses an object-based screen model.
 
-Core layout types:
+Core default layout types:
+
+- `WindowLayout`
+- `RowLayout`
+- `ColumnLayout`
+- `PanelLayout`
+- `CenterLayout`
+- `LayoutSlot`
+- `LayoutLength`
+
+Advanced tree primitives still exist:
 
 - `StackLayout`
 - `SplitLayout`
 - `DockLayout`
-- `PanelLayout`
-- `CenterLayout`
 - `OverlayLayout`
 - `ComponentLayout`
-- `LayoutSlot`
-- `LayoutLength`
 
-The old static helper DSL still exists as an advanced bridge, but it is no longer the primary authoring model.
+The default authoring model should read like explicit screen assembly, not nested layout-tree construction.
 
 ### Control Model
 
@@ -151,7 +157,8 @@ The old composition engine is still present internally, but it is no longer the 
 
 Default app code uses:
 
-- `HandleScreenInput(message)` for control input dispatch
+- automatic control input dispatch before `TeaApp.Update(...)`
+- `InputHandled` when the app needs to suppress global shortcuts after control routing
 - typed key messages such as `KeyPressed`
 - typed pointer messages such as `PointerInput`
 - `TeaEffects` for quit/tick/sequence/batch behavior

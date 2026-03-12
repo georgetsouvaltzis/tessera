@@ -1,4 +1,5 @@
 using TeaSharp.Internal;
+using System.ComponentModel;
 
 namespace TeaSharp;
 
@@ -7,8 +8,11 @@ public abstract class TeaApp : global::TeaSharp.Core.Abstractions.IScreen
     private ScreenContext _context = new();
     private ScreenOptions _runtimeScreenOptions = ScreenOptions.Empty;
     private CompiledScreen? _interactiveScreen;
+    private bool _inputHandled;
 
     public ScreenContext Context => _context;
+
+    protected bool InputHandled => _inputHandled;
 
     public virtual ScreenOptions DefaultScreenOptions => ScreenOptions.Empty;
 
@@ -18,6 +22,7 @@ public abstract class TeaApp : global::TeaSharp.Core.Abstractions.IScreen
 
     public abstract Screen Build(ScreenContext context);
 
+    [EditorBrowsable(EditorBrowsableState.Advanced)]
     protected bool HandleScreenInput(Message message)
     {
         ArgumentNullException.ThrowIfNull(message);
@@ -47,6 +52,7 @@ public abstract class TeaApp : global::TeaSharp.Core.Abstractions.IScreen
                 break;
         }
 
+        _inputHandled = _interactiveScreen?.Handle(mapped) ?? false;
         return TeaEffectAdapter.ToCore(Update(mapped));
     }
 

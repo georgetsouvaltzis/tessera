@@ -1,11 +1,13 @@
 using TeaSharp.Components.Composition;
 using TeaSharp.Components.Primitives;
+using System.ComponentModel;
 
 namespace TeaSharp.Layout;
 
 /// <summary>
 /// Represents a deterministic two-slot split layout.
 /// </summary>
+[EditorBrowsable(EditorBrowsableState.Advanced)]
 public sealed class SplitLayout : LayoutNode
 {
     public SplitLayout(LayoutOrientation orientation, LayoutSlot first, LayoutSlot second, int gap = 0, Thickness padding = default)

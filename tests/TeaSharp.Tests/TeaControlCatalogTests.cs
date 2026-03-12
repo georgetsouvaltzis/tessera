@@ -1,4 +1,5 @@
 using System.ComponentModel;
+using TeaSharp.Components.Advanced;
 using TeaSharp.Components.Prebuilt;
 using TeaSharp.Components.Productivity;
 using TeaSharp.Components.UiKit;
@@ -15,11 +16,21 @@ internal static class TeaControlCatalogTests
         typeof(TextInput),
         typeof(TextArea),
         typeof(Choice),
+        typeof(ComboBox),
         typeof(Dialog),
+        typeof(LogView),
+        typeof(NotificationLevel),
+        typeof(Notifications),
+        typeof(ProgressBar),
+        typeof(Slider),
+        typeof(Spinner),
         typeof(StatusBar),
         typeof(Tabs),
         typeof(ListView<string>),
         typeof(Table),
+        typeof(Toggle),
+        typeof(TreeItem),
+        typeof(TreeView),
         typeof(MenuBar),
         typeof(MenuItem),
     ];
@@ -38,10 +49,16 @@ internal static class TeaControlCatalogTests
         typeof(TextAreaOptions),
         typeof(DropdownComponent),
         typeof(DropdownOptions),
+        typeof(ComboboxComponent),
+        typeof(ComboboxOptions),
         typeof(DialogComponent),
         typeof(DialogOptions),
+        typeof(ProgressBarComponent),
+        typeof(ProgressBarOptions),
         typeof(StatusBarComponent),
         typeof(StatusBarOptions),
+        typeof(LogViewerComponent),
+        typeof(LogViewerOptions),
         typeof(TabsComponent),
         typeof(TabsOptions),
         typeof(TabSelectionChangedEventArgs),
@@ -54,6 +71,11 @@ internal static class TeaControlCatalogTests
         typeof(MenuBarOptions),
         typeof(MenuBarItem),
         typeof(MenuBarItemActivatedEventArgs),
+        typeof(ToggleSwitchComponent),
+        typeof(SliderComponent),
+        typeof(SpinnerComponent),
+        typeof(TreeViewComponent),
+        typeof(NotificationCenterComponent),
     ];
 
     public static IEnumerable<TestCase> Cases()
@@ -61,6 +83,9 @@ internal static class TeaControlCatalogTests
         yield return new TestCase(
             "TeaControlCatalog_NewControlTypes_RemainDiscoverable",
             NewControlTypes_RemainDiscoverable);
+        yield return new TestCase(
+            "TeaControlCatalog_RootPollingMethods_AreMarkedAdvanced",
+            RootPollingMethods_AreMarkedAdvanced);
         yield return new TestCase(
             "TeaControlCatalog_LegacyPromotedTypes_AreMarkedAdvanced",
             LegacyPromotedTypes_AreMarkedAdvanced);
@@ -75,6 +100,30 @@ internal static class TeaControlCatalogTests
                 typeof(EditorBrowsableAttribute));
 
             TestAssert.True(attribute is null, $"{type.Name} should remain on the default discoverable control path.");
+        }
+
+        return Task.CompletedTask;
+    }
+
+    private static Task RootPollingMethods_AreMarkedAdvanced()
+    {
+        var methods =
+            new (Type Type, string Name, Type[] Parameters)[]
+            {
+                (typeof(Button), nameof(Button.TryConsumeActivation), Type.EmptyTypes),
+                (typeof(TextInput), nameof(TextInput.TryConsumeSubmission), [typeof(string).MakeByRefType()]),
+                (typeof(TextInput), nameof(TextInput.TryConsumeCancellation), [typeof(string).MakeByRefType()]),
+                (typeof(Dialog), nameof(Dialog.TryConsumeResult), [typeof(TeaSharp.Controls.DialogResult).MakeByRefType()]),
+                (typeof(MenuBar), nameof(MenuBar.TryConsumeActivation), [typeof(string).MakeByRefType()]),
+            };
+
+        foreach (var (type, name, parameters) in methods)
+        {
+            var method = type.GetMethod(name, parameters);
+            TestAssert.True(method is not null, $"{type.Name}.{name} should exist for advanced callers.");
+            var attribute = (EditorBrowsableAttribute?)Attribute.GetCustomAttribute(method!, typeof(EditorBrowsableAttribute));
+            TestAssert.True(attribute is not null, $"{type.Name}.{name} should be marked advanced.");
+            TestAssert.True(attribute!.State == EditorBrowsableState.Advanced, $"{type.Name}.{name} should be hidden from the default path.");
         }
 
         return Task.CompletedTask;

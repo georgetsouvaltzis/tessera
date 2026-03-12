@@ -4,7 +4,7 @@ Use this pattern for normal apps:
 
 - derive from `TeaApp`
 - handle terminal input through `Message`
-- route controls through `HandleScreenInput(...)`
+- let controls route automatically before `Update(...)`
 - return a `Screen` from `Build(ScreenContext)`
 - run with `Tea.RunAsync(...)` or `TeaApplicationBuilder`
 - keep low-level composition APIs as advanced-only escape hatches
@@ -38,15 +38,15 @@ internal sealed class CounterApp : TeaApp
     private readonly Button _increment = new() { Text = "Increment" };
     private readonly StatusBar _status = new();
 
+    public CounterApp()
+    {
+        _increment.Activated += (_, _) => _count++;
+    }
+
     public override TeaEffect? Update(Message message)
     {
-        if (HandleScreenInput(message))
+        if (InputHandled)
         {
-            if (_increment.TryConsumeActivation())
-            {
-                _count++;
-            }
-
             return null;
         }
 
@@ -60,13 +60,12 @@ internal sealed class CounterApp : TeaApp
         _status.LeftText = $"Count: {_count}";
         _status.RightText = $"Size {context.Width}x{context.Height}";
 
-        return Screen.From(
-            new DockLayout(
-                bottom: new LayoutSlot(_status, LayoutLength.Fixed(1)),
-                fill: new LayoutSlot(
-                    new CenterLayout(_increment, width: 20, height: 3),
-                    LayoutLength.Fill()),
-                padding: Thickness.All(1)));
+        return Screen.From(new WindowLayout
+        {
+            Footer = LayoutSlot.Fixed(_status, 1),
+            Body = new CenterLayout(_increment, width: 20, height: 3),
+            Padding = Thickness.All(1),
+        });
     }
 }
 ```
@@ -79,7 +78,8 @@ internal sealed class CounterApp : TeaApp
 - `Update(Message)` handles input, terminal events, and custom messages
 - `Build(ScreenContext)` creates the current frame
 - `DefaultScreenOptions` defines per-app terminal defaults
-- `HandleScreenInput(Message)` routes keyboard and pointer input into the most recently built screen tree
+- built-in controls route keyboard and pointer input automatically before `Update(Message)`
+- `InputHandled` is available when the app needs to suppress global shortcuts after a control already consumed input
 
 `ScreenContext` already tracks terminal size and focus state, so normal apps do not need to manage `_width`, `_height`, or focus-reporting flags by hand.
 
@@ -87,15 +87,21 @@ internal sealed class CounterApp : TeaApp
 
 The default composition path uses explicit layout objects, not a nested static DSL.
 
-Common layout types:
+Common default layout types:
+
+- `WindowLayout`
+- `RowLayout`
+- `ColumnLayout`
+- `PanelLayout`
+- `CenterLayout`
+- `LayoutSlot`
+
+Advanced tree-oriented layout primitives remain available, but they are no longer the default story:
 
 - `StackLayout`
 - `SplitLayout`
 - `DockLayout`
-- `PanelLayout`
-- `CenterLayout`
 - `OverlayLayout`
-- `LayoutSlot`
 
 Common default controls:
 
@@ -104,9 +110,21 @@ Common default controls:
 - `TextInput`
 - `TextArea`
 - `Choice`
+- `ComboBox`
 - `Dialog`
+- `ProgressBar`
+- `LogView`
+- `Notifications`
+- `Toggle`
+- `Slider`
+- `Spinner`
 - `StatusBar`
-
+- `Tabs`
+- `ListView<T>`
+- `Table`
+- `TreeItem`
+- `TreeView`
+- `MenuBar`
 These types compile down into the existing internal composition/runtime engine, but normal apps do not need to use `ScreenComposer` directly.
 
 ## Startup

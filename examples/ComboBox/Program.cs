@@ -1,8 +1,7 @@
 using TeaSharp;
-using TeaSharp.Components.Prebuilt;
-using TeaSharp.Components.Primitives;
 using TeaSharp.Controls;
 using TeaSharp.Layout;
+using TeaSharp.Components.Primitives;
 
 var app = Tea.CreateBuilder()
     .UseApp<ComboBoxDemoApp>()
@@ -23,27 +22,15 @@ await app.RunAsync();
 
 internal sealed class ComboBoxDemoApp : TeaApp
 {
-    private readonly ComboboxComponent _combobox = new(new ComboboxOptions(
-        Items:
-        [
-            "us-east-1",
-            "us-east-2",
-            "us-west-1",
-            "us-west-2",
-            "eu-central-1",
-            "eu-west-1",
-            "eu-west-2",
-            "ap-southeast-1",
-            "ap-southeast-2",
-            "ap-northeast-1",
-            "sa-east-1",
-        ],
-        Title: "Region",
-        Placeholder: "type to filter regions",
-        IsFocused: true,
-        MaxVisibleItems: 7,
-        Border: BorderStyle.SingleLine,
-        Padding: Thickness.All(1)));
+    private readonly ComboBox _combobox = new()
+    {
+        Title = "Region",
+        Placeholder = "type to filter regions",
+        MaxVisibleItems = 7,
+        Border = BorderStyle.SingleLine,
+        Padding = Thickness.All(1),
+        IsFocused = true,
+    };
 
     private readonly Label _details = new()
     {
@@ -56,6 +43,21 @@ internal sealed class ComboBoxDemoApp : TeaApp
 
     public ComboBoxDemoApp()
     {
+        _combobox.SetItems(
+        [
+            "us-east-1",
+            "us-east-2",
+            "us-west-1",
+            "us-west-2",
+            "eu-central-1",
+            "eu-west-1",
+            "eu-west-2",
+            "ap-southeast-1",
+            "ap-southeast-2",
+            "ap-northeast-1",
+            "sa-east-1",
+        ]);
+
         _combobox.SelectionChanged += (_, args) =>
         {
             _details.Text = $"Selected: {args.SelectedItem}";
@@ -68,7 +70,7 @@ internal sealed class ComboBoxDemoApp : TeaApp
 
     public override TeaEffect? Update(Message message)
     {
-        if (HandleScreenInput(message))
+        if (InputHandled)
         {
             _details.Text =
                 $"""
@@ -89,26 +91,25 @@ internal sealed class ComboBoxDemoApp : TeaApp
     {
         _status.LeftText = "Type to filter   Enter select   Esc close   q quit";
 
-        return Screen.From(
-            new DockLayout(
-                bottom: new LayoutSlot(_status, LayoutLength.Fixed(1)),
-                fill: new LayoutSlot(
-                    new CenterLayout(
-                        new PanelLayout(
-                            new StackLayout(
-                                LayoutOrientation.Vertical,
-                                gap: 1,
-                                children:
-                                [
-                                    new LayoutSlot(_combobox, LayoutLength.Fixed(9)),
-                                    new LayoutSlot(_details, LayoutLength.Fixed(6)),
-                                ]),
-                            title: "ComboBox",
-                            border: BorderStyle.Rounded,
-                            padding: Thickness.All(1)),
-                        width: Math.Min(60, Math.Max(38, context.Width - 4)),
-                        height: 20),
-                    LayoutLength.Fill()),
-                padding: Thickness.All(1)));
+        var content = new ColumnLayout
+        {
+            Gap = 1,
+        };
+        content.AddFixed(_combobox, 9);
+        content.AddFixed(_details, 6);
+
+        return Screen.From(new WindowLayout
+        {
+            Footer = LayoutSlot.Fixed(_status, 1),
+            Body = new CenterLayout(
+                new PanelLayout(
+                    content,
+                    title: "ComboBox",
+                    border: BorderStyle.Rounded,
+                    padding: Thickness.All(1)),
+                width: Math.Min(60, Math.Max(38, context.Width - 4)),
+                height: 20),
+            Padding = Thickness.All(1),
+        });
     }
 }

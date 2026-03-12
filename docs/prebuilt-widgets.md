@@ -14,12 +14,21 @@ Preferred public catalog:
 3. `TextInput`
 4. `TextArea`
 5. `Choice`
-6. `Dialog`
-7. `StatusBar`
-8. `Tabs`
-9. `ListView<T>`
-10. `Table`
-11. `MenuBar`
+6. `ComboBox`
+7. `Dialog`
+8. `ProgressBar`
+9. `LogView`
+10. `Notifications`
+11. `Toggle`
+12. `Slider`
+13. `Spinner`
+14. `StatusBar`
+15. `Tabs`
+16. `ListView<T>`
+17. `Table`
+18. `TreeItem`
+19. `TreeView`
+20. `MenuBar`
 
 These live in `TeaSharp.Controls`.
 
@@ -29,15 +38,7 @@ The older component catalog remains available when you need functionality that h
 
 Common advanced widgets:
 
-- `ComboboxComponent`
-- `ProgressBarComponent`
-- `LogViewerComponent`
 - `CommandPaletteComponent`
-- `TreeViewComponent`
-- `NotificationCenterComponent`
-- `ToggleSwitchComponent`
-- `SliderComponent`
-- `SpinnerComponent`
 - `ContextMenuComponent`
 - `DatePickerComponent`
 - `TimePickerComponent`
@@ -62,26 +63,31 @@ So an app can stay on `TeaApp` + `Screen` + `Layout`, while still embedding an a
 
 ```csharp
 using TeaSharp;
-using TeaSharp.Components.Prebuilt;
 using TeaSharp.Components.Primitives;
+using TeaSharp.Controls;
 using TeaSharp.Layout;
 
 internal sealed class ComboApp : TeaApp
 {
-    private readonly ComboboxComponent _combo = new(new ComboboxOptions(
-        Items: ["alpha", "beta", "gamma"],
-        Title: "Environment",
-        Border: BorderStyle.SingleLine,
-        Padding: Thickness.All(1)));
-
-    public override TeaEffect? Update(Message message)
+    private readonly ComboBox _combo = new()
     {
-        HandleScreenInput(message);
-        return null;
+        Title = "Environment",
+        Border = BorderStyle.SingleLine,
+        Padding = Thickness.All(1),
+    };
+
+    public ComboApp()
+    {
+        _combo.SetItems(["alpha", "beta", "gamma"]);
     }
 
+    public override TeaEffect? Update(Message message) => null;
+
     public override Screen Build(ScreenContext context) =>
-        Screen.From(new CenterLayout(_combo, width: 48, height: 8));
+        Screen.From(new WindowLayout
+        {
+            Body = new CenterLayout(_combo, width: 48, height: 8),
+        });
 }
 ```
 

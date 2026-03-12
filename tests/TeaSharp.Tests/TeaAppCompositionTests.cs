@@ -1,4 +1,5 @@
 using System.ComponentModel;
+using TeaSharp.Components.Composition;
 using TeaSharp.Components.Primitives;
 using TeaSharp.Controls;
 using TeaSharp.Core.Abstractions;
@@ -12,26 +13,41 @@ internal static class TeaAppCompositionTests
     public static IEnumerable<TestCase> Cases()
     {
         yield return new TestCase(
-            "TeaAppComposition_HandleScreenInput_RoutesButtonActivation",
-            HandleScreenInput_RoutesButtonActivation);
+            "TeaAppComposition_AutomaticallyRoutesButtonActivation",
+            AutomaticallyRoutesButtonActivation);
         yield return new TestCase(
-            "TeaAppComposition_HandleScreenInput_UsesTabToMoveFocusIntoTextInput",
-            HandleScreenInput_UsesTabToMoveFocusIntoTextInput);
+            "TeaAppComposition_AutomaticallyRoutesTabIntoTextInput",
+            AutomaticallyRoutesTabIntoTextInput);
         yield return new TestCase(
-            "TeaAppComposition_HandleScreenInput_RoutesChoiceSelection",
-            HandleScreenInput_RoutesChoiceSelection);
+            "TeaAppComposition_AutomaticallyRoutesChoiceSelection",
+            AutomaticallyRoutesChoiceSelection);
         yield return new TestCase(
-            "TeaAppComposition_HandleScreenInput_RoutesTabsSelection",
-            HandleScreenInput_RoutesTabsSelection);
+            "TeaAppComposition_AutomaticallyRoutesComboBoxSelection",
+            AutomaticallyRoutesComboBoxSelection);
         yield return new TestCase(
-            "TeaAppComposition_HandleScreenInput_RoutesMenuBarActivation",
-            HandleScreenInput_RoutesMenuBarActivation);
+            "TeaAppComposition_AutomaticallyRoutesTabsSelection",
+            AutomaticallyRoutesTabsSelection);
+        yield return new TestCase(
+            "TeaAppComposition_AutomaticallyRoutesMenuBarActivation",
+            AutomaticallyRoutesMenuBarActivation);
+        yield return new TestCase(
+            "TeaAppComposition_InputHandled_ReportsWhenControlConsumedInput",
+            InputHandled_ReportsWhenControlConsumedInput);
         yield return new TestCase(
             "TeaAppComposition_LegacyLayoutHelpers_AreMarkedAdvanced",
             LegacyLayoutHelpers_AreMarkedAdvanced);
+        yield return new TestCase(
+            "TeaAppComposition_AdvancedLayoutOverloads_AreMarkedAdvanced",
+            AdvancedLayoutOverloads_AreMarkedAdvanced);
+        yield return new TestCase(
+            "TeaAppComposition_LowLevelTreeLayouts_AreMarkedAdvanced",
+            LowLevelTreeLayouts_AreMarkedAdvanced);
+        yield return new TestCase(
+            "TeaAppComposition_ScreenAssemblyLayouts_RemainDiscoverable",
+            ScreenAssemblyLayouts_RemainDiscoverable);
     }
 
-    private static Task HandleScreenInput_RoutesButtonActivation()
+    private static Task AutomaticallyRoutesButtonActivation()
     {
         var app = new ButtonApp();
         var screen = (IScreen)app;
@@ -40,11 +56,11 @@ internal static class TeaAppCompositionTests
         screen.Render();
         screen.Update(new KeyPressMsg(KeyCode.Enter));
 
-        TestAssert.True(app.Button.TryConsumeActivation(), "Enter should activate the focused button through HandleScreenInput.");
+        TestAssert.Equal(1, app.ActivationCount, "Enter should activate the focused button automatically before Update.");
         return Task.CompletedTask;
     }
 
-    private static Task HandleScreenInput_UsesTabToMoveFocusIntoTextInput()
+    private static Task AutomaticallyRoutesTabIntoTextInput()
     {
         var app = new FormApp();
         var screen = (IScreen)app;
@@ -56,12 +72,11 @@ internal static class TeaAppCompositionTests
         screen.Update(new KeyPressMsg(KeyCode.Enter));
 
         TestAssert.Equal("x", app.Input.Value, "Tab should move focus to the next control and route typing into the text input.");
-        TestAssert.True(app.Input.TryConsumeSubmission(out var value), "Enter should submit through the routed text input.");
-        TestAssert.Equal("x", value, "Submitted text should match the typed value.");
+        TestAssert.Equal("x", app.LastSubmittedValue, "Enter should raise submission through the routed text input.");
         return Task.CompletedTask;
     }
 
-    private static Task HandleScreenInput_RoutesChoiceSelection()
+    private static Task AutomaticallyRoutesChoiceSelection()
     {
         var app = new ChoiceApp();
         var screen = (IScreen)app;
@@ -76,7 +91,22 @@ internal static class TeaAppCompositionTests
         return Task.CompletedTask;
     }
 
-    private static Task HandleScreenInput_RoutesTabsSelection()
+    private static Task AutomaticallyRoutesComboBoxSelection()
+    {
+        var app = new ComboBoxApp();
+        var screen = (IScreen)app;
+
+        screen.Update(new WindowSizeMsg(80, 24));
+        screen.Render();
+        screen.Update(new KeyPressMsg(KeyCode.Character, "w"));
+        screen.Update(new KeyPressMsg(KeyCode.Down));
+        screen.Update(new KeyPressMsg(KeyCode.Enter));
+
+        TestAssert.Equal("west", app.ComboBox.SelectedItem, "ComboBox should route filter, navigate, and confirm through the compiled screen.");
+        return Task.CompletedTask;
+    }
+
+    private static Task AutomaticallyRoutesTabsSelection()
     {
         var app = new TabsApp();
         var screen = (IScreen)app;
@@ -89,7 +119,7 @@ internal static class TeaAppCompositionTests
         return Task.CompletedTask;
     }
 
-    private static async Task HandleScreenInput_RoutesMenuBarActivation()
+    private static async Task AutomaticallyRoutesMenuBarActivation()
     {
         var app = new MenuApp();
         var screen = (IScreen)app;
@@ -99,8 +129,20 @@ internal static class TeaAppCompositionTests
         screen.Update(new KeyPressMsg(KeyCode.Character, "r"));
 
         await Task.Yield();
-        TestAssert.True(app.Menu.TryConsumeActivation(out var itemId), "MenuBar should surface activation through the new wrapper.");
-        TestAssert.Equal("refresh", itemId, "MenuBar activation should preserve the configured item id.");
+        TestAssert.Equal("refresh", app.LastActivatedItemId, "MenuBar activation should preserve the configured item id.");
+    }
+
+    private static Task InputHandled_ReportsWhenControlConsumedInput()
+    {
+        var app = new InputHandledApp();
+        var screen = (IScreen)app;
+
+        screen.Update(new WindowSizeMsg(80, 24));
+        screen.Render();
+        screen.Update(new KeyPressMsg(KeyCode.Enter));
+
+        TestAssert.True(app.WasInputHandledDuringLastUpdate, "TeaApp should report when screen input was consumed automatically.");
+        return Task.CompletedTask;
     }
 
     private static Task LegacyLayoutHelpers_AreMarkedAdvanced()
@@ -131,18 +173,97 @@ internal static class TeaAppCompositionTests
         return Task.CompletedTask;
     }
 
+    private static Task AdvancedLayoutOverloads_AreMarkedAdvanced()
+    {
+        var advancedCtors =
+            new (Type Type, Type[] Parameters)[]
+            {
+                (typeof(LayoutSlot), [typeof(ICanvasComponent), typeof(LayoutLength), typeof(Thickness), typeof(ScreenRegionKey), typeof(int?), typeof(int?), typeof(bool?), typeof(bool), typeof(bool), typeof(int), typeof(Action)]),
+                (typeof(CenterLayout), [typeof(ICanvasComponent), typeof(int?), typeof(int?), typeof(Thickness), typeof(ScreenRegionKey), typeof(bool?), typeof(bool), typeof(bool), typeof(int), typeof(Action)]),
+                (typeof(PanelLayout), [typeof(ICanvasComponent), typeof(string), typeof(BorderStyle), typeof(Thickness), typeof(Thickness), typeof(ScreenRegionKey), typeof(int?), typeof(int?), typeof(bool?), typeof(bool), typeof(bool), typeof(int), typeof(Action)]),
+                (typeof(ComponentLayout), [typeof(ICanvasComponent), typeof(ScreenRegionKey), typeof(int?), typeof(int?), typeof(bool?), typeof(bool), typeof(bool), typeof(int), typeof(Action)]),
+            };
+
+        foreach (var (type, parameters) in advancedCtors)
+        {
+            var ctor = type.GetConstructor(parameters);
+            TestAssert.True(ctor is not null, $"{type.Name} advanced overload should exist for advanced callers.");
+            var attribute = (EditorBrowsableAttribute?)Attribute.GetCustomAttribute(ctor!, typeof(EditorBrowsableAttribute));
+            TestAssert.True(attribute is not null, $"{type.Name} advanced overload should be marked advanced.");
+            TestAssert.True(attribute!.State == EditorBrowsableState.Advanced, $"{type.Name} advanced overload should be hidden from default discoverability.");
+        }
+
+        return Task.CompletedTask;
+    }
+
+    private static Task LowLevelTreeLayouts_AreMarkedAdvanced()
+    {
+        Type[] layoutTypes =
+        [
+            typeof(StackLayout),
+            typeof(SplitLayout),
+            typeof(DockLayout),
+            typeof(OverlayLayout),
+            typeof(ComponentLayout),
+        ];
+
+        foreach (var type in layoutTypes)
+        {
+            var attribute = (EditorBrowsableAttribute?)Attribute.GetCustomAttribute(
+                type,
+                typeof(EditorBrowsableAttribute));
+
+            TestAssert.True(attribute is not null, $"{type.Name} should be explicitly marked as advanced.");
+            TestAssert.True(
+                attribute!.State == EditorBrowsableState.Advanced,
+                $"{type.Name} should be hidden from the default composition path.");
+        }
+
+        return Task.CompletedTask;
+    }
+
+    private static Task ScreenAssemblyLayouts_RemainDiscoverable()
+    {
+        Type[] layoutTypes =
+        [
+            typeof(WindowLayout),
+            typeof(RowLayout),
+            typeof(ColumnLayout),
+            typeof(PanelLayout),
+            typeof(CenterLayout),
+            typeof(LayoutSlot),
+        ];
+
+        foreach (var type in layoutTypes)
+        {
+            var attribute = (EditorBrowsableAttribute?)Attribute.GetCustomAttribute(
+                type,
+                typeof(EditorBrowsableAttribute));
+
+            TestAssert.True(attribute is null, $"{type.Name} should remain on the default composition path.");
+        }
+
+        return Task.CompletedTask;
+    }
+
     private sealed class ButtonApp : TeaApp
     {
         public Button Button { get; } = new() { Text = "Run" };
 
-        public override TeaEffect? Update(Message message)
+        public int ActivationCount { get; private set; }
+
+        public ButtonApp()
         {
-            HandleScreenInput(message);
-            return null;
+            Button.Activated += (_, _) => ActivationCount++;
         }
 
+        public override TeaEffect? Update(Message message) => null;
+
         public override Screen Build(ScreenContext context) =>
-            Screen.From(new CenterLayout(Button, width: 16, height: 3));
+            Screen.From(new WindowLayout
+            {
+                Body = new CenterLayout(Button, width: 16, height: 3),
+            });
     }
 
     private sealed class FormApp : TeaApp
@@ -151,24 +272,31 @@ internal static class TeaAppCompositionTests
 
         public TextInput Input { get; } = new() { Title = "Command" };
 
-        public override TeaEffect? Update(Message message)
+        public string LastSubmittedValue { get; private set; } = string.Empty;
+
+        public FormApp()
         {
-            HandleScreenInput(message);
-            return null;
+            Input.Submitted += (_, args) => LastSubmittedValue = args.Value;
         }
+
+        public override TeaEffect? Update(Message message) => null;
 
         public override Screen Build(ScreenContext context)
         {
-            var layout = new StackLayout(
-                LayoutOrientation.Vertical,
-                gap: 1,
-                children:
-                [
-                    new LayoutSlot(Button, LayoutLength.Fixed(3)),
-                    new LayoutSlot(Input, LayoutLength.Fixed(3)),
-                ]);
+            var fields = new ColumnLayout
+            {
+                Gap = 1,
+            };
+            fields.AddFixed(Button, 3);
+            fields.AddFixed(Input, 3);
 
-            return Screen.From(new PanelLayout(layout, title: "Form", border: BorderStyle.SingleLine, padding: Thickness.All(1)));
+            return Screen.From(new WindowLayout
+            {
+                Body = new CenterLayout(
+                    new PanelLayout(fields, title: "Form", border: BorderStyle.SingleLine, padding: Thickness.All(1)),
+                    width: 28,
+                    height: 10),
+            });
         }
     }
 
@@ -181,46 +309,87 @@ internal static class TeaAppCompositionTests
             Choice.SetItems(["Open", "History", "Archived"]);
         }
 
-        public override TeaEffect? Update(Message message)
-        {
-            HandleScreenInput(message);
-            return null;
-        }
+        public override TeaEffect? Update(Message message) => null;
 
         public override Screen Build(ScreenContext context) =>
-            Screen.From(new CenterLayout(Choice, width: 28, height: 6));
+            Screen.From(new WindowLayout
+            {
+                Body = new CenterLayout(Choice, width: 28, height: 6),
+            });
     }
 
     private sealed class TabsApp : TeaApp
     {
         public Tabs Tabs { get; } = new("Open", "History", "Archived");
 
-        public override TeaEffect? Update(Message message)
-        {
-            HandleScreenInput(message);
-            return null;
-        }
+        public override TeaEffect? Update(Message message) => null;
 
         public override Screen Build(ScreenContext context) =>
-            Screen.From(new CenterLayout(Tabs, width: 36, height: 1));
+            Screen.From(new WindowLayout
+            {
+                Body = new CenterLayout(Tabs, width: 36, height: 1),
+            });
+    }
+
+    private sealed class ComboBoxApp : TeaApp
+    {
+        public ComboBox ComboBox { get; } = new()
+        {
+            Title = "Regions",
+            IsFocused = true,
+        };
+
+        public ComboBoxApp()
+        {
+            ComboBox.SetItems(["east", "west", "north"]);
+        }
+
+        public override TeaEffect? Update(Message message) => null;
+
+        public override Screen Build(ScreenContext context) =>
+            Screen.From(new WindowLayout
+            {
+                Body = new CenterLayout(ComboBox, width: 28, height: 6),
+            });
     }
 
     private sealed class MenuApp : TeaApp
     {
         public MenuBar Menu { get; } = new();
 
+        public string LastActivatedItemId { get; private set; } = string.Empty;
+
         public MenuApp()
         {
             Menu.SetItems([new MenuItem("refresh", "Refresh", 'r')]);
+            Menu.ItemActivated += (_, args) => LastActivatedItemId = args.ItemId;
         }
+
+        public override TeaEffect? Update(Message message) => null;
+
+        public override Screen Build(ScreenContext context) =>
+            Screen.From(new WindowLayout
+            {
+                Body = new CenterLayout(Menu, width: 24, height: 1),
+            });
+    }
+
+    private sealed class InputHandledApp : TeaApp
+    {
+        public Button Button { get; } = new() { Text = "Run" };
+
+        public bool WasInputHandledDuringLastUpdate { get; private set; }
 
         public override TeaEffect? Update(Message message)
         {
-            HandleScreenInput(message);
+            WasInputHandledDuringLastUpdate = InputHandled;
             return null;
         }
 
         public override Screen Build(ScreenContext context) =>
-            Screen.From(new CenterLayout(Menu, width: 24, height: 1));
+            Screen.From(new WindowLayout
+            {
+                Body = new CenterLayout(Button, width: 16, height: 3),
+            });
     }
 }

@@ -4,12 +4,14 @@ using TeaSharp.Components.Interaction;
 using TeaSharp.Components.Primitives;
 using TeaSharp.Components.Primitives.Internal;
 using TeaSharp.Components.Styling;
+using System.ComponentModel;
 using TeaSharp.Core.Abstractions;
 using TeaSharp.Core.Messages;
 using TeaSharp.Widgets;
 
 namespace TeaSharp.Components.Advanced;
 
+[EditorBrowsable(EditorBrowsableState.Advanced)]
 public sealed partial class NotificationCenterComponent : IStatefulComponent, IMouseStatefulComponent, IFocusableComponent
 {
     private readonly List<NotificationEntry> _entries = [];

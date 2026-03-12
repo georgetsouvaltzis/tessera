@@ -1,6 +1,7 @@
 using TeaSharp.Components.Composition;
 using TeaSharp.Components.Primitives;
 using TeaSharp.Components.Primitives.Internal;
+using System.ComponentModel;
 
 namespace TeaSharp.Layout;
 
@@ -23,15 +24,31 @@ public sealed class PanelLayout : LayoutNode
         string? title = null,
         BorderStyle border = BorderStyle.None,
         Thickness padding = default,
-        Thickness margin = default,
-        ScreenRegionKey? regionKey = null,
-        int? preferredWidth = null,
-        int? preferredHeight = null,
-        bool? focusable = null,
-        bool focusOnClick = true,
-        bool interceptsPointer = true,
-        int layer = (int)ScreenLayer.Base,
-        Action? onFocus = null)
+        Thickness margin = default)
+        : this(
+            new ComponentLayout(component),
+            title,
+            border,
+            padding,
+            margin)
+    {
+    }
+
+    [EditorBrowsable(EditorBrowsableState.Advanced)]
+    public PanelLayout(
+        ICanvasComponent component,
+        string? title,
+        BorderStyle border,
+        Thickness padding,
+        Thickness margin,
+        ScreenRegionKey? regionKey,
+        int? preferredWidth,
+        int? preferredHeight,
+        bool? focusable,
+        bool focusOnClick,
+        bool interceptsPointer,
+        int layer,
+        Action? onFocus)
         : this(
             new ComponentLayout(component, regionKey, preferredWidth, preferredHeight, focusable, focusOnClick, interceptsPointer, layer, onFocus),
             title,

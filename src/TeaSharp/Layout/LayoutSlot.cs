@@ -1,6 +1,7 @@
 using TeaSharp.Components.Primitives;
 using TeaSharp.Core.Abstractions;
 using TeaSharp.Components.Composition;
+using System.ComponentModel;
 
 namespace TeaSharp.Layout;
 
@@ -9,21 +10,57 @@ namespace TeaSharp.Layout;
 /// </summary>
 public sealed record LayoutSlot
 {
+    public static LayoutSlot Auto(LayoutNode content, Thickness margin = default) =>
+        new(content, LayoutLength.Auto(), margin);
+
+    public static LayoutSlot Auto(ICanvasComponent component, Thickness margin = default) =>
+        new(component, LayoutLength.Auto(), margin);
+
+    public static LayoutSlot Fixed(LayoutNode content, int size, Thickness margin = default) =>
+        new(content, LayoutLength.Fixed(size), margin);
+
+    public static LayoutSlot Fixed(ICanvasComponent component, int size, Thickness margin = default) =>
+        new(component, LayoutLength.Fixed(size), margin);
+
+    public static LayoutSlot Fill(LayoutNode content, Thickness margin = default) =>
+        new(content, LayoutLength.Fill(), margin);
+
+    public static LayoutSlot Fill(ICanvasComponent component, Thickness margin = default) =>
+        new(component, LayoutLength.Fill(), margin);
+
+    public static LayoutSlot Weighted(LayoutNode content, int weight, Thickness margin = default) =>
+        new(content, LayoutLength.Weighted(weight), margin);
+
+    public static LayoutSlot Weighted(ICanvasComponent component, int weight, Thickness margin = default) =>
+        new(component, LayoutLength.Weighted(weight), margin);
+
     /// <summary>
     /// Creates a slot for the provided TeaSharp component.
     /// </summary>
     public LayoutSlot(
         ICanvasComponent component,
         LayoutLength length,
-        Thickness margin = default,
-        ScreenRegionKey? regionKey = null,
-        int? preferredWidth = null,
-        int? preferredHeight = null,
-        bool? focusable = null,
-        bool focusOnClick = true,
-        bool interceptsPointer = true,
-        int layer = (int)ScreenLayer.Base,
-        Action? onFocus = null)
+        Thickness margin = default)
+        : this(
+            new ComponentLayout(component),
+            length,
+            margin)
+    {
+    }
+
+    [EditorBrowsable(EditorBrowsableState.Advanced)]
+    public LayoutSlot(
+        ICanvasComponent component,
+        LayoutLength length,
+        Thickness margin,
+        ScreenRegionKey? regionKey,
+        int? preferredWidth,
+        int? preferredHeight,
+        bool? focusable,
+        bool focusOnClick,
+        bool interceptsPointer,
+        int layer,
+        Action? onFocus)
         : this(
             new ComponentLayout(component, regionKey, preferredWidth, preferredHeight, focusable, focusOnClick, interceptsPointer, layer, onFocus),
             length,

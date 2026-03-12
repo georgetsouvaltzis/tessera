@@ -1,13 +1,16 @@
 using TeaSharp.Components.Composition;
 using TeaSharp.Components.Primitives;
+using System.ComponentModel;
 
 namespace TeaSharp.Layout;
 
 /// <summary>
 /// Represents a layout leaf backed by a TeaSharp canvas component.
 /// </summary>
+[EditorBrowsable(EditorBrowsableState.Advanced)]
 public sealed class ComponentLayout : LayoutNode
 {
+    [EditorBrowsable(EditorBrowsableState.Advanced)]
     public ComponentLayout(
         ICanvasComponent component,
         ScreenRegionKey? regionKey,
@@ -43,6 +46,7 @@ public sealed class ComponentLayout : LayoutNode
     /// <summary>
     /// Gets the optional stable region key used when the component participates in screen routing.
     /// </summary>
+    [EditorBrowsable(EditorBrowsableState.Advanced)]
     public ScreenRegionKey? RegionKey { get; }
 
     /// <summary>
@@ -58,26 +62,31 @@ public sealed class ComponentLayout : LayoutNode
     /// <summary>
     /// Gets the explicit focusability override, if provided.
     /// </summary>
+    [EditorBrowsable(EditorBrowsableState.Advanced)]
     public bool? Focusable { get; }
 
     /// <summary>
     /// Gets a value indicating whether mouse clicks should move focus into the component.
     /// </summary>
+    [EditorBrowsable(EditorBrowsableState.Advanced)]
     public bool FocusOnClick { get; }
 
     /// <summary>
     /// Gets a value indicating whether the component should intercept pointer input.
     /// </summary>
+    [EditorBrowsable(EditorBrowsableState.Advanced)]
     public bool InterceptsPointer { get; }
 
     /// <summary>
     /// Gets the target screen layer used for composition.
     /// </summary>
+    [EditorBrowsable(EditorBrowsableState.Advanced)]
     public int Layer { get; }
 
     /// <summary>
     /// Gets the optional callback raised when the region receives focus.
     /// </summary>
+    [EditorBrowsable(EditorBrowsableState.Advanced)]
     public Action? OnFocus { get; }
 
     internal override LayoutMeasurement Measure(in Rect availableBounds)

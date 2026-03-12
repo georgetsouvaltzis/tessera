@@ -1,9 +1,8 @@
 using System.Globalization;
 using TeaSharp;
-using TeaSharp.Components.Advanced;
-using TeaSharp.Components.Primitives;
 using TeaSharp.Controls;
 using TeaSharp.Layout;
+using TeaSharp.Components.Primitives;
 
 var app = Tea.CreateBuilder()
     .UseApp<KanbanApp>()
@@ -144,12 +143,12 @@ internal sealed class KanbanApp : TeaApp
         Padding = Thickness.All(1),
     };
 
-    private readonly NotificationCenterComponent _activity = new()
+    private readonly Notifications _activity = new()
     {
         Title = "Activity",
         Border = BorderStyle.SingleLine,
         Padding = Thickness.All(1),
-        MaxEntries = 48,
+        MaxItems = 48,
     };
 
     private readonly Dialog _deleteDialog = new()
@@ -175,28 +174,21 @@ internal sealed class KanbanApp : TeaApp
         _todo.SelectionChanged += (_, args) => SelectCard(KanbanLane.Todo, args.SelectedItem);
         _doing.SelectionChanged += (_, args) => SelectCard(KanbanLane.Doing, args.SelectedItem);
         _done.SelectionChanged += (_, args) => SelectCard(KanbanLane.Done, args.SelectedItem);
+        _composer.Submitted += (_, args) => CreateCard(args.Value);
+        _deleteDialog.Accepted += (_, _) => ApplyDelete(DialogResult.Accepted);
+        _deleteDialog.Dismissed += (_, _) => ApplyDelete(DialogResult.Dismissed);
 
-        _activity.Push("Kanban ready", NotificationSeverity.Success);
-        _activity.Push("Use Tab to move focus", NotificationSeverity.Info);
-        _activity.Push("h/l move cards between lanes", NotificationSeverity.Warning);
+        _activity.Push("Kanban ready", NotificationLevel.Success);
+        _activity.Push("Use Tab to move focus", NotificationLevel.Info);
+        _activity.Push("h/l move cards between lanes", NotificationLevel.Warning);
 
         LoadBoard(0);
     }
 
     public override TeaEffect? Update(Message message)
     {
-        if (HandleScreenInput(message))
+        if (InputHandled)
         {
-            if (_composer.TryConsumeSubmission(out var submitted))
-            {
-                CreateCard(submitted);
-            }
-
-            if (_deleteDialog.TryConsumeResult(out var result))
-            {
-                ApplyDelete(result);
-            }
-
             return null;
         }
 
@@ -244,43 +236,32 @@ internal sealed class KanbanApp : TeaApp
             $"{_boardStates[_boards.SelectedIndex].Name}   Todo={_todo.Count} Doing={_doing.Count} Done={_done.Count}";
         _status.RightText = _statusText;
 
-        var boardColumns = new SplitLayout(
-            LayoutOrientation.Horizontal,
-            new LayoutSlot(_todo, LayoutLength.Fill()),
-            new LayoutSlot(
-                new SplitLayout(
-                    LayoutOrientation.Horizontal,
-                    new LayoutSlot(_doing, LayoutLength.Fill()),
-                    new LayoutSlot(_done, LayoutLength.Fill()),
-                    gap: 1),
-                LayoutLength.Weighted(2)),
-            gap: 1);
+        var lanes = new RowLayout
+        {
+            Gap = 1,
+        };
+        lanes.AddWeighted(_todo, 1);
+        lanes.AddWeighted(_doing, 1);
+        lanes.AddWeighted(_done, 1);
 
-        var sidebar = new StackLayout(
-            LayoutOrientation.Vertical,
-            gap: 1,
-            children:
-            [
-                new LayoutSlot(_details, LayoutLength.Fixed(9)),
-                new LayoutSlot(_composer, LayoutLength.Fixed(5)),
-                new LayoutSlot(_activity, LayoutLength.Fill()),
-            ]);
+        var sidebar = new ColumnLayout
+        {
+            Gap = 1,
+        };
+        sidebar.AddFixed(_details, 9);
+        sidebar.AddFixed(_composer, 5);
+        sidebar.AddFill(_activity);
 
-        var content = new SplitLayout(
-            LayoutOrientation.Horizontal,
-            new LayoutSlot(boardColumns, LayoutLength.Weighted(3)),
-            new LayoutSlot(sidebar, LayoutLength.Fixed(Math.Min(34, Math.Max(28, context.Width / 4)))),
-            gap: 1);
-
-        return Screen.From(
-            new OverlayLayout(
-                new DockLayout(
-                    top: new LayoutSlot(_boards, LayoutLength.Fixed(1)),
-                    bottom: new LayoutSlot(_status, LayoutLength.Fixed(1)),
-                    fill: new LayoutSlot(content, LayoutLength.Fill()),
-                    gap: 1,
-                    padding: Thickness.All(1)),
-                new CenterLayout(_deleteDialog, width: 42, height: 8)));
+        return Screen.From(new WindowLayout
+        {
+            Header = LayoutSlot.Fixed(_boards, 1),
+            Footer = LayoutSlot.Fixed(_status, 1),
+            Right = LayoutSlot.Fixed(sidebar, Math.Min(34, Math.Max(28, context.Width / 4))),
+            Body = lanes,
+            Overlay = new CenterLayout(_deleteDialog, width: 42, height: 8),
+            Gap = 1,
+            Padding = Thickness.All(1),
+        });
     }
 
     private void LoadBoard(int index)
@@ -331,7 +312,7 @@ internal sealed class KanbanApp : TeaApp
         board.Todo.Insert(0, card);
         _todo.SetItems(board.Todo);
         _activeLane = KanbanLane.Todo;
-        _activity.Push($"created {card.Title}", NotificationSeverity.Success);
+        _activity.Push($"created {card.Title}", NotificationLevel.Success);
         _statusText = $"Created {card.Title}";
     }
 
@@ -365,7 +346,7 @@ internal sealed class KanbanApp : TeaApp
 
         GetLaneCollection(board, _activeLane).RemoveAll(existing => existing.Id == card.Id);
         LoadBoard(_boards.SelectedIndex);
-        _activity.Push($"deleted {card.Title}", NotificationSeverity.Warning);
+        _activity.Push($"deleted {card.Title}", NotificationLevel.Warning);
         _statusText = $"Deleted {card.Title}";
     }
 
@@ -391,7 +372,7 @@ internal sealed class KanbanApp : TeaApp
         GetLaneCollection(board, targetLane).Add(card);
         LoadBoard(_boards.SelectedIndex);
         _activeLane = targetLane;
-        _activity.Push($"moved {card.Title} to {targetLane}", NotificationSeverity.Info);
+        _activity.Push($"moved {card.Title} to {targetLane}", NotificationLevel.Info);
         _statusText = $"Moved {card.Title} to {targetLane}";
     }
 

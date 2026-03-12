@@ -1,8 +1,7 @@
 using TeaSharp;
-using TeaSharp.Components.Advanced;
-using TeaSharp.Components.Primitives;
 using TeaSharp.Controls;
 using TeaSharp.Layout;
+using TeaSharp.Components.Primitives;
 
 var app = Tea.CreateBuilder()
     .UseApp<AdvancedWidgetsApp>()
@@ -24,14 +23,14 @@ internal sealed record AdvancedTick(DateTimeOffset At) : Message;
 
 internal sealed class AdvancedWidgetsApp : TeaApp
 {
-    private readonly ToggleSwitchComponent _toggle = new()
+    private readonly Toggle _toggle = new()
     {
         Title = "Feature Flag",
         Border = BorderStyle.SingleLine,
         Padding = Thickness.All(1),
     };
 
-    private readonly SliderComponent _slider = new()
+    private readonly Slider _slider = new()
     {
         Title = "Concurrency",
         Min = 1,
@@ -41,7 +40,7 @@ internal sealed class AdvancedWidgetsApp : TeaApp
         Padding = Thickness.All(1),
     };
 
-    private readonly SpinnerComponent _spinner = new()
+    private readonly Spinner _spinner = new()
     {
         Title = "Indexer",
         Label = "running",
@@ -49,19 +48,19 @@ internal sealed class AdvancedWidgetsApp : TeaApp
         Padding = Thickness.All(1),
     };
 
-    private readonly TreeViewComponent _tree = new()
+    private readonly TreeView _tree = new()
     {
         Title = "Workspace",
         Border = BorderStyle.SingleLine,
         Padding = Thickness.All(1),
     };
 
-    private readonly NotificationCenterComponent _notifications = new()
+    private readonly Notifications _notifications = new()
     {
         Title = "Notifications",
         Border = BorderStyle.SingleLine,
         Padding = Thickness.All(1),
-        MaxEntries = 48,
+        MaxItems = 48,
     };
 
     private readonly Label _summary = new()
@@ -79,41 +78,41 @@ internal sealed class AdvancedWidgetsApp : TeaApp
     {
         _slider.SetValue(8);
         _toggle.SetValue(true);
-        _tree.SetRoots(
+        _tree.SetItems(
         [
-            new TreeItemNode("root", "TeaSharp")
+            new TreeItem("root", "TeaSharp")
             {
                 Expanded = true,
             },
-            new TreeItemNode("runtime", "Runtime",
+            new TreeItem("runtime", "Runtime",
             [
-                new TreeItemNode("input", "Input pipeline"),
-                new TreeItemNode("render", "Renderer"),
-                new TreeItemNode("screen", "Screen compiler"),
+                new TreeItem("input", "Input pipeline"),
+                new TreeItem("render", "Renderer"),
+                new TreeItem("screen", "Screen compiler"),
             ])
             {
                 Expanded = true,
             },
-            new TreeItemNode("controls", "Controls",
+            new TreeItem("controls", "Controls",
             [
-                new TreeItemNode("core", "Root catalog"),
-                new TreeItemNode("advanced", "Advanced catalog"),
+                new TreeItem("core", "Root catalog"),
+                new TreeItem("advanced", "Advanced catalog"),
             ])
             {
                 Expanded = true,
             },
         ]);
 
-        _notifications.Push("advanced demo booted", NotificationSeverity.Success);
-        _notifications.Push("tab cycles focus", NotificationSeverity.Info);
-        _notifications.Push("n pushes a notification", NotificationSeverity.Warning);
+        _notifications.Push("advanced demo booted", NotificationLevel.Success);
+        _notifications.Push("tab cycles focus", NotificationLevel.Info);
+        _notifications.Push("n pushes a notification", NotificationLevel.Warning);
     }
 
     public override TeaEffect? Initialize() => TeaEffects.Tick(TimeSpan.FromMilliseconds(250), static now => new AdvancedTick(now));
 
     public override TeaEffect? Update(Message message)
     {
-        if (HandleScreenInput(message))
+        if (InputHandled)
         {
             return null;
         }
@@ -128,7 +127,7 @@ internal sealed class AdvancedWidgetsApp : TeaApp
 
             if (_tick % 12 == 0)
             {
-                _notifications.Push($"heartbeat {tick.At:HH:mm:ss}", NotificationSeverity.Info);
+                _notifications.Push($"heartbeat {tick.At:HH:mm:ss}", NotificationLevel.Info);
             }
 
             return TeaEffects.Tick(TimeSpan.FromMilliseconds(250), static now => new AdvancedTick(now));
@@ -143,7 +142,7 @@ internal sealed class AdvancedWidgetsApp : TeaApp
 
             if (key.IsCharacter('n'))
             {
-                _notifications.Push($"manual event {_tick:000}", NotificationSeverity.Warning);
+                _notifications.Push($"manual event {_tick:000}", NotificationLevel.Warning);
                 _status.RightText = "notification pushed";
                 return null;
             }
@@ -159,44 +158,37 @@ internal sealed class AdvancedWidgetsApp : TeaApp
             Toggle: {(_toggle.Value ? "ON" : "OFF")}
             Concurrency: {_slider.Value:0}
             Spinner: {(_spinner.Running ? "running" : "paused")}
-            Selected node: {_tree.SelectedNodeId ?? "none"}
-            Notifications: {_notifications.Entries.Count}
+            Selected node: {_tree.SelectedId ?? "none"}
+            Notifications: {_notifications.Count}
             Size: {context.Width}x{context.Height}
             """;
 
         _status.LeftText = "Tab focus   Enter/Space activate   n notify   q quit";
         _status.RightText = $"tick={_tick:0000}";
 
-        return Screen.From(
-            new DockLayout(
-                bottom: new LayoutSlot(_status, LayoutLength.Fixed(1)),
-                fill: new LayoutSlot(
-                    new SplitLayout(
-                        LayoutOrientation.Horizontal,
-                        new LayoutSlot(
-                            new StackLayout(
-                                LayoutOrientation.Vertical,
-                                gap: 1,
-                                children:
-                                [
-                                    new LayoutSlot(_toggle, LayoutLength.Fixed(5)),
-                                    new LayoutSlot(_slider, LayoutLength.Fixed(6)),
-                                    new LayoutSlot(_spinner, LayoutLength.Fixed(5)),
-                                    new LayoutSlot(_summary, LayoutLength.Fill()),
-                                ]),
-                            LayoutLength.Fixed(Math.Min(38, Math.Max(30, context.Width / 3)))),
-                        new LayoutSlot(
-                            new StackLayout(
-                                LayoutOrientation.Vertical,
-                                gap: 1,
-                                children:
-                                [
-                                    new LayoutSlot(_tree, LayoutLength.Fill()),
-                                    new LayoutSlot(_notifications, LayoutLength.Fill()),
-                                ]),
-                            LayoutLength.Fill()),
-                        gap: 1),
-                    LayoutLength.Fill()),
-                padding: Thickness.All(1)));
+        var left = new ColumnLayout
+        {
+            Gap = 1,
+        };
+        left.AddFixed(_toggle, 5);
+        left.AddFixed(_slider, 6);
+        left.AddFixed(_spinner, 5);
+        left.AddFill(_summary);
+
+        var right = new ColumnLayout
+        {
+            Gap = 1,
+        };
+        right.AddFill(_tree);
+        right.AddFill(_notifications);
+
+        return Screen.From(new WindowLayout
+        {
+            Footer = LayoutSlot.Fixed(_status, 1),
+            Left = LayoutSlot.Fixed(left, Math.Min(38, Math.Max(30, context.Width / 3))),
+            Body = right,
+            Padding = Thickness.All(1),
+            Gap = 1,
+        });
     }
 }

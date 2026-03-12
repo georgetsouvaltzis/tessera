@@ -78,28 +78,16 @@ internal sealed class OrdersApp : TeaApp
         _orders.SetItems(_details.Keys.OrderBy(static value => value, StringComparer.Ordinal).ToArray());
         _orders.SelectionChanged += (_, args) => SelectOrder(args.SelectedItem);
         _refresh.Activated += (_, _) => Refresh();
+        _command.Submitted += (_, args) => Execute(args.Value);
+        _confirmDelete.Accepted += (_, _) => ApplyDialogResult(DialogResult.Accepted);
+        _confirmDelete.Dismissed += (_, _) => ApplyDialogResult(DialogResult.Dismissed);
         SelectOrder(_orders.SelectedItem);
     }
 
     public override TeaEffect? Update(Message message)
     {
-        if (HandleScreenInput(message))
+        if (InputHandled)
         {
-            if (_refresh.TryConsumeActivation())
-            {
-                Refresh();
-            }
-
-            if (_command.TryConsumeSubmission(out var command))
-            {
-                return Execute(command);
-            }
-
-            if (_confirmDelete.TryConsumeResult(out var result))
-            {
-                return ApplyDialogResult(result);
-            }
-
             return null;
         }
 
@@ -128,32 +116,24 @@ internal sealed class OrdersApp : TeaApp
         _status.LeftText = $"Order {_orders.SelectedItem}    Tab move focus    d delete";
         _status.RightText = _statusText;
 
-        var content = new DockLayout(
-            top: new LayoutSlot(new CenterLayout(_refresh, width: 26, height: 5), LayoutLength.Fixed(5)),
-            bottom: new LayoutSlot(_status, LayoutLength.Fixed(1)),
-            fill: new LayoutSlot(
-                new SplitLayout(
-                    LayoutOrientation.Horizontal,
-                    new LayoutSlot(new PanelLayout(_orders, border: BorderStyle.SingleLine, padding: Thickness.All(1)), LayoutLength.Fixed(28)),
-                    new LayoutSlot(
-                        new StackLayout(
-                            LayoutOrientation.Vertical,
-                            gap: 1,
-                            children:
-                            [
-                                new LayoutSlot(_summary, LayoutLength.Fixed(6)),
-                                new LayoutSlot(_detailsView, LayoutLength.Fill()),
-                                new LayoutSlot(_command, LayoutLength.Fixed(5)),
-                            ]),
-                        LayoutLength.Fill()),
-                    gap: 1),
-                LayoutLength.Fill()),
-            gap: 1,
-            padding: Thickness.All(1));
+        var detailsColumn = new ColumnLayout
+        {
+            Gap = 1,
+        };
+        detailsColumn.AddFixed(_summary, 6);
+        detailsColumn.AddFill(_detailsView);
+        detailsColumn.AddFixed(_command, 5);
 
-        return Screen.From(new OverlayLayout(
-            content,
-            new CenterLayout(_confirmDelete, width: 42, height: 8)));
+        return Screen.From(new WindowLayout
+        {
+            Header = LayoutSlot.Fixed(new CenterLayout(_refresh, width: 26, height: 5), 5),
+            Footer = LayoutSlot.Fixed(_status, 1),
+            Left = LayoutSlot.Fixed(new PanelLayout(_orders, border: BorderStyle.SingleLine, padding: Thickness.All(1)), 28),
+            Body = detailsColumn,
+            Overlay = new CenterLayout(_confirmDelete, width: 42, height: 8),
+            Gap = 1,
+            Padding = Thickness.All(1),
+        });
     }
 
     private void SelectOrder(string orderId)
@@ -173,34 +153,33 @@ internal sealed class OrdersApp : TeaApp
         _statusText = $"Refreshed at {DateTimeOffset.Now:HH:mm:ss}";
     }
 
-    private TeaEffect? Execute(string command)
+    private void Execute(string command)
     {
         var normalized = command.Trim();
         if (normalized.Length == 0)
         {
-            return null;
+            return;
         }
 
         if (normalized.Equals("refresh", StringComparison.OrdinalIgnoreCase))
         {
             Refresh();
-            return null;
+            return;
         }
 
         if (normalized.Equals("delete", StringComparison.OrdinalIgnoreCase))
         {
             OpenDeleteDialog();
-            return null;
+            return;
         }
 
         if (normalized.Equals("focus", StringComparison.OrdinalIgnoreCase))
         {
             _statusText = "Use Tab / Shift+Tab to move focus.";
-            return null;
+            return;
         }
 
         _statusText = $"Unknown command: {normalized}";
-        return null;
     }
 
     private void OpenDeleteDialog()
@@ -217,24 +196,23 @@ internal sealed class OrdersApp : TeaApp
             "Press Esc to keep it.");
     }
 
-    private TeaEffect? ApplyDialogResult(DialogResult result)
+    private void ApplyDialogResult(DialogResult result)
     {
         if (result != DialogResult.Accepted)
         {
             _statusText = "Delete cancelled.";
-            return null;
+            return;
         }
 
         var selected = _orders.SelectedItem;
         if (!_details.Remove(selected))
         {
             _statusText = "Nothing to delete.";
-            return null;
+            return;
         }
 
         _orders.SetItems(_details.Keys.OrderBy(static value => value, StringComparer.Ordinal).ToArray());
         SelectOrder(_orders.SelectedItem);
         _statusText = $"Deleted {selected}";
-        return null;
     }
 }

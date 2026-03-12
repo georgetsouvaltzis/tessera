@@ -33,25 +33,31 @@ Normal apps are built from:
 Recommended flow:
 
 1. `Update(Message)` handles typed app/runtime input.
-2. `HandleScreenInput(message)` forwards input into the current screen tree.
-3. `Build(ScreenContext)` returns a layout tree.
+2. built-in controls receive routed input automatically before `Update(Message)`.
+3. `Build(ScreenContext)` returns a screen assembled from named layout objects.
 
 That replaces the older default reliance on `InteractiveScreenModel`, `ScreenComposer`, and `InputRouter`.
 
 ## Layout
 
-Primary layout nouns:
+Primary default layout nouns:
+
+- `WindowLayout`
+- `RowLayout`
+- `ColumnLayout`
+- `PanelLayout`
+- `CenterLayout`
+- `LayoutSlot`
+- `LayoutLength`
+
+Advanced tree-oriented layout primitives still exist:
 
 - `StackLayout`
 - `SplitLayout`
 - `DockLayout`
-- `PanelLayout`
-- `CenterLayout`
 - `OverlayLayout`
-- `LayoutSlot`
-- `LayoutLength`
 
-These are explicit objects, not a nested static DSL. The goal is readable C# object construction and predictable composition.
+The default path should read like shallow screen assembly, not nested tree construction.
 
 ## Root Controls
 
@@ -62,11 +68,20 @@ Current default catalog:
 - `TextInput`
 - `TextArea`
 - `Choice`
+- `ComboBox`
 - `Dialog`
+- `ProgressBar`
+- `LogView`
+- `Notifications`
+- `Toggle`
+- `Slider`
+- `Spinner`
 - `StatusBar`
 - `Tabs`
 - `ListView<T>`
 - `Table`
+- `TreeItem`
+- `TreeView`
 - `MenuBar`
 
 These names are the preferred public nouns.
@@ -133,7 +148,7 @@ internal sealed class SearchApp : TeaApp
 
     public override TeaEffect? Update(Message message)
     {
-        if (HandleScreenInput(message))
+        if (InputHandled)
         {
             return null;
         }
@@ -148,13 +163,12 @@ internal sealed class SearchApp : TeaApp
         _status.LeftText = $"Size {context.Width}x{context.Height}";
         _status.RightText = "q quit";
 
-        return Screen.From(
-            new DockLayout(
-                bottom: new LayoutSlot(_status, LayoutLength.Fixed(1)),
-                fill: new LayoutSlot(
-                    new CenterLayout(_query, width: 48, height: 5),
-                    LayoutLength.Fill()),
-                padding: Thickness.All(1)));
+        return Screen.From(new WindowLayout
+        {
+            Footer = LayoutSlot.Fixed(_status, 1),
+            Body = new CenterLayout(_query, width: 48, height: 5),
+            Padding = Thickness.All(1),
+        });
     }
 }
 ```

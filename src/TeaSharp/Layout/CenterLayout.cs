@@ -1,5 +1,6 @@
 using TeaSharp.Components.Composition;
 using TeaSharp.Components.Primitives;
+using System.ComponentModel;
 
 namespace TeaSharp.Layout;
 
@@ -20,13 +21,27 @@ public sealed class CenterLayout : LayoutNode
         ICanvasComponent component,
         int? width = null,
         int? height = null,
-        Thickness margin = default,
-        ScreenRegionKey? regionKey = null,
-        bool? focusable = null,
-        bool focusOnClick = true,
-        bool interceptsPointer = true,
-        int layer = (int)ScreenLayer.Base,
-        Action? onFocus = null)
+        Thickness margin = default)
+        : this(
+            new ComponentLayout(component),
+            width,
+            height,
+            margin)
+    {
+    }
+
+    [EditorBrowsable(EditorBrowsableState.Advanced)]
+    public CenterLayout(
+        ICanvasComponent component,
+        int? width,
+        int? height,
+        Thickness margin,
+        ScreenRegionKey? regionKey,
+        bool? focusable,
+        bool focusOnClick,
+        bool interceptsPointer,
+        int layer,
+        Action? onFocus)
         : this(
             new ComponentLayout(component, regionKey, width, height, focusable, focusOnClick, interceptsPointer, layer, onFocus),
             width,

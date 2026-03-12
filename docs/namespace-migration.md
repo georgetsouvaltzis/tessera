@@ -63,7 +63,7 @@ Advanced-only namespaces remain available, but they should be opt-in.
 ### Layout
 
 - `UiKit.Layout` -> `TeaSharp.Layout.*`
-- `Frame` / `Dashboard` / `Form` helpers -> explicit `DockLayout`, `SplitLayout`, `StackLayout`, `PanelLayout`, `OverlayLayout`
+- `Frame` / `Dashboard` / `Form` helpers -> `WindowLayout`, `RowLayout`, `ColumnLayout`, `PanelLayout`, `CenterLayout`, `LayoutSlot`
 
 ## What Stayed Advanced
 
@@ -122,12 +122,14 @@ internal sealed class SearchApp : TeaApp
 
     public override TeaEffect? Update(Message message)
     {
-        HandleScreenInput(message);
         return null;
     }
 
     public override Screen Build(ScreenContext context) =>
-        Screen.From(new CenterLayout(_input, width: 48, height: 5));
+        Screen.From(new WindowLayout
+        {
+            Body = new CenterLayout(_input, width: 48, height: 5),
+        });
 }
 ```
 

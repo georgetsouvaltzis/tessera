@@ -1,30 +1,25 @@
-using TeaSharp.Components.Prebuilt;
+using TeaSharp.Components.Advanced;
 using TeaSharp.Components.Primitives;
-using System.ComponentModel;
 
 namespace TeaSharp.Controls;
 
-public sealed class Button : Control
+public sealed class Spinner : Control
 {
-    private readonly ButtonComponent _component = new();
+    private readonly SpinnerComponent _component = new();
 
-    public event EventHandler? Activated
+    public string Title
     {
-        add => _component.Pressed += value;
-        remove => _component.Pressed -= value;
+        get => _component.Title;
+        set => _component.Title = value ?? string.Empty;
     }
 
-    public string Text
+    public string Label
     {
         get => _component.Label;
         set => _component.Label = value ?? string.Empty;
     }
 
-    public string? Description
-    {
-        get => _component.Description;
-        set => _component.Description = value;
-    }
+    public bool Running => _component.Running;
 
     public BorderStyle Border
     {
@@ -38,24 +33,15 @@ public sealed class Button : Control
         set => _component.Padding = value;
     }
 
-    public int ActivationCount => _component.PressCount;
-
-    public bool IsPressed => _component.IsPressed;
-
     public override bool IsFocused
     {
         get => _component.IsFocused;
         set => _component.IsFocused = value;
     }
 
-    public override bool IsDisabled
-    {
-        get => !_component.Enabled;
-        set => _component.Enabled = !value;
-    }
+    public void SetRunning(bool running) => _component.SetRunning(running);
 
-    [EditorBrowsable(EditorBrowsableState.Advanced)]
-    public bool TryConsumeActivation() => _component.TryConsumePress();
+    public void Advance() => _component.Advance();
 
     public override bool Handle(Message message)
     {

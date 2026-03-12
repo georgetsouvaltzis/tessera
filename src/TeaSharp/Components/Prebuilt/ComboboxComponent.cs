@@ -12,6 +12,7 @@ using TeaSharp.Widgets;
 
 namespace TeaSharp.Components.Prebuilt;
 
+[EditorBrowsable(EditorBrowsableState.Advanced)]
 public sealed partial class ComboboxComponent : IStatefulComponent, IMouseStatefulComponent, IFocusableComponent
 {
     private readonly OptionListController _options = new();

@@ -6,9 +6,9 @@ The default app path is intentionally small:
 
 - derive from `TeaApp`
 - run apps with `Tea.RunAsync(...)` or `TeaApplicationBuilder`
-- route built-in controls with `HandleScreenInput(...)`
+- let built-in controls route automatically before `Update(...)`
 - return `Screen` from `Build(ScreenContext)`
-- compose screens with explicit layout objects from `TeaSharp.Layout`
+- assemble screens with `WindowLayout`, `RowLayout`, and `ColumnLayout`
 - use first-class controls from `TeaSharp.Controls`
 - configure runtime behavior with `TeaRuntimeOptions`
 - keep `TeaSharp.Components.Composition` and `TeaSharp.Core.*` for advanced or transitional scenarios only
@@ -46,15 +46,15 @@ internal sealed class CounterApp : TeaApp
     };
     private readonly StatusBar _status = new();
 
+    public CounterApp()
+    {
+        _increment.Activated += (_, _) => _count++;
+    }
+
     public override TeaEffect? Update(Message message)
     {
-        if (HandleScreenInput(message))
+        if (InputHandled)
         {
-            if (_increment.TryConsumeActivation())
-            {
-                _count++;
-            }
-
             return null;
         }
 
@@ -68,13 +68,12 @@ internal sealed class CounterApp : TeaApp
         _status.LeftText = $"Count: {_count}";
         _status.RightText = "Enter increments   Ctrl+C quits";
 
-        return Screen.From(
-            new DockLayout(
-                bottom: new LayoutSlot(_status, LayoutLength.Fixed(1)),
-                fill: new LayoutSlot(
-                    new CenterLayout(_increment, width: 20, height: 3),
-                    LayoutLength.Fill()),
-                padding: Thickness.All(1)));
+        return Screen.From(new WindowLayout
+        {
+            Footer = LayoutSlot.Fixed(_status, 1),
+            Body = new CenterLayout(_increment, width: 20, height: 3),
+            Padding = Thickness.All(1),
+        });
     }
 }
 ```

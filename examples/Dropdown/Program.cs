@@ -61,7 +61,7 @@ internal sealed class ChoiceDemoApp : TeaApp
 
     public override TeaEffect? Update(Message message)
     {
-        if (HandleScreenInput(message))
+        if (InputHandled)
         {
             return null;
         }
@@ -75,26 +75,25 @@ internal sealed class ChoiceDemoApp : TeaApp
     {
         _status.LeftText = "Enter/Space open-select   Up/Down move   q quit";
 
-        return Screen.From(
-            new DockLayout(
-                bottom: new LayoutSlot(_status, LayoutLength.Fixed(1)),
-                fill: new LayoutSlot(
-                    new CenterLayout(
-                        new PanelLayout(
-                            new StackLayout(
-                                LayoutOrientation.Vertical,
-                                gap: 1,
-                                children:
-                                [
-                                    new LayoutSlot(_choice, LayoutLength.Fixed(8)),
-                                    new LayoutSlot(_details, LayoutLength.Fixed(5)),
-                                ]),
-                            title: "TeaSharp Choice",
-                            border: TeaSharp.Components.Primitives.BorderStyle.Rounded,
-                            padding: TeaSharp.Components.Primitives.Thickness.All(1)),
-                        width: Math.Min(54, Math.Max(32, context.Width - 4)),
-                        height: 16),
-                    LayoutLength.Fill()),
-                padding: TeaSharp.Components.Primitives.Thickness.All(1)));
+        var content = new ColumnLayout
+        {
+            Gap = 1,
+        };
+        content.AddFixed(_choice, 8);
+        content.AddFixed(_details, 5);
+
+        return Screen.From(new WindowLayout
+        {
+            Footer = LayoutSlot.Fixed(_status, 1),
+            Body = new CenterLayout(
+                new PanelLayout(
+                    content,
+                    title: "TeaSharp Choice",
+                    border: TeaSharp.Components.Primitives.BorderStyle.Rounded,
+                    padding: TeaSharp.Components.Primitives.Thickness.All(1)),
+                width: Math.Min(54, Math.Max(32, context.Width - 4)),
+                height: 16),
+            Padding = TeaSharp.Components.Primitives.Thickness.All(1),
+        });
     }
 }

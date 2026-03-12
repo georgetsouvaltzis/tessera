@@ -33,6 +33,7 @@ internal sealed class ProductivityApp : TeaApp
         ClearOnSubmit = true,
     };
     private readonly StatusBar _status = new();
+    private bool _quitRequested;
 
     private readonly Dictionary<string, string[]> _taskSets = new(StringComparer.Ordinal)
     {
@@ -59,6 +60,10 @@ internal sealed class ProductivityApp : TeaApp
             else if (args.ItemId == "focus")
             {
                 _status.RightText = "Use Tab / Shift+Tab to move focus.";
+            }
+            else if (args.ItemId == "quit")
+            {
+                _quitRequested = true;
             }
         };
 
@@ -98,13 +103,14 @@ internal sealed class ProductivityApp : TeaApp
 
     public override TeaEffect? Update(Message message)
     {
-        if (HandleScreenInput(message))
+        if (_quitRequested)
         {
-            if (_menu.TryConsumeActivation(out var itemId) && itemId == "quit")
-            {
-                return TeaEffects.Quit;
-            }
+            _quitRequested = false;
+            return TeaEffects.Quit;
+        }
 
+        if (InputHandled)
+        {
             return null;
         }
 
@@ -117,36 +123,26 @@ internal sealed class ProductivityApp : TeaApp
     {
         _status.LeftText = $"Tab={_tabs.Items[_tabs.SelectedIndex]}   Tasks={_tasks.Count}";
 
-        return Screen.From(
-            new DockLayout(
-                top: new LayoutSlot(
-                    new StackLayout(
-                        LayoutOrientation.Vertical,
-                        children:
-                        [
-                            new LayoutSlot(_menu, LayoutLength.Fixed(1)),
-                            new LayoutSlot(_tabs, LayoutLength.Fixed(1)),
-                        ]),
-                    LayoutLength.Fixed(2)),
-                bottom: new LayoutSlot(_status, LayoutLength.Fixed(1)),
-                fill: new LayoutSlot(
-                    new SplitLayout(
-                        LayoutOrientation.Horizontal,
-                        new LayoutSlot(_tasks, LayoutLength.Fixed(Math.Min(36, Math.Max(24, context.Width / 3)))),
-                        new LayoutSlot(
-                            new StackLayout(
-                                LayoutOrientation.Vertical,
-                                gap: 1,
-                                children:
-                                [
-                                    new LayoutSlot(_table, LayoutLength.Fill()),
-                                    new LayoutSlot(_command, LayoutLength.Fixed(5)),
-                                ]),
-                            LayoutLength.Fill()),
-                        gap: 1),
-                    LayoutLength.Fill()),
-                gap: 1,
-                padding: TeaSharp.Components.Primitives.Thickness.All(1)));
+        var header = new ColumnLayout();
+        header.AddFixed(_menu, 1);
+        header.AddFixed(_tabs, 1);
+
+        var details = new ColumnLayout
+        {
+            Gap = 1,
+        };
+        details.AddFill(_table);
+        details.AddFixed(_command, 5);
+
+        return Screen.From(new WindowLayout
+        {
+            Header = LayoutSlot.Fixed(header, 2),
+            Footer = LayoutSlot.Fixed(_status, 1),
+            Left = LayoutSlot.Fixed(_tasks, Math.Min(36, Math.Max(24, context.Width / 3))),
+            Body = details,
+            Gap = 1,
+            Padding = TeaSharp.Components.Primitives.Thickness.All(1),
+        });
     }
 
     private void LoadTasks(string tab)

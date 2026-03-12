@@ -1,5 +1,6 @@
 using TeaSharp.Components.Primitives;
 using TeaSharp.Components.Productivity;
+using System.ComponentModel;
 
 namespace TeaSharp.Controls;
 
@@ -74,6 +75,7 @@ public sealed class MenuBar : Control
         return Forward(_component, message, bounds) || Handle(message);
     }
 
+    [EditorBrowsable(EditorBrowsableState.Advanced)]
     public bool TryConsumeActivation(out string itemId) => _component.TryConsumeActivation(out itemId);
 
     public override void Render(Canvas canvas, Rect rect)

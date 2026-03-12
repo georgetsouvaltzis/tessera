@@ -327,39 +327,57 @@ Extensibility should be explicit and stable.
 
 These are known deviations from the agreement and should be treated as active correction work.
 
-### 1. The New Composition Path Is Still Too DSL-Like
+### 1. Keep The Default Composition Path Shallow
 
-Even after removing static helpers, the current default examples still rely heavily on nested layout object trees such as:
+The default path now uses:
 
-- `new DockLayout(new SplitLayout(new StackLayout(...)))`
+- `WindowLayout`
+- `RowLayout`
+- `ColumnLayout`
+- `PanelLayout`
+- `CenterLayout`
 
-That still violates the intent of the "no Dart-like composition" agreement.
+That is the correct direction.
 
-### 2. Layout Authoring Still Leans On Tree Construction Instead Of Screen Assembly
+The remaining risk is regression:
 
-The current root layout model is usable, but it is still more tree-oriented than builder-oriented.
+- larger examples drifting back toward giant layout-assembly blocks
+- new docs/examples reintroducing tree-first authoring
 
-The default authoring path should move toward shallower, more explicit screen construction.
+This must be watched continuously.
 
-### 3. The Stable Path Is Still Blurry
+### 2. The Stable Path Is Much Clearer, But Still Needs Policing
 
-Some examples and docs still mix root controls with advanced `*Component` types.
+The root path is now materially clearer:
 
-That makes it unclear which path is:
+- `TeaApp`
+- automatic control routing before `Update(...)`
+- `InputHandled`
+- root controls
+- `WindowLayout` + `RowLayout` + `ColumnLayout`
 
-- default
-- advanced
-- transitional only
+But it must stay that way:
 
-This must be corrected in the examples and in IntelliSense-facing guidance.
+- root docs/examples must keep teaching only the default path
+- advanced tree primitives must remain advanced-only in discoverability
+- root polling methods must remain advanced-only
+- new wrappers should continue replacing old `*Component` nouns where justified
 
-### 4. Default Input Flow Still Feels Magical
+### 3. Default Input Flow Is Acceptable, But Not Final
 
-The current `HandleScreenInput(...)` plus post-routing probing pattern is still framework knowledge.
+The old `HandleScreenInput(...)` plus post-routing probing story is no longer the default path.
 
-If a new user has to learn routing order before they can use a button or input correctly, the default API is not finished.
+The remaining issue is `InputHandled`.
 
-### 5. Custom Widget Story Still Shows Engine DNA
+It is acceptable for now, but it is still a framework-global concept rather than the cleanest possible interaction model.
+
+Long-term goal:
+
+- obvious interaction semantics
+- less framework-global state in `Update(...)`
+- one even clearer default control story
+
+### 4. Custom Widget Story Still Shows Engine DNA
 
 Current examples of drift:
 
@@ -369,7 +387,7 @@ Current examples of drift:
 
 This is acceptable internally for now, but it should not remain the long-term consumer story.
 
-### 6. Root Catalog Is Incomplete
+### 5. Root Catalog Is Incomplete
 
 Some important controls still require direct use of advanced `*Component` types.
 

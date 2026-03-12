@@ -17,21 +17,30 @@ This is the working map from legacy pre-release APIs to the current default path
 - `TextInputComponent` -> `TextInput`
 - `TextAreaComponent` -> `TextArea`
 - `DropdownComponent` -> `Choice`
+- `ComboboxComponent` -> `ComboBox`
 - `DialogComponent` -> `Dialog`
+- `ProgressBarComponent` -> `ProgressBar`
+- `LogViewerComponent` -> `LogView`
+- `NotificationCenterComponent` -> `Notifications`
+- `ToggleSwitchComponent` -> `Toggle`
+- `SliderComponent` -> `Slider`
+- `SpinnerComponent` -> `Spinner`
 - `StatusBarComponent` -> `StatusBar`
 - `TabsComponent` -> `Tabs`
 - `ListComponent<T>` -> `ListView<T>`
 - `TableComponent` -> `Table`
+- `TreeViewComponent` -> `TreeView`
+- `TreeItemNode` -> `TreeItem`
 - `MenuBarComponent` -> `MenuBar`
 - `MenuBarItem` -> `MenuItem`
 
 ## Composition
 
 - `ScreenComposer` -> build `Screen` from `TeaSharp.Layout` object-model types
-- `InteractiveScreenModel` -> `TeaApp` + `HandleScreenInput(...)`
+- `InteractiveScreenModel` -> `TeaApp` with automatic control routing before `Update(...)`
 - `InputRouter` -> typed `Message` handling in `TeaApp.Update(...)`
 - `ScreenRegionKey` -> implicit tree order unless you are on the advanced path
-- `Stack` / `Split` / `Panel` / `Dock` / `Overlay` / `Center` / `Slot` static helper DSLs -> `StackLayout`, `SplitLayout`, `PanelLayout`, `DockLayout`, `OverlayLayout`, `CenterLayout`, `LayoutSlot`
+- `Stack` / `Split` / `Panel` / `Dock` / `Overlay` / `Center` / `Slot` static helper DSLs -> `WindowLayout`, `RowLayout`, `ColumnLayout`, `PanelLayout`, `CenterLayout`, `LayoutSlot`
 
 ## Notes
 

@@ -1,5 +1,6 @@
 using TeaSharp.Components.Prebuilt;
 using TeaSharp.Components.Primitives;
+using System.ComponentModel;
 
 namespace TeaSharp.Controls;
 
@@ -83,8 +84,10 @@ public sealed class TextInput : Control
 
     public void Clear() => _component.Clear();
 
+    [EditorBrowsable(EditorBrowsableState.Advanced)]
     public bool TryConsumeSubmission(out string value) => _component.TryConsumeSubmit(out value);
 
+    [EditorBrowsable(EditorBrowsableState.Advanced)]
     public bool TryConsumeCancellation(out string value) => _component.TryConsumeCancel(out value);
 
     public override bool Handle(Message message)
