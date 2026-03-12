@@ -1,5 +1,13 @@
 # TeaSharp Refactor Plan
 
+This file is historical.
+
+Current maintainer source-of-truth:
+
+- `docs/source-of-truth.md`
+
+Use that document for redesign decisions, API shape, naming rules, and correction work. This file remains only as a record of older execution phases.
+
 ## Goals
 
 - make component composition explicit and testable
