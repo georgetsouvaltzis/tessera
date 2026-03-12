@@ -121,7 +121,7 @@ That contract gives:
 - render hook through `Render(Canvas, Rect)`
 - typed message hook through `Handle(Message)`
 - optional pointer-aware hook through `Handle(Message, Rect)`
-- automatic bridge into the current runtime/composition engine
+- automatic bridge into the current runtime/composition engine without exposing the legacy component interfaces on the default path
 
 Design rule:
 

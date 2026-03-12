@@ -1,6 +1,7 @@
 using TeaSharp.Components.Primitives;
 using TeaSharp.Core.Abstractions;
 using TeaSharp.Components.Composition;
+using TeaSharp.Controls;
 using System.ComponentModel;
 
 namespace TeaSharp.Layout;
@@ -13,36 +14,64 @@ public sealed record LayoutSlot
     public static LayoutSlot Auto(LayoutNode content, Thickness margin = default) =>
         new(content, LayoutLength.Auto(), margin);
 
+    [EditorBrowsable(EditorBrowsableState.Advanced)]
     public static LayoutSlot Auto(ICanvasComponent component, Thickness margin = default) =>
         new(component, LayoutLength.Auto(), margin);
+
+    public static LayoutSlot Auto(Control control, Thickness margin = default) =>
+        new(control, LayoutLength.Auto(), margin);
 
     public static LayoutSlot Fixed(LayoutNode content, int size, Thickness margin = default) =>
         new(content, LayoutLength.Fixed(size), margin);
 
+    [EditorBrowsable(EditorBrowsableState.Advanced)]
     public static LayoutSlot Fixed(ICanvasComponent component, int size, Thickness margin = default) =>
         new(component, LayoutLength.Fixed(size), margin);
+
+    public static LayoutSlot Fixed(Control control, int size, Thickness margin = default) =>
+        new(control, LayoutLength.Fixed(size), margin);
 
     public static LayoutSlot Fill(LayoutNode content, Thickness margin = default) =>
         new(content, LayoutLength.Fill(), margin);
 
+    [EditorBrowsable(EditorBrowsableState.Advanced)]
     public static LayoutSlot Fill(ICanvasComponent component, Thickness margin = default) =>
         new(component, LayoutLength.Fill(), margin);
+
+    public static LayoutSlot Fill(Control control, Thickness margin = default) =>
+        new(control, LayoutLength.Fill(), margin);
 
     public static LayoutSlot Weighted(LayoutNode content, int weight, Thickness margin = default) =>
         new(content, LayoutLength.Weighted(weight), margin);
 
+    [EditorBrowsable(EditorBrowsableState.Advanced)]
     public static LayoutSlot Weighted(ICanvasComponent component, int weight, Thickness margin = default) =>
         new(component, LayoutLength.Weighted(weight), margin);
+
+    public static LayoutSlot Weighted(Control control, int weight, Thickness margin = default) =>
+        new(control, LayoutLength.Weighted(weight), margin);
 
     /// <summary>
     /// Creates a slot for the provided TeaSharp component.
     /// </summary>
+    [EditorBrowsable(EditorBrowsableState.Advanced)]
     public LayoutSlot(
         ICanvasComponent component,
         LayoutLength length,
         Thickness margin = default)
         : this(
             new ComponentLayout(component),
+            length,
+            margin)
+    {
+    }
+
+    public LayoutSlot(
+        Control control,
+        LayoutLength length,
+        Thickness margin = default)
+        : this(
+            new ComponentLayout(control),
             length,
             margin)
     {

@@ -384,7 +384,6 @@ Long-term goal:
 Current examples of drift:
 
 - `TeaApp : TeaSharp.Core.Abstractions.IScreen`
-- `Control : IStatefulComponent, IMouseStatefulComponent, IFocusableComponent`
 - adapter-driven bridges visible in consumer-facing types
 
 This is acceptable internally for now, but it should not remain the long-term consumer story.

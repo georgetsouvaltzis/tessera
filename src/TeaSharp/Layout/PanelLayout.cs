@@ -1,6 +1,7 @@
 using TeaSharp.Components.Composition;
 using TeaSharp.Components.Primitives;
 using TeaSharp.Components.Primitives.Internal;
+using TeaSharp.Controls;
 using System.ComponentModel;
 
 namespace TeaSharp.Layout;
@@ -19,6 +20,7 @@ public sealed class PanelLayout : LayoutNode
         Margin = margin;
     }
 
+    [EditorBrowsable(EditorBrowsableState.Advanced)]
     public PanelLayout(
         ICanvasComponent component,
         string? title = null,
@@ -27,6 +29,21 @@ public sealed class PanelLayout : LayoutNode
         Thickness margin = default)
         : this(
             new ComponentLayout(component),
+            title,
+            border,
+            padding,
+            margin)
+    {
+    }
+
+    public PanelLayout(
+        Control control,
+        string? title = null,
+        BorderStyle border = BorderStyle.None,
+        Thickness padding = default,
+        Thickness margin = default)
+        : this(
+            new ComponentLayout(control),
             title,
             border,
             padding,

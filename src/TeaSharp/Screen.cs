@@ -1,8 +1,10 @@
 using TeaSharp.Components.Primitives;
 using TeaSharp.Core.Abstractions;
+using TeaSharp.Controls;
 using TeaSharp.Components.Composition;
 using TeaSharp.Internal;
 using TeaSharp.Layout;
+using System.ComponentModel;
 
 namespace TeaSharp;
 
@@ -27,6 +29,10 @@ public sealed class Screen
 
     public static Screen From(LayoutNode layout) => new(layout: layout ?? throw new ArgumentNullException(nameof(layout)));
 
+    public static Screen From(Control control) =>
+        new(layout: new ComponentLayout(control ?? throw new ArgumentNullException(nameof(control))));
+
+    [EditorBrowsable(EditorBrowsableState.Advanced)]
     public static Screen From(ICanvasComponent component) =>
         new(layout: new ComponentLayout(component ?? throw new ArgumentNullException(nameof(component))));
 

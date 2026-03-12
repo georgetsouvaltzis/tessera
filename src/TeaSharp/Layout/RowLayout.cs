@@ -1,6 +1,8 @@
 using TeaSharp.Components.Composition;
 using TeaSharp.Components.Primitives;
+using TeaSharp.Controls;
 using TeaSharp.Core.Abstractions;
+using System.ComponentModel;
 
 namespace TeaSharp.Layout;
 
@@ -24,26 +26,42 @@ public sealed class RowLayout : LayoutNode
     public RowLayout AddAuto(LayoutNode content, Thickness margin = default)
         => Add(LayoutSlot.Auto(content, margin));
 
+    [EditorBrowsable(EditorBrowsableState.Advanced)]
     public RowLayout AddAuto(ICanvasComponent component, Thickness margin = default)
         => Add(LayoutSlot.Auto(component, margin));
+
+    public RowLayout AddAuto(Control control, Thickness margin = default)
+        => Add(LayoutSlot.Auto(control, margin));
 
     public RowLayout AddFixed(LayoutNode content, int size, Thickness margin = default)
         => Add(LayoutSlot.Fixed(content, size, margin));
 
+    [EditorBrowsable(EditorBrowsableState.Advanced)]
     public RowLayout AddFixed(ICanvasComponent component, int size, Thickness margin = default)
         => Add(LayoutSlot.Fixed(component, size, margin));
+
+    public RowLayout AddFixed(Control control, int size, Thickness margin = default)
+        => Add(LayoutSlot.Fixed(control, size, margin));
 
     public RowLayout AddFill(LayoutNode content, Thickness margin = default)
         => Add(LayoutSlot.Fill(content, margin));
 
+    [EditorBrowsable(EditorBrowsableState.Advanced)]
     public RowLayout AddFill(ICanvasComponent component, Thickness margin = default)
         => Add(LayoutSlot.Fill(component, margin));
+
+    public RowLayout AddFill(Control control, Thickness margin = default)
+        => Add(LayoutSlot.Fill(control, margin));
 
     public RowLayout AddWeighted(LayoutNode content, int weight, Thickness margin = default)
         => Add(LayoutSlot.Weighted(content, weight, margin));
 
+    [EditorBrowsable(EditorBrowsableState.Advanced)]
     public RowLayout AddWeighted(ICanvasComponent component, int weight, Thickness margin = default)
         => Add(LayoutSlot.Weighted(component, weight, margin));
+
+    public RowLayout AddWeighted(Control control, int weight, Thickness margin = default)
+        => Add(LayoutSlot.Weighted(control, weight, margin));
 
     internal override LayoutMeasurement Measure(in Rect availableBounds)
     {

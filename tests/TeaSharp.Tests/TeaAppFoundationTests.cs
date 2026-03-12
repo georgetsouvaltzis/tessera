@@ -77,8 +77,8 @@ internal static class TeaAppFoundationTests
     private static Task TeaControl_Bridge_MapsCoreMessagesToPublicMessages()
     {
         var control = new RecordingControl();
-        var stateful = (IStatefulComponent)control;
-        var mouseStateful = (IMouseStatefulComponent)control;
+        var stateful = (IStatefulComponent)control.Component;
+        var mouseStateful = (IMouseStatefulComponent)control.Component;
 
         stateful.Update(new KeyPressMsg(KeyCode.Enter));
         mouseStateful.UpdateMouse(new MouseClickMsg(MouseButton.Left, 2, 3), new Rect(0, 0, 10, 10));

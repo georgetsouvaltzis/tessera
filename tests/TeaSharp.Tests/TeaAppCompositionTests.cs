@@ -43,6 +43,9 @@ internal static class TeaAppCompositionTests
             "TeaAppComposition_AdvancedLayoutOverloads_AreMarkedAdvanced",
             AdvancedLayoutOverloads_AreMarkedAdvanced);
         yield return new TestCase(
+            "TeaAppComposition_LegacyCanvasComponentEntryPoints_AreMarkedAdvanced",
+            LegacyCanvasComponentEntryPoints_AreMarkedAdvanced);
+        yield return new TestCase(
             "TeaAppComposition_LowLevelTreeLayouts_AreMarkedAdvanced",
             LowLevelTreeLayouts_AreMarkedAdvanced);
         yield return new TestCase(
@@ -209,6 +212,55 @@ internal static class TeaAppCompositionTests
             var attribute = (EditorBrowsableAttribute?)Attribute.GetCustomAttribute(ctor!, typeof(EditorBrowsableAttribute));
             TestAssert.True(attribute is not null, $"{type.Name} advanced overload should be marked advanced.");
             TestAssert.True(attribute!.State == EditorBrowsableState.Advanced, $"{type.Name} advanced overload should be hidden from default discoverability.");
+        }
+
+        return Task.CompletedTask;
+    }
+
+    private static Task LegacyCanvasComponentEntryPoints_AreMarkedAdvanced()
+    {
+        var advancedMethods =
+            new (Type Type, string Name, Type[] Parameters)[]
+            {
+                (typeof(Screen), nameof(Screen.From), [typeof(ICanvasComponent)]),
+                (typeof(LayoutSlot), nameof(LayoutSlot.Auto), [typeof(ICanvasComponent), typeof(Thickness)]),
+                (typeof(LayoutSlot), nameof(LayoutSlot.Fixed), [typeof(ICanvasComponent), typeof(int), typeof(Thickness)]),
+                (typeof(LayoutSlot), nameof(LayoutSlot.Fill), [typeof(ICanvasComponent), typeof(Thickness)]),
+                (typeof(LayoutSlot), nameof(LayoutSlot.Weighted), [typeof(ICanvasComponent), typeof(int), typeof(Thickness)]),
+                (typeof(RowLayout), nameof(RowLayout.AddAuto), [typeof(ICanvasComponent), typeof(Thickness)]),
+                (typeof(RowLayout), nameof(RowLayout.AddFixed), [typeof(ICanvasComponent), typeof(int), typeof(Thickness)]),
+                (typeof(RowLayout), nameof(RowLayout.AddFill), [typeof(ICanvasComponent), typeof(Thickness)]),
+                (typeof(RowLayout), nameof(RowLayout.AddWeighted), [typeof(ICanvasComponent), typeof(int), typeof(Thickness)]),
+                (typeof(ColumnLayout), nameof(ColumnLayout.AddAuto), [typeof(ICanvasComponent), typeof(Thickness)]),
+                (typeof(ColumnLayout), nameof(ColumnLayout.AddFixed), [typeof(ICanvasComponent), typeof(int), typeof(Thickness)]),
+                (typeof(ColumnLayout), nameof(ColumnLayout.AddFill), [typeof(ICanvasComponent), typeof(Thickness)]),
+                (typeof(ColumnLayout), nameof(ColumnLayout.AddWeighted), [typeof(ICanvasComponent), typeof(int), typeof(Thickness)]),
+            };
+
+        foreach (var (type, name, parameters) in advancedMethods)
+        {
+            var method = type.GetMethod(name, parameters);
+            TestAssert.True(method is not null, $"{type.Name}.{name} legacy component overload should exist for advanced callers.");
+            var attribute = (EditorBrowsableAttribute?)Attribute.GetCustomAttribute(method!, typeof(EditorBrowsableAttribute));
+            TestAssert.True(attribute is not null, $"{type.Name}.{name} legacy component overload should be marked advanced.");
+            TestAssert.True(attribute!.State == EditorBrowsableState.Advanced, $"{type.Name}.{name} legacy component overload should be hidden from the default path.");
+        }
+
+        var advancedCtors =
+            new (Type Type, Type[] Parameters)[]
+            {
+                (typeof(LayoutSlot), [typeof(ICanvasComponent), typeof(LayoutLength), typeof(Thickness)]),
+                (typeof(CenterLayout), [typeof(ICanvasComponent), typeof(int?), typeof(int?), typeof(Thickness)]),
+                (typeof(PanelLayout), [typeof(ICanvasComponent), typeof(string), typeof(BorderStyle), typeof(Thickness), typeof(Thickness)]),
+            };
+
+        foreach (var (type, parameters) in advancedCtors)
+        {
+            var ctor = type.GetConstructor(parameters);
+            TestAssert.True(ctor is not null, $"{type.Name} legacy component constructor should exist for advanced callers.");
+            var attribute = (EditorBrowsableAttribute?)Attribute.GetCustomAttribute(ctor!, typeof(EditorBrowsableAttribute));
+            TestAssert.True(attribute is not null, $"{type.Name} legacy component constructor should be marked advanced.");
+            TestAssert.True(attribute!.State == EditorBrowsableState.Advanced, $"{type.Name} legacy component constructor should be hidden from the default path.");
         }
 
         return Task.CompletedTask;

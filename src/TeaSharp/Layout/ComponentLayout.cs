@@ -1,5 +1,6 @@
 using TeaSharp.Components.Composition;
 using TeaSharp.Components.Primitives;
+using TeaSharp.Controls;
 using System.ComponentModel;
 
 namespace TeaSharp.Layout;
@@ -35,6 +36,11 @@ public sealed class ComponentLayout : LayoutNode
 
     public ComponentLayout(ICanvasComponent component)
         : this(component, null, null, null, null, focusOnClick: true, interceptsPointer: true, layer: (int)ScreenLayer.Base, onFocus: null)
+    {
+    }
+
+    public ComponentLayout(Control control)
+        : this((control ?? throw new ArgumentNullException(nameof(control))).Component)
     {
     }
 

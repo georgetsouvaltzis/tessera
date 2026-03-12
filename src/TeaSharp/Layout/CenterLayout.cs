@@ -1,5 +1,6 @@
 using TeaSharp.Components.Composition;
 using TeaSharp.Components.Primitives;
+using TeaSharp.Controls;
 using System.ComponentModel;
 
 namespace TeaSharp.Layout;
@@ -17,6 +18,7 @@ public sealed class CenterLayout : LayoutNode
         Margin = margin;
     }
 
+    [EditorBrowsable(EditorBrowsableState.Advanced)]
     public CenterLayout(
         ICanvasComponent component,
         int? width = null,
@@ -24,6 +26,19 @@ public sealed class CenterLayout : LayoutNode
         Thickness margin = default)
         : this(
             new ComponentLayout(component),
+            width,
+            height,
+            margin)
+    {
+    }
+
+    public CenterLayout(
+        Control control,
+        int? width = null,
+        int? height = null,
+        Thickness margin = default)
+        : this(
+            new ComponentLayout(control),
             width,
             height,
             margin)

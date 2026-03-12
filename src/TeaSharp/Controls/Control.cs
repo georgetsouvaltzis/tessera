@@ -6,8 +6,15 @@ using TeaSharp.Internal;
 
 namespace TeaSharp.Controls;
 
-public abstract class Control : IStatefulComponent, IMouseStatefulComponent, IFocusableComponent
+public abstract class Control
 {
+    private readonly ControlComponentAdapter _componentAdapter;
+
+    protected Control()
+    {
+        _componentAdapter = new ControlComponentAdapter(this);
+    }
+
     public virtual bool IsFocused { get; set; }
 
     public virtual bool IsDisabled { get; set; }
@@ -45,23 +52,39 @@ public abstract class Control : IStatefulComponent, IMouseStatefulComponent, IFo
             && mouseStateful.UpdateMouse((MouseMsg)TeaMessageAdapter.ToCore(message), bounds);
     }
 
-    bool IStatefulComponent.Update(IMessage message)
+    internal ICanvasComponent Component => _componentAdapter;
+
+    private sealed class ControlComponentAdapter(Control owner) : IStatefulComponent, IMouseStatefulComponent, IFocusableComponent
     {
-        if (IsDisabled)
+        public bool IsFocused
         {
-            return false;
+            get => owner.IsFocused;
+            set => owner.IsFocused = value;
         }
 
-        return Handle(TeaMessageAdapter.ToPublic(message));
-    }
-
-    bool IMouseStatefulComponent.UpdateMouse(MouseMsg message, Rect bounds)
-    {
-        if (IsDisabled)
+        public void Render(Canvas canvas, Rect rect)
         {
-            return false;
+            owner.Render(canvas, rect);
         }
 
-        return Handle(TeaMessageAdapter.ToPublic(message), bounds);
+        public bool Update(IMessage message)
+        {
+            if (owner.IsDisabled)
+            {
+                return false;
+            }
+
+            return owner.Handle(TeaMessageAdapter.ToPublic(message));
+        }
+
+        public bool UpdateMouse(MouseMsg message, Rect bounds)
+        {
+            if (owner.IsDisabled)
+            {
+                return false;
+            }
+
+            return owner.Handle(TeaMessageAdapter.ToPublic(message), bounds);
+        }
     }
 }
