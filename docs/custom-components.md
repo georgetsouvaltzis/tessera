@@ -1,61 +1,38 @@
 # TeaSharp Custom Components
 
-For the recommended full-app shell, see `docs/app-pattern.md`.
+For the default app shell, see `docs/app-pattern.md`.
 
-TeaSharp custom components are built around three contracts:
+TeaSharp keeps custom widgets available, but through a smaller contract than the full runtime engine.
 
-- `ICanvasComponent`: render-only component.
-- `IStatefulComponent`: render + local `Update(IMessage)` state transitions.
-- `IMouseStatefulComponent`: optional bounds-aware mouse transitions via `UpdateMouse(MouseMsg, Rect)`.
-- `IFocusableComponent`: explicit `IsFocused` state for keyboard-routing participation.
-- `ComponentComposer`: deterministic slot composition and optional update routing for lower-level component subtrees.
-  - default keyboard mode is focused-slot only
-  - switch to `KeyboardRoutingMode.Broadcast` when a container should fan out input
-  - use it for slot-based component trees inside a larger app shell
-- `ScreenComposer`: named screen regions with frame snapshots, focus ownership, and mouse routing for larger app surfaces
-  - prefer `ScreenRegionKey` fields over ad hoc string constants once a screen grows beyond a toy example
-  - overlay helpers handle blocking modals/palettes and passive toast overlays without extra app-level hit-testing
-- `InputRouter`: app-level key precedence across overlays, command bars, focused regions, and global shortcuts
-  - typical scope order: `System` -> `Modal` -> `Palette` -> `CommandBar` -> `FocusedRegion` -> `Global`
-  - use `CaptureWhileActive` for modal/palette/command scopes so lower handlers cannot accidentally run
-  - use `blocksGlobalShortcuts` on text-entry scopes to suppress plain-character globals while editing
-- `InteractiveScreenModel`: reusable screen shell for apps that compose a `ScreenComposer` + `InputRouter`
-  - call `RouteKey(...)`, `RouteMouse(...)`, and `RenderScreen(...)` instead of hand-rolling `EnsureScreen` / `BeginFrame` / `CompleteFrame` glue
+## Default Contract
 
-## Minimal Render-Only Component
+Use `TeaSharp.Controls.Control` when you want a reusable interactive widget.
+
+`Control` already bridges into the existing component/runtime pipeline and gives you:
+
+- `Render(Canvas, Rect)`
+- `Handle(Message)`
+- `Handle(Message, Rect)` for bounds-aware pointer work
+- `IsFocused`
+- `IsDisabled`
+- `IsReadOnly`
+
+This keeps custom widgets independent from `InputRouter`, `ScreenRegionKey`, and other screen-scale routing types.
+
+## Minimal Custom Control
 
 ```csharp
-using TeaSharp.Components.Composition;
+using TeaSharp;
+using TeaSharp.Controls;
 using TeaSharp.Components.Primitives;
 
-public sealed class ClockComponent : ICanvasComponent
-{
-    public void Render(Canvas canvas, Rect rect)
-    {
-        canvas.DrawBox(rect, "Clock");
-        var body = rect.Inset(1, 1);
-        canvas.WriteText(body.X, body.Y, DateTimeOffset.Now.ToString("HH:mm:ss"), body.Width);
-    }
-}
-```
-
-## Stateful Component
-
-```csharp
-using TeaSharp.Components.Composition;
-using TeaSharp.Components.Primitives;
-using TeaSharp.Core.Abstractions;
-using TeaSharp.Core.Messages;
-
-public sealed class CounterChip : IStatefulComponent, IFocusableComponent
+public sealed class CounterBadge : Control
 {
     private int _count;
 
-    public bool IsFocused { get; set; }
-
-    public bool Update(IMessage message)
+    public override bool Handle(Message message)
     {
-        if (message is KeyPressMsg key && key.IsCharacter('+', KeyModifiers.None, ignoreCase: false))
+        if (message is KeyPressed key && key.IsCharacter('+', ignoreCase: false))
         {
             _count++;
             return true;
@@ -64,39 +41,39 @@ public sealed class CounterChip : IStatefulComponent, IFocusableComponent
         return false;
     }
 
-    public void Render(Canvas canvas, Rect rect)
+    public override void Render(Canvas canvas, Rect rect)
     {
-        canvas.DrawBox(rect, "Chip");
+        canvas.DrawBox(rect, "Counter");
         var body = rect.Inset(1, 1);
         canvas.WriteText(body.X, body.Y, $"count={_count}", body.Width);
     }
 }
 ```
 
-## Compose In a Local Component Subtree
+## When To Use The Advanced Contracts
 
-```csharp
-var canvas = new Canvas(width, height, CanvasTextMode.GraphemeAware);
-var composer = new ComponentComposer();
+The older composition contracts remain available:
 
-composer.Add(new ClockComponent(), new Rect(0, 0, 24, 3));
-composer.Add(new CounterChip(), new Rect(24, 0, 24, 3));
+- `ICanvasComponent`
+- `IStatefulComponent`
+- `IMouseStatefulComponent`
+- `IFocusableComponent`
+- `ComponentComposer`
+- `ScreenComposer`
 
-// default keyboard routing targets the focused slot:
-composer.Update(message);
+Those types are now marked `EditorBrowsable(Advanced)`. Use them when you need:
 
-composer.Render(canvas);
-return canvas.Render();
-```
+- tight integration with an existing advanced screen
+- explicit region routing
+- deterministic slot composition
+- direct interop with legacy TeaSharp component APIs
 
-## Practical Notes
+## Design Rules For Custom Widgets
 
-- Keep components deterministic: all state transitions via `Update`.
-- For mouse-aware widgets, keep bounds checks inside `UpdateMouse` and treat coordinates as canvas-space.
-- Use `IFocusableComponent` instead of relying on naming conventions or reflection.
-- Keep render pure: no side effects from `Render`.
-- If you need full Unicode layout fidelity in component text, use `CanvasTextMode.GraphemeAware`.
-- Use composer slots as an explicit layout graph; avoid hidden global state.
-- For screen-scale apps, keep one owner per concern: `ScreenComposer` for regions/focus/mouse, `InputRouter` for key precedence.
-- If your model is “one screen + some overlays + scoped shortcuts”, derive from `InteractiveScreenModel` and keep region keys as `static readonly ScreenRegionKey` fields.
-- Treat `ComponentComposer` as a lower-level subtree helper, not the default top-level app shell.
+- keep rendering pure; no side effects from `Render`
+- keep state transitions in `Handle`
+- prefer typed `Message` handling over raw core messages
+- keep focus local to the control
+- only drop to advanced composition contracts when the widget truly needs screen-scale routing
+
+The intent is simple: custom controls should be easy to write without forcing authors to learn the runtime engine.

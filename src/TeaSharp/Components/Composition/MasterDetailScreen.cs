@@ -1,11 +1,13 @@
 using TeaSharp.Components.Primitives;
 using TeaSharp.Core.Abstractions;
+using System.ComponentModel;
 
 namespace TeaSharp.Components.Composition;
 
 /// <summary>
 /// Represents a master-detail screen shell with optional header and footer regions.
 /// </summary>
+[EditorBrowsable(EditorBrowsableState.Advanced)]
 public sealed class MasterDetailScreen
 {
     private readonly ScreenComposer _screen;

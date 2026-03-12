@@ -6,9 +6,11 @@ using TeaSharp.Components.UiKit.Internal;
 using TeaSharp.Core.Abstractions;
 using TeaSharp.Core.Messages;
 using TeaSharp.Widgets;
+using System.ComponentModel;
 
 namespace TeaSharp.Components.UiKit;
 
+[EditorBrowsable(EditorBrowsableState.Advanced)]
 public static class Layout
 {
     public static ViewportClass Classify(int width)
@@ -88,4 +90,3 @@ public static class Layout
         return result;
     }
 }
-

@@ -1,11 +1,13 @@
 using TeaSharp.Components.Primitives;
 using TeaSharp.Core.Abstractions;
+using System.ComponentModel;
 
 namespace TeaSharp.Components.Composition;
 
 /// <summary>
 /// Represents a dashboard-style screen shell with optional header and footer plus sidebar and main regions.
 /// </summary>
+[EditorBrowsable(EditorBrowsableState.Advanced)]
 public sealed class DashboardScreen
 {
     private readonly ScreenComposer _screen;

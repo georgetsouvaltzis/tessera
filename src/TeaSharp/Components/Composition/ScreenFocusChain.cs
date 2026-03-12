@@ -1,8 +1,11 @@
+using System.ComponentModel;
+
 namespace TeaSharp.Components.Composition;
 
 /// <summary>
 /// Defines an ordered set of focusable regions for app-level navigation helpers.
 /// </summary>
+[EditorBrowsable(EditorBrowsableState.Advanced)]
 public sealed class ScreenFocusChain
 {
     private readonly ScreenRegionKey[] _regionKeys;

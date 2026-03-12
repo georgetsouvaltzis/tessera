@@ -2,10 +2,12 @@ using TeaSharp.Components.Primitives;
 using TeaSharp.Core.Abstractions;
 using TeaSharp.Core.Messages;
 using System.Diagnostics.CodeAnalysis;
+using System.ComponentModel;
 using TeaSharp.Layout;
 
 namespace TeaSharp.Components.Composition;
 
+[EditorBrowsable(EditorBrowsableState.Advanced)]
 public abstract class InteractiveScreenModel : IScreen
 {
     protected ScreenComposer Screen { get; } = new();

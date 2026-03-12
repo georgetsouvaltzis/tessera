@@ -6,15 +6,42 @@ using TeaSharp.Core.Commands;
 namespace TeaSharp;
 
 /// <summary>
-/// Provides the primary application-facing entry points for TeaSharp programs and effects.
+/// Provides the primary application-facing entry points for TeaSharp applications and advanced program hosting.
 /// </summary>
 public static class Tea
 {
     /// <summary>
-    /// Creates a program using the stable application-facing host defaults.
+    /// Creates a builder for the TeaSharp application startup surface.
+    /// </summary>
+    public static TeaApplicationBuilder CreateBuilder() => new();
+
+    /// <summary>
+    /// Creates an application using the TeaSharp-native startup surface.
+    /// </summary>
+    /// <param name="app">The app to host.</param>
+    /// <param name="options">Runtime options for the application loop.</param>
+    public static TeaApplication CreateApplication(TeaApp app, TeaRuntimeOptions? options = null) =>
+        new(app, options);
+
+    /// <summary>
+    /// Runs an application using the TeaSharp-native startup surface.
+    /// </summary>
+    /// <param name="app">The app to run.</param>
+    /// <param name="options">Runtime options for the application loop.</param>
+    /// <param name="cancellationToken">A token that cancels application execution.</param>
+    public static async Task<TeaApp> RunAsync(TeaApp app, TeaRuntimeOptions? options = null, CancellationToken cancellationToken = default)
+    {
+        var application = CreateApplication(app, options);
+        await application.RunAsync(cancellationToken).ConfigureAwait(false);
+        return app;
+    }
+
+    /// <summary>
+    /// Creates a program using the advanced program-hosting surface.
     /// </summary>
     /// <param name="screen">The initial application screen.</param>
     /// <returns>A program ready to run.</returns>
+    [EditorBrowsable(EditorBrowsableState.Advanced)]
     public static TeaProgram CreateProgram(IScreen screen) =>
         new(screen, new TeaProgramOptions().ToProgramOptions());
 
@@ -29,11 +56,12 @@ public static class Tea
         new(screen, options);
 
     /// <summary>
-    /// Creates a program using the stable application-facing host configuration surface.
+    /// Creates a program using the advanced program-hosting surface with legacy runtime options.
     /// </summary>
     /// <param name="screen">The initial application screen.</param>
     /// <param name="options">Application-facing runtime options.</param>
     /// <returns>A program ready to run.</returns>
+    [EditorBrowsable(EditorBrowsableState.Advanced)]
     public static TeaProgram CreateProgram(IScreen screen, TeaProgramOptions options) =>
         new(screen, options?.ToProgramOptions());
 

@@ -1,11 +1,13 @@
 using TeaSharp.Components.Primitives;
 using TeaSharp.Core.Abstractions;
+using System.ComponentModel;
 
 namespace TeaSharp.Components.Composition;
 
 /// <summary>
 /// Represents a form-style screen shell with optional header and footer plus body and action regions.
 /// </summary>
+[EditorBrowsable(EditorBrowsableState.Advanced)]
 public sealed class FormScreen
 {
     private readonly ScreenComposer _screen;

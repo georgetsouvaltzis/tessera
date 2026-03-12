@@ -2,85 +2,92 @@
 
 ## Purpose
 
-This document defines the current public API tiers in TeaSharp so refactors can reduce surface area deliberately instead of by accident.
+This document tracks the public API tiers so the pre-release redesign stays deliberate.
 
-## Current Public Surface Tiers
+## Tier 1: Default Consumer Path
 
-### Tier 1: Consumer-facing APIs worth keeping stable
+These are the types new applications should discover first.
 
-- `TeaSharp.Tea`
-- `TeaSharp.TeaProgramOptions`
-- `TeaSharp.Components.Prebuilt.*`, `TeaSharp.Components.Productivity.*`, `TeaSharp.Components.UiKit.*`, `TeaSharp.Components.Advanced.*`, `TeaSharp.Components.Composition.*`, `TeaSharp.Components.Primitives.*`, `TeaSharp.Components.Charting.*`, and `TeaSharp.Components.Dashboard.*` types intended for application authors
-- `TeaSharp.Styles.*`
-- high-level model/message contracts required to build applications:
-  - `IScreen`
-  - `IMessage`
-  - `ScreenOutput`
-  - `ScreenFrame`
-  - `InputHooks`
-  - `TerminalOutput`
-  - `Effect`
+- `Tea`
+- `TeaApp`
+- `TeaApplication`
+- `TeaApplicationBuilder`
+- `TeaRuntimeOptions`
+- `TeaEffect`
+- `TeaEffects`
+- `Message` and the typed message records in `TeaSharp`
+- `Screen`
+- `ScreenContext`
+- `ScreenOptions`
+- `TeaSharp.Controls.Control`
 
-### Tier 2: Advanced seams that should remain available, but not dominate the default path
+The intended beginner path is:
 
+- build an app by deriving from `TeaApp`
+- run it with `Tea.RunAsync(...)` or `TeaApplicationBuilder`
+- return `Screen` from `Build(ScreenContext)`
+- keep configuration in `TeaRuntimeOptions` and `ScreenOptions`
+
+## Tier 2: Advanced But Supported
+
+These APIs remain public because they still offer real value, but they should not dominate the default path.
+
+- `TeaProgramOptions`
+- `IScreen`
 - `ProgramOptions`
 - `TeaProgram`
-- `ComponentComposer`
-- `TeaSharp.Components.Styling.*`
+- `TeaSharp.Components.Composition.*`
 - `TeaSharp.Components.Interaction.*`
+- `TeaSharp.Components.Styling.*`
 - `IProgramRenderer`
 - `ITerminalAdapter`
 - `IEventDecoder`
-- rendering/input host seams (`AnsiDiffRenderer`, `AnsiRendererOptions`, `NullRenderer`, `TerminalReader`)
-- lower-level widget infrastructure (`TextInputModel`, `ViewportModel`, `ListModel<T>`, `IWidgetKeyMap`, `*KeyMap`)
-- terminal capability detection types
-- specialized rendering/input infrastructure for advanced host customization
+- renderer, terminal, and capability-probing seams
+- low-level widget infrastructure such as `TextInputModel`, `ViewportModel`, `ListModel<T>`, and `*KeyMap`
 
-### Tier 3: Engine details currently public, but candidates for narrowing or internalization
+Most of these types are now marked `EditorBrowsable(Advanced)`.
 
-- `TerminalReader`
-- `IEventDecoder` and decoding primitives
-- low-level widget models and keymap types that leak through higher-level component APIs
-- mutable styling/interactivity collaborators exposed directly on components
-- duplicate composition infrastructure where one model can become the recommended path
+## Tier 3: Candidates For Further Narrowing
 
-## Current Pressure Points
+These areas still expose more mechanism than the long-term public design should:
 
-- `TeaSharp` is a thin facade, while much of the real app contract still lives under `TeaSharp.Core`.
-- `ProgramOptions` exposes too many runtime wiring seams for the default consumer experience.
-- components do not follow one consistent constructor/options pattern.
-- low-level widget types are visible in places where consumer-facing components should be enough.
-- composition is split between `ComponentComposer` and `ScreenComposer`.
-- `ScreenComposer` + `InputRouter` + `InteractiveScreenModel` is now the documented default path; `ComponentComposer` is being pushed toward lower-level subtree use.
-- `ScreenComposer` raw string region-id overloads remain for compatibility, but are now marked `EditorBrowsable(Advanced)` so typed `ScreenRegionKey` usage stays the default path.
-- runtime plumbing seams (`IProgramRenderer`, `ITerminalAdapter`, `EventDecoder`, `TerminalReader`, capability detectors/profiles) are now explicitly marked `EditorBrowsable(Advanced)` so the stable host path stays centered on `Tea.CreateProgram(model)` / `Tea.CreateProgram(model, TeaProgramOptions)`.
+- composition types centered on explicit region routing
+- low-level widget models leaking through component configuration
+- runtime seams that most apps never need
+- duplicate terminology between root app types and older core/runtime types
 
-## Target Public Surface
+## Current Direction
 
-### Stable default path
+TeaSharp is shifting from:
 
-- application authors should be able to stay mostly in:
-  - `TeaSharp`
-  - category-based component namespaces (`TeaSharp.Components.Prebuilt`, `TeaSharp.Components.Productivity`, `TeaSharp.Components.UiKit`, `TeaSharp.Components.Advanced`, `TeaSharp.Components.Composition`, `TeaSharp.Components.Primitives`, `TeaSharp.Components.Charting`, `TeaSharp.Components.Dashboard`)
-  - `TeaSharp.Styles`
-- app hosting should prefer `Tea.CreateProgram(model)` for defaults or `TeaProgramOptions` for stable customization, with `ProgramOptions` reserved for advanced/runtime customization.
-- common component setup should flow through `*Options` records and small constructor overloads.
-- examples and docs should demonstrate the stable path first.
+- `Tea.CreateProgram(...)`
+- `TeaProgramOptions`
+- `InteractiveScreenModel`
+- `ScreenComposer`
+- `InputRouter`
 
-### Advanced path
+to:
 
-- rendering, terminal, capability, and decoding seams can stay public where they offer real extension value.
-- advanced seams should move behind clearer documentation and naming so they do not look like the primary path for all consumers.
-- `KeyBinding` remains discoverable for now because higher-level component customization still depends on it directly.
+- `Tea.RunAsync(...)`
+- `TeaApplicationBuilder`
+- `TeaApp`
+- `Screen`
+- `ScreenContext`
+- `TeaRuntimeOptions`
 
-### Internalization targets
+The old stack remains available for now, but it is no longer the recommended starting point.
 
-- internal engine helpers that are public only for historical/test reasons should be reduced over time.
-- low-level types should stop leaking through higher-level component options unless that coupling is intentional.
+## Design Constraints
 
-## Immediate Follow-up Targets
+- normal apps should stay in `TeaSharp`
+- normal apps should not import `TeaSharp.Core.*`
+- normal apps should not manage terminal size manually
+- normal apps should not manage input scopes or region routing manually
+- custom widgets should remain possible through a small stable contract
 
-1. continue adding `*Options` records to high-churn components.
-2. standardize component constructor patterns and clone mutable option collaborators on ingress where appropriate.
-3. decide which composition model is primary and document the non-primary path as lower-level or transitional.
-4. narrow `ProgramOptions` into default consumer options vs advanced host customization seams.
+## Follow-up Targets
+
+1. keep moving control authoring toward a single obvious configuration style
+2. continue pushing screen-scale routing types behind advanced discoverability
+3. introduce the next app-facing composition layer without exposing engine vocabulary
+4. keep custom widget extensibility stable while internal runtime details continue to shrink

@@ -1,12 +1,14 @@
 using TeaSharp.Components.Prebuilt;
 using TeaSharp.Components.Primitives;
 using TeaSharp.Core.Abstractions;
+using System.ComponentModel;
 
 namespace TeaSharp.Components.Composition;
 
 /// <summary>
 /// Coordinates dialog visibility, modal registration, and focus restoration for app workflows.
 /// </summary>
+[EditorBrowsable(EditorBrowsableState.Advanced)]
 public sealed class DialogWorkflow
 {
     private readonly Func<ScreenFocusSnapshot> _captureFocus;

@@ -47,14 +47,17 @@ internal static class RuntimeApiContractTests
         }
 
         yield return new TestCase(
-            "RuntimeApi_TeaProgramOptions_RemainsDefaultSurface",
-            TeaProgramOptions_RemainsDefaultSurface);
+            "RuntimeApi_TeaRuntimeOptions_RemainsDefaultSurface",
+            TeaRuntimeOptions_RemainsDefaultSurface);
         yield return new TestCase(
-            "RuntimeApi_TeaProgramFactoryOverloads_FavorStableSurface",
-            TeaProgramFactoryOverloads_FavorStableSurface);
+            "RuntimeApi_TeaProgramOptions_IsMarkedAdvanced",
+            TeaProgramOptions_IsMarkedAdvanced);
         yield return new TestCase(
-            "RuntimeApi_TeaProgramFactory_DefaultOverload_RemainsStableSurface",
-            TeaProgramFactory_DefaultOverload_RemainsStableSurface);
+            "RuntimeApi_TeaStartupSurface_RemainsDefaultDiscovery",
+            TeaStartupSurface_RemainsDefaultDiscovery);
+        yield return new TestCase(
+            "RuntimeApi_TeaProgramFactoryOverloads_AreMarkedAdvanced",
+            TeaProgramFactoryOverloads_AreMarkedAdvanced);
         yield return new TestCase(
             "RuntimeApi_TeaProgramConstructor_IsMarkedAdvanced",
             TeaProgramConstructor_IsMarkedAdvanced);
@@ -73,17 +76,50 @@ internal static class RuntimeApiContractTests
         return Task.CompletedTask;
     }
 
-    private static Task TeaProgramOptions_RemainsDefaultSurface()
+    private static Task TeaRuntimeOptions_RemainsDefaultSurface()
+    {
+        var attribute = (EditorBrowsableAttribute?)Attribute.GetCustomAttribute(
+            typeof(TeaRuntimeOptions),
+            typeof(EditorBrowsableAttribute));
+
+        TestAssert.True(attribute is null, "TeaRuntimeOptions should remain the default discoverable host configuration surface.");
+        return Task.CompletedTask;
+    }
+
+    private static Task TeaProgramOptions_IsMarkedAdvanced()
     {
         var attribute = (EditorBrowsableAttribute?)Attribute.GetCustomAttribute(
             typeof(TeaProgramOptions),
             typeof(EditorBrowsableAttribute));
 
-        TestAssert.True(attribute is null, "TeaProgramOptions should remain the default discoverable host configuration surface.");
+        TestAssert.True(attribute is not null, "TeaProgramOptions should be explicitly marked as legacy program-hosting options.");
+        TestAssert.True(
+            attribute!.State == EditorBrowsableState.Advanced,
+            "TeaProgramOptions should be hidden from default discovery.");
         return Task.CompletedTask;
     }
 
-    private static Task TeaProgramFactoryOverloads_FavorStableSurface()
+    private static Task TeaStartupSurface_RemainsDefaultDiscovery()
+    {
+        var createBuilder = typeof(Tea).GetMethod(nameof(Tea.CreateBuilder), BindingFlags.Public | BindingFlags.Static);
+        var createApplication = typeof(Tea).GetMethod(nameof(Tea.CreateApplication), BindingFlags.Public | BindingFlags.Static, [typeof(TeaApp), typeof(TeaRuntimeOptions)]);
+        var runAsync = typeof(Tea).GetMethod(nameof(Tea.RunAsync), BindingFlags.Public | BindingFlags.Static, [typeof(TeaApp), typeof(TeaRuntimeOptions), typeof(CancellationToken)]);
+
+        TestAssert.True(createBuilder is not null, "Tea.CreateBuilder should exist.");
+        TestAssert.True(createApplication is not null, "Tea.CreateApplication(app, options) should exist.");
+        TestAssert.True(runAsync is not null, "Tea.RunAsync(app, options, token) should exist.");
+
+        var builderAttribute = (EditorBrowsableAttribute?)Attribute.GetCustomAttribute(createBuilder!, typeof(EditorBrowsableAttribute));
+        var applicationAttribute = (EditorBrowsableAttribute?)Attribute.GetCustomAttribute(createApplication!, typeof(EditorBrowsableAttribute));
+        var runAttribute = (EditorBrowsableAttribute?)Attribute.GetCustomAttribute(runAsync!, typeof(EditorBrowsableAttribute));
+
+        TestAssert.True(builderAttribute is null, "Tea.CreateBuilder should remain discoverable.");
+        TestAssert.True(applicationAttribute is null, "Tea.CreateApplication should remain discoverable.");
+        TestAssert.True(runAttribute is null, "Tea.RunAsync should remain discoverable.");
+        return Task.CompletedTask;
+    }
+
+    private static Task TeaProgramFactoryOverloads_AreMarkedAdvanced()
     {
         var defaultOverload = typeof(Tea).GetMethod(
             nameof(Tea.CreateProgram),
@@ -112,20 +148,18 @@ internal static class RuntimeApiContractTests
             stableOverload!,
             typeof(EditorBrowsableAttribute));
 
-        TestAssert.True(defaultAttribute is null, "The zero-config Tea.CreateProgram overload should remain the default discoverable factory.");
+        TestAssert.True(defaultAttribute is not null, "The zero-config Tea.CreateProgram overload should be explicitly marked as advanced.");
+        TestAssert.True(
+            defaultAttribute!.State == EditorBrowsableState.Advanced,
+            "The zero-config Tea.CreateProgram overload should be hidden from default discovery.");
         TestAssert.True(advancedAttribute is not null, "The ProgramOptions overload should be explicitly marked as advanced.");
         TestAssert.True(
             advancedAttribute!.State == EditorBrowsableState.Advanced,
             "The ProgramOptions overload should be hidden from default discovery.");
-        TestAssert.True(stableAttribute is null, "The TeaProgramOptions overload should remain the default discoverable factory.");
-        return Task.CompletedTask;
-    }
-
-    private static Task TeaProgramFactory_DefaultOverload_RemainsStableSurface()
-    {
-        var program = Tea.CreateProgram(new NoOpModel());
-
-        TestAssert.True(program is not null, "Tea.CreateProgram(model) should create a program using stable host defaults.");
+        TestAssert.True(stableAttribute is not null, "The TeaProgramOptions overload should be explicitly marked as advanced.");
+        TestAssert.True(
+            stableAttribute!.State == EditorBrowsableState.Advanced,
+            "The TeaProgramOptions overload should be hidden from default discovery.");
         return Task.CompletedTask;
     }
 

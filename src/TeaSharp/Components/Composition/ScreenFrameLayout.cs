@@ -1,10 +1,12 @@
 using TeaSharp.Components.Primitives;
+using System.ComponentModel;
 
 namespace TeaSharp.Components.Composition;
 
 /// <summary>
 /// Represents a common screen shell split into header, body, and footer regions.
 /// </summary>
+[EditorBrowsable(EditorBrowsableState.Advanced)]
 public readonly record struct ScreenFrameLayout(Rect Bounds, Rect Header, Rect Body, Rect Footer)
 {
     /// <summary>

@@ -2,11 +2,13 @@ using TeaSharp.Components.Primitives;
 using TeaSharp.Core.Abstractions;
 using TeaSharp.Core.Messages;
 using System.Diagnostics.CodeAnalysis;
+using System.ComponentModel;
 using TeaSharp.Components.Composition.Internal;
 using TeaSharp.Layout;
 
 namespace TeaSharp.Components.Composition;
 
+[EditorBrowsable(EditorBrowsableState.Advanced)]
 public sealed partial class ScreenComposer
 {
     private readonly List<ScreenRegion> _regions = [];

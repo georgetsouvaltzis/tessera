@@ -17,10 +17,32 @@ namespace TeaSharp.Tests;
 
 internal static class CompositionApiContractTests
 {
+    private static readonly Type[] AdvancedCompositionTypes =
+    [
+        typeof(ScreenComposer),
+        typeof(InputRouter),
+        typeof(InteractiveScreenModel),
+        typeof(ScreenRegionKey),
+        typeof(DialogWorkflow),
+        typeof(InputScope),
+        typeof(InputScopeBehavior),
+        typeof(InputScopeKind),
+        typeof(InputRouteResult),
+        typeof(ScreenFocusChain),
+        typeof(ScreenFocusSnapshot),
+        typeof(ScreenFrameLayout),
+        typeof(ScreenLayer),
+        typeof(KeyboardRoutingMode),
+        typeof(MasterDetailScreen),
+        typeof(DashboardScreen),
+        typeof(FormScreen),
+        typeof(TeaSharp.Components.UiKit.Layout),
+    ];
+
     public static IEnumerable<TestCase> Cases()
     {
         yield return new TestCase("CompositionApi_ComponentComposer_IsMarkedAdvanced", ComponentComposer_IsMarkedAdvanced);
-        yield return new TestCase("CompositionApi_ScreenComposer_RemainsDefaultSurface", ScreenComposer_RemainsDefaultSurface);
+        yield return new TestCase("CompositionApi_AdvancedCompositionTypes_AreMarkedAdvanced", AdvancedCompositionTypes_AreMarkedAdvanced);
         yield return new TestCase("CompositionApi_ScreenComposer_StringOverloads_AreMarkedAdvanced", ScreenComposer_StringOverloads_AreMarkedAdvanced);
     }
 
@@ -37,13 +59,20 @@ internal static class CompositionApiContractTests
         return Task.CompletedTask;
     }
 
-    private static Task ScreenComposer_RemainsDefaultSurface()
+    private static Task AdvancedCompositionTypes_AreMarkedAdvanced()
     {
-        var attribute = (EditorBrowsableAttribute?)Attribute.GetCustomAttribute(
-            typeof(ScreenComposer),
-            typeof(EditorBrowsableAttribute));
+        foreach (var type in AdvancedCompositionTypes)
+        {
+            var attribute = (EditorBrowsableAttribute?)Attribute.GetCustomAttribute(
+                type,
+                typeof(EditorBrowsableAttribute));
 
-        TestAssert.True(attribute is null, "ScreenComposer should remain the default discoverable composition surface.");
+            TestAssert.True(attribute is not null, $"{type.Name} should be explicitly marked as advanced.");
+            TestAssert.True(
+                attribute!.State == EditorBrowsableState.Advanced,
+                $"{type.Name} should be hidden from the default discoverable API.");
+        }
+
         return Task.CompletedTask;
     }
 

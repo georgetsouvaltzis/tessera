@@ -1,11 +1,13 @@
+using System.ComponentModel;
 using TeaSharp.Core.Abstractions;
 using TeaSharp.Core.Application;
 
 namespace TeaSharp;
 
 /// <summary>
-/// Defines the stable application-facing runtime options used by <see cref="Tea.CreateProgram(IScreen)"/> and <see cref="Tea.CreateProgram(IScreen, TeaProgramOptions)"/>.
+/// Defines the legacy runtime options used by the advanced program-hosting surface.
 /// </summary>
+[EditorBrowsable(EditorBrowsableState.Advanced)]
 public sealed class TeaProgramOptions
 {
     /// <summary>

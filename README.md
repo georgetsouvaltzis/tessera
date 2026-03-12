@@ -2,77 +2,104 @@
 
 TeaSharp is a message-driven terminal UI library for .NET.
 
-It keeps the default app path small:
+The default app path is intentionally small:
 
-- build apps around `Tea.CreateProgram(...)`
-- configure runtime behavior with `TeaProgramOptions`
-- compose screens with `ScreenComposer`, `InputRouter`, and `InteractiveScreenModel`
-- use `TeaSharp.Layout` when you want intent-driven layout instead of manual geometry
-- use the category namespaces for application-facing controls:
-  - `TeaSharp.Components.Prebuilt`
-  - `TeaSharp.Components.Productivity`
-  - `TeaSharp.Components.UiKit`
-  - `TeaSharp.Components.Advanced`
-  - `TeaSharp.Components.Composition`
-  - `TeaSharp.Components.Primitives`
-- migration details: [docs/namespace-migration.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/namespace-migration.md)
+- derive from `TeaApp`
+- run apps with `Tea.RunAsync(...)` or `TeaApplicationBuilder`
+- return `Screen` from `Build(ScreenContext)`
+- configure runtime behavior with `TeaRuntimeOptions`
+- keep `TeaSharp.Components.Composition` and `TeaSharp.Core.*` for advanced or transitional scenarios only
 
-If you want the canonical starter example for the current public app API, start with `examples/WidgetGallery`.
-That sample demonstrates the intended path:
-
-- `InteractiveScreenModel`
-- `ScreenComposer`
-- `TeaSharp.Layout`
-- `Dashboard(...)`, `Form(...)`, and `MasterDetail(...)`
-- `CreateDialogWorkflow(...)`
-- options-first components and event-driven integration
+If you need custom runtime wiring, explicit region routing, or low-level component composition, those APIs still exist, but they are now marked `EditorBrowsable(Advanced)` and are no longer the starter path.
 
 ## Quick Start
 
 ```csharp
 using TeaSharp;
-using TeaSharp.Core.Abstractions;
 
-var program = Tea.CreateProgram(new CounterModel(), new TeaProgramOptions
+var app = Tea.CreateBuilder()
+    .UseApp<CounterApp>()
+    .ConfigureRuntime(static runtime =>
+    {
+        runtime.MaxFps = 60;
+        runtime.Screen = new ScreenOptions
+        {
+            AltScreen = true,
+            WindowTitle = "Counter",
+        };
+    })
+    .Build();
+
+await app.RunAsync();
+
+internal sealed class CounterApp : TeaApp
 {
-    MaxFps = 60,
-});
+    private int _count;
 
-await program.RunAsync();
+    public override TeaEffect? Update(Message message)
+    {
+        if (message is not KeyPressed key)
+        {
+            return null;
+        }
+
+        if (key.Is(Key.Up))
+        {
+            _count++;
+            return null;
+        }
+
+        if (key.Is(Key.Down))
+        {
+            _count--;
+            return null;
+        }
+
+        return key.IsCharacter('c', ModifierKeys.Ctrl)
+            ? TeaEffects.Quit
+            : null;
+    }
+
+    public override Screen Build(ScreenContext context)
+    {
+        return Screen.From(
+            $"""
+            Counter
+
+            Size: {context.Width} x {context.Height}
+            Count: {_count}
+
+            Up / Down: change
+            Ctrl+C: quit
+            """);
+    }
+}
 ```
 
-### Centered Hello World
+For tiny apps, the short path also exists:
 
 ```csharp
-using TeaSharp;
-using TeaSharp.Core.Abstractions;
-using TeaSharp.Core.Messages;
-using TeaSharp.Layout;
-using TeaSharp.Styles;
+await Tea.RunAsync(new HelloApp());
 
-var program = Tea.CreateProgram(new HelloWorldScreen());
-await program.RunAsync();
-
-internal sealed class HelloWorldScreen : IScreen
+internal sealed class HelloApp : TeaApp
 {
-    public Effect? Init() => null;
+    public override TeaEffect? Update(Message message)
+        => message is KeyPressed key && key.IsCharacter('c', ModifierKeys.Ctrl)
+            ? TeaEffects.Quit
+            : null;
 
-    public Effect? Update(IMessage message) => null;
-
-    public ScreenOutput Render() =>
-        ScreenOutput.From(
-            Center.Text("Hello World", style: TeaStyle.Empty.WithBold()));
+    public override Screen Build(ScreenContext context)
+        => Screen.From("Hello from TeaSharp");
 }
 ```
 
 ## Docs
 
-- architecture and public surface: `docs/spec.md`
-- recommended app shell: `docs/app-pattern.md`
-- components: `docs/components.md`
-- layout facade: `TeaSharp.Layout` (`Split`, `Stack`, `Panel`, `Center`, `Dock`, `Overlay`, `Slot`)
-- prebuilt widgets: `docs/prebuilt-widgets.md`
-- lower-level widgets: `docs/widgets.md`
+- app model and startup: [docs/app-pattern.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/app-pattern.md)
+- custom widgets: [docs/custom-components.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/custom-components.md)
+- public API tiers: [docs/public-api-inventory.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/public-api-inventory.md)
+- engine and namespace notes: [docs/spec.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/spec.md), [docs/namespace-migration.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/namespace-migration.md)
+- existing widget catalogs: [docs/prebuilt-widgets.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/prebuilt-widgets.md), [docs/widgets.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/widgets.md)
 
 ## Build
 

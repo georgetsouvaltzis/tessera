@@ -1,8 +1,10 @@
 using TeaSharp.Components.Primitives;
 using TeaSharp.Core.Messages;
+using System.ComponentModel;
 
 namespace TeaSharp.Components.Composition;
 
+[EditorBrowsable(EditorBrowsableState.Advanced)]
 public sealed class InputRouter
 {
     private readonly List<RegisteredScope> _scopes = [];
