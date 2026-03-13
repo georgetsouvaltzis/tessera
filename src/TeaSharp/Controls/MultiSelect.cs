@@ -42,7 +42,7 @@ public sealed class MultiSelect : Control
             return false;
         }
 
-        return Forward(_component, message);
+        return ControlForwarder.Forward(_component, message);
     }
 
     public override void Render(Canvas canvas, Rect rect) => _component.Render(canvas, rect);

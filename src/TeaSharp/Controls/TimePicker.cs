@@ -82,9 +82,9 @@ public sealed class TimePicker : Control
 
     public void SetValue(TimeOnly time) => _component.SetValue(time);
 
-    public override bool Handle(Message message) => Forward(_component, message);
+    public override bool Handle(Message message) => ControlForwarder.Forward(_component, message);
 
-    public override bool Handle(Message message, Rect bounds) => Forward(_component, message, bounds) || Handle(message);
+    public override bool Handle(Message message, Rect bounds) => ControlForwarder.Forward(_component, message, bounds) || Handle(message);
 
     public override void Render(Canvas canvas, Rect rect) => _component.Render(canvas, rect);
 }

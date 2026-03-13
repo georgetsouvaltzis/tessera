@@ -109,7 +109,7 @@ Root controls currently include:
 - `Table`
 - `MenuBar`
 
-These types provide the default control vocabulary. Older `*Component` names remain available as advanced or migration bridges.
+These types provide the default control vocabulary. Most promoted legacy `*Component` names are now internal bridges behind these controls.
 
 ### Custom Control Model
 
@@ -121,6 +121,8 @@ That contract gives:
 - typed message hook through `Handle(Message)`
 - optional pointer-aware hook through `Handle(Message, Rect)`
 - automatic bridge into the current runtime/composition engine without exposing the legacy component interfaces on the default path
+
+The legacy component contracts still exist for advanced interop, but they are intentionally marked advanced and are no longer part of the normal custom-widget story.
 
 Design rule:
 

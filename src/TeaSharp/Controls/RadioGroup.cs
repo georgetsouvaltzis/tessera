@@ -40,7 +40,7 @@ public sealed class RadioGroup : Control
 
         var previousIndex = SelectedIndex;
         var previousItem = SelectedItem;
-        var changed = Forward(_component, message);
+        var changed = ControlForwarder.Forward(_component, message);
         if (changed && previousIndex != SelectedIndex)
         {
             SelectionChanged?.Invoke(this, new SelectionChangedEventArgs(previousIndex, SelectedIndex, previousItem, SelectedItem));

@@ -88,7 +88,7 @@ public sealed class Dialog : Control
 
     public override bool Handle(Message message)
     {
-        return Forward(_component, message);
+        return ControlForwarder.Forward(_component, message);
     }
 
     public override void Render(Canvas canvas, Rect rect)

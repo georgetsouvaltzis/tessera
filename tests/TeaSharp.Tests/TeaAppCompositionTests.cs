@@ -54,6 +54,9 @@ internal static class TeaAppCompositionTests
             "TeaAppComposition_LegacyCanvasComponentEntryPoints_AreMarkedAdvanced",
             LegacyCanvasComponentEntryPoints_AreMarkedAdvanced);
         yield return new TestCase(
+            "TeaAppComposition_LowLevelComponentContracts_AreMarkedAdvanced",
+            LowLevelComponentContracts_AreMarkedAdvanced);
+        yield return new TestCase(
             "TeaAppComposition_LowLevelTreeLayouts_AreMarkedAdvanced",
             LowLevelTreeLayouts_AreMarkedAdvanced);
         yield return new TestCase(
@@ -315,6 +318,32 @@ internal static class TeaAppCompositionTests
             var attribute = (EditorBrowsableAttribute?)Attribute.GetCustomAttribute(ctor!, typeof(EditorBrowsableAttribute));
             TestAssert.True(attribute is not null, $"{type.Name} legacy component constructor should be marked advanced.");
             TestAssert.True(attribute!.State == EditorBrowsableState.Advanced, $"{type.Name} legacy component constructor should be hidden from the default path.");
+        }
+
+        return Task.CompletedTask;
+    }
+
+    private static Task LowLevelComponentContracts_AreMarkedAdvanced()
+    {
+        Type[] contracts =
+        [
+            typeof(ICanvasComponent),
+            typeof(IStatefulComponent),
+            typeof(IMouseStatefulComponent),
+            typeof(IFocusableComponent),
+            typeof(IInteractiveComponent),
+        ];
+
+        foreach (var contract in contracts)
+        {
+            var attribute = (EditorBrowsableAttribute?)Attribute.GetCustomAttribute(
+                contract,
+                typeof(EditorBrowsableAttribute));
+
+            TestAssert.True(attribute is not null, $"{contract.Name} should be explicitly marked as advanced.");
+            TestAssert.True(
+                attribute!.State == EditorBrowsableState.Advanced,
+                $"{contract.Name} should be hidden from the default custom-widget path.");
         }
 
         return Task.CompletedTask;

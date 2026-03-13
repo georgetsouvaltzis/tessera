@@ -58,9 +58,9 @@ public sealed class DatePicker : Control
 
     public void SetDate(DateOnly date) => _component.SetDate(date);
 
-    public override bool Handle(Message message) => Forward(_component, message);
+    public override bool Handle(Message message) => ControlForwarder.Forward(_component, message);
 
-    public override bool Handle(Message message, Rect bounds) => Forward(_component, message, bounds) || Handle(message);
+    public override bool Handle(Message message, Rect bounds) => ControlForwarder.Forward(_component, message, bounds) || Handle(message);
 
     public override void Render(Canvas canvas, Rect rect) => _component.Render(canvas, rect);
 }

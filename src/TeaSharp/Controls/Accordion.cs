@@ -28,15 +28,15 @@ public sealed class Accordion : Control
         _component.SetSections(_sections.Select(static section => new LegacyAccordionSection(section.Title, section.BodyLines, section.Expanded)));
     }
 
-    public bool MoveNext() => Forward(_component, new KeyPressed(Key.Down));
+    public bool MoveNext() => ControlForwarder.Forward(_component, new KeyPressed(Key.Down));
 
-    public bool MovePrevious() => Forward(_component, new KeyPressed(Key.Up));
+    public bool MovePrevious() => ControlForwarder.Forward(_component, new KeyPressed(Key.Up));
 
-    public bool ToggleSelected() => Forward(_component, new KeyPressed(Key.Enter));
+    public bool ToggleSelected() => ControlForwarder.Forward(_component, new KeyPressed(Key.Enter));
 
     public override bool Handle(Message message)
     {
-        return IsFocused && Forward(_component, message);
+        return IsFocused && ControlForwarder.Forward(_component, message);
     }
 
     public override void Render(Canvas canvas, Rect rect)

@@ -45,12 +45,12 @@ public sealed class Spinner : Control
 
     public override bool Handle(Message message)
     {
-        return Forward(_component, message);
+        return ControlForwarder.Forward(_component, message);
     }
 
     public override bool Handle(Message message, Rect bounds)
     {
-        return Forward(_component, message, bounds) || Handle(message);
+        return ControlForwarder.Forward(_component, message, bounds) || Handle(message);
     }
 
     public override void Render(Canvas canvas, Rect rect)

@@ -89,12 +89,12 @@ public sealed class CommandPalette : Control
 
     public override bool Handle(Message message)
     {
-        return Forward(_component, message);
+        return ControlForwarder.Forward(_component, message);
     }
 
     public override bool Handle(Message message, Rect bounds)
     {
-        return Forward(_component, message, bounds) || Handle(message);
+        return ControlForwarder.Forward(_component, message, bounds) || Handle(message);
     }
 
     [EditorBrowsable(EditorBrowsableState.Advanced)]

@@ -79,6 +79,11 @@ These APIs remain public because they still offer real value, but they should no
 - `ProgramOptions`
 - `TeaProgram`
 - `ScreenRegionKey`
+- `ICanvasComponent`
+- `IStatefulComponent`
+- `IMouseStatefulComponent`
+- `IFocusableComponent`
+- `IInteractiveComponent`
 - `TeaSharp.Components.Interaction.*`
 - `TeaSharp.Components.Styling.*`
 - `IProgramRenderer`

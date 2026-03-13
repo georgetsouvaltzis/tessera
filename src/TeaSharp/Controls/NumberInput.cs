@@ -86,7 +86,7 @@ public sealed class NumberInput : Control
     [EditorBrowsable(EditorBrowsableState.Advanced)]
     public bool TryConsumeSubmission(out double value) => _component.TryConsumeSubmit(out value);
 
-    public override bool Handle(Message message) => Forward(_component, message);
+    public override bool Handle(Message message) => ControlForwarder.Forward(_component, message);
 
     public override void Render(Canvas canvas, Rect rect) => _component.Render(canvas, rect);
 }

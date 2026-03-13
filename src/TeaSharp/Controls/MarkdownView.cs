@@ -45,7 +45,7 @@ public sealed class MarkdownView : Control
 
     public void SetMarkdown(string markdown) => _component.SetMarkdown(markdown);
 
-    public override bool Handle(Message message) => Forward(_component, message);
+    public override bool Handle(Message message) => ControlForwarder.Forward(_component, message);
 
     public override void Render(Canvas canvas, Rect rect) => _component.Render(canvas, rect);
 }
