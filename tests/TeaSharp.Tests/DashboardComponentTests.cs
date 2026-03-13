@@ -1,13 +1,5 @@
-using TeaSharp.Components.Advanced;
-using TeaSharp.Components.Charting;
-using TeaSharp.Components.Composition;
-using TeaSharp.Components.Dashboard;
-using TeaSharp.Components.Interaction;
-using TeaSharp.Components.Prebuilt;
 using TeaSharp.Components.Primitives;
-using TeaSharp.Components.Productivity;
-using TeaSharp.Components.Styling;
-using TeaSharp.Components.UiKit;
+using TeaSharp.Controls;
 
 namespace TeaSharp.Tests;
 
@@ -73,7 +65,7 @@ internal static class DashboardComponentTests
     {
         // Arrange
         var canvas = new Canvas(26, 5);
-        var gauge = new GaugeComponent
+        var gauge = new Gauge
         {
             Title = "Load",
             MinValue = 0,
@@ -97,15 +89,15 @@ internal static class DashboardComponentTests
     {
         // Arrange
         var canvas = new Canvas(34, 7);
-        var stats = new StatsCardComponent
+        var stats = new StatsCard
         {
             Title = "Stats",
         };
         stats.SetItems(
         [
-            new StatsCardItem("raw", "yes"),
-            new StatsCardItem("mouse", "yes"),
-            new StatsCardItem("paste", "no"),
+            new StatItem("raw", "yes"),
+            new StatItem("mouse", "yes"),
+            new StatItem("paste", "no"),
         ]);
 
         // Act
@@ -123,7 +115,7 @@ internal static class DashboardComponentTests
     {
         // Arrange
         var canvas = new Canvas(30, 6);
-        var log = new MiniLogComponent(capacity: 3)
+        var log = new MiniLog(capacity: 3)
         {
             Title = "Live Event",
         };

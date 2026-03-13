@@ -1,10 +1,8 @@
 using TeaSharp.Components.Composition;
 using TeaSharp.Components.Primitives;
-using System.ComponentModel;
 namespace TeaSharp.Components.Charting;
 
-[EditorBrowsable(EditorBrowsableState.Advanced)]
-public static class Charts
+internal static class Charts
 {
     public static void DrawLineChart(
         Canvas canvas,

@@ -99,13 +99,10 @@ Important advanced namespaces:
 Examples:
 
 - `Canvas`
-- `LineChartComponent` when you need the raw advanced seam instead of root `LineChart`
-- `BarChartComponent` when you need the raw advanced seam instead of root `BarChart`
-- `GaugeComponent` when you need the raw advanced seam instead of root `Gauge`
-- `MiniLogComponent` when you need the raw advanced seam instead of root `MiniLog`
-- `StatsCardComponent` when you need the raw advanced seam instead of root `StatsCard`
+- `TeaSharp.Components.Charting.LineChartOptions` when you need advanced chart rendering knobs through root `LineChart.Options`
+- `TeaSharp.Components.Charting.BarChartOptions` when you need advanced chart rendering knobs through root `BarChart.Options`
 
-These advanced types can still be placed directly inside the layout model through the advanced canvas-component entry points.
+These advanced types now exist primarily as option records used through the root chart controls. Raw canvas-component interop still exists separately through `ICanvasComponent`.
 
 ## Legacy Composition APIs
 

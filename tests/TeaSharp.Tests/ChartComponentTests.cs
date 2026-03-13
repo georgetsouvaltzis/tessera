@@ -1,13 +1,7 @@
-using TeaSharp.Components.Advanced;
 using TeaSharp.Components.Charting;
 using TeaSharp.Components.Composition;
-using TeaSharp.Components.Dashboard;
-using TeaSharp.Components.Interaction;
-using TeaSharp.Components.Prebuilt;
 using TeaSharp.Components.Primitives;
-using TeaSharp.Components.Productivity;
-using TeaSharp.Components.Styling;
-using TeaSharp.Components.UiKit;
+using TeaSharp.Controls;
 using System.Globalization;
 using TeaSharp.Core.Abstractions;
 using TeaSharp.Core.Messages;
@@ -39,9 +33,14 @@ internal static class ChartComponentTests
         // Arrange
         var canvas = new Canvas(30, 10);
         var samples = new[] { 1.0, 2.0, 3.5, 2.4, 5.2, 4.1, 6.0 };
+        var chart = new LineChart
+        {
+            Title = "CPU",
+        };
+        chart.SetSamples(samples);
 
         // Act
-        Charts.DrawLineChart(canvas, new Rect(0, 0, 30, 10), samples, title: "CPU");
+        chart.Render(canvas, new Rect(0, 0, 30, 10));
         var output = canvas.Render();
 
         // Assert
@@ -55,15 +54,20 @@ internal static class ChartComponentTests
     {
         // Arrange
         var canvas = new Canvas(30, 8);
-        BarDatum[] bars =
+        BarPoint[] bars =
         [
             new("ok", 80),
             new("warn", 20),
             new("crit", 10),
         ];
+        var chart = new BarChart
+        {
+            Title = "Status",
+        };
+        chart.SetBars(bars);
 
         // Act
-        Charts.DrawBarChart(canvas, new Rect(0, 0, 30, 8), bars, title: "Status");
+        chart.Render(canvas, new Rect(0, 0, 30, 8));
         var output = canvas.Render();
 
         // Assert
@@ -78,18 +82,19 @@ internal static class ChartComponentTests
         // Arrange
         var canvas = new Canvas(34, 12);
         var samples = new[] { 20.0, 30.0, 10.0, 50.0, 40.0, 60.0 };
-
-        // Act
-        Charts.DrawLineChart(
-            canvas,
-            new Rect(0, 0, 34, 12),
-            samples,
-            title: "Latency",
-            options: new LineChartOptions(
+        var chart = new LineChart
+        {
+            Title = "Latency",
+            Options = new LineChartOptions(
                 ShowAxes: true,
                 Legend: "p95",
                 XLabel: "time",
-                YLabel: "ms"));
+                YLabel: "ms"),
+        };
+        chart.SetSamples(samples);
+
+        // Act
+        chart.Render(canvas, new Rect(0, 0, 34, 12));
         var output = canvas.Render();
 
         // Assert
@@ -104,22 +109,23 @@ internal static class ChartComponentTests
     {
         // Arrange
         var canvas = new Canvas(36, 8);
-        IReadOnlyList<BarDatum> bars =
+        IReadOnlyList<BarPoint> bars =
         [
             new("ok", 90),
             new("warn", 35),
             new("crit", 10),
         ];
+        var chart = new BarChart
+        {
+            Title = "Health",
+            Options = new BarChartOptions(
+                ShowScale: true,
+                Legend: "req/s"),
+        };
+        chart.SetBars(bars);
 
         // Act
-        Charts.DrawBarChart(
-            canvas,
-            new Rect(0, 0, 36, 8),
-            bars,
-            title: "Health",
-            options: new BarChartOptions(
-                ShowScale: true,
-                Legend: "req/s"));
+        chart.Render(canvas, new Rect(0, 0, 36, 8));
         var output = canvas.Render();
 
         // Assert
@@ -132,19 +138,19 @@ internal static class ChartComponentTests
     private static Task LineChartComponent_HonorsCapacity()
     {
         // Arrange
-        var component = new LineChartComponent(capacity: 4);
+        var chart = new LineChart(capacity: 4);
 
         // Act
-        component.Append(1);
-        component.Append(2);
-        component.Append(3);
-        component.Append(4);
-        component.Append(5);
+        chart.Append(1);
+        chart.Append(2);
+        chart.Append(3);
+        chart.Append(4);
+        chart.Append(5);
 
         // Assert
-        TestAssert.Equal(4, component.Samples.Count, "Line chart component should keep only the latest samples.");
-        TestAssert.Equal(2d, component.Samples[0], "Oldest sample should be dropped once capacity is exceeded.");
-        TestAssert.Equal(5d, component.Samples[^1], "Newest sample should be retained.");
+        TestAssert.Equal(4, chart.Samples.Count, "Line chart should keep only the latest samples.");
+        TestAssert.Equal(2d, chart.Samples[0], "Oldest sample should be dropped once capacity is exceeded.");
+        TestAssert.Equal(5d, chart.Samples[^1], "Newest sample should be retained.");
         return Task.CompletedTask;
     }
 
@@ -154,20 +160,26 @@ internal static class ChartComponentTests
         var samples = Enumerable.Range(0, 20).Select(i => (double)i).ToArray();
         var baseCanvas = new Canvas(32, 10);
         var zoomedCanvas = new Canvas(32, 10);
+        var baselineChart = new LineChart
+        {
+            Title = "Zoom",
+            Options = new LineChartOptions(),
+            Zoom = 1.0,
+            Offset = 0,
+        };
+        baselineChart.SetSamples(samples);
+        var shiftedChart = new LineChart
+        {
+            Title = "Zoom",
+            Options = new LineChartOptions(),
+            Zoom = 2.0,
+            Offset = 6,
+        };
+        shiftedChart.SetSamples(samples);
 
         // Act
-        Charts.DrawLineChart(
-            baseCanvas,
-            new Rect(0, 0, 32, 10),
-            samples,
-            title: "Zoom",
-            options: new LineChartOptions(Zoom: 1.0, Offset: 0));
-        Charts.DrawLineChart(
-            zoomedCanvas,
-            new Rect(0, 0, 32, 10),
-            samples,
-            title: "Zoom",
-            options: new LineChartOptions(Zoom: 2.0, Offset: 6));
+        baselineChart.Render(baseCanvas, new Rect(0, 0, 32, 10));
+        shiftedChart.Render(zoomedCanvas, new Rect(0, 0, 32, 10));
         var baseline = baseCanvas.Render();
         var zoomed = zoomedCanvas.Render();
 

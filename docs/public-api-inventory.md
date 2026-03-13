@@ -92,9 +92,8 @@ These APIs remain public because they still offer real value, but they should no
 - `TeaSharp.Hosting.TeaHostingOptions`
 - `TeaSharp.Hosting.TeaHost.CreateApplication(...)`
 - `TeaSharp.Hosting.TeaHost.RunAsync(...)`
-- `TeaSharp.Components.Charting.*`
-- `TeaSharp.Components.Dashboard.*`
-- `TeaSharp.Components.Primitives.Widgets`
+- `TeaSharp.Components.Charting.BarChartOptions`
+- `TeaSharp.Components.Charting.LineChartOptions`
 - `IScreen`
 - `ProgramOptions`
 - `TeaProgram`

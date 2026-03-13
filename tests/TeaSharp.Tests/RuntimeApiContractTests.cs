@@ -25,17 +25,8 @@ internal static class RuntimeApiContractTests
     private static readonly (string Name, Type Type)[] AdvancedRuntimeTypes =
     [
         ("TeaHostingOptions", typeof(TeaHostingOptions)),
-        ("Charts", typeof(Charts)),
-        ("BarChartComponent", typeof(BarChartComponent)),
         ("BarChartOptions", typeof(BarChartOptions)),
-        ("BarDatum", typeof(BarDatum)),
-        ("LineChartComponent", typeof(LineChartComponent)),
         ("LineChartOptions", typeof(LineChartOptions)),
-        ("GaugeComponent", typeof(GaugeComponent)),
-        ("MiniLogComponent", typeof(MiniLogComponent)),
-        ("StatsCardComponent", typeof(StatsCardComponent)),
-        ("StatsCardItem", typeof(StatsCardItem)),
-        ("CanvasWidgets", typeof(TeaSharp.Components.Primitives.Widgets)),
         ("IProgramRenderer", typeof(IProgramRenderer)),
         ("NullRenderer", typeof(NullRenderer)),
         ("AnsiDiffRenderer", typeof(AnsiDiffRenderer)),
@@ -86,6 +77,9 @@ internal static class RuntimeApiContractTests
         yield return new TestCase(
             "RuntimeApi_DefaultSpacingAndBorderTypes_LiveAtRootNamespace",
             DefaultSpacingAndBorderTypes_LiveAtRootNamespace);
+        yield return new TestCase(
+            "RuntimeApi_LegacyChartDashboardAndCanvasHelpers_AreInternalized",
+            LegacyChartDashboardAndCanvasHelpers_AreInternalized);
     }
 
     private static Task AssertMarkedAdvanced(Type type)
@@ -258,6 +252,32 @@ internal static class RuntimeApiContractTests
         TestAssert.True(
             attribute!.State == EditorBrowsableState.Advanced,
             "TeaProgram constructor should be hidden from default discovery.");
+        return Task.CompletedTask;
+    }
+
+    private static Task LegacyChartDashboardAndCanvasHelpers_AreInternalized()
+    {
+        string[] typeNames =
+        [
+            "TeaSharp.Components.Charting.Charts",
+            "TeaSharp.Components.Charting.BarChartComponent",
+            "TeaSharp.Components.Charting.BarDatum",
+            "TeaSharp.Components.Charting.LineChartComponent",
+            "TeaSharp.Components.Dashboard.GaugeComponent",
+            "TeaSharp.Components.Dashboard.MiniLogComponent",
+            "TeaSharp.Components.Dashboard.StatsCardComponent",
+            "TeaSharp.Components.Dashboard.StatsCardItem",
+            "TeaSharp.Components.Primitives.Widgets",
+        ];
+
+        var assembly = typeof(Tea).Assembly;
+        foreach (var typeName in typeNames)
+        {
+            var type = assembly.GetType(typeName, throwOnError: false);
+            TestAssert.True(type is not null, $"{typeName} should continue to exist as an internal bridge.");
+            TestAssert.True(type!.IsNotPublic, $"{typeName} should no longer be public once a root wrapper exists.");
+        }
+
         return Task.CompletedTask;
     }
 

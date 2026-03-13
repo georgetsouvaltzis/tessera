@@ -1,9 +1,7 @@
 using TeaSharp.Components.Primitives.Internal;
-using System.ComponentModel;
 namespace TeaSharp.Components.Primitives;
 
-[EditorBrowsable(EditorBrowsableState.Advanced)]
-public static class Widgets
+internal static class Widgets
 {
     private static ReadOnlySpan<char> SparklineSteps => "▁▂▃▄▅▆▇█";
 

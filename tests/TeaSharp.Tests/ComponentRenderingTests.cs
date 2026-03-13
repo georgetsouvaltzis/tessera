@@ -1,19 +1,12 @@
-using TeaSharp.Components.Advanced;
-using TeaSharp.Components.Charting;
-using TeaSharp.Components.Composition;
-using TeaSharp.Components.Dashboard;
-using TeaSharp.Components.Interaction;
-using TeaSharp.Components.Prebuilt;
 using TeaSharp.Components.Primitives;
-using TeaSharp.Components.Productivity;
-using TeaSharp.Components.Styling;
-using TeaSharp.Components.UiKit;
-using TWidgets = TeaSharp.Components.Primitives.Widgets;
+using System.Reflection;
 
 namespace TeaSharp.Tests;
 
 internal static class ComponentRenderingTests
 {
+    private static readonly string[] CardLines = ["line one", "line two"];
+
     public static IEnumerable<TestCase> Cases()
     {
         yield return new TestCase("Components_Canvas_DrawBox_RendersFrameAndTitle", Canvas_DrawBox_RendersFrameAndTitle);
@@ -46,7 +39,7 @@ internal static class ComponentRenderingTests
         var canvas = new Canvas(14, 2);
 
         // Act
-        TWidgets.DrawProgressBar(canvas, new Rect(1, 0, 12, 2), 0.5, "50%");
+        InvokeWidgets("DrawProgressBar", canvas, new Rect(1, 0, 12, 2), 0.5, "50%");
         var lines = canvas.Render().Split('\n');
 
         // Assert
@@ -64,7 +57,7 @@ internal static class ComponentRenderingTests
         var values = new[] { 0, 14, 28, 42, 57, 71, 85, 100 };
 
         // Act
-        TWidgets.DrawSparkline(canvas, new Rect(0, 0, 8, 1), values, minValue: 0, maxValue: 100);
+        InvokeWidgets("DrawSparkline", canvas, new Rect(0, 0, 8, 1), values, 0, 100);
         var output = canvas.Render();
 
         // Assert
@@ -79,7 +72,7 @@ internal static class ComponentRenderingTests
         var items = new[] { "alpha", "beta", "gamma" };
 
         // Act
-        TWidgets.DrawList(canvas, new Rect(0, 0, 18, 3), items, selectedIndex: 1);
+        InvokeWidgets("DrawList", canvas, new Rect(0, 0, 18, 3), items, 1);
         var lines = canvas.Render().Split('\n');
 
         // Assert
@@ -95,11 +88,12 @@ internal static class ComponentRenderingTests
         var canvas = new Canvas(24, 6);
 
         // Act
-        TWidgets.DrawCard(
+        InvokeWidgets("DrawCard",
             canvas,
             new Rect(0, 0, 24, 6),
             "Card",
-            ["line one", "line two"]);
+            CardLines,
+            '▌');
         var output = canvas.Render();
 
         // Assert
@@ -122,7 +116,7 @@ internal static class ComponentRenderingTests
         ];
 
         // Act
-        TWidgets.DrawTable(canvas, new Rect(0, 0, 34, 8), headers, rows, selectedRow: 1, title: "Stats");
+        InvokeWidgets("DrawTable", canvas, new Rect(0, 0, 34, 8), headers, rows, 1, "Stats", BorderStyle.SingleLine, default(Thickness));
         var output = canvas.Render();
 
         // Assert
@@ -131,5 +125,16 @@ internal static class ComponentRenderingTests
         TestAssert.True(output.Contains('┼'), "Table should render header divider intersections.");
         TestAssert.True(output.Contains("› Mem", StringComparison.Ordinal), "Selected row should include selection prefix.");
         return Task.CompletedTask;
+    }
+
+    private static void InvokeWidgets(string methodName, params object?[] arguments)
+    {
+        var type = typeof(Canvas).Assembly.GetType("TeaSharp.Components.Primitives.Widgets", throwOnError: true)!;
+        var method = type
+            .GetMethods(BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic)
+            .SingleOrDefault(candidate => string.Equals(candidate.Name, methodName, StringComparison.Ordinal)
+                && candidate.GetParameters().Length == arguments.Length);
+        TestAssert.True(method is not null, $"Widgets.{methodName} should continue to exist as an internal bridge.");
+        method!.Invoke(null, arguments);
     }
 }
