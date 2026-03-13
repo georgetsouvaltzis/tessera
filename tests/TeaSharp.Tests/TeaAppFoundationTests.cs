@@ -19,6 +19,9 @@ internal static class TeaAppFoundationTests
             "TeaAppBuilder_CreatesConfiguredApplication",
             TeaAppBuilder_CreatesConfiguredApplication);
         yield return new TestCase(
+            "TeaApp_Post_QueuesControlEventMessagesAsEffects",
+            TeaApp_Post_QueuesControlEventMessagesAsEffects);
+        yield return new TestCase(
             "TeaControl_Bridge_MapsCoreMessagesToPublicMessages",
             TeaControl_Bridge_MapsCoreMessagesToPublicMessages);
     }
@@ -71,6 +74,22 @@ internal static class TeaAppFoundationTests
         TestAssert.Equal(24, application.Options.MaxFps, "Tea builder should preserve runtime options.");
         TestAssert.True(application.Options.Screen.AltScreen == true, "Tea builder should preserve screen defaults.");
         return Task.CompletedTask;
+    }
+
+    private static async Task TeaApp_Post_QueuesControlEventMessagesAsEffects()
+    {
+        var app = new PostingApp();
+        var screen = app.RuntimeScreen;
+
+        screen.Update(new WindowSizeMsg(80, 24));
+        screen.Render();
+        var effect = screen.Update(new KeyPressMsg(KeyCode.Enter));
+
+        TestAssert.True(effect is not null, "Post should queue a follow-up effect when a control event emits a message.");
+
+        var message = await effect!(CancellationToken.None);
+        TestAssert.True(message is not null, "Post should emit a follow-up message.");
+        TestAssert.Equal(0, app.Count, "Post should not mutate app state until the queued message is processed by the runtime.");
     }
 
     private static Task TeaControl_Bridge_MapsCoreMessagesToPublicMessages()
@@ -136,5 +155,39 @@ internal static class TeaAppFoundationTests
             LastPointer = message;
             return true;
         }
+    }
+
+    private sealed record IncrementRequested : Message;
+
+    private sealed class PostingApp : TeaApp
+    {
+        private readonly Button _button = new()
+        {
+            Text = "Increment",
+            IsFocused = true,
+        };
+
+        private int _count;
+
+        public int Count => _count;
+
+        public PostingApp()
+        {
+            _button.Activated += (_, _) => Post(new IncrementRequested());
+        }
+
+        public override TeaEffect? Update(Message message)
+        {
+            if (message is IncrementRequested)
+            {
+                _count++;
+            }
+
+            return null;
+        }
+
+        public override Screen Build(ScreenContext context) => Screen.From(_button);
+
+        protected override TeaEffect? UpdateHandledInput(Message message) => null;
     }
 }

@@ -10,8 +10,9 @@ namespace TeaSharp;
 /// The runtime calls <see cref="Initialize"/> once before the first render, <see cref="Update"/> for
 /// application-level messages, and <see cref="Build"/> whenever the screen must be re-rendered. Built-in
 /// controls usually consume their own input before it reaches <see cref="Update"/>; use
+/// <see cref="Post"/> when a control event should flow back through the application message pipeline, and
 /// <see cref="RequestEffect"/> or <see cref="UpdateHandledInput"/> only when a control interaction needs to
-/// trigger runtime work.
+/// trigger runtime work directly.
 /// </remarks>
 public abstract class TeaApp
 {
@@ -67,6 +68,17 @@ public abstract class TeaApp
     {
         ArgumentNullException.ThrowIfNull(message);
         return _interactiveScreen?.Handle(message) ?? false;
+    }
+
+    /// <summary>
+    /// Posts a message to flow back through <see cref="Update"/> after the current pass completes.
+    /// <para>This method does not call <see cref="Update"/> immediately; the runtime processes the message on the next pass.</para>
+    /// </summary>
+    /// <param name="message">The message to post.</param>
+    protected void Post(Message message)
+    {
+        ArgumentNullException.ThrowIfNull(message);
+        RequestEffect(TeaEffects.Emit(message));
     }
 
     /// <summary>

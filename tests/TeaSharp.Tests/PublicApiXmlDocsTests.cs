@@ -73,6 +73,7 @@ internal static class PublicApiXmlDocsTests
         string[] memberNames =
         [
             "M:TeaSharp.TeaApp.Initialize",
+            "M:TeaSharp.TeaApp.Post(TeaSharp.Message)",
             "M:TeaSharp.TeaApp.Update(TeaSharp.Message)",
             "M:TeaSharp.TeaApp.Build(TeaSharp.ScreenContext)",
             "M:TeaSharp.TeaApplication.RunAsync(System.Threading.CancellationToken)",

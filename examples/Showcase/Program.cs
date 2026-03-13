@@ -19,6 +19,11 @@ var app = Tea.CreateBuilder()
 
 await app.RunAsync();
 
+internal sealed record OrderSelected(string OrderId) : Message;
+internal sealed record RefreshRequested : Message;
+internal sealed record CommandSubmitted(string Value) : Message;
+internal sealed record DeleteDialogResponded(DialogResult Result) : Message;
+
 internal sealed class OrdersApp : TeaApp
 {
     private readonly Dictionary<string, string> _details = new(StringComparer.Ordinal)
@@ -75,11 +80,11 @@ internal sealed class OrdersApp : TeaApp
     public OrdersApp()
     {
         _orders.SetItems(_details.Keys.OrderBy(static value => value, StringComparer.Ordinal).ToArray());
-        _orders.SelectionChanged += (_, args) => SelectOrder(args.SelectedItem);
-        _refresh.Activated += (_, _) => Refresh();
-        _command.Submitted += (_, args) => Execute(args.Value);
-        _confirmDelete.Accepted += (_, _) => ApplyDialogResult(DialogResult.Accepted);
-        _confirmDelete.Dismissed += (_, _) => ApplyDialogResult(DialogResult.Dismissed);
+        _orders.SelectionChanged += (_, args) => Post(new OrderSelected(args.SelectedItem));
+        _refresh.Activated += (_, _) => Post(new RefreshRequested());
+        _command.Submitted += (_, args) => Post(new CommandSubmitted(args.Value));
+        _confirmDelete.Accepted += (_, _) => Post(new DeleteDialogResponded(DialogResult.Accepted));
+        _confirmDelete.Dismissed += (_, _) => Post(new DeleteDialogResponded(DialogResult.Dismissed));
         SelectOrder(_orders.SelectedItem);
     }
 
@@ -93,6 +98,23 @@ internal sealed class OrdersApp : TeaApp
         if (message is KeyPressed focusKey && focusKey.IsCharacter('d'))
         {
             OpenDeleteDialog();
+            return null;
+        }
+
+        switch (message)
+        {
+            case OrderSelected selected:
+                SelectOrder(selected.OrderId);
+                break;
+            case RefreshRequested:
+                Refresh();
+                break;
+            case CommandSubmitted submitted:
+                Execute(submitted.Value);
+                break;
+            case DeleteDialogResponded responded:
+                ApplyDialogResult(responded.Result);
+                break;
         }
 
         return null;

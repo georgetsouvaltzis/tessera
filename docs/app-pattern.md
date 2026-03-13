@@ -78,6 +78,8 @@ internal sealed class CounterApp : TeaApp
 - `Build(ScreenContext)` creates the current frame
 - `DefaultScreenOptions` defines per-app terminal defaults
 - built-in controls route keyboard, pointer, and paste input before `Update(Message)`
+- when a control event should re-enter the app state machine, call `Post(...)`
+- `Post(...)` does not call `Update(...)` immediately; it queues a follow-up message for the next runtime pass
 - `RequestEffect(...)` is available when a control event needs to trigger runtime work such as `TeaEffects.Quit`
 
 `ScreenContext` already tracks terminal size and focus state, so normal apps do not need to manage `_width`, `_height`, or focus-reporting flags by hand.
