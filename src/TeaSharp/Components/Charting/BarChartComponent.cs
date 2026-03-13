@@ -1,5 +1,6 @@
 using TeaSharp.Components.Composition;
 using TeaSharp.Components.Primitives;
+using TeaSharp.Controls;
 namespace TeaSharp.Components.Charting;
 
 internal sealed class BarChartComponent : ICanvasComponent

@@ -11,6 +11,7 @@ using TeaSharp.Components.UiKit;
 using System.ComponentModel;
 using System.Reflection;
 using TeaSharp;
+using TeaSharp.Controls;
 using TeaSharp.Hosting;
 using TeaSharp.Core.Abstractions;
 using TeaSharp.Core.Application;
@@ -25,8 +26,8 @@ internal static class RuntimeApiContractTests
     private static readonly (string Name, Type Type)[] AdvancedRuntimeTypes =
     [
         ("TeaHostingOptions", typeof(TeaHostingOptions)),
-        ("BarChartOptions", typeof(BarChartOptions)),
-        ("LineChartOptions", typeof(LineChartOptions)),
+        ("BarChartOptions", typeof(TeaSharp.Controls.BarChartOptions)),
+        ("LineChartOptions", typeof(TeaSharp.Controls.LineChartOptions)),
         ("IProgramRenderer", typeof(IProgramRenderer)),
         ("NullRenderer", typeof(NullRenderer)),
         ("AnsiDiffRenderer", typeof(AnsiDiffRenderer)),

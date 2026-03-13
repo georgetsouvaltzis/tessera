@@ -1,8 +1,9 @@
-using TeaSharp.Components.Composition;
-using TeaSharp.Components.Primitives;
 using System.ComponentModel;
-namespace TeaSharp.Components.Charting;
+namespace TeaSharp.Controls;
 
+/// <summary>
+/// Defines advanced rendering options for a <see cref="LineChart"/>.
+/// </summary>
 [EditorBrowsable(EditorBrowsableState.Advanced)]
 public readonly record struct LineChartOptions(
     bool ShowAxes = false,

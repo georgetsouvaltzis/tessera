@@ -99,8 +99,8 @@ Important advanced namespaces:
 Examples:
 
 - `Canvas`
-- `TeaSharp.Components.Charting.LineChartOptions` when you need advanced chart rendering knobs through root `LineChart.Options`
-- `TeaSharp.Components.Charting.BarChartOptions` when you need advanced chart rendering knobs through root `BarChart.Options`
+- `TeaSharp.Controls.LineChartOptions` when you need advanced chart rendering knobs through root `LineChart.Options`
+- `TeaSharp.Controls.BarChartOptions` when you need advanced chart rendering knobs through root `BarChart.Options`
 
 These advanced types now exist primarily as option records used through the root chart controls. Raw canvas-component interop still exists separately through `ICanvasComponent`.
 
