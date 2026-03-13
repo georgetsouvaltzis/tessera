@@ -9,6 +9,7 @@ namespace TeaSharp.Controls;
 public abstract class Control
 {
     private readonly ControlComponentAdapter _componentAdapter;
+    private bool _focusRequestPending;
 
     protected Control()
     {
@@ -20,6 +21,11 @@ public abstract class Control
     public virtual bool IsDisabled { get; set; }
 
     public virtual bool IsReadOnly { get; set; }
+
+    public void RequestFocus()
+    {
+        _focusRequestPending = true;
+    }
 
     public abstract void Render(Canvas canvas, Rect rect);
 
@@ -54,12 +60,19 @@ public abstract class Control
 
     internal ICanvasComponent Component => _componentAdapter;
 
-    private sealed class ControlComponentAdapter(Control owner) : IStatefulComponent, IMouseStatefulComponent, IFocusableComponent
+    private sealed class ControlComponentAdapter(Control owner) : IStatefulComponent, IMouseStatefulComponent, IFocusableComponent, IFocusRequestSource
     {
         public bool IsFocused
         {
             get => owner.IsFocused;
-            set => owner.IsFocused = value;
+            set
+            {
+                owner.IsFocused = value;
+                if (value)
+                {
+                    owner._focusRequestPending = false;
+                }
+            }
         }
 
         public void Render(Canvas canvas, Rect rect)
@@ -85,6 +98,13 @@ public abstract class Control
             }
 
             return owner.Handle(TeaMessageAdapter.ToPublic(message), bounds);
+        }
+
+        public bool ConsumeFocusRequest()
+        {
+            var requested = owner._focusRequestPending;
+            owner._focusRequestPending = false;
+            return requested;
         }
     }
 }

@@ -173,7 +173,6 @@ internal static class TeaAppCompositionTests
         var app = new OverlayPaletteApp();
         var screen = app.RuntimeScreen;
 
-        TestAssert.True(app.Palette.IsFocused, "Overlay test should start with the palette requesting focus.");
         screen.Update(new WindowSizeMsg(80, 24));
         screen.Render();
         TestAssert.True(app.Palette.IsFocused, "Visible overlay should own focus after the screen is composed.");
@@ -527,7 +526,6 @@ internal static class TeaAppCompositionTests
         public CommandPalette Palette { get; } = new()
         {
             Title = "Actions",
-            IsFocused = true,
         };
 
         public int ButtonActivationCount { get; private set; }

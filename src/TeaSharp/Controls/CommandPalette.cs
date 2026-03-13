@@ -79,7 +79,11 @@ public sealed class CommandPalette : Control
 
     public void ClearQuery() => _component.ClearQuery();
 
-    public void Open() => _component.Open();
+    public void Open()
+    {
+        RequestFocus();
+        _component.Open();
+    }
 
     public void Close() => _component.Close();
 

@@ -71,13 +71,11 @@ internal sealed class AdvancedWidgetsApp : TeaApp
     private readonly CommandPalette _palette = new()
     {
         Title = "Workspace Actions",
-        IsFocused = true,
     };
 
     private readonly ContextMenu _contextMenu = new()
     {
         Title = "Quick Actions",
-        IsFocused = true,
     };
 
     private readonly Label _summary = new()

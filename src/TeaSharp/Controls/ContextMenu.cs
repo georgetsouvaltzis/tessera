@@ -91,7 +91,11 @@ public sealed class ContextMenu : Control
         _component.SetItems(mapped);
     }
 
-    public void OpenAt(int x, int y) => _component.OpenAt(x, y);
+    public void OpenAt(int x, int y)
+    {
+        RequestFocus();
+        _component.OpenAt(x, y);
+    }
 
     public void Close() => _component.Close();
 

@@ -249,7 +249,9 @@ public sealed partial class ScreenComposer
         Func<MouseMsg, Rect, bool>? updateMouse = mouseStateful is null
             ? null
             : (message, bounds) => mouseStateful.UpdateMouse(message, bounds);
-        var requestedFocus = focusTarget?.IsFocused == true;
+        var requestedFocus =
+            focusTarget?.IsFocused == true
+            || component is TeaSharp.Controls.IFocusRequestSource focusRequestSource && focusRequestSource.ConsumeFocusRequest();
         var region = new ScreenRegion(
             id,
             bounds,
