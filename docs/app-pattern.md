@@ -73,6 +73,8 @@ internal sealed class CounterApp : TeaApp
 
 `ScreenContext` already tracks terminal size and focus state, so normal apps do not need to manage `_width`, `_height`, or focus-reporting flags by hand.
 
+If a control should claim focus programmatically, call `RequestFocus()`. When multiple controls request focus during the same build pass, the most recent request wins.
+
 ## Composition Model
 
 The default composition path uses explicit layout objects, not a nested static DSL.

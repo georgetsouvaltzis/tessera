@@ -13,6 +13,8 @@ public sealed partial class ScreenComposer
 {
     private readonly List<ScreenRegion> _regions = [];
     private bool _frameFocusOverrideRequested;
+    private ScreenRegionKey? _requestedFocusRegionKey;
+    private long _requestedFocusOrder;
 
     public IReadOnlyList<ScreenRegion> Regions => _regions;
 
@@ -205,6 +207,8 @@ public sealed partial class ScreenComposer
     public void BeginFrame()
     {
         _frameFocusOverrideRequested = false;
+        _requestedFocusRegionKey = null;
+        _requestedFocusOrder = 0;
         foreach (var region in _regions)
         {
             region.ApplyFocus(false, invokeFocus: false);
@@ -249,9 +253,14 @@ public sealed partial class ScreenComposer
         Func<MouseMsg, Rect, bool>? updateMouse = mouseStateful is null
             ? null
             : (message, bounds) => mouseStateful.UpdateMouse(message, bounds);
-        var requestedFocus =
-            focusTarget?.IsFocused == true
-            || component is TeaSharp.Controls.IFocusRequestSource focusRequestSource && focusRequestSource.ConsumeFocusRequest();
+        var requestedFocus = focusTarget?.IsFocused == true;
+        var requestOrder = 0L;
+        if (component is TeaSharp.Controls.IFocusRequestSource focusRequestSource
+            && focusRequestSource.TryConsumeFocusRequest(out var explicitRequestOrder))
+        {
+            requestedFocus = true;
+            requestOrder = explicitRequestOrder;
+        }
         var region = new ScreenRegion(
             id,
             bounds,
@@ -268,8 +277,20 @@ public sealed partial class ScreenComposer
 
         if (requestedFocus)
         {
-            ApplyFocus(id, invokeFocus: false);
-            _frameFocusOverrideRequested = true;
+            if (requestOrder > 0)
+            {
+                if (_requestedFocusRegionKey is null || requestOrder >= _requestedFocusOrder)
+                {
+                    _requestedFocusRegionKey = id;
+                    _requestedFocusOrder = requestOrder;
+                    _frameFocusOverrideRequested = true;
+                }
+            }
+            else
+            {
+                ApplyFocus(id, invokeFocus: false);
+                _frameFocusOverrideRequested = true;
+            }
         }
 
         return region;

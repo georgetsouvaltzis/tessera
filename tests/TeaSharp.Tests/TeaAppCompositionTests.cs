@@ -39,6 +39,9 @@ internal static class TeaAppCompositionTests
             "TeaAppComposition_VisibleOverlayCanClaimFocusThroughRootLayouts",
             VisibleOverlayCanClaimFocusThroughRootLayouts);
         yield return new TestCase(
+            "TeaAppComposition_FocusRequestsPreferLatestRequestOverCompositionOrder",
+            FocusRequestsPreferLatestRequestOverCompositionOrder);
+        yield return new TestCase(
             "TeaAppComposition_LegacyLayoutHelpers_AreMarkedAdvanced",
             LegacyLayoutHelpers_AreMarkedAdvanced);
         yield return new TestCase(
@@ -180,6 +183,20 @@ internal static class TeaAppCompositionTests
 
         TestAssert.Equal("rollback", app.LastExecutedItemId, "Visible overlays should be able to claim focus through the root layout model.");
         TestAssert.Equal(0, app.ButtonActivationCount, "Overlay focus should keep the underlying body control from activating.");
+        return Task.CompletedTask;
+    }
+
+    private static Task FocusRequestsPreferLatestRequestOverCompositionOrder()
+    {
+        var app = new FocusRequestOrderingApp();
+        var screen = app.RuntimeScreen;
+
+        screen.Update(new WindowSizeMsg(80, 24));
+        screen.Render();
+        screen.Update(new KeyPressMsg(KeyCode.Enter));
+
+        TestAssert.Equal(1, app.LeftActivationCount, "The most recent RequestFocus call should win even when the control is composed earlier.");
+        TestAssert.Equal(0, app.RightActivationCount, "Composition order should not override focus request order.");
         return Task.CompletedTask;
     }
 
@@ -553,5 +570,42 @@ internal static class TeaAppCompositionTests
                 Body = new CenterLayout(Button, width: 16, height: 3),
                 Overlay = new CenterLayout(Palette, width: 48, height: 10),
             });
+    }
+
+    private sealed class FocusRequestOrderingApp : TeaApp
+    {
+        public Button LeftButton { get; } = new() { Text = "Left" };
+
+        public Button RightButton { get; } = new() { Text = "Right" };
+
+        public int LeftActivationCount { get; private set; }
+
+        public int RightActivationCount { get; private set; }
+
+        public FocusRequestOrderingApp()
+        {
+            LeftButton.Activated += (_, _) => LeftActivationCount++;
+            RightButton.Activated += (_, _) => RightActivationCount++;
+
+            RightButton.RequestFocus();
+            LeftButton.RequestFocus();
+        }
+
+        public override TeaEffect? Update(Message message) => null;
+
+        public override Screen Build(ScreenContext context)
+        {
+            var row = new RowLayout
+            {
+                Gap = 2,
+            };
+            row.AddFixed(LeftButton, 12);
+            row.AddFixed(RightButton, 12);
+
+            return Screen.From(new WindowLayout
+            {
+                Body = new CenterLayout(row, width: 28, height: 3),
+            });
+        }
     }
 }

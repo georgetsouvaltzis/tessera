@@ -8,8 +8,10 @@ namespace TeaSharp.Controls;
 
 public abstract class Control
 {
+    private static long s_focusRequestCounter;
     private readonly ControlComponentAdapter _componentAdapter;
     private bool _focusRequestPending;
+    private long _focusRequestOrder;
 
     protected Control()
     {
@@ -25,6 +27,7 @@ public abstract class Control
     public void RequestFocus()
     {
         _focusRequestPending = true;
+        _focusRequestOrder = Interlocked.Increment(ref s_focusRequestCounter);
     }
 
     public abstract void Render(Canvas canvas, Rect rect);
@@ -100,10 +103,11 @@ public abstract class Control
             return owner.Handle(TeaMessageAdapter.ToPublic(message), bounds);
         }
 
-        public bool ConsumeFocusRequest()
+        public bool TryConsumeFocusRequest(out long order)
         {
             var requested = owner._focusRequestPending;
             owner._focusRequestPending = false;
+            order = owner._focusRequestOrder;
             return requested;
         }
     }
