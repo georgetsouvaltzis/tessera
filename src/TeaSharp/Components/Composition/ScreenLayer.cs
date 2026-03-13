@@ -3,7 +3,7 @@ using System.ComponentModel;
 namespace TeaSharp.Components.Composition;
 
 [EditorBrowsable(EditorBrowsableState.Advanced)]
-public enum ScreenLayer
+internal enum ScreenLayer
 {
     Base = 0,
     Overlay = 100,

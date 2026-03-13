@@ -7,7 +7,7 @@ namespace TeaSharp.Components.Composition;
 /// Represents a common screen shell split into header, body, and footer regions.
 /// </summary>
 [EditorBrowsable(EditorBrowsableState.Advanced)]
-public readonly record struct ScreenFrameLayout(Rect Bounds, Rect Header, Rect Body, Rect Footer)
+internal readonly record struct ScreenFrameLayout(Rect Bounds, Rect Header, Rect Body, Rect Footer)
 {
     /// <summary>
     /// Gets a value indicating whether the frame contains a header region.

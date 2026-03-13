@@ -7,4 +7,4 @@ namespace TeaSharp.Components.Composition;
 /// </summary>
 /// <param name="RegionKey">The focused region key at capture time.</param>
 [EditorBrowsable(EditorBrowsableState.Advanced)]
-public readonly record struct ScreenFocusSnapshot(ScreenRegionKey? RegionKey);
+internal readonly record struct ScreenFocusSnapshot(ScreenRegionKey? RegionKey);

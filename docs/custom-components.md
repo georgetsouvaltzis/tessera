@@ -53,20 +53,16 @@ public sealed class CounterBadge : Control
 
 ## When To Use The Advanced Contracts
 
-The older composition contracts remain available:
+The older component contracts still remain available:
 
 - `ICanvasComponent`
 - `IStatefulComponent`
 - `IMouseStatefulComponent`
 - `IFocusableComponent`
-- `ComponentComposer`
-- `ScreenComposer`
 
-Those types are now marked `EditorBrowsable(Advanced)`. Use them when you need:
+The old screen-scale composition engine is now internal-only. Use the remaining advanced component contracts when you need:
 
-- tight integration with an existing advanced screen
-- explicit region routing
-- deterministic slot composition
+- tight integration with an existing legacy component
 - direct interop with legacy TeaSharp component APIs
 
 ## Design Rules For Custom Widgets
@@ -75,6 +71,6 @@ Those types are now marked `EditorBrowsable(Advanced)`. Use them when you need:
 - keep state transitions in `Handle`
 - prefer typed `Message` handling over raw core messages
 - keep focus local to the control
-- only drop to advanced composition contracts when the widget truly needs screen-scale routing
+- only drop to advanced component contracts when the widget truly needs low-level interop
 
 The intent is simple: custom controls should be easy to write without forcing authors to learn the runtime engine.

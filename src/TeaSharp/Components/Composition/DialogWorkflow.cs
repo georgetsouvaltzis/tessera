@@ -9,7 +9,7 @@ namespace TeaSharp.Components.Composition;
 /// Coordinates dialog visibility, modal registration, and focus restoration for app workflows.
 /// </summary>
 [EditorBrowsable(EditorBrowsableState.Advanced)]
-public sealed class DialogWorkflow
+internal sealed class DialogWorkflow
 {
     private readonly Func<ScreenFocusSnapshot> _captureFocus;
     private readonly Func<ScreenFocusSnapshot, bool> _restoreFocus;

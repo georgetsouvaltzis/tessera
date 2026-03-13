@@ -8,7 +8,7 @@ namespace TeaSharp.Components.Composition;
 /// Represents a form-style screen shell with optional header and footer plus body and action regions.
 /// </summary>
 [EditorBrowsable(EditorBrowsableState.Advanced)]
-public sealed class FormScreen
+internal sealed class FormScreen
 {
     private readonly ScreenComposer _screen;
     private readonly List<ScreenRegionKey> _focusOrder = [];

@@ -7,7 +7,7 @@ using TeaSharp.Core.Messages;
 namespace TeaSharp.Components.Composition;
 
 [EditorBrowsable(EditorBrowsableState.Advanced)]
-public sealed class ComponentComposer
+internal sealed class ComponentComposer
 {
     private readonly List<ComponentSlot> _slots = [];
     private int _focusedSlotIndex = -1;

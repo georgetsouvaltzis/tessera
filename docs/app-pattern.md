@@ -192,12 +192,10 @@ Advanced runtime seams remain available, but they now sit under `TeaSharp.Hostin
 
 ## Advanced Escape Hatch
 
-The older composition stack remains available for now:
+Most of the older composition stack is now internal-only.
 
-- `ScreenComposer`
-- `InteractiveScreenModel`
-- `InputRouter`
+The main surviving public interop token is:
+
 - `ScreenRegionKey`
-- shell helpers such as `MasterDetail`, `Dashboard`, and `Form`
 
-The former static layout helper DSL is now internal-only. Advanced callers that still need screen-scale routing should work directly with the remaining advanced composition types instead of the old helper mini-language.
+That token only exists so the remaining advanced layout overloads can keep a stable region identity where necessary. Normal apps should not need it.

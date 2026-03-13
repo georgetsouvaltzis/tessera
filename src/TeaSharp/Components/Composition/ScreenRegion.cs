@@ -4,7 +4,7 @@ using TeaSharp.Core.Messages;
 
 namespace TeaSharp.Components.Composition;
 
-public sealed class ScreenRegion
+internal sealed class ScreenRegion
 {
     private readonly Action<Canvas, Rect> _render;
     private readonly Func<IMessage, bool>? _update;

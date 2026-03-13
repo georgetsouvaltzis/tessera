@@ -3,7 +3,7 @@ using System.ComponentModel;
 namespace TeaSharp.Components.Composition;
 
 [EditorBrowsable(EditorBrowsableState.Advanced)]
-public enum KeyboardRoutingMode
+internal enum KeyboardRoutingMode
 {
     FocusedOnly = 0,
     Broadcast = 1,

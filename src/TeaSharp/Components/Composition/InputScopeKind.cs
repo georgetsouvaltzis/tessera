@@ -3,7 +3,7 @@ using System.ComponentModel;
 namespace TeaSharp.Components.Composition;
 
 [EditorBrowsable(EditorBrowsableState.Advanced)]
-public enum InputScopeKind
+internal enum InputScopeKind
 {
     System = 0,
     Modal = 100,

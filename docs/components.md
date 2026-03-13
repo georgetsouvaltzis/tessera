@@ -116,15 +116,13 @@ These can still be placed directly inside the new layout model through `PanelLay
 
 ## Legacy Composition APIs
 
-The following remain public but are no longer the default story:
+The old composition engine is now mostly internal-only.
 
-- `ScreenComposer`
-- `ComponentComposer`
-- `InteractiveScreenModel`
-- `InputRouter`
+The main public interop token that remains is:
+
 - `ScreenRegionKey`
 
-Use them only when you need lower-level orchestration than the root model provides.
+Use it only when an advanced layout overload needs a stable region identity.
 
 ## Example
 

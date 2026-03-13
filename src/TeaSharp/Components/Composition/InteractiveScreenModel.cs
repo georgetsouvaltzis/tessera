@@ -8,7 +8,7 @@ using TeaSharp.Layout;
 namespace TeaSharp.Components.Composition;
 
 [EditorBrowsable(EditorBrowsableState.Advanced)]
-public abstract class InteractiveScreenModel : IScreen
+internal abstract class InteractiveScreenModel : IScreen
 {
     protected ScreenComposer Screen { get; } = new();
 

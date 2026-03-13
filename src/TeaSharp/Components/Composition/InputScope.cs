@@ -5,7 +5,7 @@ using System.ComponentModel;
 namespace TeaSharp.Components.Composition;
 
 [EditorBrowsable(EditorBrowsableState.Advanced)]
-public sealed class InputScope
+internal sealed class InputScope
 {
     public InputScope(
         string id,

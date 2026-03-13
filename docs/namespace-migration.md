@@ -71,10 +71,6 @@ Advanced-only namespaces remain available, but they should be opt-in.
 
 These still exist, but they are not the first path:
 
-- `ScreenComposer`
-- `ComponentComposer`
-- `InteractiveScreenModel`
-- `InputRouter`
 - `ScreenRegionKey`
 - low-level widget models in `TeaSharp.Widgets`
 - advanced widgets that do not have root wrappers yet
@@ -85,21 +81,31 @@ Before:
 
 ```csharp
 using TeaSharp;
-using TeaSharp.Components.Composition;
 using TeaSharp.Components.Prebuilt;
 using TeaSharp.Components.Primitives;
 using TeaSharp.Core.Abstractions;
 using TeaSharp.Core.Messages;
 
-internal sealed class SearchModel : InteractiveScreenModel
+internal sealed class SearchScreen : IScreen
 {
     private readonly TextInputComponent _input = new(new TextInputOptions(
         Title: "Search",
         Placeholder: "type here"));
+    private readonly ScreenComposer _screen = new();
 
-    protected override void ComposeScreen(Rect bodyRect)
+    public ScreenOutput Render()
     {
-        Screen.AddComponent(new ScreenRegionKey("search"), bodyRect, _input, focusable: true);
+        _screen.BeginFrame();
+        var bodyRect = new Rect(0, 0, 80, 24);
+        _screen.AddComponent(new ScreenRegionKey("search"), bodyRect, _input, focusable: true);
+        _screen.CompleteFrame();
+        return new ScreenOutput(_screen.RenderToFrame());
+    }
+
+    public Effect? Update(IMessage message)
+    {
+        _screen.Update(message);
+        return null;
     }
 }
 ```

@@ -5,7 +5,7 @@ using System.ComponentModel;
 namespace TeaSharp.Components.Composition;
 
 [EditorBrowsable(EditorBrowsableState.Advanced)]
-public sealed class InputRouter
+internal sealed class InputRouter
 {
     private readonly List<RegisteredScope> _scopes = [];
     private int _nextOrder;

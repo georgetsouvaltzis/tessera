@@ -78,7 +78,7 @@ These APIs remain public because they still offer real value, but they should no
 - `IScreen`
 - `ProgramOptions`
 - `TeaProgram`
-- `TeaSharp.Components.Composition.*`
+- `ScreenRegionKey`
 - `TeaSharp.Components.Interaction.*`
 - `TeaSharp.Components.Styling.*`
 - `IProgramRenderer`
@@ -93,7 +93,7 @@ Most of these types are now marked `EditorBrowsable(Advanced)`.
 
 These areas still expose more mechanism than the long-term public design should:
 
-- composition types centered on explicit region routing
+- region-key-based advanced layout interop
 - low-level widget models leaking through component configuration
 - runtime seams that most apps never need
 - duplicate terminology between root app types and older core/runtime types
@@ -120,7 +120,7 @@ to:
 - `WindowLayout`, `RowLayout`, `ColumnLayout`, `PanelLayout`, `CenterLayout`, `LayoutSlot`
 - root `TeaSharp.Controls` wrappers
 
-The old tree-oriented stack remains available for now, but it is marked advanced and is no longer the recommended starting point. The previous static layout helper DSL is now internal-only.
+The old tree-oriented stack now mostly compiles behind the scenes as an internal bridge. The previous static layout helper DSL is also internal-only.
 
 ## Design Constraints
 
@@ -133,6 +133,6 @@ The old tree-oriented stack remains available for now, but it is marked advanced
 ## Follow-up Targets
 
 1. keep moving control authoring toward a single obvious configuration style
-2. continue pushing screen-scale routing types behind advanced discoverability
+2. continue shrinking region-key-based advanced interop
 3. introduce the next app-facing composition layer without exposing engine vocabulary
 4. keep custom widget extensibility stable while internal runtime details continue to shrink

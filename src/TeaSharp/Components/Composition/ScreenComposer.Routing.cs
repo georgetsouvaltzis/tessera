@@ -4,7 +4,7 @@ using TeaSharp.Core.Messages;
 
 namespace TeaSharp.Components.Composition;
 
-public sealed partial class ScreenComposer
+internal sealed partial class ScreenComposer
 {
     private void CompleteTypedFrame(ScreenRegionKey? preferredFocusRegionKey)
     {

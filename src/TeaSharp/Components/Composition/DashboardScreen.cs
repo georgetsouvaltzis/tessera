@@ -8,7 +8,7 @@ namespace TeaSharp.Components.Composition;
 /// Represents a dashboard-style screen shell with optional header and footer plus sidebar and main regions.
 /// </summary>
 [EditorBrowsable(EditorBrowsableState.Advanced)]
-public sealed class DashboardScreen
+internal sealed class DashboardScreen
 {
     private readonly ScreenComposer _screen;
     private readonly List<ScreenRegionKey> _focusOrder = [];

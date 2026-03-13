@@ -9,7 +9,7 @@ using TeaSharp.Layout;
 namespace TeaSharp.Components.Composition;
 
 [EditorBrowsable(EditorBrowsableState.Advanced)]
-public sealed partial class ScreenComposer
+internal sealed partial class ScreenComposer
 {
     private readonly List<ScreenRegion> _regions = [];
     private bool _frameFocusOverrideRequested;

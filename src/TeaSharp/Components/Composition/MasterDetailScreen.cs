@@ -8,7 +8,7 @@ namespace TeaSharp.Components.Composition;
 /// Represents a master-detail screen shell with optional header and footer regions.
 /// </summary>
 [EditorBrowsable(EditorBrowsableState.Advanced)]
-public sealed class MasterDetailScreen
+internal sealed class MasterDetailScreen
 {
     private readonly ScreenComposer _screen;
     private readonly List<ScreenRegionKey> _focusOrder = [];
