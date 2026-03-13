@@ -23,7 +23,7 @@ internal sealed record GalleryTick(DateTimeOffset At) : Message;
 
 internal sealed class WidgetGalleryApp : TeaApp
 {
-    private readonly Tabs _tabs = new("Basics", "Inputs", "Data", "Overlay", "Advanced");
+    private readonly Tabs _tabs = new("Basics", "Inputs", "Data", "Overlay", "Advanced", "Telemetry");
     private readonly Label _label = new()
     {
         Title = "Label",
@@ -121,6 +121,32 @@ internal sealed class WidgetGalleryApp : TeaApp
         MaxItems = 32,
     };
 
+    private readonly Gauge _gauge = new()
+    {
+        Title = "CPU",
+        MaxValue = 100,
+    };
+
+    private readonly StatsCard _statsCard = new()
+    {
+        Title = "Cluster",
+    };
+
+    private readonly MiniLog _miniLog = new()
+    {
+        Title = "Mini Log",
+    };
+
+    private readonly BarChart _barChart = new()
+    {
+        Title = "Services",
+    };
+
+    private readonly LineChart _lineChart = new(48)
+    {
+        Title = "Latency",
+    };
+
     private readonly StatusBar _status = new();
 
     private int _tick;
@@ -212,6 +238,19 @@ internal sealed class WidgetGalleryApp : TeaApp
 
         _logs.Append("gallery booted");
         _notifications.Push("widget gallery ready", NotificationLevel.Info);
+        _miniLog.Append("telemetry ready");
+        _barChart.SetBars(
+        [
+            new BarPoint("api", 42),
+            new BarPoint("worker", 58),
+            new BarPoint("events", 33),
+        ]);
+        _statsCard.SetItems(
+        [
+            new StatItem("raw", "yes"),
+            new StatItem("mouse", "yes"),
+            new StatItem("paste", "yes"),
+        ]);
     }
 
     public override TeaEffect? Initialize() => TeaEffects.Tick(TimeSpan.FromMilliseconds(300), static now => new GalleryTick(now));
@@ -222,9 +261,18 @@ internal sealed class WidgetGalleryApp : TeaApp
         {
             _tick++;
             _progress.SetValue((_tick % 100) / 100.0);
+            _lineChart.Append(20 + Math.Sin(_tick / 6d) * 12 + (_tick % 5));
+            _gauge.Value = (_tick * 7) % 100;
+            _gauge.Label = $"{_gauge.Value:0}%";
+            _barChart.SetValue("api", 30 + (_tick % 40));
+            _barChart.SetValue("worker", 45 + ((_tick * 3) % 30));
+            _barChart.SetValue("events", 20 + ((_tick * 5) % 25));
+            _statsCard.SetValue("tick", _tick.ToString("0000", System.Globalization.CultureInfo.InvariantCulture));
+            _statsCard.SetValue("focus", Context.HasFocus ? "yes" : "no");
             if (_tick % 10 == 0)
             {
                 _logs.Append($"{tick.At:HH:mm:ss} pulse={_tick:0000}");
+                _miniLog.Append($"{tick.At:HH:mm:ss} p95={20 + (_tick % 15)}ms");
             }
 
             return TeaEffects.Tick(TimeSpan.FromMilliseconds(300), static now => new GalleryTick(now));
@@ -296,7 +344,8 @@ internal sealed class WidgetGalleryApp : TeaApp
                 Width = Math.Min(64, Math.Max(36, context.Width - 6)),
                 Height = 8,
             },
-            _ => CreateAdvancedTab(),
+            4 => CreateAdvancedTab(),
+            _ => CreateTelemetryTab(),
         };
     }
 
@@ -406,5 +455,67 @@ internal sealed class WidgetGalleryApp : TeaApp
             },
         };
         return content;
+    }
+
+    private RowLayout CreateTelemetryTab()
+    {
+        var left = new ColumnLayout
+        {
+            Gap = 1,
+            Items =
+            {
+                new LayoutSlot
+                {
+                    Content = _gauge,
+                    Length = 5,
+                },
+                new LayoutSlot
+                {
+                    Content = _statsCard,
+                    Length = 6,
+                },
+                new LayoutSlot
+                {
+                    Content = _miniLog,
+                    Length = LayoutLength.Fill(),
+                },
+            },
+        };
+
+        var right = new ColumnLayout
+        {
+            Gap = 1,
+            Items =
+            {
+                new LayoutSlot
+                {
+                    Content = _barChart,
+                    Length = 10,
+                },
+                new LayoutSlot
+                {
+                    Content = _lineChart,
+                    Length = LayoutLength.Fill(),
+                },
+            },
+        };
+
+        return new RowLayout
+        {
+            Gap = 1,
+            Items =
+            {
+                new LayoutSlot
+                {
+                    Content = left,
+                    Length = 24,
+                },
+                new LayoutSlot
+                {
+                    Content = right,
+                    Length = LayoutLength.Fill(),
+                },
+            },
+        };
     }
 }

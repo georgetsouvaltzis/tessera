@@ -90,7 +90,7 @@ These names are the preferred public nouns.
 
 The older `*Component` catalog still exists for:
 
-- controls that do not have root wrappers yet
+- a small advanced band where we still intentionally expose raw seams
 - advanced customization
 - migration support
 - custom-control composition
@@ -105,12 +105,12 @@ Important advanced namespaces:
 
 Examples:
 
-- `LineChartComponent`
-- `BarChartComponent`
-- `GaugeComponent`
-- `MiniLogComponent`
-- `StatsCardComponent`
 - `Canvas`
+- `LineChartComponent` when you need the raw advanced seam instead of root `LineChart`
+- `BarChartComponent` when you need the raw advanced seam instead of root `BarChart`
+- `GaugeComponent` when you need the raw advanced seam instead of root `Gauge`
+- `MiniLogComponent` when you need the raw advanced seam instead of root `MiniLog`
+- `StatsCardComponent` when you need the raw advanced seam instead of root `StatsCard`
 
 These advanced types can still be placed directly inside the layout model through the advanced canvas-component entry points.
 

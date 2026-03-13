@@ -46,6 +46,13 @@ These are the types new applications should discover first.
 - `TeaSharp.Controls.ContextMenu`
 - `TeaSharp.Controls.ContextMenuItem`
 - `TeaSharp.Controls.ProgressBar`
+- `TeaSharp.Controls.BarPoint`
+- `TeaSharp.Controls.BarChart`
+- `TeaSharp.Controls.LineChart`
+- `TeaSharp.Controls.Gauge`
+- `TeaSharp.Controls.MiniLog`
+- `TeaSharp.Controls.StatItem`
+- `TeaSharp.Controls.StatsCard`
 - `TeaSharp.Controls.NumberInput`
 - `TeaSharp.Controls.DatePicker`
 - `TeaSharp.Controls.TimePicker`

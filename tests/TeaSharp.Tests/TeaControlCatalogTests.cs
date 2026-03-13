@@ -47,6 +47,13 @@ internal static class TeaControlCatalogTests
         typeof(MultiSelect),
         typeof(RadioGroup),
         typeof(TimeField),
+        typeof(BarPoint),
+        typeof(BarChart),
+        typeof(LineChart),
+        typeof(Gauge),
+        typeof(MiniLog),
+        typeof(StatItem),
+        typeof(StatsCard),
     ];
 
     private static readonly string[] InternalizedLegacyPrebuiltTypes =
@@ -150,6 +157,9 @@ internal static class TeaControlCatalogTests
         yield return new TestCase(
             "TeaControlCatalog_PromotedAdvancedControls_WorkThroughRootWrappers",
             PromotedAdvancedControls_WorkThroughRootWrappers);
+        yield return new TestCase(
+            "TeaControlCatalog_PromotedDashboardAndChartControls_WorkThroughRootWrappers",
+            PromotedDashboardAndChartControls_WorkThroughRootWrappers);
     }
 
     private static Task NewControlTypes_RemainDiscoverable()
@@ -359,6 +369,71 @@ internal static class TeaControlCatalogTests
         TestAssert.True(!menu.IsVisible, "ContextMenu should close after executing through the root wrapper.");
         TestAssert.True(commandItemId == "rollback", "CommandPalette should filter and execute through the root wrapper.");
         TestAssert.True(!palette.IsVisible, "CommandPalette should close after executing through the root wrapper.");
+        return Task.CompletedTask;
+    }
+
+    private static Task PromotedDashboardAndChartControls_WorkThroughRootWrappers()
+    {
+        var bars = new BarChart
+        {
+            Title = "Bars",
+        };
+        bars.SetBars([new BarPoint("cpu", 42), new BarPoint("mem", 73)]);
+        bars.SetValue("cpu", 55);
+        var barCanvas = new Canvas(24, 8);
+        bars.Render(barCanvas, new Rect(0, 0, 24, 8));
+
+        var line = new LineChart(capacity: 4)
+        {
+            Title = "Line",
+        };
+        line.SetSamples([1, 2, 3, 4, 5]);
+        line.ZoomIn();
+        line.Pan(1);
+        var lineCanvas = new Canvas(24, 8);
+        line.Render(lineCanvas, new Rect(0, 0, 24, 8));
+
+        var gauge = new Gauge
+        {
+            Title = "Gauge",
+            Value = 72,
+            MaxValue = 100,
+            Label = "72%",
+        };
+        var gaugeCanvas = new Canvas(24, 5);
+        gauge.Render(gaugeCanvas, new Rect(0, 0, 24, 5));
+
+        var log = new MiniLog(capacity: 3)
+        {
+            Title = "Log",
+        };
+        log.Append("one");
+        log.Append("two");
+        log.Append("three");
+        log.Append("four");
+        var logCanvas = new Canvas(24, 6);
+        log.Render(logCanvas, new Rect(0, 0, 24, 6));
+
+        var stats = new StatsCard
+        {
+            Title = "Stats",
+        };
+        stats.SetItems([new StatItem("raw", "yes"), new StatItem("mouse", "yes")]);
+        stats.SetValue("paste", "no");
+        var statsCanvas = new Canvas(24, 6);
+        stats.Render(statsCanvas, new Rect(0, 0, 24, 6));
+
+        TestAssert.Equal(55d, bars.Bars[0].Value, "BarChart should update named bar values through the root wrapper.");
+        TestAssert.True(barCanvas.Render().Contains("Bars", StringComparison.Ordinal), "BarChart should render through the root wrapper.");
+        TestAssert.Equal(4, line.Samples.Count, "LineChart should honor capacity through the root wrapper.");
+        TestAssert.True(line.Zoom > 1.0, "LineChart should zoom through the root wrapper.");
+        TestAssert.True(line.Offset == 1, "LineChart should pan through the root wrapper.");
+        TestAssert.True(lineCanvas.Render().Contains("Line", StringComparison.Ordinal), "LineChart should render through the root wrapper.");
+        TestAssert.True(gaugeCanvas.Render().Contains("72%", StringComparison.Ordinal), "Gauge should render labels through the root wrapper.");
+        TestAssert.Equal(3, log.Entries.Count, "MiniLog should honor capacity through the root wrapper.");
+        TestAssert.True(logCanvas.Render().Contains("four", StringComparison.Ordinal), "MiniLog should render appended entries through the root wrapper.");
+        TestAssert.Equal(3, stats.Items.Count, "StatsCard should store values through the root wrapper.");
+        TestAssert.True(statsCanvas.Render().Contains("paste", StringComparison.Ordinal), "StatsCard should render values through the root wrapper.");
         return Task.CompletedTask;
     }
 }
