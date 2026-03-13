@@ -26,6 +26,7 @@ internal static class WidgetApiContractTests
         ("ListModel", typeof(ListModel<string>)),
         ("ViewportModel", typeof(ViewportModel)),
         ("WidgetInteractionProfile", typeof(WidgetInteractionProfile)),
+        ("WidgetVisualState", typeof(WidgetVisualState)),
         ("WidgetStatePalette", typeof(WidgetStatePalette)),
         ("WidgetStateAppearance", typeof(WidgetStateAppearance)),
     ];
@@ -38,7 +39,6 @@ internal static class WidgetApiContractTests
                 $"WidgetApi_{name}_IsMarkedAdvanced",
                 () => AssertMarkedAdvanced(type));
         }
-
     }
 
     private static Task AssertMarkedAdvanced(Type type)
@@ -53,5 +53,4 @@ internal static class WidgetApiContractTests
             $"{type.Name} should be hidden from default API discovery.");
         return Task.CompletedTask;
     }
-
 }

@@ -1,8 +1,10 @@
 using TeaSharp.Components.Styling.Internal;
 using TeaSharp.Styles;
+using System.ComponentModel;
 
 namespace TeaSharp.Components.Styling;
 
+[EditorBrowsable(EditorBrowsableState.Advanced)]
 public enum WidgetVisualState
 {
     Default = 0,
@@ -32,4 +34,3 @@ public enum WidgetVisualState
     New = 24,
     Stale = 25,
 }
-
