@@ -11,18 +11,35 @@ namespace TeaSharp.Layout;
 /// </summary>
 public sealed class RowLayout : LayoutNode
 {
+    /// <summary>
+    /// Gets the arranged row items in left-to-right order.
+    /// </summary>
     public IList<LayoutSlot> Items { get; } = [];
 
+    /// <summary>
+    /// Gets or sets the gap between items.
+    /// </summary>
     public int Gap { get; set; }
 
+    /// <summary>
+    /// Gets or sets the inner padding applied before arranging items.
+    /// </summary>
     public Thickness Padding { get; set; }
 
+    /// <summary>
+    /// Adds a preconfigured slot to the row.
+    /// </summary>
+    /// <param name="item">The slot to add.</param>
+    /// <returns>The current row layout.</returns>
     public RowLayout Add(LayoutSlot item)
     {
         Items.Add(item ?? throw new ArgumentNullException(nameof(item)));
         return this;
     }
 
+    /// <summary>
+    /// Adds an auto-sized layout node.
+    /// </summary>
     public RowLayout AddAuto(LayoutNode content, Thickness margin = default)
         => Add(LayoutSlot.Auto(content, margin));
 
@@ -30,9 +47,15 @@ public sealed class RowLayout : LayoutNode
     public RowLayout AddAuto(ICanvasComponent component, Thickness margin = default)
         => Add(LayoutSlot.Auto(component, margin));
 
+    /// <summary>
+    /// Adds an auto-sized control.
+    /// </summary>
     public RowLayout AddAuto(Control control, Thickness margin = default)
         => Add(LayoutSlot.Auto(control, margin));
 
+    /// <summary>
+    /// Adds a fixed-size layout node.
+    /// </summary>
     public RowLayout AddFixed(LayoutNode content, int size, Thickness margin = default)
         => Add(LayoutSlot.Fixed(content, size, margin));
 
@@ -40,9 +63,15 @@ public sealed class RowLayout : LayoutNode
     public RowLayout AddFixed(ICanvasComponent component, int size, Thickness margin = default)
         => Add(LayoutSlot.Fixed(component, size, margin));
 
+    /// <summary>
+    /// Adds a fixed-size control.
+    /// </summary>
     public RowLayout AddFixed(Control control, int size, Thickness margin = default)
         => Add(LayoutSlot.Fixed(control, size, margin));
 
+    /// <summary>
+    /// Adds a fill layout node.
+    /// </summary>
     public RowLayout AddFill(LayoutNode content, Thickness margin = default)
         => Add(LayoutSlot.Fill(content, margin));
 
@@ -50,9 +79,15 @@ public sealed class RowLayout : LayoutNode
     public RowLayout AddFill(ICanvasComponent component, Thickness margin = default)
         => Add(LayoutSlot.Fill(component, margin));
 
+    /// <summary>
+    /// Adds a fill control.
+    /// </summary>
     public RowLayout AddFill(Control control, Thickness margin = default)
         => Add(LayoutSlot.Fill(control, margin));
 
+    /// <summary>
+    /// Adds a weighted layout node.
+    /// </summary>
     public RowLayout AddWeighted(LayoutNode content, int weight, Thickness margin = default)
         => Add(LayoutSlot.Weighted(content, weight, margin));
 
@@ -60,6 +95,9 @@ public sealed class RowLayout : LayoutNode
     public RowLayout AddWeighted(ICanvasComponent component, int weight, Thickness margin = default)
         => Add(LayoutSlot.Weighted(component, weight, margin));
 
+    /// <summary>
+    /// Adds a weighted control.
+    /// </summary>
     public RowLayout AddWeighted(Control control, int weight, Thickness margin = default)
         => Add(LayoutSlot.Weighted(control, weight, margin));
 

@@ -9,8 +9,19 @@ namespace TeaSharp.Layout;
 /// <summary>
 /// Represents a grouped container with optional frame styling and nested content.
 /// </summary>
+/// <remarks>
+/// Border and padding reduce the inner content area before the nested content is measured and composed.
+/// </remarks>
 public sealed class PanelLayout : LayoutNode
 {
+    /// <summary>
+    /// Creates a panel layout around nested content.
+    /// </summary>
+    /// <param name="content">The content shown inside the panel.</param>
+    /// <param name="title">The optional panel title.</param>
+    /// <param name="border">The frame border style.</param>
+    /// <param name="padding">The inner panel padding.</param>
+    /// <param name="margin">The outer panel margin.</param>
     public PanelLayout(LayoutNode content, string? title = null, BorderStyle border = BorderStyle.None, Thickness padding = default, Thickness margin = default)
     {
         Content = content ?? throw new ArgumentNullException(nameof(content));
@@ -36,6 +47,14 @@ public sealed class PanelLayout : LayoutNode
     {
     }
 
+    /// <summary>
+    /// Creates a panel layout around a control.
+    /// </summary>
+    /// <param name="control">The control shown inside the panel.</param>
+    /// <param name="title">The optional panel title.</param>
+    /// <param name="border">The frame border style.</param>
+    /// <param name="padding">The inner panel padding.</param>
+    /// <param name="margin">The outer panel margin.</param>
     public PanelLayout(
         Control control,
         string? title = null,

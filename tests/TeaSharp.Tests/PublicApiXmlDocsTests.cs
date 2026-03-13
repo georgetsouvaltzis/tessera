@@ -15,6 +15,9 @@ internal static class PublicApiXmlDocsTests
         yield return new TestCase(
             "PublicApiXmlDocs_KeyMembers_HaveSummaries",
             KeyMembers_HaveSummaries);
+        yield return new TestCase(
+            "PublicApiXmlDocs_EntryControlsAndLayouts_HaveSummaries",
+            EntryControlsAndLayouts_HaveSummaries);
     }
 
     private static Task RootTypes_HaveSummaries()
@@ -79,6 +82,38 @@ internal static class PublicApiXmlDocsTests
             "M:TeaSharp.ScreenContext.CreateCanvas(TeaSharp.Components.Primitives.CanvasTextMode)",
             "M:TeaSharp.TeaEffects.Emit(TeaSharp.Message)",
             "M:TeaSharp.TeaEffects.Tick(System.TimeSpan,System.Func{System.DateTimeOffset,TeaSharp.Message})",
+        ];
+
+        var docs = LoadDocumentation();
+        foreach (var memberName in memberNames)
+        {
+            AssertTagHasContent(docs, memberName, "summary");
+        }
+
+        return Task.CompletedTask;
+    }
+
+    private static Task EntryControlsAndLayouts_HaveSummaries()
+    {
+        string[] memberNames =
+        [
+            "T:TeaSharp.Controls.Control",
+            "T:TeaSharp.Controls.Button",
+            "T:TeaSharp.Controls.TextInput",
+            "T:TeaSharp.Controls.Choice",
+            "T:TeaSharp.Controls.ComboBox",
+            "T:TeaSharp.Controls.Dialog",
+            "T:TeaSharp.Controls.ListView`1",
+            "T:TeaSharp.Controls.MenuBar",
+            "T:TeaSharp.Layout.LayoutSlot",
+            "T:TeaSharp.Layout.CenterLayout",
+            "T:TeaSharp.Layout.PanelLayout",
+            "T:TeaSharp.Layout.WindowLayout",
+            "T:TeaSharp.Layout.RowLayout",
+            "T:TeaSharp.Layout.ColumnLayout",
+            "T:TeaSharp.Components.Primitives.Canvas",
+            "T:TeaSharp.Thickness",
+            "T:TeaSharp.BorderStyle",
         ];
 
         var docs = LoadDocumentation();

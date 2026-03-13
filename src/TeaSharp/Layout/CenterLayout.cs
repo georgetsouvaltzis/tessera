@@ -10,6 +10,13 @@ namespace TeaSharp.Layout;
 /// </summary>
 public sealed class CenterLayout : LayoutNode
 {
+    /// <summary>
+    /// Creates a centered layout node around nested content.
+    /// </summary>
+    /// <param name="content">The content to center.</param>
+    /// <param name="width">The explicit width to use, when supplied. When omitted, measured content width is used.</param>
+    /// <param name="height">The explicit height to use, when supplied. When omitted, measured content height is used.</param>
+    /// <param name="margin">The margin applied before centering.</param>
     public CenterLayout(LayoutNode content, int? width = null, int? height = null, Thickness margin = default)
     {
         Content = content ?? throw new ArgumentNullException(nameof(content));
@@ -32,6 +39,13 @@ public sealed class CenterLayout : LayoutNode
     {
     }
 
+    /// <summary>
+    /// Creates a centered layout node around a control.
+    /// </summary>
+    /// <param name="control">The control to center.</param>
+    /// <param name="width">The explicit width to use, when supplied. When omitted, measured control width is used.</param>
+    /// <param name="height">The explicit height to use, when supplied. When omitted, measured control height is used.</param>
+    /// <param name="margin">The margin applied before centering.</param>
     public CenterLayout(
         Control control,
         int? width = null,

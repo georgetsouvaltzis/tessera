@@ -3,11 +3,24 @@ using System.Text;
 
 namespace TeaSharp.Components.Primitives;
 
+/// <summary>
+/// Represents a mutable terminal drawing surface.
+/// </summary>
+/// <remarks>
+/// This is the low-level drawing primitive behind custom rendering and advanced component interop. Prefer root
+/// controls and layouts for normal application authoring.
+/// </remarks>
 public sealed class Canvas
 {
     private readonly char[]? _cells;
     private readonly CanvasGraphemeBuffer? _graphemeBuffer;
 
+    /// <summary>
+    /// Initializes a new canvas.
+    /// </summary>
+    /// <param name="width">The canvas width in cells.</param>
+    /// <param name="height">The canvas height in cells.</param>
+    /// <param name="textMode">The text rendering mode.</param>
     public Canvas(int width, int height, CanvasTextMode textMode = CanvasTextMode.Fast)
     {
         Width = Math.Max(1, width);
@@ -25,14 +38,30 @@ public sealed class Canvas
         Clear();
     }
 
+    /// <summary>
+    /// Gets the canvas width in cells.
+    /// </summary>
     public int Width { get; }
 
+    /// <summary>
+    /// Gets the canvas height in cells.
+    /// </summary>
     public int Height { get; }
 
+    /// <summary>
+    /// Gets the text rendering mode used by the canvas.
+    /// </summary>
     public CanvasTextMode TextMode { get; }
 
+    /// <summary>
+    /// Gets the full canvas bounds.
+    /// </summary>
     public Rect Bounds => new(0, 0, Width, Height);
 
+    /// <summary>
+    /// Clears the canvas with the supplied fill character.
+    /// </summary>
+    /// <param name="fill">The fill character.</param>
     public void Clear(char fill = ' ')
     {
         if (TextMode == CanvasTextMode.Fast)
@@ -44,6 +73,9 @@ public sealed class Canvas
         _graphemeBuffer!.Clear(fill);
     }
 
+    /// <summary>
+    /// Writes a single cell.
+    /// </summary>
     public void Set(int x, int y, char value)
     {
         if (x < 0 || y < 0 || x >= Width || y >= Height)
@@ -60,6 +92,9 @@ public sealed class Canvas
         _graphemeBuffer!.Set(x, y, value);
     }
 
+    /// <summary>
+    /// Reads a single cell.
+    /// </summary>
     public char Get(int x, int y)
     {
         if (x < 0 || y < 0 || x >= Width || y >= Height)
@@ -75,6 +110,9 @@ public sealed class Canvas
         return _graphemeBuffer!.Get(x, y);
     }
 
+    /// <summary>
+    /// Writes text starting at the supplied position.
+    /// </summary>
     public void WriteText(int x, int y, string text, int maxWidth = int.MaxValue)
     {
         if (string.IsNullOrEmpty(text) || y < 0 || y >= Height || maxWidth <= 0)
@@ -108,6 +146,9 @@ public sealed class Canvas
         }
     }
 
+    /// <summary>
+    /// Draws a horizontal line.
+    /// </summary>
     public void DrawHorizontalLine(int x, int y, int width, char value = '─')
     {
         if (width <= 0 || y < 0 || y >= Height)
@@ -123,6 +164,9 @@ public sealed class Canvas
         }
     }
 
+    /// <summary>
+    /// Draws a vertical line.
+    /// </summary>
     public void DrawVerticalLine(int x, int y, int height, char value = '│')
     {
         if (height <= 0 || x < 0 || x >= Width)
@@ -138,6 +182,9 @@ public sealed class Canvas
         }
     }
 
+    /// <summary>
+    /// Draws a border box with an optional title.
+    /// </summary>
     public void DrawBox(Rect rect, string? title = null, BorderStyle borderStyle = BorderStyle.SingleLine)
     {
         if (borderStyle == BorderStyle.None)
@@ -175,6 +222,9 @@ public sealed class Canvas
         }
     }
 
+    /// <summary>
+    /// Renders the canvas into a string frame.
+    /// </summary>
     public string Render()
     {
         return TextMode == CanvasTextMode.Fast
