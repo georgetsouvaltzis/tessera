@@ -3,6 +3,9 @@ using TeaSharp.Components.Primitives;
 
 namespace TeaSharp.Controls;
 
+/// <summary>
+/// Represents a hierarchical tree viewer.
+/// </summary>
 public sealed class TreeView : Control
 {
     private readonly TreeViewComponent _component = new();

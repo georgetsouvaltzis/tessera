@@ -1,5 +1,9 @@
 namespace TeaSharp.Controls;
 
+/// <summary>
+/// Provides the selected item for a list-style control.
+/// </summary>
+/// <typeparam name="T">The item type.</typeparam>
 public sealed class ListSelectionChangedEventArgs<T> : EventArgs
 {
     public ListSelectionChangedEventArgs(int previousIndex, int selectedIndex, T? previousItem, T? selectedItem)

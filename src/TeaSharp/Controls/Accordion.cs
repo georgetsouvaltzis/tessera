@@ -4,6 +4,9 @@ using TeaSharp.Components.UiKit;
 
 namespace TeaSharp.Controls;
 
+/// <summary>
+/// Represents a multi-section control that expands and collapses one section at a time.
+/// </summary>
 public sealed class Accordion : Control
 {
     private readonly AccordionComponent _component = new();

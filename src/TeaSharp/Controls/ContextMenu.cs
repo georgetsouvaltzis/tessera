@@ -5,6 +5,9 @@ using TeaSharp.Components.Productivity;
 
 namespace TeaSharp.Controls;
 
+/// <summary>
+/// Represents a pointer-anchored menu of contextual actions.
+/// </summary>
 public sealed class ContextMenu : Control
 {
     private readonly ContextMenuComponent _component = new();

@@ -3,6 +3,9 @@ using TeaSharp.Components.Primitives;
 
 namespace TeaSharp.Controls;
 
+/// <summary>
+/// Represents a multi-line text editor.
+/// </summary>
 public sealed class TextArea : Control
 {
     private readonly TextAreaComponent _component = new();

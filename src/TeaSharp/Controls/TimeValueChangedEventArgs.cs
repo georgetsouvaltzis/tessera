@@ -1,5 +1,8 @@
 namespace TeaSharp.Controls;
 
+/// <summary>
+/// Provides the newly selected time value.
+/// </summary>
 public sealed class TimeValueChangedEventArgs : EventArgs
 {
     public TimeValueChangedEventArgs(TimeOnly previousValue, TimeOnly value)

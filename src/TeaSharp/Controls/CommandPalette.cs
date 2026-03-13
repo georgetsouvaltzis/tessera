@@ -5,6 +5,9 @@ using TeaSharp.Components.Primitives;
 
 namespace TeaSharp.Controls;
 
+/// <summary>
+/// Represents a searchable command launcher overlay.
+/// </summary>
 public sealed class CommandPalette : Control
 {
     private readonly CommandPaletteComponent _component = new();

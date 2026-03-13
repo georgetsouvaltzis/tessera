@@ -3,6 +3,9 @@ using TeaSharp.Components.UiKit;
 
 namespace TeaSharp.Controls;
 
+/// <summary>
+/// Represents a tab-strip for switching between named views.
+/// </summary>
 public sealed class Tabs : Control
 {
     private readonly TabsComponent _component;

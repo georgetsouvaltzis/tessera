@@ -3,6 +3,9 @@ using TeaSharp.Components.Primitives;
 
 namespace TeaSharp.Controls;
 
+/// <summary>
+/// Represents a scrolling log viewer.
+/// </summary>
 public sealed class LogView : Control
 {
     private readonly LogViewerComponent _component = new();

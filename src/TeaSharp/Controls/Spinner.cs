@@ -3,6 +3,9 @@ using TeaSharp.Components.Primitives;
 
 namespace TeaSharp.Controls;
 
+/// <summary>
+/// Represents an animated busy indicator.
+/// </summary>
 public sealed class Spinner : Control
 {
     private readonly SpinnerComponent _component = new();

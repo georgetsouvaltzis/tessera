@@ -4,6 +4,9 @@ using TeaSharp.Components.Styling;
 
 namespace TeaSharp.Controls;
 
+/// <summary>
+/// Represents a compact status badge with a semantic tone.
+/// </summary>
 public sealed class Badge : Control
 {
     private readonly LegacyBadgeComponent _component = new();

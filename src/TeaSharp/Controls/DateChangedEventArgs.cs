@@ -1,5 +1,8 @@
 namespace TeaSharp.Controls;
 
+/// <summary>
+/// Provides the newly selected date value.
+/// </summary>
 public sealed class DateChangedEventArgs : EventArgs
 {
     public DateChangedEventArgs(DateOnly previousDate, DateOnly selectedDate)

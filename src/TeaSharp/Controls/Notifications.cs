@@ -3,6 +3,9 @@ using TeaSharp.Components.Primitives;
 
 namespace TeaSharp.Controls;
 
+/// <summary>
+/// Represents a stacked notification feed.
+/// </summary>
 public sealed class Notifications : Control
 {
     private readonly NotificationCenterComponent _component = new();

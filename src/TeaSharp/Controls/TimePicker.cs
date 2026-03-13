@@ -3,6 +3,9 @@ using TeaSharp.Components.Productivity;
 
 namespace TeaSharp.Controls;
 
+/// <summary>
+/// Represents a control for editing a time-of-day value.
+/// </summary>
 public sealed class TimePicker : Control
 {
     private readonly TimePickerComponent _component = new();

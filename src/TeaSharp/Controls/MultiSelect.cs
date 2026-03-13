@@ -3,6 +3,9 @@ using TeaSharp.Components.UiKit;
 
 namespace TeaSharp.Controls;
 
+/// <summary>
+/// Represents a control for choosing multiple items from a list.
+/// </summary>
 public sealed class MultiSelect : Control
 {
     private readonly CheckboxListComponent _component = new();

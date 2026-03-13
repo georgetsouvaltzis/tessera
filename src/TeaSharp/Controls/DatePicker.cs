@@ -3,6 +3,9 @@ using TeaSharp.Components.Productivity;
 
 namespace TeaSharp.Controls;
 
+/// <summary>
+/// Represents a control for selecting a calendar date.
+/// </summary>
 public sealed class DatePicker : Control
 {
     private readonly DatePickerComponent _component = new();

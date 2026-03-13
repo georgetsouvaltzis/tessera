@@ -1,5 +1,8 @@
 namespace TeaSharp.Controls;
 
+/// <summary>
+/// Defines the semantic tone applied to a <see cref="Badge"/>.
+/// </summary>
 public enum BadgeTone
 {
     Default = 0,

@@ -4,6 +4,9 @@ using TeaSharp.Styles;
 
 namespace TeaSharp.Controls;
 
+/// <summary>
+/// Represents read-only text content.
+/// </summary>
 public sealed class Label : Control
 {
     private readonly TextBlockComponent _component = new();

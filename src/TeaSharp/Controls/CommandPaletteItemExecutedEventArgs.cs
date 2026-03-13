@@ -1,5 +1,8 @@
 namespace TeaSharp.Controls;
 
+/// <summary>
+/// Provides the executed <see cref="CommandPaletteItem"/> for a command palette action.
+/// </summary>
 public sealed class CommandPaletteItemExecutedEventArgs : EventArgs
 {
     public CommandPaletteItemExecutedEventArgs(CommandPaletteItem item)

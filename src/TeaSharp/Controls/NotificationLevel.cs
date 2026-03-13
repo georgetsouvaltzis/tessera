@@ -1,5 +1,8 @@
 namespace TeaSharp.Controls;
 
+/// <summary>
+/// Defines the semantic severity of a notification entry.
+/// </summary>
 public enum NotificationLevel
 {
     Info = 0,

@@ -3,6 +3,9 @@ using TeaSharp.Components.Primitives;
 
 namespace TeaSharp.Controls;
 
+/// <summary>
+/// Represents a tabular data viewer.
+/// </summary>
 public sealed class Table : Control
 {
     private readonly TableComponent _component;

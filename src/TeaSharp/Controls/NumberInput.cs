@@ -4,6 +4,9 @@ using TeaSharp.Components.Productivity;
 
 namespace TeaSharp.Controls;
 
+/// <summary>
+/// Represents a numeric text input with parsed submission events.
+/// </summary>
 public sealed class NumberInput : Control
 {
     private readonly NumberInputComponent _component = new();

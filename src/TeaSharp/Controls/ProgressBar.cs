@@ -3,6 +3,9 @@ using TeaSharp.Components.Primitives;
 
 namespace TeaSharp.Controls;
 
+/// <summary>
+/// Represents a bounded progress indicator.
+/// </summary>
 public sealed class ProgressBar : Control
 {
     private readonly ProgressBarComponent _component = new();

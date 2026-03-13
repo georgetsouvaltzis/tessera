@@ -3,6 +3,9 @@ using TeaSharp.Components.Productivity;
 
 namespace TeaSharp.Controls;
 
+/// <summary>
+/// Represents a read-only markdown renderer.
+/// </summary>
 public sealed class MarkdownView : Control
 {
     private readonly MarkdownViewerComponent _component = new();

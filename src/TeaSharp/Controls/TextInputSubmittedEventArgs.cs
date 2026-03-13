@@ -1,5 +1,8 @@
 namespace TeaSharp.Controls;
 
+/// <summary>
+/// Provides the submitted text value from a text input control.
+/// </summary>
 public sealed class TextInputSubmittedEventArgs : EventArgs
 {
     public TextInputSubmittedEventArgs(string value)

@@ -3,6 +3,9 @@ using TeaSharp.Components.Primitives;
 
 namespace TeaSharp.Controls;
 
+/// <summary>
+/// Represents a binary on/off control.
+/// </summary>
 public sealed class Toggle : Control
 {
     private readonly ToggleSwitchComponent _component = new();

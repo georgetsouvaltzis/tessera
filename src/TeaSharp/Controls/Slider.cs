@@ -3,6 +3,9 @@ using TeaSharp.Components.Primitives;
 
 namespace TeaSharp.Controls;
 
+/// <summary>
+/// Represents a bounded slider control.
+/// </summary>
 public sealed class Slider : Control
 {
     private readonly SliderComponent _component = new();

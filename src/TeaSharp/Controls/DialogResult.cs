@@ -1,5 +1,8 @@
 namespace TeaSharp.Controls;
 
+/// <summary>
+/// Identifies how a dialog was closed.
+/// </summary>
 public enum DialogResult
 {
     None = 0,

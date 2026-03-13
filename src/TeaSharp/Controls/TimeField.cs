@@ -1,5 +1,8 @@
 namespace TeaSharp.Controls;
 
+/// <summary>
+/// Identifies the active field within a time editor.
+/// </summary>
 public enum TimeField
 {
     Hour = 0,

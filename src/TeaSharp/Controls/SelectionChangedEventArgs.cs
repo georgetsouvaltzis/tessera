@@ -1,5 +1,8 @@
 namespace TeaSharp.Controls;
 
+/// <summary>
+/// Provides the selected string item for choice-style controls.
+/// </summary>
 public sealed class SelectionChangedEventArgs : EventArgs
 {
     public SelectionChangedEventArgs(int previousIndex, int selectedIndex, string previousItem, string selectedItem)

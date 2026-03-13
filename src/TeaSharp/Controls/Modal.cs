@@ -3,6 +3,9 @@ using TeaSharp.Components.UiKit;
 
 namespace TeaSharp.Controls;
 
+/// <summary>
+/// Represents a dismissible overlay panel.
+/// </summary>
 public sealed class Modal : Control
 {
     private readonly ModalComponent _component = new();

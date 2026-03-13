@@ -3,6 +3,9 @@ using TeaSharp.Components.UiKit;
 
 namespace TeaSharp.Controls;
 
+/// <summary>
+/// Represents a single-choice group of radio options.
+/// </summary>
 public sealed class RadioGroup : Control
 {
     private readonly RadioGroupComponent _component = new();

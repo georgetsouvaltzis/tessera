@@ -1,5 +1,8 @@
 namespace TeaSharp.Controls;
 
+/// <summary>
+/// Represents one node in a <see cref="TreeView"/>.
+/// </summary>
 public sealed class TreeItem
 {
     private readonly List<TreeItem> _children = [];

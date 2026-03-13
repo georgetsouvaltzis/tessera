@@ -3,6 +3,9 @@ using TeaSharp.Components.Primitives;
 
 namespace TeaSharp.Controls;
 
+/// <summary>
+/// Represents a two-sided status strip.
+/// </summary>
 public sealed class StatusBar : Control
 {
     private readonly StatusBarComponent _component = new();
