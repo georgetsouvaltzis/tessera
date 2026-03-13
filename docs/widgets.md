@@ -2,7 +2,7 @@
 
 `TeaSharp.Widgets` is the low-level stateful widget layer.
 
-It remains public for advanced composition and custom controls, but it is no longer the default app path.
+It remains public for advanced composition and custom controls, but it is no longer the default app path and is intentionally marked advanced in API discovery.
 
 ## When To Use It
 

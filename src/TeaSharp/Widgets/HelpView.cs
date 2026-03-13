@@ -1,7 +1,9 @@
 using TeaSharp.Widgets.Internal;
+using System.ComponentModel;
 
 namespace TeaSharp.Widgets;
 
+[EditorBrowsable(EditorBrowsableState.Advanced)]
 public static class HelpView
 {
     public static string RenderColumns(

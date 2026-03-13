@@ -1,7 +1,9 @@
 using TeaSharp.Core.Messages;
+using System.ComponentModel;
 
 namespace TeaSharp.Widgets;
 
+[EditorBrowsable(EditorBrowsableState.Advanced)]
 public sealed class KeyBinding
 {
     private readonly HashSet<KeyChord> _chords;

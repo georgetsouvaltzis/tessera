@@ -5,6 +5,7 @@ using TeaSharp.Widgets.Internal;
 
 namespace TeaSharp.Widgets;
 
+[EditorBrowsable(EditorBrowsableState.Advanced)]
 public readonly record struct ListRow<T>(T Item, int Index, bool Selected);
 
 [EditorBrowsable(EditorBrowsableState.Advanced)]
