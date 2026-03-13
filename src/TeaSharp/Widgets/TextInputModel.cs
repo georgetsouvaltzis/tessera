@@ -6,7 +6,7 @@ using TeaSharp.Widgets.Internal;
 namespace TeaSharp.Widgets;
 
 [EditorBrowsable(EditorBrowsableState.Advanced)]
-public sealed class TextInputModel
+internal sealed class TextInputModel
 {
     public string Value { get; private set; } = string.Empty;
 

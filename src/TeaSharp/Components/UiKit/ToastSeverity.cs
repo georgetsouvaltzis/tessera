@@ -9,11 +9,10 @@ using TeaSharp.Widgets;
 
 namespace TeaSharp.Components.UiKit;
 
-public enum ToastSeverity
+internal enum ToastSeverity
 {
     Info = 0,
     Success = 1,
     Warning = 2,
     Error = 3,
 }
-

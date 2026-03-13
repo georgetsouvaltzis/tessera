@@ -71,8 +71,8 @@ Advanced-only namespaces remain available, but they should be opt-in.
 
 These still exist, but they are not the first path:
 
-- low-level widget models in `TeaSharp.Widgets`
 - advanced widgets that do not have root wrappers yet
+- hosting/runtime seams in `TeaSharp.Hosting`
 
 ## Migration Example
 

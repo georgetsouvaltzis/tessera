@@ -9,7 +9,7 @@ using TeaSharp.Widgets;
 
 namespace TeaSharp.Components.UiKit;
 
-public enum ViewportClass
+internal enum ViewportClass
 {
     Xs = 0,
     Sm = 1,
@@ -17,4 +17,3 @@ public enum ViewportClass
     Lg = 3,
     Xl = 4,
 }
-

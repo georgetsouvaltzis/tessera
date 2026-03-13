@@ -3,7 +3,7 @@ using System.ComponentModel;
 namespace TeaSharp.Widgets;
 
 [EditorBrowsable(EditorBrowsableState.Advanced)]
-public sealed class TextInputKeyMap : IWidgetKeyMap
+internal sealed class TextInputKeyMap : IWidgetKeyMap
 {
     public static TextInputKeyMap Default { get; } = new();
 

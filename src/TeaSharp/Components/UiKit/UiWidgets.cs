@@ -10,7 +10,7 @@ using TeaSharp.Widgets;
 
 namespace TeaSharp.Components.UiKit;
 
-public static class UiWidgets
+internal static class UiWidgets
 {
     public static void DrawBreadcrumb(Canvas canvas, Rect rect, IReadOnlyList<string> segments, string separator = " / ")
     {

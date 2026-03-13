@@ -9,7 +9,7 @@ using UiLayout = TeaSharp.Components.UiKit.Layout;
 
 namespace TeaSharp.Components.Prebuilt;
 
-public sealed partial class LayoutContainerComponent
+internal sealed partial class LayoutContainerComponent
 {
     private List<ComponentSlot> CreateSlots(List<Rect>? rects = null)
     {

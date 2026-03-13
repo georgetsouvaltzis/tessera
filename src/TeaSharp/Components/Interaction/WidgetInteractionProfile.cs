@@ -3,7 +3,7 @@ using TeaSharp.Components.Styling;
 namespace TeaSharp.Components.Interaction;
 
 [EditorBrowsable(EditorBrowsableState.Advanced)]
-public sealed class WidgetInteractionProfile
+internal sealed class WidgetInteractionProfile
 {
     public static WidgetInteractionProfile Default { get; } = new();
 

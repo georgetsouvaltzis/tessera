@@ -105,14 +105,14 @@ Important advanced namespaces:
 
 Examples:
 
-- `ComboboxComponent`
-- `SortableTableComponent`
-- `ToastCenterComponent`
-- `ViewportClass`
-- `UiWidgets`
+- `LineChartComponent`
+- `BarChartComponent`
+- `GaugeComponent`
+- `MiniLogComponent`
+- `StatsCardComponent`
 - `Canvas`
 
-These can still be placed directly inside the new layout model through `PanelLayout`, `CenterLayout`, or `LayoutSlot`.
+These advanced types can still be placed directly inside the layout model through the advanced canvas-component entry points.
 
 ## Legacy Composition APIs
 

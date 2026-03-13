@@ -177,9 +177,8 @@ Advanced/custom-host scenarios can still reach:
 - raw canvas drawing
 - legacy composition helpers
 - legacy `*Component` types without root wrappers yet
-- low-level widget models in `TeaSharp.Widgets`
 
-Most promoted legacy `*Component` families are now internal bridges behind root `TeaSharp.Controls` wrappers. The remaining public advanced layer is mainly hosting/runtime seams and low-level widget infrastructure.
+Most promoted legacy `*Component` families are now internal bridges behind root `TeaSharp.Controls` wrappers. The remaining public advanced layer is mainly hosting/runtime seams plus a smaller set of explicit interop contracts.
 
 ## Repo Profile
 

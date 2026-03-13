@@ -10,7 +10,7 @@ using TeaSharp.Widgets;
 
 namespace TeaSharp.Components.Prebuilt;
 
-public enum LayoutFlow
+internal enum LayoutFlow
 {
     Rows = 0,
     Columns = 1,

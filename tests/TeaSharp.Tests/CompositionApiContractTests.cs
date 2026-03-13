@@ -38,12 +38,25 @@ internal static class CompositionApiContractTests
         "TeaSharp.Components.Composition.ComponentSlot",
         "TeaSharp.Components.Composition.ScreenRegion",
         "TeaSharp.Components.Composition.ScreenRegionKey",
+        "TeaSharp.Components.Prebuilt.LayoutFlow",
+        "TeaSharp.Components.Prebuilt.LayoutContainerOptions",
+        "TeaSharp.Components.Prebuilt.LayoutContainerComponent",
+        "TeaSharp.Components.UiKit.Layout",
+        "TeaSharp.Components.UiKit.SelectComponent",
+        "TeaSharp.Components.UiKit.SortableTableComponent",
+        "TeaSharp.Components.UiKit.TimelineEntry",
+        "TeaSharp.Components.UiKit.ToastCenterComponent",
+        "TeaSharp.Components.UiKit.ToastMessage",
+        "TeaSharp.Components.UiKit.ToastSeverity",
+        "TeaSharp.Components.UiKit.TreeNode",
+        "TeaSharp.Components.UiKit.UiTheme",
+        "TeaSharp.Components.UiKit.UiWidgets",
+        "TeaSharp.Components.UiKit.ViewportClass",
     ];
 
     public static IEnumerable<TestCase> Cases()
     {
         yield return new TestCase("CompositionApi_InternalizedCompositionTypes_AreNotPublic", InternalizedCompositionTypes_AreNotPublic);
-        yield return new TestCase("CompositionApi_RemainingInteropTypes_AreMarkedAdvanced", RemainingInteropTypes_AreMarkedAdvanced);
     }
 
     private static Task InternalizedCompositionTypes_AreNotPublic()
@@ -55,23 +68,6 @@ internal static class CompositionApiContractTests
             var type = assembly.GetType(typeName, throwOnError: false);
             TestAssert.True(type is not null, $"{typeName} should continue to exist as an internal bridge.");
             TestAssert.True(type!.IsNotPublic, $"{typeName} should no longer be public.");
-        }
-
-        return Task.CompletedTask;
-    }
-
-    private static Task RemainingInteropTypes_AreMarkedAdvanced()
-    {
-        Type[] advancedTypes =
-        [
-            typeof(TeaSharp.Components.UiKit.Layout),
-        ];
-
-        foreach (var type in advancedTypes)
-        {
-            var attribute = (EditorBrowsableAttribute?)Attribute.GetCustomAttribute(type, typeof(EditorBrowsableAttribute));
-            TestAssert.True(attribute is not null, $"{type.Name} should remain explicitly marked as advanced.");
-            TestAssert.True(attribute!.State == EditorBrowsableState.Advanced, $"{type.Name} should stay hidden from default discovery.");
         }
 
         return Task.CompletedTask;

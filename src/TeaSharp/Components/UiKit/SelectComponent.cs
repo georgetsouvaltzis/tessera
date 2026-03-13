@@ -9,7 +9,7 @@ using TeaSharp.Widgets;
 
 namespace TeaSharp.Components.UiKit;
 
-public sealed class SelectComponent : IStatefulComponent
+internal sealed class SelectComponent : IStatefulComponent
 {
     private readonly List<string> _items = [];
 
@@ -66,4 +66,3 @@ public sealed class SelectComponent : IStatefulComponent
         canvas.WriteText(content.X, content.Y, $"< {selected} >", content.Width);
     }
 }
-

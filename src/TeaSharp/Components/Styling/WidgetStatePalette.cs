@@ -5,7 +5,7 @@ using TeaSharp.Styles;
 namespace TeaSharp.Components.Styling;
 
 [EditorBrowsable(EditorBrowsableState.Advanced)]
-public sealed class WidgetStatePalette
+internal sealed class WidgetStatePalette
 {
     private readonly Dictionary<WidgetVisualState, WidgetStateAppearance> _appearances = [];
     private WidgetStatePalette? _parent;

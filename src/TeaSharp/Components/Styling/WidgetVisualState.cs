@@ -5,7 +5,7 @@ using System.ComponentModel;
 namespace TeaSharp.Components.Styling;
 
 [EditorBrowsable(EditorBrowsableState.Advanced)]
-public enum WidgetVisualState
+internal enum WidgetVisualState
 {
     Default = 0,
     Focused = 1,

@@ -11,7 +11,7 @@ using System.ComponentModel;
 namespace TeaSharp.Components.UiKit;
 
 [EditorBrowsable(EditorBrowsableState.Advanced)]
-public static class Layout
+internal static class Layout
 {
     public static ViewportClass Classify(int width)
     {

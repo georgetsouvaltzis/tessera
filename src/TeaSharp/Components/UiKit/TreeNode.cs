@@ -5,4 +5,4 @@ using TeaSharp.Components.Styling;
 using TeaSharp.Components.UiKit.Internal;
 namespace TeaSharp.Components.UiKit;
 
-public readonly record struct TreeNode(string Label, int Depth, bool Selected = false);
+internal readonly record struct TreeNode(string Label, int Depth, bool Selected = false);

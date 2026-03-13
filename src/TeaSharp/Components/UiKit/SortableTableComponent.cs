@@ -9,7 +9,7 @@ using TeaSharp.Widgets;
 
 namespace TeaSharp.Components.UiKit;
 
-public sealed class SortableTableComponent : IStatefulComponent, IMouseStatefulComponent, IFocusableComponent
+internal sealed class SortableTableComponent : IStatefulComponent, IMouseStatefulComponent, IFocusableComponent
 {
     private readonly List<IReadOnlyList<string>> _rows = [];
     private WidgetInteractionProfile _interactionProfile = WidgetInteractionProfile.Default.Clone();

@@ -9,7 +9,7 @@ using TeaSharp.Widgets;
 
 namespace TeaSharp.Components.UiKit;
 
-public sealed class ToastCenterComponent : IStatefulComponent
+internal sealed class ToastCenterComponent : IStatefulComponent
 {
     private readonly List<ActiveToast> _toasts = [];
 
@@ -86,4 +86,3 @@ public sealed class ToastCenterComponent : IStatefulComponent
         public ToastSeverity Severity = severity;
     }
 }
-

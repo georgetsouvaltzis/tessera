@@ -10,7 +10,7 @@ using TeaSharp.Core.Messages;
 
 namespace TeaSharp.Components.Prebuilt;
 
-public sealed partial class LayoutContainerComponent : IStatefulComponent, IMouseStatefulComponent
+internal sealed partial class LayoutContainerComponent : IStatefulComponent, IMouseStatefulComponent
 {
     private readonly List<(ICanvasComponent Component, int Weight)> _children = [];
     private bool _draggingSplit;

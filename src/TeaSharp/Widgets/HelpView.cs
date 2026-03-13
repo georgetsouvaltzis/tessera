@@ -4,7 +4,7 @@ using System.ComponentModel;
 namespace TeaSharp.Widgets;
 
 [EditorBrowsable(EditorBrowsableState.Advanced)]
-public static class HelpView
+internal static class HelpView
 {
     public static string RenderColumns(
         IEnumerable<KeyBinding> bindings,

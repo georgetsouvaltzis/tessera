@@ -83,13 +83,10 @@ These APIs remain public because they still offer real value, but they should no
 - `IMouseStatefulComponent`
 - `IFocusableComponent`
 - `IInteractiveComponent`
-- `TeaSharp.Components.Interaction.*`
-- `TeaSharp.Components.Styling.*`
 - `IProgramRenderer`
 - `ITerminalAdapter`
 - `IEventDecoder`
 - renderer, terminal, and capability-probing seams
-- low-level widget infrastructure such as `TextInputModel`, `ViewportModel`, `ListModel<T>`, and `*KeyMap`
 
 Most of these types are now marked `EditorBrowsable(Advanced)`.
 
@@ -100,7 +97,7 @@ These areas still expose more mechanism than the long-term public design should:
 - low-level widget models leaking through component configuration
 - runtime seams that most apps never need
 - duplicate terminology between root app types and older core/runtime types
-- the remaining low-level widget namespaces that still expose an alternate engine-shaped control story
+- the remaining advanced component namespaces that still expose an alternate engine-shaped control story
 
 ## Current Direction
 

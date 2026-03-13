@@ -3,7 +3,7 @@ using System.ComponentModel;
 namespace TeaSharp.Widgets;
 
 [EditorBrowsable(EditorBrowsableState.Advanced)]
-public interface IWidgetKeyMap
+internal interface IWidgetKeyMap
 {
     IReadOnlyList<KeyBinding> HelpBindings { get; }
 }

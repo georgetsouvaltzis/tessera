@@ -5,4 +5,4 @@ using TeaSharp.Components.Styling;
 using TeaSharp.Components.UiKit.Internal;
 namespace TeaSharp.Components.UiKit;
 
-public readonly record struct TimelineEntry(string Time, string Text);
+internal readonly record struct TimelineEntry(string Time, string Text);
