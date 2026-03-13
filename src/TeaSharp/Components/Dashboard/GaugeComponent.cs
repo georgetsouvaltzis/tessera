@@ -1,8 +1,10 @@
 using TeaSharp.Components.Charting;
 using TeaSharp.Components.Composition;
 using TeaSharp.Components.Primitives;
+using System.ComponentModel;
 namespace TeaSharp.Components.Dashboard;
 
+[EditorBrowsable(EditorBrowsableState.Advanced)]
 public sealed class GaugeComponent : ICanvasComponent
 {
     public string Title { get; set; } = "Gauge";

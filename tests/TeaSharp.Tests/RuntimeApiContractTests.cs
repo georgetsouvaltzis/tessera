@@ -25,6 +25,17 @@ internal static class RuntimeApiContractTests
     private static readonly (string Name, Type Type)[] AdvancedRuntimeTypes =
     [
         ("TeaHostingOptions", typeof(TeaHostingOptions)),
+        ("Charts", typeof(Charts)),
+        ("BarChartComponent", typeof(BarChartComponent)),
+        ("BarChartOptions", typeof(BarChartOptions)),
+        ("BarDatum", typeof(BarDatum)),
+        ("LineChartComponent", typeof(LineChartComponent)),
+        ("LineChartOptions", typeof(LineChartOptions)),
+        ("GaugeComponent", typeof(GaugeComponent)),
+        ("MiniLogComponent", typeof(MiniLogComponent)),
+        ("StatsCardComponent", typeof(StatsCardComponent)),
+        ("StatsCardItem", typeof(StatsCardItem)),
+        ("CanvasWidgets", typeof(TeaSharp.Components.Primitives.Widgets)),
         ("IProgramRenderer", typeof(IProgramRenderer)),
         ("NullRenderer", typeof(NullRenderer)),
         ("AnsiDiffRenderer", typeof(AnsiDiffRenderer)),

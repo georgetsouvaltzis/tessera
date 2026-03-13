@@ -55,8 +55,8 @@ internal static class TeaAppCompositionTests
             "TeaAppComposition_LegacyCanvasComponentEntryPoints_AreMarkedAdvanced",
             LegacyCanvasComponentEntryPoints_AreMarkedAdvanced);
         yield return new TestCase(
-            "TeaAppComposition_LowLevelComponentContracts_AreMarkedAdvanced",
-            LowLevelComponentContracts_AreMarkedAdvanced);
+            "TeaAppComposition_LowLevelComponentContracts_AreInternalized",
+            LowLevelComponentContracts_AreInternalized);
         yield return new TestCase(
             "TeaAppComposition_LowLevelTreeLayouts_AreMarkedAdvanced",
             LowLevelTreeLayouts_AreMarkedAdvanced);
@@ -328,27 +328,31 @@ internal static class TeaAppCompositionTests
         return Task.CompletedTask;
     }
 
-    private static Task LowLevelComponentContracts_AreMarkedAdvanced()
+    private static Task LowLevelComponentContracts_AreInternalized()
     {
-        Type[] contracts =
+        var canvasContract = typeof(ICanvasComponent);
+        var canvasAttribute = (EditorBrowsableAttribute?)Attribute.GetCustomAttribute(
+            canvasContract,
+            typeof(EditorBrowsableAttribute));
+
+        TestAssert.True(canvasAttribute is not null, "ICanvasComponent should remain explicitly marked as advanced.");
+        TestAssert.True(canvasAttribute!.State == EditorBrowsableState.Advanced, "ICanvasComponent should stay hidden from the default custom-widget path.");
+
+        string[] contractNames =
         [
-            typeof(ICanvasComponent),
-            typeof(IStatefulComponent),
-            typeof(IMouseStatefulComponent),
-            typeof(IFocusableComponent),
-            typeof(IInteractiveComponent),
+            "TeaSharp.Components.Composition.IStatefulComponent",
+            "TeaSharp.Components.Composition.IMouseStatefulComponent",
+            "TeaSharp.Components.Composition.IFocusableComponent",
+            "TeaSharp.Components.Composition.IInteractiveComponent",
         ];
 
-        foreach (var contract in contracts)
-        {
-            var attribute = (EditorBrowsableAttribute?)Attribute.GetCustomAttribute(
-                contract,
-                typeof(EditorBrowsableAttribute));
+        var assembly = typeof(Screen).Assembly;
 
-            TestAssert.True(attribute is not null, $"{contract.Name} should be explicitly marked as advanced.");
-            TestAssert.True(
-                attribute!.State == EditorBrowsableState.Advanced,
-                $"{contract.Name} should be hidden from the default custom-widget path.");
+        foreach (var contractName in contractNames)
+        {
+            var contract = assembly.GetType(contractName, throwOnError: false);
+            TestAssert.True(contract is not null, $"{contractName} should continue to exist as an internal bridge.");
+            TestAssert.True(contract!.IsNotPublic, $"{contractName} should no longer be public.");
         }
 
         return Task.CompletedTask;

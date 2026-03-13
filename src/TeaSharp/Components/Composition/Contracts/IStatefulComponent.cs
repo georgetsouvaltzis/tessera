@@ -6,7 +6,7 @@ using System.ComponentModel;
 namespace TeaSharp.Components.Composition;
 
 [EditorBrowsable(EditorBrowsableState.Advanced)]
-public interface IStatefulComponent : ICanvasComponent
+internal interface IStatefulComponent : ICanvasComponent
 {
     bool Update(IMessage message);
 }

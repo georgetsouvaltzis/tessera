@@ -6,7 +6,7 @@ using System.ComponentModel;
 namespace TeaSharp.Components.Composition;
 
 [EditorBrowsable(EditorBrowsableState.Advanced)]
-public interface IFocusableComponent : ICanvasComponent
+internal interface IFocusableComponent : ICanvasComponent
 {
     bool IsFocused { get; set; }
 }

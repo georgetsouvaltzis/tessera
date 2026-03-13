@@ -75,14 +75,13 @@ These APIs remain public because they still offer real value, but they should no
 - `TeaSharp.Hosting.TeaHostingOptions`
 - `TeaSharp.Hosting.TeaHost.CreateApplication(...)`
 - `TeaSharp.Hosting.TeaHost.RunAsync(...)`
+- `TeaSharp.Components.Charting.*`
+- `TeaSharp.Components.Dashboard.*`
+- `TeaSharp.Components.Primitives.Widgets`
 - `IScreen`
 - `ProgramOptions`
 - `TeaProgram`
 - `ICanvasComponent`
-- `IStatefulComponent`
-- `IMouseStatefulComponent`
-- `IFocusableComponent`
-- `IInteractiveComponent`
 - `IProgramRenderer`
 - `ITerminalAdapter`
 - `IEventDecoder`

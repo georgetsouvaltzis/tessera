@@ -1,7 +1,9 @@
 using TeaSharp.Components.Composition;
 using TeaSharp.Components.Primitives;
+using System.ComponentModel;
 namespace TeaSharp.Components.Charting;
 
+[EditorBrowsable(EditorBrowsableState.Advanced)]
 public static class Charts
 {
     public static void DrawLineChart(
@@ -232,4 +234,3 @@ public static class Charts
             : value.ToString("0.0", System.Globalization.CultureInfo.InvariantCulture);
     }
 }
-

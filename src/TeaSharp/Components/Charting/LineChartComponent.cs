@@ -1,7 +1,9 @@
 using TeaSharp.Components.Composition;
 using TeaSharp.Components.Primitives;
+using System.ComponentModel;
 namespace TeaSharp.Components.Charting;
 
+[EditorBrowsable(EditorBrowsableState.Advanced)]
 public sealed class LineChartComponent : ICanvasComponent
 {
     private readonly List<double> _samples = [];
@@ -70,4 +72,3 @@ public sealed class LineChartComponent : ICanvasComponent
         Offset = Math.Max(0, Offset + delta);
     }
 }
-

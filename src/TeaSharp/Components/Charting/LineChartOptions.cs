@@ -1,7 +1,9 @@
 using TeaSharp.Components.Composition;
 using TeaSharp.Components.Primitives;
+using System.ComponentModel;
 namespace TeaSharp.Components.Charting;
 
+[EditorBrowsable(EditorBrowsableState.Advanced)]
 public readonly record struct LineChartOptions(
     bool ShowAxes = false,
     string? Legend = null,

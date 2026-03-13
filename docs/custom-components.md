@@ -53,14 +53,11 @@ public sealed class CounterBadge : Control
 
 ## When To Use The Advanced Contracts
 
-The older component contracts still remain available, but only as advanced interop seams:
+The remaining raw component contract is:
 
 - `ICanvasComponent`
-- `IStatefulComponent`
-- `IMouseStatefulComponent`
-- `IFocusableComponent`
 
-The old screen-scale composition engine is now internal-only, and these interfaces are marked advanced in discovery. Use them only when you need:
+The old screen-scale composition engine is now internal-only. Use `ICanvasComponent` only when you need:
 
 - tight integration with an existing legacy component
 - direct interop with legacy TeaSharp component APIs

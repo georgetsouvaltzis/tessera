@@ -6,4 +6,4 @@ using System.ComponentModel;
 namespace TeaSharp.Components.Composition;
 
 [EditorBrowsable(EditorBrowsableState.Advanced)]
-public interface IInteractiveComponent : IStatefulComponent, IMouseStatefulComponent, IFocusableComponent;
+internal interface IInteractiveComponent : IStatefulComponent, IMouseStatefulComponent, IFocusableComponent;

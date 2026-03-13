@@ -6,7 +6,7 @@ using System.ComponentModel;
 namespace TeaSharp.Components.Composition;
 
 [EditorBrowsable(EditorBrowsableState.Advanced)]
-public interface IMouseStatefulComponent : ICanvasComponent
+internal interface IMouseStatefulComponent : ICanvasComponent
 {
     bool UpdateMouse(MouseMsg message, Rect bounds);
 }
