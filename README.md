@@ -59,7 +59,11 @@ internal sealed class CounterApp : TeaApp
 
         return Screen.From(new WindowLayout
         {
-            Footer = LayoutSlot.Fixed(_status, 1),
+            Footer = new LayoutSlot
+            {
+                Content = _status,
+                Length = 1,
+            },
             Body = new CenterLayout
             {
                 Content = _increment,

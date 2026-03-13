@@ -136,31 +136,80 @@ internal sealed class ProductivityApp : TeaApp
         var left = new ColumnLayout
         {
             Gap = 1,
+            Items =
+            {
+                new LayoutSlot
+                {
+                    Content = _checklist,
+                    Length = LayoutLength.Fill(),
+                },
+                new LayoutSlot
+                {
+                    Content = _priority,
+                    Length = 6,
+                },
+            },
         };
-        left.AddFill(_checklist);
-        left.AddFixed(_priority, 6);
 
         var schedule = new RowLayout
         {
             Gap = 1,
+            Items =
+            {
+                new LayoutSlot
+                {
+                    Content = _estimate,
+                    Length = 24,
+                },
+                new LayoutSlot
+                {
+                    Content = _dueDate,
+                    Length = 30,
+                },
+                new LayoutSlot
+                {
+                    Content = _dueTime,
+                    Length = LayoutLength.Fill(),
+                },
+            },
         };
-        schedule.AddFixed(_estimate, 24);
-        schedule.AddFixed(_dueDate, 30);
-        schedule.AddFill(_dueTime);
 
         var body = new ColumnLayout
         {
             Gap = 1,
+            Items =
+            {
+                new LayoutSlot
+                {
+                    Content = schedule,
+                    Length = 10,
+                },
+                new LayoutSlot
+                {
+                    Content = _runbook,
+                    Length = LayoutLength.Fill(),
+                },
+            },
         };
-        body.AddFixed(schedule, 10);
-        body.AddFill(_runbook);
 
         return Screen.From(new WindowLayout
         {
-            Header = LayoutSlot.Fixed(_menu, 1),
-            Left = LayoutSlot.Fixed(left, Math.Min(34, Math.Max(28, context.Width / 3))),
+            Header = new LayoutSlot
+            {
+                Content = _menu,
+                Length = 1,
+            },
+            Left = new LayoutSlot
+            {
+                Content = left,
+                Length = Math.Min(34, Math.Max(28, context.Width / 3)),
+            },
             Body = body,
-            Footer = LayoutSlot.Fixed(_status, 1),
+            Footer = new LayoutSlot
+            {
+                Content = _status,
+                Length = 1,
+            },
             Gap = 1,
             Padding = Thickness.All(1),
         });

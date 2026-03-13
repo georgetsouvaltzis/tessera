@@ -235,19 +235,53 @@ internal sealed class AdvancedWidgetsApp : TeaApp
         var left = new ColumnLayout
         {
             Gap = 1,
+            Items =
+            {
+                new LayoutSlot
+                {
+                    Content = _modeBadge,
+                    Length = 1,
+                },
+                new LayoutSlot
+                {
+                    Content = _toggle,
+                    Length = 5,
+                },
+                new LayoutSlot
+                {
+                    Content = _slider,
+                    Length = 6,
+                },
+                new LayoutSlot
+                {
+                    Content = _spinner,
+                    Length = 5,
+                },
+                new LayoutSlot
+                {
+                    Content = _summary,
+                    Length = LayoutLength.Fill(),
+                },
+            },
         };
-        left.AddFixed(_modeBadge, 1);
-        left.AddFixed(_toggle, 5);
-        left.AddFixed(_slider, 6);
-        left.AddFixed(_spinner, 5);
-        left.AddFill(_summary);
 
         var right = new ColumnLayout
         {
             Gap = 1,
+            Items =
+            {
+                new LayoutSlot
+                {
+                    Content = _tree,
+                    Length = LayoutLength.Fill(),
+                },
+                new LayoutSlot
+                {
+                    Content = _notifications,
+                    Length = LayoutLength.Fill(),
+                },
+            },
         };
-        right.AddFill(_tree);
-        right.AddFill(_notifications);
 
         LayoutNode? overlay = null;
         if (_palette.IsVisible)
@@ -271,8 +305,16 @@ internal sealed class AdvancedWidgetsApp : TeaApp
 
         return Screen.From(new WindowLayout
         {
-            Footer = LayoutSlot.Fixed(_status, 1),
-            Left = LayoutSlot.Fixed(left, Math.Min(38, Math.Max(30, context.Width / 3))),
+            Footer = new LayoutSlot
+            {
+                Content = _status,
+                Length = 1,
+            },
+            Left = new LayoutSlot
+            {
+                Content = left,
+                Length = Math.Min(38, Math.Max(30, context.Width / 3)),
+            },
             Body = right,
             Overlay = overlay,
             Padding = Thickness.All(1),

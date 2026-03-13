@@ -9,6 +9,10 @@ namespace TeaSharp.Layout;
 /// <summary>
 /// Represents a vertical list of layout items.
 /// </summary>
+/// <remarks>
+/// Prefer object and collection initializer assembly through <see cref="Items"/> on the default path. The
+/// <c>Add*</c> helpers remain available as advanced convenience methods.
+/// </remarks>
 public sealed class ColumnLayout : LayoutNode
 {
     /// <summary>
@@ -40,6 +44,7 @@ public sealed class ColumnLayout : LayoutNode
     /// <summary>
     /// Adds an auto-sized layout node.
     /// </summary>
+    [EditorBrowsable(EditorBrowsableState.Advanced)]
     public ColumnLayout AddAuto(LayoutNode content, Thickness margin = default)
         => Add(LayoutSlot.Auto(content, margin));
 
@@ -50,12 +55,14 @@ public sealed class ColumnLayout : LayoutNode
     /// <summary>
     /// Adds an auto-sized control.
     /// </summary>
+    [EditorBrowsable(EditorBrowsableState.Advanced)]
     public ColumnLayout AddAuto(Control control, Thickness margin = default)
         => Add(LayoutSlot.Auto(control, margin));
 
     /// <summary>
     /// Adds a fixed-size layout node.
     /// </summary>
+    [EditorBrowsable(EditorBrowsableState.Advanced)]
     public ColumnLayout AddFixed(LayoutNode content, int size, Thickness margin = default)
         => Add(LayoutSlot.Fixed(content, size, margin));
 
@@ -66,12 +73,14 @@ public sealed class ColumnLayout : LayoutNode
     /// <summary>
     /// Adds a fixed-size control.
     /// </summary>
+    [EditorBrowsable(EditorBrowsableState.Advanced)]
     public ColumnLayout AddFixed(Control control, int size, Thickness margin = default)
         => Add(LayoutSlot.Fixed(control, size, margin));
 
     /// <summary>
     /// Adds a fill layout node.
     /// </summary>
+    [EditorBrowsable(EditorBrowsableState.Advanced)]
     public ColumnLayout AddFill(LayoutNode content, Thickness margin = default)
         => Add(LayoutSlot.Fill(content, margin));
 
@@ -82,12 +91,14 @@ public sealed class ColumnLayout : LayoutNode
     /// <summary>
     /// Adds a fill control.
     /// </summary>
+    [EditorBrowsable(EditorBrowsableState.Advanced)]
     public ColumnLayout AddFill(Control control, Thickness margin = default)
         => Add(LayoutSlot.Fill(control, margin));
 
     /// <summary>
     /// Adds a weighted layout node.
     /// </summary>
+    [EditorBrowsable(EditorBrowsableState.Advanced)]
     public ColumnLayout AddWeighted(LayoutNode content, int weight, Thickness margin = default)
         => Add(LayoutSlot.Weighted(content, weight, margin));
 
@@ -98,6 +109,7 @@ public sealed class ColumnLayout : LayoutNode
     /// <summary>
     /// Adds a weighted control.
     /// </summary>
+    [EditorBrowsable(EditorBrowsableState.Advanced)]
     public ColumnLayout AddWeighted(Control control, int weight, Thickness margin = default)
         => Add(LayoutSlot.Weighted(control, weight, margin));
 

@@ -233,24 +233,66 @@ internal sealed class KanbanApp : TeaApp
         var lanes = new RowLayout
         {
             Gap = 1,
+            Items =
+            {
+                new LayoutSlot
+                {
+                    Content = _todo,
+                    Length = LayoutLength.Weighted(1),
+                },
+                new LayoutSlot
+                {
+                    Content = _doing,
+                    Length = LayoutLength.Weighted(1),
+                },
+                new LayoutSlot
+                {
+                    Content = _done,
+                    Length = LayoutLength.Weighted(1),
+                },
+            },
         };
-        lanes.AddWeighted(_todo, 1);
-        lanes.AddWeighted(_doing, 1);
-        lanes.AddWeighted(_done, 1);
 
         var sidebar = new ColumnLayout
         {
             Gap = 1,
+            Items =
+            {
+                new LayoutSlot
+                {
+                    Content = _details,
+                    Length = 9,
+                },
+                new LayoutSlot
+                {
+                    Content = _composer,
+                    Length = 5,
+                },
+                new LayoutSlot
+                {
+                    Content = _activity,
+                    Length = LayoutLength.Fill(),
+                },
+            },
         };
-        sidebar.AddFixed(_details, 9);
-        sidebar.AddFixed(_composer, 5);
-        sidebar.AddFill(_activity);
 
         return Screen.From(new WindowLayout
         {
-            Header = LayoutSlot.Fixed(_boards, 1),
-            Footer = LayoutSlot.Fixed(_status, 1),
-            Right = LayoutSlot.Fixed(sidebar, Math.Min(34, Math.Max(28, context.Width / 4))),
+            Header = new LayoutSlot
+            {
+                Content = _boards,
+                Length = 1,
+            },
+            Footer = new LayoutSlot
+            {
+                Content = _status,
+                Length = 1,
+            },
+            Right = new LayoutSlot
+            {
+                Content = sidebar,
+                Length = Math.Min(34, Math.Max(28, context.Width / 4)),
+            },
             Body = lanes,
             Overlay = new CenterLayout
             {

@@ -3,6 +3,7 @@ using TeaSharp.Core.Abstractions;
 using TeaSharp.Components.Composition;
 using TeaSharp.Controls;
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 
 namespace TeaSharp.Layout;
 
@@ -15,6 +16,13 @@ namespace TeaSharp.Layout;
 /// </remarks>
 public sealed record LayoutSlot
 {
+    /// <summary>
+    /// Creates an empty slot for object-initializer assembly.
+    /// </summary>
+    public LayoutSlot()
+    {
+    }
+
     /// <summary>
     /// Creates an auto-sized slot for layout content.
     /// </summary>
@@ -127,6 +135,7 @@ public sealed record LayoutSlot
     /// Creates a slot for the provided TeaSharp component.
     /// </summary>
     [EditorBrowsable(EditorBrowsableState.Advanced)]
+    [SetsRequiredMembers]
     public LayoutSlot(
         ICanvasComponent component,
         LayoutLength length,
@@ -144,6 +153,7 @@ public sealed record LayoutSlot
     /// <param name="control">The control to place in the slot.</param>
     /// <param name="length">The primary-axis sizing rule.</param>
     /// <param name="margin">The outer margin applied around the slot content.</param>
+    [SetsRequiredMembers]
     public LayoutSlot(
         Control control,
         LayoutLength length,
@@ -155,6 +165,7 @@ public sealed record LayoutSlot
     {
     }
 
+    [SetsRequiredMembers]
     internal LayoutSlot(
         ICanvasComponent component,
         LayoutLength length,
@@ -180,6 +191,7 @@ public sealed record LayoutSlot
     /// <param name="content">The layout content.</param>
     /// <param name="length">The primary-axis sizing rule.</param>
     /// <param name="margin">The outer margin applied around the slot content.</param>
+    [SetsRequiredMembers]
     public LayoutSlot(LayoutNode content, LayoutLength length, Thickness margin = default)
     {
         Content = content ?? throw new ArgumentNullException(nameof(content));
@@ -190,15 +202,15 @@ public sealed record LayoutSlot
     /// <summary>
     /// Gets the slot content.
     /// </summary>
-    public LayoutNode Content { get; }
+    public required LayoutNode Content { get; init; }
 
     /// <summary>
     /// Gets the primary-axis sizing rule.
     /// </summary>
-    public LayoutLength Length { get; }
+    public required LayoutLength Length { get; init; }
 
     /// <summary>
     /// Gets the outer margin applied to the slot.
     /// </summary>
-    public Thickness Margin { get; }
+    public Thickness Margin { get; init; }
 }

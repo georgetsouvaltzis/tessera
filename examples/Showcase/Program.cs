@@ -113,10 +113,25 @@ internal sealed class OrdersApp : TeaApp
         var detailsColumn = new ColumnLayout
         {
             Gap = 1,
+            Items =
+            {
+                new LayoutSlot
+                {
+                    Content = _summary,
+                    Length = 6,
+                },
+                new LayoutSlot
+                {
+                    Content = _detailsView,
+                    Length = LayoutLength.Fill(),
+                },
+                new LayoutSlot
+                {
+                    Content = _command,
+                    Length = 5,
+                },
+            },
         };
-        detailsColumn.AddFixed(_summary, 6);
-        detailsColumn.AddFill(_detailsView);
-        detailsColumn.AddFixed(_command, 5);
         var refreshPanel = new CenterLayout
         {
             Content = _refresh,
@@ -138,9 +153,21 @@ internal sealed class OrdersApp : TeaApp
 
         return Screen.From(new WindowLayout
         {
-            Header = LayoutSlot.Fixed(refreshPanel, 5),
-            Footer = LayoutSlot.Fixed(_status, 1),
-            Left = LayoutSlot.Fixed(ordersPanel, 28),
+            Header = new LayoutSlot
+            {
+                Content = refreshPanel,
+                Length = 5,
+            },
+            Footer = new LayoutSlot
+            {
+                Content = _status,
+                Length = 1,
+            },
+            Left = new LayoutSlot
+            {
+                Content = ordersPanel,
+                Length = 28,
+            },
             Body = detailsColumn,
             Overlay = deleteOverlay,
             Gap = 1,

@@ -255,8 +255,16 @@ internal sealed class WidgetGalleryApp : TeaApp
 
         return Screen.From(new WindowLayout
         {
-            Header = LayoutSlot.Fixed(_tabs, 1),
-            Footer = LayoutSlot.Fixed(_status, 1),
+            Header = new LayoutSlot
+            {
+                Content = _tabs,
+                Length = 1,
+            },
+            Footer = new LayoutSlot
+            {
+                Content = _status,
+                Length = 1,
+            },
             Body = BuildTabContent(context),
             Overlay = new CenterLayout
             {
@@ -297,10 +305,25 @@ internal sealed class WidgetGalleryApp : TeaApp
         var content = new ColumnLayout
         {
             Gap = 1,
+            Items =
+            {
+                new LayoutSlot
+                {
+                    Content = _label,
+                    Length = 6,
+                },
+                new LayoutSlot
+                {
+                    Content = _button,
+                    Length = 5,
+                },
+                new LayoutSlot
+                {
+                    Content = _progress,
+                    Length = 4,
+                },
+            },
         };
-        content.AddFixed(_label, 6);
-        content.AddFixed(_button, 5);
-        content.AddFixed(_progress, 4);
         return content;
     }
 
@@ -309,10 +332,25 @@ internal sealed class WidgetGalleryApp : TeaApp
         var content = new ColumnLayout
         {
             Gap = 1,
+            Items =
+            {
+                new LayoutSlot
+                {
+                    Content = _textInput,
+                    Length = 5,
+                },
+                new LayoutSlot
+                {
+                    Content = _choice,
+                    Length = 8,
+                },
+                new LayoutSlot
+                {
+                    Content = _textArea,
+                    Length = LayoutLength.Fill(),
+                },
+            },
         };
-        content.AddFixed(_textInput, 5);
-        content.AddFixed(_choice, 8);
-        content.AddFill(_textArea);
         return content;
     }
 
@@ -321,13 +359,28 @@ internal sealed class WidgetGalleryApp : TeaApp
         var details = new ColumnLayout
         {
             Gap = 1,
+            Items =
+            {
+                new LayoutSlot
+                {
+                    Content = _table,
+                    Length = 10,
+                },
+                new LayoutSlot
+                {
+                    Content = _logs,
+                    Length = LayoutLength.Fill(),
+                },
+            },
         };
-        details.AddFixed(_table, 10);
-        details.AddFill(_logs);
 
         return new WindowLayout
         {
-            Left = LayoutSlot.Fixed(_list, Math.Min(28, Math.Max(22, context.Width / 4))),
+            Left = new LayoutSlot
+            {
+                Content = _list,
+                Length = Math.Min(28, Math.Max(22, context.Width / 4)),
+            },
             Body = details,
             Gap = 1,
         };
@@ -338,9 +391,20 @@ internal sealed class WidgetGalleryApp : TeaApp
         var content = new RowLayout
         {
             Gap = 1,
+            Items =
+            {
+                new LayoutSlot
+                {
+                    Content = _tree,
+                    Length = LayoutLength.Fill(),
+                },
+                new LayoutSlot
+                {
+                    Content = _notifications,
+                    Length = LayoutLength.Fill(),
+                },
+            },
         };
-        content.AddFill(_tree);
-        content.AddFill(_notifications);
         return content;
     }
 }

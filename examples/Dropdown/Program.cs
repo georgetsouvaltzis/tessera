@@ -71,9 +71,20 @@ internal sealed class ChoiceDemoApp : TeaApp
         var content = new ColumnLayout
         {
             Gap = 1,
+            Items =
+            {
+                new LayoutSlot
+                {
+                    Content = _choice,
+                    Length = 8,
+                },
+                new LayoutSlot
+                {
+                    Content = _details,
+                    Length = 5,
+                },
+            },
         };
-        content.AddFixed(_choice, 8);
-        content.AddFixed(_details, 5);
         var panel = new PanelLayout
         {
             Content = content,
@@ -90,7 +101,11 @@ internal sealed class ChoiceDemoApp : TeaApp
 
         return Screen.From(new WindowLayout
         {
-            Footer = LayoutSlot.Fixed(_status, 1),
+            Footer = new LayoutSlot
+            {
+                Content = _status,
+                Length = 1,
+            },
             Body = body,
             Padding = Thickness.All(1),
         });

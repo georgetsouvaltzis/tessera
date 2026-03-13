@@ -6,6 +6,12 @@ namespace TeaSharp.Layout;
 public readonly record struct LayoutLength(LayoutLengthKind Kind, int Value = 0)
 {
     /// <summary>
+    /// Converts an integer into a fixed-size layout length.
+    /// </summary>
+    /// <param name="value">The exact size to reserve.</param>
+    public static implicit operator LayoutLength(int value) => Fixed(value);
+
+    /// <summary>
     /// Creates an auto-sized length.
     /// </summary>
     public static LayoutLength Auto() => new(LayoutLengthKind.Auto);

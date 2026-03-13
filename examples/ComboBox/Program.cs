@@ -85,9 +85,20 @@ internal sealed class ComboBoxDemoApp : TeaApp
         var content = new ColumnLayout
         {
             Gap = 1,
+            Items =
+            {
+                new LayoutSlot
+                {
+                    Content = _combobox,
+                    Length = 9,
+                },
+                new LayoutSlot
+                {
+                    Content = _details,
+                    Length = 6,
+                },
+            },
         };
-        content.AddFixed(_combobox, 9);
-        content.AddFixed(_details, 6);
         var panel = new PanelLayout
         {
             Content = content,
@@ -104,7 +115,11 @@ internal sealed class ComboBoxDemoApp : TeaApp
 
         return Screen.From(new WindowLayout
         {
-            Footer = LayoutSlot.Fixed(_status, 1),
+            Footer = new LayoutSlot
+            {
+                Content = _status,
+                Length = 1,
+            },
             Body = body,
             Padding = Thickness.All(1),
         });
