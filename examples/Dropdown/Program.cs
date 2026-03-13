@@ -74,18 +74,24 @@ internal sealed class ChoiceDemoApp : TeaApp
         };
         content.AddFixed(_choice, 8);
         content.AddFixed(_details, 5);
+        var panel = new PanelLayout
+        {
+            Content = content,
+            Title = "TeaSharp Choice",
+            Border = BorderStyle.Rounded,
+            Padding = Thickness.All(1),
+        };
+        var body = new CenterLayout
+        {
+            Content = panel,
+            Width = Math.Min(54, Math.Max(32, context.Width - 4)),
+            Height = 16,
+        };
 
         return Screen.From(new WindowLayout
         {
             Footer = LayoutSlot.Fixed(_status, 1),
-            Body = new CenterLayout(
-                new PanelLayout(
-                    content,
-                    title: "TeaSharp Choice",
-                    border: BorderStyle.Rounded,
-                    padding: Thickness.All(1)),
-                width: Math.Min(54, Math.Max(32, context.Width - 4)),
-                height: 16),
+            Body = body,
             Padding = Thickness.All(1),
         });
     }

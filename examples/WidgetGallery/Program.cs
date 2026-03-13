@@ -258,7 +258,12 @@ internal sealed class WidgetGalleryApp : TeaApp
             Header = LayoutSlot.Fixed(_tabs, 1),
             Footer = LayoutSlot.Fixed(_status, 1),
             Body = BuildTabContent(context),
-            Overlay = new CenterLayout(_dialog, width: 42, height: 8),
+            Overlay = new CenterLayout
+            {
+                Content = _dialog,
+                Width = 42,
+                Height = 8,
+            },
             Gap = 1,
             Padding = Thickness.All(1),
         });
@@ -271,16 +276,18 @@ internal sealed class WidgetGalleryApp : TeaApp
             0 => CreateBasicsTab(),
             1 => CreateInputsTab(),
             2 => CreateDataTab(context),
-            3 => new CenterLayout(
-                new Label
+            3 => new CenterLayout
+            {
+                Content = new Label
                 {
                     Title = "Overlay",
                     Text = "Press d to open the confirmation dialog.\nFocus and rendering stay on the new screen model.",
                     Border = BorderStyle.SingleLine,
                     Padding = Thickness.All(1),
                 },
-                width: Math.Min(64, Math.Max(36, context.Width - 6)),
-                height: 8),
+                Width = Math.Min(64, Math.Max(36, context.Width - 6)),
+                Height = 8,
+            },
             _ => CreateAdvancedTab(),
         };
     }

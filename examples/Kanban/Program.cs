@@ -252,7 +252,12 @@ internal sealed class KanbanApp : TeaApp
             Footer = LayoutSlot.Fixed(_status, 1),
             Right = LayoutSlot.Fixed(sidebar, Math.Min(34, Math.Max(28, context.Width / 4))),
             Body = lanes,
-            Overlay = new CenterLayout(_deleteDialog, width: 42, height: 8),
+            Overlay = new CenterLayout
+            {
+                Content = _deleteDialog,
+                Width = 42,
+                Height = 8,
+            },
             Gap = 1,
             Padding = Thickness.All(1),
         });

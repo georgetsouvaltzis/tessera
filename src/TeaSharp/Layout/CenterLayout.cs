@@ -2,6 +2,7 @@ using TeaSharp.Components.Composition;
 using TeaSharp.Components.Primitives;
 using TeaSharp.Controls;
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 
 namespace TeaSharp.Layout;
 
@@ -11,12 +12,20 @@ namespace TeaSharp.Layout;
 public sealed class CenterLayout : LayoutNode
 {
     /// <summary>
+    /// Creates an empty centered layout for object-initializer assembly.
+    /// </summary>
+    public CenterLayout()
+    {
+    }
+
+    /// <summary>
     /// Creates a centered layout node around nested content.
     /// </summary>
     /// <param name="content">The content to center.</param>
     /// <param name="width">The explicit width to use, when supplied. When omitted, measured content width is used.</param>
     /// <param name="height">The explicit height to use, when supplied. When omitted, measured content height is used.</param>
     /// <param name="margin">The margin applied before centering.</param>
+    [SetsRequiredMembers]
     public CenterLayout(LayoutNode content, int? width = null, int? height = null, Thickness margin = default)
     {
         Content = content ?? throw new ArgumentNullException(nameof(content));
@@ -26,6 +35,7 @@ public sealed class CenterLayout : LayoutNode
     }
 
     [EditorBrowsable(EditorBrowsableState.Advanced)]
+    [SetsRequiredMembers]
     public CenterLayout(
         ICanvasComponent component,
         int? width = null,
@@ -46,6 +56,7 @@ public sealed class CenterLayout : LayoutNode
     /// <param name="width">The explicit width to use, when supplied. When omitted, measured control width is used.</param>
     /// <param name="height">The explicit height to use, when supplied. When omitted, measured control height is used.</param>
     /// <param name="margin">The margin applied before centering.</param>
+    [SetsRequiredMembers]
     public CenterLayout(
         Control control,
         int? width = null,
@@ -59,6 +70,7 @@ public sealed class CenterLayout : LayoutNode
     {
     }
 
+    [SetsRequiredMembers]
     internal CenterLayout(
         ICanvasComponent component,
         int? width,
@@ -81,27 +93,27 @@ public sealed class CenterLayout : LayoutNode
     /// <summary>
     /// Gets the centered content.
     /// </summary>
-    public LayoutNode Content { get; }
+    public required LayoutNode Content { get; init; }
 
     /// <summary>
     /// Gets the explicit content width, if provided.
     /// </summary>
-    public int? Width { get; }
+    public int? Width { get; init; }
 
     /// <summary>
     /// Gets the explicit content height, if provided.
     /// </summary>
-    public int? Height { get; }
+    public int? Height { get; init; }
 
     /// <summary>
     /// Gets the outer margin applied before centering.
     /// </summary>
-    public Thickness Margin { get; }
+    public Thickness Margin { get; init; }
 
     internal override LayoutMeasurement Measure(in Rect availableBounds)
     {
         var inner = availableBounds.Inset(Margin);
-        var measured = Content.Measure(inner);
+        var measured = GetContent().Measure(inner);
         var width = Width ?? measured.Width;
         var height = Height ?? measured.Height;
         return new LayoutMeasurement(
@@ -117,11 +129,15 @@ public sealed class CenterLayout : LayoutNode
             return;
         }
 
-        var measured = Content.Measure(inner);
+        var content = GetContent();
+        var measured = content.Measure(inner);
         var width = Math.Clamp(Width ?? measured.Width, 0, inner.Width);
         var height = Math.Clamp(Height ?? measured.Height, 0, inner.Height);
         var x = inner.X + Math.Max(0, (inner.Width - width) / 2);
         var y = inner.Y + Math.Max(0, (inner.Height - height) / 2);
-        Content.Compose(screen, new Rect(x, y, width, height), $"{path}/center");
+        content.Compose(screen, new Rect(x, y, width, height), $"{path}/center");
     }
+
+    private LayoutNode GetContent()
+        => Content ?? throw new InvalidOperationException($"{nameof(CenterLayout)} requires {nameof(Content)} to be configured.");
 }

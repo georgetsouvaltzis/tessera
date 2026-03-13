@@ -89,7 +89,12 @@ internal sealed class ComboApp : TeaApp
     public override Screen Build(ScreenContext context) =>
         Screen.From(new WindowLayout
         {
-            Body = new CenterLayout(_combo, width: 48, height: 8),
+            Body = new CenterLayout
+            {
+                Content = _combo,
+                Width = 48,
+                Height = 8,
+            },
         });
 }
 ```

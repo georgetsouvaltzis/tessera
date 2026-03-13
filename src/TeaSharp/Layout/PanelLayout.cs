@@ -3,6 +3,7 @@ using TeaSharp.Components.Primitives;
 using TeaSharp.Components.Primitives.Internal;
 using TeaSharp.Controls;
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 
 namespace TeaSharp.Layout;
 
@@ -15,6 +16,13 @@ namespace TeaSharp.Layout;
 public sealed class PanelLayout : LayoutNode
 {
     /// <summary>
+    /// Creates an empty panel layout for object-initializer assembly.
+    /// </summary>
+    public PanelLayout()
+    {
+    }
+
+    /// <summary>
     /// Creates a panel layout around nested content.
     /// </summary>
     /// <param name="content">The content shown inside the panel.</param>
@@ -22,6 +30,7 @@ public sealed class PanelLayout : LayoutNode
     /// <param name="border">The frame border style.</param>
     /// <param name="padding">The inner panel padding.</param>
     /// <param name="margin">The outer panel margin.</param>
+    [SetsRequiredMembers]
     public PanelLayout(LayoutNode content, string? title = null, BorderStyle border = BorderStyle.None, Thickness padding = default, Thickness margin = default)
     {
         Content = content ?? throw new ArgumentNullException(nameof(content));
@@ -32,6 +41,7 @@ public sealed class PanelLayout : LayoutNode
     }
 
     [EditorBrowsable(EditorBrowsableState.Advanced)]
+    [SetsRequiredMembers]
     public PanelLayout(
         ICanvasComponent component,
         string? title = null,
@@ -55,6 +65,7 @@ public sealed class PanelLayout : LayoutNode
     /// <param name="border">The frame border style.</param>
     /// <param name="padding">The inner panel padding.</param>
     /// <param name="margin">The outer panel margin.</param>
+    [SetsRequiredMembers]
     public PanelLayout(
         Control control,
         string? title = null,
@@ -70,6 +81,7 @@ public sealed class PanelLayout : LayoutNode
     {
     }
 
+    [SetsRequiredMembers]
     internal PanelLayout(
         ICanvasComponent component,
         string? title,
@@ -96,33 +108,33 @@ public sealed class PanelLayout : LayoutNode
     /// <summary>
     /// Gets the nested layout content.
     /// </summary>
-    public LayoutNode Content { get; }
+    public required LayoutNode Content { get; init; }
 
     /// <summary>
     /// Gets the optional panel title.
     /// </summary>
-    public string? Title { get; }
+    public string? Title { get; init; }
 
     /// <summary>
     /// Gets the frame border style.
     /// </summary>
-    public BorderStyle Border { get; }
+    public BorderStyle Border { get; init; }
 
     /// <summary>
     /// Gets the inner panel padding.
     /// </summary>
-    public Thickness Padding { get; }
+    public Thickness Padding { get; init; }
 
     /// <summary>
     /// Gets the outer panel margin.
     /// </summary>
-    public Thickness Margin { get; }
+    public Thickness Margin { get; init; }
 
     internal override LayoutMeasurement Measure(in Rect availableBounds)
     {
         var inner = Rect.Intersect(availableBounds.Inset(Margin), availableBounds);
         var contentBounds = FrameLayout.ResolveContentRect(inner, Border, Padding);
-        var measured = Content.Measure(contentBounds);
+        var measured = GetContent().Measure(contentBounds);
         var width = measured.Width + Margin.Horizontal + Padding.Horizontal + (Border == BorderStyle.None ? 0 : 2);
         var height = measured.Height + Margin.Vertical + Padding.Vertical + (Border == BorderStyle.None ? 0 : 2);
 
@@ -161,6 +173,9 @@ public sealed class PanelLayout : LayoutNode
             return;
         }
 
-        Content.Compose(screen, contentRect, $"{path}/content");
+        GetContent().Compose(screen, contentRect, $"{path}/content");
     }
+
+    private LayoutNode GetContent()
+        => Content ?? throw new InvalidOperationException($"{nameof(PanelLayout)} requires {nameof(Content)} to be configured.");
 }

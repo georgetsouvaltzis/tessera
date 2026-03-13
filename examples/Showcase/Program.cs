@@ -117,14 +117,32 @@ internal sealed class OrdersApp : TeaApp
         detailsColumn.AddFixed(_summary, 6);
         detailsColumn.AddFill(_detailsView);
         detailsColumn.AddFixed(_command, 5);
+        var refreshPanel = new CenterLayout
+        {
+            Content = _refresh,
+            Width = 26,
+            Height = 5,
+        };
+        var ordersPanel = new PanelLayout
+        {
+            Content = _orders,
+            Border = BorderStyle.SingleLine,
+            Padding = Thickness.All(1),
+        };
+        var deleteOverlay = new CenterLayout
+        {
+            Content = _confirmDelete,
+            Width = 42,
+            Height = 8,
+        };
 
         return Screen.From(new WindowLayout
         {
-            Header = LayoutSlot.Fixed(new CenterLayout(_refresh, width: 26, height: 5), 5),
+            Header = LayoutSlot.Fixed(refreshPanel, 5),
             Footer = LayoutSlot.Fixed(_status, 1),
-            Left = LayoutSlot.Fixed(new PanelLayout(_orders, border: BorderStyle.SingleLine, padding: Thickness.All(1)), 28),
+            Left = LayoutSlot.Fixed(ordersPanel, 28),
             Body = detailsColumn,
-            Overlay = new CenterLayout(_confirmDelete, width: 42, height: 8),
+            Overlay = deleteOverlay,
             Gap = 1,
             Padding = Thickness.All(1),
         });

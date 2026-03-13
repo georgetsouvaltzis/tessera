@@ -152,7 +152,12 @@ internal sealed class SearchApp : TeaApp
         return Screen.From(new WindowLayout
         {
             Footer = LayoutSlot.Fixed(_status, 1),
-            Body = new CenterLayout(_query, width: 48, height: 5),
+            Body = new CenterLayout
+            {
+                Content = _query,
+                Width = 48,
+                Height = 5,
+            },
             Padding = Thickness.All(1),
         });
     }

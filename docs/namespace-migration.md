@@ -134,7 +134,12 @@ internal sealed class SearchApp : TeaApp
     public override Screen Build(ScreenContext context) =>
         Screen.From(new WindowLayout
         {
-            Body = new CenterLayout(_input, width: 48, height: 5),
+            Body = new CenterLayout
+            {
+                Content = _input,
+                Width = 48,
+                Height = 5,
+            },
         });
 }
 ```

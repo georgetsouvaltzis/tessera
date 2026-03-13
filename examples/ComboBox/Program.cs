@@ -88,18 +88,24 @@ internal sealed class ComboBoxDemoApp : TeaApp
         };
         content.AddFixed(_combobox, 9);
         content.AddFixed(_details, 6);
+        var panel = new PanelLayout
+        {
+            Content = content,
+            Title = "ComboBox",
+            Border = BorderStyle.Rounded,
+            Padding = Thickness.All(1),
+        };
+        var body = new CenterLayout
+        {
+            Content = panel,
+            Width = Math.Min(60, Math.Max(38, context.Width - 4)),
+            Height = 20,
+        };
 
         return Screen.From(new WindowLayout
         {
             Footer = LayoutSlot.Fixed(_status, 1),
-            Body = new CenterLayout(
-                new PanelLayout(
-                    content,
-                    title: "ComboBox",
-                    border: BorderStyle.Rounded,
-                    padding: Thickness.All(1)),
-                width: Math.Min(60, Math.Max(38, context.Width - 4)),
-                height: 20),
+            Body = body,
             Padding = Thickness.All(1),
         });
     }

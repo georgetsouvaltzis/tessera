@@ -10,6 +10,7 @@ using TeaSharp.Components.Styling;
 using TeaSharp.Components.UiKit;
 using System.ComponentModel;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using TeaSharp.Core.Abstractions;
 using TeaSharp.Layout;
 
@@ -68,6 +69,7 @@ internal static class CompositionApiContractTests
     public static IEnumerable<TestCase> Cases()
     {
         yield return new TestCase("CompositionApi_RootLayoutTypes_RemainDiscoverable", RootLayoutTypes_RemainDiscoverable);
+        yield return new TestCase("CompositionApi_CenterAndPanelLayouts_SupportObjectInitializerAssembly", CenterAndPanelLayouts_SupportObjectInitializerAssembly);
         yield return new TestCase("CompositionApi_InternalizedCompositionTypes_AreNotPublic", InternalizedCompositionTypes_AreNotPublic);
     }
 
@@ -85,6 +87,13 @@ internal static class CompositionApiContractTests
         return Task.CompletedTask;
     }
 
+    private static Task CenterAndPanelLayouts_SupportObjectInitializerAssembly()
+    {
+        AssertObjectInitializerShape(typeof(CenterLayout));
+        AssertObjectInitializerShape(typeof(PanelLayout));
+        return Task.CompletedTask;
+    }
+
     private static Task InternalizedCompositionTypes_AreNotPublic()
     {
         var assembly = typeof(Screen).Assembly;
@@ -97,5 +106,18 @@ internal static class CompositionApiContractTests
         }
 
         return Task.CompletedTask;
+    }
+
+    private static void AssertObjectInitializerShape(Type type)
+    {
+        var constructor = type.GetConstructor(Type.EmptyTypes);
+        TestAssert.True(constructor is not null, $"{type.Name} should expose a parameterless constructor for object-initializer assembly.");
+
+        var property = type.GetProperty("Content", BindingFlags.Public | BindingFlags.Instance);
+        TestAssert.True(property is not null, $"{type.Name} should expose a public Content property.");
+        TestAssert.True(property!.SetMethod is not null, $"{type.Name}.Content should be settable during object initialization.");
+
+        var requiredAttribute = (RequiredMemberAttribute?)Attribute.GetCustomAttribute(property, typeof(RequiredMemberAttribute));
+        TestAssert.True(requiredAttribute is not null, $"{type.Name}.Content should stay required for valid object-initializer assembly.");
     }
 }
