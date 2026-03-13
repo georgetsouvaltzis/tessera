@@ -45,8 +45,7 @@ public sealed class CenterLayout : LayoutNode
     {
     }
 
-    [EditorBrowsable(EditorBrowsableState.Advanced)]
-    public CenterLayout(
+    internal CenterLayout(
         ICanvasComponent component,
         int? width,
         int? height,

@@ -51,8 +51,7 @@ public sealed class PanelLayout : LayoutNode
     {
     }
 
-    [EditorBrowsable(EditorBrowsableState.Advanced)]
-    public PanelLayout(
+    internal PanelLayout(
         ICanvasComponent component,
         string? title,
         BorderStyle border,

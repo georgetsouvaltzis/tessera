@@ -3,7 +3,7 @@ using System.ComponentModel;
 namespace TeaSharp.Components.Composition;
 
 [EditorBrowsable(EditorBrowsableState.Advanced)]
-public readonly record struct ScreenRegionKey
+internal readonly record struct ScreenRegionKey
 {
     public ScreenRegionKey(string value)
     {

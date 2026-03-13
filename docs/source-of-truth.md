@@ -80,7 +80,6 @@ The default app path must not require users to understand:
 - `ComponentComposer`
 - `InputRouter`
 - `InputScope*`
-- `ScreenRegionKey`
 - terminal capability plumbing
 - manual resize bookkeeping
 - manual focus choreography

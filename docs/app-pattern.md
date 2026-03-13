@@ -194,8 +194,4 @@ Advanced runtime seams remain available, but they now sit under `TeaSharp.Hostin
 
 Most of the older composition stack is now internal-only.
 
-The main surviving public interop token is:
-
-- `ScreenRegionKey`
-
-That token only exists so the remaining advanced layout overloads can keep a stable region identity where necessary. Normal apps should not need it.
+Advanced interop still exists through hosting/runtime seams and advanced component/layout overloads, but explicit region-key composition is no longer part of the public path.

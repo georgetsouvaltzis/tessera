@@ -37,6 +37,7 @@ internal static class CompositionApiContractTests
         "TeaSharp.Components.Composition.FormScreen",
         "TeaSharp.Components.Composition.ComponentSlot",
         "TeaSharp.Components.Composition.ScreenRegion",
+        "TeaSharp.Components.Composition.ScreenRegionKey",
     ];
 
     public static IEnumerable<TestCase> Cases()
@@ -63,7 +64,6 @@ internal static class CompositionApiContractTests
     {
         Type[] advancedTypes =
         [
-            typeof(ScreenRegionKey),
             typeof(TeaSharp.Components.UiKit.Layout),
         ];
 

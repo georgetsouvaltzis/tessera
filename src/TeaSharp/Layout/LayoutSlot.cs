@@ -77,8 +77,7 @@ public sealed record LayoutSlot
     {
     }
 
-    [EditorBrowsable(EditorBrowsableState.Advanced)]
-    public LayoutSlot(
+    internal LayoutSlot(
         ICanvasComponent component,
         LayoutLength length,
         Thickness margin,

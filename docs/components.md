@@ -118,11 +118,7 @@ These can still be placed directly inside the new layout model through `PanelLay
 
 The old composition engine is now mostly internal-only.
 
-The main public interop token that remains is:
-
-- `ScreenRegionKey`
-
-Use it only when an advanced layout overload needs a stable region identity.
+Explicit region-key composition is now internal-only.
 
 ## Example
 

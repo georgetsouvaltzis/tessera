@@ -1,4 +1,5 @@
 using System.ComponentModel;
+using System.Reflection;
 using TeaSharp.Components.Composition;
 using TeaSharp.Components.Primitives;
 using TeaSharp.Controls;
@@ -48,8 +49,8 @@ internal static class TeaAppCompositionTests
             "TeaAppComposition_LegacyLayoutHelpers_AreInternalized",
             LegacyLayoutHelpers_AreInternalized);
         yield return new TestCase(
-            "TeaAppComposition_AdvancedLayoutOverloads_AreMarkedAdvanced",
-            AdvancedLayoutOverloads_AreMarkedAdvanced);
+            "TeaAppComposition_RegionKeyInteropOverloads_AreInternalized",
+            RegionKeyInteropOverloads_AreInternalized);
         yield return new TestCase(
             "TeaAppComposition_LegacyCanvasComponentEntryPoints_AreMarkedAdvanced",
             LegacyCanvasComponentEntryPoints_AreMarkedAdvanced);
@@ -252,9 +253,9 @@ internal static class TeaAppCompositionTests
         return Task.CompletedTask;
     }
 
-    private static Task AdvancedLayoutOverloads_AreMarkedAdvanced()
+    private static Task RegionKeyInteropOverloads_AreInternalized()
     {
-        var advancedCtors =
+        var internalCtors =
             new (Type Type, Type[] Parameters)[]
             {
                 (typeof(LayoutSlot), [typeof(ICanvasComponent), typeof(LayoutLength), typeof(Thickness), typeof(ScreenRegionKey), typeof(int?), typeof(int?), typeof(bool?), typeof(bool), typeof(bool), typeof(int), typeof(Action)]),
@@ -262,13 +263,17 @@ internal static class TeaAppCompositionTests
                 (typeof(PanelLayout), [typeof(ICanvasComponent), typeof(string), typeof(BorderStyle), typeof(Thickness), typeof(Thickness), typeof(ScreenRegionKey), typeof(int?), typeof(int?), typeof(bool?), typeof(bool), typeof(bool), typeof(int), typeof(Action)]),
             };
 
-        foreach (var (type, parameters) in advancedCtors)
+        foreach (var (type, parameters) in internalCtors)
         {
-            var ctor = type.GetConstructor(parameters);
-            TestAssert.True(ctor is not null, $"{type.Name} advanced overload should exist for advanced callers.");
-            var attribute = (EditorBrowsableAttribute?)Attribute.GetCustomAttribute(ctor!, typeof(EditorBrowsableAttribute));
-            TestAssert.True(attribute is not null, $"{type.Name} advanced overload should be marked advanced.");
-            TestAssert.True(attribute!.State == EditorBrowsableState.Advanced, $"{type.Name} advanced overload should be hidden from default discoverability.");
+            var publicCtor = type.GetConstructor(parameters);
+            TestAssert.True(publicCtor is null, $"{type.Name} region-key overload should no longer be public.");
+
+            var internalCtor = type.GetConstructor(
+                BindingFlags.Instance | BindingFlags.NonPublic,
+                binder: null,
+                types: parameters,
+                modifiers: null);
+            TestAssert.True(internalCtor is not null, $"{type.Name} region-key overload should remain as an internal bridge.");
         }
 
         return Task.CompletedTask;

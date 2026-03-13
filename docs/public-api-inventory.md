@@ -78,7 +78,6 @@ These APIs remain public because they still offer real value, but they should no
 - `IScreen`
 - `ProgramOptions`
 - `TeaProgram`
-- `ScreenRegionKey`
 - `ICanvasComponent`
 - `IStatefulComponent`
 - `IMouseStatefulComponent`
@@ -98,7 +97,6 @@ Most of these types are now marked `EditorBrowsable(Advanced)`.
 
 These areas still expose more mechanism than the long-term public design should:
 
-- region-key-based advanced layout interop
 - low-level widget models leaking through component configuration
 - runtime seams that most apps never need
 - duplicate terminology between root app types and older core/runtime types

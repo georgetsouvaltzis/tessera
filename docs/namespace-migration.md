@@ -71,7 +71,6 @@ Advanced-only namespaces remain available, but they should be opt-in.
 
 These still exist, but they are not the first path:
 
-- `ScreenRegionKey`
 - low-level widget models in `TeaSharp.Widgets`
 - advanced widgets that do not have root wrappers yet
 
