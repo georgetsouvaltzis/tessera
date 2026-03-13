@@ -1,15 +1,10 @@
 using TeaSharp.Components.Primitives;
 
 using TeaSharp.Components.Composition;
-using System.ComponentModel;
 
 namespace TeaSharp.Layout;
 
-/// <summary>
-/// Represents multiple layout nodes composed over the same bounds.
-/// </summary>
-[EditorBrowsable(EditorBrowsableState.Advanced)]
-public sealed class OverlayLayout : LayoutNode
+internal sealed class OverlayLayout : LayoutNode
 {
     public OverlayLayout(IReadOnlyList<LayoutNode> items)
     {

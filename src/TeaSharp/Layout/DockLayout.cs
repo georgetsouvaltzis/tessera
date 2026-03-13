@@ -1,14 +1,9 @@
 using TeaSharp.Components.Composition;
 using TeaSharp.Components.Primitives;
-using System.ComponentModel;
 
 namespace TeaSharp.Layout;
 
-/// <summary>
-/// Represents a docked layout with optional top, bottom, left, right, and fill content.
-/// </summary>
-[EditorBrowsable(EditorBrowsableState.Advanced)]
-public sealed class DockLayout : LayoutNode
+internal sealed class DockLayout : LayoutNode
 {
     public DockLayout(
         LayoutSlot? top = null,

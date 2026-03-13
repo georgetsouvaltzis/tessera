@@ -84,13 +84,6 @@ Core default layout types:
 - `LayoutSlot`
 - `LayoutLength`
 
-Advanced tree primitives still exist:
-
-- `StackLayout`
-- `SplitLayout`
-- `DockLayout`
-- `OverlayLayout`
-
 The default authoring model should read like explicit screen assembly, not nested layout-tree construction.
 
 ### Control Model

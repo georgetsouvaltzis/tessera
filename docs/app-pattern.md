@@ -99,13 +99,6 @@ Common default layout types:
 - `CenterLayout`
 - `LayoutSlot`
 
-Advanced tree-oriented layout primitives remain available, but they are no longer the default story:
-
-- `StackLayout`
-- `SplitLayout`
-- `DockLayout`
-- `OverlayLayout`
-
 Common default controls:
 
 - `Label`

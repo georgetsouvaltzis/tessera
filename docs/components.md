@@ -50,13 +50,6 @@ Primary default layout nouns:
 - `LayoutSlot`
 - `LayoutLength`
 
-Advanced tree-oriented layout primitives still exist:
-
-- `StackLayout`
-- `SplitLayout`
-- `DockLayout`
-- `OverlayLayout`
-
 The default path should read like shallow screen assembly, not nested tree construction.
 
 ## Root Controls

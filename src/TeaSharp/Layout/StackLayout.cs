@@ -1,14 +1,9 @@
 using TeaSharp.Components.Composition;
 using TeaSharp.Components.Primitives;
-using System.ComponentModel;
 
 namespace TeaSharp.Layout;
 
-/// <summary>
-/// Represents an ordered row or column layout.
-/// </summary>
-[EditorBrowsable(EditorBrowsableState.Advanced)]
-public sealed class StackLayout : LayoutNode
+internal sealed class StackLayout : LayoutNode
 {
     public StackLayout(LayoutOrientation orientation, IReadOnlyList<LayoutSlot> children, int gap = 0, Thickness padding = default)
     {

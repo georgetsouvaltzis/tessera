@@ -58,8 +58,8 @@ internal static class TeaAppCompositionTests
             "TeaAppComposition_LowLevelComponentContracts_AreInternalized",
             LowLevelComponentContracts_AreInternalized);
         yield return new TestCase(
-            "TeaAppComposition_LowLevelTreeLayouts_AreMarkedAdvanced",
-            LowLevelTreeLayouts_AreMarkedAdvanced);
+            "TeaAppComposition_LowLevelTreeLayouts_AreInternalized",
+            LowLevelTreeLayouts_AreInternalized);
         yield return new TestCase(
             "TeaAppComposition_ComponentLayout_IsInternalized",
             ComponentLayout_IsInternalized);
@@ -358,26 +358,24 @@ internal static class TeaAppCompositionTests
         return Task.CompletedTask;
     }
 
-    private static Task LowLevelTreeLayouts_AreMarkedAdvanced()
+    private static Task LowLevelTreeLayouts_AreInternalized()
     {
-        Type[] layoutTypes =
+        string[] layoutTypeNames =
         [
-            typeof(StackLayout),
-            typeof(SplitLayout),
-            typeof(DockLayout),
-            typeof(OverlayLayout),
+            "TeaSharp.Layout.StackLayout",
+            "TeaSharp.Layout.SplitLayout",
+            "TeaSharp.Layout.DockLayout",
+            "TeaSharp.Layout.OverlayLayout",
+            "TeaSharp.Layout.LayoutOrientation",
         ];
 
-        foreach (var type in layoutTypes)
-        {
-            var attribute = (EditorBrowsableAttribute?)Attribute.GetCustomAttribute(
-                type,
-                typeof(EditorBrowsableAttribute));
+        var assembly = typeof(Screen).Assembly;
 
-            TestAssert.True(attribute is not null, $"{type.Name} should be explicitly marked as advanced.");
-            TestAssert.True(
-                attribute!.State == EditorBrowsableState.Advanced,
-                $"{type.Name} should be hidden from the default composition path.");
+        foreach (var typeName in layoutTypeNames)
+        {
+            var type = assembly.GetType(typeName, throwOnError: false);
+            TestAssert.True(type is not null, $"{typeName} should continue to exist as an internal bridge.");
+            TestAssert.True(type!.IsNotPublic, $"{typeName} should no longer be public on the root layout path.");
         }
 
         return Task.CompletedTask;
