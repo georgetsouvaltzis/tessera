@@ -1,25 +1,63 @@
 namespace TeaSharp;
 
+/// <summary>
+/// Configures terminal behavior for a rendered screen.
+/// </summary>
+/// <remarks>
+/// These options describe terminal-facing behavior for rendered output, such as alternate screen usage,
+/// mouse tracking, focus reporting, and default colors. Use <see cref="TeaRuntimeOptions"/> for runtime-loop
+/// behavior instead.
+/// </remarks>
 public sealed class ScreenOptions
 {
+    /// <summary>
+    /// Gets an empty set of screen options.
+    /// </summary>
     public static ScreenOptions Empty { get; } = new();
 
+    /// <summary>
+    /// Gets or sets whether the screen should use the terminal alternate buffer.
+    /// </summary>
     public bool? AltScreen { get; init; }
 
+    /// <summary>
+    /// Gets or sets whether bracketed paste mode should be enabled.
+    /// </summary>
     public bool? EnableBracketedPaste { get; init; }
 
+    /// <summary>
+    /// Gets or sets whether terminal focus reporting should be enabled.
+    /// </summary>
     public bool? EnableFocusReporting { get; init; }
 
+    /// <summary>
+    /// Gets or sets whether synchronized terminal updates should be enabled.
+    /// </summary>
     public bool? EnableSynchronizedUpdates { get; init; }
 
+    /// <summary>
+    /// Gets or sets the mouse tracking mode for the screen.
+    /// </summary>
     public MouseTrackingMode? MouseTracking { get; init; }
 
+    /// <summary>
+    /// Gets or sets the terminal cursor color.
+    /// </summary>
     public string? CursorColor { get; init; }
 
+    /// <summary>
+    /// Gets or sets the default foreground color.
+    /// </summary>
     public string? ForegroundColor { get; init; }
 
+    /// <summary>
+    /// Gets or sets the default background color.
+    /// </summary>
     public string? BackgroundColor { get; init; }
 
+    /// <summary>
+    /// Gets or sets the terminal window title.
+    /// </summary>
     public string? WindowTitle { get; init; }
 
     internal ScreenOptions Merge(ScreenOptions? overrides)
