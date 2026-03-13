@@ -46,6 +46,9 @@ internal static class TeaAppCompositionTests
             "TeaAppComposition_FocusRequests_AreOneShotAcrossLaterBuilds",
             FocusRequests_AreOneShotAcrossLaterBuilds);
         yield return new TestCase(
+            "TeaAppComposition_ScreenBuilder_ComposesAndRoutesDefaultControls",
+            ScreenBuilder_ComposesAndRoutesDefaultControls);
+        yield return new TestCase(
             "TeaAppComposition_LegacyLayoutHelpers_AreInternalized",
             LegacyLayoutHelpers_AreInternalized);
         yield return new TestCase(
@@ -223,6 +226,19 @@ internal static class TeaAppCompositionTests
 
         TestAssert.Equal(0, app.LeftActivationCount, "Consumed focus requests should not steal focus back on later builds.");
         TestAssert.Equal(1, app.RightActivationCount, "User focus changes should persist after a one-shot focus request is consumed.");
+        return Task.CompletedTask;
+    }
+
+    private static Task ScreenBuilder_ComposesAndRoutesDefaultControls()
+    {
+        var app = new BuilderAuthoredApp();
+        var screen = app.RuntimeScreen;
+
+        screen.Update(new WindowSizeMsg(80, 24));
+        screen.Render();
+        screen.Update(new KeyPressMsg(KeyCode.Enter));
+
+        TestAssert.Equal(1, app.ActivationCount, "The imperative Screen.Build path should still compile into routable default controls.");
         return Task.CompletedTask;
     }
 
@@ -703,6 +719,35 @@ internal static class TeaAppCompositionTests
             return Screen.From(new WindowLayout
             {
                 Body = new CenterLayout(row, width: 28, height: 3),
+            });
+        }
+    }
+
+    private sealed class BuilderAuthoredApp : TeaApp
+    {
+        private readonly Button _button = new() { Text = "Run" };
+        private readonly StatusBar _status = new();
+
+        public BuilderAuthoredApp()
+        {
+            _button.Activated += (_, _) => ActivationCount++;
+            _button.RequestFocus();
+        }
+
+        public int ActivationCount { get; private set; }
+
+        public override TeaEffect? Update(Message message) => null;
+
+        public override Screen Build(ScreenContext context)
+        {
+            _status.LeftText = "Enter activates";
+            _status.RightText = $"Size {context.Width}x{context.Height}";
+
+            return Screen.Build(window =>
+            {
+                window.Padding(1);
+                window.Footer(1, _status);
+                window.Body(body => body.Center(_button, width: 18, height: 3));
             });
         }
     }

@@ -50,20 +50,11 @@ internal sealed class CounterApp : TeaApp
         _status.LeftText = $"Count: {_count}";
         _status.RightText = $"Size {context.Width}x{context.Height}";
 
-        return Screen.From(new WindowLayout
+        return Screen.Build(window =>
         {
-            Footer = new LayoutSlot
-            {
-                Content = _status,
-                Length = 1,
-            },
-            Body = new CenterLayout
-            {
-                Content = _increment,
-                Width = 20,
-                Height = 3,
-            },
-            Padding = Thickness.All(1),
+            window.Padding(1);
+            window.Footer(1, _status);
+            window.Body(body => body.Center(_increment, width: 20, height: 3));
         });
     }
 }
@@ -88,10 +79,15 @@ If a control should claim focus programmatically, call `RequestFocus()`. The req
 
 ## Composition Model
 
-The default composition path uses explicit layout objects, not a nested static DSL.
+The default composition path uses imperative screen assembly over explicit layout objects, not a nested static DSL.
 
 Common default layout types:
 
+- `Screen.Build(...)`
+- `WindowBuilder`
+- `ContentBuilder`
+- `StackBuilder`
+- `PanelBuilder`
 - `WindowLayout`
 - `RowLayout`
 - `ColumnLayout`

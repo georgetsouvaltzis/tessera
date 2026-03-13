@@ -9,8 +9,6 @@ public sealed class CounterFixtureModel
 {
     private int _count;
 
-    public Effect? Init() => null;
-
     public Effect? Update(IMessage message)
     {
         if (message is not KeyPressMsg key)

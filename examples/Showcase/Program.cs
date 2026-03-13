@@ -132,68 +132,21 @@ internal sealed class OrdersApp : TeaApp
         _status.LeftText = $"Order {_orders.SelectedItem}    Tab move focus    d delete";
         _status.RightText = _statusText;
 
-        var detailsColumn = new ColumnLayout
+        return Screen.Build(window =>
         {
-            Gap = 1,
-            Items =
+            window.Padding(1);
+            window.Gap(1);
+            window.Header(5, header => header.Center(_refresh, width: 26, height: 5));
+            window.Footer(1, _status);
+            window.Left(28, panel => panel.Border().Padding(1).Content(_orders));
+            window.Body(body => body.Column(column =>
             {
-                new LayoutSlot
-                {
-                    Content = _summary,
-                    Length = 6,
-                },
-                new LayoutSlot
-                {
-                    Content = _detailsView,
-                    Length = LayoutLength.Fill(),
-                },
-                new LayoutSlot
-                {
-                    Content = _command,
-                    Length = 5,
-                },
-            },
-        };
-        var refreshPanel = new CenterLayout
-        {
-            Content = _refresh,
-            Width = 26,
-            Height = 5,
-        };
-        var ordersPanel = new PanelLayout
-        {
-            Content = _orders,
-            Border = BorderStyle.SingleLine,
-            Padding = Thickness.All(1),
-        };
-        var deleteOverlay = new CenterLayout
-        {
-            Content = _confirmDelete,
-            Width = 42,
-            Height = 8,
-        };
-
-        return Screen.From(new WindowLayout
-        {
-            Header = new LayoutSlot
-            {
-                Content = refreshPanel,
-                Length = 5,
-            },
-            Footer = new LayoutSlot
-            {
-                Content = _status,
-                Length = 1,
-            },
-            Left = new LayoutSlot
-            {
-                Content = ordersPanel,
-                Length = 28,
-            },
-            Body = detailsColumn,
-            Overlay = deleteOverlay,
-            Gap = 1,
-            Padding = Thickness.All(1),
+                column.Gap(1);
+                column.Fixed(6, _summary);
+                column.Fill(_detailsView);
+                column.Fixed(5, _command);
+            }));
+            window.Overlay(overlay => overlay.Center(_confirmDelete, width: 42, height: 8));
         });
     }
 

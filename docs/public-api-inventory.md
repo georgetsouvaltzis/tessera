@@ -29,6 +29,7 @@ These are the types new applications should discover first.
 - `Screen`
 - `ScreenContext`
 - `ScreenOptions`
+- `Screen.Build(...)`
 - `TeaSharp.Layout.*` object-model types
 - `TeaSharp.Controls.Button`
 - `TeaSharp.Controls.Label`
@@ -81,7 +82,7 @@ The intended beginner path is:
 - run it with `Tea.RunAsync(...)` or `TeaApplicationBuilder`
 - rely on automatic control routing; `Update(...)` handles only unhandled input plus runtime messages
 - return `Screen` from `Build(ScreenContext)`
-- assemble screens with `WindowLayout`, `RowLayout`, and `ColumnLayout`
+- assemble screens with `Screen.Build(...)` and shallow builder callbacks
 - keep configuration in `TeaRuntimeOptions` and `ScreenOptions`
 
 ## Tier 2: Advanced But Supported
@@ -91,12 +92,16 @@ These APIs remain public because they still offer real value, but they should no
 - `TeaSharp.Hosting.TeaHostingOptions`
 - `TeaSharp.Hosting.TeaHost.CreateApplication(...)`
 - `TeaSharp.Hosting.TeaHost.RunAsync(...)`
+- `TeaSharp.Hosting.IProgramRenderer`
+- `TeaSharp.Hosting.AnsiDiffRenderer`
+- `TeaSharp.Hosting.NullRenderer`
+- `TeaSharp.Hosting.ITerminalAdapter`
+- `TeaSharp.Hosting.ConsoleTerminalAdapter`
+- `TeaSharp.Hosting.IEventDecoder`
+- `TeaSharp.Hosting.EventDecoder`
 - `TeaSharp.Controls.BarChartOptions`
 - `TeaSharp.Controls.LineChartOptions`
 - `ICanvasComponent`
-- `IProgramRenderer`
-- `ITerminalAdapter`
-- `IEventDecoder`
 - renderer, terminal, and capability-probing seams
 
 Most of these types are now marked `EditorBrowsable(Advanced)`.

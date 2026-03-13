@@ -8,12 +8,12 @@ The default app path is intentionally small:
 - run apps with `Tea.RunAsync(...)` or `TeaApplicationBuilder`
 - let built-in controls route automatically; `Update(...)` handles unhandled input plus runtime messages
 - return `Screen` from `Build(ScreenContext)`
-- assemble screens with `WindowLayout`, `RowLayout`, and `ColumnLayout`
+- assemble screens with `Screen.Build(...)` and shallow builder callbacks
 - use first-class controls from `TeaSharp.Controls`
 - configure runtime behavior with `TeaRuntimeOptions`
 - keep low-level runtime wiring under `TeaSharp.Hosting` only when you truly need advanced seams
 
-If you need custom runtime wiring, explicit region routing, or low-level component composition, those APIs still exist, but they are now marked `EditorBrowsable(Advanced)` and are no longer the starter path.
+If you need custom runtime wiring, explicit region routing, or low-level component composition, those APIs still exist under `TeaSharp.Hosting` or advanced namespaces, but they are marked `EditorBrowsable(Advanced)` and are no longer the starter path.
 
 ## Quick Start
 
@@ -57,20 +57,11 @@ internal sealed class CounterApp : TeaApp
         _status.LeftText = $"Count: {_count}";
         _status.RightText = "Enter increments   Ctrl+C quits";
 
-        return Screen.From(new WindowLayout
+        return Screen.Build(window =>
         {
-            Footer = new LayoutSlot
-            {
-                Content = _status,
-                Length = 1,
-            },
-            Body = new CenterLayout
-            {
-                Content = _increment,
-                Width = 20,
-                Height = 3,
-            },
-            Padding = Thickness.All(1),
+            window.Padding(1);
+            window.Footer(1, _status);
+            window.Body(body => body.Center(_increment, width: 20, height: 3));
         });
     }
 }

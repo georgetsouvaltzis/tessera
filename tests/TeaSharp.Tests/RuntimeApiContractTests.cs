@@ -28,14 +28,14 @@ internal static class RuntimeApiContractTests
         ("TeaHostingOptions", typeof(TeaHostingOptions)),
         ("BarChartOptions", typeof(TeaSharp.Controls.BarChartOptions)),
         ("LineChartOptions", typeof(TeaSharp.Controls.LineChartOptions)),
-        ("IProgramRenderer", typeof(IProgramRenderer)),
-        ("NullRenderer", typeof(NullRenderer)),
-        ("AnsiDiffRenderer", typeof(AnsiDiffRenderer)),
+        ("IProgramRenderer", typeof(TeaSharp.Hosting.IProgramRenderer)),
+        ("NullRenderer", typeof(TeaSharp.Hosting.NullRenderer)),
+        ("AnsiDiffRenderer", typeof(TeaSharp.Hosting.AnsiDiffRenderer)),
         ("AnsiRendererOptions", typeof(AnsiRendererOptions)),
-        ("ITerminalAdapter", typeof(ITerminalAdapter)),
-        ("ConsoleTerminalAdapter", typeof(ConsoleTerminalAdapter)),
-        ("IEventDecoder", typeof(IEventDecoder)),
-        ("EventDecoder", typeof(EventDecoder)),
+        ("ITerminalAdapter", typeof(TeaSharp.Hosting.ITerminalAdapter)),
+        ("ConsoleTerminalAdapter", typeof(TeaSharp.Hosting.ConsoleTerminalAdapter)),
+        ("IEventDecoder", typeof(TeaSharp.Hosting.IEventDecoder)),
+        ("EventDecoder", typeof(TeaSharp.Hosting.EventDecoder)),
         ("TerminalReader", typeof(TerminalReader)),
         ("TerminalCapabilityDetector", typeof(TerminalCapabilityDetector)),
         ("TerminalColorProfileDetector", typeof(TerminalColorProfileDetector)),
@@ -136,11 +136,20 @@ internal static class RuntimeApiContractTests
     {
         var messageFilter = typeof(TeaHostingOptions).GetProperty(nameof(TeaHostingOptions.MessageFilter));
         var mapEffectException = typeof(TeaHostingOptions).GetProperty(nameof(TeaHostingOptions.MapEffectException));
+        var renderer = typeof(TeaHostingOptions).GetProperty(nameof(TeaHostingOptions.Renderer));
+        var terminal = typeof(TeaHostingOptions).GetProperty(nameof(TeaHostingOptions.Terminal));
+        var eventDecoder = typeof(TeaHostingOptions).GetProperty(nameof(TeaHostingOptions.EventDecoder));
 
         TestAssert.True(messageFilter is not null, "TeaHostingOptions.MessageFilter should exist.");
         TestAssert.True(mapEffectException is not null, "TeaHostingOptions.MapEffectException should exist.");
+        TestAssert.True(renderer is not null, "TeaHostingOptions.Renderer should exist.");
+        TestAssert.True(terminal is not null, "TeaHostingOptions.Terminal should exist.");
+        TestAssert.True(eventDecoder is not null, "TeaHostingOptions.EventDecoder should exist.");
         TestAssert.True(messageFilter!.PropertyType == typeof(Func<TeaApp, Message, Message>), "TeaHostingOptions.MessageFilter should use TeaApp and Message, not core runtime types.");
         TestAssert.True(mapEffectException!.PropertyType == typeof(Func<Exception, Message>), "TeaHostingOptions.MapEffectException should use public Message contracts.");
+        TestAssert.True(renderer!.PropertyType == typeof(TeaSharp.Hosting.IProgramRenderer), "TeaHostingOptions.Renderer should use TeaSharp.Hosting contracts.");
+        TestAssert.True(terminal!.PropertyType == typeof(TeaSharp.Hosting.ITerminalAdapter), "TeaHostingOptions.Terminal should use TeaSharp.Hosting contracts.");
+        TestAssert.True(eventDecoder!.PropertyType == typeof(TeaSharp.Hosting.IEventDecoder), "TeaHostingOptions.EventDecoder should use TeaSharp.Hosting contracts.");
         return Task.CompletedTask;
     }
 
