@@ -7,7 +7,7 @@ namespace TeaSharp.Layout;
 /// Creates deterministic two-pane splits.
 /// </summary>
 [EditorBrowsable(EditorBrowsableState.Advanced)]
-public static class Split
+internal static class Split
 {
     /// <summary>
     /// Splits the available bounds into left and right slots.

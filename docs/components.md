@@ -112,7 +112,7 @@ Examples:
 - `UiWidgets`
 - `Canvas`
 
-These can still be placed directly inside the new layout model through `ComponentLayout`, `PanelLayout`, `CenterLayout`, or `LayoutSlot`.
+These can still be placed directly inside the new layout model through `PanelLayout`, `CenterLayout`, or `LayoutSlot`.
 
 ## Legacy Composition APIs
 

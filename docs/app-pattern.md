@@ -198,7 +198,6 @@ The older composition stack remains available for now:
 - `InteractiveScreenModel`
 - `InputRouter`
 - `ScreenRegionKey`
-- layout helper DSL types such as `Stack`, `Split`, `Panel`, `Dock`, `Overlay`, `Center`, and `Slot`
 - shell helpers such as `MasterDetail`, `Dashboard`, and `Form`
 
-Those APIs are now explicitly marked advanced. They are still usable for transitional or highly customized screens, but they are no longer the recommended starting point.
+The former static layout helper DSL is now internal-only. Advanced callers that still need screen-scale routing should work directly with the remaining advanced composition types instead of the old helper mini-language.

@@ -7,7 +7,7 @@ namespace TeaSharp.Layout;
 /// Creates docked layouts for common shell compositions.
 /// </summary>
 [EditorBrowsable(EditorBrowsableState.Advanced)]
-public static class Dock
+internal static class Dock
 {
     /// <summary>
     /// Creates a dock layout around optional top, bottom, left, right, and fill content.

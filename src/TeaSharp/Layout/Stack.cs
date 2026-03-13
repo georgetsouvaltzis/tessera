@@ -9,7 +9,7 @@ namespace TeaSharp.Layout;
 /// </summary>
 [SuppressMessage("Naming", "CA1711:Identifiers should not have incorrect suffix", Justification = "Stack is the intentional public layout noun for ordered rows and columns.")]
 [EditorBrowsable(EditorBrowsableState.Advanced)]
-public static class Stack
+internal static class Stack
 {
     /// <summary>
     /// Arranges the provided slots left-to-right.

@@ -6,7 +6,7 @@ namespace TeaSharp.Layout;
 /// Creates overlay compositions using back-to-front layout items.
 /// </summary>
 [EditorBrowsable(EditorBrowsableState.Advanced)]
-public static class Overlay
+internal static class Overlay
 {
     /// <summary>
     /// Creates an overlay from the provided items.

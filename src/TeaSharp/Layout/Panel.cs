@@ -9,7 +9,7 @@ namespace TeaSharp.Layout;
 /// Creates grouped panel layouts with borders, padding, and nested content.
 /// </summary>
 [EditorBrowsable(EditorBrowsableState.Advanced)]
-public static class Panel
+internal static class Panel
 {
     /// <summary>
     /// Wraps an existing layout node in panel chrome.

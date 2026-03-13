@@ -9,7 +9,7 @@ namespace TeaSharp.Layout;
 /// Represents a layout leaf backed by a TeaSharp canvas component.
 /// </summary>
 [EditorBrowsable(EditorBrowsableState.Advanced)]
-public sealed class ComponentLayout : LayoutNode
+internal sealed class ComponentLayout : LayoutNode
 {
     [EditorBrowsable(EditorBrowsableState.Advanced)]
     public ComponentLayout(

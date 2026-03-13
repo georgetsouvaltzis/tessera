@@ -108,7 +108,6 @@ TeaSharp is shifting from:
 - `InteractiveScreenModel`
 - `ScreenComposer`
 - `InputRouter`
-- static layout helper DSLs
 
 to:
 
@@ -121,7 +120,7 @@ to:
 - `WindowLayout`, `RowLayout`, `ColumnLayout`, `PanelLayout`, `CenterLayout`, `LayoutSlot`
 - root `TeaSharp.Controls` wrappers
 
-The old tree-oriented stack remains available for now, but it is marked advanced and is no longer the recommended starting point.
+The old tree-oriented stack remains available for now, but it is marked advanced and is no longer the recommended starting point. The previous static layout helper DSL is now internal-only.
 
 ## Design Constraints
 

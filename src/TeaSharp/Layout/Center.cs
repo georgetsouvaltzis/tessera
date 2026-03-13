@@ -10,7 +10,7 @@ namespace TeaSharp.Layout;
 /// Creates centered layouts without exposing manual geometry math.
 /// </summary>
 [EditorBrowsable(EditorBrowsableState.Advanced)]
-public static class Center
+internal static class Center
 {
     /// <summary>
     /// Centers an existing layout node.

@@ -8,7 +8,7 @@ namespace TeaSharp.Layout;
 /// Creates deterministic layout slots without exposing geometry math to app code.
 /// </summary>
 [EditorBrowsable(EditorBrowsableState.Advanced)]
-public static class Slot
+internal static class Slot
 {
     /// <summary>
     /// Creates an auto-sized slot from an existing layout node.

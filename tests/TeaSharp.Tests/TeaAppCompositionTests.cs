@@ -45,8 +45,8 @@ internal static class TeaAppCompositionTests
             "TeaAppComposition_FocusRequests_AreOneShotAcrossLaterBuilds",
             FocusRequests_AreOneShotAcrossLaterBuilds);
         yield return new TestCase(
-            "TeaAppComposition_LegacyLayoutHelpers_AreMarkedAdvanced",
-            LegacyLayoutHelpers_AreMarkedAdvanced);
+            "TeaAppComposition_LegacyLayoutHelpers_AreInternalized",
+            LegacyLayoutHelpers_AreInternalized);
         yield return new TestCase(
             "TeaAppComposition_AdvancedLayoutOverloads_AreMarkedAdvanced",
             AdvancedLayoutOverloads_AreMarkedAdvanced);
@@ -56,6 +56,9 @@ internal static class TeaAppCompositionTests
         yield return new TestCase(
             "TeaAppComposition_LowLevelTreeLayouts_AreMarkedAdvanced",
             LowLevelTreeLayouts_AreMarkedAdvanced);
+        yield return new TestCase(
+            "TeaAppComposition_ComponentLayout_IsInternalized",
+            ComponentLayout_IsInternalized);
         yield return new TestCase(
             "TeaAppComposition_ScreenAssemblyLayouts_RemainDiscoverable",
             ScreenAssemblyLayouts_RemainDiscoverable);
@@ -219,29 +222,28 @@ internal static class TeaAppCompositionTests
         return Task.CompletedTask;
     }
 
-    private static Task LegacyLayoutHelpers_AreMarkedAdvanced()
+    private static Task LegacyLayoutHelpers_AreInternalized()
     {
-        Type[] helperTypes =
+        string[] helperTypeNames =
         [
-            typeof(Stack),
-            typeof(Split),
-            typeof(Panel),
-            typeof(Dock),
-            typeof(Overlay),
-            typeof(Center),
-            typeof(Slot),
+            "TeaSharp.Layout.Stack",
+            "TeaSharp.Layout.Split",
+            "TeaSharp.Layout.Panel",
+            "TeaSharp.Layout.Dock",
+            "TeaSharp.Layout.Overlay",
+            "TeaSharp.Layout.Center",
+            "TeaSharp.Layout.Slot",
         ];
 
-        foreach (var helperType in helperTypes)
-        {
-            var attribute = (EditorBrowsableAttribute?)Attribute.GetCustomAttribute(
-                helperType,
-                typeof(EditorBrowsableAttribute));
+        var assembly = typeof(LayoutSlot).Assembly;
 
-            TestAssert.True(attribute is not null, $"{helperType.Name} should be explicitly marked as advanced.");
+        foreach (var helperTypeName in helperTypeNames)
+        {
+            var helperType = assembly.GetType(helperTypeName, throwOnError: false);
+            TestAssert.True(helperType is not null, $"{helperTypeName} should still exist as an internal legacy bridge.");
             TestAssert.True(
-                attribute!.State == EditorBrowsableState.Advanced,
-                $"{helperType.Name} should be hidden from the default composition path.");
+                helperType!.IsNotPublic,
+                $"{helperTypeName} should no longer be public on the default composition path.");
         }
 
         return Task.CompletedTask;
@@ -255,7 +257,6 @@ internal static class TeaAppCompositionTests
                 (typeof(LayoutSlot), [typeof(ICanvasComponent), typeof(LayoutLength), typeof(Thickness), typeof(ScreenRegionKey), typeof(int?), typeof(int?), typeof(bool?), typeof(bool), typeof(bool), typeof(int), typeof(Action)]),
                 (typeof(CenterLayout), [typeof(ICanvasComponent), typeof(int?), typeof(int?), typeof(Thickness), typeof(ScreenRegionKey), typeof(bool?), typeof(bool), typeof(bool), typeof(int), typeof(Action)]),
                 (typeof(PanelLayout), [typeof(ICanvasComponent), typeof(string), typeof(BorderStyle), typeof(Thickness), typeof(Thickness), typeof(ScreenRegionKey), typeof(int?), typeof(int?), typeof(bool?), typeof(bool), typeof(bool), typeof(int), typeof(Action)]),
-                (typeof(ComponentLayout), [typeof(ICanvasComponent), typeof(ScreenRegionKey), typeof(int?), typeof(int?), typeof(bool?), typeof(bool), typeof(bool), typeof(int), typeof(Action)]),
             };
 
         foreach (var (type, parameters) in advancedCtors)
@@ -327,7 +328,6 @@ internal static class TeaAppCompositionTests
             typeof(SplitLayout),
             typeof(DockLayout),
             typeof(OverlayLayout),
-            typeof(ComponentLayout),
         ];
 
         foreach (var type in layoutTypes)
@@ -342,6 +342,14 @@ internal static class TeaAppCompositionTests
                 $"{type.Name} should be hidden from the default composition path.");
         }
 
+        return Task.CompletedTask;
+    }
+
+    private static Task ComponentLayout_IsInternalized()
+    {
+        var type = typeof(LayoutSlot).Assembly.GetType("TeaSharp.Layout.ComponentLayout", throwOnError: false);
+        TestAssert.True(type is not null, "ComponentLayout should continue to exist as an internal bridge leaf.");
+        TestAssert.True(type!.IsNotPublic, "ComponentLayout should no longer be public.");
         return Task.CompletedTask;
     }
 

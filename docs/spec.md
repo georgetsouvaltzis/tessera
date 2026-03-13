@@ -90,7 +90,6 @@ Advanced tree primitives still exist:
 - `SplitLayout`
 - `DockLayout`
 - `OverlayLayout`
-- `ComponentLayout`
 
 The default authoring model should read like explicit screen assembly, not nested layout-tree construction.
 
