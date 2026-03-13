@@ -4,6 +4,16 @@
 
 This document tracks the public API tiers so the pre-release redesign stays deliberate.
 
+## Freeze Status
+
+The current working freeze line is:
+
+- Tier 1 is the supported default consumer path
+- Tier 2 is the supported advanced escape-hatch path
+- anything outside those tiers is still a candidate for internalization or deletion before first public release
+
+Examples, README guidance, and starter docs should teach Tier 1 first. Tier 2 may remain public, but it should not be the default onboarding story.
+
 ## Tier 1: Default Consumer Path
 
 These are the types new applications should discover first.
@@ -132,6 +142,6 @@ The old tree-oriented stack now mostly compiles behind the scenes as an internal
 ## Follow-up Targets
 
 1. keep moving control authoring toward a single obvious configuration style
-2. continue shrinking region-key-based advanced interop
-3. introduce the next app-facing composition layer without exposing engine vocabulary
-4. keep custom widget extensibility stable while internal runtime details continue to shrink
+2. review Tier 2 periodically and internalize anything that is public only by inertia
+3. keep custom widget extensibility stable while internal runtime details continue to shrink
+4. preserve discoverability tests so legacy namespaces do not drift back onto the default path

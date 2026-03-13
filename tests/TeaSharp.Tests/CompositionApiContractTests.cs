@@ -11,11 +11,22 @@ using TeaSharp.Components.UiKit;
 using System.ComponentModel;
 using System.Reflection;
 using TeaSharp.Core.Abstractions;
+using TeaSharp.Layout;
 
 namespace TeaSharp.Tests;
 
 internal static class CompositionApiContractTests
 {
+    private static readonly Type[] RootLayoutTypes =
+    [
+        typeof(WindowLayout),
+        typeof(RowLayout),
+        typeof(ColumnLayout),
+        typeof(PanelLayout),
+        typeof(CenterLayout),
+        typeof(LayoutSlot),
+    ];
+
     private static readonly string[] InternalizedCompositionTypes =
     [
         "TeaSharp.Components.Composition.ScreenComposer",
@@ -56,7 +67,22 @@ internal static class CompositionApiContractTests
 
     public static IEnumerable<TestCase> Cases()
     {
+        yield return new TestCase("CompositionApi_RootLayoutTypes_RemainDiscoverable", RootLayoutTypes_RemainDiscoverable);
         yield return new TestCase("CompositionApi_InternalizedCompositionTypes_AreNotPublic", InternalizedCompositionTypes_AreNotPublic);
+    }
+
+    private static Task RootLayoutTypes_RemainDiscoverable()
+    {
+        foreach (var type in RootLayoutTypes)
+        {
+            var attribute = (EditorBrowsableAttribute?)Attribute.GetCustomAttribute(
+                type,
+                typeof(EditorBrowsableAttribute));
+
+            TestAssert.True(attribute is null, $"{type.Name} should remain on the default discoverable layout path.");
+        }
+
+        return Task.CompletedTask;
     }
 
     private static Task InternalizedCompositionTypes_AreNotPublic()
