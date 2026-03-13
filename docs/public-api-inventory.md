@@ -97,7 +97,7 @@ These areas still expose more mechanism than the long-term public design should:
 - low-level widget models leaking through component configuration
 - runtime seams that most apps never need
 - duplicate terminology between root app types and older core/runtime types
-- older category-based component namespaces that still coexist with the new control names
+- the remaining low-level widget namespaces that still expose an alternate engine-shaped control story
 
 ## Current Direction
 

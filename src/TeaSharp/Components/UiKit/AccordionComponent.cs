@@ -11,7 +11,7 @@ using TeaSharp.Widgets;
 namespace TeaSharp.Components.UiKit;
 
 [EditorBrowsable(EditorBrowsableState.Advanced)]
-public sealed class AccordionComponent : IStatefulComponent
+internal sealed class AccordionComponent : IStatefulComponent
 {
     private readonly List<AccordionSection> _sections = [];
 

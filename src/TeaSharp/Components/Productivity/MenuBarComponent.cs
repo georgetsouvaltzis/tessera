@@ -15,7 +15,7 @@ namespace TeaSharp.Components.Productivity;
 /// Renders and routes a single-row menu surface with keyboard shortcuts and mouse activation.
 /// </summary>
 [EditorBrowsable(EditorBrowsableState.Advanced)]
-public sealed class MenuBarComponent : IStatefulComponent, IMouseStatefulComponent, IFocusableComponent
+internal sealed class MenuBarComponent : IStatefulComponent, IMouseStatefulComponent, IFocusableComponent
 {
     private readonly List<MenuBarItem> _items = [];
     private WidgetInteractionProfile _interactionProfile = WidgetInteractionProfile.Default.Clone();

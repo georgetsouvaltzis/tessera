@@ -13,7 +13,7 @@ using TeaSharp.Widgets;
 namespace TeaSharp.Components.Prebuilt;
 
 [EditorBrowsable(EditorBrowsableState.Advanced)]
-public sealed class ProgressBarComponent : IStatefulComponent, IFocusableComponent
+internal sealed class ProgressBarComponent : IStatefulComponent, IFocusableComponent
 {
     public ProgressBarComponent()
     {

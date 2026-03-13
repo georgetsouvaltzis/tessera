@@ -11,7 +11,7 @@ using TeaSharp.Widgets;
 namespace TeaSharp.Components.Advanced;
 
 [EditorBrowsable(EditorBrowsableState.Advanced)]
-public sealed record CommandPaletteItem(
+internal sealed record CommandPaletteItem(
     string Id,
     string Title,
     string Description = "",

@@ -7,7 +7,7 @@ using TeaSharp.Components.Primitives.Internal;
 using TeaSharp.Components.Styling;
 namespace TeaSharp.Components.Prebuilt;
 
-public sealed partial class DropdownComponent
+internal sealed partial class DropdownComponent
 {
     private Rect ResolveRenderContentRect(Canvas canvas, Rect clipped)
     {

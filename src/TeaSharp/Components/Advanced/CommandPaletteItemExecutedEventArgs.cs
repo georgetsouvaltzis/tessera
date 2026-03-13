@@ -6,7 +6,7 @@ namespace TeaSharp.Components.Advanced;
 /// Describes a command-palette item execution.
 /// </summary>
 [EditorBrowsable(EditorBrowsableState.Advanced)]
-public sealed class CommandPaletteItemExecutedEventArgs : EventArgs
+internal sealed class CommandPaletteItemExecutedEventArgs : EventArgs
 {
     /// <summary>
     /// Initializes a new execution payload for a command-palette item.

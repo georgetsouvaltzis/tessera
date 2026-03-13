@@ -6,7 +6,7 @@ namespace TeaSharp.Components.Productivity;
 /// Describes a menu-bar item activation.
 /// </summary>
 [EditorBrowsable(EditorBrowsableState.Advanced)]
-public sealed class MenuBarItemActivatedEventArgs : EventArgs
+internal sealed class MenuBarItemActivatedEventArgs : EventArgs
 {
     /// <summary>
     /// Initializes a new activation payload for a menu-bar item.

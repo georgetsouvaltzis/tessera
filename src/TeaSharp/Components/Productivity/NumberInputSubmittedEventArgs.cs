@@ -6,7 +6,7 @@ namespace TeaSharp.Components.Productivity;
 /// Describes a submitted numeric value.
 /// </summary>
 [EditorBrowsable(EditorBrowsableState.Advanced)]
-public sealed class NumberInputSubmittedEventArgs : EventArgs
+internal sealed class NumberInputSubmittedEventArgs : EventArgs
 {
     /// <summary>
     /// Initializes a new event payload for a submitted numeric value.

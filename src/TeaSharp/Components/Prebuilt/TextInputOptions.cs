@@ -13,7 +13,7 @@ namespace TeaSharp.Components.Prebuilt;
 /// Defines the one-shot configuration used to construct a <see cref="TextInputComponent"/>.
 /// </summary>
 [EditorBrowsable(EditorBrowsableState.Advanced)]
-public sealed record TextInputOptions(
+internal sealed record TextInputOptions(
     string Title = "Text Input",
     string Placeholder = "",
     string InitialValue = "",

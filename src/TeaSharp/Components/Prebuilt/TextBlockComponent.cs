@@ -16,7 +16,7 @@ using TeaSharp.Widgets;
 namespace TeaSharp.Components.Prebuilt;
 
 [EditorBrowsable(EditorBrowsableState.Advanced)]
-public sealed class TextBlockComponent : ICanvasComponent
+internal sealed class TextBlockComponent : ICanvasComponent
 {
     public TextBlockComponent()
     {

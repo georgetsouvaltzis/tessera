@@ -6,7 +6,7 @@ namespace TeaSharp.Components.Productivity;
 /// Describes a time-value transition.
 /// </summary>
 [EditorBrowsable(EditorBrowsableState.Advanced)]
-public sealed class TimeValueChangedEventArgs : EventArgs
+internal sealed class TimeValueChangedEventArgs : EventArgs
 {
     /// <summary>
     /// Initializes a new time-value change payload.

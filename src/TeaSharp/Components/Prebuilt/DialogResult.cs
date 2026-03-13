@@ -10,10 +10,9 @@ using TeaSharp.Widgets;
 
 namespace TeaSharp.Components.Prebuilt;
 
-public enum DialogResult
+internal enum DialogResult
 {
     None = 0,
     Accepted = 1,
     Dismissed = 2,
 }
-

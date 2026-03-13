@@ -12,7 +12,7 @@ using TeaSharp.Widgets;
 namespace TeaSharp.Components.Productivity;
 
 [EditorBrowsable(EditorBrowsableState.Advanced)]
-public enum TimePickerField
+internal enum TimePickerField
 {
     Hour = 0,
     Minute = 1,

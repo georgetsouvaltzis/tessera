@@ -24,7 +24,7 @@ namespace TeaSharp.Components.Productivity;
 /// <param name="CloseKey">Optional key binding used to close the menu.</param>
 /// <param name="InteractionProfile">Optional mouse interaction profile.</param>
 [EditorBrowsable(EditorBrowsableState.Advanced)]
-public sealed record ContextMenuOptions(
+internal sealed record ContextMenuOptions(
     IEnumerable<ContextMenuItem>? Items = null,
     string Title = "Context",
     bool IsFocused = false,

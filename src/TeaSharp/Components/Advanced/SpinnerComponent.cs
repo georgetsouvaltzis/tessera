@@ -12,7 +12,7 @@ using TeaSharp.Widgets;
 namespace TeaSharp.Components.Advanced;
 
 [EditorBrowsable(EditorBrowsableState.Advanced)]
-public sealed class SpinnerComponent : IStatefulComponent, IMouseStatefulComponent, IFocusableComponent
+internal sealed class SpinnerComponent : IStatefulComponent, IMouseStatefulComponent, IFocusableComponent
 {
     private List<string> _frames = ["|", "/", "-", "\\"];
     private WidgetInteractionProfile _interactionProfile = WidgetInteractionProfile.Default.Clone();

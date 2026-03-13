@@ -12,7 +12,7 @@ using TeaSharp.Widgets;
 namespace TeaSharp.Components.Prebuilt;
 
 [EditorBrowsable(EditorBrowsableState.Advanced)]
-public sealed class DialogComponent : IStatefulComponent, IFocusableComponent
+internal sealed class DialogComponent : IStatefulComponent, IFocusableComponent
 {
     private long _resultVersion;
     private long _consumedResultVersion;

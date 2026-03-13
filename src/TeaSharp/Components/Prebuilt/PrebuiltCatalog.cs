@@ -10,7 +10,7 @@ namespace TeaSharp.Components.Prebuilt;
 /// <summary>
 /// Provides discoverable factory methods for the stable prebuilt widget surface.
 /// </summary>
-public static class PrebuiltCatalog
+internal static class PrebuiltCatalog
 {
     public static TextBlockComponent Label(TextBlockOptions? options = null) => options is null ? new TextBlockComponent() : new TextBlockComponent(options);
 

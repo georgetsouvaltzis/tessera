@@ -13,7 +13,7 @@ namespace TeaSharp.Components.Prebuilt;
 /// Defines the one-shot configuration used to construct a <see cref="ProgressBarComponent"/>.
 /// </summary>
 [EditorBrowsable(EditorBrowsableState.Advanced)]
-public sealed record ProgressBarOptions(
+internal sealed record ProgressBarOptions(
     string Title = "Progress",
     double InitialValue = 0.0,
     bool IsFocused = false,

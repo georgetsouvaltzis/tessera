@@ -1,13 +1,7 @@
 using System.ComponentModel;
-using TeaSharp.Components.Advanced;
 using TeaSharp.Components.Prebuilt;
 using TeaSharp.Components.Primitives;
-using TeaSharp.Components.Productivity;
-using TeaSharp.Components.UiKit;
 using TeaSharp.Controls;
-using RootAccordionSection = TeaSharp.Controls.AccordionSection;
-using RootCommandPaletteItem = TeaSharp.Controls.CommandPaletteItem;
-using RootContextMenuItem = TeaSharp.Controls.ContextMenuItem;
 
 namespace TeaSharp.Tests;
 
@@ -20,16 +14,16 @@ internal static class TeaControlCatalogTests
         typeof(BadgeTone),
         typeof(Button),
         typeof(Accordion),
-        typeof(RootAccordionSection),
+        typeof(TeaSharp.Controls.AccordionSection),
         typeof(TextInput),
         typeof(TextArea),
         typeof(Choice),
         typeof(ComboBox),
         typeof(CommandPalette),
-        typeof(RootCommandPaletteItem),
+        typeof(TeaSharp.Controls.CommandPaletteItem),
         typeof(Dialog),
         typeof(ContextMenu),
-        typeof(RootContextMenuItem),
+        typeof(TeaSharp.Controls.ContextMenuItem),
         typeof(LogView),
         typeof(Modal),
         typeof(NotificationLevel),
@@ -55,73 +49,82 @@ internal static class TeaControlCatalogTests
         typeof(TimeField),
     ];
 
-    private static readonly Type[] LegacyPromotedTypes =
+    private static readonly string[] InternalizedLegacyPrebuiltTypes =
     [
-        typeof(TextBlockComponent),
-        typeof(TextBlockOptions),
-        typeof(ButtonComponent),
-        typeof(ButtonOptions),
-        typeof(TextInputComponent),
-        typeof(TextInputOptions),
-        typeof(global::TeaSharp.Components.Prebuilt.TextInputSubmittedEventArgs),
-        typeof(global::TeaSharp.Components.Prebuilt.TextInputCancelledEventArgs),
-        typeof(TextAreaComponent),
-        typeof(TextAreaOptions),
-        typeof(DropdownComponent),
-        typeof(DropdownOptions),
-        typeof(ComboboxComponent),
-        typeof(ComboboxOptions),
-        typeof(DialogComponent),
-        typeof(DialogOptions),
-        typeof(ProgressBarComponent),
-        typeof(ProgressBarOptions),
-        typeof(StatusBarComponent),
-        typeof(StatusBarOptions),
-        typeof(LogViewerComponent),
-        typeof(LogViewerOptions),
-        typeof(TabsComponent),
-        typeof(TabsOptions),
-        typeof(TabSelectionChangedEventArgs),
-        typeof(ListComponent<string>),
-        typeof(ListOptions<string>),
-        typeof(global::TeaSharp.Components.Prebuilt.ListSelectionChangedEventArgs<string>),
-        typeof(TableComponent),
-        typeof(TableOptions),
-        typeof(MenuBarComponent),
-        typeof(MenuBarOptions),
-        typeof(MenuBarItem),
-        typeof(MenuBarItemActivatedEventArgs),
-        typeof(ToggleSwitchComponent),
-        typeof(SliderComponent),
-        typeof(SpinnerComponent),
-        typeof(TreeViewComponent),
-        typeof(NotificationCenterComponent),
-        typeof(BadgeComponent),
-        typeof(CommandPaletteComponent),
-        typeof(global::TeaSharp.Components.Advanced.CommandPaletteItem),
-        typeof(global::TeaSharp.Components.Advanced.CommandPaletteItemExecutedEventArgs),
-        typeof(NumberInputComponent),
-        typeof(NumberInputOptions),
-        typeof(global::TeaSharp.Components.Productivity.NumberInputSubmittedEventArgs),
-        typeof(DatePickerComponent),
-        typeof(DatePickerOptions),
-        typeof(global::TeaSharp.Components.Productivity.DateChangedEventArgs),
-        typeof(TimePickerComponent),
-        typeof(TimePickerOptions),
-        typeof(global::TeaSharp.Components.Productivity.TimeValueChangedEventArgs),
-        typeof(global::TeaSharp.Components.Productivity.TimePickerField),
-        typeof(MarkdownViewerComponent),
-        typeof(MarkdownViewerOptions),
-        typeof(CheckboxListComponent),
-        typeof(RadioGroupComponent),
-        typeof(ContextMenuComponent),
-        typeof(ContextMenuOptions),
-        typeof(global::TeaSharp.Components.Productivity.ContextMenuItem),
-        typeof(global::TeaSharp.Components.Productivity.ContextMenuItemExecutedEventArgs),
-        typeof(ModalComponent),
-        typeof(ModalOptions),
-        typeof(AccordionComponent),
-        typeof(global::TeaSharp.Components.UiKit.AccordionSection),
+        "TeaSharp.Components.Prebuilt.TextBlockComponent",
+        "TeaSharp.Components.Prebuilt.TextBlockOptions",
+        "TeaSharp.Components.Prebuilt.ButtonComponent",
+        "TeaSharp.Components.Prebuilt.ButtonOptions",
+        "TeaSharp.Components.Prebuilt.TextInputComponent",
+        "TeaSharp.Components.Prebuilt.TextInputOptions",
+        "TeaSharp.Components.Prebuilt.TextInputSubmittedEventArgs",
+        "TeaSharp.Components.Prebuilt.TextInputCancelledEventArgs",
+        "TeaSharp.Components.Prebuilt.TextAreaComponent",
+        "TeaSharp.Components.Prebuilt.TextAreaOptions",
+        "TeaSharp.Components.Prebuilt.DropdownComponent",
+        "TeaSharp.Components.Prebuilt.DropdownOptions",
+        "TeaSharp.Components.Prebuilt.ComboboxComponent",
+        "TeaSharp.Components.Prebuilt.ComboboxOptions",
+        "TeaSharp.Components.Prebuilt.DialogComponent",
+        "TeaSharp.Components.Prebuilt.DialogOptions",
+        "TeaSharp.Components.Prebuilt.DialogResult",
+        "TeaSharp.Components.Prebuilt.ProgressBarComponent",
+        "TeaSharp.Components.Prebuilt.ProgressBarOptions",
+        "TeaSharp.Components.Prebuilt.StatusBarComponent",
+        "TeaSharp.Components.Prebuilt.StatusBarOptions",
+        "TeaSharp.Components.Prebuilt.LogViewerComponent",
+        "TeaSharp.Components.Prebuilt.LogViewerOptions",
+        "TeaSharp.Components.Prebuilt.ListComponent`1",
+        "TeaSharp.Components.Prebuilt.ListOptions`1",
+        "TeaSharp.Components.Prebuilt.ListSelectionChangedEventArgs`1",
+        "TeaSharp.Components.Prebuilt.TableComponent",
+        "TeaSharp.Components.Prebuilt.TableOptions",
+        "TeaSharp.Components.Prebuilt.OptionSelectionChangedEventArgs",
+    ];
+
+    private static readonly string[] InternalizedLegacyPromotedTypes =
+    [
+        "TeaSharp.Components.Advanced.BadgeComponent",
+        "TeaSharp.Components.Advanced.CommandPaletteComponent",
+        "TeaSharp.Components.Advanced.CommandPaletteItem",
+        "TeaSharp.Components.Advanced.CommandPaletteItemExecutedEventArgs",
+        "TeaSharp.Components.Advanced.NotificationCenterComponent",
+        "TeaSharp.Components.Advanced.NotificationEntry",
+        "TeaSharp.Components.Advanced.NotificationSeverity",
+        "TeaSharp.Components.Advanced.SliderComponent",
+        "TeaSharp.Components.Advanced.SpinnerComponent",
+        "TeaSharp.Components.Advanced.ToggleSwitchComponent",
+        "TeaSharp.Components.Advanced.TreeItemNode",
+        "TeaSharp.Components.Advanced.TreeViewComponent",
+        "TeaSharp.Components.Productivity.ContextMenuComponent",
+        "TeaSharp.Components.Productivity.ContextMenuItem",
+        "TeaSharp.Components.Productivity.ContextMenuItemExecutedEventArgs",
+        "TeaSharp.Components.Productivity.ContextMenuOptions",
+        "TeaSharp.Components.Productivity.DateChangedEventArgs",
+        "TeaSharp.Components.Productivity.DatePickerComponent",
+        "TeaSharp.Components.Productivity.DatePickerOptions",
+        "TeaSharp.Components.Productivity.MarkdownViewerComponent",
+        "TeaSharp.Components.Productivity.MarkdownViewerOptions",
+        "TeaSharp.Components.Productivity.MenuBarComponent",
+        "TeaSharp.Components.Productivity.MenuBarItem",
+        "TeaSharp.Components.Productivity.MenuBarItemActivatedEventArgs",
+        "TeaSharp.Components.Productivity.MenuBarOptions",
+        "TeaSharp.Components.Productivity.NumberInputComponent",
+        "TeaSharp.Components.Productivity.NumberInputOptions",
+        "TeaSharp.Components.Productivity.NumberInputSubmittedEventArgs",
+        "TeaSharp.Components.Productivity.TimePickerComponent",
+        "TeaSharp.Components.Productivity.TimePickerField",
+        "TeaSharp.Components.Productivity.TimePickerOptions",
+        "TeaSharp.Components.Productivity.TimeValueChangedEventArgs",
+        "TeaSharp.Components.UiKit.AccordionComponent",
+        "TeaSharp.Components.UiKit.AccordionSection",
+        "TeaSharp.Components.UiKit.CheckboxListComponent",
+        "TeaSharp.Components.UiKit.ModalComponent",
+        "TeaSharp.Components.UiKit.ModalOptions",
+        "TeaSharp.Components.UiKit.RadioGroupComponent",
+        "TeaSharp.Components.UiKit.TabSelectionChangedEventArgs",
+        "TeaSharp.Components.UiKit.TabsComponent",
+        "TeaSharp.Components.UiKit.TabsOptions",
     ];
 
     public static IEnumerable<TestCase> Cases()
@@ -133,8 +136,11 @@ internal static class TeaControlCatalogTests
             "TeaControlCatalog_RootPollingMethods_AreMarkedAdvanced",
             RootPollingMethods_AreMarkedAdvanced);
         yield return new TestCase(
-            "TeaControlCatalog_LegacyPromotedTypes_AreMarkedAdvanced",
-            LegacyPromotedTypes_AreMarkedAdvanced);
+            "TeaControlCatalog_InternalizedLegacyPrebuiltTypes_AreNotPublic",
+            InternalizedLegacyPrebuiltTypes_AreNotPublic);
+        yield return new TestCase(
+            "TeaControlCatalog_InternalizedLegacyPromotedTypes_AreNotPublic",
+            InternalizedLegacyPromotedTypes_AreNotPublic);
         yield return new TestCase(
             "TeaControlCatalog_PromotedFormControls_WorkThroughRootWrappers",
             PromotedFormControls_WorkThroughRootWrappers);
@@ -184,18 +190,29 @@ internal static class TeaControlCatalogTests
         return Task.CompletedTask;
     }
 
-    private static Task LegacyPromotedTypes_AreMarkedAdvanced()
+    private static Task InternalizedLegacyPrebuiltTypes_AreNotPublic()
     {
-        foreach (var type in LegacyPromotedTypes)
-        {
-            var attribute = (EditorBrowsableAttribute?)Attribute.GetCustomAttribute(
-                type,
-                typeof(EditorBrowsableAttribute));
+        var assembly = typeof(Label).Assembly;
 
-            TestAssert.True(attribute is not null, $"{type.Name} should be explicitly marked as advanced.");
-            TestAssert.True(
-                attribute!.State == EditorBrowsableState.Advanced,
-                $"{type.Name} should be hidden from default discovery now that a root-level control exists.");
+        foreach (var typeName in InternalizedLegacyPrebuiltTypes)
+        {
+            var type = assembly.GetType(typeName, throwOnError: false);
+            TestAssert.True(type is not null, $"{typeName} should continue to exist as an internal bridge.");
+            TestAssert.True(type!.IsNotPublic, $"{typeName} should no longer be public once a root wrapper exists.");
+        }
+
+        return Task.CompletedTask;
+    }
+
+    private static Task InternalizedLegacyPromotedTypes_AreNotPublic()
+    {
+        var assembly = typeof(Label).Assembly;
+
+        foreach (var typeName in InternalizedLegacyPromotedTypes)
+        {
+            var type = assembly.GetType(typeName, throwOnError: false);
+            TestAssert.True(type is not null, $"{typeName} should continue to exist as an internal bridge.");
+            TestAssert.True(type!.IsNotPublic, $"{typeName} should no longer be public once a root wrapper exists.");
         }
 
         return Task.CompletedTask;
@@ -286,8 +303,8 @@ internal static class TeaControlCatalogTests
         };
         accordion.SetSections(
         [
-            new RootAccordionSection("Overview", ["alpha"]),
-            new RootAccordionSection("Deploy", ["ship it"]),
+            new TeaSharp.Controls.AccordionSection("Overview", ["alpha"]),
+            new TeaSharp.Controls.AccordionSection("Deploy", ["ship it"]),
         ]);
         accordion.MoveNext();
         accordion.ToggleSelected();
@@ -312,8 +329,8 @@ internal static class TeaControlCatalogTests
         menu.ItemExecuted += (_, args) => contextItemId = args.ItemId;
         menu.SetItems(
         [
-            new RootContextMenuItem("copy", "Copy"),
-            new RootContextMenuItem("paste", "Paste"),
+            new TeaSharp.Controls.ContextMenuItem("copy", "Copy"),
+            new TeaSharp.Controls.ContextMenuItem("paste", "Paste"),
         ]);
         menu.OpenAt(2, 2);
         menu.Handle(new KeyPressed(Key.Enter));
@@ -326,8 +343,8 @@ internal static class TeaControlCatalogTests
         palette.ItemExecuted += (_, args) => commandItemId = args.ItemId;
         palette.SetItems(
         [
-            new RootCommandPaletteItem("deploy", "Deploy", "publish release"),
-            new RootCommandPaletteItem("rollback", "Rollback", "restore previous"),
+            new TeaSharp.Controls.CommandPaletteItem("deploy", "Deploy", "publish release"),
+            new TeaSharp.Controls.CommandPaletteItem("rollback", "Rollback", "restore previous"),
         ]);
         palette.Open();
         palette.QueryText = "roll";

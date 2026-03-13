@@ -6,7 +6,7 @@ namespace TeaSharp.Components.Productivity;
 /// Describes a context-menu item execution.
 /// </summary>
 [EditorBrowsable(EditorBrowsableState.Advanced)]
-public sealed class ContextMenuItemExecutedEventArgs : EventArgs
+internal sealed class ContextMenuItemExecutedEventArgs : EventArgs
 {
     /// <summary>
     /// Initializes a new execution payload for a context-menu item.

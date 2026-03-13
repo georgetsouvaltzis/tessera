@@ -9,7 +9,7 @@ using System.ComponentModel;
 namespace TeaSharp.Components.Prebuilt;
 
 [EditorBrowsable(EditorBrowsableState.Advanced)]
-public sealed record TextBlockOptions(
+internal sealed record TextBlockOptions(
     string Text = "",
     string? Title = null,
     BorderStyle Border = BorderStyle.SingleLine,

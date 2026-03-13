@@ -11,7 +11,7 @@ using TeaSharp.Widgets;
 namespace TeaSharp.Components.UiKit;
 
 [EditorBrowsable(EditorBrowsableState.Advanced)]
-public sealed class RadioGroupComponent : IStatefulComponent
+internal sealed class RadioGroupComponent : IStatefulComponent
 {
     private readonly List<string> _items = [];
 

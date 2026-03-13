@@ -7,7 +7,7 @@ using TeaSharp.Components.Primitives.Internal;
 using TeaSharp.Components.Styling;
 namespace TeaSharp.Components.Prebuilt;
 
-public sealed partial class ComboboxComponent
+internal sealed partial class ComboboxComponent
 {
     private Rect ResolveRenderContentRect(Canvas canvas, Rect clipped)
     {

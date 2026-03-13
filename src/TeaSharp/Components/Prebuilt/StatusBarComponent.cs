@@ -12,7 +12,7 @@ using TeaSharp.Widgets;
 namespace TeaSharp.Components.Prebuilt;
 
 [EditorBrowsable(EditorBrowsableState.Advanced)]
-public sealed class StatusBarComponent : ICanvasComponent
+internal sealed class StatusBarComponent : ICanvasComponent
 {
     public StatusBarComponent()
     {

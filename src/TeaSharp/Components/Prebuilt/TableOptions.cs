@@ -11,7 +11,7 @@ namespace TeaSharp.Components.Prebuilt;
 /// Defines the one-shot configuration used to construct a <see cref="TableComponent"/>.
 /// </summary>
 [EditorBrowsable(EditorBrowsableState.Advanced)]
-public sealed record TableOptions(
+internal sealed record TableOptions(
     IReadOnlyList<string> Headers,
     string Title = "Table",
     bool IsFocused = false,

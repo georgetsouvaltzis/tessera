@@ -6,7 +6,7 @@ namespace TeaSharp.Components.Productivity;
 /// Describes a date selection transition.
 /// </summary>
 [EditorBrowsable(EditorBrowsableState.Advanced)]
-public sealed class DateChangedEventArgs : EventArgs
+internal sealed class DateChangedEventArgs : EventArgs
 {
     /// <summary>
     /// Initializes a new date-change payload.

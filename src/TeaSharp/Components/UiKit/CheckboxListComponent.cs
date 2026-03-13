@@ -11,7 +11,7 @@ using TeaSharp.Widgets;
 namespace TeaSharp.Components.UiKit;
 
 [EditorBrowsable(EditorBrowsableState.Advanced)]
-public sealed class CheckboxListComponent : IStatefulComponent
+internal sealed class CheckboxListComponent : IStatefulComponent
 {
     private readonly List<(string Label, bool Checked)> _items = [];
 

@@ -13,7 +13,7 @@ namespace TeaSharp.Components.Prebuilt;
 /// Defines the one-shot configuration used to construct a <see cref="ComboboxComponent"/>.
 /// </summary>
 [EditorBrowsable(EditorBrowsableState.Advanced)]
-public sealed record ComboboxOptions(
+internal sealed record ComboboxOptions(
     IReadOnlyList<string>? Items = null,
     string Title = "Combobox",
     string Placeholder = "",

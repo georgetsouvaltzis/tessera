@@ -12,7 +12,7 @@ using TeaSharp.Widgets;
 namespace TeaSharp.Components.Prebuilt;
 
 [EditorBrowsable(EditorBrowsableState.Advanced)]
-public sealed class TableComponent : IStatefulComponent, IMouseStatefulComponent, IFocusableComponent
+internal sealed class TableComponent : IStatefulComponent, IMouseStatefulComponent, IFocusableComponent
 {
     private readonly SortableTableComponent _inner;
 

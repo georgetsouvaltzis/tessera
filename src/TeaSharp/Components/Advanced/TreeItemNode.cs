@@ -9,7 +9,7 @@ using TeaSharp.Widgets;
 
 namespace TeaSharp.Components.Advanced;
 
-public sealed class TreeItemNode
+internal sealed class TreeItemNode
 {
     private readonly List<TreeItemNode> _children = [];
 
@@ -38,4 +38,3 @@ public sealed class TreeItemNode
         _children.Add(child);
     }
 }
-

@@ -12,7 +12,7 @@ using TeaSharp.Widgets;
 namespace TeaSharp.Components.Productivity;
 
 [EditorBrowsable(EditorBrowsableState.Advanced)]
-public sealed record ContextMenuItem(
+internal sealed record ContextMenuItem(
     string Id,
     string Title,
     IReadOnlyCollection<WidgetVisualState>? States = null);

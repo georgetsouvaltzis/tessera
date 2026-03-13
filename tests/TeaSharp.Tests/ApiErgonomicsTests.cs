@@ -8,6 +8,7 @@ using TeaSharp.Components.Primitives;
 using TeaSharp.Components.Productivity;
 using TeaSharp.Components.Styling;
 using TeaSharp.Components.UiKit;
+using TeaSharp.Controls;
 
 namespace TeaSharp.Tests;
 
@@ -32,10 +33,10 @@ internal static class ApiErgonomicsTests
         yield return new TestCase("ApiErgonomics_InteractionProfiles_AreClonedOnAssignment", InteractionProfiles_AreClonedOnAssignment);
         yield return new TestCase("ApiErgonomics_ActionEvents_EnableEventDrivenIntegration", ActionEvents_EnableEventDrivenIntegration);
         yield return new TestCase("ApiErgonomics_ConsumeMethods_ExposeOneShotInteractionResults", ConsumeMethods_ExposeOneShotInteractionResults);
-        yield return new TestCase("ApiErgonomics_PrebuiltCatalog_CreatesConfiguredTextInput", PrebuiltCatalog_CreatesConfiguredTextInput);
-        yield return new TestCase("ApiErgonomics_ProductivityCatalog_CreatesConfiguredMenuBar", ProductivityCatalog_CreatesConfiguredMenuBar);
+        yield return new TestCase("ApiErgonomics_RootTextInput_ConfiguresWithoutCatalog", RootTextInput_ConfiguresWithoutCatalog);
+        yield return new TestCase("ApiErgonomics_RootMenuBar_ConfiguresWithoutCatalog", RootMenuBar_ConfiguresWithoutCatalog);
         yield return new TestCase("ApiErgonomics_DialogOptions_ConfigureFrameWithoutLegacyBorderStyleName", DialogOptions_ConfigureFrameWithoutLegacyBorderStyleName);
-        yield return new TestCase("ApiErgonomics_UiKitCatalog_CreatesConfiguredModal", UiKitCatalog_CreatesConfiguredModal);
+        yield return new TestCase("ApiErgonomics_RootModal_ConfiguresWithoutCatalog", RootModal_ConfiguresWithoutCatalog);
         yield return new TestCase("ApiErgonomics_ModalOptions_ConfigureFrameWithoutLegacyBorderStyleName", ModalOptions_ConfigureFrameWithoutLegacyBorderStyleName);
     }
 
@@ -364,29 +365,33 @@ internal static class ApiErgonomicsTests
         return Task.CompletedTask;
     }
 
-    private static Task PrebuiltCatalog_CreatesConfiguredTextInput()
+    private static Task RootTextInput_ConfiguresWithoutCatalog()
     {
-        var input = TeaSharp.Components.Prebuilt.PrebuiltCatalog.TextInput(new TextInputOptions(
-            Title: "Search",
-            InitialValue: "tea"));
+        var input = new TextInput
+        {
+            Title = "Search",
+        };
+        input.SetValue("tea");
 
-        TestAssert.Equal("Search", input.Title, "Prebuilt catalog should create configured text input instances.");
-        TestAssert.Equal("tea", input.Value, "Prebuilt catalog should pass options through to the component.");
+        TestAssert.Equal("Search", input.Title, "Root text input should configure directly without a category catalog.");
+        TestAssert.Equal("tea", input.Value, "Root text input should expose state without catalog indirection.");
         return Task.CompletedTask;
     }
 
-    private static Task ProductivityCatalog_CreatesConfiguredMenuBar()
+    private static Task RootMenuBar_ConfiguresWithoutCatalog()
     {
-        var menu = TeaSharp.Components.Productivity.ProductivityCatalog.MenuBar(new MenuBarOptions(
-            Items:
-            [
-                new MenuBarItem("file", "File", 'f'),
-                new MenuBarItem("help", "Help", 'h'),
-            ],
-            IsFocused: true));
+        var menu = new MenuBar
+        {
+            IsFocused = true,
+        };
+        menu.SetItems(
+        [
+            new MenuItem("file", "File", 'f'),
+            new MenuItem("help", "Help", 'h'),
+        ]);
 
-        TestAssert.True(menu.IsFocused, "Productivity catalog should create configured menu surfaces.");
-        TestAssert.Equal(2, menu.Items.Count, "Productivity catalog should pass items through to the component.");
+        TestAssert.True(menu.IsFocused, "Root menu bar should configure directly without a category catalog.");
+        TestAssert.Equal(2, menu.Items.Count, "Root menu bar should accept items directly.");
         return Task.CompletedTask;
     }
 
@@ -406,16 +411,18 @@ internal static class ApiErgonomicsTests
         return Task.CompletedTask;
     }
 
-    private static Task UiKitCatalog_CreatesConfiguredModal()
+    private static Task RootModal_ConfiguresWithoutCatalog()
     {
-        var modal = TeaSharp.Components.UiKit.UiKitCatalog.Modal(new ModalOptions(
-            Title: "Confirm",
-            IsVisible: true,
-            BodyLines: ["ready"]));
+        var modal = new Modal
+        {
+            Title = "Confirm",
+            IsVisible = true,
+        };
+        modal.SetBodyLines(["ready"]);
 
-        TestAssert.True(modal.IsVisible, "UI-kit catalog should create configured modal surfaces.");
-        TestAssert.Equal("Confirm", modal.Title, "UI-kit catalog should pass options through to the component.");
-        TestAssert.Equal(1, modal.BodyLines.Count, "UI-kit catalog should preserve configured modal content.");
+        TestAssert.True(modal.IsVisible, "Root modal should configure directly without a category catalog.");
+        TestAssert.Equal("Confirm", modal.Title, "Root modal should preserve configured title.");
+        TestAssert.Equal(1, modal.BodyLines.Count, "Root modal should preserve configured body content.");
         return Task.CompletedTask;
     }
 

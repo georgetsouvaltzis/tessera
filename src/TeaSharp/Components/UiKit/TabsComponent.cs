@@ -11,7 +11,7 @@ using TeaSharp.Widgets;
 namespace TeaSharp.Components.UiKit;
 
 [EditorBrowsable(EditorBrowsableState.Advanced)]
-public sealed class TabsComponent : IStatefulComponent, IMouseStatefulComponent, IFocusableComponent
+internal sealed class TabsComponent : IStatefulComponent, IMouseStatefulComponent, IFocusableComponent
 {
     private readonly List<string> _tabs = [];
     private WidgetInteractionProfile _interactionProfile = WidgetInteractionProfile.Default.Clone();

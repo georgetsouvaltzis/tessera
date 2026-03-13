@@ -9,10 +9,9 @@ using TeaSharp.Widgets;
 
 namespace TeaSharp.Components.Advanced;
 
-public sealed record NotificationEntry(
+internal sealed record NotificationEntry(
     string Id,
     string Message,
     NotificationSeverity Severity,
     DateTimeOffset CreatedAt,
     bool IsRead = false);
-

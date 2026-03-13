@@ -12,7 +12,7 @@ namespace TeaSharp.Components.Productivity;
 /// Defines the one-shot configuration used to construct a <see cref="TimePickerComponent"/>.
 /// </summary>
 [EditorBrowsable(EditorBrowsableState.Advanced)]
-public sealed record TimePickerOptions(
+internal sealed record TimePickerOptions(
     string Title = "Time Picker",
     TimeOnly? InitialValue = null,
     bool IsFocused = false,

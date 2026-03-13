@@ -13,7 +13,7 @@ namespace TeaSharp.Components.Prebuilt;
 /// Defines the one-shot configuration used to construct a <see cref="ButtonComponent"/>.
 /// </summary>
 [EditorBrowsable(EditorBrowsableState.Advanced)]
-public sealed record ButtonOptions(
+internal sealed record ButtonOptions(
     string Label = "Button",
     string? Description = null,
     bool IsFocused = false,

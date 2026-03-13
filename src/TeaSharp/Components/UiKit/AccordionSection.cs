@@ -7,4 +7,4 @@ using TeaSharp.Components.UiKit.Internal;
 namespace TeaSharp.Components.UiKit;
 
 [EditorBrowsable(EditorBrowsableState.Advanced)]
-public readonly record struct AccordionSection(string Title, IReadOnlyList<string> BodyLines, bool Expanded = false);
+internal readonly record struct AccordionSection(string Title, IReadOnlyList<string> BodyLines, bool Expanded = false);

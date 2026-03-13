@@ -12,7 +12,7 @@ namespace TeaSharp.Components.Productivity;
 /// Defines the one-shot configuration used to construct a <see cref="MarkdownViewerComponent"/>.
 /// </summary>
 [EditorBrowsable(EditorBrowsableState.Advanced)]
-public sealed record MarkdownViewerOptions(
+internal sealed record MarkdownViewerOptions(
     string Title = "Markdown",
     string InitialMarkdown = "",
     bool IsFocused = false,

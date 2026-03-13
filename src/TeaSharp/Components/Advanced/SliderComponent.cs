@@ -12,7 +12,7 @@ using TeaSharp.Widgets;
 namespace TeaSharp.Components.Advanced;
 
 [EditorBrowsable(EditorBrowsableState.Advanced)]
-public sealed class SliderComponent : IStatefulComponent, IMouseStatefulComponent, IFocusableComponent
+internal sealed class SliderComponent : IStatefulComponent, IMouseStatefulComponent, IFocusableComponent
 {
     private WidgetInteractionProfile _interactionProfile = WidgetInteractionProfile.Default.Clone();
     private bool _hovered;

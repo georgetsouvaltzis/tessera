@@ -9,7 +9,7 @@ namespace TeaSharp.Components.UiKit;
 /// <summary>
 /// Provides discoverable factory methods for the stable UI-kit component surface.
 /// </summary>
-public static class UiKitCatalog
+internal static class UiKitCatalog
 {
     public static TabsComponent Tabs(IEnumerable<string> tabs) => new(tabs);
 

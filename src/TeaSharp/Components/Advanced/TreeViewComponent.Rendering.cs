@@ -6,7 +6,7 @@ using TeaSharp.Components.Primitives.Internal;
 using TeaSharp.Components.Styling;
 namespace TeaSharp.Components.Advanced;
 
-public sealed partial class TreeViewComponent
+internal sealed partial class TreeViewComponent
 {
     private Rect ResolveRenderContentRect(Canvas canvas, Rect clipped)
     {

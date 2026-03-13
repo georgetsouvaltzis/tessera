@@ -7,7 +7,7 @@ namespace TeaSharp.Components.Prebuilt;
 /// </summary>
 /// <typeparam name="T">The list item type.</typeparam>
 [EditorBrowsable(EditorBrowsableState.Advanced)]
-public sealed class ListSelectionChangedEventArgs<T> : EventArgs
+internal sealed class ListSelectionChangedEventArgs<T> : EventArgs
 {
     /// <summary>
     /// Initializes a new list-selection payload.

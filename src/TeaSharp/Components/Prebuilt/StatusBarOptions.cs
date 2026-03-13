@@ -11,7 +11,7 @@ namespace TeaSharp.Components.Prebuilt;
 /// Defines the one-shot configuration used to construct a <see cref="StatusBarComponent"/>.
 /// </summary>
 [EditorBrowsable(EditorBrowsableState.Advanced)]
-public sealed record StatusBarOptions(
+internal sealed record StatusBarOptions(
     string LeftText = "",
     string RightText = "",
     UiTheme? Theme = null);

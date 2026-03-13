@@ -3,7 +3,7 @@ namespace TeaSharp.Components.Prebuilt;
 /// <summary>
 /// Describes a string-option selection transition.
 /// </summary>
-public sealed class OptionSelectionChangedEventArgs : EventArgs
+internal sealed class OptionSelectionChangedEventArgs : EventArgs
 {
     /// <summary>
     /// Initializes a new option-selection payload.

@@ -12,7 +12,7 @@ using TeaSharp.Widgets;
 namespace TeaSharp.Components.Advanced;
 
 [EditorBrowsable(EditorBrowsableState.Advanced)]
-public sealed partial class NotificationCenterComponent : IStatefulComponent, IMouseStatefulComponent, IFocusableComponent
+internal sealed partial class NotificationCenterComponent : IStatefulComponent, IMouseStatefulComponent, IFocusableComponent
 {
     private readonly List<NotificationEntry> _entries = [];
     private WidgetInteractionProfile _interactionProfile = WidgetInteractionProfile.Default.Clone();

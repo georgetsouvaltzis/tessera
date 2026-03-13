@@ -22,7 +22,7 @@ namespace TeaSharp.Components.Prebuilt;
 /// <param name="AcceptKey">Optional key binding used to accept the dialog.</param>
 /// <param name="DismissKey">Optional key binding used to dismiss the dialog.</param>
 [EditorBrowsable(EditorBrowsableState.Advanced)]
-public sealed record DialogOptions(
+internal sealed record DialogOptions(
     string Title = "Dialog",
     IReadOnlyList<string>? BodyLines = null,
     bool IsVisible = false,

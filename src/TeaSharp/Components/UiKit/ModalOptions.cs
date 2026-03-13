@@ -16,7 +16,7 @@ namespace TeaSharp.Components.UiKit;
 /// <param name="BodyLines">Body lines rendered inside the modal.</param>
 /// <param name="Theme">Optional UI theme override.</param>
 [EditorBrowsable(EditorBrowsableState.Advanced)]
-public sealed record ModalOptions(
+internal sealed record ModalOptions(
     string Title = "Modal",
     bool IsVisible = false,
     BorderStyle Border = BorderStyle.Rounded,

@@ -6,7 +6,7 @@ namespace TeaSharp.Components.Prebuilt;
 /// Describes a cancelled text-input value.
 /// </summary>
 [EditorBrowsable(EditorBrowsableState.Advanced)]
-public sealed class TextInputCancelledEventArgs : EventArgs
+internal sealed class TextInputCancelledEventArgs : EventArgs
 {
     /// <summary>
     /// Initializes a new event payload for a cancelled text-input value.

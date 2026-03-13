@@ -14,7 +14,7 @@ namespace TeaSharp.Components.Productivity;
 /// Renders and routes a contextual action menu anchored to a screen position.
 /// </summary>
 [EditorBrowsable(EditorBrowsableState.Advanced)]
-public sealed partial class ContextMenuComponent : IStatefulComponent, IMouseStatefulComponent, IFocusableComponent
+internal sealed partial class ContextMenuComponent : IStatefulComponent, IMouseStatefulComponent, IFocusableComponent
 {
     private readonly List<ContextMenuItem> _items = [];
     private WidgetInteractionProfile _interactionProfile = WidgetInteractionProfile.Default.Clone();

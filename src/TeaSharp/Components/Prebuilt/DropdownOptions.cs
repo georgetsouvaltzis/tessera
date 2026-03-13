@@ -13,7 +13,7 @@ namespace TeaSharp.Components.Prebuilt;
 /// Defines the one-shot configuration used to construct a <see cref="DropdownComponent"/>.
 /// </summary>
 [EditorBrowsable(EditorBrowsableState.Advanced)]
-public sealed record DropdownOptions(
+internal sealed record DropdownOptions(
     IReadOnlyList<string>? Items = null,
     string Title = "Dropdown",
     bool IsFocused = false,

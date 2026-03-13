@@ -8,7 +8,7 @@ using TeaSharp.Widgets;
 
 namespace TeaSharp.Components.Productivity;
 
-public sealed partial class ContextMenuComponent
+internal sealed partial class ContextMenuComponent
 {
     private void RenderMenu(Canvas canvas, Rect menuBounds, Rect content)
     {

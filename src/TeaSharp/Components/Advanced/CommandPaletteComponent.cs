@@ -12,7 +12,7 @@ using TeaSharp.Widgets;
 namespace TeaSharp.Components.Advanced;
 
 [EditorBrowsable(EditorBrowsableState.Advanced)]
-public sealed class CommandPaletteComponent : IStatefulComponent, IMouseStatefulComponent, IFocusableComponent
+internal sealed class CommandPaletteComponent : IStatefulComponent, IMouseStatefulComponent, IFocusableComponent
 {
     private readonly CommandPaletteController _controller = new();
     private WidgetInteractionProfile _interactionProfile = WidgetInteractionProfile.Default.Clone();

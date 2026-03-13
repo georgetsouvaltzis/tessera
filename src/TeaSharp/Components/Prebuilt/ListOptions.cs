@@ -13,7 +13,7 @@ namespace TeaSharp.Components.Prebuilt;
 /// Defines the one-shot configuration used to construct a <see cref="ListComponent{T}"/>.
 /// </summary>
 [EditorBrowsable(EditorBrowsableState.Advanced)]
-public sealed record ListOptions<T>(
+internal sealed record ListOptions<T>(
     IEnumerable<T> Items,
     Func<T, string> ToText,
     string Title = "List",

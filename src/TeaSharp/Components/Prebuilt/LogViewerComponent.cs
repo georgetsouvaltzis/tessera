@@ -16,7 +16,7 @@ namespace TeaSharp.Components.Prebuilt;
 /// Provides a scrollable log surface with optional filtering, pause, and clear behavior.
 /// </summary>
 [EditorBrowsable(EditorBrowsableState.Advanced)]
-public sealed class LogViewerComponent : IStatefulComponent, IFocusableComponent
+internal sealed class LogViewerComponent : IStatefulComponent, IFocusableComponent
 {
     private readonly ViewportModel _viewport = new();
     private readonly List<string> _entries = [];

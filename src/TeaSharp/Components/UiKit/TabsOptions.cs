@@ -12,7 +12,7 @@ namespace TeaSharp.Components.UiKit;
 /// Defines the one-shot configuration used to construct a <see cref="TabsComponent"/>.
 /// </summary>
 [EditorBrowsable(EditorBrowsableState.Advanced)]
-public sealed record TabsOptions(
+internal sealed record TabsOptions(
     IEnumerable<string> Tabs,
     bool IsFocused = false,
     bool EnableNumericShortcuts = true,

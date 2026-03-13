@@ -12,7 +12,7 @@ using TeaSharp.Widgets;
 namespace TeaSharp.Components.Advanced;
 
 [EditorBrowsable(EditorBrowsableState.Advanced)]
-public sealed partial class TreeViewComponent : IStatefulComponent, IMouseStatefulComponent, IFocusableComponent
+internal sealed partial class TreeViewComponent : IStatefulComponent, IMouseStatefulComponent, IFocusableComponent
 {
     private readonly List<TreeItemNode> _roots = [];
     private readonly List<(TreeItemNode Node, int Depth, int? ParentVisibleIndex)> _visible = [];

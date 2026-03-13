@@ -6,7 +6,7 @@ namespace TeaSharp.Components.UiKit;
 /// Describes a tab selection transition.
 /// </summary>
 [EditorBrowsable(EditorBrowsableState.Advanced)]
-public sealed class TabSelectionChangedEventArgs : EventArgs
+internal sealed class TabSelectionChangedEventArgs : EventArgs
 {
     /// <summary>
     /// Initializes a new tab-selection payload.

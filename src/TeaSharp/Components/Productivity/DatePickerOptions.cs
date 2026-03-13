@@ -12,7 +12,7 @@ namespace TeaSharp.Components.Productivity;
 /// Defines the one-shot configuration used to construct a <see cref="DatePickerComponent"/>.
 /// </summary>
 [EditorBrowsable(EditorBrowsableState.Advanced)]
-public sealed record DatePickerOptions(
+internal sealed record DatePickerOptions(
     string Title = "Date Picker",
     DateOnly? InitialDate = null,
     bool IsFocused = false,

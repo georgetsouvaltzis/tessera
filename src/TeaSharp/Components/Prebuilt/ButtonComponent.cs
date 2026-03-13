@@ -14,7 +14,7 @@ using TeaSharp.Widgets;
 namespace TeaSharp.Components.Prebuilt;
 
 [EditorBrowsable(EditorBrowsableState.Advanced)]
-public sealed class ButtonComponent : IStatefulComponent, IMouseStatefulComponent, IFocusableComponent
+internal sealed class ButtonComponent : IStatefulComponent, IMouseStatefulComponent, IFocusableComponent
 {
     private static readonly KeyBinding ActivateKey = new("enter/space", "activate", "enter", "space");
     private WidgetInteractionProfile _interactionProfile = WidgetInteractionProfile.Default.Clone();

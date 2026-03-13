@@ -6,7 +6,7 @@ namespace TeaSharp.Components.Prebuilt;
 /// Describes a submitted text-input value.
 /// </summary>
 [EditorBrowsable(EditorBrowsableState.Advanced)]
-public sealed class TextInputSubmittedEventArgs : EventArgs
+internal sealed class TextInputSubmittedEventArgs : EventArgs
 {
     /// <summary>
     /// Initializes a new event payload for a submitted text-input value.

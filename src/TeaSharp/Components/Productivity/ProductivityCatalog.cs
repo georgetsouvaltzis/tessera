@@ -9,7 +9,7 @@ namespace TeaSharp.Components.Productivity;
 /// <summary>
 /// Provides discoverable factory methods for the stable productivity widget surface.
 /// </summary>
-public static class ProductivityCatalog
+internal static class ProductivityCatalog
 {
     public static MenuBarComponent MenuBar(MenuBarOptions? options = null) => options is null ? new MenuBarComponent() : new MenuBarComponent(options);
 

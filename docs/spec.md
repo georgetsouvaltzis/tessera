@@ -177,7 +177,7 @@ Advanced/custom-host scenarios can still reach:
 - legacy `*Component` types without root wrappers yet
 - low-level widget models in `TeaSharp.Widgets`
 
-Some of these still remain public where they materially support extensibility; the old composition engine now largely survives as an internal bridge.
+Most promoted legacy `*Component` families are now internal bridges behind root `TeaSharp.Controls` wrappers. The remaining public advanced layer is mainly hosting/runtime seams and low-level widget infrastructure.
 
 ## Repo Profile
 

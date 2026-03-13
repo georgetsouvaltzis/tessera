@@ -11,7 +11,7 @@ using TeaSharp.Widgets;
 namespace TeaSharp.Components.Advanced;
 
 [EditorBrowsable(EditorBrowsableState.Advanced)]
-public sealed class BadgeComponent : ICanvasComponent
+internal sealed class BadgeComponent : ICanvasComponent
 {
     public string Text { get; set; } = "Badge";
 

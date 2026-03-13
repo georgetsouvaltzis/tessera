@@ -12,7 +12,7 @@ using System.ComponentModel;
 namespace TeaSharp.Components.Productivity;
 
 [EditorBrowsable(EditorBrowsableState.Advanced)]
-public sealed record MenuBarItem(
+internal sealed record MenuBarItem(
     string Id,
     string Title,
     char Shortcut = '\0',

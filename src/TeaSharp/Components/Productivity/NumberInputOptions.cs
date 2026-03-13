@@ -12,7 +12,7 @@ namespace TeaSharp.Components.Productivity;
 /// Defines the one-shot configuration used to construct a <see cref="NumberInputComponent"/>.
 /// </summary>
 [EditorBrowsable(EditorBrowsableState.Advanced)]
-public sealed record NumberInputOptions(
+internal sealed record NumberInputOptions(
     string Title = "Number Input",
     double InitialValue = 0.0,
     bool IsFocused = false,

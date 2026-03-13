@@ -14,7 +14,7 @@ namespace TeaSharp.Components.Productivity;
 /// Provides structured numeric entry on top of a text-backed editing surface.
 /// </summary>
 [EditorBrowsable(EditorBrowsableState.Advanced)]
-public sealed class NumberInputComponent : IStatefulComponent, IFocusableComponent
+internal sealed class NumberInputComponent : IStatefulComponent, IFocusableComponent
 {
     private bool _replaceOnNextCharacter = true;
     private readonly TextInputModel _input = new();
