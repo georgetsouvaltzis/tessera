@@ -28,7 +28,6 @@ internal sealed class ComboBoxDemoApp : TeaApp
         MaxVisibleItems = 7,
         Border = BorderStyle.SingleLine,
         Padding = Thickness.All(1),
-        IsFocused = true,
     };
 
     private readonly Label _details = new()
@@ -42,6 +41,7 @@ internal sealed class ComboBoxDemoApp : TeaApp
 
     public ComboBoxDemoApp()
     {
+        _combobox.RequestFocus();
         _combobox.SetItems(
         [
             "us-east-1",
