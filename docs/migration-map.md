@@ -5,8 +5,8 @@ This is the working map from legacy pre-release APIs to the current default path
 ## Startup
 
 - `Tea.CreateProgram(model)` -> `Tea.RunAsync(app)` or `Tea.CreateBuilder().UseApp(...).Build().RunAsync()`
-- advanced program hosting moved to `TeaSharp.Hosting.TeaHost`
-- `TeaProgramOptions` -> `TeaRuntimeOptions` on the default path, or `TeaSharp.Hosting.TeaProgramOptions` on the advanced hosting path
+- advanced host customization moved to `TeaSharp.Hosting.TeaHost.CreateApplication(...)` / `RunAsync(...)`
+- `TeaProgramOptions` -> internalized; migrate to `TeaRuntimeOptions` plus `TeaSharp.Hosting.TeaHostingOptions` when advanced hosting seams are required
 - `IScreen` -> `TeaApp`
 - `Effect` helpers -> `TeaEffects`
 - `ScreenOutput` / `TerminalOutput` -> `Screen` / `ScreenOptions`
@@ -53,5 +53,5 @@ This is the working map from legacy pre-release APIs to the current default path
 
 ## Notes
 
-- Legacy types are still available for now, but the ones with a root-level replacement are marked `EditorBrowsable(Advanced)`.
+- Legacy types without a supported public replacement may still exist internally as bridges, but they are no longer part of the supported public path.
 - Advanced screen composition still lives under the older component namespaces. Widgets without a root wrapper should be treated as advanced.

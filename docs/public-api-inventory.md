@@ -88,15 +88,11 @@ The intended beginner path is:
 
 These APIs remain public because they still offer real value, but they should not dominate the default path.
 
-- `TeaSharp.Hosting.TeaProgramOptions`
 - `TeaSharp.Hosting.TeaHostingOptions`
 - `TeaSharp.Hosting.TeaHost.CreateApplication(...)`
 - `TeaSharp.Hosting.TeaHost.RunAsync(...)`
 - `TeaSharp.Controls.BarChartOptions`
 - `TeaSharp.Controls.LineChartOptions`
-- `IScreen`
-- `ProgramOptions`
-- `TeaProgram`
 - `ICanvasComponent`
 - `IProgramRenderer`
 - `ITerminalAdapter`
@@ -118,8 +114,6 @@ These areas still expose more mechanism than the long-term public design should:
 
 TeaSharp is shifting from:
 
-- `TeaSharp.Hosting.TeaHost.CreateProgram(...)`
-- `TeaSharp.Hosting.TeaProgramOptions`
 - `InteractiveScreenModel`
 - `ScreenComposer`
 - `InputRouter`
@@ -134,6 +128,8 @@ to:
 - `TeaRuntimeOptions`
 - `WindowLayout`, `RowLayout`, `ColumnLayout`, `PanelLayout`, `CenterLayout`, `LayoutSlot`
 - root `TeaSharp.Controls` wrappers
+
+The old `TeaHost.CreateProgram(...)` / `TeaProgramOptions` / `IScreen` program-hosting path is now internal-only.
 
 The old tree-oriented stack now mostly compiles behind the scenes as an internal bridge. The previous static layout helper DSL is also internal-only.
 

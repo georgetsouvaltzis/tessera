@@ -9,7 +9,7 @@ namespace TeaSharp.Core.Application;
 /// <summary>
 /// Runs a TeaSharp screen inside the runtime event loop.
 /// </summary>
-public sealed partial class TeaProgram
+internal sealed partial class TeaProgram
 {
     private readonly ProgramOptions _options;
     private readonly Channel<IMessage> _messages;
@@ -26,7 +26,7 @@ public sealed partial class TeaProgram
     /// <param name="initialScreen">The initial application screen.</param>
     /// <param name="options">Advanced runtime options.</param>
     [EditorBrowsable(EditorBrowsableState.Advanced)]
-    public TeaProgram(IScreen initialScreen, ProgramOptions? options = null)
+    internal TeaProgram(IScreen initialScreen, ProgramOptions? options = null)
     {
         Screen = initialScreen ?? throw new ArgumentNullException(nameof(initialScreen));
         _options = options ?? new ProgramOptions();
@@ -37,13 +37,13 @@ public sealed partial class TeaProgram
     /// <summary>
     /// Gets the current application screen.
     /// </summary>
-    public IScreen Screen { get; private set; }
+    internal IScreen Screen { get; private set; }
 
     /// <summary>
     /// Enqueues a message for delivery to the running program.
     /// </summary>
     /// <param name="message">The message to enqueue.</param>
-    public void Send(IMessage message)
+    internal void Send(IMessage message)
     {
         if (message is not null)
         {
@@ -56,7 +56,7 @@ public sealed partial class TeaProgram
     /// </summary>
     /// <param name="cancellationToken">A token that cancels program execution.</param>
     /// <returns>The final application screen.</returns>
-    public Task<IScreen> RunAsync(CancellationToken cancellationToken = default) =>
+    internal Task<IScreen> RunAsync(CancellationToken cancellationToken = default) =>
         RunProgramAsync(cancellationToken);
 
     /// <summary>
@@ -64,6 +64,6 @@ public sealed partial class TeaProgram
     /// </summary>
     /// <param name="kill">When <see langword="true"/>, forces terminal teardown without a graceful quit message.</param>
     /// <param name="cancellationToken">A token that cancels the stop operation.</param>
-    public Task StopAsync(bool kill = false, CancellationToken cancellationToken = default) =>
+    internal Task StopAsync(bool kill = false, CancellationToken cancellationToken = default) =>
         StopProgramAsync(kill, cancellationToken);
 }

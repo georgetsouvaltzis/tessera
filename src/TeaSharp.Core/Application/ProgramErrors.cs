@@ -1,8 +1,8 @@
 namespace TeaSharp.Core.Application;
 
-public sealed class TeaProgramInterruptedException : Exception
+internal sealed class TeaProgramInterruptedException : Exception
 {
-    public TeaProgramInterruptedException()
+    internal TeaProgramInterruptedException()
         : base("Program interrupted.")
     {
     }

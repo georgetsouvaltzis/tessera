@@ -3,7 +3,7 @@ using TeaSharp.Core.Messages;
 
 namespace TeaSharp.Core.Application;
 
-public sealed partial class TeaProgram
+internal sealed partial class TeaProgram
 {
     private async Task ProcessMessageLoopAsync(Task commandLoop, Task? inputLoop, Task? resizeLoop, CancellationToken token)
     {

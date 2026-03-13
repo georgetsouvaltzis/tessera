@@ -1,20 +1,11 @@
-using TeaSharp.Components.Advanced;
-using TeaSharp.Components.Charting;
-using TeaSharp.Components.Composition;
-using TeaSharp.Components.Dashboard;
-using TeaSharp.Components.Interaction;
-using TeaSharp.Components.Prebuilt;
-using TeaSharp.Components.Primitives;
-using TeaSharp.Components.Productivity;
-using TeaSharp.Components.Styling;
-using TeaSharp.Components.UiKit;
 using TeaSharp;
 using TeaSharp.Core.Abstractions;
+using TeaSharp.Core.Input;
 using TeaSharp.Core.Messages;
 
 namespace TeaSharp.TestFixtures;
 
-public sealed class CounterFixtureModel : IScreen
+public sealed class CounterFixtureModel
 {
     private int _count;
 
@@ -44,9 +35,9 @@ public sealed class CounterFixtureModel : IScreen
             : null;
     }
 
-    public TeaSharp.Core.Abstractions.ScreenOutput Render()
+    public ScreenOutput Render()
     {
-        return TeaSharp.Core.Abstractions.ScreenOutput.From($"Counter\n\nCount: {_count}\n\nUp/Down: change  q: quit") with
+        return ScreenOutput.From($"Counter\n\nCount: {_count}\n\nUp/Down: change  q: quit") with
         {
             Terminal = new TerminalOutput
             {
@@ -55,4 +46,36 @@ public sealed class CounterFixtureModel : IScreen
             },
         };
     }
+}
+
+public sealed class CounterFixtureApp : TeaApp
+{
+    private int _count;
+
+    public override TeaEffect? Update(Message message)
+    {
+        if (message is not KeyPressed key)
+        {
+            return null;
+        }
+
+        if (key.Is(Key.Up))
+        {
+            _count++;
+            return null;
+        }
+
+        if (key.Is(Key.Down))
+        {
+            _count--;
+            return null;
+        }
+
+        return key.IsCharacter('q')
+            ? TeaEffects.Quit
+            : null;
+    }
+
+    public override Screen Build(ScreenContext context) =>
+        Screen.From($"Counter\n\nCount: {_count}\n\nUp/Down: change  q: quit");
 }

@@ -11,7 +11,7 @@ The default app path is intentionally small:
 - assemble screens with `WindowLayout`, `RowLayout`, and `ColumnLayout`
 - use first-class controls from `TeaSharp.Controls`
 - configure runtime behavior with `TeaRuntimeOptions`
-- keep `TeaSharp.Components.Composition` and `TeaSharp.Core.*` for advanced or transitional scenarios only
+- keep low-level runtime wiring under `TeaSharp.Hosting` only when you truly need advanced seams
 
 If you need custom runtime wiring, explicit region routing, or low-level component composition, those APIs still exist, but they are now marked `EditorBrowsable(Advanced)` and are no longer the starter path.
 

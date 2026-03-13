@@ -5,7 +5,7 @@ using TeaSharp.Core.Terminal;
 
 namespace TeaSharp.Core.Application;
 
-public sealed partial class TeaProgram
+internal sealed partial class TeaProgram
 {
     private async Task<IScreen> RunProgramAsync(CancellationToken cancellationToken)
     {
