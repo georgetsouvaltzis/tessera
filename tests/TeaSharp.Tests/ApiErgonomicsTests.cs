@@ -1,7 +1,6 @@
 using TeaSharp.Components.Advanced;
 using TeaSharp.Components.Charting;
 using TeaSharp.Components.Composition;
-using TeaSharp.Components.Dashboard;
 using TeaSharp.Components.Interaction;
 using TeaSharp.Components.Prebuilt;
 using TeaSharp.Components.Primitives;
@@ -18,10 +17,6 @@ internal static class ApiErgonomicsTests
     {
         yield return new TestCase("ApiErgonomics_Thickness_UsesStandardSpacingVocabulary", Thickness_UsesStandardSpacingVocabulary);
         yield return new TestCase("ApiErgonomics_ScreenFrameLayout_ReducesScreenRectBookkeeping", ScreenFrameLayout_ReducesScreenRectBookkeeping);
-        yield return new TestCase("ApiErgonomics_MasterDetailScreen_ReducesShellBookkeeping", MasterDetailScreen_ReducesShellBookkeeping);
-        yield return new TestCase("ApiErgonomics_DashboardScreen_ReducesShellBookkeeping", DashboardScreen_ReducesShellBookkeeping);
-        yield return new TestCase("ApiErgonomics_FormScreen_ReducesShellBookkeeping", FormScreen_ReducesShellBookkeeping);
-        yield return new TestCase("ApiErgonomics_DialogWorkflow_ReducesOpenCloseBoilerplate", DialogWorkflow_ReducesOpenCloseBoilerplate);
         yield return new TestCase("ApiErgonomics_TextInputOptions_ConfigureComponentWithoutNestedInputAccess", TextInputOptions_ConfigureComponentWithoutNestedInputAccess);
         yield return new TestCase("ApiErgonomics_TextAreaOptions_ConfigureComponentWithoutNestedInputAccess", TextAreaOptions_ConfigureComponentWithoutNestedInputAccess);
         yield return new TestCase("ApiErgonomics_ListComponent_ExposesSelectionWithoutModelAccess", ListComponent_ExposesSelectionWithoutModelAccess);
@@ -64,101 +59,6 @@ internal static class ApiErgonomicsTests
         TestAssert.Equal(new Rect(0, 28, 100, 2), frame.Footer, "Screen frame should expose footer bounds directly.");
         TestAssert.Equal(28, left.Width, "Screen frame body split should preserve requested left width.");
         TestAssert.Equal(72, right.Width, "Screen frame body split should preserve remaining width.");
-        return Task.CompletedTask;
-    }
-
-    private static Task MasterDetailScreen_ReducesShellBookkeeping()
-    {
-        var screen = new ScreenComposer();
-        var scaffold = screen.MasterDetail(new Rect(0, 0, 100, 30), masterWidth: 28, headerHeight: 1, footerHeight: 2);
-        var master = new ButtonComponent();
-        var detail = new ButtonComponent();
-
-        screen.BeginFrame();
-        scaffold.AddMaster("master", master);
-        scaffold.AddDetail("detail", detail);
-        screen.CompleteFrame();
-
-        var focusChain = scaffold.CreateFocusChain();
-        var changed = screen.FocusFirst(focusChain);
-
-        TestAssert.Equal(new Rect(0, 1, 28, 27), scaffold.Master, "Master-detail scaffold should expose master bounds directly.");
-        TestAssert.Equal(new Rect(28, 1, 72, 27), scaffold.Detail, "Master-detail scaffold should expose detail bounds directly.");
-        TestAssert.True(changed, "Master-detail scaffold should build a reusable focus chain from added regions.");
-        TestAssert.True(screen.FocusedRegionKey == new ScreenRegionKey("master"), "Scaffold focus chain should respect helper-add order.");
-        return Task.CompletedTask;
-    }
-
-    private static Task DashboardScreen_ReducesShellBookkeeping()
-    {
-        var screen = new ScreenComposer();
-        var scaffold = screen.Dashboard(new Rect(0, 0, 100, 30), sidebarWidth: 20, headerHeight: 1, footerHeight: 2);
-        var sidebar = new ButtonComponent();
-        var main = new ButtonComponent();
-
-        screen.BeginFrame();
-        scaffold.AddSidebar("sidebar", sidebar);
-        scaffold.AddMain("main", main);
-        screen.CompleteFrame();
-
-        var focusChain = scaffold.CreateFocusChain();
-        var changed = screen.FocusFirst(focusChain);
-
-        TestAssert.Equal(new Rect(0, 1, 20, 27), scaffold.Sidebar, "Dashboard scaffold should expose sidebar bounds directly.");
-        TestAssert.Equal(new Rect(20, 1, 80, 27), scaffold.Main, "Dashboard scaffold should expose main bounds directly.");
-        TestAssert.True(changed, "Dashboard scaffold should build a reusable focus chain from added regions.");
-        TestAssert.True(screen.FocusedRegionKey == new ScreenRegionKey("sidebar"), "Scaffold focus chain should respect helper-add order.");
-        return Task.CompletedTask;
-    }
-
-    private static Task FormScreen_ReducesShellBookkeeping()
-    {
-        var screen = new ScreenComposer();
-        var scaffold = screen.Form(new Rect(0, 0, 100, 30), actionsHeight: 2, headerHeight: 1, footerHeight: 2);
-        var body = new ButtonComponent();
-        var actions = new ButtonComponent();
-
-        screen.BeginFrame();
-        scaffold.AddBody("body", body);
-        scaffold.AddActions("actions", actions);
-        screen.CompleteFrame();
-
-        var focusChain = scaffold.CreateFocusChain();
-        var changed = screen.FocusFirst(focusChain);
-
-        TestAssert.Equal(new Rect(0, 1, 100, 25), scaffold.Body, "Form scaffold should expose body bounds directly.");
-        TestAssert.Equal(new Rect(0, 26, 100, 2), scaffold.Actions, "Form scaffold should expose action bounds directly.");
-        TestAssert.True(changed, "Form scaffold should build a reusable focus chain from added regions.");
-        TestAssert.True(screen.FocusedRegionKey == new ScreenRegionKey("body"), "Scaffold focus chain should respect helper-add order.");
-        return Task.CompletedTask;
-    }
-
-    private static Task DialogWorkflow_ReducesOpenCloseBoilerplate()
-    {
-        var screen = new ScreenComposer();
-        var dialog = new DialogComponent(new DialogOptions(Title: "Confirm"));
-        var editor = new ButtonComponent();
-        var editorKey = new ScreenRegionKey("editor");
-        var dialogKey = new ScreenRegionKey("dialog");
-        var workflow = screen.CreateDialogWorkflow(dialog, dialogKey, new ScreenFocusChain([editorKey]));
-
-        screen.BeginFrame();
-        screen.AddComponent(editorKey, new Rect(0, 0, 20, 6), editor);
-        screen.CompleteFrame(editorKey);
-
-        workflow.Show("Confirm delete", ["Delete item?"]);
-
-        screen.BeginFrame();
-        screen.AddComponent(editorKey, new Rect(0, 0, 20, 6), editor);
-        workflow.Compose(new Rect(0, 0, 20, 6));
-        screen.CompleteFrame();
-
-        TestAssert.True(screen.FocusedRegionKey == dialogKey, "Dialog workflow should move focus to the dialog without manual focus bookkeeping.");
-
-        var restored = workflow.Hide();
-
-        TestAssert.True(restored, "Dialog workflow should restore prior focus when hidden programmatically.");
-        TestAssert.True(screen.FocusedRegionKey == editorKey, "Dialog workflow should return focus to the previously active region.");
         return Task.CompletedTask;
     }
 

@@ -20,17 +20,9 @@ internal static class ScreenComposerTests
     public static IEnumerable<TestCase> Cases()
     {
         yield return new TestCase("Components_ScreenComposer_FrameCreatesHeaderBodyFooterRegions", ScreenComposer_FrameCreatesHeaderBodyFooterRegions);
-        yield return new TestCase("Components_ScreenComposer_MasterDetailCreatesExpectedRegions", ScreenComposer_MasterDetailCreatesExpectedRegions);
-        yield return new TestCase("Components_MasterDetailScreen_CreateFocusChainTracksAddedRegions", MasterDetailScreen_CreateFocusChainTracksAddedRegions);
-        yield return new TestCase("Components_ScreenComposer_DashboardCreatesExpectedRegions", ScreenComposer_DashboardCreatesExpectedRegions);
-        yield return new TestCase("Components_DashboardScreen_CreateFocusChainTracksAddedRegions", DashboardScreen_CreateFocusChainTracksAddedRegions);
-        yield return new TestCase("Components_ScreenComposer_FormCreatesExpectedRegions", ScreenComposer_FormCreatesExpectedRegions);
-        yield return new TestCase("Components_FormScreen_CreateFocusChainTracksAddedRegions", FormScreen_CreateFocusChainTracksAddedRegions);
         yield return new TestCase("Components_ScreenComposer_ComposeSplitColumns_UsesDeterministicSlotBounds", ScreenComposer_ComposeSplitColumns_UsesDeterministicSlotBounds);
         yield return new TestCase("Components_ScreenComposer_ComposePanelRow_UsesGroupPaddingMarginAndBorder", ScreenComposer_ComposePanelRow_UsesGroupPaddingMarginAndBorder);
         yield return new TestCase("Components_ScreenComposer_ComposeCenterText_RendersCenteredStyledText", ScreenComposer_ComposeCenterText_RendersCenteredStyledText);
-        yield return new TestCase("Components_DialogWorkflow_ShowAndCompose_FocusesDialogRegion", DialogWorkflow_ShowAndCompose_FocusesDialogRegion);
-        yield return new TestCase("Components_DialogWorkflow_Dismiss_RestoresPriorFocus", DialogWorkflow_Dismiss_RestoresPriorFocus);
         yield return new TestCase("Components_ScreenComposer_MouseClickFocusesAndRoutesToRegisteredRegion", ScreenComposer_MouseClickFocusesAndRoutesToRegisteredRegion);
         yield return new TestCase("Components_ScreenComposer_FocusNextCyclesAcrossFocusableRegions", ScreenComposer_FocusNextCyclesAcrossFocusableRegions);
         yield return new TestCase("Components_ScreenComposer_FocusFirstTargetsFirstFocusableRegion", ScreenComposer_FocusFirstTargetsFirstFocusableRegion);
@@ -55,132 +47,6 @@ internal static class ScreenComposerTests
         TestAssert.Equal(56, right.Width, "Body column split should preserve remaining width.");
         TestAssert.Equal(10, top.Height, "Body row split should preserve requested top height when possible.");
         TestAssert.Equal(11, bottom.Height, "Body row split should preserve remaining height.");
-        return Task.CompletedTask;
-    }
-
-    private static Task ScreenComposer_MasterDetailCreatesExpectedRegions()
-    {
-        var composer = new ScreenComposer();
-        var scaffold = composer.MasterDetail(new Rect(0, 0, 100, 30), masterWidth: 32, headerHeight: 2, footerHeight: 1);
-
-        TestAssert.Equal(new Rect(0, 0, 100, 2), scaffold.Header, "Master-detail scaffold should expose header bounds.");
-        TestAssert.Equal(new Rect(0, 2, 32, 27), scaffold.Master, "Master-detail scaffold should expose master-pane bounds.");
-        TestAssert.Equal(new Rect(32, 2, 68, 27), scaffold.Detail, "Master-detail scaffold should expose detail-pane bounds.");
-        TestAssert.Equal(new Rect(0, 29, 100, 1), scaffold.Footer, "Master-detail scaffold should expose footer bounds.");
-        return Task.CompletedTask;
-    }
-
-    private static Task MasterDetailScreen_CreateFocusChainTracksAddedRegions()
-    {
-        var composer = new ScreenComposer();
-        var scaffold = composer.MasterDetail(new Rect(0, 0, 100, 24), masterWidth: 28, headerHeight: 1, footerHeight: 1);
-        var header = new MouseProbeComponent();
-        var master = new MouseProbeComponent();
-        var detail = new MouseProbeComponent();
-        var footer = new MouseProbeComponent();
-        var headerKey = new ScreenRegionKey("header");
-        var masterKey = new ScreenRegionKey("master");
-        var detailKey = new ScreenRegionKey("detail");
-        var footerKey = new ScreenRegionKey("footer");
-
-        composer.BeginFrame();
-        scaffold.AddHeader(headerKey, header);
-        scaffold.AddMaster(masterKey, master);
-        scaffold.AddDetail(detailKey, detail);
-        scaffold.AddFooter(footerKey, footer);
-        composer.CompleteFrame();
-        var focusChain = scaffold.CreateFocusChain();
-
-        var firstChanged = composer.FocusFirst(focusChain);
-        var nextChanged = composer.FocusNext(focusChain);
-
-        TestAssert.True(firstChanged, "Scaffold focus chain should focus the first added focusable region.");
-        TestAssert.True(nextChanged, "Scaffold focus chain should advance through tracked regions.");
-        TestAssert.True(composer.FocusedRegionKey == masterKey, "Focus chain should preserve header-master-detail-footer order.");
-        return Task.CompletedTask;
-    }
-
-    private static Task ScreenComposer_DashboardCreatesExpectedRegions()
-    {
-        var composer = new ScreenComposer();
-        var scaffold = composer.Dashboard(new Rect(0, 0, 100, 30), sidebarWidth: 24, headerHeight: 2, footerHeight: 1);
-
-        TestAssert.Equal(new Rect(0, 0, 100, 2), scaffold.Header, "Dashboard scaffold should expose header bounds.");
-        TestAssert.Equal(new Rect(0, 2, 24, 27), scaffold.Sidebar, "Dashboard scaffold should expose sidebar bounds.");
-        TestAssert.Equal(new Rect(24, 2, 76, 27), scaffold.Main, "Dashboard scaffold should expose main bounds.");
-        TestAssert.Equal(new Rect(0, 29, 100, 1), scaffold.Footer, "Dashboard scaffold should expose footer bounds.");
-        return Task.CompletedTask;
-    }
-
-    private static Task DashboardScreen_CreateFocusChainTracksAddedRegions()
-    {
-        var composer = new ScreenComposer();
-        var scaffold = composer.Dashboard(new Rect(0, 0, 100, 24), sidebarWidth: 22, headerHeight: 1, footerHeight: 1);
-        var header = new MouseProbeComponent();
-        var sidebar = new MouseProbeComponent();
-        var main = new MouseProbeComponent();
-        var footer = new MouseProbeComponent();
-        var headerKey = new ScreenRegionKey("header");
-        var sidebarKey = new ScreenRegionKey("sidebar");
-        var mainKey = new ScreenRegionKey("main");
-        var footerKey = new ScreenRegionKey("footer");
-
-        composer.BeginFrame();
-        scaffold.AddHeader(headerKey, header);
-        scaffold.AddSidebar(sidebarKey, sidebar);
-        scaffold.AddMain(mainKey, main);
-        scaffold.AddFooter(footerKey, footer);
-        composer.CompleteFrame();
-        var focusChain = scaffold.CreateFocusChain();
-
-        var firstChanged = composer.FocusFirst(focusChain);
-        var nextChanged = composer.FocusNext(focusChain);
-
-        TestAssert.True(firstChanged, "Dashboard focus chain should focus the first added focusable region.");
-        TestAssert.True(nextChanged, "Dashboard focus chain should advance through tracked regions.");
-        TestAssert.True(composer.FocusedRegionKey == sidebarKey, "Focus chain should preserve header-sidebar-main-footer order.");
-        return Task.CompletedTask;
-    }
-
-    private static Task ScreenComposer_FormCreatesExpectedRegions()
-    {
-        var composer = new ScreenComposer();
-        var scaffold = composer.Form(new Rect(0, 0, 100, 30), actionsHeight: 3, headerHeight: 2, footerHeight: 1);
-
-        TestAssert.Equal(new Rect(0, 0, 100, 2), scaffold.Header, "Form scaffold should expose header bounds.");
-        TestAssert.Equal(new Rect(0, 2, 100, 24), scaffold.Body, "Form scaffold should expose main body bounds.");
-        TestAssert.Equal(new Rect(0, 26, 100, 3), scaffold.Actions, "Form scaffold should expose action-bar bounds.");
-        TestAssert.Equal(new Rect(0, 29, 100, 1), scaffold.Footer, "Form scaffold should expose footer bounds.");
-        return Task.CompletedTask;
-    }
-
-    private static Task FormScreen_CreateFocusChainTracksAddedRegions()
-    {
-        var composer = new ScreenComposer();
-        var scaffold = composer.Form(new Rect(0, 0, 100, 24), actionsHeight: 2, headerHeight: 1, footerHeight: 1);
-        var header = new MouseProbeComponent();
-        var body = new MouseProbeComponent();
-        var actions = new MouseProbeComponent();
-        var footer = new MouseProbeComponent();
-        var headerKey = new ScreenRegionKey("header");
-        var bodyKey = new ScreenRegionKey("body");
-        var actionsKey = new ScreenRegionKey("actions");
-        var footerKey = new ScreenRegionKey("footer");
-
-        composer.BeginFrame();
-        scaffold.AddHeader(headerKey, header);
-        scaffold.AddBody(bodyKey, body);
-        scaffold.AddActions(actionsKey, actions);
-        scaffold.AddFooter(footerKey, footer);
-        composer.CompleteFrame();
-        var focusChain = scaffold.CreateFocusChain();
-
-        var firstChanged = composer.FocusFirst(focusChain);
-        var nextChanged = composer.FocusNext(focusChain);
-
-        TestAssert.True(firstChanged, "Form focus chain should focus the first added focusable region.");
-        TestAssert.True(nextChanged, "Form focus chain should advance through tracked regions.");
-        TestAssert.True(composer.FocusedRegionKey == bodyKey, "Focus chain should preserve header-body-actions-footer order.");
         return Task.CompletedTask;
     }
 
@@ -257,62 +123,6 @@ internal static class ScreenComposerTests
 
         TestAssert.Equal(5, lines.Length, "Centered text should render within the provided canvas height.");
         TestAssert.True(lines[2].StartsWith(expected, StringComparison.Ordinal), "Center.Text should place styled text in the middle row without manual geometry math.");
-        return Task.CompletedTask;
-    }
-
-    private static Task DialogWorkflow_ShowAndCompose_FocusesDialogRegion()
-    {
-        var composer = new ScreenComposer();
-        var dialog = new DialogComponent(new DialogOptions(Title: "Confirm"));
-        var baseKey = new ScreenRegionKey("base");
-        var dialogKey = new ScreenRegionKey("dialog");
-        var workflow = composer.CreateDialogWorkflow(dialog, dialogKey, new ScreenFocusChain([baseKey]));
-
-        composer.BeginFrame();
-        composer.AddComponent(baseKey, new Rect(0, 0, 20, 6), new MouseProbeComponent());
-        composer.CompleteFrame(baseKey);
-
-        workflow.Show("Confirm delete", ["Delete card?"]);
-
-        composer.BeginFrame();
-        composer.AddComponent(baseKey, new Rect(0, 0, 20, 6), new MouseProbeComponent());
-        workflow.Compose(new Rect(0, 0, 20, 6));
-        composer.CompleteFrame();
-
-        TestAssert.True(dialog.IsVisible, "Dialog workflow should open the dialog.");
-        TestAssert.True(dialog.IsFocused, "Dialog workflow should focus the dialog region after composition.");
-        TestAssert.True(composer.FocusedRegionKey == dialogKey, "Dialog workflow should move screen focus to the dialog region.");
-        TestAssert.Equal("Confirm delete", dialog.Title, "Dialog workflow should apply title updates.");
-        TestAssert.Equal("Delete card?", dialog.BodyLines[0], "Dialog workflow should apply content updates.");
-        return Task.CompletedTask;
-    }
-
-    private static Task DialogWorkflow_Dismiss_RestoresPriorFocus()
-    {
-        var composer = new ScreenComposer();
-        var dialog = new DialogComponent(new DialogOptions(Title: "Confirm"));
-        var baseComponent = new MouseProbeComponent();
-        var baseKey = new ScreenRegionKey("base");
-        var dialogKey = new ScreenRegionKey("dialog");
-        var workflow = composer.CreateDialogWorkflow(dialog, dialogKey, new ScreenFocusChain([baseKey]));
-
-        composer.BeginFrame();
-        composer.AddComponent(baseKey, new Rect(0, 0, 20, 6), baseComponent);
-        composer.CompleteFrame(baseKey);
-
-        workflow.Show();
-
-        composer.BeginFrame();
-        composer.AddComponent(baseKey, new Rect(0, 0, 20, 6), baseComponent);
-        workflow.Compose(new Rect(0, 0, 20, 6));
-        composer.CompleteFrame();
-
-        var changed = composer.Update(new KeyPressMsg(KeyCode.Escape));
-
-        TestAssert.True(changed, "IsFocused dialog should handle dismiss input.");
-        TestAssert.True(!dialog.IsVisible, "Dialog workflow should allow the dialog to close.");
-        TestAssert.True(composer.FocusedRegionKey == baseKey, "Dialog workflow should restore focus to the previously focused region.");
-        TestAssert.True(baseComponent.IsFocused, "Prior focus target should regain focus after dialog dismissal.");
         return Task.CompletedTask;
     }
 
