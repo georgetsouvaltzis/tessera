@@ -11,8 +11,6 @@ namespace TeaSharp.Components.Productivity;
 /// </summary>
 internal static class ProductivityCatalog
 {
-    public static ContextMenuComponent ContextMenu(ContextMenuOptions? options = null) => options is null ? new ContextMenuComponent() : new ContextMenuComponent(options);
-
     public static NumberInputComponent NumberInput(NumberInputOptions? options = null) => options is null ? new NumberInputComponent() : new NumberInputComponent(options);
 
     public static DatePickerComponent DatePicker(DatePickerOptions? options = null) => options is null ? new DatePickerComponent() : new DatePickerComponent(options);

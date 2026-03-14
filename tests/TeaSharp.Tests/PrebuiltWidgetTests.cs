@@ -53,6 +53,11 @@ internal static class PrebuiltWidgetTests
         yield return new TestCase("Controls_MenuBar_TryConsumeActivation_IsSingleUse", MenuBar_TryConsumeActivation_IsSingleUse);
         yield return new TestCase("Controls_MenuBar_MouseClickActivatesItem", MenuBar_MouseClickActivatesItem);
         yield return new TestCase("Controls_MenuBar_MouseMotionSelectsHoveredItem", MenuBar_MouseMotionSelectsHoveredItem);
+        yield return new TestCase("Controls_ContextMenu_ExecutesAndCloses", ContextMenu_ExecutesAndCloses);
+        yield return new TestCase("Controls_ContextMenu_ItemExecutedEvent_ReportsItem", ContextMenu_ItemExecutedEvent_ReportsItem);
+        yield return new TestCase("Controls_ContextMenu_TryConsumeExecution_IsSingleUse", ContextMenu_TryConsumeExecution_IsSingleUse);
+        yield return new TestCase("Controls_ContextMenu_MouseClickExecutesAndCloses", ContextMenu_MouseClickExecutesAndCloses);
+        yield return new TestCase("Controls_ContextMenu_MouseReleaseExecutesAndCloses", ContextMenu_MouseReleaseExecutesAndCloses);
         yield return new TestCase("Prebuilt_TableComponent_ForwardsSortHotkeys", TableComponent_ForwardsSortHotkeys);
         yield return new TestCase("Prebuilt_ProgressBarComponent_AdjustsValue", ProgressBarComponent_AdjustsValue);
         yield return new TestCase("Controls_StatusBar_RendersLeftAndRightText", StatusBar_RendersLeftAndRightText);
@@ -678,6 +683,112 @@ internal static class PrebuiltWidgetTests
         menu.Handle(new KeyPressed(Key.Enter));
 
         TestAssert.Equal("file", activated ?? string.Empty, "Menu bar activation event should expose the selected item id.");
+        return Task.CompletedTask;
+    }
+
+    private static Task ContextMenu_ExecutesAndCloses()
+    {
+        var menu = new ContextMenu
+        {
+            IsFocused = true,
+        };
+        menu.SetItems(
+        [
+            new ContextMenuItem("copy", "Copy"),
+            new ContextMenuItem("paste", "Paste"),
+        ]);
+        menu.OpenAt(4, 2);
+
+        menu.Handle(new KeyPressed(Key.Down));
+        menu.Handle(new KeyPressed(Key.Enter));
+
+        TestAssert.Equal("paste", menu.LastExecutedItemId ?? string.Empty, "Context menu should execute selected action.");
+        TestAssert.True(!menu.IsVisible, "Context menu should close after execute.");
+        return Task.CompletedTask;
+    }
+
+    private static Task ContextMenu_MouseClickExecutesAndCloses()
+    {
+        var menu = new ContextMenu
+        {
+            Border = BorderStyle.None,
+        };
+        menu.SetItems(
+        [
+            new ContextMenuItem("copy", "Copy"),
+            new ContextMenuItem("paste", "Paste"),
+        ]);
+        menu.OpenAt(0, 0);
+
+        var changed = menu.Handle(new PointerInput(PointerEventKind.Press, PointerButton.Left, 0, 1), new Rect(0, 0, 20, 6));
+
+        TestAssert.True(changed, "Context menu click should execute row action.");
+        TestAssert.Equal("paste", menu.LastExecutedItemId ?? string.Empty, "Context menu click should execute clicked item.");
+        TestAssert.True(!menu.IsVisible, "Context menu should close after mouse execute.");
+        return Task.CompletedTask;
+    }
+
+    private static Task ContextMenu_TryConsumeExecution_IsSingleUse()
+    {
+        var menu = new ContextMenu
+        {
+            IsFocused = true,
+        };
+        menu.SetItems(
+        [
+            new ContextMenuItem("copy", "Copy"),
+            new ContextMenuItem("paste", "Paste"),
+        ]);
+        menu.OpenAt(4, 2);
+
+        menu.Handle(new KeyPressed(Key.Enter));
+
+        TestAssert.True(menu.TryConsumeExecution(out var itemId), "Context menu should expose one-shot execution consumption.");
+        TestAssert.Equal("copy", itemId, "Context menu should consume the executed item id.");
+        TestAssert.True(!menu.TryConsumeExecution(out _), "Context menu should not report the same execution twice.");
+        return Task.CompletedTask;
+    }
+
+    private static Task ContextMenu_ItemExecutedEvent_ReportsItem()
+    {
+        var menu = new ContextMenu
+        {
+            IsFocused = true,
+        };
+        menu.SetItems(
+        [
+            new ContextMenuItem("copy", "Copy"),
+            new ContextMenuItem("paste", "Paste"),
+        ]);
+        string? executed = null;
+        menu.ItemExecuted += (_, args) => executed = args.ItemId;
+        menu.OpenAt(4, 2);
+
+        menu.Handle(new KeyPressed(Key.Down));
+        menu.Handle(new KeyPressed(Key.Enter));
+
+        TestAssert.Equal("paste", executed ?? string.Empty, "Context menu execution event should expose the executed item id.");
+        return Task.CompletedTask;
+    }
+
+    private static Task ContextMenu_MouseReleaseExecutesAndCloses()
+    {
+        var menu = new ContextMenu
+        {
+            Border = BorderStyle.None,
+        };
+        menu.SetItems(
+        [
+            new ContextMenuItem("copy", "Copy"),
+            new ContextMenuItem("paste", "Paste"),
+        ]);
+        menu.OpenAt(0, 0);
+
+        var changed = menu.Handle(new PointerInput(PointerEventKind.Release, PointerButton.None, 0, 1), new Rect(0, 0, 20, 6));
+
+        TestAssert.True(changed, "Context menu mouse release should execute row action.");
+        TestAssert.Equal("paste", menu.LastExecutedItemId ?? string.Empty, "Context menu release should execute hovered item.");
+        TestAssert.True(!menu.IsVisible, "Context menu should close after mouse release execute.");
         return Task.CompletedTask;
     }
 

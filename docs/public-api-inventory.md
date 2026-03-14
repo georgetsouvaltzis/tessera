@@ -146,6 +146,7 @@ The first root controls that already own their implementation directly are:
 - `TextArea`
 - `Choice`
 - `ComboBox`
+- `ContextMenu`
 - `ListView<T>`
 - `Tabs`
 - `MenuBar`

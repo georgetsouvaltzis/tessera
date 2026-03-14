@@ -16,12 +16,6 @@ internal static class ProductivityPrebuiltWidgetTests
 {
     public static IEnumerable<TestCase> Cases()
     {
-        yield return new TestCase("Productivity_ContextMenuComponent_ExecutesAndCloses", ContextMenuComponent_ExecutesAndCloses);
-        yield return new TestCase("Productivity_ContextMenuComponent_ItemExecutedEvent_ReportsItem", ContextMenuComponent_ItemExecutedEvent_ReportsItem);
-        yield return new TestCase("Productivity_ContextMenuComponent_TryConsumeExecution_IsSingleUse", ContextMenuComponent_TryConsumeExecution_IsSingleUse);
-        yield return new TestCase("Productivity_ContextMenuComponent_MouseClickExecutesAndCloses", ContextMenuComponent_MouseClickExecutesAndCloses);
-        yield return new TestCase("Productivity_ContextMenuComponent_MouseReleaseExecutesAndCloses", ContextMenuComponent_MouseReleaseExecutesAndCloses);
-        yield return new TestCase("Productivity_ContextMenuComponent_ParamsSetterReplacesItems", ContextMenuComponent_ParamsSetterReplacesItems);
         yield return new TestCase("Productivity_NumberInputComponent_AdjustsAndSubmits", NumberInputComponent_AdjustsAndSubmits);
         yield return new TestCase("Productivity_NumberInputComponent_SubmittedEvent_ReportsValue", NumberInputComponent_SubmittedEvent_ReportsValue);
         yield return new TestCase("Productivity_NumberInputComponent_TryConsumeSubmit_IsSingleUse", NumberInputComponent_TryConsumeSubmit_IsSingleUse);
@@ -32,113 +26,6 @@ internal static class ProductivityPrebuiltWidgetTests
         yield return new TestCase("Productivity_TimePickerComponent_ValueChangedEvent_ReportsTransition", TimePickerComponent_ValueChangedEvent_ReportsTransition);
         yield return new TestCase("Productivity_TimePickerComponent_MouseWheelAdjustsField", TimePickerComponent_MouseWheelAdjustsField);
         yield return new TestCase("Productivity_MarkdownViewerComponent_RendersMarkdown", MarkdownViewerComponent_RendersMarkdown);
-    }
-
-    private static Task ContextMenuComponent_ExecutesAndCloses()
-    {
-        var menu = new ContextMenuComponent(new ContextMenuOptions(
-            Items:
-            [
-                new ContextMenuItem("copy", "Copy"),
-                new ContextMenuItem("paste", "Paste"),
-            ],
-            IsFocused: true));
-        menu.OpenAt(4, 2);
-        menu.Update(new KeyPressMsg(KeyCode.Down));
-        menu.Update(new KeyPressMsg(KeyCode.Enter));
-
-        TestAssert.Equal("paste", menu.LastExecutedItemId ?? string.Empty, "Context menu should execute selected action.");
-        TestAssert.True(!menu.IsVisible, "Context menu should close after execute.");
-        return Task.CompletedTask;
-    }
-
-    private static Task ContextMenuComponent_MouseClickExecutesAndCloses()
-    {
-        var menu = new ContextMenuComponent(new ContextMenuOptions(
-            Items:
-            [
-                new ContextMenuItem("copy", "Copy"),
-                new ContextMenuItem("paste", "Paste"),
-            ],
-            Border: BorderStyle.None));
-        menu.OpenAt(0, 0);
-
-        var changed = menu.UpdateMouse(new MouseClickMsg(MouseButton.Left, 0, 1), new Rect(0, 0, 20, 6));
-
-        TestAssert.True(changed, "Context menu click should execute row action.");
-        TestAssert.Equal("paste", menu.LastExecutedItemId ?? string.Empty, "Context menu click should execute clicked item.");
-        TestAssert.True(!menu.IsVisible, "Context menu should close after mouse execute.");
-        return Task.CompletedTask;
-    }
-
-    private static Task ContextMenuComponent_TryConsumeExecution_IsSingleUse()
-    {
-        var menu = new ContextMenuComponent(new ContextMenuOptions(
-            Items:
-            [
-                new ContextMenuItem("copy", "Copy"),
-                new ContextMenuItem("paste", "Paste"),
-            ],
-            IsFocused: true));
-        menu.OpenAt(4, 2);
-        menu.Update(new KeyPressMsg(KeyCode.Enter));
-
-        TestAssert.True(menu.TryConsumeExecution(out var itemId), "Context menu should expose one-shot execution consumption.");
-        TestAssert.Equal("copy", itemId, "Context menu should consume the executed item id.");
-        TestAssert.True(!menu.TryConsumeExecution(out _), "Context menu should not report the same execution twice.");
-        return Task.CompletedTask;
-    }
-
-    private static Task ContextMenuComponent_ItemExecutedEvent_ReportsItem()
-    {
-        var menu = new ContextMenuComponent(new ContextMenuOptions(
-            Items:
-            [
-                new ContextMenuItem("copy", "Copy"),
-                new ContextMenuItem("paste", "Paste"),
-            ],
-            IsFocused: true));
-        string? executed = null;
-        menu.ItemExecuted += (_, args) => executed = args.ItemId;
-        menu.OpenAt(4, 2);
-
-        menu.Update(new KeyPressMsg(KeyCode.Down));
-        menu.Update(new KeyPressMsg(KeyCode.Enter));
-
-        TestAssert.Equal("paste", executed ?? string.Empty, "Context menu execution event should expose the executed item id.");
-        return Task.CompletedTask;
-    }
-
-    private static Task ContextMenuComponent_MouseReleaseExecutesAndCloses()
-    {
-        var menu = new ContextMenuComponent(new ContextMenuOptions(
-            Items:
-            [
-                new ContextMenuItem("copy", "Copy"),
-                new ContextMenuItem("paste", "Paste"),
-            ],
-            Border: BorderStyle.None));
-        menu.OpenAt(0, 0);
-
-        var changed = menu.UpdateMouse(new MouseReleaseMsg(MouseButton.None, 0, 1), new Rect(0, 0, 20, 6));
-
-        TestAssert.True(changed, "Context menu mouse release should execute row action.");
-        TestAssert.Equal("paste", menu.LastExecutedItemId ?? string.Empty, "Context menu release should execute hovered item.");
-        TestAssert.True(!menu.IsVisible, "Context menu should close after mouse release execute.");
-        return Task.CompletedTask;
-    }
-
-    private static Task ContextMenuComponent_ParamsSetterReplacesItems()
-    {
-        var menu = new ContextMenuComponent();
-
-        menu.SetItems(
-            new ContextMenuItem("copy", "Copy"),
-            new ContextMenuItem("paste", "Paste"));
-
-        TestAssert.Equal(2, menu.Items.Count, "Params-based context menu setup should populate items.");
-        TestAssert.Equal("paste", menu.Items[1].Id, "Params-based context menu setup should keep item order.");
-        return Task.CompletedTask;
     }
 
     private static Task NumberInputComponent_AdjustsAndSubmits()
