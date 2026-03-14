@@ -479,6 +479,48 @@ Over time, reduce visible consumer dependence on:
 Internal bridging is fine.
 Consumer-facing design should not advertise the bridge.
 
+### Phase I. Replace The Legacy Compiler And Runtime Bridge
+
+This phase is explicit, not implied.
+
+TeaSharp currently ships the new public authoring model on top of an older internal bridge:
+
+- `ScreenComposer`
+- region-based composition internals
+- the current runtime/program bridge behind `TeaApp`
+
+That was the correct transition strategy, but it is not the intended end state.
+
+This phase begins when we start replacing those bridge internals directly.
+
+Scope:
+
+- define the new internal compilation target for `Screen`, controls, and layout
+- stop compiling the root path into `ScreenComposer` as the primary bridge
+- replace the current runtime/program bridge with a runtime designed around the new root contracts
+- preserve public API shape while swapping internal execution
+- remove obsolete bridge code once parity is reached
+
+Required approach:
+
+1. inventory current bridge responsibilities
+2. define parity requirements before replacement
+3. replace compiler/runtime in slices, not a blind rewrite
+4. keep the root public API stable while internals move
+5. delete bridge layers only after parity tests pass
+
+This phase is the point where TeaSharp stops merely hiding the old engine and starts no longer depending on it for the default path.
+
+### Phase J. Final Public/Advanced Cutoff And Release Discipline
+
+After the bridge replacement is complete:
+
+- freeze the supported public API surface
+- re-evaluate every remaining advanced public seam
+- internalize or delete anything still public only by inertia
+- finish XML docs, inventory docs, and release-shape cleanup
+- ensure docs/examples match the actual supported layers exactly
+
 ## Review Checklist For Every API Change
 
 Before accepting a public API or example change, ask:
