@@ -1,27 +1,21 @@
-using TeaSharp.Components.UiKit;
-using TeaSharp.Components.Prebuilt;
-using TeaSharp.Components.Primitives;
-using TeaSharp.Components.Styling;
-namespace TeaSharp.Components.Prebuilt.Internal;
+namespace TeaSharp.Controls.Internal;
 
-internal sealed class OptionListController
+internal sealed class SelectionListState
 {
     private readonly List<string> _items = [];
     private readonly List<int> _visibleIndices = [];
 
     public IReadOnlyList<string> Items => _items;
 
-    public IReadOnlyList<int> VisibleIndices => _visibleIndices;
+    public int Count => _items.Count;
+
+    public int VisibleCount => _visibleIndices.Count;
 
     public int SelectedIndex { get; private set; } = -1;
 
     public int HighlightedVisibleIndex { get; private set; }
 
     public int HoveredVisibleIndex { get; private set; } = -1;
-
-    public int Count => _items.Count;
-
-    public int VisibleCount => _visibleIndices.Count;
 
     public string SelectedItem => SelectedIndex >= 0 && SelectedIndex < _items.Count
         ? _items[SelectedIndex]
@@ -53,11 +47,11 @@ internal sealed class OptionListController
     {
         _visibleIndices.Clear();
         var normalized = filter?.Trim() ?? string.Empty;
-        for (var i = 0; i < _items.Count; i++)
+        for (var index = 0; index < _items.Count; index++)
         {
-            if (normalized.Length == 0 || _items[i].Contains(normalized, StringComparison.OrdinalIgnoreCase))
+            if (normalized.Length == 0 || _items[index].Contains(normalized, StringComparison.OrdinalIgnoreCase))
             {
-                _visibleIndices.Add(i);
+                _visibleIndices.Add(index);
             }
         }
 

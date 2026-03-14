@@ -144,6 +144,8 @@ The first root controls that already own their implementation directly are:
 - `Button`
 - `TextInput`
 - `TextArea`
+- `Choice`
+- `ComboBox`
 - `StatusBar`
 
 Their old `TeaSharp.Components.Prebuilt.*` counterparts have been removed instead of kept as compatibility wrappers.

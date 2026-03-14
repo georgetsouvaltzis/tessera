@@ -20,9 +20,8 @@ internal static class ApiErgonomicsTests
         yield return new TestCase("ApiErgonomics_RootTextInput_ConfiguresWithoutNestedInputAccess", RootTextInput_ConfiguresWithoutNestedInputAccess);
         yield return new TestCase("ApiErgonomics_RootTextArea_ConfiguresWithoutNestedInputAccess", RootTextArea_ConfiguresWithoutNestedInputAccess);
         yield return new TestCase("ApiErgonomics_ListComponent_ExposesSelectionWithoutModelAccess", ListComponent_ExposesSelectionWithoutModelAccess);
-        yield return new TestCase("ApiErgonomics_DropdownOptions_ConfigureComponentWithoutPostConstructionMutation", DropdownOptions_ConfigureComponentWithoutPostConstructionMutation);
-        yield return new TestCase("ApiErgonomics_ComboboxOptions_ConfigureComponentWithoutPostConstructionMutation", ComboboxOptions_ConfigureComponentWithoutPostConstructionMutation);
-        yield return new TestCase("ApiErgonomics_ComboboxComponent_ExposesFilterWithoutNestedInputAccess", ComboboxComponent_ExposesFilterWithoutNestedInputAccess);
+        yield return new TestCase("ApiErgonomics_RootChoice_ConfiguresWithoutPostConstructionMutation", RootChoice_ConfiguresWithoutPostConstructionMutation);
+        yield return new TestCase("ApiErgonomics_RootComboBox_ExposesFilterWithoutNestedInputAccess", RootComboBox_ExposesFilterWithoutNestedInputAccess);
         yield return new TestCase("ApiErgonomics_TableOptions_ExposePageSizeWithoutInnerAccess", TableOptions_ExposePageSizeWithoutInnerAccess);
         yield return new TestCase("ApiErgonomics_TableComponent_ExposesSortStateWithoutInnerAccess", TableComponent_ExposesSortStateWithoutInnerAccess);
         yield return new TestCase("ApiErgonomics_InteractionProfiles_AreClonedOnAssignment", InteractionProfiles_AreClonedOnAssignment);
@@ -128,50 +127,28 @@ internal static class ApiErgonomicsTests
         return Task.CompletedTask;
     }
 
-    private static Task DropdownOptions_ConfigureComponentWithoutPostConstructionMutation()
+    private static Task RootChoice_ConfiguresWithoutPostConstructionMutation()
     {
-        var options = new DropdownOptions(
-            Items: ["Development", "Production"],
-            Title: "Environment",
-            IsFocused: true,
-            Border: BorderStyle.None,
-            MaxVisibleItems: 4,
-            InteractionProfile: WidgetInteractionProfile.KeyboardOnly);
-        var dropdown = new DropdownComponent(options);
+        var choice = new Choice
+        {
+            Title = "Environment",
+            IsFocused = true,
+            Border = BorderStyle.None,
+            MaxVisibleItems = 4,
+        };
+        choice.SetItems(["Development", "Production"]);
 
-        TestAssert.Equal("Environment", dropdown.Title, "Dropdown options should set title.");
-        TestAssert.True(dropdown.IsFocused, "Dropdown options should set focus.");
-        TestAssert.True(dropdown.Border == BorderStyle.None, "Dropdown options should set border style.");
-        TestAssert.Equal(4, dropdown.MaxVisibleItems, "Dropdown options should set max visible items.");
-        TestAssert.Equal("Development", dropdown.SelectedItem, "Dropdown options should preload items.");
-        TestAssert.True(!ReferenceEquals(options.InteractionProfile, dropdown.InteractionProfile), "Dropdown should clone interaction profile instead of sharing mutable state.");
+        TestAssert.Equal("Environment", choice.Title, "Choice configuration should set title.");
+        TestAssert.True(choice.IsFocused, "Choice configuration should set focus.");
+        TestAssert.True(choice.Border == BorderStyle.None, "Choice configuration should set border style.");
+        TestAssert.Equal(4, choice.MaxVisibleItems, "Choice configuration should set max visible items.");
+        TestAssert.Equal("Development", choice.SelectedItem, "Choice should preload items through root configuration.");
         return Task.CompletedTask;
     }
 
-    private static Task ComboboxOptions_ConfigureComponentWithoutPostConstructionMutation()
+    private static Task RootComboBox_ExposesFilterWithoutNestedInputAccess()
     {
-        var options = new ComboboxOptions(
-            Items: ["alpha", "beta"],
-            Title: "Region",
-            Placeholder: "type here",
-            InitialFilter: "be",
-            IsFocused: true,
-            MaxVisibleItems: 5,
-            InteractionProfile: WidgetInteractionProfile.KeyboardOnly);
-        var combobox = new ComboboxComponent(options);
-
-        TestAssert.Equal("Region", combobox.Title, "Combobox options should set title.");
-        TestAssert.Equal("type here", combobox.Placeholder, "Combobox options should set placeholder.");
-        TestAssert.Equal("be", combobox.FilterText, "Combobox options should set initial filter text.");
-        TestAssert.True(combobox.IsFocused, "Combobox options should set focus.");
-        TestAssert.Equal(5, combobox.MaxVisibleItems, "Combobox options should set max visible items.");
-        TestAssert.True(!ReferenceEquals(options.InteractionProfile, combobox.InteractionProfile), "Combobox should clone interaction profile instead of sharing mutable state.");
-        return Task.CompletedTask;
-    }
-
-    private static Task ComboboxComponent_ExposesFilterWithoutNestedInputAccess()
-    {
-        var combobox = new ComboboxComponent
+        var combobox = new ComboBox
         {
             Placeholder = "type here",
         };
@@ -179,8 +156,8 @@ internal static class ApiErgonomicsTests
         combobox.SetItems(["alpha", "beta"]);
         combobox.SetFilterText("be");
 
-        TestAssert.Equal("type here", combobox.Placeholder, "Combobox should expose placeholder at component level.");
-        TestAssert.Equal("be", combobox.FilterText, "Combobox should expose filter text at component level.");
+        TestAssert.Equal("type here", combobox.Placeholder, "ComboBox should expose placeholder at root level.");
+        TestAssert.Equal("be", combobox.FilterText, "ComboBox should expose filter text at root level.");
         return Task.CompletedTask;
     }
 
@@ -207,7 +184,7 @@ internal static class ApiErgonomicsTests
     private static Task InteractionProfiles_AreClonedOnAssignment()
     {
         var shared = WidgetInteractionProfile.KeyboardOnly;
-        var dropdown = new DropdownComponent
+        var palette = new CommandPaletteComponent
         {
             InteractionProfile = shared,
         };
@@ -216,11 +193,11 @@ internal static class ApiErgonomicsTests
             InteractionProfile = shared,
         };
 
-        dropdown.InteractionProfile.NavigateOnWheel = true;
+        palette.InteractionProfile.NavigateOnWheel = true;
 
         TestAssert.True(!shared.NavigateOnWheel, "Shared profile instances should not be mutated through component assignment.");
         TestAssert.True(!tabs.InteractionProfile.NavigateOnWheel, "Components should not share the same interaction profile instance.");
-        TestAssert.True(dropdown.InteractionProfile.NavigateOnWheel, "Component-local profile mutation should still work after cloning.");
+        TestAssert.True(palette.InteractionProfile.NavigateOnWheel, "Component-local profile mutation should still work after cloning.");
         return Task.CompletedTask;
     }
 

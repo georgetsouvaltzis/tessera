@@ -58,10 +58,6 @@ internal static class TeaControlCatalogTests
 
     private static readonly string[] InternalizedLegacyPrebuiltTypes =
     [
-        "TeaSharp.Components.Prebuilt.DropdownComponent",
-        "TeaSharp.Components.Prebuilt.DropdownOptions",
-        "TeaSharp.Components.Prebuilt.ComboboxComponent",
-        "TeaSharp.Components.Prebuilt.ComboboxOptions",
         "TeaSharp.Components.Prebuilt.DialogComponent",
         "TeaSharp.Components.Prebuilt.DialogOptions",
         "TeaSharp.Components.Prebuilt.DialogResult",
@@ -74,7 +70,6 @@ internal static class TeaControlCatalogTests
         "TeaSharp.Components.Prebuilt.ListSelectionChangedEventArgs`1",
         "TeaSharp.Components.Prebuilt.TableComponent",
         "TeaSharp.Components.Prebuilt.TableOptions",
-        "TeaSharp.Components.Prebuilt.OptionSelectionChangedEventArgs",
     ];
 
     private static readonly string[] RemovedLegacyPrebuiltTypes =
@@ -91,6 +86,11 @@ internal static class TeaControlCatalogTests
         "TeaSharp.Components.Prebuilt.TextAreaOptions",
         "TeaSharp.Components.Prebuilt.StatusBarComponent",
         "TeaSharp.Components.Prebuilt.StatusBarOptions",
+        "TeaSharp.Components.Prebuilt.DropdownComponent",
+        "TeaSharp.Components.Prebuilt.DropdownOptions",
+        "TeaSharp.Components.Prebuilt.ComboboxComponent",
+        "TeaSharp.Components.Prebuilt.ComboboxOptions",
+        "TeaSharp.Components.Prebuilt.OptionSelectionChangedEventArgs",
     ];
 
     private static readonly string[] InternalizedLegacyPromotedTypes =

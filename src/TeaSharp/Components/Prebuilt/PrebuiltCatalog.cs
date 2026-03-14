@@ -21,10 +21,6 @@ internal static class PrebuiltCatalog
 
     public static TableComponent Table(TableOptions options) => new(options);
 
-    public static DropdownComponent Dropdown(DropdownOptions? options = null) => options is null ? new DropdownComponent() : new DropdownComponent(options);
-
-    public static ComboboxComponent Combobox(ComboboxOptions? options = null) => options is null ? new ComboboxComponent() : new ComboboxComponent(options);
-
     public static ProgressBarComponent ProgressBar(ProgressBarOptions? options = null) => options is null ? new ProgressBarComponent() : new ProgressBarComponent(options);
 
 
