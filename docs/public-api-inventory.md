@@ -138,6 +138,14 @@ The old `TeaHost.CreateProgram(...)` / `TeaProgramOptions` / `IScreen` program-h
 
 The old tree-oriented stack now mostly compiles behind the scenes as an internal bridge. The previous static layout helper DSL is also internal-only.
 
+The first root controls that already own their implementation directly are:
+
+- `Label`
+- `Button`
+- `TextInput`
+
+Their old `TeaSharp.Components.Prebuilt.*` counterparts have been removed instead of kept as compatibility wrappers.
+
 ## Design Constraints
 
 - normal apps should stay in `TeaSharp`

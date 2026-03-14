@@ -82,36 +82,34 @@ Historical pre-redesign example:
 
 ```csharp
 using TeaSharp;
-using TeaSharp.Components.Prebuilt;
+using TeaSharp.Controls;
 using TeaSharp.Components.Primitives;
-using TeaSharp.Core.Abstractions;
 using TeaSharp.Core.Messages;
 
-internal sealed class SearchScreen : IScreen
+internal sealed class SearchScreen : TeaApp
 {
-    private readonly TextInputComponent _input = new(new TextInputOptions(
-        Title: "Search",
-        Placeholder: "type here"));
-    private readonly ScreenComposer _screen = new();
-
-    public ScreenOutput Render()
+    private readonly TextInput _input = new()
     {
-        _screen.BeginFrame();
-        var bodyRect = new Rect(0, 0, 80, 24);
-        _screen.AddComponent(new ScreenRegionKey("search"), bodyRect, _input, focusable: true);
-        _screen.CompleteFrame();
-        return new ScreenOutput(_screen.RenderToFrame());
+        Title = "Search",
+        Placeholder = "type here",
+    };
+
+    public override Screen Build(ScreenContext context)
+    {
+        return Screen.Build(screen =>
+        {
+            screen.Content(content =>
+            {
+                content.Add(_input);
+            });
+        });
     }
 
-    public Effect? Update(IMessage message)
-    {
-        _screen.Update(message);
-        return null;
-    }
+    public override Effect? Update(Message message) => null;
 }
 ```
 
-That path no longer exists in the supported implementation; use `TeaApp` and the root `TeaSharp.Controls` / `TeaSharp.Layout` surface instead.
+That path no longer exists in the supported implementation. The `TextInputComponent` / `TextInputOptions` pair shown above is removed; use `TeaApp` and the root `TeaSharp.Controls` / `TeaSharp.Layout` surface instead.
 
 After:
 

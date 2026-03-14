@@ -58,14 +58,6 @@ internal static class TeaControlCatalogTests
 
     private static readonly string[] InternalizedLegacyPrebuiltTypes =
     [
-        "TeaSharp.Components.Prebuilt.TextBlockComponent",
-        "TeaSharp.Components.Prebuilt.TextBlockOptions",
-        "TeaSharp.Components.Prebuilt.ButtonComponent",
-        "TeaSharp.Components.Prebuilt.ButtonOptions",
-        "TeaSharp.Components.Prebuilt.TextInputComponent",
-        "TeaSharp.Components.Prebuilt.TextInputOptions",
-        "TeaSharp.Components.Prebuilt.TextInputSubmittedEventArgs",
-        "TeaSharp.Components.Prebuilt.TextInputCancelledEventArgs",
         "TeaSharp.Components.Prebuilt.TextAreaComponent",
         "TeaSharp.Components.Prebuilt.TextAreaOptions",
         "TeaSharp.Components.Prebuilt.DropdownComponent",
@@ -87,6 +79,18 @@ internal static class TeaControlCatalogTests
         "TeaSharp.Components.Prebuilt.TableComponent",
         "TeaSharp.Components.Prebuilt.TableOptions",
         "TeaSharp.Components.Prebuilt.OptionSelectionChangedEventArgs",
+    ];
+
+    private static readonly string[] RemovedLegacyPrebuiltTypes =
+    [
+        "TeaSharp.Components.Prebuilt.TextBlockComponent",
+        "TeaSharp.Components.Prebuilt.TextBlockOptions",
+        "TeaSharp.Components.Prebuilt.ButtonComponent",
+        "TeaSharp.Components.Prebuilt.ButtonOptions",
+        "TeaSharp.Components.Prebuilt.TextInputComponent",
+        "TeaSharp.Components.Prebuilt.TextInputOptions",
+        "TeaSharp.Components.Prebuilt.TextInputSubmittedEventArgs",
+        "TeaSharp.Components.Prebuilt.TextInputCancelledEventArgs",
     ];
 
     private static readonly string[] InternalizedLegacyPromotedTypes =
@@ -145,6 +149,9 @@ internal static class TeaControlCatalogTests
         yield return new TestCase(
             "TeaControlCatalog_InternalizedLegacyPrebuiltTypes_AreNotPublic",
             InternalizedLegacyPrebuiltTypes_AreNotPublic);
+        yield return new TestCase(
+            "TeaControlCatalog_RemovedLegacyPrebuiltTypes_AreAbsent",
+            RemovedLegacyPrebuiltTypes_AreAbsent);
         yield return new TestCase(
             "TeaControlCatalog_InternalizedLegacyPromotedTypes_AreNotPublic",
             InternalizedLegacyPromotedTypes_AreNotPublic);
@@ -209,6 +216,19 @@ internal static class TeaControlCatalogTests
             var type = assembly.GetType(typeName, throwOnError: false);
             TestAssert.True(type is not null, $"{typeName} should continue to exist as an internal bridge.");
             TestAssert.True(type!.IsNotPublic, $"{typeName} should no longer be public once a root wrapper exists.");
+        }
+
+        return Task.CompletedTask;
+    }
+
+    private static Task RemovedLegacyPrebuiltTypes_AreAbsent()
+    {
+        var assembly = typeof(Label).Assembly;
+
+        foreach (var typeName in RemovedLegacyPrebuiltTypes)
+        {
+            var type = assembly.GetType(typeName, throwOnError: false);
+            TestAssert.True(type is null, $"{typeName} should be removed once the root control owns the implementation directly.");
         }
 
         return Task.CompletedTask;

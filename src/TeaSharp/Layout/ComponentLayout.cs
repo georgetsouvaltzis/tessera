@@ -42,12 +42,15 @@ internal sealed class ComponentLayout : LayoutNode
     public ComponentLayout(Control control)
         : this((control ?? throw new ArgumentNullException(nameof(control))).Component)
     {
+        Control = control;
     }
 
     /// <summary>
     /// Gets the wrapped TeaSharp component.
     /// </summary>
     public ICanvasComponent Component { get; }
+
+    internal Control? Control { get; }
 
     /// <summary>
     /// Gets the optional stable region key used when the component participates in screen routing.
@@ -104,7 +107,9 @@ internal sealed class ComponentLayout : LayoutNode
                 Math.Clamp(PreferredHeight ?? availableBounds.Height, 0, availableBounds.Height));
         }
 
-        return LayoutIntrinsicMeasurer.Measure(Component, availableBounds);
+        return Control is not null
+            ? Control.Measure(availableBounds)
+            : LayoutIntrinsicMeasurer.Measure(Component, availableBounds);
     }
 
     internal override void Compose(ScreenComposer screen, in Rect bounds, string path)

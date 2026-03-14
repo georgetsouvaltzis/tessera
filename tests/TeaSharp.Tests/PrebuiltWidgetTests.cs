@@ -8,8 +8,10 @@ using TeaSharp.Components.Primitives;
 using TeaSharp.Components.Productivity;
 using TeaSharp.Components.Styling;
 using TeaSharp.Components.UiKit;
+using TeaSharp.Controls;
 using System.Globalization;
 using TeaSharp.Core.Messages;
+using LegacyDialogResult = TeaSharp.Components.Prebuilt.DialogResult;
 
 namespace TeaSharp.Tests;
 
@@ -17,17 +19,17 @@ internal static class PrebuiltWidgetTests
 {
     public static IEnumerable<TestCase> Cases()
     {
-        yield return new TestCase("Prebuilt_LabelComponent_RendersText", LabelComponent_RendersText);
-        yield return new TestCase("Prebuilt_ButtonComponent_ActivatesWhenFocused", ButtonComponent_ActivatesWhenFocused);
-        yield return new TestCase("Prebuilt_ButtonComponent_MouseClickActivatesAndTracksState", ButtonComponent_MouseClickActivatesAndTracksState);
-        yield return new TestCase("Prebuilt_ButtonComponent_PressedEvent_FiresOnActivation", ButtonComponent_PressedEvent_FiresOnActivation);
-        yield return new TestCase("Prebuilt_ButtonComponent_TryConsumePress_IsSingleUse", ButtonComponent_TryConsumePress_IsSingleUse);
-        yield return new TestCase("Prebuilt_ButtonComponent_RendersBorderedState", ButtonComponent_RendersBorderedState);
-        yield return new TestCase("Prebuilt_TextInputComponent_SubmitsValue", TextInputComponent_SubmitsValue);
-        yield return new TestCase("Prebuilt_TextInputComponent_Events_ReportSubmitAndCancelValues", TextInputComponent_Events_ReportSubmitAndCancelValues);
-        yield return new TestCase("Prebuilt_TextInputComponent_TryConsumeSubmitAndCancel_AreSingleUse", TextInputComponent_TryConsumeSubmitAndCancel_AreSingleUse);
-        yield return new TestCase("Prebuilt_TextInputComponent_CancelSignalsAndCanClear", TextInputComponent_CancelSignalsAndCanClear);
-        yield return new TestCase("Prebuilt_TextInputComponent_HidesBorderWhenConfigured", TextInputComponent_HidesBorderWhenConfigured);
+        yield return new TestCase("Controls_Label_RendersText", Label_RendersText);
+        yield return new TestCase("Controls_Button_ActivatesWhenFocused", Button_ActivatesWhenFocused);
+        yield return new TestCase("Controls_Button_MouseClickActivatesAndTracksState", Button_MouseClickActivatesAndTracksState);
+        yield return new TestCase("Controls_Button_ActivatedEvent_FiresOnActivation", Button_ActivatedEvent_FiresOnActivation);
+        yield return new TestCase("Controls_Button_TryConsumeActivation_IsSingleUse", Button_TryConsumeActivation_IsSingleUse);
+        yield return new TestCase("Controls_Button_RendersBorderedState", Button_RendersBorderedState);
+        yield return new TestCase("Controls_TextInput_SubmitsValue", TextInput_SubmitsValue);
+        yield return new TestCase("Controls_TextInput_Events_ReportSubmitAndCancelValues", TextInput_Events_ReportSubmitAndCancelValues);
+        yield return new TestCase("Controls_TextInput_TryConsumeSubmissionAndCancellation_AreSingleUse", TextInput_TryConsumeSubmissionAndCancellation_AreSingleUse);
+        yield return new TestCase("Controls_TextInput_CancelSignalsAndCanClear", TextInput_CancelSignalsAndCanClear);
+        yield return new TestCase("Controls_TextInput_HidesBorderWhenConfigured", TextInput_HidesBorderWhenConfigured);
         yield return new TestCase("Prebuilt_TextAreaComponent_RendersMultilineContent", TextAreaComponent_RendersMultilineContent);
         yield return new TestCase("Prebuilt_TextAreaComponent_EnterInsertsNewline", TextAreaComponent_EnterInsertsNewline);
         yield return new TestCase("Prebuilt_ListComponent_NavigatesSelection", ListComponent_NavigatesSelection);
@@ -57,9 +59,9 @@ internal static class PrebuiltWidgetTests
         yield return new TestCase("Prebuilt_LayoutContainerComponent_MouseRoutesToTargetChild", LayoutContainerComponent_MouseRoutesToTargetChild);
     }
 
-    private static Task LabelComponent_RendersText()
+    private static Task Label_RendersText()
     {
-        var label = new TextBlockComponent
+        var label = new Label
         {
             Title = "L",
             Text = "hello\nworld",
@@ -74,78 +76,82 @@ internal static class PrebuiltWidgetTests
         return Task.CompletedTask;
     }
 
-    private static Task ButtonComponent_ActivatesWhenFocused()
+    private static Task Button_ActivatesWhenFocused()
     {
-        var button = new ButtonComponent
+        var button = new Button
         {
-            Label = "Go",
+            Text = "Go",
             IsFocused = true,
         };
 
-        var changed = button.Update(new KeyPressMsg(KeyCode.Enter));
+        var changed = button.Handle(new KeyPressed(Key.Enter));
 
         TestAssert.True(changed, "IsFocused button should handle enter.");
-        TestAssert.Equal(1, button.PressCount, "Button press count should increment.");
+        TestAssert.Equal(1, button.ActivationCount, "Button activation count should increment.");
         return Task.CompletedTask;
     }
 
-    private static Task ButtonComponent_MouseClickActivatesAndTracksState()
+    private static Task Button_MouseClickActivatesAndTracksState()
     {
-        var button = new ButtonComponent(new ButtonOptions(
-            Label: "Deploy",
-            Border: BorderStyle.SingleLine));
+        var button = new Button
+        {
+            Text = "Deploy",
+            Border = BorderStyle.SingleLine,
+        };
         var bounds = new Rect(0, 0, 18, 5);
 
-        var hoverChanged = button.UpdateMouse(new MouseMotionMsg(MouseButton.None, 4, 2), bounds);
-        var clickChanged = button.UpdateMouse(new MouseClickMsg(MouseButton.Left, 4, 2), bounds);
-        var releaseChanged = button.UpdateMouse(new MouseReleaseMsg(MouseButton.Left, 4, 2), bounds);
+        var hoverChanged = button.Handle(new PointerInput(PointerEventKind.Motion, PointerButton.None, 4, 2), bounds);
+        var clickChanged = button.Handle(new PointerInput(PointerEventKind.Press, PointerButton.Left, 4, 2), bounds);
+        var releaseChanged = button.Handle(new PointerInput(PointerEventKind.Release, PointerButton.Left, 4, 2), bounds);
 
         TestAssert.True(hoverChanged, "Mouse motion inside button should update hover state.");
         TestAssert.True(clickChanged, "Mouse click should activate the button.");
         TestAssert.True(releaseChanged, "Mouse release should clear the pressed state.");
-        TestAssert.True(button.Hovered, "Button should remain hovered while pointer is inside.");
         TestAssert.True(!button.IsPressed, "Button should clear pressed state on release.");
-        TestAssert.True(button.PressCount == 1, "Mouse click should increment press count.");
-        TestAssert.True(!button.WasPressed, "Release should clear the one-frame pressed signal.");
+        TestAssert.True(button.ActivationCount == 1, "Mouse click should increment activation count.");
+        TestAssert.True(button.TryConsumeActivation(), "Button should surface a one-shot activation after the click.");
+        TestAssert.True(!button.TryConsumeActivation(), "Activation consumption should remain single-use after the click.");
         return Task.CompletedTask;
     }
 
-    private static Task ButtonComponent_TryConsumePress_IsSingleUse()
+    private static Task Button_TryConsumeActivation_IsSingleUse()
     {
-        var button = new ButtonComponent
+        var button = new Button
         {
             IsFocused = true,
         };
 
-        button.Update(new KeyPressMsg(KeyCode.Enter));
+        button.Handle(new KeyPressed(Key.Enter));
 
-        TestAssert.True(button.TryConsumePress(), "Button should expose one-shot press consumption.");
-        TestAssert.True(!button.TryConsumePress(), "Button should not report the same press twice.");
+        TestAssert.True(button.TryConsumeActivation(), "Button should expose one-shot activation consumption.");
+        TestAssert.True(!button.TryConsumeActivation(), "Button should not report the same activation twice.");
         return Task.CompletedTask;
     }
 
-    private static Task ButtonComponent_PressedEvent_FiresOnActivation()
+    private static Task Button_ActivatedEvent_FiresOnActivation()
     {
-        var button = new ButtonComponent
+        var button = new Button
         {
             IsFocused = true,
         };
         var pressCount = 0;
-        button.Pressed += (_, _) => pressCount++;
+        button.Activated += (_, _) => pressCount++;
 
-        button.Update(new KeyPressMsg(KeyCode.Enter));
-        button.Update(new KeyPressMsg(KeyCode.Enter));
+        button.Handle(new KeyPressed(Key.Enter));
+        button.Handle(new KeyPressed(Key.Enter));
 
-        TestAssert.Equal(2, pressCount, "Button should raise the pressed event for each activation.");
+        TestAssert.Equal(2, pressCount, "Button should raise the activated event for each activation.");
         return Task.CompletedTask;
     }
 
-    private static Task ButtonComponent_RendersBorderedState()
+    private static Task Button_RendersBorderedState()
     {
-        var button = new ButtonComponent(new ButtonOptions(
-            Label: "Start",
-            Description: "click or press enter",
-            Border: BorderStyle.SingleLine));
+        var button = new Button
+        {
+            Text = "Start",
+            Description = "click or press enter",
+            Border = BorderStyle.SingleLine,
+        };
         var canvas = new Canvas(24, 5);
 
         button.Render(canvas, new Rect(0, 0, 24, 5));
@@ -156,16 +162,17 @@ internal static class PrebuiltWidgetTests
         return Task.CompletedTask;
     }
 
-    private static Task TextInputComponent_SubmitsValue()
+    private static Task TextInput_SubmitsValue()
     {
-        var input = new TextInputComponent
+        var input = new TextInput
         {
+            IsFocused = true,
             ClearOnSubmit = true,
         };
 
-        input.Update(new KeyPressMsg(KeyCode.Character, "a"));
-        input.Update(new KeyPressMsg(KeyCode.Character, "b"));
-        input.Update(new KeyPressMsg(KeyCode.Enter));
+        input.Handle(new KeyPressed(Key.Character, "a"));
+        input.Handle(new KeyPressed(Key.Character, "b"));
+        input.Handle(new KeyPressed(Key.Enter));
 
         TestAssert.Equal("ab", input.LastSubmittedValue, "Text input should capture submitted value.");
         TestAssert.Equal(1, input.SubmitCount, "Text input should count submissions.");
@@ -173,9 +180,9 @@ internal static class PrebuiltWidgetTests
         return Task.CompletedTask;
     }
 
-    private static Task TextInputComponent_HidesBorderWhenConfigured()
+    private static Task TextInput_HidesBorderWhenConfigured()
     {
-        var input = new TextInputComponent
+        var input = new TextInput
         {
             Border = BorderStyle.None,
         };
@@ -190,51 +197,51 @@ internal static class PrebuiltWidgetTests
         return Task.CompletedTask;
     }
 
-    private static Task TextInputComponent_CancelSignalsAndCanClear()
+    private static Task TextInput_CancelSignalsAndCanClear()
     {
-        var input = new TextInputComponent
+        var input = new TextInput
         {
+            IsFocused = true,
             ClearOnCancel = true,
         };
 
-        input.Update(new KeyPressMsg(KeyCode.Character, "a"));
-        input.Update(new KeyPressMsg(KeyCode.Character, "b"));
-        var changed = input.Update(new KeyPressMsg(KeyCode.Escape));
+        input.Handle(new KeyPressed(Key.Character, "a"));
+        input.Handle(new KeyPressed(Key.Character, "b"));
+        var changed = input.Handle(new KeyPressed(Key.Escape));
 
         TestAssert.True(changed, "Text input escape should signal a handled cancel action.");
-        TestAssert.True(input.WasCancelled, "Text input should expose cancellation signal after escape.");
         TestAssert.Equal("ab", input.LastCancelledValue, "Text input should capture cancelled value.");
         TestAssert.Equal(1, input.CancelCount, "Text input should count cancel actions.");
         TestAssert.Equal(string.Empty, input.Value, "Text input should clear value on cancel when configured.");
         return Task.CompletedTask;
     }
 
-    private static Task TextInputComponent_TryConsumeSubmitAndCancel_AreSingleUse()
+    private static Task TextInput_TryConsumeSubmissionAndCancellation_AreSingleUse()
     {
-        var input = new TextInputComponent
+        var input = new TextInput
         {
             IsFocused = true,
         };
 
-        input.Update(new KeyPressMsg(KeyCode.Character, "a"));
-        input.Update(new KeyPressMsg(KeyCode.Enter));
+        input.Handle(new KeyPressed(Key.Character, "a"));
+        input.Handle(new KeyPressed(Key.Enter));
 
-        TestAssert.True(input.TryConsumeSubmit(out var submitted), "Text input should expose one-shot submit consumption.");
+        TestAssert.True(input.TryConsumeSubmission(out var submitted), "Text input should expose one-shot submit consumption.");
         TestAssert.Equal("a", submitted, "Consumed submit should preserve submitted value.");
-        TestAssert.True(!input.TryConsumeSubmit(out _), "Submit consumption should be single-use per submit.");
+        TestAssert.True(!input.TryConsumeSubmission(out _), "Submit consumption should be single-use per submit.");
 
-        input.Update(new KeyPressMsg(KeyCode.Character, "b"));
-        input.Update(new KeyPressMsg(KeyCode.Escape));
+        input.Handle(new KeyPressed(Key.Character, "b"));
+        input.Handle(new KeyPressed(Key.Escape));
 
-        TestAssert.True(input.TryConsumeCancel(out var cancelled), "Text input should expose one-shot cancel consumption.");
+        TestAssert.True(input.TryConsumeCancellation(out var cancelled), "Text input should expose one-shot cancel consumption.");
         TestAssert.Equal("ab", cancelled, "Consumed cancel should preserve cancelled value.");
-        TestAssert.True(!input.TryConsumeCancel(out _), "Cancel consumption should be single-use per cancel.");
+        TestAssert.True(!input.TryConsumeCancellation(out _), "Cancel consumption should be single-use per cancel.");
         return Task.CompletedTask;
     }
 
-    private static Task TextInputComponent_Events_ReportSubmitAndCancelValues()
+    private static Task TextInput_Events_ReportSubmitAndCancelValues()
     {
-        var input = new TextInputComponent
+        var input = new TextInput
         {
             IsFocused = true,
         };
@@ -243,10 +250,10 @@ internal static class PrebuiltWidgetTests
         input.Submitted += (_, args) => submitted = args.Value;
         input.Cancelled += (_, args) => cancelled = args.Value;
 
-        input.Update(new KeyPressMsg(KeyCode.Character, "a"));
-        input.Update(new KeyPressMsg(KeyCode.Enter));
-        input.Update(new KeyPressMsg(KeyCode.Character, "b"));
-        input.Update(new KeyPressMsg(KeyCode.Escape));
+        input.Handle(new KeyPressed(Key.Character, "a"));
+        input.Handle(new KeyPressed(Key.Enter));
+        input.Handle(new KeyPressed(Key.Character, "b"));
+        input.Handle(new KeyPressed(Key.Escape));
 
         TestAssert.Equal("a", submitted ?? string.Empty, "Text input submit event should expose the submitted value.");
         TestAssert.Equal("ab", cancelled ?? string.Empty, "Text input cancel event should expose the cancelled value.");
@@ -314,7 +321,7 @@ internal static class PrebuiltWidgetTests
         {
             IsFocused = true,
         };
-        ListSelectionChangedEventArgs<string>? args = null;
+        TeaSharp.Components.Prebuilt.ListSelectionChangedEventArgs<string>? args = null;
         list.SelectionChanged += (_, eventArgs) => args = eventArgs;
 
         list.Update(new KeyPressMsg(KeyCode.Down));
@@ -630,13 +637,13 @@ internal static class PrebuiltWidgetTests
 
         var accepted = dialog.Update(new KeyPressMsg(KeyCode.Enter));
         TestAssert.True(accepted, "Dialog should accept on enter.");
-        TestAssert.True(dialog.LastResult == DialogResult.Accepted, "Dialog should record accepted result.");
+        TestAssert.True(dialog.LastResult == LegacyDialogResult.Accepted, "Dialog should record accepted result.");
 
         dialog.IsVisible = true;
         dialog.IsFocused = true;
         var dismissed = dialog.Update(new KeyPressMsg(KeyCode.Escape));
         TestAssert.True(dismissed, "Dialog should dismiss on escape.");
-        TestAssert.True(dialog.LastResult == DialogResult.Dismissed, "Dialog should record dismissed result.");
+        TestAssert.True(dialog.LastResult == LegacyDialogResult.Dismissed, "Dialog should record dismissed result.");
         return Task.CompletedTask;
     }
 
@@ -651,7 +658,7 @@ internal static class PrebuiltWidgetTests
         dialog.Update(new KeyPressMsg(KeyCode.Enter));
 
         TestAssert.True(dialog.TryConsumeResult(out var result), "Dialog should expose one-shot result consumption.");
-        TestAssert.True(result == DialogResult.Accepted, "Dialog should consume accepted result.");
+        TestAssert.True(result == LegacyDialogResult.Accepted, "Dialog should consume accepted result.");
         TestAssert.True(!dialog.TryConsumeResult(out _), "Dialog result consumption should be single-use per decision.");
         return Task.CompletedTask;
     }
@@ -685,8 +692,8 @@ internal static class PrebuiltWidgetTests
             GridRows = 1,
             GridColumns = 2,
         };
-        layout.Add(new TextBlockComponent { Border = BorderStyle.None, Text = "left" });
-        layout.Add(new TextBlockComponent { Border = BorderStyle.None, Text = "right" });
+        layout.Add(new Label { Border = BorderStyle.None, Text = "left" }.Component);
+        layout.Add(new Label { Border = BorderStyle.None, Text = "right" }.Component);
 
         var canvas = new Canvas(20, 3);
         layout.Render(canvas, new Rect(0, 0, 20, 3));
@@ -705,8 +712,8 @@ internal static class PrebuiltWidgetTests
             MinPrimarySize = 4,
             MinSecondarySize = 4,
         };
-        layout.Add(new TextBlockComponent { Border = BorderStyle.None, Text = "left" });
-        layout.Add(new TextBlockComponent { Border = BorderStyle.None, Text = "right" });
+        layout.Add(new Label { Border = BorderStyle.None, Text = "left" }.Component);
+        layout.Add(new Label { Border = BorderStyle.None, Text = "right" }.Component);
         layout.SetPrimarySize(12);
 
         var bounds = new Rect(0, 0, 30, 6);

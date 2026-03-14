@@ -3,6 +3,7 @@ using TeaSharp.Components.Primitives;
 using TeaSharp.Core.Abstractions;
 using TeaSharp.Core.Messages;
 using TeaSharp.Internal;
+using TeaSharp.Layout;
 
 namespace TeaSharp.Controls;
 
@@ -79,6 +80,11 @@ public abstract class Control
     public virtual bool Handle(Message message, Rect bounds)
     {
         return Handle(message);
+    }
+
+    internal virtual LayoutMeasurement Measure(in Rect availableBounds)
+    {
+        return new LayoutMeasurement(availableBounds.Width, availableBounds.Height);
     }
 
     internal ICanvasComponent Component => _componentAdapter;

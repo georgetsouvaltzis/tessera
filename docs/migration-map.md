@@ -53,5 +53,6 @@ This is the working map from legacy pre-release APIs to the current default path
 
 ## Notes
 
+- `TextBlockComponent`, `ButtonComponent`, and `TextInputComponent` are removed, not merely hidden.
 - Legacy types without a supported public replacement may still exist internally as bridges, but they are no longer part of the supported public path.
 - Advanced screen composition still lives under the older component namespaces. Widgets without a root wrapper should be treated as advanced.

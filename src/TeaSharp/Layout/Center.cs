@@ -1,6 +1,6 @@
 using TeaSharp.Components.Composition;
-using TeaSharp.Components.Prebuilt;
 using TeaSharp.Components.Primitives;
+using TeaSharp.Controls;
 using TeaSharp.Styles;
 using System.ComponentModel;
 
@@ -49,12 +49,14 @@ internal static class Center
         Thickness padding = default,
         Thickness margin = default) =>
         Item(
-            new TextBlockComponent(new TextBlockOptions(
-                Text: text,
-                Title: title,
-                Border: border,
-                Padding: padding,
-                TextStyle: style)),
+            new Label
+            {
+                Text = text,
+                Title = title,
+                Border = border,
+                Padding = padding,
+                TextStyle = style,
+            },
             width: null,
             height: null,
             margin: margin);

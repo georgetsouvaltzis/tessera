@@ -81,12 +81,15 @@ These names are the preferred public nouns.
 
 ## Advanced Components
 
-The older `*Component` catalog still exists for:
+The older `*Component` catalog still exists only for:
 
 - a small advanced band where we still intentionally expose raw seams
 - advanced customization
-- migration support
 - custom-control composition
+
+Important cutoff:
+
+- `TextBlockComponent`, `ButtonComponent`, and `TextInputComponent` are removed. Use `Label`, `Button`, and `TextInput`.
 
 Important advanced namespaces:
 

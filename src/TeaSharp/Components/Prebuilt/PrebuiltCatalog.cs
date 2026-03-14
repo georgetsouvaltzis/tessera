@@ -12,12 +12,6 @@ namespace TeaSharp.Components.Prebuilt;
 /// </summary>
 internal static class PrebuiltCatalog
 {
-    public static TextBlockComponent Label(TextBlockOptions? options = null) => options is null ? new TextBlockComponent() : new TextBlockComponent(options);
-
-    public static ButtonComponent Button(ButtonOptions? options = null) => options is null ? new ButtonComponent() : new ButtonComponent(options);
-
-    public static TextInputComponent TextInput(TextInputOptions? options = null) => options is null ? new TextInputComponent() : new TextInputComponent(options);
-
     public static TextAreaComponent TextArea(TextAreaOptions? options = null) => options is null ? new TextAreaComponent() : new TextAreaComponent(options);
 
     public static ListComponent<T> List<T>(IEnumerable<T> items, Func<T, string> toText) => new(items, toText);

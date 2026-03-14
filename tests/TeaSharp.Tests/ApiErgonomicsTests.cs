@@ -17,7 +17,7 @@ internal static class ApiErgonomicsTests
     {
         yield return new TestCase("ApiErgonomics_Thickness_UsesStandardSpacingVocabulary", Thickness_UsesStandardSpacingVocabulary);
         yield return new TestCase("ApiErgonomics_ScreenFrameLayout_ReducesScreenRectBookkeeping", ScreenFrameLayout_ReducesScreenRectBookkeeping);
-        yield return new TestCase("ApiErgonomics_TextInputOptions_ConfigureComponentWithoutNestedInputAccess", TextInputOptions_ConfigureComponentWithoutNestedInputAccess);
+        yield return new TestCase("ApiErgonomics_RootTextInput_ConfiguresWithoutNestedInputAccess", RootTextInput_ConfiguresWithoutNestedInputAccess);
         yield return new TestCase("ApiErgonomics_TextAreaOptions_ConfigureComponentWithoutNestedInputAccess", TextAreaOptions_ConfigureComponentWithoutNestedInputAccess);
         yield return new TestCase("ApiErgonomics_ListComponent_ExposesSelectionWithoutModelAccess", ListComponent_ExposesSelectionWithoutModelAccess);
         yield return new TestCase("ApiErgonomics_DropdownOptions_ConfigureComponentWithoutPostConstructionMutation", DropdownOptions_ConfigureComponentWithoutPostConstructionMutation);
@@ -62,16 +62,18 @@ internal static class ApiErgonomicsTests
         return Task.CompletedTask;
     }
 
-    private static Task TextInputOptions_ConfigureComponentWithoutNestedInputAccess()
+    private static Task RootTextInput_ConfiguresWithoutNestedInputAccess()
     {
-        var input = new TextInputComponent(new TextInputOptions(
-            Title: "Command",
-            Placeholder: "type here",
-            InitialValue: "deploy",
-            MaxLength: 32,
-            ClearOnSubmit: true,
-            MaskInput: true,
-            MaskCharacter: '#'));
+        var input = new TextInput
+        {
+            Title = "Command",
+            Placeholder = "type here",
+            MaxLength = 32,
+            ClearOnSubmit = true,
+            MaskInput = true,
+            MaskCharacter = '#',
+        };
+        input.SetValue("deploy");
 
         TestAssert.Equal("Command", input.Title, "Text input options should set title.");
         TestAssert.Equal("type here", input.Placeholder, "Text input options should set placeholder.");
@@ -203,7 +205,7 @@ internal static class ApiErgonomicsTests
     private static Task InteractionProfiles_AreClonedOnAssignment()
     {
         var shared = WidgetInteractionProfile.KeyboardOnly;
-        var button = new ButtonComponent
+        var dropdown = new DropdownComponent
         {
             InteractionProfile = shared,
         };
@@ -212,53 +214,53 @@ internal static class ApiErgonomicsTests
             InteractionProfile = shared,
         };
 
-        button.InteractionProfile.NavigateOnWheel = true;
+        dropdown.InteractionProfile.NavigateOnWheel = true;
 
         TestAssert.True(!shared.NavigateOnWheel, "Shared profile instances should not be mutated through component assignment.");
         TestAssert.True(!tabs.InteractionProfile.NavigateOnWheel, "Components should not share the same interaction profile instance.");
-        TestAssert.True(button.InteractionProfile.NavigateOnWheel, "Component-local profile mutation should still work after cloning.");
+        TestAssert.True(dropdown.InteractionProfile.NavigateOnWheel, "Component-local profile mutation should still work after cloning.");
         return Task.CompletedTask;
     }
 
     private static Task ConsumeMethods_ExposeOneShotInteractionResults()
     {
-        var button = new ButtonComponent
+        var button = new Button
         {
             IsFocused = true,
         };
-        button.Update(new TeaSharp.Core.Messages.KeyPressMsg(TeaSharp.Core.Messages.KeyCode.Enter));
+        button.Handle(new KeyPressed(Key.Enter));
 
-        var input = new TextInputComponent
+        var input = new TextInput
         {
             IsFocused = true,
         };
-        input.Update(new TeaSharp.Core.Messages.KeyPressMsg(TeaSharp.Core.Messages.KeyCode.Character, "x"));
-        input.Update(new TeaSharp.Core.Messages.KeyPressMsg(TeaSharp.Core.Messages.KeyCode.Enter));
+        input.Handle(new KeyPressed(Key.Character, "x"));
+        input.Handle(new KeyPressed(Key.Enter));
 
-        TestAssert.True(button.TryConsumePress(), "Button should expose one-shot press consumption instead of requiring poll-style flags.");
-        TestAssert.True(input.TryConsumeSubmit(out var submitted), "Text input should expose one-shot submit consumption.");
+        TestAssert.True(button.TryConsumeActivation(), "Button should expose one-shot activation consumption instead of requiring poll-style flags.");
+        TestAssert.True(input.TryConsumeSubmission(out var submitted), "Text input should expose one-shot submit consumption.");
         TestAssert.Equal("x", submitted, "Consumed submit should preserve submitted text.");
         return Task.CompletedTask;
     }
 
     private static Task ActionEvents_EnableEventDrivenIntegration()
     {
-        var button = new ButtonComponent
+        var button = new Button
         {
             IsFocused = true,
         };
-        var input = new TextInputComponent
+        var input = new TextInput
         {
             IsFocused = true,
         };
         var buttonPressed = 0;
         string? submitted = null;
-        button.Pressed += (_, _) => buttonPressed++;
+        button.Activated += (_, _) => buttonPressed++;
         input.Submitted += (_, args) => submitted = args.Value;
 
-        button.Update(new TeaSharp.Core.Messages.KeyPressMsg(TeaSharp.Core.Messages.KeyCode.Enter));
-        input.Update(new TeaSharp.Core.Messages.KeyPressMsg(TeaSharp.Core.Messages.KeyCode.Character, "x"));
-        input.Update(new TeaSharp.Core.Messages.KeyPressMsg(TeaSharp.Core.Messages.KeyCode.Enter));
+        button.Handle(new KeyPressed(Key.Enter));
+        input.Handle(new KeyPressed(Key.Character, "x"));
+        input.Handle(new KeyPressed(Key.Enter));
 
         TestAssert.Equal(1, buttonPressed, "Button should expose an event-driven activation hook.");
         TestAssert.Equal("x", submitted ?? string.Empty, "Text input should expose submitted text through an event payload.");
