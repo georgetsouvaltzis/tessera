@@ -1,24 +1,15 @@
 using System.ComponentModel;
-using System.Threading.Channels;
 using TeaSharp.Core.Abstractions;
-using TeaSharp.Core.Messages;
-using TeaSharp.Core.Terminal;
 
 namespace TeaSharp.Core.Application;
 
 /// <summary>
 /// Runs a TeaSharp screen inside the runtime event loop.
 /// </summary>
-internal sealed partial class TeaProgram
+internal sealed class TeaProgram
 {
-    private readonly ProgramOptions _options;
-    private readonly Channel<IMessage> _messages;
-    private readonly Channel<Effect> _effects;
-    private readonly object _stateLock = new();
-    private readonly TeaCapabilityProbe _capabilityProbe = new();
-    private readonly TeaProgramRuntimeState _runtime = new();
-    private CancellationTokenSource? _cts;
-    private bool _running;
+    private readonly IScreen _screen;
+    private readonly TeaRuntimeLoop _runtime;
 
     /// <summary>
     /// Initializes a program for the provided screen.
@@ -28,10 +19,8 @@ internal sealed partial class TeaProgram
     [EditorBrowsable(EditorBrowsableState.Advanced)]
     internal TeaProgram(IScreen initialScreen, ProgramOptions? options = null)
     {
-        Screen = initialScreen ?? throw new ArgumentNullException(nameof(initialScreen));
-        _options = options ?? new ProgramOptions();
-        _messages = Channel.CreateUnbounded<IMessage>();
-        _effects = Channel.CreateUnbounded<Effect>();
+        _screen = initialScreen ?? throw new ArgumentNullException(nameof(initialScreen));
+        _runtime = new TeaRuntimeLoop(_screen.Init, _screen.Update, _screen.Render, options);
     }
 
     internal TeaProgram(
@@ -46,7 +35,7 @@ internal sealed partial class TeaProgram
     /// <summary>
     /// Gets the current application screen.
     /// </summary>
-    internal IScreen Screen { get; private set; }
+    internal IScreen Screen => _screen;
 
     /// <summary>
     /// Enqueues a message for delivery to the running program.
@@ -54,10 +43,7 @@ internal sealed partial class TeaProgram
     /// <param name="message">The message to enqueue.</param>
     internal void Send(IMessage message)
     {
-        if (message is not null)
-        {
-            _messages.Writer.TryWrite(message);
-        }
+        _runtime.Send(message);
     }
 
     /// <summary>
@@ -65,8 +51,11 @@ internal sealed partial class TeaProgram
     /// </summary>
     /// <param name="cancellationToken">A token that cancels program execution.</param>
     /// <returns>The final application screen.</returns>
-    internal Task<IScreen> RunAsync(CancellationToken cancellationToken = default) =>
-        RunProgramAsync(cancellationToken);
+    internal async Task<IScreen> RunAsync(CancellationToken cancellationToken = default)
+    {
+        await _runtime.RunAsync(cancellationToken).ConfigureAwait(false);
+        return _screen;
+    }
 
     /// <summary>
     /// Requests program shutdown and waits for runtime cleanup to complete.
@@ -74,7 +63,7 @@ internal sealed partial class TeaProgram
     /// <param name="kill">When <see langword="true"/>, forces terminal teardown without a graceful quit message.</param>
     /// <param name="cancellationToken">A token that cancels the stop operation.</param>
     internal Task StopAsync(bool kill = false, CancellationToken cancellationToken = default) =>
-        StopProgramAsync(kill, cancellationToken);
+        _runtime.StopAsync(kill, cancellationToken);
 
     private sealed class DelegateScreen : IScreen
     {

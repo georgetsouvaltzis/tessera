@@ -31,6 +31,9 @@ internal static class TeaAppFoundationTests
         yield return new TestCase(
             "TeaApplication_RuntimePath_DoesNotStoreTeaProgramDirectly",
             TeaApplication_RuntimePath_DoesNotStoreTeaProgramDirectly);
+        yield return new TestCase(
+            "TeaRuntimeBridge_RuntimePath_DoesNotStoreTeaProgramDirectly",
+            TeaRuntimeBridge_RuntimePath_DoesNotStoreTeaProgramDirectly);
     }
 
     private static Task TeaApp_ContextTracksResizeMessages()
@@ -131,6 +134,18 @@ internal static class TeaAppFoundationTests
         TestAssert.True(
             legacyField is null,
             "TeaApplication should depend on the internal runtime seam rather than storing TeaProgram directly.");
+        return Task.CompletedTask;
+    }
+
+    private static Task TeaRuntimeBridge_RuntimePath_DoesNotStoreTeaProgramDirectly()
+    {
+        var runtimeType = typeof(TeaApplication).Assembly.GetType("TeaSharp.Internal.LegacyTeaRuntime", throwOnError: true)!;
+        var fields = runtimeType.GetFields(BindingFlags.Instance | BindingFlags.NonPublic);
+        var legacyField = fields.FirstOrDefault(field => field.FieldType == typeof(TeaSharp.Core.Application.TeaProgram));
+
+        TestAssert.True(
+            legacyField is null,
+            "LegacyTeaRuntime should depend on the extracted runtime loop rather than storing TeaProgram directly.");
         return Task.CompletedTask;
     }
 

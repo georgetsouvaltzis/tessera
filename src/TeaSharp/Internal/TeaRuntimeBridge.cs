@@ -23,28 +23,28 @@ internal static class TeaRuntimeFactory
 
 internal sealed class LegacyTeaRuntime : ITeaRuntime
 {
-    private readonly TeaProgram _program;
+    private readonly TeaRuntimeLoop _runtime;
 
     public LegacyTeaRuntime(TeaApp app, TeaRuntimeOptions options, TeaSharp.Hosting.TeaHostingOptions? hosting)
     {
         app.ConfigureRuntimeScreen(options.Screen);
-        _program = new TeaProgram(app.InitializeCore, app.UpdateCore, app.RenderCore, CreateProgramOptions(app, options, hosting));
+        _runtime = new TeaRuntimeLoop(app.InitializeCore, app.UpdateCore, app.RenderCore, CreateProgramOptions(app, options, hosting));
     }
 
     public void Send(Message message)
     {
         ArgumentNullException.ThrowIfNull(message);
-        _program.Send(TeaMessageAdapter.ToCore(message));
+        _runtime.Send(TeaMessageAdapter.ToCore(message));
     }
 
     public Task RunAsync(CancellationToken cancellationToken)
     {
-        return _program.RunAsync(cancellationToken);
+        return _runtime.RunAsync(cancellationToken);
     }
 
     public Task StopAsync(bool kill, CancellationToken cancellationToken)
     {
-        return _program.StopAsync(kill, cancellationToken);
+        return _runtime.StopAsync(kill, cancellationToken);
     }
 
     private static ProgramOptions CreateProgramOptions(TeaApp app, TeaRuntimeOptions options, TeaSharp.Hosting.TeaHostingOptions? hosting)
