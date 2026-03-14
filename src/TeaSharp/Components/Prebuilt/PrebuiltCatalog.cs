@@ -13,10 +13,6 @@ namespace TeaSharp.Components.Prebuilt;
 internal static class PrebuiltCatalog
 {
 
-    public static ListComponent<T> List<T>(IEnumerable<T> items, Func<T, string> toText) => new(items, toText);
-
-    public static ListComponent<T> List<T>(ListOptions<T> options) => new(options);
-
     public static TableComponent Table(IReadOnlyList<string> headers) => new(headers);
 
     public static TableComponent Table(TableOptions options) => new(options);

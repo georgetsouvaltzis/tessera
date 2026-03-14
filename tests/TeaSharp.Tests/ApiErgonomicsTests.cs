@@ -19,7 +19,7 @@ internal static class ApiErgonomicsTests
         yield return new TestCase("ApiErgonomics_ScreenFrameLayout_ReducesScreenRectBookkeeping", ScreenFrameLayout_ReducesScreenRectBookkeeping);
         yield return new TestCase("ApiErgonomics_RootTextInput_ConfiguresWithoutNestedInputAccess", RootTextInput_ConfiguresWithoutNestedInputAccess);
         yield return new TestCase("ApiErgonomics_RootTextArea_ConfiguresWithoutNestedInputAccess", RootTextArea_ConfiguresWithoutNestedInputAccess);
-        yield return new TestCase("ApiErgonomics_ListComponent_ExposesSelectionWithoutModelAccess", ListComponent_ExposesSelectionWithoutModelAccess);
+        yield return new TestCase("ApiErgonomics_RootListView_ExposesSelectionWithoutModelAccess", RootListView_ExposesSelectionWithoutModelAccess);
         yield return new TestCase("ApiErgonomics_RootChoice_ConfiguresWithoutPostConstructionMutation", RootChoice_ConfiguresWithoutPostConstructionMutation);
         yield return new TestCase("ApiErgonomics_RootComboBox_ExposesFilterWithoutNestedInputAccess", RootComboBox_ExposesFilterWithoutNestedInputAccess);
         yield return new TestCase("ApiErgonomics_TableOptions_ExposePageSizeWithoutInnerAccess", TableOptions_ExposePageSizeWithoutInnerAccess);
@@ -113,17 +113,18 @@ internal static class ApiErgonomicsTests
         return Task.CompletedTask;
     }
 
-    private static Task ListComponent_ExposesSelectionWithoutModelAccess()
+    private static Task RootListView_ExposesSelectionWithoutModelAccess()
     {
-        var list = new ListComponent<string>(["one", "two", "three"], item => item)
+        var list = new ListView<string>(item => item)
         {
             IsFocused = true,
         };
+        list.SetItems(["one", "two", "three"]);
 
-        list.Update(new TeaSharp.Core.Messages.KeyPressMsg(TeaSharp.Core.Messages.KeyCode.Down));
+        list.Handle(new KeyPressed(Key.Down));
 
-        TestAssert.Equal("two", list.SelectedItem ?? string.Empty, "List should expose selection at component level.");
-        TestAssert.Equal(1, list.SelectedIndex, "List should expose selected index at component level.");
+        TestAssert.Equal("two", list.SelectedItem ?? string.Empty, "ListView should expose selection at root level.");
+        TestAssert.Equal(1, list.SelectedIndex, "ListView should expose selected index at root level.");
         return Task.CompletedTask;
     }
 

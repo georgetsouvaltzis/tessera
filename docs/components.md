@@ -89,7 +89,7 @@ The older `*Component` catalog still exists only for:
 
 Important cutoff:
 
-- `TextBlockComponent`, `ButtonComponent`, `TextInputComponent`, `TextAreaComponent`, `StatusBarComponent`, `DropdownComponent`, and `ComboboxComponent` are removed. Use `Label`, `Button`, `TextInput`, `TextArea`, `StatusBar`, `Choice`, and `ComboBox`.
+- `TextBlockComponent`, `ButtonComponent`, `TextInputComponent`, `TextAreaComponent`, `StatusBarComponent`, `DropdownComponent`, `ComboboxComponent`, and `ListComponent<T>` are removed. Use `Label`, `Button`, `TextInput`, `TextArea`, `StatusBar`, `Choice`, `ComboBox`, and `ListView<T>`.
 
 Important advanced namespaces:
 
