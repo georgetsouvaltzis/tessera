@@ -96,9 +96,6 @@ internal static class TeaControlCatalogTests
     private static readonly string[] InternalizedLegacyPromotedTypes =
     [
         "TeaSharp.Components.Advanced.BadgeComponent",
-        "TeaSharp.Components.Advanced.CommandPaletteComponent",
-        "TeaSharp.Components.Advanced.CommandPaletteItem",
-        "TeaSharp.Components.Advanced.CommandPaletteItemExecutedEventArgs",
         "TeaSharp.Components.Advanced.NotificationCenterComponent",
         "TeaSharp.Components.Advanced.NotificationEntry",
         "TeaSharp.Components.Advanced.NotificationSeverity",
@@ -137,6 +134,9 @@ internal static class TeaControlCatalogTests
         "TeaSharp.Components.Productivity.ContextMenuItem",
         "TeaSharp.Components.Productivity.ContextMenuItemExecutedEventArgs",
         "TeaSharp.Components.Productivity.ContextMenuOptions",
+        "TeaSharp.Components.Advanced.CommandPaletteComponent",
+        "TeaSharp.Components.Advanced.CommandPaletteItem",
+        "TeaSharp.Components.Advanced.CommandPaletteItemExecutedEventArgs",
         "TeaSharp.Components.UiKit.TabSelectionChangedEventArgs",
         "TeaSharp.Components.UiKit.TabsComponent",
         "TeaSharp.Components.UiKit.TabsOptions",

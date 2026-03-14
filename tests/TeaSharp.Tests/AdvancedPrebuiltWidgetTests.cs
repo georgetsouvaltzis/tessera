@@ -23,11 +23,6 @@ internal static class AdvancedPrebuiltWidgetTests
         yield return new TestCase("Advanced_SliderComponent_MouseClickSetsValue", SliderComponent_MouseClickSetsValue);
         yield return new TestCase("Advanced_SpinnerComponent_AdvancesFrame", SpinnerComponent_AdvancesFrame);
         yield return new TestCase("Advanced_SpinnerComponent_MouseWheelAdvancesFrame", SpinnerComponent_MouseWheelAdvancesFrame);
-        yield return new TestCase("Advanced_CommandPaletteComponent_FiltersAndExecutes", CommandPaletteComponent_FiltersAndExecutes);
-        yield return new TestCase("Advanced_CommandPaletteComponent_ItemExecutedEvent_ReportsItem", CommandPaletteComponent_ItemExecutedEvent_ReportsItem);
-        yield return new TestCase("Advanced_CommandPaletteComponent_TryConsumeExecution_IsSingleUse", CommandPaletteComponent_TryConsumeExecution_IsSingleUse);
-        yield return new TestCase("Advanced_CommandPaletteComponent_MouseClickExecutesSelection", CommandPaletteComponent_MouseClickExecutesSelection);
-        yield return new TestCase("Advanced_CommandPaletteComponent_ExposesQueryAccessors", CommandPaletteComponent_ExposesQueryAccessors);
         yield return new TestCase("Advanced_TreeViewComponent_TogglesExpansion", TreeViewComponent_TogglesExpansion);
         yield return new TestCase("Advanced_TreeViewComponent_MouseClickSelectsVisibleNode", TreeViewComponent_MouseClickSelectsVisibleNode);
         yield return new TestCase("Advanced_NotificationCenterComponent_DismissesEntries", NotificationCenterComponent_DismissesEntries);
@@ -143,110 +138,6 @@ internal static class AdvancedPrebuiltWidgetTests
 
         TestAssert.True(changed, "Spinner wheel should advance frame while running.");
         TestAssert.True(spinner.FrameIndex != before, "Spinner wheel should move frame index.");
-        return Task.CompletedTask;
-    }
-
-    private static Task CommandPaletteComponent_FiltersAndExecutes()
-    {
-        var palette = new CommandPaletteComponent
-        {
-            IsFocused = true,
-        };
-        palette.SetItems(
-        [
-            new CommandPaletteItem("deploy", "Deploy", "publish release"),
-            new CommandPaletteItem("rollback", "Rollback", "restore previous"),
-        ]);
-
-        palette.Update(new KeyPressMsg(KeyCode.Character, "p", KeyModifiers.Ctrl));
-        palette.Update(new KeyPressMsg(KeyCode.Character, "r"));
-        palette.Update(new KeyPressMsg(KeyCode.Character, "o"));
-        palette.Update(new KeyPressMsg(KeyCode.Enter));
-
-        TestAssert.Equal("rollback", palette.LastExecutedItemId ?? string.Empty, "Command palette should execute filtered item.");
-        TestAssert.True(!palette.IsOpen, "Palette should close after execute.");
-        return Task.CompletedTask;
-    }
-
-    private static Task CommandPaletteComponent_MouseClickExecutesSelection()
-    {
-        var palette = new CommandPaletteComponent
-        {
-            IsFocused = true,
-        };
-        palette.SetItems(
-        [
-            new CommandPaletteItem("deploy", "Deploy", "publish release"),
-            new CommandPaletteItem("rollback", "Rollback", "restore previous"),
-        ]);
-        palette.Open();
-
-        var changed = palette.UpdateMouse(new MouseClickMsg(MouseButton.Left, 12, 5), new Rect(0, 0, 60, 20));
-
-        TestAssert.True(changed, "Command palette click should execute selected command.");
-        TestAssert.Equal("deploy", palette.LastExecutedItemId ?? string.Empty, "Palette click should execute clicked row.");
-        TestAssert.True(!palette.IsOpen, "Palette should close after click execute.");
-        return Task.CompletedTask;
-    }
-
-    private static Task CommandPaletteComponent_TryConsumeExecution_IsSingleUse()
-    {
-        var palette = new CommandPaletteComponent
-        {
-            IsFocused = true,
-        };
-        palette.SetItems(
-        [
-            new CommandPaletteItem("deploy", "Deploy", "publish release"),
-            new CommandPaletteItem("rollback", "Rollback", "restore previous"),
-        ]);
-
-        palette.Update(new KeyPressMsg(KeyCode.Character, "p", KeyModifiers.Ctrl));
-        palette.Update(new KeyPressMsg(KeyCode.Enter));
-
-        TestAssert.True(palette.TryConsumeExecution(out var itemId), "Command palette should expose one-shot execution consumption.");
-        TestAssert.Equal("deploy", itemId, "Command palette should consume the executed item id.");
-        TestAssert.True(!palette.TryConsumeExecution(out _), "Command palette should not report the same execution twice.");
-        return Task.CompletedTask;
-    }
-
-    private static Task CommandPaletteComponent_ItemExecutedEvent_ReportsItem()
-    {
-        var palette = new CommandPaletteComponent
-        {
-            IsFocused = true,
-        };
-        string? executed = null;
-        palette.ItemExecuted += (_, args) => executed = args.ItemId;
-        palette.SetItems(
-        [
-            new CommandPaletteItem("deploy", "Deploy", "publish release"),
-            new CommandPaletteItem("rollback", "Rollback", "restore previous"),
-        ]);
-
-        palette.Update(new KeyPressMsg(KeyCode.Character, "p", KeyModifiers.Ctrl));
-        palette.Update(new KeyPressMsg(KeyCode.Enter));
-
-        TestAssert.Equal("deploy", executed ?? string.Empty, "Command palette execution event should expose the executed command id.");
-        return Task.CompletedTask;
-    }
-
-    private static Task CommandPaletteComponent_ExposesQueryAccessors()
-    {
-        var palette = new CommandPaletteComponent();
-        palette.SetItems(
-        [
-            new CommandPaletteItem("deploy", "Deploy", "publish release"),
-            new CommandPaletteItem("rollback", "Rollback", "restore previous"),
-        ]);
-
-        palette.SetQueryText("roll");
-
-        TestAssert.Equal("roll", palette.QueryText, "Command palette should expose the current query text without requiring the raw text-input model.");
-
-        palette.ClearQuery();
-
-        TestAssert.Equal(string.Empty, palette.QueryText, "Command palette should clear the query through the component-level API.");
         return Task.CompletedTask;
     }
 

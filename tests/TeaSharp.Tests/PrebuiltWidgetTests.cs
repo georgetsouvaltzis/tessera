@@ -58,6 +58,13 @@ internal static class PrebuiltWidgetTests
         yield return new TestCase("Controls_ContextMenu_TryConsumeExecution_IsSingleUse", ContextMenu_TryConsumeExecution_IsSingleUse);
         yield return new TestCase("Controls_ContextMenu_MouseClickExecutesAndCloses", ContextMenu_MouseClickExecutesAndCloses);
         yield return new TestCase("Controls_ContextMenu_MouseReleaseExecutesAndCloses", ContextMenu_MouseReleaseExecutesAndCloses);
+        yield return new TestCase("Controls_CommandPalette_FiltersAndExecutes", CommandPalette_FiltersAndExecutes);
+        yield return new TestCase("Controls_CommandPalette_ItemExecutedEvent_ReportsItem", CommandPalette_ItemExecutedEvent_ReportsItem);
+        yield return new TestCase("Controls_CommandPalette_TryConsumeExecution_IsSingleUse", CommandPalette_TryConsumeExecution_IsSingleUse);
+        yield return new TestCase("Controls_CommandPalette_MouseClickExecutesSelection", CommandPalette_MouseClickExecutesSelection);
+        yield return new TestCase("Controls_CommandPalette_ExposesQueryAccessors", CommandPalette_ExposesQueryAccessors);
+        yield return new TestCase("Controls_CommandPalette_Open_ClearsQueryWhenClosed", CommandPalette_Open_ClearsQueryWhenClosed);
+        yield return new TestCase("Controls_CommandPalette_LettersRemainQueryable", CommandPalette_LettersRemainQueryable);
         yield return new TestCase("Prebuilt_TableComponent_ForwardsSortHotkeys", TableComponent_ForwardsSortHotkeys);
         yield return new TestCase("Prebuilt_ProgressBarComponent_AdjustsValue", ProgressBarComponent_AdjustsValue);
         yield return new TestCase("Controls_StatusBar_RendersLeftAndRightText", StatusBar_RendersLeftAndRightText);
@@ -789,6 +796,141 @@ internal static class PrebuiltWidgetTests
         TestAssert.True(changed, "Context menu mouse release should execute row action.");
         TestAssert.Equal("paste", menu.LastExecutedItemId ?? string.Empty, "Context menu release should execute hovered item.");
         TestAssert.True(!menu.IsVisible, "Context menu should close after mouse release execute.");
+        return Task.CompletedTask;
+    }
+
+    private static Task CommandPalette_FiltersAndExecutes()
+    {
+        var palette = new CommandPalette
+        {
+            IsFocused = true,
+        };
+        palette.SetItems(
+        [
+            new CommandPaletteItem("deploy", "Deploy", "publish release"),
+            new CommandPaletteItem("rollback", "Rollback", "restore previous"),
+        ]);
+
+        palette.Handle(new KeyPressed(Key.Character, "p", ModifierKeys.Ctrl));
+        palette.Handle(new KeyPressed(Key.Character, "r"));
+        palette.Handle(new KeyPressed(Key.Character, "o"));
+        palette.Handle(new KeyPressed(Key.Enter));
+
+        TestAssert.Equal("rollback", palette.LastExecutedItemId ?? string.Empty, "Command palette should execute filtered item.");
+        TestAssert.True(!palette.IsVisible, "Palette should close after execute.");
+        return Task.CompletedTask;
+    }
+
+    private static Task CommandPalette_MouseClickExecutesSelection()
+    {
+        var palette = new CommandPalette
+        {
+            IsFocused = true,
+        };
+        palette.SetItems(
+        [
+            new CommandPaletteItem("deploy", "Deploy", "publish release"),
+            new CommandPaletteItem("rollback", "Rollback", "restore previous"),
+        ]);
+        palette.Open();
+
+        var changed = palette.Handle(new PointerInput(PointerEventKind.Press, PointerButton.Left, 12, 5), new Rect(0, 0, 60, 20));
+
+        TestAssert.True(changed, "Command palette click should execute selected command.");
+        TestAssert.Equal("deploy", palette.LastExecutedItemId ?? string.Empty, "Palette click should execute clicked row.");
+        TestAssert.True(!palette.IsVisible, "Palette should close after click execute.");
+        return Task.CompletedTask;
+    }
+
+    private static Task CommandPalette_TryConsumeExecution_IsSingleUse()
+    {
+        var palette = new CommandPalette
+        {
+            IsFocused = true,
+        };
+        palette.SetItems(
+        [
+            new CommandPaletteItem("deploy", "Deploy", "publish release"),
+            new CommandPaletteItem("rollback", "Rollback", "restore previous"),
+        ]);
+
+        palette.Handle(new KeyPressed(Key.Character, "p", ModifierKeys.Ctrl));
+        palette.Handle(new KeyPressed(Key.Enter));
+
+        TestAssert.True(palette.TryConsumeExecution(out var itemId), "Command palette should expose one-shot execution consumption.");
+        TestAssert.Equal("deploy", itemId, "Command palette should consume the executed item id.");
+        TestAssert.True(!palette.TryConsumeExecution(out _), "Command palette should not report the same execution twice.");
+        return Task.CompletedTask;
+    }
+
+    private static Task CommandPalette_ItemExecutedEvent_ReportsItem()
+    {
+        var palette = new CommandPalette
+        {
+            IsFocused = true,
+        };
+        string? executed = null;
+        palette.ItemExecuted += (_, args) => executed = args.ItemId;
+        palette.SetItems(
+        [
+            new CommandPaletteItem("deploy", "Deploy", "publish release"),
+            new CommandPaletteItem("rollback", "Rollback", "restore previous"),
+        ]);
+
+        palette.Handle(new KeyPressed(Key.Character, "p", ModifierKeys.Ctrl));
+        palette.Handle(new KeyPressed(Key.Enter));
+
+        TestAssert.Equal("deploy", executed ?? string.Empty, "Command palette execution event should expose the executed command id.");
+        return Task.CompletedTask;
+    }
+
+    private static Task CommandPalette_ExposesQueryAccessors()
+    {
+        var palette = new CommandPalette();
+        palette.SetItems(
+        [
+            new CommandPaletteItem("deploy", "Deploy", "publish release"),
+            new CommandPaletteItem("rollback", "Rollback", "restore previous"),
+        ]);
+
+        palette.SetQueryText("roll");
+
+        TestAssert.Equal("roll", palette.QueryText, "Command palette should expose the current query text without requiring a nested input model.");
+
+        palette.ClearQuery();
+
+        TestAssert.Equal(string.Empty, palette.QueryText, "Command palette should clear the query through the root API.");
+        return Task.CompletedTask;
+    }
+
+    private static Task CommandPalette_Open_ClearsQueryWhenClosed()
+    {
+        var palette = new CommandPalette();
+        palette.SetItems([new CommandPaletteItem("deploy", "Deploy")]);
+        palette.SetQueryText("dep");
+
+        palette.Open();
+
+        TestAssert.Equal(string.Empty, palette.QueryText, "Opening the palette from a closed state should reset query text for a fresh interaction.");
+        return Task.CompletedTask;
+    }
+
+    private static Task CommandPalette_LettersRemainQueryable()
+    {
+        var palette = new CommandPalette
+        {
+            IsFocused = true,
+        };
+        palette.SetItems(
+        [
+            new CommandPaletteItem("jobs", "Jobs"),
+            new CommandPaletteItem("deploy", "Deploy"),
+        ]);
+
+        palette.Open();
+        palette.Handle(new KeyPressed(Key.Character, "j"));
+
+        TestAssert.Equal("j", palette.QueryText, "Letter keys should contribute to the query instead of being stolen for navigation.");
         return Task.CompletedTask;
     }
 
