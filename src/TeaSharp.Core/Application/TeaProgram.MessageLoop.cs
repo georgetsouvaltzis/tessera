@@ -28,7 +28,7 @@ internal sealed partial class TeaProgram
                     _capabilityProbe.Observe(probeModeReport);
                 }
 
-                var filtered = _options.MessageFilter is null ? message : _options.MessageFilter(Screen, message);
+                var filtered = _options.MessageFilter is null ? message : _options.MessageFilter(message);
                 if (filtered is null)
                 {
                     continue;

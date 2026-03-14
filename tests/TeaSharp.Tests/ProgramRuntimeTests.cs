@@ -124,7 +124,7 @@ internal static class ProgramRuntimeTests
             DisableRenderer = true,
             DisableInput = true,
             Terminal = new FakeTerminalAdapter(),
-            MessageFilter = (_, msg) =>
+            MessageFilter = msg =>
             {
                 if (blocked && msg is QuitMsg)
                 {

@@ -53,7 +53,7 @@ internal sealed class LegacyTeaRuntime : ITeaRuntime
         {
             MessageFilter = hosting?.MessageFilter is null
                 ? null
-                : (_, message) =>
+                : message =>
                 {
                     var filtered = hosting.MessageFilter(app, TeaMessageAdapter.ToPublic(message));
                     return filtered is null ? null : TeaMessageAdapter.ToCore(filtered);

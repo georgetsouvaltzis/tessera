@@ -9,7 +9,7 @@ namespace TeaSharp.Core.Application;
 [EditorBrowsable(EditorBrowsableState.Advanced)]
 internal sealed class ProgramOptions
 {
-    public Func<IScreen, IMessage, IMessage?>? MessageFilter { get; init; }
+    public Func<IMessage, IMessage?>? MessageFilter { get; init; }
 
     public int MaxFps { get; init; } = 60;
 
