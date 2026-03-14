@@ -2,6 +2,7 @@ using TeaSharp.Controls;
 using TeaSharp.Components.Composition;
 using TeaSharp.Components.Primitives;
 using TeaSharp.Core.Messages;
+using System.Reflection;
 
 namespace TeaSharp.Tests;
 
@@ -24,6 +25,12 @@ internal static class TeaAppFoundationTests
         yield return new TestCase(
             "TeaControl_Bridge_MapsCoreMessagesToPublicMessages",
             TeaControl_Bridge_MapsCoreMessagesToPublicMessages);
+        yield return new TestCase(
+            "TeaApp_RuntimeScreenBridge_DoesNotExposeCoreIScreen",
+            TeaApp_RuntimeScreenBridge_DoesNotExposeCoreIScreen);
+        yield return new TestCase(
+            "TeaApplication_RuntimePath_DoesNotStoreTeaProgramDirectly",
+            TeaApplication_RuntimePath_DoesNotStoreTeaProgramDirectly);
     }
 
     private static Task TeaApp_ContextTracksResizeMessages()
@@ -103,6 +110,28 @@ internal static class TeaAppFoundationTests
 
         TestAssert.True(control.LastMessage is KeyPressed, "Control should map keyboard input to the new public message model.");
         TestAssert.True(control.LastPointer is PointerInput { Kind: PointerEventKind.Press, X: 2, Y: 3 }, "Control should map pointer input to the new public message model.");
+        return Task.CompletedTask;
+    }
+
+    private static Task TeaApp_RuntimeScreenBridge_DoesNotExposeCoreIScreen()
+    {
+        var runtimeScreen = typeof(TeaApp).GetProperty("RuntimeScreen", BindingFlags.Instance | BindingFlags.NonPublic);
+
+        TestAssert.True(runtimeScreen is not null, "TeaApp should still expose an internal runtime-screen bridge.");
+        TestAssert.True(
+            runtimeScreen!.PropertyType != typeof(TeaSharp.Core.Abstractions.IScreen),
+            "TeaApp should no longer depend directly on the core IScreen bridge contract.");
+        return Task.CompletedTask;
+    }
+
+    private static Task TeaApplication_RuntimePath_DoesNotStoreTeaProgramDirectly()
+    {
+        var fields = typeof(TeaApplication).GetFields(BindingFlags.Instance | BindingFlags.NonPublic);
+        var legacyField = fields.FirstOrDefault(field => field.FieldType == typeof(TeaSharp.Core.Application.TeaProgram));
+
+        TestAssert.True(
+            legacyField is null,
+            "TeaApplication should depend on the internal runtime seam rather than storing TeaProgram directly.");
         return Task.CompletedTask;
     }
 

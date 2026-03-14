@@ -88,18 +88,13 @@ public sealed class Screen
     public static Screen From(ICanvasComponent component) =>
         new(layout: new ComponentLayout(component ?? throw new ArgumentNullException(nameof(component))));
 
-    internal ScreenRenderResult Compile(ScreenContext context, ScreenOptions defaults)
+    internal ScreenRenderResult Compile(IScreenCompiler compiler, ScreenContext context, ScreenOptions defaults)
     {
-        if (_layout is not null)
-        {
-            return ScreenCompiler.Compile(_layout, context, defaults.Merge(Options));
-        }
+        ArgumentNullException.ThrowIfNull(compiler);
 
-        var output = new ScreenOutput(ScreenFrame.From(_text ?? string.Empty))
-        {
-            Terminal = defaults.Merge(Options).ToTerminalOutput(),
-        };
-
-        return new ScreenRenderResult(output, null);
+        return compiler.Compile(
+            new ScreenContent(_text, _layout),
+            context,
+            defaults.Merge(Options));
     }
 }

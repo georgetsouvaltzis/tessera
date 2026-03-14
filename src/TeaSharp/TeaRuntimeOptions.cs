@@ -1,6 +1,4 @@
 using System.ComponentModel;
-using TeaSharp.Core.Application;
-using TeaSharp.Internal;
 
 namespace TeaSharp;
 
@@ -67,49 +65,4 @@ public sealed class TeaRuntimeOptions
     /// Gets or sets the screen options applied to the application runtime.
     /// </summary>
     public ScreenOptions Screen { get; set; } = ScreenOptions.Empty;
-
-    internal ProgramOptions ToProgramOptions(TeaApp app, TeaSharp.Hosting.TeaHostingOptions? hosting = null)
-    {
-        ArgumentNullException.ThrowIfNull(app);
-
-        return new ProgramOptions
-        {
-            MessageFilter = hosting?.MessageFilter is null
-                ? null
-                : (_, message) =>
-                {
-                    var filtered = hosting.MessageFilter(app, TeaMessageAdapter.ToPublic(message));
-                    return filtered is null ? null : TeaMessageAdapter.ToCore(filtered);
-                },
-            MaxFps = MaxFps,
-            AdaptiveFramePacing = AdaptiveFramePacing,
-            DisableRenderer = DisableRenderer,
-            DisableInput = DisableInput,
-            UseConsoleKeyEvents = UseConsoleKeyEvents,
-            CatchEffectExceptions = CatchEffectExceptions,
-            MapEffectException = hosting?.MapEffectException is null
-                ? null
-                : exception =>
-                {
-                    var mapped = hosting.MapEffectException(exception);
-                    return mapped is null ? null : TeaMessageAdapter.ToCore(mapped);
-                },
-            EscapeTimeout = EscapeTimeout,
-            EnableResizeSignals = EnableResizeSignals,
-            ResizePollInterval = ResizePollInterval,
-            MinResizePollInterval = MinResizePollInterval,
-            EnableCapabilityProbe = hosting?.EnableCapabilityProbe ?? true,
-            CapabilityProbeTimeout = hosting?.CapabilityProbeTimeout ?? TimeSpan.FromMilliseconds(260),
-            MaxConcurrentEffects = hosting?.MaxConcurrentEffects ?? 0,
-            Renderer = hosting?.Renderer,
-            AnsiRendererOptions = hosting?.AnsiRendererOptions,
-            Terminal = hosting?.Terminal,
-            TerminalCapabilities = hosting?.TerminalCapabilities,
-            TerminalCapabilityDetector = hosting?.TerminalCapabilityDetector,
-            ColorProfile = hosting?.ColorProfile,
-            ColorProfileDetector = hosting?.ColorProfileDetector,
-            EventDecoder = hosting?.EventDecoder,
-            CapabilityProbeModes = hosting?.CapabilityProbeModes,
-        };
-    }
 }

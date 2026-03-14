@@ -2,7 +2,16 @@ using TeaSharp.Core.Abstractions;
 
 namespace TeaSharp.Internal;
 
-internal sealed class TeaAppRuntimeScreen : IScreen
+internal interface ITeaAppRuntimeScreen
+{
+    Effect? Init();
+
+    Effect? Update(IMessage message);
+
+    ScreenOutput Render();
+}
+
+internal sealed class TeaAppRuntimeScreen : ITeaAppRuntimeScreen
 {
     private readonly TeaApp _app;
 

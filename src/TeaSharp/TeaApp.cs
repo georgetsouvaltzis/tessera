@@ -18,10 +18,11 @@ public abstract class TeaApp
 {
     private ScreenContext _context = new();
     private ScreenOptions _runtimeScreenOptions = ScreenOptions.Empty;
-    private CompiledScreen? _interactiveScreen;
+    private readonly IScreenCompiler _screenCompiler = ScreenCompilationFactory.CreateDefault();
+    private ICompiledScreenInteraction? _interactiveScreen;
     private bool _inputHandled;
     private readonly List<TeaEffect> _pendingEffects = [];
-    private global::TeaSharp.Core.Abstractions.IScreen? _runtimeScreen;
+    private ITeaAppRuntimeScreen? _runtimeScreen;
 
     /// <summary>
     /// Gets the most recent screen context supplied by the runtime.
@@ -106,7 +107,7 @@ public abstract class TeaApp
         _runtimeScreenOptions = screenOptions ?? ScreenOptions.Empty;
     }
 
-    internal global::TeaSharp.Core.Abstractions.IScreen RuntimeScreen =>
+    internal ITeaAppRuntimeScreen RuntimeScreen =>
         _runtimeScreen ??= new TeaAppRuntimeScreen(this);
 
     internal global::TeaSharp.Core.Abstractions.Effect? InitializeCore() =>
@@ -136,7 +137,7 @@ public abstract class TeaApp
 
     internal global::TeaSharp.Core.Abstractions.ScreenOutput RenderCore()
     {
-        var rendered = Build(_context).Compile(_context, _runtimeScreenOptions.Merge(DefaultScreenOptions));
+        var rendered = Build(_context).Compile(_screenCompiler, _context, _runtimeScreenOptions.Merge(DefaultScreenOptions));
         _interactiveScreen = rendered.Interaction;
         return rendered.Output;
     }

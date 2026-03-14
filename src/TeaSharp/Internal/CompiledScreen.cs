@@ -5,11 +5,30 @@ using TeaSharp.Layout;
 
 namespace TeaSharp.Internal;
 
-internal sealed class CompiledScreen
+internal interface ICompiledScreenInteraction
+{
+    bool Handle(Message message);
+}
+
+internal sealed record ScreenRenderResult(ScreenOutput Output, ICompiledScreenInteraction? Interaction);
+
+internal readonly record struct ScreenContent(string? Text, LayoutNode? Layout);
+
+internal interface IScreenCompiler
+{
+    ScreenRenderResult Compile(ScreenContent content, ScreenContext context, ScreenOptions options);
+}
+
+internal static class ScreenCompilationFactory
+{
+    public static IScreenCompiler CreateDefault() => new LegacyScreenCompiler();
+}
+
+internal sealed class LegacyCompiledScreen : ICompiledScreenInteraction
 {
     private readonly ScreenComposer _screen;
 
-    public CompiledScreen(ScreenComposer screen)
+    public LegacyCompiledScreen(ScreenComposer screen)
     {
         _screen = screen ?? throw new ArgumentNullException(nameof(screen));
     }
@@ -35,15 +54,27 @@ internal sealed class CompiledScreen
     }
 }
 
-internal sealed record ScreenRenderResult(ScreenOutput Output, CompiledScreen? Interaction);
-
-internal static class ScreenCompiler
+internal sealed class LegacyScreenCompiler : IScreenCompiler
 {
-    public static ScreenRenderResult Compile(LayoutNode layout, ScreenContext context, ScreenOptions options)
+    public ScreenRenderResult Compile(ScreenContent content, ScreenContext context, ScreenOptions options)
     {
-        ArgumentNullException.ThrowIfNull(layout);
         ArgumentNullException.ThrowIfNull(context);
 
+        if (content.Layout is not null)
+        {
+            return CompileLayout(content.Layout, context, options);
+        }
+
+        var output = new ScreenOutput(ScreenFrame.From(content.Text ?? string.Empty))
+        {
+            Terminal = options.ToTerminalOutput(),
+        };
+
+        return new ScreenRenderResult(output, null);
+    }
+
+    private static ScreenRenderResult CompileLayout(LayoutNode layout, ScreenContext context, ScreenOptions options)
+    {
         var canvas = context.CreateCanvas(CanvasTextMode.GraphemeAware);
         canvas.Clear();
 
@@ -58,6 +89,6 @@ internal static class ScreenCompiler
             Terminal = options.ToTerminalOutput(),
         };
 
-        return new ScreenRenderResult(output, new CompiledScreen(screen));
+        return new ScreenRenderResult(output, new LegacyCompiledScreen(screen));
     }
 }

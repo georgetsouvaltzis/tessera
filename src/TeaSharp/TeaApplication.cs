@@ -1,3 +1,5 @@
+using TeaSharp.Internal;
+
 namespace TeaSharp;
 
 /// <summary>
@@ -12,15 +14,14 @@ public sealed class TeaApplication
     private readonly TeaApp _app;
     private readonly TeaRuntimeOptions _options;
     private readonly global::TeaSharp.Hosting.TeaHostingOptions? _hosting;
-    private readonly global::TeaSharp.Core.Application.TeaProgram _program;
+    private readonly ITeaRuntime _runtime;
 
     internal TeaApplication(TeaApp app, TeaRuntimeOptions? options = null, global::TeaSharp.Hosting.TeaHostingOptions? hosting = null)
     {
         _app = app ?? throw new ArgumentNullException(nameof(app));
         _options = options ?? new TeaRuntimeOptions();
         _hosting = hosting;
-        _app.ConfigureRuntimeScreen(_options.Screen);
-        _program = new global::TeaSharp.Core.Application.TeaProgram(_app.RuntimeScreen, _options.ToProgramOptions(_app, _hosting));
+        _runtime = TeaRuntimeFactory.Create(_app, _options, _hosting);
     }
 
     /// <summary>
@@ -42,7 +43,7 @@ public sealed class TeaApplication
     public void Send(Message message)
     {
         ArgumentNullException.ThrowIfNull(message);
-        _program.Send(TeaSharp.Internal.TeaMessageAdapter.ToCore(message));
+        _runtime.Send(message);
     }
 
     /// <summary>
@@ -52,7 +53,7 @@ public sealed class TeaApplication
     /// <returns>The application instance after the run completes.</returns>
     public async Task<TeaApp> RunAsync(CancellationToken cancellationToken = default)
     {
-        await _program.RunAsync(cancellationToken).ConfigureAwait(false);
+        await _runtime.RunAsync(cancellationToken).ConfigureAwait(false);
         return _app;
     }
 
@@ -64,6 +65,6 @@ public sealed class TeaApplication
     /// <returns>A task that completes when the stop request has been processed.</returns>
     public Task StopAsync(bool kill = false, CancellationToken cancellationToken = default)
     {
-        return _program.StopAsync(kill, cancellationToken);
+        return _runtime.StopAsync(kill, cancellationToken);
     }
 }

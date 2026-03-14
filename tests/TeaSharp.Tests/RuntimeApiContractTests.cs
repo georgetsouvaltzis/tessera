@@ -64,6 +64,9 @@ internal static class RuntimeApiContractTests
             "RuntimeApi_TeaRuntimeOptions_DoNotExposeHostingOrInterceptionHooks",
             TeaRuntimeOptions_DoNotExposeHostingOrInterceptionHooks);
         yield return new TestCase(
+            "RuntimeApi_TeaRuntimeOptions_DoNotOwnLegacyProgramTranslation",
+            TeaRuntimeOptions_DoNotOwnLegacyProgramTranslation);
+        yield return new TestCase(
             "RuntimeApi_TeaHostApplicationOverloads_AreMarkedAdvanced",
             TeaHostApplicationOverloads_AreMarkedAdvanced);
         yield return new TestCase(
@@ -168,6 +171,16 @@ internal static class RuntimeApiContractTests
             TestAssert.True(property is null, $"TeaRuntimeOptions should no longer expose {propertyName} directly.");
         }
 
+        return Task.CompletedTask;
+    }
+
+    private static Task TeaRuntimeOptions_DoNotOwnLegacyProgramTranslation()
+    {
+        var translationMethod = typeof(TeaRuntimeOptions).GetMethod("ToProgramOptions", BindingFlags.Instance | BindingFlags.NonPublic);
+
+        TestAssert.True(
+            translationMethod is null,
+            "TeaRuntimeOptions should not own legacy ProgramOptions translation once runtime bridging moves behind the internal runtime seam.");
         return Task.CompletedTask;
     }
 
