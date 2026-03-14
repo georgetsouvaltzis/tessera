@@ -21,7 +21,7 @@ internal interface IScreenCompiler
 
 internal static class ScreenCompilationFactory
 {
-    public static IScreenCompiler CreateDefault() => new LegacyScreenCompiler();
+    public static IScreenCompiler CreateDefault() => new HybridScreenCompiler();
 }
 
 internal sealed class LegacyCompiledScreen : ICompiledScreenInteraction

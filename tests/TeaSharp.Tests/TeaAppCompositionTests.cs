@@ -49,6 +49,9 @@ internal static class TeaAppCompositionTests
             "TeaAppComposition_ScreenBuilder_ComposesAndRoutesDefaultControls",
             ScreenBuilder_ComposesAndRoutesDefaultControls);
         yield return new TestCase(
+            "TeaAppComposition_RootLayouts_UseSceneCompilerInsteadOfLegacyCompiledScreen",
+            RootLayouts_UseSceneCompilerInsteadOfLegacyCompiledScreen);
+        yield return new TestCase(
             "TeaAppComposition_LegacyLayoutHelpers_AreInternalized",
             LegacyLayoutHelpers_AreInternalized);
         yield return new TestCase(
@@ -239,6 +242,24 @@ internal static class TeaAppCompositionTests
         screen.Update(new KeyPressMsg(KeyCode.Enter));
 
         TestAssert.Equal(1, app.ActivationCount, "The imperative Screen.Build path should still compile into routable default controls.");
+        return Task.CompletedTask;
+    }
+
+    private static Task RootLayouts_UseSceneCompilerInsteadOfLegacyCompiledScreen()
+    {
+        var app = new BuilderAuthoredApp();
+        var screen = app.RuntimeScreen;
+
+        screen.Update(new WindowSizeMsg(80, 24));
+        screen.Render();
+
+        var field = typeof(TeaApp).GetField("_interactiveScreen", BindingFlags.Instance | BindingFlags.NonPublic);
+        var compiled = field?.GetValue(app);
+
+        TestAssert.True(compiled is not null, "Rendering a root layout should capture an interactive screen snapshot.");
+        TestAssert.True(
+            compiled!.GetType().FullName != "TeaSharp.Internal.LegacyCompiledScreen",
+            "Root layout screens should compile through the new scene compiler instead of the legacy ScreenComposer bridge.");
         return Task.CompletedTask;
     }
 
