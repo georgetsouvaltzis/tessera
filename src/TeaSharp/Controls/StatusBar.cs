@@ -1,5 +1,5 @@
-using TeaSharp.Components.Prebuilt;
 using TeaSharp.Components.Primitives;
+using TeaSharp.Components.UiKit;
 
 namespace TeaSharp.Controls;
 
@@ -8,22 +8,20 @@ namespace TeaSharp.Controls;
 /// </summary>
 public sealed class StatusBar : Control
 {
-    private readonly StatusBarComponent _component = new();
-
     public string LeftText
     {
-        get => _component.LeftText;
-        set => _component.LeftText = value ?? string.Empty;
-    }
+        get;
+        set => field = value ?? string.Empty;
+    } = string.Empty;
 
     public string RightText
     {
-        get => _component.RightText;
-        set => _component.RightText = value ?? string.Empty;
-    }
+        get;
+        set => field = value ?? string.Empty;
+    } = string.Empty;
 
     public override void Render(Canvas canvas, Rect rect)
     {
-        _component.Render(canvas, rect);
+        UiWidgets.DrawStatusBar(canvas, rect, LeftText, RightText);
     }
 }

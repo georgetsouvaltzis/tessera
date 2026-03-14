@@ -12,7 +12,6 @@ namespace TeaSharp.Components.Prebuilt;
 /// </summary>
 internal static class PrebuiltCatalog
 {
-    public static TextAreaComponent TextArea(TextAreaOptions? options = null) => options is null ? new TextAreaComponent() : new TextAreaComponent(options);
 
     public static ListComponent<T> List<T>(IEnumerable<T> items, Func<T, string> toText) => new(items, toText);
 
@@ -28,7 +27,6 @@ internal static class PrebuiltCatalog
 
     public static ProgressBarComponent ProgressBar(ProgressBarOptions? options = null) => options is null ? new ProgressBarComponent() : new ProgressBarComponent(options);
 
-    public static StatusBarComponent StatusBar(StatusBarOptions? options = null) => options is null ? new StatusBarComponent() : new StatusBarComponent(options);
 
     public static LogViewerComponent LogViewer(LogViewerOptions? options = null) => options is null ? new LogViewerComponent() : new LogViewerComponent(options);
 

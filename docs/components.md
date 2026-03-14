@@ -89,7 +89,7 @@ The older `*Component` catalog still exists only for:
 
 Important cutoff:
 
-- `TextBlockComponent`, `ButtonComponent`, and `TextInputComponent` are removed. Use `Label`, `Button`, and `TextInput`.
+- `TextBlockComponent`, `ButtonComponent`, `TextInputComponent`, `TextAreaComponent`, and `StatusBarComponent` are removed. Use `Label`, `Button`, `TextInput`, `TextArea`, and `StatusBar`.
 
 Important advanced namespaces:
 

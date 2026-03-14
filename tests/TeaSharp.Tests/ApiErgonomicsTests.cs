@@ -18,7 +18,7 @@ internal static class ApiErgonomicsTests
         yield return new TestCase("ApiErgonomics_Thickness_UsesStandardSpacingVocabulary", Thickness_UsesStandardSpacingVocabulary);
         yield return new TestCase("ApiErgonomics_ScreenFrameLayout_ReducesScreenRectBookkeeping", ScreenFrameLayout_ReducesScreenRectBookkeeping);
         yield return new TestCase("ApiErgonomics_RootTextInput_ConfiguresWithoutNestedInputAccess", RootTextInput_ConfiguresWithoutNestedInputAccess);
-        yield return new TestCase("ApiErgonomics_TextAreaOptions_ConfigureComponentWithoutNestedInputAccess", TextAreaOptions_ConfigureComponentWithoutNestedInputAccess);
+        yield return new TestCase("ApiErgonomics_RootTextArea_ConfiguresWithoutNestedInputAccess", RootTextArea_ConfiguresWithoutNestedInputAccess);
         yield return new TestCase("ApiErgonomics_ListComponent_ExposesSelectionWithoutModelAccess", ListComponent_ExposesSelectionWithoutModelAccess);
         yield return new TestCase("ApiErgonomics_DropdownOptions_ConfigureComponentWithoutPostConstructionMutation", DropdownOptions_ConfigureComponentWithoutPostConstructionMutation);
         yield return new TestCase("ApiErgonomics_ComboboxOptions_ConfigureComponentWithoutPostConstructionMutation", ComboboxOptions_ConfigureComponentWithoutPostConstructionMutation);
@@ -85,13 +85,15 @@ internal static class ApiErgonomicsTests
         return Task.CompletedTask;
     }
 
-    private static Task TextAreaOptions_ConfigureComponentWithoutNestedInputAccess()
+    private static Task RootTextArea_ConfiguresWithoutNestedInputAccess()
     {
-        var area = new TextAreaComponent(new TextAreaOptions(
-            Title: "Notes",
-            InitialValue: "a\nb",
-            ShowLineNumbers: true,
-            Wrap: true));
+        var area = new TextArea
+        {
+            Title = "Notes",
+            ShowLineNumbers = true,
+            Wrap = true,
+        };
+        area.SetValue("a\nb");
 
         TestAssert.Equal("Notes", area.Title, "Text area options should set title.");
         TestAssert.Equal("a\nb", area.Value, "Text area options should set initial value.");

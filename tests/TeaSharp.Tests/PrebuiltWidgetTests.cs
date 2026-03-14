@@ -30,8 +30,8 @@ internal static class PrebuiltWidgetTests
         yield return new TestCase("Controls_TextInput_TryConsumeSubmissionAndCancellation_AreSingleUse", TextInput_TryConsumeSubmissionAndCancellation_AreSingleUse);
         yield return new TestCase("Controls_TextInput_CancelSignalsAndCanClear", TextInput_CancelSignalsAndCanClear);
         yield return new TestCase("Controls_TextInput_HidesBorderWhenConfigured", TextInput_HidesBorderWhenConfigured);
-        yield return new TestCase("Prebuilt_TextAreaComponent_RendersMultilineContent", TextAreaComponent_RendersMultilineContent);
-        yield return new TestCase("Prebuilt_TextAreaComponent_EnterInsertsNewline", TextAreaComponent_EnterInsertsNewline);
+        yield return new TestCase("Controls_TextArea_RendersMultilineContent", TextArea_RendersMultilineContent);
+        yield return new TestCase("Controls_TextArea_EnterInsertsNewline", TextArea_EnterInsertsNewline);
         yield return new TestCase("Prebuilt_ListComponent_NavigatesSelection", ListComponent_NavigatesSelection);
         yield return new TestCase("Prebuilt_ListComponent_SelectionChangedEvent_ReportsTransition", ListComponent_SelectionChangedEvent_ReportsTransition);
         yield return new TestCase("Prebuilt_ListComponent_MouseClickSelectsRow", ListComponent_MouseClickSelectsRow);
@@ -48,7 +48,7 @@ internal static class PrebuiltWidgetTests
         yield return new TestCase("Prebuilt_ComboboxComponent_MouseWheelNavigatesAndSelects", ComboboxComponent_MouseWheelNavigatesAndSelects);
         yield return new TestCase("Prebuilt_TableComponent_ForwardsSortHotkeys", TableComponent_ForwardsSortHotkeys);
         yield return new TestCase("Prebuilt_ProgressBarComponent_AdjustsValue", ProgressBarComponent_AdjustsValue);
-        yield return new TestCase("Prebuilt_StatusBarComponent_RendersLeftAndRightText", StatusBarComponent_RendersLeftAndRightText);
+        yield return new TestCase("Controls_StatusBar_RendersLeftAndRightText", StatusBar_RendersLeftAndRightText);
         yield return new TestCase("Prebuilt_LogViewerComponent_AppendsAndFilters", LogViewerComponent_AppendsAndFilters);
         yield return new TestCase("Prebuilt_DialogComponent_AcceptsAndDismisses", DialogComponent_AcceptsAndDismisses);
         yield return new TestCase("Prebuilt_DialogComponent_Events_FirePerDecision", DialogComponent_Events_FirePerDecision);
@@ -260,9 +260,9 @@ internal static class PrebuiltWidgetTests
         return Task.CompletedTask;
     }
 
-    private static Task TextAreaComponent_RendersMultilineContent()
+    private static Task TextArea_RendersMultilineContent()
     {
-        var area = new TextAreaComponent
+        var area = new TextArea
         {
             ShowLineNumbers = true,
         };
@@ -277,24 +277,24 @@ internal static class PrebuiltWidgetTests
         return Task.CompletedTask;
     }
 
-    private static Task TextAreaComponent_EnterInsertsNewline()
+    private static Task TextArea_EnterInsertsNewline()
     {
-        var area = new TextAreaComponent
+        var area = new TextArea
         {
             IsFocused = true,
         };
 
-        area.Update(new KeyPressMsg(KeyCode.Character, "l"));
-        area.Update(new KeyPressMsg(KeyCode.Character, "i"));
-        area.Update(new KeyPressMsg(KeyCode.Character, "n"));
-        area.Update(new KeyPressMsg(KeyCode.Character, "e"));
-        area.Update(new KeyPressMsg(KeyCode.Character, "A"));
-        area.Update(new KeyPressMsg(KeyCode.Enter));
-        area.Update(new KeyPressMsg(KeyCode.Character, "l"));
-        area.Update(new KeyPressMsg(KeyCode.Character, "i"));
-        area.Update(new KeyPressMsg(KeyCode.Character, "n"));
-        area.Update(new KeyPressMsg(KeyCode.Character, "e"));
-        area.Update(new KeyPressMsg(KeyCode.Character, "B"));
+        area.Handle(new KeyPressed(Key.Character, "l"));
+        area.Handle(new KeyPressed(Key.Character, "i"));
+        area.Handle(new KeyPressed(Key.Character, "n"));
+        area.Handle(new KeyPressed(Key.Character, "e"));
+        area.Handle(new KeyPressed(Key.Character, "A"));
+        area.Handle(new KeyPressed(Key.Enter));
+        area.Handle(new KeyPressed(Key.Character, "l"));
+        area.Handle(new KeyPressed(Key.Character, "i"));
+        area.Handle(new KeyPressed(Key.Character, "n"));
+        area.Handle(new KeyPressed(Key.Character, "e"));
+        area.Handle(new KeyPressed(Key.Character, "B"));
 
         TestAssert.True(area.Value.Contains('\n'), "Text area Enter should insert newline.");
         TestAssert.True(area.Value.StartsWith("lineA\nlineB", StringComparison.Ordinal), "Text area should keep content on separate lines.");
@@ -594,9 +594,9 @@ internal static class PrebuiltWidgetTests
         return Task.CompletedTask;
     }
 
-    private static Task StatusBarComponent_RendersLeftAndRightText()
+    private static Task StatusBar_RendersLeftAndRightText()
     {
-        var status = new StatusBarComponent
+        var status = new StatusBar
         {
             LeftText = "left",
             RightText = "right",
