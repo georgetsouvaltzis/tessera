@@ -1,6 +1,6 @@
 namespace TeaSharp.Core.Application;
 
-internal static class TeaProgramBackgroundLoops
+internal static class TeaBackgroundLoops
 {
     public static async Task AwaitAsync(Task commandLoop, Task? inputLoop, Task? resizeLoop)
     {

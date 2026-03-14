@@ -6,7 +6,7 @@ using TeaSharp.Core.Terminal;
 
 namespace TeaSharp.Core.Application;
 
-internal static class TeaProgramResizeMonitor
+internal static class TeaResizeMonitor
 {
     public static (Task? Loop, IDisposable? SignalRegistration) Start(
         ITerminalAdapter? terminal,

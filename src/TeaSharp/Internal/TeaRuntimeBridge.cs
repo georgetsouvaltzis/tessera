@@ -17,15 +17,15 @@ internal static class TeaRuntimeFactory
     {
         ArgumentNullException.ThrowIfNull(app);
         ArgumentNullException.ThrowIfNull(options);
-        return new LegacyTeaRuntime(app, options, hosting);
+        return new TeaAppRuntime(app, options, hosting);
     }
 }
 
-internal sealed class LegacyTeaRuntime : ITeaRuntime
+internal sealed class TeaAppRuntime : ITeaRuntime
 {
     private readonly TeaRuntimeLoop _runtime;
 
-    public LegacyTeaRuntime(TeaApp app, TeaRuntimeOptions options, TeaSharp.Hosting.TeaHostingOptions? hosting)
+    public TeaAppRuntime(TeaApp app, TeaRuntimeOptions options, TeaSharp.Hosting.TeaHostingOptions? hosting)
     {
         app.ConfigureRuntimeScreen(options.Screen);
         _runtime = new TeaRuntimeLoop(app.InitializeCore, app.UpdateCore, app.RenderCore, CreateProgramOptions(app, options, hosting));

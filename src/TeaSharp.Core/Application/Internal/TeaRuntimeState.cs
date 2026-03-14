@@ -5,7 +5,7 @@ using TeaSharp.Core.Terminal;
 
 namespace TeaSharp.Core.Application;
 
-internal sealed class TeaProgramRuntimeState
+internal sealed class TeaRuntimeState
 {
     public ITerminalAdapter? Terminal { get; set; }
 
@@ -13,7 +13,7 @@ internal sealed class TeaProgramRuntimeState
 
     public TerminalReader? Reader { get; set; }
 
-    public TeaProgramEffectScheduler? EffectScheduler { get; set; }
+    public TeaEffectScheduler? EffectScheduler { get; set; }
 
     public TerminalCapabilityProfile Capabilities { get; set; } = TerminalCapabilityProfile.AllSupported;
 

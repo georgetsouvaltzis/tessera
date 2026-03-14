@@ -1,6 +1,6 @@
 namespace TeaSharp.Core.Application;
 
-internal static class TeaProgramFramePacer
+internal static class TeaFramePacer
 {
     public static async Task<(bool Rendered, DateTimeOffset LastRender, bool PendingRender)> TryRenderAsync(
         bool adaptiveFramePacing,

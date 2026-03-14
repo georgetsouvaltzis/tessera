@@ -139,13 +139,13 @@ internal static class TeaAppFoundationTests
 
     private static Task TeaRuntimeBridge_RuntimePath_DoesNotStoreTeaProgramDirectly()
     {
-        var runtimeType = typeof(TeaApplication).Assembly.GetType("TeaSharp.Internal.LegacyTeaRuntime", throwOnError: true)!;
+        var runtimeType = typeof(TeaApplication).Assembly.GetType("TeaSharp.Internal.TeaAppRuntime", throwOnError: true)!;
         var fields = runtimeType.GetFields(BindingFlags.Instance | BindingFlags.NonPublic);
         var legacyField = fields.FirstOrDefault(field => field.FieldType == typeof(TeaSharp.Core.Application.TeaProgram));
 
         TestAssert.True(
             legacyField is null,
-            "LegacyTeaRuntime should depend on the extracted runtime loop rather than storing TeaProgram directly.");
+            "TeaAppRuntime should depend on the extracted runtime loop rather than storing TeaProgram directly.");
         return Task.CompletedTask;
     }
 

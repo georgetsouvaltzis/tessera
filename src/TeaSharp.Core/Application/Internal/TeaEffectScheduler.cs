@@ -5,7 +5,7 @@ using TeaSharp.Core.Messages;
 
 namespace TeaSharp.Core.Application;
 
-internal sealed class TeaProgramEffectScheduler : IDisposable
+internal sealed class TeaEffectScheduler : IDisposable
 {
     private readonly ProgramOptions _options;
     private readonly Action<IMessage> _send;
@@ -14,7 +14,7 @@ internal sealed class TeaProgramEffectScheduler : IDisposable
     private readonly SemaphoreSlim? _effectConcurrencyGate;
     private ExceptionDispatchInfo? _unhandledEffectException;
 
-    public TeaProgramEffectScheduler(ProgramOptions options, Action<IMessage> send)
+    public TeaEffectScheduler(ProgramOptions options, Action<IMessage> send)
     {
         _options = options;
         _send = send;
@@ -175,7 +175,7 @@ internal sealed class TeaProgramEffectScheduler : IDisposable
         _ = task.ContinueWith(
             static (completed, state) =>
             {
-                if (state is not TeaProgramEffectScheduler scheduler)
+                if (state is not TeaEffectScheduler scheduler)
                 {
                     return;
                 }

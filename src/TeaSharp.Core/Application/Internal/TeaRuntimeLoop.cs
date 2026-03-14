@@ -17,7 +17,7 @@ internal sealed class TeaRuntimeLoop
     private readonly Channel<Effect> _effects;
     private readonly object _stateLock = new();
     private readonly TeaCapabilityProbe _capabilityProbe = new();
-    private readonly TeaProgramRuntimeState _runtime = new();
+    private readonly TeaRuntimeState _runtime = new();
     private CancellationTokenSource? _cts;
     private bool _running;
 
@@ -77,7 +77,7 @@ internal sealed class TeaRuntimeLoop
                 ? new NullRenderer()
                 : _options.Renderer ?? new AnsiDiffRenderer(_runtime.Capabilities, _options.AnsiRendererOptions);
             _runtime.Renderer.UpdateCapabilities(_runtime.Capabilities);
-            _runtime.EffectScheduler = new TeaProgramEffectScheduler(_options, Send);
+            _runtime.EffectScheduler = new TeaEffectScheduler(_options, Send);
 
             await _runtime.Terminal.PrepareAsync(token).ConfigureAwait(false);
             await _runtime.Renderer.InitializeAsync(_runtime.Terminal.Output, token).ConfigureAwait(false);
@@ -90,7 +90,7 @@ internal sealed class TeaRuntimeLoop
                 var size = await _runtime.Terminal.GetSizeAsync(token).ConfigureAwait(false);
                 _runtime.Renderer.Resize(size.Width, size.Height);
                 Send(new WindowSizeMsg(size.Width, size.Height));
-                (resizeLoop, resizeSignalRegistration) = TeaProgramResizeMonitor.Start(_runtime.Terminal, _options, size, Send, token);
+                (resizeLoop, resizeSignalRegistration) = TeaResizeMonitor.Start(_runtime.Terminal, _options, size, Send, token);
             }
 
             var commandLoop = Task.Run(() => _runtime.EffectScheduler!.RunLoopAsync(_effects.Reader, token), token);
@@ -168,7 +168,7 @@ internal sealed class TeaRuntimeLoop
                 if (filtered is QuitMsg)
                 {
                     _cts?.Cancel();
-                    await TeaProgramBackgroundLoops.AwaitAsync(commandLoop, inputLoop, resizeLoop).ConfigureAwait(false);
+                    await TeaBackgroundLoops.AwaitAsync(commandLoop, inputLoop, resizeLoop).ConfigureAwait(false);
                     await ShutdownAsync(kill: false, CancellationToken.None).ConfigureAwait(false);
                     return;
                 }
@@ -181,7 +181,7 @@ internal sealed class TeaRuntimeLoop
                         unhandledCommandException.Throw();
                     }
 
-                    throw new TeaProgramInterruptedException();
+                    throw new TeaRuntimeInterruptedException();
                 }
 
                 if (await TryHandleCommandEnvelopeAsync(filtered, token).ConfigureAwait(false))
@@ -210,7 +210,7 @@ internal sealed class TeaRuntimeLoop
                 }
 
                 pendingRender = true;
-                var renderAttempt = await TeaProgramFramePacer.TryRenderAsync(
+                var renderAttempt = await TeaFramePacer.TryRenderAsync(
                     _options.AdaptiveFramePacing,
                     minFrame,
                     lastRender,
@@ -227,7 +227,7 @@ internal sealed class TeaRuntimeLoop
 
             if (_options.AdaptiveFramePacing && pendingRender)
             {
-                var delayedRender = await TeaProgramFramePacer.DelayAndRenderAsync(
+                var delayedRender = await TeaFramePacer.DelayAndRenderAsync(
                     minFrame,
                     lastRender,
                     () => RenderAsync(_render(), token),
@@ -238,7 +238,7 @@ internal sealed class TeaRuntimeLoop
         }
 
         _cts?.Cancel();
-        await TeaProgramBackgroundLoops.AwaitAsync(commandLoop, inputLoop, resizeLoop).ConfigureAwait(false);
+        await TeaBackgroundLoops.AwaitAsync(commandLoop, inputLoop, resizeLoop).ConfigureAwait(false);
         await ShutdownAsync(kill: false, CancellationToken.None).ConfigureAwait(false);
     }
 
