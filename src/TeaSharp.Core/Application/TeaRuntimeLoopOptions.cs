@@ -7,7 +7,7 @@ using TeaSharp.Core.Terminal;
 namespace TeaSharp.Core.Application;
 
 [EditorBrowsable(EditorBrowsableState.Advanced)]
-internal sealed class ProgramOptions
+internal sealed class TeaRuntimeLoopOptions
 {
     public Func<IMessage, IMessage?>? MessageFilter { get; init; }
 

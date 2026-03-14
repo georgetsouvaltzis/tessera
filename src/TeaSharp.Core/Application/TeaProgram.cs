@@ -17,7 +17,7 @@ internal sealed class TeaProgram
     /// <param name="initialScreen">The initial application screen.</param>
     /// <param name="options">Advanced runtime options.</param>
     [EditorBrowsable(EditorBrowsableState.Advanced)]
-    internal TeaProgram(IScreen initialScreen, ProgramOptions? options = null)
+    internal TeaProgram(IScreen initialScreen, TeaRuntimeLoopOptions? options = null)
     {
         _screen = initialScreen ?? throw new ArgumentNullException(nameof(initialScreen));
         _runtime = new TeaRuntimeLoop(_screen.Init, _screen.Update, _screen.Render, options);
@@ -27,7 +27,7 @@ internal sealed class TeaProgram
         Func<Effect?>? initialize,
         Func<IMessage, Effect?> update,
         Func<ScreenOutput> render,
-        ProgramOptions? options = null)
+        TeaRuntimeLoopOptions? options = null)
         : this(new DelegateScreen(initialize, update, render), options)
     {
     }

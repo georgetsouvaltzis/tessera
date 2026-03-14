@@ -16,7 +16,7 @@ internal sealed class TeaCapabilityProbe
 
     public async Task StartAsync(
         ITerminalAdapter? terminal,
-        ProgramOptions options,
+        TeaRuntimeLoopOptions options,
         TerminalCapabilityProfile runtimeCapabilities,
         Action<IMessage> send,
         CancellationToken token)

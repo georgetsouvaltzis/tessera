@@ -10,7 +10,7 @@ internal static class TeaResizeMonitor
 {
     public static (Task? Loop, IDisposable? SignalRegistration) Start(
         ITerminalAdapter? terminal,
-        ProgramOptions options,
+        TeaRuntimeLoopOptions options,
         TerminalSize initialSize,
         Action<IMessage> send,
         CancellationToken token)
@@ -69,7 +69,7 @@ internal static class TeaResizeMonitor
         return (loop, registration);
     }
 
-    private static IDisposable? TryRegisterResizeSignal(ITerminalAdapter terminal, ProgramOptions options, Action onResize)
+    private static IDisposable? TryRegisterResizeSignal(ITerminalAdapter terminal, TeaRuntimeLoopOptions options, Action onResize)
     {
         if (!options.EnableResizeSignals)
         {

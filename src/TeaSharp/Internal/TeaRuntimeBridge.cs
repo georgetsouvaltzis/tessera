@@ -28,7 +28,7 @@ internal sealed class TeaAppRuntime : ITeaRuntime
     public TeaAppRuntime(TeaApp app, TeaRuntimeOptions options, TeaSharp.Hosting.TeaHostingOptions? hosting)
     {
         app.ConfigureRuntimeScreen(options.Screen);
-        _runtime = new TeaRuntimeLoop(app.InitializeCore, app.UpdateCore, app.RenderCore, CreateProgramOptions(app, options, hosting));
+        _runtime = new TeaRuntimeLoop(app.InitializeCore, app.UpdateCore, app.RenderCore, CreateRuntimeLoopOptions(app, options, hosting));
     }
 
     public void Send(Message message)
@@ -47,9 +47,9 @@ internal sealed class TeaAppRuntime : ITeaRuntime
         return _runtime.StopAsync(kill, cancellationToken);
     }
 
-    private static ProgramOptions CreateProgramOptions(TeaApp app, TeaRuntimeOptions options, TeaSharp.Hosting.TeaHostingOptions? hosting)
+    private static TeaRuntimeLoopOptions CreateRuntimeLoopOptions(TeaApp app, TeaRuntimeOptions options, TeaSharp.Hosting.TeaHostingOptions? hosting)
     {
-        return new ProgramOptions
+        return new TeaRuntimeLoopOptions
         {
             MessageFilter = hosting?.MessageFilter is null
                 ? null

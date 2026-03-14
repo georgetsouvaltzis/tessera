@@ -180,7 +180,7 @@ internal static class RuntimeApiContractTests
 
         TestAssert.True(
             translationMethod is null,
-            "TeaRuntimeOptions should not own legacy ProgramOptions translation once runtime bridging moves behind the internal runtime seam.");
+            "TeaRuntimeOptions should not own legacy TeaRuntimeLoopOptions translation once runtime bridging moves behind the internal runtime seam.");
         return Task.CompletedTask;
     }
 
@@ -241,7 +241,7 @@ internal static class RuntimeApiContractTests
 
         TestAssert.True(teaProgramOptions is null, "TeaProgramOptions should no longer exist on the supported hosting surface.");
         TestAssert.True(typeof(IScreen).IsNotPublic, "IScreen should be an internal runtime bridge.");
-        TestAssert.True(typeof(ProgramOptions).IsNotPublic, "ProgramOptions should be an internal runtime bridge.");
+        TestAssert.True(typeof(TeaRuntimeLoopOptions).IsNotPublic, "TeaRuntimeLoopOptions should be an internal runtime bridge.");
         TestAssert.True(typeof(TeaProgram).IsNotPublic, "TeaProgram should be an internal runtime bridge.");
         return Task.CompletedTask;
     }

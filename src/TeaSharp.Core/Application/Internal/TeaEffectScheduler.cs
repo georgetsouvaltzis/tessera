@@ -7,14 +7,14 @@ namespace TeaSharp.Core.Application;
 
 internal sealed class TeaEffectScheduler : IDisposable
 {
-    private readonly ProgramOptions _options;
+    private readonly TeaRuntimeLoopOptions _options;
     private readonly Action<IMessage> _send;
     private readonly object _effectTaskLock = new();
     private readonly HashSet<Task> _effectTasks = [];
     private readonly SemaphoreSlim? _effectConcurrencyGate;
     private ExceptionDispatchInfo? _unhandledEffectException;
 
-    public TeaEffectScheduler(ProgramOptions options, Action<IMessage> send)
+    public TeaEffectScheduler(TeaRuntimeLoopOptions options, Action<IMessage> send)
     {
         _options = options;
         _send = send;

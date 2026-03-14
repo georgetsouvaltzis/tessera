@@ -12,7 +12,7 @@ internal sealed class TeaRuntimeLoop
     private readonly Func<Effect?>? _initialize;
     private readonly Func<IMessage, Effect?> _update;
     private readonly Func<ScreenOutput> _render;
-    private readonly ProgramOptions _options;
+    private readonly TeaRuntimeLoopOptions _options;
     private readonly Channel<IMessage> _messages;
     private readonly Channel<Effect> _effects;
     private readonly object _stateLock = new();
@@ -25,12 +25,12 @@ internal sealed class TeaRuntimeLoop
         Func<Effect?>? initialize,
         Func<IMessage, Effect?> update,
         Func<ScreenOutput> render,
-        ProgramOptions? options = null)
+        TeaRuntimeLoopOptions? options = null)
     {
         _initialize = initialize;
         _update = update ?? throw new ArgumentNullException(nameof(update));
         _render = render ?? throw new ArgumentNullException(nameof(render));
-        _options = options ?? new ProgramOptions();
+        _options = options ?? new TeaRuntimeLoopOptions();
         _messages = Channel.CreateUnbounded<IMessage>();
         _effects = Channel.CreateUnbounded<Effect>();
     }
