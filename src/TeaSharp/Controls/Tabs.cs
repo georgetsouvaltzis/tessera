@@ -1,5 +1,6 @@
 using TeaSharp.Components.Primitives;
-using TeaSharp.Components.UiKit;
+using TeaSharp.Controls.Internal;
+using TeaSharp.Layout;
 
 namespace TeaSharp.Controls;
 
@@ -8,13 +9,13 @@ namespace TeaSharp.Controls;
 /// </summary>
 public sealed class Tabs : Control
 {
-    private readonly TabsComponent _component;
+    private readonly List<string> _items = [];
+    private int _selectedIndex;
+    private int _hoveredIndex = -1;
 
     public Tabs(IEnumerable<string> items)
     {
-        _component = new TabsComponent(items ?? Array.Empty<string>());
-        _component.SelectionChanged += (_, args) =>
-            SelectionChanged?.Invoke(this, new SelectionChangedEventArgs(args.PreviousIndex, args.SelectedIndex, args.PreviousTab, args.SelectedTab));
+        SetItems(items ?? Array.Empty<string>());
     }
 
     public Tabs(params string[] items)
@@ -24,30 +25,204 @@ public sealed class Tabs : Control
 
     public event EventHandler<SelectionChangedEventArgs>? SelectionChanged;
 
-    public IReadOnlyList<string> Items => _component.Tabs;
+    public IReadOnlyList<string> Items => _items;
 
-    public int SelectedIndex => _component.SelectedIndex;
+    public int SelectedIndex => _selectedIndex;
 
     public override bool IsFocused
     {
-        get => _component.IsFocused;
-        set => _component.IsFocused = value;
+        get;
+        set;
     }
 
-    public void Select(int index) => _component.Select(index);
+    public void SetItems(IEnumerable<string> items)
+    {
+        ArgumentNullException.ThrowIfNull(items);
+        _items.Clear();
+        _items.AddRange(items.Where(static item => item is not null));
+        if (_items.Count == 0)
+        {
+            _selectedIndex = 0;
+            _hoveredIndex = -1;
+            return;
+        }
+
+        _selectedIndex = Math.Clamp(_selectedIndex, 0, _items.Count - 1);
+    }
+
+    public void Select(int index)
+    {
+        if (_items.Count == 0)
+        {
+            _selectedIndex = 0;
+            return;
+        }
+
+        SetSelectedIndex(Math.Clamp(index, 0, _items.Count - 1));
+    }
 
     public override bool Handle(Message message)
     {
-        return ControlForwarder.Forward(_component, message);
+        if (!IsFocused || _items.Count == 0 || message is not KeyPressed key)
+        {
+            return false;
+        }
+
+        if (key.Is(Key.Right) || key.IsCharacter('l'))
+        {
+            return SetSelectedIndex((_selectedIndex + 1) % _items.Count);
+        }
+
+        if (key.Is(Key.Left) || key.IsCharacter('h'))
+        {
+            return SetSelectedIndex((_selectedIndex + _items.Count - 1) % _items.Count);
+        }
+
+        if (key.Key == Key.Character
+            && key.Modifiers == ModifierKeys.None
+            && key.Text.Length == 1
+            && char.IsDigit(key.Text[0]))
+        {
+            var requested = key.Text[0] == '0' ? 10 : key.Text[0] - '0';
+            if (requested >= 1 && requested <= _items.Count)
+            {
+                return SetSelectedIndex(requested - 1);
+            }
+        }
+
+        return false;
     }
 
     public override bool Handle(Message message, Rect bounds)
     {
-        return ControlForwarder.Forward(_component, message, bounds) || Handle(message);
+        if (_items.Count == 0 || message is not PointerInput pointer || bounds.IsEmpty)
+        {
+            return Handle(message);
+        }
+
+        var inRow = bounds.Contains(pointer.X, pointer.Y) && pointer.Y == bounds.Y;
+        if (!inRow)
+        {
+            if (pointer.Kind is PointerEventKind.Motion or PointerEventKind.Press)
+            {
+                return SetHoveredIndex(-1) || Handle(message);
+            }
+
+            return Handle(message);
+        }
+
+        if (pointer.Kind == PointerEventKind.Wheel)
+        {
+            if (pointer.Button == PointerButton.WheelDown)
+            {
+                return SetSelectedIndex((_selectedIndex + 1) % _items.Count);
+            }
+
+            if (pointer.Button == PointerButton.WheelUp)
+            {
+                return SetSelectedIndex((_selectedIndex + _items.Count - 1) % _items.Count);
+            }
+        }
+
+        var hovered = HitTestTabIndex(pointer.X, bounds);
+        if (pointer.Kind == PointerEventKind.Motion)
+        {
+            return SetHoveredIndex(hovered);
+        }
+
+        if (pointer.Kind == PointerEventKind.Press && pointer.Button == PointerButton.Left && hovered >= 0)
+        {
+            return SetSelectedIndex(hovered);
+        }
+
+        return Handle(message);
     }
 
     public override void Render(Canvas canvas, Rect rect)
     {
-        _component.Render(canvas, rect);
+        var clipped = Rect.Intersect(rect, canvas.Bounds);
+        if (clipped.IsEmpty || clipped.Height < 1 || _items.Count == 0)
+        {
+            return;
+        }
+
+        var x = clipped.X;
+        for (var index = 0; index < _items.Count && x < clipped.Right; index++)
+        {
+            var label = FormatLabel(index, hovered: index == _hoveredIndex);
+            canvas.WriteText(x, clipped.Y, label, clipped.Right - x);
+            x += ControlTextLayout.MeasureDisplayWidth(label) + 1;
+        }
+    }
+
+    internal override LayoutMeasurement Measure(in Rect availableBounds)
+    {
+        var width = 0;
+        for (var index = 0; index < _items.Count; index++)
+        {
+            width += ControlTextLayout.MeasureDisplayWidth(FormatLabel(index, hovered: false));
+            if (index > 0)
+            {
+                width++;
+            }
+        }
+
+        return new LayoutMeasurement(
+            Math.Clamp(width, 0, availableBounds.Width),
+            Math.Clamp(_items.Count == 0 ? 0 : 1, 0, availableBounds.Height));
+    }
+
+    private string FormatLabel(int index, bool hovered)
+    {
+        var label = index == _selectedIndex
+            ? $"[{index + 1}:{_items[index]}]"
+            : $" {index + 1}:{_items[index]} ";
+        return hovered && index != _selectedIndex
+            ? $">{label.Trim()}<"
+            : label;
+    }
+
+    private int HitTestTabIndex(int x, Rect bounds)
+    {
+        var cursor = bounds.X;
+        for (var index = 0; index < _items.Count && cursor < bounds.Right; index++)
+        {
+            var label = FormatLabel(index, hovered: false);
+            var width = ControlTextLayout.MeasureDisplayWidth(label);
+            var end = cursor + width;
+            if (x >= cursor && x < end)
+            {
+                return index;
+            }
+
+            cursor = end + 1;
+        }
+
+        return -1;
+    }
+
+    private bool SetHoveredIndex(int index)
+    {
+        if (_hoveredIndex == index)
+        {
+            return false;
+        }
+
+        _hoveredIndex = index;
+        return true;
+    }
+
+    private bool SetSelectedIndex(int index)
+    {
+        if (_items.Count == 0 || index == _selectedIndex)
+        {
+            return false;
+        }
+
+        var previousIndex = _selectedIndex;
+        var previousTab = _items[previousIndex];
+        _selectedIndex = index;
+        SelectionChanged?.Invoke(this, new SelectionChangedEventArgs(previousIndex, _selectedIndex, previousTab, _items[_selectedIndex]));
+        return true;
     }
 }

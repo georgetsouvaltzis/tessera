@@ -116,10 +116,6 @@ internal static class TeaControlCatalogTests
         "TeaSharp.Components.Productivity.DatePickerOptions",
         "TeaSharp.Components.Productivity.MarkdownViewerComponent",
         "TeaSharp.Components.Productivity.MarkdownViewerOptions",
-        "TeaSharp.Components.Productivity.MenuBarComponent",
-        "TeaSharp.Components.Productivity.MenuBarItem",
-        "TeaSharp.Components.Productivity.MenuBarItemActivatedEventArgs",
-        "TeaSharp.Components.Productivity.MenuBarOptions",
         "TeaSharp.Components.Productivity.NumberInputComponent",
         "TeaSharp.Components.Productivity.NumberInputOptions",
         "TeaSharp.Components.Productivity.NumberInputSubmittedEventArgs",
@@ -133,6 +129,14 @@ internal static class TeaControlCatalogTests
         "TeaSharp.Components.UiKit.ModalComponent",
         "TeaSharp.Components.UiKit.ModalOptions",
         "TeaSharp.Components.UiKit.RadioGroupComponent",
+    ];
+
+    private static readonly string[] RemovedLegacyPromotedTypes =
+    [
+        "TeaSharp.Components.Productivity.MenuBarComponent",
+        "TeaSharp.Components.Productivity.MenuBarItem",
+        "TeaSharp.Components.Productivity.MenuBarItemActivatedEventArgs",
+        "TeaSharp.Components.Productivity.MenuBarOptions",
         "TeaSharp.Components.UiKit.TabSelectionChangedEventArgs",
         "TeaSharp.Components.UiKit.TabsComponent",
         "TeaSharp.Components.UiKit.TabsOptions",
@@ -155,6 +159,9 @@ internal static class TeaControlCatalogTests
         yield return new TestCase(
             "TeaControlCatalog_InternalizedLegacyPromotedTypes_AreNotPublic",
             InternalizedLegacyPromotedTypes_AreNotPublic);
+        yield return new TestCase(
+            "TeaControlCatalog_RemovedLegacyPromotedTypes_AreAbsent",
+            RemovedLegacyPromotedTypes_AreAbsent);
         yield return new TestCase(
             "TeaControlCatalog_PromotedFormControls_WorkThroughRootWrappers",
             PromotedFormControls_WorkThroughRootWrappers);
@@ -243,6 +250,19 @@ internal static class TeaControlCatalogTests
             var type = assembly.GetType(typeName, throwOnError: false);
             TestAssert.True(type is not null, $"{typeName} should continue to exist as an internal bridge.");
             TestAssert.True(type!.IsNotPublic, $"{typeName} should no longer be public once a root wrapper exists.");
+        }
+
+        return Task.CompletedTask;
+    }
+
+    private static Task RemovedLegacyPromotedTypes_AreAbsent()
+    {
+        var assembly = typeof(Label).Assembly;
+
+        foreach (var typeName in RemovedLegacyPromotedTypes)
+        {
+            var type = assembly.GetType(typeName, throwOnError: false);
+            TestAssert.True(type is null, $"{typeName} should be removed once the root wrapper owns the implementation directly.");
         }
 
         return Task.CompletedTask;

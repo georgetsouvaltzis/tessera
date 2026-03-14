@@ -11,9 +11,5 @@ namespace TeaSharp.Components.UiKit;
 /// </summary>
 internal static class UiKitCatalog
 {
-    public static TabsComponent Tabs(IEnumerable<string> tabs) => new(tabs);
-
-    public static TabsComponent Tabs(TabsOptions options) => new(options);
-
     public static ModalComponent Modal(ModalOptions? options = null) => options is null ? new ModalComponent() : new ModalComponent(options);
 }

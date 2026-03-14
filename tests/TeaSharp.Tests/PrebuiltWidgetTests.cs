@@ -32,6 +32,10 @@ internal static class PrebuiltWidgetTests
         yield return new TestCase("Controls_TextInput_HidesBorderWhenConfigured", TextInput_HidesBorderWhenConfigured);
         yield return new TestCase("Controls_TextArea_RendersMultilineContent", TextArea_RendersMultilineContent);
         yield return new TestCase("Controls_TextArea_EnterInsertsNewline", TextArea_EnterInsertsNewline);
+        yield return new TestCase("Controls_Tabs_CycleAndSelectByNumber", Tabs_CycleAndSelectByNumber);
+        yield return new TestCase("Controls_Tabs_ZeroShortcut_SelectsTenthTab", Tabs_ZeroShortcut_SelectsTenthTab);
+        yield return new TestCase("Controls_Tabs_MouseClickSelectsTab", Tabs_MouseClickSelectsTab);
+        yield return new TestCase("Controls_Tabs_SelectionChangedEvent_ReportsTab", Tabs_SelectionChangedEvent_ReportsTab);
         yield return new TestCase("Controls_ListView_NavigatesSelection", ListView_NavigatesSelection);
         yield return new TestCase("Controls_ListView_SelectionChangedEvent_ReportsTransition", ListView_SelectionChangedEvent_ReportsTransition);
         yield return new TestCase("Controls_ListView_MouseClickSelectsRow", ListView_MouseClickSelectsRow);
@@ -44,6 +48,11 @@ internal static class PrebuiltWidgetTests
         yield return new TestCase("Controls_ComboBox_FiltersAndSelects", ComboBox_FiltersAndSelects);
         yield return new TestCase("Controls_ComboBox_SelectionChangedEvent_ReportsSelection", ComboBox_SelectionChangedEvent_ReportsSelection);
         yield return new TestCase("Controls_ComboBox_MouseWheelNavigatesAndSelects", ComboBox_MouseWheelNavigatesAndSelects);
+        yield return new TestCase("Controls_MenuBar_ActivatesShortcut", MenuBar_ActivatesShortcut);
+        yield return new TestCase("Controls_MenuBar_ItemActivatedEvent_ReportsItem", MenuBar_ItemActivatedEvent_ReportsItem);
+        yield return new TestCase("Controls_MenuBar_TryConsumeActivation_IsSingleUse", MenuBar_TryConsumeActivation_IsSingleUse);
+        yield return new TestCase("Controls_MenuBar_MouseClickActivatesItem", MenuBar_MouseClickActivatesItem);
+        yield return new TestCase("Controls_MenuBar_MouseMotionSelectsHoveredItem", MenuBar_MouseMotionSelectsHoveredItem);
         yield return new TestCase("Prebuilt_TableComponent_ForwardsSortHotkeys", TableComponent_ForwardsSortHotkeys);
         yield return new TestCase("Prebuilt_ProgressBarComponent_AdjustsValue", ProgressBarComponent_AdjustsValue);
         yield return new TestCase("Controls_StatusBar_RendersLeftAndRightText", StatusBar_RendersLeftAndRightText);
@@ -299,6 +308,63 @@ internal static class PrebuiltWidgetTests
         return Task.CompletedTask;
     }
 
+    private static Task Tabs_CycleAndSelectByNumber()
+    {
+        var tabs = new Tabs("Overview", "Data", "Forms")
+        {
+            IsFocused = true,
+        };
+
+        tabs.Handle(new KeyPressed(Key.Right));
+        tabs.Handle(new KeyPressed(Key.Character, "3"));
+
+        TestAssert.Equal(2, tabs.SelectedIndex, "Tabs should select requested one-based index from numeric key.");
+        return Task.CompletedTask;
+    }
+
+    private static Task Tabs_MouseClickSelectsTab()
+    {
+        var tabs = new Tabs("Overview", "Data", "Forms");
+
+        var changed = tabs.Handle(new PointerInput(PointerEventKind.Press, PointerButton.Left, 15, 0), new Rect(0, 0, 40, 1));
+
+        TestAssert.True(changed, "Mouse click inside tab row should update selected tab.");
+        TestAssert.Equal(1, tabs.SelectedIndex, "Tab click should select the clicked tab.");
+        return Task.CompletedTask;
+    }
+
+    private static Task Tabs_ZeroShortcut_SelectsTenthTab()
+    {
+        var tabs = new Tabs("1", "2", "3", "4", "5", "6", "7", "8", "9", "10")
+        {
+            IsFocused = true,
+        };
+
+        tabs.Handle(new KeyPressed(Key.Character, "0"));
+
+        TestAssert.Equal(9, tabs.SelectedIndex, "Zero shortcut should map to the tenth tab for parity with legacy tab strips.");
+        return Task.CompletedTask;
+    }
+
+    private static Task Tabs_SelectionChangedEvent_ReportsTab()
+    {
+        var tabs = new Tabs("Overview", "Data", "Forms")
+        {
+            IsFocused = true,
+        };
+        SelectionChangedEventArgs? args = null;
+        tabs.SelectionChanged += (_, eventArgs) => args = eventArgs;
+
+        tabs.Handle(new KeyPressed(Key.Right));
+
+        TestAssert.True(args is not null, "Tabs should raise selection changed when the selected tab changes.");
+        TestAssert.Equal(0, args!.PreviousIndex, "Tabs event should expose the previous index.");
+        TestAssert.Equal(1, args.SelectedIndex, "Tabs event should expose the selected index.");
+        TestAssert.Equal("Overview", args.PreviousItem, "Tabs event should expose the previous tab label.");
+        TestAssert.Equal("Data", args.SelectedItem, "Tabs event should expose the selected tab label.");
+        return Task.CompletedTask;
+    }
+
     private static Task ListView_NavigatesSelection()
     {
         var list = new ListView<string>(x => x)
@@ -514,6 +580,104 @@ internal static class PrebuiltWidgetTests
         TestAssert.True(selectChanged, "Option click should select highlighted combobox row.");
         TestAssert.True(!combobox.IsOpen, "Combobox should close after click-select.");
         TestAssert.Equal("gamma", combobox.SelectedItem, "Combobox selection should reflect wheel-adjusted highlighted option.");
+        return Task.CompletedTask;
+    }
+
+    private static Task MenuBar_ActivatesShortcut()
+    {
+        var menu = new MenuBar
+        {
+            IsFocused = true,
+        };
+        menu.SetItems(
+        [
+            new MenuItem("file", "File", 'f'),
+            new MenuItem("edit", "Edit", 'e'),
+            new MenuItem("help", "Help", 'h'),
+        ]);
+
+        menu.Handle(new KeyPressed(Key.Character, "e"));
+        menu.Handle(new KeyPressed(Key.Character, "h"));
+        menu.Handle(new KeyPressed(Key.Enter));
+        menu.Handle(new KeyPressed(Key.Enter));
+
+        TestAssert.Equal("help", menu.LastActivatedItemId ?? string.Empty, "Menu bar should prioritize shortcut activation over navigation aliases.");
+        TestAssert.True(menu.TryConsumeActivation(out var itemId), "Menu bar should expose one-shot activation consumption.");
+        TestAssert.Equal("help", itemId, "Menu bar should consume the activated item id.");
+        return Task.CompletedTask;
+    }
+
+    private static Task MenuBar_MouseClickActivatesItem()
+    {
+        var menu = new MenuBar();
+        menu.SetItems(
+        [
+            new MenuItem("file", "File", 'f'),
+            new MenuItem("edit", "Edit", 'e'),
+            new MenuItem("help", "Help", 'h'),
+        ]);
+
+        var changed = menu.Handle(new PointerInput(PointerEventKind.Press, PointerButton.Left, 12, 0), new Rect(0, 0, 40, 1));
+
+        TestAssert.True(changed, "Menu mouse click should trigger selection and activation.");
+        TestAssert.Equal("edit", menu.LastActivatedItemId ?? string.Empty, "Menu mouse click should activate clicked item.");
+        return Task.CompletedTask;
+    }
+
+    private static Task MenuBar_MouseMotionSelectsHoveredItem()
+    {
+        var menu = new MenuBar();
+        menu.SetItems(
+        [
+            new MenuItem("file", "File", 'f'),
+            new MenuItem("edit", "Edit", 'e'),
+            new MenuItem("help", "Help", 'h'),
+        ]);
+
+        var changed = menu.Handle(new PointerInput(PointerEventKind.Motion, PointerButton.None, 12, 0), new Rect(0, 0, 40, 1));
+
+        TestAssert.True(changed, "Menu hover should move selection to the hovered item.");
+        TestAssert.Equal(1, menu.SelectedIndex, "Menu hover should track the hovered item for parity with legacy menu bars.");
+        return Task.CompletedTask;
+    }
+
+    private static Task MenuBar_TryConsumeActivation_IsSingleUse()
+    {
+        var menu = new MenuBar
+        {
+            IsFocused = true,
+        };
+        menu.SetItems(
+        [
+            new MenuItem("file", "File", 'f'),
+            new MenuItem("help", "Help", 'h'),
+        ]);
+
+        menu.Handle(new KeyPressed(Key.Enter));
+
+        TestAssert.True(menu.TryConsumeActivation(out var itemId), "Menu bar should expose one-shot activation consumption.");
+        TestAssert.Equal("file", itemId, "Menu bar should consume the activated item id.");
+        TestAssert.True(!menu.TryConsumeActivation(out _), "Menu bar should not report the same activation twice.");
+        return Task.CompletedTask;
+    }
+
+    private static Task MenuBar_ItemActivatedEvent_ReportsItem()
+    {
+        var menu = new MenuBar
+        {
+            IsFocused = true,
+        };
+        menu.SetItems(
+        [
+            new MenuItem("file", "File", 'f'),
+            new MenuItem("help", "Help", 'h'),
+        ]);
+        string? activated = null;
+        menu.ItemActivated += (_, args) => activated = args.ItemId;
+
+        menu.Handle(new KeyPressed(Key.Enter));
+
+        TestAssert.Equal("file", activated ?? string.Empty, "Menu bar activation event should expose the selected item id.");
         return Task.CompletedTask;
     }
 

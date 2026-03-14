@@ -16,11 +16,6 @@ internal static class ProductivityPrebuiltWidgetTests
 {
     public static IEnumerable<TestCase> Cases()
     {
-        yield return new TestCase("Productivity_MenuBarComponent_ActivatesShortcut", MenuBarComponent_ActivatesShortcut);
-        yield return new TestCase("Productivity_MenuBarComponent_ItemActivatedEvent_ReportsItem", MenuBarComponent_ItemActivatedEvent_ReportsItem);
-        yield return new TestCase("Productivity_MenuBarComponent_TryConsumeActivation_IsSingleUse", MenuBarComponent_TryConsumeActivation_IsSingleUse);
-        yield return new TestCase("Productivity_MenuBarComponent_MouseClickActivatesItem", MenuBarComponent_MouseClickActivatesItem);
-        yield return new TestCase("Productivity_MenuBarComponent_ParamsSetterReplacesItems", MenuBarComponent_ParamsSetterReplacesItems);
         yield return new TestCase("Productivity_ContextMenuComponent_ExecutesAndCloses", ContextMenuComponent_ExecutesAndCloses);
         yield return new TestCase("Productivity_ContextMenuComponent_ItemExecutedEvent_ReportsItem", ContextMenuComponent_ItemExecutedEvent_ReportsItem);
         yield return new TestCase("Productivity_ContextMenuComponent_TryConsumeExecution_IsSingleUse", ContextMenuComponent_TryConsumeExecution_IsSingleUse);
@@ -37,81 +32,6 @@ internal static class ProductivityPrebuiltWidgetTests
         yield return new TestCase("Productivity_TimePickerComponent_ValueChangedEvent_ReportsTransition", TimePickerComponent_ValueChangedEvent_ReportsTransition);
         yield return new TestCase("Productivity_TimePickerComponent_MouseWheelAdjustsField", TimePickerComponent_MouseWheelAdjustsField);
         yield return new TestCase("Productivity_MarkdownViewerComponent_RendersMarkdown", MarkdownViewerComponent_RendersMarkdown);
-    }
-
-    private static Task MenuBarComponent_ActivatesShortcut()
-    {
-        var menu = new MenuBarComponent(new MenuBarOptions(
-            Items:
-            [
-                new MenuBarItem("file", "File", 'f'),
-                new MenuBarItem("edit", "Edit", 'e'),
-                new MenuBarItem("help", "Help", 'h'),
-            ],
-            IsFocused: true));
-
-        menu.Update(new KeyPressMsg(KeyCode.Character, "e"));
-        menu.Update(new KeyPressMsg(KeyCode.Character, "h"));
-        var activationVersion = menu.ActivationVersion;
-        menu.Update(new KeyPressMsg(KeyCode.Enter));
-        menu.Update(new KeyPressMsg(KeyCode.Enter));
-
-        TestAssert.Equal("help", menu.LastActivatedItemId ?? string.Empty, "Menu bar should prioritize shortcut activation over navigation aliases.");
-        TestAssert.True(menu.ActivationVersion == activationVersion + 2, "Menu bar should count repeated activations on the same selected item.");
-        return Task.CompletedTask;
-    }
-
-    private static Task MenuBarComponent_MouseClickActivatesItem()
-    {
-        var menu = new MenuBarComponent();
-        menu.SetItems(
-        [
-            new MenuBarItem("file", "File", 'f'),
-            new MenuBarItem("edit", "Edit", 'e'),
-            new MenuBarItem("help", "Help", 'h'),
-        ]);
-
-        var changed = menu.UpdateMouse(new MouseClickMsg(MouseButton.Left, 12, 0), new Rect(0, 0, 40, 1));
-
-        TestAssert.True(changed, "Menu mouse click should trigger selection/activation.");
-        TestAssert.Equal("edit", menu.LastActivatedItemId ?? string.Empty, "Menu mouse click should activate clicked item.");
-        return Task.CompletedTask;
-    }
-
-    private static Task MenuBarComponent_TryConsumeActivation_IsSingleUse()
-    {
-        var menu = new MenuBarComponent(new MenuBarOptions(
-            Items:
-            [
-                new MenuBarItem("file", "File", 'f'),
-                new MenuBarItem("help", "Help", 'h'),
-            ],
-            IsFocused: true));
-
-        menu.Update(new KeyPressMsg(KeyCode.Enter));
-
-        TestAssert.True(menu.TryConsumeActivation(out var itemId), "Menu bar should expose one-shot activation consumption.");
-        TestAssert.Equal("file", itemId, "Menu bar should consume the activated item id.");
-        TestAssert.True(!menu.TryConsumeActivation(out _), "Menu bar should not report the same activation twice.");
-        return Task.CompletedTask;
-    }
-
-    private static Task MenuBarComponent_ItemActivatedEvent_ReportsItem()
-    {
-        var menu = new MenuBarComponent(new MenuBarOptions(
-            Items:
-            [
-                new MenuBarItem("file", "File", 'f'),
-                new MenuBarItem("help", "Help", 'h'),
-            ],
-            IsFocused: true));
-        string? activated = null;
-        menu.ItemActivated += (_, args) => activated = args.ItemId;
-
-        menu.Update(new KeyPressMsg(KeyCode.Enter));
-
-        TestAssert.Equal("file", activated ?? string.Empty, "Menu bar activation event should expose the selected item id.");
-        return Task.CompletedTask;
     }
 
     private static Task ContextMenuComponent_ExecutesAndCloses()
@@ -205,19 +125,6 @@ internal static class ProductivityPrebuiltWidgetTests
         TestAssert.True(changed, "Context menu mouse release should execute row action.");
         TestAssert.Equal("paste", menu.LastExecutedItemId ?? string.Empty, "Context menu release should execute hovered item.");
         TestAssert.True(!menu.IsVisible, "Context menu should close after mouse release execute.");
-        return Task.CompletedTask;
-    }
-
-    private static Task MenuBarComponent_ParamsSetterReplacesItems()
-    {
-        var menu = new MenuBarComponent();
-
-        menu.SetItems(
-            new MenuBarItem("file", "File", 'f'),
-            new MenuBarItem("help", "Help", 'h'));
-
-        TestAssert.Equal(2, menu.Items.Count, "Params-based menu bar setup should populate items.");
-        TestAssert.Equal("file", menu.Items[0].Id, "Params-based menu bar setup should keep item order.");
         return Task.CompletedTask;
     }
 

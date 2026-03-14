@@ -147,6 +147,8 @@ The first root controls that already own their implementation directly are:
 - `Choice`
 - `ComboBox`
 - `ListView<T>`
+- `Tabs`
+- `MenuBar`
 - `StatusBar`
 
 Their old `TeaSharp.Components.Prebuilt.*` counterparts have been removed instead of kept as compatibility wrappers.
