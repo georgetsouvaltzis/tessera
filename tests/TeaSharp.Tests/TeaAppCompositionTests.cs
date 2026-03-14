@@ -52,6 +52,9 @@ internal static class TeaAppCompositionTests
             "TeaAppComposition_RootLayouts_UseSceneCompilerInsteadOfLegacyCompiledScreen",
             RootLayouts_UseSceneCompilerInsteadOfLegacyCompiledScreen);
         yield return new TestCase(
+            "TeaAppComposition_LegacyCompilerTypes_AreRemovedFromDefaultCompilerPath",
+            LegacyCompilerTypes_AreRemovedFromDefaultCompilerPath);
+        yield return new TestCase(
             "TeaAppComposition_LegacyLayoutHelpers_AreInternalized",
             LegacyLayoutHelpers_AreInternalized);
         yield return new TestCase(
@@ -260,6 +263,22 @@ internal static class TeaAppCompositionTests
         TestAssert.True(
             compiled!.GetType().FullName != "TeaSharp.Internal.LegacyCompiledScreen",
             "Root layout screens should compile through the new scene compiler instead of the legacy ScreenComposer bridge.");
+        return Task.CompletedTask;
+    }
+
+    private static Task LegacyCompilerTypes_AreRemovedFromDefaultCompilerPath()
+    {
+        var assembly = typeof(TeaApp).Assembly;
+
+        TestAssert.True(
+            assembly.GetType("TeaSharp.Internal.HybridScreenCompiler", throwOnError: false) is null,
+            "HybridScreenCompiler should be removed once built-in root layouts compile directly through TeaSceneCompiler.");
+        TestAssert.True(
+            assembly.GetType("TeaSharp.Internal.LegacyScreenCompiler", throwOnError: false) is null,
+            "LegacyScreenCompiler should no longer exist as a silent fallback in the default compiler path.");
+        TestAssert.True(
+            assembly.GetType("TeaSharp.Internal.LegacyCompiledScreen", throwOnError: false) is null,
+            "LegacyCompiledScreen should be removed once root layout interaction is handled by the new scene compiler.");
         return Task.CompletedTask;
     }
 

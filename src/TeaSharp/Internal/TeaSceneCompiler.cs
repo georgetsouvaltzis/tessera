@@ -7,27 +7,11 @@ using TeaSharp.Layout;
 
 namespace TeaSharp.Internal;
 
-internal sealed class HybridScreenCompiler : IScreenCompiler
-{
-    private readonly TeaSceneCompiler _scene = new();
-    private readonly LegacyScreenCompiler _legacy = new();
-
-    public ScreenRenderResult Compile(ScreenContent content, ScreenContext context, ScreenOptions options)
-    {
-        if (_scene.TryCompile(content, context, options, out var result))
-        {
-            return result;
-        }
-
-        return _legacy.Compile(content, context, options);
-    }
-}
-
-internal sealed class TeaSceneCompiler
+internal sealed class TeaSceneCompiler : IScreenCompiler
 {
     private string? _focusedRegionId;
 
-    public bool TryCompile(ScreenContent content, ScreenContext context, ScreenOptions options, out ScreenRenderResult result)
+    public ScreenRenderResult Compile(ScreenContent content, ScreenContext context, ScreenOptions options)
     {
         ArgumentNullException.ThrowIfNull(context);
 
@@ -38,8 +22,7 @@ internal sealed class TeaSceneCompiler
                 Terminal = options.ToTerminalOutput(),
             };
 
-            result = new ScreenRenderResult(textOutput, null);
-            return true;
+            return new ScreenRenderResult(textOutput, null);
         }
 
         var canvas = context.CreateCanvas(CanvasTextMode.GraphemeAware);
@@ -48,8 +31,8 @@ internal sealed class TeaSceneCompiler
         var builder = new TeaSceneBuilder(_focusedRegionId);
         if (!builder.TryBuild(content.Layout, canvas.Bounds, "root"))
         {
-            result = null!;
-            return false;
+            throw new InvalidOperationException(
+                $"TeaSceneCompiler does not support layout node '{content.Layout.GetType().FullName}'.");
         }
 
         var interaction = builder.Build(focusedRegionId => _focusedRegionId = focusedRegionId);
@@ -61,8 +44,7 @@ internal sealed class TeaSceneCompiler
             Terminal = options.ToTerminalOutput(),
         };
 
-        result = new ScreenRenderResult(output, interaction.HasInteraction ? interaction : null);
-        return true;
+        return new ScreenRenderResult(output, interaction.HasInteraction ? interaction : null);
     }
 
     private sealed class TeaSceneBuilder
