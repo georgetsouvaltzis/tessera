@@ -241,8 +241,11 @@ internal static class RuntimeApiContractTests
 
         TestAssert.True(teaProgramOptions is null, "TeaProgramOptions should no longer exist on the supported hosting surface.");
         TestAssert.True(typeof(IScreen).IsNotPublic, "IScreen should be an internal runtime bridge.");
+        var coreAssembly = typeof(TeaRuntimeLoopOptions).Assembly;
+        var teaProgram = coreAssembly.GetType("TeaSharp.Core.Application.TeaProgram", throwOnError: false);
+
         TestAssert.True(typeof(TeaRuntimeLoopOptions).IsNotPublic, "TeaRuntimeLoopOptions should be an internal runtime bridge.");
-        TestAssert.True(typeof(TeaProgram).IsNotPublic, "TeaProgram should be an internal runtime bridge.");
+        TestAssert.True(teaProgram is null, "TeaProgram should be removed once TeaRuntimeLoop owns the runtime loop.");
         return Task.CompletedTask;
     }
 

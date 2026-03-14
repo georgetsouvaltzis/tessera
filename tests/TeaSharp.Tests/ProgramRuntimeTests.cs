@@ -119,7 +119,7 @@ internal static class ProgramRuntimeTests
         // Arrange
         var model = new IdleModel();
         var blocked = true;
-        var program = new TeaProgram(model, new TeaRuntimeLoopOptions
+        var program = new TestRuntimeDriver(model, new TeaRuntimeLoopOptions
         {
             DisableRenderer = true,
             DisableInput = true,
@@ -157,7 +157,7 @@ internal static class ProgramRuntimeTests
     {
         // Arrange
         var model = new CommandErrorCaptureModel();
-        var program = new TeaProgram(model, new TeaRuntimeLoopOptions
+        var program = new TestRuntimeDriver(model, new TeaRuntimeLoopOptions
         {
             DisableRenderer = true,
             DisableInput = true,
@@ -179,7 +179,7 @@ internal static class ProgramRuntimeTests
     {
         // Arrange
         var model = new CommandFaultModel();
-        var program = new TeaProgram(model, new TeaRuntimeLoopOptions
+        var program = new TestRuntimeDriver(model, new TeaRuntimeLoopOptions
         {
             DisableRenderer = true,
             DisableInput = true,
@@ -205,7 +205,7 @@ internal static class ProgramRuntimeTests
     {
         // Arrange
         var model = new CommandRecoveryModel();
-        var program = new TeaProgram(model, new TeaRuntimeLoopOptions
+        var program = new TestRuntimeDriver(model, new TeaRuntimeLoopOptions
         {
             DisableRenderer = true,
             DisableInput = true,
@@ -225,7 +225,7 @@ internal static class ProgramRuntimeTests
     {
         // Arrange
         var model = new CommandErrorCaptureModel();
-        var program = new TeaProgram(model, new TeaRuntimeLoopOptions
+        var program = new TestRuntimeDriver(model, new TeaRuntimeLoopOptions
         {
             DisableRenderer = true,
             DisableInput = true,
@@ -249,7 +249,7 @@ internal static class ProgramRuntimeTests
         // Arrange
         var nonAdaptiveModel = new BurstUpdateModel(targetCount: 8);
         await using var nonAdaptiveRenderer = new RenderCountingRendererSpy();
-        var nonAdaptiveProgram = new TeaProgram(nonAdaptiveModel, new TeaRuntimeLoopOptions
+        var nonAdaptiveProgram = new TestRuntimeDriver(nonAdaptiveModel, new TeaRuntimeLoopOptions
         {
             DisableInput = true,
             Renderer = nonAdaptiveRenderer,
@@ -260,7 +260,7 @@ internal static class ProgramRuntimeTests
 
         var adaptiveModel = new BurstUpdateModel(targetCount: 8);
         await using var adaptiveRenderer = new RenderCountingRendererSpy();
-        var adaptiveProgram = new TeaProgram(adaptiveModel, new TeaRuntimeLoopOptions
+        var adaptiveProgram = new TestRuntimeDriver(adaptiveModel, new TeaRuntimeLoopOptions
         {
             DisableInput = true,
             Renderer = adaptiveRenderer,
@@ -284,7 +284,7 @@ internal static class ProgramRuntimeTests
         // Arrange
         var model = new RawOutputInitModel();
         await using var renderer = new RenderCountingRendererSpy();
-        var program = new TeaProgram(model, new TeaRuntimeLoopOptions
+        var program = new TestRuntimeDriver(model, new TeaRuntimeLoopOptions
         {
             DisableInput = true,
             Renderer = renderer,
@@ -304,7 +304,7 @@ internal static class ProgramRuntimeTests
     {
         // Arrange
         var model = new MouseInterceptModel();
-        var program = new TeaProgram(model, new TeaRuntimeLoopOptions
+        var program = new TestRuntimeDriver(model, new TeaRuntimeLoopOptions
         {
             DisableRenderer = true,
             DisableInput = true,
@@ -326,7 +326,7 @@ internal static class ProgramRuntimeTests
         // Arrange
         var terminal = new ResizingFakeTerminal();
         var model = new ResizeTrackingModel();
-        var program = new TeaProgram(model, new TeaRuntimeLoopOptions
+        var program = new TestRuntimeDriver(model, new TeaRuntimeLoopOptions
         {
             DisableRenderer = true,
             DisableInput = true,
@@ -355,7 +355,7 @@ internal static class ProgramRuntimeTests
             ModeReports: true,
             Source: "test-override");
         var model = new CapabilityTrackingModel();
-        var program = new TeaProgram(model, new TeaRuntimeLoopOptions
+        var program = new TestRuntimeDriver(model, new TeaRuntimeLoopOptions
         {
             DisableRenderer = true,
             DisableInput = true,
@@ -375,7 +375,7 @@ internal static class ProgramRuntimeTests
     {
         // Arrange
         var model = new ColorProfileTrackingModel();
-        var program = new TeaProgram(model, new TeaRuntimeLoopOptions
+        var program = new TestRuntimeDriver(model, new TeaRuntimeLoopOptions
         {
             DisableRenderer = true,
             DisableInput = true,
@@ -403,7 +403,7 @@ internal static class ProgramRuntimeTests
             ModeReports: false,
             Source: "capability-detector-delegate");
         var model = new CapabilityTrackingModel();
-        var program = new TeaProgram(model, new TeaRuntimeLoopOptions
+        var program = new TestRuntimeDriver(model, new TeaRuntimeLoopOptions
         {
             DisableRenderer = true,
             DisableInput = true,
@@ -422,7 +422,7 @@ internal static class ProgramRuntimeTests
     {
         // Arrange
         var model = new ColorProfileTrackingModel();
-        var program = new TeaProgram(model, new TeaRuntimeLoopOptions
+        var program = new TestRuntimeDriver(model, new TeaRuntimeLoopOptions
         {
             DisableRenderer = true,
             DisableInput = true,
@@ -444,7 +444,7 @@ internal static class ProgramRuntimeTests
         // Arrange
         var terminal = new InteractiveProbeTerminalAdapter();
         var model = new TimedQuitModel(TimeSpan.FromMilliseconds(90));
-        var program = new TeaProgram(model, new TeaRuntimeLoopOptions
+        var program = new TestRuntimeDriver(model, new TeaRuntimeLoopOptions
         {
             DisableRenderer = true,
             DisableInput = false,
@@ -477,7 +477,7 @@ internal static class ProgramRuntimeTests
         // Arrange
         var terminal = new InteractiveInputTerminalAdapter("x");
         var decoder = new QuitOnFirstByteDecoder();
-        var program = new TeaProgram(new IdleModel(), new TeaRuntimeLoopOptions
+        var program = new TestRuntimeDriver(new IdleModel(), new TeaRuntimeLoopOptions
         {
             DisableRenderer = true,
             DisableInput = false,
@@ -496,7 +496,7 @@ internal static class ProgramRuntimeTests
     {
         // Arrange
         var model = new ConcurrencyTrackingModel(commandCount: 6, delay: TimeSpan.FromMilliseconds(25));
-        var program = new TeaProgram(model, new TeaRuntimeLoopOptions
+        var program = new TestRuntimeDriver(model, new TeaRuntimeLoopOptions
         {
             DisableRenderer = true,
             DisableInput = true,
@@ -516,7 +516,7 @@ internal static class ProgramRuntimeTests
         // Arrange
         var terminal = new InteractiveProbeTerminalAdapter();
         var model = new TimedQuitProbeViewModel(TimeSpan.FromMilliseconds(60));
-        var program = new TeaProgram(model, new TeaRuntimeLoopOptions
+        var program = new TestRuntimeDriver(model, new TeaRuntimeLoopOptions
         {
             DisableInput = true,
             Terminal = terminal,
@@ -551,7 +551,7 @@ internal static class ProgramRuntimeTests
         // Arrange
         var terminal = new InteractiveProbeTerminalAdapter();
         var model = new TimedQuitModel(TimeSpan.FromMilliseconds(90));
-        var program = new TeaProgram(model, new TeaRuntimeLoopOptions
+        var program = new TestRuntimeDriver(model, new TeaRuntimeLoopOptions
         {
             DisableRenderer = true,
             DisableInput = false,
@@ -593,7 +593,7 @@ internal static class ProgramRuntimeTests
             SynchronizedUpdates: true,
             ModeReports: true,
             Source: "probe-timeout-test");
-        var program = new TeaProgram(model, new TeaRuntimeLoopOptions
+        var program = new TestRuntimeDriver(model, new TeaRuntimeLoopOptions
         {
             DisableRenderer = true,
             DisableInput = false,
@@ -629,7 +629,7 @@ internal static class ProgramRuntimeTests
             SynchronizedUpdates: true,
             ModeReports: true,
             Source: "probe-response-test");
-        var program = new TeaProgram(model, new TeaRuntimeLoopOptions
+        var program = new TestRuntimeDriver(model, new TeaRuntimeLoopOptions
         {
             DisableRenderer = true,
             DisableInput = false,
@@ -672,7 +672,7 @@ internal static class ProgramRuntimeTests
             SynchronizedUpdates: true,
             ModeReports: true,
             Source: "probe-legacy-mouse-test");
-        var program = new TeaProgram(model, new TeaRuntimeLoopOptions
+        var program = new TestRuntimeDriver(model, new TeaRuntimeLoopOptions
         {
             DisableRenderer = true,
             DisableInput = false,
@@ -715,7 +715,7 @@ internal static class ProgramRuntimeTests
             SynchronizedUpdates: true,
             ModeReports: true,
             Source: "probe-all-responses-test");
-        var program = new TeaProgram(model, new TeaRuntimeLoopOptions
+        var program = new TestRuntimeDriver(model, new TeaRuntimeLoopOptions
         {
             DisableRenderer = true,
             DisableInput = false,
@@ -753,7 +753,7 @@ internal static class ProgramRuntimeTests
             ModeReports: true,
             Source: "test-initial");
         var model = new CapabilityRefinementModel();
-        var program = new TeaProgram(model, new TeaRuntimeLoopOptions
+        var program = new TestRuntimeDriver(model, new TeaRuntimeLoopOptions
         {
             DisableRenderer = true,
             DisableInput = true,
@@ -787,7 +787,7 @@ internal static class ProgramRuntimeTests
         var model = new CapabilityProbeResponseModel(
             TimeSpan.FromMilliseconds(120),
             [new ModeReportMsg(1000, ModeReportState.Set)]);
-        var program = new TeaProgram(model, new TeaRuntimeLoopOptions
+        var program = new TestRuntimeDriver(model, new TeaRuntimeLoopOptions
         {
             DisableRenderer = true,
             DisableInput = true,
@@ -819,7 +819,7 @@ internal static class ProgramRuntimeTests
             ModeReports: true,
             Source: "test-unsupported");
         var model = new UnsupportedModeReportRefinementModel();
-        var program = new TeaProgram(model, new TeaRuntimeLoopOptions
+        var program = new TestRuntimeDriver(model, new TeaRuntimeLoopOptions
         {
             DisableRenderer = true,
             DisableInput = true,
@@ -852,7 +852,7 @@ internal static class ProgramRuntimeTests
             Source: "test-renderer-propagation");
         var model = new UnsupportedModeReportRefinementModel();
         await using var renderer = new CapabilityAwareRendererSpy();
-        var program = new TeaProgram(model, new TeaRuntimeLoopOptions
+        var program = new TestRuntimeDriver(model, new TeaRuntimeLoopOptions
         {
             DisableInput = true,
             Renderer = renderer,
@@ -874,7 +874,7 @@ internal static class ProgramRuntimeTests
         var terminal = new SignalDrivenFakeTerminal(new TeaSharp.Core.Terminal.TerminalSize(80, 24));
         var model = new ResizeTrackingModel();
         Action? raiseSignal = null;
-        var program = new TeaProgram(model, new TeaRuntimeLoopOptions
+        var program = new TestRuntimeDriver(model, new TeaRuntimeLoopOptions
         {
             DisableRenderer = true,
             DisableInput = true,
@@ -911,7 +911,7 @@ internal static class ProgramRuntimeTests
         var terminal = new ResizingFakeTerminal();
         var model = new ResizeTrackingModel();
         var registrationCalls = 0;
-        var program = new TeaProgram(model, new TeaRuntimeLoopOptions
+        var program = new TestRuntimeDriver(model, new TeaRuntimeLoopOptions
         {
             DisableRenderer = true,
             DisableInput = true,
@@ -938,7 +938,7 @@ internal static class ProgramRuntimeTests
         // Arrange
         var terminal = new ResizingFakeTerminal();
         var model = new ResizeTrackingModel();
-        var program = new TeaProgram(model, new TeaRuntimeLoopOptions
+        var program = new TestRuntimeDriver(model, new TeaRuntimeLoopOptions
         {
             DisableRenderer = true,
             DisableInput = true,
@@ -960,7 +960,7 @@ internal static class ProgramRuntimeTests
         // Arrange
         var terminal = new DisposeOrderingTerminalAdapter();
         var model = new QuitOnQModel();
-        var program = new TeaProgram(model, new TeaRuntimeLoopOptions
+        var program = new TestRuntimeDriver(model, new TeaRuntimeLoopOptions
         {
             DisableRenderer = true,
             Terminal = terminal,
@@ -974,7 +974,7 @@ internal static class ProgramRuntimeTests
         TestAssert.True(terminal.DisposeObservedCancellation, "Program should cancel input processing before terminal dispose.");
     }
 
-    private static TeaProgram NewProgram(IScreen model) =>
+    private static TestRuntimeDriver NewProgram(IScreen model) =>
         new(model, new TeaRuntimeLoopOptions
         {
             DisableRenderer = true,
@@ -993,6 +993,29 @@ internal static class ProgramRuntimeTests
             }
 
             await Task.Delay(10);
+        }
+    }
+
+    private sealed class TestRuntimeDriver
+    {
+        private readonly IScreen _screen;
+        private readonly TeaRuntimeLoop _runtime;
+
+        public TestRuntimeDriver(IScreen screen, TeaRuntimeLoopOptions? options = null)
+        {
+            _screen = screen ?? throw new ArgumentNullException(nameof(screen));
+            _runtime = new TeaRuntimeLoop(screen.Init, screen.Update, screen.Render, options);
+        }
+
+        public void Send(IMessage message)
+        {
+            _runtime.Send(message);
+        }
+
+        public async Task<IScreen> RunAsync(CancellationToken cancellationToken = default)
+        {
+            await _runtime.RunAsync(cancellationToken).ConfigureAwait(false);
+            return _screen;
         }
     }
 }

@@ -128,8 +128,9 @@ internal static class TeaAppFoundationTests
 
     private static Task TeaApplication_RuntimePath_DoesNotStoreTeaProgramDirectly()
     {
+        const string legacyTypeName = "TeaSharp.Core.Application.TeaProgram";
         var fields = typeof(TeaApplication).GetFields(BindingFlags.Instance | BindingFlags.NonPublic);
-        var legacyField = fields.FirstOrDefault(field => field.FieldType == typeof(TeaSharp.Core.Application.TeaProgram));
+        var legacyField = fields.FirstOrDefault(field => field.FieldType.FullName == legacyTypeName);
 
         TestAssert.True(
             legacyField is null,
@@ -139,9 +140,10 @@ internal static class TeaAppFoundationTests
 
     private static Task TeaRuntimeBridge_RuntimePath_DoesNotStoreTeaProgramDirectly()
     {
+        const string legacyTypeName = "TeaSharp.Core.Application.TeaProgram";
         var runtimeType = typeof(TeaApplication).Assembly.GetType("TeaSharp.Internal.TeaAppRuntime", throwOnError: true)!;
         var fields = runtimeType.GetFields(BindingFlags.Instance | BindingFlags.NonPublic);
-        var legacyField = fields.FirstOrDefault(field => field.FieldType == typeof(TeaSharp.Core.Application.TeaProgram));
+        var legacyField = fields.FirstOrDefault(field => field.FieldType.FullName == legacyTypeName);
 
         TestAssert.True(
             legacyField is null,
