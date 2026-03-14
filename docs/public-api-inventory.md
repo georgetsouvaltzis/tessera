@@ -134,7 +134,7 @@ to:
 - `WindowLayout`, `RowLayout`, `ColumnLayout`, `PanelLayout`, `CenterLayout`, `LayoutSlot`
 - root `TeaSharp.Controls` wrappers
 
-The old `TeaHost.CreateProgram(...)` / `TeaProgramOptions` / `IScreen` program-hosting path is now internal-only.
+The old `TeaHost.CreateProgram(...)` / `TeaProgramOptions` / `IScreen` program-hosting path has been removed.
 
 The old tree-oriented stack now mostly compiles behind the scenes as an internal bridge. The previous static layout helper DSL is also internal-only.
 

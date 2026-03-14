@@ -1,5 +1,6 @@
 using TeaSharp.Components.Charting;
 using TeaSharp.Components.Composition;
+using TeaSharp.Components.Composition.Internal;
 using TeaSharp.Components.Primitives;
 using TeaSharp.Controls;
 using System.Globalization;
@@ -194,7 +195,7 @@ internal static class ChartComponentTests
     {
         // Arrange
         var canvas = new Canvas(20, 5);
-        var composer = new ComponentComposer();
+        var composer = new TestComponentHost();
         var counter = new CounterComponent();
         composer.Add(counter, new Rect(0, 0, 20, 5));
 
@@ -211,7 +212,7 @@ internal static class ChartComponentTests
 
     private static Task Composer_FocusedRoutingTargetsFocusedSlotOnly()
     {
-        var composer = new ComponentComposer();
+        var composer = new TestComponentHost();
         var first = new KeyProbeComponent { IsFocused = true };
         var second = new KeyProbeComponent();
         composer.Add(first, new Rect(0, 0, 10, 4));
@@ -227,7 +228,7 @@ internal static class ChartComponentTests
 
     private static Task Composer_BroadcastRoutingUpdatesAllSlots()
     {
-        var composer = new ComponentComposer
+        var composer = new TestComponentHost
         {
             KeyboardRoutingMode = KeyboardRoutingMode.Broadcast,
         };
@@ -246,7 +247,7 @@ internal static class ChartComponentTests
 
     private static Task Composer_FocusFirstTargetsFirstFocusableSlot()
     {
-        var composer = new ComponentComposer();
+        var composer = new TestComponentHost();
         var first = new CounterComponent();
         var second = new KeyProbeComponent();
         composer.Add(first, new Rect(0, 0, 10, 4));
@@ -262,7 +263,7 @@ internal static class ChartComponentTests
 
     private static Task Composer_FocusNextCyclesAcrossFocusableSlots()
     {
-        var composer = new ComponentComposer();
+        var composer = new TestComponentHost();
         var first = new KeyProbeComponent { IsFocused = true };
         var second = new CounterComponent();
         var third = new KeyProbeComponent();
@@ -281,7 +282,7 @@ internal static class ChartComponentTests
 
     private static Task Composer_FocusPreviousCyclesBackwardAcrossFocusableSlots()
     {
-        var composer = new ComponentComposer();
+        var composer = new TestComponentHost();
         var first = new KeyProbeComponent();
         var second = new CounterComponent();
         var third = new KeyProbeComponent { IsFocused = true };
@@ -300,7 +301,7 @@ internal static class ChartComponentTests
 
     private static Task Composer_MouseClickFocusesTargetSlot()
     {
-        var composer = new ComponentComposer();
+        var composer = new TestComponentHost();
         var first = new MouseProbeComponent { IsFocused = true };
         var second = new MouseProbeComponent { IsFocused = false };
         composer.Add(first, new Rect(0, 0, 10, 4));
@@ -317,7 +318,7 @@ internal static class ChartComponentTests
 
     private static Task Composer_MouseWheelFallsBackToFocusedSlot()
     {
-        var composer = new ComponentComposer();
+        var composer = new TestComponentHost();
         var focused = new MouseProbeComponent { IsFocused = true };
         composer.Add(focused, new Rect(0, 0, 10, 4));
 
@@ -391,6 +392,50 @@ internal static class ChartComponentTests
         public void Render(Canvas canvas, Rect rect)
         {
             canvas.WriteText(rect.X, rect.Y, IsFocused ? "focused" : "idle", rect.Width);
+        }
+    }
+
+    private sealed class TestComponentHost
+    {
+        private readonly List<ComponentSlot> _slots = [];
+        private int _focusedSlotIndex = -1;
+
+        public KeyboardRoutingMode KeyboardRoutingMode { get; set; } = KeyboardRoutingMode.FocusedOnly;
+
+        public int FocusedSlotIndex => _focusedSlotIndex;
+
+        public void Add(ICanvasComponent component, Rect bounds)
+        {
+            _slots.Add(new ComponentSlot(component, bounds));
+            if (component is IFocusableComponent { IsFocused: true })
+            {
+                _focusedSlotIndex = _slots.Count - 1;
+            }
+        }
+
+        public bool Update(IMessage message)
+        {
+            return ComponentRouting.Update(
+                _slots,
+                message,
+                clickToFocusEnabled: true,
+                routeMouseWheelToFocusedSlot: true,
+                KeyboardRoutingMode,
+                ref _focusedSlotIndex);
+        }
+
+        public bool FocusFirst() => ComponentRouting.FocusFirst(_slots, ref _focusedSlotIndex);
+
+        public bool FocusNext() => ComponentRouting.FocusNext(_slots, ref _focusedSlotIndex);
+
+        public bool FocusPrevious() => ComponentRouting.FocusPrevious(_slots, ref _focusedSlotIndex);
+
+        public void Render(Canvas canvas)
+        {
+            foreach (var slot in _slots)
+            {
+                slot.Component.Render(canvas, slot.Bounds);
+            }
         }
     }
 }

@@ -19,34 +19,41 @@ using ModelView = TeaSharp.Core.Abstractions.ScreenOutput;
 
 namespace TeaSharp.Tests;
 
-internal sealed class InitQuitModel : IScreen
+internal abstract class TestRuntimeModel
 {
-    public Effect? Init() => Effects.Quit;
+    public virtual Effect? Init() => null;
 
-    public Effect? Update(IMessage message) => null;
+    public abstract Effect? Update(IMessage message);
 
-    public ModelView Render() => ModelView.From("quit");
+    public abstract ModelView Render();
 }
 
-internal sealed class IdleModel : IScreen
+internal sealed class InitQuitModel : TestRuntimeModel
 {
-    public Effect? Init() => null;
+    public override Effect? Init() => Effects.Quit;
 
-    public Effect? Update(IMessage message) => null;
+    public override Effect? Update(IMessage message) => null;
 
-    public ModelView Render() => ModelView.From("idle");
+    public override ModelView Render() => ModelView.From("quit");
 }
 
-internal sealed class SequenceModel : IScreen
+internal sealed class IdleModel : TestRuntimeModel
+{
+    public override Effect? Update(IMessage message) => null;
+
+    public override ModelView Render() => ModelView.From("idle");
+}
+
+internal sealed class SequenceModel : TestRuntimeModel
 {
     public List<int> Values { get; } = [];
 
-    public Effect? Init() => Effects.Sequence(
+    public override Effect? Init() => Effects.Sequence(
         Effects.FromMessage(new NumberMsg(1)),
         Effects.FromMessage(new NumberMsg(2)),
         Effects.Quit);
 
-    public Effect? Update(IMessage message)
+    public override Effect? Update(IMessage message)
     {
         if (message is NumberMsg number)
         {
@@ -56,18 +63,18 @@ internal sealed class SequenceModel : IScreen
         return null;
     }
 
-    public ModelView Render() => ModelView.From("sequence");
+    public override ModelView Render() => ModelView.From("sequence");
 }
 
-internal sealed class BatchModel : IScreen
+internal sealed class BatchModel : TestRuntimeModel
 {
     public int Count { get; private set; }
 
-    public Effect? Init() => Effects.Batch(
+    public override Effect? Init() => Effects.Batch(
         Effects.FromMessage(new NumberMsg(1)),
         Effects.FromMessage(new NumberMsg(2)));
 
-    public Effect? Update(IMessage message)
+    public override Effect? Update(IMessage message)
     {
         if (message is NumberMsg)
         {
@@ -81,18 +88,18 @@ internal sealed class BatchModel : IScreen
         return null;
     }
 
-    public ModelView Render() => ModelView.From("batch");
+    public override ModelView Render() => ModelView.From("batch");
 }
 
-internal sealed class CommandErrorCaptureModel : IScreen
+internal sealed class CommandErrorCaptureModel : TestRuntimeModel
 {
     private const string CommandFailureMessage = "command-failure-for-tests";
 
     public Exception? CapturedError { get; private set; }
 
-    public Effect? Init() => _ => throw new InvalidOperationException(CommandFailureMessage);
+    public override Effect? Init() => _ => throw new InvalidOperationException(CommandFailureMessage);
 
-    public Effect? Update(IMessage message)
+    public override Effect? Update(IMessage message)
     {
         if (message is EffectErrorMsg error)
         {
@@ -103,27 +110,27 @@ internal sealed class CommandErrorCaptureModel : IScreen
         return null;
     }
 
-    public ModelView Render() => ModelView.From("command-error-capture");
+    public override ModelView Render() => ModelView.From("command-error-capture");
 }
 
-internal sealed class CommandFaultModel : IScreen
+internal sealed class CommandFaultModel : TestRuntimeModel
 {
     public const string FailureMessage = "command-failure-for-tests";
 
-    public Effect? Init() => _ => throw new InvalidOperationException(FailureMessage);
+    public override Effect? Init() => _ => throw new InvalidOperationException(FailureMessage);
 
-    public Effect? Update(IMessage message) => null;
+    public override Effect? Update(IMessage message) => null;
 
-    public ModelView Render() => ModelView.From("command-fault");
+    public override ModelView Render() => ModelView.From("command-fault");
 }
 
-internal sealed class CommandRecoveryModel : IScreen
+internal sealed class CommandRecoveryModel : TestRuntimeModel
 {
     public int? RecoveredValue { get; private set; }
 
-    public Effect? Init() => _ => throw new InvalidOperationException(CommandFaultModel.FailureMessage);
+    public override Effect? Init() => _ => throw new InvalidOperationException(CommandFaultModel.FailureMessage);
 
-    public Effect? Update(IMessage message)
+    public override Effect? Update(IMessage message)
     {
         if (message is NumberMsg number)
         {
@@ -139,10 +146,10 @@ internal sealed class CommandRecoveryModel : IScreen
         return null;
     }
 
-    public ModelView Render() => ModelView.From("command-recovery");
+    public override ModelView Render() => ModelView.From("command-recovery");
 }
 
-internal sealed class BurstUpdateModel : IScreen
+internal sealed class BurstUpdateModel : TestRuntimeModel
 {
     private readonly int _targetCount;
 
@@ -153,7 +160,7 @@ internal sealed class BurstUpdateModel : IScreen
 
     public int Count { get; private set; }
 
-    public Effect? Init()
+    public override Effect? Init()
     {
         var commands = new List<Effect?>(_targetCount);
         for (var i = 0; i < _targetCount; i++)
@@ -164,7 +171,7 @@ internal sealed class BurstUpdateModel : IScreen
         return Effects.Batch([.. commands]);
     }
 
-    public Effect? Update(IMessage message)
+    public override Effect? Update(IMessage message)
     {
         if (message is NumberMsg)
         {
@@ -178,16 +185,16 @@ internal sealed class BurstUpdateModel : IScreen
         return null;
     }
 
-    public ModelView Render() => ModelView.From($"burst-{Count}");
+    public override ModelView Render() => ModelView.From($"burst-{Count}");
 }
 
-internal sealed class ResizeTrackingModel : IScreen
+internal sealed class ResizeTrackingModel : TestRuntimeModel
 {
     public List<(int W, int H)> Seen { get; } = [];
 
-    public Effect? Init() => null;
+    public override Effect? Init() => null;
 
-    public Effect? Update(IMessage message)
+    public override Effect? Update(IMessage message)
     {
         if (message is WindowSizeMsg ws)
         {
@@ -201,16 +208,16 @@ internal sealed class ResizeTrackingModel : IScreen
         return null;
     }
 
-    public ModelView Render() => ModelView.From("resize");
+    public override ModelView Render() => ModelView.From("resize");
 }
 
-internal sealed class CapabilityTrackingModel : IScreen
+internal sealed class CapabilityTrackingModel : TestRuntimeModel
 {
     public TerminalCapabilityProfile? Seen { get; private set; }
 
-    public Effect? Init() => null;
+    public override Effect? Init() => null;
 
-    public Effect? Update(IMessage message)
+    public override Effect? Update(IMessage message)
     {
         if (message is TerminalCapabilitiesMsg capabilities)
         {
@@ -221,16 +228,16 @@ internal sealed class CapabilityTrackingModel : IScreen
         return null;
     }
 
-    public ModelView Render() => ModelView.From("capabilities");
+    public override ModelView Render() => ModelView.From("capabilities");
 }
 
-internal sealed class ColorProfileTrackingModel : IScreen
+internal sealed class ColorProfileTrackingModel : TestRuntimeModel
 {
     public TerminalColorProfile Seen { get; private set; } = TerminalColorProfile.Unknown;
 
-    public Effect? Init() => null;
+    public override Effect? Init() => null;
 
-    public Effect? Update(IMessage message)
+    public override Effect? Update(IMessage message)
     {
         if (message is ColorProfileMsg colorProfile)
         {
@@ -241,16 +248,16 @@ internal sealed class ColorProfileTrackingModel : IScreen
         return null;
     }
 
-    public ModelView Render() => ModelView.From("color-profile");
+    public override ModelView Render() => ModelView.From("color-profile");
 }
 
-internal sealed class CapabilityRefinementModel : IScreen
+internal sealed class CapabilityRefinementModel : TestRuntimeModel
 {
     public List<TerminalCapabilityProfile> Seen { get; } = [];
 
-    public Effect? Init() => Effects.FromMessage(new ModeReportMsg(2026, ModeReportState.Reset));
+    public override Effect? Init() => Effects.FromMessage(new ModeReportMsg(2026, ModeReportState.Reset));
 
-    public Effect? Update(IMessage message)
+    public override Effect? Update(IMessage message)
     {
         if (message is TerminalCapabilitiesMsg capabilities)
         {
@@ -264,16 +271,16 @@ internal sealed class CapabilityRefinementModel : IScreen
         return null;
     }
 
-    public ModelView Render() => ModelView.From("capability-refinement");
+    public override ModelView Render() => ModelView.From("capability-refinement");
 }
 
-internal sealed class UnsupportedModeReportRefinementModel : IScreen
+internal sealed class UnsupportedModeReportRefinementModel : TestRuntimeModel
 {
     public List<TerminalCapabilityProfile> Seen { get; } = [];
 
-    public Effect? Init() => Effects.FromMessage(new ModeReportMsg(1006, ModeReportState.Unsupported));
+    public override Effect? Init() => Effects.FromMessage(new ModeReportMsg(1006, ModeReportState.Unsupported));
 
-    public Effect? Update(IMessage message)
+    public override Effect? Update(IMessage message)
     {
         if (message is TerminalCapabilitiesMsg capabilities)
         {
@@ -287,10 +294,10 @@ internal sealed class UnsupportedModeReportRefinementModel : IScreen
         return null;
     }
 
-    public ModelView Render() => ModelView.From("capability-unsupported-refinement");
+    public override ModelView Render() => ModelView.From("capability-unsupported-refinement");
 }
 
-internal sealed class CapabilityProbeTimeoutModel : IScreen
+internal sealed class CapabilityProbeTimeoutModel : TestRuntimeModel
 {
     private readonly TimeSpan _safetyQuitDelay;
     public List<TerminalCapabilityProfile> Seen { get; } = [];
@@ -300,9 +307,9 @@ internal sealed class CapabilityProbeTimeoutModel : IScreen
         _safetyQuitDelay = safetyQuitDelay;
     }
 
-    public Effect? Init() => Effects.Tick(_safetyQuitDelay, _ => new QuitMsg());
+    public override Effect? Init() => Effects.Tick(_safetyQuitDelay, _ => new QuitMsg());
 
-    public Effect? Update(IMessage message)
+    public override Effect? Update(IMessage message)
     {
         if (message is TerminalCapabilitiesMsg capabilities)
         {
@@ -316,10 +323,10 @@ internal sealed class CapabilityProbeTimeoutModel : IScreen
         return null;
     }
 
-    public ModelView Render() => ModelView.From("capability-probe-timeout");
+    public override ModelView Render() => ModelView.From("capability-probe-timeout");
 }
 
-internal sealed class CapabilityProbeResponseModel : IScreen
+internal sealed class CapabilityProbeResponseModel : TestRuntimeModel
 {
     private readonly TimeSpan _quitDelay;
     private readonly IReadOnlyList<ModeReportMsg> _reports;
@@ -331,7 +338,7 @@ internal sealed class CapabilityProbeResponseModel : IScreen
         _reports = reports;
     }
 
-    public Effect? Init()
+    public override Effect? Init()
     {
         var commands = new List<Effect?>(_reports.Count + 1);
         foreach (var report in _reports)
@@ -343,7 +350,7 @@ internal sealed class CapabilityProbeResponseModel : IScreen
         return Effects.Sequence([.. commands]);
     }
 
-    public Effect? Update(IMessage message)
+    public override Effect? Update(IMessage message)
     {
         if (message is TerminalCapabilitiesMsg capabilities)
         {
@@ -353,10 +360,10 @@ internal sealed class CapabilityProbeResponseModel : IScreen
         return null;
     }
 
-    public ModelView Render() => ModelView.From("capability-probe-response");
+    public override ModelView Render() => ModelView.From("capability-probe-response");
 }
 
-internal sealed class TimedQuitModel : IScreen
+internal sealed class TimedQuitModel : TestRuntimeModel
 {
     private readonly TimeSpan _delay;
 
@@ -365,14 +372,14 @@ internal sealed class TimedQuitModel : IScreen
         _delay = delay;
     }
 
-    public Effect? Init() => Effects.Tick(_delay, _ => new QuitMsg());
+    public override Effect? Init() => Effects.Tick(_delay, _ => new QuitMsg());
 
-    public Effect? Update(IMessage message) => null;
+    public override Effect? Update(IMessage message) => null;
 
-    public ModelView Render() => ModelView.From("timed-quit");
+    public override ModelView Render() => ModelView.From("timed-quit");
 }
 
-internal sealed class TimedQuitProbeViewModel : IScreen
+internal sealed class TimedQuitProbeViewModel : TestRuntimeModel
 {
     private readonly TimeSpan _delay;
 
@@ -381,11 +388,11 @@ internal sealed class TimedQuitProbeViewModel : IScreen
         _delay = delay;
     }
 
-    public Effect? Init() => Effects.Tick(_delay, _ => new QuitMsg());
+    public override Effect? Init() => Effects.Tick(_delay, _ => new QuitMsg());
 
-    public Effect? Update(IMessage message) => null;
+    public override Effect? Update(IMessage message) => null;
 
-    public ModelView Render() => ModelView.From("timed-probe-view") with
+    public override ModelView Render() => ModelView.From("timed-probe-view") with
     {
         Terminal = new TerminalOutput
         {
@@ -397,7 +404,7 @@ internal sealed class TimedQuitProbeViewModel : IScreen
     };
 }
 
-internal sealed class ConcurrencyTrackingModel : IScreen
+internal sealed class ConcurrencyTrackingModel : TestRuntimeModel
 {
     private readonly int _commandCount;
     private readonly TimeSpan _delay;
@@ -413,7 +420,7 @@ internal sealed class ConcurrencyTrackingModel : IScreen
 
     public int MaxActiveCommands => Volatile.Read(ref _maxActiveCommands);
 
-    public Effect? Init()
+    public override Effect? Init()
     {
         var commands = new Effect?[_commandCount];
         for (var i = 0; i < _commandCount; i++)
@@ -438,7 +445,7 @@ internal sealed class ConcurrencyTrackingModel : IScreen
         return Effects.Batch(commands);
     }
 
-    public Effect? Update(IMessage message)
+    public override Effect? Update(IMessage message)
     {
         if (message is NumberMsg)
         {
@@ -452,7 +459,7 @@ internal sealed class ConcurrencyTrackingModel : IScreen
         return null;
     }
 
-    public ModelView Render() => ModelView.From("concurrency-tracking");
+    public override ModelView Render() => ModelView.From("concurrency-tracking");
 
     private void TrackMax(int active)
     {
@@ -472,24 +479,24 @@ internal sealed class ConcurrencyTrackingModel : IScreen
     }
 }
 
-internal sealed class RawOutputInitModel : IScreen
+internal sealed class RawOutputInitModel : TestRuntimeModel
 {
-    public Effect? Init() => Effects.Sequence(
+    public override Effect? Init() => Effects.Sequence(
         Effects.Raw("raw-sequence"),
         Effects.Quit);
 
-    public Effect? Update(IMessage message) => null;
+    public override Effect? Update(IMessage message) => null;
 
-    public ModelView Render() => ModelView.From("raw-output");
+    public override ModelView Render() => ModelView.From("raw-output");
 }
 
-internal sealed class MouseInterceptModel : IScreen
+internal sealed class MouseInterceptModel : TestRuntimeModel
 {
     public int Intercepted { get; private set; }
 
-    public Effect? Init() => null;
+    public override Effect? Init() => null;
 
-    public Effect? Update(IMessage message)
+    public override Effect? Update(IMessage message)
     {
         if (message is NumberMsg)
         {
@@ -500,7 +507,7 @@ internal sealed class MouseInterceptModel : IScreen
         return null;
     }
 
-    public ModelView Render() => ModelView.From("mouse-intercept") with
+    public override ModelView Render() => ModelView.From("mouse-intercept") with
     {
         Input = new InputHooks
         {
@@ -622,11 +629,11 @@ internal sealed class RenderCountingRendererSpy : IProgramRenderer
 
 internal sealed record NumberMsg(int Value) : IMessage;
 
-internal sealed class QuitOnQModel : IScreen
+internal sealed class QuitOnQModel : TestRuntimeModel
 {
-    public Effect? Init() => null;
+    public override Effect? Init() => null;
 
-    public Effect? Update(IMessage message)
+    public override Effect? Update(IMessage message)
     {
         if (message is KeyPressMsg key
             && key.IsCharacter('q', KeyModifiers.None))
@@ -637,7 +644,7 @@ internal sealed class QuitOnQModel : IScreen
         return null;
     }
 
-    public ModelView Render() => ModelView.From("quit-on-q");
+    public override ModelView Render() => ModelView.From("quit-on-q");
 }
 
 internal sealed class DisposeOrderingTerminalAdapter : ITerminalAdapter

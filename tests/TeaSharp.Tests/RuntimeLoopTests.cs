@@ -974,7 +974,7 @@ internal static class RuntimeLoopTests
         TestAssert.True(terminal.DisposeObservedCancellation, "Program should cancel input processing before terminal dispose.");
     }
 
-    private static TestRuntimeDriver NewProgram(IScreen model) =>
+    private static TestRuntimeDriver NewProgram(TestRuntimeModel model) =>
         new(model, new TeaRuntimeLoopOptions
         {
             DisableRenderer = true,
@@ -998,10 +998,10 @@ internal static class RuntimeLoopTests
 
     private sealed class TestRuntimeDriver
     {
-        private readonly IScreen _screen;
+        private readonly TestRuntimeModel _screen;
         private readonly TeaRuntimeLoop _runtime;
 
-        public TestRuntimeDriver(IScreen screen, TeaRuntimeLoopOptions? options = null)
+        public TestRuntimeDriver(TestRuntimeModel screen, TeaRuntimeLoopOptions? options = null)
         {
             _screen = screen ?? throw new ArgumentNullException(nameof(screen));
             _runtime = new TeaRuntimeLoop(screen.Init, screen.Update, screen.Render, options);
@@ -1012,7 +1012,7 @@ internal static class RuntimeLoopTests
             _runtime.Send(message);
         }
 
-        public async Task<IScreen> RunAsync(CancellationToken cancellationToken = default)
+        public async Task<TestRuntimeModel> RunAsync(CancellationToken cancellationToken = default)
         {
             await _runtime.RunAsync(cancellationToken).ConfigureAwait(false);
             return _screen;

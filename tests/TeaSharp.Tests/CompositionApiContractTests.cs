@@ -32,7 +32,6 @@ internal static class CompositionApiContractTests
     private static readonly string[] InternalizedCompositionTypes =
     [
         "TeaSharp.Components.Composition.ScreenComposer",
-        "TeaSharp.Components.Composition.ComponentComposer",
         "TeaSharp.Components.Composition.ScreenFocusChain",
         "TeaSharp.Components.Composition.ScreenFocusSnapshot",
         "TeaSharp.Components.Composition.ScreenFrameLayout",

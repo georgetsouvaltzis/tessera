@@ -78,6 +78,8 @@ These still exist, but they are not the first path:
 
 Before:
 
+Historical pre-redesign example:
+
 ```csharp
 using TeaSharp;
 using TeaSharp.Components.Prebuilt;
@@ -108,6 +110,8 @@ internal sealed class SearchScreen : IScreen
     }
 }
 ```
+
+That path no longer exists in the supported implementation; use `TeaApp` and the root `TeaSharp.Controls` / `TeaSharp.Layout` surface instead.
 
 After:
 
