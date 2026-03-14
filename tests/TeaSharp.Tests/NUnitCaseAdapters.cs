@@ -18,7 +18,7 @@ public sealed class NUnitCaseAdapters
 {
     public static IEnumerable<TestCaseData> Cases()
     {
-        foreach (var testCase in ProgramRuntimeTests.Cases()) yield return ToCaseData(testCase);
+        foreach (var testCase in RuntimeLoopTests.Cases()) yield return ToCaseData(testCase);
         foreach (var testCase in EventDecoderGoldenTests.Cases()) yield return ToCaseData(testCase);
         foreach (var testCase in TerminalReaderBehaviorTests.Cases()) yield return ToCaseData(testCase);
         foreach (var testCase in RendererBehaviorTests.Cases()) yield return ToCaseData(testCase);

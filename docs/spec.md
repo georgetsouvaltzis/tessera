@@ -127,7 +127,7 @@ Design rule:
 
 The current runtime still uses the original core engine:
 
-- internal `TeaProgram`
+- internal `TeaRuntimeLoop`
 - terminal adapters
 - decoder
 - renderer

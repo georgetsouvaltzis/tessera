@@ -29,11 +29,11 @@ internal static class TeaAppFoundationTests
             "TeaApp_RuntimeScreenBridge_IsRemoved",
             TeaApp_RuntimeScreenBridge_IsRemoved);
         yield return new TestCase(
-            "TeaApplication_RuntimePath_DoesNotStoreTeaProgramDirectly",
-            TeaApplication_RuntimePath_DoesNotStoreTeaProgramDirectly);
+            "TeaApplication_RuntimePath_DoesNotStoreLegacyProgramWrapper",
+            TeaApplication_RuntimePath_DoesNotStoreLegacyProgramWrapper);
         yield return new TestCase(
-            "TeaRuntimeBridge_RuntimePath_DoesNotStoreTeaProgramDirectly",
-            TeaRuntimeBridge_RuntimePath_DoesNotStoreTeaProgramDirectly);
+            "TeaRuntimeBridge_RuntimePath_DoesNotStoreLegacyProgramWrapper",
+            TeaRuntimeBridge_RuntimePath_DoesNotStoreLegacyProgramWrapper);
     }
 
     private static Task TeaApp_ContextTracksResizeMessages()
@@ -126,7 +126,7 @@ internal static class TeaAppFoundationTests
         return Task.CompletedTask;
     }
 
-    private static Task TeaApplication_RuntimePath_DoesNotStoreTeaProgramDirectly()
+    private static Task TeaApplication_RuntimePath_DoesNotStoreLegacyProgramWrapper()
     {
         const string legacyTypeName = "TeaSharp.Core.Application.TeaProgram";
         var fields = typeof(TeaApplication).GetFields(BindingFlags.Instance | BindingFlags.NonPublic);
@@ -138,7 +138,7 @@ internal static class TeaAppFoundationTests
         return Task.CompletedTask;
     }
 
-    private static Task TeaRuntimeBridge_RuntimePath_DoesNotStoreTeaProgramDirectly()
+    private static Task TeaRuntimeBridge_RuntimePath_DoesNotStoreLegacyProgramWrapper()
     {
         const string legacyTypeName = "TeaSharp.Core.Application.TeaProgram";
         var runtimeType = typeof(TeaApplication).Assembly.GetType("TeaSharp.Internal.TeaAppRuntime", throwOnError: true)!;

@@ -22,7 +22,7 @@ Status: in progress
 - inventory the public API into stable, advanced, and engine-detail tiers
 - document the target stable surface before deeper package-boundary changes
 - use the inventory to drive later internalization and namespace cleanup
-- start separating stable app-hosting setup from advanced runtime wiring (`TeaProgramOptions` vs `ProgramOptions`)
+- start separating stable app-hosting setup from advanced runtime wiring (`TeaProgramOptions` vs runtime internals)
 
 ## Phase 1: Interaction Contracts
 
@@ -53,7 +53,7 @@ Status: in progress
 - split `UiKit.cs` into layout, primitives, tables, forms, overlays
 - split `AdvancedPrebuiltWidgets.cs` and `ProductivityPrebuiltWidgets.cs` by widget family
 - keep the public namespace stable while reducing per-file responsibility
-- split `TeaProgram` lifecycle/message-loop/runtime responsibilities into dedicated files without changing the public API
+- split the old runtime lifecycle/message-loop/runtime responsibilities into dedicated files without changing the public API
 - split `ScreenComposer` typed API, routing logic, and legacy string bridges into dedicated files
 - split `ComboboxComponent` and `DropdownComponent` so render/state-resolution helpers are separated from update/configuration logic
 - split `TreeViewComponent` and `NotificationCenterComponent` so rendering/state styling helpers are separated from interaction logic

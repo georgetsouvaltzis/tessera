@@ -17,44 +17,44 @@ using TeaSharp.Core.Terminal;
 
 namespace TeaSharp.Tests;
 
-internal static class ProgramRuntimeTests
+internal static class RuntimeLoopTests
 {
     public static IEnumerable<TestCase> Cases()
     {
-        yield return new TestCase("Program_InitReturnsQuit_Exits", InitQuitCommand_ExitsProgram);
-        yield return new TestCase("Program_SendQuit_StopsRunLoop", SendQuit_StopsProgram);
-        yield return new TestCase("Program_SequenceCommands_ProcessInOrder", Sequence_ProcessesInOrder);
-        yield return new TestCase("Program_BatchCommands_ProcessAll", Batch_ProcessesAllCommands);
-        yield return new TestCase("Program_FilterBlocksFirstQuit_AllowsSecond", Filter_CanBlockQuitMessage);
-        yield return new TestCase("Program_CommandException_WithCatch_EmitsCommandErrorMsg", CommandException_WithCatch_EmitsCommandErrorMsg);
-        yield return new TestCase("Program_CommandException_WithRecovery_EmitsRecoveredMessage", CommandException_WithRecovery_EmitsRecoveredMessage);
-        yield return new TestCase("Program_CommandException_RecoveryFailure_EmitsCommandErrorMsg", CommandException_RecoveryFailure_EmitsCommandErrorMsg);
-        yield return new TestCase("Program_CommandException_WithoutCatch_Propagates", CommandException_WithoutCatch_Propagates);
-        yield return new TestCase("Program_AdaptiveFramePacing_BatchesBurstRenders", AdaptiveFramePacing_BatchesBurstRenders);
-        yield return new TestCase("Program_RawOutputMsg_WritesDirectlyToRenderer", RawOutputMsg_WritesDirectlyToRenderer);
-        yield return new TestCase("Program_MouseOnViewInterceptor_EnqueuesCommand", MouseOnViewInterceptor_EnqueuesCommand);
-        yield return new TestCase("Program_EmitsTerminalCapabilitiesMessage", EmitsTerminalCapabilitiesMessage);
-        yield return new TestCase("Program_EmitsColorProfileMessage", EmitsColorProfileMessage);
-        yield return new TestCase("Program_TerminalCapabilityDetectorDelegate_OverridesDetection", TerminalCapabilityDetectorDelegate_OverridesDetection);
-        yield return new TestCase("Program_ColorProfileDetectorDelegate_OverridesDetection", ColorProfileDetectorDelegate_OverridesDetection);
-        yield return new TestCase("Program_CapabilityProbe_CustomModeList_WritesOnlyConfiguredQueries", CapabilityProbe_CustomModeList_WritesOnlyConfiguredQueries);
-        yield return new TestCase("Program_EventDecoderOverride_IsUsedForInputLoop", EventDecoderOverride_IsUsedForInputLoop);
-        yield return new TestCase("Program_MaxConcurrentEffects_OneSerializesExecution", MaxConcurrentEffects_OneSerializesExecution);
-        yield return new TestCase("Program_AnsiRendererOptions_DisableModeQueries", AnsiRendererOptions_DisableModeQueries);
-        yield return new TestCase("Program_CapabilityProbe_WritesModeQueries", CapabilityProbe_WritesModeQueries);
-        yield return new TestCase("Program_CapabilityProbe_TimeoutDisablesModeReportsWhenNoResponses", CapabilityProbe_TimeoutDisablesModeReportsWhenNoResponses);
-        yield return new TestCase("Program_CapabilityProbe_PartialResponseDisablesUnresolvedModes", CapabilityProbe_PartialResponseDisablesUnresolvedModes);
-        yield return new TestCase("Program_CapabilityProbe_LegacyMouseResponsePreservesMouseCapability", CapabilityProbe_LegacyMouseResponsePreservesMouseCapability);
-        yield return new TestCase("Program_CapabilityProbe_AllResponsesPreventTimeoutFallback", CapabilityProbe_AllResponsesPreventTimeoutFallback);
-        yield return new TestCase("Program_ModeReport_RefinesTerminalCapabilities", ModeReport_RefinesTerminalCapabilities);
-        yield return new TestCase("Program_ModeReport_LegacyMouseSetEnablesCapability", ModeReport_LegacyMouseSetEnablesCapability);
-        yield return new TestCase("Program_ModeReport_UnsupportedDisablesCapability", ModeReport_UnsupportedDisablesCapability);
-        yield return new TestCase("Program_ModeReport_PropagatesCapabilitiesToRenderer", ModeReport_PropagatesCapabilitiesToRenderer);
-        yield return new TestCase("Program_ResizeLoop_EmitsWindowSizeChanges", ResizeLoop_EmitsWindowSizeChanges);
-        yield return new TestCase("Program_ResizeSignalsDisabled_SkipsSignalRegistration", ResizeSignalsDisabled_SkipsSignalRegistration);
-        yield return new TestCase("Program_ResizeSignalFactoryFailure_FallsBackToPolling", ResizeSignalFactoryFailure_FallsBackToPolling);
-        yield return new TestCase("Program_ResizeSignal_EmitsWindowSizeChanges", ResizeSignal_EmitsWindowSizeChanges);
-        yield return new TestCase("Program_QuitFromInput_CancelsBeforeTerminalDispose", QuitFromInput_CancelsBeforeTerminalDispose);
+        yield return new TestCase("Runtime_InitReturnsQuit_Exits", InitQuitCommand_ExitsProgram);
+        yield return new TestCase("Runtime_SendQuit_StopsRunLoop", SendQuit_StopsProgram);
+        yield return new TestCase("Runtime_SequenceCommands_ProcessInOrder", Sequence_ProcessesInOrder);
+        yield return new TestCase("Runtime_BatchCommands_ProcessAll", Batch_ProcessesAllCommands);
+        yield return new TestCase("Runtime_FilterBlocksFirstQuit_AllowsSecond", Filter_CanBlockQuitMessage);
+        yield return new TestCase("Runtime_CommandException_WithCatch_EmitsCommandErrorMsg", CommandException_WithCatch_EmitsCommandErrorMsg);
+        yield return new TestCase("Runtime_CommandException_WithRecovery_EmitsRecoveredMessage", CommandException_WithRecovery_EmitsRecoveredMessage);
+        yield return new TestCase("Runtime_CommandException_RecoveryFailure_EmitsCommandErrorMsg", CommandException_RecoveryFailure_EmitsCommandErrorMsg);
+        yield return new TestCase("Runtime_CommandException_WithoutCatch_Propagates", CommandException_WithoutCatch_Propagates);
+        yield return new TestCase("Runtime_AdaptiveFramePacing_BatchesBurstRenders", AdaptiveFramePacing_BatchesBurstRenders);
+        yield return new TestCase("Runtime_RawOutputMsg_WritesDirectlyToRenderer", RawOutputMsg_WritesDirectlyToRenderer);
+        yield return new TestCase("Runtime_MouseOnViewInterceptor_EnqueuesCommand", MouseOnViewInterceptor_EnqueuesCommand);
+        yield return new TestCase("Runtime_EmitsTerminalCapabilitiesMessage", EmitsTerminalCapabilitiesMessage);
+        yield return new TestCase("Runtime_EmitsColorProfileMessage", EmitsColorProfileMessage);
+        yield return new TestCase("Runtime_TerminalCapabilityDetectorDelegate_OverridesDetection", TerminalCapabilityDetectorDelegate_OverridesDetection);
+        yield return new TestCase("Runtime_ColorProfileDetectorDelegate_OverridesDetection", ColorProfileDetectorDelegate_OverridesDetection);
+        yield return new TestCase("Runtime_CapabilityProbe_CustomModeList_WritesOnlyConfiguredQueries", CapabilityProbe_CustomModeList_WritesOnlyConfiguredQueries);
+        yield return new TestCase("Runtime_EventDecoderOverride_IsUsedForInputLoop", EventDecoderOverride_IsUsedForInputLoop);
+        yield return new TestCase("Runtime_MaxConcurrentEffects_OneSerializesExecution", MaxConcurrentEffects_OneSerializesExecution);
+        yield return new TestCase("Runtime_AnsiRendererOptions_DisableModeQueries", AnsiRendererOptions_DisableModeQueries);
+        yield return new TestCase("Runtime_CapabilityProbe_WritesModeQueries", CapabilityProbe_WritesModeQueries);
+        yield return new TestCase("Runtime_CapabilityProbe_TimeoutDisablesModeReportsWhenNoResponses", CapabilityProbe_TimeoutDisablesModeReportsWhenNoResponses);
+        yield return new TestCase("Runtime_CapabilityProbe_PartialResponseDisablesUnresolvedModes", CapabilityProbe_PartialResponseDisablesUnresolvedModes);
+        yield return new TestCase("Runtime_CapabilityProbe_LegacyMouseResponsePreservesMouseCapability", CapabilityProbe_LegacyMouseResponsePreservesMouseCapability);
+        yield return new TestCase("Runtime_CapabilityProbe_AllResponsesPreventTimeoutFallback", CapabilityProbe_AllResponsesPreventTimeoutFallback);
+        yield return new TestCase("Runtime_ModeReport_RefinesTerminalCapabilities", ModeReport_RefinesTerminalCapabilities);
+        yield return new TestCase("Runtime_ModeReport_LegacyMouseSetEnablesCapability", ModeReport_LegacyMouseSetEnablesCapability);
+        yield return new TestCase("Runtime_ModeReport_UnsupportedDisablesCapability", ModeReport_UnsupportedDisablesCapability);
+        yield return new TestCase("Runtime_ModeReport_PropagatesCapabilitiesToRenderer", ModeReport_PropagatesCapabilitiesToRenderer);
+        yield return new TestCase("Runtime_ResizeLoop_EmitsWindowSizeChanges", ResizeLoop_EmitsWindowSizeChanges);
+        yield return new TestCase("Runtime_ResizeSignalsDisabled_SkipsSignalRegistration", ResizeSignalsDisabled_SkipsSignalRegistration);
+        yield return new TestCase("Runtime_ResizeSignalFactoryFailure_FallsBackToPolling", ResizeSignalFactoryFailure_FallsBackToPolling);
+        yield return new TestCase("Runtime_ResizeSignal_EmitsWindowSizeChanges", ResizeSignal_EmitsWindowSizeChanges);
+        yield return new TestCase("Runtime_QuitFromInput_CancelsBeforeTerminalDispose", QuitFromInput_CancelsBeforeTerminalDispose);
     }
 
     private static async Task InitQuitCommand_ExitsProgram()
