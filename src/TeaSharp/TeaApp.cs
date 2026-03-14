@@ -22,7 +22,6 @@ public abstract class TeaApp
     private ICompiledScreenInteraction? _interactiveScreen;
     private bool _inputHandled;
     private readonly List<TeaEffect> _pendingEffects = [];
-    private ITeaAppRuntimeScreen? _runtimeScreen;
 
     /// <summary>
     /// Gets the most recent screen context supplied by the runtime.
@@ -106,9 +105,6 @@ public abstract class TeaApp
     {
         _runtimeScreenOptions = screenOptions ?? ScreenOptions.Empty;
     }
-
-    internal ITeaAppRuntimeScreen RuntimeScreen =>
-        _runtimeScreen ??= new TeaAppRuntimeScreen(this);
 
     internal global::TeaSharp.Core.Abstractions.Effect? InitializeCore() =>
         TeaEffectAdapter.ToCore(Initialize());

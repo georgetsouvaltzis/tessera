@@ -34,6 +34,15 @@ internal sealed partial class TeaProgram
         _effects = Channel.CreateUnbounded<Effect>();
     }
 
+    internal TeaProgram(
+        Func<Effect?>? initialize,
+        Func<IMessage, Effect?> update,
+        Func<ScreenOutput> render,
+        ProgramOptions? options = null)
+        : this(new DelegateScreen(initialize, update, render), options)
+    {
+    }
+
     /// <summary>
     /// Gets the current application screen.
     /// </summary>
@@ -66,4 +75,31 @@ internal sealed partial class TeaProgram
     /// <param name="cancellationToken">A token that cancels the stop operation.</param>
     internal Task StopAsync(bool kill = false, CancellationToken cancellationToken = default) =>
         StopProgramAsync(kill, cancellationToken);
+
+    private sealed class DelegateScreen : IScreen
+    {
+        private readonly Func<Effect?>? _initialize;
+        private readonly Func<IMessage, Effect?> _update;
+        private readonly Func<ScreenOutput> _render;
+
+        public DelegateScreen(
+            Func<Effect?>? initialize,
+            Func<IMessage, Effect?> update,
+            Func<ScreenOutput> render)
+        {
+            _initialize = initialize;
+            _update = update ?? throw new ArgumentNullException(nameof(update));
+            _render = render ?? throw new ArgumentNullException(nameof(render));
+        }
+
+        public Effect? Init() => _initialize?.Invoke();
+
+        public Effect? Update(IMessage message)
+        {
+            ArgumentNullException.ThrowIfNull(message);
+            return _update(message);
+        }
+
+        public ScreenOutput Render() => _render();
+    }
 }

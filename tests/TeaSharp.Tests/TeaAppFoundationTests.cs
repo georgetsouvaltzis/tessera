@@ -26,8 +26,8 @@ internal static class TeaAppFoundationTests
             "TeaControl_Bridge_MapsCoreMessagesToPublicMessages",
             TeaControl_Bridge_MapsCoreMessagesToPublicMessages);
         yield return new TestCase(
-            "TeaApp_RuntimeScreenBridge_DoesNotExposeCoreIScreen",
-            TeaApp_RuntimeScreenBridge_DoesNotExposeCoreIScreen);
+            "TeaApp_RuntimeScreenBridge_IsRemoved",
+            TeaApp_RuntimeScreenBridge_IsRemoved);
         yield return new TestCase(
             "TeaApplication_RuntimePath_DoesNotStoreTeaProgramDirectly",
             TeaApplication_RuntimePath_DoesNotStoreTeaProgramDirectly);
@@ -36,7 +36,7 @@ internal static class TeaAppFoundationTests
     private static Task TeaApp_ContextTracksResizeMessages()
     {
         var app = new ResizeAwareApp();
-        var screen = app.RuntimeScreen;
+        var screen = new TeaAppDriver(app);
 
         screen.Update(new WindowSizeMsg(120, 40));
         var rendered = screen.Render();
@@ -48,7 +48,7 @@ internal static class TeaAppFoundationTests
     private static async Task TeaApp_InitializeEffect_RoundTripsCustomMessages()
     {
         var app = new BootApp();
-        var screen = app.RuntimeScreen;
+        var screen = new TeaAppDriver(app);
 
         var init = screen.Init();
         TestAssert.True(init is not null, "TeaApp.Initialize should adapt to the legacy runtime effect contract.");
@@ -86,7 +86,7 @@ internal static class TeaAppFoundationTests
     private static async Task TeaApp_Post_QueuesControlEventMessagesAsEffects()
     {
         var app = new PostingApp();
-        var screen = app.RuntimeScreen;
+        var screen = new TeaAppDriver(app);
 
         screen.Update(new WindowSizeMsg(80, 24));
         screen.Render();
@@ -113,14 +113,13 @@ internal static class TeaAppFoundationTests
         return Task.CompletedTask;
     }
 
-    private static Task TeaApp_RuntimeScreenBridge_DoesNotExposeCoreIScreen()
+    private static Task TeaApp_RuntimeScreenBridge_IsRemoved()
     {
         var runtimeScreen = typeof(TeaApp).GetProperty("RuntimeScreen", BindingFlags.Instance | BindingFlags.NonPublic);
+        var adapterType = typeof(TeaApp).Assembly.GetType("TeaSharp.Internal.TeaAppRuntimeScreen", throwOnError: false);
 
-        TestAssert.True(runtimeScreen is not null, "TeaApp should still expose an internal runtime-screen bridge.");
-        TestAssert.True(
-            runtimeScreen!.PropertyType != typeof(TeaSharp.Core.Abstractions.IScreen),
-            "TeaApp should no longer depend directly on the core IScreen bridge contract.");
+        TestAssert.True(runtimeScreen is null, "TeaApp should no longer expose a runtime-screen adapter property.");
+        TestAssert.True(adapterType is null, "TeaSharp should no longer ship a TeaAppRuntimeScreen adapter type.");
         return Task.CompletedTask;
     }
 
@@ -187,6 +186,25 @@ internal static class TeaAppFoundationTests
     }
 
     private sealed record IncrementRequested : Message;
+
+    private sealed class TeaAppDriver
+    {
+        private readonly TeaApp _app;
+
+        public TeaAppDriver(TeaApp app)
+        {
+            _app = app;
+        }
+
+        public global::TeaSharp.Core.Abstractions.Effect? Init() => _app.InitializeCore();
+
+        public global::TeaSharp.Core.Abstractions.Effect? Update(global::TeaSharp.Core.Abstractions.IMessage message)
+        {
+            return _app.UpdateCore(message);
+        }
+
+        public global::TeaSharp.Core.Abstractions.ScreenOutput Render() => _app.RenderCore();
+    }
 
     private sealed class PostingApp : TeaApp
     {

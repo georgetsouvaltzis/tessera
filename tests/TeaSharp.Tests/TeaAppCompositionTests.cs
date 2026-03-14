@@ -80,7 +80,7 @@ internal static class TeaAppCompositionTests
     private static Task AutomaticallyRoutesButtonActivation()
     {
         var app = new ButtonApp();
-        var screen = app.RuntimeScreen;
+        var screen = new TeaAppDriver(app);
 
         screen.Update(new WindowSizeMsg(80, 24));
         screen.Render();
@@ -93,7 +93,7 @@ internal static class TeaAppCompositionTests
     private static Task AutomaticallyRoutesTabIntoTextInput()
     {
         var app = new FormApp();
-        var screen = app.RuntimeScreen;
+        var screen = new TeaAppDriver(app);
 
         screen.Update(new WindowSizeMsg(80, 24));
         screen.Render();
@@ -109,7 +109,7 @@ internal static class TeaAppCompositionTests
     private static Task AutomaticallyRoutesChoiceSelection()
     {
         var app = new ChoiceApp();
-        var screen = app.RuntimeScreen;
+        var screen = new TeaAppDriver(app);
 
         screen.Update(new WindowSizeMsg(80, 24));
         screen.Render();
@@ -124,7 +124,7 @@ internal static class TeaAppCompositionTests
     private static Task AutomaticallyRoutesComboBoxSelection()
     {
         var app = new ComboBoxApp();
-        var screen = app.RuntimeScreen;
+        var screen = new TeaAppDriver(app);
 
         screen.Update(new WindowSizeMsg(80, 24));
         screen.Render();
@@ -139,7 +139,7 @@ internal static class TeaAppCompositionTests
     private static Task AutomaticallyRoutesTabsSelection()
     {
         var app = new TabsApp();
-        var screen = app.RuntimeScreen;
+        var screen = new TeaAppDriver(app);
 
         screen.Update(new WindowSizeMsg(80, 24));
         screen.Render();
@@ -152,7 +152,7 @@ internal static class TeaAppCompositionTests
     private static async Task AutomaticallyRoutesMenuBarActivation()
     {
         var app = new MenuApp();
-        var screen = app.RuntimeScreen;
+        var screen = new TeaAppDriver(app);
 
         screen.Update(new WindowSizeMsg(80, 24));
         screen.Render();
@@ -165,7 +165,7 @@ internal static class TeaAppCompositionTests
     private static Task HandledControlInput_DoesNotReachDefaultUpdate()
     {
         var app = new FilteredInputApp();
-        var screen = app.RuntimeScreen;
+        var screen = new TeaAppDriver(app);
 
         screen.Update(new WindowSizeMsg(80, 24));
         screen.Render();
@@ -179,7 +179,7 @@ internal static class TeaAppCompositionTests
     private static Task RequestEffect_AllowsHandledControlInputToTriggerRuntimeEffect()
     {
         var app = new RequestedEffectApp();
-        var screen = app.RuntimeScreen;
+        var screen = new TeaAppDriver(app);
 
         screen.Update(new WindowSizeMsg(80, 24));
         screen.Render();
@@ -193,7 +193,7 @@ internal static class TeaAppCompositionTests
     private static Task VisibleOverlayCanClaimFocusThroughRootLayouts()
     {
         var app = new OverlayPaletteApp();
-        var screen = app.RuntimeScreen;
+        var screen = new TeaAppDriver(app);
 
         screen.Update(new WindowSizeMsg(80, 24));
         screen.Render();
@@ -208,7 +208,7 @@ internal static class TeaAppCompositionTests
     private static Task FocusRequestsPreferLatestRequestOverCompositionOrder()
     {
         var app = new FocusRequestOrderingApp();
-        var screen = app.RuntimeScreen;
+        var screen = new TeaAppDriver(app);
 
         screen.Update(new WindowSizeMsg(80, 24));
         screen.Render();
@@ -222,7 +222,7 @@ internal static class TeaAppCompositionTests
     private static Task FocusRequests_AreOneShotAcrossLaterBuilds()
     {
         var app = new OneShotFocusRequestApp();
-        var screen = app.RuntimeScreen;
+        var screen = new TeaAppDriver(app);
 
         screen.Update(new WindowSizeMsg(80, 24));
         screen.Render();
@@ -238,7 +238,7 @@ internal static class TeaAppCompositionTests
     private static Task ScreenBuilder_ComposesAndRoutesDefaultControls()
     {
         var app = new BuilderAuthoredApp();
-        var screen = app.RuntimeScreen;
+        var screen = new TeaAppDriver(app);
 
         screen.Update(new WindowSizeMsg(80, 24));
         screen.Render();
@@ -251,7 +251,7 @@ internal static class TeaAppCompositionTests
     private static Task RootLayouts_UseSceneCompilerInsteadOfLegacyCompiledScreen()
     {
         var app = new BuilderAuthoredApp();
-        var screen = app.RuntimeScreen;
+        var screen = new TeaAppDriver(app);
 
         screen.Update(new WindowSizeMsg(80, 24));
         screen.Render();
@@ -467,6 +467,23 @@ internal static class TeaAppCompositionTests
         }
 
         return Task.CompletedTask;
+    }
+
+    private sealed class TeaAppDriver
+    {
+        private readonly TeaApp _app;
+
+        public TeaAppDriver(TeaApp app)
+        {
+            _app = app;
+        }
+
+        public global::TeaSharp.Core.Abstractions.Effect? Update(global::TeaSharp.Core.Abstractions.IMessage message)
+        {
+            return _app.UpdateCore(message);
+        }
+
+        public global::TeaSharp.Core.Abstractions.ScreenOutput Render() => _app.RenderCore();
     }
 
     private sealed class ButtonApp : TeaApp

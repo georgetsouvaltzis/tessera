@@ -1,4 +1,3 @@
-using TeaSharp.Core.Abstractions;
 using TeaSharp.Core.Application;
 
 namespace TeaSharp.Internal;
@@ -29,7 +28,7 @@ internal sealed class LegacyTeaRuntime : ITeaRuntime
     public LegacyTeaRuntime(TeaApp app, TeaRuntimeOptions options, TeaSharp.Hosting.TeaHostingOptions? hosting)
     {
         app.ConfigureRuntimeScreen(options.Screen);
-        _program = new TeaProgram(new LegacyTeaAppScreenAdapter(app.RuntimeScreen), CreateProgramOptions(app, options, hosting));
+        _program = new TeaProgram(app.InitializeCore, app.UpdateCore, app.RenderCore, CreateProgramOptions(app, options, hosting));
     }
 
     public void Send(Message message)
@@ -89,25 +88,5 @@ internal sealed class LegacyTeaRuntime : ITeaRuntime
             EventDecoder = hosting?.EventDecoder,
             CapabilityProbeModes = hosting?.CapabilityProbeModes,
         };
-    }
-
-    private sealed class LegacyTeaAppScreenAdapter : IScreen
-    {
-        private readonly ITeaAppRuntimeScreen _screen;
-
-        public LegacyTeaAppScreenAdapter(ITeaAppRuntimeScreen screen)
-        {
-            _screen = screen ?? throw new ArgumentNullException(nameof(screen));
-        }
-
-        public Effect? Init() => _screen.Init();
-
-        public Effect? Update(IMessage message)
-        {
-            ArgumentNullException.ThrowIfNull(message);
-            return _screen.Update(message);
-        }
-
-        public ScreenOutput Render() => _screen.Render();
     }
 }
