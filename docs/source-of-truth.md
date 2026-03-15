@@ -407,7 +407,7 @@ Recent progress:
 
 Remaining drift:
 
-- some lower-level runtime/input helpers still live deeper than the preferred TeaSharp-owned hosting surface
+- the remaining `TeaSharp.Core` public surface is now mostly a product-position question rather than an accidental leak
 - some deep advanced helpers may still need clearer public wrappers or relocation
 
 Internal bridging is acceptable.
@@ -498,6 +498,12 @@ Over time, reduce visible consumer dependence on:
 
 Internal bridging is fine.
 Consumer-facing design should not advertise the bridge.
+
+Current status:
+
+- the TeaSharp-facing app and hosting surface is now substantially decoupled from direct core contract exposure
+- remaining narrowing work should be selective, not mechanical
+- any further `TeaSharp.Core` reductions should be justified as product-direction decisions, not just cleanup momentum
 
 ### Phase I. Replace The Legacy Compiler And Runtime Bridge
 
