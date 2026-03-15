@@ -61,6 +61,9 @@ internal static class RuntimeApiContractTests
             "RuntimeApi_HostingInterfaces_DoNotInheritCoreContracts",
             HostingInterfaces_DoNotInheritCoreContracts);
         yield return new TestCase(
+            "RuntimeApi_CoreInputDecoders_AreInternalized",
+            CoreInputDecoders_AreInternalized);
+        yield return new TestCase(
             "RuntimeApi_TeaRuntimeOptions_DoNotExposeHostingOrInterceptionHooks",
             TeaRuntimeOptions_DoNotExposeHostingOrInterceptionHooks);
         yield return new TestCase(
@@ -185,6 +188,14 @@ internal static class RuntimeApiContractTests
         TestAssert.True(
             !typeof(TeaSharp.Hosting.IEventDecoder).IsAssignableTo(typeof(global::TeaSharp.Core.Input.IEventDecoder)),
             "TeaSharp.Hosting.IEventDecoder should be TeaSharp-owned, not a core interface alias.");
+        return Task.CompletedTask;
+    }
+
+    private static Task CoreInputDecoders_AreInternalized()
+    {
+        TestAssert.True(typeof(global::TeaSharp.Core.Input.EventDecoder).IsNotPublic, "TeaSharp.Core.Input.EventDecoder should be internal.");
+        TestAssert.True(typeof(global::TeaSharp.Core.Input.IEventDecoder).IsNotPublic, "TeaSharp.Core.Input.IEventDecoder should be internal.");
+        TestAssert.True(typeof(global::TeaSharp.Core.Input.DecodeResult).IsNotPublic, "TeaSharp.Core.Input.DecodeResult should be internal.");
         return Task.CompletedTask;
     }
 

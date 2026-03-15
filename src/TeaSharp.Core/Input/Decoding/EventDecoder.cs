@@ -4,7 +4,7 @@ using TeaSharp.Core.Messages;
 namespace TeaSharp.Core.Input;
 
 [EditorBrowsable(EditorBrowsableState.Advanced)]
-public sealed class EventDecoder : IEventDecoder
+internal sealed class EventDecoder : IEventDecoder
 {
     public DecodeResult Decode(ReadOnlySpan<byte> buffer, bool timeoutExpired)
     {

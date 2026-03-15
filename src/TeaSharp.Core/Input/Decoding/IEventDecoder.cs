@@ -3,7 +3,7 @@ using System.ComponentModel;
 namespace TeaSharp.Core.Input;
 
 [EditorBrowsable(EditorBrowsableState.Advanced)]
-public interface IEventDecoder
+internal interface IEventDecoder
 {
     DecodeResult Decode(ReadOnlySpan<byte> buffer, bool timeoutExpired);
 }

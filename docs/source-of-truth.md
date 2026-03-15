@@ -401,6 +401,7 @@ Recent progress:
 - advanced hosting interfaces (`IProgramRenderer`, `ITerminalAdapter`, `IEventDecoder`) are now TeaSharp-owned contracts instead of direct core interface aliases
 - advanced hosting payloads now have TeaSharp-owned wrappers for render output, decode results, terminal size, cursor style, ANSI renderer options, terminal capabilities, and terminal color profiles
 - advanced hosting detection now has TeaSharp-owned wrappers for capability and color-profile detection
+- core-only decoder helpers now sit behind TeaSharp-owned hosting wrappers instead of remaining public by inertia
 
 Remaining drift:
 
