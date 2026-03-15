@@ -2,7 +2,6 @@ using TeaSharp.Components.Composition;
 using TeaSharp.Components.Interaction;
 using TeaSharp.Components.Prebuilt;
 using TeaSharp.Components.Primitives;
-using TeaSharp.Components.Productivity;
 using TeaSharp.Components.Styling;
 using TeaSharp.Components.UiKit;
 using System.ComponentModel;
@@ -46,9 +45,13 @@ internal static class CompositionApiContractTests
         "TeaSharp.Components.UiKit.ToastMessage",
         "TeaSharp.Components.UiKit.ToastSeverity",
         "TeaSharp.Components.UiKit.TreeNode",
+        "TeaSharp.Components.UiKit.ViewportClass",
+    ];
+
+    private static readonly string[] RemovedCompositionTypes =
+    [
         "TeaSharp.Components.UiKit.UiTheme",
         "TeaSharp.Components.UiKit.UiWidgets",
-        "TeaSharp.Components.UiKit.ViewportClass",
     ];
 
     public static IEnumerable<TestCase> Cases()
@@ -58,6 +61,7 @@ internal static class CompositionApiContractTests
         yield return new TestCase("CompositionApi_LayoutLength_SupportsImplicitFixedIntegers", LayoutLength_SupportsImplicitFixedIntegers);
         yield return new TestCase("CompositionApi_RowAndColumnSizingHelpers_AreMarkedAdvanced", RowAndColumnSizingHelpers_AreMarkedAdvanced);
         yield return new TestCase("CompositionApi_InternalizedCompositionTypes_AreNotPublic", InternalizedCompositionTypes_AreNotPublic);
+        yield return new TestCase("CompositionApi_RemovedCompositionTypes_AreAbsent", RemovedCompositionTypes_AreAbsent);
     }
 
     private static Task RootLayoutTypes_RemainDiscoverable()
@@ -118,6 +122,19 @@ internal static class CompositionApiContractTests
             var type = assembly.GetType(typeName, throwOnError: false);
             TestAssert.True(type is not null, $"{typeName} should continue to exist as an internal bridge.");
             TestAssert.True(type!.IsNotPublic, $"{typeName} should no longer be public.");
+        }
+
+        return Task.CompletedTask;
+    }
+
+    private static Task RemovedCompositionTypes_AreAbsent()
+    {
+        var assembly = typeof(Screen).Assembly;
+
+        foreach (var typeName in RemovedCompositionTypes)
+        {
+            var type = assembly.GetType(typeName, throwOnError: false);
+            TestAssert.True(type is null, $"{typeName} should be removed once the root path owns the behavior directly.");
         }
 
         return Task.CompletedTask;

@@ -17,8 +17,8 @@ internal static class UiKitComponentTests
         yield return new TestCase("UiKit_Canvas_DrawBox_BorderStyles_RenderExpectedCorners", Canvas_DrawBox_BorderStyles_RenderExpectedCorners);
         yield return new TestCase("UiKit_Layout_SplitVertical_StaysWithinBounds", Layout_SplitVertical_StaysWithinBounds);
         yield return new TestCase("UiKit_Layout_Grid_DistributesRemainderAcrossCells", Layout_Grid_DistributesRemainderAcrossCells);
-        yield return new TestCase("UiKit_Widgets_DrawStatusBar_PlacesLeftAndRightText", Widgets_DrawStatusBar_PlacesLeftAndRightText);
-        yield return new TestCase("UiKit_Widgets_DrawStatusBar_UsesThemeFill", Widgets_DrawStatusBar_UsesThemeFill);
+        yield return new TestCase("Controls_StatusBar_PlacesLeftAndRightText", StatusBar_PlacesLeftAndRightText);
+        yield return new TestCase("Controls_StatusBar_UsesFillCharacter", StatusBar_UsesFillCharacter);
         yield return new TestCase("UiKit_FormComponents_RespondToInput", FormComponents_RespondToInput);
         yield return new TestCase("Controls_Modal_VisibleStateControlsRendering", Modal_VisibleStateControlsRendering);
         yield return new TestCase("Controls_Modal_BackdropOccludesUnderlyingContent", Modal_BackdropOccludesUnderlyingContent);
@@ -76,13 +76,18 @@ internal static class UiKitComponentTests
         return Task.CompletedTask;
     }
 
-    private static Task Widgets_DrawStatusBar_PlacesLeftAndRightText()
+    private static Task StatusBar_PlacesLeftAndRightText()
     {
         // Arrange
+        var statusBar = new StatusBar
+        {
+            LeftText = "left",
+            RightText = "right",
+        };
         var canvas = new Canvas(24, 1);
 
         // Act
-        UiWidgets.DrawStatusBar(canvas, new Rect(0, 0, 24, 1), "left", "right");
+        statusBar.Render(canvas, new Rect(0, 0, 24, 1));
         var output = canvas.Render();
 
         // Assert
@@ -91,13 +96,19 @@ internal static class UiKitComponentTests
         return Task.CompletedTask;
     }
 
-    private static Task Widgets_DrawStatusBar_UsesThemeFill()
+    private static Task StatusBar_UsesFillCharacter()
     {
         // Arrange
+        var statusBar = new StatusBar
+        {
+            LeftText = "L",
+            RightText = "R",
+            Fill = '.',
+        };
         var canvas = new Canvas(16, 1);
 
         // Act
-        UiWidgets.DrawStatusBar(canvas, new Rect(0, 0, 16, 1), "L", "R", new UiTheme(StatusFill: '.'));
+        statusBar.Render(canvas, new Rect(0, 0, 16, 1));
         var output = canvas.Render();
 
         // Assert
