@@ -30,7 +30,7 @@ internal static class ApiErgonomicsTests
         yield return new TestCase("ApiErgonomics_RootMenuBar_ConfiguresWithoutCatalog", RootMenuBar_ConfiguresWithoutCatalog);
         yield return new TestCase("ApiErgonomics_RootDialog_ConfiguresFrameWithoutLegacyBorderStyleName", RootDialog_ConfiguresFrameWithoutLegacyBorderStyleName);
         yield return new TestCase("ApiErgonomics_RootModal_ConfiguresWithoutCatalog", RootModal_ConfiguresWithoutCatalog);
-        yield return new TestCase("ApiErgonomics_ModalOptions_ConfigureFrameWithoutLegacyBorderStyleName", ModalOptions_ConfigureFrameWithoutLegacyBorderStyleName);
+        yield return new TestCase("ApiErgonomics_RootModal_ConfiguresFrameWithoutLegacyBorderStyleName", RootModal_ConfiguresFrameWithoutLegacyBorderStyleName);
     }
 
     private static Task Thickness_UsesStandardSpacingVocabulary()
@@ -289,14 +289,16 @@ internal static class ApiErgonomicsTests
         return Task.CompletedTask;
     }
 
-    private static Task ModalOptions_ConfigureFrameWithoutLegacyBorderStyleName()
+    private static Task RootModal_ConfiguresFrameWithoutLegacyBorderStyleName()
     {
-        var modal = new ModalComponent(new ModalOptions(
-            Title: "Confirm",
-            IsVisible: true,
-            Border: BorderStyle.Ascii,
-            Padding: Thickness.Symmetric(horizontal: 2, vertical: 1),
-            BodyLines: ["ready"]));
+        var modal = new Modal
+        {
+            Title = "Confirm",
+            IsVisible = true,
+            Border = BorderStyle.Ascii,
+            Padding = Thickness.Symmetric(horizontal: 2, vertical: 1),
+            BodyLines = ["ready"],
+        };
 
         TestAssert.True(modal.IsVisible, "Modal options should set visibility.");
         TestAssert.True(modal.Border == BorderStyle.Ascii, "Modal options should set border style through Border.");

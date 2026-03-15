@@ -5,9 +5,9 @@ using TeaSharp.Components.Dashboard;
 using TeaSharp.Components.Interaction;
 using TeaSharp.Components.Prebuilt;
 using TeaSharp.Components.Primitives;
-using TeaSharp.Components.Productivity;
 using TeaSharp.Components.Styling;
 using TeaSharp.Components.UiKit;
+using TeaSharp.Controls;
 using TeaSharp.Core.Messages;
 using UiLayout = TeaSharp.Components.UiKit.Layout;
 
@@ -26,9 +26,9 @@ internal static class UiKitComponentTests
         yield return new TestCase("UiKit_SortableTableComponent_VirtualizationWindow_RendersSlice", SortableTableComponent_VirtualizationWindow_RendersSlice);
         yield return new TestCase("UiKit_SortableTableComponent_MouseClickSelectsVisibleRow", SortableTableComponent_MouseClickSelectsVisibleRow);
         yield return new TestCase("UiKit_FormComponents_RespondToInput", FormComponents_RespondToInput);
-        yield return new TestCase("UiKit_ModalComponent_VisibleStateControlsRendering", ModalComponent_VisibleStateControlsRendering);
-        yield return new TestCase("UiKit_ModalComponent_BackdropOccludesUnderlyingContent", ModalComponent_BackdropOccludesUnderlyingContent);
-        yield return new TestCase("UiKit_ModalComponent_BackdropOccludesUnderlyingContent_GraphemeAwareCanvas", ModalComponent_BackdropOccludesUnderlyingContent_GraphemeAwareCanvas);
+        yield return new TestCase("Controls_Modal_VisibleStateControlsRendering", Modal_VisibleStateControlsRendering);
+        yield return new TestCase("Controls_Modal_BackdropOccludesUnderlyingContent", Modal_BackdropOccludesUnderlyingContent);
+        yield return new TestCase("Controls_Modal_BackdropOccludesUnderlyingContent_GraphemeAwareCanvas", Modal_BackdropOccludesUnderlyingContent_GraphemeAwareCanvas);
     }
 
     private static Task Canvas_DrawBox_BorderStyles_RenderExpectedCorners()
@@ -199,37 +199,45 @@ internal static class UiKitComponentTests
     private static Task FormComponents_RespondToInput()
     {
         // Arrange
-        var checklist = new CheckboxListComponent();
+        var checklist = new MultiSelect
+        {
+            IsFocused = true,
+        };
         checklist.SetItems([("focus", true), ("mouse", false)]);
 
-        var radio = new RadioGroupComponent();
+        var radio = new RadioGroup
+        {
+            IsFocused = true,
+        };
         radio.SetItems(["a", "b", "c"]);
 
         var select = new SelectComponent();
         select.SetItems(["compact", "cozy"]);
 
         // Act
-        checklist.Update(new KeyPressMsg(KeyCode.Down));
-        checklist.Update(new KeyPressMsg(KeyCode.Enter));
-        radio.Update(new KeyPressMsg(KeyCode.Right));
+        checklist.Handle(new KeyPressed(Key.Down));
+        checklist.Handle(new KeyPressed(Key.Enter));
+        radio.Handle(new KeyPressed(Key.Right));
         select.Update(new KeyPressMsg(KeyCode.Right));
 
         // Assert
-        TestAssert.True(checklist.Items[1].Checked, "Checklist enter key should toggle selected item.");
+        TestAssert.True(checklist.CheckedItems.Contains("mouse", StringComparer.Ordinal), "Checklist enter key should toggle selected item.");
         TestAssert.Equal(1, radio.SelectedIndex, "Radio group should advance selection on right arrow.");
         TestAssert.Equal(1, select.SelectedIndex, "Select component should advance selection on right arrow.");
         return Task.CompletedTask;
     }
 
-    private static Task ModalComponent_VisibleStateControlsRendering()
+    private static Task Modal_VisibleStateControlsRendering()
     {
         // Arrange
         var hiddenCanvas = new Canvas(30, 10);
         var shownCanvas = new Canvas(30, 10);
-        var modal = new ModalComponent(new ModalOptions(
-            Title: "Help",
-            BodyLines: ["line one", "line two"],
-            Theme: new UiTheme(ModalBackdropFill: ':')));
+        var modal = new Modal
+        {
+            Title = "Help",
+            BodyLines = ["line one", "line two"],
+            BackdropFill = ':',
+        };
 
         // Act
         modal.IsVisible = false;
@@ -248,18 +256,20 @@ internal static class UiKitComponentTests
         return Task.CompletedTask;
     }
 
-    private static Task ModalComponent_BackdropOccludesUnderlyingContent()
+    private static Task Modal_BackdropOccludesUnderlyingContent()
     {
         // Arrange
         var canvas = new Canvas(40, 12);
         canvas.WriteText(0, 0, "UNDERLAY-TEXT", 40);
         canvas.DrawBox(new Rect(0, 1, 40, 10), "underlay");
 
-        var modal = new ModalComponent(new ModalOptions(
-            IsVisible: true,
-            Title: "Dialog",
-            BodyLines: ["confirm action"],
-            Theme: new UiTheme(ModalBackdropFill: ':')));
+        var modal = new Modal
+        {
+            IsVisible = true,
+            Title = "Dialog",
+            BodyLines = ["confirm action"],
+            BackdropFill = ':',
+        };
 
         // Act
         modal.Render(canvas, new Rect(0, 0, 40, 12));
@@ -272,18 +282,20 @@ internal static class UiKitComponentTests
         return Task.CompletedTask;
     }
 
-    private static Task ModalComponent_BackdropOccludesUnderlyingContent_GraphemeAwareCanvas()
+    private static Task Modal_BackdropOccludesUnderlyingContent_GraphemeAwareCanvas()
     {
         // Arrange
         var canvas = new Canvas(40, 12, CanvasTextMode.GraphemeAware);
         canvas.WriteText(0, 0, "UNDERLAY-TEXT", 40);
         canvas.DrawBox(new Rect(0, 1, 40, 10), "underlay");
 
-        var modal = new ModalComponent(new ModalOptions(
-            IsVisible: true,
-            Title: "Dialog",
-            BodyLines: ["confirm action"],
-            Theme: new UiTheme(ModalBackdropFill: ':')));
+        var modal = new Modal
+        {
+            IsVisible = true,
+            Title = "Dialog",
+            BodyLines = ["confirm action"],
+            BackdropFill = ':',
+        };
 
         // Act
         modal.Render(canvas, new Rect(0, 0, 40, 12));

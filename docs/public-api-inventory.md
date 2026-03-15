@@ -155,6 +155,10 @@ The first root controls that already own their implementation directly are:
 - `DatePicker`
 - `TimePicker`
 - `MarkdownView`
+- `Modal`
+- `Accordion`
+- `RadioGroup`
+- `MultiSelect`
 - `ListView<T>`
 - `Tabs`
 - `MenuBar`

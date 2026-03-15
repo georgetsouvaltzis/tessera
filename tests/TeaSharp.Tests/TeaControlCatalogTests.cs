@@ -104,12 +104,6 @@ internal static class TeaControlCatalogTests
         "TeaSharp.Components.Advanced.ToggleSwitchComponent",
         "TeaSharp.Components.Advanced.TreeItemNode",
         "TeaSharp.Components.Advanced.TreeViewComponent",
-        "TeaSharp.Components.UiKit.AccordionComponent",
-        "TeaSharp.Components.UiKit.AccordionSection",
-        "TeaSharp.Components.UiKit.CheckboxListComponent",
-        "TeaSharp.Components.UiKit.ModalComponent",
-        "TeaSharp.Components.UiKit.ModalOptions",
-        "TeaSharp.Components.UiKit.RadioGroupComponent",
     ];
 
     private static readonly string[] RemovedLegacyPromotedTypes =
@@ -137,6 +131,12 @@ internal static class TeaControlCatalogTests
         "TeaSharp.Components.Productivity.TimePickerField",
         "TeaSharp.Components.Productivity.TimePickerOptions",
         "TeaSharp.Components.Productivity.TimeValueChangedEventArgs",
+        "TeaSharp.Components.UiKit.AccordionComponent",
+        "TeaSharp.Components.UiKit.AccordionSection",
+        "TeaSharp.Components.UiKit.CheckboxListComponent",
+        "TeaSharp.Components.UiKit.ModalComponent",
+        "TeaSharp.Components.UiKit.ModalOptions",
+        "TeaSharp.Components.UiKit.RadioGroupComponent",
         "TeaSharp.Components.UiKit.TabSelectionChangedEventArgs",
         "TeaSharp.Components.UiKit.TabsComponent",
         "TeaSharp.Components.UiKit.TabsOptions",
