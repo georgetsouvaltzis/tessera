@@ -20,9 +20,6 @@ internal static class UiKitComponentTests
         yield return new TestCase("UiKit_Layout_Grid_DistributesRemainderAcrossCells", Layout_Grid_DistributesRemainderAcrossCells);
         yield return new TestCase("UiKit_Widgets_DrawStatusBar_PlacesLeftAndRightText", Widgets_DrawStatusBar_PlacesLeftAndRightText);
         yield return new TestCase("UiKit_Widgets_DrawStatusBar_UsesThemeFill", Widgets_DrawStatusBar_UsesThemeFill);
-        yield return new TestCase("UiKit_SortableTableComponent_UpdatesSortAndPaging", SortableTableComponent_UpdatesSortAndPaging);
-        yield return new TestCase("UiKit_SortableTableComponent_VirtualizationWindow_RendersSlice", SortableTableComponent_VirtualizationWindow_RendersSlice);
-        yield return new TestCase("UiKit_SortableTableComponent_MouseClickSelectsVisibleRow", SortableTableComponent_MouseClickSelectsVisibleRow);
         yield return new TestCase("UiKit_FormComponents_RespondToInput", FormComponents_RespondToInput);
         yield return new TestCase("Controls_Modal_VisibleStateControlsRendering", Modal_VisibleStateControlsRendering);
         yield return new TestCase("Controls_Modal_BackdropOccludesUnderlyingContent", Modal_BackdropOccludesUnderlyingContent);
@@ -106,91 +103,6 @@ internal static class UiKitComponentTests
 
         // Assert
         TestAssert.True(output.Contains('.'), "Status bar should use theme fill character.");
-        return Task.CompletedTask;
-    }
-
-    private static Task SortableTableComponent_UpdatesSortAndPaging()
-    {
-        // Arrange
-        var table = new SortableTableComponent(["Metric", "Value"]) { PageSize = 2, Title = "Sample" };
-        table.SetRows(
-        [
-            ["cpu", "33"],
-            ["mem", "60"],
-            ["io", "18"],
-            ["latency", "22"],
-            ["errors", "1"],
-        ]);
-
-        // Act
-        table.Update(new KeyPressMsg(KeyCode.Character, "]"));
-        table.Update(new KeyPressMsg(KeyCode.Character, "c"));
-        table.Update(new KeyPressMsg(KeyCode.Character, "s"));
-        var canvas = new Canvas(40, 8);
-        table.Render(canvas, new Rect(0, 0, 40, 8));
-        var output = canvas.Render();
-
-        // Assert
-        TestAssert.True(output.Contains("p2/3", StringComparison.Ordinal), "Table should update to second page when next-page key is pressed.");
-        TestAssert.True(output.Contains("sort:Value desc", StringComparison.Ordinal), "Table should switch sort column and direction from hotkeys.");
-        return Task.CompletedTask;
-    }
-
-    private static Task SortableTableComponent_VirtualizationWindow_RendersSlice()
-    {
-        // Arrange
-        var table = new SortableTableComponent(["Metric", "Value"])
-        {
-            EnableVirtualization = true,
-            Title = "Virtual",
-        };
-        table.SetRows(
-        [
-            ["a", "1"],
-            ["b", "2"],
-            ["c", "3"],
-            ["d", "4"],
-            ["e", "5"],
-        ]);
-        table.SetVirtualWindow(startIndex: 2, windowSize: 2);
-
-        // Act
-        var canvas = new Canvas(32, 8);
-        table.Render(canvas, new Rect(0, 0, 32, 8));
-        var output = canvas.Render();
-
-        // Assert
-        TestAssert.True(output.Contains("v3+2", StringComparison.Ordinal), "Virtualized table title should report active window.");
-        TestAssert.True(output.Contains('c'), "Virtualized slice should include starting row.");
-        TestAssert.True(output.Contains('d'), "Virtualized slice should include following row.");
-        return Task.CompletedTask;
-    }
-
-    private static Task SortableTableComponent_MouseClickSelectsVisibleRow()
-    {
-        // Arrange
-        var table = new SortableTableComponent(["Metric", "Value"])
-        {
-            Border = BorderStyle.None,
-            Title = "Sample",
-        };
-        table.SetRows(
-        [
-            ["cpu", "33"],
-            ["mem", "60"],
-            ["io", "18"],
-        ]);
-        var bounds = new Rect(0, 0, 40, 6);
-
-        // Act
-        var changed = table.UpdateMouse(new MouseClickMsg(MouseButton.Left, 2, 5), bounds);
-        var canvas = new Canvas(40, 6);
-        table.Render(canvas, bounds);
-        var output = canvas.Render();
-
-        // Assert
-        TestAssert.True(changed, "Mouse click on table row should update visible selection.");
-        TestAssert.True(output.Contains("› mem", StringComparison.Ordinal), "Clicked row should render with selected marker.");
         return Task.CompletedTask;
     }
 

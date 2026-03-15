@@ -1,10 +1,43 @@
 using TeaSharp.Components.Primitives;
 using TeaSharp.Components.Primitives.Internal;
-using TeaSharp.Components.UiKit;
-namespace TeaSharp.Components.UiKit.Internal;
 
-internal static class SortableTablePointerHelper
+namespace TeaSharp.Controls.Internal;
+
+internal sealed record TableRenderState(IReadOnlyList<IReadOnlyList<string>> VisibleRows, string Title, int VisibleRowCount);
+
+internal static class TableViewState
 {
+    public static TableRenderState Build(
+        IReadOnlyList<IReadOnlyList<string>> rows,
+        IReadOnlyList<string> headers,
+        string title,
+        int sortColumn,
+        bool sortDescending,
+        int pageSize,
+        int pageIndex)
+    {
+        var sorted = rows
+            .OrderBy(row => ValueAt(row, sortColumn), StringComparer.OrdinalIgnoreCase)
+            .ToList();
+        if (sortDescending)
+        {
+            sorted.Reverse();
+        }
+
+        var safePageSize = Math.Max(1, pageSize);
+        var pageCount = Math.Max(1, (sorted.Count + safePageSize - 1) / safePageSize);
+        var page = Math.Clamp(pageIndex, 0, pageCount - 1);
+        var offset = page * safePageSize;
+        var visibleRows = sorted.Skip(offset).Take(safePageSize).ToList();
+        var sortLabel = headers.Count == 0
+            ? string.Empty
+            : headers[Math.Clamp(sortColumn, 0, headers.Count - 1)];
+        return new TableRenderState(
+            visibleRows,
+            $"{title} p{page + 1}/{pageCount} sort:{sortLabel} {(sortDescending ? "desc" : "asc")}",
+            visibleRows.Count);
+    }
+
     public static Rect ResolveContentRect(Rect bounds, BorderStyle border, Thickness padding, string title)
     {
         if (border != BorderStyle.None)
@@ -26,7 +59,6 @@ internal static class SortableTablePointerHelper
         var separatorCount = columnCount - 1;
         var availableWidth = Math.Max(columnCount, content.Width - separatorCount);
         var widths = ComputeColumnWidths(availableWidth, columnCount);
-
         var cursor = content.X;
         for (var i = 0; i < widths.Length; i++)
         {
@@ -70,6 +102,16 @@ internal static class SortableTablePointerHelper
         }
 
         return (hovered, selected);
+    }
+
+    private static string ValueAt(IReadOnlyList<string> row, int column)
+    {
+        if (column < 0 || column >= row.Count)
+        {
+            return string.Empty;
+        }
+
+        return row[column];
     }
 
     private static int[] ComputeColumnWidths(int width, int columns)

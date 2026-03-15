@@ -21,8 +21,8 @@ internal static class ApiErgonomicsTests
         yield return new TestCase("ApiErgonomics_RootListView_ExposesSelectionWithoutModelAccess", RootListView_ExposesSelectionWithoutModelAccess);
         yield return new TestCase("ApiErgonomics_RootChoice_ConfiguresWithoutPostConstructionMutation", RootChoice_ConfiguresWithoutPostConstructionMutation);
         yield return new TestCase("ApiErgonomics_RootComboBox_ExposesFilterWithoutNestedInputAccess", RootComboBox_ExposesFilterWithoutNestedInputAccess);
-        yield return new TestCase("ApiErgonomics_TableOptions_ExposePageSizeWithoutInnerAccess", TableOptions_ExposePageSizeWithoutInnerAccess);
-        yield return new TestCase("ApiErgonomics_TableComponent_ExposesSortStateWithoutInnerAccess", TableComponent_ExposesSortStateWithoutInnerAccess);
+        yield return new TestCase("ApiErgonomics_Table_ExposePageSizeWithoutInnerAccess", Table_ExposePageSizeWithoutInnerAccess);
+        yield return new TestCase("ApiErgonomics_Table_ExposesSortStateWithoutInnerAccess", Table_ExposesSortStateWithoutInnerAccess);
         yield return new TestCase("ApiErgonomics_ActionEvents_EnableEventDrivenIntegration", ActionEvents_EnableEventDrivenIntegration);
         yield return new TestCase("ApiErgonomics_ConsumeMethods_ExposeOneShotInteractionResults", ConsumeMethods_ExposeOneShotInteractionResults);
         yield return new TestCase("ApiErgonomics_RootTextInput_ConfiguresWithoutCatalog", RootTextInput_ConfiguresWithoutCatalog);
@@ -99,12 +99,13 @@ internal static class ApiErgonomicsTests
         return Task.CompletedTask;
     }
 
-    private static Task TableOptions_ExposePageSizeWithoutInnerAccess()
+    private static Task Table_ExposePageSizeWithoutInnerAccess()
     {
-        var table = new TableComponent(new TableOptions(
-            ["Name", "Status"],
-            Title: "Deployments",
-            PageSize: 6));
+        var table = new Table("Name", "Status")
+        {
+            Title = "Deployments",
+            PageSize = 6,
+        };
 
         TestAssert.Equal("Deployments", table.Title, "Table options should set title.");
         TestAssert.Equal(6, table.PageSize, "Table options should set page size.");
@@ -160,9 +161,9 @@ internal static class ApiErgonomicsTests
         return Task.CompletedTask;
     }
 
-    private static Task TableComponent_ExposesSortStateWithoutInnerAccess()
+    private static Task Table_ExposesSortStateWithoutInnerAccess()
     {
-        var table = new TableComponent(["Name", "Status"])
+        var table = new Table("Name", "Status")
         {
             IsFocused = true,
         };
@@ -172,8 +173,8 @@ internal static class ApiErgonomicsTests
             ["worker", "warn"],
         ]);
 
-        table.Update(new TeaSharp.Core.Messages.KeyPressMsg(TeaSharp.Core.Messages.KeyCode.Character, "c"));
-        table.Update(new TeaSharp.Core.Messages.KeyPressMsg(TeaSharp.Core.Messages.KeyCode.Character, "s"));
+        table.Handle(new KeyPressed(Key.Character, "c"));
+        table.Handle(new KeyPressed(Key.Character, "s"));
 
         TestAssert.Equal(1, table.SortColumn, "Table should expose sort column at component level.");
         TestAssert.True(table.SortDescending, "Table should expose sort direction at component level.");

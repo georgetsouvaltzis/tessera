@@ -42,7 +42,6 @@ internal static class CompositionApiContractTests
         "TeaSharp.Components.Prebuilt.LayoutContainerComponent",
         "TeaSharp.Components.UiKit.Layout",
         "TeaSharp.Components.UiKit.SelectComponent",
-        "TeaSharp.Components.UiKit.SortableTableComponent",
         "TeaSharp.Components.UiKit.TimelineEntry",
         "TeaSharp.Components.UiKit.ToastCenterComponent",
         "TeaSharp.Components.UiKit.ToastMessage",

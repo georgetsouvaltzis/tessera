@@ -56,11 +56,7 @@ internal static class TeaControlCatalogTests
         typeof(StatsCard),
     ];
 
-    private static readonly string[] InternalizedLegacyPrebuiltTypes =
-    [
-        "TeaSharp.Components.Prebuilt.TableComponent",
-        "TeaSharp.Components.Prebuilt.TableOptions",
-    ];
+    private static readonly string[] InternalizedLegacyPrebuiltTypes = [];
 
     private static readonly string[] RemovedLegacyPrebuiltTypes =
     [
@@ -91,6 +87,8 @@ internal static class TeaControlCatalogTests
         "TeaSharp.Components.Prebuilt.ProgressBarOptions",
         "TeaSharp.Components.Prebuilt.LogViewerComponent",
         "TeaSharp.Components.Prebuilt.LogViewerOptions",
+        "TeaSharp.Components.Prebuilt.TableComponent",
+        "TeaSharp.Components.Prebuilt.TableOptions",
     ];
 
     private static readonly string[] InternalizedLegacyPromotedTypes =
@@ -137,6 +135,7 @@ internal static class TeaControlCatalogTests
         "TeaSharp.Components.UiKit.ModalComponent",
         "TeaSharp.Components.UiKit.ModalOptions",
         "TeaSharp.Components.UiKit.RadioGroupComponent",
+        "TeaSharp.Components.UiKit.SortableTableComponent",
         "TeaSharp.Components.UiKit.TabSelectionChangedEventArgs",
         "TeaSharp.Components.UiKit.TabsComponent",
         "TeaSharp.Components.UiKit.TabsOptions",

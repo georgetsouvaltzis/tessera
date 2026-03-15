@@ -61,7 +61,7 @@ internal static class PrebuiltWidgetTests
         yield return new TestCase("Controls_CommandPalette_ExposesQueryAccessors", CommandPalette_ExposesQueryAccessors);
         yield return new TestCase("Controls_CommandPalette_Open_ClearsQueryWhenClosed", CommandPalette_Open_ClearsQueryWhenClosed);
         yield return new TestCase("Controls_CommandPalette_LettersRemainQueryable", CommandPalette_LettersRemainQueryable);
-        yield return new TestCase("Prebuilt_TableComponent_ForwardsSortHotkeys", TableComponent_ForwardsSortHotkeys);
+        yield return new TestCase("Controls_Table_ForwardsSortHotkeys", Table_ForwardsSortHotkeys);
         yield return new TestCase("Controls_ProgressBar_AdjustsValue", ProgressBar_AdjustsValue);
         yield return new TestCase("Controls_StatusBar_RendersLeftAndRightText", StatusBar_RendersLeftAndRightText);
         yield return new TestCase("Controls_LogView_AppendsAndFilters", LogView_AppendsAndFilters);
@@ -930,9 +930,9 @@ internal static class PrebuiltWidgetTests
         return Task.CompletedTask;
     }
 
-    private static Task TableComponent_ForwardsSortHotkeys()
+    private static Task Table_ForwardsSortHotkeys()
     {
-        var table = new TableComponent(["A", "B"])
+        var table = new Table("A", "B")
         {
             IsFocused = true,
             Title = "T",
@@ -943,8 +943,8 @@ internal static class PrebuiltWidgetTests
             ["y", "1"],
         ]);
 
-        table.Update(new KeyPressMsg(KeyCode.Character, "c"));
-        table.Update(new KeyPressMsg(KeyCode.Character, "s"));
+        table.Handle(new KeyPressed(Key.Character, "c"));
+        table.Handle(new KeyPressed(Key.Character, "s"));
         TestAssert.Equal(1, table.SortColumn, "Table should change sort column from hotkey.");
         TestAssert.True(table.SortDescending, "Table should toggle sort direction from hotkey.");
         return Task.CompletedTask;

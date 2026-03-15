@@ -8,8 +8,5 @@ namespace TeaSharp.Components.Prebuilt;
 internal static class PrebuiltCatalog
 {
 
-    public static TableComponent Table(IReadOnlyList<string> headers) => new(headers);
-
-    public static TableComponent Table(TableOptions options) => new(options);
     public static LayoutContainerComponent LayoutContainer(LayoutContainerOptions? options = null) => options is null ? new LayoutContainerComponent() : new LayoutContainerComponent(options);
 }
