@@ -4,11 +4,13 @@ namespace TeaSharp.Internal;
 
 internal static class TeaMessageAdapter
 {
+    internal sealed record CoreMessageEnvelope(Message Message) : global::TeaSharp.Core.Abstractions.IMessage;
+
     public static Message ToPublic(global::TeaSharp.Core.Abstractions.IMessage message)
     {
         return message switch
         {
-            MessageEnvelope envelope => envelope.Message,
+            CoreMessageEnvelope envelope => envelope.Message,
             KeyPressMsg key => new KeyPressed((Key)key.Code, key.Text, (ModifierKeys)key.Modifiers, key.IsRepeat),
             KeyReleaseMsg key => new KeyReleased((Key)key.Code, key.Text, (ModifierKeys)key.Modifiers),
             WindowSizeMsg size => new WindowResized(size.Width, size.Height),
@@ -27,7 +29,6 @@ internal static class TeaMessageAdapter
     {
         return message switch
         {
-            RuntimeMessage runtime => runtime.Raw,
             KeyPressed key => new KeyPressMsg((KeyCode)key.Key, key.Text, (global::TeaSharp.Core.Messages.KeyModifiers)key.Modifiers, key.IsRepeat),
             KeyReleased key => new KeyReleaseMsg((KeyCode)key.Key, key.Text, (global::TeaSharp.Core.Messages.KeyModifiers)key.Modifiers),
             WindowResized size => new WindowSizeMsg(size.Width, size.Height),
@@ -45,7 +46,7 @@ internal static class TeaMessageAdapter
             FocusChanged => new FocusOutMsg(),
             Faulted faulted => new EffectErrorMsg(faulted.Exception),
             ExternalMessage { Raw: global::TeaSharp.Core.Abstractions.IMessage raw } => raw,
-            _ => new MessageEnvelope(message),
+            _ => new CoreMessageEnvelope(message),
         };
     }
 }

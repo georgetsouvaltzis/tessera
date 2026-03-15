@@ -186,5 +186,5 @@ Their old `TeaSharp.Components.Prebuilt.*` counterparts have been removed instea
 
 1. keep moving control authoring toward a single obvious configuration style
 2. review Tier 2 periodically and internalize anything that is public only by inertia
-3. keep custom widget extensibility stable while internal runtime details continue to shrink
+3. keep custom widget extensibility stable while internal runtime details continue to shrink and stay behind TeaSharp-owned internal adapters
 4. preserve discoverability tests so legacy namespaces do not drift back onto the default path

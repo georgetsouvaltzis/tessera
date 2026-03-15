@@ -28,7 +28,11 @@ internal sealed class TeaAppRuntime : ITeaRuntime
     public TeaAppRuntime(TeaApp app, TeaRuntimeOptions options, TeaSharp.Hosting.TeaHostingOptions? hosting)
     {
         app.ConfigureRuntimeScreen(options.Screen);
-        _runtime = new TeaRuntimeLoop(app.InitializeCore, app.UpdateCore, app.RenderCore, CreateRuntimeLoopOptions(app, options, hosting));
+        _runtime = new TeaRuntimeLoop(
+            () => TeaEffectAdapter.ToCore(app.InitializeRuntime()),
+            message => TeaEffectAdapter.ToCore(app.UpdateRuntime(TeaMessageAdapter.ToPublic(message))),
+            () => app.RenderRuntime().Output,
+            CreateRuntimeLoopOptions(app, options, hosting));
     }
 
     public void Send(Message message)

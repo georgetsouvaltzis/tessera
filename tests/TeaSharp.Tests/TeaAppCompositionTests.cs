@@ -4,6 +4,7 @@ using TeaSharp.Components.Composition;
 using TeaSharp.Components.Primitives;
 using TeaSharp.Controls;
 using TeaSharp.Core.Messages;
+using TeaSharp.Internal;
 using TeaSharp.Layout;
 
 namespace TeaSharp.Tests;
@@ -492,12 +493,10 @@ internal static class TeaAppCompositionTests
             _app = app;
         }
 
-        public global::TeaSharp.Core.Abstractions.Effect? Update(global::TeaSharp.Core.Abstractions.IMessage message)
-        {
-            return _app.UpdateCore(message);
-        }
+        public global::TeaSharp.Core.Abstractions.Effect? Update(global::TeaSharp.Core.Abstractions.IMessage message) =>
+            TeaEffectAdapter.ToCore(_app.UpdateRuntime(TeaMessageAdapter.ToPublic(message)));
 
-        public global::TeaSharp.Core.Abstractions.ScreenOutput Render() => _app.RenderCore();
+        public global::TeaSharp.Core.Abstractions.ScreenOutput Render() => _app.RenderRuntime().Output;
     }
 
     private sealed class ButtonApp : TeaApp

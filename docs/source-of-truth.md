@@ -362,6 +362,12 @@ But it must stay that way:
 - root polling methods must remain advanced-only
 - new wrappers should continue replacing old `*Component` nouns where justified
 
+Recent progress:
+
+- the old layout helper mini-DSL (`Stack` / `Split` / `Panel` / `Dock` / `Overlay` / `Center` / `Slot`) is removed instead of merely hidden
+- `Screen.From(LayoutNode)` is now advanced-only in discoverability so the builder path stays primary
+- migration-facing examples and docs now teach `Screen.Build(...)` with explicit imperative statements instead of fluent or object-tree-first assembly
+
 ### 3. Default Input Flow Is Better, But Still Not Final
 
 The old `HandleScreenInput(...)` plus post-routing probing story is no longer the default path.
@@ -371,6 +377,12 @@ The current model is:
 - controls consume keyboard, pointer, and paste input first
 - `TeaApp.Update(...)` sees unhandled input plus runtime messages
 - `RequestEffect(...)` lets control events trigger runtime behavior
+
+Recent progress:
+
+- `TeaApp` no longer exposes `HandleScreenInput(...)`
+- `TeaApp` no longer exposes `UpdateHandledInput(...)`
+- `TeaApp` no longer exposes `InputHandled`
 
 Long-term goal:
 
@@ -384,6 +396,8 @@ Recent progress:
 
 - `TeaApp` no longer directly implements `TeaSharp.Core.Abstractions.IScreen`
 - the runtime bridge now sits behind internal adapter types
+- `TeaApp` now updates and renders through TeaSharp-owned internal runtime methods, with core translation pushed to the runtime edge
+- message-envelope and screen-option core translation now live under internal adapters instead of root public files
 
 Remaining drift:
 

@@ -135,11 +135,6 @@ public sealed record Faulted(Exception Exception) : Message;
 /// <param name="Raw">The raw payload supplied by the runtime or host.</param>
 public sealed record ExternalMessage(object Raw) : Message;
 
-internal sealed record RuntimeMessage(
-    global::TeaSharp.Core.Abstractions.IMessage Raw) : Message;
-
-internal sealed record MessageEnvelope(Message Message) : global::TeaSharp.Core.Abstractions.IMessage;
-
 /// <summary>
 /// Identifies a keyboard key independent of platform-specific key codes.
 /// </summary>

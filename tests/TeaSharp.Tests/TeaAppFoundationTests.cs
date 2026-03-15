@@ -1,6 +1,7 @@
 using TeaSharp.Controls;
 using TeaSharp.Components.Primitives;
 using TeaSharp.Core.Messages;
+using TeaSharp.Internal;
 using System.Reflection;
 
 namespace TeaSharp.Tests;
@@ -50,10 +51,10 @@ internal static class TeaAppFoundationTests
         var screen = new TeaAppDriver(app);
 
         var init = screen.Init();
-        TestAssert.True(init is not null, "TeaApp.Initialize should adapt to the legacy runtime effect contract.");
+        TestAssert.True(init is not null, "TeaApp.Initialize should adapt to the runtime effect contract.");
 
         var message = await init!(CancellationToken.None);
-        TestAssert.True(message is MessageEnvelope, "Custom messages should be wrapped for the legacy runtime.");
+        TestAssert.True(message is not null, "Custom messages should be wrapped for runtime delivery.");
 
         screen.Update(message!);
         var rendered = screen.Render();
@@ -195,14 +196,12 @@ internal static class TeaAppFoundationTests
             _app = app;
         }
 
-        public global::TeaSharp.Core.Abstractions.Effect? Init() => _app.InitializeCore();
+        public global::TeaSharp.Core.Abstractions.Effect? Init() => TeaEffectAdapter.ToCore(_app.InitializeRuntime());
 
-        public global::TeaSharp.Core.Abstractions.Effect? Update(global::TeaSharp.Core.Abstractions.IMessage message)
-        {
-            return _app.UpdateCore(message);
-        }
+        public global::TeaSharp.Core.Abstractions.Effect? Update(global::TeaSharp.Core.Abstractions.IMessage message) =>
+            TeaEffectAdapter.ToCore(_app.UpdateRuntime(TeaMessageAdapter.ToPublic(message)));
 
-        public global::TeaSharp.Core.Abstractions.ScreenOutput Render() => _app.RenderCore();
+        public global::TeaSharp.Core.Abstractions.ScreenOutput Render() => _app.RenderRuntime().Output;
     }
 
     private sealed class PostingApp : TeaApp

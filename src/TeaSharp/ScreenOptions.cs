@@ -81,24 +81,4 @@ public sealed class ScreenOptions
         };
     }
 
-    internal global::TeaSharp.Core.Abstractions.TerminalOutput ToTerminalOutput()
-    {
-        return new global::TeaSharp.Core.Abstractions.TerminalOutput
-        {
-            AltScreen = AltScreen ?? false,
-            EnableBracketedPaste = EnableBracketedPaste ?? false,
-            EnableFocusReporting = EnableFocusReporting ?? false,
-            EnableSynchronizedUpdates = EnableSynchronizedUpdates ?? false,
-            MouseMode = MouseTracking switch
-            {
-                MouseTrackingMode.CellMotion => global::TeaSharp.Core.Abstractions.MouseMode.CellMotion,
-                MouseTrackingMode.AllMotion => global::TeaSharp.Core.Abstractions.MouseMode.AllMotion,
-                _ => global::TeaSharp.Core.Abstractions.MouseMode.None,
-            },
-            CursorColor = CursorColor,
-            ForegroundColor = ForegroundColor,
-            BackgroundColor = BackgroundColor,
-            WindowTitle = WindowTitle,
-        };
-    }
 }

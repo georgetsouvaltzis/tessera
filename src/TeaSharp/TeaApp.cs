@@ -77,12 +77,10 @@ public abstract class TeaApp
         _runtimeScreenOptions = screenOptions ?? ScreenOptions.Empty;
     }
 
-    internal global::TeaSharp.Core.Abstractions.Effect? InitializeCore() =>
-        TeaEffectAdapter.ToCore(Initialize());
+    internal TeaEffect? InitializeRuntime() => Initialize();
 
-    internal global::TeaSharp.Core.Abstractions.Effect? UpdateCore(global::TeaSharp.Core.Abstractions.IMessage message)
+    internal TeaEffect? UpdateRuntime(Message mapped)
     {
-        var mapped = TeaMessageAdapter.ToPublic(message);
         switch (mapped)
         {
             case WindowResized resized:
@@ -99,14 +97,14 @@ public abstract class TeaApp
                 ? null
                 : Update(mapped);
 
-        return TeaEffectAdapter.ToCore(CombineEffects(effect, DrainRequestedEffects()));
+        return CombineEffects(effect, DrainRequestedEffects());
     }
 
-    internal global::TeaSharp.Core.Abstractions.ScreenOutput RenderCore()
+    internal ScreenRenderResult RenderRuntime()
     {
         var rendered = Build(_context).Compile(_screenCompiler, _context, _runtimeScreenOptions.Merge(DefaultScreenOptions));
         _interactiveScreen = rendered.Interaction;
-        return rendered.Output;
+        return rendered;
     }
 
     private TeaEffect? DrainRequestedEffects()
