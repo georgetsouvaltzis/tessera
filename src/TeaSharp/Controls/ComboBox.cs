@@ -1,8 +1,6 @@
 using TeaSharp.Controls.Internal;
 using TeaSharp.Components.Primitives;
 using TeaSharp.Components.Primitives.Internal;
-using TeaSharp.Core.Messages;
-using TeaSharp.Internal;
 using TeaSharp.Layout;
 using TeaSharp.Widgets;
 
@@ -166,7 +164,7 @@ public sealed class ComboBox : Control
             }
         }
 
-        var inputResult = _input.Update(TeaMessageAdapter.ToCore(message));
+        var inputResult = _input.Update(message);
         if (inputResult.Changed)
         {
             _options.ApplyFilter(_input.Value);

@@ -1,6 +1,5 @@
 using System.ComponentModel;
-using TeaSharp.Core.Abstractions;
-using TeaSharp.Core.Messages;
+using TeaSharp.Internal;
 using TeaSharp.Widgets.Internal;
 
 namespace TeaSharp.Widgets;
@@ -118,13 +117,18 @@ internal sealed class ListModel<T>
         ApplyFilter();
     }
 
-    public bool Update(IMessage message, ListKeyMap? keyMap = null)
+    public bool Update(global::TeaSharp.Core.Abstractions.IMessage message, ListKeyMap? keyMap = null)
+    {
+        return Update(TeaMessageAdapter.ToPublic(message), keyMap);
+    }
+
+    public bool Update(Message message, ListKeyMap? keyMap = null)
     {
         keyMap ??= ListKeyMap.Default;
         var beforeSelection = SelectedIndex;
         var beforeOffset = _offset;
 
-        if (message is KeyPressMsg key)
+        if (message is KeyPressed key)
         {
             if (keyMap.Up.Matches(key)) MoveSelection(-1);
             else if (keyMap.Down.Matches(key)) MoveSelection(1);
@@ -133,10 +137,10 @@ internal sealed class ListModel<T>
             else if (keyMap.Home.Matches(key)) Select(0);
             else if (keyMap.End.Matches(key)) Select(Math.Max(0, _filteredIndexes.Count - 1));
         }
-        else if (message is MouseWheelMsg wheel)
+        else if (message is PointerInput { Kind: PointerEventKind.Wheel } wheel)
         {
-            if (wheel.Button == MouseButton.WheelUp) MoveSelection(-1);
-            else if (wheel.Button == MouseButton.WheelDown) MoveSelection(1);
+            if (wheel.Button == PointerButton.WheelUp) MoveSelection(-1);
+            else if (wheel.Button == PointerButton.WheelDown) MoveSelection(1);
         }
 
         return beforeSelection != SelectedIndex || beforeOffset != _offset;

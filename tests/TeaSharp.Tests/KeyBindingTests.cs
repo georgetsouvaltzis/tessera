@@ -1,7 +1,6 @@
 using TeaSharp.Components.Composition;
 using TeaSharp.Components.Primitives;
 using TeaSharp.Components.Styling;
-using TeaSharp.Core.Messages;
 using TeaSharp.Widgets;
 
 namespace TeaSharp.Tests;
@@ -18,7 +17,7 @@ internal static class KeyBindingTests
     {
         var binding = new KeyBinding("+", "plus", "+");
 
-        var matches = binding.Matches(new KeyPressMsg(KeyCode.Character, "+"));
+        var matches = binding.Matches(new KeyPressed(Key.Character, "+"));
 
         TestAssert.True(matches, "Binding should match literal plus character.");
         return Task.CompletedTask;
@@ -28,7 +27,7 @@ internal static class KeyBindingTests
     {
         var binding = new KeyBinding("plus", "plus", "plus");
 
-        var matches = binding.Matches(new KeyPressMsg(KeyCode.Character, "+"));
+        var matches = binding.Matches(new KeyPressed(Key.Character, "+"));
 
         TestAssert.True(matches, "Binding should match plus alias.");
         return Task.CompletedTask;

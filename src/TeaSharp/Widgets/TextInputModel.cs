@@ -1,6 +1,5 @@
 using System.ComponentModel;
-using TeaSharp.Core.Abstractions;
-using TeaSharp.Core.Messages;
+using TeaSharp.Internal;
 using TeaSharp.Widgets.Internal;
 
 namespace TeaSharp.Widgets;
@@ -38,16 +37,21 @@ internal sealed class TextInputModel
         SelectionAnchor = null;
     }
 
-    public TextInputUpdateResult Update(IMessage message, TextInputKeyMap? keyMap = null)
+    public TextInputUpdateResult Update(global::TeaSharp.Core.Abstractions.IMessage message, TextInputKeyMap? keyMap = null)
+    {
+        return Update(TeaMessageAdapter.ToPublic(message), keyMap);
+    }
+
+    public TextInputUpdateResult Update(Message message, TextInputKeyMap? keyMap = null)
     {
         keyMap ??= TextInputKeyMap.Default;
 
-        if (message is PasteMsg paste)
+        if (message is Pasted paste)
         {
             return Apply(TextInputBuffer.InsertText(State, paste.Content, MaxLength));
         }
 
-        if (message is not KeyPressMsg key)
+        if (message is not KeyPressed key)
         {
             return default;
         }
@@ -55,8 +59,8 @@ internal sealed class TextInputModel
         if (keyMap.Submit.Matches(key))
         {
             if (Multiline
-                && !key.Modifiers.HasFlag(KeyModifiers.Ctrl)
-                && !key.Modifiers.HasFlag(KeyModifiers.Meta))
+                && !key.Modifiers.HasFlag(ModifierKeys.Ctrl)
+                && !key.Modifiers.HasFlag(ModifierKeys.Meta))
             {
                 return Apply(TextInputBuffer.InsertText(State, "\n", MaxLength));
             }
@@ -71,7 +75,7 @@ internal sealed class TextInputModel
             return new TextInputUpdateResult(Changed: false, Submitted: false);
         }
 
-        var extendSelection = key.Modifiers.HasFlag(KeyModifiers.Shift);
+        var extendSelection = key.Modifiers.HasFlag(ModifierKeys.Shift);
 
         if (keyMap.WordLeft.Matches(key))
         {
@@ -97,13 +101,13 @@ internal sealed class TextInputModel
             return default;
         }
 
-        if (Multiline && key.Code == KeyCode.Up)
+        if (Multiline && key.Key == Key.Up)
         {
             Apply(TextInputSelection.MoveCursor(State, TextInputSelection.MoveVerticalLine(Value, Cursor, -1), extendSelection));
             return default;
         }
 
-        if (Multiline && key.Code == KeyCode.Down)
+        if (Multiline && key.Key == Key.Down)
         {
             Apply(TextInputSelection.MoveCursor(State, TextInputSelection.MoveVerticalLine(Value, Cursor, 1), extendSelection));
             return default;
@@ -141,11 +145,11 @@ internal sealed class TextInputModel
             return Apply(TextInputBuffer.DeleteForward(State));
         }
 
-        if (key.Code == KeyCode.Character
+        if (key.Key == Key.Character
             && !string.IsNullOrEmpty(key.Text)
-            && !key.Modifiers.HasFlag(KeyModifiers.Ctrl)
-            && !key.Modifiers.HasFlag(KeyModifiers.Alt)
-            && !key.Modifiers.HasFlag(KeyModifiers.Meta))
+            && !key.Modifiers.HasFlag(ModifierKeys.Ctrl)
+            && !key.Modifiers.HasFlag(ModifierKeys.Alt)
+            && !key.Modifiers.HasFlag(ModifierKeys.Meta))
         {
             return Apply(TextInputBuffer.InsertText(State, key.Text, MaxLength));
         }

@@ -1,6 +1,5 @@
 using System.ComponentModel;
-using TeaSharp.Core.Abstractions;
-using TeaSharp.Core.Messages;
+using TeaSharp.Internal;
 using TeaSharp.Widgets.Internal;
 
 namespace TeaSharp.Widgets;
@@ -110,13 +109,18 @@ internal sealed class ViewportModel
         ClampOffsets();
     }
 
-    public bool Update(IMessage message, ViewportKeyMap? keyMap = null)
+    public bool Update(global::TeaSharp.Core.Abstractions.IMessage message, ViewportKeyMap? keyMap = null)
+    {
+        return Update(TeaMessageAdapter.ToPublic(message), keyMap);
+    }
+
+    public bool Update(Message message, ViewportKeyMap? keyMap = null)
     {
         keyMap ??= ViewportKeyMap.Default;
         var beforeX = XOffset;
         var beforeY = YOffset;
 
-        if (message is KeyPressMsg key)
+        if (message is KeyPressed key)
         {
             if (keyMap.Up.Matches(key)) ScrollBy(-1);
             else if (keyMap.Down.Matches(key)) ScrollBy(1);
@@ -127,10 +131,10 @@ internal sealed class ViewportModel
             else if (keyMap.Left.Matches(key)) ScrollBy(0, -2);
             else if (keyMap.Right.Matches(key)) ScrollBy(0, 2);
         }
-        else if (message is MouseWheelMsg wheel)
+        else if (message is PointerInput { Kind: PointerEventKind.Wheel } wheel)
         {
-            if (wheel.Button == MouseButton.WheelUp) ScrollBy(-3);
-            else if (wheel.Button == MouseButton.WheelDown) ScrollBy(3);
+            if (wheel.Button == PointerButton.WheelUp) ScrollBy(-3);
+            else if (wheel.Button == PointerButton.WheelDown) ScrollBy(3);
         }
 
         return beforeX != XOffset || beforeY != YOffset;

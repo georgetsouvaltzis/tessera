@@ -1,7 +1,6 @@
 using TeaSharp.Components.Primitives;
 using TeaSharp.Components.Primitives.Internal;
 using TeaSharp.Controls.Internal;
-using TeaSharp.Internal;
 using TeaSharp.Layout;
 using TeaSharp.Widgets;
 
@@ -73,14 +72,14 @@ public sealed class TextArea : Control
         }
 
         var changed = false;
-        var update = _input.Update(TeaMessageAdapter.ToCore(message));
+        var update = _input.Update(message);
         if (update.Changed)
         {
             SyncViewport();
             changed = true;
         }
 
-        if (_viewport.Update(TeaMessageAdapter.ToCore(message)))
+        if (_viewport.Update(message))
         {
             changed = true;
         }

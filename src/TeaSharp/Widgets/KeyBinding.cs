@@ -1,5 +1,5 @@
-using TeaSharp.Core.Messages;
 using System.ComponentModel;
+using TeaSharp.Internal;
 
 namespace TeaSharp.Widgets;
 
@@ -34,9 +34,14 @@ internal sealed class KeyBinding
 
     public string Description { get; }
 
-    public bool Matches(KeyPressMsg key)
+    public bool Matches(KeyPressed key)
     {
         return KeyChord.TryFromKeyPress(key, out var chord) && _chords.Contains(chord);
+    }
+
+    public bool Matches(global::TeaSharp.Core.Messages.KeyPressMsg key)
+    {
+        return TeaMessageAdapter.ToPublic(key) is KeyPressed mapped && Matches(mapped);
     }
 
     public bool Matches(string chord)
@@ -61,23 +66,23 @@ internal sealed class KeyBinding
         throw new ArgumentException($"Unsupported key chord '{chord}'.", nameof(chord));
     }
 
-    private readonly record struct KeyChord(KeyCode Code, char Character, KeyModifiers Modifiers)
+    private readonly record struct KeyChord(Key Code, char Character, ModifierKeys Modifiers)
     {
-        public static bool TryFromKeyPress(KeyPressMsg key, out KeyChord chord)
+        public static bool TryFromKeyPress(KeyPressed key, out KeyChord chord)
         {
             chord = default;
-            if (key.Code == KeyCode.Character)
+            if (key.Key == Key.Character)
             {
                 if (key.Text.Length != 1)
                 {
                     return false;
                 }
 
-                chord = new KeyChord(KeyCode.Character, char.ToLowerInvariant(key.Text[0]), key.Modifiers);
+                chord = new KeyChord(Key.Character, char.ToLowerInvariant(key.Text[0]), key.Modifiers);
                 return true;
             }
 
-            chord = new KeyChord(key.Code, '\0', key.Modifiers);
+            chord = new KeyChord(key.Key, '\0', key.Modifiers);
             return true;
         }
 
@@ -91,11 +96,11 @@ internal sealed class KeyBinding
 
             if (string.Equals(chord, "+", StringComparison.Ordinal))
             {
-                parsed = new KeyChord(KeyCode.Character, '+', KeyModifiers.None);
+                parsed = new KeyChord(Key.Character, '+', ModifierKeys.None);
                 return true;
             }
 
-            var modifiers = KeyModifiers.None;
+            var modifiers = ModifierKeys.None;
             string? keyToken = null;
             var segments = chord.Split('+', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries);
             for (var i = 0; i < segments.Length; i++)
@@ -128,73 +133,73 @@ internal sealed class KeyBinding
 
             if (keyToken.Length == 1)
             {
-                parsed = new KeyChord(KeyCode.Character, char.ToLowerInvariant(keyToken[0]), modifiers);
+                parsed = new KeyChord(Key.Character, char.ToLowerInvariant(keyToken[0]), modifiers);
                 return true;
             }
 
             return false;
         }
 
-        private static bool TryParseModifier(string token, out KeyModifiers modifier)
+        private static bool TryParseModifier(string token, out ModifierKeys modifier)
         {
             modifier = token switch
             {
-                "ctrl" or "control" => KeyModifiers.Ctrl,
-                "alt" => KeyModifiers.Alt,
-                "shift" => KeyModifiers.Shift,
-                "meta" => KeyModifiers.Meta,
-                _ => KeyModifiers.None,
+                "ctrl" or "control" => ModifierKeys.Ctrl,
+                "alt" => ModifierKeys.Alt,
+                "shift" => ModifierKeys.Shift,
+                "meta" => ModifierKeys.Meta,
+                _ => ModifierKeys.None,
             };
 
-            return modifier != KeyModifiers.None;
+            return modifier != ModifierKeys.None;
         }
 
-        private static bool TryParseKeyCode(string token, out KeyCode keyCode, out char character)
+        private static bool TryParseKeyCode(string token, out Key keyCode, out char character)
         {
             character = '\0';
             keyCode = token switch
             {
-                "enter" or "return" => KeyCode.Enter,
-                "tab" => KeyCode.Tab,
-                "esc" or "escape" => KeyCode.Escape,
-                "backspace" => KeyCode.Backspace,
-                "up" => KeyCode.Up,
-                "down" => KeyCode.Down,
-                "left" => KeyCode.Left,
-                "right" => KeyCode.Right,
-                "home" => KeyCode.Home,
-                "end" => KeyCode.End,
-                "pageup" or "pgup" => KeyCode.PageUp,
-                "pagedown" or "pgdn" => KeyCode.PageDown,
-                "insert" => KeyCode.Insert,
-                "delete" => KeyCode.Delete,
-                "f1" => KeyCode.F1,
-                "f2" => KeyCode.F2,
-                "f3" => KeyCode.F3,
-                "f4" => KeyCode.F4,
-                "f5" => KeyCode.F5,
-                "f6" => KeyCode.F6,
-                "f7" => KeyCode.F7,
-                "f8" => KeyCode.F8,
-                "f9" => KeyCode.F9,
-                "f10" => KeyCode.F10,
-                "f11" => KeyCode.F11,
-                "f12" => KeyCode.F12,
-                "space" => KeyCode.Character,
-                "plus" => KeyCode.Character,
-                _ => KeyCode.Unknown,
+                "enter" or "return" => Key.Enter,
+                "tab" => Key.Tab,
+                "esc" or "escape" => Key.Escape,
+                "backspace" => Key.Backspace,
+                "up" => Key.Up,
+                "down" => Key.Down,
+                "left" => Key.Left,
+                "right" => Key.Right,
+                "home" => Key.Home,
+                "end" => Key.End,
+                "pageup" or "pgup" => Key.PageUp,
+                "pagedown" or "pgdn" => Key.PageDown,
+                "insert" => Key.Insert,
+                "delete" => Key.Delete,
+                "f1" => Key.F1,
+                "f2" => Key.F2,
+                "f3" => Key.F3,
+                "f4" => Key.F4,
+                "f5" => Key.F5,
+                "f6" => Key.F6,
+                "f7" => Key.F7,
+                "f8" => Key.F8,
+                "f9" => Key.F9,
+                "f10" => Key.F10,
+                "f11" => Key.F11,
+                "f12" => Key.F12,
+                "space" => Key.Character,
+                "plus" => Key.Character,
+                _ => Key.Unknown,
             };
 
-            if (keyCode == KeyCode.Unknown)
+            if (keyCode == Key.Unknown)
             {
                 return false;
             }
 
-            if (keyCode == KeyCode.Character && token == "space")
+            if (keyCode == Key.Character && token == "space")
             {
                 character = ' ';
             }
-            else if (keyCode == KeyCode.Character && token == "plus")
+            else if (keyCode == Key.Character && token == "plus")
             {
                 character = '+';
             }

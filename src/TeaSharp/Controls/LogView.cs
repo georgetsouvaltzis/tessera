@@ -1,6 +1,5 @@
 using TeaSharp.Components.Primitives;
 using TeaSharp.Components.Primitives.Internal;
-using TeaSharp.Internal;
 using TeaSharp.Layout;
 using TeaSharp.Widgets;
 
@@ -102,7 +101,7 @@ public sealed class LogView : Control
             }
         }
 
-        return _viewport.Update(TeaMessageAdapter.ToCore(message), ViewportKeyMap.Default);
+        return _viewport.Update(message, ViewportKeyMap.Default);
     }
 
     public override void Render(Canvas canvas, Rect rect)

@@ -1,6 +1,5 @@
 using System.ComponentModel;
 using TeaSharp.Components.Primitives;
-using TeaSharp.Internal;
 using TeaSharp.Widgets;
 
 namespace TeaSharp.Controls;
@@ -137,7 +136,7 @@ public sealed class CommandPalette : Control
             }
         }
 
-        var inputResult = _query.Update(TeaMessageAdapter.ToCore(message));
+        var inputResult = _query.Update(message);
         if (inputResult.Changed)
         {
             RefreshFilter();

@@ -2,7 +2,6 @@ using System.ComponentModel;
 using TeaSharp.Components.Primitives;
 using TeaSharp.Controls.Internal;
 using TeaSharp.Components.Styling;
-using TeaSharp.Internal;
 using TeaSharp.Layout;
 using TeaSharp.Widgets;
 
@@ -152,7 +151,7 @@ public sealed class NumberInput : Control
             }
         }
 
-        var result = _input.Update(TeaMessageAdapter.ToCore(message));
+        var result = _input.Update(message);
         if (result.Changed)
         {
             _replaceOnNextCharacter = false;

@@ -1,7 +1,6 @@
 using TeaSharp.Components.Primitives;
 using TeaSharp.Components.Primitives.Internal;
 using TeaSharp.Controls.Internal;
-using TeaSharp.Internal;
 using TeaSharp.Layout;
 using TeaSharp.Widgets;
 
@@ -132,7 +131,7 @@ public sealed class ListView<T> : Control
 
         var previousIndex = SelectedIndex;
         var previousItem = SelectedItem;
-        var changed = _model.Update(TeaMessageAdapter.ToCore(message));
+        var changed = _model.Update(message);
         RaiseSelectionChangedIfNeeded(previousIndex, previousItem);
         return changed;
     }

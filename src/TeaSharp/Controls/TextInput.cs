@@ -1,8 +1,6 @@
 using TeaSharp.Components.Primitives;
 using TeaSharp.Components.Primitives.Internal;
 using TeaSharp.Controls.Internal;
-using TeaSharp.Core.Messages;
-using TeaSharp.Internal;
 using TeaSharp.Layout;
 using TeaSharp.Widgets;
 using System.ComponentModel;
@@ -207,7 +205,7 @@ public sealed class TextInput : Control
             return true;
         }
 
-        var result = _input.Update(TeaMessageAdapter.ToCore(message));
+        var result = _input.Update(message);
         if (!result.Submitted)
         {
             return result.Changed;
