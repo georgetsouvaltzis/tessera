@@ -6,7 +6,7 @@ using System.ComponentModel;
 namespace TeaSharp.Core.Terminal;
 
 [EditorBrowsable(EditorBrowsableState.Advanced)]
-public static class TerminalCapabilityDetector
+internal static class TerminalCapabilityDetector
 {
     public static TerminalCapabilityProfile Detect()
     {

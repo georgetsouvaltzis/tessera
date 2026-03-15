@@ -64,6 +64,9 @@ internal static class RuntimeApiContractTests
             "RuntimeApi_CoreInputDecoders_AreInternalized",
             CoreInputDecoders_AreInternalized);
         yield return new TestCase(
+            "RuntimeApi_CoreTerminalDetectors_AreInternalized",
+            CoreTerminalDetectors_AreInternalized);
+        yield return new TestCase(
             "RuntimeApi_TeaRuntimeOptions_DoNotExposeHostingOrInterceptionHooks",
             TeaRuntimeOptions_DoNotExposeHostingOrInterceptionHooks);
         yield return new TestCase(
@@ -196,6 +199,13 @@ internal static class RuntimeApiContractTests
         TestAssert.True(typeof(global::TeaSharp.Core.Input.EventDecoder).IsNotPublic, "TeaSharp.Core.Input.EventDecoder should be internal.");
         TestAssert.True(typeof(global::TeaSharp.Core.Input.IEventDecoder).IsNotPublic, "TeaSharp.Core.Input.IEventDecoder should be internal.");
         TestAssert.True(typeof(global::TeaSharp.Core.Input.DecodeResult).IsNotPublic, "TeaSharp.Core.Input.DecodeResult should be internal.");
+        return Task.CompletedTask;
+    }
+
+    private static Task CoreTerminalDetectors_AreInternalized()
+    {
+        TestAssert.True(typeof(global::TeaSharp.Core.Terminal.TerminalCapabilityDetector).IsNotPublic, "TeaSharp.Core.Terminal.TerminalCapabilityDetector should be internal.");
+        TestAssert.True(typeof(global::TeaSharp.Core.Terminal.TerminalColorProfileDetector).IsNotPublic, "TeaSharp.Core.Terminal.TerminalColorProfileDetector should be internal.");
         return Task.CompletedTask;
     }
 
