@@ -1,21 +1,21 @@
 using TeaSharp.Components.Primitives;
-using TeaSharp.Components.Productivity;
+using TeaSharp.Controls;
 using TeaSharp.Components.Styling;
 namespace TeaSharp.Components.Productivity.Internal;
 
 internal static class TimePickerFields
 {
-    public static TimePickerField Next(TimePickerField field)
+    public static TimeField Next(TimeField field)
     {
-        return (TimePickerField)(((int)field + 1) % 3);
+        return (TimeField)(((int)field + 1) % 3);
     }
 
-    public static TimePickerField Previous(TimePickerField field)
+    public static TimeField Previous(TimeField field)
     {
-        return (TimePickerField)(((int)field + 2) % 3);
+        return (TimeField)(((int)field + 2) % 3);
     }
 
-    public static TimePickerField? FieldFromPointer(Rect content, int x, int y)
+    public static TimeField? FieldFromPointer(Rect content, int x, int y)
     {
         if (y < content.Y || y >= content.Bottom)
         {
@@ -30,19 +30,19 @@ internal static class TimePickerFields
 
         return index switch
         {
-            <= 2 => TimePickerField.Hour,
-            <= 5 => TimePickerField.Minute,
-            <= 8 => TimePickerField.Second,
+            <= 2 => TimeField.Hour,
+            <= 5 => TimeField.Minute,
+            <= 8 => TimeField.Second,
             _ => null,
         };
     }
 
-    public static TimeOnly Adjust(TimeOnly value, TimePickerField activeField, int hourStep, int minuteStep, int secondStep, int direction)
+    public static TimeOnly Adjust(TimeOnly value, TimeField activeField, int hourStep, int minuteStep, int secondStep, int direction)
     {
         var delta = activeField switch
         {
-            TimePickerField.Hour => TimeSpan.FromHours(hourStep * direction),
-            TimePickerField.Minute => TimeSpan.FromMinutes(minuteStep * direction),
+            TimeField.Hour => TimeSpan.FromHours(hourStep * direction),
+            TimeField.Minute => TimeSpan.FromMinutes(minuteStep * direction),
             _ => TimeSpan.FromSeconds(secondStep * direction),
         };
 

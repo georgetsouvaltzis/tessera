@@ -1,6 +1,6 @@
 using TeaSharp.Components.Primitives;
-using TeaSharp.Components.Productivity;
 using TeaSharp.Components.Styling;
+using TeaSharp.Controls;
 namespace TeaSharp.Components.Productivity.Internal;
 
 internal static class TimePickerStateResolver
@@ -9,9 +9,9 @@ internal static class TimePickerStateResolver
         bool focused,
         bool disabled,
         bool readOnly,
-        TimePickerField activeField,
-        TimePickerField? hoveredField,
-        TimePickerField field)
+        TimeField activeField,
+        TimeField? hoveredField,
+        TimeField field)
     {
         var states = new List<WidgetVisualState>(5);
         if (focused)

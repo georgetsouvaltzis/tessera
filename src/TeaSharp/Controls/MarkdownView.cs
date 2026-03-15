@@ -1,5 +1,9 @@
 using TeaSharp.Components.Primitives;
-using TeaSharp.Components.Productivity;
+using TeaSharp.Components.Primitives.Internal;
+using TeaSharp.Components.Productivity.Internal;
+using TeaSharp.Internal;
+using TeaSharp.Layout;
+using TeaSharp.Widgets;
 
 namespace TeaSharp.Controls;
 
@@ -8,47 +12,110 @@ namespace TeaSharp.Controls;
 /// </summary>
 public sealed class MarkdownView : Control
 {
-    private readonly MarkdownViewerComponent _component = new();
+    private readonly ViewportModel _viewport = new();
+    private string _markdown = string.Empty;
 
     public string Title
     {
-        get => _component.Title;
-        set => _component.Title = value ?? string.Empty;
-    }
+        get;
+        set => field = value ?? string.Empty;
+    } = "Markdown";
 
     public BorderStyle Border
     {
-        get => _component.Border;
-        set => _component.Border = value;
-    }
+        get;
+        set;
+    } = BorderStyle.SingleLine;
 
     public Thickness Padding
     {
-        get => _component.Padding;
-        set => _component.Padding = value;
+        get;
+        set;
     }
 
     public bool Wrap
     {
-        get => _component.Wrap;
-        set => _component.Wrap = value;
+        get => _viewport.Wrap;
+        set => _viewport.SetWrap(value);
     }
 
     public bool ShowLineNumbers
     {
-        get => _component.ShowLineNumbers;
-        set => _component.ShowLineNumbers = value;
+        get => _viewport.ShowLineNumbers;
+        set => _viewport.ShowLineNumbers = value;
     }
 
     public override bool IsFocused
     {
-        get => _component.IsFocused;
-        set => _component.IsFocused = value;
+        get;
+        set;
     }
 
-    public void SetMarkdown(string markdown) => _component.SetMarkdown(markdown);
+    public void SetMarkdown(string markdown)
+    {
+        _markdown = markdown ?? string.Empty;
+        _viewport.SetLines(MarkdownLineRenderer.Render(_markdown));
+    }
 
-    public override bool Handle(Message message) => ControlForwarder.Forward(_component, message);
+    public override bool Handle(Message message)
+    {
+        return _viewport.Update(TeaMessageAdapter.ToCore(message), ViewportKeyMap.Default);
+    }
 
-    public override void Render(Canvas canvas, Rect rect) => _component.Render(canvas, rect);
+    public override void Render(Canvas canvas, Rect rect)
+    {
+        var clipped = Rect.Intersect(rect, canvas.Bounds);
+        if (clipped.IsEmpty)
+        {
+            return;
+        }
+
+        var content = FrameLayout.DrawFrameAndResolveContent(
+            canvas,
+            clipped,
+            Border == BorderStyle.None ? null : IsFocused ? $"{Title} *" : Title,
+            Border,
+            Padding);
+
+        if (content.IsEmpty)
+        {
+            return;
+        }
+
+        _viewport.Resize(content.Width, content.Height);
+        var lines = _viewport.RenderLines();
+        var rows = Math.Min(content.Height, lines.Count);
+        for (var row = 0; row < rows; row++)
+        {
+            canvas.WriteText(content.X, content.Y + row, lines[row], content.Width);
+        }
+    }
+
+    internal override LayoutMeasurement Measure(in Rect availableBounds)
+    {
+        var lines = MarkdownLineRenderer.Render(_markdown);
+        var width = 0;
+        for (var index = 0; index < lines.Count; index++)
+        {
+            width = Math.Max(width, lines[index].Length);
+        }
+
+        if (ShowLineNumbers)
+        {
+            width += 4;
+        }
+
+        width += Padding.Horizontal;
+        var height = Math.Max(1, lines.Count) + Padding.Vertical;
+        if (Border != BorderStyle.None)
+        {
+            width += 2;
+            height += 2;
+            width = Math.Max(width, Title.Length + 4);
+        }
+
+        return new LayoutMeasurement(
+            Math.Clamp(width, 0, availableBounds.Width),
+            Math.Clamp(height, 0, availableBounds.Height));
+    }
 }

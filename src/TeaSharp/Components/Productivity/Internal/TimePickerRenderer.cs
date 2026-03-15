@@ -1,7 +1,7 @@
 using TeaSharp.Components.Primitives;
 using TeaSharp.Components.Primitives.Internal;
-using TeaSharp.Components.Productivity;
 using TeaSharp.Components.Styling;
+using TeaSharp.Controls;
 using System.Globalization;
 
 namespace TeaSharp.Components.Productivity.Internal;
@@ -18,8 +18,8 @@ internal static class TimePickerRenderer
         BorderStyle border,
         Thickness padding,
         TimeOnly value,
-        TimePickerField activeField,
-        TimePickerField? hoveredField,
+        TimeField activeField,
+        TimeField? hoveredField,
         WidgetStatePalette fieldStatePalette)
     {
         var clipped = Rect.Intersect(rect, canvas.Bounds);
@@ -40,20 +40,20 @@ internal static class TimePickerRenderer
             return;
         }
 
-        var hour = RenderField(value.Hour.ToString("D2", CultureInfo.InvariantCulture), TimePickerField.Hour, focused, disabled, readOnly, activeField, hoveredField, fieldStatePalette);
-        var minute = RenderField(value.Minute.ToString("D2", CultureInfo.InvariantCulture), TimePickerField.Minute, focused, disabled, readOnly, activeField, hoveredField, fieldStatePalette);
-        var second = RenderField(value.Second.ToString("D2", CultureInfo.InvariantCulture), TimePickerField.Second, focused, disabled, readOnly, activeField, hoveredField, fieldStatePalette);
+        var hour = RenderField(value.Hour.ToString("D2", CultureInfo.InvariantCulture), TimeField.Hour, focused, disabled, readOnly, activeField, hoveredField, fieldStatePalette);
+        var minute = RenderField(value.Minute.ToString("D2", CultureInfo.InvariantCulture), TimeField.Minute, focused, disabled, readOnly, activeField, hoveredField, fieldStatePalette);
+        var second = RenderField(value.Second.ToString("D2", CultureInfo.InvariantCulture), TimeField.Second, focused, disabled, readOnly, activeField, hoveredField, fieldStatePalette);
         canvas.WriteText(content.X, content.Y, $"{hour}:{minute}:{second}", content.Width);
     }
 
     private static string RenderField(
         string value,
-        TimePickerField field,
+        TimeField field,
         bool focused,
         bool disabled,
         bool readOnly,
-        TimePickerField activeField,
-        TimePickerField? hoveredField,
+        TimeField activeField,
+        TimeField? hoveredField,
         WidgetStatePalette fieldStatePalette)
     {
         var states = TimePickerStateResolver.ResolveFieldStates(focused, disabled, readOnly, activeField, hoveredField, field);

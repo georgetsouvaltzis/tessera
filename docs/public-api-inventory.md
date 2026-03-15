@@ -151,6 +151,10 @@ The first root controls that already own their implementation directly are:
 - `Dialog`
 - `ProgressBar`
 - `LogView`
+- `NumberInput`
+- `DatePicker`
+- `TimePicker`
+- `MarkdownView`
 - `ListView<T>`
 - `Tabs`
 - `MenuBar`
