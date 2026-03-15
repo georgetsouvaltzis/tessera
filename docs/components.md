@@ -95,7 +95,6 @@ Important advanced namespaces:
 
 - `TeaSharp.Components.Prebuilt`
 - `TeaSharp.Components.Productivity`
-- `TeaSharp.Components.Advanced`
 - `TeaSharp.Components.Primitives`
 - `TeaSharp.Components.Composition`
 

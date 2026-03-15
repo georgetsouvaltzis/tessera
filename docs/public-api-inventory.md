@@ -62,7 +62,7 @@ These are the types new applications should discover first.
 - `TeaSharp.Controls.RadioGroup`
 - `TeaSharp.Controls.LogView`
 - `TeaSharp.Controls.Modal`
-- `TeaSharp.Controls.Notifications`
+- `TeaSharp.Controls.Notifications` (native)
 - `TeaSharp.Controls.Toggle`
 - `TeaSharp.Controls.Slider`
 - `TeaSharp.Controls.Spinner`
@@ -71,7 +71,7 @@ These are the types new applications should discover first.
 - `TeaSharp.Controls.ListView<T>`
 - `TeaSharp.Controls.Table`
 - `TeaSharp.Controls.TreeItem`
-- `TeaSharp.Controls.TreeView`
+- `TeaSharp.Controls.TreeView` (native)
 - `TeaSharp.Controls.MenuBar`
 - `TeaSharp.Controls.MenuItem`
 - `TeaSharp.Controls.Control`

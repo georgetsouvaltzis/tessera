@@ -1,5 +1,7 @@
-using TeaSharp.Components.Advanced;
 using TeaSharp.Components.Primitives;
+using TeaSharp.Components.Primitives.Internal;
+using TeaSharp.Components.Styling;
+using TeaSharp.Layout;
 
 namespace TeaSharp.Controls;
 
@@ -8,73 +10,394 @@ namespace TeaSharp.Controls;
 /// </summary>
 public sealed class TreeView : Control
 {
-    private readonly TreeViewComponent _component = new();
+    private readonly List<TreeItem> _roots = [];
+    private readonly List<(TreeItem Node, int Depth, int? ParentVisibleIndex)> _visible = [];
+    private readonly WidgetStatePalette _statePalette = WidgetStatePalette.CreateDefault();
+    private int _selectedIndex;
+    private int _hoveredIndex = -1;
 
     public string Title
     {
-        get => _component.Title;
-        set => _component.Title = value ?? string.Empty;
-    }
+        get;
+        set => field = value ?? string.Empty;
+    } = "Tree";
 
-    public string? SelectedId => _component.SelectedNodeId;
+    public string? SelectedId => _selectedIndex >= 0 && _selectedIndex < _visible.Count
+        ? _visible[_selectedIndex].Node.Id
+        : null;
 
     public BorderStyle Border
     {
-        get => _component.Border;
-        set => _component.Border = value;
-    }
+        get;
+        set;
+    } = BorderStyle.SingleLine;
 
     public Thickness Padding
     {
-        get => _component.Padding;
-        set => _component.Padding = value;
+        get;
+        set;
     }
 
     public override bool IsFocused
     {
-        get => _component.IsFocused;
-        set => _component.IsFocused = value;
+        get;
+        set;
     }
 
     public override bool IsDisabled
     {
-        get => _component.IsDisabled;
-        set => _component.IsDisabled = value;
+        get;
+        set;
     }
 
     public override bool IsReadOnly
     {
-        get => _component.IsReadOnly;
-        set => _component.IsReadOnly = value;
+        get;
+        set;
     }
 
     public void SetItems(IEnumerable<TreeItem> items)
     {
         ArgumentNullException.ThrowIfNull(items);
-        _component.SetRoots(items.Select(ToNode));
+        _roots.Clear();
+        foreach (var item in items)
+        {
+            if (item is not null)
+            {
+                _roots.Add(Clone(item));
+            }
+        }
+
+        RefreshVisible();
     }
 
     public override bool Handle(Message message)
     {
-        return ControlForwarder.Forward(_component, message);
+        if (!IsFocused || IsDisabled || IsReadOnly || message is not KeyPressed key || _visible.Count == 0)
+        {
+            return false;
+        }
+
+        if (key.Is(Key.Down) || key.IsCharacter('j'))
+        {
+            return MoveSelection(+1);
+        }
+
+        if (key.Is(Key.Up) || key.IsCharacter('k'))
+        {
+            return MoveSelection(-1);
+        }
+
+        if (key.Is(Key.Right) || key.IsCharacter('l'))
+        {
+            return ExpandOrMoveIntoChild();
+        }
+
+        if (key.Is(Key.Left) || key.IsCharacter('h'))
+        {
+            return CollapseOrMoveToParent();
+        }
+
+        if (key.Is(Key.Enter) || key.IsCharacter(' '))
+        {
+            var node = _visible[_selectedIndex].Node;
+            if (node.Children.Count == 0)
+            {
+                return false;
+            }
+
+            node.Expanded = !node.Expanded;
+            RefreshVisible();
+            return true;
+        }
+
+        return false;
     }
 
     public override bool Handle(Message message, Rect bounds)
     {
-        return ControlForwarder.Forward(_component, message, bounds) || Handle(message);
+        if (IsDisabled || IsReadOnly || message is not PointerInput pointer || _visible.Count == 0)
+        {
+            return Handle(message);
+        }
+
+        var content = ResolveContentRect(bounds);
+        if (content.IsEmpty)
+        {
+            return Handle(message);
+        }
+
+        var inside = content.Contains(pointer.X, pointer.Y);
+        var changed = false;
+        if (!inside)
+        {
+            if (pointer.Kind is PointerEventKind.Motion or PointerEventKind.Press)
+            {
+                changed |= SetHoveredIndex(-1);
+            }
+
+            if (pointer.Kind is not PointerEventKind.Wheel)
+            {
+                return changed || Handle(message);
+            }
+        }
+
+        if (pointer.Kind == PointerEventKind.Wheel)
+        {
+            if (pointer.Button == PointerButton.WheelDown)
+            {
+                return MoveSelection(+1) || changed;
+            }
+
+            if (pointer.Button == PointerButton.WheelUp)
+            {
+                return MoveSelection(-1) || changed;
+            }
+        }
+
+        if (!inside)
+        {
+            return changed || Handle(message);
+        }
+
+        var hovered = ComputeWindowStart(content.Height) + (pointer.Y - content.Y);
+        if (hovered < 0 || hovered >= _visible.Count)
+        {
+            hovered = -1;
+        }
+
+        if (pointer.Kind == PointerEventKind.Motion)
+        {
+            return SetHoveredIndex(hovered);
+        }
+
+        if (pointer.Kind == PointerEventKind.Press && pointer.Button == PointerButton.Left && hovered >= 0)
+        {
+            changed |= SetHoveredIndex(hovered);
+            if (_selectedIndex != hovered)
+            {
+                _selectedIndex = hovered;
+                changed = true;
+            }
+
+            return changed;
+        }
+
+        return changed || Handle(message);
     }
 
     public override void Render(Canvas canvas, Rect rect)
     {
-        _component.Render(canvas, rect);
+        var clipped = Rect.Intersect(rect, canvas.Bounds);
+        if (clipped.IsEmpty)
+        {
+            return;
+        }
+
+        var content = FrameLayout.DrawFrameAndResolveContent(
+            canvas,
+            clipped,
+            Border == BorderStyle.None ? null : IsFocused ? $"{Title} *" : Title,
+            Border,
+            Padding);
+        if (content.IsEmpty)
+        {
+            return;
+        }
+
+        if (_visible.Count == 0)
+        {
+            canvas.WriteText(content.X, content.Y, _statePalette.Render("(empty)", WidgetVisualState.Empty), content.Width);
+            return;
+        }
+
+        var start = ComputeWindowStart(content.Height);
+        var end = Math.Min(_visible.Count, start + content.Height);
+        for (var row = 0; row < end - start; row++)
+        {
+            var index = start + row;
+            var (node, depth, _) = _visible[index];
+            var indent = new string(' ', Math.Max(0, depth) * 2);
+            var marker = node.Children.Count == 0 ? "•" : node.Expanded ? "▾" : "▸";
+            var cursor = index == _selectedIndex ? ">" : " ";
+            canvas.WriteText(
+                content.X,
+                content.Y + row,
+                _statePalette.Render($"{cursor} {indent}{marker} {node.Label}", ResolveStates(index == _selectedIndex, index == _hoveredIndex)),
+                content.Width);
+        }
     }
 
-    private static TreeItemNode ToNode(TreeItem item)
+    internal override LayoutMeasurement Measure(in Rect availableBounds)
     {
-        var node = new TreeItemNode(item.Id, item.Label, item.Children.Select(ToNode))
+        var width = Math.Max(12, Title.Length + 4);
+        if (_visible.Count > 0)
+        {
+            width = Math.Max(width, _visible.Max(static entry => (entry.Depth * 2) + entry.Node.Label.Length + 4));
+        }
+
+        var height = Math.Max(1, _visible.Count);
+        if (Border != BorderStyle.None)
+        {
+            width += 2 + Padding.Horizontal;
+            height += 2 + Padding.Vertical;
+        }
+
+        return new LayoutMeasurement(
+            Math.Clamp(width, 0, availableBounds.Width),
+            Math.Clamp(height, 0, availableBounds.Height));
+    }
+
+    private bool MoveSelection(int delta)
+    {
+        var next = delta > 0
+            ? Math.Min(_visible.Count - 1, _selectedIndex + delta)
+            : Math.Max(0, _selectedIndex + delta);
+        if (next == _selectedIndex)
+        {
+            return false;
+        }
+
+        _selectedIndex = next;
+        return true;
+    }
+
+    private bool ExpandOrMoveIntoChild()
+    {
+        var node = _visible[_selectedIndex].Node;
+        if (node.Children.Count == 0)
+        {
+            return false;
+        }
+
+        if (!node.Expanded)
+        {
+            node.Expanded = true;
+            RefreshVisible();
+            return true;
+        }
+
+        if (_selectedIndex + 1 < _visible.Count && _visible[_selectedIndex + 1].Depth > _visible[_selectedIndex].Depth)
+        {
+            _selectedIndex++;
+            return true;
+        }
+
+        return false;
+    }
+
+    private bool CollapseOrMoveToParent()
+    {
+        var entry = _visible[_selectedIndex];
+        if (entry.Node.Expanded && entry.Node.Children.Count > 0)
+        {
+            entry.Node.Expanded = false;
+            RefreshVisible();
+            return true;
+        }
+
+        if (entry.ParentVisibleIndex is int parent)
+        {
+            _selectedIndex = parent;
+            return true;
+        }
+
+        return false;
+    }
+
+    private void RefreshVisible()
+    {
+        _visible.Clear();
+        for (var index = 0; index < _roots.Count; index++)
+        {
+            AppendVisible(_roots[index], 0, null);
+        }
+
+        if (_visible.Count == 0)
+        {
+            _selectedIndex = 0;
+            _hoveredIndex = -1;
+            return;
+        }
+
+        _selectedIndex = Math.Clamp(_selectedIndex, 0, _visible.Count - 1);
+        _hoveredIndex = Math.Clamp(_hoveredIndex, -1, _visible.Count - 1);
+    }
+
+    private void AppendVisible(TreeItem node, int depth, int? parentVisibleIndex)
+    {
+        var visibleIndex = _visible.Count;
+        _visible.Add((node, depth, parentVisibleIndex));
+        if (!node.Expanded || node.Children.Count == 0)
+        {
+            return;
+        }
+
+        for (var index = 0; index < node.Children.Count; index++)
+        {
+            AppendVisible(node.Children[index], depth + 1, visibleIndex);
+        }
+    }
+
+    private Rect ResolveContentRect(Rect bounds)
+    {
+        return FrameLayout.ResolveContentRect(bounds, Border, Padding);
+    }
+
+    private int ComputeWindowStart(int contentHeight)
+    {
+        return Math.Clamp(_selectedIndex - (contentHeight / 2), 0, Math.Max(0, _visible.Count - contentHeight));
+    }
+
+    private bool SetHoveredIndex(int index)
+    {
+        if (_hoveredIndex == index)
+        {
+            return false;
+        }
+
+        _hoveredIndex = index;
+        return true;
+    }
+
+    private List<WidgetVisualState> ResolveStates(bool selected, bool hovered)
+    {
+        var states = new List<WidgetVisualState>(5);
+        if (IsFocused)
+        {
+            states.Add(WidgetVisualState.Focused);
+        }
+
+        if (IsDisabled)
+        {
+            states.Add(WidgetVisualState.Disabled);
+        }
+
+        if (IsReadOnly)
+        {
+            states.Add(WidgetVisualState.ReadOnly);
+        }
+
+        if (selected)
+        {
+            states.Add(WidgetVisualState.Cursor);
+            states.Add(WidgetVisualState.Selected);
+        }
+
+        if (hovered)
+        {
+            states.Add(WidgetVisualState.Hovered);
+        }
+
+        return states;
+    }
+
+    private static TreeItem Clone(TreeItem item)
+    {
+        var clone = new TreeItem(item.Id, item.Label, item.Children.Select(Clone))
         {
             Expanded = item.Expanded,
         };
-        return node;
+        return clone;
     }
 }

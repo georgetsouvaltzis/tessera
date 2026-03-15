@@ -91,14 +91,7 @@ internal static class TeaControlCatalogTests
         "TeaSharp.Components.Prebuilt.TableOptions",
     ];
 
-    private static readonly string[] InternalizedLegacyPromotedTypes =
-    [
-        "TeaSharp.Components.Advanced.NotificationCenterComponent",
-        "TeaSharp.Components.Advanced.NotificationEntry",
-        "TeaSharp.Components.Advanced.NotificationSeverity",
-        "TeaSharp.Components.Advanced.TreeItemNode",
-        "TeaSharp.Components.Advanced.TreeViewComponent",
-    ];
+    private static readonly string[] InternalizedLegacyPromotedTypes = [];
 
     private static readonly string[] RemovedLegacyPromotedTypes =
     [
@@ -114,8 +107,13 @@ internal static class TeaControlCatalogTests
         "TeaSharp.Components.Advanced.CommandPaletteItem",
         "TeaSharp.Components.Advanced.CommandPaletteItemExecutedEventArgs",
         "TeaSharp.Components.Advanced.BadgeComponent",
+        "TeaSharp.Components.Advanced.NotificationCenterComponent",
+        "TeaSharp.Components.Advanced.NotificationEntry",
+        "TeaSharp.Components.Advanced.NotificationSeverity",
         "TeaSharp.Components.Advanced.SliderComponent",
         "TeaSharp.Components.Advanced.SpinnerComponent",
+        "TeaSharp.Components.Advanced.TreeItemNode",
+        "TeaSharp.Components.Advanced.TreeViewComponent",
         "TeaSharp.Components.Advanced.ToggleSwitchComponent",
         "TeaSharp.Components.Productivity.DateChangedEventArgs",
         "TeaSharp.Components.Productivity.DatePickerComponent",

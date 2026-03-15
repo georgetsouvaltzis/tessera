@@ -1,7 +1,5 @@
-using TeaSharp.Components.Advanced;
 using TeaSharp.Components.Primitives;
 using TeaSharp.Controls;
-using TeaSharp.Core.Messages;
 
 namespace TeaSharp.Tests;
 
@@ -19,10 +17,10 @@ internal static class AdvancedPrebuiltWidgetTests
         yield return new TestCase("Controls_Spinner_MouseClickTogglesRunning", Spinner_MouseClickTogglesRunning);
         yield return new TestCase("Controls_Spinner_MouseWheelAdvancesFrame", Spinner_MouseWheelAdvancesFrame);
         yield return new TestCase("Controls_Toggle_MouseWheelSetsValue", Toggle_MouseWheelSetsValue);
-        yield return new TestCase("Advanced_TreeViewComponent_TogglesExpansion", TreeViewComponent_TogglesExpansion);
-        yield return new TestCase("Advanced_TreeViewComponent_MouseClickSelectsVisibleNode", TreeViewComponent_MouseClickSelectsVisibleNode);
-        yield return new TestCase("Advanced_NotificationCenterComponent_DismissesEntries", NotificationCenterComponent_DismissesEntries);
-        yield return new TestCase("Advanced_NotificationCenterComponent_MouseWheelMovesSelection", NotificationCenterComponent_MouseWheelMovesSelection);
+        yield return new TestCase("Controls_TreeView_TogglesExpansion", TreeView_TogglesExpansion);
+        yield return new TestCase("Controls_TreeView_MouseClickSelectsVisibleNode", TreeView_MouseClickSelectsVisibleNode);
+        yield return new TestCase("Controls_Notifications_DismissesEntries", Notifications_DismissesEntries);
+        yield return new TestCase("Controls_Notifications_MouseWheelMovesSelection", Notifications_MouseWheelMovesSelection);
     }
 
     private static Task Badge_RendersLabel()
@@ -198,18 +196,18 @@ internal static class AdvancedPrebuiltWidgetTests
         return Task.CompletedTask;
     }
 
-    private static Task TreeViewComponent_TogglesExpansion()
+    private static Task TreeView_TogglesExpansion()
     {
-        var tree = new TreeViewComponent
+        var tree = new TreeView
         {
             IsFocused = true,
             Border = BorderStyle.None,
         };
-        tree.SetRoots(
+        tree.SetItems(
         [
-            new TreeItemNode("root", "Root",
+            new TreeItem("root", "Root",
             [
-                new TreeItemNode("child", "Child"),
+                new TreeItem("child", "Child"),
             ]),
         ]);
         var canvas = new Canvas(40, 5);
@@ -218,7 +216,7 @@ internal static class AdvancedPrebuiltWidgetTests
         var expanded = canvas.Render();
         TestAssert.True(expanded.Contains("Child", StringComparison.Ordinal), "Tree should render child when expanded.");
 
-        tree.Update(new KeyPressMsg(KeyCode.Enter));
+        tree.Handle(new KeyPressed(Key.Enter));
         canvas.Clear();
         tree.Render(canvas, new Rect(0, 0, 40, 5));
         var collapsed = canvas.Render();
@@ -226,62 +224,70 @@ internal static class AdvancedPrebuiltWidgetTests
         return Task.CompletedTask;
     }
 
-    private static Task TreeViewComponent_MouseClickSelectsVisibleNode()
+    private static Task TreeView_MouseClickSelectsVisibleNode()
     {
-        var tree = new TreeViewComponent
+        var tree = new TreeView
         {
             Border = BorderStyle.None,
         };
-        tree.SetRoots(
+        tree.SetItems(
         [
-            new TreeItemNode("root", "Root",
+            new TreeItem("root", "Root",
             [
-                new TreeItemNode("child", "Child"),
+                new TreeItem("child", "Child"),
             ]),
         ]);
 
-        var changed = tree.UpdateMouse(new MouseClickMsg(MouseButton.Left, 0, 1), new Rect(0, 0, 30, 4));
+        var changed = tree.Handle(new PointerInput(PointerEventKind.Press, PointerButton.Left, 0, 1), new Rect(0, 0, 30, 4));
 
         TestAssert.True(changed, "Tree click should update selected node.");
-        TestAssert.Equal("child", tree.SelectedNodeId ?? string.Empty, "Tree click should select visible row under pointer.");
+        TestAssert.Equal("child", tree.SelectedId ?? string.Empty, "Tree click should select visible row under pointer.");
         return Task.CompletedTask;
     }
 
-    private static Task NotificationCenterComponent_DismissesEntries()
+    private static Task Notifications_DismissesEntries()
     {
-        var center = new NotificationCenterComponent
+        var center = new Notifications
         {
             IsFocused = true,
         };
-        center.Push("hello", NotificationSeverity.Info, id: "a");
-        center.Push("oops", NotificationSeverity.Error, id: "b");
+        center.Push("hello", NotificationLevel.Info, id: "a");
+        center.Push("oops", NotificationLevel.Error, id: "b");
 
-        center.Update(new KeyPressMsg(KeyCode.Down));
-        center.Update(new KeyPressMsg(KeyCode.Character, "d"));
+        center.Handle(new KeyPressed(Key.Down));
+        center.Handle(new KeyPressed(Key.Character, "d"));
 
-        TestAssert.Equal(1, center.Entries.Count, "Notification center should dismiss selected entry.");
-        TestAssert.Equal("a", center.Entries[0].Id, "Remaining entry should be the non-selected one.");
+        TestAssert.Equal(1, center.Count, "Notification center should dismiss selected entry.");
+        var canvas = new Canvas(48, 4);
+        center.Render(canvas, new Rect(0, 0, 48, 4));
+        var output = canvas.Render();
+        TestAssert.True(output.Contains("hello", StringComparison.Ordinal), "Remaining entry should still render.");
+        TestAssert.True(!output.Contains("oops", StringComparison.Ordinal), "Dismissed entry should no longer render.");
         return Task.CompletedTask;
     }
 
-    private static Task NotificationCenterComponent_MouseWheelMovesSelection()
+    private static Task Notifications_MouseWheelMovesSelection()
     {
-        var center = new NotificationCenterComponent
+        var center = new Notifications
         {
             IsFocused = true,
             Border = BorderStyle.None,
         };
-        center.Push("first", NotificationSeverity.Info, id: "a");
-        center.Push("second", NotificationSeverity.Info, id: "b");
-        center.Push("third", NotificationSeverity.Info, id: "c");
+        center.Push("first", NotificationLevel.Info, id: "a");
+        center.Push("second", NotificationLevel.Info, id: "b");
+        center.Push("third", NotificationLevel.Info, id: "c");
 
-        var changed = center.UpdateMouse(new MouseWheelMsg(MouseButton.WheelUp, 0, 1), new Rect(0, 0, 32, 6));
-        center.Update(new KeyPressMsg(KeyCode.Character, "d"));
+        var changed = center.Handle(new PointerInput(PointerEventKind.Wheel, PointerButton.WheelUp, 0, 1), new Rect(0, 0, 32, 6));
+        center.Handle(new KeyPressed(Key.Character, "d"));
 
         TestAssert.True(changed, "Notification center wheel should move selected entry.");
-        TestAssert.Equal(2, center.Entries.Count, "Dismiss should remove wheel-selected entry.");
-        TestAssert.True(center.Entries.Any(entry => entry.Id == "c"), "Newest entry should remain after moving selection up.");
-        TestAssert.True(center.Entries.Any(entry => entry.Id == "a"), "Oldest entry should remain after removing middle entry.");
+        TestAssert.Equal(2, center.Count, "Dismiss should remove wheel-selected entry.");
+        var canvas = new Canvas(48, 6);
+        center.Render(canvas, new Rect(0, 0, 48, 6));
+        var output = canvas.Render();
+        TestAssert.True(output.Contains("third", StringComparison.Ordinal), "Newest entry should remain after moving selection up.");
+        TestAssert.True(output.Contains("first", StringComparison.Ordinal), "Oldest entry should remain after removing middle entry.");
+        TestAssert.True(!output.Contains("second", StringComparison.Ordinal), "Wheel-selected entry should be removed.");
         return Task.CompletedTask;
     }
 }

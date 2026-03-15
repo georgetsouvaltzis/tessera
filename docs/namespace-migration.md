@@ -28,7 +28,6 @@ Old default mindset:
 - `TeaSharp.Components.Prebuilt`
 - `TeaSharp.Components.Productivity`
 - `TeaSharp.Components.UiKit`
-- `TeaSharp.Components.Advanced`
 
 New default mindset:
 
