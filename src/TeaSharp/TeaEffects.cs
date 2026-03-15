@@ -26,12 +26,12 @@ public static class TeaEffects
     /// <summary>
     /// Gets an effect that terminates the application loop.
     /// </summary>
-    public static TeaEffect Quit => TeaEffectAdapter.FromCore(global::TeaSharp.Core.Commands.Effects.Quit)!;
+    public static TeaEffect Quit => TeaEffectFactory.Quit;
 
     /// <summary>
     /// Gets an effect that interrupts the current program execution.
     /// </summary>
-    public static TeaEffect Interrupt => TeaEffectAdapter.FromCore(global::TeaSharp.Core.Commands.Effects.Interrupt)!;
+    public static TeaEffect Interrupt => TeaEffectFactory.Interrupt;
 
     /// <summary>
     /// Emits a message after the supplied delay.
@@ -79,9 +79,7 @@ public static class TeaEffects
     /// <returns>The combined effect, or <see langword="null"/> when nothing is supplied.</returns>
     public static TeaEffect? Batch(params TeaEffect?[] effects)
     {
-        var core = global::TeaSharp.Core.Commands.Effects.Batch(
-            effects.Select(TeaEffectAdapter.ToCore).ToArray());
-        return TeaEffectAdapter.FromCore(core);
+        return TeaEffectFactory.Batch(effects);
     }
 
     /// <summary>
@@ -91,9 +89,7 @@ public static class TeaEffects
     /// <returns>The combined effect, or <see langword="null"/> when nothing is supplied.</returns>
     public static TeaEffect? Sequence(params TeaEffect?[] effects)
     {
-        var core = global::TeaSharp.Core.Commands.Effects.Sequence(
-            effects.Select(TeaEffectAdapter.ToCore).ToArray());
-        return TeaEffectAdapter.FromCore(core);
+        return TeaEffectFactory.Sequence(effects);
     }
 
     /// <summary>
@@ -102,7 +98,7 @@ public static class TeaEffects
     /// <param name="content">The raw terminal content to emit.</param>
     /// <returns>An effect that writes the supplied content.</returns>
     public static TeaEffect Raw(string content) =>
-        TeaEffectAdapter.FromCore(global::TeaSharp.Core.Commands.Effects.Raw(content))!;
+        TeaEffectFactory.Raw(content);
 
     /// <summary>
     /// Requests a terminal capability value by name.
@@ -110,7 +106,7 @@ public static class TeaEffects
     /// <param name="name">The capability name.</param>
     /// <returns>An effect that requests the capability.</returns>
     public static TeaEffect RequestCapability(string name) =>
-        TeaEffectAdapter.FromCore(global::TeaSharp.Core.Commands.Effects.RequestCapability(name))!;
+        TeaEffectFactory.RequestCapability(name);
 
     /// <summary>
     /// Writes content to the clipboard.
@@ -118,14 +114,14 @@ public static class TeaEffects
     /// <param name="content">The content to store.</param>
     /// <returns>An effect that writes to the clipboard.</returns>
     public static TeaEffect SetClipboard(string content) =>
-        TeaEffectAdapter.FromCore(global::TeaSharp.Core.Commands.Effects.SetClipboard(content))!;
+        TeaEffectFactory.SetClipboard(content);
 
     /// <summary>
     /// Reads the current clipboard content.
     /// </summary>
     /// <returns>An effect that requests clipboard content.</returns>
     public static TeaEffect ReadClipboard() =>
-        TeaEffectAdapter.FromCore(global::TeaSharp.Core.Commands.Effects.ReadClipboard())!;
+        TeaEffectFactory.ReadClipboard();
 
     /// <summary>
     /// Writes content to the primary clipboard selection.
@@ -133,33 +129,33 @@ public static class TeaEffects
     /// <param name="content">The content to store.</param>
     /// <returns>An effect that writes to the primary clipboard selection.</returns>
     public static TeaEffect SetPrimaryClipboard(string content) =>
-        TeaEffectAdapter.FromCore(global::TeaSharp.Core.Commands.Effects.SetPrimaryClipboard(content))!;
+        TeaEffectFactory.SetPrimaryClipboard(content);
 
     /// <summary>
     /// Reads the current primary clipboard selection.
     /// </summary>
     /// <returns>An effect that requests primary clipboard content.</returns>
     public static TeaEffect ReadPrimaryClipboard() =>
-        TeaEffectAdapter.FromCore(global::TeaSharp.Core.Commands.Effects.ReadPrimaryClipboard())!;
+        TeaEffectFactory.ReadPrimaryClipboard();
 
     /// <summary>
     /// Requests the terminal foreground color.
     /// </summary>
     /// <returns>An effect that requests the foreground color.</returns>
     public static TeaEffect RequestForegroundColor() =>
-        TeaEffectAdapter.FromCore(global::TeaSharp.Core.Commands.Effects.RequestForegroundColor())!;
+        TeaEffectFactory.RequestForegroundColor();
 
     /// <summary>
     /// Requests the terminal background color.
     /// </summary>
     /// <returns>An effect that requests the background color.</returns>
     public static TeaEffect RequestBackgroundColor() =>
-        TeaEffectAdapter.FromCore(global::TeaSharp.Core.Commands.Effects.RequestBackgroundColor())!;
+        TeaEffectFactory.RequestBackgroundColor();
 
     /// <summary>
     /// Requests the terminal cursor color.
     /// </summary>
     /// <returns>An effect that requests the cursor color.</returns>
     public static TeaEffect RequestCursorColor() =>
-        TeaEffectAdapter.FromCore(global::TeaSharp.Core.Commands.Effects.RequestCursorColor())!;
+        TeaEffectFactory.RequestCursorColor();
 }
