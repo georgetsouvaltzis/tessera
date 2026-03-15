@@ -1,5 +1,4 @@
 using TeaSharp.Components.Composition;
-using TeaSharp.Components.Interaction;
 using TeaSharp.Components.Primitives;
 using TeaSharp.Components.Styling;
 using TeaSharp.Core.Abstractions;

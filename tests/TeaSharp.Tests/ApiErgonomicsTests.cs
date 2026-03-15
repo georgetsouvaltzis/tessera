@@ -1,4 +1,3 @@
-using TeaSharp.Components.Interaction;
 using TeaSharp.Components.Primitives;
 using TeaSharp.Components.Styling;
 using TeaSharp.Controls;

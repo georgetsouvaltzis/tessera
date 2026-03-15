@@ -1,4 +1,3 @@
-using TeaSharp.Components.Interaction;
 using TeaSharp.Components.Primitives;
 using TeaSharp.Components.Styling;
 
@@ -20,7 +19,6 @@ internal static class WidgetApiContractTests
         "TeaSharp.Widgets.ListRow`1",
         "TeaSharp.Widgets.ListModel`1",
         "TeaSharp.Widgets.ViewportModel",
-        "TeaSharp.Components.Interaction.WidgetInteractionProfile",
         "TeaSharp.Components.Styling.WidgetVisualState",
         "TeaSharp.Components.Styling.WidgetStatePalette",
         "TeaSharp.Components.Styling.WidgetStateAppearance",
