@@ -1,6 +1,6 @@
-using System.ComponentModel;
-using TeaSharp.Components.Charting;
 using TeaSharp.Components.Primitives;
+using TeaSharp.Controls.Internal;
+using TeaSharp.Layout;
 
 namespace TeaSharp.Controls;
 
@@ -9,7 +9,6 @@ namespace TeaSharp.Controls;
 /// </summary>
 public sealed class BarChart : Control
 {
-    private readonly BarChartComponent _component = new();
     private readonly List<BarPoint> _bars = [];
 
     /// <summary>
@@ -17,17 +16,17 @@ public sealed class BarChart : Control
     /// </summary>
     public string Title
     {
-        get => _component.Title;
-        set => _component.Title = value ?? string.Empty;
-    }
+        get;
+        set => field = value ?? string.Empty;
+    } = "Bar Chart";
 
     /// <summary>
     /// Gets or sets the optional maximum value used when scaling bars.
     /// </summary>
     public double? MaxValue
     {
-        get => _component.MaxValue;
-        set => _component.MaxValue = value;
+        get;
+        set;
     }
 
     /// <summary>
@@ -38,11 +37,11 @@ public sealed class BarChart : Control
     /// <summary>
     /// Gets or sets advanced chart rendering options.
     /// </summary>
-    [EditorBrowsable(EditorBrowsableState.Advanced)]
+    [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Advanced)]
     public BarChartOptions? Options
     {
-        get => _component.Options;
-        set => _component.Options = value;
+        get;
+        set;
     }
 
     /// <summary>
@@ -58,8 +57,6 @@ public sealed class BarChart : Control
         {
             _bars.Add(new BarPoint(bar.Label ?? string.Empty, bar.Value));
         }
-
-        _component.SetBars(_bars.Select(static bar => new BarDatum(bar.Label, bar.Value)));
     }
 
     /// <summary>
@@ -75,17 +72,30 @@ public sealed class BarChart : Control
             if (string.Equals(_bars[i].Label, normalizedLabel, StringComparison.Ordinal))
             {
                 _bars[i] = new BarPoint(normalizedLabel, value);
-                _component.SetValue(normalizedLabel, value);
                 return;
             }
         }
 
         _bars.Add(new BarPoint(normalizedLabel, value));
-        _component.SetValue(normalizedLabel, value);
     }
 
     public override void Render(Canvas canvas, Rect rect)
     {
-        _component.Render(canvas, rect);
+        ChartRenderer.DrawBarChart(canvas, rect, _bars, Title, MaxValue, Options);
+    }
+
+    internal override LayoutMeasurement Measure(in Rect availableBounds)
+    {
+        var widestLabel = 0;
+        for (var i = 0; i < _bars.Count; i++)
+        {
+            widestLabel = Math.Max(widestLabel, _bars[i].Label.Length);
+        }
+
+        var width = Math.Max(12, widestLabel + 14);
+        var height = Math.Max(4, _bars.Count + 2);
+        return new LayoutMeasurement(
+            Math.Clamp(width, 0, availableBounds.Width),
+            Math.Clamp(height, 0, availableBounds.Height));
     }
 }

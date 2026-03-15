@@ -1,5 +1,4 @@
 using TeaSharp.Components.Advanced;
-using TeaSharp.Components.Charting;
 using TeaSharp.Components.Composition;
 using TeaSharp.Components.Interaction;
 using TeaSharp.Components.Prebuilt;
@@ -72,8 +71,8 @@ internal static class RuntimeApiContractTests
             "RuntimeApi_DefaultSpacingAndBorderTypes_LiveAtRootNamespace",
             DefaultSpacingAndBorderTypes_LiveAtRootNamespace);
         yield return new TestCase(
-            "RuntimeApi_LegacyChartDashboardAndCanvasHelpers_AreInternalized",
-            LegacyChartDashboardAndCanvasHelpers_AreInternalized);
+            "RuntimeApi_LegacyChartingHelpers_AreRemoved",
+            LegacyChartingHelpers_AreRemoved);
         yield return new TestCase(
             "RuntimeApi_LegacyDashboardHelpers_AreRemoved",
             LegacyDashboardHelpers_AreRemoved);
@@ -210,7 +209,7 @@ internal static class RuntimeApiContractTests
         return Task.CompletedTask;
     }
 
-    private static Task LegacyChartDashboardAndCanvasHelpers_AreInternalized()
+    private static Task LegacyChartingHelpers_AreRemoved()
     {
         string[] typeNames =
         [
@@ -225,8 +224,14 @@ internal static class RuntimeApiContractTests
         foreach (var typeName in typeNames)
         {
             var type = assembly.GetType(typeName, throwOnError: false);
-            TestAssert.True(type is not null, $"{typeName} should continue to exist as an internal bridge.");
-            TestAssert.True(type!.IsNotPublic, $"{typeName} should no longer be public once a root wrapper exists.");
+            if (typeName == "TeaSharp.Components.Primitives.Widgets")
+            {
+                TestAssert.True(type is not null, $"{typeName} should continue to exist as an internal bridge.");
+                TestAssert.True(type!.IsNotPublic, $"{typeName} should no longer be public once a root wrapper exists.");
+                continue;
+            }
+
+            TestAssert.True(type is null, $"{typeName} should be removed once the root wrapper owns the implementation directly.");
         }
 
         return Task.CompletedTask;

@@ -1,18 +1,17 @@
-using TeaSharp.Components.Composition;
 using TeaSharp.Components.Primitives;
-using TeaSharp.Controls;
-namespace TeaSharp.Components.Charting;
 
-internal static class Charts
+namespace TeaSharp.Controls.Internal;
+
+internal static class ChartRenderer
 {
     public static void DrawLineChart(
         Canvas canvas,
         Rect rect,
         IReadOnlyList<double> samples,
-        string title = "Line Chart",
-        double? minValue = null,
-        double? maxValue = null,
-        LineChartOptions? options = null)
+        string title,
+        double? minValue,
+        double? maxValue,
+        LineChartOptions? options)
     {
         var clipped = Rect.Intersect(rect, canvas.Bounds);
         if (clipped.IsEmpty || clipped.Width < 4 || clipped.Height < 4)
@@ -125,10 +124,10 @@ internal static class Charts
     public static void DrawBarChart(
         Canvas canvas,
         Rect rect,
-        IReadOnlyList<BarDatum> bars,
-        string title = "Bar Chart",
-        double? maxValue = null,
-        BarChartOptions? options = null)
+        IReadOnlyList<BarPoint> bars,
+        string title,
+        double? maxValue,
+        BarChartOptions? options)
     {
         var clipped = Rect.Intersect(rect, canvas.Bounds);
         if (clipped.IsEmpty || clipped.Width < 6 || clipped.Height < 3)
@@ -164,10 +163,7 @@ internal static class Charts
         var widestLabel = 0;
         for (var i = 0; i < rows; i++)
         {
-            if (bars[i].Label.Length > widestLabel)
-            {
-                widestLabel = bars[i].Label.Length;
-            }
+            widestLabel = Math.Max(widestLabel, bars[i].Label.Length);
         }
 
         var labelWidth = Math.Clamp(widestLabel, 3, 12);

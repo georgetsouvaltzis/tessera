@@ -162,6 +162,8 @@ The first root controls that already own their implementation directly are:
 - `Gauge`
 - `MiniLog`
 - `StatsCard`
+- `BarChart`
+- `LineChart`
 - `ListView<T>`
 - `Tabs`
 - `MenuBar`

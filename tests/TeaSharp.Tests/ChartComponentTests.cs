@@ -1,4 +1,3 @@
-using TeaSharp.Components.Charting;
 using TeaSharp.Components.Composition;
 using TeaSharp.Components.Composition.Internal;
 using TeaSharp.Components.Primitives;

@@ -1,5 +1,4 @@
 using TeaSharp.Components.Advanced;
-using TeaSharp.Components.Charting;
 using TeaSharp.Components.Composition;
 using TeaSharp.Components.Interaction;
 using TeaSharp.Components.Prebuilt;
