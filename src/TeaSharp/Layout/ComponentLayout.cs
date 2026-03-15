@@ -22,7 +22,7 @@ internal sealed class ComponentLayout : LayoutNode
         int layer,
         Action? onFocus)
     {
-        Component = component ?? throw new ArgumentNullException(nameof(component));
+        CanvasComponent = component ?? throw new ArgumentNullException(nameof(component));
         PreferredWidth = preferredWidth;
         PreferredHeight = preferredHeight;
         Focusable = focusable;
@@ -38,15 +38,14 @@ internal sealed class ComponentLayout : LayoutNode
     }
 
     public ComponentLayout(Control control)
-        : this((control ?? throw new ArgumentNullException(nameof(control))).Component)
     {
-        Control = control;
+        Control = control ?? throw new ArgumentNullException(nameof(control));
     }
 
     /// <summary>
     /// Gets the wrapped TeaSharp component.
     /// </summary>
-    public ICanvasComponent Component { get; }
+    public ICanvasComponent? CanvasComponent { get; }
 
     internal Control? Control { get; }
 
@@ -101,6 +100,6 @@ internal sealed class ComponentLayout : LayoutNode
 
         return Control is not null
             ? Control.Measure(availableBounds)
-            : LayoutIntrinsicMeasurer.Measure(Component, availableBounds);
+            : LayoutIntrinsicMeasurer.Measure(CanvasComponent!, availableBounds);
     }
 }

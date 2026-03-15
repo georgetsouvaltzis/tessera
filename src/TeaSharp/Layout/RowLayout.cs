@@ -48,6 +48,10 @@ public sealed class RowLayout : LayoutNode
     public RowLayout AddAuto(LayoutNode content, Thickness margin = default)
         => Add(LayoutSlot.Auto(content, margin));
 
+    /// <remarks>
+    /// Raw <see cref="ICanvasComponent"/> interop is render-only. Use <see cref="Control"/> when the content needs
+    /// focus or input handling.
+    /// </remarks>
     [EditorBrowsable(EditorBrowsableState.Advanced)]
     public RowLayout AddAuto(ICanvasComponent component, Thickness margin = default)
         => Add(LayoutSlot.Auto(component, margin));
@@ -66,6 +70,10 @@ public sealed class RowLayout : LayoutNode
     public RowLayout AddFixed(LayoutNode content, int size, Thickness margin = default)
         => Add(LayoutSlot.Fixed(content, size, margin));
 
+    /// <remarks>
+    /// Raw <see cref="ICanvasComponent"/> interop is render-only. Use <see cref="Control"/> when the content needs
+    /// focus or input handling.
+    /// </remarks>
     [EditorBrowsable(EditorBrowsableState.Advanced)]
     public RowLayout AddFixed(ICanvasComponent component, int size, Thickness margin = default)
         => Add(LayoutSlot.Fixed(component, size, margin));
@@ -84,6 +92,10 @@ public sealed class RowLayout : LayoutNode
     public RowLayout AddFill(LayoutNode content, Thickness margin = default)
         => Add(LayoutSlot.Fill(content, margin));
 
+    /// <remarks>
+    /// Raw <see cref="ICanvasComponent"/> interop is render-only. Use <see cref="Control"/> when the content needs
+    /// focus or input handling.
+    /// </remarks>
     [EditorBrowsable(EditorBrowsableState.Advanced)]
     public RowLayout AddFill(ICanvasComponent component, Thickness margin = default)
         => Add(LayoutSlot.Fill(component, margin));
@@ -102,6 +114,10 @@ public sealed class RowLayout : LayoutNode
     public RowLayout AddWeighted(LayoutNode content, int weight, Thickness margin = default)
         => Add(LayoutSlot.Weighted(content, weight, margin));
 
+    /// <remarks>
+    /// Raw <see cref="ICanvasComponent"/> interop is render-only. Use <see cref="Control"/> when the content needs
+    /// focus or input handling.
+    /// </remarks>
     [EditorBrowsable(EditorBrowsableState.Advanced)]
     public RowLayout AddWeighted(ICanvasComponent component, int weight, Thickness margin = default)
         => Add(LayoutSlot.Weighted(component, weight, margin));

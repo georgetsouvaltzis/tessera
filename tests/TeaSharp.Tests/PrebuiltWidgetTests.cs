@@ -1,4 +1,3 @@
-using TeaSharp.Components.Composition;
 using TeaSharp.Components.Interaction;
 using TeaSharp.Components.Primitives;
 using TeaSharp.Components.Styling;
@@ -1049,49 +1048,6 @@ internal static class PrebuiltWidgetTests
         TestAssert.Equal(1, accepted, "Dialog should raise accepted exactly once for an accept decision.");
         TestAssert.Equal(1, dismissed, "Dialog should raise dismissed exactly once for a dismiss decision.");
         return Task.CompletedTask;
-    }
-
-    private sealed class KeyProbeComponent : IStatefulComponent, IFocusableComponent
-    {
-        public bool IsFocused { get; set; }
-
-        public int KeyEvents { get; private set; }
-
-        public bool Update(TeaSharp.Core.Abstractions.IMessage message)
-        {
-            if (message is not KeyPressMsg)
-            {
-                return false;
-            }
-
-            KeyEvents++;
-            return true;
-        }
-
-        public void Render(Canvas canvas, Rect rect)
-        {
-            canvas.WriteText(rect.X, rect.Y, KeyEvents.ToString(CultureInfo.InvariantCulture), rect.Width);
-        }
-    }
-
-    private sealed class MouseProbeComponent : IStatefulComponent, IMouseStatefulComponent, IFocusableComponent
-    {
-        public bool IsFocused { get; set; }
-
-        public int MouseEvents { get; private set; }
-
-        public bool Update(TeaSharp.Core.Abstractions.IMessage message) => false;
-
-        public bool UpdateMouse(MouseMsg message, Rect bounds)
-        {
-            MouseEvents++;
-            return true;
-        }
-
-        public void Render(Canvas canvas, Rect rect)
-        {
-            canvas.WriteText(rect.X, rect.Y, IsFocused ? "focused" : "idle", rect.Width);
-        }
     }
 
     private static bool ContainsStrikethroughSgr(string value)

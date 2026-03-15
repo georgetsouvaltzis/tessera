@@ -84,6 +84,10 @@ public sealed class Screen
     /// </summary>
     /// <param name="component">The component to render.</param>
     /// <returns>A screen that renders the supplied advanced component.</returns>
+    /// <remarks>
+    /// <see cref="ICanvasComponent"/> is a render-only advanced seam. Use <see cref="Control"/> for interactive
+    /// custom widgets that participate in focus and input routing.
+    /// </remarks>
     [EditorBrowsable(EditorBrowsableState.Advanced)]
     public static Screen From(ICanvasComponent component) =>
         new(layout: new ComponentLayout(component ?? throw new ArgumentNullException(nameof(component))));

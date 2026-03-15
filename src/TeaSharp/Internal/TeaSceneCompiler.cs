@@ -396,30 +396,46 @@ internal sealed class TeaSceneCompiler : IScreenCompiler
                 return true;
             }
 
-            var stateful = component.Component as IStatefulComponent;
-            var mouseStateful = component.Component as IMouseStatefulComponent;
-            var focusTarget = component.Component as IFocusableComponent;
-            var requestedFocus = focusTarget?.IsFocused == true;
+            Action<Canvas, Rect> render;
+            Func<IMessage, bool>? update = null;
+            Func<MouseMsg, Rect, bool>? updateMouse = null;
+            Action<bool>? setFocused = null;
+            var focusable = component.Focusable ?? false;
+            var requestedFocus = false;
             var requestOrder = 0L;
-            if (component.Component is Controls.IFocusRequestSource focusRequestSource
-                && focusRequestSource.TryConsumeFocusRequest(out var explicitOrder))
+
+            if (component.Control is { } control)
             {
-                requestedFocus = true;
-                requestOrder = explicitOrder;
+                render = control.Render;
+                update = control.HandleCore;
+                updateMouse = control.HandleMouseCore;
+                setFocused = control.ApplyFocus;
+                focusable = component.Focusable ?? control.CanFocus;
+                requestedFocus = control.IsFocused;
+
+                if (control.TryConsumeFocusRequest(out var explicitOrder))
+                {
+                    requestedFocus = true;
+                    requestOrder = explicitOrder;
+                }
+            }
+            else
+            {
+                render = component.CanvasComponent!.Render;
             }
 
             var id = $"{path}/component";
             _regions.Add(new TeaSceneRegion(
                 id,
                 bounds,
-                component.Component.Render,
-                stateful is null ? null : stateful.Update,
-                mouseStateful is null ? null : mouseStateful.UpdateMouse,
-                component.Focusable ?? focusTarget is not null,
+                render,
+                update,
+                updateMouse,
+                focusable,
                 component.FocusOnClick,
                 component.InterceptsPointer,
                 component.Layer,
-                focusTarget,
+                setFocused,
                 component.OnFocus));
 
             if (requestedFocus)
@@ -690,15 +706,12 @@ internal sealed class TeaSceneCompiler : IScreenCompiler
         bool FocusOnClick,
         bool InterceptsPointer,
         int Layer,
-        IFocusableComponent? FocusTarget,
+        Action<bool>? SetFocused,
         Action? OnFocus)
     {
         public void ApplyFocus(bool focused, bool invokeFocus)
         {
-            if (FocusTarget is not null)
-            {
-                FocusTarget.IsFocused = focused;
-            }
+            SetFocused?.Invoke(focused);
 
             if (focused && invokeFocus)
             {

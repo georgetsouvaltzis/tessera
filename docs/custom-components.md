@@ -59,8 +59,8 @@ The remaining raw component contract is:
 
 The old screen-scale composition engine is now internal-only. Use `ICanvasComponent` only when you need:
 
-- tight integration with an existing legacy component
-- direct interop with legacy TeaSharp component APIs
+- render-only interop with an existing low-level canvas primitive
+- a raw drawing surface without control-level input/focus behavior
 
 ## Design Rules For Custom Widgets
 

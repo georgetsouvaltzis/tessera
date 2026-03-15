@@ -1,4 +1,3 @@
-using TeaSharp.Components.Composition;
 using TeaSharp.Components.Primitives;
 using TeaSharp.Core.Abstractions;
 using TeaSharp.Core.Messages;
@@ -17,13 +16,11 @@ namespace TeaSharp.Controls;
 public abstract class Control
 {
     private static long s_focusRequestCounter;
-    private readonly ControlComponentAdapter _componentAdapter;
     private bool _focusRequestPending;
     private long _focusRequestOrder;
 
     protected Control()
     {
-        _componentAdapter = new ControlComponentAdapter(this);
     }
 
     /// <summary>
@@ -87,54 +84,42 @@ public abstract class Control
         return new LayoutMeasurement(availableBounds.Width, availableBounds.Height);
     }
 
-    internal ICanvasComponent Component => _componentAdapter;
+    internal virtual bool CanFocus => true;
 
-    private sealed class ControlComponentAdapter(Control owner) : IStatefulComponent, IMouseStatefulComponent, IFocusableComponent, IFocusRequestSource
+    internal void ApplyFocus(bool focused)
     {
-        public bool IsFocused
+        IsFocused = focused;
+        if (focused)
         {
-            get => owner.IsFocused;
-            set
-            {
-                owner.IsFocused = value;
-                if (value)
-                {
-                    owner._focusRequestPending = false;
-                }
-            }
+            _focusRequestPending = false;
+        }
+    }
+
+    internal bool HandleCore(IMessage message)
+    {
+        if (IsDisabled)
+        {
+            return false;
         }
 
-        public void Render(Canvas canvas, Rect rect)
+        return Handle(TeaMessageAdapter.ToPublic(message));
+    }
+
+    internal bool HandleMouseCore(MouseMsg message, Rect bounds)
+    {
+        if (IsDisabled)
         {
-            owner.Render(canvas, rect);
+            return false;
         }
 
-        public bool Update(IMessage message)
-        {
-            if (owner.IsDisabled)
-            {
-                return false;
-            }
+        return Handle(TeaMessageAdapter.ToPublic(message), bounds);
+    }
 
-            return owner.Handle(TeaMessageAdapter.ToPublic(message));
-        }
-
-        public bool UpdateMouse(MouseMsg message, Rect bounds)
-        {
-            if (owner.IsDisabled)
-            {
-                return false;
-            }
-
-            return owner.Handle(TeaMessageAdapter.ToPublic(message), bounds);
-        }
-
-        public bool TryConsumeFocusRequest(out long order)
-        {
-            var requested = owner._focusRequestPending;
-            owner._focusRequestPending = false;
-            order = owner._focusRequestOrder;
-            return requested;
-        }
+    internal bool TryConsumeFocusRequest(out long order)
+    {
+        var requested = _focusRequestPending;
+        _focusRequestPending = false;
+        order = _focusRequestOrder;
+        return requested;
     }
 }

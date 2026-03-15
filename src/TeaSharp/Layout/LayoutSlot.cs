@@ -34,6 +34,10 @@ public sealed record LayoutSlot
     /// <summary>
     /// Creates an auto-sized slot for a raw advanced component.
     /// </summary>
+    /// <remarks>
+    /// Raw <see cref="ICanvasComponent"/> interop is render-only. Use <see cref="Control"/> when the content needs
+    /// focus or input handling.
+    /// </remarks>
     [EditorBrowsable(EditorBrowsableState.Advanced)]
     public static LayoutSlot Auto(ICanvasComponent component, Thickness margin = default) =>
         new(component, LayoutLength.Auto(), margin);
@@ -58,6 +62,10 @@ public sealed record LayoutSlot
     /// <summary>
     /// Creates a fixed-size slot for a raw advanced component.
     /// </summary>
+    /// <remarks>
+    /// Raw <see cref="ICanvasComponent"/> interop is render-only. Use <see cref="Control"/> when the content needs
+    /// focus or input handling.
+    /// </remarks>
     [EditorBrowsable(EditorBrowsableState.Advanced)]
     public static LayoutSlot Fixed(ICanvasComponent component, int size, Thickness margin = default) =>
         new(component, LayoutLength.Fixed(size), margin);
@@ -85,6 +93,10 @@ public sealed record LayoutSlot
     /// <summary>
     /// Creates a fill slot for a raw advanced component.
     /// </summary>
+    /// <remarks>
+    /// Raw <see cref="ICanvasComponent"/> interop is render-only. Use <see cref="Control"/> when the content needs
+    /// focus or input handling.
+    /// </remarks>
     [EditorBrowsable(EditorBrowsableState.Advanced)]
     public static LayoutSlot Fill(ICanvasComponent component, Thickness margin = default) =>
         new(component, LayoutLength.Fill(), margin);
@@ -115,6 +127,10 @@ public sealed record LayoutSlot
     /// <summary>
     /// Creates a weighted slot for a raw advanced component.
     /// </summary>
+    /// <remarks>
+    /// Raw <see cref="ICanvasComponent"/> interop is render-only. Use <see cref="Control"/> when the content needs
+    /// focus or input handling.
+    /// </remarks>
     [EditorBrowsable(EditorBrowsableState.Advanced)]
     public static LayoutSlot Weighted(ICanvasComponent component, int weight, Thickness margin = default) =>
         new(component, LayoutLength.Weighted(weight), margin);

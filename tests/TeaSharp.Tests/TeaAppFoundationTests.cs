@@ -1,5 +1,4 @@
 using TeaSharp.Controls;
-using TeaSharp.Components.Composition;
 using TeaSharp.Components.Primitives;
 using TeaSharp.Core.Messages;
 using System.Reflection;
@@ -22,9 +21,6 @@ internal static class TeaAppFoundationTests
         yield return new TestCase(
             "TeaApp_Post_QueuesControlEventMessagesAsEffects",
             TeaApp_Post_QueuesControlEventMessagesAsEffects);
-        yield return new TestCase(
-            "TeaControl_Bridge_MapsCoreMessagesToPublicMessages",
-            TeaControl_Bridge_MapsCoreMessagesToPublicMessages);
         yield return new TestCase(
             "TeaApp_RuntimeScreenBridge_IsRemoved",
             TeaApp_RuntimeScreenBridge_IsRemoved);
@@ -100,20 +96,6 @@ internal static class TeaAppFoundationTests
         var message = await effect!(CancellationToken.None);
         TestAssert.True(message is not null, "Post should emit a follow-up message.");
         TestAssert.Equal(0, app.Count, "Post should not mutate app state until the queued message is processed by the runtime.");
-    }
-
-    private static Task TeaControl_Bridge_MapsCoreMessagesToPublicMessages()
-    {
-        var control = new RecordingControl();
-        var stateful = (IStatefulComponent)control.Component;
-        var mouseStateful = (IMouseStatefulComponent)control.Component;
-
-        stateful.Update(new KeyPressMsg(KeyCode.Enter));
-        mouseStateful.UpdateMouse(new MouseClickMsg(MouseButton.Left, 2, 3), new Rect(0, 0, 10, 10));
-
-        TestAssert.True(control.LastMessage is KeyPressed, "Control should map keyboard input to the new public message model.");
-        TestAssert.True(control.LastPointer is PointerInput { Kind: PointerEventKind.Press, X: 2, Y: 3 }, "Control should map pointer input to the new public message model.");
-        return Task.CompletedTask;
     }
 
     private static Task TeaApp_RuntimeScreenBridge_IsRemoved()

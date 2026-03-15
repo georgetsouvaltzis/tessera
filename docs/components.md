@@ -104,7 +104,7 @@ Examples:
 - `TeaSharp.Controls.LineChartOptions` when you need advanced chart rendering knobs through root `LineChart.Options`
 - `TeaSharp.Controls.BarChartOptions` when you need advanced chart rendering knobs through root `BarChart.Options`
 
-These advanced types now exist primarily as option records used through the root chart controls. Raw canvas-component interop still exists separately through `ICanvasComponent`.
+These advanced types now exist primarily as option records used through the root chart controls. Raw canvas-component interop still exists separately through `ICanvasComponent`, which is now render-only.
 
 ## Legacy Composition APIs
 

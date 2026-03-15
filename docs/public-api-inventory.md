@@ -101,7 +101,7 @@ These APIs remain public because they still offer real value, but they should no
 - `TeaSharp.Hosting.EventDecoder`
 - `TeaSharp.Controls.BarChartOptions`
 - `TeaSharp.Controls.LineChartOptions`
-- `ICanvasComponent`
+- `ICanvasComponent` as a render-only advanced seam
 - renderer, terminal, and capability-probing seams
 
 Most of these types are now marked `EditorBrowsable(Advanced)`.

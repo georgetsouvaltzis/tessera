@@ -67,8 +67,8 @@ internal static class TeaAppCompositionTests
             "TeaAppComposition_LegacyCanvasComponentEntryPoints_AreMarkedAdvanced",
             LegacyCanvasComponentEntryPoints_AreMarkedAdvanced);
         yield return new TestCase(
-            "TeaAppComposition_LowLevelComponentContracts_AreInternalized",
-            LowLevelComponentContracts_AreInternalized);
+            "TeaAppComposition_LowLevelComponentContracts_AreRemoved",
+            LowLevelComponentContracts_AreRemoved);
         yield return new TestCase(
             "TeaAppComposition_LowLevelTreeLayouts_AreInternalized",
             LowLevelTreeLayouts_AreInternalized);
@@ -402,7 +402,7 @@ internal static class TeaAppCompositionTests
         return Task.CompletedTask;
     }
 
-    private static Task LowLevelComponentContracts_AreInternalized()
+    private static Task LowLevelComponentContracts_AreRemoved()
     {
         var canvasContract = typeof(ICanvasComponent);
         var canvasAttribute = (EditorBrowsableAttribute?)Attribute.GetCustomAttribute(
@@ -425,8 +425,7 @@ internal static class TeaAppCompositionTests
         foreach (var contractName in contractNames)
         {
             var contract = assembly.GetType(contractName, throwOnError: false);
-            TestAssert.True(contract is not null, $"{contractName} should continue to exist as an internal bridge.");
-            TestAssert.True(contract!.IsNotPublic, $"{contractName} should no longer be public.");
+            TestAssert.True(contract is null, $"{contractName} should be removed once the scene compiler owns control interaction directly.");
         }
 
         return Task.CompletedTask;
