@@ -1,8 +1,8 @@
 using TeaSharp.Components.Primitives;
+using TeaSharp.Components.Composition;
 using TeaSharp.Controls;
 using TeaSharp.Styles;
 using System.ComponentModel;
-using TeaSharp.Components.Composition;
 
 namespace TeaSharp.Layout;
 
@@ -29,7 +29,7 @@ internal static class Center
         bool? focusable = null,
         bool focusOnClick = true,
         bool interceptsPointer = true,
-        int layer = (int)ScreenLayer.Base,
+        int layer = 0,
         Action? onFocus = null) =>
         new(
             new ComponentLayout(component, width, height, focusable, focusOnClick, interceptsPointer, layer, onFocus),

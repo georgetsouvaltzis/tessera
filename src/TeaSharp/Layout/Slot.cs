@@ -1,6 +1,6 @@
 using TeaSharp.Components.Primitives;
-using System.ComponentModel;
 using TeaSharp.Components.Composition;
+using System.ComponentModel;
 
 namespace TeaSharp.Layout;
 
@@ -27,7 +27,7 @@ internal static class Slot
         bool? focusable = null,
         bool focusOnClick = true,
         bool interceptsPointer = true,
-        int layer = (int)ScreenLayer.Base,
+        int layer = 0,
         Action? onFocus = null) =>
         new(
             new ComponentLayout(component, preferredWidth, preferredHeight, focusable, focusOnClick, interceptsPointer, layer, onFocus),
@@ -52,7 +52,7 @@ internal static class Slot
         bool? focusable = null,
         bool focusOnClick = true,
         bool interceptsPointer = true,
-        int layer = (int)ScreenLayer.Base,
+        int layer = 0,
         Action? onFocus = null) =>
         new(
             new ComponentLayout(component, preferredWidth, preferredHeight, focusable, focusOnClick, interceptsPointer, layer, onFocus),
@@ -76,7 +76,7 @@ internal static class Slot
         bool? focusable = null,
         bool focusOnClick = true,
         bool interceptsPointer = true,
-        int layer = (int)ScreenLayer.Base,
+        int layer = 0,
         Action? onFocus = null) =>
         new(
             new ComponentLayout(component, preferredWidth, preferredHeight, focusable, focusOnClick, interceptsPointer, layer, onFocus),
@@ -101,7 +101,7 @@ internal static class Slot
         bool? focusable = null,
         bool focusOnClick = true,
         bool interceptsPointer = true,
-        int layer = (int)ScreenLayer.Base,
+        int layer = 0,
         Action? onFocus = null) =>
         new(
             new ComponentLayout(component, preferredWidth, preferredHeight, focusable, focusOnClick, interceptsPointer, layer, onFocus),

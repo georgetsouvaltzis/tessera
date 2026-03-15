@@ -1,6 +1,6 @@
 using TeaSharp.Components.Primitives;
-using System.ComponentModel;
 using TeaSharp.Components.Composition;
+using System.ComponentModel;
 
 namespace TeaSharp.Layout;
 
@@ -35,7 +35,7 @@ internal static class Panel
         bool? focusable = null,
         bool focusOnClick = true,
         bool interceptsPointer = true,
-        int layer = (int)ScreenLayer.Base,
+        int layer = 0,
         Action? onFocus = null) =>
         Item(
             new ComponentLayout(component, preferredWidth, preferredHeight, focusable, focusOnClick, interceptsPointer, layer, onFocus),

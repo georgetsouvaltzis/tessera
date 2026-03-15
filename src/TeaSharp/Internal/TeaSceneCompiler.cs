@@ -187,7 +187,7 @@ internal sealed class TeaSceneCompiler : IScreenCompiler
                     false,
                     false,
                     false,
-                    (int)ScreenLayer.Base,
+                    0,
                     null,
                     null));
             }

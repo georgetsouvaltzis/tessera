@@ -21,10 +21,7 @@ internal static class CompositionApiContractTests
         typeof(LayoutSlot),
     ];
 
-    private static readonly string[] InternalizedCompositionTypes =
-    [
-        "TeaSharp.Components.Composition.ScreenLayer",
-    ];
+    private static readonly string[] InternalizedCompositionTypes = [];
 
     private static readonly string[] RemovedCompositionTypes =
     [
@@ -35,6 +32,7 @@ internal static class CompositionApiContractTests
         "TeaSharp.Components.Composition.ScreenRegion",
         "TeaSharp.Components.Composition.ScreenRegionKey",
         "TeaSharp.Components.Composition.ComponentSlot",
+        "TeaSharp.Components.Composition.ScreenLayer",
         "TeaSharp.Components.Prebuilt.LayoutFlow",
         "TeaSharp.Components.Prebuilt.LayoutContainerOptions",
         "TeaSharp.Components.Prebuilt.LayoutContainerComponent",
