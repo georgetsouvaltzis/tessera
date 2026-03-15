@@ -1,5 +1,4 @@
 using System.ComponentModel;
-using TeaSharp.Core.Terminal;
 using TeaSharp.Internal;
 
 namespace TeaSharp.Hosting;
@@ -18,7 +17,7 @@ public sealed class NullRenderer : IProgramRenderer
     public void Resize(int width, int height) => _inner.Resize(width, height);
 
     public void UpdateCapabilities(TerminalCapabilityProfile capabilities) =>
-        _inner.UpdateCapabilities(capabilities);
+        _inner.UpdateCapabilities(capabilities.ToCore());
 
     public void Render(RenderOutput output) =>
         _inner.Render(output.ToCore());

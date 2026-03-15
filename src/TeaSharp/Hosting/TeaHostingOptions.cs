@@ -1,7 +1,4 @@
 using System.ComponentModel;
-using TeaSharp.Core.Input;
-using TeaSharp.Core.Rendering;
-using TeaSharp.Core.Terminal;
 
 namespace TeaSharp.Hosting;
 

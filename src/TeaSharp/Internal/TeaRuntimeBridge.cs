@@ -83,12 +83,16 @@ internal sealed class TeaAppRuntime : ITeaRuntime
             CapabilityProbeTimeout = hosting?.CapabilityProbeTimeout ?? TimeSpan.FromMilliseconds(260),
             MaxConcurrentEffects = hosting?.MaxConcurrentEffects ?? 0,
             Renderer = hosting?.Renderer is null ? null : new HostingRendererAdapter(hosting.Renderer),
-            AnsiRendererOptions = hosting?.AnsiRendererOptions,
+            AnsiRendererOptions = hosting?.AnsiRendererOptions?.ToCore(),
             Terminal = hosting?.Terminal is null ? null : new HostingTerminalAdapter(hosting.Terminal),
-            TerminalCapabilities = hosting?.TerminalCapabilities,
-            TerminalCapabilityDetector = hosting?.TerminalCapabilityDetector,
-            ColorProfile = hosting?.ColorProfile,
-            ColorProfileDetector = hosting?.ColorProfileDetector,
+            TerminalCapabilities = hosting?.TerminalCapabilities?.ToCore(),
+            TerminalCapabilityDetector = hosting?.TerminalCapabilityDetector is null
+                ? null
+                : () => hosting.TerminalCapabilityDetector().ToCore(),
+            ColorProfile = hosting?.ColorProfile?.ToCore(),
+            ColorProfileDetector = hosting?.ColorProfileDetector is null
+                ? null
+                : () => hosting.ColorProfileDetector().ToCore(),
             EventDecoder = hosting?.EventDecoder is null ? null : new HostingEventDecoderAdapter(hosting.EventDecoder),
             CapabilityProbeModes = hosting?.CapabilityProbeModes,
         };
@@ -124,7 +128,7 @@ internal sealed class TeaAppRuntime : ITeaRuntime
         public void Resize(int width, int height) => inner.Resize(width, height);
 
         public void UpdateCapabilities(global::TeaSharp.Core.Terminal.TerminalCapabilityProfile capabilities) =>
-            inner.UpdateCapabilities(capabilities);
+            inner.UpdateCapabilities(capabilities.AsHosting());
 
         public void Render(global::TeaSharp.Core.Abstractions.ScreenOutput output) =>
             inner.Render(output.ToHosting());

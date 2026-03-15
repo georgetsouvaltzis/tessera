@@ -94,11 +94,16 @@ These APIs remain public because they still offer real value, but they should no
 - `TeaSharp.Hosting.TeaHost.RunAsync(...)`
 - `TeaSharp.Hosting.IProgramRenderer`
 - `TeaSharp.Hosting.RenderOutput`
+- `TeaSharp.Hosting.AnsiRendererOptions`
 - `TeaSharp.Hosting.AnsiDiffRenderer`
 - `TeaSharp.Hosting.NullRenderer`
 - `TeaSharp.Hosting.ITerminalAdapter`
 - `TeaSharp.Hosting.TerminalSize`
+- `TeaSharp.Hosting.TerminalCapabilityProfile`
+- `TeaSharp.Hosting.TerminalColorProfile`
 - `TeaSharp.Hosting.ConsoleTerminalAdapter`
+- `TeaSharp.Hosting.TerminalCapabilityDetector`
+- `TeaSharp.Hosting.TerminalColorProfileDetector`
 - `TeaSharp.Hosting.IEventDecoder`
 - `TeaSharp.Hosting.EventDecodeResult`
 - `TeaSharp.Hosting.EventDecoder`
@@ -118,7 +123,7 @@ These areas still expose more mechanism than the long-term public design should:
 - runtime seams that most apps never need
 - duplicate terminology between root app types and older core/runtime types
 - the remaining advanced component namespaces that still expose an alternate engine-shaped control story
-- advanced hosting option values that still surface deeper runtime types for capabilities/colors/ANSI tuning
+- lower-level runtime/input helpers that still live deeper than the preferred TeaSharp-owned hosting surface
 
 ## Current Direction
 

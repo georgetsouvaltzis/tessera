@@ -1,6 +1,4 @@
 using System.ComponentModel;
-using TeaSharp.Core.Rendering;
-using TeaSharp.Core.Terminal;
 using TeaSharp.Internal;
 
 namespace TeaSharp.Hosting;
@@ -20,7 +18,7 @@ public sealed class AnsiDiffRenderer : IProgramRenderer
         TerminalCapabilityProfile? capabilities = null,
         AnsiRendererOptions? options = null)
     {
-        _inner = new global::TeaSharp.Core.Rendering.AnsiDiffRenderer(capabilities, options);
+        _inner = new global::TeaSharp.Core.Rendering.AnsiDiffRenderer(capabilities?.ToCore(), options?.ToCore());
     }
 
     public ValueTask InitializeAsync(Stream output, CancellationToken cancellationToken) =>
@@ -29,7 +27,7 @@ public sealed class AnsiDiffRenderer : IProgramRenderer
     public void Resize(int width, int height) => _inner.Resize(width, height);
 
     public void UpdateCapabilities(TerminalCapabilityProfile capabilities) =>
-        _inner.UpdateCapabilities(capabilities);
+        _inner.UpdateCapabilities(capabilities.ToCore());
 
     public void Render(RenderOutput output) =>
         _inner.Render(output.ToCore());

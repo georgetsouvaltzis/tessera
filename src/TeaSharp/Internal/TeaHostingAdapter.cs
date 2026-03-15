@@ -1,11 +1,64 @@
 using TeaSharp.Core.Abstractions;
 using TeaSharp.Core.Input;
-using TeaSharp.Core.Rendering;
 
 namespace TeaSharp.Internal;
 
 internal static class TeaHostingAdapter
 {
+    public static global::TeaSharp.Core.Rendering.AnsiRendererOptions ToCore(this Hosting.AnsiRendererOptions options)
+    {
+        ArgumentNullException.ThrowIfNull(options);
+        return new global::TeaSharp.Core.Rendering.AnsiRendererOptions
+        {
+            FlushTimeout = options.FlushTimeout,
+            QueryModeReports = options.QueryModeReports,
+            QueryModeReportsOncePerMode = options.QueryModeReportsOncePerMode,
+            IncludeKittyKeyboardBaseFlag = options.IncludeKittyKeyboardBaseFlag,
+        };
+    }
+
+    public static global::TeaSharp.Core.Terminal.TerminalCapabilityProfile ToCore(this Hosting.TerminalCapabilityProfile profile)
+    {
+        ArgumentNullException.ThrowIfNull(profile);
+        return new global::TeaSharp.Core.Terminal.TerminalCapabilityProfile(
+            profile.FocusReporting,
+            profile.MouseReporting,
+            profile.BracketedPaste,
+            profile.SynchronizedUpdates,
+            profile.ModeReports,
+            profile.Source);
+    }
+
+    public static Hosting.TerminalCapabilityProfile AsHosting(this global::TeaSharp.Core.Terminal.TerminalCapabilityProfile profile)
+    {
+        ArgumentNullException.ThrowIfNull(profile);
+        return new Hosting.TerminalCapabilityProfile(
+            profile.FocusReporting,
+            profile.MouseReporting,
+            profile.BracketedPaste,
+            profile.SynchronizedUpdates,
+            profile.ModeReports,
+            profile.Source);
+    }
+
+    public static global::TeaSharp.Core.Terminal.TerminalColorProfile ToCore(this Hosting.TerminalColorProfile profile) =>
+        profile switch
+        {
+            Hosting.TerminalColorProfile.Ansi16 => global::TeaSharp.Core.Terminal.TerminalColorProfile.Ansi16,
+            Hosting.TerminalColorProfile.Ansi256 => global::TeaSharp.Core.Terminal.TerminalColorProfile.Ansi256,
+            Hosting.TerminalColorProfile.TrueColor => global::TeaSharp.Core.Terminal.TerminalColorProfile.TrueColor,
+            _ => global::TeaSharp.Core.Terminal.TerminalColorProfile.Unknown,
+        };
+
+    public static Hosting.TerminalColorProfile AsHosting(this global::TeaSharp.Core.Terminal.TerminalColorProfile profile) =>
+        profile switch
+        {
+            global::TeaSharp.Core.Terminal.TerminalColorProfile.Ansi16 => Hosting.TerminalColorProfile.Ansi16,
+            global::TeaSharp.Core.Terminal.TerminalColorProfile.Ansi256 => Hosting.TerminalColorProfile.Ansi256,
+            global::TeaSharp.Core.Terminal.TerminalColorProfile.TrueColor => Hosting.TerminalColorProfile.TrueColor,
+            _ => Hosting.TerminalColorProfile.Unknown,
+        };
+
     public static global::TeaSharp.Core.Terminal.TerminalSize ToCore(this Hosting.TerminalSize size) =>
         new(size.Width, size.Height);
 

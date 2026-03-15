@@ -399,12 +399,13 @@ Recent progress:
 - `TeaApp` now updates and renders through TeaSharp-owned internal runtime methods, with core translation pushed to the runtime edge
 - message-envelope and screen-option core translation now live under internal adapters instead of root public files
 - advanced hosting interfaces (`IProgramRenderer`, `ITerminalAdapter`, `IEventDecoder`) are now TeaSharp-owned contracts instead of direct core interface aliases
-- advanced hosting payloads now have TeaSharp-owned wrappers for render output, decode results, terminal size, and cursor style
+- advanced hosting payloads now have TeaSharp-owned wrappers for render output, decode results, terminal size, cursor style, ANSI renderer options, terminal capabilities, and terminal color profiles
+- advanced hosting detection now has TeaSharp-owned wrappers for capability and color-profile detection
 
 Remaining drift:
 
-- some advanced hosting option values still expose deeper runtime types (`AnsiRendererOptions`, terminal capability/color profiles)
-- some deep hosting options may still need clearer public wrappers or relocation
+- some lower-level runtime/input helpers still live deeper than the preferred TeaSharp-owned hosting surface
+- some deep advanced helpers may still need clearer public wrappers or relocation
 
 Internal bridging is acceptable.
 Consumer-facing contracts should keep moving away from core type exposure.

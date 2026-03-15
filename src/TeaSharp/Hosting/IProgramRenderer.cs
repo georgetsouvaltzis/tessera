@@ -12,7 +12,7 @@ public interface IProgramRenderer : IAsyncDisposable
 
     void Resize(int width, int height);
 
-    void UpdateCapabilities(global::TeaSharp.Core.Terminal.TerminalCapabilityProfile capabilities);
+    void UpdateCapabilities(TerminalCapabilityProfile capabilities);
 
     void Render(RenderOutput output);
 

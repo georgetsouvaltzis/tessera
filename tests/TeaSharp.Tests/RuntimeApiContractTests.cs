@@ -9,8 +9,8 @@ using TeaSharp.Hosting;
 using TeaSharp.Core.Abstractions;
 using TeaSharp.Core.Application;
 using TeaSharp.Core.Input;
-using TeaSharp.Core.Rendering;
 using TeaSharp.Core.Terminal;
+using CoreAnsiRendererOptions = TeaSharp.Core.Rendering.AnsiRendererOptions;
 
 namespace TeaSharp.Tests;
 
@@ -25,18 +25,19 @@ internal static class RuntimeApiContractTests
         ("RenderOutput", typeof(TeaSharp.Hosting.RenderOutput)),
         ("NullRenderer", typeof(TeaSharp.Hosting.NullRenderer)),
         ("AnsiDiffRenderer", typeof(TeaSharp.Hosting.AnsiDiffRenderer)),
-        ("AnsiRendererOptions", typeof(AnsiRendererOptions)),
+        ("AnsiRendererOptions", typeof(TeaSharp.Hosting.AnsiRendererOptions)),
         ("ITerminalAdapter", typeof(TeaSharp.Hosting.ITerminalAdapter)),
         ("TerminalSize", typeof(TeaSharp.Hosting.TerminalSize)),
+        ("TerminalCapabilityProfile", typeof(TeaSharp.Hosting.TerminalCapabilityProfile)),
+        ("TerminalColorProfile", typeof(TeaSharp.Hosting.TerminalColorProfile)),
         ("ConsoleTerminalAdapter", typeof(TeaSharp.Hosting.ConsoleTerminalAdapter)),
         ("IEventDecoder", typeof(TeaSharp.Hosting.IEventDecoder)),
         ("EventDecodeResult", typeof(TeaSharp.Hosting.EventDecodeResult)),
         ("EventDecoder", typeof(TeaSharp.Hosting.EventDecoder)),
         ("TerminalCursorStyle", typeof(TeaSharp.Hosting.TerminalCursorStyle)),
+        ("TerminalCapabilityDetector", typeof(TeaSharp.Hosting.TerminalCapabilityDetector)),
+        ("TerminalColorProfileDetector", typeof(TeaSharp.Hosting.TerminalColorProfileDetector)),
         ("TerminalReader", typeof(TerminalReader)),
-        ("TerminalCapabilityDetector", typeof(TerminalCapabilityDetector)),
-        ("TerminalColorProfileDetector", typeof(TerminalColorProfileDetector)),
-        ("TerminalCapabilityProfile", typeof(TerminalCapabilityProfile)),
     ];
 
     public static IEnumerable<TestCase> Cases()
@@ -143,18 +144,33 @@ internal static class RuntimeApiContractTests
         var messageFilter = typeof(TeaHostingOptions).GetProperty(nameof(TeaHostingOptions.MessageFilter));
         var mapEffectException = typeof(TeaHostingOptions).GetProperty(nameof(TeaHostingOptions.MapEffectException));
         var renderer = typeof(TeaHostingOptions).GetProperty(nameof(TeaHostingOptions.Renderer));
+        var rendererOptions = typeof(TeaHostingOptions).GetProperty(nameof(TeaHostingOptions.AnsiRendererOptions));
         var terminal = typeof(TeaHostingOptions).GetProperty(nameof(TeaHostingOptions.Terminal));
+        var terminalCapabilities = typeof(TeaHostingOptions).GetProperty(nameof(TeaHostingOptions.TerminalCapabilities));
+        var terminalCapabilityDetector = typeof(TeaHostingOptions).GetProperty(nameof(TeaHostingOptions.TerminalCapabilityDetector));
+        var colorProfile = typeof(TeaHostingOptions).GetProperty(nameof(TeaHostingOptions.ColorProfile));
+        var colorProfileDetector = typeof(TeaHostingOptions).GetProperty(nameof(TeaHostingOptions.ColorProfileDetector));
         var eventDecoder = typeof(TeaHostingOptions).GetProperty(nameof(TeaHostingOptions.EventDecoder));
 
         TestAssert.True(messageFilter is not null, "TeaHostingOptions.MessageFilter should exist.");
         TestAssert.True(mapEffectException is not null, "TeaHostingOptions.MapEffectException should exist.");
         TestAssert.True(renderer is not null, "TeaHostingOptions.Renderer should exist.");
+        TestAssert.True(rendererOptions is not null, "TeaHostingOptions.AnsiRendererOptions should exist.");
         TestAssert.True(terminal is not null, "TeaHostingOptions.Terminal should exist.");
+        TestAssert.True(terminalCapabilities is not null, "TeaHostingOptions.TerminalCapabilities should exist.");
+        TestAssert.True(terminalCapabilityDetector is not null, "TeaHostingOptions.TerminalCapabilityDetector should exist.");
+        TestAssert.True(colorProfile is not null, "TeaHostingOptions.ColorProfile should exist.");
+        TestAssert.True(colorProfileDetector is not null, "TeaHostingOptions.ColorProfileDetector should exist.");
         TestAssert.True(eventDecoder is not null, "TeaHostingOptions.EventDecoder should exist.");
         TestAssert.True(messageFilter!.PropertyType == typeof(Func<TeaApp, Message, Message>), "TeaHostingOptions.MessageFilter should use TeaApp and Message, not core runtime types.");
         TestAssert.True(mapEffectException!.PropertyType == typeof(Func<Exception, Message>), "TeaHostingOptions.MapEffectException should use public Message contracts.");
         TestAssert.True(renderer!.PropertyType == typeof(TeaSharp.Hosting.IProgramRenderer), "TeaHostingOptions.Renderer should use TeaSharp.Hosting contracts.");
+        TestAssert.True(rendererOptions!.PropertyType == typeof(TeaSharp.Hosting.AnsiRendererOptions), "TeaHostingOptions.AnsiRendererOptions should use TeaSharp.Hosting contracts.");
         TestAssert.True(terminal!.PropertyType == typeof(TeaSharp.Hosting.ITerminalAdapter), "TeaHostingOptions.Terminal should use TeaSharp.Hosting contracts.");
+        TestAssert.True(terminalCapabilities!.PropertyType == typeof(TeaSharp.Hosting.TerminalCapabilityProfile), "TeaHostingOptions.TerminalCapabilities should use TeaSharp.Hosting capability contracts.");
+        TestAssert.True(terminalCapabilityDetector!.PropertyType == typeof(Func<TeaSharp.Hosting.TerminalCapabilityProfile>), "TeaHostingOptions.TerminalCapabilityDetector should use TeaSharp.Hosting capability contracts.");
+        TestAssert.True(colorProfile!.PropertyType == typeof(TeaSharp.Hosting.TerminalColorProfile?), "TeaHostingOptions.ColorProfile should use TeaSharp.Hosting color contracts.");
+        TestAssert.True(colorProfileDetector!.PropertyType == typeof(Func<TeaSharp.Hosting.TerminalColorProfile>), "TeaHostingOptions.ColorProfileDetector should use TeaSharp.Hosting color contracts.");
         TestAssert.True(eventDecoder!.PropertyType == typeof(TeaSharp.Hosting.IEventDecoder), "TeaHostingOptions.EventDecoder should use TeaSharp.Hosting contracts.");
         return Task.CompletedTask;
     }
