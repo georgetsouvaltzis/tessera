@@ -11,8 +11,11 @@ internal static class DashboardComponentTests
         yield return new TestCase("Components_Canvas_GraphemeAware_PreservesLeadingAnsiEscape", Canvas_GraphemeAware_PreservesLeadingAnsiEscape);
         yield return new TestCase("Components_Canvas_GraphemeAware_TruncatedStyledText_ResetsStyleBeforeFollowingCells", Canvas_GraphemeAware_TruncatedStyledText_ResetsStyleBeforeFollowingCells);
         yield return new TestCase("Components_Gauge_RendersValueAndLabel", Gauge_RendersValueAndLabel);
+        yield return new TestCase("Components_Gauge_ClampsOutOfRangeAndHandlesFlatRange", Gauge_ClampsOutOfRangeAndHandlesFlatRange);
         yield return new TestCase("Components_StatsCard_RendersEntries", StatsCard_RendersEntries);
+        yield return new TestCase("Components_StatsCard_SetValue_ReplacesExistingEntry", StatsCard_SetValue_ReplacesExistingEntry);
         yield return new TestCase("Components_MiniLog_RespectsCapacityAndShowsLatest", MiniLog_RespectsCapacityAndShowsLatest);
+        yield return new TestCase("Components_MiniLog_Append_SplitsEmbeddedNewlines", MiniLog_Append_SplitsEmbeddedNewlines);
     }
 
     private static Task Canvas_GraphemeAware_RendersWideAndCombiningText()
@@ -111,6 +114,25 @@ internal static class DashboardComponentTests
         return Task.CompletedTask;
     }
 
+    private static Task StatsCard_SetValue_ReplacesExistingEntry()
+    {
+        // Arrange
+        var stats = new StatsCard();
+        stats.SetItems(
+        [
+            new StatItem("raw", "yes"),
+            new StatItem("mouse", "yes"),
+        ]);
+
+        // Act
+        stats.SetValue("raw", "no");
+
+        // Assert
+        TestAssert.Equal(2, stats.Items.Count, "Stats card should replace matching labels instead of appending duplicates.");
+        TestAssert.Equal("no", stats.Items[0].Value, "Stats card should update the matching entry in place.");
+        return Task.CompletedTask;
+    }
+
     private static Task MiniLog_RespectsCapacityAndShowsLatest()
     {
         // Arrange
@@ -133,6 +155,54 @@ internal static class DashboardComponentTests
         TestAssert.True(output.Contains("Live Event", StringComparison.Ordinal), "Mini log should render title.");
         TestAssert.True(output.Contains("two", StringComparison.Ordinal), "Mini log should retain recent lines.");
         TestAssert.True(output.Contains("four", StringComparison.Ordinal), "Mini log should render latest line.");
+        return Task.CompletedTask;
+    }
+
+    private static Task MiniLog_Append_SplitsEmbeddedNewlines()
+    {
+        // Arrange
+        var log = new MiniLog(capacity: 4);
+
+        // Act
+        log.Append("one\r\ntwo\nthree\rfour");
+
+        // Assert
+        TestAssert.Equal(4, log.Entries.Count, "Mini log should split embedded newlines into separate entries.");
+        TestAssert.Equal("one", log.Entries[0], "Mini log should preserve the first split line.");
+        TestAssert.Equal("four", log.Entries[3], "Mini log should preserve the last split line.");
+        return Task.CompletedTask;
+    }
+
+    private static Task Gauge_ClampsOutOfRangeAndHandlesFlatRange()
+    {
+        // Arrange
+        var flatCanvas = new Canvas(22, 5);
+        var flatGauge = new Gauge
+        {
+            Title = "Flat",
+            MinValue = 10,
+            MaxValue = 10,
+            Value = 15,
+        };
+
+        var lowCanvas = new Canvas(22, 5);
+        var lowGauge = new Gauge
+        {
+            Title = "Low",
+            MinValue = 0,
+            MaxValue = 100,
+            Value = -20,
+        };
+
+        // Act
+        flatGauge.Render(flatCanvas, new Rect(0, 0, 22, 5));
+        lowGauge.Render(lowCanvas, new Rect(0, 0, 22, 5));
+        var flatOutput = flatCanvas.Render();
+        var lowOutput = lowCanvas.Render();
+
+        // Assert
+        TestAssert.True(flatOutput.Contains("15", StringComparison.Ordinal), "Gauge should still render its label when the range is flat.");
+        TestAssert.True(!lowOutput.Contains('█'), "Gauge should clamp values below range to an empty bar.");
         return Task.CompletedTask;
     }
 }

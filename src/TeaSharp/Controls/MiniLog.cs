@@ -1,5 +1,5 @@
-using TeaSharp.Components.Dashboard;
 using TeaSharp.Components.Primitives;
+using TeaSharp.Layout;
 
 namespace TeaSharp.Controls;
 
@@ -8,7 +8,7 @@ namespace TeaSharp.Controls;
 /// </summary>
 public sealed class MiniLog : Control
 {
-    private readonly MiniLogComponent _component;
+    private readonly List<string> _entries = [];
 
     /// <summary>
     /// Creates a compact log with the provided entry capacity.
@@ -16,41 +16,92 @@ public sealed class MiniLog : Control
     /// <param name="capacity">The maximum number of retained log lines.</param>
     public MiniLog(int capacity = 120)
     {
-        _component = new MiniLogComponent(capacity);
+        Capacity = Math.Max(1, capacity);
     }
 
     /// <summary>
     /// Gets the maximum number of retained log lines.
     /// </summary>
-    public int Capacity => _component.Capacity;
+    public int Capacity { get; }
 
     /// <summary>
     /// Gets or sets the log title.
     /// </summary>
     public string Title
     {
-        get => _component.Title;
-        set => _component.Title = value ?? string.Empty;
-    }
+        get;
+        set => field = value ?? string.Empty;
+    } = "Mini Log";
 
     /// <summary>
     /// Gets the retained log lines.
     /// </summary>
-    public IReadOnlyList<string> Entries => _component.Entries;
+    public IReadOnlyList<string> Entries => _entries;
 
     /// <summary>
     /// Appends one log line.
     /// </summary>
     /// <param name="line">The log line to append.</param>
-    public void Append(string line) => _component.Append(line ?? string.Empty);
+    public void Append(string line)
+    {
+        if (string.IsNullOrEmpty(line))
+        {
+            return;
+        }
+
+        var normalized = line
+            .Replace("\r\n", "\n", StringComparison.Ordinal)
+            .Replace('\r', '\n');
+        var parts = normalized.Split('\n');
+        foreach (var part in parts)
+        {
+            _entries.Add(part);
+            if (_entries.Count > Capacity)
+            {
+                _entries.RemoveAt(0);
+            }
+        }
+    }
 
     /// <summary>
     /// Clears all retained log lines.
     /// </summary>
-    public void Clear() => _component.Clear();
+    public void Clear() => _entries.Clear();
 
     public override void Render(Canvas canvas, Rect rect)
     {
-        _component.Render(canvas, rect);
+        var clipped = Rect.Intersect(rect, canvas.Bounds);
+        if (clipped.IsEmpty || clipped.Width < 4 || clipped.Height < 3)
+        {
+            return;
+        }
+
+        canvas.DrawBox(clipped, Title);
+        var content = clipped.Inset(1, 1);
+        if (content.IsEmpty || _entries.Count == 0)
+        {
+            return;
+        }
+
+        var rows = Math.Min(content.Height, _entries.Count);
+        var offset = Math.Max(0, _entries.Count - rows);
+        for (var row = 0; row < rows; row++)
+        {
+            canvas.WriteText(content.X, content.Y + row, _entries[offset + row], content.Width);
+        }
+    }
+
+    internal override LayoutMeasurement Measure(in Rect availableBounds)
+    {
+        var width = Math.Max(8, Title.Length + 4);
+        for (var index = 0; index < _entries.Count; index++)
+        {
+            width = Math.Max(width, _entries[index].Length + 2);
+        }
+
+        var height = Math.Max(3, Math.Min(_entries.Count + 2, Capacity + 2));
+        return new LayoutMeasurement(
+            Math.Clamp(width, 0, availableBounds.Width),
+            Math.Clamp(height, 0, availableBounds.Height));
     }
 }

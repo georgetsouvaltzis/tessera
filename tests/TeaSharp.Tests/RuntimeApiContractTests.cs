@@ -1,7 +1,6 @@
 using TeaSharp.Components.Advanced;
 using TeaSharp.Components.Charting;
 using TeaSharp.Components.Composition;
-using TeaSharp.Components.Dashboard;
 using TeaSharp.Components.Interaction;
 using TeaSharp.Components.Prebuilt;
 using TeaSharp.Components.Primitives;
@@ -75,6 +74,9 @@ internal static class RuntimeApiContractTests
         yield return new TestCase(
             "RuntimeApi_LegacyChartDashboardAndCanvasHelpers_AreInternalized",
             LegacyChartDashboardAndCanvasHelpers_AreInternalized);
+        yield return new TestCase(
+            "RuntimeApi_LegacyDashboardHelpers_AreRemoved",
+            LegacyDashboardHelpers_AreRemoved);
         yield return new TestCase(
             "RuntimeApi_LegacyProgramHostingSurface_IsInternalized",
             LegacyProgramHostingSurface_IsInternalized);
@@ -216,10 +218,6 @@ internal static class RuntimeApiContractTests
             "TeaSharp.Components.Charting.BarChartComponent",
             "TeaSharp.Components.Charting.BarDatum",
             "TeaSharp.Components.Charting.LineChartComponent",
-            "TeaSharp.Components.Dashboard.GaugeComponent",
-            "TeaSharp.Components.Dashboard.MiniLogComponent",
-            "TeaSharp.Components.Dashboard.StatsCardComponent",
-            "TeaSharp.Components.Dashboard.StatsCardItem",
             "TeaSharp.Components.Primitives.Widgets",
         ];
 
@@ -229,6 +227,26 @@ internal static class RuntimeApiContractTests
             var type = assembly.GetType(typeName, throwOnError: false);
             TestAssert.True(type is not null, $"{typeName} should continue to exist as an internal bridge.");
             TestAssert.True(type!.IsNotPublic, $"{typeName} should no longer be public once a root wrapper exists.");
+        }
+
+        return Task.CompletedTask;
+    }
+
+    private static Task LegacyDashboardHelpers_AreRemoved()
+    {
+        string[] typeNames =
+        [
+            "TeaSharp.Components.Dashboard.GaugeComponent",
+            "TeaSharp.Components.Dashboard.MiniLogComponent",
+            "TeaSharp.Components.Dashboard.StatsCardComponent",
+            "TeaSharp.Components.Dashboard.StatsCardItem",
+        ];
+
+        var assembly = typeof(Tea).Assembly;
+        foreach (var typeName in typeNames)
+        {
+            var type = assembly.GetType(typeName, throwOnError: false);
+            TestAssert.True(type is null, $"{typeName} should be removed once the root wrapper owns the implementation directly.");
         }
 
         return Task.CompletedTask;

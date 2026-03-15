@@ -159,6 +159,9 @@ The first root controls that already own their implementation directly are:
 - `Accordion`
 - `RadioGroup`
 - `MultiSelect`
+- `Gauge`
+- `MiniLog`
+- `StatsCard`
 - `ListView<T>`
 - `Tabs`
 - `MenuBar`
