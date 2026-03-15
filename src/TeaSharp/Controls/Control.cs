@@ -1,7 +1,4 @@
 using TeaSharp.Components.Primitives;
-using TeaSharp.Core.Abstractions;
-using TeaSharp.Core.Messages;
-using TeaSharp.Internal;
 using TeaSharp.Layout;
 
 namespace TeaSharp.Controls;
@@ -93,26 +90,6 @@ public abstract class Control
         {
             _focusRequestPending = false;
         }
-    }
-
-    internal bool HandleCore(IMessage message)
-    {
-        if (IsDisabled)
-        {
-            return false;
-        }
-
-        return Handle(TeaMessageAdapter.ToPublic(message));
-    }
-
-    internal bool HandleMouseCore(MouseMsg message, Rect bounds)
-    {
-        if (IsDisabled)
-        {
-            return false;
-        }
-
-        return Handle(TeaMessageAdapter.ToPublic(message), bounds);
     }
 
     internal bool TryConsumeFocusRequest(out long order)

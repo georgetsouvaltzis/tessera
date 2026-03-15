@@ -2,7 +2,6 @@ using TeaSharp.Components.Composition;
 using TeaSharp.Components.Primitives;
 using TeaSharp.Components.Primitives.Internal;
 using TeaSharp.Core.Abstractions;
-using TeaSharp.Core.Messages;
 using TeaSharp.Layout;
 
 namespace TeaSharp.Internal;
@@ -397,8 +396,8 @@ internal sealed class TeaSceneCompiler : IScreenCompiler
             }
 
             Action<Canvas, Rect> render;
-            Func<IMessage, bool>? update = null;
-            Func<MouseMsg, Rect, bool>? updateMouse = null;
+            Func<Message, bool>? update = null;
+            Func<PointerInput, Rect, bool>? updateMouse = null;
             Action<bool>? setFocused = null;
             var focusable = false;
             var focusOnClick = false;
@@ -409,8 +408,8 @@ internal sealed class TeaSceneCompiler : IScreenCompiler
             if (component.Control is { } control)
             {
                 render = control.Render;
-                update = control.HandleCore;
-                updateMouse = control.HandleMouseCore;
+                update = control.Handle;
+                updateMouse = control.Handle;
                 setFocused = control.ApplyFocus;
                 focusable = control.CanFocus;
                 focusOnClick = true;
@@ -528,20 +527,19 @@ internal sealed class TeaSceneCompiler : IScreenCompiler
                 }
             }
 
-            var coreMessage = TeaMessageAdapter.ToCore(message);
-            if (coreMessage is MouseMsg mouse)
+            if (message is PointerInput pointer)
             {
-                return UpdateMouse(mouse);
+                return UpdateMouse(pointer);
             }
 
-            return TryGetFocusedRegion(out var focused) && focused.Update is not null && focused.Update(coreMessage);
+            return TryGetFocusedRegion(out var focused) && focused.Update is not null && focused.Update(message);
         }
 
-        private bool UpdateMouse(MouseMsg message)
+        private bool UpdateMouse(PointerInput message)
         {
             var changed = false;
             var targetIndex = FindTopMostRegion(message.X, message.Y);
-            if (targetIndex < 0 && message is MouseWheelMsg && TryGetFocusedRegionIndex(out var focusedIndex))
+            if (targetIndex < 0 && message.Kind == PointerEventKind.Wheel && TryGetFocusedRegionIndex(out var focusedIndex))
             {
                 targetIndex = focusedIndex;
             }
@@ -552,7 +550,7 @@ internal sealed class TeaSceneCompiler : IScreenCompiler
             }
 
             var target = _regions[targetIndex];
-            if (message is MouseClickMsg { Button: MouseButton.Left } && target.Focusable && target.FocusOnClick)
+            if (message is { Kind: PointerEventKind.Press, Button: PointerButton.Left } && target.Focusable && target.FocusOnClick)
             {
                 changed |= ApplyFocus(target.Id, invokeFocus: true);
             }
@@ -704,8 +702,8 @@ internal sealed class TeaSceneCompiler : IScreenCompiler
         string Id,
         Rect Bounds,
         Action<Canvas, Rect> Render,
-        Func<IMessage, bool>? Update,
-        Func<MouseMsg, Rect, bool>? UpdateMouse,
+        Func<Message, bool>? Update,
+        Func<PointerInput, Rect, bool>? UpdateMouse,
         bool Focusable,
         bool FocusOnClick,
         bool InterceptsPointer,
