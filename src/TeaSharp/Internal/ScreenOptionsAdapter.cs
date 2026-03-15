@@ -24,4 +24,25 @@ internal static class ScreenOptionsAdapter
             WindowTitle = options.WindowTitle,
         };
     }
+
+    public static ScreenOptions ToScreenOptions(this global::TeaSharp.Core.Abstractions.TerminalOutput output)
+    {
+        return new ScreenOptions
+        {
+            AltScreen = output.AltScreen,
+            EnableBracketedPaste = output.EnableBracketedPaste,
+            EnableFocusReporting = output.EnableFocusReporting,
+            EnableSynchronizedUpdates = output.EnableSynchronizedUpdates,
+            MouseTracking = output.MouseMode switch
+            {
+                global::TeaSharp.Core.Abstractions.MouseMode.CellMotion => MouseTrackingMode.CellMotion,
+                global::TeaSharp.Core.Abstractions.MouseMode.AllMotion => MouseTrackingMode.AllMotion,
+                _ => MouseTrackingMode.None,
+            },
+            CursorColor = output.CursorColor,
+            ForegroundColor = output.ForegroundColor,
+            BackgroundColor = output.BackgroundColor,
+            WindowTitle = output.WindowTitle,
+        };
+    }
 }

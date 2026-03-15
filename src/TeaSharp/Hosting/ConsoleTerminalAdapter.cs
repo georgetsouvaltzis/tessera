@@ -1,5 +1,5 @@
 using System.ComponentModel;
-using TeaSharp.Core.Terminal;
+using TeaSharp.Internal;
 
 namespace TeaSharp.Hosting;
 
@@ -26,7 +26,7 @@ public sealed class ConsoleTerminalAdapter : ITerminalAdapter
         _inner.RestoreAsync(cancellationToken);
 
     public ValueTask<TerminalSize> GetSizeAsync(CancellationToken cancellationToken) =>
-        _inner.GetSizeAsync(cancellationToken);
+        _inner.GetSizeAsync(cancellationToken).AsHosting();
 
     public ValueTask DisposeAsync() => _inner.DisposeAsync();
 }

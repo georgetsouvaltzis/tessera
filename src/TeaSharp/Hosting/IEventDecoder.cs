@@ -6,6 +6,7 @@ namespace TeaSharp.Hosting;
 /// Represents the input decoder seam used by advanced TeaSharp hosting scenarios.
 /// </summary>
 [EditorBrowsable(EditorBrowsableState.Advanced)]
-public interface IEventDecoder : global::TeaSharp.Core.Input.IEventDecoder
+public interface IEventDecoder
 {
+    EventDecodeResult Decode(ReadOnlySpan<byte> buffer, bool timeoutExpired);
 }

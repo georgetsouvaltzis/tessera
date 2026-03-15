@@ -22,13 +22,17 @@ internal static class RuntimeApiContractTests
         ("BarChartOptions", typeof(TeaSharp.Controls.BarChartOptions)),
         ("LineChartOptions", typeof(TeaSharp.Controls.LineChartOptions)),
         ("IProgramRenderer", typeof(TeaSharp.Hosting.IProgramRenderer)),
+        ("RenderOutput", typeof(TeaSharp.Hosting.RenderOutput)),
         ("NullRenderer", typeof(TeaSharp.Hosting.NullRenderer)),
         ("AnsiDiffRenderer", typeof(TeaSharp.Hosting.AnsiDiffRenderer)),
         ("AnsiRendererOptions", typeof(AnsiRendererOptions)),
         ("ITerminalAdapter", typeof(TeaSharp.Hosting.ITerminalAdapter)),
+        ("TerminalSize", typeof(TeaSharp.Hosting.TerminalSize)),
         ("ConsoleTerminalAdapter", typeof(TeaSharp.Hosting.ConsoleTerminalAdapter)),
         ("IEventDecoder", typeof(TeaSharp.Hosting.IEventDecoder)),
+        ("EventDecodeResult", typeof(TeaSharp.Hosting.EventDecodeResult)),
         ("EventDecoder", typeof(TeaSharp.Hosting.EventDecoder)),
+        ("TerminalCursorStyle", typeof(TeaSharp.Hosting.TerminalCursorStyle)),
         ("TerminalReader", typeof(TerminalReader)),
         ("TerminalCapabilityDetector", typeof(TerminalCapabilityDetector)),
         ("TerminalColorProfileDetector", typeof(TerminalColorProfileDetector)),
@@ -53,6 +57,9 @@ internal static class RuntimeApiContractTests
         yield return new TestCase(
             "RuntimeApi_TeaHostingOptions_UsePublicMessageContracts",
             TeaHostingOptions_UsePublicMessageContracts);
+        yield return new TestCase(
+            "RuntimeApi_HostingInterfaces_DoNotInheritCoreContracts",
+            HostingInterfaces_DoNotInheritCoreContracts);
         yield return new TestCase(
             "RuntimeApi_TeaRuntimeOptions_DoNotExposeHostingOrInterceptionHooks",
             TeaRuntimeOptions_DoNotExposeHostingOrInterceptionHooks);
@@ -149,6 +156,20 @@ internal static class RuntimeApiContractTests
         TestAssert.True(renderer!.PropertyType == typeof(TeaSharp.Hosting.IProgramRenderer), "TeaHostingOptions.Renderer should use TeaSharp.Hosting contracts.");
         TestAssert.True(terminal!.PropertyType == typeof(TeaSharp.Hosting.ITerminalAdapter), "TeaHostingOptions.Terminal should use TeaSharp.Hosting contracts.");
         TestAssert.True(eventDecoder!.PropertyType == typeof(TeaSharp.Hosting.IEventDecoder), "TeaHostingOptions.EventDecoder should use TeaSharp.Hosting contracts.");
+        return Task.CompletedTask;
+    }
+
+    private static Task HostingInterfaces_DoNotInheritCoreContracts()
+    {
+        TestAssert.True(
+            !typeof(TeaSharp.Hosting.IProgramRenderer).IsAssignableTo(typeof(global::TeaSharp.Core.Rendering.IProgramRenderer)),
+            "TeaSharp.Hosting.IProgramRenderer should be TeaSharp-owned, not a core interface alias.");
+        TestAssert.True(
+            !typeof(TeaSharp.Hosting.ITerminalAdapter).IsAssignableTo(typeof(global::TeaSharp.Core.Terminal.ITerminalAdapter)),
+            "TeaSharp.Hosting.ITerminalAdapter should be TeaSharp-owned, not a core interface alias.");
+        TestAssert.True(
+            !typeof(TeaSharp.Hosting.IEventDecoder).IsAssignableTo(typeof(global::TeaSharp.Core.Input.IEventDecoder)),
+            "TeaSharp.Hosting.IEventDecoder should be TeaSharp-owned, not a core interface alias.");
         return Task.CompletedTask;
     }
 

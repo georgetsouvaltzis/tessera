@@ -82,15 +82,69 @@ internal sealed class TeaAppRuntime : ITeaRuntime
             EnableCapabilityProbe = hosting?.EnableCapabilityProbe ?? true,
             CapabilityProbeTimeout = hosting?.CapabilityProbeTimeout ?? TimeSpan.FromMilliseconds(260),
             MaxConcurrentEffects = hosting?.MaxConcurrentEffects ?? 0,
-            Renderer = hosting?.Renderer,
+            Renderer = hosting?.Renderer is null ? null : new HostingRendererAdapter(hosting.Renderer),
             AnsiRendererOptions = hosting?.AnsiRendererOptions,
-            Terminal = hosting?.Terminal,
+            Terminal = hosting?.Terminal is null ? null : new HostingTerminalAdapter(hosting.Terminal),
             TerminalCapabilities = hosting?.TerminalCapabilities,
             TerminalCapabilityDetector = hosting?.TerminalCapabilityDetector,
             ColorProfile = hosting?.ColorProfile,
             ColorProfileDetector = hosting?.ColorProfileDetector,
-            EventDecoder = hosting?.EventDecoder,
+            EventDecoder = hosting?.EventDecoder is null ? null : new HostingEventDecoderAdapter(hosting.EventDecoder),
             CapabilityProbeModes = hosting?.CapabilityProbeModes,
         };
+    }
+
+    private sealed class HostingTerminalAdapter(TeaSharp.Hosting.ITerminalAdapter inner)
+        : global::TeaSharp.Core.Terminal.ITerminalAdapter
+    {
+        public Stream Input => inner.Input;
+
+        public Stream Output => inner.Output;
+
+        public bool IsInputInteractive => inner.IsInputInteractive;
+
+        public bool IsOutputInteractive => inner.IsOutputInteractive;
+
+        public ValueTask PrepareAsync(CancellationToken cancellationToken) => inner.PrepareAsync(cancellationToken);
+
+        public ValueTask RestoreAsync(CancellationToken cancellationToken) => inner.RestoreAsync(cancellationToken);
+
+        public async ValueTask<global::TeaSharp.Core.Terminal.TerminalSize> GetSizeAsync(CancellationToken cancellationToken) =>
+            (await inner.GetSizeAsync(cancellationToken).ConfigureAwait(false)).ToCore();
+
+        public ValueTask DisposeAsync() => inner.DisposeAsync();
+    }
+
+    private sealed class HostingRendererAdapter(TeaSharp.Hosting.IProgramRenderer inner)
+        : global::TeaSharp.Core.Rendering.IProgramRenderer
+    {
+        public ValueTask InitializeAsync(Stream output, CancellationToken cancellationToken) =>
+            inner.InitializeAsync(output, cancellationToken);
+
+        public void Resize(int width, int height) => inner.Resize(width, height);
+
+        public void UpdateCapabilities(global::TeaSharp.Core.Terminal.TerminalCapabilityProfile capabilities) =>
+            inner.UpdateCapabilities(capabilities);
+
+        public void Render(global::TeaSharp.Core.Abstractions.ScreenOutput output) =>
+            inner.Render(output.ToHosting());
+
+        public ValueTask WriteRawAsync(string content, CancellationToken cancellationToken) =>
+            inner.WriteRawAsync(content, cancellationToken);
+
+        public ValueTask FlushAsync(CancellationToken cancellationToken) =>
+            inner.FlushAsync(cancellationToken);
+
+        public ValueTask ResetAsync(CancellationToken cancellationToken) =>
+            inner.ResetAsync(cancellationToken);
+
+        public ValueTask DisposeAsync() => inner.DisposeAsync();
+    }
+
+    private sealed class HostingEventDecoderAdapter(TeaSharp.Hosting.IEventDecoder inner)
+        : global::TeaSharp.Core.Input.IEventDecoder
+    {
+        public global::TeaSharp.Core.Input.DecodeResult Decode(ReadOnlySpan<byte> buffer, bool timeoutExpired) =>
+            inner.Decode(buffer, timeoutExpired).ToCore();
     }
 }

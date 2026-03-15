@@ -1,5 +1,6 @@
 using System.ComponentModel;
 using TeaSharp.Core.Terminal;
+using TeaSharp.Internal;
 
 namespace TeaSharp.Hosting;
 
@@ -19,8 +20,8 @@ public sealed class NullRenderer : IProgramRenderer
     public void UpdateCapabilities(TerminalCapabilityProfile capabilities) =>
         _inner.UpdateCapabilities(capabilities);
 
-    public void Render(global::TeaSharp.Core.Abstractions.ScreenOutput output) =>
-        _inner.Render(output);
+    public void Render(RenderOutput output) =>
+        _inner.Render(output.ToCore());
 
     public ValueTask WriteRawAsync(string content, CancellationToken cancellationToken) =>
         _inner.WriteRawAsync(content, cancellationToken);
