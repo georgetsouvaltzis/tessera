@@ -87,14 +87,14 @@ internal sealed class ComboApp : TeaApp
     public override TeaEffect? Update(Message message) => null;
 
     public override Screen Build(ScreenContext context) =>
-        Screen.From(new WindowLayout
+        Screen.Build(window =>
         {
-            Body = new CenterLayout
+            window.Body(new CenterLayout
             {
                 Content = _combo,
                 Width = 48,
                 Height = 8,
-            },
+            });
         });
 }
 ```

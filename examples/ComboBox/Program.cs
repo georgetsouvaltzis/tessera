@@ -113,15 +113,11 @@ internal sealed class ComboBoxDemoApp : TeaApp
             Height = 20,
         };
 
-        return Screen.From(new WindowLayout
+        return Screen.Build(window =>
         {
-            Footer = new LayoutSlot
-            {
-                Content = _status,
-                Length = 1,
-            },
-            Body = body,
-            Padding = Thickness.All(1),
+            window.Padding(1);
+            window.Body(body);
+            window.Footer(1, _status);
         });
     }
 }

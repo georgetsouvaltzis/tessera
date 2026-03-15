@@ -141,20 +141,16 @@ internal sealed class SearchApp : TeaApp
         _status.LeftText = $"Size {context.Width}x{context.Height}";
         _status.RightText = "q quit";
 
-        return Screen.From(new WindowLayout
+        return Screen.Build(window =>
         {
-            Footer = new LayoutSlot
-            {
-                Content = _status,
-                Length = 1,
-            },
-            Body = new CenterLayout
+            window.Padding(1);
+            window.Body(new CenterLayout
             {
                 Content = _query,
                 Width = 48,
                 Height = 5,
-            },
-            Padding = Thickness.All(1),
+            });
+            window.Footer(1, _status);
         });
     }
 }

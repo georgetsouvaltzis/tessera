@@ -303,22 +303,19 @@ internal sealed class AdvancedWidgetsApp : TeaApp
             };
         }
 
-        return Screen.From(new WindowLayout
+        return Screen.Build(window =>
         {
-            Footer = new LayoutSlot
+            window.Gap(1);
+            window.Padding(1);
+            window.Left(Math.Min(38, Math.Max(30, context.Width / 3)), left);
+            window.Body(right);
+
+            if (overlay is not null)
             {
-                Content = _status,
-                Length = 1,
-            },
-            Left = new LayoutSlot
-            {
-                Content = left,
-                Length = Math.Min(38, Math.Max(30, context.Width / 3)),
-            },
-            Body = right,
-            Overlay = overlay,
-            Padding = Thickness.All(1),
-            Gap = 1,
+                window.Overlay(overlay);
+            }
+
+            window.Footer(1, _status);
         });
     }
 }

@@ -133,14 +133,14 @@ internal sealed class SearchApp : TeaApp
     }
 
     public override Screen Build(ScreenContext context) =>
-        Screen.From(new WindowLayout
+        Screen.Build(window =>
         {
-            Body = new CenterLayout
+            window.Body(new CenterLayout
             {
                 Content = _input,
                 Width = 48,
                 Height = 5,
-            },
+            });
         });
 }
 ```
