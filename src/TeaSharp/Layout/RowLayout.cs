@@ -1,6 +1,5 @@
 using TeaSharp.Components.Primitives;
 using TeaSharp.Controls;
-using TeaSharp.Core.Abstractions;
 using System.ComponentModel;
 using TeaSharp.Components.Composition;
 

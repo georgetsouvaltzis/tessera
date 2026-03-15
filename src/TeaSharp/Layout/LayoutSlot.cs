@@ -1,5 +1,4 @@
 using TeaSharp.Components.Primitives;
-using TeaSharp.Core.Abstractions;
 using TeaSharp.Controls;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
@@ -176,25 +175,6 @@ public sealed record LayoutSlot
         Thickness margin = default)
         : this(
             new ComponentLayout(control),
-            length,
-            margin)
-    {
-    }
-
-    [SetsRequiredMembers]
-    internal LayoutSlot(
-        ICanvasComponent component,
-        LayoutLength length,
-        Thickness margin,
-        int? preferredWidth,
-        int? preferredHeight,
-        bool? focusable,
-        bool focusOnClick,
-        bool interceptsPointer,
-        int layer,
-        Action? onFocus)
-        : this(
-            new ComponentLayout(component, preferredWidth, preferredHeight, focusable, focusOnClick, interceptsPointer, layer, onFocus),
             length,
             margin)
     {

@@ -14,27 +14,12 @@ internal sealed class ComponentLayout : LayoutNode
     [EditorBrowsable(EditorBrowsableState.Advanced)]
     public ComponentLayout(
         ICanvasComponent component,
-        int? preferredWidth,
-        int? preferredHeight,
-        bool? focusable,
-        bool focusOnClick,
-        bool interceptsPointer,
-        int layer,
-        Action? onFocus)
+        int? preferredWidth = null,
+        int? preferredHeight = null)
     {
         CanvasComponent = component ?? throw new ArgumentNullException(nameof(component));
         PreferredWidth = preferredWidth;
         PreferredHeight = preferredHeight;
-        Focusable = focusable;
-        FocusOnClick = focusOnClick;
-        InterceptsPointer = interceptsPointer;
-        Layer = layer;
-        OnFocus = onFocus;
-    }
-
-    public ComponentLayout(ICanvasComponent component)
-        : this(component, null, null, null, focusOnClick: true, interceptsPointer: true, layer: 0, onFocus: null)
-    {
     }
 
     public ComponentLayout(Control control)
@@ -58,36 +43,6 @@ internal sealed class ComponentLayout : LayoutNode
     /// Gets the preferred height used when the layout needs an intrinsic measurement.
     /// </summary>
     public int? PreferredHeight { get; }
-
-    /// <summary>
-    /// Gets the explicit focusability override, if provided.
-    /// </summary>
-    [EditorBrowsable(EditorBrowsableState.Advanced)]
-    public bool? Focusable { get; }
-
-    /// <summary>
-    /// Gets a value indicating whether mouse clicks should move focus into the component.
-    /// </summary>
-    [EditorBrowsable(EditorBrowsableState.Advanced)]
-    public bool FocusOnClick { get; }
-
-    /// <summary>
-    /// Gets a value indicating whether the component should intercept pointer input.
-    /// </summary>
-    [EditorBrowsable(EditorBrowsableState.Advanced)]
-    public bool InterceptsPointer { get; }
-
-    /// <summary>
-    /// Gets the target screen layer used for composition.
-    /// </summary>
-    [EditorBrowsable(EditorBrowsableState.Advanced)]
-    public int Layer { get; }
-
-    /// <summary>
-    /// Gets the optional callback raised when the region receives focus.
-    /// </summary>
-    [EditorBrowsable(EditorBrowsableState.Advanced)]
-    public Action? OnFocus { get; }
 
     internal override LayoutMeasurement Measure(in Rect availableBounds)
     {

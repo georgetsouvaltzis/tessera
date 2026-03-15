@@ -400,7 +400,9 @@ internal sealed class TeaSceneCompiler : IScreenCompiler
             Func<IMessage, bool>? update = null;
             Func<MouseMsg, Rect, bool>? updateMouse = null;
             Action<bool>? setFocused = null;
-            var focusable = component.Focusable ?? false;
+            var focusable = false;
+            var focusOnClick = false;
+            var interceptsPointer = false;
             var requestedFocus = false;
             var requestOrder = 0L;
 
@@ -410,7 +412,9 @@ internal sealed class TeaSceneCompiler : IScreenCompiler
                 update = control.HandleCore;
                 updateMouse = control.HandleMouseCore;
                 setFocused = control.ApplyFocus;
-                focusable = component.Focusable ?? control.CanFocus;
+                focusable = control.CanFocus;
+                focusOnClick = true;
+                interceptsPointer = true;
                 requestedFocus = control.IsFocused;
 
                 if (control.TryConsumeFocusRequest(out var explicitOrder))
@@ -432,11 +436,11 @@ internal sealed class TeaSceneCompiler : IScreenCompiler
                 update,
                 updateMouse,
                 focusable,
-                component.FocusOnClick,
-                component.InterceptsPointer,
-                component.Layer,
+                focusOnClick,
+                interceptsPointer,
+                0,
                 setFocused,
-                component.OnFocus));
+                null));
 
             if (requestedFocus)
             {

@@ -58,11 +58,11 @@ internal static class TeaAppCompositionTests
             "TeaAppComposition_LegacyCompilerTypes_AreRemovedFromDefaultCompilerPath",
             LegacyCompilerTypes_AreRemovedFromDefaultCompilerPath);
         yield return new TestCase(
-            "TeaAppComposition_LegacyLayoutHelpers_AreInternalized",
-            LegacyLayoutHelpers_AreInternalized);
+            "TeaAppComposition_LegacyLayoutHelpers_AreRemoved",
+            LegacyLayoutHelpers_AreRemoved);
         yield return new TestCase(
-            "TeaAppComposition_LegacyCanvasComponentBridgeCtors_AreInternalized",
-            LegacyCanvasComponentBridgeCtors_AreInternalized);
+            "TeaAppComposition_LegacyCanvasComponentBridgeCtors_AreRemoved",
+            LegacyCanvasComponentBridgeCtors_AreRemoved);
         yield return new TestCase(
             "TeaAppComposition_LegacyCanvasComponentEntryPoints_AreMarkedAdvanced",
             LegacyCanvasComponentEntryPoints_AreMarkedAdvanced);
@@ -300,7 +300,7 @@ internal static class TeaAppCompositionTests
         return Task.CompletedTask;
     }
 
-    private static Task LegacyLayoutHelpers_AreInternalized()
+    private static Task LegacyLayoutHelpers_AreRemoved()
     {
         string[] helperTypeNames =
         [
@@ -318,18 +318,15 @@ internal static class TeaAppCompositionTests
         foreach (var helperTypeName in helperTypeNames)
         {
             var helperType = assembly.GetType(helperTypeName, throwOnError: false);
-            TestAssert.True(helperType is not null, $"{helperTypeName} should still exist as an internal legacy bridge.");
-            TestAssert.True(
-                helperType!.IsNotPublic,
-                $"{helperTypeName} should no longer be public on the default composition path.");
+            TestAssert.True(helperType is null, $"{helperTypeName} should be removed once object-based layout assembly is the only supported path.");
         }
 
         return Task.CompletedTask;
     }
 
-    private static Task LegacyCanvasComponentBridgeCtors_AreInternalized()
+    private static Task LegacyCanvasComponentBridgeCtors_AreRemoved()
     {
-        var internalCtors =
+        var removedCtors =
             new (Type Type, Type[] Parameters)[]
             {
                 (typeof(LayoutSlot), [typeof(ICanvasComponent), typeof(LayoutLength), typeof(Thickness), typeof(int?), typeof(int?), typeof(bool?), typeof(bool), typeof(bool), typeof(int), typeof(Action)]),
@@ -337,17 +334,17 @@ internal static class TeaAppCompositionTests
                 (typeof(PanelLayout), [typeof(ICanvasComponent), typeof(string), typeof(BorderStyle), typeof(Thickness), typeof(Thickness), typeof(int?), typeof(int?), typeof(bool?), typeof(bool), typeof(bool), typeof(int), typeof(Action)]),
             };
 
-        foreach (var (type, parameters) in internalCtors)
+        foreach (var (type, parameters) in removedCtors)
         {
             var publicCtor = type.GetConstructor(parameters);
-            TestAssert.True(publicCtor is null, $"{type.Name} advanced canvas bridge constructor should no longer be public.");
+            TestAssert.True(publicCtor is null, $"{type.Name} legacy advanced canvas bridge constructor should be removed.");
 
             var internalCtor = type.GetConstructor(
                 BindingFlags.Instance | BindingFlags.NonPublic,
                 binder: null,
                 types: parameters,
                 modifiers: null);
-            TestAssert.True(internalCtor is not null, $"{type.Name} advanced canvas bridge constructor should remain as an internal bridge.");
+            TestAssert.True(internalCtor is null, $"{type.Name} legacy advanced canvas bridge constructor should be removed instead of kept internal.");
         }
 
         return Task.CompletedTask;

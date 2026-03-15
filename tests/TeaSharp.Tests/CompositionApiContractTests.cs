@@ -3,7 +3,6 @@ using TeaSharp.Components.Styling;
 using System.ComponentModel;
 using System.Reflection;
 using System.Runtime.CompilerServices;
-using TeaSharp.Core.Abstractions;
 using TeaSharp.Controls;
 using TeaSharp.Layout;
 
@@ -47,6 +46,13 @@ internal static class CompositionApiContractTests
         "TeaSharp.Components.UiKit.ViewportClass",
         "TeaSharp.Components.UiKit.UiTheme",
         "TeaSharp.Components.UiKit.UiWidgets",
+        "TeaSharp.Layout.Stack",
+        "TeaSharp.Layout.Split",
+        "TeaSharp.Layout.Panel",
+        "TeaSharp.Layout.Dock",
+        "TeaSharp.Layout.Overlay",
+        "TeaSharp.Layout.Center",
+        "TeaSharp.Layout.Slot",
     ];
 
     public static IEnumerable<TestCase> Cases()

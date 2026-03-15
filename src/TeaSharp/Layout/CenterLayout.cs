@@ -70,25 +70,6 @@ public sealed class CenterLayout : LayoutNode
     {
     }
 
-    [SetsRequiredMembers]
-    internal CenterLayout(
-        ICanvasComponent component,
-        int? width,
-        int? height,
-        Thickness margin,
-        bool? focusable,
-        bool focusOnClick,
-        bool interceptsPointer,
-        int layer,
-        Action? onFocus)
-        : this(
-            new ComponentLayout(component, width, height, focusable, focusOnClick, interceptsPointer, layer, onFocus),
-            width,
-            height,
-            margin)
-    {
-    }
-
     /// <summary>
     /// Gets the centered content.
     /// </summary>

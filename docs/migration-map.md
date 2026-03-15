@@ -49,7 +49,7 @@ This is the working map from legacy pre-release APIs to the current default path
 - `InteractiveScreenModel` -> `TeaApp` with automatic control routing and `Update(...)` for unhandled input/runtime messages
 - `InputRouter` -> typed `Message` handling in `TeaApp.Update(...)`
 - `ScreenRegionKey` -> internalized; rely on implicit tree order on the public path
-- `Stack` / `Split` / `Panel` / `Dock` / `Overlay` / `Center` / `Slot` static helper DSLs -> internalized; replace with `WindowLayout`, `RowLayout`, `ColumnLayout`, `PanelLayout`, `CenterLayout`, `LayoutSlot`
+- `Stack` / `Split` / `Panel` / `Dock` / `Overlay` / `Center` / `Slot` static helper DSLs -> removed; replace with `WindowLayout`, `RowLayout`, `ColumnLayout`, `PanelLayout`, `CenterLayout`, `LayoutSlot`
 
 ## Notes
 

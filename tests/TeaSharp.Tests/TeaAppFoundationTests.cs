@@ -233,7 +233,5 @@ internal static class TeaAppFoundationTests
         }
 
         public override Screen Build(ScreenContext context) => Screen.From(_button);
-
-        protected override TeaEffect? UpdateHandledInput(Message message) => null;
     }
 }

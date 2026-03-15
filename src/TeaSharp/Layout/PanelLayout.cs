@@ -81,29 +81,6 @@ public sealed class PanelLayout : LayoutNode
     {
     }
 
-    [SetsRequiredMembers]
-    internal PanelLayout(
-        ICanvasComponent component,
-        string? title,
-        BorderStyle border,
-        Thickness padding,
-        Thickness margin,
-        int? preferredWidth,
-        int? preferredHeight,
-        bool? focusable,
-        bool focusOnClick,
-        bool interceptsPointer,
-        int layer,
-        Action? onFocus)
-        : this(
-            new ComponentLayout(component, preferredWidth, preferredHeight, focusable, focusOnClick, interceptsPointer, layer, onFocus),
-            title,
-            border,
-            padding,
-            margin)
-    {
-    }
-
     /// <summary>
     /// Gets the nested layout content.
     /// </summary>

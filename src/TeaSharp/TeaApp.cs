@@ -1,5 +1,4 @@
 using TeaSharp.Internal;
-using System.ComponentModel;
 
 namespace TeaSharp;
 
@@ -11,8 +10,7 @@ namespace TeaSharp;
 /// application-level messages, and <see cref="Build"/> whenever the screen must be re-rendered. Built-in
 /// controls usually consume their own input before it reaches <see cref="Update"/>; use
 /// <see cref="Post"/> when a control event should flow back through the application message pipeline, and
-/// <see cref="RequestEffect"/> or <see cref="UpdateHandledInput"/> only when a control interaction needs to
-/// trigger runtime work directly.
+/// <see cref="RequestEffect"/> when app logic needs to trigger runtime work directly.
 /// </remarks>
 public abstract class TeaApp
 {
@@ -20,19 +18,12 @@ public abstract class TeaApp
     private ScreenOptions _runtimeScreenOptions = ScreenOptions.Empty;
     private readonly IScreenCompiler _screenCompiler = ScreenCompilationFactory.CreateDefault();
     private ICompiledScreenInteraction? _interactiveScreen;
-    private bool _inputHandled;
     private readonly List<TeaEffect> _pendingEffects = [];
 
     /// <summary>
     /// Gets the most recent screen context supplied by the runtime.
     /// </summary>
     public ScreenContext Context => _context;
-
-    /// <summary>
-    /// Gets a value indicating whether the current input message was already consumed by the compiled screen tree.
-    /// </summary>
-    [EditorBrowsable(EditorBrowsableState.Advanced)]
-    protected bool InputHandled => _inputHandled;
 
     /// <summary>
     /// Gets the default screen options applied to every screen built by this application.
@@ -59,18 +50,6 @@ public abstract class TeaApp
     public abstract Screen Build(ScreenContext context);
 
     /// <summary>
-    /// Routes an input message through the compiled screen tree.
-    /// </summary>
-    /// <param name="message">The input message to route.</param>
-    /// <returns><see langword="true"/> when a control handled the message; otherwise, <see langword="false"/>.</returns>
-    [EditorBrowsable(EditorBrowsableState.Advanced)]
-    protected bool HandleScreenInput(Message message)
-    {
-        ArgumentNullException.ThrowIfNull(message);
-        return _interactiveScreen?.Handle(message) ?? false;
-    }
-
-    /// <summary>
     /// Posts a message to flow back through <see cref="Update"/> after the current pass completes.
     /// <para>This method does not call <see cref="Update"/> immediately; the runtime processes the message on the next pass.</para>
     /// </summary>
@@ -93,14 +72,6 @@ public abstract class TeaApp
         }
     }
 
-    /// <summary>
-    /// Produces a follow-up effect for input already handled by the compiled screen tree.
-    /// </summary>
-    /// <param name="message">The handled input message.</param>
-    /// <returns>The effect to schedule after the handled input, or <see langword="null"/>.</returns>
-    [EditorBrowsable(EditorBrowsableState.Advanced)]
-    protected virtual TeaEffect? UpdateHandledInput(Message message) => null;
-
     internal void ConfigureRuntimeScreen(ScreenOptions screenOptions)
     {
         _runtimeScreenOptions = screenOptions ?? ScreenOptions.Empty;
@@ -122,10 +93,10 @@ public abstract class TeaApp
                 break;
         }
 
-        _inputHandled = _interactiveScreen?.Handle(mapped) ?? false;
+        var handledInput = _interactiveScreen?.Handle(mapped) ?? false;
         var effect =
-            _inputHandled && IsUserInputMessage(mapped)
-                ? UpdateHandledInput(mapped)
+            handledInput && IsUserInputMessage(mapped)
+                ? null
                 : Update(mapped);
 
         return TeaEffectAdapter.ToCore(CombineEffects(effect, DrainRequestedEffects()));
