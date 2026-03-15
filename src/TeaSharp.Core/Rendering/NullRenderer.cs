@@ -5,7 +5,7 @@ using TeaSharp.Core.Terminal;
 namespace TeaSharp.Core.Rendering;
 
 [EditorBrowsable(EditorBrowsableState.Advanced)]
-public sealed class NullRenderer : IProgramRenderer
+internal sealed class NullRenderer : IProgramRenderer
 {
     public ValueTask InitializeAsync(Stream output, CancellationToken cancellationToken) => ValueTask.CompletedTask;
 

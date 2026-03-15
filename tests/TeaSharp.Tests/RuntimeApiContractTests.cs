@@ -67,6 +67,9 @@ internal static class RuntimeApiContractTests
             "RuntimeApi_CoreTerminalDetectors_AreInternalized",
             CoreTerminalDetectors_AreInternalized);
         yield return new TestCase(
+            "RuntimeApi_CoreRendererAndTerminalContracts_AreInternalized",
+            CoreRendererAndTerminalContracts_AreInternalized);
+        yield return new TestCase(
             "RuntimeApi_TeaRuntimeOptions_DoNotExposeHostingOrInterceptionHooks",
             TeaRuntimeOptions_DoNotExposeHostingOrInterceptionHooks);
         yield return new TestCase(
@@ -206,6 +209,17 @@ internal static class RuntimeApiContractTests
     {
         TestAssert.True(typeof(global::TeaSharp.Core.Terminal.TerminalCapabilityDetector).IsNotPublic, "TeaSharp.Core.Terminal.TerminalCapabilityDetector should be internal.");
         TestAssert.True(typeof(global::TeaSharp.Core.Terminal.TerminalColorProfileDetector).IsNotPublic, "TeaSharp.Core.Terminal.TerminalColorProfileDetector should be internal.");
+        return Task.CompletedTask;
+    }
+
+    private static Task CoreRendererAndTerminalContracts_AreInternalized()
+    {
+        TestAssert.True(typeof(global::TeaSharp.Core.Rendering.IProgramRenderer).IsNotPublic, "TeaSharp.Core.Rendering.IProgramRenderer should be internal.");
+        TestAssert.True(typeof(global::TeaSharp.Core.Rendering.AnsiDiffRenderer).IsNotPublic, "TeaSharp.Core.Rendering.AnsiDiffRenderer should be internal.");
+        TestAssert.True(typeof(global::TeaSharp.Core.Rendering.NullRenderer).IsNotPublic, "TeaSharp.Core.Rendering.NullRenderer should be internal.");
+        TestAssert.True(typeof(global::TeaSharp.Core.Rendering.AnsiRendererOptions).IsNotPublic, "TeaSharp.Core.Rendering.AnsiRendererOptions should be internal.");
+        TestAssert.True(typeof(global::TeaSharp.Core.Terminal.ITerminalAdapter).IsNotPublic, "TeaSharp.Core.Terminal.ITerminalAdapter should be internal.");
+        TestAssert.True(typeof(global::TeaSharp.Core.Terminal.ConsoleTerminalAdapter).IsNotPublic, "TeaSharp.Core.Terminal.ConsoleTerminalAdapter should be internal.");
         return Task.CompletedTask;
     }
 

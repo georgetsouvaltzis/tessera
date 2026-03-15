@@ -5,7 +5,7 @@ using TeaSharp.Core.Abstractions;
 using TeaSharp.Core.Messages;
 
 [EditorBrowsable(EditorBrowsableState.Advanced)]
-public sealed class ConsoleTerminalAdapter : ITerminalAdapter
+internal sealed class ConsoleTerminalAdapter : ITerminalAdapter
 {
     private readonly bool _treatControlAsInputOriginal;
     private readonly bool _ownsInput;

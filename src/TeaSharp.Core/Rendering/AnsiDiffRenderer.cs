@@ -7,7 +7,7 @@ using TeaSharp.Core.Terminal;
 namespace TeaSharp.Core.Rendering;
 
 [EditorBrowsable(EditorBrowsableState.Advanced)]
-public sealed class AnsiDiffRenderer : IProgramRenderer
+internal sealed class AnsiDiffRenderer : IProgramRenderer
 {
     private readonly AnsiRendererOptions _options;
     private Stream? _output;

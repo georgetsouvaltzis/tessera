@@ -5,7 +5,7 @@ using TeaSharp.Core.Terminal;
 namespace TeaSharp.Core.Rendering;
 
 [EditorBrowsable(EditorBrowsableState.Advanced)]
-public interface IProgramRenderer : IAsyncDisposable
+internal interface IProgramRenderer : IAsyncDisposable
 {
     ValueTask InitializeAsync(Stream output, CancellationToken cancellationToken);
     void Resize(int width, int height);

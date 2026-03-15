@@ -403,6 +403,7 @@ Recent progress:
 - advanced hosting detection now has TeaSharp-owned wrappers for capability and color-profile detection
 - core-only decoder helpers now sit behind TeaSharp-owned hosting wrappers instead of remaining public by inertia
 - core-only terminal capability detectors now sit behind TeaSharp-owned hosting wrappers instead of remaining public by inertia
+- core-only renderer and terminal adapter contracts now sit behind TeaSharp-owned hosting wrappers instead of remaining public by inertia
 
 Remaining drift:
 
