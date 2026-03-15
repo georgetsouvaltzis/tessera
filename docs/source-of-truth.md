@@ -485,7 +485,6 @@ This phase is explicit, not implied.
 
 TeaSharp currently ships the new public authoring model on top of an older internal bridge:
 
-- `ScreenComposer`
 - region-based composition internals
 - the current runtime/program bridge behind `TeaApp`
 
@@ -496,7 +495,7 @@ This phase begins when we start replacing those bridge internals directly.
 Scope:
 
 - define the new internal compilation target for `Screen`, controls, and layout
-- stop compiling the root path into `ScreenComposer` as the primary bridge
+- remove `ScreenComposer` and stop compiling the root path through the region-based bridge
 - replace the current runtime/program bridge with a runtime designed around the new root contracts
 - preserve public API shape while swapping internal execution
 - remove obsolete bridge code once parity is reached

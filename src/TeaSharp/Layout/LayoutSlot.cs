@@ -1,9 +1,9 @@
 using TeaSharp.Components.Primitives;
 using TeaSharp.Core.Abstractions;
-using TeaSharp.Components.Composition;
 using TeaSharp.Controls;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
+using TeaSharp.Components.Composition;
 
 namespace TeaSharp.Layout;
 
@@ -170,7 +170,6 @@ public sealed record LayoutSlot
         ICanvasComponent component,
         LayoutLength length,
         Thickness margin,
-        ScreenRegionKey? regionKey,
         int? preferredWidth,
         int? preferredHeight,
         bool? focusable,
@@ -179,7 +178,7 @@ public sealed record LayoutSlot
         int layer,
         Action? onFocus)
         : this(
-            new ComponentLayout(component, regionKey, preferredWidth, preferredHeight, focusable, focusOnClick, interceptsPointer, layer, onFocus),
+            new ComponentLayout(component, preferredWidth, preferredHeight, focusable, focusOnClick, interceptsPointer, layer, onFocus),
             length,
             margin)
     {

@@ -1,7 +1,7 @@
-using TeaSharp.Components.Composition;
 using TeaSharp.Components.Primitives;
 using TeaSharp.Controls;
 using System.ComponentModel;
+using TeaSharp.Components.Composition;
 
 namespace TeaSharp.Layout;
 
@@ -14,7 +14,6 @@ internal sealed class ComponentLayout : LayoutNode
     [EditorBrowsable(EditorBrowsableState.Advanced)]
     public ComponentLayout(
         ICanvasComponent component,
-        ScreenRegionKey? regionKey,
         int? preferredWidth,
         int? preferredHeight,
         bool? focusable,
@@ -24,7 +23,6 @@ internal sealed class ComponentLayout : LayoutNode
         Action? onFocus)
     {
         Component = component ?? throw new ArgumentNullException(nameof(component));
-        RegionKey = regionKey;
         PreferredWidth = preferredWidth;
         PreferredHeight = preferredHeight;
         Focusable = focusable;
@@ -35,7 +33,7 @@ internal sealed class ComponentLayout : LayoutNode
     }
 
     public ComponentLayout(ICanvasComponent component)
-        : this(component, null, null, null, null, focusOnClick: true, interceptsPointer: true, layer: (int)ScreenLayer.Base, onFocus: null)
+        : this(component, null, null, null, focusOnClick: true, interceptsPointer: true, layer: (int)ScreenLayer.Base, onFocus: null)
     {
     }
 
@@ -51,12 +49,6 @@ internal sealed class ComponentLayout : LayoutNode
     public ICanvasComponent Component { get; }
 
     internal Control? Control { get; }
-
-    /// <summary>
-    /// Gets the optional stable region key used when the component participates in screen routing.
-    /// </summary>
-    [EditorBrowsable(EditorBrowsableState.Advanced)]
-    public ScreenRegionKey? RegionKey { get; }
 
     /// <summary>
     /// Gets the preferred width used when the layout needs an intrinsic measurement.
@@ -110,16 +102,5 @@ internal sealed class ComponentLayout : LayoutNode
         return Control is not null
             ? Control.Measure(availableBounds)
             : LayoutIntrinsicMeasurer.Measure(Component, availableBounds);
-    }
-
-    internal override void Compose(ScreenComposer screen, in Rect bounds, string path)
-    {
-        if (bounds.IsEmpty)
-        {
-            return;
-        }
-
-        var regionKey = RegionKey ?? LayoutRegionKeys.Generated(path, "component");
-        screen.AddComponent(regionKey, bounds, Component, Focusable, FocusOnClick, InterceptsPointer, Layer, OnFocus);
     }
 }

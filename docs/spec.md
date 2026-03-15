@@ -140,12 +140,12 @@ Those remain the execution backend while the new root API compiles into them.
 The root screen model compiles through:
 
 1. layout tree normalization
-2. `ScreenComposer` population
-3. focus/input routing snapshot
+2. scene graph compilation
+3. focus/input routing
 4. canvas rendering
 5. terminal output emission
 
-The old composition engine is still present internally, but it is no longer the default app contract.
+The old public composition engine has been removed. Remaining advanced bridges are internal implementation details, not part of the app contract.
 
 ### Interaction
 

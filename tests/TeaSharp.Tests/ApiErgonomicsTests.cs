@@ -1,4 +1,3 @@
-using TeaSharp.Components.Composition;
 using TeaSharp.Components.Interaction;
 using TeaSharp.Components.Prebuilt;
 using TeaSharp.Components.Primitives;
@@ -13,7 +12,6 @@ internal static class ApiErgonomicsTests
     public static IEnumerable<TestCase> Cases()
     {
         yield return new TestCase("ApiErgonomics_Thickness_UsesStandardSpacingVocabulary", Thickness_UsesStandardSpacingVocabulary);
-        yield return new TestCase("ApiErgonomics_ScreenFrameLayout_ReducesScreenRectBookkeeping", ScreenFrameLayout_ReducesScreenRectBookkeeping);
         yield return new TestCase("ApiErgonomics_RootTextInput_ConfiguresWithoutNestedInputAccess", RootTextInput_ConfiguresWithoutNestedInputAccess);
         yield return new TestCase("ApiErgonomics_RootTextArea_ConfiguresWithoutNestedInputAccess", RootTextArea_ConfiguresWithoutNestedInputAccess);
         yield return new TestCase("ApiErgonomics_RootListView_ExposesSelectionWithoutModelAccess", RootListView_ExposesSelectionWithoutModelAccess);
@@ -40,20 +38,6 @@ internal static class ApiErgonomicsTests
         TestAssert.Equal(1, spacing.Bottom, "Thickness should expose bottom spacing.");
         TestAssert.Equal(4, spacing.Horizontal, "Thickness should expose aggregate horizontal spacing.");
         TestAssert.Equal(2, spacing.Vertical, "Thickness should expose aggregate vertical spacing.");
-        return Task.CompletedTask;
-    }
-
-    private static Task ScreenFrameLayout_ReducesScreenRectBookkeeping()
-    {
-        var screen = new ScreenComposer();
-        var frame = screen.Frame(new Rect(0, 0, 100, 30), headerHeight: 1, footerHeight: 2);
-        var (left, right) = frame.SplitBodyColumns(28);
-
-        TestAssert.Equal(new Rect(0, 0, 100, 1), frame.Header, "Screen frame should expose header bounds directly.");
-        TestAssert.Equal(new Rect(0, 1, 100, 27), frame.Body, "Screen frame should expose body bounds directly.");
-        TestAssert.Equal(new Rect(0, 28, 100, 2), frame.Footer, "Screen frame should expose footer bounds directly.");
-        TestAssert.Equal(28, left.Width, "Screen frame body split should preserve requested left width.");
-        TestAssert.Equal(72, right.Width, "Screen frame body split should preserve remaining width.");
         return Task.CompletedTask;
     }
 

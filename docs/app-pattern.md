@@ -117,7 +117,7 @@ Common default controls:
 - `TreeItem`
 - `TreeView`
 - `MenuBar`
-These types compile down into the existing internal composition/runtime engine, but normal apps do not need to use `ScreenComposer` directly.
+These types compile through TeaSharp's scene compiler and runtime loop. Normal apps do not need to touch the old composition bridge at all.
 
 ## Startup
 

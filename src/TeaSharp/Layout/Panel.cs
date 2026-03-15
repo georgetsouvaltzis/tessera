@@ -1,6 +1,6 @@
-using TeaSharp.Components.Composition;
 using TeaSharp.Components.Primitives;
 using System.ComponentModel;
+using TeaSharp.Components.Composition;
 
 namespace TeaSharp.Layout;
 
@@ -26,7 +26,6 @@ internal static class Panel
     /// </summary>
     public static PanelLayout Item(
         ICanvasComponent component,
-        ScreenRegionKey? regionKey = null,
         string? title = null,
         BorderStyle border = BorderStyle.None,
         Thickness padding = default,
@@ -39,7 +38,7 @@ internal static class Panel
         int layer = (int)ScreenLayer.Base,
         Action? onFocus = null) =>
         Item(
-            new ComponentLayout(component, regionKey, preferredWidth, preferredHeight, focusable, focusOnClick, interceptsPointer, layer, onFocus),
+            new ComponentLayout(component, preferredWidth, preferredHeight, focusable, focusOnClick, interceptsPointer, layer, onFocus),
             title,
             border,
             padding,

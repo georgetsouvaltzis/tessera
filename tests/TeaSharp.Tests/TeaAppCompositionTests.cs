@@ -61,8 +61,8 @@ internal static class TeaAppCompositionTests
             "TeaAppComposition_LegacyLayoutHelpers_AreInternalized",
             LegacyLayoutHelpers_AreInternalized);
         yield return new TestCase(
-            "TeaAppComposition_RegionKeyInteropOverloads_AreInternalized",
-            RegionKeyInteropOverloads_AreInternalized);
+            "TeaAppComposition_LegacyCanvasComponentBridgeCtors_AreInternalized",
+            LegacyCanvasComponentBridgeCtors_AreInternalized);
         yield return new TestCase(
             "TeaAppComposition_LegacyCanvasComponentEntryPoints_AreMarkedAdvanced",
             LegacyCanvasComponentEntryPoints_AreMarkedAdvanced);
@@ -327,27 +327,27 @@ internal static class TeaAppCompositionTests
         return Task.CompletedTask;
     }
 
-    private static Task RegionKeyInteropOverloads_AreInternalized()
+    private static Task LegacyCanvasComponentBridgeCtors_AreInternalized()
     {
         var internalCtors =
             new (Type Type, Type[] Parameters)[]
             {
-                (typeof(LayoutSlot), [typeof(ICanvasComponent), typeof(LayoutLength), typeof(Thickness), typeof(ScreenRegionKey), typeof(int?), typeof(int?), typeof(bool?), typeof(bool), typeof(bool), typeof(int), typeof(Action)]),
-                (typeof(CenterLayout), [typeof(ICanvasComponent), typeof(int?), typeof(int?), typeof(Thickness), typeof(ScreenRegionKey), typeof(bool?), typeof(bool), typeof(bool), typeof(int), typeof(Action)]),
-                (typeof(PanelLayout), [typeof(ICanvasComponent), typeof(string), typeof(BorderStyle), typeof(Thickness), typeof(Thickness), typeof(ScreenRegionKey), typeof(int?), typeof(int?), typeof(bool?), typeof(bool), typeof(bool), typeof(int), typeof(Action)]),
+                (typeof(LayoutSlot), [typeof(ICanvasComponent), typeof(LayoutLength), typeof(Thickness), typeof(int?), typeof(int?), typeof(bool?), typeof(bool), typeof(bool), typeof(int), typeof(Action)]),
+                (typeof(CenterLayout), [typeof(ICanvasComponent), typeof(int?), typeof(int?), typeof(Thickness), typeof(bool?), typeof(bool), typeof(bool), typeof(int), typeof(Action)]),
+                (typeof(PanelLayout), [typeof(ICanvasComponent), typeof(string), typeof(BorderStyle), typeof(Thickness), typeof(Thickness), typeof(int?), typeof(int?), typeof(bool?), typeof(bool), typeof(bool), typeof(int), typeof(Action)]),
             };
 
         foreach (var (type, parameters) in internalCtors)
         {
             var publicCtor = type.GetConstructor(parameters);
-            TestAssert.True(publicCtor is null, $"{type.Name} region-key overload should no longer be public.");
+            TestAssert.True(publicCtor is null, $"{type.Name} advanced canvas bridge constructor should no longer be public.");
 
             var internalCtor = type.GetConstructor(
                 BindingFlags.Instance | BindingFlags.NonPublic,
                 binder: null,
                 types: parameters,
                 modifiers: null);
-            TestAssert.True(internalCtor is not null, $"{type.Name} region-key overload should remain as an internal bridge.");
+            TestAssert.True(internalCtor is not null, $"{type.Name} advanced canvas bridge constructor should remain as an internal bridge.");
         }
 
         return Task.CompletedTask;

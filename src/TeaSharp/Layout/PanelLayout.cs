@@ -1,9 +1,9 @@
-using TeaSharp.Components.Composition;
 using TeaSharp.Components.Primitives;
 using TeaSharp.Components.Primitives.Internal;
 using TeaSharp.Controls;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
+using TeaSharp.Components.Composition;
 
 namespace TeaSharp.Layout;
 
@@ -88,7 +88,6 @@ public sealed class PanelLayout : LayoutNode
         BorderStyle border,
         Thickness padding,
         Thickness margin,
-        ScreenRegionKey? regionKey,
         int? preferredWidth,
         int? preferredHeight,
         bool? focusable,
@@ -97,7 +96,7 @@ public sealed class PanelLayout : LayoutNode
         int layer,
         Action? onFocus)
         : this(
-            new ComponentLayout(component, regionKey, preferredWidth, preferredHeight, focusable, focusOnClick, interceptsPointer, layer, onFocus),
+            new ComponentLayout(component, preferredWidth, preferredHeight, focusable, focusOnClick, interceptsPointer, layer, onFocus),
             title,
             border,
             padding,
@@ -146,34 +145,6 @@ public sealed class PanelLayout : LayoutNode
         return new LayoutMeasurement(
             Math.Clamp(width, 0, availableBounds.Width),
             Math.Clamp(height, 0, availableBounds.Height));
-    }
-
-    internal override void Compose(ScreenComposer screen, in Rect bounds, string path)
-    {
-        var outer = Rect.Intersect(bounds.Inset(Margin), bounds);
-        if (outer.IsEmpty)
-        {
-            return;
-        }
-
-        if (Border != BorderStyle.None)
-        {
-            screen.AddRegion(
-                LayoutRegionKeys.Generated(path, "panel"),
-                outer,
-                (canvas, rect) => canvas.DrawBox(rect, Title, Border),
-                focusable: false,
-                focusOnClick: false,
-                interceptsPointer: false);
-        }
-
-        var contentRect = FrameLayout.ResolveContentRect(outer, Border, Padding);
-        if (contentRect.IsEmpty)
-        {
-            return;
-        }
-
-        GetContent().Compose(screen, contentRect, $"{path}/content");
     }
 
     private LayoutNode GetContent()

@@ -1,8 +1,8 @@
-using TeaSharp.Components.Composition;
 using TeaSharp.Components.Primitives;
 using TeaSharp.Controls;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
+using TeaSharp.Components.Composition;
 
 namespace TeaSharp.Layout;
 
@@ -76,14 +76,13 @@ public sealed class CenterLayout : LayoutNode
         int? width,
         int? height,
         Thickness margin,
-        ScreenRegionKey? regionKey,
         bool? focusable,
         bool focusOnClick,
         bool interceptsPointer,
         int layer,
         Action? onFocus)
         : this(
-            new ComponentLayout(component, regionKey, width, height, focusable, focusOnClick, interceptsPointer, layer, onFocus),
+            new ComponentLayout(component, width, height, focusable, focusOnClick, interceptsPointer, layer, onFocus),
             width,
             height,
             margin)
@@ -119,23 +118,6 @@ public sealed class CenterLayout : LayoutNode
         return new LayoutMeasurement(
             Math.Clamp(width + Margin.Horizontal, 0, availableBounds.Width),
             Math.Clamp(height + Margin.Vertical, 0, availableBounds.Height));
-    }
-
-    internal override void Compose(ScreenComposer screen, in Rect bounds, string path)
-    {
-        var inner = Rect.Intersect(bounds.Inset(Margin), bounds);
-        if (inner.IsEmpty)
-        {
-            return;
-        }
-
-        var content = GetContent();
-        var measured = content.Measure(inner);
-        var width = Math.Clamp(Width ?? measured.Width, 0, inner.Width);
-        var height = Math.Clamp(Height ?? measured.Height, 0, inner.Height);
-        var x = inner.X + Math.Max(0, (inner.Width - width) / 2);
-        var y = inner.Y + Math.Max(0, (inner.Height - height) / 2);
-        content.Compose(screen, new Rect(x, y, width, height), $"{path}/center");
     }
 
     private LayoutNode GetContent()

@@ -120,7 +120,6 @@ These areas still expose more mechanism than the long-term public design should:
 TeaSharp is shifting from:
 
 - `InteractiveScreenModel`
-- `ScreenComposer`
 - `InputRouter`
 
 to:
@@ -136,7 +135,7 @@ to:
 
 The old `TeaHost.CreateProgram(...)` / `TeaProgramOptions` / `IScreen` program-hosting path has been removed.
 
-The old tree-oriented stack now mostly compiles behind the scenes as an internal bridge. The previous static layout helper DSL is also internal-only.
+The old `ScreenComposer` composition bridge has been removed. The previous static layout helper DSL is internal-only, and root layouts now compile through the scene compiler/runtime loop.
 
 The first root controls that already own their implementation directly are:
 

@@ -1,7 +1,5 @@
 using TeaSharp.Components.Primitives;
 
-using TeaSharp.Components.Composition;
-
 namespace TeaSharp.Layout;
 
 internal sealed class OverlayLayout : LayoutNode
@@ -33,13 +31,5 @@ internal sealed class OverlayLayout : LayoutNode
         }
 
         return new LayoutMeasurement(width, height);
-    }
-
-    internal override void Compose(ScreenComposer screen, in Rect bounds, string path)
-    {
-        for (var index = 0; index < Items.Count; index++)
-        {
-            Items[index].Compose(screen, bounds, $"{path}/overlay:{index}");
-        }
     }
 }

@@ -1,4 +1,3 @@
-using TeaSharp.Components.Composition;
 using TeaSharp.Components.Interaction;
 using TeaSharp.Components.Prebuilt;
 using TeaSharp.Components.Primitives;
@@ -27,14 +26,8 @@ internal static class CompositionApiContractTests
 
     private static readonly string[] InternalizedCompositionTypes =
     [
-        "TeaSharp.Components.Composition.ScreenComposer",
-        "TeaSharp.Components.Composition.ScreenFocusChain",
-        "TeaSharp.Components.Composition.ScreenFocusSnapshot",
-        "TeaSharp.Components.Composition.ScreenFrameLayout",
         "TeaSharp.Components.Composition.ScreenLayer",
         "TeaSharp.Components.Composition.ComponentSlot",
-        "TeaSharp.Components.Composition.ScreenRegion",
-        "TeaSharp.Components.Composition.ScreenRegionKey",
         "TeaSharp.Components.Prebuilt.LayoutFlow",
         "TeaSharp.Components.Prebuilt.LayoutContainerOptions",
         "TeaSharp.Components.Prebuilt.LayoutContainerComponent",
@@ -50,6 +43,12 @@ internal static class CompositionApiContractTests
 
     private static readonly string[] RemovedCompositionTypes =
     [
+        "TeaSharp.Components.Composition.ScreenComposer",
+        "TeaSharp.Components.Composition.ScreenFocusChain",
+        "TeaSharp.Components.Composition.ScreenFocusSnapshot",
+        "TeaSharp.Components.Composition.ScreenFrameLayout",
+        "TeaSharp.Components.Composition.ScreenRegion",
+        "TeaSharp.Components.Composition.ScreenRegionKey",
         "TeaSharp.Components.UiKit.UiTheme",
         "TeaSharp.Components.UiKit.UiWidgets",
     ];

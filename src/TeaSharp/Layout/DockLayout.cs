@@ -1,4 +1,3 @@
-using TeaSharp.Components.Composition;
 using TeaSharp.Components.Primitives;
 
 namespace TeaSharp.Layout;
@@ -61,6 +60,4 @@ internal sealed class DockLayout : LayoutNode
     internal override LayoutMeasurement Measure(in Rect availableBounds) =>
         LayoutArrangement.MeasureDock(this, availableBounds);
 
-    internal override void Compose(ScreenComposer screen, in Rect bounds, string path) =>
-        LayoutArrangement.ComposeDock(screen, this, bounds, path);
 }

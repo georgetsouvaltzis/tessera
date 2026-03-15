@@ -1,6 +1,6 @@
-using TeaSharp.Components.Composition;
 using TeaSharp.Components.Primitives;
 using System.ComponentModel;
+using TeaSharp.Components.Composition;
 
 namespace TeaSharp.Layout;
 
@@ -21,7 +21,6 @@ internal static class Slot
     /// </summary>
     public static LayoutSlot Auto(
         ICanvasComponent component,
-        ScreenRegionKey? regionKey = null,
         int? preferredWidth = null,
         int? preferredHeight = null,
         Thickness margin = default,
@@ -31,7 +30,7 @@ internal static class Slot
         int layer = (int)ScreenLayer.Base,
         Action? onFocus = null) =>
         new(
-            new ComponentLayout(component, regionKey, preferredWidth, preferredHeight, focusable, focusOnClick, interceptsPointer, layer, onFocus),
+            new ComponentLayout(component, preferredWidth, preferredHeight, focusable, focusOnClick, interceptsPointer, layer, onFocus),
             LayoutLength.Auto(),
             margin);
 
@@ -47,7 +46,6 @@ internal static class Slot
     public static LayoutSlot Fixed(
         int size,
         ICanvasComponent component,
-        ScreenRegionKey? regionKey = null,
         int? preferredWidth = null,
         int? preferredHeight = null,
         Thickness margin = default,
@@ -57,7 +55,7 @@ internal static class Slot
         int layer = (int)ScreenLayer.Base,
         Action? onFocus = null) =>
         new(
-            new ComponentLayout(component, regionKey, preferredWidth, preferredHeight, focusable, focusOnClick, interceptsPointer, layer, onFocus),
+            new ComponentLayout(component, preferredWidth, preferredHeight, focusable, focusOnClick, interceptsPointer, layer, onFocus),
             LayoutLength.Fixed(size),
             margin);
 
@@ -72,7 +70,6 @@ internal static class Slot
     /// </summary>
     public static LayoutSlot Fill(
         ICanvasComponent component,
-        ScreenRegionKey? regionKey = null,
         int? preferredWidth = null,
         int? preferredHeight = null,
         Thickness margin = default,
@@ -82,7 +79,7 @@ internal static class Slot
         int layer = (int)ScreenLayer.Base,
         Action? onFocus = null) =>
         new(
-            new ComponentLayout(component, regionKey, preferredWidth, preferredHeight, focusable, focusOnClick, interceptsPointer, layer, onFocus),
+            new ComponentLayout(component, preferredWidth, preferredHeight, focusable, focusOnClick, interceptsPointer, layer, onFocus),
             LayoutLength.Fill(),
             margin);
 
@@ -98,7 +95,6 @@ internal static class Slot
     public static LayoutSlot Weighted(
         int weight,
         ICanvasComponent component,
-        ScreenRegionKey? regionKey = null,
         int? preferredWidth = null,
         int? preferredHeight = null,
         Thickness margin = default,
@@ -108,7 +104,7 @@ internal static class Slot
         int layer = (int)ScreenLayer.Base,
         Action? onFocus = null) =>
         new(
-            new ComponentLayout(component, regionKey, preferredWidth, preferredHeight, focusable, focusOnClick, interceptsPointer, layer, onFocus),
+            new ComponentLayout(component, preferredWidth, preferredHeight, focusable, focusOnClick, interceptsPointer, layer, onFocus),
             LayoutLength.Weighted(weight),
             margin);
 }

@@ -1,4 +1,3 @@
-using TeaSharp.Components.Composition;
 using TeaSharp.Components.Primitives;
 
 namespace TeaSharp.Layout;
@@ -58,15 +57,4 @@ internal sealed class SplitLayout : LayoutNode
             Padding,
             availableBounds);
 
-    internal override void Compose(ScreenComposer screen, in Rect bounds, string path)
-    {
-        LayoutArrangement.ComposeStack(
-            screen,
-            IsHorizontal,
-            new[] { First, Second },
-            Gap,
-            Padding,
-            bounds,
-            path);
-    }
 }

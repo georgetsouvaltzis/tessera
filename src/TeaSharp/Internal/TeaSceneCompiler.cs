@@ -408,7 +408,7 @@ internal sealed class TeaSceneCompiler : IScreenCompiler
                 requestOrder = explicitOrder;
             }
 
-            var id = component.RegionKey?.Value ?? $"{path}/component";
+            var id = $"{path}/component";
             _regions.Add(new TeaSceneRegion(
                 id,
                 bounds,

@@ -1,8 +1,8 @@
-using TeaSharp.Components.Composition;
 using TeaSharp.Components.Primitives;
 using TeaSharp.Controls;
 using TeaSharp.Styles;
 using System.ComponentModel;
+using TeaSharp.Components.Composition;
 
 namespace TeaSharp.Layout;
 
@@ -23,7 +23,6 @@ internal static class Center
     /// </summary>
     public static CenterLayout Item(
         ICanvasComponent component,
-        ScreenRegionKey? regionKey = null,
         int? width = null,
         int? height = null,
         Thickness margin = default,
@@ -33,7 +32,7 @@ internal static class Center
         int layer = (int)ScreenLayer.Base,
         Action? onFocus = null) =>
         new(
-            new ComponentLayout(component, regionKey, width, height, focusable, focusOnClick, interceptsPointer, layer, onFocus),
+            new ComponentLayout(component, width, height, focusable, focusOnClick, interceptsPointer, layer, onFocus),
             width,
             height,
             margin);

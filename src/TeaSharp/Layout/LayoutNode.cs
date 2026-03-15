@@ -1,4 +1,3 @@
-using TeaSharp.Components.Composition;
 using TeaSharp.Components.Primitives;
 using TeaSharp.Controls;
 
@@ -17,6 +16,4 @@ public abstract class LayoutNode
         => new ComponentLayout(control ?? throw new ArgumentNullException(nameof(control)));
 
     internal abstract LayoutMeasurement Measure(in Rect availableBounds);
-
-    internal abstract void Compose(ScreenComposer screen, in Rect bounds, string path);
 }

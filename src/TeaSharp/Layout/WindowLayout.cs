@@ -1,4 +1,3 @@
-using TeaSharp.Components.Composition;
 using TeaSharp.Components.Primitives;
 
 namespace TeaSharp.Layout;
@@ -56,12 +55,6 @@ public sealed class WindowLayout : LayoutNode
     {
         return CreateRoot().Measure(availableBounds);
     }
-
-    internal override void Compose(ScreenComposer screen, in Rect bounds, string path)
-    {
-        CreateRoot().Compose(screen, bounds, path);
-    }
-
     private LayoutNode CreateRoot()
     {
         var content = new DockLayout(

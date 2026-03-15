@@ -1,8 +1,8 @@
-using TeaSharp.Components.Composition;
 using TeaSharp.Components.Primitives;
 using TeaSharp.Controls;
 using TeaSharp.Core.Abstractions;
 using System.ComponentModel;
+using TeaSharp.Components.Composition;
 
 namespace TeaSharp.Layout;
 
@@ -117,11 +117,5 @@ public sealed class ColumnLayout : LayoutNode
     {
         return new StackLayout(LayoutOrientation.Vertical, [.. Items], Gap, Padding)
             .Measure(availableBounds);
-    }
-
-    internal override void Compose(ScreenComposer screen, in Rect bounds, string path)
-    {
-        new StackLayout(LayoutOrientation.Vertical, [.. Items], Gap, Padding)
-            .Compose(screen, bounds, path);
     }
 }
