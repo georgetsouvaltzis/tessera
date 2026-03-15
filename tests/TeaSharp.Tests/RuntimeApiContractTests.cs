@@ -37,7 +37,6 @@ internal static class RuntimeApiContractTests
         ("TerminalCursorStyle", typeof(TeaSharp.Hosting.TerminalCursorStyle)),
         ("TerminalCapabilityDetector", typeof(TeaSharp.Hosting.TerminalCapabilityDetector)),
         ("TerminalColorProfileDetector", typeof(TeaSharp.Hosting.TerminalColorProfileDetector)),
-        ("TerminalReader", typeof(TerminalReader)),
     ];
 
     public static IEnumerable<TestCase> Cases()

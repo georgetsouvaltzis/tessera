@@ -6,7 +6,7 @@ using TeaSharp.Core.Messages;
 namespace TeaSharp.Core.Input;
 
 [EditorBrowsable(EditorBrowsableState.Advanced)]
-public sealed class TerminalReader(Stream input, IEventDecoder decoder, TimeSpan escapeTimeout)
+internal sealed class TerminalReader(Stream input, IEventDecoder decoder, TimeSpan escapeTimeout)
 {
     private const int DefaultReadBufferSize = 4096;
 
