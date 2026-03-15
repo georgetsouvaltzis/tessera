@@ -148,6 +148,9 @@ The first root controls that already own their implementation directly are:
 - `ComboBox`
 - `ContextMenu`
 - `CommandPalette`
+- `Dialog`
+- `ProgressBar`
+- `LogView`
 - `ListView<T>`
 - `Tabs`
 - `MenuBar`

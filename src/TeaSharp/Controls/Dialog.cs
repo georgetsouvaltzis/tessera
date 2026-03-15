@@ -1,6 +1,8 @@
-using TeaSharp.Components.Prebuilt;
 using TeaSharp.Components.Primitives;
+using TeaSharp.Components.Primitives.Internal;
 using System.ComponentModel;
+using TeaSharp.Controls.Internal;
+using TeaSharp.Layout;
 
 namespace TeaSharp.Controls;
 
@@ -9,42 +11,36 @@ namespace TeaSharp.Controls;
 /// </summary>
 public sealed class Dialog : Control
 {
-    private readonly DialogComponent _component = new();
+    private long _resultVersion;
+    private long _consumedResultVersion;
+    private List<string> _bodyLines = ["Confirm?"];
 
     /// <summary>
     /// Occurs when the dialog is accepted.
     /// </summary>
-    public event EventHandler? Accepted
-    {
-        add => _component.Accepted += value;
-        remove => _component.Accepted -= value;
-    }
+    public event EventHandler? Accepted;
 
     /// <summary>
     /// Occurs when the dialog is dismissed.
     /// </summary>
-    public event EventHandler? Dismissed
-    {
-        add => _component.Dismissed += value;
-        remove => _component.Dismissed -= value;
-    }
+    public event EventHandler? Dismissed;
 
     /// <summary>
     /// Gets or sets the dialog title.
     /// </summary>
     public string Title
     {
-        get => _component.Title;
-        set => _component.Title = value ?? string.Empty;
-    }
+        get;
+        set => field = value ?? string.Empty;
+    } = "Dialog";
 
     /// <summary>
     /// Gets or sets the dialog body lines.
     /// </summary>
     public IReadOnlyList<string> BodyLines
     {
-        get => _component.BodyLines;
-        set => _component.BodyLines = value ?? Array.Empty<string>();
+        get => _bodyLines;
+        set => _bodyLines = [.. (value ?? ["Confirm?"])];
     }
 
     /// <summary>
@@ -52,17 +48,17 @@ public sealed class Dialog : Control
     /// </summary>
     public BorderStyle Border
     {
-        get => _component.Border;
-        set => _component.Border = value;
-    }
+        get;
+        set;
+    } = BorderStyle.Rounded;
 
     /// <summary>
     /// Gets or sets the inner padding applied to the dialog body.
     /// </summary>
     public Thickness Padding
     {
-        get => _component.Padding;
-        set => _component.Padding = value;
+        get;
+        set;
     }
 
     /// <summary>
@@ -70,15 +66,17 @@ public sealed class Dialog : Control
     /// </summary>
     public bool IsVisible
     {
-        get => _component.IsVisible;
-        set => _component.IsVisible = value;
+        get;
+        set;
     }
 
     public override bool IsFocused
     {
-        get => _component.IsFocused;
-        set => _component.IsFocused = value;
+        get;
+        set;
     }
+
+    public DialogResult LastResult { get; private set; }
 
     /// <summary>
     /// Shows the dialog with the supplied title and body lines.
@@ -90,6 +88,7 @@ public sealed class Dialog : Control
         Title = title;
         BodyLines = lines;
         IsVisible = true;
+        RequestFocus();
     }
 
     /// <summary>
@@ -101,35 +100,131 @@ public sealed class Dialog : Control
     }
 
     /// <summary>
-    /// Attempts to consume a pending dialog result from the wrapped legacy component.
+    /// Attempts to consume the latest dialog result exactly once.
     /// </summary>
     /// <param name="result">Receives the consumed result when available.</param>
     /// <returns><see langword="true"/> when a result was consumed; otherwise, <see langword="false"/>.</returns>
     [EditorBrowsable(EditorBrowsableState.Advanced)]
     public bool TryConsumeResult(out DialogResult result)
     {
-        if (_component.TryConsumeResult(out var current))
+        if (_resultVersion == _consumedResultVersion)
         {
-            result = current switch
-            {
-                global::TeaSharp.Components.Prebuilt.DialogResult.Accepted => DialogResult.Accepted,
-                global::TeaSharp.Components.Prebuilt.DialogResult.Dismissed => DialogResult.Dismissed,
-                _ => DialogResult.None,
-            };
-            return true;
+            result = DialogResult.None;
+            return false;
         }
 
-        result = DialogResult.None;
-        return false;
+        _consumedResultVersion = _resultVersion;
+        result = LastResult;
+        return true;
     }
 
     public override bool Handle(Message message)
     {
-        return ControlForwarder.Forward(_component, message);
+        if (!IsVisible || !IsFocused || message is not KeyPressed key)
+        {
+            return false;
+        }
+
+        if (key.Is(Key.Escape))
+        {
+            return ApplyResult(DialogResult.Dismissed);
+        }
+
+        if (key.Is(Key.Enter) || key.IsCharacter(' '))
+        {
+            return ApplyResult(DialogResult.Accepted);
+        }
+
+        return false;
     }
 
     public override void Render(Canvas canvas, Rect rect)
     {
-        _component.Render(canvas, rect);
+        if (!IsVisible)
+        {
+            return;
+        }
+
+        var clipped = Rect.Intersect(rect, canvas.Bounds);
+        if (clipped.IsEmpty)
+        {
+            return;
+        }
+
+        for (var y = clipped.Y; y < clipped.Bottom; y++)
+        {
+            for (var x = clipped.X; x < clipped.Right; x++)
+            {
+                canvas.Set(x, y, '·');
+            }
+        }
+
+        if (clipped.Width < 4 || clipped.Height < 4)
+        {
+            return;
+        }
+
+        var modalWidth = Math.Clamp(clipped.Width * 3 / 5, 4, Math.Max(4, clipped.Width - 2));
+        var modalHeight = Math.Clamp(clipped.Height / 2, 4, Math.Max(4, clipped.Height - 2));
+        var modalX = clipped.X + (clipped.Width - modalWidth) / 2;
+        var modalY = clipped.Y + (clipped.Height - modalHeight) / 2;
+        var modal = new Rect(modalX, modalY, modalWidth, modalHeight);
+
+        FillRect(canvas, modal, ' ');
+        var body = FrameLayout.DrawFrameAndResolveContent(canvas, modal, Title, Border, Padding);
+        if (body.IsEmpty)
+        {
+            return;
+        }
+
+        var rows = Math.Min(body.Height, _bodyLines.Count);
+        for (var row = 0; row < rows; row++)
+        {
+            canvas.WriteText(body.X, body.Y + row, _bodyLines[row], body.Width);
+        }
+    }
+
+    internal override LayoutMeasurement Measure(in Rect availableBounds)
+    {
+        var longest = _bodyLines.Count == 0 ? 8 : _bodyLines.Max(ControlTextLayout.MeasureDisplayWidth);
+        var width = Math.Max(Title.Length + 4, longest + Padding.Horizontal) + 2;
+        var height = Math.Max(4, _bodyLines.Count + Padding.Vertical + 2);
+        return new LayoutMeasurement(
+            Math.Clamp(width, 0, availableBounds.Width),
+            Math.Clamp(height, 0, availableBounds.Height));
+    }
+
+    private bool ApplyResult(DialogResult result)
+    {
+        IsVisible = false;
+        LastResult = result;
+        _resultVersion++;
+        if (result == DialogResult.Accepted)
+        {
+            Accepted?.Invoke(this, EventArgs.Empty);
+        }
+        else if (result == DialogResult.Dismissed)
+        {
+            Dismissed?.Invoke(this, EventArgs.Empty);
+        }
+
+        return true;
+    }
+
+    private static void FillRect(Canvas canvas, Rect rect, char fill)
+    {
+        var clipped = Rect.Intersect(rect, canvas.Bounds);
+        if (clipped.IsEmpty)
+        {
+            return;
+        }
+
+        for (var y = clipped.Y; y < clipped.Bottom; y++)
+        {
+            for (var x = clipped.X; x < clipped.Right; x++)
+            {
+                canvas.Set(x, y, fill);
+            }
+        }
     }
 }

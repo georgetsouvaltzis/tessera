@@ -58,13 +58,6 @@ internal static class TeaControlCatalogTests
 
     private static readonly string[] InternalizedLegacyPrebuiltTypes =
     [
-        "TeaSharp.Components.Prebuilt.DialogComponent",
-        "TeaSharp.Components.Prebuilt.DialogOptions",
-        "TeaSharp.Components.Prebuilt.DialogResult",
-        "TeaSharp.Components.Prebuilt.ProgressBarComponent",
-        "TeaSharp.Components.Prebuilt.ProgressBarOptions",
-        "TeaSharp.Components.Prebuilt.LogViewerComponent",
-        "TeaSharp.Components.Prebuilt.LogViewerOptions",
         "TeaSharp.Components.Prebuilt.TableComponent",
         "TeaSharp.Components.Prebuilt.TableOptions",
     ];
@@ -91,6 +84,13 @@ internal static class TeaControlCatalogTests
         "TeaSharp.Components.Prebuilt.ListComponent`1",
         "TeaSharp.Components.Prebuilt.ListOptions`1",
         "TeaSharp.Components.Prebuilt.ListSelectionChangedEventArgs`1",
+        "TeaSharp.Components.Prebuilt.DialogComponent",
+        "TeaSharp.Components.Prebuilt.DialogOptions",
+        "TeaSharp.Components.Prebuilt.DialogResult",
+        "TeaSharp.Components.Prebuilt.ProgressBarComponent",
+        "TeaSharp.Components.Prebuilt.ProgressBarOptions",
+        "TeaSharp.Components.Prebuilt.LogViewerComponent",
+        "TeaSharp.Components.Prebuilt.LogViewerOptions",
     ];
 
     private static readonly string[] InternalizedLegacyPromotedTypes =

@@ -11,8 +11,6 @@ using TeaSharp.Components.UiKit;
 using TeaSharp.Controls;
 using System.Globalization;
 using TeaSharp.Core.Messages;
-using LegacyDialogResult = TeaSharp.Components.Prebuilt.DialogResult;
-
 namespace TeaSharp.Tests;
 
 internal static class PrebuiltWidgetTests
@@ -66,12 +64,12 @@ internal static class PrebuiltWidgetTests
         yield return new TestCase("Controls_CommandPalette_Open_ClearsQueryWhenClosed", CommandPalette_Open_ClearsQueryWhenClosed);
         yield return new TestCase("Controls_CommandPalette_LettersRemainQueryable", CommandPalette_LettersRemainQueryable);
         yield return new TestCase("Prebuilt_TableComponent_ForwardsSortHotkeys", TableComponent_ForwardsSortHotkeys);
-        yield return new TestCase("Prebuilt_ProgressBarComponent_AdjustsValue", ProgressBarComponent_AdjustsValue);
+        yield return new TestCase("Controls_ProgressBar_AdjustsValue", ProgressBar_AdjustsValue);
         yield return new TestCase("Controls_StatusBar_RendersLeftAndRightText", StatusBar_RendersLeftAndRightText);
-        yield return new TestCase("Prebuilt_LogViewerComponent_AppendsAndFilters", LogViewerComponent_AppendsAndFilters);
-        yield return new TestCase("Prebuilt_DialogComponent_AcceptsAndDismisses", DialogComponent_AcceptsAndDismisses);
-        yield return new TestCase("Prebuilt_DialogComponent_Events_FirePerDecision", DialogComponent_Events_FirePerDecision);
-        yield return new TestCase("Prebuilt_DialogComponent_TryConsumeResult_IsSingleUse", DialogComponent_TryConsumeResult_IsSingleUse);
+        yield return new TestCase("Controls_LogView_AppendsAndFilters", LogView_AppendsAndFilters);
+        yield return new TestCase("Controls_Dialog_AcceptsAndDismisses", Dialog_AcceptsAndDismisses);
+        yield return new TestCase("Controls_Dialog_Events_FirePerDecision", Dialog_Events_FirePerDecision);
+        yield return new TestCase("Controls_Dialog_TryConsumeResult_IsSingleUse", Dialog_TryConsumeResult_IsSingleUse);
         yield return new TestCase("Prebuilt_LayoutContainerComponent_RendersChildren", LayoutContainerComponent_RendersChildren);
         yield return new TestCase("Prebuilt_LayoutContainerComponent_KeyboardRoutesToFocusedChildOnly", LayoutContainerComponent_KeyboardRoutesToFocusedChildOnly);
         yield return new TestCase("Prebuilt_LayoutContainerComponent_MouseResizeAdjustsPrimarySize", LayoutContainerComponent_MouseResizeAdjustsPrimarySize);
@@ -954,17 +952,17 @@ internal static class PrebuiltWidgetTests
         return Task.CompletedTask;
     }
 
-    private static Task ProgressBarComponent_AdjustsValue()
+    private static Task ProgressBar_AdjustsValue()
     {
-        var progress = new ProgressBarComponent
+        var progress = new ProgressBar
         {
             IsFocused = true,
             Step = 0.25,
         };
 
-        progress.Update(new KeyPressMsg(KeyCode.Right));
-        progress.Update(new KeyPressMsg(KeyCode.Right));
-        progress.Update(new KeyPressMsg(KeyCode.Left));
+        progress.Handle(new KeyPressed(Key.Right));
+        progress.Handle(new KeyPressed(Key.Right));
+        progress.Handle(new KeyPressed(Key.Left));
 
         TestAssert.True(Math.Abs(progress.Value - 0.25) < 0.0001, "Progress should settle at 25% after two increments and one decrement.");
         return Task.CompletedTask;
@@ -987,12 +985,15 @@ internal static class PrebuiltWidgetTests
         return Task.CompletedTask;
     }
 
-    private static Task LogViewerComponent_AppendsAndFilters()
+    private static Task LogView_AppendsAndFilters()
     {
-        var logs = new LogViewerComponent(new LogViewerOptions(
-            IsFocused: true,
-            InitialEntries: ["alpha", "beta"],
-            InitialFilter: "alp"));
+        var logs = new LogView
+        {
+            IsFocused = true,
+        };
+        logs.Append("alpha");
+        logs.Append("beta");
+        logs.SetFilter("alp");
         var canvas = new Canvas(26, 8);
 
         logs.Render(canvas, new Rect(0, 0, 26, 8));
@@ -1003,45 +1004,45 @@ internal static class PrebuiltWidgetTests
         return Task.CompletedTask;
     }
 
-    private static Task DialogComponent_AcceptsAndDismisses()
+    private static Task Dialog_AcceptsAndDismisses()
     {
-        var dialog = new DialogComponent
+        var dialog = new Dialog
         {
             IsVisible = true,
             IsFocused = true,
         };
 
-        var accepted = dialog.Update(new KeyPressMsg(KeyCode.Enter));
+        var accepted = dialog.Handle(new KeyPressed(Key.Enter));
         TestAssert.True(accepted, "Dialog should accept on enter.");
-        TestAssert.True(dialog.LastResult == LegacyDialogResult.Accepted, "Dialog should record accepted result.");
+        TestAssert.True(dialog.LastResult == DialogResult.Accepted, "Dialog should record accepted result.");
 
         dialog.IsVisible = true;
         dialog.IsFocused = true;
-        var dismissed = dialog.Update(new KeyPressMsg(KeyCode.Escape));
+        var dismissed = dialog.Handle(new KeyPressed(Key.Escape));
         TestAssert.True(dismissed, "Dialog should dismiss on escape.");
-        TestAssert.True(dialog.LastResult == LegacyDialogResult.Dismissed, "Dialog should record dismissed result.");
+        TestAssert.True(dialog.LastResult == DialogResult.Dismissed, "Dialog should record dismissed result.");
         return Task.CompletedTask;
     }
 
-    private static Task DialogComponent_TryConsumeResult_IsSingleUse()
+    private static Task Dialog_TryConsumeResult_IsSingleUse()
     {
-        var dialog = new DialogComponent
+        var dialog = new Dialog
         {
             IsVisible = true,
             IsFocused = true,
         };
 
-        dialog.Update(new KeyPressMsg(KeyCode.Enter));
+        dialog.Handle(new KeyPressed(Key.Enter));
 
         TestAssert.True(dialog.TryConsumeResult(out var result), "Dialog should expose one-shot result consumption.");
-        TestAssert.True(result == LegacyDialogResult.Accepted, "Dialog should consume accepted result.");
+        TestAssert.True(result == DialogResult.Accepted, "Dialog should consume accepted result.");
         TestAssert.True(!dialog.TryConsumeResult(out _), "Dialog result consumption should be single-use per decision.");
         return Task.CompletedTask;
     }
 
-    private static Task DialogComponent_Events_FirePerDecision()
+    private static Task Dialog_Events_FirePerDecision()
     {
-        var dialog = new DialogComponent
+        var dialog = new Dialog
         {
             IsVisible = true,
             IsFocused = true,
@@ -1051,9 +1052,9 @@ internal static class PrebuiltWidgetTests
         dialog.Accepted += (_, _) => accepted++;
         dialog.Dismissed += (_, _) => dismissed++;
 
-        dialog.Update(new KeyPressMsg(KeyCode.Enter));
+        dialog.Handle(new KeyPressed(Key.Enter));
         dialog.IsVisible = true;
-        dialog.Update(new KeyPressMsg(KeyCode.Escape));
+        dialog.Handle(new KeyPressed(Key.Escape));
 
         TestAssert.Equal(1, accepted, "Dialog should raise accepted exactly once for an accept decision.");
         TestAssert.Equal(1, dismissed, "Dialog should raise dismissed exactly once for a dismiss decision.");

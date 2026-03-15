@@ -28,7 +28,7 @@ internal static class ApiErgonomicsTests
         yield return new TestCase("ApiErgonomics_ConsumeMethods_ExposeOneShotInteractionResults", ConsumeMethods_ExposeOneShotInteractionResults);
         yield return new TestCase("ApiErgonomics_RootTextInput_ConfiguresWithoutCatalog", RootTextInput_ConfiguresWithoutCatalog);
         yield return new TestCase("ApiErgonomics_RootMenuBar_ConfiguresWithoutCatalog", RootMenuBar_ConfiguresWithoutCatalog);
-        yield return new TestCase("ApiErgonomics_DialogOptions_ConfigureFrameWithoutLegacyBorderStyleName", DialogOptions_ConfigureFrameWithoutLegacyBorderStyleName);
+        yield return new TestCase("ApiErgonomics_RootDialog_ConfiguresFrameWithoutLegacyBorderStyleName", RootDialog_ConfiguresFrameWithoutLegacyBorderStyleName);
         yield return new TestCase("ApiErgonomics_RootModal_ConfiguresWithoutCatalog", RootModal_ConfiguresWithoutCatalog);
         yield return new TestCase("ApiErgonomics_ModalOptions_ConfigureFrameWithoutLegacyBorderStyleName", ModalOptions_ConfigureFrameWithoutLegacyBorderStyleName);
     }
@@ -256,14 +256,16 @@ internal static class ApiErgonomicsTests
         return Task.CompletedTask;
     }
 
-    private static Task DialogOptions_ConfigureFrameWithoutLegacyBorderStyleName()
+    private static Task RootDialog_ConfiguresFrameWithoutLegacyBorderStyleName()
     {
-        var dialog = new DialogComponent(new DialogOptions(
-            Title: "Confirm delete",
-            IsVisible: true,
-            Border: BorderStyle.Heavy,
-            Padding: Thickness.All(1),
-            BodyLines: ["Delete item?"]));
+        var dialog = new Dialog
+        {
+            Title = "Confirm delete",
+            IsVisible = true,
+            Border = BorderStyle.Heavy,
+            Padding = Thickness.All(1),
+            BodyLines = ["Delete item?"],
+        };
 
         TestAssert.True(dialog.IsVisible, "Dialog options should set visibility.");
         TestAssert.True(dialog.Border == BorderStyle.Heavy, "Dialog options should set border style through Border.");

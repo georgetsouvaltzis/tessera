@@ -1,5 +1,7 @@
-using TeaSharp.Components.Prebuilt;
 using TeaSharp.Components.Primitives;
+using TeaSharp.Components.Primitives.Internal;
+using TeaSharp.Controls.Internal;
+using TeaSharp.Layout;
 
 namespace TeaSharp.Controls;
 
@@ -8,49 +10,101 @@ namespace TeaSharp.Controls;
 /// </summary>
 public sealed class ProgressBar : Control
 {
-    private readonly ProgressBarComponent _component = new();
-
     public string Title
     {
-        get => _component.Title;
-        set => _component.Title = value ?? string.Empty;
-    }
+        get;
+        set => field = value ?? string.Empty;
+    } = "Progress";
 
-    public double Value => _component.Value;
+    public double Value { get; private set; }
 
     public double Step
     {
-        get => _component.Step;
-        set => _component.Step = value;
-    }
+        get;
+        set;
+    } = 0.05;
 
     public BorderStyle Border
     {
-        get => _component.Border;
-        set => _component.Border = value;
-    }
+        get;
+        set;
+    } = BorderStyle.SingleLine;
 
     public Thickness Padding
     {
-        get => _component.Padding;
-        set => _component.Padding = value;
+        get;
+        set;
     }
 
     public override bool IsFocused
     {
-        get => _component.IsFocused;
-        set => _component.IsFocused = value;
+        get;
+        set;
     }
 
-    public void SetValue(double value) => _component.SetValue(value);
+    public void SetValue(double value) => Value = Math.Clamp(value, 0.0, 1.0);
 
     public override bool Handle(Message message)
     {
-        return ControlForwarder.Forward(_component, message);
+        if (!IsFocused || message is not KeyPressed key)
+        {
+            return false;
+        }
+
+        if (key.Is(Key.Left) || key.IsCharacter('-'))
+        {
+            SetValue(Value - Step);
+            return true;
+        }
+
+        if (key.Is(Key.Right) || key.IsCharacter('+'))
+        {
+            SetValue(Value + Step);
+            return true;
+        }
+
+        return false;
     }
 
     public override void Render(Canvas canvas, Rect rect)
     {
-        _component.Render(canvas, rect);
+        var clipped = Rect.Intersect(rect, canvas.Bounds);
+        if (clipped.IsEmpty)
+        {
+            return;
+        }
+
+        var content = FrameLayout.DrawFrameAndResolveContent(
+            canvas,
+            clipped,
+            Border == BorderStyle.None ? null : IsFocused ? $"{Title} *" : Title,
+            Border,
+            Padding);
+        if (content.IsEmpty)
+        {
+            return;
+        }
+
+        var percent = (int)Math.Round(Value * 100, MidpointRounding.AwayFromZero);
+        TeaSharp.Components.Primitives.Widgets.DrawProgressBar(
+            canvas,
+            new Rect(content.X, content.Y, content.Width, 1),
+            Value,
+            $"{percent}%");
+    }
+
+    internal override LayoutMeasurement Measure(in Rect availableBounds)
+    {
+        var width = Math.Max(12, Title.Length + 4) + Padding.Horizontal;
+        var height = Padding.Vertical + 2;
+        if (Border != BorderStyle.None)
+        {
+            width += 2;
+            height += 2;
+        }
+
+        return new LayoutMeasurement(
+            Math.Clamp(width, 0, availableBounds.Width),
+            Math.Clamp(height, 0, availableBounds.Height));
     }
 }

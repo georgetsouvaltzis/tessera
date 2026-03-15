@@ -40,6 +40,9 @@ internal static class TeaAppCompositionTests
             "TeaAppComposition_VisibleOverlayCanClaimFocusThroughRootLayouts",
             VisibleOverlayCanClaimFocusThroughRootLayouts);
         yield return new TestCase(
+            "TeaAppComposition_DialogShow_RequestsFocusForOverlayComposition",
+            DialogShow_RequestsFocusForOverlayComposition);
+        yield return new TestCase(
             "TeaAppComposition_FocusRequestsPreferLatestRequestOverCompositionOrder",
             FocusRequestsPreferLatestRequestOverCompositionOrder);
         yield return new TestCase(
@@ -202,6 +205,21 @@ internal static class TeaAppCompositionTests
 
         TestAssert.Equal("rollback", app.LastExecutedItemId, "Visible overlays should be able to claim focus through the root layout model.");
         TestAssert.Equal(0, app.ButtonActivationCount, "Overlay focus should keep the underlying body control from activating.");
+        return Task.CompletedTask;
+    }
+
+    private static Task DialogShow_RequestsFocusForOverlayComposition()
+    {
+        var app = new OverlayDialogApp();
+        var screen = new TeaAppDriver(app);
+
+        screen.Update(new WindowSizeMsg(80, 24));
+        screen.Render();
+        TestAssert.True(app.Dialog.IsFocused, "Dialog.Show should request focus for the next composition pass.");
+        screen.Update(new KeyPressMsg(KeyCode.Enter));
+
+        TestAssert.True(app.Dialog.LastResult == DialogResult.Accepted, "Enter should be routed into the shown dialog.");
+        TestAssert.Equal(0, app.ButtonActivationCount, "Dialog focus should keep the underlying body control from activating.");
         return Task.CompletedTask;
     }
 
@@ -743,6 +761,33 @@ internal static class TeaAppCompositionTests
                 Body = new CenterLayout(row, width: 28, height: 3),
             });
         }
+    }
+
+    private sealed class OverlayDialogApp : TeaApp
+    {
+        public Button Button { get; } = new() { Text = "Primary" };
+
+        public Dialog Dialog { get; } = new()
+        {
+            Padding = Thickness.All(1),
+        };
+
+        public int ButtonActivationCount { get; private set; }
+
+        public OverlayDialogApp()
+        {
+            Button.Activated += (_, _) => ButtonActivationCount++;
+            Dialog.Show("Confirm", "Apply changes?");
+        }
+
+        public override TeaEffect? Update(Message message) => null;
+
+        public override Screen Build(ScreenContext context) =>
+            Screen.From(new WindowLayout
+            {
+                Body = new CenterLayout(Button, width: 18, height: 3),
+                Overlay = new CenterLayout(Dialog, width: 48, height: 10),
+            });
     }
 
     private sealed class OneShotFocusRequestApp : TeaApp
