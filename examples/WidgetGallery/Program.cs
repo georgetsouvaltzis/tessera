@@ -301,27 +301,19 @@ internal sealed class WidgetGalleryApp : TeaApp
         _status.LeftText = $"Tab={_tabs.Items[_tabs.SelectedIndex]}   Tick={_tick:0000}";
         _status.RightText = _statusText;
 
-        return Screen.From(new WindowLayout
+        return Screen.Build(window =>
         {
-            Header = new LayoutSlot
-            {
-                Content = _tabs,
-                Length = 1,
-            },
-            Footer = new LayoutSlot
-            {
-                Content = _status,
-                Length = 1,
-            },
-            Body = BuildTabContent(context),
-            Overlay = new CenterLayout
+            window.Gap(1);
+            window.Padding(1);
+            window.Header(1, _tabs);
+            window.Body(BuildTabContent(context));
+            window.Overlay(new CenterLayout
             {
                 Content = _dialog,
                 Width = 42,
                 Height = 8,
-            },
-            Gap = 1,
-            Padding = Thickness.All(1),
+            });
+            window.Footer(1, _status);
         });
     }
 

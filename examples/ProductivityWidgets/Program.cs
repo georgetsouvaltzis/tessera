@@ -192,26 +192,14 @@ internal sealed class ProductivityApp : TeaApp
             },
         };
 
-        return Screen.From(new WindowLayout
+        return Screen.Build(window =>
         {
-            Header = new LayoutSlot
-            {
-                Content = _menu,
-                Length = 1,
-            },
-            Left = new LayoutSlot
-            {
-                Content = left,
-                Length = Math.Min(34, Math.Max(28, context.Width / 3)),
-            },
-            Body = body,
-            Footer = new LayoutSlot
-            {
-                Content = _status,
-                Length = 1,
-            },
-            Gap = 1,
-            Padding = Thickness.All(1),
+            window.Gap(1);
+            window.Padding(1);
+            window.Header(1, _menu);
+            window.Left(Math.Min(34, Math.Max(28, context.Width / 3)), left);
+            window.Body(body);
+            window.Footer(1, _status);
         });
     }
 

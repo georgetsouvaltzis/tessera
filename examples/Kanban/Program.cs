@@ -276,32 +276,20 @@ internal sealed class KanbanApp : TeaApp
             },
         };
 
-        return Screen.From(new WindowLayout
+        return Screen.Build(window =>
         {
-            Header = new LayoutSlot
-            {
-                Content = _boards,
-                Length = 1,
-            },
-            Footer = new LayoutSlot
-            {
-                Content = _status,
-                Length = 1,
-            },
-            Right = new LayoutSlot
-            {
-                Content = sidebar,
-                Length = Math.Min(34, Math.Max(28, context.Width / 4)),
-            },
-            Body = lanes,
-            Overlay = new CenterLayout
+            window.Gap(1);
+            window.Padding(1);
+            window.Header(1, _boards);
+            window.Right(Math.Min(34, Math.Max(28, context.Width / 4)), sidebar);
+            window.Body(lanes);
+            window.Overlay(new CenterLayout
             {
                 Content = _deleteDialog,
                 Width = 42,
                 Height = 8,
-            },
-            Gap = 1,
-            Padding = Thickness.All(1),
+            });
+            window.Footer(1, _status);
         });
     }
 
