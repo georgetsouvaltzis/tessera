@@ -1,8 +1,6 @@
 using TeaSharp.Components.Interaction;
-using TeaSharp.Components.Prebuilt;
 using TeaSharp.Components.Primitives;
 using TeaSharp.Components.Styling;
-using TeaSharp.Components.UiKit;
 using TeaSharp.Controls;
 
 namespace TeaSharp.Tests;

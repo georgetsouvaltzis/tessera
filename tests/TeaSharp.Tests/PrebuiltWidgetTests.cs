@@ -1,9 +1,7 @@
 using TeaSharp.Components.Composition;
 using TeaSharp.Components.Interaction;
-using TeaSharp.Components.Prebuilt;
 using TeaSharp.Components.Primitives;
 using TeaSharp.Components.Styling;
-using TeaSharp.Components.UiKit;
 using TeaSharp.Controls;
 using System.Globalization;
 using TeaSharp.Core.Messages;
@@ -66,10 +64,6 @@ internal static class PrebuiltWidgetTests
         yield return new TestCase("Controls_Dialog_AcceptsAndDismisses", Dialog_AcceptsAndDismisses);
         yield return new TestCase("Controls_Dialog_Events_FirePerDecision", Dialog_Events_FirePerDecision);
         yield return new TestCase("Controls_Dialog_TryConsumeResult_IsSingleUse", Dialog_TryConsumeResult_IsSingleUse);
-        yield return new TestCase("Prebuilt_LayoutContainerComponent_RendersChildren", LayoutContainerComponent_RendersChildren);
-        yield return new TestCase("Prebuilt_LayoutContainerComponent_KeyboardRoutesToFocusedChildOnly", LayoutContainerComponent_KeyboardRoutesToFocusedChildOnly);
-        yield return new TestCase("Prebuilt_LayoutContainerComponent_MouseResizeAdjustsPrimarySize", LayoutContainerComponent_MouseResizeAdjustsPrimarySize);
-        yield return new TestCase("Prebuilt_LayoutContainerComponent_MouseRoutesToTargetChild", LayoutContainerComponent_MouseRoutesToTargetChild);
     }
 
     private static Task Label_RendersText()
@@ -1054,88 +1048,6 @@ internal static class PrebuiltWidgetTests
 
         TestAssert.Equal(1, accepted, "Dialog should raise accepted exactly once for an accept decision.");
         TestAssert.Equal(1, dismissed, "Dialog should raise dismissed exactly once for a dismiss decision.");
-        return Task.CompletedTask;
-    }
-
-    private static Task LayoutContainerComponent_RendersChildren()
-    {
-        var layout = new LayoutContainerComponent
-        {
-            Mode = LayoutFlow.Grid,
-            GridRows = 1,
-            GridColumns = 2,
-        };
-        layout.Add(new Label { Border = BorderStyle.None, Text = "left" }.Component);
-        layout.Add(new Label { Border = BorderStyle.None, Text = "right" }.Component);
-
-        var canvas = new Canvas(20, 3);
-        layout.Render(canvas, new Rect(0, 0, 20, 3));
-        var output = canvas.Render();
-
-        TestAssert.True(output.Contains("left", StringComparison.Ordinal), "Layout container should render first child.");
-        TestAssert.True(output.Contains("right", StringComparison.Ordinal), "Layout container should render second child.");
-        return Task.CompletedTask;
-    }
-
-    private static Task LayoutContainerComponent_MouseResizeAdjustsPrimarySize()
-    {
-        var layout = new LayoutContainerComponent
-        {
-            Mode = LayoutFlow.Columns,
-            MinPrimarySize = 4,
-            MinSecondarySize = 4,
-        };
-        layout.Add(new Label { Border = BorderStyle.None, Text = "left" }.Component);
-        layout.Add(new Label { Border = BorderStyle.None, Text = "right" }.Component);
-        layout.SetPrimarySize(12);
-
-        var bounds = new Rect(0, 0, 30, 6);
-        layout.UpdateMouse(new MouseClickMsg(MouseButton.Left, 12, 1), bounds);
-        var changed = layout.UpdateMouse(new MouseMotionMsg(MouseButton.Left, 20, 1), bounds);
-        layout.UpdateMouse(new MouseReleaseMsg(MouseButton.Left, 20, 1), bounds);
-
-        TestAssert.True(changed, "Dragging split should update primary size.");
-        TestAssert.Equal(20, layout.PrimarySize ?? -1, "Drag motion should move split to pointer position.");
-        return Task.CompletedTask;
-    }
-
-    private static Task LayoutContainerComponent_KeyboardRoutesToFocusedChildOnly()
-    {
-        var first = new KeyProbeComponent { IsFocused = true };
-        var second = new KeyProbeComponent();
-        var layout = new LayoutContainerComponent
-        {
-            Mode = LayoutFlow.Columns,
-        };
-        layout.Add(first);
-        layout.Add(second);
-
-        var changed = layout.Update(new KeyPressMsg(KeyCode.Character, "x"));
-
-        TestAssert.True(changed, "IsFocused child should handle keyboard input.");
-        TestAssert.Equal(1, first.KeyEvents, "IsFocused child should receive keyboard input.");
-        TestAssert.Equal(0, second.KeyEvents, "Non-focused child should not receive keyboard input.");
-        return Task.CompletedTask;
-    }
-
-    private static Task LayoutContainerComponent_MouseRoutesToTargetChild()
-    {
-        var first = new MouseProbeComponent();
-        var second = new MouseProbeComponent();
-        var layout = new LayoutContainerComponent
-        {
-            Mode = LayoutFlow.Columns,
-        };
-        layout.Add(first);
-        layout.Add(second);
-
-        var changed = layout.UpdateMouse(new MouseClickMsg(MouseButton.Left, 16, 1), new Rect(0, 0, 20, 4));
-
-        TestAssert.True(changed, "Mouse click should be routed and focus updated.");
-        TestAssert.Equal(0, first.MouseEvents, "First child should not receive click outside its bounds.");
-        TestAssert.Equal(1, second.MouseEvents, "Second child should receive routed mouse click.");
-        TestAssert.True(!first.IsFocused, "First child focus should be cleared.");
-        TestAssert.True(second.IsFocused, "Target child should become focused.");
         return Task.CompletedTask;
     }
 

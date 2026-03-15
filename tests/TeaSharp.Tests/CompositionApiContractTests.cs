@@ -1,8 +1,6 @@
 using TeaSharp.Components.Interaction;
-using TeaSharp.Components.Prebuilt;
 using TeaSharp.Components.Primitives;
 using TeaSharp.Components.Styling;
-using TeaSharp.Components.UiKit;
 using System.ComponentModel;
 using System.Reflection;
 using System.Runtime.CompilerServices;
@@ -28,17 +26,6 @@ internal static class CompositionApiContractTests
     [
         "TeaSharp.Components.Composition.ScreenLayer",
         "TeaSharp.Components.Composition.ComponentSlot",
-        "TeaSharp.Components.Prebuilt.LayoutFlow",
-        "TeaSharp.Components.Prebuilt.LayoutContainerOptions",
-        "TeaSharp.Components.Prebuilt.LayoutContainerComponent",
-        "TeaSharp.Components.UiKit.Layout",
-        "TeaSharp.Components.UiKit.SelectComponent",
-        "TeaSharp.Components.UiKit.TimelineEntry",
-        "TeaSharp.Components.UiKit.ToastCenterComponent",
-        "TeaSharp.Components.UiKit.ToastMessage",
-        "TeaSharp.Components.UiKit.ToastSeverity",
-        "TeaSharp.Components.UiKit.TreeNode",
-        "TeaSharp.Components.UiKit.ViewportClass",
     ];
 
     private static readonly string[] RemovedCompositionTypes =
@@ -49,6 +36,18 @@ internal static class CompositionApiContractTests
         "TeaSharp.Components.Composition.ScreenFrameLayout",
         "TeaSharp.Components.Composition.ScreenRegion",
         "TeaSharp.Components.Composition.ScreenRegionKey",
+        "TeaSharp.Components.Prebuilt.LayoutFlow",
+        "TeaSharp.Components.Prebuilt.LayoutContainerOptions",
+        "TeaSharp.Components.Prebuilt.LayoutContainerComponent",
+        "TeaSharp.Components.Prebuilt.PrebuiltCatalog",
+        "TeaSharp.Components.UiKit.Layout",
+        "TeaSharp.Components.UiKit.SelectComponent",
+        "TeaSharp.Components.UiKit.TimelineEntry",
+        "TeaSharp.Components.UiKit.ToastCenterComponent",
+        "TeaSharp.Components.UiKit.ToastMessage",
+        "TeaSharp.Components.UiKit.ToastSeverity",
+        "TeaSharp.Components.UiKit.TreeNode",
+        "TeaSharp.Components.UiKit.ViewportClass",
         "TeaSharp.Components.UiKit.UiTheme",
         "TeaSharp.Components.UiKit.UiWidgets",
     ];
