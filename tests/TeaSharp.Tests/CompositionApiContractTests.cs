@@ -61,6 +61,7 @@ internal static class CompositionApiContractTests
         yield return new TestCase("CompositionApi_KeyLayoutTypes_SupportObjectInitializerAssembly", KeyLayoutTypes_SupportObjectInitializerAssembly);
         yield return new TestCase("CompositionApi_LayoutLength_SupportsImplicitFixedIntegers", LayoutLength_SupportsImplicitFixedIntegers);
         yield return new TestCase("CompositionApi_RowAndColumnSizingHelpers_AreMarkedAdvanced", RowAndColumnSizingHelpers_AreMarkedAdvanced);
+        yield return new TestCase("CompositionApi_ScreenFromLayoutNode_IsMarkedAdvanced", ScreenFromLayoutNode_IsMarkedAdvanced);
         yield return new TestCase("CompositionApi_InternalizedCompositionTypes_AreNotPublic", InternalizedCompositionTypes_AreNotPublic);
         yield return new TestCase("CompositionApi_RemovedCompositionTypes_AreAbsent", RemovedCompositionTypes_AreAbsent);
     }
@@ -111,6 +112,12 @@ internal static class CompositionApiContractTests
         AssertMarkedAdvanced(typeof(ColumnLayout), nameof(ColumnLayout.AddFixed), [typeof(LayoutNode), typeof(int), typeof(Thickness)]);
         AssertMarkedAdvanced(typeof(ColumnLayout), nameof(ColumnLayout.AddFill), [typeof(LayoutNode), typeof(Thickness)]);
         AssertMarkedAdvanced(typeof(ColumnLayout), nameof(ColumnLayout.AddWeighted), [typeof(LayoutNode), typeof(int), typeof(Thickness)]);
+        return Task.CompletedTask;
+    }
+
+    private static Task ScreenFromLayoutNode_IsMarkedAdvanced()
+    {
+        AssertMarkedAdvanced(typeof(Screen), nameof(Screen.From), [typeof(LayoutNode)]);
         return Task.CompletedTask;
     }
 

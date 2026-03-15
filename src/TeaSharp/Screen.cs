@@ -55,6 +55,10 @@ public sealed class Screen
     /// </summary>
     /// <param name="layout">The layout tree to render.</param>
     /// <returns>A screen that renders the supplied layout.</returns>
+    /// <remarks>
+    /// Prefer <see cref="Build(Action{WindowBuilder})"/> for the default app path.
+    /// </remarks>
+    [EditorBrowsable(EditorBrowsableState.Advanced)]
     public static Screen From(LayoutNode layout) => new(layout: layout ?? throw new ArgumentNullException(nameof(layout)));
 
     /// <summary>
