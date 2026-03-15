@@ -1,7 +1,7 @@
 using TeaSharp.Components.Primitives;
 using TeaSharp.Controls;
 using TeaSharp.Components.Styling;
-namespace TeaSharp.Components.Productivity.Internal;
+namespace TeaSharp.Controls.Internal;
 
 internal static class TimePickerFields
 {

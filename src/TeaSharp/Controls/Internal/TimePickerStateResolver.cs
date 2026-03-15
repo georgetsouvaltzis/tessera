@@ -1,7 +1,7 @@
 using TeaSharp.Components.Primitives;
 using TeaSharp.Components.Styling;
 using TeaSharp.Controls;
-namespace TeaSharp.Components.Productivity.Internal;
+namespace TeaSharp.Controls.Internal;
 
 internal static class TimePickerStateResolver
 {

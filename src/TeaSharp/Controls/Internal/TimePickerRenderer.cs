@@ -4,7 +4,7 @@ using TeaSharp.Components.Styling;
 using TeaSharp.Controls;
 using System.Globalization;
 
-namespace TeaSharp.Components.Productivity.Internal;
+namespace TeaSharp.Controls.Internal;
 
 internal static class TimePickerRenderer
 {

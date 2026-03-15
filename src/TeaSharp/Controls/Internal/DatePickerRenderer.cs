@@ -1,10 +1,9 @@
 using TeaSharp.Components.Primitives;
 using TeaSharp.Components.Primitives.Internal;
-using TeaSharp.Components.Productivity;
 using TeaSharp.Components.Styling;
 using System.Globalization;
 
-namespace TeaSharp.Components.Productivity.Internal;
+namespace TeaSharp.Controls.Internal;
 
 internal static class DatePickerRenderer
 {

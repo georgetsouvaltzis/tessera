@@ -1,8 +1,7 @@
 using TeaSharp.Components.Primitives;
 using TeaSharp.Components.Primitives.Internal;
-using TeaSharp.Components.Productivity;
 using TeaSharp.Components.Styling;
-namespace TeaSharp.Components.Productivity.Internal;
+namespace TeaSharp.Controls.Internal;
 
 internal static class DatePickerCalendar
 {

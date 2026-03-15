@@ -1,6 +1,6 @@
 using TeaSharp.Components.Primitives;
 using TeaSharp.Components.Primitives.Internal;
-using TeaSharp.Components.Productivity.Internal;
+using TeaSharp.Controls.Internal;
 using TeaSharp.Internal;
 using TeaSharp.Layout;
 using TeaSharp.Widgets;
