@@ -1,5 +1,7 @@
-using TeaSharp.Components.Advanced;
 using TeaSharp.Components.Primitives;
+using TeaSharp.Components.Primitives.Internal;
+using TeaSharp.Components.Styling;
+using TeaSharp.Layout;
 
 namespace TeaSharp.Controls;
 
@@ -8,72 +10,226 @@ namespace TeaSharp.Controls;
 /// </summary>
 public sealed class Toggle : Control
 {
-    private readonly ToggleSwitchComponent _component = new();
+    private readonly WidgetStatePalette _statePalette = WidgetStatePalette.CreateDefault();
+    private bool _hovered;
 
     public string Title
     {
-        get => _component.Title;
-        set => _component.Title = value ?? string.Empty;
-    }
+        get;
+        set => field = value ?? string.Empty;
+    } = "Toggle";
 
     public string OnText
     {
-        get => _component.OnText;
-        set => _component.OnText = value ?? string.Empty;
-    }
+        get;
+        set => field = value ?? string.Empty;
+    } = "ON";
 
     public string OffText
     {
-        get => _component.OffText;
-        set => _component.OffText = value ?? string.Empty;
-    }
+        get;
+        set => field = value ?? string.Empty;
+    } = "OFF";
 
-    public bool Value => _component.Value;
+    public bool Value
+    {
+        get;
+        private set;
+    }
 
     public BorderStyle Border
     {
-        get => _component.Border;
-        set => _component.Border = value;
-    }
+        get;
+        set;
+    } = BorderStyle.SingleLine;
 
     public Thickness Padding
     {
-        get => _component.Padding;
-        set => _component.Padding = value;
+        get;
+        set;
     }
 
     public override bool IsFocused
     {
-        get => _component.IsFocused;
-        set => _component.IsFocused = value;
+        get;
+        set;
     }
 
     public override bool IsDisabled
     {
-        get => _component.IsDisabled;
-        set => _component.IsDisabled = value;
+        get;
+        set;
     }
 
     public override bool IsReadOnly
     {
-        get => _component.IsReadOnly;
-        set => _component.IsReadOnly = value;
+        get;
+        set;
     }
 
-    public void SetValue(bool value) => _component.SetValue(value);
+    public void SetValue(bool value) => Value = value;
 
     public override bool Handle(Message message)
     {
-        return ControlForwarder.Forward(_component, message);
+        if (!IsFocused || IsDisabled || IsReadOnly || message is not KeyPressed key)
+        {
+            return false;
+        }
+
+        if (key.Is(Key.Enter) || key.IsCharacter(' '))
+        {
+            Value = !Value;
+            return true;
+        }
+
+        if (key.Is(Key.Right))
+        {
+            var changed = !Value;
+            Value = true;
+            return changed;
+        }
+
+        if (key.Is(Key.Left))
+        {
+            var changed = Value;
+            Value = false;
+            return changed;
+        }
+
+        return false;
     }
 
     public override bool Handle(Message message, Rect bounds)
     {
-        return ControlForwarder.Forward(_component, message, bounds) || Handle(message);
+        if (IsDisabled || IsReadOnly || message is not PointerInput pointer)
+        {
+            return Handle(message);
+        }
+
+        var content = ResolveContentRect(bounds);
+        if (content.IsEmpty)
+        {
+            return false;
+        }
+
+        var inside = content.Contains(pointer.X, pointer.Y);
+        var changed = false;
+        if (!inside)
+        {
+            if (pointer.Kind is PointerEventKind.Motion or PointerEventKind.Press)
+            {
+                changed |= SetHovered(false);
+            }
+
+            return changed;
+        }
+
+        if (pointer.Kind == PointerEventKind.Motion)
+        {
+            return SetHovered(true);
+        }
+
+        if (pointer.Kind == PointerEventKind.Wheel)
+        {
+            if (pointer.Button == PointerButton.WheelUp)
+            {
+                var was = Value;
+                Value = true;
+                return !was || changed;
+            }
+
+            if (pointer.Button == PointerButton.WheelDown)
+            {
+                var was = Value;
+                Value = false;
+                return was || changed;
+            }
+        }
+
+        if (pointer is { Kind: PointerEventKind.Press, Button: PointerButton.Left })
+        {
+            changed |= SetHovered(true);
+            Value = !Value;
+            return true;
+        }
+
+        return Handle(message);
     }
 
     public override void Render(Canvas canvas, Rect rect)
     {
-        _component.Render(canvas, rect);
+        var clipped = Rect.Intersect(rect, canvas.Bounds);
+        if (clipped.IsEmpty)
+        {
+            return;
+        }
+
+        var content = FrameLayout.DrawFrameAndResolveContent(
+            canvas,
+            clipped,
+            Border == BorderStyle.None ? null : IsFocused ? $"{Title} *" : Title,
+            Border,
+            Padding);
+
+        if (content.IsEmpty || content.Height < 1)
+        {
+            return;
+        }
+
+        var states = new List<WidgetVisualState>(4);
+        if (IsFocused)
+        {
+            states.Add(WidgetVisualState.Focused);
+        }
+
+        if (IsDisabled)
+        {
+            states.Add(WidgetVisualState.Disabled);
+        }
+
+        if (IsReadOnly)
+        {
+            states.Add(WidgetVisualState.ReadOnly);
+        }
+
+        if (_hovered)
+        {
+            states.Add(WidgetVisualState.Hovered);
+        }
+
+        if (Value)
+        {
+            states.Add(WidgetVisualState.Checked);
+            states.Add(WidgetVisualState.Success);
+        }
+        else
+        {
+            states.Add(WidgetVisualState.Unchecked);
+        }
+
+        var label = Value ? OnText : OffText;
+        canvas.WriteText(content.X, content.Y, _statePalette.Render($"<{label}>", states), content.Width);
+    }
+
+    internal override LayoutMeasurement Measure(in Rect availableBounds)
+    {
+        var width = Math.Max(8, Title.Length + Math.Max(OnText.Length, OffText.Length) + 6);
+        var height = Border == BorderStyle.None ? 1 + Padding.Vertical : 3 + Padding.Vertical;
+        return new LayoutMeasurement(
+            Math.Clamp(width, 0, availableBounds.Width),
+            Math.Clamp(height, 0, availableBounds.Height));
+    }
+
+    private Rect ResolveContentRect(Rect bounds) => FrameLayout.ResolveContentRect(bounds, Border, Padding);
+
+    private bool SetHovered(bool hovered)
+    {
+        if (_hovered == hovered)
+        {
+            return false;
+        }
+
+        _hovered = hovered;
+        return true;
     }
 }

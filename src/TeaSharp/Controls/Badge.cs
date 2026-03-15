@@ -1,6 +1,7 @@
-using LegacyBadgeComponent = TeaSharp.Components.Advanced.BadgeComponent;
 using TeaSharp.Components.Primitives;
 using TeaSharp.Components.Styling;
+using TeaSharp.Controls.Internal;
+using TeaSharp.Layout;
 
 namespace TeaSharp.Controls;
 
@@ -9,32 +10,47 @@ namespace TeaSharp.Controls;
 /// </summary>
 public sealed class Badge : Control
 {
-    private readonly LegacyBadgeComponent _component = new();
-
     public string Text
     {
-        get => _component.Text;
-        set => _component.Text = value ?? string.Empty;
-    }
+        get;
+        set => field = value ?? string.Empty;
+    } = "Badge";
 
     public bool ShowBrackets
     {
-        get => _component.ShowBrackets;
-        set => _component.ShowBrackets = value;
-    }
+        get;
+        set;
+    } = true;
 
     public BadgeTone Tone { get; set; }
 
     public override void Render(Canvas canvas, Rect rect)
     {
-        _component.State = Tone switch
+        var clipped = Rect.Intersect(rect, canvas.Bounds);
+        if (clipped.IsEmpty || clipped.Height < 1)
+        {
+            return;
+        }
+
+        var label = ShowBrackets
+            ? $"[{Text}]"
+            : Text;
+        var state = Tone switch
         {
             BadgeTone.Success => WidgetVisualState.Success,
             BadgeTone.Warning => WidgetVisualState.Warning,
             BadgeTone.Error => WidgetVisualState.Error,
             _ => WidgetVisualState.Default,
         };
+        var palette = WidgetStatePalette.CreateDefault();
+        canvas.WriteText(clipped.X, clipped.Y, palette.Render(label, state), clipped.Width);
+    }
 
-        _component.Render(canvas, rect);
+    internal override LayoutMeasurement Measure(in Rect availableBounds)
+    {
+        var width = ControlTextLayout.MeasureDisplayWidth(ShowBrackets ? $"[{Text}]" : Text);
+        return new LayoutMeasurement(
+            Math.Clamp(width, 0, availableBounds.Width),
+            Math.Clamp(1, 0, availableBounds.Height));
     }
 }
