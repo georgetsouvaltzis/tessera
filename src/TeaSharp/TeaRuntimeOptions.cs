@@ -1,4 +1,5 @@
 using System.ComponentModel;
+using TeaSharp.Styles;
 
 namespace TeaSharp;
 
@@ -65,4 +66,9 @@ public sealed class TeaRuntimeOptions
     /// Gets or sets the screen options applied to the application runtime.
     /// </summary>
     public ScreenOptions Screen { get; set; } = ScreenOptions.Empty;
+
+    /// <summary>
+    /// Gets or sets the optional global theme applied by controls that support semantic theming.
+    /// </summary>
+    public TeaTheme? Theme { get; set; }
 }
