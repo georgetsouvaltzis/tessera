@@ -345,6 +345,130 @@ public static class TeaThemeControlExtensions
         return control.ApplyThemeDefaults(resolved);
     }
 
+    /// <summary>
+    /// Applies a resolved theme to a <see cref="Breadcrumb"/>.
+    /// </summary>
+    public static Breadcrumb ApplyTheme(this Breadcrumb control, TeaTheme theme)
+    {
+        ArgumentNullException.ThrowIfNull(control);
+        ArgumentNullException.ThrowIfNull(theme);
+
+        control.TitleStyle = theme.Text.Secondary;
+        control.FocusedTitleStyle = theme.Focus.Title;
+        control.ItemStyle = theme.Text.Primary;
+        control.SelectedItemStyle = theme.Selection.Foreground.Merge(theme.Selection.Background);
+        control.SeparatorStyle = theme.Text.Muted;
+        return control;
+    }
+
+    /// <summary>
+    /// Resolves and applies hierarchical overrides to a <see cref="Breadcrumb"/>.
+    /// </summary>
+    public static Breadcrumb ApplyTheme(
+        this Breadcrumb control,
+        TeaThemeOverrides overrides,
+        TeaTheme baseTheme,
+        TeaThemeVisualState state = TeaThemeVisualState.Default)
+    {
+        ArgumentNullException.ThrowIfNull(overrides);
+        var resolved = overrides.Resolve(control, baseTheme, state);
+        return control.ApplyTheme(resolved);
+    }
+
+    /// <summary>
+    /// Applies theme defaults to a <see cref="Breadcrumb"/> without overwriting explicit non-empty styles.
+    /// </summary>
+    public static Breadcrumb ApplyThemeDefaults(this Breadcrumb control, TeaTheme theme)
+    {
+        ArgumentNullException.ThrowIfNull(control);
+        ArgumentNullException.ThrowIfNull(theme);
+
+        control.TitleStyle = ApplyDefault(control.TitleStyle, theme.Text.Secondary);
+        control.FocusedTitleStyle = ApplyDefault(control.FocusedTitleStyle, theme.Focus.Title);
+        control.ItemStyle = ApplyDefault(control.ItemStyle, theme.Text.Primary);
+        control.SelectedItemStyle = ApplyDefault(
+            control.SelectedItemStyle,
+            theme.Selection.Foreground.Merge(theme.Selection.Background));
+        control.SeparatorStyle = ApplyDefault(control.SeparatorStyle, theme.Text.Muted);
+        return control;
+    }
+
+    /// <summary>
+    /// Resolves and applies hierarchical defaults to a <see cref="Breadcrumb"/> without overwriting explicit non-empty styles.
+    /// </summary>
+    public static Breadcrumb ApplyThemeDefaults(
+        this Breadcrumb control,
+        TeaThemeOverrides overrides,
+        TeaTheme baseTheme,
+        TeaThemeVisualState state = TeaThemeVisualState.Default)
+    {
+        ArgumentNullException.ThrowIfNull(overrides);
+        var resolved = overrides.Resolve(control, baseTheme, state);
+        return control.ApplyThemeDefaults(resolved);
+    }
+
+    /// <summary>
+    /// Applies a resolved theme to a <see cref="Paginator"/>.
+    /// </summary>
+    public static Paginator ApplyTheme(this Paginator control, TeaTheme theme)
+    {
+        ArgumentNullException.ThrowIfNull(control);
+        ArgumentNullException.ThrowIfNull(theme);
+
+        control.TitleStyle = theme.Text.Secondary;
+        control.FocusedTitleStyle = theme.Focus.Title;
+        control.LabelStyle = theme.Text.Primary;
+        control.ActivePageLabelStyle = theme.Selection.Foreground.Merge(theme.Selection.Background);
+        control.DisabledNavigationLabelStyle = theme.Text.Muted;
+        return control;
+    }
+
+    /// <summary>
+    /// Resolves and applies hierarchical overrides to a <see cref="Paginator"/>.
+    /// </summary>
+    public static Paginator ApplyTheme(
+        this Paginator control,
+        TeaThemeOverrides overrides,
+        TeaTheme baseTheme,
+        TeaThemeVisualState state = TeaThemeVisualState.Default)
+    {
+        ArgumentNullException.ThrowIfNull(overrides);
+        var resolved = overrides.Resolve(control, baseTheme, state);
+        return control.ApplyTheme(resolved);
+    }
+
+    /// <summary>
+    /// Applies theme defaults to a <see cref="Paginator"/> without overwriting explicit non-empty styles.
+    /// </summary>
+    public static Paginator ApplyThemeDefaults(this Paginator control, TeaTheme theme)
+    {
+        ArgumentNullException.ThrowIfNull(control);
+        ArgumentNullException.ThrowIfNull(theme);
+
+        control.TitleStyle = ApplyDefault(control.TitleStyle, theme.Text.Secondary);
+        control.FocusedTitleStyle = ApplyDefault(control.FocusedTitleStyle, theme.Focus.Title);
+        control.LabelStyle = ApplyDefault(control.LabelStyle, theme.Text.Primary);
+        control.ActivePageLabelStyle = ApplyDefault(
+            control.ActivePageLabelStyle,
+            theme.Selection.Foreground.Merge(theme.Selection.Background));
+        control.DisabledNavigationLabelStyle = ApplyDefault(control.DisabledNavigationLabelStyle, theme.Text.Muted);
+        return control;
+    }
+
+    /// <summary>
+    /// Resolves and applies hierarchical defaults to a <see cref="Paginator"/> without overwriting explicit non-empty styles.
+    /// </summary>
+    public static Paginator ApplyThemeDefaults(
+        this Paginator control,
+        TeaThemeOverrides overrides,
+        TeaTheme baseTheme,
+        TeaThemeVisualState state = TeaThemeVisualState.Default)
+    {
+        ArgumentNullException.ThrowIfNull(overrides);
+        var resolved = overrides.Resolve(control, baseTheme, state);
+        return control.ApplyThemeDefaults(resolved);
+    }
+
     private static TeaStyle ApplyDefault(TeaStyle current, TeaStyle fallback)
     {
         return current.IsEmpty ? fallback : current;
