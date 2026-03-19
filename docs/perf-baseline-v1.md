@@ -6,6 +6,7 @@ Environment:
 - mode: `inProcess` BenchmarkDotNet toolchain
 - host: `Darwin arm64`
 - terminal: `xterm-ghostty`
+- benchmark mode family: `render+materialize` (current benchmark methods call `canvas.Render()`)
 
 Commands and measured outputs:
 1. `dotnet run --project benchmarks/TeaSharp.Benchmarks -c Release --no-build -- --inProcess --filter "*Startup*"`
@@ -21,3 +22,4 @@ Commands and measured outputs:
 Notes:
 - priority-setting warnings on this host (`Permission denied` / `Operation not permitted`) are non-fatal noise
 - runs complete and report benchmark summaries in `inProcess` mode
+- this baseline is for `render+materialize`; render-only baselines should be tracked separately once captured

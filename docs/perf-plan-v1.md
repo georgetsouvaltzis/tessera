@@ -63,6 +63,19 @@ Measurement rules:
 - warmup included before recorded samples
 - minimum 10 measured iterations per scenario
 
+Benchmark modes:
+- render-only mode:
+  - measures control/layout/style work up to render calls
+  - excludes string materialization (`canvas.Render()`)
+- render+materialize mode:
+  - includes final buffer/string materialization (`canvas.Render()`)
+  - captures end-to-end frame cost and allocation impact seen by app authors
+
+Gating policy by mode:
+- render-only is the regression gate for renderer/layout internals (hot-path control cost)
+- render+materialize is the release-facing gate for frame/allocation budgets
+- Public V1 perf gate requires both mode families to remain within regression budget
+
 Harness quick commands:
 - List benchmarks:
   - `dotnet run --project benchmarks/TeaSharp.Benchmarks --configuration Release -- --list flat`
@@ -70,6 +83,9 @@ Harness quick commands:
   - `dotnet run --project benchmarks/TeaSharp.Benchmarks --configuration Release -- --filter "*"`
 - Run a single benchmark scenario filter:
   - `dotnet run --project benchmarks/TeaSharp.Benchmarks --configuration Release -- --filter "*LargeTable*"`
+- Mode-specific examples (dual-mode instrumentation):
+  - render-only slice: `dotnet run --project benchmarks/TeaSharp.Benchmarks --configuration Release -- --filter "*RenderOnly*"`
+  - render+materialize slice: `dotnet run --project benchmarks/TeaSharp.Benchmarks --configuration Release -- --filter "*Materialize*"`
 - Future V1 gate scenario filters (when benchmark classes are present):
   - `dotnet run --project benchmarks/TeaSharp.Benchmarks --configuration Release -- --filter "*Resize*"`
   - `dotnet run --project benchmarks/TeaSharp.Benchmarks --configuration Release -- --filter "*Overlay*"`

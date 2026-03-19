@@ -2,6 +2,21 @@
 
 BenchmarkDotNet harness used by Public V1 perf gates.
 
+## Modes
+
+Two BenchmarkDotNet mode families are tracked:
+- render-only: control render path only; excludes final `canvas.Render()` materialization
+- render+materialize: includes `canvas.Render()` to measure full frame/output cost
+
+Why both:
+- render-only isolates renderer/layout regressions
+- render+materialize reflects end-to-end user-visible frame and allocation cost
+
+Gating:
+- render-only gates renderer/layout regression budget
+- render+materialize gates release-facing frame/allocation budgets
+- V1 perf gate requires both mode families to stay within budget
+
 ## Deterministic Execution Commands
 
 Use Release configuration for comparisons and gates.
@@ -15,6 +30,12 @@ dotnet run --project benchmarks/TeaSharp.Benchmarks --configuration Release -- -
 
 # 3) Run a single scenario (example: LargeTable)
 dotnet run --project benchmarks/TeaSharp.Benchmarks --configuration Release -- --filter "*LargeTable*"
+
+# 4) Run render-only mode slice (dual-mode instrumentation)
+dotnet run --project benchmarks/TeaSharp.Benchmarks --configuration Release -- --filter "*RenderOnly*"
+
+# 5) Run render+materialize mode slice (dual-mode instrumentation)
+dotnet run --project benchmarks/TeaSharp.Benchmarks --configuration Release -- --filter "*Materialize*"
 ```
 
 Optional helper:
