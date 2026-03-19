@@ -26,6 +26,23 @@ All agents must treat this file as the source of truth for scope, sequencing, ow
 - Image embedding (`kitty`, `iTerm2`, `wezterm`, `ghostty`) with capability fallback.
 - Advanced image render modes (native, pixelated block fallback).
 
+## Authoritative Execution Order (Do Not Reorder)
+1. **Correctness + Bug-Fix Stabilization**
+   - Fix regressions first; no feature polish before stability.
+   - Add/extend regression tests for every production bug class touched.
+   - Exit criteria: integration + unit gates green for touched areas; no known P0/P1 regressions open.
+2. **API Simplification + Boundary Cleanup**
+   - Simplify public entry points and recurring control patterns.
+   - Keep advanced seams available but out of default onboarding path.
+   - Exit criteria: API review pass + naming clarity gate pass + no new onboarding leaks from `TeaSharp.Core`.
+3. **Visual Polish + Theming Consistency**
+   - Improve default visuals after behavior/API stability.
+   - Keep keyboard/mouse semantics unchanged unless explicitly scoped.
+   - Exit criteria: snapshots/visual assertions updated; theme override behavior verified.
+4. **Expansion + Perf Hardening + Docs Freeze**
+   - Ship remaining V1 widget tranche, perf hardening, and final docs freeze in one release phase.
+   - Exit criteria: widget tranche complete, perf gates pass, docs/commenting gates pass, release checklist complete.
+
 ## Current Progress
 - **M1: Boundary Baseline** -> **Done**
   - no-DI startup policy established on docs path
@@ -71,48 +88,78 @@ All agents must treat this file as the source of truth for scope, sequencing, ow
 - Benchmark harness and baseline comparisons per [perf-plan-v1.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/perf-plan-v1.md).
 - Public API docs and examples as release gate.
 
-## Parallelization Map
-- Run WS-A + WS-B + WS-C in parallel.
-- WS-D runs continuously, with one hardening sprint at the end.
-- Blocking dependencies:
-  - WS-B token contract must stabilize before full WS-C styling adoption.
-  - WS-A boundary decisions must land before final docs freeze.
+## API Simplification Contract
+- Keep default app-authoring surface in `TeaSharp`, `TeaSharp.Controls`, `TeaSharp.Layout`.
+- Generalize recurring control patterns:
+  - consistent `Title`, `FocusMarker`, `ShowFocusMarker`, `Border`, `Padding`, and style hook naming.
+  - consistent event payload conventions (`SelectionChanged`, submit/cancel, activate/execute).
+  - consistent state naming (`IsOpen`, `IsFocused`, `IsDisabled`, `IsReadOnly`) and semantics.
+- Hide complex internals from default path:
+  - avoid exposing low-level runtime/compiler/renderer details in onboarding docs/examples.
+  - keep advanced APIs in explicit advanced namespaces/docs.
+- No breaking API reshapes in V1 unless they remove ambiguity and are migration-documented in the same change.
+
+## Naming Clarity Gate
+- Public names must be unambiguous to C# developers without reading internals.
+- Gate checklist for every new/renamed public symbol:
+  - Name matches behavior and scope (no overloaded meaning like "Manager", "Helper", "Context" without domain prefix).
+  - Method intent is obvious from signature (`Set*`, `Apply*`, `Try*`, `Create*`, `Render*` used consistently).
+  - Option/state names avoid double negatives and hidden side effects.
+  - Similar controls use the same term for the same concept (for example `SelectedItem` vs `CurrentItem` must be standardized).
+  - Ambiguous names require rename before merge or explicit documented exception.
+
+## Public API Commenting Gate
+- All public APIs changed for V1 must have meaningful XML docs.
+- Minimum bar:
+  - `<summary>` explains behavior and intent, not type restatement.
+  - `<param>` documents constraints/default behavior where non-obvious.
+  - `<returns>` for non-void methods with semantic meaning.
+  - `<remarks>` where side effects, lifecycle, or ordering matter.
+  - `<exception>` where caller-actionable exceptions are expected.
+- Gate enforcement:
+  - PR fails if new/changed public APIs are undocumented or copy-template comments.
+  - Docs must match actual runtime behavior in examples/tests.
+
+## Parallelization Constraints
+- Parallel work is allowed only within the active phase in the authoritative execution order.
+- Do not start phase N+1 before phase N exit criteria are satisfied.
+- Within a phase:
+  - parallelize only with disjoint file ownership.
+  - central coordinator validates gate status before opening next checkpoint.
 
 ## Milestones and Acceptance Criteria
-### M1: Boundary Baseline
+### M1: Correctness and Bug-Fix Stabilization
 - Acceptance:
-  - no-DI public startup policy implemented
-  - starter examples compile with `TeaSharp` namespaces only
-  - boundary tests green
+  - all known P0/P1 regressions in active scope are fixed or explicitly deferred with owner/date
+  - regression tests added/updated for every fixed defect class
+  - touched-area unit/integration filters pass consistently
 
-### M2: Theme Contract
+### M2: API Simplification and Boundary Contract
 - Acceptance:
-  - semantic theme model documented and implemented
-  - built-in palettes: Catppuccin + Rosé Pine + custom
-  - focused/selected/hovered/error visuals overrideable
+  - API simplification contract is satisfied for touched public surfaces
+  - naming clarity gate passes for all new/renamed public symbols
+  - default onboarding path remains `TeaSharp`-first with no new `TeaSharp.Core` onboarding leakage
 
-### M3: Widget Tranche
+### M3: Visual Polish and Theme Consistency
 - Acceptance:
-  - 10-15 widgets from `docs/widget-roadmap-v1.md` V1 tranche are implemented
-  - all new widgets expose consistent style/state override hooks
-  - all new widgets are validated against global theme + per-widget overrides
-  - widget docs/examples and control catalog updates are merged
+  - default visuals are improved without semantic/input regressions
+  - theme/default/override behavior is validated on touched controls
+  - visual/text snapshot expectations are updated where intentional changes were made
 
-### M4: Hardening and Release Candidate
+### M4: Expansion + Performance + Docs Freeze (Release Candidate)
 - Acceptance:
-  - full test suite green
-  - example smoke green
-  - benchmark suite produced with baseline report following `docs/perf-plan-v1.md`
-  - regression budget gates from `docs/perf-plan-v1.md` pass
-  - public docs complete and coherent
+  - V1 widget tranche target from `docs/widget-roadmap-v1.md` is complete
+  - perf gates from `docs/perf-plan-v1.md` pass with benchmark report attached
+  - public API commenting gate passes for V1-touching APIs
+  - docs/examples/release checklist are coherent and frozen for RC
 
 ## Dependency Graph and Critical Path
-1. M1 no-DI + boundary guardrails
-2. M2 theme token contract
-3. M3 widget delivery on top of M2 style contract
-4. M4 hardening + perf + docs freeze
+1. Correctness + bug-fix stabilization
+2. API simplification + boundary cleanup
+3. Visual polish + theming consistency
+4. Expansion + perf hardening + docs freeze
 
-Critical path: M1 -> M2 -> M3 -> M4.
+Critical path: Phase 1 -> Phase 2 -> Phase 3 -> Phase 4 (strict order).
 
 ## Agent Ownership Matrix (3-Lane Model)
 | Lane | Primary Responsibility | Typical Files |
@@ -125,6 +172,27 @@ Coordination rules:
 - One lane per logical task.
 - Parallel where file ownership is disjoint.
 - Merge checkpoints at each milestone.
+
+## Agent Coordination Checkpoints
+- **C0: Stabilization Ready**
+  - Required: open regression inventory, failing tests triaged, lane ownership map confirmed.
+  - Exit: correctness phase can begin.
+- **C1: Correctness Exit**
+  - Required: all active regressions closed or explicitly deferred with owner/date.
+  - Required commands: touched-area unit/integration filters + smoke scenarios.
+  - Exit: API simplification phase can begin.
+- **C2: API Contract Exit**
+  - Required: API simplification contract pass + naming clarity gate pass.
+  - Required: public API diff reviewed and migration notes updated.
+  - Exit: visual polish phase can begin.
+- **C3: Visual Exit**
+  - Required: visual defaults updated with behavior parity; theme override checks green.
+  - Required: snapshot/text-render assertions updated where expected.
+  - Exit: expansion/perf/docs-freeze phase can begin.
+- **C4: Release Candidate Exit**
+  - Required: widget tranche target met, perf gates pass per `docs/perf-plan-v1.md`, docs/commenting gate pass.
+  - Required: final verification matrix run and archived in PR/release notes.
+  - Exit: Public V1 release approval.
 
 ## Risk Register
 | Risk | Impact | Mitigation |
