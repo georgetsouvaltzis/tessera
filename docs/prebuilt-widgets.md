@@ -60,6 +60,8 @@ Preferred public catalog:
 47. `DataGrid`
 48. `TreeTable`
 49. `KeyValueList`
+50. `Timeline`
+51. `Stepper`
 
 These live in `TeaSharp.Controls`.
 

@@ -14,7 +14,7 @@ Control additions remain C#-first object-model APIs with no DI requirement on th
 - `Toggle`, `Slider`, `Spinner`, `ProgressBar`, `LogView`
 - `Badge`, `Accordion`, `NumberInput`, `DatePicker`, `TimePicker`
 - `MultiSelect`, `RadioGroup`, `Gauge`, `MiniLog`, `StatsCard`
-- `BarChart`, `LineChart`, `MarkdownView`
+- `BarChart`, `LineChart`, `MarkdownView`, `Timeline`, `Stepper`
 
 ### Planned Expansion (to reach 40-50 total)
 - `FileExplorer`
@@ -23,8 +23,6 @@ Control additions remain C#-first object-model APIs with no DI requirement on th
 - `Paginator`
 - `PropertyGrid`
 - `DiffView`
-- `Timeline`
-- `Stepper` (wizard flow)
 - `ToastCenter`
 
 ## Prioritized V1 Tranche (10-15)

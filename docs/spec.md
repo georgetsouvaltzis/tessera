@@ -138,6 +138,8 @@ Root controls currently include:
 - `DataGrid`
 - `TreeTable`
 - `KeyValueList`
+- `Timeline`
+- `Stepper`
 - `TreeItem`
 - `TreeView`
 - `MenuBar`
