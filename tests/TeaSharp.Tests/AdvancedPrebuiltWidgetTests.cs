@@ -21,6 +21,10 @@ internal static class AdvancedPrebuiltWidgetTests
         yield return new TestCase("Controls_TreeView_MouseClickSelectsVisibleNode", TreeView_MouseClickSelectsVisibleNode);
         yield return new TestCase("Controls_Notifications_DismissesEntries", Notifications_DismissesEntries);
         yield return new TestCase("Controls_Notifications_MouseWheelMovesSelection", Notifications_MouseWheelMovesSelection);
+        yield return new TestCase("Controls_Toolbar_KeyboardNavigationUpdatesSelection", Toolbar_KeyboardNavigationUpdatesSelection);
+        yield return new TestCase("Controls_Toolbar_MouseClickSelectsItem", Toolbar_MouseClickSelectsItem);
+        yield return new TestCase("Controls_Toolbar_SelectionChangedEvent_ReportsTransition", Toolbar_SelectionChangedEvent_ReportsTransition);
+        yield return new TestCase("Controls_Toolbar_RendersTitleAndSelectedLabel", Toolbar_RendersTitleAndSelectedLabel);
     }
 
     private static Task Badge_RendersLabel()
@@ -288,6 +292,95 @@ internal static class AdvancedPrebuiltWidgetTests
         TestAssert.True(output.Contains("third", StringComparison.Ordinal), "Newest entry should remain after moving selection up.");
         TestAssert.True(output.Contains("first", StringComparison.Ordinal), "Oldest entry should remain after removing middle entry.");
         TestAssert.True(!output.Contains("second", StringComparison.Ordinal), "Wheel-selected entry should be removed.");
+        return Task.CompletedTask;
+    }
+
+    private static Task Toolbar_KeyboardNavigationUpdatesSelection()
+    {
+        var toolbar = new Toolbar
+        {
+            IsFocused = true,
+        };
+        toolbar.SetItems(
+        [
+            new ToolbarItem("new", "New"),
+            new ToolbarItem("open", "Open"),
+            new ToolbarItem("save", "Save"),
+        ]);
+
+        toolbar.Handle(new KeyPressed(Key.Right));
+        toolbar.Handle(new KeyPressed(Key.End));
+        var unchangedAtEnd = toolbar.Handle(new KeyPressed(Key.Right));
+        toolbar.Handle(new KeyPressed(Key.Home));
+
+        TestAssert.True(!unchangedAtEnd, "Toolbar should clamp navigation at the end.");
+        TestAssert.Equal(0, toolbar.SelectedIndex, "Toolbar Home key should move selection back to the first item.");
+        TestAssert.Equal("new", toolbar.SelectedItem?.Id ?? string.Empty, "Toolbar should expose selected item after keyboard navigation.");
+        return Task.CompletedTask;
+    }
+
+    private static Task Toolbar_MouseClickSelectsItem()
+    {
+        var toolbar = new Toolbar();
+        toolbar.SetItems(
+        [
+            new ToolbarItem("new", "New"),
+            new ToolbarItem("open", "Open"),
+            new ToolbarItem("save", "Save"),
+        ]);
+
+        var changed = toolbar.Handle(new PointerInput(PointerEventKind.Press, PointerButton.Left, 9, 0), new Rect(0, 0, 40, 1));
+
+        TestAssert.True(changed, "Toolbar click should select the hit item.");
+        TestAssert.Equal(1, toolbar.SelectedIndex, "Toolbar click should select the second item from the hit location.");
+        TestAssert.Equal("open", toolbar.SelectedItem?.Id ?? string.Empty, "Toolbar click should expose selected item id.");
+        return Task.CompletedTask;
+    }
+
+    private static Task Toolbar_SelectionChangedEvent_ReportsTransition()
+    {
+        var toolbar = new Toolbar
+        {
+            IsFocused = true,
+        };
+        toolbar.SetItems(
+        [
+            new ToolbarItem("new", "New"),
+            new ToolbarItem("open", "Open"),
+            new ToolbarItem("save", "Save"),
+        ]);
+        ToolbarSelectionChangedEventArgs? args = null;
+        toolbar.SelectionChanged += (_, eventArgs) => args = eventArgs;
+
+        toolbar.Handle(new KeyPressed(Key.Right));
+
+        TestAssert.True(args is not null, "Toolbar should raise selection changed when selected item changes.");
+        TestAssert.Equal(0, args!.PreviousIndex, "Toolbar event should report previous index.");
+        TestAssert.Equal(1, args.SelectedIndex, "Toolbar event should report selected index.");
+        TestAssert.Equal("new", args.PreviousItem?.Id ?? string.Empty, "Toolbar event should report previous item.");
+        TestAssert.Equal("open", args.SelectedItem?.Id ?? string.Empty, "Toolbar event should report selected item.");
+        return Task.CompletedTask;
+    }
+
+    private static Task Toolbar_RendersTitleAndSelectedLabel()
+    {
+        var toolbar = new Toolbar
+        {
+            IsFocused = true,
+            Title = "Main",
+        };
+        toolbar.SetItems(
+        [
+            new ToolbarItem("new", "New"),
+            new ToolbarItem("open", "Open"),
+        ]);
+
+        var canvas = new Canvas(40, 1);
+        toolbar.Render(canvas, new Rect(0, 0, 40, 1));
+        var output = canvas.Render();
+
+        TestAssert.True(output.Contains("Main *", StringComparison.Ordinal), "Toolbar should render focused title marker.");
+        TestAssert.True(output.Contains("[New]", StringComparison.Ordinal), "Toolbar should render selected item with a bracket marker.");
         return Task.CompletedTask;
     }
 }
