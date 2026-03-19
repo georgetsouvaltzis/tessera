@@ -16,6 +16,8 @@ internal static class WidgetStateTests
         yield return new TestCase("Widgets_Viewport_ScrollAndHorizontalOffset", Viewport_ScrollAndHorizontalOffset);
         yield return new TestCase("Widgets_Viewport_WrapMode_SoftWrapsRows", Viewport_WrapMode_SoftWrapsRows);
         yield return new TestCase("Widgets_Viewport_GutterAndHighlight_RenderDecorations", Viewport_GutterAndHighlight_RenderDecorations);
+        yield return new TestCase("Widgets_Viewport_HighlightWithoutGutter_PreservesMarkerPrefix", Viewport_HighlightWithoutGutter_PreservesMarkerPrefix);
+        yield return new TestCase("Widgets_Viewport_LineNumberPrefix_ClipsWhenViewportNarrow", Viewport_LineNumberPrefix_ClipsWhenViewportNarrow);
         yield return new TestCase("Widgets_TextInput_EditWordAndSubmit", TextInput_EditWordAndSubmit);
         yield return new TestCase("Widgets_TextInput_AltBindings_WorkForWordOps", TextInput_AltBindings_WorkForWordOps);
         yield return new TestCase("Widgets_TextInput_Multiline_EnterAndVerticalNavigation", TextInput_Multiline_EnterAndVerticalNavigation);
@@ -139,6 +141,44 @@ internal static class WidgetStateTests
         // Assert
         TestAssert.True(lines[0].StartsWith(" 1 ", StringComparison.Ordinal), "Viewport line numbers should prefix each visual row.");
         TestAssert.True(lines[1].StartsWith(" 2> ", StringComparison.Ordinal), "Highlighted visual row should include marker.");
+        return Task.CompletedTask;
+    }
+
+    private static Task Viewport_HighlightWithoutGutter_PreservesMarkerPrefix()
+    {
+        // Arrange
+        var viewport = new ViewportModel
+        {
+            ShowLineNumbers = false,
+            HighlightVisualLine = 0,
+        };
+        viewport.Resize(width: 4, height: 1);
+        viewport.SetWrap(false);
+        viewport.SetContent("abcdef");
+
+        // Act
+        var lines = viewport.RenderLines();
+
+        // Assert
+        TestAssert.Equal("> abcd", lines[0], "Highlight marker should prefix clipped content even when viewport width is fully consumed.");
+        return Task.CompletedTask;
+    }
+
+    private static Task Viewport_LineNumberPrefix_ClipsWhenViewportNarrow()
+    {
+        // Arrange
+        var viewport = new ViewportModel
+        {
+            ShowLineNumbers = true,
+        };
+        viewport.Resize(width: 2, height: 1);
+        viewport.SetContent("alpha");
+
+        // Act
+        var lines = viewport.RenderLines();
+
+        // Assert
+        TestAssert.Equal(" 1", lines[0], "When width is smaller than gutter prefix, viewport should render clipped prefix only.");
         return Task.CompletedTask;
     }
 

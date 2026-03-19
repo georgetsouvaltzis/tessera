@@ -47,8 +47,16 @@ internal static class ViewportRenderer
                 continue;
             }
 
-            var clipped = ViewportLineFormatter.ClipLine(line, wrap, width, xOffset, showLineNumbers, lineNumberWidth);
-            rendered.Add(ViewportLineFormatter.DecorateLine(clipped, showLineNumbers, highlightVisualLine, visualIndex, lineNumberWidth, width));
+            rendered.Add(
+                ViewportLineFormatter.FormatLine(
+                    line,
+                    wrap,
+                    width,
+                    xOffset,
+                    showLineNumbers,
+                    highlightVisualLine,
+                    visualIndex,
+                    lineNumberWidth));
         }
 
         return rendered;
