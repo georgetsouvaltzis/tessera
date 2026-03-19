@@ -20,6 +20,10 @@ internal static class ProductivityPrebuiltWidgetTests
         yield return new TestCase("Controls_Paginator_PageChangedEvent_ReportsTransition", Paginator_PageChangedEvent_ReportsTransition);
         yield return new TestCase("Controls_Paginator_MousePressOnHitTargets_ChangesPage", Paginator_MousePressOnHitTargets_ChangesPage);
         yield return new TestCase("Controls_Paginator_RendersCompactOneLineLayout", Paginator_RendersCompactOneLineLayout);
+        yield return new TestCase("Controls_SearchBox_UpdatesQueryAndRaisesEvent", SearchBox_UpdatesQueryAndRaisesEvent);
+        yield return new TestCase("Controls_SearchBox_NavigationCommands_UpdateIndexAndRaiseEvent", SearchBox_NavigationCommands_UpdateIndexAndRaiseEvent);
+        yield return new TestCase("Controls_SearchBox_MousePressOnHitTargets_Navigates", SearchBox_MousePressOnHitTargets_Navigates);
+        yield return new TestCase("Controls_SearchBox_RendersPlaceholderAndMatchCounter", SearchBox_RendersPlaceholderAndMatchCounter);
         yield return new TestCase("Controls_MarkdownView_RendersMarkdown", MarkdownView_RendersMarkdown);
     }
 
@@ -267,6 +271,99 @@ internal static class ProductivityPrebuiltWidgetTests
         TestAssert.True(
             output.Contains("Prev  Page 5/12  Next", StringComparison.Ordinal),
             "Paginator should render compact one-line layout with current page label.");
+        return Task.CompletedTask;
+    }
+
+    private static Task SearchBox_UpdatesQueryAndRaisesEvent()
+    {
+        var search = new SearchBox
+        {
+            IsFocused = true,
+        };
+        SearchBoxQueryChangedEventArgs? args = null;
+        var raised = 0;
+        search.QueryChanged += (_, eventArgs) =>
+        {
+            raised++;
+            args = eventArgs;
+        };
+
+        search.Handle(new KeyPressed(Key.Character, "a"));
+        search.Handle(new KeyPressed(Key.Character, "b"));
+
+        TestAssert.Equal("ab", search.QueryText, "SearchBox should update query text from typed characters.");
+        TestAssert.Equal(2, raised, "SearchBox should raise query changed once per mutation.");
+        TestAssert.True(args is not null, "SearchBox should provide query changed payload.");
+        TestAssert.Equal("a", args!.PreviousQuery, "SearchBox query payload should expose previous query.");
+        TestAssert.Equal("ab", args.Query, "SearchBox query payload should expose current query.");
+        return Task.CompletedTask;
+    }
+
+    private static Task SearchBox_NavigationCommands_UpdateIndexAndRaiseEvent()
+    {
+        var search = new SearchBox
+        {
+            IsFocused = true,
+        };
+        search.SetMatchState(5, 0);
+
+        SearchBoxNavigationRequestedEventArgs? args = null;
+        var raised = 0;
+        search.NavigationRequested += (_, eventArgs) =>
+        {
+            raised++;
+            args = eventArgs;
+        };
+
+        search.Handle(new KeyPressed(Key.Enter));
+        search.Handle(new KeyPressed(Key.F3));
+        search.Handle(new KeyPressed(Key.F3, string.Empty, ModifierKeys.Shift));
+
+        TestAssert.Equal(3, raised, "SearchBox should raise navigation requested per navigation command.");
+        TestAssert.Equal(1, search.CurrentMatchIndex ?? -1, "SearchBox should update current match index based on navigation.");
+        TestAssert.True(args is not null, "SearchBox should expose navigation payload details.");
+        TestAssert.True(args!.Direction == SearchNavigationDirection.Previous, "SearchBox should report previous direction on Shift+F3.");
+        TestAssert.Equal(2, args.PreviousMatchIndex ?? -1, "SearchBox should report previous index before navigation.");
+        TestAssert.Equal(1, args.CurrentMatchIndex ?? -1, "SearchBox should report current index after navigation.");
+        return Task.CompletedTask;
+    }
+
+    private static Task SearchBox_MousePressOnHitTargets_Navigates()
+    {
+        var search = new SearchBox
+        {
+            Border = BorderStyle.None,
+        };
+        search.SetMatchState(3, 0);
+        var bounds = new Rect(0, 0, 30, 1);
+
+        var nextChanged = search.Handle(new PointerInput(PointerEventKind.Press, PointerButton.Left, 26, 0), bounds);
+        TestAssert.True(nextChanged, "SearchBox next hit target click should be handled.");
+        TestAssert.Equal(1, search.CurrentMatchIndex ?? -1, "SearchBox next hit target should move to next match.");
+
+        var previousChanged = search.Handle(new PointerInput(PointerEventKind.Press, PointerButton.Left, 21, 0), bounds);
+        TestAssert.True(previousChanged, "SearchBox previous hit target click should be handled.");
+        TestAssert.Equal(0, search.CurrentMatchIndex ?? -1, "SearchBox previous hit target should move to previous match.");
+        return Task.CompletedTask;
+    }
+
+    private static Task SearchBox_RendersPlaceholderAndMatchCounter()
+    {
+        var search = new SearchBox
+        {
+            Border = BorderStyle.None,
+            Placeholder = "find text",
+        };
+        search.SetMatchState(8, 2);
+        var canvas = new Canvas(36, 1);
+
+        search.Render(canvas, new Rect(0, 0, 36, 1));
+        var output = canvas.Render();
+
+        TestAssert.True(output.Contains("find text", StringComparison.Ordinal), "SearchBox should render placeholder text when query is empty.");
+        TestAssert.True(output.Contains("3/8", StringComparison.Ordinal), "SearchBox should render current/total match label.");
+        TestAssert.True(output.Contains("Prev", StringComparison.Ordinal), "SearchBox should render previous navigation label.");
+        TestAssert.True(output.Contains("Next", StringComparison.Ordinal), "SearchBox should render next navigation label.");
         return Task.CompletedTask;
     }
 
