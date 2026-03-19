@@ -29,6 +29,7 @@ public sealed class NUnitCaseAdapters
         foreach (var testCase in PublicApiXmlDocsTests.Cases()) yield return ToCaseData(testCase);
         foreach (var testCase in PublicApiBoundaryTests.Cases()) yield return ToCaseData(testCase);
         foreach (var testCase in ThemeFoundationTests.Cases()) yield return ToCaseData(testCase);
+        foreach (var testCase in ThemeOverridesTests.Cases()) yield return ToCaseData(testCase);
         foreach (var testCase in TeaControlCatalogTests.Cases()) yield return ToCaseData(testCase);
         foreach (var testCase in TeaAppCompositionTests.Cases()) yield return ToCaseData(testCase);
         foreach (var testCase in TeaAppFoundationTests.Cases()) yield return ToCaseData(testCase);
