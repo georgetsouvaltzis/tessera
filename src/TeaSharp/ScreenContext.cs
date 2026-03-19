@@ -1,4 +1,5 @@
 using TeaSharp.Components.Primitives;
+using TeaSharp.Styles;
 
 namespace TeaSharp;
 
@@ -16,6 +17,11 @@ public sealed record ScreenContext
     /// Gets the current screen height in character cells.
     /// </summary>
     public int Height { get; init; }
+
+    /// <summary>
+    /// Gets the optional semantic theme configured for the current runtime.
+    /// </summary>
+    public TeaTheme? Theme { get; init; }
 
     /// <summary>
     /// Gets a value indicating whether the application currently has terminal focus.

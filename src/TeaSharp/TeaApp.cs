@@ -1,4 +1,5 @@
 using TeaSharp.Internal;
+using TeaSharp.Styles;
 
 namespace TeaSharp;
 
@@ -16,6 +17,7 @@ public abstract class TeaApp
 {
     private ScreenContext _context = new();
     private ScreenOptions _runtimeScreenOptions = ScreenOptions.Empty;
+    private TeaTheme? _runtimeTheme;
     private readonly IScreenCompiler _screenCompiler = ScreenCompilationFactory.CreateDefault();
     private ICompiledScreenInteraction? _interactiveScreen;
     private readonly List<TeaEffect> _pendingEffects = [];
@@ -75,6 +77,20 @@ public abstract class TeaApp
     internal void ConfigureRuntimeScreen(ScreenOptions screenOptions)
     {
         _runtimeScreenOptions = screenOptions ?? ScreenOptions.Empty;
+        _context = _context with { Theme = _runtimeTheme };
+    }
+
+    internal void ConfigureRuntimeOptions(TeaRuntimeOptions options)
+    {
+        ArgumentNullException.ThrowIfNull(options);
+        _runtimeScreenOptions = options.Screen ?? ScreenOptions.Empty;
+        ConfigureRuntimeTheme(options.Theme);
+    }
+
+    internal void ConfigureRuntimeTheme(TeaTheme? theme)
+    {
+        _runtimeTheme = theme;
+        _context = _context with { Theme = _runtimeTheme };
     }
 
     internal TeaEffect? InitializeRuntime() => Initialize();

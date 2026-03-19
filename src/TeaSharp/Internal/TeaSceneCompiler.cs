@@ -1,13 +1,19 @@
 using TeaSharp.Components.Composition;
 using TeaSharp.Components.Primitives;
 using TeaSharp.Components.Primitives.Internal;
+using TeaSharp.Controls;
 using TeaSharp.Core.Abstractions;
 using TeaSharp.Layout;
+using TeaSharp.Styles;
+using System.Collections.Concurrent;
+using System.Reflection;
 
 namespace TeaSharp.Internal;
 
 internal sealed class TeaSceneCompiler : IScreenCompiler
 {
+    private static readonly MethodInfo ListViewThemeDefaultsMethodDefinition = ResolveListViewThemeDefaultsMethodDefinition();
+    private static readonly ConcurrentDictionary<Type, MethodInfo> ListViewThemeDefaultsMethods = new();
     private string? _focusedRegionId;
 
     public ScreenRenderResult Compile(ScreenContent content, ScreenContext context, ScreenOptions options)
@@ -22,6 +28,11 @@ internal sealed class TeaSceneCompiler : IScreenCompiler
             };
 
             return new ScreenRenderResult(textOutput, null);
+        }
+
+        if (context.Theme is { } theme)
+        {
+            ApplyThemeDefaults(content.Layout, theme);
         }
 
         var canvas = context.CreateCanvas(CanvasTextMode.GraphemeAware);
@@ -44,6 +55,144 @@ internal sealed class TeaSceneCompiler : IScreenCompiler
         };
 
         return new ScreenRenderResult(output, interaction.HasInteraction ? interaction : null);
+    }
+
+    private static void ApplyThemeDefaults(LayoutNode layout, TeaTheme theme)
+    {
+        switch (layout)
+        {
+            case ComponentLayout component when component.Control is { } control:
+                ApplyThemeDefaults(control, theme);
+                return;
+            case WindowLayout window:
+                ApplyThemeDefaults(window.Header, theme);
+                ApplyThemeDefaults(window.Footer, theme);
+                ApplyThemeDefaults(window.Left, theme);
+                ApplyThemeDefaults(window.Right, theme);
+                if (window.Body is not null)
+                {
+                    ApplyThemeDefaults(window.Body, theme);
+                }
+
+                if (window.Overlay is not null)
+                {
+                    ApplyThemeDefaults(window.Overlay, theme);
+                }
+
+                return;
+            case RowLayout row:
+                ApplyThemeDefaults(row.Items, theme);
+                return;
+            case ColumnLayout column:
+                ApplyThemeDefaults(column.Items, theme);
+                return;
+            case CenterLayout center:
+                ApplyThemeDefaults(center.Content, theme);
+                return;
+            case PanelLayout panel:
+                ApplyThemeDefaults(panel.Content, theme);
+                return;
+            case OverlayLayout overlay:
+                for (var index = 0; index < overlay.Items.Count; index++)
+                {
+                    ApplyThemeDefaults(overlay.Items[index], theme);
+                }
+
+                return;
+            case DockLayout dock:
+                ApplyThemeDefaults(dock.Top, theme);
+                ApplyThemeDefaults(dock.Bottom, theme);
+                ApplyThemeDefaults(dock.Left, theme);
+                ApplyThemeDefaults(dock.Right, theme);
+                ApplyThemeDefaults(dock.Fill, theme);
+                return;
+            case StackLayout stack:
+                ApplyThemeDefaults(stack.Children, theme);
+                return;
+            case SplitLayout split:
+                ApplyThemeDefaults(split.First, theme);
+                ApplyThemeDefaults(split.Second, theme);
+                return;
+            default:
+                return;
+        }
+    }
+
+    private static void ApplyThemeDefaults(IEnumerable<LayoutSlot> slots, TeaTheme theme)
+    {
+        foreach (var slot in slots)
+        {
+            ApplyThemeDefaults(slot, theme);
+        }
+    }
+
+    private static void ApplyThemeDefaults(LayoutSlot? slot, TeaTheme theme)
+    {
+        if (slot is not null)
+        {
+            ApplyThemeDefaults(slot.Content, theme);
+        }
+    }
+
+    private static void ApplyThemeDefaults(Control control, TeaTheme theme)
+    {
+        switch (control)
+        {
+            case Button button:
+                button.ApplyThemeDefaults(theme);
+                return;
+            case StatusBar statusBar:
+                statusBar.ApplyThemeDefaults(theme);
+                return;
+            case TextInput textInput:
+                textInput.ApplyThemeDefaults(theme);
+                return;
+            case Table table:
+                table.ApplyThemeDefaults(theme);
+                return;
+            case Tabs tabs:
+                tabs.ApplyThemeDefaults(theme);
+                return;
+            default:
+                ApplyListViewThemeDefaults(control, theme);
+                return;
+        }
+    }
+
+    private static void ApplyListViewThemeDefaults(Control control, TeaTheme theme)
+    {
+        var controlType = control.GetType();
+        if (!controlType.IsGenericType || controlType.GetGenericTypeDefinition() != typeof(ListView<>))
+        {
+            return;
+        }
+
+        var itemType = controlType.GetGenericArguments()[0];
+        var method = ListViewThemeDefaultsMethods.GetOrAdd(
+            itemType,
+            static value => ListViewThemeDefaultsMethodDefinition.MakeGenericMethod(value));
+        _ = method.Invoke(null, [control, theme]);
+    }
+
+    private static MethodInfo ResolveListViewThemeDefaultsMethodDefinition()
+    {
+        return typeof(TeaThemeControlExtensions).GetMethods(BindingFlags.Public | BindingFlags.Static)
+            .Single(
+                static method =>
+                {
+                    if (method.Name != nameof(TeaThemeControlExtensions.ApplyThemeDefaults)
+                        || !method.IsGenericMethodDefinition
+                        || method.GetGenericArguments().Length != 1)
+                    {
+                        return false;
+                    }
+
+                    var parameters = method.GetParameters();
+                    return parameters.Length == 2
+                        && parameters[0].ParameterType.IsGenericType
+                        && parameters[0].ParameterType.GetGenericTypeDefinition() == typeof(ListView<>)
+                        && parameters[1].ParameterType == typeof(TeaTheme);
+                });
     }
 
     private sealed class TeaSceneBuilder
