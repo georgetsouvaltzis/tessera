@@ -45,6 +45,95 @@ Theme primitives use the following public types:
 - `TeaThemes.RosePine(RosePineVariant)`
 - `TeaRuntimeOptions.Theme`
 
+## Theme Cookbook
+
+### Select Catppuccin
+
+```csharp
+using TeaSharp;
+using TeaSharp.Styles;
+
+var app = Tea.CreateBuilder()
+    .UseApp<MyApp>()
+    .ConfigureRuntime(static runtime =>
+    {
+        runtime.Theme = TeaThemes.Catppuccin(CatppuccinVariant.Mocha);
+    })
+    .Build();
+```
+
+### Select Rosé Pine
+
+```csharp
+using TeaSharp;
+using TeaSharp.Styles;
+
+var app = Tea.CreateBuilder()
+    .UseApp<MyApp>()
+    .ConfigureRuntime(static runtime =>
+    {
+        runtime.Theme = TeaThemes.RosePine(RosePineVariant.Main);
+    })
+    .Build();
+```
+
+### Set a Custom Theme
+
+```csharp
+using TeaSharp;
+using TeaSharp.Styles;
+
+var baseTheme = TeaThemes.Catppuccin(CatppuccinVariant.Macchiato);
+var customTheme = new TeaTheme
+{
+    Text = baseTheme.Text,
+    Surface = baseTheme.Surface,
+    Border = new TeaThemeBorderTokens
+    {
+        Default = baseTheme.Border.Default,
+        Strong = baseTheme.Border.Strong,
+        Focused = TeaStyle.Empty.WithBold().WithForeground(AnsiColor.Rgb(255, 184, 108)),
+        Error = baseTheme.Border.Error,
+    },
+    State = baseTheme.State,
+    Accent = baseTheme.Accent,
+    Selection = baseTheme.Selection,
+    Focus = baseTheme.Focus,
+};
+
+var app = Tea.CreateBuilder()
+    .UseApp<MyApp>()
+    .ConfigureRuntime(runtime => runtime.Theme = customTheme)
+    .Build();
+```
+
+### Per-Control Overrides
+
+```csharp
+using TeaSharp.Controls;
+using TeaSharp.Styles;
+
+var button = new Button
+{
+    LabelStyle = TeaStyle.Empty.WithForeground(AnsiColor.BrightWhite),
+    FocusedLabelStyle = TeaStyle.Empty.WithBold().WithForeground(AnsiColor.BrightYellow),
+};
+
+var list = new ListView<string>()
+{
+    DefaultRowStyle = TeaStyle.Empty.WithForeground(AnsiColor.BrightWhite),
+    HoveredRowStyle = TeaStyle.Empty.WithUnderline().WithForeground(AnsiColor.BrightCyan),
+    SelectedRowStyle = TeaStyle.Empty.WithBold().WithForeground(AnsiColor.BrightGreen),
+};
+
+var input = new TextInput
+{
+    ValueTextStyle = TeaStyle.Empty.WithForeground(AnsiColor.BrightWhite),
+    PlaceholderTextStyle = TeaStyle.Empty.WithDim().WithForeground(AnsiColor.BrightBlack),
+    FocusedTitleStyle = TeaStyle.Empty.WithBold().WithForeground(AnsiColor.BrightYellow),
+};
+```
+
 ## Palette Model
 
 V1 ships with:

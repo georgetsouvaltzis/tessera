@@ -26,6 +26,15 @@ All agents must treat this file as the source of truth for scope, sequencing, ow
 - Image embedding (`kitty`, `iTerm2`, `wezterm`, `ghostty`) with capability fallback.
 - Advanced image render modes (native, pixelated block fallback).
 
+## Current Progress
+- **M1: Boundary Baseline** -> **Done**
+  - no-DI startup policy established on docs path
+  - canonical onboarding progression established (`HelloWorld` -> `CounterForm` -> `WorkspaceApp`)
+  - boundary guardrails active
+- **M2: Theme Contract** -> **In Progress**
+  - semantic token model and built-in palette types in flight
+  - control-level style hooks rollout ongoing
+
 ## Workstreams
 ### WS-A: Public API and Runtime Boundaries
 - Remove DI-centric startup from the default app path.

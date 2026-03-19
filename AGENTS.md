@@ -50,4 +50,5 @@ Before handoff, run full cycle (build/tests/examples/docs consistency) and repor
 ## Commit Rules
 - Conventional commit prefixes: `feat|fix|refactor|build|chore|docs|perf|test`.
 - Keep commits logically scoped and verifiable.
+- Commit each completed logical slice before moving to the next slice.
 - Include docs updates whenever public behavior/API changes.

@@ -8,6 +8,9 @@ Use this pattern for normal apps:
 - return a `Screen` from `Build(ScreenContext)`
 - run with `Tea.RunAsync(...)` or `TeaApplicationBuilder`
 - keep low-level composition APIs as advanced-only escape hatches
+- apply global visual theming through `TeaRuntimeOptions.Theme` when needed
+
+See [theme-system-v1.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/theme-system-v1.md) for palette selection and per-control overrides.
 
 ## Default Shape
 
@@ -15,12 +18,14 @@ Use this pattern for normal apps:
 using TeaSharp;
 using TeaSharp.Controls;
 using TeaSharp.Layout;
+using TeaSharp.Styles;
 
 var app = Tea.CreateBuilder()
     .UseApp<CounterApp>()
     .ConfigureRuntime(static runtime =>
     {
         runtime.MaxFps = 60;
+        runtime.Theme = TeaThemes.Catppuccin(CatppuccinVariant.Mocha);
         runtime.Screen = new ScreenOptions
         {
             AltScreen = true,
@@ -124,11 +129,14 @@ These types compile through TeaSharp's scene compiler and runtime loop. Normal a
 Use `Tea.RunAsync(app, options)` for small apps.
 
 ```csharp
+using TeaSharp.Styles;
+
 await Tea.RunAsync(
     new HelloApp(),
     new TeaRuntimeOptions
     {
         MaxFps = 30,
+        Theme = TeaThemes.RosePine(RosePineVariant.Main),
         Screen = new ScreenOptions
         {
             AltScreen = true,
