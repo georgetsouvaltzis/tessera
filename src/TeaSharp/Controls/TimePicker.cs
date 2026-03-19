@@ -3,6 +3,8 @@ using TeaSharp.Components.Primitives.Internal;
 using TeaSharp.Controls.Internal;
 using TeaSharp.Components.Styling;
 using TeaSharp.Layout;
+using TeaSharp.Styles;
+using System.Globalization;
 
 namespace TeaSharp.Controls;
 
@@ -21,6 +23,60 @@ public sealed class TimePicker : Control
         get;
         set => field = value ?? string.Empty;
     } = "Time Picker";
+
+    public string FocusMarker
+    {
+        get;
+        set => field = value ?? string.Empty;
+    } = "*";
+
+    public bool ShowFocusMarker
+    {
+        get;
+        set;
+    } = true;
+
+    public TeaStyle TitleStyle
+    {
+        get;
+        set;
+    } = TeaStyle.Empty;
+
+    public TeaStyle FocusedTitleStyle
+    {
+        get;
+        set;
+    } = TeaStyle.Empty;
+
+    public TeaStyle ValueTextStyle
+    {
+        get;
+        set;
+    } = TeaStyle.Empty;
+
+    public TeaStyle ActiveFieldStyle
+    {
+        get;
+        set;
+    } = TeaStyle.Empty;
+
+    public TeaStyle HoveredFieldStyle
+    {
+        get;
+        set;
+    } = TeaStyle.Empty;
+
+    public TeaStyle DisabledValueStyle
+    {
+        get;
+        set;
+    } = TeaStyle.Empty;
+
+    public TeaStyle SeparatorStyle
+    {
+        get;
+        set;
+    } = TeaStyle.Empty;
 
     public BorderStyle Border
     {
@@ -193,12 +249,56 @@ public sealed class TimePicker : Control
 
     public override void Render(Canvas canvas, Rect rect)
     {
-        TimePickerRenderer.Render(canvas, rect, Title, IsFocused, IsDisabled, IsReadOnly, Border, Padding, Value, ActiveField, _hoveredField, _fieldStatePalette);
+        var clipped = Rect.Intersect(rect, canvas.Bounds);
+        if (clipped.IsEmpty)
+        {
+            return;
+        }
+
+        var title = Border == BorderStyle.None ? null : FormatTitle();
+        if (!string.IsNullOrEmpty(title))
+        {
+            var titleStyle = IsFocused ? FocusedTitleStyle : TitleStyle;
+            if (!titleStyle.IsEmpty)
+            {
+                title = titleStyle.Render(title);
+            }
+        }
+
+        var content = FrameLayout.DrawFrameAndResolveContent(
+            canvas,
+            clipped,
+            title,
+            Border,
+            Padding);
+
+        if (content.IsEmpty || content.Height < 1)
+        {
+            return;
+        }
+
+        var hour = RenderField(
+            Value.Hour.ToString("D2", CultureInfo.InvariantCulture),
+            TimeField.Hour);
+        var minute = RenderField(
+            Value.Minute.ToString("D2", CultureInfo.InvariantCulture),
+            TimeField.Minute);
+        var second = RenderField(
+            Value.Second.ToString("D2", CultureInfo.InvariantCulture),
+            TimeField.Second);
+
+        var separator = ":";
+        if (!SeparatorStyle.IsEmpty)
+        {
+            separator = SeparatorStyle.Render(separator);
+        }
+
+        canvas.WriteText(content.X, content.Y, $"{hour}{separator}{minute}{separator}{second}", content.Width);
     }
 
     internal override LayoutMeasurement Measure(in Rect availableBounds)
     {
-        var width = Math.Max(8, Title.Length + 4) + Padding.Horizontal;
+        var width = Math.Max(8, ControlTextLayout.MeasureDisplayWidth(FormatTitleForMeasure()) + 4) + Padding.Horizontal;
         var height = Padding.Vertical + 1;
         if (Border != BorderStyle.None)
         {
@@ -220,5 +320,64 @@ public sealed class TimePicker : Control
 
         _hoveredField = field;
         return true;
+    }
+
+    private string FormatTitle()
+    {
+        if (IsFocused && ShowFocusMarker && !string.IsNullOrWhiteSpace(FocusMarker))
+        {
+            return $"{Title} {FocusMarker}";
+        }
+
+        return Title;
+    }
+
+    private string FormatTitleForMeasure()
+    {
+        if (ShowFocusMarker && !string.IsNullOrWhiteSpace(FocusMarker))
+        {
+            return $"{Title} {FocusMarker}";
+        }
+
+        return Title;
+    }
+
+    private string RenderField(string value, TimeField field)
+    {
+        var states = TimePickerStateResolver.ResolveFieldStates(IsFocused, IsDisabled, IsReadOnly, ActiveField, _hoveredField, field);
+        var rendered = _fieldStatePalette.Render(value, states);
+        var style = ResolveFieldStyle(field);
+        if (!style.IsEmpty)
+        {
+            rendered = style.Render(rendered);
+        }
+
+        return rendered;
+    }
+
+    private TeaStyle ResolveFieldStyle(TimeField field)
+    {
+        TeaStyle style;
+        if (ActiveField == field && !ActiveFieldStyle.IsEmpty)
+        {
+            style = ActiveFieldStyle;
+        }
+        else if (_hoveredField.HasValue && _hoveredField.Value == field && !HoveredFieldStyle.IsEmpty)
+        {
+            style = HoveredFieldStyle;
+        }
+        else
+        {
+            style = ValueTextStyle;
+        }
+
+        if ((IsDisabled || IsReadOnly) && !DisabledValueStyle.IsEmpty)
+        {
+            style = style.IsEmpty
+                ? DisabledValueStyle
+                : style.Merge(DisabledValueStyle);
+        }
+
+        return style;
     }
 }

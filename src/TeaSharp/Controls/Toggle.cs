@@ -1,7 +1,9 @@
 using TeaSharp.Components.Primitives;
 using TeaSharp.Components.Primitives.Internal;
 using TeaSharp.Components.Styling;
+using TeaSharp.Controls.Internal;
 using TeaSharp.Layout;
+using TeaSharp.Styles;
 
 namespace TeaSharp.Controls;
 
@@ -18,6 +20,54 @@ public sealed class Toggle : Control
         get;
         set => field = value ?? string.Empty;
     } = "Toggle";
+
+    public string FocusMarker
+    {
+        get;
+        set => field = value ?? string.Empty;
+    } = "*";
+
+    public bool ShowFocusMarker
+    {
+        get;
+        set;
+    } = true;
+
+    public TeaStyle TitleStyle
+    {
+        get;
+        set;
+    } = TeaStyle.Empty;
+
+    public TeaStyle FocusedTitleStyle
+    {
+        get;
+        set;
+    } = TeaStyle.Empty;
+
+    public TeaStyle ValueStyle
+    {
+        get;
+        set;
+    } = TeaStyle.Empty;
+
+    public TeaStyle OnValueStyle
+    {
+        get;
+        set;
+    } = TeaStyle.Empty;
+
+    public TeaStyle OffValueStyle
+    {
+        get;
+        set;
+    } = TeaStyle.Empty;
+
+    public TeaStyle DisabledValueStyle
+    {
+        get;
+        set;
+    } = TeaStyle.Empty;
 
     public string OnText
     {
@@ -164,10 +214,20 @@ public sealed class Toggle : Control
             return;
         }
 
+        var title = Border == BorderStyle.None ? null : FormatTitle();
+        if (!string.IsNullOrEmpty(title))
+        {
+            var titleStyle = IsFocused ? FocusedTitleStyle : TitleStyle;
+            if (!titleStyle.IsEmpty)
+            {
+                title = titleStyle.Render(title);
+            }
+        }
+
         var content = FrameLayout.DrawFrameAndResolveContent(
             canvas,
             clipped,
-            Border == BorderStyle.None ? null : IsFocused ? $"{Title} *" : Title,
+            title,
             Border,
             Padding);
 
@@ -208,12 +268,19 @@ public sealed class Toggle : Control
         }
 
         var label = Value ? OnText : OffText;
-        canvas.WriteText(content.X, content.Y, _statePalette.Render($"<{label}>", states), content.Width);
+        var rendered = _statePalette.Render($"<{label}>", states);
+        var valueStyle = ResolveValueStyle();
+        if (!valueStyle.IsEmpty)
+        {
+            rendered = valueStyle.Render(rendered);
+        }
+
+        canvas.WriteText(content.X, content.Y, rendered, content.Width);
     }
 
     internal override LayoutMeasurement Measure(in Rect availableBounds)
     {
-        var width = Math.Max(8, Title.Length + Math.Max(OnText.Length, OffText.Length) + 6);
+        var width = Math.Max(8, ControlTextLayout.MeasureDisplayWidth(FormatTitleForMeasure()) + Math.Max(OnText.Length, OffText.Length) + 6);
         var height = Border == BorderStyle.None ? 1 + Padding.Vertical : 3 + Padding.Vertical;
         return new LayoutMeasurement(
             Math.Clamp(width, 0, availableBounds.Width),
@@ -231,5 +298,41 @@ public sealed class Toggle : Control
 
         _hovered = hovered;
         return true;
+    }
+
+    private string FormatTitle()
+    {
+        if (IsFocused && ShowFocusMarker && !string.IsNullOrWhiteSpace(FocusMarker))
+        {
+            return $"{Title} {FocusMarker}";
+        }
+
+        return Title;
+    }
+
+    private string FormatTitleForMeasure()
+    {
+        if (ShowFocusMarker && !string.IsNullOrWhiteSpace(FocusMarker))
+        {
+            return $"{Title} {FocusMarker}";
+        }
+
+        return Title;
+    }
+
+    private TeaStyle ResolveValueStyle()
+    {
+        var style = Value
+            ? (OnValueStyle.IsEmpty ? ValueStyle : OnValueStyle)
+            : (OffValueStyle.IsEmpty ? ValueStyle : OffValueStyle);
+
+        if (IsDisabled && !DisabledValueStyle.IsEmpty)
+        {
+            style = style.IsEmpty
+                ? DisabledValueStyle
+                : style.Merge(DisabledValueStyle);
+        }
+
+        return style;
     }
 }

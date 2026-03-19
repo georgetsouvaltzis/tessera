@@ -41,6 +41,18 @@ public sealed class Label : Control
         set;
     } = TeaStyle.Empty;
 
+    public TeaStyle TitleStyle
+    {
+        get;
+        set;
+    } = TeaStyle.Empty;
+
+    public TeaStyle FocusedTitleStyle
+    {
+        get;
+        set;
+    } = TeaStyle.Empty;
+
     public TeaSharp.Layout.HorizontalAlignment HorizontalAlignment
     {
         get;
@@ -61,10 +73,20 @@ public sealed class Label : Control
             return;
         }
 
+        var title = Border == BorderStyle.None ? null : Title;
+        if (!string.IsNullOrEmpty(title))
+        {
+            var titleStyle = IsFocused ? FocusedTitleStyle : TitleStyle;
+            if (!titleStyle.IsEmpty)
+            {
+                title = titleStyle.Render(title);
+            }
+        }
+
         var content = FrameLayout.DrawFrameAndResolveContent(
             canvas,
             clipped,
-            Border == BorderStyle.None ? null : Title,
+            title,
             Border,
             Padding);
         if (content.IsEmpty)

@@ -1,8 +1,10 @@
 using System.ComponentModel;
 using TeaSharp.Components.Primitives;
+using TeaSharp.Components.Primitives.Internal;
 using TeaSharp.Controls.Internal;
 using TeaSharp.Components.Styling;
 using TeaSharp.Layout;
+using TeaSharp.Styles;
 using TeaSharp.Widgets;
 
 namespace TeaSharp.Controls;
@@ -25,6 +27,48 @@ public sealed class NumberInput : Control
         get;
         set => field = value ?? string.Empty;
     } = "Number Input";
+
+    public string FocusMarker
+    {
+        get;
+        set => field = value ?? string.Empty;
+    } = "*";
+
+    public bool ShowFocusMarker
+    {
+        get;
+        set;
+    } = true;
+
+    public TeaStyle TitleStyle
+    {
+        get;
+        set;
+    } = TeaStyle.Empty;
+
+    public TeaStyle FocusedTitleStyle
+    {
+        get;
+        set;
+    } = TeaStyle.Empty;
+
+    public TeaStyle ValueTextStyle
+    {
+        get;
+        set;
+    } = TeaStyle.Empty;
+
+    public TeaStyle SummaryTextStyle
+    {
+        get;
+        set;
+    } = TeaStyle.Empty;
+
+    public TeaStyle DisabledTextStyle
+    {
+        get;
+        set;
+    } = TeaStyle.Empty;
 
     public BorderStyle Border
     {
@@ -178,7 +222,55 @@ public sealed class NumberInput : Control
 
     public override void Render(Canvas canvas, Rect rect)
     {
-        NumberInputRenderer.Render(canvas, rect, _input, _statePalette, Title, IsFocused, IsDisabled, IsReadOnly, Border, Padding, Value, Min, Max, Precision);
+        var clipped = Rect.Intersect(rect, canvas.Bounds);
+        if (clipped.IsEmpty)
+        {
+            return;
+        }
+
+        var title = Border == BorderStyle.None ? null : FormatTitle();
+        if (!string.IsNullOrEmpty(title))
+        {
+            var titleStyle = IsFocused ? FocusedTitleStyle : TitleStyle;
+            if (!titleStyle.IsEmpty)
+            {
+                title = titleStyle.Render(title);
+            }
+        }
+
+        var content = FrameLayout.DrawFrameAndResolveContent(
+            canvas,
+            clipped,
+            title,
+            Border,
+            Padding);
+        if (content.IsEmpty)
+        {
+            return;
+        }
+
+        var states = NumberInputStateResolver.Resolve(IsFocused, IsDisabled, IsReadOnly);
+        var frame = _input.BuildFrame(content.Width);
+        var valueText = _statePalette.Render(frame.Text, states);
+        var valueStyle = ResolveValueStyle();
+        if (!valueStyle.IsEmpty)
+        {
+            valueText = valueStyle.Render(valueText);
+        }
+
+        canvas.WriteText(content.X, content.Y, valueText, content.Width);
+        if (content.Height > 1)
+        {
+            var summary = $"value={NumberInputFormatting.Format(Value, Precision)} range=[{NumberInputFormatting.Format(Min, Precision)}, {NumberInputFormatting.Format(Max, Precision)}]";
+            summary = _statePalette.Render(summary, states);
+            var summaryStyle = ResolveSummaryStyle();
+            if (!summaryStyle.IsEmpty)
+            {
+                summary = summaryStyle.Render(summary);
+            }
+
+            canvas.WriteText(content.X, content.Y + 1, summary, content.Width);
+        }
     }
 
     internal override LayoutMeasurement Measure(in Rect availableBounds)
@@ -194,7 +286,7 @@ public sealed class NumberInput : Control
         {
             width += 2;
             height += 2;
-            width = Math.Max(width, Title.Length + 4);
+            width = Math.Max(width, ControlTextLayout.MeasureDisplayWidth(FormatTitleForMeasure()) + 4);
         }
 
         return new LayoutMeasurement(
@@ -220,5 +312,49 @@ public sealed class NumberInput : Control
         _submitVersion++;
         Submitted?.Invoke(this, new NumberInputSubmittedEventArgs(Value));
         SyncInput();
+    }
+
+    private string FormatTitle()
+    {
+        if (IsFocused && ShowFocusMarker && !string.IsNullOrWhiteSpace(FocusMarker))
+        {
+            return $"{Title} {FocusMarker}";
+        }
+
+        return Title;
+    }
+
+    private string FormatTitleForMeasure()
+    {
+        if (ShowFocusMarker && !string.IsNullOrWhiteSpace(FocusMarker))
+        {
+            return $"{Title} {FocusMarker}";
+        }
+
+        return Title;
+    }
+
+    private TeaStyle ResolveValueStyle()
+    {
+        if ((IsDisabled || IsReadOnly) && !DisabledTextStyle.IsEmpty)
+        {
+            return ValueTextStyle.IsEmpty
+                ? DisabledTextStyle
+                : ValueTextStyle.Merge(DisabledTextStyle);
+        }
+
+        return ValueTextStyle;
+    }
+
+    private TeaStyle ResolveSummaryStyle()
+    {
+        if ((IsDisabled || IsReadOnly) && !DisabledTextStyle.IsEmpty)
+        {
+            return SummaryTextStyle.IsEmpty
+                ? DisabledTextStyle
+                : SummaryTextStyle.Merge(DisabledTextStyle);
+        }
+
+        return SummaryTextStyle;
     }
 }

@@ -1,7 +1,10 @@
 using TeaSharp.Components.Primitives;
+using TeaSharp.Components.Primitives.Internal;
 using TeaSharp.Controls.Internal;
 using TeaSharp.Components.Styling;
 using TeaSharp.Layout;
+using TeaSharp.Styles;
+using System.Globalization;
 
 namespace TeaSharp.Controls;
 
@@ -20,6 +23,66 @@ public sealed class DatePicker : Control
         get;
         set => field = value ?? string.Empty;
     } = "Date Picker";
+
+    public string FocusMarker
+    {
+        get;
+        set => field = value ?? string.Empty;
+    } = "*";
+
+    public bool ShowFocusMarker
+    {
+        get;
+        set;
+    } = true;
+
+    public TeaStyle TitleStyle
+    {
+        get;
+        set;
+    } = TeaStyle.Empty;
+
+    public TeaStyle FocusedTitleStyle
+    {
+        get;
+        set;
+    } = TeaStyle.Empty;
+
+    public TeaStyle MonthHeaderStyle
+    {
+        get;
+        set;
+    } = TeaStyle.Empty;
+
+    public TeaStyle WeekdayHeaderStyle
+    {
+        get;
+        set;
+    } = TeaStyle.Empty;
+
+    public TeaStyle DayStyle
+    {
+        get;
+        set;
+    } = TeaStyle.Empty;
+
+    public TeaStyle SelectedDayStyle
+    {
+        get;
+        set;
+    } = TeaStyle.Empty;
+
+    public TeaStyle HoveredDayStyle
+    {
+        get;
+        set;
+    } = TeaStyle.Empty;
+
+    public TeaStyle DisabledDayStyle
+    {
+        get;
+        set;
+    } = TeaStyle.Empty;
 
     public BorderStyle Border
     {
@@ -190,12 +253,99 @@ public sealed class DatePicker : Control
 
     public override void Render(Canvas canvas, Rect rect)
     {
-        DatePickerRenderer.Render(canvas, rect, Title, IsFocused, Border, Padding, CurrentMonth, SelectedDate, _hoveredDate, _dayStatePalette);
+        var clipped = Rect.Intersect(rect, canvas.Bounds);
+        if (clipped.IsEmpty)
+        {
+            return;
+        }
+
+        var title = Border == BorderStyle.None ? null : FormatTitle();
+        if (!string.IsNullOrEmpty(title))
+        {
+            var titleStyle = IsFocused ? FocusedTitleStyle : TitleStyle;
+            if (!titleStyle.IsEmpty)
+            {
+                title = titleStyle.Render(title);
+            }
+        }
+
+        var content = FrameLayout.DrawFrameAndResolveContent(
+            canvas,
+            clipped,
+            title,
+            Border,
+            Padding);
+        if (content.IsEmpty || content.Height < 3)
+        {
+            return;
+        }
+
+        var monthText = $"{CurrentMonth:yyyy-MM}";
+        if (!MonthHeaderStyle.IsEmpty)
+        {
+            monthText = MonthHeaderStyle.Render(monthText);
+        }
+
+        canvas.WriteText(content.X, content.Y, monthText, content.Width);
+        if (content.Height == 1)
+        {
+            return;
+        }
+
+        var weekdays = "Mo Tu We Th Fr Sa Su";
+        if (!WeekdayHeaderStyle.IsEmpty)
+        {
+            weekdays = WeekdayHeaderStyle.Render(weekdays);
+        }
+
+        canvas.WriteText(content.X, content.Y + 1, weekdays, content.Width);
+        if (content.Height < 3)
+        {
+            return;
+        }
+
+        var first = new DateOnly(CurrentMonth.Year, CurrentMonth.Month, 1);
+        var startOffset = ((int)first.DayOfWeek + 6) % 7;
+        var daysInMonth = DateTime.DaysInMonth(CurrentMonth.Year, CurrentMonth.Month);
+        var day = 1;
+        for (var row = 0; row < 6 && (content.Y + 2 + row) < content.Bottom; row++)
+        {
+            for (var col = 0; col < 7; col++)
+            {
+                var cell = row * 7 + col;
+                if (cell < startOffset || day > daysInMonth)
+                {
+                    continue;
+                }
+
+                var x = content.X + (col * 3);
+                if (x + 1 >= content.Right)
+                {
+                    continue;
+                }
+
+                var date = new DateOnly(CurrentMonth.Year, CurrentMonth.Month, day);
+                var states = DatePickerStateResolver.ResolveDayStates(IsFocused, SelectedDate, _hoveredDate, date);
+                var dayText = _dayStatePalette.Render(day.ToString(CultureInfo.InvariantCulture).PadLeft(2, ' '), states);
+                var dayStyle = ResolveDayStyle(date);
+                if (!dayStyle.IsEmpty)
+                {
+                    dayText = dayStyle.Render(dayText);
+                }
+
+                canvas.WriteText(
+                    x,
+                    content.Y + 2 + row,
+                    dayText,
+                    Math.Min(2, content.Right - x));
+                day++;
+            }
+        }
     }
 
     internal override LayoutMeasurement Measure(in Rect availableBounds)
     {
-        var width = Math.Max(20, Title.Length + 4) + Padding.Horizontal;
+        var width = Math.Max(20, ControlTextLayout.MeasureDisplayWidth(FormatTitleForMeasure()) + 4) + Padding.Horizontal;
         var height = 8 + Padding.Vertical;
         if (Border != BorderStyle.None)
         {
@@ -217,5 +367,51 @@ public sealed class DatePicker : Control
 
         _hoveredDate = date;
         return true;
+    }
+
+    private string FormatTitle()
+    {
+        if (IsFocused && ShowFocusMarker && !string.IsNullOrWhiteSpace(FocusMarker))
+        {
+            return $"{Title} {FocusMarker}";
+        }
+
+        return Title;
+    }
+
+    private string FormatTitleForMeasure()
+    {
+        if (ShowFocusMarker && !string.IsNullOrWhiteSpace(FocusMarker))
+        {
+            return $"{Title} {FocusMarker}";
+        }
+
+        return Title;
+    }
+
+    private TeaStyle ResolveDayStyle(DateOnly date)
+    {
+        TeaStyle style;
+        if (date == SelectedDate && !SelectedDayStyle.IsEmpty)
+        {
+            style = SelectedDayStyle;
+        }
+        else if (_hoveredDate.HasValue && _hoveredDate.Value == date && !HoveredDayStyle.IsEmpty)
+        {
+            style = HoveredDayStyle;
+        }
+        else
+        {
+            style = DayStyle;
+        }
+
+        if ((IsDisabled || IsReadOnly) && !DisabledDayStyle.IsEmpty)
+        {
+            style = style.IsEmpty
+                ? DisabledDayStyle
+                : style.Merge(DisabledDayStyle);
+        }
+
+        return style;
     }
 }

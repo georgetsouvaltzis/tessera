@@ -2,6 +2,7 @@ using TeaSharp.Components.Primitives;
 using TeaSharp.Components.Primitives.Internal;
 using TeaSharp.Controls.Internal;
 using TeaSharp.Layout;
+using TeaSharp.Styles;
 using TeaSharp.Widgets;
 
 namespace TeaSharp.Controls;
@@ -19,6 +20,42 @@ public sealed class TextArea : Control
         get;
         set => field = value ?? string.Empty;
     } = "Text Area";
+
+    public string FocusMarker
+    {
+        get;
+        set => field = value ?? string.Empty;
+    } = "*";
+
+    public bool ShowFocusMarker
+    {
+        get;
+        set;
+    } = true;
+
+    public TeaStyle TitleStyle
+    {
+        get;
+        set;
+    } = TeaStyle.Empty;
+
+    public TeaStyle FocusedTitleStyle
+    {
+        get;
+        set;
+    } = TeaStyle.Empty;
+
+    public TeaStyle ValueTextStyle
+    {
+        get;
+        set;
+    } = TeaStyle.Empty;
+
+    public TeaStyle DisabledValueTextStyle
+    {
+        get;
+        set;
+    } = TeaStyle.Empty;
 
     public string Value => _input.Value;
 
@@ -96,10 +133,20 @@ public sealed class TextArea : Control
             return;
         }
 
+        var title = Border == BorderStyle.None ? null : FormatTitle();
+        if (!string.IsNullOrEmpty(title))
+        {
+            var titleStyle = IsFocused ? FocusedTitleStyle : TitleStyle;
+            if (!titleStyle.IsEmpty)
+            {
+                title = titleStyle.Render(title);
+            }
+        }
+
         var content = FrameLayout.DrawFrameAndResolveContent(
             canvas,
             clipped,
-            Border == BorderStyle.None ? null : IsFocused ? $"{Title} *" : Title,
+            title,
             Border,
             Padding);
         if (content.IsEmpty)
@@ -113,9 +160,18 @@ public sealed class TextArea : Control
 
         var lines = _viewport.RenderLines();
         var rows = Math.Min(content.Height, lines.Count);
+        var lineStyle = IsDisabled
+            ? ResolveDisabledLineStyle()
+            : ValueTextStyle;
         for (var row = 0; row < rows; row++)
         {
-            canvas.WriteText(content.X, content.Y + row, lines[row], content.Width);
+            var line = lines[row];
+            if (!lineStyle.IsEmpty)
+            {
+                line = lineStyle.Render(line);
+            }
+
+            canvas.WriteText(content.X, content.Y + row, line, content.Width);
         }
     }
 
@@ -139,7 +195,7 @@ public sealed class TextArea : Control
         {
             width += 2;
             height += 2;
-            width = Math.Max(width, Title.Length + 4);
+            width = Math.Max(width, ControlTextLayout.MeasureDisplayWidth(FormatTitleForMeasure()) + 4);
         }
 
         return new LayoutMeasurement(
@@ -170,5 +226,37 @@ public sealed class TextArea : Control
         }
 
         return lines;
+    }
+
+    private string FormatTitle()
+    {
+        if (IsFocused && ShowFocusMarker && !string.IsNullOrWhiteSpace(FocusMarker))
+        {
+            return $"{Title} {FocusMarker}";
+        }
+
+        return Title;
+    }
+
+    private string FormatTitleForMeasure()
+    {
+        if (ShowFocusMarker && !string.IsNullOrWhiteSpace(FocusMarker))
+        {
+            return $"{Title} {FocusMarker}";
+        }
+
+        return Title;
+    }
+
+    private TeaStyle ResolveDisabledLineStyle()
+    {
+        if (DisabledValueTextStyle.IsEmpty)
+        {
+            return ValueTextStyle;
+        }
+
+        return ValueTextStyle.IsEmpty
+            ? DisabledValueTextStyle
+            : ValueTextStyle.Merge(DisabledValueTextStyle);
     }
 }
