@@ -11,6 +11,7 @@ namespace TeaSharp.Controls;
 public sealed class CommandPalette : Control
 {
     private readonly List<CommandPaletteItem> _items = [];
+    private readonly List<CommandPaletteRenderCache> _itemRenderCache = [];
     private readonly List<int> _filteredIndices = [];
     private readonly TextInputModel _query = new();
     private int _selectedFilteredIndex;
@@ -83,6 +84,7 @@ public sealed class CommandPalette : Control
             _items.Add(item);
         }
 
+        RebuildItemRenderCache();
         RefreshFilter();
     }
 
@@ -286,12 +288,9 @@ public sealed class CommandPalette : Control
         var row = 0;
         for (var filteredIndex = start; filteredIndex < end; filteredIndex++, row++)
         {
-            var item = _items[_filteredIndices[filteredIndex]];
-            var marker = filteredIndex == _selectedFilteredIndex ? ">" : filteredIndex == _hoveredFilteredIndex ? "▸" : " ";
-            var summary = string.IsNullOrWhiteSpace(item.Description)
-                ? item.Title
-                : $"{item.Title} - {item.Description}";
-            canvas.WriteText(content.X, content.Y + 1 + row, ApplyStyle($"{marker} {summary}", ResolveItemStyle(filteredIndex)), content.Width);
+            var itemIndex = _filteredIndices[filteredIndex];
+            var rowText = ResolveRowText(itemIndex, filteredIndex);
+            canvas.WriteText(content.X, content.Y + 1 + row, ApplyStyle(rowText, ResolveItemStyle(filteredIndex)), content.Width);
         }
     }
 
@@ -299,13 +298,10 @@ public sealed class CommandPalette : Control
     {
         _filteredIndices.Clear();
         var filter = _query.Value.Trim();
-        for (var index = 0; index < _items.Count; index++)
+        for (var index = 0; index < _itemRenderCache.Count; index++)
         {
-            var item = _items[index];
             var include = filter.Length == 0
-                || item.Title.Contains(filter, StringComparison.OrdinalIgnoreCase)
-                || item.Description.Contains(filter, StringComparison.OrdinalIgnoreCase)
-                || item.Id.Contains(filter, StringComparison.OrdinalIgnoreCase);
+                || _itemRenderCache[index].SearchText.Contains(filter, StringComparison.OrdinalIgnoreCase);
             if (include)
             {
                 _filteredIndices.Add(index);
@@ -362,6 +358,29 @@ public sealed class CommandPalette : Control
 
         _selectedFilteredIndex = index;
         return true;
+    }
+
+    private void RebuildItemRenderCache()
+    {
+        _itemRenderCache.Clear();
+        for (var index = 0; index < _items.Count; index++)
+        {
+            var item = _items[index];
+            _itemRenderCache.Add(CommandPaletteRenderCache.Create(item));
+        }
+    }
+
+    private string ResolveRowText(int itemIndex, int filteredIndex)
+    {
+        var row = _itemRenderCache[itemIndex];
+        if (filteredIndex == _selectedFilteredIndex)
+        {
+            return row.SelectedRow;
+        }
+
+        return filteredIndex == _hoveredFilteredIndex
+            ? row.HoveredRow
+            : row.NormalRow;
     }
 
     private bool ExecuteSelected()
@@ -461,5 +480,21 @@ public sealed class CommandPalette : Control
     private static string ApplyStyle(string text, TeaStyle style)
     {
         return style.IsEmpty ? text : style.Render(text);
+    }
+
+    private readonly record struct CommandPaletteRenderCache(string SearchText, string NormalRow, string SelectedRow, string HoveredRow)
+    {
+        public static CommandPaletteRenderCache Create(CommandPaletteItem item)
+        {
+            var summary = string.IsNullOrWhiteSpace(item.Description)
+                ? item.Title
+                : string.Concat(item.Title, " - ", item.Description);
+            var search = string.Concat(item.Title, "\n", item.Description, "\n", item.Id);
+            return new CommandPaletteRenderCache(
+                search,
+                string.Concat("  ", summary),
+                string.Concat("> ", summary),
+                string.Concat("▸ ", summary));
+        }
     }
 }

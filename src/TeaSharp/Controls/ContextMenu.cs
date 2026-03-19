@@ -12,8 +12,10 @@ namespace TeaSharp.Controls;
 public sealed class ContextMenu : Control
 {
     private readonly List<ContextMenuItem> _items = [];
+    private readonly List<ContextMenuRenderCache> _itemRenderCache = [];
     private int _selectedIndex;
     private int _hoveredIndex = -1;
+    private int _cachedItemWidth = 12;
     private long _executionVersion;
     private long _consumedExecutionVersion;
 
@@ -94,6 +96,7 @@ public sealed class ContextMenu : Control
             _items.Add(item);
         }
 
+        RebuildItemRenderCache();
         _selectedIndex = Math.Clamp(_selectedIndex, 0, Math.Max(0, _items.Count - 1));
         _hoveredIndex = -1;
     }
@@ -282,21 +285,18 @@ public sealed class ContextMenu : Control
         var rows = Math.Min(content.Height, _items.Count);
         for (var index = 0; index < rows; index++)
         {
-            var prefix = index == _selectedIndex ? ">" : index == _hoveredIndex ? "▸" : " ";
+            var rowText = ResolveRowText(index);
             canvas.WriteText(
                 content.X,
                 content.Y + index,
-                ApplyStyle($"{prefix} {_items[index].Title}", ResolveItemStyle(index)),
+                ApplyStyle(rowText, ResolveItemStyle(index)),
                 content.Width);
         }
     }
 
     internal override LayoutMeasurement Measure(in Rect availableBounds)
     {
-        var itemWidth = _items.Count == 0
-            ? 12
-            : Math.Max(12, _items.Max(static item => item.Title.Length + 4));
-        var width = itemWidth + Padding.Horizontal + (Border == BorderStyle.None ? 0 : 2);
+        var width = _cachedItemWidth + Padding.Horizontal + (Border == BorderStyle.None ? 0 : 2);
         var height = Math.Max(3, _items.Count + 2);
         return new LayoutMeasurement(
             Math.Clamp(width, 0, availableBounds.Width),
@@ -365,16 +365,40 @@ public sealed class ContextMenu : Control
             return false;
         }
 
-        var itemWidth = _items.Count == 0
-            ? 12
-            : Math.Max(12, _items.Max(static item => item.Title.Length + 4));
-        var width = Math.Min(itemWidth, bounds.Width);
+        var width = Math.Min(_cachedItemWidth, bounds.Width);
         var height = Math.Min(Math.Max(3, _items.Count + 2), bounds.Height);
         var x = Math.Clamp(AnchorX, bounds.X, Math.Max(bounds.X, bounds.Right - width));
         var y = Math.Clamp(AnchorY, bounds.Y, Math.Max(bounds.Y, bounds.Bottom - height));
         menuBounds = new Rect(x, y, width, height);
         content = FrameLayout.ResolveContentRect(menuBounds, Border, Padding);
         return !content.IsEmpty;
+    }
+
+    private void RebuildItemRenderCache()
+    {
+        _itemRenderCache.Clear();
+        var width = 12;
+        for (var index = 0; index < _items.Count; index++)
+        {
+            var item = _items[index];
+            _itemRenderCache.Add(ContextMenuRenderCache.Create(item.Title));
+            width = Math.Max(width, item.Title.Length + 4);
+        }
+
+        _cachedItemWidth = width;
+    }
+
+    private string ResolveRowText(int index)
+    {
+        var row = _itemRenderCache[index];
+        if (index == _selectedIndex)
+        {
+            return row.SelectedRow;
+        }
+
+        return index == _hoveredIndex
+            ? row.HoveredRow
+            : row.NormalRow;
     }
 
     private void ExecuteItem(int index)
@@ -384,5 +408,16 @@ public sealed class ContextMenu : Control
         _executionVersion++;
         ItemExecuted?.Invoke(this, new ContextMenuItemExecutedEventArgs(item));
         Close();
+    }
+
+    private readonly record struct ContextMenuRenderCache(string NormalRow, string SelectedRow, string HoveredRow)
+    {
+        public static ContextMenuRenderCache Create(string title)
+        {
+            return new ContextMenuRenderCache(
+                string.Concat("  ", title),
+                string.Concat("> ", title),
+                string.Concat("▸ ", title));
+        }
     }
 }

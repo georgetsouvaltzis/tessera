@@ -57,6 +57,7 @@ internal static class PrebuiltWidgetTests
         yield return new TestCase("Controls_ContextMenu_TryConsumeExecution_IsSingleUse", ContextMenu_TryConsumeExecution_IsSingleUse);
         yield return new TestCase("Controls_ContextMenu_MouseClickExecutesAndCloses", ContextMenu_MouseClickExecutesAndCloses);
         yield return new TestCase("Controls_ContextMenu_MouseReleaseExecutesAndCloses", ContextMenu_MouseReleaseExecutesAndCloses);
+        yield return new TestCase("Controls_ContextMenu_SetItems_RecomputesLayoutFromCachedWidths", ContextMenu_SetItems_RecomputesLayoutFromCachedWidths);
         yield return new TestCase("Controls_CommandPalette_FiltersAndExecutes", CommandPalette_FiltersAndExecutes);
         yield return new TestCase("Controls_CommandPalette_ItemExecutedEvent_ReportsItem", CommandPalette_ItemExecutedEvent_ReportsItem);
         yield return new TestCase("Controls_CommandPalette_TryConsumeExecution_IsSingleUse", CommandPalette_TryConsumeExecution_IsSingleUse);
@@ -64,6 +65,7 @@ internal static class PrebuiltWidgetTests
         yield return new TestCase("Controls_CommandPalette_ExposesQueryAccessors", CommandPalette_ExposesQueryAccessors);
         yield return new TestCase("Controls_CommandPalette_Open_ClearsQueryWhenClosed", CommandPalette_Open_ClearsQueryWhenClosed);
         yield return new TestCase("Controls_CommandPalette_LettersRemainQueryable", CommandPalette_LettersRemainQueryable);
+        yield return new TestCase("Controls_CommandPalette_SetItems_RefreshesCachedRowsAndFilter", CommandPalette_SetItems_RefreshesCachedRowsAndFilter);
         yield return new TestCase("Controls_FileExplorer_KeyboardNavigationAndExpansion", FileExplorer_KeyboardNavigationAndExpansion);
         yield return new TestCase("Controls_FileExplorer_SelectPathAndEvent_ReportsTransition", FileExplorer_SelectPathAndEvent_ReportsTransition);
         yield return new TestCase("Controls_FileExplorer_MouseClickSelectsRow", FileExplorer_MouseClickSelectsRow);
@@ -999,6 +1001,31 @@ internal static class PrebuiltWidgetTests
         return Task.CompletedTask;
     }
 
+    private static Task ContextMenu_SetItems_RecomputesLayoutFromCachedWidths()
+    {
+        var menu = new ContextMenu
+        {
+            Border = BorderStyle.None,
+        };
+        menu.SetItems(
+        [
+            new ContextMenuItem("long", "This is a very long title that should stretch width"),
+        ]);
+        menu.OpenAt(18, 0);
+        menu.SetItems(
+        [
+            new ContextMenuItem("short", "B"),
+        ]);
+
+        var canvas = new Canvas(20, 4);
+        menu.Render(canvas, new Rect(0, 0, 20, 4));
+
+        TestAssert.Equal(' ', canvas.Get(0, 0), "Recomputed width should keep short menu anchored near the right edge.");
+        TestAssert.Equal('>', canvas.Get(8, 0), "Recomputed width should place selected row at updated x-offset.");
+        TestAssert.True(canvas.Render().Contains("> B", StringComparison.Ordinal), "Context menu should render rows from the refreshed cache after SetItems.");
+        return Task.CompletedTask;
+    }
+
     private static Task CommandPalette_FiltersAndExecutes()
     {
         var palette = new CommandPalette
@@ -1131,6 +1158,33 @@ internal static class PrebuiltWidgetTests
         palette.Handle(new KeyPressed(Key.Character, "j"));
 
         TestAssert.Equal("j", palette.QueryText, "Letter keys should contribute to the query instead of being stolen for navigation.");
+        return Task.CompletedTask;
+    }
+
+    private static Task CommandPalette_SetItems_RefreshesCachedRowsAndFilter()
+    {
+        var palette = new CommandPalette
+        {
+            IsFocused = true,
+        };
+        palette.SetItems(
+        [
+            new CommandPaletteItem("deploy", "Deploy", "publish release"),
+        ]);
+        palette.Open();
+
+        palette.SetItems(
+        [
+            new CommandPaletteItem("rollback", "Rollback", "restore previous"),
+        ]);
+        palette.SetQueryText("roll");
+
+        var canvas = new Canvas(80, 20);
+        palette.Render(canvas, new Rect(0, 0, 80, 20));
+        var output = canvas.Render();
+
+        TestAssert.True(output.Contains("Rollback - restore previous", StringComparison.Ordinal), "Command palette should render rows from the refreshed item cache.");
+        TestAssert.True(!output.Contains("Deploy - publish release", StringComparison.Ordinal), "Command palette should not keep stale cached row text after SetItems.");
         return Task.CompletedTask;
     }
 
