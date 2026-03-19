@@ -36,6 +36,11 @@ internal static partial class ThemeOverridesTests
         {
             yield return testCase;
         }
+
+        foreach (var testCase in InputValueCases())
+        {
+            yield return testCase;
+        }
     }
 
     private static TeaTheme BuildThemeWithPrimary(byte red, byte green, byte blue)
