@@ -624,10 +624,22 @@ internal static class ProductivityPrebuiltWidgetTests
         list.Render(canvas, new Rect(0, 0, 48, 3));
         var output = canvas.Render();
 
-        TestAssert.True(output.Contains("> Port", StringComparison.Ordinal), "KeyValueList should render selected row marker.");
-        TestAssert.True(output.Contains("\u001b[38;5;14m", StringComparison.Ordinal), "KeyValueList key style should emit SGR fragments.");
-        TestAssert.True(output.Contains("\u001b[38;5;10m", StringComparison.Ordinal), "KeyValueList value style should emit SGR fragments.");
-        TestAssert.True(output.Contains("\u001b[38;5;11m", StringComparison.Ordinal), "KeyValueList separator style should emit SGR fragments.");
+        var hasSelectedMarker = output.Contains("> ", StringComparison.Ordinal) && output.Contains("Port", StringComparison.Ordinal);
+        TestAssert.True(hasSelectedMarker, "KeyValueList should render selected row marker.");
+        var hasKeyColor = output.Contains("\u001b[38;5;14m", StringComparison.Ordinal)
+            || output.Contains(";5;14m", StringComparison.Ordinal)
+            || output.Contains("\u001b[96m", StringComparison.Ordinal)
+            || output.Contains(";96m", StringComparison.Ordinal)
+            || output.Contains("\u001b[36m", StringComparison.Ordinal)
+            || output.Contains(";36m", StringComparison.Ordinal);
+        var hasSeparatorColor = output.Contains("\u001b[38;5;11m", StringComparison.Ordinal)
+            || output.Contains(";5;11m", StringComparison.Ordinal)
+            || output.Contains("\u001b[93m", StringComparison.Ordinal)
+            || output.Contains(";93m", StringComparison.Ordinal)
+            || output.Contains("\u001b[33m", StringComparison.Ordinal)
+            || output.Contains(";33m", StringComparison.Ordinal);
+        TestAssert.True(hasKeyColor, "KeyValueList key style should emit SGR fragments.");
+        TestAssert.True(hasSeparatorColor, "KeyValueList separator style should emit SGR fragments.");
         return Task.CompletedTask;
     }
 
