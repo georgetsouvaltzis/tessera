@@ -39,7 +39,7 @@ Default namespaces:
 - `TeaSharp`
 - `TeaSharp.Controls`
 - `TeaSharp.Layout`
-- `TeaSharp.Styling`
+- `TeaSharp.Styles`
 
 Advanced namespace:
 
@@ -54,6 +54,8 @@ Primary app contract:
 - `TeaApp`
 - `Tea.RunAsync(...)`
 - `Tea.CreateBuilder()`
+- `TeaApplicationBuilder.ConfigureServices(...)`
+- `TeaApplicationBuilder.UseApp<TApp>()` (DI-activated)
 - `TeaApplicationBuilder`
 - `TeaApplication`
 - `TeaRuntimeOptions`
@@ -69,6 +71,11 @@ App model shape:
 1. `Initialize()` optionally returns the first effect.
 2. `Update(Message)` handles typed input/runtime messages.
 3. `Build(ScreenContext)` returns the next assembled screen.
+
+Startup model:
+
+- minimal path: `Tea.RunAsync(new App())`
+- configured path: `Tea.CreateBuilder().ConfigureServices(...).UseApp<TApp>().ConfigureRuntime(...).Build()`
 
 ### Composition Model
 
@@ -95,12 +102,37 @@ Root controls currently include:
 - `TextInput`
 - `TextArea`
 - `Choice`
+- `ComboBox`
 - `Dialog`
+- `CommandPalette`
+- `ContextMenu`
+- `Notifications`
+- `Toggle`
+- `Slider`
+- `Spinner`
 - `StatusBar`
 - `Tabs`
 - `ListView<T>`
 - `Table`
+- `TreeItem`
+- `TreeView`
 - `MenuBar`
+- `NumberInput`
+- `DatePicker`
+- `TimePicker`
+- `MarkdownView`
+- `MultiSelect`
+- `RadioGroup`
+- `ProgressBar`
+- `LogView`
+- `Badge`
+- `Accordion`
+- `Modal`
+- `Gauge`
+- `MiniLog`
+- `StatsCard`
+- `BarChart`
+- `LineChart`
 
 These types provide the default control vocabulary. Most promoted legacy `*Component` names are now internal bridges behind these controls.
 

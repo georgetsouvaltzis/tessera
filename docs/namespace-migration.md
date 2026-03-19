@@ -37,6 +37,8 @@ New default mindset:
 
 Advanced-only namespaces remain available, but they should be opt-in.
 
+`TeaSharp.Core` stays supported as the low-level product, not the default app path.
+
 ## Common Type Moves
 
 ### App Model
@@ -70,8 +72,8 @@ Advanced-only namespaces remain available, but they should be opt-in.
 
 These still exist, but they are not the first path:
 
-- advanced widgets that do not have root wrappers yet
 - hosting/runtime seams in `TeaSharp.Hosting`
+- advanced composition interop seams (`Screen.From(LayoutNode)`, `Screen.From(ICanvasComponent)`)
 
 ## Migration Example
 
@@ -83,7 +85,6 @@ Historical pre-redesign example:
 using TeaSharp;
 using TeaSharp.Controls;
 using TeaSharp.Components.Primitives;
-using TeaSharp.Core.Messages;
 
 internal sealed class SearchScreen : TeaApp
 {

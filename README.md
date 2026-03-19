@@ -5,7 +5,8 @@ TeaSharp is a message-driven terminal UI library for .NET.
 The default app path is intentionally small:
 
 - derive from `TeaApp`
-- run apps with `Tea.RunAsync(...)` or `TeaApplicationBuilder`
+- run apps with `Tea.RunAsync(...)` for minimal startup, or `Tea.CreateBuilder()` for configured startup
+- register app dependencies with `ConfigureServices(...)`, then activate apps with `UseApp<TApp>()`
 - let built-in controls route automatically; `Update(...)` handles unhandled input plus runtime messages
 - return `Screen` from `Build(ScreenContext)`
 - assemble screens with `Screen.Build(...)` and shallow builder callbacks
@@ -18,11 +19,16 @@ If you need custom runtime wiring, explicit region routing, or low-level compone
 ## Quick Start
 
 ```csharp
+using Microsoft.Extensions.DependencyInjection;
 using TeaSharp;
 using TeaSharp.Controls;
 using TeaSharp.Layout;
 
 var app = Tea.CreateBuilder()
+    .ConfigureServices(services =>
+    {
+        services.AddSingleton<CounterState>();
+    })
     .UseApp<CounterApp>()
     .ConfigureRuntime(static runtime =>
     {
@@ -39,13 +45,17 @@ await app.RunAsync();
 
 internal sealed class CounterApp : TeaApp
 {
-    private int _count;
+    private readonly CounterState _state;
     private readonly Button _increment = new()
     {
         Text = "Increment",
     };
     private readonly StatusBar _status = new();
-    public CounterApp() => _increment.Activated += (_, _) => _count++;
+    public CounterApp(CounterState state)
+    {
+        _state = state;
+        _increment.Activated += (_, _) => _state.Count++;
+    }
 
     public override TeaEffect? Update(Message message)
         => message is KeyPressed key && key.IsCharacter('c', ModifierKeys.Ctrl)
@@ -54,7 +64,7 @@ internal sealed class CounterApp : TeaApp
 
     public override Screen Build(ScreenContext context)
     {
-        _status.LeftText = $"Count: {_count}";
+        _status.LeftText = $"Count: {_state.Count}";
         _status.RightText = "Enter increments   Ctrl+C quits";
 
         return Screen.Build(window =>
@@ -64,6 +74,11 @@ internal sealed class CounterApp : TeaApp
             window.Body(body => body.Center(_increment, width: 20, height: 3));
         });
     }
+}
+
+internal sealed class CounterState
+{
+    public int Count { get; set; }
 }
 ```
 
@@ -87,12 +102,13 @@ internal sealed class HelloApp : TeaApp
 ## Docs
 
 - app model and startup: [docs/app-pattern.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/app-pattern.md)
+- C#-first public API policy: [docs/public-api-guidelines.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/public-api-guidelines.md)
 - custom widgets: [docs/custom-components.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/custom-components.md)
 - public API tiers: [docs/public-api-inventory.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/public-api-inventory.md)
 - legacy-to-new map: [docs/migration-map.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/migration-map.md)
 - canonical example app: [examples/Showcase/Program.cs](/Users/georgetsouvaltzis/Projects/playground/teasharp/examples/Showcase/Program.cs)
 - engine and namespace notes: [docs/spec.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/spec.md), [docs/namespace-migration.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/namespace-migration.md)
-- existing widget catalogs: [docs/prebuilt-widgets.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/prebuilt-widgets.md), [docs/widgets.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/widgets.md)
+- control catalog: [docs/prebuilt-widgets.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/prebuilt-widgets.md)
 
 ## Build
 

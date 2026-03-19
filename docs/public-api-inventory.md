@@ -124,7 +124,7 @@ These areas still expose more mechanism than the long-term public design should:
 - duplicate terminology between root app types and older core/runtime types
 - the remaining advanced component namespaces that still expose an alternate engine-shaped control story
 - lower-level runtime/input helpers that still live deeper than the preferred TeaSharp-owned hosting surface
-- the remaining public `TeaSharp.Core` layer, if it is not intended to stay as a standalone low-level package
+- overlap between `TeaSharp` and `TeaSharp.Core` mental models when boundaries are not documented clearly
 
 ## Current Direction
 
@@ -197,6 +197,6 @@ Their old `TeaSharp.Components.Prebuilt.*` counterparts have been removed instea
 
 1. keep moving control authoring toward a single obvious configuration style
 2. review Tier 2 periodically and internalize anything that is public only by inertia
-3. decide explicitly how much standalone `TeaSharp.Core` surface should remain public versus staying as TeaSharp implementation detail
+3. keep `TeaSharp.Core` as the intentional low-level product and keep docs/examples explicit about when app authors should prefer `TeaSharp` instead
 4. keep custom widget extensibility stable while internal runtime details continue to shrink and stay behind TeaSharp-owned internal adapters
 5. preserve discoverability tests so legacy namespaces do not drift back onto the default path

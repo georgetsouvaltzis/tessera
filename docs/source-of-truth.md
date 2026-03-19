@@ -56,6 +56,11 @@ Preferred entrypoints:
 - `TeaApplication`
 - `TeaRuntimeOptions`
 
+Preferred startup forms:
+
+- minimal: `Tea.RunAsync(new App())`
+- configured: `Tea.CreateBuilder().ConfigureServices(...).UseApp<TApp>().ConfigureRuntime(...).Build()`
+
 The framework must not take a hard dependency on Generic Host as its identity.
 
 ### 3. Small Default Surface
@@ -65,7 +70,7 @@ Normal apps should primarily live in:
 - `TeaSharp`
 - `TeaSharp.Controls`
 - `TeaSharp.Layout`
-- `TeaSharp.Styling`
+- `TeaSharp.Styles`
 
 Advanced/runtime seams belong away from the default path, under advanced namespaces such as `TeaSharp.Hosting`.
 
@@ -407,7 +412,7 @@ Recent progress:
 
 Remaining drift:
 
-- the remaining `TeaSharp.Core` public surface is now mostly a product-position question rather than an accidental leak
+- `TeaSharp.Core` is intentionally retained as a low-level product; boundaries with `TeaSharp` and `TeaSharp.Hosting` must stay explicit
 - some deep advanced helpers may still need clearer public wrappers or relocation
 
 Internal bridging is acceptable.
@@ -475,7 +480,7 @@ The long-term goal is:
 ### Phase E. Rework Examples To Match The Corrected Model
 
 - rewrite examples to stop teaching nested tree authoring as the main path
-- keep advanced widget examples on the new startup model, but simplify their screen assembly too
+- keep advanced control examples on the new startup model, but simplify their screen assembly too
 - default examples must not instantiate advanced `*Component` types directly
 
 ### Phase F. Continue Narrowing Legacy Mechanism
@@ -485,7 +490,7 @@ The long-term goal is:
 
 ### Phase G. Continue Promoting Root Controls
 
-- move the most common advanced widgets behind clearer root-level names or wrappers where appropriate
+- move the most common advanced control affordances behind clearer root-level names or wrappers where appropriate
 - keep naming coherent across families
 
 ### Phase H. Decouple Consumer Contracts From Core Adapters

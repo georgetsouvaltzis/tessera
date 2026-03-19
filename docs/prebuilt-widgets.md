@@ -1,9 +1,9 @@
-# TeaSharp Controls And Advanced Widgets
+# TeaSharp Control Catalog
 
 TeaSharp now distinguishes between:
 
 - root controls for the default app path
-- advanced `*Component` widgets for deeper customization
+- advanced seams for specialized hosting and interop
 
 ## Root Controls
 
@@ -35,33 +35,43 @@ Preferred public catalog:
 24. `MarkdownView`
 25. `MultiSelect`
 26. `RadioGroup`
+27. `CommandPalette`
+28. `ContextMenu`
+29. `Badge`
+30. `Modal`
+31. `Accordion`
+32. `Gauge`
+33. `MiniLog`
+34. `StatsCard`
+35. `BarChart`
+36. `LineChart`
 
 These live in `TeaSharp.Controls`.
 
-## Advanced Widgets
+## Advanced Seams
 
-The older component catalog remains available when you need functionality that has not been promoted to the root catalog yet.
+Use advanced seams only when your app needs runtime or rendering control beyond normal app authoring.
 
-Common promoted advanced widgets:
+Common advanced seams:
 
-- `CommandPalette`
-- `ContextMenu`
-- `Badge`
-- `Modal`
-- `Accordion`
-
-These live under:
-
-- `TeaSharp.Controls`
+- `TeaSharp.Hosting.TeaHost`
+- `TeaSharp.Hosting.TeaHostingOptions`
+- `TeaSharp.Hosting.IProgramRenderer`
+- `TeaSharp.Hosting.ITerminalAdapter`
+- `TeaSharp.Hosting.IEventDecoder`
+- `Screen.From(LayoutNode)` and `Screen.From(ICanvasComponent)` for explicit advanced composition interop
+- `TryConsume...` control methods for transitional advanced polling scenarios
 
 ## How They Fit Together
 
-The new screen model accepts both:
+Most applications should stay on:
 
-- root controls
-- advanced components
+- `TeaApp`
+- `Screen.Build(...)`
+- `TeaSharp.Controls`
+- `TeaSharp.Layout`
 
-So an app can stay on `TeaApp` + `Screen` + `Layout`, while still embedding an advanced widget directly inside a `LayoutSlot`, `PanelLayout`, or `CenterLayout`.
+Advanced seams are supported, but they should be opt-in and uncommon for regular app teams.
 
 ## Example
 
@@ -111,14 +121,14 @@ Current example projects:
 - `examples/Kanban`
 - `examples/WidgetGallery`
 
-All of these now run on the new `TeaApp` startup/composition path, even when they demonstrate advanced widgets.
+All of these now run on the new `TeaApp` startup/composition path, even when they demonstrate advanced seams.
 
 ## Migration Guidance
 
 - Prefer root control names when available.
-- Treat older `*Component` names as advanced or transitional.
+- Treat older `*Component` names as transitional and avoid using them in new app code.
 - Keep `TeaSharp.Controls` and `TeaSharp.Layout` as the main app imports.
-- Reach for advanced namespaces only when the root catalog does not cover the scenario yet.
+- Reach for advanced seams only when the root catalog and runtime options cannot cover the scenario.
 
 See also:
 
