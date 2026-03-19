@@ -42,6 +42,7 @@ internal static class ProductivityPrebuiltWidgetTests
         yield return new TestCase("Controls_SearchBox_NavigationCommands_UpdateIndexAndRaiseEvent", SearchBox_NavigationCommands_UpdateIndexAndRaiseEvent);
         yield return new TestCase("Controls_SearchBox_MousePressOnHitTargets_Navigates", SearchBox_MousePressOnHitTargets_Navigates);
         yield return new TestCase("Controls_SearchBox_RendersPlaceholderAndMatchCounter", SearchBox_RendersPlaceholderAndMatchCounter);
+        yield return new TestCase("Controls_SearchBox_BorderStyleHooks_Rendered", SearchBox_BorderStyleHooks_Rendered);
         yield return new TestCase("Controls_MarkdownView_RendersMarkdown", MarkdownView_RendersMarkdown);
     }
 
@@ -855,6 +856,39 @@ internal static class ProductivityPrebuiltWidgetTests
         return Task.CompletedTask;
     }
 
+    private static Task SearchBox_BorderStyleHooks_Rendered()
+    {
+        var search = new SearchBox
+        {
+            Title = "Search",
+            IsFocused = true,
+            FocusMarker = "!",
+            ShowFocusMarker = true,
+            Border = BorderStyle.SingleLine,
+            BorderStyleText = TeaStyle.Empty.WithForeground(AnsiColor.BrightBlue),
+            FocusedBorderStyleText = TeaStyle.Empty.WithBold(),
+            DisabledNavigationLabelStyle = TeaStyle.Empty.WithForeground(AnsiColor.BrightBlack),
+        };
+        search.SetQueryText("abc");
+
+        var focusedCanvas = new Canvas(40, 3, CanvasTextMode.GraphemeAware);
+        search.Render(focusedCanvas, new Rect(0, 0, 40, 3));
+        var focusedOutput = focusedCanvas.Render();
+
+        TestAssert.True(focusedOutput.Contains("Search !", StringComparison.Ordinal), "SearchBox should render custom focus marker in title.");
+        TestAssert.True(ContainsBoldSgr(focusedOutput), "SearchBox should merge focused border style into border glyph rendering.");
+        TestAssert.True(ContainsBlueForegroundSgr(focusedOutput), "SearchBox should apply configured border color style.");
+
+        search.IsFocused = false;
+        search.IsDisabled = true;
+        var disabledCanvas = new Canvas(40, 3, CanvasTextMode.GraphemeAware);
+        search.Render(disabledCanvas, new Rect(0, 0, 40, 3));
+        var disabledOutput = disabledCanvas.Render();
+
+        TestAssert.True(ContainsMutedForegroundSgr(disabledOutput), "SearchBox disabled border should merge muted styling.");
+        return Task.CompletedTask;
+    }
+
     private static Task MarkdownView_RendersMarkdown()
     {
         var viewer = new MarkdownView
@@ -871,5 +905,33 @@ internal static class ProductivityPrebuiltWidgetTests
         TestAssert.True(output.Contains("• one", StringComparison.Ordinal), "Markdown viewer should render bullets.");
         TestAssert.True(output.Contains("code", StringComparison.Ordinal), "Markdown viewer should render code block content.");
         return Task.CompletedTask;
+    }
+
+    private static bool ContainsBoldSgr(string value)
+    {
+        return value.Contains("\u001b[1m", StringComparison.Ordinal)
+            || value.Contains(";1m", StringComparison.Ordinal)
+            || value.Contains("[1;", StringComparison.Ordinal)
+            || value.Contains(";1;", StringComparison.Ordinal);
+    }
+
+    private static bool ContainsBlueForegroundSgr(string value)
+    {
+        return value.Contains("\u001b[94m", StringComparison.Ordinal)
+            || value.Contains(";94m", StringComparison.Ordinal)
+            || value.Contains("\u001b[38;5;12m", StringComparison.Ordinal)
+            || value.Contains(";5;12m", StringComparison.Ordinal)
+            || value.Contains("\u001b[34m", StringComparison.Ordinal)
+            || value.Contains(";34m", StringComparison.Ordinal);
+    }
+
+    private static bool ContainsMutedForegroundSgr(string value)
+    {
+        return value.Contains("\u001b[90m", StringComparison.Ordinal)
+            || value.Contains(";90m", StringComparison.Ordinal)
+            || value.Contains("\u001b[38;5;8m", StringComparison.Ordinal)
+            || value.Contains(";5;8m", StringComparison.Ordinal)
+            || value.Contains("\u001b[30m", StringComparison.Ordinal)
+            || value.Contains(";30m", StringComparison.Ordinal);
     }
 }

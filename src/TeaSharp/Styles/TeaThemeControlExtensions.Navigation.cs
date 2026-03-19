@@ -243,6 +243,8 @@ public static partial class TeaThemeControlExtensions
         control.MatchHighlightStyle = theme.Accent.Primary;
         control.NavigationLabelStyle = theme.Accent.Secondary;
         control.DisabledNavigationLabelStyle = theme.Text.Muted;
+        control.BorderStyleText = theme.Border.Default;
+        control.FocusedBorderStyleText = theme.Border.Focused.Merge(theme.Focus.Border);
         return control;
     }
 
@@ -269,6 +271,8 @@ public static partial class TeaThemeControlExtensions
         control.MatchHighlightStyle = ApplyDefault(control.MatchHighlightStyle, theme.Accent.Primary);
         control.NavigationLabelStyle = ApplyDefault(control.NavigationLabelStyle, theme.Accent.Secondary);
         control.DisabledNavigationLabelStyle = ApplyDefault(control.DisabledNavigationLabelStyle, theme.Text.Muted);
+        control.BorderStyleText = ApplyDefault(control.BorderStyleText, theme.Border.Default);
+        control.FocusedBorderStyleText = ApplyDefault(control.FocusedBorderStyleText, theme.Border.Focused.Merge(theme.Focus.Border));
         return control;
     }
 

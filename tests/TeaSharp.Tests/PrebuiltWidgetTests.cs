@@ -21,6 +21,7 @@ internal static class PrebuiltWidgetTests
         yield return new TestCase("Controls_TextInput_TryConsumeSubmissionAndCancellation_AreSingleUse", TextInput_TryConsumeSubmissionAndCancellation_AreSingleUse);
         yield return new TestCase("Controls_TextInput_CancelSignalsAndCanClear", TextInput_CancelSignalsAndCanClear);
         yield return new TestCase("Controls_TextInput_HidesBorderWhenConfigured", TextInput_HidesBorderWhenConfigured);
+        yield return new TestCase("Controls_TextInput_FocusMarkerAndBorderStyleHooks_Rendered", TextInput_FocusMarkerAndBorderStyleHooks_Rendered);
         yield return new TestCase("Controls_TextArea_RendersMultilineContent", TextArea_RendersMultilineContent);
         yield return new TestCase("Controls_TextArea_EnterInsertsNewline", TextArea_EnterInsertsNewline);
         yield return new TestCase("Controls_Tabs_CycleAndSelectByNumber", Tabs_CycleAndSelectByNumber);
@@ -248,6 +249,39 @@ internal static class PrebuiltWidgetTests
         TestAssert.Equal("ab", input.LastCancelledValue, "Text input should capture cancelled value.");
         TestAssert.Equal(1, input.CancelCount, "Text input should count cancel actions.");
         TestAssert.Equal(string.Empty, input.Value, "Text input should clear value on cancel when configured.");
+        return Task.CompletedTask;
+    }
+
+    private static Task TextInput_FocusMarkerAndBorderStyleHooks_Rendered()
+    {
+        var input = new TextInput
+        {
+            Title = "Input",
+            IsFocused = true,
+            FocusMarker = "!",
+            ShowFocusMarker = true,
+            Border = BorderStyle.SingleLine,
+            BorderStyleText = TeaStyle.Empty.WithForeground(AnsiColor.BrightBlue),
+            FocusedBorderStyleText = TeaStyle.Empty.WithBold(),
+            PlaceholderTextStyle = TeaStyle.Empty.WithForeground(AnsiColor.BrightBlack),
+        };
+        input.SetValue("abc");
+
+        var focusedCanvas = new Canvas(24, 3, CanvasTextMode.GraphemeAware);
+        input.Render(focusedCanvas, new Rect(0, 0, 24, 3));
+        var focusedOutput = focusedCanvas.Render();
+
+        TestAssert.True(focusedOutput.Contains("Input !", StringComparison.Ordinal), "Text input should render custom focus marker in title.");
+        TestAssert.True(ContainsBoldSgr(focusedOutput), "Text input should merge focused border style into border glyph rendering.");
+        TestAssert.True(ContainsBlueForegroundSgr(focusedOutput), "Text input should apply configured border color style.");
+
+        input.IsFocused = false;
+        input.IsDisabled = true;
+        var disabledCanvas = new Canvas(24, 3, CanvasTextMode.GraphemeAware);
+        input.Render(disabledCanvas, new Rect(0, 0, 24, 3));
+        var disabledOutput = disabledCanvas.Render();
+
+        TestAssert.True(ContainsMutedForegroundSgr(disabledOutput), "Text input disabled border should merge muted styling.");
         return Task.CompletedTask;
     }
 
@@ -1879,5 +1913,33 @@ internal static class PrebuiltWidgetTests
             || value.Contains(";9m", StringComparison.Ordinal)
             || value.Contains(";9;", StringComparison.Ordinal)
             || value.Contains("[9;", StringComparison.Ordinal);
+    }
+
+    private static bool ContainsBoldSgr(string value)
+    {
+        return value.Contains("\u001b[1m", StringComparison.Ordinal)
+            || value.Contains(";1m", StringComparison.Ordinal)
+            || value.Contains("[1;", StringComparison.Ordinal)
+            || value.Contains(";1;", StringComparison.Ordinal);
+    }
+
+    private static bool ContainsBlueForegroundSgr(string value)
+    {
+        return value.Contains("\u001b[94m", StringComparison.Ordinal)
+            || value.Contains(";94m", StringComparison.Ordinal)
+            || value.Contains("\u001b[38;5;12m", StringComparison.Ordinal)
+            || value.Contains(";5;12m", StringComparison.Ordinal)
+            || value.Contains("\u001b[34m", StringComparison.Ordinal)
+            || value.Contains(";34m", StringComparison.Ordinal);
+    }
+
+    private static bool ContainsMutedForegroundSgr(string value)
+    {
+        return value.Contains("\u001b[90m", StringComparison.Ordinal)
+            || value.Contains(";90m", StringComparison.Ordinal)
+            || value.Contains("\u001b[38;5;8m", StringComparison.Ordinal)
+            || value.Contains(";5;8m", StringComparison.Ordinal)
+            || value.Contains("\u001b[30m", StringComparison.Ordinal)
+            || value.Contains(";30m", StringComparison.Ordinal);
     }
 }

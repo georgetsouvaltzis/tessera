@@ -78,6 +78,12 @@ public sealed class SearchBox : Control
     /// <summary>Gets or sets style for placeholder text.</summary>
     public TeaStyle PlaceholderTextStyle { get; set; } = TeaStyle.Empty;
 
+    /// <summary>Gets or sets style applied to border glyphs when the control is not focused.</summary>
+    public TeaStyle BorderStyleText { get; set; } = TeaStyle.Empty;
+
+    /// <summary>Gets or sets style applied to border glyphs when the control is focused.</summary>
+    public TeaStyle FocusedBorderStyleText { get; set; } = TeaStyle.Empty;
+
     /// <summary>Gets or sets style for the match counter label.</summary>
     public TeaStyle MatchCounterStyle { get; set; } = TeaStyle.Empty;
 
@@ -276,7 +282,13 @@ public sealed class SearchBox : Control
         }
 
         var title = Border == BorderStyle.None ? null : RenderTitle();
-        var content = FrameLayout.DrawFrameAndResolveContent(canvas, clipped, title, Border, Padding);
+        var content = FrameLayout.DrawFrameAndResolveContent(
+            canvas,
+            clipped,
+            title,
+            Border,
+            Padding,
+            ResolveBorderStyleText());
         if (content.IsEmpty || content.Height < 1)
         {
             return;
@@ -343,6 +355,22 @@ public sealed class SearchBox : Control
     {
         var style = NavigationLabelStyle;
         if (!enabled || IsDisabled || IsReadOnly)
+        {
+            style = style.Merge(DisabledNavigationLabelStyle);
+        }
+
+        return style;
+    }
+
+    private TeaStyle ResolveBorderStyleText()
+    {
+        var style = BorderStyleText;
+        if (IsFocused)
+        {
+            style = style.Merge(FocusedBorderStyleText);
+        }
+
+        if (IsDisabled || IsReadOnly)
         {
             style = style.Merge(DisabledNavigationLabelStyle);
         }

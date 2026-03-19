@@ -24,6 +24,7 @@ internal static partial class ThemeOverridesTests
         var mergedSelection = theme.Selection.Foreground.Merge(theme.Selection.Background);
 
         var label = new Label().ApplyTheme(theme);
+        var textInput = new TextInput().ApplyTheme(theme);
         var textArea = new TextArea().ApplyTheme(theme);
         var toggle = new Toggle().ApplyTheme(theme);
         var slider = new Slider().ApplyTheme(theme);
@@ -36,6 +37,12 @@ internal static partial class ThemeOverridesTests
         TestAssert.Equal(theme.Text.Secondary, label.TitleStyle, "Label title style should map to Text.Secondary.");
         TestAssert.Equal(theme.Focus.Title, label.FocusedTitleStyle, "Label focused title style should map to Focus.Title.");
         TestAssert.Equal(theme.Text.Primary, label.TextStyle, "Label text style should map to Text.Primary.");
+
+        TestAssert.Equal(theme.Text.Primary, textInput.ValueTextStyle, "TextInput value style should map to Text.Primary.");
+        TestAssert.Equal(theme.Text.Muted, textInput.PlaceholderTextStyle, "TextInput placeholder style should map to Text.Muted.");
+        TestAssert.Equal(theme.Focus.Title, textInput.FocusedTitleStyle, "TextInput focused title style should map to Focus.Title.");
+        TestAssert.Equal(theme.Border.Default, textInput.BorderStyleText, "TextInput border style should map to Border.Default.");
+        TestAssert.Equal(theme.Border.Focused.Merge(theme.Focus.Border), textInput.FocusedBorderStyleText, "TextInput focused border style should map to focused border tokens.");
 
         TestAssert.Equal(theme.Text.Secondary, textArea.TitleStyle, "TextArea title style should map to Text.Secondary.");
         TestAssert.Equal(theme.Focus.Title, textArea.FocusedTitleStyle, "TextArea focused title style should map to Focus.Title.");
@@ -102,6 +109,7 @@ internal static partial class ThemeOverridesTests
         var theme = BuildInputValueTheme();
 
         var label = new Label { TextStyle = explicitStyle };
+        var textInput = new TextInput { BorderStyleText = explicitStyle };
         var textArea = new TextArea { ValueTextStyle = explicitStyle };
         var toggle = new Toggle { OnValueStyle = explicitStyle };
         var slider = new Slider { FillStyle = explicitStyle };
@@ -112,6 +120,7 @@ internal static partial class ThemeOverridesTests
         var timePicker = new TimePicker { ActiveFieldStyle = explicitStyle };
 
         label.ApplyThemeDefaults(theme);
+        textInput.ApplyThemeDefaults(theme);
         textArea.ApplyThemeDefaults(theme);
         toggle.ApplyThemeDefaults(theme);
         slider.ApplyThemeDefaults(theme);
@@ -123,6 +132,9 @@ internal static partial class ThemeOverridesTests
 
         TestAssert.Equal(explicitStyle, label.TextStyle, "Defaults should not overwrite explicit Label.TextStyle.");
         TestAssert.Equal(theme.Text.Secondary, label.TitleStyle, "Defaults should fill empty Label.TitleStyle.");
+
+        TestAssert.Equal(explicitStyle, textInput.BorderStyleText, "Defaults should not overwrite explicit TextInput.BorderStyleText.");
+        TestAssert.Equal(theme.Border.Focused.Merge(theme.Focus.Border), textInput.FocusedBorderStyleText, "Defaults should fill empty TextInput.FocusedBorderStyleText.");
 
         TestAssert.Equal(explicitStyle, textArea.ValueTextStyle, "Defaults should not overwrite explicit TextArea.ValueTextStyle.");
         TestAssert.Equal(theme.Text.Muted, textArea.DisabledValueTextStyle, "Defaults should fill empty TextArea.DisabledValueTextStyle.");
@@ -155,6 +167,7 @@ internal static partial class ThemeOverridesTests
     {
         var explicitStyle = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(221, 222, 223));
         var label = new Label { TextStyle = explicitStyle };
+        var textInput = new TextInput { BorderStyleText = explicitStyle };
         var textArea = new TextArea();
         var toggle = new Toggle { ValueStyle = explicitStyle };
         var slider = new Slider();
@@ -170,6 +183,7 @@ internal static partial class ThemeOverridesTests
         var mergedSelection = typeTheme.Selection.Foreground.Merge(typeTheme.Selection.Background);
 
         overrides.SetControlType<Label>(typeTheme);
+        overrides.SetControlType<TextInput>(typeTheme);
         overrides.SetControlType<TextArea>(typeTheme);
         overrides.SetControlType<Toggle>(typeTheme);
         overrides.SetControlType<Slider>(typeTheme);
@@ -180,6 +194,7 @@ internal static partial class ThemeOverridesTests
         overrides.SetControlType<TimePicker>(typeTheme);
 
         label.ApplyThemeDefaults(overrides, baseTheme, TeaThemeVisualState.Focused);
+        textInput.ApplyThemeDefaults(overrides, baseTheme, TeaThemeVisualState.Focused);
         textArea.ApplyTheme(overrides, baseTheme, TeaThemeVisualState.Focused);
         toggle.ApplyThemeDefaults(overrides, baseTheme, TeaThemeVisualState.Focused);
         slider.ApplyTheme(overrides, baseTheme, TeaThemeVisualState.Focused);
@@ -191,6 +206,9 @@ internal static partial class ThemeOverridesTests
 
         TestAssert.Equal(explicitStyle, label.TextStyle, "Override defaults should not overwrite explicit Label.TextStyle.");
         TestAssert.Equal(typeTheme.Text.Secondary, label.TitleStyle, "Override defaults should fill empty Label.TitleStyle.");
+
+        TestAssert.Equal(explicitStyle, textInput.BorderStyleText, "Override defaults should not overwrite explicit TextInput.BorderStyleText.");
+        TestAssert.Equal(typeTheme.Border.Focused.Merge(typeTheme.Focus.Border), textInput.FocusedBorderStyleText, "Override defaults should fill empty TextInput.FocusedBorderStyleText.");
 
         TestAssert.Equal(typeTheme.Text.Primary, textArea.ValueTextStyle, "Override apply should map TextArea.ValueTextStyle.");
         TestAssert.Equal(typeTheme.Text.Muted, textArea.DisabledValueTextStyle, "Override apply should map TextArea.DisabledValueTextStyle.");
@@ -237,6 +255,12 @@ internal static partial class ThemeOverridesTests
             Focus = new TeaThemeFocusTokens
             {
                 Title = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(61, 62, 63)),
+                Border = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(64, 65, 66)),
+            },
+            Border = new TeaThemeBorderTokens
+            {
+                Default = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(101, 102, 103)),
+                Focused = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(111, 112, 113)),
             },
             Selection = new TeaThemeSelectionTokens
             {

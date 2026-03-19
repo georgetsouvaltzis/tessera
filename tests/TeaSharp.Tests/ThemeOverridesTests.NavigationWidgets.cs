@@ -193,11 +193,17 @@ internal static partial class ThemeOverridesTests
             {
                 Ring = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(62, 63, 64)),
                 Title = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(72, 73, 74)),
+                Border = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(75, 76, 77)),
             },
             Selection = new TeaThemeSelectionTokens
             {
                 Foreground = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(82, 83, 84)),
                 Background = TeaStyle.Empty.WithBackground(AnsiColor.Rgb(92, 93, 94)),
+            },
+            Border = new TeaThemeBorderTokens
+            {
+                Default = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(95, 96, 97)),
+                Focused = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(98, 99, 100)),
             },
         };
 
@@ -234,6 +240,8 @@ internal static partial class ThemeOverridesTests
         TestAssert.Equal(theme.Accent.Primary, searchBox.MatchHighlightStyle, "SearchBox match highlight style should map to Accent.Primary.");
         TestAssert.Equal(theme.Accent.Secondary, searchBox.NavigationLabelStyle, "SearchBox navigation label style should map to Accent.Secondary.");
         TestAssert.Equal(theme.Text.Muted, searchBox.DisabledNavigationLabelStyle, "SearchBox disabled nav style should map to Text.Muted.");
+        TestAssert.Equal(theme.Border.Default, searchBox.BorderStyleText, "SearchBox border style should map to Border.Default.");
+        TestAssert.Equal(theme.Border.Focused.Merge(theme.Focus.Border), searchBox.FocusedBorderStyleText, "SearchBox focused border style should map to focused border tokens.");
 
         return Task.CompletedTask;
     }
@@ -258,11 +266,17 @@ internal static partial class ThemeOverridesTests
             {
                 Ring = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(17, 18, 19)),
                 Title = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(20, 21, 22)),
+                Border = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(24, 25, 26)),
             },
             Selection = new TeaThemeSelectionTokens
             {
                 Foreground = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(23, 24, 25)),
                 Background = TeaStyle.Empty.WithBackground(AnsiColor.Rgb(26, 27, 28)),
+            },
+            Border = new TeaThemeBorderTokens
+            {
+                Default = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(27, 28, 29)),
+                Focused = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(30, 31, 32)),
             },
         };
 
@@ -277,6 +291,7 @@ internal static partial class ThemeOverridesTests
         var searchBox = new SearchBox
         {
             ValueTextStyle = explicitStyle,
+            BorderStyleText = explicitStyle,
         };
 
         toolbar.ApplyThemeDefaults(theme);
@@ -288,7 +303,9 @@ internal static partial class ThemeOverridesTests
         TestAssert.Equal(explicitStyle, commandBar.SelectedItemStyle, "Defaults should not overwrite explicit CommandBar.SelectedItemStyle.");
         TestAssert.Equal(theme.Text.Muted, commandBar.DisabledItemStyle, "Defaults should fill empty CommandBar.DisabledItemStyle.");
         TestAssert.Equal(explicitStyle, searchBox.ValueTextStyle, "Defaults should not overwrite explicit SearchBox.ValueTextStyle.");
+        TestAssert.Equal(explicitStyle, searchBox.BorderStyleText, "Defaults should not overwrite explicit SearchBox.BorderStyleText.");
         TestAssert.Equal(theme.Accent.Secondary, searchBox.NavigationLabelStyle, "Defaults should fill empty SearchBox.NavigationLabelStyle.");
+        TestAssert.Equal(theme.Border.Focused.Merge(theme.Focus.Border), searchBox.FocusedBorderStyleText, "Defaults should fill empty SearchBox.FocusedBorderStyleText.");
 
         return Task.CompletedTask;
     }
@@ -324,11 +341,17 @@ internal static partial class ThemeOverridesTests
             {
                 Ring = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(151, 152, 153)),
                 Title = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(161, 162, 163)),
+                Border = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(164, 165, 166)),
             },
             Selection = new TeaThemeSelectionTokens
             {
                 Foreground = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(171, 172, 173)),
                 Background = TeaStyle.Empty.WithBackground(AnsiColor.Rgb(181, 182, 183)),
+            },
+            Border = new TeaThemeBorderTokens
+            {
+                Default = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(184, 185, 186)),
+                Focused = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(187, 188, 189)),
             },
         };
         overrides.SetControlType<Toolbar>(typeTheme);
@@ -348,6 +371,8 @@ internal static partial class ThemeOverridesTests
             "Override apply should map CommandBar selected style.");
         TestAssert.Equal(explicitStyle, searchBox.ValueTextStyle, "Override defaults should not overwrite explicit SearchBox.ValueTextStyle.");
         TestAssert.Equal(typeTheme.Accent.Primary, searchBox.MatchHighlightStyle, "Override defaults should fill empty SearchBox.MatchHighlightStyle.");
+        TestAssert.Equal(typeTheme.Border.Default, searchBox.BorderStyleText, "Override defaults should map SearchBox border style.");
+        TestAssert.Equal(typeTheme.Border.Focused.Merge(typeTheme.Focus.Border), searchBox.FocusedBorderStyleText, "Override defaults should fill SearchBox focused border style.");
 
         return Task.CompletedTask;
     }

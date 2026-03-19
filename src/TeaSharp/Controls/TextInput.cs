@@ -133,6 +133,24 @@ public sealed class TextInput : Control
     } = TeaStyle.Empty;
 
     /// <summary>
+    /// Gets or sets the style applied to border glyphs when the control is not focused.
+    /// </summary>
+    public TeaStyle BorderStyleText
+    {
+        get;
+        set;
+    } = TeaStyle.Empty;
+
+    /// <summary>
+    /// Gets or sets the style applied to border glyphs when the control is focused.
+    /// </summary>
+    public TeaStyle FocusedBorderStyleText
+    {
+        get;
+        set;
+    } = TeaStyle.Empty;
+
+    /// <summary>
     /// Gets or sets a value indicating whether the field should clear after submission.
     /// </summary>
     public bool ClearOnSubmit
@@ -302,7 +320,8 @@ public sealed class TextInput : Control
             clipped,
             title,
             Border,
-            Padding);
+            Padding,
+            ResolveBorderStyleText());
         if (content.IsEmpty)
         {
             return;
@@ -339,5 +358,21 @@ public sealed class TextInput : Control
         }
 
         return Title;
+    }
+
+    private TeaStyle ResolveBorderStyleText()
+    {
+        var style = BorderStyleText;
+        if (IsFocused)
+        {
+            style = style.Merge(FocusedBorderStyleText);
+        }
+
+        if (IsDisabled)
+        {
+            style = style.Merge(PlaceholderTextStyle);
+        }
+
+        return style;
     }
 }
