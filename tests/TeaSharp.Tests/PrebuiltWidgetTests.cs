@@ -72,6 +72,7 @@ internal static class PrebuiltWidgetTests
         yield return new TestCase("Controls_DataGrid_SortComparerAndSortHook", DataGrid_SortComparerAndSortHook);
         yield return new TestCase("Controls_DataGrid_MouseClickSelectsRow", DataGrid_MouseClickSelectsRow);
         yield return new TestCase("Controls_DataGrid_RendersTitleAndStyleHooks", DataGrid_RendersTitleAndStyleHooks);
+        yield return new TestCase("Controls_DataGrid_UnstyledCells_ClearTrailingContentOnReusedCanvas", DataGrid_UnstyledCells_ClearTrailingContentOnReusedCanvas);
         yield return new TestCase("Controls_DiffView_ComputesLineEntries", DiffView_ComputesLineEntries);
         yield return new TestCase("Controls_DiffView_NavigatesSelectionAndTogglesMode", DiffView_NavigatesSelectionAndTogglesMode);
         yield return new TestCase("Controls_DiffView_MouseClickSelectsEntry", DiffView_MouseClickSelectsEntry);
@@ -1524,6 +1525,41 @@ internal static class PrebuiltWidgetTests
         TestAssert.True(output.Contains("\u001b[4;38;5;11m", StringComparison.Ordinal), "DataGrid should render header style.");
         TestAssert.True(output.Contains("\u001b[1;38;5;10m", StringComparison.Ordinal), "DataGrid should render selected cell style.");
         TestAssert.True(output.Contains("\u001b[2;38;5;14m", StringComparison.Ordinal), "DataGrid should render muted row style.");
+        return Task.CompletedTask;
+    }
+
+    private static Task DataGrid_UnstyledCells_ClearTrailingContentOnReusedCanvas()
+    {
+        var grid = new DataGrid
+        {
+            Border = BorderStyle.None,
+            ShowHeader = false,
+        };
+        grid.SetColumns(
+        [
+            new DataGridColumn("name", "Name")
+            {
+                Width = 8,
+            },
+        ]);
+        grid.SetRows(
+        [
+            ["LONGTEXT"],
+        ]);
+
+        var canvas = new Canvas(12, 2);
+        grid.Render(canvas, new Rect(0, 0, 12, 2));
+
+        grid.SetRows(
+        [
+            ["A"],
+        ]);
+        grid.Render(canvas, new Rect(0, 0, 12, 2));
+
+        var firstLine = canvas.Render().Split('\n')[0];
+        TestAssert.True(
+            firstLine.StartsWith("A       ", StringComparison.Ordinal),
+            "Unstyled DataGrid cells should clear trailing content when new value is shorter.");
         return Task.CompletedTask;
     }
 

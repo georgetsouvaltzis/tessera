@@ -207,18 +207,26 @@ public sealed partial class DataGrid
         for (var columnIndex = 0; columnIndex < _columns.Count && x < content.Right; columnIndex++)
         {
             var width = Math.Max(1, widths[columnIndex]);
-            var header = PadToWidth(RenderHeaderText(columnIndex), width);
+            var remainingWidth = content.Right - x;
             var style = HeaderStyle;
             if (IsDisabled)
             {
                 style = style.Merge(DisabledStyle);
             }
 
-            canvas.WriteText(x, y, ApplyStyle(header, style), content.Right - x);
+            WritePaddedCell(canvas, x, y, RenderHeaderText(columnIndex), width, style, remainingWidth);
             x += width;
             if (columnIndex < _columns.Count - 1 && x < content.Right)
             {
-                canvas.WriteText(x, y, ApplyStyle("|", style), content.Right - x);
+                if (style.IsEmpty)
+                {
+                    canvas.Set(x, y, '|');
+                }
+                else
+                {
+                    canvas.WriteText(x, y, ApplyStyle("|", style), content.Right - x);
+                }
+
                 x += 1;
             }
         }
@@ -231,13 +239,21 @@ public sealed partial class DataGrid
         for (var columnIndex = 0; columnIndex < _columns.Count && x < content.Right; columnIndex++)
         {
             var width = Math.Max(1, widths[columnIndex]);
-            var text = PadToWidth(GetCellValue(row, columnIndex), width);
+            var remainingWidth = content.Right - x;
             var style = ResolveCellStyle(rowIndex, columnIndex);
-            canvas.WriteText(x, y, ApplyStyle(text, style), content.Right - x);
+            WritePaddedCell(canvas, x, y, GetCellValue(row, columnIndex), width, style, remainingWidth);
             x += width;
             if (columnIndex < _columns.Count - 1 && x < content.Right)
             {
-                canvas.WriteText(x, y, ApplyStyle("|", style), content.Right - x);
+                if (style.IsEmpty)
+                {
+                    canvas.Set(x, y, '|');
+                }
+                else
+                {
+                    canvas.WriteText(x, y, ApplyStyle("|", style), content.Right - x);
+                }
+
                 x += 1;
             }
         }
@@ -328,5 +344,30 @@ public sealed partial class DataGrid
         return string.IsNullOrEmpty(text) || style.IsEmpty
             ? text
             : style.Render(text);
+    }
+
+    private static void WritePaddedCell(
+        Canvas canvas,
+        int x,
+        int y,
+        string value,
+        int width,
+        TeaStyle style,
+        int maxWidth)
+    {
+        var effectiveWidth = Math.Max(0, Math.Min(width, maxWidth));
+        if (effectiveWidth <= 0)
+        {
+            return;
+        }
+
+        if (style.IsEmpty)
+        {
+            canvas.WriteTextPadded(x, y, value, effectiveWidth);
+            return;
+        }
+
+        var text = PadToWidth(value, width);
+        canvas.WriteText(x, y, ApplyStyle(text, style), maxWidth);
     }
 }

@@ -129,6 +129,92 @@ public sealed class Canvas
         _graphemeBuffer!.WriteText(x, y, text, maxWidth);
     }
 
+    internal void WriteTextPadded(int x, int y, string? text, int width)
+    {
+        if (y < 0 || y >= Height || width <= 0)
+        {
+            return;
+        }
+
+        if (TextMode == CanvasTextMode.Fast)
+        {
+            WriteTextPaddedFast(x, y, text, width);
+            return;
+        }
+
+        WriteTextPaddedPortable(x, y, text, width);
+    }
+
+    private void WriteTextPaddedFast(int x, int y, string? text, int width)
+    {
+        var cx = x;
+        var written = 0;
+        var cells = _cells!;
+        var rowStart = y * Width;
+        if (!string.IsNullOrEmpty(text))
+        {
+            foreach (var raw in text)
+            {
+                if (written >= width)
+                {
+                    break;
+                }
+
+                if (raw == '\r')
+                {
+                    continue;
+                }
+
+                var value = raw == '\n' ? ' ' : raw;
+                if ((uint)cx < (uint)Width)
+                {
+                    cells[rowStart + cx] = value;
+                }
+
+                cx++;
+                written++;
+            }
+        }
+
+        for (; written < width; written++, cx++)
+        {
+            if ((uint)cx < (uint)Width)
+            {
+                cells[rowStart + cx] = ' ';
+            }
+        }
+    }
+
+    private void WriteTextPaddedPortable(int x, int y, string? text, int width)
+    {
+        var cx = x;
+        var written = 0;
+        if (!string.IsNullOrEmpty(text))
+        {
+            foreach (var raw in text)
+            {
+                if (written >= width)
+                {
+                    break;
+                }
+
+                if (raw == '\r')
+                {
+                    continue;
+                }
+
+                Set(cx, y, raw == '\n' ? ' ' : raw);
+                cx++;
+                written++;
+            }
+        }
+
+        for (; written < width; written++, cx++)
+        {
+            Set(cx, y, ' ');
+        }
+    }
+
     private void WriteTextFast(int x, int y, string text, int maxWidth)
     {
         var cx = x;
