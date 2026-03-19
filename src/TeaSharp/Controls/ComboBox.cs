@@ -2,6 +2,7 @@ using TeaSharp.Controls.Internal;
 using TeaSharp.Components.Primitives;
 using TeaSharp.Components.Primitives.Internal;
 using TeaSharp.Layout;
+using TeaSharp.Styles;
 using TeaSharp.Widgets;
 
 namespace TeaSharp.Controls;
@@ -31,6 +32,32 @@ public sealed class ComboBox : Control
         get;
         set => field = value ?? string.Empty;
     } = "ComboBox";
+
+    public string FocusMarker
+    {
+        get;
+        set => field = value ?? string.Empty;
+    } = "*";
+
+    public bool ShowFocusMarker { get; set; } = true;
+
+    public TeaStyle TitleStyle { get; set; } = TeaStyle.Empty;
+
+    public TeaStyle FocusedTitleStyle { get; set; } = TeaStyle.Empty;
+
+    public TeaStyle ValueTextStyle { get; set; } = TeaStyle.Empty;
+
+    public TeaStyle PlaceholderTextStyle { get; set; } = TeaStyle.Empty;
+
+    public TeaStyle OptionStyle { get; set; } = TeaStyle.Empty;
+
+    public TeaStyle SelectedOptionStyle { get; set; } = TeaStyle.Empty;
+
+    public TeaStyle HoveredOptionStyle { get; set; } = TeaStyle.Empty;
+
+    public TeaStyle MutedStyle { get; set; } = TeaStyle.Empty;
+
+    public TeaStyle DisabledStyle { get; set; } = TeaStyle.Empty;
 
     /// <summary>
     /// Gets or sets the placeholder shown when no filter text is present.
@@ -284,7 +311,7 @@ public sealed class ComboBox : Control
         var content = FrameLayout.DrawFrameAndResolveContent(
             canvas,
             clipped,
-            Border == BorderStyle.None ? null : IsFocused ? $"{Title} *" : Title,
+            Border == BorderStyle.None ? null : RenderTitle(),
             Border,
             Padding);
         if (content.IsEmpty)
@@ -318,7 +345,9 @@ public sealed class ComboBox : Control
         var frameWidth = Math.Max(1, content.Width - 2);
         var frame = _input.BuildFrame(frameWidth);
         var indicator = IsOpen ? "^" : "v";
-        canvas.WriteText(content.X, content.Y, $"{indicator} {frame.Text}", content.Width);
+        var valueStyle = ResolveFieldValueStyle(frame.PlaceholderVisible);
+        var text = $"{ApplyStyle(indicator, valueStyle)} {ApplyStyle(frame.Text, valueStyle)}";
+        canvas.WriteText(content.X, content.Y, text, content.Width);
     }
 
     private void RenderOpenOptions(Canvas canvas, Rect content)
@@ -330,7 +359,7 @@ public sealed class ComboBox : Control
 
         if (_options.VisibleCount == 0)
         {
-            canvas.WriteText(content.X, content.Y + 1, "(no matches)", content.Width);
+            canvas.WriteText(content.X, content.Y + 1, ApplyStyle("(no matches)", MutedStyle), content.Width);
             return;
         }
 
@@ -344,7 +373,7 @@ public sealed class ComboBox : Control
             var highlight = visibleIndex == _options.HighlightedVisibleIndex ? ">" : " ";
             var selectedMarker = itemIndex == _options.SelectedIndex ? "*" : " ";
             var text = $"{highlight}{selectedMarker} {_options.Items[itemIndex]}";
-            canvas.WriteText(content.X, content.Y + 1 + row, text, content.Width);
+            canvas.WriteText(content.X, content.Y + 1 + row, ApplyStyle(text, ResolveOptionStyle(itemIndex, visibleIndex)), content.Width);
         }
     }
 
@@ -413,5 +442,50 @@ public sealed class ComboBox : Control
         }
 
         SelectionChanged?.Invoke(this, new SelectionChangedEventArgs(previousIndex, _options.SelectedIndex, previousItem, _options.SelectedItem));
+    }
+
+    private string RenderTitle()
+    {
+        var title = IsFocused && ShowFocusMarker && FocusMarker.Length > 0
+            ? $"{Title} {FocusMarker}"
+            : Title;
+        return ApplyStyle(title, IsFocused ? FocusedTitleStyle : TitleStyle);
+    }
+
+    private TeaStyle ResolveFieldValueStyle(bool placeholderVisible)
+    {
+        var style = placeholderVisible ? PlaceholderTextStyle : ValueTextStyle;
+        if (IsDisabled)
+        {
+            style = style.Merge(DisabledStyle).Merge(MutedStyle);
+        }
+
+        return style;
+    }
+
+    private TeaStyle ResolveOptionStyle(int itemIndex, int visibleIndex)
+    {
+        var style = OptionStyle;
+        if (itemIndex == _options.SelectedIndex)
+        {
+            style = style.Merge(SelectedOptionStyle);
+        }
+
+        if (visibleIndex == _options.HighlightedVisibleIndex)
+        {
+            style = style.Merge(HoveredOptionStyle);
+        }
+
+        if (IsDisabled)
+        {
+            style = style.Merge(DisabledStyle).Merge(MutedStyle);
+        }
+
+        return style;
+    }
+
+    private static string ApplyStyle(string text, TeaStyle style)
+    {
+        return style.IsEmpty ? text : style.Render(text);
     }
 }

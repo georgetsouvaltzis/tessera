@@ -1,5 +1,6 @@
 using System.ComponentModel;
 using TeaSharp.Components.Primitives;
+using TeaSharp.Styles;
 using TeaSharp.Widgets;
 
 namespace TeaSharp.Controls;
@@ -24,6 +25,24 @@ public sealed class CommandPalette : Control
         get;
         set => field = value ?? string.Empty;
     } = "Command Palette";
+
+    public TeaStyle TitleStyle { get; set; } = TeaStyle.Empty;
+
+    public TeaStyle FocusedTitleStyle { get; set; } = TeaStyle.Empty;
+
+    public TeaStyle QueryTextStyle { get; set; } = TeaStyle.Empty;
+
+    public TeaStyle PlaceholderTextStyle { get; set; } = TeaStyle.Empty;
+
+    public TeaStyle ItemStyle { get; set; } = TeaStyle.Empty;
+
+    public TeaStyle SelectedItemStyle { get; set; } = TeaStyle.Empty;
+
+    public TeaStyle HoveredItemStyle { get; set; } = TeaStyle.Empty;
+
+    public TeaStyle MutedItemStyle { get; set; } = TeaStyle.Empty;
+
+    public TeaStyle DisabledItemStyle { get; set; } = TeaStyle.Empty;
 
     public bool IsVisible { get; private set; }
 
@@ -239,11 +258,17 @@ public sealed class CommandPalette : Control
             return;
         }
 
-        canvas.DrawBox(modal, Title, BorderStyle.Rounded);
+        canvas.DrawBox(modal, ApplyStyle(Title, IsFocused ? FocusedTitleStyle : TitleStyle), BorderStyle.Rounded);
 
         var queryWidth = Math.Max(1, content.Width - 2);
         var frame = _query.BuildFrame(queryWidth);
-        canvas.WriteText(content.X, content.Y, $"> {frame.Text}", content.Width);
+        var queryStyle = frame.PlaceholderVisible ? PlaceholderTextStyle : QueryTextStyle;
+        if (IsDisabled)
+        {
+            queryStyle = queryStyle.Merge(DisabledItemStyle).Merge(MutedItemStyle);
+        }
+
+        canvas.WriteText(content.X, content.Y, ApplyStyle($"> {frame.Text}", queryStyle), content.Width);
         if (content.Height <= 1)
         {
             return;
@@ -251,7 +276,7 @@ public sealed class CommandPalette : Control
 
         if (_filteredIndices.Count == 0)
         {
-            canvas.WriteText(content.X, content.Y + 1, "(no commands)", content.Width);
+            canvas.WriteText(content.X, content.Y + 1, ApplyStyle("(no commands)", MutedItemStyle), content.Width);
             return;
         }
 
@@ -266,7 +291,7 @@ public sealed class CommandPalette : Control
             var summary = string.IsNullOrWhiteSpace(item.Description)
                 ? item.Title
                 : $"{item.Title} - {item.Description}";
-            canvas.WriteText(content.X, content.Y + 1 + row, $"{marker} {summary}", content.Width);
+            canvas.WriteText(content.X, content.Y + 1 + row, ApplyStyle($"{marker} {summary}", ResolveItemStyle(filteredIndex)), content.Width);
         }
     }
 
@@ -410,5 +435,31 @@ public sealed class CommandPalette : Control
         modal = new Rect(modalX, modalY, modalWidth, modalHeight);
         content = modal.Inset(1, 1);
         return !content.IsEmpty;
+    }
+
+    private TeaStyle ResolveItemStyle(int filteredIndex)
+    {
+        var style = ItemStyle;
+        if (filteredIndex == _selectedFilteredIndex)
+        {
+            style = style.Merge(SelectedItemStyle);
+        }
+
+        if (filteredIndex == _hoveredFilteredIndex)
+        {
+            style = style.Merge(HoveredItemStyle);
+        }
+
+        if (IsDisabled)
+        {
+            style = style.Merge(DisabledItemStyle).Merge(MutedItemStyle);
+        }
+
+        return style;
+    }
+
+    private static string ApplyStyle(string text, TeaStyle style)
+    {
+        return style.IsEmpty ? text : style.Render(text);
     }
 }

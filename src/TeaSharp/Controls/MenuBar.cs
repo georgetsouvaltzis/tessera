@@ -1,6 +1,7 @@
 using TeaSharp.Components.Primitives;
 using TeaSharp.Controls.Internal;
 using TeaSharp.Layout;
+using TeaSharp.Styles;
 using System.ComponentModel;
 
 namespace TeaSharp.Controls;
@@ -30,6 +31,31 @@ public sealed class MenuBar : Control
     /// Gets the configured menu items.
     /// </summary>
     public IReadOnlyList<MenuItem> Items => _items;
+
+    /// <summary>
+    /// Gets or sets default style for menu items.
+    /// </summary>
+    public TeaStyle ItemStyle { get; set; } = TeaStyle.Empty;
+
+    /// <summary>
+    /// Gets or sets style merged into selected item labels.
+    /// </summary>
+    public TeaStyle SelectedItemStyle { get; set; } = TeaStyle.Empty;
+
+    /// <summary>
+    /// Gets or sets style merged into hovered item labels.
+    /// </summary>
+    public TeaStyle HoveredItemStyle { get; set; } = TeaStyle.Empty;
+
+    /// <summary>
+    /// Gets or sets style merged into the selected item while focused.
+    /// </summary>
+    public TeaStyle FocusedItemStyle { get; set; } = TeaStyle.Empty;
+
+    /// <summary>
+    /// Gets or sets style merged when the control is disabled.
+    /// </summary>
+    public TeaStyle DisabledItemStyle { get; set; } = TeaStyle.Empty;
 
     public override bool IsFocused
     {
@@ -219,9 +245,9 @@ public sealed class MenuBar : Control
         var x = clipped.X;
         for (var index = 0; index < _items.Count && x < clipped.Right; index++)
         {
-            var label = FormatLabel(index, hovered: index == _hoveredIndex);
-            canvas.WriteText(x, clipped.Y, label, clipped.Right - x);
-            x += ControlTextLayout.MeasureDisplayWidth(label) + 1;
+            var rawLabel = FormatLabel(index, hovered: index == _hoveredIndex);
+            canvas.WriteText(x, clipped.Y, ApplyStyle(rawLabel, ResolveItemStyle(index)), clipped.Right - x);
+            x += ControlTextLayout.MeasureDisplayWidth(rawLabel) + 1;
         }
     }
 
@@ -284,6 +310,36 @@ public sealed class MenuBar : Control
 
         _hoveredIndex = index;
         return true;
+    }
+
+    private TeaStyle ResolveItemStyle(int index)
+    {
+        var style = ItemStyle;
+        if (index == _selectedIndex)
+        {
+            style = style.Merge(SelectedItemStyle);
+            if (IsFocused)
+            {
+                style = style.Merge(FocusedItemStyle);
+            }
+        }
+
+        if (index == _hoveredIndex)
+        {
+            style = style.Merge(HoveredItemStyle);
+        }
+
+        if (IsDisabled)
+        {
+            style = style.Merge(DisabledItemStyle);
+        }
+
+        return style;
+    }
+
+    private static string ApplyStyle(string text, TeaStyle style)
+    {
+        return style.IsEmpty ? text : style.Render(text);
     }
 
     private void ActivateItem(MenuItem item)

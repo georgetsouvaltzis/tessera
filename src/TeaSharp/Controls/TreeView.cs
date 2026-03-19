@@ -1,7 +1,7 @@
 using TeaSharp.Components.Primitives;
 using TeaSharp.Components.Primitives.Internal;
-using TeaSharp.Components.Styling;
 using TeaSharp.Layout;
+using TeaSharp.Styles;
 
 namespace TeaSharp.Controls;
 
@@ -12,7 +12,6 @@ public sealed class TreeView : Control
 {
     private readonly List<TreeItem> _roots = [];
     private readonly List<(TreeItem Node, int Depth, int? ParentVisibleIndex)> _visible = [];
-    private readonly WidgetStatePalette _statePalette = WidgetStatePalette.CreateDefault();
     private int _selectedIndex;
     private int _hoveredIndex = -1;
 
@@ -21,6 +20,30 @@ public sealed class TreeView : Control
         get;
         set => field = value ?? string.Empty;
     } = "Tree";
+
+    public string FocusMarker
+    {
+        get;
+        set => field = value ?? string.Empty;
+    } = "*";
+
+    public bool ShowFocusMarker { get; set; } = true;
+
+    public TeaStyle TitleStyle { get; set; } = TeaStyle.Empty;
+
+    public TeaStyle FocusedTitleStyle { get; set; } = TeaStyle.Empty;
+
+    public TeaStyle BranchStyle { get; set; } = TeaStyle.Empty;
+
+    public TeaStyle LeafStyle { get; set; } = TeaStyle.Empty;
+
+    public TeaStyle SelectedItemStyle { get; set; } = TeaStyle.Empty;
+
+    public TeaStyle HoveredItemStyle { get; set; } = TeaStyle.Empty;
+
+    public TeaStyle MutedStyle { get; set; } = TeaStyle.Empty;
+
+    public TeaStyle DisabledStyle { get; set; } = TeaStyle.Empty;
 
     public string? SelectedId => _selectedIndex >= 0 && _selectedIndex < _visible.Count
         ? _visible[_selectedIndex].Node.Id
@@ -197,7 +220,7 @@ public sealed class TreeView : Control
         var content = FrameLayout.DrawFrameAndResolveContent(
             canvas,
             clipped,
-            Border == BorderStyle.None ? null : IsFocused ? $"{Title} *" : Title,
+            Border == BorderStyle.None ? null : RenderTitle(),
             Border,
             Padding);
         if (content.IsEmpty)
@@ -207,7 +230,7 @@ public sealed class TreeView : Control
 
         if (_visible.Count == 0)
         {
-            canvas.WriteText(content.X, content.Y, _statePalette.Render("(empty)", WidgetVisualState.Empty), content.Width);
+            canvas.WriteText(content.X, content.Y, ApplyStyle("(empty)", MutedStyle), content.Width);
             return;
         }
 
@@ -223,7 +246,7 @@ public sealed class TreeView : Control
             canvas.WriteText(
                 content.X,
                 content.Y + row,
-                _statePalette.Render($"{cursor} {indent}{marker} {node.Label}", ResolveStates(index == _selectedIndex, index == _hoveredIndex)),
+                ApplyStyle($"{cursor} {indent}{marker} {node.Label}", ResolveRowStyle(node, index == _selectedIndex, index == _hoveredIndex)),
                 content.Width);
         }
     }
@@ -360,38 +383,6 @@ public sealed class TreeView : Control
         return true;
     }
 
-    private List<WidgetVisualState> ResolveStates(bool selected, bool hovered)
-    {
-        var states = new List<WidgetVisualState>(5);
-        if (IsFocused)
-        {
-            states.Add(WidgetVisualState.Focused);
-        }
-
-        if (IsDisabled)
-        {
-            states.Add(WidgetVisualState.Disabled);
-        }
-
-        if (IsReadOnly)
-        {
-            states.Add(WidgetVisualState.ReadOnly);
-        }
-
-        if (selected)
-        {
-            states.Add(WidgetVisualState.Cursor);
-            states.Add(WidgetVisualState.Selected);
-        }
-
-        if (hovered)
-        {
-            states.Add(WidgetVisualState.Hovered);
-        }
-
-        return states;
-    }
-
     private static TreeItem Clone(TreeItem item)
     {
         var clone = new TreeItem(item.Id, item.Label, item.Children.Select(Clone))
@@ -399,5 +390,39 @@ public sealed class TreeView : Control
             Expanded = item.Expanded,
         };
         return clone;
+    }
+
+    private string RenderTitle()
+    {
+        var title = IsFocused && ShowFocusMarker && FocusMarker.Length > 0
+            ? $"{Title} {FocusMarker}"
+            : Title;
+        return ApplyStyle(title, IsFocused ? FocusedTitleStyle : TitleStyle);
+    }
+
+    private TeaStyle ResolveRowStyle(TreeItem node, bool selected, bool hovered)
+    {
+        var style = node.Children.Count == 0 ? LeafStyle : BranchStyle;
+        if (selected)
+        {
+            style = style.Merge(SelectedItemStyle);
+        }
+
+        if (hovered)
+        {
+            style = style.Merge(HoveredItemStyle);
+        }
+
+        if (IsDisabled)
+        {
+            style = style.Merge(DisabledStyle).Merge(MutedStyle);
+        }
+
+        return style;
+    }
+
+    private static string ApplyStyle(string text, TeaStyle style)
+    {
+        return style.IsEmpty ? text : style.Render(text);
     }
 }

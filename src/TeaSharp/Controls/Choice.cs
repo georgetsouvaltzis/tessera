@@ -2,6 +2,7 @@ using TeaSharp.Controls.Internal;
 using TeaSharp.Components.Primitives;
 using TeaSharp.Components.Primitives.Internal;
 using TeaSharp.Layout;
+using TeaSharp.Styles;
 
 namespace TeaSharp.Controls;
 
@@ -26,6 +27,30 @@ public sealed class Choice : Control
         get;
         set => field = value ?? string.Empty;
     } = "Choice";
+
+    public string FocusMarker
+    {
+        get;
+        set => field = value ?? string.Empty;
+    } = "*";
+
+    public bool ShowFocusMarker { get; set; } = true;
+
+    public TeaStyle TitleStyle { get; set; } = TeaStyle.Empty;
+
+    public TeaStyle FocusedTitleStyle { get; set; } = TeaStyle.Empty;
+
+    public TeaStyle ValueStyle { get; set; } = TeaStyle.Empty;
+
+    public TeaStyle OptionStyle { get; set; } = TeaStyle.Empty;
+
+    public TeaStyle SelectedOptionStyle { get; set; } = TeaStyle.Empty;
+
+    public TeaStyle HoveredOptionStyle { get; set; } = TeaStyle.Empty;
+
+    public TeaStyle MutedStyle { get; set; } = TeaStyle.Empty;
+
+    public TeaStyle DisabledStyle { get; set; } = TeaStyle.Empty;
 
     /// <summary>
     /// Gets or sets the field border style.
@@ -256,7 +281,7 @@ public sealed class Choice : Control
         var content = FrameLayout.DrawFrameAndResolveContent(
             canvas,
             clipped,
-            Border == BorderStyle.None ? null : IsFocused ? $"{Title} *" : Title,
+            Border == BorderStyle.None ? null : RenderTitle(),
             Border,
             Padding);
         if (content.IsEmpty)
@@ -289,7 +314,9 @@ public sealed class Choice : Control
     {
         var indicator = IsOpen ? "^" : "v";
         var selected = _options.Count == 0 ? "(empty)" : SelectedItem;
-        canvas.WriteText(content.X, content.Y, $"{indicator} {selected}", content.Width);
+        var valueStyle = ResolveFieldValueStyle();
+        var text = $"{ApplyStyle(indicator, valueStyle)} {ApplyStyle(selected, valueStyle)}";
+        canvas.WriteText(content.X, content.Y, text, content.Width);
     }
 
     private void RenderOpenOptions(Canvas canvas, Rect content)
@@ -309,7 +336,7 @@ public sealed class Choice : Control
             var highlight = visibleIndex == _options.HighlightedVisibleIndex ? ">" : " ";
             var selectedMarker = itemIndex == _options.SelectedIndex ? "*" : " ";
             var text = $"{highlight}{selectedMarker} {_options.Items[itemIndex]}";
-            canvas.WriteText(content.X, content.Y + 1 + row, text, content.Width);
+            canvas.WriteText(content.X, content.Y + 1 + row, ApplyStyle(text, ResolveOptionStyle(itemIndex, visibleIndex)), content.Width);
         }
     }
 
@@ -397,5 +424,50 @@ public sealed class Choice : Control
     private void RaiseSelectionChanged(int previousIndex, string previousItem)
     {
         SelectionChanged?.Invoke(this, new SelectionChangedEventArgs(previousIndex, SelectedIndex, previousItem, SelectedItem));
+    }
+
+    private string RenderTitle()
+    {
+        var title = IsFocused && ShowFocusMarker && FocusMarker.Length > 0
+            ? $"{Title} {FocusMarker}"
+            : Title;
+        return ApplyStyle(title, IsFocused ? FocusedTitleStyle : TitleStyle);
+    }
+
+    private TeaStyle ResolveFieldValueStyle()
+    {
+        var style = _options.Count == 0 ? MutedStyle : ValueStyle;
+        if (IsDisabled)
+        {
+            style = style.Merge(DisabledStyle).Merge(MutedStyle);
+        }
+
+        return style;
+    }
+
+    private TeaStyle ResolveOptionStyle(int itemIndex, int visibleIndex)
+    {
+        var style = OptionStyle;
+        if (itemIndex == _options.SelectedIndex)
+        {
+            style = style.Merge(SelectedOptionStyle);
+        }
+
+        if (visibleIndex == _options.HighlightedVisibleIndex)
+        {
+            style = style.Merge(HoveredOptionStyle);
+        }
+
+        if (IsDisabled)
+        {
+            style = style.Merge(DisabledStyle).Merge(MutedStyle);
+        }
+
+        return style;
+    }
+
+    private static string ApplyStyle(string text, TeaStyle style)
+    {
+        return style.IsEmpty ? text : style.Render(text);
     }
 }

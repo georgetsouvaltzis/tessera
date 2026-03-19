@@ -2,6 +2,7 @@ using System.ComponentModel;
 using TeaSharp.Components.Primitives;
 using TeaSharp.Components.Primitives.Internal;
 using TeaSharp.Layout;
+using TeaSharp.Styles;
 
 namespace TeaSharp.Controls;
 
@@ -23,6 +24,20 @@ public sealed class ContextMenu : Control
         get;
         set => field = value ?? string.Empty;
     } = "Context";
+
+    public TeaStyle TitleStyle { get; set; } = TeaStyle.Empty;
+
+    public TeaStyle FocusedTitleStyle { get; set; } = TeaStyle.Empty;
+
+    public TeaStyle ItemStyle { get; set; } = TeaStyle.Empty;
+
+    public TeaStyle SelectedItemStyle { get; set; } = TeaStyle.Empty;
+
+    public TeaStyle HoveredItemStyle { get; set; } = TeaStyle.Empty;
+
+    public TeaStyle DisabledItemStyle { get; set; } = TeaStyle.Empty;
+
+    public TeaStyle MutedItemStyle { get; set; } = TeaStyle.Empty;
 
     public bool IsVisible { get; private set; }
 
@@ -255,12 +270,12 @@ public sealed class ContextMenu : Control
 
         if (Border != BorderStyle.None)
         {
-            canvas.DrawBox(menuBounds, Title, Border);
+            canvas.DrawBox(menuBounds, ApplyStyle(Title, IsFocused ? FocusedTitleStyle : TitleStyle), Border);
         }
 
         if (_items.Count == 0)
         {
-            canvas.WriteText(content.X, content.Y, "(empty)", content.Width);
+            canvas.WriteText(content.X, content.Y, ApplyStyle("(empty)", MutedItemStyle), content.Width);
             return;
         }
 
@@ -268,7 +283,11 @@ public sealed class ContextMenu : Control
         for (var index = 0; index < rows; index++)
         {
             var prefix = index == _selectedIndex ? ">" : index == _hoveredIndex ? "▸" : " ";
-            canvas.WriteText(content.X, content.Y + index, $"{prefix} {_items[index].Title}", content.Width);
+            canvas.WriteText(
+                content.X,
+                content.Y + index,
+                ApplyStyle($"{prefix} {_items[index].Title}", ResolveItemStyle(index)),
+                content.Width);
         }
     }
 
@@ -301,6 +320,32 @@ public sealed class ContextMenu : Control
 
         _hoveredIndex = index;
         return true;
+    }
+
+    private TeaStyle ResolveItemStyle(int index)
+    {
+        var style = ItemStyle;
+        if (index == _selectedIndex)
+        {
+            style = style.Merge(SelectedItemStyle);
+        }
+
+        if (index == _hoveredIndex)
+        {
+            style = style.Merge(HoveredItemStyle);
+        }
+
+        if (IsDisabled)
+        {
+            style = style.Merge(DisabledItemStyle).Merge(MutedItemStyle);
+        }
+
+        return style;
+    }
+
+    private static string ApplyStyle(string text, TeaStyle style)
+    {
+        return style.IsEmpty ? text : style.Render(text);
     }
 
     private static bool ContainsWithRightTolerance(Rect rect, int x, int y)

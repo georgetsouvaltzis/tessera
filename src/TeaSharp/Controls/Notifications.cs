@@ -1,7 +1,7 @@
 using TeaSharp.Components.Primitives;
 using TeaSharp.Components.Primitives.Internal;
-using TeaSharp.Components.Styling;
 using TeaSharp.Layout;
+using TeaSharp.Styles;
 
 namespace TeaSharp.Controls;
 
@@ -11,7 +11,6 @@ namespace TeaSharp.Controls;
 public sealed class Notifications : Control
 {
     private readonly List<NotificationItem> _items = [];
-    private readonly WidgetStatePalette _statePalette = WidgetStatePalette.CreateDefault();
     private int _selectedIndex;
     private int _hoveredIndex = -1;
 
@@ -20,6 +19,38 @@ public sealed class Notifications : Control
         get;
         set => field = value ?? string.Empty;
     } = "Notifications";
+
+    public string FocusMarker
+    {
+        get;
+        set => field = value ?? string.Empty;
+    } = "*";
+
+    public bool ShowFocusMarker { get; set; } = true;
+
+    public TeaStyle TitleStyle { get; set; } = TeaStyle.Empty;
+
+    public TeaStyle FocusedTitleStyle { get; set; } = TeaStyle.Empty;
+
+    public TeaStyle ItemStyle { get; set; } = TeaStyle.Empty;
+
+    public TeaStyle SelectedItemStyle { get; set; } = TeaStyle.Empty;
+
+    public TeaStyle HoveredItemStyle { get; set; } = TeaStyle.Empty;
+
+    public TeaStyle UnreadItemStyle { get; set; } = TeaStyle.Empty;
+
+    public TeaStyle MutedItemStyle { get; set; } = TeaStyle.Empty;
+
+    public TeaStyle InfoItemStyle { get; set; } = TeaStyle.Empty;
+
+    public TeaStyle SuccessItemStyle { get; set; } = TeaStyle.Empty;
+
+    public TeaStyle WarningItemStyle { get; set; } = TeaStyle.Empty;
+
+    public TeaStyle ErrorItemStyle { get; set; } = TeaStyle.Empty;
+
+    public TeaStyle DisabledItemStyle { get; set; } = TeaStyle.Empty;
 
     public BorderStyle Border
     {
@@ -227,7 +258,7 @@ public sealed class Notifications : Control
         var content = FrameLayout.DrawFrameAndResolveContent(
             canvas,
             clipped,
-            Border == BorderStyle.None ? null : IsFocused ? $"{Title} *" : Title,
+            Border == BorderStyle.None ? null : RenderTitle(),
             Border,
             Padding);
         if (content.IsEmpty)
@@ -237,7 +268,7 @@ public sealed class Notifications : Control
 
         if (_items.Count == 0)
         {
-            canvas.WriteText(content.X, content.Y, _statePalette.Render("(empty)", WidgetVisualState.Empty), content.Width);
+            canvas.WriteText(content.X, content.Y, ApplyStyle("(empty)", MutedItemStyle), content.Width);
             return;
         }
 
@@ -248,7 +279,7 @@ public sealed class Notifications : Control
             var index = start + row;
             var item = _items[index];
             var line = FormatLine(item, index == _selectedIndex);
-            canvas.WriteText(content.X, content.Y + row, _statePalette.Render(line, ResolveStates(item, index == _selectedIndex, index == _hoveredIndex)), content.Width);
+            canvas.WriteText(content.X, content.Y + row, ApplyStyle(line, ResolveLineStyle(item, index == _selectedIndex, index == _hoveredIndex)), content.Width);
         }
     }
 
@@ -270,48 +301,42 @@ public sealed class Notifications : Control
         return $"{cursor}{readMark} {timestamp}{item.Message}";
     }
 
-    private List<WidgetVisualState> ResolveStates(NotificationItem item, bool selected, bool hovered)
+    private TeaStyle ResolveLineStyle(NotificationItem item, bool selected, bool hovered)
     {
-        var states = new List<WidgetVisualState>(7);
-        if (IsFocused)
-        {
-            states.Add(WidgetVisualState.Focused);
-        }
-
-        if (IsDisabled)
-        {
-            states.Add(WidgetVisualState.Disabled);
-        }
-
-        if (IsReadOnly)
-        {
-            states.Add(WidgetVisualState.ReadOnly);
-        }
-
+        var style = ItemStyle;
         if (selected)
         {
-            states.Add(WidgetVisualState.Cursor);
-            states.Add(WidgetVisualState.Selected);
+            style = style.Merge(SelectedItemStyle);
         }
 
         if (hovered)
         {
-            states.Add(WidgetVisualState.Hovered);
+            style = style.Merge(HoveredItemStyle);
         }
 
         if (!item.IsRead)
         {
-            states.Add(WidgetVisualState.New);
+            style = style.Merge(UnreadItemStyle);
+        }
+        else
+        {
+            style = style.Merge(MutedItemStyle);
         }
 
-        states.Add(item.Level switch
+        style = style.Merge(item.Level switch
         {
-            NotificationLevel.Success => WidgetVisualState.Success,
-            NotificationLevel.Warning => WidgetVisualState.Warning,
-            NotificationLevel.Error => WidgetVisualState.Error,
-            _ => WidgetVisualState.Default,
+            NotificationLevel.Success => SuccessItemStyle,
+            NotificationLevel.Warning => WarningItemStyle,
+            NotificationLevel.Error => ErrorItemStyle,
+            _ => InfoItemStyle,
         });
-        return states;
+
+        if (IsDisabled)
+        {
+            style = style.Merge(DisabledItemStyle).Merge(MutedItemStyle);
+        }
+
+        return style;
     }
 
     private int ComputeWindowStart(int contentHeight)
@@ -352,6 +377,19 @@ public sealed class Notifications : Control
 
         _hoveredIndex = index;
         return true;
+    }
+
+    private string RenderTitle()
+    {
+        var title = IsFocused && ShowFocusMarker && FocusMarker.Length > 0
+            ? $"{Title} {FocusMarker}"
+            : Title;
+        return ApplyStyle(title, IsFocused ? FocusedTitleStyle : TitleStyle);
+    }
+
+    private static string ApplyStyle(string text, TeaStyle style)
+    {
+        return style.IsEmpty ? text : style.Render(text);
     }
 
     private sealed record NotificationItem(
