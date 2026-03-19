@@ -1,7 +1,15 @@
+using System.Collections.Concurrent;
+using System.Text;
+
 namespace TeaSharp.Styles;
 
 public readonly record struct TeaStyle
 {
+    private const string ResetSequence = "\u001b[0m";
+    private static readonly ConcurrentDictionary<TeaStyle, RenderSequences> SequenceCache = new();
+
+    private readonly record struct RenderSequences(string OpenSequence, string ResetSequence);
+
     public static TeaStyle Empty => default;
 
     public bool? Bold { get; init; }
@@ -78,124 +86,7 @@ public readonly record struct TeaStyle
             return string.Empty;
         }
 
-        var parts = new List<string>(8);
-
-        if (Bold is true)
-        {
-            parts.Add("1");
-        }
-        else if (Bold is false)
-        {
-            parts.Add("22");
-        }
-
-        if (Dim is true)
-        {
-            parts.Add("2");
-        }
-        else if (Dim is false)
-        {
-            parts.Add("22");
-        }
-
-        if (Italic is true)
-        {
-            parts.Add("3");
-        }
-        else if (Italic is false)
-        {
-            parts.Add("23");
-        }
-
-        if (DoubleUnderline is true)
-        {
-            parts.Add("21");
-        }
-        else if (Underline is true)
-        {
-            parts.Add("4");
-        }
-
-        if (Underline is false || (DoubleUnderline is false && Underline is not true))
-        {
-            parts.Add("24");
-        }
-
-        if (Blink is true)
-        {
-            parts.Add("5");
-        }
-        else if (Blink is false)
-        {
-            parts.Add("25");
-        }
-
-        if (Strikethrough is true)
-        {
-            parts.Add("9");
-        }
-        else if (Strikethrough is false)
-        {
-            parts.Add("29");
-        }
-
-        if (Conceal is true)
-        {
-            parts.Add("8");
-        }
-        else if (Conceal is false)
-        {
-            parts.Add("28");
-        }
-
-        if (Overline is true)
-        {
-            parts.Add("53");
-        }
-        else if (Overline is false)
-        {
-            parts.Add("55");
-        }
-
-        if (Encircled is true)
-        {
-            parts.Add("52");
-        }
-        else if (Framed is true)
-        {
-            parts.Add("51");
-        }
-
-        if ((Framed is false || Encircled is false) && Framed is not true && Encircled is not true)
-        {
-            parts.Add("54");
-        }
-
-        if (Inverse is true)
-        {
-            parts.Add("7");
-        }
-        else if (Inverse is false)
-        {
-            parts.Add("27");
-        }
-
-        if (Foreground is AnsiColor foreground)
-        {
-            parts.Add(foreground.ToForegroundParameter());
-        }
-
-        if (Background is AnsiColor background)
-        {
-            parts.Add(background.ToBackgroundParameter());
-        }
-
-        if (parts.Count == 0)
-        {
-            return string.Empty;
-        }
-
-        return $"\u001b[{string.Join(";", parts)}m";
+        return GetSequences().OpenSequence;
     }
 
     public string Render(string text)
@@ -205,6 +96,148 @@ public readonly record struct TeaStyle
             return text;
         }
 
-        return $"{ToEscapeSequence()}{text}\u001b[0m";
+        var sequences = GetSequences();
+        return string.Concat(sequences.OpenSequence, text, sequences.ResetSequence);
+    }
+
+    private RenderSequences GetSequences()
+    {
+        return SequenceCache.GetOrAdd(
+            this,
+            static style => new RenderSequences(BuildEscapeSequence(style), ResetSequence));
+    }
+
+    private static string BuildEscapeSequence(TeaStyle style)
+    {
+        var builder = new StringBuilder(48);
+        var hasAny = false;
+
+        static void AppendParameter(StringBuilder builder, ref bool hasAny, string parameter)
+        {
+            if (hasAny)
+            {
+                builder.Append(';');
+            }
+
+            builder.Append(parameter);
+            hasAny = true;
+        }
+
+        if (style.Bold is true)
+        {
+            AppendParameter(builder, ref hasAny, "1");
+        }
+        else if (style.Bold is false)
+        {
+            AppendParameter(builder, ref hasAny, "22");
+        }
+
+        if (style.Dim is true)
+        {
+            AppendParameter(builder, ref hasAny, "2");
+        }
+        else if (style.Dim is false)
+        {
+            AppendParameter(builder, ref hasAny, "22");
+        }
+
+        if (style.Italic is true)
+        {
+            AppendParameter(builder, ref hasAny, "3");
+        }
+        else if (style.Italic is false)
+        {
+            AppendParameter(builder, ref hasAny, "23");
+        }
+
+        if (style.DoubleUnderline is true)
+        {
+            AppendParameter(builder, ref hasAny, "21");
+        }
+        else if (style.Underline is true)
+        {
+            AppendParameter(builder, ref hasAny, "4");
+        }
+
+        if (style.Underline is false || (style.DoubleUnderline is false && style.Underline is not true))
+        {
+            AppendParameter(builder, ref hasAny, "24");
+        }
+
+        if (style.Blink is true)
+        {
+            AppendParameter(builder, ref hasAny, "5");
+        }
+        else if (style.Blink is false)
+        {
+            AppendParameter(builder, ref hasAny, "25");
+        }
+
+        if (style.Strikethrough is true)
+        {
+            AppendParameter(builder, ref hasAny, "9");
+        }
+        else if (style.Strikethrough is false)
+        {
+            AppendParameter(builder, ref hasAny, "29");
+        }
+
+        if (style.Conceal is true)
+        {
+            AppendParameter(builder, ref hasAny, "8");
+        }
+        else if (style.Conceal is false)
+        {
+            AppendParameter(builder, ref hasAny, "28");
+        }
+
+        if (style.Overline is true)
+        {
+            AppendParameter(builder, ref hasAny, "53");
+        }
+        else if (style.Overline is false)
+        {
+            AppendParameter(builder, ref hasAny, "55");
+        }
+
+        if (style.Encircled is true)
+        {
+            AppendParameter(builder, ref hasAny, "52");
+        }
+        else if (style.Framed is true)
+        {
+            AppendParameter(builder, ref hasAny, "51");
+        }
+
+        if ((style.Framed is false || style.Encircled is false) && style.Framed is not true && style.Encircled is not true)
+        {
+            AppendParameter(builder, ref hasAny, "54");
+        }
+
+        if (style.Inverse is true)
+        {
+            AppendParameter(builder, ref hasAny, "7");
+        }
+        else if (style.Inverse is false)
+        {
+            AppendParameter(builder, ref hasAny, "27");
+        }
+
+        if (style.Foreground is AnsiColor foreground)
+        {
+            AppendParameter(builder, ref hasAny, foreground.ToForegroundParameter());
+        }
+
+        if (style.Background is AnsiColor background)
+        {
+            AppendParameter(builder, ref hasAny, background.ToBackgroundParameter());
+        }
+
+        if (!hasAny)
+        {
+            return string.Empty;
+        }
+
+        return string.Concat("\u001b[", builder.ToString(), "m");
     }
 }

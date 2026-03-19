@@ -16,6 +16,8 @@ internal static class StyleRenderingTests
         yield return new TestCase("Style_Render_BlinkAndStrikethrough_EmitsSgr", Style_Render_BlinkAndStrikethrough_EmitsSgr);
         yield return new TestCase("Style_Render_ConcealAndOverline_EmitsSgr", Style_Render_ConcealAndOverline_EmitsSgr);
         yield return new TestCase("Style_Render_DoubleUnderlineAndFrame_EmitsSgr", Style_Render_DoubleUnderlineAndFrame_EmitsSgr);
+        yield return new TestCase("Style_ToEscapeSequence_CachesPerStyleValue", Style_ToEscapeSequence_CachesPerStyleValue);
+        yield return new TestCase("Style_Render_DisabledFlags_PreserveResetSemantics", Style_Render_DisabledFlags_PreserveResetSemantics);
         yield return new TestCase("Style_Render_EmptyStyle_Passthrough", Style_Render_EmptyStyle_Passthrough);
         yield return new TestCase("Renderer_StyledContent_EmitsSgrSequences", Renderer_StyledContent_EmitsSgrSequences);
         yield return new TestCase("Renderer_StyleOnlyChange_TriggersDiffPatch", Renderer_StyleOnlyChange_TriggersDiffPatch);
@@ -113,6 +115,46 @@ internal static class StyleRenderingTests
             "\u001b[21;51;38;5;13mboxed\u001b[0m",
             rendered,
             "Double underline + frame should be encoded in SGR output.");
+        return Task.CompletedTask;
+    }
+
+    private static Task Style_ToEscapeSequence_CachesPerStyleValue()
+    {
+        var firstStyle = TeaStyle.Empty
+            .WithBold()
+            .WithForeground(AnsiColor.BrightGreen);
+        var secondStyle = TeaStyle.Empty
+            .WithUnderline()
+            .WithForeground(AnsiColor.BrightGreen);
+
+        var firstA = firstStyle.ToEscapeSequence();
+        var firstB = firstStyle.ToEscapeSequence();
+        var second = secondStyle.ToEscapeSequence();
+
+        TestAssert.True(
+            ReferenceEquals(firstA, firstB),
+            "ToEscapeSequence should reuse cached escape string for the same style value.");
+        TestAssert.True(
+            !ReferenceEquals(firstA, second),
+            "Distinct style values should not share cached escape string instances.");
+        TestAssert.Equal("\u001b[1;38;5;10m", firstA, "Cached style escape output should remain correct.");
+        TestAssert.Equal("\u001b[4;38;5;10m", second, "Distinct style escape output should remain correct.");
+        return Task.CompletedTask;
+    }
+
+    private static Task Style_Render_DisabledFlags_PreserveResetSemantics()
+    {
+        var style = TeaStyle.Empty
+            .WithBold(false)
+            .WithUnderline(false)
+            .WithInverse(false)
+            .WithForeground(AnsiColor.BrightRed);
+
+        var rendered = style.Render("x");
+        TestAssert.Equal(
+            "\u001b[22;24;27;38;5;9mx\u001b[0m",
+            rendered,
+            "Render should preserve exact reset/open semantics for explicitly disabled flags.");
         return Task.CompletedTask;
     }
 
