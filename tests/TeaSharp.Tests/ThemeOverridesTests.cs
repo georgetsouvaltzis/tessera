@@ -13,6 +13,12 @@ internal static class ThemeOverridesTests
         yield return new TestCase(
             "ThemeOverrides_ApplyHelpers_MapExpectedTokensForButtonAndStatusBar",
             ApplyHelpers_MapExpectedTokensForButtonAndStatusBar);
+        yield return new TestCase(
+            "ThemeOverrides_ApplyThemeDefaults_DoesNotOverwriteExplicitStyles",
+            ApplyThemeDefaults_DoesNotOverwriteExplicitStyles);
+        yield return new TestCase(
+            "ThemeOverrides_ApplyHelpers_MapExpectedTokensForTableAndTabs",
+            ApplyHelpers_MapExpectedTokensForTableAndTabs);
     }
 
     private static Task Precedence_InstanceStateBeatsTypeAndGlobal()
@@ -79,6 +85,71 @@ internal static class ThemeOverridesTests
         TestAssert.Equal(theme.Text.Primary, statusBar.LeftTextStyle, "StatusBar left style should map to Text.Primary.");
         TestAssert.Equal(theme.Text.Secondary, statusBar.RightTextStyle, "StatusBar right style should map to Text.Secondary.");
         TestAssert.Equal(theme.Surface.Panel, statusBar.FillStyle, "StatusBar fill style should map to Surface.Panel.");
+
+        return Task.CompletedTask;
+    }
+
+    private static Task ApplyThemeDefaults_DoesNotOverwriteExplicitStyles()
+    {
+        var explicitStyle = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(201, 202, 203));
+        var theme = new TeaTheme
+        {
+            Text = new TeaThemeTextTokens
+            {
+                Primary = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(1, 2, 3)),
+                Secondary = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(4, 5, 6)),
+                Muted = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(7, 8, 9)),
+            },
+            Surface = new TeaThemeSurfaceTokens
+            {
+                Panel = TeaStyle.Empty.WithBackground(AnsiColor.Rgb(10, 20, 30)),
+            },
+            Focus = new TeaThemeFocusTokens
+            {
+                Title = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(31, 32, 33)),
+            },
+        };
+
+        var button = new Button
+        {
+            LabelStyle = explicitStyle,
+        };
+        var statusBar = new StatusBar
+        {
+            LeftTextStyle = explicitStyle,
+        };
+
+        button.ApplyThemeDefaults(theme);
+        statusBar.ApplyThemeDefaults(theme);
+
+        TestAssert.Equal(explicitStyle, button.LabelStyle, "Defaults should not overwrite explicit Button.LabelStyle.");
+        TestAssert.Equal(explicitStyle, statusBar.LeftTextStyle, "Defaults should not overwrite explicit StatusBar.LeftTextStyle.");
+        TestAssert.Equal(theme.Text.Secondary, statusBar.RightTextStyle, "Defaults should fill empty StatusBar.RightTextStyle.");
+
+        return Task.CompletedTask;
+    }
+
+    private static Task ApplyHelpers_MapExpectedTokensForTableAndTabs()
+    {
+        var theme = new TeaTheme
+        {
+            Text = new TeaThemeTextTokens
+            {
+                Secondary = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(41, 42, 43)),
+            },
+            Focus = new TeaThemeFocusTokens
+            {
+                Title = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(51, 52, 53)),
+            },
+        };
+
+        var table = new Table("A", "B").ApplyTheme(theme);
+        var tabs = new Tabs("Home", "Logs").ApplyTheme(theme);
+
+        TestAssert.Equal(theme.Text.Secondary, table.TitleStyle, "Table title style should map to Text.Secondary.");
+        TestAssert.Equal(theme.Focus.Title, table.FocusedTitleStyle, "Table focused title style should map to Focus.Title.");
+        TestAssert.Equal(theme.Text.Secondary, tabs.TitleStyle, "Tabs title style should map to Text.Secondary.");
+        TestAssert.Equal(theme.Focus.Title, tabs.FocusedTitleStyle, "Tabs focused title style should map to Focus.Title.");
 
         return Task.CompletedTask;
     }
