@@ -12,6 +12,9 @@ Usage:
   scripts/run_benchmarks_v1.sh all
   scripts/run_benchmarks_v1.sh scenario "<filter>"
   scripts/run_benchmarks_v1.sh shortlist
+  scripts/run_benchmarks_v1.sh shortlist-render-only
+  scripts/run_benchmarks_v1.sh shortlist-materialize
+  scripts/run_benchmarks_v1.sh iteration-template
 
 Modes:
   list      List benchmarks (--list flat)
@@ -19,6 +22,9 @@ Modes:
   scenario  Run a single filter pattern
   shortlist Run V1-oriented filter shortlist:
             Resize, Overlay, LogTail, Startup, LargeTable, StyledHeavy
+  shortlist-render-only   Run six render-only methods (current "*Only" suffix)
+  shortlist-materialize   Run six materialize methods (current non-"Only" names)
+  iteration-template      Print compact before/after report template
 EOF
 }
 
@@ -33,7 +39,64 @@ if [[ ! -f "$PROJECT_PATH" ]]; then
 fi
 
 MODE="${1:-all}"
+
+if [[ "$MODE" == "help" || "$MODE" == "--help" || "$MODE" == "-h" ]]; then
+  usage
+  exit 0
+fi
+
+if [[ "$MODE" == "iteration-template" ]]; then
+  cat <<'EOF'
+Date (UTC):
+Before commit:
+After commit:
+Host/terminal note:
+
+| Scenario | Render-only (before -> after) | Render-only alloc (before -> after) | Materialize (before -> after) | Materialize alloc (before -> after) | RO mean delta % | MAT mean delta % | Gate |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| Startup | __ us -> __ us | __ KB -> __ KB | __ us -> __ us | __ KB -> __ KB | __% | __% | pass/fail |
+| LogTail | __ us -> __ us | __ KB -> __ KB | __ us -> __ us | __ KB -> __ KB | __% | __% | pass/fail |
+| LargeTable | __ us -> __ us | __ KB -> __ KB | __ us -> __ us | __ KB -> __ KB | __% | __% | pass/fail |
+| OverlayStress | __ us -> __ us | __ KB -> __ KB | __ us -> __ us | __ KB -> __ KB | __% | __% | pass/fail |
+| ResizeStorm | __ us -> __ us | __ KB -> __ KB | __ us -> __ us | __ KB -> __ KB | __% | __% | pass/fail |
+| StyledHeavy | __ us -> __ us | __ KB -> __ KB | __ us -> __ us | __ KB -> __ KB | __% | __% | pass/fail |
+
+Result summary:
+EOF
+  exit 0
+fi
+
 run dotnet build "$PROJECT_PATH" --configuration "$CONFIGURATION" --no-restore --nologo -v minimal
+
+run_render_only_shortlist() {
+  local filters=(
+    "*StartupLikeFirstFrameRenderOnly"
+    "*AppendAndScrollLogTailOnly"
+    "*RenderLargeTableFrameOnly"
+    "*RenderOverlayStressFramesOnly"
+    "*RenderResizeStormFramesOnly"
+    "*RenderStyledHeavyFrameOnly"
+  )
+
+  for filter in "${filters[@]}"; do
+    run dotnet run --project "$PROJECT_PATH" --configuration "$CONFIGURATION" --no-build -- --filter "$filter"
+  done
+}
+
+run_materialize_shortlist() {
+  local filters=(
+    "*StartupLikeFirstFrameRender"
+    "*AppendAndScrollLogTail"
+    "*RenderLargeTableFrame"
+    "*RenderOverlayStressFrames"
+    "*RenderResizeStormFrames"
+    "*RenderStyledHeavyFrame"
+  )
+
+  for filter in "${filters[@]}"; do
+    run dotnet run --project "$PROJECT_PATH" --configuration "$CONFIGURATION" --no-build -- --filter "$filter"
+  done
+}
 
 case "$MODE" in
   list)
@@ -56,6 +119,12 @@ case "$MODE" in
     for filter in "${FILTERS[@]}"; do
       run dotnet run --project "$PROJECT_PATH" --configuration "$CONFIGURATION" --no-build -- --filter "$filter"
     done
+    ;;
+  shortlist-render-only)
+    run_render_only_shortlist
+    ;;
+  shortlist-materialize)
+    run_materialize_shortlist
     ;;
   *)
     usage

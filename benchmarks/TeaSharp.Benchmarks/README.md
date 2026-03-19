@@ -31,11 +31,11 @@ dotnet run --project benchmarks/TeaSharp.Benchmarks --configuration Release -- -
 # 3) Run a single scenario (example: LargeTable)
 dotnet run --project benchmarks/TeaSharp.Benchmarks --configuration Release -- --filter "*LargeTable*"
 
-# 4) Run render-only mode slice (dual-mode instrumentation)
-dotnet run --project benchmarks/TeaSharp.Benchmarks --configuration Release -- --filter "*RenderOnly*"
+# 4) Run render-only mode slice (current suffix pattern)
+dotnet run --project benchmarks/TeaSharp.Benchmarks --configuration Release -- --filter "*Only"
 
-# 5) Run render+materialize mode slice (dual-mode instrumentation)
-dotnet run --project benchmarks/TeaSharp.Benchmarks --configuration Release -- --filter "*Materialize*"
+# 5) Run render+materialize mode slice (current method names without `Only`)
+dotnet run --project benchmarks/TeaSharp.Benchmarks --configuration Release -- --filter "*Frame" --filter "*ScrollLogTail" --filter "*FirstFrameRender" --filter "*OverlayStressFrames" --filter "*ResizeStormFrames"
 ```
 
 Optional helper:
@@ -44,7 +44,23 @@ Optional helper:
 scripts/run_benchmarks_v1.sh list
 scripts/run_benchmarks_v1.sh all
 scripts/run_benchmarks_v1.sh scenario "*Overlay*"
+scripts/run_benchmarks_v1.sh shortlist
+scripts/run_benchmarks_v1.sh shortlist-render-only
+scripts/run_benchmarks_v1.sh shortlist-materialize
+scripts/run_benchmarks_v1.sh iteration-template
 ```
+
+## Before/After Reporting Workflow
+
+Use the same host/terminal/configuration for both runs.
+
+1. checkout baseline commit and run shortlist for the target mode
+2. checkout candidate commit and run the same shortlist mode
+3. copy results into the iteration log template from `docs/perf-baseline-v1.md`
+
+Mode guidance:
+- `shortlist-render-only`: runs the six `*Only` methods (renderer/layout gate signals)
+- `shortlist-materialize`: runs the six non-`Only` methods (end-to-end frame/allocation gate signals)
 
 ## Artifacts Location
 

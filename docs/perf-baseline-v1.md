@@ -23,3 +23,25 @@ Notes:
 - priority-setting warnings on this host (`Permission denied` / `Operation not permitted`) are non-fatal noise
 - runs complete and report benchmark summaries in `inProcess` mode
 - this baseline is for `render+materialize`; render-only baselines should be tracked separately once captured
+
+## Iteration Log (Template)
+
+Metadata:
+- Date (UTC): `YYYY-MM-DD`
+- Before commit: `<sha>`
+- After commit: `<sha>`
+- Host/terminal note: `<machine + terminal profile>`
+
+Per-scenario table (one row per scenario, both modes captured in-row):
+
+| Scenario | Render-only (before -> after) | Render-only alloc (before -> after) | Materialize (before -> after) | Materialize alloc (before -> after) | RO mean delta % | MAT mean delta % | Gate |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| Startup | __ us -> __ us | __ KB -> __ KB | __ us -> __ us | __ KB -> __ KB | __% | __% | pass/fail |
+| LogTail | __ us -> __ us | __ KB -> __ KB | __ us -> __ us | __ KB -> __ KB | __% | __% | pass/fail |
+| LargeTable | __ us -> __ us | __ KB -> __ KB | __ us -> __ us | __ KB -> __ KB | __% | __% | pass/fail |
+| OverlayStress | __ us -> __ us | __ KB -> __ KB | __ us -> __ us | __ KB -> __ KB | __% | __% | pass/fail |
+| ResizeStorm | __ us -> __ us | __ KB -> __ KB | __ us -> __ us | __ KB -> __ KB | __% | __% | pass/fail |
+| StyledHeavy | __ us -> __ us | __ KB -> __ KB | __ us -> __ us | __ KB -> __ KB | __% | __% | pass/fail |
+
+Final note:
+- Result summary + mitigation note if any gate is `fail`

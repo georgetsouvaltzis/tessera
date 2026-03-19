@@ -84,22 +84,34 @@ Harness quick commands:
 - Run a single benchmark scenario filter:
   - `dotnet run --project benchmarks/TeaSharp.Benchmarks --configuration Release -- --filter "*LargeTable*"`
 - Mode-specific examples (dual-mode instrumentation):
-  - render-only slice: `dotnet run --project benchmarks/TeaSharp.Benchmarks --configuration Release -- --filter "*RenderOnly*"`
-  - render+materialize slice: `dotnet run --project benchmarks/TeaSharp.Benchmarks --configuration Release -- --filter "*Materialize*"`
+  - render-only slice: `dotnet run --project benchmarks/TeaSharp.Benchmarks --configuration Release -- --filter "*Only"`
+  - render+materialize slice: `dotnet run --project benchmarks/TeaSharp.Benchmarks --configuration Release -- --filter "*Frame" --filter "*ScrollLogTail" --filter "*FirstFrameRender" --filter "*OverlayStressFrames" --filter "*ResizeStormFrames"`
 - Future V1 gate scenario filters (when benchmark classes are present):
   - `dotnet run --project benchmarks/TeaSharp.Benchmarks --configuration Release -- --filter "*Resize*"`
   - `dotnet run --project benchmarks/TeaSharp.Benchmarks --configuration Release -- --filter "*Overlay*"`
   - `dotnet run --project benchmarks/TeaSharp.Benchmarks --configuration Release -- --filter "*LogTail*"`
 - Scripted path (optional):
   - `scripts/run_benchmarks_v1.sh list|all|scenario "<filter>"|shortlist`
+  - `scripts/run_benchmarks_v1.sh shortlist-render-only`
+  - `scripts/run_benchmarks_v1.sh shortlist-materialize`
+  - `scripts/run_benchmarks_v1.sh iteration-template`
 
 BenchmarkDotNet artifacts/report directory:
 - `benchmarks/TeaSharp.Benchmarks/bin/Release/net10.0/BenchmarkDotNet.Artifacts/`
 
 Expected `--list flat` scenarios:
 - `TeaSharp.Benchmarks.StartupRenderBenchmarks.StartupLikeFirstFrameRender`
+- `TeaSharp.Benchmarks.StartupRenderBenchmarks.StartupLikeFirstFrameRenderOnly`
+- `TeaSharp.Benchmarks.LogTailStreamBenchmarks.AppendAndScrollLogTail`
+- `TeaSharp.Benchmarks.LogTailStreamBenchmarks.AppendAndScrollLogTailOnly`
 - `TeaSharp.Benchmarks.LargeTableBenchmarks.RenderLargeTableFrame`
+- `TeaSharp.Benchmarks.LargeTableBenchmarks.RenderLargeTableFrameOnly`
+- `TeaSharp.Benchmarks.OverlayStressBenchmarks.RenderOverlayStressFrames`
+- `TeaSharp.Benchmarks.OverlayStressBenchmarks.RenderOverlayStressFramesOnly`
+- `TeaSharp.Benchmarks.ResizeStormBenchmarks.RenderResizeStormFrames`
+- `TeaSharp.Benchmarks.ResizeStormBenchmarks.RenderResizeStormFramesOnly`
 - `TeaSharp.Benchmarks.StyledHeavyOutputBenchmarks.RenderStyledHeavyFrame`
+- `TeaSharp.Benchmarks.StyledHeavyOutputBenchmarks.RenderStyledHeavyFrameOnly`
 
 ## Comparison Protocol vs Other TUIs
 
@@ -128,3 +140,21 @@ Release gate for Public V1:
 - no metric exceeds regression budget
 - SLO targets met or variance explained with approved mitigation plan
 - perf report attached to release checklist
+
+## Iteration Reporting (Before/After)
+
+Purpose:
+- capture one comparable before/after pair for the same commit range, machine, terminal, and runtime config
+- make gate decisions explicit by mode (`render-only` and `render+materialize`)
+
+Workflow:
+1. run shortlist in the selected mode on baseline commit (before)
+2. run shortlist in the same mode on candidate commit (after)
+3. append one iteration row per scenario with both modes in the same row
+4. mark gate result (`pass`/`fail`) with short reason
+
+Minimum report fields:
+- date (UTC), before commit, after commit
+- scenario name, render-only before/after mean+alloc, materialize before/after mean+alloc
+- mean/alloc delta % for each mode
+- gating result
