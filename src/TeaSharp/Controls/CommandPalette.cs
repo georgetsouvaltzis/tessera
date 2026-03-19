@@ -12,10 +12,13 @@ public sealed class CommandPalette : Control
 {
     private readonly List<CommandPaletteItem> _items = [];
     private readonly List<CommandPaletteRenderCache> _itemRenderCache = [];
+    private readonly List<int> _allItemIndices = [];
+    private readonly List<int> _filterSeedIndices = [];
     private readonly List<int> _filteredIndices = [];
     private readonly TextInputModel _query = new();
     private int _selectedFilteredIndex;
     private int _hoveredFilteredIndex = -1;
+    private string _lastFilter = string.Empty;
     private long _executionVersion;
     private long _consumedExecutionVersion;
 
@@ -296,18 +299,47 @@ public sealed class CommandPalette : Control
 
     private void RefreshFilter()
     {
-        _filteredIndices.Clear();
         var filter = _query.Value.Trim();
-        for (var index = 0; index < _itemRenderCache.Count; index++)
+        if (string.Equals(filter, _lastFilter, StringComparison.Ordinal))
         {
-            var include = filter.Length == 0
-                || _itemRenderCache[index].SearchText.Contains(filter, StringComparison.OrdinalIgnoreCase);
-            if (include)
+            ClampSelectionAndHover();
+            return;
+        }
+
+        var canNarrow = filter.Length > 0
+            && _lastFilter.Length > 0
+            && filter.StartsWith(_lastFilter, StringComparison.OrdinalIgnoreCase);
+        if (canNarrow)
+        {
+            _filterSeedIndices.Clear();
+            _filterSeedIndices.AddRange(_filteredIndices);
+        }
+
+        _filteredIndices.Clear();
+        var source = canNarrow ? _filterSeedIndices : _allItemIndices;
+        if (filter.Length == 0)
+        {
+            _filteredIndices.AddRange(_allItemIndices);
+            _lastFilter = string.Empty;
+            ClampSelectionAndHover();
+            return;
+        }
+
+        for (var index = 0; index < source.Count; index++)
+        {
+            var itemIndex = source[index];
+            if (_itemRenderCache[itemIndex].SearchText.Contains(filter, StringComparison.OrdinalIgnoreCase))
             {
-                _filteredIndices.Add(index);
+                _filteredIndices.Add(itemIndex);
             }
         }
 
+        _lastFilter = filter;
+        ClampSelectionAndHover();
+    }
+
+    private void ClampSelectionAndHover()
+    {
         if (_filteredIndices.Count == 0)
         {
             _selectedFilteredIndex = 0;
@@ -363,11 +395,18 @@ public sealed class CommandPalette : Control
     private void RebuildItemRenderCache()
     {
         _itemRenderCache.Clear();
+        _allItemIndices.Clear();
+        _filterSeedIndices.Clear();
+        _filteredIndices.Clear();
         for (var index = 0; index < _items.Count; index++)
         {
             var item = _items[index];
             _itemRenderCache.Add(CommandPaletteRenderCache.Create(item));
+            _allItemIndices.Add(index);
         }
+
+        _filteredIndices.AddRange(_allItemIndices);
+        _lastFilter = string.Empty;
     }
 
     private string ResolveRowText(int itemIndex, int filteredIndex)

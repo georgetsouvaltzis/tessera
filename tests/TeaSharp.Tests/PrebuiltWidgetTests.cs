@@ -66,6 +66,7 @@ internal static class PrebuiltWidgetTests
         yield return new TestCase("Controls_CommandPalette_Open_ClearsQueryWhenClosed", CommandPalette_Open_ClearsQueryWhenClosed);
         yield return new TestCase("Controls_CommandPalette_LettersRemainQueryable", CommandPalette_LettersRemainQueryable);
         yield return new TestCase("Controls_CommandPalette_SetItems_RefreshesCachedRowsAndFilter", CommandPalette_SetItems_RefreshesCachedRowsAndFilter);
+        yield return new TestCase("Controls_CommandPalette_QueryTransitions_KeepFilterAccurate", CommandPalette_QueryTransitions_KeepFilterAccurate);
         yield return new TestCase("Controls_FileExplorer_KeyboardNavigationAndExpansion", FileExplorer_KeyboardNavigationAndExpansion);
         yield return new TestCase("Controls_FileExplorer_SelectPathAndEvent_ReportsTransition", FileExplorer_SelectPathAndEvent_ReportsTransition);
         yield return new TestCase("Controls_FileExplorer_MouseClickSelectsRow", FileExplorer_MouseClickSelectsRow);
@@ -1185,6 +1186,43 @@ internal static class PrebuiltWidgetTests
 
         TestAssert.True(output.Contains("Rollback - restore previous", StringComparison.Ordinal), "Command palette should render rows from the refreshed item cache.");
         TestAssert.True(!output.Contains("Deploy - publish release", StringComparison.Ordinal), "Command palette should not keep stale cached row text after SetItems.");
+        return Task.CompletedTask;
+    }
+
+    private static Task CommandPalette_QueryTransitions_KeepFilterAccurate()
+    {
+        var palette = new CommandPalette
+        {
+            IsFocused = true,
+        };
+        palette.SetItems(
+        [
+            new CommandPaletteItem("rollback", "Rollback", "restore previous"),
+            new CommandPaletteItem("run", "Run", "execute pipeline"),
+            new CommandPaletteItem("deploy", "Deploy", "publish release"),
+        ]);
+        palette.Open();
+
+        palette.SetQueryText("ro");
+        var narrowedCanvas = new Canvas(80, 20);
+        palette.Render(narrowedCanvas, new Rect(0, 0, 80, 20));
+        var narrowed = narrowedCanvas.Render();
+        TestAssert.True(narrowed.Contains("Rollback - restore previous", StringComparison.Ordinal), "Narrowed query should keep matching command.");
+        TestAssert.True(!narrowed.Contains("Run - execute pipeline", StringComparison.Ordinal), "Narrowed query should hide non-matching commands.");
+
+        palette.SetQueryText("r");
+        var expandedCanvas = new Canvas(80, 20);
+        palette.Render(expandedCanvas, new Rect(0, 0, 80, 20));
+        var expanded = expandedCanvas.Render();
+        TestAssert.True(expanded.Contains("Rollback - restore previous", StringComparison.Ordinal), "Shrinking query should retain prior match.");
+        TestAssert.True(expanded.Contains("Run - execute pipeline", StringComparison.Ordinal), "Shrinking query should restore broader matches.");
+
+        palette.SetQueryText("de");
+        var transitionedCanvas = new Canvas(80, 20);
+        palette.Render(transitionedCanvas, new Rect(0, 0, 80, 20));
+        var transitioned = transitionedCanvas.Render();
+        TestAssert.True(transitioned.Contains("Deploy - publish release", StringComparison.Ordinal), "Non-prefix transition should rescan and find unrelated matches.");
+        TestAssert.True(!transitioned.Contains("Rollback - restore previous", StringComparison.Ordinal), "Non-prefix transition should drop stale prefix-only matches.");
         return Task.CompletedTask;
     }
 
