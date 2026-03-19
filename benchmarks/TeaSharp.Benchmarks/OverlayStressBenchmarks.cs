@@ -75,6 +75,17 @@ public class OverlayStressBenchmarks
     [Benchmark(Description = "overlay stress with palette/context/dialog layers")]
     public int RenderOverlayStressFrames()
     {
+        return RenderOverlayStressFramesCore(materialize: true);
+    }
+
+    [Benchmark(Description = "overlay stress render-only with palette/context/dialog layers")]
+    public int RenderOverlayStressFramesOnly()
+    {
+        return RenderOverlayStressFramesCore(materialize: false);
+    }
+
+    private int RenderOverlayStressFramesCore(bool materialize)
+    {
         var totalLength = 0;
         for (var frame = 0; frame < FrameCount; frame++)
         {
@@ -95,7 +106,9 @@ public class OverlayStressBenchmarks
             _dialog.IsVisible = true;
             _dialog.Render(canvas, _rootBounds);
 
-            totalLength += canvas.Render().Length;
+            totalLength += materialize
+                ? canvas.Render().Length
+                : canvas.Bounds.Width * canvas.Bounds.Height;
 
             _dialog.Hide();
             _contextMenu.Close();

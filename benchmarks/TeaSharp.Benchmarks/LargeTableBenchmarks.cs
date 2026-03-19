@@ -26,8 +26,21 @@ public class LargeTableBenchmarks
     [Benchmark(Description = "large-table render (2k x 16)")]
     public int RenderLargeTableFrame()
     {
+        var canvas = RenderLargeTableFrameCore();
+        return canvas.Render().Length;
+    }
+
+    [Benchmark(Description = "large-table render-only (2k x 16, no materialization)")]
+    public int RenderLargeTableFrameOnly()
+    {
+        var canvas = RenderLargeTableFrameCore();
+        return canvas.Bounds.Width * canvas.Bounds.Height;
+    }
+
+    private Canvas RenderLargeTableFrameCore()
+    {
         var canvas = new Canvas(_bounds.Width, _bounds.Height);
         _grid.Render(canvas, _bounds);
-        return canvas.Render().Length;
+        return canvas;
     }
 }

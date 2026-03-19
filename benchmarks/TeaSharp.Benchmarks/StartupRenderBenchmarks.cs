@@ -14,6 +14,19 @@ public class StartupRenderBenchmarks
     [Benchmark(Description = "startup-ish first-frame render baseline")]
     public int StartupLikeFirstFrameRender()
     {
+        var canvas = RenderStartupLikeFrame();
+        return canvas.Render().Length;
+    }
+
+    [Benchmark(Description = "startup-ish first-frame render-only (no materialization)")]
+    public int StartupLikeFirstFrameRenderOnly()
+    {
+        var canvas = RenderStartupLikeFrame();
+        return canvas.Bounds.Width * canvas.Bounds.Height;
+    }
+
+    private Canvas RenderStartupLikeFrame()
+    {
         var grid = new DataGrid
         {
             Border = BorderStyle.SingleLine,
@@ -38,6 +51,6 @@ public class StartupRenderBenchmarks
         grid.Render(canvas, _gridBounds);
         inspector.Render(canvas, _inspectorBounds);
         status.Render(canvas, _statusBounds);
-        return canvas.Render().Length;
+        return canvas;
     }
 }

@@ -55,6 +55,17 @@ public class ResizeStormBenchmarks
     [Benchmark(Description = "resize storm repeated recomposition")]
     public int RenderResizeStormFrames()
     {
+        return RenderResizeStormFramesCore(materialize: true);
+    }
+
+    [Benchmark(Description = "resize storm repeated recomposition render-only")]
+    public int RenderResizeStormFramesOnly()
+    {
+        return RenderResizeStormFramesCore(materialize: false);
+    }
+
+    private int RenderResizeStormFramesCore(bool materialize)
+    {
         var totalLength = 0;
         for (var iteration = 0; iteration < ResizeIterations; iteration++)
         {
@@ -79,7 +90,9 @@ public class ResizeStormBenchmarks
             _miniLog.Render(canvas, new Rect(leftWidth, topHeight, rightWidth, bottomHeight));
             _statusBar.Render(canvas, statusBounds);
 
-            totalLength += canvas.Render().Length;
+            totalLength += materialize
+                ? canvas.Render().Length
+                : canvas.Bounds.Width * canvas.Bounds.Height;
         }
 
         return totalLength;

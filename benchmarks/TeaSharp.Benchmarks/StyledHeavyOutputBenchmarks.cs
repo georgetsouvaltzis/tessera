@@ -36,8 +36,21 @@ public class StyledHeavyOutputBenchmarks
     [Benchmark(Description = "styled-heavy output render")]
     public int RenderStyledHeavyFrame()
     {
+        var canvas = RenderStyledHeavyFrameCore();
+        return canvas.Render().Length;
+    }
+
+    [Benchmark(Description = "styled-heavy output render-only (no materialization)")]
+    public int RenderStyledHeavyFrameOnly()
+    {
+        var canvas = RenderStyledHeavyFrameCore();
+        return canvas.Bounds.Width * canvas.Bounds.Height;
+    }
+
+    private Canvas RenderStyledHeavyFrameCore()
+    {
         var canvas = new Canvas(_bounds.Width, _bounds.Height);
         _grid.Render(canvas, _bounds);
-        return canvas.Render().Length;
+        return canvas;
     }
 }

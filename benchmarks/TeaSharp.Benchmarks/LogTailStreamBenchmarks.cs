@@ -21,6 +21,17 @@ public class LogTailStreamBenchmarks
     [Benchmark(Description = "log-tail stream append + scroll workload")]
     public int AppendAndScrollLogTail()
     {
+        return AppendAndScrollLogTailCore(materialize: true);
+    }
+
+    [Benchmark(Description = "log-tail stream append + scroll render-only (no materialization)")]
+    public int AppendAndScrollLogTailOnly()
+    {
+        return AppendAndScrollLogTailCore(materialize: false);
+    }
+
+    private int AppendAndScrollLogTailCore(bool materialize)
+    {
         _logView.Clear();
         for (var index = 0; index < AppendBatchSize; index++)
         {
@@ -37,7 +48,9 @@ public class LogTailStreamBenchmarks
 
         var canvas = new Canvas(_bounds.Width, _bounds.Height);
         _logView.Render(canvas, _bounds);
-        return canvas.Render().Length;
+        return materialize
+            ? canvas.Render().Length
+            : canvas.Bounds.Width * canvas.Bounds.Height;
     }
 
     private static string[] CreateSeedLines()
