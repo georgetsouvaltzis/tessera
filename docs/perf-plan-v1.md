@@ -64,9 +64,21 @@ Measurement rules:
 - minimum 10 measured iterations per scenario
 
 Harness quick commands:
-- `dotnet build benchmarks/TeaSharp.Benchmarks/TeaSharp.Benchmarks.csproj --no-restore --nologo -v minimal`
-- `dotnet run --project benchmarks/TeaSharp.Benchmarks --no-build -- --list flat`
-- `dotnet run --project benchmarks/TeaSharp.Benchmarks --no-build -- --filter "*"`
+- List benchmarks:
+  - `dotnet run --project benchmarks/TeaSharp.Benchmarks --configuration Release -- --list flat`
+- Run all benchmarks in Release:
+  - `dotnet run --project benchmarks/TeaSharp.Benchmarks --configuration Release -- --filter "*"`
+- Run a single benchmark scenario filter:
+  - `dotnet run --project benchmarks/TeaSharp.Benchmarks --configuration Release -- --filter "*LargeTable*"`
+- Future V1 gate scenario filters (when benchmark classes are present):
+  - `dotnet run --project benchmarks/TeaSharp.Benchmarks --configuration Release -- --filter "*Resize*"`
+  - `dotnet run --project benchmarks/TeaSharp.Benchmarks --configuration Release -- --filter "*Overlay*"`
+  - `dotnet run --project benchmarks/TeaSharp.Benchmarks --configuration Release -- --filter "*LogTail*"`
+- Scripted path (optional):
+  - `scripts/run_benchmarks_v1.sh list|all|scenario "<filter>"|shortlist`
+
+BenchmarkDotNet artifacts/report directory:
+- `benchmarks/TeaSharp.Benchmarks/bin/Release/net10.0/BenchmarkDotNet.Artifacts/`
 
 Expected `--list flat` scenarios:
 - `TeaSharp.Benchmarks.StartupRenderBenchmarks.StartupLikeFirstFrameRender`
