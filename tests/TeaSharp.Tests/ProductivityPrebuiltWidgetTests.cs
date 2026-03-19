@@ -26,6 +26,10 @@ internal static class ProductivityPrebuiltWidgetTests
         yield return new TestCase("Controls_FuzzyFinder_Escape_ClearsThenCloses", FuzzyFinder_Escape_ClearsThenCloses);
         yield return new TestCase("Controls_FuzzyFinder_MousePress_SelectsAndActivatesRow", FuzzyFinder_MousePress_SelectsAndActivatesRow);
         yield return new TestCase("Controls_FuzzyFinder_RendersPlaceholderAndSelectedMarker", FuzzyFinder_RendersPlaceholderAndSelectedMarker);
+        yield return new TestCase("Controls_Stepper_KeyboardNavigationCompletionAndBounds", Stepper_KeyboardNavigationCompletionAndBounds);
+        yield return new TestCase("Controls_Stepper_CurrentStepChangedEvent_ReportsTransition", Stepper_CurrentStepChangedEvent_ReportsTransition);
+        yield return new TestCase("Controls_Stepper_MousePressSelectsStep", Stepper_MousePressSelectsStep);
+        yield return new TestCase("Controls_Stepper_RendersFlowAndStyles", Stepper_RendersFlowAndStyles);
         yield return new TestCase("Controls_PropertyGrid_KeyboardNavigationAndReadOnlySemantics", PropertyGrid_KeyboardNavigationAndReadOnlySemantics);
         yield return new TestCase("Controls_PropertyGrid_SelectionChangedEvent_ReportsTransition", PropertyGrid_SelectionChangedEvent_ReportsTransition);
         yield return new TestCase("Controls_PropertyGrid_RendersHeadersCategoriesAndSelection", PropertyGrid_RendersHeadersCategoriesAndSelection);
@@ -399,6 +403,121 @@ internal static class ProductivityPrebuiltWidgetTests
         TestAssert.True(output.Contains("search files", StringComparison.Ordinal), "FuzzyFinder should render placeholder text.");
         TestAssert.True(output.Contains("> alpha", StringComparison.Ordinal), "FuzzyFinder should render selected row marker.");
         TestAssert.True(output.Contains("\u001b[38;5;11m", StringComparison.Ordinal), "FuzzyFinder should apply placeholder style SGR.");
+        return Task.CompletedTask;
+    }
+
+    private static Task Stepper_KeyboardNavigationCompletionAndBounds()
+    {
+        var stepper = new Stepper
+        {
+            IsFocused = true,
+        };
+        stepper.SetSteps(
+        [
+            new StepperStep("intro", "Intro"),
+            new StepperStep("review", "Review", isDisabled: true),
+            new StepperStep("finish", "Finish"),
+        ]);
+
+        TestAssert.Equal(0, stepper.CurrentIndex, "Stepper should select the first enabled step.");
+
+        var nextChanged = stepper.Handle(new KeyPressed(Key.Right));
+        TestAssert.True(nextChanged, "Stepper Right should move to next enabled step.");
+        TestAssert.Equal(2, stepper.CurrentIndex, "Stepper should skip disabled steps during forward navigation.");
+
+        var nextAtEndChanged = stepper.Handle(new KeyPressed(Key.Right));
+        TestAssert.True(!nextAtEndChanged, "Stepper should not move past the last enabled step.");
+        TestAssert.Equal(2, stepper.CurrentIndex, "Stepper should stay on the last enabled step.");
+
+        var previousChanged = stepper.Handle(new KeyPressed(Key.Left));
+        TestAssert.True(previousChanged, "Stepper Left should move to previous enabled step.");
+        TestAssert.Equal(0, stepper.CurrentIndex, "Stepper should skip disabled steps during backward navigation.");
+
+        var completeChanged = stepper.Handle(new KeyPressed(Key.Enter));
+        TestAssert.True(completeChanged, "Stepper Enter should complete the current step.");
+        TestAssert.True(stepper.Steps[0].IsCompleted, "Stepper should mark current step as completed.");
+        return Task.CompletedTask;
+    }
+
+    private static Task Stepper_CurrentStepChangedEvent_ReportsTransition()
+    {
+        var stepper = new Stepper
+        {
+            IsFocused = true,
+        };
+        stepper.SetSteps(
+        [
+            new StepperStep("intro", "Intro"),
+            new StepperStep("config", "Config"),
+            new StepperStep("finish", "Finish"),
+        ]);
+
+        StepperCurrentStepChangedEventArgs? args = null;
+        stepper.CurrentStepChanged += (_, eventArgs) => args = eventArgs;
+
+        stepper.Handle(new KeyPressed(Key.End));
+
+        TestAssert.True(args is not null, "Stepper should raise current-step changed when the current step changes.");
+        TestAssert.Equal(0, args!.PreviousIndex, "Stepper event should expose previous index.");
+        TestAssert.Equal(2, args.CurrentIndex, "Stepper event should expose current index.");
+        TestAssert.Equal("intro", args.PreviousStep?.Id ?? string.Empty, "Stepper event should expose previous step id.");
+        TestAssert.Equal("finish", args.CurrentStep?.Id ?? string.Empty, "Stepper event should expose current step id.");
+        return Task.CompletedTask;
+    }
+
+    private static Task Stepper_MousePressSelectsStep()
+    {
+        var stepper = new Stepper
+        {
+            Title = string.Empty,
+        };
+        stepper.SetSteps(
+        [
+            new StepperStep("intro", "Intro"),
+            new StepperStep("config", "Config"),
+            new StepperStep("finish", "Finish"),
+        ]);
+
+        var changed = stepper.Handle(new PointerInput(PointerEventKind.Press, PointerButton.Left, 15, 0), new Rect(0, 0, 80, 1));
+
+        TestAssert.True(changed, "Stepper click should update current step.");
+        TestAssert.Equal(1, stepper.CurrentIndex, "Stepper click should select the step under pointer.");
+        TestAssert.Equal("config", stepper.CurrentStep?.Id ?? string.Empty, "Stepper click should expose selected step id.");
+        return Task.CompletedTask;
+    }
+
+    private static Task Stepper_RendersFlowAndStyles()
+    {
+        var stepper = new Stepper
+        {
+            IsFocused = true,
+            Title = "Wizard",
+            ConnectorStyle = TeaStyle.Empty.WithForeground(AnsiColor.BrightYellow),
+            CompletedStepStyle = TeaStyle.Empty.WithForeground(AnsiColor.BrightGreen),
+            ActiveStepStyle = TeaStyle.Empty.WithForeground(AnsiColor.BrightCyan).WithBold(),
+            PendingStepStyle = TeaStyle.Empty.WithForeground(AnsiColor.BrightWhite),
+            DisabledStepStyle = TeaStyle.Empty.WithDim(),
+        };
+        stepper.SetSteps(
+        [
+            new StepperStep("intro", "Intro"),
+            new StepperStep("config", "Configure"),
+            new StepperStep("done", "Done", isDisabled: true),
+        ]);
+        stepper.SetStepCompleted(0);
+        TestAssert.True(stepper.Steps[0].IsCompleted, "Stepper should mark the first step as completed for rendering.");
+        stepper.SetCurrentStep(1);
+        var canvas = new Canvas(120, 1);
+
+        stepper.Render(canvas, new Rect(0, 0, 120, 1));
+        var output = canvas.Render();
+
+        TestAssert.True(output.Contains("Wizard *", StringComparison.Ordinal), "Stepper should render focused title marker.");
+        TestAssert.Equal(1, stepper.CurrentIndex, "Stepper should keep active step index while rendering.");
+        TestAssert.True(stepper.Steps[2].IsDisabled, "Stepper should keep disabled step state while rendering.");
+        TestAssert.Equal(TeaStyle.Empty.WithForeground(AnsiColor.BrightYellow), stepper.ConnectorStyle, "Stepper should retain connector style hook value.");
+        TestAssert.Equal(TeaStyle.Empty.WithForeground(AnsiColor.BrightGreen), stepper.CompletedStepStyle, "Stepper should retain completed-step style hook value.");
+        TestAssert.Equal(TeaStyle.Empty.WithDim(), stepper.DisabledStepStyle, "Stepper should retain disabled-step style hook value.");
         return Task.CompletedTask;
     }
 
