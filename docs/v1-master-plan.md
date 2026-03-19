@@ -61,7 +61,7 @@ All agents must treat this file as the source of truth for scope, sequencing, ow
 ### WS-D: Quality, Performance, and Docs
 - Full-cycle validation: unit, integration, example smoke, docs sync.
 - Cleanup pass: remove dead/legacy paths, simplify logic, optimize hot allocations.
-- Benchmark harness and baseline comparisons.
+- Benchmark harness and baseline comparisons per [perf-plan-v1.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/perf-plan-v1.md).
 - Public API docs and examples as release gate.
 
 ## Parallelization Map
@@ -95,7 +95,8 @@ All agents must treat this file as the source of truth for scope, sequencing, ow
 - Acceptance:
   - full test suite green
   - example smoke green
-  - benchmark suite produced with baseline report
+  - benchmark suite produced with baseline report following `docs/perf-plan-v1.md`
+  - regression budget gates from `docs/perf-plan-v1.md` pass
   - public docs complete and coherent
 
 ## Dependency Graph and Critical Path
