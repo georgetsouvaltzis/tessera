@@ -65,6 +65,11 @@ Preferred public catalog:
 
 These live in `TeaSharp.Controls`.
 
+### Dropdown Visual Defaults
+
+- `Choice` and `ComboBox` now use richer dropdown glyph defaults for closed/open states.
+- Rendering tokens remain customizable through control styling/theme overrides.
+
 ## Theme Mapping Snapshot
 
 Current shipped `TeaThemeControlExtensions` mappings include:
