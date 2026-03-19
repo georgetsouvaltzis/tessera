@@ -17,6 +17,13 @@ internal static class PublicApiBoundaryTests
 
     private static readonly Regex TeaSharpCoreImportRegex = new(@"(?m)^\s*using\s+.*TeaSharp\.Core.*;", RegexOptions.Compiled);
 
+    private static readonly string[] CanonicalExampleProjectPaths =
+    [
+        "examples/HelloWorld/HelloWorld.csproj",
+        "examples/CounterForm/CounterForm.csproj",
+        "examples/WorkspaceApp/WorkspaceApp.csproj",
+    ];
+
     private static readonly string[] CoreImportAllowList =
     [
     ];
@@ -35,6 +42,15 @@ internal static class PublicApiBoundaryTests
         yield return new TestCase(
             "PublicApiBoundary_PublicApiGuidelinesExistAndDescribeCSharpFirstBoundaries",
             PublicApiGuidelines_ExistAndDescribeCSharpFirstBoundaries);
+        yield return new TestCase(
+            "PublicApiBoundary_CanonicalExampleProjectsExist",
+            CanonicalExampleProjects_Exist);
+        yield return new TestCase(
+            "PublicApiBoundary_CanonicalExampleProgramsDoNotImportTeaSharpCore",
+            CanonicalExamplePrograms_DoNotImportTeaSharpCore);
+        yield return new TestCase(
+            "PublicApiBoundary_ExamplesSolutionIncludesCanonicalProjects",
+            ExamplesSolution_IncludesCanonicalProjects);
     }
 
     private static Task Docs_DoNotReferenceTeaSharpStyling()
@@ -94,6 +110,55 @@ internal static class PublicApiBoundaryTests
                 text.Contains(term, StringComparison.Ordinal),
                 $"Expected {ToRepoRelativePath(guidelinesPath)} to mention {term}.");
         }
+
+        return Task.CompletedTask;
+    }
+
+    private static Task CanonicalExampleProjects_Exist()
+    {
+        var repoRoot = GetRepoRoot();
+        var missing = CanonicalExampleProjectPaths
+            .Where(path => !File.Exists(Path.Combine(repoRoot, path)))
+            .ToArray();
+
+        TestAssert.True(
+            missing.Length == 0,
+            $"Canonical example projects are missing: {string.Join(", ", missing)}.");
+
+        return Task.CompletedTask;
+    }
+
+    private static Task CanonicalExamplePrograms_DoNotImportTeaSharpCore()
+    {
+        var repoRoot = GetRepoRoot();
+        var offenders = CanonicalExampleProjectPaths
+            .Select(path => path.Replace(".csproj", "/Program.cs", StringComparison.Ordinal))
+            .Where(path => File.Exists(Path.Combine(repoRoot, path)))
+            .Where(path => TeaSharpCoreImportRegex.IsMatch(File.ReadAllText(Path.Combine(repoRoot, path))))
+            .ToArray();
+
+        TestAssert.True(
+            offenders.Length == 0,
+            $"Canonical examples must not import TeaSharp.Core.*. Offenders: {string.Join(", ", offenders)}.");
+
+        return Task.CompletedTask;
+    }
+
+    private static Task ExamplesSolution_IncludesCanonicalProjects()
+    {
+        var repoRoot = GetRepoRoot();
+        var solutionPath = Path.Combine(repoRoot, "TeaSharp.Examples.slnx");
+        TestAssert.True(File.Exists(solutionPath), "Expected TeaSharp.Examples.slnx at repository root.");
+
+        var solutionText = File.ReadAllText(solutionPath);
+        var missing = CanonicalExampleProjectPaths
+            .Where(path => !solutionText.Contains(path.Replace('/', Path.DirectorySeparatorChar), StringComparison.Ordinal)
+                && !solutionText.Contains(path, StringComparison.Ordinal))
+            .ToArray();
+
+        TestAssert.True(
+            missing.Length == 0,
+            $"TeaSharp.Examples.slnx must include canonical example projects. Missing: {string.Join(", ", missing)}.");
 
         return Task.CompletedTask;
     }

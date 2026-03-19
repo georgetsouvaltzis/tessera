@@ -77,6 +77,15 @@ Startup model:
 - minimal path: `Tea.RunAsync(new App())`
 - configured path: `Tea.CreateBuilder().ConfigureServices(...).UseApp<TApp>().ConfigureRuntime(...).Build()`
 
+Canonical onboarding progression:
+
+1. `examples/HelloWorld`: minimal startup path.
+2. `examples/CounterForm`: configured DI startup path (`ConfigureServices(...)` + `UseApp<TApp>()`).
+3. `examples/WorkspaceApp`: stateful multi-pane coordination with app-level messages/effects.
+4. Advanced interaction lane: `examples/AdvancedWidgets` and `examples/WidgetGallery`.
+
+Default onboarding remains in `TeaSharp`. `TeaSharp.Core` is a low-level advanced product lane.
+
 ### Composition Model
 
 TeaSharp uses an object-based screen model.

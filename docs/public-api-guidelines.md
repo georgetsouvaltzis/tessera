@@ -32,6 +32,17 @@ Support two startup lanes:
 
 `UseApp<TApp>()` should activate app types through DI so constructor injection works without forcing Generic Host.
 
+## Canonical Example Progression
+
+Teach examples in this sequence:
+
+1. `examples/HelloWorld`: minimal startup path (`Tea.RunAsync(new App())`).
+2. `examples/CounterForm`: configured startup (`Tea.CreateBuilder().ConfigureServices(...).UseApp<TApp>()...`).
+3. `examples/WorkspaceApp`: stateful app with coordinated message/effect flows.
+4. Advanced interaction lane: `examples/AdvancedWidgets` and `examples/WidgetGallery`.
+
+Keep onboarding in `TeaSharp` namespaces. `TeaSharp.Core` is the low-level advanced lane and should not appear in starter examples.
+
 ## Canonical App Pattern
 
 Default integration model for app code:

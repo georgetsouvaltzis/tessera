@@ -1,11 +1,14 @@
 <Solution>
   <Folder Name="/examples/">
     <Project Path="examples/AdvancedWidgets/AdvancedWidgets.csproj" />
+    <Project Path="examples/CounterForm/CounterForm.csproj" />
     <Project Path="examples/ComboBox/ComboBox.csproj" />
     <Project Path="examples/Dropdown/Dropdown.csproj" />
+    <Project Path="examples/HelloWorld/HelloWorld.csproj" />
     <Project Path="examples/Showcase/Showcase.csproj" />
     <Project Path="examples/Kanban/Kanban.csproj" />
     <Project Path="examples/ProductivityWidgets/ProductivityWidgets.csproj" />
+    <Project Path="examples/WorkspaceApp/WorkspaceApp.csproj" />
     <Project Path="examples/WidgetGallery/WidgetGallery.csproj" />
   </Folder>
   <Folder Name="/src/">

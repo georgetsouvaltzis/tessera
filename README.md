@@ -99,6 +99,17 @@ internal sealed class HelloApp : TeaApp
 }
 ```
 
+## Example Progression
+
+Follow examples in this order:
+
+1. `examples/HelloWorld`: minimal startup with `Tea.RunAsync(new App())`.
+2. `examples/CounterForm`: configured startup with `Tea.CreateBuilder()`, `ConfigureServices(...)`, and `UseApp<TApp>()`.
+3. `examples/WorkspaceApp`: stateful multi-pane app using app-level messages/effects for coordinated flows.
+4. Advanced interaction lane: `examples/AdvancedWidgets` and `examples/WidgetGallery` for richer overlays, command surfaces, and advanced behavior.
+
+Default onboarding should stay in `TeaSharp` namespaces. `TeaSharp.Core` is the low-level advanced lane.
+
 ## Docs
 
 - app model and startup: [docs/app-pattern.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/app-pattern.md)
@@ -106,7 +117,7 @@ internal sealed class HelloApp : TeaApp
 - custom widgets: [docs/custom-components.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/custom-components.md)
 - public API tiers: [docs/public-api-inventory.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/public-api-inventory.md)
 - legacy-to-new map: [docs/migration-map.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/migration-map.md)
-- canonical example app: [examples/Showcase/Program.cs](/Users/georgetsouvaltzis/Projects/playground/teasharp/examples/Showcase/Program.cs)
+- canonical progression: [examples/HelloWorld/Program.cs](/Users/georgetsouvaltzis/Projects/playground/teasharp/examples/HelloWorld/Program.cs), [examples/CounterForm/Program.cs](/Users/georgetsouvaltzis/Projects/playground/teasharp/examples/CounterForm/Program.cs), [examples/WorkspaceApp/Program.cs](/Users/georgetsouvaltzis/Projects/playground/teasharp/examples/WorkspaceApp/Program.cs)
 - engine and namespace notes: [docs/spec.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/spec.md), [docs/namespace-migration.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/namespace-migration.md)
 - control catalog: [docs/prebuilt-widgets.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/prebuilt-widgets.md)
 

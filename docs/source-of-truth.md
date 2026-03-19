@@ -320,12 +320,15 @@ Extensibility should be explicit and stable.
 ## Documentation Rules
 
 - the first example must teach the intended path
+- onboarding progression is fixed: `examples/HelloWorld` -> `examples/CounterForm` -> `examples/WorkspaceApp` -> advanced interaction lane
+- onboarding docs must keep both startup forms explicit: minimal `Tea.RunAsync(new App())` and configured `Tea.CreateBuilder().ConfigureServices(...).UseApp<TApp>()...`
 - starter docs must not teach advanced engine vocabulary
 - examples must not contradict the source-of-truth API
 - old-path examples, if kept, must be clearly marked advanced
 - default docs/examples must stay inside `TeaSharp`, `TeaSharp.Controls`, `TeaSharp.Layout`, plus `TeaSharp.Components.Primitives` only when drawing primitives are required
 - default docs/examples must not instantiate `*Component` types directly
 - if an example needs advanced `*Component` types, the example must be marked advanced
+- default onboarding must not import `TeaSharp.Core.*`; that namespace is the low-level advanced lane
 
 ## Current Drift To Correct
 

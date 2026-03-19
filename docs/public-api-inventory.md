@@ -79,11 +79,13 @@ These are the types new applications should discover first.
 The intended beginner path is:
 
 - build an app by deriving from `TeaApp`
-- run it with `Tea.RunAsync(...)` or `TeaApplicationBuilder`
+- run it with the minimal startup lane (`Tea.RunAsync(new App())`) or configured startup lane (`Tea.CreateBuilder().ConfigureServices(...).UseApp<TApp>()...`)
 - rely on automatic control routing; `Update(...)` handles only unhandled input plus runtime messages
 - return `Screen` from `Build(ScreenContext)`
 - assemble screens with `Screen.Build(...)` and shallow builder callbacks
 - keep configuration in `TeaRuntimeOptions` and `ScreenOptions`
+- follow canonical onboarding examples in order: `examples/HelloWorld` -> `examples/CounterForm` -> `examples/WorkspaceApp`
+- treat `TeaSharp.Core` as the low-level advanced lane, not default onboarding
 
 ## Tier 2: Advanced But Supported
 
