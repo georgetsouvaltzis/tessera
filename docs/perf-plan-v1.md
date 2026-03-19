@@ -47,6 +47,10 @@ Required benchmark scenarios:
 - frequent style/state changes across many cells
 - validates style diffing/render overhead
 
+Supplemental benchmark coverage (not part of the six-scenario gate checklist):
+- viewport no-decoration render loop (`LogView`)
+- validates hot-path viewport rendering with and without final materialization
+
 ## Harness Approach
 
 Two-layer harness:
@@ -59,6 +63,7 @@ Two-layer harness:
 
 Measurement rules:
 - Release configuration only
+- benchmark project enables Release-only `AllowUnsafeBlocks` for BenchmarkDotNet-generated harness compatibility
 - same terminal profile and dimensions per comparison
 - warmup included before recorded samples
 - minimum 10 measured iterations per scenario
@@ -86,6 +91,7 @@ Harness quick commands:
 - Mode-specific examples (dual-mode instrumentation):
   - render-only slice: `dotnet run --project benchmarks/TeaSharp.Benchmarks --configuration Release -- --inProcess --filter "*Only"`
   - render+materialize slice: `dotnet run --project benchmarks/TeaSharp.Benchmarks --configuration Release -- --inProcess --filter "*Frame" --filter "*ScrollLogTail" --filter "*FirstFrameRender" --filter "*OverlayStressFrames" --filter "*ResizeStormFrames"`
+  - viewport slice: `dotnet run --project benchmarks/TeaSharp.Benchmarks --configuration Release -- --inProcess --filter "*Viewport*"`
 - Future V1 gate scenario filters (when benchmark classes are present):
   - `dotnet run --project benchmarks/TeaSharp.Benchmarks --configuration Release -- --filter "*Resize*"`
   - `dotnet run --project benchmarks/TeaSharp.Benchmarks --configuration Release -- --filter "*Overlay*"`
@@ -114,6 +120,8 @@ Expected `--list flat` scenarios:
 - `TeaSharp.Benchmarks.ResizeStormBenchmarks.RenderResizeStormFramesOnly`
 - `TeaSharp.Benchmarks.StyledHeavyOutputBenchmarks.RenderStyledHeavyFrame`
 - `TeaSharp.Benchmarks.StyledHeavyOutputBenchmarks.RenderStyledHeavyFrameOnly`
+- `TeaSharp.Benchmarks.ViewportRenderBenchmarks.RenderViewportNoDecoration`
+- `TeaSharp.Benchmarks.ViewportRenderBenchmarks.RenderViewportNoDecorationOnly`
 
 ## Comparison Protocol vs Other TUIs
 

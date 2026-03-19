@@ -58,6 +58,7 @@ All agents must treat this file as the source of truth for scope, sequencing, ow
   - control-level style hooks and theme mappings are implemented across the shipped Public V1 control surface
 - **WS-D benchmark harness status**
   - `BenchmarkSwitcher` discoverability is wired and `--list flat` lists all 6 required scenarios (`Startup`, `LogTail`, `LargeTable`, `OverlayStress`, `ResizeStorm`, `StyledHeavyOutput`)
+  - supplemental viewport no-decoration benchmark coverage is wired (`ViewportRenderBenchmarks`) for render/materialize hot-path tracking
 
 ## Workstreams
 ### WS-A: Public API and Runtime Boundaries

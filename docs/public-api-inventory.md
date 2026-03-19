@@ -47,9 +47,11 @@ These are the types new applications should discover first.
 - `TeaSharp.Controls.DropdownGlyphSet`
 - `TeaSharp.Controls.CommandPalette`
 - `TeaSharp.Controls.CommandPaletteItem`
+- `TeaSharp.Controls.CommandPaletteGlyphSet`
 - `TeaSharp.Controls.Dialog`
 - `TeaSharp.Controls.ContextMenu`
 - `TeaSharp.Controls.ContextMenuItem`
+- `TeaSharp.Controls.ContextMenuGlyphSet`
 - `TeaSharp.Controls.ProgressBar`
 - `TeaSharp.Controls.BarPoint`
 - `TeaSharp.Controls.BarChart`
@@ -84,6 +86,7 @@ These are the types new applications should discover first.
 - `TeaSharp.Controls.TreeView` (native)
 - `TeaSharp.Controls.TreeViewGlyphSet`
 - `TeaSharp.Controls.MenuBar`
+- `TeaSharp.Controls.MenuBarGlyphSet`
 - `TeaSharp.Controls.Toolbar`
 - `TeaSharp.Controls.CommandBar`
 - `TeaSharp.Controls.SearchBox`
@@ -243,6 +246,7 @@ Input/value controls with direct token mappings:
 
 - `TextInput`, `TextArea`, `Toggle`, `Slider`, `Spinner`, `ProgressBar`, `NumberInput`, `DatePicker`, `TimePicker`
 - `TextInput` maps value/placeholder/focused-title styling; focus title marker is configurable through `FocusMarker` + `ShowFocusMarker`
+- `TextArea`, `NumberInput`, `DatePicker`, and `TimePicker` map `BorderStyleText` -> `Border.Default` and `FocusedBorderStyleText` -> `Border.Focused + Focus.Border`
 
 Navigation controls with direct token mappings:
 
@@ -256,6 +260,8 @@ Navigation/overlay controls with direct token mappings:
 - `Choice`/`ComboBox` keep glyph customization explicit through `DropdownGlyphSet`
 - `TreeView` maps `BorderStyleText` -> `Border.Default` and `FocusedBorderStyleText` -> `Border.Focused + Focus.Border`
 - `TreeView` keeps title focus marker rendering configurable through `FocusMarker` + `ShowFocusMarker` and glyph customization through `TreeViewGlyphSet`
+- `MenuBar`, `ContextMenu`, and `CommandPalette` map border text hooks to border/focus tokens
+- `MenuBar`, `ContextMenu`, and `CommandPalette` expose typed glyph configuration through `MenuBarGlyphSet`, `ContextMenuGlyphSet`, and `CommandPaletteGlyphSet`
 - `ContextMenu` preserves focused title markers in bordered rendering width calculations
 
 Navigation primitive controls with direct token mappings:

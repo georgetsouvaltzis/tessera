@@ -194,6 +194,7 @@ Input/value mapping coverage includes:
 - `TextInput`, `TextArea`, `Toggle`, `Slider`, `Spinner`, `ProgressBar`, `NumberInput`, `DatePicker`, `TimePicker`
 - `TextInput` maps value/placeholder/focused-title styles; title marker remains configurable via `FocusMarker` + `ShowFocusMarker`
 - `TextInput` maps `BorderStyleText` -> `theme.Border.Default` and `FocusedBorderStyleText` -> `theme.Border.Focused.Merge(theme.Focus.Border)`
+- `TextArea`, `NumberInput`, `DatePicker`, and `TimePicker` map `BorderStyleText` -> `theme.Border.Default` and `FocusedBorderStyleText` -> `theme.Border.Focused.Merge(theme.Focus.Border)`
 
 Basic mapping coverage includes:
 
@@ -212,6 +213,8 @@ Navigation/overlay mapping coverage includes:
 - `Choice`/`ComboBox` map `FocusedBorderStyleText` -> `theme.Border.Focused.Merge(theme.Focus.Border)`
 - `Choice`/`ComboBox` expose `Glyphs` via `DropdownGlyphSet` for closed/open/highlight/selected markers
 - `TreeView` maps border text hooks and title focus marker; branch/leaf markers are configurable through `TreeViewGlyphSet`
+- `MenuBar`, `ContextMenu`, and `CommandPalette` map `BorderStyleText` + `FocusedBorderStyleText` to border/focus tokens
+- `MenuBar`, `ContextMenu`, and `CommandPalette` expose typed glyph configuration (`MenuBarGlyphSet`, `ContextMenuGlyphSet`, `CommandPaletteGlyphSet`)
 - `ContextMenu` preserves focused title markers in bordered title rendering width calculations
 - `SearchBox` maps title/value/placeholder/match/navigation styles plus border text hooks; title marker is configurable through `FocusMarker` + `ShowFocusMarker`
 

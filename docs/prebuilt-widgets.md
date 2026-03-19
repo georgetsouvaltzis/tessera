@@ -77,6 +77,12 @@ These live in `TeaSharp.Controls`.
 - `ListView<T>` and `TreeView` expose `FocusMarker` and `ShowFocusMarker` for title focus rendering.
 - `TextInput` and `SearchBox` expose `FocusMarker` and `ShowFocusMarker` with `TitleStyle`/`FocusedTitleStyle`.
 - `TextInput` and `SearchBox` style hooks include title/value/placeholder plus border text hooks (`BorderStyleText`/`FocusedBorderStyleText`).
+- `TextArea`, `NumberInput`, `DatePicker`, and `TimePicker` also expose border text hooks for focused/unfocused frame rendering.
+
+### Navigation Overlay Glyph and Border Hooks
+
+- `MenuBar`, `ContextMenu`, and `CommandPalette` support `BorderStyleText`/`FocusedBorderStyleText`.
+- Glyph customization is typed through `MenuBarGlyphSet`, `ContextMenuGlyphSet`, and `CommandPaletteGlyphSet`.
 
 ### Table and TreeView Visual Hooks
 
@@ -110,6 +116,7 @@ Current shipped `TeaThemeControlExtensions` mappings include:
 - navigation primitives: `Accordion`, `MultiSelect`, `RadioGroup`
 - navigation overlay details: `Choice`/`ComboBox` include border text token mapping plus `DropdownGlyphSet` marker customization
 - navigation overlay details: `TreeView` includes border text token mapping plus `TreeViewGlyphSet` marker customization
+- navigation overlay details: `MenuBar`/`ContextMenu`/`CommandPalette` include border text token mapping plus typed glyph-set customization
 - data/flow controls: `DataGrid`, `TreeTable`, `KeyValueList`, `Timeline`, `Stepper`
 - data/flow details: `DataGrid` and `TreeTable` include border text token mapping plus explicit separator/marker text APIs
 - explorer/feedback controls: `DiffView`, `PropertyGrid`, `FileExplorer`, `FuzzyFinder`, `ToastCenter`
