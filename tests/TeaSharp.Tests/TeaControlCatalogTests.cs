@@ -30,6 +30,13 @@ internal static class TeaControlCatalogTests
         typeof(DiffLineEntry),
         typeof(DiffLineKind),
         typeof(DiffViewMode),
+        typeof(FileExplorer),
+        typeof(FileExplorerItem),
+        typeof(FileExplorerSelectionChangedEventArgs),
+        typeof(FuzzyFinder),
+        typeof(FuzzyFinderItem),
+        typeof(FuzzyFinderSelectionChangedEventArgs),
+        typeof(FuzzyFinderItemSelectedEventArgs),
         typeof(ContextMenu),
         typeof(TeaSharp.Controls.ContextMenuItem),
         typeof(LogView),
@@ -73,6 +80,8 @@ internal static class TeaControlCatalogTests
         typeof(MiniLog),
         typeof(StatItem),
         typeof(StatsCard),
+        typeof(ToastCenter),
+        typeof(ToastItem),
     ];
 
     private static readonly string[] InternalizedLegacyPrebuiltTypes = [];
