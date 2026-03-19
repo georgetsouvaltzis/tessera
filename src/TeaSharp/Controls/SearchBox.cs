@@ -107,8 +107,13 @@ public sealed class SearchBox : Control
         set => field = value ?? string.Empty;
     } = "Next";
 
+    /// <inheritdoc />
     public override bool IsFocused { get; set; }
+
+    /// <inheritdoc />
     public override bool IsDisabled { get; set; }
+
+    /// <inheritdoc />
     public override bool IsReadOnly { get; set; }
 
     /// <summary>Replaces query text and raises <see cref="QueryChanged"/> when needed.</summary>
@@ -159,6 +164,7 @@ public sealed class SearchBox : Control
     /// <summary>Requests previous match navigation.</summary>
     public void PreviousMatch() => RequestNavigation(SearchNavigationDirection.Previous);
 
+    /// <inheritdoc />
     public override bool Handle(Message message)
     {
         if (IsDisabled)
@@ -200,6 +206,7 @@ public sealed class SearchBox : Control
         return true;
     }
 
+    /// <inheritdoc />
     public override bool Handle(Message message, Rect bounds)
     {
         if (IsDisabled || message is not PointerInput pointer || bounds.IsEmpty)
@@ -259,6 +266,7 @@ public sealed class SearchBox : Control
         return true;
     }
 
+    /// <inheritdoc />
     public override void Render(Canvas canvas, Rect rect)
     {
         var clipped = Rect.Intersect(rect, canvas.Bounds);
