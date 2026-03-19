@@ -5,7 +5,7 @@ using TeaSharp.Controls;
 namespace TeaSharp.Benchmarks;
 
 [MemoryDiagnoser]
-public sealed class LargeTableBenchmarks
+public class LargeTableBenchmarks
 {
     private readonly DataGrid _grid = new()
     {

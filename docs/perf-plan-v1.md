@@ -63,6 +63,11 @@ Measurement rules:
 - warmup included before recorded samples
 - minimum 10 measured iterations per scenario
 
+Harness quick commands:
+- `dotnet build benchmarks/TeaSharp.Benchmarks/TeaSharp.Benchmarks.csproj --no-restore --nologo -v minimal`
+- `dotnet run --project benchmarks/TeaSharp.Benchmarks --no-build -- --list flat`
+- `dotnet run --project benchmarks/TeaSharp.Benchmarks --no-build -- --filter "*"`
+
 ## Comparison Protocol vs Other TUIs
 
 Comparison is methodology-first, not marketing-first:

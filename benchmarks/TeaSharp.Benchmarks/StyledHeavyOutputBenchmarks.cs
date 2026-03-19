@@ -6,7 +6,7 @@ using TeaSharp.Styles;
 namespace TeaSharp.Benchmarks;
 
 [MemoryDiagnoser]
-public sealed class StyledHeavyOutputBenchmarks
+public class StyledHeavyOutputBenchmarks
 {
     private readonly DataGrid _grid = new()
     {

@@ -5,10 +5,14 @@ using TeaSharp.Controls;
 namespace TeaSharp.Benchmarks;
 
 [MemoryDiagnoser]
-public sealed class StartupRenderBenchmarks
+public class StartupRenderBenchmarks
 {
+    private readonly Rect _gridBounds = new(0, 0, 120, 24);
+    private readonly Rect _inspectorBounds = new(0, 24, 120, 10);
+    private readonly Rect _statusBounds = new(0, 35, 120, 1);
+
     [Benchmark(Description = "startup-ish first-frame render baseline")]
-    public int StartupLike_FirstFrame_Render()
+    public int StartupLikeFirstFrameRender()
     {
         var grid = new DataGrid
         {
@@ -30,10 +34,10 @@ public sealed class StartupRenderBenchmarks
             RightText = "startup",
         };
 
-        var canvas = new Canvas(120, 36);
-        grid.Render(canvas, new Rect(0, 0, 120, 24));
-        inspector.Render(canvas, new Rect(0, 24, 120, 10));
-        status.Render(canvas, new Rect(0, 35, 120, 1));
+        var canvas = new Canvas(_gridBounds.Width, _statusBounds.Bottom + 1);
+        grid.Render(canvas, _gridBounds);
+        inspector.Render(canvas, _inspectorBounds);
+        status.Render(canvas, _statusBounds);
         return canvas.Render().Length;
     }
 }
