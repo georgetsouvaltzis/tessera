@@ -11,12 +11,15 @@ internal static class ProductivityPrebuiltWidgetTests
         yield return new TestCase("Controls_NumberInput_AdjustsAndSubmits", NumberInput_AdjustsAndSubmits);
         yield return new TestCase("Controls_NumberInput_SubmittedEvent_ReportsValue", NumberInput_SubmittedEvent_ReportsValue);
         yield return new TestCase("Controls_NumberInput_TryConsumeSubmission_IsSingleUse", NumberInput_TryConsumeSubmission_IsSingleUse);
+        yield return new TestCase("Controls_NumberInput_BorderStyleHooks_Rendered", NumberInput_BorderStyleHooks_Rendered);
         yield return new TestCase("Controls_DatePicker_MovesDate", DatePicker_MovesDate);
         yield return new TestCase("Controls_DatePicker_DateChangedEvent_ReportsTransition", DatePicker_DateChangedEvent_ReportsTransition);
         yield return new TestCase("Controls_DatePicker_MouseClickSelectsDate", DatePicker_MouseClickSelectsDate);
+        yield return new TestCase("Controls_DatePicker_BorderStyleHooks_Rendered", DatePicker_BorderStyleHooks_Rendered);
         yield return new TestCase("Controls_TimePicker_AdjustsField", TimePicker_AdjustsField);
         yield return new TestCase("Controls_TimePicker_ValueChangedEvent_ReportsTransition", TimePicker_ValueChangedEvent_ReportsTransition);
         yield return new TestCase("Controls_TimePicker_MouseWheelAdjustsField", TimePicker_MouseWheelAdjustsField);
+        yield return new TestCase("Controls_TimePicker_BorderStyleHooks_Rendered", TimePicker_BorderStyleHooks_Rendered);
         yield return new TestCase("Controls_Paginator_KeyboardNavigationAndBoundsClamping", Paginator_KeyboardNavigationAndBoundsClamping);
         yield return new TestCase("Controls_Paginator_PageChangedEvent_ReportsTransition", Paginator_PageChangedEvent_ReportsTransition);
         yield return new TestCase("Controls_Paginator_MousePressOnHitTargets_ChangesPage", Paginator_MousePressOnHitTargets_ChangesPage);
@@ -106,6 +109,39 @@ internal static class ProductivityPrebuiltWidgetTests
         return Task.CompletedTask;
     }
 
+    private static Task NumberInput_BorderStyleHooks_Rendered()
+    {
+        var input = new NumberInput
+        {
+            Title = "Number",
+            IsFocused = true,
+            FocusMarker = "!",
+            ShowFocusMarker = true,
+            Border = BorderStyle.SingleLine,
+            BorderStyleText = TeaStyle.Empty.WithForeground(AnsiColor.BrightBlue),
+            FocusedBorderStyleText = TeaStyle.Empty.WithBold(),
+            DisabledTextStyle = TeaStyle.Empty.WithForeground(AnsiColor.BrightBlack),
+        };
+        input.SetValue(42);
+
+        var focusedCanvas = new Canvas(40, 4, CanvasTextMode.GraphemeAware);
+        input.Render(focusedCanvas, new Rect(0, 0, 40, 4));
+        var focusedOutput = focusedCanvas.Render();
+
+        TestAssert.True(focusedOutput.Contains("Number !", StringComparison.Ordinal), "NumberInput should render custom focus marker in title.");
+        TestAssert.True(ContainsBoldSgr(focusedOutput), "NumberInput should merge focused border style into border glyph rendering.");
+        TestAssert.True(ContainsBlueForegroundSgr(focusedOutput), "NumberInput should apply configured border color style.");
+
+        input.IsFocused = false;
+        input.IsDisabled = true;
+        var disabledCanvas = new Canvas(40, 4, CanvasTextMode.GraphemeAware);
+        input.Render(disabledCanvas, new Rect(0, 0, 40, 4));
+        var disabledOutput = disabledCanvas.Render();
+
+        TestAssert.True(ContainsMutedForegroundSgr(disabledOutput), "NumberInput disabled border should merge muted styling.");
+        return Task.CompletedTask;
+    }
+
     private static Task DatePicker_MovesDate()
     {
         var picker = new DatePicker
@@ -150,6 +186,39 @@ internal static class ProductivityPrebuiltWidgetTests
         TestAssert.True(args is not null, "Date picker should raise date changed when the selected date changes.");
         TestAssert.Equal(new DateOnly(2026, 3, 8), args!.PreviousDate, "Date picker event should expose the previous date.");
         TestAssert.Equal(new DateOnly(2026, 3, 9), args.SelectedDate, "Date picker event should expose the selected date.");
+        return Task.CompletedTask;
+    }
+
+    private static Task DatePicker_BorderStyleHooks_Rendered()
+    {
+        var picker = new DatePicker
+        {
+            Title = "Date",
+            IsFocused = true,
+            FocusMarker = "!",
+            ShowFocusMarker = true,
+            Border = BorderStyle.SingleLine,
+            BorderStyleText = TeaStyle.Empty.WithForeground(AnsiColor.BrightBlue),
+            FocusedBorderStyleText = TeaStyle.Empty.WithBold(),
+            DisabledDayStyle = TeaStyle.Empty.WithForeground(AnsiColor.BrightBlack),
+        };
+        picker.SetDate(new DateOnly(2026, 3, 8));
+
+        var focusedCanvas = new Canvas(28, 10, CanvasTextMode.GraphemeAware);
+        picker.Render(focusedCanvas, new Rect(0, 0, 28, 10));
+        var focusedOutput = focusedCanvas.Render();
+
+        TestAssert.True(focusedOutput.Contains("Date !", StringComparison.Ordinal), "DatePicker should render custom focus marker in title.");
+        TestAssert.True(ContainsBoldSgr(focusedOutput), "DatePicker should merge focused border style into border glyph rendering.");
+        TestAssert.True(ContainsBlueForegroundSgr(focusedOutput), "DatePicker should apply configured border color style.");
+
+        picker.IsFocused = false;
+        picker.IsDisabled = true;
+        var disabledCanvas = new Canvas(28, 10, CanvasTextMode.GraphemeAware);
+        picker.Render(disabledCanvas, new Rect(0, 0, 28, 10));
+        var disabledOutput = disabledCanvas.Render();
+
+        TestAssert.True(ContainsMutedForegroundSgr(disabledOutput), "DatePicker disabled border should merge muted styling.");
         return Task.CompletedTask;
     }
 
@@ -202,6 +271,39 @@ internal static class ProductivityPrebuiltWidgetTests
         TestAssert.True(args is not null, "Time picker should raise value changed when the selected time changes.");
         TestAssert.Equal(new TimeOnly(10, 0, 0), args!.PreviousValue, "Time picker event should expose the previous value.");
         TestAssert.Equal(new TimeOnly(10, 5, 0), args.Value, "Time picker event should expose the current value.");
+        return Task.CompletedTask;
+    }
+
+    private static Task TimePicker_BorderStyleHooks_Rendered()
+    {
+        var picker = new TimePicker
+        {
+            Title = "Time",
+            IsFocused = true,
+            FocusMarker = "!",
+            ShowFocusMarker = true,
+            Border = BorderStyle.SingleLine,
+            BorderStyleText = TeaStyle.Empty.WithForeground(AnsiColor.BrightBlue),
+            FocusedBorderStyleText = TeaStyle.Empty.WithBold(),
+            DisabledValueStyle = TeaStyle.Empty.WithForeground(AnsiColor.BrightBlack),
+        };
+        picker.SetValue(new TimeOnly(10, 30, 0));
+
+        var focusedCanvas = new Canvas(32, 4, CanvasTextMode.GraphemeAware);
+        picker.Render(focusedCanvas, new Rect(0, 0, 32, 4));
+        var focusedOutput = focusedCanvas.Render();
+
+        TestAssert.True(focusedOutput.Contains("Time !", StringComparison.Ordinal), "TimePicker should render custom focus marker in title.");
+        TestAssert.True(ContainsBoldSgr(focusedOutput), "TimePicker should merge focused border style into border glyph rendering.");
+        TestAssert.True(ContainsBlueForegroundSgr(focusedOutput), "TimePicker should apply configured border color style.");
+
+        picker.IsFocused = false;
+        picker.IsDisabled = true;
+        var disabledCanvas = new Canvas(32, 4, CanvasTextMode.GraphemeAware);
+        picker.Render(disabledCanvas, new Rect(0, 0, 32, 4));
+        var disabledOutput = disabledCanvas.Render();
+
+        TestAssert.True(ContainsMutedForegroundSgr(disabledOutput), "TimePicker disabled border should merge muted styling.");
         return Task.CompletedTask;
     }
 

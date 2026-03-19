@@ -24,6 +24,7 @@ internal static class PrebuiltWidgetTests
         yield return new TestCase("Controls_TextInput_FocusMarkerAndBorderStyleHooks_Rendered", TextInput_FocusMarkerAndBorderStyleHooks_Rendered);
         yield return new TestCase("Controls_TextArea_RendersMultilineContent", TextArea_RendersMultilineContent);
         yield return new TestCase("Controls_TextArea_EnterInsertsNewline", TextArea_EnterInsertsNewline);
+        yield return new TestCase("Controls_TextArea_FocusMarkerAndBorderStyleHooks_Rendered", TextArea_FocusMarkerAndBorderStyleHooks_Rendered);
         yield return new TestCase("Controls_Tabs_CycleAndSelectByNumber", Tabs_CycleAndSelectByNumber);
         yield return new TestCase("Controls_Tabs_ZeroShortcut_SelectsTenthTab", Tabs_ZeroShortcut_SelectsTenthTab);
         yield return new TestCase("Controls_Tabs_MouseClickSelectsTab", Tabs_MouseClickSelectsTab);
@@ -372,6 +373,40 @@ internal static class PrebuiltWidgetTests
 
         TestAssert.True(area.Value.Contains('\n'), "Text area Enter should insert newline.");
         TestAssert.True(area.Value.StartsWith("lineA\nlineB", StringComparison.Ordinal), "Text area should keep content on separate lines.");
+        return Task.CompletedTask;
+    }
+
+    private static Task TextArea_FocusMarkerAndBorderStyleHooks_Rendered()
+    {
+        var borderStyle = TeaStyle.Empty.WithForeground(AnsiColor.BrightBlue);
+        var focusedBorderStyle = TeaStyle.Empty.WithBold();
+        var mergedBorderStyle = borderStyle.Merge(focusedBorderStyle);
+        var area = new TextArea
+        {
+            Title = "Notes",
+            IsFocused = true,
+            FocusMarker = "!",
+            Border = BorderStyle.SingleLine,
+            BorderStyleText = borderStyle,
+            FocusedBorderStyleText = focusedBorderStyle,
+            DisabledValueTextStyle = TeaStyle.Empty.WithDim(),
+        };
+        area.SetValue("line1\nline2");
+
+        var focusedCanvas = new Canvas(30, 6, CanvasTextMode.GraphemeAware);
+        area.Render(focusedCanvas, new Rect(0, 0, 30, 6));
+        var focusedOutput = focusedCanvas.Render();
+
+        TestAssert.True(focusedOutput.Contains("Notes !", StringComparison.Ordinal), "TextArea should render custom focus marker in title.");
+        TestAssert.True(focusedOutput.Contains(mergedBorderStyle.Render("┌"), StringComparison.Ordinal), "TextArea should style focused border glyphs.");
+
+        area.IsFocused = false;
+        area.IsDisabled = true;
+        var disabledCanvas = new Canvas(30, 6, CanvasTextMode.GraphemeAware);
+        area.Render(disabledCanvas, new Rect(0, 0, 30, 6));
+        var disabledOutput = disabledCanvas.Render();
+
+        TestAssert.True(disabledOutput.Contains("\u001b[2;", StringComparison.Ordinal), "TextArea disabled border should include dim styling.");
         return Task.CompletedTask;
     }
 
