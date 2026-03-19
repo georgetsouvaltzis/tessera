@@ -84,6 +84,8 @@ internal static partial class ThemeOverridesTests
         TestAssert.Equal(theme.Accent.Primary, treeView.BranchStyle, "TreeView branch style should map to Accent.Primary.");
         TestAssert.Equal(theme.Text.Primary, treeView.LeafStyle, "TreeView leaf style should map to Text.Primary.");
         TestAssert.Equal(theme.Accent.Secondary, treeView.HoveredItemStyle, "TreeView hovered style should map to Accent.Secondary.");
+        TestAssert.Equal(theme.Border.Default, treeView.BorderStyleText, "TreeView border style should map to Border.Default.");
+        TestAssert.Equal(theme.Border.Focused.Merge(theme.Focus.Border), treeView.FocusedBorderStyleText, "TreeView focused border style should map to focused border tokens.");
 
         TestAssert.Equal(theme.Text.Primary, menuBar.ItemStyle, "MenuBar item style should map to Text.Primary.");
         TestAssert.Equal(theme.Focus.Ring, menuBar.FocusedItemStyle, "MenuBar focused style should map to Focus.Ring.");
@@ -143,7 +145,7 @@ internal static partial class ThemeOverridesTests
 
         var choice = new Choice { OptionStyle = explicitStyle, BorderStyleText = explicitStyle };
         var comboBox = new ComboBox { ValueTextStyle = explicitStyle, BorderStyleText = explicitStyle };
-        var treeView = new TreeView { BranchStyle = explicitStyle };
+        var treeView = new TreeView { BranchStyle = explicitStyle, BorderStyleText = explicitStyle };
         var menuBar = new MenuBar { ItemStyle = explicitStyle };
         var contextMenu = new ContextMenu { ItemStyle = explicitStyle };
         var commandPalette = new CommandPalette { ItemStyle = explicitStyle };
@@ -168,7 +170,9 @@ internal static partial class ThemeOverridesTests
         TestAssert.Equal(theme.Border.Focused.Merge(theme.Focus.Border), comboBox.FocusedBorderStyleText, "Defaults should fill empty ComboBox.FocusedBorderStyleText.");
 
         TestAssert.Equal(explicitStyle, treeView.BranchStyle, "Defaults should not overwrite explicit TreeView.BranchStyle.");
+        TestAssert.Equal(explicitStyle, treeView.BorderStyleText, "Defaults should not overwrite explicit TreeView.BorderStyleText.");
         TestAssert.Equal(theme.Text.Primary, treeView.LeafStyle, "Defaults should fill empty TreeView.LeafStyle.");
+        TestAssert.Equal(theme.Border.Focused.Merge(theme.Focus.Border), treeView.FocusedBorderStyleText, "Defaults should fill empty TreeView.FocusedBorderStyleText.");
 
         TestAssert.Equal(explicitStyle, menuBar.ItemStyle, "Defaults should not overwrite explicit MenuBar.ItemStyle.");
         TestAssert.Equal(theme.Focus.Ring, menuBar.FocusedItemStyle, "Defaults should fill empty MenuBar.FocusedItemStyle.");
@@ -258,6 +262,8 @@ internal static partial class ThemeOverridesTests
         TestAssert.Equal(typeTheme.Border.Default, comboBox.BorderStyleText, "Override apply should map ComboBox border styles.");
         TestAssert.Equal(typeTheme.Border.Focused.Merge(typeTheme.Focus.Border), comboBox.FocusedBorderStyleText, "Override apply should map ComboBox focused border styles.");
         TestAssert.Equal(typeTheme.Accent.Primary, treeView.BranchStyle, "Override apply should map TreeView branch style.");
+        TestAssert.Equal(typeTheme.Border.Default, treeView.BorderStyleText, "Override apply should map TreeView border styles.");
+        TestAssert.Equal(typeTheme.Border.Focused.Merge(typeTheme.Focus.Border), treeView.FocusedBorderStyleText, "Override apply should map TreeView focused border styles.");
         TestAssert.Equal(explicitStyle, menuBar.ItemStyle, "Override defaults should not overwrite explicit MenuBar.ItemStyle.");
         TestAssert.Equal(typeTheme.Text.Secondary, contextMenu.TitleStyle, "Override apply should map ContextMenu title style.");
         TestAssert.Equal(explicitStyle, commandPalette.ItemStyle, "Override defaults should not overwrite explicit CommandPalette.ItemStyle.");

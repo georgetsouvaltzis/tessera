@@ -20,6 +20,8 @@ internal static class AdvancedPrebuiltWidgetTests
         yield return new TestCase("Controls_Toggle_MouseWheelSetsValue", Toggle_MouseWheelSetsValue);
         yield return new TestCase("Controls_TreeView_TogglesExpansion", TreeView_TogglesExpansion);
         yield return new TestCase("Controls_TreeView_MouseClickSelectsVisibleNode", TreeView_MouseClickSelectsVisibleNode);
+        yield return new TestCase("Controls_TreeView_CustomGlyphSet_RendersCustomMarkers", TreeView_CustomGlyphSet_RendersCustomMarkers);
+        yield return new TestCase("Controls_TreeView_FocusedBorderStyleText_StylesFrameGlyphs", TreeView_FocusedBorderStyleText_StylesFrameGlyphs);
         yield return new TestCase("Controls_Notifications_DismissesEntries", Notifications_DismissesEntries);
         yield return new TestCase("Controls_Notifications_MouseWheelMovesSelection", Notifications_MouseWheelMovesSelection);
         yield return new TestCase("Controls_ToastCenter_KeyboardNavigationAndDismiss", ToastCenter_KeyboardNavigationAndDismiss);
@@ -258,6 +260,57 @@ internal static class AdvancedPrebuiltWidgetTests
 
         TestAssert.True(changed, "Tree click should update selected node.");
         TestAssert.Equal("child", tree.SelectedId ?? string.Empty, "Tree click should select visible row under pointer.");
+        return Task.CompletedTask;
+    }
+
+    private static Task TreeView_CustomGlyphSet_RendersCustomMarkers()
+    {
+        var tree = new TreeView
+        {
+            IsFocused = true,
+            Border = BorderStyle.None,
+            Glyphs = new TreeViewGlyphSet("v", ">", "*"),
+        };
+        tree.SetItems(
+        [
+            new TreeItem("root", "Root",
+            [
+                new TreeItem("child", "Child"),
+            ]),
+        ]);
+        var canvas = new Canvas(40, 5);
+
+        tree.Render(canvas, new Rect(0, 0, 40, 5));
+        var expanded = canvas.Render();
+        TestAssert.True(expanded.Contains("v Root", StringComparison.Ordinal), "Tree should render custom expanded branch marker.");
+        TestAssert.True(expanded.Contains("* Child", StringComparison.Ordinal), "Tree should render custom leaf marker.");
+
+        tree.Handle(new KeyPressed(Key.Enter));
+        canvas.Clear();
+        tree.Render(canvas, new Rect(0, 0, 40, 5));
+        var collapsed = canvas.Render();
+        TestAssert.True(collapsed.Contains("> > Root", StringComparison.Ordinal), "Tree should render custom collapsed branch marker.");
+        return Task.CompletedTask;
+    }
+
+    private static Task TreeView_FocusedBorderStyleText_StylesFrameGlyphs()
+    {
+        var focusedBorderStyle = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(91, 52, 33));
+        var tree = new TreeView
+        {
+            IsFocused = true,
+            Border = BorderStyle.SingleLine,
+            Title = string.Empty,
+            BorderStyleText = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(11, 12, 13)),
+            FocusedBorderStyleText = focusedBorderStyle,
+        };
+        tree.SetItems([new TreeItem("root", "Root")]);
+        var canvas = new Canvas(24, 5, CanvasTextMode.GraphemeAware);
+
+        tree.Render(canvas, new Rect(0, 0, 24, 5));
+        var output = canvas.Render();
+
+        TestAssert.True(output.Contains(focusedBorderStyle.Render("┌"), StringComparison.Ordinal), "TreeView should style focused border glyphs.");
         return Task.CompletedTask;
     }
 
