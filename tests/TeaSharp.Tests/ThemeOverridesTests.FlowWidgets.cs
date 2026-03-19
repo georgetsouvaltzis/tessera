@@ -5,6 +5,19 @@ namespace TeaSharp.Tests;
 
 internal static partial class ThemeOverridesTests
 {
+    private static IEnumerable<TestCase> FlowCases()
+    {
+        yield return new TestCase(
+            "ThemeOverrides_ApplyHelpers_MapExpectedTokens_ForTimelineAndStepper",
+            ApplyHelpers_MapExpectedTokens_ForTimelineAndStepper);
+        yield return new TestCase(
+            "ThemeOverrides_ApplyThemeDefaults_DoNotOverwriteExplicitStyles_ForTimelineAndStepper",
+            ApplyThemeDefaults_DoNotOverwriteExplicitStyles_ForTimelineAndStepper);
+        yield return new TestCase(
+            "ThemeOverrides_OverrideOverloads_ResolveExpectedTokens_ForTimelineAndStepper",
+            OverrideOverloads_ResolveExpectedTokens_ForTimelineAndStepper);
+    }
+
     private static Task ApplyHelpers_MapExpectedTokens_ForTimelineAndStepper()
     {
         var theme = new TeaTheme

@@ -5,6 +5,28 @@ namespace TeaSharp.Tests;
 
 internal static partial class ThemeOverridesTests
 {
+    private static IEnumerable<TestCase> NavigationCases()
+    {
+        yield return new TestCase(
+            "ThemeOverrides_ApplyHelpers_MapExpectedTokensForBreadcrumbAndPaginator",
+            ApplyHelpers_MapExpectedTokensForBreadcrumbAndPaginator);
+        yield return new TestCase(
+            "ThemeOverrides_ApplyThemeDefaults_DoesNotOverwriteExplicitStyles_ForBreadcrumbAndPaginator",
+            ApplyThemeDefaults_DoesNotOverwriteExplicitStyles_ForBreadcrumbAndPaginator);
+        yield return new TestCase(
+            "ThemeOverrides_OverrideOverloads_ResolveExpectedTokens_ForBreadcrumbAndPaginator",
+            OverrideOverloads_ResolveExpectedTokens_ForBreadcrumbAndPaginator);
+        yield return new TestCase(
+            "ThemeOverrides_ApplyHelpers_MapExpectedTokens_ForToolbarCommandBarAndSearchBox",
+            ApplyHelpers_MapExpectedTokens_ForToolbarCommandBarAndSearchBox);
+        yield return new TestCase(
+            "ThemeOverrides_ApplyThemeDefaults_DoNotOverwriteExplicitStyles_ForToolbarCommandBarAndSearchBox",
+            ApplyThemeDefaults_DoNotOverwriteExplicitStyles_ForToolbarCommandBarAndSearchBox);
+        yield return new TestCase(
+            "ThemeOverrides_OverrideOverloads_ResolveExpectedTokens_ForToolbarCommandBarAndSearchBox",
+            OverrideOverloads_ResolveExpectedTokens_ForToolbarCommandBarAndSearchBox);
+    }
+
     private static Task ApplyHelpers_MapExpectedTokensForBreadcrumbAndPaginator()
     {
         var theme = new TeaTheme

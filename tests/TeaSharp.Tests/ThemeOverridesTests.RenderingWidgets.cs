@@ -5,6 +5,28 @@ namespace TeaSharp.Tests;
 
 internal static partial class ThemeOverridesTests
 {
+    private static IEnumerable<TestCase> RenderingCases()
+    {
+        yield return new TestCase(
+            "ThemeOverrides_ApplyHelpers_MapExpectedTokens_ForDiffViewAndPropertyGrid",
+            ApplyHelpers_MapExpectedTokens_ForDiffViewAndPropertyGrid);
+        yield return new TestCase(
+            "ThemeOverrides_ApplyThemeDefaults_DoNotOverwriteExplicitStyles_ForDiffViewAndPropertyGrid",
+            ApplyThemeDefaults_DoNotOverwriteExplicitStyles_ForDiffViewAndPropertyGrid);
+        yield return new TestCase(
+            "ThemeOverrides_OverrideOverloads_ResolveExpectedTokens_ForDiffViewAndPropertyGrid",
+            OverrideOverloads_ResolveExpectedTokens_ForDiffViewAndPropertyGrid);
+        yield return new TestCase(
+            "ThemeOverrides_ApplyHelpers_MapExpectedTokens_ForFileExplorerFuzzyFinderAndToastCenter",
+            ApplyHelpers_MapExpectedTokens_ForFileExplorerFuzzyFinderAndToastCenter);
+        yield return new TestCase(
+            "ThemeOverrides_ApplyThemeDefaults_DoNotOverwriteExplicitStyles_ForFileExplorerFuzzyFinderAndToastCenter",
+            ApplyThemeDefaults_DoNotOverwriteExplicitStyles_ForFileExplorerFuzzyFinderAndToastCenter);
+        yield return new TestCase(
+            "ThemeOverrides_OverrideOverloads_ResolveExpectedTokens_ForFileExplorerFuzzyFinderAndToastCenter",
+            OverrideOverloads_ResolveExpectedTokens_ForFileExplorerFuzzyFinderAndToastCenter);
+    }
+
     private static Task ApplyHelpers_MapExpectedTokens_ForDiffViewAndPropertyGrid()
     {
         var theme = new TeaTheme

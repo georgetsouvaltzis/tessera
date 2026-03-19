@@ -5,6 +5,19 @@ namespace TeaSharp.Tests;
 
 internal static partial class ThemeOverridesTests
 {
+    private static IEnumerable<TestCase> DataCases()
+    {
+        yield return new TestCase(
+            "ThemeOverrides_ApplyHelpers_MapExpectedTokens_ForDataGridTreeTableAndKeyValueList",
+            ApplyHelpers_MapExpectedTokens_ForDataGridTreeTableAndKeyValueList);
+        yield return new TestCase(
+            "ThemeOverrides_ApplyThemeDefaults_DoNotOverwriteExplicitStyles_ForDataGridTreeTableAndKeyValueList",
+            ApplyThemeDefaults_DoNotOverwriteExplicitStyles_ForDataGridTreeTableAndKeyValueList);
+        yield return new TestCase(
+            "ThemeOverrides_OverrideOverloads_ResolveExpectedTokens_ForDataGridTreeTableAndKeyValueList",
+            OverrideOverloads_ResolveExpectedTokens_ForDataGridTreeTableAndKeyValueList);
+    }
+
     private static Task ApplyHelpers_MapExpectedTokens_ForDataGridTreeTableAndKeyValueList()
     {
         var theme = new TeaTheme

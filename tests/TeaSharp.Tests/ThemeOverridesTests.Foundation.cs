@@ -5,6 +5,22 @@ namespace TeaSharp.Tests;
 
 internal static partial class ThemeOverridesTests
 {
+    private static IEnumerable<TestCase> FoundationCases()
+    {
+        yield return new TestCase(
+            "ThemeOverrides_Precedence_InstanceStateBeatsTypeAndGlobal",
+            Precedence_InstanceStateBeatsTypeAndGlobal);
+        yield return new TestCase(
+            "ThemeOverrides_ApplyHelpers_MapExpectedTokensForButtonAndStatusBar",
+            ApplyHelpers_MapExpectedTokensForButtonAndStatusBar);
+        yield return new TestCase(
+            "ThemeOverrides_ApplyThemeDefaults_DoesNotOverwriteExplicitStyles",
+            ApplyThemeDefaults_DoesNotOverwriteExplicitStyles);
+        yield return new TestCase(
+            "ThemeOverrides_ApplyHelpers_MapExpectedTokensForTableAndTabs",
+            ApplyHelpers_MapExpectedTokensForTableAndTabs);
+    }
+
     private static Task Precedence_InstanceStateBeatsTypeAndGlobal()
     {
         var button = new Button();
