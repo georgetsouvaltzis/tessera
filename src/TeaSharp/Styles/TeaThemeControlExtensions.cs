@@ -623,6 +623,108 @@ public static class TeaThemeControlExtensions
         return control.ApplyThemeDefaults(overrides.Resolve(control, baseTheme, state));
     }
 
+    public static DiffView ApplyTheme(this DiffView control, TeaTheme theme)
+    {
+        ArgumentNullException.ThrowIfNull(control);
+        ArgumentNullException.ThrowIfNull(theme);
+
+        control.TitleStyle = theme.Text.Secondary;
+        control.FocusedTitleStyle = theme.Focus.Title;
+        control.HeaderStyle = theme.Text.Secondary;
+        control.AddedLineStyle = theme.State.Success;
+        control.RemovedLineStyle = theme.State.Error;
+        control.UnchangedLineStyle = theme.Text.Primary;
+        control.SelectedLineStyle = theme.Selection.Foreground.Merge(theme.Selection.Background);
+        return control;
+    }
+
+    public static DiffView ApplyTheme(
+        this DiffView control,
+        TeaThemeOverrides overrides,
+        TeaTheme baseTheme,
+        TeaThemeVisualState state = TeaThemeVisualState.Default)
+    {
+        ArgumentNullException.ThrowIfNull(overrides);
+        return control.ApplyTheme(overrides.Resolve(control, baseTheme, state));
+    }
+
+    public static DiffView ApplyThemeDefaults(this DiffView control, TeaTheme theme)
+    {
+        ArgumentNullException.ThrowIfNull(control);
+        ArgumentNullException.ThrowIfNull(theme);
+
+        control.TitleStyle = ApplyDefault(control.TitleStyle, theme.Text.Secondary);
+        control.FocusedTitleStyle = ApplyDefault(control.FocusedTitleStyle, theme.Focus.Title);
+        control.HeaderStyle = ApplyDefault(control.HeaderStyle, theme.Text.Secondary);
+        control.AddedLineStyle = ApplyDefault(control.AddedLineStyle, theme.State.Success);
+        control.RemovedLineStyle = ApplyDefault(control.RemovedLineStyle, theme.State.Error);
+        control.UnchangedLineStyle = ApplyDefault(control.UnchangedLineStyle, theme.Text.Primary);
+        control.SelectedLineStyle = ApplyDefault(
+            control.SelectedLineStyle,
+            theme.Selection.Foreground.Merge(theme.Selection.Background));
+        return control;
+    }
+
+    public static DiffView ApplyThemeDefaults(
+        this DiffView control,
+        TeaThemeOverrides overrides,
+        TeaTheme baseTheme,
+        TeaThemeVisualState state = TeaThemeVisualState.Default)
+    {
+        ArgumentNullException.ThrowIfNull(overrides);
+        return control.ApplyThemeDefaults(overrides.Resolve(control, baseTheme, state));
+    }
+
+    public static PropertyGrid ApplyTheme(this PropertyGrid control, TeaTheme theme)
+    {
+        ArgumentNullException.ThrowIfNull(control);
+        ArgumentNullException.ThrowIfNull(theme);
+
+        control.TitleStyle = theme.Text.Secondary;
+        control.FocusedTitleStyle = theme.Focus.Title;
+        control.HeaderStyle = theme.Text.Secondary;
+        control.KeyStyle = theme.Text.Secondary;
+        control.ValueStyle = theme.Text.Primary;
+        control.SelectedRowStyle = theme.Selection.Foreground.Merge(theme.Selection.Background);
+        return control;
+    }
+
+    public static PropertyGrid ApplyTheme(
+        this PropertyGrid control,
+        TeaThemeOverrides overrides,
+        TeaTheme baseTheme,
+        TeaThemeVisualState state = TeaThemeVisualState.Default)
+    {
+        ArgumentNullException.ThrowIfNull(overrides);
+        return control.ApplyTheme(overrides.Resolve(control, baseTheme, state));
+    }
+
+    public static PropertyGrid ApplyThemeDefaults(this PropertyGrid control, TeaTheme theme)
+    {
+        ArgumentNullException.ThrowIfNull(control);
+        ArgumentNullException.ThrowIfNull(theme);
+
+        control.TitleStyle = ApplyDefault(control.TitleStyle, theme.Text.Secondary);
+        control.FocusedTitleStyle = ApplyDefault(control.FocusedTitleStyle, theme.Focus.Title);
+        control.HeaderStyle = ApplyDefault(control.HeaderStyle, theme.Text.Secondary);
+        control.KeyStyle = ApplyDefault(control.KeyStyle, theme.Text.Secondary);
+        control.ValueStyle = ApplyDefault(control.ValueStyle, theme.Text.Primary);
+        control.SelectedRowStyle = ApplyDefault(
+            control.SelectedRowStyle,
+            theme.Selection.Foreground.Merge(theme.Selection.Background));
+        return control;
+    }
+
+    public static PropertyGrid ApplyThemeDefaults(
+        this PropertyGrid control,
+        TeaThemeOverrides overrides,
+        TeaTheme baseTheme,
+        TeaThemeVisualState state = TeaThemeVisualState.Default)
+    {
+        ArgumentNullException.ThrowIfNull(overrides);
+        return control.ApplyThemeDefaults(overrides.Resolve(control, baseTheme, state));
+    }
+
     private static TeaStyle ApplyDefault(TeaStyle current, TeaStyle fallback)
     {
         return current.IsEmpty ? fallback : current;

@@ -37,6 +37,15 @@ internal static class ThemeOverridesTests
         yield return new TestCase(
             "ThemeOverrides_OverrideOverloads_ResolveExpectedTokens_ForToolbarCommandBarAndSearchBox",
             OverrideOverloads_ResolveExpectedTokens_ForToolbarCommandBarAndSearchBox);
+        yield return new TestCase(
+            "ThemeOverrides_ApplyHelpers_MapExpectedTokens_ForDiffViewAndPropertyGrid",
+            ApplyHelpers_MapExpectedTokens_ForDiffViewAndPropertyGrid);
+        yield return new TestCase(
+            "ThemeOverrides_ApplyThemeDefaults_DoNotOverwriteExplicitStyles_ForDiffViewAndPropertyGrid",
+            ApplyThemeDefaults_DoNotOverwriteExplicitStyles_ForDiffViewAndPropertyGrid);
+        yield return new TestCase(
+            "ThemeOverrides_OverrideOverloads_ResolveExpectedTokens_ForDiffViewAndPropertyGrid",
+            OverrideOverloads_ResolveExpectedTokens_ForDiffViewAndPropertyGrid);
     }
 
     private static Task Precedence_InstanceStateBeatsTypeAndGlobal()
@@ -484,6 +493,150 @@ internal static class ThemeOverridesTests
             "Override apply should map CommandBar selected style.");
         TestAssert.Equal(explicitStyle, searchBox.ValueTextStyle, "Override defaults should not overwrite explicit SearchBox.ValueTextStyle.");
         TestAssert.Equal(typeTheme.Accent.Primary, searchBox.MatchHighlightStyle, "Override defaults should fill empty SearchBox.MatchHighlightStyle.");
+
+        return Task.CompletedTask;
+    }
+
+    private static Task ApplyHelpers_MapExpectedTokens_ForDiffViewAndPropertyGrid()
+    {
+        var theme = new TeaTheme
+        {
+            Text = new TeaThemeTextTokens
+            {
+                Primary = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(31, 32, 33)),
+                Secondary = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(41, 42, 43)),
+            },
+            Focus = new TeaThemeFocusTokens
+            {
+                Title = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(51, 52, 53)),
+            },
+            State = new TeaThemeStateTokens
+            {
+                Success = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(61, 62, 63)),
+                Error = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(71, 72, 73)),
+            },
+            Selection = new TeaThemeSelectionTokens
+            {
+                Foreground = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(81, 82, 83)),
+                Background = TeaStyle.Empty.WithBackground(AnsiColor.Rgb(91, 92, 93)),
+            },
+        };
+
+        var diffView = new DiffView().ApplyTheme(theme);
+        var propertyGrid = new PropertyGrid().ApplyTheme(theme);
+
+        TestAssert.Equal(theme.Text.Secondary, diffView.TitleStyle, "DiffView title style should map to Text.Secondary.");
+        TestAssert.Equal(theme.Focus.Title, diffView.FocusedTitleStyle, "DiffView focused title style should map to Focus.Title.");
+        TestAssert.Equal(theme.Text.Secondary, diffView.HeaderStyle, "DiffView header style should map to Text.Secondary.");
+        TestAssert.Equal(theme.State.Success, diffView.AddedLineStyle, "DiffView added line style should map to State.Success.");
+        TestAssert.Equal(theme.State.Error, diffView.RemovedLineStyle, "DiffView removed line style should map to State.Error.");
+        TestAssert.Equal(theme.Text.Primary, diffView.UnchangedLineStyle, "DiffView unchanged line style should map to Text.Primary.");
+        TestAssert.Equal(
+            theme.Selection.Foreground.Merge(theme.Selection.Background),
+            diffView.SelectedLineStyle,
+            "DiffView selected line style should map to merged Selection styles.");
+
+        TestAssert.Equal(theme.Text.Secondary, propertyGrid.TitleStyle, "PropertyGrid title style should map to Text.Secondary.");
+        TestAssert.Equal(theme.Focus.Title, propertyGrid.FocusedTitleStyle, "PropertyGrid focused title style should map to Focus.Title.");
+        TestAssert.Equal(theme.Text.Secondary, propertyGrid.HeaderStyle, "PropertyGrid header style should map to Text.Secondary.");
+        TestAssert.Equal(theme.Text.Secondary, propertyGrid.KeyStyle, "PropertyGrid key style should map to Text.Secondary.");
+        TestAssert.Equal(theme.Text.Primary, propertyGrid.ValueStyle, "PropertyGrid value style should map to Text.Primary.");
+        TestAssert.Equal(
+            theme.Selection.Foreground.Merge(theme.Selection.Background),
+            propertyGrid.SelectedRowStyle,
+            "PropertyGrid selected row style should map to merged Selection styles.");
+
+        return Task.CompletedTask;
+    }
+
+    private static Task ApplyThemeDefaults_DoNotOverwriteExplicitStyles_ForDiffViewAndPropertyGrid()
+    {
+        var explicitStyle = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(201, 202, 203));
+        var theme = new TeaTheme
+        {
+            Text = new TeaThemeTextTokens
+            {
+                Primary = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(1, 2, 3)),
+                Secondary = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(4, 5, 6)),
+            },
+            Focus = new TeaThemeFocusTokens
+            {
+                Title = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(7, 8, 9)),
+            },
+            State = new TeaThemeStateTokens
+            {
+                Success = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(10, 11, 12)),
+                Error = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(13, 14, 15)),
+            },
+            Selection = new TeaThemeSelectionTokens
+            {
+                Foreground = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(16, 17, 18)),
+                Background = TeaStyle.Empty.WithBackground(AnsiColor.Rgb(19, 20, 21)),
+            },
+        };
+
+        var diffView = new DiffView
+        {
+            AddedLineStyle = explicitStyle,
+        };
+        var propertyGrid = new PropertyGrid
+        {
+            ValueStyle = explicitStyle,
+        };
+
+        diffView.ApplyThemeDefaults(theme);
+        propertyGrid.ApplyThemeDefaults(theme);
+
+        TestAssert.Equal(explicitStyle, diffView.AddedLineStyle, "Defaults should not overwrite explicit DiffView.AddedLineStyle.");
+        TestAssert.Equal(theme.State.Error, diffView.RemovedLineStyle, "Defaults should fill empty DiffView.RemovedLineStyle.");
+        TestAssert.Equal(explicitStyle, propertyGrid.ValueStyle, "Defaults should not overwrite explicit PropertyGrid.ValueStyle.");
+        TestAssert.Equal(theme.Text.Secondary, propertyGrid.HeaderStyle, "Defaults should fill empty PropertyGrid.HeaderStyle.");
+
+        return Task.CompletedTask;
+    }
+
+    private static Task OverrideOverloads_ResolveExpectedTokens_ForDiffViewAndPropertyGrid()
+    {
+        var explicitStyle = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(221, 222, 223));
+        var diffView = new DiffView
+        {
+            UnchangedLineStyle = explicitStyle,
+        };
+        var propertyGrid = new PropertyGrid();
+        var baseTheme = BuildThemeWithPrimary(1, 1, 1);
+        var overrides = new TeaThemeOverrides();
+        var typeTheme = new TeaTheme
+        {
+            Text = new TeaThemeTextTokens
+            {
+                Primary = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(101, 102, 103)),
+                Secondary = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(111, 112, 113)),
+            },
+            Focus = new TeaThemeFocusTokens
+            {
+                Title = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(121, 122, 123)),
+            },
+            State = new TeaThemeStateTokens
+            {
+                Success = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(131, 132, 133)),
+                Error = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(141, 142, 143)),
+            },
+            Selection = new TeaThemeSelectionTokens
+            {
+                Foreground = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(151, 152, 153)),
+                Background = TeaStyle.Empty.WithBackground(AnsiColor.Rgb(161, 162, 163)),
+            },
+        };
+        overrides.SetControlType<DiffView>(typeTheme);
+        overrides.SetControlType<PropertyGrid>(typeTheme);
+
+        diffView.ApplyThemeDefaults(overrides, baseTheme);
+        propertyGrid.ApplyTheme(overrides, baseTheme);
+
+        TestAssert.Equal(explicitStyle, diffView.UnchangedLineStyle, "Override defaults should not overwrite explicit DiffView.UnchangedLineStyle.");
+        TestAssert.Equal(typeTheme.State.Success, diffView.AddedLineStyle, "Override defaults should fill empty DiffView.AddedLineStyle.");
+        TestAssert.Equal(typeTheme.Text.Secondary, propertyGrid.KeyStyle, "Override apply should map PropertyGrid key style.");
+        TestAssert.Equal(typeTheme.Text.Primary, propertyGrid.ValueStyle, "Override apply should map PropertyGrid value style.");
 
         return Task.CompletedTask;
     }
