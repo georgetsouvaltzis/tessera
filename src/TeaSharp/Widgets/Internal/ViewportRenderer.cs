@@ -10,26 +10,43 @@ internal static class ViewportRenderer
         int yOffset,
         bool wrap,
         bool showLineNumbers,
-        int? highlightVisualLine)
+        int? highlightVisualLine,
+        List<string>? target = null)
     {
+        var rendered = target ?? [];
+        rendered.Clear();
+
         if (visualLines.Count == 0)
         {
-            return [string.Empty];
+            rendered.Add(string.Empty);
+            return rendered;
         }
 
         var start = Math.Clamp(yOffset, 0, Math.Max(0, visualLines.Count - 1));
         var max = Math.Min(height, visualLines.Count - start);
         if (max <= 0)
         {
-            return [string.Empty];
+            rendered.Add(string.Empty);
+            return rendered;
         }
 
-        var rendered = new List<string>(max);
+        if (rendered.Capacity < max)
+        {
+            rendered.Capacity = max;
+        }
+
         var lineNumberWidth = ViewportLineFormatter.ComputeLineNumberWidth(showLineNumbers, visualLines.Count);
+        var canBypassDecoration = !showLineNumbers && !highlightVisualLine.HasValue && xOffset == 0;
         for (var i = 0; i < max; i++)
         {
             var visualIndex = start + i;
             var line = visualLines[visualIndex];
+            if (canBypassDecoration && (wrap || line.Length <= width))
+            {
+                rendered.Add(line);
+                continue;
+            }
+
             var clipped = ViewportLineFormatter.ClipLine(line, wrap, width, xOffset, showLineNumbers, lineNumberWidth);
             rendered.Add(ViewportLineFormatter.DecorateLine(clipped, showLineNumbers, highlightVisualLine, visualIndex, lineNumberWidth, width));
         }

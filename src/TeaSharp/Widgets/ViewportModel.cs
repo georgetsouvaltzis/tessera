@@ -9,6 +9,7 @@ internal sealed class ViewportModel
 {
     private readonly List<string> _sourceLines = [];
     private readonly List<string> _visualLinesCache = [];
+    private readonly List<string> _renderLinesCache = [];
     private int _maxVisualWidth;
     private bool _visualCacheDirty = true;
 
@@ -76,10 +77,18 @@ internal sealed class ViewportModel
         ClampOffsets();
     }
 
+    public void AppendRawLine(string line)
+    {
+        _sourceLines.Add(line ?? string.Empty);
+        _visualCacheDirty = true;
+        ClampOffsets();
+    }
+
     public void Clear()
     {
         _sourceLines.Clear();
         _visualLinesCache.Clear();
+        _renderLinesCache.Clear();
         _maxVisualWidth = 0;
         _visualCacheDirty = false;
         XOffset = 0;
@@ -142,7 +151,16 @@ internal sealed class ViewportModel
 
     public IReadOnlyList<string> RenderLines()
     {
-        return ViewportRenderer.RenderLines(GetVisualLines(), Width, Height, XOffset, YOffset, Wrap, ShowLineNumbers, HighlightVisualLine);
+        return ViewportRenderer.RenderLines(
+            GetVisualLines(),
+            Width,
+            Height,
+            XOffset,
+            YOffset,
+            Wrap,
+            ShowLineNumbers,
+            HighlightVisualLine,
+            _renderLinesCache);
     }
 
     private List<string> GetVisualLines()

@@ -102,8 +102,17 @@ public sealed class LogView : Control
             return;
         }
 
-        _entries.Add(line ?? string.Empty);
-        RefreshViewport();
+        var value = line ?? string.Empty;
+        _entries.Add(value);
+        if (!HasActiveFilter())
+        {
+            _viewport.AppendRawLine(value);
+        }
+        else if (value.Contains(_filter, StringComparison.OrdinalIgnoreCase))
+        {
+            _viewport.AppendRawLine(value);
+        }
+
         if (AutoScroll)
         {
             _viewport.ScrollToBottom();
@@ -113,12 +122,18 @@ public sealed class LogView : Control
     public void Clear()
     {
         _entries.Clear();
-        RefreshViewport();
+        _viewport.Clear();
     }
 
     public void SetFilter(string filter)
     {
-        _filter = filter ?? string.Empty;
+        var normalized = filter ?? string.Empty;
+        if (string.Equals(_filter, normalized, StringComparison.Ordinal))
+        {
+            return;
+        }
+
+        _filter = normalized;
         RefreshViewport();
     }
 
@@ -213,7 +228,23 @@ public sealed class LogView : Control
 
     private void RefreshViewport()
     {
-        _viewport.SetLines(FilterEntries(_entries, _filter));
+        if (!HasActiveFilter())
+        {
+            _viewport.SetLines(_entries);
+            return;
+        }
+
+        var filtered = new List<string>();
+        for (var index = 0; index < _entries.Count; index++)
+        {
+            var entry = _entries[index];
+            if (entry.Contains(_filter, StringComparison.OrdinalIgnoreCase))
+            {
+                filtered.Add(entry);
+            }
+        }
+
+        _viewport.SetLines(filtered);
     }
 
     private string FormatTitle()
@@ -236,13 +267,8 @@ public sealed class LogView : Control
         return Title;
     }
 
-    private static IEnumerable<string> FilterEntries(IReadOnlyList<string> entries, string filter)
+    private bool HasActiveFilter()
     {
-        if (string.IsNullOrWhiteSpace(filter))
-        {
-            return entries;
-        }
-
-        return entries.Where(line => line.Contains(filter, StringComparison.OrdinalIgnoreCase));
+        return !string.IsNullOrWhiteSpace(_filter);
     }
 }
