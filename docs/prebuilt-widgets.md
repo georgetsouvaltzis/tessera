@@ -5,6 +5,8 @@ TeaSharp now distinguishes between:
 - root controls for the default app path
 - advanced seams for specialized hosting and interop
 
+Root controls are C#-first and no-DI by default.
+
 ## Root Controls
 
 Preferred public catalog:
@@ -52,6 +54,9 @@ Preferred public catalog:
 41. `SearchBox`
 42. `DiffView`
 43. `PropertyGrid`
+44. `FileExplorer`
+45. `FuzzyFinder`
+46. `ToastCenter`
 
 These live in `TeaSharp.Controls`.
 

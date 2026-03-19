@@ -149,6 +149,9 @@ Root controls currently include:
 - `SearchBox`
 - `DiffView`
 - `PropertyGrid`
+- `FileExplorer`
+- `FuzzyFinder`
+- `ToastCenter`
 - `RadioGroup`
 - `ProgressBar`
 - `LogView`

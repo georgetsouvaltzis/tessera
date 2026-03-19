@@ -82,6 +82,9 @@ These are the types new applications should discover first.
 - `TeaSharp.Controls.SearchBox`
 - `TeaSharp.Controls.DiffView`
 - `TeaSharp.Controls.PropertyGrid`
+- `TeaSharp.Controls.FileExplorer`
+- `TeaSharp.Controls.FuzzyFinder`
+- `TeaSharp.Controls.ToastCenter`
 - `TeaSharp.Controls.MenuItem`
 - `TeaSharp.Controls.Control`
 
@@ -201,6 +204,9 @@ The first root controls that already own their implementation directly are:
 - `SearchBox`
 - `DiffView`
 - `PropertyGrid`
+- `FileExplorer`
+- `FuzzyFinder`
+- `ToastCenter`
 
 Their old `TeaSharp.Components.Prebuilt.*` counterparts have been removed instead of kept as compatibility wrappers.
 

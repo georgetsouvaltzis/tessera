@@ -4,6 +4,8 @@ This roadmap defines the widget-heavy Public V1 path targeting **40-50 built-in 
 
 ## Target Inventory
 
+Control additions remain C#-first object-model APIs with no DI requirement on the default app path.
+
 ### Current Built-ins (baseline)
 - `Label`, `Button`, `TextInput`, `TextArea`, `StatusBar`
 - `Choice`, `ComboBox`, `ListView<T>`, `Table`, `TreeView`, `TreeItem`, `Tabs`, `MenuBar`, `Toolbar`
@@ -52,15 +54,15 @@ Acceptance for V1 tranche:
 - `[x]` `Breadcrumb` (shipped)
 - `[x]` `Paginator` (shipped)
 - `[ ]` `DataGrid`
-- `[ ]` `FuzzyFinder`
+- `[x]` `FuzzyFinder` (shipped)
 - `[x]` `CommandBar` (shipped)
 - `[x]` `PropertyGrid` (shipped)
-- `[ ]` `FileExplorer`
+- `[x]` `FileExplorer` (shipped)
 - `[ ]` `TreeTable`
 - `[x]` `DiffView` (shipped)
 - `[x]` `Toolbar` (shipped)
 - `[x]` `SearchBox` (shipped)
-- `[ ]` `ToastCenter`
+- `[x]` `ToastCenter` (shipped)
 
 ## API Consistency Rules
 - All widgets derive from `Control`.
