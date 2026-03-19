@@ -33,6 +33,10 @@ internal static class AdvancedPrebuiltWidgetTests
         yield return new TestCase("Controls_TreeTable_PointerClickSelectsVisibleRow", TreeTable_PointerClickSelectsVisibleRow);
         yield return new TestCase("Controls_TreeTable_SelectionChangedEvent_ReportsTransition", TreeTable_SelectionChangedEvent_ReportsTransition);
         yield return new TestCase("Controls_TreeTable_RendersHeadersRowsAndStyles", TreeTable_RendersHeadersRowsAndStyles);
+        yield return new TestCase("Controls_Timeline_KeyboardNavigationTracksSelection", Timeline_KeyboardNavigationTracksSelection);
+        yield return new TestCase("Controls_Timeline_PointerClickSelectsRow", Timeline_PointerClickSelectsRow);
+        yield return new TestCase("Controls_Timeline_SelectionChangedEvent_ReportsTransition", Timeline_SelectionChangedEvent_ReportsTransition);
+        yield return new TestCase("Controls_Timeline_RendersTitleAndStyleHooks", Timeline_RendersTitleAndStyleHooks);
     }
 
     private static Task Badge_RendersLabel()
@@ -615,6 +619,123 @@ internal static class AdvancedPrebuiltWidgetTests
         table.Render(canvas, new Rect(0, 0, 80, 8));
         output = canvas.Render();
         TestAssert.True(output.Contains("\u001b[2;", StringComparison.Ordinal), "TreeTable disabled rows should include muted styling.");
+        return Task.CompletedTask;
+    }
+
+    private static Task Timeline_KeyboardNavigationTracksSelection()
+    {
+        var timeline = new Timeline
+        {
+            IsFocused = true,
+            Border = BorderStyle.None,
+        };
+        timeline.SetEntries(
+        [
+            new TimelineEntry("a", "Started", "09:00"),
+            new TimelineEntry("b", "Queued", "09:05"),
+            new TimelineEntry("c", "Running", "09:10"),
+            new TimelineEntry("d", "Done", "09:15"),
+        ]);
+
+        timeline.Handle(new KeyPressed(Key.Down));
+        timeline.Handle(new KeyPressed(Key.PageDown));
+        timeline.Handle(new KeyPressed(Key.End));
+        timeline.Handle(new KeyPressed(Key.Up));
+        timeline.Handle(new KeyPressed(Key.Home));
+
+        TestAssert.Equal("a", timeline.SelectedItem?.Id ?? string.Empty, "Timeline Home key should move selection to first entry.");
+        TestAssert.True(timeline.Select(3), "Timeline Select should allow direct selection.");
+        TestAssert.Equal("d", timeline.SelectedItem?.Id ?? string.Empty, "Timeline Select should update selected entry.");
+        return Task.CompletedTask;
+    }
+
+    private static Task Timeline_PointerClickSelectsRow()
+    {
+        var timeline = new Timeline
+        {
+            Border = BorderStyle.None,
+        };
+        timeline.SetEntries(
+        [
+            new TimelineEntry("a", "Started", "09:00"),
+            new TimelineEntry("b", "Queued", "09:05"),
+            new TimelineEntry("c", "Running", "09:10"),
+        ]);
+
+        var changed = timeline.Handle(
+            new PointerInput(PointerEventKind.Press, PointerButton.Left, 1, 1),
+            new Rect(0, 0, 40, 4));
+
+        TestAssert.True(changed, "Timeline pointer press should select clicked row.");
+        TestAssert.Equal("b", timeline.SelectedItem?.Id ?? string.Empty, "Timeline pointer selection should map row to timeline entry.");
+        return Task.CompletedTask;
+    }
+
+    private static Task Timeline_SelectionChangedEvent_ReportsTransition()
+    {
+        var timeline = new Timeline
+        {
+            IsFocused = true,
+            Border = BorderStyle.None,
+        };
+        timeline.SetEntries(
+        [
+            new TimelineEntry("a", "Started", "09:00"),
+            new TimelineEntry("b", "Queued", "09:05"),
+        ]);
+        TimelineSelectionChangedEventArgs? args = null;
+        timeline.SelectionChanged += (_, eventArgs) => args = eventArgs;
+
+        timeline.Handle(new KeyPressed(Key.Down));
+
+        TestAssert.True(args is not null, "Timeline should raise selection changed when selection moves.");
+        TestAssert.Equal(0, args!.PreviousIndex, "Timeline event should expose previous index.");
+        TestAssert.Equal(1, args.SelectedIndex, "Timeline event should expose selected index.");
+        TestAssert.Equal("a", args.PreviousItem?.Id ?? string.Empty, "Timeline event should expose previous item.");
+        TestAssert.Equal("b", args.SelectedItem?.Id ?? string.Empty, "Timeline event should expose selected item.");
+        return Task.CompletedTask;
+    }
+
+    private static Task Timeline_RendersTitleAndStyleHooks()
+    {
+        var timeline = new Timeline
+        {
+            Title = "Timeline",
+            IsFocused = true,
+            FocusMarker = "!",
+            Border = BorderStyle.SingleLine,
+            FocusedTitleStyle = TeaStyle.Empty.WithUnderline().WithForeground(AnsiColor.BrightMagenta),
+            TimestampStyle = TeaStyle.Empty.WithForeground(AnsiColor.BrightBlue),
+            LabelStyle = TeaStyle.Empty.WithForeground(AnsiColor.BrightCyan),
+            ContentStyle = TeaStyle.Empty.WithForeground(AnsiColor.BrightGreen),
+            SeparatorStyle = TeaStyle.Empty.WithForeground(AnsiColor.BrightYellow),
+            SelectedRowStyle = TeaStyle.Empty.WithBold(),
+            MutedStyle = TeaStyle.Empty.WithDim(),
+        };
+        timeline.SetEntries(
+        [
+            new TimelineEntry("a", "Started", "09:00", status: "ok", isMuted: true),
+            new TimelineEntry("b", "Running", "09:05", content: "Worker A"),
+        ]);
+        timeline.Select(1);
+        var canvas = new Canvas(160, 6);
+
+        timeline.Render(canvas, new Rect(0, 0, 160, 6));
+        var output = canvas.Render();
+
+        TestAssert.True(output.Contains("Timeline !", StringComparison.Ordinal), "Timeline should render focused title marker.");
+        TestAssert.True(output.Contains("\u001b[4;38;5;13m", StringComparison.Ordinal), "Timeline should render focused title style.");
+        var hasTimestampColor = output.Contains("\u001b[38;5;12m", StringComparison.Ordinal)
+            || output.Contains(";5;12m", StringComparison.Ordinal)
+            || output.Contains("\u001b[94m", StringComparison.Ordinal);
+        TestAssert.True(hasTimestampColor, "Timeline should render timestamp style.");
+        var hasSeparatorColor = output.Contains("\u001b[38;5;11m", StringComparison.Ordinal)
+            || output.Contains(";5;11m", StringComparison.Ordinal)
+            || output.Contains("\u001b[93m", StringComparison.Ordinal)
+            || output.Contains("\u001b[33m", StringComparison.Ordinal);
+        TestAssert.True(hasSeparatorColor, "Timeline should render separator/status style.");
+        TestAssert.True(output.Contains("Worker A", StringComparison.Ordinal), "Timeline should render entry content text.");
+        TestAssert.True(output.Contains("\u001b[2;", StringComparison.Ordinal), "Timeline muted rows should include dim style.");
         return Task.CompletedTask;
     }
 }
