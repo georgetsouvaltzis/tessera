@@ -7,6 +7,11 @@
     <IsPackable>false</IsPackable>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)' == 'Release'">
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <TeaSharpAllowUnsafe>true</TeaSharpAllowUnsafe>
+  </PropertyGroup>
+
   <ItemGroup>
     <ProjectReference Include="..\..\src\TeaSharp\TeaSharp.csproj" />
   </ItemGroup>
