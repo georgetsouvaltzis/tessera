@@ -32,8 +32,12 @@ All agents must treat this file as the source of truth for scope, sequencing, ow
   - canonical onboarding progression established (`HelloWorld` -> `CounterForm` -> `WorkspaceApp`)
   - boundary guardrails active
 - **M2: Theme Contract** -> **In Progress**
-  - semantic token model and built-in palette types in flight
-  - control-level style hooks rollout ongoing
+  - `TeaThemeControlExtensions` split into domain partial files (`Basic`, `InputValue`, `Navigation`, `NavigationOverlay`, `DataAndFlow`, `ExplorerAndFeedback`)
+  - direct token mappings landed for input/value controls (`TextArea`, `Toggle`, `Slider`, `Spinner`, `ProgressBar`, `NumberInput`, `DatePicker`, `TimePicker`)
+  - direct token mappings landed for navigation/overlay controls (`Choice`, `ComboBox`, `TreeView`, `MenuBar`, `ContextMenu`, `CommandPalette`, `Notifications`)
+  - control-level style hooks rollout remains in progress for remaining controls/test hardening
+- **WS-D benchmark harness status**
+  - `BenchmarkSwitcher` discoverability is wired and `--list flat` lists startup, large-table, and styled-heavy scenarios
 
 ## Workstreams
 ### WS-A: Public API and Runtime Boundaries

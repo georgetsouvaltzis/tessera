@@ -228,6 +228,18 @@ Their old `TeaSharp.Components.Prebuilt.*` counterparts have been removed instea
 - normal apps should not manage input scopes or region routing manually
 - custom widgets should remain possible through a small stable contract
 
+## Theme Mapping Status
+
+Current shipped theme mapping is centralized in `TeaSharp.Styles.TeaThemeControlExtensions` and split into domain partial files (`Basic`, `InputValue`, `Navigation`, `NavigationOverlay`, `DataAndFlow`, `ExplorerAndFeedback`).
+
+Input/value controls with direct token mappings:
+
+- `TextArea`, `Toggle`, `Slider`, `Spinner`, `ProgressBar`, `NumberInput`, `DatePicker`, `TimePicker`
+
+Navigation/overlay controls with direct token mappings:
+
+- `Choice`, `ComboBox`, `TreeView`, `MenuBar`, `ContextMenu`, `CommandPalette`, `Notifications`
+
 ## Follow-up Targets
 
 1. keep moving control authoring toward a single obvious configuration style

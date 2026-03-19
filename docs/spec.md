@@ -92,6 +92,9 @@ V1 theming is semantic-token based with override hierarchy:
 - semantic tokens for text/surface/border/state/focus/selection/accent
 - built-in palettes (Catppuccin, Rosé Pine) plus custom palette
 - override precedence: global theme -> control type -> control instance -> state
+- `TeaThemeControlExtensions` is split by domain (`Basic`, `InputValue`, `Navigation`, `NavigationOverlay`, `DataAndFlow`, `ExplorerAndFeedback`)
+- mapped input/value controls include `TextArea`, `Toggle`, `Slider`, `Spinner`, `ProgressBar`, `NumberInput`, `DatePicker`, `TimePicker`
+- mapped navigation/overlay controls include `Choice`, `ComboBox`, `TreeView`, `MenuBar`, `ContextMenu`, `CommandPalette`, `Notifications`
 
 Focus visuals must be theme-driven (for example focused border style/color), not limited to marker suffixes.
 

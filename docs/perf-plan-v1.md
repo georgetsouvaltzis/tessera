@@ -68,6 +68,11 @@ Harness quick commands:
 - `dotnet run --project benchmarks/TeaSharp.Benchmarks --no-build -- --list flat`
 - `dotnet run --project benchmarks/TeaSharp.Benchmarks --no-build -- --filter "*"`
 
+Expected `--list flat` scenarios:
+- `TeaSharp.Benchmarks.StartupRenderBenchmarks.StartupLikeFirstFrameRender`
+- `TeaSharp.Benchmarks.LargeTableBenchmarks.RenderLargeTableFrame`
+- `TeaSharp.Benchmarks.StyledHeavyOutputBenchmarks.RenderStyledHeavyFrame`
+
 ## Comparison Protocol vs Other TUIs
 
 Comparison is methodology-first, not marketing-first:

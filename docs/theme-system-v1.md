@@ -169,6 +169,31 @@ Default policy for all controls:
 - error/warning/success states are token-driven and accessible by contrast
 - disabled/read-only states are clearly lower emphasis, still readable
 
+## Implemented Extension Layout
+
+`TeaThemeControlExtensions` is split into domain partial files:
+
+- `TeaThemeControlExtensions.Basic.cs`
+- `TeaThemeControlExtensions.InputValue.cs`
+- `TeaThemeControlExtensions.Navigation.cs`
+- `TeaThemeControlExtensions.NavigationOverlay.cs`
+- `TeaThemeControlExtensions.DataAndFlow.cs`
+- `TeaThemeControlExtensions.ExplorerAndFeedback.cs`
+
+Mapped controls expose:
+
+- `ApplyTheme(TeaTheme theme)`
+- `ApplyThemeDefaults(TeaTheme theme)`
+- overloads taking `TeaThemeOverrides`, `baseTheme`, and `TeaThemeVisualState`
+
+Input/value mapping coverage includes:
+
+- `TextArea`, `Toggle`, `Slider`, `Spinner`, `ProgressBar`, `NumberInput`, `DatePicker`, `TimePicker`
+
+Navigation/overlay mapping coverage includes:
+
+- `Choice`, `ComboBox`, `TreeView`, `MenuBar`, `ContextMenu`, `CommandPalette`, `Notifications`
+
 ## V1 Rollout
 
 Phase 1 (baseline controls):
