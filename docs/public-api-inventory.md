@@ -80,6 +80,8 @@ These are the types new applications should discover first.
 - `TeaSharp.Controls.Toolbar`
 - `TeaSharp.Controls.CommandBar`
 - `TeaSharp.Controls.SearchBox`
+- `TeaSharp.Controls.DiffView`
+- `TeaSharp.Controls.PropertyGrid`
 - `TeaSharp.Controls.MenuItem`
 - `TeaSharp.Controls.Control`
 
@@ -197,6 +199,8 @@ The first root controls that already own their implementation directly are:
 - `StatusBar`
 - `Paginator`
 - `SearchBox`
+- `DiffView`
+- `PropertyGrid`
 
 Their old `TeaSharp.Components.Prebuilt.*` counterparts have been removed instead of kept as compatibility wrappers.
 

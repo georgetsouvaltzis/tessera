@@ -147,6 +147,8 @@ Root controls currently include:
 - `MultiSelect`
 - `Paginator`
 - `SearchBox`
+- `DiffView`
+- `PropertyGrid`
 - `RadioGroup`
 - `ProgressBar`
 - `LogView`

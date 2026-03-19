@@ -50,6 +50,8 @@ Preferred public catalog:
 39. `Toolbar`
 40. `CommandBar`
 41. `SearchBox`
+42. `DiffView`
+43. `PropertyGrid`
 
 These live in `TeaSharp.Controls`.
 

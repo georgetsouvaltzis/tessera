@@ -8,7 +8,7 @@ This roadmap defines the widget-heavy Public V1 path targeting **40-50 built-in 
 - `Label`, `Button`, `TextInput`, `TextArea`, `StatusBar`
 - `Choice`, `ComboBox`, `ListView<T>`, `Table`, `TreeView`, `TreeItem`, `Tabs`, `MenuBar`, `Toolbar`
 - `Dialog`, `Modal`, `Notifications`, `ContextMenu`, `CommandPalette`
-- `CommandBar`, `SearchBox`
+- `CommandBar`, `SearchBox`, `DiffView`, `PropertyGrid`
 - `Toggle`, `Slider`, `Spinner`, `ProgressBar`, `LogView`
 - `Badge`, `Accordion`, `NumberInput`, `DatePicker`, `TimePicker`
 - `MultiSelect`, `RadioGroup`, `Gauge`, `MiniLog`, `StatsCard`
@@ -54,10 +54,10 @@ Acceptance for V1 tranche:
 - `[ ]` `DataGrid`
 - `[ ]` `FuzzyFinder`
 - `[x]` `CommandBar` (shipped)
-- `[ ]` `PropertyGrid`
+- `[x]` `PropertyGrid` (shipped)
 - `[ ]` `FileExplorer`
 - `[ ]` `TreeTable`
-- `[ ]` `DiffView`
+- `[x]` `DiffView` (shipped)
 - `[x]` `Toolbar` (shipped)
 - `[x]` `SearchBox` (shipped)
 - `[ ]` `ToastCenter`
