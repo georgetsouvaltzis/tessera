@@ -217,19 +217,41 @@ public sealed class Canvas
 
     private void WriteTextFast(int x, int y, string text, int maxWidth)
     {
-        var cx = x;
-        var written = 0;
-        foreach (var ch in text)
+        var lineEnd = text.AsSpan().IndexOfAny('\r', '\n');
+        var sourceLength = lineEnd < 0 ? text.Length : lineEnd;
+        if (sourceLength <= 0)
         {
-            if (ch is '\r' or '\n' || written >= maxWidth)
-            {
-                break;
-            }
-
-            Set(cx, y, ch);
-            cx++;
-            written++;
+            return;
         }
+
+        var maxSourceLength = Math.Min(sourceLength, maxWidth);
+        if (maxSourceLength <= 0 || x >= Width || x + maxSourceLength <= 0)
+        {
+            return;
+        }
+
+        var sourceStart = 0;
+        var targetX = x;
+        var copyLength = maxSourceLength;
+        if (targetX < 0)
+        {
+            sourceStart = -targetX;
+            targetX = 0;
+            copyLength -= sourceStart;
+            if (copyLength <= 0)
+            {
+                return;
+            }
+        }
+
+        copyLength = Math.Min(copyLength, Width - targetX);
+        if (copyLength <= 0)
+        {
+            return;
+        }
+
+        var rowStart = y * Width;
+        text.AsSpan(sourceStart, copyLength).CopyTo(_cells!.AsSpan(rowStart + targetX, copyLength));
     }
 
     /// <summary>
@@ -237,17 +259,7 @@ public sealed class Canvas
     /// </summary>
     public void DrawHorizontalLine(int x, int y, int width, char value = '─')
     {
-        if (width <= 0 || y < 0 || y >= Height)
-        {
-            return;
-        }
-
-        var start = Math.Max(0, x);
-        var end = Math.Min(Width, x + width);
-        for (var cx = start; cx < end; cx++)
-        {
-            Set(cx, y, value);
-        }
+        FillRow(y, x, width, value);
     }
 
     /// <summary>
@@ -265,6 +277,46 @@ public sealed class Canvas
         for (var cy = start; cy < end; cy++)
         {
             Set(x, cy, value);
+        }
+    }
+
+    internal void FillRect(Rect rect, char fill)
+    {
+        var clipped = Rect.Intersect(rect, Bounds);
+        if (clipped.IsEmpty)
+        {
+            return;
+        }
+
+        for (var y = clipped.Y; y < clipped.Bottom; y++)
+        {
+            FillRow(y, clipped.X, clipped.Width, fill);
+        }
+    }
+
+    internal void FillRow(int y, int x, int width, char fill)
+    {
+        if (width <= 0 || y < 0 || y >= Height)
+        {
+            return;
+        }
+
+        var start = Math.Max(0, x);
+        var end = Math.Min(Width, x + width);
+        if (start >= end)
+        {
+            return;
+        }
+
+        if (TextMode == CanvasTextMode.Fast)
+        {
+            Array.Fill(_cells!, fill, (y * Width) + start, end - start);
+            return;
+        }
+
+        for (var cx = start; cx < end; cx++)
+        {
+            _graphemeBuffer!.Set(cx, y, fill);
         }
     }
 

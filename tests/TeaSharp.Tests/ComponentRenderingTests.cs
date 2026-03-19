@@ -10,6 +10,7 @@ internal static class ComponentRenderingTests
     public static IEnumerable<TestCase> Cases()
     {
         yield return new TestCase("Components_Canvas_DrawBox_RendersFrameAndTitle", Canvas_DrawBox_RendersFrameAndTitle);
+        yield return new TestCase("Components_Canvas_WriteText_ClipsAndStopsAtLineBreaks", Canvas_WriteText_ClipsAndStopsAtLineBreaks);
         yield return new TestCase("Components_Widgets_DrawProgressBar_RendersExpectedFill", Widgets_DrawProgressBar_RendersExpectedFill);
         yield return new TestCase("Components_Widgets_DrawSparkline_MapsValuesToBlocks", Widgets_DrawSparkline_MapsValuesToBlocks);
         yield return new TestCase("Components_Widgets_DrawList_MarksSelectedRow", Widgets_DrawList_MarksSelectedRow);
@@ -30,6 +31,31 @@ internal static class ComponentRenderingTests
         TestAssert.True(output.Contains('┌'), "Box should include top-left corner.");
         TestAssert.True(output.Contains('┘'), "Box should include bottom-right corner.");
         TestAssert.True(output.Contains(" Panel ", StringComparison.Ordinal), "Box should render title in top border.");
+        return Task.CompletedTask;
+    }
+
+    private static Task Canvas_WriteText_ClipsAndStopsAtLineBreaks()
+    {
+        // Arrange
+        var canvas = new Canvas(6, 1);
+
+        // Act
+        canvas.Clear('.');
+        canvas.WriteText(-2, 0, "ABCDE", 6);
+        var clipped = canvas.Render();
+
+        canvas.Clear('.');
+        canvas.WriteText(0, 0, "AB\nCD", 6);
+        var newlineStopped = canvas.Render();
+
+        canvas.Clear('.');
+        canvas.WriteText(0, 0, "AB\rCD", 6);
+        var carriageReturnStopped = canvas.Render();
+
+        // Assert
+        TestAssert.Equal("CDE...", clipped, "WriteText should clip negative x offsets without shifting visible characters.");
+        TestAssert.Equal("AB....", newlineStopped, "WriteText should stop at newline in fast text mode.");
+        TestAssert.Equal("AB....", carriageReturnStopped, "WriteText should stop at carriage return in fast text mode.");
         return Task.CompletedTask;
     }
 

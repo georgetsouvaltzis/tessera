@@ -84,6 +84,7 @@ internal static class PrebuiltWidgetTests
         yield return new TestCase("Controls_Dialog_AcceptsAndDismisses", Dialog_AcceptsAndDismisses);
         yield return new TestCase("Controls_Dialog_Events_FirePerDecision", Dialog_Events_FirePerDecision);
         yield return new TestCase("Controls_Dialog_TryConsumeResult_IsSingleUse", Dialog_TryConsumeResult_IsSingleUse);
+        yield return new TestCase("Controls_Dialog_Render_ClipsBackdropToRequestedRect", Dialog_Render_ClipsBackdropToRequestedRect);
     }
 
     private static Task Label_RendersText()
@@ -1669,6 +1670,27 @@ internal static class PrebuiltWidgetTests
 
         TestAssert.Equal(1, accepted, "Dialog should raise accepted exactly once for an accept decision.");
         TestAssert.Equal(1, dismissed, "Dialog should raise dismissed exactly once for a dismiss decision.");
+        return Task.CompletedTask;
+    }
+
+    private static Task Dialog_Render_ClipsBackdropToRequestedRect()
+    {
+        var canvas = new Canvas(12, 6);
+        canvas.Clear('#');
+        var dialog = new Dialog
+        {
+            IsVisible = true,
+            IsFocused = true,
+            Title = "Confirm",
+            BodyLines = ["Apply?"],
+        };
+
+        dialog.Render(canvas, new Rect(2, 1, 8, 4));
+
+        TestAssert.Equal('#', canvas.Get(0, 0), "Dialog should not mutate cells outside the requested rect.");
+        TestAssert.Equal('#', canvas.Get(11, 5), "Dialog should preserve content outside the clipped backdrop bounds.");
+        TestAssert.Equal('·', canvas.Get(2, 1), "Dialog should fill backdrop cells inside the requested rect.");
+        TestAssert.Equal('#', canvas.Get(1, 1), "Dialog backdrop fill should remain clipped and not bleed left.");
         return Task.CompletedTask;
     }
 

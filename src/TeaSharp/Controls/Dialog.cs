@@ -197,13 +197,7 @@ public sealed class Dialog : Control
             return;
         }
 
-        for (var y = clipped.Y; y < clipped.Bottom; y++)
-        {
-            for (var x = clipped.X; x < clipped.Right; x++)
-            {
-                canvas.Set(x, y, '·');
-            }
-        }
+        canvas.FillRect(clipped, '·');
 
         if (clipped.Width < 4 || clipped.Height < 4)
         {
@@ -216,7 +210,7 @@ public sealed class Dialog : Control
         var modalY = clipped.Y + (clipped.Height - modalHeight) / 2;
         var modal = new Rect(modalX, modalY, modalWidth, modalHeight);
 
-        FillRect(canvas, modal, ' ');
+        canvas.FillRect(modal, ' ');
         var body = FrameLayout.DrawFrameAndResolveContent(canvas, modal, RenderTitle(), Border, Padding);
         if (body.IsEmpty)
         {
@@ -285,23 +279,6 @@ public sealed class Dialog : Control
         }
 
         return true;
-    }
-
-    private static void FillRect(Canvas canvas, Rect rect, char fill)
-    {
-        var clipped = Rect.Intersect(rect, canvas.Bounds);
-        if (clipped.IsEmpty)
-        {
-            return;
-        }
-
-        for (var y = clipped.Y; y < clipped.Bottom; y++)
-        {
-            for (var x = clipped.X; x < clipped.Right; x++)
-            {
-                canvas.Set(x, y, fill);
-            }
-        }
     }
 
     private static string ApplyStyle(string text, TeaStyle style)
