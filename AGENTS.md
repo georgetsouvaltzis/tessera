@@ -5,6 +5,7 @@
 - `docs/widget-roadmap-v1.md` is the authoritative widget scope contract for M3.
 - `docs/perf-plan-v1.md` is the authoritative performance strategy and release-gate policy.
 - If a task conflicts with older docs, follow `v1-master-plan.md` and update outdated docs in the same change.
+- Execute work in strict phase order from `v1-master-plan.md`: correctness -> API simplification -> visual polish -> expansion/perf/docs freeze.
 
 ## Project Structure
 - `src/TeaSharp`: default public app-authoring API.
@@ -24,6 +25,7 @@
 - Theme and style are first-class Public V1 concerns.
 - Use semantic theme tokens and explicit override hierarchy (global -> control-type -> instance -> state).
 - Hardcoded visual affordances (for example focus markers) should migrate to theme-driven behavior.
+- For dropdown-style controls, prefer typed hooks (`DropdownGlyphSet`, `BorderStyleText`, `FocusedBorderStyleText`) over inline hardcoded glyph strings.
 
 ## Coordination Model
 - One logical task per agent lane.
@@ -50,6 +52,7 @@ For performance-sensitive or release-track slices, run checks required by `docs/
 - Keep files under 500 LOC where practical; split when needed.
 - Fix root causes, not temporary patches.
 - Add regression tests when fixing bugs.
+- For changed public APIs, add meaningful XML docs (`<summary>`, relevant `<param>`, `<returns>`, and `<remarks>` when behavior/ordering is non-obvious).
 
 ## Commit Rules
 - Conventional commit prefixes: `feat|fix|refactor|build|chore|docs|perf|test`.
