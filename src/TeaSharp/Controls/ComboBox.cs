@@ -60,6 +60,21 @@ public sealed class ComboBox : Control
     public TeaStyle DisabledStyle { get; set; } = TeaStyle.Empty;
 
     /// <summary>
+    /// Gets or sets the style applied to border glyphs when the control is not focused.
+    /// </summary>
+    public TeaStyle BorderStyleText { get; set; } = TeaStyle.Empty;
+
+    /// <summary>
+    /// Gets or sets the style applied to border glyphs when the control is focused.
+    /// </summary>
+    public TeaStyle FocusedBorderStyleText { get; set; } = TeaStyle.Empty;
+
+    /// <summary>
+    /// Gets or sets glyphs used to render field indicators and option markers.
+    /// </summary>
+    public DropdownGlyphSet Glyphs { get; set; } = DropdownGlyphSet.Default;
+
+    /// <summary>
     /// Gets or sets the placeholder shown when no filter text is present.
     /// </summary>
     public string Placeholder
@@ -313,7 +328,8 @@ public sealed class ComboBox : Control
             clipped,
             Border == BorderStyle.None ? null : RenderTitle(),
             Border,
-            Padding);
+            Padding,
+            ResolveBorderStyleText());
         if (content.IsEmpty)
         {
             return;
@@ -326,7 +342,7 @@ public sealed class ComboBox : Control
     internal override LayoutMeasurement Measure(in Rect availableBounds)
     {
         var fieldText = _input.BuildFrame(Math.Max(1, availableBounds.Width)).Text;
-        var width = ControlTextLayout.MeasureDisplayWidth($"▾ {fieldText}") + Padding.Horizontal;
+        var width = ControlTextLayout.MeasureDisplayWidth($"{Glyphs.CollapsedIndicator} {fieldText}") + Padding.Horizontal;
         var height = Padding.Vertical + 1;
         if (Border != BorderStyle.None)
         {
@@ -344,7 +360,7 @@ public sealed class ComboBox : Control
     {
         var frameWidth = Math.Max(1, content.Width - 2);
         var frame = _input.BuildFrame(frameWidth);
-        var indicator = IsOpen ? "▴" : "▾";
+        var indicator = IsOpen ? Glyphs.ExpandedIndicator : Glyphs.CollapsedIndicator;
         var valueStyle = ResolveFieldValueStyle(frame.PlaceholderVisible);
         var text = $"{ApplyStyle(indicator, valueStyle)} {ApplyStyle(frame.Text, valueStyle)}";
         canvas.WriteText(content.X, content.Y, text, content.Width);
@@ -370,8 +386,8 @@ public sealed class ComboBox : Control
         for (var visibleIndex = start; visibleIndex < end; visibleIndex++, row++)
         {
             var itemIndex = _options.VisibleItemIndexAt(visibleIndex);
-            var highlight = visibleIndex == _options.HighlightedVisibleIndex ? "▸" : " ";
-            var selectedMarker = itemIndex == _options.SelectedIndex ? "✓" : " ";
+            var highlight = visibleIndex == _options.HighlightedVisibleIndex ? Glyphs.HighlightedOptionMarker : " ";
+            var selectedMarker = itemIndex == _options.SelectedIndex ? Glyphs.SelectedOptionMarker : " ";
             var text = $"{highlight}{selectedMarker} {_options.Items[itemIndex]}";
             canvas.WriteText(content.X, content.Y + 1 + row, ApplyStyle(text, ResolveOptionStyle(itemIndex, visibleIndex)), content.Width);
         }
@@ -474,6 +490,22 @@ public sealed class ComboBox : Control
         if (visibleIndex == _options.HighlightedVisibleIndex)
         {
             style = style.Merge(HoveredOptionStyle);
+        }
+
+        if (IsDisabled)
+        {
+            style = style.Merge(DisabledStyle).Merge(MutedStyle);
+        }
+
+        return style;
+    }
+
+    private TeaStyle ResolveBorderStyleText()
+    {
+        var style = BorderStyleText;
+        if (IsFocused)
+        {
+            style = style.Merge(FocusedBorderStyleText);
         }
 
         if (IsDisabled)

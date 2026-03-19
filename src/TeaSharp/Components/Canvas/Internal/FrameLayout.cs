@@ -21,4 +21,20 @@ internal static class FrameLayout
 
         return ResolveContentRect(bounds, border, padding);
     }
+
+    public static Rect DrawFrameAndResolveContent(
+        Canvas canvas,
+        Rect bounds,
+        string? title,
+        BorderStyle border,
+        Thickness padding,
+        TeaSharp.Styles.TeaStyle borderStyleText)
+    {
+        if (border != BorderStyle.None)
+        {
+            canvas.DrawBox(bounds, title, border, borderStyleText);
+        }
+
+        return ResolveContentRect(bounds, border, padding);
+    }
 }

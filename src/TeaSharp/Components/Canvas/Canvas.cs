@@ -1,4 +1,5 @@
 using TeaSharp.Components.Primitives.Internal;
+using TeaSharp.Styles;
 using System.Text;
 
 namespace TeaSharp.Components.Primitives;
@@ -361,6 +362,63 @@ public sealed class Canvas
     }
 
     /// <summary>
+    /// Draws a border box with an optional title and optional border glyph style.
+    /// </summary>
+    /// <remarks>
+    /// Styled border rendering is applied only when <see cref="TextMode"/> is <see cref="CanvasTextMode.GraphemeAware"/>.
+    /// In fast mode, border style hooks are ignored to preserve allocation-free rendering behavior.
+    /// </remarks>
+    public void DrawBox(Rect rect, string? title, BorderStyle borderStyle, TeaStyle borderStyleText)
+    {
+        if (borderStyle == BorderStyle.None)
+        {
+            return;
+        }
+
+        if (borderStyleText.IsEmpty || TextMode == CanvasTextMode.Fast)
+        {
+            DrawBox(rect, title, borderStyle);
+            return;
+        }
+
+        var clipped = Rect.Intersect(rect, Bounds);
+        if (clipped.IsEmpty || clipped.Width < 2 || clipped.Height < 2)
+        {
+            return;
+        }
+
+        var (horizontal, vertical, topLeft, topRight, bottomLeft, bottomRight) = borderStyle switch
+        {
+            BorderStyle.Rounded => ('─', '│', '╭', '╮', '╰', '╯'),
+            BorderStyle.Heavy => ('━', '┃', '┏', '┓', '┗', '┛'),
+            BorderStyle.Ascii => ('-', '|', '+', '+', '+', '+'),
+            _ => ('─', '│', '┌', '┐', '└', '┘'),
+        };
+
+        for (var x = clipped.X + 1; x < clipped.Right - 1; x++)
+        {
+            WriteStyledCell(x, clipped.Y, horizontal, borderStyleText);
+            WriteStyledCell(x, clipped.Bottom - 1, horizontal, borderStyleText);
+        }
+
+        for (var y = clipped.Y + 1; y < clipped.Bottom - 1; y++)
+        {
+            WriteStyledCell(clipped.X, y, vertical, borderStyleText);
+            WriteStyledCell(clipped.Right - 1, y, vertical, borderStyleText);
+        }
+
+        WriteStyledCell(clipped.X, clipped.Y, topLeft, borderStyleText);
+        WriteStyledCell(clipped.Right - 1, clipped.Y, topRight, borderStyleText);
+        WriteStyledCell(clipped.X, clipped.Bottom - 1, bottomLeft, borderStyleText);
+        WriteStyledCell(clipped.Right - 1, clipped.Bottom - 1, bottomRight, borderStyleText);
+
+        if (!string.IsNullOrWhiteSpace(title))
+        {
+            WriteText(clipped.X + 2, clipped.Y, $" {title.Trim()} ", clipped.Width - 4);
+        }
+    }
+
+    /// <summary>
     /// Renders the canvas into a string frame.
     /// </summary>
     public string Render()
@@ -384,5 +442,15 @@ public sealed class Canvas
         }
 
         return sb.ToString();
+    }
+
+    private void WriteStyledCell(int x, int y, char value, TeaStyle style)
+    {
+        if (x < 0 || y < 0 || x >= Width || y >= Height)
+        {
+            return;
+        }
+
+        WriteText(x, y, style.Render(value.ToString()));
     }
 }

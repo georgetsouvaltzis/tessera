@@ -17,6 +17,8 @@ public static partial class TeaThemeControlExtensions
         control.HoveredOptionStyle = theme.Accent.Secondary;
         control.MutedStyle = theme.Text.Muted;
         control.DisabledStyle = theme.Text.Muted;
+        control.BorderStyleText = theme.Border.Default;
+        control.FocusedBorderStyleText = theme.Border.Focused.Merge(theme.Focus.Border);
         return control;
     }
 
@@ -45,6 +47,8 @@ public static partial class TeaThemeControlExtensions
         control.HoveredOptionStyle = ApplyDefault(control.HoveredOptionStyle, theme.Accent.Secondary);
         control.MutedStyle = ApplyDefault(control.MutedStyle, theme.Text.Muted);
         control.DisabledStyle = ApplyDefault(control.DisabledStyle, theme.Text.Muted);
+        control.BorderStyleText = ApplyDefault(control.BorderStyleText, theme.Border.Default);
+        control.FocusedBorderStyleText = ApplyDefault(control.FocusedBorderStyleText, theme.Border.Focused.Merge(theme.Focus.Border));
         return control;
     }
 
@@ -72,6 +76,8 @@ public static partial class TeaThemeControlExtensions
         control.HoveredOptionStyle = theme.Accent.Secondary;
         control.MutedStyle = theme.Text.Muted;
         control.DisabledStyle = theme.Text.Muted;
+        control.BorderStyleText = theme.Border.Default;
+        control.FocusedBorderStyleText = theme.Border.Focused.Merge(theme.Focus.Border);
         return control;
     }
 
@@ -101,6 +107,8 @@ public static partial class TeaThemeControlExtensions
         control.HoveredOptionStyle = ApplyDefault(control.HoveredOptionStyle, theme.Accent.Secondary);
         control.MutedStyle = ApplyDefault(control.MutedStyle, theme.Text.Muted);
         control.DisabledStyle = ApplyDefault(control.DisabledStyle, theme.Text.Muted);
+        control.BorderStyleText = ApplyDefault(control.BorderStyleText, theme.Border.Default);
+        control.FocusedBorderStyleText = ApplyDefault(control.FocusedBorderStyleText, theme.Border.Focused.Merge(theme.Focus.Border));
         return control;
     }
 

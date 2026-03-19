@@ -53,6 +53,21 @@ public sealed class Choice : Control
     public TeaStyle DisabledStyle { get; set; } = TeaStyle.Empty;
 
     /// <summary>
+    /// Gets or sets the style applied to border glyphs when the control is not focused.
+    /// </summary>
+    public TeaStyle BorderStyleText { get; set; } = TeaStyle.Empty;
+
+    /// <summary>
+    /// Gets or sets the style applied to border glyphs when the control is focused.
+    /// </summary>
+    public TeaStyle FocusedBorderStyleText { get; set; } = TeaStyle.Empty;
+
+    /// <summary>
+    /// Gets or sets glyphs used to render field indicators and option markers.
+    /// </summary>
+    public DropdownGlyphSet Glyphs { get; set; } = DropdownGlyphSet.Default;
+
+    /// <summary>
     /// Gets or sets the field border style.
     /// </summary>
     public BorderStyle Border
@@ -283,7 +298,8 @@ public sealed class Choice : Control
             clipped,
             Border == BorderStyle.None ? null : RenderTitle(),
             Border,
-            Padding);
+            Padding,
+            ResolveBorderStyleText());
         if (content.IsEmpty)
         {
             return;
@@ -296,7 +312,7 @@ public sealed class Choice : Control
     internal override LayoutMeasurement Measure(in Rect availableBounds)
     {
         var selected = _options.Count == 0 ? "(empty)" : SelectedItem;
-        var width = ControlTextLayout.MeasureDisplayWidth($"▾ {selected}") + Padding.Horizontal;
+        var width = ControlTextLayout.MeasureDisplayWidth($"{Glyphs.CollapsedIndicator} {selected}") + Padding.Horizontal;
         var height = Padding.Vertical + 1;
         if (Border != BorderStyle.None)
         {
@@ -312,7 +328,7 @@ public sealed class Choice : Control
 
     private void RenderField(Canvas canvas, Rect content)
     {
-        var indicator = IsOpen ? "▴" : "▾";
+        var indicator = IsOpen ? Glyphs.ExpandedIndicator : Glyphs.CollapsedIndicator;
         var selected = _options.Count == 0 ? "(empty)" : SelectedItem;
         var valueStyle = ResolveFieldValueStyle();
         var text = $"{ApplyStyle(indicator, valueStyle)} {ApplyStyle(selected, valueStyle)}";
@@ -333,8 +349,8 @@ public sealed class Choice : Control
         for (var visibleIndex = start; visibleIndex < end; visibleIndex++, row++)
         {
             var itemIndex = _options.VisibleItemIndexAt(visibleIndex);
-            var highlight = visibleIndex == _options.HighlightedVisibleIndex ? "▸" : " ";
-            var selectedMarker = itemIndex == _options.SelectedIndex ? "✓" : " ";
+            var highlight = visibleIndex == _options.HighlightedVisibleIndex ? Glyphs.HighlightedOptionMarker : " ";
+            var selectedMarker = itemIndex == _options.SelectedIndex ? Glyphs.SelectedOptionMarker : " ";
             var text = $"{highlight}{selectedMarker} {_options.Items[itemIndex]}";
             canvas.WriteText(content.X, content.Y + 1 + row, ApplyStyle(text, ResolveOptionStyle(itemIndex, visibleIndex)), content.Width);
         }
@@ -456,6 +472,22 @@ public sealed class Choice : Control
         if (visibleIndex == _options.HighlightedVisibleIndex)
         {
             style = style.Merge(HoveredOptionStyle);
+        }
+
+        if (IsDisabled)
+        {
+            style = style.Merge(DisabledStyle).Merge(MutedStyle);
+        }
+
+        return style;
+    }
+
+    private TeaStyle ResolveBorderStyleText()
+    {
+        var style = BorderStyleText;
+        if (IsFocused)
+        {
+            style = style.Merge(FocusedBorderStyleText);
         }
 
         if (IsDisabled)
