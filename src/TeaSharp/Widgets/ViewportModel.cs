@@ -9,7 +9,6 @@ internal sealed class ViewportModel
 {
     private readonly List<string> _sourceLines = [];
     private readonly List<string> _visualLinesCache = [];
-    private readonly List<string> _renderLinesCache = [];
     private int _maxVisualWidth;
     private bool _visualCacheDirty = true;
 
@@ -88,7 +87,6 @@ internal sealed class ViewportModel
     {
         _sourceLines.Clear();
         _visualLinesCache.Clear();
-        _renderLinesCache.Clear();
         _maxVisualWidth = 0;
         _visualCacheDirty = false;
         XOffset = 0;
@@ -159,8 +157,7 @@ internal sealed class ViewportModel
             YOffset,
             Wrap,
             ShowLineNumbers,
-            HighlightVisualLine,
-            _renderLinesCache);
+            HighlightVisualLine);
     }
 
     private List<string> GetVisualLines()
