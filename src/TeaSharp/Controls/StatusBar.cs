@@ -1,5 +1,6 @@
 using TeaSharp.Components.Primitives;
 using TeaSharp.Layout;
+using TeaSharp.Styles;
 
 namespace TeaSharp.Controls;
 
@@ -26,6 +27,33 @@ public sealed class StatusBar : Control
         set;
     } = ' ';
 
+    /// <summary>
+    /// Gets or sets the style used for <see cref="LeftText"/>.
+    /// </summary>
+    public TeaStyle LeftTextStyle
+    {
+        get;
+        set;
+    } = TeaStyle.Empty;
+
+    /// <summary>
+    /// Gets or sets the style used for <see cref="RightText"/>.
+    /// </summary>
+    public TeaStyle RightTextStyle
+    {
+        get;
+        set;
+    } = TeaStyle.Empty;
+
+    /// <summary>
+    /// Gets or sets the style used for the fill row generated from <see cref="Fill"/>.
+    /// </summary>
+    public TeaStyle FillStyle
+    {
+        get;
+        set;
+    } = TeaStyle.Empty;
+
     public override void Render(Canvas canvas, Rect rect)
     {
         var clipped = Rect.Intersect(rect, canvas.Bounds);
@@ -34,11 +62,36 @@ public sealed class StatusBar : Control
             return;
         }
 
-        var row = new string(Fill, Math.Max(0, clipped.Width)).ToCharArray();
-        CopyToRow(row, 0, LeftText);
+        var leftWidth = Math.Min(clipped.Width, LeftText.Length);
+        var rightWidth = Math.Min(clipped.Width, RightText.Length);
         var rightStart = Math.Max(0, clipped.Width - RightText.Length);
-        CopyToRow(row, rightStart, RightText);
-        canvas.WriteText(clipped.X, clipped.Y, new string(row), clipped.Width);
+        var gapStart = Math.Clamp(leftWidth, 0, clipped.Width);
+        var gapWidth = Math.Max(0, rightStart - gapStart);
+        if (gapWidth > 0)
+        {
+            var fillText = new string(Fill, gapWidth);
+            canvas.WriteText(clipped.X + gapStart, clipped.Y, ApplyStyle(fillText, FillStyle), gapWidth);
+        }
+
+        if (leftWidth > 0)
+        {
+            canvas.WriteText(clipped.X, clipped.Y, ApplyStyle(LeftText, LeftTextStyle), clipped.Width);
+        }
+
+        if (rightStart < clipped.Width)
+        {
+            canvas.WriteText(
+                clipped.X + rightStart,
+                clipped.Y,
+                ApplyStyle(RightText, RightTextStyle),
+                rightWidth);
+        }
+
+        if (leftWidth == 0 && rightWidth == 0)
+        {
+            var fillText = new string(Fill, Math.Max(0, clipped.Width));
+            canvas.WriteText(clipped.X, clipped.Y, ApplyStyle(fillText, FillStyle), clipped.Width);
+        }
     }
 
     internal override LayoutMeasurement Measure(in Rect availableBounds)
@@ -48,17 +101,13 @@ public sealed class StatusBar : Control
             Math.Clamp(1, 0, availableBounds.Height));
     }
 
-    private static void CopyToRow(char[] row, int start, string text)
+    private static string ApplyStyle(string text, TeaStyle style)
     {
-        if (row.Length == 0 || string.IsNullOrEmpty(text) || start >= row.Length)
+        if (string.IsNullOrEmpty(text) || style.IsEmpty)
         {
-            return;
+            return text;
         }
 
-        var index = Math.Max(0, start);
-        for (var i = 0; i < text.Length && index < row.Length; i++, index++)
-        {
-            row[index] = text[i];
-        }
+        return style.Render(text);
     }
 }

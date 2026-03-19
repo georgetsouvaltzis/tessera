@@ -2,6 +2,7 @@ using TeaSharp.Components.Primitives;
 using TeaSharp.Components.Primitives.Internal;
 using TeaSharp.Controls.Internal;
 using TeaSharp.Layout;
+using TeaSharp.Styles;
 using TeaSharp.Widgets;
 
 namespace TeaSharp.Controls;
@@ -55,6 +56,33 @@ public sealed class ListView<T> : Control
         get;
         set;
     }
+
+    /// <summary>
+    /// Gets or sets the style used for unselected and non-hovered rows.
+    /// </summary>
+    public TeaStyle DefaultRowStyle
+    {
+        get;
+        set;
+    } = TeaStyle.Empty;
+
+    /// <summary>
+    /// Gets or sets the style used for hovered rows.
+    /// </summary>
+    public TeaStyle HoveredRowStyle
+    {
+        get;
+        set;
+    } = TeaStyle.Empty;
+
+    /// <summary>
+    /// Gets or sets the style used for selected rows.
+    /// </summary>
+    public TeaStyle SelectedRowStyle
+    {
+        get;
+        set;
+    } = TeaStyle.Empty;
 
     /// <summary>
     /// Gets or sets how many items fit in a page-sized view.
@@ -226,18 +254,19 @@ public sealed class ListView<T> : Control
         var rows = _model.VisibleRows();
         if (rows.Count == 0 && content.Height > 0)
         {
-            canvas.WriteText(content.X, content.Y, "(empty)", content.Width);
+            canvas.WriteText(content.X, content.Y, ApplyRowStyle("(empty)", selected: false, hovered: false), content.Width);
             return;
         }
 
         for (var row = 0; row < rows.Count && row < content.Height; row++)
         {
             var visible = rows[row];
+            var hovered = _hoveredFilteredIndex == visible.Index;
             var marker = visible.Selected
                 ? "›"
-                : _hoveredFilteredIndex == visible.Index ? "▸" : " ";
+                : hovered ? "▸" : " ";
             var text = $"{marker} {_model.LabelFor(visible.Item)}";
-            canvas.WriteText(content.X, content.Y + row, text, content.Width);
+            canvas.WriteText(content.X, content.Y + row, ApplyRowStyle(text, visible.Selected, hovered), content.Width);
         }
     }
 
@@ -317,6 +346,27 @@ public sealed class ListView<T> : Control
     {
         var hitWidth = Math.Min(contentWidth, 2 + ControlTextLayout.MeasureDisplayWidth(label));
         return pointerX >= contentX && pointerX < contentX + hitWidth;
+    }
+
+    private string ApplyRowStyle(string text, bool selected, bool hovered)
+    {
+        var style = DefaultRowStyle;
+        if (hovered)
+        {
+            style = style.Merge(HoveredRowStyle);
+        }
+
+        if (selected)
+        {
+            style = style.Merge(SelectedRowStyle);
+        }
+
+        if (style.IsEmpty || string.IsNullOrEmpty(text))
+        {
+            return text;
+        }
+
+        return style.Render(text);
     }
 
     private static string DefaultText(T item) => item?.ToString() ?? string.Empty;

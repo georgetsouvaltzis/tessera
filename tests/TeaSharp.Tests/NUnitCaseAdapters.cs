@@ -17,6 +17,7 @@ public sealed class NUnitCaseAdapters
         foreach (var testCase in RendererBehaviorTests.Cases()) yield return ToCaseData(testCase);
         foreach (var testCase in RendererSnapshotTests.Cases()) yield return ToCaseData(testCase);
         foreach (var testCase in StyleRenderingTests.Cases()) yield return ToCaseData(testCase);
+        foreach (var testCase in ControlStyleHooksTests.Cases()) yield return ToCaseData(testCase);
         foreach (var testCase in WidgetStateTests.Cases()) yield return ToCaseData(testCase);
         foreach (var testCase in ChartComponentTests.Cases()) yield return ToCaseData(testCase);
         foreach (var testCase in DashboardComponentTests.Cases()) yield return ToCaseData(testCase);

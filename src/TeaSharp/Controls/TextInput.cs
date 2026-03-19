@@ -2,6 +2,7 @@ using TeaSharp.Components.Primitives;
 using TeaSharp.Components.Primitives.Internal;
 using TeaSharp.Controls.Internal;
 using TeaSharp.Layout;
+using TeaSharp.Styles;
 using TeaSharp.Widgets;
 using System.ComponentModel;
 
@@ -76,6 +77,33 @@ public sealed class TextInput : Control
         get;
         set;
     }
+
+    /// <summary>
+    /// Gets or sets the style used for the input value text.
+    /// </summary>
+    public TeaStyle ValueTextStyle
+    {
+        get;
+        set;
+    } = TeaStyle.Empty;
+
+    /// <summary>
+    /// Gets or sets the style used when the placeholder text is shown.
+    /// </summary>
+    public TeaStyle PlaceholderTextStyle
+    {
+        get;
+        set;
+    } = TeaStyle.Empty;
+
+    /// <summary>
+    /// Gets or sets the style applied to the title when the input is focused.
+    /// </summary>
+    public TeaStyle FocusedTitleStyle
+    {
+        get;
+        set;
+    } = TeaStyle.Empty;
 
     /// <summary>
     /// Gets or sets a value indicating whether the field should clear after submission.
@@ -230,10 +258,18 @@ public sealed class TextInput : Control
             return;
         }
 
+        var title = Border == BorderStyle.None
+            ? null
+            : IsFocused ? $"{Title} *" : Title;
+        if (IsFocused && !FocusedTitleStyle.IsEmpty && title is not null)
+        {
+            title = FocusedTitleStyle.Render(title);
+        }
+
         var content = FrameLayout.DrawFrameAndResolveContent(
             canvas,
             clipped,
-            Border == BorderStyle.None ? null : IsFocused ? $"{Title} *" : Title,
+            title,
             Border,
             Padding);
         if (content.IsEmpty)
@@ -242,7 +278,9 @@ public sealed class TextInput : Control
         }
 
         var frame = _input.BuildFrame(content.Width);
-        canvas.WriteText(content.X, content.Y, frame.Text, content.Width);
+        var style = frame.PlaceholderVisible ? PlaceholderTextStyle : ValueTextStyle;
+        var text = style.IsEmpty ? frame.Text : style.Render(frame.Text);
+        canvas.WriteText(content.X, content.Y, text, content.Width);
     }
 
     internal override LayoutMeasurement Measure(in Rect availableBounds)

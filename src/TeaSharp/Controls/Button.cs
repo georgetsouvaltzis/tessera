@@ -2,6 +2,7 @@ using TeaSharp.Components.Primitives;
 using TeaSharp.Components.Primitives.Internal;
 using TeaSharp.Controls.Internal;
 using TeaSharp.Layout;
+using TeaSharp.Styles;
 using System.ComponentModel;
 
 namespace TeaSharp.Controls;
@@ -60,6 +61,42 @@ public sealed class Button : Control
         get;
         set;
     }
+
+    /// <summary>
+    /// Gets or sets the base style applied to the button label.
+    /// </summary>
+    public TeaStyle LabelStyle
+    {
+        get;
+        set;
+    } = TeaStyle.Empty;
+
+    /// <summary>
+    /// Gets or sets the style merged into the label style when the button is focused.
+    /// </summary>
+    public TeaStyle FocusedLabelStyle
+    {
+        get;
+        set;
+    } = TeaStyle.Empty;
+
+    /// <summary>
+    /// Gets or sets the style merged into the label style when the button is disabled.
+    /// </summary>
+    public TeaStyle DisabledLabelStyle
+    {
+        get;
+        set;
+    } = TeaStyle.Empty;
+
+    /// <summary>
+    /// Gets or sets the style merged into the label style when the button is pressed.
+    /// </summary>
+    public TeaStyle PressedLabelStyle
+    {
+        get;
+        set;
+    } = TeaStyle.Empty.WithInverse().WithBold();
 
     /// <summary>
     /// Gets how many activations have been observed.
@@ -176,10 +213,10 @@ public sealed class Button : Control
             label += " (disabled)";
         }
 
-        var renderedLabel = _pressed ? ControlTextLayout.ApplyPressedStyle(label) : label;
+        var renderedLabel = ApplyLabelStyle(label);
         var rowCount = string.IsNullOrWhiteSpace(Description) || content.Height < 2 ? 1 : 2;
         var top = content.Y + Math.Max(0, (content.Height - rowCount) / 2);
-        ControlTextLayout.WriteCentered(canvas, content, top, renderedLabel);
+        WriteCenteredLabel(canvas, content, top, label, renderedLabel);
         if (rowCount > 1)
         {
             ControlTextLayout.WriteCentered(canvas, content, top + 1, Description!);
@@ -234,5 +271,51 @@ public sealed class Button : Control
 
         _pressed = pressed;
         return true;
+    }
+
+    private string ApplyLabelStyle(string label)
+    {
+        var style = LabelStyle;
+        if (IsFocused)
+        {
+            style = style.Merge(FocusedLabelStyle);
+        }
+
+        if (IsDisabled)
+        {
+            style = style.Merge(DisabledLabelStyle);
+        }
+
+        if (_pressed)
+        {
+            style = style.Merge(PressedLabelStyle);
+        }
+
+        if (style.IsEmpty)
+        {
+            return label;
+        }
+
+        return style.Render(label);
+    }
+
+    private static void WriteCenteredLabel(Canvas canvas, Rect content, int y, string plainLabel, string renderedLabel)
+    {
+        if (y < content.Y || y > content.Bottom)
+        {
+            return;
+        }
+
+        var displayWidth = ControlTextLayout.MeasureDisplayWidth(plainLabel);
+        var x = content.X;
+        var width = content.Width;
+        if (displayWidth < content.Width)
+        {
+            var offset = (content.Width - displayWidth) / 2;
+            x += offset;
+            width -= offset;
+        }
+
+        canvas.WriteText(x, y, renderedLabel, width);
     }
 }
