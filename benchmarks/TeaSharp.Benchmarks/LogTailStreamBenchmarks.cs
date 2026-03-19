@@ -8,6 +8,8 @@ namespace TeaSharp.Benchmarks;
 public class LogTailStreamBenchmarks
 {
     private const int AppendBatchSize = 2_048;
+    private static readonly KeyPressed UpKey = new(Key.Up);
+    private static readonly KeyPressed DownKey = new(Key.Down);
     private readonly string[] _seedLines = CreateSeedLines();
     private readonly LogView _logView = new()
     {
@@ -17,6 +19,7 @@ public class LogTailStreamBenchmarks
     };
 
     private readonly Rect _bounds = new(0, 0, 160, 42);
+    private readonly Canvas _canvas = new(160, 42);
 
     [Benchmark(Description = "log-tail stream append + scroll workload")]
     public int AppendAndScrollLogTail()
@@ -38,19 +41,19 @@ public class LogTailStreamBenchmarks
             _logView.Append(_seedLines[index % _seedLines.Length]);
             if ((index & 31) == 7)
             {
-                _logView.Handle(new KeyPressed(Key.Up));
+                _logView.Handle(UpKey);
             }
             else if ((index & 31) == 23)
             {
-                _logView.Handle(new KeyPressed(Key.Down));
+                _logView.Handle(DownKey);
             }
         }
 
-        var canvas = new Canvas(_bounds.Width, _bounds.Height);
-        _logView.Render(canvas, _bounds);
+        _canvas.Clear();
+        _logView.Render(_canvas, _bounds);
         return materialize
-            ? canvas.Render().Length
-            : canvas.Bounds.Width * canvas.Bounds.Height;
+            ? _canvas.Render().Length
+            : _canvas.Bounds.Width * _canvas.Bounds.Height;
     }
 
     private static string[] CreateSeedLines()

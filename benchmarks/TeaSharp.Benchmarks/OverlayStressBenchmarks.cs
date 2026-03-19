@@ -8,6 +8,7 @@ namespace TeaSharp.Benchmarks;
 public class OverlayStressBenchmarks
 {
     private const int FrameCount = 48;
+    private static readonly KeyPressed DownKey = new(Key.Down);
     private readonly DataGrid _grid = new()
     {
         Border = BorderStyle.SingleLine,
@@ -41,6 +42,7 @@ public class OverlayStressBenchmarks
     private readonly Rect _gridBounds = new(0, 0, 160, 45);
     private readonly Rect _statusBounds = new(0, 45, 160, 1);
     private readonly string[] _queries = ["op", "deploy", "open", "refresh", "toggle"];
+    private readonly Canvas _canvas = new(160, 46);
 
     [GlobalSetup]
     public void Setup()
@@ -89,26 +91,26 @@ public class OverlayStressBenchmarks
         var totalLength = 0;
         for (var frame = 0; frame < FrameCount; frame++)
         {
-            var canvas = new Canvas(_rootBounds.Width, _rootBounds.Height);
-            _grid.Render(canvas, _gridBounds);
-            _statusBar.Render(canvas, _statusBounds);
+            _canvas.Clear();
+            _grid.Render(_canvas, _gridBounds);
+            _statusBar.Render(_canvas, _statusBounds);
 
             _commandPalette.Open();
             _commandPalette.SetQueryText(_queries[frame % _queries.Length]);
-            _commandPalette.Handle(new KeyPressed(Key.Down));
-            _commandPalette.Handle(new KeyPressed(Key.Down));
-            _commandPalette.Render(canvas, _rootBounds);
+            _commandPalette.Handle(DownKey);
+            _commandPalette.Handle(DownKey);
+            _commandPalette.Render(_canvas, _rootBounds);
 
             _contextMenu.OpenAt(2 + (frame % 24), 3 + (frame % 11));
-            _contextMenu.Handle(new KeyPressed(Key.Down));
-            _contextMenu.Render(canvas, _rootBounds);
+            _contextMenu.Handle(DownKey);
+            _contextMenu.Render(_canvas, _rootBounds);
 
             _dialog.IsVisible = true;
-            _dialog.Render(canvas, _rootBounds);
+            _dialog.Render(_canvas, _rootBounds);
 
             totalLength += materialize
-                ? canvas.Render().Length
-                : canvas.Bounds.Width * canvas.Bounds.Height;
+                ? _canvas.Render().Length
+                : _canvas.Bounds.Width * _canvas.Bounds.Height;
 
             _dialog.Hide();
             _contextMenu.Close();

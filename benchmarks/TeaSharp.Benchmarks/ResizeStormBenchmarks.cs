@@ -27,7 +27,8 @@ public class ResizeStormBenchmarks
         RightText = "recompose",
     };
 
-    private readonly (int Width, int Height)[] _sizes = BuildSizeSequence();
+    private readonly ResizeSnapshot[] _snapshots = BuildSnapshots();
+    private Canvas[] _snapshotCanvases = [];
 
     [GlobalSetup]
     public void Setup()
@@ -50,6 +51,8 @@ public class ResizeStormBenchmarks
         {
             _miniLog.Append($"evt-{index:D3} size-check {(index * 37 + 5) % 997:D3}");
         }
+
+        _snapshotCanvases = CreateCanvases(_snapshots);
     }
 
     [Benchmark(Description = "resize storm repeated recomposition")]
@@ -69,26 +72,19 @@ public class ResizeStormBenchmarks
         var totalLength = 0;
         for (var iteration = 0; iteration < ResizeIterations; iteration++)
         {
-            var size = _sizes[iteration % _sizes.Length];
-            var width = size.Width;
-            var height = size.Height;
+            var snapshotIndex = iteration % _snapshots.Length;
+            var snapshot = _snapshots[snapshotIndex];
+            var canvas = _snapshotCanvases[snapshotIndex];
 
-            _grid.Handle(new WindowResized(width, height));
-            _markdownView.Handle(new WindowResized(width, height));
-            _miniLog.Handle(new WindowResized(width, height));
+            _grid.Handle(snapshot.ResizeMessage);
+            _markdownView.Handle(snapshot.ResizeMessage);
+            _miniLog.Handle(snapshot.ResizeMessage);
 
-            var canvas = new Canvas(width, height);
-            var statusBounds = new Rect(0, height - 1, width, 1);
-            var bodyHeight = Math.Max(1, height - 1);
-            var topHeight = Math.Max(6, bodyHeight * 2 / 3);
-            var bottomHeight = Math.Max(1, bodyHeight - topHeight);
-            var leftWidth = Math.Max(20, width / 2);
-            var rightWidth = Math.Max(1, width - leftWidth);
-
-            _grid.Render(canvas, new Rect(0, 0, width, topHeight));
-            _markdownView.Render(canvas, new Rect(0, topHeight, leftWidth, bottomHeight));
-            _miniLog.Render(canvas, new Rect(leftWidth, topHeight, rightWidth, bottomHeight));
-            _statusBar.Render(canvas, statusBounds);
+            canvas.Clear();
+            _grid.Render(canvas, snapshot.GridBounds);
+            _markdownView.Render(canvas, snapshot.MarkdownBounds);
+            _miniLog.Render(canvas, snapshot.MiniLogBounds);
+            _statusBar.Render(canvas, snapshot.StatusBounds);
 
             totalLength += materialize
                 ? canvas.Render().Length
@@ -98,16 +94,47 @@ public class ResizeStormBenchmarks
         return totalLength;
     }
 
-    private static (int Width, int Height)[] BuildSizeSequence()
+    private static ResizeSnapshot[] BuildSnapshots()
     {
-        var sizes = new (int Width, int Height)[12];
-        for (var index = 0; index < sizes.Length; index++)
+        var snapshots = new ResizeSnapshot[12];
+        for (var index = 0; index < snapshots.Length; index++)
         {
             var width = 90 + ((index * 17) % 70);
             var height = 24 + ((index * 11) % 20);
-            sizes[index] = (width, height);
+            var statusBounds = new Rect(0, height - 1, width, 1);
+            var bodyHeight = Math.Max(1, height - 1);
+            var topHeight = Math.Max(6, bodyHeight * 2 / 3);
+            var bottomHeight = Math.Max(1, bodyHeight - topHeight);
+            var leftWidth = Math.Max(20, width / 2);
+            var rightWidth = Math.Max(1, width - leftWidth);
+
+            snapshots[index] = new ResizeSnapshot(
+                new WindowResized(width, height),
+                new Rect(0, 0, width, topHeight),
+                new Rect(0, topHeight, leftWidth, bottomHeight),
+                new Rect(leftWidth, topHeight, rightWidth, bottomHeight),
+                statusBounds);
         }
 
-        return sizes;
+        return snapshots;
     }
+
+    private static Canvas[] CreateCanvases(IReadOnlyList<ResizeSnapshot> snapshots)
+    {
+        var canvases = new Canvas[snapshots.Count];
+        for (var index = 0; index < snapshots.Count; index++)
+        {
+            var status = snapshots[index].StatusBounds;
+            canvases[index] = new Canvas(status.Width, status.Y + status.Height);
+        }
+
+        return canvases;
+    }
+
+    private readonly record struct ResizeSnapshot(
+        WindowResized ResizeMessage,
+        Rect GridBounds,
+        Rect MarkdownBounds,
+        Rect MiniLogBounds,
+        Rect StatusBounds);
 }
