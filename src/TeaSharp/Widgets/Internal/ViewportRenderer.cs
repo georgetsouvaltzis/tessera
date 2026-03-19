@@ -2,6 +2,9 @@ namespace TeaSharp.Widgets.Internal;
 
 internal static class ViewportRenderer
 {
+    [ThreadStatic]
+    private static List<string>? s_threadRenderBuffer;
+
     public static IReadOnlyList<string> RenderLines(
         IReadOnlyList<string> visualLines,
         int width,
@@ -13,7 +16,7 @@ internal static class ViewportRenderer
         int? highlightVisualLine,
         List<string>? target = null)
     {
-        var rendered = target ?? [];
+        var rendered = target ?? (s_threadRenderBuffer ??= []);
         rendered.Clear();
 
         if (visualLines.Count == 0)
