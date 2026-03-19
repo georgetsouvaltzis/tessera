@@ -6,4 +6,5 @@ obj/
 *.user
 *.suo
 .artifacts/
+BenchmarkDotNet.Artifacts/
 coord/
