@@ -50,6 +50,7 @@ internal static class PrebuiltWidgetTests
         yield return new TestCase("Controls_CommandBar_KeyboardNavigationAndActivation", CommandBar_KeyboardNavigationAndActivation);
         yield return new TestCase("Controls_CommandBar_ItemActivatedEvent_ReportsItem", CommandBar_ItemActivatedEvent_ReportsItem);
         yield return new TestCase("Controls_CommandBar_MouseClickSelectsAndActivatesItem", CommandBar_MouseClickSelectsAndActivatesItem);
+        yield return new TestCase("Controls_CommandBar_DisabledItemDoesNotActivate", CommandBar_DisabledItemDoesNotActivate);
         yield return new TestCase("Controls_CommandBar_FocusMarkerAndStyleHooks_Rendered", CommandBar_FocusMarkerAndStyleHooks_Rendered);
         yield return new TestCase("Controls_ContextMenu_ExecutesAndCloses", ContextMenu_ExecutesAndCloses);
         yield return new TestCase("Controls_ContextMenu_ItemExecutedEvent_ReportsItem", ContextMenu_ItemExecutedEvent_ReportsItem);
@@ -813,6 +814,26 @@ internal static class PrebuiltWidgetTests
         TestAssert.True(changed, "Command bar mouse click should select and activate the clicked command.");
         TestAssert.Equal(1, bar.SelectedIndex, "Command bar mouse click should select the clicked command index.");
         TestAssert.Equal("test", bar.LastActivatedItemId ?? string.Empty, "Command bar mouse click should activate the clicked command id.");
+        return Task.CompletedTask;
+    }
+
+    private static Task CommandBar_DisabledItemDoesNotActivate()
+    {
+        var bar = new CommandBar
+        {
+            IsFocused = true,
+        };
+        bar.SetItems(
+        [
+            new CommandBarItem("build", "Build", 'b'),
+            new CommandBarItem("deploy", "Deploy", 'd', IsDisabled: true),
+        ]);
+
+        var changed = bar.Handle(new KeyPressed(Key.Character, "d"));
+
+        TestAssert.True(changed, "Command bar shortcut should still move selection to disabled command.");
+        TestAssert.Equal(1, bar.SelectedIndex, "Command bar should select disabled command when shortcut matches.");
+        TestAssert.True(bar.LastActivatedItemId is null, "Command bar should not activate disabled command.");
         return Task.CompletedTask;
     }
 
