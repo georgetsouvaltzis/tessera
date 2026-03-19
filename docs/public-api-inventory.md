@@ -82,6 +82,7 @@ These are the types new applications should discover first.
 - `TeaSharp.Controls.Stepper`
 - `TeaSharp.Controls.TreeItem`
 - `TeaSharp.Controls.TreeView` (native)
+- `TeaSharp.Controls.TreeViewGlyphSet`
 - `TeaSharp.Controls.MenuBar`
 - `TeaSharp.Controls.Toolbar`
 - `TeaSharp.Controls.CommandBar`
@@ -237,14 +238,17 @@ Input/value controls with direct token mappings:
 
 - `TextInput`, `TextArea`, `Toggle`, `Slider`, `Spinner`, `ProgressBar`, `NumberInput`, `DatePicker`, `TimePicker`
 - `TextInput` maps value/placeholder/focused-title styling; focus title marker is configurable through `FocusMarker` + `ShowFocusMarker`
+- `TextInput` maps `BorderStyleText` -> `Border.Default` and `FocusedBorderStyleText` -> `Border.Focused + Focus.Border`
+- `Table` (Basic extension) maps `BorderStyleText` -> `Border.Default` and `FocusedBorderStyleText` -> `Border.Focused + Focus.Border`
 
 Navigation/overlay controls with direct token mappings:
 
 - `Choice`, `ComboBox`, `TreeView`, `MenuBar`, `ContextMenu`, `CommandPalette`, `Notifications`, `SearchBox`
 - `Choice`/`ComboBox` map `BorderStyleText` -> `Border.Default` and `FocusedBorderStyleText` -> `Border.Focused + Focus.Border`
 - `Choice`/`ComboBox` keep glyph customization explicit through `DropdownGlyphSet`
-- `TreeView` keeps title focus marker rendering configurable through `FocusMarker` + `ShowFocusMarker`
-- `SearchBox` maps title/value/placeholder/match/navigation styles; title focus marker is configurable through `FocusMarker` + `ShowFocusMarker`
+- `TreeView` maps `BorderStyleText` -> `Border.Default` and `FocusedBorderStyleText` -> `Border.Focused + Focus.Border`
+- `TreeView` keeps title focus marker rendering configurable through `FocusMarker` + `ShowFocusMarker` and glyph customization through `TreeViewGlyphSet`
+- `SearchBox` maps title/value/placeholder/match/navigation styles plus border text hooks; title focus marker is configurable through `FocusMarker` + `ShowFocusMarker`
 
 Navigation primitive controls with direct token mappings:
 

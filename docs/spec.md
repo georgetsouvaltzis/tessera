@@ -97,8 +97,10 @@ V1 theming is semantic-token based with override hierarchy:
 - mapped navigation/overlay controls include `Choice`, `ComboBox`, `TreeView`, `MenuBar`, `ContextMenu`, `CommandPalette`, `Notifications`, `SearchBox`
 - `Choice` and `ComboBox` map `BorderStyleText`/`FocusedBorderStyleText` to semantic border/focus tokens by default
 - dropdown marker customization is explicit through `DropdownGlyphSet` on `Choice` and `ComboBox`
+- `Table` and `TreeView` map `BorderStyleText`/`FocusedBorderStyleText` to semantic border/focus tokens by default
+- `TreeView` marker customization is explicit through `TreeViewGlyphSet`
 - `ListView<T>` and `TreeView` expose `FocusMarker` + `ShowFocusMarker` for explicit focus-title rendering
-- `TextInput` and `SearchBox` expose focus-title marker customization plus title/value/placeholder style hooks
+- `TextInput` and `SearchBox` expose focus-title marker customization plus title/value/placeholder and border style hooks
 - mapped navigation primitive controls include `Accordion`, `MultiSelect`, `RadioGroup`
 - mapped rendering text utility controls include `Badge`, `LogView`, `MarkdownView`, `MiniLog`
 - mapped modal/chart summary controls include `Dialog`, `Modal`, `BarChart`, `LineChart`, `Gauge`, `StatsCard`
@@ -153,6 +155,7 @@ Root controls currently include:
 - `Stepper`
 - `TreeItem`
 - `TreeView`
+- `TreeViewGlyphSet`
 - `MenuBar`
 - `Toolbar`
 - `CommandBar`

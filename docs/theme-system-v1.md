@@ -193,6 +193,8 @@ Input/value mapping coverage includes:
 
 - `TextInput`, `TextArea`, `Toggle`, `Slider`, `Spinner`, `ProgressBar`, `NumberInput`, `DatePicker`, `TimePicker`
 - `TextInput` maps value/placeholder/focused-title styles; title marker remains configurable via `FocusMarker` + `ShowFocusMarker`
+- `TextInput` maps `BorderStyleText` -> `theme.Border.Default` and `FocusedBorderStyleText` -> `theme.Border.Focused.Merge(theme.Focus.Border)`
+- `Table` (Basic extension) maps `BorderStyleText` -> `theme.Border.Default` and `FocusedBorderStyleText` -> `theme.Border.Focused.Merge(theme.Focus.Border)`
 
 Navigation/overlay mapping coverage includes:
 
@@ -200,8 +202,8 @@ Navigation/overlay mapping coverage includes:
 - `Choice`/`ComboBox` map `BorderStyleText` -> `theme.Border.Default`
 - `Choice`/`ComboBox` map `FocusedBorderStyleText` -> `theme.Border.Focused.Merge(theme.Focus.Border)`
 - `Choice`/`ComboBox` expose `Glyphs` via `DropdownGlyphSet` for closed/open/highlight/selected markers
-- `TreeView` title focus marker rendering is configurable through `FocusMarker` + `ShowFocusMarker`
-- `SearchBox` maps title/value/placeholder/match/navigation styles; title marker is configurable through `FocusMarker` + `ShowFocusMarker`
+- `TreeView` maps border text hooks and title focus marker; branch/leaf markers are configurable through `TreeViewGlyphSet`
+- `SearchBox` maps title/value/placeholder/match/navigation styles plus border text hooks; title marker is configurable through `FocusMarker` + `ShowFocusMarker`
 
 Navigation primitive mapping coverage includes:
 

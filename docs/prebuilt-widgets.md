@@ -76,7 +76,12 @@ These live in `TeaSharp.Controls`.
 
 - `ListView<T>` and `TreeView` expose `FocusMarker` and `ShowFocusMarker` for title focus rendering.
 - `TextInput` and `SearchBox` expose `FocusMarker` and `ShowFocusMarker` with `TitleStyle`/`FocusedTitleStyle`.
-- `TextInput` and `SearchBox` style hooks focus on title/value/placeholder (plus match/navigation styles for `SearchBox`).
+- `TextInput` and `SearchBox` style hooks include title/value/placeholder plus border text hooks (`BorderStyleText`/`FocusedBorderStyleText`).
+
+### Table and TreeView Visual Hooks
+
+- `Table` supports `BorderStyleText` and `FocusedBorderStyleText` for focused/unfocused frame glyph rendering.
+- `TreeView` supports the same border text hooks and typed marker customization via `TreeViewGlyphSet`.
 
 ## Theme Mapping Snapshot
 
@@ -84,6 +89,8 @@ Current shipped `TeaThemeControlExtensions` mappings include:
 
 - navigation primitives: `Accordion`, `MultiSelect`, `RadioGroup`
 - navigation overlay details: `Choice`/`ComboBox` include border text token mapping plus `DropdownGlyphSet` marker customization
+- navigation overlay details: `TreeView` includes border text token mapping plus `TreeViewGlyphSet` marker customization
+- basic mapping details: `Table` includes border text token mapping (`BorderStyleText`, `FocusedBorderStyleText`)
 - rendering text utilities: `Badge`, `LogView`, `MarkdownView`, `MiniLog`
 - modal/chart summary controls: `Dialog`, `Modal`, `BarChart`, `LineChart`, `Gauge`, `StatsCard`
 
