@@ -1,5 +1,7 @@
 using TeaSharp.Components.Primitives;
+using TeaSharp.Controls.Internal;
 using TeaSharp.Layout;
+using TeaSharp.Styles;
 
 namespace TeaSharp.Controls;
 
@@ -15,6 +17,123 @@ public sealed class Accordion : Control
         get;
         set => field = value ?? string.Empty;
     } = "Accordion";
+
+    /// <summary>
+    /// Gets or sets the marker shown in the title when the control is focused.
+    /// </summary>
+    public string FocusMarker
+    {
+        get;
+        set => field = value ?? string.Empty;
+    } = "*";
+
+    /// <summary>
+    /// Gets or sets a value indicating whether the title focus marker should be rendered.
+    /// </summary>
+    public bool ShowFocusMarker
+    {
+        get;
+        set;
+    } = true;
+
+    /// <summary>
+    /// Gets or sets the title style applied when the control is not focused.
+    /// </summary>
+    public TeaStyle TitleStyle
+    {
+        get;
+        set;
+    } = TeaStyle.Empty;
+
+    /// <summary>
+    /// Gets or sets the title style applied when the control is focused.
+    /// </summary>
+    public TeaStyle FocusedTitleStyle
+    {
+        get;
+        set;
+    } = TeaStyle.Empty;
+
+    /// <summary>
+    /// Gets or sets the base style applied to section header rows.
+    /// </summary>
+    public TeaStyle ItemStyle
+    {
+        get;
+        set;
+    } = TeaStyle.Empty;
+
+    /// <summary>
+    /// Gets or sets the style merged into selected section rows.
+    /// </summary>
+    public TeaStyle SelectedItemStyle
+    {
+        get;
+        set;
+    } = TeaStyle.Empty;
+
+    /// <summary>
+    /// Gets or sets the style merged into expanded section rows.
+    /// </summary>
+    public TeaStyle ExpandedItemStyle
+    {
+        get;
+        set;
+    } = TeaStyle.Empty;
+
+    /// <summary>
+    /// Gets or sets the style applied to expanded body lines.
+    /// </summary>
+    public TeaStyle BodyStyle
+    {
+        get;
+        set;
+    } = TeaStyle.Empty;
+
+    /// <summary>
+    /// Gets or sets the style merged when the control is disabled.
+    /// </summary>
+    public TeaStyle DisabledItemStyle
+    {
+        get;
+        set;
+    } = TeaStyle.Empty;
+
+    /// <summary>
+    /// Gets or sets the marker shown before the selected section.
+    /// </summary>
+    public string SelectedMarker
+    {
+        get;
+        set => field = value ?? string.Empty;
+    } = "›";
+
+    /// <summary>
+    /// Gets or sets the marker shown before unselected sections.
+    /// </summary>
+    public string UnselectedMarker
+    {
+        get;
+        set => field = value ?? string.Empty;
+    } = " ";
+
+    /// <summary>
+    /// Gets or sets the marker shown for expanded sections.
+    /// </summary>
+    public string ExpandedMarker
+    {
+        get;
+        set => field = value ?? string.Empty;
+    } = "▾";
+
+    /// <summary>
+    /// Gets or sets the marker shown for collapsed sections.
+    /// </summary>
+    public string CollapsedMarker
+    {
+        get;
+        set => field = value ?? string.Empty;
+    } = "▸";
 
     public int SelectedIndex { get; private set; }
 
@@ -80,7 +199,7 @@ public sealed class Accordion : Control
 
     public override bool Handle(Message message)
     {
-        if (!IsFocused || message is not KeyPressed key)
+        if (!IsFocused || IsDisabled || IsReadOnly || message is not KeyPressed key)
         {
             return false;
         }
@@ -105,7 +224,7 @@ public sealed class Accordion : Control
 
     public override void Render(Canvas canvas, Rect rect)
     {
-        canvas.DrawBox(rect, Title);
+        canvas.DrawBox(rect, RenderTitle());
         var content = rect.Inset(1, 1);
         if (content.IsEmpty || _sections.Count == 0)
         {
@@ -116,9 +235,10 @@ public sealed class Accordion : Control
         for (var index = 0; index < _sections.Count && row < content.Height; index++)
         {
             var section = _sections[index];
-            var selected = index == SelectedIndex ? "›" : " ";
-            var marker = section.Expanded ? "▾" : "▸";
-            canvas.WriteText(content.X, content.Y + row, $"{selected} {marker} {section.Title}", content.Width);
+            var selected = index == SelectedIndex ? SelectedMarker : UnselectedMarker;
+            var marker = section.Expanded ? ExpandedMarker : CollapsedMarker;
+            var line = $"{selected} {marker} {section.Title}";
+            canvas.WriteText(content.X, content.Y + row, ApplyStyle(line, ResolveSectionStyle(index, section.Expanded)), content.Width);
             row++;
 
             if (!section.Expanded)
@@ -128,7 +248,11 @@ public sealed class Accordion : Control
 
             for (var bodyIndex = 0; bodyIndex < section.BodyLines.Count && row < content.Height; bodyIndex++)
             {
-                canvas.WriteText(content.X + 2, content.Y + row, section.BodyLines[bodyIndex], Math.Max(0, content.Width - 2));
+                canvas.WriteText(
+                    content.X + 2,
+                    content.Y + row,
+                    ApplyStyle(section.BodyLines[bodyIndex], ResolveBodyStyle()),
+                    Math.Max(0, content.Width - 2));
                 row++;
             }
         }
@@ -136,12 +260,22 @@ public sealed class Accordion : Control
 
     internal override LayoutMeasurement Measure(in Rect availableBounds)
     {
-        var width = Title.Length + 4;
+        var width = ControlTextLayout.MeasureDisplayWidth(FormatTitleText(includeFocusMarkerWhenUnfocused: true)) + 4;
         var height = 2;
+        var sectionPrefixWidth = Math.Max(
+                ControlTextLayout.MeasureDisplayWidth(SelectedMarker),
+                ControlTextLayout.MeasureDisplayWidth(UnselectedMarker))
+            + 1
+            + Math.Max(
+                ControlTextLayout.MeasureDisplayWidth(ExpandedMarker),
+                ControlTextLayout.MeasureDisplayWidth(CollapsedMarker))
+            + 1;
         for (var index = 0; index < _sections.Count; index++)
         {
             var section = _sections[index];
-            width = Math.Max(width, section.Title.Length + 4);
+            width = Math.Max(
+                width,
+                sectionPrefixWidth + ControlTextLayout.MeasureDisplayWidth(section.Title) + 2);
             height++;
             if (!section.Expanded)
             {
@@ -150,7 +284,7 @@ public sealed class Accordion : Control
 
             for (var bodyIndex = 0; bodyIndex < section.BodyLines.Count; bodyIndex++)
             {
-                width = Math.Max(width, section.BodyLines[bodyIndex].Length + 4);
+                width = Math.Max(width, ControlTextLayout.MeasureDisplayWidth(section.BodyLines[bodyIndex]) + 4);
                 height++;
             }
         }
@@ -158,5 +292,59 @@ public sealed class Accordion : Control
         return new LayoutMeasurement(
             Math.Clamp(width, 0, availableBounds.Width),
             Math.Clamp(height, 0, availableBounds.Height));
+    }
+
+    private string FormatTitleText(bool includeFocusMarkerWhenUnfocused = false)
+    {
+        if ((IsFocused || includeFocusMarkerWhenUnfocused) && ShowFocusMarker && !string.IsNullOrWhiteSpace(FocusMarker))
+        {
+            return $"{Title} {FocusMarker}";
+        }
+
+        return Title;
+    }
+
+    private string RenderTitle()
+    {
+        return ApplyStyle(FormatTitleText(), IsFocused ? FocusedTitleStyle : TitleStyle);
+    }
+
+    private TeaStyle ResolveSectionStyle(int index, bool expanded)
+    {
+        var style = ItemStyle;
+        if (expanded)
+        {
+            style = style.Merge(ExpandedItemStyle);
+        }
+
+        if (index == SelectedIndex)
+        {
+            style = style.Merge(SelectedItemStyle);
+        }
+
+        if (IsDisabled)
+        {
+            style = style.Merge(DisabledItemStyle);
+        }
+
+        return style;
+    }
+
+    private TeaStyle ResolveBodyStyle()
+    {
+        var style = BodyStyle;
+        if (IsDisabled)
+        {
+            style = style.Merge(DisabledItemStyle);
+        }
+
+        return style;
+    }
+
+    private static string ApplyStyle(string text, TeaStyle style)
+    {
+        return string.IsNullOrEmpty(text) || style.IsEmpty
+            ? text
+            : style.Render(text);
     }
 }

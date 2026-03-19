@@ -25,6 +25,15 @@ internal static partial class ThemeOverridesTests
         yield return new TestCase(
             "ThemeOverrides_OverrideOverloads_ResolveExpectedTokens_ForToolbarCommandBarAndSearchBox",
             OverrideOverloads_ResolveExpectedTokens_ForToolbarCommandBarAndSearchBox);
+        yield return new TestCase(
+            "ThemeOverrides_ApplyHelpers_MapExpectedTokens_ForAccordionMultiSelectAndRadioGroup",
+            ApplyHelpers_MapExpectedTokens_ForAccordionMultiSelectAndRadioGroup);
+        yield return new TestCase(
+            "ThemeOverrides_ApplyThemeDefaults_DoNotOverwriteExplicitStyles_ForAccordionMultiSelectAndRadioGroup",
+            ApplyThemeDefaults_DoNotOverwriteExplicitStyles_ForAccordionMultiSelectAndRadioGroup);
+        yield return new TestCase(
+            "ThemeOverrides_OverrideOverloads_ResolveExpectedTokens_ForAccordionMultiSelectAndRadioGroup",
+            OverrideOverloads_ResolveExpectedTokens_ForAccordionMultiSelectAndRadioGroup);
     }
 
     private static Task ApplyHelpers_MapExpectedTokensForBreadcrumbAndPaginator()
@@ -342,4 +351,5 @@ internal static partial class ThemeOverridesTests
 
         return Task.CompletedTask;
     }
+
 }
