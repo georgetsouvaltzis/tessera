@@ -1,4 +1,5 @@
 using TeaSharp.Components.Primitives;
+using TeaSharp.Components.Primitives.Internal;
 using TeaSharp.Controls.Internal;
 using TeaSharp.Layout;
 using TeaSharp.Styles;
@@ -56,6 +57,42 @@ public sealed class MenuBar : Control
     /// Gets or sets style merged when the control is disabled.
     /// </summary>
     public TeaStyle DisabledItemStyle { get; set; } = TeaStyle.Empty;
+
+    /// <summary>
+    /// Gets or sets the style applied to border glyphs when the control is not focused.
+    /// </summary>
+    public TeaStyle BorderStyleText { get; set; } = TeaStyle.Empty;
+
+    /// <summary>
+    /// Gets or sets the style applied to border glyphs when the control is focused.
+    /// </summary>
+    public TeaStyle FocusedBorderStyleText { get; set; } = TeaStyle.Empty;
+
+    /// <summary>
+    /// Gets or sets glyphs used for selected/hovered wrappers and shortcut delimiters.
+    /// </summary>
+    public MenuBarGlyphSet Glyphs { get; set; } = MenuBarGlyphSet.Default;
+
+    /// <summary>
+    /// Gets or sets the optional frame border style.
+    /// </summary>
+    /// <remarks>
+    /// Defaults to <see cref="BorderStyle.None"/> to preserve previous single-row rendering.
+    /// </remarks>
+    public BorderStyle Border
+    {
+        get;
+        set;
+    } = BorderStyle.None;
+
+    /// <summary>
+    /// Gets or sets inner padding applied inside the optional frame.
+    /// </summary>
+    public Thickness Padding
+    {
+        get;
+        set;
+    }
 
     public override bool IsFocused
     {
@@ -154,7 +191,13 @@ public sealed class MenuBar : Control
             return Handle(message);
         }
 
-        var inRow = bounds.Contains(pointer.X, pointer.Y) && pointer.Y == bounds.Y;
+        var content = FrameLayout.ResolveContentRect(bounds, Border, Padding);
+        if (content.IsEmpty)
+        {
+            return Handle(message);
+        }
+
+        var inRow = content.Contains(pointer.X, pointer.Y) && pointer.Y == content.Y;
         var changed = false;
         if (!inRow)
         {
@@ -181,7 +224,7 @@ public sealed class MenuBar : Control
             }
         }
 
-        var hovered = HitTestItemIndex(pointer.X, bounds);
+        var hovered = HitTestItemIndex(pointer.X, content);
         if (pointer.Kind == PointerEventKind.Motion)
         {
             if (hovered >= 0 && _selectedIndex != hovered)
@@ -237,16 +280,22 @@ public sealed class MenuBar : Control
     public override void Render(Canvas canvas, Rect rect)
     {
         var clipped = Rect.Intersect(rect, canvas.Bounds);
-        if (clipped.IsEmpty || clipped.Height < 1 || _items.Count == 0)
+        if (clipped.IsEmpty || _items.Count == 0)
         {
             return;
         }
 
-        var x = clipped.X;
-        for (var index = 0; index < _items.Count && x < clipped.Right; index++)
+        var content = FrameLayout.DrawFrameAndResolveContent(canvas, clipped, null, Border, Padding, ResolveBorderStyleText());
+        if (content.IsEmpty || content.Height < 1)
+        {
+            return;
+        }
+
+        var x = content.X;
+        for (var index = 0; index < _items.Count && x < content.Right; index++)
         {
             var rawLabel = FormatLabel(index, hovered: index == _hoveredIndex);
-            canvas.WriteText(x, clipped.Y, ApplyStyle(rawLabel, ResolveItemStyle(index)), clipped.Right - x);
+            canvas.WriteText(x, content.Y, ApplyStyle(rawLabel, ResolveItemStyle(index)), content.Right - x);
             x += ControlTextLayout.MeasureDisplayWidth(rawLabel) + 1;
         }
     }
@@ -263,9 +312,12 @@ public sealed class MenuBar : Control
             }
         }
 
+        width += Padding.Horizontal + (Border == BorderStyle.None ? 0 : 2);
+        var height = (_items.Count == 0 ? 0 : 1) + Padding.Vertical + (Border == BorderStyle.None ? 0 : 2);
+
         return new LayoutMeasurement(
             Math.Clamp(width, 0, availableBounds.Width),
-            Math.Clamp(_items.Count == 0 ? 0 : 1, 0, availableBounds.Height));
+            Math.Clamp(height, 0, availableBounds.Height));
     }
 
     private string FormatLabel(int index, bool hovered)
@@ -273,19 +325,19 @@ public sealed class MenuBar : Control
         var item = _items[index];
         var core = item.Shortcut == '\0'
             ? item.Text
-            : $"{item.Text}({item.Shortcut})";
+            : string.Concat(item.Text, Glyphs.ShortcutOpen, item.Shortcut, Glyphs.ShortcutClose);
         var label = index == _selectedIndex
-            ? $"[{core}]"
-            : $" {core} ";
+            ? string.Concat(Glyphs.SelectedPrefix, core, Glyphs.SelectedSuffix)
+            : string.Concat(Glyphs.UnselectedPrefix, core, Glyphs.UnselectedSuffix);
         return hovered && index != _selectedIndex
-            ? $">{label.Trim()}<"
+            ? string.Concat(Glyphs.HoveredPrefix, core, Glyphs.HoveredSuffix)
             : label;
     }
 
-    private int HitTestItemIndex(int x, Rect bounds)
+    private int HitTestItemIndex(int x, Rect content)
     {
-        var cursor = bounds.X;
-        for (var index = 0; index < _items.Count && cursor < bounds.Right; index++)
+        var cursor = content.X;
+        for (var index = 0; index < _items.Count && cursor < content.Right; index++)
         {
             var label = FormatLabel(index, hovered: false);
             var width = ControlTextLayout.MeasureDisplayWidth(label);
@@ -327,6 +379,22 @@ public sealed class MenuBar : Control
         if (index == _hoveredIndex)
         {
             style = style.Merge(HoveredItemStyle);
+        }
+
+        if (IsDisabled)
+        {
+            style = style.Merge(DisabledItemStyle);
+        }
+
+        return style;
+    }
+
+    private TeaStyle ResolveBorderStyleText()
+    {
+        var style = BorderStyleText;
+        if (IsFocused)
+        {
+            style = style.Merge(FocusedBorderStyleText);
         }
 
         if (IsDisabled)

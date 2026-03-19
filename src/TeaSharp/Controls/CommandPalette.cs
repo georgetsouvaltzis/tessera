@@ -1,5 +1,7 @@
 using System.ComponentModel;
 using TeaSharp.Components.Primitives;
+using TeaSharp.Components.Primitives.Internal;
+using TeaSharp.Controls.Internal;
 using TeaSharp.Styles;
 using TeaSharp.Widgets;
 
@@ -22,48 +24,146 @@ public sealed class CommandPalette : Control
     private long _executionVersion;
     private long _consumedExecutionVersion;
 
+    /// <summary>
+    /// Occurs when a command is executed from the current filtered selection.
+    /// </summary>
     public event EventHandler<CommandPaletteItemExecutedEventArgs>? ItemExecuted;
 
+    /// <summary>
+    /// Gets or sets the overlay title.
+    /// </summary>
     public string Title
     {
         get;
         set => field = value ?? string.Empty;
     } = "Command Palette";
 
+    /// <summary>
+    /// Gets or sets the marker appended to the title when focused and <see cref="ShowFocusMarker"/> is enabled.
+    /// </summary>
+    public string FocusMarker
+    {
+        get;
+        set => field = value ?? string.Empty;
+    } = "*";
+
+    /// <summary>
+    /// Gets or sets a value indicating whether <see cref="FocusMarker"/> should be shown while focused.
+    /// </summary>
+    /// <remarks>
+    /// Defaults to <see langword="false"/> to preserve existing command palette title rendering.
+    /// </remarks>
+    public bool ShowFocusMarker { get; set; }
+
+    /// <summary>
+    /// Gets or sets style merged into the title when not focused.
+    /// </summary>
     public TeaStyle TitleStyle { get; set; } = TeaStyle.Empty;
 
+    /// <summary>
+    /// Gets or sets style merged into the title when focused.
+    /// </summary>
     public TeaStyle FocusedTitleStyle { get; set; } = TeaStyle.Empty;
 
+    /// <summary>
+    /// Gets or sets style merged into query text when the placeholder is not visible.
+    /// </summary>
     public TeaStyle QueryTextStyle { get; set; } = TeaStyle.Empty;
 
+    /// <summary>
+    /// Gets or sets style merged into placeholder text.
+    /// </summary>
     public TeaStyle PlaceholderTextStyle { get; set; } = TeaStyle.Empty;
 
+    /// <summary>
+    /// Gets or sets base style applied to command rows.
+    /// </summary>
     public TeaStyle ItemStyle { get; set; } = TeaStyle.Empty;
 
+    /// <summary>
+    /// Gets or sets style merged into the selected command row.
+    /// </summary>
     public TeaStyle SelectedItemStyle { get; set; } = TeaStyle.Empty;
 
+    /// <summary>
+    /// Gets or sets style merged into hovered command rows.
+    /// </summary>
     public TeaStyle HoveredItemStyle { get; set; } = TeaStyle.Empty;
 
+    /// <summary>
+    /// Gets or sets style merged into muted rows.
+    /// </summary>
     public TeaStyle MutedItemStyle { get; set; } = TeaStyle.Empty;
 
+    /// <summary>
+    /// Gets or sets style merged when the control is disabled.
+    /// </summary>
     public TeaStyle DisabledItemStyle { get; set; } = TeaStyle.Empty;
 
+    /// <summary>
+    /// Gets or sets the style applied to border glyphs when not focused.
+    /// </summary>
+    public TeaStyle BorderStyleText { get; set; } = TeaStyle.Empty;
+
+    /// <summary>
+    /// Gets or sets the style applied to border glyphs when focused.
+    /// </summary>
+    public TeaStyle FocusedBorderStyleText { get; set; } = TeaStyle.Empty;
+
+    /// <summary>
+    /// Gets or sets glyphs used for query prompt and row markers.
+    /// </summary>
+    public CommandPaletteGlyphSet Glyphs { get; set; } = CommandPaletteGlyphSet.Default;
+
+    /// <summary>
+    /// Gets or sets the frame border style for the overlay panel.
+    /// </summary>
+    public BorderStyle Border
+    {
+        get;
+        set;
+    } = BorderStyle.Rounded;
+
+    /// <summary>
+    /// Gets or sets inner padding applied inside the overlay frame.
+    /// </summary>
+    public Thickness Padding
+    {
+        get;
+        set;
+    }
+
+    /// <summary>
+    /// Gets a value indicating whether the palette is currently visible.
+    /// </summary>
     public bool IsVisible { get; private set; }
 
+    /// <summary>
+    /// Gets or sets the maximum number of visible command rows.
+    /// </summary>
     public int MaxVisibleItems
     {
         get;
         set;
     } = 8;
 
+    /// <summary>
+    /// Gets or sets the current query text.
+    /// </summary>
     public string QueryText
     {
         get => _query.Value;
         set => SetQueryText(value ?? string.Empty);
     }
 
+    /// <summary>
+    /// Gets the last executed command id.
+    /// </summary>
     public string? LastExecutedItemId { get; private set; }
 
+    /// <summary>
+    /// Gets the configured command entries.
+    /// </summary>
     public IReadOnlyList<CommandPaletteItem> Items => _items;
 
     public override bool IsFocused
@@ -263,9 +363,11 @@ public sealed class CommandPalette : Control
             return;
         }
 
-        canvas.DrawBox(modal, ApplyStyle(Title, IsFocused ? FocusedTitleStyle : TitleStyle), BorderStyle.Rounded);
+        var title = Border == BorderStyle.None ? null : RenderTitleText();
+        content = FrameLayout.DrawFrameAndResolveContent(canvas, modal, title, Border, Padding, ResolveBorderStyleText());
 
-        var queryWidth = Math.Max(1, content.Width - 2);
+        var queryPrompt = ResolveQueryPrompt();
+        var queryWidth = Math.Max(1, content.Width - ControlTextLayout.MeasureDisplayWidth(queryPrompt));
         var frame = _query.BuildFrame(queryWidth);
         var queryStyle = frame.PlaceholderVisible ? PlaceholderTextStyle : QueryTextStyle;
         if (IsDisabled)
@@ -273,7 +375,7 @@ public sealed class CommandPalette : Control
             queryStyle = queryStyle.Merge(DisabledItemStyle).Merge(MutedItemStyle);
         }
 
-        canvas.WriteText(content.X, content.Y, ApplyStyle($"> {frame.Text}", queryStyle), content.Width);
+        canvas.WriteText(content.X, content.Y, ApplyStyle(string.Concat(queryPrompt, frame.Text), queryStyle), content.Width);
         if (content.Height <= 1)
         {
             return;
@@ -412,14 +514,12 @@ public sealed class CommandPalette : Control
     private string ResolveRowText(int itemIndex, int filteredIndex)
     {
         var row = _itemRenderCache[itemIndex];
-        if (filteredIndex == _selectedFilteredIndex)
-        {
-            return row.SelectedRow;
-        }
-
-        return filteredIndex == _hoveredFilteredIndex
-            ? row.HoveredRow
-            : row.NormalRow;
+        var marker = filteredIndex == _selectedFilteredIndex
+            ? Glyphs.SelectedRowMarker
+            : filteredIndex == _hoveredFilteredIndex
+                ? Glyphs.HoveredRowMarker
+                : Glyphs.NormalRowMarker;
+        return string.Concat(marker, Glyphs.MarkerSeparator, row.Summary);
     }
 
     private bool ExecuteSelected()
@@ -477,7 +577,7 @@ public sealed class CommandPalette : Control
             : -1;
     }
 
-    private static bool TryResolveModal(Rect bounds, out Rect modal, out Rect content)
+    private bool TryResolveModal(Rect bounds, out Rect modal, out Rect content)
     {
         modal = default;
         content = default;
@@ -491,8 +591,61 @@ public sealed class CommandPalette : Control
         var modalX = bounds.X + (bounds.Width - modalWidth) / 2;
         var modalY = bounds.Y + (bounds.Height - modalHeight) / 2;
         modal = new Rect(modalX, modalY, modalWidth, modalHeight);
-        content = modal.Inset(1, 1);
+        content = FrameLayout.ResolveContentRect(modal, Border, Padding);
         return !content.IsEmpty;
+    }
+
+    private string ResolveQueryPrompt()
+    {
+        if (string.IsNullOrEmpty(Glyphs.QueryPrompt))
+        {
+            return string.Empty;
+        }
+
+        return string.Concat(Glyphs.QueryPrompt, Glyphs.MarkerSeparator);
+    }
+
+    private string FormatTitleText()
+    {
+        if (string.IsNullOrEmpty(Title))
+        {
+            return string.Empty;
+        }
+
+        if (IsFocused && ShowFocusMarker && !string.IsNullOrWhiteSpace(FocusMarker))
+        {
+            return string.Concat(Title, " ", FocusMarker);
+        }
+
+        return Title;
+    }
+
+    private string RenderTitleText()
+    {
+        var title = FormatTitleText();
+        if (string.IsNullOrEmpty(title))
+        {
+            return title;
+        }
+
+        var style = IsFocused ? FocusedTitleStyle : TitleStyle;
+        return ApplyStyle(title, style);
+    }
+
+    private TeaStyle ResolveBorderStyleText()
+    {
+        var style = BorderStyleText;
+        if (IsFocused)
+        {
+            style = style.Merge(FocusedBorderStyleText);
+        }
+
+        if (IsDisabled)
+        {
+            style = style.Merge(DisabledItemStyle).Merge(MutedItemStyle);
+        }
+
+        return style;
     }
 
     private TeaStyle ResolveItemStyle(int filteredIndex)
@@ -521,7 +674,7 @@ public sealed class CommandPalette : Control
         return style.IsEmpty ? text : style.Render(text);
     }
 
-    private readonly record struct CommandPaletteRenderCache(string SearchText, string NormalRow, string SelectedRow, string HoveredRow)
+    private readonly record struct CommandPaletteRenderCache(string SearchText, string Summary)
     {
         public static CommandPaletteRenderCache Create(CommandPaletteItem item)
         {
@@ -529,11 +682,7 @@ public sealed class CommandPalette : Control
                 ? item.Title
                 : string.Concat(item.Title, " - ", item.Description);
             var search = string.Concat(item.Title, "\n", item.Description, "\n", item.Id);
-            return new CommandPaletteRenderCache(
-                search,
-                string.Concat("  ", summary),
-                string.Concat("> ", summary),
-                string.Concat("▸ ", summary));
+            return new CommandPaletteRenderCache(search, summary);
         }
     }
 }

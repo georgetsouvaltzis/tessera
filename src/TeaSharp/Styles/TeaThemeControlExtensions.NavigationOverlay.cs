@@ -190,6 +190,8 @@ public static partial class TeaThemeControlExtensions
         control.HoveredItemStyle = theme.Accent.Secondary;
         control.FocusedItemStyle = theme.Focus.Ring;
         control.DisabledItemStyle = theme.Text.Muted;
+        control.BorderStyleText = theme.Border.Default;
+        control.FocusedBorderStyleText = theme.Border.Focused.Merge(theme.Focus.Border);
         return control;
     }
 
@@ -215,6 +217,8 @@ public static partial class TeaThemeControlExtensions
         control.HoveredItemStyle = ApplyDefault(control.HoveredItemStyle, theme.Accent.Secondary);
         control.FocusedItemStyle = ApplyDefault(control.FocusedItemStyle, theme.Focus.Ring);
         control.DisabledItemStyle = ApplyDefault(control.DisabledItemStyle, theme.Text.Muted);
+        control.BorderStyleText = ApplyDefault(control.BorderStyleText, theme.Border.Default);
+        control.FocusedBorderStyleText = ApplyDefault(control.FocusedBorderStyleText, theme.Border.Focused.Merge(theme.Focus.Border));
         return control;
     }
 
@@ -240,6 +244,8 @@ public static partial class TeaThemeControlExtensions
         control.HoveredItemStyle = theme.Accent.Secondary;
         control.DisabledItemStyle = theme.Text.Muted;
         control.MutedItemStyle = theme.Text.Muted;
+        control.BorderStyleText = theme.Border.Default;
+        control.FocusedBorderStyleText = theme.Border.Focused.Merge(theme.Focus.Border);
         return control;
     }
 
@@ -267,6 +273,8 @@ public static partial class TeaThemeControlExtensions
         control.HoveredItemStyle = ApplyDefault(control.HoveredItemStyle, theme.Accent.Secondary);
         control.DisabledItemStyle = ApplyDefault(control.DisabledItemStyle, theme.Text.Muted);
         control.MutedItemStyle = ApplyDefault(control.MutedItemStyle, theme.Text.Muted);
+        control.BorderStyleText = ApplyDefault(control.BorderStyleText, theme.Border.Default);
+        control.FocusedBorderStyleText = ApplyDefault(control.FocusedBorderStyleText, theme.Border.Focused.Merge(theme.Focus.Border));
         return control;
     }
 
@@ -294,6 +302,8 @@ public static partial class TeaThemeControlExtensions
         control.HoveredItemStyle = theme.Accent.Secondary;
         control.MutedItemStyle = theme.Text.Muted;
         control.DisabledItemStyle = theme.Text.Muted;
+        control.BorderStyleText = theme.Border.Default;
+        control.FocusedBorderStyleText = theme.Border.Focused.Merge(theme.Focus.Border);
         return control;
     }
 
@@ -323,6 +333,8 @@ public static partial class TeaThemeControlExtensions
         control.HoveredItemStyle = ApplyDefault(control.HoveredItemStyle, theme.Accent.Secondary);
         control.MutedItemStyle = ApplyDefault(control.MutedItemStyle, theme.Text.Muted);
         control.DisabledItemStyle = ApplyDefault(control.DisabledItemStyle, theme.Text.Muted);
+        control.BorderStyleText = ApplyDefault(control.BorderStyleText, theme.Border.Default);
+        control.FocusedBorderStyleText = ApplyDefault(control.FocusedBorderStyleText, theme.Border.Focused.Merge(theme.Focus.Border));
         return control;
     }
 
