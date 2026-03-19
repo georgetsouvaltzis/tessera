@@ -28,6 +28,11 @@ internal static partial class ThemeOverridesTests
                 Secondary = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(21, 22, 23)),
                 Muted = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(31, 32, 33)),
             },
+            Border = new TeaThemeBorderTokens
+            {
+                Default = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(34, 35, 36)),
+                Focused = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(37, 38, 39)),
+            },
             Accent = new TeaThemeAccentTokens
             {
                 Primary = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(41, 42, 43)),
@@ -63,6 +68,8 @@ internal static partial class ThemeOverridesTests
         TestAssert.Equal(theme.Text.Secondary, choice.TitleStyle, "Choice title style should map to Text.Secondary.");
         TestAssert.Equal(theme.Focus.Title, choice.FocusedTitleStyle, "Choice focused title style should map to Focus.Title.");
         TestAssert.Equal(theme.Text.Primary, choice.OptionStyle, "Choice option style should map to Text.Primary.");
+        TestAssert.Equal(theme.Border.Default, choice.BorderStyleText, "Choice border style should map to Border.Default.");
+        TestAssert.Equal(theme.Border.Focused.Merge(theme.Focus.Border), choice.FocusedBorderStyleText, "Choice focused border style should map to focused border tokens.");
         TestAssert.Equal(
             theme.Selection.Foreground.Merge(theme.Selection.Background),
             choice.SelectedOptionStyle,
@@ -71,6 +78,8 @@ internal static partial class ThemeOverridesTests
         TestAssert.Equal(theme.Text.Primary, comboBox.ValueTextStyle, "ComboBox value style should map to Text.Primary.");
         TestAssert.Equal(theme.Text.Muted, comboBox.PlaceholderTextStyle, "ComboBox placeholder style should map to Text.Muted.");
         TestAssert.Equal(theme.Accent.Secondary, comboBox.HoveredOptionStyle, "ComboBox hovered option style should map to Accent.Secondary.");
+        TestAssert.Equal(theme.Border.Default, comboBox.BorderStyleText, "ComboBox border style should map to Border.Default.");
+        TestAssert.Equal(theme.Border.Focused.Merge(theme.Focus.Border), comboBox.FocusedBorderStyleText, "ComboBox focused border style should map to focused border tokens.");
 
         TestAssert.Equal(theme.Accent.Primary, treeView.BranchStyle, "TreeView branch style should map to Accent.Primary.");
         TestAssert.Equal(theme.Text.Primary, treeView.LeafStyle, "TreeView leaf style should map to Text.Primary.");
@@ -105,6 +114,11 @@ internal static partial class ThemeOverridesTests
                 Secondary = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(4, 5, 6)),
                 Muted = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(7, 8, 9)),
             },
+            Border = new TeaThemeBorderTokens
+            {
+                Default = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(9, 10, 11)),
+                Focused = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(12, 13, 14)),
+            },
             Accent = new TeaThemeAccentTokens
             {
                 Primary = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(10, 11, 12)),
@@ -127,8 +141,8 @@ internal static partial class ThemeOverridesTests
             },
         };
 
-        var choice = new Choice { OptionStyle = explicitStyle };
-        var comboBox = new ComboBox { ValueTextStyle = explicitStyle };
+        var choice = new Choice { OptionStyle = explicitStyle, BorderStyleText = explicitStyle };
+        var comboBox = new ComboBox { ValueTextStyle = explicitStyle, BorderStyleText = explicitStyle };
         var treeView = new TreeView { BranchStyle = explicitStyle };
         var menuBar = new MenuBar { ItemStyle = explicitStyle };
         var contextMenu = new ContextMenu { ItemStyle = explicitStyle };
@@ -144,10 +158,14 @@ internal static partial class ThemeOverridesTests
         notifications.ApplyThemeDefaults(theme);
 
         TestAssert.Equal(explicitStyle, choice.OptionStyle, "Defaults should not overwrite explicit Choice.OptionStyle.");
+        TestAssert.Equal(explicitStyle, choice.BorderStyleText, "Defaults should not overwrite explicit Choice.BorderStyleText.");
         TestAssert.Equal(theme.Text.Secondary, choice.TitleStyle, "Defaults should fill empty Choice.TitleStyle.");
+        TestAssert.Equal(theme.Border.Focused.Merge(theme.Focus.Border), choice.FocusedBorderStyleText, "Defaults should fill empty Choice.FocusedBorderStyleText.");
 
         TestAssert.Equal(explicitStyle, comboBox.ValueTextStyle, "Defaults should not overwrite explicit ComboBox.ValueTextStyle.");
+        TestAssert.Equal(explicitStyle, comboBox.BorderStyleText, "Defaults should not overwrite explicit ComboBox.BorderStyleText.");
         TestAssert.Equal(theme.Text.Muted, comboBox.PlaceholderTextStyle, "Defaults should fill empty ComboBox.PlaceholderTextStyle.");
+        TestAssert.Equal(theme.Border.Focused.Merge(theme.Focus.Border), comboBox.FocusedBorderStyleText, "Defaults should fill empty ComboBox.FocusedBorderStyleText.");
 
         TestAssert.Equal(explicitStyle, treeView.BranchStyle, "Defaults should not overwrite explicit TreeView.BranchStyle.");
         TestAssert.Equal(theme.Text.Primary, treeView.LeafStyle, "Defaults should fill empty TreeView.LeafStyle.");
@@ -170,7 +188,7 @@ internal static partial class ThemeOverridesTests
     private static Task OverrideOverloads_ResolveExpectedTokens_ForChoiceComboBoxTreeViewMenuBarContextMenuCommandPaletteAndNotifications()
     {
         var explicitStyle = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(221, 222, 223));
-        var choice = new Choice { ValueStyle = explicitStyle };
+        var choice = new Choice { ValueStyle = explicitStyle, BorderStyleText = explicitStyle };
         var comboBox = new ComboBox();
         var treeView = new TreeView();
         var menuBar = new MenuBar { ItemStyle = explicitStyle };
@@ -187,6 +205,11 @@ internal static partial class ThemeOverridesTests
                 Primary = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(101, 102, 103)),
                 Secondary = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(111, 112, 113)),
                 Muted = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(121, 122, 123)),
+            },
+            Border = new TeaThemeBorderTokens
+            {
+                Default = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(124, 125, 126)),
+                Focused = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(127, 128, 129)),
             },
             Accent = new TeaThemeAccentTokens
             {
@@ -229,7 +252,11 @@ internal static partial class ThemeOverridesTests
         notifications.ApplyTheme(overrides, baseTheme);
 
         TestAssert.Equal(explicitStyle, choice.ValueStyle, "Override defaults should not overwrite explicit Choice.ValueStyle.");
+        TestAssert.Equal(explicitStyle, choice.BorderStyleText, "Override defaults should not overwrite explicit Choice.BorderStyleText.");
+        TestAssert.Equal(typeTheme.Border.Focused.Merge(typeTheme.Focus.Border), choice.FocusedBorderStyleText, "Override defaults should map Choice focused border styles.");
         TestAssert.Equal(typeTheme.Selection.Foreground.Merge(typeTheme.Selection.Background), comboBox.SelectedOptionStyle, "Override apply should map ComboBox selected option style.");
+        TestAssert.Equal(typeTheme.Border.Default, comboBox.BorderStyleText, "Override apply should map ComboBox border styles.");
+        TestAssert.Equal(typeTheme.Border.Focused.Merge(typeTheme.Focus.Border), comboBox.FocusedBorderStyleText, "Override apply should map ComboBox focused border styles.");
         TestAssert.Equal(typeTheme.Accent.Primary, treeView.BranchStyle, "Override apply should map TreeView branch style.");
         TestAssert.Equal(explicitStyle, menuBar.ItemStyle, "Override defaults should not overwrite explicit MenuBar.ItemStyle.");
         TestAssert.Equal(typeTheme.Text.Secondary, contextMenu.TitleStyle, "Override apply should map ContextMenu title style.");

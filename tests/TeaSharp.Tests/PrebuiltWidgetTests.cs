@@ -39,9 +39,11 @@ internal static class PrebuiltWidgetTests
         yield return new TestCase("Controls_Choice_SelectionChangedEvent_ReportsSelection", Choice_SelectionChangedEvent_ReportsSelection);
         yield return new TestCase("Controls_Choice_HidesBorderWhenConfigured", Choice_HidesBorderWhenConfigured);
         yield return new TestCase("Controls_Choice_MouseClickOpensAndSelects", Choice_MouseClickOpensAndSelects);
+        yield return new TestCase("Controls_Choice_CustomGlyphSet_RendersCustomGlyphs", Choice_CustomGlyphSet_RendersCustomGlyphs);
         yield return new TestCase("Controls_ComboBox_FiltersAndSelects", ComboBox_FiltersAndSelects);
         yield return new TestCase("Controls_ComboBox_SelectionChangedEvent_ReportsSelection", ComboBox_SelectionChangedEvent_ReportsSelection);
         yield return new TestCase("Controls_ComboBox_MouseWheelNavigatesAndSelects", ComboBox_MouseWheelNavigatesAndSelects);
+        yield return new TestCase("Controls_ComboBox_CustomGlyphSet_RendersCustomGlyphs", ComboBox_CustomGlyphSet_RendersCustomGlyphs);
         yield return new TestCase("Controls_MenuBar_ActivatesShortcut", MenuBar_ActivatesShortcut);
         yield return new TestCase("Controls_MenuBar_ItemActivatedEvent_ReportsItem", MenuBar_ItemActivatedEvent_ReportsItem);
         yield return new TestCase("Controls_MenuBar_TryConsumeActivation_IsSingleUse", MenuBar_TryConsumeActivation_IsSingleUse);
@@ -616,6 +618,26 @@ internal static class PrebuiltWidgetTests
         return Task.CompletedTask;
     }
 
+    private static Task Choice_CustomGlyphSet_RendersCustomGlyphs()
+    {
+        var dropdown = new Choice
+        {
+            IsFocused = true,
+            Border = BorderStyle.None,
+            Glyphs = new DropdownGlyphSet("v", "^", ">", "+"),
+        };
+        dropdown.SetItems(["alpha", "beta", "gamma"]);
+        dropdown.Handle(new KeyPressed(Key.Enter));
+
+        var canvas = new Canvas(24, 6);
+        dropdown.Render(canvas, new Rect(0, 0, 24, 6));
+        var output = canvas.Render();
+
+        TestAssert.True(output.Contains("^ alpha", StringComparison.Ordinal), "Choice should render custom expanded indicator glyph.");
+        TestAssert.True(output.Contains(">+ alpha", StringComparison.Ordinal), "Choice should render custom option marker glyphs.");
+        return Task.CompletedTask;
+    }
+
     private static Task ComboBox_FiltersAndSelects()
     {
         var combobox = new ComboBox
@@ -671,6 +693,26 @@ internal static class PrebuiltWidgetTests
         TestAssert.True(selectChanged, "Option click should select highlighted combobox row.");
         TestAssert.True(!combobox.IsOpen, "Combobox should close after click-select.");
         TestAssert.Equal("gamma", combobox.SelectedItem, "Combobox selection should reflect wheel-adjusted highlighted option.");
+        return Task.CompletedTask;
+    }
+
+    private static Task ComboBox_CustomGlyphSet_RendersCustomGlyphs()
+    {
+        var combobox = new ComboBox
+        {
+            IsFocused = true,
+            Border = BorderStyle.None,
+            Glyphs = new DropdownGlyphSet("v", "^", ">", "+"),
+        };
+        combobox.SetItems(["alpha", "beta", "gamma"]);
+        combobox.Handle(new KeyPressed(Key.Down));
+
+        var canvas = new Canvas(24, 6);
+        combobox.Render(canvas, new Rect(0, 0, 24, 6));
+        var output = canvas.Render();
+
+        TestAssert.True(output.Contains("^ ", StringComparison.Ordinal), "ComboBox should render custom expanded indicator glyph.");
+        TestAssert.True(output.Contains(">  alpha", StringComparison.Ordinal), "ComboBox should render custom highlighted marker glyph.");
         return Task.CompletedTask;
     }
 
