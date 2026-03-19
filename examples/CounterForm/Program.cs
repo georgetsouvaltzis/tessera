@@ -1,11 +1,9 @@
 using System.Globalization;
-using Microsoft.Extensions.DependencyInjection;
 using TeaSharp;
 using TeaSharp.Controls;
 using TeaSharp.Layout;
 
 var app = Tea.CreateBuilder()
-    .ConfigureServices(static services => services.AddSingleton<CounterState>())
     .UseApp<CounterFormApp>()
     .ConfigureRuntime(static runtime =>
     {
@@ -25,7 +23,7 @@ internal sealed record CounterResetRequested : Message;
 
 internal sealed class CounterFormApp : TeaApp
 {
-    private readonly CounterState _state;
+    private readonly CounterState _state = new();
     private readonly TextInput _stepInput = new()
     {
         Title = "Step Size",
@@ -60,9 +58,8 @@ internal sealed class CounterFormApp : TeaApp
     private readonly StatusBar _status = new();
     private string _statusText = "Ready";
 
-    public CounterFormApp(CounterState state)
+    public CounterFormApp()
     {
-        _state = state;
         _stepInput.SetValue(_state.Step.ToString(CultureInfo.InvariantCulture));
         _stepInput.Submitted += (_, args) =>
         {

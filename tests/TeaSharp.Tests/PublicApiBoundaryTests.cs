@@ -16,6 +16,7 @@ internal static class PublicApiBoundaryTests
     ];
 
     private static readonly Regex TeaSharpCoreImportRegex = new(@"(?m)^\s*using\s+.*TeaSharp\.Core.*;", RegexOptions.Compiled);
+    private static readonly Regex DependencyInjectionImportRegex = new(@"(?m)^\s*using\s+.*Microsoft\.Extensions\.DependencyInjection.*;", RegexOptions.Compiled);
 
     private static readonly string[] CanonicalExampleProjectPaths =
     [
@@ -48,6 +49,9 @@ internal static class PublicApiBoundaryTests
         yield return new TestCase(
             "PublicApiBoundary_CanonicalExampleProgramsDoNotImportTeaSharpCore",
             CanonicalExamplePrograms_DoNotImportTeaSharpCore);
+        yield return new TestCase(
+            "PublicApiBoundary_CanonicalExampleProgramsDoNotImportDependencyInjection",
+            CanonicalExamplePrograms_DoNotImportDependencyInjection);
         yield return new TestCase(
             "PublicApiBoundary_ExamplesSolutionIncludesCanonicalProjects",
             ExamplesSolution_IncludesCanonicalProjects);
@@ -140,6 +144,22 @@ internal static class PublicApiBoundaryTests
         TestAssert.True(
             offenders.Length == 0,
             $"Canonical examples must not import TeaSharp.Core.*. Offenders: {string.Join(", ", offenders)}.");
+
+        return Task.CompletedTask;
+    }
+
+    private static Task CanonicalExamplePrograms_DoNotImportDependencyInjection()
+    {
+        var repoRoot = GetRepoRoot();
+        var offenders = CanonicalExampleProjectPaths
+            .Select(path => path.Replace(".csproj", "/Program.cs", StringComparison.Ordinal))
+            .Where(path => File.Exists(Path.Combine(repoRoot, path)))
+            .Where(path => DependencyInjectionImportRegex.IsMatch(File.ReadAllText(Path.Combine(repoRoot, path))))
+            .ToArray();
+
+        TestAssert.True(
+            offenders.Length == 0,
+            $"Canonical examples should not depend on Microsoft.Extensions.DependencyInjection. Offenders: {string.Join(", ", offenders)}.");
 
         return Task.CompletedTask;
     }

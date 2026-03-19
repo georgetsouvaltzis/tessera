@@ -1,5 +1,3 @@
-using Microsoft.Extensions.DependencyInjection;
-
 namespace TeaSharp;
 
 /// <summary>
@@ -11,9 +9,8 @@ namespace TeaSharp;
 /// </remarks>
 public sealed class TeaApplicationBuilder
 {
-    private Func<IServiceProvider, TeaApp>? _appFactory;
+    private Func<TeaApp>? _appFactory;
     private readonly TeaRuntimeOptions _runtime = new();
-    private readonly ServiceCollection _services = new();
 
     /// <summary>
     /// Gets the runtime options that will be applied to the built application.
@@ -21,34 +18,14 @@ public sealed class TeaApplicationBuilder
     public TeaRuntimeOptions Runtime => _runtime;
 
     /// <summary>
-    /// Gets the service collection used to construct the configured <see cref="TeaApp"/>.
-    /// </summary>
-    /// <remarks>
-    /// Register dependencies here when the app type configured by <see cref="UseApp{TApp}"/> requires
-    /// constructor injection.
-    /// </remarks>
-    public IServiceCollection Services => _services;
-
-    /// <summary>
     /// Configures the application to create a new <typeparamref name="TApp"/> instance when built.
     /// </summary>
     /// <typeparam name="TApp">The application type.</typeparam>
     /// <returns>The current builder.</returns>
     public TeaApplicationBuilder UseApp<TApp>()
-        where TApp : TeaApp
+        where TApp : TeaApp, new()
     {
-        _appFactory = static services => ActivatorUtilities.CreateInstance<TApp>(services);
-        return this;
-    }
-
-    /// <summary>
-    /// Configures the application to create its <see cref="TeaApp"/> from the supplied service-aware factory.
-    /// </summary>
-    /// <param name="factory">The application factory.</param>
-    /// <returns>The current builder.</returns>
-    public TeaApplicationBuilder UseApp(Func<IServiceProvider, TeaApp> factory)
-    {
-        _appFactory = factory ?? throw new ArgumentNullException(nameof(factory));
+        _appFactory = static () => new TApp();
         return this;
     }
 
@@ -59,8 +36,7 @@ public sealed class TeaApplicationBuilder
     /// <returns>The current builder.</returns>
     public TeaApplicationBuilder UseApp(Func<TeaApp> factory)
     {
-        ArgumentNullException.ThrowIfNull(factory);
-        _appFactory = _ => factory();
+        _appFactory = factory ?? throw new ArgumentNullException(nameof(factory));
         return this;
     }
 
@@ -72,19 +48,7 @@ public sealed class TeaApplicationBuilder
     public TeaApplicationBuilder UseApp(TeaApp app)
     {
         ArgumentNullException.ThrowIfNull(app);
-        _appFactory = _ => app;
-        return this;
-    }
-
-    /// <summary>
-    /// Applies dependency registration before the application is built.
-    /// </summary>
-    /// <param name="configure">The callback that mutates <see cref="Services"/>.</param>
-    /// <returns>The current builder.</returns>
-    public TeaApplicationBuilder ConfigureServices(Action<IServiceCollection> configure)
-    {
-        ArgumentNullException.ThrowIfNull(configure);
-        configure(_services);
+        _appFactory = () => app;
         return this;
     }
 
@@ -112,9 +76,6 @@ public sealed class TeaApplicationBuilder
             throw new InvalidOperationException("No TeaApp factory configured. Call UseApp(...) before Build().");
         }
 
-        var services = _services.BuildServiceProvider();
-        var app = _appFactory(services)
-            ?? throw new InvalidOperationException("Configured TeaApp factory returned null.");
-        return new TeaApplication(app, _runtime);
+        return new TeaApplication(_appFactory(), _runtime);
     }
 }

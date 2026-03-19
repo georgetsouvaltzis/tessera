@@ -1,17 +1,15 @@
-using Microsoft.Extensions.DependencyInjection;
-
 namespace TeaSharp.Tests;
 
-internal static class TeaApplicationBuilderDiTests
+internal static class TeaApplicationBuilderContractTests
 {
     public static IEnumerable<TestCase> Cases()
     {
         yield return new TestCase(
-            "TeaApplicationBuilder_UseAppGeneric_ResolvesConstructorDependenciesFromServicesCollection",
-            UseAppGeneric_ResolvesConstructorDependenciesFromServicesCollection);
+            "TeaApplicationBuilder_UseAppGeneric_CreatesConfiguredAppType",
+            UseAppGeneric_CreatesConfiguredAppType);
         yield return new TestCase(
-            "TeaApplicationBuilder_ConfigureServices_RegistersDependenciesConsumedByApp",
-            ConfigureServices_RegistersDependenciesConsumedByApp);
+            "TeaApplicationBuilder_UseAppFactory_UsesFactoryResult",
+            UseAppFactory_UsesFactoryResult);
         yield return new TestCase(
             "TeaApplicationBuilder_UseAppInstance_RemainsSupported",
             UseAppInstance_RemainsSupported);
@@ -20,33 +18,24 @@ internal static class TeaApplicationBuilderDiTests
             BuildWithoutUseApp_ThrowsClearError);
     }
 
-    private static Task UseAppGeneric_ResolvesConstructorDependenciesFromServicesCollection()
+    private static Task UseAppGeneric_CreatesConfiguredAppType()
     {
         var application = Tea.CreateBuilder()
-            .ConfigureServices(static services => services.AddSingleton<ITestDependency>(new TestDependency("services")))
-            .UseApp<DependencyInjectedApp>()
+            .UseApp<FactoryApp>()
             .Build();
 
-        var app = (DependencyInjectedApp)application.App;
-        TestAssert.Equal("services", app.DependencyValue, "UseApp<TApp>() should construct the app through DI.");
+        TestAssert.True(application.App is FactoryApp, "UseApp<TApp>() should construct the configured app type.");
         return Task.CompletedTask;
     }
 
-    private static Task ConfigureServices_RegistersDependenciesConsumedByApp()
+    private static Task UseAppFactory_UsesFactoryResult()
     {
+        var created = new FactoryApp();
         var application = Tea.CreateBuilder()
-            .ConfigureServices(static services =>
-            {
-                services.AddSingleton<ITestDependency>(new TestDependency("configure-callback"));
-            })
-            .UseApp<DependencyInjectedApp>()
+            .UseApp(() => created)
             .Build();
 
-        var app = (DependencyInjectedApp)application.App;
-        TestAssert.Equal(
-            "configure-callback",
-            app.DependencyValue,
-            "ConfigureServices should register constructor dependencies used by UseApp<TApp>().");
+        TestAssert.ReferenceSame(created, application.App, "UseApp(Func<TeaApp>) should use the returned app instance.");
         return Task.CompletedTask;
     }
 
@@ -80,23 +69,11 @@ internal static class TeaApplicationBuilderDiTests
         return Task.CompletedTask;
     }
 
-    private interface ITestDependency
+    private sealed class FactoryApp : TeaApp
     {
-        string Value { get; }
-    }
-
-    private sealed class TestDependency(string value) : ITestDependency
-    {
-        public string Value { get; } = value;
-    }
-
-    private sealed class DependencyInjectedApp(ITestDependency dependency) : TeaApp
-    {
-        public string DependencyValue { get; } = dependency.Value;
-
         public override TeaEffect? Update(Message message) => null;
 
-        public override Screen Build(ScreenContext context) => Screen.From("di");
+        public override Screen Build(ScreenContext context) => Screen.From("factory");
     }
 
     private sealed class InstanceApp : TeaApp
