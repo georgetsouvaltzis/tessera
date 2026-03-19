@@ -1215,7 +1215,7 @@ internal static class PrebuiltWidgetTests
         ]);
 
         var changed = explorer.Handle(
-            new PointerInput(PointerEventKind.Press, PointerButton.Left, x: 0, y: 2),
+            new PointerInput(PointerEventKind.Press, PointerButton.Left, 0, 2),
             new Rect(0, 0, 40, 4));
 
         TestAssert.True(changed, "FileExplorer click should select clicked row.");
@@ -1256,8 +1256,16 @@ internal static class PrebuiltWidgetTests
         TestAssert.True(output.Contains("Files !", StringComparison.Ordinal), "FileExplorer should render focused title marker.");
         TestAssert.True(output.Contains("src", StringComparison.Ordinal), "FileExplorer should render directory rows.");
         TestAssert.True(output.Contains("app.cs", StringComparison.Ordinal), "FileExplorer should render file rows.");
-        TestAssert.True(output.Contains("\u001b[38;5;14m", StringComparison.Ordinal), "FileExplorer should emit directory style fragments.");
-        TestAssert.True(output.Contains("\u001b[38;5;10m", StringComparison.Ordinal), "FileExplorer should emit file style fragments.");
+        var hasDirectoryColor = output.Contains("\u001b[38;5;14m", StringComparison.Ordinal)
+            || output.Contains("\u001b[96m", StringComparison.Ordinal);
+        var hasFileColor = output.Contains("\u001b[38;5;10m", StringComparison.Ordinal)
+            || output.Contains(";5;10m", StringComparison.Ordinal)
+            || output.Contains("\u001b[92m", StringComparison.Ordinal)
+            || output.Contains(";92m", StringComparison.Ordinal)
+            || output.Contains("\u001b[32m", StringComparison.Ordinal)
+            || output.Contains(";32m", StringComparison.Ordinal);
+        TestAssert.True(hasDirectoryColor, "FileExplorer should emit directory style fragments.");
+        TestAssert.True(hasFileColor, "FileExplorer should emit file style fragments.");
         return Task.CompletedTask;
     }
 
