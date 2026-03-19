@@ -194,7 +194,16 @@ Input/value mapping coverage includes:
 - `TextInput`, `TextArea`, `Toggle`, `Slider`, `Spinner`, `ProgressBar`, `NumberInput`, `DatePicker`, `TimePicker`
 - `TextInput` maps value/placeholder/focused-title styles; title marker remains configurable via `FocusMarker` + `ShowFocusMarker`
 - `TextInput` maps `BorderStyleText` -> `theme.Border.Default` and `FocusedBorderStyleText` -> `theme.Border.Focused.Merge(theme.Focus.Border)`
-- `Table` (Basic extension) maps `BorderStyleText` -> `theme.Border.Default` and `FocusedBorderStyleText` -> `theme.Border.Focused.Merge(theme.Focus.Border)`
+
+Basic mapping coverage includes:
+
+- `Button`, `ListView<T>`, `StatusBar`, `TextInput`, `Table`, `Tabs`
+- `Table` maps `BorderStyleText` -> `theme.Border.Default` and `FocusedBorderStyleText` -> `theme.Border.Focused.Merge(theme.Focus.Border)`
+
+Navigation mapping coverage includes:
+
+- `Breadcrumb`, `Paginator`, `Toolbar`, `CommandBar`, `SearchBox`
+- `SearchBox` maps title/value/placeholder/match/navigation styles plus border text hooks
 
 Navigation/overlay mapping coverage includes:
 
@@ -216,6 +225,14 @@ Rendering text utility mapping coverage includes:
 Modal/chart summary mapping coverage includes:
 
 - `Dialog`, `Modal`, `BarChart`, `LineChart`, `Gauge`, `StatsCard`
+
+Data/flow mapping coverage includes:
+
+- `DataGrid`, `TreeTable`, `KeyValueList`, `Timeline`, `Stepper`
+
+Explorer/feedback mapping coverage includes:
+
+- `DiffView`, `PropertyGrid`, `FileExplorer`, `FuzzyFinder`, `ToastCenter`
 
 ## V1 Rollout
 

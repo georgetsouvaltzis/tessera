@@ -99,6 +99,20 @@ All agents must treat this file as the source of truth for scope, sequencing, ow
   - keep advanced APIs in explicit advanced namespaces/docs.
 - No breaking API reshapes in V1 unless they remove ambiguity and are migration-documented in the same change.
 
+## API Simplification Execution Checklist (Phase 2 Gate)
+1. Default path remains no-DI: `Tea.RunAsync(new App())` and `Tea.CreateBuilder().UseApp<TApp>().ConfigureRuntime(...)`.
+2. Advanced seams (`TeaSharp.Hosting`, renderer/terminal adapters) stay documented as opt-in only.
+3. Public control APIs follow C# conventions:
+   - noun properties for state/config (`Title`, `IsOpen`, `SelectedIndex`)
+   - verb methods for actions (`SetItems`, `ApplyTheme`, `Clear`)
+   - `Try*` only for non-throwing probe/consume patterns
+4. Cross-control naming is normalized:
+   - focus/title: `FocusMarker`, `ShowFocusMarker`, `TitleStyle`, `FocusedTitleStyle`
+   - frame styling: `BorderStyleText`, `FocusedBorderStyleText` where border glyph styling exists
+   - selection semantics: `SelectedIndex`, `SelectedItem`, `SelectionChanged`
+5. Public XML docs match runtime behavior for any changed API before merge.
+6. Starter docs/examples do not import `TeaSharp.Core.*`.
+
 ## Naming Clarity Gate
 - Public names must be unambiguous to C# developers without reading internals.
 - Gate checklist for every new/renamed public symbol:
@@ -119,6 +133,26 @@ All agents must treat this file as the source of truth for scope, sequencing, ow
 - Gate enforcement:
   - PR fails if new/changed public APIs are undocumented or copy-template comments.
   - Docs must match actual runtime behavior in examples/tests.
+
+## Beautiful UI Visual Customization Checklist (Phase 3 Gate)
+1. Override hierarchy remains enforced and documented:
+   - global theme -> control-type defaults -> control instance -> state.
+2. Focus visuals are fully overrideable (marker + title + border), not marker-only.
+3. Border/text styling hooks are wired for shipped interactive controls:
+   - `Choice`, `ComboBox`, `TextInput`, `SearchBox`, `Table`, `TreeView`.
+4. Glyph customization hooks are available where symbolic affordances are core UX:
+   - `DropdownGlyphSet` for `Choice`/`ComboBox`
+   - `TreeViewGlyphSet` for `TreeView`.
+5. Navigation/listing controls expose coherent title-focus options:
+   - `ListView<T>`, `Table`, `TreeView`, `TextInput`, `SearchBox`.
+6. Theme mappings cover current V1 control groups:
+   - `Basic`, `InputValue`, `Navigation`, `NavigationOverlay`, `NavigationPrimitives`, `DataAndFlow`, `ExplorerAndFeedback`, `RenderingTextUtilities`, `ModalAndCharts`.
+7. Monochrome rendering remains readable when style hooks are empty.
+
+## Open V1 Visual Parity Gaps (Current)
+- Add focused docs examples for border/glyph override APIs (`BorderStyleText`, `FocusedBorderStyleText`, `DropdownGlyphSet`, `TreeViewGlyphSet`).
+- Add visual regression assertions for monochrome vs color output on high-use controls (`Table`, `TreeView`, `SearchBox`, `Choice`, `ComboBox`).
+- Add cross-control token audit for disabled/error/selection style consistency in theme defaults.
 
 ## Parallelization Constraints
 - Parallel work is allowed only within the active phase in the authoritative execution order.

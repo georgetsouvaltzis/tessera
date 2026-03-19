@@ -234,12 +234,20 @@ Their old `TeaSharp.Components.Prebuilt.*` counterparts have been removed instea
 
 Current shipped theme mapping is centralized in `TeaSharp.Styles.TeaThemeControlExtensions` and split into domain partial files (`Basic`, `InputValue`, `Navigation`, `NavigationOverlay`, `NavigationPrimitives`, `DataAndFlow`, `ExplorerAndFeedback`, `RenderingTextUtilities`, `ModalAndCharts`).
 
+Basic controls with direct token mappings:
+
+- `Button`, `ListView<T>`, `StatusBar`, `TextInput`, `Table`, `Tabs`
+- `TextInput` and `Table` map `BorderStyleText` -> `Border.Default` and `FocusedBorderStyleText` -> `Border.Focused + Focus.Border`
+
 Input/value controls with direct token mappings:
 
 - `TextInput`, `TextArea`, `Toggle`, `Slider`, `Spinner`, `ProgressBar`, `NumberInput`, `DatePicker`, `TimePicker`
 - `TextInput` maps value/placeholder/focused-title styling; focus title marker is configurable through `FocusMarker` + `ShowFocusMarker`
-- `TextInput` maps `BorderStyleText` -> `Border.Default` and `FocusedBorderStyleText` -> `Border.Focused + Focus.Border`
-- `Table` (Basic extension) maps `BorderStyleText` -> `Border.Default` and `FocusedBorderStyleText` -> `Border.Focused + Focus.Border`
+
+Navigation controls with direct token mappings:
+
+- `Breadcrumb`, `Paginator`, `Toolbar`, `CommandBar`, `SearchBox`
+- `SearchBox` maps title/value/placeholder/match/navigation styles plus border text hooks; title focus marker is configurable through `FocusMarker` + `ShowFocusMarker`
 
 Navigation/overlay controls with direct token mappings:
 
@@ -248,11 +256,18 @@ Navigation/overlay controls with direct token mappings:
 - `Choice`/`ComboBox` keep glyph customization explicit through `DropdownGlyphSet`
 - `TreeView` maps `BorderStyleText` -> `Border.Default` and `FocusedBorderStyleText` -> `Border.Focused + Focus.Border`
 - `TreeView` keeps title focus marker rendering configurable through `FocusMarker` + `ShowFocusMarker` and glyph customization through `TreeViewGlyphSet`
-- `SearchBox` maps title/value/placeholder/match/navigation styles plus border text hooks; title focus marker is configurable through `FocusMarker` + `ShowFocusMarker`
 
 Navigation primitive controls with direct token mappings:
 
 - `Accordion`, `MultiSelect`, `RadioGroup`
+
+Data/flow controls with direct token mappings:
+
+- `DataGrid`, `TreeTable`, `KeyValueList`, `Timeline`, `Stepper`
+
+Explorer/feedback controls with direct token mappings:
+
+- `DiffView`, `PropertyGrid`, `FileExplorer`, `FuzzyFinder`, `ToastCenter`
 
 Rendering text utility controls with direct token mappings:
 

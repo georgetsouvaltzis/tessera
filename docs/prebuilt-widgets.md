@@ -83,14 +83,26 @@ These live in `TeaSharp.Controls`.
 - `Table` supports `BorderStyleText` and `FocusedBorderStyleText` for focused/unfocused frame glyph rendering.
 - `TreeView` supports the same border text hooks and typed marker customization via `TreeViewGlyphSet`.
 
+### Beautiful UI Checklist (Current Phase)
+
+- Apply semantic theme first (`TeaRuntimeOptions.Theme`), then control-type, instance, and state overrides.
+- Use explicit focus/title hooks (`FocusMarker`, `ShowFocusMarker`, `TitleStyle`, `FocusedTitleStyle`) on interactive controls.
+- Use border text hooks where supported (`BorderStyleText`, `FocusedBorderStyleText`) to avoid hardcoded frame emphasis.
+- Use typed glyph sets for symbolic affordances (`DropdownGlyphSet`, `TreeViewGlyphSet`) instead of inline string literals.
+- Keep monochrome-safe defaults when style hooks are left empty.
+
 ## Theme Mapping Snapshot
 
 Current shipped `TeaThemeControlExtensions` mappings include:
 
+- basic controls: `Button`, `ListView<T>`, `StatusBar`, `TextInput`, `Table`, `Tabs`
+- input/value controls: `TextArea`, `Toggle`, `Slider`, `Spinner`, `ProgressBar`, `NumberInput`, `DatePicker`, `TimePicker`
+- navigation controls: `Breadcrumb`, `Paginator`, `Toolbar`, `CommandBar`, `SearchBox`
 - navigation primitives: `Accordion`, `MultiSelect`, `RadioGroup`
 - navigation overlay details: `Choice`/`ComboBox` include border text token mapping plus `DropdownGlyphSet` marker customization
 - navigation overlay details: `TreeView` includes border text token mapping plus `TreeViewGlyphSet` marker customization
-- basic mapping details: `Table` includes border text token mapping (`BorderStyleText`, `FocusedBorderStyleText`)
+- data/flow controls: `DataGrid`, `TreeTable`, `KeyValueList`, `Timeline`, `Stepper`
+- explorer/feedback controls: `DiffView`, `PropertyGrid`, `FileExplorer`, `FuzzyFinder`, `ToastCenter`
 - rendering text utilities: `Badge`, `LogView`, `MarkdownView`, `MiniLog`
 - modal/chart summary controls: `Dialog`, `Modal`, `BarChart`, `LineChart`, `Gauge`, `StatsCard`
 
