@@ -591,7 +591,7 @@ internal static class PrebuiltWidgetTests
         dropdown.Render(canvas, new Rect(0, 0, 24, 5));
         var output = canvas.Render();
 
-        TestAssert.True(output.Contains("v alpha", StringComparison.Ordinal), "Dropdown should render selected item in borderless mode.");
+        TestAssert.True(output.Contains("▾ alpha", StringComparison.Ordinal), "Dropdown should render selected item in borderless mode.");
         TestAssert.True(!output.Contains('┌'), "Dropdown should not draw border when disabled.");
         return Task.CompletedTask;
     }

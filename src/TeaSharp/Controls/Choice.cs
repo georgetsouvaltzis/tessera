@@ -296,7 +296,7 @@ public sealed class Choice : Control
     internal override LayoutMeasurement Measure(in Rect availableBounds)
     {
         var selected = _options.Count == 0 ? "(empty)" : SelectedItem;
-        var width = ControlTextLayout.MeasureDisplayWidth($"v {selected}") + Padding.Horizontal;
+        var width = ControlTextLayout.MeasureDisplayWidth($"▾ {selected}") + Padding.Horizontal;
         var height = Padding.Vertical + 1;
         if (Border != BorderStyle.None)
         {
@@ -312,7 +312,7 @@ public sealed class Choice : Control
 
     private void RenderField(Canvas canvas, Rect content)
     {
-        var indicator = IsOpen ? "^" : "v";
+        var indicator = IsOpen ? "▴" : "▾";
         var selected = _options.Count == 0 ? "(empty)" : SelectedItem;
         var valueStyle = ResolveFieldValueStyle();
         var text = $"{ApplyStyle(indicator, valueStyle)} {ApplyStyle(selected, valueStyle)}";
@@ -333,8 +333,8 @@ public sealed class Choice : Control
         for (var visibleIndex = start; visibleIndex < end; visibleIndex++, row++)
         {
             var itemIndex = _options.VisibleItemIndexAt(visibleIndex);
-            var highlight = visibleIndex == _options.HighlightedVisibleIndex ? ">" : " ";
-            var selectedMarker = itemIndex == _options.SelectedIndex ? "*" : " ";
+            var highlight = visibleIndex == _options.HighlightedVisibleIndex ? "▸" : " ";
+            var selectedMarker = itemIndex == _options.SelectedIndex ? "✓" : " ";
             var text = $"{highlight}{selectedMarker} {_options.Items[itemIndex]}";
             canvas.WriteText(content.X, content.Y + 1 + row, ApplyStyle(text, ResolveOptionStyle(itemIndex, visibleIndex)), content.Width);
         }

@@ -326,7 +326,7 @@ public sealed class ComboBox : Control
     internal override LayoutMeasurement Measure(in Rect availableBounds)
     {
         var fieldText = _input.BuildFrame(Math.Max(1, availableBounds.Width)).Text;
-        var width = ControlTextLayout.MeasureDisplayWidth($"v {fieldText}") + Padding.Horizontal;
+        var width = ControlTextLayout.MeasureDisplayWidth($"▾ {fieldText}") + Padding.Horizontal;
         var height = Padding.Vertical + 1;
         if (Border != BorderStyle.None)
         {
@@ -344,7 +344,7 @@ public sealed class ComboBox : Control
     {
         var frameWidth = Math.Max(1, content.Width - 2);
         var frame = _input.BuildFrame(frameWidth);
-        var indicator = IsOpen ? "^" : "v";
+        var indicator = IsOpen ? "▴" : "▾";
         var valueStyle = ResolveFieldValueStyle(frame.PlaceholderVisible);
         var text = $"{ApplyStyle(indicator, valueStyle)} {ApplyStyle(frame.Text, valueStyle)}";
         canvas.WriteText(content.X, content.Y, text, content.Width);
@@ -370,8 +370,8 @@ public sealed class ComboBox : Control
         for (var visibleIndex = start; visibleIndex < end; visibleIndex++, row++)
         {
             var itemIndex = _options.VisibleItemIndexAt(visibleIndex);
-            var highlight = visibleIndex == _options.HighlightedVisibleIndex ? ">" : " ";
-            var selectedMarker = itemIndex == _options.SelectedIndex ? "*" : " ";
+            var highlight = visibleIndex == _options.HighlightedVisibleIndex ? "▸" : " ";
+            var selectedMarker = itemIndex == _options.SelectedIndex ? "✓" : " ";
             var text = $"{highlight}{selectedMarker} {_options.Items[itemIndex]}";
             canvas.WriteText(content.X, content.Y + 1 + row, ApplyStyle(text, ResolveOptionStyle(itemIndex, visibleIndex)), content.Width);
         }
