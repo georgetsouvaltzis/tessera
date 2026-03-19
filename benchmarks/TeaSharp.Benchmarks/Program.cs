@@ -12,6 +12,7 @@ public static class Program
         typeof(OverlayStressBenchmarks),
         typeof(ResizeStormBenchmarks),
         typeof(StyledHeavyOutputBenchmarks),
+        typeof(ViewportRenderBenchmarks),
     ];
 
     public static void Main(string[] args)
