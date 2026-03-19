@@ -1,11 +1,13 @@
 using TeaSharp;
 using TeaSharp.Controls;
 using TeaSharp.Layout;
+using TeaSharp.Styles;
 
 var app = Tea.CreateBuilder()
     .UseApp<ChoiceDemoApp>()
     .ConfigureRuntime(static runtime =>
     {
+        runtime.Theme = ChoiceDemoApp.DemoTheme;
         runtime.Screen = new ScreenOptions
         {
             AltScreen = true,
@@ -20,16 +22,21 @@ await app.RunAsync();
 
 internal sealed class ChoiceDemoApp : TeaApp
 {
+    internal static readonly TeaTheme DemoTheme = TeaThemes.RosePine(RosePineVariant.Moon);
+
     private readonly Choice _choice = new()
     {
-        Title = "Environment",
+        Title = "Deployment Target",
         MaxVisibleItems = 6,
+        Border = BorderStyle.Rounded,
+        Padding = Thickness.All(1),
+        FocusMarker = "◆",
     };
 
     private readonly Label _details = new()
     {
-        Title = "Selection",
-        Border = BorderStyle.SingleLine,
+        Title = "Live Selection",
+        Border = BorderStyle.Rounded,
         Padding = Thickness.All(1),
     };
 
@@ -37,6 +44,16 @@ internal sealed class ChoiceDemoApp : TeaApp
 
     public ChoiceDemoApp()
     {
+        _choice.ApplyThemeDefaults(DemoTheme);
+        _details.ApplyThemeDefaults(DemoTheme);
+        _status.ApplyThemeDefaults(DemoTheme);
+
+        _choice.FocusedTitleStyle = DemoTheme.Focus.Title.WithUnderline();
+        _details.TextStyle = DemoTheme.Text.Secondary;
+        _status.Fill = '·';
+        _status.LeftTextStyle = DemoTheme.Text.Muted;
+        _status.RightTextStyle = DemoTheme.Accent.Primary.WithBold();
+
         _choice.SetItems(
         [
             "Development",
@@ -51,12 +68,10 @@ internal sealed class ChoiceDemoApp : TeaApp
 
         _choice.SelectionChanged += (_, args) =>
         {
-            _details.Text = $"Current: {args.SelectedItem}";
-            _status.RightText = $"selected={args.SelectedItem}";
+            RefreshSelection(args.SelectedItem);
         };
 
-        _details.Text = $"Current: {_choice.SelectedItem}";
-        _status.RightText = "ready";
+        RefreshSelection(_choice.SelectedItem);
     }
 
     public override TeaEffect? Update(Message message)
@@ -66,7 +81,7 @@ internal sealed class ChoiceDemoApp : TeaApp
 
     public override Screen Build(ScreenContext context)
     {
-        _status.LeftText = "Enter/Space open-select   Up/Down move   q quit";
+        _status.LeftText = "↑/↓ navigate   Enter/Space pick   Mouse hover/click   q quit";
 
         var content = new ColumnLayout
         {
@@ -76,27 +91,27 @@ internal sealed class ChoiceDemoApp : TeaApp
                 new LayoutSlot
                 {
                     Content = _choice,
-                    Length = 8,
+                    Length = 9,
                 },
                 new LayoutSlot
                 {
                     Content = _details,
-                    Length = 5,
+                    Length = 6,
                 },
             },
         };
         var panel = new PanelLayout
         {
             Content = content,
-            Title = "TeaSharp Choice",
+            Title = "Rosé Pine • Dropdown",
             Border = BorderStyle.Rounded,
             Padding = Thickness.All(1),
         };
         var body = new CenterLayout
         {
             Content = panel,
-            Width = Math.Min(54, Math.Max(32, context.Width - 4)),
-            Height = 16,
+            Width = Math.Min(66, Math.Max(40, context.Width - 6)),
+            Height = 18,
         };
 
         return Screen.Build(window =>
@@ -105,5 +120,16 @@ internal sealed class ChoiceDemoApp : TeaApp
             window.Body(body);
             window.Footer(1, _status);
         });
+    }
+
+    private void RefreshSelection(string value)
+    {
+        _details.Text =
+            $"""
+            Active profile
+            {DemoTheme.Accent.Primary.WithBold().Render(value)}
+            Rollout hint: this target will be used by the next deploy command.
+            """;
+        _status.RightText = $"● {value}";
     }
 }
