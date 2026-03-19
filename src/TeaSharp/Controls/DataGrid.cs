@@ -88,6 +88,43 @@ public sealed partial class DataGrid : Control
     public TeaStyle DisabledStyle { get; set; } = TeaStyle.Empty;
 
     /// <summary>
+    /// Gets or sets style applied to border glyphs when the control is not focused.
+    /// </summary>
+    public TeaStyle BorderStyleText { get; set; } = TeaStyle.Empty;
+
+    /// <summary>
+    /// Gets or sets style applied to border glyphs when the control is focused.
+    /// </summary>
+    public TeaStyle FocusedBorderStyleText { get; set; } = TeaStyle.Empty;
+
+    /// <summary>
+    /// Gets or sets the separator text rendered between columns.
+    /// </summary>
+    public string ColumnSeparatorText
+    {
+        get;
+        set => field = value ?? string.Empty;
+    } = "|";
+
+    /// <summary>
+    /// Gets or sets the marker appended to sorted headers in ascending mode.
+    /// </summary>
+    public string SortAscendingMarker
+    {
+        get;
+        set => field = value ?? string.Empty;
+    } = "▲";
+
+    /// <summary>
+    /// Gets or sets the marker appended to sorted headers in descending mode.
+    /// </summary>
+    public string SortDescendingMarker
+    {
+        get;
+        set => field = value ?? string.Empty;
+    } = "▼";
+
+    /// <summary>
     /// Gets or sets border style.
     /// </summary>
     public BorderStyle Border { get; set; } = BorderStyle.SingleLine;
@@ -392,7 +429,8 @@ public sealed partial class DataGrid : Control
         }
 
         var widths = ResolveColumnWidths(content.Width);
-        var columnIndex = HitTestColumn(pointer.X, content.X, widths);
+        var separatorWidth = ResolveColumnSeparatorWidth();
+        var columnIndex = HitTestColumn(pointer.X, content.X, widths, separatorWidth);
         if (columnIndex < 0)
         {
             return true;

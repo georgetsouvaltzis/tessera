@@ -4,7 +4,7 @@ namespace TeaSharp.Controls;
 
 public sealed partial class TreeTable
 {
-    private string RenderHeader() => string.Join(" | ", _columns);
+    private string RenderHeader() => string.Join(ResolveColumnSeparatorText(), _columns);
 
     private string RenderTitle()
     {
@@ -161,6 +161,40 @@ public sealed partial class TreeTable
         return string.IsNullOrEmpty(text) || style.IsEmpty
             ? text
             : style.Render(text);
+    }
+
+    private TeaStyle ResolveBorderStyleText()
+    {
+        var style = BorderStyleText;
+        if (IsFocused)
+        {
+            style = style.Merge(FocusedBorderStyleText);
+        }
+
+        if (IsDisabled)
+        {
+            style = style.Merge(MutedRowStyle);
+        }
+
+        return style;
+    }
+
+    private string ResolveColumnSeparatorText() => ColumnSeparatorText;
+
+    private string ResolveSelectedRowMarkerText() => SelectedRowMarker;
+
+    private string ResolveUnselectedRowMarkerText() => UnselectedRowMarker;
+
+    private string ResolveRowGlyph(TreeTableNode item)
+    {
+        if (!item.IsBranch)
+        {
+            return LeafMarker;
+        }
+
+        return item.IsExpanded
+            ? ExpandedBranchMarker
+            : CollapsedBranchMarker;
     }
 
     private readonly record struct VisibleEntry(TreeTableNode Item, int Depth, int? ParentVisibleIndex);

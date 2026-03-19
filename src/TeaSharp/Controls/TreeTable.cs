@@ -91,6 +91,70 @@ public sealed partial class TreeTable : Control
     public TeaStyle MutedRowStyle { get; set; } = TeaStyle.Empty;
 
     /// <summary>
+    /// Gets or sets style applied to border glyphs when the control is not focused.
+    /// </summary>
+    public TeaStyle BorderStyleText { get; set; } = TeaStyle.Empty;
+
+    /// <summary>
+    /// Gets or sets style applied to border glyphs when the control is focused.
+    /// </summary>
+    public TeaStyle FocusedBorderStyleText { get; set; } = TeaStyle.Empty;
+
+    /// <summary>
+    /// Gets or sets text rendered between columns.
+    /// </summary>
+    public string ColumnSeparatorText
+    {
+        get;
+        set => field = value ?? string.Empty;
+    } = " | ";
+
+    /// <summary>
+    /// Gets or sets marker text rendered for selected rows.
+    /// </summary>
+    public string SelectedRowMarker
+    {
+        get;
+        set => field = value ?? string.Empty;
+    } = ">";
+
+    /// <summary>
+    /// Gets or sets marker text rendered for unselected rows.
+    /// </summary>
+    public string UnselectedRowMarker
+    {
+        get;
+        set => field = value ?? string.Empty;
+    } = " ";
+
+    /// <summary>
+    /// Gets or sets marker text rendered for expanded branch rows.
+    /// </summary>
+    public string ExpandedBranchMarker
+    {
+        get;
+        set => field = value ?? string.Empty;
+    } = "-";
+
+    /// <summary>
+    /// Gets or sets marker text rendered for collapsed branch rows.
+    /// </summary>
+    public string CollapsedBranchMarker
+    {
+        get;
+        set => field = value ?? string.Empty;
+    } = "+";
+
+    /// <summary>
+    /// Gets or sets marker text rendered for leaf rows.
+    /// </summary>
+    public string LeafMarker
+    {
+        get;
+        set => field = value ?? string.Empty;
+    } = ".";
+
+    /// <summary>
     /// Gets or sets border style.
     /// </summary>
     public BorderStyle Border { get; set; } = BorderStyle.SingleLine;
@@ -314,7 +378,13 @@ public sealed partial class TreeTable : Control
         }
 
         var title = Border == BorderStyle.None ? null : RenderTitle();
-        var content = FrameLayout.DrawFrameAndResolveContent(canvas, clipped, title, Border, Padding);
+        var content = FrameLayout.DrawFrameAndResolveContent(
+            canvas,
+            clipped,
+            title,
+            Border,
+            Padding,
+            ResolveBorderStyleText());
         if (content.IsEmpty || content.Height <= 0)
         {
             return;
@@ -339,9 +409,11 @@ public sealed partial class TreeTable : Control
         {
             var visibleIndex = _scrollOffset + row;
             var entry = _visible[visibleIndex];
-            var marker = visibleIndex == _selectedVisibleIndex ? ">" : " ";
+            var marker = visibleIndex == _selectedVisibleIndex
+                ? ResolveSelectedRowMarkerText()
+                : ResolveUnselectedRowMarkerText();
             var indent = new string(' ', entry.Depth * 2);
-            var glyph = entry.Item.IsBranch ? (entry.Item.IsExpanded ? "-" : "+") : ".";
+            var glyph = ResolveRowGlyph(entry.Item);
             var firstColumn = $"{indent}{glyph} {entry.Item.Label}";
             var values = new List<string>(_columns.Count) { firstColumn };
             for (var column = 1; column < _columns.Count; column++)
@@ -350,7 +422,7 @@ public sealed partial class TreeTable : Control
                 values.Add(valueIndex < entry.Item.Values.Count ? entry.Item.Values[valueIndex] : string.Empty);
             }
 
-            var line = $"{marker} {string.Join(" | ", values)}";
+            var line = $"{marker} {string.Join(ResolveColumnSeparatorText(), values)}";
             var style = entry.Item.IsBranch ? BranchRowStyle : LeafRowStyle;
             if (visibleIndex == _selectedVisibleIndex)
             {
@@ -372,9 +444,16 @@ public sealed partial class TreeTable : Control
         for (var index = 0; index < _visible.Count; index++)
         {
             var entry = _visible[index];
-            var valuesWidth = entry.Item.Values.Sum(ControlTextLayout.MeasureDisplayWidth);
-            var separators = Math.Max(0, _columns.Count - 1) * 3;
-            var rowWidth = 5 + (entry.Depth * 2) + ControlTextLayout.MeasureDisplayWidth(entry.Item.Label) + valuesWidth + separators;
+            var firstColumn = $"{new string(' ', entry.Depth * 2)}{ResolveRowGlyph(entry.Item)} {entry.Item.Label}";
+            var values = new List<string>(_columns.Count) { firstColumn };
+            for (var column = 1; column < _columns.Count; column++)
+            {
+                var valueIndex = column - 1;
+                values.Add(valueIndex < entry.Item.Values.Count ? entry.Item.Values[valueIndex] : string.Empty);
+            }
+
+            var rowText = $"{ResolveSelectedRowMarkerText()} {string.Join(ResolveColumnSeparatorText(), values)}";
+            var rowWidth = ControlTextLayout.MeasureDisplayWidth(rowText);
             width = Math.Max(width, rowWidth);
         }
 

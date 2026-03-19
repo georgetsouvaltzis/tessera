@@ -18,7 +18,13 @@ public sealed partial class DataGrid
         }
 
         var title = Border == BorderStyle.None ? null : RenderTitle();
-        var content = FrameLayout.DrawFrameAndResolveContent(canvas, clipped, title, Border, Padding);
+        var content = FrameLayout.DrawFrameAndResolveContent(
+            canvas,
+            clipped,
+            title,
+            Border,
+            Padding,
+            ResolveBorderStyleText());
         if (content.IsEmpty)
         {
             return;
@@ -81,7 +87,7 @@ public sealed partial class DataGrid
                 lineWidth += Math.Max(3, ControlTextLayout.MeasureDisplayWidth(GetCellValue(row, columnIndex)));
             }
 
-            lineWidth += Math.Max(0, _columns.Count - 1);
+            lineWidth += Math.Max(0, _columns.Count - 1) * ResolveColumnSeparatorWidth();
             width = Math.Max(width, lineWidth);
         }
 
@@ -138,7 +144,7 @@ public sealed partial class DataGrid
             return widths;
         }
 
-        var separatorWidth = Math.Max(0, count - 1);
+        var separatorWidth = Math.Max(0, count - 1) * ResolveColumnSeparatorWidth();
         var budget = Math.Max(count, availableWidth - separatorWidth);
         var total = 0;
         for (var index = 0; index < count; index++)
@@ -150,7 +156,7 @@ public sealed partial class DataGrid
             }
             else
             {
-                widths[index] = Math.Max(3, ControlTextLayout.MeasureDisplayWidth(_columns[index].Header));
+                widths[index] = Math.Max(3, ControlTextLayout.MeasureDisplayWidth(RenderHeaderText(index)));
             }
 
             total += widths[index];
@@ -180,7 +186,7 @@ public sealed partial class DataGrid
         return widths;
     }
 
-    private static int HitTestColumn(int pointerX, int contentX, int[] widths)
+    private static int HitTestColumn(int pointerX, int contentX, int[] widths, int separatorWidth)
     {
         var cursor = contentX;
         for (var index = 0; index < widths.Length; index++)
@@ -192,9 +198,9 @@ public sealed partial class DataGrid
             }
 
             cursor += width;
-            if (index < widths.Length - 1)
+            if (index < widths.Length - 1 && separatorWidth > 0)
             {
-                cursor += 1;
+                cursor += separatorWidth;
             }
         }
 
@@ -203,6 +209,8 @@ public sealed partial class DataGrid
 
     private void WriteHeader(Canvas canvas, Rect content, int y, int[] widths)
     {
+        var separator = ResolveColumnSeparatorText();
+        var separatorWidth = ResolveColumnSeparatorWidth();
         var x = content.X;
         for (var columnIndex = 0; columnIndex < _columns.Count && x < content.Right; columnIndex++)
         {
@@ -216,24 +224,18 @@ public sealed partial class DataGrid
 
             WritePaddedCell(canvas, x, y, RenderHeaderText(columnIndex), width, style, remainingWidth);
             x += width;
-            if (columnIndex < _columns.Count - 1 && x < content.Right)
+            if (columnIndex < _columns.Count - 1 && separatorWidth > 0 && x < content.Right)
             {
-                if (style.IsEmpty)
-                {
-                    canvas.Set(x, y, '|');
-                }
-                else
-                {
-                    canvas.WriteText(x, y, ApplyStyle("|", style), content.Right - x);
-                }
-
-                x += 1;
+                WritePaddedCell(canvas, x, y, separator, separatorWidth, style, content.Right - x);
+                x += separatorWidth;
             }
         }
     }
 
     private void WriteRow(Canvas canvas, Rect content, int y, int[] widths, int rowIndex)
     {
+        var separator = ResolveColumnSeparatorText();
+        var separatorWidth = ResolveColumnSeparatorWidth();
         var x = content.X;
         var row = _rows[rowIndex];
         for (var columnIndex = 0; columnIndex < _columns.Count && x < content.Right; columnIndex++)
@@ -243,18 +245,10 @@ public sealed partial class DataGrid
             var style = ResolveCellStyle(rowIndex, columnIndex);
             WritePaddedCell(canvas, x, y, GetCellValue(row, columnIndex), width, style, remainingWidth);
             x += width;
-            if (columnIndex < _columns.Count - 1 && x < content.Right)
+            if (columnIndex < _columns.Count - 1 && separatorWidth > 0 && x < content.Right)
             {
-                if (style.IsEmpty)
-                {
-                    canvas.Set(x, y, '|');
-                }
-                else
-                {
-                    canvas.WriteText(x, y, ApplyStyle("|", style), content.Right - x);
-                }
-
-                x += 1;
+                WritePaddedCell(canvas, x, y, separator, separatorWidth, style, content.Right - x);
+                x += separatorWidth;
             }
         }
     }
@@ -290,7 +284,11 @@ public sealed partial class DataGrid
         var text = _columns[columnIndex].Header;
         if (columnIndex == _sortColumnIndex)
         {
-            text = _sortDescending ? $"{text} ▼" : $"{text} ▲";
+            var marker = _sortDescending ? SortDescendingMarker : SortAscendingMarker;
+            if (!string.IsNullOrEmpty(marker))
+            {
+                text = $"{text} {marker}";
+            }
         }
 
         return text;
@@ -315,6 +313,32 @@ public sealed partial class DataGrid
 
         return Title;
     }
+
+    private TeaStyle ResolveBorderStyleText()
+    {
+        var style = BorderStyleText;
+        if (IsFocused)
+        {
+            style = style.Merge(FocusedBorderStyleText);
+        }
+
+        if (IsDisabled)
+        {
+            style = style.Merge(DisabledStyle).Merge(MutedStyle);
+        }
+
+        return style;
+    }
+
+    private int ResolveColumnSeparatorWidth()
+    {
+        var separator = ResolveColumnSeparatorText();
+        return string.IsNullOrEmpty(separator)
+            ? 0
+            : ControlTextLayout.MeasureDisplayWidth(separator);
+    }
+
+    private string ResolveColumnSeparatorText() => ColumnSeparatorText;
 
     private static string PadToWidth(string value, int width)
     {
