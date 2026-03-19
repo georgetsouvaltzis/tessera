@@ -95,6 +95,8 @@ V1 theming is semantic-token based with override hierarchy:
 - `TeaThemeControlExtensions` is split by domain (`Basic`, `InputValue`, `Navigation`, `NavigationOverlay`, `NavigationPrimitives`, `DataAndFlow`, `ExplorerAndFeedback`, `RenderingTextUtilities`, `ModalAndCharts`)
 - mapped input/value controls include `TextArea`, `Toggle`, `Slider`, `Spinner`, `ProgressBar`, `NumberInput`, `DatePicker`, `TimePicker`
 - mapped navigation/overlay controls include `Choice`, `ComboBox`, `TreeView`, `MenuBar`, `ContextMenu`, `CommandPalette`, `Notifications`
+- `Choice` and `ComboBox` map `BorderStyleText`/`FocusedBorderStyleText` to semantic border/focus tokens by default
+- dropdown marker customization is explicit through `DropdownGlyphSet` on `Choice` and `ComboBox`
 - mapped navigation primitive controls include `Accordion`, `MultiSelect`, `RadioGroup`
 - mapped rendering text utility controls include `Badge`, `LogView`, `MarkdownView`, `MiniLog`
 - mapped modal/chart summary controls include `Dialog`, `Modal`, `BarChart`, `LineChart`, `Gauge`, `StatsCard`
@@ -130,6 +132,7 @@ Root controls currently include:
 - `TextArea`
 - `Choice`
 - `ComboBox`
+- `DropdownGlyphSet`
 - `Dialog`
 - `CommandPalette`
 - `ContextMenu`

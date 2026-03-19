@@ -196,6 +196,9 @@ Input/value mapping coverage includes:
 Navigation/overlay mapping coverage includes:
 
 - `Choice`, `ComboBox`, `TreeView`, `MenuBar`, `ContextMenu`, `CommandPalette`, `Notifications`
+- `Choice`/`ComboBox` map `BorderStyleText` -> `theme.Border.Default`
+- `Choice`/`ComboBox` map `FocusedBorderStyleText` -> `theme.Border.Focused.Merge(theme.Focus.Border)`
+- `Choice`/`ComboBox` expose `Glyphs` via `DropdownGlyphSet` for closed/open/highlight/selected markers
 
 Navigation primitive mapping coverage includes:
 

@@ -44,6 +44,7 @@ These are the types new applications should discover first.
 - `TeaSharp.Controls.TextArea`
 - `TeaSharp.Controls.Choice`
 - `TeaSharp.Controls.ComboBox`
+- `TeaSharp.Controls.DropdownGlyphSet`
 - `TeaSharp.Controls.CommandPalette`
 - `TeaSharp.Controls.CommandPaletteItem`
 - `TeaSharp.Controls.Dialog`
@@ -239,6 +240,8 @@ Input/value controls with direct token mappings:
 Navigation/overlay controls with direct token mappings:
 
 - `Choice`, `ComboBox`, `TreeView`, `MenuBar`, `ContextMenu`, `CommandPalette`, `Notifications`
+- `Choice`/`ComboBox` map `BorderStyleText` -> `Border.Default` and `FocusedBorderStyleText` -> `Border.Focused + Focus.Border`
+- `Choice`/`ComboBox` keep glyph customization explicit through `DropdownGlyphSet`
 
 Navigation primitive controls with direct token mappings:
 

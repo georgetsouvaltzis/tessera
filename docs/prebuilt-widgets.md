@@ -68,13 +68,16 @@ These live in `TeaSharp.Controls`.
 ### Dropdown Visual Defaults
 
 - `Choice` and `ComboBox` now use richer dropdown glyph defaults for closed/open states.
-- Rendering tokens remain customizable through control styling/theme overrides.
+- `Choice.Glyphs` and `ComboBox.Glyphs` use `DropdownGlyphSet` for explicit collapsed/expanded/highlighted/selected markers.
+- Border text visuals are overrideable per control through `BorderStyleText` and `FocusedBorderStyleText`.
+- Theme defaults map those border text hooks to semantic border/focus tokens.
 
 ## Theme Mapping Snapshot
 
 Current shipped `TeaThemeControlExtensions` mappings include:
 
 - navigation primitives: `Accordion`, `MultiSelect`, `RadioGroup`
+- navigation overlay details: `Choice`/`ComboBox` include border text token mapping plus `DropdownGlyphSet` marker customization
 - rendering text utilities: `Badge`, `LogView`, `MarkdownView`, `MiniLog`
 - modal/chart summary controls: `Dialog`, `Modal`, `BarChart`, `LineChart`, `Gauge`, `StatsCard`
 
