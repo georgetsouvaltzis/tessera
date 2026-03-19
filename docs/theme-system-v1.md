@@ -191,14 +191,17 @@ Mapped controls expose:
 
 Input/value mapping coverage includes:
 
-- `TextArea`, `Toggle`, `Slider`, `Spinner`, `ProgressBar`, `NumberInput`, `DatePicker`, `TimePicker`
+- `TextInput`, `TextArea`, `Toggle`, `Slider`, `Spinner`, `ProgressBar`, `NumberInput`, `DatePicker`, `TimePicker`
+- `TextInput` maps value/placeholder/focused-title styles; title marker remains configurable via `FocusMarker` + `ShowFocusMarker`
 
 Navigation/overlay mapping coverage includes:
 
-- `Choice`, `ComboBox`, `TreeView`, `MenuBar`, `ContextMenu`, `CommandPalette`, `Notifications`
+- `Choice`, `ComboBox`, `TreeView`, `MenuBar`, `ContextMenu`, `CommandPalette`, `Notifications`, `SearchBox`
 - `Choice`/`ComboBox` map `BorderStyleText` -> `theme.Border.Default`
 - `Choice`/`ComboBox` map `FocusedBorderStyleText` -> `theme.Border.Focused.Merge(theme.Focus.Border)`
 - `Choice`/`ComboBox` expose `Glyphs` via `DropdownGlyphSet` for closed/open/highlight/selected markers
+- `TreeView` title focus marker rendering is configurable through `FocusMarker` + `ShowFocusMarker`
+- `SearchBox` maps title/value/placeholder/match/navigation styles; title marker is configurable through `FocusMarker` + `ShowFocusMarker`
 
 Navigation primitive mapping coverage includes:
 

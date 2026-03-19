@@ -235,13 +235,16 @@ Current shipped theme mapping is centralized in `TeaSharp.Styles.TeaThemeControl
 
 Input/value controls with direct token mappings:
 
-- `TextArea`, `Toggle`, `Slider`, `Spinner`, `ProgressBar`, `NumberInput`, `DatePicker`, `TimePicker`
+- `TextInput`, `TextArea`, `Toggle`, `Slider`, `Spinner`, `ProgressBar`, `NumberInput`, `DatePicker`, `TimePicker`
+- `TextInput` maps value/placeholder/focused-title styling; focus title marker is configurable through `FocusMarker` + `ShowFocusMarker`
 
 Navigation/overlay controls with direct token mappings:
 
-- `Choice`, `ComboBox`, `TreeView`, `MenuBar`, `ContextMenu`, `CommandPalette`, `Notifications`
+- `Choice`, `ComboBox`, `TreeView`, `MenuBar`, `ContextMenu`, `CommandPalette`, `Notifications`, `SearchBox`
 - `Choice`/`ComboBox` map `BorderStyleText` -> `Border.Default` and `FocusedBorderStyleText` -> `Border.Focused + Focus.Border`
 - `Choice`/`ComboBox` keep glyph customization explicit through `DropdownGlyphSet`
+- `TreeView` keeps title focus marker rendering configurable through `FocusMarker` + `ShowFocusMarker`
+- `SearchBox` maps title/value/placeholder/match/navigation styles; title focus marker is configurable through `FocusMarker` + `ShowFocusMarker`
 
 Navigation primitive controls with direct token mappings:
 

@@ -93,10 +93,12 @@ V1 theming is semantic-token based with override hierarchy:
 - built-in palettes (Catppuccin, Rosé Pine) plus custom palette
 - override precedence: global theme -> control type -> control instance -> state
 - `TeaThemeControlExtensions` is split by domain (`Basic`, `InputValue`, `Navigation`, `NavigationOverlay`, `NavigationPrimitives`, `DataAndFlow`, `ExplorerAndFeedback`, `RenderingTextUtilities`, `ModalAndCharts`)
-- mapped input/value controls include `TextArea`, `Toggle`, `Slider`, `Spinner`, `ProgressBar`, `NumberInput`, `DatePicker`, `TimePicker`
-- mapped navigation/overlay controls include `Choice`, `ComboBox`, `TreeView`, `MenuBar`, `ContextMenu`, `CommandPalette`, `Notifications`
+- mapped input/value controls include `TextInput`, `TextArea`, `Toggle`, `Slider`, `Spinner`, `ProgressBar`, `NumberInput`, `DatePicker`, `TimePicker`
+- mapped navigation/overlay controls include `Choice`, `ComboBox`, `TreeView`, `MenuBar`, `ContextMenu`, `CommandPalette`, `Notifications`, `SearchBox`
 - `Choice` and `ComboBox` map `BorderStyleText`/`FocusedBorderStyleText` to semantic border/focus tokens by default
 - dropdown marker customization is explicit through `DropdownGlyphSet` on `Choice` and `ComboBox`
+- `ListView<T>` and `TreeView` expose `FocusMarker` + `ShowFocusMarker` for explicit focus-title rendering
+- `TextInput` and `SearchBox` expose focus-title marker customization plus title/value/placeholder style hooks
 - mapped navigation primitive controls include `Accordion`, `MultiSelect`, `RadioGroup`
 - mapped rendering text utility controls include `Badge`, `LogView`, `MarkdownView`, `MiniLog`
 - mapped modal/chart summary controls include `Dialog`, `Modal`, `BarChart`, `LineChart`, `Gauge`, `StatsCard`

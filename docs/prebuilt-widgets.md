@@ -72,6 +72,12 @@ These live in `TeaSharp.Controls`.
 - Border text visuals are overrideable per control through `BorderStyleText` and `FocusedBorderStyleText`.
 - Theme defaults map those border text hooks to semantic border/focus tokens.
 
+### Focus Marker and Title Hooks
+
+- `ListView<T>` and `TreeView` expose `FocusMarker` and `ShowFocusMarker` for title focus rendering.
+- `TextInput` and `SearchBox` expose `FocusMarker` and `ShowFocusMarker` with `TitleStyle`/`FocusedTitleStyle`.
+- `TextInput` and `SearchBox` style hooks focus on title/value/placeholder (plus match/navigation styles for `SearchBox`).
+
 ## Theme Mapping Snapshot
 
 Current shipped `TeaThemeControlExtensions` mappings include:
