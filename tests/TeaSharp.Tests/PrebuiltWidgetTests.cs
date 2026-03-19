@@ -26,6 +26,9 @@ internal static class PrebuiltWidgetTests
         yield return new TestCase("Controls_Tabs_ZeroShortcut_SelectsTenthTab", Tabs_ZeroShortcut_SelectsTenthTab);
         yield return new TestCase("Controls_Tabs_MouseClickSelectsTab", Tabs_MouseClickSelectsTab);
         yield return new TestCase("Controls_Tabs_SelectionChangedEvent_ReportsTab", Tabs_SelectionChangedEvent_ReportsTab);
+        yield return new TestCase("Controls_Breadcrumb_NavigatesSelection", Breadcrumb_NavigatesSelection);
+        yield return new TestCase("Controls_Breadcrumb_MouseClickSelectsItem", Breadcrumb_MouseClickSelectsItem);
+        yield return new TestCase("Controls_Breadcrumb_SelectionChangedEvent_ReportsTransition", Breadcrumb_SelectionChangedEvent_ReportsTransition);
         yield return new TestCase("Controls_ListView_NavigatesSelection", ListView_NavigatesSelection);
         yield return new TestCase("Controls_ListView_SelectionChangedEvent_ReportsTransition", ListView_SelectionChangedEvent_ReportsTransition);
         yield return new TestCase("Controls_ListView_MouseClickSelectsRow", ListView_MouseClickSelectsRow);
@@ -360,6 +363,73 @@ internal static class PrebuiltWidgetTests
         TestAssert.Equal(1, args.SelectedIndex, "Tabs event should expose the selected index.");
         TestAssert.Equal("Overview", args.PreviousItem, "Tabs event should expose the previous tab label.");
         TestAssert.Equal("Data", args.SelectedItem, "Tabs event should expose the selected tab label.");
+        return Task.CompletedTask;
+    }
+
+    private static Task Breadcrumb_NavigatesSelection()
+    {
+        var breadcrumb = new Breadcrumb
+        {
+            IsFocused = true,
+        };
+        breadcrumb.SetItems(
+        [
+            new BreadcrumbItem("home", "Home"),
+            new BreadcrumbItem("projects", "Projects"),
+            new BreadcrumbItem("build", "Build"),
+        ]);
+
+        breadcrumb.Handle(new KeyPressed(Key.End));
+        breadcrumb.Handle(new KeyPressed(Key.Left));
+        breadcrumb.Handle(new KeyPressed(Key.Home));
+        breadcrumb.Handle(new KeyPressed(Key.Right));
+
+        TestAssert.Equal(1, breadcrumb.SelectedIndex, "Breadcrumb keyboard navigation should handle Home/End/Left/Right transitions.");
+        TestAssert.Equal("projects", breadcrumb.SelectedItem?.Id ?? string.Empty, "Breadcrumb keyboard navigation should select the expected item.");
+        return Task.CompletedTask;
+    }
+
+    private static Task Breadcrumb_MouseClickSelectsItem()
+    {
+        var breadcrumb = new Breadcrumb();
+        breadcrumb.SetItems(
+        [
+            new BreadcrumbItem("home", "Home"),
+            new BreadcrumbItem("docs", "Docs"),
+            new BreadcrumbItem("api", "API"),
+        ]);
+
+        var changed = breadcrumb.Handle(new PointerInput(PointerEventKind.Press, PointerButton.Left, 9, 0), new Rect(0, 0, 40, 1));
+
+        TestAssert.True(changed, "Breadcrumb mouse click should select the clicked segment.");
+        TestAssert.Equal(1, breadcrumb.SelectedIndex, "Breadcrumb mouse click should select the clicked item index.");
+        TestAssert.Equal("docs", breadcrumb.SelectedItem?.Id ?? string.Empty, "Breadcrumb mouse click should select the clicked item.");
+        return Task.CompletedTask;
+    }
+
+    private static Task Breadcrumb_SelectionChangedEvent_ReportsTransition()
+    {
+        var breadcrumb = new Breadcrumb
+        {
+            IsFocused = true,
+        };
+        breadcrumb.SetItems(
+        [
+            new BreadcrumbItem("home", "Home"),
+            new BreadcrumbItem("projects", "Projects"),
+            new BreadcrumbItem("build", "Build"),
+        ]);
+
+        BreadcrumbSelectionChangedEventArgs? args = null;
+        breadcrumb.SelectionChanged += (_, eventArgs) => args = eventArgs;
+
+        breadcrumb.Handle(new KeyPressed(Key.Right));
+
+        TestAssert.True(args is not null, "Breadcrumb should raise selection changed when the selected item changes.");
+        TestAssert.Equal(0, args!.PreviousIndex, "Breadcrumb event should expose previous index.");
+        TestAssert.Equal(1, args.SelectedIndex, "Breadcrumb event should expose selected index.");
+        TestAssert.Equal("home", args.PreviousItem?.Id ?? string.Empty, "Breadcrumb event should expose previous item.");
+        TestAssert.Equal("projects", args.SelectedItem?.Id ?? string.Empty, "Breadcrumb event should expose selected item.");
         return Task.CompletedTask;
     }
 
