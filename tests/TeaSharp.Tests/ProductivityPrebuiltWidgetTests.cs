@@ -30,6 +30,10 @@ internal static class ProductivityPrebuiltWidgetTests
         yield return new TestCase("Controls_PropertyGrid_SelectionChangedEvent_ReportsTransition", PropertyGrid_SelectionChangedEvent_ReportsTransition);
         yield return new TestCase("Controls_PropertyGrid_RendersHeadersCategoriesAndSelection", PropertyGrid_RendersHeadersCategoriesAndSelection);
         yield return new TestCase("Controls_PropertyGrid_StyleHooks_EmitSgrFragments", PropertyGrid_StyleHooks_EmitSgrFragments);
+        yield return new TestCase("Controls_KeyValueList_KeyboardNavigationAndBounds", KeyValueList_KeyboardNavigationAndBounds);
+        yield return new TestCase("Controls_KeyValueList_SelectionChangedEvent_ReportsTransition", KeyValueList_SelectionChangedEvent_ReportsTransition);
+        yield return new TestCase("Controls_KeyValueList_MousePressSelectsRow", KeyValueList_MousePressSelectsRow);
+        yield return new TestCase("Controls_KeyValueList_StyleHooks_Rendered", KeyValueList_StyleHooks_Rendered);
         yield return new TestCase("Controls_SearchBox_UpdatesQueryAndRaisesEvent", SearchBox_UpdatesQueryAndRaisesEvent);
         yield return new TestCase("Controls_SearchBox_NavigationCommands_UpdateIndexAndRaiseEvent", SearchBox_NavigationCommands_UpdateIndexAndRaiseEvent);
         yield return new TestCase("Controls_SearchBox_MousePressOnHitTargets_Navigates", SearchBox_MousePressOnHitTargets_Navigates);
@@ -515,6 +519,115 @@ internal static class ProductivityPrebuiltWidgetTests
         TestAssert.True(
             hasCombinedBoldUnderline || hasSeparateBoldUnderline,
             "PropertyGrid selected row style should merge into row rendering.");
+        return Task.CompletedTask;
+    }
+
+    private static Task KeyValueList_KeyboardNavigationAndBounds()
+    {
+        var list = new KeyValueList
+        {
+            IsFocused = true,
+        };
+        list.SetEntries(
+        [
+            new KeyValueListEntry("Host", "localhost"),
+            new KeyValueListEntry("Port", "5432"),
+            new KeyValueListEntry("Timeout", "30s"),
+        ]);
+
+        var upAtStart = list.Handle(new KeyPressed(Key.Up));
+        TestAssert.True(!upAtStart, "KeyValueList should not move above first row.");
+        TestAssert.Equal(0, list.SelectedIndex, "KeyValueList should select first row by default.");
+
+        var downChanged = list.Handle(new KeyPressed(Key.Down));
+        TestAssert.True(downChanged, "KeyValueList should move selection down.");
+        TestAssert.Equal(1, list.SelectedIndex, "KeyValueList should move to second row after Down.");
+
+        var endChanged = list.Handle(new KeyPressed(Key.End));
+        TestAssert.True(endChanged, "KeyValueList End should jump to last row.");
+        TestAssert.Equal(2, list.SelectedIndex, "KeyValueList should select last row after End.");
+
+        list.IsReadOnly = true;
+        var blocked = list.Handle(new KeyPressed(Key.Up));
+        TestAssert.True(!blocked, "KeyValueList should ignore navigation when read-only.");
+        TestAssert.Equal(2, list.SelectedIndex, "KeyValueList selection should remain unchanged while read-only.");
+        return Task.CompletedTask;
+    }
+
+    private static Task KeyValueList_SelectionChangedEvent_ReportsTransition()
+    {
+        var list = new KeyValueList
+        {
+            IsFocused = true,
+        };
+        list.SetEntries(
+        [
+            new KeyValueListEntry("User", "tea"),
+            new KeyValueListEntry("Retries", "3"),
+        ]);
+
+        KeyValueListSelectionChangedEventArgs? args = null;
+        list.SelectionChanged += (_, eventArgs) => args = eventArgs;
+
+        list.Handle(new KeyPressed(Key.Down));
+
+        TestAssert.True(args is not null, "KeyValueList should raise selection changed when selection updates.");
+        TestAssert.Equal(0, args!.PreviousIndex, "KeyValueList event should expose previous index.");
+        TestAssert.Equal(1, args.CurrentIndex, "KeyValueList event should expose current index.");
+        TestAssert.True(args.PreviousItem is not null, "KeyValueList event should expose previous item.");
+        TestAssert.True(args.CurrentItem is not null, "KeyValueList event should expose current item.");
+        TestAssert.Equal("User", args.PreviousItem!.Key, "KeyValueList previous item key should match previous selection.");
+        TestAssert.Equal("Retries", args.CurrentItem!.Key, "KeyValueList current item key should match new selection.");
+        return Task.CompletedTask;
+    }
+
+    private static Task KeyValueList_MousePressSelectsRow()
+    {
+        var list = new KeyValueList
+        {
+            Border = BorderStyle.None,
+        };
+        list.SetEntries(
+        [
+            new KeyValueListEntry("Host", "localhost"),
+            new KeyValueListEntry("Port", "5432"),
+            new KeyValueListEntry("Timeout", "30s"),
+        ]);
+
+        var changed = list.Handle(new PointerInput(PointerEventKind.Press, PointerButton.Left, 0, 1), new Rect(0, 0, 48, 3));
+
+        TestAssert.True(changed, "KeyValueList click should update selected row.");
+        TestAssert.Equal(1, list.SelectedIndex, "KeyValueList click should select row by pointer Y offset.");
+        TestAssert.True(list.SelectedItem is not null, "KeyValueList should expose selected item after click.");
+        TestAssert.Equal("Port", list.SelectedItem!.Key, "KeyValueList click should select expected key.");
+        return Task.CompletedTask;
+    }
+
+    private static Task KeyValueList_StyleHooks_Rendered()
+    {
+        var list = new KeyValueList
+        {
+            Border = BorderStyle.None,
+            KeyStyle = TeaStyle.Empty.WithForeground(AnsiColor.BrightCyan),
+            ValueStyle = TeaStyle.Empty.WithForeground(AnsiColor.BrightGreen),
+            SeparatorStyle = TeaStyle.Empty.WithForeground(AnsiColor.BrightYellow),
+            SelectedRowStyle = TeaStyle.Empty.WithBold(),
+        };
+        list.SetEntries(
+        [
+            new KeyValueListEntry("Host", "localhost"),
+            new KeyValueListEntry("Port", "5432"),
+        ]);
+        list.SetSelectedIndex(1);
+        var canvas = new Canvas(48, 3);
+
+        list.Render(canvas, new Rect(0, 0, 48, 3));
+        var output = canvas.Render();
+
+        TestAssert.True(output.Contains("> Port", StringComparison.Ordinal), "KeyValueList should render selected row marker.");
+        TestAssert.True(output.Contains("\u001b[38;5;14m", StringComparison.Ordinal), "KeyValueList key style should emit SGR fragments.");
+        TestAssert.True(output.Contains("\u001b[38;5;10m", StringComparison.Ordinal), "KeyValueList value style should emit SGR fragments.");
+        TestAssert.True(output.Contains("\u001b[38;5;11m", StringComparison.Ordinal), "KeyValueList separator style should emit SGR fragments.");
         return Task.CompletedTask;
     }
 
