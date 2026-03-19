@@ -1,5 +1,6 @@
 using TeaSharp.Components.Primitives;
 using TeaSharp.Controls;
+using TeaSharp.Styles;
 
 namespace TeaSharp.Tests;
 
@@ -21,6 +22,9 @@ internal static class AdvancedPrebuiltWidgetTests
         yield return new TestCase("Controls_TreeView_MouseClickSelectsVisibleNode", TreeView_MouseClickSelectsVisibleNode);
         yield return new TestCase("Controls_Notifications_DismissesEntries", Notifications_DismissesEntries);
         yield return new TestCase("Controls_Notifications_MouseWheelMovesSelection", Notifications_MouseWheelMovesSelection);
+        yield return new TestCase("Controls_ToastCenter_KeyboardNavigationAndDismiss", ToastCenter_KeyboardNavigationAndDismiss);
+        yield return new TestCase("Controls_ToastCenter_PointerSelectsAndDismissesRow", ToastCenter_PointerSelectsAndDismissesRow);
+        yield return new TestCase("Controls_ToastCenter_StyleHooksAndTimeoutMetadata", ToastCenter_StyleHooksAndTimeoutMetadata);
         yield return new TestCase("Controls_Toolbar_KeyboardNavigationUpdatesSelection", Toolbar_KeyboardNavigationUpdatesSelection);
         yield return new TestCase("Controls_Toolbar_MouseClickSelectsItem", Toolbar_MouseClickSelectsItem);
         yield return new TestCase("Controls_Toolbar_SelectionChangedEvent_ReportsTransition", Toolbar_SelectionChangedEvent_ReportsTransition);
@@ -292,6 +296,90 @@ internal static class AdvancedPrebuiltWidgetTests
         TestAssert.True(output.Contains("third", StringComparison.Ordinal), "Newest entry should remain after moving selection up.");
         TestAssert.True(output.Contains("first", StringComparison.Ordinal), "Oldest entry should remain after removing middle entry.");
         TestAssert.True(!output.Contains("second", StringComparison.Ordinal), "Wheel-selected entry should be removed.");
+        return Task.CompletedTask;
+    }
+
+    private static Task ToastCenter_KeyboardNavigationAndDismiss()
+    {
+        var center = new ToastCenter
+        {
+            IsFocused = true,
+            Border = BorderStyle.None,
+            VisibleCapacity = 3,
+            MaxItems = 3,
+            AutoDismissExpired = false,
+        };
+        center.Push("first", NotificationLevel.Info, id: "a", timeout: null);
+        center.Push("second", NotificationLevel.Warning, id: "b", timeout: null);
+        center.Push("third", NotificationLevel.Error, id: "c", timeout: null);
+        center.Push("fourth", NotificationLevel.Success, id: "d", timeout: null);
+
+        TestAssert.Equal(3, center.Count, "Toast center should trim queue to max item count.");
+        TestAssert.Equal("b", center.Items[0].Id, "Oldest toast should be dropped when max queue size is reached.");
+
+        center.Handle(new KeyPressed(Key.Up));
+        TestAssert.Equal("c", center.SelectedItem?.Id ?? string.Empty, "Up key should move toast selection.");
+
+        var dismissed = center.Handle(new KeyPressed(Key.Delete));
+        TestAssert.True(dismissed, "Delete key should dismiss selected toast.");
+        TestAssert.Equal(2, center.Count, "Delete should remove one toast.");
+        TestAssert.Equal("d", center.SelectedItem?.Id ?? string.Empty, "Selection should remain stable after dismissal.");
+        return Task.CompletedTask;
+    }
+
+    private static Task ToastCenter_PointerSelectsAndDismissesRow()
+    {
+        var center = new ToastCenter
+        {
+            Border = BorderStyle.None,
+            AutoDismissExpired = false,
+        };
+        center.Push("alpha", NotificationLevel.Info, id: "a", timeout: null);
+        center.Push("beta", NotificationLevel.Warning, id: "b", timeout: null);
+        center.Push("gamma", NotificationLevel.Error, id: "c", timeout: null);
+
+        var bounds = new Rect(0, 0, 40, 4);
+        var selected = center.Handle(new PointerInput(PointerEventKind.Press, PointerButton.Left, 1, 1), bounds);
+        var dismissed = center.Handle(new PointerInput(PointerEventKind.Press, PointerButton.Right, 1, 1), bounds);
+
+        TestAssert.True(selected, "Pointer left-click should select the hit row.");
+        TestAssert.True(dismissed, "Pointer right-click should dismiss the hit row.");
+        TestAssert.Equal(2, center.Count, "Pointer dismiss should remove one toast.");
+        TestAssert.Equal("c", center.SelectedItem?.Id ?? string.Empty, "Selection should move to nearest remaining toast.");
+        return Task.CompletedTask;
+    }
+
+    private static Task ToastCenter_StyleHooksAndTimeoutMetadata()
+    {
+        var center = new ToastCenter
+        {
+            IsFocused = true,
+            Title = "Toasts",
+            FocusMarker = "!",
+            Border = BorderStyle.SingleLine,
+            AutoDismissExpired = false,
+            ItemStyle = TeaStyle.Empty.WithForeground(AnsiColor.BrightCyan),
+            SelectedItemStyle = TeaStyle.Empty.WithBold(),
+            MutedItemStyle = TeaStyle.Empty.WithDim(),
+            WarningItemStyle = TeaStyle.Empty.WithForeground(AnsiColor.BrightYellow),
+            FocusedTitleStyle = TeaStyle.Empty.WithUnderline().WithForeground(AnsiColor.BrightMagenta),
+        };
+        center.Push("muted", NotificationLevel.Info, id: "m", timeout: null);
+        center.SetMuted("m");
+        center.Push("expired", NotificationLevel.Info, id: "x", timeout: TimeSpan.Zero);
+        center.Push("warning", NotificationLevel.Warning, id: "w", timeout: null);
+
+        var removed = center.DismissExpired(DateTimeOffset.UtcNow);
+        TestAssert.Equal(1, removed, "DismissExpired should remove timeout-expired toasts.");
+
+        var canvas = new Canvas(48, 6);
+        center.Render(canvas, new Rect(0, 0, 48, 6));
+        var output = canvas.Render();
+
+        TestAssert.True(output.Contains("Toasts !", StringComparison.Ordinal), "Focused title should include focus marker.");
+        TestAssert.True(output.Contains("\u001b[4;38;5;13m", StringComparison.Ordinal), "Focused title style should render.");
+        TestAssert.True(output.Contains("\u001b[1;38;5;11m", StringComparison.Ordinal), "Selected warning style should render.");
+        TestAssert.True(output.Contains("\u001b[2;38;5;14m", StringComparison.Ordinal), "Muted row style should render.");
         return Task.CompletedTask;
     }
 
