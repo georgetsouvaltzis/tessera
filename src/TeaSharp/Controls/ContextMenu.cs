@@ -1,6 +1,7 @@
 using System.ComponentModel;
 using TeaSharp.Components.Primitives;
 using TeaSharp.Components.Primitives.Internal;
+using TeaSharp.Controls.Internal;
 using TeaSharp.Layout;
 using TeaSharp.Styles;
 
@@ -19,13 +20,36 @@ public sealed class ContextMenu : Control
     private long _executionVersion;
     private long _consumedExecutionVersion;
 
+    /// <summary>
+    /// Occurs when a menu item is executed.
+    /// </summary>
     public event EventHandler<ContextMenuItemExecutedEventArgs>? ItemExecuted;
 
+    /// <summary>
+    /// Gets or sets the menu title.
+    /// </summary>
     public string Title
     {
         get;
         set => field = value ?? string.Empty;
     } = "Context";
+
+    /// <summary>
+    /// Gets or sets the marker appended to the title while focused when <see cref="ShowFocusMarker"/> is enabled.
+    /// </summary>
+    public string FocusMarker
+    {
+        get;
+        set => field = value ?? string.Empty;
+    } = "*";
+
+    /// <summary>
+    /// Gets or sets a value indicating whether the focus marker should be shown while focused.
+    /// </summary>
+    /// <remarks>
+    /// Defaults to <see langword="false"/> to preserve previous context-menu title output.
+    /// </remarks>
+    public bool ShowFocusMarker { get; set; }
 
     public TeaStyle TitleStyle { get; set; } = TeaStyle.Empty;
 
@@ -40,6 +64,21 @@ public sealed class ContextMenu : Control
     public TeaStyle DisabledItemStyle { get; set; } = TeaStyle.Empty;
 
     public TeaStyle MutedItemStyle { get; set; } = TeaStyle.Empty;
+
+    /// <summary>
+    /// Gets or sets the style applied to border glyphs when the control is not focused.
+    /// </summary>
+    public TeaStyle BorderStyleText { get; set; } = TeaStyle.Empty;
+
+    /// <summary>
+    /// Gets or sets the style applied to border glyphs when the control is focused.
+    /// </summary>
+    public TeaStyle FocusedBorderStyleText { get; set; } = TeaStyle.Empty;
+
+    /// <summary>
+    /// Gets or sets row marker glyphs used for rendering.
+    /// </summary>
+    public ContextMenuGlyphSet Glyphs { get; set; } = ContextMenuGlyphSet.Default;
 
     public bool IsVisible { get; private set; }
 
@@ -273,7 +312,7 @@ public sealed class ContextMenu : Control
 
         if (Border != BorderStyle.None)
         {
-            canvas.DrawBox(menuBounds, ApplyStyle(Title, IsFocused ? FocusedTitleStyle : TitleStyle), Border);
+            canvas.DrawBox(menuBounds, RenderTitleText(), Border, ResolveBorderStyleText());
         }
 
         if (_items.Count == 0)
@@ -296,7 +335,7 @@ public sealed class ContextMenu : Control
 
     internal override LayoutMeasurement Measure(in Rect availableBounds)
     {
-        var width = _cachedItemWidth + Padding.Horizontal + (Border == BorderStyle.None ? 0 : 2);
+        var width = ResolvePreferredWidth() + Padding.Horizontal + (Border == BorderStyle.None ? 0 : 2);
         var height = Math.Max(3, _items.Count + 2);
         return new LayoutMeasurement(
             Math.Clamp(width, 0, availableBounds.Width),
@@ -343,9 +382,52 @@ public sealed class ContextMenu : Control
         return style;
     }
 
+    private TeaStyle ResolveBorderStyleText()
+    {
+        var style = BorderStyleText;
+        if (IsFocused)
+        {
+            style = style.Merge(FocusedBorderStyleText);
+        }
+
+        if (IsDisabled)
+        {
+            style = style.Merge(DisabledItemStyle).Merge(MutedItemStyle);
+        }
+
+        return style;
+    }
+
     private static string ApplyStyle(string text, TeaStyle style)
     {
         return style.IsEmpty ? text : style.Render(text);
+    }
+
+    private string RenderTitleText()
+    {
+        var title = FormatTitleText();
+        if (string.IsNullOrEmpty(title))
+        {
+            return title;
+        }
+
+        var style = IsFocused ? FocusedTitleStyle : TitleStyle;
+        return ApplyStyle(title, style);
+    }
+
+    private string FormatTitleText()
+    {
+        if (string.IsNullOrEmpty(Title))
+        {
+            return string.Empty;
+        }
+
+        if (IsFocused && ShowFocusMarker && !string.IsNullOrWhiteSpace(FocusMarker))
+        {
+            return string.Concat(Title, " ", FocusMarker);
+        }
+
+        return Title;
     }
 
     private static bool ContainsWithRightTolerance(Rect rect, int x, int y)
@@ -365,7 +447,7 @@ public sealed class ContextMenu : Control
             return false;
         }
 
-        var width = Math.Min(_cachedItemWidth, bounds.Width);
+        var width = Math.Min(ResolvePreferredWidth(), bounds.Width);
         var height = Math.Min(Math.Max(3, _items.Count + 2), bounds.Height);
         var x = Math.Clamp(AnchorX, bounds.X, Math.Max(bounds.X, bounds.Right - width));
         var y = Math.Clamp(AnchorY, bounds.Y, Math.Max(bounds.Y, bounds.Bottom - height));
@@ -382,23 +464,49 @@ public sealed class ContextMenu : Control
         {
             var item = _items[index];
             _itemRenderCache.Add(ContextMenuRenderCache.Create(item.Title));
-            width = Math.Max(width, item.Title.Length + 4);
+            width = Math.Max(width, ResolveMinimumRowWidth(item.Title));
         }
 
         _cachedItemWidth = width;
     }
 
+    private int ResolvePreferredWidth()
+    {
+        var width = Math.Max(12, _cachedItemWidth);
+        for (var index = 0; index < _itemRenderCache.Count; index++)
+        {
+            width = Math.Max(width, ResolveMinimumRowWidth(_itemRenderCache[index].Title));
+        }
+
+        if (Border != BorderStyle.None)
+        {
+            // DrawBox writes title as $" {title} " inside a width-4 slot.
+            // Reserve enough room so focused markers in titles are not clipped.
+            width = Math.Max(width, ControlTextLayout.MeasureDisplayWidth(FormatTitleText()) + 6);
+        }
+
+        return width;
+    }
+
     private string ResolveRowText(int index)
     {
         var row = _itemRenderCache[index];
-        if (index == _selectedIndex)
-        {
-            return row.SelectedRow;
-        }
+        var marker = index == _selectedIndex
+            ? Glyphs.SelectedRowMarker
+            : index == _hoveredIndex
+                ? Glyphs.HoveredRowMarker
+                : Glyphs.NormalRowMarker;
+        return string.Concat(marker, Glyphs.MarkerSeparator, row.Title);
+    }
 
-        return index == _hoveredIndex
-            ? row.HoveredRow
-            : row.NormalRow;
+    private int ResolveMinimumRowWidth(string title)
+    {
+        var markerWidth = Math.Max(
+            ControlTextLayout.MeasureDisplayWidth(Glyphs.NormalRowMarker),
+            Math.Max(
+                ControlTextLayout.MeasureDisplayWidth(Glyphs.SelectedRowMarker),
+                ControlTextLayout.MeasureDisplayWidth(Glyphs.HoveredRowMarker)));
+        return markerWidth + ControlTextLayout.MeasureDisplayWidth(Glyphs.MarkerSeparator) + ControlTextLayout.MeasureDisplayWidth(title) + 2;
     }
 
     private void ExecuteItem(int index)
@@ -410,14 +518,11 @@ public sealed class ContextMenu : Control
         Close();
     }
 
-    private readonly record struct ContextMenuRenderCache(string NormalRow, string SelectedRow, string HoveredRow)
+    private readonly record struct ContextMenuRenderCache(string Title)
     {
         public static ContextMenuRenderCache Create(string title)
         {
-            return new ContextMenuRenderCache(
-                string.Concat("  ", title),
-                string.Concat("> ", title),
-                string.Concat("▸ ", title));
+            return new ContextMenuRenderCache(title ?? string.Empty);
         }
     }
 }
