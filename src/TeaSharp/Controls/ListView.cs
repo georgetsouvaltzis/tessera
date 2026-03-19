@@ -76,6 +76,24 @@ public sealed class ListView<T> : Control
     } = TeaStyle.Empty;
 
     /// <summary>
+    /// Gets or sets the style applied to border glyphs when the control is not focused.
+    /// </summary>
+    public TeaStyle BorderStyleText
+    {
+        get;
+        set;
+    } = TeaStyle.Empty;
+
+    /// <summary>
+    /// Gets or sets the style applied to border glyphs when the control is focused.
+    /// </summary>
+    public TeaStyle FocusedBorderStyleText
+    {
+        get;
+        set;
+    } = TeaStyle.Empty;
+
+    /// <summary>
     /// Gets or sets the list border style.
     /// </summary>
     public BorderStyle Border
@@ -119,6 +137,15 @@ public sealed class ListView<T> : Control
         get;
         set;
     } = TeaStyle.Empty;
+
+    /// <summary>
+    /// Gets or sets row markers used during list rendering.
+    /// </summary>
+    public ListViewMarkerSet RowMarkers
+    {
+        get;
+        set;
+    } = ListViewMarkerSet.Default;
 
     /// <summary>
     /// Gets or sets how many items fit in a page-sized view.
@@ -280,7 +307,8 @@ public sealed class ListView<T> : Control
             clipped,
             Border == BorderStyle.None ? null : FormatTitle(),
             Border,
-            Padding);
+            Padding,
+            ResolveBorderStyleText());
         if (content.IsEmpty)
         {
             return;
@@ -299,8 +327,8 @@ public sealed class ListView<T> : Control
             var visible = rows[row];
             var hovered = _hoveredFilteredIndex == visible.Index;
             var marker = visible.Selected
-                ? "›"
-                : hovered ? "▸" : " ";
+                ? RowMarkers.SelectedRowMarker
+                : hovered ? RowMarkers.HoveredRowMarker : RowMarkers.DefaultRowMarker;
             var text = $"{marker} {_model.LabelFor(visible.Item)}";
             canvas.WriteText(content.X, content.Y + row, ApplyRowStyle(text, visible.Selected, hovered), content.Width);
         }
@@ -312,7 +340,7 @@ public sealed class ListView<T> : Control
         var width = 0;
         for (var index = 0; index < rows.Count; index++)
         {
-            width = Math.Max(width, ControlTextLayout.MeasureDisplayWidth(_model.LabelFor(rows[index].Item)) + 2);
+            width = Math.Max(width, ControlTextLayout.MeasureDisplayWidth(_model.LabelFor(rows[index].Item)) + ResolveMarkerPrefixWidth());
         }
 
         width += Padding.Horizontal;
@@ -378,9 +406,9 @@ public sealed class ListView<T> : Control
         return true;
     }
 
-    private static bool IsPointerWithinRowLabel(int pointerX, int contentX, int contentWidth, string label)
+    private bool IsPointerWithinRowLabel(int pointerX, int contentX, int contentWidth, string label)
     {
-        var hitWidth = Math.Min(contentWidth, 2 + ControlTextLayout.MeasureDisplayWidth(label));
+        var hitWidth = Math.Min(contentWidth, ResolveMarkerPrefixWidth() + ControlTextLayout.MeasureDisplayWidth(label));
         return pointerX >= contentX && pointerX < contentX + hitWidth;
     }
 
@@ -420,6 +448,23 @@ public sealed class ListView<T> : Control
         }
 
         return style.Render(title);
+    }
+
+    private int ResolveMarkerPrefixWidth()
+    {
+        var markerWidth = Math.Max(
+            ControlTextLayout.MeasureDisplayWidth(RowMarkers.DefaultRowMarker),
+            Math.Max(
+                ControlTextLayout.MeasureDisplayWidth(RowMarkers.HoveredRowMarker),
+                ControlTextLayout.MeasureDisplayWidth(RowMarkers.SelectedRowMarker)));
+        return markerWidth + 1;
+    }
+
+    private TeaStyle ResolveBorderStyleText()
+    {
+        return IsFocused
+            ? BorderStyleText.Merge(FocusedBorderStyleText)
+            : BorderStyleText;
     }
 
     private static string DefaultText(T item) => item?.ToString() ?? string.Empty;
