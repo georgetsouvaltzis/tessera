@@ -213,8 +213,8 @@ internal sealed class TeaSceneCompiler : IScreenCompiler
             return layout switch
             {
                 WindowLayout window => TryBuildWindow(window, bounds, path),
-                RowLayout row => TryBuildStack(true, row.Items.ToArray(), row.Gap, row.Padding, bounds, path),
-                ColumnLayout column => TryBuildStack(false, column.Items.ToArray(), column.Gap, column.Padding, bounds, path),
+                RowLayout row => TryBuildStack(true, AsReadOnlyList(row.Items), row.Gap, row.Padding, bounds, path),
+                ColumnLayout column => TryBuildStack(false, AsReadOnlyList(column.Items), column.Gap, column.Padding, bounds, path),
                 CenterLayout center => TryBuildCenter(center, bounds, path),
                 PanelLayout panel => TryBuildPanel(panel, bounds, path),
                 OverlayLayout overlay => TryBuildOverlay(overlay, bounds, path),
@@ -235,6 +235,11 @@ internal sealed class TeaSceneCompiler : IScreenCompiler
                 _requestedFocusOrder,
                 _implicitFocusRegionId,
                 trackFocus);
+        }
+
+        private static IReadOnlyList<LayoutSlot> AsReadOnlyList(IList<LayoutSlot> slots)
+        {
+            return slots as IReadOnlyList<LayoutSlot> ?? [.. slots];
         }
 
         private bool TryBuildWindow(WindowLayout window, in Rect bounds, string path)
@@ -466,7 +471,12 @@ internal sealed class TeaSceneCompiler : IScreenCompiler
                 }
             }
 
-            var totalWeight = flexibleWeights.Sum();
+            var totalWeight = 0;
+            for (var index = 0; index < flexibleWeights.Length; index++)
+            {
+                totalWeight += flexibleWeights[index];
+            }
+
             if (totalWeight > 0 && remaining > 0)
             {
                 var assigned = 0;
@@ -630,6 +640,7 @@ internal sealed class TeaSceneCompiler : IScreenCompiler
     private sealed class TeaSceneCompiledScreen : ICompiledScreenInteraction
     {
         private readonly IReadOnlyList<TeaSceneRegion> _regions;
+        private readonly int[]? _renderOrder;
         private readonly Action<string?> _trackFocus;
 
         public TeaSceneCompiledScreen(
@@ -642,9 +653,10 @@ internal sealed class TeaSceneCompiler : IScreenCompiler
         {
             _regions = regions;
             _trackFocus = trackFocus;
+            _renderOrder = BuildRenderOrder(regions);
             FocusedRegionId = ResolveInitialFocus(previousFocusedRegionId, requestedFocusRegionId, requestedFocusOrder, implicitFocusRegionId);
             ApplyFocus(FocusedRegionId, invokeFocus: false);
-            HasInteraction = _regions.Any(region => region.Update is not null || region.UpdateMouse is not null || region.Focusable);
+            HasInteraction = HasInteractiveRegions(_regions);
         }
 
         public string? FocusedRegionId { get; private set; }
@@ -653,8 +665,20 @@ internal sealed class TeaSceneCompiler : IScreenCompiler
 
         public void Render(Canvas canvas)
         {
-            foreach (var region in _regions.OrderBy(static region => region.Layer))
+            if (_renderOrder is null)
             {
+                for (var index = 0; index < _regions.Count; index++)
+                {
+                    var region = _regions[index];
+                    region.Render(canvas, region.Bounds);
+                }
+
+                return;
+            }
+
+            for (var orderIndex = 0; orderIndex < _renderOrder.Length; orderIndex++)
+            {
+                var region = _regions[_renderOrder[orderIndex]];
                 region.Render(canvas, region.Bounds);
             }
         }
@@ -765,24 +789,87 @@ internal sealed class TeaSceneCompiler : IScreenCompiler
 
         private int FindTopMostRegion(int x, int y)
         {
-            TeaSceneRegion? best = null;
-            var bestIndex = -1;
-            for (var index = 0; index < _regions.Count; index++)
+            if (_renderOrder is null)
             {
-                var region = _regions[index];
-                if (!region.Bounds.Contains(x, y) || !region.InterceptsPointer)
+                for (var index = _regions.Count - 1; index >= 0; index--)
                 {
-                    continue;
+                    var region = _regions[index];
+                    if (region.Bounds.Contains(x, y) && region.InterceptsPointer)
+                    {
+                        return index;
+                    }
                 }
 
-                if (best is null || region.Layer >= best.Layer)
+                return -1;
+            }
+
+            for (var orderIndex = _renderOrder.Length - 1; orderIndex >= 0; orderIndex--)
+            {
+                var regionIndex = _renderOrder[orderIndex];
+                var region = _regions[regionIndex];
+                if (region.Bounds.Contains(x, y) && region.InterceptsPointer)
                 {
-                    best = region;
-                    bestIndex = index;
+                    return regionIndex;
                 }
             }
 
-            return bestIndex;
+            return -1;
+        }
+
+        private static bool HasInteractiveRegions(IReadOnlyList<TeaSceneRegion> regions)
+        {
+            for (var index = 0; index < regions.Count; index++)
+            {
+                var region = regions[index];
+                if (region.Update is not null || region.UpdateMouse is not null || region.Focusable)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        private static int[]? BuildRenderOrder(IReadOnlyList<TeaSceneRegion> regions)
+        {
+            if (regions.Count <= 1)
+            {
+                return null;
+            }
+
+            var sorted = true;
+            var previousLayer = regions[0].Layer;
+            for (var index = 1; index < regions.Count; index++)
+            {
+                var layer = regions[index].Layer;
+                if (layer < previousLayer)
+                {
+                    sorted = false;
+                    break;
+                }
+
+                previousLayer = layer;
+            }
+
+            if (sorted)
+            {
+                return null;
+            }
+
+            var order = new int[regions.Count];
+            for (var index = 0; index < order.Length; index++)
+            {
+                order[index] = index;
+            }
+
+            Array.Sort(
+                order,
+                (left, right) =>
+                {
+                    var layerCompare = regions[left].Layer.CompareTo(regions[right].Layer);
+                    return layerCompare != 0 ? layerCompare : left.CompareTo(right);
+                });
+            return order;
         }
 
         private int FindFocusableIndex(int startIndex, int step)
