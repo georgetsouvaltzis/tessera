@@ -1,5 +1,7 @@
 using TeaSharp.Components.Primitives;
+using TeaSharp.Controls.Internal;
 using TeaSharp.Layout;
+using TeaSharp.Styles;
 
 namespace TeaSharp.Controls;
 
@@ -18,6 +20,40 @@ public sealed class StatsCard : Control
         get;
         set => field = value ?? string.Empty;
     } = "Stats";
+
+    /// <summary>
+    /// Gets or sets the marker shown in the title when focused.
+    /// </summary>
+    public string FocusMarker
+    {
+        get;
+        set => field = value ?? string.Empty;
+    } = "*";
+
+    /// <summary>
+    /// Gets or sets whether the focused title marker should be rendered.
+    /// </summary>
+    public bool ShowFocusMarker { get; set; } = true;
+
+    /// <summary>
+    /// Gets or sets the title style used when not focused.
+    /// </summary>
+    public TeaStyle TitleStyle { get; set; } = TeaStyle.Empty;
+
+    /// <summary>
+    /// Gets or sets the title style used when focused.
+    /// </summary>
+    public TeaStyle FocusedTitleStyle { get; set; } = TeaStyle.Empty;
+
+    /// <summary>
+    /// Gets or sets style used for item key text.
+    /// </summary>
+    public TeaStyle KeyStyle { get; set; } = TeaStyle.Empty;
+
+    /// <summary>
+    /// Gets or sets style used for item value text.
+    /// </summary>
+    public TeaStyle ValueStyle { get; set; } = TeaStyle.Empty;
 
     /// <summary>
     /// Gets the current card items.
@@ -68,7 +104,7 @@ public sealed class StatsCard : Control
             return;
         }
 
-        canvas.DrawBox(clipped, Title);
+        canvas.DrawBox(clipped, RenderTitle());
         var content = clipped.Inset(1, 1);
         if (content.IsEmpty || _items.Count == 0)
         {
@@ -83,14 +119,14 @@ public sealed class StatsCard : Control
             var label = item.Label.Length > keyWidth
                 ? item.Label[..keyWidth]
                 : item.Label.PadRight(keyWidth);
-            var line = $"{label} {item.Value}";
+            var line = $"{ApplyStyle(label, KeyStyle)} {ApplyStyle(item.Value, ValueStyle)}";
             canvas.WriteText(content.X, content.Y + row, line, content.Width);
         }
     }
 
     internal override LayoutMeasurement Measure(in Rect availableBounds)
     {
-        var width = Math.Max(8, Title.Length + 4);
+        var width = Math.Max(8, ControlTextLayout.MeasureDisplayWidth(FormatTitleForMeasure()) + 4);
         for (var index = 0; index < _items.Count; index++)
         {
             width = Math.Max(width, _items[index].Label.Length + _items[index].Value.Length + 2);
@@ -100,5 +136,40 @@ public sealed class StatsCard : Control
         return new LayoutMeasurement(
             Math.Clamp(width, 0, availableBounds.Width),
             Math.Clamp(height, 0, availableBounds.Height));
+    }
+
+    private string RenderTitle()
+    {
+        return ApplyStyle(FormatTitleText(), IsFocused ? FocusedTitleStyle : TitleStyle);
+    }
+
+    private string FormatTitleText()
+    {
+        if (string.IsNullOrEmpty(Title))
+        {
+            return string.Empty;
+        }
+
+        if (IsFocused && ShowFocusMarker && !string.IsNullOrWhiteSpace(FocusMarker))
+        {
+            return $"{Title} {FocusMarker}";
+        }
+
+        return Title;
+    }
+
+    private string FormatTitleForMeasure()
+    {
+        if (ShowFocusMarker && !string.IsNullOrWhiteSpace(FocusMarker))
+        {
+            return $"{Title} {FocusMarker}";
+        }
+
+        return Title;
+    }
+
+    private static string ApplyStyle(string text, TeaStyle style)
+    {
+        return style.IsEmpty ? text : style.Render(text ?? string.Empty);
     }
 }

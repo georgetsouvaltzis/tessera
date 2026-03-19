@@ -1,6 +1,8 @@
 using TeaSharp.Components.Primitives;
 using TeaSharp.Controls.Internal;
 using TeaSharp.Layout;
+using TeaSharp.Styles;
+using System.Globalization;
 
 namespace TeaSharp.Controls;
 
@@ -33,6 +35,40 @@ public sealed class LineChart : Control
         get;
         set => field = value ?? string.Empty;
     } = "Line Chart";
+
+    /// <summary>
+    /// Gets or sets the marker shown in the title when focused.
+    /// </summary>
+    public string FocusMarker
+    {
+        get;
+        set => field = value ?? string.Empty;
+    } = "*";
+
+    /// <summary>
+    /// Gets or sets whether the focused title marker should be rendered.
+    /// </summary>
+    public bool ShowFocusMarker { get; set; } = true;
+
+    /// <summary>
+    /// Gets or sets the title style used when not focused.
+    /// </summary>
+    public TeaStyle TitleStyle { get; set; } = TeaStyle.Empty;
+
+    /// <summary>
+    /// Gets or sets the title style used when focused.
+    /// </summary>
+    public TeaStyle FocusedTitleStyle { get; set; } = TeaStyle.Empty;
+
+    /// <summary>
+    /// Gets or sets style used for min/max stat text.
+    /// </summary>
+    public TeaStyle StatsStyle { get; set; } = TeaStyle.Empty;
+
+    /// <summary>
+    /// Gets or sets style used for legend and axis labels.
+    /// </summary>
+    public TeaStyle MetaTextStyle { get; set; } = TeaStyle.Empty;
 
     /// <summary>
     /// Gets or sets the optional minimum value used when scaling samples.
@@ -145,15 +181,139 @@ public sealed class LineChart : Control
             Zoom = Zoom,
             Offset = Offset,
         };
-        ChartRenderer.DrawLineChart(canvas, rect, _samples, Title, MinValue, MaxValue, options);
+        if (!MetaTextStyle.IsEmpty)
+        {
+            options = options with
+            {
+                Legend = StyleOptional(options.Legend, MetaTextStyle),
+                XLabel = StyleOptional(options.XLabel, MetaTextStyle),
+                YLabel = StyleOptional(options.YLabel, MetaTextStyle),
+            };
+        }
+
+        ChartRenderer.DrawLineChart(canvas, rect, _samples, RenderTitle(), MinValue, MaxValue, options);
+        TryRenderStyledStats(canvas, rect, options);
     }
 
     internal override LayoutMeasurement Measure(in Rect availableBounds)
     {
-        var width = Math.Max(16, Title.Length + 8);
+        var width = Math.Max(16, ControlTextLayout.MeasureDisplayWidth(FormatTitleForMeasure()) + 8);
         var height = 8;
         return new LayoutMeasurement(
             Math.Clamp(width, 0, availableBounds.Width),
             Math.Clamp(height, 0, availableBounds.Height));
+    }
+
+    private string RenderTitle()
+    {
+        return ApplyStyle(FormatTitleText(), IsFocused ? FocusedTitleStyle : TitleStyle);
+    }
+
+    private string FormatTitleText()
+    {
+        if (string.IsNullOrEmpty(Title))
+        {
+            return string.Empty;
+        }
+
+        if (IsFocused && ShowFocusMarker && !string.IsNullOrWhiteSpace(FocusMarker))
+        {
+            return $"{Title} {FocusMarker}";
+        }
+
+        return Title;
+    }
+
+    private string FormatTitleForMeasure()
+    {
+        if (ShowFocusMarker && !string.IsNullOrWhiteSpace(FocusMarker))
+        {
+            return $"{Title} {FocusMarker}";
+        }
+
+        return Title;
+    }
+
+    private static string StyleOptional(string? value, TeaStyle style)
+    {
+        if (string.IsNullOrWhiteSpace(value) || style.IsEmpty)
+        {
+            return value ?? string.Empty;
+        }
+
+        return style.Render(value.Trim());
+    }
+
+    private static string ApplyStyle(string text, TeaStyle style)
+    {
+        return style.IsEmpty ? text : style.Render(text);
+    }
+
+    private void TryRenderStyledStats(Canvas canvas, Rect rect, LineChartOptions options)
+    {
+        if (StatsStyle.IsEmpty || _samples.Count == 0)
+        {
+            return;
+        }
+
+        var clipped = Rect.Intersect(rect, canvas.Bounds);
+        if (clipped.IsEmpty || clipped.Width < 4 || clipped.Height < 4)
+        {
+            return;
+        }
+
+        var content = clipped.Inset(1, 1);
+        if (content.IsEmpty)
+        {
+            return;
+        }
+
+        var plot = options.ShowAxes && content.Width >= 6 && content.Height >= 4
+            ? new Rect(content.X + 1, content.Y, content.Width - 1, content.Height - 1)
+            : content;
+        if (plot.IsEmpty)
+        {
+            return;
+        }
+
+        var zoom = double.IsFinite(options.Zoom)
+            ? Math.Clamp(options.Zoom, 0.1, 8.0)
+            : 1.0;
+        var count = Math.Clamp((int)Math.Round(plot.Width / zoom, MidpointRounding.AwayFromZero), 1, _samples.Count);
+        var maxOffset = Math.Max(0, _samples.Count - count);
+        var offset = Math.Clamp(options.Offset, 0, maxOffset);
+        var min = MinValue ?? double.PositiveInfinity;
+        var max = MaxValue ?? double.NegativeInfinity;
+        if (!MinValue.HasValue || !MaxValue.HasValue)
+        {
+            for (var index = 0; index < count; index++)
+            {
+                var value = _samples[offset + index];
+                if (!MinValue.HasValue && value < min)
+                {
+                    min = value;
+                }
+
+                if (!MaxValue.HasValue && value > max)
+                {
+                    max = value;
+                }
+            }
+        }
+
+        if (Math.Abs(max - min) < double.Epsilon)
+        {
+            max = min + 1;
+        }
+
+        var stats = StatsStyle.Render($"min:{FormatStat(min)} max:{FormatStat(max)}");
+        canvas.WriteText(content.X, content.Y, stats, content.Width);
+    }
+
+    private static string FormatStat(double value)
+    {
+        return Math.Abs(value) >= 100
+            ? value.ToString("0", CultureInfo.InvariantCulture)
+            : value.ToString("0.0", CultureInfo.InvariantCulture);
     }
 }

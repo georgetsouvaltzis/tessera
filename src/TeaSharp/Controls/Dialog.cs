@@ -3,6 +3,7 @@ using TeaSharp.Components.Primitives.Internal;
 using System.ComponentModel;
 using TeaSharp.Controls.Internal;
 using TeaSharp.Layout;
+using TeaSharp.Styles;
 
 namespace TeaSharp.Controls;
 
@@ -60,6 +61,51 @@ public sealed class Dialog : Control
         get;
         set;
     }
+
+    /// <summary>
+    /// Gets or sets the marker shown in the title when focused.
+    /// </summary>
+    public string FocusMarker
+    {
+        get;
+        set => field = value ?? string.Empty;
+    } = "*";
+
+    /// <summary>
+    /// Gets or sets whether the focused title marker should be rendered.
+    /// </summary>
+    public bool ShowFocusMarker
+    {
+        get;
+        set;
+    } = true;
+
+    /// <summary>
+    /// Gets or sets the title style used when not focused.
+    /// </summary>
+    public TeaStyle TitleStyle
+    {
+        get;
+        set;
+    } = TeaStyle.Empty;
+
+    /// <summary>
+    /// Gets or sets the title style used when focused.
+    /// </summary>
+    public TeaStyle FocusedTitleStyle
+    {
+        get;
+        set;
+    } = TeaStyle.Empty;
+
+    /// <summary>
+    /// Gets or sets body text style.
+    /// </summary>
+    public TeaStyle BodyTextStyle
+    {
+        get;
+        set;
+    } = TeaStyle.Empty;
 
     /// <summary>
     /// Gets or sets a value indicating whether the dialog is visible.
@@ -171,7 +217,7 @@ public sealed class Dialog : Control
         var modal = new Rect(modalX, modalY, modalWidth, modalHeight);
 
         FillRect(canvas, modal, ' ');
-        var body = FrameLayout.DrawFrameAndResolveContent(canvas, modal, Title, Border, Padding);
+        var body = FrameLayout.DrawFrameAndResolveContent(canvas, modal, RenderTitle(), Border, Padding);
         if (body.IsEmpty)
         {
             return;
@@ -180,18 +226,48 @@ public sealed class Dialog : Control
         var rows = Math.Min(body.Height, _bodyLines.Count);
         for (var row = 0; row < rows; row++)
         {
-            canvas.WriteText(body.X, body.Y + row, _bodyLines[row], body.Width);
+            canvas.WriteText(body.X, body.Y + row, ApplyStyle(_bodyLines[row], BodyTextStyle), body.Width);
         }
     }
 
     internal override LayoutMeasurement Measure(in Rect availableBounds)
     {
         var longest = _bodyLines.Count == 0 ? 8 : _bodyLines.Max(ControlTextLayout.MeasureDisplayWidth);
-        var width = Math.Max(Title.Length + 4, longest + Padding.Horizontal) + 2;
+        var width = Math.Max(ControlTextLayout.MeasureDisplayWidth(FormatTitleForMeasure()) + 4, longest + Padding.Horizontal) + 2;
         var height = Math.Max(4, _bodyLines.Count + Padding.Vertical + 2);
         return new LayoutMeasurement(
             Math.Clamp(width, 0, availableBounds.Width),
             Math.Clamp(height, 0, availableBounds.Height));
+    }
+
+    private string RenderTitle()
+    {
+        return ApplyStyle(FormatTitleText(), IsFocused ? FocusedTitleStyle : TitleStyle);
+    }
+
+    private string FormatTitleText()
+    {
+        if (string.IsNullOrEmpty(Title))
+        {
+            return string.Empty;
+        }
+
+        if (IsFocused && ShowFocusMarker && !string.IsNullOrWhiteSpace(FocusMarker))
+        {
+            return $"{Title} {FocusMarker}";
+        }
+
+        return Title;
+    }
+
+    private string FormatTitleForMeasure()
+    {
+        if (ShowFocusMarker && !string.IsNullOrWhiteSpace(FocusMarker))
+        {
+            return $"{Title} {FocusMarker}";
+        }
+
+        return Title;
     }
 
     private bool ApplyResult(DialogResult result)
@@ -226,5 +302,10 @@ public sealed class Dialog : Control
                 canvas.Set(x, y, fill);
             }
         }
+    }
+
+    private static string ApplyStyle(string text, TeaStyle style)
+    {
+        return style.IsEmpty ? text : style.Render(text);
     }
 }
