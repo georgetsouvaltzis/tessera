@@ -19,6 +19,9 @@ internal static partial class ThemeOverridesTests
         yield return new TestCase(
             "ThemeOverrides_ApplyHelpers_MapExpectedTokensForTableAndTabs",
             ApplyHelpers_MapExpectedTokensForTableAndTabs);
+        yield return new TestCase(
+            "ThemeOverrides_ApplyHelpers_MapExpectedTokensForListViewBorderStyles",
+            ApplyHelpers_MapExpectedTokensForListViewBorderStyles);
     }
 
     private static Task Precedence_InstanceStateBeatsTypeAndGlobal()
@@ -151,6 +154,50 @@ internal static partial class ThemeOverridesTests
         TestAssert.Equal(theme.Text.Secondary, tabs.TitleStyle, "Tabs title style should map to Text.Secondary.");
         TestAssert.Equal(theme.Focus.Title, tabs.FocusedTitleStyle, "Tabs focused title style should map to Focus.Title.");
 
+        return Task.CompletedTask;
+    }
+
+    private static Task ApplyHelpers_MapExpectedTokensForListViewBorderStyles()
+    {
+        var explicitBorderStyle = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(210, 211, 212));
+        var theme = new TeaTheme
+        {
+            Text = new TeaThemeTextTokens
+            {
+                Primary = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(31, 32, 33)),
+            },
+            Accent = new TeaThemeAccentTokens
+            {
+                Secondary = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(41, 42, 43)),
+            },
+            Border = new TeaThemeBorderTokens
+            {
+                Default = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(51, 52, 53)),
+                Focused = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(61, 62, 63)),
+            },
+            Focus = new TeaThemeFocusTokens
+            {
+                Border = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(71, 72, 73)),
+            },
+            Selection = new TeaThemeSelectionTokens
+            {
+                Foreground = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(81, 82, 83)),
+                Background = TeaStyle.Empty.WithBackground(AnsiColor.Rgb(91, 92, 93)),
+            },
+        };
+
+        var list = new ListView<string>(x => x).ApplyTheme(theme);
+        TestAssert.Equal(theme.Border.Default, list.BorderStyleText, "ListView border style should map to Border.Default.");
+        TestAssert.Equal(theme.Border.Focused.Merge(theme.Focus.Border), list.FocusedBorderStyleText, "ListView focused border style should map to focused border tokens.");
+
+        list = new ListView<string>(x => x)
+        {
+            BorderStyleText = explicitBorderStyle,
+        };
+        list.ApplyThemeDefaults(theme);
+
+        TestAssert.Equal(explicitBorderStyle, list.BorderStyleText, "ListView defaults should not overwrite explicit border style.");
+        TestAssert.Equal(theme.Border.Focused.Merge(theme.Focus.Border), list.FocusedBorderStyleText, "ListView defaults should fill focused border style.");
         return Task.CompletedTask;
     }
 }

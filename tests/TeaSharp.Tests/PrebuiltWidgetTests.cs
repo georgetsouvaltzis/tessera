@@ -35,6 +35,8 @@ internal static class PrebuiltWidgetTests
         yield return new TestCase("Controls_ListView_MouseClickSelectsRow", ListView_MouseClickSelectsRow);
         yield return new TestCase("Controls_ListView_MouseClickOutsideLabel_DoesNotSelectRow", ListView_MouseClickOutsideLabel_DoesNotSelectRow);
         yield return new TestCase("Controls_ListView_MouseMotionShowsHoverMarker", ListView_MouseMotionShowsHoverMarker);
+        yield return new TestCase("Controls_ListView_CustomRowMarkers_RenderCustomMarkers", ListView_CustomRowMarkers_RenderCustomMarkers);
+        yield return new TestCase("Controls_ListView_FocusedBorderStyleText_StylesFrameGlyphs", ListView_FocusedBorderStyleText_StylesFrameGlyphs);
         yield return new TestCase("Controls_Choice_SelectsOpenMenuItem", Choice_SelectsOpenMenuItem);
         yield return new TestCase("Controls_Choice_SelectionChangedEvent_ReportsSelection", Choice_SelectionChangedEvent_ReportsSelection);
         yield return new TestCase("Controls_Choice_HidesBorderWhenConfigured", Choice_HidesBorderWhenConfigured);
@@ -539,6 +541,48 @@ internal static class PrebuiltWidgetTests
 
         TestAssert.True(changed, "Mouse motion inside list should update hover state.");
         TestAssert.True(output.Contains("▸ two", StringComparison.Ordinal), "Hovered row should render the hover marker.");
+        return Task.CompletedTask;
+    }
+
+    private static Task ListView_CustomRowMarkers_RenderCustomMarkers()
+    {
+        var list = new ListView<string>(x => x)
+        {
+            Border = BorderStyle.None,
+            RowMarkers = new ListViewMarkerSet(".", ">", "+"),
+        };
+        list.SetItems(["one", "two", "three"]);
+
+        list.Handle(new PointerInput(PointerEventKind.Motion, PointerButton.None, 0, 1), new Rect(0, 0, 20, 3));
+        var canvas = new Canvas(20, 3);
+
+        list.Render(canvas, new Rect(0, 0, 20, 3));
+        var output = canvas.Render();
+
+        TestAssert.True(output.Contains("+ one", StringComparison.Ordinal), "Selected rows should render the custom selected marker.");
+        TestAssert.True(output.Contains("> two", StringComparison.Ordinal), "Hovered rows should render the custom hovered marker.");
+        TestAssert.True(output.Contains(". three", StringComparison.Ordinal), "Unselected rows should render the custom default marker.");
+        return Task.CompletedTask;
+    }
+
+    private static Task ListView_FocusedBorderStyleText_StylesFrameGlyphs()
+    {
+        var focusedBorderStyle = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(123, 45, 67));
+        var list = new ListView<string>(x => x)
+        {
+            IsFocused = true,
+            Border = BorderStyle.SingleLine,
+            BorderStyleText = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(11, 22, 33)),
+            FocusedBorderStyleText = focusedBorderStyle,
+            Title = string.Empty,
+        };
+        list.SetItems(["one"]);
+        var canvas = new Canvas(16, 4, CanvasTextMode.GraphemeAware);
+
+        list.Render(canvas, new Rect(0, 0, 16, 4));
+        var output = canvas.Render();
+
+        TestAssert.True(output.Contains(focusedBorderStyle.Render("┌"), StringComparison.Ordinal), "Focused border style should be applied to frame glyphs.");
         return Task.CompletedTask;
     }
 
