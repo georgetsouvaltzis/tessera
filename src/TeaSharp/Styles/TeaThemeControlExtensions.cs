@@ -921,6 +921,198 @@ public static class TeaThemeControlExtensions
         return control.ApplyThemeDefaults(overrides.Resolve(control, baseTheme, state));
     }
 
+    /// <summary>
+    /// Applies a resolved theme to a <see cref="DataGrid"/>.
+    /// </summary>
+    public static DataGrid ApplyTheme(this DataGrid control, TeaTheme theme)
+    {
+        ArgumentNullException.ThrowIfNull(control);
+        ArgumentNullException.ThrowIfNull(theme);
+
+        control.TitleStyle = theme.Text.Secondary;
+        control.FocusedTitleStyle = theme.Focus.Title;
+        control.HeaderStyle = theme.Text.Secondary;
+        control.RowStyle = theme.Text.Primary;
+        control.SelectedRowStyle = theme.Selection.Foreground.Merge(theme.Selection.Background);
+        control.SelectedCellStyle = theme.Accent.Primary;
+        control.MutedStyle = theme.Text.Muted;
+        control.DisabledStyle = theme.Text.Muted;
+        return control;
+    }
+
+    /// <summary>
+    /// Resolves and applies hierarchical overrides to a <see cref="DataGrid"/>.
+    /// </summary>
+    public static DataGrid ApplyTheme(
+        this DataGrid control,
+        TeaThemeOverrides overrides,
+        TeaTheme baseTheme,
+        TeaThemeVisualState state = TeaThemeVisualState.Default)
+    {
+        ArgumentNullException.ThrowIfNull(overrides);
+        return control.ApplyTheme(overrides.Resolve(control, baseTheme, state));
+    }
+
+    /// <summary>
+    /// Applies theme defaults to a <see cref="DataGrid"/> without overwriting explicit non-empty styles.
+    /// </summary>
+    public static DataGrid ApplyThemeDefaults(this DataGrid control, TeaTheme theme)
+    {
+        ArgumentNullException.ThrowIfNull(control);
+        ArgumentNullException.ThrowIfNull(theme);
+
+        control.TitleStyle = ApplyDefault(control.TitleStyle, theme.Text.Secondary);
+        control.FocusedTitleStyle = ApplyDefault(control.FocusedTitleStyle, theme.Focus.Title);
+        control.HeaderStyle = ApplyDefault(control.HeaderStyle, theme.Text.Secondary);
+        control.RowStyle = ApplyDefault(control.RowStyle, theme.Text.Primary);
+        control.SelectedRowStyle = ApplyDefault(
+            control.SelectedRowStyle,
+            theme.Selection.Foreground.Merge(theme.Selection.Background));
+        control.SelectedCellStyle = ApplyDefault(control.SelectedCellStyle, theme.Accent.Primary);
+        control.MutedStyle = ApplyDefault(control.MutedStyle, theme.Text.Muted);
+        control.DisabledStyle = ApplyDefault(control.DisabledStyle, theme.Text.Muted);
+        return control;
+    }
+
+    /// <summary>
+    /// Resolves and applies hierarchical defaults to a <see cref="DataGrid"/> without overwriting explicit non-empty styles.
+    /// </summary>
+    public static DataGrid ApplyThemeDefaults(
+        this DataGrid control,
+        TeaThemeOverrides overrides,
+        TeaTheme baseTheme,
+        TeaThemeVisualState state = TeaThemeVisualState.Default)
+    {
+        ArgumentNullException.ThrowIfNull(overrides);
+        return control.ApplyThemeDefaults(overrides.Resolve(control, baseTheme, state));
+    }
+
+    /// <summary>
+    /// Applies a resolved theme to a <see cref="TreeTable"/>.
+    /// </summary>
+    public static TreeTable ApplyTheme(this TreeTable control, TeaTheme theme)
+    {
+        ArgumentNullException.ThrowIfNull(control);
+        ArgumentNullException.ThrowIfNull(theme);
+
+        control.TitleStyle = theme.Text.Secondary;
+        control.FocusedTitleStyle = theme.Focus.Title;
+        control.HeaderStyle = theme.Text.Secondary;
+        control.BranchRowStyle = theme.Accent.Primary;
+        control.LeafRowStyle = theme.Text.Primary;
+        control.SelectedRowStyle = theme.Selection.Foreground.Merge(theme.Selection.Background);
+        control.MutedRowStyle = theme.Text.Muted;
+        return control;
+    }
+
+    /// <summary>
+    /// Resolves and applies hierarchical overrides to a <see cref="TreeTable"/>.
+    /// </summary>
+    public static TreeTable ApplyTheme(
+        this TreeTable control,
+        TeaThemeOverrides overrides,
+        TeaTheme baseTheme,
+        TeaThemeVisualState state = TeaThemeVisualState.Default)
+    {
+        ArgumentNullException.ThrowIfNull(overrides);
+        return control.ApplyTheme(overrides.Resolve(control, baseTheme, state));
+    }
+
+    /// <summary>
+    /// Applies theme defaults to a <see cref="TreeTable"/> without overwriting explicit non-empty styles.
+    /// </summary>
+    public static TreeTable ApplyThemeDefaults(this TreeTable control, TeaTheme theme)
+    {
+        ArgumentNullException.ThrowIfNull(control);
+        ArgumentNullException.ThrowIfNull(theme);
+
+        control.TitleStyle = ApplyDefault(control.TitleStyle, theme.Text.Secondary);
+        control.FocusedTitleStyle = ApplyDefault(control.FocusedTitleStyle, theme.Focus.Title);
+        control.HeaderStyle = ApplyDefault(control.HeaderStyle, theme.Text.Secondary);
+        control.BranchRowStyle = ApplyDefault(control.BranchRowStyle, theme.Accent.Primary);
+        control.LeafRowStyle = ApplyDefault(control.LeafRowStyle, theme.Text.Primary);
+        control.SelectedRowStyle = ApplyDefault(
+            control.SelectedRowStyle,
+            theme.Selection.Foreground.Merge(theme.Selection.Background));
+        control.MutedRowStyle = ApplyDefault(control.MutedRowStyle, theme.Text.Muted);
+        return control;
+    }
+
+    /// <summary>
+    /// Resolves and applies hierarchical defaults to a <see cref="TreeTable"/> without overwriting explicit non-empty styles.
+    /// </summary>
+    public static TreeTable ApplyThemeDefaults(
+        this TreeTable control,
+        TeaThemeOverrides overrides,
+        TeaTheme baseTheme,
+        TeaThemeVisualState state = TeaThemeVisualState.Default)
+    {
+        ArgumentNullException.ThrowIfNull(overrides);
+        return control.ApplyThemeDefaults(overrides.Resolve(control, baseTheme, state));
+    }
+
+    /// <summary>
+    /// Applies a resolved theme to a <see cref="KeyValueList"/>.
+    /// </summary>
+    public static KeyValueList ApplyTheme(this KeyValueList control, TeaTheme theme)
+    {
+        ArgumentNullException.ThrowIfNull(control);
+        ArgumentNullException.ThrowIfNull(theme);
+
+        control.TitleStyle = theme.Text.Secondary;
+        control.FocusedTitleStyle = theme.Focus.Title;
+        control.KeyStyle = theme.Text.Secondary;
+        control.ValueStyle = theme.Text.Primary;
+        control.SelectedRowStyle = theme.Selection.Foreground.Merge(theme.Selection.Background);
+        control.SeparatorStyle = theme.Text.Muted;
+        return control;
+    }
+
+    /// <summary>
+    /// Resolves and applies hierarchical overrides to a <see cref="KeyValueList"/>.
+    /// </summary>
+    public static KeyValueList ApplyTheme(
+        this KeyValueList control,
+        TeaThemeOverrides overrides,
+        TeaTheme baseTheme,
+        TeaThemeVisualState state = TeaThemeVisualState.Default)
+    {
+        ArgumentNullException.ThrowIfNull(overrides);
+        return control.ApplyTheme(overrides.Resolve(control, baseTheme, state));
+    }
+
+    /// <summary>
+    /// Applies theme defaults to a <see cref="KeyValueList"/> without overwriting explicit non-empty styles.
+    /// </summary>
+    public static KeyValueList ApplyThemeDefaults(this KeyValueList control, TeaTheme theme)
+    {
+        ArgumentNullException.ThrowIfNull(control);
+        ArgumentNullException.ThrowIfNull(theme);
+
+        control.TitleStyle = ApplyDefault(control.TitleStyle, theme.Text.Secondary);
+        control.FocusedTitleStyle = ApplyDefault(control.FocusedTitleStyle, theme.Focus.Title);
+        control.KeyStyle = ApplyDefault(control.KeyStyle, theme.Text.Secondary);
+        control.ValueStyle = ApplyDefault(control.ValueStyle, theme.Text.Primary);
+        control.SelectedRowStyle = ApplyDefault(
+            control.SelectedRowStyle,
+            theme.Selection.Foreground.Merge(theme.Selection.Background));
+        control.SeparatorStyle = ApplyDefault(control.SeparatorStyle, theme.Text.Muted);
+        return control;
+    }
+
+    /// <summary>
+    /// Resolves and applies hierarchical defaults to a <see cref="KeyValueList"/> without overwriting explicit non-empty styles.
+    /// </summary>
+    public static KeyValueList ApplyThemeDefaults(
+        this KeyValueList control,
+        TeaThemeOverrides overrides,
+        TeaTheme baseTheme,
+        TeaThemeVisualState state = TeaThemeVisualState.Default)
+    {
+        ArgumentNullException.ThrowIfNull(overrides);
+        return control.ApplyThemeDefaults(overrides.Resolve(control, baseTheme, state));
+    }
+
     private static TeaStyle ApplyDefault(TeaStyle current, TeaStyle fallback)
     {
         return current.IsEmpty ? fallback : current;
