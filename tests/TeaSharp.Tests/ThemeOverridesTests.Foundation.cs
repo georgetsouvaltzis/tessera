@@ -22,6 +22,9 @@ internal static partial class ThemeOverridesTests
         yield return new TestCase(
             "ThemeOverrides_ApplyHelpers_MapExpectedTokensForListViewBorderStyles",
             ApplyHelpers_MapExpectedTokensForListViewBorderStyles);
+        yield return new TestCase(
+            "ThemeOverrides_TableBorderStyles_DefaultsAndOverrides_PreserveExplicitStyles",
+            TableBorderStyles_DefaultsAndOverrides_PreserveExplicitStyles);
     }
 
     private static Task Precedence_InstanceStateBeatsTypeAndGlobal()
@@ -140,9 +143,15 @@ internal static partial class ThemeOverridesTests
             {
                 Secondary = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(41, 42, 43)),
             },
+            Border = new TeaThemeBorderTokens
+            {
+                Default = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(44, 45, 46)),
+                Focused = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(47, 48, 49)),
+            },
             Focus = new TeaThemeFocusTokens
             {
                 Title = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(51, 52, 53)),
+                Border = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(54, 55, 56)),
             },
         };
 
@@ -151,6 +160,8 @@ internal static partial class ThemeOverridesTests
 
         TestAssert.Equal(theme.Text.Secondary, table.TitleStyle, "Table title style should map to Text.Secondary.");
         TestAssert.Equal(theme.Focus.Title, table.FocusedTitleStyle, "Table focused title style should map to Focus.Title.");
+        TestAssert.Equal(theme.Border.Default, table.BorderStyleText, "Table border style should map to Border.Default.");
+        TestAssert.Equal(theme.Border.Focused.Merge(theme.Focus.Border), table.FocusedBorderStyleText, "Table focused border style should map to focused border tokens.");
         TestAssert.Equal(theme.Text.Secondary, tabs.TitleStyle, "Tabs title style should map to Text.Secondary.");
         TestAssert.Equal(theme.Focus.Title, tabs.FocusedTitleStyle, "Tabs focused title style should map to Focus.Title.");
 
@@ -198,6 +209,72 @@ internal static partial class ThemeOverridesTests
 
         TestAssert.Equal(explicitBorderStyle, list.BorderStyleText, "ListView defaults should not overwrite explicit border style.");
         TestAssert.Equal(theme.Border.Focused.Merge(theme.Focus.Border), list.FocusedBorderStyleText, "ListView defaults should fill focused border style.");
+        return Task.CompletedTask;
+    }
+
+    private static Task TableBorderStyles_DefaultsAndOverrides_PreserveExplicitStyles()
+    {
+        var explicitStyle = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(201, 202, 203));
+        var theme = new TeaTheme
+        {
+            Text = new TeaThemeTextTokens
+            {
+                Secondary = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(41, 42, 43)),
+            },
+            Border = new TeaThemeBorderTokens
+            {
+                Default = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(51, 52, 53)),
+                Focused = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(61, 62, 63)),
+            },
+            Focus = new TeaThemeFocusTokens
+            {
+                Title = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(71, 72, 73)),
+                Border = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(81, 82, 83)),
+            },
+        };
+
+        var table = new Table("A", "B")
+        {
+            BorderStyleText = explicitStyle,
+        };
+        table.ApplyThemeDefaults(theme);
+
+        TestAssert.Equal(explicitStyle, table.BorderStyleText, "Table defaults should not overwrite explicit border style.");
+        TestAssert.Equal(theme.Border.Focused.Merge(theme.Focus.Border), table.FocusedBorderStyleText, "Table defaults should fill focused border style.");
+
+        var baseTheme = BuildThemeWithPrimary(1, 1, 1);
+        var typeTheme = new TeaTheme
+        {
+            Text = new TeaThemeTextTokens
+            {
+                Secondary = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(101, 102, 103)),
+            },
+            Border = new TeaThemeBorderTokens
+            {
+                Default = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(111, 112, 113)),
+                Focused = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(121, 122, 123)),
+            },
+            Focus = new TeaThemeFocusTokens
+            {
+                Title = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(131, 132, 133)),
+                Border = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(141, 142, 143)),
+            },
+        };
+        var overrides = new TeaThemeOverrides();
+        overrides.SetControlType<Table>(typeTheme);
+
+        var overrideApplied = new Table("A", "B");
+        overrideApplied.ApplyTheme(overrides, baseTheme);
+        TestAssert.Equal(typeTheme.Border.Default, overrideApplied.BorderStyleText, "Override apply should map Table border style.");
+        TestAssert.Equal(typeTheme.Border.Focused.Merge(typeTheme.Focus.Border), overrideApplied.FocusedBorderStyleText, "Override apply should map Table focused border style.");
+
+        var overrideDefaults = new Table("A", "B")
+        {
+            BorderStyleText = explicitStyle,
+        };
+        overrideDefaults.ApplyThemeDefaults(overrides, baseTheme);
+        TestAssert.Equal(explicitStyle, overrideDefaults.BorderStyleText, "Override defaults should not overwrite explicit Table border style.");
+        TestAssert.Equal(typeTheme.Border.Focused.Merge(typeTheme.Focus.Border), overrideDefaults.FocusedBorderStyleText, "Override defaults should fill Table focused border style.");
         return Task.CompletedTask;
     }
 }

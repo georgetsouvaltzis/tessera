@@ -86,6 +86,7 @@ internal static class PrebuiltWidgetTests
         yield return new TestCase("Controls_DiffView_MouseClickSelectsEntry", DiffView_MouseClickSelectsEntry);
         yield return new TestCase("Controls_DiffView_RendersStyledEntries", DiffView_RendersStyledEntries);
         yield return new TestCase("Controls_Table_ForwardsSortHotkeys", Table_ForwardsSortHotkeys);
+        yield return new TestCase("Controls_Table_FocusMarkerAndBorderStyleHooks_Rendered", Table_FocusMarkerAndBorderStyleHooks_Rendered);
         yield return new TestCase("Controls_ProgressBar_AdjustsValue", ProgressBar_AdjustsValue);
         yield return new TestCase("Controls_StatusBar_RendersLeftAndRightText", StatusBar_RendersLeftAndRightText);
         yield return new TestCase("Controls_LogView_AppendsAndFilters", LogView_AppendsAndFilters);
@@ -1578,6 +1579,33 @@ internal static class PrebuiltWidgetTests
         table.Handle(new KeyPressed(Key.Character, "s"));
         TestAssert.Equal(1, table.SortColumn, "Table should change sort column from hotkey.");
         TestAssert.True(table.SortDescending, "Table should toggle sort direction from hotkey.");
+        return Task.CompletedTask;
+    }
+
+    private static Task Table_FocusMarkerAndBorderStyleHooks_Rendered()
+    {
+        var table = new Table("Name", "State")
+        {
+            Title = "T",
+            IsFocused = true,
+            FocusMarker = "!",
+            ShowFocusMarker = true,
+            BorderStyleText = TeaStyle.Empty.WithForeground(AnsiColor.BrightBlue),
+            FocusedBorderStyleText = TeaStyle.Empty.WithBold(),
+        };
+        table.SetRows(
+        [
+            ["svc-a", "ok"],
+            ["svc-b", "warn"],
+        ]);
+
+        var canvas = new Canvas(36, 6, CanvasTextMode.GraphemeAware);
+        table.Render(canvas, new Rect(0, 0, 36, 6));
+        var output = canvas.Render();
+
+        TestAssert.True(output.Contains("T !", StringComparison.Ordinal), "Table should render custom focus marker in title.");
+        TestAssert.True(ContainsBoldSgr(output), "Table should merge focused border style into border glyph rendering.");
+        TestAssert.True(ContainsBlueForegroundSgr(output), "Table should apply configured border color style.");
         return Task.CompletedTask;
     }
 
