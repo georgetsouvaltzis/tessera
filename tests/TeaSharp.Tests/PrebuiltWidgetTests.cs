@@ -64,6 +64,10 @@ internal static class PrebuiltWidgetTests
         yield return new TestCase("Controls_CommandPalette_ExposesQueryAccessors", CommandPalette_ExposesQueryAccessors);
         yield return new TestCase("Controls_CommandPalette_Open_ClearsQueryWhenClosed", CommandPalette_Open_ClearsQueryWhenClosed);
         yield return new TestCase("Controls_CommandPalette_LettersRemainQueryable", CommandPalette_LettersRemainQueryable);
+        yield return new TestCase("Controls_FileExplorer_KeyboardNavigationAndExpansion", FileExplorer_KeyboardNavigationAndExpansion);
+        yield return new TestCase("Controls_FileExplorer_SelectPathAndEvent_ReportsTransition", FileExplorer_SelectPathAndEvent_ReportsTransition);
+        yield return new TestCase("Controls_FileExplorer_MouseClickSelectsRow", FileExplorer_MouseClickSelectsRow);
+        yield return new TestCase("Controls_FileExplorer_RendersTitleAndStyleHooks", FileExplorer_RendersTitleAndStyleHooks);
         yield return new TestCase("Controls_DiffView_ComputesLineEntries", DiffView_ComputesLineEntries);
         yield return new TestCase("Controls_DiffView_NavigatesSelectionAndTogglesMode", DiffView_NavigatesSelectionAndTogglesMode);
         yield return new TestCase("Controls_DiffView_MouseClickSelectsEntry", DiffView_MouseClickSelectsEntry);
@@ -1121,6 +1125,139 @@ internal static class PrebuiltWidgetTests
         palette.Handle(new KeyPressed(Key.Character, "j"));
 
         TestAssert.Equal("j", palette.QueryText, "Letter keys should contribute to the query instead of being stolen for navigation.");
+        return Task.CompletedTask;
+    }
+
+    private static Task FileExplorer_KeyboardNavigationAndExpansion()
+    {
+        var src = new FileExplorerItem(
+            "src",
+            isDirectory: true,
+            path: "/src",
+            children:
+            [
+                new FileExplorerItem("app.cs", isDirectory: false, path: "/src/app.cs"),
+            ])
+        {
+            IsExpanded = false,
+        };
+        var readme = new FileExplorerItem("README.md", isDirectory: false, path: "/README.md");
+        var explorer = new FileExplorer
+        {
+            IsFocused = true,
+        };
+        explorer.SetItems([src, readme]);
+
+        TestAssert.Equal("/src", explorer.SelectedPath ?? string.Empty, "FileExplorer should select first row by default.");
+
+        var expanded = explorer.Handle(new KeyPressed(Key.Right));
+        TestAssert.True(expanded, "FileExplorer Right should expand collapsed directory.");
+        TestAssert.Equal("/src", explorer.SelectedPath ?? string.Empty, "FileExplorer should remain on directory row after expand.");
+
+        var downChanged = explorer.Handle(new KeyPressed(Key.Down));
+        TestAssert.True(downChanged, "FileExplorer Down should move to next visible row.");
+        TestAssert.Equal("/src/app.cs", explorer.SelectedPath ?? string.Empty, "FileExplorer Down should move into expanded child row.");
+
+        var leftChanged = explorer.Handle(new KeyPressed(Key.Left));
+        TestAssert.True(leftChanged, "FileExplorer Left on child row should move to parent.");
+        TestAssert.Equal("/src", explorer.SelectedPath ?? string.Empty, "FileExplorer Left should select parent row.");
+
+        var collapsed = explorer.Handle(new KeyPressed(Key.Enter));
+        TestAssert.True(collapsed, "FileExplorer Enter should toggle directory expansion.");
+        TestAssert.Equal("/src", explorer.SelectedPath ?? string.Empty, "FileExplorer should keep selected directory after collapse.");
+        return Task.CompletedTask;
+    }
+
+    private static Task FileExplorer_SelectPathAndEvent_ReportsTransition()
+    {
+        var explorer = new FileExplorer();
+        explorer.SetItems(
+        [
+            new FileExplorerItem(
+                "src",
+                isDirectory: true,
+                path: "/src",
+                children:
+                [
+                    new FileExplorerItem("app.cs", isDirectory: false, path: "/src/app.cs"),
+                ]),
+        ]);
+        FileExplorerSelectionChangedEventArgs? args = null;
+        explorer.SelectionChanged += (_, eventArgs) => args = eventArgs;
+
+        var changed = explorer.SelectPath("/src/app.cs");
+
+        TestAssert.True(changed, "FileExplorer should select path when node exists.");
+        TestAssert.True(args is not null, "FileExplorer should raise selection changed when selecting a path.");
+        TestAssert.Equal("/src", args!.PreviousPath ?? string.Empty, "FileExplorer event should expose previous path.");
+        TestAssert.Equal("/src/app.cs", args.CurrentPath ?? string.Empty, "FileExplorer event should expose current path.");
+        TestAssert.True(!explorer.SelectPath("/missing"), "FileExplorer should not change selection for unknown path.");
+        return Task.CompletedTask;
+    }
+
+    private static Task FileExplorer_MouseClickSelectsRow()
+    {
+        var explorer = new FileExplorer
+        {
+            Border = BorderStyle.None,
+        };
+        explorer.SetItems(
+        [
+            new FileExplorerItem(
+                "src",
+                isDirectory: true,
+                path: "/src",
+                children:
+                [
+                    new FileExplorerItem("app.cs", isDirectory: false, path: "/src/app.cs"),
+                ]),
+            new FileExplorerItem("README.md", isDirectory: false, path: "/README.md"),
+        ]);
+
+        var changed = explorer.Handle(
+            new PointerInput(PointerEventKind.Press, PointerButton.Left, x: 0, y: 2),
+            new Rect(0, 0, 40, 4));
+
+        TestAssert.True(changed, "FileExplorer click should select clicked row.");
+        TestAssert.Equal("/README.md", explorer.SelectedPath ?? string.Empty, "FileExplorer click should select expected row path.");
+        return Task.CompletedTask;
+    }
+
+    private static Task FileExplorer_RendersTitleAndStyleHooks()
+    {
+        var explorer = new FileExplorer
+        {
+            Title = "Files",
+            IsFocused = true,
+            FocusMarker = "!",
+            ShowFocusMarker = true,
+            FocusedTitleStyle = TeaStyle.Empty.WithUnderline().WithForeground(AnsiColor.BrightMagenta),
+            DirectoryStyle = TeaStyle.Empty.WithForeground(AnsiColor.BrightCyan),
+            FileStyle = TeaStyle.Empty.WithForeground(AnsiColor.BrightGreen),
+            SelectedStyle = TeaStyle.Empty.WithBold(),
+        };
+        explorer.SetItems(
+        [
+            new FileExplorerItem(
+                "src",
+                isDirectory: true,
+                path: "/src",
+                children:
+                [
+                    new FileExplorerItem("app.cs", isDirectory: false, path: "/src/app.cs"),
+                ]),
+        ]);
+        explorer.SelectPath("/src/app.cs");
+        var canvas = new Canvas(48, 6);
+
+        explorer.Render(canvas, new Rect(0, 0, 48, 6));
+        var output = canvas.Render();
+
+        TestAssert.True(output.Contains("Files !", StringComparison.Ordinal), "FileExplorer should render focused title marker.");
+        TestAssert.True(output.Contains("src", StringComparison.Ordinal), "FileExplorer should render directory rows.");
+        TestAssert.True(output.Contains("app.cs", StringComparison.Ordinal), "FileExplorer should render file rows.");
+        TestAssert.True(output.Contains("\u001b[38;5;14m", StringComparison.Ordinal), "FileExplorer should emit directory style fragments.");
+        TestAssert.True(output.Contains("\u001b[38;5;10m", StringComparison.Ordinal), "FileExplorer should emit file style fragments.");
         return Task.CompletedTask;
     }
 
