@@ -230,7 +230,7 @@ Their old `TeaSharp.Components.Prebuilt.*` counterparts have been removed instea
 
 ## Theme Mapping Status
 
-Current shipped theme mapping is centralized in `TeaSharp.Styles.TeaThemeControlExtensions` and split into domain partial files (`Basic`, `InputValue`, `Navigation`, `NavigationOverlay`, `DataAndFlow`, `ExplorerAndFeedback`).
+Current shipped theme mapping is centralized in `TeaSharp.Styles.TeaThemeControlExtensions` and split into domain partial files (`Basic`, `InputValue`, `Navigation`, `NavigationOverlay`, `NavigationPrimitives`, `DataAndFlow`, `ExplorerAndFeedback`, `RenderingTextUtilities`, `ModalAndCharts`).
 
 Input/value controls with direct token mappings:
 
@@ -239,6 +239,18 @@ Input/value controls with direct token mappings:
 Navigation/overlay controls with direct token mappings:
 
 - `Choice`, `ComboBox`, `TreeView`, `MenuBar`, `ContextMenu`, `CommandPalette`, `Notifications`
+
+Navigation primitive controls with direct token mappings:
+
+- `Accordion`, `MultiSelect`, `RadioGroup`
+
+Rendering text utility controls with direct token mappings:
+
+- `Badge`, `LogView`, `MarkdownView`, `MiniLog`
+
+Modal/chart summary controls with direct token mappings:
+
+- `Dialog`, `Modal`, `BarChart`, `LineChart`, `Gauge`, `StatsCard`
 
 ## Follow-up Targets
 

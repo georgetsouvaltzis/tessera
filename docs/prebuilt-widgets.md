@@ -65,6 +65,14 @@ Preferred public catalog:
 
 These live in `TeaSharp.Controls`.
 
+## Theme Mapping Snapshot
+
+Current shipped `TeaThemeControlExtensions` mappings include:
+
+- navigation primitives: `Accordion`, `MultiSelect`, `RadioGroup`
+- rendering text utilities: `Badge`, `LogView`, `MarkdownView`, `MiniLog`
+- modal/chart summary controls: `Dialog`, `Modal`, `BarChart`, `LineChart`, `Gauge`, `StatsCard`
+
 ## Advanced Seams
 
 Use advanced seams only when your app needs runtime or rendering control beyond normal app authoring.

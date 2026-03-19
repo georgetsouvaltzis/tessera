@@ -177,8 +177,11 @@ Default policy for all controls:
 - `TeaThemeControlExtensions.InputValue.cs`
 - `TeaThemeControlExtensions.Navigation.cs`
 - `TeaThemeControlExtensions.NavigationOverlay.cs`
+- `TeaThemeControlExtensions.NavigationPrimitives.cs`
 - `TeaThemeControlExtensions.DataAndFlow.cs`
 - `TeaThemeControlExtensions.ExplorerAndFeedback.cs`
+- `TeaThemeControlExtensions.RenderingTextUtilities.cs`
+- `TeaThemeControlExtensions.ModalAndCharts.cs`
 
 Mapped controls expose:
 
@@ -194,6 +197,18 @@ Navigation/overlay mapping coverage includes:
 
 - `Choice`, `ComboBox`, `TreeView`, `MenuBar`, `ContextMenu`, `CommandPalette`, `Notifications`
 
+Navigation primitive mapping coverage includes:
+
+- `Accordion`, `MultiSelect`, `RadioGroup`
+
+Rendering text utility mapping coverage includes:
+
+- `Badge`, `LogView`, `MarkdownView`, `MiniLog`
+
+Modal/chart summary mapping coverage includes:
+
+- `Dialog`, `Modal`, `BarChart`, `LineChart`, `Gauge`, `StatsCard`
+
 ## V1 Rollout
 
 Phase 1 (baseline controls):
@@ -202,7 +217,7 @@ Phase 1 (baseline controls):
 
 Phase 2 (data and advanced controls):
 
-- `TreeView`, `DataGrid`, `TreeTable`, `KeyValueList`, `Timeline`, `Stepper`, `MenuBar`, `Notifications`, `DiffView`, `PropertyGrid`, `FileExplorer`, `FuzzyFinder`, `ToastCenter`, `Toggle`, `Slider`, `Spinner`, chart and log controls
+- `TreeView`, `DataGrid`, `TreeTable`, `KeyValueList`, `Timeline`, `Stepper`, `MenuBar`, `Notifications`, `DiffView`, `PropertyGrid`, `FileExplorer`, `FuzzyFinder`, `ToastCenter`, `Toggle`, `Slider`, `Spinner`, `Accordion`, `MultiSelect`, `RadioGroup`, `Badge`, `LogView`, `MarkdownView`, `MiniLog`, `Dialog`, `Modal`, `BarChart`, `LineChart`, `Gauge`, `StatsCard`
 
 Acceptance criteria:
 

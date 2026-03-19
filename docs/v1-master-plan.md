@@ -32,9 +32,12 @@ All agents must treat this file as the source of truth for scope, sequencing, ow
   - canonical onboarding progression established (`HelloWorld` -> `CounterForm` -> `WorkspaceApp`)
   - boundary guardrails active
 - **M2: Theme Contract** -> **In Progress**
-  - `TeaThemeControlExtensions` split into domain partial files (`Basic`, `InputValue`, `Navigation`, `NavigationOverlay`, `DataAndFlow`, `ExplorerAndFeedback`)
+  - `TeaThemeControlExtensions` split into domain partial files (`Basic`, `InputValue`, `Navigation`, `NavigationOverlay`, `NavigationPrimitives`, `DataAndFlow`, `ExplorerAndFeedback`, `RenderingTextUtilities`, `ModalAndCharts`)
   - direct token mappings landed for input/value controls (`TextArea`, `Toggle`, `Slider`, `Spinner`, `ProgressBar`, `NumberInput`, `DatePicker`, `TimePicker`)
   - direct token mappings landed for navigation/overlay controls (`Choice`, `ComboBox`, `TreeView`, `MenuBar`, `ContextMenu`, `CommandPalette`, `Notifications`)
+  - direct token mappings landed for navigation primitives (`Accordion`, `MultiSelect`, `RadioGroup`)
+  - direct token mappings landed for rendering text utilities (`Badge`, `LogView`, `MarkdownView`, `MiniLog`)
+  - direct token mappings landed for modal/chart summary controls (`Dialog`, `Modal`, `BarChart`, `LineChart`, `Gauge`, `StatsCard`)
   - control-level style hooks rollout remains in progress for remaining controls/test hardening
 - **WS-D benchmark harness status**
   - `BenchmarkSwitcher` discoverability is wired and `--list flat` lists startup, large-table, and styled-heavy scenarios
