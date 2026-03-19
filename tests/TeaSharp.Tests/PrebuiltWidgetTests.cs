@@ -1,6 +1,7 @@
 using TeaSharp.Components.Primitives;
 using TeaSharp.Components.Styling;
 using TeaSharp.Controls;
+using TeaSharp.Styles;
 using System.Globalization;
 using TeaSharp.Core.Messages;
 namespace TeaSharp.Tests;
@@ -46,6 +47,10 @@ internal static class PrebuiltWidgetTests
         yield return new TestCase("Controls_MenuBar_TryConsumeActivation_IsSingleUse", MenuBar_TryConsumeActivation_IsSingleUse);
         yield return new TestCase("Controls_MenuBar_MouseClickActivatesItem", MenuBar_MouseClickActivatesItem);
         yield return new TestCase("Controls_MenuBar_MouseMotionSelectsHoveredItem", MenuBar_MouseMotionSelectsHoveredItem);
+        yield return new TestCase("Controls_CommandBar_KeyboardNavigationAndActivation", CommandBar_KeyboardNavigationAndActivation);
+        yield return new TestCase("Controls_CommandBar_ItemActivatedEvent_ReportsItem", CommandBar_ItemActivatedEvent_ReportsItem);
+        yield return new TestCase("Controls_CommandBar_MouseClickSelectsAndActivatesItem", CommandBar_MouseClickSelectsAndActivatesItem);
+        yield return new TestCase("Controls_CommandBar_FocusMarkerAndStyleHooks_Rendered", CommandBar_FocusMarkerAndStyleHooks_Rendered);
         yield return new TestCase("Controls_ContextMenu_ExecutesAndCloses", ContextMenu_ExecutesAndCloses);
         yield return new TestCase("Controls_ContextMenu_ItemExecutedEvent_ReportsItem", ContextMenu_ItemExecutedEvent_ReportsItem);
         yield return new TestCase("Controls_ContextMenu_TryConsumeExecution_IsSingleUse", ContextMenu_TryConsumeExecution_IsSingleUse);
@@ -746,6 +751,110 @@ internal static class PrebuiltWidgetTests
         menu.Handle(new KeyPressed(Key.Enter));
 
         TestAssert.Equal("file", activated ?? string.Empty, "Menu bar activation event should expose the selected item id.");
+        return Task.CompletedTask;
+    }
+
+    private static Task CommandBar_KeyboardNavigationAndActivation()
+    {
+        var bar = new CommandBar
+        {
+            IsFocused = true,
+        };
+        bar.SetItems(
+        [
+            new CommandBarItem("build", "Build", 'b'),
+            new CommandBarItem("test", "Test", 't'),
+            new CommandBarItem("deploy", "Deploy", 'd'),
+        ]);
+
+        bar.Handle(new KeyPressed(Key.Right));
+        bar.Handle(new KeyPressed(Key.End));
+        bar.Handle(new KeyPressed(Key.Left));
+        var activated = bar.Handle(new KeyPressed(Key.Enter));
+
+        TestAssert.True(activated, "Command bar enter should activate the selected command.");
+        TestAssert.Equal(1, bar.SelectedIndex, "Command bar keyboard navigation should honor End/Left transitions.");
+        TestAssert.Equal("test", bar.LastActivatedItemId ?? string.Empty, "Command bar should activate the selected command id.");
+        return Task.CompletedTask;
+    }
+
+    private static Task CommandBar_ItemActivatedEvent_ReportsItem()
+    {
+        var bar = new CommandBar
+        {
+            IsFocused = true,
+        };
+        bar.SetItems(
+        [
+            new CommandBarItem("build", "Build", 'b'),
+            new CommandBarItem("deploy", "Deploy", 'd'),
+        ]);
+        string? activated = null;
+        bar.ItemActivated += (_, args) => activated = args.ItemId;
+
+        bar.Handle(new KeyPressed(Key.Character, "d"));
+
+        TestAssert.Equal("deploy", activated ?? string.Empty, "Command bar activation event should expose the activated command id.");
+        return Task.CompletedTask;
+    }
+
+    private static Task CommandBar_MouseClickSelectsAndActivatesItem()
+    {
+        var bar = new CommandBar();
+        bar.SetItems(
+        [
+            new CommandBarItem("build", "Build", 'b'),
+            new CommandBarItem("test", "Test", 't'),
+            new CommandBarItem("deploy", "Deploy", 'd'),
+        ]);
+
+        var changed = bar.Handle(new PointerInput(PointerEventKind.Press, PointerButton.Left, 13, 0), new Rect(0, 0, 60, 1));
+
+        TestAssert.True(changed, "Command bar mouse click should select and activate the clicked command.");
+        TestAssert.Equal(1, bar.SelectedIndex, "Command bar mouse click should select the clicked command index.");
+        TestAssert.Equal("test", bar.LastActivatedItemId ?? string.Empty, "Command bar mouse click should activate the clicked command id.");
+        return Task.CompletedTask;
+    }
+
+    private static Task CommandBar_FocusMarkerAndStyleHooks_Rendered()
+    {
+        var bar = new CommandBar
+        {
+            Title = "Cmd",
+            IsFocused = true,
+            FocusMarker = "!",
+            ShowFocusMarker = true,
+            SelectedPrefix = "<",
+            SelectedSuffix = ">",
+        };
+        bar.SetItems(
+        [
+            new CommandBarItem("open", "Open", 'o'),
+            new CommandBarItem("save", "Save", 's', IsDisabled: true),
+        ]);
+        var canvas = new Canvas(64, 1);
+
+        bar.Render(canvas, new Rect(0, 0, 64, 1));
+        var focusedOutput = canvas.Render();
+
+        TestAssert.True(focusedOutput.Contains("Cmd !", StringComparison.Ordinal), "Command bar should render custom focus marker in title.");
+        TestAssert.True(focusedOutput.Contains("<Open(o)>", StringComparison.Ordinal), "Command bar should render selected item with custom selection delimiters.");
+
+        bar.ShowFocusMarker = false;
+        var withoutMarkerCanvas = new Canvas(64, 1);
+        bar.Render(withoutMarkerCanvas, new Rect(0, 0, 64, 1));
+        var withoutMarker = withoutMarkerCanvas.Render();
+
+        TestAssert.True(!withoutMarker.Contains('!'), "Command bar should allow hiding the focus marker.");
+
+        bar.ItemStyle = TeaStyle.Empty.WithStrikethrough();
+        bar.SelectedItemStyle = TeaStyle.Empty.WithBold();
+        bar.DisabledItemStyle = TeaStyle.Empty.WithDim();
+        var styledCanvas = new Canvas(64, 1);
+        bar.Render(styledCanvas, new Rect(0, 0, 64, 1));
+        var styledOutput = styledCanvas.Render();
+
+        TestAssert.True(ContainsStrikethroughSgr(styledOutput), "Command bar should apply item style hooks during rendering.");
         return Task.CompletedTask;
     }
 
