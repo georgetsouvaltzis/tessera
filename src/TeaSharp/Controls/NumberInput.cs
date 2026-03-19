@@ -70,6 +70,24 @@ public sealed class NumberInput : Control
         set;
     } = TeaStyle.Empty;
 
+    /// <summary>
+    /// Gets or sets the style applied to border glyphs when the control is not focused.
+    /// </summary>
+    public TeaStyle BorderStyleText
+    {
+        get;
+        set;
+    } = TeaStyle.Empty;
+
+    /// <summary>
+    /// Gets or sets the style applied to border glyphs when the control is focused.
+    /// </summary>
+    public TeaStyle FocusedBorderStyleText
+    {
+        get;
+        set;
+    } = TeaStyle.Empty;
+
     public BorderStyle Border
     {
         get;
@@ -243,7 +261,8 @@ public sealed class NumberInput : Control
             clipped,
             title,
             Border,
-            Padding);
+            Padding,
+            ResolveBorderStyleText());
         if (content.IsEmpty)
         {
             return;
@@ -356,5 +375,21 @@ public sealed class NumberInput : Control
         }
 
         return SummaryTextStyle;
+    }
+
+    private TeaStyle ResolveBorderStyleText()
+    {
+        var style = BorderStyleText;
+        if (IsFocused)
+        {
+            style = style.Merge(FocusedBorderStyleText);
+        }
+
+        if (IsDisabled || IsReadOnly)
+        {
+            style = style.Merge(DisabledTextStyle);
+        }
+
+        return style;
     }
 }

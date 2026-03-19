@@ -57,6 +57,24 @@ public sealed class TextArea : Control
         set;
     } = TeaStyle.Empty;
 
+    /// <summary>
+    /// Gets or sets the style applied to border glyphs when the control is not focused.
+    /// </summary>
+    public TeaStyle BorderStyleText
+    {
+        get;
+        set;
+    } = TeaStyle.Empty;
+
+    /// <summary>
+    /// Gets or sets the style applied to border glyphs when the control is focused.
+    /// </summary>
+    public TeaStyle FocusedBorderStyleText
+    {
+        get;
+        set;
+    } = TeaStyle.Empty;
+
     public string Value => _input.Value;
 
     public BorderStyle Border
@@ -148,7 +166,8 @@ public sealed class TextArea : Control
             clipped,
             title,
             Border,
-            Padding);
+            Padding,
+            ResolveBorderStyleText());
         if (content.IsEmpty)
         {
             return;
@@ -258,5 +277,21 @@ public sealed class TextArea : Control
         return ValueTextStyle.IsEmpty
             ? DisabledValueTextStyle
             : ValueTextStyle.Merge(DisabledValueTextStyle);
+    }
+
+    private TeaStyle ResolveBorderStyleText()
+    {
+        var style = BorderStyleText;
+        if (IsFocused)
+        {
+            style = style.Merge(FocusedBorderStyleText);
+        }
+
+        if (IsDisabled)
+        {
+            style = style.Merge(DisabledValueTextStyle);
+        }
+
+        return style;
     }
 }
