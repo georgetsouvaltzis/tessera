@@ -54,8 +54,7 @@ Primary app contract:
 - `TeaApp`
 - `Tea.RunAsync(...)`
 - `Tea.CreateBuilder()`
-- `TeaApplicationBuilder.ConfigureServices(...)`
-- `TeaApplicationBuilder.UseApp<TApp>()` (DI-activated)
+- `TeaApplicationBuilder.UseApp<TApp>()`
 - `TeaApplicationBuilder`
 - `TeaApplication`
 - `TeaRuntimeOptions`
@@ -75,16 +74,28 @@ App model shape:
 Startup model:
 
 - minimal path: `Tea.RunAsync(new App())`
-- configured path: `Tea.CreateBuilder().ConfigureServices(...).UseApp<TApp>().ConfigureRuntime(...).Build()`
+- configured path: `Tea.CreateBuilder().UseApp<TApp>().ConfigureRuntime(...).Build()`
 
 Canonical onboarding progression:
 
 1. `examples/HelloWorld`: minimal startup path.
-2. `examples/CounterForm`: configured DI startup path (`ConfigureServices(...)` + `UseApp<TApp>()`).
+2. `examples/CounterForm`: configured startup path (`UseApp<TApp>()` + `ConfigureRuntime(...)`).
 3. `examples/WorkspaceApp`: stateful multi-pane coordination with app-level messages/effects.
 4. Advanced interaction lane: `examples/AdvancedWidgets` and `examples/WidgetGallery`.
 
 Default onboarding remains in `TeaSharp`. `TeaSharp.Core` is a low-level advanced product lane.
+
+### Theme Model
+
+V1 theming is semantic-token based with override hierarchy:
+
+- semantic tokens for text/surface/border/state/focus/selection/accent
+- built-in palettes (Catppuccin, Rosé Pine) plus custom palette
+- override precedence: global theme -> control type -> control instance -> state
+
+Focus visuals must be theme-driven (for example focused border style/color), not limited to marker suffixes.
+
+Image rendering is planned for V1.1.
 
 ### Composition Model
 

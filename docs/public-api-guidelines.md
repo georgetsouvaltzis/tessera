@@ -28,20 +28,31 @@ Avoid framework-specific patterns when BCL conventions already solve the problem
 Support two startup lanes:
 
 - minimal: `await Tea.RunAsync(new App());`
-- configured: `Tea.CreateBuilder().ConfigureServices(...).UseApp<TApp>().ConfigureRuntime(...).Build()`
+- configured: `Tea.CreateBuilder().UseApp<TApp>().ConfigureRuntime(...).Build()`
 
-`UseApp<TApp>()` should activate app types through DI so constructor injection works without forcing Generic Host.
+TeaSharp is a library-first TUI framework. Default startup should not require DI containers or Generic Host wiring.
 
 ## Canonical Example Progression
 
 Teach examples in this sequence:
 
 1. `examples/HelloWorld`: minimal startup path (`Tea.RunAsync(new App())`).
-2. `examples/CounterForm`: configured startup (`Tea.CreateBuilder().ConfigureServices(...).UseApp<TApp>()...`).
+2. `examples/CounterForm`: configured startup (`Tea.CreateBuilder().UseApp<TApp>().ConfigureRuntime(...).Build()`).
 3. `examples/WorkspaceApp`: stateful app with coordinated message/effect flows.
 4. Advanced interaction lane: `examples/AdvancedWidgets` and `examples/WidgetGallery`.
 
 Keep onboarding in `TeaSharp` namespaces. `TeaSharp.Core` is the low-level advanced lane and should not appear in starter examples.
+
+## Canonical Theme Pattern
+
+Theming must be semantic-token based and overrideable:
+
+- semantic tokens (`Text`, `Surface`, `Border`, `State`, `Accent`, `Selection`, `Focus`)
+- built-in palettes (Catppuccin, Rosé Pine)
+- custom user palette
+- override hierarchy: global -> control type -> control instance -> state
+
+Focus styling must be configurable beyond `"*"` markers. Border/title/focus visuals should be theme-driven.
 
 ## Canonical App Pattern
 
@@ -69,6 +80,7 @@ Alternative composition surfaces may remain public for advanced scenarios, but d
 - Normal app examples should not import `TeaSharp.Core.*`.
 - Public docs should use `TeaSharp.Styles` (not legacy namespace names).
 - Runtime knobs for advanced hosting should live under `TeaSharp.Hosting` discoverability, not the default path.
+- Images are V1.1 scope, not V1 scope.
 
 ## Review Checklist
 

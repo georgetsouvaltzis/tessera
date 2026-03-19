@@ -59,7 +59,7 @@ Preferred entrypoints:
 Preferred startup forms:
 
 - minimal: `Tea.RunAsync(new App())`
-- configured: `Tea.CreateBuilder().ConfigureServices(...).UseApp<TApp>().ConfigureRuntime(...).Build()`
+- configured: `Tea.CreateBuilder().UseApp<TApp>().ConfigureRuntime(...).Build()`
 
 The framework must not take a hard dependency on Generic Host as its identity.
 
@@ -120,6 +120,19 @@ Advanced path:
 - custom controls/widgets
 - low-level runtime seams
 - advanced rendering and input behavior
+
+### 7. Theme-First Visual Model
+
+V1 visuals must be controlled by semantic theme tokens and override layers.
+
+Required:
+
+- built-in palettes (Catppuccin and Rosé Pine variants)
+- custom user palette support
+- global + control-type + control-instance + state overrides
+- focus visuals configurable without relying only on `"*"` markers
+
+Image rendering is V1.1 scope and should not block V1 theme delivery.
 
 ## Public Design Rules
 
@@ -321,7 +334,7 @@ Extensibility should be explicit and stable.
 
 - the first example must teach the intended path
 - onboarding progression is fixed: `examples/HelloWorld` -> `examples/CounterForm` -> `examples/WorkspaceApp` -> advanced interaction lane
-- onboarding docs must keep both startup forms explicit: minimal `Tea.RunAsync(new App())` and configured `Tea.CreateBuilder().ConfigureServices(...).UseApp<TApp>()...`
+- onboarding docs must keep both startup forms explicit: minimal `Tea.RunAsync(new App())` and configured `Tea.CreateBuilder().UseApp<TApp>().ConfigureRuntime(...).Build()`
 - starter docs must not teach advanced engine vocabulary
 - examples must not contradict the source-of-truth API
 - old-path examples, if kept, must be clearly marked advanced
@@ -329,6 +342,8 @@ Extensibility should be explicit and stable.
 - default docs/examples must not instantiate `*Component` types directly
 - if an example needs advanced `*Component` types, the example must be marked advanced
 - default onboarding must not import `TeaSharp.Core.*`; that namespace is the low-level advanced lane
+- V1 docs must explain semantic theming and override hierarchy
+- V1 docs must mark image support as V1.1
 
 ## Current Drift To Correct
 

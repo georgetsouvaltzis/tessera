@@ -26,6 +26,8 @@ These are the types new applications should discover first.
 - `TeaEffect`
 - `TeaEffects`
 - `Message` and the typed message records in `TeaSharp`
+- `TeaSharp.Styles.TeaStyle`
+- `TeaSharp.Styles.AnsiColor`
 - `Screen`
 - `ScreenContext`
 - `ScreenOptions`
@@ -79,13 +81,14 @@ These are the types new applications should discover first.
 The intended beginner path is:
 
 - build an app by deriving from `TeaApp`
-- run it with the minimal startup lane (`Tea.RunAsync(new App())`) or configured startup lane (`Tea.CreateBuilder().ConfigureServices(...).UseApp<TApp>()...`)
+- run it with the minimal startup lane (`Tea.RunAsync(new App())`) or configured startup lane (`Tea.CreateBuilder().UseApp<TApp>().ConfigureRuntime(...).Build()`)
 - rely on automatic control routing; `Update(...)` handles only unhandled input plus runtime messages
 - return `Screen` from `Build(ScreenContext)`
 - assemble screens with `Screen.Build(...)` and shallow builder callbacks
 - keep configuration in `TeaRuntimeOptions` and `ScreenOptions`
 - follow canonical onboarding examples in order: `examples/HelloWorld` -> `examples/CounterForm` -> `examples/WorkspaceApp`
 - treat `TeaSharp.Core` as the low-level advanced lane, not default onboarding
+- use semantic theme tokens and palette-driven styling on the default path
 
 ## Tier 2: Advanced But Supported
 
@@ -202,3 +205,4 @@ Their old `TeaSharp.Components.Prebuilt.*` counterparts have been removed instea
 3. keep `TeaSharp.Core` as the intentional low-level product and keep docs/examples explicit about when app authors should prefer `TeaSharp` instead
 4. keep custom widget extensibility stable while internal runtime details continue to shrink and stay behind TeaSharp-owned internal adapters
 5. preserve discoverability tests so legacy namespaces do not drift back onto the default path
+6. keep V1 image scope out of the V1 default path docs (image rendering planned for V1.1)
