@@ -26,16 +26,16 @@ Use Release configuration for comparisons and gates.
 dotnet run --project benchmarks/TeaSharp.Benchmarks --configuration Release -- --list flat
 
 # 2) Run all scenarios in Release
-dotnet run --project benchmarks/TeaSharp.Benchmarks --configuration Release -- --filter "*"
+dotnet run --project benchmarks/TeaSharp.Benchmarks --configuration Release -- --inProcess --filter "*"
 
 # 3) Run a single scenario (example: LargeTable)
-dotnet run --project benchmarks/TeaSharp.Benchmarks --configuration Release -- --filter "*LargeTable*"
+dotnet run --project benchmarks/TeaSharp.Benchmarks --configuration Release -- --inProcess --filter "*LargeTable*"
 
 # 4) Run render-only mode slice (current suffix pattern)
-dotnet run --project benchmarks/TeaSharp.Benchmarks --configuration Release -- --filter "*Only"
+dotnet run --project benchmarks/TeaSharp.Benchmarks --configuration Release -- --inProcess --filter "*Only"
 
 # 5) Run render+materialize mode slice (current method names without `Only`)
-dotnet run --project benchmarks/TeaSharp.Benchmarks --configuration Release -- --filter "*Frame" --filter "*ScrollLogTail" --filter "*FirstFrameRender" --filter "*OverlayStressFrames" --filter "*ResizeStormFrames"
+dotnet run --project benchmarks/TeaSharp.Benchmarks --configuration Release -- --inProcess --filter "*Frame" --filter "*ScrollLogTail" --filter "*FirstFrameRender" --filter "*OverlayStressFrames" --filter "*ResizeStormFrames"
 ```
 
 Optional helper:
@@ -61,6 +61,8 @@ Use the same host/terminal/configuration for both runs.
 Mode guidance:
 - `shortlist-render-only`: runs the six `*Only` methods (renderer/layout gate signals)
 - `shortlist-materialize`: runs the six non-`Only` methods (end-to-end frame/allocation gate signals)
+- helper execution modes (`all|scenario|shortlist*`) use `--inProcess` by default
+- helper uses lazy build; it builds only when benchmark output is missing
 
 ## Artifacts Location
 

@@ -80,12 +80,12 @@ Harness quick commands:
 - List benchmarks:
   - `dotnet run --project benchmarks/TeaSharp.Benchmarks --configuration Release -- --list flat`
 - Run all benchmarks in Release:
-  - `dotnet run --project benchmarks/TeaSharp.Benchmarks --configuration Release -- --filter "*"`
+  - `dotnet run --project benchmarks/TeaSharp.Benchmarks --configuration Release -- --inProcess --filter "*"`
 - Run a single benchmark scenario filter:
-  - `dotnet run --project benchmarks/TeaSharp.Benchmarks --configuration Release -- --filter "*LargeTable*"`
+  - `dotnet run --project benchmarks/TeaSharp.Benchmarks --configuration Release -- --inProcess --filter "*LargeTable*"`
 - Mode-specific examples (dual-mode instrumentation):
-  - render-only slice: `dotnet run --project benchmarks/TeaSharp.Benchmarks --configuration Release -- --filter "*Only"`
-  - render+materialize slice: `dotnet run --project benchmarks/TeaSharp.Benchmarks --configuration Release -- --filter "*Frame" --filter "*ScrollLogTail" --filter "*FirstFrameRender" --filter "*OverlayStressFrames" --filter "*ResizeStormFrames"`
+  - render-only slice: `dotnet run --project benchmarks/TeaSharp.Benchmarks --configuration Release -- --inProcess --filter "*Only"`
+  - render+materialize slice: `dotnet run --project benchmarks/TeaSharp.Benchmarks --configuration Release -- --inProcess --filter "*Frame" --filter "*ScrollLogTail" --filter "*FirstFrameRender" --filter "*OverlayStressFrames" --filter "*ResizeStormFrames"`
 - Future V1 gate scenario filters (when benchmark classes are present):
   - `dotnet run --project benchmarks/TeaSharp.Benchmarks --configuration Release -- --filter "*Resize*"`
   - `dotnet run --project benchmarks/TeaSharp.Benchmarks --configuration Release -- --filter "*Overlay*"`
@@ -95,6 +95,8 @@ Harness quick commands:
   - `scripts/run_benchmarks_v1.sh shortlist-render-only`
   - `scripts/run_benchmarks_v1.sh shortlist-materialize`
   - `scripts/run_benchmarks_v1.sh iteration-template`
+  - script execution modes (`all|scenario|shortlist*`) run with `--inProcess` for trend/gate stability
+  - script performs lazy build (build only when benchmark output is missing)
 
 BenchmarkDotNet artifacts/report directory:
 - `benchmarks/TeaSharp.Benchmarks/bin/Release/net10.0/BenchmarkDotNet.Artifacts/`

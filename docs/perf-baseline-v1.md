@@ -6,23 +6,24 @@ Environment:
 - mode: `inProcess` BenchmarkDotNet toolchain
 - host: `Darwin arm64`
 - terminal: `xterm-ghostty`
-- benchmark mode family: `render+materialize` (current benchmark methods call `canvas.Render()`)
+- benchmark mode families: `render-only` + `render+materialize`
 
-Commands and measured outputs:
-1. `dotnet run --project benchmarks/TeaSharp.Benchmarks -c Release --no-build -- --inProcess --filter "*Startup*"`
-   - Mean: `15.67 us`
-   - Allocated: `50.17 KB`
-2. `dotnet run --project benchmarks/TeaSharp.Benchmarks -c Release --no-build -- --inProcess --filter "*LargeTable*"`
-   - Mean: `23.61 us`
-   - Allocated: `78.38 KB`
-3. `dotnet run --project benchmarks/TeaSharp.Benchmarks -c Release --no-build -- --inProcess --filter "*StyledHeavy*"`
-   - Mean: `68.31 us`
-   - Allocated: `311.02 KB`
+Latest measured snapshot (current head):
+- command pattern: `dotnet run --project benchmarks/TeaSharp.Benchmarks --configuration Release --no-build -- --inProcess --filter "*<ScenarioClass>*"`
+
+| Scenario | Render-only mean | Render-only alloc | Materialize mean | Materialize alloc |
+| --- | --- | --- | --- | --- |
+| Startup | `11.45 us` | `29.91 KB` | `12.31 us` | `47.49 KB` |
+| LogTail | `7.112 ms` | `80.47 KB` | `6.552 ms` | `106.97 KB` |
+| LargeTable | `10.97 us` | `15.67 KB` | `12.67 us` | `46.88 KB` |
+| OverlayStress | `368.8 us` | `70.32 KB` | `438.6 us` | `1463.45 KB` |
+| ResizeStorm | `256.3 us` | `88.97 KB` | `319.8 us` | `1256.91 KB` |
+| StyledHeavy | `50.35 us` | `93.23 KB` | `52.12 us` | `118.48 KB` |
 
 Notes:
 - priority-setting warnings on this host (`Permission denied` / `Operation not permitted`) are non-fatal noise
 - runs complete and report benchmark summaries in `inProcess` mode
-- this baseline is for `render+materialize`; render-only baselines should be tracked separately once captured
+- table captures both mode families for the same scenario set
 
 ## Iteration Log (Template)
 

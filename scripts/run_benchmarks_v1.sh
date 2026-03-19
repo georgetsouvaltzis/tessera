@@ -4,6 +4,7 @@ set -euo pipefail
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 PROJECT_PATH="$ROOT_DIR/benchmarks/TeaSharp.Benchmarks/TeaSharp.Benchmarks.csproj"
 CONFIGURATION="Release"
+OUTPUT_DLL="$ROOT_DIR/benchmarks/TeaSharp.Benchmarks/bin/$CONFIGURATION/net10.0/TeaSharp.Benchmarks.dll"
 
 usage() {
   cat <<'EOF'
@@ -18,7 +19,7 @@ Usage:
 
 Modes:
   list      List benchmarks (--list flat)
-  all       Run all benchmarks (--filter "*")
+  all       Run all benchmarks in inProcess mode (--filter "*")
   scenario  Run a single filter pattern
   shortlist Run V1-oriented filter shortlist:
             Resize, Overlay, LogTail, Startup, LargeTable, StyledHeavy
@@ -31,6 +32,18 @@ EOF
 run() {
   echo "+ $*"
   "$@"
+}
+
+run_benchmark() {
+  run dotnet run --project "$PROJECT_PATH" --configuration "$CONFIGURATION" --no-build -- --inProcess "$@"
+}
+
+ensure_build_if_missing() {
+  if [[ -f "$OUTPUT_DLL" ]]; then
+    return
+  fi
+
+  run dotnet build "$PROJECT_PATH" --configuration "$CONFIGURATION" --no-restore --nologo -v minimal
 }
 
 if [[ ! -f "$PROJECT_PATH" ]]; then
@@ -66,8 +79,6 @@ EOF
   exit 0
 fi
 
-run dotnet build "$PROJECT_PATH" --configuration "$CONFIGURATION" --no-restore --nologo -v minimal
-
 run_render_only_shortlist() {
   local filters=(
     "*StartupLikeFirstFrameRenderOnly"
@@ -79,7 +90,7 @@ run_render_only_shortlist() {
   )
 
   for filter in "${filters[@]}"; do
-    run dotnet run --project "$PROJECT_PATH" --configuration "$CONFIGURATION" --no-build -- --filter "$filter"
+    run_benchmark --filter "$filter"
   done
 }
 
@@ -94,16 +105,18 @@ run_materialize_shortlist() {
   )
 
   for filter in "${filters[@]}"; do
-    run dotnet run --project "$PROJECT_PATH" --configuration "$CONFIGURATION" --no-build -- --filter "$filter"
+    run_benchmark --filter "$filter"
   done
 }
 
 case "$MODE" in
   list)
+    ensure_build_if_missing
     run dotnet run --project "$PROJECT_PATH" --configuration "$CONFIGURATION" --no-build -- --list flat
     ;;
   all)
-    run dotnet run --project "$PROJECT_PATH" --configuration "$CONFIGURATION" --no-build -- --filter "*"
+    ensure_build_if_missing
+    run_benchmark --filter "*"
     ;;
   scenario)
     if [[ $# -lt 2 ]]; then
@@ -112,18 +125,22 @@ case "$MODE" in
       exit 1
     fi
 
-    run dotnet run --project "$PROJECT_PATH" --configuration "$CONFIGURATION" --no-build -- --filter "$2"
+    ensure_build_if_missing
+    run_benchmark --filter "$2"
     ;;
   shortlist)
+    ensure_build_if_missing
     FILTERS=("*Resize*" "*Overlay*" "*LogTail*" "*Startup*" "*LargeTable*" "*StyledHeavy*")
     for filter in "${FILTERS[@]}"; do
-      run dotnet run --project "$PROJECT_PATH" --configuration "$CONFIGURATION" --no-build -- --filter "$filter"
+      run_benchmark --filter "$filter"
     done
     ;;
   shortlist-render-only)
+    ensure_build_if_missing
     run_render_only_shortlist
     ;;
   shortlist-materialize)
+    ensure_build_if_missing
     run_materialize_shortlist
     ;;
   *)
