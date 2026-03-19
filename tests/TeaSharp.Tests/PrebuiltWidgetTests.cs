@@ -1202,7 +1202,7 @@ internal static class PrebuiltWidgetTests
         menu.Render(canvas, new Rect(0, 0, 32, 8));
         var output = canvas.Render();
 
-        TestAssert.True(output.Contains("Context", StringComparison.Ordinal) && output.Contains("!", StringComparison.Ordinal), "ContextMenu should render the focus marker when enabled.");
+        TestAssert.True(output.Contains("Context", StringComparison.Ordinal) && output.Contains('!'), "ContextMenu should render the focus marker when enabled.");
         TestAssert.True(output.Contains("▶:Copy", StringComparison.Ordinal), "ContextMenu should render selected rows with custom marker glyphs.");
         TestAssert.True(output.Contains(focusedBorderStyle.Render("┌"), StringComparison.Ordinal), "ContextMenu should style focused border glyphs.");
         return Task.CompletedTask;
