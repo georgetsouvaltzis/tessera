@@ -180,10 +180,10 @@ public sealed partial class DataGrid
         return widths;
     }
 
-    private int HitTestColumn(int pointerX, int contentX, IReadOnlyList<int> widths)
+    private static int HitTestColumn(int pointerX, int contentX, int[] widths)
     {
         var cursor = contentX;
-        for (var index = 0; index < widths.Count; index++)
+        for (var index = 0; index < widths.Length; index++)
         {
             var width = Math.Max(0, widths[index]);
             if (pointerX >= cursor && pointerX < cursor + width)
@@ -192,7 +192,7 @@ public sealed partial class DataGrid
             }
 
             cursor += width;
-            if (index < widths.Count - 1)
+            if (index < widths.Length - 1)
             {
                 cursor += 1;
             }
@@ -201,7 +201,7 @@ public sealed partial class DataGrid
         return -1;
     }
 
-    private void WriteHeader(Canvas canvas, Rect content, int y, IReadOnlyList<int> widths)
+    private void WriteHeader(Canvas canvas, Rect content, int y, int[] widths)
     {
         var x = content.X;
         for (var columnIndex = 0; columnIndex < _columns.Count && x < content.Right; columnIndex++)
@@ -224,7 +224,7 @@ public sealed partial class DataGrid
         }
     }
 
-    private void WriteRow(Canvas canvas, Rect content, int y, IReadOnlyList<int> widths, int rowIndex)
+    private void WriteRow(Canvas canvas, Rect content, int y, int[] widths, int rowIndex)
     {
         var x = content.X;
         var row = _rows[rowIndex];
