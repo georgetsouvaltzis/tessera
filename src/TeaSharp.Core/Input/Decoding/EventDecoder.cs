@@ -123,9 +123,9 @@ internal sealed class EventDecoder : IEventDecoder
 
         if (!DecoderCommon.TryFindFinalByte(buffer, 2, out var finalIndex))
         {
-            return timeoutExpired
-                ? new DecodeResult(1, new KeyPressMsg(KeyCode.Escape), false)
-                : new DecodeResult(0, null, true);
+            // Keep partial CSI payload buffered even after escape timeout so split control sequences
+            // (for example SGR mouse reports) cannot degrade into literal text fragments.
+            return new DecodeResult(0, null, true);
         }
 
         var consumed = finalIndex + 1;

@@ -14,6 +14,8 @@ internal static class TerminalReaderBehaviorTests
     {
         yield return new TestCase("TerminalReader_BracketedPaste_AggregatesContent", BracketedPaste_AggregatesContent);
         yield return new TestCase("TerminalReader_ChunkedStream_DecodesMixedSequences", ChunkedStream_DecodesMixedSequences);
+        yield return new TestCase("TerminalReader_SplitSgrMouseAcrossTimeout_DoesNotLeakCharacterFragments", SplitSgrMouseAcrossTimeout_DoesNotLeakCharacterFragments);
+        yield return new TestCase("TerminalReader_SplitCsiControlAcrossTimeout_DoesNotLeakCharacterFragments", SplitCsiControlAcrossTimeout_DoesNotLeakCharacterFragments);
         yield return new TestCase("TerminalReader_TrailingEscape_EmitsEscapeAfterTimeout", TrailingEscape_EmitsEscapeAfterTimeout);
         yield return new TestCase("TerminalReader_EscapeThenDelayedChar_EmitsEscapeThenChar", EscapeThenDelayedChar_EmitsEscapeThenChar);
         yield return new TestCase("TerminalReader_EscapeThenImmediateChar_EmitsAltChar", EscapeThenImmediateChar_EmitsAltChar);
@@ -82,6 +84,56 @@ internal static class TerminalReaderBehaviorTests
             "Trailing ESC should decode as Escape key.");
     }
 
+    private static async Task SplitSgrMouseAcrossTimeout_DoesNotLeakCharacterFragments()
+    {
+        // Arrange
+        var stream = new TimedChunkReadStream(
+        [
+            (Encoding.UTF8.GetBytes("\u001b[<26;4;"), 0),
+            (Encoding.UTF8.GetBytes("6M"), 35),
+        ]);
+        var reader = new TerminalReader(stream, new EventDecoder(), TimeSpan.FromMilliseconds(10));
+        var events = new List<IMessage>();
+
+        // Act
+        await reader.StreamEventsAsync(events.Add, CancellationToken.None);
+
+        // Assert
+        TestAssert.Equal(1, events.Count, "Split SGR mouse sequence should decode into one mouse message.");
+        TestAssert.True(
+            events[0] is MouseClickMsg
+            {
+                Button: MouseButton.Right,
+                X: 3,
+                Y: 5,
+                Modifiers: KeyModifiers.Ctrl | KeyModifiers.Alt,
+            },
+            "Split SGR mouse sequence should preserve right-click + ctrl/alt modifiers.");
+        AssertNoCharacterLeak(events, "Split SGR mouse sequence should not emit character key fragments.");
+    }
+
+    private static async Task SplitCsiControlAcrossTimeout_DoesNotLeakCharacterFragments()
+    {
+        // Arrange
+        var stream = new TimedChunkReadStream(
+        [
+            (Encoding.UTF8.GetBytes("\u001b[?1006;"), 0),
+            (Encoding.UTF8.GetBytes("1$y"), 35),
+        ]);
+        var reader = new TerminalReader(stream, new EventDecoder(), TimeSpan.FromMilliseconds(10));
+        var events = new List<IMessage>();
+
+        // Act
+        await reader.StreamEventsAsync(events.Add, CancellationToken.None);
+
+        // Assert
+        TestAssert.Equal(1, events.Count, "Split CSI control sequence should decode into one control message.");
+        TestAssert.True(
+            events[0] is ModeReportMsg { Mode: 1006, State: ModeReportState.Set },
+            "Split CSI mode-report sequence should preserve parsed mode/state.");
+        AssertNoCharacterLeak(events, "Split CSI control sequence should not emit character key fragments.");
+    }
+
     private static async Task EscapeThenDelayedChar_EmitsEscapeThenChar()
     {
         // Arrange
@@ -132,6 +184,17 @@ internal static class TerminalReaderBehaviorTests
 
         // Assert
         TestAssert.True(run.IsCompletedSuccessfully, "Reader should exit when cancellation is requested even if read is still pending.");
+    }
+
+    private static void AssertNoCharacterLeak(List<IMessage> events, string message)
+    {
+        for (var i = 0; i < events.Count; i++)
+        {
+            if (events[i] is KeyPressMsg { Code: KeyCode.Character })
+            {
+                throw new InvalidOperationException(message);
+            }
+        }
     }
 
     private sealed class ChunkedReadStream(byte[] payload, int maxChunkSize) : Stream
