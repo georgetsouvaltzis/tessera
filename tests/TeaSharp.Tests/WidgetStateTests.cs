@@ -96,11 +96,12 @@ internal static class WidgetStateTests
         // Act
         viewport.Update(new KeyPressMsg(KeyCode.Right));
         var horizontal = viewport.RenderLines();
+        var firstLineAfterHorizontalScroll = horizontal[0];
         viewport.Update(new KeyPressMsg(KeyCode.Down));
         var lines = viewport.RenderLines();
 
         // Assert
-        TestAssert.Equal("23456789", horizontal[0], "Horizontal scroll should shift viewport content.");
+        TestAssert.Equal("23456789", firstLineAfterHorizontalScroll, "Horizontal scroll should shift viewport content.");
         TestAssert.Equal("cdefghij", lines[0], "Vertical scroll should move viewport to the next row.");
         TestAssert.Equal("mnopqrst", lines[1], "Viewport should render following row with same horizontal offset.");
         return Task.CompletedTask;
@@ -116,12 +117,14 @@ internal static class WidgetStateTests
 
         // Act
         var first = viewport.RenderLines();
+        var firstLine = first[0];
+        var secondLine = first[1];
         viewport.Update(new KeyPressMsg(KeyCode.Down));
         var second = viewport.RenderLines();
 
         // Assert
-        TestAssert.Equal("abcd", first[0], "Wrap mode should render first visual segment.");
-        TestAssert.Equal("efgh", first[1], "Wrap mode should render second visual segment.");
+        TestAssert.Equal("abcd", firstLine, "Wrap mode should render first visual segment.");
+        TestAssert.Equal("efgh", secondLine, "Wrap mode should render second visual segment.");
         TestAssert.Equal("efgh", second[0], "Vertical scroll should move through wrapped visual rows.");
         TestAssert.Equal("ijkl", second[1], "Vertical scroll should reveal last wrapped segment.");
         return Task.CompletedTask;
