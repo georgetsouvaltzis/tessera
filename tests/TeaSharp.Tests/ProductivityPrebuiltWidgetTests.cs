@@ -21,6 +21,11 @@ internal static class ProductivityPrebuiltWidgetTests
         yield return new TestCase("Controls_Paginator_PageChangedEvent_ReportsTransition", Paginator_PageChangedEvent_ReportsTransition);
         yield return new TestCase("Controls_Paginator_MousePressOnHitTargets_ChangesPage", Paginator_MousePressOnHitTargets_ChangesPage);
         yield return new TestCase("Controls_Paginator_RendersCompactOneLineLayout", Paginator_RendersCompactOneLineLayout);
+        yield return new TestCase("Controls_FuzzyFinder_SetQuery_FiltersResults", FuzzyFinder_SetQuery_FiltersResults);
+        yield return new TestCase("Controls_FuzzyFinder_KeyboardNavigationAndEnter_RaisesSelection", FuzzyFinder_KeyboardNavigationAndEnter_RaisesSelection);
+        yield return new TestCase("Controls_FuzzyFinder_Escape_ClearsThenCloses", FuzzyFinder_Escape_ClearsThenCloses);
+        yield return new TestCase("Controls_FuzzyFinder_MousePress_SelectsAndActivatesRow", FuzzyFinder_MousePress_SelectsAndActivatesRow);
+        yield return new TestCase("Controls_FuzzyFinder_RendersPlaceholderAndSelectedMarker", FuzzyFinder_RendersPlaceholderAndSelectedMarker);
         yield return new TestCase("Controls_PropertyGrid_KeyboardNavigationAndReadOnlySemantics", PropertyGrid_KeyboardNavigationAndReadOnlySemantics);
         yield return new TestCase("Controls_PropertyGrid_SelectionChangedEvent_ReportsTransition", PropertyGrid_SelectionChangedEvent_ReportsTransition);
         yield return new TestCase("Controls_PropertyGrid_RendersHeadersCategoriesAndSelection", PropertyGrid_RendersHeadersCategoriesAndSelection);
@@ -276,6 +281,120 @@ internal static class ProductivityPrebuiltWidgetTests
         TestAssert.True(
             output.Contains("Prev  Page 5/12  Next", StringComparison.Ordinal),
             "Paginator should render compact one-line layout with current page label.");
+        return Task.CompletedTask;
+    }
+
+    private static Task FuzzyFinder_SetQuery_FiltersResults()
+    {
+        var finder = new FuzzyFinder
+        {
+            IsFocused = true,
+            Border = BorderStyle.None,
+        };
+        finder.SetItems(
+        [
+            new FuzzyFinderItem("api", "ApiClient.cs", "src/TeaSharp"),
+            new FuzzyFinderItem("fuzzy", "FuzzyFinder.cs", "src/TeaSharp/Controls"),
+            new FuzzyFinderItem("readme", "README.md", "docs"),
+        ]);
+
+        finder.SetQuery("ffc");
+
+        TestAssert.Equal(1, finder.ResultCount, "FuzzyFinder should keep only matching results for a restrictive query.");
+        TestAssert.True(finder.SelectedItem is not null, "FuzzyFinder should keep a selected item when results exist.");
+        TestAssert.Equal("fuzzy", finder.SelectedItem!.Id, "FuzzyFinder should surface the matched item.");
+        return Task.CompletedTask;
+    }
+
+    private static Task FuzzyFinder_KeyboardNavigationAndEnter_RaisesSelection()
+    {
+        var finder = new FuzzyFinder
+        {
+            IsFocused = true,
+            Border = BorderStyle.None,
+        };
+        finder.SetItems(["alpha", "beta", "gamma"]);
+
+        FuzzyFinderSelectionChangedEventArgs? selectionChangedArgs = null;
+        FuzzyFinderItemSelectedEventArgs? selectedArgs = null;
+        finder.SelectionChanged += (_, args) => selectionChangedArgs = args;
+        finder.ItemSelected += (_, args) => selectedArgs = args;
+
+        finder.Handle(new KeyPressed(Key.Down));
+        finder.Handle(new KeyPressed(Key.Down));
+        finder.Handle(new KeyPressed(Key.Enter));
+
+        TestAssert.Equal(2, finder.SelectedIndex, "FuzzyFinder should move selection with keyboard navigation.");
+        TestAssert.True(selectionChangedArgs is not null, "FuzzyFinder should raise selection-changed when highlight moves.");
+        TestAssert.True(selectedArgs is not null, "FuzzyFinder should raise selected event when Enter activates a row.");
+        TestAssert.Equal("gamma", selectedArgs!.ItemId, "FuzzyFinder selected payload should include the selected item id.");
+        TestAssert.True(
+            string.Equals("gamma", finder.LastSelectedItemId, StringComparison.Ordinal),
+            "FuzzyFinder should track the last activated item id.");
+        return Task.CompletedTask;
+    }
+
+    private static Task FuzzyFinder_Escape_ClearsThenCloses()
+    {
+        var finder = new FuzzyFinder
+        {
+            IsFocused = true,
+            Border = BorderStyle.None,
+        };
+        finder.SetItems(["alpha", "beta"]);
+        finder.SetQuery("a");
+
+        var cleared = finder.Handle(new KeyPressed(Key.Escape));
+        var closed = finder.Handle(new KeyPressed(Key.Escape));
+        var ignored = finder.Handle(new KeyPressed(Key.Escape));
+
+        TestAssert.True(cleared, "FuzzyFinder should handle Escape when query text is present.");
+        TestAssert.Equal(string.Empty, finder.QueryText, "FuzzyFinder Escape should clear query first.");
+        TestAssert.True(closed, "FuzzyFinder should handle Escape after query is cleared by closing results.");
+        TestAssert.True(!finder.IsOpen, "FuzzyFinder should close results after second Escape.");
+        TestAssert.True(!ignored, "FuzzyFinder should ignore Escape when already closed and query is empty.");
+        return Task.CompletedTask;
+    }
+
+    private static Task FuzzyFinder_MousePress_SelectsAndActivatesRow()
+    {
+        var finder = new FuzzyFinder
+        {
+            Border = BorderStyle.None,
+        };
+        finder.SetItems(["one", "two", "three"]);
+
+        FuzzyFinderItemSelectedEventArgs? selectedArgs = null;
+        finder.ItemSelected += (_, args) => selectedArgs = args;
+        var bounds = new Rect(0, 0, 40, 5);
+
+        var changed = finder.Handle(new PointerInput(PointerEventKind.Press, PointerButton.Left, 2, 2), bounds);
+
+        TestAssert.True(changed, "FuzzyFinder mouse press should select and activate a result row.");
+        TestAssert.Equal(1, finder.SelectedIndex, "FuzzyFinder mouse press should map row coordinates to selected index.");
+        TestAssert.True(selectedArgs is not null, "FuzzyFinder mouse press should raise item selected payload.");
+        TestAssert.Equal("two", selectedArgs!.ItemId, "FuzzyFinder mouse press should activate clicked item.");
+        return Task.CompletedTask;
+    }
+
+    private static Task FuzzyFinder_RendersPlaceholderAndSelectedMarker()
+    {
+        var finder = new FuzzyFinder
+        {
+            Border = BorderStyle.None,
+            Placeholder = "search files",
+            PlaceholderTextStyle = TeaStyle.Empty.WithForeground(AnsiColor.BrightYellow),
+            SelectedItemStyle = TeaStyle.Empty.WithBold(),
+        };
+        finder.SetItems(["alpha", "beta"]);
+        var canvas = new Canvas(40, 4);
+
+        finder.Render(canvas, new Rect(0, 0, 40, 4));
+        var output = canvas.Render();
+
+        TestAssert.True(output.Contains("search files", StringComparison.Ordinal), "FuzzyFinder should render placeholder text.");
+        TestAssert.True(output.Contains("> alpha", StringComparison.Ordinal), "FuzzyFinder should render selected row marker.");
+        TestAssert.True(output.Contains("\u001b[38;5;11m", StringComparison.Ordinal), "FuzzyFinder should apply placeholder style SGR.");
         return Task.CompletedTask;
     }
 
