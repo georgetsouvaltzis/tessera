@@ -31,16 +31,16 @@ All agents must treat this file as the source of truth for scope, sequencing, ow
   - no-DI startup policy established on docs path
   - canonical onboarding progression established (`HelloWorld` -> `CounterForm` -> `WorkspaceApp`)
   - boundary guardrails active
-- **M2: Theme Contract** -> **In Progress**
+- **M2: Theme Contract** -> **Done**
   - `TeaThemeControlExtensions` split into domain partial files (`Basic`, `InputValue`, `Navigation`, `NavigationOverlay`, `NavigationPrimitives`, `DataAndFlow`, `ExplorerAndFeedback`, `RenderingTextUtilities`, `ModalAndCharts`)
   - direct token mappings landed for input/value controls (`TextArea`, `Toggle`, `Slider`, `Spinner`, `ProgressBar`, `NumberInput`, `DatePicker`, `TimePicker`)
   - direct token mappings landed for navigation/overlay controls (`Choice`, `ComboBox`, `TreeView`, `MenuBar`, `ContextMenu`, `CommandPalette`, `Notifications`)
   - direct token mappings landed for navigation primitives (`Accordion`, `MultiSelect`, `RadioGroup`)
   - direct token mappings landed for rendering text utilities (`Badge`, `LogView`, `MarkdownView`, `MiniLog`)
   - direct token mappings landed for modal/chart summary controls (`Dialog`, `Modal`, `BarChart`, `LineChart`, `Gauge`, `StatsCard`)
-  - control-level style hooks rollout remains in progress for remaining controls/test hardening
+  - control-level style hooks and theme mappings are implemented across the shipped Public V1 control surface
 - **WS-D benchmark harness status**
-  - `BenchmarkSwitcher` discoverability is wired and `--list flat` lists startup, large-table, and styled-heavy scenarios
+  - `BenchmarkSwitcher` discoverability is wired and `--list flat` lists all 6 required scenarios (`Startup`, `LogTail`, `LargeTable`, `OverlayStress`, `ResizeStorm`, `StyledHeavyOutput`)
 
 ## Workstreams
 ### WS-A: Public API and Runtime Boundaries
