@@ -52,6 +52,7 @@ internal static class PrebuiltWidgetTests
         yield return new TestCase("Controls_MenuBar_TryConsumeActivation_IsSingleUse", MenuBar_TryConsumeActivation_IsSingleUse);
         yield return new TestCase("Controls_MenuBar_MouseClickActivatesItem", MenuBar_MouseClickActivatesItem);
         yield return new TestCase("Controls_MenuBar_MouseMotionSelectsHoveredItem", MenuBar_MouseMotionSelectsHoveredItem);
+        yield return new TestCase("Controls_MenuBar_CustomGlyphsAndFocusedBorderStyleText_Rendered", MenuBar_CustomGlyphsAndFocusedBorderStyleText_Rendered);
         yield return new TestCase("Controls_CommandBar_KeyboardNavigationAndActivation", CommandBar_KeyboardNavigationAndActivation);
         yield return new TestCase("Controls_CommandBar_ItemActivatedEvent_ReportsItem", CommandBar_ItemActivatedEvent_ReportsItem);
         yield return new TestCase("Controls_CommandBar_MouseClickSelectsAndActivatesItem", CommandBar_MouseClickSelectsAndActivatesItem);
@@ -63,6 +64,7 @@ internal static class PrebuiltWidgetTests
         yield return new TestCase("Controls_ContextMenu_MouseClickExecutesAndCloses", ContextMenu_MouseClickExecutesAndCloses);
         yield return new TestCase("Controls_ContextMenu_MouseReleaseExecutesAndCloses", ContextMenu_MouseReleaseExecutesAndCloses);
         yield return new TestCase("Controls_ContextMenu_SetItems_RecomputesLayoutFromCachedWidths", ContextMenu_SetItems_RecomputesLayoutFromCachedWidths);
+        yield return new TestCase("Controls_ContextMenu_CustomGlyphsFocusMarkerAndBorderStyleText_Rendered", ContextMenu_CustomGlyphsFocusMarkerAndBorderStyleText_Rendered);
         yield return new TestCase("Controls_CommandPalette_FiltersAndExecutes", CommandPalette_FiltersAndExecutes);
         yield return new TestCase("Controls_CommandPalette_ItemExecutedEvent_ReportsItem", CommandPalette_ItemExecutedEvent_ReportsItem);
         yield return new TestCase("Controls_CommandPalette_TryConsumeExecution_IsSingleUse", CommandPalette_TryConsumeExecution_IsSingleUse);
@@ -72,6 +74,7 @@ internal static class PrebuiltWidgetTests
         yield return new TestCase("Controls_CommandPalette_LettersRemainQueryable", CommandPalette_LettersRemainQueryable);
         yield return new TestCase("Controls_CommandPalette_SetItems_RefreshesCachedRowsAndFilter", CommandPalette_SetItems_RefreshesCachedRowsAndFilter);
         yield return new TestCase("Controls_CommandPalette_QueryTransitions_KeepFilterAccurate", CommandPalette_QueryTransitions_KeepFilterAccurate);
+        yield return new TestCase("Controls_CommandPalette_CustomGlyphsFocusMarkerAndBorderStyleText_Rendered", CommandPalette_CustomGlyphsFocusMarkerAndBorderStyleText_Rendered);
         yield return new TestCase("Controls_FileExplorer_KeyboardNavigationAndExpansion", FileExplorer_KeyboardNavigationAndExpansion);
         yield return new TestCase("Controls_FileExplorer_SelectPathAndEvent_ReportsTransition", FileExplorer_SelectPathAndEvent_ReportsTransition);
         yield return new TestCase("Controls_FileExplorer_MouseClickSelectsRow", FileExplorer_MouseClickSelectsRow);
@@ -79,6 +82,7 @@ internal static class PrebuiltWidgetTests
         yield return new TestCase("Controls_DataGrid_KeyboardNavigationTracksSelection", DataGrid_KeyboardNavigationTracksSelection);
         yield return new TestCase("Controls_DataGrid_SortComparerAndSortHook", DataGrid_SortComparerAndSortHook);
         yield return new TestCase("Controls_DataGrid_MouseClickSelectsRow", DataGrid_MouseClickSelectsRow);
+        yield return new TestCase("Controls_DataGrid_CustomColumnSeparator_HitTestingAndRendering", DataGrid_CustomColumnSeparator_HitTestingAndRendering);
         yield return new TestCase("Controls_DataGrid_RendersTitleAndStyleHooks", DataGrid_RendersTitleAndStyleHooks);
         yield return new TestCase("Controls_DataGrid_UnstyledCells_ClearTrailingContentOnReusedCanvas", DataGrid_UnstyledCells_ClearTrailingContentOnReusedCanvas);
         yield return new TestCase("Controls_DiffView_ComputesLineEntries", DiffView_ComputesLineEntries);
@@ -893,6 +897,32 @@ internal static class PrebuiltWidgetTests
         return Task.CompletedTask;
     }
 
+    private static Task MenuBar_CustomGlyphsAndFocusedBorderStyleText_Rendered()
+    {
+        var focusedBorderStyle = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(85, 44, 21));
+        var menu = new MenuBar
+        {
+            IsFocused = true,
+            Border = BorderStyle.SingleLine,
+            Glyphs = new MenuBarGlyphSet("(", ")", " ", " ", "{", "}", "{", "}"),
+            BorderStyleText = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(1, 2, 3)),
+            FocusedBorderStyleText = focusedBorderStyle,
+        };
+        menu.SetItems(
+        [
+            new MenuItem("file", "File", 'f'),
+            new MenuItem("edit", "Edit", 'e'),
+        ]);
+        var canvas = new Canvas(40, 3, CanvasTextMode.GraphemeAware);
+
+        menu.Render(canvas, new Rect(0, 0, 40, 3));
+        var output = canvas.Render();
+
+        TestAssert.True(output.Contains("(File{f})", StringComparison.Ordinal), "MenuBar should render selected labels using custom glyph delimiters.");
+        TestAssert.True(output.Contains(focusedBorderStyle.Render("┌"), StringComparison.Ordinal), "MenuBar should style focused border glyphs.");
+        return Task.CompletedTask;
+    }
+
     private static Task CommandBar_KeyboardNavigationAndActivation()
     {
         var bar = new CommandBar
@@ -1148,6 +1178,36 @@ internal static class PrebuiltWidgetTests
         return Task.CompletedTask;
     }
 
+    private static Task ContextMenu_CustomGlyphsFocusMarkerAndBorderStyleText_Rendered()
+    {
+        var focusedBorderStyle = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(72, 33, 10));
+        var menu = new ContextMenu
+        {
+            IsFocused = true,
+            Border = BorderStyle.SingleLine,
+            ShowFocusMarker = true,
+            FocusMarker = "!",
+            Glyphs = new ContextMenuGlyphSet(".", "▶", "~", ":"),
+            BorderStyleText = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(2, 3, 4)),
+            FocusedBorderStyleText = focusedBorderStyle,
+        };
+        menu.SetItems(
+        [
+            new ContextMenuItem("copy", "Copy"),
+            new ContextMenuItem("paste", "Paste"),
+        ]);
+        menu.OpenAt(0, 0);
+
+        var canvas = new Canvas(32, 8, CanvasTextMode.GraphemeAware);
+        menu.Render(canvas, new Rect(0, 0, 32, 8));
+        var output = canvas.Render();
+
+        TestAssert.True(output.Contains("Context", StringComparison.Ordinal) && output.Contains("!", StringComparison.Ordinal), "ContextMenu should render the focus marker when enabled.");
+        TestAssert.True(output.Contains("▶:Copy", StringComparison.Ordinal), "ContextMenu should render selected rows with custom marker glyphs.");
+        TestAssert.True(output.Contains(focusedBorderStyle.Render("┌"), StringComparison.Ordinal), "ContextMenu should style focused border glyphs.");
+        return Task.CompletedTask;
+    }
+
     private static Task CommandPalette_FiltersAndExecutes()
     {
         var palette = new CommandPalette
@@ -1344,6 +1404,38 @@ internal static class PrebuiltWidgetTests
         var transitioned = transitionedCanvas.Render();
         TestAssert.True(transitioned.Contains("Deploy - publish release", StringComparison.Ordinal), "Non-prefix transition should rescan and find unrelated matches.");
         TestAssert.True(!transitioned.Contains("Rollback - restore previous", StringComparison.Ordinal), "Non-prefix transition should drop stale prefix-only matches.");
+        return Task.CompletedTask;
+    }
+
+    private static Task CommandPalette_CustomGlyphsFocusMarkerAndBorderStyleText_Rendered()
+    {
+        var focusedBorderStyle = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(61, 14, 77));
+        var palette = new CommandPalette
+        {
+            IsFocused = true,
+            ShowFocusMarker = true,
+            FocusMarker = "!",
+            Border = BorderStyle.SingleLine,
+            Glyphs = new CommandPaletteGlyphSet("?", ".", "*", "~", ":"),
+            BorderStyleText = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(12, 13, 14)),
+            FocusedBorderStyleText = focusedBorderStyle,
+        };
+        palette.SetItems(
+        [
+            new CommandPaletteItem("deploy", "Deploy", "publish release"),
+            new CommandPaletteItem("rollback", "Rollback", "restore previous"),
+        ]);
+        palette.Open();
+        palette.SetQueryText("de");
+
+        var canvas = new Canvas(80, 20, CanvasTextMode.GraphemeAware);
+        palette.Render(canvas, new Rect(0, 0, 80, 20));
+        var output = canvas.Render();
+
+        TestAssert.True(output.Contains("Command Palette !", StringComparison.Ordinal), "CommandPalette should render title focus marker when enabled.");
+        TestAssert.True(output.Contains("?:de", StringComparison.Ordinal), "CommandPalette should render query prompt with custom glyphs.");
+        TestAssert.True(output.Contains("*:Deploy - publish release", StringComparison.Ordinal), "CommandPalette should render selected row with custom marker glyphs.");
+        TestAssert.True(output.Contains(focusedBorderStyle.Render("┌"), StringComparison.Ordinal), "CommandPalette should style focused border glyphs.");
         return Task.CompletedTask;
     }
 
@@ -1729,8 +1821,42 @@ internal static class PrebuiltWidgetTests
         return Task.CompletedTask;
     }
 
+    private static Task DataGrid_CustomColumnSeparator_HitTestingAndRendering()
+    {
+        var grid = new DataGrid
+        {
+            Border = BorderStyle.None,
+            IsFocused = true,
+            ColumnSeparatorText = " || ",
+        };
+        grid.SetColumns(
+        [
+            new DataGridColumn("name", "Name"),
+            new DataGridColumn("status", "Status"),
+        ]);
+        grid.SetRows(
+        [
+            ["A", "Open"],
+        ]);
+
+        var changed = grid.Handle(
+            new PointerInput(PointerEventKind.Press, PointerButton.Left, 10, 1),
+            new Rect(0, 0, 30, 3));
+        var canvas = new Canvas(30, 3);
+        grid.Render(canvas, new Rect(0, 0, 30, 3));
+        var output = canvas.Render();
+
+        TestAssert.True(changed, "DataGrid click should handle selection with custom column separator width.");
+        TestAssert.Equal(1, grid.SelectedColumnIndex, "DataGrid click should hit-test into second column with custom separator width.");
+        TestAssert.True(output.Contains(" || ", StringComparison.Ordinal), "DataGrid should render custom column separator text.");
+        return Task.CompletedTask;
+    }
+
     private static Task DataGrid_RendersTitleAndStyleHooks()
     {
+        var borderStyle = TeaStyle.Empty.WithForeground(AnsiColor.BrightBlue);
+        var focusedBorderStyle = TeaStyle.Empty.WithBold();
+        var mergedBorderStyle = borderStyle.Merge(focusedBorderStyle);
         var grid = new DataGrid
         {
             Title = "Grid",
@@ -1743,11 +1869,19 @@ internal static class PrebuiltWidgetTests
             SelectedRowStyle = TeaStyle.Empty.WithBold(),
             SelectedCellStyle = TeaStyle.Empty.WithForeground(AnsiColor.BrightGreen),
             MutedStyle = TeaStyle.Empty.WithDim(),
+            BorderStyleText = borderStyle,
+            FocusedBorderStyleText = focusedBorderStyle,
+            ColumnSeparatorText = "¦",
+            SortAscendingMarker = "^",
             MutedRowPredicate = static (rowIndex, _) => rowIndex == 0,
         };
         grid.SetColumns(
         [
-            new DataGridColumn("name", "Name"),
+            new DataGridColumn("name", "Name")
+            {
+                IsSortable = true,
+                SortComparer = static (left, right) => string.CompareOrdinal(left, right),
+            },
             new DataGridColumn("status", "Status"),
         ]);
         grid.SetRows(
@@ -1756,12 +1890,16 @@ internal static class PrebuiltWidgetTests
             ["B", "Done"],
         ]);
         grid.SelectCell(1, 1);
-        var canvas = new Canvas(48, 6);
+        grid.SortByColumn(0, DataGridSortDirection.Ascending);
+        var canvas = new Canvas(48, 6, CanvasTextMode.GraphemeAware);
 
         grid.Render(canvas, new Rect(0, 0, 48, 6));
         var output = canvas.Render();
 
         TestAssert.True(output.Contains("Grid !", StringComparison.Ordinal), "DataGrid should render focused title marker.");
+        TestAssert.True(output.Contains("Name ^", StringComparison.Ordinal), "DataGrid should render custom sort marker for sorted headers.");
+        TestAssert.True(output.Contains('¦'), "DataGrid should render custom column separator text.");
+        TestAssert.True(output.Contains(mergedBorderStyle.Render("┌"), StringComparison.Ordinal), "DataGrid should style focused border glyphs.");
         TestAssert.True(output.Contains("\u001b[4;38;5;13m", StringComparison.Ordinal), "DataGrid should render focused title style.");
         TestAssert.True(output.Contains("\u001b[4;38;5;11m", StringComparison.Ordinal), "DataGrid should render header style.");
         TestAssert.True(output.Contains("\u001b[1;38;5;10m", StringComparison.Ordinal), "DataGrid should render selected cell style.");

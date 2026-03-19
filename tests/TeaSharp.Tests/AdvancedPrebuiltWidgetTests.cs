@@ -632,15 +632,27 @@ internal static class AdvancedPrebuiltWidgetTests
 
     private static Task TreeTable_RendersHeadersRowsAndStyles()
     {
+        var borderStyle = TeaStyle.Empty.WithForeground(AnsiColor.BrightBlue);
+        var focusedBorderStyle = TeaStyle.Empty.WithBold();
+        var mergedBorderStyle = borderStyle.Merge(focusedBorderStyle);
         var table = new TreeTable("Name", "Size", "Kind")
         {
-            Border = BorderStyle.None,
+            Border = BorderStyle.SingleLine,
             IsFocused = true,
+            FocusMarker = "!",
             HeaderStyle = TeaStyle.Empty.WithForeground(AnsiColor.BrightBlue),
             BranchRowStyle = TeaStyle.Empty.WithForeground(AnsiColor.BrightCyan),
             LeafRowStyle = TeaStyle.Empty.WithForeground(AnsiColor.BrightGreen),
             SelectedRowStyle = TeaStyle.Empty.WithBold(),
             MutedRowStyle = TeaStyle.Empty.WithDim(),
+            BorderStyleText = borderStyle,
+            FocusedBorderStyleText = focusedBorderStyle,
+            ColumnSeparatorText = " • ",
+            SelectedRowMarker = ">>",
+            UnselectedRowMarker = "..",
+            ExpandedBranchMarker = "v",
+            CollapsedBranchMarker = ">",
+            LeafMarker = "*",
         };
         table.SetItems(
         [
@@ -653,16 +665,17 @@ internal static class AdvancedPrebuiltWidgetTests
 
         table.Handle(new KeyPressed(Key.Down));
 
-        var canvas = new Canvas(80, 8);
+        var canvas = new Canvas(80, 8, CanvasTextMode.GraphemeAware);
 
         table.Render(canvas, new Rect(0, 0, 80, 8));
         var output = canvas.Render();
 
-        TestAssert.True(output.Contains("Name | Size | Kind", StringComparison.Ordinal), "TreeTable should render header row.");
-        TestAssert.True(output.Contains(">   . Program.cs | 12 KB | file", StringComparison.Ordinal), "TreeTable should render selected leaf row.");
-        TestAssert.True(output.Contains("  - src | dir | folder", StringComparison.Ordinal), "TreeTable should render branch row.");
-        TestAssert.True(output.Contains(". README.md | 4 KB | file", StringComparison.Ordinal), "TreeTable should render additional leaf rows.");
-        TestAssert.True(output.Contains(". Program.cs | 12 KB | file", StringComparison.Ordinal), "TreeTable should render leaf row values.");
+        TestAssert.True(output.Contains("Tree Table !", StringComparison.Ordinal), "TreeTable should render focused title marker.");
+        TestAssert.True(output.Contains("Name • Size • Kind", StringComparison.Ordinal), "TreeTable should render custom header separator.");
+        TestAssert.True(output.Contains(">>   * Program.cs • 12 KB • file", StringComparison.Ordinal), "TreeTable should render selected row and custom leaf marker.");
+        TestAssert.True(output.Contains(".. v src • dir • folder", StringComparison.Ordinal), "TreeTable should render custom expanded branch marker.");
+        TestAssert.True(output.Contains(".. * README.md • 4 KB • file", StringComparison.Ordinal), "TreeTable should render additional leaf rows with custom marker.");
+        TestAssert.True(output.Contains(mergedBorderStyle.Render("┌"), StringComparison.Ordinal), "TreeTable should style focused border glyphs.");
         TestAssert.True(output.Contains("\u001b[38;5;12m", StringComparison.Ordinal), "TreeTable header style should render ANSI color.");
         TestAssert.True(output.Contains("\u001b[38;5;14m", StringComparison.Ordinal), "TreeTable branch row style should render ANSI color.");
         TestAssert.True(output.Contains("\u001b[38;5;10m", StringComparison.Ordinal), "TreeTable leaf row style should render ANSI color.");

@@ -35,11 +35,17 @@ internal static partial class ThemeOverridesTests
             Focus = new TeaThemeFocusTokens
             {
                 Title = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(51, 52, 53)),
+                Border = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(54, 55, 56)),
             },
             Selection = new TeaThemeSelectionTokens
             {
                 Foreground = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(61, 62, 63)),
                 Background = TeaStyle.Empty.WithBackground(AnsiColor.Rgb(71, 72, 73)),
+            },
+            Border = new TeaThemeBorderTokens
+            {
+                Default = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(74, 75, 76)),
+                Focused = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(77, 78, 79)),
             },
         };
 
@@ -57,6 +63,8 @@ internal static partial class ThemeOverridesTests
             "DataGrid selected row style should map to merged Selection styles.");
         TestAssert.Equal(theme.Accent.Primary, dataGrid.SelectedCellStyle, "DataGrid selected cell style should map to Accent.Primary.");
         TestAssert.Equal(theme.Text.Muted, dataGrid.MutedStyle, "DataGrid muted style should map to Text.Muted.");
+        TestAssert.Equal(theme.Border.Default, dataGrid.BorderStyleText, "DataGrid border style should map to Border.Default.");
+        TestAssert.Equal(theme.Border.Focused.Merge(theme.Focus.Border), dataGrid.FocusedBorderStyleText, "DataGrid focused border style should map to focused border tokens.");
 
         TestAssert.Equal(theme.Text.Secondary, treeTable.TitleStyle, "TreeTable title style should map to Text.Secondary.");
         TestAssert.Equal(theme.Focus.Title, treeTable.FocusedTitleStyle, "TreeTable focused title style should map to Focus.Title.");
@@ -68,6 +76,8 @@ internal static partial class ThemeOverridesTests
             treeTable.SelectedRowStyle,
             "TreeTable selected style should map to merged Selection styles.");
         TestAssert.Equal(theme.Text.Muted, treeTable.MutedRowStyle, "TreeTable muted style should map to Text.Muted.");
+        TestAssert.Equal(theme.Border.Default, treeTable.BorderStyleText, "TreeTable border style should map to Border.Default.");
+        TestAssert.Equal(theme.Border.Focused.Merge(theme.Focus.Border), treeTable.FocusedBorderStyleText, "TreeTable focused border style should map to focused border tokens.");
 
         TestAssert.Equal(theme.Text.Secondary, keyValueList.TitleStyle, "KeyValueList title style should map to Text.Secondary.");
         TestAssert.Equal(theme.Focus.Title, keyValueList.FocusedTitleStyle, "KeyValueList focused title style should map to Focus.Title.");
@@ -100,21 +110,29 @@ internal static partial class ThemeOverridesTests
             Focus = new TeaThemeFocusTokens
             {
                 Title = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(13, 14, 15)),
+                Border = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(22, 23, 24)),
             },
             Selection = new TeaThemeSelectionTokens
             {
                 Foreground = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(16, 17, 18)),
                 Background = TeaStyle.Empty.WithBackground(AnsiColor.Rgb(19, 20, 21)),
             },
+            Border = new TeaThemeBorderTokens
+            {
+                Default = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(25, 26, 27)),
+                Focused = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(28, 29, 30)),
+            },
         };
 
         var dataGrid = new DataGrid
         {
             RowStyle = explicitStyle,
+            BorderStyleText = explicitStyle,
         };
         var treeTable = new TreeTable
         {
             LeafRowStyle = explicitStyle,
+            BorderStyleText = explicitStyle,
         };
         var keyValueList = new KeyValueList
         {
@@ -126,9 +144,13 @@ internal static partial class ThemeOverridesTests
         keyValueList.ApplyThemeDefaults(theme);
 
         TestAssert.Equal(explicitStyle, dataGrid.RowStyle, "Defaults should not overwrite explicit DataGrid.RowStyle.");
+        TestAssert.Equal(explicitStyle, dataGrid.BorderStyleText, "Defaults should not overwrite explicit DataGrid.BorderStyleText.");
         TestAssert.Equal(theme.Accent.Primary, dataGrid.SelectedCellStyle, "Defaults should fill empty DataGrid.SelectedCellStyle.");
+        TestAssert.Equal(theme.Border.Focused.Merge(theme.Focus.Border), dataGrid.FocusedBorderStyleText, "Defaults should fill empty DataGrid.FocusedBorderStyleText.");
         TestAssert.Equal(explicitStyle, treeTable.LeafRowStyle, "Defaults should not overwrite explicit TreeTable.LeafRowStyle.");
+        TestAssert.Equal(explicitStyle, treeTable.BorderStyleText, "Defaults should not overwrite explicit TreeTable.BorderStyleText.");
         TestAssert.Equal(theme.Accent.Primary, treeTable.BranchRowStyle, "Defaults should fill empty TreeTable.BranchRowStyle.");
+        TestAssert.Equal(theme.Border.Focused.Merge(theme.Focus.Border), treeTable.FocusedBorderStyleText, "Defaults should fill empty TreeTable.FocusedBorderStyleText.");
         TestAssert.Equal(explicitStyle, keyValueList.ValueStyle, "Defaults should not overwrite explicit KeyValueList.ValueStyle.");
         TestAssert.Equal(theme.Text.Muted, keyValueList.SeparatorStyle, "Defaults should fill empty KeyValueList.SeparatorStyle.");
 
@@ -165,11 +187,17 @@ internal static partial class ThemeOverridesTests
             Focus = new TeaThemeFocusTokens
             {
                 Title = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(141, 142, 143)),
+                Border = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(164, 165, 166)),
             },
             Selection = new TeaThemeSelectionTokens
             {
                 Foreground = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(151, 152, 153)),
                 Background = TeaStyle.Empty.WithBackground(AnsiColor.Rgb(161, 162, 163)),
+            },
+            Border = new TeaThemeBorderTokens
+            {
+                Default = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(167, 168, 169)),
+                Focused = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(170, 171, 172)),
             },
         };
 
@@ -183,8 +211,12 @@ internal static partial class ThemeOverridesTests
 
         TestAssert.Equal(explicitStyle, dataGrid.RowStyle, "Override defaults should not overwrite explicit DataGrid.RowStyle.");
         TestAssert.Equal(typeTheme.Accent.Primary, dataGrid.SelectedCellStyle, "Override defaults should fill empty DataGrid.SelectedCellStyle.");
+        TestAssert.Equal(typeTheme.Border.Default, dataGrid.BorderStyleText, "Override defaults should fill empty DataGrid.BorderStyleText.");
+        TestAssert.Equal(typeTheme.Border.Focused.Merge(typeTheme.Focus.Border), dataGrid.FocusedBorderStyleText, "Override defaults should fill empty DataGrid.FocusedBorderStyleText.");
         TestAssert.Equal(typeTheme.Accent.Primary, treeTable.BranchRowStyle, "Override apply should map TreeTable branch style.");
         TestAssert.Equal(typeTheme.Text.Primary, treeTable.LeafRowStyle, "Override apply should map TreeTable leaf style.");
+        TestAssert.Equal(typeTheme.Border.Default, treeTable.BorderStyleText, "Override apply should map TreeTable border style.");
+        TestAssert.Equal(typeTheme.Border.Focused.Merge(typeTheme.Focus.Border), treeTable.FocusedBorderStyleText, "Override apply should map TreeTable focused border style.");
         TestAssert.Equal(explicitStyle, keyValueList.ValueStyle, "Override defaults should not overwrite explicit KeyValueList.ValueStyle.");
         TestAssert.Equal(typeTheme.Text.Muted, keyValueList.SeparatorStyle, "Override defaults should fill empty KeyValueList.SeparatorStyle.");
 
