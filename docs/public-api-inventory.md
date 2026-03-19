@@ -74,6 +74,9 @@ These are the types new applications should discover first.
 - `TeaSharp.Controls.Tabs`
 - `TeaSharp.Controls.ListView<T>`
 - `TeaSharp.Controls.Table`
+- `TeaSharp.Controls.DataGrid`
+- `TeaSharp.Controls.TreeTable`
+- `TeaSharp.Controls.KeyValueList`
 - `TeaSharp.Controls.TreeItem`
 - `TeaSharp.Controls.TreeView` (native)
 - `TeaSharp.Controls.MenuBar`
@@ -196,6 +199,9 @@ The first root controls that already own their implementation directly are:
 - `LineChart`
 - `ListView<T>`
 - `Tabs`
+- `DataGrid`
+- `TreeTable`
+- `KeyValueList`
 - `MenuBar`
 - `Toolbar`
 - `CommandBar`

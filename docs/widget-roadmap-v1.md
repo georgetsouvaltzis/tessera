@@ -8,17 +8,15 @@ Control additions remain C#-first object-model APIs with no DI requirement on th
 
 ### Current Built-ins (baseline)
 - `Label`, `Button`, `TextInput`, `TextArea`, `StatusBar`
-- `Choice`, `ComboBox`, `ListView<T>`, `Table`, `TreeView`, `TreeItem`, `Tabs`, `MenuBar`, `Toolbar`
+- `Choice`, `ComboBox`, `ListView<T>`, `Table`, `DataGrid`, `TreeTable`, `TreeView`, `TreeItem`, `Tabs`, `MenuBar`, `Toolbar`
 - `Dialog`, `Modal`, `Notifications`, `ContextMenu`, `CommandPalette`
-- `CommandBar`, `SearchBox`, `DiffView`, `PropertyGrid`
+- `CommandBar`, `SearchBox`, `DiffView`, `PropertyGrid`, `KeyValueList`
 - `Toggle`, `Slider`, `Spinner`, `ProgressBar`, `LogView`
 - `Badge`, `Accordion`, `NumberInput`, `DatePicker`, `TimePicker`
 - `MultiSelect`, `RadioGroup`, `Gauge`, `MiniLog`, `StatsCard`
 - `BarChart`, `LineChart`, `MarkdownView`
 
 ### Planned Expansion (to reach 40-50 total)
-- `DataGrid` (virtualized rows/columns)
-- `TreeTable`
 - `FileExplorer`
 - `FuzzyFinder`
 - `Breadcrumb`
@@ -27,7 +25,6 @@ Control additions remain C#-first object-model APIs with no DI requirement on th
 - `DiffView`
 - `Timeline`
 - `Stepper` (wizard flow)
-- `KeyValueList` (inspector panel)
 - `ToastCenter`
 
 ## Prioritized V1 Tranche (10-15)
@@ -53,12 +50,12 @@ Acceptance for V1 tranche:
 ## V1 Tranche Progress
 - `[x]` `Breadcrumb` (shipped)
 - `[x]` `Paginator` (shipped)
-- `[ ]` `DataGrid`
+- `[x]` `DataGrid` (shipped)
 - `[x]` `FuzzyFinder` (shipped)
 - `[x]` `CommandBar` (shipped)
 - `[x]` `PropertyGrid` (shipped)
 - `[x]` `FileExplorer` (shipped)
-- `[ ]` `TreeTable`
+- `[x]` `TreeTable` (shipped)
 - `[x]` `DiffView` (shipped)
 - `[x]` `Toolbar` (shipped)
 - `[x]` `SearchBox` (shipped)

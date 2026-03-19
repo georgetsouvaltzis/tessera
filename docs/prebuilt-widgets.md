@@ -57,6 +57,9 @@ Preferred public catalog:
 44. `FileExplorer`
 45. `FuzzyFinder`
 46. `ToastCenter`
+47. `DataGrid`
+48. `TreeTable`
+49. `KeyValueList`
 
 These live in `TeaSharp.Controls`.
 

@@ -135,6 +135,9 @@ Root controls currently include:
 - `Tabs`
 - `ListView<T>`
 - `Table`
+- `DataGrid`
+- `TreeTable`
+- `KeyValueList`
 - `TreeItem`
 - `TreeView`
 - `MenuBar`

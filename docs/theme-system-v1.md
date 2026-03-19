@@ -177,7 +177,7 @@ Phase 1 (baseline controls):
 
 Phase 2 (data and advanced controls):
 
-- `TreeView`, `MenuBar`, `Notifications`, `DiffView`, `PropertyGrid`, `FileExplorer`, `FuzzyFinder`, `ToastCenter`, `Toggle`, `Slider`, `Spinner`, chart and log controls
+- `TreeView`, `DataGrid`, `TreeTable`, `KeyValueList`, `MenuBar`, `Notifications`, `DiffView`, `PropertyGrid`, `FileExplorer`, `FuzzyFinder`, `ToastCenter`, `Toggle`, `Slider`, `Spinner`, chart and log controls
 
 Acceptance criteria:
 
