@@ -119,6 +119,7 @@ Root controls currently include:
 
 - `Label`
 - `Button`
+- `Breadcrumb`
 - `TextInput`
 - `TextArea`
 - `Choice`
@@ -142,6 +143,7 @@ Root controls currently include:
 - `TimePicker`
 - `MarkdownView`
 - `MultiSelect`
+- `Paginator`
 - `RadioGroup`
 - `ProgressBar`
 - `LogView`

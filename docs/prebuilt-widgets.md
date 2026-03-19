@@ -45,6 +45,8 @@ Preferred public catalog:
 34. `StatsCard`
 35. `BarChart`
 36. `LineChart`
+37. `Breadcrumb`
+38. `Paginator`
 
 These live in `TeaSharp.Controls`.
 

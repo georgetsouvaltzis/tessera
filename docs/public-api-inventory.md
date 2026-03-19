@@ -34,6 +34,7 @@ These are the types new applications should discover first.
 - `Screen.Build(...)`
 - `TeaSharp.Layout.*` object-model types
 - `TeaSharp.Controls.Button`
+- `TeaSharp.Controls.Breadcrumb`
 - `TeaSharp.Controls.Label`
 - `TeaSharp.Controls.Badge`
 - `TeaSharp.Controls.BadgeTone`
@@ -61,6 +62,7 @@ These are the types new applications should discover first.
 - `TeaSharp.Controls.TimePicker`
 - `TeaSharp.Controls.MarkdownView`
 - `TeaSharp.Controls.MultiSelect`
+- `TeaSharp.Controls.Paginator`
 - `TeaSharp.Controls.RadioGroup`
 - `TeaSharp.Controls.LogView`
 - `TeaSharp.Controls.Modal`
@@ -159,6 +161,7 @@ The first root controls that already own their implementation directly are:
 - `Button`
 - `TextInput`
 - `TextArea`
+- `Breadcrumb`
 - `Choice`
 - `ComboBox`
 - `ContextMenu`
@@ -187,6 +190,7 @@ The first root controls that already own their implementation directly are:
 - `Tabs`
 - `MenuBar`
 - `StatusBar`
+- `Paginator`
 
 Their old `TeaSharp.Components.Prebuilt.*` counterparts have been removed instead of kept as compatibility wrappers.
 

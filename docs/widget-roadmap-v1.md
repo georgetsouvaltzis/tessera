@@ -50,6 +50,20 @@ Acceptance for V1 tranche:
 - documented in control catalog/docs
 - theme-aware and overrideable
 
+## V1 Tranche Progress
+- `[x]` `Breadcrumb` (shipped)
+- `[x]` `Paginator` (shipped)
+- `[ ]` `DataGrid`
+- `[ ]` `FuzzyFinder`
+- `[ ]` `CommandBar`
+- `[ ]` `PropertyGrid`
+- `[ ]` `FileExplorer`
+- `[ ]` `TreeTable`
+- `[ ]` `DiffView`
+- `[ ]` `Toolbar`
+- `[ ]` `SearchBox`
+- `[ ]` `ToastCenter`
+
 ## API Consistency Rules
 - All widgets derive from `Control`.
 - Input routing follows normal control `Handle(...)` semantics.

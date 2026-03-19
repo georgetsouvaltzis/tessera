@@ -100,6 +100,7 @@ Follow examples in this order:
 4. Advanced interaction lane: `examples/AdvancedWidgets` and `examples/WidgetGallery` for richer overlays, command surfaces, and advanced behavior.
 
 Default onboarding should stay in `TeaSharp` namespaces. `TeaSharp.Core` is the low-level advanced lane.
+Current V1 widget expansion includes `Breadcrumb` and `Paginator`.
 
 ## Docs
 
