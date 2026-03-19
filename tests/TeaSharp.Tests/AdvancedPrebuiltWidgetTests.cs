@@ -29,6 +29,10 @@ internal static class AdvancedPrebuiltWidgetTests
         yield return new TestCase("Controls_Toolbar_MouseClickSelectsItem", Toolbar_MouseClickSelectsItem);
         yield return new TestCase("Controls_Toolbar_SelectionChangedEvent_ReportsTransition", Toolbar_SelectionChangedEvent_ReportsTransition);
         yield return new TestCase("Controls_Toolbar_RendersTitleAndSelectedLabel", Toolbar_RendersTitleAndSelectedLabel);
+        yield return new TestCase("Controls_TreeTable_KeyboardNavigationAndExpansion", TreeTable_KeyboardNavigationAndExpansion);
+        yield return new TestCase("Controls_TreeTable_PointerClickSelectsVisibleRow", TreeTable_PointerClickSelectsVisibleRow);
+        yield return new TestCase("Controls_TreeTable_SelectionChangedEvent_ReportsTransition", TreeTable_SelectionChangedEvent_ReportsTransition);
+        yield return new TestCase("Controls_TreeTable_RendersHeadersRowsAndStyles", TreeTable_RendersHeadersRowsAndStyles);
     }
 
     private static Task Badge_RendersLabel()
@@ -469,6 +473,148 @@ internal static class AdvancedPrebuiltWidgetTests
 
         TestAssert.True(output.Contains("Main *", StringComparison.Ordinal), "Toolbar should render focused title marker.");
         TestAssert.True(output.Contains("[New]", StringComparison.Ordinal), "Toolbar should render selected item with a bracket marker.");
+        return Task.CompletedTask;
+    }
+
+    private static Task TreeTable_KeyboardNavigationAndExpansion()
+    {
+        var src = new TreeTableNode("src", "src", ["dir", "folder"],
+        [
+            new TreeTableNode("core", "TeaSharp.Core.csproj", ["12 KB", "file"]),
+        ])
+        {
+            IsExpanded = false,
+        };
+
+        var table = new TreeTable("Name", "Size", "Kind")
+        {
+            IsFocused = true,
+            Border = BorderStyle.None,
+        };
+        table.SetItems(
+        [
+            src,
+            new TreeTableNode("readme", "README.md", ["4 KB", "file"]),
+        ]);
+
+        var expanded = table.Handle(new KeyPressed(Key.Right));
+        TestAssert.True(expanded, "TreeTable Right key should expand selected collapsed branch.");
+
+        var intoChild = table.Handle(new KeyPressed(Key.Right));
+        TestAssert.True(intoChild, "TreeTable Right key should move into first child when branch is expanded.");
+        TestAssert.Equal("core", table.SelectedItem?.Id ?? string.Empty, "TreeTable should select first child after moving into branch.");
+
+        var backToParent = table.Handle(new KeyPressed(Key.Left));
+        TestAssert.True(backToParent, "TreeTable Left key should move selection to parent row.");
+        TestAssert.Equal("src", table.SelectedItem?.Id ?? string.Empty, "TreeTable should select parent row after Left.");
+
+        var collapsed = table.Handle(new KeyPressed(Key.Enter));
+        TestAssert.True(collapsed, "TreeTable Enter should collapse selected branch.");
+        TestAssert.True(!(table.SelectedItem?.IsExpanded ?? true), "TreeTable selected branch should be collapsed after Enter.");
+
+        var down = table.Handle(new KeyPressed(Key.Down));
+        TestAssert.True(down, "TreeTable Down key should move selection to next visible row.");
+        TestAssert.Equal("readme", table.SelectedItem?.Id ?? string.Empty, "TreeTable Down should skip collapsed children.");
+
+        var up = table.Handle(new KeyPressed(Key.Up));
+        TestAssert.True(up, "TreeTable Up key should move selection back to previous row.");
+        TestAssert.Equal("src", table.SelectedItem?.Id ?? string.Empty, "TreeTable Up should return selection to branch row.");
+
+        var expandedAgain = table.Handle(new KeyPressed(Key.Right));
+        TestAssert.True(expandedAgain, "TreeTable Right key should expand collapsed branch.");
+        TestAssert.True(table.SelectedItem?.IsExpanded ?? false, "TreeTable selected branch should be expanded after Right.");
+        return Task.CompletedTask;
+    }
+
+    private static Task TreeTable_PointerClickSelectsVisibleRow()
+    {
+        var table = new TreeTable("Name", "Size", "Kind")
+        {
+            Border = BorderStyle.None,
+        };
+        table.SetItems(
+        [
+            new TreeTableNode("src", "src", ["dir", "folder"],
+            [
+                new TreeTableNode("core", "TeaSharp.Core.csproj", ["12 KB", "file"]),
+            ]),
+            new TreeTableNode("readme", "README.md", ["4 KB", "file"]),
+        ]);
+
+        var changed = table.Handle(new PointerInput(PointerEventKind.Press, PointerButton.Left, 2, 3), new Rect(0, 0, 64, 8));
+
+        TestAssert.True(changed, "TreeTable pointer press should select clicked row.");
+        TestAssert.Equal("readme", table.SelectedItem?.Id ?? string.Empty, "TreeTable pointer press should map row to selected item.");
+        return Task.CompletedTask;
+    }
+
+    private static Task TreeTable_SelectionChangedEvent_ReportsTransition()
+    {
+        var table = new TreeTable("Name", "Value")
+        {
+            IsFocused = true,
+            Border = BorderStyle.None,
+        };
+        table.SetItems(
+        [
+            new TreeTableNode("a", "Alpha", ["1"]),
+            new TreeTableNode("b", "Beta", ["2"]),
+        ]);
+        TreeTableSelectionChangedEventArgs? args = null;
+        table.SelectionChanged += (_, eventArgs) => args = eventArgs;
+
+        table.Handle(new KeyPressed(Key.Down));
+
+        TestAssert.True(args is not null, "TreeTable should raise selection-changed event when selection moves.");
+        TestAssert.Equal(0, args!.PreviousIndex, "TreeTable event should expose previous selected index.");
+        TestAssert.Equal(1, args.SelectedIndex, "TreeTable event should expose current selected index.");
+        TestAssert.Equal("a", args.PreviousItem?.Id ?? string.Empty, "TreeTable event should expose previous selected item.");
+        TestAssert.Equal("b", args.SelectedItem?.Id ?? string.Empty, "TreeTable event should expose current selected item.");
+        return Task.CompletedTask;
+    }
+
+    private static Task TreeTable_RendersHeadersRowsAndStyles()
+    {
+        var table = new TreeTable("Name", "Size", "Kind")
+        {
+            Border = BorderStyle.None,
+            IsFocused = true,
+            HeaderStyle = TeaStyle.Empty.WithForeground(AnsiColor.BrightBlue),
+            BranchRowStyle = TeaStyle.Empty.WithForeground(AnsiColor.BrightCyan),
+            LeafRowStyle = TeaStyle.Empty.WithForeground(AnsiColor.BrightGreen),
+            SelectedRowStyle = TeaStyle.Empty.WithBold(),
+            MutedRowStyle = TeaStyle.Empty.WithDim(),
+        };
+        table.SetItems(
+        [
+            new TreeTableNode("src", "src", ["dir", "folder"],
+            [
+                new TreeTableNode("program", "Program.cs", ["12 KB", "file"]),
+            ]),
+            new TreeTableNode("readme", "README.md", ["4 KB", "file"]),
+        ]);
+
+        table.Handle(new KeyPressed(Key.Down));
+
+        var canvas = new Canvas(80, 8);
+
+        table.Render(canvas, new Rect(0, 0, 80, 8));
+        var output = canvas.Render();
+
+        TestAssert.True(output.Contains("Name | Size | Kind", StringComparison.Ordinal), "TreeTable should render header row.");
+        TestAssert.True(output.Contains(">   . Program.cs | 12 KB | file", StringComparison.Ordinal), "TreeTable should render selected leaf row.");
+        TestAssert.True(output.Contains("  - src | dir | folder", StringComparison.Ordinal), "TreeTable should render branch row.");
+        TestAssert.True(output.Contains(". README.md | 4 KB | file", StringComparison.Ordinal), "TreeTable should render additional leaf rows.");
+        TestAssert.True(output.Contains(". Program.cs | 12 KB | file", StringComparison.Ordinal), "TreeTable should render leaf row values.");
+        TestAssert.True(output.Contains("\u001b[38;5;12m", StringComparison.Ordinal), "TreeTable header style should render ANSI color.");
+        TestAssert.True(output.Contains("\u001b[38;5;14m", StringComparison.Ordinal), "TreeTable branch row style should render ANSI color.");
+        TestAssert.True(output.Contains("\u001b[38;5;10m", StringComparison.Ordinal), "TreeTable leaf row style should render ANSI color.");
+
+        table.IsDisabled = true;
+        canvas.Clear();
+        table.Render(canvas, new Rect(0, 0, 80, 8));
+        output = canvas.Render();
+        TestAssert.True(output.Contains("\u001b[2;", StringComparison.Ordinal), "TreeTable disabled rows should include muted styling.");
         return Task.CompletedTask;
     }
 }
