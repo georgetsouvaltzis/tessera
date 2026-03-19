@@ -36,6 +36,12 @@ internal static class ViewportRenderer
         }
 
         var noDecoration = !showLineNumbers && !highlightVisualLine.HasValue;
+        if (noDecoration)
+        {
+            RenderNoDecorationLines(visualLines, start, max, wrap, width, xOffset, rendered);
+            return rendered;
+        }
+
         var lineNumberWidth = showLineNumbers
             ? ViewportLineFormatter.ComputeLineNumberWidth(showLineNumbers: true, visualLineCount: visualLines.Count)
             : 0;
@@ -43,19 +49,6 @@ internal static class ViewportRenderer
         {
             var visualIndex = start + i;
             var line = visualLines[visualIndex];
-
-            if (noDecoration)
-            {
-                rendered.Add(
-                    ViewportLineFormatter.ClipLine(
-                        line,
-                        wrap,
-                        width,
-                        xOffset,
-                        showLineNumbers: false,
-                        lineNumberWidth: 0));
-                continue;
-            }
 
             rendered.Add(
                 ViewportLineFormatter.FormatLine(
@@ -70,5 +63,41 @@ internal static class ViewportRenderer
         }
 
         return rendered;
+    }
+
+    private static void RenderNoDecorationLines(
+        IReadOnlyList<string> visualLines,
+        int start,
+        int max,
+        bool wrap,
+        int width,
+        int xOffset,
+        List<string> rendered)
+    {
+        if (width <= 0)
+        {
+            for (var i = 0; i < max; i++)
+            {
+                rendered.Add(string.Empty);
+            }
+
+            return;
+        }
+
+        if (xOffset == 0 || wrap)
+        {
+            for (var i = 0; i < max; i++)
+            {
+                var line = visualLines[start + i];
+                rendered.Add(line.Length <= width ? line : line[..width]);
+            }
+
+            return;
+        }
+
+        for (var i = 0; i < max; i++)
+        {
+            rendered.Add(ViewportLineFormatter.FormatNoDecoration(visualLines[start + i], wrap: false, width, xOffset));
+        }
     }
 }

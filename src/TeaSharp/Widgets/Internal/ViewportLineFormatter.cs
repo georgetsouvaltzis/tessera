@@ -29,29 +29,7 @@ internal static class ViewportLineFormatter
         var availableWidth = showLineNumbers
             ? Math.Max(0, width - (lineNumberWidth + 2))
             : width;
-        if (availableWidth <= 0)
-        {
-            return string.Empty;
-        }
-
-        if (wrap)
-        {
-            return line.Length <= availableWidth ? line : line[..availableWidth];
-        }
-
-        if (xOffset >= line.Length)
-        {
-            return string.Empty;
-        }
-
-        if (xOffset == 0 && line.Length <= availableWidth)
-        {
-            return line;
-        }
-
-        var remaining = line.Length - xOffset;
-        var length = Math.Min(availableWidth, remaining);
-        return line.Substring(xOffset, length);
+        return FormatNoDecoration(line, wrap, availableWidth, xOffset);
     }
 
     public static string DecorateLine(string line, bool showLineNumbers, int? highlightVisualLine, int visualIndex, int lineNumberWidth, int width)
@@ -134,6 +112,12 @@ internal static class ViewportLineFormatter
                     state.line.AsSpan(state.sliceStart, state.contentLength).CopyTo(destination[(state.lineNumberWidth + 2)..]);
                 }
             });
+    }
+
+    public static string FormatNoDecoration(string line, bool wrap, int width, int xOffset)
+    {
+        var (sliceStart, sliceLength) = ComputeSlice(line, wrap, width, xOffset);
+        return Slice(line, sliceStart, sliceLength);
     }
 
     public static List<string> NormalizeContentLines(string content)
