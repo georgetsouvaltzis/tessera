@@ -120,8 +120,28 @@ internal static class Widgets
         int selectedRow = -1,
         string? title = null,
         BorderStyle border = BorderStyle.SingleLine,
-        Thickness padding = default,
-        TeaSharp.Styles.TeaStyle borderStyleText = default)
+        Thickness padding = default)
+        => DrawTable(
+            canvas,
+            rect,
+            headers,
+            rows,
+            selectedRow,
+            title,
+            border,
+            padding,
+            borderStyleText: default);
+
+    public static void DrawTable(
+        Canvas canvas,
+        Rect rect,
+        IReadOnlyList<string> headers,
+        IReadOnlyList<IReadOnlyList<string>> rows,
+        int selectedRow,
+        string? title,
+        BorderStyle border,
+        Thickness padding,
+        TeaSharp.Styles.TeaStyle borderStyleText)
     {
         var clipped = Rect.Intersect(rect, canvas.Bounds);
         if (clipped.IsEmpty || headers.Count == 0)
