@@ -16,6 +16,10 @@ internal static class ProductivityPrebuiltWidgetTests
         yield return new TestCase("Controls_TimePicker_AdjustsField", TimePicker_AdjustsField);
         yield return new TestCase("Controls_TimePicker_ValueChangedEvent_ReportsTransition", TimePicker_ValueChangedEvent_ReportsTransition);
         yield return new TestCase("Controls_TimePicker_MouseWheelAdjustsField", TimePicker_MouseWheelAdjustsField);
+        yield return new TestCase("Controls_Paginator_KeyboardNavigationAndBoundsClamping", Paginator_KeyboardNavigationAndBoundsClamping);
+        yield return new TestCase("Controls_Paginator_PageChangedEvent_ReportsTransition", Paginator_PageChangedEvent_ReportsTransition);
+        yield return new TestCase("Controls_Paginator_MousePressOnHitTargets_ChangesPage", Paginator_MousePressOnHitTargets_ChangesPage);
+        yield return new TestCase("Controls_Paginator_RendersCompactOneLineLayout", Paginator_RendersCompactOneLineLayout);
         yield return new TestCase("Controls_MarkdownView_RendersMarkdown", MarkdownView_RendersMarkdown);
     }
 
@@ -175,6 +179,94 @@ internal static class ProductivityPrebuiltWidgetTests
         TestAssert.True(args is not null, "Time picker should raise value changed when the selected time changes.");
         TestAssert.Equal(new TimeOnly(10, 0, 0), args!.PreviousValue, "Time picker event should expose the previous value.");
         TestAssert.Equal(new TimeOnly(10, 5, 0), args.Value, "Time picker event should expose the current value.");
+        return Task.CompletedTask;
+    }
+
+    private static Task Paginator_KeyboardNavigationAndBoundsClamping()
+    {
+        var paginator = new Paginator
+        {
+            IsFocused = true,
+            PageCount = 3,
+        };
+
+        var leftChanged = paginator.Handle(new KeyPressed(Key.Left));
+        TestAssert.True(!leftChanged, "Paginator should not move left from the first page.");
+        TestAssert.Equal(0, paginator.PageIndex, "Paginator should stay on first page when moving left from index 0.");
+
+        paginator.SetPage(999);
+        TestAssert.Equal(2, paginator.PageIndex, "Paginator should clamp out-of-range positive page requests.");
+        paginator.SetPage(-5);
+        TestAssert.Equal(0, paginator.PageIndex, "Paginator should clamp out-of-range negative page requests.");
+
+        var pageDownChanged = paginator.Handle(new KeyPressed(Key.PageDown));
+        TestAssert.True(pageDownChanged, "Paginator PageDown should move to next page.");
+        TestAssert.Equal(1, paginator.PageIndex, "Paginator should move to page index 1 after PageDown.");
+
+        var endChanged = paginator.Handle(new KeyPressed(Key.End));
+        TestAssert.True(endChanged, "Paginator End should jump to the last page.");
+        TestAssert.Equal(2, paginator.PageIndex, "Paginator End should select the last page.");
+
+        var rightAtEndChanged = paginator.Handle(new KeyPressed(Key.Right));
+        TestAssert.True(!rightAtEndChanged, "Paginator should not move right from the last page.");
+        TestAssert.Equal(2, paginator.PageIndex, "Paginator should stay on last page when moving right from end.");
+        return Task.CompletedTask;
+    }
+
+    private static Task Paginator_PageChangedEvent_ReportsTransition()
+    {
+        var paginator = new Paginator
+        {
+            PageCount = 4,
+        };
+        PageChangedEventArgs? args = null;
+        paginator.PageChanged += (_, eventArgs) => args = eventArgs;
+
+        paginator.SetPage(2);
+
+        TestAssert.True(args is not null, "Paginator should raise page changed when page index updates.");
+        TestAssert.Equal(0, args!.PreviousPageIndex, "Paginator event should expose previous page index.");
+        TestAssert.Equal(2, args.NewPageIndex, "Paginator event should expose new page index.");
+        return Task.CompletedTask;
+    }
+
+    private static Task Paginator_MousePressOnHitTargets_ChangesPage()
+    {
+        var paginator = new Paginator
+        {
+            PageCount = 3,
+        };
+        var bounds = new Rect(0, 0, 40, 1);
+
+        var nextChanged = paginator.Handle(new PointerInput(PointerEventKind.Press, PointerButton.Left, 16, 0), bounds);
+        TestAssert.True(nextChanged, "Paginator next hit target click should advance page.");
+        TestAssert.Equal(1, paginator.PageIndex, "Paginator next hit target should select the next page.");
+
+        var prevChanged = paginator.Handle(new PointerInput(PointerEventKind.Press, PointerButton.Left, 0, 0), bounds);
+        TestAssert.True(prevChanged, "Paginator previous hit target click should move to previous page.");
+        TestAssert.Equal(0, paginator.PageIndex, "Paginator previous hit target should select the previous page.");
+
+        var prevDisabledChanged = paginator.Handle(new PointerInput(PointerEventKind.Press, PointerButton.Left, 0, 0), bounds);
+        TestAssert.True(!prevDisabledChanged, "Paginator previous hit target should not move before the first page.");
+        TestAssert.Equal(0, paginator.PageIndex, "Paginator should stay on first page after disabled previous click.");
+        return Task.CompletedTask;
+    }
+
+    private static Task Paginator_RendersCompactOneLineLayout()
+    {
+        var paginator = new Paginator
+        {
+            PageCount = 12,
+        };
+        paginator.SetPage(4);
+        var canvas = new Canvas(40, 1);
+
+        paginator.Render(canvas, new Rect(0, 0, 40, 1));
+        var output = canvas.Render();
+
+        TestAssert.True(
+            output.Contains("Prev  Page 5/12  Next", StringComparison.Ordinal),
+            "Paginator should render compact one-line layout with current page label.");
         return Task.CompletedTask;
     }
 
