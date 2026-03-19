@@ -64,6 +64,10 @@ internal static class PrebuiltWidgetTests
         yield return new TestCase("Controls_CommandPalette_ExposesQueryAccessors", CommandPalette_ExposesQueryAccessors);
         yield return new TestCase("Controls_CommandPalette_Open_ClearsQueryWhenClosed", CommandPalette_Open_ClearsQueryWhenClosed);
         yield return new TestCase("Controls_CommandPalette_LettersRemainQueryable", CommandPalette_LettersRemainQueryable);
+        yield return new TestCase("Controls_DiffView_ComputesLineEntries", DiffView_ComputesLineEntries);
+        yield return new TestCase("Controls_DiffView_NavigatesSelectionAndTogglesMode", DiffView_NavigatesSelectionAndTogglesMode);
+        yield return new TestCase("Controls_DiffView_MouseClickSelectsEntry", DiffView_MouseClickSelectsEntry);
+        yield return new TestCase("Controls_DiffView_RendersStyledEntries", DiffView_RendersStyledEntries);
         yield return new TestCase("Controls_Table_ForwardsSortHotkeys", Table_ForwardsSortHotkeys);
         yield return new TestCase("Controls_ProgressBar_AdjustsValue", ProgressBar_AdjustsValue);
         yield return new TestCase("Controls_StatusBar_RendersLeftAndRightText", StatusBar_RendersLeftAndRightText);
@@ -1117,6 +1121,80 @@ internal static class PrebuiltWidgetTests
         palette.Handle(new KeyPressed(Key.Character, "j"));
 
         TestAssert.Equal("j", palette.QueryText, "Letter keys should contribute to the query instead of being stolen for navigation.");
+        return Task.CompletedTask;
+    }
+
+    private static Task DiffView_ComputesLineEntries()
+    {
+        var diff = new DiffView();
+        diff.SetTexts("alpha\nbeta\ngamma", "alpha\ngamma\ndelta");
+
+        var entries = diff.Entries;
+        TestAssert.Equal(4, entries.Count, "Diff view should produce line-level entries for unchanged/removed/added lines.");
+        TestAssert.Equal((int)DiffLineKind.Unchanged, (int)entries[0].Kind, "First line should be unchanged.");
+        TestAssert.Equal((int)DiffLineKind.Removed, (int)entries[1].Kind, "Second line should be removed.");
+        TestAssert.Equal((int)DiffLineKind.Unchanged, (int)entries[2].Kind, "Third line should align back to unchanged.");
+        TestAssert.Equal((int)DiffLineKind.Added, (int)entries[3].Kind, "Trailing new line should be added.");
+        TestAssert.Equal("beta", entries[1].OldText, "Removed entry should keep old text.");
+        TestAssert.Equal("delta", entries[3].NewText, "Added entry should keep new text.");
+        return Task.CompletedTask;
+    }
+
+    private static Task DiffView_NavigatesSelectionAndTogglesMode()
+    {
+        var diff = new DiffView
+        {
+            IsFocused = true,
+        };
+        diff.SetTexts("one\ntwo\nthree", "one\nthree\nfour");
+
+        diff.Handle(new KeyPressed(Key.Down));
+        diff.Handle(new KeyPressed(Key.End));
+        diff.Handle(new KeyPressed(Key.Up));
+        var toggled = diff.Handle(new KeyPressed(Key.Tab));
+
+        TestAssert.Equal(2, diff.SelectedIndex, "Diff view keyboard navigation should move and clamp selected entry.");
+        TestAssert.True(toggled, "Diff view tab should toggle render mode.");
+        TestAssert.Equal((int)DiffViewMode.SideBySide, (int)diff.Mode, "Diff view tab should switch to side-by-side mode.");
+        return Task.CompletedTask;
+    }
+
+    private static Task DiffView_MouseClickSelectsEntry()
+    {
+        var diff = new DiffView
+        {
+            Border = BorderStyle.None,
+        };
+        diff.SetTexts("a\nb\nc\nd", "a\nc\nd\ne");
+
+        var changed = diff.Handle(new PointerInput(PointerEventKind.Press, PointerButton.Left, 0, 2), new Rect(0, 0, 40, 6));
+
+        TestAssert.True(changed, "Diff view click should select the clicked entry row.");
+        TestAssert.Equal(1, diff.SelectedIndex, "Diff view click should select the expected entry index after header offset.");
+        return Task.CompletedTask;
+    }
+
+    private static Task DiffView_RendersStyledEntries()
+    {
+        var diff = new DiffView
+        {
+            Border = BorderStyle.None,
+            AddedLineStyle = TeaStyle.Empty.WithForeground(AnsiColor.BrightGreen),
+            RemovedLineStyle = TeaStyle.Empty.WithForeground(AnsiColor.BrightRed),
+            UnchangedLineStyle = TeaStyle.Empty.WithForeground(AnsiColor.BrightWhite),
+            SelectedLineStyle = TeaStyle.Empty.WithBold(),
+            HeaderStyle = TeaStyle.Empty.WithUnderline(),
+        };
+        diff.SetTexts("a\nb\nc", "a\nc\nd");
+        var canvas = new Canvas(48, 6);
+
+        diff.Render(canvas, new Rect(0, 0, 48, 6));
+        var output = canvas.Render();
+
+        TestAssert.True(output.Contains("Old -> New", StringComparison.Ordinal), "Diff view should render header.");
+        TestAssert.True(output.Contains('+'), "Diff view should render added line marker.");
+        TestAssert.True(output.Contains('-'), "Diff view should render removed line marker.");
+        TestAssert.True(output.Contains("\u001b[4m", StringComparison.Ordinal) || output.Contains(";4m", StringComparison.Ordinal), "Diff view should apply header style.");
         return Task.CompletedTask;
     }
 

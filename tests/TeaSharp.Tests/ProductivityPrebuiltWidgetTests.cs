@@ -1,5 +1,6 @@
 using TeaSharp.Components.Primitives;
 using TeaSharp.Controls;
+using TeaSharp.Styles;
 
 namespace TeaSharp.Tests;
 
@@ -20,6 +21,10 @@ internal static class ProductivityPrebuiltWidgetTests
         yield return new TestCase("Controls_Paginator_PageChangedEvent_ReportsTransition", Paginator_PageChangedEvent_ReportsTransition);
         yield return new TestCase("Controls_Paginator_MousePressOnHitTargets_ChangesPage", Paginator_MousePressOnHitTargets_ChangesPage);
         yield return new TestCase("Controls_Paginator_RendersCompactOneLineLayout", Paginator_RendersCompactOneLineLayout);
+        yield return new TestCase("Controls_PropertyGrid_KeyboardNavigationAndReadOnlySemantics", PropertyGrid_KeyboardNavigationAndReadOnlySemantics);
+        yield return new TestCase("Controls_PropertyGrid_SelectionChangedEvent_ReportsTransition", PropertyGrid_SelectionChangedEvent_ReportsTransition);
+        yield return new TestCase("Controls_PropertyGrid_RendersHeadersCategoriesAndSelection", PropertyGrid_RendersHeadersCategoriesAndSelection);
+        yield return new TestCase("Controls_PropertyGrid_StyleHooks_EmitSgrFragments", PropertyGrid_StyleHooks_EmitSgrFragments);
         yield return new TestCase("Controls_SearchBox_UpdatesQueryAndRaisesEvent", SearchBox_UpdatesQueryAndRaisesEvent);
         yield return new TestCase("Controls_SearchBox_NavigationCommands_UpdateIndexAndRaiseEvent", SearchBox_NavigationCommands_UpdateIndexAndRaiseEvent);
         yield return new TestCase("Controls_SearchBox_MousePressOnHitTargets_Navigates", SearchBox_MousePressOnHitTargets_Navigates);
@@ -271,6 +276,126 @@ internal static class ProductivityPrebuiltWidgetTests
         TestAssert.True(
             output.Contains("Prev  Page 5/12  Next", StringComparison.Ordinal),
             "Paginator should render compact one-line layout with current page label.");
+        return Task.CompletedTask;
+    }
+
+    private static Task PropertyGrid_KeyboardNavigationAndReadOnlySemantics()
+    {
+        var grid = new PropertyGrid
+        {
+            IsFocused = true,
+        };
+        grid.SetProperties(
+        [
+            new PropertyGridProperty("Host", "localhost", "General"),
+            new PropertyGridProperty("Port", "5432", "General"),
+            new PropertyGridProperty("Timeout", "30s", "Network"),
+        ]);
+
+        var upAtStart = grid.Handle(new KeyPressed(Key.Up));
+        TestAssert.True(!upAtStart, "PropertyGrid should not move above the first row.");
+        TestAssert.Equal(0, grid.SelectedIndex, "PropertyGrid should start with first row selected.");
+
+        var downChanged = grid.Handle(new KeyPressed(Key.Down));
+        TestAssert.True(downChanged, "PropertyGrid should move selection down.");
+        TestAssert.Equal(1, grid.SelectedIndex, "PropertyGrid should move to second row after Down.");
+
+        var endChanged = grid.Handle(new KeyPressed(Key.End));
+        TestAssert.True(endChanged, "PropertyGrid should jump to last row on End.");
+        TestAssert.Equal(2, grid.SelectedIndex, "PropertyGrid should select the last row on End.");
+
+        grid.IsReadOnly = true;
+        var blocked = grid.Handle(new KeyPressed(Key.Up));
+        TestAssert.True(!blocked, "PropertyGrid should ignore navigation while read-only.");
+        TestAssert.Equal(2, grid.SelectedIndex, "PropertyGrid selection should remain unchanged while read-only.");
+        return Task.CompletedTask;
+    }
+
+    private static Task PropertyGrid_SelectionChangedEvent_ReportsTransition()
+    {
+        var grid = new PropertyGrid
+        {
+            IsFocused = true,
+        };
+        grid.SetProperties(
+        [
+            new PropertyGridProperty("User", "tea"),
+            new PropertyGridProperty("Retries", "3"),
+        ]);
+
+        PropertyGridSelectionChangedEventArgs? args = null;
+        grid.SelectionChanged += (_, eventArgs) => args = eventArgs;
+
+        grid.Handle(new KeyPressed(Key.Down));
+
+        TestAssert.True(args is not null, "PropertyGrid should raise selection changed when selection updates.");
+        TestAssert.Equal(0, args!.PreviousIndex, "PropertyGrid event should expose previous index.");
+        TestAssert.Equal(1, args.CurrentIndex, "PropertyGrid event should expose current index.");
+        TestAssert.True(args.PreviousProperty is not null, "PropertyGrid event should expose previous property.");
+        TestAssert.True(args.CurrentProperty is not null, "PropertyGrid event should expose current property.");
+        TestAssert.Equal("User", args.PreviousProperty!.Name, "PropertyGrid event previous property should match previous selection.");
+        TestAssert.Equal("Retries", args.CurrentProperty!.Name, "PropertyGrid event current property should match new selection.");
+        return Task.CompletedTask;
+    }
+
+    private static Task PropertyGrid_RendersHeadersCategoriesAndSelection()
+    {
+        var grid = new PropertyGrid
+        {
+            Border = BorderStyle.None,
+        };
+        grid.SetProperties(
+        [
+            new PropertyGridProperty("Host", "localhost", "General"),
+            new PropertyGridProperty("Port", "5432", "General"),
+            new PropertyGridProperty("Timeout", "30s", "Network"),
+        ]);
+        grid.SetSelectedIndex(1);
+        var canvas = new Canvas(52, 8);
+
+        grid.Render(canvas, new Rect(0, 0, 52, 8));
+        var output = canvas.Render();
+
+        TestAssert.True(output.Contains("Property", StringComparison.Ordinal), "PropertyGrid should render key column header.");
+        TestAssert.True(output.Contains("Value", StringComparison.Ordinal), "PropertyGrid should render value column header.");
+        TestAssert.True(output.Contains("[General]", StringComparison.Ordinal), "PropertyGrid should render category header.");
+        TestAssert.True(output.Contains("> Port", StringComparison.Ordinal), "PropertyGrid should render selected row marker.");
+        return Task.CompletedTask;
+    }
+
+    private static Task PropertyGrid_StyleHooks_EmitSgrFragments()
+    {
+        var grid = new PropertyGrid
+        {
+            Border = BorderStyle.None,
+            HeaderStyle = TeaStyle.Empty.WithForeground(AnsiColor.BrightBlue),
+            KeyStyle = TeaStyle.Empty.WithForeground(AnsiColor.BrightCyan),
+            ValueStyle = TeaStyle.Empty.WithForeground(AnsiColor.BrightGreen),
+            SelectedRowStyle = TeaStyle.Empty.WithUnderline().WithBold(),
+        };
+        grid.SetProperties(
+        [
+            new PropertyGridProperty("Mode", "prod", "Runtime"),
+            new PropertyGridProperty("Workers", "8", "Runtime"),
+        ]);
+        grid.SetSelectedIndex(1);
+        var canvas = new Canvas(52, 6);
+
+        grid.Render(canvas, new Rect(0, 0, 52, 6));
+        var output = canvas.Render();
+
+        TestAssert.True(output.Contains("\u001b[38;5;12m", StringComparison.Ordinal), "PropertyGrid header style should emit SGR fragments.");
+        TestAssert.True(output.Contains("\u001b[38;5;14m", StringComparison.Ordinal), "PropertyGrid key style should emit SGR fragments.");
+        TestAssert.True(output.Contains("\u001b[38;5;10m", StringComparison.Ordinal), "PropertyGrid value style should emit SGR fragments.");
+        var hasCombinedBoldUnderline = output.Contains("\u001b[1;4m", StringComparison.Ordinal)
+            || output.Contains("\u001b[4;1m", StringComparison.Ordinal)
+            || output.Contains("\u001b[1;4;", StringComparison.Ordinal)
+            || output.Contains("\u001b[4;1;", StringComparison.Ordinal);
+        var hasSeparateBoldUnderline = output.Contains("\u001b[1;", StringComparison.Ordinal)
+            && output.Contains(";4m", StringComparison.Ordinal);
+        TestAssert.True(
+            hasCombinedBoldUnderline || hasSeparateBoldUnderline,
+            "PropertyGrid selected row style should merge into row rendering.");
         return Task.CompletedTask;
     }
 
