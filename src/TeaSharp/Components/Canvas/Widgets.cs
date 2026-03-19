@@ -120,7 +120,8 @@ internal static class Widgets
         int selectedRow = -1,
         string? title = null,
         BorderStyle border = BorderStyle.SingleLine,
-        Thickness padding = default)
+        Thickness padding = default,
+        TeaSharp.Styles.TeaStyle borderStyleText = default)
     {
         var clipped = Rect.Intersect(rect, canvas.Bounds);
         if (clipped.IsEmpty || headers.Count == 0)
@@ -143,7 +144,7 @@ internal static class Widgets
         Rect contentRect;
         if (showBorder)
         {
-            canvas.DrawBox(clipped, title, border);
+            canvas.DrawBox(clipped, title, border, borderStyleText);
             contentRect = clipped.Inset(1, 1).Inset(padding);
         }
         else

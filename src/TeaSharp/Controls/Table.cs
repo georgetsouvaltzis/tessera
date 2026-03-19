@@ -67,12 +67,36 @@ public sealed class Table : Control
         set;
     } = TeaStyle.Empty;
 
+    /// <summary>
+    /// Gets or sets the style applied to border glyphs when the control is not focused.
+    /// </summary>
+    public TeaStyle BorderStyleText
+    {
+        get;
+        set;
+    } = TeaStyle.Empty;
+
+    /// <summary>
+    /// Gets or sets the style applied to border glyphs when the control is focused.
+    /// </summary>
+    public TeaStyle FocusedBorderStyleText
+    {
+        get;
+        set;
+    } = TeaStyle.Empty;
+
+    /// <summary>
+    /// Gets or sets the border style used for the table frame.
+    /// </summary>
     public BorderStyle Border
     {
         get;
         set;
     } = BorderStyle.SingleLine;
 
+    /// <summary>
+    /// Gets or sets the inner padding applied to the table body.
+    /// </summary>
     public Thickness Padding
     {
         get;
@@ -254,7 +278,8 @@ public sealed class Table : Control
             selectedRow: _selectedVisibleRow >= 0 ? _selectedVisibleRow : _hoveredVisibleRow,
             title: state.Title,
             border: Border,
-            padding: Padding);
+            padding: Padding,
+            borderStyleText: ResolveBorderStyleText());
     }
 
     internal override LayoutMeasurement Measure(in Rect availableBounds)
@@ -328,6 +353,13 @@ public sealed class Table : Control
 
         _selectedVisibleRow = row;
         return true;
+    }
+
+    private TeaStyle ResolveBorderStyleText()
+    {
+        return IsFocused
+            ? BorderStyleText.Merge(FocusedBorderStyleText)
+            : BorderStyleText;
     }
 
     private string FormatTitle()
