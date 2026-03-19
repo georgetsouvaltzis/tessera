@@ -138,12 +138,15 @@ Root controls currently include:
 - `TreeItem`
 - `TreeView`
 - `MenuBar`
+- `Toolbar`
+- `CommandBar`
 - `NumberInput`
 - `DatePicker`
 - `TimePicker`
 - `MarkdownView`
 - `MultiSelect`
 - `Paginator`
+- `SearchBox`
 - `RadioGroup`
 - `ProgressBar`
 - `LogView`

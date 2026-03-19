@@ -173,7 +173,7 @@ Default policy for all controls:
 
 Phase 1 (baseline controls):
 
-- `Label`, `StatusBar`, `Button`, `TextInput`, `ListView<T>`, `Table`, `Tabs`, `Breadcrumb`, `Paginator`, `Dialog`, `ContextMenu`, `CommandPalette`
+- `Label`, `StatusBar`, `Button`, `TextInput`, `ListView<T>`, `Table`, `Tabs`, `Breadcrumb`, `Paginator`, `Toolbar`, `CommandBar`, `SearchBox`, `Dialog`, `ContextMenu`, `CommandPalette`
 
 Phase 2 (data and advanced controls):
 

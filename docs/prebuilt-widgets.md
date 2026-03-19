@@ -47,6 +47,9 @@ Preferred public catalog:
 36. `LineChart`
 37. `Breadcrumb`
 38. `Paginator`
+39. `Toolbar`
+40. `CommandBar`
+41. `SearchBox`
 
 These live in `TeaSharp.Controls`.
 

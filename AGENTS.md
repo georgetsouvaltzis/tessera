@@ -30,6 +30,7 @@
 - Parallelize only when file ownership is disjoint.
 - Use milestone checkpoints defined in `docs/v1-master-plan.md`.
 - Keep notes short and update docs when behavior/API changes.
+- When new controls ship, sync `docs/widget-roadmap-v1.md`, `docs/prebuilt-widgets.md`, `docs/public-api-inventory.md`, `docs/spec.md`, and `docs/theme-system-v1.md` in the same slice.
 
 ## Build/Test Commands
 Use .NET 10 from `global.json`.

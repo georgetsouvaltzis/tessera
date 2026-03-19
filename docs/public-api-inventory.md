@@ -77,6 +77,9 @@ These are the types new applications should discover first.
 - `TeaSharp.Controls.TreeItem`
 - `TeaSharp.Controls.TreeView` (native)
 - `TeaSharp.Controls.MenuBar`
+- `TeaSharp.Controls.Toolbar`
+- `TeaSharp.Controls.CommandBar`
+- `TeaSharp.Controls.SearchBox`
 - `TeaSharp.Controls.MenuItem`
 - `TeaSharp.Controls.Control`
 
@@ -189,8 +192,11 @@ The first root controls that already own their implementation directly are:
 - `ListView<T>`
 - `Tabs`
 - `MenuBar`
+- `Toolbar`
+- `CommandBar`
 - `StatusBar`
 - `Paginator`
+- `SearchBox`
 
 Their old `TeaSharp.Components.Prebuilt.*` counterparts have been removed instead of kept as compatibility wrappers.
 

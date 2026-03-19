@@ -6,8 +6,9 @@ This roadmap defines the widget-heavy Public V1 path targeting **40-50 built-in 
 
 ### Current Built-ins (baseline)
 - `Label`, `Button`, `TextInput`, `TextArea`, `StatusBar`
-- `Choice`, `ComboBox`, `ListView<T>`, `Table`, `TreeView`, `TreeItem`, `Tabs`, `MenuBar`
+- `Choice`, `ComboBox`, `ListView<T>`, `Table`, `TreeView`, `TreeItem`, `Tabs`, `MenuBar`, `Toolbar`
 - `Dialog`, `Modal`, `Notifications`, `ContextMenu`, `CommandPalette`
+- `CommandBar`, `SearchBox`
 - `Toggle`, `Slider`, `Spinner`, `ProgressBar`, `LogView`
 - `Badge`, `Accordion`, `NumberInput`, `DatePicker`, `TimePicker`
 - `MultiSelect`, `RadioGroup`, `Gauge`, `MiniLog`, `StatsCard`
@@ -19,15 +20,12 @@ This roadmap defines the widget-heavy Public V1 path targeting **40-50 built-in 
 - `FileExplorer`
 - `FuzzyFinder`
 - `Breadcrumb`
-- `CommandBar`
-- `Toolbar`
 - `Paginator`
 - `PropertyGrid`
 - `DiffView`
 - `Timeline`
 - `Stepper` (wizard flow)
 - `KeyValueList` (inspector panel)
-- `SearchBox` (highlight + result nav)
 - `ToastCenter`
 
 ## Prioritized V1 Tranche (10-15)
@@ -55,13 +53,13 @@ Acceptance for V1 tranche:
 - `[x]` `Paginator` (shipped)
 - `[ ]` `DataGrid`
 - `[ ]` `FuzzyFinder`
-- `[ ]` `CommandBar`
+- `[x]` `CommandBar` (shipped)
 - `[ ]` `PropertyGrid`
 - `[ ]` `FileExplorer`
 - `[ ]` `TreeTable`
 - `[ ]` `DiffView`
-- `[ ]` `Toolbar`
-- `[ ]` `SearchBox`
+- `[x]` `Toolbar` (shipped)
+- `[x]` `SearchBox` (shipped)
 - `[ ]` `ToastCenter`
 
 ## API Consistency Rules
