@@ -212,6 +212,7 @@ Navigation/overlay mapping coverage includes:
 - `Choice`/`ComboBox` map `FocusedBorderStyleText` -> `theme.Border.Focused.Merge(theme.Focus.Border)`
 - `Choice`/`ComboBox` expose `Glyphs` via `DropdownGlyphSet` for closed/open/highlight/selected markers
 - `TreeView` maps border text hooks and title focus marker; branch/leaf markers are configurable through `TreeViewGlyphSet`
+- `ContextMenu` preserves focused title markers in bordered title rendering width calculations
 - `SearchBox` maps title/value/placeholder/match/navigation styles plus border text hooks; title marker is configurable through `FocusMarker` + `ShowFocusMarker`
 
 Navigation primitive mapping coverage includes:
@@ -229,6 +230,8 @@ Modal/chart summary mapping coverage includes:
 Data/flow mapping coverage includes:
 
 - `DataGrid`, `TreeTable`, `KeyValueList`, `Timeline`, `Stepper`
+- `DataGrid` maps border text hooks and exposes `ColumnSeparatorText` plus sort marker text APIs
+- `TreeTable` maps border text hooks and exposes `ColumnSeparatorText`, row marker text APIs, and branch/leaf marker text APIs
 
 Explorer/feedback mapping coverage includes:
 

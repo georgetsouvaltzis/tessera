@@ -83,6 +83,15 @@ These live in `TeaSharp.Controls`.
 - `Table` supports `BorderStyleText` and `FocusedBorderStyleText` for focused/unfocused frame glyph rendering.
 - `TreeView` supports the same border text hooks and typed marker customization via `TreeViewGlyphSet`.
 
+### DataGrid and TreeTable Visual Hooks
+
+- `DataGrid` supports `BorderStyleText`/`FocusedBorderStyleText`, `ColumnSeparatorText`, `SortAscendingMarker`, and `SortDescendingMarker`.
+- `TreeTable` supports `BorderStyleText`/`FocusedBorderStyleText`, `ColumnSeparatorText`, row markers (`SelectedRowMarker`/`UnselectedRowMarker`), and tree markers (`ExpandedBranchMarker`/`CollapsedBranchMarker`/`LeafMarker`).
+
+### ContextMenu Bordered Title Behavior
+
+- Bordered `ContextMenu` titles now preserve focused `FocusMarker` output by reserving width for the rendered title marker text.
+
 ### Beautiful UI Checklist (Current Phase)
 
 - Apply semantic theme first (`TeaRuntimeOptions.Theme`), then control-type, instance, and state overrides.
@@ -102,6 +111,7 @@ Current shipped `TeaThemeControlExtensions` mappings include:
 - navigation overlay details: `Choice`/`ComboBox` include border text token mapping plus `DropdownGlyphSet` marker customization
 - navigation overlay details: `TreeView` includes border text token mapping plus `TreeViewGlyphSet` marker customization
 - data/flow controls: `DataGrid`, `TreeTable`, `KeyValueList`, `Timeline`, `Stepper`
+- data/flow details: `DataGrid` and `TreeTable` include border text token mapping plus explicit separator/marker text APIs
 - explorer/feedback controls: `DiffView`, `PropertyGrid`, `FileExplorer`, `FuzzyFinder`, `ToastCenter`
 - rendering text utilities: `Badge`, `LogView`, `MarkdownView`, `MiniLog`
 - modal/chart summary controls: `Dialog`, `Modal`, `BarChart`, `LineChart`, `Gauge`, `StatsCard`

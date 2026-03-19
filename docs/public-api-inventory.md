@@ -256,6 +256,7 @@ Navigation/overlay controls with direct token mappings:
 - `Choice`/`ComboBox` keep glyph customization explicit through `DropdownGlyphSet`
 - `TreeView` maps `BorderStyleText` -> `Border.Default` and `FocusedBorderStyleText` -> `Border.Focused + Focus.Border`
 - `TreeView` keeps title focus marker rendering configurable through `FocusMarker` + `ShowFocusMarker` and glyph customization through `TreeViewGlyphSet`
+- `ContextMenu` preserves focused title markers in bordered rendering width calculations
 
 Navigation primitive controls with direct token mappings:
 
@@ -264,6 +265,10 @@ Navigation primitive controls with direct token mappings:
 Data/flow controls with direct token mappings:
 
 - `DataGrid`, `TreeTable`, `KeyValueList`, `Timeline`, `Stepper`
+- `DataGrid` maps `BorderStyleText` -> `Border.Default` and `FocusedBorderStyleText` -> `Border.Focused + Focus.Border`
+- `DataGrid` provides API-level text hooks for `ColumnSeparatorText`, `SortAscendingMarker`, and `SortDescendingMarker`
+- `TreeTable` maps `BorderStyleText` -> `Border.Default` and `FocusedBorderStyleText` -> `Border.Focused + Focus.Border`
+- `TreeTable` provides API-level text hooks for `ColumnSeparatorText`, row markers, and branch/leaf markers
 
 Explorer/feedback controls with direct token mappings:
 
