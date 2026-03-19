@@ -68,6 +68,10 @@ internal static class PrebuiltWidgetTests
         yield return new TestCase("Controls_FileExplorer_SelectPathAndEvent_ReportsTransition", FileExplorer_SelectPathAndEvent_ReportsTransition);
         yield return new TestCase("Controls_FileExplorer_MouseClickSelectsRow", FileExplorer_MouseClickSelectsRow);
         yield return new TestCase("Controls_FileExplorer_RendersTitleAndStyleHooks", FileExplorer_RendersTitleAndStyleHooks);
+        yield return new TestCase("Controls_DataGrid_KeyboardNavigationTracksSelection", DataGrid_KeyboardNavigationTracksSelection);
+        yield return new TestCase("Controls_DataGrid_SortComparerAndSortHook", DataGrid_SortComparerAndSortHook);
+        yield return new TestCase("Controls_DataGrid_MouseClickSelectsRow", DataGrid_MouseClickSelectsRow);
+        yield return new TestCase("Controls_DataGrid_RendersTitleAndStyleHooks", DataGrid_RendersTitleAndStyleHooks);
         yield return new TestCase("Controls_DiffView_ComputesLineEntries", DiffView_ComputesLineEntries);
         yield return new TestCase("Controls_DiffView_NavigatesSelectionAndTogglesMode", DiffView_NavigatesSelectionAndTogglesMode);
         yield return new TestCase("Controls_DiffView_MouseClickSelectsEntry", DiffView_MouseClickSelectsEntry);
@@ -1360,6 +1364,166 @@ internal static class PrebuiltWidgetTests
         table.Handle(new KeyPressed(Key.Character, "s"));
         TestAssert.Equal(1, table.SortColumn, "Table should change sort column from hotkey.");
         TestAssert.True(table.SortDescending, "Table should toggle sort direction from hotkey.");
+        return Task.CompletedTask;
+    }
+
+    private static Task DataGrid_KeyboardNavigationTracksSelection()
+    {
+        var grid = new DataGrid
+        {
+            IsFocused = true,
+            Border = BorderStyle.None,
+            PageSize = 2,
+        };
+        grid.SetColumns(
+        [
+            new DataGridColumn("name", "Name"),
+            new DataGridColumn("status", "Status"),
+        ]);
+        grid.SetRows(
+        [
+            ["A", "Open"],
+            ["B", "Done"],
+            ["C", "Todo"],
+        ]);
+
+        grid.Handle(new KeyPressed(Key.Right));
+        grid.Handle(new KeyPressed(Key.Down));
+        grid.Handle(new KeyPressed(Key.PageDown));
+        grid.Handle(new KeyPressed(Key.Home));
+        grid.Handle(new KeyPressed(Key.End));
+
+        TestAssert.Equal(2, grid.SelectedRowIndex, "DataGrid End should move to last row.");
+        TestAssert.Equal(1, grid.SelectedColumnIndex, "DataGrid End should move to last column.");
+        TestAssert.Equal("Todo", grid.SelectedCellValue ?? string.Empty, "DataGrid should expose selected cell value.");
+        return Task.CompletedTask;
+    }
+
+    private static Task DataGrid_SortComparerAndSortHook()
+    {
+        var grid = new DataGrid
+        {
+            IsFocused = true,
+            Border = BorderStyle.None,
+        };
+        grid.SetColumns(
+        [
+            new DataGridColumn("value", "Value")
+            {
+                IsSortable = true,
+                SortComparer = static (left, right) => string.CompareOrdinal(left, right),
+            },
+        ]);
+        grid.SetRows(
+        [
+            ["b"],
+            ["a"],
+        ]);
+
+        var sortedAscending = grid.SortByColumn(0);
+        var sortedDescending = grid.SortByColumn(0);
+
+        TestAssert.True(sortedAscending, "DataGrid should sort ascending using column comparer.");
+        TestAssert.True(sortedDescending, "DataGrid should toggle and sort descending on repeat sort request.");
+        TestAssert.Equal("b", grid.Rows[0][0], "DataGrid descending sort should place lexicographically larger value first.");
+
+        var hookGrid = new DataGrid
+        {
+            IsFocused = true,
+            Border = BorderStyle.None,
+        };
+        hookGrid.SetColumns(
+        [
+            new DataGridColumn("score", "Score")
+            {
+                IsSortable = true,
+            },
+        ]);
+        hookGrid.SetRows(
+        [
+            ["2"],
+            ["1"],
+        ]);
+
+        DataGridSortRequestedEventArgs? eventArgs = null;
+        hookGrid.SortRequested += (_, args) =>
+        {
+            eventArgs = args;
+            args.Handled = true;
+        };
+
+        var handledByHook = hookGrid.SortByColumn(0);
+        TestAssert.True(handledByHook, "DataGrid should allow external sort hook handling when comparer is not provided.");
+        TestAssert.True(eventArgs is not null, "DataGrid should raise sort request event.");
+        TestAssert.Equal(0, eventArgs!.ColumnIndex, "DataGrid sort event should expose requested column.");
+        return Task.CompletedTask;
+    }
+
+    private static Task DataGrid_MouseClickSelectsRow()
+    {
+        var grid = new DataGrid
+        {
+            Border = BorderStyle.None,
+            IsFocused = true,
+        };
+        grid.SetColumns(
+        [
+            new DataGridColumn("name", "Name"),
+            new DataGridColumn("status", "Status"),
+        ]);
+        grid.SetRows(
+        [
+            ["A", "Open"],
+            ["B", "Done"],
+            ["C", "Todo"],
+        ]);
+
+        var changed = grid.Handle(
+            new PointerInput(PointerEventKind.Press, PointerButton.Left, 2, 2),
+            new Rect(0, 0, 32, 4));
+
+        TestAssert.True(changed, "DataGrid click should update selected row.");
+        TestAssert.Equal(1, grid.SelectedRowIndex, "DataGrid click should select the row under pointer.");
+        return Task.CompletedTask;
+    }
+
+    private static Task DataGrid_RendersTitleAndStyleHooks()
+    {
+        var grid = new DataGrid
+        {
+            Title = "Grid",
+            IsFocused = true,
+            FocusMarker = "!",
+            Border = BorderStyle.SingleLine,
+            FocusedTitleStyle = TeaStyle.Empty.WithUnderline().WithForeground(AnsiColor.BrightMagenta),
+            HeaderStyle = TeaStyle.Empty.WithUnderline().WithForeground(AnsiColor.BrightYellow),
+            RowStyle = TeaStyle.Empty.WithForeground(AnsiColor.BrightCyan),
+            SelectedRowStyle = TeaStyle.Empty.WithBold(),
+            SelectedCellStyle = TeaStyle.Empty.WithForeground(AnsiColor.BrightGreen),
+            MutedStyle = TeaStyle.Empty.WithDim(),
+            MutedRowPredicate = static (rowIndex, _) => rowIndex == 0,
+        };
+        grid.SetColumns(
+        [
+            new DataGridColumn("name", "Name"),
+            new DataGridColumn("status", "Status"),
+        ]);
+        grid.SetRows(
+        [
+            ["A", "Open"],
+            ["B", "Done"],
+        ]);
+        grid.SelectCell(1, 1);
+        var canvas = new Canvas(48, 6);
+
+        grid.Render(canvas, new Rect(0, 0, 48, 6));
+        var output = canvas.Render();
+
+        TestAssert.True(output.Contains("Grid !", StringComparison.Ordinal), "DataGrid should render focused title marker.");
+        TestAssert.True(output.Contains("\u001b[4;38;5;13m", StringComparison.Ordinal), "DataGrid should render focused title style.");
+        TestAssert.True(output.Contains("\u001b[4;38;5;11m", StringComparison.Ordinal), "DataGrid should render header style.");
+        TestAssert.True(output.Contains("\u001b[1;38;5;10m", StringComparison.Ordinal), "DataGrid should render selected cell style.");
+        TestAssert.True(output.Contains("\u001b[2;38;5;14m", StringComparison.Ordinal), "DataGrid should render muted row style.");
         return Task.CompletedTask;
     }
 

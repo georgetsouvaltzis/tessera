@@ -1,0 +1,332 @@
+using TeaSharp.Components.Primitives;
+using TeaSharp.Components.Primitives.Internal;
+using TeaSharp.Controls.Internal;
+using TeaSharp.Layout;
+using TeaSharp.Styles;
+
+namespace TeaSharp.Controls;
+
+public sealed partial class DataGrid
+{
+    /// <inheritdoc />
+    public override void Render(Canvas canvas, Rect rect)
+    {
+        var clipped = Rect.Intersect(rect, canvas.Bounds);
+        if (clipped.IsEmpty)
+        {
+            return;
+        }
+
+        var title = Border == BorderStyle.None ? null : RenderTitle();
+        var content = FrameLayout.DrawFrameAndResolveContent(canvas, clipped, title, Border, Padding);
+        if (content.IsEmpty)
+        {
+            return;
+        }
+
+        if (_columns.Count == 0)
+        {
+            canvas.WriteText(content.X, content.Y, ApplyStyle("(no columns)", MutedStyle), content.Width);
+            return;
+        }
+
+        var widths = ResolveColumnWidths(content.Width);
+        var y = content.Y;
+        if (ShowHeader && y < content.Bottom)
+        {
+            WriteHeader(canvas, content, y, widths);
+            y++;
+        }
+
+        var rowCapacity = ResolveVisibleRowCapacity(content.Height);
+        _lastViewportRowCount = rowCapacity;
+        if (_rows.Count == 0)
+        {
+            if (y <= content.Bottom)
+            {
+                canvas.WriteText(content.X, y, ApplyStyle("(empty)", MutedStyle), content.Width);
+            }
+
+            return;
+        }
+
+        EnsureSelectionVisible(rowCapacity);
+        for (var row = 0; row < rowCapacity; row++)
+        {
+            var rowIndex = _scrollOffset + row;
+            if (rowIndex < 0 || rowIndex >= _rows.Count || y + row > content.Bottom)
+            {
+                break;
+            }
+
+            WriteRow(canvas, content, y + row, widths, rowIndex);
+        }
+    }
+
+    internal override LayoutMeasurement Measure(in Rect availableBounds)
+    {
+        var minimumWidth = _columns.Count == 0 ? 12 : _columns.Count * 8 + Math.Max(0, _columns.Count - 1);
+        var width = minimumWidth;
+        for (var columnIndex = 0; columnIndex < _columns.Count; columnIndex++)
+        {
+            width = Math.Max(width, ControlTextLayout.MeasureDisplayWidth(RenderHeaderText(columnIndex)) + 2);
+        }
+
+        for (var rowIndex = 0; rowIndex < _rows.Count; rowIndex++)
+        {
+            var row = _rows[rowIndex];
+            var lineWidth = 0;
+            for (var columnIndex = 0; columnIndex < _columns.Count; columnIndex++)
+            {
+                lineWidth += Math.Max(3, ControlTextLayout.MeasureDisplayWidth(GetCellValue(row, columnIndex)));
+            }
+
+            lineWidth += Math.Max(0, _columns.Count - 1);
+            width = Math.Max(width, lineWidth);
+        }
+
+        var rowCapacity = _rows.Count == 0 ? 1 : Math.Min(Math.Max(1, PageSize), _rows.Count);
+        var height = rowCapacity + (ShowHeader ? 1 : 0);
+        if (Border != BorderStyle.None)
+        {
+            width = Math.Max(width, ControlTextLayout.MeasureDisplayWidth(FormatTitleText()) + 4);
+            width += 2;
+            height += 2;
+        }
+
+        width += Padding.Horizontal;
+        height += Padding.Vertical;
+
+        return new LayoutMeasurement(
+            Math.Clamp(width, 0, availableBounds.Width),
+            Math.Clamp(height, 0, availableBounds.Height));
+    }
+
+    private void EnsureSelectionVisible(int rowCapacity)
+    {
+        if (_rows.Count == 0)
+        {
+            _scrollOffset = 0;
+            return;
+        }
+
+        var safeCapacity = Math.Max(1, rowCapacity);
+        if (_selectedRowIndex < _scrollOffset)
+        {
+            _scrollOffset = _selectedRowIndex;
+        }
+        else if (_selectedRowIndex >= _scrollOffset + safeCapacity)
+        {
+            _scrollOffset = _selectedRowIndex - safeCapacity + 1;
+        }
+
+        _scrollOffset = Math.Clamp(_scrollOffset, 0, Math.Max(0, _rows.Count - safeCapacity));
+    }
+
+    private int ResolveVisibleRowCapacity(int contentHeight)
+    {
+        var rows = contentHeight - (ShowHeader ? 1 : 0);
+        return Math.Max(1, rows);
+    }
+
+    private int[] ResolveColumnWidths(int availableWidth)
+    {
+        var count = _columns.Count;
+        var widths = new int[count];
+        if (count == 0 || availableWidth <= 0)
+        {
+            return widths;
+        }
+
+        var separatorWidth = Math.Max(0, count - 1);
+        var budget = Math.Max(count, availableWidth - separatorWidth);
+        var total = 0;
+        for (var index = 0; index < count; index++)
+        {
+            var explicitWidth = _columns[index].Width ?? -1;
+            if (explicitWidth > 0)
+            {
+                widths[index] = explicitWidth;
+            }
+            else
+            {
+                widths[index] = Math.Max(3, ControlTextLayout.MeasureDisplayWidth(_columns[index].Header));
+            }
+
+            total += widths[index];
+        }
+
+        if (total > budget)
+        {
+            var index = count - 1;
+            while (total > budget && index >= 0)
+            {
+                if (widths[index] > 3)
+                {
+                    widths[index]--;
+                    total--;
+                }
+                else
+                {
+                    index--;
+                }
+            }
+        }
+        else if (total < budget)
+        {
+            widths[count - 1] += budget - total;
+        }
+
+        return widths;
+    }
+
+    private int HitTestColumn(int pointerX, int contentX, IReadOnlyList<int> widths)
+    {
+        var cursor = contentX;
+        for (var index = 0; index < widths.Count; index++)
+        {
+            var width = Math.Max(0, widths[index]);
+            if (pointerX >= cursor && pointerX < cursor + width)
+            {
+                return index;
+            }
+
+            cursor += width;
+            if (index < widths.Count - 1)
+            {
+                cursor += 1;
+            }
+        }
+
+        return -1;
+    }
+
+    private void WriteHeader(Canvas canvas, Rect content, int y, IReadOnlyList<int> widths)
+    {
+        var x = content.X;
+        for (var columnIndex = 0; columnIndex < _columns.Count && x < content.Right; columnIndex++)
+        {
+            var width = Math.Max(1, widths[columnIndex]);
+            var header = PadToWidth(RenderHeaderText(columnIndex), width);
+            var style = HeaderStyle;
+            if (IsDisabled)
+            {
+                style = style.Merge(DisabledStyle);
+            }
+
+            canvas.WriteText(x, y, ApplyStyle(header, style), content.Right - x);
+            x += width;
+            if (columnIndex < _columns.Count - 1 && x < content.Right)
+            {
+                canvas.WriteText(x, y, ApplyStyle("|", style), content.Right - x);
+                x += 1;
+            }
+        }
+    }
+
+    private void WriteRow(Canvas canvas, Rect content, int y, IReadOnlyList<int> widths, int rowIndex)
+    {
+        var x = content.X;
+        var row = _rows[rowIndex];
+        for (var columnIndex = 0; columnIndex < _columns.Count && x < content.Right; columnIndex++)
+        {
+            var width = Math.Max(1, widths[columnIndex]);
+            var text = PadToWidth(GetCellValue(row, columnIndex), width);
+            var style = ResolveCellStyle(rowIndex, columnIndex);
+            canvas.WriteText(x, y, ApplyStyle(text, style), content.Right - x);
+            x += width;
+            if (columnIndex < _columns.Count - 1 && x < content.Right)
+            {
+                canvas.WriteText(x, y, ApplyStyle("|", style), content.Right - x);
+                x += 1;
+            }
+        }
+    }
+
+    private TeaStyle ResolveCellStyle(int rowIndex, int columnIndex)
+    {
+        var style = RowStyle;
+        if (IsRowMuted(rowIndex))
+        {
+            style = style.Merge(MutedStyle);
+        }
+
+        if (rowIndex == _selectedRowIndex)
+        {
+            style = style.Merge(SelectedRowStyle);
+        }
+
+        if (rowIndex == _selectedRowIndex && columnIndex == _selectedColumnIndex)
+        {
+            style = style.Merge(SelectedCellStyle);
+        }
+
+        if (IsDisabled)
+        {
+            style = style.Merge(DisabledStyle);
+        }
+
+        return style;
+    }
+
+    private string RenderHeaderText(int columnIndex)
+    {
+        var text = _columns[columnIndex].Header;
+        if (columnIndex == _sortColumnIndex)
+        {
+            text = _sortDescending ? $"{text} ▼" : $"{text} ▲";
+        }
+
+        return text;
+    }
+
+    private string RenderTitle()
+    {
+        return ApplyStyle(FormatTitleText(), IsFocused ? FocusedTitleStyle : TitleStyle);
+    }
+
+    private string FormatTitleText()
+    {
+        if (string.IsNullOrEmpty(Title))
+        {
+            return string.Empty;
+        }
+
+        if (IsFocused && ShowFocusMarker && !string.IsNullOrWhiteSpace(FocusMarker))
+        {
+            return $"{Title} {FocusMarker}";
+        }
+
+        return Title;
+    }
+
+    private static string PadToWidth(string value, int width)
+    {
+        var text = value ?? string.Empty;
+        if (width <= 0)
+        {
+            return string.Empty;
+        }
+
+        var singleLine = text.Replace("\r", string.Empty, StringComparison.Ordinal)
+            .Replace("\n", " ", StringComparison.Ordinal);
+        if (singleLine.Length > width)
+        {
+            return singleLine[..width];
+        }
+
+        if (singleLine.Length < width)
+        {
+            return singleLine.PadRight(width);
+        }
+
+        return singleLine;
+    }
+
+    private static string ApplyStyle(string text, TeaStyle style)
+    {
+        return string.IsNullOrEmpty(text) || style.IsEmpty
+            ? text
+            : style.Render(text);
+    }
+}
