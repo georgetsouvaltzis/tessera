@@ -25,6 +25,25 @@ Notes:
 - runs complete and report benchmark summaries in `inProcess` mode
 - table captures both mode families for the same scenario set
 
+## Iteration 3 Spotlight (2026-03-19)
+
+Commit range:
+- `6bad663` -> `d9d0d21` -> `6d93e67` -> `fb6b057` -> `d90110e`
+
+Validation:
+- latest HEAD build/tests status: green
+
+Spotlight before/after deltas (compared to prior full snapshot in this doc):
+
+| Scenario | Render-only (before -> after) | Render-only alloc | RO delta | Materialize (before -> after) | Materialize alloc | MAT delta |
+| --- | --- | --- | --- | --- | --- | --- |
+| LogTail | `7.112 ms -> 4.976 ms` | n/a in latest capture | `-30.03%` | `6.552 ms -> 5.005 ms` | `106.97 KB` | `-23.61%` |
+| OverlayStress | `368.8 us -> 354.2 us` | `49.5 KB` | `-3.96%` | `438.6 us -> 410.2 us` | n/a in latest capture | `-6.48%` |
+| ResizeStorm | `256.3 us -> 253.5 us` | `65.86 KB` | `-1.09%` | `319.8 us -> 305.7 us` | n/a in latest capture | `-4.41%` |
+
+Iteration caveat:
+- spotlight measurements came from targeted scenario runs; use a same-pass full sweep for final release gate decisions
+
 ## Iteration Log (Template)
 
 Metadata:
