@@ -17,6 +17,15 @@ internal static partial class ThemeOverridesTests
             "ThemeOverrides_OverrideOverloads_ResolveExpectedTokens_ForDiffViewAndPropertyGrid",
             OverrideOverloads_ResolveExpectedTokens_ForDiffViewAndPropertyGrid);
         yield return new TestCase(
+            "ThemeOverrides_ApplyHelpers_MapExpectedTokens_ForBadgeLogViewMarkdownViewAndMiniLog",
+            ApplyHelpers_MapExpectedTokens_ForBadgeLogViewMarkdownViewAndMiniLog);
+        yield return new TestCase(
+            "ThemeOverrides_ApplyThemeDefaults_DoNotOverwriteExplicitStyles_ForBadgeLogViewMarkdownViewAndMiniLog",
+            ApplyThemeDefaults_DoNotOverwriteExplicitStyles_ForBadgeLogViewMarkdownViewAndMiniLog);
+        yield return new TestCase(
+            "ThemeOverrides_OverrideOverloads_ResolveExpectedTokens_ForBadgeLogViewMarkdownViewAndMiniLog",
+            OverrideOverloads_ResolveExpectedTokens_ForBadgeLogViewMarkdownViewAndMiniLog);
+        yield return new TestCase(
             "ThemeOverrides_ApplyHelpers_MapExpectedTokens_ForFileExplorerFuzzyFinderAndToastCenter",
             ApplyHelpers_MapExpectedTokens_ForFileExplorerFuzzyFinderAndToastCenter);
         yield return new TestCase(
@@ -167,6 +176,171 @@ internal static partial class ThemeOverridesTests
         TestAssert.Equal(typeTheme.State.Success, diffView.AddedLineStyle, "Override defaults should fill empty DiffView.AddedLineStyle.");
         TestAssert.Equal(typeTheme.Text.Secondary, propertyGrid.KeyStyle, "Override apply should map PropertyGrid key style.");
         TestAssert.Equal(typeTheme.Text.Primary, propertyGrid.ValueStyle, "Override apply should map PropertyGrid value style.");
+
+        return Task.CompletedTask;
+    }
+
+    private static Task ApplyHelpers_MapExpectedTokens_ForBadgeLogViewMarkdownViewAndMiniLog()
+    {
+        var theme = new TeaTheme
+        {
+            Text = new TeaThemeTextTokens
+            {
+                Primary = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(31, 32, 33)),
+                Secondary = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(41, 42, 43)),
+                Muted = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(51, 52, 53)),
+            },
+            Focus = new TeaThemeFocusTokens
+            {
+                Ring = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(61, 62, 63)),
+                Title = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(71, 72, 73)),
+            },
+            State = new TeaThemeStateTokens
+            {
+                Success = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(81, 82, 83)),
+                Warning = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(91, 92, 93)),
+                Error = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(101, 102, 103)),
+            },
+        };
+
+        var badge = new Badge().ApplyTheme(theme);
+        var logView = new LogView().ApplyTheme(theme);
+        var markdownView = new MarkdownView().ApplyTheme(theme);
+        var miniLog = new MiniLog().ApplyTheme(theme);
+
+        TestAssert.Equal(theme.Text.Primary, badge.TextStyle, "Badge text style should map to Text.Primary.");
+        TestAssert.Equal(theme.Focus.Ring, badge.FocusedTextStyle, "Badge focused style should map to Focus.Ring.");
+        TestAssert.Equal(theme.State.Success, badge.SuccessTextStyle, "Badge success style should map to State.Success.");
+        TestAssert.Equal(theme.State.Warning, badge.WarningTextStyle, "Badge warning style should map to State.Warning.");
+        TestAssert.Equal(theme.State.Error, badge.ErrorTextStyle, "Badge error style should map to State.Error.");
+
+        TestAssert.Equal(theme.Text.Secondary, logView.TitleStyle, "LogView title style should map to Text.Secondary.");
+        TestAssert.Equal(theme.Focus.Title, logView.FocusedTitleStyle, "LogView focused title style should map to Focus.Title.");
+        TestAssert.Equal(theme.Text.Primary, logView.EntryStyle, "LogView entry style should map to Text.Primary.");
+        TestAssert.Equal(theme.Text.Muted, logView.PausedTitleStyle, "LogView paused title style should map to Text.Muted.");
+
+        TestAssert.Equal(theme.Text.Secondary, markdownView.TitleStyle, "MarkdownView title style should map to Text.Secondary.");
+        TestAssert.Equal(theme.Focus.Title, markdownView.FocusedTitleStyle, "MarkdownView focused title style should map to Focus.Title.");
+        TestAssert.Equal(theme.Text.Primary, markdownView.ContentStyle, "MarkdownView content style should map to Text.Primary.");
+
+        TestAssert.Equal(theme.Text.Secondary, miniLog.TitleStyle, "MiniLog title style should map to Text.Secondary.");
+        TestAssert.Equal(theme.Focus.Title, miniLog.FocusedTitleStyle, "MiniLog focused title style should map to Focus.Title.");
+        TestAssert.Equal(theme.Text.Primary, miniLog.EntryStyle, "MiniLog entry style should map to Text.Primary.");
+
+        return Task.CompletedTask;
+    }
+
+    private static Task ApplyThemeDefaults_DoNotOverwriteExplicitStyles_ForBadgeLogViewMarkdownViewAndMiniLog()
+    {
+        var explicitStyle = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(211, 212, 213));
+        var theme = new TeaTheme
+        {
+            Text = new TeaThemeTextTokens
+            {
+                Primary = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(1, 2, 3)),
+                Secondary = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(4, 5, 6)),
+                Muted = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(7, 8, 9)),
+            },
+            Focus = new TeaThemeFocusTokens
+            {
+                Ring = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(10, 11, 12)),
+                Title = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(13, 14, 15)),
+            },
+            State = new TeaThemeStateTokens
+            {
+                Success = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(16, 17, 18)),
+                Warning = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(19, 20, 21)),
+                Error = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(22, 23, 24)),
+            },
+        };
+
+        var badge = new Badge
+        {
+            TextStyle = explicitStyle,
+        };
+        var logView = new LogView
+        {
+            EntryStyle = explicitStyle,
+        };
+        var markdownView = new MarkdownView
+        {
+            ContentStyle = explicitStyle,
+        };
+        var miniLog = new MiniLog
+        {
+            EntryStyle = explicitStyle,
+        };
+
+        badge.ApplyThemeDefaults(theme);
+        logView.ApplyThemeDefaults(theme);
+        markdownView.ApplyThemeDefaults(theme);
+        miniLog.ApplyThemeDefaults(theme);
+
+        TestAssert.Equal(explicitStyle, badge.TextStyle, "Defaults should not overwrite explicit Badge.TextStyle.");
+        TestAssert.Equal(theme.State.Error, badge.ErrorTextStyle, "Defaults should fill empty Badge.ErrorTextStyle.");
+        TestAssert.Equal(explicitStyle, logView.EntryStyle, "Defaults should not overwrite explicit LogView.EntryStyle.");
+        TestAssert.Equal(theme.Text.Secondary, logView.TitleStyle, "Defaults should fill empty LogView.TitleStyle.");
+        TestAssert.Equal(explicitStyle, markdownView.ContentStyle, "Defaults should not overwrite explicit MarkdownView.ContentStyle.");
+        TestAssert.Equal(theme.Focus.Title, markdownView.FocusedTitleStyle, "Defaults should fill empty MarkdownView.FocusedTitleStyle.");
+        TestAssert.Equal(explicitStyle, miniLog.EntryStyle, "Defaults should not overwrite explicit MiniLog.EntryStyle.");
+        TestAssert.Equal(theme.Focus.Title, miniLog.FocusedTitleStyle, "Defaults should fill empty MiniLog.FocusedTitleStyle.");
+
+        return Task.CompletedTask;
+    }
+
+    private static Task OverrideOverloads_ResolveExpectedTokens_ForBadgeLogViewMarkdownViewAndMiniLog()
+    {
+        var explicitStyle = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(221, 222, 223));
+        var badge = new Badge
+        {
+            TextStyle = explicitStyle,
+        };
+        var logView = new LogView();
+        var markdownView = new MarkdownView
+        {
+            ContentStyle = explicitStyle,
+        };
+        var miniLog = new MiniLog();
+        var baseTheme = BuildThemeWithPrimary(1, 1, 1);
+        var overrides = new TeaThemeOverrides();
+        var typeTheme = new TeaTheme
+        {
+            Text = new TeaThemeTextTokens
+            {
+                Primary = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(101, 102, 103)),
+                Secondary = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(111, 112, 113)),
+                Muted = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(121, 122, 123)),
+            },
+            Focus = new TeaThemeFocusTokens
+            {
+                Ring = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(131, 132, 133)),
+                Title = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(141, 142, 143)),
+            },
+            State = new TeaThemeStateTokens
+            {
+                Success = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(151, 152, 153)),
+                Warning = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(161, 162, 163)),
+                Error = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(171, 172, 173)),
+            },
+        };
+        overrides.SetControlType<Badge>(typeTheme);
+        overrides.SetControlType<LogView>(typeTheme);
+        overrides.SetControlType<MarkdownView>(typeTheme);
+        overrides.SetControlType<MiniLog>(typeTheme);
+
+        badge.ApplyThemeDefaults(overrides, baseTheme);
+        logView.ApplyTheme(overrides, baseTheme);
+        markdownView.ApplyThemeDefaults(overrides, baseTheme);
+        miniLog.ApplyTheme(overrides, baseTheme);
+
+        TestAssert.Equal(explicitStyle, badge.TextStyle, "Override defaults should not overwrite explicit Badge.TextStyle.");
+        TestAssert.Equal(typeTheme.State.Warning, badge.WarningTextStyle, "Override defaults should fill empty Badge.WarningTextStyle.");
+        TestAssert.Equal(typeTheme.Text.Primary, logView.EntryStyle, "Override apply should map LogView.EntryStyle.");
+        TestAssert.Equal(typeTheme.Text.Muted, logView.PausedTitleStyle, "Override apply should map LogView.PausedTitleStyle.");
+        TestAssert.Equal(explicitStyle, markdownView.ContentStyle, "Override defaults should not overwrite explicit MarkdownView.ContentStyle.");
+        TestAssert.Equal(typeTheme.Text.Secondary, markdownView.TitleStyle, "Override defaults should fill empty MarkdownView.TitleStyle.");
+        TestAssert.Equal(typeTheme.Text.Secondary, miniLog.TitleStyle, "Override apply should map MiniLog.TitleStyle.");
+        TestAssert.Equal(typeTheme.Text.Primary, miniLog.EntryStyle, "Override apply should map MiniLog.EntryStyle.");
 
         return Task.CompletedTask;
     }

@@ -1,6 +1,8 @@
 using TeaSharp.Components.Primitives;
 using TeaSharp.Components.Primitives.Internal;
+using TeaSharp.Controls.Internal;
 using TeaSharp.Layout;
+using TeaSharp.Styles;
 using TeaSharp.Widgets;
 
 namespace TeaSharp.Controls;
@@ -24,6 +26,42 @@ public sealed class LogView : Control
         get;
         set => field = value ?? string.Empty;
     } = "Logs";
+
+    public string FocusMarker
+    {
+        get;
+        set => field = value ?? string.Empty;
+    } = "*";
+
+    public bool ShowFocusMarker
+    {
+        get;
+        set;
+    } = true;
+
+    public TeaStyle TitleStyle
+    {
+        get;
+        set;
+    } = TeaStyle.Empty;
+
+    public TeaStyle FocusedTitleStyle
+    {
+        get;
+        set;
+    } = TeaStyle.Empty;
+
+    public TeaStyle EntryStyle
+    {
+        get;
+        set;
+    } = TeaStyle.Empty;
+
+    public TeaStyle PausedTitleStyle
+    {
+        get;
+        set;
+    } = TeaStyle.Empty;
 
     public BorderStyle Border
     {
@@ -112,10 +150,24 @@ public sealed class LogView : Control
             return;
         }
 
-        var title = IsFocused ? $"{Title} *" : Title;
+        var title = FormatTitle();
         if (IsPaused)
         {
             title += " [paused]";
+        }
+
+        if (!string.IsNullOrEmpty(title))
+        {
+            var titleStyle = IsFocused ? FocusedTitleStyle : TitleStyle;
+            if (IsPaused && !PausedTitleStyle.IsEmpty)
+            {
+                titleStyle = titleStyle.IsEmpty ? PausedTitleStyle : titleStyle.Merge(PausedTitleStyle);
+            }
+
+            if (!titleStyle.IsEmpty)
+            {
+                title = titleStyle.Render(title);
+            }
         }
 
         var content = FrameLayout.DrawFrameAndResolveContent(
@@ -134,13 +186,19 @@ public sealed class LogView : Control
         var rows = Math.Min(content.Height, lines.Count);
         for (var row = 0; row < rows; row++)
         {
-            canvas.WriteText(content.X, content.Y + row, lines[row], content.Width);
+            var line = lines[row];
+            if (!EntryStyle.IsEmpty)
+            {
+                line = EntryStyle.Render(line);
+            }
+
+            canvas.WriteText(content.X, content.Y + row, line, content.Width);
         }
     }
 
     internal override LayoutMeasurement Measure(in Rect availableBounds)
     {
-        var width = Math.Max(18, Title.Length + 4) + Padding.Horizontal;
+        var width = Math.Max(18, ControlTextLayout.MeasureDisplayWidth(FormatTitleForMeasure()) + 4) + Padding.Horizontal;
         var height = Math.Max(4, Padding.Vertical + 4);
         if (Border != BorderStyle.None)
         {
@@ -156,6 +214,26 @@ public sealed class LogView : Control
     private void RefreshViewport()
     {
         _viewport.SetLines(FilterEntries(_entries, _filter));
+    }
+
+    private string FormatTitle()
+    {
+        if (IsFocused && ShowFocusMarker && !string.IsNullOrWhiteSpace(FocusMarker))
+        {
+            return $"{Title} {FocusMarker}";
+        }
+
+        return Title;
+    }
+
+    private string FormatTitleForMeasure()
+    {
+        if (ShowFocusMarker && !string.IsNullOrWhiteSpace(FocusMarker))
+        {
+            return $"{Title} {FocusMarker}";
+        }
+
+        return Title;
     }
 
     private static IEnumerable<string> FilterEntries(IReadOnlyList<string> entries, string filter)

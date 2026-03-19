@@ -2,6 +2,7 @@ using TeaSharp.Components.Primitives;
 using TeaSharp.Components.Styling;
 using TeaSharp.Controls.Internal;
 using TeaSharp.Layout;
+using TeaSharp.Styles;
 
 namespace TeaSharp.Controls;
 
@@ -24,6 +25,36 @@ public sealed class Badge : Control
 
     public BadgeTone Tone { get; set; }
 
+    public TeaStyle TextStyle
+    {
+        get;
+        set;
+    } = TeaStyle.Empty;
+
+    public TeaStyle FocusedTextStyle
+    {
+        get;
+        set;
+    } = TeaStyle.Empty;
+
+    public TeaStyle SuccessTextStyle
+    {
+        get;
+        set;
+    } = TeaStyle.Empty;
+
+    public TeaStyle WarningTextStyle
+    {
+        get;
+        set;
+    } = TeaStyle.Empty;
+
+    public TeaStyle ErrorTextStyle
+    {
+        get;
+        set;
+    } = TeaStyle.Empty;
+
     public override void Render(Canvas canvas, Rect rect)
     {
         var clipped = Rect.Intersect(rect, canvas.Bounds);
@@ -43,7 +74,14 @@ public sealed class Badge : Control
             _ => WidgetVisualState.Default,
         };
         var palette = WidgetStatePalette.CreateDefault();
-        canvas.WriteText(clipped.X, clipped.Y, palette.Render(label, state), clipped.Width);
+        var text = palette.Render(label, state);
+        var style = ResolveToneStyle();
+        if (!style.IsEmpty)
+        {
+            text = style.Render(text);
+        }
+
+        canvas.WriteText(clipped.X, clipped.Y, text, clipped.Width);
     }
 
     internal override LayoutMeasurement Measure(in Rect availableBounds)
@@ -52,5 +90,41 @@ public sealed class Badge : Control
         return new LayoutMeasurement(
             Math.Clamp(width, 0, availableBounds.Width),
             Math.Clamp(1, 0, availableBounds.Height));
+    }
+
+    private TeaStyle ResolveToneStyle()
+    {
+        var style = TextStyle;
+        switch (Tone)
+        {
+            case BadgeTone.Success:
+                if (!SuccessTextStyle.IsEmpty)
+                {
+                    style = style.IsEmpty ? SuccessTextStyle : style.Merge(SuccessTextStyle);
+                }
+
+                break;
+            case BadgeTone.Warning:
+                if (!WarningTextStyle.IsEmpty)
+                {
+                    style = style.IsEmpty ? WarningTextStyle : style.Merge(WarningTextStyle);
+                }
+
+                break;
+            case BadgeTone.Error:
+                if (!ErrorTextStyle.IsEmpty)
+                {
+                    style = style.IsEmpty ? ErrorTextStyle : style.Merge(ErrorTextStyle);
+                }
+
+                break;
+        }
+
+        if (IsFocused && !FocusedTextStyle.IsEmpty)
+        {
+            style = style.IsEmpty ? FocusedTextStyle : style.Merge(FocusedTextStyle);
+        }
+
+        return style;
     }
 }

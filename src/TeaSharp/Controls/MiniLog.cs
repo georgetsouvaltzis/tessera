@@ -1,5 +1,6 @@
 using TeaSharp.Components.Primitives;
 using TeaSharp.Layout;
+using TeaSharp.Styles;
 
 namespace TeaSharp.Controls;
 
@@ -32,6 +33,51 @@ public sealed class MiniLog : Control
         get;
         set => field = value ?? string.Empty;
     } = "Mini Log";
+
+    /// <summary>
+    /// Gets or sets the marker shown in the title when the control is focused.
+    /// </summary>
+    public string FocusMarker
+    {
+        get;
+        set => field = value ?? string.Empty;
+    } = "*";
+
+    /// <summary>
+    /// Gets or sets a value indicating whether the focus marker should be rendered when focused.
+    /// </summary>
+    public bool ShowFocusMarker
+    {
+        get;
+        set;
+    } = true;
+
+    /// <summary>
+    /// Gets or sets the title style applied when the control is not focused.
+    /// </summary>
+    public TeaStyle TitleStyle
+    {
+        get;
+        set;
+    } = TeaStyle.Empty;
+
+    /// <summary>
+    /// Gets or sets the title style applied when the control is focused.
+    /// </summary>
+    public TeaStyle FocusedTitleStyle
+    {
+        get;
+        set;
+    } = TeaStyle.Empty;
+
+    /// <summary>
+    /// Gets or sets the style applied to each rendered log line.
+    /// </summary>
+    public TeaStyle EntryStyle
+    {
+        get;
+        set;
+    } = TeaStyle.Empty;
 
     /// <summary>
     /// Gets the retained log lines.
@@ -76,7 +122,17 @@ public sealed class MiniLog : Control
             return;
         }
 
-        canvas.DrawBox(clipped, Title);
+        var title = FormatTitle();
+        if (!string.IsNullOrEmpty(title))
+        {
+            var titleStyle = IsFocused ? FocusedTitleStyle : TitleStyle;
+            if (!titleStyle.IsEmpty)
+            {
+                title = titleStyle.Render(title);
+            }
+        }
+
+        canvas.DrawBox(clipped, title);
         var content = clipped.Inset(1, 1);
         if (content.IsEmpty || _entries.Count == 0)
         {
@@ -87,7 +143,13 @@ public sealed class MiniLog : Control
         var offset = Math.Max(0, _entries.Count - rows);
         for (var row = 0; row < rows; row++)
         {
-            canvas.WriteText(content.X, content.Y + row, _entries[offset + row], content.Width);
+            var line = _entries[offset + row];
+            if (!EntryStyle.IsEmpty)
+            {
+                line = EntryStyle.Render(line);
+            }
+
+            canvas.WriteText(content.X, content.Y + row, line, content.Width);
         }
     }
 
@@ -103,5 +165,15 @@ public sealed class MiniLog : Control
         return new LayoutMeasurement(
             Math.Clamp(width, 0, availableBounds.Width),
             Math.Clamp(height, 0, availableBounds.Height));
+    }
+
+    private string FormatTitle()
+    {
+        if (IsFocused && ShowFocusMarker && !string.IsNullOrWhiteSpace(FocusMarker))
+        {
+            return $"{Title} {FocusMarker}";
+        }
+
+        return Title;
     }
 }
