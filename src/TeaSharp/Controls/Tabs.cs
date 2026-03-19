@@ -1,6 +1,7 @@
 using TeaSharp.Components.Primitives;
 using TeaSharp.Controls.Internal;
 using TeaSharp.Layout;
+using TeaSharp.Styles;
 
 namespace TeaSharp.Controls;
 
@@ -28,6 +29,51 @@ public sealed class Tabs : Control
     public IReadOnlyList<string> Items => _items;
 
     public int SelectedIndex => _selectedIndex;
+
+    /// <summary>
+    /// Gets or sets the optional title shown before tab labels.
+    /// </summary>
+    public string Title
+    {
+        get;
+        set => field = value ?? string.Empty;
+    } = string.Empty;
+
+    /// <summary>
+    /// Gets or sets the marker shown in the title when the control is focused.
+    /// </summary>
+    public string FocusMarker
+    {
+        get;
+        set => field = value ?? string.Empty;
+    } = "*";
+
+    /// <summary>
+    /// Gets or sets a value indicating whether the focus marker should be rendered in the title when focused.
+    /// </summary>
+    public bool ShowFocusMarker
+    {
+        get;
+        set;
+    } = true;
+
+    /// <summary>
+    /// Gets or sets the title style applied when the control is not focused.
+    /// </summary>
+    public TeaStyle TitleStyle
+    {
+        get;
+        set;
+    } = TeaStyle.Empty;
+
+    /// <summary>
+    /// Gets or sets the title style applied when the control is focused.
+    /// </summary>
+    public TeaStyle FocusedTitleStyle
+    {
+        get;
+        set;
+    } = TeaStyle.Empty;
 
     public override bool IsFocused
     {
@@ -147,6 +193,13 @@ public sealed class Tabs : Control
         }
 
         var x = clipped.X;
+        var plainTitle = FormatTitleText();
+        if (!string.IsNullOrEmpty(plainTitle))
+        {
+            canvas.WriteText(x, clipped.Y, RenderTitle(plainTitle), clipped.Right - x);
+            x += ControlTextLayout.MeasureDisplayWidth(plainTitle) + 1;
+        }
+
         for (var index = 0; index < _items.Count && x < clipped.Right; index++)
         {
             var label = FormatLabel(index, hovered: index == _hoveredIndex);
@@ -167,6 +220,12 @@ public sealed class Tabs : Control
             }
         }
 
+        var title = FormatTitleText();
+        if (!string.IsNullOrEmpty(title))
+        {
+            width += ControlTextLayout.MeasureDisplayWidth(title) + (_items.Count > 0 ? 1 : 0);
+        }
+
         return new LayoutMeasurement(
             Math.Clamp(width, 0, availableBounds.Width),
             Math.Clamp(_items.Count == 0 ? 0 : 1, 0, availableBounds.Height));
@@ -185,6 +244,12 @@ public sealed class Tabs : Control
     private int HitTestTabIndex(int x, Rect bounds)
     {
         var cursor = bounds.X;
+        var title = FormatTitleText();
+        if (!string.IsNullOrEmpty(title))
+        {
+            cursor += ControlTextLayout.MeasureDisplayWidth(title) + 1;
+        }
+
         for (var index = 0; index < _items.Count && cursor < bounds.Right; index++)
         {
             var label = FormatLabel(index, hovered: false);
@@ -224,5 +289,31 @@ public sealed class Tabs : Control
         _selectedIndex = index;
         SelectionChanged?.Invoke(this, new SelectionChangedEventArgs(previousIndex, _selectedIndex, previousTab, _items[_selectedIndex]));
         return true;
+    }
+
+    private string FormatTitleText()
+    {
+        if (string.IsNullOrEmpty(Title))
+        {
+            return string.Empty;
+        }
+
+        if (IsFocused && ShowFocusMarker && !string.IsNullOrWhiteSpace(FocusMarker))
+        {
+            return $"{Title} {FocusMarker}";
+        }
+
+        return Title;
+    }
+
+    private string RenderTitle(string title)
+    {
+        var style = IsFocused ? FocusedTitleStyle : TitleStyle;
+        if (style.IsEmpty || string.IsNullOrEmpty(title))
+        {
+            return title;
+        }
+
+        return style.Render(title);
     }
 }

@@ -40,6 +40,42 @@ public sealed class ListView<T> : Control
     } = "List";
 
     /// <summary>
+    /// Gets or sets the marker shown in the title when the control is focused.
+    /// </summary>
+    public string FocusMarker
+    {
+        get;
+        set => field = value ?? string.Empty;
+    } = "*";
+
+    /// <summary>
+    /// Gets or sets a value indicating whether the focus marker should be rendered in the title when focused.
+    /// </summary>
+    public bool ShowFocusMarker
+    {
+        get;
+        set;
+    } = true;
+
+    /// <summary>
+    /// Gets or sets the title style applied when the control is not focused.
+    /// </summary>
+    public TeaStyle TitleStyle
+    {
+        get;
+        set;
+    } = TeaStyle.Empty;
+
+    /// <summary>
+    /// Gets or sets the title style applied when the control is focused.
+    /// </summary>
+    public TeaStyle FocusedTitleStyle
+    {
+        get;
+        set;
+    } = TeaStyle.Empty;
+
+    /// <summary>
     /// Gets or sets the list border style.
     /// </summary>
     public BorderStyle Border
@@ -242,7 +278,7 @@ public sealed class ListView<T> : Control
         var content = FrameLayout.DrawFrameAndResolveContent(
             canvas,
             clipped,
-            Border == BorderStyle.None ? null : IsFocused ? $"{Title} *" : Title,
+            Border == BorderStyle.None ? null : FormatTitle(),
             Border,
             Padding);
         if (content.IsEmpty)
@@ -367,6 +403,23 @@ public sealed class ListView<T> : Control
         }
 
         return style.Render(text);
+    }
+
+    private string FormatTitle()
+    {
+        var title = Title;
+        if (IsFocused && ShowFocusMarker && !string.IsNullOrWhiteSpace(FocusMarker))
+        {
+            title = $"{title} {FocusMarker}";
+        }
+
+        var style = IsFocused ? FocusedTitleStyle : TitleStyle;
+        if (style.IsEmpty || string.IsNullOrEmpty(title))
+        {
+            return title;
+        }
+
+        return style.Render(title);
     }
 
     private static string DefaultText(T item) => item?.ToString() ?? string.Empty;

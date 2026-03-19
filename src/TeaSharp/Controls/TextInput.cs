@@ -47,6 +47,33 @@ public sealed class TextInput : Control
     } = "Text Input";
 
     /// <summary>
+    /// Gets or sets the marker shown in the title when the control is focused.
+    /// </summary>
+    public string FocusMarker
+    {
+        get;
+        set => field = value ?? string.Empty;
+    } = "*";
+
+    /// <summary>
+    /// Gets or sets a value indicating whether the focus marker should be rendered in the title when focused.
+    /// </summary>
+    public bool ShowFocusMarker
+    {
+        get;
+        set;
+    } = true;
+
+    /// <summary>
+    /// Gets or sets the title style applied when the control is not focused.
+    /// </summary>
+    public TeaStyle TitleStyle
+    {
+        get;
+        set;
+    } = TeaStyle.Empty;
+
+    /// <summary>
     /// Gets or sets the placeholder shown when the field is empty.
     /// </summary>
     public string Placeholder
@@ -260,10 +287,14 @@ public sealed class TextInput : Control
 
         var title = Border == BorderStyle.None
             ? null
-            : IsFocused ? $"{Title} *" : Title;
-        if (IsFocused && !FocusedTitleStyle.IsEmpty && title is not null)
+            : FormatTitle();
+        if (title is not null)
         {
-            title = FocusedTitleStyle.Render(title);
+            var titleStyle = IsFocused ? FocusedTitleStyle : TitleStyle;
+            if (!titleStyle.IsEmpty)
+            {
+                title = titleStyle.Render(title);
+            }
         }
 
         var content = FrameLayout.DrawFrameAndResolveContent(
@@ -278,8 +309,8 @@ public sealed class TextInput : Control
         }
 
         var frame = _input.BuildFrame(content.Width);
-        var style = frame.PlaceholderVisible ? PlaceholderTextStyle : ValueTextStyle;
-        var text = style.IsEmpty ? frame.Text : style.Render(frame.Text);
+        var textStyle = frame.PlaceholderVisible ? PlaceholderTextStyle : ValueTextStyle;
+        var text = textStyle.IsEmpty ? frame.Text : textStyle.Render(frame.Text);
         canvas.WriteText(content.X, content.Y, text, content.Width);
     }
 
@@ -298,5 +329,15 @@ public sealed class TextInput : Control
         return new LayoutMeasurement(
             Math.Clamp(width, 0, availableBounds.Width),
             Math.Clamp(height, 0, availableBounds.Height));
+    }
+
+    private string FormatTitle()
+    {
+        if (IsFocused && ShowFocusMarker && !string.IsNullOrWhiteSpace(FocusMarker))
+        {
+            return $"{Title} {FocusMarker}";
+        }
+
+        return Title;
     }
 }

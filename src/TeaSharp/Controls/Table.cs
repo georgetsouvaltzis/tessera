@@ -1,6 +1,7 @@
 using TeaSharp.Components.Primitives;
 using TeaSharp.Controls.Internal;
 using TeaSharp.Layout;
+using TeaSharp.Styles;
 
 namespace TeaSharp.Controls;
 
@@ -29,6 +30,42 @@ public sealed class Table : Control
         get;
         set => field = value ?? string.Empty;
     } = "Table";
+
+    /// <summary>
+    /// Gets or sets the marker shown in the title when the control is focused.
+    /// </summary>
+    public string FocusMarker
+    {
+        get;
+        set => field = value ?? string.Empty;
+    } = "*";
+
+    /// <summary>
+    /// Gets or sets a value indicating whether the focus marker should be rendered in the title when focused.
+    /// </summary>
+    public bool ShowFocusMarker
+    {
+        get;
+        set;
+    } = true;
+
+    /// <summary>
+    /// Gets or sets the title style applied when the control is not focused.
+    /// </summary>
+    public TeaStyle TitleStyle
+    {
+        get;
+        set;
+    } = TeaStyle.Empty;
+
+    /// <summary>
+    /// Gets or sets the title style applied when the control is focused.
+    /// </summary>
+    public TeaStyle FocusedTitleStyle
+    {
+        get;
+        set;
+    } = TeaStyle.Empty;
 
     public BorderStyle Border
     {
@@ -249,7 +286,7 @@ public sealed class Table : Control
         return TableViewState.Build(
             _rows,
             _columns,
-            IsFocused ? $"{Title} *" : Title,
+            FormatTitle(),
             SortColumn,
             SortDescending,
             PageSize,
@@ -291,5 +328,22 @@ public sealed class Table : Control
 
         _selectedVisibleRow = row;
         return true;
+    }
+
+    private string FormatTitle()
+    {
+        var title = Title;
+        if (IsFocused && ShowFocusMarker && !string.IsNullOrWhiteSpace(FocusMarker))
+        {
+            title = $"{title} {FocusMarker}";
+        }
+
+        var style = IsFocused ? FocusedTitleStyle : TitleStyle;
+        if (style.IsEmpty || string.IsNullOrEmpty(title))
+        {
+            return title;
+        }
+
+        return style.Render(title);
     }
 }

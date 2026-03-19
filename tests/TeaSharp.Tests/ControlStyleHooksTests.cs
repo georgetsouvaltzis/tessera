@@ -15,11 +15,23 @@ internal static class ControlStyleHooksTests
             "Controls_ListView_StyleHooks_EmitSgrFragments",
             ListView_StyleHooks_EmitSgrFragments);
         yield return new TestCase(
+            "Controls_ListView_TitleMarkerAndStyleOverrides_EmitExpectedFragments",
+            ListView_TitleMarkerAndStyleOverrides_EmitExpectedFragments);
+        yield return new TestCase(
             "Controls_Button_StyleHooks_EmitSgrFragments",
             Button_StyleHooks_EmitSgrFragments);
         yield return new TestCase(
             "Controls_TextInput_StyleHooks_EmitSgrFragments",
             TextInput_StyleHooks_EmitSgrFragments);
+        yield return new TestCase(
+            "Controls_TextInput_TitleMarkerAndStyleOverrides_EmitExpectedFragments",
+            TextInput_TitleMarkerAndStyleOverrides_EmitExpectedFragments);
+        yield return new TestCase(
+            "Controls_Table_TitleMarkerAndStyleOverrides_EmitExpectedFragments",
+            Table_TitleMarkerAndStyleOverrides_EmitExpectedFragments);
+        yield return new TestCase(
+            "Controls_Tabs_TitleMarkerAndStyleOverrides_EmitExpectedFragments",
+            Tabs_TitleMarkerAndStyleOverrides_EmitExpectedFragments);
     }
 
     private static Task StatusBar_StyleHooks_EmitSgrFragments()
@@ -62,6 +74,34 @@ internal static class ControlStyleHooksTests
         AssertContains(output, "\u001b[1;38;5;10m");
         AssertContains(output, "\u001b[4;38;5;11m");
         AssertContains(output, "\u001b[38;5;14m");
+        return Task.CompletedTask;
+    }
+
+    private static Task ListView_TitleMarkerAndStyleOverrides_EmitExpectedFragments()
+    {
+        var list = new ListView<string>(static value => value)
+        {
+            Title = "Projects",
+            Border = BorderStyle.SingleLine,
+            IsFocused = true,
+            FocusMarker = "!",
+            ShowFocusMarker = true,
+            FocusedTitleStyle = TeaStyle.Empty.WithUnderline().WithForeground(AnsiColor.BrightMagenta),
+            TitleStyle = TeaStyle.Empty.WithForeground(AnsiColor.BrightCyan),
+        };
+        list.SetItems(["alpha"]);
+
+        var focused = Render(list, width: 32, height: 4);
+        AssertContains(focused, "Projects !");
+        AssertContains(focused, "\u001b[4;38;5;13m");
+
+        list.ShowFocusMarker = false;
+        var withoutMarker = Render(list, width: 32, height: 4);
+        AssertNotContains(withoutMarker, "Projects !");
+
+        list.IsFocused = false;
+        var unfocused = Render(list, width: 32, height: 4);
+        AssertContains(unfocused, "\u001b[38;5;14m");
         return Task.CompletedTask;
     }
 
@@ -119,6 +159,91 @@ internal static class ControlStyleHooksTests
         return Task.CompletedTask;
     }
 
+    private static Task TextInput_TitleMarkerAndStyleOverrides_EmitExpectedFragments()
+    {
+        var input = new TextInput
+        {
+            Border = BorderStyle.SingleLine,
+            IsFocused = true,
+            Title = "Search",
+            FocusMarker = "!",
+            ShowFocusMarker = true,
+            FocusedTitleStyle = TeaStyle.Empty.WithUnderline().WithForeground(AnsiColor.BrightMagenta),
+            TitleStyle = TeaStyle.Empty.WithForeground(AnsiColor.BrightCyan),
+        };
+
+        var focused = Render(input, width: 24, height: 3);
+        AssertContains(focused, "Search !");
+        AssertContains(focused, "\u001b[4;38;5;13m");
+
+        input.ShowFocusMarker = false;
+        var withoutMarker = Render(input, width: 24, height: 3);
+        AssertNotContains(withoutMarker, "Search !");
+
+        input.IsFocused = false;
+        var unfocused = Render(input, width: 24, height: 3);
+        AssertContains(unfocused, "\u001b[38;5;14m");
+        return Task.CompletedTask;
+    }
+
+    private static Task Table_TitleMarkerAndStyleOverrides_EmitExpectedFragments()
+    {
+        var table = new Table("Name", "Status")
+        {
+            Title = "Tasks",
+            Border = BorderStyle.SingleLine,
+            IsFocused = true,
+            FocusMarker = "!",
+            ShowFocusMarker = true,
+            FocusedTitleStyle = TeaStyle.Empty.WithUnderline().WithForeground(AnsiColor.BrightMagenta),
+            TitleStyle = TeaStyle.Empty.WithForeground(AnsiColor.BrightCyan),
+        };
+        table.SetRows(
+        [
+            ["A", "Open"],
+            ["B", "Done"],
+        ]);
+
+        var focused = Render(table, width: 48, height: 8);
+        AssertContains(focused, "Tasks !");
+        AssertContains(focused, "\u001b[4;38;5;13m");
+
+        table.ShowFocusMarker = false;
+        var withoutMarker = Render(table, width: 48, height: 8);
+        AssertNotContains(withoutMarker, "Tasks !");
+
+        table.IsFocused = false;
+        var unfocused = Render(table, width: 48, height: 8);
+        AssertContains(unfocused, "\u001b[38;5;14m");
+        return Task.CompletedTask;
+    }
+
+    private static Task Tabs_TitleMarkerAndStyleOverrides_EmitExpectedFragments()
+    {
+        var tabs = new Tabs("Home", "Build", "Deploy")
+        {
+            IsFocused = true,
+            Title = "Main",
+            FocusMarker = "!",
+            ShowFocusMarker = true,
+            FocusedTitleStyle = TeaStyle.Empty.WithUnderline().WithForeground(AnsiColor.BrightMagenta),
+            TitleStyle = TeaStyle.Empty.WithForeground(AnsiColor.BrightCyan),
+        };
+
+        var focused = Render(tabs, width: 48, height: 1);
+        AssertContains(focused, "Main !");
+        AssertContains(focused, "\u001b[4;38;5;13m");
+
+        tabs.ShowFocusMarker = false;
+        var withoutMarker = Render(tabs, width: 48, height: 1);
+        AssertNotContains(withoutMarker, "Main !");
+
+        tabs.IsFocused = false;
+        var unfocused = Render(tabs, width: 48, height: 1);
+        AssertContains(unfocused, "\u001b[38;5;14m");
+        return Task.CompletedTask;
+    }
+
     private static string Render(Control control, int width, int height)
     {
         var canvas = new Canvas(width, height, CanvasTextMode.GraphemeAware);
@@ -131,6 +256,14 @@ internal static class ControlStyleHooksTests
         if (!actual.Contains(expectedFragment, StringComparison.Ordinal))
         {
             throw new InvalidOperationException($"Expected output to contain '{Escape(expectedFragment)}'.");
+        }
+    }
+
+    private static void AssertNotContains(string actual, string unexpectedFragment)
+    {
+        if (actual.Contains(unexpectedFragment, StringComparison.Ordinal))
+        {
+            throw new InvalidOperationException($"Expected output to not contain '{Escape(unexpectedFragment)}'.");
         }
     }
 
