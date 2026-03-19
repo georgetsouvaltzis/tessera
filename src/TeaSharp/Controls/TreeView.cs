@@ -1,5 +1,6 @@
 using TeaSharp.Components.Primitives;
 using TeaSharp.Components.Primitives.Internal;
+using TeaSharp.Controls.Internal;
 using TeaSharp.Layout;
 using TeaSharp.Styles;
 
@@ -33,6 +34,16 @@ public sealed class TreeView : Control
 
     public TeaStyle FocusedTitleStyle { get; set; } = TeaStyle.Empty;
 
+    /// <summary>
+    /// Gets or sets the style applied to border glyphs when the control is not focused.
+    /// </summary>
+    public TeaStyle BorderStyleText { get; set; } = TeaStyle.Empty;
+
+    /// <summary>
+    /// Gets or sets the style applied to border glyphs when the control is focused.
+    /// </summary>
+    public TeaStyle FocusedBorderStyleText { get; set; } = TeaStyle.Empty;
+
     public TeaStyle BranchStyle { get; set; } = TeaStyle.Empty;
 
     public TeaStyle LeafStyle { get; set; } = TeaStyle.Empty;
@@ -44,6 +55,11 @@ public sealed class TreeView : Control
     public TeaStyle MutedStyle { get; set; } = TeaStyle.Empty;
 
     public TeaStyle DisabledStyle { get; set; } = TeaStyle.Empty;
+
+    /// <summary>
+    /// Gets or sets glyphs used for branch and leaf markers.
+    /// </summary>
+    public TreeViewGlyphSet Glyphs { get; set; } = TreeViewGlyphSet.Default;
 
     public string? SelectedId => _selectedIndex >= 0 && _selectedIndex < _visible.Count
         ? _visible[_selectedIndex].Node.Id
@@ -222,7 +238,8 @@ public sealed class TreeView : Control
             clipped,
             Border == BorderStyle.None ? null : RenderTitle(),
             Border,
-            Padding);
+            Padding,
+            ResolveBorderStyleText());
         if (content.IsEmpty)
         {
             return;
@@ -241,7 +258,7 @@ public sealed class TreeView : Control
             var index = start + row;
             var (node, depth, _) = _visible[index];
             var indent = new string(' ', Math.Max(0, depth) * 2);
-            var marker = node.Children.Count == 0 ? "•" : node.Expanded ? "▾" : "▸";
+            var marker = ResolveNodeMarker(node);
             var cursor = index == _selectedIndex ? ">" : " ";
             canvas.WriteText(
                 content.X,
@@ -256,7 +273,14 @@ public sealed class TreeView : Control
         var width = Math.Max(12, Title.Length + 4);
         if (_visible.Count > 0)
         {
-            width = Math.Max(width, _visible.Max(static entry => (entry.Depth * 2) + entry.Node.Label.Length + 4));
+            for (var index = 0; index < _visible.Count; index++)
+            {
+                var entry = _visible[index];
+                var rowWidth = (entry.Depth * 2)
+                    + ResolveTreePrefixWidth(entry.Node)
+                    + ControlTextLayout.MeasureDisplayWidth(entry.Node.Label);
+                width = Math.Max(width, rowWidth);
+            }
         }
 
         var height = Math.Max(1, _visible.Count);
@@ -412,6 +436,37 @@ public sealed class TreeView : Control
         {
             style = style.Merge(HoveredItemStyle);
         }
+
+        if (IsDisabled)
+        {
+            style = style.Merge(DisabledStyle).Merge(MutedStyle);
+        }
+
+        return style;
+    }
+
+    private string ResolveNodeMarker(TreeItem node)
+    {
+        if (node.Children.Count == 0)
+        {
+            return Glyphs.LeafMarker;
+        }
+
+        return node.Expanded
+            ? Glyphs.ExpandedBranchMarker
+            : Glyphs.CollapsedBranchMarker;
+    }
+
+    private int ResolveTreePrefixWidth(TreeItem node)
+    {
+        return 3 + ControlTextLayout.MeasureDisplayWidth(ResolveNodeMarker(node));
+    }
+
+    private TeaStyle ResolveBorderStyleText()
+    {
+        var style = IsFocused
+            ? BorderStyleText.Merge(FocusedBorderStyleText)
+            : BorderStyleText;
 
         if (IsDisabled)
         {
