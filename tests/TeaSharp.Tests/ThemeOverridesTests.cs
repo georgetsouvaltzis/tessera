@@ -17,6 +17,11 @@ internal static partial class ThemeOverridesTests
             yield return testCase;
         }
 
+        foreach (var testCase in NavigationOverlayCases())
+        {
+            yield return testCase;
+        }
+
         foreach (var testCase in RenderingCases())
         {
             yield return testCase;
