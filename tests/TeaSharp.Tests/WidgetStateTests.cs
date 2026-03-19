@@ -3,6 +3,7 @@ using TeaSharp.Components.Primitives;
 using TeaSharp.Components.Styling;
 using TeaSharp.Core.Messages;
 using TeaSharp.Widgets;
+using TeaSharp.Widgets.Internal;
 
 namespace TeaSharp.Tests;
 
@@ -15,6 +16,8 @@ internal static class WidgetStateTests
         yield return new TestCase("Widgets_HelpView_RenderColumns_UsesExpandedLayout", HelpView_RenderColumns_UsesExpandedLayout);
         yield return new TestCase("Widgets_Viewport_ScrollAndHorizontalOffset", Viewport_ScrollAndHorizontalOffset);
         yield return new TestCase("Widgets_Viewport_WrapMode_SoftWrapsRows", Viewport_WrapMode_SoftWrapsRows);
+        yield return new TestCase("Widgets_Viewport_NoDecoration_NoClip_ReusesOriginalLineReferences", Viewport_NoDecoration_NoClip_ReusesOriginalLineReferences);
+        yield return new TestCase("Widgets_Viewport_NoDecoration_HorizontalOffsetBeyondLineRendersEmpty", Viewport_NoDecoration_HorizontalOffsetBeyondLineRendersEmpty);
         yield return new TestCase("Widgets_Viewport_GutterAndHighlight_RenderDecorations", Viewport_GutterAndHighlight_RenderDecorations);
         yield return new TestCase("Widgets_Viewport_HighlightWithoutGutter_PreservesMarkerPrefix", Viewport_HighlightWithoutGutter_PreservesMarkerPrefix);
         yield return new TestCase("Widgets_Viewport_LineNumberPrefix_ClipsWhenViewportNarrow", Viewport_LineNumberPrefix_ClipsWhenViewportNarrow);
@@ -121,6 +124,43 @@ internal static class WidgetStateTests
         TestAssert.Equal("efgh", first[1], "Wrap mode should render second visual segment.");
         TestAssert.Equal("efgh", second[0], "Vertical scroll should move through wrapped visual rows.");
         TestAssert.Equal("ijkl", second[1], "Vertical scroll should reveal last wrapped segment.");
+        return Task.CompletedTask;
+    }
+
+    private static Task Viewport_NoDecoration_NoClip_ReusesOriginalLineReferences()
+    {
+        // Arrange
+        var viewport = new ViewportModel();
+        viewport.Resize(width: 24, height: 2);
+        viewport.SetWrap(false);
+        var first = "alpha";
+        var second = "beta";
+        viewport.SetLines([first, second]);
+
+        // Act
+        var lines = viewport.RenderLines();
+
+        // Assert
+        TestAssert.True(object.ReferenceEquals(first, lines[0]), "No-decoration path should reuse existing line instance when clipping is not required.");
+        TestAssert.True(object.ReferenceEquals(second, lines[1]), "No-decoration path should reuse existing line instance for subsequent rows when clipping is not required.");
+        return Task.CompletedTask;
+    }
+
+    private static Task Viewport_NoDecoration_HorizontalOffsetBeyondLineRendersEmpty()
+    {
+        // Act
+        var lines = ViewportRenderer.RenderLines(
+            ["abc"],
+            width: 6,
+            height: 1,
+            xOffset: 10,
+            yOffset: 0,
+            wrap: false,
+            showLineNumbers: false,
+            highlightVisualLine: null);
+
+        // Assert
+        TestAssert.Equal(string.Empty, lines[0], "No-decoration path should return empty output when horizontal offset exceeds line length.");
         return Task.CompletedTask;
     }
 
