@@ -6,7 +6,7 @@ The default app path is intentionally small:
 
 - derive from `TeaApp`
 - run apps with `Tea.RunAsync(...)` for minimal startup, or `Tea.CreateBuilder()` for configured startup
-- register app dependencies with `ConfigureServices(...)`, then activate apps with `UseApp<TApp>()`
+- choose the app with `UseApp(...)`, then configure runtime with `ConfigureRuntime(...)`
 - let built-in controls route automatically; `Update(...)` handles unhandled input plus runtime messages
 - return `Screen` from `Build(ScreenContext)`
 - assemble screens with `Screen.Build(...)` and shallow builder callbacks
@@ -19,16 +19,11 @@ If you need custom runtime wiring, explicit region routing, or low-level compone
 ## Quick Start
 
 ```csharp
-using Microsoft.Extensions.DependencyInjection;
 using TeaSharp;
 using TeaSharp.Controls;
 using TeaSharp.Layout;
 
 var app = Tea.CreateBuilder()
-    .ConfigureServices(services =>
-    {
-        services.AddSingleton<CounterState>();
-    })
     .UseApp<CounterApp>()
     .ConfigureRuntime(static runtime =>
     {
@@ -45,17 +40,13 @@ await app.RunAsync();
 
 internal sealed class CounterApp : TeaApp
 {
-    private readonly CounterState _state;
+    private readonly CounterState _state = new();
     private readonly Button _increment = new()
     {
         Text = "Increment",
     };
     private readonly StatusBar _status = new();
-    public CounterApp(CounterState state)
-    {
-        _state = state;
-        _increment.Activated += (_, _) => _state.Count++;
-    }
+    public CounterApp() => _increment.Activated += (_, _) => _state.Count++;
 
     public override TeaEffect? Update(Message message)
         => message is KeyPressed key && key.IsCharacter('c', ModifierKeys.Ctrl)
@@ -104,7 +95,7 @@ internal sealed class HelloApp : TeaApp
 Follow examples in this order:
 
 1. `examples/HelloWorld`: minimal startup with `Tea.RunAsync(new App())`.
-2. `examples/CounterForm`: configured startup with `Tea.CreateBuilder()`, `ConfigureServices(...)`, and `UseApp<TApp>()`.
+2. `examples/CounterForm`: configured startup with `Tea.CreateBuilder()`, `UseApp(...)`, and `ConfigureRuntime(...)`.
 3. `examples/WorkspaceApp`: stateful multi-pane app using app-level messages/effects for coordinated flows.
 4. Advanced interaction lane: `examples/AdvancedWidgets` and `examples/WidgetGallery` for richer overlays, command surfaces, and advanced behavior.
 
