@@ -35,15 +35,25 @@ internal static class ViewportRenderer
             rendered.Capacity = max;
         }
 
-        var lineNumberWidth = ViewportLineFormatter.ComputeLineNumberWidth(showLineNumbers, visualLines.Count);
-        var canBypassDecoration = !showLineNumbers && !highlightVisualLine.HasValue && xOffset == 0;
+        var noDecoration = !showLineNumbers && !highlightVisualLine.HasValue;
+        var lineNumberWidth = showLineNumbers
+            ? ViewportLineFormatter.ComputeLineNumberWidth(showLineNumbers: true, visualLineCount: visualLines.Count)
+            : 0;
         for (var i = 0; i < max; i++)
         {
             var visualIndex = start + i;
             var line = visualLines[visualIndex];
-            if (canBypassDecoration && (wrap || line.Length <= width))
+
+            if (noDecoration)
             {
-                rendered.Add(line);
+                rendered.Add(
+                    ViewportLineFormatter.ClipLine(
+                        line,
+                        wrap,
+                        width,
+                        xOffset,
+                        showLineNumbers: false,
+                        lineNumberWidth: 0));
                 continue;
             }
 
