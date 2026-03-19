@@ -56,6 +56,7 @@ All agents must treat this file as the source of truth for scope, sequencing, ow
 - Expand built-in widgets (10-15 in V1 tranche).
 - Ensure widget APIs follow consistent control/event/style patterns.
 - Keep customization/theming first-class for all new widgets.
+- Execution scope and inventory are tracked in [widget-roadmap-v1.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/widget-roadmap-v1.md).
 
 ### WS-D: Quality, Performance, and Docs
 - Full-cycle validation: unit, integration, example smoke, docs sync.
@@ -85,9 +86,10 @@ All agents must treat this file as the source of truth for scope, sequencing, ow
 
 ### M3: Widget Tranche
 - Acceptance:
-  - 10-15 new widgets added
-  - all new widgets theme-aware
-  - widget docs/examples added
+  - 10-15 widgets from `docs/widget-roadmap-v1.md` V1 tranche are implemented
+  - all new widgets expose consistent style/state override hooks
+  - all new widgets are validated against global theme + per-widget overrides
+  - widget docs/examples and control catalog updates are merged
 
 ### M4: Hardening and Release Candidate
 - Acceptance:

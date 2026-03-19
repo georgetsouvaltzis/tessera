@@ -2,6 +2,7 @@
 
 ## Source Of Truth
 - `docs/v1-master-plan.md` is the authoritative execution plan for Public V1.
+- `docs/widget-roadmap-v1.md` is the authoritative widget scope contract for M3.
 - If a task conflicts with older docs, follow `v1-master-plan.md` and update outdated docs in the same change.
 
 ## Project Structure
