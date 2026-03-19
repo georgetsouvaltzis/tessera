@@ -43,6 +43,9 @@ Theme primitives use the following public types:
 - `TeaThemeFocusTokens`
 - `TeaThemes.Catppuccin(CatppuccinVariant)`
 - `TeaThemes.RosePine(RosePineVariant)`
+- `TeaThemeOverrides`
+- `TeaThemeVisualState`
+- `TeaThemeControlExtensions.ApplyTheme(...)`
 - `TeaRuntimeOptions.Theme`
 
 ## Theme Cookbook
