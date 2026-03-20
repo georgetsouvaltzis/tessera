@@ -11,11 +11,13 @@ internal static class PrebuiltWidgetTests
     public static IEnumerable<TestCase> Cases()
     {
         yield return new TestCase("Controls_Label_RendersText", Label_RendersText);
+        yield return new TestCase("Controls_Label_FocusedBorderStyleText_StylesFrameGlyphs", Label_FocusedBorderStyleText_StylesFrameGlyphs);
         yield return new TestCase("Controls_Button_ActivatesWhenFocused", Button_ActivatesWhenFocused);
         yield return new TestCase("Controls_Button_MouseClickActivatesAndTracksState", Button_MouseClickActivatesAndTracksState);
         yield return new TestCase("Controls_Button_ActivatedEvent_FiresOnActivation", Button_ActivatedEvent_FiresOnActivation);
         yield return new TestCase("Controls_Button_TryConsumeActivation_IsSingleUse", Button_TryConsumeActivation_IsSingleUse);
         yield return new TestCase("Controls_Button_RendersBorderedState", Button_RendersBorderedState);
+        yield return new TestCase("Controls_Button_FocusedBorderStyleText_StylesFrameGlyphs", Button_FocusedBorderStyleText_StylesFrameGlyphs);
         yield return new TestCase("Controls_TextInput_SubmitsValue", TextInput_SubmitsValue);
         yield return new TestCase("Controls_TextInput_Events_ReportSubmitAndCancelValues", TextInput_Events_ReportSubmitAndCancelValues);
         yield return new TestCase("Controls_TextInput_TryConsumeSubmissionAndCancellation_AreSingleUse", TextInput_TryConsumeSubmissionAndCancellation_AreSingleUse);
@@ -95,6 +97,7 @@ internal static class PrebuiltWidgetTests
         yield return new TestCase("Controls_Table_ForwardsSortHotkeys", Table_ForwardsSortHotkeys);
         yield return new TestCase("Controls_Table_FocusMarkerAndBorderStyleHooks_Rendered", Table_FocusMarkerAndBorderStyleHooks_Rendered);
         yield return new TestCase("Controls_ProgressBar_AdjustsValue", ProgressBar_AdjustsValue);
+        yield return new TestCase("Controls_ProgressBar_FocusMarkerAndBorderStyleHooks_Rendered", ProgressBar_FocusMarkerAndBorderStyleHooks_Rendered);
         yield return new TestCase("Controls_StatusBar_RendersLeftAndRightText", StatusBar_RendersLeftAndRightText);
         yield return new TestCase("Controls_LogView_AppendsAndFilters", LogView_AppendsAndFilters);
         yield return new TestCase("Controls_Dialog_AcceptsAndDismisses", Dialog_AcceptsAndDismisses);
@@ -117,6 +120,27 @@ internal static class PrebuiltWidgetTests
 
         TestAssert.True(output.Contains("hello", StringComparison.Ordinal), "Label should render first line.");
         TestAssert.True(output.Contains("world", StringComparison.Ordinal), "Label should render second line.");
+        return Task.CompletedTask;
+    }
+
+    private static Task Label_FocusedBorderStyleText_StylesFrameGlyphs()
+    {
+        var focusedBorderStyle = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(55, 88, 144));
+        var label = new Label
+        {
+            IsFocused = true,
+            Border = BorderStyle.SingleLine,
+            Title = string.Empty,
+            BorderStyleText = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(13, 16, 19)),
+            FocusedBorderStyleText = focusedBorderStyle,
+            Text = "content",
+        };
+        var canvas = new Canvas(24, 4, CanvasTextMode.GraphemeAware);
+
+        label.Render(canvas, new Rect(0, 0, 24, 4));
+        var output = canvas.Render();
+
+        TestAssert.True(output.Contains(focusedBorderStyle.Render("┌"), StringComparison.Ordinal), "Label should style focused border glyphs.");
         return Task.CompletedTask;
     }
 
@@ -203,6 +227,26 @@ internal static class PrebuiltWidgetTests
 
         TestAssert.True(output.Contains("[Start]", StringComparison.Ordinal), "Bordered button should render its label.");
         TestAssert.True(output.Contains("click or press enter", StringComparison.Ordinal), "Bordered button should render its description.");
+        return Task.CompletedTask;
+    }
+
+    private static Task Button_FocusedBorderStyleText_StylesFrameGlyphs()
+    {
+        var focusedBorderStyle = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(128, 72, 44)).WithBold();
+        var button = new Button
+        {
+            IsFocused = true,
+            Border = BorderStyle.SingleLine,
+            BorderStyleText = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(30, 30, 30)),
+            FocusedBorderStyleText = focusedBorderStyle,
+            Text = "Run",
+        };
+        var canvas = new Canvas(20, 5, CanvasTextMode.GraphemeAware);
+
+        button.Render(canvas, new Rect(0, 0, 20, 5));
+        var output = canvas.Render();
+
+        TestAssert.True(output.Contains(focusedBorderStyle.Render("┌"), StringComparison.Ordinal), "Button should style focused border glyphs.");
         return Task.CompletedTask;
     }
 
@@ -2049,6 +2093,29 @@ internal static class PrebuiltWidgetTests
         progress.Handle(new KeyPressed(Key.Left));
 
         TestAssert.True(Math.Abs(progress.Value - 0.25) < 0.0001, "Progress should settle at 25% after two increments and one decrement.");
+        return Task.CompletedTask;
+    }
+
+    private static Task ProgressBar_FocusMarkerAndBorderStyleHooks_Rendered()
+    {
+        var focusedBorderStyle = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(84, 109, 60)).WithBold();
+        var progress = new ProgressBar
+        {
+            IsFocused = true,
+            Border = BorderStyle.SingleLine,
+            Title = "Load",
+            FocusMarker = "!",
+            BorderStyleText = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(7, 7, 7)),
+            FocusedBorderStyleText = focusedBorderStyle,
+        };
+        progress.SetValue(0.4);
+        var canvas = new Canvas(28, 5, CanvasTextMode.GraphemeAware);
+
+        progress.Render(canvas, new Rect(0, 0, 28, 5));
+        var output = canvas.Render();
+
+        TestAssert.True(output.Contains("Load !", StringComparison.Ordinal), "ProgressBar should render custom focus marker when focused.");
+        TestAssert.True(output.Contains(focusedBorderStyle.Render("┌"), StringComparison.Ordinal), "ProgressBar should style focused border glyphs.");
         return Task.CompletedTask;
     }
 

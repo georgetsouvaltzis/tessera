@@ -66,9 +66,15 @@ internal static partial class ThemeOverridesTests
             {
                 Panel = TeaStyle.Empty.WithBackground(AnsiColor.Rgb(40, 41, 42)),
             },
+            Border = new TeaThemeBorderTokens
+            {
+                Default = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(43, 44, 45)),
+                Focused = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(46, 47, 48)),
+            },
             Focus = new TeaThemeFocusTokens
             {
                 Ring = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(50, 51, 52)),
+                Border = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(53, 54, 55)),
             },
             Selection = new TeaThemeSelectionTokens
             {
@@ -87,6 +93,8 @@ internal static partial class ThemeOverridesTests
             theme.Selection.Foreground.Merge(theme.Selection.Background),
             button.PressedLabelStyle,
             "Button pressed style should map to merged Selection styles.");
+        TestAssert.Equal(theme.Border.Default, button.BorderStyleText, "Button border style should map to Border.Default.");
+        TestAssert.Equal(theme.Border.Focused.Merge(theme.Focus.Border), button.FocusedBorderStyleText, "Button focused border style should map to focused border tokens.");
 
         TestAssert.Equal(theme.Text.Primary, statusBar.LeftTextStyle, "StatusBar left style should map to Text.Primary.");
         TestAssert.Equal(theme.Text.Secondary, statusBar.RightTextStyle, "StatusBar right style should map to Text.Secondary.");
@@ -110,15 +118,22 @@ internal static partial class ThemeOverridesTests
             {
                 Panel = TeaStyle.Empty.WithBackground(AnsiColor.Rgb(10, 20, 30)),
             },
+            Border = new TeaThemeBorderTokens
+            {
+                Default = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(22, 23, 24)),
+                Focused = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(25, 26, 27)),
+            },
             Focus = new TeaThemeFocusTokens
             {
                 Title = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(31, 32, 33)),
+                Border = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(34, 35, 36)),
             },
         };
 
         var button = new Button
         {
             LabelStyle = explicitStyle,
+            BorderStyleText = explicitStyle,
         };
         var statusBar = new StatusBar
         {
@@ -129,6 +144,8 @@ internal static partial class ThemeOverridesTests
         statusBar.ApplyThemeDefaults(theme);
 
         TestAssert.Equal(explicitStyle, button.LabelStyle, "Defaults should not overwrite explicit Button.LabelStyle.");
+        TestAssert.Equal(explicitStyle, button.BorderStyleText, "Defaults should not overwrite explicit Button.BorderStyleText.");
+        TestAssert.Equal(theme.Border.Focused.Merge(theme.Focus.Border), button.FocusedBorderStyleText, "Defaults should fill empty Button.FocusedBorderStyleText.");
         TestAssert.Equal(explicitStyle, statusBar.LeftTextStyle, "Defaults should not overwrite explicit StatusBar.LeftTextStyle.");
         TestAssert.Equal(theme.Text.Secondary, statusBar.RightTextStyle, "Defaults should fill empty StatusBar.RightTextStyle.");
 

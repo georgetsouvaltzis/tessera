@@ -11,12 +11,15 @@ internal static class AdvancedPrebuiltWidgetTests
         yield return new TestCase("Controls_Badge_RendersLabel", Badge_RendersLabel);
         yield return new TestCase("Controls_Toggle_TogglesValue", Toggle_TogglesValue);
         yield return new TestCase("Controls_Toggle_MouseClickTogglesValue", Toggle_MouseClickTogglesValue);
+        yield return new TestCase("Controls_Toggle_FocusedBorderStyleText_StylesFrameGlyphs", Toggle_FocusedBorderStyleText_StylesFrameGlyphs);
         yield return new TestCase("Controls_Slider_AdjustsValue", Slider_AdjustsValue);
         yield return new TestCase("Controls_Slider_MouseClickSetsValue", Slider_MouseClickSetsValue);
         yield return new TestCase("Controls_Slider_DragUpdatesValue", Slider_DragUpdatesValue);
+        yield return new TestCase("Controls_Slider_FocusedBorderStyleText_StylesFrameGlyphs", Slider_FocusedBorderStyleText_StylesFrameGlyphs);
         yield return new TestCase("Controls_Spinner_AdvancesFrame", Spinner_AdvancesFrame);
         yield return new TestCase("Controls_Spinner_MouseClickTogglesRunning", Spinner_MouseClickTogglesRunning);
         yield return new TestCase("Controls_Spinner_MouseWheelAdvancesFrame", Spinner_MouseWheelAdvancesFrame);
+        yield return new TestCase("Controls_Spinner_FocusedBorderStyleText_StylesFrameGlyphs", Spinner_FocusedBorderStyleText_StylesFrameGlyphs);
         yield return new TestCase("Controls_Toggle_MouseWheelSetsValue", Toggle_MouseWheelSetsValue);
         yield return new TestCase("Controls_TreeView_TogglesExpansion", TreeView_TogglesExpansion);
         yield return new TestCase("Controls_TreeView_MouseClickSelectsVisibleNode", TreeView_MouseClickSelectsVisibleNode);
@@ -85,6 +88,26 @@ internal static class AdvancedPrebuiltWidgetTests
         return Task.CompletedTask;
     }
 
+    private static Task Toggle_FocusedBorderStyleText_StylesFrameGlyphs()
+    {
+        var focusedBorderStyle = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(102, 65, 122));
+        var toggle = new Toggle
+        {
+            IsFocused = true,
+            Border = BorderStyle.SingleLine,
+            Title = string.Empty,
+            BorderStyleText = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(17, 18, 19)),
+            FocusedBorderStyleText = focusedBorderStyle,
+        };
+        var canvas = new Canvas(24, 4, CanvasTextMode.GraphemeAware);
+
+        toggle.Render(canvas, new Rect(0, 0, 24, 4));
+        var output = canvas.Render();
+
+        TestAssert.True(output.Contains(focusedBorderStyle.Render("┌"), StringComparison.Ordinal), "Toggle should style focused border glyphs.");
+        return Task.CompletedTask;
+    }
+
     private static Task Slider_AdjustsValue()
     {
         var slider = new Slider
@@ -143,6 +166,26 @@ internal static class AdvancedPrebuiltWidgetTests
         return Task.CompletedTask;
     }
 
+    private static Task Slider_FocusedBorderStyleText_StylesFrameGlyphs()
+    {
+        var focusedBorderStyle = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(49, 111, 124));
+        var slider = new Slider
+        {
+            IsFocused = true,
+            Border = BorderStyle.SingleLine,
+            Title = string.Empty,
+            BorderStyleText = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(20, 20, 20)),
+            FocusedBorderStyleText = focusedBorderStyle,
+        };
+        var canvas = new Canvas(28, 5, CanvasTextMode.GraphemeAware);
+
+        slider.Render(canvas, new Rect(0, 0, 28, 5));
+        var output = canvas.Render();
+
+        TestAssert.True(output.Contains(focusedBorderStyle.Render("┌"), StringComparison.Ordinal), "Slider should style focused border glyphs.");
+        return Task.CompletedTask;
+    }
+
     private static Task Spinner_AdvancesFrame()
     {
         var spinner = new Spinner
@@ -195,6 +238,26 @@ internal static class AdvancedPrebuiltWidgetTests
 
         TestAssert.True(changed, "Spinner wheel should advance frame while running.");
         TestAssert.True(!string.Equals(before, after, StringComparison.Ordinal), "Spinner wheel should move frame index.");
+        return Task.CompletedTask;
+    }
+
+    private static Task Spinner_FocusedBorderStyleText_StylesFrameGlyphs()
+    {
+        var focusedBorderStyle = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(130, 84, 46));
+        var spinner = new Spinner
+        {
+            IsFocused = true,
+            Border = BorderStyle.SingleLine,
+            Title = string.Empty,
+            BorderStyleText = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(22, 22, 22)),
+            FocusedBorderStyleText = focusedBorderStyle,
+        };
+        var canvas = new Canvas(24, 4, CanvasTextMode.GraphemeAware);
+
+        spinner.Render(canvas, new Rect(0, 0, 24, 4));
+        var output = canvas.Render();
+
+        TestAssert.True(output.Contains(focusedBorderStyle.Render("┌"), StringComparison.Ordinal), "Spinner should style focused border glyphs.");
         return Task.CompletedTask;
     }
 

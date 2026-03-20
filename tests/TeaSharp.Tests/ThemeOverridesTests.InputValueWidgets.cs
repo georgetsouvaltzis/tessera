@@ -37,6 +37,8 @@ internal static partial class ThemeOverridesTests
         TestAssert.Equal(theme.Text.Secondary, label.TitleStyle, "Label title style should map to Text.Secondary.");
         TestAssert.Equal(theme.Focus.Title, label.FocusedTitleStyle, "Label focused title style should map to Focus.Title.");
         TestAssert.Equal(theme.Text.Primary, label.TextStyle, "Label text style should map to Text.Primary.");
+        TestAssert.Equal(theme.Border.Default, label.BorderStyleText, "Label border style should map to Border.Default.");
+        TestAssert.Equal(theme.Border.Focused.Merge(theme.Focus.Border), label.FocusedBorderStyleText, "Label focused border style should map to focused border tokens.");
 
         TestAssert.Equal(theme.Text.Primary, textInput.ValueTextStyle, "TextInput value style should map to Text.Primary.");
         TestAssert.Equal(theme.Text.Muted, textInput.PlaceholderTextStyle, "TextInput placeholder style should map to Text.Muted.");
@@ -57,6 +59,8 @@ internal static partial class ThemeOverridesTests
         TestAssert.Equal(theme.State.Success, toggle.OnValueStyle, "Toggle on style should map to State.Success.");
         TestAssert.Equal(theme.Text.Secondary, toggle.OffValueStyle, "Toggle off style should map to Text.Secondary.");
         TestAssert.Equal(theme.Text.Muted, toggle.DisabledValueStyle, "Toggle disabled style should map to Text.Muted.");
+        TestAssert.Equal(theme.Border.Default, toggle.BorderStyleText, "Toggle border style should map to Border.Default.");
+        TestAssert.Equal(theme.Border.Focused.Merge(theme.Focus.Border), toggle.FocusedBorderStyleText, "Toggle focused border style should map to focused border tokens.");
 
         TestAssert.Equal(theme.Text.Secondary, slider.TitleStyle, "Slider title style should map to Text.Secondary.");
         TestAssert.Equal(theme.Focus.Title, slider.FocusedTitleStyle, "Slider focused title style should map to Focus.Title.");
@@ -64,6 +68,8 @@ internal static partial class ThemeOverridesTests
         TestAssert.Equal(theme.Accent.Primary, slider.FillStyle, "Slider fill style should map to Accent.Primary.");
         TestAssert.Equal(theme.Text.Muted, slider.TrackStyle, "Slider track style should map to Text.Muted.");
         TestAssert.Equal(theme.Text.Muted, slider.DisabledStyle, "Slider disabled style should map to Text.Muted.");
+        TestAssert.Equal(theme.Border.Default, slider.BorderStyleText, "Slider border style should map to Border.Default.");
+        TestAssert.Equal(theme.Border.Focused.Merge(theme.Focus.Border), slider.FocusedBorderStyleText, "Slider focused border style should map to focused border tokens.");
 
         TestAssert.Equal(theme.Text.Secondary, spinner.TitleStyle, "Spinner title style should map to Text.Secondary.");
         TestAssert.Equal(theme.Focus.Title, spinner.FocusedTitleStyle, "Spinner focused title style should map to Focus.Title.");
@@ -71,6 +77,8 @@ internal static partial class ThemeOverridesTests
         TestAssert.Equal(theme.Accent.Primary, spinner.RunningValueStyle, "Spinner running style should map to Accent.Primary.");
         TestAssert.Equal(theme.Text.Secondary, spinner.StoppedValueStyle, "Spinner stopped style should map to Text.Secondary.");
         TestAssert.Equal(theme.Text.Muted, spinner.DisabledValueStyle, "Spinner disabled style should map to Text.Muted.");
+        TestAssert.Equal(theme.Border.Default, spinner.BorderStyleText, "Spinner border style should map to Border.Default.");
+        TestAssert.Equal(theme.Border.Focused.Merge(theme.Focus.Border), spinner.FocusedBorderStyleText, "Spinner focused border style should map to focused border tokens.");
 
         TestAssert.Equal(theme.Text.Secondary, progressBar.TitleStyle, "ProgressBar title style should map to Text.Secondary.");
         TestAssert.Equal(theme.Focus.Title, progressBar.FocusedTitleStyle, "ProgressBar focused title style should map to Focus.Title.");
@@ -78,6 +86,8 @@ internal static partial class ThemeOverridesTests
         TestAssert.Equal(theme.Text.Muted, progressBar.TrackStyle, "ProgressBar track style should map to Text.Muted.");
         TestAssert.Equal(theme.Text.Primary, progressBar.LabelStyle, "ProgressBar label style should map to Text.Primary.");
         TestAssert.Equal(theme.Text.Muted, progressBar.DisabledStyle, "ProgressBar disabled style should map to Text.Muted.");
+        TestAssert.Equal(theme.Border.Default, progressBar.BorderStyleText, "ProgressBar border style should map to Border.Default.");
+        TestAssert.Equal(theme.Border.Focused.Merge(theme.Focus.Border), progressBar.FocusedBorderStyleText, "ProgressBar focused border style should map to focused border tokens.");
 
         TestAssert.Equal(theme.Text.Secondary, numberInput.TitleStyle, "NumberInput title style should map to Text.Secondary.");
         TestAssert.Equal(theme.Focus.Title, numberInput.FocusedTitleStyle, "NumberInput focused title style should map to Focus.Title.");
@@ -116,13 +126,13 @@ internal static partial class ThemeOverridesTests
         var explicitStyle = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(201, 202, 203));
         var theme = BuildInputValueTheme();
 
-        var label = new Label { TextStyle = explicitStyle };
+        var label = new Label { TextStyle = explicitStyle, BorderStyleText = explicitStyle };
         var textInput = new TextInput { BorderStyleText = explicitStyle };
         var textArea = new TextArea { ValueTextStyle = explicitStyle, BorderStyleText = explicitStyle };
-        var toggle = new Toggle { OnValueStyle = explicitStyle };
-        var slider = new Slider { FillStyle = explicitStyle };
-        var spinner = new Spinner { RunningValueStyle = explicitStyle };
-        var progressBar = new ProgressBar { FillStyle = explicitStyle };
+        var toggle = new Toggle { OnValueStyle = explicitStyle, BorderStyleText = explicitStyle };
+        var slider = new Slider { FillStyle = explicitStyle, BorderStyleText = explicitStyle };
+        var spinner = new Spinner { RunningValueStyle = explicitStyle, BorderStyleText = explicitStyle };
+        var progressBar = new ProgressBar { FillStyle = explicitStyle, BorderStyleText = explicitStyle };
         var numberInput = new NumberInput { ValueTextStyle = explicitStyle, BorderStyleText = explicitStyle };
         var datePicker = new DatePicker { SelectedDayStyle = explicitStyle, BorderStyleText = explicitStyle };
         var timePicker = new TimePicker { ActiveFieldStyle = explicitStyle, BorderStyleText = explicitStyle };
@@ -140,6 +150,8 @@ internal static partial class ThemeOverridesTests
 
         TestAssert.Equal(explicitStyle, label.TextStyle, "Defaults should not overwrite explicit Label.TextStyle.");
         TestAssert.Equal(theme.Text.Secondary, label.TitleStyle, "Defaults should fill empty Label.TitleStyle.");
+        TestAssert.Equal(explicitStyle, label.BorderStyleText, "Defaults should not overwrite explicit Label.BorderStyleText.");
+        TestAssert.Equal(theme.Border.Focused.Merge(theme.Focus.Border), label.FocusedBorderStyleText, "Defaults should fill empty Label.FocusedBorderStyleText.");
 
         TestAssert.Equal(explicitStyle, textInput.BorderStyleText, "Defaults should not overwrite explicit TextInput.BorderStyleText.");
         TestAssert.Equal(theme.Border.Focused.Merge(theme.Focus.Border), textInput.FocusedBorderStyleText, "Defaults should fill empty TextInput.FocusedBorderStyleText.");
@@ -151,15 +163,23 @@ internal static partial class ThemeOverridesTests
 
         TestAssert.Equal(explicitStyle, toggle.OnValueStyle, "Defaults should not overwrite explicit Toggle.OnValueStyle.");
         TestAssert.Equal(theme.Text.Secondary, toggle.OffValueStyle, "Defaults should fill empty Toggle.OffValueStyle.");
+        TestAssert.Equal(explicitStyle, toggle.BorderStyleText, "Defaults should not overwrite explicit Toggle.BorderStyleText.");
+        TestAssert.Equal(theme.Border.Focused.Merge(theme.Focus.Border), toggle.FocusedBorderStyleText, "Defaults should fill empty Toggle.FocusedBorderStyleText.");
 
         TestAssert.Equal(explicitStyle, slider.FillStyle, "Defaults should not overwrite explicit Slider.FillStyle.");
         TestAssert.Equal(theme.Text.Muted, slider.TrackStyle, "Defaults should fill empty Slider.TrackStyle.");
+        TestAssert.Equal(explicitStyle, slider.BorderStyleText, "Defaults should not overwrite explicit Slider.BorderStyleText.");
+        TestAssert.Equal(theme.Border.Focused.Merge(theme.Focus.Border), slider.FocusedBorderStyleText, "Defaults should fill empty Slider.FocusedBorderStyleText.");
 
         TestAssert.Equal(explicitStyle, spinner.RunningValueStyle, "Defaults should not overwrite explicit Spinner.RunningValueStyle.");
         TestAssert.Equal(theme.Text.Secondary, spinner.StoppedValueStyle, "Defaults should fill empty Spinner.StoppedValueStyle.");
+        TestAssert.Equal(explicitStyle, spinner.BorderStyleText, "Defaults should not overwrite explicit Spinner.BorderStyleText.");
+        TestAssert.Equal(theme.Border.Focused.Merge(theme.Focus.Border), spinner.FocusedBorderStyleText, "Defaults should fill empty Spinner.FocusedBorderStyleText.");
 
         TestAssert.Equal(explicitStyle, progressBar.FillStyle, "Defaults should not overwrite explicit ProgressBar.FillStyle.");
         TestAssert.Equal(theme.Text.Muted, progressBar.TrackStyle, "Defaults should fill empty ProgressBar.TrackStyle.");
+        TestAssert.Equal(explicitStyle, progressBar.BorderStyleText, "Defaults should not overwrite explicit ProgressBar.BorderStyleText.");
+        TestAssert.Equal(theme.Border.Focused.Merge(theme.Focus.Border), progressBar.FocusedBorderStyleText, "Defaults should fill empty ProgressBar.FocusedBorderStyleText.");
 
         TestAssert.Equal(explicitStyle, numberInput.ValueTextStyle, "Defaults should not overwrite explicit NumberInput.ValueTextStyle.");
         TestAssert.Equal(theme.Text.Secondary, numberInput.SummaryTextStyle, "Defaults should fill empty NumberInput.SummaryTextStyle.");
@@ -185,12 +205,12 @@ internal static partial class ThemeOverridesTests
     private static Task OverrideOverloads_ResolveExpectedTokens_ForLabelAndInputValueWidgets()
     {
         var explicitStyle = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(221, 222, 223));
-        var label = new Label { TextStyle = explicitStyle };
+        var label = new Label { TextStyle = explicitStyle, BorderStyleText = explicitStyle };
         var textInput = new TextInput { BorderStyleText = explicitStyle };
         var textArea = new TextArea { BorderStyleText = explicitStyle };
-        var toggle = new Toggle { ValueStyle = explicitStyle };
+        var toggle = new Toggle { ValueStyle = explicitStyle, BorderStyleText = explicitStyle };
         var slider = new Slider();
-        var spinner = new Spinner { ValueStyle = explicitStyle };
+        var spinner = new Spinner { ValueStyle = explicitStyle, BorderStyleText = explicitStyle };
         var progressBar = new ProgressBar();
         var numberInput = new NumberInput { ValueTextStyle = explicitStyle, BorderStyleText = explicitStyle };
         var datePicker = new DatePicker { BorderStyleText = explicitStyle };
@@ -225,6 +245,8 @@ internal static partial class ThemeOverridesTests
 
         TestAssert.Equal(explicitStyle, label.TextStyle, "Override defaults should not overwrite explicit Label.TextStyle.");
         TestAssert.Equal(typeTheme.Text.Secondary, label.TitleStyle, "Override defaults should fill empty Label.TitleStyle.");
+        TestAssert.Equal(explicitStyle, label.BorderStyleText, "Override defaults should not overwrite explicit Label.BorderStyleText.");
+        TestAssert.Equal(typeTheme.Border.Focused.Merge(typeTheme.Focus.Border), label.FocusedBorderStyleText, "Override defaults should fill empty Label.FocusedBorderStyleText.");
 
         TestAssert.Equal(explicitStyle, textInput.BorderStyleText, "Override defaults should not overwrite explicit TextInput.BorderStyleText.");
         TestAssert.Equal(typeTheme.Border.Focused.Merge(typeTheme.Focus.Border), textInput.FocusedBorderStyleText, "Override defaults should fill empty TextInput.FocusedBorderStyleText.");
@@ -236,15 +258,23 @@ internal static partial class ThemeOverridesTests
 
         TestAssert.Equal(explicitStyle, toggle.ValueStyle, "Override defaults should not overwrite explicit Toggle.ValueStyle.");
         TestAssert.Equal(typeTheme.State.Success, toggle.OnValueStyle, "Override defaults should fill empty Toggle.OnValueStyle.");
+        TestAssert.Equal(explicitStyle, toggle.BorderStyleText, "Override defaults should not overwrite explicit Toggle.BorderStyleText.");
+        TestAssert.Equal(typeTheme.Border.Focused.Merge(typeTheme.Focus.Border), toggle.FocusedBorderStyleText, "Override defaults should fill empty Toggle.FocusedBorderStyleText.");
 
         TestAssert.Equal(typeTheme.Accent.Primary, slider.FillStyle, "Override apply should map Slider.FillStyle.");
         TestAssert.Equal(typeTheme.Text.Muted, slider.TrackStyle, "Override apply should map Slider.TrackStyle.");
+        TestAssert.Equal(typeTheme.Border.Default, slider.BorderStyleText, "Override apply should map Slider.BorderStyleText.");
+        TestAssert.Equal(typeTheme.Border.Focused.Merge(typeTheme.Focus.Border), slider.FocusedBorderStyleText, "Override apply should map Slider focused border style.");
 
         TestAssert.Equal(explicitStyle, spinner.ValueStyle, "Override defaults should not overwrite explicit Spinner.ValueStyle.");
         TestAssert.Equal(typeTheme.Accent.Primary, spinner.RunningValueStyle, "Override defaults should fill empty Spinner.RunningValueStyle.");
+        TestAssert.Equal(explicitStyle, spinner.BorderStyleText, "Override defaults should not overwrite explicit Spinner.BorderStyleText.");
+        TestAssert.Equal(typeTheme.Border.Focused.Merge(typeTheme.Focus.Border), spinner.FocusedBorderStyleText, "Override defaults should fill empty Spinner focused border style.");
 
         TestAssert.Equal(typeTheme.Accent.Primary, progressBar.FillStyle, "Override apply should map ProgressBar.FillStyle.");
         TestAssert.Equal(typeTheme.Text.Muted, progressBar.TrackStyle, "Override apply should map ProgressBar.TrackStyle.");
+        TestAssert.Equal(typeTheme.Border.Default, progressBar.BorderStyleText, "Override apply should map ProgressBar.BorderStyleText.");
+        TestAssert.Equal(typeTheme.Border.Focused.Merge(typeTheme.Focus.Border), progressBar.FocusedBorderStyleText, "Override apply should map ProgressBar focused border style.");
 
         TestAssert.Equal(explicitStyle, numberInput.ValueTextStyle, "Override defaults should not overwrite explicit NumberInput.ValueTextStyle.");
         TestAssert.Equal(typeTheme.Text.Secondary, numberInput.SummaryTextStyle, "Override defaults should fill empty NumberInput.SummaryTextStyle.");
