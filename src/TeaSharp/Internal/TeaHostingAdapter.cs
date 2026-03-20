@@ -26,8 +26,8 @@ internal static class TeaHostingAdapter
             profile.BracketedPaste,
             profile.SynchronizedUpdates,
             profile.ModeReports,
-            profile.Osc50FontControl,
-            profile.Iterm2ProfileSwitch,
+            profile.SupportsOsc50FontRequests,
+            profile.SupportsIterm2ProfileRequests,
             profile.Source);
     }
 
@@ -40,8 +40,8 @@ internal static class TeaHostingAdapter
             profile.BracketedPaste,
             profile.SynchronizedUpdates,
             profile.ModeReports,
-            profile.Osc50FontControl,
-            profile.Iterm2ProfileSwitch,
+            profile.SupportsOsc50FontRequests,
+            profile.SupportsIterm2ProfileRequests,
             profile.Source);
     }
 

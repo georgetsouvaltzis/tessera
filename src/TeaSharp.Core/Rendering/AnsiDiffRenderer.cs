@@ -174,7 +174,9 @@ internal sealed class AnsiDiffRenderer : IProgramRenderer
         var requestedIterm2Profile = SanitizeIterm2Profile(terminal.Iterm2Profile);
         var requestedFontSpec = SanitizeFontSpec(terminal.FontSpec)
             ?? BuildStructuredFontSpec(terminal.FontFamily, terminal.FontSize);
-        if (_capabilities.Iterm2ProfileSwitch)
+        var shouldPreferIterm2Profile = _capabilities.SupportsIterm2ProfileRequests
+            && requestedIterm2Profile is not null;
+        if (_capabilities.SupportsIterm2ProfileRequests)
         {
             if (!string.Equals(_iterm2Profile, requestedIterm2Profile, StringComparison.Ordinal))
             {
@@ -186,12 +188,12 @@ internal sealed class AnsiDiffRenderer : IProgramRenderer
                 _iterm2Profile = requestedIterm2Profile;
             }
         }
-        else if (requestedIterm2Profile is null)
+        else
         {
             _iterm2Profile = null;
         }
 
-        if (!_capabilities.Iterm2ProfileSwitch && _capabilities.Osc50FontControl)
+        if (_capabilities.SupportsOsc50FontRequests && !shouldPreferIterm2Profile)
         {
             if (!string.Equals(_fontSpec, requestedFontSpec, StringComparison.Ordinal))
             {
@@ -203,7 +205,7 @@ internal sealed class AnsiDiffRenderer : IProgramRenderer
                 _fontSpec = requestedFontSpec;
             }
         }
-        else if (requestedFontSpec is null)
+        else
         {
             _fontSpec = null;
         }

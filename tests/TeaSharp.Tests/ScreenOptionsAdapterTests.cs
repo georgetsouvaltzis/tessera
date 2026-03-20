@@ -106,14 +106,14 @@ internal static class ScreenOptionsAdapterTests
             BracketedPaste: true,
             SynchronizedUpdates: true,
             ModeReports: true,
-            Osc50FontControl: false,
-            Iterm2ProfileSwitch: true,
+            SupportsOsc50FontRequests: false,
+            SupportsIterm2ProfileRequests: true,
             Source: "hosting");
 
         var coreProfile = hostingProfile.ToCore();
 
-        TestAssert.True(!coreProfile.Osc50FontControl, "Hosting profile should map Osc50FontControl to core.");
-        TestAssert.True(coreProfile.Iterm2ProfileSwitch, "Hosting profile should map Iterm2ProfileSwitch to core.");
+        TestAssert.True(!coreProfile.SupportsOsc50FontRequests, "Hosting profile should map SupportsOsc50FontRequests to core.");
+        TestAssert.True(coreProfile.SupportsIterm2ProfileRequests, "Hosting profile should map SupportsIterm2ProfileRequests to core.");
         return Task.CompletedTask;
     }
 
@@ -125,14 +125,14 @@ internal static class ScreenOptionsAdapterTests
             BracketedPaste: true,
             SynchronizedUpdates: true,
             ModeReports: true,
-            Osc50FontControl: false,
-            Iterm2ProfileSwitch: true,
+            SupportsOsc50FontRequests: false,
+            SupportsIterm2ProfileRequests: true,
             Source: "core");
 
         var hostingProfile = coreProfile.AsHosting();
 
-        TestAssert.True(!hostingProfile.Osc50FontControl, "Core profile should map Osc50FontControl to hosting.");
-        TestAssert.True(hostingProfile.Iterm2ProfileSwitch, "Core profile should map Iterm2ProfileSwitch to hosting.");
+        TestAssert.True(!hostingProfile.SupportsOsc50FontRequests, "Core profile should map SupportsOsc50FontRequests to hosting.");
+        TestAssert.True(hostingProfile.SupportsIterm2ProfileRequests, "Core profile should map SupportsIterm2ProfileRequests to hosting.");
         return Task.CompletedTask;
     }
 }

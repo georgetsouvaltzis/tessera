@@ -56,8 +56,8 @@ internal static class TerminalCapabilityDetector
                 BracketedPaste: false,
                 SynchronizedUpdates: false,
                 ModeReports: false,
-                Osc50FontControl: false,
-                Iterm2ProfileSwitch: false,
+                SupportsOsc50FontRequests: false,
+                SupportsIterm2ProfileRequests: false,
                 Source: "env:TERM=dumb");
         }
 
@@ -71,8 +71,8 @@ internal static class TerminalCapabilityDetector
                 BracketedPaste: false,
                 SynchronizedUpdates: false,
                 ModeReports: false,
-                Osc50FontControl: false,
-                Iterm2ProfileSwitch: false,
+                SupportsOsc50FontRequests: false,
+                SupportsIterm2ProfileRequests: false,
                 Source: $"env:TERM={termLower}");
         }
 
@@ -84,8 +84,8 @@ internal static class TerminalCapabilityDetector
                 BracketedPaste: true,
                 SynchronizedUpdates: true,
                 ModeReports: true,
-                Osc50FontControl: false,
-                Iterm2ProfileSwitch: true,
+                SupportsOsc50FontRequests: false,
+                SupportsIterm2ProfileRequests: true,
                 Source: "env:TERM_PROGRAM=iTerm.app");
         }
 
@@ -97,8 +97,8 @@ internal static class TerminalCapabilityDetector
                 BracketedPaste: true,
                 SynchronizedUpdates: false,
                 ModeReports: true,
-                Osc50FontControl: false,
-                Iterm2ProfileSwitch: false,
+                SupportsOsc50FontRequests: false,
+                SupportsIterm2ProfileRequests: false,
                 Source: "env:TERM_PROGRAM=Apple_Terminal");
         }
 
@@ -110,16 +110,16 @@ internal static class TerminalCapabilityDetector
                 BracketedPaste: true,
                 SynchronizedUpdates: true,
                 ModeReports: true,
-                Osc50FontControl: false,
-                Iterm2ProfileSwitch: false,
+                SupportsOsc50FontRequests: false,
+                SupportsIterm2ProfileRequests: false,
                 Source: $"env:TERM_PROGRAM={termProgramLower}");
         }
 
         if (!string.IsNullOrWhiteSpace(wtSession))
         {
             return new TerminalCapabilityProfile(
-                Osc50FontControl: false,
-                Iterm2ProfileSwitch: false,
+                SupportsOsc50FontRequests: false,
+                SupportsIterm2ProfileRequests: false,
                 Source: "env:WT_SESSION");
         }
 
@@ -128,27 +128,24 @@ internal static class TerminalCapabilityDetector
             || termLower.Contains("kitty", StringComparison.Ordinal))
         {
             return new TerminalCapabilityProfile(
-                Osc50FontControl: false,
-                Iterm2ProfileSwitch: false,
+                SupportsOsc50FontRequests: false,
+                SupportsIterm2ProfileRequests: false,
                 Source: $"env:TERM={termLower}");
         }
 
         if (termLower.Contains("xterm", StringComparison.Ordinal)
-            || termLower.Contains("screen", StringComparison.Ordinal)
-            || termLower.Contains("tmux", StringComparison.Ordinal)
-            || termLower.Contains("alacritty", StringComparison.Ordinal)
             || termLower.Contains("rxvt", StringComparison.Ordinal))
         {
             return new TerminalCapabilityProfile(
-                Osc50FontControl: true,
-                Iterm2ProfileSwitch: false,
+                SupportsOsc50FontRequests: true,
+                SupportsIterm2ProfileRequests: false,
                 Source: $"env:TERM={termLower}");
         }
 
         return TerminalCapabilityProfile.AllSupported with
         {
-            Osc50FontControl = false,
-            Iterm2ProfileSwitch = false,
+            SupportsOsc50FontRequests = false,
+            SupportsIterm2ProfileRequests = false,
             Source = "assumed-supported",
         };
     }
@@ -173,8 +170,8 @@ internal static class TerminalCapabilityDetector
             BracketedPaste = profile.BracketedPaste || (hasBd && hasBe) || hasXt,
             SynchronizedUpdates = profile.SynchronizedUpdates || hasSync,
             ModeReports = profile.ModeReports || hasXt || hasXm,
-            Osc50FontControl = profile.Osc50FontControl,
-            Iterm2ProfileSwitch = profile.Iterm2ProfileSwitch,
+            SupportsOsc50FontRequests = profile.SupportsOsc50FontRequests,
+            SupportsIterm2ProfileRequests = profile.SupportsIterm2ProfileRequests,
         };
 
         var changed = next.FocusReporting != profile.FocusReporting
@@ -182,8 +179,8 @@ internal static class TerminalCapabilityDetector
             || next.BracketedPaste != profile.BracketedPaste
             || next.SynchronizedUpdates != profile.SynchronizedUpdates
             || next.ModeReports != profile.ModeReports
-            || next.Osc50FontControl != profile.Osc50FontControl
-            || next.Iterm2ProfileSwitch != profile.Iterm2ProfileSwitch;
+            || next.SupportsOsc50FontRequests != profile.SupportsOsc50FontRequests
+            || next.SupportsIterm2ProfileRequests != profile.SupportsIterm2ProfileRequests;
 
         if (!changed)
         {
@@ -225,8 +222,8 @@ internal static class TerminalCapabilityDetector
                 "paste" => next with { BracketedPaste = enabled },
                 "sync" => next with { SynchronizedUpdates = enabled },
                 "decrpm" or "mode_reports" or "mode-reports" => next with { ModeReports = enabled },
-                "osc50" or "font_osc50" or "font-osc50" => next with { Osc50FontControl = enabled },
-                "iterm2_profile" or "iterm2-profile" or "iterm_profile" or "iterm-profile" => next with { Iterm2ProfileSwitch = enabled },
+                "osc50" or "font_osc50" or "font-osc50" or "supports_osc50_font_requests" or "supports-osc50-font-requests" => next with { SupportsOsc50FontRequests = enabled },
+                "iterm2_profile" or "iterm2-profile" or "iterm_profile" or "iterm-profile" or "supports_iterm2_profile_requests" or "supports-iterm2-profile-requests" => next with { SupportsIterm2ProfileRequests = enabled },
                 _ => next,
             };
         }
