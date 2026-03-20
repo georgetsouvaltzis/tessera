@@ -19,6 +19,7 @@ public sealed class ContextMenu : Control
     private int _cachedItemWidth = 12;
     private long _executionVersion;
     private long _consumedExecutionVersion;
+    private ContextMenuGlyphSet _glyphs = ContextMenuGlyphSet.Default;
 
     /// <summary>
     /// Occurs when a menu item is executed.
@@ -78,7 +79,20 @@ public sealed class ContextMenu : Control
     /// <summary>
     /// Gets or sets row marker glyphs used for rendering.
     /// </summary>
-    public ContextMenuGlyphSet Glyphs { get; set; } = ContextMenuGlyphSet.Default;
+    public ContextMenuGlyphSet Glyphs
+    {
+        get => _glyphs;
+        set
+        {
+            if (_glyphs == value)
+            {
+                return;
+            }
+
+            _glyphs = value;
+            RebuildItemRenderCache();
+        }
+    }
 
     public bool IsVisible { get; private set; }
 
@@ -324,7 +338,7 @@ public sealed class ContextMenu : Control
         var rows = Math.Min(content.Height, _items.Count);
         for (var index = 0; index < rows; index++)
         {
-            var rowText = ResolveRowText(index);
+            var rowText = ResolveRowText(_itemRenderCache[index], index);
             canvas.WriteText(
                 content.X,
                 content.Y + index,
@@ -463,8 +477,9 @@ public sealed class ContextMenu : Control
         for (var index = 0; index < _items.Count; index++)
         {
             var item = _items[index];
-            _itemRenderCache.Add(ContextMenuRenderCache.Create(item.Title));
-            width = Math.Max(width, ResolveMinimumRowWidth(item.Title));
+            var cache = ContextMenuRenderCache.Create(item.Title, _glyphs);
+            _itemRenderCache.Add(cache);
+            width = Math.Max(width, cache.MinimumRowWidth);
         }
 
         _cachedItemWidth = width;
@@ -473,10 +488,6 @@ public sealed class ContextMenu : Control
     private int ResolvePreferredWidth()
     {
         var width = Math.Max(12, _cachedItemWidth);
-        for (var index = 0; index < _itemRenderCache.Count; index++)
-        {
-            width = Math.Max(width, ResolveMinimumRowWidth(_itemRenderCache[index].Title));
-        }
 
         if (Border != BorderStyle.None)
         {
@@ -488,25 +499,29 @@ public sealed class ContextMenu : Control
         return width;
     }
 
-    private string ResolveRowText(int index)
+    private string ResolveRowText(ContextMenuRenderCache row, int index)
     {
-        var row = _itemRenderCache[index];
-        var marker = index == _selectedIndex
-            ? Glyphs.SelectedRowMarker
-            : index == _hoveredIndex
-                ? Glyphs.HoveredRowMarker
-                : Glyphs.NormalRowMarker;
-        return string.Concat(marker, Glyphs.MarkerSeparator, row.Title);
+        if (index == _selectedIndex)
+        {
+            return row.SelectedRowText;
+        }
+
+        if (index == _hoveredIndex)
+        {
+            return row.HoveredRowText;
+        }
+
+        return row.NormalRowText;
     }
 
-    private int ResolveMinimumRowWidth(string title)
+    private static int ResolveMinimumRowWidth(string title, ContextMenuGlyphSet glyphs)
     {
         var markerWidth = Math.Max(
-            ControlTextLayout.MeasureDisplayWidth(Glyphs.NormalRowMarker),
+            ControlTextLayout.MeasureDisplayWidth(glyphs.NormalRowMarker),
             Math.Max(
-                ControlTextLayout.MeasureDisplayWidth(Glyphs.SelectedRowMarker),
-                ControlTextLayout.MeasureDisplayWidth(Glyphs.HoveredRowMarker)));
-        return markerWidth + ControlTextLayout.MeasureDisplayWidth(Glyphs.MarkerSeparator) + ControlTextLayout.MeasureDisplayWidth(title) + 2;
+                ControlTextLayout.MeasureDisplayWidth(glyphs.SelectedRowMarker),
+                ControlTextLayout.MeasureDisplayWidth(glyphs.HoveredRowMarker)));
+        return markerWidth + ControlTextLayout.MeasureDisplayWidth(glyphs.MarkerSeparator) + ControlTextLayout.MeasureDisplayWidth(title) + 2;
     }
 
     private void ExecuteItem(int index)
@@ -518,11 +533,22 @@ public sealed class ContextMenu : Control
         Close();
     }
 
-    private readonly record struct ContextMenuRenderCache(string Title)
+    private readonly record struct ContextMenuRenderCache(
+        string Title,
+        string NormalRowText,
+        string SelectedRowText,
+        string HoveredRowText,
+        int MinimumRowWidth)
     {
-        public static ContextMenuRenderCache Create(string title)
+        public static ContextMenuRenderCache Create(string title, ContextMenuGlyphSet glyphs)
         {
-            return new ContextMenuRenderCache(title ?? string.Empty);
+            var safeTitle = title ?? string.Empty;
+            return new ContextMenuRenderCache(
+                safeTitle,
+                string.Concat(glyphs.NormalRowMarker, glyphs.MarkerSeparator, safeTitle),
+                string.Concat(glyphs.SelectedRowMarker, glyphs.MarkerSeparator, safeTitle),
+                string.Concat(glyphs.HoveredRowMarker, glyphs.MarkerSeparator, safeTitle),
+                ResolveMinimumRowWidth(safeTitle, glyphs));
         }
     }
 }

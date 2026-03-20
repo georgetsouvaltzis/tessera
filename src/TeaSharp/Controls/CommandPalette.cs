@@ -23,6 +23,7 @@ public sealed class CommandPalette : Control
     private string _lastFilter = string.Empty;
     private long _executionVersion;
     private long _consumedExecutionVersion;
+    private CommandPaletteGlyphSet _glyphs = CommandPaletteGlyphSet.Default;
 
     /// <summary>
     /// Occurs when a command is executed from the current filtered selection.
@@ -113,7 +114,21 @@ public sealed class CommandPalette : Control
     /// <summary>
     /// Gets or sets glyphs used for query prompt and row markers.
     /// </summary>
-    public CommandPaletteGlyphSet Glyphs { get; set; } = CommandPaletteGlyphSet.Default;
+    public CommandPaletteGlyphSet Glyphs
+    {
+        get => _glyphs;
+        set
+        {
+            if (_glyphs == value)
+            {
+                return;
+            }
+
+            _glyphs = value;
+            RebuildItemRenderCache();
+            RefreshFilter();
+        }
+    }
 
     /// <summary>
     /// Gets or sets the frame border style for the overlay panel.
@@ -394,7 +409,7 @@ public sealed class CommandPalette : Control
         for (var filteredIndex = start; filteredIndex < end; filteredIndex++, row++)
         {
             var itemIndex = _filteredIndices[filteredIndex];
-            var rowText = ResolveRowText(itemIndex, filteredIndex);
+            var rowText = ResolveRowText(_itemRenderCache[itemIndex], filteredIndex);
             canvas.WriteText(content.X, content.Y + 1 + row, ApplyStyle(rowText, ResolveItemStyle(filteredIndex)), content.Width);
         }
     }
@@ -503,7 +518,7 @@ public sealed class CommandPalette : Control
         for (var index = 0; index < _items.Count; index++)
         {
             var item = _items[index];
-            _itemRenderCache.Add(CommandPaletteRenderCache.Create(item));
+            _itemRenderCache.Add(CommandPaletteRenderCache.Create(item, _glyphs));
             _allItemIndices.Add(index);
         }
 
@@ -511,15 +526,19 @@ public sealed class CommandPalette : Control
         _lastFilter = string.Empty;
     }
 
-    private string ResolveRowText(int itemIndex, int filteredIndex)
+    private string ResolveRowText(CommandPaletteRenderCache row, int filteredIndex)
     {
-        var row = _itemRenderCache[itemIndex];
-        var marker = filteredIndex == _selectedFilteredIndex
-            ? Glyphs.SelectedRowMarker
-            : filteredIndex == _hoveredFilteredIndex
-                ? Glyphs.HoveredRowMarker
-                : Glyphs.NormalRowMarker;
-        return string.Concat(marker, Glyphs.MarkerSeparator, row.Summary);
+        if (filteredIndex == _selectedFilteredIndex)
+        {
+            return row.SelectedRowText;
+        }
+
+        if (filteredIndex == _hoveredFilteredIndex)
+        {
+            return row.HoveredRowText;
+        }
+
+        return row.NormalRowText;
     }
 
     private bool ExecuteSelected()
@@ -597,12 +616,12 @@ public sealed class CommandPalette : Control
 
     private string ResolveQueryPrompt()
     {
-        if (string.IsNullOrEmpty(Glyphs.QueryPrompt))
+        if (string.IsNullOrEmpty(_glyphs.QueryPrompt))
         {
             return string.Empty;
         }
 
-        return string.Concat(Glyphs.QueryPrompt, Glyphs.MarkerSeparator);
+        return string.Concat(_glyphs.QueryPrompt, _glyphs.MarkerSeparator);
     }
 
     private string FormatTitleText()
@@ -674,15 +693,25 @@ public sealed class CommandPalette : Control
         return style.IsEmpty ? text : style.Render(text);
     }
 
-    private readonly record struct CommandPaletteRenderCache(string SearchText, string Summary)
+    private readonly record struct CommandPaletteRenderCache(
+        string SearchText,
+        string Summary,
+        string NormalRowText,
+        string SelectedRowText,
+        string HoveredRowText)
     {
-        public static CommandPaletteRenderCache Create(CommandPaletteItem item)
+        public static CommandPaletteRenderCache Create(CommandPaletteItem item, CommandPaletteGlyphSet glyphs)
         {
             var summary = string.IsNullOrWhiteSpace(item.Description)
                 ? item.Title
                 : string.Concat(item.Title, " - ", item.Description);
             var search = string.Concat(item.Title, "\n", item.Description, "\n", item.Id);
-            return new CommandPaletteRenderCache(search, summary);
+            return new CommandPaletteRenderCache(
+                search,
+                summary,
+                string.Concat(glyphs.NormalRowMarker, glyphs.MarkerSeparator, summary),
+                string.Concat(glyphs.SelectedRowMarker, glyphs.MarkerSeparator, summary),
+                string.Concat(glyphs.HoveredRowMarker, glyphs.MarkerSeparator, summary));
         }
     }
 }
