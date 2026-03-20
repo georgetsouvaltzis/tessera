@@ -12,8 +12,8 @@ internal static class TerminalCapabilityDetectorTests
         yield return new TestCase("CapabilityDetector_TERM_Dumb_DisablesAdvancedModes", TermDumb_DisablesAdvancedModes);
         yield return new TestCase("CapabilityDetector_AppleTerminal_DisablesSyncUpdates", AppleTerminal_DisablesSyncUpdates);
         yield return new TestCase("CapabilityDetector_Xterm_EnablesAllModes", Xterm_EnablesAllModes);
-        yield return new TestCase("CapabilityDetector_ITerm2_PrefersProfileSwitchAndDisablesOsc50", ITerm2_PrefersProfileSwitchAndDisablesOsc50);
-        yield return new TestCase("CapabilityDetector_ModernTerminals_DisableUnsupportedOsc50", ModernTerminals_DisableUnsupportedOsc50);
+        yield return new TestCase("CapabilityDetector_Matrix_FontControlFlags_ForKnownTerminals", Matrix_FontControlFlags_ForKnownTerminals);
+        yield return new TestCase("CapabilityDetector_HostEnvironment_Ghostty_EvidenceHook", HostEnvironment_Ghostty_EvidenceHook);
         yield return new TestCase("CapabilityDetector_TerminfoEnrichesLinuxMouse", TerminfoEnrichesLinuxMouse);
         yield return new TestCase("CapabilityDetector_TerminfoEnrichesVt100Extensions", TerminfoEnrichesVt100Extensions);
         yield return new TestCase("CapabilityDetector_EnvOverride_AppliesCaps", EnvOverride_AppliesCaps);
@@ -70,29 +70,74 @@ internal static class TerminalCapabilityDetectorTests
         return Task.CompletedTask;
     }
 
-    private static Task ITerm2_PrefersProfileSwitchAndDisablesOsc50()
+    private static Task Matrix_FontControlFlags_ForKnownTerminals()
     {
-        var profile = Detect(
-            ("TERM", "xterm-256color"),
-            ("TERM_PROGRAM", "iTerm.app"));
+        var cases = new[]
+        {
+            new
+            {
+                Name = "iTerm2",
+                Env = new (string Name, string? Value)[] { ("TERM", "xterm-256color"), ("TERM_PROGRAM", "iTerm.app"), ("WT_SESSION", null) },
+                ExpectedOsc50 = false,
+                ExpectedIterm2 = true,
+            },
+            new
+            {
+                Name = "WezTerm",
+                Env = new (string Name, string? Value)[] { ("TERM", "xterm-256color"), ("TERM_PROGRAM", "WezTerm"), ("WT_SESSION", null) },
+                ExpectedOsc50 = false,
+                ExpectedIterm2 = false,
+            },
+            new
+            {
+                Name = "Ghostty",
+                Env = new (string Name, string? Value)[] { ("TERM", "xterm-ghostty"), ("TERM_PROGRAM", null), ("WT_SESSION", null) },
+                ExpectedOsc50 = false,
+                ExpectedIterm2 = false,
+            },
+            new
+            {
+                Name = "Kitty",
+                Env = new (string Name, string? Value)[] { ("TERM", "xterm-kitty"), ("TERM_PROGRAM", null), ("WT_SESSION", null) },
+                ExpectedOsc50 = false,
+                ExpectedIterm2 = false,
+            },
+            new
+            {
+                Name = "WindowsTerminal",
+                Env = new (string Name, string? Value)[] { ("TERM", "xterm-256color"), ("TERM_PROGRAM", null), ("WT_SESSION", "1") },
+                ExpectedOsc50 = false,
+                ExpectedIterm2 = false,
+            },
+        };
 
-        TestAssert.True(profile.SupportsOsc50FontRequests is false, "iTerm2 should disable OSC 50 font control.");
-        TestAssert.True(profile.SupportsIterm2ProfileRequests, "iTerm2 should enable profile switching.");
+        foreach (var item in cases)
+        {
+            var profile = Detect(item.Env);
+            TestAssert.True(
+                profile.SupportsOsc50FontRequests == item.ExpectedOsc50,
+                $"{item.Name} should set SupportsOsc50FontRequests={item.ExpectedOsc50}.");
+            TestAssert.True(
+                profile.SupportsIterm2ProfileRequests == item.ExpectedIterm2,
+                $"{item.Name} should set SupportsIterm2ProfileRequests={item.ExpectedIterm2}.");
+        }
+
         return Task.CompletedTask;
     }
 
-    private static Task ModernTerminals_DisableUnsupportedOsc50()
+    private static Task HostEnvironment_Ghostty_EvidenceHook()
     {
-        var ghostty = Detect(("TERM", "xterm-ghostty"));
-        var wezterm = Detect(("TERM_PROGRAM", "WezTerm"), ("TERM", "xterm-256color"));
-        var windowsTerminal = Detect(("WT_SESSION", "1"), ("TERM", "xterm-256color"));
-        var kitty = Detect(("TERM", "xterm-kitty"));
+        var termLower = (Environment.GetEnvironmentVariable("TERM") ?? string.Empty).Trim().ToLowerInvariant();
+        var termProgramLower = (Environment.GetEnvironmentVariable("TERM_PROGRAM") ?? string.Empty).Trim().ToLowerInvariant();
+        var isGhosttyHost = termLower.Contains("ghostty", StringComparison.Ordinal) || termProgramLower == "ghostty";
+        if (!isGhosttyHost)
+        {
+            return Task.CompletedTask;
+        }
 
-        TestAssert.True(!ghostty.SupportsOsc50FontRequests, "Ghostty should disable unsupported OSC 50 font control.");
-        TestAssert.True(!wezterm.SupportsOsc50FontRequests, "WezTerm should disable unsupported OSC 50 font control.");
-        TestAssert.True(!windowsTerminal.SupportsOsc50FontRequests, "Windows Terminal should disable unsupported OSC 50 font control.");
-        TestAssert.True(!kitty.SupportsOsc50FontRequests, "Kitty should disable unsupported OSC 50 font control.");
-        TestAssert.True(!kitty.SupportsIterm2ProfileRequests, "Kitty should not enable iTerm2 profile switching.");
+        var profile = TerminalCapabilityDetector.Detect();
+        TestAssert.True(!profile.SupportsOsc50FontRequests, "Ghostty host should disable unsupported OSC 50 font control.");
+        TestAssert.True(!profile.SupportsIterm2ProfileRequests, "Ghostty host should not enable iTerm2 profile switching.");
         return Task.CompletedTask;
     }
 
