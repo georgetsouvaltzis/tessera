@@ -6,11 +6,11 @@ using TeaSharp.Styles;
 namespace TeaSharp.Controls;
 
 /// <summary>
-/// Represents a centered empty-state surface with optional primary action.
+/// Represents a centered empty-data surface with optional action affordance.
 /// </summary>
 public sealed class EmptyState : Control
 {
-    private bool _isActionHovered;
+    private bool _hovered;
 
     /// <summary>
     /// Occurs when the action is activated.
@@ -18,7 +18,12 @@ public sealed class EmptyState : Control
     public event EventHandler? Activated;
 
     /// <summary>
-    /// Gets or sets the primary title.
+    /// Occurs when the action is activated.
+    /// </summary>
+    public event EventHandler? ActionInvoked;
+
+    /// <summary>
+    /// Gets or sets the title text.
     /// </summary>
     public string Title
     {
@@ -27,7 +32,7 @@ public sealed class EmptyState : Control
     } = "Nothing here yet";
 
     /// <summary>
-    /// Gets or sets the body message.
+    /// Gets or sets the body text.
     /// </summary>
     public string Description
     {
@@ -36,7 +41,16 @@ public sealed class EmptyState : Control
     } = "There is no data to display.";
 
     /// <summary>
-    /// Gets or sets the optional hint text.
+    /// Gets or sets the body text.
+    /// </summary>
+    public string Body
+    {
+        get => Description;
+        set => Description = value;
+    }
+
+    /// <summary>
+    /// Gets or sets optional hint text.
     /// </summary>
     public string Hint
     {
@@ -45,7 +59,7 @@ public sealed class EmptyState : Control
     } = string.Empty;
 
     /// <summary>
-    /// Gets or sets the action text.
+    /// Gets or sets action label text.
     /// </summary>
     public string ActionText
     {
@@ -54,12 +68,21 @@ public sealed class EmptyState : Control
     } = "Retry";
 
     /// <summary>
-    /// Gets or sets a value indicating whether the primary action should be rendered.
+    /// Gets or sets action label text.
+    /// </summary>
+    public string ActionLabel
+    {
+        get => ActionText;
+        set => ActionText = value;
+    }
+
+    /// <summary>
+    /// Gets or sets whether the action is visible and interactive.
     /// </summary>
     public bool ShowAction { get; set; } = true;
 
     /// <summary>
-    /// Gets or sets the marker shown in the title while focused.
+    /// Gets or sets focus marker text.
     /// </summary>
     public string FocusMarker
     {
@@ -68,105 +91,117 @@ public sealed class EmptyState : Control
     } = "*";
 
     /// <summary>
-    /// Gets or sets a value indicating whether the focus marker should be rendered in the title.
+    /// Gets or sets whether focus marker should render while focused.
     /// </summary>
     public bool ShowFocusMarker { get; set; } = true;
 
     /// <summary>
-    /// Gets or sets the title style when not focused.
+    /// Gets or sets default text style.
     /// </summary>
-    public TeaStyle TitleStyle { get; set; } = TeaStyle.Empty;
+    public TeaStyle DefaultStyle { get; set; } = TeaStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the title style when focused.
+    /// Gets or sets focused text style.
     /// </summary>
-    public TeaStyle FocusedTitleStyle { get; set; } = TeaStyle.Empty;
+    public TeaStyle FocusedStyle { get; set; } = TeaStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the body style.
+    /// Gets or sets hovered text style.
     /// </summary>
-    public TeaStyle DescriptionStyle { get; set; } = TeaStyle.Empty;
+    public TeaStyle HoveredStyle { get; set; } = TeaStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the hint style.
+    /// Gets or sets disabled text style.
     /// </summary>
-    public TeaStyle HintStyle { get; set; } = TeaStyle.Empty;
+    public TeaStyle DisabledStyle { get; set; } = TeaStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the action style.
+    /// Gets or sets action text style.
     /// </summary>
     public TeaStyle ActionStyle { get; set; } = TeaStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the action style while focused.
+    /// Gets or sets title style.
+    /// </summary>
+    public TeaStyle TitleStyle { get; set; } = TeaStyle.Empty;
+
+    /// <summary>
+    /// Gets or sets focused title style.
+    /// </summary>
+    public TeaStyle FocusedTitleStyle { get; set; } = TeaStyle.Empty;
+
+    /// <summary>
+    /// Gets or sets body style.
+    /// </summary>
+    public TeaStyle DescriptionStyle { get; set; } = TeaStyle.Empty;
+
+    /// <summary>
+    /// Gets or sets hint style.
+    /// </summary>
+    public TeaStyle HintStyle { get; set; } = TeaStyle.Empty;
+
+    /// <summary>
+    /// Gets or sets focused action style.
     /// </summary>
     public TeaStyle FocusedActionStyle { get; set; } = TeaStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the action style while hovered.
+    /// Gets or sets hovered action style.
     /// </summary>
     public TeaStyle HoveredActionStyle { get; set; } = TeaStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the style merged while disabled.
+    /// Gets whether pointer is inside control bounds.
     /// </summary>
-    public TeaStyle DisabledStyle { get; set; } = TeaStyle.Empty;
+    public bool IsHovered => _hovered;
 
     internal override bool CanFocus => ShowAction && !IsDisabled;
 
+    /// <inheritdoc />
     public override bool Handle(Message message)
     {
-        if (IsDisabled || !ShowAction || !IsFocused || message is not KeyPressed key)
+        if (IsDisabled || !HasAction() || !IsFocused || message is not KeyPressed key)
         {
             return false;
         }
 
-        if (key.Is(Key.Enter) || key.IsCharacter(' '))
+        if (!key.Is(Key.Enter) && !key.IsCharacter(' '))
         {
-            Activated?.Invoke(this, EventArgs.Empty);
+            return false;
+        }
+
+        RaiseActivated();
+        return true;
+    }
+
+    /// <inheritdoc />
+    public override bool Handle(Message message, Rect bounds)
+    {
+        if (message is not PointerInput pointer || IsDisabled || !HasAction())
+        {
+            return Handle(message);
+        }
+
+        if (bounds.IsEmpty || pointer.Kind == PointerEventKind.Wheel)
+        {
+            return Handle(message);
+        }
+
+        var inside = bounds.Contains(pointer.X, pointer.Y);
+        var changed = pointer.Kind is PointerEventKind.Motion or PointerEventKind.Press or PointerEventKind.Release
+            ? SetHovered(inside)
+            : false;
+        if (pointer.Kind == PointerEventKind.Press && pointer.Button == PointerButton.Left && inside)
+        {
+            IsFocused = true;
+            RaiseActivated();
             return true;
         }
 
-        return false;
+        return changed || Handle(message);
     }
 
-    public override bool Handle(Message message, Rect bounds)
-    {
-        if (message is not PointerInput pointer || !ShowAction || IsDisabled)
-        {
-            return Handle(message);
-        }
-
-        var actionRect = ResolveActionRect(bounds);
-        if (actionRect.IsEmpty)
-        {
-            return Handle(message);
-        }
-
-        if (pointer.Kind == PointerEventKind.Wheel)
-        {
-            return Handle(message);
-        }
-
-        var contains = actionRect.Contains(pointer.X, pointer.Y);
-        if (pointer.Kind is PointerEventKind.Motion or PointerEventKind.Press)
-        {
-            var hoverChanged = _isActionHovered != contains;
-            _isActionHovered = contains;
-
-            if (pointer.Kind == PointerEventKind.Press && contains && pointer.Button == PointerButton.Left)
-            {
-                IsFocused = true;
-                Activated?.Invoke(this, EventArgs.Empty);
-                return true;
-            }
-
-            return hoverChanged;
-        }
-
-        return false;
-    }
-
+    /// <inheritdoc />
     public override void Render(Canvas canvas, Rect rect)
     {
         var clipped = Rect.Intersect(rect, canvas.Bounds);
@@ -202,28 +237,30 @@ public sealed class EmptyState : Control
 
     private List<(string Text, TeaStyle Style)> BuildLines()
     {
-        var lines = new List<(string Text, TeaStyle Style)>(4)
+        var lines = new List<(string Text, TeaStyle Style)>
         {
             (RenderTitle(), ResolveTitleStyle()),
         };
 
         if (!string.IsNullOrWhiteSpace(Description))
         {
-            lines.Add((Description, ResolveDescriptionStyle()));
+            lines.Add((Description, MergeStateStyle(DescriptionStyle)));
         }
 
         if (!string.IsNullOrWhiteSpace(Hint))
         {
-            lines.Add((Hint, ResolveHintStyle()));
+            lines.Add((Hint, MergeStateStyle(HintStyle)));
         }
 
-        if (ShowAction && !string.IsNullOrWhiteSpace(ActionText))
+        if (HasAction())
         {
             lines.Add((RenderActionText(), ResolveActionStyle()));
         }
 
         return lines;
     }
+
+    private bool HasAction() => ShowAction && !string.IsNullOrWhiteSpace(ActionText);
 
     private string RenderTitle()
     {
@@ -235,25 +272,12 @@ public sealed class EmptyState : Control
         return $"{Title} {FocusMarker}";
     }
 
-    private string RenderActionText()
-    {
-        return $"[{ActionText}]";
-    }
+    private string RenderActionText() => $"[{ActionText}]";
 
     private TeaStyle ResolveTitleStyle()
     {
-        var style = IsFocused ? FocusedTitleStyle : TitleStyle;
-        return MergeDisabledStyle(style);
-    }
-
-    private TeaStyle ResolveDescriptionStyle()
-    {
-        return MergeDisabledStyle(DescriptionStyle);
-    }
-
-    private TeaStyle ResolveHintStyle()
-    {
-        return MergeDisabledStyle(HintStyle);
+        var style = IsFocused && !FocusedTitleStyle.IsEmpty ? FocusedTitleStyle : TitleStyle;
+        return MergeStateStyle(style);
     }
 
     private TeaStyle ResolveActionStyle()
@@ -264,45 +288,55 @@ public sealed class EmptyState : Control
             style = style.IsEmpty ? FocusedActionStyle : style.Merge(FocusedActionStyle);
         }
 
-        if (_isActionHovered && !HoveredActionStyle.IsEmpty)
+        if (_hovered && !HoveredActionStyle.IsEmpty)
         {
             style = style.IsEmpty ? HoveredActionStyle : style.Merge(HoveredActionStyle);
         }
 
-        return MergeDisabledStyle(style);
+        return MergeStateStyle(style);
     }
 
-    private TeaStyle MergeDisabledStyle(TeaStyle style)
+    private TeaStyle MergeStateStyle(TeaStyle localStyle)
     {
-        if (!IsDisabled || DisabledStyle.IsEmpty)
+        var style = DefaultStyle;
+        if (IsFocused)
+        {
+            style = style.Merge(FocusedStyle);
+        }
+
+        if (_hovered)
+        {
+            style = style.Merge(HoveredStyle);
+        }
+
+        if (IsDisabled)
+        {
+            style = style.Merge(DisabledStyle);
+        }
+
+        if (localStyle.IsEmpty)
         {
             return style;
         }
 
-        return style.IsEmpty ? DisabledStyle : style.Merge(DisabledStyle);
+        return style.IsEmpty ? localStyle : style.Merge(localStyle);
     }
 
-    private Rect ResolveActionRect(Rect bounds)
+    private bool SetHovered(bool hovered)
     {
-        var clipped = Rect.Intersect(bounds, bounds);
-        if (clipped.IsEmpty || !ShowAction || string.IsNullOrWhiteSpace(ActionText))
+        if (_hovered == hovered)
         {
-            return new Rect(0, 0, 0, 0);
+            return false;
         }
 
-        var lines = BuildLines();
-        var actionLineIndex = lines.Count - 1;
-        var startY = clipped.Y + Math.Max(0, (clipped.Height - lines.Count) / 2);
-        var y = startY + actionLineIndex;
-        if (y < clipped.Y || y >= clipped.Bottom)
-        {
-            return new Rect(0, 0, 0, 0);
-        }
+        _hovered = hovered;
+        return true;
+    }
 
-        var actionText = RenderActionText();
-        var width = ControlTextLayout.MeasureDisplayWidth(actionText);
-        var x = clipped.X + Math.Max(0, (clipped.Width - width) / 2);
-        return new Rect(x, y, Math.Min(width, clipped.Right - x), 1);
+    private void RaiseActivated()
+    {
+        Activated?.Invoke(this, EventArgs.Empty);
+        ActionInvoked?.Invoke(this, EventArgs.Empty);
     }
 
     private static string ApplyStyle(string text, TeaStyle style)
