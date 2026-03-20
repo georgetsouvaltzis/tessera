@@ -80,6 +80,7 @@ internal static class PrebuiltWidgetTests
         yield return new TestCase("Controls_FileExplorer_SelectPathAndEvent_ReportsTransition", FileExplorer_SelectPathAndEvent_ReportsTransition);
         yield return new TestCase("Controls_FileExplorer_MouseClickSelectsRow", FileExplorer_MouseClickSelectsRow);
         yield return new TestCase("Controls_FileExplorer_RendersTitleAndStyleHooks", FileExplorer_RendersTitleAndStyleHooks);
+        yield return new TestCase("Controls_FileExplorer_BorderStyleHooks_Rendered", FileExplorer_BorderStyleHooks_Rendered);
         yield return new TestCase("Controls_DataGrid_KeyboardNavigationTracksSelection", DataGrid_KeyboardNavigationTracksSelection);
         yield return new TestCase("Controls_DataGrid_SortComparerAndSortHook", DataGrid_SortComparerAndSortHook);
         yield return new TestCase("Controls_DataGrid_MouseClickSelectsRow", DataGrid_MouseClickSelectsRow);
@@ -90,6 +91,7 @@ internal static class PrebuiltWidgetTests
         yield return new TestCase("Controls_DiffView_NavigatesSelectionAndTogglesMode", DiffView_NavigatesSelectionAndTogglesMode);
         yield return new TestCase("Controls_DiffView_MouseClickSelectsEntry", DiffView_MouseClickSelectsEntry);
         yield return new TestCase("Controls_DiffView_RendersStyledEntries", DiffView_RendersStyledEntries);
+        yield return new TestCase("Controls_DiffView_BorderStyleHooks_Rendered", DiffView_BorderStyleHooks_Rendered);
         yield return new TestCase("Controls_Table_ForwardsSortHotkeys", Table_ForwardsSortHotkeys);
         yield return new TestCase("Controls_Table_FocusMarkerAndBorderStyleHooks_Rendered", Table_FocusMarkerAndBorderStyleHooks_Rendered);
         yield return new TestCase("Controls_ProgressBar_AdjustsValue", ProgressBar_AdjustsValue);
@@ -1615,6 +1617,39 @@ internal static class PrebuiltWidgetTests
         return Task.CompletedTask;
     }
 
+    private static Task FileExplorer_BorderStyleHooks_Rendered()
+    {
+        var explorer = new FileExplorer
+        {
+            Title = "Files",
+            IsFocused = true,
+            FocusMarker = "!",
+            ShowFocusMarker = true,
+            Border = BorderStyle.SingleLine,
+            BorderStyleText = TeaStyle.Empty.WithForeground(AnsiColor.BrightBlue),
+            FocusedBorderStyleText = TeaStyle.Empty.WithBold(),
+            MutedStyle = TeaStyle.Empty.WithForeground(AnsiColor.BrightBlack),
+        };
+        explorer.SetItems([new FileExplorerItem("readme.md", isDirectory: false, path: "/readme.md")]);
+
+        var focusedCanvas = new Canvas(36, 5, CanvasTextMode.GraphemeAware);
+        explorer.Render(focusedCanvas, new Rect(0, 0, 36, 5));
+        var focusedOutput = focusedCanvas.Render();
+
+        TestAssert.True(focusedOutput.Contains("Files !", StringComparison.Ordinal), "FileExplorer should render custom focus marker in title.");
+        TestAssert.True(ContainsBoldSgr(focusedOutput), "FileExplorer should merge focused border style into border glyph rendering.");
+        TestAssert.True(ContainsBlueForegroundSgr(focusedOutput), "FileExplorer should apply configured border color style.");
+
+        explorer.IsFocused = false;
+        explorer.IsDisabled = true;
+        var disabledCanvas = new Canvas(36, 5, CanvasTextMode.GraphemeAware);
+        explorer.Render(disabledCanvas, new Rect(0, 0, 36, 5));
+        var disabledOutput = disabledCanvas.Render();
+
+        TestAssert.True(ContainsMutedForegroundSgr(disabledOutput), "FileExplorer disabled border should merge muted styling.");
+        return Task.CompletedTask;
+    }
+
     private static Task DiffView_ComputesLineEntries()
     {
         var diff = new DiffView();
@@ -1686,6 +1721,30 @@ internal static class PrebuiltWidgetTests
         TestAssert.True(output.Contains('+'), "Diff view should render added line marker.");
         TestAssert.True(output.Contains('-'), "Diff view should render removed line marker.");
         TestAssert.True(output.Contains("\u001b[4m", StringComparison.Ordinal) || output.Contains(";4m", StringComparison.Ordinal), "Diff view should apply header style.");
+        return Task.CompletedTask;
+    }
+
+    private static Task DiffView_BorderStyleHooks_Rendered()
+    {
+        var diff = new DiffView
+        {
+            Title = "Diff",
+            IsFocused = true,
+            FocusMarker = "!",
+            ShowFocusMarker = true,
+            Border = BorderStyle.SingleLine,
+            BorderStyleText = TeaStyle.Empty.WithForeground(AnsiColor.BrightBlue),
+            FocusedBorderStyleText = TeaStyle.Empty.WithBold(),
+        };
+        diff.SetTexts("one\ntwo", "one\nthree");
+
+        var canvas = new Canvas(48, 6, CanvasTextMode.GraphemeAware);
+        diff.Render(canvas, new Rect(0, 0, 48, 6));
+        var output = canvas.Render();
+
+        TestAssert.True(output.Contains("Diff !", StringComparison.Ordinal), "DiffView should render custom focus marker in title.");
+        TestAssert.True(ContainsBoldSgr(output), "DiffView should merge focused border style into border glyph rendering.");
+        TestAssert.True(ContainsBlueForegroundSgr(output), "DiffView should apply configured border color style.");
         return Task.CompletedTask;
     }
 
