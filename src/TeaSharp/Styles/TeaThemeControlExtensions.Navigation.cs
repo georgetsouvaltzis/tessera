@@ -285,4 +285,78 @@ public static partial class TeaThemeControlExtensions
         ArgumentNullException.ThrowIfNull(overrides);
         return control.ApplyThemeDefaults(overrides.Resolve(control, baseTheme, state));
     }
+
+    /// <summary>
+    /// Applies a resolved theme to a <see cref="SearchResultsView"/>.
+    /// </summary>
+    public static SearchResultsView ApplyTheme(this SearchResultsView control, TeaTheme theme)
+    {
+        ArgumentNullException.ThrowIfNull(control);
+        ArgumentNullException.ThrowIfNull(theme);
+
+        control.TitleStyle = theme.Text.Secondary;
+        control.FocusedTitleStyle = theme.Focus.Title;
+        control.DefaultRowStyle = theme.Text.Primary;
+        control.HoveredRowStyle = theme.Accent.Secondary;
+        control.SelectedRowStyle = theme.Selection.Foreground.Merge(theme.Selection.Background);
+        control.FocusedSelectedRowStyle = theme.Focus.Ring;
+        control.PressedRowStyle = theme.Focus.Ring.Merge(theme.Selection.Foreground);
+        control.DisabledRowStyle = theme.Text.Muted;
+        control.ErrorRowStyle = theme.State.Error;
+        control.BorderStyleText = theme.Border.Default;
+        control.FocusedBorderStyleText = theme.Border.Focused.Merge(theme.Focus.Border);
+        return control;
+    }
+
+    /// <summary>
+    /// Resolves and applies hierarchical overrides to a <see cref="SearchResultsView"/>.
+    /// </summary>
+    public static SearchResultsView ApplyTheme(
+        this SearchResultsView control,
+        TeaThemeOverrides overrides,
+        TeaTheme baseTheme,
+        TeaThemeVisualState state = TeaThemeVisualState.Default)
+    {
+        ArgumentNullException.ThrowIfNull(overrides);
+        return control.ApplyTheme(overrides.Resolve(control, baseTheme, state));
+    }
+
+    /// <summary>
+    /// Applies theme defaults to a <see cref="SearchResultsView"/> without overwriting explicit non-empty styles.
+    /// </summary>
+    public static SearchResultsView ApplyThemeDefaults(this SearchResultsView control, TeaTheme theme)
+    {
+        ArgumentNullException.ThrowIfNull(control);
+        ArgumentNullException.ThrowIfNull(theme);
+
+        control.TitleStyle = ApplyDefault(control.TitleStyle, theme.Text.Secondary);
+        control.FocusedTitleStyle = ApplyDefault(control.FocusedTitleStyle, theme.Focus.Title);
+        control.DefaultRowStyle = ApplyDefault(control.DefaultRowStyle, theme.Text.Primary);
+        control.HoveredRowStyle = ApplyDefault(control.HoveredRowStyle, theme.Accent.Secondary);
+        control.SelectedRowStyle = ApplyDefault(
+            control.SelectedRowStyle,
+            theme.Selection.Foreground.Merge(theme.Selection.Background));
+        control.FocusedSelectedRowStyle = ApplyDefault(control.FocusedSelectedRowStyle, theme.Focus.Ring);
+        control.PressedRowStyle = ApplyDefault(control.PressedRowStyle, theme.Focus.Ring.Merge(theme.Selection.Foreground));
+        control.DisabledRowStyle = ApplyDefault(control.DisabledRowStyle, theme.Text.Muted);
+        control.ErrorRowStyle = ApplyDefault(control.ErrorRowStyle, theme.State.Error);
+        control.BorderStyleText = ApplyDefault(control.BorderStyleText, theme.Border.Default);
+        control.FocusedBorderStyleText = ApplyDefault(
+            control.FocusedBorderStyleText,
+            theme.Border.Focused.Merge(theme.Focus.Border));
+        return control;
+    }
+
+    /// <summary>
+    /// Resolves and applies hierarchical defaults to a <see cref="SearchResultsView"/> without overwriting explicit non-empty styles.
+    /// </summary>
+    public static SearchResultsView ApplyThemeDefaults(
+        this SearchResultsView control,
+        TeaThemeOverrides overrides,
+        TeaTheme baseTheme,
+        TeaThemeVisualState state = TeaThemeVisualState.Default)
+    {
+        ArgumentNullException.ThrowIfNull(overrides);
+        return control.ApplyThemeDefaults(overrides.Resolve(control, baseTheme, state));
+    }
 }
