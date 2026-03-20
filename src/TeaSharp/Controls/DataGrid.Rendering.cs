@@ -36,11 +36,13 @@ public sealed partial class DataGrid
             return;
         }
 
-        var widths = ResolveColumnWidths(content.Width);
+        var separator = ResolveColumnSeparatorText();
+        var separatorWidth = ResolveColumnSeparatorWidth(separator);
+        var widths = ResolveColumnWidths(content.Width, separatorWidth);
         var y = content.Y;
         if (ShowHeader && y < content.Bottom)
         {
-            WriteHeader(canvas, content, y, widths);
+            WriteHeader(canvas, content, y, widths, separator, separatorWidth);
             y++;
         }
 
@@ -65,7 +67,7 @@ public sealed partial class DataGrid
                 break;
             }
 
-            WriteRow(canvas, content, y + row, widths, rowIndex);
+            WriteRow(canvas, content, y + row, widths, rowIndex, separator, separatorWidth);
         }
     }
 
@@ -73,6 +75,7 @@ public sealed partial class DataGrid
     {
         var minimumWidth = _columns.Count == 0 ? 12 : _columns.Count * 8 + Math.Max(0, _columns.Count - 1);
         var width = minimumWidth;
+        var separatorWidth = ResolveColumnSeparatorWidth(ResolveColumnSeparatorText());
         for (var columnIndex = 0; columnIndex < _columns.Count; columnIndex++)
         {
             width = Math.Max(width, ControlTextLayout.MeasureDisplayWidth(RenderHeaderText(columnIndex)) + 2);
@@ -87,7 +90,7 @@ public sealed partial class DataGrid
                 lineWidth += Math.Max(3, ControlTextLayout.MeasureDisplayWidth(GetCellValue(row, columnIndex)));
             }
 
-            lineWidth += Math.Max(0, _columns.Count - 1) * ResolveColumnSeparatorWidth();
+            lineWidth += Math.Max(0, _columns.Count - 1) * separatorWidth;
             width = Math.Max(width, lineWidth);
         }
 
@@ -135,7 +138,7 @@ public sealed partial class DataGrid
         return Math.Max(1, rows);
     }
 
-    private int[] ResolveColumnWidths(int availableWidth)
+    private int[] ResolveColumnWidths(int availableWidth, int separatorWidth)
     {
         var count = _columns.Count;
         var widths = new int[count];
@@ -144,8 +147,8 @@ public sealed partial class DataGrid
             return widths;
         }
 
-        var separatorWidth = Math.Max(0, count - 1) * ResolveColumnSeparatorWidth();
-        var budget = Math.Max(count, availableWidth - separatorWidth);
+        var totalSeparatorWidth = Math.Max(0, count - 1) * separatorWidth;
+        var budget = Math.Max(count, availableWidth - totalSeparatorWidth);
         var total = 0;
         for (var index = 0; index < count; index++)
         {
@@ -207,10 +210,8 @@ public sealed partial class DataGrid
         return -1;
     }
 
-    private void WriteHeader(Canvas canvas, Rect content, int y, int[] widths)
+    private void WriteHeader(Canvas canvas, Rect content, int y, int[] widths, string separator, int separatorWidth)
     {
-        var separator = ResolveColumnSeparatorText();
-        var separatorWidth = ResolveColumnSeparatorWidth();
         var x = content.X;
         for (var columnIndex = 0; columnIndex < _columns.Count && x < content.Right; columnIndex++)
         {
@@ -232,10 +233,8 @@ public sealed partial class DataGrid
         }
     }
 
-    private void WriteRow(Canvas canvas, Rect content, int y, int[] widths, int rowIndex)
+    private void WriteRow(Canvas canvas, Rect content, int y, int[] widths, int rowIndex, string separator, int separatorWidth)
     {
-        var separator = ResolveColumnSeparatorText();
-        var separatorWidth = ResolveColumnSeparatorWidth();
         var x = content.X;
         var row = _rows[rowIndex];
         for (var columnIndex = 0; columnIndex < _columns.Count && x < content.Right; columnIndex++)
@@ -287,7 +286,7 @@ public sealed partial class DataGrid
             var marker = _sortDescending ? SortDescendingMarker : SortAscendingMarker;
             if (!string.IsNullOrEmpty(marker))
             {
-                text = $"{text} {marker}";
+                text = string.Concat(text, " ", marker);
             }
         }
 
@@ -308,7 +307,7 @@ public sealed partial class DataGrid
 
         if (IsFocused && ShowFocusMarker && !string.IsNullOrWhiteSpace(FocusMarker))
         {
-            return $"{Title} {FocusMarker}";
+            return string.Concat(Title, " ", FocusMarker);
         }
 
         return Title;
@@ -330,13 +329,12 @@ public sealed partial class DataGrid
         return style;
     }
 
-    private int ResolveColumnSeparatorWidth()
-    {
-        var separator = ResolveColumnSeparatorText();
-        return string.IsNullOrEmpty(separator)
+    private static int ResolveColumnSeparatorWidth(string separator) =>
+        string.IsNullOrEmpty(separator)
             ? 0
             : ControlTextLayout.MeasureDisplayWidth(separator);
-    }
+
+    private int ResolveColumnSeparatorWidth() => ResolveColumnSeparatorWidth(ResolveColumnSeparatorText());
 
     private string ResolveColumnSeparatorText() => ColumnSeparatorText;
 
@@ -348,19 +346,37 @@ public sealed partial class DataGrid
             return string.Empty;
         }
 
-        var singleLine = text.Replace("\r", string.Empty, StringComparison.Ordinal)
-            .Replace("\n", " ", StringComparison.Ordinal);
-        if (singleLine.Length > width)
+        var firstControlCharacter = text.AsSpan().IndexOfAny('\r', '\n');
+        if (firstControlCharacter < 0)
         {
-            return singleLine[..width];
+            if (text.Length > width)
+            {
+                return text[..width];
+            }
+
+            return text.Length < width
+                ? text.PadRight(width)
+                : text;
         }
 
-        if (singleLine.Length < width)
-        {
-            return singleLine.PadRight(width);
-        }
+        return string.Create(
+            width,
+            text,
+            static (destination, source) =>
+            {
+                destination.Fill(' ');
+                var writeIndex = 0;
+                for (var readIndex = 0; readIndex < source.Length && writeIndex < destination.Length; readIndex++)
+                {
+                    var current = source[readIndex];
+                    if (current == '\r')
+                    {
+                        continue;
+                    }
 
-        return singleLine;
+                    destination[writeIndex++] = current == '\n' ? ' ' : current;
+                }
+            });
     }
 
     private static string ApplyStyle(string text, TeaStyle style)
@@ -391,7 +407,7 @@ public sealed partial class DataGrid
             return;
         }
 
-        var text = PadToWidth(value, width);
+        var text = PadToWidth(value, effectiveWidth);
         canvas.WriteText(x, y, ApplyStyle(text, style), maxWidth);
     }
 }

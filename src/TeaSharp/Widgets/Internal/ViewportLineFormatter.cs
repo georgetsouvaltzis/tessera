@@ -122,10 +122,59 @@ internal static class ViewportLineFormatter
 
     public static List<string> NormalizeContentLines(string content)
     {
-        var normalized = content
-            .Replace("\r\n", "\n", StringComparison.Ordinal)
-            .Replace('\r', '\n');
-        return [.. normalized.Split('\n')];
+        if (string.IsNullOrEmpty(content))
+        {
+            return [string.Empty];
+        }
+
+        var lines = new List<string>();
+        var start = 0;
+        for (var index = 0; index < content.Length; index++)
+        {
+            var current = content[index];
+            if (current != '\n' && current != '\r')
+            {
+                continue;
+            }
+
+            lines.Add(content[start..index]);
+            if (current == '\r' && index + 1 < content.Length && content[index + 1] == '\n')
+            {
+                index++;
+            }
+
+            start = index + 1;
+        }
+
+        lines.Add(content[start..]);
+        return lines;
+    }
+
+    public static string NormalizeInlineLine(string line)
+    {
+        if (string.IsNullOrEmpty(line))
+        {
+            return string.Empty;
+        }
+
+        var source = line.AsSpan();
+        var firstBreak = source.IndexOfAny('\r', '\n');
+        if (firstBreak < 0)
+        {
+            return line;
+        }
+
+        return string.Create(
+            source.Length,
+            line,
+            static (destination, state) =>
+            {
+                for (var index = 0; index < state.Length; index++)
+                {
+                    var current = state[index];
+                    destination[index] = current is '\r' or '\n' ? ' ' : current;
+                }
+            });
     }
 
     private static string Slice(string line, int start, int length)

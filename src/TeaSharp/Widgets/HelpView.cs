@@ -22,6 +22,15 @@ internal static class HelpView
 
     private static string[] ToChunks(IEnumerable<KeyBinding> bindings)
     {
-        return bindings.Select(static binding => $"{binding.Keys} {binding.Description}").ToArray();
+        var chunks = bindings is ICollection<KeyBinding> collection
+            ? new List<string>(collection.Count)
+            : [];
+
+        foreach (var binding in bindings)
+        {
+            chunks.Add(string.Concat(binding.Keys, " ", binding.Description));
+        }
+
+        return [.. chunks];
     }
 }

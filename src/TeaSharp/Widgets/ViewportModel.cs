@@ -71,7 +71,7 @@ internal sealed class ViewportModel
 
     public void AppendLine(string line)
     {
-        _sourceLines.Add(line.Replace('\n', ' ').Replace('\r', ' '));
+        _sourceLines.Add(ViewportLineFormatter.NormalizeInlineLine(line ?? string.Empty));
         _visualCacheDirty = true;
         ClampOffsets();
     }

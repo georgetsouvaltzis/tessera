@@ -14,6 +14,7 @@ public sealed class TextArea : Control
 {
     private readonly ViewportModel _viewport = new();
     private readonly TextInputModel _input = new() { Multiline = true };
+    private string _lastViewportValue = string.Empty;
 
     public string Title
     {
@@ -196,9 +197,9 @@ public sealed class TextArea : Control
 
     internal override LayoutMeasurement Measure(in Rect availableBounds)
     {
-        var lines = _input.Value.Replace("\r\n", "\n", StringComparison.Ordinal).Replace('\r', '\n').Split('\n');
+        var lines = ViewportLineFormatter.NormalizeContentLines(_input.Value);
         var width = 0;
-        for (var index = 0; index < lines.Length; index++)
+        for (var index = 0; index < lines.Count; index++)
         {
             width = Math.Max(width, ControlTextLayout.MeasureDisplayWidth(lines[index]));
         }
@@ -209,7 +210,7 @@ public sealed class TextArea : Control
         }
 
         width += Padding.Horizontal;
-        var height = Math.Max(1, lines.Length) + Padding.Vertical;
+        var height = Math.Max(1, lines.Count) + Padding.Vertical;
         if (Border != BorderStyle.None)
         {
             width += 2;
@@ -224,7 +225,14 @@ public sealed class TextArea : Control
 
     private void SyncViewport()
     {
-        _viewport.SetLines(_input.Value.Replace("\r\n", "\n", StringComparison.Ordinal).Replace('\r', '\n').Split('\n'));
+        var value = _input.Value;
+        if (string.Equals(value, _lastViewportValue, StringComparison.Ordinal))
+        {
+            return;
+        }
+
+        _viewport.SetLines(ViewportLineFormatter.NormalizeContentLines(value));
+        _lastViewportValue = value;
     }
 
     private int CursorLineIndex()

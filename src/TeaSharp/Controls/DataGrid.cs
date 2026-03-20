@@ -428,8 +428,8 @@ public sealed partial class DataGrid : Control
             return true;
         }
 
-        var widths = ResolveColumnWidths(content.Width);
         var separatorWidth = ResolveColumnSeparatorWidth();
+        var widths = ResolveColumnWidths(content.Width, separatorWidth);
         var columnIndex = HitTestColumn(pointer.X, content.X, widths, separatorWidth);
         if (columnIndex < 0)
         {

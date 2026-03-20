@@ -22,7 +22,26 @@ internal static class HelpViewLayout
         var columns = Math.Max(1, (maxWidth + gap) / perColumn);
         if (columns <= 1)
         {
-            return string.Join('\n', chunks.Select(chunk => chunk.Length <= maxWidth ? chunk : chunk[..maxWidth]));
+            var builder = new StringBuilder();
+            for (var index = 0; index < chunks.Count; index++)
+            {
+                if (index > 0)
+                {
+                    builder.Append('\n');
+                }
+
+                var chunk = chunks[index];
+                if (chunk.Length <= maxWidth)
+                {
+                    builder.Append(chunk);
+                }
+                else
+                {
+                    builder.Append(chunk, 0, maxWidth);
+                }
+            }
+
+            return builder.ToString();
         }
 
         var rows = (int)Math.Ceiling(chunks.Count / (double)columns);
@@ -68,28 +87,48 @@ internal static class HelpViewLayout
             return string.Join("  |  ", chunks);
         }
 
+        const string Separator = "  |  ";
         var lines = new List<string>();
-        var current = string.Empty;
+        var current = new StringBuilder(maxWidth);
         foreach (var chunk in chunks)
         {
-            var candidate = current.Length == 0 ? chunk : $"{current}  |  {chunk}";
-            if (candidate.Length <= maxWidth)
+            if (current.Length == 0)
             {
-                current = candidate;
+                if (chunk.Length <= maxWidth)
+                {
+                    current.Append(chunk);
+                }
+                else
+                {
+                    lines.Add(chunk[..maxWidth]);
+                }
+
                 continue;
             }
 
-            if (current.Length > 0)
+            var candidateLength = current.Length + Separator.Length + chunk.Length;
+            if (candidateLength <= maxWidth)
             {
-                lines.Add(current);
+                current.Append(Separator);
+                current.Append(chunk);
+                continue;
             }
 
-            current = chunk.Length <= maxWidth ? chunk : chunk[..maxWidth];
+            lines.Add(current.ToString());
+            current.Clear();
+            if (chunk.Length <= maxWidth)
+            {
+                current.Append(chunk);
+            }
+            else
+            {
+                lines.Add(chunk[..maxWidth]);
+            }
         }
 
-        if (current.Length > 0)
+        if (current.Length != 0)
         {
-            lines.Add(current);
+            lines.Add(current.ToString());
         }
 
         return string.Join('\n', lines);
