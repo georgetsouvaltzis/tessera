@@ -4,7 +4,7 @@
 - Target: background colors, hover/selected/focused overrides, theme token wiring.
 - Focused areas: `TeaTheme`, `TeaThemeOverrides`, `TeaThemeControlExtensions.*`, dropdown-like controls (`Choice`, `ComboBox`), and representative nav/data/overlay/input controls.
 - This is analysis-only. No product code changes.
-- Synced against current repository HEAD after lane merges.
+- Synced against current repository HEAD after lane commits `79d4658`, `03e17e0`, `842aaaf`.
 
 ## Final Sync Findings
 
@@ -17,10 +17,11 @@
 - Built-in palettes populate background tokens (`Surface.*`, `Selection.Background`) (`src/TeaSharp/Styles/TeaThemes.cs:162`, `src/TeaSharp/Styles/TeaThemes.cs:187`).
 - Surface tokens are barely wired into controls (notably `StatusBar.FillStyle`) (`src/TeaSharp/Styles/TeaThemeControlExtensions.Basic.cs:143`).
 
-### 3) Runtime applies base theme defaults, not override hierarchy
-- Scene compiler applies only `context.Theme` defaults (`src/TeaSharp/Internal/TeaSceneCompiler.cs:33`).
-- `ScreenContext` carries `Theme` but no `ThemeOverrides` (`src/TeaSharp/ScreenContext.cs:24`).
-- Net: `TeaThemeOverrides` is available API but not automatically integrated into render pipeline.
+### 3) Runtime now applies override hierarchy during scene compilation
+- `ScreenContext` now carries `ThemeOverrides` (`src/TeaSharp/ScreenContext.cs:29`) and runtime options expose it (`src/TeaSharp/TeaRuntimeOptions.cs:78`).
+- Runtime wiring propagates overrides through app context (`src/TeaSharp/TeaApp.cs:89`, `src/TeaSharp/TeaApp.cs:171`).
+- Scene compiler now resolves per-control visual state and applies `ApplyThemeDefaults(overrides, baseTheme, state)` (`src/TeaSharp/Internal/TeaSceneCompiler.cs:37`, `src/TeaSharp/Internal/TeaSceneCompiler.cs:130`, `src/TeaSharp/Internal/TeaSceneCompiler.cs:252`, `src/TeaSharp/Internal/TeaSceneCompiler.cs:364`).
+- Runtime coverage exists via dedicated tests (`tests/TeaSharp.Tests/ThemeOverridesRuntimeWiringTests.cs:12`, `:35`, `:83`).
 
 ## Support Matrix (Final)
 
@@ -32,47 +33,37 @@
 | CommandPalette | Yes (`HoveredItemStyle`) | Yes (`SelectedItemStyle`) | Yes (title/border) | Yes | Yes (`NavigationOverlay`) |
 | MenuBar | Yes (`HoveredItemStyle`) | Yes (`SelectedItemStyle`) | Yes (`FocusedItemStyle` + border) | Yes | Yes (`NavigationOverlay`) |
 | ListView | Yes (`HoveredRowStyle`) | Yes (`SelectedRowStyle`) | Yes (title/border) | Yes | Yes (`Basic`) |
-| DataGrid | No explicit hover style | Yes (`SelectedRowStyle`, `SelectedCellStyle`) | Yes (title/border) | Yes | Yes (`DataAndFlow`) |
-| TreeTable | No explicit hover style | Yes (`SelectedRowStyle`) | Yes (title/border) | Yes | Yes (`DataAndFlow`) |
+| DataGrid | Yes (`HoveredRowStyle`, `HoveredCellStyle`) | Yes (`SelectedRowStyle`, `SelectedCellStyle`) | Yes (title/border) | Yes | Partial (hover hooks not theme-mapped) |
+| TreeTable | Yes (`HoveredRowStyle`) | Yes (`SelectedRowStyle`) | Yes (title/border) | Yes | Yes (`DataAndFlow`) |
 | TreeView | Yes (`HoveredItemStyle`) | Yes (`SelectedItemStyle`) | Yes (title/border) | Yes | Yes (`NavigationOverlay`) |
-| FileExplorer | No explicit hover style | Yes (`SelectedStyle`) | Yes (title/border) | Yes | Yes (`ExplorerAndFeedback`) |
-| FuzzyFinder | No hover style hook | Yes (`SelectedItemStyle`) | Yes (title/border) | Yes | Partial (no hover token map) |
+| FileExplorer | Yes (`HoveredStyle`) | Yes (`SelectedStyle`) | Yes (title/border) | Yes | Yes (`ExplorerAndFeedback`) |
+| FuzzyFinder | Yes (`HoveredItemStyle`) | Yes (`SelectedItemStyle`) | Yes (title/border) | Yes | Yes (`ExplorerAndFeedback`) |
 | DatePicker | Yes (`HoveredDayStyle`) | Yes (`SelectedDayStyle`) | Yes (title/border) | Yes | Yes (`InputValue`) |
 | TimePicker | Yes (`HoveredFieldStyle`) | Yes (`ActiveFieldStyle`/selected semantics) | Yes (title/border) | Yes | Yes (`InputValue`) |
-| Table | Internal hover/selection only | Internal marker only | Yes (title/border) | Limited row styling | Minimal (`Basic` title/border only) |
+| Table | Yes (`HoveredRowStyle`) | Yes (`SelectedRowStyle`) | Yes (title/border) | Yes | Yes (`Basic`) |
 
 ## Concrete Gaps (with references)
 
-1. **Overrides not auto-applied at runtime**
-- `TeaThemeOverrides` resolution exists, but compiler path does not consume it (`src/TeaSharp/Styles/TeaThemeOverrides.cs:99`, `src/TeaSharp/Internal/TeaSceneCompiler.cs:33`, `src/TeaSharp/ScreenContext.cs:24`).
+1. **DataGrid hover hooks are not mapped from theme tokens**
+- Runtime/render now supports hovered row/cell styles (`src/TeaSharp/Controls/DataGrid.cs:85`, `src/TeaSharp/Controls/DataGrid.cs:90`, `src/TeaSharp/Controls/DataGrid.Rendering.cs:268`), but `ApplyTheme`/`ApplyThemeDefaults` do not set hover tokens (`src/TeaSharp/Styles/TeaThemeControlExtensions.DataAndFlow.cs:15`, `src/TeaSharp/Styles/TeaThemeControlExtensions.DataAndFlow.cs:49`).
 
-2. **Surface/background theme tokens underutilized**
-- `Surface.Base/Panel/Overlay` are defined, but control mappings rarely consume them (`src/TeaSharp/Styles/TeaThemes.cs:162`, `src/TeaSharp/Styles/TeaThemeControlExtensions.Basic.cs:143`).
+2. **Surface/background theme tokens remain underutilized**
+- `Surface.Base/Panel/Overlay` are defined, but broad control mappings still rarely consume them (`src/TeaSharp/Styles/TeaThemes.cs:162`, `src/TeaSharp/Styles/TeaThemeControlExtensions.Basic.cs:143`).
 
 3. **Border style hooks are mode-sensitive**
 - Styled border glyphs are ignored in `CanvasTextMode.Fast`; only active in `GraphemeAware` (`src/TeaSharp/Components/Canvas/Canvas.cs:369`, `src/TeaSharp/Components/Canvas/Canvas.cs:379`).
 
-4. **Dropdown field-hover state tracked but not rendered**
-- `Choice` and `ComboBox` track `_fieldHovered`, but field style resolver ignores it (`src/TeaSharp/Controls/Choice.cs:15`, `src/TeaSharp/Controls/Choice.cs:453`, `src/TeaSharp/Controls/ComboBox.cs:20`, `src/TeaSharp/Controls/ComboBox.cs:471`).
-
-5. **Table row visual state not style-hook driven**
-- Table keeps hovered/selected row indices, but rendering delegates to `Widgets.DrawTable` with hardcoded selected marker behavior and no row style hooks (`src/TeaSharp/Controls/Table.cs:15`, `src/TeaSharp/Controls/Table.cs:273`, `src/TeaSharp/Components/Canvas/Widgets.cs:205`, `src/TeaSharp/Components/Canvas/Widgets.cs:235`).
-
-6. **FuzzyFinder has no hover visual override path**
-- Render only differentiates selected vs non-selected rows; no hovered row state/style hook (`src/TeaSharp/Controls/FuzzyFinder.Rendering.cs:68`).
-- Theme mapping for FuzzyFinder similarly has no hover token target (`src/TeaSharp/Styles/TeaThemeControlExtensions.ExplorerAndFeedback.cs:195`).
-
-7. **Theme-override state coverage in tests is narrow**
-- Existing override tests heavily exercise focused state; hovered/selected/disabled/error/active state layering is not broadly asserted (`tests/TeaSharp.Tests/ThemeOverridesTests.Foundation.cs:39`, `tests/TeaSharp.Tests/ThemeOverridesTests.InputValueWidgets.cs:235`).
+4. **Theme-override state coverage in tests is still incomplete**
+- Runtime wiring + focused-state behavior are now covered (`tests/TeaSharp.Tests/ThemeOverridesRuntimeWiringTests.cs:35`, `:83`), and hover parity tests exist for nav/explorer controls (`tests/TeaSharp.Tests/ThemeStateParity_NavigationExplorerTests.cs:21`), but broad `Selected/Disabled/Error/Active` override layering assertions are still limited.
 
 ## Final Sync Summary
 
-- Full visual-state/style pass (`hover` + `selected` + `focused` hooks and token wiring): `9/14` controls (`Choice`, `ComboBox`, `ContextMenu`, `CommandPalette`, `MenuBar`, `ListView`, `TreeView`, `DatePicker`, `TimePicker`).
-- Partial pass: `5/14` controls (`DataGrid`, `TreeTable`, `FileExplorer`, `FuzzyFinder`, `Table`).
-- Remaining known gaps are unchanged in this sync and are concentrated in runtime override integration plus missing hover/token parity for data/explorer controls.
+- Full visual-state/style pass (`hover` + `selected` + `focused` hooks and token wiring): `13/14` controls (`Choice`, `ComboBox`, `ContextMenu`, `CommandPalette`, `MenuBar`, `ListView`, `TreeTable`, `TreeView`, `FileExplorer`, `FuzzyFinder`, `DatePicker`, `TimePicker`, `Table`).
+- Partial pass: `1/14` (`DataGrid`, pending hover token mapping in theme extensions).
+- Runtime override integration is now landed; remaining gaps are token adoption + residual parity/test breadth.
 
 ## Suggested Priority Order
-1. Runtime integration of `TeaThemeOverrides` (without breaking explicit control-level styles).
-2. Surface/background token adoption policy (panel/fill semantics per control family).
-3. Visual-state parity: add hover hooks where state already exists (DataGrid, TreeTable, FileExplorer, FuzzyFinder, Table).
-4. Expand theme-override state tests to `Hovered`, `Selected`, `Disabled`, `Error`, `Active`.
+1. Add DataGrid hover token mapping in `TeaThemeControlExtensions.DataAndFlow`.
+2. Expand surface/background token adoption policy (panel/fill semantics per control family).
+3. Expand theme-override state tests for `Selected`, `Disabled`, `Error`, and `Active` layering.
+4. Decide whether fast-mode border-style behavior is intentional long-term or should have opt-in parity.
