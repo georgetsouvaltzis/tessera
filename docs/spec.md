@@ -127,22 +127,26 @@ Image rendering is planned for V1.1.
 ### Typography Portability
 
 - Portable typography in TeaSharp is ANSI SGR emphasis intent (for example bold/dim) and should be treated as styling intent, not a real font engine contract.
-- Terminal-specific typography request is available via `ScreenOptions.FontSpec`; renderer emits OSC 50 when this value is set.
-- Custom family/size requests are best-effort and not guaranteed on all terminals. Public guidance should treat `FontSpec` as optional opt-in behavior with graceful fallback.
-
-Support matrix for `ScreenOptions.FontSpec` in TeaSharp V1:
-
-- set to `null`: no OSC 50 emission (no-op)
-- set to non-empty value: emit OSC 50 set-font request on change (sanitized)
-- terminal capability probing: not implemented for font support
-- reset semantics: do not force unknown font restore
+- Terminal-facing font requests are best-effort and explicitly opt-in through `ScreenOptions`:
+  - `FontSpec`: legacy/explicit raw request lane.
+  - `FontFamily` + `FontSize`: structured request lane.
+  - `Iterm2Profile`: iTerm2 profile-switch lane.
+- Behavior is capability-gated by terminal detection flags:
+  - `SupportsOsc50FontRequests`
+  - `SupportsIterm2ProfileRequests`
+- Preference rule: when `Iterm2Profile` is set and `SupportsIterm2ProfileRequests` is true, renderer prefers iTerm2 profile switching over OSC 50 font requests.
+- Reset semantics remain conservative: TeaSharp does not force unknown font restore.
+- Terminal-by-terminal guidance lives in [terminal-font-capability-matrix.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/terminal-font-capability-matrix.md).
 
 Preferred C# usage:
 
 ```csharp
 runtime.Screen = new ScreenOptions
 {
-    FontSpec = "JetBrains Mono 13",
+    FontSpec = "JetBrains Mono 13", // legacy/raw OSC 50 request
+    FontFamily = "JetBrains Mono",  // structured request
+    FontSize = 13,
+    Iterm2Profile = "TeaSharp",
 };
 ```
 

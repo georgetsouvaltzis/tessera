@@ -243,23 +243,34 @@ Border override, dropdown/tree glyph-set, and data marker/separator cookbook sni
 ## Typography Capability Status
 
 - Portable typography lane: `TeaStyle.WithFontWeight(TeaFontWeight)` for ANSI SGR emphasis intent (normal/bold/dim), not real font engine control.
-- Terminal-specific lane: `ScreenOptions.FontSpec` requests terminal font changes through OSC 50 output in the renderer.
-- Explicit caveat: custom family/size is best-effort via OSC 50 and not guaranteed to apply across terminals.
+- Terminal request lanes:
+  - `ScreenOptions.FontSpec` (legacy/explicit raw request).
+  - `ScreenOptions.FontFamily` + `ScreenOptions.FontSize` (structured request).
+  - `ScreenOptions.Iterm2Profile` (iTerm2 profile switch request).
+- Capability gating:
+  - OSC 50 requests are emitted only when `SupportsOsc50FontRequests` is true.
+  - iTerm2 profile requests are emitted only when `SupportsIterm2ProfileRequests` is true.
+- Preference rule: if iTerm2 profile switching is supported and `Iterm2Profile` is set, renderer prefers profile switching over OSC 50 font requests.
+- Explicit caveat: all font requests are best-effort and terminal-dependent.
+- Terminal matrix: [terminal-font-capability-matrix.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/terminal-font-capability-matrix.md).
 
 Usage guidance (default path):
 
 ```csharp
 runtime.Screen = new ScreenOptions
 {
-    FontSpec = "JetBrains Mono 13",
+    FontSpec = "JetBrains Mono 13", // legacy/raw
+    FontFamily = "JetBrains Mono",  // structured
+    FontSize = 13,
+    Iterm2Profile = "TeaSharp",
 };
 ```
 
 Support matrix (TeaSharp V1 contract):
 
-- sequence emission: yes, when `FontSpec` changes and value is non-empty
+- sequence emission: capability-gated (`SupportsOsc50FontRequests` / `SupportsIterm2ProfileRequests`)
 - sanitization: `BEL`, `ESC`, `\`, and control chars are stripped before emission
-- capability detection/probe: no
+- preference: iTerm2 profile lane wins when supported and requested
 - reset/restore previous font: no (intentionally avoids unsafe assumptions)
 
 Bordered control parity policy:
