@@ -49,6 +49,9 @@ Support matrix (TeaSharp V1 behavior):
 - capability probe: none (best-effort only; terminal may ignore).
 - reset behavior: no font restore sequence (TeaSharp avoids unsafe restore assumptions).
 
+Cross-terminal details and caveats are documented in:
+`docs/terminal-font-capability-matrix.md`.
+
 ## Renderer Behavior
 
 `AnsiDiffRenderer` now parses SGR (`CSI ... m`) in view content and keeps style metadata at cell level.  

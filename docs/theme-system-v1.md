@@ -52,6 +52,9 @@ runtime.Screen = new ScreenOptions
 - sanitization: strips `BEL`, `ESC`, `\`, and control chars
 - reset: no forced font restore sequence
 
+Cross-terminal support and terminal-specific caveats:
+`docs/terminal-font-capability-matrix.md`.
+
 ## Public API Names (V1 Foundations)
 
 Theme primitives use the following public types:
