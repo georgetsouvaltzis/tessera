@@ -7,6 +7,7 @@
     <Project Path="examples/HelloWorld/HelloWorld.csproj" />
     <Project Path="examples/Showcase/Showcase.csproj" />
     <Project Path="examples/Kanban/Kanban.csproj" />
+    <Project Path="examples/PlottingDashboard/PlottingDashboard.csproj" />
     <Project Path="examples/ProductivityWidgets/ProductivityWidgets.csproj" />
     <Project Path="examples/WorkspaceApp/WorkspaceApp.csproj" />
     <Project Path="examples/WidgetGallery/WidgetGallery.csproj" />
