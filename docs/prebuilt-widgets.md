@@ -109,6 +109,11 @@ var dataGrid = new DataGrid { ColumnSeparatorText = " │ ", SortAscendingMarker
 var treeTable = new TreeTable("Name", "Value") { ColumnSeparatorText = " │ ", SelectedRowMarker = ">", UnselectedRowMarker = " ", ExpandedBranchMarker = "▼", CollapsedBranchMarker = "▶", LeafMarker = "•" };
 ```
 
+### Rendering and Explorer Border Hooks
+
+- `Notifications`, `LogView`, and `MarkdownView` support `BorderStyleText`/`FocusedBorderStyleText` with theme token mapping.
+- `DiffView`, `PropertyGrid`, `FileExplorer`, `FuzzyFinder`, and `ToastCenter` support the same border-style hooks with theme token mapping.
+
 ### ContextMenu Bordered Title Behavior
 
 - Bordered `ContextMenu` titles now preserve focused `FocusMarker` output by reserving width for the rendered title marker text.
@@ -120,6 +125,7 @@ var treeTable = new TreeTable("Name", "Value") { ColumnSeparatorText = " │ ", 
 - Use border text hooks where supported (`BorderStyleText`, `FocusedBorderStyleText`) to avoid hardcoded frame emphasis.
 - Use typed glyph sets for symbolic affordances (`DropdownGlyphSet`, `TreeViewGlyphSet`) instead of inline string literals.
 - For any new bordered control, ship border hooks + theme token mapping + parity tests in the same slice.
+- Parity policy drift is guarded by `BorderedControlParityPolicyTests.cs`.
 - Keep monochrome-safe defaults when style hooks are left empty.
 
 ## Theme Mapping Snapshot
@@ -133,6 +139,7 @@ Current shipped `TeaThemeControlExtensions` mappings include:
 - navigation overlay details: `Choice`/`ComboBox` include border text token mapping plus `DropdownGlyphSet` marker customization
 - navigation overlay details: `TreeView` includes border text token mapping plus `TreeViewGlyphSet` marker customization
 - navigation overlay details: `MenuBar`/`ContextMenu`/`CommandPalette` include border text token mapping plus typed glyph-set customization
+- navigation overlay details: `Notifications` includes border text token mapping
 - data/flow controls: `DataGrid`, `TreeTable`, `KeyValueList`, `Timeline`, `Stepper`
 - data/flow details: `DataGrid` and `TreeTable` include border text token mapping plus explicit separator/marker text APIs
 - explorer/feedback controls: `DiffView`, `PropertyGrid`, `FileExplorer`, `FuzzyFinder`, `ToastCenter`

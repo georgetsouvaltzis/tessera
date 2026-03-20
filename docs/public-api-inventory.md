@@ -270,6 +270,7 @@ Navigation/overlay controls with direct token mappings:
 - `TreeView` keeps title focus marker rendering configurable through `FocusMarker` + `ShowFocusMarker` and glyph customization through `TreeViewGlyphSet`
 - `MenuBar`, `ContextMenu`, and `CommandPalette` map border text hooks to border/focus tokens
 - `MenuBar`, `ContextMenu`, and `CommandPalette` expose typed glyph configuration through `MenuBarGlyphSet`, `ContextMenuGlyphSet`, and `CommandPaletteGlyphSet`
+- `Notifications` maps `BorderStyleText` -> `Border.Default` and `FocusedBorderStyleText` -> `Border.Focused + Focus.Border`
 - `ContextMenu` preserves focused title markers in bordered rendering width calculations
 
 Navigation primitive controls with direct token mappings:
@@ -287,10 +288,12 @@ Data/flow controls with direct token mappings:
 Explorer/feedback controls with direct token mappings:
 
 - `DiffView`, `PropertyGrid`, `FileExplorer`, `FuzzyFinder`, `ToastCenter`
+- `DiffView`, `PropertyGrid`, `FileExplorer`, `FuzzyFinder`, and `ToastCenter` map `BorderStyleText` -> `Border.Default` and `FocusedBorderStyleText` -> `Border.Focused + Focus.Border`
 
 Rendering text utility controls with direct token mappings:
 
 - `Badge`, `LogView`, `MarkdownView`, `MiniLog`
+- `LogView` and `MarkdownView` map `BorderStyleText` -> `Border.Default` and `FocusedBorderStyleText` -> `Border.Focused + Focus.Border`
 
 Modal/chart summary controls with direct token mappings:
 
@@ -302,5 +305,5 @@ Modal/chart summary controls with direct token mappings:
 2. review Tier 2 periodically and internalize anything that is public only by inertia
 3. keep `TeaSharp.Core` as the intentional low-level product and keep docs/examples explicit about when app authors should prefer `TeaSharp` instead
 4. keep custom widget extensibility stable while internal runtime details continue to shrink and stay behind TeaSharp-owned internal adapters
-5. preserve discoverability tests so legacy namespaces do not drift back onto the default path
+5. preserve discoverability and parity policy tests (for example `BorderedControlParityPolicyTests.cs`) so new bordered controls cannot drift from required hook/mapping coverage
 6. keep V1 image scope out of the V1 default path docs (image rendering planned for V1.1)

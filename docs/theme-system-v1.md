@@ -305,6 +305,7 @@ Navigation/overlay mapping coverage includes:
 - `TreeView` maps border text hooks and title focus marker; branch/leaf markers are configurable through `TreeViewGlyphSet`
 - `MenuBar`, `ContextMenu`, and `CommandPalette` map `BorderStyleText` + `FocusedBorderStyleText` to border/focus tokens
 - `MenuBar`, `ContextMenu`, and `CommandPalette` expose typed glyph configuration (`MenuBarGlyphSet`, `ContextMenuGlyphSet`, `CommandPaletteGlyphSet`)
+- `Notifications` maps `BorderStyleText` + `FocusedBorderStyleText` to border/focus tokens
 - `ContextMenu` preserves focused title markers in bordered title rendering width calculations
 - `SearchBox` maps title/value/placeholder/match/navigation styles plus border text hooks; title marker is configurable through `FocusMarker` + `ShowFocusMarker`
 
@@ -315,6 +316,7 @@ Navigation primitive mapping coverage includes:
 Rendering text utility mapping coverage includes:
 
 - `Badge`, `LogView`, `MarkdownView`, `MiniLog`
+- `LogView` and `MarkdownView` map `BorderStyleText` + `FocusedBorderStyleText` to border/focus tokens
 
 Modal/chart summary mapping coverage includes:
 
@@ -329,12 +331,13 @@ Data/flow mapping coverage includes:
 Explorer/feedback mapping coverage includes:
 
 - `DiffView`, `PropertyGrid`, `FileExplorer`, `FuzzyFinder`, `ToastCenter`
+- `DiffView`, `PropertyGrid`, `FileExplorer`, `FuzzyFinder`, and `ToastCenter` map `BorderStyleText` + `FocusedBorderStyleText` to border/focus tokens
 
 Bordered control parity enforcement:
 
 - new bordered controls must expose `BorderStyleText` and `FocusedBorderStyleText`
 - new bordered controls must map those hooks to `theme.Border.Default` and `theme.Border.Focused.Merge(theme.Focus.Border)`
-- test enforcement is maintained through `ThemeOverridesTests.*` token-mapping suites plus `VisualParityTests` edge-case coverage
+- test enforcement is maintained through `ThemeOverridesTests.*` token-mapping suites, `VisualParityTests` edge-case coverage, and `BorderedControlParityPolicyTests.cs`
 
 ## V1 Rollout
 

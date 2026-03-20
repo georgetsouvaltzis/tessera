@@ -103,6 +103,8 @@ V1 theming is semantic-token based with override hierarchy:
 - `TreeView` marker customization is explicit through `TreeViewGlyphSet`
 - `TextArea`, `NumberInput`, `DatePicker`, and `TimePicker` map `BorderStyleText`/`FocusedBorderStyleText` to semantic border/focus tokens by default
 - `MenuBar`, `ContextMenu`, and `CommandPalette` map border text hooks and expose typed glyph-set customization
+- `Notifications`, `LogView`, and `MarkdownView` map `BorderStyleText`/`FocusedBorderStyleText` to semantic border/focus tokens by default
+- `DiffView`, `PropertyGrid`, `FileExplorer`, `FuzzyFinder`, and `ToastCenter` map `BorderStyleText`/`FocusedBorderStyleText` to semantic border/focus tokens by default
 - `ListView<T>` and `TreeView` expose `FocusMarker` + `ShowFocusMarker` for explicit focus-title rendering
 - `TextInput` and `SearchBox` expose focus-title marker customization plus title/value/placeholder and border style hooks
 - `DataGrid` and `TreeTable` map `BorderStyleText`/`FocusedBorderStyleText` to semantic border/focus tokens by default
