@@ -44,6 +44,7 @@ internal static class BorderedControlParityPolicyTests
         typeof(Toggle),
         typeof(TreeTable),
         typeof(TreeView),
+        typeof(ValidationSummary),
     ];
 
     public static IEnumerable<TestCase> Cases()

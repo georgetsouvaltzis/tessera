@@ -211,6 +211,144 @@ public static partial class TeaThemeControlExtensions
     }
 
     /// <summary>
+    /// Applies a resolved theme to an <see cref="EmptyState"/>.
+    /// </summary>
+    public static EmptyState ApplyTheme(this EmptyState control, TeaTheme theme)
+    {
+        ArgumentNullException.ThrowIfNull(control);
+        ArgumentNullException.ThrowIfNull(theme);
+
+        control.TitleStyle = theme.Text.Secondary;
+        control.FocusedTitleStyle = theme.Focus.Title;
+        control.DescriptionStyle = theme.Text.Primary;
+        control.HintStyle = theme.Text.Muted;
+        control.ActionStyle = theme.Accent.Primary;
+        control.FocusedActionStyle = theme.Focus.Ring.Merge(theme.Accent.Primary);
+        control.HoveredActionStyle = theme.Accent.Secondary;
+        control.DisabledStyle = theme.Text.Muted;
+        return control;
+    }
+
+    /// <summary>
+    /// Resolves and applies hierarchical overrides to an <see cref="EmptyState"/>.
+    /// </summary>
+    public static EmptyState ApplyTheme(
+        this EmptyState control,
+        TeaThemeOverrides overrides,
+        TeaTheme baseTheme,
+        TeaThemeVisualState state = TeaThemeVisualState.Default)
+    {
+        ArgumentNullException.ThrowIfNull(overrides);
+        return control.ApplyTheme(overrides.Resolve(control, baseTheme, state));
+    }
+
+    /// <summary>
+    /// Applies theme defaults to an <see cref="EmptyState"/> without overwriting explicit non-empty styles.
+    /// </summary>
+    public static EmptyState ApplyThemeDefaults(this EmptyState control, TeaTheme theme)
+    {
+        ArgumentNullException.ThrowIfNull(control);
+        ArgumentNullException.ThrowIfNull(theme);
+
+        control.TitleStyle = ApplyDefault(control.TitleStyle, theme.Text.Secondary);
+        control.FocusedTitleStyle = ApplyDefault(control.FocusedTitleStyle, theme.Focus.Title);
+        control.DescriptionStyle = ApplyDefault(control.DescriptionStyle, theme.Text.Primary);
+        control.HintStyle = ApplyDefault(control.HintStyle, theme.Text.Muted);
+        control.ActionStyle = ApplyDefault(control.ActionStyle, theme.Accent.Primary);
+        control.FocusedActionStyle = ApplyDefault(control.FocusedActionStyle, theme.Focus.Ring.Merge(theme.Accent.Primary));
+        control.HoveredActionStyle = ApplyDefault(control.HoveredActionStyle, theme.Accent.Secondary);
+        control.DisabledStyle = ApplyDefault(control.DisabledStyle, theme.Text.Muted);
+        return control;
+    }
+
+    /// <summary>
+    /// Resolves and applies hierarchical defaults to an <see cref="EmptyState"/> without overwriting explicit non-empty styles.
+    /// </summary>
+    public static EmptyState ApplyThemeDefaults(
+        this EmptyState control,
+        TeaThemeOverrides overrides,
+        TeaTheme baseTheme,
+        TeaThemeVisualState state = TeaThemeVisualState.Default)
+    {
+        ArgumentNullException.ThrowIfNull(overrides);
+        return control.ApplyThemeDefaults(overrides.Resolve(control, baseTheme, state));
+    }
+
+    /// <summary>
+    /// Applies a resolved theme to a <see cref="ValidationSummary"/>.
+    /// </summary>
+    public static ValidationSummary ApplyTheme(this ValidationSummary control, TeaTheme theme)
+    {
+        ArgumentNullException.ThrowIfNull(control);
+        ArgumentNullException.ThrowIfNull(theme);
+
+        control.TitleStyle = theme.Text.Secondary;
+        control.FocusedTitleStyle = theme.Focus.Title;
+        control.DefaultIssueStyle = theme.Text.Primary;
+        control.InfoSeverityStyle = theme.State.Info;
+        control.WarningSeverityStyle = theme.State.Warning;
+        control.ErrorSeverityStyle = theme.State.Error;
+        control.SelectedIssueStyle = theme.Selection.Foreground.Merge(theme.Selection.Background);
+        control.FocusedIssueStyle = theme.Focus.Ring;
+        control.HoveredIssueStyle = theme.Accent.Secondary;
+        control.DisabledIssueStyle = theme.Text.Muted;
+        control.BorderStyleText = theme.Border.Default;
+        control.FocusedBorderStyleText = theme.Border.Focused.Merge(theme.Focus.Border);
+        return control;
+    }
+
+    /// <summary>
+    /// Resolves and applies hierarchical overrides to a <see cref="ValidationSummary"/>.
+    /// </summary>
+    public static ValidationSummary ApplyTheme(
+        this ValidationSummary control,
+        TeaThemeOverrides overrides,
+        TeaTheme baseTheme,
+        TeaThemeVisualState state = TeaThemeVisualState.Default)
+    {
+        ArgumentNullException.ThrowIfNull(overrides);
+        return control.ApplyTheme(overrides.Resolve(control, baseTheme, state));
+    }
+
+    /// <summary>
+    /// Applies theme defaults to a <see cref="ValidationSummary"/> without overwriting explicit non-empty styles.
+    /// </summary>
+    public static ValidationSummary ApplyThemeDefaults(this ValidationSummary control, TeaTheme theme)
+    {
+        ArgumentNullException.ThrowIfNull(control);
+        ArgumentNullException.ThrowIfNull(theme);
+
+        control.TitleStyle = ApplyDefault(control.TitleStyle, theme.Text.Secondary);
+        control.FocusedTitleStyle = ApplyDefault(control.FocusedTitleStyle, theme.Focus.Title);
+        control.DefaultIssueStyle = ApplyDefault(control.DefaultIssueStyle, theme.Text.Primary);
+        control.InfoSeverityStyle = ApplyDefault(control.InfoSeverityStyle, theme.State.Info);
+        control.WarningSeverityStyle = ApplyDefault(control.WarningSeverityStyle, theme.State.Warning);
+        control.ErrorSeverityStyle = ApplyDefault(control.ErrorSeverityStyle, theme.State.Error);
+        control.SelectedIssueStyle = ApplyDefault(
+            control.SelectedIssueStyle,
+            theme.Selection.Foreground.Merge(theme.Selection.Background));
+        control.FocusedIssueStyle = ApplyDefault(control.FocusedIssueStyle, theme.Focus.Ring);
+        control.HoveredIssueStyle = ApplyDefault(control.HoveredIssueStyle, theme.Accent.Secondary);
+        control.DisabledIssueStyle = ApplyDefault(control.DisabledIssueStyle, theme.Text.Muted);
+        control.BorderStyleText = ApplyDefault(control.BorderStyleText, theme.Border.Default);
+        control.FocusedBorderStyleText = ApplyDefault(control.FocusedBorderStyleText, theme.Border.Focused.Merge(theme.Focus.Border));
+        return control;
+    }
+
+    /// <summary>
+    /// Resolves and applies hierarchical defaults to a <see cref="ValidationSummary"/> without overwriting explicit non-empty styles.
+    /// </summary>
+    public static ValidationSummary ApplyThemeDefaults(
+        this ValidationSummary control,
+        TeaThemeOverrides overrides,
+        TeaTheme baseTheme,
+        TeaThemeVisualState state = TeaThemeVisualState.Default)
+    {
+        ArgumentNullException.ThrowIfNull(overrides);
+        return control.ApplyThemeDefaults(overrides.Resolve(control, baseTheme, state));
+    }
+
+    /// <summary>
     /// Applies a resolved theme to a <see cref="Timeline"/>.
     /// </summary>
     public static Timeline ApplyTheme(this Timeline control, TeaTheme theme)
