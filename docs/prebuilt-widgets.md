@@ -75,6 +75,22 @@ Preferred public catalog:
 62. `LinePlotOptions`
 63. `PlotPanel`
 64. `PlotPanelOptions`
+65. `VirtualizedListView<T>`
+66. `VirtualizedListViewOptions`
+67. `GroupedListView<TGroup,TItem>`
+68. `GroupedListViewGroup<TGroup,TItem>`
+69. `GroupedListSelectionChangedEventArgs<TGroup,TItem>`
+70. `KanbanBoard`
+71. `KanbanLane`
+72. `KanbanCard`
+73. `KanbanSelectionChangedEventArgs`
+74. `TagInput`
+75. `CalendarMonthView`
+76. `CalendarDayCell`
+77. `CalendarDateSelectedEventArgs`
+78. `SchedulerTimeline`
+79. `SchedulerEntry`
+80. `SchedulerSelectionChangedEventArgs`
 
 These live in `TeaSharp.Controls`.
 
@@ -173,6 +189,13 @@ Theme and override pattern:
 - Start with semantic defaults (`ApplyThemeDefaults(theme)`), then set instance overrides (`LegendStyle`, `StatsStyle`, `AxisStyle`, `BorderStyleText`, `FocusedBorderStyleText`).
 - Bordered plotting controls (`Sparkline`, `AreaPlot`, `LinePlot`, `PlotPanel`) should use border style hooks instead of hardcoded emphasis markers.
 
+### Wave 2 Data/Planning Controls
+
+- `VirtualizedListView<T>`, `GroupedListView<TGroup,TItem>`, `KanbanBoard`, and `TagInput` are bordered controls with `BorderStyleText`/`FocusedBorderStyleText`.
+- `CalendarMonthView` and `SchedulerTimeline` are unbordered planning views with full title/row/day style hooks.
+- Theme helpers now cover all six controls (`ApplyTheme` + `ApplyThemeDefaults` + override overloads).
+- Recommended usage: call `ApplyThemeDefaults(runtime.Theme)` first, then instance overrides per screen state.
+
 ### Beautiful UI Checklist (Current Phase)
 
 - Apply semantic theme first (`TeaRuntimeOptions.Theme`), then control-type, instance, and state overrides.
@@ -199,6 +222,8 @@ Current shipped `TeaThemeControlExtensions` mappings include:
 - data/flow controls: `DataGrid`, `TreeTable`, `KeyValueList`, `Timeline`, `Stepper`
 - data/flow details: `DataGrid` and `TreeTable` include border text token mapping plus explicit separator/marker text APIs
 - data/flow details: `KeyValueList` and `Timeline` include border text token mapping
+- planning/boards controls: `VirtualizedListView<T>`, `GroupedListView<TGroup,TItem>`, `KanbanBoard`, `TagInput`, `CalendarMonthView`, `SchedulerTimeline`
+- planning/boards details: bordered controls in this set map border tokens; scheduler/calendar map semantic row/day/title tokens
 - explorer/feedback controls: `DiffView`, `PropertyGrid`, `FileExplorer`, `FuzzyFinder`, `ToastCenter`
 - rendering text utilities: `Badge`, `LogView`, `MarkdownView`, `MiniLog`
 - modal/chart summary controls: `Dialog`, `Modal`, `BarChart`, `LineChart`, `Gauge`, `StatsCard`

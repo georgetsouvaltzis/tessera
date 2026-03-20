@@ -86,7 +86,23 @@ These are the types new applications should discover first.
 - `TeaSharp.Controls.StatusBar`
 - `TeaSharp.Controls.Tabs`
 - `TeaSharp.Controls.ListView<T>`
+- `TeaSharp.Controls.VirtualizedListView<T>`
+- `TeaSharp.Controls.VirtualizedListViewOptions`
+- `TeaSharp.Controls.GroupedListView<TGroup,TItem>`
+- `TeaSharp.Controls.GroupedListViewGroup<TGroup,TItem>`
+- `TeaSharp.Controls.GroupedListSelectionChangedEventArgs<TGroup,TItem>`
 - `TeaSharp.Controls.Table`
+- `TeaSharp.Controls.KanbanBoard`
+- `TeaSharp.Controls.KanbanLane`
+- `TeaSharp.Controls.KanbanCard`
+- `TeaSharp.Controls.KanbanSelectionChangedEventArgs`
+- `TeaSharp.Controls.TagInput`
+- `TeaSharp.Controls.CalendarMonthView`
+- `TeaSharp.Controls.CalendarDayCell`
+- `TeaSharp.Controls.CalendarDateSelectedEventArgs`
+- `TeaSharp.Controls.SchedulerTimeline`
+- `TeaSharp.Controls.SchedulerEntry`
+- `TeaSharp.Controls.SchedulerSelectionChangedEventArgs`
 - `TeaSharp.Controls.DataGrid`
 - `TeaSharp.Controls.TreeTable`
 - `TeaSharp.Controls.KeyValueList`
@@ -225,9 +241,15 @@ The first root controls that already own their implementation directly are:
 - `LinePlot`
 - `PlotPanel`
 - `ListView<T>`
+- `VirtualizedListView<T>`
+- `GroupedListView<TGroup,TItem>`
 - `Tabs`
 - `DataGrid`
 - `TreeTable`
+- `KanbanBoard`
+- `TagInput`
+- `CalendarMonthView`
+- `SchedulerTimeline`
 - `KeyValueList`
 - `Timeline`
 - `Stepper`
@@ -256,7 +278,7 @@ Their old `TeaSharp.Components.Prebuilt.*` counterparts have been removed instea
 
 ## Theme Mapping Status
 
-Current shipped theme mapping is centralized in `TeaSharp.Styles.TeaThemeControlExtensions` and split into domain partial files (`Basic`, `InputValue`, `Navigation`, `NavigationOverlay`, `NavigationPrimitives`, `DataAndFlow`, `ExplorerAndFeedback`, `RenderingTextUtilities`, `ModalAndCharts`, `Plotting`).
+Current shipped theme mapping is centralized in `TeaSharp.Styles.TeaThemeControlExtensions` and split into domain partial files (`Basic`, `InputValue`, `Navigation`, `NavigationOverlay`, `NavigationPrimitives`, `DataAndFlow`, `PlanningAndBoards`, `ExplorerAndFeedback`, `RenderingTextUtilities`, `ModalAndCharts`, `Plotting`).
 Overlay glyph cookbook snippets for `MenuBarGlyphSet`, `ContextMenuGlyphSet`, and `CommandPaletteGlyphSet` are documented in [theme-system-v1.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/theme-system-v1.md).
 Border override, dropdown/tree glyph-set, and data marker/separator cookbook snippets are documented in [theme-system-v1.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/theme-system-v1.md).
 

@@ -54,6 +54,13 @@ Wave 1 shipped in this lane:
 | `TagInput` | P1 | Label-driven domain modeling | add/remove tag markers |
 | `RichTextView` | P1 | Structured text output with emphasis | heading/list/quote markers |
 
+Wave 2 integration status (current lane):
+
+- Implemented and wired: `VirtualizedListView<T>`, `GroupedListView<TGroup,TItem>`, `KanbanBoard`, `TagInput`, `CalendarMonthView`, `SchedulerTimeline`.
+- Theme extension coverage added (`ApplyTheme`, `ApplyThemeDefaults`, override overloads).
+- Bordered parity + control-catalog + theme-override tests updated for this shipped subset.
+- Remaining Wave 2 backlog: `PivotTable`, `QueryBuilder`, `RichTextView`.
+
 ### Wave 3 (P1): Dev/Ops Workflows (8)
 
 | Widget | Priority | C# workflow rationale | Glyph hooks |

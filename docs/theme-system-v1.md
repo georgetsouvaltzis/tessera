@@ -217,6 +217,33 @@ var grid = new DataGrid
 };
 ```
 
+### Wave 2 Data/Planning Theme Hooks
+
+`TeaThemeControlExtensions` includes explicit mappings for:
+
+- `VirtualizedListView<T>`
+- `GroupedListView<TGroup,TItem>`
+- `KanbanBoard`
+- `TagInput`
+- `CalendarMonthView`
+- `SchedulerTimeline`
+
+Bordered controls in this set (`VirtualizedListView<T>`, `GroupedListView<TGroup,TItem>`, `KanbanBoard`, `TagInput`) map `BorderStyleText` and `FocusedBorderStyleText` to semantic border/focus tokens by default.
+
+```csharp
+using TeaSharp.Controls;
+using TeaSharp.Styles;
+
+var theme = TeaThemes.Catppuccin(CatppuccinVariant.Mocha);
+
+var kanban = new KanbanBoard().ApplyThemeDefaults(theme);
+kanban.BorderStyleText = TeaStyle.Empty.WithForeground(AnsiColor.BrightBlack);
+kanban.FocusedBorderStyleText = TeaStyle.Empty.WithBold().WithForeground(AnsiColor.BrightYellow);
+
+var scheduler = new SchedulerTimeline().ApplyThemeDefaults(theme);
+scheduler.ConflictRowStyle = TeaStyle.Empty.WithBold().WithForeground(AnsiColor.BrightRed);
+```
+
 ### Dropdown and Tree Glyph Sets
 
 ```csharp

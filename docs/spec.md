@@ -92,7 +92,7 @@ V1 theming is semantic-token based with override hierarchy:
 - semantic tokens for text/surface/border/state/focus/selection/accent
 - built-in palettes (Catppuccin, Rosé Pine) plus custom palette
 - override precedence: global theme -> control type -> control instance -> state
-- `TeaThemeControlExtensions` is split by domain (`Basic`, `InputValue`, `Navigation`, `NavigationOverlay`, `NavigationPrimitives`, `DataAndFlow`, `ExplorerAndFeedback`, `RenderingTextUtilities`, `ModalAndCharts`, `Plotting`)
+- `TeaThemeControlExtensions` is split by domain (`Basic`, `InputValue`, `Navigation`, `NavigationOverlay`, `NavigationPrimitives`, `DataAndFlow`, `PlanningAndBoards`, `ExplorerAndFeedback`, `RenderingTextUtilities`, `ModalAndCharts`, `Plotting`)
 - mapped input/value controls include `TextInput`, `TextArea`, `Toggle`, `Slider`, `Spinner`, `ProgressBar`, `NumberInput`, `DatePicker`, `TimePicker`
 - mapped basic controls include `Label`, `Button`, `ListView<T>`, `StatusBar`, `TextInput`, `Table`, `Tabs`
 - mapped navigation controls include `Breadcrumb`, `Paginator`, `Toolbar`, `CommandBar`, `SearchBox`, `SearchResultsView`
@@ -116,6 +116,8 @@ V1 theming is semantic-token based with override hierarchy:
 - parity rule: any new bordered public control must ship border-style hooks, token mappings, and parity regression coverage in the same change
 - mapped navigation primitive controls include `Accordion`, `MultiSelect`, `RadioGroup`
 - mapped data/flow controls include `DataGrid`, `TreeTable`, `KeyValueList`, `Timeline`, `Stepper`
+- mapped planning/boards controls include `VirtualizedListView<T>`, `GroupedListView<TGroup,TItem>`, `KanbanBoard`, `TagInput`, `CalendarMonthView`, `SchedulerTimeline`
+- bordered planning/boards controls (`VirtualizedListView<T>`, `GroupedListView<TGroup,TItem>`, `KanbanBoard`, `TagInput`) map `BorderStyleText`/`FocusedBorderStyleText` to semantic border/focus tokens by default
 - mapped explorer/feedback controls include `DiffView`, `PropertyGrid`, `FileExplorer`, `FuzzyFinder`, `ToastCenter`
 - mapped rendering text utility controls include `Badge`, `LogView`, `MarkdownView`, `MiniLog`
 - mapped modal/chart summary controls include `Dialog`, `Modal`, `BarChart`, `LineChart`, `Gauge`, `StatsCard`
@@ -192,7 +194,23 @@ Root controls currently include:
 - `StatusBar`
 - `Tabs`
 - `ListView<T>`
+- `VirtualizedListView<T>`
+- `VirtualizedListViewOptions`
+- `GroupedListView<TGroup,TItem>`
+- `GroupedListViewGroup<TGroup,TItem>`
+- `GroupedListSelectionChangedEventArgs<TGroup,TItem>`
 - `Table`
+- `KanbanBoard`
+- `KanbanLane`
+- `KanbanCard`
+- `KanbanSelectionChangedEventArgs`
+- `TagInput`
+- `CalendarMonthView`
+- `CalendarDayCell`
+- `CalendarDateSelectedEventArgs`
+- `SchedulerTimeline`
+- `SchedulerEntry`
+- `SchedulerSelectionChangedEventArgs`
 - `DataGrid`
 - `TreeTable`
 - `KeyValueList`
