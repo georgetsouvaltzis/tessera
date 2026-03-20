@@ -91,6 +91,8 @@ These are the types new applications should discover first.
 - `TeaSharp.Controls.Toolbar`
 - `TeaSharp.Controls.CommandBar`
 - `TeaSharp.Controls.SearchBox`
+- `TeaSharp.Controls.SearchResultsView`
+- `TeaSharp.Controls.SearchResultsGlyphSet`
 - `TeaSharp.Controls.DiffView`
 - `TeaSharp.Controls.PropertyGrid`
 - `TeaSharp.Controls.FileExplorer`
@@ -218,6 +220,7 @@ The first root controls that already own their implementation directly are:
 - `StatusBar`
 - `Paginator`
 - `SearchBox`
+- `SearchResultsView`
 - `DiffView`
 - `PropertyGrid`
 - `FileExplorer`
@@ -294,8 +297,9 @@ Input/value controls with direct token mappings:
 
 Navigation controls with direct token mappings:
 
-- `Breadcrumb`, `Paginator`, `Toolbar`, `CommandBar`, `SearchBox`
+- `Breadcrumb`, `Paginator`, `Toolbar`, `CommandBar`, `SearchBox`, `SearchResultsView`
 - `SearchBox` maps title/value/placeholder/match/navigation styles plus border text hooks; title focus marker is configurable through `FocusMarker` + `ShowFocusMarker`
+- `SearchResultsView` maps title, row-state, and border text hooks; marker customization is explicit through `SearchResultsGlyphSet`
 
 Navigation/overlay controls with direct token mappings:
 

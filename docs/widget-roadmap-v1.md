@@ -36,6 +36,10 @@ Notation: all rows inherit the strict state-style contract above; `Glyph hooks` 
 | `EmptyState` | P0 | Predictable zero-data UX | icon/marker slot glyph |
 | `SearchResultsView` | P0 | Common search result rendering | match markers, rank marker |
 
+Wave 1 shipped in this lane:
+
+- `SearchResultsView` with `SearchResultsGlyphSet`, state style hooks, and navigation-theme mapping.
+
 ### Wave 2 (P0/P1): Data, Planning, Query (9)
 
 | Widget | Priority | C# workflow rationale | Glyph hooks |

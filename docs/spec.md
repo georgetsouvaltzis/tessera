@@ -95,7 +95,7 @@ V1 theming is semantic-token based with override hierarchy:
 - `TeaThemeControlExtensions` is split by domain (`Basic`, `InputValue`, `Navigation`, `NavigationOverlay`, `NavigationPrimitives`, `DataAndFlow`, `ExplorerAndFeedback`, `RenderingTextUtilities`, `ModalAndCharts`)
 - mapped input/value controls include `TextInput`, `TextArea`, `Toggle`, `Slider`, `Spinner`, `ProgressBar`, `NumberInput`, `DatePicker`, `TimePicker`
 - mapped basic controls include `Label`, `Button`, `ListView<T>`, `StatusBar`, `TextInput`, `Table`, `Tabs`
-- mapped navigation controls include `Breadcrumb`, `Paginator`, `Toolbar`, `CommandBar`, `SearchBox`
+- mapped navigation controls include `Breadcrumb`, `Paginator`, `Toolbar`, `CommandBar`, `SearchBox`, `SearchResultsView`
 - mapped navigation/overlay controls include `Choice`, `ComboBox`, `TreeView`, `MenuBar`, `ContextMenu`, `CommandPalette`, `Notifications`, `SearchBox`
 - `Choice` and `ComboBox` map `BorderStyleText`/`FocusedBorderStyleText` to semantic border/focus tokens by default
 - dropdown marker customization is explicit through `DropdownGlyphSet` on `Choice` and `ComboBox`
@@ -108,6 +108,7 @@ V1 theming is semantic-token based with override hierarchy:
 - `DiffView`, `PropertyGrid`, `FileExplorer`, `FuzzyFinder`, and `ToastCenter` map `BorderStyleText`/`FocusedBorderStyleText` to semantic border/focus tokens by default
 - `ListView<T>` and `TreeView` expose `FocusMarker` + `ShowFocusMarker` for explicit focus-title rendering
 - `TextInput` and `SearchBox` expose focus-title marker customization plus title/value/placeholder and border style hooks
+- `SearchResultsView` exposes focus-title markers, row-state styles, border style hooks, and typed marker customization through `SearchResultsGlyphSet`
 - `DataGrid` and `TreeTable` map `BorderStyleText`/`FocusedBorderStyleText` to semantic border/focus tokens by default
 - `DataGrid` and `TreeTable` expose explicit text-based visual hooks for separators and selection/sort/tree markers
 - `KeyValueList` and `Timeline` map `BorderStyleText`/`FocusedBorderStyleText` to semantic border/focus tokens by default
@@ -210,6 +211,8 @@ Root controls currently include:
 - `MultiSelect`
 - `Paginator`
 - `SearchBox`
+- `SearchResultsView`
+- `SearchResultsGlyphSet`
 - `DiffView`
 - `PropertyGrid`
 - `FileExplorer`

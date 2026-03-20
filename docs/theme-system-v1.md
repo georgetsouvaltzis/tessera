@@ -233,6 +233,18 @@ var tree = new TreeView
 };
 ```
 
+### Search Results Glyph Set
+
+```csharp
+using TeaSharp.Controls;
+
+var results = new SearchResultsView
+{
+    Glyphs = new SearchResultsGlyphSet("·", "▸", "▶", "~", "."),
+    ShowRankMarker = true,
+};
+```
+
 ### Data Widget Marker and Separator APIs
 
 ```csharp
@@ -324,8 +336,9 @@ Basic mapping coverage includes:
 
 Navigation mapping coverage includes:
 
-- `Breadcrumb`, `Paginator`, `Toolbar`, `CommandBar`, `SearchBox`
+- `Breadcrumb`, `Paginator`, `Toolbar`, `CommandBar`, `SearchBox`, `SearchResultsView`
 - `SearchBox` maps title/value/placeholder/match/navigation styles plus border text hooks
+- `SearchResultsView` maps title, row-state, and border text hooks; row markers are customizable through `SearchResultsGlyphSet`
 
 Navigation/overlay mapping coverage includes:
 

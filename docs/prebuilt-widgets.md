@@ -62,6 +62,8 @@ Preferred public catalog:
 49. `KeyValueList`
 50. `Timeline`
 51. `Stepper`
+52. `SearchResultsView`
+53. `SearchResultsGlyphSet`
 
 These live in `TeaSharp.Controls`.
 
@@ -90,6 +92,12 @@ var menuBar = new MenuBar { Glyphs = new MenuBarGlyphSet("[", "]", " ", " ", "{"
 var contextMenu = new ContextMenu { ShowFocusMarker = true, Glyphs = new ContextMenuGlyphSet("·", ">", "▸", " ") };
 var commandPalette = new CommandPalette { ShowFocusMarker = true, Glyphs = new CommandPaletteGlyphSet("❯", " ", ">", "▸", " ") };
 ```
+
+### Search Results Hooks
+
+- `SearchResultsView` exposes title/focus markers, bordered frame hooks, and full row-state style hooks.
+- Row markers are customizable through `SearchResultsGlyphSet` (`DefaultRowMarker`, `HoveredRowMarker`, `SelectedRowMarker`, `MatchMarker`, `RankSeparator`).
+- Query matching can display explicit match markers with rank prefixes for dense result lists.
 
 ### Table and TreeView Visual Hooks
 
@@ -141,6 +149,7 @@ Current shipped `TeaThemeControlExtensions` mappings include:
 - basic controls: `Label`, `Button`, `ListView<T>`, `StatusBar`, `TextInput`, `Table`, `Tabs`
 - input/value controls: `TextArea`, `Toggle`, `Slider`, `Spinner`, `ProgressBar`, `NumberInput`, `DatePicker`, `TimePicker`
 - navigation controls: `Breadcrumb`, `Paginator`, `Toolbar`, `CommandBar`, `SearchBox`
+- navigation controls: `SearchResultsView` (row-state + border token mapping)
 - navigation primitives: `Accordion`, `MultiSelect`, `RadioGroup`
 - navigation overlay details: `Choice`/`ComboBox` include border text token mapping plus `DropdownGlyphSet` marker customization
 - navigation overlay details: `TreeView` includes border text token mapping plus `TreeViewGlyphSet` marker customization
