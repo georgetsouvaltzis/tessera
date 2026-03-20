@@ -1,3 +1,4 @@
+using System.Buffers;
 using System.ComponentModel;
 using System.Text;
 using TeaSharp.Core.Abstractions;
@@ -12,54 +13,62 @@ internal sealed class TerminalReader(Stream input, IEventDecoder decoder, TimeSp
 
     public async Task StreamEventsAsync(Action<IMessage> onEvent, CancellationToken cancellationToken = default)
     {
-        var pending = new PendingByteBuffer(DefaultReadBufferSize);
-        var readBuffer = new byte[DefaultReadBufferSize];
-        var state = new PasteState();
-        var readTask = input.ReadAsync(readBuffer.AsMemory(0, readBuffer.Length), cancellationToken).AsTask();
+        using var pending = new PendingByteBuffer(DefaultReadBufferSize);
+        var readBuffer = ArrayPool<byte>.Shared.Rent(DefaultReadBufferSize);
 
-        while (!cancellationToken.IsCancellationRequested)
+        try
         {
+            var state = new PasteState();
+            var readTask = input.ReadAsync(readBuffer.AsMemory(0, DefaultReadBufferSize), cancellationToken).AsTask();
+
+            while (!cancellationToken.IsCancellationRequested)
+            {
+                if (pending.Count > 0)
+                {
+                    var completed = await Task.WhenAny(
+                            readTask,
+                            Task.Delay(escapeTimeout, cancellationToken))
+                        .ConfigureAwait(false);
+                    if (!ReferenceEquals(completed, readTask))
+                    {
+                        Drain(pending, onEvent, state, timeoutExpired: true);
+                        continue;
+                    }
+                }
+
+                int read;
+                try
+                {
+                    read = await readTask.WaitAsync(cancellationToken).ConfigureAwait(false);
+                }
+                catch (OperationCanceledException)
+                {
+                    break;
+                }
+                catch (ObjectDisposedException)
+                {
+                    break;
+                }
+
+                if (read <= 0)
+                {
+                    break;
+                }
+
+                pending.Append(readBuffer.AsSpan(0, read));
+                Drain(pending, onEvent, state, timeoutExpired: false);
+                readTask = input.ReadAsync(readBuffer.AsMemory(0, DefaultReadBufferSize), cancellationToken).AsTask();
+            }
+
             if (pending.Count > 0)
             {
-                var completed = await Task.WhenAny(
-                        readTask,
-                        Task.Delay(escapeTimeout, cancellationToken))
-                    .ConfigureAwait(false);
-                if (!ReferenceEquals(completed, readTask))
-                {
-                    Drain(pending, onEvent, state, timeoutExpired: true);
-                    continue;
-                }
+                await Task.Delay(escapeTimeout, cancellationToken).ConfigureAwait(false);
+                Drain(pending, onEvent, state, timeoutExpired: true);
             }
-
-            int read;
-            try
-            {
-                read = await readTask.WaitAsync(cancellationToken).ConfigureAwait(false);
-            }
-            catch (OperationCanceledException)
-            {
-                break;
-            }
-            catch (ObjectDisposedException)
-            {
-                break;
-            }
-
-            if (read <= 0)
-            {
-                break;
-            }
-
-            pending.Append(readBuffer.AsSpan(0, read));
-            Drain(pending, onEvent, state, timeoutExpired: false);
-            readTask = input.ReadAsync(readBuffer.AsMemory(0, readBuffer.Length), cancellationToken).AsTask();
         }
-
-        if (pending.Count > 0)
+        finally
         {
-            await Task.Delay(escapeTimeout, cancellationToken).ConfigureAwait(false);
-            Drain(pending, onEvent, state, timeoutExpired: true);
+            ArrayPool<byte>.Shared.Return(readBuffer);
         }
     }
 
@@ -144,15 +153,17 @@ internal sealed class TerminalReader(Stream input, IEventDecoder decoder, TimeSp
         public StringBuilder Buffer { get; } = new();
     }
 
-    private sealed class PendingByteBuffer
+    private sealed class PendingByteBuffer : IDisposable
     {
+        private readonly ArrayPool<byte> _pool;
         private byte[] _buffer;
         private int _start;
         private int _end;
 
         public PendingByteBuffer(int initialCapacity)
         {
-            _buffer = new byte[Math.Max(initialCapacity, 64)];
+            _pool = ArrayPool<byte>.Shared;
+            _buffer = _pool.Rent(Math.Max(initialCapacity, 64));
             _start = 0;
             _end = 0;
         }
@@ -218,13 +229,15 @@ internal sealed class TerminalReader(Stream input, IEventDecoder decoder, TimeSp
                 newSize *= 2;
             }
 
-            var next = new byte[newSize];
+            var next = _pool.Rent(newSize);
             if (currentCount > 0)
             {
                 _buffer.AsSpan(_start, currentCount).CopyTo(next);
             }
 
+            var previous = _buffer;
             _buffer = next;
+            _pool.Return(previous);
             _start = 0;
             _end = currentCount;
         }
@@ -246,6 +259,14 @@ internal sealed class TerminalReader(Stream input, IEventDecoder decoder, TimeSp
             _buffer.AsSpan(_start, currentCount).CopyTo(_buffer);
             _start = 0;
             _end = currentCount;
+        }
+
+        public void Dispose()
+        {
+            _pool.Return(_buffer);
+            _buffer = [];
+            _start = 0;
+            _end = 0;
         }
     }
 }

@@ -31,8 +31,16 @@ internal sealed class TeaRuntimeLoop
         _update = update ?? throw new ArgumentNullException(nameof(update));
         _render = render ?? throw new ArgumentNullException(nameof(render));
         _options = options ?? new TeaRuntimeLoopOptions();
-        _messages = Channel.CreateUnbounded<IMessage>();
-        _effects = Channel.CreateUnbounded<Effect>();
+        _messages = Channel.CreateUnbounded<IMessage>(new UnboundedChannelOptions
+        {
+            SingleReader = true,
+            SingleWriter = false,
+        });
+        _effects = Channel.CreateUnbounded<Effect>(new UnboundedChannelOptions
+        {
+            SingleReader = true,
+            SingleWriter = true,
+        });
     }
 
     public void Send(IMessage message)

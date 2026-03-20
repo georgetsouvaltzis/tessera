@@ -20,10 +20,11 @@ internal static class TeaResizeMonitor
             return (null, null);
         }
 
-        var signalTicks = Channel.CreateUnbounded<bool>(new UnboundedChannelOptions
+        var signalTicks = Channel.CreateBounded<bool>(new BoundedChannelOptions(1)
         {
             SingleReader = true,
             SingleWriter = false,
+            FullMode = BoundedChannelFullMode.DropOldest,
         });
 
         var registration = TryRegisterResizeSignal(terminal, options, () => signalTicks.Writer.TryWrite(true));
@@ -41,9 +42,7 @@ internal static class TeaResizeMonitor
             {
                 try
                 {
-                    var pollDelay = Task.Delay(interval, token);
-                    var signalWait = signalTicks.Reader.WaitToReadAsync(token).AsTask();
-                    await Task.WhenAny(pollDelay, signalWait).ConfigureAwait(false);
+                    await WaitForSignalOrPollIntervalAsync(signalTicks.Reader, interval, token).ConfigureAwait(false);
 
                     while (signalTicks.Reader.TryRead(out _))
                     {
@@ -67,6 +66,23 @@ internal static class TeaResizeMonitor
         }, token);
 
         return (loop, registration);
+    }
+
+    private static async Task WaitForSignalOrPollIntervalAsync(ChannelReader<bool> signalTicks, TimeSpan interval, CancellationToken token)
+    {
+        var waitForSignal = signalTicks.WaitToReadAsync(token);
+        if (waitForSignal.IsCompletedSuccessfully)
+        {
+            return;
+        }
+
+        try
+        {
+            await waitForSignal.AsTask().WaitAsync(interval, token).ConfigureAwait(false);
+        }
+        catch (TimeoutException)
+        {
+        }
     }
 
     private static IDisposable? TryRegisterResizeSignal(ITerminalAdapter terminal, TeaRuntimeLoopOptions options, Action onResize)
