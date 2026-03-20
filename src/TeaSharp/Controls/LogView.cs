@@ -63,6 +63,24 @@ public sealed class LogView : Control
         set;
     } = TeaStyle.Empty;
 
+    /// <summary>
+    /// Gets or sets style applied to border glyphs when the control is not focused.
+    /// </summary>
+    public TeaStyle BorderStyleText
+    {
+        get;
+        set;
+    } = TeaStyle.Empty;
+
+    /// <summary>
+    /// Gets or sets style merged into border glyphs while the control is focused.
+    /// </summary>
+    public TeaStyle FocusedBorderStyleText
+    {
+        get;
+        set;
+    } = TeaStyle.Empty;
+
     public BorderStyle Border
     {
         get;
@@ -190,7 +208,8 @@ public sealed class LogView : Control
             clipped,
             Border == BorderStyle.None ? null : title,
             Border,
-            Padding);
+            Padding,
+            ResolveBorderStyleText());
         if (content.IsEmpty)
         {
             return;
@@ -270,5 +289,16 @@ public sealed class LogView : Control
     private bool HasActiveFilter()
     {
         return !string.IsNullOrWhiteSpace(_filter);
+    }
+
+    private TeaStyle ResolveBorderStyleText()
+    {
+        var style = BorderStyleText;
+        if (IsFocused)
+        {
+            style = style.Merge(FocusedBorderStyleText);
+        }
+
+        return style;
     }
 }

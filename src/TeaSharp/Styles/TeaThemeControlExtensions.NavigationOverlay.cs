@@ -365,6 +365,8 @@ public static partial class TeaThemeControlExtensions
         control.WarningItemStyle = theme.State.Warning;
         control.ErrorItemStyle = theme.State.Error;
         control.DisabledItemStyle = theme.Text.Muted;
+        control.BorderStyleText = theme.Border.Default;
+        control.FocusedBorderStyleText = theme.Border.Focused.Merge(theme.Focus.Border);
         return control;
     }
 
@@ -397,6 +399,8 @@ public static partial class TeaThemeControlExtensions
         control.WarningItemStyle = ApplyDefault(control.WarningItemStyle, theme.State.Warning);
         control.ErrorItemStyle = ApplyDefault(control.ErrorItemStyle, theme.State.Error);
         control.DisabledItemStyle = ApplyDefault(control.DisabledItemStyle, theme.Text.Muted);
+        control.BorderStyleText = ApplyDefault(control.BorderStyleText, theme.Border.Default);
+        control.FocusedBorderStyleText = ApplyDefault(control.FocusedBorderStyleText, theme.Border.Focused.Merge(theme.Focus.Border));
         return control;
     }
 

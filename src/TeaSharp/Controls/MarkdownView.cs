@@ -51,6 +51,24 @@ public sealed class MarkdownView : Control
         set;
     } = TeaStyle.Empty;
 
+    /// <summary>
+    /// Gets or sets style applied to border glyphs when the control is not focused.
+    /// </summary>
+    public TeaStyle BorderStyleText
+    {
+        get;
+        set;
+    } = TeaStyle.Empty;
+
+    /// <summary>
+    /// Gets or sets style merged into border glyphs while the control is focused.
+    /// </summary>
+    public TeaStyle FocusedBorderStyleText
+    {
+        get;
+        set;
+    } = TeaStyle.Empty;
+
     public BorderStyle Border
     {
         get;
@@ -115,7 +133,8 @@ public sealed class MarkdownView : Control
             clipped,
             title,
             Border,
-            Padding);
+            Padding,
+            ResolveBorderStyleText());
 
         if (content.IsEmpty)
         {
@@ -183,5 +202,16 @@ public sealed class MarkdownView : Control
         }
 
         return Title;
+    }
+
+    private TeaStyle ResolveBorderStyleText()
+    {
+        var style = BorderStyleText;
+        if (IsFocused)
+        {
+            style = style.Merge(FocusedBorderStyleText);
+        }
+
+        return style;
     }
 }
