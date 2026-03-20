@@ -34,13 +34,13 @@ Correctness is a continuous gate across all phases: fix regressions at source an
    - Verify Ghostty, iTerm2, WezTerm, Kitty, and Windows Terminal behavior.
    - Document support model for `ScreenOptions.FontSpec` (best-effort request, terminal-dependent).
    - Exit criteria: matrix complete + unsupported terminals verified as safe no-op (no crash, no broken frame output).
-2. **(3) Visual Quality Baseline Contract**
-   - Define and enforce minimum visual contract (readability, focus/selection clarity, consistent borders/markers).
-   - Full polish is deferred until after widget expansion.
-   - Exit criteria: baseline contract documented + focused render/theme assertions green.
-3. **(4) Widget Expansion**
+2. **(4) Widget Expansion**
    - Deliver planned built-in widget tranche with consistent theming/state hooks.
    - Exit criteria: widget tranche targets met per roadmap and covered by render/theme tests.
+3. **(3) Visual Quality Full Polish Pass**
+   - Execute full visual refinement after the widget tranche is implemented.
+   - Keep only minimum visual contract enforcement during widget build-out (state hooks, override path, monochrome readability).
+   - Exit criteria: polish checklist complete for expanded widget surface; visual regressions closed.
 4. **(1) API Freeze + Cleanup**
    - Freeze public naming/shape, remove ambiguity, cleanup dead or duplicate paths.
    - Exit criteria: naming clarity gate pass + API commenting gate pass + cleanup diffs validated.
@@ -59,10 +59,10 @@ Correctness is a continuous gate across all phases: fix regressions at source an
   - verification evidence captured in [terminal-compatibility-evidence-v1.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/terminal-compatibility-evidence-v1.md)
   - explicit environment note: iTerm2/WezTerm/Kitty/Windows Terminal binaries are not installed on this host; their verification uses deterministic tests + official specs; Ghostty has host evidence
   - capability-gated no-op fallback behavior is covered by deterministic tests for unsupported terminals
-- **M2: Visual Quality Baseline Contract** -> **Done**
-  - current controls have baseline theme/style parity and regression coverage for key focus/selection/border paths
-- **M3: Widget Expansion** -> **In progress**
+- **M2: Widget Expansion** -> **In progress**
   - roadmap execution active; remaining tranche tracked in [widget-roadmap-v1.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/widget-roadmap-v1.md)
+- **M3: Visual Quality Full Polish Pass** -> **Pending**
+  - full polish starts after widget tranche completion
 - **M4: API Freeze + Cleanup** -> **In progress**
   - naming clarity and XML commenting gates active for all V1-touching API updates
 - **M5: Performance Gate + Benchmarks + Docs Freeze** -> **Pending manual signoff**
@@ -155,7 +155,7 @@ Release approval rule: M5 is only complete when all four rows above are moved fr
   - PR fails if new/changed public APIs are undocumented or copy-template comments.
   - Docs must match actual runtime behavior in examples/tests.
 
-## Visual Quality Baseline Checklist (Phase 2 Gate)
+## Visual Quality Baseline Contract (Applied During Phase 2 Widget Build-Out)
 1. Override hierarchy remains enforced and documented:
    - global theme -> control-type defaults -> control instance -> state.
 2. Focus visuals are fully overrideable (marker + title + border), not marker-only.
@@ -169,6 +169,13 @@ Release approval rule: M5 is only complete when all four rows above are moved fr
 6. Theme mappings cover current V1 control groups:
    - `Basic`, `InputValue`, `Navigation`, `NavigationOverlay`, `NavigationPrimitives`, `DataAndFlow`, `ExplorerAndFeedback`, `RenderingTextUtilities`, `ModalAndCharts`.
 7. Monochrome rendering remains readable when style hooks are empty.
+
+## Visual Quality Full Polish Checklist (Phase 3 Gate)
+1. Expanded widget set receives spacing/contrast/passive-state polish review.
+2. Focus, hover, selected, and error visuals are consistent across new widgets.
+3. Default visuals feel cohesive across built-ins with no hardcoded focus marker assumptions.
+4. WidgetGallery/Showcase outputs are updated to demonstrate polished defaults.
+5. Regression snapshots/text assertions are updated for intentional visual deltas only.
 
 ## Open V1 Visual Parity Gaps (Current)
 - Closed: cookbook examples for overlay glyph APIs, border overrides, dropdown/tree glyph sets, and data widget separator/marker hooks (`edf676c`, `dcdc51f`).
@@ -192,17 +199,17 @@ Release approval rule: M5 is only complete when all four rows above are moved fr
   - unsupported terminals are validated as no-op fallback for font requests (safe output; no frame corruption)
   - touched-area unit/integration checks pass
 
-### M2: Visual Quality Baseline Contract
-- Acceptance:
-  - minimal visual contract is implemented for current controls (readability, focus/selection clarity, border consistency)
-  - theme/default/override behavior is validated on touched controls
-  - intentional visual expectation updates are captured in tests
-
-### M3: Widget Expansion
+### M2: Widget Expansion
 - Acceptance:
   - V1 widget tranche target from `docs/widget-roadmap-v1.md` is complete
   - new widgets follow existing API/style naming and theme-token conventions
-  - render + theme coverage exists for added widgets
+  - minimum visual baseline contract is enforced for every added widget
+
+### M3: Visual Quality Full Polish Pass
+- Acceptance:
+  - full polish checklist is complete for expanded widget surface
+  - theme/default/override behavior is validated across new widgets
+  - intentional visual expectation updates are captured in tests
 
 ### M4: API Freeze + Cleanup
 - Acceptance:
@@ -219,8 +226,8 @@ Release approval rule: M5 is only complete when all four rows above are moved fr
 
 ## Dependency Graph and Critical Path
 1. Terminal compatibility verification matrix
-2. Visual quality baseline contract
-3. Widget expansion
+2. Widget expansion
+3. Visual quality full polish pass
 4. API freeze + cleanup
 5. Performance gate + benchmarks + docs freeze
 
@@ -245,14 +252,14 @@ Coordination rules:
 - **C1: Terminal Matrix Exit**
   - Required: compatibility matrix complete for Ghostty/iTerm2/WezTerm/Kitty/Windows Terminal.
   - Required: `FontSpec` unsupported paths verified as safe no-op.
-  - Exit: visual baseline phase can begin.
-- **C2: Visual Baseline Exit**
-  - Required: minimal visual contract implemented and tested for touched controls.
-  - Required: theme override checks green.
   - Exit: widget expansion phase can begin.
-- **C3: Widget Expansion Exit**
+- **C2: Widget Expansion Exit**
   - Required: widget tranche target met with render/theme coverage.
   - Required: full polish backlog for expanded widgets captured.
+  - Exit: visual full-polish phase can begin.
+- **C3: Visual Full-Polish Exit**
+  - Required: full visual polish checklist pass for expanded widgets.
+  - Required: visual regression assertions updated for intentional changes.
   - Exit: API freeze/cleanup phase can begin.
 - **C4: API Freeze Exit**
   - Required: API freeze/cleanup checklist pass + naming clarity gate pass + XML docs pass.
