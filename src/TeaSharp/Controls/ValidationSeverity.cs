@@ -1,22 +1,22 @@
 namespace TeaSharp.Controls;
 
 /// <summary>
-/// Identifies the severity of a validation issue.
+/// Represents the severity level of a validation issue.
 /// </summary>
 public enum ValidationSeverity
 {
     /// <summary>
-    /// Informational issue that does not block completion.
+    /// Informational issue.
     /// </summary>
     Info = 0,
 
     /// <summary>
-    /// Warning issue that may require user attention.
+    /// Warning issue.
     /// </summary>
     Warning = 1,
 
     /// <summary>
-    /// Error issue that blocks successful validation.
+    /// Error issue.
     /// </summary>
     Error = 2,
 }

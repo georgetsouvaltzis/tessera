@@ -1,46 +1,46 @@
 namespace TeaSharp.Controls;
 
 /// <summary>
-/// Provides details when a <see cref="ValidationSummary" /> selection changes.
+/// Provides data for validation selection change events.
 /// </summary>
 public sealed class ValidationSelectionChangedEventArgs : EventArgs
 {
     /// <summary>
-    /// Initializes a new selection payload.
+    /// Initializes a new instance of the <see cref="ValidationSelectionChangedEventArgs"/> class.
     /// </summary>
-    /// <param name="previousIndex">The selected index before the change.</param>
-    /// <param name="currentIndex">The selected index after the change.</param>
-    /// <param name="previousItem">The selected issue before the change.</param>
-    /// <param name="currentItem">The selected issue after the change.</param>
+    /// <param name="previousIndex">The previous selected index.</param>
+    /// <param name="currentIndex">The current selected index.</param>
+    /// <param name="previousIssue">The previously selected issue.</param>
+    /// <param name="currentIssue">The currently selected issue.</param>
     public ValidationSelectionChangedEventArgs(
         int previousIndex,
         int currentIndex,
-        ValidationIssue? previousItem,
-        ValidationIssue? currentItem)
+        ValidationIssue? previousIssue,
+        ValidationIssue? currentIssue)
     {
         PreviousIndex = previousIndex;
         CurrentIndex = currentIndex;
-        PreviousItem = previousItem;
-        CurrentItem = currentItem;
+        PreviousIssue = previousIssue;
+        CurrentIssue = currentIssue;
     }
 
     /// <summary>
-    /// Gets the selected index before the change.
+    /// Gets the previous selected index.
     /// </summary>
     public int PreviousIndex { get; }
 
     /// <summary>
-    /// Gets the selected index after the change.
+    /// Gets the current selected index.
     /// </summary>
     public int CurrentIndex { get; }
 
     /// <summary>
-    /// Gets the selected issue before the change.
+    /// Gets the previously selected issue.
     /// </summary>
-    public ValidationIssue? PreviousItem { get; }
+    public ValidationIssue? PreviousIssue { get; }
 
     /// <summary>
-    /// Gets the selected issue after the change.
+    /// Gets the currently selected issue.
     /// </summary>
-    public ValidationIssue? CurrentItem { get; }
+    public ValidationIssue? CurrentIssue { get; }
 }
