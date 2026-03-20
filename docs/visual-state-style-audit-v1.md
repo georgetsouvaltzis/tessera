@@ -4,8 +4,9 @@
 - Target: background colors, hover/selected/focused overrides, theme token wiring.
 - Focused areas: `TeaTheme`, `TeaThemeOverrides`, `TeaThemeControlExtensions.*`, dropdown-like controls (`Choice`, `ComboBox`), and representative nav/data/overlay/input controls.
 - This is analysis-only. No product code changes.
+- Synced against current repository HEAD after lane merges.
 
-## Baseline Findings
+## Final Sync Findings
 
 ### 1) Theme hierarchy exists and is deterministic
 - Override precedence is explicit: global -> global-state -> control-type -> control-type-state -> control-instance -> control-instance-state (`src/TeaSharp/Styles/TeaThemeOverrides.cs:7`, `src/TeaSharp/Styles/TeaThemeOverrides.cs:99`).
@@ -21,7 +22,7 @@
 - `ScreenContext` carries `Theme` but no `ThemeOverrides` (`src/TeaSharp/ScreenContext.cs:24`).
 - Net: `TeaThemeOverrides` is available API but not automatically integrated into render pipeline.
 
-## Support Matrix (Current)
+## Support Matrix (Final)
 
 | Control | Hover hook | Selected hook | Focused hook | Background-ready hook | Theme token wiring |
 |---|---|---|---|---|---|
@@ -33,6 +34,7 @@
 | ListView | Yes (`HoveredRowStyle`) | Yes (`SelectedRowStyle`) | Yes (title/border) | Yes | Yes (`Basic`) |
 | DataGrid | No explicit hover style | Yes (`SelectedRowStyle`, `SelectedCellStyle`) | Yes (title/border) | Yes | Yes (`DataAndFlow`) |
 | TreeTable | No explicit hover style | Yes (`SelectedRowStyle`) | Yes (title/border) | Yes | Yes (`DataAndFlow`) |
+| TreeView | Yes (`HoveredItemStyle`) | Yes (`SelectedItemStyle`) | Yes (title/border) | Yes | Yes (`NavigationOverlay`) |
 | FileExplorer | No explicit hover style | Yes (`SelectedStyle`) | Yes (title/border) | Yes | Yes (`ExplorerAndFeedback`) |
 | FuzzyFinder | No hover style hook | Yes (`SelectedItemStyle`) | Yes (title/border) | Yes | Partial (no hover token map) |
 | DatePicker | Yes (`HoveredDayStyle`) | Yes (`SelectedDayStyle`) | Yes (title/border) | Yes | Yes (`InputValue`) |
@@ -62,6 +64,12 @@
 
 7. **Theme-override state coverage in tests is narrow**
 - Existing override tests heavily exercise focused state; hovered/selected/disabled/error/active state layering is not broadly asserted (`tests/TeaSharp.Tests/ThemeOverridesTests.Foundation.cs:39`, `tests/TeaSharp.Tests/ThemeOverridesTests.InputValueWidgets.cs:235`).
+
+## Final Sync Summary
+
+- Full visual-state/style pass (`hover` + `selected` + `focused` hooks and token wiring): `9/14` controls (`Choice`, `ComboBox`, `ContextMenu`, `CommandPalette`, `MenuBar`, `ListView`, `TreeView`, `DatePicker`, `TimePicker`).
+- Partial pass: `5/14` controls (`DataGrid`, `TreeTable`, `FileExplorer`, `FuzzyFinder`, `Table`).
+- Remaining known gaps are unchanged in this sync and are concentrated in runtime override integration plus missing hover/token parity for data/explorer controls.
 
 ## Suggested Priority Order
 1. Runtime integration of `TeaThemeOverrides` (without breaking explicit control-level styles).

@@ -2,7 +2,7 @@
 
 Scope: `Choice`, `ComboBox`, `ContextMenu`, `CommandPalette`, `ListView<T>`, `Table`, `TreeView`, `MenuBar`, `MultiSelect`, `RadioGroup`, `DataGrid`.
 
-Method: code + tests only (no docs-claim scoring).
+Method: code + tests only (no docs-claim scoring), synced against current repository HEAD after lane merges.
 
 | Control | Mouse click | Mouse hover | Selection semantics | Evidence (code/tests) |
 |---|---|---|---|---|
@@ -23,3 +23,16 @@ Method: code + tests only (no docs-claim scoring).
 - `Supported` means implemented in control runtime behavior.
 - `Partially supported` means behavior exists but public selection state/contracts are limited for app-level integration.
 - `Missing` means no pointer-based path exists in current control implementation.
+
+## Final Sync Summary
+
+- Full pass (`click` + `hover` + `selection semantics`): `4/11` (`Choice`, `ComboBox`, `ListView<T>`, `MenuBar`).
+- Partial pass (at least one dimension constrained): `5/11` (`ContextMenu`, `CommandPalette`, `Table`, `TreeView`, `DataGrid`).
+- Missing pointer-path support: `2/11` (`MultiSelect`, `RadioGroup`).
+
+## Remaining Known Gaps
+
+- `MultiSelect` and `RadioGroup` still do not implement `Handle(Message, Rect)` pointer paths (`src/TeaSharp/Controls/MultiSelect.cs:156`, `src/TeaSharp/Controls/RadioGroup.cs:122`).
+- `DataGrid` still lacks pointer-motion hover semantics (wheel + click only in pointer handler) (`src/TeaSharp/Controls/DataGrid.cs:390`).
+- `ContextMenu` and `CommandPalette` remain execution-centric for selection exposure (`LastExecutedItemId`/`TryConsumeExecution`) without public selected-index contract (`src/TeaSharp/Controls/ContextMenu.cs:115`, `src/TeaSharp/Controls/ContextMenu.cs:300`, `src/TeaSharp/Controls/CommandPalette.cs:177`, `src/TeaSharp/Controls/CommandPalette.cs:354`).
+- `Table` and `TreeView` expose only limited selection contracts for app-level state sync (`src/TeaSharp/Controls/Table.cs:347`, `src/TeaSharp/Controls/TreeView.cs:64`).
