@@ -8,19 +8,19 @@ Environment:
 - terminal: `xterm-ghostty`
 - benchmark mode families: `render-only` + `render+materialize`
 
-Latest measured snapshot (current head):
+Latest measured snapshot (current head `b8bf21512484`):
 - command pattern (render-only): `scripts/run_benchmarks_v1.sh shortlist-render-only`
 - command pattern (materialize): `scripts/run_benchmarks_v1.sh shortlist-materialize`
 - command pattern (viewport supplemental): `scripts/run_benchmarks_v1.sh scenario "*Viewport*"`
 
 | Scenario | Render-only mean | Render-only alloc | Materialize mean | Materialize alloc |
 | --- | --- | --- | --- | --- |
-| Startup | `12.60 us` | `30.52 KB` | `13.20 us` | `48.11 KB` |
-| LogTail | `4.899 ms` | `80.1 KB` | `4.955 ms` | `106.61 KB` |
-| LargeTable | `12.76 us` | `15.67 KB` | `14.11 us` | `46.88 KB` |
-| OverlayStress | `429.7 us` | `61.13 KB` | `495.0 us` | `1.42 MB` |
-| ResizeStorm | `299.5 us` | `59.11 KB` | `365.4 us` | `1.2 MB` |
-| StyledHeavy | `55.53 us` | `93.23 KB` | `56.17 us` | `118.48 KB` |
+| Startup | `12.08 us` | `30.52 KB` | `14.02 us` | `48.11 KB` |
+| LogTail | `4.842 ms` | `80.1 KB` | `6.835 ms` | `106.61 KB` |
+| LargeTable | `12.65 us` | `15.67 KB` | `14.87 us` | `46.88 KB` |
+| OverlayStress | `429.6 us` | `61.13 KB` | `504.9 us` | `1.42 MB` |
+| ResizeStorm | `301.7 us` | `59.11 KB` | `375.0 us` | `1.2 MB` |
+| StyledHeavy | `57.56 us` | `93.23 KB` | `59.57 us` | `118.48 KB` |
 
 Supplemental viewport scenario (optional):
 
@@ -62,6 +62,35 @@ Measured deltas vs accepted baseline:
 Conclusion:
 - measured benchmark budgets: `pass` (worst time regression `+5.79%`, worst allocation regression `+1.60%`)
 - input latency p95 budget: `not measured` in current BenchmarkDotNet shortlist lane
+
+## Iteration 4 Snapshot Refresh (2026-03-20)
+
+Commits:
+- prior documented snapshot: `b132c8a1cfa8`
+- current measured head: `b8bf21512484`
+
+Commands:
+- `scripts/run_benchmarks_v1.sh shortlist-render-only`
+- `scripts/run_benchmarks_v1.sh shortlist-materialize`
+
+Budget thresholds from `docs/perf-plan-v1.md`:
+- time regression budget: `> 10%` -> fail
+- allocation regression budget: `> 15%` -> fail
+
+Measured deltas vs prior documented snapshot:
+
+| Scenario | RO mean delta | RO alloc delta | MAT mean delta | MAT alloc delta | Gate |
+| --- | --- | --- | --- | --- | --- |
+| Startup | `-4.13%` | `+0.00%` | `+6.21%` | `+0.00%` | `pass` |
+| LogTail | `-1.16%` | `+0.00%` | `+37.94%` | `+0.00%` | `fail` |
+| LargeTable | `-0.86%` | `+0.00%` | `+5.39%` | `+0.00%` | `pass` |
+| OverlayStress | `-0.02%` | `+0.00%` | `+2.00%` | `+0.00%` | `pass` |
+| ResizeStorm | `+0.73%` | `+0.00%` | `+2.63%` | `+0.00%` | `pass` |
+| StyledHeavy | `+3.66%` | `+0.00%` | `+6.05%` | `+0.00%` | `pass` |
+
+Conclusion:
+- measured benchmark budgets: `fail` (worst time regression `+37.94%` in `LogTail` materialize; worst allocation regression `+0.00%`)
+- next step: attribute `LogTail` materialize regression with targeted scenario repeats before release gate signoff
 
 ## Iteration 3 Spotlight (2026-03-19)
 
