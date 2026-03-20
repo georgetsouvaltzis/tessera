@@ -21,7 +21,7 @@ internal struct SgrStyleState
     private string? _foreground;
     private string? _background;
 
-    public void Apply(int[] codes)
+    public void Apply(ReadOnlySpan<int> codes)
     {
         if (codes.Length == 0)
         {
@@ -107,7 +107,7 @@ internal struct SgrStyleState
         _background = null;
     }
 
-    private static string? ParseExtendedColorParameter(int[] codes, ref int index, bool foreground)
+    private static string? ParseExtendedColorParameter(ReadOnlySpan<int> codes, ref int index, bool foreground)
     {
         if (index + 1 >= codes.Length)
         {

@@ -1,3 +1,5 @@
+using System.Buffers;
+
 namespace TeaSharp.Core.Rendering;
 
 internal static class SgrParser
@@ -33,20 +35,26 @@ internal static class SgrParser
             return false;
         }
 
-        state.Apply(ParseParameters(text.AsSpan(index + 2, cursor - (index + 2))));
+        ApplyParameters(text.AsSpan(index + 2, cursor - (index + 2)), ref state);
         currentStyle = state.ToEscapeSequence();
         index = cursor + 1;
         return true;
     }
 
-    private static int[] ParseParameters(ReadOnlySpan<char> parameters)
+    private static void ApplyParameters(ReadOnlySpan<char> parameters, ref SgrStyleState state)
     {
         if (parameters.Length == 0)
         {
-            return [0];
+            Span<int> reset = stackalloc int[1];
+            reset[0] = 0;
+            state.Apply(reset);
+            return;
         }
 
-        var values = new List<int>(8);
+        Span<int> stack = stackalloc int[16];
+        var values = stack;
+        int[]? rented = null;
+        var count = 0;
         var value = 0;
         var hasValue = false;
 
@@ -61,13 +69,44 @@ internal static class SgrParser
 
             if (ch is ';' or ':')
             {
-                values.Add(hasValue ? value : 0);
+                EnsureCapacity(ref values, ref rented, count + 1);
+                values[count++] = hasValue ? value : 0;
                 value = 0;
                 hasValue = false;
             }
         }
 
-        values.Add(hasValue ? value : 0);
-        return [.. values];
+        EnsureCapacity(ref values, ref rented, count + 1);
+        values[count++] = hasValue ? value : 0;
+        state.Apply(values[..count]);
+
+        if (rented is not null)
+        {
+            ArrayPool<int>.Shared.Return(rented);
+        }
+    }
+
+    private static void EnsureCapacity(ref Span<int> values, ref int[]? rented, int required)
+    {
+        if (required <= values.Length)
+        {
+            return;
+        }
+
+        var newSize = values.Length * 2;
+        while (newSize < required)
+        {
+            newSize *= 2;
+        }
+
+        var next = ArrayPool<int>.Shared.Rent(newSize);
+        values.CopyTo(next);
+        if (rented is not null)
+        {
+            ArrayPool<int>.Shared.Return(rented);
+        }
+
+        rented = next;
+        values = next;
     }
 }

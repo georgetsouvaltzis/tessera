@@ -9,6 +9,20 @@ namespace TeaSharp.Core.Application;
 
 internal sealed class TeaRuntimeLoop
 {
+    private static readonly UnboundedChannelOptions MessageChannelOptions = new()
+    {
+        SingleReader = true,
+        SingleWriter = false,
+        AllowSynchronousContinuations = true,
+    };
+
+    private static readonly UnboundedChannelOptions EffectChannelOptions = new()
+    {
+        SingleReader = true,
+        SingleWriter = true,
+        AllowSynchronousContinuations = true,
+    };
+
     private readonly Func<Effect?>? _initialize;
     private readonly Func<IMessage, Effect?> _update;
     private readonly Func<ScreenOutput> _render;
@@ -31,16 +45,8 @@ internal sealed class TeaRuntimeLoop
         _update = update ?? throw new ArgumentNullException(nameof(update));
         _render = render ?? throw new ArgumentNullException(nameof(render));
         _options = options ?? new TeaRuntimeLoopOptions();
-        _messages = Channel.CreateUnbounded<IMessage>(new UnboundedChannelOptions
-        {
-            SingleReader = true,
-            SingleWriter = false,
-        });
-        _effects = Channel.CreateUnbounded<Effect>(new UnboundedChannelOptions
-        {
-            SingleReader = true,
-            SingleWriter = true,
-        });
+        _messages = Channel.CreateUnbounded<IMessage>(MessageChannelOptions);
+        _effects = Channel.CreateUnbounded<Effect>(EffectChannelOptions);
     }
 
     public void Send(IMessage message)

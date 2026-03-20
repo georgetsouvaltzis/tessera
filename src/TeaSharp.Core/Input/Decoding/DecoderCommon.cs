@@ -96,42 +96,22 @@ internal static class DecoderCommon
 
     public static List<int?> ParseIntegerParameters(ReadOnlySpan<byte> bytes)
     {
-        var values = new List<int?>();
+        var values = new List<int?>(8);
         if (bytes.IsEmpty)
         {
             return values;
         }
 
-        var text = ToAscii(bytes);
-        var parts = text.Split([';', ':']);
-        foreach (var part in parts)
+        var segmentStart = 0;
+        for (var i = 0; i <= bytes.Length; i++)
         {
-            if (string.IsNullOrWhiteSpace(part))
+            if (i < bytes.Length && bytes[i] is not (byte)';' and not (byte)':')
             {
-                values.Add(null);
                 continue;
             }
 
-            var segment = part.Trim();
-            var start = 0;
-            while (start < segment.Length && !char.IsDigit(segment[start]))
-            {
-                start++;
-            }
-
-            if (start >= segment.Length)
-            {
-                values.Add(null);
-                continue;
-            }
-
-            var end = start;
-            while (end < segment.Length && char.IsDigit(segment[end]))
-            {
-                end++;
-            }
-
-            values.Add(int.TryParse(segment[start..end], out var value) ? value : null);
+            values.Add(ParseIntegerSegment(bytes[segmentStart..i]));
+            segmentStart = i + 1;
         }
 
         return values;
@@ -156,6 +136,36 @@ internal static class DecoderCommon
     public static string ToAscii(ReadOnlySpan<byte> bytes)
     {
         return Encoding.ASCII.GetString(bytes);
+    }
+
+    private static int? ParseIntegerSegment(ReadOnlySpan<byte> segment)
+    {
+        if (segment.IsEmpty)
+        {
+            return null;
+        }
+
+        var value = 0;
+        var foundDigit = false;
+        var readingDigits = false;
+
+        foreach (var b in segment)
+        {
+            if (b is >= (byte)'0' and <= (byte)'9')
+            {
+                value = (value * 10) + (b - (byte)'0');
+                foundDigit = true;
+                readingDigits = true;
+                continue;
+            }
+
+            if (readingDigits)
+            {
+                break;
+            }
+        }
+
+        return foundDigit ? value : null;
     }
 
     public static KeyModifiers ParseModifiers(int? rawModifier)

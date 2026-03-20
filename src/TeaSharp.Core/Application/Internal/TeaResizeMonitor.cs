@@ -8,6 +8,14 @@ namespace TeaSharp.Core.Application;
 
 internal static class TeaResizeMonitor
 {
+    private static readonly BoundedChannelOptions ResizeSignalChannelOptions = new(1)
+    {
+        SingleReader = true,
+        SingleWriter = false,
+        FullMode = BoundedChannelFullMode.DropOldest,
+        AllowSynchronousContinuations = true,
+    };
+
     public static (Task? Loop, IDisposable? SignalRegistration) Start(
         ITerminalAdapter? terminal,
         TeaRuntimeLoopOptions options,
@@ -20,12 +28,7 @@ internal static class TeaResizeMonitor
             return (null, null);
         }
 
-        var signalTicks = Channel.CreateBounded<bool>(new BoundedChannelOptions(1)
-        {
-            SingleReader = true,
-            SingleWriter = false,
-            FullMode = BoundedChannelFullMode.DropOldest,
-        });
+        var signalTicks = Channel.CreateBounded<bool>(ResizeSignalChannelOptions);
 
         var registration = TryRegisterResizeSignal(terminal, options, () => signalTicks.Writer.TryWrite(true));
         var loop = Task.Run(async () =>

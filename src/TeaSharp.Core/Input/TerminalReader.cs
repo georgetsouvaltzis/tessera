@@ -23,31 +23,42 @@ internal sealed class TerminalReader(Stream input, IEventDecoder decoder, TimeSp
 
             while (!cancellationToken.IsCancellationRequested)
             {
+                int read;
+
                 if (pending.Count > 0)
                 {
-                    var completed = await Task.WhenAny(
-                            readTask,
-                            Task.Delay(escapeTimeout, cancellationToken))
-                        .ConfigureAwait(false);
-                    if (!ReferenceEquals(completed, readTask))
+                    try
+                    {
+                        read = await readTask.WaitAsync(escapeTimeout, cancellationToken).ConfigureAwait(false);
+                    }
+                    catch (TimeoutException)
                     {
                         Drain(pending, onEvent, state, timeoutExpired: true);
                         continue;
                     }
+                    catch (OperationCanceledException)
+                    {
+                        break;
+                    }
+                    catch (ObjectDisposedException)
+                    {
+                        break;
+                    }
                 }
-
-                int read;
-                try
+                else
                 {
-                    read = await readTask.WaitAsync(cancellationToken).ConfigureAwait(false);
-                }
-                catch (OperationCanceledException)
-                {
-                    break;
-                }
-                catch (ObjectDisposedException)
-                {
-                    break;
+                    try
+                    {
+                        read = await readTask.WaitAsync(cancellationToken).ConfigureAwait(false);
+                    }
+                    catch (OperationCanceledException)
+                    {
+                        break;
+                    }
+                    catch (ObjectDisposedException)
+                    {
+                        break;
+                    }
                 }
 
                 if (read <= 0)
