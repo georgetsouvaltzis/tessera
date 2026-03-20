@@ -88,11 +88,15 @@ public sealed partial class TreeTable
         {
             _selectedVisibleIndex = 0;
             _scrollOffset = 0;
+            _hoveredVisibleIndex = -1;
             return;
         }
 
         _selectedVisibleIndex = Math.Clamp(_selectedVisibleIndex, 0, _visible.Count - 1);
         _scrollOffset = Math.Clamp(_scrollOffset, 0, Math.Max(0, _visible.Count - 1));
+        _hoveredVisibleIndex = _hoveredVisibleIndex >= 0 && _hoveredVisibleIndex < _visible.Count
+            ? _hoveredVisibleIndex
+            : -1;
     }
 
     private void AppendVisible(TreeTableNode item, int depth, int? parentVisibleIndex)
@@ -184,6 +188,36 @@ public sealed partial class TreeTable
     private string ResolveSelectedRowMarkerText() => SelectedRowMarker;
 
     private string ResolveUnselectedRowMarkerText() => UnselectedRowMarker;
+
+    private int RowToVisibleIndex(in TeaSharp.Components.Primitives.Rect content, int y)
+    {
+        var row = y - content.Y;
+        if (row <= 0)
+        {
+            return -1;
+        }
+
+        var viewportRows = Math.Max(0, content.Height - 1);
+        EnsureSelectionVisible(viewportRows);
+        var visibleIndex = _scrollOffset + row - 1;
+        return visibleIndex >= 0 && visibleIndex < _visible.Count
+            ? visibleIndex
+            : -1;
+    }
+
+    private bool SetHoveredVisibleIndex(int index)
+    {
+        var normalized = index >= 0 && index < _visible.Count
+            ? index
+            : -1;
+        if (_hoveredVisibleIndex == normalized)
+        {
+            return false;
+        }
+
+        _hoveredVisibleIndex = normalized;
+        return true;
+    }
 
     private string ResolveRowGlyph(TreeTableNode item)
     {

@@ -16,6 +16,7 @@ public sealed partial class FuzzyFinder : Control
     private readonly TextInputModel _query = new();
     private int _selectedIndex;
     private int _scrollOffset;
+    private int _hoveredIndex = -1;
 
     /// <summary>
     /// Initializes a new fuzzy finder.
@@ -202,6 +203,15 @@ public sealed partial class FuzzyFinder : Control
     /// Gets or sets style for non-selected result rows.
     /// </summary>
     public TeaStyle ListItemStyle
+    {
+        get;
+        set;
+    } = TeaStyle.Empty;
+
+    /// <summary>
+    /// Gets or sets style merged into hovered result rows.
+    /// </summary>
+    public TeaStyle HoveredItemStyle
     {
         get;
         set;

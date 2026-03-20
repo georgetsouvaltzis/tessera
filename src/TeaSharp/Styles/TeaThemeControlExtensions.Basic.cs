@@ -256,6 +256,10 @@ public static partial class TeaThemeControlExtensions
 
         control.TitleStyle = theme.Text.Secondary;
         control.FocusedTitleStyle = theme.Focus.Title;
+        control.HeaderStyle = theme.Text.Secondary;
+        control.RowStyle = theme.Text.Primary;
+        control.HoveredRowStyle = theme.Accent.Secondary;
+        control.SelectedRowStyle = theme.Selection.Foreground.Merge(theme.Selection.Background);
         control.BorderStyleText = theme.Border.Default;
         control.FocusedBorderStyleText = theme.Border.Focused.Merge(theme.Focus.Border);
         return control;
@@ -285,6 +289,12 @@ public static partial class TeaThemeControlExtensions
 
         control.TitleStyle = ApplyDefault(control.TitleStyle, theme.Text.Secondary);
         control.FocusedTitleStyle = ApplyDefault(control.FocusedTitleStyle, theme.Focus.Title);
+        control.HeaderStyle = ApplyDefault(control.HeaderStyle, theme.Text.Secondary);
+        control.RowStyle = ApplyDefault(control.RowStyle, theme.Text.Primary);
+        control.HoveredRowStyle = ApplyDefault(control.HoveredRowStyle, theme.Accent.Secondary);
+        control.SelectedRowStyle = ApplyDefault(
+            control.SelectedRowStyle,
+            theme.Selection.Foreground.Merge(theme.Selection.Background));
         control.BorderStyleText = ApplyDefault(control.BorderStyleText, theme.Border.Default);
         control.FocusedBorderStyleText = ApplyDefault(control.FocusedBorderStyleText, theme.Border.Focused.Merge(theme.Focus.Border));
         return control;

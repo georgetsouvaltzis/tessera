@@ -16,6 +16,7 @@ public sealed partial class TreeTable : Control
     private readonly List<VisibleEntry> _visible = [];
     private int _selectedVisibleIndex;
     private int _scrollOffset;
+    private int _hoveredVisibleIndex = -1;
 
     /// <summary>
     /// Initializes a tree table with optional columns.
@@ -84,6 +85,11 @@ public sealed partial class TreeTable : Control
     /// Gets or sets style merged into selected rows.
     /// </summary>
     public TeaStyle SelectedRowStyle { get; set; } = TeaStyle.Empty;
+
+    /// <summary>
+    /// Gets or sets style merged into hovered rows.
+    /// </summary>
+    public TeaStyle HoveredRowStyle { get; set; } = TeaStyle.Empty;
 
     /// <summary>
     /// Gets or sets style merged when disabled.
@@ -325,24 +331,45 @@ public sealed partial class TreeTable : Control
         }
 
         var content = FrameLayout.ResolveContentRect(bounds, Border, Padding);
-        if (content.IsEmpty || !content.Contains(pointer.X, pointer.Y))
+        var inside = !content.IsEmpty && content.Contains(pointer.X, pointer.Y);
+        var changed = false;
+        if (!inside)
         {
-            return Handle(message);
+            if (pointer.Kind is PointerEventKind.Motion or PointerEventKind.Press)
+            {
+                changed |= SetHoveredVisibleIndex(-1);
+            }
+
+            if (pointer.Kind is not PointerEventKind.Wheel)
+            {
+                return changed || Handle(message);
+            }
         }
 
         if (pointer.Kind == PointerEventKind.Wheel)
         {
             if (pointer.Button == PointerButton.WheelDown)
             {
-                return SetSelectedVisibleIndex(Math.Min(_visible.Count - 1, _selectedVisibleIndex + 1));
+                return changed | SetSelectedVisibleIndex(Math.Min(_visible.Count - 1, _selectedVisibleIndex + 1));
             }
 
             if (pointer.Button == PointerButton.WheelUp)
             {
-                return SetSelectedVisibleIndex(Math.Max(0, _selectedVisibleIndex - 1));
+                return changed | SetSelectedVisibleIndex(Math.Max(0, _selectedVisibleIndex - 1));
             }
 
             return false;
+        }
+
+        if (!inside)
+        {
+            return changed || Handle(message);
+        }
+
+        var hoveredVisibleIndex = RowToVisibleIndex(content, pointer.Y);
+        if (pointer.Kind == PointerEventKind.Motion)
+        {
+            return SetHoveredVisibleIndex(hoveredVisibleIndex);
         }
 
         if (pointer.Kind != PointerEventKind.Press || pointer.Button != PointerButton.Left)
@@ -351,21 +378,13 @@ public sealed partial class TreeTable : Control
         }
 
         RequestFocus();
-        var row = pointer.Y - content.Y;
-        if (row <= 0)
+        changed |= SetHoveredVisibleIndex(hoveredVisibleIndex);
+        if (hoveredVisibleIndex < 0)
         {
-            return true;
+            return changed || true;
         }
 
-        var viewportRows = Math.Max(0, content.Height - 1);
-        EnsureSelectionVisible(viewportRows);
-        var visibleIndex = _scrollOffset + row - 1;
-        if (visibleIndex < 0 || visibleIndex >= _visible.Count)
-        {
-            return true;
-        }
-
-        return SetSelectedVisibleIndex(visibleIndex);
+        return changed | SetSelectedVisibleIndex(hoveredVisibleIndex);
     }
 
     /// <inheritdoc />
@@ -424,6 +443,11 @@ public sealed partial class TreeTable : Control
 
             var line = $"{marker} {string.Join(ResolveColumnSeparatorText(), values)}";
             var style = entry.Item.IsBranch ? BranchRowStyle : LeafRowStyle;
+            if (visibleIndex == _hoveredVisibleIndex)
+            {
+                style = style.Merge(HoveredRowStyle);
+            }
+
             if (visibleIndex == _selectedVisibleIndex)
             {
                 style = style.Merge(SelectedRowStyle);

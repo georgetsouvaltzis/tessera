@@ -1,3 +1,4 @@
+using System.Text;
 using TeaSharp.Components.Primitives;
 using TeaSharp.Controls.Internal;
 using TeaSharp.Layout;
@@ -62,6 +63,42 @@ public sealed class Table : Control
     /// Gets or sets the title style applied when the control is focused.
     /// </summary>
     public TeaStyle FocusedTitleStyle
+    {
+        get;
+        set;
+    } = TeaStyle.Empty;
+
+    /// <summary>
+    /// Gets or sets the style applied to header rows.
+    /// </summary>
+    public TeaStyle HeaderStyle
+    {
+        get;
+        set;
+    } = TeaStyle.Empty;
+
+    /// <summary>
+    /// Gets or sets the style applied to non-selected, non-hovered data rows.
+    /// </summary>
+    public TeaStyle RowStyle
+    {
+        get;
+        set;
+    } = TeaStyle.Empty;
+
+    /// <summary>
+    /// Gets or sets the style merged into hovered data rows.
+    /// </summary>
+    public TeaStyle HoveredRowStyle
+    {
+        get;
+        set;
+    } = TeaStyle.Empty;
+
+    /// <summary>
+    /// Gets or sets the style merged into selected data rows.
+    /// </summary>
+    public TeaStyle SelectedRowStyle
     {
         get;
         set;
@@ -268,18 +305,66 @@ public sealed class Table : Control
 
     public override void Render(Canvas canvas, Rect rect)
     {
+        var clipped = Rect.Intersect(rect, canvas.Bounds);
+        if (clipped.IsEmpty || _columns.Count == 0)
+        {
+            return;
+        }
+
         var state = BuildState();
         NormalizeVisibleRowPointers(state.VisibleRowCount);
-        TeaSharp.Components.Primitives.Widgets.DrawTable(
-            canvas,
-            rect,
-            _columns,
-            state.VisibleRows,
-            selectedRow: _selectedVisibleRow >= 0 ? _selectedVisibleRow : _hoveredVisibleRow,
-            title: state.Title,
-            border: Border,
-            padding: Padding,
-            borderStyleText: ResolveBorderStyleText());
+
+        var showBorder = Border != BorderStyle.None;
+        Rect content;
+        if (showBorder)
+        {
+            canvas.DrawBox(clipped, state.Title, Border, ResolveBorderStyleText());
+            content = clipped.Inset(1, 1).Inset(Padding);
+        }
+        else
+        {
+            content = clipped.Inset(Padding);
+            if (!string.IsNullOrWhiteSpace(state.Title))
+            {
+                canvas.WriteText(content.X, content.Y, state.Title, content.Width);
+                content = new Rect(content.X, content.Y + 1, content.Width, content.Height - 1);
+            }
+        }
+
+        if (content.Height < 3 || content.Width <= 0)
+        {
+            return;
+        }
+
+        var separatorCount = _columns.Count - 1;
+        var availableWidth = Math.Max(_columns.Count, content.Width - separatorCount);
+        var widths = ComputeColumnWidths(availableWidth, _columns.Count);
+
+        var header = BuildRowText(widths, _columns, selectedMarker: false);
+        canvas.WriteText(content.X, content.Y, ApplyStyle(header, HeaderStyle), content.Width);
+
+        var dividerY = content.Y + 1;
+        canvas.DrawHorizontalLine(content.X, dividerY, content.Width, '─');
+        var separatorX = content.X;
+        for (var index = 0; index < widths.Length - 1; index++)
+        {
+            separatorX += widths[index];
+            canvas.Set(separatorX, dividerY, '┼');
+            separatorX++;
+        }
+
+        var maxRows = Math.Min(state.VisibleRows.Count, Math.Max(0, content.Height - 2));
+        for (var row = 0; row < maxRows; row++)
+        {
+            var markerRow = _selectedVisibleRow >= 0
+                ? row == _selectedVisibleRow
+                : row == _hoveredVisibleRow;
+            var isHovered = row == _hoveredVisibleRow;
+            var isSelected = row == _selectedVisibleRow;
+            var rowText = BuildRowText(widths, state.VisibleRows[row], markerRow);
+            var style = ResolveRowStyle(selected: isSelected, hovered: isHovered);
+            canvas.WriteText(content.X, content.Y + 2 + row, ApplyStyle(rowText, style), content.Width);
+        }
     }
 
     internal override LayoutMeasurement Measure(in Rect availableBounds)
@@ -362,6 +447,22 @@ public sealed class Table : Control
             : BorderStyleText;
     }
 
+    private TeaStyle ResolveRowStyle(bool selected, bool hovered)
+    {
+        var style = RowStyle;
+        if (hovered)
+        {
+            style = style.Merge(HoveredRowStyle);
+        }
+
+        if (selected)
+        {
+            style = style.Merge(SelectedRowStyle);
+        }
+
+        return style;
+    }
+
     private string FormatTitle()
     {
         var title = Title;
@@ -377,5 +478,68 @@ public sealed class Table : Control
         }
 
         return style.Render(title);
+    }
+
+    private static int[] ComputeColumnWidths(int width, int columns)
+    {
+        var widths = new int[columns];
+        var baseWidth = width / columns;
+        var remainder = width % columns;
+        for (var index = 0; index < columns; index++)
+        {
+            widths[index] = baseWidth + (index < remainder ? 1 : 0);
+        }
+
+        return widths;
+    }
+
+    private static string BuildRowText(int[] widths, IReadOnlyList<string> cells, bool selectedMarker)
+    {
+        var totalWidth = 0;
+        for (var index = 0; index < widths.Length; index++)
+        {
+            totalWidth += widths[index];
+        }
+
+        var builder = new StringBuilder(Math.Max(0, totalWidth + widths.Length - 1));
+        for (var column = 0; column < widths.Length; column++)
+        {
+            var width = widths[column];
+            var value = column < cells.Count ? cells[column] ?? string.Empty : string.Empty;
+            if (selectedMarker && column == 0 && width >= 2)
+            {
+                value = string.Concat("› ", value);
+            }
+
+            builder.Append(FitText(value, width));
+            if (column < widths.Length - 1)
+            {
+                builder.Append('│');
+            }
+        }
+
+        return builder.ToString();
+    }
+
+    private static string FitText(string text, int width)
+    {
+        if (width <= 0)
+        {
+            return string.Empty;
+        }
+
+        if (text.Length >= width)
+        {
+            return text[..width];
+        }
+
+        return text.PadRight(width);
+    }
+
+    private static string ApplyStyle(string text, TeaStyle style)
+    {
+        return style.IsEmpty || string.IsNullOrEmpty(text)
+            ? text
+            : style.Render(text);
     }
 }

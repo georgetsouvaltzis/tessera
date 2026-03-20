@@ -126,6 +126,7 @@ public static partial class TeaThemeControlExtensions
         control.FocusedTitleStyle = theme.Focus.Title;
         control.DirectoryStyle = theme.Accent.Primary;
         control.FileStyle = theme.Text.Primary;
+        control.HoveredStyle = theme.Accent.Secondary;
         control.SelectedStyle = theme.Selection.Foreground.Merge(theme.Selection.Background);
         control.MutedStyle = theme.Text.Muted;
         control.BorderStyleText = theme.Border.Default;
@@ -158,6 +159,7 @@ public static partial class TeaThemeControlExtensions
         control.FocusedTitleStyle = ApplyDefault(control.FocusedTitleStyle, theme.Focus.Title);
         control.DirectoryStyle = ApplyDefault(control.DirectoryStyle, theme.Accent.Primary);
         control.FileStyle = ApplyDefault(control.FileStyle, theme.Text.Primary);
+        control.HoveredStyle = ApplyDefault(control.HoveredStyle, theme.Accent.Secondary);
         control.SelectedStyle = ApplyDefault(
             control.SelectedStyle,
             theme.Selection.Foreground.Merge(theme.Selection.Background));
@@ -193,6 +195,7 @@ public static partial class TeaThemeControlExtensions
         control.ValueTextStyle = theme.Text.Primary;
         control.PlaceholderTextStyle = theme.Text.Muted;
         control.ListItemStyle = theme.Text.Primary;
+        control.HoveredItemStyle = theme.Accent.Secondary;
         control.SelectedItemStyle = theme.Selection.Foreground.Merge(theme.Selection.Background);
         control.MatchHighlightStyle = theme.Accent.Primary;
         control.BorderStyleText = theme.Border.Default;
@@ -226,6 +229,7 @@ public static partial class TeaThemeControlExtensions
         control.ValueTextStyle = ApplyDefault(control.ValueTextStyle, theme.Text.Primary);
         control.PlaceholderTextStyle = ApplyDefault(control.PlaceholderTextStyle, theme.Text.Muted);
         control.ListItemStyle = ApplyDefault(control.ListItemStyle, theme.Text.Primary);
+        control.HoveredItemStyle = ApplyDefault(control.HoveredItemStyle, theme.Accent.Secondary);
         control.SelectedItemStyle = ApplyDefault(
             control.SelectedItemStyle,
             theme.Selection.Foreground.Merge(theme.Selection.Background));

@@ -100,22 +100,42 @@ public sealed partial class FuzzyFinder
             return Handle(message);
         }
 
-        if (!content.Contains(pointer.X, pointer.Y))
+        var inside = content.Contains(pointer.X, pointer.Y);
+        var changed = false;
+        if (!inside)
         {
-            return Handle(message);
+            if (pointer.Kind is PointerEventKind.Motion or PointerEventKind.Press)
+            {
+                changed |= SetHoveredIndex(-1);
+            }
+
+            if (pointer.Kind is not PointerEventKind.Wheel)
+            {
+                return changed || Handle(message);
+            }
         }
 
         if (pointer.Kind == PointerEventKind.Wheel && IsOpen)
         {
             if (pointer.Button == PointerButton.WheelDown)
             {
-                return MoveSelection(1);
+                return changed | MoveSelection(1);
             }
 
             if (pointer.Button == PointerButton.WheelUp)
             {
-                return MoveSelection(-1);
+                return changed | MoveSelection(-1);
             }
+        }
+
+        if (!inside)
+        {
+            return changed || Handle(message);
+        }
+
+        if (pointer.Kind == PointerEventKind.Motion)
+        {
+            return SetHoveredIndex(ResolveVisibleIndexFromPointer(content, pointer.Y));
         }
 
         if (pointer.Kind != PointerEventKind.Press || pointer.Button != PointerButton.Left)
@@ -125,27 +145,54 @@ public sealed partial class FuzzyFinder
 
         RequestFocus();
         IsOpen = true;
-
-        if (pointer.Y == content.Y)
+        var index = ResolveVisibleIndexFromPointer(content, pointer.Y);
+        changed |= SetHoveredIndex(index);
+        if (index < 0)
         {
-            return true;
+            return changed || true;
         }
 
-        var visibleCount = ResolveVisibleResultCount(content.Height);
-        var row = pointer.Y - content.Y - 1;
-        if (row < 0 || row >= visibleCount)
-        {
-            return true;
-        }
-
-        var index = _scrollOffset + row;
-        var changed = SetSelectedIndex(index);
+        changed |= SetSelectedIndex(index);
         if (!IsReadOnly)
         {
             changed |= ActivateSelected();
         }
 
         return changed;
+    }
+
+    private int ResolveVisibleIndexFromPointer(in Rect content, int y)
+    {
+        if (y == content.Y)
+        {
+            return -1;
+        }
+
+        var visibleCount = ResolveVisibleResultCount(content.Height);
+        var row = y - content.Y - 1;
+        if (row < 0 || row >= visibleCount)
+        {
+            return -1;
+        }
+
+        var index = _scrollOffset + row;
+        return index >= 0 && index < _results.Count
+            ? index
+            : -1;
+    }
+
+    private bool SetHoveredIndex(int index)
+    {
+        var normalized = index < 0 || index >= _results.Count
+            ? -1
+            : index;
+        if (_hoveredIndex == normalized)
+        {
+            return false;
+        }
+
+        _hoveredIndex = normalized;
+        return true;
     }
 
     private bool MoveSelection(int delta)

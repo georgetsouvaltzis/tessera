@@ -42,6 +42,11 @@ public sealed class Choice : Control
 
     public TeaStyle ValueStyle { get; set; } = TeaStyle.Empty;
 
+    /// <summary>
+    /// Gets or sets the style merged into the field value when the pointer hovers the collapsed field row.
+    /// </summary>
+    public TeaStyle HoveredValueStyle { get; set; } = TeaStyle.Empty;
+
     public TeaStyle OptionStyle { get; set; } = TeaStyle.Empty;
 
     public TeaStyle SelectedOptionStyle { get; set; } = TeaStyle.Empty;
@@ -453,6 +458,11 @@ public sealed class Choice : Control
     private TeaStyle ResolveFieldValueStyle()
     {
         var style = _options.Count == 0 ? MutedStyle : ValueStyle;
+        if (_fieldHovered)
+        {
+            style = style.Merge(HoveredValueStyle);
+        }
+
         if (IsDisabled)
         {
             style = style.Merge(DisabledStyle).Merge(MutedStyle);

@@ -65,9 +65,17 @@ public sealed partial class FuzzyFinder
                 label = HighlightMatch(label, result.MatchIndices);
             }
 
-            var rowStyle = index == _selectedIndex
-                ? ListItemStyle.Merge(SelectedItemStyle)
-                : ListItemStyle;
+            var rowStyle = ListItemStyle;
+            if (index == _hoveredIndex)
+            {
+                rowStyle = rowStyle.Merge(HoveredItemStyle);
+            }
+
+            if (index == _selectedIndex)
+            {
+                rowStyle = rowStyle.Merge(SelectedItemStyle);
+            }
+
             var marker = index == _selectedIndex ? ">" : " ";
             canvas.WriteText(content.X, content.Y + 1 + row, ApplyStyle($"{marker} {label}", rowStyle), content.Width);
         }

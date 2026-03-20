@@ -12,6 +12,7 @@ public static partial class TeaThemeControlExtensions
         control.TitleStyle = theme.Text.Secondary;
         control.FocusedTitleStyle = theme.Focus.Title;
         control.ValueStyle = theme.Text.Primary;
+        control.HoveredValueStyle = theme.Accent.Secondary;
         control.OptionStyle = theme.Text.Primary;
         control.SelectedOptionStyle = theme.Selection.Foreground.Merge(theme.Selection.Background);
         control.HoveredOptionStyle = theme.Accent.Secondary;
@@ -40,6 +41,7 @@ public static partial class TeaThemeControlExtensions
         control.TitleStyle = ApplyDefault(control.TitleStyle, theme.Text.Secondary);
         control.FocusedTitleStyle = ApplyDefault(control.FocusedTitleStyle, theme.Focus.Title);
         control.ValueStyle = ApplyDefault(control.ValueStyle, theme.Text.Primary);
+        control.HoveredValueStyle = ApplyDefault(control.HoveredValueStyle, theme.Accent.Secondary);
         control.OptionStyle = ApplyDefault(control.OptionStyle, theme.Text.Primary);
         control.SelectedOptionStyle = ApplyDefault(
             control.SelectedOptionStyle,
@@ -71,6 +73,7 @@ public static partial class TeaThemeControlExtensions
         control.FocusedTitleStyle = theme.Focus.Title;
         control.ValueTextStyle = theme.Text.Primary;
         control.PlaceholderTextStyle = theme.Text.Muted;
+        control.HoveredValueStyle = theme.Accent.Secondary;
         control.OptionStyle = theme.Text.Primary;
         control.SelectedOptionStyle = theme.Selection.Foreground.Merge(theme.Selection.Background);
         control.HoveredOptionStyle = theme.Accent.Secondary;
@@ -100,6 +103,7 @@ public static partial class TeaThemeControlExtensions
         control.FocusedTitleStyle = ApplyDefault(control.FocusedTitleStyle, theme.Focus.Title);
         control.ValueTextStyle = ApplyDefault(control.ValueTextStyle, theme.Text.Primary);
         control.PlaceholderTextStyle = ApplyDefault(control.PlaceholderTextStyle, theme.Text.Muted);
+        control.HoveredValueStyle = ApplyDefault(control.HoveredValueStyle, theme.Accent.Secondary);
         control.OptionStyle = ApplyDefault(control.OptionStyle, theme.Text.Primary);
         control.SelectedOptionStyle = ApplyDefault(
             control.SelectedOptionStyle,

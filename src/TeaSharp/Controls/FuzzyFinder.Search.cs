@@ -31,6 +31,7 @@ public sealed partial class FuzzyFinder
         {
             _selectedIndex = 0;
             _scrollOffset = 0;
+            _hoveredIndex = -1;
             RaiseSelectionChangedIfNeeded(previousIndex, previousItem);
             return;
         }
@@ -43,6 +44,7 @@ public sealed partial class FuzzyFinder
                 {
                     _selectedIndex = index;
                     _scrollOffset = 0;
+                    _hoveredIndex = _hoveredIndex >= _results.Count ? -1 : _hoveredIndex;
                     RaiseSelectionChangedIfNeeded(previousIndex, previousItem);
                     return;
                 }
@@ -51,6 +53,7 @@ public sealed partial class FuzzyFinder
 
         _selectedIndex = Math.Clamp(_selectedIndex, 0, _results.Count - 1);
         _scrollOffset = 0;
+        _hoveredIndex = _hoveredIndex >= _results.Count ? -1 : _hoveredIndex;
         RaiseSelectionChangedIfNeeded(previousIndex, previousItem);
     }
 

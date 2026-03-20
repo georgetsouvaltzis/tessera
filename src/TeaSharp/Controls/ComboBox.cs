@@ -49,6 +49,11 @@ public sealed class ComboBox : Control
 
     public TeaStyle PlaceholderTextStyle { get; set; } = TeaStyle.Empty;
 
+    /// <summary>
+    /// Gets or sets the style merged into the field value when the pointer hovers the field row.
+    /// </summary>
+    public TeaStyle HoveredValueStyle { get; set; } = TeaStyle.Empty;
+
     public TeaStyle OptionStyle { get; set; } = TeaStyle.Empty;
 
     public TeaStyle SelectedOptionStyle { get; set; } = TeaStyle.Empty;
@@ -471,6 +476,11 @@ public sealed class ComboBox : Control
     private TeaStyle ResolveFieldValueStyle(bool placeholderVisible)
     {
         var style = placeholderVisible ? PlaceholderTextStyle : ValueTextStyle;
+        if (_fieldHovered)
+        {
+            style = style.Merge(HoveredValueStyle);
+        }
+
         if (IsDisabled)
         {
             style = style.Merge(DisabledStyle).Merge(MutedStyle);

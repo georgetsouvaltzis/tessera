@@ -87,6 +87,7 @@ public static partial class TeaThemeControlExtensions
         control.HeaderStyle = theme.Text.Secondary;
         control.BranchRowStyle = theme.Accent.Primary;
         control.LeafRowStyle = theme.Text.Primary;
+        control.HoveredRowStyle = theme.Accent.Secondary;
         control.SelectedRowStyle = theme.Selection.Foreground.Merge(theme.Selection.Background);
         control.MutedRowStyle = theme.Text.Muted;
         control.BorderStyleText = theme.Border.Default;
@@ -120,6 +121,7 @@ public static partial class TeaThemeControlExtensions
         control.HeaderStyle = ApplyDefault(control.HeaderStyle, theme.Text.Secondary);
         control.BranchRowStyle = ApplyDefault(control.BranchRowStyle, theme.Accent.Primary);
         control.LeafRowStyle = ApplyDefault(control.LeafRowStyle, theme.Text.Primary);
+        control.HoveredRowStyle = ApplyDefault(control.HoveredRowStyle, theme.Accent.Secondary);
         control.SelectedRowStyle = ApplyDefault(
             control.SelectedRowStyle,
             theme.Selection.Foreground.Merge(theme.Selection.Background));

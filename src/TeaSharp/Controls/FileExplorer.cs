@@ -15,6 +15,7 @@ public sealed partial class FileExplorer : Control
     private readonly List<VisibleEntry> _visible = [];
     private int _selectedVisibleIndex;
     private int _scrollOffset;
+    private int _hoveredVisibleIndex = -1;
 
     /// <summary>
     /// Occurs when the selected node changes.
@@ -60,6 +61,11 @@ public sealed partial class FileExplorer : Control
     /// Gets or sets the style merged into selected rows.
     /// </summary>
     public TeaStyle SelectedStyle { get; set; } = TeaStyle.Empty;
+
+    /// <summary>
+    /// Gets or sets the style merged into hovered rows.
+    /// </summary>
+    public TeaStyle HoveredStyle { get; set; } = TeaStyle.Empty;
 
     /// <summary>
     /// Gets or sets the style used for muted/disabled output.
@@ -242,22 +248,41 @@ public sealed partial class FileExplorer : Control
         var content = FrameLayout.ResolveContentRect(bounds, Border, Padding);
         if (content.IsEmpty || !content.Contains(pointer.X, pointer.Y))
         {
+            if (pointer.Kind is PointerEventKind.Motion or PointerEventKind.Press)
+            {
+                var hoverChanged = SetHoveredVisibleIndex(-1);
+                if (pointer.Kind is not PointerEventKind.Wheel)
+                {
+                    return hoverChanged || Handle(message);
+                }
+            }
+
             return Handle(message);
         }
+
+        var changed = false;
 
         if (pointer.Kind == PointerEventKind.Wheel)
         {
             if (pointer.Button == PointerButton.WheelDown)
             {
-                return SetSelectedVisibleIndex(Math.Min(_visible.Count - 1, _selectedVisibleIndex + 1));
+                return changed | SetSelectedVisibleIndex(Math.Min(_visible.Count - 1, _selectedVisibleIndex + 1));
             }
 
             if (pointer.Button == PointerButton.WheelUp)
             {
-                return SetSelectedVisibleIndex(Math.Max(0, _selectedVisibleIndex - 1));
+                return changed | SetSelectedVisibleIndex(Math.Max(0, _selectedVisibleIndex - 1));
             }
 
             return false;
+        }
+
+        EnsureSelectionVisible(content.Height);
+        var row = pointer.Y - content.Y;
+        var hoveredVisibleIndex = RowToVisibleIndex(row);
+        if (pointer.Kind == PointerEventKind.Motion)
+        {
+            return SetHoveredVisibleIndex(hoveredVisibleIndex);
         }
 
         if (pointer.Kind != PointerEventKind.Press || pointer.Button != PointerButton.Left)
@@ -266,20 +291,13 @@ public sealed partial class FileExplorer : Control
         }
 
         RequestFocus();
-        var row = pointer.Y - content.Y;
-        if (row < 0)
+        changed |= SetHoveredVisibleIndex(hoveredVisibleIndex);
+        if (hoveredVisibleIndex < 0)
         {
-            return true;
+            return changed || true;
         }
 
-        EnsureSelectionVisible(content.Height);
-        var visibleIndex = _scrollOffset + row;
-        if (visibleIndex < 0 || visibleIndex >= _visible.Count)
-        {
-            return true;
-        }
-
-        return SetSelectedVisibleIndex(visibleIndex);
+        return changed | SetSelectedVisibleIndex(hoveredVisibleIndex);
     }
 
     public override void Render(Canvas canvas, Rect rect)
@@ -321,6 +339,11 @@ public sealed partial class FileExplorer : Control
                 ? entry.Item.IsExpanded ? "▾" : "▸"
                 : "•";
             var style = entry.Item.IsDirectory ? DirectoryStyle : FileStyle;
+            if (index == _hoveredVisibleIndex)
+            {
+                style = style.Merge(HoveredStyle);
+            }
+
             if (index == _selectedVisibleIndex)
             {
                 style = style.Merge(SelectedStyle);
@@ -478,6 +501,7 @@ public sealed partial class FileExplorer : Control
         {
             _selectedVisibleIndex = 0;
             _scrollOffset = 0;
+            _hoveredVisibleIndex = -1;
             RaiseSelectionChangedIfNeeded(previousPath, previousItem);
             return;
         }
@@ -487,6 +511,9 @@ public sealed partial class FileExplorer : Control
             : _visible.FindIndex(entry => string.Equals(entry.Item.Path, previousPath, StringComparison.Ordinal));
         _selectedVisibleIndex = Math.Clamp(preferredIndex < 0 ? 0 : preferredIndex, 0, _visible.Count - 1);
         _scrollOffset = Math.Clamp(_scrollOffset, 0, Math.Max(0, _visible.Count - 1));
+        _hoveredVisibleIndex = _hoveredVisibleIndex >= 0 && _hoveredVisibleIndex < _visible.Count
+            ? _hoveredVisibleIndex
+            : -1;
         RaiseSelectionChangedIfNeeded(previousPath, previousItem);
     }
 
@@ -523,6 +550,33 @@ public sealed partial class FileExplorer : Control
         }
 
         _scrollOffset = Math.Clamp(_scrollOffset, 0, Math.Max(0, _visible.Count - viewportHeight));
+    }
+
+    private int RowToVisibleIndex(int row)
+    {
+        if (row < 0)
+        {
+            return -1;
+        }
+
+        var visibleIndex = _scrollOffset + row;
+        return visibleIndex >= 0 && visibleIndex < _visible.Count
+            ? visibleIndex
+            : -1;
+    }
+
+    private bool SetHoveredVisibleIndex(int visibleIndex)
+    {
+        var normalized = visibleIndex >= 0 && visibleIndex < _visible.Count
+            ? visibleIndex
+            : -1;
+        if (_hoveredVisibleIndex == normalized)
+        {
+            return false;
+        }
+
+        _hoveredVisibleIndex = normalized;
+        return true;
     }
 
 }
