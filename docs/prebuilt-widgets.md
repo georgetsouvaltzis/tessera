@@ -83,6 +83,13 @@ These live in `TeaSharp.Controls`.
 
 - `MenuBar`, `ContextMenu`, and `CommandPalette` support `BorderStyleText`/`FocusedBorderStyleText`.
 - Glyph customization is typed through `MenuBarGlyphSet`, `ContextMenuGlyphSet`, and `CommandPaletteGlyphSet`.
+- Quick cookbook setup:
+
+```csharp
+var menuBar = new MenuBar { Glyphs = new MenuBarGlyphSet("[", "]", " ", " ", "{", "}", "(", ")") };
+var contextMenu = new ContextMenu { ShowFocusMarker = true, Glyphs = new ContextMenuGlyphSet("·", ">", "▸", " ") };
+var commandPalette = new CommandPalette { ShowFocusMarker = true, Glyphs = new CommandPaletteGlyphSet("❯", " ", ">", "▸", " ") };
+```
 
 ### Table and TreeView Visual Hooks
 

@@ -137,6 +137,32 @@ var input = new TextInput
 };
 ```
 
+### Overlay Glyph APIs (MenuBar, ContextMenu, CommandPalette)
+
+```csharp
+using TeaSharp.Controls;
+
+var menuBar = new MenuBar
+{
+    Border = BorderStyle.SingleLine,
+    Glyphs = new MenuBarGlyphSet("[", "]", " ", " ", "{", "}", "<", ">"),
+};
+
+var contextMenu = new ContextMenu
+{
+    Border = BorderStyle.Rounded,
+    ShowFocusMarker = true,
+    Glyphs = new ContextMenuGlyphSet("·", ">", "▸", " "),
+};
+
+var commandPalette = new CommandPalette
+{
+    Border = BorderStyle.Rounded,
+    ShowFocusMarker = true,
+    Glyphs = new CommandPaletteGlyphSet("❯", " ", ">", "▸", " "),
+};
+```
+
 ## Palette Model
 
 V1 ships with:

@@ -151,7 +151,7 @@ All agents must treat this file as the source of truth for scope, sequencing, ow
 7. Monochrome rendering remains readable when style hooks are empty.
 
 ## Open V1 Visual Parity Gaps (Current)
-- Add focused docs examples for border/glyph override APIs (`BorderStyleText`, `FocusedBorderStyleText`, `DropdownGlyphSet`, `TreeViewGlyphSet`, DataGrid/TreeTable separator-marker hooks).
+- Overlay glyph cookbook examples are now documented (`MenuBarGlyphSet`, `ContextMenuGlyphSet`, `CommandPaletteGlyphSet`); remaining docs examples should cover border override APIs plus `DropdownGlyphSet`/`TreeViewGlyphSet` and DataGrid/TreeTable separator-marker hooks.
 - Add visual regression assertions for monochrome vs color output on high-use controls (`Table`, `TreeView`, `SearchBox`, `Choice`, `ComboBox`).
 - Add cross-control token audit for disabled/error/selection style consistency in theme defaults.
 
