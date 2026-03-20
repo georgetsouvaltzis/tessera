@@ -18,6 +18,7 @@ public abstract class TeaApp
     private ScreenContext _context = new();
     private ScreenOptions _runtimeScreenOptions = ScreenOptions.Empty;
     private TeaTheme? _runtimeTheme;
+    private TeaThemeOverrides? _runtimeThemeOverrides;
     private readonly IScreenCompiler _screenCompiler = ScreenCompilationFactory.CreateDefault();
     private ICompiledScreenInteraction? _interactiveScreen;
     private readonly List<TeaEffect> _pendingEffects = [];
@@ -77,7 +78,7 @@ public abstract class TeaApp
     internal void ConfigureRuntimeScreen(ScreenOptions screenOptions)
     {
         _runtimeScreenOptions = screenOptions ?? ScreenOptions.Empty;
-        _context = _context with { Theme = _runtimeTheme };
+        ApplyRuntimeThemeContext();
     }
 
     internal void ConfigureRuntimeOptions(TeaRuntimeOptions options)
@@ -85,12 +86,19 @@ public abstract class TeaApp
         ArgumentNullException.ThrowIfNull(options);
         _runtimeScreenOptions = options.Screen ?? ScreenOptions.Empty;
         ConfigureRuntimeTheme(options.Theme);
+        ConfigureRuntimeThemeOverrides(options.ThemeOverrides);
     }
 
     internal void ConfigureRuntimeTheme(TeaTheme? theme)
     {
         _runtimeTheme = theme;
-        _context = _context with { Theme = _runtimeTheme };
+        ApplyRuntimeThemeContext();
+    }
+
+    internal void ConfigureRuntimeThemeOverrides(TeaThemeOverrides? overrides)
+    {
+        _runtimeThemeOverrides = overrides;
+        ApplyRuntimeThemeContext();
     }
 
     internal TeaEffect? InitializeRuntime() => Initialize();
@@ -154,4 +162,13 @@ public abstract class TeaApp
             or PasteStarted
             or PasteEnded
             or Pasted;
+
+    private void ApplyRuntimeThemeContext()
+    {
+        _context = _context with
+        {
+            Theme = _runtimeTheme,
+            ThemeOverrides = _runtimeThemeOverrides,
+        };
+    }
 }

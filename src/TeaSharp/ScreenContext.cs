@@ -24,6 +24,11 @@ public sealed record ScreenContext
     public TeaTheme? Theme { get; init; }
 
     /// <summary>
+    /// Gets optional hierarchical theme overrides configured for the current runtime.
+    /// </summary>
+    public TeaThemeOverrides? ThemeOverrides { get; init; }
+
+    /// <summary>
     /// Gets a value indicating whether the application currently has terminal focus.
     /// </summary>
     public bool HasFocus { get; init; } = true;

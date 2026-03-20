@@ -14,6 +14,8 @@ internal sealed class TeaSceneCompiler : IScreenCompiler
 {
     private static readonly MethodInfo ListViewThemeDefaultsApplierFactoryMethodDefinition = ResolveListViewThemeDefaultsApplierFactoryMethodDefinition();
     private static readonly ConcurrentDictionary<Type, Action<Control, TeaTheme>> ListViewThemeDefaultsAppliers = new();
+    private static readonly MethodInfo ListViewThemeDefaultsWithOverridesApplierFactoryMethodDefinition = ResolveListViewThemeDefaultsWithOverridesApplierFactoryMethodDefinition();
+    private static readonly ConcurrentDictionary<Type, Action<Control, TeaThemeOverrides, TeaTheme, TeaThemeVisualState>> ListViewThemeDefaultsWithOverridesAppliers = new();
     private string? _focusedRegionId;
 
     public ScreenRenderResult Compile(ScreenContent content, ScreenContext context, ScreenOptions options)
@@ -32,7 +34,14 @@ internal sealed class TeaSceneCompiler : IScreenCompiler
 
         if (context.Theme is { } theme)
         {
-            ApplyThemeDefaults(content.Layout, theme);
+            if (context.ThemeOverrides is { } overrides)
+            {
+                ApplyThemeDefaults(content.Layout, theme, overrides, context.HasFocus);
+            }
+            else
+            {
+                ApplyThemeDefaults(content.Layout, theme);
+            }
         }
 
         var canvas = context.CreateCanvas(CanvasTextMode.GraphemeAware);
@@ -118,6 +127,67 @@ internal sealed class TeaSceneCompiler : IScreenCompiler
         }
     }
 
+    private static void ApplyThemeDefaults(LayoutNode layout, TeaTheme theme, TeaThemeOverrides overrides, bool hasTerminalFocus)
+    {
+        switch (layout)
+        {
+            case ComponentLayout component when component.Control is { } control:
+                ApplyThemeDefaults(control, theme, overrides, hasTerminalFocus);
+                return;
+            case WindowLayout window:
+                ApplyThemeDefaults(window.Header, theme, overrides, hasTerminalFocus);
+                ApplyThemeDefaults(window.Footer, theme, overrides, hasTerminalFocus);
+                ApplyThemeDefaults(window.Left, theme, overrides, hasTerminalFocus);
+                ApplyThemeDefaults(window.Right, theme, overrides, hasTerminalFocus);
+                if (window.Body is not null)
+                {
+                    ApplyThemeDefaults(window.Body, theme, overrides, hasTerminalFocus);
+                }
+
+                if (window.Overlay is not null)
+                {
+                    ApplyThemeDefaults(window.Overlay, theme, overrides, hasTerminalFocus);
+                }
+
+                return;
+            case RowLayout row:
+                ApplyThemeDefaults(row.Items, theme, overrides, hasTerminalFocus);
+                return;
+            case ColumnLayout column:
+                ApplyThemeDefaults(column.Items, theme, overrides, hasTerminalFocus);
+                return;
+            case CenterLayout center:
+                ApplyThemeDefaults(center.Content, theme, overrides, hasTerminalFocus);
+                return;
+            case PanelLayout panel:
+                ApplyThemeDefaults(panel.Content, theme, overrides, hasTerminalFocus);
+                return;
+            case OverlayLayout overlay:
+                for (var index = 0; index < overlay.Items.Count; index++)
+                {
+                    ApplyThemeDefaults(overlay.Items[index], theme, overrides, hasTerminalFocus);
+                }
+
+                return;
+            case DockLayout dock:
+                ApplyThemeDefaults(dock.Top, theme, overrides, hasTerminalFocus);
+                ApplyThemeDefaults(dock.Bottom, theme, overrides, hasTerminalFocus);
+                ApplyThemeDefaults(dock.Left, theme, overrides, hasTerminalFocus);
+                ApplyThemeDefaults(dock.Right, theme, overrides, hasTerminalFocus);
+                ApplyThemeDefaults(dock.Fill, theme, overrides, hasTerminalFocus);
+                return;
+            case StackLayout stack:
+                ApplyThemeDefaults(stack.Children, theme, overrides, hasTerminalFocus);
+                return;
+            case SplitLayout split:
+                ApplyThemeDefaults(split.First, theme, overrides, hasTerminalFocus);
+                ApplyThemeDefaults(split.Second, theme, overrides, hasTerminalFocus);
+                return;
+            default:
+                return;
+        }
+    }
+
     private static void ApplyThemeDefaults(IEnumerable<LayoutSlot> slots, TeaTheme theme)
     {
         foreach (var slot in slots)
@@ -126,11 +196,31 @@ internal sealed class TeaSceneCompiler : IScreenCompiler
         }
     }
 
+    private static void ApplyThemeDefaults(
+        IEnumerable<LayoutSlot> slots,
+        TeaTheme theme,
+        TeaThemeOverrides overrides,
+        bool hasTerminalFocus)
+    {
+        foreach (var slot in slots)
+        {
+            ApplyThemeDefaults(slot, theme, overrides, hasTerminalFocus);
+        }
+    }
+
     private static void ApplyThemeDefaults(LayoutSlot? slot, TeaTheme theme)
     {
         if (slot is not null)
         {
             ApplyThemeDefaults(slot.Content, theme);
+        }
+    }
+
+    private static void ApplyThemeDefaults(LayoutSlot? slot, TeaTheme theme, TeaThemeOverrides overrides, bool hasTerminalFocus)
+    {
+        if (slot is not null)
+        {
+            ApplyThemeDefaults(slot.Content, theme, overrides, hasTerminalFocus);
         }
     }
 
@@ -159,6 +249,33 @@ internal sealed class TeaSceneCompiler : IScreenCompiler
         }
     }
 
+    private static void ApplyThemeDefaults(Control control, TeaTheme theme, TeaThemeOverrides overrides, bool hasTerminalFocus)
+    {
+        var state = ResolveVisualState(control, hasTerminalFocus);
+
+        switch (control)
+        {
+            case Button button:
+                button.ApplyThemeDefaults(overrides, theme, state);
+                return;
+            case StatusBar statusBar:
+                statusBar.ApplyThemeDefaults(overrides, theme, state);
+                return;
+            case TextInput textInput:
+                textInput.ApplyThemeDefaults(overrides, theme, state);
+                return;
+            case Table table:
+                table.ApplyThemeDefaults(overrides, theme, state);
+                return;
+            case Tabs tabs:
+                tabs.ApplyThemeDefaults(overrides, theme, state);
+                return;
+            default:
+                ApplyListViewThemeDefaults(control, overrides, theme, state);
+                return;
+        }
+    }
+
     private static void ApplyListViewThemeDefaults(Control control, TeaTheme theme)
     {
         var controlType = control.GetType();
@@ -172,11 +289,38 @@ internal sealed class TeaSceneCompiler : IScreenCompiler
         applier(control, theme);
     }
 
+    private static void ApplyListViewThemeDefaults(
+        Control control,
+        TeaThemeOverrides overrides,
+        TeaTheme theme,
+        TeaThemeVisualState state)
+    {
+        var controlType = control.GetType();
+        if (!controlType.IsGenericType || controlType.GetGenericTypeDefinition() != typeof(ListView<>))
+        {
+            return;
+        }
+
+        var itemType = controlType.GetGenericArguments()[0];
+        var applier = ListViewThemeDefaultsWithOverridesAppliers.GetOrAdd(
+            itemType,
+            static value => CreateListViewThemeDefaultsWithOverridesApplier(value));
+        applier(control, overrides, theme, state);
+    }
+
     private static Action<Control, TeaTheme> CreateListViewThemeDefaultsApplier(Type itemType)
     {
         var factory = ListViewThemeDefaultsApplierFactoryMethodDefinition.MakeGenericMethod(itemType);
         return (Action<Control, TeaTheme>)(factory.Invoke(null, null)
             ?? throw new InvalidOperationException("Failed to build ListView<T> theme applier delegate."));
+    }
+
+    private static Action<Control, TeaThemeOverrides, TeaTheme, TeaThemeVisualState> CreateListViewThemeDefaultsWithOverridesApplier(
+        Type itemType)
+    {
+        var factory = ListViewThemeDefaultsWithOverridesApplierFactoryMethodDefinition.MakeGenericMethod(itemType);
+        return (Action<Control, TeaThemeOverrides, TeaTheme, TeaThemeVisualState>)(factory.Invoke(null, null)
+            ?? throw new InvalidOperationException("Failed to build ListView<T> theme+override applier delegate."));
     }
 
     private static MethodInfo ResolveListViewThemeDefaultsApplierFactoryMethodDefinition()
@@ -185,6 +329,14 @@ internal sealed class TeaSceneCompiler : IScreenCompiler
             nameof(CreateListViewThemeDefaultsApplierCore),
             BindingFlags.NonPublic | BindingFlags.Static)
             ?? throw new InvalidOperationException("Unable to resolve ListView<T> theme applier factory method.");
+    }
+
+    private static MethodInfo ResolveListViewThemeDefaultsWithOverridesApplierFactoryMethodDefinition()
+    {
+        return typeof(TeaSceneCompiler).GetMethod(
+            nameof(CreateListViewThemeDefaultsWithOverridesApplierCore),
+            BindingFlags.NonPublic | BindingFlags.Static)
+            ?? throw new InvalidOperationException("Unable to resolve ListView<T> theme+override applier factory method.");
     }
 
     private static Action<Control, TeaTheme> CreateListViewThemeDefaultsApplierCore<TItem>()
@@ -196,6 +348,32 @@ internal sealed class TeaSceneCompiler : IScreenCompiler
                 _ = listView.ApplyThemeDefaults(theme);
             }
         };
+    }
+
+    private static Action<Control, TeaThemeOverrides, TeaTheme, TeaThemeVisualState> CreateListViewThemeDefaultsWithOverridesApplierCore<TItem>()
+    {
+        return static (control, overrides, theme, state) =>
+        {
+            if (control is ListView<TItem> listView)
+            {
+                _ = listView.ApplyThemeDefaults(overrides, theme, state);
+            }
+        };
+    }
+
+    private static TeaThemeVisualState ResolveVisualState(Control control, bool hasTerminalFocus)
+    {
+        if (control.IsDisabled)
+        {
+            return TeaThemeVisualState.Disabled;
+        }
+
+        if (hasTerminalFocus && control.IsFocused)
+        {
+            return TeaThemeVisualState.Focused;
+        }
+
+        return TeaThemeVisualState.Default;
     }
 
     private sealed class TeaSceneBuilder

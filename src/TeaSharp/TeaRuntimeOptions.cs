@@ -71,4 +71,9 @@ public sealed class TeaRuntimeOptions
     /// Gets or sets the optional global theme applied by controls that support semantic theming.
     /// </summary>
     public TeaTheme? Theme { get; set; }
+
+    /// <summary>
+    /// Gets or sets optional hierarchical theme overrides applied on top of <see cref="Theme"/>.
+    /// </summary>
+    public TeaThemeOverrides? ThemeOverrides { get; set; }
 }
