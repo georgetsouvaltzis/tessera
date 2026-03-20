@@ -1,87 +1,88 @@
 # TeaSharp Widget Roadmap V1
 
-This roadmap defines the widget-heavy Public V1 path targeting **40-50 built-in widgets** with consistent APIs and theming.
+This roadmap expands the widget catalog by **+34 additional widgets** in delivery waves, keeping the public C# API cohesive and theme-first.
 
-## Target Inventory
+## Target and Delivery Model
 
-Control additions remain C#-first object-model APIs with no DI requirement on the default app path.
+- Target: move toward **40-50 production-grade widgets** with consistent authoring patterns.
+- Scope: **docs + implementation waves**, no DI-first requirement on default app path.
+- Delivery: each wave must ship with tests, examples, and theme mapping hooks.
 
-### Current Built-ins (baseline)
-- `Label`, `Button`, `TextInput`, `TextArea`, `StatusBar`
-- `Choice`, `ComboBox`, `ListView<T>`, `Table`, `DataGrid`, `TreeTable`, `TreeView`, `TreeItem`, `Tabs`, `MenuBar`, `Toolbar`
-- `Dialog`, `Modal`, `Notifications`, `ContextMenu`, `CommandPalette`
-- `CommandBar`, `SearchBox`, `DiffView`, `PropertyGrid`, `KeyValueList`
-- `Toggle`, `Slider`, `Spinner`, `ProgressBar`, `LogView`
-- `Badge`, `Accordion`, `NumberInput`, `DatePicker`, `TimePicker`
-- `MultiSelect`, `RadioGroup`, `Gauge`, `MiniLog`, `StatsCard`
-- `BarChart`, `LineChart`, `MarkdownView`, `Timeline`, `Stepper`
+## Strict Theming Contract (applies to every new widget)
 
-### Planned Expansion (to reach 40-50 total)
-- `FileExplorer`
-- `FuzzyFinder`
-- `Breadcrumb`
-- `Paginator`
-- `PropertyGrid`
-- `DiffView`
-- `ToastCenter`
+Each widget in this roadmap must implement the same minimum visual contract from day one:
 
-## Prioritized V1 Tranche (10-15)
-1. `DataGrid`
-2. `FuzzyFinder`
-3. `Breadcrumb`
-4. `CommandBar`
-5. `PropertyGrid`
-6. `FileExplorer`
-7. `TreeTable`
-8. `DiffView`
-9. `Paginator`
-10. `Toolbar`
-11. `SearchBox`
-12. `ToastCenter`
+- required state styles: `Default`, `Hover`, `Focus`, `Pressed/Active`, `Selected`, `Disabled`, `Error`, `ReadOnly` (if editable)
+- hover/focus/selected behavior: visually distinct in both color and monochrome terminals; `Focus` must not be hidden by `Hover`
+- glyph hooks: widget-specific glyph set properties (no hardcoded glyph literals in render path)
+- override layers: global theme -> control type defaults -> instance overrides -> state overrides
+- API shape: explicit C# properties/events; no `TeaSharp.Core.*` leakage in default authoring path
 
-Acceptance for V1 tranche:
-- implemented in `TeaSharp.Controls` as first-class controls
-- covered by unit tests + example usage
-- documented in control catalog/docs
-- theme-aware and overrideable
+## Delivery Waves (+34 Widgets)
 
-## V1 Tranche Progress
-- `[x]` `Breadcrumb` (shipped)
-- `[x]` `Paginator` (shipped)
-- `[x]` `DataGrid` (shipped)
-- `[x]` `FuzzyFinder` (shipped)
-- `[x]` `CommandBar` (shipped)
-- `[x]` `PropertyGrid` (shipped)
-- `[x]` `FileExplorer` (shipped)
-- `[x]` `TreeTable` (shipped)
-- `[x]` `DiffView` (shipped)
-- `[x]` `Toolbar` (shipped)
-- `[x]` `SearchBox` (shipped)
-- `[x]` `ToastCenter` (shipped)
+Notation: all rows inherit the strict state-style contract above; `Glyph hooks` column lists required widget-specific glyph seams.
 
-## API Consistency Rules
-- All widgets derive from `Control`.
-- Input routing follows normal control `Handle(...)` semantics.
-- Public notifications use `EventHandler` / `EventHandler<TEventArgs>`.
-- Mutable configuration via explicit properties (no implicit hidden globals).
-- Names must align with existing control vocabulary.
-- No `TeaSharp.Core.*` types in default widget authoring APIs.
+### Wave 1 (P0): App Shell + Forms (9)
 
-## Theming and Customization Requirements
-Each new widget must support:
-- global theme application through `TeaRuntimeOptions.Theme`
-- per-widget style overrides for default/focused/selected/disabled/error states
-- focus rendering override (not hardcoded marker-only behavior)
-- readable output in both color-capable and monochrome terminals
+| Widget | Priority | C# workflow rationale | Glyph hooks |
+| --- | --- | --- | --- |
+| `Form` | P0 | Standard CRUD/data-entry scaffolding | section divider, required marker, submit marker |
+| `FieldSet` | P0 | Group reusable input blocks | border set, title markers |
+| `ValidationSummary` | P0 | Centralized model validation output | severity markers, bullet markers |
+| `DataForm<TModel>` | P0 | Strongly-typed model editing | field separators, validation markers |
+| `Wizard` | P0 | Multi-step onboarding/config flows | step markers, connector glyphs |
+| `SplitView` | P0 | Master/detail and inspector layouts | splitter glyph, collapse marker |
+| `InspectorPanel` | P0 | Right-pane metadata/property editing | section expand/collapse glyphs |
+| `EmptyState` | P0 | Predictable zero-data UX | icon/marker slot glyph |
+| `SearchResultsView` | P0 | Common search result rendering | match markers, rank marker |
 
-Minimum style hooks per widget:
-- text/content style
-- border/title style
-- focus style
-- selection style (if selectable)
-- disabled/error style (if state applies)
+### Wave 2 (P0/P1): Data, Planning, Query (9)
+
+| Widget | Priority | C# workflow rationale | Glyph hooks |
+| --- | --- | --- | --- |
+| `VirtualizedListView<T>` | P0 | Large collections without UI lag | overflow, continuation markers |
+| `GroupedListView<TGroup,TItem>` | P0 | Grouped domain lists | group expand/collapse markers |
+| `PivotTable` | P1 | Analytical summaries in-console | sort marker, subtotal marker |
+| `QueryBuilder` | P1 | Filter/query composition in tools | operator markers, join markers |
+| `KanbanBoard` | P1 | Task-state workflows | lane separators, card markers |
+| `CalendarMonthView` | P1 | Scheduling and planning UIs | day markers, current-day marker |
+| `SchedulerTimeline` | P1 | Time-slice planning/editor tools | tick markers, range handles |
+| `TagInput` | P1 | Label-driven domain modeling | add/remove tag markers |
+| `RichTextView` | P1 | Structured text output with emphasis | heading/list/quote markers |
+
+### Wave 3 (P1): Dev/Ops Workflows (8)
+
+| Widget | Priority | C# workflow rationale | Glyph hooks |
+| --- | --- | --- | --- |
+| `JsonTreeView` | P1 | API/debug payload inspection | node expand/collapse, type marker |
+| `LogTailPanel` | P1 | Streaming logs with filters | level markers, follow marker |
+| `TraceViewer` | P1 | Request/operation trace analysis | span markers, timing separators |
+| `CommandOutput` | P1 | Deterministic process output panes | prompt marker, continuation marker |
+| `TaskRunnerPanel` | P1 | Build/test/deploy dashboards | status markers, progress markers |
+| `ActivityFeed` | P1 | Event/audit visualization | event type markers, timestamp marker |
+| `NotificationInbox` | P1 | Persistent in-app notifications | unread marker, severity marker |
+| `KeyBindingHelpDialog` | P1 | Discoverability for shortcuts | keycap separators, category markers |
+
+### Wave 4 (P2): Advanced Composition + Visual Data (8)
+
+| Widget | Priority | C# workflow rationale | Glyph hooks |
+| --- | --- | --- | --- |
+| `DockLayout` | P2 | IDE-like pane composition | dock handle glyphs |
+| `PaneTabs` | P2 | Multi-pane/multi-view workspaces | tab close/dirty markers |
+| `PaletteEditor` | P2 | Theme/palette authoring tools | swatch markers, active marker |
+| `Heatmap` | P2 | Dense matrix-based insights | cell markers, legend markers |
+| `Sparkline` | P2 | Inline trend telemetry | min/max markers |
+| `TreeMapChart` | P2 | Hierarchical metric distribution | hierarchy separators |
+| `TerminalPanel` | P2 | Embedded subprocess sessions | prompt/stream markers |
+| `ProcessListView` | P2 | Runtime process inspection | status markers, sort marker |
+
+## Visual Pass Timing
+
+- **Phase A (implementation-first):** each widget ships with strict minimal visual contract (state styles + glyph hooks + override hierarchy) and monochrome-safe rendering.
+- **Phase B (full visual polish):** after functionality stabilizes, run a dedicated visual pass for spacing, animation cadence, token tuning, and showcase examples.
+- Release rule: no widget can skip Phase A; Phase B is scheduled after wave completion and before RC promotion.
 
 ## Coordination Notes
-- `docs/v1-master-plan.md` remains milestone source of truth.
-- This roadmap is the widget scope contract for M3.
-- Image-centric controls remain V1.1 scope.
+
+- Source-of-truth milestone mapping stays in [v1-master-plan.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/v1-master-plan.md).
+- Public API and theme consistency remain aligned with [public-api-inventory.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/public-api-inventory.md) and [theme-system-v1.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/theme-system-v1.md).
