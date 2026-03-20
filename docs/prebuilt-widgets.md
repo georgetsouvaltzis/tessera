@@ -100,6 +100,14 @@ var commandPalette = new CommandPalette { ShowFocusMarker = true, Glyphs = new C
 
 - `DataGrid` supports `BorderStyleText`/`FocusedBorderStyleText`, `ColumnSeparatorText`, `SortAscendingMarker`, and `SortDescendingMarker`.
 - `TreeTable` supports `BorderStyleText`/`FocusedBorderStyleText`, `ColumnSeparatorText`, row markers (`SelectedRowMarker`/`UnselectedRowMarker`), and tree markers (`ExpandedBranchMarker`/`CollapsedBranchMarker`/`LeafMarker`).
+- Quick cookbook setup:
+
+```csharp
+var combo = new ComboBox { Glyphs = new DropdownGlyphSet("v", "^", ">", "+") };
+var tree = new TreeView { Glyphs = new TreeViewGlyphSet("▼", "▶", "•") };
+var dataGrid = new DataGrid { ColumnSeparatorText = " │ ", SortAscendingMarker = " ↑", SortDescendingMarker = " ↓" };
+var treeTable = new TreeTable("Name", "Value") { ColumnSeparatorText = " │ ", SelectedRowMarker = ">", UnselectedRowMarker = " ", ExpandedBranchMarker = "▼", CollapsedBranchMarker = "▶", LeafMarker = "•" };
+```
 
 ### ContextMenu Bordered Title Behavior
 

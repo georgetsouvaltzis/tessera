@@ -163,6 +163,70 @@ var commandPalette = new CommandPalette
 };
 ```
 
+### Border Override APIs (High-Use Controls)
+
+```csharp
+using TeaSharp.Controls;
+using TeaSharp.Styles;
+
+var input = new TextInput
+{
+    BorderStyleText = TeaStyle.Empty.WithForeground(AnsiColor.BrightBlack),
+    FocusedBorderStyleText = TeaStyle.Empty.WithBold().WithForeground(AnsiColor.BrightCyan),
+};
+
+var choice = new Choice
+{
+    BorderStyleText = TeaStyle.Empty.WithForeground(AnsiColor.BrightBlack),
+    FocusedBorderStyleText = TeaStyle.Empty.WithBold().WithForeground(AnsiColor.BrightGreen),
+};
+
+var grid = new DataGrid
+{
+    BorderStyleText = TeaStyle.Empty.WithForeground(AnsiColor.BrightBlack),
+    FocusedBorderStyleText = TeaStyle.Empty.WithBold().WithForeground(AnsiColor.BrightYellow),
+};
+```
+
+### Dropdown and Tree Glyph Sets
+
+```csharp
+using TeaSharp.Controls;
+
+var combo = new ComboBox
+{
+    Glyphs = new DropdownGlyphSet("v", "^", ">", "+"),
+};
+
+var tree = new TreeView
+{
+    Glyphs = new TreeViewGlyphSet("▼", "▶", "•"),
+};
+```
+
+### Data Widget Marker and Separator APIs
+
+```csharp
+using TeaSharp.Controls;
+
+var dataGrid = new DataGrid
+{
+    ColumnSeparatorText = " │ ",
+    SortAscendingMarker = " ↑",
+    SortDescendingMarker = " ↓",
+};
+
+var treeTable = new TreeTable("Name", "Value")
+{
+    ColumnSeparatorText = " │ ",
+    SelectedRowMarker = ">",
+    UnselectedRowMarker = " ",
+    ExpandedBranchMarker = "▼",
+    CollapsedBranchMarker = "▶",
+    LeafMarker = "•",
+};
+```
+
 ## Palette Model
 
 V1 ships with:
