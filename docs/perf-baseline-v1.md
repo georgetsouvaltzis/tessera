@@ -37,7 +37,7 @@ Notes:
 
 Commits:
 - accepted baseline (before): `d30df85076ee`
-- candidate measured (after): `6010062b6123`
+- candidate measured (after): `842aaaf8ba64`
 
 Commands:
 - `scripts/run_benchmarks_v1.sh list`

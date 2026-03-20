@@ -17,7 +17,7 @@ Do not mark a checkbox complete unless command output/evidence is attached.
   - evidence: `Build succeeded. 0 Warning(s), 0 Error(s).`
 - [x] Full test suite passed
   - command: `dotnet test TeaSharp.slnx --no-restore --nologo --tl:off -v minimal`
-  - evidence: `Passed: TeaSharp.Tests 523/523, TeaSharp.IntegrationTests 10/10.`
+  - evidence: `Passed: TeaSharp.Tests 541/541, TeaSharp.IntegrationTests 10/10.`
 - [x] Canonical examples build passed
   - command: `dotnet build TeaSharp.Examples.slnx --no-restore --nologo`
   - evidence: `Build succeeded. 0 Warning(s), 0 Error(s).`
@@ -39,7 +39,7 @@ Do not mark a checkbox complete unless command output/evidence is attached.
   - command template: `scripts/run_benchmarks_v1.sh shortlist-materialize`
   - evidence: `Captured in [perf-baseline-v1.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/perf-baseline-v1.md): dual-mode table for Startup, LogTail, LargeTable, OverlayStress, ResizeStorm, StyledHeavy (Date: 2026-03-20).`
 - [x] Regression budget check completed vs previous baseline
-  - baseline doc: `docs/perf-baseline-v1.md` (`before: d30df85076ee`, `after: 6010062b6123`)
+  - baseline doc: `docs/perf-baseline-v1.md` (`before: d30df85076ee`, `after: 842aaaf8ba64`)
   - pass/fail + deltas: `PASS` (`worst time regression: +1.51%`, `worst alloc regression: +0.00%`, all six gate scenarios pass in both modes; input latency p95 budget remains not measured in current BenchmarkDotNet shortlist lane).
 
 ## Docs and Public API Commenting
