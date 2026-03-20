@@ -78,6 +78,16 @@ public sealed class Modal : Control
     /// </summary>
     public TeaStyle BodyTextStyle { get; set; } = TeaStyle.Empty;
 
+    /// <summary>
+    /// Gets or sets style applied to border glyphs when the control is not focused.
+    /// </summary>
+    public TeaStyle BorderStyleText { get; set; } = TeaStyle.Empty;
+
+    /// <summary>
+    /// Gets or sets style merged into border glyphs while the control is focused.
+    /// </summary>
+    public TeaStyle FocusedBorderStyleText { get; set; } = TeaStyle.Empty;
+
     public override void Render(Canvas canvas, Rect rect)
     {
         if (!IsVisible)
@@ -111,7 +121,7 @@ public sealed class Modal : Control
         var modal = new Rect(modalX, modalY, modalWidth, modalHeight);
 
         FillRect(canvas, modal, ' ');
-        var body = FrameLayout.DrawFrameAndResolveContent(canvas, modal, RenderTitle(), Border, Padding);
+        var body = FrameLayout.DrawFrameAndResolveContent(canvas, modal, RenderTitle(), Border, Padding, ResolveBorderStyleText());
         if (body.IsEmpty)
         {
             return;
@@ -168,6 +178,17 @@ public sealed class Modal : Control
         }
 
         return Title;
+    }
+
+    private TeaStyle ResolveBorderStyleText()
+    {
+        var style = BorderStyleText;
+        if (IsFocused)
+        {
+            style = style.Merge(FocusedBorderStyleText);
+        }
+
+        return style;
     }
 
     private static void FillRect(Canvas canvas, Rect rect, char fill)

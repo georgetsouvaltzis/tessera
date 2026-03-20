@@ -90,6 +90,16 @@ public sealed class Timeline : Control
     public TeaStyle DisabledStyle { get; set; } = TeaStyle.Empty;
 
     /// <summary>
+    /// Gets or sets style applied to border glyphs when the control is not focused.
+    /// </summary>
+    public TeaStyle BorderStyleText { get; set; } = TeaStyle.Empty;
+
+    /// <summary>
+    /// Gets or sets style merged into border glyphs while the control is focused.
+    /// </summary>
+    public TeaStyle FocusedBorderStyleText { get; set; } = TeaStyle.Empty;
+
+    /// <summary>
     /// Gets or sets border style.
     /// </summary>
     public BorderStyle Border { get; set; } = BorderStyle.SingleLine;
@@ -272,7 +282,7 @@ public sealed class Timeline : Control
         }
 
         var title = Border == BorderStyle.None ? null : RenderTitle();
-        var content = FrameLayout.DrawFrameAndResolveContent(canvas, clipped, title, Border, Padding);
+        var content = FrameLayout.DrawFrameAndResolveContent(canvas, clipped, title, Border, Padding, ResolveBorderStyleText());
         if (content.IsEmpty)
         {
             return;
@@ -385,6 +395,22 @@ public sealed class Timeline : Control
         if (IsDisabled)
         {
             style = style.Merge(DisabledStyle).Merge(MutedStyle);
+        }
+
+        return style;
+    }
+
+    private TeaStyle ResolveBorderStyleText()
+    {
+        var style = BorderStyleText;
+        if (IsFocused)
+        {
+            style = style.Merge(FocusedBorderStyleText);
+        }
+
+        if (IsDisabled || IsReadOnly)
+        {
+            style = style.Merge(DisabledStyle);
         }
 
         return style;

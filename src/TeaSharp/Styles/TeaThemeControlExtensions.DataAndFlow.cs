@@ -156,6 +156,8 @@ public static partial class TeaThemeControlExtensions
         control.ValueStyle = theme.Text.Primary;
         control.SelectedRowStyle = theme.Selection.Foreground.Merge(theme.Selection.Background);
         control.SeparatorStyle = theme.Text.Muted;
+        control.BorderStyleText = theme.Border.Default;
+        control.FocusedBorderStyleText = theme.Border.Focused.Merge(theme.Focus.Border);
         return control;
     }
 
@@ -188,6 +190,8 @@ public static partial class TeaThemeControlExtensions
             control.SelectedRowStyle,
             theme.Selection.Foreground.Merge(theme.Selection.Background));
         control.SeparatorStyle = ApplyDefault(control.SeparatorStyle, theme.Text.Muted);
+        control.BorderStyleText = ApplyDefault(control.BorderStyleText, theme.Border.Default);
+        control.FocusedBorderStyleText = ApplyDefault(control.FocusedBorderStyleText, theme.Border.Focused.Merge(theme.Focus.Border));
         return control;
     }
 
@@ -221,6 +225,8 @@ public static partial class TeaThemeControlExtensions
         control.SeparatorStyle = theme.Text.Muted;
         control.MutedStyle = theme.Text.Muted;
         control.DisabledStyle = theme.Text.Muted;
+        control.BorderStyleText = theme.Border.Default;
+        control.FocusedBorderStyleText = theme.Border.Focused.Merge(theme.Focus.Border);
         return control;
     }
 
@@ -256,6 +262,8 @@ public static partial class TeaThemeControlExtensions
         control.SeparatorStyle = ApplyDefault(control.SeparatorStyle, theme.Text.Muted);
         control.MutedStyle = ApplyDefault(control.MutedStyle, theme.Text.Muted);
         control.DisabledStyle = ApplyDefault(control.DisabledStyle, theme.Text.Muted);
+        control.BorderStyleText = ApplyDefault(control.BorderStyleText, theme.Border.Default);
+        control.FocusedBorderStyleText = ApplyDefault(control.FocusedBorderStyleText, theme.Border.Focused.Merge(theme.Focus.Border));
         return control;
     }
 

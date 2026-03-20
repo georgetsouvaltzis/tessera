@@ -86,6 +86,16 @@ public sealed class KeyValueList : Control
     public TeaStyle SelectedRowStyle { get; set; } = TeaStyle.Empty;
 
     /// <summary>
+    /// Gets or sets style applied to border glyphs when the control is not focused.
+    /// </summary>
+    public TeaStyle BorderStyleText { get; set; } = TeaStyle.Empty;
+
+    /// <summary>
+    /// Gets or sets style merged into border glyphs while the control is focused.
+    /// </summary>
+    public TeaStyle FocusedBorderStyleText { get; set; } = TeaStyle.Empty;
+
+    /// <summary>
     /// Gets current entries.
     /// </summary>
     public IReadOnlyList<KeyValueListEntry> Entries => _entries;
@@ -246,7 +256,7 @@ public sealed class KeyValueList : Control
         }
 
         var title = Border == BorderStyle.None ? null : RenderTitle();
-        var content = FrameLayout.DrawFrameAndResolveContent(canvas, clipped, title, Border, Padding);
+        var content = FrameLayout.DrawFrameAndResolveContent(canvas, clipped, title, Border, Padding, ResolveBorderStyleText());
         if (content.IsEmpty)
         {
             return;
@@ -339,6 +349,17 @@ public sealed class KeyValueList : Control
         SelectionChanged?.Invoke(
             this,
             new KeyValueListSelectionChangedEventArgs(previousIndex, _selectedIndex, previousItem, SelectedItem));
+    }
+
+    private TeaStyle ResolveBorderStyleText()
+    {
+        var style = BorderStyleText;
+        if (IsFocused)
+        {
+            style = style.Merge(FocusedBorderStyleText);
+        }
+
+        return style;
     }
 
     private static string PadRight(string text, int width)
