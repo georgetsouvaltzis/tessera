@@ -7,7 +7,7 @@ Do not mark a checkbox complete unless command output/evidence is attached.
 
 - [ ] RC tag/branch: `<fill>`
 - [x] Date (UTC): `2026-03-20`
-- [x] Commit SHA: `807f7dd0c7e6`
+- [x] Commit SHA: `842aaaf8ba64`
 - [ ] Owner: `<fill>`
 
 ## Build, Test, Examples
@@ -74,16 +74,16 @@ Do not mark a checkbox complete unless command output/evidence is attached.
 ## Evidence Snapshot (this run)
 
 - `dotnet build TeaSharp.slnx --no-restore --nologo` -> `Build succeeded. 0 Warning(s), 0 Error(s).`
-- `dotnet test TeaSharp.slnx --no-restore --nologo --tl:off -v minimal` -> `TeaSharp.Tests: 523 passed; TeaSharp.IntegrationTests: 10 passed.`
+- `dotnet test TeaSharp.slnx --no-restore --nologo --tl:off -v minimal` -> `TeaSharp.Tests: 541 passed; TeaSharp.IntegrationTests: 10 passed.`
 - `dotnet build TeaSharp.Examples.slnx --no-restore --nologo` -> `Build succeeded. 0 Warning(s), 0 Error(s).`
 - `scripts/smoke_examples_v1.sh 4` -> `PASS HelloWorld`, `PASS CounterForm`, `PASS WorkspaceApp`, `SUMMARY pass=3 fail=0` (bounded startup probe; processes intentionally terminated after 4s).
 - `dotnet run --project benchmarks/TeaSharp.Benchmarks --no-build -- --list flat` -> listed gate scenarios in both `render` and `render-only` forms.
 - `scripts/run_benchmarks_v1.sh shortlist-render-only` -> Startup `10.61 us / 29.02 KB`, LogTail `5.012 ms / 80.1 KB`, LargeTable `11.71 us / 15.67 KB`, OverlayStress `375.8 us / 51 KB`, ResizeStorm `281.6 us / 59.11 KB`, StyledHeavy `48.93 us / 93.23 KB`.
 - `scripts/run_benchmarks_v1.sh shortlist-materialize` -> Startup `11.73 us / 46.61 KB`, LogTail `5.053 ms / 106.61 KB`, LargeTable `13.47 us / 46.88 KB`, OverlayStress `439.6 us / 1.41 MB`, ResizeStorm `337.5 us / 1.2 MB`, StyledHeavy `50.23 us / 118.48 KB`.
 - regression budget decision vs baseline `d30df85076ee`: `PASS` (worst time regression `+1.51%`; worst alloc regression `+0.00%`; both under plan thresholds `10%` and `15%`).
-- `scripts/run_benchmarks_v1.sh scenario "*OverlayStress*"` -> materialize `422.6 us / 1444.13 KB`, render-only `367.0 us / 51 KB`.
-- `scripts/run_benchmarks_v1.sh scenario "*LargeTable*"` -> materialize `13.23 us / 46.88 KB`, render-only `11.35 us / 15.67 KB`.
-- `scripts/run_benchmarks_v1.sh scenario "*ResizeStorm*"` -> materialize `326.6 us / 1227.05 KB`, render-only `265.2 us / 59.11 KB`.
+- `scripts/run_benchmarks_v1.sh scenario "*OverlayStress*"` -> materialize `420.9 us / 1444.13 KB`, render-only `358.6 us / 51 KB`.
+- `scripts/run_benchmarks_v1.sh scenario "*LargeTable*"` -> materialize `12.78 us / 46.88 KB`, render-only `11.23 us / 15.67 KB`.
+- `scripts/run_benchmarks_v1.sh scenario "*ResizeStorm*"` -> materialize `328.1 us / 1227.05 KB`, render-only `265.4 us / 59.11 KB`.
 - `dotnet test tests/TeaSharp.Tests --no-restore --nologo --filter "PublicApiXmlDocs_"` -> `Passed: 4, Failed: 0, Skipped: 0.`
 - dual-mode benchmark snapshot reference: [perf-baseline-v1.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/perf-baseline-v1.md) (`Date: 2026-03-20`, `inProcess`, six gate scenarios).
 - overlay optimization spotlight reference: [perf-baseline-v1.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/perf-baseline-v1.md) (`Overlay Optimization Spotlight`, added in commit `d30df85` after perf commits `9d2bc23`, `3487356`).
