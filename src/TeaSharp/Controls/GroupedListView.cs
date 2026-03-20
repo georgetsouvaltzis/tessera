@@ -172,7 +172,18 @@ public sealed class GroupedListView<TGroup, TItem> : Control
             RequestFocus();
             changed |= SetHovered(rowIndex);
             changed |= SetSelectedRowIndex(rowIndex);
-            if (TryGetRow(rowIndex, out var row) && row.IsHeader) changed |= ToggleGroup(row.GroupIndex);
+            if (TryGetRow(rowIndex, out var row) && row.IsHeader)
+            {
+                var markerClick = pointer.X <= content.X + 2;
+                if (markerClick)
+                {
+                    changed |= ToggleGroup(row.GroupIndex);
+                }
+                else if (!_groups[row.GroupIndex].IsCollapsed && _groups[row.GroupIndex].Items.Count > 0)
+                {
+                    changed |= SetSelectedItem(row.GroupIndex, 0);
+                }
+            }
         }
 
         return changed;

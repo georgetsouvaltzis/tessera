@@ -73,7 +73,7 @@ public sealed class VirtualizedListView<T> : Control
     public void SetItems(IReadOnlyList<T> items)
     {
         ArgumentNullException.ThrowIfNull(items);
-        var prev = (_selectedIndex, SelectedItem);
+        var prev = (_selectedIndex, CaptureSelectedItemForEvent());
         _resolver = null;
         _items = items;
         _count = items.Count;
@@ -92,7 +92,7 @@ public sealed class VirtualizedListView<T> : Control
     public void SetDataSource(int count, Func<int, T> itemResolver)
     {
         ArgumentNullException.ThrowIfNull(itemResolver);
-        var prev = (_selectedIndex, SelectedItem);
+        var prev = (_selectedIndex, CaptureSelectedItemForEvent());
         _items = Empty;
         _resolver = itemResolver;
         _count = Math.Max(0, count);
@@ -103,7 +103,7 @@ public sealed class VirtualizedListView<T> : Control
     /// <summary>Clears data and selection.</summary>
     public void Clear()
     {
-        var prev = (_selectedIndex, SelectedItem);
+        var prev = (_selectedIndex, CaptureSelectedItemForEvent());
         _items = Empty;
         _resolver = null;
         _count = 0;
@@ -127,7 +127,7 @@ public sealed class VirtualizedListView<T> : Control
             return false;
         }
 
-        var prev = (_selectedIndex, SelectedItem);
+        var prev = (_selectedIndex, CaptureSelectedItemForEvent());
         _selectedIndex = next;
         EnsureSelectionVisible(_viewportHeight);
         RaiseSelectionChangedIfNeeded(prev.Item1, prev.Item2);
@@ -302,8 +302,10 @@ public sealed class VirtualizedListView<T> : Control
 
     private void RaiseSelectionChangedIfNeeded(int previousIndex, T? previousItem)
     {
-        if (previousIndex == _selectedIndex && ReferenceEquals(previousItem, SelectedItem)) return;
-        SelectionChanged?.Invoke(this, new ListSelectionChangedEventArgs<T>(previousIndex, _selectedIndex, previousItem, SelectedItem));
+        if (SelectionChanged is null) return;
+        var currentItem = SelectedItem;
+        if (previousIndex == _selectedIndex && ReferenceEquals(previousItem, currentItem)) return;
+        SelectionChanged.Invoke(this, new ListSelectionChangedEventArgs<T>(previousIndex, _selectedIndex, previousItem, currentItem));
     }
 
     private TeaStyle ResolveRowStyle(bool selected, bool hovered)
@@ -330,4 +332,6 @@ public sealed class VirtualizedListView<T> : Control
     private static string ApplyStyle(string text, TeaStyle style) => string.IsNullOrEmpty(text) || style.IsEmpty ? text : style.Render(text);
 
     private static string DefaultText(T item) => item?.ToString() ?? string.Empty;
+
+    private T? CaptureSelectedItemForEvent() => SelectionChanged is null ? default : SelectedItem;
 }

@@ -303,8 +303,7 @@ public sealed class CalendarMonthView : Control
         }
 
         var cellWidth = Math.Max(2, Math.Min(DefaultCellWidth, content.Width / CalendarColumns));
-        var gridWidth = cellWidth * CalendarColumns;
-        var gridX = content.X + Math.Max(0, (content.Width - gridWidth) / 2);
+        var gridX = content.X;
         layout = new CalendarGridLayout(content, gridX, cellWidth, content.Y, content.Y + 1, content.Y + 2);
         return true;
     }
