@@ -5,6 +5,11 @@
 This document is the maintainer contract for TeaSharp's pre-public redesign.
 Public V1 release-candidate execution checklist: [public-v1-rc-checklist.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/public-v1-rc-checklist.md).
 
+RC closure clarification:
+- this file defines API/design direction and constraints
+- this file does not, by itself, close Public V1 RC
+- RC closure requires explicit manual signoff evidence in `docs/v1-master-plan.md` and the RC checklist
+
 Use it as the decision gate for:
 
 - API design
@@ -15,6 +20,19 @@ Use it as the decision gate for:
 - internalization/removals
 
 If a change conflicts with this document, the change is wrong unless this document is deliberately updated first.
+
+## V1 RC Manual Signoff Scope (Explicit)
+
+Unresolved until manually signed off:
+
+- RC checklist completion with owner/date evidence
+- verification matrix rerun on the final RC candidate SHA
+- performance gate signoff per `docs/perf-plan-v1.md`
+- docs freeze coherence signoff across source-of-truth docs and public API docs
+
+Interpretation rule:
+- “agreement implemented in code” is not equivalent to “RC approved”
+- RC is approved only after the manual signoff items above are marked complete in the master plan/checklist
 
 ## Product Position
 
@@ -444,6 +462,11 @@ Some important controls still require direct use of advanced `*Component` types.
 That is acceptable temporarily, but the long-term path should reduce how often normal apps need advanced namespaces.
 
 ## Correction Plan
+
+Ambiguity guard for RC closure:
+- Phases B-H are directional correction backlog.
+- For Public V1 RC, only items tied to active blockers or explicit gate failures are mandatory.
+- Backlog items without an RC blocker link must not be treated as implicit release blockers.
 
 ### Phase A. Freeze The Rules
 

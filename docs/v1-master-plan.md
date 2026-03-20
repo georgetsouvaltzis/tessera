@@ -45,6 +45,10 @@ Release-candidate execution checklist: [public-v1-rc-checklist.md](/Users/george
    - Exit criteria: widget tranche complete, perf gates pass, docs/commenting gates pass, release checklist complete.
 
 ## Current Progress
+- **Status Legend (for this file)**
+  - `Done` = implementation landed and merged.
+  - `Pending manual signoff` = release-gate evidence still required; RC is not closed.
+  - `Blocked` = open issue prevents phase exit.
 - **M1: Boundary Baseline** -> **Done**
   - no-DI startup policy established on docs path
   - canonical onboarding progression established (`HelloWorld` -> `CounterForm` -> `WorkspaceApp`)
@@ -61,6 +65,18 @@ Release-candidate execution checklist: [public-v1-rc-checklist.md](/Users/george
 - **WS-D benchmark harness status**
   - `BenchmarkSwitcher` discoverability is wired and `--list flat` lists all 6 required scenarios (`Startup`, `LogTail`, `LargeTable`, `OverlayStress`, `ResizeStorm`, `StyledHeavyOutput`)
   - supplemental viewport no-decoration benchmark coverage is wired (`ViewportRenderBenchmarks`) for render/materialize hot-path tracking
+
+## RC Closure Manual Signoffs (Unresolved Until Checked)
+Public V1 RC must not be declared closed from this document alone. The gates below require explicit human signoff with evidence links.
+
+| Gate | Required Evidence | Current Status |
+|---|---|---|
+| RC checklist closure | Completed entries in [public-v1-rc-checklist.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/public-v1-rc-checklist.md) with owner/date | Pending manual signoff |
+| Verification matrix rerun on RC candidate SHA | Command output + pass/fail summary for unit, integration, full suite, and example smoke from the exact candidate SHA | Pending manual signoff |
+| Performance gate approval | Benchmark report links and pass/fail verdict per [perf-plan-v1.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/perf-plan-v1.md) | Pending manual signoff |
+| Docs freeze coherence approval | Final docs diff review confirming `v1-master-plan.md` + `source-of-truth.md` + API docs are aligned | Pending manual signoff |
+
+Release approval rule: M4 is only complete when all four rows above are moved from `Pending manual signoff` to `Done` with owner/date evidence.
 
 ## Workstreams
 ### WS-A: Public API and Runtime Boundaries
