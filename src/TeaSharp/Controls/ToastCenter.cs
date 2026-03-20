@@ -58,6 +58,12 @@ public sealed partial class ToastCenter : Control
     /// <summary>Gets or sets the title style applied when focused.</summary>
     public TeaStyle FocusedTitleStyle { get; set; } = TeaStyle.Empty;
 
+    /// <summary>Gets or sets the style applied to border glyphs when the control is not focused.</summary>
+    public TeaStyle BorderStyleText { get; set; } = TeaStyle.Empty;
+
+    /// <summary>Gets or sets the style applied to border glyphs when the control is focused.</summary>
+    public TeaStyle FocusedBorderStyleText { get; set; } = TeaStyle.Empty;
+
     /// <summary>Gets or sets the base style used for toast rows.</summary>
     public TeaStyle ItemStyle { get; set; } = TeaStyle.Empty;
 

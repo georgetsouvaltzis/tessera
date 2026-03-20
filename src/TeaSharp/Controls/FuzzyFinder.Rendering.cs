@@ -23,7 +23,8 @@ public sealed partial class FuzzyFinder
             clipped,
             Border == BorderStyle.None ? null : RenderTitle(),
             Border,
-            Padding);
+            Padding,
+            ResolveBorderStyleText());
         if (content.IsEmpty || content.Height < 1)
         {
             return;
@@ -98,5 +99,21 @@ public sealed partial class FuzzyFinder
         }
 
         return style.Render(text);
+    }
+
+    private TeaStyle ResolveBorderStyleText()
+    {
+        var style = BorderStyleText;
+        if (IsFocused)
+        {
+            style = style.Merge(FocusedBorderStyleText);
+        }
+
+        if (IsDisabled)
+        {
+            style = style.Merge(PlaceholderTextStyle);
+        }
+
+        return style;
     }
 }

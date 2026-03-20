@@ -67,6 +67,16 @@ public sealed partial class FileExplorer : Control
     public TeaStyle MutedStyle { get; set; } = TeaStyle.Empty;
 
     /// <summary>
+    /// Gets or sets the style applied to border glyphs when the control is not focused.
+    /// </summary>
+    public TeaStyle BorderStyleText { get; set; } = TeaStyle.Empty;
+
+    /// <summary>
+    /// Gets or sets the style applied to border glyphs when the control is focused.
+    /// </summary>
+    public TeaStyle FocusedBorderStyleText { get; set; } = TeaStyle.Empty;
+
+    /// <summary>
     /// Gets or sets the border style.
     /// </summary>
     public BorderStyle Border { get; set; } = BorderStyle.SingleLine;
@@ -281,7 +291,13 @@ public sealed partial class FileExplorer : Control
         }
 
         var title = Border == BorderStyle.None ? null : RenderTitle();
-        var content = FrameLayout.DrawFrameAndResolveContent(canvas, clipped, title, Border, Padding);
+        var content = FrameLayout.DrawFrameAndResolveContent(
+            canvas,
+            clipped,
+            title,
+            Border,
+            Padding,
+            ResolveBorderStyleText());
         if (content.IsEmpty)
         {
             return;
@@ -429,6 +445,22 @@ public sealed partial class FileExplorer : Control
             ? $"{Title} {FocusMarker}"
             : Title;
         return ApplyStyle(value ?? string.Empty, IsFocused ? FocusedTitleStyle : TitleStyle);
+    }
+
+    private TeaStyle ResolveBorderStyleText()
+    {
+        var style = BorderStyleText;
+        if (IsFocused)
+        {
+            style = style.Merge(FocusedBorderStyleText);
+        }
+
+        if (IsDisabled)
+        {
+            style = style.Merge(MutedStyle);
+        }
+
+        return style;
     }
 
     private void RefreshVisible()

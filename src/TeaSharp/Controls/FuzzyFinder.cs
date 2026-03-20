@@ -81,6 +81,24 @@ public sealed partial class FuzzyFinder : Control
     } = TeaStyle.Empty;
 
     /// <summary>
+    /// Gets or sets the style applied to border glyphs when the control is not focused.
+    /// </summary>
+    public TeaStyle BorderStyleText
+    {
+        get;
+        set;
+    } = TeaStyle.Empty;
+
+    /// <summary>
+    /// Gets or sets the style applied to border glyphs when the control is focused.
+    /// </summary>
+    public TeaStyle FocusedBorderStyleText
+    {
+        get;
+        set;
+    } = TeaStyle.Empty;
+
+    /// <summary>
     /// Gets or sets the border style.
     /// </summary>
     public BorderStyle Border

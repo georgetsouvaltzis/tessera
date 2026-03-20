@@ -23,7 +23,13 @@ public sealed partial class ToastCenter
         }
 
         var title = Border == BorderStyle.None ? null : RenderTitle();
-        var content = FrameLayout.DrawFrameAndResolveContent(canvas, clipped, title, Border, Padding);
+        var content = FrameLayout.DrawFrameAndResolveContent(
+            canvas,
+            clipped,
+            title,
+            Border,
+            Padding,
+            ResolveBorderStyleText());
         if (content.IsEmpty)
         {
             return;
@@ -145,5 +151,21 @@ public sealed partial class ToastCenter
         }
 
         return style.Render(text);
+    }
+
+    private TeaStyle ResolveBorderStyleText()
+    {
+        var style = BorderStyleText;
+        if (IsFocused)
+        {
+            style = style.Merge(FocusedBorderStyleText);
+        }
+
+        if (IsDisabled)
+        {
+            style = style.Merge(MutedItemStyle);
+        }
+
+        return style;
     }
 }

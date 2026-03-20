@@ -61,6 +61,24 @@ public sealed class DiffView : Control
     } = TeaStyle.Empty;
 
     /// <summary>
+    /// Gets or sets the style applied to border glyphs when the control is not focused.
+    /// </summary>
+    public TeaStyle BorderStyleText
+    {
+        get;
+        set;
+    } = TeaStyle.Empty;
+
+    /// <summary>
+    /// Gets or sets the style applied to border glyphs when the control is focused.
+    /// </summary>
+    public TeaStyle FocusedBorderStyleText
+    {
+        get;
+        set;
+    } = TeaStyle.Empty;
+
+    /// <summary>
     /// Gets or sets the border style.
     /// </summary>
     public BorderStyle Border
@@ -295,7 +313,13 @@ public sealed class DiffView : Control
         var title = Border == BorderStyle.None
             ? null
             : RenderTitle();
-        var content = FrameLayout.DrawFrameAndResolveContent(canvas, clipped, title, Border, Padding);
+        var content = FrameLayout.DrawFrameAndResolveContent(
+            canvas,
+            clipped,
+            title,
+            Border,
+            Padding,
+            ResolveBorderStyleText());
         if (content.IsEmpty || content.Height < 1)
         {
             return;
@@ -442,5 +466,16 @@ public sealed class DiffView : Control
         }
 
         return style.Render(text);
+    }
+
+    private TeaStyle ResolveBorderStyleText()
+    {
+        var style = BorderStyleText;
+        if (IsFocused)
+        {
+            style = style.Merge(FocusedBorderStyleText);
+        }
+
+        return style;
     }
 }
