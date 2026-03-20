@@ -21,12 +21,13 @@ Do not mark a checkbox complete unless command output/evidence is attached.
 - [x] Canonical examples build passed
   - command: `dotnet build TeaSharp.Examples.slnx --no-restore --nologo`
   - evidence: `Build succeeded. 0 Warning(s), 0 Error(s).`
-- [ ] Canonical examples smoke run validated
+- [x] Canonical examples smoke run validated
   - commands:
     - `dotnet run --project examples/HelloWorld --no-build`
     - `dotnet run --project examples/CounterForm --no-build`
     - `dotnet run --project examples/WorkspaceApp --no-build`
-  - evidence: `Not executed in this run (interactive/manual lane).`
+    - `scripts/smoke_examples_v1.sh 4`
+  - evidence: `scripts/smoke_examples_v1.sh 4` -> `PASS HelloWorld startup alive >=4s`, `PASS CounterForm startup alive >=4s`, `PASS WorkspaceApp startup alive >=4s`, `SUMMARY pass=3 fail=0`.
 
 ## Benchmark Evidence and Regression Budgets
 
@@ -75,6 +76,7 @@ Do not mark a checkbox complete unless command output/evidence is attached.
 - `dotnet build TeaSharp.slnx --no-restore --nologo` -> `Build succeeded. 0 Warning(s), 0 Error(s).`
 - `dotnet test TeaSharp.slnx --no-restore --nologo --tl:off -v minimal` -> `TeaSharp.Tests: 523 passed; TeaSharp.IntegrationTests: 10 passed.`
 - `dotnet build TeaSharp.Examples.slnx --no-restore --nologo` -> `Build succeeded. 0 Warning(s), 0 Error(s).`
+- `scripts/smoke_examples_v1.sh 4` -> `PASS HelloWorld`, `PASS CounterForm`, `PASS WorkspaceApp`, `SUMMARY pass=3 fail=0` (bounded startup probe; processes intentionally terminated after 4s).
 - `dotnet run --project benchmarks/TeaSharp.Benchmarks --no-build -- --list flat` -> listed gate scenarios in both `render` and `render-only` forms.
 - `dotnet test tests/TeaSharp.Tests --no-restore --nologo --filter "PublicApiXmlDocs_"` -> `Passed: 4, Failed: 0, Skipped: 0.`
 - dual-mode benchmark snapshot reference: [perf-baseline-v1.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/perf-baseline-v1.md) (`Date: 2026-03-20`, `inProcess`, six gate scenarios).
