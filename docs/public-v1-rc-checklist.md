@@ -7,7 +7,7 @@ Do not mark a checkbox complete unless command output/evidence is attached.
 
 - [ ] RC tag/branch: `<fill>`
 - [x] Date (UTC): `2026-03-20`
-- [x] Commit SHA: `1ca078d51940`
+- [x] Commit SHA: `d30df85076ee`
 - [ ] Owner: `<fill>`
 
 ## Build, Test, Examples
@@ -17,7 +17,7 @@ Do not mark a checkbox complete unless command output/evidence is attached.
   - evidence: `Build succeeded. 0 Warning(s), 0 Error(s).`
 - [x] Full test suite passed
   - command: `dotnet test TeaSharp.slnx --no-restore --nologo --tl:off -v minimal`
-  - evidence: `Passed: TeaSharp.Tests 521/521, TeaSharp.IntegrationTests 10/10.`
+  - evidence: `Passed: TeaSharp.Tests 523/523, TeaSharp.IntegrationTests 10/10.`
 - [x] Canonical examples build passed
   - command: `dotnet build TeaSharp.Examples.slnx --no-restore --nologo`
   - evidence: `Build succeeded. 0 Warning(s), 0 Error(s).`
@@ -73,8 +73,9 @@ Do not mark a checkbox complete unless command output/evidence is attached.
 ## Evidence Snapshot (this run)
 
 - `dotnet build TeaSharp.slnx --no-restore --nologo` -> `Build succeeded. 0 Warning(s), 0 Error(s).`
-- `dotnet test TeaSharp.slnx --no-restore --nologo --tl:off -v minimal` -> `TeaSharp.Tests: 521 passed; TeaSharp.IntegrationTests: 10 passed.`
+- `dotnet test TeaSharp.slnx --no-restore --nologo --tl:off -v minimal` -> `TeaSharp.Tests: 523 passed; TeaSharp.IntegrationTests: 10 passed.`
 - `dotnet build TeaSharp.Examples.slnx --no-restore --nologo` -> `Build succeeded. 0 Warning(s), 0 Error(s).`
 - `dotnet run --project benchmarks/TeaSharp.Benchmarks --no-build -- --list flat` -> listed gate scenarios in both `render` and `render-only` forms.
 - `dotnet test tests/TeaSharp.Tests --no-restore --nologo --filter "PublicApiXmlDocs_"` -> `Passed: 4, Failed: 0, Skipped: 0.`
 - dual-mode benchmark snapshot reference: [perf-baseline-v1.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/perf-baseline-v1.md) (`Date: 2026-03-20`, `inProcess`, six gate scenarios).
+- overlay optimization spotlight reference: [perf-baseline-v1.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/perf-baseline-v1.md) (`Overlay Optimization Spotlight`, added in commit `d30df85` after perf commits `9d2bc23`, `3487356`).
