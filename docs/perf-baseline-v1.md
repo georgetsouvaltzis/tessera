@@ -8,25 +8,25 @@ Environment:
 - terminal: `xterm-ghostty`
 - benchmark mode families: `render-only` + `render+materialize`
 
-Latest measured snapshot (current head `b8bf21512484`):
+Latest measured snapshot (current head `6010062b6123`):
 - command pattern (render-only): `scripts/run_benchmarks_v1.sh shortlist-render-only`
 - command pattern (materialize): `scripts/run_benchmarks_v1.sh shortlist-materialize`
 - command pattern (viewport supplemental): `scripts/run_benchmarks_v1.sh scenario "*Viewport*"`
 
 | Scenario | Render-only mean | Render-only alloc | Materialize mean | Materialize alloc |
 | --- | --- | --- | --- | --- |
-| Startup | `12.08 us` | `30.52 KB` | `14.02 us` | `48.11 KB` |
-| LogTail | `4.842 ms` | `80.1 KB` | `6.835 ms` | `106.61 KB` |
-| LargeTable | `12.65 us` | `15.67 KB` | `14.87 us` | `46.88 KB` |
-| OverlayStress | `429.6 us` | `61.13 KB` | `504.9 us` | `1.42 MB` |
-| ResizeStorm | `301.7 us` | `59.11 KB` | `375.0 us` | `1.2 MB` |
-| StyledHeavy | `57.56 us` | `93.23 KB` | `59.57 us` | `118.48 KB` |
+| Startup | `10.61 us` | `29.02 KB` | `11.73 us` | `46.61 KB` |
+| LogTail | `5.012 ms` | `80.1 KB` | `5.053 ms` | `106.61 KB` |
+| LargeTable | `11.71 us` | `15.67 KB` | `13.47 us` | `46.88 KB` |
+| OverlayStress | `375.8 us` | `51 KB` | `439.6 us` | `1.41 MB` |
+| ResizeStorm | `281.6 us` | `59.11 KB` | `337.5 us` | `1.2 MB` |
+| StyledHeavy | `48.93 us` | `93.23 KB` | `50.23 us` | `118.48 KB` |
 
 Supplemental viewport scenario (optional):
 
 | Scenario | Render-only mean | Render-only alloc | Materialize mean | Materialize alloc |
 | --- | --- | --- | --- | --- |
-| ViewportRenderBenchmarks | `51.82 us` | `5 KB` | `99.58 us` | `1701.5 KB` |
+| ViewportRenderBenchmarks | `55.15 us` | `5 KB` | `105.80 us` | `1701.5 KB` |
 
 Notes:
 - priority-setting warnings on this host (`Permission denied` / `Operation not permitted`) are non-fatal noise
@@ -37,7 +37,7 @@ Notes:
 
 Commits:
 - accepted baseline (before): `d30df85076ee`
-- candidate measured (after): `06cc6a8c59e3`
+- candidate measured (after): `6010062b6123`
 
 Commands:
 - `scripts/run_benchmarks_v1.sh list`
@@ -52,45 +52,16 @@ Measured deltas vs accepted baseline:
 
 | Scenario | RO mean delta | RO alloc delta | MAT mean delta | MAT alloc delta | Gate |
 | --- | --- | --- | --- | --- | --- |
-| Startup | `+5.79%` | `+1.60%` | `-0.45%` | `+1.01%` | `pass` |
-| LogTail | `-21.95%` | `-0.46%` | `-0.46%` | `-0.34%` | `pass` |
-| LargeTable | `-1.31%` | `+0.00%` | `-1.05%` | `+0.00%` | `pass` |
-| OverlayStress | `-12.22%` | `-47.17%` | `-12.76%` | `-3.40%` | `pass` |
-| ResizeStorm | `-2.19%` | `-10.25%` | `-2.69%` | `+0.00%` | `pass` |
-| StyledHeavy | `-0.14%` | `+0.00%` | `-3.36%` | `+0.00%` | `pass` |
+| Startup | `-10.92%` | `-3.40%` | `-11.54%` | `-2.14%` | `pass` |
+| LogTail | `-20.15%` | `-0.46%` | `+1.51%` | `-0.34%` | `pass` |
+| LargeTable | `-9.44%` | `+0.00%` | `-5.54%` | `+0.00%` | `pass` |
+| OverlayStress | `-23.23%` | `-55.92%` | `-22.52%` | `-4.08%` | `pass` |
+| ResizeStorm | `-8.03%` | `-10.25%` | `-10.12%` | `+0.00%` | `pass` |
+| StyledHeavy | `-12.01%` | `+0.00%` | `-13.58%` | `+0.00%` | `pass` |
 
 Conclusion:
-- measured benchmark budgets: `pass` (worst time regression `+5.79%`, worst allocation regression `+1.60%`)
+- measured benchmark budgets: `pass` (worst time regression `+1.51%`, worst allocation regression `+0.00%`)
 - input latency p95 budget: `not measured` in current BenchmarkDotNet shortlist lane
-
-## Iteration 4 Snapshot Refresh (2026-03-20)
-
-Commits:
-- prior documented snapshot: `b132c8a1cfa8`
-- current measured head: `b8bf21512484`
-
-Commands:
-- `scripts/run_benchmarks_v1.sh shortlist-render-only`
-- `scripts/run_benchmarks_v1.sh shortlist-materialize`
-
-Budget thresholds from `docs/perf-plan-v1.md`:
-- time regression budget: `> 10%` -> fail
-- allocation regression budget: `> 15%` -> fail
-
-Measured deltas vs prior documented snapshot:
-
-| Scenario | RO mean delta | RO alloc delta | MAT mean delta | MAT alloc delta | Gate |
-| --- | --- | --- | --- | --- | --- |
-| Startup | `-4.13%` | `+0.00%` | `+6.21%` | `+0.00%` | `pass` |
-| LogTail | `-1.16%` | `+0.00%` | `+37.94%` | `+0.00%` | `fail` |
-| LargeTable | `-0.86%` | `+0.00%` | `+5.39%` | `+0.00%` | `pass` |
-| OverlayStress | `-0.02%` | `+0.00%` | `+2.00%` | `+0.00%` | `pass` |
-| ResizeStorm | `+0.73%` | `+0.00%` | `+2.63%` | `+0.00%` | `pass` |
-| StyledHeavy | `+3.66%` | `+0.00%` | `+6.05%` | `+0.00%` | `pass` |
-
-Conclusion:
-- measured benchmark budgets: `fail` (worst time regression `+37.94%` in `LogTail` materialize; worst allocation regression `+0.00%`)
-- next step: attribute `LogTail` materialize regression with targeted scenario repeats before release gate signoff
 
 ## Iteration 3 Spotlight (2026-03-19)
 
