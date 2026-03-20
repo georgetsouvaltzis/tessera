@@ -143,6 +143,36 @@ var treeTable = new TreeTable("Name", "Value") { ColumnSeparatorText = " │ ", 
 
 - Bordered `ContextMenu` titles now preserve focused `FocusMarker` output by reserving width for the rendered title marker text.
 
+### Plotting and Dashboard Authoring
+
+Use plotting controls by data shape:
+
+- `Sparkline`: compact single-metric trend in one row (high-frequency status bars).
+- `AreaPlot`: single series trend where fill emphasizes magnitude.
+- `LinePlot`: multi-series time-aligned trend comparisons (`LineSeries` per metric).
+- `ScatterPlot`: X/Y correlation or non-time samples.
+- `Histogram`: distribution/bucket views (latency buckets, error counts).
+- `PlotPanel`: compose multiple plot controls into one bordered dashboard surface.
+
+Recommended streaming patterns:
+
+- For `Sparkline` and `AreaPlot`, prefer constructor capacity (`new Sparkline(capacity: 240)`) and append (`Append(value)`).
+- For `LinePlot`, keep bounded external buffers per metric, then refresh each `LineSeries` via `SetSamples(...)`.
+- Reuse controls and series instances across frames; mutate data only in `Update(...)`.
+
+```csharp
+private static void PushBounded(Queue<double> buffer, double value, int capacity)
+{
+    if (buffer.Count == capacity) buffer.Dequeue();
+    buffer.Enqueue(value);
+}
+```
+
+Theme and override pattern:
+
+- Start with semantic defaults (`ApplyThemeDefaults(theme)`), then set instance overrides (`LegendStyle`, `StatsStyle`, `AxisStyle`, `BorderStyleText`, `FocusedBorderStyleText`).
+- Bordered plotting controls (`Sparkline`, `AreaPlot`, `LinePlot`, `PlotPanel`) should use border style hooks instead of hardcoded emphasis markers.
+
 ### Beautiful UI Checklist (Current Phase)
 
 - Apply semantic theme first (`TeaRuntimeOptions.Theme`), then control-type, instance, and state overrides.
@@ -250,6 +280,7 @@ Current example projects:
 - `examples/WidgetGallery`
 
 All of these now run on the new `TeaApp` startup/composition path, even when they demonstrate advanced seams.
+`examples/PlottingDashboard` will be the dedicated plotting/dashboard reference once it lands; until then use `WidgetGallery` and `AdvancedWidgets` for plotting composition patterns.
 
 ## Migration Guidance
 

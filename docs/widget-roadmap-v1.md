@@ -93,6 +93,27 @@ These controls are already shipped on the public path and are not part of the +3
 
 All shipped plotting controls follow the strict theming contract (state styles, glyph hooks where applicable, and override hierarchy).
 
+### Plotting Dashboard Authoring Notes
+
+Use the shipped plotting controls by intent:
+
+- `Sparkline`/`AreaPlot` for bounded streaming single-series telemetry
+- `LinePlot` for multi-series trend dashboards
+- `ScatterPlot` for correlation
+- `Histogram` for distribution buckets
+- `PlotPanel` to compose multiple plotting controls into one screen region
+
+Recommended implementation pattern:
+
+- keep bounded buffers for stream inputs
+- update existing controls/series in place (avoid rebuilding control trees)
+- apply theme defaults, then instance-level visual overrides
+
+Documentation and examples:
+
+- canonical plotting/dashboard sample: `examples/PlottingDashboard` (add when available)
+- current stopgap references: `examples/WidgetGallery`, `examples/AdvancedWidgets`
+
 ## Visual Pass Timing
 
 - **Phase A (implementation-first):** each widget ships with strict minimal visual contract (state styles + glyph hooks + override hierarchy) and monochrome-safe rendering.

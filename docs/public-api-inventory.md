@@ -260,6 +260,24 @@ Current shipped theme mapping is centralized in `TeaSharp.Styles.TeaThemeControl
 Overlay glyph cookbook snippets for `MenuBarGlyphSet`, `ContextMenuGlyphSet`, and `CommandPaletteGlyphSet` are documented in [theme-system-v1.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/theme-system-v1.md).
 Border override, dropdown/tree glyph-set, and data marker/separator cookbook snippets are documented in [theme-system-v1.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/theme-system-v1.md).
 
+## Plotting Authoring Guidance (Tier 1)
+
+Plotting/dashboard controls on the default app path:
+
+- single-metric trend: `Sparkline` or `AreaPlot`
+- multi-metric trend: `LinePlot` + `LineSeries`
+- correlation analysis: `ScatterPlot`
+- distribution analysis: `Histogram`
+- dashboard composition: `PlotPanel`
+
+Operational pattern:
+
+- stream with bounded buffers
+- reuse long-lived controls/series and mutate data in place
+- apply theme defaults first, then control-instance overrides for title, border, legend, stats, axis, and data emphasis
+
+Planned reference sample: `examples/PlottingDashboard` (once available).
+
 ## Typography Capability Status
 
 - Portable typography lane: `TeaStyle.WithFontWeight(TeaFontWeight)` for ANSI SGR emphasis intent (normal/bold/dim), not real font engine control.

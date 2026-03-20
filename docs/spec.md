@@ -244,6 +244,32 @@ Root controls currently include:
 
 These types provide the default control vocabulary. Most promoted legacy `*Component` names are now internal bridges behind these controls.
 
+### Plotting and Dashboard Authoring Guidance
+
+Recommended control selection:
+
+- `Sparkline`: compact single metric, fast append path, bounded by constructor capacity.
+- `AreaPlot`: single metric with fill semantics.
+- `LinePlot` + `LineSeries`: multi-series trend dashboards.
+- `ScatterPlot`: correlation analysis (X/Y points).
+- `Histogram`: bucketed distributions.
+- `PlotPanel`: container for composing multiple plot controls in grid-like dashboards.
+
+Streaming guidance:
+
+- Keep producers bounded. For `Sparkline`/`AreaPlot`, use capacity constructors and `Append`.
+- For `LinePlot`, keep bounded external buffers per series and call `LineSeries.SetSamples(...)`.
+- Reuse control instances and update data only; avoid rebuilding controls each frame.
+
+Theming guidance:
+
+- Apply semantic defaults first (`ApplyThemeDefaults`), then instance overrides.
+- Bordered plotting controls expose `BorderStyleText` and `FocusedBorderStyleText`; use those hooks for focus emphasis instead of hardcoded symbols.
+
+Reference example:
+
+- `examples/PlottingDashboard` is the planned canonical plotting dashboard sample once available.
+
 ### Custom Control Model
 
 Custom widgets extend `TeaSharp.Controls.Control`.
