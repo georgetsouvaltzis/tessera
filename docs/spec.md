@@ -108,6 +108,7 @@ V1 theming is semantic-token based with override hierarchy:
 - `DataGrid` and `TreeTable` map `BorderStyleText`/`FocusedBorderStyleText` to semantic border/focus tokens by default
 - `DataGrid` and `TreeTable` expose explicit text-based visual hooks for separators and selection/sort/tree markers
 - `ContextMenu` preserves focused title marker text when rendering bordered titles
+- parity rule: any new bordered public control must ship border-style hooks, token mappings, and parity regression coverage in the same change
 - mapped navigation primitive controls include `Accordion`, `MultiSelect`, `RadioGroup`
 - mapped data/flow controls include `DataGrid`, `TreeTable`, `KeyValueList`, `Timeline`, `Stepper`
 - mapped explorer/feedback controls include `DiffView`, `PropertyGrid`, `FileExplorer`, `FuzzyFinder`, `ToastCenter`

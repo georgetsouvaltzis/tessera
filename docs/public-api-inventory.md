@@ -239,6 +239,12 @@ Current shipped theme mapping is centralized in `TeaSharp.Styles.TeaThemeControl
 Overlay glyph cookbook snippets for `MenuBarGlyphSet`, `ContextMenuGlyphSet`, and `CommandPaletteGlyphSet` are documented in [theme-system-v1.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/theme-system-v1.md).
 Border override, dropdown/tree glyph-set, and data marker/separator cookbook snippets are documented in [theme-system-v1.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/theme-system-v1.md).
 
+Bordered control parity policy:
+
+- any public control with bordered frame rendering must expose `BorderStyleText` and `FocusedBorderStyleText`
+- each bordered control must have `ApplyTheme`/`ApplyThemeDefaults` token mapping in the corresponding `TeaThemeControlExtensions` domain file
+- parity is enforced through theme mapping tests plus visual edge-case assertions before merge
+
 Basic controls with direct token mappings:
 
 - `Button`, `ListView<T>`, `StatusBar`, `TextInput`, `Table`, `Tabs`

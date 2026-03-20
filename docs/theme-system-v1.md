@@ -330,6 +330,12 @@ Explorer/feedback mapping coverage includes:
 
 - `DiffView`, `PropertyGrid`, `FileExplorer`, `FuzzyFinder`, `ToastCenter`
 
+Bordered control parity enforcement:
+
+- new bordered controls must expose `BorderStyleText` and `FocusedBorderStyleText`
+- new bordered controls must map those hooks to `theme.Border.Default` and `theme.Border.Focused.Merge(theme.Focus.Border)`
+- test enforcement is maintained through `ThemeOverridesTests.*` token-mapping suites plus `VisualParityTests` edge-case coverage
+
 ## V1 Rollout
 
 Phase 1 (baseline controls):

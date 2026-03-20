@@ -154,7 +154,7 @@ All agents must treat this file as the source of truth for scope, sequencing, ow
 - Closed: cookbook examples for overlay glyph APIs, border overrides, dropdown/tree glyph sets, and data widget separator/marker hooks (`edf676c`, `dcdc51f`).
 - Closed: visual edge-case regression assertions for parity-sensitive rendering paths (`7caa741`).
 - Closed: overlay/input token-consistency enforcement in theme mappings (`74751e6`).
-- Remaining: enforce the same parity rule for any new control added post-freeze (must ship with style hooks + token mapping + regression coverage in the same slice).
+- Remaining (forward-only): keep parity policy enforced for any new bordered control added post-freeze (must ship with `BorderStyleText`/`FocusedBorderStyleText`, token mapping, and regression coverage in the same slice).
 
 ## Parallelization Constraints
 - Parallel work is allowed only within the active phase in the authoritative execution order.

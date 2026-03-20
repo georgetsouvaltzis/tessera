@@ -119,6 +119,7 @@ var treeTable = new TreeTable("Name", "Value") { ColumnSeparatorText = " │ ", 
 - Use explicit focus/title hooks (`FocusMarker`, `ShowFocusMarker`, `TitleStyle`, `FocusedTitleStyle`) on interactive controls.
 - Use border text hooks where supported (`BorderStyleText`, `FocusedBorderStyleText`) to avoid hardcoded frame emphasis.
 - Use typed glyph sets for symbolic affordances (`DropdownGlyphSet`, `TreeViewGlyphSet`) instead of inline string literals.
+- For any new bordered control, ship border hooks + theme token mapping + parity tests in the same slice.
 - Keep monochrome-safe defaults when style hooks are left empty.
 
 ## Theme Mapping Snapshot
