@@ -7,7 +7,7 @@ Do not mark a checkbox complete unless command output/evidence is attached.
 
 - [ ] RC tag/branch: `<fill>`
 - [x] Date (UTC): `2026-03-20`
-- [x] Commit SHA: `06cc6a8c59e3`
+- [x] Commit SHA: `b132c8a1cfa8`
 - [ ] Owner: `<fill>`
 
 ## Build, Test, Examples
