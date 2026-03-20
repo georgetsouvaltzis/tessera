@@ -72,22 +72,21 @@ public sealed partial class FuzzyFinder
 
     private static bool TryScore(string query, string candidate, out int score, out int[] matchIndices)
     {
-        if (string.IsNullOrWhiteSpace(query))
+        var trimmedQuery = query.AsSpan().Trim();
+        if (trimmedQuery.IsEmpty)
         {
             score = 0;
             matchIndices = [];
             return true;
         }
 
-        var q = query.Trim().ToLowerInvariant();
-        var c = candidate.ToLowerInvariant();
-        var matches = new List<int>(q.Length);
+        matchIndices = new int[trimmedQuery.Length];
         score = 0;
         var searchStart = 0;
         var previous = -2;
-        for (var index = 0; index < q.Length; index++)
+        for (var index = 0; index < trimmedQuery.Length; index++)
         {
-            var foundAt = c.IndexOf(q[index], searchStart);
+            var foundAt = IndexOfOrdinalIgnoreCase(candidate, trimmedQuery[index], searchStart);
             if (foundAt < 0)
             {
                 score = int.MinValue;
@@ -95,9 +94,9 @@ public sealed partial class FuzzyFinder
                 return false;
             }
 
-            matches.Add(foundAt);
+            matchIndices[index] = foundAt;
             score += 10;
-            if (foundAt == 0 || IsWordBoundary(c[foundAt - 1]))
+            if (foundAt == 0 || IsWordBoundary(candidate[foundAt - 1]))
             {
                 score += 6;
             }
@@ -112,9 +111,22 @@ public sealed partial class FuzzyFinder
             searchStart = foundAt + 1;
         }
 
-        score -= c.Length - q.Length;
-        matchIndices = [.. matches];
+        score -= candidate.Length - trimmedQuery.Length;
         return true;
+    }
+
+    private static int IndexOfOrdinalIgnoreCase(string candidate, char value, int start)
+    {
+        var needle = char.ToLowerInvariant(value);
+        for (var index = Math.Max(0, start); index < candidate.Length; index++)
+        {
+            if (char.ToLowerInvariant(candidate[index]) == needle)
+            {
+                return index;
+            }
+        }
+
+        return -1;
     }
 
     private static bool IsWordBoundary(char value)

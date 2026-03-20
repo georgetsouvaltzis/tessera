@@ -6,10 +6,7 @@ internal static class MarkdownLineRenderer
 {
     public static List<string> Render(string markdown)
     {
-        var lines = markdown
-            .Replace("\r\n", "\n", StringComparison.Ordinal)
-            .Replace('\r', '\n')
-            .Split('\n');
+        var lines = ControlTextLayout.SplitLines(markdown);
 
         var output = new List<string>(lines.Length);
         var inCode = false;

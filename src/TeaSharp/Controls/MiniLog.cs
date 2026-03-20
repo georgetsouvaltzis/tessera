@@ -95,17 +95,38 @@ public sealed class MiniLog : Control
             return;
         }
 
-        var normalized = line
-            .Replace("\r\n", "\n", StringComparison.Ordinal)
-            .Replace('\r', '\n');
-        var parts = normalized.Split('\n');
-        foreach (var part in parts)
+        AppendNormalizedLines(line);
+    }
+
+    private void AppendNormalizedLines(string line)
+    {
+        var start = 0;
+        for (var index = 0; index < line.Length; index++)
         {
-            _entries.Add(part);
-            if (_entries.Count > Capacity)
+            var current = line[index];
+            if (current is not ('\n' or '\r'))
             {
-                _entries.RemoveAt(0);
+                continue;
             }
+
+            AddEntry(line.AsSpan(start, index - start));
+            if (current == '\r' && index + 1 < line.Length && line[index + 1] == '\n')
+            {
+                index++;
+            }
+
+            start = index + 1;
+        }
+
+        AddEntry(line.AsSpan(start));
+    }
+
+    private void AddEntry(ReadOnlySpan<char> entry)
+    {
+        _entries.Add(entry.ToString());
+        if (_entries.Count > Capacity)
+        {
+            _entries.RemoveAt(0);
         }
     }
 

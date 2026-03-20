@@ -44,15 +44,24 @@ internal static class TextInputFrameBuilder
         }
 
         start = Math.Clamp(start, 0, Math.Max(0, visible.Length - 1));
-        var text = start >= visible.Length
-            ? string.Empty
-            : visible.Substring(start, Math.Min(width, visible.Length - start));
-        if (text.Length < width)
-        {
-            text = text.PadRight(width);
-        }
+        var text = BuildWindowText(visible, start, width);
 
         var cursorColumn = Math.Clamp(lineCursor - start, 0, Math.Max(0, width - 1));
         return new TextInputFrame(text, cursorColumn, isPlaceholder);
+    }
+
+    private static string BuildWindowText(string visible, int start, int width)
+    {
+        return string.Create(width, (visible, start, width), static (destination, state) =>
+        {
+            destination.Fill(' ');
+            if ((uint)state.start >= (uint)state.visible.Length)
+            {
+                return;
+            }
+
+            var sourceLength = Math.Min(state.width, state.visible.Length - state.start);
+            state.visible.AsSpan(state.start, sourceLength).CopyTo(destination);
+        });
     }
 }

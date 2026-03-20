@@ -18,11 +18,38 @@ internal static class Widgets
 
     public static void DrawPanel(Canvas canvas, Rect rect, string title, string content)
     {
-        var lines = content
-            .Replace("\r\n", "\n", StringComparison.Ordinal)
-            .Replace('\r', '\n')
-            .Split('\n');
-        DrawPanel(canvas, rect, title, lines);
+        canvas.DrawBox(rect, title);
+        var contentRect = rect.Inset(1, 1);
+        if (contentRect.IsEmpty)
+        {
+            return;
+        }
+
+        var row = 0;
+        var value = content ?? string.Empty;
+        var start = 0;
+        for (var index = 0; index < value.Length && row < contentRect.Height; index++)
+        {
+            var current = value[index];
+            if (current is not ('\n' or '\r'))
+            {
+                continue;
+            }
+
+            canvas.WriteText(contentRect.X, contentRect.Y + row, value[start..index], contentRect.Width);
+            row++;
+            if (current == '\r' && index + 1 < value.Length && value[index + 1] == '\n')
+            {
+                index++;
+            }
+
+            start = index + 1;
+        }
+
+        if (row < contentRect.Height)
+        {
+            canvas.WriteText(contentRect.X, contentRect.Y + row, value[start..], contentRect.Width);
+        }
     }
 
     public static void DrawProgressBar(Canvas canvas, Rect rect, double value, string? label = null)

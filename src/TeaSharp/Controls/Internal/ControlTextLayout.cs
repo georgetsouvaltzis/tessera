@@ -15,7 +15,7 @@ internal static class ControlTextLayout
             return value.Split('\n');
         }
 
-        return NormalizeCarriageReturns(value).Split('\n');
+        return SplitLinesWithCarriageNormalization(value);
     }
 
     public static int MeasureDisplayWidth(string text)
@@ -85,26 +85,38 @@ internal static class ControlTextLayout
         return true;
     }
 
-    private static string NormalizeCarriageReturns(string text)
+    private static string[] SplitLinesWithCarriageNormalization(string value)
     {
-        var builder = new System.Text.StringBuilder(text.Length);
-        for (var index = 0; index < text.Length; index++)
+        var estimatedLines = 1;
+        for (var index = 0; index < value.Length; index++)
         {
-            var value = text[index];
-            if (value == '\r')
+            var current = value[index];
+            if (current is '\n' or '\r')
             {
-                if (index + 1 < text.Length && text[index + 1] == '\n')
-                {
-                    continue;
-                }
+                estimatedLines++;
+            }
+        }
 
-                builder.Append('\n');
+        var lines = new List<string>(estimatedLines);
+        var start = 0;
+        for (var index = 0; index < value.Length; index++)
+        {
+            var current = value[index];
+            if (current is not ('\n' or '\r'))
+            {
                 continue;
             }
 
-            builder.Append(value);
+            lines.Add(value[start..index]);
+            if (current == '\r' && index + 1 < value.Length && value[index + 1] == '\n')
+            {
+                index++;
+            }
+
+            start = index + 1;
         }
 
-        return builder.ToString();
+        lines.Add(value[start..]);
+        return [.. lines];
     }
 }

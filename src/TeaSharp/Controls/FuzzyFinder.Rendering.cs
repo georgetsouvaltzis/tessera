@@ -88,12 +88,25 @@ public sealed partial class FuzzyFinder
             return text;
         }
 
-        var set = new HashSet<int>(indices);
         var buffer = new StringBuilder(text.Length * 2);
+        var matchCursor = 0;
         for (var index = 0; index < text.Length; index++)
         {
+            while (matchCursor < indices.Length && indices[matchCursor] < index)
+            {
+                matchCursor++;
+            }
+
             var value = text[index].ToString();
-            buffer.Append(set.Contains(index) ? MatchHighlightStyle.Render(value) : value);
+            if (matchCursor < indices.Length && indices[matchCursor] == index)
+            {
+                buffer.Append(MatchHighlightStyle.Render(value));
+                matchCursor++;
+            }
+            else
+            {
+                buffer.Append(value);
+            }
         }
 
         return buffer.ToString();
