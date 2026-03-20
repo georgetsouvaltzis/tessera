@@ -54,10 +54,11 @@ Correctness is a continuous gate across all phases: fix regressions at source an
   - `In progress` = active execution, not yet at phase exit criteria.
   - `Pending manual signoff` = release-gate evidence still required; RC is not closed.
   - `Blocked` = open issue prevents phase exit.
-- **M1: Terminal Compatibility Verification Matrix** -> **In progress**
+- **M1: Terminal Compatibility Verification Matrix** -> **Done**
   - cross-terminal font capability doc added (`xterm`, `iTerm2`, `Kitty`, `WezTerm`, `Ghostty`, Windows terminals)
-  - `ScreenOptions.FontSpec` support model remains experimental best-effort (`OSC 50`, sanitized, no forced restore)
-  - remaining gate: explicit verification evidence for no-op fallback behavior on unsupported terminals
+  - verification evidence captured in [terminal-compatibility-evidence-v1.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/terminal-compatibility-evidence-v1.md)
+  - explicit environment note: iTerm2/WezTerm/Kitty/Windows Terminal binaries are not installed on this host; their verification uses deterministic tests + official specs; Ghostty has host evidence
+  - capability-gated no-op fallback behavior is covered by deterministic tests for unsupported terminals
 - **M2: Visual Quality Baseline Contract** -> **Done**
   - current controls have baseline theme/style parity and regression coverage for key focus/selection/border paths
 - **M3: Widget Expansion** -> **In progress**
