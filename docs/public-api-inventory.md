@@ -57,6 +57,15 @@ These are the types new applications should discover first.
 - `TeaSharp.Controls.BarPoint`
 - `TeaSharp.Controls.BarChart`
 - `TeaSharp.Controls.LineChart`
+- `TeaSharp.Controls.Sparkline`
+- `TeaSharp.Controls.AreaPlot`
+- `TeaSharp.Controls.ScatterPlotPoint`
+- `TeaSharp.Controls.ScatterPlot`
+- `TeaSharp.Controls.HistogramBucket`
+- `TeaSharp.Controls.Histogram`
+- `TeaSharp.Controls.LineSeries`
+- `TeaSharp.Controls.LinePlot`
+- `TeaSharp.Controls.PlotPanel`
 - `TeaSharp.Controls.Gauge`
 - `TeaSharp.Controls.MiniLog`
 - `TeaSharp.Controls.StatItem`
@@ -138,6 +147,8 @@ These APIs remain public because they still offer real value, but they should no
 - `TeaSharp.Hosting.TerminalCursorStyle`
 - `TeaSharp.Controls.BarChartOptions`
 - `TeaSharp.Controls.LineChartOptions`
+- `TeaSharp.Controls.LinePlotOptions`
+- `TeaSharp.Controls.PlotPanelOptions`
 - `ICanvasComponent` as a render-only advanced seam
 - renderer, terminal, and capability-probing seams
 
@@ -207,6 +218,12 @@ The first root controls that already own their implementation directly are:
 - `StatsCard`
 - `BarChart`
 - `LineChart`
+- `Sparkline`
+- `AreaPlot`
+- `ScatterPlot`
+- `Histogram`
+- `LinePlot`
+- `PlotPanel`
 - `ListView<T>`
 - `Tabs`
 - `DataGrid`
@@ -239,7 +256,7 @@ Their old `TeaSharp.Components.Prebuilt.*` counterparts have been removed instea
 
 ## Theme Mapping Status
 
-Current shipped theme mapping is centralized in `TeaSharp.Styles.TeaThemeControlExtensions` and split into domain partial files (`Basic`, `InputValue`, `Navigation`, `NavigationOverlay`, `NavigationPrimitives`, `DataAndFlow`, `ExplorerAndFeedback`, `RenderingTextUtilities`, `ModalAndCharts`).
+Current shipped theme mapping is centralized in `TeaSharp.Styles.TeaThemeControlExtensions` and split into domain partial files (`Basic`, `InputValue`, `Navigation`, `NavigationOverlay`, `NavigationPrimitives`, `DataAndFlow`, `ExplorerAndFeedback`, `RenderingTextUtilities`, `ModalAndCharts`, `Plotting`).
 Overlay glyph cookbook snippets for `MenuBarGlyphSet`, `ContextMenuGlyphSet`, and `CommandPaletteGlyphSet` are documented in [theme-system-v1.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/theme-system-v1.md).
 Border override, dropdown/tree glyph-set, and data marker/separator cookbook snippets are documented in [theme-system-v1.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/theme-system-v1.md).
 

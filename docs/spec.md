@@ -92,7 +92,7 @@ V1 theming is semantic-token based with override hierarchy:
 - semantic tokens for text/surface/border/state/focus/selection/accent
 - built-in palettes (Catppuccin, Rosé Pine) plus custom palette
 - override precedence: global theme -> control type -> control instance -> state
-- `TeaThemeControlExtensions` is split by domain (`Basic`, `InputValue`, `Navigation`, `NavigationOverlay`, `NavigationPrimitives`, `DataAndFlow`, `ExplorerAndFeedback`, `RenderingTextUtilities`, `ModalAndCharts`)
+- `TeaThemeControlExtensions` is split by domain (`Basic`, `InputValue`, `Navigation`, `NavigationOverlay`, `NavigationPrimitives`, `DataAndFlow`, `ExplorerAndFeedback`, `RenderingTextUtilities`, `ModalAndCharts`, `Plotting`)
 - mapped input/value controls include `TextInput`, `TextArea`, `Toggle`, `Slider`, `Spinner`, `ProgressBar`, `NumberInput`, `DatePicker`, `TimePicker`
 - mapped basic controls include `Label`, `Button`, `ListView<T>`, `StatusBar`, `TextInput`, `Table`, `Tabs`
 - mapped navigation controls include `Breadcrumb`, `Paginator`, `Toolbar`, `CommandBar`, `SearchBox`, `SearchResultsView`
@@ -119,6 +119,7 @@ V1 theming is semantic-token based with override hierarchy:
 - mapped explorer/feedback controls include `DiffView`, `PropertyGrid`, `FileExplorer`, `FuzzyFinder`, `ToastCenter`
 - mapped rendering text utility controls include `Badge`, `LogView`, `MarkdownView`, `MiniLog`
 - mapped modal/chart summary controls include `Dialog`, `Modal`, `BarChart`, `LineChart`, `Gauge`, `StatsCard`
+- mapped plotting controls include `Sparkline`, `AreaPlot`, `ScatterPlot`, `Histogram`, `LinePlot`, `PlotPanel`
 - `Dialog` and `Modal` map `BorderStyleText`/`FocusedBorderStyleText` to semantic border/focus tokens by default
 
 Focus visuals must be theme-driven (for example focused border style/color), not limited to marker suffixes.
@@ -229,6 +230,17 @@ Root controls currently include:
 - `StatsCard`
 - `BarChart`
 - `LineChart`
+- `Sparkline`
+- `AreaPlot`
+- `ScatterPlot`
+- `ScatterPlotPoint`
+- `Histogram`
+- `HistogramBucket`
+- `LinePlot`
+- `LineSeries`
+- `LinePlotOptions`
+- `PlotPanel`
+- `PlotPanelOptions`
 
 These types provide the default control vocabulary. Most promoted legacy `*Component` names are now internal bridges behind these controls.
 

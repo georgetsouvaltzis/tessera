@@ -80,6 +80,19 @@ Wave 1 shipped in this lane:
 | `TerminalPanel` | P2 | Embedded subprocess sessions | prompt/stream markers |
 | `ProcessListView` | P2 | Runtime process inspection | status markers, sort marker |
 
+## Shipped Plotting Baseline (Current V1 Track)
+
+These controls are already shipped on the public path and are not part of the +34 backlog count:
+
+- `Sparkline`
+- `AreaPlot`
+- `ScatterPlot`
+- `Histogram`
+- `LinePlot`
+- `PlotPanel`
+
+All shipped plotting controls follow the strict theming contract (state styles, glyph hooks where applicable, and override hierarchy).
+
 ## Visual Pass Timing
 
 - **Phase A (implementation-first):** each widget ships with strict minimal visual contract (state styles + glyph hooks + override hierarchy) and monochrome-safe rendering.

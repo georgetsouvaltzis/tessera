@@ -313,11 +313,13 @@ Default policy for all controls:
 - `TeaThemeControlExtensions.ExplorerAndFeedback.cs`
 - `TeaThemeControlExtensions.RenderingTextUtilities.cs`
 - `TeaThemeControlExtensions.ModalAndCharts.cs`
+- `TeaThemeControlExtensions.Plotting.cs`
 
 Mapped controls expose:
 
 - `ApplyTheme(TeaTheme theme)`
 - `ApplyThemeDefaults(TeaTheme theme)`
+- plotting mappings: `Sparkline`, `AreaPlot`, `ScatterPlot`, `Histogram`, `LinePlot`, `PlotPanel`
 - overloads taking `TeaThemeOverrides`, `baseTheme`, and `TeaThemeVisualState`
 
 Input/value mapping coverage includes:

@@ -64,6 +64,17 @@ Preferred public catalog:
 51. `Stepper`
 52. `SearchResultsView`
 53. `SearchResultsGlyphSet`
+54. `Sparkline`
+55. `AreaPlot`
+56. `ScatterPlot`
+57. `ScatterPlotPoint`
+58. `Histogram`
+59. `HistogramBucket`
+60. `LinePlot`
+61. `LineSeries`
+62. `LinePlotOptions`
+63. `PlotPanel`
+64. `PlotPanelOptions`
 
 These live in `TeaSharp.Controls`.
 
@@ -162,6 +173,8 @@ Current shipped `TeaThemeControlExtensions` mappings include:
 - rendering text utilities: `Badge`, `LogView`, `MarkdownView`, `MiniLog`
 - modal/chart summary controls: `Dialog`, `Modal`, `BarChart`, `LineChart`, `Gauge`, `StatsCard`
 - modal/chart summary details: `Dialog` and `Modal` include border text token mapping
+- plotting controls: `Sparkline`, `AreaPlot`, `ScatterPlot`, `Histogram`, `LinePlot`, `PlotPanel`
+- plotting details: bordered plotting controls (`Sparkline`, `AreaPlot`, `LinePlot`, `PlotPanel`) include border text token mapping; `ScatterPlot`/`Histogram` map point or bar + axis + legend tokens
 
 ## Advanced Seams
 
