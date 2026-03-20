@@ -42,6 +42,7 @@ internal static partial class ThemeOverridesTests
             {
                 Ring = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(61, 62, 63)),
                 Title = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(71, 72, 73)),
+                Border = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(74, 75, 76)),
             },
             Selection = new TeaThemeSelectionTokens
             {
@@ -68,6 +69,8 @@ internal static partial class ThemeOverridesTests
         TestAssert.Equal(theme.Text.Secondary, choice.TitleStyle, "Choice title style should map to Text.Secondary.");
         TestAssert.Equal(theme.Focus.Title, choice.FocusedTitleStyle, "Choice focused title style should map to Focus.Title.");
         TestAssert.Equal(theme.Text.Primary, choice.OptionStyle, "Choice option style should map to Text.Primary.");
+        TestAssert.Equal(theme.Text.Muted, choice.DisabledStyle, "Choice disabled style should map to Text.Muted.");
+        TestAssert.Equal(theme.Text.Muted, choice.MutedStyle, "Choice muted style should map to Text.Muted.");
         TestAssert.Equal(theme.Border.Default, choice.BorderStyleText, "Choice border style should map to Border.Default.");
         TestAssert.Equal(theme.Border.Focused.Merge(theme.Focus.Border), choice.FocusedBorderStyleText, "Choice focused border style should map to focused border tokens.");
         TestAssert.Equal(
@@ -77,36 +80,73 @@ internal static partial class ThemeOverridesTests
 
         TestAssert.Equal(theme.Text.Primary, comboBox.ValueTextStyle, "ComboBox value style should map to Text.Primary.");
         TestAssert.Equal(theme.Text.Muted, comboBox.PlaceholderTextStyle, "ComboBox placeholder style should map to Text.Muted.");
+        TestAssert.Equal(
+            theme.Selection.Foreground.Merge(theme.Selection.Background),
+            comboBox.SelectedOptionStyle,
+            "ComboBox selected option style should map to merged Selection styles.");
         TestAssert.Equal(theme.Accent.Secondary, comboBox.HoveredOptionStyle, "ComboBox hovered option style should map to Accent.Secondary.");
+        TestAssert.Equal(theme.Text.Muted, comboBox.DisabledStyle, "ComboBox disabled style should map to Text.Muted.");
+        TestAssert.Equal(theme.Text.Muted, comboBox.MutedStyle, "ComboBox muted style should map to Text.Muted.");
         TestAssert.Equal(theme.Border.Default, comboBox.BorderStyleText, "ComboBox border style should map to Border.Default.");
         TestAssert.Equal(theme.Border.Focused.Merge(theme.Focus.Border), comboBox.FocusedBorderStyleText, "ComboBox focused border style should map to focused border tokens.");
 
         TestAssert.Equal(theme.Accent.Primary, treeView.BranchStyle, "TreeView branch style should map to Accent.Primary.");
         TestAssert.Equal(theme.Text.Primary, treeView.LeafStyle, "TreeView leaf style should map to Text.Primary.");
+        TestAssert.Equal(
+            theme.Selection.Foreground.Merge(theme.Selection.Background),
+            treeView.SelectedItemStyle,
+            "TreeView selected style should map to merged Selection styles.");
         TestAssert.Equal(theme.Accent.Secondary, treeView.HoveredItemStyle, "TreeView hovered style should map to Accent.Secondary.");
+        TestAssert.Equal(theme.Text.Muted, treeView.DisabledStyle, "TreeView disabled style should map to Text.Muted.");
+        TestAssert.Equal(theme.Text.Muted, treeView.MutedStyle, "TreeView muted style should map to Text.Muted.");
         TestAssert.Equal(theme.Border.Default, treeView.BorderStyleText, "TreeView border style should map to Border.Default.");
         TestAssert.Equal(theme.Border.Focused.Merge(theme.Focus.Border), treeView.FocusedBorderStyleText, "TreeView focused border style should map to focused border tokens.");
 
         TestAssert.Equal(theme.Text.Primary, menuBar.ItemStyle, "MenuBar item style should map to Text.Primary.");
+        TestAssert.Equal(
+            theme.Selection.Foreground.Merge(theme.Selection.Background),
+            menuBar.SelectedItemStyle,
+            "MenuBar selected style should map to merged Selection styles.");
         TestAssert.Equal(theme.Focus.Ring, menuBar.FocusedItemStyle, "MenuBar focused style should map to Focus.Ring.");
+        TestAssert.Equal(theme.Text.Muted, menuBar.DisabledItemStyle, "MenuBar disabled style should map to Text.Muted.");
         TestAssert.Equal(theme.Border.Default, menuBar.BorderStyleText, "MenuBar border style should map to Border.Default.");
         TestAssert.Equal(theme.Border.Focused.Merge(theme.Focus.Border), menuBar.FocusedBorderStyleText, "MenuBar focused border style should map to focused border tokens.");
 
         TestAssert.Equal(theme.Text.Secondary, contextMenu.TitleStyle, "ContextMenu title style should map to Text.Secondary.");
+        TestAssert.Equal(
+            theme.Selection.Foreground.Merge(theme.Selection.Background),
+            contextMenu.SelectedItemStyle,
+            "ContextMenu selected style should map to merged Selection styles.");
         TestAssert.Equal(theme.Accent.Secondary, contextMenu.HoveredItemStyle, "ContextMenu hovered style should map to Accent.Secondary.");
+        TestAssert.Equal(theme.Text.Muted, contextMenu.DisabledItemStyle, "ContextMenu disabled style should map to Text.Muted.");
+        TestAssert.Equal(theme.Text.Muted, contextMenu.MutedItemStyle, "ContextMenu muted style should map to Text.Muted.");
         TestAssert.Equal(theme.Border.Default, contextMenu.BorderStyleText, "ContextMenu border style should map to Border.Default.");
         TestAssert.Equal(theme.Border.Focused.Merge(theme.Focus.Border), contextMenu.FocusedBorderStyleText, "ContextMenu focused border style should map to focused border tokens.");
 
         TestAssert.Equal(theme.Text.Secondary, commandPalette.TitleStyle, "CommandPalette title style should map to Text.Secondary.");
         TestAssert.Equal(theme.Text.Primary, commandPalette.QueryTextStyle, "CommandPalette query style should map to Text.Primary.");
         TestAssert.Equal(theme.Text.Muted, commandPalette.PlaceholderTextStyle, "CommandPalette placeholder style should map to Text.Muted.");
+        TestAssert.Equal(
+            theme.Selection.Foreground.Merge(theme.Selection.Background),
+            commandPalette.SelectedItemStyle,
+            "CommandPalette selected style should map to merged Selection styles.");
+        TestAssert.Equal(theme.Text.Muted, commandPalette.DisabledItemStyle, "CommandPalette disabled style should map to Text.Muted.");
+        TestAssert.Equal(theme.Text.Muted, commandPalette.MutedItemStyle, "CommandPalette muted style should map to Text.Muted.");
         TestAssert.Equal(theme.Border.Default, commandPalette.BorderStyleText, "CommandPalette border style should map to Border.Default.");
         TestAssert.Equal(theme.Border.Focused.Merge(theme.Focus.Border), commandPalette.FocusedBorderStyleText, "CommandPalette focused border style should map to focused border tokens.");
 
+        TestAssert.Equal(
+            theme.Selection.Foreground.Merge(theme.Selection.Background),
+            notifications.SelectedItemStyle,
+            "Notifications selected style should map to merged Selection styles.");
+        TestAssert.Equal(theme.Accent.Secondary, notifications.HoveredItemStyle, "Notifications hovered style should map to Accent.Secondary.");
+        TestAssert.Equal(theme.Accent.Primary, notifications.UnreadItemStyle, "Notifications unread style should map to Accent.Primary.");
+        TestAssert.Equal(theme.Text.Muted, notifications.MutedItemStyle, "Notifications muted style should map to Text.Muted.");
         TestAssert.Equal(theme.State.Info, notifications.InfoItemStyle, "Notifications info style should map to State.Info.");
         TestAssert.Equal(theme.State.Success, notifications.SuccessItemStyle, "Notifications success style should map to State.Success.");
         TestAssert.Equal(theme.State.Warning, notifications.WarningItemStyle, "Notifications warning style should map to State.Warning.");
         TestAssert.Equal(theme.State.Error, notifications.ErrorItemStyle, "Notifications error style should map to State.Error.");
+        TestAssert.Equal(theme.Text.Muted, notifications.DisabledItemStyle, "Notifications disabled style should map to Text.Muted.");
 
         return Task.CompletedTask;
     }
@@ -136,16 +176,17 @@ internal static partial class ThemeOverridesTests
             {
                 Ring = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(16, 17, 18)),
                 Title = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(19, 20, 21)),
+                Border = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(22, 23, 24)),
             },
             Selection = new TeaThemeSelectionTokens
             {
-                Foreground = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(22, 23, 24)),
-                Background = TeaStyle.Empty.WithBackground(AnsiColor.Rgb(25, 26, 27)),
+                Foreground = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(25, 26, 27)),
+                Background = TeaStyle.Empty.WithBackground(AnsiColor.Rgb(28, 29, 30)),
             },
             State = new TeaThemeStateTokens
             {
-                Success = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(28, 29, 30)),
-                Error = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(31, 32, 33)),
+                Success = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(31, 32, 33)),
+                Error = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(34, 35, 36)),
             },
         };
 
@@ -197,6 +238,7 @@ internal static partial class ThemeOverridesTests
 
         TestAssert.Equal(explicitStyle, notifications.ItemStyle, "Defaults should not overwrite explicit Notifications.ItemStyle.");
         TestAssert.Equal(theme.State.Success, notifications.SuccessItemStyle, "Defaults should fill empty Notifications.SuccessItemStyle.");
+        TestAssert.Equal(theme.Text.Muted, notifications.DisabledItemStyle, "Defaults should fill empty Notifications.DisabledItemStyle.");
 
         return Task.CompletedTask;
     }
@@ -236,6 +278,7 @@ internal static partial class ThemeOverridesTests
             {
                 Ring = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(151, 152, 153)),
                 Title = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(161, 162, 163)),
+                Border = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(164, 165, 166)),
             },
             Selection = new TeaThemeSelectionTokens
             {
@@ -286,6 +329,7 @@ internal static partial class ThemeOverridesTests
         TestAssert.Equal(typeTheme.Border.Default, commandPalette.BorderStyleText, "Override defaults should map CommandPalette border styles.");
         TestAssert.Equal(typeTheme.Border.Focused.Merge(typeTheme.Focus.Border), commandPalette.FocusedBorderStyleText, "Override defaults should map CommandPalette focused border styles.");
         TestAssert.Equal(typeTheme.State.Warning, notifications.WarningItemStyle, "Override apply should map Notifications warning style.");
+        TestAssert.Equal(typeTheme.Text.Muted, notifications.DisabledItemStyle, "Override apply should map Notifications disabled style.");
 
         return Task.CompletedTask;
     }

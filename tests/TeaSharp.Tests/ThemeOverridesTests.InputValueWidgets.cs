@@ -163,16 +163,19 @@ internal static partial class ThemeOverridesTests
 
         TestAssert.Equal(explicitStyle, numberInput.ValueTextStyle, "Defaults should not overwrite explicit NumberInput.ValueTextStyle.");
         TestAssert.Equal(theme.Text.Secondary, numberInput.SummaryTextStyle, "Defaults should fill empty NumberInput.SummaryTextStyle.");
+        TestAssert.Equal(theme.Text.Muted, numberInput.DisabledTextStyle, "Defaults should fill empty NumberInput.DisabledTextStyle.");
         TestAssert.Equal(explicitStyle, numberInput.BorderStyleText, "Defaults should not overwrite explicit NumberInput.BorderStyleText.");
         TestAssert.Equal(theme.Border.Focused.Merge(theme.Focus.Border), numberInput.FocusedBorderStyleText, "Defaults should fill empty NumberInput.FocusedBorderStyleText.");
 
         TestAssert.Equal(explicitStyle, datePicker.SelectedDayStyle, "Defaults should not overwrite explicit DatePicker.SelectedDayStyle.");
         TestAssert.Equal(theme.Accent.Secondary, datePicker.HoveredDayStyle, "Defaults should fill empty DatePicker.HoveredDayStyle.");
+        TestAssert.Equal(theme.Text.Muted, datePicker.DisabledDayStyle, "Defaults should fill empty DatePicker.DisabledDayStyle.");
         TestAssert.Equal(explicitStyle, datePicker.BorderStyleText, "Defaults should not overwrite explicit DatePicker.BorderStyleText.");
         TestAssert.Equal(theme.Border.Focused.Merge(theme.Focus.Border), datePicker.FocusedBorderStyleText, "Defaults should fill empty DatePicker.FocusedBorderStyleText.");
 
         TestAssert.Equal(explicitStyle, timePicker.ActiveFieldStyle, "Defaults should not overwrite explicit TimePicker.ActiveFieldStyle.");
         TestAssert.Equal(theme.Accent.Secondary, timePicker.HoveredFieldStyle, "Defaults should fill empty TimePicker.HoveredFieldStyle.");
+        TestAssert.Equal(theme.Text.Muted, timePicker.DisabledValueStyle, "Defaults should fill empty TimePicker.DisabledValueStyle.");
         TestAssert.Equal(explicitStyle, timePicker.BorderStyleText, "Defaults should not overwrite explicit TimePicker.BorderStyleText.");
         TestAssert.Equal(theme.Border.Focused.Merge(theme.Focus.Border), timePicker.FocusedBorderStyleText, "Defaults should fill empty TimePicker.FocusedBorderStyleText.");
 
@@ -245,16 +248,19 @@ internal static partial class ThemeOverridesTests
 
         TestAssert.Equal(explicitStyle, numberInput.ValueTextStyle, "Override defaults should not overwrite explicit NumberInput.ValueTextStyle.");
         TestAssert.Equal(typeTheme.Text.Secondary, numberInput.SummaryTextStyle, "Override defaults should fill empty NumberInput.SummaryTextStyle.");
+        TestAssert.Equal(typeTheme.Text.Muted, numberInput.DisabledTextStyle, "Override defaults should fill empty NumberInput.DisabledTextStyle.");
         TestAssert.Equal(explicitStyle, numberInput.BorderStyleText, "Override defaults should not overwrite explicit NumberInput.BorderStyleText.");
         TestAssert.Equal(typeTheme.Border.Focused.Merge(typeTheme.Focus.Border), numberInput.FocusedBorderStyleText, "Override defaults should fill NumberInput focused border style.");
 
         TestAssert.Equal(typeTheme.Text.Primary, datePicker.DayStyle, "Override apply should map DatePicker.DayStyle.");
         TestAssert.Equal(mergedSelection, datePicker.SelectedDayStyle, "Override apply should map DatePicker.SelectedDayStyle.");
+        TestAssert.Equal(typeTheme.Text.Muted, datePicker.DisabledDayStyle, "Override apply should map DatePicker.DisabledDayStyle.");
         TestAssert.Equal(typeTheme.Border.Default, datePicker.BorderStyleText, "Override apply should map DatePicker border style.");
         TestAssert.Equal(typeTheme.Border.Focused.Merge(typeTheme.Focus.Border), datePicker.FocusedBorderStyleText, "Override apply should map DatePicker focused border style.");
 
         TestAssert.Equal(explicitStyle, timePicker.ActiveFieldStyle, "Override defaults should not overwrite explicit TimePicker.ActiveFieldStyle.");
         TestAssert.Equal(typeTheme.Accent.Secondary, timePicker.HoveredFieldStyle, "Override defaults should fill empty TimePicker.HoveredFieldStyle.");
+        TestAssert.Equal(typeTheme.Text.Muted, timePicker.DisabledValueStyle, "Override defaults should fill empty TimePicker.DisabledValueStyle.");
         TestAssert.Equal(explicitStyle, timePicker.BorderStyleText, "Override defaults should not overwrite explicit TimePicker.BorderStyleText.");
         TestAssert.Equal(typeTheme.Border.Focused.Merge(typeTheme.Focus.Border), timePicker.FocusedBorderStyleText, "Override defaults should fill TimePicker focused border style.");
 
