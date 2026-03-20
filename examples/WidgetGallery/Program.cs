@@ -23,7 +23,7 @@ internal sealed record GalleryTick(DateTimeOffset At) : Message;
 
 internal sealed class WidgetGalleryApp : TeaApp
 {
-    private readonly Tabs _tabs = new("Basics", "Inputs", "Data", "Overlay", "Advanced", "Telemetry");
+    private readonly Tabs _tabs = new("Basics", "Inputs", "Data", "Overlay", "Advanced", "Plots", "Telemetry");
     private readonly Label _label = new()
     {
         Title = "Label",
@@ -147,6 +147,65 @@ internal sealed class WidgetGalleryApp : TeaApp
         Title = "Latency",
     };
 
+    private readonly LineSeries _lineP50Series = new("p50");
+    private readonly LineSeries _lineP95Series = new("p95");
+
+    private readonly LinePlot _linePlot = new()
+    {
+        Title = "Line Plot",
+        Border = BorderStyle.SingleLine,
+        Padding = Thickness.All(1),
+        Options = new LinePlotOptions(
+            ShowAxes: true,
+            ShowLegend: true,
+            ShowStats: true,
+            XLabel: "time",
+            YLabel: "ms"),
+    };
+
+    private readonly ScatterPlot _scatterPlot = new()
+    {
+        Title = "Scatter Plot",
+        Options = new ScatterPlotOptions(
+            ShowAxes: true,
+            ShowLabels: false,
+            Legend: "throughput vs errors",
+            XLabel: "req/s",
+            YLabel: "errors"),
+    };
+
+    private readonly Histogram _histogram = new()
+    {
+        Title = "Histogram",
+        Options = new HistogramOptions(
+            ShowAxes: true,
+            ShowBucketLabels: true,
+            ShowScale: true,
+            Legend: "latency distribution",
+            XLabel: "percentile",
+            YLabel: "ms"),
+    };
+
+    private readonly Sparkline _sparkline = new(capacity: 96)
+    {
+        Title = "Sparkline",
+        Border = BorderStyle.SingleLine,
+        Padding = Thickness.All(1),
+        Options = new SparklineOptions(
+            ShowStats: true,
+            Legend: "cpu%"),
+    };
+
+    private readonly AreaPlot _areaPlot = new(capacity: 96)
+    {
+        Title = "Area Plot",
+        Border = BorderStyle.SingleLine,
+        Padding = Thickness.All(1),
+        Options = new AreaPlotOptions(
+            ShowStats: true,
+            Legend: "queue depth"),
+    };
+
     private readonly StatusBar _status = new();
 
     private int _tick;
@@ -251,6 +310,9 @@ internal sealed class WidgetGalleryApp : TeaApp
             new StatItem("mouse", "yes"),
             new StatItem("paste", "yes"),
         ]);
+
+        _linePlot.SetSeries([_lineP50Series, _lineP95Series]);
+        UpdatePlotWidgets();
     }
 
     public override TeaEffect? Initialize() => TeaEffects.Tick(TimeSpan.FromMilliseconds(300), static now => new GalleryTick(now));
@@ -262,6 +324,7 @@ internal sealed class WidgetGalleryApp : TeaApp
             _tick++;
             _progress.SetValue((_tick % 100) / 100.0);
             _lineChart.Append(20 + Math.Sin(_tick / 6d) * 12 + (_tick % 5));
+            UpdatePlotWidgets();
             _gauge.Value = (_tick * 7) % 100;
             _gauge.Label = $"{_gauge.Value:0}%";
             _barChart.SetValue("api", 30 + (_tick % 40));
@@ -298,7 +361,7 @@ internal sealed class WidgetGalleryApp : TeaApp
 
     public override Screen Build(ScreenContext context)
     {
-        _status.LeftText = $"Tab={_tabs.Items[_tabs.SelectedIndex]}   Tick={_tick:0000}";
+        _status.LeftText = $"Tab={_tabs.Items[_tabs.SelectedIndex]}   Tick={_tick:0000}   arrows/tab switch   d dialog   q quit";
         _status.RightText = _statusText;
 
         return Screen.Build(window =>
@@ -337,6 +400,7 @@ internal sealed class WidgetGalleryApp : TeaApp
                 Height = 8,
             },
             4 => CreateAdvancedTab(),
+            5 => CreatePlotsTab(),
             _ => CreateTelemetryTab(),
         };
     }
@@ -509,5 +573,121 @@ internal sealed class WidgetGalleryApp : TeaApp
                 },
             },
         };
+    }
+
+    private RowLayout CreatePlotsTab()
+    {
+        var left = new ColumnLayout
+        {
+            Gap = 1,
+            Items =
+            {
+                new LayoutSlot
+                {
+                    Content = _linePlot,
+                    Length = 10,
+                },
+                new LayoutSlot
+                {
+                    Content = _histogram,
+                    Length = LayoutLength.Fill(),
+                },
+            },
+        };
+
+        var right = new ColumnLayout
+        {
+            Gap = 1,
+            Items =
+            {
+                new LayoutSlot
+                {
+                    Content = _scatterPlot,
+                    Length = 10,
+                },
+                new LayoutSlot
+                {
+                    Content = _sparkline,
+                    Length = 4,
+                },
+                new LayoutSlot
+                {
+                    Content = _areaPlot,
+                    Length = LayoutLength.Fill(),
+                },
+            },
+        };
+
+        return new RowLayout
+        {
+            Gap = 1,
+            Items =
+            {
+                new LayoutSlot
+                {
+                    Content = left,
+                    Length = LayoutLength.Fill(),
+                },
+                new LayoutSlot
+                {
+                    Content = right,
+                    Length = LayoutLength.Fill(),
+                },
+            },
+        };
+    }
+
+    private void UpdatePlotWidgets()
+    {
+        var lineWindow = 72;
+        var p50Samples = new double[lineWindow];
+        var p95Samples = new double[lineWindow];
+        for (var index = 0; index < lineWindow; index++)
+        {
+            var sampleTick = _tick - (lineWindow - 1 - index);
+            if (sampleTick < 0)
+            {
+                sampleTick = 0;
+            }
+
+            var baseline = 18 + (Math.Sin(sampleTick / 7d) * 6) + (sampleTick % 4);
+            p50Samples[index] = baseline;
+            p95Samples[index] = baseline + 11 + (Math.Cos(sampleTick / 11d) * 3);
+        }
+
+        _lineP50Series.SetSamples(p50Samples);
+        _lineP95Series.SetSamples(p95Samples);
+
+        var latestP50 = p50Samples[lineWindow - 1];
+        var latestP95 = p95Samples[lineWindow - 1];
+        _histogram.SetBuckets(
+        [
+            new HistogramBucket("p50", Math.Round(latestP50, 2)),
+            new HistogramBucket("p75", Math.Round(latestP50 + 3.8, 2)),
+            new HistogramBucket("p90", Math.Round(latestP50 + 7.4, 2)),
+            new HistogramBucket("p99", Math.Round(latestP95 + 4.2, 2)),
+        ]);
+
+        var pointCount = 36;
+        var points = new ScatterPlotPoint[pointCount];
+        for (var index = 0; index < pointCount; index++)
+        {
+            var pointTick = _tick - (pointCount - 1 - index);
+            if (pointTick < 0)
+            {
+                pointTick = 0;
+            }
+
+            var throughput = 120 + (Math.Sin(pointTick / 4d) * 26) + (pointTick % 9);
+            var errors = Math.Max(0, 1.5 + (Math.Cos(pointTick / 6d) * 1.8) + ((pointTick % 11) == 0 ? 2.5 : 0));
+            points[index] = new ScatterPlotPoint(throughput, errors);
+        }
+
+        _scatterPlot.SetPoints(points);
+
+        var cpu = 36 + (Math.Sin(_tick / 5d) * 18) + (_tick % 6);
+        var queueDepth = 8 + Math.Max(0, (Math.Sin(_tick / 9d) * 6)) + ((_tick + 2) % 4);
+        _sparkline.Append(cpu);
+        _areaPlot.Append(queueDepth);
     }
 }
