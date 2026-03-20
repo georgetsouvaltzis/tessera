@@ -177,20 +177,22 @@ public sealed class EmptyState : Control
     /// <inheritdoc />
     public override bool Handle(Message message, Rect bounds)
     {
-        if (message is not PointerInput pointer || IsDisabled || !HasAction())
-        {
-            return Handle(message);
-        }
-
-        if (bounds.IsEmpty || pointer.Kind == PointerEventKind.Wheel)
+        if (message is not PointerInput pointer || bounds.IsEmpty)
         {
             return Handle(message);
         }
 
         var inside = bounds.Contains(pointer.X, pointer.Y);
-        var changed = pointer.Kind is PointerEventKind.Motion or PointerEventKind.Press or PointerEventKind.Release
-            ? SetHovered(inside)
-            : false;
+        if (pointer.Kind == PointerEventKind.Motion)
+        {
+            return SetHovered(inside);
+        }
+
+        if (IsDisabled || !HasAction())
+        {
+            return false;
+        }
+
         if (pointer.Kind == PointerEventKind.Press && pointer.Button == PointerButton.Left && inside)
         {
             IsFocused = true;
@@ -198,66 +200,233 @@ public sealed class EmptyState : Control
             return true;
         }
 
-        return changed || Handle(message);
+        if (pointer.Kind == PointerEventKind.Release)
+        {
+            return SetHovered(inside);
+        }
+
+        return false;
     }
 
     /// <inheritdoc />
     public override void Render(Canvas canvas, Rect rect)
     {
         var clipped = Rect.Intersect(rect, canvas.Bounds);
-        if (clipped.IsEmpty)
+        if (clipped.IsEmpty || clipped.Height < 1)
         {
             return;
         }
 
-        var lines = BuildLines();
-        if (lines.Count == 0)
+        var y = clipped.Y;
+        if (TryWriteLine(canvas, clipped, ref y, RenderTitle(), ResolveTitleLineStyle(), includeActionStyles: false))
         {
             return;
         }
 
-        var startY = clipped.Y + Math.Max(0, (clipped.Height - lines.Count) / 2);
-        for (var index = 0; index < lines.Count; index++)
+        if (TryRenderBody(canvas, clipped, ref y))
         {
-            var line = lines[index];
-            var width = ControlTextLayout.MeasureDisplayWidth(line.Text);
-            var x = clipped.X + Math.Max(0, (clipped.Width - width) / 2);
-            canvas.WriteText(x, startY + index, ApplyStyle(line.Text, line.Style), clipped.Right - x);
+            return;
         }
+
+        if (TryWriteLine(canvas, clipped, ref y, Hint, ResolveHintLineStyle(), includeActionStyles: false))
+        {
+            return;
+        }
+
+        if (!HasAction())
+        {
+            return;
+        }
+
+        _ = TryWriteLine(
+            canvas,
+            clipped,
+            ref y,
+            RenderActionText(),
+            ResolveActionLineStyle(),
+            includeActionStyles: true);
     }
 
     internal override LayoutMeasurement Measure(in Rect availableBounds)
     {
-        var lines = BuildLines();
-        var width = lines.Count == 0 ? 0 : lines.Max(static line => ControlTextLayout.MeasureDisplayWidth(line.Text));
-        return new LayoutMeasurement(
-            Math.Clamp(width, 0, availableBounds.Width),
-            Math.Clamp(lines.Count, 0, availableBounds.Height));
-    }
+        var width = 0;
+        var height = 0;
 
-    private List<(string Text, TeaStyle Style)> BuildLines()
-    {
-        var lines = new List<(string Text, TeaStyle Style)>
+        var title = RenderTitle();
+        if (!string.IsNullOrWhiteSpace(title))
         {
-            (RenderTitle(), ResolveTitleStyle()),
-        };
-
-        if (!string.IsNullOrWhiteSpace(Description))
-        {
-            lines.Add((Description, MergeStateStyle(DescriptionStyle)));
+            width = Math.Max(width, ControlTextLayout.MeasureDisplayWidth(title));
+            height++;
         }
+
+        MeasureBody(ref width, ref height);
 
         if (!string.IsNullOrWhiteSpace(Hint))
         {
-            lines.Add((Hint, MergeStateStyle(HintStyle)));
+            width = Math.Max(width, ControlTextLayout.MeasureDisplayWidth(Hint));
+            height++;
         }
 
         if (HasAction())
         {
-            lines.Add((RenderActionText(), ResolveActionStyle()));
+            width = Math.Max(width, ControlTextLayout.MeasureDisplayWidth(RenderActionText()));
+            height++;
         }
 
-        return lines;
+        return new LayoutMeasurement(
+            Math.Clamp(width, 0, availableBounds.Width),
+            Math.Clamp(height, 0, availableBounds.Height));
+    }
+
+    private bool TryRenderBody(Canvas canvas, Rect clipped, ref int y)
+    {
+        if (string.IsNullOrEmpty(Description))
+        {
+            return false;
+        }
+
+        var body = Description.AsSpan();
+        var lineStart = 0;
+        while (lineStart <= body.Length)
+        {
+            if (y >= clipped.Bottom)
+            {
+                return true;
+            }
+
+            var lineEnd = lineStart;
+            while (lineEnd < body.Length && body[lineEnd] is not '\n' and not '\r')
+            {
+                lineEnd++;
+            }
+
+            if (lineEnd > lineStart)
+            {
+                var line = SliceToString(Description, lineStart, lineEnd - lineStart);
+                canvas.WriteText(
+                    clipped.X,
+                    y,
+                    ApplyStylePipeline(line, ResolveBodyLineStyle(), includeActionStyles: false),
+                    clipped.Width);
+            }
+
+            y++;
+            if (lineEnd >= body.Length)
+            {
+                break;
+            }
+
+            if (body[lineEnd] == '\r' && lineEnd + 1 < body.Length && body[lineEnd + 1] == '\n')
+            {
+                lineStart = lineEnd + 2;
+            }
+            else
+            {
+                lineStart = lineEnd + 1;
+            }
+        }
+
+        return false;
+    }
+
+    private void MeasureBody(ref int width, ref int height)
+    {
+        if (string.IsNullOrEmpty(Description))
+        {
+            return;
+        }
+
+        var body = Description.AsSpan();
+        var lineStart = 0;
+        while (lineStart <= body.Length)
+        {
+            var lineEnd = lineStart;
+            while (lineEnd < body.Length && body[lineEnd] is not '\n' and not '\r')
+            {
+                lineEnd++;
+            }
+
+            if (lineEnd > lineStart)
+            {
+                width = Math.Max(width, MeasureSpanDisplayWidth(body[lineStart..lineEnd]));
+            }
+
+            height++;
+            if (lineEnd >= body.Length)
+            {
+                break;
+            }
+
+            if (body[lineEnd] == '\r' && lineEnd + 1 < body.Length && body[lineEnd + 1] == '\n')
+            {
+                lineStart = lineEnd + 2;
+            }
+            else
+            {
+                lineStart = lineEnd + 1;
+            }
+        }
+    }
+
+    private static int MeasureSpanDisplayWidth(ReadOnlySpan<char> span)
+    {
+        if (span.IsEmpty)
+        {
+            return 0;
+        }
+
+        var ascii = true;
+        for (var index = 0; index < span.Length; index++)
+        {
+            var value = span[index];
+            if (value < '\u0020' || value > '\u007e')
+            {
+                ascii = false;
+                break;
+            }
+        }
+
+        if (ascii)
+        {
+            return span.Length;
+        }
+
+        return ControlTextLayout.MeasureDisplayWidth(span.ToString());
+    }
+
+    private static string SliceToString(string source, int start, int length)
+    {
+        if (length <= 0)
+        {
+            return string.Empty;
+        }
+
+        return start == 0 && length == source.Length
+            ? source
+            : source.Substring(start, length);
+    }
+
+    private bool TryWriteLine(
+        Canvas canvas,
+        Rect clipped,
+        ref int y,
+        string text,
+        TeaStyle localStyle,
+        bool includeActionStyles)
+    {
+        if (string.IsNullOrWhiteSpace(text))
+        {
+            return false;
+        }
+
+        if (y >= clipped.Bottom)
+        {
+            return true;
+        }
+
+        canvas.WriteText(clipped.X, y, ApplyStylePipeline(text, localStyle, includeActionStyles), clipped.Width);
+        y++;
+        return y >= clipped.Bottom;
     }
 
     private bool HasAction() => ShowAction && !string.IsNullOrWhiteSpace(ActionText);
@@ -274,13 +443,18 @@ public sealed class EmptyState : Control
 
     private string RenderActionText() => $"[{ActionText}]";
 
-    private TeaStyle ResolveTitleStyle()
+    private TeaStyle ResolveTitleLineStyle()
     {
-        var style = IsFocused && !FocusedTitleStyle.IsEmpty ? FocusedTitleStyle : TitleStyle;
-        return MergeStateStyle(style);
+        return IsFocused && !FocusedTitleStyle.IsEmpty
+            ? FocusedTitleStyle
+            : TitleStyle;
     }
 
-    private TeaStyle ResolveActionStyle()
+    private TeaStyle ResolveBodyLineStyle() => DescriptionStyle;
+
+    private TeaStyle ResolveHintLineStyle() => HintStyle;
+
+    private TeaStyle ResolveActionLineStyle()
     {
         var style = ActionStyle;
         if (IsFocused && !FocusedActionStyle.IsEmpty)
@@ -293,33 +467,34 @@ public sealed class EmptyState : Control
             style = style.IsEmpty ? HoveredActionStyle : style.Merge(HoveredActionStyle);
         }
 
-        return MergeStateStyle(style);
+        return style;
     }
 
-    private TeaStyle MergeStateStyle(TeaStyle localStyle)
+    private string ApplyStylePipeline(string text, TeaStyle localStyle, bool includeActionStyles)
     {
-        var style = DefaultStyle;
+        var styled = ApplyStyle(text, DefaultStyle);
         if (IsFocused)
         {
-            style = style.Merge(FocusedStyle);
+            styled = ApplyStyle(styled, FocusedStyle);
         }
 
         if (_hovered)
         {
-            style = style.Merge(HoveredStyle);
+            styled = ApplyStyle(styled, HoveredStyle);
+        }
+
+        styled = ApplyStyle(styled, localStyle);
+        if (includeActionStyles)
+        {
+            styled = ApplyStyle(styled, ActionStyle);
         }
 
         if (IsDisabled)
         {
-            style = style.Merge(DisabledStyle);
+            styled = ApplyStyle(styled, DisabledStyle);
         }
 
-        if (localStyle.IsEmpty)
-        {
-            return style;
-        }
-
-        return style.IsEmpty ? localStyle : style.Merge(localStyle);
+        return styled;
     }
 
     private bool SetHovered(bool hovered)
