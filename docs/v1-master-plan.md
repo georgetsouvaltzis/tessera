@@ -28,44 +28,44 @@ Release-candidate execution checklist: [public-v1-rc-checklist.md](/Users/george
 - Advanced image render modes (native, pixelated block fallback).
 
 ## Authoritative Execution Order (Do Not Reorder)
-1. **Correctness + Bug-Fix Stabilization**
-   - Fix regressions first; no feature polish before stability.
-   - Add/extend regression tests for every production bug class touched.
-   - Exit criteria: integration + unit gates green for touched areas; no known P0/P1 regressions open.
-2. **API Simplification + Boundary Cleanup**
-   - Simplify public entry points and recurring control patterns.
-   - Keep advanced seams available but out of default onboarding path.
-   - Exit criteria: API review pass + naming clarity gate pass + no new onboarding leaks from `TeaSharp.Core`.
-3. **Visual Polish + Theming Consistency**
-   - Improve default visuals after behavior/API stability.
-   - Keep keyboard/mouse semantics unchanged unless explicitly scoped.
-   - Exit criteria: snapshots/visual assertions updated; theme override behavior verified.
-4. **Expansion + Perf Hardening + Docs Freeze**
-   - Ship remaining V1 widget tranche, perf hardening, and final docs freeze in one release phase.
-   - Exit criteria: widget tranche complete, perf gates pass, docs/commenting gates pass, release checklist complete.
+Correctness is a continuous gate across all phases: fix regressions at source and add regression tests for touched bug classes.
+
+1. **(2) Terminal Compatibility Verification Matrix**
+   - Verify Ghostty, iTerm2, WezTerm, Kitty, and Windows Terminal behavior.
+   - Document support model for `ScreenOptions.FontSpec` (best-effort request, terminal-dependent).
+   - Exit criteria: matrix complete + unsupported terminals verified as safe no-op (no crash, no broken frame output).
+2. **(3) Visual Quality Baseline Contract**
+   - Define and enforce minimum visual contract (readability, focus/selection clarity, consistent borders/markers).
+   - Full polish is deferred until after widget expansion.
+   - Exit criteria: baseline contract documented + focused render/theme assertions green.
+3. **(4) Widget Expansion**
+   - Deliver planned built-in widget tranche with consistent theming/state hooks.
+   - Exit criteria: widget tranche targets met per roadmap and covered by render/theme tests.
+4. **(1) API Freeze + Cleanup**
+   - Freeze public naming/shape, remove ambiguity, cleanup dead or duplicate paths.
+   - Exit criteria: naming clarity gate pass + API commenting gate pass + cleanup diffs validated.
+5. **(5) Performance Gate + Benchmarks**
+   - Run V1 benchmark gate and finalize docs/release checklist.
+   - Exit criteria: perf gates pass, benchmark evidence attached, docs/release coherence signoff complete.
 
 ## Current Progress
 - **Status Legend (for this file)**
   - `Done` = implementation landed and merged.
+  - `In progress` = active execution, not yet at phase exit criteria.
   - `Pending manual signoff` = release-gate evidence still required; RC is not closed.
   - `Blocked` = open issue prevents phase exit.
-- **M1: Boundary Baseline** -> **Done**
-  - no-DI startup policy established on docs path
-  - canonical onboarding progression established (`HelloWorld` -> `CounterForm` -> `WorkspaceApp`)
-  - boundary guardrails active
-- **M2: Theme Contract** -> **Done**
-  - `TeaThemeControlExtensions` split into domain partial files (`Basic`, `InputValue`, `Navigation`, `NavigationOverlay`, `NavigationPrimitives`, `DataAndFlow`, `ExplorerAndFeedback`, `RenderingTextUtilities`, `ModalAndCharts`)
-  - direct token mappings landed for input/value controls (`TextArea`, `Toggle`, `Slider`, `Spinner`, `ProgressBar`, `NumberInput`, `DatePicker`, `TimePicker`)
-  - direct token mappings landed for navigation/overlay controls (`Choice`, `ComboBox`, `TreeView`, `MenuBar`, `ContextMenu`, `CommandPalette`, `Notifications`)
-  - direct token mappings landed for navigation primitives (`Accordion`, `MultiSelect`, `RadioGroup`)
-  - direct token mappings landed for rendering text utilities (`Badge`, `LogView`, `MarkdownView`, `MiniLog`)
-  - direct token mappings landed for modal/chart summary controls (`Dialog`, `Modal`, `BarChart`, `LineChart`, `Gauge`, `StatsCard`)
-  - bordered-control parity rollout is effectively complete for current shipped controls (including `Button`, `Label`, `ProgressBar`, `Toggle`, `Slider`, `Spinner`, `Dialog`, `Modal`, `KeyValueList`, `Timeline`)
-  - control-level style hooks and theme mappings are implemented across the shipped Public V1 control surface
-  - terminal font request lane is exposed as experimental best-effort (`ScreenOptions.FontSpec` -> renderer OSC 50 emission with sanitization and no forced restore contract)
-- **WS-D benchmark harness status**
-  - `BenchmarkSwitcher` discoverability is wired and `--list flat` lists all 6 required scenarios (`Startup`, `LogTail`, `LargeTable`, `OverlayStress`, `ResizeStorm`, `StyledHeavyOutput`)
-  - supplemental viewport no-decoration benchmark coverage is wired (`ViewportRenderBenchmarks`) for render/materialize hot-path tracking
+- **M1: Terminal Compatibility Verification Matrix** -> **In progress**
+  - cross-terminal font capability doc added (`xterm`, `iTerm2`, `Kitty`, `WezTerm`, `Ghostty`, Windows terminals)
+  - `ScreenOptions.FontSpec` support model remains experimental best-effort (`OSC 50`, sanitized, no forced restore)
+  - remaining gate: explicit verification evidence for no-op fallback behavior on unsupported terminals
+- **M2: Visual Quality Baseline Contract** -> **Done**
+  - current controls have baseline theme/style parity and regression coverage for key focus/selection/border paths
+- **M3: Widget Expansion** -> **In progress**
+  - roadmap execution active; remaining tranche tracked in [widget-roadmap-v1.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/widget-roadmap-v1.md)
+- **M4: API Freeze + Cleanup** -> **In progress**
+  - naming clarity and XML commenting gates active for all V1-touching API updates
+- **M5: Performance Gate + Benchmarks + Docs Freeze** -> **Pending manual signoff**
+  - harness and scenarios are wired; final pass/fail evidence is still required at RC
 
 ## RC Closure Manual Signoffs (Unresolved Until Checked)
 Public V1 RC must not be declared closed from this document alone. The gates below require explicit human signoff with evidence links.
@@ -77,7 +77,7 @@ Public V1 RC must not be declared closed from this document alone. The gates bel
 | Performance gate approval | Benchmark report links and pass/fail verdict per [perf-plan-v1.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/perf-plan-v1.md) | Pending manual signoff |
 | Docs freeze coherence approval | Final docs diff review confirming `v1-master-plan.md` + `source-of-truth.md` + API docs are aligned | Pending manual signoff |
 
-Release approval rule: M4 is only complete when all four rows above are moved from `Pending manual signoff` to `Done` with owner/date evidence.
+Release approval rule: M5 is only complete when all four rows above are moved from `Pending manual signoff` to `Done` with owner/date evidence.
 
 ## Workstreams
 ### WS-A: Public API and Runtime Boundaries
@@ -119,7 +119,7 @@ Release approval rule: M4 is only complete when all four rows above are moved fr
   - keep advanced APIs in explicit advanced namespaces/docs.
 - No breaking API reshapes in V1 unless they remove ambiguity and are migration-documented in the same change.
 
-## API Simplification Execution Checklist (Phase 2 Gate)
+## API Freeze/Cleanup Checklist (Phase 4 Gate)
 1. Default path remains no-DI: `Tea.RunAsync(new App())` and `Tea.CreateBuilder().UseApp<TApp>().ConfigureRuntime(...)`.
 2. Advanced seams (`TeaSharp.Hosting`, renderer/terminal adapters) stay documented as opt-in only.
 3. Public control APIs follow C# conventions:
@@ -154,7 +154,7 @@ Release approval rule: M4 is only complete when all four rows above are moved fr
   - PR fails if new/changed public APIs are undocumented or copy-template comments.
   - Docs must match actual runtime behavior in examples/tests.
 
-## Beautiful UI Visual Customization Checklist (Phase 3 Gate)
+## Visual Quality Baseline Checklist (Phase 2 Gate)
 1. Override hierarchy remains enforced and documented:
    - global theme -> control-type defaults -> control instance -> state.
 2. Focus visuals are fully overrideable (marker + title + border), not marker-only.
@@ -184,38 +184,46 @@ Release approval rule: M4 is only complete when all four rows above are moved fr
   - central coordinator validates gate status before opening next checkpoint.
 
 ## Milestones and Acceptance Criteria
-### M1: Correctness and Bug-Fix Stabilization
+### M1: Terminal Compatibility Verification Matrix
 - Acceptance:
-  - all known P0/P1 regressions in active scope are fixed or explicitly deferred with owner/date
-  - regression tests added/updated for every fixed defect class
-  - touched-area unit/integration filters pass consistently
+  - matrix coverage complete for Ghostty, iTerm2, WezTerm, Kitty, and Windows Terminal
+  - `ScreenOptions.FontSpec` support model is explicit (best-effort, terminal-dependent)
+  - unsupported terminals are validated as no-op fallback for font requests (safe output; no frame corruption)
+  - touched-area unit/integration checks pass
 
-### M2: API Simplification and Boundary Contract
+### M2: Visual Quality Baseline Contract
 - Acceptance:
-  - API simplification contract is satisfied for touched public surfaces
-  - naming clarity gate passes for all new/renamed public symbols
-  - default onboarding path remains `TeaSharp`-first with no new `TeaSharp.Core` onboarding leakage
-
-### M3: Visual Polish and Theme Consistency
-- Acceptance:
-  - default visuals are improved without semantic/input regressions
+  - minimal visual contract is implemented for current controls (readability, focus/selection clarity, border consistency)
   - theme/default/override behavior is validated on touched controls
-  - visual/text snapshot expectations are updated where intentional changes were made
+  - intentional visual expectation updates are captured in tests
 
-### M4: Expansion + Performance + Docs Freeze (Release Candidate)
+### M3: Widget Expansion
 - Acceptance:
   - V1 widget tranche target from `docs/widget-roadmap-v1.md` is complete
-  - perf gates from `docs/perf-plan-v1.md` pass with benchmark report attached
+  - new widgets follow existing API/style naming and theme-token conventions
+  - render + theme coverage exists for added widgets
+
+### M4: API Freeze + Cleanup
+- Acceptance:
+  - API freeze/cleanup checklist is satisfied for touched public surfaces
+  - naming clarity gate passes for all new/renamed public symbols
+  - default onboarding path remains `TeaSharp`-first with no new `TeaSharp.Core` leakage
   - public API commenting gate passes for V1-touching APIs
+
+### M5: Performance Gate + Benchmarks + Docs Freeze (Release Candidate)
+- Acceptance:
+  - perf gates from `docs/perf-plan-v1.md` pass with benchmark report attached
   - docs/examples/release checklist are coherent and frozen for RC
+  - RC manual signoff rows are all moved to `Done` with owner/date evidence
 
 ## Dependency Graph and Critical Path
-1. Correctness + bug-fix stabilization
-2. API simplification + boundary cleanup
-3. Visual polish + theming consistency
-4. Expansion + perf hardening + docs freeze
+1. Terminal compatibility verification matrix
+2. Visual quality baseline contract
+3. Widget expansion
+4. API freeze + cleanup
+5. Performance gate + benchmarks + docs freeze
 
-Critical path: Phase 1 -> Phase 2 -> Phase 3 -> Phase 4 (strict order).
+Critical path: Phase 1 -> Phase 2 -> Phase 3 -> Phase 4 -> Phase 5 (strict order).
 
 ## Agent Ownership Matrix (3-Lane Model)
 | Lane | Primary Responsibility | Typical Files |
@@ -230,24 +238,28 @@ Coordination rules:
 - Merge checkpoints at each milestone.
 
 ## Agent Coordination Checkpoints
-- **C0: Stabilization Ready**
-  - Required: open regression inventory, failing tests triaged, lane ownership map confirmed.
-  - Exit: correctness phase can begin.
-- **C1: Correctness Exit**
-  - Required: all active regressions closed or explicitly deferred with owner/date.
-  - Required commands: touched-area unit/integration filters + smoke scenarios.
-  - Exit: API simplification phase can begin.
-- **C2: API Contract Exit**
-  - Required: API simplification contract pass + naming clarity gate pass.
+- **C0: Matrix Ready**
+  - Required: lane ownership map confirmed and terminal verification inputs agreed.
+  - Exit: terminal compatibility phase can begin.
+- **C1: Terminal Matrix Exit**
+  - Required: compatibility matrix complete for Ghostty/iTerm2/WezTerm/Kitty/Windows Terminal.
+  - Required: `FontSpec` unsupported paths verified as safe no-op.
+  - Exit: visual baseline phase can begin.
+- **C2: Visual Baseline Exit**
+  - Required: minimal visual contract implemented and tested for touched controls.
+  - Required: theme override checks green.
+  - Exit: widget expansion phase can begin.
+- **C3: Widget Expansion Exit**
+  - Required: widget tranche target met with render/theme coverage.
+  - Required: full polish backlog for expanded widgets captured.
+  - Exit: API freeze/cleanup phase can begin.
+- **C4: API Freeze Exit**
+  - Required: API freeze/cleanup checklist pass + naming clarity gate pass + XML docs pass.
   - Required: public API diff reviewed and migration notes updated.
-  - Exit: visual polish phase can begin.
-- **C3: Visual Exit**
-  - Required: visual defaults updated with behavior parity; theme override checks green.
-  - Required: snapshot/text-render assertions updated where expected.
-  - Exit: expansion/perf/docs-freeze phase can begin.
-- **C4: Release Candidate Exit**
-  - Required: widget tranche target met, perf gates pass per `docs/perf-plan-v1.md`, docs/commenting gate pass.
-  - Required: final verification matrix run and archived in PR/release notes.
+  - Exit: perf/docs-freeze phase can begin.
+- **C5: Release Candidate Exit**
+  - Required: perf gates pass per `docs/perf-plan-v1.md` and benchmark evidence attached.
+  - Required: final verification matrix run and RC manual signoff rows closed.
   - Exit: Public V1 release approval.
 
 ## Risk Register
