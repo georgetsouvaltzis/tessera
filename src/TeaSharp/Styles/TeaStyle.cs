@@ -29,6 +29,23 @@ public readonly record struct TeaStyle
 
     public TeaStyle WithBold(bool enabled = true) => this with { Bold = enabled };
     public TeaStyle WithDim(bool enabled = true) => this with { Dim = enabled };
+    /// <summary>
+    /// Applies typography emphasis intent using ANSI SGR emphasis flags.
+    /// </summary>
+    /// <param name="weight">The typography emphasis intent to apply.</param>
+    /// <remarks>
+    /// This controls ANSI bold/dim emphasis only and does not control terminal font families, point sizes, or real font engines.
+    /// </remarks>
+    public TeaStyle WithFontWeight(TeaFontWeight weight)
+    {
+        return weight switch
+        {
+            TeaFontWeight.Bold => this with { Bold = true, Dim = false },
+            TeaFontWeight.Dim => this with { Bold = false, Dim = true },
+            _ => this with { Bold = false, Dim = false },
+        };
+    }
+
     public TeaStyle WithItalic(bool enabled = true) => this with { Italic = enabled };
     public TeaStyle WithUnderline(bool enabled = true) => this with { Underline = enabled };
     public TeaStyle WithDoubleUnderline(bool enabled = true) => this with { DoubleUnderline = enabled };

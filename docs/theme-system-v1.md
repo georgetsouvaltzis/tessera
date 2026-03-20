@@ -29,6 +29,13 @@ Theme values should be semantic, not control-specific:
 
 All tokens map to `TeaStyle` values and are consumable by controls without raw ANSI strings in app code.
 
+## Typography Emphasis Intent
+
+TeaSharp supports lightweight typography intent through `TeaFontWeight` and `TeaStyle.WithFontWeight(...)`.
+This maps to ANSI SGR emphasis flags only (`Normal`, `Bold`, `Dim`).
+
+It does **not** control terminal font engines, real font families, font sizes, or ligature behavior.
+
 ## Public API Names (V1 Foundations)
 
 Theme primitives use the following public types:
@@ -47,6 +54,8 @@ Theme primitives use the following public types:
 - `TeaThemeVisualState`
 - `TeaThemeControlExtensions.ApplyTheme(...)`
 - `TeaRuntimeOptions.Theme`
+- `TeaFontWeight`
+- `TeaStyle.WithFontWeight(TeaFontWeight)`
 
 ## Theme Cookbook
 

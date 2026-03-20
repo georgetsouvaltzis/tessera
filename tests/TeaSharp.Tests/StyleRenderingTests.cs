@@ -13,6 +13,8 @@ internal static class StyleRenderingTests
     public static IEnumerable<TestCase> Cases()
     {
         yield return new TestCase("Style_Merge_ComposesAttributes", Style_Merge_ComposesAttributes);
+        yield return new TestCase("Style_FontWeight_MapsToBoldAndDimFlags", Style_FontWeight_MapsToBoldAndDimFlags);
+        yield return new TestCase("Style_FontWeight_MergeOverridesWeightFlags", Style_FontWeight_MergeOverridesWeightFlags);
         yield return new TestCase("Style_Render_BlinkAndStrikethrough_EmitsSgr", Style_Render_BlinkAndStrikethrough_EmitsSgr);
         yield return new TestCase("Style_Render_ConcealAndOverline_EmitsSgr", Style_Render_ConcealAndOverline_EmitsSgr);
         yield return new TestCase("Style_Render_DoubleUnderlineAndFrame_EmitsSgr", Style_Render_DoubleUnderlineAndFrame_EmitsSgr);
@@ -45,6 +47,33 @@ internal static class StyleRenderingTests
             "\u001b[1;4;38;5;33;48;2;10;20;30mX\u001b[0m",
             rendered,
             "Merged style should emit composed SGR sequence.");
+        return Task.CompletedTask;
+    }
+
+    private static Task Style_FontWeight_MapsToBoldAndDimFlags()
+    {
+        var normal = TeaStyle.Empty.WithFontWeight(TeaFontWeight.Normal);
+        var bold = TeaStyle.Empty.WithFontWeight(TeaFontWeight.Bold);
+        var dim = TeaStyle.Empty.WithFontWeight(TeaFontWeight.Dim);
+
+        TestAssert.True(normal.Bold is false && normal.Dim is false, "Normal font weight should disable bold/dim emphasis flags.");
+        TestAssert.True(bold.Bold is true && bold.Dim is false, "Bold font weight should enable bold and disable dim emphasis flags.");
+        TestAssert.True(dim.Bold is false && dim.Dim is true, "Dim font weight should disable bold and enable dim emphasis flags.");
+        return Task.CompletedTask;
+    }
+
+    private static Task Style_FontWeight_MergeOverridesWeightFlags()
+    {
+        var baseStyle = TeaStyle.Empty.WithBold().WithForeground(AnsiColor.BrightGreen);
+        var overlay = TeaStyle.Empty.WithFontWeight(TeaFontWeight.Dim);
+
+        var merged = baseStyle.Merge(overlay);
+        var rendered = merged.Render("X");
+
+        TestAssert.Equal(
+            "\u001b[22;2;38;5;10mX\u001b[0m",
+            rendered,
+            "Font weight overlay should override prior bold emphasis using SGR weight flags.");
         return Task.CompletedTask;
     }
 
