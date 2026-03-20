@@ -69,6 +69,31 @@ public sealed class ScreenOptions
     /// </remarks>
     public string? FontSpec { get; init; }
 
+    /// <summary>
+    /// Gets or sets an optional structured font family request.
+    /// </summary>
+    /// <remarks>
+    /// When specified together with <see cref="FontSize"/>, TeaSharp composes an OSC 50 request for terminals
+    /// that advertise OSC 50 support.
+    /// </remarks>
+    public string? FontFamily { get; init; }
+
+    /// <summary>
+    /// Gets or sets an optional structured font size request.
+    /// </summary>
+    /// <remarks>
+    /// Values less than or equal to zero are ignored.
+    /// </remarks>
+    public int? FontSize { get; init; }
+
+    /// <summary>
+    /// Gets or sets an optional iTerm2 profile switch request.
+    /// </summary>
+    /// <remarks>
+    /// This request is emitted only when terminal capabilities indicate iTerm2 profile switching support.
+    /// </remarks>
+    public string? Iterm2Profile { get; init; }
+
     internal ScreenOptions Merge(ScreenOptions? overrides)
     {
         if (overrides is null)
@@ -88,6 +113,9 @@ public sealed class ScreenOptions
             BackgroundColor = overrides.BackgroundColor ?? BackgroundColor,
             WindowTitle = overrides.WindowTitle ?? WindowTitle,
             FontSpec = overrides.FontSpec ?? FontSpec,
+            FontFamily = overrides.FontFamily ?? FontFamily,
+            FontSize = overrides.FontSize ?? FontSize,
+            Iterm2Profile = overrides.Iterm2Profile ?? Iterm2Profile,
         };
     }
 

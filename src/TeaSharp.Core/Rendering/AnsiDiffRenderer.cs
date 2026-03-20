@@ -1,4 +1,5 @@
 using System.ComponentModel;
+using System.Globalization;
 using System.Text;
 using TeaSharp.Core.Abstractions;
 using TeaSharp.Core.Rendering.Internal;
@@ -28,6 +29,7 @@ internal sealed class AnsiDiffRenderer : IProgramRenderer
     private readonly HashSet<int> _queriedModes = [];
     private string? _windowTitle;
     private string? _fontSpec;
+    private string? _iterm2Profile;
     private int _width;
     private int _height;
     private bool _fullRepaintRequired;
@@ -64,6 +66,7 @@ internal sealed class AnsiDiffRenderer : IProgramRenderer
         _queriedModes.Clear();
         _windowTitle = null;
         _fontSpec = null;
+        _iterm2Profile = null;
         _width = 0;
         _height = 0;
         _fullRepaintRequired = true;
@@ -168,15 +171,41 @@ internal sealed class AnsiDiffRenderer : IProgramRenderer
             _windowTitle = terminal.WindowTitle;
         }
 
-        var requestedFontSpec = SanitizeFontSpec(terminal.FontSpec);
-        if (!string.Equals(_fontSpec, requestedFontSpec, StringComparison.Ordinal))
+        var requestedIterm2Profile = SanitizeIterm2Profile(terminal.Iterm2Profile);
+        var requestedFontSpec = SanitizeFontSpec(terminal.FontSpec)
+            ?? BuildStructuredFontSpec(terminal.FontFamily, terminal.FontSize);
+        if (_capabilities.Iterm2ProfileSwitch)
         {
-            if (requestedFontSpec is not null)
+            if (!string.Equals(_iterm2Profile, requestedIterm2Profile, StringComparison.Ordinal))
             {
-                await _writer.WriteAsync($"\u001b]50;{requestedFontSpec}\u0007").ConfigureAwait(false);
-            }
+                if (requestedIterm2Profile is not null)
+                {
+                    await _writer.WriteAsync($"\u001b]1337;SetProfile={requestedIterm2Profile}\u0007").ConfigureAwait(false);
+                }
 
-            _fontSpec = requestedFontSpec;
+                _iterm2Profile = requestedIterm2Profile;
+            }
+        }
+        else if (requestedIterm2Profile is null)
+        {
+            _iterm2Profile = null;
+        }
+
+        if (!_capabilities.Iterm2ProfileSwitch && _capabilities.Osc50FontControl)
+        {
+            if (!string.Equals(_fontSpec, requestedFontSpec, StringComparison.Ordinal))
+            {
+                if (requestedFontSpec is not null)
+                {
+                    await _writer.WriteAsync($"\u001b]50;{requestedFontSpec}\u0007").ConfigureAwait(false);
+                }
+
+                _fontSpec = requestedFontSpec;
+            }
+        }
+        else if (requestedFontSpec is null)
+        {
+            _fontSpec = null;
         }
 
         var requestedKeyboardFlags = GetKeyboardEnhancementFlags(terminal.KeyboardEnhancements);
@@ -327,6 +356,7 @@ internal sealed class AnsiDiffRenderer : IProgramRenderer
 
         // Font restore sequence is intentionally omitted because no portable "reset to previous font" contract exists.
         _fontSpec = null;
+        _iterm2Profile = null;
 
         await _writer.FlushAsync(cancellationToken).ConfigureAwait(false);
         _previousFrame = RenderFrameBuffer.Empty;
@@ -453,5 +483,48 @@ internal sealed class AnsiDiffRenderer : IProgramRenderer
         }
 
         return builder.Length == 0 ? null : builder.ToString();
+    }
+
+    private static string? SanitizeIterm2Profile(string? profile)
+    {
+        if (string.IsNullOrWhiteSpace(profile))
+        {
+            return null;
+        }
+
+        var builder = new StringBuilder(profile.Length);
+        for (var index = 0; index < profile.Length; index++)
+        {
+            var character = profile[index];
+            if (character is '\u001b' or '\u0007' or '\\' or ';')
+            {
+                continue;
+            }
+
+            if (char.IsControl(character))
+            {
+                continue;
+            }
+
+            _ = builder.Append(character);
+        }
+
+        return builder.Length == 0 ? null : builder.ToString();
+    }
+
+    private static string? BuildStructuredFontSpec(string? family, int? size)
+    {
+        var sanitizedFamily = SanitizeFontSpec(family);
+        if (sanitizedFamily is null)
+        {
+            return null;
+        }
+
+        if (size is null || size <= 0)
+        {
+            return sanitizedFamily;
+        }
+
+        return string.Concat(sanitizedFamily, " ", size.Value.ToString(CultureInfo.InvariantCulture));
     }
 }

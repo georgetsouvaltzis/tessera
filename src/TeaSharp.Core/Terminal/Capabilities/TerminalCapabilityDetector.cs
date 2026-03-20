@@ -56,6 +56,8 @@ internal static class TerminalCapabilityDetector
                 BracketedPaste: false,
                 SynchronizedUpdates: false,
                 ModeReports: false,
+                Osc50FontControl: false,
+                Iterm2ProfileSwitch: false,
                 Source: "env:TERM=dumb");
         }
 
@@ -69,7 +71,22 @@ internal static class TerminalCapabilityDetector
                 BracketedPaste: false,
                 SynchronizedUpdates: false,
                 ModeReports: false,
+                Osc50FontControl: false,
+                Iterm2ProfileSwitch: false,
                 Source: $"env:TERM={termLower}");
+        }
+
+        if (termProgramLower == "iterm.app")
+        {
+            return new TerminalCapabilityProfile(
+                FocusReporting: true,
+                MouseReporting: true,
+                BracketedPaste: true,
+                SynchronizedUpdates: true,
+                ModeReports: true,
+                Osc50FontControl: false,
+                Iterm2ProfileSwitch: true,
+                Source: "env:TERM_PROGRAM=iTerm.app");
         }
 
         if (termProgramLower == "apple_terminal")
@@ -80,27 +97,60 @@ internal static class TerminalCapabilityDetector
                 BracketedPaste: true,
                 SynchronizedUpdates: false,
                 ModeReports: true,
+                Osc50FontControl: false,
+                Iterm2ProfileSwitch: false,
                 Source: "env:TERM_PROGRAM=Apple_Terminal");
+        }
+
+        if (termProgramLower == "wezterm" || termProgramLower == "ghostty")
+        {
+            return new TerminalCapabilityProfile(
+                FocusReporting: true,
+                MouseReporting: true,
+                BracketedPaste: true,
+                SynchronizedUpdates: true,
+                ModeReports: true,
+                Osc50FontControl: false,
+                Iterm2ProfileSwitch: false,
+                Source: $"env:TERM_PROGRAM={termProgramLower}");
         }
 
         if (!string.IsNullOrWhiteSpace(wtSession))
         {
-            return new TerminalCapabilityProfile(Source: "env:WT_SESSION");
+            return new TerminalCapabilityProfile(
+                Osc50FontControl: false,
+                Iterm2ProfileSwitch: false,
+                Source: "env:WT_SESSION");
+        }
+
+        if (termLower.Contains("wezterm", StringComparison.Ordinal)
+            || termLower.Contains("ghostty", StringComparison.Ordinal)
+            || termLower.Contains("kitty", StringComparison.Ordinal))
+        {
+            return new TerminalCapabilityProfile(
+                Osc50FontControl: false,
+                Iterm2ProfileSwitch: false,
+                Source: $"env:TERM={termLower}");
         }
 
         if (termLower.Contains("xterm", StringComparison.Ordinal)
             || termLower.Contains("screen", StringComparison.Ordinal)
             || termLower.Contains("tmux", StringComparison.Ordinal)
-            || termLower.Contains("ghostty", StringComparison.Ordinal)
-            || termLower.Contains("wezterm", StringComparison.Ordinal)
             || termLower.Contains("alacritty", StringComparison.Ordinal)
-            || termLower.Contains("kitty", StringComparison.Ordinal)
             || termLower.Contains("rxvt", StringComparison.Ordinal))
         {
-            return new TerminalCapabilityProfile(Source: $"env:TERM={termLower}");
+            return new TerminalCapabilityProfile(
+                Osc50FontControl: true,
+                Iterm2ProfileSwitch: false,
+                Source: $"env:TERM={termLower}");
         }
 
-        return TerminalCapabilityProfile.AllSupported with { Source = "assumed-supported" };
+        return TerminalCapabilityProfile.AllSupported with
+        {
+            Osc50FontControl = false,
+            Iterm2ProfileSwitch = false,
+            Source = "assumed-supported",
+        };
     }
 
     private static TerminalCapabilityProfile EnrichWithTerminfo(
@@ -123,13 +173,17 @@ internal static class TerminalCapabilityDetector
             BracketedPaste = profile.BracketedPaste || (hasBd && hasBe) || hasXt,
             SynchronizedUpdates = profile.SynchronizedUpdates || hasSync,
             ModeReports = profile.ModeReports || hasXt || hasXm,
+            Osc50FontControl = profile.Osc50FontControl,
+            Iterm2ProfileSwitch = profile.Iterm2ProfileSwitch,
         };
 
         var changed = next.FocusReporting != profile.FocusReporting
             || next.MouseReporting != profile.MouseReporting
             || next.BracketedPaste != profile.BracketedPaste
             || next.SynchronizedUpdates != profile.SynchronizedUpdates
-            || next.ModeReports != profile.ModeReports;
+            || next.ModeReports != profile.ModeReports
+            || next.Osc50FontControl != profile.Osc50FontControl
+            || next.Iterm2ProfileSwitch != profile.Iterm2ProfileSwitch;
 
         if (!changed)
         {
@@ -171,6 +225,8 @@ internal static class TerminalCapabilityDetector
                 "paste" => next with { BracketedPaste = enabled },
                 "sync" => next with { SynchronizedUpdates = enabled },
                 "decrpm" or "mode_reports" or "mode-reports" => next with { ModeReports = enabled },
+                "osc50" or "font_osc50" or "font-osc50" => next with { Osc50FontControl = enabled },
+                "iterm2_profile" or "iterm2-profile" or "iterm_profile" or "iterm-profile" => next with { Iterm2ProfileSwitch = enabled },
                 _ => next,
             };
         }

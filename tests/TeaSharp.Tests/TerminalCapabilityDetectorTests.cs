@@ -12,6 +12,8 @@ internal static class TerminalCapabilityDetectorTests
         yield return new TestCase("CapabilityDetector_TERM_Dumb_DisablesAdvancedModes", TermDumb_DisablesAdvancedModes);
         yield return new TestCase("CapabilityDetector_AppleTerminal_DisablesSyncUpdates", AppleTerminal_DisablesSyncUpdates);
         yield return new TestCase("CapabilityDetector_Xterm_EnablesAllModes", Xterm_EnablesAllModes);
+        yield return new TestCase("CapabilityDetector_ITerm2_PrefersProfileSwitchAndDisablesOsc50", ITerm2_PrefersProfileSwitchAndDisablesOsc50);
+        yield return new TestCase("CapabilityDetector_ModernTerminals_DisableUnsupportedOsc50", ModernTerminals_DisableUnsupportedOsc50);
         yield return new TestCase("CapabilityDetector_TerminfoEnrichesLinuxMouse", TerminfoEnrichesLinuxMouse);
         yield return new TestCase("CapabilityDetector_TerminfoEnrichesVt100Extensions", TerminfoEnrichesVt100Extensions);
         yield return new TestCase("CapabilityDetector_EnvOverride_AppliesCaps", EnvOverride_AppliesCaps);
@@ -28,6 +30,8 @@ internal static class TerminalCapabilityDetectorTests
         TestAssert.True(!profile.BracketedPaste, "TERM=dumb should disable bracketed paste.");
         TestAssert.True(!profile.SynchronizedUpdates, "TERM=dumb should disable synchronized updates.");
         TestAssert.True(!profile.ModeReports, "TERM=dumb should disable mode reports.");
+        TestAssert.True(!profile.Osc50FontControl, "TERM=dumb should disable OSC 50 font control.");
+        TestAssert.True(!profile.Iterm2ProfileSwitch, "TERM=dumb should disable iTerm2 profile switching.");
         return Task.CompletedTask;
     }
 
@@ -45,6 +49,8 @@ internal static class TerminalCapabilityDetectorTests
         TestAssert.True(profile.BracketedPaste, "Apple Terminal should keep bracketed paste enabled.");
         TestAssert.True(!profile.SynchronizedUpdates, "Apple Terminal should disable synchronized updates.");
         TestAssert.True(profile.ModeReports, "Apple Terminal should keep mode reports enabled.");
+        TestAssert.True(!profile.Osc50FontControl, "Apple Terminal should disable OSC 50 font control by default.");
+        TestAssert.True(!profile.Iterm2ProfileSwitch, "Apple Terminal should not enable iTerm2 profile switching.");
         return Task.CompletedTask;
     }
 
@@ -59,6 +65,34 @@ internal static class TerminalCapabilityDetectorTests
         TestAssert.True(profile.BracketedPaste, "xterm should enable bracketed paste.");
         TestAssert.True(profile.SynchronizedUpdates, "xterm should enable synchronized updates.");
         TestAssert.True(profile.ModeReports, "xterm should enable mode reports.");
+        TestAssert.True(profile.Osc50FontControl, "xterm should enable OSC 50 font control.");
+        TestAssert.True(!profile.Iterm2ProfileSwitch, "xterm should not enable iTerm2 profile switching.");
+        return Task.CompletedTask;
+    }
+
+    private static Task ITerm2_PrefersProfileSwitchAndDisablesOsc50()
+    {
+        var profile = Detect(
+            ("TERM", "xterm-256color"),
+            ("TERM_PROGRAM", "iTerm.app"));
+
+        TestAssert.True(profile.Osc50FontControl is false, "iTerm2 should disable OSC 50 font control.");
+        TestAssert.True(profile.Iterm2ProfileSwitch, "iTerm2 should enable profile switching.");
+        return Task.CompletedTask;
+    }
+
+    private static Task ModernTerminals_DisableUnsupportedOsc50()
+    {
+        var ghostty = Detect(("TERM", "xterm-ghostty"));
+        var wezterm = Detect(("TERM_PROGRAM", "WezTerm"), ("TERM", "xterm-256color"));
+        var windowsTerminal = Detect(("WT_SESSION", "1"), ("TERM", "xterm-256color"));
+        var kitty = Detect(("TERM", "xterm-kitty"));
+
+        TestAssert.True(!ghostty.Osc50FontControl, "Ghostty should disable unsupported OSC 50 font control.");
+        TestAssert.True(!wezterm.Osc50FontControl, "WezTerm should disable unsupported OSC 50 font control.");
+        TestAssert.True(!windowsTerminal.Osc50FontControl, "Windows Terminal should disable unsupported OSC 50 font control.");
+        TestAssert.True(!kitty.Osc50FontControl, "Kitty should disable unsupported OSC 50 font control.");
+        TestAssert.True(!kitty.Iterm2ProfileSwitch, "Kitty should not enable iTerm2 profile switching.");
         return Task.CompletedTask;
     }
 
@@ -102,7 +136,7 @@ internal static class TerminalCapabilityDetectorTests
         // Arrange + Act
         var profile = Detect(
             ("TERM", "xterm-256color"),
-            ("TEASHARP_CAPS", "focus=0,mouse=0,paste=1,sync=0,decrpm=0"));
+            ("TEASHARP_CAPS", "focus=0,mouse=0,paste=1,sync=0,decrpm=0,osc50=0,iterm2_profile=1"));
 
         // Assert
         TestAssert.True(!profile.FocusReporting, "Override should disable focus reporting.");
@@ -110,6 +144,8 @@ internal static class TerminalCapabilityDetectorTests
         TestAssert.True(profile.BracketedPaste, "Override should allow enabling bracketed paste.");
         TestAssert.True(!profile.SynchronizedUpdates, "Override should disable synchronized updates.");
         TestAssert.True(!profile.ModeReports, "Override should disable mode reports.");
+        TestAssert.True(!profile.Osc50FontControl, "Override should allow disabling OSC 50 font control.");
+        TestAssert.True(profile.Iterm2ProfileSwitch, "Override should allow enabling iTerm2 profile switching.");
         TestAssert.True(
             profile.Source.Contains("+override", StringComparison.Ordinal),
             "Source should include override marker when TEASHARP_CAPS applies.");

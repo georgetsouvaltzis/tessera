@@ -32,6 +32,9 @@ internal static class RendererBehaviorTests
         yield return new TestCase("Renderer_KeyboardEnhancements_CanDisableKittyBaseFlag", KeyboardEnhancements_CanDisableKittyBaseFlag);
         yield return new TestCase("Renderer_FontSpec_EmitsOsc50WhenChanged", FontSpec_EmitsOsc50WhenChanged);
         yield return new TestCase("Renderer_FontSpec_NullIsNoOpAndSanitizesUnsafeChars", FontSpec_NullIsNoOpAndSanitizesUnsafeChars);
+        yield return new TestCase("Renderer_FontSpec_CapabilityDisabled_DoesNotEmitOsc50", FontSpec_CapabilityDisabled_DoesNotEmitOsc50);
+        yield return new TestCase("Renderer_StructuredFontRequest_ComposesOsc50", StructuredFontRequest_ComposesOsc50);
+        yield return new TestCase("Renderer_ITerm2Profile_EmitsSetProfileAndSuppressesOsc50", ITerm2Profile_EmitsSetProfileAndSuppressesOsc50);
         yield return new TestCase("Renderer_CellDiff_UpdatesOnlyChangedCellRun", CellDiff_UpdatesOnlyChangedCellRun);
         yield return new TestCase("Renderer_CellDiff_ClearsShortenedLineTail", CellDiff_ClearsShortenedLineTail);
         yield return new TestCase("Renderer_Resize_ClipsToWidth", Resize_ClipsToWidth);
@@ -618,6 +621,71 @@ internal static class RendererBehaviorTests
         // Assert
         AssertContains(rendered, "\u001b]50;Mono[31m\u0007");
         AssertDoesNotContain(rendered, "\u001b]50;Mon\\o\u0007\u001b[31m\u0007");
+    }
+
+    private static async Task FontSpec_CapabilityDisabled_DoesNotEmitOsc50()
+    {
+        await using var renderer = new AnsiDiffRenderer(
+            new TerminalCapabilityProfile(Osc50FontControl: false, Source: "font-disabled"));
+        await using var output = new MemoryStream();
+        await renderer.InitializeAsync(output, CancellationToken.None);
+
+        renderer.Render(ScreenOutput.From("font-disabled") with
+        {
+            Terminal = new TerminalOutput
+            {
+                FontSpec = "Iosevka Term 14",
+            },
+        });
+        await renderer.FlushAsync(CancellationToken.None);
+        var rendered = ReadUtf8(output);
+
+        AssertDoesNotContain(rendered, "\u001b]50;");
+    }
+
+    private static async Task StructuredFontRequest_ComposesOsc50()
+    {
+        await using var renderer = new AnsiDiffRenderer();
+        await using var output = new MemoryStream();
+        await renderer.InitializeAsync(output, CancellationToken.None);
+
+        renderer.Render(ScreenOutput.From("font-structured") with
+        {
+            Terminal = new TerminalOutput
+            {
+                FontFamily = "JetBrains Mono",
+                FontSize = 13,
+            },
+        });
+        await renderer.FlushAsync(CancellationToken.None);
+        var rendered = ReadUtf8(output);
+
+        AssertContains(rendered, "\u001b]50;JetBrains Mono 13\u0007");
+    }
+
+    private static async Task ITerm2Profile_EmitsSetProfileAndSuppressesOsc50()
+    {
+        await using var renderer = new AnsiDiffRenderer(
+            new TerminalCapabilityProfile(
+                Osc50FontControl: false,
+                Iterm2ProfileSwitch: true,
+                Source: "iterm2"));
+        await using var output = new MemoryStream();
+        await renderer.InitializeAsync(output, CancellationToken.None);
+
+        renderer.Render(ScreenOutput.From("font-iterm") with
+        {
+            Terminal = new TerminalOutput
+            {
+                Iterm2Profile = "Te\\a\u0007;\u001b[31m",
+                FontSpec = "Iosevka Term 14",
+            },
+        });
+        await renderer.FlushAsync(CancellationToken.None);
+        var rendered = ReadUtf8(output);
+
+        AssertContains(rendered, "\u001b]1337;SetProfile=Tea[31m\u0007");
+        AssertDoesNotContain(rendered, "\u001b]50;");
     }
 
     private static async Task CellDiff_UpdatesOnlyChangedCellRun()

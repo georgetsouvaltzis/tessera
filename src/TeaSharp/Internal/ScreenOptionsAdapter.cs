@@ -23,6 +23,9 @@ internal static class ScreenOptionsAdapter
             BackgroundColor = options.BackgroundColor,
             WindowTitle = options.WindowTitle,
             FontSpec = options.FontSpec,
+            FontFamily = options.FontFamily,
+            FontSize = options.FontSize,
+            Iterm2Profile = options.Iterm2Profile,
         };
     }
 
@@ -45,6 +48,9 @@ internal static class ScreenOptionsAdapter
             BackgroundColor = output.BackgroundColor,
             WindowTitle = output.WindowTitle,
             FontSpec = output.FontSpec,
+            FontFamily = output.FontFamily,
+            FontSize = output.FontSize,
+            Iterm2Profile = output.Iterm2Profile,
         };
     }
 }

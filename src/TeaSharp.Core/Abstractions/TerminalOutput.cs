@@ -14,4 +14,7 @@ public readonly record struct TerminalOutput
     public TerminalProgress? Progress { get; init; }
     public string? WindowTitle { get; init; }
     public string? FontSpec { get; init; }
+    public string? FontFamily { get; init; }
+    public int? FontSize { get; init; }
+    public string? Iterm2Profile { get; init; }
 }
