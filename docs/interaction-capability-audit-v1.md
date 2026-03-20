@@ -24,6 +24,13 @@ Method: code + tests only (no docs-claim scoring), synced against current reposi
 - `Partially supported` means behavior exists but public selection state/contracts are limited for app-level integration.
 - `Missing` means no pointer-based path exists in current control implementation.
 
+## Typography Capability Status (Sync)
+
+- Portable text emphasis is available through ANSI SGR style flags (for example `TeaStyle.WithFontWeight(TeaFontWeight)` for normal/bold/dim intent) [`src/TeaSharp/Styles/TeaStyle.cs:39`](../src/TeaSharp/Styles/TeaStyle.cs#L39), [`src/TeaSharp/Styles/TeaFontWeight.cs:9`](../src/TeaSharp/Styles/TeaFontWeight.cs#L9).
+- Custom font family/size can be requested via `ScreenOptions.FontSpec`; this is explicitly marked experimental and terminal-dependent [`src/TeaSharp/ScreenOptions.cs:64`](../src/TeaSharp/ScreenOptions.cs#L64), [`src/TeaSharp/ScreenOptions.cs:70`](../src/TeaSharp/ScreenOptions.cs#L70).
+- Renderer behavior for `FontSpec` is an OSC 50 request (`ESC ] 50 ; ... BEL`) after sanitization [`src/TeaSharp.Core/Rendering/AnsiDiffRenderer.cs:171`](../src/TeaSharp.Core/Rendering/AnsiDiffRenderer.cs#L171), [`src/TeaSharp.Core/Rendering/AnsiDiffRenderer.cs:176`](../src/TeaSharp.Core/Rendering/AnsiDiffRenderer.cs#L176), [`src/TeaSharp.Core/Rendering/AnsiDiffRenderer.cs:431`](../src/TeaSharp.Core/Rendering/AnsiDiffRenderer.cs#L431).
+- Caveat: custom family/size is best-effort and not guaranteed to apply on a given terminal (`FontSpec` is optional, terminal-specific, and does not promise application) [`src/TeaSharp/ScreenOptions.cs:67`](../src/TeaSharp/ScreenOptions.cs#L67), [`src/TeaSharp/ScreenOptions.cs:68`](../src/TeaSharp/ScreenOptions.cs#L68).
+
 ## Final Sync Summary
 
 - Full pass (`click` + `hover` + `selection semantics`): `7/11` (`Choice`, `ComboBox`, `ListView<T>`, `MenuBar`, `MultiSelect`, `RadioGroup`, `DataGrid`).

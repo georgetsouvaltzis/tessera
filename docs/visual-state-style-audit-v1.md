@@ -23,6 +23,12 @@
 - Scene compiler now resolves per-control visual state and applies `ApplyThemeDefaults(overrides, baseTheme, state)` (`src/TeaSharp/Internal/TeaSceneCompiler.cs:37`, `src/TeaSharp/Internal/TeaSceneCompiler.cs:130`, `src/TeaSharp/Internal/TeaSceneCompiler.cs:252`, `src/TeaSharp/Internal/TeaSceneCompiler.cs:364`).
 - Runtime coverage exists via dedicated tests (`tests/TeaSharp.Tests/ThemeOverridesRuntimeWiringTests.cs:12`, `:35`, `:83`).
 
+### 4) Typography support is split between portable SGR emphasis and terminal-specific font requests
+- Portable emphasis intent is exposed through `TeaStyle.WithFontWeight(TeaFontWeight)` and maps to ANSI SGR bold/dim behavior only (`src/TeaSharp/Styles/TeaStyle.cs:39`, `src/TeaSharp/Styles/TeaFontWeight.cs:9`).
+- `ScreenOptions.FontSpec` provides an experimental terminal font request path (`src/TeaSharp/ScreenOptions.cs:64`, `src/TeaSharp/ScreenOptions.cs:70`).
+- The renderer emits OSC 50 when `FontSpec` changes (`src/TeaSharp.Core/Rendering/AnsiDiffRenderer.cs:171`, `:176`) and sanitizes control characters before output (`:431`).
+- Caveat for V1 docs: custom family/size remains best-effort via OSC 50 and is not guaranteed across terminals (`src/TeaSharp/ScreenOptions.cs:67`, `:68`).
+
 ## Support Matrix (Final)
 
 | Control | Hover hook | Selected hook | Focused hook | Background-ready hook | Theme token wiring |
@@ -55,6 +61,9 @@
 
 4. **Theme-override state coverage in tests is still incomplete**
 - Runtime wiring + focused-state behavior are now covered (`tests/TeaSharp.Tests/ThemeOverridesRuntimeWiringTests.cs:35`, `:83`), and hover parity tests exist for nav/explorer controls (`tests/TeaSharp.Tests/ThemeStateParity_NavigationExplorerTests.cs:21`), but broad `Selected/Disabled/Error/Active` override layering assertions are still limited.
+
+5. **Terminal typography requests are non-portable by design**
+- `FontSpec` is explicitly documented as terminal-dependent and optional (`src/TeaSharp/ScreenOptions.cs:67`, `:68`), so style/theme guidance must treat custom family/size as an opt-in best-effort path, not a guaranteed visual contract.
 
 ## Final Sync Summary
 

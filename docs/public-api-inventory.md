@@ -28,6 +28,7 @@ These are the types new applications should discover first.
 - `Message` and the typed message records in `TeaSharp`
 - `TeaSharp.Styles.TeaStyle`
 - `TeaSharp.Styles.AnsiColor`
+- `TeaSharp.Styles.TeaFontWeight`
 - `Screen`
 - `ScreenContext`
 - `ScreenOptions`
@@ -238,6 +239,12 @@ Their old `TeaSharp.Components.Prebuilt.*` counterparts have been removed instea
 Current shipped theme mapping is centralized in `TeaSharp.Styles.TeaThemeControlExtensions` and split into domain partial files (`Basic`, `InputValue`, `Navigation`, `NavigationOverlay`, `NavigationPrimitives`, `DataAndFlow`, `ExplorerAndFeedback`, `RenderingTextUtilities`, `ModalAndCharts`).
 Overlay glyph cookbook snippets for `MenuBarGlyphSet`, `ContextMenuGlyphSet`, and `CommandPaletteGlyphSet` are documented in [theme-system-v1.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/theme-system-v1.md).
 Border override, dropdown/tree glyph-set, and data marker/separator cookbook snippets are documented in [theme-system-v1.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/theme-system-v1.md).
+
+## Typography Capability Status
+
+- Portable typography lane: `TeaStyle.WithFontWeight(TeaFontWeight)` for ANSI SGR emphasis intent (normal/bold/dim), not real font engine control.
+- Terminal-specific lane: `ScreenOptions.FontSpec` requests terminal font changes through OSC 50 output in the renderer.
+- Explicit caveat: custom family/size is best-effort via OSC 50 and not guaranteed to apply across terminals.
 
 Bordered control parity policy:
 

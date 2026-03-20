@@ -124,6 +124,12 @@ Focus visuals must be theme-driven (for example focused border style/color), not
 
 Image rendering is planned for V1.1.
 
+### Typography Portability
+
+- Portable typography in TeaSharp is ANSI SGR emphasis intent (for example bold/dim) and should be treated as styling intent, not a real font engine contract.
+- Terminal-specific typography request is available via `ScreenOptions.FontSpec`; renderer emits OSC 50 when this value is set.
+- Custom family/size requests are best-effort and not guaranteed on all terminals. Public guidance should treat `FontSpec` as optional opt-in behavior with graceful fallback.
+
 ### Composition Model
 
 TeaSharp uses an object-based screen model.
