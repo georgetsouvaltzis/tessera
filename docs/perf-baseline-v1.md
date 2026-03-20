@@ -15,23 +15,53 @@ Latest measured snapshot (current head):
 
 | Scenario | Render-only mean | Render-only alloc | Materialize mean | Materialize alloc |
 | --- | --- | --- | --- | --- |
-| Startup | `11.91 us` | `30.04 KB` | `13.26 us` | `47.63 KB` |
-| LogTail | `6.277 ms` | `80.47 KB` | `4.978 ms` | `106.97 KB` |
-| LargeTable | `12.93 us` | `15.67 KB` | `14.26 us` | `46.88 KB` |
-| OverlayStress | `489.5 us` | `115.71 KB` | `567.4 us` | `1.47 MB` |
-| ResizeStorm | `306.2 us` | `65.86 KB` | `375.5 us` | `1.2 MB` |
-| StyledHeavy | `55.61 us` | `93.23 KB` | `58.12 us` | `118.48 KB` |
+| Startup | `12.60 us` | `30.52 KB` | `13.20 us` | `48.11 KB` |
+| LogTail | `4.899 ms` | `80.1 KB` | `4.955 ms` | `106.61 KB` |
+| LargeTable | `12.76 us` | `15.67 KB` | `14.11 us` | `46.88 KB` |
+| OverlayStress | `429.7 us` | `61.13 KB` | `495.0 us` | `1.42 MB` |
+| ResizeStorm | `299.5 us` | `59.11 KB` | `365.4 us` | `1.2 MB` |
+| StyledHeavy | `55.53 us` | `93.23 KB` | `56.17 us` | `118.48 KB` |
 
 Supplemental viewport scenario (optional):
 
 | Scenario | Render-only mean | Render-only alloc | Materialize mean | Materialize alloc |
 | --- | --- | --- | --- | --- |
-| ViewportRenderBenchmarks | `44.76 us` | `28.5 KB` | `102.66 us` | `1725 KB` |
+| ViewportRenderBenchmarks | `51.82 us` | `5 KB` | `99.58 us` | `1701.5 KB` |
 
 Notes:
 - priority-setting warnings on this host (`Permission denied` / `Operation not permitted`) are non-fatal noise
 - values above are from `inProcess` mode and represent single-host snapshots
 - table captures both mode families for the same scenario set
+
+## Regression Budget Check (2026-03-20)
+
+Commits:
+- accepted baseline (before): `d30df85076ee`
+- candidate measured (after): `06cc6a8c59e3`
+
+Commands:
+- `scripts/run_benchmarks_v1.sh list`
+- `scripts/run_benchmarks_v1.sh shortlist-render-only`
+- `scripts/run_benchmarks_v1.sh shortlist-materialize`
+
+Budget thresholds from `docs/perf-plan-v1.md`:
+- time regression budget: `> 10%` -> fail
+- allocation regression budget: `> 15%` -> fail
+
+Measured deltas vs accepted baseline:
+
+| Scenario | RO mean delta | RO alloc delta | MAT mean delta | MAT alloc delta | Gate |
+| --- | --- | --- | --- | --- | --- |
+| Startup | `+5.79%` | `+1.60%` | `-0.45%` | `+1.01%` | `pass` |
+| LogTail | `-21.95%` | `-0.46%` | `-0.46%` | `-0.34%` | `pass` |
+| LargeTable | `-1.31%` | `+0.00%` | `-1.05%` | `+0.00%` | `pass` |
+| OverlayStress | `-12.22%` | `-47.17%` | `-12.76%` | `-3.40%` | `pass` |
+| ResizeStorm | `-2.19%` | `-10.25%` | `-2.69%` | `+0.00%` | `pass` |
+| StyledHeavy | `-0.14%` | `+0.00%` | `-3.36%` | `+0.00%` | `pass` |
+
+Conclusion:
+- measured benchmark budgets: `pass` (worst time regression `+5.79%`, worst allocation regression `+1.60%`)
+- input latency p95 budget: `not measured` in current BenchmarkDotNet shortlist lane
 
 ## Iteration 3 Spotlight (2026-03-19)
 

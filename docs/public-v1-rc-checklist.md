@@ -7,7 +7,7 @@ Do not mark a checkbox complete unless command output/evidence is attached.
 
 - [ ] RC tag/branch: `<fill>`
 - [x] Date (UTC): `2026-03-20`
-- [x] Commit SHA: `d30df85076ee`
+- [x] Commit SHA: `06cc6a8c59e3`
 - [ ] Owner: `<fill>`
 
 ## Build, Test, Examples
@@ -38,9 +38,9 @@ Do not mark a checkbox complete unless command output/evidence is attached.
   - command template: `scripts/run_benchmarks_v1.sh shortlist-render-only`
   - command template: `scripts/run_benchmarks_v1.sh shortlist-materialize`
   - evidence: `Captured in [perf-baseline-v1.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/perf-baseline-v1.md): dual-mode table for Startup, LogTail, LargeTable, OverlayStress, ResizeStorm, StyledHeavy (Date: 2026-03-20).`
-- [ ] Regression budget check completed vs previous baseline
-  - baseline doc: `docs/perf-baseline-v1.md`
-  - pass/fail + deltas: `Not explicitly computed in this run.`
+- [x] Regression budget check completed vs previous baseline
+  - baseline doc: `docs/perf-baseline-v1.md` (`before: d30df85076ee`, `after: 06cc6a8c59e3`)
+  - pass/fail + deltas: `PASS` (`worst time regression: +5.79%`, `worst alloc regression: +1.60%`, all six gate scenarios pass in both modes; input latency p95 budget remains not measured in current BenchmarkDotNet shortlist lane).
 
 ## Docs and Public API Commenting
 
@@ -78,6 +78,9 @@ Do not mark a checkbox complete unless command output/evidence is attached.
 - `dotnet build TeaSharp.Examples.slnx --no-restore --nologo` -> `Build succeeded. 0 Warning(s), 0 Error(s).`
 - `scripts/smoke_examples_v1.sh 4` -> `PASS HelloWorld`, `PASS CounterForm`, `PASS WorkspaceApp`, `SUMMARY pass=3 fail=0` (bounded startup probe; processes intentionally terminated after 4s).
 - `dotnet run --project benchmarks/TeaSharp.Benchmarks --no-build -- --list flat` -> listed gate scenarios in both `render` and `render-only` forms.
+- `scripts/run_benchmarks_v1.sh shortlist-render-only` -> Startup `12.60 us / 30.52 KB`, LogTail `4.899 ms / 80.1 KB`, LargeTable `12.76 us / 15.67 KB`, OverlayStress `429.7 us / 61.13 KB`, ResizeStorm `299.5 us / 59.11 KB`, StyledHeavy `55.53 us / 93.23 KB`.
+- `scripts/run_benchmarks_v1.sh shortlist-materialize` -> Startup `13.20 us / 48.11 KB`, LogTail `4.955 ms / 106.61 KB`, LargeTable `14.11 us / 46.88 KB`, OverlayStress `495.0 us / 1.42 MB`, ResizeStorm `365.4 us / 1.2 MB`, StyledHeavy `56.17 us / 118.48 KB`.
+- regression budget decision vs baseline `d30df85076ee`: `PASS` (worst time regression `+5.79%`; worst alloc regression `+1.60%`; both under plan thresholds `10%` and `15%`).
 - `dotnet test tests/TeaSharp.Tests --no-restore --nologo --filter "PublicApiXmlDocs_"` -> `Passed: 4, Failed: 0, Skipped: 0.`
 - dual-mode benchmark snapshot reference: [perf-baseline-v1.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/perf-baseline-v1.md) (`Date: 2026-03-20`, `inProcess`, six gate scenarios).
 - overlay optimization spotlight reference: [perf-baseline-v1.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/perf-baseline-v1.md) (`Overlay Optimization Spotlight`, added in commit `d30df85` after perf commits `9d2bc23`, `3487356`).
