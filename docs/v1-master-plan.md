@@ -2,6 +2,7 @@
 
 This document is the authoritative execution plan for Public V1.
 All agents must treat this file as the source of truth for scope, sequencing, ownership, and done criteria.
+Release-candidate execution checklist: [public-v1-rc-checklist.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/public-v1-rc-checklist.md).
 
 ## Vision
 - Ship a C#-first TUI library with a small default API, strong extensibility, and polished visuals.
@@ -249,7 +250,7 @@ Coordination rules:
 | Full suite | `dotnet test TeaSharp.slnx --no-restore` | must pass |
 | Example smoke | build/run canonical + advanced examples | must pass |
 | Benchmarks | benchmark suite report committed to docs/artifacts | must exist |
-| Docs | public API + examples + migration guidance consistent | must pass review |
+| Docs | public API + examples + migration guidance consistent; RC checklist completed | must pass review |
 
 ## Weekly Checkpoint Format
 - Week label:

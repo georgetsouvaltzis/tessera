@@ -3,6 +3,7 @@
 ## Purpose
 
 This document is the maintainer contract for TeaSharp's pre-public redesign.
+Public V1 release-candidate execution checklist: [public-v1-rc-checklist.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/public-v1-rc-checklist.md).
 
 Use it as the decision gate for:
 
