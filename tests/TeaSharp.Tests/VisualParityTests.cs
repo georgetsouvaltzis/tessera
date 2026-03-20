@@ -26,6 +26,24 @@ internal static class VisualParityTests
         yield return new TestCase(
             "VisualParity_MenuBar_BorderedGlyphWrappers_AppliesFocusedBorderStyleOverride",
             MenuBar_BorderedGlyphWrappers_AppliesFocusedBorderStyleOverride);
+        yield return new TestCase(
+            "VisualParity_Notifications_BorderedTitleAndFocusMarker_RendersWithoutAnsiByDefault",
+            Notifications_BorderedTitleAndFocusMarker_RendersWithoutAnsiByDefault);
+        yield return new TestCase(
+            "VisualParity_Notifications_BorderedTitleAndFocusMarker_AppliesBorderStyleOverrides",
+            Notifications_BorderedTitleAndFocusMarker_AppliesBorderStyleOverrides);
+        yield return new TestCase(
+            "VisualParity_LogView_BorderedTitleAndFocusMarker_RendersWithoutAnsiByDefault",
+            LogView_BorderedTitleAndFocusMarker_RendersWithoutAnsiByDefault);
+        yield return new TestCase(
+            "VisualParity_LogView_BorderedTitleAndFocusMarker_AppliesBorderStyleOverrides",
+            LogView_BorderedTitleAndFocusMarker_AppliesBorderStyleOverrides);
+        yield return new TestCase(
+            "VisualParity_MarkdownView_BorderedTitleAndFocusMarker_RendersWithoutAnsiByDefault",
+            MarkdownView_BorderedTitleAndFocusMarker_RendersWithoutAnsiByDefault);
+        yield return new TestCase(
+            "VisualParity_MarkdownView_BorderedTitleAndFocusMarker_AppliesBorderStyleOverrides",
+            MarkdownView_BorderedTitleAndFocusMarker_AppliesBorderStyleOverrides);
     }
 
     private static Task ContextMenu_BorderedLongTitleWithMarker_RendersWithoutAnsiByDefault()
@@ -207,6 +225,149 @@ internal static class VisualParityTests
 
         var mergedBorderStyle = baseBorderStyle.Merge(focusedBorderStyle);
         TestAssert.True(output.Contains(mergedBorderStyle.Render("┌"), StringComparison.Ordinal), "MenuBar should render focused border glyphs with merged border style overrides.");
+        return Task.CompletedTask;
+    }
+
+    private static Task Notifications_BorderedTitleAndFocusMarker_RendersWithoutAnsiByDefault()
+    {
+        var notifications = new Notifications
+        {
+            IsFocused = true,
+            Border = BorderStyle.SingleLine,
+            Title = "Notification Feed",
+            FocusMarker = "!",
+            ShowFocusMarker = true,
+        };
+        notifications.Push("build finished", NotificationLevel.Success, "a");
+        notifications.Push("pipeline warning", NotificationLevel.Warning, "b");
+
+        var canvas = new Canvas(48, 8);
+        notifications.Render(canvas, new Rect(0, 0, 48, 8));
+        var output = canvas.Render();
+
+        TestAssert.True(output.Contains("Notification Feed !", StringComparison.Ordinal), "Notifications should render title and focus marker by default.");
+        TestAssert.True(output.Contains("pipeline warning", StringComparison.Ordinal), "Notifications should render item text in monochrome mode.");
+        TestAssert.True(!ContainsAnsiEscape(output), "Notifications monochrome defaults should not emit ANSI style sequences.");
+        return Task.CompletedTask;
+    }
+
+    private static Task Notifications_BorderedTitleAndFocusMarker_AppliesBorderStyleOverrides()
+    {
+        var focusedBorderStyle = TeaStyle.Empty.WithBold();
+        var baseBorderStyle = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(20, 30, 90));
+        var notifications = new Notifications
+        {
+            IsFocused = true,
+            Border = BorderStyle.SingleLine,
+            Title = "Notification Feed",
+            FocusMarker = "!",
+            ShowFocusMarker = true,
+            BorderStyleText = baseBorderStyle,
+            FocusedBorderStyleText = focusedBorderStyle,
+        };
+        notifications.Push("pipeline warning", NotificationLevel.Warning, "a");
+
+        var canvas = new Canvas(48, 8, CanvasTextMode.GraphemeAware);
+        notifications.Render(canvas, new Rect(0, 0, 48, 8));
+        var output = canvas.Render();
+
+        var mergedBorderStyle = baseBorderStyle.Merge(focusedBorderStyle);
+        TestAssert.True(output.Contains(mergedBorderStyle.Render("┌"), StringComparison.Ordinal), "Notifications should render focused border glyphs with merged border style overrides.");
+        return Task.CompletedTask;
+    }
+
+    private static Task LogView_BorderedTitleAndFocusMarker_RendersWithoutAnsiByDefault()
+    {
+        var logs = new LogView
+        {
+            IsFocused = true,
+            Border = BorderStyle.SingleLine,
+            Title = "Build Logs",
+            FocusMarker = "!",
+            ShowFocusMarker = true,
+        };
+        logs.Append("compile started");
+        logs.Append("compile finished");
+
+        var canvas = new Canvas(48, 8);
+        logs.Render(canvas, new Rect(0, 0, 48, 8));
+        var output = canvas.Render();
+
+        TestAssert.True(output.Contains("Build Logs !", StringComparison.Ordinal), "LogView should render title and focus marker by default.");
+        TestAssert.True(output.Contains("compile finished", StringComparison.Ordinal), "LogView should render entry text in monochrome mode.");
+        TestAssert.True(!ContainsAnsiEscape(output), "LogView monochrome defaults should not emit ANSI style sequences.");
+        return Task.CompletedTask;
+    }
+
+    private static Task LogView_BorderedTitleAndFocusMarker_AppliesBorderStyleOverrides()
+    {
+        var focusedBorderStyle = TeaStyle.Empty.WithBold();
+        var baseBorderStyle = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(90, 40, 10));
+        var logs = new LogView
+        {
+            IsFocused = true,
+            Border = BorderStyle.SingleLine,
+            Title = "Build Logs",
+            FocusMarker = "!",
+            ShowFocusMarker = true,
+            BorderStyleText = baseBorderStyle,
+            FocusedBorderStyleText = focusedBorderStyle,
+        };
+        logs.Append("compile finished");
+
+        var canvas = new Canvas(48, 8, CanvasTextMode.GraphemeAware);
+        logs.Render(canvas, new Rect(0, 0, 48, 8));
+        var output = canvas.Render();
+
+        var mergedBorderStyle = baseBorderStyle.Merge(focusedBorderStyle);
+        TestAssert.True(output.Contains(mergedBorderStyle.Render("┌"), StringComparison.Ordinal), "LogView should render focused border glyphs with merged border style overrides.");
+        return Task.CompletedTask;
+    }
+
+    private static Task MarkdownView_BorderedTitleAndFocusMarker_RendersWithoutAnsiByDefault()
+    {
+        var markdown = new MarkdownView
+        {
+            IsFocused = true,
+            Border = BorderStyle.SingleLine,
+            Title = "README Preview",
+            FocusMarker = "!",
+            ShowFocusMarker = true,
+        };
+        markdown.SetMarkdown("# heading\n- item");
+
+        var canvas = new Canvas(48, 8);
+        markdown.Render(canvas, new Rect(0, 0, 48, 8));
+        var output = canvas.Render();
+
+        TestAssert.True(output.Contains("README Preview !", StringComparison.Ordinal), "MarkdownView should render title and focus marker by default.");
+        TestAssert.True(output.Contains("# HEADING", StringComparison.Ordinal), "MarkdownView should render markdown content in monochrome mode.");
+        TestAssert.True(!ContainsAnsiEscape(output), "MarkdownView monochrome defaults should not emit ANSI style sequences.");
+        return Task.CompletedTask;
+    }
+
+    private static Task MarkdownView_BorderedTitleAndFocusMarker_AppliesBorderStyleOverrides()
+    {
+        var focusedBorderStyle = TeaStyle.Empty.WithBold();
+        var baseBorderStyle = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(12, 80, 30));
+        var markdown = new MarkdownView
+        {
+            IsFocused = true,
+            Border = BorderStyle.SingleLine,
+            Title = "README Preview",
+            FocusMarker = "!",
+            ShowFocusMarker = true,
+            BorderStyleText = baseBorderStyle,
+            FocusedBorderStyleText = focusedBorderStyle,
+        };
+        markdown.SetMarkdown("# heading");
+
+        var canvas = new Canvas(48, 8, CanvasTextMode.GraphemeAware);
+        markdown.Render(canvas, new Rect(0, 0, 48, 8));
+        var output = canvas.Render();
+
+        var mergedBorderStyle = baseBorderStyle.Merge(focusedBorderStyle);
+        TestAssert.True(output.Contains(mergedBorderStyle.Render("┌"), StringComparison.Ordinal), "MarkdownView should render focused border glyphs with merged border style overrides.");
         return Task.CompletedTask;
     }
 

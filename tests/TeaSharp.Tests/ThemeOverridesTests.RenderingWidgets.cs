@@ -48,10 +48,16 @@ internal static partial class ThemeOverridesTests
             Focus = new TeaThemeFocusTokens
             {
                 Title = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(51, 52, 53)),
+                Border = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(54, 55, 56)),
+            },
+            Border = new TeaThemeBorderTokens
+            {
+                Default = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(57, 58, 59)),
+                Focused = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(60, 61, 62)),
             },
             State = new TeaThemeStateTokens
             {
-                Success = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(61, 62, 63)),
+                Success = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(63, 64, 65)),
                 Error = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(71, 72, 73)),
             },
             Selection = new TeaThemeSelectionTokens
@@ -74,6 +80,8 @@ internal static partial class ThemeOverridesTests
             theme.Selection.Foreground.Merge(theme.Selection.Background),
             diffView.SelectedLineStyle,
             "DiffView selected line style should map to merged Selection styles.");
+        TestAssert.Equal(theme.Border.Default, diffView.BorderStyleText, "DiffView border style should map to Border.Default.");
+        TestAssert.Equal(theme.Border.Focused.Merge(theme.Focus.Border), diffView.FocusedBorderStyleText, "DiffView focused border style should map to focused border tokens.");
 
         TestAssert.Equal(theme.Text.Secondary, propertyGrid.TitleStyle, "PropertyGrid title style should map to Text.Secondary.");
         TestAssert.Equal(theme.Focus.Title, propertyGrid.FocusedTitleStyle, "PropertyGrid focused title style should map to Focus.Title.");
@@ -84,6 +92,8 @@ internal static partial class ThemeOverridesTests
             theme.Selection.Foreground.Merge(theme.Selection.Background),
             propertyGrid.SelectedRowStyle,
             "PropertyGrid selected row style should map to merged Selection styles.");
+        TestAssert.Equal(theme.Border.Default, propertyGrid.BorderStyleText, "PropertyGrid border style should map to Border.Default.");
+        TestAssert.Equal(theme.Border.Focused.Merge(theme.Focus.Border), propertyGrid.FocusedBorderStyleText, "PropertyGrid focused border style should map to focused border tokens.");
 
         return Task.CompletedTask;
     }
@@ -101,26 +111,34 @@ internal static partial class ThemeOverridesTests
             Focus = new TeaThemeFocusTokens
             {
                 Title = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(7, 8, 9)),
+                Border = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(10, 11, 12)),
+            },
+            Border = new TeaThemeBorderTokens
+            {
+                Default = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(13, 14, 15)),
+                Focused = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(16, 17, 18)),
             },
             State = new TeaThemeStateTokens
             {
-                Success = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(10, 11, 12)),
-                Error = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(13, 14, 15)),
+                Success = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(19, 20, 21)),
+                Error = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(22, 23, 24)),
             },
             Selection = new TeaThemeSelectionTokens
             {
-                Foreground = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(16, 17, 18)),
-                Background = TeaStyle.Empty.WithBackground(AnsiColor.Rgb(19, 20, 21)),
+                Foreground = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(25, 26, 27)),
+                Background = TeaStyle.Empty.WithBackground(AnsiColor.Rgb(28, 29, 30)),
             },
         };
 
         var diffView = new DiffView
         {
             AddedLineStyle = explicitStyle,
+            BorderStyleText = explicitStyle,
         };
         var propertyGrid = new PropertyGrid
         {
             ValueStyle = explicitStyle,
+            BorderStyleText = explicitStyle,
         };
 
         diffView.ApplyThemeDefaults(theme);
@@ -128,8 +146,12 @@ internal static partial class ThemeOverridesTests
 
         TestAssert.Equal(explicitStyle, diffView.AddedLineStyle, "Defaults should not overwrite explicit DiffView.AddedLineStyle.");
         TestAssert.Equal(theme.State.Error, diffView.RemovedLineStyle, "Defaults should fill empty DiffView.RemovedLineStyle.");
+        TestAssert.Equal(explicitStyle, diffView.BorderStyleText, "Defaults should not overwrite explicit DiffView.BorderStyleText.");
+        TestAssert.Equal(theme.Border.Focused.Merge(theme.Focus.Border), diffView.FocusedBorderStyleText, "Defaults should fill empty DiffView.FocusedBorderStyleText.");
         TestAssert.Equal(explicitStyle, propertyGrid.ValueStyle, "Defaults should not overwrite explicit PropertyGrid.ValueStyle.");
         TestAssert.Equal(theme.Text.Secondary, propertyGrid.HeaderStyle, "Defaults should fill empty PropertyGrid.HeaderStyle.");
+        TestAssert.Equal(explicitStyle, propertyGrid.BorderStyleText, "Defaults should not overwrite explicit PropertyGrid.BorderStyleText.");
+        TestAssert.Equal(theme.Border.Focused.Merge(theme.Focus.Border), propertyGrid.FocusedBorderStyleText, "Defaults should fill empty PropertyGrid.FocusedBorderStyleText.");
 
         return Task.CompletedTask;
     }
@@ -154,10 +176,16 @@ internal static partial class ThemeOverridesTests
             Focus = new TeaThemeFocusTokens
             {
                 Title = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(121, 122, 123)),
+                Border = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(124, 125, 126)),
+            },
+            Border = new TeaThemeBorderTokens
+            {
+                Default = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(127, 128, 129)),
+                Focused = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(130, 131, 132)),
             },
             State = new TeaThemeStateTokens
             {
-                Success = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(131, 132, 133)),
+                Success = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(133, 134, 135)),
                 Error = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(141, 142, 143)),
             },
             Selection = new TeaThemeSelectionTokens
@@ -174,8 +202,12 @@ internal static partial class ThemeOverridesTests
 
         TestAssert.Equal(explicitStyle, diffView.UnchangedLineStyle, "Override defaults should not overwrite explicit DiffView.UnchangedLineStyle.");
         TestAssert.Equal(typeTheme.State.Success, diffView.AddedLineStyle, "Override defaults should fill empty DiffView.AddedLineStyle.");
+        TestAssert.Equal(typeTheme.Border.Default, diffView.BorderStyleText, "Override defaults should fill DiffView border style.");
+        TestAssert.Equal(typeTheme.Border.Focused.Merge(typeTheme.Focus.Border), diffView.FocusedBorderStyleText, "Override defaults should fill DiffView focused border style.");
         TestAssert.Equal(typeTheme.Text.Secondary, propertyGrid.KeyStyle, "Override apply should map PropertyGrid key style.");
         TestAssert.Equal(typeTheme.Text.Primary, propertyGrid.ValueStyle, "Override apply should map PropertyGrid value style.");
+        TestAssert.Equal(typeTheme.Border.Default, propertyGrid.BorderStyleText, "Override apply should map PropertyGrid border style.");
+        TestAssert.Equal(typeTheme.Border.Focused.Merge(typeTheme.Focus.Border), propertyGrid.FocusedBorderStyleText, "Override apply should map PropertyGrid focused border style.");
 
         return Task.CompletedTask;
     }
@@ -190,10 +222,16 @@ internal static partial class ThemeOverridesTests
                 Secondary = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(41, 42, 43)),
                 Muted = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(51, 52, 53)),
             },
+            Border = new TeaThemeBorderTokens
+            {
+                Default = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(54, 55, 56)),
+                Focused = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(57, 58, 59)),
+            },
             Focus = new TeaThemeFocusTokens
             {
                 Ring = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(61, 62, 63)),
                 Title = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(71, 72, 73)),
+                Border = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(74, 75, 76)),
             },
             State = new TeaThemeStateTokens
             {
@@ -218,10 +256,14 @@ internal static partial class ThemeOverridesTests
         TestAssert.Equal(theme.Focus.Title, logView.FocusedTitleStyle, "LogView focused title style should map to Focus.Title.");
         TestAssert.Equal(theme.Text.Primary, logView.EntryStyle, "LogView entry style should map to Text.Primary.");
         TestAssert.Equal(theme.Text.Muted, logView.PausedTitleStyle, "LogView paused title style should map to Text.Muted.");
+        TestAssert.Equal(theme.Border.Default, logView.BorderStyleText, "LogView border style should map to Border.Default.");
+        TestAssert.Equal(theme.Border.Focused.Merge(theme.Focus.Border), logView.FocusedBorderStyleText, "LogView focused border style should map to focused border tokens.");
 
         TestAssert.Equal(theme.Text.Secondary, markdownView.TitleStyle, "MarkdownView title style should map to Text.Secondary.");
         TestAssert.Equal(theme.Focus.Title, markdownView.FocusedTitleStyle, "MarkdownView focused title style should map to Focus.Title.");
         TestAssert.Equal(theme.Text.Primary, markdownView.ContentStyle, "MarkdownView content style should map to Text.Primary.");
+        TestAssert.Equal(theme.Border.Default, markdownView.BorderStyleText, "MarkdownView border style should map to Border.Default.");
+        TestAssert.Equal(theme.Border.Focused.Merge(theme.Focus.Border), markdownView.FocusedBorderStyleText, "MarkdownView focused border style should map to focused border tokens.");
 
         TestAssert.Equal(theme.Text.Secondary, miniLog.TitleStyle, "MiniLog title style should map to Text.Secondary.");
         TestAssert.Equal(theme.Focus.Title, miniLog.FocusedTitleStyle, "MiniLog focused title style should map to Focus.Title.");
@@ -241,10 +283,16 @@ internal static partial class ThemeOverridesTests
                 Secondary = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(4, 5, 6)),
                 Muted = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(7, 8, 9)),
             },
+            Border = new TeaThemeBorderTokens
+            {
+                Default = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(8, 9, 10)),
+                Focused = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(11, 12, 13)),
+            },
             Focus = new TeaThemeFocusTokens
             {
                 Ring = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(10, 11, 12)),
                 Title = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(13, 14, 15)),
+                Border = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(14, 15, 16)),
             },
             State = new TeaThemeStateTokens
             {
@@ -261,6 +309,7 @@ internal static partial class ThemeOverridesTests
         var logView = new LogView
         {
             EntryStyle = explicitStyle,
+            BorderStyleText = explicitStyle,
         };
         var markdownView = new MarkdownView
         {
@@ -280,8 +329,12 @@ internal static partial class ThemeOverridesTests
         TestAssert.Equal(theme.State.Error, badge.ErrorTextStyle, "Defaults should fill empty Badge.ErrorTextStyle.");
         TestAssert.Equal(explicitStyle, logView.EntryStyle, "Defaults should not overwrite explicit LogView.EntryStyle.");
         TestAssert.Equal(theme.Text.Secondary, logView.TitleStyle, "Defaults should fill empty LogView.TitleStyle.");
+        TestAssert.Equal(explicitStyle, logView.BorderStyleText, "Defaults should not overwrite explicit LogView.BorderStyleText.");
+        TestAssert.Equal(theme.Border.Focused.Merge(theme.Focus.Border), logView.FocusedBorderStyleText, "Defaults should fill empty LogView.FocusedBorderStyleText.");
         TestAssert.Equal(explicitStyle, markdownView.ContentStyle, "Defaults should not overwrite explicit MarkdownView.ContentStyle.");
         TestAssert.Equal(theme.Focus.Title, markdownView.FocusedTitleStyle, "Defaults should fill empty MarkdownView.FocusedTitleStyle.");
+        TestAssert.Equal(theme.Border.Default, markdownView.BorderStyleText, "Defaults should fill empty MarkdownView.BorderStyleText.");
+        TestAssert.Equal(theme.Border.Focused.Merge(theme.Focus.Border), markdownView.FocusedBorderStyleText, "Defaults should fill empty MarkdownView.FocusedBorderStyleText.");
         TestAssert.Equal(explicitStyle, miniLog.EntryStyle, "Defaults should not overwrite explicit MiniLog.EntryStyle.");
         TestAssert.Equal(theme.Focus.Title, miniLog.FocusedTitleStyle, "Defaults should fill empty MiniLog.FocusedTitleStyle.");
 
@@ -311,10 +364,16 @@ internal static partial class ThemeOverridesTests
                 Secondary = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(111, 112, 113)),
                 Muted = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(121, 122, 123)),
             },
+            Border = new TeaThemeBorderTokens
+            {
+                Default = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(124, 125, 126)),
+                Focused = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(127, 128, 129)),
+            },
             Focus = new TeaThemeFocusTokens
             {
                 Ring = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(131, 132, 133)),
                 Title = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(141, 142, 143)),
+                Border = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(144, 145, 146)),
             },
             State = new TeaThemeStateTokens
             {
@@ -337,8 +396,12 @@ internal static partial class ThemeOverridesTests
         TestAssert.Equal(typeTheme.State.Warning, badge.WarningTextStyle, "Override defaults should fill empty Badge.WarningTextStyle.");
         TestAssert.Equal(typeTheme.Text.Primary, logView.EntryStyle, "Override apply should map LogView.EntryStyle.");
         TestAssert.Equal(typeTheme.Text.Muted, logView.PausedTitleStyle, "Override apply should map LogView.PausedTitleStyle.");
+        TestAssert.Equal(typeTheme.Border.Default, logView.BorderStyleText, "Override apply should map LogView.BorderStyleText.");
+        TestAssert.Equal(typeTheme.Border.Focused.Merge(typeTheme.Focus.Border), logView.FocusedBorderStyleText, "Override apply should map LogView focused border style.");
         TestAssert.Equal(explicitStyle, markdownView.ContentStyle, "Override defaults should not overwrite explicit MarkdownView.ContentStyle.");
         TestAssert.Equal(typeTheme.Text.Secondary, markdownView.TitleStyle, "Override defaults should fill empty MarkdownView.TitleStyle.");
+        TestAssert.Equal(typeTheme.Border.Default, markdownView.BorderStyleText, "Override defaults should fill MarkdownView.BorderStyleText.");
+        TestAssert.Equal(typeTheme.Border.Focused.Merge(typeTheme.Focus.Border), markdownView.FocusedBorderStyleText, "Override defaults should fill MarkdownView focused border style.");
         TestAssert.Equal(typeTheme.Text.Secondary, miniLog.TitleStyle, "Override apply should map MiniLog.TitleStyle.");
         TestAssert.Equal(typeTheme.Text.Primary, miniLog.EntryStyle, "Override apply should map MiniLog.EntryStyle.");
 
@@ -363,6 +426,12 @@ internal static partial class ThemeOverridesTests
             Focus = new TeaThemeFocusTokens
             {
                 Title = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(61, 62, 63)),
+                Border = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(64, 65, 66)),
+            },
+            Border = new TeaThemeBorderTokens
+            {
+                Default = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(67, 68, 69)),
+                Focused = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(70, 71, 72)),
             },
             Selection = new TeaThemeSelectionTokens
             {
@@ -391,6 +460,8 @@ internal static partial class ThemeOverridesTests
             fileExplorer.SelectedStyle,
             "FileExplorer selected style should map to merged Selection styles.");
         TestAssert.Equal(theme.Text.Muted, fileExplorer.MutedStyle, "FileExplorer muted style should map to Text.Muted.");
+        TestAssert.Equal(theme.Border.Default, fileExplorer.BorderStyleText, "FileExplorer border style should map to Border.Default.");
+        TestAssert.Equal(theme.Border.Focused.Merge(theme.Focus.Border), fileExplorer.FocusedBorderStyleText, "FileExplorer focused border style should map to focused border tokens.");
 
         TestAssert.Equal(theme.Text.Secondary, fuzzyFinder.TitleStyle, "FuzzyFinder title style should map to Text.Secondary.");
         TestAssert.Equal(theme.Focus.Title, fuzzyFinder.FocusedTitleStyle, "FuzzyFinder focused title style should map to Focus.Title.");
@@ -402,6 +473,8 @@ internal static partial class ThemeOverridesTests
             fuzzyFinder.SelectedItemStyle,
             "FuzzyFinder selected item style should map to merged Selection styles.");
         TestAssert.Equal(theme.Accent.Primary, fuzzyFinder.MatchHighlightStyle, "FuzzyFinder match style should map to Accent.Primary.");
+        TestAssert.Equal(theme.Border.Default, fuzzyFinder.BorderStyleText, "FuzzyFinder border style should map to Border.Default.");
+        TestAssert.Equal(theme.Border.Focused.Merge(theme.Focus.Border), fuzzyFinder.FocusedBorderStyleText, "FuzzyFinder focused border style should map to focused border tokens.");
 
         TestAssert.Equal(theme.Text.Secondary, toastCenter.TitleStyle, "ToastCenter title style should map to Text.Secondary.");
         TestAssert.Equal(theme.Focus.Title, toastCenter.FocusedTitleStyle, "ToastCenter focused title style should map to Focus.Title.");
@@ -416,6 +489,8 @@ internal static partial class ThemeOverridesTests
         TestAssert.Equal(theme.State.Success, toastCenter.SuccessItemStyle, "ToastCenter success style should map to State.Success.");
         TestAssert.Equal(theme.State.Warning, toastCenter.WarningItemStyle, "ToastCenter warning style should map to State.Warning.");
         TestAssert.Equal(theme.State.Error, toastCenter.ErrorItemStyle, "ToastCenter error style should map to State.Error.");
+        TestAssert.Equal(theme.Border.Default, toastCenter.BorderStyleText, "ToastCenter border style should map to Border.Default.");
+        TestAssert.Equal(theme.Border.Focused.Merge(theme.Focus.Border), toastCenter.FocusedBorderStyleText, "ToastCenter focused border style should map to focused border tokens.");
 
         return Task.CompletedTask;
     }
@@ -439,32 +514,41 @@ internal static partial class ThemeOverridesTests
             Focus = new TeaThemeFocusTokens
             {
                 Title = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(16, 17, 18)),
+                Border = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(19, 20, 21)),
+            },
+            Border = new TeaThemeBorderTokens
+            {
+                Default = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(22, 23, 24)),
+                Focused = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(25, 26, 27)),
             },
             Selection = new TeaThemeSelectionTokens
             {
-                Foreground = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(19, 20, 21)),
-                Background = TeaStyle.Empty.WithBackground(AnsiColor.Rgb(22, 23, 24)),
+                Foreground = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(28, 29, 30)),
+                Background = TeaStyle.Empty.WithBackground(AnsiColor.Rgb(31, 32, 33)),
             },
             State = new TeaThemeStateTokens
             {
-                Info = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(25, 26, 27)),
-                Success = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(28, 29, 30)),
-                Warning = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(31, 32, 33)),
-                Error = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(34, 35, 36)),
+                Info = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(34, 35, 36)),
+                Success = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(37, 38, 39)),
+                Warning = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(40, 41, 42)),
+                Error = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(43, 44, 45)),
             },
         };
 
         var fileExplorer = new FileExplorer
         {
             DirectoryStyle = explicitStyle,
+            BorderStyleText = explicitStyle,
         };
         var fuzzyFinder = new FuzzyFinder
         {
             MatchHighlightStyle = explicitStyle,
+            BorderStyleText = explicitStyle,
         };
         var toastCenter = new ToastCenter
         {
             WarningItemStyle = explicitStyle,
+            BorderStyleText = explicitStyle,
         };
 
         fileExplorer.ApplyThemeDefaults(theme);
@@ -473,10 +557,16 @@ internal static partial class ThemeOverridesTests
 
         TestAssert.Equal(explicitStyle, fileExplorer.DirectoryStyle, "Defaults should not overwrite explicit FileExplorer.DirectoryStyle.");
         TestAssert.Equal(theme.Text.Primary, fileExplorer.FileStyle, "Defaults should fill empty FileExplorer.FileStyle.");
+        TestAssert.Equal(explicitStyle, fileExplorer.BorderStyleText, "Defaults should not overwrite explicit FileExplorer.BorderStyleText.");
+        TestAssert.Equal(theme.Border.Focused.Merge(theme.Focus.Border), fileExplorer.FocusedBorderStyleText, "Defaults should fill empty FileExplorer.FocusedBorderStyleText.");
         TestAssert.Equal(explicitStyle, fuzzyFinder.MatchHighlightStyle, "Defaults should not overwrite explicit FuzzyFinder.MatchHighlightStyle.");
         TestAssert.Equal(theme.Text.Muted, fuzzyFinder.PlaceholderTextStyle, "Defaults should fill empty FuzzyFinder.PlaceholderTextStyle.");
+        TestAssert.Equal(explicitStyle, fuzzyFinder.BorderStyleText, "Defaults should not overwrite explicit FuzzyFinder.BorderStyleText.");
+        TestAssert.Equal(theme.Border.Focused.Merge(theme.Focus.Border), fuzzyFinder.FocusedBorderStyleText, "Defaults should fill empty FuzzyFinder.FocusedBorderStyleText.");
         TestAssert.Equal(explicitStyle, toastCenter.WarningItemStyle, "Defaults should not overwrite explicit ToastCenter.WarningItemStyle.");
         TestAssert.Equal(theme.State.Error, toastCenter.ErrorItemStyle, "Defaults should fill empty ToastCenter.ErrorItemStyle.");
+        TestAssert.Equal(explicitStyle, toastCenter.BorderStyleText, "Defaults should not overwrite explicit ToastCenter.BorderStyleText.");
+        TestAssert.Equal(theme.Border.Focused.Merge(theme.Focus.Border), toastCenter.FocusedBorderStyleText, "Defaults should fill empty ToastCenter.FocusedBorderStyleText.");
 
         return Task.CompletedTask;
     }
@@ -508,6 +598,12 @@ internal static partial class ThemeOverridesTests
             Focus = new TeaThemeFocusTokens
             {
                 Title = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(151, 152, 153)),
+                Border = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(154, 155, 156)),
+            },
+            Border = new TeaThemeBorderTokens
+            {
+                Default = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(157, 158, 159)),
+                Focused = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(160, 161, 162)),
             },
             Selection = new TeaThemeSelectionTokens
             {
@@ -532,10 +628,16 @@ internal static partial class ThemeOverridesTests
 
         TestAssert.Equal(typeTheme.Accent.Primary, fileExplorer.DirectoryStyle, "Override apply should map FileExplorer directory style.");
         TestAssert.Equal(typeTheme.Selection.Foreground.Merge(typeTheme.Selection.Background), fileExplorer.SelectedStyle, "Override apply should map FileExplorer selected style.");
+        TestAssert.Equal(typeTheme.Border.Default, fileExplorer.BorderStyleText, "Override apply should map FileExplorer border style.");
+        TestAssert.Equal(typeTheme.Border.Focused.Merge(typeTheme.Focus.Border), fileExplorer.FocusedBorderStyleText, "Override apply should map FileExplorer focused border style.");
         TestAssert.Equal(explicitStyle, fuzzyFinder.ListItemStyle, "Override defaults should not overwrite explicit FuzzyFinder.ListItemStyle.");
         TestAssert.Equal(typeTheme.Accent.Primary, fuzzyFinder.MatchHighlightStyle, "Override defaults should fill empty FuzzyFinder.MatchHighlightStyle.");
+        TestAssert.Equal(typeTheme.Border.Default, fuzzyFinder.BorderStyleText, "Override defaults should fill FuzzyFinder border style.");
+        TestAssert.Equal(typeTheme.Border.Focused.Merge(typeTheme.Focus.Border), fuzzyFinder.FocusedBorderStyleText, "Override defaults should fill FuzzyFinder focused border style.");
         TestAssert.Equal(typeTheme.State.Info, toastCenter.InfoItemStyle, "Override apply should map ToastCenter info style.");
         TestAssert.Equal(typeTheme.State.Warning, toastCenter.WarningItemStyle, "Override apply should map ToastCenter warning style.");
+        TestAssert.Equal(typeTheme.Border.Default, toastCenter.BorderStyleText, "Override apply should map ToastCenter border style.");
+        TestAssert.Equal(typeTheme.Border.Focused.Merge(typeTheme.Focus.Border), toastCenter.FocusedBorderStyleText, "Override apply should map ToastCenter focused border style.");
 
         return Task.CompletedTask;
     }

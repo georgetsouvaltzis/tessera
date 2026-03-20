@@ -147,6 +147,8 @@ internal static partial class ThemeOverridesTests
         TestAssert.Equal(theme.State.Warning, notifications.WarningItemStyle, "Notifications warning style should map to State.Warning.");
         TestAssert.Equal(theme.State.Error, notifications.ErrorItemStyle, "Notifications error style should map to State.Error.");
         TestAssert.Equal(theme.Text.Muted, notifications.DisabledItemStyle, "Notifications disabled style should map to Text.Muted.");
+        TestAssert.Equal(theme.Border.Default, notifications.BorderStyleText, "Notifications border style should map to Border.Default.");
+        TestAssert.Equal(theme.Border.Focused.Merge(theme.Focus.Border), notifications.FocusedBorderStyleText, "Notifications focused border style should map to focused border tokens.");
 
         return Task.CompletedTask;
     }
@@ -196,7 +198,7 @@ internal static partial class ThemeOverridesTests
         var menuBar = new MenuBar { ItemStyle = explicitStyle, BorderStyleText = explicitStyle };
         var contextMenu = new ContextMenu { ItemStyle = explicitStyle, BorderStyleText = explicitStyle };
         var commandPalette = new CommandPalette { ItemStyle = explicitStyle, BorderStyleText = explicitStyle };
-        var notifications = new Notifications { ItemStyle = explicitStyle };
+        var notifications = new Notifications { ItemStyle = explicitStyle, BorderStyleText = explicitStyle };
 
         choice.ApplyThemeDefaults(theme);
         comboBox.ApplyThemeDefaults(theme);
@@ -239,6 +241,8 @@ internal static partial class ThemeOverridesTests
         TestAssert.Equal(explicitStyle, notifications.ItemStyle, "Defaults should not overwrite explicit Notifications.ItemStyle.");
         TestAssert.Equal(theme.State.Success, notifications.SuccessItemStyle, "Defaults should fill empty Notifications.SuccessItemStyle.");
         TestAssert.Equal(theme.Text.Muted, notifications.DisabledItemStyle, "Defaults should fill empty Notifications.DisabledItemStyle.");
+        TestAssert.Equal(explicitStyle, notifications.BorderStyleText, "Defaults should not overwrite explicit Notifications.BorderStyleText.");
+        TestAssert.Equal(theme.Border.Focused.Merge(theme.Focus.Border), notifications.FocusedBorderStyleText, "Defaults should fill empty Notifications.FocusedBorderStyleText.");
 
         return Task.CompletedTask;
     }
@@ -330,6 +334,8 @@ internal static partial class ThemeOverridesTests
         TestAssert.Equal(typeTheme.Border.Focused.Merge(typeTheme.Focus.Border), commandPalette.FocusedBorderStyleText, "Override defaults should map CommandPalette focused border styles.");
         TestAssert.Equal(typeTheme.State.Warning, notifications.WarningItemStyle, "Override apply should map Notifications warning style.");
         TestAssert.Equal(typeTheme.Text.Muted, notifications.DisabledItemStyle, "Override apply should map Notifications disabled style.");
+        TestAssert.Equal(typeTheme.Border.Default, notifications.BorderStyleText, "Override apply should map Notifications border styles.");
+        TestAssert.Equal(typeTheme.Border.Focused.Merge(typeTheme.Focus.Border), notifications.FocusedBorderStyleText, "Override apply should map Notifications focused border styles.");
 
         return Task.CompletedTask;
     }
