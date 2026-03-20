@@ -14,6 +14,8 @@ public sealed partial class DataGrid : Control
     private readonly List<IReadOnlyList<string>> _rows = [];
     private int _selectedRowIndex;
     private int _selectedColumnIndex;
+    private int _hoveredRowIndex = -1;
+    private int _hoveredColumnIndex = -1;
     private int _scrollOffset;
     private int _sortColumnIndex = -1;
     private bool _sortDescending;
@@ -76,6 +78,16 @@ public sealed partial class DataGrid : Control
     /// Gets or sets style merged into the selected cell.
     /// </summary>
     public TeaStyle SelectedCellStyle { get; set; } = TeaStyle.Empty;
+
+    /// <summary>
+    /// Gets or sets style merged into the hovered row.
+    /// </summary>
+    public TeaStyle HoveredRowStyle { get; set; } = TeaStyle.Empty;
+
+    /// <summary>
+    /// Gets or sets style merged into the hovered cell.
+    /// </summary>
+    public TeaStyle HoveredCellStyle { get; set; } = TeaStyle.Empty;
 
     /// <summary>
     /// Gets or sets style merged into muted rows.
@@ -215,12 +227,14 @@ public sealed partial class DataGrid : Control
         if (_columns.Count == 0)
         {
             _selectedColumnIndex = 0;
+            _hoveredColumnIndex = -1;
             _sortColumnIndex = -1;
             _sortDescending = false;
         }
         else
         {
             _selectedColumnIndex = Math.Clamp(_selectedColumnIndex, 0, _columns.Count - 1);
+            _hoveredColumnIndex = Math.Clamp(_hoveredColumnIndex, -1, _columns.Count - 1);
             if (_sortColumnIndex < 0 || _sortColumnIndex >= _columns.Count)
             {
                 _sortColumnIndex = -1;
@@ -254,6 +268,7 @@ public sealed partial class DataGrid : Control
         }
 
         _selectedRowIndex = _rows.Count == 0 ? 0 : Math.Clamp(_selectedRowIndex, 0, _rows.Count - 1);
+        _hoveredRowIndex = Math.Clamp(_hoveredRowIndex, -1, _rows.Count - 1);
         _scrollOffset = Math.Clamp(_scrollOffset, 0, Math.Max(0, _rows.Count - 1));
     }
 
@@ -401,25 +416,44 @@ public sealed partial class DataGrid : Control
         }
 
         _lastViewportRowCount = ResolveVisibleRowCapacity(content.Height);
+        var inside = content.Contains(pointer.X, pointer.Y);
+        var changed = false;
+
+        if (!inside && pointer.Kind is PointerEventKind.Motion or PointerEventKind.Press)
+        {
+            changed |= SetHoveredCell(-1, -1);
+        }
+
+        if (pointer.Kind == PointerEventKind.Motion)
+        {
+            if (!inside)
+            {
+                return changed;
+            }
+
+            var hoveredColumn = ResolveHoveredColumnIndex(pointer.X, content);
+            var hoveredRow = ResolveHoveredRowIndex(pointer.Y, content);
+            return changed | SetHoveredCell(hoveredRow, hoveredColumn);
+        }
 
         if (pointer.Kind == PointerEventKind.Wheel)
         {
             if (pointer.Button == PointerButton.WheelDown)
             {
-                return SetSelectedCell(_selectedRowIndex + 1, _selectedColumnIndex);
+                return changed | SetSelectedCell(_selectedRowIndex + 1, _selectedColumnIndex);
             }
 
             if (pointer.Button == PointerButton.WheelUp)
             {
-                return SetSelectedCell(_selectedRowIndex - 1, _selectedColumnIndex);
+                return changed | SetSelectedCell(_selectedRowIndex - 1, _selectedColumnIndex);
             }
 
-            return false;
+            return changed;
         }
 
-        if (pointer.Kind != PointerEventKind.Press || pointer.Button != PointerButton.Left || !content.Contains(pointer.X, pointer.Y))
+        if (pointer.Kind != PointerEventKind.Press || pointer.Button != PointerButton.Left || !inside)
         {
-            return Handle(message);
+            return changed || Handle(message);
         }
 
         RequestFocus();
@@ -433,14 +467,16 @@ public sealed partial class DataGrid : Control
         var columnIndex = HitTestColumn(pointer.X, content.X, widths, separatorWidth);
         if (columnIndex < 0)
         {
+            SetHoveredCell(-1, -1);
             return true;
         }
 
         if (ShowHeader && pointer.Y == content.Y)
         {
+            changed |= SetHoveredCell(-1, columnIndex);
             var selectionChanged = SetSelectedCell(_selectedRowIndex, columnIndex);
             var sortChanged = !IsReadOnly && SortByColumn(columnIndex);
-            return selectionChanged || sortChanged;
+            return changed || selectionChanged || sortChanged;
         }
 
         var firstRowY = content.Y + (ShowHeader ? 1 : 0);
@@ -451,7 +487,8 @@ public sealed partial class DataGrid : Control
 
         EnsureSelectionVisible(_lastViewportRowCount);
         var rowIndex = _scrollOffset + (pointer.Y - firstRowY);
-        return SetSelectedCell(rowIndex, columnIndex);
+        changed |= SetHoveredCell(rowIndex, columnIndex);
+        return changed | SetSelectedCell(rowIndex, columnIndex);
     }
 
     private DataGridSortDirection ResolveSortDirection(int columnIndex)
@@ -486,6 +523,45 @@ public sealed partial class DataGrid : Control
         _selectedRowIndex = normalizedRow;
         _selectedColumnIndex = normalizedColumn;
         EnsureSelectionVisible(_lastViewportRowCount);
+        return true;
+    }
+
+    private int ResolveHoveredRowIndex(int pointerY, Rect content)
+    {
+        var firstRowY = content.Y + (ShowHeader ? 1 : 0);
+        if (pointerY < firstRowY || _rows.Count == 0)
+        {
+            return -1;
+        }
+
+        EnsureSelectionVisible(_lastViewportRowCount);
+        var rowIndex = _scrollOffset + (pointerY - firstRowY);
+        return rowIndex >= 0 && rowIndex < _rows.Count
+            ? rowIndex
+            : -1;
+    }
+
+    private int ResolveHoveredColumnIndex(int pointerX, Rect content)
+    {
+        if (_columns.Count == 0)
+        {
+            return -1;
+        }
+
+        var separatorWidth = ResolveColumnSeparatorWidth();
+        var widths = ResolveColumnWidths(content.Width, separatorWidth);
+        return HitTestColumn(pointerX, content.X, widths, separatorWidth);
+    }
+
+    private bool SetHoveredCell(int rowIndex, int columnIndex)
+    {
+        if (_hoveredRowIndex == rowIndex && _hoveredColumnIndex == columnIndex)
+        {
+            return false;
+        }
+
+        _hoveredRowIndex = rowIndex;
+        _hoveredColumnIndex = columnIndex;
         return true;
     }
 

@@ -11,6 +11,7 @@ namespace TeaSharp.Controls;
 public sealed class RadioGroup : Control
 {
     private readonly List<string> _items = [];
+    private int _hoveredIndex = -1;
 
     public event EventHandler<SelectionChangedEventArgs>? SelectionChanged;
 
@@ -75,6 +76,15 @@ public sealed class RadioGroup : Control
     } = TeaStyle.Empty;
 
     /// <summary>
+    /// Gets or sets the style merged into hovered rows.
+    /// </summary>
+    public TeaStyle HoveredItemStyle
+    {
+        get;
+        set;
+    } = TeaStyle.Empty;
+
+    /// <summary>
     /// Gets or sets the style merged when the control is disabled.
     /// </summary>
     public TeaStyle DisabledItemStyle
@@ -117,6 +127,8 @@ public sealed class RadioGroup : Control
         {
             SelectedIndex = Math.Max(0, _items.Count - 1);
         }
+
+        _hoveredIndex = Math.Clamp(_hoveredIndex, -1, _items.Count - 1);
     }
 
     public override bool Handle(Message message)
@@ -151,6 +163,55 @@ public sealed class RadioGroup : Control
         return changed;
     }
 
+    public override bool Handle(Message message, Rect bounds)
+    {
+        if (IsDisabled || IsReadOnly || _items.Count == 0 || message is not PointerInput pointer || bounds.IsEmpty)
+        {
+            return Handle(message);
+        }
+
+        var content = bounds.Inset(1, 1);
+        if (content.IsEmpty)
+        {
+            return Handle(message);
+        }
+
+        var inside = content.Contains(pointer.X, pointer.Y);
+        if (!inside)
+        {
+            if (pointer.Kind is PointerEventKind.Motion or PointerEventKind.Press)
+            {
+                return SetHoveredIndex(-1);
+            }
+
+            return false;
+        }
+
+        var hovered = ResolveHoveredIndex(pointer.Y, content);
+        if (pointer.Kind == PointerEventKind.Motion)
+        {
+            return SetHoveredIndex(hovered);
+        }
+
+        if (pointer.Kind != PointerEventKind.Press || pointer.Button != PointerButton.Left || hovered < 0)
+        {
+            return false;
+        }
+
+        RequestFocus();
+        var changed = SetHoveredIndex(hovered);
+        if (SelectedIndex == hovered)
+        {
+            return changed;
+        }
+
+        var previousIndex = SelectedIndex;
+        var previousItem = SelectedItem;
+        SelectedIndex = hovered;
+        SelectionChanged?.Invoke(this, new SelectionChangedEventArgs(previousIndex, SelectedIndex, previousItem, SelectedItem));
+        return true;
+    }
+
     public override void Render(Canvas canvas, Rect rect)
     {
         canvas.DrawBox(rect, RenderTitle());
@@ -165,7 +226,7 @@ public sealed class RadioGroup : Control
         {
             var marker = row == SelectedIndex ? SelectedMarker : UnselectedMarker;
             var line = $"{marker} {_items[row]}";
-            canvas.WriteText(content.X, content.Y + row, ApplyStyle(line, ResolveItemStyle(row)), content.Width);
+            canvas.WriteText(content.X, content.Y + row, ApplyStyle(line, ResolveItemStyle(row, row == _hoveredIndex)), content.Width);
         }
     }
 
@@ -201,12 +262,17 @@ public sealed class RadioGroup : Control
         return ApplyStyle(FormatTitleText(), IsFocused ? FocusedTitleStyle : TitleStyle);
     }
 
-    private TeaStyle ResolveItemStyle(int row)
+    private TeaStyle ResolveItemStyle(int row, bool hovered)
     {
         var style = ItemStyle;
         if (row == SelectedIndex)
         {
             style = style.Merge(SelectedItemStyle);
+        }
+
+        if (hovered)
+        {
+            style = style.Merge(HoveredItemStyle);
         }
 
         if (IsDisabled)
@@ -222,5 +288,27 @@ public sealed class RadioGroup : Control
         return string.IsNullOrEmpty(text) || style.IsEmpty
             ? text
             : style.Render(text);
+    }
+
+    private int ResolveHoveredIndex(int pointerY, Rect content)
+    {
+        var row = pointerY - content.Y;
+        if (row < 0 || row >= content.Height || row >= _items.Count)
+        {
+            return -1;
+        }
+
+        return row;
+    }
+
+    private bool SetHoveredIndex(int index)
+    {
+        if (_hoveredIndex == index)
+        {
+            return false;
+        }
+
+        _hoveredIndex = index;
+        return true;
     }
 }

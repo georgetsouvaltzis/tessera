@@ -265,9 +265,19 @@ public sealed partial class DataGrid
             style = style.Merge(SelectedRowStyle);
         }
 
+        if (rowIndex == _hoveredRowIndex)
+        {
+            style = style.Merge(HoveredRowStyle);
+        }
+
         if (rowIndex == _selectedRowIndex && columnIndex == _selectedColumnIndex)
         {
             style = style.Merge(SelectedCellStyle);
+        }
+
+        if (rowIndex == _hoveredRowIndex && columnIndex == _hoveredColumnIndex)
+        {
+            style = style.Merge(HoveredCellStyle);
         }
 
         if (IsDisabled)
