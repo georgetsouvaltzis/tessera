@@ -67,7 +67,7 @@ internal sealed class CanvasGraphemeBuffer
 
         while (index < text.Length)
         {
-            if (CanvasAnsiScanner.TryReadEscape(text, index, out var ansiSequence, out var consumed))
+            if (CanvasAnsiScanner.TryReadEscape(text, index, out var consumed))
             {
                 sawAnsi = true;
                 if (lastColumn >= 0)
@@ -75,12 +75,12 @@ internal sealed class CanvasGraphemeBuffer
                     var previousIndex = (y * _width) + lastColumn;
                     if (_cells[previousIndex] is string previous)
                     {
-                        _cells[previousIndex] = previous + ansiSequence;
+                        _cells[previousIndex] = ConcatSlice(previous, text, index, consumed);
                     }
                 }
                 else
                 {
-                    pendingZeroWidth += ansiSequence;
+                    pendingZeroWidth = ConcatSlice(pendingZeroWidth, text, index, consumed);
                 }
 
                 index += consumed;
@@ -103,12 +103,12 @@ internal sealed class CanvasGraphemeBuffer
                     var previousIndex = (y * _width) + lastColumn;
                     if (_cells[previousIndex] is string previous)
                     {
-                        _cells[previousIndex] = previous + element;
+                        _cells[previousIndex] = string.Concat(previous, element);
                     }
                 }
                 else
                 {
-                    pendingZeroWidth += element;
+                    pendingZeroWidth = string.Concat(pendingZeroWidth, element);
                 }
 
                 continue;
@@ -124,7 +124,9 @@ internal sealed class CanvasGraphemeBuffer
             {
                 if (elementWidth == 1 || cx + 1 < _width)
                 {
-                    var value = pendingZeroWidth.Length == 0 ? element : pendingZeroWidth + element;
+                    var value = pendingZeroWidth.Length == 0
+                        ? element
+                        : string.Concat(pendingZeroWidth, element);
                     pendingZeroWidth = string.Empty;
                     SetCell(cx, y, value, elementWidth);
                     lastColumn = cx;
@@ -151,12 +153,12 @@ internal sealed class CanvasGraphemeBuffer
                 var previousIndex = (y * _width) + lastColumn;
                 if (_cells[previousIndex] is string previous && !previous.EndsWith("\u001b[0m", StringComparison.Ordinal))
                 {
-                    _cells[previousIndex] = previous + "\u001b[0m";
+                    _cells[previousIndex] = string.Concat(previous, "\u001b[0m");
                 }
             }
             else
             {
-                pendingZeroWidth += "\u001b[0m";
+                pendingZeroWidth = string.Concat(pendingZeroWidth, "\u001b[0m");
             }
         }
 
@@ -165,7 +167,7 @@ internal sealed class CanvasGraphemeBuffer
             var previousIndex = (y * _width) + lastColumn;
             if (_cells[previousIndex] is string previous)
             {
-                _cells[previousIndex] = previous + pendingZeroWidth;
+                _cells[previousIndex] = string.Concat(previous, pendingZeroWidth);
             }
         }
     }
@@ -253,5 +255,24 @@ internal sealed class CanvasGraphemeBuffer
 
         _cells[index] = null;
         _continuations[index] = false;
+    }
+
+    private static string ConcatSlice(string prefix, string source, int start, int length)
+    {
+        if (length <= 0)
+        {
+            return prefix;
+        }
+
+        if (prefix.Length == 0)
+        {
+            return source.Substring(start, length);
+        }
+
+        return string.Create(prefix.Length + length, (prefix, source, start, length), static (destination, state) =>
+        {
+            state.prefix.AsSpan().CopyTo(destination);
+            state.source.AsSpan(state.start, state.length).CopyTo(destination[state.prefix.Length..]);
+        });
     }
 }

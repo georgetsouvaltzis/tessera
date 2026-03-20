@@ -2,9 +2,8 @@ namespace TeaSharp.Components.Primitives.Internal;
 
 internal static class CanvasAnsiScanner
 {
-    public static bool TryReadEscape(string text, int start, out string sequence, out int consumed)
+    public static bool TryReadEscape(string text, int start, out int consumed)
     {
-        sequence = string.Empty;
         consumed = 0;
         if (start < 0 || start >= text.Length || text[start] != '\u001b' || start + 1 >= text.Length)
         {
@@ -23,7 +22,6 @@ internal static class CanvasAnsiScanner
             if (ch >= '@' && ch <= '~')
             {
                 consumed = (cursor - start) + 1;
-                sequence = text.Substring(start, consumed);
                 return true;
             }
 
@@ -36,5 +34,17 @@ internal static class CanvasAnsiScanner
         }
 
         return false;
+    }
+
+    public static bool TryReadEscape(string text, int start, out string sequence, out int consumed)
+    {
+        if (!TryReadEscape(text, start, out consumed))
+        {
+            sequence = string.Empty;
+            return false;
+        }
+
+        sequence = text.Substring(start, consumed);
+        return true;
     }
 }

@@ -355,9 +355,10 @@ public sealed class Canvas
         Set(clipped.X, clipped.Bottom - 1, bottomLeft);
         Set(clipped.Right - 1, clipped.Bottom - 1, bottomRight);
 
-        if (!string.IsNullOrWhiteSpace(title))
+        var titleSegment = FormatTitleSegment(title);
+        if (titleSegment is not null)
         {
-            WriteText(clipped.X + 2, clipped.Y, $" {title.Trim()} ", clipped.Width - 4);
+            WriteText(clipped.X + 2, clipped.Y, titleSegment, clipped.Width - 4);
         }
     }
 
@@ -394,27 +395,34 @@ public sealed class Canvas
             BorderStyle.Ascii => ('-', '|', '+', '+', '+', '+'),
             _ => ('─', '│', '┌', '┐', '└', '┘'),
         };
+        var styledHorizontal = RenderStyledGlyph(borderStyleText, horizontal);
+        var styledVertical = RenderStyledGlyph(borderStyleText, vertical);
+        var styledTopLeft = RenderStyledGlyph(borderStyleText, topLeft);
+        var styledTopRight = RenderStyledGlyph(borderStyleText, topRight);
+        var styledBottomLeft = RenderStyledGlyph(borderStyleText, bottomLeft);
+        var styledBottomRight = RenderStyledGlyph(borderStyleText, bottomRight);
 
         for (var x = clipped.X + 1; x < clipped.Right - 1; x++)
         {
-            WriteStyledCell(x, clipped.Y, horizontal, borderStyleText);
-            WriteStyledCell(x, clipped.Bottom - 1, horizontal, borderStyleText);
+            WriteText(x, clipped.Y, styledHorizontal, 1);
+            WriteText(x, clipped.Bottom - 1, styledHorizontal, 1);
         }
 
         for (var y = clipped.Y + 1; y < clipped.Bottom - 1; y++)
         {
-            WriteStyledCell(clipped.X, y, vertical, borderStyleText);
-            WriteStyledCell(clipped.Right - 1, y, vertical, borderStyleText);
+            WriteText(clipped.X, y, styledVertical, 1);
+            WriteText(clipped.Right - 1, y, styledVertical, 1);
         }
 
-        WriteStyledCell(clipped.X, clipped.Y, topLeft, borderStyleText);
-        WriteStyledCell(clipped.Right - 1, clipped.Y, topRight, borderStyleText);
-        WriteStyledCell(clipped.X, clipped.Bottom - 1, bottomLeft, borderStyleText);
-        WriteStyledCell(clipped.Right - 1, clipped.Bottom - 1, bottomRight, borderStyleText);
+        WriteText(clipped.X, clipped.Y, styledTopLeft, 1);
+        WriteText(clipped.Right - 1, clipped.Y, styledTopRight, 1);
+        WriteText(clipped.X, clipped.Bottom - 1, styledBottomLeft, 1);
+        WriteText(clipped.Right - 1, clipped.Bottom - 1, styledBottomRight, 1);
 
-        if (!string.IsNullOrWhiteSpace(title))
+        var titleSegment = FormatTitleSegment(title);
+        if (titleSegment is not null)
         {
-            WriteText(clipped.X + 2, clipped.Y, $" {title.Trim()} ", clipped.Width - 4);
+            WriteText(clipped.X + 2, clipped.Y, titleSegment, clipped.Width - 4);
         }
     }
 
@@ -444,13 +452,18 @@ public sealed class Canvas
         return sb.ToString();
     }
 
-    private void WriteStyledCell(int x, int y, char value, TeaStyle style)
+    private static string? FormatTitleSegment(string? title)
     {
-        if (x < 0 || y < 0 || x >= Width || y >= Height)
+        if (string.IsNullOrWhiteSpace(title))
         {
-            return;
+            return null;
         }
 
-        WriteText(x, y, style.Render(value.ToString()));
+        return string.Concat(" ", title.Trim(), " ");
+    }
+
+    private static string RenderStyledGlyph(TeaStyle style, char value)
+    {
+        return style.Render(string.Create(1, value, static (buffer, state) => buffer[0] = state));
     }
 }

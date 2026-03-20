@@ -9,10 +9,13 @@ internal static class ControlTextLayout
 {
     public static string[] SplitLines(string text)
     {
-        return (text ?? string.Empty)
-            .Replace("\r\n", "\n", StringComparison.Ordinal)
-            .Replace('\r', '\n')
-            .Split('\n');
+        var value = text ?? string.Empty;
+        if (value.IndexOf('\r', StringComparison.Ordinal) < 0)
+        {
+            return value.Split('\n');
+        }
+
+        return NormalizeCarriageReturns(value).Split('\n');
     }
 
     public static int MeasureDisplayWidth(string text)
@@ -22,12 +25,17 @@ internal static class ControlTextLayout
             return 0;
         }
 
+        if (IsPlainAscii(text))
+        {
+            return text.Length;
+        }
+
         var width = 0;
         var enumerator = StringInfo.GetTextElementEnumerator(text);
         while (enumerator.MoveNext())
         {
             var element = enumerator.GetTextElement();
-            if (CanvasAnsiScanner.TryReadEscape(element, 0, out _, out _))
+            if (CanvasAnsiScanner.TryReadEscape(element, 0, out _))
             {
                 continue;
             }
@@ -61,5 +69,42 @@ internal static class ControlTextLayout
     public static string ApplyPressedStyle(string text)
     {
         return TeaStyle.Empty.WithInverse().WithBold().Render(text);
+    }
+
+    private static bool IsPlainAscii(string text)
+    {
+        for (var index = 0; index < text.Length; index++)
+        {
+            var value = text[index];
+            if (value < '\u0020' || value > '\u007e')
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    private static string NormalizeCarriageReturns(string text)
+    {
+        var builder = new System.Text.StringBuilder(text.Length);
+        for (var index = 0; index < text.Length; index++)
+        {
+            var value = text[index];
+            if (value == '\r')
+            {
+                if (index + 1 < text.Length && text[index + 1] == '\n')
+                {
+                    continue;
+                }
+
+                builder.Append('\n');
+                continue;
+            }
+
+            builder.Append(value);
+        }
+
+        return builder.ToString();
     }
 }
