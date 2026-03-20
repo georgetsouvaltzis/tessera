@@ -25,6 +25,11 @@ internal static partial class ThemeOverridesTests
         yield return new TestCase(
             "ThemeOverrides_OverrideOverloads_ResolveExpectedTokens_ForDialogModalAndCharts",
             OverrideOverloads_ResolveExpectedTokens_ForDialogModalAndCharts);
+
+        foreach (var testCase in FlowWave2Cases())
+        {
+            yield return testCase;
+        }
     }
 
     private static Task ApplyHelpers_MapExpectedTokens_ForTimelineAndStepper()

@@ -22,6 +22,8 @@ internal static class BorderedControlParityPolicyTests
         typeof(DiffView),
         typeof(FileExplorer),
         typeof(FuzzyFinder),
+        typeof(GroupedListView<,>),
+        typeof(KanbanBoard),
         typeof(KeyValueList),
         typeof(Label),
         typeof(ListView<>),
@@ -40,6 +42,7 @@ internal static class BorderedControlParityPolicyTests
         typeof(Slider),
         typeof(Sparkline),
         typeof(Spinner),
+        typeof(TagInput),
         typeof(Table),
         typeof(TextArea),
         typeof(TextInput),
@@ -50,6 +53,7 @@ internal static class BorderedControlParityPolicyTests
         typeof(TreeTable),
         typeof(TreeView),
         typeof(ValidationSummary),
+        typeof(VirtualizedListView<>),
     ];
 
     public static IEnumerable<TestCase> Cases()
