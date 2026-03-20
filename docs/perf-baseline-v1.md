@@ -52,6 +52,25 @@ Spotlight before/after deltas (compared to prior full snapshot in this doc):
 Iteration caveat:
 - spotlight measurements came from targeted scenario runs; use a same-pass full sweep for final release gate decisions
 
+## Overlay Optimization Spotlight (2026-03-20)
+
+Commits:
+- `9d2bc23`
+- `3487356`
+
+Command:
+- `scripts/run_benchmarks_v1.sh scenario "*OverlayStress*"`
+
+Targeted before/after evidence:
+
+| Mode | Mean (before -> after) | Mean delta | Alloc (before -> after) | Alloc delta |
+| --- | --- | --- | --- | --- |
+| Render-only | `489.9 us -> 428.8 us` | `-12.47%` | `115.71 KB -> 61.13 KB` | `-47.17%` |
+| Materialize | `578.7 us -> 495.4 us` | `-14.40%` | `1508.84 KB -> 1454.25 KB` | `-3.62%` |
+
+Note:
+- this is targeted scenario evidence for `OverlayStress`; it does not replace full-suite gate runs
+
 ## Iteration Log (Template)
 
 Metadata:
