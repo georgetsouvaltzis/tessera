@@ -94,7 +94,7 @@ V1 theming is semantic-token based with override hierarchy:
 - override precedence: global theme -> control type -> control instance -> state
 - `TeaThemeControlExtensions` is split by domain (`Basic`, `InputValue`, `Navigation`, `NavigationOverlay`, `NavigationPrimitives`, `DataAndFlow`, `ExplorerAndFeedback`, `RenderingTextUtilities`, `ModalAndCharts`)
 - mapped input/value controls include `TextInput`, `TextArea`, `Toggle`, `Slider`, `Spinner`, `ProgressBar`, `NumberInput`, `DatePicker`, `TimePicker`
-- mapped basic controls include `Button`, `ListView<T>`, `StatusBar`, `TextInput`, `Table`, `Tabs`
+- mapped basic controls include `Label`, `Button`, `ListView<T>`, `StatusBar`, `TextInput`, `Table`, `Tabs`
 - mapped navigation controls include `Breadcrumb`, `Paginator`, `Toolbar`, `CommandBar`, `SearchBox`
 - mapped navigation/overlay controls include `Choice`, `ComboBox`, `TreeView`, `MenuBar`, `ContextMenu`, `CommandPalette`, `Notifications`, `SearchBox`
 - `Choice` and `ComboBox` map `BorderStyleText`/`FocusedBorderStyleText` to semantic border/focus tokens by default
@@ -102,6 +102,7 @@ V1 theming is semantic-token based with override hierarchy:
 - `Table` and `TreeView` map `BorderStyleText`/`FocusedBorderStyleText` to semantic border/focus tokens by default
 - `TreeView` marker customization is explicit through `TreeViewGlyphSet`
 - `TextArea`, `NumberInput`, `DatePicker`, and `TimePicker` map `BorderStyleText`/`FocusedBorderStyleText` to semantic border/focus tokens by default
+- `Toggle`, `Slider`, `Spinner`, and `ProgressBar` map `BorderStyleText`/`FocusedBorderStyleText` to semantic border/focus tokens by default
 - `MenuBar`, `ContextMenu`, and `CommandPalette` map border text hooks and expose typed glyph-set customization
 - `Notifications`, `LogView`, and `MarkdownView` map `BorderStyleText`/`FocusedBorderStyleText` to semantic border/focus tokens by default
 - `DiffView`, `PropertyGrid`, `FileExplorer`, `FuzzyFinder`, and `ToastCenter` map `BorderStyleText`/`FocusedBorderStyleText` to semantic border/focus tokens by default
@@ -109,6 +110,7 @@ V1 theming is semantic-token based with override hierarchy:
 - `TextInput` and `SearchBox` expose focus-title marker customization plus title/value/placeholder and border style hooks
 - `DataGrid` and `TreeTable` map `BorderStyleText`/`FocusedBorderStyleText` to semantic border/focus tokens by default
 - `DataGrid` and `TreeTable` expose explicit text-based visual hooks for separators and selection/sort/tree markers
+- `KeyValueList` and `Timeline` map `BorderStyleText`/`FocusedBorderStyleText` to semantic border/focus tokens by default
 - `ContextMenu` preserves focused title marker text when rendering bordered titles
 - parity rule: any new bordered public control must ship border-style hooks, token mappings, and parity regression coverage in the same change
 - mapped navigation primitive controls include `Accordion`, `MultiSelect`, `RadioGroup`
@@ -116,6 +118,7 @@ V1 theming is semantic-token based with override hierarchy:
 - mapped explorer/feedback controls include `DiffView`, `PropertyGrid`, `FileExplorer`, `FuzzyFinder`, `ToastCenter`
 - mapped rendering text utility controls include `Badge`, `LogView`, `MarkdownView`, `MiniLog`
 - mapped modal/chart summary controls include `Dialog`, `Modal`, `BarChart`, `LineChart`, `Gauge`, `StatsCard`
+- `Dialog` and `Modal` map `BorderStyleText`/`FocusedBorderStyleText` to semantic border/focus tokens by default
 
 Focus visuals must be theme-driven (for example focused border style/color), not limited to marker suffixes.
 

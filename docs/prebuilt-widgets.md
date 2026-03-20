@@ -114,6 +114,12 @@ var treeTable = new TreeTable("Name", "Value") { ColumnSeparatorText = " │ ", 
 - `Notifications`, `LogView`, and `MarkdownView` support `BorderStyleText`/`FocusedBorderStyleText` with theme token mapping.
 - `DiffView`, `PropertyGrid`, `FileExplorer`, `FuzzyFinder`, and `ToastCenter` support the same border-style hooks with theme token mapping.
 
+### Latest Border Hook Rollout (Group1 and Group2)
+
+- `Button`, `Label`, `ProgressBar`, `Toggle`, `Slider`, and `Spinner` expose `BorderStyleText`/`FocusedBorderStyleText`.
+- `Dialog`, `Modal`, `KeyValueList`, and `Timeline` expose `BorderStyleText`/`FocusedBorderStyleText`.
+- Theme defaults map all of the above to semantic border/focus tokens.
+
 ### ContextMenu Bordered Title Behavior
 
 - Bordered `ContextMenu` titles now preserve focused `FocusMarker` output by reserving width for the rendered title marker text.
@@ -132,7 +138,7 @@ var treeTable = new TreeTable("Name", "Value") { ColumnSeparatorText = " │ ", 
 
 Current shipped `TeaThemeControlExtensions` mappings include:
 
-- basic controls: `Button`, `ListView<T>`, `StatusBar`, `TextInput`, `Table`, `Tabs`
+- basic controls: `Label`, `Button`, `ListView<T>`, `StatusBar`, `TextInput`, `Table`, `Tabs`
 - input/value controls: `TextArea`, `Toggle`, `Slider`, `Spinner`, `ProgressBar`, `NumberInput`, `DatePicker`, `TimePicker`
 - navigation controls: `Breadcrumb`, `Paginator`, `Toolbar`, `CommandBar`, `SearchBox`
 - navigation primitives: `Accordion`, `MultiSelect`, `RadioGroup`
@@ -142,9 +148,11 @@ Current shipped `TeaThemeControlExtensions` mappings include:
 - navigation overlay details: `Notifications` includes border text token mapping
 - data/flow controls: `DataGrid`, `TreeTable`, `KeyValueList`, `Timeline`, `Stepper`
 - data/flow details: `DataGrid` and `TreeTable` include border text token mapping plus explicit separator/marker text APIs
+- data/flow details: `KeyValueList` and `Timeline` include border text token mapping
 - explorer/feedback controls: `DiffView`, `PropertyGrid`, `FileExplorer`, `FuzzyFinder`, `ToastCenter`
 - rendering text utilities: `Badge`, `LogView`, `MarkdownView`, `MiniLog`
 - modal/chart summary controls: `Dialog`, `Modal`, `BarChart`, `LineChart`, `Gauge`, `StatsCard`
+- modal/chart summary details: `Dialog` and `Modal` include border text token mapping
 
 ## Advanced Seams
 

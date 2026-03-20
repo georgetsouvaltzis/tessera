@@ -247,13 +247,15 @@ Bordered control parity policy:
 
 Basic controls with direct token mappings:
 
-- `Button`, `ListView<T>`, `StatusBar`, `TextInput`, `Table`, `Tabs`
+- `Label`, `Button`, `ListView<T>`, `StatusBar`, `TextInput`, `Table`, `Tabs`
+- `Label` and `Button` map `BorderStyleText` -> `Border.Default` and `FocusedBorderStyleText` -> `Border.Focused + Focus.Border`
 - `TextInput` and `Table` map `BorderStyleText` -> `Border.Default` and `FocusedBorderStyleText` -> `Border.Focused + Focus.Border`
 
 Input/value controls with direct token mappings:
 
 - `TextInput`, `TextArea`, `Toggle`, `Slider`, `Spinner`, `ProgressBar`, `NumberInput`, `DatePicker`, `TimePicker`
 - `TextInput` maps value/placeholder/focused-title styling; focus title marker is configurable through `FocusMarker` + `ShowFocusMarker`
+- `Toggle`, `Slider`, `Spinner`, and `ProgressBar` map `BorderStyleText` -> `Border.Default` and `FocusedBorderStyleText` -> `Border.Focused + Focus.Border`
 - `TextArea`, `NumberInput`, `DatePicker`, and `TimePicker` map `BorderStyleText` -> `Border.Default` and `FocusedBorderStyleText` -> `Border.Focused + Focus.Border`
 
 Navigation controls with direct token mappings:
@@ -284,6 +286,7 @@ Data/flow controls with direct token mappings:
 - `DataGrid` provides API-level text hooks for `ColumnSeparatorText`, `SortAscendingMarker`, and `SortDescendingMarker`
 - `TreeTable` maps `BorderStyleText` -> `Border.Default` and `FocusedBorderStyleText` -> `Border.Focused + Focus.Border`
 - `TreeTable` provides API-level text hooks for `ColumnSeparatorText`, row markers, and branch/leaf markers
+- `KeyValueList` and `Timeline` map `BorderStyleText` -> `Border.Default` and `FocusedBorderStyleText` -> `Border.Focused + Focus.Border`
 
 Explorer/feedback controls with direct token mappings:
 
@@ -298,6 +301,7 @@ Rendering text utility controls with direct token mappings:
 Modal/chart summary controls with direct token mappings:
 
 - `Dialog`, `Modal`, `BarChart`, `LineChart`, `Gauge`, `StatsCard`
+- `Dialog` and `Modal` map `BorderStyleText` -> `Border.Default` and `FocusedBorderStyleText` -> `Border.Focused + Focus.Border`
 
 ## Follow-up Targets
 

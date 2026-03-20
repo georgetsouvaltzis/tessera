@@ -55,6 +55,7 @@ All agents must treat this file as the source of truth for scope, sequencing, ow
   - direct token mappings landed for navigation primitives (`Accordion`, `MultiSelect`, `RadioGroup`)
   - direct token mappings landed for rendering text utilities (`Badge`, `LogView`, `MarkdownView`, `MiniLog`)
   - direct token mappings landed for modal/chart summary controls (`Dialog`, `Modal`, `BarChart`, `LineChart`, `Gauge`, `StatsCard`)
+  - bordered-control parity rollout is effectively complete for current shipped controls (including `Button`, `Label`, `ProgressBar`, `Toggle`, `Slider`, `Spinner`, `Dialog`, `Modal`, `KeyValueList`, `Timeline`)
   - control-level style hooks and theme mappings are implemented across the shipped Public V1 control surface
 - **WS-D benchmark harness status**
   - `BenchmarkSwitcher` discoverability is wired and `--list flat` lists all 6 required scenarios (`Startup`, `LogTail`, `LargeTable`, `OverlayStress`, `ResizeStorm`, `StyledHeavyOutput`)
@@ -154,7 +155,7 @@ All agents must treat this file as the source of truth for scope, sequencing, ow
 - Closed: cookbook examples for overlay glyph APIs, border overrides, dropdown/tree glyph sets, and data widget separator/marker hooks (`edf676c`, `dcdc51f`).
 - Closed: visual edge-case regression assertions for parity-sensitive rendering paths (`7caa741`).
 - Closed: overlay/input token-consistency enforcement in theme mappings (`74751e6`).
-- Closed: bordered-control parity manifest and explorer/diff border rendering coverage (`52e7574`, `91f07b9`).
+- Closed: bordered-control parity rollout for existing shipped controls (including Group1/Group2 additions) (`52e7574`, `91f07b9`, `33b22d5`, `4a3a103`, `135065e`, `98a6d7d`).
 - Remaining (forward-only): keep parity policy enforced for any new bordered control added post-freeze (must ship with `BorderStyleText`/`FocusedBorderStyleText`, token mapping, and regression coverage in the same slice).
 
 ## Parallelization Constraints

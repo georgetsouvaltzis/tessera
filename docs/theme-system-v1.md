@@ -284,11 +284,13 @@ Input/value mapping coverage includes:
 - `TextInput`, `TextArea`, `Toggle`, `Slider`, `Spinner`, `ProgressBar`, `NumberInput`, `DatePicker`, `TimePicker`
 - `TextInput` maps value/placeholder/focused-title styles; title marker remains configurable via `FocusMarker` + `ShowFocusMarker`
 - `TextInput` maps `BorderStyleText` -> `theme.Border.Default` and `FocusedBorderStyleText` -> `theme.Border.Focused.Merge(theme.Focus.Border)`
+- `Toggle`, `Slider`, `Spinner`, and `ProgressBar` map `BorderStyleText` -> `theme.Border.Default` and `FocusedBorderStyleText` -> `theme.Border.Focused.Merge(theme.Focus.Border)`
 - `TextArea`, `NumberInput`, `DatePicker`, and `TimePicker` map `BorderStyleText` -> `theme.Border.Default` and `FocusedBorderStyleText` -> `theme.Border.Focused.Merge(theme.Focus.Border)`
 
 Basic mapping coverage includes:
 
-- `Button`, `ListView<T>`, `StatusBar`, `TextInput`, `Table`, `Tabs`
+- `Label`, `Button`, `ListView<T>`, `StatusBar`, `TextInput`, `Table`, `Tabs`
+- `Label` and `Button` map `BorderStyleText` -> `theme.Border.Default` and `FocusedBorderStyleText` -> `theme.Border.Focused.Merge(theme.Focus.Border)`
 - `Table` maps `BorderStyleText` -> `theme.Border.Default` and `FocusedBorderStyleText` -> `theme.Border.Focused.Merge(theme.Focus.Border)`
 
 Navigation mapping coverage includes:
@@ -321,12 +323,14 @@ Rendering text utility mapping coverage includes:
 Modal/chart summary mapping coverage includes:
 
 - `Dialog`, `Modal`, `BarChart`, `LineChart`, `Gauge`, `StatsCard`
+- `Dialog` and `Modal` map border text hooks to semantic border/focus tokens
 
 Data/flow mapping coverage includes:
 
 - `DataGrid`, `TreeTable`, `KeyValueList`, `Timeline`, `Stepper`
 - `DataGrid` maps border text hooks and exposes `ColumnSeparatorText` plus sort marker text APIs
 - `TreeTable` maps border text hooks and exposes `ColumnSeparatorText`, row marker text APIs, and branch/leaf marker text APIs
+- `KeyValueList` and `Timeline` map border text hooks to semantic border/focus tokens
 
 Explorer/feedback mapping coverage includes:
 
@@ -338,6 +342,7 @@ Bordered control parity enforcement:
 - new bordered controls must expose `BorderStyleText` and `FocusedBorderStyleText`
 - new bordered controls must map those hooks to `theme.Border.Default` and `theme.Border.Focused.Merge(theme.Focus.Border)`
 - test enforcement is maintained through `ThemeOverridesTests.*` token-mapping suites, `VisualParityTests` edge-case coverage, and `BorderedControlParityPolicyTests.cs`
+- bordered-control parity rollout is complete for current shipped controls; policy remains forward-only for newly added controls
 
 ## V1 Rollout
 
