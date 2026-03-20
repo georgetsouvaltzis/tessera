@@ -10,6 +10,7 @@ internal static class BorderedControlParityPolicyTests
 {
     private static readonly Type[] RegisteredBorderedControls =
     [
+        typeof(AreaPlot),
         typeof(Button),
         typeof(Choice),
         typeof(ComboBox),
@@ -24,17 +25,20 @@ internal static class BorderedControlParityPolicyTests
         typeof(KeyValueList),
         typeof(Label),
         typeof(ListView<>),
+        typeof(LinePlot),
         typeof(LogView),
         typeof(MarkdownView),
         typeof(MenuBar),
         typeof(Modal),
         typeof(Notifications),
         typeof(NumberInput),
+        typeof(PlotPanel),
         typeof(ProgressBar),
         typeof(PropertyGrid),
         typeof(SearchBox),
         typeof(SearchResultsView),
         typeof(Slider),
+        typeof(Sparkline),
         typeof(Spinner),
         typeof(Table),
         typeof(TextArea),

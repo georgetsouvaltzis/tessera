@@ -1,0 +1,112 @@
+using NUnit.Framework;
+using TeaSharp.Components.Primitives;
+using TeaSharp.Components.Styling;
+using TeaSharp.Controls;
+using TeaSharp.Styles;
+
+namespace TeaSharp.Tests;
+
+[TestFixture]
+[NonParallelizable]
+public sealed class LinePlotControlTests
+{
+    [Test]
+    public void LinePlotRender_MultiSeriesLegendAndStatsRendered()
+    {
+        var cpu = new LineSeries("cpu", [12, 18, 24, 20, 16])
+        {
+            PointGlyph = '●',
+        };
+        var mem = new LineSeries("mem", [44, 42, 40, 38, 36])
+        {
+            PointGlyph = '◆',
+        };
+        var control = new LinePlot
+        {
+            Title = "Telemetry",
+            Options = new LinePlotOptions(ShowLegend: true, ShowStats: true),
+        };
+        control.SetSeries([cpu, mem]);
+
+        var output = Render(control, width: 48, height: 12);
+
+        Assert.That(output.Contains("Telemetry", StringComparison.Ordinal), Is.True);
+        Assert.That(output.Contains("min:", StringComparison.Ordinal), Is.True);
+        Assert.That(output.Contains("cpu", StringComparison.Ordinal), Is.True);
+        Assert.That(output.Contains("mem", StringComparison.Ordinal), Is.True);
+        Assert.That(output.Contains('●') || output.Contains('◆'), Is.True);
+    }
+
+    [Test]
+    public void LinePlotRender_FocusedTitleAndBorderStyleApplied()
+    {
+        var borderStyle = TeaStyle.Empty.WithForeground(AnsiColor.BrightGreen);
+        var focusedTitle = TeaStyle.Empty.WithUnderline().WithForeground(AnsiColor.BrightMagenta);
+        var control = new LinePlot
+        {
+            Title = "Focus",
+            FocusMarker = "!",
+            ShowFocusMarker = true,
+            IsFocused = true,
+            Border = BorderStyle.SingleLine,
+            FocusedTitleStyle = focusedTitle,
+            FocusedBorderStyleText = borderStyle,
+        };
+        control.SetSeries([new LineSeries("s0", [1, 2, 3, 2, 1])]);
+
+        var output = Render(control, width: 36, height: 10);
+
+        Assert.That(output.Contains(focusedTitle.Render("Focus !"), StringComparison.Ordinal), Is.True);
+        Assert.That(output.Contains(borderStyle.Render("┌"), StringComparison.Ordinal), Is.True);
+    }
+
+    [Test]
+    public void LinePlotApi_AppendRemoveAndClearSeriesBehaves()
+    {
+        var control = new LinePlot();
+        control.AddSeries(new LineSeries("a", [1, 2]));
+        control.AddSeries(new LineSeries("b", [10]));
+
+        var appended = control.AppendSample("a", 3);
+        var removed = control.RemoveSeries("b");
+        control.Clear();
+
+        Assert.That(appended, Is.True);
+        Assert.That(removed, Is.True);
+        Assert.That(control.Series.Count, Is.EqualTo(0));
+    }
+
+    [Test]
+    public void LinePlotZoomOffset_ShiftsVisibleStatsWindow()
+    {
+        var samples = Enumerable.Range(0, 20).Select(static value => (double)value).ToArray();
+        var series = new LineSeries("s0", samples);
+        var baseline = new LinePlot
+        {
+            Title = "Zoom",
+            Options = new LinePlotOptions(ShowLegend: false, ShowStats: true, Zoom: 1.0, Offset: 0),
+        };
+        baseline.SetSeries([series]);
+
+        var shifted = new LinePlot
+        {
+            Title = "Zoom",
+            Options = new LinePlotOptions(ShowLegend: false, ShowStats: true, Zoom: 2.0, Offset: 8),
+        };
+        shifted.SetSeries([new LineSeries("s0", samples)]);
+
+        var baselineOutput = Render(baseline, width: 34, height: 10);
+        var shiftedOutput = Render(shifted, width: 34, height: 10);
+
+        Assert.That(baselineOutput.Contains("min:0.0", StringComparison.Ordinal), Is.True);
+        Assert.That(shiftedOutput.Contains("min:0.0", StringComparison.Ordinal), Is.False);
+        Assert.That(shiftedOutput.Contains("max:", StringComparison.Ordinal), Is.True);
+    }
+
+    private static string Render(LinePlot control, int width, int height)
+    {
+        var canvas = new Canvas(width, height, CanvasTextMode.GraphemeAware);
+        control.Render(canvas, new Rect(0, 0, width, height));
+        return canvas.Render();
+    }
+}

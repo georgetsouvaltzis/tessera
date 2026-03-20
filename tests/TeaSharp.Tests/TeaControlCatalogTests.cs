@@ -97,6 +97,15 @@ internal static class TeaControlCatalogTests
         typeof(BarPoint),
         typeof(BarChart),
         typeof(LineChart),
+        typeof(Sparkline),
+        typeof(AreaPlot),
+        typeof(ScatterPlotPoint),
+        typeof(ScatterPlot),
+        typeof(HistogramBucket),
+        typeof(Histogram),
+        typeof(LineSeries),
+        typeof(LinePlot),
+        typeof(PlotPanel),
         typeof(Gauge),
         typeof(MiniLog),
         typeof(StatItem),
@@ -479,6 +488,30 @@ internal static class TeaControlCatalogTests
         var lineCanvas = new Canvas(24, 8);
         line.Render(lineCanvas, new Rect(0, 0, 24, 8));
 
+        var linePlot = new LinePlot
+        {
+            Title = "Multi",
+            Options = new LinePlotOptions(ShowLegend: true, ShowStats: true),
+        };
+        linePlot.SetSeries(
+        [
+            new LineSeries("cpu", [10, 20, 30, 20]),
+            new LineSeries("mem", [55, 50, 48, 47]),
+        ]);
+        linePlot.AppendSample("cpu", 25);
+        var linePlotCanvas = new Canvas(32, 10);
+        linePlot.Render(linePlotCanvas, new Rect(0, 0, 32, 10));
+
+        var panel = new PlotPanel
+        {
+            Title = "Panel",
+            Border = BorderStyle.SingleLine,
+            Options = new PlotPanelOptions(Columns: 2, Spacing: 1),
+        };
+        panel.SetPlots([linePlot, line]);
+        var panelCanvas = new Canvas(56, 14);
+        panel.Render(panelCanvas, new Rect(0, 0, 56, 14));
+
         var gauge = new Gauge
         {
             Title = "Gauge",
@@ -515,6 +548,9 @@ internal static class TeaControlCatalogTests
         TestAssert.True(line.Zoom > 1.0, "LineChart should zoom through the root wrapper.");
         TestAssert.True(line.Offset == 1, "LineChart should pan through the root wrapper.");
         TestAssert.True(lineCanvas.Render().Contains("Line", StringComparison.Ordinal), "LineChart should render through the root wrapper.");
+        TestAssert.True(linePlot.Series.Count == 2, "LinePlot should keep multi-series data through the root wrapper.");
+        TestAssert.True(linePlotCanvas.Render().Contains("cpu", StringComparison.Ordinal), "LinePlot should render legend entries through the root wrapper.");
+        TestAssert.True(panelCanvas.Render().Contains("Panel", StringComparison.Ordinal), "PlotPanel should render through the root wrapper.");
         TestAssert.True(gaugeCanvas.Render().Contains("72%", StringComparison.Ordinal), "Gauge should render labels through the root wrapper.");
         TestAssert.Equal(3, log.Entries.Count, "MiniLog should honor capacity through the root wrapper.");
         TestAssert.True(logCanvas.Render().Contains("four", StringComparison.Ordinal), "MiniLog should render appended entries through the root wrapper.");

@@ -225,6 +225,7 @@ internal static partial class ThemeOverridesTests
             },
             Accent = new TeaThemeAccentTokens
             {
+                Primary = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(30, 31, 32)),
                 Secondary = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(31, 32, 33)),
             },
             Focus = new TeaThemeFocusTokens
@@ -243,6 +244,12 @@ internal static partial class ThemeOverridesTests
         var modal = new Modal().ApplyTheme(theme);
         var barChart = new BarChart().ApplyTheme(theme);
         var lineChart = new LineChart().ApplyTheme(theme);
+        var sparkline = new Sparkline().ApplyTheme(theme);
+        var areaPlot = new AreaPlot().ApplyTheme(theme);
+        var scatterPlot = new ScatterPlot().ApplyTheme(theme);
+        var histogram = new Histogram().ApplyTheme(theme);
+        var linePlot = new LinePlot().ApplyTheme(theme);
+        var plotPanel = new PlotPanel().ApplyTheme(theme);
         var gauge = new Gauge().ApplyTheme(theme);
         var statsCard = new StatsCard().ApplyTheme(theme);
 
@@ -268,6 +275,40 @@ internal static partial class ThemeOverridesTests
         TestAssert.Equal(theme.Text.Secondary, lineChart.StatsStyle, "LineChart stats style should map to Text.Secondary.");
         TestAssert.Equal(theme.Accent.Secondary, lineChart.MetaTextStyle, "LineChart meta text style should map to Accent.Secondary.");
 
+        TestAssert.Equal(theme.Text.Secondary, sparkline.TitleStyle, "Sparkline title style should map to Text.Secondary.");
+        TestAssert.Equal(theme.Focus.Title, sparkline.FocusedTitleStyle, "Sparkline focused title style should map to Focus.Title.");
+        TestAssert.Equal(theme.Accent.Primary, sparkline.DataStyle, "Sparkline data style should map to Accent.Primary.");
+        TestAssert.Equal(theme.Border.Default, sparkline.BorderStyleText, "Sparkline border style should map to Border.Default.");
+        TestAssert.Equal(theme.Border.Focused.Merge(theme.Focus.Border), sparkline.FocusedBorderStyleText, "Sparkline focused border style should map to focused border tokens.");
+
+        TestAssert.Equal(theme.Text.Secondary, areaPlot.TitleStyle, "AreaPlot title style should map to Text.Secondary.");
+        TestAssert.Equal(theme.Focus.Title, areaPlot.FocusedTitleStyle, "AreaPlot focused title style should map to Focus.Title.");
+        TestAssert.Equal(theme.Accent.Primary, areaPlot.FillStyle, "AreaPlot fill style should map to Accent.Primary.");
+        TestAssert.Equal(theme.Accent.Secondary, areaPlot.LineStyle, "AreaPlot line style should map to Accent.Secondary.");
+        TestAssert.Equal(theme.Border.Default, areaPlot.BorderStyleText, "AreaPlot border style should map to Border.Default.");
+        TestAssert.Equal(theme.Border.Focused.Merge(theme.Focus.Border), areaPlot.FocusedBorderStyleText, "AreaPlot focused border style should map to focused border tokens.");
+
+        TestAssert.Equal(theme.Text.Secondary, scatterPlot.TitleStyle, "ScatterPlot title style should map to Text.Secondary.");
+        TestAssert.Equal(theme.Focus.Title, scatterPlot.FocusedTitleStyle, "ScatterPlot focused title style should map to Focus.Title.");
+        TestAssert.Equal(theme.Accent.Primary, scatterPlot.PointStyle, "ScatterPlot point style should map to Accent.Primary.");
+        TestAssert.Equal(theme.Text.Muted, scatterPlot.AxisStyle, "ScatterPlot axis style should map to Text.Muted.");
+        TestAssert.Equal(theme.Text.Secondary, scatterPlot.LegendStyle, "ScatterPlot legend style should map to Text.Secondary.");
+
+        TestAssert.Equal(theme.Text.Secondary, histogram.TitleStyle, "Histogram title style should map to Text.Secondary.");
+        TestAssert.Equal(theme.Focus.Title, histogram.FocusedTitleStyle, "Histogram focused title style should map to Focus.Title.");
+        TestAssert.Equal(theme.Accent.Primary, histogram.BarStyle, "Histogram bar style should map to Accent.Primary.");
+        TestAssert.Equal(theme.Text.Muted, histogram.AxisStyle, "Histogram axis style should map to Text.Muted.");
+        TestAssert.Equal(theme.Text.Secondary, histogram.LegendStyle, "Histogram legend style should map to Text.Secondary.");
+
+        TestAssert.Equal(theme.Text.Secondary, linePlot.TitleStyle, "LinePlot title style should map to Text.Secondary.");
+        TestAssert.Equal(theme.Focus.Title, linePlot.FocusedTitleStyle, "LinePlot focused title style should map to Focus.Title.");
+        TestAssert.Equal(theme.Text.Secondary, linePlot.StatsStyle, "LinePlot stats style should map to Text.Secondary.");
+        TestAssert.Equal(theme.Accent.Secondary, linePlot.LegendStyle, "LinePlot legend style should map to Accent.Secondary.");
+        TestAssert.Equal(theme.Text.Secondary, plotPanel.TitleStyle, "PlotPanel title style should map to Text.Secondary.");
+        TestAssert.Equal(theme.Focus.Title, plotPanel.FocusedTitleStyle, "PlotPanel focused title style should map to Focus.Title.");
+        TestAssert.Equal(theme.Border.Default, plotPanel.BorderStyleText, "PlotPanel border style should map to Border.Default.");
+        TestAssert.Equal(theme.Border.Focused.Merge(theme.Focus.Border), plotPanel.FocusedBorderStyleText, "PlotPanel focused border style should map to focused border tokens.");
+
         TestAssert.Equal(theme.Text.Secondary, gauge.TitleStyle, "Gauge title style should map to Text.Secondary.");
         TestAssert.Equal(theme.Focus.Title, gauge.FocusedTitleStyle, "Gauge focused title style should map to Focus.Title.");
         TestAssert.Equal(theme.Text.Primary, gauge.ValueLabelStyle, "Gauge value label style should map to Text.Primary.");
@@ -292,6 +333,7 @@ internal static partial class ThemeOverridesTests
             },
             Accent = new TeaThemeAccentTokens
             {
+                Primary = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(6, 7, 8)),
                 Secondary = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(7, 8, 9)),
             },
             Focus = new TeaThemeFocusTokens
@@ -324,6 +366,34 @@ internal static partial class ThemeOverridesTests
         {
             MetaTextStyle = explicitStyle,
         };
+        var sparkline = new Sparkline
+        {
+            DataStyle = explicitStyle,
+            BorderStyleText = explicitStyle,
+        };
+        var areaPlot = new AreaPlot
+        {
+            FillStyle = explicitStyle,
+            BorderStyleText = explicitStyle,
+        };
+        var scatterPlot = new ScatterPlot
+        {
+            PointStyle = explicitStyle,
+        };
+        var histogram = new Histogram
+        {
+            BarStyle = explicitStyle,
+        };
+        var linePlot = new LinePlot
+        {
+            LegendStyle = explicitStyle,
+            BorderStyleText = explicitStyle,
+        };
+        var plotPanel = new PlotPanel
+        {
+            TitleStyle = explicitStyle,
+            BorderStyleText = explicitStyle,
+        };
         var gauge = new Gauge
         {
             ValueLabelStyle = explicitStyle,
@@ -337,6 +407,12 @@ internal static partial class ThemeOverridesTests
         modal.ApplyThemeDefaults(theme);
         barChart.ApplyThemeDefaults(theme);
         lineChart.ApplyThemeDefaults(theme);
+        sparkline.ApplyThemeDefaults(theme);
+        areaPlot.ApplyThemeDefaults(theme);
+        scatterPlot.ApplyThemeDefaults(theme);
+        histogram.ApplyThemeDefaults(theme);
+        linePlot.ApplyThemeDefaults(theme);
+        plotPanel.ApplyThemeDefaults(theme);
         gauge.ApplyThemeDefaults(theme);
         statsCard.ApplyThemeDefaults(theme);
 
@@ -352,6 +428,26 @@ internal static partial class ThemeOverridesTests
         TestAssert.Equal(theme.Text.Secondary, barChart.LegendStyle, "Defaults should fill empty BarChart.LegendStyle.");
         TestAssert.Equal(explicitStyle, lineChart.MetaTextStyle, "Defaults should not overwrite explicit LineChart.MetaTextStyle.");
         TestAssert.Equal(theme.Text.Secondary, lineChart.StatsStyle, "Defaults should fill empty LineChart.StatsStyle.");
+        TestAssert.Equal(explicitStyle, sparkline.DataStyle, "Defaults should not overwrite explicit Sparkline.DataStyle.");
+        TestAssert.Equal(theme.Text.Secondary, sparkline.MetaStyle, "Defaults should fill empty Sparkline.MetaStyle.");
+        TestAssert.Equal(explicitStyle, sparkline.BorderStyleText, "Defaults should not overwrite explicit Sparkline.BorderStyleText.");
+        TestAssert.Equal(theme.Border.Focused.Merge(theme.Focus.Border), sparkline.FocusedBorderStyleText, "Defaults should fill empty Sparkline.FocusedBorderStyleText.");
+        TestAssert.Equal(explicitStyle, areaPlot.FillStyle, "Defaults should not overwrite explicit AreaPlot.FillStyle.");
+        TestAssert.Equal(theme.Accent.Secondary, areaPlot.LineStyle, "Defaults should fill empty AreaPlot.LineStyle.");
+        TestAssert.Equal(explicitStyle, areaPlot.BorderStyleText, "Defaults should not overwrite explicit AreaPlot.BorderStyleText.");
+        TestAssert.Equal(theme.Border.Focused.Merge(theme.Focus.Border), areaPlot.FocusedBorderStyleText, "Defaults should fill empty AreaPlot.FocusedBorderStyleText.");
+        TestAssert.Equal(explicitStyle, scatterPlot.PointStyle, "Defaults should not overwrite explicit ScatterPlot.PointStyle.");
+        TestAssert.Equal(theme.Text.Muted, scatterPlot.AxisStyle, "Defaults should fill empty ScatterPlot.AxisStyle.");
+        TestAssert.Equal(explicitStyle, histogram.BarStyle, "Defaults should not overwrite explicit Histogram.BarStyle.");
+        TestAssert.Equal(theme.Text.Muted, histogram.AxisStyle, "Defaults should fill empty Histogram.AxisStyle.");
+        TestAssert.Equal(explicitStyle, linePlot.LegendStyle, "Defaults should not overwrite explicit LinePlot.LegendStyle.");
+        TestAssert.Equal(theme.Text.Muted, linePlot.AxisStyle, "Defaults should fill empty LinePlot.AxisStyle.");
+        TestAssert.Equal(explicitStyle, linePlot.BorderStyleText, "Defaults should not overwrite explicit LinePlot.BorderStyleText.");
+        TestAssert.Equal(theme.Border.Focused.Merge(theme.Focus.Border), linePlot.FocusedBorderStyleText, "Defaults should fill empty LinePlot.FocusedBorderStyleText.");
+        TestAssert.Equal(explicitStyle, plotPanel.TitleStyle, "Defaults should not overwrite explicit PlotPanel.TitleStyle.");
+        TestAssert.Equal(theme.Text.Muted, plotPanel.EmptyTextStyle, "Defaults should fill empty PlotPanel.EmptyTextStyle.");
+        TestAssert.Equal(explicitStyle, plotPanel.BorderStyleText, "Defaults should not overwrite explicit PlotPanel.BorderStyleText.");
+        TestAssert.Equal(theme.Border.Focused.Merge(theme.Focus.Border), plotPanel.FocusedBorderStyleText, "Defaults should fill empty PlotPanel.FocusedBorderStyleText.");
         TestAssert.Equal(explicitStyle, gauge.ValueLabelStyle, "Defaults should not overwrite explicit Gauge.ValueLabelStyle.");
         TestAssert.Equal(theme.Text.Secondary, gauge.TitleStyle, "Defaults should fill empty Gauge.TitleStyle.");
         TestAssert.Equal(explicitStyle, statsCard.KeyStyle, "Defaults should not overwrite explicit StatsCard.KeyStyle.");
@@ -373,6 +469,30 @@ internal static partial class ThemeOverridesTests
         {
             StatsStyle = explicitStyle,
         };
+        var sparkline = new Sparkline
+        {
+            DataStyle = explicitStyle,
+        };
+        var areaPlot = new AreaPlot
+        {
+            FillStyle = explicitStyle,
+        };
+        var scatterPlot = new ScatterPlot
+        {
+            PointStyle = explicitStyle,
+        };
+        var histogram = new Histogram
+        {
+            BarStyle = explicitStyle,
+        };
+        var linePlot = new LinePlot
+        {
+            StatsStyle = explicitStyle,
+        };
+        var plotPanel = new PlotPanel
+        {
+            EmptyTextStyle = explicitStyle,
+        };
         var gauge = new Gauge();
         var statsCard = new StatsCard
         {
@@ -390,6 +510,7 @@ internal static partial class ThemeOverridesTests
             },
             Accent = new TeaThemeAccentTokens
             {
+                Primary = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(119, 120, 121)),
                 Secondary = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(121, 122, 123)),
             },
             Focus = new TeaThemeFocusTokens
@@ -408,6 +529,12 @@ internal static partial class ThemeOverridesTests
         overrides.SetControlType<Modal>(typeTheme);
         overrides.SetControlType<BarChart>(typeTheme);
         overrides.SetControlType<LineChart>(typeTheme);
+        overrides.SetControlType<Sparkline>(typeTheme);
+        overrides.SetControlType<AreaPlot>(typeTheme);
+        overrides.SetControlType<ScatterPlot>(typeTheme);
+        overrides.SetControlType<Histogram>(typeTheme);
+        overrides.SetControlType<LinePlot>(typeTheme);
+        overrides.SetControlType<PlotPanel>(typeTheme);
         overrides.SetControlType<Gauge>(typeTheme);
         overrides.SetControlType<StatsCard>(typeTheme);
 
@@ -415,6 +542,12 @@ internal static partial class ThemeOverridesTests
         modal.ApplyThemeDefaults(overrides, baseTheme);
         barChart.ApplyTheme(overrides, baseTheme);
         lineChart.ApplyThemeDefaults(overrides, baseTheme);
+        sparkline.ApplyThemeDefaults(overrides, baseTheme);
+        areaPlot.ApplyThemeDefaults(overrides, baseTheme);
+        scatterPlot.ApplyThemeDefaults(overrides, baseTheme);
+        histogram.ApplyThemeDefaults(overrides, baseTheme);
+        linePlot.ApplyThemeDefaults(overrides, baseTheme);
+        plotPanel.ApplyThemeDefaults(overrides, baseTheme);
         gauge.ApplyTheme(overrides, baseTheme);
         statsCard.ApplyThemeDefaults(overrides, baseTheme);
 
@@ -430,6 +563,27 @@ internal static partial class ThemeOverridesTests
         TestAssert.Equal(typeTheme.Text.Secondary, barChart.LegendStyle, "Override apply should map BarChart legend style.");
         TestAssert.Equal(explicitStyle, lineChart.StatsStyle, "Override defaults should not overwrite explicit LineChart.StatsStyle.");
         TestAssert.Equal(typeTheme.Accent.Secondary, lineChart.MetaTextStyle, "Override defaults should fill empty LineChart.MetaTextStyle.");
+        TestAssert.Equal(explicitStyle, sparkline.DataStyle, "Override defaults should not overwrite explicit Sparkline.DataStyle.");
+        TestAssert.Equal(typeTheme.Text.Secondary, sparkline.MetaStyle, "Override defaults should fill empty Sparkline.MetaStyle.");
+        TestAssert.Equal(typeTheme.Border.Default, sparkline.BorderStyleText, "Override defaults should fill empty Sparkline.BorderStyleText.");
+        TestAssert.Equal(typeTheme.Border.Focused.Merge(typeTheme.Focus.Border), sparkline.FocusedBorderStyleText, "Override defaults should fill empty Sparkline.FocusedBorderStyleText.");
+        TestAssert.Equal(explicitStyle, areaPlot.FillStyle, "Override defaults should not overwrite explicit AreaPlot.FillStyle.");
+        TestAssert.Equal(typeTheme.Accent.Secondary, areaPlot.LineStyle, "Override defaults should fill empty AreaPlot.LineStyle.");
+        TestAssert.Equal(typeTheme.Border.Default, areaPlot.BorderStyleText, "Override defaults should fill empty AreaPlot.BorderStyleText.");
+        TestAssert.Equal(typeTheme.Border.Focused.Merge(typeTheme.Focus.Border), areaPlot.FocusedBorderStyleText, "Override defaults should fill empty AreaPlot.FocusedBorderStyleText.");
+        TestAssert.Equal(explicitStyle, scatterPlot.PointStyle, "Override defaults should not overwrite explicit ScatterPlot.PointStyle.");
+        TestAssert.Equal(typeTheme.Text.Muted, scatterPlot.AxisStyle, "Override defaults should fill empty ScatterPlot.AxisStyle.");
+        TestAssert.Equal(typeTheme.Text.Secondary, scatterPlot.LegendStyle, "Override defaults should fill empty ScatterPlot.LegendStyle.");
+        TestAssert.Equal(explicitStyle, histogram.BarStyle, "Override defaults should not overwrite explicit Histogram.BarStyle.");
+        TestAssert.Equal(typeTheme.Text.Muted, histogram.AxisStyle, "Override defaults should fill empty Histogram.AxisStyle.");
+        TestAssert.Equal(explicitStyle, linePlot.StatsStyle, "Override defaults should not overwrite explicit LinePlot.StatsStyle.");
+        TestAssert.Equal(typeTheme.Accent.Secondary, linePlot.LegendStyle, "Override defaults should fill empty LinePlot.LegendStyle.");
+        TestAssert.Equal(typeTheme.Border.Default, linePlot.BorderStyleText, "Override defaults should fill empty LinePlot.BorderStyleText.");
+        TestAssert.Equal(typeTheme.Border.Focused.Merge(typeTheme.Focus.Border), linePlot.FocusedBorderStyleText, "Override defaults should fill empty LinePlot.FocusedBorderStyleText.");
+        TestAssert.Equal(typeTheme.Text.Secondary, plotPanel.TitleStyle, "Override defaults should fill empty PlotPanel.TitleStyle.");
+        TestAssert.Equal(explicitStyle, plotPanel.EmptyTextStyle, "Override defaults should not overwrite explicit PlotPanel.EmptyTextStyle.");
+        TestAssert.Equal(typeTheme.Border.Default, plotPanel.BorderStyleText, "Override defaults should fill empty PlotPanel.BorderStyleText.");
+        TestAssert.Equal(typeTheme.Border.Focused.Merge(typeTheme.Focus.Border), plotPanel.FocusedBorderStyleText, "Override defaults should fill empty PlotPanel.FocusedBorderStyleText.");
         TestAssert.Equal(typeTheme.Text.Primary, gauge.ValueLabelStyle, "Override apply should map Gauge value label style.");
         TestAssert.Equal(explicitStyle, statsCard.ValueStyle, "Override defaults should not overwrite explicit StatsCard.ValueStyle.");
         TestAssert.Equal(typeTheme.Text.Secondary, statsCard.KeyStyle, "Override defaults should fill empty StatsCard.KeyStyle.");
