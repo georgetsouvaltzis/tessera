@@ -561,7 +561,8 @@ internal static class RendererBehaviorTests
     private static async Task FontSpec_EmitsOsc50WhenChanged()
     {
         // Arrange
-        await using var renderer = new AnsiDiffRenderer();
+        await using var renderer = new AnsiDiffRenderer(
+            new TerminalCapabilityProfile(SupportsOsc50FontRequests: true, Source: "font-enabled"));
         await using var output = new MemoryStream();
         await renderer.InitializeAsync(output, CancellationToken.None);
 
@@ -600,7 +601,8 @@ internal static class RendererBehaviorTests
     private static async Task FontSpec_NullIsNoOpAndSanitizesUnsafeChars()
     {
         // Arrange
-        await using var renderer = new AnsiDiffRenderer();
+        await using var renderer = new AnsiDiffRenderer(
+            new TerminalCapabilityProfile(SupportsOsc50FontRequests: true, Source: "font-enabled"));
         await using var output = new MemoryStream();
         await renderer.InitializeAsync(output, CancellationToken.None);
         renderer.Render(ScreenOutput.From("initial"));
@@ -626,7 +628,7 @@ internal static class RendererBehaviorTests
     private static async Task FontSpec_CapabilityDisabled_DoesNotEmitOsc50()
     {
         await using var renderer = new AnsiDiffRenderer(
-            new TerminalCapabilityProfile(Osc50FontControl: false, Source: "font-disabled"));
+            new TerminalCapabilityProfile(SupportsOsc50FontRequests: false, Source: "font-disabled"));
         await using var output = new MemoryStream();
         await renderer.InitializeAsync(output, CancellationToken.None);
 
@@ -645,7 +647,8 @@ internal static class RendererBehaviorTests
 
     private static async Task StructuredFontRequest_ComposesOsc50()
     {
-        await using var renderer = new AnsiDiffRenderer();
+        await using var renderer = new AnsiDiffRenderer(
+            new TerminalCapabilityProfile(SupportsOsc50FontRequests: true, Source: "font-enabled"));
         await using var output = new MemoryStream();
         await renderer.InitializeAsync(output, CancellationToken.None);
 
@@ -667,8 +670,8 @@ internal static class RendererBehaviorTests
     {
         await using var renderer = new AnsiDiffRenderer(
             new TerminalCapabilityProfile(
-                Osc50FontControl: false,
-                Iterm2ProfileSwitch: true,
+                SupportsOsc50FontRequests: false,
+                SupportsIterm2ProfileRequests: true,
                 Source: "iterm2"));
         await using var output = new MemoryStream();
         await renderer.InitializeAsync(output, CancellationToken.None);
