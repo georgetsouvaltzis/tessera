@@ -104,14 +104,67 @@ public sealed class ValidationSummary : Control
     public TeaStyle InfoSeverityStyle { get; set; } = TeaStyle.Empty;
 
     /// <summary>
+    /// Gets or sets style merged into informational rows.
+    /// </summary>
+    /// <remarks>
+    /// Alias for <see cref="InfoSeverityStyle"/> retained for style extension compatibility.
+    /// </remarks>
+    public TeaStyle InfoIssueStyle
+    {
+        get => InfoSeverityStyle;
+        set => InfoSeverityStyle = value;
+    }
+
+    /// <summary>
     /// Gets or sets style merged into warning rows.
     /// </summary>
     public TeaStyle WarningSeverityStyle { get; set; } = TeaStyle.Empty;
 
     /// <summary>
+    /// Gets or sets style merged into warning rows.
+    /// </summary>
+    /// <remarks>
+    /// Alias for <see cref="WarningSeverityStyle"/> retained for style extension compatibility.
+    /// </remarks>
+    public TeaStyle WarningIssueStyle
+    {
+        get => WarningSeverityStyle;
+        set => WarningSeverityStyle = value;
+    }
+
+    /// <summary>
     /// Gets or sets style merged into error rows.
     /// </summary>
     public TeaStyle ErrorSeverityStyle { get; set; } = TeaStyle.Empty;
+
+    /// <summary>
+    /// Gets or sets style merged into error rows.
+    /// </summary>
+    /// <remarks>
+    /// Alias for <see cref="ErrorSeverityStyle"/> retained for style extension compatibility.
+    /// </remarks>
+    public TeaStyle ErrorIssueStyle
+    {
+        get => ErrorSeverityStyle;
+        set => ErrorSeverityStyle = value;
+    }
+
+    /// <summary>
+    /// Gets or sets style used for empty-state text.
+    /// </summary>
+    public TeaStyle EmptyStyle { get; set; } = TeaStyle.Empty;
+
+    /// <summary>
+    /// Gets or sets style merged into rows when disabled.
+    /// </summary>
+    /// <remarks>
+    /// Alias for <see cref="DisabledIssueStyle"/> retained for style extension compatibility.
+    /// </remarks>
+    public TeaStyle DisabledStyle
+    {
+        get => DisabledIssueStyle;
+        set => DisabledIssueStyle = value;
+    }
 
     /// <summary>
     /// Gets or sets the text rendered when no issues are available.
@@ -354,7 +407,7 @@ public sealed class ValidationSummary : Control
 
         if (_issues.Count == 0)
         {
-            canvas.WriteText(content.X, content.Y, ApplyStyle(EmptyText, DefaultIssueStyle), content.Width);
+            canvas.WriteText(content.X, content.Y, ApplyStyle(EmptyText, ResolveEmptyStyle()), content.Width);
             return;
         }
 
@@ -499,6 +552,17 @@ public sealed class ValidationSummary : Control
             ValidationSeverity.Warning => WarningSeverityStyle,
             _ => ErrorSeverityStyle,
         };
+    }
+
+    private TeaStyle ResolveEmptyStyle()
+    {
+        var style = EmptyStyle.IsEmpty ? DefaultIssueStyle : EmptyStyle;
+        if (IsDisabled)
+        {
+            style = style.Merge(DisabledIssueStyle);
+        }
+
+        return style;
     }
 
     private static char ResolveSeverityMarker(ValidationSeverity severity)
