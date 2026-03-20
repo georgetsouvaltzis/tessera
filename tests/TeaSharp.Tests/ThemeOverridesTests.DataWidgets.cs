@@ -88,6 +88,8 @@ internal static partial class ThemeOverridesTests
             keyValueList.SelectedRowStyle,
             "KeyValueList selected style should map to merged Selection styles.");
         TestAssert.Equal(theme.Text.Muted, keyValueList.SeparatorStyle, "KeyValueList separator style should map to Text.Muted.");
+        TestAssert.Equal(theme.Border.Default, keyValueList.BorderStyleText, "KeyValueList border style should map to Border.Default.");
+        TestAssert.Equal(theme.Border.Focused.Merge(theme.Focus.Border), keyValueList.FocusedBorderStyleText, "KeyValueList focused border style should map to focused border tokens.");
 
         return Task.CompletedTask;
     }
@@ -137,6 +139,7 @@ internal static partial class ThemeOverridesTests
         var keyValueList = new KeyValueList
         {
             ValueStyle = explicitStyle,
+            BorderStyleText = explicitStyle,
         };
 
         dataGrid.ApplyThemeDefaults(theme);
@@ -153,6 +156,8 @@ internal static partial class ThemeOverridesTests
         TestAssert.Equal(theme.Border.Focused.Merge(theme.Focus.Border), treeTable.FocusedBorderStyleText, "Defaults should fill empty TreeTable.FocusedBorderStyleText.");
         TestAssert.Equal(explicitStyle, keyValueList.ValueStyle, "Defaults should not overwrite explicit KeyValueList.ValueStyle.");
         TestAssert.Equal(theme.Text.Muted, keyValueList.SeparatorStyle, "Defaults should fill empty KeyValueList.SeparatorStyle.");
+        TestAssert.Equal(explicitStyle, keyValueList.BorderStyleText, "Defaults should not overwrite explicit KeyValueList.BorderStyleText.");
+        TestAssert.Equal(theme.Border.Focused.Merge(theme.Focus.Border), keyValueList.FocusedBorderStyleText, "Defaults should fill empty KeyValueList.FocusedBorderStyleText.");
 
         return Task.CompletedTask;
     }
@@ -168,6 +173,7 @@ internal static partial class ThemeOverridesTests
         var keyValueList = new KeyValueList
         {
             ValueStyle = explicitStyle,
+            BorderStyleText = explicitStyle,
         };
 
         var baseTheme = BuildThemeWithPrimary(1, 1, 1);
@@ -219,6 +225,8 @@ internal static partial class ThemeOverridesTests
         TestAssert.Equal(typeTheme.Border.Focused.Merge(typeTheme.Focus.Border), treeTable.FocusedBorderStyleText, "Override apply should map TreeTable focused border style.");
         TestAssert.Equal(explicitStyle, keyValueList.ValueStyle, "Override defaults should not overwrite explicit KeyValueList.ValueStyle.");
         TestAssert.Equal(typeTheme.Text.Muted, keyValueList.SeparatorStyle, "Override defaults should fill empty KeyValueList.SeparatorStyle.");
+        TestAssert.Equal(explicitStyle, keyValueList.BorderStyleText, "Override defaults should not overwrite explicit KeyValueList.BorderStyleText.");
+        TestAssert.Equal(typeTheme.Border.Focused.Merge(typeTheme.Focus.Border), keyValueList.FocusedBorderStyleText, "Override defaults should fill empty KeyValueList.FocusedBorderStyleText.");
 
         return Task.CompletedTask;
     }

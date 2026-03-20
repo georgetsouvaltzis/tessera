@@ -44,11 +44,17 @@ internal static partial class ThemeOverridesTests
             Focus = new TeaThemeFocusTokens
             {
                 Title = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(51, 52, 53)),
+                Border = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(54, 55, 56)),
             },
             Selection = new TeaThemeSelectionTokens
             {
                 Foreground = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(61, 62, 63)),
                 Background = TeaStyle.Empty.WithBackground(AnsiColor.Rgb(71, 72, 73)),
+            },
+            Border = new TeaThemeBorderTokens
+            {
+                Default = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(74, 75, 76)),
+                Focused = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(77, 78, 79)),
             },
             State = new TeaThemeStateTokens
             {
@@ -69,6 +75,8 @@ internal static partial class ThemeOverridesTests
             "Timeline selected row style should map to merged Selection styles.");
         TestAssert.Equal(theme.Text.Muted, timeline.MutedStyle, "Timeline muted style should map to Text.Muted.");
         TestAssert.Equal(theme.Text.Muted, timeline.SeparatorStyle, "Timeline separator style should map to Text.Muted.");
+        TestAssert.Equal(theme.Border.Default, timeline.BorderStyleText, "Timeline border style should map to Border.Default.");
+        TestAssert.Equal(theme.Border.Focused.Merge(theme.Focus.Border), timeline.FocusedBorderStyleText, "Timeline focused border style should map to focused border tokens.");
 
         TestAssert.Equal(theme.Text.Secondary, stepper.TitleStyle, "Stepper title style should map to Text.Secondary.");
         TestAssert.Equal(theme.Focus.Title, stepper.FocusedTitleStyle, "Stepper focused title style should map to Focus.Title.");
@@ -100,21 +108,28 @@ internal static partial class ThemeOverridesTests
             Focus = new TeaThemeFocusTokens
             {
                 Title = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(13, 14, 15)),
+                Border = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(16, 17, 18)),
             },
             Selection = new TeaThemeSelectionTokens
             {
-                Foreground = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(16, 17, 18)),
-                Background = TeaStyle.Empty.WithBackground(AnsiColor.Rgb(19, 20, 21)),
+                Foreground = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(19, 20, 21)),
+                Background = TeaStyle.Empty.WithBackground(AnsiColor.Rgb(22, 23, 24)),
+            },
+            Border = new TeaThemeBorderTokens
+            {
+                Default = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(25, 26, 27)),
+                Focused = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(28, 29, 30)),
             },
             State = new TeaThemeStateTokens
             {
-                Success = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(22, 23, 24)),
+                Success = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(31, 32, 33)),
             },
         };
 
         var timeline = new Timeline
         {
             ContentStyle = explicitStyle,
+            BorderStyleText = explicitStyle,
         };
         var stepper = new Stepper
         {
@@ -126,6 +141,8 @@ internal static partial class ThemeOverridesTests
 
         TestAssert.Equal(explicitStyle, timeline.ContentStyle, "Defaults should not overwrite explicit Timeline.ContentStyle.");
         TestAssert.Equal(theme.Text.Secondary, timeline.TimestampStyle, "Defaults should fill empty Timeline.TimestampStyle.");
+        TestAssert.Equal(explicitStyle, timeline.BorderStyleText, "Defaults should not overwrite explicit Timeline.BorderStyleText.");
+        TestAssert.Equal(theme.Border.Focused.Merge(theme.Focus.Border), timeline.FocusedBorderStyleText, "Defaults should fill empty Timeline.FocusedBorderStyleText.");
         TestAssert.Equal(explicitStyle, stepper.ActiveStepStyle, "Defaults should not overwrite explicit Stepper.ActiveStepStyle.");
         TestAssert.Equal(theme.State.Success, stepper.CompletedStepStyle, "Defaults should fill empty Stepper.CompletedStepStyle.");
 
@@ -158,11 +175,17 @@ internal static partial class ThemeOverridesTests
             Focus = new TeaThemeFocusTokens
             {
                 Title = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(141, 142, 143)),
+                Border = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(144, 145, 146)),
             },
             Selection = new TeaThemeSelectionTokens
             {
                 Foreground = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(151, 152, 153)),
                 Background = TeaStyle.Empty.WithBackground(AnsiColor.Rgb(161, 162, 163)),
+            },
+            Border = new TeaThemeBorderTokens
+            {
+                Default = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(164, 165, 166)),
+                Focused = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(167, 168, 169)),
             },
             State = new TeaThemeStateTokens
             {
@@ -182,6 +205,8 @@ internal static partial class ThemeOverridesTests
             typeTheme.Selection.Foreground.Merge(typeTheme.Selection.Background),
             timeline.SelectedRowStyle,
             "Override apply should map Timeline selected row style.");
+        TestAssert.Equal(typeTheme.Border.Default, timeline.BorderStyleText, "Override apply should map Timeline border style.");
+        TestAssert.Equal(typeTheme.Border.Focused.Merge(typeTheme.Focus.Border), timeline.FocusedBorderStyleText, "Override apply should map Timeline focused border style.");
         TestAssert.Equal(explicitStyle, stepper.StepTextStyle, "Override defaults should not overwrite explicit Stepper.StepTextStyle.");
         TestAssert.Equal(typeTheme.Accent.Primary, stepper.ActiveStepStyle, "Override defaults should fill empty Stepper.ActiveStepStyle.");
         TestAssert.Equal(typeTheme.State.Success, stepper.CompletedStepStyle, "Override defaults should fill empty Stepper.CompletedStepStyle.");
@@ -205,6 +230,12 @@ internal static partial class ThemeOverridesTests
             Focus = new TeaThemeFocusTokens
             {
                 Title = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(41, 42, 43)),
+                Border = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(44, 45, 46)),
+            },
+            Border = new TeaThemeBorderTokens
+            {
+                Default = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(47, 48, 49)),
+                Focused = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(50, 51, 52)),
             },
         };
 
@@ -218,10 +249,14 @@ internal static partial class ThemeOverridesTests
         TestAssert.Equal(theme.Text.Secondary, dialog.TitleStyle, "Dialog title style should map to Text.Secondary.");
         TestAssert.Equal(theme.Focus.Title, dialog.FocusedTitleStyle, "Dialog focused title style should map to Focus.Title.");
         TestAssert.Equal(theme.Text.Primary, dialog.BodyTextStyle, "Dialog body style should map to Text.Primary.");
+        TestAssert.Equal(theme.Border.Default, dialog.BorderStyleText, "Dialog border style should map to Border.Default.");
+        TestAssert.Equal(theme.Border.Focused.Merge(theme.Focus.Border), dialog.FocusedBorderStyleText, "Dialog focused border style should map to focused border tokens.");
 
         TestAssert.Equal(theme.Text.Secondary, modal.TitleStyle, "Modal title style should map to Text.Secondary.");
         TestAssert.Equal(theme.Focus.Title, modal.FocusedTitleStyle, "Modal focused title style should map to Focus.Title.");
         TestAssert.Equal(theme.Text.Primary, modal.BodyTextStyle, "Modal body style should map to Text.Primary.");
+        TestAssert.Equal(theme.Border.Default, modal.BorderStyleText, "Modal border style should map to Border.Default.");
+        TestAssert.Equal(theme.Border.Focused.Merge(theme.Focus.Border), modal.FocusedBorderStyleText, "Modal focused border style should map to focused border tokens.");
 
         TestAssert.Equal(theme.Text.Secondary, barChart.TitleStyle, "BarChart title style should map to Text.Secondary.");
         TestAssert.Equal(theme.Focus.Title, barChart.FocusedTitleStyle, "BarChart focused title style should map to Focus.Title.");
@@ -262,16 +297,24 @@ internal static partial class ThemeOverridesTests
             Focus = new TeaThemeFocusTokens
             {
                 Title = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(10, 11, 12)),
+                Border = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(13, 14, 15)),
+            },
+            Border = new TeaThemeBorderTokens
+            {
+                Default = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(16, 17, 18)),
+                Focused = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(19, 20, 21)),
             },
         };
 
         var dialog = new Dialog
         {
             BodyTextStyle = explicitStyle,
+            BorderStyleText = explicitStyle,
         };
         var modal = new Modal
         {
             TitleStyle = explicitStyle,
+            BorderStyleText = explicitStyle,
         };
         var barChart = new BarChart
         {
@@ -299,8 +342,12 @@ internal static partial class ThemeOverridesTests
 
         TestAssert.Equal(explicitStyle, dialog.BodyTextStyle, "Defaults should not overwrite explicit Dialog.BodyTextStyle.");
         TestAssert.Equal(theme.Text.Secondary, dialog.TitleStyle, "Defaults should fill empty Dialog.TitleStyle.");
+        TestAssert.Equal(explicitStyle, dialog.BorderStyleText, "Defaults should not overwrite explicit Dialog.BorderStyleText.");
+        TestAssert.Equal(theme.Border.Focused.Merge(theme.Focus.Border), dialog.FocusedBorderStyleText, "Defaults should fill empty Dialog.FocusedBorderStyleText.");
         TestAssert.Equal(explicitStyle, modal.TitleStyle, "Defaults should not overwrite explicit Modal.TitleStyle.");
         TestAssert.Equal(theme.Text.Primary, modal.BodyTextStyle, "Defaults should fill empty Modal.BodyTextStyle.");
+        TestAssert.Equal(explicitStyle, modal.BorderStyleText, "Defaults should not overwrite explicit Modal.BorderStyleText.");
+        TestAssert.Equal(theme.Border.Focused.Merge(theme.Focus.Border), modal.FocusedBorderStyleText, "Defaults should fill empty Modal.FocusedBorderStyleText.");
         TestAssert.Equal(explicitStyle, barChart.LabelStyle, "Defaults should not overwrite explicit BarChart.LabelStyle.");
         TestAssert.Equal(theme.Text.Secondary, barChart.LegendStyle, "Defaults should fill empty BarChart.LegendStyle.");
         TestAssert.Equal(explicitStyle, lineChart.MetaTextStyle, "Defaults should not overwrite explicit LineChart.MetaTextStyle.");
@@ -348,6 +395,12 @@ internal static partial class ThemeOverridesTests
             Focus = new TeaThemeFocusTokens
             {
                 Title = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(131, 132, 133)),
+                Border = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(134, 135, 136)),
+            },
+            Border = new TeaThemeBorderTokens
+            {
+                Default = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(137, 138, 139)),
+                Focused = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(140, 141, 142)),
             },
         };
 
@@ -367,8 +420,12 @@ internal static partial class ThemeOverridesTests
 
         TestAssert.Equal(typeTheme.Text.Secondary, dialog.TitleStyle, "Override apply should map Dialog title style.");
         TestAssert.Equal(typeTheme.Text.Primary, dialog.BodyTextStyle, "Override apply should map Dialog body style.");
+        TestAssert.Equal(typeTheme.Border.Default, dialog.BorderStyleText, "Override apply should map Dialog border style.");
+        TestAssert.Equal(typeTheme.Border.Focused.Merge(typeTheme.Focus.Border), dialog.FocusedBorderStyleText, "Override apply should map Dialog focused border style.");
         TestAssert.Equal(typeTheme.Focus.Title, modal.FocusedTitleStyle, "Override defaults should fill empty Modal.FocusedTitleStyle.");
         TestAssert.Equal(explicitStyle, modal.BodyTextStyle, "Override defaults should not overwrite explicit Modal.BodyTextStyle.");
+        TestAssert.Equal(typeTheme.Border.Default, modal.BorderStyleText, "Override defaults should fill empty Modal.BorderStyleText.");
+        TestAssert.Equal(typeTheme.Border.Focused.Merge(typeTheme.Focus.Border), modal.FocusedBorderStyleText, "Override defaults should fill empty Modal.FocusedBorderStyleText.");
         TestAssert.Equal(typeTheme.Text.Primary, barChart.LabelStyle, "Override apply should map BarChart label style.");
         TestAssert.Equal(typeTheme.Text.Secondary, barChart.LegendStyle, "Override apply should map BarChart legend style.");
         TestAssert.Equal(explicitStyle, lineChart.StatsStyle, "Override defaults should not overwrite explicit LineChart.StatsStyle.");
