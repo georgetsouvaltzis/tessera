@@ -18,6 +18,8 @@ public static partial class TeaThemeControlExtensions
         control.PressedLabelStyle = ApplyDefault(
             control.PressedLabelStyle,
             theme.Selection.Foreground.Merge(theme.Selection.Background));
+        control.BorderStyleText = ApplyDefault(control.BorderStyleText, theme.Border.Default);
+        control.FocusedBorderStyleText = ApplyDefault(control.FocusedBorderStyleText, theme.Border.Focused.Merge(theme.Focus.Border));
         return control;
     }
 
@@ -47,6 +49,8 @@ public static partial class TeaThemeControlExtensions
         control.FocusedLabelStyle = theme.Focus.Ring;
         control.DisabledLabelStyle = theme.Text.Muted;
         control.PressedLabelStyle = theme.Selection.Foreground.Merge(theme.Selection.Background);
+        control.BorderStyleText = theme.Border.Default;
+        control.FocusedBorderStyleText = theme.Border.Focused.Merge(theme.Focus.Border);
         return control;
     }
 

@@ -70,6 +70,24 @@ public sealed class Slider : Control
         set;
     } = TeaStyle.Empty;
 
+    /// <summary>
+    /// Gets or sets the style applied to border glyphs when the control is not focused.
+    /// </summary>
+    public TeaStyle BorderStyleText
+    {
+        get;
+        set;
+    } = TeaStyle.Empty;
+
+    /// <summary>
+    /// Gets or sets the style applied to border glyphs when the control is focused.
+    /// </summary>
+    public TeaStyle FocusedBorderStyleText
+    {
+        get;
+        set;
+    } = TeaStyle.Empty;
+
     public double Min
     {
         get;
@@ -245,7 +263,8 @@ public sealed class Slider : Control
             clipped,
             title,
             Border,
-            Padding);
+            Padding,
+            ResolveBorderStyleText());
 
         if (content.IsEmpty)
         {
@@ -413,6 +432,22 @@ public sealed class Slider : Control
             var style = index < filled ? fillStyle : trackStyle;
             WriteStyledChar(canvas, clipped.X + 1 + index, clipped.Y, index < filled ? '█' : '░', style);
         }
+    }
+
+    private TeaStyle ResolveBorderStyleText()
+    {
+        var style = BorderStyleText;
+        if (IsFocused)
+        {
+            style = style.Merge(FocusedBorderStyleText);
+        }
+
+        if (IsDisabled || IsReadOnly)
+        {
+            style = style.Merge(DisabledStyle);
+        }
+
+        return style;
     }
 
     private TeaStyle ResolveTrackStyle()

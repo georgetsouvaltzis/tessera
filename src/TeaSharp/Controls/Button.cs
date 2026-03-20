@@ -99,6 +99,24 @@ public sealed class Button : Control
     } = TeaStyle.Empty.WithInverse().WithBold();
 
     /// <summary>
+    /// Gets or sets the style applied to border glyphs when the control is not focused.
+    /// </summary>
+    public TeaStyle BorderStyleText
+    {
+        get;
+        set;
+    } = TeaStyle.Empty;
+
+    /// <summary>
+    /// Gets or sets the style applied to border glyphs when the control is focused.
+    /// </summary>
+    public TeaStyle FocusedBorderStyleText
+    {
+        get;
+        set;
+    } = TeaStyle.Empty;
+
+    /// <summary>
     /// Gets how many activations have been observed.
     /// </summary>
     public int ActivationCount => _activationCount;
@@ -201,7 +219,13 @@ public sealed class Button : Control
             return;
         }
 
-        var content = FrameLayout.DrawFrameAndResolveContent(canvas, clipped, null, Border, Padding);
+        var content = FrameLayout.DrawFrameAndResolveContent(
+            canvas,
+            clipped,
+            null,
+            Border,
+            Padding,
+            ResolveBorderStyleText());
         if (content.IsEmpty || content.Height < 1)
         {
             return;
@@ -317,5 +341,21 @@ public sealed class Button : Control
         }
 
         canvas.WriteText(x, y, renderedLabel, width);
+    }
+
+    private TeaStyle ResolveBorderStyleText()
+    {
+        var style = BorderStyleText;
+        if (IsFocused)
+        {
+            style = style.Merge(FocusedBorderStyleText);
+        }
+
+        if (IsDisabled)
+        {
+            style = style.Merge(DisabledLabelStyle);
+        }
+
+        return style;
     }
 }
