@@ -36,6 +36,22 @@ This maps to ANSI SGR emphasis flags only (`Normal`, `Bold`, `Dim`).
 
 It does **not** control terminal font engines, real font families, font sizes, or ligature behavior.
 
+Experimental terminal font request is exposed separately through `ScreenOptions.FontSpec`:
+
+```csharp
+runtime.Screen = new ScreenOptions
+{
+    FontSpec = "Iosevka Term 14",
+};
+```
+
+`FontSpec` behavior in TeaSharp V1:
+
+- null/empty: no sequence emitted
+- non-empty: renderer emits OSC 50 when value changes
+- sanitization: strips `BEL`, `ESC`, `\`, and control chars
+- reset: no forced font restore sequence
+
 ## Public API Names (V1 Foundations)
 
 Theme primitives use the following public types:
@@ -54,6 +70,7 @@ Theme primitives use the following public types:
 - `TeaThemeVisualState`
 - `TeaThemeControlExtensions.ApplyTheme(...)`
 - `TeaRuntimeOptions.Theme`
+- `ScreenOptions.FontSpec` (experimental best-effort terminal font request)
 - `TeaFontWeight`
 - `TeaStyle.WithFontWeight(TeaFontWeight)`
 

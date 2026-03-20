@@ -130,6 +130,22 @@ Image rendering is planned for V1.1.
 - Terminal-specific typography request is available via `ScreenOptions.FontSpec`; renderer emits OSC 50 when this value is set.
 - Custom family/size requests are best-effort and not guaranteed on all terminals. Public guidance should treat `FontSpec` as optional opt-in behavior with graceful fallback.
 
+Support matrix for `ScreenOptions.FontSpec` in TeaSharp V1:
+
+- set to `null`: no OSC 50 emission (no-op)
+- set to non-empty value: emit OSC 50 set-font request on change (sanitized)
+- terminal capability probing: not implemented for font support
+- reset semantics: do not force unknown font restore
+
+Preferred C# usage:
+
+```csharp
+runtime.Screen = new ScreenOptions
+{
+    FontSpec = "JetBrains Mono 13",
+};
+```
+
 ### Composition Model
 
 TeaSharp uses an object-based screen model.

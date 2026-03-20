@@ -246,6 +246,22 @@ Border override, dropdown/tree glyph-set, and data marker/separator cookbook sni
 - Terminal-specific lane: `ScreenOptions.FontSpec` requests terminal font changes through OSC 50 output in the renderer.
 - Explicit caveat: custom family/size is best-effort via OSC 50 and not guaranteed to apply across terminals.
 
+Usage guidance (default path):
+
+```csharp
+runtime.Screen = new ScreenOptions
+{
+    FontSpec = "JetBrains Mono 13",
+};
+```
+
+Support matrix (TeaSharp V1 contract):
+
+- sequence emission: yes, when `FontSpec` changes and value is non-empty
+- sanitization: `BEL`, `ESC`, `\`, and control chars are stripped before emission
+- capability detection/probe: no
+- reset/restore previous font: no (intentionally avoids unsafe assumptions)
+
 Bordered control parity policy:
 
 - any public control with bordered frame rendering must expose `BorderStyleText` and `FocusedBorderStyleText`

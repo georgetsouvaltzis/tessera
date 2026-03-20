@@ -62,6 +62,7 @@ Release-candidate execution checklist: [public-v1-rc-checklist.md](/Users/george
   - direct token mappings landed for modal/chart summary controls (`Dialog`, `Modal`, `BarChart`, `LineChart`, `Gauge`, `StatsCard`)
   - bordered-control parity rollout is effectively complete for current shipped controls (including `Button`, `Label`, `ProgressBar`, `Toggle`, `Slider`, `Spinner`, `Dialog`, `Modal`, `KeyValueList`, `Timeline`)
   - control-level style hooks and theme mappings are implemented across the shipped Public V1 control surface
+  - terminal font request lane is exposed as experimental best-effort (`ScreenOptions.FontSpec` -> renderer OSC 50 emission with sanitization and no forced restore contract)
 - **WS-D benchmark harness status**
   - `BenchmarkSwitcher` discoverability is wired and `--list flat` lists all 6 required scenarios (`Startup`, `LogTail`, `LargeTable`, `OverlayStress`, `ResizeStorm`, `StyledHeavyOutput`)
   - supplemental viewport no-decoration benchmark coverage is wired (`ViewportRenderBenchmarks`) for render/materialize hot-path tracking
