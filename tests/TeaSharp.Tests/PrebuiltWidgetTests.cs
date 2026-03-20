@@ -68,6 +68,7 @@ internal static class PrebuiltWidgetTests
         yield return new TestCase("Controls_ContextMenu_MouseReleaseExecutesAndCloses", ContextMenu_MouseReleaseExecutesAndCloses);
         yield return new TestCase("Controls_ContextMenu_SetItems_RecomputesLayoutFromCachedWidths", ContextMenu_SetItems_RecomputesLayoutFromCachedWidths);
         yield return new TestCase("Controls_ContextMenu_CustomGlyphsFocusMarkerAndBorderStyleText_Rendered", ContextMenu_CustomGlyphsFocusMarkerAndBorderStyleText_Rendered);
+        yield return new TestCase("Controls_ContextMenu_GlyphUpdate_RebuildsCachedRows", ContextMenu_GlyphUpdate_RebuildsCachedRows);
         yield return new TestCase("Controls_CommandPalette_FiltersAndExecutes", CommandPalette_FiltersAndExecutes);
         yield return new TestCase("Controls_CommandPalette_ItemExecutedEvent_ReportsItem", CommandPalette_ItemExecutedEvent_ReportsItem);
         yield return new TestCase("Controls_CommandPalette_TryConsumeExecution_IsSingleUse", CommandPalette_TryConsumeExecution_IsSingleUse);
@@ -78,6 +79,7 @@ internal static class PrebuiltWidgetTests
         yield return new TestCase("Controls_CommandPalette_SetItems_RefreshesCachedRowsAndFilter", CommandPalette_SetItems_RefreshesCachedRowsAndFilter);
         yield return new TestCase("Controls_CommandPalette_QueryTransitions_KeepFilterAccurate", CommandPalette_QueryTransitions_KeepFilterAccurate);
         yield return new TestCase("Controls_CommandPalette_CustomGlyphsFocusMarkerAndBorderStyleText_Rendered", CommandPalette_CustomGlyphsFocusMarkerAndBorderStyleText_Rendered);
+        yield return new TestCase("Controls_CommandPalette_GlyphUpdate_RebuildsCachedRows", CommandPalette_GlyphUpdate_RebuildsCachedRows);
         yield return new TestCase("Controls_FileExplorer_KeyboardNavigationAndExpansion", FileExplorer_KeyboardNavigationAndExpansion);
         yield return new TestCase("Controls_FileExplorer_SelectPathAndEvent_ReportsTransition", FileExplorer_SelectPathAndEvent_ReportsTransition);
         yield return new TestCase("Controls_FileExplorer_MouseClickSelectsRow", FileExplorer_MouseClickSelectsRow);
@@ -1289,6 +1291,34 @@ internal static class PrebuiltWidgetTests
         return Task.CompletedTask;
     }
 
+    private static Task ContextMenu_GlyphUpdate_RebuildsCachedRows()
+    {
+        var menu = new ContextMenu
+        {
+            Border = BorderStyle.None,
+        };
+        menu.SetItems(
+        [
+            new ContextMenuItem("copy", "Copy"),
+        ]);
+        menu.OpenAt(0, 0);
+
+        var beforeCanvas = new Canvas(24, 4);
+        menu.Render(beforeCanvas, new Rect(0, 0, 24, 4));
+        var before = beforeCanvas.Render();
+
+        menu.Glyphs = new ContextMenuGlyphSet(".", "SEL", "HOV", "::");
+
+        var afterCanvas = new Canvas(24, 4);
+        menu.Render(afterCanvas, new Rect(0, 0, 24, 4));
+        var after = afterCanvas.Render();
+
+        TestAssert.True(before.Contains("> Copy", StringComparison.Ordinal), "ContextMenu should render default selected marker before glyph update.");
+        TestAssert.True(after.Contains("SEL::Copy", StringComparison.Ordinal), "ContextMenu should rebuild cached row text when glyphs change.");
+        TestAssert.True(!after.Contains("> Copy", StringComparison.Ordinal), "ContextMenu should not keep stale row marker cache after glyph update.");
+        return Task.CompletedTask;
+    }
+
     private static Task CommandPalette_FiltersAndExecutes()
     {
         var palette = new CommandPalette
@@ -1517,6 +1547,36 @@ internal static class PrebuiltWidgetTests
         TestAssert.True(output.Contains("?:de", StringComparison.Ordinal), "CommandPalette should render query prompt with custom glyphs.");
         TestAssert.True(output.Contains("*:Deploy - publish release", StringComparison.Ordinal), "CommandPalette should render selected row with custom marker glyphs.");
         TestAssert.True(output.Contains(focusedBorderStyle.Render("┌"), StringComparison.Ordinal), "CommandPalette should style focused border glyphs.");
+        return Task.CompletedTask;
+    }
+
+    private static Task CommandPalette_GlyphUpdate_RebuildsCachedRows()
+    {
+        var palette = new CommandPalette
+        {
+            IsFocused = true,
+        };
+        palette.SetItems(
+        [
+            new CommandPaletteItem("deploy", "Deploy", "publish release"),
+        ]);
+        palette.Open();
+        palette.SetQueryText("de");
+
+        var beforeCanvas = new Canvas(80, 12);
+        palette.Render(beforeCanvas, new Rect(0, 0, 80, 12));
+        var before = beforeCanvas.Render();
+
+        palette.Glyphs = new CommandPaletteGlyphSet("Q", ".", "SEL", "HOV", "::");
+
+        var afterCanvas = new Canvas(80, 12);
+        palette.Render(afterCanvas, new Rect(0, 0, 80, 12));
+        var after = afterCanvas.Render();
+
+        TestAssert.True(before.Contains("> Deploy - publish release", StringComparison.Ordinal), "CommandPalette should render default selected marker before glyph update.");
+        TestAssert.True(after.Contains("SEL::Deploy - publish release", StringComparison.Ordinal), "CommandPalette should rebuild cached row text when glyphs change.");
+        TestAssert.True(after.Contains("Q::de", StringComparison.Ordinal), "CommandPalette should render updated query prompt glyphs.");
+        TestAssert.True(!after.Contains("> Deploy - publish release", StringComparison.Ordinal), "CommandPalette should not keep stale row marker cache after glyph update.");
         return Task.CompletedTask;
     }
 
