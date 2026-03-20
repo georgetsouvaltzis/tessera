@@ -27,6 +27,7 @@ internal sealed class AnsiDiffRenderer : IProgramRenderer
     private int _keyboardEnhancementFlags;
     private readonly HashSet<int> _queriedModes = [];
     private string? _windowTitle;
+    private string? _fontSpec;
     private int _width;
     private int _height;
     private bool _fullRepaintRequired;
@@ -62,6 +63,7 @@ internal sealed class AnsiDiffRenderer : IProgramRenderer
         _keyboardEnhancementFlags = 0;
         _queriedModes.Clear();
         _windowTitle = null;
+        _fontSpec = null;
         _width = 0;
         _height = 0;
         _fullRepaintRequired = true;
@@ -164,6 +166,17 @@ internal sealed class AnsiDiffRenderer : IProgramRenderer
             }
 
             _windowTitle = terminal.WindowTitle;
+        }
+
+        var requestedFontSpec = SanitizeFontSpec(terminal.FontSpec);
+        if (!string.Equals(_fontSpec, requestedFontSpec, StringComparison.Ordinal))
+        {
+            if (requestedFontSpec is not null)
+            {
+                await _writer.WriteAsync($"\u001b]50;{requestedFontSpec}\u0007").ConfigureAwait(false);
+            }
+
+            _fontSpec = requestedFontSpec;
         }
 
         var requestedKeyboardFlags = GetKeyboardEnhancementFlags(terminal.KeyboardEnhancements);
@@ -312,6 +325,9 @@ internal sealed class AnsiDiffRenderer : IProgramRenderer
             _altScreen = false;
         }
 
+        // Font restore sequence is intentionally omitted because no portable "reset to previous font" contract exists.
+        _fontSpec = null;
+
         await _writer.FlushAsync(cancellationToken).ConfigureAwait(false);
         _previousFrame = RenderFrameBuffer.Empty;
         _fullRepaintRequired = true;
@@ -412,4 +428,30 @@ internal sealed class AnsiDiffRenderer : IProgramRenderer
         return AnsiEscapeSequences.KeyboardEnhancementFlags(options, _options.IncludeKittyKeyboardBaseFlag);
     }
 
+    private static string? SanitizeFontSpec(string? fontSpec)
+    {
+        if (string.IsNullOrWhiteSpace(fontSpec))
+        {
+            return null;
+        }
+
+        var builder = new StringBuilder(fontSpec.Length);
+        for (var index = 0; index < fontSpec.Length; index++)
+        {
+            var character = fontSpec[index];
+            if (character is '\u001b' or '\u0007' or '\\')
+            {
+                continue;
+            }
+
+            if (char.IsControl(character))
+            {
+                continue;
+            }
+
+            _ = builder.Append(character);
+        }
+
+        return builder.Length == 0 ? null : builder.ToString();
+    }
 }

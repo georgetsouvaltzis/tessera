@@ -30,6 +30,8 @@ internal static class RendererBehaviorTests
         yield return new TestCase("Renderer_Progress_EmitsOscProgressSequences", Progress_EmitsOscProgressSequences);
         yield return new TestCase("Renderer_KeyboardEnhancements_EmitsKittySequence", KeyboardEnhancements_EmitsKittySequence);
         yield return new TestCase("Renderer_KeyboardEnhancements_CanDisableKittyBaseFlag", KeyboardEnhancements_CanDisableKittyBaseFlag);
+        yield return new TestCase("Renderer_FontSpec_EmitsOsc50WhenChanged", FontSpec_EmitsOsc50WhenChanged);
+        yield return new TestCase("Renderer_FontSpec_NullIsNoOpAndSanitizesUnsafeChars", FontSpec_NullIsNoOpAndSanitizesUnsafeChars);
         yield return new TestCase("Renderer_CellDiff_UpdatesOnlyChangedCellRun", CellDiff_UpdatesOnlyChangedCellRun);
         yield return new TestCase("Renderer_CellDiff_ClearsShortenedLineTail", CellDiff_ClearsShortenedLineTail);
         yield return new TestCase("Renderer_Resize_ClipsToWidth", Resize_ClipsToWidth);
@@ -551,6 +553,71 @@ internal static class RendererBehaviorTests
         AssertContains(rendered, "\u001b[>2u");
         AssertContains(rendered, "\u001b[>0u");
         AssertDoesNotContain(rendered, "\u001b[>3u");
+    }
+
+    private static async Task FontSpec_EmitsOsc50WhenChanged()
+    {
+        // Arrange
+        await using var renderer = new AnsiDiffRenderer();
+        await using var output = new MemoryStream();
+        await renderer.InitializeAsync(output, CancellationToken.None);
+
+        // Act
+        renderer.Render(ScreenOutput.From("font-a") with
+        {
+            Terminal = new TerminalOutput
+            {
+                FontSpec = "Iosevka Term 14",
+            },
+        });
+        await renderer.FlushAsync(CancellationToken.None);
+        renderer.Render(ScreenOutput.From("font-b") with
+        {
+            Terminal = new TerminalOutput
+            {
+                FontSpec = "Iosevka Term 14",
+            },
+        });
+        await renderer.FlushAsync(CancellationToken.None);
+        renderer.Render(ScreenOutput.From("font-c") with
+        {
+            Terminal = new TerminalOutput
+            {
+                FontSpec = "JetBrains Mono 13",
+            },
+        });
+        await renderer.FlushAsync(CancellationToken.None);
+        var rendered = ReadUtf8(output);
+
+        // Assert
+        AssertCount(rendered, "\u001b]50;Iosevka Term 14\u0007", 1);
+        AssertCount(rendered, "\u001b]50;JetBrains Mono 13\u0007", 1);
+    }
+
+    private static async Task FontSpec_NullIsNoOpAndSanitizesUnsafeChars()
+    {
+        // Arrange
+        await using var renderer = new AnsiDiffRenderer();
+        await using var output = new MemoryStream();
+        await renderer.InitializeAsync(output, CancellationToken.None);
+        renderer.Render(ScreenOutput.From("initial"));
+        await renderer.FlushAsync(CancellationToken.None);
+        var marker = output.Length;
+
+        // Act
+        renderer.Render(ScreenOutput.From("unsafe") with
+        {
+            Terminal = new TerminalOutput
+            {
+                FontSpec = "Mon\\o\u0007\u001b[31m",
+            },
+        });
+        await renderer.FlushAsync(CancellationToken.None);
+        var rendered = ReadUtf8(output, marker);
+
+        // Assert
+        AssertContains(rendered, "\u001b]50;Mono[31m\u0007");
+        AssertDoesNotContain(rendered, "\u001b]50;Mon\\o\u0007\u001b[31m\u0007");
     }
 
     private static async Task CellDiff_UpdatesOnlyChangedCellRun()

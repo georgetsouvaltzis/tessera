@@ -49,6 +49,7 @@ public sealed class NUnitCaseAdapters
         foreach (var testCase in BorderedFlowDataRenderTests.Cases()) yield return ToCaseData(testCase);
         foreach (var testCase in ApiErgonomicsTests.Cases()) yield return ToCaseData(testCase);
         foreach (var testCase in ConsoleTerminalAdapterHelperTests.Cases()) yield return ToCaseData(testCase);
+        foreach (var testCase in ScreenOptionsAdapterTests.Cases()) yield return ToCaseData(testCase);
     }
 
     [TestCaseSource(nameof(Cases))]

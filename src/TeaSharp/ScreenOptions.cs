@@ -60,6 +60,15 @@ public sealed class ScreenOptions
     /// </summary>
     public string? WindowTitle { get; init; }
 
+    /// <summary>
+    /// Gets or sets an experimental best-effort terminal font request.
+    /// </summary>
+    /// <remarks>
+    /// This is terminal-dependent and optional. Set this explicitly to opt in.
+    /// TeaSharp emits an OSC 50 request when supported by the terminal, but does not guarantee application.
+    /// </remarks>
+    public string? FontSpec { get; init; }
+
     internal ScreenOptions Merge(ScreenOptions? overrides)
     {
         if (overrides is null)
@@ -78,6 +87,7 @@ public sealed class ScreenOptions
             ForegroundColor = overrides.ForegroundColor ?? ForegroundColor,
             BackgroundColor = overrides.BackgroundColor ?? BackgroundColor,
             WindowTitle = overrides.WindowTitle ?? WindowTitle,
+            FontSpec = overrides.FontSpec ?? FontSpec,
         };
     }
 
