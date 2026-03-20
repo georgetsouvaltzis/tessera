@@ -12,8 +12,8 @@ namespace TeaSharp.Internal;
 
 internal sealed class TeaSceneCompiler : IScreenCompiler
 {
-    private static readonly MethodInfo ListViewThemeDefaultsMethodDefinition = ResolveListViewThemeDefaultsMethodDefinition();
-    private static readonly ConcurrentDictionary<Type, MethodInfo> ListViewThemeDefaultsMethods = new();
+    private static readonly MethodInfo ListViewThemeDefaultsApplierFactoryMethodDefinition = ResolveListViewThemeDefaultsApplierFactoryMethodDefinition();
+    private static readonly ConcurrentDictionary<Type, Action<Control, TeaTheme>> ListViewThemeDefaultsAppliers = new();
     private string? _focusedRegionId;
 
     public ScreenRenderResult Compile(ScreenContent content, ScreenContext context, ScreenOptions options)
@@ -168,31 +168,34 @@ internal sealed class TeaSceneCompiler : IScreenCompiler
         }
 
         var itemType = controlType.GetGenericArguments()[0];
-        var method = ListViewThemeDefaultsMethods.GetOrAdd(
-            itemType,
-            static value => ListViewThemeDefaultsMethodDefinition.MakeGenericMethod(value));
-        _ = method.Invoke(null, [control, theme]);
+        var applier = ListViewThemeDefaultsAppliers.GetOrAdd(itemType, static value => CreateListViewThemeDefaultsApplier(value));
+        applier(control, theme);
     }
 
-    private static MethodInfo ResolveListViewThemeDefaultsMethodDefinition()
+    private static Action<Control, TeaTheme> CreateListViewThemeDefaultsApplier(Type itemType)
     {
-        return typeof(TeaThemeControlExtensions).GetMethods(BindingFlags.Public | BindingFlags.Static)
-            .Single(
-                static method =>
-                {
-                    if (method.Name != nameof(TeaThemeControlExtensions.ApplyThemeDefaults)
-                        || !method.IsGenericMethodDefinition
-                        || method.GetGenericArguments().Length != 1)
-                    {
-                        return false;
-                    }
+        var factory = ListViewThemeDefaultsApplierFactoryMethodDefinition.MakeGenericMethod(itemType);
+        return (Action<Control, TeaTheme>)(factory.Invoke(null, null)
+            ?? throw new InvalidOperationException("Failed to build ListView<T> theme applier delegate."));
+    }
 
-                    var parameters = method.GetParameters();
-                    return parameters.Length == 2
-                        && parameters[0].ParameterType.IsGenericType
-                        && parameters[0].ParameterType.GetGenericTypeDefinition() == typeof(ListView<>)
-                        && parameters[1].ParameterType == typeof(TeaTheme);
-                });
+    private static MethodInfo ResolveListViewThemeDefaultsApplierFactoryMethodDefinition()
+    {
+        return typeof(TeaSceneCompiler).GetMethod(
+            nameof(CreateListViewThemeDefaultsApplierCore),
+            BindingFlags.NonPublic | BindingFlags.Static)
+            ?? throw new InvalidOperationException("Unable to resolve ListView<T> theme applier factory method.");
+    }
+
+    private static Action<Control, TeaTheme> CreateListViewThemeDefaultsApplierCore<TItem>()
+    {
+        return static (control, theme) =>
+        {
+            if (control is ListView<TItem> listView)
+            {
+                _ = listView.ApplyThemeDefaults(theme);
+            }
+        };
     }
 
     private sealed class TeaSceneBuilder

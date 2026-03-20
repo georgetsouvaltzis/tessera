@@ -8,15 +8,27 @@ internal static class TeaEffectFactory
 
     public static TeaEffect? Batch(params TeaEffect?[] effects)
     {
-        var core = global::TeaSharp.Core.Commands.Effects.Batch(
-            effects.Select(TeaEffectAdapter.ToCore).ToArray());
+        ArgumentNullException.ThrowIfNull(effects);
+        var adapted = new global::TeaSharp.Core.Abstractions.Effect?[effects.Length];
+        for (var index = 0; index < effects.Length; index++)
+        {
+            adapted[index] = TeaEffectAdapter.ToCore(effects[index]);
+        }
+
+        var core = global::TeaSharp.Core.Commands.Effects.Batch(adapted);
         return TeaEffectAdapter.FromCore(core);
     }
 
     public static TeaEffect? Sequence(params TeaEffect?[] effects)
     {
-        var core = global::TeaSharp.Core.Commands.Effects.Sequence(
-            effects.Select(TeaEffectAdapter.ToCore).ToArray());
+        ArgumentNullException.ThrowIfNull(effects);
+        var adapted = new global::TeaSharp.Core.Abstractions.Effect?[effects.Length];
+        for (var index = 0; index < effects.Length; index++)
+        {
+            adapted[index] = TeaEffectAdapter.ToCore(effects[index]);
+        }
+
+        var core = global::TeaSharp.Core.Commands.Effects.Sequence(adapted);
         return TeaEffectAdapter.FromCore(core);
     }
 

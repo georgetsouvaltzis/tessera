@@ -101,6 +101,16 @@ public sealed class TeaThemeOverrides
         ArgumentNullException.ThrowIfNull(control);
         ArgumentNullException.ThrowIfNull(baseTheme);
 
+        if (GlobalTheme is null
+            && _globalStateThemes.Count == 0
+            && _controlTypeThemes.Count == 0
+            && _controlTypeStateThemes.Count == 0
+            && _controlInstanceThemes.Count == 0
+            && _controlInstanceStateThemes.Count == 0)
+        {
+            return baseTheme;
+        }
+
         var resolved = baseTheme;
         if (GlobalTheme is not null)
         {
