@@ -33,6 +33,7 @@ internal static class BorderedControlParityPolicyTests
         typeof(ProgressBar),
         typeof(PropertyGrid),
         typeof(SearchBox),
+        typeof(SearchResultsView),
         typeof(Slider),
         typeof(Spinner),
         typeof(Table),
