@@ -253,6 +253,36 @@ var richText = new RichTextView().ApplyThemeDefaults(theme);
 richText.InlineCodeStyle = TeaStyle.Empty.WithBackground(AnsiColor.BrightBlack).WithForeground(AnsiColor.BrightWhite);
 ```
 
+### Wave 3 Dev/Ops Theme Hooks
+
+`TeaThemeControlExtensions` includes explicit mappings for:
+
+- `JsonTreeView`
+- `CommandOutput`
+- `LogTailPanel`
+- `ActivityFeed`
+- `NotificationInbox`
+- `KeyBindingHelpDialog`
+
+Bordered controls in this set (`JsonTreeView`, `CommandOutput`, `LogTailPanel`, `ActivityFeed`) map `BorderStyleText` and `FocusedBorderStyleText` to semantic border/focus tokens by default.
+
+```csharp
+using TeaSharp.Controls;
+using TeaSharp.Styles;
+
+var theme = TeaThemes.RosePine(RosePineVariant.Main);
+
+var logs = new LogTailPanel().ApplyThemeDefaults(theme);
+logs.BorderStyleText = TeaStyle.Empty.WithForeground(AnsiColor.BrightBlack);
+logs.FocusedBorderStyleText = TeaStyle.Empty.WithBold().WithForeground(AnsiColor.BrightYellow);
+
+var inbox = new NotificationInbox().ApplyThemeDefaults(theme);
+inbox.PinnedItemStyle = TeaStyle.Empty.WithBold().WithForeground(AnsiColor.BrightCyan);
+
+var help = new KeyBindingHelpDialog().ApplyThemeDefaults(theme);
+help.KeysStyle = TeaStyle.Empty.WithBold().WithForeground(AnsiColor.BrightWhite);
+```
+
 ### Dropdown and Tree Glyph Sets
 
 ```csharp
@@ -350,6 +380,7 @@ Default policy for all controls:
 - `TeaThemeControlExtensions.RenderingTextUtilities.cs`
 - `TeaThemeControlExtensions.ModalAndCharts.cs`
 - `TeaThemeControlExtensions.Plotting.cs`
+- `TeaThemeControlExtensions.DevOpsAndWorkflows.cs`
 
 Mapped controls expose:
 
@@ -416,6 +447,11 @@ Explorer/feedback mapping coverage includes:
 
 - `DiffView`, `PropertyGrid`, `FileExplorer`, `FuzzyFinder`, `ToastCenter`
 - `DiffView`, `PropertyGrid`, `FileExplorer`, `FuzzyFinder`, and `ToastCenter` map `BorderStyleText` + `FocusedBorderStyleText` to border/focus tokens
+
+Dev/ops workflow mapping coverage includes:
+
+- `JsonTreeView`, `CommandOutput`, `LogTailPanel`, `ActivityFeed`, `NotificationInbox`, `KeyBindingHelpDialog`
+- bordered controls in this set map `BorderStyleText` + `FocusedBorderStyleText` to border/focus tokens
 
 Bordered control parity enforcement:
 

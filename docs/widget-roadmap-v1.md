@@ -74,6 +74,13 @@ Wave 2 integration status (current lane):
 | `NotificationInbox` | P1 | Persistent in-app notifications | unread marker, severity marker |
 | `KeyBindingHelpDialog` | P1 | Discoverability for shortcuts | keycap separators, category markers |
 
+Wave 3 integration status (current lane):
+
+- Implemented and wired: `JsonTreeView`, `CommandOutput`, `LogTailPanel`, `ActivityFeed`, `NotificationInbox`, `KeyBindingHelpDialog`.
+- Theme extension coverage added for all shipped Wave 3 controls (`ApplyTheme`, `ApplyThemeDefaults`, override overloads).
+- Bordered parity + control-catalog + theme-override tests now include bordered Wave 3 controls (`JsonTreeView`, `CommandOutput`, `LogTailPanel`, `ActivityFeed`).
+- Remaining Wave 3 backlog: `TraceViewer`, `TaskRunnerPanel`.
+
 ### Wave 4 (P2): Advanced Composition + Visual Data (8)
 
 | Widget | Priority | C# workflow rationale | Glyph hooks |

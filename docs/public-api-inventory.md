@@ -116,6 +116,23 @@ These are the types new applications should discover first.
 - `TeaSharp.Controls.RichTextView`
 - `TeaSharp.Controls.RichTextSegment`
 - `TeaSharp.Controls.RichTextStyleKind`
+- `TeaSharp.Controls.JsonTreeView`
+- `TeaSharp.Controls.JsonTreeNode`
+- `TeaSharp.Controls.JsonTreeNodeKind`
+- `TeaSharp.Controls.JsonTreeSelectionChangedEventArgs`
+- `TeaSharp.Controls.CommandOutput`
+- `TeaSharp.Controls.CommandOutputLine`
+- `TeaSharp.Controls.CommandOutputChannel`
+- `TeaSharp.Controls.LogTailPanel`
+- `TeaSharp.Controls.LogEntry`
+- `TeaSharp.Controls.LogLevel`
+- `TeaSharp.Controls.ActivityFeed`
+- `TeaSharp.Controls.ActivityFeedItem`
+- `TeaSharp.Controls.ActivityFeedItemKind`
+- `TeaSharp.Controls.NotificationInbox`
+- `TeaSharp.Controls.InboxItem`
+- `TeaSharp.Controls.KeyBindingHelpDialog`
+- `TeaSharp.Controls.KeyBindingItem`
 - `TeaSharp.Controls.DataGrid`
 - `TeaSharp.Controls.TreeTable`
 - `TeaSharp.Controls.KeyValueList`
@@ -294,10 +311,11 @@ Their old `TeaSharp.Components.Prebuilt.*` counterparts have been removed instea
 
 ## Theme Mapping Status
 
-Current shipped theme mapping is centralized in `TeaSharp.Styles.TeaThemeControlExtensions` and split into domain partial files (`Basic`, `InputValue`, `Navigation`, `NavigationOverlay`, `NavigationPrimitives`, `DataAndFlow`, `PlanningAndBoards`, `QueryAndRichText`, `ExplorerAndFeedback`, `RenderingTextUtilities`, `ModalAndCharts`, `Plotting`).
+Current shipped theme mapping is centralized in `TeaSharp.Styles.TeaThemeControlExtensions` and split into domain partial files (`Basic`, `InputValue`, `Navigation`, `NavigationOverlay`, `NavigationPrimitives`, `DataAndFlow`, `PlanningAndBoards`, `QueryAndRichText`, `ExplorerAndFeedback`, `RenderingTextUtilities`, `ModalAndCharts`, `Plotting`, `DevOpsAndWorkflows`).
 Overlay glyph cookbook snippets for `MenuBarGlyphSet`, `ContextMenuGlyphSet`, and `CommandPaletteGlyphSet` are documented in [theme-system-v1.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/theme-system-v1.md).
 Border override, dropdown/tree glyph-set, and data marker/separator cookbook snippets are documented in [theme-system-v1.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/theme-system-v1.md).
 Wave 2 query/analytics controls (`PivotTable`, `QueryBuilder`, `RichTextView`) are mapped with the same semantic-token and border-style contract.
+Wave 3 dev/ops controls (`JsonTreeView`, `CommandOutput`, `LogTailPanel`, `ActivityFeed`, `NotificationInbox`, `KeyBindingHelpDialog`) are mapped with the same semantic-token contract.
 
 ## Plotting Authoring Guidance (Tier 1)
 
@@ -404,6 +422,11 @@ Explorer/feedback controls with direct token mappings:
 
 - `DiffView`, `PropertyGrid`, `FileExplorer`, `FuzzyFinder`, `ToastCenter`
 - `DiffView`, `PropertyGrid`, `FileExplorer`, `FuzzyFinder`, and `ToastCenter` map `BorderStyleText` -> `Border.Default` and `FocusedBorderStyleText` -> `Border.Focused + Focus.Border`
+
+Dev/ops workflow controls with direct token mappings:
+
+- `JsonTreeView`, `CommandOutput`, `LogTailPanel`, `ActivityFeed`, `NotificationInbox`, `KeyBindingHelpDialog`
+- `JsonTreeView`, `CommandOutput`, `LogTailPanel`, and `ActivityFeed` map `BorderStyleText` -> `Border.Default` and `FocusedBorderStyleText` -> `Border.Focused + Focus.Border`
 
 Rendering text utility controls with direct token mappings:
 

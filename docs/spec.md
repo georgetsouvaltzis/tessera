@@ -92,7 +92,7 @@ V1 theming is semantic-token based with override hierarchy:
 - semantic tokens for text/surface/border/state/focus/selection/accent
 - built-in palettes (Catppuccin, Rosé Pine) plus custom palette
 - override precedence: global theme -> control type -> control instance -> state
-- `TeaThemeControlExtensions` is split by domain (`Basic`, `InputValue`, `Navigation`, `NavigationOverlay`, `NavigationPrimitives`, `DataAndFlow`, `PlanningAndBoards`, `QueryAndRichText`, `ExplorerAndFeedback`, `RenderingTextUtilities`, `ModalAndCharts`, `Plotting`)
+- `TeaThemeControlExtensions` is split by domain (`Basic`, `InputValue`, `Navigation`, `NavigationOverlay`, `NavigationPrimitives`, `DataAndFlow`, `PlanningAndBoards`, `QueryAndRichText`, `ExplorerAndFeedback`, `RenderingTextUtilities`, `ModalAndCharts`, `Plotting`, `DevOpsAndWorkflows`)
 - mapped input/value controls include `TextInput`, `TextArea`, `Toggle`, `Slider`, `Spinner`, `ProgressBar`, `NumberInput`, `DatePicker`, `TimePicker`
 - mapped basic controls include `Label`, `Button`, `ListView<T>`, `StatusBar`, `TextInput`, `Table`, `Tabs`
 - mapped navigation controls include `Breadcrumb`, `Paginator`, `Toolbar`, `CommandBar`, `SearchBox`, `SearchResultsView`
@@ -121,6 +121,8 @@ V1 theming is semantic-token based with override hierarchy:
 - mapped query/analytics controls include `PivotTable`, `QueryBuilder`, `RichTextView`
 - bordered query/analytics controls (`PivotTable`, `QueryBuilder`, `RichTextView`) map `BorderStyleText`/`FocusedBorderStyleText` to semantic border/focus tokens by default
 - mapped explorer/feedback controls include `DiffView`, `PropertyGrid`, `FileExplorer`, `FuzzyFinder`, `ToastCenter`
+- mapped dev/ops workflow controls include `JsonTreeView`, `CommandOutput`, `LogTailPanel`, `ActivityFeed`, `NotificationInbox`, `KeyBindingHelpDialog`
+- bordered dev/ops workflow controls (`JsonTreeView`, `CommandOutput`, `LogTailPanel`, `ActivityFeed`) map `BorderStyleText`/`FocusedBorderStyleText` to semantic border/focus tokens by default
 - mapped rendering text utility controls include `Badge`, `LogView`, `MarkdownView`, `MiniLog`
 - mapped modal/chart summary controls include `Dialog`, `Modal`, `BarChart`, `LineChart`, `Gauge`, `StatsCard`
 - mapped plotting controls include `Sparkline`, `AreaPlot`, `ScatterPlot`, `Histogram`, `LinePlot`, `PlotPanel`
@@ -226,6 +228,23 @@ Root controls currently include:
 - `RichTextView`
 - `RichTextSegment`
 - `RichTextStyleKind`
+- `JsonTreeView`
+- `JsonTreeNode`
+- `JsonTreeNodeKind`
+- `JsonTreeSelectionChangedEventArgs`
+- `CommandOutput`
+- `CommandOutputLine`
+- `CommandOutputChannel`
+- `LogTailPanel`
+- `LogEntry`
+- `LogLevel`
+- `ActivityFeed`
+- `ActivityFeedItem`
+- `ActivityFeedItemKind`
+- `NotificationInbox`
+- `InboxItem`
+- `KeyBindingHelpDialog`
+- `KeyBindingItem`
 - `DataGrid`
 - `TreeTable`
 - `KeyValueList`
