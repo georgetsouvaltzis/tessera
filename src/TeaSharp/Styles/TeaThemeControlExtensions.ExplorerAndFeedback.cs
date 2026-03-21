@@ -18,6 +18,7 @@ public static partial class TeaThemeControlExtensions
         control.SelectedLineStyle = theme.Selection.Foreground.Merge(theme.Selection.Background);
         control.BorderStyleText = theme.Border.Default;
         control.FocusedBorderStyleText = theme.Border.Focused.Merge(theme.Focus.Border);
+        control.FocusMarker = theme.Focus.Marker;
         return control;
     }
 
@@ -47,6 +48,7 @@ public static partial class TeaThemeControlExtensions
             theme.Selection.Foreground.Merge(theme.Selection.Background));
         control.BorderStyleText = ApplyDefault(control.BorderStyleText, theme.Border.Default);
         control.FocusedBorderStyleText = ApplyDefault(control.FocusedBorderStyleText, theme.Border.Focused.Merge(theme.Focus.Border));
+        control.FocusMarker = ApplyDefault(control.FocusMarker, theme.Focus.Marker);
         return control;
     }
 
@@ -73,6 +75,7 @@ public static partial class TeaThemeControlExtensions
         control.SelectedRowStyle = theme.Selection.Foreground.Merge(theme.Selection.Background);
         control.BorderStyleText = theme.Border.Default;
         control.FocusedBorderStyleText = theme.Border.Focused.Merge(theme.Focus.Border);
+        control.FocusMarker = theme.Focus.Marker;
         return control;
     }
 
@@ -101,6 +104,7 @@ public static partial class TeaThemeControlExtensions
             theme.Selection.Foreground.Merge(theme.Selection.Background));
         control.BorderStyleText = ApplyDefault(control.BorderStyleText, theme.Border.Default);
         control.FocusedBorderStyleText = ApplyDefault(control.FocusedBorderStyleText, theme.Border.Focused.Merge(theme.Focus.Border));
+        control.FocusMarker = ApplyDefault(control.FocusMarker, theme.Focus.Marker);
         return control;
     }
 
@@ -131,6 +135,7 @@ public static partial class TeaThemeControlExtensions
         control.MutedStyle = theme.Text.Muted;
         control.BorderStyleText = theme.Border.Default;
         control.FocusedBorderStyleText = theme.Border.Focused.Merge(theme.Focus.Border);
+        control.FocusMarker = theme.Focus.Marker;
         return control;
     }
 
@@ -166,6 +171,7 @@ public static partial class TeaThemeControlExtensions
         control.MutedStyle = ApplyDefault(control.MutedStyle, theme.Text.Muted);
         control.BorderStyleText = ApplyDefault(control.BorderStyleText, theme.Border.Default);
         control.FocusedBorderStyleText = ApplyDefault(control.FocusedBorderStyleText, theme.Border.Focused.Merge(theme.Focus.Border));
+        control.FocusMarker = ApplyDefault(control.FocusMarker, theme.Focus.Marker);
         return control;
     }
 
@@ -200,6 +206,7 @@ public static partial class TeaThemeControlExtensions
         control.MatchHighlightStyle = theme.Accent.Primary;
         control.BorderStyleText = theme.Border.Default;
         control.FocusedBorderStyleText = theme.Border.Focused.Merge(theme.Focus.Border);
+        control.FocusMarker = theme.Focus.Marker;
         return control;
     }
 
@@ -236,6 +243,7 @@ public static partial class TeaThemeControlExtensions
         control.MatchHighlightStyle = ApplyDefault(control.MatchHighlightStyle, theme.Accent.Primary);
         control.BorderStyleText = ApplyDefault(control.BorderStyleText, theme.Border.Default);
         control.FocusedBorderStyleText = ApplyDefault(control.FocusedBorderStyleText, theme.Border.Focused.Merge(theme.Focus.Border));
+        control.FocusMarker = ApplyDefault(control.FocusMarker, theme.Focus.Marker);
         return control;
     }
 
@@ -272,6 +280,7 @@ public static partial class TeaThemeControlExtensions
         control.ErrorItemStyle = theme.State.Error;
         control.BorderStyleText = theme.Border.Default;
         control.FocusedBorderStyleText = theme.Border.Focused.Merge(theme.Focus.Border);
+        control.FocusMarker = theme.Focus.Marker;
         return control;
     }
 
@@ -310,6 +319,7 @@ public static partial class TeaThemeControlExtensions
         control.ErrorItemStyle = ApplyDefault(control.ErrorItemStyle, theme.State.Error);
         control.BorderStyleText = ApplyDefault(control.BorderStyleText, theme.Border.Default);
         control.FocusedBorderStyleText = ApplyDefault(control.FocusedBorderStyleText, theme.Border.Focused.Merge(theme.Focus.Border));
+        control.FocusMarker = ApplyDefault(control.FocusMarker, theme.Focus.Marker);
         return control;
     }
 

@@ -21,6 +21,7 @@ public static partial class TeaThemeControlExtensions
         control.FocusedSelectedRowStyle = theme.Focus.Ring;
         control.DisabledStyle = theme.Text.Muted;
         control.EmptyStyle = theme.Text.Muted;
+        control.FocusMarker = theme.Focus.Marker;
         return control;
     }
 
@@ -51,6 +52,7 @@ public static partial class TeaThemeControlExtensions
         control.FocusedSelectedRowStyle = ApplyDefault(control.FocusedSelectedRowStyle, theme.Focus.Ring);
         control.DisabledStyle = ApplyDefault(control.DisabledStyle, theme.Text.Muted);
         control.EmptyStyle = ApplyDefault(control.EmptyStyle, theme.Text.Muted);
+        control.FocusMarker = ApplyDefault(control.FocusMarker, theme.Focus.Marker);
         return control;
     }
 
@@ -79,6 +81,7 @@ public static partial class TeaThemeControlExtensions
         control.FocusedSelectedItemStyle = theme.Focus.Ring;
         control.DisabledStyle = theme.Text.Muted;
         control.EmptyStyle = theme.Text.Muted;
+        control.FocusMarker = theme.Focus.Marker;
         return control;
     }
 
@@ -107,6 +110,7 @@ public static partial class TeaThemeControlExtensions
         control.FocusedSelectedItemStyle = ApplyDefault(control.FocusedSelectedItemStyle, theme.Focus.Ring);
         control.DisabledStyle = ApplyDefault(control.DisabledStyle, theme.Text.Muted);
         control.EmptyStyle = ApplyDefault(control.EmptyStyle, theme.Text.Muted);
+        control.FocusMarker = ApplyDefault(control.FocusMarker, theme.Focus.Marker);
         return control;
     }
 
@@ -185,6 +189,7 @@ public static partial class TeaThemeControlExtensions
         control.FocusedSelectedRowStyle = theme.Focus.Ring;
         control.DisabledStyle = theme.Text.Muted;
         control.EmptyStyle = theme.Text.Muted;
+        control.FocusMarker = theme.Focus.Marker;
         return control;
     }
 
@@ -217,6 +222,7 @@ public static partial class TeaThemeControlExtensions
         control.FocusedSelectedRowStyle = ApplyDefault(control.FocusedSelectedRowStyle, theme.Focus.Ring);
         control.DisabledStyle = ApplyDefault(control.DisabledStyle, theme.Text.Muted);
         control.EmptyStyle = ApplyDefault(control.EmptyStyle, theme.Text.Muted);
+        control.FocusMarker = ApplyDefault(control.FocusMarker, theme.Focus.Marker);
         return control;
     }
 
@@ -247,6 +253,7 @@ public static partial class TeaThemeControlExtensions
         control.HoveredStepStyle = theme.Accent.Secondary;
         control.DisabledStepStyle = theme.Text.Muted;
         control.EmptyStyle = theme.Text.Muted;
+        control.FocusMarker = theme.Focus.Marker;
         return control;
     }
 
@@ -277,6 +284,7 @@ public static partial class TeaThemeControlExtensions
         control.HoveredStepStyle = ApplyDefault(control.HoveredStepStyle, theme.Accent.Secondary);
         control.DisabledStepStyle = ApplyDefault(control.DisabledStepStyle, theme.Text.Muted);
         control.EmptyStyle = ApplyDefault(control.EmptyStyle, theme.Text.Muted);
+        control.FocusMarker = ApplyDefault(control.FocusMarker, theme.Focus.Marker);
         return control;
     }
 
@@ -309,6 +317,7 @@ public static partial class TeaThemeControlExtensions
         control.ReadOnlyFieldStyle = theme.Text.Muted;
         control.DisabledStyle = theme.Text.Muted;
         control.ErrorStyle = theme.State.Error;
+        control.FocusMarker = theme.Focus.Marker;
         return control;
     }
 
@@ -342,6 +351,7 @@ public static partial class TeaThemeControlExtensions
         control.ReadOnlyFieldStyle = ApplyDefault(control.ReadOnlyFieldStyle, theme.Text.Muted);
         control.DisabledStyle = ApplyDefault(control.DisabledStyle, theme.Text.Muted);
         control.ErrorStyle = ApplyDefault(control.ErrorStyle, theme.State.Error);
+        control.FocusMarker = ApplyDefault(control.FocusMarker, theme.Focus.Marker);
         return control;
     }
 

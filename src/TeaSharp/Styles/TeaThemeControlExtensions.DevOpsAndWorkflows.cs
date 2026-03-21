@@ -20,6 +20,7 @@ public static partial class TeaThemeControlExtensions
         control.MutedStyle = theme.Text.Muted;
         control.BorderStyleText = theme.Border.Default;
         control.FocusedBorderStyleText = theme.Border.Focused.Merge(theme.Focus.Border);
+        control.FocusMarker = theme.Focus.Marker;
         return control;
     }
 
@@ -51,6 +52,7 @@ public static partial class TeaThemeControlExtensions
         control.MutedStyle = ApplyDefault(control.MutedStyle, theme.Text.Muted);
         control.BorderStyleText = ApplyDefault(control.BorderStyleText, theme.Border.Default);
         control.FocusedBorderStyleText = ApplyDefault(control.FocusedBorderStyleText, theme.Border.Focused.Merge(theme.Focus.Border));
+        control.FocusMarker = ApplyDefault(control.FocusMarker, theme.Focus.Marker);
         return control;
     }
 
@@ -82,6 +84,7 @@ public static partial class TeaThemeControlExtensions
         control.EmptyStyle = theme.Text.Muted;
         control.BorderStyleText = theme.Border.Default;
         control.FocusedBorderStyleText = theme.Border.Focused.Merge(theme.Focus.Border);
+        control.FocusMarker = theme.Focus.Marker;
         return control;
     }
 
@@ -115,6 +118,7 @@ public static partial class TeaThemeControlExtensions
         control.EmptyStyle = ApplyDefault(control.EmptyStyle, theme.Text.Muted);
         control.BorderStyleText = ApplyDefault(control.BorderStyleText, theme.Border.Default);
         control.FocusedBorderStyleText = ApplyDefault(control.FocusedBorderStyleText, theme.Border.Focused.Merge(theme.Focus.Border));
+        control.FocusMarker = ApplyDefault(control.FocusMarker, theme.Focus.Marker);
         return control;
     }
 
@@ -149,6 +153,7 @@ public static partial class TeaThemeControlExtensions
         control.DisabledEntryStyle = theme.Text.Muted;
         control.BorderStyleText = theme.Border.Default;
         control.FocusedBorderStyleText = theme.Border.Focused.Merge(theme.Focus.Border);
+        control.FocusMarker = theme.Focus.Marker;
         return control;
     }
 
@@ -185,6 +190,7 @@ public static partial class TeaThemeControlExtensions
         control.DisabledEntryStyle = ApplyDefault(control.DisabledEntryStyle, theme.Text.Muted);
         control.BorderStyleText = ApplyDefault(control.BorderStyleText, theme.Border.Default);
         control.FocusedBorderStyleText = ApplyDefault(control.FocusedBorderStyleText, theme.Border.Focused.Merge(theme.Focus.Border));
+        control.FocusMarker = ApplyDefault(control.FocusMarker, theme.Focus.Marker);
         return control;
     }
 
@@ -219,6 +225,7 @@ public static partial class TeaThemeControlExtensions
         control.EmptyStyle = theme.Text.Muted;
         control.BorderStyleText = theme.Border.Default;
         control.FocusedBorderStyleText = theme.Border.Focused.Merge(theme.Focus.Border);
+        control.FocusMarker = theme.Focus.Marker;
         return control;
     }
 
@@ -255,6 +262,7 @@ public static partial class TeaThemeControlExtensions
         control.EmptyStyle = ApplyDefault(control.EmptyStyle, theme.Text.Muted);
         control.BorderStyleText = ApplyDefault(control.BorderStyleText, theme.Border.Default);
         control.FocusedBorderStyleText = ApplyDefault(control.FocusedBorderStyleText, theme.Border.Focused.Merge(theme.Focus.Border));
+        control.FocusMarker = ApplyDefault(control.FocusMarker, theme.Focus.Marker);
         return control;
     }
 
@@ -287,6 +295,7 @@ public static partial class TeaThemeControlExtensions
         control.PinnedItemStyle = theme.Accent.Primary;
         control.DisabledStyle = theme.Text.Muted;
         control.EmptyTextStyle = theme.Text.Muted;
+        control.FocusMarker = theme.Focus.Marker;
         return control;
     }
 
@@ -321,6 +330,7 @@ public static partial class TeaThemeControlExtensions
         control.PinnedItemStyle = ApplyDefault(control.PinnedItemStyle, theme.Accent.Primary);
         control.DisabledStyle = ApplyDefault(control.DisabledStyle, theme.Text.Muted);
         control.EmptyTextStyle = ApplyDefault(control.EmptyTextStyle, theme.Text.Muted);
+        control.FocusMarker = ApplyDefault(control.FocusMarker, theme.Focus.Marker);
         return control;
     }
 
@@ -349,6 +359,7 @@ public static partial class TeaThemeControlExtensions
         control.GlobalBindingStyle = theme.State.Info;
         control.DisabledStyle = theme.Text.Muted;
         control.EmptyTextStyle = theme.Text.Muted;
+        control.FocusMarker = theme.Focus.Marker;
         return control;
     }
 
@@ -379,6 +390,7 @@ public static partial class TeaThemeControlExtensions
         control.GlobalBindingStyle = ApplyDefault(control.GlobalBindingStyle, theme.State.Info);
         control.DisabledStyle = ApplyDefault(control.DisabledStyle, theme.Text.Muted);
         control.EmptyTextStyle = ApplyDefault(control.EmptyTextStyle, theme.Text.Muted);
+        control.FocusMarker = ApplyDefault(control.FocusMarker, theme.Focus.Marker);
         return control;
     }
 
@@ -413,6 +425,7 @@ public static partial class TeaThemeControlExtensions
         control.MutedRowStyle = theme.Text.Muted;
         control.DisabledStyle = theme.Text.Muted;
         control.EmptyTextStyle = theme.Text.Muted;
+        control.FocusMarker = theme.Focus.Marker;
         return control;
     }
 
@@ -449,6 +462,7 @@ public static partial class TeaThemeControlExtensions
         control.MutedRowStyle = ApplyDefault(control.MutedRowStyle, theme.Text.Muted);
         control.DisabledStyle = ApplyDefault(control.DisabledStyle, theme.Text.Muted);
         control.EmptyTextStyle = ApplyDefault(control.EmptyTextStyle, theme.Text.Muted);
+        control.FocusMarker = ApplyDefault(control.FocusMarker, theme.Focus.Marker);
         return control;
     }
 
@@ -481,6 +495,7 @@ public static partial class TeaThemeControlExtensions
         control.SucceededStatusStyle = theme.State.Success;
         control.FailedStatusStyle = theme.State.Error;
         control.EmptyStyle = theme.Text.Muted;
+        control.FocusMarker = theme.Focus.Marker;
         return control;
     }
 
@@ -515,6 +530,7 @@ public static partial class TeaThemeControlExtensions
         control.SucceededStatusStyle = ApplyDefault(control.SucceededStatusStyle, theme.State.Success);
         control.FailedStatusStyle = ApplyDefault(control.FailedStatusStyle, theme.State.Error);
         control.EmptyStyle = ApplyDefault(control.EmptyStyle, theme.Text.Muted);
+        control.FocusMarker = ApplyDefault(control.FocusMarker, theme.Focus.Marker);
         return control;
     }
 
