@@ -94,7 +94,12 @@ public sealed class TraceEntry
 
 public sealed partial class TraceViewer
 {
-    private bool SetSelectedIndex(int index)
+    /// <summary>
+    /// Sets the selected entry index using bounds clamping.
+    /// </summary>
+    /// <param name="index">Requested index.</param>
+    /// <returns><see langword="true" /> when selection changed; otherwise <see langword="false" />.</returns>
+    public bool SetSelectedIndex(int index)
     {
         if (_entries.Count == 0)
         {

@@ -182,6 +182,34 @@ public sealed class Timeline : Control
         return SetSelectedIndex(index);
     }
 
+    /// <summary>
+    /// Sets the selected entry index using bounds clamping.
+    /// </summary>
+    /// <param name="index">The requested selected index.</param>
+    /// <returns><see langword="true" /> when selection changed; otherwise <see langword="false" />.</returns>
+    public bool SetSelectedIndex(int index)
+    {
+        if (_entries.Count == 0)
+        {
+            return false;
+        }
+
+        var clamped = Math.Clamp(index, 0, _entries.Count - 1);
+        if (clamped == _selectedIndex)
+        {
+            return false;
+        }
+
+        var previousIndex = _selectedIndex;
+        var previousItem = _entries[previousIndex];
+        _selectedIndex = clamped;
+        EnsureSelectionVisible(_lastViewportRows);
+        SelectionChanged?.Invoke(
+            this,
+            new TimelineSelectionChangedEventArgs(previousIndex, _selectedIndex, previousItem, _entries[_selectedIndex]));
+        return true;
+    }
+
     /// <inheritdoc />
     public override bool Handle(Message message)
     {
@@ -414,29 +442,6 @@ public sealed class Timeline : Control
         }
 
         return style;
-    }
-
-    private bool SetSelectedIndex(int index)
-    {
-        if (_entries.Count == 0)
-        {
-            return false;
-        }
-
-        var clamped = Math.Clamp(index, 0, _entries.Count - 1);
-        if (clamped == _selectedIndex)
-        {
-            return false;
-        }
-
-        var previousIndex = _selectedIndex;
-        var previousItem = _entries[previousIndex];
-        _selectedIndex = clamped;
-        EnsureSelectionVisible(_lastViewportRows);
-        SelectionChanged?.Invoke(
-            this,
-            new TimelineSelectionChangedEventArgs(previousIndex, _selectedIndex, previousItem, _entries[_selectedIndex]));
-        return true;
     }
 
     private void EnsureSelectionVisible(int viewportRows)

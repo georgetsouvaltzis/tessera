@@ -163,6 +163,32 @@ public sealed class SchedulerTimeline : Control
         return SetSelectedIndex(index);
     }
 
+    /// <summary>
+    /// Sets the selected entry index using bounds clamping.
+    /// </summary>
+    /// <param name="index">Requested entry index.</param>
+    /// <returns><see langword="true" /> when selection changed; otherwise, <see langword="false" />.</returns>
+    public bool SetSelectedIndex(int index)
+    {
+        if (_entries.Count == 0)
+        {
+            return false;
+        }
+
+        var next = Math.Clamp(index, 0, _entries.Count - 1);
+        if (next == _selectedIndex)
+        {
+            return false;
+        }
+
+        var previousIndex = _selectedIndex;
+        var previousEntry = _entries[previousIndex];
+        _selectedIndex = next;
+        EnsureSelectionVisible(_lastViewportRows);
+        SelectionChanged?.Invoke(this, new SchedulerSelectionChangedEventArgs(previousIndex, _selectedIndex, previousEntry, _entries[_selectedIndex]));
+        return true;
+    }
+
     /// <inheritdoc />
     public override bool Handle(Message message)
     {
@@ -383,27 +409,6 @@ public sealed class SchedulerTimeline : Control
     private TeaStyle ResolveStyle(TeaStyle style)
     {
         return IsDisabled ? style.Merge(DisabledStyle) : style;
-    }
-
-    private bool SetSelectedIndex(int index)
-    {
-        if (_entries.Count == 0)
-        {
-            return false;
-        }
-
-        var next = Math.Clamp(index, 0, _entries.Count - 1);
-        if (next == _selectedIndex)
-        {
-            return false;
-        }
-
-        var previousIndex = _selectedIndex;
-        var previousEntry = _entries[previousIndex];
-        _selectedIndex = next;
-        EnsureSelectionVisible(_lastViewportRows);
-        SelectionChanged?.Invoke(this, new SchedulerSelectionChangedEventArgs(previousIndex, _selectedIndex, previousEntry, _entries[_selectedIndex]));
-        return true;
     }
 
     private void RaiseSelectionChangedIfNeeded(int previousIndex, SchedulerEntry? previousEntry)

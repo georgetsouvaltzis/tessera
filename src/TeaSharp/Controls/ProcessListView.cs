@@ -197,6 +197,22 @@ public sealed class ProcessListView : Control
     /// <returns><see langword="true"/> when selection changed.</returns>
     public bool Select(int index) => SetSelectedIndex(index);
 
+    /// <summary>Sets the selected row index using bounds clamping.</summary>
+    /// <param name="index">Requested index.</param>
+    /// <returns><see langword="true"/> when selection changed.</returns>
+    public bool SetSelectedIndex(int index)
+    {
+        if (_entries.Count == 0) return false;
+        var clamped = Math.Clamp(index, 0, _entries.Count - 1);
+        if (clamped == _selectedIndex) return false;
+        var previousIndex = _selectedIndex;
+        var previousEntry = SelectedEntry;
+        _selectedIndex = clamped;
+        EnsureSelectionVisible(_lastViewportRows);
+        RaiseSelectionChangedIfNeeded(previousIndex, previousEntry);
+        return true;
+    }
+
     /// <inheritdoc />
     public override bool Handle(Message message)
     {
@@ -299,19 +315,6 @@ public sealed class ProcessListView : Control
         var rowCount = Math.Max(1, _entries.Count);
         var height = rowCount + headerRows + Padding.Vertical + (Border == BorderStyle.None ? 0 : 2);
         return new LayoutMeasurement(Math.Clamp(width, 0, availableBounds.Width), Math.Clamp(height, 0, availableBounds.Height));
-    }
-
-    private bool SetSelectedIndex(int index)
-    {
-        if (_entries.Count == 0) return false;
-        var clamped = Math.Clamp(index, 0, _entries.Count - 1);
-        if (clamped == _selectedIndex) return false;
-        var previousIndex = _selectedIndex;
-        var previousEntry = SelectedEntry;
-        _selectedIndex = clamped;
-        EnsureSelectionVisible(_lastViewportRows);
-        RaiseSelectionChangedIfNeeded(previousIndex, previousEntry);
-        return true;
     }
 
     private bool SetHoveredIndex(int index)

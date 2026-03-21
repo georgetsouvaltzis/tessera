@@ -96,6 +96,25 @@ public sealed class Tabs : Control
         _selectedIndex = Math.Clamp(_selectedIndex, 0, _items.Count - 1);
     }
 
+    /// <summary>
+    /// Sets the selected tab index using bounds clamping.
+    /// </summary>
+    /// <param name="index">Requested index.</param>
+    /// <returns><see langword="true"/> when selection changed; otherwise <see langword="false"/>.</returns>
+    public bool SetSelectedIndex(int index)
+    {
+        if (_items.Count == 0)
+        {
+            return false;
+        }
+
+        return TrySetSelectedIndex(Math.Clamp(index, 0, _items.Count - 1));
+    }
+
+    /// <summary>
+    /// Selects a tab by index.
+    /// </summary>
+    /// <param name="index">Requested index.</param>
     public void Select(int index)
     {
         if (_items.Count == 0)
@@ -104,7 +123,7 @@ public sealed class Tabs : Control
             return;
         }
 
-        SetSelectedIndex(Math.Clamp(index, 0, _items.Count - 1));
+        _ = SetSelectedIndex(index);
     }
 
     public override bool Handle(Message message)
@@ -116,12 +135,12 @@ public sealed class Tabs : Control
 
         if (key.Is(Key.Right) || key.IsCharacter('l'))
         {
-            return SetSelectedIndex((_selectedIndex + 1) % _items.Count);
+            return TrySetSelectedIndex((_selectedIndex + 1) % _items.Count);
         }
 
         if (key.Is(Key.Left) || key.IsCharacter('h'))
         {
-            return SetSelectedIndex((_selectedIndex + _items.Count - 1) % _items.Count);
+            return TrySetSelectedIndex((_selectedIndex + _items.Count - 1) % _items.Count);
         }
 
         if (key.Key == Key.Character
@@ -132,7 +151,7 @@ public sealed class Tabs : Control
             var requested = key.Text[0] == '0' ? 10 : key.Text[0] - '0';
             if (requested >= 1 && requested <= _items.Count)
             {
-                return SetSelectedIndex(requested - 1);
+                return TrySetSelectedIndex(requested - 1);
             }
         }
 
@@ -161,12 +180,12 @@ public sealed class Tabs : Control
         {
             if (pointer.Button == PointerButton.WheelDown)
             {
-                return SetSelectedIndex((_selectedIndex + 1) % _items.Count);
+                return TrySetSelectedIndex((_selectedIndex + 1) % _items.Count);
             }
 
             if (pointer.Button == PointerButton.WheelUp)
             {
-                return SetSelectedIndex((_selectedIndex + _items.Count - 1) % _items.Count);
+                return TrySetSelectedIndex((_selectedIndex + _items.Count - 1) % _items.Count);
             }
         }
 
@@ -178,7 +197,7 @@ public sealed class Tabs : Control
 
         if (pointer.Kind == PointerEventKind.Press && pointer.Button == PointerButton.Left && hovered >= 0)
         {
-            return SetSelectedIndex(hovered);
+            return TrySetSelectedIndex(hovered);
         }
 
         return Handle(message);
@@ -277,7 +296,7 @@ public sealed class Tabs : Control
         return true;
     }
 
-    private bool SetSelectedIndex(int index)
+    private bool TrySetSelectedIndex(int index)
     {
         if (_items.Count == 0 || index == _selectedIndex)
         {

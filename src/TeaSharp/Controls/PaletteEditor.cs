@@ -135,6 +135,22 @@ public sealed class PaletteEditor : Control
     /// <returns><see langword="true"/> when selection changed.</returns>
     public bool Select(int index) => SetSelectedIndex(index);
 
+    /// <summary>Sets the selected swatch index using bounds clamping.</summary>
+    /// <param name="index">Requested index.</param>
+    /// <returns><see langword="true"/> when selection changed.</returns>
+    public bool SetSelectedIndex(int index)
+    {
+        if (_swatches.Count == 0) return false;
+        var clamped = Math.Clamp(index, 0, _swatches.Count - 1);
+        if (clamped == _selectedIndex) return false;
+        var previousIndex = _selectedIndex;
+        var previousSwatch = SelectedSwatch;
+        _selectedIndex = clamped;
+        EnsureSelectionVisible(_lastViewportRows);
+        RaiseSelectionChangedIfNeeded(previousIndex, previousSwatch);
+        return true;
+    }
+
     /// <inheritdoc />
     public override bool Handle(Message message)
     {
@@ -293,19 +309,6 @@ public sealed class PaletteEditor : Control
         }
 
         _ = WriteStyledText(canvas, cursor, y, BuildBody(swatch), rowStyle, remaining);
-    }
-
-    private bool SetSelectedIndex(int index)
-    {
-        if (_swatches.Count == 0) return false;
-        var clamped = Math.Clamp(index, 0, _swatches.Count - 1);
-        if (clamped == _selectedIndex) return false;
-        var previousIndex = _selectedIndex;
-        var previousSwatch = SelectedSwatch;
-        _selectedIndex = clamped;
-        EnsureSelectionVisible(_lastViewportRows);
-        RaiseSelectionChangedIfNeeded(previousIndex, previousSwatch);
-        return true;
     }
 
     private void EnsureSelectionVisible(int viewportRows)

@@ -246,7 +246,10 @@ public sealed class PaneTabs : Control
         return null;
     }
 
-    private bool SetSelectedIndex(int index)
+    /// <summary>Sets the selected tab index.</summary>
+    /// <param name="index">Requested index.</param>
+    /// <returns><see langword="true"/> when selection changed; otherwise <see langword="false"/>.</returns>
+    public bool SetSelectedIndex(int index)
     {
         if (index < 0 || index >= _tabs.Count || _tabs[index].IsDisabled || index == _selectedIndex) return false;
         var previous = _selectedIndex;

@@ -171,6 +171,33 @@ public sealed class Toolbar : Control
         RaiseSelectionChangedIfNeeded(previousIndex, previousItem);
     }
 
+    /// <summary>
+    /// Sets the selected toolbar item index using bounds clamping.
+    /// </summary>
+    /// <param name="index">Requested index.</param>
+    /// <returns><see langword="true"/> when selection changed; otherwise <see langword="false"/>.</returns>
+    public bool SetSelectedIndex(int index)
+    {
+        if (_items.Count == 0)
+        {
+            return false;
+        }
+
+        var clamped = Math.Clamp(index, 0, _items.Count - 1);
+        if (clamped == _selectedIndex)
+        {
+            return false;
+        }
+
+        var previousIndex = _selectedIndex;
+        var previousItem = _items[previousIndex];
+        _selectedIndex = clamped;
+        SelectionChanged?.Invoke(
+            this,
+            new ToolbarSelectionChangedEventArgs(previousIndex, _selectedIndex, previousItem, _items[_selectedIndex]));
+        return true;
+    }
+
     /// <inheritdoc />
     public override bool Handle(Message message)
     {
@@ -282,28 +309,6 @@ public sealed class Toolbar : Control
         return new LayoutMeasurement(
             Math.Clamp(width, 0, availableBounds.Width),
             Math.Clamp(width == 0 ? 0 : 1, 0, availableBounds.Height));
-    }
-
-    private bool SetSelectedIndex(int index)
-    {
-        if (_items.Count == 0)
-        {
-            return false;
-        }
-
-        var clamped = Math.Clamp(index, 0, _items.Count - 1);
-        if (clamped == _selectedIndex)
-        {
-            return false;
-        }
-
-        var previousIndex = _selectedIndex;
-        var previousItem = _items[previousIndex];
-        _selectedIndex = clamped;
-        SelectionChanged?.Invoke(
-            this,
-            new ToolbarSelectionChangedEventArgs(previousIndex, _selectedIndex, previousItem, _items[_selectedIndex]));
-        return true;
     }
 
     private void RaiseSelectionChangedIfNeeded(int previousIndex, ToolbarItem? previousItem)
