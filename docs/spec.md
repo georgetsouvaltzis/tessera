@@ -134,6 +134,30 @@ V1 theming is semantic-token based with override hierarchy:
 
 Focus visuals must be theme-driven (for example focused border style/color), not limited to marker suffixes.
 
+Visual polish override recipe for navigation inputs:
+
+- set frame hooks first (`BorderStyleText`, `FocusedBorderStyleText`)
+- set typed markers second (`DropdownGlyphSet` for `Choice`/`ComboBox`, `TreeViewGlyphSet` for `TreeView`)
+- set title/row text state hooks third (`TitleStyle`, `FocusedTitleStyle`, selected/hovered styles)
+
+Minimal C# pattern:
+
+```csharp
+var choice = new Choice
+{
+    BorderStyleText = TeaStyle.Empty.WithForeground(AnsiColor.BrightBlack),
+    FocusedBorderStyleText = TeaStyle.Empty.WithBold().WithForeground(AnsiColor.BrightGreen),
+    Glyphs = new DropdownGlyphSet("▾", "▴", ">", "✓"),
+};
+
+var tree = new TreeView
+{
+    BorderStyleText = TeaStyle.Empty.WithForeground(AnsiColor.BrightBlack),
+    FocusedBorderStyleText = TeaStyle.Empty.WithBold().WithForeground(AnsiColor.BrightMagenta),
+    Glyphs = new TreeViewGlyphSet("▼", "▶", "•"),
+};
+```
+
 Image rendering is planned for V1.1.
 
 ### Typography Portability

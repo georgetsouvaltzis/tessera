@@ -217,6 +217,44 @@ var grid = new DataGrid
 };
 ```
 
+### Visual Polish Patterns (Choice/ComboBox/TreeView)
+
+Use the same three-layer pattern for polished defaults and app-specific overrides:
+
+1. border hook override (`BorderStyleText`, `FocusedBorderStyleText`)
+2. typed glyph set override (`DropdownGlyphSet`, `TreeViewGlyphSet`)
+3. text-state override (`TitleStyle`, `FocusedTitleStyle`, row/item styles)
+
+```csharp
+using TeaSharp.Controls;
+using TeaSharp.Styles;
+
+var choice = new Choice
+{
+    BorderStyleText = TeaStyle.Empty.WithForeground(AnsiColor.BrightBlack),
+    FocusedBorderStyleText = TeaStyle.Empty.WithBold().WithForeground(AnsiColor.BrightGreen),
+    Glyphs = new DropdownGlyphSet("▾", "▴", ">", "✓"),
+    TitleStyle = TeaStyle.Empty.WithForeground(AnsiColor.BrightWhite),
+    FocusedTitleStyle = TeaStyle.Empty.WithBold().WithForeground(AnsiColor.BrightCyan),
+};
+
+var comboBox = new ComboBox
+{
+    BorderStyleText = TeaStyle.Empty.WithForeground(AnsiColor.BrightBlack),
+    FocusedBorderStyleText = TeaStyle.Empty.WithBold().WithForeground(AnsiColor.BrightYellow),
+    Glyphs = new DropdownGlyphSet("▼", "▲", "•", "✓"),
+};
+
+var treeView = new TreeView
+{
+    BorderStyleText = TeaStyle.Empty.WithForeground(AnsiColor.BrightBlack),
+    FocusedBorderStyleText = TeaStyle.Empty.WithBold().WithForeground(AnsiColor.BrightMagenta),
+    Glyphs = new TreeViewGlyphSet("▼", "▶", "•"),
+    TitleStyle = TeaStyle.Empty.WithForeground(AnsiColor.BrightWhite),
+    FocusedTitleStyle = TeaStyle.Empty.WithBold().WithForeground(AnsiColor.BrightMagenta),
+};
+```
+
 ### Wave 1 App Shell + Forms Theme Hooks
 
 `TeaThemeControlExtensions.FormsAndShell.cs` includes explicit mappings for:

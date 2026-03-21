@@ -64,7 +64,10 @@ Correctness is a continuous gate across all phases: fix regressions at source an
   - Wave 1 app-shell/forms tranche integrated in docs+catalog/theme coverage (`Form`, `FieldSet`, `DataForm<TModel>`, `Wizard`, `SplitView`, `InspectorPanel`)
   - Wave 4 batch A + B integrated in docs+catalog/theme coverage (`DockWorkspace`, `PaneTabs`, `PaletteEditor`, `Heatmap`, `TreeMapChart`, `TerminalPanel`, `ProcessListView`)
 - **M3: Visual Quality Full Polish Pass** -> **In progress**
-  - visual polish implementation evidence landed in `ef9dea4` and `991d0d0` (examples/showcase/gallery polish slices)
+  - visual polish evidence placeholders are active and must be replaced by real commit SHAs before M3 closure:
+    - `TODO_POLISH_SHA_WIDGET_GALLERY` -> WidgetGallery polished default theme/layout slice
+    - `TODO_POLISH_SHA_CHOICE_COMBO_TREEVIEW` -> Choice/ComboBox/TreeView border+glyph+text override slice
+    - `TODO_POLISH_SHA_VISUAL_REGRESSION` -> visual regression assertions/snapshots update slice
   - latest workspace verification on March 21, 2026 is green (`dotnet test TeaSharp.slnx --no-build`, `dotnet build TeaSharp.Examples.slnx --no-restore --nologo -v minimal`)
   - M3 is not closed until the full [Visual Quality Full Polish Checklist](#visual-quality-full-polish-checklist-phase-3-gate) is explicitly satisfied
 - **M4: API Freeze + Cleanup** -> **In progress**
