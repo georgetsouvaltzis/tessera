@@ -85,14 +85,20 @@ Wave 3 integration status (current lane):
 
 | Widget | Priority | C# workflow rationale | Glyph hooks |
 | --- | --- | --- | --- |
-| `DockLayout` | P2 | IDE-like pane composition | dock handle glyphs |
+| `DockWorkspace` | P2 | IDE-like pane composition | dock handle glyphs |
 | `PaneTabs` | P2 | Multi-pane/multi-view workspaces | tab close/dirty markers |
 | `PaletteEditor` | P2 | Theme/palette authoring tools | swatch markers, active marker |
 | `Heatmap` | P2 | Dense matrix-based insights | cell markers, legend markers |
-| `Sparkline` | P2 | Inline trend telemetry | min/max markers |
+| `Sparkline` (baseline shipped) | P2 | Inline trend telemetry | min/max markers |
 | `TreeMapChart` | P2 | Hierarchical metric distribution | hierarchy separators |
 | `TerminalPanel` | P2 | Embedded subprocess sessions | prompt/stream markers |
 | `ProcessListView` | P2 | Runtime process inspection | status markers, sort marker |
+
+Wave 4 integration status (batch A):
+
+- Shipped and integrated: `DockWorkspace`, `PaneTabs`, `PaletteEditor`, `Heatmap`.
+- Theme extension domain file `TeaThemeControlExtensions.Workspace.cs` is active for Wave 4 workspace/visual-data mappings.
+- Remaining Wave 4 backlog: `TreeMapChart`, `TerminalPanel`, `ProcessListView` (`Sparkline` already shipped in plotting baseline).
 
 ## Shipped Plotting Baseline (Current V1 Track)
 

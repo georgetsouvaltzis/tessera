@@ -127,6 +127,18 @@ Preferred public catalog:
 114. `TaskRunnerPanel`
 115. `TaskRunItem`
 116. `TaskRunnerSelectionChangedEventArgs`
+117. `DockWorkspace`
+118. `DockPane`
+119. `DockPanePosition`
+120. `PaneTabs`
+121. `PaneTabItem`
+122. `PaneTabSelectionChangedEventArgs`
+123. `PaletteEditor`
+124. `PaletteSwatch`
+125. `PaletteSelectionChangedEventArgs`
+126. `Heatmap`
+127. `HeatmapCell`
+128. `HeatmapLegend`
 
 These live in `TeaSharp.Controls`.
 
@@ -240,6 +252,12 @@ Theme and override pattern:
 - Theme helpers now cover all eight controls (`ApplyTheme` + `ApplyThemeDefaults` + override overloads).
 - Recommended usage: `ApplyThemeDefaults(runtime.Theme)` first, then per-screen marker/style overrides.
 
+### Wave 4 Workspace + Visual Data Controls (Batch A)
+
+- Shipped and integrated controls: `DockWorkspace`, `PaneTabs`, `PaletteEditor`, `Heatmap`.
+- Support types: `DockPane`, `DockPanePosition`, `PaneTabItem`, `PaneTabSelectionChangedEventArgs`, `PaletteSwatch`, `PaletteSelectionChangedEventArgs`, `HeatmapCell`, `HeatmapLegend`.
+- Theme mappings in `TeaThemeControlExtensions.Workspace.cs` cover `DockWorkspace`, `PaneTabs`, and `Heatmap`; `PaletteEditor` ships with explicit style hooks.
+
 ### Beautiful UI Checklist (Current Phase)
 
 - Apply semantic theme first (`TeaRuntimeOptions.Theme`), then control-type, instance, and state overrides.
@@ -278,6 +296,8 @@ Current shipped `TeaThemeControlExtensions` mappings include:
 - plotting details: bordered plotting controls (`Sparkline`, `AreaPlot`, `LinePlot`, `PlotPanel`) include border text token mapping; `ScatterPlot`/`Histogram` map point or bar + axis + legend tokens
 - dev/ops workflow controls: `JsonTreeView`, `TraceViewer`, `CommandOutput`, `LogTailPanel`, `TaskRunnerPanel`, `ActivityFeed`, `NotificationInbox`, `KeyBindingHelpDialog`
 - dev/ops details: bordered controls in this set map border text hooks to semantic border/focus tokens; inbox/help-dialog map semantic title/row/state tokens
+- workspace/visual-data controls: `DockWorkspace`, `PaneTabs`, `PaletteEditor`, `Heatmap`
+- workspace/visual-data details: `DockWorkspace`, `PaneTabs`, and `Heatmap` map semantic tokens through `TeaThemeControlExtensions.Workspace.cs`; `PaletteEditor` uses control-level style hooks
 
 ## Advanced Seams
 

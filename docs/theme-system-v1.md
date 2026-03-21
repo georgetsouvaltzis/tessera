@@ -291,6 +291,33 @@ var help = new KeyBindingHelpDialog().ApplyThemeDefaults(theme);
 help.KeysStyle = TeaStyle.Empty.WithBold().WithForeground(AnsiColor.BrightWhite);
 ```
 
+### Wave 4 Workspace + Visual Data Theme Hooks (Batch A)
+
+`TeaThemeControlExtensions.Workspace.cs` includes explicit mappings for:
+
+- `DockWorkspace`
+- `PaneTabs`
+- `Heatmap`
+
+These controls map `BorderStyleText` and `FocusedBorderStyleText` to semantic border/focus tokens by default.
+`PaletteEditor` is shipped and integrated with explicit control-level style hooks.
+
+```csharp
+using TeaSharp.Controls;
+using TeaSharp.Styles;
+
+var theme = TeaThemes.Catppuccin(CatppuccinVariant.Macchiato);
+
+var workspace = new DockWorkspace().ApplyThemeDefaults(theme);
+workspace.FocusedPaneBorderStyleText = TeaStyle.Empty.WithBold().WithForeground(AnsiColor.BrightYellow);
+
+var tabs = new PaneTabs().ApplyThemeDefaults(theme);
+tabs.HoveredTabStyle = TeaStyle.Empty.WithUnderline().WithForeground(AnsiColor.BrightCyan);
+
+var heatmap = new Heatmap().ApplyThemeDefaults(theme);
+heatmap.PeakCellStyle = TeaStyle.Empty.WithBold().WithForeground(AnsiColor.BrightGreen);
+```
+
 ### Dropdown and Tree Glyph Sets
 
 ```csharp
@@ -389,12 +416,14 @@ Default policy for all controls:
 - `TeaThemeControlExtensions.ModalAndCharts.cs`
 - `TeaThemeControlExtensions.Plotting.cs`
 - `TeaThemeControlExtensions.DevOpsAndWorkflows.cs`
+- `TeaThemeControlExtensions.Workspace.cs`
 
 Mapped controls expose:
 
 - `ApplyTheme(TeaTheme theme)`
 - `ApplyThemeDefaults(TeaTheme theme)`
 - plotting mappings: `Sparkline`, `AreaPlot`, `ScatterPlot`, `Histogram`, `LinePlot`, `PlotPanel`
+- workspace mappings: `DockWorkspace`, `PaneTabs`, `Heatmap`
 - overloads taking `TeaThemeOverrides`, `baseTheme`, and `TeaThemeVisualState`
 
 Input/value mapping coverage includes:
@@ -460,6 +489,12 @@ Dev/ops workflow mapping coverage includes:
 
 - `JsonTreeView`, `CommandOutput`, `LogTailPanel`, `ActivityFeed`, `NotificationInbox`, `KeyBindingHelpDialog`
 - bordered controls in this set map `BorderStyleText` + `FocusedBorderStyleText` to border/focus tokens
+
+Workspace/visual-data mapping coverage includes:
+
+- `DockWorkspace`, `PaneTabs`, `Heatmap`
+- these controls map `BorderStyleText` + `FocusedBorderStyleText` to border/focus tokens
+- `PaletteEditor` remains style-hook driven and is not currently in `TeaThemeControlExtensions.Workspace.cs`
 
 Bordered control parity enforcement:
 
