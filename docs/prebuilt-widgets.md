@@ -166,6 +166,13 @@ Preferred public catalog:
 
 These live in `TeaSharp.Controls`.
 
+## Taxonomy Cross-Link (Expansion Planning)
+
+For actionable implementation backlog and category grouping (data viz, layout, inputs, overlays, status/ops, navigation), use:
+
+- [widget-roadmap-v1.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/widget-roadmap-v1.md) -> `Expansion Backlog: +36 Dashboard-First Widgets`
+- same roadmap section also contains dependency graph, top-12 API sketch contract, and lane-parallel sequencing
+
 ### Dropdown Visual Defaults
 
 - `Choice` and `ComboBox` now use richer dropdown glyph defaults for closed/open states.

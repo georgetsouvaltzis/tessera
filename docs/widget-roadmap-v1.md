@@ -137,6 +137,143 @@ Documentation and examples:
 - canonical plotting/dashboard sample: `examples/PlottingDashboard` (add when available)
 - current stopgap references: `examples/WidgetGallery`, `examples/AdvancedWidgets`
 
+## Expansion Backlog: +36 Dashboard-First Widgets
+
+This backlog is intentionally implementation-oriented for the next growth tranche beyond the current +34 wave completion. It keeps dashboard and operational TUI use-cases first.
+
+Dependency keys:
+
+- `D0`: existing V1 control contract (selection/focus/title/border hooks, theme override layers)
+- `D1`: shared chart primitives (`Series`, scales, legends, bucket/axis formatters)
+- `D2`: shared virtualization/windowing helpers for dense rows/cells
+- `D3`: shared overlay stack and focus trapping contract
+- `D4`: shared adaptive layout primitives (pane resize, snap, docking rules)
+- `D5`: terminal capability-gated image/media path (V1.1 only)
+
+### Data Viz (6)
+
+| Widget | Target | Dashboard use-case | Depends on |
+| --- | --- | --- | --- |
+| `BulletChart` | V1 | KPI vs target and qualitative ranges | `D0`, `D1` |
+| `BoxPlot` | V1 | percentile/distribution inspection | `D0`, `D1` |
+| `CandlestickChart` | V1 | market/service interval trend views | `D0`, `D1` |
+| `RadarChart` | V1.1 | multivariate profile comparison | `D0`, `D1` |
+| `GanttChart` | V1 | timeline execution planning | `D0`, `D1`, `D2` |
+| `FunnelChart` | V1 | conversion/drop-off pipelines | `D0`, `D1` |
+
+### Layout and Composition (6)
+
+| Widget | Target | Dashboard use-case | Depends on |
+| --- | --- | --- | --- |
+| `DashboardGrid` | V1 | drag/reflow card-based metric boards | `D0`, `D4` |
+| `CardDeck` | V1 | card stacks for grouped summaries | `D0`, `D4` |
+| `ResizablePaneGroup` | V1 | multi-pane operator workspaces | `D0`, `D4` |
+| `TileLayoutPanel` | V1 | dense tiled monitoring surfaces | `D0`, `D4` |
+| `DrilldownStack` | V1 | master->detail history navigation | `D0`, `D4` |
+| `FloatingPanelHost` | V1.1 | detachable inspector/transient panes | `D0`, `D3`, `D4` |
+
+### Inputs and Editors (6)
+
+| Widget | Target | Dashboard use-case | Depends on |
+| --- | --- | --- | --- |
+| `AutocompleteInput` | V1 | command/filter authoring with suggestions | `D0`, `D3` |
+| `TokenEditor` | V1 | structured labels/tags/owners editing | `D0` |
+| `PathPicker` | V1 | file/log/config source selection | `D0`, `D3` |
+| `CronExpressionInput` | V1 | schedule authoring in automation tools | `D0` |
+| `NumericRangeInput` | V1 | bounded thresholds and filter ranges | `D0` |
+| `JsonEditor` | V1.1 | structured JSON edit/validate panes | `D0`, `D2` |
+
+### Overlays and Workflow (6)
+
+| Widget | Target | Dashboard use-case | Depends on |
+| --- | --- | --- | --- |
+| `QuickOpenOverlay` | V1 | fuzzy jump across resources/views | `D0`, `D3` |
+| `ActionSheet` | V1 | context-safe command execution menus | `D0`, `D3` |
+| `TooltipOverlay` | V1 | dense-help hints for complex UIs | `D0`, `D3` |
+| `SpotlightOverlay` | V1 | focused walkthrough/highlight mode | `D0`, `D3` |
+| `CommandHistoryOverlay` | V1 | replay/reuse previous commands | `D0`, `D3` |
+| `ImagePreviewOverlay` | V1.1 | capability-gated image preview panes | `D0`, `D3`, `D5` |
+
+### Status and Ops (6)
+
+| Widget | Target | Dashboard use-case | Depends on |
+| --- | --- | --- | --- |
+| `HealthBoard` | V1 | aggregated service health surface | `D0`, `D1` |
+| `IncidentTimelinePanel` | V1 | incident events and milestone review | `D0`, `D1` |
+| `DeploymentPipelineView` | V1 | stage-gated release visibility | `D0` |
+| `AlertRuleTable` | V1 | rule status and suppression controls | `D0`, `D2` |
+| `SlaBurnRatePanel` | V1 | SLO/error-budget burn monitoring | `D0`, `D1` |
+| `ResourceQuotaPanel` | V1 | quota/limit and headroom tracking | `D0`, `D1` |
+
+### Navigation and Discovery (6)
+
+| Widget | Target | Dashboard use-case | Depends on |
+| --- | --- | --- | --- |
+| `SideNavRail` | V1 | persistent section navigation | `D0` |
+| `WorkspaceSwitcher` | V1 | fast context switching between workspaces | `D0`, `D3` |
+| `OutlineNavigator` | V1 | tree-like structural navigation | `D0`, `D2` |
+| `JumpList` | V1 | MRU and pinned target navigation | `D0` |
+| `RecentItemsNavigator` | V1 | recency-based productivity flow | `D0` |
+| `KeymapCheatSheetPanel` | V1 | always-available shortcut discoverability | `D0` |
+
+## Dependency Graph (Build Order)
+
+1. `D0` and `D4` first (API/style parity + layout substrate). This unlocks `DashboardGrid`, `ResizablePaneGroup`, `TileLayoutPanel`, `SideNavRail`.
+2. `D3` second (overlay host contracts). This unlocks `QuickOpenOverlay`, `ActionSheet`, `WorkspaceSwitcher`, `AutocompleteInput`.
+3. `D1` third (shared chart primitives). This unlocks `BulletChart`, `BoxPlot`, `FunnelChart`, `HealthBoard`, `SlaBurnRatePanel`.
+4. `D2` fourth (dense virtualization helpers). This unlocks `GanttChart`, `AlertRuleTable`, `OutlineNavigator`, and V1.1 `JsonEditor`.
+5. `D5` last and V1.1-only. This unlocks `ImagePreviewOverlay` and any future image-capable widgets.
+
+## Top 12 Widgets: Minimal Public API Sketch + Style Contract
+
+| Widget | Minimal C# API sketch | Required style/theming hooks |
+| --- | --- | --- |
+| `DashboardGrid` | `SetTiles(IEnumerable<DashboardTile>)`, `MoveTile(string tileId, int row, int column)`, `ResizeTile(string tileId, int rowSpan, int columnSpan)`, `SelectedTileId`, `SelectionChanged` | tile border/title style hooks, selected tile style, drag-preview style, focus marker support |
+| `ResizablePaneGroup` | `SetPanes(IEnumerable<PaneSpec>)`, `SetSplitRatio(int paneIndex, double ratio)`, `SelectedPaneIndex`, `SelectionChanged` | splitter style text, focused splitter style, pane title/focus marker hooks |
+| `SideNavRail` | `SetItems(IEnumerable<NavItem>)`, `SetSelectedIndex(int index)`, `SelectedItem`, `SelectionChanged`, `Activated` | selected/hover/focus item styles, collapse marker glyphs, badge marker glyph |
+| `WorkspaceSwitcher` | `SetWorkspaces(IEnumerable<WorkspaceItem>)`, `Open()`, `Close()`, `SetSelectedIndex(int index)`, `Submitted` | overlay border hooks, selected row style, search-hit marker glyph, dim-backdrop style |
+| `QuickOpenOverlay` | `SetItems(IEnumerable<QuickOpenItem>)`, `SetQuery(string query)`, `SetSelectedIndex(int index)`, `Submitted`, `Cancelled` | query input style hooks, row state styles, match marker glyphs, focused border hooks |
+| `AutocompleteInput` | `Text`, `SetSuggestions(IEnumerable<string>)`, `SetSelectedSuggestionIndex(int index)`, `SuggestionCommitted` | input/title/focus styles, popup border hooks, highlighted suggestion style, suggestion marker glyph |
+| `TokenEditor` | `SetTokens(IEnumerable<TokenItem>)`, `AddToken(string text)`, `RemoveSelectedToken()`, `SelectedTokenIndex`, `SelectionChanged` | token chip default/selected/error styles, add/remove marker glyphs, focus marker support |
+| `BulletChart` | `Title`, `SetRanges(IEnumerable<BulletRange>)`, `SetValue(double value)`, `SetTarget(double target)` | range-segment styles, value bar style, target marker glyph/style, threshold warning styles |
+| `BoxPlot` | `Title`, `SetSeries(IEnumerable<BoxPlotSeries>)`, `SetSelectedSeries(int index)`, `SelectionChanged` | quartile/median/whisker styles, selected series style, axis/legend text hooks |
+| `GanttChart` | `SetTasks(IEnumerable<GanttTask>)`, `SetViewport(DateOnly start, DateOnly end)`, `SetSelectedIndex(int index)`, `SelectionChanged` | bar styles by status, dependency marker glyphs, today marker style, focused border hooks |
+| `HealthBoard` | `SetServices(IEnumerable<HealthService>)`, `SetSelectedIndex(int index)`, `SelectionChanged`, `Acknowledge(string serviceId)` | status-severity styles, degraded/outage glyph hooks, selected row style, muted acknowledged style |
+| `DeploymentPipelineView` | `SetStages(IEnumerable<PipelineStage>)`, `SetSelectedStageIndex(int index)`, `SelectionChanged`, `RetrySelected()` | stage state styles, connector glyph hooks, selected stage style, running animation marker text |
+
+Global style contract for every widget above:
+
+- must support state styles: `Default`, `Hover`, `Focus`, `Selected`, `Disabled`
+- bordered controls must expose `BorderStyleText` + `FocusedBorderStyleText`
+- title-bearing controls must expose `FocusMarker` + `ShowFocusMarker`
+- all marker literals must be typed glyph-set properties (no hardcoded render literals)
+
+## Implementation Sequencing (Parallel Agent Lanes)
+
+Phase 1 (foundation, 2 weeks):
+
+- Lane A (layout/nav): `DashboardGrid`, `ResizablePaneGroup`, `SideNavRail`, `JumpList`
+- Lane B (overlays/input): `QuickOpenOverlay`, `AutocompleteInput`, `TokenEditor`
+- Lane C (data viz/ops): `BulletChart`, `BoxPlot`, `HealthBoard`
+
+Phase 2 (breadth, 2-3 weeks):
+
+- Lane A: `TileLayoutPanel`, `DrilldownStack`, `WorkspaceSwitcher`, `OutlineNavigator`
+- Lane B: `ActionSheet`, `TooltipOverlay`, `CommandHistoryOverlay`, `PathPicker`, `NumericRangeInput`, `CronExpressionInput`
+- Lane C: `FunnelChart`, `GanttChart`, `IncidentTimelinePanel`, `DeploymentPipelineView`, `AlertRuleTable`, `SlaBurnRatePanel`, `ResourceQuotaPanel`
+
+Phase 3 (V1.1 capability tranche):
+
+- Lane A: `FloatingPanelHost`
+- Lane B: `JsonEditor`, `ImagePreviewOverlay`
+- Lane C: `RadarChart` and other higher-density chart variants gated by terminal capability + perf budget
+
+Execution rules:
+
+- each widget slice must land with tests + theme mapping + deterministic interaction coverage
+- each phase ends with benchmark checks for render-only and render+materialize hot paths
+- image-capable widgets remain strictly V1.1 and capability-gated
+
 ## Visual Pass Timing
 
 - **Phase A (implementation-first):** each widget ships with strict minimal visual contract (state styles + glyph hooks + override hierarchy) and monochrome-safe rendering.
