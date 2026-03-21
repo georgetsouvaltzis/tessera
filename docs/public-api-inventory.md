@@ -190,6 +190,8 @@ These are the types new applications should discover first.
 - `TeaSharp.Controls.Wizard`
 - `TeaSharp.Controls.WizardStep`
 - `TeaSharp.Controls.WizardStepChangedEventArgs`
+- `TeaSharp.Controls.EmptyState`
+- `TeaSharp.Controls.ValidationSummary`
 - `TeaSharp.Controls.DiffView`
 - `TeaSharp.Controls.PropertyGrid`
 - `TeaSharp.Controls.FileExplorer`
@@ -373,6 +375,23 @@ Wave 2 query/analytics controls (`PivotTable`, `QueryBuilder`, `RichTextView`) a
 Wave 3 dev/ops controls (`JsonTreeView`, `CommandOutput`, `LogTailPanel`, `ActivityFeed`, `NotificationInbox`, `KeyBindingHelpDialog`) are mapped with the same semantic-token contract.
 Wave 4 batch A + B controls (`DockWorkspace`, `PaneTabs`, `PaletteEditor`, `Heatmap`, `TreeMapChart`, `TerminalPanel`, `ProcessListView`) are integrated and mapped in `TeaThemeControlExtensions.Workspace.cs`.
 Wave 1 app-shell/forms controls (`Form`, `FieldSet`, `DataForm<TModel>`, `Wizard`, `SplitView`, `InspectorPanel`) are integrated and mapped in `TeaThemeControlExtensions.FormsAndShell.cs`.
+
+## State-Style Naming Matrix (Tier 1 Consumer Quick Lookup)
+
+Use this matrix to find the expected public hook names quickly when customizing focus/selection/hover/border behavior on the no-DI default path.
+
+| Control family | Focus hooks | Selected hooks | Hovered hooks | Border hooks |
+|---|---|---|---|---|
+| Text and query inputs (`TextInput`, `TextArea`, `SearchBox`, `NumberInput`, `DatePicker`, `TimePicker`) | `FocusMarker`, `ShowFocusMarker`, `TitleStyle`, `FocusedTitleStyle` | `Selected*` where control-specific (for example result rows in `SearchResultsView`) | `Hovered*` where control-specific | `BorderStyleText`, `FocusedBorderStyleText` |
+| List and tree navigation (`ListView<T>`, `TreeView`, `Choice`, `ComboBox`, `SearchResultsView`) | `FocusMarker`, `ShowFocusMarker`, `TitleStyle`, `FocusedTitleStyle` | `SelectedIndex`, `SelectedItem`, `Selected*Style` | `Hovered*Style` | `BorderStyleText`, `FocusedBorderStyleText` |
+| Data surfaces (`Table`, `DataGrid`, `TreeTable`, `KeyValueList`, `Timeline`) | `FocusMarker`, `ShowFocusMarker`, focused title styles where supported | `Selected*Marker` and/or `Selected*Style` | `Hovered*Style` where supported | `BorderStyleText`, `FocusedBorderStyleText` |
+| Forms and validation (`Form`, `FieldSet`, `DataForm<TModel>`, `Wizard`, `ValidationSummary`) | `FocusMarker`, `ShowFocusMarker`, `FocusedTitleStyle` | `Selected*Style` or active-step styles | `Hovered*Style` where supported | `BorderStyleText`, `FocusedBorderStyleText` |
+| Menus and overlays (`MenuBar`, `ContextMenu`, `CommandPalette`, `Notifications`) | `FocusMarker`, `ShowFocusMarker`, focused title styles where supported | selected-item style/marker hooks per control | hovered-item style/marker hooks per control | `BorderStyleText`, `FocusedBorderStyleText` |
+
+Marker/glyph note:
+
+- symbolic affordances remain explicit and typed (`DropdownGlyphSet`, `TreeViewGlyphSet`, `MenuBarGlyphSet`, `ContextMenuGlyphSet`, `CommandPaletteGlyphSet`, `SearchResultsGlyphSet`)
+- `Focus.Marker` token is first-class in theme docs and should be mapped through marker-capable controls instead of hardcoded marker styling
 
 ## Plotting Authoring Guidance (Tier 1)
 

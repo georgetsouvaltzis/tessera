@@ -30,6 +30,18 @@ Theme values should be semantic, not control-specific:
 All tokens map to `TeaStyle` values and are consumable by controls without raw ANSI strings in app code.
 `Focus.Marker` is a first-class token and should drive focus-marker rendering for controls that expose marker hooks (`FocusMarker`/`ShowFocusMarker`), rather than hardcoded marker styling.
 
+## Consumer Hook Matrix (Quick Lookup)
+
+Use these naming patterns on the no-DI public path (`Tea.RunAsync(new App())` or `Tea.CreateBuilder().UseApp<TApp>()...`):
+
+| Family | Focus | Selected | Hovered | Border |
+|---|---|---|---|---|
+| Inputs/query (`TextInput`, `TextArea`, `SearchBox`) | `FocusMarker`, `ShowFocusMarker`, `FocusedTitleStyle` | control-specific `Selected*` hooks | control-specific `Hovered*` hooks | `BorderStyleText`, `FocusedBorderStyleText` |
+| Navigation/list (`ListView<T>`, `TreeView`, `Choice`, `ComboBox`) | title focus hooks + marker hooks | `SelectedIndex`/`SelectedItem` + `Selected*Style` | `Hovered*Style` | `BorderStyleText`, `FocusedBorderStyleText` |
+| Data/forms (`Table`, `DataGrid`, `TreeTable`, `Form`, `FieldSet`, `DataForm<TModel>`, `ValidationSummary`) | focused title/marker hooks | `Selected*Style` and row/cell markers | `Hovered*Style` | `BorderStyleText`, `FocusedBorderStyleText` |
+
+Extended family-by-family matrix lives in [public-api-inventory.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/public-api-inventory.md).
+
 ## Typography Emphasis Intent
 
 TeaSharp supports lightweight typography intent through `TeaFontWeight` and `TeaStyle.WithFontWeight(...)`.
