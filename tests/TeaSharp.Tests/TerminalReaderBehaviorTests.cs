@@ -15,6 +15,8 @@ internal static class TerminalReaderBehaviorTests
         yield return new TestCase("TerminalReader_BracketedPaste_AggregatesContent", BracketedPaste_AggregatesContent);
         yield return new TestCase("TerminalReader_ChunkedStream_DecodesMixedSequences", ChunkedStream_DecodesMixedSequences);
         yield return new TestCase("TerminalReader_SplitSgrMouseAcrossTimeout_DoesNotLeakCharacterFragments", SplitSgrMouseAcrossTimeout_DoesNotLeakCharacterFragments);
+        yield return new TestCase("TerminalReader_SplitSgrMouseFollowedByFilterText_DoesNotLeakMouseBytesIntoCharacters", SplitSgrMouseFollowedByFilterText_DoesNotLeakMouseBytesIntoCharacters);
+        yield return new TestCase("TerminalReader_SplitSgrMouseReleaseFollowedByFilterText_DoesNotLeakMouseBytesIntoCharacters", SplitSgrMouseReleaseFollowedByFilterText_DoesNotLeakMouseBytesIntoCharacters);
         yield return new TestCase("TerminalReader_SplitCsiControlAcrossTimeout_DoesNotLeakCharacterFragments", SplitCsiControlAcrossTimeout_DoesNotLeakCharacterFragments);
         yield return new TestCase("TerminalReader_TrailingEscape_EmitsEscapeAfterTimeout", TrailingEscape_EmitsEscapeAfterTimeout);
         yield return new TestCase("TerminalReader_EscapeThenDelayedChar_EmitsEscapeThenChar", EscapeThenDelayedChar_EmitsEscapeThenChar);
@@ -134,6 +136,64 @@ internal static class TerminalReaderBehaviorTests
         AssertNoCharacterLeak(events, "Split CSI control sequence should not emit character key fragments.");
     }
 
+    private static async Task SplitSgrMouseFollowedByFilterText_DoesNotLeakMouseBytesIntoCharacters()
+    {
+        // Arrange
+        var stream = new TimedChunkReadStream(
+        [
+            (Encoding.UTF8.GetBytes("\u001b[<26;4;"), 0),
+            (Encoding.UTF8.GetBytes("6M"), 35),
+            (Encoding.UTF8.GetBytes("be"), 0),
+        ]);
+        var reader = new TerminalReader(stream, new EventDecoder(), TimeSpan.FromMilliseconds(10));
+        var events = new List<IMessage>();
+
+        // Act
+        await reader.StreamEventsAsync(events.Add, CancellationToken.None);
+
+        // Assert
+        TestAssert.True(events.Count >= 3, "Expected one mouse event followed by filter text key events.");
+        TestAssert.True(
+            events[0] is MouseClickMsg
+            {
+                Button: MouseButton.Right,
+                X: 3,
+                Y: 5,
+                Modifiers: KeyModifiers.Ctrl | KeyModifiers.Alt,
+            },
+            "Split SGR mouse click should decode before typed filter text.");
+        AssertCharacterTextAfterMouse(events, "be", "Filter text should remain clean after split mouse sequence.");
+    }
+
+    private static async Task SplitSgrMouseReleaseFollowedByFilterText_DoesNotLeakMouseBytesIntoCharacters()
+    {
+        // Arrange
+        var stream = new TimedChunkReadStream(
+        [
+            (Encoding.UTF8.GetBytes("\u001b[<0;8;"), 0),
+            (Encoding.UTF8.GetBytes("3m"), 35),
+            (Encoding.UTF8.GetBytes("go"), 0),
+        ]);
+        var reader = new TerminalReader(stream, new EventDecoder(), TimeSpan.FromMilliseconds(10));
+        var events = new List<IMessage>();
+
+        // Act
+        await reader.StreamEventsAsync(events.Add, CancellationToken.None);
+
+        // Assert
+        TestAssert.True(events.Count >= 3, "Expected one mouse-release event followed by filter text key events.");
+        TestAssert.True(
+            events[0] is MouseReleaseMsg
+            {
+                Button: MouseButton.Left,
+                X: 7,
+                Y: 2,
+                Modifiers: KeyModifiers.None,
+            },
+            "Split SGR mouse release should decode before typed filter text.");
+        AssertCharacterTextAfterMouse(events, "go", "Filter text should remain clean after split mouse-release sequence.");
+    }
+
     private static async Task EscapeThenDelayedChar_EmitsEscapeThenChar()
     {
         // Arrange
@@ -194,6 +254,39 @@ internal static class TerminalReaderBehaviorTests
             {
                 throw new InvalidOperationException(message);
             }
+        }
+    }
+
+    private static void AssertCharacterTextAfterMouse(List<IMessage> events, string expectedText, string message)
+    {
+        var firstMouseIndex = -1;
+        for (var i = 0; i < events.Count; i++)
+        {
+            if (events[i] is MouseMsg)
+            {
+                firstMouseIndex = i;
+                break;
+            }
+        }
+
+        if (firstMouseIndex < 0)
+        {
+            throw new InvalidOperationException("Expected at least one mouse event.");
+        }
+
+        var builder = new StringBuilder();
+        for (var i = firstMouseIndex + 1; i < events.Count; i++)
+        {
+            if (events[i] is KeyPressMsg { Code: KeyCode.Character, Text: var text })
+            {
+                builder.Append(text);
+            }
+        }
+
+        var actual = builder.ToString();
+        if (!string.Equals(expectedText, actual, StringComparison.Ordinal))
+        {
+            throw new InvalidOperationException($"{message}. Expected=\"{expectedText}\", Actual=\"{actual}\".");
         }
     }
 

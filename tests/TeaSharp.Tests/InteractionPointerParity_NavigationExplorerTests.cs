@@ -15,6 +15,12 @@ internal static class InteractionPointerParity_NavigationExplorerTests
             "InteractionPointerParity_ComboBox_FieldHoverStyle_IsRendered",
             ComboBox_FieldHoverStyle_IsRendered);
         yield return new TestCase(
+            "InteractionPointerParity_Choice_CustomBorderGlyphAndFocusMarker_RenderStable",
+            Choice_CustomBorderGlyphAndFocusMarker_RenderStable);
+        yield return new TestCase(
+            "InteractionPointerParity_ComboBox_CustomBorderGlyphAndFocusMarker_RenderStable",
+            ComboBox_CustomBorderGlyphAndFocusMarker_RenderStable);
+        yield return new TestCase(
             "InteractionPointerParity_FuzzyFinder_HoveredRowStyle_IsRendered",
             FuzzyFinder_HoveredRowStyle_IsRendered);
         yield return new TestCase(
@@ -69,6 +75,68 @@ internal static class InteractionPointerParity_NavigationExplorerTests
         TestAssert.True(changed, "ComboBox pointer motion over field should update hover state.");
         TestAssert.True(output.Contains('▾'), "ComboBox should render the field indicator.");
         TestAssert.True(output.Contains(hoverStyle.ToEscapeSequence(), StringComparison.Ordinal), "ComboBox field hover style should render SGR sequence.");
+        return Task.CompletedTask;
+    }
+
+    private static Task Choice_CustomBorderGlyphAndFocusMarker_RenderStable()
+    {
+        var focusedBorder = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(180, 120, 30));
+        var control = new Choice
+        {
+            Border = BorderStyle.SingleLine,
+            Title = "Choice",
+            IsFocused = true,
+            FocusMarker = "◆",
+            ShowFocusMarker = true,
+            BorderStyleText = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(40, 40, 40)),
+            FocusedBorderStyleText = focusedBorder,
+            Glyphs = new DropdownGlyphSet("v", "^", ">", "+"),
+        };
+        control.SetItems(["alpha", "beta"]);
+        _ = control.Handle(new KeyPressed(Key.Down));
+
+        var first = Render(control, 40, 8, CanvasTextMode.GraphemeAware);
+        var second = Render(control, 40, 8, CanvasTextMode.GraphemeAware);
+
+        TestAssert.True(first.Contains("Choice ◆", StringComparison.Ordinal), "Choice title should render custom focus marker.");
+        TestAssert.True(first.Contains("^ alpha", StringComparison.Ordinal), "Choice field should render custom expanded indicator.");
+        TestAssert.True(first.Contains(">+ alpha", StringComparison.Ordinal), "Choice options should render custom highlighted and selected markers.");
+        TestAssert.True(first.Contains(focusedBorder.Render("┌"), StringComparison.Ordinal), "Choice focused border style should render on border glyphs.");
+        TestAssert.Equal(first, second, "Choice custom border/glyph render should be deterministic.");
+        return Task.CompletedTask;
+    }
+
+    private static Task ComboBox_CustomBorderGlyphAndFocusMarker_RenderStable()
+    {
+        var focusedBorder = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(120, 180, 50));
+        var hoverStyle = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(210, 90, 70));
+        var control = new ComboBox
+        {
+            Border = BorderStyle.SingleLine,
+            Title = "Combo",
+            IsFocused = true,
+            FocusMarker = "◆",
+            ShowFocusMarker = true,
+            BorderStyleText = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(40, 40, 40)),
+            FocusedBorderStyleText = focusedBorder,
+            HoveredValueStyle = hoverStyle,
+            Glyphs = new DropdownGlyphSet("v", "^", ">", "*"),
+        };
+        control.SetItems(["alpha", "beta"]);
+        _ = control.Handle(new KeyPressed(Key.Down));
+        _ = control.Handle(new KeyPressed(Key.Enter));
+        _ = control.Handle(new KeyPressed(Key.Down));
+        _ = control.Handle(new PointerInput(PointerEventKind.Motion, PointerButton.None, 1, 1), new Rect(0, 0, 40, 8));
+
+        var first = Render(control, 40, 8, CanvasTextMode.GraphemeAware);
+        var second = Render(control, 40, 8, CanvasTextMode.GraphemeAware);
+
+        TestAssert.True(first.Contains("Combo ◆", StringComparison.Ordinal), "ComboBox title should render custom focus marker.");
+        TestAssert.True(first.Contains('^'), "ComboBox field should render custom expanded indicator.");
+        TestAssert.True(first.Contains(">* alpha", StringComparison.Ordinal), "ComboBox options should render custom highlighted and selected markers.");
+        TestAssert.True(first.Contains(focusedBorder.Render("┌"), StringComparison.Ordinal), "ComboBox focused border style should render on border glyphs.");
+        TestAssert.True(first.Contains(hoverStyle.ToEscapeSequence(), StringComparison.Ordinal), "ComboBox hovered field style should render SGR sequence.");
+        TestAssert.Equal(first, second, "ComboBox custom border/glyph render should be deterministic.");
         return Task.CompletedTask;
     }
 
@@ -171,5 +239,13 @@ internal static class InteractionPointerParity_NavigationExplorerTests
         TestAssert.True(output.Contains("svc-b", StringComparison.Ordinal), "Table should render hovered row label.");
         TestAssert.True(output.Contains(hoverStyle.ToEscapeSequence(), StringComparison.Ordinal), "Table hovered row style should render SGR sequence.");
         return Task.CompletedTask;
+    }
+
+    private static string Render(Control control, int width, int height, CanvasTextMode mode = CanvasTextMode.Fast)
+    {
+        var canvas = new Canvas(width, height, mode);
+        var bounds = new Rect(0, 0, width, height);
+        control.Render(canvas, bounds);
+        return canvas.Render();
     }
 }
