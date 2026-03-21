@@ -108,7 +108,7 @@ internal sealed class TeaSceneCompiler : IScreenCompiler
                 }
 
                 return;
-            case DockLayout dock:
+            case TeaSharp.Layout.DockLayout dock:
                 ApplyThemeDefaults(dock.Top, theme);
                 ApplyThemeDefaults(dock.Bottom, theme);
                 ApplyThemeDefaults(dock.Left, theme);
@@ -169,7 +169,7 @@ internal sealed class TeaSceneCompiler : IScreenCompiler
                 }
 
                 return;
-            case DockLayout dock:
+            case TeaSharp.Layout.DockLayout dock:
                 ApplyThemeDefaults(dock.Top, theme, overrides, hasTerminalFocus);
                 ApplyThemeDefaults(dock.Bottom, theme, overrides, hasTerminalFocus);
                 ApplyThemeDefaults(dock.Left, theme, overrides, hasTerminalFocus);
@@ -399,7 +399,7 @@ internal sealed class TeaSceneCompiler : IScreenCompiler
                 CenterLayout center => TryBuildCenter(center, bounds, path),
                 PanelLayout panel => TryBuildPanel(panel, bounds, path),
                 OverlayLayout overlay => TryBuildOverlay(overlay, bounds, path),
-                DockLayout dock => TryBuildDock(dock, bounds, path),
+                TeaSharp.Layout.DockLayout dock => TryBuildDock(dock, bounds, path),
                 StackLayout stack => TryBuildStack(stack.IsHorizontal, stack.Children, stack.Gap, stack.Padding, bounds, path),
                 SplitLayout split => TryBuildStack(split.IsHorizontal, [split.First, split.Second], split.Gap, split.Padding, bounds, path),
                 ComponentLayout component => TryBuildComponent(component, bounds, path),
@@ -546,7 +546,7 @@ internal sealed class TeaSceneCompiler : IScreenCompiler
             return TryBuild(center.Content, new Rect(x, y, width, height), $"{path}/center");
         }
 
-        private bool TryBuildDock(DockLayout dock, in Rect bounds, string path)
+        private bool TryBuildDock(TeaSharp.Layout.DockLayout dock, in Rect bounds, string path)
         {
             var inner = Rect.Intersect(bounds.Inset(dock.Padding), bounds);
             if (inner.IsEmpty)
