@@ -140,7 +140,7 @@ internal sealed class PublicApiDashboardApp : TeaApp
     }
 
     public override TeaEffect? Initialize() =>
-        TeaEffects.Tick(TimeSpan.FromMilliseconds(350), static now => new DashboardTick(now));
+        TeaEffects.Periodic(TimeSpan.FromMilliseconds(350), static now => new DashboardTick(now));
 
     public override TeaEffect? Update(Message message)
     {
@@ -171,7 +171,7 @@ internal sealed class PublicApiDashboardApp : TeaApp
         {
             _tick++;
             SimulateTelemetry(tick.At);
-            return TeaEffects.Tick(TimeSpan.FromMilliseconds(350), static now => new DashboardTick(now));
+            return null;
         }
 
         return null;
