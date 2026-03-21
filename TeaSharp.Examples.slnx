@@ -4,6 +4,7 @@
     <Project Path="examples/CounterForm/CounterForm.csproj" />
     <Project Path="examples/ComboBox/ComboBox.csproj" />
     <Project Path="examples/Dropdown/Dropdown.csproj" />
+    <Project Path="examples/ExternalConsumerReviewApp/ExternalConsumerReviewApp.csproj" />
     <Project Path="examples/HelloWorld/HelloWorld.csproj" />
     <Project Path="examples/Showcase/Showcase.csproj" />
     <Project Path="examples/Kanban/Kanban.csproj" />
