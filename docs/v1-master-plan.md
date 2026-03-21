@@ -68,6 +68,8 @@ Correctness is a continuous gate across all phases: fix regressions at source an
     - `1c43dbe` -> WidgetGallery polished default theme/layout slice
     - `d3d7065` -> Choice/ComboBox/TreeView border+glyph+focus-marker token override slice
     - `1dba5bc` + `3731c50` -> visual regression/assertion updates and decoder leak fix
+    - `TODO_POLISH_SHA_FOCUS_MARKER_PARITY_WIRING` -> cross-control focus-marker parity wiring follow-up (replace with landed SHA)
+    - `TODO_POLISH_SHA_FOCUS_MARKER_POLICY_TESTS` -> focus-marker policy/regression test follow-up (replace with landed SHA)
   - latest workspace verification on March 21, 2026 is green (`dotnet test TeaSharp.slnx --no-build`, `dotnet build TeaSharp.Examples.slnx --no-restore --nologo -v minimal`)
   - M3 is not closed until the full [Visual Quality Full Polish Checklist](#visual-quality-full-polish-checklist-phase-3-gate) is explicitly satisfied
 - **M4: API Freeze + Cleanup** -> **In progress**

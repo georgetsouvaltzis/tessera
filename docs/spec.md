@@ -90,6 +90,7 @@ Default onboarding remains in `TeaSharp`. `TeaSharp.Core` is a low-level advance
 V1 theming is semantic-token based with override hierarchy:
 
 - semantic tokens for text/surface/border/state/focus/selection/accent
+- `Focus.Marker` is first-class and wired across focus-marker controls (controls exposing `FocusMarker`/`ShowFocusMarker`)
 - built-in palettes (Catppuccin, Rosé Pine) plus custom palette
 - override precedence: global theme -> control type -> control instance -> state
 - `TeaThemeControlExtensions` is split by domain (`Basic`, `InputValue`, `Navigation`, `NavigationOverlay`, `NavigationPrimitives`, `DataAndFlow`, `PlanningAndBoards`, `QueryAndRichText`, `ExplorerAndFeedback`, `RenderingTextUtilities`, `ModalAndCharts`, `Plotting`, `DevOpsAndWorkflows`, `Workspace`, `FormsAndShell`)

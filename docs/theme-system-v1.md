@@ -25,9 +25,10 @@ Theme values should be semantic, not control-specific:
 - `State.Success`, `State.Warning`, `State.Error`, `State.Info`
 - `Accent.Primary`, `Accent.Secondary`
 - `Selection.Background`, `Selection.Foreground`
-- `Focus.Ring`, `Focus.Title`, `Focus.Border`
+- `Focus.Ring`, `Focus.Title`, `Focus.Border`, `Focus.Marker`
 
 All tokens map to `TeaStyle` values and are consumable by controls without raw ANSI strings in app code.
+`Focus.Marker` is a first-class token and should drive focus-marker rendering for controls that expose marker hooks (`FocusMarker`/`ShowFocusMarker`), rather than hardcoded marker styling.
 
 ## Typography Emphasis Intent
 
