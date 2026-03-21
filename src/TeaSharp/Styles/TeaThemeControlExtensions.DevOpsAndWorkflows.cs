@@ -391,4 +391,140 @@ public static partial class TeaThemeControlExtensions
         ArgumentNullException.ThrowIfNull(overrides);
         return control.ApplyThemeDefaults(overrides.Resolve(control, baseTheme, state));
     }
+
+    public static TraceViewer ApplyTheme(this TraceViewer control, TeaTheme theme)
+    {
+        ArgumentNullException.ThrowIfNull(control);
+        ArgumentNullException.ThrowIfNull(theme);
+
+        control.TitleStyle = theme.Text.Secondary;
+        control.FocusedTitleStyle = theme.Focus.Title;
+        control.BorderStyleText = theme.Border.Default;
+        control.FocusedBorderStyleText = theme.Border.Focused.Merge(theme.Focus.Border);
+        control.EntryStyle = theme.Text.Primary;
+        control.VerboseRowStyle = theme.Text.Muted;
+        control.InfoRowStyle = theme.State.Info;
+        control.WarningRowStyle = theme.State.Warning;
+        control.ErrorRowStyle = theme.State.Error;
+        control.CriticalRowStyle = theme.State.Error;
+        control.SelectedRowStyle = theme.Selection.Foreground.Merge(theme.Selection.Background);
+        control.FocusedSelectedRowStyle = theme.Focus.Ring;
+        control.HoveredRowStyle = theme.Accent.Secondary;
+        control.MutedRowStyle = theme.Text.Muted;
+        control.DisabledStyle = theme.Text.Muted;
+        control.EmptyTextStyle = theme.Text.Muted;
+        return control;
+    }
+
+    public static TraceViewer ApplyTheme(
+        this TraceViewer control,
+        TeaThemeOverrides overrides,
+        TeaTheme baseTheme,
+        TeaThemeVisualState state = TeaThemeVisualState.Default)
+    {
+        ArgumentNullException.ThrowIfNull(overrides);
+        return control.ApplyTheme(overrides.Resolve(control, baseTheme, state));
+    }
+
+    public static TraceViewer ApplyThemeDefaults(this TraceViewer control, TeaTheme theme)
+    {
+        ArgumentNullException.ThrowIfNull(control);
+        ArgumentNullException.ThrowIfNull(theme);
+
+        control.TitleStyle = ApplyDefault(control.TitleStyle, theme.Text.Secondary);
+        control.FocusedTitleStyle = ApplyDefault(control.FocusedTitleStyle, theme.Focus.Title);
+        control.BorderStyleText = ApplyDefault(control.BorderStyleText, theme.Border.Default);
+        control.FocusedBorderStyleText = ApplyDefault(control.FocusedBorderStyleText, theme.Border.Focused.Merge(theme.Focus.Border));
+        control.EntryStyle = ApplyDefault(control.EntryStyle, theme.Text.Primary);
+        control.VerboseRowStyle = ApplyDefault(control.VerboseRowStyle, theme.Text.Muted);
+        control.InfoRowStyle = ApplyDefault(control.InfoRowStyle, theme.State.Info);
+        control.WarningRowStyle = ApplyDefault(control.WarningRowStyle, theme.State.Warning);
+        control.ErrorRowStyle = ApplyDefault(control.ErrorRowStyle, theme.State.Error);
+        control.CriticalRowStyle = ApplyDefault(control.CriticalRowStyle, theme.State.Error);
+        control.SelectedRowStyle = ApplyDefault(
+            control.SelectedRowStyle,
+            theme.Selection.Foreground.Merge(theme.Selection.Background));
+        control.FocusedSelectedRowStyle = ApplyDefault(control.FocusedSelectedRowStyle, theme.Focus.Ring);
+        control.HoveredRowStyle = ApplyDefault(control.HoveredRowStyle, theme.Accent.Secondary);
+        control.MutedRowStyle = ApplyDefault(control.MutedRowStyle, theme.Text.Muted);
+        control.DisabledStyle = ApplyDefault(control.DisabledStyle, theme.Text.Muted);
+        control.EmptyTextStyle = ApplyDefault(control.EmptyTextStyle, theme.Text.Muted);
+        return control;
+    }
+
+    public static TraceViewer ApplyThemeDefaults(
+        this TraceViewer control,
+        TeaThemeOverrides overrides,
+        TeaTheme baseTheme,
+        TeaThemeVisualState state = TeaThemeVisualState.Default)
+    {
+        ArgumentNullException.ThrowIfNull(overrides);
+        return control.ApplyThemeDefaults(overrides.Resolve(control, baseTheme, state));
+    }
+
+    public static TaskRunnerPanel ApplyTheme(this TaskRunnerPanel control, TeaTheme theme)
+    {
+        ArgumentNullException.ThrowIfNull(control);
+        ArgumentNullException.ThrowIfNull(theme);
+
+        control.TitleStyle = theme.Text.Secondary;
+        control.FocusedTitleStyle = theme.Focus.Title;
+        control.BorderStyleText = theme.Border.Default;
+        control.FocusedBorderStyleText = theme.Border.Focused.Merge(theme.Focus.Border);
+        control.RowStyle = theme.Text.Primary;
+        control.HoveredRowStyle = theme.Accent.Secondary;
+        control.SelectedRowStyle = theme.Selection.Foreground.Merge(theme.Selection.Background);
+        control.FocusedSelectedRowStyle = theme.Focus.Ring;
+        control.DisabledRowStyle = theme.Text.Muted;
+        control.StatusMarkerStyle = theme.Text.Secondary;
+        control.RunningStatusStyle = theme.State.Info;
+        control.SucceededStatusStyle = theme.State.Success;
+        control.FailedStatusStyle = theme.State.Error;
+        control.EmptyStyle = theme.Text.Muted;
+        return control;
+    }
+
+    public static TaskRunnerPanel ApplyTheme(
+        this TaskRunnerPanel control,
+        TeaThemeOverrides overrides,
+        TeaTheme baseTheme,
+        TeaThemeVisualState state = TeaThemeVisualState.Default)
+    {
+        ArgumentNullException.ThrowIfNull(overrides);
+        return control.ApplyTheme(overrides.Resolve(control, baseTheme, state));
+    }
+
+    public static TaskRunnerPanel ApplyThemeDefaults(this TaskRunnerPanel control, TeaTheme theme)
+    {
+        ArgumentNullException.ThrowIfNull(control);
+        ArgumentNullException.ThrowIfNull(theme);
+
+        control.TitleStyle = ApplyDefault(control.TitleStyle, theme.Text.Secondary);
+        control.FocusedTitleStyle = ApplyDefault(control.FocusedTitleStyle, theme.Focus.Title);
+        control.BorderStyleText = ApplyDefault(control.BorderStyleText, theme.Border.Default);
+        control.FocusedBorderStyleText = ApplyDefault(control.FocusedBorderStyleText, theme.Border.Focused.Merge(theme.Focus.Border));
+        control.RowStyle = ApplyDefault(control.RowStyle, theme.Text.Primary);
+        control.HoveredRowStyle = ApplyDefault(control.HoveredRowStyle, theme.Accent.Secondary);
+        control.SelectedRowStyle = ApplyDefault(
+            control.SelectedRowStyle,
+            theme.Selection.Foreground.Merge(theme.Selection.Background));
+        control.FocusedSelectedRowStyle = ApplyDefault(control.FocusedSelectedRowStyle, theme.Focus.Ring);
+        control.DisabledRowStyle = ApplyDefault(control.DisabledRowStyle, theme.Text.Muted);
+        control.StatusMarkerStyle = ApplyDefault(control.StatusMarkerStyle, theme.Text.Secondary);
+        control.RunningStatusStyle = ApplyDefault(control.RunningStatusStyle, theme.State.Info);
+        control.SucceededStatusStyle = ApplyDefault(control.SucceededStatusStyle, theme.State.Success);
+        control.FailedStatusStyle = ApplyDefault(control.FailedStatusStyle, theme.State.Error);
+        control.EmptyStyle = ApplyDefault(control.EmptyStyle, theme.Text.Muted);
+        return control;
+    }
+
+    public static TaskRunnerPanel ApplyThemeDefaults(
+        this TaskRunnerPanel control,
+        TeaThemeOverrides overrides,
+        TeaTheme baseTheme,
+        TeaThemeVisualState state = TeaThemeVisualState.Default)
+    {
+        ArgumentNullException.ThrowIfNull(overrides);
+        return control.ApplyThemeDefaults(overrides.Resolve(control, baseTheme, state));
+    }
 }

@@ -64,6 +64,8 @@ internal static partial class ThemeOverridesTests
         var activity = new ActivityFeed().ApplyTheme(theme);
         var inbox = new NotificationInbox().ApplyTheme(theme);
         var help = new KeyBindingHelpDialog().ApplyTheme(theme);
+        var traceViewer = new TraceViewer().ApplyTheme(theme);
+        var taskRunner = new TaskRunnerPanel().ApplyTheme(theme);
 
         TestAssert.Equal(theme.Text.Secondary, json.TitleStyle, "JsonTreeView title style should map to Text.Secondary.");
         TestAssert.Equal(theme.Focus.Title, json.FocusedTitleStyle, "JsonTreeView focused title style should map to Focus.Title.");
@@ -95,6 +97,16 @@ internal static partial class ThemeOverridesTests
         TestAssert.Equal(theme.Accent.Primary, help.KeysStyle, "KeyBindingHelpDialog keys style should map to Accent.Primary.");
         TestAssert.Equal(theme.State.Info, help.GlobalBindingStyle, "KeyBindingHelpDialog global binding style should map to State.Info.");
         TestAssert.Equal(theme.Selection.Foreground.Merge(theme.Selection.Background), help.SelectedRowStyle, "KeyBindingHelpDialog selected style should map to merged Selection styles.");
+
+        TestAssert.Equal(theme.Text.Primary, traceViewer.EntryStyle, "TraceViewer entry style should map to Text.Primary.");
+        TestAssert.Equal(theme.State.Warning, traceViewer.WarningRowStyle, "TraceViewer warning style should map to State.Warning.");
+        TestAssert.Equal(theme.Selection.Foreground.Merge(theme.Selection.Background), traceViewer.SelectedRowStyle, "TraceViewer selected style should map to merged Selection styles.");
+        TestAssert.Equal(theme.Border.Default, traceViewer.BorderStyleText, "TraceViewer border style should map to Border.Default.");
+
+        TestAssert.Equal(theme.Text.Primary, taskRunner.RowStyle, "TaskRunnerPanel row style should map to Text.Primary.");
+        TestAssert.Equal(theme.State.Success, taskRunner.SucceededStatusStyle, "TaskRunnerPanel succeeded status style should map to State.Success.");
+        TestAssert.Equal(theme.State.Error, taskRunner.FailedStatusStyle, "TaskRunnerPanel failed status style should map to State.Error.");
+        TestAssert.Equal(theme.Border.Focused.Merge(theme.Focus.Border), taskRunner.FocusedBorderStyleText, "TaskRunnerPanel focused border style should map to focused border tokens.");
 
         return Task.CompletedTask;
     }
@@ -146,6 +158,8 @@ internal static partial class ThemeOverridesTests
         var activity = new ActivityFeed { SuccessItemStyle = explicitStyle, BorderStyleText = explicitStyle };
         var inbox = new NotificationInbox { ItemStyle = explicitStyle };
         var help = new KeyBindingHelpDialog { KeysStyle = explicitStyle };
+        var traceViewer = new TraceViewer { EntryStyle = explicitStyle, BorderStyleText = explicitStyle };
+        var taskRunner = new TaskRunnerPanel { RowStyle = explicitStyle, BorderStyleText = explicitStyle };
 
         json.ApplyThemeDefaults(theme);
         commandOutput.ApplyThemeDefaults(theme);
@@ -153,6 +167,8 @@ internal static partial class ThemeOverridesTests
         activity.ApplyThemeDefaults(theme);
         inbox.ApplyThemeDefaults(theme);
         help.ApplyThemeDefaults(theme);
+        traceViewer.ApplyThemeDefaults(theme);
+        taskRunner.ApplyThemeDefaults(theme);
 
         TestAssert.Equal(explicitStyle, json.ValueStyle, "Defaults should not overwrite explicit JsonTreeView.ValueStyle.");
         TestAssert.Equal(theme.Text.Secondary, json.ContainerStyle, "Defaults should fill empty JsonTreeView.ContainerStyle.");
@@ -178,6 +194,14 @@ internal static partial class ThemeOverridesTests
         TestAssert.Equal(theme.State.Info, help.GlobalBindingStyle, "Defaults should fill empty KeyBindingHelpDialog.GlobalBindingStyle.");
         TestAssert.Equal(theme.Text.Muted, help.EmptyTextStyle, "Defaults should fill empty KeyBindingHelpDialog.EmptyTextStyle.");
 
+        TestAssert.Equal(explicitStyle, traceViewer.EntryStyle, "Defaults should not overwrite explicit TraceViewer.EntryStyle.");
+        TestAssert.Equal(theme.State.Warning, traceViewer.WarningRowStyle, "Defaults should fill empty TraceViewer.WarningRowStyle.");
+        TestAssert.Equal(explicitStyle, traceViewer.BorderStyleText, "Defaults should not overwrite explicit TraceViewer.BorderStyleText.");
+
+        TestAssert.Equal(explicitStyle, taskRunner.RowStyle, "Defaults should not overwrite explicit TaskRunnerPanel.RowStyle.");
+        TestAssert.Equal(theme.State.Success, taskRunner.SucceededStatusStyle, "Defaults should fill empty TaskRunnerPanel.SucceededStatusStyle.");
+        TestAssert.Equal(explicitStyle, taskRunner.BorderStyleText, "Defaults should not overwrite explicit TaskRunnerPanel.BorderStyleText.");
+
         return Task.CompletedTask;
     }
 
@@ -190,6 +214,8 @@ internal static partial class ThemeOverridesTests
         var activity = new ActivityFeed { SuccessItemStyle = explicitStyle };
         var inbox = new NotificationInbox { ItemStyle = explicitStyle };
         var help = new KeyBindingHelpDialog { KeysStyle = explicitStyle };
+        var traceViewer = new TraceViewer { EntryStyle = explicitStyle };
+        var taskRunner = new TaskRunnerPanel { RowStyle = explicitStyle };
 
         var baseTheme = BuildThemeWithPrimary(1, 1, 1);
         var overrides = new TeaThemeOverrides();
@@ -237,6 +263,8 @@ internal static partial class ThemeOverridesTests
         overrides.SetControlType<ActivityFeed>(typeTheme);
         overrides.SetControlType<NotificationInbox>(typeTheme);
         overrides.SetControlType<KeyBindingHelpDialog>(typeTheme);
+        overrides.SetControlType<TraceViewer>(typeTheme);
+        overrides.SetControlType<TaskRunnerPanel>(typeTheme);
 
         json.ApplyThemeDefaults(overrides, baseTheme);
         commandOutput.ApplyThemeDefaults(overrides, baseTheme);
@@ -244,6 +272,8 @@ internal static partial class ThemeOverridesTests
         activity.ApplyThemeDefaults(overrides, baseTheme);
         inbox.ApplyThemeDefaults(overrides, baseTheme);
         help.ApplyThemeDefaults(overrides, baseTheme);
+        traceViewer.ApplyThemeDefaults(overrides, baseTheme);
+        taskRunner.ApplyThemeDefaults(overrides, baseTheme);
 
         TestAssert.Equal(explicitStyle, json.ValueStyle, "Override defaults should not overwrite explicit JsonTreeView.ValueStyle.");
         TestAssert.Equal(typeTheme.Border.Default, json.BorderStyleText, "Override defaults should fill empty JsonTreeView.BorderStyleText.");
@@ -262,6 +292,14 @@ internal static partial class ThemeOverridesTests
 
         TestAssert.Equal(explicitStyle, help.KeysStyle, "Override defaults should not overwrite explicit KeyBindingHelpDialog.KeysStyle.");
         TestAssert.Equal(typeTheme.State.Info, help.GlobalBindingStyle, "Override defaults should fill empty KeyBindingHelpDialog.GlobalBindingStyle.");
+
+        TestAssert.Equal(explicitStyle, traceViewer.EntryStyle, "Override defaults should not overwrite explicit TraceViewer.EntryStyle.");
+        TestAssert.Equal(typeTheme.State.Warning, traceViewer.WarningRowStyle, "Override defaults should fill empty TraceViewer.WarningRowStyle.");
+        TestAssert.Equal(typeTheme.Border.Default, traceViewer.BorderStyleText, "Override defaults should fill empty TraceViewer.BorderStyleText.");
+
+        TestAssert.Equal(explicitStyle, taskRunner.RowStyle, "Override defaults should not overwrite explicit TaskRunnerPanel.RowStyle.");
+        TestAssert.Equal(typeTheme.State.Success, taskRunner.SucceededStatusStyle, "Override defaults should fill empty TaskRunnerPanel.SucceededStatusStyle.");
+        TestAssert.Equal(typeTheme.Border.Default, taskRunner.BorderStyleText, "Override defaults should fill empty TaskRunnerPanel.BorderStyleText.");
 
         return Task.CompletedTask;
     }
