@@ -59,12 +59,14 @@ Correctness is a continuous gate across all phases: fix regressions at source an
   - verification evidence captured in [terminal-compatibility-evidence-v1.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/terminal-compatibility-evidence-v1.md)
   - explicit environment note: iTerm2/WezTerm/Kitty/Windows Terminal binaries are not installed on this host; their verification uses deterministic tests + official specs; Ghostty has host evidence
   - capability-gated no-op fallback behavior is covered by deterministic tests for unsupported terminals
-- **M2: Widget Expansion** -> **In progress**
-  - roadmap execution active; remaining tranche tracked in [widget-roadmap-v1.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/widget-roadmap-v1.md)
-  - Wave 1 app-shell/forms tranche complete in docs+catalog/theme coverage (`Form`, `FieldSet`, `DataForm<TModel>`, `Wizard`, `SplitView`, `InspectorPanel`)
+- **M2: Widget Expansion** -> **Done**
+  - widget roadmap backlog is zero across Waves 1-4 in [widget-roadmap-v1.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/widget-roadmap-v1.md)
+  - Wave 1 app-shell/forms tranche integrated in docs+catalog/theme coverage (`Form`, `FieldSet`, `DataForm<TModel>`, `Wizard`, `SplitView`, `InspectorPanel`)
   - Wave 4 batch A + B integrated in docs+catalog/theme coverage (`DockWorkspace`, `PaneTabs`, `PaletteEditor`, `Heatmap`, `TreeMapChart`, `TerminalPanel`, `ProcessListView`)
-- **M3: Visual Quality Full Polish Pass** -> **Pending**
-  - full polish starts after widget tranche completion
+- **M3: Visual Quality Full Polish Pass** -> **In progress**
+  - visual polish implementation evidence landed in `ef9dea4` and `991d0d0` (examples/showcase/gallery polish slices)
+  - latest workspace verification on March 21, 2026 is green (`dotnet test TeaSharp.slnx --no-build`, `dotnet build TeaSharp.Examples.slnx --no-restore --nologo -v minimal`)
+  - M3 is not closed until the full [Visual Quality Full Polish Checklist](#visual-quality-full-polish-checklist-phase-3-gate) is explicitly satisfied
 - **M4: API Freeze + Cleanup** -> **In progress**
   - naming clarity and XML commenting gates active for all V1-touching API updates
 - **M5: Performance Gate + Benchmarks + Docs Freeze** -> **Pending manual signoff**
