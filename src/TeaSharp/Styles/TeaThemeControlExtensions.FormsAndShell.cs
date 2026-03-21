@@ -289,4 +289,70 @@ public static partial class TeaThemeControlExtensions
         ArgumentNullException.ThrowIfNull(overrides);
         return control.ApplyThemeDefaults(overrides.Resolve(control, baseTheme, state));
     }
+
+    public static DataForm<TModel> ApplyTheme<TModel>(this DataForm<TModel> control, TeaTheme theme)
+        where TModel : class
+    {
+        ArgumentNullException.ThrowIfNull(control);
+        ArgumentNullException.ThrowIfNull(theme);
+
+        control.TitleStyle = theme.Text.Secondary;
+        control.FocusedTitleStyle = theme.Focus.Title;
+        control.BorderStyleText = theme.Border.Default;
+        control.FocusedBorderStyleText = theme.Border.Focused.Merge(theme.Focus.Border);
+        control.LabelStyle = theme.Text.Secondary;
+        control.ValueStyle = theme.Text.Primary;
+        control.PlaceholderStyle = theme.Text.Muted;
+        control.SelectedFieldStyle = theme.Selection.Foreground.Merge(theme.Selection.Background);
+        control.FocusedSelectedFieldStyle = theme.Focus.Ring;
+        control.HoveredFieldStyle = theme.Accent.Secondary;
+        control.ReadOnlyFieldStyle = theme.Text.Muted;
+        control.DisabledStyle = theme.Text.Muted;
+        control.ErrorStyle = theme.State.Error;
+        return control;
+    }
+
+    public static DataForm<TModel> ApplyTheme<TModel>(
+        this DataForm<TModel> control,
+        TeaThemeOverrides overrides,
+        TeaTheme baseTheme,
+        TeaThemeVisualState state = TeaThemeVisualState.Default)
+        where TModel : class
+    {
+        ArgumentNullException.ThrowIfNull(overrides);
+        return control.ApplyTheme(overrides.Resolve(control, baseTheme, state));
+    }
+
+    public static DataForm<TModel> ApplyThemeDefaults<TModel>(this DataForm<TModel> control, TeaTheme theme)
+        where TModel : class
+    {
+        ArgumentNullException.ThrowIfNull(control);
+        ArgumentNullException.ThrowIfNull(theme);
+
+        control.TitleStyle = ApplyDefault(control.TitleStyle, theme.Text.Secondary);
+        control.FocusedTitleStyle = ApplyDefault(control.FocusedTitleStyle, theme.Focus.Title);
+        control.BorderStyleText = ApplyDefault(control.BorderStyleText, theme.Border.Default);
+        control.FocusedBorderStyleText = ApplyDefault(control.FocusedBorderStyleText, theme.Border.Focused.Merge(theme.Focus.Border));
+        control.LabelStyle = ApplyDefault(control.LabelStyle, theme.Text.Secondary);
+        control.ValueStyle = ApplyDefault(control.ValueStyle, theme.Text.Primary);
+        control.PlaceholderStyle = ApplyDefault(control.PlaceholderStyle, theme.Text.Muted);
+        control.SelectedFieldStyle = ApplyDefault(control.SelectedFieldStyle, theme.Selection.Foreground.Merge(theme.Selection.Background));
+        control.FocusedSelectedFieldStyle = ApplyDefault(control.FocusedSelectedFieldStyle, theme.Focus.Ring);
+        control.HoveredFieldStyle = ApplyDefault(control.HoveredFieldStyle, theme.Accent.Secondary);
+        control.ReadOnlyFieldStyle = ApplyDefault(control.ReadOnlyFieldStyle, theme.Text.Muted);
+        control.DisabledStyle = ApplyDefault(control.DisabledStyle, theme.Text.Muted);
+        control.ErrorStyle = ApplyDefault(control.ErrorStyle, theme.State.Error);
+        return control;
+    }
+
+    public static DataForm<TModel> ApplyThemeDefaults<TModel>(
+        this DataForm<TModel> control,
+        TeaThemeOverrides overrides,
+        TeaTheme baseTheme,
+        TeaThemeVisualState state = TeaThemeVisualState.Default)
+        where TModel : class
+    {
+        ArgumentNullException.ThrowIfNull(overrides);
+        return control.ApplyThemeDefaults(overrides.Resolve(control, baseTheme, state));
+    }
 }

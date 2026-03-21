@@ -19,6 +19,7 @@ internal static class BorderedControlParityPolicyTests
         typeof(CommandPalette),
         typeof(ContextMenu),
         typeof(DataGrid),
+        typeof(DataForm<>),
         typeof(DatePicker),
         typeof(Dialog),
         typeof(DiffView),
