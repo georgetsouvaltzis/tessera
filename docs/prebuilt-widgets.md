@@ -139,6 +139,15 @@ Preferred public catalog:
 126. `Heatmap`
 127. `HeatmapCell`
 128. `HeatmapLegend`
+129. `TreeMapChart`
+130. `TreeMapNode`
+131. `TerminalPanel`
+132. `TerminalPanelLine`
+133. `TerminalPanelChannel`
+134. `ProcessListView`
+135. `ProcessListEntry`
+136. `ProcessListStatus`
+137. `ProcessListSelectionChangedEventArgs`
 
 These live in `TeaSharp.Controls`.
 
@@ -252,11 +261,11 @@ Theme and override pattern:
 - Theme helpers now cover all eight controls (`ApplyTheme` + `ApplyThemeDefaults` + override overloads).
 - Recommended usage: `ApplyThemeDefaults(runtime.Theme)` first, then per-screen marker/style overrides.
 
-### Wave 4 Workspace + Visual Data Controls (Batch A)
+### Wave 4 Workspace + Visual Data Controls (Batch A + B)
 
-- Shipped and integrated controls: `DockWorkspace`, `PaneTabs`, `PaletteEditor`, `Heatmap`.
-- Support types: `DockPane`, `DockPanePosition`, `PaneTabItem`, `PaneTabSelectionChangedEventArgs`, `PaletteSwatch`, `PaletteSelectionChangedEventArgs`, `HeatmapCell`, `HeatmapLegend`.
-- Theme mappings in `TeaThemeControlExtensions.Workspace.cs` cover `DockWorkspace`, `PaneTabs`, and `Heatmap`; `PaletteEditor` ships with explicit style hooks.
+- Shipped and integrated controls: `DockWorkspace`, `PaneTabs`, `PaletteEditor`, `Heatmap`, `TreeMapChart`, `TerminalPanel`, `ProcessListView`.
+- Support types: `DockPane`, `DockPanePosition`, `PaneTabItem`, `PaneTabSelectionChangedEventArgs`, `PaletteSwatch`, `PaletteSelectionChangedEventArgs`, `HeatmapCell`, `HeatmapLegend`, `TreeMapNode`, `TerminalPanelLine`, `TerminalPanelChannel`, `ProcessListEntry`, `ProcessListStatus`, `ProcessListSelectionChangedEventArgs`.
+- Theme mappings in `TeaThemeControlExtensions.Workspace.cs` cover all Wave 4 controls listed above.
 
 ### Beautiful UI Checklist (Current Phase)
 
@@ -296,8 +305,8 @@ Current shipped `TeaThemeControlExtensions` mappings include:
 - plotting details: bordered plotting controls (`Sparkline`, `AreaPlot`, `LinePlot`, `PlotPanel`) include border text token mapping; `ScatterPlot`/`Histogram` map point or bar + axis + legend tokens
 - dev/ops workflow controls: `JsonTreeView`, `TraceViewer`, `CommandOutput`, `LogTailPanel`, `TaskRunnerPanel`, `ActivityFeed`, `NotificationInbox`, `KeyBindingHelpDialog`
 - dev/ops details: bordered controls in this set map border text hooks to semantic border/focus tokens; inbox/help-dialog map semantic title/row/state tokens
-- workspace/visual-data controls: `DockWorkspace`, `PaneTabs`, `PaletteEditor`, `Heatmap`
-- workspace/visual-data details: `DockWorkspace`, `PaneTabs`, and `Heatmap` map semantic tokens through `TeaThemeControlExtensions.Workspace.cs`; `PaletteEditor` uses control-level style hooks
+- workspace/visual-data controls: `DockWorkspace`, `PaneTabs`, `PaletteEditor`, `Heatmap`, `TreeMapChart`, `TerminalPanel`, `ProcessListView`
+- workspace/visual-data details: all controls in this set map semantic tokens through `TeaThemeControlExtensions.Workspace.cs`; bordered controls in this set (`DockWorkspace`, `PaneTabs`, `Heatmap`, `TreeMapChart`, `ProcessListView`) map border text hooks by default
 
 ## Advanced Seams
 

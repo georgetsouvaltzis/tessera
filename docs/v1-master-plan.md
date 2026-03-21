@@ -61,7 +61,7 @@ Correctness is a continuous gate across all phases: fix regressions at source an
   - capability-gated no-op fallback behavior is covered by deterministic tests for unsupported terminals
 - **M2: Widget Expansion** -> **In progress**
   - roadmap execution active; remaining tranche tracked in [widget-roadmap-v1.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/widget-roadmap-v1.md)
-  - Wave 4 batch A integrated in docs+catalog/theme coverage (`DockWorkspace`, `PaneTabs`, `PaletteEditor`, `Heatmap`)
+  - Wave 4 batch A + B integrated in docs+catalog/theme coverage (`DockWorkspace`, `PaneTabs`, `PaletteEditor`, `Heatmap`, `TreeMapChart`, `TerminalPanel`, `ProcessListView`)
 - **M3: Visual Quality Full Polish Pass** -> **Pending**
   - full polish starts after widget tranche completion
 - **M4: API Freeze + Cleanup** -> **In progress**

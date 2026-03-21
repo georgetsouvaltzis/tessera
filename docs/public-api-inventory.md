@@ -144,6 +144,15 @@ These are the types new applications should discover first.
 - `TeaSharp.Controls.Heatmap`
 - `TeaSharp.Controls.HeatmapCell`
 - `TeaSharp.Controls.HeatmapLegend`
+- `TeaSharp.Controls.TreeMapChart`
+- `TeaSharp.Controls.TreeMapNode`
+- `TeaSharp.Controls.TerminalPanel`
+- `TeaSharp.Controls.TerminalPanelLine`
+- `TeaSharp.Controls.TerminalPanelChannel`
+- `TeaSharp.Controls.ProcessListView`
+- `TeaSharp.Controls.ProcessListEntry`
+- `TeaSharp.Controls.ProcessListStatus`
+- `TeaSharp.Controls.ProcessListSelectionChangedEventArgs`
 - `TeaSharp.Controls.ActivityFeed`
 - `TeaSharp.Controls.ActivityFeedItem`
 - `TeaSharp.Controls.ActivityFeedItemKind`
@@ -308,6 +317,9 @@ The first root controls that already own their implementation directly are:
 - `PaneTabs`
 - `PaletteEditor`
 - `Heatmap`
+- `TreeMapChart`
+- `TerminalPanel`
+- `ProcessListView`
 - `MenuBar`
 - `Toolbar`
 - `CommandBar`
@@ -338,7 +350,7 @@ Overlay glyph cookbook snippets for `MenuBarGlyphSet`, `ContextMenuGlyphSet`, an
 Border override, dropdown/tree glyph-set, and data marker/separator cookbook snippets are documented in [theme-system-v1.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/theme-system-v1.md).
 Wave 2 query/analytics controls (`PivotTable`, `QueryBuilder`, `RichTextView`) are mapped with the same semantic-token and border-style contract.
 Wave 3 dev/ops controls (`JsonTreeView`, `CommandOutput`, `LogTailPanel`, `ActivityFeed`, `NotificationInbox`, `KeyBindingHelpDialog`) are mapped with the same semantic-token contract.
-Wave 4 batch A controls (`DockWorkspace`, `PaneTabs`, `PaletteEditor`, `Heatmap`) are integrated; `TeaThemeControlExtensions.Workspace.cs` maps `DockWorkspace`, `PaneTabs`, and `Heatmap`.
+Wave 4 batch A + B controls (`DockWorkspace`, `PaneTabs`, `PaletteEditor`, `Heatmap`, `TreeMapChart`, `TerminalPanel`, `ProcessListView`) are integrated and mapped in `TeaThemeControlExtensions.Workspace.cs`.
 
 ## Plotting Authoring Guidance (Tier 1)
 
@@ -453,8 +465,8 @@ Dev/ops workflow controls with direct token mappings:
 
 Workspace/visual-data controls with direct token mappings:
 
-- `DockWorkspace`, `PaneTabs`, `Heatmap`
-- these controls map `BorderStyleText` -> `Border.Default` and `FocusedBorderStyleText` -> `Border.Focused + Focus.Border`
+- `DockWorkspace`, `PaneTabs`, `PaletteEditor`, `Heatmap`, `TreeMapChart`, `TerminalPanel`, `ProcessListView`
+- bordered controls in this set (`DockWorkspace`, `PaneTabs`, `Heatmap`, `TreeMapChart`, `ProcessListView`) map `BorderStyleText` -> `Border.Default` and `FocusedBorderStyleText` -> `Border.Focused + Focus.Border`
 
 Rendering text utility controls with direct token mappings:
 

@@ -94,11 +94,11 @@ Wave 3 integration status (current lane):
 | `TerminalPanel` | P2 | Embedded subprocess sessions | prompt/stream markers |
 | `ProcessListView` | P2 | Runtime process inspection | status markers, sort marker |
 
-Wave 4 integration status (batch A):
+Wave 4 integration status (batch A + B):
 
-- Shipped and integrated: `DockWorkspace`, `PaneTabs`, `PaletteEditor`, `Heatmap`.
+- Shipped and integrated: `DockWorkspace`, `PaneTabs`, `PaletteEditor`, `Heatmap`, `TreeMapChart`, `TerminalPanel`, `ProcessListView`.
 - Theme extension domain file `TeaThemeControlExtensions.Workspace.cs` is active for Wave 4 workspace/visual-data mappings.
-- Remaining Wave 4 backlog: `TreeMapChart`, `TerminalPanel`, `ProcessListView` (`Sparkline` already shipped in plotting baseline).
+- Remaining Wave 4 backlog: none (`Sparkline` already shipped in plotting baseline).
 
 ## Shipped Plotting Baseline (Current V1 Track)
 

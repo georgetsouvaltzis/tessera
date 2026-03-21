@@ -123,8 +123,8 @@ V1 theming is semantic-token based with override hierarchy:
 - mapped explorer/feedback controls include `DiffView`, `PropertyGrid`, `FileExplorer`, `FuzzyFinder`, `ToastCenter`
 - mapped dev/ops workflow controls include `JsonTreeView`, `TraceViewer`, `CommandOutput`, `LogTailPanel`, `TaskRunnerPanel`, `ActivityFeed`, `NotificationInbox`, `KeyBindingHelpDialog`
 - bordered dev/ops workflow controls (`JsonTreeView`, `TraceViewer`, `CommandOutput`, `LogTailPanel`, `TaskRunnerPanel`, `ActivityFeed`) map `BorderStyleText`/`FocusedBorderStyleText` to semantic border/focus tokens by default
-- mapped workspace/visual-data controls include `DockWorkspace`, `PaneTabs`, `PaletteEditor`, `Heatmap`
-- `TeaThemeControlExtensions.Workspace.cs` maps `DockWorkspace`, `PaneTabs`, and `Heatmap`; `PaletteEditor` currently relies on explicit control style hooks
+- mapped workspace/visual-data controls include `DockWorkspace`, `PaneTabs`, `PaletteEditor`, `Heatmap`, `TreeMapChart`, `TerminalPanel`, `ProcessListView`
+- `TeaThemeControlExtensions.Workspace.cs` maps all workspace/visual-data controls in this set
 - mapped rendering text utility controls include `Badge`, `LogView`, `MarkdownView`, `MiniLog`
 - mapped modal/chart summary controls include `Dialog`, `Modal`, `BarChart`, `LineChart`, `Gauge`, `StatsCard`
 - mapped plotting controls include `Sparkline`, `AreaPlot`, `ScatterPlot`, `Histogram`, `LinePlot`, `PlotPanel`
@@ -258,6 +258,15 @@ Root controls currently include:
 - `Heatmap`
 - `HeatmapCell`
 - `HeatmapLegend`
+- `TreeMapChart`
+- `TreeMapNode`
+- `TerminalPanel`
+- `TerminalPanelLine`
+- `TerminalPanelChannel`
+- `ProcessListView`
+- `ProcessListEntry`
+- `ProcessListStatus`
+- `ProcessListSelectionChangedEventArgs`
 - `ActivityFeed`
 - `ActivityFeedItem`
 - `ActivityFeedItemKind`
