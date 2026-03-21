@@ -30,6 +30,11 @@ internal static partial class ThemeOverridesTests
         {
             yield return testCase;
         }
+
+        foreach (var testCase in FlowWave3Cases())
+        {
+            yield return testCase;
+        }
     }
 
     private static Task ApplyHelpers_MapExpectedTokens_ForTimelineAndStepper()
