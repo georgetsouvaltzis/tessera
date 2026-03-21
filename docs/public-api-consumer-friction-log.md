@@ -21,3 +21,12 @@ Context: consumer-centric pass re-checked against current `examples/PublicApiDas
 1. Execute V1.x de-emphasis: keep compatibility members, but remove `Current*` from onboarding examples/docs where canonical `Selected*` exists.
 2. Continue naming/docs consistency pass for remaining public theme-extension APIs to reduce source-diving.
 3. Keep advanced-vs-default path labels explicit in widget docs so onboarding stays `TeaSharp`-first.
+
+## Wave-2 External Consumer Findings (Open)
+
+| Friction Item | Severity | Brief Rationale | Pointers |
+|---|---|---|---|
+| StatsCard border/padding styling gap | P1 | `StatsCard` lacks `Border`/`Padding`/border style hooks, so status cards cannot match theme-driven border behavior used by most bordered controls. | `examples/ExternalConsumerReviewApp/ExternalConsumerReviewApp.Wave2.cs`, `src/TeaSharp/Controls/StatsCard.cs`, `docs/external-consumer-review-v1.md` |
+| LinePlot streaming retention ergonomics | P1 | `LineSeries.Append(...)` is unbounded; consumers must implement manual copy+trim loops for long-running dashboards. | `examples/ExternalConsumerReviewApp/ExternalConsumerReviewApp.Wave2.cs`, `src/TeaSharp/Controls/LineSeries.cs`, `docs/external-consumer-review-v1.md` |
+| LinePlot mixed-unit readability (single shared Y scale) | P1 | No per-series scale mode or secondary axis; mixed metrics (req/s vs ms) become hard to read in one panel. | `examples/ExternalConsumerReviewApp/ExternalConsumerReviewApp.Wave2.cs`, `src/TeaSharp/Controls/LinePlot.cs`, `docs/external-consumer-review-v1.md` |
+| Generic `Options` naming for plot controls | P2 | Advanced plot setup hangs off generic `Options` property (`LinePlotOptions`, etc.), which is less discoverable for first-time consumers. | `src/TeaSharp/Controls/LinePlot.cs`, `src/TeaSharp/Controls/Sparkline.cs`, `src/TeaSharp/Controls/ScatterPlot.cs`, `docs/external-consumer-review-v1.md` |

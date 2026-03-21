@@ -24,13 +24,13 @@ await app.RunAsync();
 
 internal sealed record DashboardPulse(DateTimeOffset At) : Message;
 
-internal sealed class ExternalConsumerReviewApp : TeaApp
+internal sealed partial class ExternalConsumerReviewApp : TeaApp
 {
     internal static readonly TeaTheme DefaultTheme = TeaThemes.Catppuccin(CatppuccinVariant.Macchiato);
 
     private static readonly TeaTheme RosePineTheme = TeaThemes.RosePine(RosePineVariant.Moon);
 
-    private readonly Tabs _navigation = new("Overview", "Operations", "Alerts")
+    private readonly Tabs _navigation = new("Overview", "Operations", "Alerts", "Analytics")
     {
         Title = "External Consumer Review",
         FocusMarker = "◆",
@@ -136,8 +136,10 @@ internal sealed class ExternalConsumerReviewApp : TeaApp
         _notifications.Push("Dashboard boot complete", NotificationLevel.Success);
         _notifications.Push("Press d to queue deployment", NotificationLevel.Info);
         _notifications.Push("Press t to switch theme", NotificationLevel.Info);
+        _notifications.Push("Press 4 for analytics screen", NotificationLevel.Info);
         AppendActivity("External consumer dashboard initialized.");
 
+        InitializeWave2Dashboard();
         ApplyThemeAndOverrides();
     }
 
@@ -189,13 +191,18 @@ internal sealed class ExternalConsumerReviewApp : TeaApp
 
     public override Screen Build(ScreenContext context)
     {
+        if (_navigation.SelectedIndex == 3)
+        {
+            return BuildAnalyticsScreen(context);
+        }
+
         _serviceTable.SetRows(BuildRowsForCurrentView());
         _selectionSummary.Text = BuildSelectionSummary(context);
 
         _status.LeftText =
             $"{CurrentThemeName()}  tick={_tick:0000}  selected={GetSelectedService().Name}";
         _status.RightText =
-            $"{_statusText}  t theme  d dialog  n note  Ctrl+C quit";
+            $"{_statusText}  1-4 tabs  t theme  d dialog  n note  Ctrl+C quit";
 
         var actionRow = new RowLayout
         {
@@ -319,6 +326,8 @@ internal sealed class ExternalConsumerReviewApp : TeaApp
                     NotificationLevel.Error);
             }
         }
+
+        UpdateWave2State();
     }
 
     private List<IReadOnlyList<string>> BuildRowsForCurrentView()
@@ -408,6 +417,8 @@ internal sealed class ExternalConsumerReviewApp : TeaApp
         _selectionSummary.TextStyle = theme.Text.Primary;
         _selectionSummary.BorderStyleText = theme.Border.Default;
         _selectionSummary.FocusedBorderStyleText = bundle.FocusedBorderStyleText;
+
+        ApplyWave2ThemeAndOverrides(theme, bundle);
 
         _status.Fill = '·';
         _status.FillStyle = theme.Surface.Panel;
