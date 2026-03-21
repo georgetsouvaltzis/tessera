@@ -121,8 +121,8 @@ V1 theming is semantic-token based with override hierarchy:
 - mapped query/analytics controls include `PivotTable`, `QueryBuilder`, `RichTextView`
 - bordered query/analytics controls (`PivotTable`, `QueryBuilder`, `RichTextView`) map `BorderStyleText`/`FocusedBorderStyleText` to semantic border/focus tokens by default
 - mapped explorer/feedback controls include `DiffView`, `PropertyGrid`, `FileExplorer`, `FuzzyFinder`, `ToastCenter`
-- mapped dev/ops workflow controls include `JsonTreeView`, `CommandOutput`, `LogTailPanel`, `ActivityFeed`, `NotificationInbox`, `KeyBindingHelpDialog`
-- bordered dev/ops workflow controls (`JsonTreeView`, `CommandOutput`, `LogTailPanel`, `ActivityFeed`) map `BorderStyleText`/`FocusedBorderStyleText` to semantic border/focus tokens by default
+- mapped dev/ops workflow controls include `JsonTreeView`, `TraceViewer`, `CommandOutput`, `LogTailPanel`, `TaskRunnerPanel`, `ActivityFeed`, `NotificationInbox`, `KeyBindingHelpDialog`
+- bordered dev/ops workflow controls (`JsonTreeView`, `TraceViewer`, `CommandOutput`, `LogTailPanel`, `TaskRunnerPanel`, `ActivityFeed`) map `BorderStyleText`/`FocusedBorderStyleText` to semantic border/focus tokens by default
 - mapped rendering text utility controls include `Badge`, `LogView`, `MarkdownView`, `MiniLog`
 - mapped modal/chart summary controls include `Dialog`, `Modal`, `BarChart`, `LineChart`, `Gauge`, `StatsCard`
 - mapped plotting controls include `Sparkline`, `AreaPlot`, `ScatterPlot`, `Histogram`, `LinePlot`, `PlotPanel`
@@ -232,12 +232,18 @@ Root controls currently include:
 - `JsonTreeNode`
 - `JsonTreeNodeKind`
 - `JsonTreeSelectionChangedEventArgs`
+- `TraceViewer`
+- `TraceEntry`
+- `TraceSelectionChangedEventArgs`
 - `CommandOutput`
 - `CommandOutputLine`
 - `CommandOutputChannel`
 - `LogTailPanel`
 - `LogEntry`
 - `LogLevel`
+- `TaskRunnerPanel`
+- `TaskRunItem`
+- `TaskRunnerSelectionChangedEventArgs`
 - `ActivityFeed`
 - `ActivityFeedItem`
 - `ActivityFeedItemKind`

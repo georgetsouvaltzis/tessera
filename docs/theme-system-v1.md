@@ -258,13 +258,15 @@ richText.InlineCodeStyle = TeaStyle.Empty.WithBackground(AnsiColor.BrightBlack).
 `TeaThemeControlExtensions` includes explicit mappings for:
 
 - `JsonTreeView`
+- `TraceViewer`
 - `CommandOutput`
 - `LogTailPanel`
+- `TaskRunnerPanel`
 - `ActivityFeed`
 - `NotificationInbox`
 - `KeyBindingHelpDialog`
 
-Bordered controls in this set (`JsonTreeView`, `CommandOutput`, `LogTailPanel`, `ActivityFeed`) map `BorderStyleText` and `FocusedBorderStyleText` to semantic border/focus tokens by default.
+Bordered controls in this set (`JsonTreeView`, `TraceViewer`, `CommandOutput`, `LogTailPanel`, `TaskRunnerPanel`, `ActivityFeed`) map `BorderStyleText` and `FocusedBorderStyleText` to semantic border/focus tokens by default.
 
 ```csharp
 using TeaSharp.Controls;
@@ -275,6 +277,12 @@ var theme = TeaThemes.RosePine(RosePineVariant.Main);
 var logs = new LogTailPanel().ApplyThemeDefaults(theme);
 logs.BorderStyleText = TeaStyle.Empty.WithForeground(AnsiColor.BrightBlack);
 logs.FocusedBorderStyleText = TeaStyle.Empty.WithBold().WithForeground(AnsiColor.BrightYellow);
+
+var trace = new TraceViewer().ApplyThemeDefaults(theme);
+trace.WarningRowStyle = TeaStyle.Empty.WithBold().WithForeground(AnsiColor.BrightYellow);
+
+var tasks = new TaskRunnerPanel().ApplyThemeDefaults(theme);
+tasks.FailedStatusStyle = TeaStyle.Empty.WithBold().WithForeground(AnsiColor.BrightRed);
 
 var inbox = new NotificationInbox().ApplyThemeDefaults(theme);
 inbox.PinnedItemStyle = TeaStyle.Empty.WithBold().WithForeground(AnsiColor.BrightCyan);

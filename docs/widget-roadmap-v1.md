@@ -76,10 +76,10 @@ Wave 2 integration status (current lane):
 
 Wave 3 integration status (current lane):
 
-- Implemented and wired: `JsonTreeView`, `CommandOutput`, `LogTailPanel`, `ActivityFeed`, `NotificationInbox`, `KeyBindingHelpDialog`.
-- Theme extension coverage added for all shipped Wave 3 controls (`ApplyTheme`, `ApplyThemeDefaults`, override overloads).
-- Bordered parity + control-catalog + theme-override tests now include bordered Wave 3 controls (`JsonTreeView`, `CommandOutput`, `LogTailPanel`, `ActivityFeed`).
-- Remaining Wave 3 backlog: `TraceViewer`, `TaskRunnerPanel`.
+- Implemented and wired: `JsonTreeView`, `TraceViewer`, `CommandOutput`, `LogTailPanel`, `TaskRunnerPanel`, `ActivityFeed`, `NotificationInbox`, `KeyBindingHelpDialog`.
+- Theme extension coverage added for all Wave 3 controls (`ApplyTheme`, `ApplyThemeDefaults`, override overloads).
+- Bordered parity + control-catalog + theme-override tests now include bordered Wave 3 controls (`JsonTreeView`, `TraceViewer`, `CommandOutput`, `LogTailPanel`, `TaskRunnerPanel`, `ActivityFeed`).
+- Remaining Wave 3 backlog: none.
 
 ### Wave 4 (P2): Advanced Composition + Visual Data (8)
 

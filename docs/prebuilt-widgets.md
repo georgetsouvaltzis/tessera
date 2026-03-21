@@ -121,6 +121,12 @@ Preferred public catalog:
 108. `InboxItem`
 109. `KeyBindingHelpDialog`
 110. `KeyBindingItem`
+111. `TraceViewer`
+112. `TraceEntry`
+113. `TraceSelectionChangedEventArgs`
+114. `TaskRunnerPanel`
+115. `TaskRunItem`
+116. `TaskRunnerSelectionChangedEventArgs`
 
 These live in `TeaSharp.Controls`.
 
@@ -229,9 +235,9 @@ Theme and override pattern:
 
 ### Wave 3 Dev/Ops Controls
 
-- Implemented controls: `JsonTreeView`, `CommandOutput`, `LogTailPanel`, `ActivityFeed`, `NotificationInbox`, `KeyBindingHelpDialog`.
-- `JsonTreeView`, `CommandOutput`, `LogTailPanel`, and `ActivityFeed` are bordered controls with `BorderStyleText`/`FocusedBorderStyleText`.
-- Theme helpers now cover all six controls (`ApplyTheme` + `ApplyThemeDefaults` + override overloads).
+- Implemented controls: `JsonTreeView`, `TraceViewer`, `CommandOutput`, `LogTailPanel`, `TaskRunnerPanel`, `ActivityFeed`, `NotificationInbox`, `KeyBindingHelpDialog`.
+- `JsonTreeView`, `TraceViewer`, `CommandOutput`, `LogTailPanel`, `TaskRunnerPanel`, and `ActivityFeed` are bordered controls with `BorderStyleText`/`FocusedBorderStyleText`.
+- Theme helpers now cover all eight controls (`ApplyTheme` + `ApplyThemeDefaults` + override overloads).
 - Recommended usage: `ApplyThemeDefaults(runtime.Theme)` first, then per-screen marker/style overrides.
 
 ### Beautiful UI Checklist (Current Phase)
@@ -270,7 +276,7 @@ Current shipped `TeaThemeControlExtensions` mappings include:
 - modal/chart summary details: `Dialog` and `Modal` include border text token mapping
 - plotting controls: `Sparkline`, `AreaPlot`, `ScatterPlot`, `Histogram`, `LinePlot`, `PlotPanel`
 - plotting details: bordered plotting controls (`Sparkline`, `AreaPlot`, `LinePlot`, `PlotPanel`) include border text token mapping; `ScatterPlot`/`Histogram` map point or bar + axis + legend tokens
-- dev/ops workflow controls: `JsonTreeView`, `CommandOutput`, `LogTailPanel`, `ActivityFeed`, `NotificationInbox`, `KeyBindingHelpDialog`
+- dev/ops workflow controls: `JsonTreeView`, `TraceViewer`, `CommandOutput`, `LogTailPanel`, `TaskRunnerPanel`, `ActivityFeed`, `NotificationInbox`, `KeyBindingHelpDialog`
 - dev/ops details: bordered controls in this set map border text hooks to semantic border/focus tokens; inbox/help-dialog map semantic title/row/state tokens
 
 ## Advanced Seams
