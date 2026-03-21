@@ -70,6 +70,9 @@ internal static class TeaThemeMerge
                     Ring = source.Focus.Ring.Merge(overlay.Focus.Ring),
                     Title = source.Focus.Title.Merge(overlay.Focus.Title),
                     Border = source.Focus.Border.Merge(overlay.Focus.Border),
+                    Marker = string.IsNullOrEmpty(overlay.Focus.Marker)
+                        ? source.Focus.Marker
+                        : overlay.Focus.Marker,
                 },
         };
     }
@@ -119,5 +122,6 @@ internal static class TeaThemeMerge
     private static bool IsEmpty(TeaThemeFocusTokens tokens) =>
         tokens.Ring.IsEmpty
         && tokens.Title.IsEmpty
-        && tokens.Border.IsEmpty;
+        && tokens.Border.IsEmpty
+        && string.IsNullOrEmpty(tokens.Marker);
 }

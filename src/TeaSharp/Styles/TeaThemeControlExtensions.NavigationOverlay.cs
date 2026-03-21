@@ -16,6 +16,7 @@ public static partial class TeaThemeControlExtensions
         control.OptionStyle = theme.Text.Primary;
         control.SelectedOptionStyle = theme.Selection.Foreground.Merge(theme.Selection.Background);
         control.HoveredOptionStyle = theme.Accent.Secondary;
+        control.FocusMarker = theme.Focus.Marker;
         control.MutedStyle = theme.Text.Muted;
         control.DisabledStyle = theme.Text.Muted;
         control.BorderStyleText = theme.Border.Default;
@@ -47,6 +48,11 @@ public static partial class TeaThemeControlExtensions
             control.SelectedOptionStyle,
             theme.Selection.Foreground.Merge(theme.Selection.Background));
         control.HoveredOptionStyle = ApplyDefault(control.HoveredOptionStyle, theme.Accent.Secondary);
+        if (control.FocusMarker.Length == 0)
+        {
+            control.FocusMarker = theme.Focus.Marker;
+        }
+
         control.MutedStyle = ApplyDefault(control.MutedStyle, theme.Text.Muted);
         control.DisabledStyle = ApplyDefault(control.DisabledStyle, theme.Text.Muted);
         control.BorderStyleText = ApplyDefault(control.BorderStyleText, theme.Border.Default);
@@ -77,6 +83,7 @@ public static partial class TeaThemeControlExtensions
         control.OptionStyle = theme.Text.Primary;
         control.SelectedOptionStyle = theme.Selection.Foreground.Merge(theme.Selection.Background);
         control.HoveredOptionStyle = theme.Accent.Secondary;
+        control.FocusMarker = theme.Focus.Marker;
         control.MutedStyle = theme.Text.Muted;
         control.DisabledStyle = theme.Text.Muted;
         control.BorderStyleText = theme.Border.Default;
@@ -109,6 +116,11 @@ public static partial class TeaThemeControlExtensions
             control.SelectedOptionStyle,
             theme.Selection.Foreground.Merge(theme.Selection.Background));
         control.HoveredOptionStyle = ApplyDefault(control.HoveredOptionStyle, theme.Accent.Secondary);
+        if (control.FocusMarker.Length == 0)
+        {
+            control.FocusMarker = theme.Focus.Marker;
+        }
+
         control.MutedStyle = ApplyDefault(control.MutedStyle, theme.Text.Muted);
         control.DisabledStyle = ApplyDefault(control.DisabledStyle, theme.Text.Muted);
         control.BorderStyleText = ApplyDefault(control.BorderStyleText, theme.Border.Default);
@@ -137,6 +149,7 @@ public static partial class TeaThemeControlExtensions
         control.LeafStyle = theme.Text.Primary;
         control.SelectedItemStyle = theme.Selection.Foreground.Merge(theme.Selection.Background);
         control.HoveredItemStyle = theme.Accent.Secondary;
+        control.FocusMarker = theme.Focus.Marker;
         control.MutedStyle = theme.Text.Muted;
         control.DisabledStyle = theme.Text.Muted;
         control.BorderStyleText = theme.Border.Default;
@@ -167,6 +180,11 @@ public static partial class TeaThemeControlExtensions
             control.SelectedItemStyle,
             theme.Selection.Foreground.Merge(theme.Selection.Background));
         control.HoveredItemStyle = ApplyDefault(control.HoveredItemStyle, theme.Accent.Secondary);
+        if (control.FocusMarker.Length == 0)
+        {
+            control.FocusMarker = theme.Focus.Marker;
+        }
+
         control.MutedStyle = ApplyDefault(control.MutedStyle, theme.Text.Muted);
         control.DisabledStyle = ApplyDefault(control.DisabledStyle, theme.Text.Muted);
         control.BorderStyleText = ApplyDefault(control.BorderStyleText, theme.Border.Default);

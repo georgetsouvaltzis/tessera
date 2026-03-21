@@ -194,6 +194,7 @@ public static class TeaThemes
                 Ring = StyleForeground(palette.Focus),
                 Title = StyleForeground(palette.Focus).WithBold(),
                 Border = StyleForeground(palette.Focus).WithBold(),
+                Marker = "*",
             },
         };
     }

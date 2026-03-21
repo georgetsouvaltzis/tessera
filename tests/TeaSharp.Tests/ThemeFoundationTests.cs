@@ -1,3 +1,4 @@
+using TeaSharp.Controls;
 using TeaSharp.Styles;
 
 namespace TeaSharp.Tests;
@@ -18,6 +19,12 @@ internal static class ThemeFoundationTests
         yield return new TestCase(
             "Theme_RuntimeOptions_HoldsThemeWithoutSideEffects",
             RuntimeOptions_HoldsThemeWithoutSideEffects);
+        yield return new TestCase(
+            "Theme_BuiltInThemes_ProvideDefaultFocusMarker",
+            BuiltInThemes_ProvideDefaultFocusMarker);
+        yield return new TestCase(
+            "Theme_Merge_PreservesFocusMarkerWhenOverlayUnspecified",
+            Merge_PreservesFocusMarkerWhenOverlayUnspecified);
     }
 
     private static Task CatppuccinMocha_ProvidesExpectedKeyTokens()
@@ -36,6 +43,7 @@ internal static class ThemeFoundationTests
 
         AssertForegroundRgb(theme.Text.Primary, 0xE0, 0xDE, 0xF4, "Rosé Pine Main should set Text.Primary.");
         AssertForegroundRgb(theme.Focus.Border, 0x9C, 0xCF, 0xD8, "Rosé Pine Main should set Focus.Border.");
+        TestAssert.Equal("*", theme.Focus.Marker, "Rosé Pine Main should set default focus marker.");
         AssertBackgroundRgb(theme.Surface.Base, 0x19, 0x17, 0x24, "Rosé Pine Main should set Surface.Base.");
         return Task.CompletedTask;
     }
@@ -44,6 +52,7 @@ internal static class ThemeFoundationTests
     {
         var customPrimary = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(1, 2, 3));
         var customFocusBorder = TeaStyle.Empty.WithBackground(AnsiColor.Rgb(10, 20, 30));
+        const string customMarker = ">>";
 
         var theme = new TeaTheme
         {
@@ -54,11 +63,13 @@ internal static class ThemeFoundationTests
             Focus = new TeaThemeFocusTokens
             {
                 Border = customFocusBorder,
+                Marker = customMarker,
             },
         };
 
         TestAssert.Equal(customPrimary, theme.Text.Primary, "Custom theme should preserve Text.Primary overrides.");
         TestAssert.Equal(customFocusBorder, theme.Focus.Border, "Custom theme should preserve Focus.Border overrides.");
+        TestAssert.Equal(customMarker, theme.Focus.Marker, "Custom theme should preserve Focus.Marker overrides.");
         return Task.CompletedTask;
     }
 
@@ -73,6 +84,50 @@ internal static class ThemeFoundationTests
         TestAssert.ReferenceSame(theme, options.Theme!, "TeaRuntimeOptions.Theme should hold the assigned theme reference.");
         TestAssert.Equal(60, options.MaxFps, "Theme assignment should not change MaxFps defaults.");
         TestAssert.ReferenceSame(ScreenOptions.Empty, options.Screen, "Theme assignment should not replace Screen defaults.");
+        return Task.CompletedTask;
+    }
+
+    private static Task BuiltInThemes_ProvideDefaultFocusMarker()
+    {
+        var catppuccin = TeaThemes.Catppuccin(CatppuccinVariant.Mocha);
+        var rosePine = TeaThemes.RosePine(RosePineVariant.Main);
+
+        TestAssert.Equal("*", catppuccin.Focus.Marker, "Catppuccin themes should set default focus marker.");
+        TestAssert.Equal("*", rosePine.Focus.Marker, "Rosé Pine themes should set default focus marker.");
+        return Task.CompletedTask;
+    }
+
+    private static Task Merge_PreservesFocusMarkerWhenOverlayUnspecified()
+    {
+        var baseTheme = new TeaTheme
+        {
+            Focus = new TeaThemeFocusTokens
+            {
+                Marker = ">>",
+            },
+        };
+
+        var overrides = new TeaThemeOverrides
+        {
+            GlobalTheme = new TeaTheme
+            {
+                Focus = new TeaThemeFocusTokens(),
+            },
+        };
+
+        var resolvedUnspecified = overrides.Resolve(new Choice(), baseTheme);
+        TestAssert.Equal(">>", resolvedUnspecified.Focus.Marker, "Unspecified overlay marker should not clear base marker.");
+
+        overrides.GlobalTheme = new TeaTheme
+        {
+            Focus = new TeaThemeFocusTokens
+            {
+                Marker = "::",
+            },
+        };
+
+        var resolvedSpecified = overrides.Resolve(new Choice(), baseTheme);
+        TestAssert.Equal("::", resolvedSpecified.Focus.Marker, "Specified overlay marker should override base marker.");
         return Task.CompletedTask;
     }
 
