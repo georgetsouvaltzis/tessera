@@ -50,6 +50,8 @@ These are the types new applications should discover first.
 - `TeaSharp.Controls.CommandPaletteItem`
 - `TeaSharp.Controls.CommandPaletteGlyphSet`
 - `TeaSharp.Controls.Dialog`
+- `TeaSharp.Controls.DialogResult`
+- `TeaSharp.Controls.DialogClosedEventArgs`
 - `TeaSharp.Controls.ContextMenu`
 - `TeaSharp.Controls.ContextMenuItem`
 - `TeaSharp.Controls.ContextMenuGlyphSet`

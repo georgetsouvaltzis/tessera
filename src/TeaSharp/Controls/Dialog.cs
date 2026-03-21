@@ -27,6 +27,11 @@ public sealed class Dialog : Control
     public event EventHandler? Dismissed;
 
     /// <summary>
+    /// Occurs when the dialog closes with a concrete <see cref="DialogResult"/>.
+    /// </summary>
+    public event EventHandler<DialogClosedEventArgs>? Closed;
+
+    /// <summary>
     /// Gets or sets the dialog title.
     /// </summary>
     public string Title
@@ -307,6 +312,7 @@ public sealed class Dialog : Control
             Dismissed?.Invoke(this, EventArgs.Empty);
         }
 
+        Closed?.Invoke(this, new DialogClosedEventArgs(result));
         return true;
     }
 
