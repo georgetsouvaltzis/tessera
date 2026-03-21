@@ -127,6 +127,7 @@ V1 theming is semantic-token based with override hierarchy:
 - mapped explorer/feedback controls include `DiffView`, `PropertyGrid`, `FileExplorer`, `FuzzyFinder`, `ToastCenter`
 - mapped dev/ops workflow controls include `JsonTreeView`, `TraceViewer`, `CommandOutput`, `LogTailPanel`, `TaskRunnerPanel`, `ActivityFeed`, `NotificationInbox`, `KeyBindingHelpDialog`
 - notification guidance: use `Notifications` as the default/onboarding notification feed; treat `NotificationInbox` as advanced/devops workflow surface
+- selection naming guidance: treat `Selected*` as canonical; compatibility `Current*` members remain in V1 where present and follow [post-v1-selection-naming-migration.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/post-v1-selection-naming-migration.md)
 - bordered dev/ops workflow controls (`JsonTreeView`, `TraceViewer`, `CommandOutput`, `LogTailPanel`, `TaskRunnerPanel`, `ActivityFeed`) map `BorderStyleText`/`FocusedBorderStyleText` to semantic border/focus tokens by default
 - mapped workspace/visual-data controls include `DockWorkspace`, `PaneTabs`, `PaletteEditor`, `Heatmap`, `TreeMapChart`, `TerminalPanel`, `ProcessListView`
 - `TeaThemeControlExtensions.Workspace.cs` maps all workspace/visual-data controls in this set

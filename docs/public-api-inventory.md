@@ -235,6 +235,16 @@ Current `Notifications` primary API surface:
 - `RemoveSelected()`
 - `Push(...)` remains supported and forwards to `Add(...)`
 
+### Selection Naming Policy (Tier 1)
+
+Canonical selection naming for docs/examples is `Selected*`:
+
+- `SelectedIndex`
+- `SelectedItem` (or domain-specific `SelectedNode`, `SelectedProperty`, etc.)
+- `SelectionChanged`
+
+Compatibility names such as `Current*` remain supported in V1 where present and are governed by the phased migration policy in [post-v1-selection-naming-migration.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/post-v1-selection-naming-migration.md).
+
 ## Tier 2: Advanced But Supported
 
 These APIs remain public because they still offer real value, but they should not dominate the default path.

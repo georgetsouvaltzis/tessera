@@ -87,6 +87,7 @@ Correctness is a continuous gate across all phases: fix regressions at source an
       - `86df879` -> [src/TeaSharp/Controls/Notifications.cs](/Users/georgetsouvaltzis/Projects/playground/teasharp/src/TeaSharp/Controls/Notifications.cs), [src/TeaSharp/Controls/InboxItem.cs](/Users/georgetsouvaltzis/Projects/playground/teasharp/src/TeaSharp/Controls/InboxItem.cs), [tests/TeaSharp.Tests/NotificationsPrimaryApiTests.cs](/Users/georgetsouvaltzis/Projects/playground/teasharp/tests/TeaSharp.Tests/NotificationsPrimaryApiTests.cs), [docs/public-api-consumer-friction-log.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/public-api-consumer-friction-log.md)
       - `refactor: normalize setselectedindex across list controls` -> selection mutation API pass across list-like controls (`SetSelectedIndex` normalization surface)
       - `refactor: add selected aliases for selection event args` -> [src/TeaSharp/Controls/KeyValueListSelectionChangedEventArgs.cs](/Users/georgetsouvaltzis/Projects/playground/teasharp/src/TeaSharp/Controls/KeyValueListSelectionChangedEventArgs.cs), [src/TeaSharp/Controls/PropertyGridSelectionChangedEventArgs.cs](/Users/georgetsouvaltzis/Projects/playground/teasharp/src/TeaSharp/Controls/PropertyGridSelectionChangedEventArgs.cs), [src/TeaSharp/Controls/ValidationSelectionChangedEventArgs.cs](/Users/georgetsouvaltzis/Projects/playground/teasharp/src/TeaSharp/Controls/ValidationSelectionChangedEventArgs.cs), [src/TeaSharp/Controls/JsonTreeSelectionChangedEventArgs.cs](/Users/georgetsouvaltzis/Projects/playground/teasharp/src/TeaSharp/Controls/JsonTreeSelectionChangedEventArgs.cs)
+      - policy closure evidence: [post-v1-selection-naming-migration.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/post-v1-selection-naming-migration.md)
   - C4 remains open until all API freeze checklist items are marked complete
 - **M5: Performance Gate + Benchmarks + Docs Freeze** -> **Pending manual signoff**
   - harness and scenarios are wired; final pass/fail evidence is still required at RC
@@ -154,6 +155,7 @@ Release approval rule: M5 is only complete when all four rows above are moved fr
    - focus/title: `FocusMarker`, `ShowFocusMarker`, `TitleStyle`, `FocusedTitleStyle`
    - frame styling: `BorderStyleText`, `FocusedBorderStyleText` where border glyph styling exists
    - selection semantics: `SelectedIndex`, `SelectedItem`, `SelectionChanged`
+   - compatibility-bearing `Current*` names follow the explicit post-V1 migration policy in [post-v1-selection-naming-migration.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/post-v1-selection-naming-migration.md)
 5. Public XML docs match runtime behavior for any changed API before merge.
 6. Starter docs/examples do not import `TeaSharp.Core.*`.
 
@@ -161,7 +163,7 @@ M4 checklist status snapshot (March 21, 2026):
 
 - item `1`: **In progress** (consumer-path evidence landed via `c712c2a`)
 - item `2`: **In progress** (no new closure evidence in this slice)
-- item `3`: **In progress** (consumer ergonomics helpers now include dialog/result, table row mutation, header row composition, theme override bundles, auto-rescheduling periodic effects, notification-surface consolidation on `Notifications`, and selection API normalization/alias coverage; broader API-surface consistency still open, including final post-V1 `Current*` -> `Selected*` primary-name cleanup policy)
+- item `3`: **In progress** (consumer ergonomics helpers now include dialog/result, table row mutation, header row composition, theme override bundles, auto-rescheduling periodic effects, notification-surface consolidation on `Notifications`, and selection API normalization/alias coverage; post-V1 migration policy is now explicit, but broader API-surface consistency and RC closure evidence are still open)
 - item `4`: **In progress** (SearchResultsView focused-border merge fix landed via `1a4fab8`)
 - item `5`: **In progress** (XML docs coverage updates landed via `4e3a240`)
 - item `6`: **In progress** (PublicApiDashboard + docs sync indicate no `TeaSharp.Core` onboarding leakage in touched assets)
