@@ -32,6 +32,12 @@ public sealed class SelectionChangedEventArgsAliasDiscoverabilityTests
 
         AssertEditorBrowsableAdvanced(typeof(FileExplorerSelectionChangedEventArgs), "CurrentPath");
         AssertEditorBrowsableAdvanced(typeof(FileExplorerSelectionChangedEventArgs), "CurrentItem");
+
+        AssertEditorBrowsableAdvanced(typeof(StepperCurrentStepChangedEventArgs), "CurrentIndex");
+        AssertEditorBrowsableAdvanced(typeof(StepperCurrentStepChangedEventArgs), "CurrentStep");
+
+        AssertEditorBrowsableAdvanced(typeof(WizardStepChangedEventArgs), "CurrentIndex");
+        AssertEditorBrowsableAdvanced(typeof(WizardStepChangedEventArgs), "CurrentStep");
     }
 
     [Test]
@@ -57,6 +63,12 @@ public sealed class SelectionChangedEventArgsAliasDiscoverabilityTests
 
         AssertEditorBrowsableMissing(typeof(FileExplorerSelectionChangedEventArgs), "SelectedPath");
         AssertEditorBrowsableMissing(typeof(FileExplorerSelectionChangedEventArgs), "SelectedItem");
+
+        AssertEditorBrowsableMissing(typeof(StepperCurrentStepChangedEventArgs), "SelectedIndex");
+        AssertEditorBrowsableMissing(typeof(StepperCurrentStepChangedEventArgs), "SelectedStep");
+
+        AssertEditorBrowsableMissing(typeof(WizardStepChangedEventArgs), "SelectedIndex");
+        AssertEditorBrowsableMissing(typeof(WizardStepChangedEventArgs), "SelectedStep");
     }
 
     private static void AssertEditorBrowsableAdvanced(Type type, string propertyName)

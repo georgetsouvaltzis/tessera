@@ -173,9 +173,9 @@ public sealed partial class Stepper
             return;
         }
 
-        CurrentStepChanged?.Invoke(
-            this,
-            new StepperCurrentStepChangedEventArgs(previousIndex, _currentIndex, previousStep, CurrentStep));
+        var args = new StepperCurrentStepChangedEventArgs(previousIndex, _currentIndex, previousStep, CurrentStep);
+        SelectionChanged?.Invoke(this, args);
+        CurrentStepChanged?.Invoke(this, args);
     }
 
     private static string ApplyStyle(string text, TeaStyle style)

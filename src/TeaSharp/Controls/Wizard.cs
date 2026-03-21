@@ -15,8 +15,15 @@ public sealed class Wizard : Control
     private int _scrollOffset;
     private int _lastViewportRows = 8;
     /// <summary>
-    /// Occurs when <see cref="CurrentIndex"/> changes.
+    /// Occurs when selection changes.
+    /// Canonical event for selection transition handling.
     /// </summary>
+    public event EventHandler<WizardStepChangedEventArgs>? SelectionChanged;
+    /// <summary>
+    /// Occurs when <see cref="CurrentIndex"/> changes.
+    /// Compatibility alias for <see cref="SelectionChanged"/>.
+    /// </summary>
+    [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Advanced)]
     public event EventHandler<WizardStepChangedEventArgs>? StepChanged;
     /// <summary>Gets or sets control title.</summary>
     public string Title { get; set; } = "Wizard";
@@ -68,8 +75,12 @@ public sealed class Wizard : Control
     public IReadOnlyList<WizardStep> Steps => _steps;
     /// <summary>Gets current step index, or <c>-1</c> when none.</summary>
     public int CurrentIndex => _currentIndex;
+    /// <summary>Gets selected step index, or <c>-1</c> when none. Canonical property for selection access.</summary>
+    public int SelectedIndex => CurrentIndex;
     /// <summary>Gets current step, if any.</summary>
     public WizardStep? CurrentStep => _currentIndex >= 0 && _currentIndex < _steps.Count ? _steps[_currentIndex] : null;
+    /// <summary>Gets selected step, if any. Canonical property for selection access.</summary>
+    public WizardStep? SelectedStep => CurrentStep;
     /// <inheritdoc />
     public override bool IsFocused { get; set; }
     /// <inheritdoc />
@@ -378,7 +389,9 @@ public sealed class Wizard : Control
         {
             return;
         }
-        StepChanged?.Invoke(this, new WizardStepChangedEventArgs(previousIndex, _currentIndex, previousStep, CurrentStep));
+        var args = new WizardStepChangedEventArgs(previousIndex, _currentIndex, previousStep, CurrentStep);
+        SelectionChanged?.Invoke(this, args);
+        StepChanged?.Invoke(this, args);
     }
     private string BuildStepLine(int index, WizardStep step)
     {

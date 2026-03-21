@@ -30,9 +30,17 @@ public sealed class StepperCurrentStepChangedEventArgs : EventArgs
     public int PreviousIndex { get; }
 
     /// <summary>
-    /// Gets the current step index.
+    /// Gets the selected step index after the change.
+    /// Compatibility alias for <see cref="SelectedIndex" />.
     /// </summary>
+    [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Advanced)]
     public int CurrentIndex { get; }
+
+    /// <summary>
+    /// Gets the selected step index after the change.
+    /// Canonical property for selection access.
+    /// </summary>
+    public int SelectedIndex => CurrentIndex;
 
     /// <summary>
     /// Gets the previous step.
@@ -40,7 +48,15 @@ public sealed class StepperCurrentStepChangedEventArgs : EventArgs
     public StepperStep? PreviousStep { get; }
 
     /// <summary>
-    /// Gets the current step.
+    /// Gets the selected step after the change.
+    /// Compatibility alias for <see cref="SelectedStep" />.
     /// </summary>
+    [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Advanced)]
     public StepperStep? CurrentStep { get; }
+
+    /// <summary>
+    /// Gets the selected step after the change.
+    /// Canonical property for selection access.
+    /// </summary>
+    public StepperStep? SelectedStep => CurrentStep;
 }

@@ -14,8 +14,16 @@ public sealed partial class Stepper : Control
     private int _currentIndex = -1;
 
     /// <summary>
-    /// Occurs when <see cref="CurrentIndex"/> changes.
+    /// Occurs when selection changes.
+    /// Canonical event for selection transition handling.
     /// </summary>
+    public event EventHandler<StepperCurrentStepChangedEventArgs>? SelectionChanged;
+
+    /// <summary>
+    /// Occurs when <see cref="CurrentIndex"/> changes.
+    /// Compatibility alias for <see cref="SelectionChanged" />.
+    /// </summary>
+    [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Advanced)]
     public event EventHandler<StepperCurrentStepChangedEventArgs>? CurrentStepChanged;
 
     /// <summary>
@@ -34,11 +42,27 @@ public sealed partial class Stepper : Control
     }
 
     /// <summary>
+    /// Gets or sets selected step index.
+    /// Canonical property for selection access.
+    /// </summary>
+    public int SelectedIndex
+    {
+        get => CurrentIndex;
+        set => SetCurrentStep(value);
+    }
+
+    /// <summary>
     /// Gets current step, when available.
     /// </summary>
     public StepperStep? CurrentStep => _currentIndex >= 0 && _currentIndex < _steps.Count
         ? _steps[_currentIndex]
         : null;
+
+    /// <summary>
+    /// Gets selected step, when available.
+    /// Canonical property for selection access.
+    /// </summary>
+    public StepperStep? SelectedStep => CurrentStep;
 
     /// <summary>
     /// Gets or sets optional title shown before steps.

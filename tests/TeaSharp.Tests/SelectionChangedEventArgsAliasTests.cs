@@ -84,4 +84,26 @@ public sealed class SelectionChangedEventArgsAliasTests
         Assert.That(args.SelectedPath, Is.EqualTo(args.CurrentPath));
         Assert.That(args.SelectedItem, Is.SameAs(args.CurrentItem));
     }
+
+    [Test]
+    public void SelectionChangedEventArgs_Stepper_SelectedAliases_ForwardToCurrentValues()
+    {
+        var previousStep = new StepperStep("intro", "Intro");
+        var currentStep = new StepperStep("done", "Done");
+        var args = new StepperCurrentStepChangedEventArgs(0, 1, previousStep, currentStep);
+
+        Assert.That(args.SelectedIndex, Is.EqualTo(args.CurrentIndex));
+        Assert.That(args.SelectedStep, Is.SameAs(args.CurrentStep));
+    }
+
+    [Test]
+    public void SelectionChangedEventArgs_Wizard_SelectedAliases_ForwardToCurrentValues()
+    {
+        var previousStep = new WizardStep("intro", "Intro");
+        var currentStep = new WizardStep("done", "Done");
+        var args = new WizardStepChangedEventArgs(0, 1, previousStep, currentStep);
+
+        Assert.That(args.SelectedIndex, Is.EqualTo(args.CurrentIndex));
+        Assert.That(args.SelectedStep, Is.SameAs(args.CurrentStep));
+    }
 }
