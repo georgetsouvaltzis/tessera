@@ -63,12 +63,9 @@ public sealed partial class SearchResultsView
 
     private TeaStyle ResolveBorderStyleText()
     {
-        if (IsFocused && !FocusedBorderStyleText.IsEmpty)
-        {
-            return FocusedBorderStyleText;
-        }
-
-        return BorderStyleText;
+        return IsFocused
+            ? BorderStyleText.Merge(FocusedBorderStyleText)
+            : BorderStyleText;
     }
 
     private string ApplyRowStyle(string text, bool selected, bool hovered, bool pressed)

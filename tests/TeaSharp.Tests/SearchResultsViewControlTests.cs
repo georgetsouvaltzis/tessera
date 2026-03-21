@@ -116,6 +116,26 @@ public sealed class SearchResultsViewControlTests
     }
 
     [Test]
+    public void Controls_SearchResultsView_FocusedBorder_MergesBaseAndFocusedStyles()
+    {
+        var control = new SearchResultsView
+        {
+            IsFocused = true,
+            Border = BorderStyle.Single,
+            BorderStyleText = TeaStyle.Empty.WithBackground(AnsiColor.Rgb(9, 8, 7)),
+            FocusedBorderStyleText = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(1, 2, 3)),
+        };
+        control.SetItems(["alpha"]);
+
+        var canvas = new Canvas(24, 4, CanvasTextMode.GraphemeAware);
+        control.Render(canvas, new Rect(0, 0, 24, 4));
+        var output = canvas.Render();
+
+        TestAssert.True(output.Contains("48;2;9;8;7", StringComparison.Ordinal), "Focused border should preserve base border style.");
+        TestAssert.True(output.Contains("38;2;1;2;3", StringComparison.Ordinal), "Focused border should merge focused border style.");
+    }
+
+    [Test]
     public void Theme_SearchResultsView_ApplyAndDefaults_MapExpectedTokens_AndPreserveExplicitStyles()
     {
         var theme = new TeaTheme
