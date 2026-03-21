@@ -38,10 +38,10 @@ Notation: all rows inherit the strict state-style contract above; `Glyph hooks` 
 
 Wave 1 integration status (current lane):
 
-- Shipped and integrated: `Form`, `FieldSet`, `Wizard`, `SplitView`, `InspectorPanel`, `EmptyState`, `ValidationSummary`, `SearchResultsView`.
+- Shipped and integrated: `Form`, `FieldSet`, `DataForm<TModel>`, `Wizard`, `SplitView`, `InspectorPanel`, `EmptyState`, `ValidationSummary`, `SearchResultsView`.
 - Theme extension coverage includes all listed controls (`ApplyTheme`, `ApplyThemeDefaults`, override overloads).
-- Bordered parity + control-catalog + theme-override tests include bordered Wave 1 controls (`Form`, `FieldSet`, `Wizard`, `SplitView`, `InspectorPanel`).
-- Remaining Wave 1 backlog: `DataForm<TModel>`.
+- Bordered parity + control-catalog + theme-override tests include bordered Wave 1 controls (`Form`, `FieldSet`, `DataForm<TModel>`, `Wizard`, `SplitView`, `InspectorPanel`).
+- Remaining Wave 1 backlog: none.
 
 ### Wave 2 (P0/P1): Data, Planning, Query (9)
 

@@ -177,6 +177,10 @@ These are the types new applications should discover first.
 - `TeaSharp.Controls.SearchResultsGlyphSet`
 - `TeaSharp.Controls.Form`
 - `TeaSharp.Controls.FormField`
+- `TeaSharp.Controls.DataForm<TModel>`
+- `TeaSharp.Controls.DataFormField<TModel>`
+- `TeaSharp.Controls.DataFormSelectionChangedEventArgs<TModel>`
+- `TeaSharp.Controls.DataFormFieldCommittedEventArgs<TModel>`
 - `TeaSharp.Controls.FieldSet`
 - `TeaSharp.Controls.SplitView`
 - `TeaSharp.Controls.SplitViewOrientation`
@@ -339,6 +343,7 @@ The first root controls that already own their implementation directly are:
 - `SearchBox`
 - `SearchResultsView`
 - `Form`
+- `DataForm<TModel>`
 - `FieldSet`
 - `SplitView`
 - `InspectorPanel`
@@ -367,7 +372,7 @@ Border override, dropdown/tree glyph-set, and data marker/separator cookbook sni
 Wave 2 query/analytics controls (`PivotTable`, `QueryBuilder`, `RichTextView`) are mapped with the same semantic-token and border-style contract.
 Wave 3 dev/ops controls (`JsonTreeView`, `CommandOutput`, `LogTailPanel`, `ActivityFeed`, `NotificationInbox`, `KeyBindingHelpDialog`) are mapped with the same semantic-token contract.
 Wave 4 batch A + B controls (`DockWorkspace`, `PaneTabs`, `PaletteEditor`, `Heatmap`, `TreeMapChart`, `TerminalPanel`, `ProcessListView`) are integrated and mapped in `TeaThemeControlExtensions.Workspace.cs`.
-Wave 1 app-shell/forms controls (`Form`, `FieldSet`, `Wizard`, `SplitView`, `InspectorPanel`) are integrated and mapped in `TeaThemeControlExtensions.FormsAndShell.cs`.
+Wave 1 app-shell/forms controls (`Form`, `FieldSet`, `DataForm<TModel>`, `Wizard`, `SplitView`, `InspectorPanel`) are integrated and mapped in `TeaThemeControlExtensions.FormsAndShell.cs`.
 
 ## Plotting Authoring Guidance (Tier 1)
 
@@ -447,7 +452,7 @@ Navigation controls with direct token mappings:
 
 Form/shell controls with direct token mappings:
 
-- `Form`, `FieldSet`, `Wizard`, `SplitView`, `InspectorPanel`
+- `Form`, `FieldSet`, `DataForm<TModel>`, `Wizard`, `SplitView`, `InspectorPanel`
 - these controls map `BorderStyleText` -> `Border.Default` and `FocusedBorderStyleText` -> `Border.Focused + Focus.Border`
 
 Navigation/overlay controls with direct token mappings:

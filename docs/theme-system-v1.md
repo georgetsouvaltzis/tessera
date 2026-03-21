@@ -223,6 +223,7 @@ var grid = new DataGrid
 
 - `Form`
 - `FieldSet`
+- `DataForm<TModel>`
 - `Wizard`
 - `SplitView`
 - `InspectorPanel`
@@ -237,6 +238,9 @@ var theme = TeaThemes.Catppuccin(CatppuccinVariant.Frappe);
 
 var form = new Form().ApplyThemeDefaults(theme);
 form.RequiredMarkerStyle = TeaStyle.Empty.WithBold().WithForeground(AnsiColor.BrightRed);
+
+var dataForm = new DataForm<object>().ApplyThemeDefaults(theme);
+dataForm.ErrorStyle = TeaStyle.Empty.WithBold().WithForeground(AnsiColor.BrightRed);
 
 var wizard = new Wizard().ApplyThemeDefaults(theme);
 wizard.ActiveStepStyle = TeaStyle.Empty.WithBold().WithForeground(AnsiColor.BrightCyan);
@@ -462,7 +466,7 @@ Mapped controls expose:
 - `ApplyThemeDefaults(TeaTheme theme)`
 - plotting mappings: `Sparkline`, `AreaPlot`, `ScatterPlot`, `Histogram`, `LinePlot`, `PlotPanel`
 - workspace mappings: `DockWorkspace`, `PaneTabs`, `PaletteEditor`, `Heatmap`, `TreeMapChart`, `TerminalPanel`, `ProcessListView`
-- app-shell/forms mappings: `Form`, `FieldSet`, `Wizard`, `SplitView`, `InspectorPanel`
+- app-shell/forms mappings: `Form`, `FieldSet`, `DataForm<TModel>`, `Wizard`, `SplitView`, `InspectorPanel`
 - overloads taking `TeaThemeOverrides`, `baseTheme`, and `TeaThemeVisualState`
 
 Input/value mapping coverage includes:
@@ -536,7 +540,7 @@ Workspace/visual-data mapping coverage includes:
 
 App-shell/forms mapping coverage includes:
 
-- `Form`, `FieldSet`, `Wizard`, `SplitView`, `InspectorPanel`
+- `Form`, `FieldSet`, `DataForm<TModel>`, `Wizard`, `SplitView`, `InspectorPanel`
 - bordered controls in this set map `BorderStyleText` + `FocusedBorderStyleText` to border/focus tokens
 
 Bordered control parity enforcement:

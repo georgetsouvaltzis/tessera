@@ -159,6 +159,10 @@ Preferred public catalog:
 146. `Wizard`
 147. `WizardStep`
 148. `WizardStepChangedEventArgs`
+149. `DataForm<TModel>`
+150. `DataFormField<TModel>`
+151. `DataFormSelectionChangedEventArgs<TModel>`
+152. `DataFormFieldCommittedEventArgs<TModel>`
 
 These live in `TeaSharp.Controls`.
 
@@ -259,9 +263,9 @@ Theme and override pattern:
 
 ### Wave 1 App Shell + Forms Controls
 
-- Shipped and integrated controls: `Form`, `FieldSet`, `Wizard`, `SplitView`, `InspectorPanel`, `EmptyState`, `ValidationSummary`, `SearchResultsView`.
-- Support types: `FormField`, `SplitViewOrientation`, `InspectorSection`, `InspectorField`, `WizardStep`, `WizardStepChangedEventArgs`.
-- Theme mappings for `Form`, `FieldSet`, `SplitView`, `InspectorPanel`, and `Wizard` live in `TeaThemeControlExtensions.FormsAndShell.cs`.
+- Shipped and integrated controls: `Form`, `FieldSet`, `DataForm<TModel>`, `Wizard`, `SplitView`, `InspectorPanel`, `EmptyState`, `ValidationSummary`, `SearchResultsView`.
+- Support types: `FormField`, `DataFormField<TModel>`, `DataFormSelectionChangedEventArgs<TModel>`, `DataFormFieldCommittedEventArgs<TModel>`, `SplitViewOrientation`, `InspectorSection`, `InspectorField`, `WizardStep`, `WizardStepChangedEventArgs`.
+- Theme mappings for `Form`, `FieldSet`, `DataForm<TModel>`, `SplitView`, `InspectorPanel`, and `Wizard` live in `TeaThemeControlExtensions.FormsAndShell.cs`.
 
 ### Wave 2 Data/Planning Controls
 
@@ -312,8 +316,8 @@ Current shipped `TeaThemeControlExtensions` mappings include:
 - data/flow details: `KeyValueList` and `Timeline` include border text token mapping
 - planning/boards controls: `VirtualizedListView<T>`, `GroupedListView<TGroup,TItem>`, `KanbanBoard`, `TagInput`, `CalendarMonthView`, `SchedulerTimeline`
 - planning/boards details: bordered controls in this set map border tokens; scheduler/calendar map semantic row/day/title tokens
-- forms/shell controls: `Form`, `FieldSet`, `SplitView`, `InspectorPanel`, `Wizard`, `EmptyState`, `ValidationSummary`, `SearchResultsView`
-- forms/shell details: `Form`, `FieldSet`, `SplitView`, `InspectorPanel`, and `Wizard` map semantic tokens through `TeaThemeControlExtensions.FormsAndShell.cs`; bordered controls in this set map border text hooks by default
+- forms/shell controls: `Form`, `FieldSet`, `DataForm<TModel>`, `SplitView`, `InspectorPanel`, `Wizard`, `EmptyState`, `ValidationSummary`, `SearchResultsView`
+- forms/shell details: `Form`, `FieldSet`, `DataForm<TModel>`, `SplitView`, `InspectorPanel`, and `Wizard` map semantic tokens through `TeaThemeControlExtensions.FormsAndShell.cs`; bordered controls in this set map border text hooks by default
 - query/analytics controls: `PivotTable`, `QueryBuilder`, `RichTextView`
 - query/analytics details: all three map semantic text/selection/focus/state tokens and bordered controls map border tokens by default
 - explorer/feedback controls: `DiffView`, `PropertyGrid`, `FileExplorer`, `FuzzyFinder`, `ToastCenter`

@@ -115,8 +115,8 @@ V1 theming is semantic-token based with override hierarchy:
 - `ContextMenu` preserves focused title marker text when rendering bordered titles
 - parity rule: any new bordered public control must ship border-style hooks, token mappings, and parity regression coverage in the same change
 - mapped navigation primitive controls include `Accordion`, `MultiSelect`, `RadioGroup`
-- mapped app-shell/forms controls include `Form`, `FieldSet`, `Wizard`, `SplitView`, `InspectorPanel`
-- bordered app-shell/forms controls (`Form`, `FieldSet`, `Wizard`, `SplitView`, `InspectorPanel`) map `BorderStyleText`/`FocusedBorderStyleText` to semantic border/focus tokens by default
+- mapped app-shell/forms controls include `Form`, `FieldSet`, `DataForm<TModel>`, `Wizard`, `SplitView`, `InspectorPanel`
+- bordered app-shell/forms controls (`Form`, `FieldSet`, `DataForm<TModel>`, `Wizard`, `SplitView`, `InspectorPanel`) map `BorderStyleText`/`FocusedBorderStyleText` to semantic border/focus tokens by default
 - mapped data/flow controls include `DataGrid`, `TreeTable`, `KeyValueList`, `Timeline`, `Stepper`
 - mapped planning/boards controls include `VirtualizedListView<T>`, `GroupedListView<TGroup,TItem>`, `KanbanBoard`, `TagInput`, `CalendarMonthView`, `SchedulerTimeline`
 - bordered planning/boards controls (`VirtualizedListView<T>`, `GroupedListView<TGroup,TItem>`, `KanbanBoard`, `TagInput`) map `BorderStyleText`/`FocusedBorderStyleText` to semantic border/focus tokens by default
@@ -299,6 +299,10 @@ Root controls currently include:
 - `SearchResultsGlyphSet`
 - `Form`
 - `FormField`
+- `DataForm<TModel>`
+- `DataFormField<TModel>`
+- `DataFormSelectionChangedEventArgs<TModel>`
+- `DataFormFieldCommittedEventArgs<TModel>`
 - `FieldSet`
 - `SplitView`
 - `SplitViewOrientation`
