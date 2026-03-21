@@ -14,6 +14,7 @@ public static partial class TeaThemeControlExtensions
 
         control.TitleStyle = theme.Text.Secondary;
         control.FocusedTitleStyle = theme.Focus.Title;
+        control.FocusMarker = theme.Focus.Marker;
         control.ItemStyle = theme.Text.Primary;
         control.SelectedItemStyle = theme.Selection.Foreground.Merge(theme.Selection.Background);
         control.SeparatorStyle = theme.Text.Muted;
@@ -44,6 +45,7 @@ public static partial class TeaThemeControlExtensions
 
         control.TitleStyle = ApplyDefault(control.TitleStyle, theme.Text.Secondary);
         control.FocusedTitleStyle = ApplyDefault(control.FocusedTitleStyle, theme.Focus.Title);
+        control.FocusMarker = ApplyDefault(control.FocusMarker, theme.Focus.Marker);
         control.ItemStyle = ApplyDefault(control.ItemStyle, theme.Text.Primary);
         control.SelectedItemStyle = ApplyDefault(
             control.SelectedItemStyle,
@@ -76,6 +78,7 @@ public static partial class TeaThemeControlExtensions
 
         control.TitleStyle = theme.Text.Secondary;
         control.FocusedTitleStyle = theme.Focus.Title;
+        control.FocusMarker = theme.Focus.Marker;
         control.LabelStyle = theme.Text.Primary;
         control.ActivePageLabelStyle = theme.Selection.Foreground.Merge(theme.Selection.Background);
         control.DisabledNavigationLabelStyle = theme.Text.Muted;
@@ -106,6 +109,7 @@ public static partial class TeaThemeControlExtensions
 
         control.TitleStyle = ApplyDefault(control.TitleStyle, theme.Text.Secondary);
         control.FocusedTitleStyle = ApplyDefault(control.FocusedTitleStyle, theme.Focus.Title);
+        control.FocusMarker = ApplyDefault(control.FocusMarker, theme.Focus.Marker);
         control.LabelStyle = ApplyDefault(control.LabelStyle, theme.Text.Primary);
         control.ActivePageLabelStyle = ApplyDefault(
             control.ActivePageLabelStyle,
@@ -135,6 +139,7 @@ public static partial class TeaThemeControlExtensions
 
         control.TitleStyle = theme.Text.Secondary;
         control.FocusedTitleStyle = theme.Focus.Title;
+        control.FocusMarker = theme.Focus.Marker;
         control.ItemStyle = theme.Text.Primary;
         control.SelectedItemStyle = theme.Selection.Foreground.Merge(theme.Selection.Background);
         control.FocusedItemStyle = theme.Focus.Ring;
@@ -159,6 +164,7 @@ public static partial class TeaThemeControlExtensions
 
         control.TitleStyle = ApplyDefault(control.TitleStyle, theme.Text.Secondary);
         control.FocusedTitleStyle = ApplyDefault(control.FocusedTitleStyle, theme.Focus.Title);
+        control.FocusMarker = ApplyDefault(control.FocusMarker, theme.Focus.Marker);
         control.ItemStyle = ApplyDefault(control.ItemStyle, theme.Text.Primary);
         control.SelectedItemStyle = ApplyDefault(
             control.SelectedItemStyle,
@@ -185,6 +191,7 @@ public static partial class TeaThemeControlExtensions
 
         control.TitleStyle = theme.Text.Secondary;
         control.FocusedTitleStyle = theme.Focus.Title;
+        control.FocusMarker = theme.Focus.Marker;
         control.ItemStyle = theme.Text.Primary;
         control.HoveredItemStyle = theme.Accent.Secondary;
         control.SelectedItemStyle = theme.Selection.Foreground.Merge(theme.Selection.Background);
@@ -210,6 +217,7 @@ public static partial class TeaThemeControlExtensions
 
         control.TitleStyle = ApplyDefault(control.TitleStyle, theme.Text.Secondary);
         control.FocusedTitleStyle = ApplyDefault(control.FocusedTitleStyle, theme.Focus.Title);
+        control.FocusMarker = ApplyDefault(control.FocusMarker, theme.Focus.Marker);
         control.ItemStyle = ApplyDefault(control.ItemStyle, theme.Text.Primary);
         control.HoveredItemStyle = ApplyDefault(control.HoveredItemStyle, theme.Accent.Secondary);
         control.SelectedItemStyle = ApplyDefault(
@@ -237,6 +245,7 @@ public static partial class TeaThemeControlExtensions
 
         control.TitleStyle = theme.Text.Secondary;
         control.FocusedTitleStyle = theme.Focus.Title;
+        control.FocusMarker = theme.Focus.Marker;
         control.ValueTextStyle = theme.Text.Primary;
         control.PlaceholderTextStyle = theme.Text.Muted;
         control.MatchCounterStyle = theme.Text.Secondary;
@@ -265,6 +274,7 @@ public static partial class TeaThemeControlExtensions
 
         control.TitleStyle = ApplyDefault(control.TitleStyle, theme.Text.Secondary);
         control.FocusedTitleStyle = ApplyDefault(control.FocusedTitleStyle, theme.Focus.Title);
+        control.FocusMarker = ApplyDefault(control.FocusMarker, theme.Focus.Marker);
         control.ValueTextStyle = ApplyDefault(control.ValueTextStyle, theme.Text.Primary);
         control.PlaceholderTextStyle = ApplyDefault(control.PlaceholderTextStyle, theme.Text.Muted);
         control.MatchCounterStyle = ApplyDefault(control.MatchCounterStyle, theme.Text.Secondary);
@@ -296,6 +306,7 @@ public static partial class TeaThemeControlExtensions
 
         control.TitleStyle = theme.Text.Secondary;
         control.FocusedTitleStyle = theme.Focus.Title;
+        control.FocusMarker = theme.Focus.Marker;
         control.DefaultRowStyle = theme.Text.Primary;
         control.HoveredRowStyle = theme.Accent.Secondary;
         control.SelectedRowStyle = theme.Selection.Foreground.Merge(theme.Selection.Background);
@@ -331,6 +342,7 @@ public static partial class TeaThemeControlExtensions
 
         control.TitleStyle = ApplyDefault(control.TitleStyle, theme.Text.Secondary);
         control.FocusedTitleStyle = ApplyDefault(control.FocusedTitleStyle, theme.Focus.Title);
+        control.FocusMarker = ApplyDefault(control.FocusMarker, theme.Focus.Marker);
         control.DefaultRowStyle = ApplyDefault(control.DefaultRowStyle, theme.Text.Primary);
         control.HoveredRowStyle = ApplyDefault(control.HoveredRowStyle, theme.Accent.Secondary);
         control.SelectedRowStyle = ApplyDefault(
