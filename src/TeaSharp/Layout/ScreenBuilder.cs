@@ -48,6 +48,16 @@ public sealed class WindowBuilder
         Header(height, BuildContent(configure), margin);
 
     /// <summary>
+    /// Builds the top section as a horizontal row of layout slots.
+    /// </summary>
+    /// <param name="height">The fixed header height in rows.</param>
+    /// <param name="configure">The callback that configures row items.</param>
+    /// <param name="margin">Optional outer margin applied to the header slot.</param>
+    /// <returns>The current builder instance for chaining.</returns>
+    public WindowBuilder HeaderRow(int height, Action<StackBuilder> configure, Thickness margin = default) =>
+        Header(height, StackBuilder.BuildRow(configure), margin);
+
+    /// <summary>
     /// Sets the bottom section to a fixed-height content block.
     /// </summary>
     public WindowBuilder Footer(int height, LayoutNode content, Thickness margin = default)
