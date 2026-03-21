@@ -26,6 +26,11 @@ internal static partial class ThemeOverridesTests
             "ThemeOverrides_OverrideOverloads_ResolveExpectedTokens_ForDialogModalAndCharts",
             OverrideOverloads_ResolveExpectedTokens_ForDialogModalAndCharts);
 
+        foreach (var testCase in FlowWave1Cases())
+        {
+            yield return testCase;
+        }
+
         foreach (var testCase in FlowWave2Cases())
         {
             yield return testCase;

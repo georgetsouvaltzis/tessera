@@ -23,10 +23,13 @@ internal static class BorderedControlParityPolicyTests
         typeof(Dialog),
         typeof(DiffView),
         typeof(DockWorkspace),
+        typeof(FieldSet),
         typeof(FileExplorer),
+        typeof(Form),
         typeof(FuzzyFinder),
         typeof(GroupedListView<,>),
         typeof(Heatmap),
+        typeof(InspectorPanel),
         typeof(JsonTreeView),
         typeof(KanbanBoard),
         typeof(KeyValueList),
@@ -51,6 +54,7 @@ internal static class BorderedControlParityPolicyTests
         typeof(SearchBox),
         typeof(SearchResultsView),
         typeof(Slider),
+        typeof(SplitView),
         typeof(Sparkline),
         typeof(Spinner),
         typeof(TagInput),
@@ -68,6 +72,7 @@ internal static class BorderedControlParityPolicyTests
         typeof(TreeView),
         typeof(ValidationSummary),
         typeof(VirtualizedListView<>),
+        typeof(Wizard),
     ];
 
     public static IEnumerable<TestCase> Cases()

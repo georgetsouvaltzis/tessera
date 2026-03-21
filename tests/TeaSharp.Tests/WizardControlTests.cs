@@ -125,8 +125,8 @@ public sealed class WizardControlTests
         var output = Render(wizard, width: 80, height: 5);
         Assert.That(output.Contains("38;2;31;32;33", StringComparison.Ordinal), Is.True);
         Assert.That(output.Contains("48;2;10;20;30", StringComparison.Ordinal), Is.True);
-        Assert.That(output.Contains(";1;", StringComparison.Ordinal) || output.Contains("[1m", StringComparison.Ordinal), Is.True);
-        Assert.That(output.Contains(";4;", StringComparison.Ordinal) || output.Contains("[4m", StringComparison.Ordinal), Is.True);
+        Assert.That(ContainsSgrParameter(output, "1"), Is.True);
+        Assert.That(ContainsSgrParameter(output, "4"), Is.True);
     }
 
     private static string Render(Wizard wizard, int width, int height)
@@ -134,5 +134,38 @@ public sealed class WizardControlTests
         var canvas = new Canvas(width, height, CanvasTextMode.GraphemeAware);
         wizard.Render(canvas, new Rect(0, 0, width, height));
         return canvas.Render();
+    }
+
+    private static bool ContainsSgrParameter(string text, string parameter)
+    {
+        var startIndex = 0;
+        while (startIndex < text.Length)
+        {
+            var escapeIndex = text.IndexOf("\u001b[", startIndex, StringComparison.Ordinal);
+            if (escapeIndex < 0)
+            {
+                return false;
+            }
+
+            var endIndex = text.IndexOf('m', escapeIndex + 2);
+            if (endIndex < 0)
+            {
+                return false;
+            }
+
+            var body = text.Substring(escapeIndex + 2, endIndex - (escapeIndex + 2));
+            var segments = body.Split(';');
+            for (var index = 0; index < segments.Length; index++)
+            {
+                if (string.Equals(segments[index], parameter, StringComparison.Ordinal))
+                {
+                    return true;
+                }
+            }
+
+            startIndex = endIndex + 1;
+        }
+
+        return false;
     }
 }
