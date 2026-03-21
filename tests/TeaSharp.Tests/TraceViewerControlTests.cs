@@ -1,3 +1,4 @@
+using System.Globalization;
 using NUnit.Framework;
 using TeaSharp.Components.Primitives;
 using TeaSharp.Controls;
@@ -26,10 +27,13 @@ public sealed class TraceViewerControlTests
         ]);
 
         var output = Render(control, width: 96, height: 8);
+        var onePointTwo = 1.2.ToString("0.##", CultureInfo.CurrentCulture);
+        var twoPointThree = 2.3.ToString("0.##", CultureInfo.CurrentCulture);
+        var fourteenPointEight = 14.8.ToString("0.##", CultureInfo.CurrentCulture);
 
-        var first = output.IndexOf("09:01:00 WRN Gateway: request accepted (1.2ms)", StringComparison.Ordinal);
-        var second = output.IndexOf("09:02:00 INF Auth: token validated (2.3ms)", StringComparison.Ordinal);
-        var third = output.IndexOf("09:03:00 ERR Db: timeout (14.8ms)", StringComparison.Ordinal);
+        var first = output.IndexOf($"09:01:00 WRN Gateway: request accepted ({onePointTwo}ms)", StringComparison.Ordinal);
+        var second = output.IndexOf($"09:02:00 INF Auth: token validated ({twoPointThree}ms)", StringComparison.Ordinal);
+        var third = output.IndexOf($"09:03:00 ERR Db: timeout ({fourteenPointEight}ms)", StringComparison.Ordinal);
         Assert.That(first >= 0, Is.True);
         Assert.That(second > first, Is.True);
         Assert.That(third > second, Is.True);
@@ -99,10 +103,13 @@ public sealed class TraceViewerControlTests
         _ = control.Handle(new PointerInput(PointerEventKind.Motion, PointerButton.None, 2, 1), new Rect(0, 0, 96, 6));
 
         var output = Render(control, width: 96, height: 6);
-
         Assert.That(output.Contains("38;2;91;92;93", StringComparison.Ordinal), Is.True);
         Assert.That(output.Contains("38;2;101;102;103", StringComparison.Ordinal), Is.True);
-        Assert.That(output.Contains(";1;", StringComparison.Ordinal) || output.Contains("[1m", StringComparison.Ordinal), Is.True);
+        Assert.That(
+            output.Contains("[1;", StringComparison.Ordinal)
+            || output.Contains(";1;", StringComparison.Ordinal)
+            || output.Contains("[1m", StringComparison.Ordinal),
+            Is.True);
         Assert.That(output.Contains(";4;", StringComparison.Ordinal) || output.Contains("[4m", StringComparison.Ordinal), Is.True);
     }
 
