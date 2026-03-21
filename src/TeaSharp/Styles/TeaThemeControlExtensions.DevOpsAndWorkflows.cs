@@ -4,6 +4,12 @@ namespace TeaSharp.Styles;
 
 public static partial class TeaThemeControlExtensions
 {
+    /// <summary>
+    /// Applies resolved theme tokens to a <see cref="JsonTreeView" />.
+    /// </summary>
+    /// <param name="control">The control to mutate.</param>
+    /// <param name="theme">The fully resolved theme tokens.</param>
+    /// <returns>The same <paramref name="control" /> instance.</returns>
     public static JsonTreeView ApplyTheme(this JsonTreeView control, TeaTheme theme)
     {
         ArgumentNullException.ThrowIfNull(control);
@@ -24,6 +30,14 @@ public static partial class TeaThemeControlExtensions
         return control;
     }
 
+    /// <summary>
+    /// Resolves overrides and applies the resulting theme to a <see cref="JsonTreeView" />.
+    /// </summary>
+    /// <param name="control">The control to mutate.</param>
+    /// <param name="overrides">Theme override rules used to resolve effective tokens.</param>
+    /// <param name="baseTheme">The base theme used during override resolution.</param>
+    /// <param name="state">The visual state used during override resolution.</param>
+    /// <returns>The same <paramref name="control" /> instance.</returns>
     public static JsonTreeView ApplyTheme(
         this JsonTreeView control,
         TeaThemeOverrides overrides,
@@ -34,6 +48,13 @@ public static partial class TeaThemeControlExtensions
         return control.ApplyTheme(overrides.Resolve(control, baseTheme, state));
     }
 
+    /// <summary>
+    /// Applies theme tokens to unset style members on a <see cref="JsonTreeView" />.
+    /// </summary>
+    /// <param name="control">The control to mutate.</param>
+    /// <param name="theme">The fallback theme tokens.</param>
+    /// <returns>The same <paramref name="control" /> instance.</returns>
+    /// <remarks>Existing non-empty style values are preserved.</remarks>
     public static JsonTreeView ApplyThemeDefaults(this JsonTreeView control, TeaTheme theme)
     {
         ArgumentNullException.ThrowIfNull(control);
@@ -56,6 +77,14 @@ public static partial class TeaThemeControlExtensions
         return control;
     }
 
+    /// <summary>
+    /// Resolves overrides and applies default-only theme values to a <see cref="JsonTreeView" />.
+    /// </summary>
+    /// <param name="control">The control to mutate.</param>
+    /// <param name="overrides">Theme override rules used to resolve effective tokens.</param>
+    /// <param name="baseTheme">The base theme used during override resolution.</param>
+    /// <param name="state">The visual state used during override resolution.</param>
+    /// <returns>The same <paramref name="control" /> instance.</returns>
     public static JsonTreeView ApplyThemeDefaults(
         this JsonTreeView control,
         TeaThemeOverrides overrides,
@@ -66,6 +95,12 @@ public static partial class TeaThemeControlExtensions
         return control.ApplyThemeDefaults(overrides.Resolve(control, baseTheme, state));
     }
 
+    /// <summary>
+    /// Applies resolved theme tokens to a <see cref="CommandOutput" />.
+    /// </summary>
+    /// <param name="control">The control to mutate.</param>
+    /// <param name="theme">The fully resolved theme tokens.</param>
+    /// <returns>The same <paramref name="control" /> instance.</returns>
     public static CommandOutput ApplyTheme(this CommandOutput control, TeaTheme theme)
     {
         ArgumentNullException.ThrowIfNull(control);
@@ -88,6 +123,14 @@ public static partial class TeaThemeControlExtensions
         return control;
     }
 
+    /// <summary>
+    /// Resolves overrides and applies the resulting theme to a <see cref="CommandOutput" />.
+    /// </summary>
+    /// <param name="control">The control to mutate.</param>
+    /// <param name="overrides">Theme override rules used to resolve effective tokens.</param>
+    /// <param name="baseTheme">The base theme used during override resolution.</param>
+    /// <param name="state">The visual state used during override resolution.</param>
+    /// <returns>The same <paramref name="control" /> instance.</returns>
     public static CommandOutput ApplyTheme(
         this CommandOutput control,
         TeaThemeOverrides overrides,
@@ -98,6 +141,13 @@ public static partial class TeaThemeControlExtensions
         return control.ApplyTheme(overrides.Resolve(control, baseTheme, state));
     }
 
+    /// <summary>
+    /// Applies theme tokens to unset style members on a <see cref="CommandOutput" />.
+    /// </summary>
+    /// <param name="control">The control to mutate.</param>
+    /// <param name="theme">The fallback theme tokens.</param>
+    /// <returns>The same <paramref name="control" /> instance.</returns>
+    /// <remarks>Existing non-empty style values are preserved.</remarks>
     public static CommandOutput ApplyThemeDefaults(this CommandOutput control, TeaTheme theme)
     {
         ArgumentNullException.ThrowIfNull(control);
@@ -122,6 +172,14 @@ public static partial class TeaThemeControlExtensions
         return control;
     }
 
+    /// <summary>
+    /// Resolves overrides and applies default-only theme values to a <see cref="CommandOutput" />.
+    /// </summary>
+    /// <param name="control">The control to mutate.</param>
+    /// <param name="overrides">Theme override rules used to resolve effective tokens.</param>
+    /// <param name="baseTheme">The base theme used during override resolution.</param>
+    /// <param name="state">The visual state used during override resolution.</param>
+    /// <returns>The same <paramref name="control" /> instance.</returns>
     public static CommandOutput ApplyThemeDefaults(
         this CommandOutput control,
         TeaThemeOverrides overrides,
@@ -132,6 +190,12 @@ public static partial class TeaThemeControlExtensions
         return control.ApplyThemeDefaults(overrides.Resolve(control, baseTheme, state));
     }
 
+    /// <summary>
+    /// Applies resolved theme tokens to a <see cref="LogTailPanel" />.
+    /// </summary>
+    /// <param name="control">The control to mutate.</param>
+    /// <param name="theme">The fully resolved theme tokens.</param>
+    /// <returns>The same <paramref name="control" /> instance.</returns>
     public static LogTailPanel ApplyTheme(this LogTailPanel control, TeaTheme theme)
     {
         ArgumentNullException.ThrowIfNull(control);
@@ -157,6 +221,14 @@ public static partial class TeaThemeControlExtensions
         return control;
     }
 
+    /// <summary>
+    /// Resolves overrides and applies the resulting theme to a <see cref="LogTailPanel" />.
+    /// </summary>
+    /// <param name="control">The control to mutate.</param>
+    /// <param name="overrides">Theme override rules used to resolve effective tokens.</param>
+    /// <param name="baseTheme">The base theme used during override resolution.</param>
+    /// <param name="state">The visual state used during override resolution.</param>
+    /// <returns>The same <paramref name="control" /> instance.</returns>
     public static LogTailPanel ApplyTheme(
         this LogTailPanel control,
         TeaThemeOverrides overrides,
@@ -167,6 +239,13 @@ public static partial class TeaThemeControlExtensions
         return control.ApplyTheme(overrides.Resolve(control, baseTheme, state));
     }
 
+    /// <summary>
+    /// Applies theme tokens to unset style members on a <see cref="LogTailPanel" />.
+    /// </summary>
+    /// <param name="control">The control to mutate.</param>
+    /// <param name="theme">The fallback theme tokens.</param>
+    /// <returns>The same <paramref name="control" /> instance.</returns>
+    /// <remarks>Existing non-empty style values are preserved.</remarks>
     public static LogTailPanel ApplyThemeDefaults(this LogTailPanel control, TeaTheme theme)
     {
         ArgumentNullException.ThrowIfNull(control);
@@ -194,6 +273,14 @@ public static partial class TeaThemeControlExtensions
         return control;
     }
 
+    /// <summary>
+    /// Resolves overrides and applies default-only theme values to a <see cref="LogTailPanel" />.
+    /// </summary>
+    /// <param name="control">The control to mutate.</param>
+    /// <param name="overrides">Theme override rules used to resolve effective tokens.</param>
+    /// <param name="baseTheme">The base theme used during override resolution.</param>
+    /// <param name="state">The visual state used during override resolution.</param>
+    /// <returns>The same <paramref name="control" /> instance.</returns>
     public static LogTailPanel ApplyThemeDefaults(
         this LogTailPanel control,
         TeaThemeOverrides overrides,
@@ -204,6 +291,12 @@ public static partial class TeaThemeControlExtensions
         return control.ApplyThemeDefaults(overrides.Resolve(control, baseTheme, state));
     }
 
+    /// <summary>
+    /// Applies resolved theme tokens to an <see cref="ActivityFeed" />.
+    /// </summary>
+    /// <param name="control">The control to mutate.</param>
+    /// <param name="theme">The fully resolved theme tokens.</param>
+    /// <returns>The same <paramref name="control" /> instance.</returns>
     public static ActivityFeed ApplyTheme(this ActivityFeed control, TeaTheme theme)
     {
         ArgumentNullException.ThrowIfNull(control);
@@ -229,6 +322,14 @@ public static partial class TeaThemeControlExtensions
         return control;
     }
 
+    /// <summary>
+    /// Resolves overrides and applies the resulting theme to an <see cref="ActivityFeed" />.
+    /// </summary>
+    /// <param name="control">The control to mutate.</param>
+    /// <param name="overrides">Theme override rules used to resolve effective tokens.</param>
+    /// <param name="baseTheme">The base theme used during override resolution.</param>
+    /// <param name="state">The visual state used during override resolution.</param>
+    /// <returns>The same <paramref name="control" /> instance.</returns>
     public static ActivityFeed ApplyTheme(
         this ActivityFeed control,
         TeaThemeOverrides overrides,
@@ -239,6 +340,13 @@ public static partial class TeaThemeControlExtensions
         return control.ApplyTheme(overrides.Resolve(control, baseTheme, state));
     }
 
+    /// <summary>
+    /// Applies theme tokens to unset style members on an <see cref="ActivityFeed" />.
+    /// </summary>
+    /// <param name="control">The control to mutate.</param>
+    /// <param name="theme">The fallback theme tokens.</param>
+    /// <returns>The same <paramref name="control" /> instance.</returns>
+    /// <remarks>Existing non-empty style values are preserved.</remarks>
     public static ActivityFeed ApplyThemeDefaults(this ActivityFeed control, TeaTheme theme)
     {
         ArgumentNullException.ThrowIfNull(control);
@@ -266,6 +374,14 @@ public static partial class TeaThemeControlExtensions
         return control;
     }
 
+    /// <summary>
+    /// Resolves overrides and applies default-only theme values to an <see cref="ActivityFeed" />.
+    /// </summary>
+    /// <param name="control">The control to mutate.</param>
+    /// <param name="overrides">Theme override rules used to resolve effective tokens.</param>
+    /// <param name="baseTheme">The base theme used during override resolution.</param>
+    /// <param name="state">The visual state used during override resolution.</param>
+    /// <returns>The same <paramref name="control" /> instance.</returns>
     public static ActivityFeed ApplyThemeDefaults(
         this ActivityFeed control,
         TeaThemeOverrides overrides,
@@ -276,6 +392,12 @@ public static partial class TeaThemeControlExtensions
         return control.ApplyThemeDefaults(overrides.Resolve(control, baseTheme, state));
     }
 
+    /// <summary>
+    /// Applies resolved theme tokens to a <see cref="NotificationInbox" />.
+    /// </summary>
+    /// <param name="control">The control to mutate.</param>
+    /// <param name="theme">The fully resolved theme tokens.</param>
+    /// <returns>The same <paramref name="control" /> instance.</returns>
     public static NotificationInbox ApplyTheme(this NotificationInbox control, TeaTheme theme)
     {
         ArgumentNullException.ThrowIfNull(control);
@@ -299,6 +421,14 @@ public static partial class TeaThemeControlExtensions
         return control;
     }
 
+    /// <summary>
+    /// Resolves overrides and applies the resulting theme to a <see cref="NotificationInbox" />.
+    /// </summary>
+    /// <param name="control">The control to mutate.</param>
+    /// <param name="overrides">Theme override rules used to resolve effective tokens.</param>
+    /// <param name="baseTheme">The base theme used during override resolution.</param>
+    /// <param name="state">The visual state used during override resolution.</param>
+    /// <returns>The same <paramref name="control" /> instance.</returns>
     public static NotificationInbox ApplyTheme(
         this NotificationInbox control,
         TeaThemeOverrides overrides,
@@ -309,6 +439,13 @@ public static partial class TeaThemeControlExtensions
         return control.ApplyTheme(overrides.Resolve(control, baseTheme, state));
     }
 
+    /// <summary>
+    /// Applies theme tokens to unset style members on a <see cref="NotificationInbox" />.
+    /// </summary>
+    /// <param name="control">The control to mutate.</param>
+    /// <param name="theme">The fallback theme tokens.</param>
+    /// <returns>The same <paramref name="control" /> instance.</returns>
+    /// <remarks>Existing non-empty style values are preserved.</remarks>
     public static NotificationInbox ApplyThemeDefaults(this NotificationInbox control, TeaTheme theme)
     {
         ArgumentNullException.ThrowIfNull(control);
@@ -334,6 +471,14 @@ public static partial class TeaThemeControlExtensions
         return control;
     }
 
+    /// <summary>
+    /// Resolves overrides and applies default-only theme values to a <see cref="NotificationInbox" />.
+    /// </summary>
+    /// <param name="control">The control to mutate.</param>
+    /// <param name="overrides">Theme override rules used to resolve effective tokens.</param>
+    /// <param name="baseTheme">The base theme used during override resolution.</param>
+    /// <param name="state">The visual state used during override resolution.</param>
+    /// <returns>The same <paramref name="control" /> instance.</returns>
     public static NotificationInbox ApplyThemeDefaults(
         this NotificationInbox control,
         TeaThemeOverrides overrides,
@@ -344,6 +489,12 @@ public static partial class TeaThemeControlExtensions
         return control.ApplyThemeDefaults(overrides.Resolve(control, baseTheme, state));
     }
 
+    /// <summary>
+    /// Applies resolved theme tokens to a <see cref="KeyBindingHelpDialog" />.
+    /// </summary>
+    /// <param name="control">The control to mutate.</param>
+    /// <param name="theme">The fully resolved theme tokens.</param>
+    /// <returns>The same <paramref name="control" /> instance.</returns>
     public static KeyBindingHelpDialog ApplyTheme(this KeyBindingHelpDialog control, TeaTheme theme)
     {
         ArgumentNullException.ThrowIfNull(control);
@@ -363,6 +514,14 @@ public static partial class TeaThemeControlExtensions
         return control;
     }
 
+    /// <summary>
+    /// Resolves overrides and applies the resulting theme to a <see cref="KeyBindingHelpDialog" />.
+    /// </summary>
+    /// <param name="control">The control to mutate.</param>
+    /// <param name="overrides">Theme override rules used to resolve effective tokens.</param>
+    /// <param name="baseTheme">The base theme used during override resolution.</param>
+    /// <param name="state">The visual state used during override resolution.</param>
+    /// <returns>The same <paramref name="control" /> instance.</returns>
     public static KeyBindingHelpDialog ApplyTheme(
         this KeyBindingHelpDialog control,
         TeaThemeOverrides overrides,
@@ -373,6 +532,13 @@ public static partial class TeaThemeControlExtensions
         return control.ApplyTheme(overrides.Resolve(control, baseTheme, state));
     }
 
+    /// <summary>
+    /// Applies theme tokens to unset style members on a <see cref="KeyBindingHelpDialog" />.
+    /// </summary>
+    /// <param name="control">The control to mutate.</param>
+    /// <param name="theme">The fallback theme tokens.</param>
+    /// <returns>The same <paramref name="control" /> instance.</returns>
+    /// <remarks>Existing non-empty style values are preserved.</remarks>
     public static KeyBindingHelpDialog ApplyThemeDefaults(this KeyBindingHelpDialog control, TeaTheme theme)
     {
         ArgumentNullException.ThrowIfNull(control);
@@ -394,6 +560,14 @@ public static partial class TeaThemeControlExtensions
         return control;
     }
 
+    /// <summary>
+    /// Resolves overrides and applies default-only theme values to a <see cref="KeyBindingHelpDialog" />.
+    /// </summary>
+    /// <param name="control">The control to mutate.</param>
+    /// <param name="overrides">Theme override rules used to resolve effective tokens.</param>
+    /// <param name="baseTheme">The base theme used during override resolution.</param>
+    /// <param name="state">The visual state used during override resolution.</param>
+    /// <returns>The same <paramref name="control" /> instance.</returns>
     public static KeyBindingHelpDialog ApplyThemeDefaults(
         this KeyBindingHelpDialog control,
         TeaThemeOverrides overrides,
@@ -404,6 +578,12 @@ public static partial class TeaThemeControlExtensions
         return control.ApplyThemeDefaults(overrides.Resolve(control, baseTheme, state));
     }
 
+    /// <summary>
+    /// Applies resolved theme tokens to a <see cref="TraceViewer" />.
+    /// </summary>
+    /// <param name="control">The control to mutate.</param>
+    /// <param name="theme">The fully resolved theme tokens.</param>
+    /// <returns>The same <paramref name="control" /> instance.</returns>
     public static TraceViewer ApplyTheme(this TraceViewer control, TeaTheme theme)
     {
         ArgumentNullException.ThrowIfNull(control);
@@ -429,6 +609,14 @@ public static partial class TeaThemeControlExtensions
         return control;
     }
 
+    /// <summary>
+    /// Resolves overrides and applies the resulting theme to a <see cref="TraceViewer" />.
+    /// </summary>
+    /// <param name="control">The control to mutate.</param>
+    /// <param name="overrides">Theme override rules used to resolve effective tokens.</param>
+    /// <param name="baseTheme">The base theme used during override resolution.</param>
+    /// <param name="state">The visual state used during override resolution.</param>
+    /// <returns>The same <paramref name="control" /> instance.</returns>
     public static TraceViewer ApplyTheme(
         this TraceViewer control,
         TeaThemeOverrides overrides,
@@ -439,6 +627,13 @@ public static partial class TeaThemeControlExtensions
         return control.ApplyTheme(overrides.Resolve(control, baseTheme, state));
     }
 
+    /// <summary>
+    /// Applies theme tokens to unset style members on a <see cref="TraceViewer" />.
+    /// </summary>
+    /// <param name="control">The control to mutate.</param>
+    /// <param name="theme">The fallback theme tokens.</param>
+    /// <returns>The same <paramref name="control" /> instance.</returns>
+    /// <remarks>Existing non-empty style values are preserved.</remarks>
     public static TraceViewer ApplyThemeDefaults(this TraceViewer control, TeaTheme theme)
     {
         ArgumentNullException.ThrowIfNull(control);
@@ -466,6 +661,14 @@ public static partial class TeaThemeControlExtensions
         return control;
     }
 
+    /// <summary>
+    /// Resolves overrides and applies default-only theme values to a <see cref="TraceViewer" />.
+    /// </summary>
+    /// <param name="control">The control to mutate.</param>
+    /// <param name="overrides">Theme override rules used to resolve effective tokens.</param>
+    /// <param name="baseTheme">The base theme used during override resolution.</param>
+    /// <param name="state">The visual state used during override resolution.</param>
+    /// <returns>The same <paramref name="control" /> instance.</returns>
     public static TraceViewer ApplyThemeDefaults(
         this TraceViewer control,
         TeaThemeOverrides overrides,
@@ -476,6 +679,12 @@ public static partial class TeaThemeControlExtensions
         return control.ApplyThemeDefaults(overrides.Resolve(control, baseTheme, state));
     }
 
+    /// <summary>
+    /// Applies resolved theme tokens to a <see cref="TaskRunnerPanel" />.
+    /// </summary>
+    /// <param name="control">The control to mutate.</param>
+    /// <param name="theme">The fully resolved theme tokens.</param>
+    /// <returns>The same <paramref name="control" /> instance.</returns>
     public static TaskRunnerPanel ApplyTheme(this TaskRunnerPanel control, TeaTheme theme)
     {
         ArgumentNullException.ThrowIfNull(control);
@@ -499,6 +708,14 @@ public static partial class TeaThemeControlExtensions
         return control;
     }
 
+    /// <summary>
+    /// Resolves overrides and applies the resulting theme to a <see cref="TaskRunnerPanel" />.
+    /// </summary>
+    /// <param name="control">The control to mutate.</param>
+    /// <param name="overrides">Theme override rules used to resolve effective tokens.</param>
+    /// <param name="baseTheme">The base theme used during override resolution.</param>
+    /// <param name="state">The visual state used during override resolution.</param>
+    /// <returns>The same <paramref name="control" /> instance.</returns>
     public static TaskRunnerPanel ApplyTheme(
         this TaskRunnerPanel control,
         TeaThemeOverrides overrides,
@@ -509,6 +726,13 @@ public static partial class TeaThemeControlExtensions
         return control.ApplyTheme(overrides.Resolve(control, baseTheme, state));
     }
 
+    /// <summary>
+    /// Applies theme tokens to unset style members on a <see cref="TaskRunnerPanel" />.
+    /// </summary>
+    /// <param name="control">The control to mutate.</param>
+    /// <param name="theme">The fallback theme tokens.</param>
+    /// <returns>The same <paramref name="control" /> instance.</returns>
+    /// <remarks>Existing non-empty style values are preserved.</remarks>
     public static TaskRunnerPanel ApplyThemeDefaults(this TaskRunnerPanel control, TeaTheme theme)
     {
         ArgumentNullException.ThrowIfNull(control);
@@ -534,6 +758,14 @@ public static partial class TeaThemeControlExtensions
         return control;
     }
 
+    /// <summary>
+    /// Resolves overrides and applies default-only theme values to a <see cref="TaskRunnerPanel" />.
+    /// </summary>
+    /// <param name="control">The control to mutate.</param>
+    /// <param name="overrides">Theme override rules used to resolve effective tokens.</param>
+    /// <param name="baseTheme">The base theme used during override resolution.</param>
+    /// <param name="state">The visual state used during override resolution.</param>
+    /// <returns>The same <paramref name="control" /> instance.</returns>
     public static TaskRunnerPanel ApplyThemeDefaults(
         this TaskRunnerPanel control,
         TeaThemeOverrides overrides,
