@@ -128,6 +128,13 @@ internal sealed class EventDecoder : IEventDecoder
                 return new DecodeResult(0, null, true);
             }
 
+            // Do not resolve a bare CSI introducer on timeout; the next chunk may continue
+            // a control sequence and consuming ESC here can leak the remainder as text.
+            if (buffer.Length == 2)
+            {
+                return new DecodeResult(0, null, true);
+            }
+
             // Keep partial control-prefixed CSI payload buffered after timeout so split control
             // sequences (for example SGR mouse reports and mode reports) cannot degrade into
             // literal text fragments.
