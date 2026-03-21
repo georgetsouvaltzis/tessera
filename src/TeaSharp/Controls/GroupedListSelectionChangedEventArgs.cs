@@ -49,6 +49,12 @@ public sealed class GroupedListSelectionChangedEventArgs<TGroup, TItem> : EventA
     public int CurrentRowIndex { get; }
 
     /// <summary>
+    /// Gets selected visible-row index.
+    /// Canonical naming alias that forwards to <see cref="CurrentRowIndex" /> for compatibility.
+    /// </summary>
+    public int SelectedRowIndex => CurrentRowIndex;
+
+    /// <summary>
     /// Gets previous selected group index, when any.
     /// </summary>
     public int? PreviousGroupIndex { get; }
@@ -57,6 +63,12 @@ public sealed class GroupedListSelectionChangedEventArgs<TGroup, TItem> : EventA
     /// Gets current selected group index, when any.
     /// </summary>
     public int? CurrentGroupIndex { get; }
+
+    /// <summary>
+    /// Gets selected group index, when any.
+    /// Canonical naming alias that forwards to <see cref="CurrentGroupIndex" /> for compatibility.
+    /// </summary>
+    public int? SelectedGroupIndex => CurrentGroupIndex;
 
     /// <summary>
     /// Gets previous selected item index within its group, when any.
@@ -69,6 +81,12 @@ public sealed class GroupedListSelectionChangedEventArgs<TGroup, TItem> : EventA
     public int? CurrentItemIndex { get; }
 
     /// <summary>
+    /// Gets selected item index within its group, when any.
+    /// Canonical naming alias that forwards to <see cref="CurrentItemIndex" /> for compatibility.
+    /// </summary>
+    public int? SelectedItemIndex => CurrentItemIndex;
+
+    /// <summary>
     /// Gets previous selected item, when any.
     /// </summary>
     public TItem? PreviousItem { get; }
@@ -77,4 +95,10 @@ public sealed class GroupedListSelectionChangedEventArgs<TGroup, TItem> : EventA
     /// Gets current selected item, when any.
     /// </summary>
     public TItem? CurrentItem { get; }
+
+    /// <summary>
+    /// Gets selected item, when any.
+    /// Canonical naming alias that forwards to <see cref="CurrentItem" /> for compatibility.
+    /// </summary>
+    public TItem? SelectedItem => CurrentItem;
 }

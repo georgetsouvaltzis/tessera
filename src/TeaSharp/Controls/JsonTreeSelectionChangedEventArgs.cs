@@ -35,6 +35,12 @@ public sealed class JsonTreeSelectionChangedEventArgs : EventArgs
     public int CurrentIndex { get; }
 
     /// <summary>
+    /// Gets the selected index after the change.
+    /// Canonical naming alias that forwards to <see cref="CurrentIndex" /> for compatibility.
+    /// </summary>
+    public int SelectedIndex => CurrentIndex;
+
+    /// <summary>
     /// Gets previously selected node.
     /// </summary>
     public JsonTreeNode? PreviousNode { get; }
@@ -43,4 +49,10 @@ public sealed class JsonTreeSelectionChangedEventArgs : EventArgs
     /// Gets currently selected node.
     /// </summary>
     public JsonTreeNode? CurrentNode { get; }
+
+    /// <summary>
+    /// Gets the selected node after the change.
+    /// Canonical naming alias that forwards to <see cref="CurrentNode" /> for compatibility.
+    /// </summary>
+    public JsonTreeNode? SelectedNode => CurrentNode;
 }

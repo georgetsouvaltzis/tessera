@@ -35,6 +35,12 @@ public sealed class KeyValueListSelectionChangedEventArgs : EventArgs
     public int CurrentIndex { get; }
 
     /// <summary>
+    /// Gets the selected index after the change.
+    /// Canonical naming alias that forwards to <see cref="CurrentIndex" /> for compatibility.
+    /// </summary>
+    public int SelectedIndex => CurrentIndex;
+
+    /// <summary>
     /// Gets selected item before the change.
     /// </summary>
     public KeyValueListEntry? PreviousItem { get; }
@@ -43,4 +49,10 @@ public sealed class KeyValueListSelectionChangedEventArgs : EventArgs
     /// Gets selected item after the change.
     /// </summary>
     public KeyValueListEntry? CurrentItem { get; }
+
+    /// <summary>
+    /// Gets the selected item after the change.
+    /// Canonical naming alias that forwards to <see cref="CurrentItem" /> for compatibility.
+    /// </summary>
+    public KeyValueListEntry? SelectedItem => CurrentItem;
 }

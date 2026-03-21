@@ -35,6 +35,12 @@ public sealed class ValidationSelectionChangedEventArgs : EventArgs
     public int CurrentIndex { get; }
 
     /// <summary>
+    /// Gets the selected index after the change.
+    /// Canonical naming alias that forwards to <see cref="CurrentIndex" /> for compatibility.
+    /// </summary>
+    public int SelectedIndex => CurrentIndex;
+
+    /// <summary>
     /// Gets the previously selected issue.
     /// </summary>
     public ValidationIssue? PreviousIssue { get; }
@@ -43,4 +49,10 @@ public sealed class ValidationSelectionChangedEventArgs : EventArgs
     /// Gets the currently selected issue.
     /// </summary>
     public ValidationIssue? CurrentIssue { get; }
+
+    /// <summary>
+    /// Gets the selected issue after the change.
+    /// Canonical naming alias that forwards to <see cref="CurrentIssue" /> for compatibility.
+    /// </summary>
+    public ValidationIssue? SelectedIssue => CurrentIssue;
 }

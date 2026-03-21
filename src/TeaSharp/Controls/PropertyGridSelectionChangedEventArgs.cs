@@ -35,6 +35,12 @@ public sealed class PropertyGridSelectionChangedEventArgs : EventArgs
     public int CurrentIndex { get; }
 
     /// <summary>
+    /// Gets the selected index after the change.
+    /// Canonical naming alias that forwards to <see cref="CurrentIndex" /> for compatibility.
+    /// </summary>
+    public int SelectedIndex => CurrentIndex;
+
+    /// <summary>
     /// Gets the selected property before the change.
     /// </summary>
     public PropertyGridProperty? PreviousProperty { get; }
@@ -43,4 +49,10 @@ public sealed class PropertyGridSelectionChangedEventArgs : EventArgs
     /// Gets the selected property after the change.
     /// </summary>
     public PropertyGridProperty? CurrentProperty { get; }
+
+    /// <summary>
+    /// Gets the selected property after the change.
+    /// Canonical naming alias that forwards to <see cref="CurrentProperty" /> for compatibility.
+    /// </summary>
+    public PropertyGridProperty? SelectedProperty => CurrentProperty;
 }

@@ -35,6 +35,12 @@ public sealed class FileExplorerSelectionChangedEventArgs : EventArgs
     public string? CurrentPath { get; }
 
     /// <summary>
+    /// Gets the selected path, if any.
+    /// Canonical naming alias that forwards to <see cref="CurrentPath" /> for compatibility.
+    /// </summary>
+    public string? SelectedPath => CurrentPath;
+
+    /// <summary>
     /// Gets the previously selected item, if any.
     /// </summary>
     public FileExplorerItem? PreviousItem { get; }
@@ -43,4 +49,10 @@ public sealed class FileExplorerSelectionChangedEventArgs : EventArgs
     /// Gets the current selected item, if any.
     /// </summary>
     public FileExplorerItem? CurrentItem { get; }
+
+    /// <summary>
+    /// Gets the selected item, if any.
+    /// Canonical naming alias that forwards to <see cref="CurrentItem" /> for compatibility.
+    /// </summary>
+    public FileExplorerItem? SelectedItem => CurrentItem;
 }
