@@ -9,4 +9,9 @@ public static partial class TeaThemeControlExtensions
     {
         return current.IsEmpty ? fallback : current;
     }
+
+    private static string ApplyDefault(string current, string fallback)
+    {
+        return string.IsNullOrEmpty(current) ? fallback : current;
+    }
 }
