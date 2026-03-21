@@ -50,6 +50,8 @@ Required benchmark scenarios:
 Supplemental benchmark coverage (not part of the six-scenario gate checklist):
 - viewport no-decoration render loop (`LogView`)
 - validates hot-path viewport rendering with and without final materialization
+- startup/input-latency p95 SLO lane (`SloLatencyBenchmarks`)
+- validates startup first-frame p95 plus normal/heavy input latency p95 with machine-readable gate output
 
 ## Harness Approach
 
@@ -101,8 +103,12 @@ Harness quick commands:
   - `scripts/run_benchmarks_v1.sh shortlist-render-only`
   - `scripts/run_benchmarks_v1.sh shortlist-materialize`
   - `scripts/run_benchmarks_v1.sh iteration-template`
+  - `scripts/perf_gate_v1.sh run`
+  - `scripts/perf_gate_v1.sh dry-run`
   - script execution modes (`all|scenario|shortlist*`) run with `--inProcess` for trend/gate stability
   - script performs lazy build (build only when benchmark output is missing)
+  - SLO gate baseline input: `docs/perf-baselines/v1-slo-gate-baseline.json`
+  - SLO gate machine-readable output: `docs/perf-baselines/latest-slo-gate-result.json`
 
 BenchmarkDotNet artifacts/report directory:
 - `benchmarks/TeaSharp.Benchmarks/bin/Release/net10.0/BenchmarkDotNet.Artifacts/`
@@ -122,6 +128,9 @@ Expected `--list flat` scenarios:
 - `TeaSharp.Benchmarks.StyledHeavyOutputBenchmarks.RenderStyledHeavyFrameOnly`
 - `TeaSharp.Benchmarks.ViewportRenderBenchmarks.RenderViewportNoDecoration`
 - `TeaSharp.Benchmarks.ViewportRenderBenchmarks.RenderViewportNoDecorationOnly`
+- `TeaSharp.Benchmarks.SloLatencyBenchmarks.StartupFirstFrameP95Ms`
+- `TeaSharp.Benchmarks.SloLatencyBenchmarks.InputLatencyNormalP95Ms`
+- `TeaSharp.Benchmarks.SloLatencyBenchmarks.InputLatencyHeavyP95Ms`
 
 ## Comparison Protocol vs Other TUIs
 

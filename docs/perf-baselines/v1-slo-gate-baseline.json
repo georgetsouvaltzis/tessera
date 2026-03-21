@@ -1,0 +1,18 @@
+{
+  "schema": "teasharp-perf-gate-baseline-v1",
+  "version": "2026-03-21",
+  "scenarios": [
+    {
+      "benchmarkId": "SloLatencyBenchmarks.StartupFirstFrameP95Ms",
+      "maxMeanMs": 120.0
+    },
+    {
+      "benchmarkId": "SloLatencyBenchmarks.InputLatencyNormalP95Ms",
+      "maxMeanMs": 12.0
+    },
+    {
+      "benchmarkId": "SloLatencyBenchmarks.InputLatencyHeavyP95Ms",
+      "maxMeanMs": 25.0
+    }
+  ]
+}

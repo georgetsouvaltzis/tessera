@@ -7,6 +7,7 @@ BenchmarkDotNet harness used by Public V1 perf gates.
 Two BenchmarkDotNet mode families are tracked:
 - render-only: control render path only; excludes final `canvas.Render()` materialization
 - render+materialize: includes `canvas.Render()` to measure full frame/output cost
+- SLO gate mode: startup/input-latency p95 thresholds compared against a baseline file
 
 Why both:
 - render-only isolates renderer/layout regressions
@@ -48,6 +49,8 @@ scripts/run_benchmarks_v1.sh shortlist
 scripts/run_benchmarks_v1.sh shortlist-render-only
 scripts/run_benchmarks_v1.sh shortlist-materialize
 scripts/run_benchmarks_v1.sh iteration-template
+scripts/perf_gate_v1.sh run
+scripts/perf_gate_v1.sh dry-run
 ```
 
 ## Before/After Reporting Workflow
@@ -63,6 +66,10 @@ Mode guidance:
 - `shortlist-materialize`: runs the six non-`Only` methods (end-to-end frame/allocation gate signals)
 - helper execution modes (`all|scenario|shortlist*`) use `--inProcess` by default
 - helper uses lazy build; it builds only when benchmark output is missing
+- SLO baseline gate:
+  - baseline: `docs/perf-baselines/v1-slo-gate-baseline.json`
+  - run: `scripts/perf_gate_v1.sh run`
+  - output: `docs/perf-baselines/latest-slo-gate-result.json`
 
 ## Artifacts Location
 

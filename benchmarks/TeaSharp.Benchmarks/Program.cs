@@ -13,10 +13,17 @@ public static class Program
         typeof(ResizeStormBenchmarks),
         typeof(StyledHeavyOutputBenchmarks),
         typeof(ViewportRenderBenchmarks),
+        typeof(SloLatencyBenchmarks),
     ];
 
     public static void Main(string[] args)
     {
+        if (PerfGateRunner.TryRun(args, out var exitCode))
+        {
+            Environment.ExitCode = exitCode;
+            return;
+        }
+
         BenchmarkSwitcher.FromTypes(BenchmarkTypes).Run(args);
     }
 }
