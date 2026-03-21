@@ -10,7 +10,7 @@ namespace TeaSharp.Controls;
 /// </summary>
 public sealed class Notifications : Control
 {
-    private readonly List<NotificationItem> _items = [];
+    private readonly List<InboxItem> _items = [];
     private int _selectedIndex;
     private int _hoveredIndex = -1;
 
@@ -80,6 +80,24 @@ public sealed class Notifications : Control
         set;
     } = 128;
 
+    /// <summary>
+    /// Gets the current notification items.
+    /// </summary>
+    public IReadOnlyList<InboxItem> Items => _items;
+
+    /// <summary>
+    /// Gets the selected notification index.
+    /// </summary>
+    /// <remarks>
+    /// Returns <c>-1</c> when the control has no items.
+    /// </remarks>
+    public int SelectedIndex => _items.Count == 0 ? -1 : _selectedIndex;
+
+    /// <summary>
+    /// Gets the selected notification item.
+    /// </summary>
+    public InboxItem? SelectedItem => _items.Count == 0 ? null : _items[_selectedIndex];
+
     public bool ShowTimestamp
     {
         get;
@@ -106,22 +124,119 @@ public sealed class Notifications : Control
         set;
     }
 
+    /// <summary>
+    /// Appends a notification entry.
+    /// </summary>
+    /// <param name="message">Notification message text.</param>
+    /// <param name="level">Notification severity level.</param>
+    /// <param name="id">Optional stable identifier. A generated id is used when omitted.</param>
     public void Push(string message, NotificationLevel level = NotificationLevel.Info, string? id = null)
     {
-        _items.Add(new NotificationItem(
-            id ?? Guid.NewGuid().ToString("n"),
-            message ?? string.Empty,
-            level,
-            DateTimeOffset.UtcNow));
-
-        if (_items.Count > MaxItems)
-        {
-            _items.RemoveAt(0);
-        }
-
-        _selectedIndex = Math.Max(0, _items.Count - 1);
+        Add(
+            new InboxItem(
+                id ?? Guid.NewGuid().ToString("n"),
+                message ?? string.Empty,
+                level,
+                DateTimeOffset.UtcNow));
     }
 
+    /// <summary>
+    /// Replaces the current notification list.
+    /// </summary>
+    /// <param name="items">Items to load into the control.</param>
+    public void SetItems(IEnumerable<InboxItem> items)
+    {
+        ArgumentNullException.ThrowIfNull(items);
+        _items.Clear();
+        foreach (var item in items)
+        {
+            if (item is not null)
+            {
+                _items.Add(Clone(item));
+            }
+        }
+
+        TrimToMaxItems();
+        _selectedIndex = _items.Count == 0 ? 0 : Math.Clamp(_selectedIndex, 0, _items.Count - 1);
+        _hoveredIndex = Math.Clamp(_hoveredIndex, -1, Math.Max(-1, _items.Count - 1));
+    }
+
+    /// <summary>
+    /// Adds one notification item to the feed.
+    /// </summary>
+    /// <param name="item">The item to add.</param>
+    public void Add(InboxItem item)
+    {
+        ArgumentNullException.ThrowIfNull(item);
+        _items.Add(Clone(item));
+        TrimToMaxItems();
+        _selectedIndex = Math.Max(0, _items.Count - 1);
+        _hoveredIndex = Math.Clamp(_hoveredIndex, -1, Math.Max(-1, _items.Count - 1));
+    }
+
+    /// <summary>
+    /// Sets the selected item index.
+    /// </summary>
+    /// <param name="index">The desired index.</param>
+    /// <returns><see langword="true"/> when selection changed; otherwise, <see langword="false"/>.</returns>
+    public bool SetSelectedIndex(int index)
+    {
+        if (_items.Count == 0)
+        {
+            return false;
+        }
+
+        var next = Math.Clamp(index, 0, _items.Count - 1);
+        if (next == _selectedIndex)
+        {
+            return false;
+        }
+
+        _selectedIndex = next;
+        return true;
+    }
+
+    /// <summary>
+    /// Compatibility wrapper for selecting by index.
+    /// </summary>
+    /// <param name="index">The desired index.</param>
+    /// <returns><see langword="true"/> when selection changed; otherwise, <see langword="false"/>.</returns>
+    public bool Select(int index)
+    {
+        return SetSelectedIndex(index);
+    }
+
+    /// <summary>
+    /// Marks every notification as read.
+    /// </summary>
+    public void MarkAllRead()
+    {
+        for (var i = 0; i < _items.Count; i++)
+        {
+            _items[i].IsRead = true;
+        }
+    }
+
+    /// <summary>
+    /// Removes the currently selected notification.
+    /// </summary>
+    /// <returns><see langword="true"/> when an item was removed; otherwise, <see langword="false"/>.</returns>
+    public bool RemoveSelected()
+    {
+        if (_items.Count == 0)
+        {
+            return false;
+        }
+
+        _items.RemoveAt(_selectedIndex);
+        _selectedIndex = Math.Clamp(_selectedIndex, 0, Math.Max(0, _items.Count - 1));
+        _hoveredIndex = Math.Clamp(_hoveredIndex, -1, Math.Max(-1, _items.Count - 1));
+        return true;
+    }
+
+    /// <summary>
+    /// Clears all notifications.
+    /// </summary>
     public void Clear()
     {
         _items.Clear();
@@ -170,16 +285,13 @@ public sealed class Notifications : Control
                 return false;
             }
 
-            _items[_selectedIndex] = item with { IsRead = true };
+            item.IsRead = true;
             return true;
         }
 
         if (key.IsCharacter('d'))
         {
-            _items.RemoveAt(_selectedIndex);
-            _selectedIndex = Math.Clamp(_selectedIndex, 0, Math.Max(0, _items.Count - 1));
-            _hoveredIndex = Math.Clamp(_hoveredIndex, -1, Math.Max(-1, _items.Count - 1));
-            return true;
+            return RemoveSelected();
         }
 
         return false;
@@ -245,12 +357,7 @@ public sealed class Notifications : Control
         if (pointer.Kind == PointerEventKind.Press && pointer.Button == PointerButton.Left && hovered >= 0)
         {
             changed |= SetHoveredIndex(hovered);
-            if (_selectedIndex != hovered)
-            {
-                _selectedIndex = hovered;
-                changed = true;
-            }
-
+            changed |= SetSelectedIndex(hovered);
             return changed;
         }
 
@@ -304,7 +411,7 @@ public sealed class Notifications : Control
             height);
     }
 
-    private string FormatLine(NotificationItem item, bool selected)
+    private string FormatLine(InboxItem item, bool selected)
     {
         var cursor = selected ? ">" : " ";
         var readMark = item.IsRead ? " " : "•";
@@ -312,7 +419,7 @@ public sealed class Notifications : Control
         return $"{cursor}{readMark} {timestamp}{item.Message}";
     }
 
-    private TeaStyle ResolveLineStyle(NotificationItem item, bool selected, bool hovered)
+    private TeaStyle ResolveLineStyle(InboxItem item, bool selected, bool hovered)
     {
         var style = ItemStyle;
         if (selected)
@@ -378,21 +485,7 @@ public sealed class Notifications : Control
 
     private bool MoveSelection(int delta)
     {
-        if (_items.Count == 0)
-        {
-            return false;
-        }
-
-        var next = delta > 0
-            ? Math.Min(_items.Count - 1, _selectedIndex + delta)
-            : Math.Max(0, _selectedIndex + delta);
-        if (next == _selectedIndex)
-        {
-            return false;
-        }
-
-        _selectedIndex = next;
-        return true;
+        return SetSelectedIndex(_selectedIndex + delta);
     }
 
     private bool SetHoveredIndex(int index)
@@ -419,10 +512,16 @@ public sealed class Notifications : Control
         return style.IsEmpty ? text : style.Render(text);
     }
 
-    private sealed record NotificationItem(
-        string Id,
-        string Message,
-        NotificationLevel Level,
-        DateTimeOffset CreatedAt,
-        bool IsRead = false);
+    private static InboxItem Clone(InboxItem item)
+    {
+        return new InboxItem(item.Id, item.Message, item.Level, item.CreatedAt, item.Source, item.IsRead, item.IsPinned);
+    }
+
+    private void TrimToMaxItems()
+    {
+        while (_items.Count > MaxItems)
+        {
+            _items.RemoveAt(0);
+        }
+    }
 }

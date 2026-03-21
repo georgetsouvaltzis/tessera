@@ -1,7 +1,7 @@
 namespace TeaSharp.Controls;
 
 /// <summary>
-/// Represents one persistent notification entry in a <see cref="NotificationInbox" />.
+/// Represents one persistent notification entry used by <see cref="Notifications" /> and <see cref="NotificationInbox" />.
 /// </summary>
 public sealed class InboxItem
 {
