@@ -9,6 +9,7 @@
     <Project Path="examples/Kanban/Kanban.csproj" />
     <Project Path="examples/PlottingDashboard/PlottingDashboard.csproj" />
     <Project Path="examples/ProductivityWidgets/ProductivityWidgets.csproj" />
+    <Project Path="examples/PublicApiDashboard/PublicApiDashboard.csproj" />
     <Project Path="examples/WorkspaceApp/WorkspaceApp.csproj" />
     <Project Path="examples/WidgetGallery/WidgetGallery.csproj" />
   </Folder>
