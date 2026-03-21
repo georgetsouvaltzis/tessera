@@ -1,5 +1,6 @@
 using System.Reflection;
 using System.Text.RegularExpressions;
+using TeaSharp;
 
 namespace TeaSharp.Tests;
 
@@ -29,6 +30,12 @@ internal static class PublicApiBoundaryTests
     [
     ];
 
+    private static readonly string[] OnboardingSourceRoots =
+    [
+        "src/TeaSharp/Controls",
+        "src/TeaSharp/Layout",
+    ];
+
     public static IEnumerable<TestCase> Cases()
     {
         yield return new TestCase(
@@ -55,6 +62,15 @@ internal static class PublicApiBoundaryTests
         yield return new TestCase(
             "PublicApiBoundary_ExamplesSolutionIncludesCanonicalProjects",
             ExamplesSolution_IncludesCanonicalProjects);
+        yield return new TestCase(
+            "PublicApiBoundary_OnboardingSourceFilesDoNotReferenceTeaSharpCore",
+            OnboardingSourceFiles_DoNotReferenceTeaSharpCore);
+        yield return new TestCase(
+            "PublicApiBoundary_CanonicalExampleProjectsDoNotReferenceTeaSharpCoreProject",
+            CanonicalExampleProjects_DoNotReferenceTeaSharpCoreProject);
+        yield return new TestCase(
+            "PublicApiBoundary_PublicTeaSharpAssemblySurfaceDoesNotExposeTeaSharpCoreTypes",
+            PublicTeaSharpAssemblySurface_DoesNotExposeTeaSharpCoreTypes);
     }
 
     private static Task Docs_DoNotReferenceTeaSharpStyling()
@@ -183,6 +199,112 @@ internal static class PublicApiBoundaryTests
         return Task.CompletedTask;
     }
 
+    private static Task OnboardingSourceFiles_DoNotReferenceTeaSharpCore()
+    {
+        var repoRoot = GetRepoRoot();
+        var offenders = new List<string>();
+
+        foreach (var sourceRoot in OnboardingSourceRoots)
+        {
+            var absoluteRoot = Path.Combine(repoRoot, sourceRoot);
+            if (!Directory.Exists(absoluteRoot))
+            {
+                continue;
+            }
+
+            foreach (var path in Directory.EnumerateFiles(absoluteRoot, "*.cs", SearchOption.AllDirectories))
+            {
+                var text = File.ReadAllText(path);
+                if (TeaSharpCoreImportRegex.IsMatch(text) || text.Contains("TeaSharp.Core.", StringComparison.Ordinal))
+                {
+                    offenders.Add(ToRepoRelativePath(path));
+                }
+            }
+        }
+
+        TestAssert.True(
+            offenders.Count == 0,
+            $"Onboarding source files must not reference TeaSharp.Core.*. Offenders: {string.Join(", ", offenders)}.");
+
+        return Task.CompletedTask;
+    }
+
+    private static Task CanonicalExampleProjects_DoNotReferenceTeaSharpCoreProject()
+    {
+        var repoRoot = GetRepoRoot();
+        var offenders = CanonicalExampleProjectPaths
+            .Where(path => File.Exists(Path.Combine(repoRoot, path)))
+            .Where(path => File.ReadAllText(Path.Combine(repoRoot, path)).Contains("TeaSharp.Core.csproj", StringComparison.Ordinal))
+            .ToArray();
+
+        TestAssert.True(
+            offenders.Length == 0,
+            $"Canonical example projects must not reference TeaSharp.Core.csproj directly. Offenders: {string.Join(", ", offenders)}.");
+
+        return Task.CompletedTask;
+    }
+
+    private static Task PublicTeaSharpAssemblySurface_DoesNotExposeTeaSharpCoreTypes()
+    {
+        var publicAssembly = typeof(TeaApp).Assembly;
+        var leakedMembers = new List<string>();
+        var publicTypes = publicAssembly.GetExportedTypes();
+
+        foreach (var type in publicTypes)
+        {
+            if (!IsOnboardingPublicType(type))
+            {
+                continue;
+            }
+
+            if (ContainsTeaSharpCoreType(type))
+            {
+                leakedMembers.Add($"{type.FullName} (type)");
+            }
+
+            const BindingFlags flags = BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.DeclaredOnly;
+
+            foreach (var constructor in type.GetConstructors(flags))
+            {
+                if (constructor.GetParameters().Any(parameter => ContainsTeaSharpCoreType(parameter.ParameterType)))
+                {
+                    leakedMembers.Add($"{type.FullName}.{constructor.Name}(...)");
+                }
+            }
+
+            foreach (var method in type.GetMethods(flags).Where(method => !method.IsSpecialName))
+            {
+                if (ContainsTeaSharpCoreType(method.ReturnType)
+                    || method.GetParameters().Any(parameter => ContainsTeaSharpCoreType(parameter.ParameterType)))
+                {
+                    leakedMembers.Add($"{type.FullName}.{method.Name}(...)");
+                }
+            }
+
+            foreach (var property in type.GetProperties(flags))
+            {
+                if (ContainsTeaSharpCoreType(property.PropertyType))
+                {
+                    leakedMembers.Add($"{type.FullName}.{property.Name}");
+                }
+            }
+
+            foreach (var @event in type.GetEvents(flags))
+            {
+                if (ContainsTeaSharpCoreType(@event.EventHandlerType))
+                {
+                    leakedMembers.Add($"{type.FullName}.{@event.Name}");
+                }
+            }
+        }
+
+        TestAssert.True(
+            leakedMembers.Count == 0,
+            $"Public TeaSharp surface must not expose TeaSharp.Core types. Offenders: {string.Join(", ", leakedMembers)}.");
+
+        return Task.CompletedTask;
+    }
+
     private static IEnumerable<string> EnumerateMarkdownFiles(string repoRoot)
     {
         yield return Path.Combine(repoRoot, "README.md");
@@ -256,5 +378,38 @@ internal static class PublicApiBoundaryTests
     private static string ToRepoRelativePath(string path)
     {
         return Path.GetRelativePath(GetRepoRoot(), path).Replace(Path.DirectorySeparatorChar, '/');
+    }
+
+    private static bool ContainsTeaSharpCoreType(Type? type)
+    {
+        if (type is null)
+        {
+            return false;
+        }
+
+        if (type.Namespace?.StartsWith("TeaSharp.Core", StringComparison.Ordinal) == true)
+        {
+            return true;
+        }
+
+        if (type.IsByRef || type.IsPointer || type.IsArray)
+        {
+            return ContainsTeaSharpCoreType(type.GetElementType());
+        }
+
+        if (!type.IsGenericType)
+        {
+            return false;
+        }
+
+        return type.GetGenericArguments().Any(ContainsTeaSharpCoreType);
+    }
+
+    private static bool IsOnboardingPublicType(Type type)
+    {
+        var @namespace = type.Namespace ?? string.Empty;
+        return @namespace.Equals("TeaSharp", StringComparison.Ordinal)
+            || @namespace.StartsWith("TeaSharp.Controls", StringComparison.Ordinal)
+            || @namespace.StartsWith("TeaSharp.Layout", StringComparison.Ordinal);
     }
 }
