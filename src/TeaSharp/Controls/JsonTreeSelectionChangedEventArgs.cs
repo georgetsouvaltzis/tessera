@@ -30,13 +30,15 @@ public sealed class JsonTreeSelectionChangedEventArgs : EventArgs
     public int PreviousIndex { get; }
 
     /// <summary>
-    /// Gets current selected index.
+    /// Gets the selected index after the change.
+    /// Compatibility alias for <see cref="SelectedIndex" />.
     /// </summary>
+    [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Advanced)]
     public int CurrentIndex { get; }
 
     /// <summary>
     /// Gets the selected index after the change.
-    /// Canonical naming alias that forwards to <see cref="CurrentIndex" /> for compatibility.
+    /// Canonical property for selection access.
     /// </summary>
     public int SelectedIndex => CurrentIndex;
 
@@ -46,13 +48,15 @@ public sealed class JsonTreeSelectionChangedEventArgs : EventArgs
     public JsonTreeNode? PreviousNode { get; }
 
     /// <summary>
-    /// Gets currently selected node.
+    /// Gets the selected node after the change.
+    /// Compatibility alias for <see cref="SelectedNode" />.
     /// </summary>
+    [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Advanced)]
     public JsonTreeNode? CurrentNode { get; }
 
     /// <summary>
     /// Gets the selected node after the change.
-    /// Canonical naming alias that forwards to <see cref="CurrentNode" /> for compatibility.
+    /// Canonical property for selection access.
     /// </summary>
     public JsonTreeNode? SelectedNode => CurrentNode;
 }

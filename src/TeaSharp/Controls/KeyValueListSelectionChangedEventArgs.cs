@@ -31,12 +31,14 @@ public sealed class KeyValueListSelectionChangedEventArgs : EventArgs
 
     /// <summary>
     /// Gets selected index after the change.
+    /// Compatibility alias for <see cref="SelectedIndex" />.
     /// </summary>
+    [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Advanced)]
     public int CurrentIndex { get; }
 
     /// <summary>
     /// Gets the selected index after the change.
-    /// Canonical naming alias that forwards to <see cref="CurrentIndex" /> for compatibility.
+    /// Canonical property for selection access.
     /// </summary>
     public int SelectedIndex => CurrentIndex;
 
@@ -47,12 +49,14 @@ public sealed class KeyValueListSelectionChangedEventArgs : EventArgs
 
     /// <summary>
     /// Gets selected item after the change.
+    /// Compatibility alias for <see cref="SelectedItem" />.
     /// </summary>
+    [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Advanced)]
     public KeyValueListEntry? CurrentItem { get; }
 
     /// <summary>
     /// Gets the selected item after the change.
-    /// Canonical naming alias that forwards to <see cref="CurrentItem" /> for compatibility.
+    /// Canonical property for selection access.
     /// </summary>
     public KeyValueListEntry? SelectedItem => CurrentItem;
 }

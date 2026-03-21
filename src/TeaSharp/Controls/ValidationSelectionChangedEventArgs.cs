@@ -30,13 +30,15 @@ public sealed class ValidationSelectionChangedEventArgs : EventArgs
     public int PreviousIndex { get; }
 
     /// <summary>
-    /// Gets the current selected index.
+    /// Gets the selected index after the change.
+    /// Compatibility alias for <see cref="SelectedIndex" />.
     /// </summary>
+    [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Advanced)]
     public int CurrentIndex { get; }
 
     /// <summary>
     /// Gets the selected index after the change.
-    /// Canonical naming alias that forwards to <see cref="CurrentIndex" /> for compatibility.
+    /// Canonical property for selection access.
     /// </summary>
     public int SelectedIndex => CurrentIndex;
 
@@ -46,13 +48,15 @@ public sealed class ValidationSelectionChangedEventArgs : EventArgs
     public ValidationIssue? PreviousIssue { get; }
 
     /// <summary>
-    /// Gets the currently selected issue.
+    /// Gets the selected issue after the change.
+    /// Compatibility alias for <see cref="SelectedIssue" />.
     /// </summary>
+    [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Advanced)]
     public ValidationIssue? CurrentIssue { get; }
 
     /// <summary>
     /// Gets the selected issue after the change.
-    /// Canonical naming alias that forwards to <see cref="CurrentIssue" /> for compatibility.
+    /// Canonical property for selection access.
     /// </summary>
     public ValidationIssue? SelectedIssue => CurrentIssue;
 }

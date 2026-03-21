@@ -31,12 +31,14 @@ public sealed class PropertyGridSelectionChangedEventArgs : EventArgs
 
     /// <summary>
     /// Gets the selected index after the change.
+    /// Compatibility alias for <see cref="SelectedIndex" />.
     /// </summary>
+    [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Advanced)]
     public int CurrentIndex { get; }
 
     /// <summary>
     /// Gets the selected index after the change.
-    /// Canonical naming alias that forwards to <see cref="CurrentIndex" /> for compatibility.
+    /// Canonical property for selection access.
     /// </summary>
     public int SelectedIndex => CurrentIndex;
 
@@ -47,12 +49,14 @@ public sealed class PropertyGridSelectionChangedEventArgs : EventArgs
 
     /// <summary>
     /// Gets the selected property after the change.
+    /// Compatibility alias for <see cref="SelectedProperty" />.
     /// </summary>
+    [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Advanced)]
     public PropertyGridProperty? CurrentProperty { get; }
 
     /// <summary>
     /// Gets the selected property after the change.
-    /// Canonical naming alias that forwards to <see cref="CurrentProperty" /> for compatibility.
+    /// Canonical property for selection access.
     /// </summary>
     public PropertyGridProperty? SelectedProperty => CurrentProperty;
 }

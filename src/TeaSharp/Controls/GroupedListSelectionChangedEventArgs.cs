@@ -44,13 +44,15 @@ public sealed class GroupedListSelectionChangedEventArgs<TGroup, TItem> : EventA
     public int PreviousRowIndex { get; }
 
     /// <summary>
-    /// Gets current visible-row index.
+    /// Gets selected visible-row index.
+    /// Compatibility alias for <see cref="SelectedRowIndex" />.
     /// </summary>
+    [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Advanced)]
     public int CurrentRowIndex { get; }
 
     /// <summary>
     /// Gets selected visible-row index.
-    /// Canonical naming alias that forwards to <see cref="CurrentRowIndex" /> for compatibility.
+    /// Canonical property for selection access.
     /// </summary>
     public int SelectedRowIndex => CurrentRowIndex;
 
@@ -60,13 +62,15 @@ public sealed class GroupedListSelectionChangedEventArgs<TGroup, TItem> : EventA
     public int? PreviousGroupIndex { get; }
 
     /// <summary>
-    /// Gets current selected group index, when any.
+    /// Gets selected group index, when any.
+    /// Compatibility alias for <see cref="SelectedGroupIndex" />.
     /// </summary>
+    [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Advanced)]
     public int? CurrentGroupIndex { get; }
 
     /// <summary>
     /// Gets selected group index, when any.
-    /// Canonical naming alias that forwards to <see cref="CurrentGroupIndex" /> for compatibility.
+    /// Canonical property for selection access.
     /// </summary>
     public int? SelectedGroupIndex => CurrentGroupIndex;
 
@@ -76,13 +80,15 @@ public sealed class GroupedListSelectionChangedEventArgs<TGroup, TItem> : EventA
     public int? PreviousItemIndex { get; }
 
     /// <summary>
-    /// Gets current selected item index within its group, when any.
+    /// Gets selected item index within its group, when any.
+    /// Compatibility alias for <see cref="SelectedItemIndex" />.
     /// </summary>
+    [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Advanced)]
     public int? CurrentItemIndex { get; }
 
     /// <summary>
     /// Gets selected item index within its group, when any.
-    /// Canonical naming alias that forwards to <see cref="CurrentItemIndex" /> for compatibility.
+    /// Canonical property for selection access.
     /// </summary>
     public int? SelectedItemIndex => CurrentItemIndex;
 
@@ -92,13 +98,15 @@ public sealed class GroupedListSelectionChangedEventArgs<TGroup, TItem> : EventA
     public TItem? PreviousItem { get; }
 
     /// <summary>
-    /// Gets current selected item, when any.
+    /// Gets selected item, when any.
+    /// Compatibility alias for <see cref="SelectedItem" />.
     /// </summary>
+    [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Advanced)]
     public TItem? CurrentItem { get; }
 
     /// <summary>
     /// Gets selected item, when any.
-    /// Canonical naming alias that forwards to <see cref="CurrentItem" /> for compatibility.
+    /// Canonical property for selection access.
     /// </summary>
     public TItem? SelectedItem => CurrentItem;
 }

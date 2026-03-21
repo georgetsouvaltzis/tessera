@@ -30,13 +30,15 @@ public sealed class FileExplorerSelectionChangedEventArgs : EventArgs
     public string? PreviousPath { get; }
 
     /// <summary>
-    /// Gets the current selected path, if any.
+    /// Gets the selected path, if any.
+    /// Compatibility alias for <see cref="SelectedPath" />.
     /// </summary>
+    [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Advanced)]
     public string? CurrentPath { get; }
 
     /// <summary>
     /// Gets the selected path, if any.
-    /// Canonical naming alias that forwards to <see cref="CurrentPath" /> for compatibility.
+    /// Canonical property for selection access.
     /// </summary>
     public string? SelectedPath => CurrentPath;
 
@@ -46,13 +48,15 @@ public sealed class FileExplorerSelectionChangedEventArgs : EventArgs
     public FileExplorerItem? PreviousItem { get; }
 
     /// <summary>
-    /// Gets the current selected item, if any.
+    /// Gets the selected item, if any.
+    /// Compatibility alias for <see cref="SelectedItem" />.
     /// </summary>
+    [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Advanced)]
     public FileExplorerItem? CurrentItem { get; }
 
     /// <summary>
     /// Gets the selected item, if any.
-    /// Canonical naming alias that forwards to <see cref="CurrentItem" /> for compatibility.
+    /// Canonical property for selection access.
     /// </summary>
     public FileExplorerItem? SelectedItem => CurrentItem;
 }
