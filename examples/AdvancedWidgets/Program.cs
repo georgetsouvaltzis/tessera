@@ -1,11 +1,13 @@
 using TeaSharp;
 using TeaSharp.Controls;
 using TeaSharp.Layout;
+using TeaSharp.Styles;
 
 var app = Tea.CreateBuilder()
     .UseApp<AdvancedWidgetsApp>()
     .ConfigureRuntime(static runtime =>
     {
+        runtime.Theme = AdvancedWidgetsApp.DemoTheme;
         runtime.Screen = new ScreenOptions
         {
             AltScreen = true,
@@ -22,6 +24,8 @@ internal sealed record AdvancedTick(DateTimeOffset At) : Message;
 
 internal sealed class AdvancedWidgetsApp : TeaApp
 {
+    internal static readonly TeaTheme DemoTheme = TeaThemes.Catppuccin(CatppuccinVariant.Macchiato);
+
     private readonly Badge _modeBadge = new()
     {
         Text = "stable",
@@ -31,8 +35,9 @@ internal sealed class AdvancedWidgetsApp : TeaApp
     private readonly Toggle _toggle = new()
     {
         Title = "Feature Flag",
-        Border = BorderStyle.SingleLine,
+        Border = BorderStyle.Rounded,
         Padding = Thickness.All(1),
+        FocusMarker = "◆",
     };
 
     private readonly Slider _slider = new()
@@ -41,47 +46,55 @@ internal sealed class AdvancedWidgetsApp : TeaApp
         Min = 1,
         Max = 32,
         Step = 1,
-        Border = BorderStyle.SingleLine,
+        Border = BorderStyle.Rounded,
         Padding = Thickness.All(1),
+        FocusMarker = "◆",
     };
 
     private readonly Spinner _spinner = new()
     {
         Title = "Indexer",
         Label = "running",
-        Border = BorderStyle.SingleLine,
+        Border = BorderStyle.Rounded,
         Padding = Thickness.All(1),
+        FocusMarker = "◆",
     };
 
     private readonly TreeView _tree = new()
     {
         Title = "Workspace",
-        Border = BorderStyle.SingleLine,
+        Border = BorderStyle.Rounded,
         Padding = Thickness.All(1),
+        FocusMarker = "◆",
     };
 
     private readonly Notifications _notifications = new()
     {
         Title = "Notifications",
-        Border = BorderStyle.SingleLine,
+        Border = BorderStyle.Rounded,
         Padding = Thickness.All(1),
         MaxItems = 48,
+        FocusMarker = "◆",
     };
 
     private readonly CommandPalette _palette = new()
     {
         Title = "Workspace Actions",
+        FocusMarker = "◆",
+        ShowFocusMarker = true,
     };
 
     private readonly ContextMenu _contextMenu = new()
     {
         Title = "Quick Actions",
+        FocusMarker = "◆",
+        ShowFocusMarker = true,
     };
 
     private readonly Label _summary = new()
     {
         Title = "Summary",
-        Border = BorderStyle.SingleLine,
+        Border = BorderStyle.Rounded,
         Padding = Thickness.All(1),
     };
 
@@ -91,6 +104,7 @@ internal sealed class AdvancedWidgetsApp : TeaApp
 
     public AdvancedWidgetsApp()
     {
+        ApplyVisuals();
         _slider.SetValue(8);
         _toggle.SetValue(true);
         _tree.SetItems(
@@ -317,5 +331,89 @@ internal sealed class AdvancedWidgetsApp : TeaApp
 
             window.Footer(1, _status);
         });
+    }
+
+    private void ApplyVisuals()
+    {
+        var selectedStyle = DemoTheme.Selection.Background.Merge(DemoTheme.Selection.Foreground);
+
+        _modeBadge.TextStyle = DemoTheme.Text.Secondary;
+        _modeBadge.SuccessTextStyle = DemoTheme.State.Success.WithBold();
+        _modeBadge.WarningTextStyle = DemoTheme.State.Warning.WithBold();
+
+        _toggle.TitleStyle = DemoTheme.Text.Secondary;
+        _toggle.FocusedTitleStyle = DemoTheme.Focus.Title;
+        _toggle.BorderStyleText = DemoTheme.Border.Default;
+        _toggle.FocusedBorderStyleText = DemoTheme.Focus.Border;
+        _toggle.ValueStyle = DemoTheme.Text.Primary;
+        _toggle.OnValueStyle = DemoTheme.State.Success.WithBold();
+        _toggle.OffValueStyle = DemoTheme.State.Warning.WithBold();
+
+        _slider.TitleStyle = DemoTheme.Text.Secondary;
+        _slider.FocusedTitleStyle = DemoTheme.Focus.Title;
+        _slider.BorderStyleText = DemoTheme.Border.Default;
+        _slider.FocusedBorderStyleText = DemoTheme.Focus.Border;
+        _slider.ValueLabelStyle = DemoTheme.Accent.Secondary.WithBold();
+        _slider.FillStyle = DemoTheme.Accent.Primary.WithBold();
+        _slider.TrackStyle = DemoTheme.Text.Muted;
+
+        _spinner.TitleStyle = DemoTheme.Text.Secondary;
+        _spinner.FocusedTitleStyle = DemoTheme.Focus.Title;
+        _spinner.BorderStyleText = DemoTheme.Border.Default;
+        _spinner.FocusedBorderStyleText = DemoTheme.Focus.Border;
+        _spinner.ValueStyle = DemoTheme.Text.Primary;
+        _spinner.RunningValueStyle = DemoTheme.State.Success.WithBold();
+        _spinner.StoppedValueStyle = DemoTheme.State.Warning.WithBold();
+
+        _tree.TitleStyle = DemoTheme.Text.Secondary;
+        _tree.FocusedTitleStyle = DemoTheme.Focus.Title;
+        _tree.BorderStyleText = DemoTheme.Border.Default;
+        _tree.FocusedBorderStyleText = DemoTheme.Focus.Border;
+        _tree.BranchStyle = DemoTheme.Text.Muted;
+        _tree.LeafStyle = DemoTheme.Text.Primary;
+        _tree.SelectedItemStyle = selectedStyle;
+        _tree.HoveredItemStyle = DemoTheme.Accent.Secondary.WithUnderline();
+
+        _notifications.TitleStyle = DemoTheme.Text.Secondary;
+        _notifications.FocusedTitleStyle = DemoTheme.Focus.Title;
+        _notifications.BorderStyleText = DemoTheme.Border.Default;
+        _notifications.FocusedBorderStyleText = DemoTheme.Focus.Border;
+        _notifications.ItemStyle = DemoTheme.Text.Secondary;
+        _notifications.SelectedItemStyle = selectedStyle;
+        _notifications.HoveredItemStyle = DemoTheme.Accent.Primary.WithUnderline();
+        _notifications.UnreadItemStyle = DemoTheme.Text.Primary.WithBold();
+        _notifications.InfoItemStyle = DemoTheme.State.Info;
+        _notifications.SuccessItemStyle = DemoTheme.State.Success;
+        _notifications.WarningItemStyle = DemoTheme.State.Warning;
+        _notifications.ErrorItemStyle = DemoTheme.State.Error;
+
+        _palette.TitleStyle = DemoTheme.Text.Secondary;
+        _palette.FocusedTitleStyle = DemoTheme.Focus.Title;
+        _palette.BorderStyleText = DemoTheme.Border.Strong;
+        _palette.FocusedBorderStyleText = DemoTheme.Focus.Border;
+        _palette.QueryTextStyle = DemoTheme.Text.Primary;
+        _palette.PlaceholderTextStyle = DemoTheme.Text.Muted.WithItalic();
+        _palette.ItemStyle = DemoTheme.Text.Secondary;
+        _palette.SelectedItemStyle = selectedStyle;
+        _palette.HoveredItemStyle = DemoTheme.Accent.Secondary.WithUnderline();
+
+        _contextMenu.TitleStyle = DemoTheme.Text.Secondary;
+        _contextMenu.FocusedTitleStyle = DemoTheme.Focus.Title;
+        _contextMenu.BorderStyleText = DemoTheme.Border.Strong;
+        _contextMenu.FocusedBorderStyleText = DemoTheme.Focus.Border;
+        _contextMenu.ItemStyle = DemoTheme.Text.Secondary;
+        _contextMenu.SelectedItemStyle = selectedStyle;
+        _contextMenu.HoveredItemStyle = DemoTheme.Accent.Secondary.WithUnderline();
+
+        _summary.TitleStyle = DemoTheme.Text.Secondary;
+        _summary.FocusedTitleStyle = DemoTheme.Focus.Title;
+        _summary.BorderStyleText = DemoTheme.Border.Default;
+        _summary.FocusedBorderStyleText = DemoTheme.Focus.Border;
+        _summary.TextStyle = DemoTheme.Text.Primary;
+
+        _status.Fill = '·';
+        _status.LeftTextStyle = DemoTheme.Text.Muted;
+        _status.RightTextStyle = DemoTheme.Accent.Primary.WithBold();
+        _status.FillStyle = DemoTheme.Surface.Panel;
     }
 }

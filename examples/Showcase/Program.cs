@@ -1,18 +1,21 @@
 using TeaSharp;
 using TeaSharp.Controls;
 using TeaSharp.Layout;
+using TeaSharp.Styles;
 
 var app = Tea.CreateBuilder()
     .UseApp<OrdersApp>()
     .ConfigureRuntime(static runtime =>
     {
         runtime.MaxFps = 30;
+        runtime.Theme = OrdersApp.DemoTheme;
         runtime.Screen = new ScreenOptions
         {
             AltScreen = true,
             WindowTitle = "TeaSharp Showcase",
             EnableFocusReporting = true,
             EnableBracketedPaste = true,
+            MouseTracking = MouseTrackingMode.AllMotion,
         };
     })
     .Build();
@@ -26,6 +29,8 @@ internal sealed record DeleteDialogResponded(DialogResult Result) : Message;
 
 internal sealed class OrdersApp : TeaApp
 {
+    internal static readonly TeaTheme DemoTheme = TeaThemes.RosePine(RosePineVariant.Moon);
+
     private readonly Dictionary<string, string> _details = new(StringComparer.Ordinal)
     {
         ["ORD-1024"] = "Pending shipment\nCustomer: Northwind\nPriority: High",
@@ -34,33 +39,40 @@ internal sealed class OrdersApp : TeaApp
         ["ORD-1027"] = "Ready for invoicing\nCustomer: Contoso\nPriority: Low",
     };
 
-    private readonly Choice _orders = new() { Title = "Orders" };
+    private readonly Choice _orders = new()
+    {
+        Title = "Orders",
+        Border = BorderStyle.Rounded,
+        FocusMarker = "◆",
+    };
     private readonly Label _summary = new()
     {
         Title = "Summary",
-        Border = BorderStyle.SingleLine,
+        Border = BorderStyle.Rounded,
         Padding = Thickness.All(1),
     };
     private readonly TextArea _detailsView = new()
     {
         Title = "Details",
-        Border = BorderStyle.SingleLine,
+        Border = BorderStyle.Rounded,
         Padding = Thickness.All(1),
         Wrap = true,
+        FocusMarker = "◆",
     };
     private readonly TextInput _command = new()
     {
         Title = "Command",
-        Border = BorderStyle.SingleLine,
+        Border = BorderStyle.Rounded,
         Padding = Thickness.All(1),
         Placeholder = "refresh, delete, or focus",
         ClearOnSubmit = true,
+        FocusMarker = "◆",
     };
     private readonly Button _refresh = new()
     {
         Text = "Refresh",
         Description = "Enter to reload",
-        Border = BorderStyle.SingleLine,
+        Border = BorderStyle.Rounded,
         Padding = Thickness.All(1),
     };
     private readonly Dialog _confirmDelete = new()
@@ -79,6 +91,7 @@ internal sealed class OrdersApp : TeaApp
 
     public OrdersApp()
     {
+        ApplyVisuals();
         _orders.SetItems(_details.Keys.OrderBy(static value => value, StringComparer.Ordinal).ToArray());
         _orders.SelectionChanged += (_, args) => Post(new OrderSelected(args.SelectedItem));
         _refresh.Activated += (_, _) => Post(new RefreshRequested());
@@ -228,5 +241,58 @@ internal sealed class OrdersApp : TeaApp
         _orders.SetItems(_details.Keys.OrderBy(static value => value, StringComparer.Ordinal).ToArray());
         SelectOrder(_orders.SelectedItem);
         _statusText = $"Deleted {selected}";
+    }
+
+    private void ApplyVisuals()
+    {
+        var selectedStyle = DemoTheme.Selection.Background.Merge(DemoTheme.Selection.Foreground);
+
+        _orders.TitleStyle = DemoTheme.Text.Secondary;
+        _orders.FocusedTitleStyle = DemoTheme.Focus.Title;
+        _orders.BorderStyleText = DemoTheme.Border.Default;
+        _orders.FocusedBorderStyleText = DemoTheme.Focus.Border;
+        _orders.ValueStyle = DemoTheme.Text.Primary;
+        _orders.OptionStyle = DemoTheme.Text.Secondary;
+        _orders.SelectedOptionStyle = selectedStyle;
+        _orders.HoveredOptionStyle = DemoTheme.Accent.Secondary.WithUnderline();
+        _orders.HoveredValueStyle = DemoTheme.Accent.Primary.WithUnderline();
+        _orders.MutedStyle = DemoTheme.Text.Muted;
+
+        _summary.TitleStyle = DemoTheme.Text.Secondary;
+        _summary.FocusedTitleStyle = DemoTheme.Focus.Title;
+        _summary.BorderStyleText = DemoTheme.Border.Default;
+        _summary.FocusedBorderStyleText = DemoTheme.Focus.Border;
+        _summary.TextStyle = DemoTheme.Text.Primary;
+
+        _detailsView.TitleStyle = DemoTheme.Text.Secondary;
+        _detailsView.FocusedTitleStyle = DemoTheme.Focus.Title;
+        _detailsView.BorderStyleText = DemoTheme.Border.Default;
+        _detailsView.FocusedBorderStyleText = DemoTheme.Focus.Border;
+        _detailsView.ValueTextStyle = DemoTheme.Text.Primary;
+
+        _command.TitleStyle = DemoTheme.Text.Secondary;
+        _command.FocusedTitleStyle = DemoTheme.Focus.Title;
+        _command.BorderStyleText = DemoTheme.Border.Default;
+        _command.FocusedBorderStyleText = DemoTheme.Focus.Border;
+        _command.ValueTextStyle = DemoTheme.Text.Primary;
+        _command.PlaceholderTextStyle = DemoTheme.Text.Muted.WithItalic();
+
+        _refresh.LabelStyle = DemoTheme.Text.Primary.WithBold();
+        _refresh.FocusedLabelStyle = DemoTheme.Accent.Primary.WithBold();
+        _refresh.PressedLabelStyle = selectedStyle.WithBold();
+        _refresh.BorderStyleText = DemoTheme.Border.Default;
+        _refresh.FocusedBorderStyleText = DemoTheme.Focus.Border;
+
+        _confirmDelete.TitleStyle = DemoTheme.Text.Secondary;
+        _confirmDelete.FocusedTitleStyle = DemoTheme.Focus.Title;
+        _confirmDelete.BorderStyleText = DemoTheme.Border.Strong;
+        _confirmDelete.FocusedBorderStyleText = DemoTheme.Focus.Border;
+        _confirmDelete.BodyTextStyle = DemoTheme.Text.Primary;
+        _confirmDelete.FocusMarker = "◆";
+
+        _status.Fill = '·';
+        _status.LeftTextStyle = DemoTheme.Text.Muted;
+        _status.RightTextStyle = DemoTheme.Accent.Primary.WithBold();
+        _status.FillStyle = DemoTheme.Surface.Panel;
     }
 }
