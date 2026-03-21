@@ -16,6 +16,15 @@ internal static partial class ThemeOverridesTests
         yield return new TestCase(
             "ThemeOverrides_OverrideOverloads_ResolveExpectedTokens_ForWave2DataPlanningControls",
             OverrideOverloads_ResolveExpectedTokens_ForWave2DataPlanningControls);
+        yield return new TestCase(
+            "ThemeOverrides_ApplyHelpers_MapExpectedTokens_ForWave2QueryPivotRichTextControls",
+            ApplyHelpers_MapExpectedTokens_ForWave2QueryPivotRichTextControls);
+        yield return new TestCase(
+            "ThemeOverrides_ApplyThemeDefaults_DoNotOverwriteExplicitStyles_ForWave2QueryPivotRichTextControls",
+            ApplyThemeDefaults_DoNotOverwriteExplicitStyles_ForWave2QueryPivotRichTextControls);
+        yield return new TestCase(
+            "ThemeOverrides_OverrideOverloads_ResolveExpectedTokens_ForWave2QueryPivotRichTextControls",
+            OverrideOverloads_ResolveExpectedTokens_ForWave2QueryPivotRichTextControls);
     }
 
     private static Task ApplyHelpers_MapExpectedTokens_ForWave2DataPlanningControls()
@@ -265,6 +274,218 @@ internal static partial class ThemeOverridesTests
         TestAssert.Equal(explicitStyle, scheduler.EntryTextStyle, "Override defaults should not overwrite explicit SchedulerTimeline.EntryTextStyle.");
         TestAssert.Equal(typeTheme.Text.Secondary, scheduler.TimeTextStyle, "Override defaults should fill empty SchedulerTimeline.TimeTextStyle.");
         TestAssert.Equal(typeTheme.State.Warning, scheduler.ConflictRowStyle, "Override defaults should fill empty SchedulerTimeline.ConflictRowStyle.");
+
+        return Task.CompletedTask;
+    }
+
+    private static Task ApplyHelpers_MapExpectedTokens_ForWave2QueryPivotRichTextControls()
+    {
+        var theme = new TeaTheme
+        {
+            Text = new TeaThemeTextTokens
+            {
+                Primary = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(11, 12, 13)),
+                Secondary = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(21, 22, 23)),
+                Muted = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(31, 32, 33)),
+            },
+            Surface = new TeaThemeSurfaceTokens
+            {
+                Panel = TeaStyle.Empty.WithBackground(AnsiColor.Rgb(35, 36, 37)),
+            },
+            Accent = new TeaThemeAccentTokens
+            {
+                Primary = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(41, 42, 43)),
+                Secondary = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(44, 45, 46)),
+            },
+            Focus = new TeaThemeFocusTokens
+            {
+                Title = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(51, 52, 53)),
+                Ring = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(54, 55, 56)),
+                Border = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(57, 58, 59)),
+            },
+            Selection = new TeaThemeSelectionTokens
+            {
+                Foreground = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(61, 62, 63)),
+                Background = TeaStyle.Empty.WithBackground(AnsiColor.Rgb(71, 72, 73)),
+            },
+            Border = new TeaThemeBorderTokens
+            {
+                Default = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(81, 82, 83)),
+                Focused = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(84, 85, 86)),
+            },
+            State = new TeaThemeStateTokens
+            {
+                Error = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(91, 92, 93)),
+            },
+        };
+
+        var pivotTable = new PivotTable().ApplyTheme(theme);
+        var queryBuilder = new QueryBuilder().ApplyTheme(theme);
+        var richTextView = new RichTextView().ApplyTheme(theme);
+
+        TestAssert.Equal(theme.Text.Secondary, pivotTable.TitleStyle, "PivotTable title style should map to Text.Secondary.");
+        TestAssert.Equal(theme.Text.Secondary, pivotTable.HeaderStyle, "PivotTable header style should map to Text.Secondary.");
+        TestAssert.Equal(theme.Text.Primary, pivotTable.BodyStyle, "PivotTable body style should map to Text.Primary.");
+        TestAssert.Equal(theme.Selection.Foreground.Merge(theme.Selection.Background), pivotTable.SelectedCellStyle, "PivotTable selected cell style should map to merged Selection styles.");
+        TestAssert.Equal(theme.Focus.Ring, pivotTable.FocusedCellStyle, "PivotTable focused cell style should map to Focus.Ring.");
+        TestAssert.Equal(theme.Border.Default, pivotTable.BorderStyleText, "PivotTable border style should map to Border.Default.");
+        TestAssert.Equal(theme.Border.Focused.Merge(theme.Focus.Border), pivotTable.FocusedBorderStyleText, "PivotTable focused border style should map to focused border tokens.");
+
+        TestAssert.Equal(theme.Text.Secondary, queryBuilder.TitleStyle, "QueryBuilder title style should map to Text.Secondary.");
+        TestAssert.Equal(theme.Text.Primary, queryBuilder.RuleStyle, "QueryBuilder rule style should map to Text.Primary.");
+        TestAssert.Equal(theme.Selection.Foreground.Merge(theme.Selection.Background), queryBuilder.SelectedRuleStyle, "QueryBuilder selected rule style should map to merged Selection styles.");
+        TestAssert.Equal(theme.Focus.Ring, queryBuilder.FocusedRuleStyle, "QueryBuilder focused rule style should map to Focus.Ring.");
+        TestAssert.Equal(theme.Accent.Secondary, queryBuilder.HoveredRuleStyle, "QueryBuilder hovered rule style should map to Accent.Secondary.");
+        TestAssert.Equal(theme.State.Error, queryBuilder.ErrorRuleStyle, "QueryBuilder error rule style should map to State.Error.");
+        TestAssert.Equal(theme.Border.Default, queryBuilder.BorderStyleText, "QueryBuilder border style should map to Border.Default.");
+
+        TestAssert.Equal(theme.Text.Secondary, richTextView.TitleStyle, "RichTextView title style should map to Text.Secondary.");
+        TestAssert.Equal(theme.Text.Primary, richTextView.TextStyle, "RichTextView text style should map to Text.Primary.");
+        TestAssert.Equal(theme.Accent.Primary, richTextView.HeadingStyle, "RichTextView heading style should map to Accent.Primary.");
+        TestAssert.Equal(theme.Text.Secondary, richTextView.ListMarkerStyle, "RichTextView list marker style should map to Text.Secondary.");
+        TestAssert.Equal(theme.Accent.Secondary, richTextView.EmphasisStyle, "RichTextView emphasis style should map to Accent.Secondary.");
+        TestAssert.Equal(theme.Surface.Panel.Merge(theme.Text.Primary), richTextView.InlineCodeStyle, "RichTextView inline code style should merge Surface.Panel and Text.Primary.");
+        TestAssert.Equal(theme.Border.Default, richTextView.BorderStyleText, "RichTextView border style should map to Border.Default.");
+
+        return Task.CompletedTask;
+    }
+
+    private static Task ApplyThemeDefaults_DoNotOverwriteExplicitStyles_ForWave2QueryPivotRichTextControls()
+    {
+        var explicitStyle = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(201, 202, 203));
+        var theme = new TeaTheme
+        {
+            Text = new TeaThemeTextTokens
+            {
+                Primary = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(1, 2, 3)),
+                Secondary = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(4, 5, 6)),
+                Muted = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(7, 8, 9)),
+            },
+            Surface = new TeaThemeSurfaceTokens
+            {
+                Panel = TeaStyle.Empty.WithBackground(AnsiColor.Rgb(10, 11, 12)),
+            },
+            Accent = new TeaThemeAccentTokens
+            {
+                Primary = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(13, 14, 15)),
+                Secondary = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(16, 17, 18)),
+            },
+            Focus = new TeaThemeFocusTokens
+            {
+                Title = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(19, 20, 21)),
+                Ring = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(22, 23, 24)),
+                Border = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(25, 26, 27)),
+            },
+            Selection = new TeaThemeSelectionTokens
+            {
+                Foreground = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(28, 29, 30)),
+                Background = TeaStyle.Empty.WithBackground(AnsiColor.Rgb(31, 32, 33)),
+            },
+            Border = new TeaThemeBorderTokens
+            {
+                Default = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(34, 35, 36)),
+                Focused = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(37, 38, 39)),
+            },
+            State = new TeaThemeStateTokens
+            {
+                Error = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(40, 41, 42)),
+            },
+        };
+
+        var pivotTable = new PivotTable { BodyStyle = explicitStyle, BorderStyleText = explicitStyle };
+        var queryBuilder = new QueryBuilder { RuleStyle = explicitStyle, BorderStyleText = explicitStyle };
+        var richTextView = new RichTextView { TextStyle = explicitStyle, BorderStyleText = explicitStyle };
+
+        pivotTable.ApplyThemeDefaults(theme);
+        queryBuilder.ApplyThemeDefaults(theme);
+        richTextView.ApplyThemeDefaults(theme);
+
+        TestAssert.Equal(explicitStyle, pivotTable.BodyStyle, "Defaults should not overwrite explicit PivotTable.BodyStyle.");
+        TestAssert.Equal(theme.Text.Secondary, pivotTable.HeaderStyle, "Defaults should fill empty PivotTable.HeaderStyle.");
+        TestAssert.Equal(explicitStyle, pivotTable.BorderStyleText, "Defaults should not overwrite explicit PivotTable.BorderStyleText.");
+        TestAssert.Equal(theme.Border.Focused.Merge(theme.Focus.Border), pivotTable.FocusedBorderStyleText, "Defaults should fill empty PivotTable.FocusedBorderStyleText.");
+
+        TestAssert.Equal(explicitStyle, queryBuilder.RuleStyle, "Defaults should not overwrite explicit QueryBuilder.RuleStyle.");
+        TestAssert.Equal(theme.Selection.Foreground.Merge(theme.Selection.Background), queryBuilder.SelectedRuleStyle, "Defaults should fill empty QueryBuilder.SelectedRuleStyle.");
+        TestAssert.Equal(theme.State.Error, queryBuilder.ErrorRuleStyle, "Defaults should fill empty QueryBuilder.ErrorRuleStyle.");
+        TestAssert.Equal(explicitStyle, queryBuilder.BorderStyleText, "Defaults should not overwrite explicit QueryBuilder.BorderStyleText.");
+
+        TestAssert.Equal(explicitStyle, richTextView.TextStyle, "Defaults should not overwrite explicit RichTextView.TextStyle.");
+        TestAssert.Equal(theme.Accent.Primary, richTextView.HeadingStyle, "Defaults should fill empty RichTextView.HeadingStyle.");
+        TestAssert.Equal(theme.Surface.Panel.Merge(theme.Text.Primary), richTextView.InlineCodeStyle, "Defaults should fill empty RichTextView.InlineCodeStyle.");
+        TestAssert.Equal(explicitStyle, richTextView.BorderStyleText, "Defaults should not overwrite explicit RichTextView.BorderStyleText.");
+
+        return Task.CompletedTask;
+    }
+
+    private static Task OverrideOverloads_ResolveExpectedTokens_ForWave2QueryPivotRichTextControls()
+    {
+        var explicitStyle = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(221, 222, 223));
+        var pivotTable = new PivotTable { BodyStyle = explicitStyle };
+        var queryBuilder = new QueryBuilder { RuleStyle = explicitStyle };
+        var richTextView = new RichTextView { TextStyle = explicitStyle };
+
+        var baseTheme = BuildThemeWithPrimary(1, 1, 1);
+        var overrides = new TeaThemeOverrides();
+        var typeTheme = new TeaTheme
+        {
+            Text = new TeaThemeTextTokens
+            {
+                Primary = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(101, 102, 103)),
+                Secondary = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(111, 112, 113)),
+                Muted = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(121, 122, 123)),
+            },
+            Surface = new TeaThemeSurfaceTokens
+            {
+                Panel = TeaStyle.Empty.WithBackground(AnsiColor.Rgb(125, 126, 127)),
+            },
+            Accent = new TeaThemeAccentTokens
+            {
+                Primary = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(131, 132, 133)),
+                Secondary = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(134, 135, 136)),
+            },
+            Focus = new TeaThemeFocusTokens
+            {
+                Title = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(141, 142, 143)),
+                Ring = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(144, 145, 146)),
+                Border = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(147, 148, 149)),
+            },
+            Selection = new TeaThemeSelectionTokens
+            {
+                Foreground = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(151, 152, 153)),
+                Background = TeaStyle.Empty.WithBackground(AnsiColor.Rgb(161, 162, 163)),
+            },
+            Border = new TeaThemeBorderTokens
+            {
+                Default = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(171, 172, 173)),
+                Focused = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(174, 175, 176)),
+            },
+            State = new TeaThemeStateTokens
+            {
+                Error = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(181, 182, 183)),
+            },
+        };
+
+        overrides.SetControlType<PivotTable>(typeTheme);
+        overrides.SetControlType<QueryBuilder>(typeTheme);
+        overrides.SetControlType<RichTextView>(typeTheme);
+
+        pivotTable.ApplyThemeDefaults(overrides, baseTheme);
+        queryBuilder.ApplyThemeDefaults(overrides, baseTheme);
+        richTextView.ApplyThemeDefaults(overrides, baseTheme);
+
+        TestAssert.Equal(explicitStyle, pivotTable.BodyStyle, "Override defaults should not overwrite explicit PivotTable.BodyStyle.");
+        TestAssert.Equal(typeTheme.Text.Secondary, pivotTable.HeaderStyle, "Override defaults should fill empty PivotTable.HeaderStyle.");
+        TestAssert.Equal(typeTheme.Border.Default, pivotTable.BorderStyleText, "Override defaults should fill empty PivotTable.BorderStyleText.");
+
+        TestAssert.Equal(explicitStyle, queryBuilder.RuleStyle, "Override defaults should not overwrite explicit QueryBuilder.RuleStyle.");
+        TestAssert.Equal(typeTheme.Selection.Foreground.Merge(typeTheme.Selection.Background), queryBuilder.SelectedRuleStyle, "Override defaults should fill empty QueryBuilder.SelectedRuleStyle.");
+        TestAssert.Equal(typeTheme.State.Error, queryBuilder.ErrorRuleStyle, "Override defaults should fill empty QueryBuilder.ErrorRuleStyle.");
+
+        TestAssert.Equal(explicitStyle, richTextView.TextStyle, "Override defaults should not overwrite explicit RichTextView.TextStyle.");
+        TestAssert.Equal(typeTheme.Accent.Primary, richTextView.HeadingStyle, "Override defaults should fill empty RichTextView.HeadingStyle.");
+        TestAssert.Equal(typeTheme.Surface.Panel.Merge(typeTheme.Text.Primary), richTextView.InlineCodeStyle, "Override defaults should fill empty RichTextView.InlineCodeStyle.");
+        TestAssert.Equal(typeTheme.Border.Default, richTextView.BorderStyleText, "Override defaults should fill empty RichTextView.BorderStyleText.");
 
         return Task.CompletedTask;
     }
