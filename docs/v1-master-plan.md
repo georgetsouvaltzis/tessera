@@ -71,7 +71,7 @@ Correctness is a continuous gate across all phases: fix regressions at source an
     - `1dba5bc` + `3731c50` -> visual regression/assertion updates and decoder leak fix
     - `cf3e8a1` -> focus-marker policy/regression test follow-up
   - runtime visual sanity artifacts exist under `.artifacts/screenshots/*`; current text-capture scans show no `<...;...M` leakage patterns
-  - latest workspace verification on March 21, 2026 is green (`dotnet test TeaSharp.slnx --no-build`, `dotnet build TeaSharp.Examples.slnx --no-restore --nologo -v minimal`)
+  - latest workspace verification on March 21, 2026 is green (`dotnet build TeaSharp.slnx --no-restore --nologo -v minimal`, `dotnet test TeaSharp.slnx --no-restore --nologo`, `dotnet build TeaSharp.Examples.slnx --no-restore --nologo -v minimal`); WorkspaceApp non-interactive launch smoke also passed (`dotnet run --project examples/WorkspaceApp --no-build --nologo`, short timed start/stop).
 - **M4: API Freeze + Cleanup** -> **In progress**
   - checklist evidence updates from recent commits:
     - item `1` + item `6` evidence: `c712c2a` -> [examples/PublicApiDashboard/Program.cs](/Users/georgetsouvaltzis/Projects/playground/teasharp/examples/PublicApiDashboard/Program.cs), [docs/public-api-consumer-friction-log.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/public-api-consumer-friction-log.md), [examples/PublicApiDashboard/README.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/examples/PublicApiDashboard/README.md)
