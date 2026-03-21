@@ -105,7 +105,12 @@ public abstract class TeaApp
 
     internal TeaEffect? UpdateRuntime(Message mapped)
     {
-        switch (mapped)
+        var routed = TeaPeriodicEffectMessage.TryUnwrap(mapped, out var periodic);
+        var nextPeriodic = periodic is null
+            ? null
+            : TeaEffects.Periodic(periodic.Interval, periodic.Factory);
+
+        switch (routed)
         {
             case WindowResized resized:
                 _context = _context with { Width = resized.Width, Height = resized.Height };
@@ -115,13 +120,14 @@ public abstract class TeaApp
                 break;
         }
 
-        var handledInput = _interactiveScreen?.Handle(mapped) ?? false;
+        var handledInput = _interactiveScreen?.Handle(routed) ?? false;
         var effect =
-            handledInput && IsUserInputMessage(mapped)
+            handledInput && IsUserInputMessage(routed)
                 ? null
-                : Update(mapped);
+                : Update(routed);
 
-        return CombineEffects(effect, DrainRequestedEffects());
+        var withPeriodic = CombineEffects(effect, nextPeriodic);
+        return CombineEffects(withPeriodic, DrainRequestedEffects());
     }
 
     internal ScreenRenderResult RenderRuntime()

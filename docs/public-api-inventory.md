@@ -25,6 +25,7 @@ These are the types new applications should discover first.
 - `TeaRuntimeOptions`
 - `TeaEffect`
 - `TeaEffects`
+- `TeaEffects.Periodic(...)` for auto-rescheduling interval updates
 - `Message` and the typed message records in `TeaSharp`
 - `TeaSharp.Styles.TeaStyle`
 - `TeaSharp.Styles.AnsiColor`

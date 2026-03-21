@@ -73,6 +73,23 @@ public static class TeaEffects
     }
 
     /// <summary>
+    /// Emits a message at the supplied interval and auto-reschedules itself through runtime plumbing.
+    /// </summary>
+    /// <param name="interval">The interval between emissions.</param>
+    /// <param name="factory">The factory that creates the message from the current UTC time.</param>
+    /// <returns>An effect that keeps emitting interval messages without app self-rescheduling in <c>Update(...)</c>.</returns>
+    public static TeaEffect Periodic(TimeSpan interval, Func<DateTimeOffset, Message> factory)
+    {
+        ArgumentNullException.ThrowIfNull(factory);
+        return Tick(interval, now =>
+        {
+            var payload = factory(now);
+            ArgumentNullException.ThrowIfNull(payload);
+            return new TeaPeriodicEffectMessage(interval, factory, payload);
+        });
+    }
+
+    /// <summary>
     /// Runs the supplied effects concurrently as a single effect.
     /// </summary>
     /// <param name="effects">The effects to batch.</param>
