@@ -365,13 +365,14 @@ internal sealed class AdvancedWidgetsApp : TeaApp
         _spinner.RunningValueStyle = DemoTheme.State.Success.WithBold();
         _spinner.StoppedValueStyle = DemoTheme.State.Warning.WithBold();
 
-        _tree.TitleStyle = DemoTheme.Text.Secondary;
-        _tree.FocusedTitleStyle = DemoTheme.Focus.Title;
-        _tree.BorderStyleText = DemoTheme.Border.Default;
-        _tree.FocusedBorderStyleText = DemoTheme.Focus.Border;
-        _tree.BranchStyle = DemoTheme.Text.Muted;
+        _tree.Glyphs = new TreeViewGlyphSet("▾", "▸", "◦");
+        _tree.TitleStyle = DemoTheme.Accent.Primary.WithBold();
+        _tree.FocusedTitleStyle = DemoTheme.Focus.Title.WithBold();
+        _tree.BorderStyleText = DemoTheme.Border.Strong;
+        _tree.FocusedBorderStyleText = DemoTheme.Border.Focused.Merge(DemoTheme.Focus.Border);
+        _tree.BranchStyle = DemoTheme.Text.Secondary;
         _tree.LeafStyle = DemoTheme.Text.Primary;
-        _tree.SelectedItemStyle = selectedStyle;
+        _tree.SelectedItemStyle = selectedStyle.WithBold();
         _tree.HoveredItemStyle = DemoTheme.Accent.Secondary.WithUnderline();
 
         _notifications.TitleStyle = DemoTheme.Text.Secondary;

@@ -93,6 +93,15 @@ internal sealed class WidgetGalleryApp : TeaApp
         MaxVisibleItems = 5,
     };
 
+    private readonly ComboBox _comboBox = new()
+    {
+        Title = "Region Filter",
+        Border = BorderStyle.Rounded,
+        Padding = Thickness.All(1),
+        MaxVisibleItems = 5,
+        Placeholder = "type to filter regions",
+    };
+
     private readonly ListView<string> _list = new()
     {
         Title = "Services",
@@ -346,6 +355,12 @@ internal sealed class WidgetGalleryApp : TeaApp
         {
             _statusText = $"environment: {args.SelectedItem}";
             _logs.Append($"choice:{args.SelectedItem}");
+        };
+        _comboBox.SetItems(["us-east-1", "us-west-2", "eu-central-1", "eu-west-1", "ap-southeast-1", "ap-northeast-1"]);
+        _comboBox.SelectionChanged += (_, args) =>
+        {
+            _statusText = $"region: {args.SelectedItem}";
+            _logs.Append($"combo:{args.SelectedItem}");
         };
 
         _list.SetItems(["api", "worker", "scheduler", "gateway", "events", "billing", "search"]);
@@ -769,7 +784,12 @@ internal sealed class WidgetGalleryApp : TeaApp
                 new LayoutSlot
                 {
                     Content = _choice,
-                    Length = 8,
+                    Length = 7,
+                },
+                new LayoutSlot
+                {
+                    Content = _comboBox,
+                    Length = 7,
                 },
                 new LayoutSlot
                 {
@@ -1017,6 +1037,7 @@ internal sealed class WidgetGalleryApp : TeaApp
         _textInput.ApplyTheme(theme);
         _textArea.ApplyTheme(theme);
         _choice.ApplyTheme(theme);
+        _comboBox.ApplyTheme(theme);
         _list.ApplyTheme(theme);
         _table.ApplyTheme(theme);
         _logs.ApplyTheme(theme);
@@ -1051,6 +1072,59 @@ internal sealed class WidgetGalleryApp : TeaApp
         _status.LeftTextStyle = theme.Text.Secondary.WithBold();
         _status.RightTextStyle = theme.Accent.Secondary;
         _status.FillStyle = theme.Surface.Panel.Merge(theme.Text.Muted);
+
+        var selectedRowStyle = theme.Selection.Foreground.Merge(theme.Selection.Background);
+        var focusedBorderStyle = theme.Border.Focused.Merge(theme.Focus.Border);
+
+        _choice.Glyphs = new DropdownGlyphSet("⌄", "⌃", "▸", "◆");
+        _choice.BorderStyleText = theme.Border.Strong;
+        _choice.FocusedBorderStyleText = focusedBorderStyle;
+        _choice.TitleStyle = theme.Accent.Primary.WithBold();
+        _choice.FocusedTitleStyle = theme.Focus.Title.WithBold();
+        _choice.ValueStyle = theme.Text.Primary.WithBold();
+        _choice.OptionStyle = theme.Text.Secondary;
+        _choice.SelectedOptionStyle = selectedRowStyle.WithBold();
+        _choice.HoveredOptionStyle = theme.Accent.Secondary.WithUnderline();
+        _choice.HoveredValueStyle = theme.Accent.Primary.WithUnderline();
+
+        _comboBox.Glyphs = new DropdownGlyphSet("⌄", "⌃", "▶", "◆");
+        _comboBox.BorderStyleText = theme.Border.Strong;
+        _comboBox.FocusedBorderStyleText = focusedBorderStyle;
+        _comboBox.TitleStyle = theme.Accent.Primary.WithBold();
+        _comboBox.FocusedTitleStyle = theme.Focus.Title.WithBold();
+        _comboBox.ValueTextStyle = theme.Text.Primary.WithBold();
+        _comboBox.PlaceholderTextStyle = theme.Text.Muted.WithItalic();
+        _comboBox.OptionStyle = theme.Text.Secondary;
+        _comboBox.SelectedOptionStyle = selectedRowStyle.WithBold();
+        _comboBox.HoveredOptionStyle = theme.Accent.Secondary.WithUnderline();
+        _comboBox.HoveredValueStyle = theme.Accent.Primary.WithUnderline();
+
+        _tree.Glyphs = new TreeViewGlyphSet("▾", "▸", "◦");
+        _tree.BorderStyleText = theme.Border.Strong;
+        _tree.FocusedBorderStyleText = focusedBorderStyle;
+        _tree.TitleStyle = theme.Accent.Primary.WithBold();
+        _tree.FocusedTitleStyle = theme.Focus.Title.WithBold();
+        _tree.BranchStyle = theme.Text.Secondary;
+        _tree.LeafStyle = theme.Text.Primary;
+        _tree.SelectedItemStyle = selectedRowStyle.WithBold();
+        _tree.HoveredItemStyle = theme.Accent.Secondary.WithUnderline();
+
+        _list.BorderStyleText = theme.Border.Strong;
+        _list.FocusedBorderStyleText = focusedBorderStyle;
+        _list.TitleStyle = theme.Accent.Primary.WithBold();
+        _list.FocusedTitleStyle = theme.Focus.Title.WithBold();
+        _list.DefaultRowStyle = theme.Text.Secondary;
+        _list.SelectedRowStyle = selectedRowStyle.WithBold();
+        _list.HoveredRowStyle = theme.Accent.Secondary.WithUnderline();
+
+        _table.BorderStyleText = theme.Border.Strong;
+        _table.FocusedBorderStyleText = focusedBorderStyle;
+        _table.TitleStyle = theme.Accent.Primary.WithBold();
+        _table.FocusedTitleStyle = theme.Focus.Title.WithBold();
+        _table.HeaderStyle = theme.Text.Primary.WithBold();
+        _table.RowStyle = theme.Text.Secondary;
+        _table.HoveredRowStyle = theme.Accent.Secondary.WithUnderline();
+        _table.SelectedRowStyle = selectedRowStyle.WithBold();
     }
 
     private string ThemeLabel() =>

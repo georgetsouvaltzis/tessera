@@ -247,13 +247,14 @@ internal sealed class OrdersApp : TeaApp
     {
         var selectedStyle = DemoTheme.Selection.Background.Merge(DemoTheme.Selection.Foreground);
 
-        _orders.TitleStyle = DemoTheme.Text.Secondary;
-        _orders.FocusedTitleStyle = DemoTheme.Focus.Title;
-        _orders.BorderStyleText = DemoTheme.Border.Default;
-        _orders.FocusedBorderStyleText = DemoTheme.Focus.Border;
-        _orders.ValueStyle = DemoTheme.Text.Primary;
+        _orders.Glyphs = new DropdownGlyphSet("⌄", "⌃", "▸", "◆");
+        _orders.TitleStyle = DemoTheme.Accent.Primary.WithBold();
+        _orders.FocusedTitleStyle = DemoTheme.Focus.Title.WithBold();
+        _orders.BorderStyleText = DemoTheme.Border.Strong;
+        _orders.FocusedBorderStyleText = DemoTheme.Border.Focused.Merge(DemoTheme.Focus.Border);
+        _orders.ValueStyle = DemoTheme.Text.Primary.WithBold();
         _orders.OptionStyle = DemoTheme.Text.Secondary;
-        _orders.SelectedOptionStyle = selectedStyle;
+        _orders.SelectedOptionStyle = selectedStyle.WithBold();
         _orders.HoveredOptionStyle = DemoTheme.Accent.Secondary.WithUnderline();
         _orders.HoveredValueStyle = DemoTheme.Accent.Primary.WithUnderline();
         _orders.MutedStyle = DemoTheme.Text.Muted;
