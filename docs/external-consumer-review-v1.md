@@ -30,14 +30,12 @@ void ApplyTheme(TeaTheme theme)
 ```
 - Suggested non-breaking fix: add helper on app surface (for example `ThemeScope.Apply(theme, params Control[] controls)`), or provide a documented aggregate helper for common dashboard control sets.
 
-### P2 - `Notifications` lacks `SelectionChanged`
-- Issue: notification feed has `SelectedIndex`/`SelectedItem` but no event. Consumers must poll every update tick to detect selection changes.
-- Repro snippet:
-```csharp
-var notifications = new Notifications();
-// Missing: notifications.SelectionChanged += ...
-```
-- Suggested non-breaking fix: add `SelectionChanged` event (same args pattern as other selection controls).
+## Resolved In This Lane
+
+### P2 - `Notifications` selection event
+- Status: resolved with additive API.
+- New surface: `Notifications.SelectionChanged` (`ListSelectionChangedEventArgs<InboxItem>` payload).
+- Validation: `NotificationsSelectionChangedEventTests` covers `SetSelectedIndex`, `Clear`, and `RemoveSelected` transitions.
 
 ## Notes
 - Current example demonstrates navigation, list/table, notifications, dialog flow, and theme switching without `TeaSharp.Core`.

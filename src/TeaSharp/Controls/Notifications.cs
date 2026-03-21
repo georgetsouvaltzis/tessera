@@ -14,6 +14,11 @@ public sealed class Notifications : Control
     private int _selectedIndex;
     private int _hoveredIndex = -1;
 
+    /// <summary>
+    /// Occurs when the selected notification changes.
+    /// </summary>
+    public event EventHandler<ListSelectionChangedEventArgs<InboxItem>>? SelectionChanged;
+
     public string Title
     {
         get;
@@ -147,6 +152,8 @@ public sealed class Notifications : Control
     public void SetItems(IEnumerable<InboxItem> items)
     {
         ArgumentNullException.ThrowIfNull(items);
+        var previousIndex = SelectedIndex;
+        var previousItem = SelectedItem;
         _items.Clear();
         foreach (var item in items)
         {
@@ -159,6 +166,7 @@ public sealed class Notifications : Control
         TrimToMaxItems();
         _selectedIndex = _items.Count == 0 ? 0 : Math.Clamp(_selectedIndex, 0, _items.Count - 1);
         _hoveredIndex = Math.Clamp(_hoveredIndex, -1, Math.Max(-1, _items.Count - 1));
+        RaiseSelectionChangedIfNeeded(previousIndex, previousItem);
     }
 
     /// <summary>
@@ -168,10 +176,13 @@ public sealed class Notifications : Control
     public void Add(InboxItem item)
     {
         ArgumentNullException.ThrowIfNull(item);
+        var previousIndex = SelectedIndex;
+        var previousItem = SelectedItem;
         _items.Add(Clone(item));
         TrimToMaxItems();
         _selectedIndex = Math.Max(0, _items.Count - 1);
         _hoveredIndex = Math.Clamp(_hoveredIndex, -1, Math.Max(-1, _items.Count - 1));
+        RaiseSelectionChangedIfNeeded(previousIndex, previousItem);
     }
 
     /// <summary>
@@ -186,6 +197,8 @@ public sealed class Notifications : Control
             return false;
         }
 
+        var previousIndex = _selectedIndex;
+        var previousItem = _items[previousIndex];
         var next = Math.Clamp(index, 0, _items.Count - 1);
         if (next == _selectedIndex)
         {
@@ -193,6 +206,7 @@ public sealed class Notifications : Control
         }
 
         _selectedIndex = next;
+        RaiseSelectionChanged(previousIndex, previousItem, _selectedIndex, _items[_selectedIndex]);
         return true;
     }
 
@@ -228,9 +242,12 @@ public sealed class Notifications : Control
             return false;
         }
 
+        var previousIndex = _selectedIndex;
+        var previousItem = _items[_selectedIndex];
         _items.RemoveAt(_selectedIndex);
         _selectedIndex = Math.Clamp(_selectedIndex, 0, Math.Max(0, _items.Count - 1));
         _hoveredIndex = Math.Clamp(_hoveredIndex, -1, Math.Max(-1, _items.Count - 1));
+        RaiseSelectionChangedIfNeeded(previousIndex, previousItem);
         return true;
     }
 
@@ -239,9 +256,12 @@ public sealed class Notifications : Control
     /// </summary>
     public void Clear()
     {
+        var previousIndex = SelectedIndex;
+        var previousItem = SelectedItem;
         _items.Clear();
         _selectedIndex = 0;
         _hoveredIndex = -1;
+        RaiseSelectionChangedIfNeeded(previousIndex, previousItem);
     }
 
     public override bool Handle(Message message)
@@ -515,6 +535,40 @@ public sealed class Notifications : Control
     private static InboxItem Clone(InboxItem item)
     {
         return new InboxItem(item.Id, item.Message, item.Level, item.CreatedAt, item.Source, item.IsRead, item.IsPinned);
+    }
+
+    private void RaiseSelectionChangedIfNeeded(int previousIndex, InboxItem? previousItem)
+    {
+        var selectedIndex = SelectedIndex;
+        var selectedItem = SelectedItem;
+        if (previousIndex == selectedIndex && IsSameItem(previousItem, selectedItem))
+        {
+            return;
+        }
+
+        RaiseSelectionChanged(previousIndex, previousItem, selectedIndex, selectedItem);
+    }
+
+    private void RaiseSelectionChanged(int previousIndex, InboxItem? previousItem, int selectedIndex, InboxItem? selectedItem)
+    {
+        SelectionChanged?.Invoke(
+            this,
+            new ListSelectionChangedEventArgs<InboxItem>(previousIndex, selectedIndex, previousItem, selectedItem));
+    }
+
+    private static bool IsSameItem(InboxItem? left, InboxItem? right)
+    {
+        if (left is null && right is null)
+        {
+            return true;
+        }
+
+        if (left is null || right is null)
+        {
+            return false;
+        }
+
+        return string.Equals(left.Id, right.Id, StringComparison.Ordinal);
     }
 
     private void TrimToMaxItems()

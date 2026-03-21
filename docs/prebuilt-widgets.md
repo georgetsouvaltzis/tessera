@@ -232,6 +232,7 @@ var treeTable = new TreeTable("Name", "Value") { ColumnSeparatorText = " │ ", 
 - `Items`
 - `SelectedIndex`
 - `SelectedItem`
+- `SelectionChanged`
 - `SetItems(IEnumerable<InboxItem>)`
 - `Add(InboxItem)`
 - `SetSelectedIndex(int)` and `Select(int)`

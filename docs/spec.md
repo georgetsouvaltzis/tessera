@@ -381,6 +381,7 @@ These types provide the default control vocabulary. Most promoted legacy `*Compo
 - `Items`
 - `SelectedIndex`
 - `SelectedItem`
+- `SelectionChanged`
 - `SetItems(IEnumerable<InboxItem>)`
 - `Add(InboxItem)`
 - `SetSelectedIndex(int)` / `Select(int)`
