@@ -78,6 +78,10 @@ Correctness is a continuous gate across all phases: fix regressions at source an
     - item `4` focused-border naming/behavior consistency evidence: `1a4fab8` -> [src/TeaSharp/Controls/SearchResultsView.Rendering.cs](/Users/georgetsouvaltzis/Projects/playground/teasharp/src/TeaSharp/Controls/SearchResultsView.Rendering.cs), [tests/TeaSharp.Tests/SearchResultsViewControlTests.cs](/Users/georgetsouvaltzis/Projects/playground/teasharp/tests/TeaSharp.Tests/SearchResultsViewControlTests.cs)
     - item `3` + item `6` docs sync evidence: `ed4449d` -> [docs/public-api-inventory.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/public-api-inventory.md), [docs/theme-system-v1.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/theme-system-v1.md), [docs/spec.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/spec.md)
     - item `5` XML docs pass evidence: `4e3a240` -> [src/TeaSharp/Styles/TeaStyle.cs](/Users/georgetsouvaltzis/Projects/playground/teasharp/src/TeaSharp/Styles/TeaStyle.cs), [src/TeaSharp/Styles/TeaThemeControlExtensions.DevOpsAndWorkflows.cs](/Users/georgetsouvaltzis/Projects/playground/teasharp/src/TeaSharp/Styles/TeaThemeControlExtensions.DevOpsAndWorkflows.cs)
+    - item `3` consumer-ergonomics closure evidence:
+      - `184e3ae` -> [src/TeaSharp/Controls/Dialog.cs](/Users/georgetsouvaltzis/Projects/playground/teasharp/src/TeaSharp/Controls/Dialog.cs), [src/TeaSharp/Controls/DialogClosedEventArgs.cs](/Users/georgetsouvaltzis/Projects/playground/teasharp/src/TeaSharp/Controls/DialogClosedEventArgs.cs), [tests/TeaSharp.Tests/DialogClosedEventTests.cs](/Users/georgetsouvaltzis/Projects/playground/teasharp/tests/TeaSharp.Tests/DialogClosedEventTests.cs)
+      - `ff557e6` -> [src/TeaSharp/Controls/Table.cs](/Users/georgetsouvaltzis/Projects/playground/teasharp/src/TeaSharp/Controls/Table.cs), [tests/TeaSharp.Tests/TableRowMutationApiTests.cs](/Users/georgetsouvaltzis/Projects/playground/teasharp/tests/TeaSharp.Tests/TableRowMutationApiTests.cs)
+      - `9cf07b2` -> [src/TeaSharp/Layout/ScreenBuilder.cs](/Users/georgetsouvaltzis/Projects/playground/teasharp/src/TeaSharp/Layout/ScreenBuilder.cs), [tests/TeaSharp.Tests/WindowBuilderHeaderRowCompositionTests.cs](/Users/georgetsouvaltzis/Projects/playground/teasharp/tests/TeaSharp.Tests/WindowBuilderHeaderRowCompositionTests.cs)
   - C4 remains open until all API freeze checklist items are marked complete
 - **M5: Performance Gate + Benchmarks + Docs Freeze** -> **Pending manual signoff**
   - harness and scenarios are wired; final pass/fail evidence is still required at RC
@@ -152,7 +156,7 @@ M4 checklist status snapshot (March 21, 2026):
 
 - item `1`: **In progress** (consumer-path evidence landed via `c712c2a`)
 - item `2`: **In progress** (no new closure evidence in this slice)
-- item `3`: **In progress** (friction-log and inventory/spec/theme sync evidence landed via `c712c2a`, `ed4449d`)
+- item `3`: **In progress** (major consumer ergonomics blockers closed via `184e3ae`, `ff557e6`, `9cf07b2`; broader API-surface consistency still open)
 - item `4`: **In progress** (SearchResultsView focused-border merge fix landed via `1a4fab8`)
 - item `5`: **In progress** (XML docs coverage updates landed via `4e3a240`)
 - item `6`: **In progress** (PublicApiDashboard + docs sync indicate no `TeaSharp.Core` onboarding leakage in touched assets)
