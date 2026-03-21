@@ -36,9 +36,12 @@ Notation: all rows inherit the strict state-style contract above; `Glyph hooks` 
 | `EmptyState` | P0 | Predictable zero-data UX | icon/marker slot glyph |
 | `SearchResultsView` | P0 | Common search result rendering | match markers, rank marker |
 
-Wave 1 shipped in this lane:
+Wave 1 integration status (current lane):
 
-- `SearchResultsView` with `SearchResultsGlyphSet`, state style hooks, and navigation-theme mapping.
+- Shipped and integrated: `Form`, `FieldSet`, `Wizard`, `SplitView`, `InspectorPanel`, `EmptyState`, `ValidationSummary`, `SearchResultsView`.
+- Theme extension coverage includes all listed controls (`ApplyTheme`, `ApplyThemeDefaults`, override overloads).
+- Bordered parity + control-catalog + theme-override tests include bordered Wave 1 controls (`Form`, `FieldSet`, `Wizard`, `SplitView`, `InspectorPanel`).
+- Remaining Wave 1 backlog: `DataForm<TModel>`.
 
 ### Wave 2 (P0/P1): Data, Planning, Query (9)
 

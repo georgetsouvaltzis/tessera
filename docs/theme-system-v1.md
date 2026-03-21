@@ -217,6 +217,34 @@ var grid = new DataGrid
 };
 ```
 
+### Wave 1 App Shell + Forms Theme Hooks
+
+`TeaThemeControlExtensions.FormsAndShell.cs` includes explicit mappings for:
+
+- `Form`
+- `FieldSet`
+- `Wizard`
+- `SplitView`
+- `InspectorPanel`
+
+These controls map `BorderStyleText` and `FocusedBorderStyleText` to semantic border/focus tokens by default.
+
+```csharp
+using TeaSharp.Controls;
+using TeaSharp.Styles;
+
+var theme = TeaThemes.Catppuccin(CatppuccinVariant.Frappe);
+
+var form = new Form().ApplyThemeDefaults(theme);
+form.RequiredMarkerStyle = TeaStyle.Empty.WithBold().WithForeground(AnsiColor.BrightRed);
+
+var wizard = new Wizard().ApplyThemeDefaults(theme);
+wizard.ActiveStepStyle = TeaStyle.Empty.WithBold().WithForeground(AnsiColor.BrightCyan);
+
+var split = new SplitView().ApplyThemeDefaults(theme);
+split.FocusedDividerStyle = TeaStyle.Empty.WithBold().WithForeground(AnsiColor.BrightYellow);
+```
+
 ### Wave 2 Data/Planning/Query Theme Hooks
 
 `TeaThemeControlExtensions` includes explicit mappings for:
@@ -426,6 +454,7 @@ Default policy for all controls:
 - `TeaThemeControlExtensions.Plotting.cs`
 - `TeaThemeControlExtensions.DevOpsAndWorkflows.cs`
 - `TeaThemeControlExtensions.Workspace.cs`
+- `TeaThemeControlExtensions.FormsAndShell.cs`
 
 Mapped controls expose:
 
@@ -433,6 +462,7 @@ Mapped controls expose:
 - `ApplyThemeDefaults(TeaTheme theme)`
 - plotting mappings: `Sparkline`, `AreaPlot`, `ScatterPlot`, `Histogram`, `LinePlot`, `PlotPanel`
 - workspace mappings: `DockWorkspace`, `PaneTabs`, `PaletteEditor`, `Heatmap`, `TreeMapChart`, `TerminalPanel`, `ProcessListView`
+- app-shell/forms mappings: `Form`, `FieldSet`, `Wizard`, `SplitView`, `InspectorPanel`
 - overloads taking `TeaThemeOverrides`, `baseTheme`, and `TeaThemeVisualState`
 
 Input/value mapping coverage includes:
@@ -502,6 +532,11 @@ Dev/ops workflow mapping coverage includes:
 Workspace/visual-data mapping coverage includes:
 
 - `DockWorkspace`, `PaneTabs`, `PaletteEditor`, `Heatmap`, `TreeMapChart`, `TerminalPanel`, `ProcessListView`
+- bordered controls in this set map `BorderStyleText` + `FocusedBorderStyleText` to border/focus tokens
+
+App-shell/forms mapping coverage includes:
+
+- `Form`, `FieldSet`, `Wizard`, `SplitView`, `InspectorPanel`
 - bordered controls in this set map `BorderStyleText` + `FocusedBorderStyleText` to border/focus tokens
 
 Bordered control parity enforcement:

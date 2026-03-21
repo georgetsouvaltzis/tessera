@@ -92,7 +92,7 @@ V1 theming is semantic-token based with override hierarchy:
 - semantic tokens for text/surface/border/state/focus/selection/accent
 - built-in palettes (Catppuccin, Rosé Pine) plus custom palette
 - override precedence: global theme -> control type -> control instance -> state
-- `TeaThemeControlExtensions` is split by domain (`Basic`, `InputValue`, `Navigation`, `NavigationOverlay`, `NavigationPrimitives`, `DataAndFlow`, `PlanningAndBoards`, `QueryAndRichText`, `ExplorerAndFeedback`, `RenderingTextUtilities`, `ModalAndCharts`, `Plotting`, `DevOpsAndWorkflows`, `Workspace`)
+- `TeaThemeControlExtensions` is split by domain (`Basic`, `InputValue`, `Navigation`, `NavigationOverlay`, `NavigationPrimitives`, `DataAndFlow`, `PlanningAndBoards`, `QueryAndRichText`, `ExplorerAndFeedback`, `RenderingTextUtilities`, `ModalAndCharts`, `Plotting`, `DevOpsAndWorkflows`, `Workspace`, `FormsAndShell`)
 - mapped input/value controls include `TextInput`, `TextArea`, `Toggle`, `Slider`, `Spinner`, `ProgressBar`, `NumberInput`, `DatePicker`, `TimePicker`
 - mapped basic controls include `Label`, `Button`, `ListView<T>`, `StatusBar`, `TextInput`, `Table`, `Tabs`
 - mapped navigation controls include `Breadcrumb`, `Paginator`, `Toolbar`, `CommandBar`, `SearchBox`, `SearchResultsView`
@@ -115,6 +115,8 @@ V1 theming is semantic-token based with override hierarchy:
 - `ContextMenu` preserves focused title marker text when rendering bordered titles
 - parity rule: any new bordered public control must ship border-style hooks, token mappings, and parity regression coverage in the same change
 - mapped navigation primitive controls include `Accordion`, `MultiSelect`, `RadioGroup`
+- mapped app-shell/forms controls include `Form`, `FieldSet`, `Wizard`, `SplitView`, `InspectorPanel`
+- bordered app-shell/forms controls (`Form`, `FieldSet`, `Wizard`, `SplitView`, `InspectorPanel`) map `BorderStyleText`/`FocusedBorderStyleText` to semantic border/focus tokens by default
 - mapped data/flow controls include `DataGrid`, `TreeTable`, `KeyValueList`, `Timeline`, `Stepper`
 - mapped planning/boards controls include `VirtualizedListView<T>`, `GroupedListView<TGroup,TItem>`, `KanbanBoard`, `TagInput`, `CalendarMonthView`, `SchedulerTimeline`
 - bordered planning/boards controls (`VirtualizedListView<T>`, `GroupedListView<TGroup,TItem>`, `KanbanBoard`, `TagInput`) map `BorderStyleText`/`FocusedBorderStyleText` to semantic border/focus tokens by default
@@ -295,6 +297,17 @@ Root controls currently include:
 - `SearchBox`
 - `SearchResultsView`
 - `SearchResultsGlyphSet`
+- `Form`
+- `FormField`
+- `FieldSet`
+- `SplitView`
+- `SplitViewOrientation`
+- `InspectorPanel`
+- `InspectorSection`
+- `InspectorField`
+- `Wizard`
+- `WizardStep`
+- `WizardStepChangedEventArgs`
 - `DiffView`
 - `PropertyGrid`
 - `FileExplorer`

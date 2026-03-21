@@ -175,6 +175,17 @@ These are the types new applications should discover first.
 - `TeaSharp.Controls.SearchBox`
 - `TeaSharp.Controls.SearchResultsView`
 - `TeaSharp.Controls.SearchResultsGlyphSet`
+- `TeaSharp.Controls.Form`
+- `TeaSharp.Controls.FormField`
+- `TeaSharp.Controls.FieldSet`
+- `TeaSharp.Controls.SplitView`
+- `TeaSharp.Controls.SplitViewOrientation`
+- `TeaSharp.Controls.InspectorPanel`
+- `TeaSharp.Controls.InspectorSection`
+- `TeaSharp.Controls.InspectorField`
+- `TeaSharp.Controls.Wizard`
+- `TeaSharp.Controls.WizardStep`
+- `TeaSharp.Controls.WizardStepChangedEventArgs`
 - `TeaSharp.Controls.DiffView`
 - `TeaSharp.Controls.PropertyGrid`
 - `TeaSharp.Controls.FileExplorer`
@@ -327,6 +338,11 @@ The first root controls that already own their implementation directly are:
 - `Paginator`
 - `SearchBox`
 - `SearchResultsView`
+- `Form`
+- `FieldSet`
+- `SplitView`
+- `InspectorPanel`
+- `Wizard`
 - `DiffView`
 - `PropertyGrid`
 - `FileExplorer`
@@ -345,12 +361,13 @@ Their old `TeaSharp.Components.Prebuilt.*` counterparts have been removed instea
 
 ## Theme Mapping Status
 
-Current shipped theme mapping is centralized in `TeaSharp.Styles.TeaThemeControlExtensions` and split into domain partial files (`Basic`, `InputValue`, `Navigation`, `NavigationOverlay`, `NavigationPrimitives`, `DataAndFlow`, `PlanningAndBoards`, `QueryAndRichText`, `ExplorerAndFeedback`, `RenderingTextUtilities`, `ModalAndCharts`, `Plotting`, `DevOpsAndWorkflows`, `Workspace`).
+Current shipped theme mapping is centralized in `TeaSharp.Styles.TeaThemeControlExtensions` and split into domain partial files (`Basic`, `InputValue`, `Navigation`, `NavigationOverlay`, `NavigationPrimitives`, `DataAndFlow`, `PlanningAndBoards`, `QueryAndRichText`, `ExplorerAndFeedback`, `RenderingTextUtilities`, `ModalAndCharts`, `Plotting`, `DevOpsAndWorkflows`, `Workspace`, `FormsAndShell`).
 Overlay glyph cookbook snippets for `MenuBarGlyphSet`, `ContextMenuGlyphSet`, and `CommandPaletteGlyphSet` are documented in [theme-system-v1.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/theme-system-v1.md).
 Border override, dropdown/tree glyph-set, and data marker/separator cookbook snippets are documented in [theme-system-v1.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/theme-system-v1.md).
 Wave 2 query/analytics controls (`PivotTable`, `QueryBuilder`, `RichTextView`) are mapped with the same semantic-token and border-style contract.
 Wave 3 dev/ops controls (`JsonTreeView`, `CommandOutput`, `LogTailPanel`, `ActivityFeed`, `NotificationInbox`, `KeyBindingHelpDialog`) are mapped with the same semantic-token contract.
 Wave 4 batch A + B controls (`DockWorkspace`, `PaneTabs`, `PaletteEditor`, `Heatmap`, `TreeMapChart`, `TerminalPanel`, `ProcessListView`) are integrated and mapped in `TeaThemeControlExtensions.Workspace.cs`.
+Wave 1 app-shell/forms controls (`Form`, `FieldSet`, `Wizard`, `SplitView`, `InspectorPanel`) are integrated and mapped in `TeaThemeControlExtensions.FormsAndShell.cs`.
 
 ## Plotting Authoring Guidance (Tier 1)
 
@@ -427,6 +444,11 @@ Navigation controls with direct token mappings:
 - `Breadcrumb`, `Paginator`, `Toolbar`, `CommandBar`, `SearchBox`, `SearchResultsView`
 - `SearchBox` maps title/value/placeholder/match/navigation styles plus border text hooks; title focus marker is configurable through `FocusMarker` + `ShowFocusMarker`
 - `SearchResultsView` maps title, row-state, and border text hooks; marker customization is explicit through `SearchResultsGlyphSet`
+
+Form/shell controls with direct token mappings:
+
+- `Form`, `FieldSet`, `Wizard`, `SplitView`, `InspectorPanel`
+- these controls map `BorderStyleText` -> `Border.Default` and `FocusedBorderStyleText` -> `Border.Focused + Focus.Border`
 
 Navigation/overlay controls with direct token mappings:
 
