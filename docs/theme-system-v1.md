@@ -217,18 +217,21 @@ var grid = new DataGrid
 };
 ```
 
-### Wave 2 Data/Planning Theme Hooks
+### Wave 2 Data/Planning/Query Theme Hooks
 
 `TeaThemeControlExtensions` includes explicit mappings for:
 
 - `VirtualizedListView<T>`
 - `GroupedListView<TGroup,TItem>`
+- `PivotTable`
+- `QueryBuilder`
 - `KanbanBoard`
 - `TagInput`
 - `CalendarMonthView`
 - `SchedulerTimeline`
+- `RichTextView`
 
-Bordered controls in this set (`VirtualizedListView<T>`, `GroupedListView<TGroup,TItem>`, `KanbanBoard`, `TagInput`) map `BorderStyleText` and `FocusedBorderStyleText` to semantic border/focus tokens by default.
+Bordered controls in this set (`VirtualizedListView<T>`, `GroupedListView<TGroup,TItem>`, `PivotTable`, `QueryBuilder`, `KanbanBoard`, `TagInput`, `RichTextView`) map `BorderStyleText` and `FocusedBorderStyleText` to semantic border/focus tokens by default.
 
 ```csharp
 using TeaSharp.Controls;
@@ -242,6 +245,12 @@ kanban.FocusedBorderStyleText = TeaStyle.Empty.WithBold().WithForeground(AnsiCol
 
 var scheduler = new SchedulerTimeline().ApplyThemeDefaults(theme);
 scheduler.ConflictRowStyle = TeaStyle.Empty.WithBold().WithForeground(AnsiColor.BrightRed);
+
+var query = new QueryBuilder().ApplyThemeDefaults(theme);
+query.ErrorRuleStyle = TeaStyle.Empty.WithBold().WithForeground(AnsiColor.BrightRed);
+
+var richText = new RichTextView().ApplyThemeDefaults(theme);
+richText.InlineCodeStyle = TeaStyle.Empty.WithBackground(AnsiColor.BrightBlack).WithForeground(AnsiColor.BrightWhite);
 ```
 
 ### Dropdown and Tree Glyph Sets

@@ -91,6 +91,19 @@ Preferred public catalog:
 78. `SchedulerTimeline`
 79. `SchedulerEntry`
 80. `SchedulerSelectionChangedEventArgs`
+81. `PivotTable`
+82. `PivotTableColumn`
+83. `PivotTableCell`
+84. `PivotSortDirection`
+85. `PivotSortRequestedEventArgs`
+86. `QueryBuilder`
+87. `QueryGroup`
+88. `QueryRule`
+89. `QueryOperator`
+90. `QueryChangedEventArgs`
+91. `RichTextView`
+92. `RichTextSegment`
+93. `RichTextStyleKind`
 
 These live in `TeaSharp.Controls`.
 
@@ -193,7 +206,8 @@ Theme and override pattern:
 
 - `VirtualizedListView<T>`, `GroupedListView<TGroup,TItem>`, `KanbanBoard`, and `TagInput` are bordered controls with `BorderStyleText`/`FocusedBorderStyleText`.
 - `CalendarMonthView` and `SchedulerTimeline` are unbordered planning views with full title/row/day style hooks.
-- Theme helpers now cover all six controls (`ApplyTheme` + `ApplyThemeDefaults` + override overloads).
+- `PivotTable`, `QueryBuilder`, and `RichTextView` are also bordered controls with semantic style hooks and border token mapping.
+- Theme helpers now cover all nine Wave 2 controls (`ApplyTheme` + `ApplyThemeDefaults` + override overloads).
 - Recommended usage: call `ApplyThemeDefaults(runtime.Theme)` first, then instance overrides per screen state.
 
 ### Beautiful UI Checklist (Current Phase)
@@ -224,6 +238,8 @@ Current shipped `TeaThemeControlExtensions` mappings include:
 - data/flow details: `KeyValueList` and `Timeline` include border text token mapping
 - planning/boards controls: `VirtualizedListView<T>`, `GroupedListView<TGroup,TItem>`, `KanbanBoard`, `TagInput`, `CalendarMonthView`, `SchedulerTimeline`
 - planning/boards details: bordered controls in this set map border tokens; scheduler/calendar map semantic row/day/title tokens
+- query/analytics controls: `PivotTable`, `QueryBuilder`, `RichTextView`
+- query/analytics details: all three map semantic text/selection/focus/state tokens and bordered controls map border tokens by default
 - explorer/feedback controls: `DiffView`, `PropertyGrid`, `FileExplorer`, `FuzzyFinder`, `ToastCenter`
 - rendering text utilities: `Badge`, `LogView`, `MarkdownView`, `MiniLog`
 - modal/chart summary controls: `Dialog`, `Modal`, `BarChart`, `LineChart`, `Gauge`, `StatsCard`

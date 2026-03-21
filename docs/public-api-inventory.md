@@ -103,6 +103,19 @@ These are the types new applications should discover first.
 - `TeaSharp.Controls.SchedulerTimeline`
 - `TeaSharp.Controls.SchedulerEntry`
 - `TeaSharp.Controls.SchedulerSelectionChangedEventArgs`
+- `TeaSharp.Controls.PivotTable`
+- `TeaSharp.Controls.PivotTableColumn`
+- `TeaSharp.Controls.PivotTableCell`
+- `TeaSharp.Controls.PivotSortDirection`
+- `TeaSharp.Controls.PivotSortRequestedEventArgs`
+- `TeaSharp.Controls.QueryBuilder`
+- `TeaSharp.Controls.QueryGroup`
+- `TeaSharp.Controls.QueryRule`
+- `TeaSharp.Controls.QueryOperator`
+- `TeaSharp.Controls.QueryChangedEventArgs`
+- `TeaSharp.Controls.RichTextView`
+- `TeaSharp.Controls.RichTextSegment`
+- `TeaSharp.Controls.RichTextStyleKind`
 - `TeaSharp.Controls.DataGrid`
 - `TeaSharp.Controls.TreeTable`
 - `TeaSharp.Controls.KeyValueList`
@@ -250,6 +263,9 @@ The first root controls that already own their implementation directly are:
 - `TagInput`
 - `CalendarMonthView`
 - `SchedulerTimeline`
+- `PivotTable`
+- `QueryBuilder`
+- `RichTextView`
 - `KeyValueList`
 - `Timeline`
 - `Stepper`
@@ -278,9 +294,10 @@ Their old `TeaSharp.Components.Prebuilt.*` counterparts have been removed instea
 
 ## Theme Mapping Status
 
-Current shipped theme mapping is centralized in `TeaSharp.Styles.TeaThemeControlExtensions` and split into domain partial files (`Basic`, `InputValue`, `Navigation`, `NavigationOverlay`, `NavigationPrimitives`, `DataAndFlow`, `PlanningAndBoards`, `ExplorerAndFeedback`, `RenderingTextUtilities`, `ModalAndCharts`, `Plotting`).
+Current shipped theme mapping is centralized in `TeaSharp.Styles.TeaThemeControlExtensions` and split into domain partial files (`Basic`, `InputValue`, `Navigation`, `NavigationOverlay`, `NavigationPrimitives`, `DataAndFlow`, `PlanningAndBoards`, `QueryAndRichText`, `ExplorerAndFeedback`, `RenderingTextUtilities`, `ModalAndCharts`, `Plotting`).
 Overlay glyph cookbook snippets for `MenuBarGlyphSet`, `ContextMenuGlyphSet`, and `CommandPaletteGlyphSet` are documented in [theme-system-v1.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/theme-system-v1.md).
 Border override, dropdown/tree glyph-set, and data marker/separator cookbook snippets are documented in [theme-system-v1.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/theme-system-v1.md).
+Wave 2 query/analytics controls (`PivotTable`, `QueryBuilder`, `RichTextView`) are mapped with the same semantic-token and border-style contract.
 
 ## Plotting Authoring Guidance (Tier 1)
 

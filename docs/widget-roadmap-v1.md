@@ -56,10 +56,10 @@ Wave 1 shipped in this lane:
 
 Wave 2 integration status (current lane):
 
-- Implemented and wired: `VirtualizedListView<T>`, `GroupedListView<TGroup,TItem>`, `KanbanBoard`, `TagInput`, `CalendarMonthView`, `SchedulerTimeline`.
-- Theme extension coverage added (`ApplyTheme`, `ApplyThemeDefaults`, override overloads).
-- Bordered parity + control-catalog + theme-override tests updated for this shipped subset.
-- Remaining Wave 2 backlog: `PivotTable`, `QueryBuilder`, `RichTextView`.
+- Implemented and wired: `VirtualizedListView<T>`, `GroupedListView<TGroup,TItem>`, `PivotTable`, `QueryBuilder`, `KanbanBoard`, `CalendarMonthView`, `SchedulerTimeline`, `TagInput`, `RichTextView`.
+- Theme extension coverage added for all Wave 2 controls (`ApplyTheme`, `ApplyThemeDefaults`, override overloads).
+- Bordered parity + control-catalog + theme-override tests now include all bordered Wave 2 controls.
+- Remaining Wave 2 backlog: none.
 
 ### Wave 3 (P1): Dev/Ops Workflows (8)
 
