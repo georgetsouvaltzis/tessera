@@ -73,7 +73,12 @@ Correctness is a continuous gate across all phases: fix regressions at source an
   - runtime visual sanity artifacts exist under `.artifacts/screenshots/*`; current text-capture scans show no `<...;...M` leakage patterns
   - latest workspace verification on March 21, 2026 is green (`dotnet test TeaSharp.slnx --no-build`, `dotnet build TeaSharp.Examples.slnx --no-restore --nologo -v minimal`)
 - **M4: API Freeze + Cleanup** -> **In progress**
-  - naming clarity and XML commenting gates active for all V1-touching API updates
+  - checklist evidence updates from recent commits:
+    - item `1` + item `6` evidence: `c712c2a` -> [examples/PublicApiDashboard/Program.cs](/Users/georgetsouvaltzis/Projects/playground/teasharp/examples/PublicApiDashboard/Program.cs), [docs/public-api-consumer-friction-log.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/public-api-consumer-friction-log.md), [examples/PublicApiDashboard/README.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/examples/PublicApiDashboard/README.md)
+    - item `4` focused-border naming/behavior consistency evidence: `1a4fab8` -> [src/TeaSharp/Controls/SearchResultsView.Rendering.cs](/Users/georgetsouvaltzis/Projects/playground/teasharp/src/TeaSharp/Controls/SearchResultsView.Rendering.cs), [tests/TeaSharp.Tests/SearchResultsViewControlTests.cs](/Users/georgetsouvaltzis/Projects/playground/teasharp/tests/TeaSharp.Tests/SearchResultsViewControlTests.cs)
+    - item `3` + item `6` docs sync evidence: `ed4449d` -> [docs/public-api-inventory.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/public-api-inventory.md), [docs/theme-system-v1.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/theme-system-v1.md), [docs/spec.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/spec.md)
+    - item `5` XML docs pass evidence: `4e3a240` -> [src/TeaSharp/Styles/TeaStyle.cs](/Users/georgetsouvaltzis/Projects/playground/teasharp/src/TeaSharp/Styles/TeaStyle.cs), [src/TeaSharp/Styles/TeaThemeControlExtensions.DevOpsAndWorkflows.cs](/Users/georgetsouvaltzis/Projects/playground/teasharp/src/TeaSharp/Styles/TeaThemeControlExtensions.DevOpsAndWorkflows.cs)
+  - C4 remains open until all API freeze checklist items are marked complete
 - **M5: Performance Gate + Benchmarks + Docs Freeze** -> **Pending manual signoff**
   - harness and scenarios are wired; final pass/fail evidence is still required at RC
 
@@ -142,6 +147,15 @@ Release approval rule: M5 is only complete when all four rows above are moved fr
    - selection semantics: `SelectedIndex`, `SelectedItem`, `SelectionChanged`
 5. Public XML docs match runtime behavior for any changed API before merge.
 6. Starter docs/examples do not import `TeaSharp.Core.*`.
+
+M4 checklist status snapshot (March 21, 2026):
+
+- item `1`: **In progress** (consumer-path evidence landed via `c712c2a`)
+- item `2`: **In progress** (no new closure evidence in this slice)
+- item `3`: **In progress** (friction-log and inventory/spec/theme sync evidence landed via `c712c2a`, `ed4449d`)
+- item `4`: **In progress** (SearchResultsView focused-border merge fix landed via `1a4fab8`)
+- item `5`: **In progress** (XML docs coverage updates landed via `4e3a240`)
+- item `6`: **In progress** (PublicApiDashboard + docs sync indicate no `TeaSharp.Core` onboarding leakage in touched assets)
 
 ## Naming Clarity Gate
 - Public names must be unambiguous to C# developers without reading internals.
