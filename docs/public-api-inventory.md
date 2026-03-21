@@ -84,7 +84,7 @@ These are the types new applications should discover first.
 - `TeaSharp.Controls.RadioGroup`
 - `TeaSharp.Controls.LogView`
 - `TeaSharp.Controls.Modal`
-- `TeaSharp.Controls.Notifications` (native)
+- `TeaSharp.Controls.Notifications` (primary notification feed API)
 - `TeaSharp.Controls.Toggle`
 - `TeaSharp.Controls.Slider`
 - `TeaSharp.Controls.Spinner`
@@ -161,7 +161,6 @@ These are the types new applications should discover first.
 - `TeaSharp.Controls.ActivityFeed`
 - `TeaSharp.Controls.ActivityFeedItem`
 - `TeaSharp.Controls.ActivityFeedItemKind`
-- `TeaSharp.Controls.NotificationInbox`
 - `TeaSharp.Controls.InboxItem`
 - `TeaSharp.Controls.KeyBindingHelpDialog`
 - `TeaSharp.Controls.KeyBindingItem`
@@ -217,6 +216,25 @@ The intended beginner path is:
 - treat `TeaSharp.Core` as the low-level advanced lane, not default onboarding
 - use semantic theme tokens and palette-driven styling on the default path
 
+### Notification Surface Guidance (Tier 1)
+
+- primary onboarding path: `TeaSharp.Controls.Notifications`
+- advanced/devops path: `TeaSharp.Controls.NotificationInbox` (Tier 2)
+- shared item model: `TeaSharp.Controls.InboxItem`
+
+Current `Notifications` primary API surface:
+
+- `Items`
+- `SelectedIndex`
+- `SelectedItem`
+- `SetItems(IEnumerable<InboxItem>)`
+- `Add(InboxItem)`
+- `SetSelectedIndex(int)`
+- `Select(int)` (compatibility wrapper)
+- `MarkAllRead()`
+- `RemoveSelected()`
+- `Push(...)` remains supported and forwards to `Add(...)`
+
 ## Tier 2: Advanced But Supported
 
 These APIs remain public because they still offer real value, but they should not dominate the default path.
@@ -240,6 +258,7 @@ These APIs remain public because they still offer real value, but they should no
 - `TeaSharp.Hosting.EventDecodeResult`
 - `TeaSharp.Hosting.EventDecoder`
 - `TeaSharp.Hosting.TerminalCursorStyle`
+- `TeaSharp.Controls.NotificationInbox` (advanced dev/ops inbox workflow)
 - `TeaSharp.Controls.BarChartOptions`
 - `TeaSharp.Controls.LineChartOptions`
 - `TeaSharp.Controls.LinePlotOptions`
@@ -377,7 +396,7 @@ Current shipped theme mapping is centralized in `TeaSharp.Styles.TeaThemeControl
 Overlay glyph cookbook snippets for `MenuBarGlyphSet`, `ContextMenuGlyphSet`, and `CommandPaletteGlyphSet` are documented in [theme-system-v1.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/theme-system-v1.md).
 Border override, dropdown/tree glyph-set, and data marker/separator cookbook snippets are documented in [theme-system-v1.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/theme-system-v1.md).
 Wave 2 query/analytics controls (`PivotTable`, `QueryBuilder`, `RichTextView`) are mapped with the same semantic-token and border-style contract.
-Wave 3 dev/ops controls (`JsonTreeView`, `CommandOutput`, `LogTailPanel`, `ActivityFeed`, `NotificationInbox`, `KeyBindingHelpDialog`) are mapped with the same semantic-token contract.
+Wave 3 dev/ops controls (`JsonTreeView`, `CommandOutput`, `LogTailPanel`, `ActivityFeed`, `NotificationInbox`, `KeyBindingHelpDialog`) are mapped with the same semantic-token contract. For onboarding/default app flows, use `Notifications`; treat `NotificationInbox` as advanced dev/ops surface.
 Wave 4 batch A + B controls (`DockWorkspace`, `PaneTabs`, `PaletteEditor`, `Heatmap`, `TreeMapChart`, `TerminalPanel`, `ProcessListView`) are integrated and mapped in `TeaThemeControlExtensions.Workspace.cs`.
 Wave 1 app-shell/forms controls (`Form`, `FieldSet`, `DataForm<TModel>`, `Wizard`, `SplitView`, `InspectorPanel`) are integrated and mapped in `TeaThemeControlExtensions.FormsAndShell.cs`.
 Reusable consumer-level override helpers are available via `TeaThemeOverrideBundle.CreateDashboardBundle(...)` and `ApplyThemeAndDashboardOverrides(...)` extensions for `ListView<T>`, `Table`, `Notifications`, `LogView`, `Button`, and `Dialog`.

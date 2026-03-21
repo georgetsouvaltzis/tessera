@@ -126,6 +126,7 @@ V1 theming is semantic-token based with override hierarchy:
 - bordered query/analytics controls (`PivotTable`, `QueryBuilder`, `RichTextView`) map `BorderStyleText`/`FocusedBorderStyleText` to semantic border/focus tokens by default
 - mapped explorer/feedback controls include `DiffView`, `PropertyGrid`, `FileExplorer`, `FuzzyFinder`, `ToastCenter`
 - mapped dev/ops workflow controls include `JsonTreeView`, `TraceViewer`, `CommandOutput`, `LogTailPanel`, `TaskRunnerPanel`, `ActivityFeed`, `NotificationInbox`, `KeyBindingHelpDialog`
+- notification guidance: use `Notifications` as the default/onboarding notification feed; treat `NotificationInbox` as advanced/devops workflow surface
 - bordered dev/ops workflow controls (`JsonTreeView`, `TraceViewer`, `CommandOutput`, `LogTailPanel`, `TaskRunnerPanel`, `ActivityFeed`) map `BorderStyleText`/`FocusedBorderStyleText` to semantic border/focus tokens by default
 - mapped workspace/visual-data controls include `DockWorkspace`, `PaneTabs`, `PaletteEditor`, `Heatmap`, `TreeMapChart`, `TerminalPanel`, `ProcessListView`
 - `TeaThemeControlExtensions.Workspace.cs` maps all workspace/visual-data controls in this set
@@ -298,7 +299,7 @@ Root controls currently include:
 - `ActivityFeed`
 - `ActivityFeedItem`
 - `ActivityFeedItemKind`
-- `NotificationInbox`
+- `NotificationInbox` (advanced dev/ops inbox surface)
 - `InboxItem`
 - `KeyBindingHelpDialog`
 - `KeyBindingItem`
@@ -367,6 +368,24 @@ Root controls currently include:
 - `PlotPanelOptions`
 
 These types provide the default control vocabulary. Most promoted legacy `*Component` names are now internal bridges behind these controls.
+
+### Notification Surface Guidance
+
+- primary path: `Notifications`
+- advanced path: `NotificationInbox`
+- shared item model: `InboxItem`
+
+`Notifications` primary API includes:
+
+- `Items`
+- `SelectedIndex`
+- `SelectedItem`
+- `SetItems(IEnumerable<InboxItem>)`
+- `Add(InboxItem)`
+- `SetSelectedIndex(int)` / `Select(int)`
+- `MarkAllRead()`
+- `RemoveSelected()`
+- `Push(...)` remains supported for append-by-message workflows
 
 ### Plotting and Dashboard Authoring Guidance
 

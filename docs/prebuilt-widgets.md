@@ -20,7 +20,7 @@ Preferred public catalog:
 7. `Dialog`
 8. `ProgressBar`
 9. `LogView`
-10. `Notifications`
+10. `Notifications` (primary notification feed)
 11. `Toggle`
 12. `Slider`
 13. `Spinner`
@@ -117,8 +117,8 @@ Preferred public catalog:
 104. `ActivityFeed`
 105. `ActivityFeedItem`
 106. `ActivityFeedItemKind`
-107. `NotificationInbox`
-108. `InboxItem`
+107. `NotificationInbox` (advanced/devops inbox)
+108. `InboxItem` (shared item model)
 109. `KeyBindingHelpDialog`
 110. `KeyBindingItem`
 111. `TraceViewer`
@@ -220,6 +220,24 @@ var treeTable = new TreeTable("Name", "Value") { ColumnSeparatorText = " │ ", 
 
 - `Notifications`, `LogView`, and `MarkdownView` support `BorderStyleText`/`FocusedBorderStyleText` with theme token mapping.
 - `DiffView`, `PropertyGrid`, `FileExplorer`, `FuzzyFinder`, and `ToastCenter` support the same border-style hooks with theme token mapping.
+
+### Notification Surface Guidance
+
+- onboarding/default path: `Notifications`
+- advanced/devops path: `NotificationInbox`
+- `InboxItem` is shared by both controls
+
+`Notifications` primary APIs:
+
+- `Items`
+- `SelectedIndex`
+- `SelectedItem`
+- `SetItems(IEnumerable<InboxItem>)`
+- `Add(InboxItem)`
+- `SetSelectedIndex(int)` and `Select(int)`
+- `MarkAllRead()`
+- `RemoveSelected()`
+- legacy `Push(...)` remains supported
 
 ### Reusable Theme Override Bundle Helpers
 
@@ -339,7 +357,7 @@ Current shipped `TeaThemeControlExtensions` mappings include:
 - modal/chart summary details: `Dialog` and `Modal` include border text token mapping
 - plotting controls: `Sparkline`, `AreaPlot`, `ScatterPlot`, `Histogram`, `LinePlot`, `PlotPanel`
 - plotting details: bordered plotting controls (`Sparkline`, `AreaPlot`, `LinePlot`, `PlotPanel`) include border text token mapping; `ScatterPlot`/`Histogram` map point or bar + axis + legend tokens
-- dev/ops workflow controls: `JsonTreeView`, `TraceViewer`, `CommandOutput`, `LogTailPanel`, `TaskRunnerPanel`, `ActivityFeed`, `NotificationInbox`, `KeyBindingHelpDialog`
+- dev/ops workflow controls: `JsonTreeView`, `TraceViewer`, `CommandOutput`, `LogTailPanel`, `TaskRunnerPanel`, `ActivityFeed`, `NotificationInbox`, `KeyBindingHelpDialog` (`NotificationInbox` is advanced/devops; default onboarding uses `Notifications`)
 - dev/ops details: bordered controls in this set map border text hooks to semantic border/focus tokens; inbox/help-dialog map semantic title/row/state tokens
 - workspace/visual-data controls: `DockWorkspace`, `PaneTabs`, `PaletteEditor`, `Heatmap`, `TreeMapChart`, `TerminalPanel`, `ProcessListView`
 - workspace/visual-data details: all controls in this set map semantic tokens through `TeaThemeControlExtensions.Workspace.cs`; bordered controls in this set (`DockWorkspace`, `PaneTabs`, `Heatmap`, `TreeMapChart`, `ProcessListView`) map border text hooks by default
