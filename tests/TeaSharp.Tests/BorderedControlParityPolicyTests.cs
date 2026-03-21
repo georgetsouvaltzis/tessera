@@ -87,6 +87,15 @@ internal static class BorderedControlParityPolicyTests
         yield return new TestCase(
             "VisualParityPolicy_BorderedControls_HaveThemeApplyAndDefaultsExtensions",
             BorderedControls_HaveThemeApplyAndDefaultsExtensions);
+        yield return new TestCase(
+            "VisualParityPolicy_BorderedControls_HaveThemeOverrideExtensions",
+            BorderedControls_HaveThemeOverrideExtensions);
+        yield return new TestCase(
+            "VisualParityPolicy_BorderedControls_ExposePrimaryAndFocusVisualHooks",
+            BorderedControls_ExposePrimaryAndFocusVisualHooks);
+        yield return new TestCase(
+            "VisualParityPolicy_BorderedControls_WithFocusMarker_ExposeShowToggleAndSetter",
+            BorderedControls_WithFocusMarker_ExposeShowToggleAndSetter);
     }
 
     private static Task BorderedControlManifest_MatchesPublicBorderedControls()
@@ -109,6 +118,8 @@ internal static class BorderedControlParityPolicyTests
         var borderedControls = DiscoverBorderedControls();
         var missingBorderStyleText = new List<string>();
         var missingFocusedBorderStyleText = new List<string>();
+        var missingBorderStyleSetter = new List<string>();
+        var missingFocusedBorderStyleSetter = new List<string>();
 
         foreach (var controlType in borderedControls)
         {
@@ -117,17 +128,28 @@ internal static class BorderedControlParityPolicyTests
             {
                 missingBorderStyleText.Add(FormatTypeName(controlType));
             }
+            else if (borderStyleProperty.SetMethod is null || !borderStyleProperty.SetMethod.IsPublic)
+            {
+                missingBorderStyleSetter.Add(FormatTypeName(controlType));
+            }
 
             var focusedBorderStyleProperty = controlType.GetProperty(nameof(Button.FocusedBorderStyleText), BindingFlags.Instance | BindingFlags.Public);
             if (focusedBorderStyleProperty?.PropertyType != typeof(TeaStyle))
             {
                 missingFocusedBorderStyleText.Add(FormatTypeName(controlType));
             }
+            else if (focusedBorderStyleProperty.SetMethod is null || !focusedBorderStyleProperty.SetMethod.IsPublic)
+            {
+                missingFocusedBorderStyleSetter.Add(FormatTypeName(controlType));
+            }
         }
 
         TestAssert.True(
-            missingBorderStyleText.Count == 0 && missingFocusedBorderStyleText.Count == 0,
-            $"Bordered controls missing style hook properties. Missing BorderStyleText: {string.Join(", ", missingBorderStyleText)}. Missing FocusedBorderStyleText: {string.Join(", ", missingFocusedBorderStyleText)}.");
+            missingBorderStyleText.Count == 0
+            && missingFocusedBorderStyleText.Count == 0
+            && missingBorderStyleSetter.Count == 0
+            && missingFocusedBorderStyleSetter.Count == 0,
+            $"Bordered controls missing style hook parity. Missing BorderStyleText: {string.Join(", ", missingBorderStyleText)}. Missing FocusedBorderStyleText: {string.Join(", ", missingFocusedBorderStyleText)}. Non-settable BorderStyleText: {string.Join(", ", missingBorderStyleSetter)}. Non-settable FocusedBorderStyleText: {string.Join(", ", missingFocusedBorderStyleSetter)}.");
 
         return Task.CompletedTask;
     }
@@ -156,6 +178,126 @@ internal static class BorderedControlParityPolicyTests
         TestAssert.True(
             missingApplyTheme.Count == 0 && missingApplyThemeDefaults.Count == 0,
             $"Bordered controls missing TeaTheme extension coverage. Missing ApplyTheme(this TControl, TeaTheme): {string.Join(", ", missingApplyTheme)}. Missing ApplyThemeDefaults(this TControl, TeaTheme): {string.Join(", ", missingApplyThemeDefaults)}.");
+
+        return Task.CompletedTask;
+    }
+
+    private static Task BorderedControls_HaveThemeOverrideExtensions()
+    {
+        var borderedControls = DiscoverBorderedControls();
+        var extensionMethods = typeof(TeaThemeControlExtensions)
+            .GetMethods(BindingFlags.Public | BindingFlags.Static);
+        var missingApplyThemeOverride = new List<string>();
+        var missingApplyThemeDefaultsOverride = new List<string>();
+
+        foreach (var controlType in borderedControls)
+        {
+            if (!HasThemeOverrideMethod(extensionMethods, "ApplyTheme", controlType))
+            {
+                missingApplyThemeOverride.Add(FormatTypeName(controlType));
+            }
+
+            if (!HasThemeOverrideMethod(extensionMethods, "ApplyThemeDefaults", controlType))
+            {
+                missingApplyThemeDefaultsOverride.Add(FormatTypeName(controlType));
+            }
+        }
+
+        TestAssert.True(
+            missingApplyThemeOverride.Count == 0 && missingApplyThemeDefaultsOverride.Count == 0,
+            $"Bordered controls missing override-aware TeaTheme extension coverage. Missing ApplyTheme(this TControl, TeaThemeOverrides, TeaTheme, TeaThemeVisualState): {string.Join(", ", missingApplyThemeOverride)}. Missing ApplyThemeDefaults(this TControl, TeaThemeOverrides, TeaTheme, TeaThemeVisualState): {string.Join(", ", missingApplyThemeDefaultsOverride)}.");
+
+        return Task.CompletedTask;
+    }
+
+    private static Task BorderedControls_ExposePrimaryAndFocusVisualHooks()
+    {
+        var borderedControls = DiscoverBorderedControls();
+        var missingPrimaryVisualStyleHooks = new List<string>();
+        var missingFocusedTitleCounterpart = new List<string>();
+        var missingFocusVisualHooks = new List<string>();
+
+        foreach (var controlType in borderedControls)
+        {
+            var teaStyleProperties = controlType
+                .GetProperties(BindingFlags.Instance | BindingFlags.Public)
+                .Where(static property => property.PropertyType == typeof(TeaStyle))
+                .ToArray();
+            var nonBorderStyleProperties = teaStyleProperties
+                .Where(static property =>
+                    !string.Equals(property.Name, nameof(Button.BorderStyleText), StringComparison.Ordinal)
+                    && !string.Equals(property.Name, nameof(Button.FocusedBorderStyleText), StringComparison.Ordinal))
+                .ToArray();
+
+            if (nonBorderStyleProperties.Length == 0)
+            {
+                missingPrimaryVisualStyleHooks.Add(FormatTypeName(controlType));
+            }
+
+            var titleStyleProperty = teaStyleProperties.FirstOrDefault(
+                static property => string.Equals(property.Name, "TitleStyle", StringComparison.Ordinal));
+            if (titleStyleProperty is not null
+                && teaStyleProperties.All(static property => !string.Equals(property.Name, "FocusedTitleStyle", StringComparison.Ordinal)))
+            {
+                missingFocusedTitleCounterpart.Add(FormatTypeName(controlType));
+            }
+
+            var hasFocusedStyleHook = teaStyleProperties.Any(
+                static property => property.Name.Contains("Focused", StringComparison.Ordinal));
+            var hasFocusMarkerHook = controlType.GetProperty("FocusMarker", BindingFlags.Instance | BindingFlags.Public)?.PropertyType == typeof(string);
+            if (!hasFocusedStyleHook && !hasFocusMarkerHook)
+            {
+                missingFocusVisualHooks.Add(FormatTypeName(controlType));
+            }
+        }
+
+        TestAssert.True(
+            missingPrimaryVisualStyleHooks.Count == 0
+            && missingFocusedTitleCounterpart.Count == 0
+            && missingFocusVisualHooks.Count == 0,
+            $"Bordered controls missing visual hook parity. Missing primary style hooks (non-border TeaStyle): {string.Join(", ", missingPrimaryVisualStyleHooks)}. Missing FocusedTitleStyle when TitleStyle is present: {string.Join(", ", missingFocusedTitleCounterpart)}. Missing focus visual hooks (Focused* TeaStyle or FocusMarker): {string.Join(", ", missingFocusVisualHooks)}.");
+
+        return Task.CompletedTask;
+    }
+
+    private static Task BorderedControls_WithFocusMarker_ExposeShowToggleAndSetter()
+    {
+        var borderedControls = DiscoverBorderedControls();
+        var missingShowFocusMarker = new List<string>();
+        var nonSettableFocusMarker = new List<string>();
+        var nonSettableShowFocusMarker = new List<string>();
+
+        foreach (var controlType in borderedControls)
+        {
+            var focusMarkerProperty = controlType.GetProperty("FocusMarker", BindingFlags.Instance | BindingFlags.Public);
+            if (focusMarkerProperty?.PropertyType != typeof(string))
+            {
+                continue;
+            }
+
+            if (focusMarkerProperty.SetMethod is null || !focusMarkerProperty.SetMethod.IsPublic)
+            {
+                nonSettableFocusMarker.Add(FormatTypeName(controlType));
+            }
+
+            var showFocusMarkerProperty = controlType.GetProperty("ShowFocusMarker", BindingFlags.Instance | BindingFlags.Public);
+            if (showFocusMarkerProperty?.PropertyType != typeof(bool))
+            {
+                missingShowFocusMarker.Add(FormatTypeName(controlType));
+                continue;
+            }
+
+            if (showFocusMarkerProperty.SetMethod is null || !showFocusMarkerProperty.SetMethod.IsPublic)
+            {
+                nonSettableShowFocusMarker.Add(FormatTypeName(controlType));
+            }
+        }
+
+        TestAssert.True(
+            missingShowFocusMarker.Count == 0
+            && nonSettableFocusMarker.Count == 0
+            && nonSettableShowFocusMarker.Count == 0,
+            $"Bordered controls with FocusMarker must expose configurable focus marker parity. Missing ShowFocusMarker: {string.Join(", ", missingShowFocusMarker)}. Non-settable FocusMarker: {string.Join(", ", nonSettableFocusMarker)}. Non-settable ShowFocusMarker: {string.Join(", ", nonSettableShowFocusMarker)}.");
 
         return Task.CompletedTask;
     }
@@ -214,6 +356,40 @@ internal static class BorderedControlParityPolicyTests
 
             var parameters = method.GetParameters();
             if (parameters.Length != 2 || parameters[1].ParameterType != typeof(TeaTheme))
+            {
+                continue;
+            }
+
+            if (!MatchesControlType(parameters[0].ParameterType, controlType))
+            {
+                continue;
+            }
+
+            return true;
+        }
+
+        return false;
+    }
+
+    private static bool HasThemeOverrideMethod(MethodInfo[] extensionMethods, string methodName, Type controlType)
+    {
+        foreach (var method in extensionMethods)
+        {
+            if (!string.Equals(method.Name, methodName, StringComparison.Ordinal))
+            {
+                continue;
+            }
+
+            if (!method.IsDefined(typeof(ExtensionAttribute), inherit: false))
+            {
+                continue;
+            }
+
+            var parameters = method.GetParameters();
+            if (parameters.Length != 4
+                || parameters[1].ParameterType != typeof(TeaThemeOverrides)
+                || parameters[2].ParameterType != typeof(TeaTheme)
+                || parameters[3].ParameterType != typeof(TeaThemeVisualState))
             {
                 continue;
             }
