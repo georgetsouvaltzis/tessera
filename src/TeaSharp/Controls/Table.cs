@@ -183,6 +183,57 @@ public sealed class Table : Control
         NormalizePage();
     }
 
+    /// <summary>
+    /// Appends a row to the current table data.
+    /// </summary>
+    /// <param name="row">Row values aligned to table columns.</param>
+    /// <exception cref="ArgumentNullException"><paramref name="row"/> is <see langword="null"/>.</exception>
+    public void AddRow(IReadOnlyList<string> row)
+    {
+        ArgumentNullException.ThrowIfNull(row);
+
+        _rows.Add(row);
+        NormalizeAfterRowMutation();
+    }
+
+    /// <summary>
+    /// Replaces an existing row at the specified index.
+    /// </summary>
+    /// <param name="index">Zero-based row index to replace.</param>
+    /// <param name="row">Replacement row values aligned to table columns.</param>
+    /// <exception cref="ArgumentOutOfRangeException"><paramref name="index"/> is outside the current row range.</exception>
+    /// <exception cref="ArgumentNullException"><paramref name="row"/> is <see langword="null"/>.</exception>
+    public void ReplaceRow(int index, IReadOnlyList<string> row)
+    {
+        ArgumentNullException.ThrowIfNull(row);
+
+        EnsureRowIndexInRange(index);
+        _rows[index] = row;
+        NormalizeAfterRowMutation();
+    }
+
+    /// <summary>
+    /// Removes the row at the specified index.
+    /// </summary>
+    /// <param name="index">Zero-based row index to remove.</param>
+    /// <exception cref="ArgumentOutOfRangeException"><paramref name="index"/> is outside the current row range.</exception>
+    public void RemoveRowAt(int index)
+    {
+        EnsureRowIndexInRange(index);
+
+        _rows.RemoveAt(index);
+        NormalizeAfterRowMutation();
+    }
+
+    /// <summary>
+    /// Removes all rows from the table.
+    /// </summary>
+    public void ClearRows()
+    {
+        _rows.Clear();
+        NormalizeAfterRowMutation();
+    }
+
     public override bool Handle(Message message)
     {
         if (!IsFocused || _columns.Count == 0 || _rows.Count == 0 || message is not KeyPressed key)
@@ -408,6 +459,46 @@ public sealed class Table : Control
         var safePageSize = Math.Max(1, PageSize);
         var pageCount = Math.Max(1, (_rows.Count + safePageSize - 1) / safePageSize);
         PageIndex = Math.Clamp(PageIndex, 0, pageCount - 1);
+    }
+
+    private void NormalizeAfterRowMutation()
+    {
+        NormalizePage();
+
+        if (_rows.Count == 0)
+        {
+            _hoveredVisibleRow = -1;
+            _selectedVisibleRow = -1;
+            return;
+        }
+
+        var visibleRows = VisibleRowCountForPage();
+        NormalizeVisibleRowPointers(visibleRows);
+    }
+
+    private int VisibleRowCountForPage()
+    {
+        var safePageSize = Math.Max(1, PageSize);
+        var start = PageIndex * safePageSize;
+        if (start >= _rows.Count)
+        {
+            return 0;
+        }
+
+        return Math.Min(safePageSize, _rows.Count - start);
+    }
+
+    private void EnsureRowIndexInRange(int index)
+    {
+        if ((uint)index < (uint)_rows.Count)
+        {
+            return;
+        }
+
+        throw new ArgumentOutOfRangeException(
+            nameof(index),
+            index,
+            $"Index must be within [0, {_rows.Count - 1}] for the current row collection.");
     }
 
     private void NormalizeVisibleRowPointers(int visibleRows)
