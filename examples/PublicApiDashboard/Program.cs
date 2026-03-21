@@ -348,69 +348,28 @@ internal sealed class PublicApiDashboardApp : TeaApp
         var theme = _useRosePine
             ? TeaThemes.RosePine(RosePineVariant.Moon)
             : TeaThemes.Catppuccin(CatppuccinVariant.Macchiato);
+        var bundle = TeaThemeOverrideBundle.CreateDashboardBundle(theme, focusMarker: "◆");
 
         _navigation.ApplyTheme(theme);
-        _deploy.ApplyTheme(theme);
-        _serviceList.ApplyTheme(theme);
-        _metricsTable.ApplyTheme(theme);
-        _activityLog.ApplyTheme(theme);
-        _notifications.ApplyTheme(theme);
+        _deploy.ApplyThemeAndDashboardOverrides(bundle);
+        _serviceList.ApplyThemeAndDashboardOverrides(bundle);
+        _metricsTable.ApplyThemeAndDashboardOverrides(bundle);
+        _activityLog.ApplyThemeAndDashboardOverrides(bundle);
+        _notifications.ApplyThemeAndDashboardOverrides(bundle);
         _selectionSummary.ApplyTheme(theme);
         _status.ApplyTheme(theme);
-        _confirmDeploy.ApplyTheme(theme);
-
-        var selectedRowStyle = theme.Selection.Foreground.Merge(theme.Selection.Background);
-        var focusedBorder = theme.Border.Focused.Merge(theme.Focus.Border);
+        _confirmDeploy.ApplyThemeAndDashboardOverrides(bundle);
 
         _navigation.TitleStyle = theme.Accent.Primary.WithBold();
         _navigation.FocusedTitleStyle = theme.Focus.Title.Merge(theme.Accent.Primary).WithBold();
-
-        _serviceList.TitleStyle = theme.Accent.Primary.WithBold();
-        _serviceList.FocusedTitleStyle = theme.Focus.Title.WithBold();
-        _serviceList.BorderStyleText = theme.Border.Strong;
-        _serviceList.FocusedBorderStyleText = focusedBorder;
-        _serviceList.DefaultRowStyle = theme.Text.Secondary;
-        _serviceList.SelectedRowStyle = selectedRowStyle.WithBold();
-        _serviceList.HoveredRowStyle = theme.Accent.Secondary.WithUnderline();
-
-        _metricsTable.TitleStyle = theme.Accent.Primary.WithBold();
-        _metricsTable.FocusedTitleStyle = theme.Focus.Title.WithBold();
-        _metricsTable.BorderStyleText = theme.Border.Strong;
-        _metricsTable.FocusedBorderStyleText = focusedBorder;
-        _metricsTable.HeaderStyle = theme.Text.Primary.WithBold();
-        _metricsTable.RowStyle = theme.Text.Secondary;
-        _metricsTable.SelectedRowStyle = selectedRowStyle.WithBold();
-        _metricsTable.HoveredRowStyle = theme.Accent.Secondary.WithUnderline();
-
-        _activityLog.BorderStyleText = theme.Border.Strong;
-        _activityLog.FocusedBorderStyleText = focusedBorder;
-        _activityLog.EntryStyle = theme.Text.Secondary;
-
-        _notifications.BorderStyleText = theme.Border.Strong;
-        _notifications.FocusedBorderStyleText = focusedBorder;
-        _notifications.SelectedItemStyle = selectedRowStyle.WithBold();
-        _notifications.HoveredItemStyle = theme.Accent.Secondary.WithUnderline();
-        _notifications.UnreadItemStyle = theme.Text.Primary.WithBold();
-
-        _deploy.BorderStyleText = theme.Border.Strong;
-        _deploy.FocusedBorderStyleText = focusedBorder;
-        _deploy.LabelStyle = theme.Text.Primary.WithBold();
-        _deploy.FocusedLabelStyle = theme.Accent.Primary.WithBold();
-        _deploy.PressedLabelStyle = selectedRowStyle.WithBold();
-
         _selectionSummary.BorderStyleText = theme.Border.Default;
-        _selectionSummary.FocusedBorderStyleText = focusedBorder;
+        _selectionSummary.FocusedBorderStyleText = bundle.FocusedBorderStyleText;
         _selectionSummary.TextStyle = theme.Text.Primary;
 
         _status.Fill = '·';
         _status.FillStyle = theme.Surface.Panel;
         _status.LeftTextStyle = theme.Text.Secondary.WithBold();
         _status.RightTextStyle = theme.Accent.Secondary;
-
-        _confirmDeploy.FocusMarker = "◆";
-        _confirmDeploy.BorderStyleText = theme.Border.Strong;
-        _confirmDeploy.FocusedBorderStyleText = focusedBorder;
-        _confirmDeploy.BodyTextStyle = theme.Text.Primary;
     }
 }
 

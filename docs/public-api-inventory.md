@@ -29,6 +29,8 @@ These are the types new applications should discover first.
 - `TeaSharp.Styles.TeaStyle`
 - `TeaSharp.Styles.AnsiColor`
 - `TeaSharp.Styles.TeaFontWeight`
+- `TeaSharp.Styles.TeaThemeOverrideBundle`
+- `TeaSharp.Styles.TeaThemeOverrideBundleExtensions`
 - `Screen`
 - `ScreenContext`
 - `ScreenOptions`
@@ -377,6 +379,7 @@ Wave 2 query/analytics controls (`PivotTable`, `QueryBuilder`, `RichTextView`) a
 Wave 3 dev/ops controls (`JsonTreeView`, `CommandOutput`, `LogTailPanel`, `ActivityFeed`, `NotificationInbox`, `KeyBindingHelpDialog`) are mapped with the same semantic-token contract.
 Wave 4 batch A + B controls (`DockWorkspace`, `PaneTabs`, `PaletteEditor`, `Heatmap`, `TreeMapChart`, `TerminalPanel`, `ProcessListView`) are integrated and mapped in `TeaThemeControlExtensions.Workspace.cs`.
 Wave 1 app-shell/forms controls (`Form`, `FieldSet`, `DataForm<TModel>`, `Wizard`, `SplitView`, `InspectorPanel`) are integrated and mapped in `TeaThemeControlExtensions.FormsAndShell.cs`.
+Reusable consumer-level override helpers are available via `TeaThemeOverrideBundle.CreateDashboardBundle(...)` and `ApplyThemeAndDashboardOverrides(...)` extensions for `ListView<T>`, `Table`, `Notifications`, `LogView`, `Button`, and `Dialog`.
 
 ## State-Style Naming Matrix (Tier 1 Consumer Quick Lookup)
 

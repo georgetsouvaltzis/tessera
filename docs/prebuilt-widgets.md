@@ -221,6 +221,19 @@ var treeTable = new TreeTable("Name", "Value") { ColumnSeparatorText = " │ ", 
 - `Notifications`, `LogView`, and `MarkdownView` support `BorderStyleText`/`FocusedBorderStyleText` with theme token mapping.
 - `DiffView`, `PropertyGrid`, `FileExplorer`, `FuzzyFinder`, and `ToastCenter` support the same border-style hooks with theme token mapping.
 
+### Reusable Theme Override Bundle Helpers
+
+- `TeaThemeOverrideBundle.CreateDashboardBundle(theme, focusMarker)` precomputes common override styles from one `TeaTheme`.
+- `ApplyThemeAndDashboardOverrides(...)` extensions reduce repeated per-control assignments for `ListView<T>`, `Table`, `Notifications`, `LogView`, `Button`, and `Dialog`.
+
+```csharp
+var bundle = TeaThemeOverrideBundle.CreateDashboardBundle(theme, focusMarker: "◆");
+serviceList.ApplyThemeAndDashboardOverrides(bundle);
+metricsTable.ApplyThemeAndDashboardOverrides(bundle);
+notifications.ApplyThemeAndDashboardOverrides(bundle);
+activityLog.ApplyThemeAndDashboardOverrides(bundle);
+```
+
 ### Latest Border Hook Rollout (Group1 and Group2)
 
 - `Button`, `Label`, `ProgressBar`, `Toggle`, `Slider`, and `Spinner` expose `BorderStyleText`/`FocusedBorderStyleText`.
