@@ -63,15 +63,15 @@ Correctness is a continuous gate across all phases: fix regressions at source an
   - widget roadmap backlog is zero across Waves 1-4 in [widget-roadmap-v1.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/widget-roadmap-v1.md)
   - Wave 1 app-shell/forms tranche integrated in docs+catalog/theme coverage (`Form`, `FieldSet`, `DataForm<TModel>`, `Wizard`, `SplitView`, `InspectorPanel`)
   - Wave 4 batch A + B integrated in docs+catalog/theme coverage (`DockWorkspace`, `PaneTabs`, `PaletteEditor`, `Heatmap`, `TreeMapChart`, `TerminalPanel`, `ProcessListView`)
-- **M3: Visual Quality Full Polish Pass** -> **In progress**
-  - visual polish implementation evidence landed:
+- **M3: Visual Quality Full Polish Pass** -> **Done**
+  - visual polish closure evidence landed:
     - `1c43dbe` -> WidgetGallery polished default theme/layout slice
     - `d3d7065` -> Choice/ComboBox/TreeView border+glyph+focus-marker token override slice
-    - `1dba5bc` + `3731c50` -> visual regression/assertion updates and decoder leak fix
     - `9ea516e` + `8e778d1` -> cross-control focus-marker parity wiring follow-up
+    - `1dba5bc` + `3731c50` -> visual regression/assertion updates and decoder leak fix
     - `cf3e8a1` -> focus-marker policy/regression test follow-up
+  - runtime visual sanity artifacts exist under `.artifacts/screenshots/*`; current text-capture scans show no `<...;...M` leakage patterns
   - latest workspace verification on March 21, 2026 is green (`dotnet test TeaSharp.slnx --no-build`, `dotnet build TeaSharp.Examples.slnx --no-restore --nologo -v minimal`)
-  - M3 is not closed until the full [Visual Quality Full Polish Checklist](#visual-quality-full-polish-checklist-phase-3-gate) is explicitly satisfied
 - **M4: API Freeze + Cleanup** -> **In progress**
   - naming clarity and XML commenting gates active for all V1-touching API updates
 - **M5: Performance Gate + Benchmarks + Docs Freeze** -> **Pending manual signoff**
@@ -195,6 +195,7 @@ Release approval rule: M5 is only complete when all four rows above are moved fr
 
 ## Parallelization Constraints
 - Parallel work is allowed only within the active phase in the authoritative execution order.
+- Current active phase: **M4 API Freeze + Cleanup** (M3 closed).
 - Do not start phase N+1 before phase N exit criteria are satisfied.
 - Within a phase:
   - parallelize only with disjoint file ownership.
@@ -255,6 +256,8 @@ Coordination rules:
 - Merge checkpoints at each milestone.
 
 ## Agent Coordination Checkpoints
+Current active checkpoint: **C4: API Freeze Exit**.
+
 - **C0: Matrix Ready**
   - Required: lane ownership map confirmed and terminal verification inputs agreed.
   - Exit: terminal compatibility phase can begin.
