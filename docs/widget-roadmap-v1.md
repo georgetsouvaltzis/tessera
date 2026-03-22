@@ -225,10 +225,10 @@ Landed controls from the expansion tranche:
 | `DashboardGrid` | `8593562`, `4e005ed` | implemented; deterministic render/interaction tests present in `DashboardGridControlTests`; included in passing targeted suite |
 | `QuickOpenOverlay` | `d91c934` | implemented; keyboard/pointer/submit + deterministic render tests present in `QuickOpenOverlayControlTests`; included in passing targeted suite |
 | `BulletChart` | `dfd4221`, `c681b64`, `4e005ed` | implemented; style-focused test stabilization landed; included in passing targeted suite |
-| `ResizablePaneGroup` | `77cc95d` | implemented; selection/resize/style + deterministic render tests present; included in passing targeted suite |
-| `SideNavRail` | `d236de2` | implemented; keyboard/pointer/activation/style tests present; included in passing targeted suite |
-| `TokenEditor` | `7fbf7be` | implemented; add/remove/navigation/style tests present; currently passing in targeted suite reruns |
-| `HealthBoard` | `18adc16` | implemented; severity/selection/ack/style tests present; included in passing targeted suite |
+| `ResizablePaneGroup` | `77cc95d`, `1c1b748` | implemented; selection/resize/style + deterministic render tests present; theme/parity wiring restored; included in passing targeted suite |
+| `SideNavRail` | `d236de2`, `1c1b748` | implemented; keyboard/pointer/activation/style tests present; theme/parity wiring restored; included in passing targeted suite |
+| `TokenEditor` | `7fbf7be`, `1c1b748` | implemented; add/remove/navigation/style tests present; theme/parity wiring restored; currently passing in targeted suite reruns |
+| `HealthBoard` | `18adc16`, `1c1b748` | implemented; severity/selection/ack/style tests present; theme/parity wiring restored; included in passing targeted suite |
 | `JumpList` | `187468c`, `03c7a43` | implemented; activation/navigation/style tests present in `JumpListControlTests`; included in passing targeted suite |
 | `AutocompleteInput` | `50212de`, `be23de7`, `03c7a43` | implemented; suggestion ranking/commit/style behavior stabilized; included in passing targeted suite |
 | `BoxPlot` | `6ae3c5b`, `03c7a43` | implemented; deterministic render/style tests present in `BoxPlotControlTests`; included in passing targeted suite |
@@ -238,8 +238,8 @@ Targeted verification command (current host):
 
 Outstanding for this tranche (do not mark done yet):
 
-- Theme extension parity is confirmed for `BulletChart`, `DashboardGrid`, `JumpList`, `AutocompleteInput`, and `BoxPlot` (`4e005ed`, `03c7a43`).
-- `QuickOpenOverlay`, `ResizablePaneGroup`, `SideNavRail`, `TokenEditor`, and `HealthBoard` still need the same `ApplyTheme`/`ApplyThemeDefaults` coverage before tranche closure.
+- Theme extension parity is confirmed for `BulletChart`, `DashboardGrid`, `HealthBoard`, `ResizablePaneGroup`, `SideNavRail`, `TokenEditor`, `JumpList`, `AutocompleteInput`, and `BoxPlot` (`4e005ed`, `1c1b748`, `03c7a43`).
+- `QuickOpenOverlay` still needs typed `ApplyTheme`/`ApplyThemeDefaults` coverage before tranche closure.
 
 ## Dependency Graph (Build Order)
 
