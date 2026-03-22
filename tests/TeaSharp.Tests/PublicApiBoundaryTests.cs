@@ -11,12 +11,14 @@ internal static class PublicApiBoundaryTests
         "C#-first",
         "TeaSharp.Core",
         "TeaSharp.Hosting",
+        "opt-in",
         "EventHandler",
         "Update(...)",
         "Build(...)",
     ];
 
     private static readonly Regex TeaSharpCoreImportRegex = new(@"(?m)^\s*using\s+.*TeaSharp\.Core.*;", RegexOptions.Compiled);
+    private static readonly Regex TeaSharpHostingImportRegex = new(@"(?m)^\s*using\s+.*TeaSharp\.Hosting.*;", RegexOptions.Compiled);
     private static readonly Regex DependencyInjectionImportRegex = new(@"(?m)^\s*using\s+.*Microsoft\.Extensions\.DependencyInjection.*;", RegexOptions.Compiled);
 
     private static readonly string[] CanonicalExampleProjectPaths =
@@ -59,6 +61,9 @@ internal static class PublicApiBoundaryTests
         yield return new TestCase(
             "PublicApiBoundary_CanonicalExampleProgramsDoNotImportDependencyInjection",
             CanonicalExamplePrograms_DoNotImportDependencyInjection);
+        yield return new TestCase(
+            "PublicApiBoundary_CanonicalExampleProgramsDoNotImportTeaSharpHosting",
+            CanonicalExamplePrograms_DoNotImportTeaSharpHosting);
         yield return new TestCase(
             "PublicApiBoundary_ExamplesSolutionIncludesCanonicalProjects",
             ExamplesSolution_IncludesCanonicalProjects);
@@ -176,6 +181,22 @@ internal static class PublicApiBoundaryTests
         TestAssert.True(
             offenders.Length == 0,
             $"Canonical examples should not depend on Microsoft.Extensions.DependencyInjection. Offenders: {string.Join(", ", offenders)}.");
+
+        return Task.CompletedTask;
+    }
+
+    private static Task CanonicalExamplePrograms_DoNotImportTeaSharpHosting()
+    {
+        var repoRoot = GetRepoRoot();
+        var offenders = CanonicalExampleProjectPaths
+            .Select(path => path.Replace(".csproj", "/Program.cs", StringComparison.Ordinal))
+            .Where(path => File.Exists(Path.Combine(repoRoot, path)))
+            .Where(path => TeaSharpHostingImportRegex.IsMatch(File.ReadAllText(Path.Combine(repoRoot, path))))
+            .ToArray();
+
+        TestAssert.True(
+            offenders.Length == 0,
+            $"Canonical examples should not import TeaSharp.Hosting in the default onboarding path. Offenders: {string.Join(", ", offenders)}.");
 
         return Task.CompletedTask;
     }

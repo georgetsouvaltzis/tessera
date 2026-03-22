@@ -9,7 +9,7 @@ TeaSharp supports two intentional product layers:
 - `TeaSharp`: primary app-authoring surface for most C# developers building TUIs.
 - `TeaSharp.Core`: low-level product for expert/runtime-driven scenarios.
 
-Advanced host seams (`TeaSharp.Hosting`) remain supported, but they are not the beginner path.
+Advanced host seams (`TeaSharp.Hosting`) remain supported as an opt-in lane, but they are not the beginner path.
 
 ## C#-First Rules
 
@@ -79,7 +79,7 @@ Alternative composition surfaces may remain public for advanced scenarios, but d
 
 - Normal app examples should not import `TeaSharp.Core.*`.
 - Public docs should use `TeaSharp.Styles` (not legacy namespace names).
-- Runtime knobs for advanced hosting should live under `TeaSharp.Hosting` discoverability, not the default path.
+- Runtime knobs for advanced hosting should live under `TeaSharp.Hosting` discoverability as opt-in APIs, not the default path.
 - Images are V1.1 scope, not V1 scope.
 
 ## Review Checklist
