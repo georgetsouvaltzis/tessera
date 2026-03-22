@@ -7,11 +7,15 @@ namespace TeaSharp.Controls;
 /// <summary>
 /// Represents a single-line input with in-place auto-complete suggestions.
 /// </summary>
+/// <remarks>
+/// Suggestions are filtered using case-insensitive substring matching against <see cref="Text" /> and ranked by earliest match position.
+/// </remarks>
 public sealed partial class AutocompleteInput : Control
 {
     private readonly TextInputModel _input = new();
     private readonly List<string> _suggestions = [];
     private readonly List<int> _filteredSuggestionIndices = [];
+    private readonly List<(int SourceIndex, int MatchIndex)> _matchBuffer = [];
     private AutocompleteInputGlyphSet _glyphs = AutocompleteInputGlyphSet.Default;
     private int _selectedSuggestionIndex = -1;
     private int _hoveredSuggestionIndex = -1;
@@ -265,13 +269,34 @@ public sealed partial class AutocompleteInput : Control
 
         _filteredSuggestionIndices.Clear();
         var text = _input.Value;
-        for (var index = 0; index < _suggestions.Count; index++)
+        if (string.IsNullOrEmpty(text))
         {
-            var suggestion = _suggestions[index];
-            if (string.IsNullOrEmpty(text)
-                || suggestion.Contains(text, StringComparison.OrdinalIgnoreCase))
+            for (var index = 0; index < _suggestions.Count; index++)
             {
                 _filteredSuggestionIndices.Add(index);
+            }
+        }
+        else
+        {
+            _matchBuffer.Clear();
+            for (var index = 0; index < _suggestions.Count; index++)
+            {
+                var matchIndex = _suggestions[index].IndexOf(text, StringComparison.OrdinalIgnoreCase);
+                if (matchIndex >= 0)
+                {
+                    _matchBuffer.Add((index, matchIndex));
+                }
+            }
+
+            _matchBuffer.Sort(static (left, right) =>
+            {
+                var rank = left.MatchIndex.CompareTo(right.MatchIndex);
+                return rank != 0 ? rank : left.SourceIndex.CompareTo(right.SourceIndex);
+            });
+
+            for (var index = 0; index < _matchBuffer.Count; index++)
+            {
+                _filteredSuggestionIndices.Add(_matchBuffer[index].SourceIndex);
             }
         }
 

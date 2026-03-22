@@ -80,7 +80,7 @@ public sealed partial class AutocompleteInput
         var suggestionMarkerWidth = ControlTextLayout.MeasureDisplayWidth(Glyphs.SuggestionMarker);
         var separatorWidth = ControlTextLayout.MeasureDisplayWidth(Glyphs.MarkerSeparator);
         var prefixWidth = suggestionMarkerWidth + separatorWidth;
-        var labelWidth = Math.Max(1, content.Width - prefixWidth);
+        var emptyPrefix = new string(' ', prefixWidth);
 
         for (var row = 0; row < visibleSuggestions; row++)
         {
@@ -90,11 +90,11 @@ public sealed partial class AutocompleteInput
             var hovered = row == _hoveredSuggestionIndex;
             var prefix = selected
                 ? string.Concat(Glyphs.SuggestionMarker, Glyphs.MarkerSeparator)
-                : new string(' ', prefixWidth);
+                : emptyPrefix;
+            var line = string.Concat(prefix, suggestion);
 
             var style = ResolveSuggestionStyle(row, hovered, selected);
-            canvas.WriteText(content.X, y, ApplyStyle(prefix, style), prefixWidth);
-            canvas.WriteText(content.X + prefixWidth, y, ApplyStyle(suggestion, style), labelWidth);
+            canvas.WriteText(content.X, y, ApplyStyle(line, style), content.Width);
         }
     }
 
