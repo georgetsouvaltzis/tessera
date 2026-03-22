@@ -202,6 +202,72 @@ public static partial class TeaThemeControlExtensions
         return control.ApplyThemeDefaults(overrides.Resolve(control, baseTheme, state));
     }
 
+    public static AutocompleteInput ApplyTheme(this AutocompleteInput control, TeaTheme theme)
+    {
+        ArgumentNullException.ThrowIfNull(control);
+        ArgumentNullException.ThrowIfNull(theme);
+
+        control.TitleStyle = theme.Text.Secondary;
+        control.FocusedTitleStyle = theme.Focus.Title;
+        control.InputTextStyle = theme.Text.Primary;
+        control.PlaceholderTextStyle = theme.Text.Muted;
+        control.PopupStyle = theme.Text.Secondary;
+        control.SuggestionStyle = theme.Text.Primary;
+        control.HoveredSuggestionStyle = theme.Accent.Secondary;
+        control.SelectedSuggestionStyle = theme.Selection.Foreground.Merge(theme.Selection.Background);
+        control.FocusedSelectedSuggestionStyle = theme.Focus.Ring;
+        control.DisabledStyle = theme.Text.Muted;
+        control.BorderStyleText = theme.Border.Default;
+        control.FocusedBorderStyleText = theme.Border.Focused.Merge(theme.Focus.Border);
+        control.CommitMarkerStyle = theme.Accent.Primary;
+        control.FocusMarker = theme.Focus.Marker;
+        return control;
+    }
+
+    public static AutocompleteInput ApplyTheme(
+        this AutocompleteInput control,
+        TeaThemeOverrides overrides,
+        TeaTheme baseTheme,
+        TeaThemeVisualState state = TeaThemeVisualState.Default)
+    {
+        ArgumentNullException.ThrowIfNull(overrides);
+        return control.ApplyTheme(overrides.Resolve(control, baseTheme, state));
+    }
+
+    public static AutocompleteInput ApplyThemeDefaults(this AutocompleteInput control, TeaTheme theme)
+    {
+        ArgumentNullException.ThrowIfNull(control);
+        ArgumentNullException.ThrowIfNull(theme);
+
+        control.TitleStyle = ApplyDefault(control.TitleStyle, theme.Text.Secondary);
+        control.FocusedTitleStyle = ApplyDefault(control.FocusedTitleStyle, theme.Focus.Title);
+        control.InputTextStyle = ApplyDefault(control.InputTextStyle, theme.Text.Primary);
+        control.PlaceholderTextStyle = ApplyDefault(control.PlaceholderTextStyle, theme.Text.Muted);
+        control.PopupStyle = ApplyDefault(control.PopupStyle, theme.Text.Secondary);
+        control.SuggestionStyle = ApplyDefault(control.SuggestionStyle, theme.Text.Primary);
+        control.HoveredSuggestionStyle = ApplyDefault(control.HoveredSuggestionStyle, theme.Accent.Secondary);
+        control.SelectedSuggestionStyle = ApplyDefault(
+            control.SelectedSuggestionStyle,
+            theme.Selection.Foreground.Merge(theme.Selection.Background));
+        control.FocusedSelectedSuggestionStyle = ApplyDefault(control.FocusedSelectedSuggestionStyle, theme.Focus.Ring);
+        control.DisabledStyle = ApplyDefault(control.DisabledStyle, theme.Text.Muted);
+        control.BorderStyleText = ApplyDefault(control.BorderStyleText, theme.Border.Default);
+        control.FocusedBorderStyleText = ApplyDefault(control.FocusedBorderStyleText, theme.Border.Focused.Merge(theme.Focus.Border));
+        control.CommitMarkerStyle = ApplyDefault(control.CommitMarkerStyle, theme.Accent.Primary);
+        control.FocusMarker = ApplyDefault(control.FocusMarker, theme.Focus.Marker);
+        return control;
+    }
+
+    public static AutocompleteInput ApplyThemeDefaults(
+        this AutocompleteInput control,
+        TeaThemeOverrides overrides,
+        TeaTheme baseTheme,
+        TeaThemeVisualState state = TeaThemeVisualState.Default)
+    {
+        ArgumentNullException.ThrowIfNull(overrides);
+        return control.ApplyThemeDefaults(overrides.Resolve(control, baseTheme, state));
+    }
+
     public static MenuBar ApplyTheme(this MenuBar control, TeaTheme theme)
     {
         ArgumentNullException.ThrowIfNull(control);

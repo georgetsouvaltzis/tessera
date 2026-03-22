@@ -311,4 +311,72 @@ public static partial class TeaThemeControlExtensions
         ArgumentNullException.ThrowIfNull(overrides);
         return control.ApplyThemeDefaults(overrides.Resolve(control, baseTheme, state));
     }
+
+    public static BoxPlot ApplyTheme(this BoxPlot control, TeaTheme theme)
+    {
+        ArgumentNullException.ThrowIfNull(control);
+        ArgumentNullException.ThrowIfNull(theme);
+
+        control.TitleStyle = theme.Text.Secondary;
+        control.FocusedTitleStyle = theme.Focus.Title;
+        control.BorderStyleText = theme.Border.Default;
+        control.FocusedBorderStyleText = theme.Border.Focused.Merge(theme.Focus.Border);
+        control.SeriesStyle = theme.Text.Primary;
+        control.HoveredSeriesStyle = theme.Accent.Secondary;
+        control.SelectedSeriesStyle = theme.Selection.Foreground.Merge(theme.Selection.Background);
+        control.FocusedSelectedSeriesStyle = theme.Focus.Ring;
+        control.QuartileStyle = theme.Accent.Primary;
+        control.MedianStyle = theme.Focus.Ring;
+        control.WhiskerStyle = theme.Text.Secondary;
+        control.MutedSeriesStyle = theme.Text.Muted;
+        control.DisabledSeriesStyle = theme.Text.Muted;
+        control.EmptyStyle = theme.Text.Muted;
+        control.FocusMarker = theme.Focus.Marker;
+        return control;
+    }
+
+    public static BoxPlot ApplyTheme(
+        this BoxPlot control,
+        TeaThemeOverrides overrides,
+        TeaTheme baseTheme,
+        TeaThemeVisualState state = TeaThemeVisualState.Default)
+    {
+        ArgumentNullException.ThrowIfNull(overrides);
+        return control.ApplyTheme(overrides.Resolve(control, baseTheme, state));
+    }
+
+    public static BoxPlot ApplyThemeDefaults(this BoxPlot control, TeaTheme theme)
+    {
+        ArgumentNullException.ThrowIfNull(control);
+        ArgumentNullException.ThrowIfNull(theme);
+
+        control.TitleStyle = ApplyDefault(control.TitleStyle, theme.Text.Secondary);
+        control.FocusedTitleStyle = ApplyDefault(control.FocusedTitleStyle, theme.Focus.Title);
+        control.BorderStyleText = ApplyDefault(control.BorderStyleText, theme.Border.Default);
+        control.FocusedBorderStyleText = ApplyDefault(control.FocusedBorderStyleText, theme.Border.Focused.Merge(theme.Focus.Border));
+        control.SeriesStyle = ApplyDefault(control.SeriesStyle, theme.Text.Primary);
+        control.HoveredSeriesStyle = ApplyDefault(control.HoveredSeriesStyle, theme.Accent.Secondary);
+        control.SelectedSeriesStyle = ApplyDefault(
+            control.SelectedSeriesStyle,
+            theme.Selection.Foreground.Merge(theme.Selection.Background));
+        control.FocusedSelectedSeriesStyle = ApplyDefault(control.FocusedSelectedSeriesStyle, theme.Focus.Ring);
+        control.QuartileStyle = ApplyDefault(control.QuartileStyle, theme.Accent.Primary);
+        control.MedianStyle = ApplyDefault(control.MedianStyle, theme.Focus.Ring);
+        control.WhiskerStyle = ApplyDefault(control.WhiskerStyle, theme.Text.Secondary);
+        control.MutedSeriesStyle = ApplyDefault(control.MutedSeriesStyle, theme.Text.Muted);
+        control.DisabledSeriesStyle = ApplyDefault(control.DisabledSeriesStyle, theme.Text.Muted);
+        control.EmptyStyle = ApplyDefault(control.EmptyStyle, theme.Text.Muted);
+        control.FocusMarker = ApplyDefault(control.FocusMarker, theme.Focus.Marker);
+        return control;
+    }
+
+    public static BoxPlot ApplyThemeDefaults(
+        this BoxPlot control,
+        TeaThemeOverrides overrides,
+        TeaTheme baseTheme,
+        TeaThemeVisualState state = TeaThemeVisualState.Default)
+    {
+        ArgumentNullException.ThrowIfNull(overrides);
+        return control.ApplyThemeDefaults(overrides.Resolve(control, baseTheme, state));
+    }
 }

@@ -11,7 +11,9 @@ internal static class BorderedControlParityPolicyTests
     private static readonly Type[] RegisteredBorderedControls =
     [
         typeof(ActivityFeed),
+        typeof(AutocompleteInput),
         typeof(AreaPlot),
+        typeof(BoxPlot),
         typeof(BulletChart),
         typeof(Button),
         typeof(Choice),
@@ -34,6 +36,7 @@ internal static class BorderedControlParityPolicyTests
         typeof(Heatmap),
         typeof(InspectorPanel),
         typeof(JsonTreeView),
+        typeof(JumpList),
         typeof(KanbanBoard),
         typeof(KeyValueList),
         typeof(Label),
