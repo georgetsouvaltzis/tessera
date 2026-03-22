@@ -63,6 +63,7 @@ Correctness is a continuous gate across all phases: fix regressions at source an
   - widget roadmap backlog is zero across Waves 1-4 in [widget-roadmap-v1.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/widget-roadmap-v1.md)
   - Wave 1 app-shell/forms tranche integrated in docs+catalog/theme coverage (`Form`, `FieldSet`, `DataForm<TModel>`, `Wizard`, `SplitView`, `InspectorPanel`)
   - Wave 4 batch A + B integrated in docs+catalog/theme coverage (`DockWorkspace`, `PaneTabs`, `PaletteEditor`, `Heatmap`, `TreeMapChart`, `TerminalPanel`, `ProcessListView`)
+  - forward-looking expansion backlog (post-current V1 tranche) documented with dependency/lanes plan in `6887517` -> [docs/widget-roadmap-v1.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/widget-roadmap-v1.md), [docs/prebuilt-widgets.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/prebuilt-widgets.md)
 - **M3: Visual Quality Full Polish Pass** -> **Done**
   - visual polish closure evidence landed:
     - `1c43dbe` -> WidgetGallery polished default theme/layout slice
@@ -85,12 +86,20 @@ Correctness is a continuous gate across all phases: fix regressions at source an
       - `d067b1d` -> [src/TeaSharp/Styles/TeaThemeOverrideBundle.cs](/Users/georgetsouvaltzis/Projects/playground/teasharp/src/TeaSharp/Styles/TeaThemeOverrideBundle.cs), [src/TeaSharp/Styles/TeaThemeOverrideBundleExtensions.cs](/Users/georgetsouvaltzis/Projects/playground/teasharp/src/TeaSharp/Styles/TeaThemeOverrideBundleExtensions.cs), [examples/PublicApiDashboard/Program.cs](/Users/georgetsouvaltzis/Projects/playground/teasharp/examples/PublicApiDashboard/Program.cs), [tests/TeaSharp.Tests/ThemeOverrideBundleApiErgonomicsTests.cs](/Users/georgetsouvaltzis/Projects/playground/teasharp/tests/TeaSharp.Tests/ThemeOverrideBundleApiErgonomicsTests.cs)
       - `07ae666` -> [src/TeaSharp/TeaEffects.cs](/Users/georgetsouvaltzis/Projects/playground/teasharp/src/TeaSharp/TeaEffects.cs), [src/TeaSharp/TeaApp.cs](/Users/georgetsouvaltzis/Projects/playground/teasharp/src/TeaSharp/TeaApp.cs), [src/TeaSharp/Internal/TeaPeriodicEffectMessage.cs](/Users/georgetsouvaltzis/Projects/playground/teasharp/src/TeaSharp/Internal/TeaPeriodicEffectMessage.cs), [tests/TeaSharp.Tests/TeaEffectsPeriodicApiErgonomicsTests.cs](/Users/georgetsouvaltzis/Projects/playground/teasharp/tests/TeaSharp.Tests/TeaEffectsPeriodicApiErgonomicsTests.cs)
       - `86df879` -> [src/TeaSharp/Controls/Notifications.cs](/Users/georgetsouvaltzis/Projects/playground/teasharp/src/TeaSharp/Controls/Notifications.cs), [src/TeaSharp/Controls/InboxItem.cs](/Users/georgetsouvaltzis/Projects/playground/teasharp/src/TeaSharp/Controls/InboxItem.cs), [tests/TeaSharp.Tests/NotificationsPrimaryApiTests.cs](/Users/georgetsouvaltzis/Projects/playground/teasharp/tests/TeaSharp.Tests/NotificationsPrimaryApiTests.cs), [docs/public-api-consumer-friction-log.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/public-api-consumer-friction-log.md)
+      - `4d4a391` -> `Notifications.SelectionChanged` event hook landed on primary API path with coverage/docs sync in [src/TeaSharp/Controls/Notifications.cs](/Users/georgetsouvaltzis/Projects/playground/teasharp/src/TeaSharp/Controls/Notifications.cs), [tests/TeaSharp.Tests/NotificationsSelectionChangedEventTests.cs](/Users/georgetsouvaltzis/Projects/playground/teasharp/tests/TeaSharp.Tests/NotificationsSelectionChangedEventTests.cs), [docs/public-api-inventory.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/public-api-inventory.md), [docs/spec.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/spec.md)
+      - `e731edc` -> stepper/wizard selection naming convergence (`Selected*` canonical + compatibility aliases) in [src/TeaSharp/Controls/StepperCurrentStepChangedEventArgs.cs](/Users/georgetsouvaltzis/Projects/playground/teasharp/src/TeaSharp/Controls/StepperCurrentStepChangedEventArgs.cs), [src/TeaSharp/Controls/WizardStepChangedEventArgs.cs](/Users/georgetsouvaltzis/Projects/playground/teasharp/src/TeaSharp/Controls/WizardStepChangedEventArgs.cs), [tests/TeaSharp.Tests/SelectionApiConvergenceTests.cs](/Users/georgetsouvaltzis/Projects/playground/teasharp/tests/TeaSharp.Tests/SelectionApiConvergenceTests.cs)
       - `refactor: normalize setselectedindex across list controls` -> selection mutation API pass across list-like controls (`SetSelectedIndex` normalization surface)
       - `refactor: add selected aliases for selection event args` -> [src/TeaSharp/Controls/KeyValueListSelectionChangedEventArgs.cs](/Users/georgetsouvaltzis/Projects/playground/teasharp/src/TeaSharp/Controls/KeyValueListSelectionChangedEventArgs.cs), [src/TeaSharp/Controls/PropertyGridSelectionChangedEventArgs.cs](/Users/georgetsouvaltzis/Projects/playground/teasharp/src/TeaSharp/Controls/PropertyGridSelectionChangedEventArgs.cs), [src/TeaSharp/Controls/ValidationSelectionChangedEventArgs.cs](/Users/georgetsouvaltzis/Projects/playground/teasharp/src/TeaSharp/Controls/ValidationSelectionChangedEventArgs.cs), [src/TeaSharp/Controls/JsonTreeSelectionChangedEventArgs.cs](/Users/georgetsouvaltzis/Projects/playground/teasharp/src/TeaSharp/Controls/JsonTreeSelectionChangedEventArgs.cs)
       - policy closure evidence: [post-v1-selection-naming-migration.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/post-v1-selection-naming-migration.md)
+    - item `1` + item `6` additional consumer-path evidence: `896c227` -> [examples/ExternalConsumerReviewApp/ExternalConsumerReviewApp.Wave2.cs](/Users/georgetsouvaltzis/Projects/playground/teasharp/examples/ExternalConsumerReviewApp/ExternalConsumerReviewApp.Wave2.cs), [examples/ExternalConsumerReviewApp/Program.cs](/Users/georgetsouvaltzis/Projects/playground/teasharp/examples/ExternalConsumerReviewApp/Program.cs), [docs/external-consumer-review-v1.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/external-consumer-review-v1.md)
+    - item `4` guardrail enforcement evidence: `0a38229` -> [tests/TeaSharp.Tests/BorderedControlParityPolicyTests.cs](/Users/georgetsouvaltzis/Projects/playground/teasharp/tests/TeaSharp.Tests/BorderedControlParityPolicyTests.cs)
+    - item `6` onboarding boundary guard evidence: `9c89036` -> [tests/TeaSharp.Tests/PublicApiBoundaryTests.cs](/Users/georgetsouvaltzis/Projects/playground/teasharp/tests/TeaSharp.Tests/PublicApiBoundaryTests.cs)
   - C4 remains open until all API freeze checklist items are marked complete
 - **M5: Performance Gate + Benchmarks + Docs Freeze** -> **Pending manual signoff**
-  - harness and scenarios are wired; final pass/fail evidence is still required at RC
+  - perf-gate harness scaffolding landed in `35b8fdc` -> [benchmarks/TeaSharp.Benchmarks/SloLatencyBenchmarks.cs](/Users/georgetsouvaltzis/Projects/playground/teasharp/benchmarks/TeaSharp.Benchmarks/SloLatencyBenchmarks.cs), [benchmarks/TeaSharp.Benchmarks/PerfGateRunner.cs](/Users/georgetsouvaltzis/Projects/playground/teasharp/benchmarks/TeaSharp.Benchmarks/PerfGateRunner.cs), [scripts/perf_gate_v1.sh](/Users/georgetsouvaltzis/Projects/playground/teasharp/scripts/perf_gate_v1.sh), [docs/perf-baselines/v1-slo-gate-baseline.json](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/perf-baselines/v1-slo-gate-baseline.json)
+  - verification evidence capture expanded in `5784559` (full-suite sanity evidence recorded in this plan)
+  - outstanding: explicit regression-budget pass/fail verdict against the accepted baseline is not yet attached for the final RC candidate SHA
+  - outstanding: RC checklist/manual signoff rows remain open until owner/date evidence is filled
 
 ## RC Closure Manual Signoffs (Unresolved Until Checked)
 Public V1 RC must not be declared closed from this document alone. The gates below require explicit human signoff with evidence links.
@@ -159,14 +168,14 @@ Release approval rule: M5 is only complete when all four rows above are moved fr
 5. Public XML docs match runtime behavior for any changed API before merge.
 6. Starter docs/examples do not import `TeaSharp.Core.*`.
 
-M4 checklist status snapshot (March 21, 2026):
+M4 checklist status snapshot (March 22, 2026):
 
-- item `1`: **In progress** (consumer-path evidence landed via `c712c2a`)
-- item `2`: **In progress** (no new closure evidence in this slice)
-- item `3`: **In progress** (consumer ergonomics helpers now include dialog/result, table row mutation, header row composition, theme override bundles, auto-rescheduling periodic effects, notification-surface consolidation on `Notifications`, and selection API normalization/alias coverage; post-V1 migration policy is now explicit, but broader API-surface consistency and RC closure evidence are still open)
-- item `4`: **In progress** (SearchResultsView focused-border merge fix landed via `1a4fab8`)
-- item `5`: **In progress** (XML docs coverage updates landed via `4e3a240`)
-- item `6`: **In progress** (PublicApiDashboard + docs sync indicate no `TeaSharp.Core` onboarding leakage in touched assets)
+- item `1`: **In progress** (consumer-path onboarding evidence exists via `c712c2a` + `896c227`; final gate closure still pending explicit checklist signoff)
+- item `2`: **In progress** (advanced seam guidance remains opt-in; no new closure stamp in this batch)
+- item `3`: **In progress** (ergonomics and naming convergence advanced via `4d4a391` + `e731edc`, but full API-surface consistency signoff remains open)
+- item `4`: **In progress** (cross-control frame/focus naming consistency and parity guardrails reinforced via `1a4fab8` + `0a38229`; final gate signoff still open)
+- item `5`: **In progress** (latest explicit XML docs closure evidence remains `4e3a240`; no new docs-gate closure commit in this batch)
+- item `6`: **In progress** (onboarding boundary guard strength improved via `9c89036` plus consumer evidence `896c227`; final closure still pending RC checklist completion)
 
 ## Naming Clarity Gate
 - Public names must be unambiguous to C# developers without reading internals.
@@ -216,7 +225,8 @@ M4 checklist status snapshot (March 21, 2026):
 - Closed: visual edge-case regression assertions for parity-sensitive rendering paths (`7caa741`).
 - Closed: overlay/input token-consistency enforcement in theme mappings (`74751e6`).
 - Closed: bordered-control parity rollout for existing shipped controls (including Group1/Group2 additions) (`52e7574`, `91f07b9`, `33b22d5`, `4a3a103`, `135065e`, `98a6d7d`).
-- Remaining (forward-only): keep parity policy enforced for any new bordered control added post-freeze (must ship with `BorderStyleText`/`FocusedBorderStyleText`, token mapping, and regression coverage in the same slice).
+- Closed (policy guardrail): bordered/focusable parity policy tests landed (`0a38229`).
+- Remaining (forward-only): any newly added bordered public control must continue to satisfy the enforced parity policy (`BorderStyleText`/`FocusedBorderStyleText`, token mapping, regression coverage) in the same slice.
 
 ## Parallelization Constraints
 - Parallel work is allowed only within the active phase in the authoritative execution order.
