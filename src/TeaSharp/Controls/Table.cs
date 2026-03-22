@@ -16,6 +16,11 @@ public sealed class Table : Control
     private int _hoveredVisibleRow = -1;
     private int _selectedVisibleRow = -1;
 
+    /// <summary>
+    /// Occurs when the selected visible row changes.
+    /// </summary>
+    public event EventHandler<ListSelectionChangedEventArgs<IReadOnlyList<string>>>? SelectionChanged;
+
     public Table(IReadOnlyList<string> columns)
     {
         _columns = columns ?? Array.Empty<string>();
@@ -164,10 +169,47 @@ public sealed class Table : Control
         private set;
     }
 
+    /// <summary>
+    /// Gets the selected row index in the current visible page, or <c>-1</c> when no row is selected.
+    /// </summary>
+    public int SelectedRowIndex
+    {
+        get
+        {
+            var state = BuildState();
+            return _selectedVisibleRow >= 0 && _selectedVisibleRow < state.VisibleRows.Count
+                ? _selectedVisibleRow
+                : -1;
+        }
+    }
+
+    /// <summary>
+    /// Gets the currently selected row in the visible page, or <see langword="null"/> when no row is selected.
+    /// </summary>
+    public IReadOnlyList<string>? SelectedRow => TryGetSelectedRow(out var selectedRow) ? selectedRow : null;
+
     public override bool IsFocused
     {
         get;
         set;
+    }
+
+    /// <summary>
+    /// Attempts to read the currently selected visible row.
+    /// </summary>
+    /// <param name="selectedRow">Selected row values when available; otherwise <see langword="null"/>.</param>
+    /// <returns><see langword="true"/> when a selected row exists; otherwise <see langword="false"/>.</returns>
+    public bool TryGetSelectedRow(out IReadOnlyList<string>? selectedRow)
+    {
+        var state = BuildState();
+        if (_selectedVisibleRow < 0 || _selectedVisibleRow >= state.VisibleRows.Count)
+        {
+            selectedRow = null;
+            return false;
+        }
+
+        selectedRow = state.VisibleRows[_selectedVisibleRow];
+        return true;
     }
 
     public void SetRows(IEnumerable<IReadOnlyList<string>> rows)
@@ -347,7 +389,7 @@ public sealed class Table : Control
             var row = TableViewState.RowFromPointer(content, pointer.Y, state.VisibleRowCount);
             if (row >= 0)
             {
-                return SetHoveredVisibleRow(row) | SetSelectedVisibleRow(row);
+                return SetHoveredVisibleRow(row) | SetSelectedVisibleRow(row, state);
             }
         }
 
@@ -520,14 +562,36 @@ public sealed class Table : Control
         return true;
     }
 
-    private bool SetSelectedVisibleRow(int row)
+    private bool SetSelectedVisibleRow(int row, TableRenderState state)
     {
         if (_selectedVisibleRow == row)
         {
             return false;
         }
 
+        var previousIndex = _selectedVisibleRow >= 0 && _selectedVisibleRow < state.VisibleRows.Count
+            ? _selectedVisibleRow
+            : -1;
+        var previousRow = previousIndex >= 0
+            ? state.VisibleRows[previousIndex]
+            : null;
+
         _selectedVisibleRow = row;
+
+        var selectedIndex = _selectedVisibleRow >= 0 && _selectedVisibleRow < state.VisibleRows.Count
+            ? _selectedVisibleRow
+            : -1;
+        var selectedRow = selectedIndex >= 0
+            ? state.VisibleRows[selectedIndex]
+            : null;
+
+        SelectionChanged?.Invoke(
+            this,
+            new ListSelectionChangedEventArgs<IReadOnlyList<string>>(
+                previousIndex,
+                selectedIndex,
+                previousRow,
+                selectedRow));
         return true;
     }
 
