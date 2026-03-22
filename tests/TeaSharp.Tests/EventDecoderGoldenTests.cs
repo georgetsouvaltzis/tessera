@@ -23,7 +23,9 @@ internal static class EventDecoderGoldenTests
         yield return new TestCase("Decoder_MouseSequences_Parse", MouseSequences_ParseExpectedMessages);
         yield return new TestCase("Decoder_MouseExtendedSequences_Parse", MouseExtendedSequences_ParseExpectedMessages);
         yield return new TestCase("Decoder_OscSequences_ParseKnownCapabilityMessages", OscSequences_ParseKnownCapabilityMessages);
+        yield return new TestCase("Decoder_OscClipboardSequence_IgnoresTrailingSegments", OscClipboardSequence_IgnoresTrailingSegments);
         yield return new TestCase("Decoder_DcsCapabilityResponse_Parses", DcsCapabilityResponse_Parses);
+        yield return new TestCase("Decoder_DcsCapabilityResponse_InvalidHexFallsBackToRawText", DcsCapabilityResponse_InvalidHexFallsBackToRawText);
         yield return new TestCase("Decoder_KeyboardEnhancementReport_Parses", KeyboardEnhancementReport_Parses);
         yield return new TestCase("Decoder_PartialCsi_RequestsMoreDataUntilTimeout", PartialCsi_RequestsMoreDataUntilTimeout);
         yield return new TestCase("Decoder_Utf8Rune_ParsesWithoutReplacement", Utf8Rune_ParsesWithoutReplacement);
@@ -337,6 +339,46 @@ internal static class EventDecoderGoldenTests
         if (result.Message is not CapabilityMsg { Name: "Tc", Value: "1" })
         {
             throw new InvalidOperationException("Expected CapabilityMsg(Tc=1).");
+        }
+
+        return Task.CompletedTask;
+    }
+
+    private static Task OscClipboardSequence_IgnoresTrailingSegments()
+    {
+        // Arrange
+        var decoder = new EventDecoder();
+
+        // Act
+        var result = decoder.Decode(
+            [0x1B, (byte)']', (byte)'5', (byte)'2', (byte)';', (byte)'c', (byte)';', (byte)'a', (byte)'G', (byte)'V', (byte)'s', (byte)'b', (byte)'G', (byte)'8', (byte)'=', (byte)';', (byte)'i', (byte)'g', (byte)'n', (byte)'o', (byte)'r', (byte)'e', (byte)'d', 0x07],
+            timeoutExpired: false);
+
+        // Assert
+        AssertConsumed(result, 24);
+        if (result.Message is not ClipboardMsg { Content: "hello", Selection: 'c' })
+        {
+            throw new InvalidOperationException("Expected ClipboardMsg(content=hello, selection=c).");
+        }
+
+        return Task.CompletedTask;
+    }
+
+    private static Task DcsCapabilityResponse_InvalidHexFallsBackToRawText()
+    {
+        // Arrange
+        var decoder = new EventDecoder();
+
+        // Act
+        var result = decoder.Decode(
+            [0x1B, (byte)'P', (byte)'1', (byte)'+', (byte)'r', (byte)'Z', (byte)'Z', (byte)'=', (byte)'3', (byte)'1', 0x1B, (byte)'\\'],
+            timeoutExpired: false);
+
+        // Assert
+        AssertConsumed(result, 12);
+        if (result.Message is not CapabilityMsg { Name: "ZZ", Value: "1" })
+        {
+            throw new InvalidOperationException("Expected CapabilityMsg(ZZ=1) for invalid name hex fallback.");
         }
 
         return Task.CompletedTask;

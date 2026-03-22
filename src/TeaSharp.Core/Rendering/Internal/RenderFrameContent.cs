@@ -9,8 +9,27 @@ internal static class RenderFrameContent
             return [string.Empty];
         }
 
-        content = content.Replace("\r\n", "\n", StringComparison.Ordinal).Replace('\r', '\n');
-        return [.. content.Split('\n')];
+        var lines = new List<string>(EstimateLineCount(content));
+        var start = 0;
+        for (var index = 0; index < content.Length; index++)
+        {
+            var current = content[index];
+            if (current is not ('\r' or '\n'))
+            {
+                continue;
+            }
+
+            lines.Add(content[start..index]);
+            if (current == '\r' && index + 1 < content.Length && content[index + 1] == '\n')
+            {
+                index++;
+            }
+
+            start = index + 1;
+        }
+
+        lines.Add(content[start..]);
+        return lines;
     }
 
     public static List<DisplayLine> WrapLines(IReadOnlyList<string> normalized, int width)
@@ -38,5 +57,20 @@ internal static class RenderFrameContent
         }
 
         return rows;
+    }
+
+    private static int EstimateLineCount(string content)
+    {
+        var lines = 1;
+        for (var index = 0; index < content.Length; index++)
+        {
+            var current = content[index];
+            if (current is '\r' or '\n')
+            {
+                lines++;
+            }
+        }
+
+        return lines;
     }
 }

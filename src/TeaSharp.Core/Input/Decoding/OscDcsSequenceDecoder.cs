@@ -43,14 +43,14 @@ internal static class OscDcsSequenceDecoder
 
     private static DecodeResult ParseOscResult(ReadOnlySpan<byte> payloadBytes, int consumed)
     {
-        var payload = DecoderCommon.ToAscii(payloadBytes);
-        var separator = payload.IndexOf(';', StringComparison.Ordinal);
-        if (separator <= 0 || !int.TryParse(payload[..separator], out var code))
+        if (!TryReadOscCode(payloadBytes, out var code, out var separator))
         {
             return new DecodeResult(consumed, null, false);
         }
 
-        var data = separator + 1 < payload.Length ? payload[(separator + 1)..] : string.Empty;
+        var data = separator + 1 < payloadBytes.Length
+            ? DecoderCommon.ToAscii(payloadBytes[(separator + 1)..])
+            : string.Empty;
         if (code == 52 && TryDecodeClipboardOsc(data, out var clipboard))
         {
             return new DecodeResult(consumed, clipboard, false);
@@ -68,27 +68,34 @@ internal static class OscDcsSequenceDecoder
     private static bool TryDecodeClipboardOsc(string data, out ClipboardMsg message)
     {
         message = default!;
-        var parts = data.Split(';');
-        if (parts.Length < 2)
+        var firstSeparator = data.IndexOf(';', StringComparison.Ordinal);
+        if (firstSeparator <= 0 || firstSeparator == data.Length - 1)
         {
             return false;
         }
 
-        var selection = parts[0].Trim();
+        var selection = data.AsSpan(0, firstSeparator).Trim();
         if (selection.Length != 1 || (selection[0] != 'c' && selection[0] != 'p'))
         {
             return false;
         }
 
-        var encoded = parts[1].Trim();
-        if (encoded == "?")
+        var encodedSpan = data.AsSpan(firstSeparator + 1);
+        var secondSeparator = encodedSpan.IndexOf(';');
+        if (secondSeparator >= 0)
+        {
+            encodedSpan = encodedSpan[..secondSeparator];
+        }
+
+        encodedSpan = encodedSpan.Trim();
+        if (encodedSpan.SequenceEqual("?".AsSpan()))
         {
             return false;
         }
 
         try
         {
-            var bytes = Convert.FromBase64String(encoded);
+            var bytes = Convert.FromBase64String(encodedSpan.ToString());
             var content = Encoding.UTF8.GetString(bytes);
             message = new ClipboardMsg(content, selection[0]);
             return true;
@@ -128,18 +135,24 @@ internal static class OscDcsSequenceDecoder
             return string.Empty;
         }
 
-        var chars = new List<char>(input.Length / 2);
+        var pairCount = input.Length / 2;
+        if (pairCount == 0)
+        {
+            return string.Empty;
+        }
+
+        Span<char> chars = pairCount <= 128 ? stackalloc char[pairCount] : new char[pairCount];
         for (var i = 0; i + 1 < input.Length; i += 2)
         {
-            if (!byte.TryParse(input.AsSpan(i, 2), System.Globalization.NumberStyles.HexNumber, null, out var value))
+            if (!TryDecodeHexPair(input[i], input[i + 1], out var value))
             {
                 return input;
             }
 
-            chars.Add((char)value);
+            chars[i / 2] = (char)value;
         }
 
-        return new string([.. chars]);
+        return new string(chars);
     }
 
     private static string NormalizeOscColor(string value)
@@ -147,15 +160,26 @@ internal static class OscDcsSequenceDecoder
         var raw = value.Trim();
         if (raw.StartsWith("rgb:", StringComparison.OrdinalIgnoreCase))
         {
-            var channels = raw[4..].Split('/');
-            if (channels.Length != 3)
+            var channels = raw.AsSpan(4);
+            var firstSeparator = channels.IndexOf('/');
+            if (firstSeparator <= 0 || firstSeparator >= channels.Length - 1)
             {
                 return raw;
             }
 
-            if (!TryParseOscColorChannel(channels[0], out var r)
-                || !TryParseOscColorChannel(channels[1], out var g)
-                || !TryParseOscColorChannel(channels[2], out var b))
+            var remaining = channels[(firstSeparator + 1)..];
+            var secondSeparator = remaining.IndexOf('/');
+            if (secondSeparator <= 0 || secondSeparator >= remaining.Length - 1)
+            {
+                return raw;
+            }
+
+            var redText = channels[..firstSeparator];
+            var greenText = remaining[..secondSeparator];
+            var blueText = remaining[(secondSeparator + 1)..];
+            if (!TryParseOscColorChannel(redText, out var r)
+                || !TryParseOscColorChannel(greenText, out var g)
+                || !TryParseOscColorChannel(blueText, out var b))
             {
                 return raw;
             }
@@ -171,7 +195,7 @@ internal static class OscDcsSequenceDecoder
         return raw;
     }
 
-    private static bool TryParseOscColorChannel(string value, out byte channel)
+    private static bool TryParseOscColorChannel(ReadOnlySpan<char> value, out byte channel)
     {
         channel = 0;
         var normalized = value.Trim();
@@ -194,5 +218,58 @@ internal static class OscDcsSequenceDecoder
         var max = normalized.Length == 3 ? 0x0FFFu : 0xFFFFu;
         channel = (byte)Math.Round((parsed / (double)max) * 255d, MidpointRounding.AwayFromZero);
         return true;
+    }
+
+    private static bool TryReadOscCode(ReadOnlySpan<byte> payloadBytes, out int code, out int separator)
+    {
+        code = 0;
+        separator = -1;
+        if (payloadBytes.IsEmpty)
+        {
+            return false;
+        }
+
+        for (var index = 0; index < payloadBytes.Length; index++)
+        {
+            if (payloadBytes[index] == (byte)';')
+            {
+                separator = index;
+                break;
+            }
+
+            if (payloadBytes[index] is < (byte)'0' or > (byte)'9')
+            {
+                return false;
+            }
+
+            code = (code * 10) + (payloadBytes[index] - (byte)'0');
+        }
+
+        return separator > 0;
+    }
+
+    private static bool TryDecodeHexPair(char high, char low, out byte value)
+    {
+        value = 0;
+        if (!TryParseHexNibble(high, out var highNibble) || !TryParseHexNibble(low, out var lowNibble))
+        {
+            return false;
+        }
+
+        value = (byte)((highNibble << 4) | lowNibble);
+        return true;
+    }
+
+    private static bool TryParseHexNibble(char value, out int nibble)
+    {
+        nibble = value switch
+        {
+            >= '0' and <= '9' => value - '0',
+            >= 'a' and <= 'f' => 10 + (value - 'a'),
+            >= 'A' and <= 'F' => 10 + (value - 'A'),
+            _ => -1,
+        };
+
+        return nibble >= 0;
     }
 }
