@@ -52,7 +52,7 @@ Do not mark a checkbox complete unless command output/evidence is attached.
   - command: `dotnet test tests/TeaSharp.Tests --no-restore --nologo --filter "PublicApiXmlDocs_"`
   - evidence: `Passed: 4/4, Failed: 0, Skipped: 0.`
 - [x] Docs consistency pass completed for shipped behavior
-  - evidence: `Current docs sync commits and references are coherent with v1 source-of-truth docs.`
+  - evidence: `Current docs sync commits and references are coherent with v1 source-of-truth docs, including external-consumer friction closure updates for Table/ListView/ThemeScope (`51d46a3`, `a9f774f`, `8ff286d`).`
 - [x] Terminal compatibility matrix evidence attached
   - reference: [terminal-compatibility-evidence-v1.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/terminal-compatibility-evidence-v1.md)
   - evidence: `iTerm2/WezTerm/Kitty/Windows Terminal binaries not installed on this host; verification uses deterministic tests + official specs; Ghostty has host evidence.`

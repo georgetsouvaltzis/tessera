@@ -4,32 +4,27 @@ Context: clean-room consumer pass by building `examples/ExternalConsumerReviewAp
 
 ## Ranked Friction
 
-### P1 - `Table` has no public selection state/events
-- Issue: table supports keyboard/mouse row selection visually, but consumers cannot read selected row index/item or subscribe to selection changes.
+### P1 - `Table` selection state/event access
+- Status: resolved in `51d46a3`.
+- Prior issue: table supported keyboard/mouse row selection visually, but consumers could not read selected row index/item or subscribe to selection changes.
 - Repro snippet:
 ```csharp
 var table = new Table("Name", "State");
 table.SetRows(rows);
-// Missing: table.SelectedIndex / table.SelectedRow / table.SelectionChanged
+var selectedIndex = table.SelectedRowIndex;
+var selectedRow = table.SelectedRow;
+var hasSelectedRow = table.TryGetSelectedRow(out var row);
+table.SelectionChanged += (_, args) => { };
 ```
-- Suggested non-breaking fix: add `SelectedRowIndex` (read-only), `TryGetSelectedRow(out IReadOnlyList<string> row)`, and `SelectionChanged` event. Keep existing behavior; just expose state.
 
 ### P1 - Runtime theme switch requires per-control boilerplate
-- Issue: switching between Catppuccin/Rosé Pine requires manually re-applying theme to every control instance.
+- Status: resolved in `8ff286d`.
+- Prior issue: switching between Catppuccin/Rosé Pine required manually re-applying theme to every control instance.
 - Repro snippet:
 ```csharp
-void ApplyTheme(TeaTheme theme)
-{
-    _tabs.ApplyTheme(theme);
-    _table.ApplyTheme(theme);
-    _list.ApplyTheme(theme);
-    _notifications.ApplyTheme(theme);
-    _dialog.ApplyTheme(theme);
-    _status.ApplyTheme(theme);
-}
+var applied = ThemeScope.Apply(theme, _tabs, _table, _list, _notifications, _dialog, _status);
 ```
-- Suggested non-breaking fix: add helper on app surface (for example `ThemeScope.Apply(theme, params Control[] controls)`), or provide a documented aggregate helper for common dashboard control sets.
-- Current V1 state: `TeaThemeOverrideBundle` helps local override composition, but there is still no first-party global fan-out helper equivalent to `ThemeScope`.
+- Current V1 state: `TeaThemeOverrideBundle` remains useful for local override composition; `ThemeScope.Apply(...)` now covers first-party global fan-out.
 
 ## Resolved In This Lane
 
@@ -85,41 +80,7 @@ Context: extended `examples/ExternalConsumerReviewApp` to exercise newly landed 
   - `4e005ed`, `1c1b748`, `03c7a43`, `db63e01` (theme/parity wiring coverage)
 
 ### Open (re-audited)
-
-#### P1 - `Table` has no public selection state/events
-- Status: open (unchanged).
-- Impact: still cannot synchronize table row selection with quick-open or side-nav actions.
-- Repro snippet:
-```csharp
-var table = new Table("Name", "State");
-table.SetRows(rows);
-// Missing: table.SelectedIndex / table.SelectedRow / table.SelectionChanged
-```
-
-#### P2 - Runtime theme switch still needs explicit per-control fan-out
-- Status: open (partially improved by extension coverage and `TeaThemeOverrideBundle`, but still app-level boilerplate).
-- Repro snippet:
-```csharp
-void ApplyTheme(TeaTheme theme)
-{
-    _dashboardRail.ApplyTheme(theme);
-    _dashboardGrid.ApplyTheme(theme);
-    _healthBoard.ApplyTheme(theme);
-    _distributionPlot.ApplyTheme(theme);
-    // ...repeat for each control instance
-}
-```
-- Notes: a `ThemeScope`-style helper is still absent from the public API surface in this lane.
-
-#### P2 - `ListView<T>` lacks programmatic selection setter
-- Status: open.
-- Impact: external quick-open command can set domain selection state, but cannot drive visual `ListView<T>` row selection through a public setter.
-- Repro snippet:
-```csharp
-var list = new ListView<ServiceHealth>(item => item.Name);
-list.SetItems(services);
-// Missing: list.SetSelectedIndex(index) or list.Select(index)
-```
+No active P1/P2 open findings in this scope after `51d46a3`, `a9f774f`, and `8ff286d`.
 
 ### Resolved After Latest Landed Commits (March 22, 2026)
 
@@ -153,6 +114,28 @@ list.SetItems(services);
   - `LinePlot.ConfigureAxes(...)`
   - `LinePlot.ConfigureGrid(...)`
   - `LinePlot.ConfigureLegend(...)`
+
+### Resolved After Follow-up Consumer API Commits (March 22, 2026)
+
+#### P1 - `Table` selection state/event gap
+- Status: resolved by `51d46a3`.
+- New consumer surface:
+  - `Table.SelectedRowIndex`
+  - `Table.SelectedRow`
+  - `Table.TryGetSelectedRow(...)`
+  - `Table.SelectionChanged`
+
+#### P2 - `ListView<T>` programmatic selection setter gap
+- Status: resolved by `a9f774f`.
+- New consumer surface:
+  - `ListView<T>.SetSelectedIndex(int)`
+  - `ListView<T>.Select(int)` (compatibility wrapper)
+
+#### P2 - Runtime theme fan-out helper gap
+- Status: resolved by `8ff286d`.
+- New consumer surface:
+  - `ThemeScope.Apply(TeaTheme, params Control[])`
+  - `ThemeScope.Apply(TeaTheme, IEnumerable<Control?>)`
 
 ## Wave 2 - Advanced Dashboard (Styling/State/Plot Readiness)
 
