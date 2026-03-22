@@ -103,6 +103,85 @@ public sealed class LinePlotControlTests
         Assert.That(shiftedOutput.Contains("max:", StringComparison.Ordinal), Is.True);
     }
 
+    [Test]
+    public void LineSeriesRetention_CapacityAndTrimToLast_KeepTrailingSamples()
+    {
+        var series = new LineSeries("req")
+        {
+            Capacity = 3,
+        };
+        series.SetSamples([1, 2, 3, 4, 5]);
+        series.Append(6);
+        series.TrimToLast(2);
+
+        Assert.That(series.Samples, Is.EqualTo(new[] { 5d, 6d }));
+    }
+
+    [Test]
+    public void LinePlotConfigureHelpers_UpdateAdvancedOptionsWithoutDirectReplacement()
+    {
+        var control = new LinePlot();
+
+        control.ConfigureAxes(showAxes: true, xLabel: "time", sharedAxisLabel: "req/s", normalizedAxisLabel: "norm")
+            .ConfigureGrid(showGrid: true)
+            .ConfigureLegend(showLegend: false);
+
+        Assert.That(control.Options.HasValue, Is.True);
+        Assert.That(control.Options!.Value.ShowAxes, Is.True);
+        Assert.That(control.Options!.Value.ShowGrid, Is.True);
+        Assert.That(control.Options!.Value.ShowLegend, Is.False);
+        Assert.That(control.Options!.Value.XLabel, Is.EqualTo("time"));
+        Assert.That(control.Options!.Value.SharedAxisLabel, Is.EqualTo("req/s"));
+        Assert.That(control.Options!.Value.NormalizedAxisLabel, Is.EqualTo("norm"));
+    }
+
+    [Test]
+    public void LinePlotRender_NormalizedSeries_UsesPerSeriesScaleForMixedUnits()
+    {
+        var requests = new LineSeries("Req/s", [0, 10, 20]) { PointGlyph = '●' };
+        var latency = new LineSeries("P95", [1000, 1001, 1002])
+        {
+            PointGlyph = '◆',
+            ScaleMode = LineSeriesScaleMode.Normalized,
+        };
+        var control = new LinePlot
+        {
+            Border = BorderStyle.None,
+            Options = new LinePlotOptions(ShowAxes: false, ShowLegend: false, ShowStats: false),
+        };
+        control.SetSeries([requests, latency]);
+
+        var canvas = new Canvas(5, 5, CanvasTextMode.GraphemeAware);
+        control.Render(canvas, new Rect(0, 0, 5, 5));
+
+        Assert.That(canvas.Get(0, 4), Is.EqualTo('◆'));
+        Assert.That(canvas.Get(2, 2), Is.EqualTo('◆'));
+        Assert.That(canvas.Get(4, 0), Is.EqualTo('◆'));
+    }
+
+    [Test]
+    public void LinePlotRender_NormalizedAxisLabel_IsRenderedWhenConfigured()
+    {
+        var control = new LinePlot
+        {
+            Border = BorderStyle.None,
+        };
+        control.ConfigureAxes(showAxes: true, xLabel: "t", sharedAxisLabel: "req/s", normalizedAxisLabel: "norm")
+            .ConfigureGrid(showGrid: false)
+            .ConfigureLegend(showLegend: false);
+        control.SetSeries(
+        [
+            new LineSeries("Req/s", [10, 11, 12]),
+            new LineSeries("P95", [100, 150, 200]) { ScaleMode = LineSeriesScaleMode.Normalized },
+        ]);
+
+        var output = Render(control, width: 24, height: 8);
+
+        Assert.That(output.Contains("req/s", StringComparison.Ordinal), Is.True);
+        Assert.That(output.Contains("norm", StringComparison.Ordinal), Is.True);
+        Assert.That(output.Contains("t", StringComparison.Ordinal), Is.True);
+    }
+
     private static string Render(LinePlot control, int width, int height)
     {
         var canvas = new Canvas(width, height, CanvasTextMode.GraphemeAware);

@@ -38,8 +38,106 @@ void ApplyTheme(TeaTheme theme)
 - Validation: `NotificationsSelectionChangedEventTests` covers `SetSelectedIndex`, `Clear`, and `RemoveSelected` transitions.
 
 ## Notes
-- Current example demonstrates navigation, list/table, notifications, dialog flow, and theme switching without `TeaSharp.Core`.
+- Current example demonstrates navigation, list/table, notifications, dialog flow, theme switching, and a dedicated `Dashboard APIs` tab without `TeaSharp.Core`.
 - No breaking API changes proposed in this pass.
+
+## Wave 3 - Dashboard API Tranche Re-Audit (March 22, 2026)
+
+Context: extended `examples/ExternalConsumerReviewApp` to exercise newly landed dashboard/control APIs and theme-extension paths from an external consumer perspective.
+
+### Resolved (evidence-backed)
+
+#### Dashboard visualization/control primitives are now consumable from onboarding namespaces
+- Status: resolved.
+- APIs exercised in example:
+  - `DashboardGrid.SetTiles(...)`, `DashboardGrid.SelectionChanged`
+  - `BulletChart.SetRanges(...)`, `BulletChart.SetValue(...)`, `BulletChart.SetTarget(...)`
+  - `HealthBoard.SetServices(...)`, `HealthBoard.SetSelectedIndex(...)`, `HealthBoard.Acknowledge(...)`
+  - `BoxPlot.SetSeries(...)`
+- Evidence commits:
+  - `8593562` (`DashboardGrid`)
+  - `dfd4221` (`BulletChart`)
+  - `18adc16` (`HealthBoard`)
+  - `6ae3c5b` (`BoxPlot`)
+
+#### Dashboard workflow/navigation surfaces are externally usable
+- Status: resolved.
+- APIs exercised in example:
+  - `SideNavRail.SetItems(...)`, `SideNavRail.SelectionChanged`, `SideNavRail.Activated`
+  - `ResizablePaneGroup.SetPanes(...)`, `ResizablePaneGroup.SetSplitRatio(...)`
+  - `JumpList.SetItems(...)`, `JumpList.Activated`
+  - `AutocompleteInput.SetSuggestions(...)`, `AutocompleteInput.SuggestionCommitted`
+  - `QuickOpenOverlay.SetItems(...)`, `QuickOpenOverlay.Open()`, `QuickOpenOverlay.Submitted`
+- Evidence commits:
+  - `d236de2` (`SideNavRail`)
+  - `77cc95d` (`ResizablePaneGroup`)
+  - `187468c` (`JumpList`)
+  - `50212de` + `be23de7` (`AutocompleteInput`)
+  - `d91c934` (`QuickOpenOverlay`)
+
+#### Theme/styling extension path exists for expansion tranche controls
+- Status: resolved.
+- APIs exercised in example:
+  - `ApplyTheme(this TControl, TeaTheme)` and `ApplyThemeDefaults(this TControl, TeaTheme)` for the above controls
+  - control-level focus/border overrides after theme apply (external-app layering)
+- Evidence commits:
+  - `4e005ed`, `1c1b748`, `03c7a43`, `db63e01` (theme/parity wiring coverage)
+
+### Open (re-audited)
+
+#### P1 - `Table` has no public selection state/events
+- Status: open (unchanged).
+- Impact: still cannot synchronize table row selection with quick-open or side-nav actions.
+- Repro snippet:
+```csharp
+var table = new Table("Name", "State");
+table.SetRows(rows);
+// Missing: table.SelectedIndex / table.SelectedRow / table.SelectionChanged
+```
+
+#### P1 - `LineSeries.Append(...)` retention is still manual for streaming dashboards
+- Status: open (unchanged).
+- Repro snippet:
+```csharp
+var series = new LineSeries("Req/s");
+series.Append(nextValue); // unbounded growth
+// Consumer still needs manual trim + SetSamples(...)
+```
+
+#### P1 - `LinePlot` still lacks mixed-unit scale controls
+- Status: open (unchanged).
+- Repro snippet:
+```csharp
+plot.SetSeries([
+    new LineSeries("Req/s", reqSeries),
+    new LineSeries("P95 ms", latencySeries),
+]);
+// Missing: per-series scale mode or secondary Y-axis
+```
+
+#### P2 - Runtime theme switch still needs explicit per-control fan-out
+- Status: open (partially improved by extension coverage, but still app-level boilerplate).
+- Repro snippet:
+```csharp
+void ApplyTheme(TeaTheme theme)
+{
+    _dashboardRail.ApplyTheme(theme);
+    _dashboardGrid.ApplyTheme(theme);
+    _healthBoard.ApplyTheme(theme);
+    _distributionPlot.ApplyTheme(theme);
+    // ...repeat for each control instance
+}
+```
+
+#### P2 - `ListView<T>` lacks programmatic selection setter
+- Status: open.
+- Impact: external quick-open command can set domain selection state, but cannot drive visual `ListView<T>` row selection through a public setter.
+- Repro snippet:
+```csharp
+var list = new ListView<ServiceHealth>(item => item.Name);
+list.SetItems(services);
+// Missing: list.SetSelectedIndex(index) or list.Select(index)
+```
 
 ## Wave 2 - Advanced Dashboard (Styling/State/Plot Readiness)
 

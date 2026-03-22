@@ -30,7 +30,7 @@ internal sealed partial class ExternalConsumerReviewApp : TeaApp
 
     private static readonly TeaTheme RosePineTheme = TeaThemes.RosePine(RosePineVariant.Moon);
 
-    private readonly Tabs _navigation = new("Overview", "Operations", "Alerts", "Analytics")
+    private readonly Tabs _navigation = new("Overview", "Operations", "Alerts", "Analytics", "Dashboard APIs")
     {
         Title = "External Consumer Review",
         FocusMarker = "◆",
@@ -137,9 +137,11 @@ internal sealed partial class ExternalConsumerReviewApp : TeaApp
         _notifications.Push("Press d to queue deployment", NotificationLevel.Info);
         _notifications.Push("Press t to switch theme", NotificationLevel.Info);
         _notifications.Push("Press 4 for analytics screen", NotificationLevel.Info);
+        _notifications.Push("Press 5 for dashboard API screen", NotificationLevel.Info);
         AppendActivity("External consumer dashboard initialized.");
 
         InitializeWave2Dashboard();
+        InitializeDashboardApiShowcase();
         ApplyThemeAndOverrides();
     }
 
@@ -150,6 +152,11 @@ internal sealed partial class ExternalConsumerReviewApp : TeaApp
     {
         if (message is KeyPressed key)
         {
+            if (HandleDashboardApiHotKeys(key))
+            {
+                return null;
+            }
+
             if (key.IsCharacter('c', ModifierKeys.Ctrl))
             {
                 return TeaEffects.Quit;
@@ -196,13 +203,18 @@ internal sealed partial class ExternalConsumerReviewApp : TeaApp
             return BuildAnalyticsScreen(context);
         }
 
+        if (_navigation.SelectedIndex == 4)
+        {
+            return BuildDashboardApiScreen(context);
+        }
+
         _serviceTable.SetRows(BuildRowsForCurrentView());
         _selectionSummary.Text = BuildSelectionSummary(context);
 
         _status.LeftText =
             $"{CurrentThemeName()}  tick={_tick:0000}  selected={GetSelectedService().Name}";
         _status.RightText =
-            $"{_statusText}  1-4 tabs  t theme  d dialog  n note  Ctrl+C quit";
+            $"{_statusText}  1-5 tabs  t theme  d dialog  n note  Ctrl+C quit";
 
         var actionRow = new RowLayout
         {
@@ -328,6 +340,7 @@ internal sealed partial class ExternalConsumerReviewApp : TeaApp
         }
 
         UpdateWave2State();
+        UpdateDashboardApiState();
     }
 
     private List<IReadOnlyList<string>> BuildRowsForCurrentView()
@@ -419,6 +432,7 @@ internal sealed partial class ExternalConsumerReviewApp : TeaApp
         _selectionSummary.FocusedBorderStyleText = bundle.FocusedBorderStyleText;
 
         ApplyWave2ThemeAndOverrides(theme, bundle);
+        ApplyDashboardApiThemeAndOverrides(theme, bundle);
 
         _status.Fill = '·';
         _status.FillStyle = theme.Surface.Panel;

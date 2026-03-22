@@ -13,5 +13,7 @@ public readonly record struct LinePlotOptions(
     bool ShowStats = true,
     string? XLabel = null,
     string? YLabel = null,
+    string? SharedAxisLabel = null,
+    string? NormalizedAxisLabel = null,
     double Zoom = 1.0,
     int Offset = 0);

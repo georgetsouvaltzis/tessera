@@ -126,6 +126,57 @@ public sealed class LinePlot : Control
     public LinePlotOptions? Options { get; set; }
 
     /// <summary>
+    /// Enables or configures axis rendering for common scenarios without replacing <see cref="Options"/>.
+    /// </summary>
+    /// <param name="showAxes"><see langword="true"/> to show axes; otherwise, <see langword="false"/>.</param>
+    /// <param name="xLabel">Optional X-axis label. When <see langword="null"/>, the existing value is preserved.</param>
+    /// <param name="sharedAxisLabel">Optional shared Y-axis label. When <see langword="null"/>, the existing value is preserved.</param>
+    /// <param name="normalizedAxisLabel">Optional normalized-axis label for normalized series. When <see langword="null"/>, the existing value is preserved.</param>
+    /// <returns>The current <see cref="LinePlot"/> instance for fluent chaining.</returns>
+    public LinePlot ConfigureAxes(
+        bool showAxes = true,
+        string? xLabel = null,
+        string? sharedAxisLabel = null,
+        string? normalizedAxisLabel = null)
+    {
+        var options = Options ?? new LinePlotOptions();
+        options = options with
+        {
+            ShowAxes = showAxes,
+            XLabel = xLabel ?? options.XLabel,
+            SharedAxisLabel = sharedAxisLabel ?? options.SharedAxisLabel,
+            NormalizedAxisLabel = normalizedAxisLabel ?? options.NormalizedAxisLabel,
+            YLabel = sharedAxisLabel ?? options.YLabel,
+        };
+        Options = options;
+        return this;
+    }
+
+    /// <summary>
+    /// Enables or disables grid rendering without replacing <see cref="Options"/>.
+    /// </summary>
+    /// <param name="showGrid"><see langword="true"/> to show grid lines; otherwise, <see langword="false"/>.</param>
+    /// <returns>The current <see cref="LinePlot"/> instance for fluent chaining.</returns>
+    public LinePlot ConfigureGrid(bool showGrid = true)
+    {
+        var options = Options ?? new LinePlotOptions();
+        Options = options with { ShowGrid = showGrid };
+        return this;
+    }
+
+    /// <summary>
+    /// Enables or disables legend rendering without replacing <see cref="Options"/>.
+    /// </summary>
+    /// <param name="showLegend"><see langword="true"/> to show the legend; otherwise, <see langword="false"/>.</param>
+    /// <returns>The current <see cref="LinePlot"/> instance for fluent chaining.</returns>
+    public LinePlot ConfigureLegend(bool showLegend = true)
+    {
+        var options = Options ?? new LinePlotOptions();
+        Options = options with { ShowLegend = showLegend };
+        return this;
+    }
+
+    /// <summary>
     /// Gets the current line series collection.
     /// </summary>
     public IReadOnlyList<LineSeries> Series => _series;
@@ -281,12 +332,6 @@ public sealed class LinePlot : Control
             DrawVerticalLine(canvas, plot.X, plot.Y, plot.Height, axisStyle, '│');
             DrawHorizontalLine(canvas, plot.X, plot.Bottom - 1, plot.Width, axisStyle, '─');
             WriteStyledGlyph(canvas, plot.X, plot.Bottom - 1, '└', axisStyle);
-            if (!string.IsNullOrWhiteSpace(options.YLabel))
-            {
-                var yLabel = options.YLabel.Trim();
-                canvas.WriteText(plot.X + 1, plot.Y, ApplyStyle(yLabel, axisStyle), Math.Max(0, plot.Width - 1));
-            }
-
             plotArea = new Rect(plot.X + 1, plot.Y, plot.Width - 1, plot.Height - 1);
         }
 
@@ -301,6 +346,10 @@ public sealed class LinePlot : Control
         }
 
         RenderSeries(canvas, plotArea, maxSampleCount, visibleCount, offset, min, max);
+        if (options.ShowAxes && plot.Width >= 3 && plot.Height >= 3)
+        {
+            RenderAxisLabels(canvas, plot, options);
+        }
 
         if (showStatsRow)
         {
@@ -362,15 +411,20 @@ public sealed class LinePlot : Control
 
     private void RenderSeries(Canvas canvas, Rect plotArea, int maxSampleCount, int visibleCount, int offset, double min, double max)
     {
-        var range = max - min;
-        if (Math.Abs(range) < double.Epsilon)
-        {
-            range = 1d;
-        }
-
         for (var seriesIndex = 0; seriesIndex < _series.Count; seriesIndex++)
         {
             var series = _series[seriesIndex];
+            if (!TryResolveSeriesScaleRange(series, maxSampleCount, visibleCount, offset, min, max, out var seriesMin, out var seriesMax))
+            {
+                continue;
+            }
+
+            var range = seriesMax - seriesMin;
+            if (Math.Abs(range) < double.Epsilon)
+            {
+                range = 1d;
+            }
+
             var style = ResolveStyled(series.Style);
             var pointGlyph = RenderGlyph(series.PointGlyph, style);
             var horizontalGlyph = RenderGlyph('─', style);
@@ -389,7 +443,7 @@ public sealed class LinePlot : Control
                     continue;
                 }
 
-                var normalized = Math.Clamp((value - min) / range, 0d, 1d);
+                var normalized = Math.Clamp((value - seriesMin) / range, 0d, 1d);
                 var y = plotArea.Bottom - 1 - (int)Math.Round(normalized * (plotArea.Height - 1), MidpointRounding.AwayFromZero);
                 var x = visibleCount <= 1
                     ? plotArea.X
@@ -406,6 +460,100 @@ public sealed class LinePlot : Control
                 previousX = x;
                 previousY = y;
             }
+        }
+    }
+
+    private static bool TryResolveSeriesScaleRange(
+        LineSeries series,
+        int maxSampleCount,
+        int visibleCount,
+        int offset,
+        double sharedMin,
+        double sharedMax,
+        out double min,
+        out double max)
+    {
+        if (series.ScaleMode == LineSeriesScaleMode.Shared)
+        {
+            min = sharedMin;
+            max = sharedMax;
+            return true;
+        }
+
+        return TryResolveSeriesVisibleRange(series, maxSampleCount, visibleCount, offset, out min, out max);
+    }
+
+    private static bool TryResolveSeriesVisibleRange(
+        LineSeries series,
+        int maxSampleCount,
+        int visibleCount,
+        int offset,
+        out double min,
+        out double max)
+    {
+        min = double.PositiveInfinity;
+        max = double.NegativeInfinity;
+        var hasData = false;
+
+        for (var index = 0; index < visibleCount; index++)
+        {
+            var globalIndex = offset + index;
+            if (!TryGetSeriesValue(series, maxSampleCount, globalIndex, out var value))
+            {
+                continue;
+            }
+
+            hasData = true;
+            if (value < min)
+            {
+                min = value;
+            }
+
+            if (value > max)
+            {
+                max = value;
+            }
+        }
+
+        if (!hasData)
+        {
+            return false;
+        }
+
+        if (Math.Abs(max - min) < double.Epsilon)
+        {
+            max = min + 1;
+        }
+
+        return true;
+    }
+
+    private void RenderAxisLabels(Canvas canvas, Rect plot, LinePlotOptions options)
+    {
+        var axisStyle = ResolveStyled(AxisStyle);
+        var sharedAxisLabel = ResolveSharedAxisLabel(options);
+        var normalizedAxisLabel = HasSeriesScaleMode(LineSeriesScaleMode.Normalized)
+            ? options.NormalizedAxisLabel?.Trim()
+            : null;
+        var rightReserved = string.IsNullOrWhiteSpace(normalizedAxisLabel) ? 0 : normalizedAxisLabel!.Length + 1;
+
+        if (!string.IsNullOrWhiteSpace(sharedAxisLabel))
+        {
+            canvas.WriteText(
+                plot.X + 1,
+                plot.Y,
+                ApplyStyle(sharedAxisLabel!, axisStyle),
+                Math.Max(0, plot.Width - 1 - rightReserved));
+        }
+
+        if (!string.IsNullOrWhiteSpace(normalizedAxisLabel))
+        {
+            var normalizedLabelX = Math.Max(plot.X + 1, plot.Right - normalizedAxisLabel!.Length);
+            canvas.WriteText(
+                normalizedLabelX,
+                plot.Y,
+                ApplyStyle(normalizedAxisLabel, axisStyle),
+                plot.Right - normalizedLabelX);
         }
     }
 
@@ -435,6 +583,7 @@ public sealed class LinePlot : Control
         min = MinValue ?? double.PositiveInfinity;
         max = MaxValue ?? double.NegativeInfinity;
         var hasData = false;
+        var hasSharedData = MinValue.HasValue && MaxValue.HasValue;
 
         if (!MinValue.HasValue || !MaxValue.HasValue)
         {
@@ -443,12 +592,19 @@ public sealed class LinePlot : Control
                 var globalIndex = offset + i;
                 for (var seriesIndex = 0; seriesIndex < _series.Count; seriesIndex++)
                 {
-                    if (!TryGetSeriesValue(_series[seriesIndex], maxSampleCount, globalIndex, out var value))
+                    var series = _series[seriesIndex];
+                    if (!TryGetSeriesValue(series, maxSampleCount, globalIndex, out var value))
                     {
                         continue;
                     }
 
                     hasData = true;
+                    if (series.ScaleMode != LineSeriesScaleMode.Shared)
+                    {
+                        continue;
+                    }
+
+                    hasSharedData = true;
                     if (!MinValue.HasValue && value < min)
                     {
                         min = value;
@@ -464,6 +620,12 @@ public sealed class LinePlot : Control
         else
         {
             hasData = true;
+        }
+
+        if (!hasSharedData)
+        {
+            min = 0;
+            max = 1;
         }
 
         if (!double.IsFinite(min))
@@ -676,5 +838,30 @@ public sealed class LinePlot : Control
         return Math.Abs(value) >= 100
             ? value.ToString("0", CultureInfo.InvariantCulture)
             : value.ToString("0.0", CultureInfo.InvariantCulture);
+    }
+
+    private static string? ResolveSharedAxisLabel(LinePlotOptions options)
+    {
+        if (!string.IsNullOrWhiteSpace(options.SharedAxisLabel))
+        {
+            return options.SharedAxisLabel.Trim();
+        }
+
+        return string.IsNullOrWhiteSpace(options.YLabel)
+            ? null
+            : options.YLabel.Trim();
+    }
+
+    private bool HasSeriesScaleMode(LineSeriesScaleMode mode)
+    {
+        for (var i = 0; i < _series.Count; i++)
+        {
+            if (_series[i].ScaleMode == mode)
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

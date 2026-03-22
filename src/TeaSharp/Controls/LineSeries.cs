@@ -8,6 +8,7 @@ namespace TeaSharp.Controls;
 public sealed class LineSeries
 {
     private readonly List<double> _samples = [];
+    private int? _capacity;
 
     /// <summary>
     /// Initializes an empty line series.
@@ -57,6 +58,33 @@ public sealed class LineSeries
     } = '●';
 
     /// <summary>
+    /// Gets or sets the per-series scaling mode used by <see cref="LinePlot"/>.
+    /// </summary>
+    public LineSeriesScaleMode ScaleMode { get; set; } = LineSeriesScaleMode.Shared;
+
+    /// <summary>
+    /// Gets or sets an optional retained sample capacity.
+    /// </summary>
+    /// <remarks>
+    /// When set, older samples are trimmed automatically after <see cref="SetSamples"/> and <see cref="Append"/>.
+    /// </remarks>
+    /// <exception cref="ArgumentOutOfRangeException">Thrown when the value is less than 1.</exception>
+    public int? Capacity
+    {
+        get => _capacity;
+        set
+        {
+            if (value is <= 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(value), "Capacity must be greater than zero.");
+            }
+
+            _capacity = value;
+            TrimToCapacity();
+        }
+    }
+
+    /// <summary>
     /// Gets the retained sample values.
     /// </summary>
     public IReadOnlyList<double> Samples => _samples;
@@ -74,6 +102,8 @@ public sealed class LineSeries
         {
             _samples.Add(sample);
         }
+
+        TrimToCapacity();
     }
 
     /// <summary>
@@ -83,6 +113,31 @@ public sealed class LineSeries
     public void Append(double sample)
     {
         _samples.Add(sample);
+        TrimToCapacity();
+    }
+
+    /// <summary>
+    /// Trims retained samples to the last <paramref name="count"/> values.
+    /// </summary>
+    /// <param name="count">The number of trailing samples to keep.</param>
+    /// <exception cref="ArgumentOutOfRangeException">Thrown when <paramref name="count"/> is negative.</exception>
+    public void TrimToLast(int count)
+    {
+        if (count < 0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(count), "Trim count must be non-negative.");
+        }
+
+        if (count == 0)
+        {
+            _samples.Clear();
+            return;
+        }
+
+        if (_samples.Count > count)
+        {
+            _samples.RemoveRange(0, _samples.Count - count);
+        }
     }
 
     /// <summary>
@@ -92,4 +147,28 @@ public sealed class LineSeries
     {
         _samples.Clear();
     }
+
+    private void TrimToCapacity()
+    {
+        if (_capacity.HasValue && _samples.Count > _capacity.Value)
+        {
+            _samples.RemoveRange(0, _samples.Count - _capacity.Value);
+        }
+    }
+}
+
+/// <summary>
+/// Defines how a <see cref="LineSeries"/> is scaled when rendered inside a <see cref="LinePlot"/>.
+/// </summary>
+public enum LineSeriesScaleMode
+{
+    /// <summary>
+    /// Uses the shared visible Y-range across all shared-scale series.
+    /// </summary>
+    Shared = 0,
+
+    /// <summary>
+    /// Uses an independent normalized Y-range based on the series' own visible samples.
+    /// </summary>
+    Normalized = 1,
 }

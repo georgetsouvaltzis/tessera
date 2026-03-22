@@ -76,7 +76,7 @@ internal sealed partial class ExternalConsumerReviewApp
         _status.LeftText =
             $"{CurrentThemeName()}  analytics  tick={_tick:0000}  selected={GetSelectedService().Name}";
         _status.RightText =
-            $"{_statusText}  1-4 tabs  t theme  d dialog  n note  Ctrl+C quit";
+            $"{_statusText}  1-5 tabs  t theme  d dialog  n note  Ctrl+C quit";
 
         var cardsRow = new RowLayout
         {
