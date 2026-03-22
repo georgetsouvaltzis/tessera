@@ -1,0 +1,35 @@
+{
+  "Schema": "teasharp-perf-gate-result-v1",
+  "Status": "dry-run",
+  "BaselinePath": "docs/perf-baselines/v1-slo-gate-baseline.json",
+  "GeneratedAtUtc": "2026-03-22T12:20:57.102229+00:00",
+  "ScenarioResults": [
+    {
+      "BenchmarkId": "SloLatencyBenchmarks.StartupFirstFrameP95Ms",
+      "MeanMs": null,
+      "AllocatedBytes": null,
+      "MaxMeanMs": 120,
+      "MaxAllocatedBytes": null,
+      "Pass": true,
+      "FailureReason": null
+    },
+    {
+      "BenchmarkId": "SloLatencyBenchmarks.InputLatencyNormalP95Ms",
+      "MeanMs": null,
+      "AllocatedBytes": null,
+      "MaxMeanMs": 12,
+      "MaxAllocatedBytes": null,
+      "Pass": true,
+      "FailureReason": null
+    },
+    {
+      "BenchmarkId": "SloLatencyBenchmarks.InputLatencyHeavyP95Ms",
+      "MeanMs": null,
+      "AllocatedBytes": null,
+      "MaxMeanMs": 25,
+      "MaxAllocatedBytes": null,
+      "Pass": true,
+      "FailureReason": null
+    }
+  ]
+}
