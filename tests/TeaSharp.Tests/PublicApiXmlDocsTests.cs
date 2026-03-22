@@ -21,6 +21,12 @@ internal static class PublicApiXmlDocsTests
         yield return new TestCase(
             "PublicApiXmlDocs_PlottingErgonomicsApis_HaveSummaries",
             PlottingErgonomicsApis_HaveSummaries);
+        yield return new TestCase(
+            "PublicApiXmlDocs_DashboardAndOverlayApis_HaveSummaries",
+            DashboardAndOverlayApis_HaveSummaries);
+        yield return new TestCase(
+            "PublicApiXmlDocs_RecentSurfaceArea_HasSummaries",
+            RecentSurfaceArea_HasSummaries);
     }
 
     private static Task RootTypes_HaveSummaries()
@@ -250,6 +256,103 @@ internal static class PublicApiXmlDocsTests
             "P:TeaSharp.Controls.LineSeries.Capacity",
             "P:TeaSharp.Controls.ScatterPlot.Capacity",
             "P:TeaSharp.Controls.LineSeries.ScaleMode",
+        ];
+
+        var docs = LoadDocumentation();
+        foreach (var memberName in memberNames)
+        {
+            AssertTagHasContent(docs, memberName, "summary");
+        }
+
+        return Task.CompletedTask;
+    }
+
+    private static Task DashboardAndOverlayApis_HaveSummaries()
+    {
+        string[] memberNames =
+        [
+            "T:TeaSharp.Controls.DashboardGrid",
+            "T:TeaSharp.Controls.DashboardTile",
+            "M:TeaSharp.Controls.DashboardGrid.SetTiles(System.Collections.Generic.IEnumerable{TeaSharp.Controls.DashboardTile})",
+            "M:TeaSharp.Controls.DashboardGrid.SetSelectedIndex(System.Int32)",
+            "T:TeaSharp.Controls.BulletChart",
+            "T:TeaSharp.Controls.BulletRange",
+            "T:TeaSharp.Controls.BulletRangeKind",
+            "M:TeaSharp.Controls.BulletChart.SetRanges(System.Collections.Generic.IEnumerable{TeaSharp.Controls.BulletRange})",
+            "M:TeaSharp.Controls.BulletChart.SetValue(System.Double)",
+            "M:TeaSharp.Controls.BulletChart.SetTarget(System.Double)",
+            "T:TeaSharp.Controls.HealthBoard",
+            "T:TeaSharp.Controls.HealthService",
+            "T:TeaSharp.Controls.HealthServiceSeverity",
+            "M:TeaSharp.Controls.HealthBoard.SetServices(System.Collections.Generic.IEnumerable{TeaSharp.Controls.HealthService})",
+            "M:TeaSharp.Controls.HealthBoard.SetSelectedIndex(System.Int32)",
+            "T:TeaSharp.Controls.SideNavRail",
+            "T:TeaSharp.Controls.NavItem",
+            "T:TeaSharp.Controls.SideNavRailGlyphSet",
+            "T:TeaSharp.Controls.SideNavRailSelectionChangedEventArgs",
+            "T:TeaSharp.Controls.SideNavRailActivatedEventArgs",
+            "M:TeaSharp.Controls.SideNavRail.SetItems(System.Collections.Generic.IEnumerable{TeaSharp.Controls.NavItem})",
+            "M:TeaSharp.Controls.SideNavRail.SetSelectedIndex(System.Int32)",
+            "T:TeaSharp.Controls.ResizablePaneGroup",
+            "T:TeaSharp.Controls.PaneSpec",
+            "M:TeaSharp.Controls.ResizablePaneGroup.SetPanes(System.Collections.Generic.IEnumerable{TeaSharp.Controls.PaneSpec})",
+            "M:TeaSharp.Controls.ResizablePaneGroup.SetSelectedPaneIndex(System.Int32)",
+            "T:TeaSharp.Controls.JumpList",
+            "T:TeaSharp.Controls.JumpListItem",
+            "T:TeaSharp.Controls.JumpListGlyphSet",
+            "T:TeaSharp.Controls.JumpListActivatedEventArgs",
+            "M:TeaSharp.Controls.JumpList.SetItems(System.Collections.Generic.IEnumerable{TeaSharp.Controls.JumpListItem})",
+            "M:TeaSharp.Controls.JumpList.SetSelectedIndex(System.Int32)",
+            "T:TeaSharp.Controls.AutocompleteInput",
+            "T:TeaSharp.Controls.AutocompleteInputGlyphSet",
+            "T:TeaSharp.Controls.AutocompleteInputSuggestionCommittedEventArgs",
+            "M:TeaSharp.Controls.AutocompleteInput.SetSuggestions(System.Collections.Generic.IEnumerable{System.String})",
+            "M:TeaSharp.Controls.AutocompleteInput.SetSelectedSuggestionIndex(System.Int32)",
+            "T:TeaSharp.Controls.QuickOpenOverlay",
+            "T:TeaSharp.Controls.QuickOpenItem",
+            "T:TeaSharp.Controls.QuickOpenOverlayGlyphSet",
+            "T:TeaSharp.Controls.QuickOpenOverlaySubmittedEventArgs",
+            "M:TeaSharp.Controls.QuickOpenOverlay.SetItems(System.Collections.Generic.IEnumerable{TeaSharp.Controls.QuickOpenItem})",
+            "M:TeaSharp.Controls.QuickOpenOverlay.SetSelectedIndex(System.Int32)",
+            "M:TeaSharp.Controls.QuickOpenOverlay.Open",
+            "M:TeaSharp.Controls.QuickOpenOverlay.Close",
+        ];
+
+        var docs = LoadDocumentation();
+        foreach (var memberName in memberNames)
+        {
+            AssertTagHasContent(docs, memberName, "summary");
+        }
+
+        return Task.CompletedTask;
+    }
+
+    private static Task RecentSurfaceArea_HasSummaries()
+    {
+        string[] memberNames =
+        [
+            "P:TeaSharp.Controls.StatsCard.Border",
+            "P:TeaSharp.Controls.StatsCard.Padding",
+            "P:TeaSharp.Controls.StatsCard.BorderStyleText",
+            "P:TeaSharp.Controls.StatsCard.FocusedBorderStyleText",
+            "P:TeaSharp.Controls.Table.SelectedRowIndex",
+            "P:TeaSharp.Controls.Table.SelectedRow",
+            "E:TeaSharp.Controls.Table.SelectionChanged",
+            "M:TeaSharp.Controls.Table.TryGetSelectedRow(System.Collections.Generic.IReadOnlyList{System.String}@)",
+            "M:TeaSharp.Controls.ListView`1.SetSelectedIndex(System.Int32)",
+            "T:TeaSharp.Styles.ThemeScope",
+            "M:TeaSharp.Styles.ThemeScope.Apply(TeaSharp.Styles.TeaTheme,TeaSharp.Controls.Control[])",
+            "M:TeaSharp.Styles.ThemeScope.Apply(TeaSharp.Styles.TeaTheme,System.Collections.Generic.IEnumerable{TeaSharp.Controls.Control})",
+            "P:TeaSharp.Controls.LinePlot.Series",
+            "M:TeaSharp.Controls.LinePlot.SetSeries(System.Collections.Generic.IEnumerable{TeaSharp.Controls.LineSeries})",
+            "M:TeaSharp.Controls.LinePlot.AddSeries(TeaSharp.Controls.LineSeries)",
+            "M:TeaSharp.Controls.LinePlot.AppendSample(System.String,System.Double)",
+            "M:TeaSharp.Controls.LineSeries.SetSamples(System.Collections.Generic.IEnumerable{System.Double})",
+            "M:TeaSharp.Controls.LineSeries.Append(System.Double)",
+            "M:TeaSharp.Controls.ScatterPlot.SetPoints(System.Collections.Generic.IEnumerable{TeaSharp.Controls.ScatterPlotPoint})",
+            "M:TeaSharp.Controls.ScatterPlot.Append(TeaSharp.Controls.ScatterPlotPoint)",
+            "M:TeaSharp.Controls.Sparkline.SetSamples(System.Collections.Generic.IEnumerable{System.Double})",
+            "M:TeaSharp.Controls.Sparkline.Append(System.Double)",
         ];
 
         var docs = LoadDocumentation();
