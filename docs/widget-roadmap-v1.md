@@ -223,7 +223,7 @@ Landed controls from the expansion tranche:
 | Control | Landed commit(s) | Current verification signal |
 | --- | --- | --- |
 | `DashboardGrid` | `8593562`, `4e005ed` | implemented; deterministic render/interaction tests present in `DashboardGridControlTests`; included in passing targeted suite |
-| `QuickOpenOverlay` | `d91c934` | implemented; keyboard/pointer/submit + deterministic render tests present in `QuickOpenOverlayControlTests`; included in passing targeted suite |
+| `QuickOpenOverlay` | `d91c934`, `db63e01` | implemented; keyboard/pointer/submit + deterministic render tests present in `QuickOpenOverlayControlTests`; typed theme/parity wiring landed; included in passing targeted suite |
 | `BulletChart` | `dfd4221`, `c681b64`, `4e005ed` | implemented; style-focused test stabilization landed; included in passing targeted suite |
 | `ResizablePaneGroup` | `77cc95d`, `1c1b748` | implemented; selection/resize/style + deterministic render tests present; theme/parity wiring restored; included in passing targeted suite |
 | `SideNavRail` | `d236de2`, `1c1b748` | implemented; keyboard/pointer/activation/style tests present; theme/parity wiring restored; included in passing targeted suite |
@@ -238,8 +238,8 @@ Targeted verification command (current host):
 
 Outstanding for this tranche (do not mark done yet):
 
-- Theme extension parity is confirmed for `BulletChart`, `DashboardGrid`, `HealthBoard`, `ResizablePaneGroup`, `SideNavRail`, `TokenEditor`, `JumpList`, `AutocompleteInput`, and `BoxPlot` (`4e005ed`, `1c1b748`, `03c7a43`).
-- `QuickOpenOverlay` still needs typed `ApplyTheme`/`ApplyThemeDefaults` coverage before tranche closure.
+- Theme extension parity is confirmed for all currently landed tranche controls (`4e005ed`, `1c1b748`, `03c7a43`, `db63e01`).
+- Remaining tranche scope is unimplemented backlog controls from the expansion list (not parity gaps on landed controls).
 
 ## Dependency Graph (Build Order)
 

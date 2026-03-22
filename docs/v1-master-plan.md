@@ -66,8 +66,8 @@ Correctness is a continuous gate across all phases: fix regressions at source an
   - forward-looking expansion backlog (post-current V1 tranche) documented with dependency/lanes plan in `6887517` -> [docs/widget-roadmap-v1.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/widget-roadmap-v1.md), [docs/prebuilt-widgets.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/prebuilt-widgets.md)
   - post-wave expansion tranche (non-M2 gate scope) landed controls: `DashboardGrid` (`8593562`), `QuickOpenOverlay` (`d91c934`), `BulletChart` (`dfd4221`), `ResizablePaneGroup` (`77cc95d`), `SideNavRail` (`d236de2`), `TokenEditor` (`7fbf7be`), `HealthBoard` (`18adc16`), `JumpList` (`187468c`), `AutocompleteInput` (`50212de` + `be23de7`), `BoxPlot` (`6ae3c5b`)
   - targeted verification signal for the landed tranche is green on this host: `dotnet test tests/TeaSharp.Tests --no-restore --nologo --filter "DashboardGrid|QuickOpenOverlay|BulletChart|ResizablePaneGroup|SideNavRail|TokenEditor|HealthBoard|JumpList|AutocompleteInput|BoxPlot"` (48 passed)
-  - integration wiring updates: `4e005ed` + `1c1b748` + `03c7a43` add theme/parity coverage for `BulletChart`, `DashboardGrid`, `HealthBoard`, `ResizablePaneGroup`, `SideNavRail`, `TokenEditor`, `JumpList`, `AutocompleteInput`, and `BoxPlot`
-  - still open for tranche closure: theme extension parity is evidence-backed for all landed tranche controls except `QuickOpenOverlay`; `QuickOpenOverlay` remains pending typed `ApplyTheme`/`ApplyThemeDefaults` wiring
+  - integration wiring updates: `4e005ed` + `1c1b748` + `03c7a43` + `db63e01` add theme/parity coverage for all currently landed tranche controls (`BulletChart`, `DashboardGrid`, `HealthBoard`, `ResizablePaneGroup`, `SideNavRail`, `TokenEditor`, `JumpList`, `AutocompleteInput`, `BoxPlot`, `QuickOpenOverlay`)
+  - tranche parity status: fully wired for all currently landed expansion controls; remaining backlog items are unimplemented controls from the expansion list
 - **M3: Visual Quality Full Polish Pass** -> **Done**
   - visual polish closure evidence landed:
     - `1c43dbe` -> WidgetGallery polished default theme/layout slice
