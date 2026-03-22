@@ -7,7 +7,7 @@ using TeaSharp.Styles;
 namespace TeaSharp.Benchmarks;
 
 [MemoryDiagnoser]
-public sealed class SloLatencyBenchmarks
+public class SloLatencyBenchmarks
 {
     private const int StartupSamples = 24;
     private const int InputSamples = 128;

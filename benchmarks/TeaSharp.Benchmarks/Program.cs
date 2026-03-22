@@ -14,6 +14,7 @@ public static class Program
         typeof(StyledHeavyOutputBenchmarks),
         typeof(ViewportRenderBenchmarks),
         typeof(SloLatencyBenchmarks),
+        typeof(InputDecodingBenchmarks),
     ];
 
     public static void Main(string[] args)
