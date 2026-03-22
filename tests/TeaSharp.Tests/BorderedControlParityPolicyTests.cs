@@ -12,6 +12,7 @@ internal static class BorderedControlParityPolicyTests
     [
         typeof(ActivityFeed),
         typeof(AreaPlot),
+        typeof(BulletChart),
         typeof(Button),
         typeof(Choice),
         typeof(ComboBox),
@@ -20,6 +21,7 @@ internal static class BorderedControlParityPolicyTests
         typeof(ContextMenu),
         typeof(DataGrid),
         typeof(DataForm<>),
+        typeof(DashboardGrid),
         typeof(DatePicker),
         typeof(Dialog),
         typeof(DiffView),
