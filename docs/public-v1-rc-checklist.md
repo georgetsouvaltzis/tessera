@@ -7,7 +7,7 @@ Do not mark a checkbox complete unless command output/evidence is attached.
 
 - [ ] RC tag/branch: `<fill>`
 - [x] Date (UTC): `2026-03-22`
-- [x] Commit SHA: `51d46a39c1a1` (pre-doc-sync head)
+- [x] Commit SHA: `3986c8b5fc24` (pre-doc-sync head)
 - [ ] Owner: `<fill>`
 
 ## Build, Test, Examples
@@ -17,10 +17,16 @@ Do not mark a checkbox complete unless command output/evidence is attached.
   - evidence: `Build succeeded. 0 Warning(s), 0 Error(s).`
 - [x] Full test suite passed
   - command: `dotnet test TeaSharp.slnx --no-restore --nologo --tl:off -v minimal`
-  - evidence: `Passed: TeaSharp.Tests 871/871, TeaSharp.IntegrationTests 10/10.`
-- [x] Canonical examples build passed
+  - evidence: `Passed: TeaSharp.Tests 873/873, TeaSharp.IntegrationTests 10/10.`
+- [ ] Canonical examples build passed
   - command: `dotnet build TeaSharp.Examples.slnx --no-restore --nologo`
-  - evidence: `Build succeeded. 0 Warning(s), 0 Error(s).`
+  - evidence: `Currently blocked on in-flight workspace project ControlPlaneOpsDashboard (`NETSDK1004` under no-restore and `CS0246` unresolved types).`
+- [x] Canonical onboarding examples build passed (targeted)
+  - commands:
+    - `dotnet build examples/HelloWorld/HelloWorld.csproj --no-restore --nologo -v minimal`
+    - `dotnet build examples/CounterForm/CounterForm.csproj --no-restore --nologo -v minimal`
+    - `dotnet build examples/WorkspaceApp/WorkspaceApp.csproj --no-restore --nologo -v minimal`
+  - evidence: `All three canonical onboarding example projects built successfully with 0 warnings and 0 errors.`
 - [x] Canonical examples smoke run validated
   - commands:
     - `dotnet run --project examples/HelloWorld --no-build`
@@ -50,9 +56,9 @@ Do not mark a checkbox complete unless command output/evidence is attached.
   - evidence: `Reviewed in current docs sync lanes; inventories/spec/theme mappings aligned to shipped API surface.`
 - [x] XML docs expectations validated for changed public API
   - command: `dotnet test tests/TeaSharp.Tests --no-restore --nologo --filter "PublicApiXmlDocs_"`
-  - evidence: `Passed: 4/4, Failed: 0, Skipped: 0.`
+  - evidence: `Passed: 5/5, Failed: 0, Skipped: 0.`
 - [x] Docs consistency pass completed for shipped behavior
-  - evidence: `Current docs sync commits and references are coherent with v1 source-of-truth docs, including external-consumer friction closure updates for Table/ListView/ThemeScope (`51d46a3`, `a9f774f`, `8ff286d`).`
+  - evidence: `Current docs sync commits and references are coherent with v1 source-of-truth docs, including Step-1 closure evidence updates (`51d46a3`, `a9f774f`, `8ff286d`, `83f0258`, `3986c8b`).`
 - [x] Terminal compatibility matrix evidence attached
   - reference: [terminal-compatibility-evidence-v1.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/terminal-compatibility-evidence-v1.md)
   - evidence: `iTerm2/WezTerm/Kitty/Windows Terminal binaries not installed on this host; verification uses deterministic tests + official specs; Ghostty has host evidence.`
@@ -61,7 +67,7 @@ Do not mark a checkbox complete unless command output/evidence is attached.
 
 - [ ] V1 scope verified complete (API simplification, theming, widget tranche, perf/docs gates)
   - reference: `docs/v1-master-plan.md`
-  - evidence: `M4 remains in progress and M5 is pending manual signoff in the master plan; keep this gate open until closure evidence is attached.`
+  - evidence: `M4 implementation evidence is complete but manual signoff remains pending, and M5 remains pending manual signoff in the master plan; keep this gate open until closure evidence is attached.`
 - [x] V1.1-only features remain out of V1 release scope
   - image rendering remains V1.1 (`kitty`, `iTerm2`, `wezterm`, `ghostty`)
   - evidence: `v1-master-plan and source-of-truth keep image rendering explicitly in V1.1 scope.`
@@ -78,8 +84,14 @@ Do not mark a checkbox complete unless command output/evidence is attached.
 ## Evidence Snapshot (this run)
 
 - `dotnet build TeaSharp.slnx --no-restore --nologo -v minimal` -> `Build succeeded. 0 Warning(s), 0 Error(s).`
-- `dotnet test TeaSharp.slnx --no-restore --nologo --tl:off -v minimal` -> `TeaSharp.Tests: 871 passed; TeaSharp.IntegrationTests: 10 passed.`
-- `dotnet build TeaSharp.Examples.slnx --no-restore --nologo -v minimal` -> `Build succeeded. 0 Warning(s), 0 Error(s).`
+- `dotnet test TeaSharp.slnx --no-restore --nologo --tl:off -v minimal` -> `TeaSharp.Tests: 873 passed; TeaSharp.IntegrationTests: 10 passed.`
+- `dotnet test tests/TeaSharp.Tests --no-restore --nologo --filter "ApiErgonomics|PublicApiBoundary|PublicApiXmlDocs"` -> `Passed: 42, Failed: 0.`
+- `dotnet test tests/TeaSharp.Tests --no-restore --nologo --filter "PublicApiXmlDocs_"` -> `Passed: 5, Failed: 0.`
+- `dotnet test tests/TeaSharp.Tests --no-restore --nologo --filter "PublicApiBoundary_"` -> `Passed: 12, Failed: 0.`
+- `dotnet build TeaSharp.Examples.slnx --no-restore --nologo -v minimal` -> `Build FAILED` (`NETSDK1004` missing assets for `ControlPlaneOpsDashboard` under no-restore; `CS0246` unresolved `ScreenContext`/`Screen` in `ControlPlaneOpsDashboard.Analytics.cs`).
+- `dotnet build examples/HelloWorld/HelloWorld.csproj --no-restore --nologo -v minimal` -> `Build succeeded. 0 Warning(s), 0 Error(s).`
+- `dotnet build examples/CounterForm/CounterForm.csproj --no-restore --nologo -v minimal` -> `Build succeeded. 0 Warning(s), 0 Error(s).`
+- `dotnet build examples/WorkspaceApp/WorkspaceApp.csproj --no-restore --nologo -v minimal` -> `Build succeeded. 0 Warning(s), 0 Error(s).`
 - `scripts/smoke_examples_v1.sh 4` -> `PASS HelloWorld`, `PASS CounterForm`, `PASS WorkspaceApp`, `SUMMARY pass=3 fail=0` (bounded startup probe; processes intentionally terminated after 4s).
 - `dotnet run --project benchmarks/TeaSharp.Benchmarks/TeaSharp.Benchmarks.csproj --no-build -- --list flat` -> listed 20 benchmark entries (`render`, `render-only`, SLO, and input decoding suites).
 - `scripts/perf_gate_v1.sh dry-run` -> intermittent wrapper stall reproduced: command prints the benchmark `dotnet build ...TeaSharp.Benchmarks.csproj...` line and may not progress.

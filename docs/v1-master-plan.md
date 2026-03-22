@@ -77,7 +77,7 @@ Correctness is a continuous gate across all phases: fix regressions at source an
     - `cf3e8a1` -> focus-marker policy/regression test follow-up
   - runtime visual sanity artifacts exist under `.artifacts/screenshots/*`; current text-capture scans show no `<...;...M` leakage patterns
   - latest workspace verification on March 21, 2026 is green (`dotnet build TeaSharp.slnx --no-restore --nologo -v minimal`, `dotnet test TeaSharp.slnx --no-restore --nologo`, `dotnet build TeaSharp.Examples.slnx --no-restore --nologo -v minimal`); WorkspaceApp non-interactive launch smoke also passed (`dotnet run --project examples/WorkspaceApp --no-build --nologo`, short timed start/stop).
-- **M4: API Freeze + Cleanup** -> **In progress**
+- **M4: API Freeze + Cleanup** -> **Pending manual signoff**
   - checklist evidence updates from recent commits:
     - item `1` + item `6` evidence: `c712c2a` -> [examples/PublicApiDashboard/Program.cs](/Users/georgetsouvaltzis/Projects/playground/teasharp/examples/PublicApiDashboard/Program.cs), [docs/public-api-consumer-friction-log.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/public-api-consumer-friction-log.md), [examples/PublicApiDashboard/README.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/examples/PublicApiDashboard/README.md)
     - item `4` focused-border naming/behavior consistency evidence: `1a4fab8` -> [src/TeaSharp/Controls/SearchResultsView.Rendering.cs](/Users/georgetsouvaltzis/Projects/playground/teasharp/src/TeaSharp/Controls/SearchResultsView.Rendering.cs), [tests/TeaSharp.Tests/SearchResultsViewControlTests.cs](/Users/georgetsouvaltzis/Projects/playground/teasharp/tests/TeaSharp.Tests/SearchResultsViewControlTests.cs)
@@ -104,12 +104,15 @@ Correctness is a continuous gate across all phases: fix regressions at source an
     - item `4` guardrail enforcement evidence: `0a38229` -> [tests/TeaSharp.Tests/BorderedControlParityPolicyTests.cs](/Users/georgetsouvaltzis/Projects/playground/teasharp/tests/TeaSharp.Tests/BorderedControlParityPolicyTests.cs)
     - item `4` theme/parity integration follow-up: `03c7a43` -> [src/TeaSharp/Styles/TeaThemeControlExtensions.Navigation.cs](/Users/georgetsouvaltzis/Projects/playground/teasharp/src/TeaSharp/Styles/TeaThemeControlExtensions.Navigation.cs), [src/TeaSharp/Styles/TeaThemeControlExtensions.NavigationOverlay.cs](/Users/georgetsouvaltzis/Projects/playground/teasharp/src/TeaSharp/Styles/TeaThemeControlExtensions.NavigationOverlay.cs), [src/TeaSharp/Styles/TeaThemeControlExtensions.Plotting.cs](/Users/georgetsouvaltzis/Projects/playground/teasharp/src/TeaSharp/Styles/TeaThemeControlExtensions.Plotting.cs), [tests/TeaSharp.Tests/BorderedControlParityPolicyTests.cs](/Users/georgetsouvaltzis/Projects/playground/teasharp/tests/TeaSharp.Tests/BorderedControlParityPolicyTests.cs)
     - item `6` onboarding boundary guard evidence: `9c89036` -> [tests/TeaSharp.Tests/PublicApiBoundaryTests.cs](/Users/georgetsouvaltzis/Projects/playground/teasharp/tests/TeaSharp.Tests/PublicApiBoundaryTests.cs)
-  - C4 remains open until all API freeze checklist items are marked complete
+    - item `2` + item `6` hosting opt-in boundary enforcement follow-up: `83f0258` -> [tests/TeaSharp.Tests/PublicApiBoundaryTests.cs](/Users/georgetsouvaltzis/Projects/playground/teasharp/tests/TeaSharp.Tests/PublicApiBoundaryTests.cs), [docs/public-api-guidelines.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/public-api-guidelines.md)
+    - item `5` XML docs gate follow-up for plotting ergonomics surface: `3986c8b` -> [tests/TeaSharp.Tests/PublicApiXmlDocsTests.cs](/Users/georgetsouvaltzis/Projects/playground/teasharp/tests/TeaSharp.Tests/PublicApiXmlDocsTests.cs)
+  - latest local API-gate command evidence (March 22, 2026): `dotnet test tests/TeaSharp.Tests --no-restore --nologo --filter "ApiErgonomics|PublicApiBoundary|PublicApiXmlDocs"` PASS (`42/42`), `dotnet test TeaSharp.slnx --no-restore --nologo --tl:off -v minimal` PASS (`TeaSharp.Tests 873/873`, `TeaSharp.IntegrationTests 10/10`)
+  - C4 implementation evidence is complete; explicit checklist owner/date signoff is still required before closing C4
 - **M5: Performance Gate + Benchmarks + Docs Freeze** -> **Pending manual signoff**
   - perf-gate harness scaffolding landed in `35b8fdc` -> [benchmarks/TeaSharp.Benchmarks/SloLatencyBenchmarks.cs](/Users/georgetsouvaltzis/Projects/playground/teasharp/benchmarks/TeaSharp.Benchmarks/SloLatencyBenchmarks.cs), [benchmarks/TeaSharp.Benchmarks/PerfGateRunner.cs](/Users/georgetsouvaltzis/Projects/playground/teasharp/benchmarks/TeaSharp.Benchmarks/PerfGateRunner.cs), [scripts/perf_gate_v1.sh](/Users/georgetsouvaltzis/Projects/playground/teasharp/scripts/perf_gate_v1.sh), [docs/perf-baselines/v1-slo-gate-baseline.json](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/perf-baselines/v1-slo-gate-baseline.json)
   - recent perf slices landed in `78b3024` + `1469de3` (input decoding benchmark coverage + decoder/render allocation improvements)
   - verification evidence capture expanded in `5784559` (full-suite sanity evidence recorded in this plan)
-  - latest local run evidence (March 22, 2026): `dotnet build TeaSharp.slnx --no-restore --nologo -v minimal` PASS, `dotnet test TeaSharp.slnx --no-restore --nologo --tl:off -v minimal` PASS (TeaSharp.Tests `871/871`, Integration `10/10`), `dotnet build TeaSharp.Examples.slnx --no-restore --nologo -v minimal` PASS, `scripts/smoke_examples_v1.sh 4` PASS (`pass=3 fail=0`)
+  - latest local run evidence (March 22, 2026): `dotnet build TeaSharp.slnx --no-restore --nologo -v minimal` PASS, `dotnet test TeaSharp.slnx --no-restore --nologo --tl:off -v minimal` PASS (TeaSharp.Tests `873/873`, Integration `10/10`), `dotnet build TeaSharp.Examples.slnx --no-restore --nologo -v minimal` currently blocked by in-flight `ControlPlaneOpsDashboard` compile issues, targeted canonical builds (`HelloWorld`, `CounterForm`, `WorkspaceApp`) PASS, `scripts/smoke_examples_v1.sh 4` PASS (`pass=3 fail=0`)
   - latest perf evidence (March 22, 2026): direct gate dry-run PASS via `dotnet benchmarks/TeaSharp.Benchmarks/bin/Release/net10.0/TeaSharp.Benchmarks.dll --perf-gate --baseline docs/perf-baselines/v1-slo-gate-baseline.json --output docs/perf-baselines/latest-slo-gate-result.json --dry-run`; input decoding snapshot from `InputDecodingBenchmarks` = osc clipboard `44.65 ns / 208 B`, osc color `60.15 ns / 136 B`, dcs capability `49.52 ns / 272 B`
   - open script note: `scripts/perf_gate_v1.sh dry-run` intermittently stalls after printing the `dotnet build ...TeaSharp.Benchmarks.csproj...` line with no further output; direct DLL command above is the current deterministic workaround until wrapper behavior is stabilized
   - outstanding: explicit regression-budget pass/fail verdict against the accepted baseline is not yet attached for the final RC candidate SHA
@@ -184,12 +187,12 @@ Release approval rule: M5 is only complete when all four rows above are moved fr
 
 M4 checklist status snapshot (March 22, 2026):
 
-- item `1`: **In progress** (consumer-path onboarding evidence exists via `c712c2a` + `896c227`; final gate closure still pending explicit checklist signoff)
-- item `2`: **In progress** (advanced seam guidance remains opt-in; no new closure stamp in this batch)
-- item `3`: **In progress** (ergonomics and naming convergence advanced via `4d4a391` + `e731edc` + `51d46a3` + `a9f774f` + `8ff286d`; previously tracked external-consumer gaps for `Table`, `ListView<T>`, and aggregate theme fan-out are now closed, while final gate signoff remains pending)
-- item `4`: **In progress** (cross-control frame/focus naming consistency and parity guardrails reinforced via `1a4fab8` + `0a38229` + `03c7a43`; final gate signoff still open)
-- item `5`: **In progress** (latest explicit XML docs closure evidence remains `4e3a240`; no new docs-gate closure commit in this batch)
-- item `6`: **In progress** (onboarding boundary guard strength improved via `9c89036` plus consumer evidence `896c227`; final closure still pending RC checklist completion)
+- item `1`: **Evidence complete** (consumer-path onboarding/no-DI coverage via `c712c2a` + `896c227`; pending manual checklist signoff)
+- item `2`: **Evidence complete** (advanced seam remains opt-in with explicit hosting-boundary enforcement in `83f0258`; pending manual checklist signoff)
+- item `3`: **Evidence complete** (ergonomics and naming convergence covered by `4d4a391` + `e731edc` + `51d46a3` + `a9f774f` + `8ff286d`; pending manual checklist signoff)
+- item `4`: **Evidence complete** (cross-control frame/focus naming consistency and parity guardrails reinforced via `1a4fab8` + `0a38229` + `03c7a43`; pending manual checklist signoff)
+- item `5`: **Evidence complete** (XML docs gate strengthened by `4e3a240` + `3986c8b`; pending manual checklist signoff)
+- item `6`: **Evidence complete** (onboarding boundary guard evidence via `9c89036` + `83f0258` + `896c227`; pending manual checklist signoff)
 
 ## Naming Clarity Gate
 - Public names must be unambiguous to C# developers without reading internals.
