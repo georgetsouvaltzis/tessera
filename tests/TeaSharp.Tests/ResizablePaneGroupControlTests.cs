@@ -56,7 +56,7 @@ public sealed class ResizablePaneGroupControlTests
         Render(control, width: 64, height: 8);
         var before = first.LastRenderBounds.Width;
 
-        var handled = control.Handle(new KeyPressed(Key.Right, modifiers: ModifierKeys.Ctrl));
+        var handled = control.Handle(new KeyPressed(Key.Right, Modifiers: ModifierKeys.Ctrl));
         Render(control, width: 64, height: 8);
         var after = first.LastRenderBounds.Width;
 

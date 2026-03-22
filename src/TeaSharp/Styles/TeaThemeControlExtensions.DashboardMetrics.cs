@@ -115,4 +115,72 @@ public static partial class TeaThemeControlExtensions
         ArgumentNullException.ThrowIfNull(overrides);
         return control.ApplyThemeDefaults(overrides.Resolve(control, baseTheme, state));
     }
+
+    public static HealthBoard ApplyTheme(this HealthBoard control, TeaTheme theme)
+    {
+        ArgumentNullException.ThrowIfNull(control);
+        ArgumentNullException.ThrowIfNull(theme);
+
+        control.TitleStyle = theme.Text.Secondary;
+        control.FocusedTitleStyle = theme.Focus.Title;
+        control.BorderStyleText = theme.Border.Default;
+        control.FocusedBorderStyleText = theme.Border.Focused.Merge(theme.Focus.Border);
+        control.ServiceStyle = theme.Text.Primary;
+        control.HealthyServiceStyle = theme.State.Success;
+        control.DegradedServiceStyle = theme.State.Warning;
+        control.OutageServiceStyle = theme.State.Error;
+        control.HoveredServiceStyle = theme.Accent.Secondary;
+        control.SelectedServiceStyle = theme.Selection.Foreground.Merge(theme.Selection.Background);
+        control.FocusedSelectedServiceStyle = theme.Focus.Ring;
+        control.AcknowledgedServiceStyle = theme.Text.Muted;
+        control.MutedServiceStyle = theme.Text.Muted;
+        control.DisabledServiceStyle = theme.Text.Muted;
+        control.EmptyStyle = theme.Text.Muted;
+        control.FocusMarker = theme.Focus.Marker;
+        return control;
+    }
+
+    public static HealthBoard ApplyTheme(
+        this HealthBoard control,
+        TeaThemeOverrides overrides,
+        TeaTheme baseTheme,
+        TeaThemeVisualState state = TeaThemeVisualState.Default)
+    {
+        ArgumentNullException.ThrowIfNull(overrides);
+        return control.ApplyTheme(overrides.Resolve(control, baseTheme, state));
+    }
+
+    public static HealthBoard ApplyThemeDefaults(this HealthBoard control, TeaTheme theme)
+    {
+        ArgumentNullException.ThrowIfNull(control);
+        ArgumentNullException.ThrowIfNull(theme);
+
+        control.TitleStyle = ApplyDefault(control.TitleStyle, theme.Text.Secondary);
+        control.FocusedTitleStyle = ApplyDefault(control.FocusedTitleStyle, theme.Focus.Title);
+        control.BorderStyleText = ApplyDefault(control.BorderStyleText, theme.Border.Default);
+        control.FocusedBorderStyleText = ApplyDefault(control.FocusedBorderStyleText, theme.Border.Focused.Merge(theme.Focus.Border));
+        control.ServiceStyle = ApplyDefault(control.ServiceStyle, theme.Text.Primary);
+        control.HealthyServiceStyle = ApplyDefault(control.HealthyServiceStyle, theme.State.Success);
+        control.DegradedServiceStyle = ApplyDefault(control.DegradedServiceStyle, theme.State.Warning);
+        control.OutageServiceStyle = ApplyDefault(control.OutageServiceStyle, theme.State.Error);
+        control.HoveredServiceStyle = ApplyDefault(control.HoveredServiceStyle, theme.Accent.Secondary);
+        control.SelectedServiceStyle = ApplyDefault(control.SelectedServiceStyle, theme.Selection.Foreground.Merge(theme.Selection.Background));
+        control.FocusedSelectedServiceStyle = ApplyDefault(control.FocusedSelectedServiceStyle, theme.Focus.Ring);
+        control.AcknowledgedServiceStyle = ApplyDefault(control.AcknowledgedServiceStyle, theme.Text.Muted);
+        control.MutedServiceStyle = ApplyDefault(control.MutedServiceStyle, theme.Text.Muted);
+        control.DisabledServiceStyle = ApplyDefault(control.DisabledServiceStyle, theme.Text.Muted);
+        control.EmptyStyle = ApplyDefault(control.EmptyStyle, theme.Text.Muted);
+        control.FocusMarker = ApplyDefault(control.FocusMarker, theme.Focus.Marker);
+        return control;
+    }
+
+    public static HealthBoard ApplyThemeDefaults(
+        this HealthBoard control,
+        TeaThemeOverrides overrides,
+        TeaTheme baseTheme,
+        TeaThemeVisualState state = TeaThemeVisualState.Default)
+    {
+        ArgumentNullException.ThrowIfNull(overrides);
+        return control.ApplyThemeDefaults(overrides.Resolve(control, baseTheme, state));
+    }
 }

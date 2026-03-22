@@ -295,6 +295,80 @@ public static partial class TeaThemeControlExtensions
     }
 
     /// <summary>
+    /// Applies a resolved theme to a <see cref="TokenEditor"/>.
+    /// </summary>
+    public static TokenEditor ApplyTheme(this TokenEditor control, TeaTheme theme)
+    {
+        ArgumentNullException.ThrowIfNull(control);
+        ArgumentNullException.ThrowIfNull(theme);
+
+        control.TitleStyle = theme.Text.Secondary;
+        control.FocusedTitleStyle = theme.Focus.Title;
+        control.TokenStyle = theme.Text.Secondary;
+        control.SelectedTokenStyle = theme.Selection.Foreground.Merge(theme.Selection.Background);
+        control.FocusedSelectedTokenStyle = theme.Focus.Ring;
+        control.HoveredTokenStyle = theme.Accent.Secondary;
+        control.DisabledTokenStyle = theme.Text.Muted;
+        control.ValueTextStyle = theme.Text.Primary;
+        control.PlaceholderTextStyle = theme.Text.Muted;
+        control.BorderStyleText = theme.Border.Default;
+        control.FocusedBorderStyleText = theme.Border.Focused.Merge(theme.Focus.Border);
+        control.FocusMarker = theme.Focus.Marker;
+        return control;
+    }
+
+    /// <summary>
+    /// Resolves and applies hierarchical overrides to a <see cref="TokenEditor"/>.
+    /// </summary>
+    public static TokenEditor ApplyTheme(
+        this TokenEditor control,
+        TeaThemeOverrides overrides,
+        TeaTheme baseTheme,
+        TeaThemeVisualState state = TeaThemeVisualState.Default)
+    {
+        ArgumentNullException.ThrowIfNull(overrides);
+        return control.ApplyTheme(overrides.Resolve(control, baseTheme, state));
+    }
+
+    /// <summary>
+    /// Applies theme defaults to a <see cref="TokenEditor"/> without overwriting explicit non-empty styles.
+    /// </summary>
+    public static TokenEditor ApplyThemeDefaults(this TokenEditor control, TeaTheme theme)
+    {
+        ArgumentNullException.ThrowIfNull(control);
+        ArgumentNullException.ThrowIfNull(theme);
+
+        control.TitleStyle = ApplyDefault(control.TitleStyle, theme.Text.Secondary);
+        control.FocusedTitleStyle = ApplyDefault(control.FocusedTitleStyle, theme.Focus.Title);
+        control.TokenStyle = ApplyDefault(control.TokenStyle, theme.Text.Secondary);
+        control.SelectedTokenStyle = ApplyDefault(
+            control.SelectedTokenStyle,
+            theme.Selection.Foreground.Merge(theme.Selection.Background));
+        control.FocusedSelectedTokenStyle = ApplyDefault(control.FocusedSelectedTokenStyle, theme.Focus.Ring);
+        control.HoveredTokenStyle = ApplyDefault(control.HoveredTokenStyle, theme.Accent.Secondary);
+        control.DisabledTokenStyle = ApplyDefault(control.DisabledTokenStyle, theme.Text.Muted);
+        control.ValueTextStyle = ApplyDefault(control.ValueTextStyle, theme.Text.Primary);
+        control.PlaceholderTextStyle = ApplyDefault(control.PlaceholderTextStyle, theme.Text.Muted);
+        control.BorderStyleText = ApplyDefault(control.BorderStyleText, theme.Border.Default);
+        control.FocusedBorderStyleText = ApplyDefault(control.FocusedBorderStyleText, theme.Border.Focused.Merge(theme.Focus.Border));
+        control.FocusMarker = ApplyDefault(control.FocusMarker, theme.Focus.Marker);
+        return control;
+    }
+
+    /// <summary>
+    /// Resolves and applies hierarchical defaults to a <see cref="TokenEditor"/> without overwriting explicit non-empty styles.
+    /// </summary>
+    public static TokenEditor ApplyThemeDefaults(
+        this TokenEditor control,
+        TeaThemeOverrides overrides,
+        TeaTheme baseTheme,
+        TeaThemeVisualState state = TeaThemeVisualState.Default)
+    {
+        ArgumentNullException.ThrowIfNull(overrides);
+        return control.ApplyThemeDefaults(overrides.Resolve(control, baseTheme, state));
+    }
+
+    /// <summary>
     /// Applies a resolved theme to a <see cref="CalendarMonthView"/>.
     /// </summary>
     public static CalendarMonthView ApplyTheme(this CalendarMonthView control, TeaTheme theme)

@@ -53,9 +53,11 @@ internal static class BorderedControlParityPolicyTests
         typeof(ProgressBar),
         typeof(PropertyGrid),
         typeof(QueryBuilder),
+        typeof(ResizablePaneGroup),
         typeof(RichTextView),
         typeof(SearchBox),
         typeof(SearchResultsView),
+        typeof(SideNavRail),
         typeof(Slider),
         typeof(SplitView),
         typeof(Sparkline),
@@ -69,6 +71,7 @@ internal static class BorderedControlParityPolicyTests
         typeof(Timeline),
         typeof(ToastCenter),
         typeof(Toggle),
+        typeof(TokenEditor),
         typeof(TraceViewer),
         typeof(TreeMapChart),
         typeof(TreeTable),
@@ -76,6 +79,7 @@ internal static class BorderedControlParityPolicyTests
         typeof(ValidationSummary),
         typeof(VirtualizedListView<>),
         typeof(Wizard),
+        typeof(HealthBoard),
     ];
 
     public static IEnumerable<TestCase> Cases()

@@ -119,7 +119,9 @@ public sealed class TokenEditorControlTests
         TestAssert.True(output.Contains("48;2;11;22;33", StringComparison.Ordinal), "Selected token style should render.");
         TestAssert.True(output.Contains("38;2;44;55;66", StringComparison.Ordinal), "Disabled token style should render.");
         TestAssert.True(
-            output.Contains(";4;", StringComparison.Ordinal) || output.Contains("[4m", StringComparison.Ordinal),
+            output.Contains(";4;", StringComparison.Ordinal)
+            || output.Contains("[4m", StringComparison.Ordinal)
+            || output.Contains("[4;", StringComparison.Ordinal),
             "Hovered token style should render.");
     }
 

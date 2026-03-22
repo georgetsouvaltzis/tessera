@@ -170,6 +170,62 @@ public static partial class TeaThemeControlExtensions
         return control.ApplyThemeDefaults(overrides.Resolve(control, baseTheme, state));
     }
 
+    public static ResizablePaneGroup ApplyTheme(this ResizablePaneGroup control, TeaTheme theme)
+    {
+        ArgumentNullException.ThrowIfNull(control);
+        ArgumentNullException.ThrowIfNull(theme);
+
+        control.TitleStyleText = theme.Text.Secondary;
+        control.FocusedTitleStyleText = theme.Focus.Title;
+        control.BorderStyleText = theme.Border.Default;
+        control.FocusedBorderStyleText = theme.Border.Focused.Merge(theme.Focus.Border);
+        control.DividerStyleText = theme.Text.Muted;
+        control.FocusedDividerStyleText = theme.Focus.Ring;
+        control.PaneStyleText = theme.Text.Primary;
+        control.SelectedPaneStyleText = theme.Selection.Foreground.Merge(theme.Selection.Background);
+        control.DisabledStyleText = theme.Text.Muted;
+        control.FocusMarker = theme.Focus.Marker;
+        return control;
+    }
+
+    public static ResizablePaneGroup ApplyTheme(
+        this ResizablePaneGroup control,
+        TeaThemeOverrides overrides,
+        TeaTheme baseTheme,
+        TeaThemeVisualState state = TeaThemeVisualState.Default)
+    {
+        ArgumentNullException.ThrowIfNull(overrides);
+        return control.ApplyTheme(overrides.Resolve(control, baseTheme, state));
+    }
+
+    public static ResizablePaneGroup ApplyThemeDefaults(this ResizablePaneGroup control, TeaTheme theme)
+    {
+        ArgumentNullException.ThrowIfNull(control);
+        ArgumentNullException.ThrowIfNull(theme);
+
+        control.TitleStyleText = ApplyDefault(control.TitleStyleText, theme.Text.Secondary);
+        control.FocusedTitleStyleText = ApplyDefault(control.FocusedTitleStyleText, theme.Focus.Title);
+        control.BorderStyleText = ApplyDefault(control.BorderStyleText, theme.Border.Default);
+        control.FocusedBorderStyleText = ApplyDefault(control.FocusedBorderStyleText, theme.Border.Focused.Merge(theme.Focus.Border));
+        control.DividerStyleText = ApplyDefault(control.DividerStyleText, theme.Text.Muted);
+        control.FocusedDividerStyleText = ApplyDefault(control.FocusedDividerStyleText, theme.Focus.Ring);
+        control.PaneStyleText = ApplyDefault(control.PaneStyleText, theme.Text.Primary);
+        control.SelectedPaneStyleText = ApplyDefault(control.SelectedPaneStyleText, theme.Selection.Foreground.Merge(theme.Selection.Background));
+        control.DisabledStyleText = ApplyDefault(control.DisabledStyleText, theme.Text.Muted);
+        control.FocusMarker = ApplyDefault(control.FocusMarker, theme.Focus.Marker);
+        return control;
+    }
+
+    public static ResizablePaneGroup ApplyThemeDefaults(
+        this ResizablePaneGroup control,
+        TeaThemeOverrides overrides,
+        TeaTheme baseTheme,
+        TeaThemeVisualState state = TeaThemeVisualState.Default)
+    {
+        ArgumentNullException.ThrowIfNull(overrides);
+        return control.ApplyThemeDefaults(overrides.Resolve(control, baseTheme, state));
+    }
+
     public static InspectorPanel ApplyTheme(this InspectorPanel control, TeaTheme theme)
     {
         ArgumentNullException.ThrowIfNull(control);
