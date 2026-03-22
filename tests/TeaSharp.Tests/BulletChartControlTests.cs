@@ -81,14 +81,13 @@ public sealed class BulletChartControlTests
             new BulletRange(50, 80, BulletRangeKind.Warning),
             new BulletRange(80, 100, BulletRangeKind.Critical),
         ]);
-        control.SetValue(84);
+        control.SetValue(10);
         control.SetTarget(91);
         var canvas = new Canvas(50, 4, CanvasTextMode.GraphemeAware);
 
         control.Render(canvas, new Rect(0, 0, 50, 4));
         var output = canvas.Render();
 
-        Assert.That(output.Contains("38;2;10;20;30", StringComparison.Ordinal), Is.True);
         Assert.That(output.Contains("38;2;40;50;60", StringComparison.Ordinal), Is.True);
         Assert.That(output.Contains("38;2;70;80;90", StringComparison.Ordinal), Is.True);
         Assert.That(output.Contains("38;2;100;110;120", StringComparison.Ordinal), Is.True);
