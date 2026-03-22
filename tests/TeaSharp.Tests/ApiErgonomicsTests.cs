@@ -23,6 +23,8 @@ internal static class ApiErgonomicsTests
         yield return new TestCase("ApiErgonomics_RootDialog_ConfiguresFrameWithoutLegacyBorderStyleName", RootDialog_ConfiguresFrameWithoutLegacyBorderStyleName);
         yield return new TestCase("ApiErgonomics_RootModal_ConfiguresWithoutCatalog", RootModal_ConfiguresWithoutCatalog);
         yield return new TestCase("ApiErgonomics_RootModal_ConfiguresFrameWithoutLegacyBorderStyleName", RootModal_ConfiguresFrameWithoutLegacyBorderStyleName);
+        yield return new TestCase("ApiErgonomics_SelectionMutators_ExposeSetSelectedIndexAcrossPrimaryControls", SelectionMutators_ExposeSetSelectedIndexAcrossPrimaryControls);
+        yield return new TestCase("ApiErgonomics_SelectionMutators_RetainLegacySelectCompatibilityWrappers", SelectionMutators_RetainLegacySelectCompatibilityWrappers);
     }
 
     private static Task Thickness_UsesStandardSpacingVocabulary()
@@ -283,6 +285,107 @@ internal static class ApiErgonomicsTests
         TestAssert.True(modal.Border == BorderStyle.Ascii, "Modal options should set border style through Border.");
         TestAssert.Equal(2, modal.Padding.Left, "Modal options should set left padding.");
         TestAssert.Equal(1, modal.Padding.Top, "Modal options should set top padding.");
+        return Task.CompletedTask;
+    }
+
+    private static Task SelectionMutators_ExposeSetSelectedIndexAcrossPrimaryControls()
+    {
+        var timeline = new Timeline();
+        timeline.SetEntries(
+        [
+            new TimelineEntry("a", "Build", "10:00"),
+            new TimelineEntry("b", "Deploy", "10:05"),
+            new TimelineEntry("c", "Verify", "10:10"),
+        ]);
+
+        var traceStart = new DateTimeOffset(2026, 03, 22, 10, 0, 0, TimeSpan.Zero);
+        var trace = new TraceViewer();
+        trace.SetEntries(
+        [
+            new TraceEntry("a", traceStart, "bootstrap", "begin"),
+            new TraceEntry("b", traceStart.AddSeconds(1), "bootstrap", "step"),
+            new TraceEntry("c", traceStart.AddSeconds(2), "bootstrap", "end"),
+        ]);
+
+        var process = new ProcessListView();
+        process.SetEntries(
+        [
+            new ProcessListEntry(1, "api"),
+            new ProcessListEntry(2, "worker"),
+            new ProcessListEntry(3, "jobs"),
+        ]);
+
+        var palette = new PaletteEditor();
+        palette.SetSwatches(
+        [
+            new PaletteSwatch("base", "#111111"),
+            new PaletteSwatch("accent", "#222222"),
+            new PaletteSwatch("focus", "#333333"),
+        ]);
+
+        var toolbar = new Toolbar();
+        toolbar.SetItems(
+        [
+            new ToolbarItem("home", "Home"),
+            new ToolbarItem("logs", "Logs"),
+            new ToolbarItem("diag", "Diag"),
+        ]);
+
+        var paneTabs = new PaneTabs();
+        paneTabs.SetTabs(
+        [
+            new PaneTabItem("home", "Home"),
+            new PaneTabItem("ops", "Operations"),
+            new PaneTabItem("diag", "Diagnostics"),
+        ]);
+
+        var tabs = new Tabs("Overview", "Logs", "Metrics");
+
+        TestAssert.True(timeline.SetSelectedIndex(1), "Timeline should expose SetSelectedIndex(int).");
+        TestAssert.True(trace.SetSelectedIndex(1), "TraceViewer should expose SetSelectedIndex(int).");
+        TestAssert.True(process.SetSelectedIndex(1), "ProcessListView should expose SetSelectedIndex(int).");
+        TestAssert.True(palette.SetSelectedIndex(1), "PaletteEditor should expose SetSelectedIndex(int).");
+        TestAssert.True(toolbar.SetSelectedIndex(1), "Toolbar should expose SetSelectedIndex(int).");
+        TestAssert.True(paneTabs.SetSelectedIndex(1), "PaneTabs should expose SetSelectedIndex(int).");
+        TestAssert.True(tabs.SetSelectedIndex(2), "Tabs should expose SetSelectedIndex(int) as canonical mutator.");
+
+        TestAssert.Equal(1, timeline.SelectedIndex, "Timeline should update selected index.");
+        TestAssert.Equal(1, trace.SelectedIndex, "TraceViewer should update selected index.");
+        TestAssert.Equal(1, process.SelectedIndex, "ProcessListView should update selected index.");
+        TestAssert.Equal(1, palette.SelectedIndex, "PaletteEditor should update selected index.");
+        TestAssert.Equal(1, toolbar.SelectedIndex, "Toolbar should update selected index.");
+        TestAssert.Equal(1, paneTabs.SelectedIndex, "PaneTabs should update selected index.");
+        TestAssert.Equal(2, tabs.SelectedIndex, "Tabs should update selected index.");
+
+        return Task.CompletedTask;
+    }
+
+    private static Task SelectionMutators_RetainLegacySelectCompatibilityWrappers()
+    {
+        var timeline = new Timeline();
+        timeline.SetEntries(
+        [
+            new TimelineEntry("a", "Build", "10:00"),
+            new TimelineEntry("b", "Deploy", "10:05"),
+        ]);
+
+        var process = new ProcessListView();
+        process.SetEntries(
+        [
+            new ProcessListEntry(1, "api"),
+            new ProcessListEntry(2, "worker"),
+        ]);
+
+        var tabs = new Tabs("A", "B", "C");
+
+        TestAssert.True(timeline.Select(1), "Timeline.Select(int) should remain as compatibility wrapper.");
+        TestAssert.True(process.Select(1), "ProcessListView.Select(int) should remain as compatibility wrapper.");
+        tabs.Select(1);
+
+        TestAssert.Equal(1, timeline.SelectedIndex, "Timeline.Select(int) should still update selection.");
+        TestAssert.Equal(1, process.SelectedIndex, "ProcessListView.Select(int) should still update selection.");
+        TestAssert.Equal(1, tabs.SelectedIndex, "Tabs.Select(int) should still forward to SetSelectedIndex(int).");
+
         return Task.CompletedTask;
     }
 }

@@ -1,6 +1,7 @@
 using System.Reflection;
 using System.Text.RegularExpressions;
 using TeaSharp;
+using TeaSharp.Styles;
 
 namespace TeaSharp.Tests;
 
@@ -76,6 +77,9 @@ internal static class PublicApiBoundaryTests
         yield return new TestCase(
             "PublicApiBoundary_PublicTeaSharpAssemblySurfaceDoesNotExposeTeaSharpCoreTypes",
             PublicTeaSharpAssemblySurface_DoesNotExposeTeaSharpCoreTypes);
+        yield return new TestCase(
+            "PublicApiBoundary_ThemeScopePublicMethods_DoNotExposeTeaSharpCoreOrHostingTypes",
+            ThemeScopePublicMethods_DoNotExposeTeaSharpCoreOrHostingTypes);
     }
 
     private static Task Docs_DoNotReferenceTeaSharpStyling()
@@ -326,6 +330,38 @@ internal static class PublicApiBoundaryTests
         return Task.CompletedTask;
     }
 
+    private static Task ThemeScopePublicMethods_DoNotExposeTeaSharpCoreOrHostingTypes()
+    {
+        var offenders = new List<string>();
+        const BindingFlags flags = BindingFlags.Public | BindingFlags.Static | BindingFlags.DeclaredOnly;
+        var methods = typeof(ThemeScope).GetMethods(flags);
+
+        for (var index = 0; index < methods.Length; index++)
+        {
+            var method = methods[index];
+            if (ContainsTeaSharpCoreType(method.ReturnType) || ContainsTeaSharpHostingType(method.ReturnType))
+            {
+                offenders.Add($"{nameof(ThemeScope)}.{method.Name}(...) return {method.ReturnType.Name}");
+            }
+
+            var parameters = method.GetParameters();
+            for (var parameterIndex = 0; parameterIndex < parameters.Length; parameterIndex++)
+            {
+                var parameter = parameters[parameterIndex];
+                if (ContainsTeaSharpCoreType(parameter.ParameterType) || ContainsTeaSharpHostingType(parameter.ParameterType))
+                {
+                    offenders.Add($"{nameof(ThemeScope)}.{method.Name}(...) param {parameter.Name}:{parameter.ParameterType.Name}");
+                }
+            }
+        }
+
+        TestAssert.True(
+            offenders.Count == 0,
+            $"ThemeScope must remain onboarding-safe and not expose TeaSharp.Core/TeaSharp.Hosting surface types. Offenders: {string.Join(", ", offenders)}.");
+
+        return Task.CompletedTask;
+    }
+
     private static IEnumerable<string> EnumerateMarkdownFiles(string repoRoot)
     {
         yield return Path.Combine(repoRoot, "README.md");
@@ -403,12 +439,22 @@ internal static class PublicApiBoundaryTests
 
     private static bool ContainsTeaSharpCoreType(Type? type)
     {
+        return ContainsNamespaceType(type, "TeaSharp.Core");
+    }
+
+    private static bool ContainsTeaSharpHostingType(Type? type)
+    {
+        return ContainsNamespaceType(type, "TeaSharp.Hosting");
+    }
+
+    private static bool ContainsNamespaceType(Type? type, string namespacePrefix)
+    {
         if (type is null)
         {
             return false;
         }
 
-        if (type.Namespace?.StartsWith("TeaSharp.Core", StringComparison.Ordinal) == true)
+        if (type.Namespace?.StartsWith(namespacePrefix, StringComparison.Ordinal) == true)
         {
             return true;
         }
@@ -423,7 +469,15 @@ internal static class PublicApiBoundaryTests
             return false;
         }
 
-        return type.GetGenericArguments().Any(ContainsTeaSharpCoreType);
+        foreach (var genericArgument in type.GetGenericArguments())
+        {
+            if (ContainsNamespaceType(genericArgument, namespacePrefix))
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private static bool IsOnboardingPublicType(Type type)
