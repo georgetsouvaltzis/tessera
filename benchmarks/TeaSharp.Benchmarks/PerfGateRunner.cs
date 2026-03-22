@@ -11,6 +11,12 @@ namespace TeaSharp.Benchmarks;
 internal static class PerfGateRunner
 {
     private const string GateFlag = "--perf-gate";
+    private const string BaselineSchema = "teasharp-perf-gate-baseline-v1";
+    private static readonly JsonSerializerOptions JsonOptions = new()
+    {
+        PropertyNameCaseInsensitive = true,
+        WriteIndented = true,
+    };
 
     public static bool TryRun(string[] args, out int exitCode)
     {
@@ -78,7 +84,7 @@ internal static class PerfGateRunner
         return CompareAgainstBaseline(baselinePath, baseline, measurements);
     }
 
-    private static IConfig CreateGateConfig()
+    private static ManualConfig CreateGateConfig()
     {
         var job = Job.Default
             .WithId("slo-gate")
@@ -117,7 +123,7 @@ internal static class PerfGateRunner
     private static PerfGateExecutionResult CompareAgainstBaseline(
         string baselinePath,
         PerfGateBaseline baseline,
-        IReadOnlyDictionary<string, PerfGateMeasurement> measurements)
+        Dictionary<string, PerfGateMeasurement> measurements)
     {
         var scenarioResults = new List<PerfGateScenarioResult>(baseline.Scenarios.Count);
         var allPassed = true;
@@ -211,12 +217,7 @@ internal static class PerfGateRunner
 
     private static void EmitResult(PerfGateExecutionResult result, string? outputPath)
     {
-        var options = new JsonSerializerOptions
-        {
-            WriteIndented = true,
-        };
-
-        var json = JsonSerializer.Serialize(result, options);
+        var json = JsonSerializer.Serialize(result, JsonOptions);
         Console.WriteLine(json);
 
         if (string.IsNullOrWhiteSpace(outputPath))
@@ -288,18 +289,39 @@ internal static class PerfGateRunner
     private static PerfGateBaseline LoadBaseline(string baselinePath)
     {
         var json = File.ReadAllText(baselinePath);
-        var baseline = JsonSerializer.Deserialize<PerfGateBaseline>(json);
+        var baseline = JsonSerializer.Deserialize<PerfGateBaseline>(json, JsonOptions);
         if (baseline is null || baseline.Scenarios is null || baseline.Scenarios.Count == 0)
         {
             throw new InvalidOperationException($"Invalid perf baseline file: {baselinePath}");
         }
 
+        if (!string.Equals(baseline.Schema, BaselineSchema, StringComparison.Ordinal))
+        {
+            throw new InvalidOperationException(
+                $"Invalid perf baseline schema '{baseline.Schema}'. Expected '{BaselineSchema}'.");
+        }
+
+        for (var index = 0; index < baseline.Scenarios.Count; index++)
+        {
+            var scenario = baseline.Scenarios[index];
+            if (string.IsNullOrWhiteSpace(scenario.BenchmarkId))
+            {
+                throw new InvalidOperationException($"Baseline scenario[{index}] missing benchmarkId.");
+            }
+
+            if (scenario.MaxMeanMs <= 0d || double.IsNaN(scenario.MaxMeanMs))
+            {
+                throw new InvalidOperationException(
+                    $"Baseline scenario[{index}] has invalid maxMeanMs '{scenario.MaxMeanMs}'.");
+            }
+        }
+
         return baseline;
     }
 
-    private static bool ContainsFlag(IReadOnlyList<string> args, string flag)
+    private static bool ContainsFlag(string[] args, string flag)
     {
-        for (var index = 0; index < args.Count; index++)
+        for (var index = 0; index < args.Length; index++)
         {
             if (string.Equals(args[index], flag, StringComparison.Ordinal))
             {
@@ -310,10 +332,10 @@ internal static class PerfGateRunner
         return false;
     }
 
-    private static bool TryReadValue(IReadOnlyList<string> args, ref int index, out string? value)
+    private static bool TryReadValue(string[] args, ref int index, out string? value)
     {
         var valueIndex = index + 1;
-        if (valueIndex >= args.Count)
+        if (valueIndex >= args.Length)
         {
             value = null;
             return false;

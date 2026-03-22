@@ -1,8 +1,9 @@
-#!/usr/bin/env bash
+#!/usr/bin/env zsh
 set -euo pipefail
 
-ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+ROOT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
 PROJECT_PATH="$ROOT_DIR/benchmarks/TeaSharp.Benchmarks/TeaSharp.Benchmarks.csproj"
+BENCHMARK_DLL_PATH="$ROOT_DIR/benchmarks/TeaSharp.Benchmarks/bin/Release/net10.0/TeaSharp.Benchmarks.dll"
 BASELINE_PATH="$ROOT_DIR/docs/perf-baselines/v1-slo-gate-baseline.json"
 OUTPUT_PATH="$ROOT_DIR/docs/perf-baselines/latest-slo-gate-result.json"
 
@@ -40,17 +41,22 @@ if [[ ! -f "$BASELINE_PATH" ]]; then
   exit 1
 fi
 
-run dotnet build "$PROJECT_PATH" --configuration Release --no-restore --nologo -v minimal
+run dotnet build "$PROJECT_PATH" --configuration Release --no-restore --nologo -v minimal --tl:off --no-dependencies
+
+if [[ ! -f "$BENCHMARK_DLL_PATH" ]]; then
+  echo "Benchmark executable not found: $BENCHMARK_DLL_PATH" >&2
+  exit 1
+fi
 
 case "$MODE" in
   run)
-    run dotnet run --project "$PROJECT_PATH" --configuration Release --no-build -- \
+    run dotnet "$BENCHMARK_DLL_PATH" \
       --perf-gate \
       --baseline "$BASELINE_PATH" \
       --output "$OUTPUT_PATH"
     ;;
   dry-run)
-    run dotnet run --project "$PROJECT_PATH" --configuration Release --no-build -- \
+    run dotnet "$BENCHMARK_DLL_PATH" \
       --perf-gate \
       --baseline "$BASELINE_PATH" \
       --output "$OUTPUT_PATH" \
