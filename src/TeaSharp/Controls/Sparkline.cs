@@ -157,9 +157,30 @@ public sealed class Sparkline : Control
     public void Append(double sample)
     {
         _samples.Add(sample);
-        if (_samples.Count > Capacity)
+        TrimToCapacity();
+    }
+
+    /// <summary>
+    /// Trims retained samples to the last <paramref name="count"/> values.
+    /// </summary>
+    /// <param name="count">The number of trailing samples to keep.</param>
+    /// <exception cref="ArgumentOutOfRangeException">Thrown when <paramref name="count"/> is negative.</exception>
+    public void TrimToLast(int count)
+    {
+        if (count < 0)
         {
-            _samples.RemoveAt(0);
+            throw new ArgumentOutOfRangeException(nameof(count), "Trim count must be non-negative.");
+        }
+
+        if (count == 0)
+        {
+            _samples.Clear();
+            return;
+        }
+
+        if (_samples.Count > count)
+        {
+            _samples.RemoveRange(0, _samples.Count - count);
         }
     }
 

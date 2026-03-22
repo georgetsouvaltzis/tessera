@@ -11,6 +11,7 @@ namespace TeaSharp.Controls;
 public sealed class ScatterPlot : Control
 {
     private readonly List<ScatterPlotPoint> _points = [];
+    private int? _capacity;
 
     /// <summary>
     /// Gets or sets the chart title.
@@ -97,6 +98,28 @@ public sealed class ScatterPlot : Control
     public IReadOnlyList<ScatterPlotPoint> Points => _points;
 
     /// <summary>
+    /// Gets or sets an optional retained point capacity.
+    /// </summary>
+    /// <remarks>
+    /// When set, older points are trimmed automatically after <see cref="SetPoints"/> and <see cref="Append"/>.
+    /// </remarks>
+    /// <exception cref="ArgumentOutOfRangeException">Thrown when the value is less than 1.</exception>
+    public int? Capacity
+    {
+        get => _capacity;
+        set
+        {
+            if (value is <= 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(value), "Capacity must be greater than zero.");
+            }
+
+            _capacity = value;
+            TrimToCapacity();
+        }
+    }
+
+    /// <summary>
     /// Replaces current points.
     /// </summary>
     /// <param name="points">Point values to render.</param>
@@ -108,6 +131,8 @@ public sealed class ScatterPlot : Control
         {
             _points.Add(new ScatterPlotPoint(point.X, point.Y, point.Label));
         }
+
+        TrimToCapacity();
     }
 
     /// <summary>
@@ -117,6 +142,31 @@ public sealed class ScatterPlot : Control
     public void Append(ScatterPlotPoint point)
     {
         _points.Add(new ScatterPlotPoint(point.X, point.Y, point.Label));
+        TrimToCapacity();
+    }
+
+    /// <summary>
+    /// Trims retained points to the last <paramref name="count"/> values.
+    /// </summary>
+    /// <param name="count">The number of trailing points to keep.</param>
+    /// <exception cref="ArgumentOutOfRangeException">Thrown when <paramref name="count"/> is negative.</exception>
+    public void TrimToLast(int count)
+    {
+        if (count < 0)
+        {
+            throw new ArgumentOutOfRangeException(nameof(count), "Trim count must be non-negative.");
+        }
+
+        if (count == 0)
+        {
+            _points.Clear();
+            return;
+        }
+
+        if (_points.Count > count)
+        {
+            _points.RemoveRange(0, _points.Count - count);
+        }
     }
 
     /// <summary>
@@ -369,5 +419,13 @@ public sealed class ScatterPlot : Control
     private static string ApplyStyle(string text, TeaStyle style)
     {
         return style.IsEmpty ? text : style.Render(text ?? string.Empty);
+    }
+
+    private void TrimToCapacity()
+    {
+        if (_capacity.HasValue && _points.Count > _capacity.Value)
+        {
+            _points.RemoveRange(0, _points.Count - _capacity.Value);
+        }
     }
 }

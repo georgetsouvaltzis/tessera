@@ -35,6 +35,8 @@ public sealed class SparklineControlTests
 
         control.Append(7);
         Assert.That(control.Samples, Is.EqualTo(new[] { 4d, 5d, 6d, 7d }));
+        control.TrimToLast(2);
+        Assert.That(control.Samples, Is.EqualTo(new[] { 6d, 7d }));
 
         control.Clear();
         Assert.That(control.Samples.Count, Is.EqualTo(0));

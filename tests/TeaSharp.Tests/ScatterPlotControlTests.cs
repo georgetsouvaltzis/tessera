@@ -85,4 +85,26 @@ public sealed class ScatterPlotControlTests
         TestAssert.True(output.Contains("38;2;120;40;30", StringComparison.Ordinal), "Point style should render foreground ANSI sequence.");
         TestAssert.True(output.Contains("[1m", StringComparison.Ordinal), "Label style should render bold ANSI sequence.");
     }
+
+    [Test]
+    public void Controls_ScatterPlot_CapacityAndTrimToLast_KeepTrailingPoints()
+    {
+        var control = new ScatterPlot
+        {
+            Capacity = 3,
+        };
+        control.SetPoints(
+        [
+            new ScatterPlotPoint(1, 1),
+            new ScatterPlotPoint(2, 2),
+            new ScatterPlotPoint(3, 3),
+            new ScatterPlotPoint(4, 4),
+        ]);
+        control.Append(new ScatterPlotPoint(5, 5));
+        control.TrimToLast(2);
+
+        Assert.That(control.Points.Count, Is.EqualTo(2));
+        Assert.That(control.Points[0].X, Is.EqualTo(4));
+        Assert.That(control.Points[1].X, Is.EqualTo(5));
+    }
 }
