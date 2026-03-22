@@ -71,6 +71,30 @@ These are the types new applications should discover first.
 - `TeaSharp.Controls.LineSeries`
 - `TeaSharp.Controls.LinePlot`
 - `TeaSharp.Controls.PlotPanel`
+- `TeaSharp.Controls.BulletChart`
+- `TeaSharp.Controls.BulletRange`
+- `TeaSharp.Controls.BulletRangeKind`
+- `TeaSharp.Controls.DashboardGrid`
+- `TeaSharp.Controls.DashboardTile`
+- `TeaSharp.Controls.QuickOpenOverlay`
+- `TeaSharp.Controls.QuickOpenItem`
+- `TeaSharp.Controls.QuickOpenOverlayGlyphSet`
+- `TeaSharp.Controls.QuickOpenOverlaySubmittedEventArgs`
+- `TeaSharp.Controls.ResizablePaneGroup`
+- `TeaSharp.Controls.PaneSpec`
+- `TeaSharp.Controls.SideNavRail`
+- `TeaSharp.Controls.NavItem`
+- `TeaSharp.Controls.SideNavRailGlyphSet`
+- `TeaSharp.Controls.SideNavRailSelectionChangedEventArgs`
+- `TeaSharp.Controls.SideNavRailActivatedEventArgs`
+- `TeaSharp.Controls.TokenEditor`
+- `TeaSharp.Controls.TokenItem`
+- `TeaSharp.Controls.TokenEditorGlyphSet`
+- `TeaSharp.Controls.TokenEditorSelectionChangedEventArgs`
+- `TeaSharp.Controls.HealthBoard`
+- `TeaSharp.Controls.HealthService`
+- `TeaSharp.Controls.HealthServiceSeverity`
+- `TeaSharp.Controls.HealthBoardGlyphSet`
 - `TeaSharp.Controls.Gauge`
 - `TeaSharp.Controls.MiniLog`
 - `TeaSharp.Controls.StatItem`
@@ -372,6 +396,13 @@ The first root controls that already own their implementation directly are:
 - `TreeMapChart`
 - `TerminalPanel`
 - `ProcessListView`
+- `DashboardGrid`
+- `QuickOpenOverlay`
+- `BulletChart`
+- `ResizablePaneGroup`
+- `SideNavRail`
+- `TokenEditor`
+- `HealthBoard`
 - `MenuBar`
 - `Toolbar`
 - `CommandBar`
@@ -410,6 +441,7 @@ Wave 2 query/analytics controls (`PivotTable`, `QueryBuilder`, `RichTextView`) a
 Wave 3 dev/ops controls (`JsonTreeView`, `CommandOutput`, `LogTailPanel`, `ActivityFeed`, `NotificationInbox`, `KeyBindingHelpDialog`) are mapped with the same semantic-token contract. For onboarding/default app flows, use `Notifications`; treat `NotificationInbox` as advanced dev/ops surface.
 Wave 4 batch A + B controls (`DockWorkspace`, `PaneTabs`, `PaletteEditor`, `Heatmap`, `TreeMapChart`, `TerminalPanel`, `ProcessListView`) are integrated and mapped in `TeaThemeControlExtensions.Workspace.cs`.
 Wave 1 app-shell/forms controls (`Form`, `FieldSet`, `DataForm<TModel>`, `Wizard`, `SplitView`, `InspectorPanel`) are integrated and mapped in `TeaThemeControlExtensions.FormsAndShell.cs`.
+Expansion tranche controls (`DashboardGrid`, `QuickOpenOverlay`, `BulletChart`, `ResizablePaneGroup`, `SideNavRail`, `TokenEditor`, `HealthBoard`) are implemented with dedicated tests; theme extension mapping is currently wired for `BulletChart` and `DashboardGrid` in `TeaThemeControlExtensions.DashboardMetrics.cs`, while the remaining five controls are still pending `ApplyTheme`/`ApplyThemeDefaults` parity wiring.
 Reusable consumer-level override helpers are available via `TeaThemeOverrideBundle.CreateDashboardBundle(...)` and `ApplyThemeAndDashboardOverrides(...)` extensions for `ListView<T>`, `Table`, `Notifications`, `LogView`, `Button`, and `Dialog`.
 
 ## State-Style Naming Matrix (Tier 1 Consumer Quick Lookup)

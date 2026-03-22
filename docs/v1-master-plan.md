@@ -64,6 +64,9 @@ Correctness is a continuous gate across all phases: fix regressions at source an
   - Wave 1 app-shell/forms tranche integrated in docs+catalog/theme coverage (`Form`, `FieldSet`, `DataForm<TModel>`, `Wizard`, `SplitView`, `InspectorPanel`)
   - Wave 4 batch A + B integrated in docs+catalog/theme coverage (`DockWorkspace`, `PaneTabs`, `PaletteEditor`, `Heatmap`, `TreeMapChart`, `TerminalPanel`, `ProcessListView`)
   - forward-looking expansion backlog (post-current V1 tranche) documented with dependency/lanes plan in `6887517` -> [docs/widget-roadmap-v1.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/widget-roadmap-v1.md), [docs/prebuilt-widgets.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/prebuilt-widgets.md)
+  - post-wave expansion tranche (non-M2 gate scope) landed controls: `DashboardGrid` (`8593562`), `QuickOpenOverlay` (`d91c934`), `BulletChart` (`dfd4221`), `ResizablePaneGroup` (`77cc95d`), `SideNavRail` (`d236de2`), `TokenEditor` (`7fbf7be`), `HealthBoard` (`18adc16`)
+  - targeted verification signal for the landed tranche is green on this host: `dotnet test tests/TeaSharp.Tests --no-restore --nologo --filter "DashboardGrid|QuickOpenOverlay|BulletChart|ResizablePaneGroup|SideNavRail|TokenEditor|HealthBoard"` (34 passed)
+  - still open for tranche closure: theme extension parity is complete for `BulletChart` + `DashboardGrid` (`4e005ed`) and still pending for `QuickOpenOverlay`, `ResizablePaneGroup`, `SideNavRail`, `TokenEditor`, `HealthBoard`
 - **M3: Visual Quality Full Polish Pass** -> **Done**
   - visual polish closure evidence landed:
     - `1c43dbe` -> WidgetGallery polished default theme/layout slice
@@ -98,6 +101,7 @@ Correctness is a continuous gate across all phases: fix regressions at source an
 - **M5: Performance Gate + Benchmarks + Docs Freeze** -> **Pending manual signoff**
   - perf-gate harness scaffolding landed in `35b8fdc` -> [benchmarks/TeaSharp.Benchmarks/SloLatencyBenchmarks.cs](/Users/georgetsouvaltzis/Projects/playground/teasharp/benchmarks/TeaSharp.Benchmarks/SloLatencyBenchmarks.cs), [benchmarks/TeaSharp.Benchmarks/PerfGateRunner.cs](/Users/georgetsouvaltzis/Projects/playground/teasharp/benchmarks/TeaSharp.Benchmarks/PerfGateRunner.cs), [scripts/perf_gate_v1.sh](/Users/georgetsouvaltzis/Projects/playground/teasharp/scripts/perf_gate_v1.sh), [docs/perf-baselines/v1-slo-gate-baseline.json](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/perf-baselines/v1-slo-gate-baseline.json)
   - verification evidence capture expanded in `5784559` (full-suite sanity evidence recorded in this plan)
+  - open script note: perf gate wrapper currently executes the built benchmark DLL directly (`dotnet benchmarks/TeaSharp.Benchmarks/bin/Release/net10.0/TeaSharp.Benchmarks.dll --perf-gate ...`); keep the wrapper command and direct path behavior in sync to avoid runner-path drift regressions
   - outstanding: explicit regression-budget pass/fail verdict against the accepted baseline is not yet attached for the final RC candidate SHA
   - outstanding: RC checklist/manual signoff rows remain open until owner/date evidence is filled
 

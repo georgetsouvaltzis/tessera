@@ -137,7 +137,7 @@ Documentation and examples:
 - canonical plotting/dashboard sample: `examples/PlottingDashboard` (add when available)
 - current stopgap references: `examples/WidgetGallery`, `examples/AdvancedWidgets`
 
-## Expansion Backlog: +36 Dashboard-First Widgets
+## Expansion Backlog: +36 Dashboard-First Widgets (7 Landed)
 
 This backlog is intentionally implementation-oriented for the next growth tranche beyond the current +34 wave completion. It keeps dashboard and operational TUI use-cases first.
 
@@ -215,6 +215,28 @@ Dependency keys:
 | `JumpList` | V1 | MRU and pinned target navigation | `D0` |
 | `RecentItemsNavigator` | V1 | recency-based productivity flow | `D0` |
 | `KeymapCheatSheetPanel` | V1 | always-available shortcut discoverability | `D0` |
+
+### Expansion Tranche Status (March 22, 2026)
+
+Landed controls from the expansion tranche:
+
+| Control | Landed commit(s) | Current verification signal |
+| --- | --- | --- |
+| `DashboardGrid` | `8593562`, `4e005ed` | implemented; deterministic render/interaction tests present in `DashboardGridControlTests`; included in passing targeted suite |
+| `QuickOpenOverlay` | `d91c934` | implemented; keyboard/pointer/submit + deterministic render tests present in `QuickOpenOverlayControlTests`; included in passing targeted suite |
+| `BulletChart` | `dfd4221`, `c681b64`, `4e005ed` | implemented; style-focused test stabilization landed; included in passing targeted suite |
+| `ResizablePaneGroup` | `77cc95d` | implemented; selection/resize/style + deterministic render tests present; included in passing targeted suite |
+| `SideNavRail` | `d236de2` | implemented; keyboard/pointer/activation/style tests present; included in passing targeted suite |
+| `TokenEditor` | `7fbf7be` | implemented; add/remove/navigation/style tests present; currently passing in targeted suite reruns |
+| `HealthBoard` | `18adc16` | implemented; severity/selection/ack/style tests present; included in passing targeted suite |
+
+Targeted verification command (current host):  
+`dotnet test tests/TeaSharp.Tests --no-restore --nologo --filter "DashboardGrid|QuickOpenOverlay|BulletChart|ResizablePaneGroup|SideNavRail|TokenEditor|HealthBoard"` -> pass (34/34).
+
+Outstanding for this tranche (do not mark done yet):
+
+- Theme extension parity is confirmed for `BulletChart` and `DashboardGrid` only (`TeaThemeControlExtensions.DashboardMetrics.cs` via `4e005ed`).
+- `QuickOpenOverlay`, `ResizablePaneGroup`, `SideNavRail`, `TokenEditor`, and `HealthBoard` still need the same `ApplyTheme`/`ApplyThemeDefaults` coverage before tranche closure.
 
 ## Dependency Graph (Build Order)
 

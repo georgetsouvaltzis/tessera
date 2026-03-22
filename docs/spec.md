@@ -134,6 +134,7 @@ V1 theming is semantic-token based with override hierarchy:
 - mapped rendering text utility controls include `Badge`, `LogView`, `MarkdownView`, `MiniLog`
 - mapped modal/chart summary controls include `Dialog`, `Modal`, `BarChart`, `LineChart`, `Gauge`, `StatsCard`
 - mapped plotting controls include `Sparkline`, `AreaPlot`, `ScatterPlot`, `Histogram`, `LinePlot`, `PlotPanel`
+- expansion tranche controls (`DashboardGrid`, `QuickOpenOverlay`, `BulletChart`, `ResizablePaneGroup`, `SideNavRail`, `TokenEditor`, `HealthBoard`) are implemented with deterministic tests; theme extension defaults are currently wired for `BulletChart` and `DashboardGrid`, while the remaining controls still need typed `ApplyTheme`/`ApplyThemeDefaults` parity wiring
 - `Dialog` and `Modal` map `BorderStyleText`/`FocusedBorderStyleText` to semantic border/focus tokens by default
 
 Focus visuals must be theme-driven (for example focused border style/color), not limited to marker suffixes.
@@ -358,6 +359,30 @@ Root controls currently include:
 - `LineChart`
 - `Sparkline`
 - `AreaPlot`
+- `BulletChart`
+- `BulletRange`
+- `BulletRangeKind`
+- `DashboardGrid`
+- `DashboardTile`
+- `QuickOpenOverlay`
+- `QuickOpenItem`
+- `QuickOpenOverlayGlyphSet`
+- `QuickOpenOverlaySubmittedEventArgs`
+- `ResizablePaneGroup`
+- `PaneSpec`
+- `SideNavRail`
+- `NavItem`
+- `SideNavRailGlyphSet`
+- `SideNavRailSelectionChangedEventArgs`
+- `SideNavRailActivatedEventArgs`
+- `TokenEditor`
+- `TokenItem`
+- `TokenEditorGlyphSet`
+- `TokenEditorSelectionChangedEventArgs`
+- `HealthBoard`
+- `HealthService`
+- `HealthServiceSeverity`
+- `HealthBoardGlyphSet`
 - `ScatterPlot`
 - `ScatterPlotPoint`
 - `Histogram`

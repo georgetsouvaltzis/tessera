@@ -163,6 +163,30 @@ Preferred public catalog:
 150. `DataFormField<TModel>`
 151. `DataFormSelectionChangedEventArgs<TModel>`
 152. `DataFormFieldCommittedEventArgs<TModel>`
+153. `DashboardGrid`
+154. `DashboardTile`
+155. `QuickOpenOverlay`
+156. `QuickOpenItem`
+157. `QuickOpenOverlayGlyphSet`
+158. `QuickOpenOverlaySubmittedEventArgs`
+159. `BulletChart`
+160. `BulletRange`
+161. `BulletRangeKind`
+162. `ResizablePaneGroup`
+163. `PaneSpec`
+164. `SideNavRail`
+165. `NavItem`
+166. `SideNavRailGlyphSet`
+167. `SideNavRailSelectionChangedEventArgs`
+168. `SideNavRailActivatedEventArgs`
+169. `TokenEditor`
+170. `TokenItem`
+171. `TokenEditorGlyphSet`
+172. `TokenEditorSelectionChangedEventArgs`
+173. `HealthBoard`
+174. `HealthService`
+175. `HealthServiceSeverity`
+176. `HealthBoardGlyphSet`
 
 These live in `TeaSharp.Controls`.
 
@@ -172,6 +196,16 @@ For actionable implementation backlog and category grouping (data viz, layout, i
 
 - [widget-roadmap-v1.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/widget-roadmap-v1.md) -> `Expansion Backlog: +36 Dashboard-First Widgets`
 - same roadmap section also contains dependency graph, top-12 API sketch contract, and lane-parallel sequencing
+
+Current landed subset from that expansion backlog:
+
+- `DashboardGrid`
+- `QuickOpenOverlay`
+- `BulletChart`
+- `ResizablePaneGroup`
+- `SideNavRail`
+- `TokenEditor`
+- `HealthBoard`
 
 ### Dropdown Visual Defaults
 
