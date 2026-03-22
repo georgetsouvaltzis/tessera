@@ -213,6 +213,30 @@ public sealed class ListView<T> : Control
         RaiseSelectionChangedIfNeeded(previousIndex, previousItem);
     }
 
+    /// <summary>
+    /// Sets the selected row index using bounds clamping.
+    /// </summary>
+    /// <param name="index">The requested index.</param>
+    /// <returns><see langword="true" /> when selection changed; otherwise, <see langword="false" />.</returns>
+    public bool SetSelectedIndex(int index)
+    {
+        var previousIndex = SelectedIndex;
+        var previousItem = SelectedItem;
+        var changed = _model.SelectFilteredIndex(index);
+        RaiseSelectionChangedIfNeeded(previousIndex, previousItem);
+        return changed;
+    }
+
+    /// <summary>
+    /// Compatibility wrapper for selecting by index.
+    /// </summary>
+    /// <param name="index">The requested index.</param>
+    /// <returns><see langword="true" /> when selection changed; otherwise, <see langword="false" />.</returns>
+    public bool Select(int index)
+    {
+        return SetSelectedIndex(index);
+    }
+
     public override bool Handle(Message message)
     {
         if (IsDisabled)
