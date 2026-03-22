@@ -501,4 +501,66 @@ public static partial class TeaThemeControlExtensions
         ArgumentNullException.ThrowIfNull(overrides);
         return control.ApplyThemeDefaults(overrides.Resolve(control, baseTheme, state));
     }
+
+    public static QuickOpenOverlay ApplyTheme(this QuickOpenOverlay control, TeaTheme theme)
+    {
+        ArgumentNullException.ThrowIfNull(control);
+        ArgumentNullException.ThrowIfNull(theme);
+
+        control.TitleStyle = theme.Text.Secondary;
+        control.FocusedTitleStyle = theme.Focus.Title;
+        control.QueryTextStyle = theme.Text.Primary;
+        control.PlaceholderStyle = theme.Text.Muted;
+        control.ItemStyle = theme.Text.Primary;
+        control.SelectedItemStyle = theme.Selection.Foreground.Merge(theme.Selection.Background);
+        control.HoveredItemStyle = theme.Accent.Secondary;
+        control.MatchMarkerStyle = theme.Accent.Primary;
+        control.DisabledStyle = theme.Text.Muted;
+        control.BorderStyleText = theme.Border.Default;
+        control.FocusedBorderStyleText = theme.Border.Focused.Merge(theme.Focus.Border);
+        control.FocusMarker = theme.Focus.Marker;
+        return control;
+    }
+
+    public static QuickOpenOverlay ApplyTheme(
+        this QuickOpenOverlay control,
+        TeaThemeOverrides overrides,
+        TeaTheme baseTheme,
+        TeaThemeVisualState state = TeaThemeVisualState.Default)
+    {
+        ArgumentNullException.ThrowIfNull(overrides);
+        return control.ApplyTheme(overrides.Resolve(control, baseTheme, state));
+    }
+
+    public static QuickOpenOverlay ApplyThemeDefaults(this QuickOpenOverlay control, TeaTheme theme)
+    {
+        ArgumentNullException.ThrowIfNull(control);
+        ArgumentNullException.ThrowIfNull(theme);
+
+        control.TitleStyle = ApplyDefault(control.TitleStyle, theme.Text.Secondary);
+        control.FocusedTitleStyle = ApplyDefault(control.FocusedTitleStyle, theme.Focus.Title);
+        control.QueryTextStyle = ApplyDefault(control.QueryTextStyle, theme.Text.Primary);
+        control.PlaceholderStyle = ApplyDefault(control.PlaceholderStyle, theme.Text.Muted);
+        control.ItemStyle = ApplyDefault(control.ItemStyle, theme.Text.Primary);
+        control.SelectedItemStyle = ApplyDefault(
+            control.SelectedItemStyle,
+            theme.Selection.Foreground.Merge(theme.Selection.Background));
+        control.HoveredItemStyle = ApplyDefault(control.HoveredItemStyle, theme.Accent.Secondary);
+        control.MatchMarkerStyle = ApplyDefault(control.MatchMarkerStyle, theme.Accent.Primary);
+        control.DisabledStyle = ApplyDefault(control.DisabledStyle, theme.Text.Muted);
+        control.BorderStyleText = ApplyDefault(control.BorderStyleText, theme.Border.Default);
+        control.FocusedBorderStyleText = ApplyDefault(control.FocusedBorderStyleText, theme.Border.Focused.Merge(theme.Focus.Border));
+        control.FocusMarker = ApplyDefault(control.FocusMarker, theme.Focus.Marker);
+        return control;
+    }
+
+    public static QuickOpenOverlay ApplyThemeDefaults(
+        this QuickOpenOverlay control,
+        TeaThemeOverrides overrides,
+        TeaTheme baseTheme,
+        TeaThemeVisualState state = TeaThemeVisualState.Default)
+    {
+        ArgumentNullException.ThrowIfNull(overrides);
+        return control.ApplyThemeDefaults(overrides.Resolve(control, baseTheme, state));
+    }
 }
