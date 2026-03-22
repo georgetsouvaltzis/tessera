@@ -29,6 +29,7 @@ void ApplyTheme(TeaTheme theme)
 }
 ```
 - Suggested non-breaking fix: add helper on app surface (for example `ThemeScope.Apply(theme, params Control[] controls)`), or provide a documented aggregate helper for common dashboard control sets.
+- Current V1 state: `TeaThemeOverrideBundle` helps local override composition, but there is still no first-party global fan-out helper equivalent to `ThemeScope`.
 
 ## Resolved In This Lane
 
@@ -95,28 +96,8 @@ table.SetRows(rows);
 // Missing: table.SelectedIndex / table.SelectedRow / table.SelectionChanged
 ```
 
-#### P1 - `LineSeries.Append(...)` retention is still manual for streaming dashboards
-- Status: open (unchanged).
-- Repro snippet:
-```csharp
-var series = new LineSeries("Req/s");
-series.Append(nextValue); // unbounded growth
-// Consumer still needs manual trim + SetSamples(...)
-```
-
-#### P1 - `LinePlot` still lacks mixed-unit scale controls
-- Status: open (unchanged).
-- Repro snippet:
-```csharp
-plot.SetSeries([
-    new LineSeries("Req/s", reqSeries),
-    new LineSeries("P95 ms", latencySeries),
-]);
-// Missing: per-series scale mode or secondary Y-axis
-```
-
 #### P2 - Runtime theme switch still needs explicit per-control fan-out
-- Status: open (partially improved by extension coverage, but still app-level boilerplate).
+- Status: open (partially improved by extension coverage and `TeaThemeOverrideBundle`, but still app-level boilerplate).
 - Repro snippet:
 ```csharp
 void ApplyTheme(TeaTheme theme)
@@ -128,6 +109,7 @@ void ApplyTheme(TeaTheme theme)
     // ...repeat for each control instance
 }
 ```
+- Notes: a `ThemeScope`-style helper is still absent from the public API surface in this lane.
 
 #### P2 - `ListView<T>` lacks programmatic selection setter
 - Status: open.
@@ -139,50 +121,83 @@ list.SetItems(services);
 // Missing: list.SetSelectedIndex(index) or list.Select(index)
 ```
 
+### Resolved After Latest Landed Commits (March 22, 2026)
+
+#### P1 - `StatsCard` border/padding style hooks
+- Status: resolved by `c21a6ce`.
+- New consumer surface:
+  - `StatsCard.Border`
+  - `StatsCard.Padding`
+  - `StatsCard.BorderStyleText`
+  - `StatsCard.FocusedBorderStyleText`
+- Theme wiring evidence:
+  - `TeaThemeControlExtensions.ApplyTheme(this StatsCard, TeaTheme)` and `ApplyThemeDefaults(...)` now map border tokens.
+
+#### P1 - Plot retention ergonomics
+- Status: resolved by `4fc0ca3` + `1781ee7`.
+- New consumer surface:
+  - `LineSeries.Capacity`, `LineSeries.TrimToLast(int)`
+  - `ScatterPlot.Capacity`, `ScatterPlot.TrimToLast(int)`
+  - `Sparkline.TrimToLast(int)` with retained `Capacity`
+
+#### P1 - Mixed-unit `LinePlot` readability
+- Status: resolved by `4fc0ca3`.
+- New consumer surface:
+  - `LineSeries.ScaleMode` (`Shared`/`Normalized`)
+  - `LinePlotOptions.SharedAxisLabel`
+  - `LinePlotOptions.NormalizedAxisLabel`
+
+#### P2 - Generic `Options` discoverability for `LinePlot`
+- Status: resolved by `4fc0ca3`.
+- New consumer helpers:
+  - `LinePlot.ConfigureAxes(...)`
+  - `LinePlot.ConfigureGrid(...)`
+  - `LinePlot.ConfigureLegend(...)`
+
 ## Wave 2 - Advanced Dashboard (Styling/State/Plot Readiness)
 
 Context: implemented an `Analytics` screen in `examples/ExternalConsumerReviewApp` with status cards, endpoint table, and `LinePlot`.
 
-### P1 - `StatsCard` has no border/padding style hooks
-- Issue: `StatsCard` always draws default box chrome, so dashboards cannot align card borders with theme border tokens used by other controls.
+### P1 - `StatsCard` border/padding style hooks
+- Status: resolved in `c21a6ce`.
+- Prior issue: `StatsCard` always drew default box chrome, so dashboards could not align card borders with theme border tokens.
 - Repro snippet:
 ```csharp
 var card = new StatsCard { Title = "Latency" };
 card.ApplyTheme(theme);
-// Missing: card.Border, card.BorderStyleText, card.FocusedBorderStyleText, card.Padding
+card.Border = BorderStyle.Rounded;
+card.Padding = Thickness.All(1);
 ```
-- Suggested non-breaking fix: add `Border`, `Padding`, `BorderStyleText`, and `FocusedBorderStyleText` to `StatsCard`.
-- Workaround used: custom title/key/value styles only; card frame remains default glyph styling.
 
-### P1 - Plot streaming requires manual sample trimming
-- Issue: `LineSeries.Append(...)` is unbounded and there is no capacity/retention API on `LineSeries` or `LinePlot`.
+### P1 - Plot streaming retention ergonomics
+- Status: resolved in `4fc0ca3` + `1781ee7`.
+- Prior issue: `LineSeries.Append(...)` was unbounded and required manual trim copies.
 - Repro snippet:
 ```csharp
 var series = new LineSeries("Req/s");
-series.Append(nextValue); // keeps growing forever
-// Consumer must copy+trim and call SetSamples(...)
+series.Capacity = 240;
+series.Append(nextValue); // auto-trims old samples
+series.TrimToLast(120);
 ```
-- Suggested non-breaking fix: add `Capacity` + automatic trimming, or `TrimToLast(int count)` helpers.
-- Workaround used: manual retention helper rebuilding `double[]` and calling `SetSamples(...)`.
 
-### P1 - `LinePlot` lacks dual-axis or per-series scale controls
-- Issue: realistic dashboards often mix units (for example req/s and ms). Current rendering uses one shared Y scale, making one series visually flatten the other.
+### P1 - `LinePlot` mixed-unit readability
+- Status: resolved in `4fc0ca3`.
+- Prior issue: mixed units (for example req/s and ms) flattened one series under one shared Y scale.
 - Repro snippet:
 ```csharp
 plot.SetSeries([
-    new LineSeries("Req/s", reqSeries),
-    new LineSeries("P95 ms", latencySeries),
+    new LineSeries("Req/s", reqSeries) { ScaleMode = LineSeriesScaleMode.Shared },
+    new LineSeries("P95 ms", latencySeries) { ScaleMode = LineSeriesScaleMode.Normalized },
 ]);
-// Missing: secondary axis or per-series normalization mode
+plot.ConfigureAxes(showAxes: true, sharedAxisLabel: "req/s", normalizedAxisLabel: "ms (norm)");
 ```
-- Suggested non-breaking fix: add optional per-series scale mode (`Shared`, `Normalized`, `SecondaryAxis`) and label hooks for each axis.
-- Workaround used: accept reduced readability or split metrics into separate plots.
 
-### P2 - `Options` naming is generic for advanced plot features
-- Issue: enabling axes/grid/legend depends on `LinePlot.Options` (`LinePlotOptions`), but `Options` is ambiguous and marked advanced, reducing discoverability for consumers building first dashboards.
+### P2 - `LinePlot` options discoverability
+- Status: resolved in `4fc0ca3` (`LinePlot`); note that other plotting controls still expose advanced `Options` directly.
 - Repro snippet:
 ```csharp
 var plot = new LinePlot();
-plot.Options = new LinePlotOptions(ShowAxes: true, ShowGrid: true);
+plot.ConfigureAxes(showAxes: true, sharedAxisLabel: "value");
+plot.ConfigureGrid(true);
+plot.ConfigureLegend(true);
 ```
-- Suggested non-breaking fix: keep `Options` but add verb-style helpers (`ConfigureAxes`, `ConfigureLegend`, `ConfigureGrid`) for common setup.
