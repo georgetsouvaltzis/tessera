@@ -64,6 +64,7 @@ internal static class BorderedControlParityPolicyTests
         typeof(Slider),
         typeof(SplitView),
         typeof(Sparkline),
+        typeof(StatsCard),
         typeof(Spinner),
         typeof(TagInput),
         typeof(Table),
