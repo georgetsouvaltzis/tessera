@@ -38,6 +38,29 @@ public sealed class ResizablePaneGroupControlTests
     }
 
     [Test]
+    public void Controls_ResizablePaneGroup_CanonicalSelectionAliases_StayInSync()
+    {
+        var control = new ResizablePaneGroup();
+        control.SetPanes(
+        [
+            new PaneSpec("left", title: "Left"),
+            new PaneSpec("center", title: "Center"),
+            new PaneSpec("right", title: "Right"),
+        ]);
+
+        Assert.That(control.SelectedIndex, Is.EqualTo(control.SelectedPaneIndex));
+        Assert.That(control.SelectedItem, Is.SameAs(control.SelectedPane));
+
+        var changed = control.SetSelectedIndex(2);
+
+        Assert.That(changed, Is.True);
+        Assert.That(control.SelectedIndex, Is.EqualTo(2));
+        Assert.That(control.SelectedPaneIndex, Is.EqualTo(2));
+        Assert.That(control.SelectedItem?.Id, Is.EqualTo("right"));
+        Assert.That(control.SelectedPane?.Id, Is.EqualTo("right"));
+    }
+
+    [Test]
     public void Controls_ResizablePaneGroup_KeyboardResize_UpdatesRenderedPaneWidths()
     {
         var first = new SpyPaneControl("first");

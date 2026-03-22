@@ -129,9 +129,25 @@ public sealed partial class ResizablePaneGroup : Control
     public int SelectedPaneIndex => _panes.Count == 0 ? -1 : _selectedPaneIndex;
 
     /// <summary>
+    /// Gets selected pane index, or <c>-1</c> when no panes exist.
+    /// </summary>
+    /// <remarks>
+    /// Canonical selection alias for cross-control API consistency.
+    /// </remarks>
+    public int SelectedIndex => SelectedPaneIndex;
+
+    /// <summary>
     /// Gets selected pane.
     /// </summary>
     public PaneSpec? SelectedPane => _panes.Count == 0 ? null : _panes[_selectedPaneIndex];
+
+    /// <summary>
+    /// Gets selected pane.
+    /// </summary>
+    /// <remarks>
+    /// Canonical selection alias for cross-control API consistency.
+    /// </remarks>
+    public PaneSpec? SelectedItem => SelectedPane;
 
     /// <inheritdoc />
     public override bool IsFocused { get; set; }
@@ -191,6 +207,16 @@ public sealed partial class ResizablePaneGroup : Control
         RaiseSelectionChanged(previousIndex, previousPane);
         return true;
     }
+
+    /// <summary>
+    /// Sets selected pane by index.
+    /// </summary>
+    /// <param name="index">Requested selected pane index.</param>
+    /// <returns><see langword="true" /> when selection changed; otherwise <see langword="false" />.</returns>
+    /// <remarks>
+    /// Canonical selection mutator alias for cross-control API consistency.
+    /// </remarks>
+    public bool SetSelectedIndex(int index) => SetSelectedPaneIndex(index);
 
     /// <summary>
     /// Sets split ratio for divider index.
