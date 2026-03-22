@@ -60,9 +60,33 @@ public sealed partial class ResizablePaneGroup : Control
     public TeaStyle TitleStyleText { get; set; } = TeaStyle.Empty;
 
     /// <summary>
+    /// Gets or sets title style while not focused.
+    /// </summary>
+    /// <remarks>
+    /// Canonical alias for cross-control title style naming consistency.
+    /// </remarks>
+    public TeaStyle TitleStyle
+    {
+        get => TitleStyleText;
+        set => TitleStyleText = value;
+    }
+
+    /// <summary>
     /// Gets or sets title style while focused.
     /// </summary>
     public TeaStyle FocusedTitleStyleText { get; set; } = TeaStyle.Empty;
+
+    /// <summary>
+    /// Gets or sets title style while focused.
+    /// </summary>
+    /// <remarks>
+    /// Canonical alias for cross-control title style naming consistency.
+    /// </remarks>
+    public TeaStyle FocusedTitleStyle
+    {
+        get => FocusedTitleStyleText;
+        set => FocusedTitleStyleText = value;
+    }
 
     /// <summary>
     /// Gets or sets divider style while not focused.

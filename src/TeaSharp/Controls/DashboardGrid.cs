@@ -48,9 +48,33 @@ public sealed partial class DashboardGrid : Control
     public TeaStyle TitleStyleText { get; set; } = TeaStyle.Empty;
 
     /// <summary>
+    /// Gets or sets title style when not focused.
+    /// </summary>
+    /// <remarks>
+    /// Canonical alias for cross-control title style naming consistency.
+    /// </remarks>
+    public TeaStyle TitleStyle
+    {
+        get => TitleStyleText;
+        set => TitleStyleText = value;
+    }
+
+    /// <summary>
     /// Gets or sets title style when focused.
     /// </summary>
     public TeaStyle FocusedTitleStyleText { get; set; } = TeaStyle.Empty;
+
+    /// <summary>
+    /// Gets or sets title style when focused.
+    /// </summary>
+    /// <remarks>
+    /// Canonical alias for cross-control title style naming consistency.
+    /// </remarks>
+    public TeaStyle FocusedTitleStyle
+    {
+        get => FocusedTitleStyleText;
+        set => FocusedTitleStyleText = value;
+    }
 
     /// <summary>
     /// Gets or sets frame border style when not focused.

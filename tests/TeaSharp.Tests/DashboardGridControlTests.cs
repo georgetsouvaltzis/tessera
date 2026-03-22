@@ -80,6 +80,22 @@ public sealed class DashboardGridControlTests
     }
 
     [Test]
+    public void Controls_DashboardGrid_CanonicalTitleStyleAliases_StayInSync()
+    {
+        var control = new DashboardGrid();
+        var titleStyle = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(12, 34, 56));
+        var focusedTitleStyle = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(65, 43, 21));
+
+        control.TitleStyle = titleStyle;
+        control.FocusedTitleStyle = focusedTitleStyle;
+
+        Assert.That(control.TitleStyleText, Is.EqualTo(titleStyle));
+        Assert.That(control.FocusedTitleStyleText, Is.EqualTo(focusedTitleStyle));
+        Assert.That(control.TitleStyle, Is.EqualTo(titleStyle));
+        Assert.That(control.FocusedTitleStyle, Is.EqualTo(focusedTitleStyle));
+    }
+
+    [Test]
     public void Controls_DashboardGrid_StyleHooks_EmitAnsiAndFocusMarker()
     {
         var control = new DashboardGrid

@@ -61,6 +61,22 @@ public sealed class ResizablePaneGroupControlTests
     }
 
     [Test]
+    public void Controls_ResizablePaneGroup_CanonicalTitleStyleAliases_StayInSync()
+    {
+        var control = new ResizablePaneGroup();
+        var titleStyle = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(17, 27, 37));
+        var focusedTitleStyle = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(73, 63, 53));
+
+        control.TitleStyle = titleStyle;
+        control.FocusedTitleStyle = focusedTitleStyle;
+
+        Assert.That(control.TitleStyleText, Is.EqualTo(titleStyle));
+        Assert.That(control.FocusedTitleStyleText, Is.EqualTo(focusedTitleStyle));
+        Assert.That(control.TitleStyle, Is.EqualTo(titleStyle));
+        Assert.That(control.FocusedTitleStyle, Is.EqualTo(focusedTitleStyle));
+    }
+
+    [Test]
     public void Controls_ResizablePaneGroup_KeyboardResize_UpdatesRenderedPaneWidths()
     {
         var first = new SpyPaneControl("first");
