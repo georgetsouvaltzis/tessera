@@ -64,9 +64,10 @@ Correctness is a continuous gate across all phases: fix regressions at source an
   - Wave 1 app-shell/forms tranche integrated in docs+catalog/theme coverage (`Form`, `FieldSet`, `DataForm<TModel>`, `Wizard`, `SplitView`, `InspectorPanel`)
   - Wave 4 batch A + B integrated in docs+catalog/theme coverage (`DockWorkspace`, `PaneTabs`, `PaletteEditor`, `Heatmap`, `TreeMapChart`, `TerminalPanel`, `ProcessListView`)
   - forward-looking expansion backlog (post-current V1 tranche) documented with dependency/lanes plan in `6887517` -> [docs/widget-roadmap-v1.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/widget-roadmap-v1.md), [docs/prebuilt-widgets.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/prebuilt-widgets.md)
-  - post-wave expansion tranche (non-M2 gate scope) landed controls: `DashboardGrid` (`8593562`), `QuickOpenOverlay` (`d91c934`), `BulletChart` (`dfd4221`), `ResizablePaneGroup` (`77cc95d`), `SideNavRail` (`d236de2`), `TokenEditor` (`7fbf7be`), `HealthBoard` (`18adc16`)
-  - targeted verification signal for the landed tranche is green on this host: `dotnet test tests/TeaSharp.Tests --no-restore --nologo --filter "DashboardGrid|QuickOpenOverlay|BulletChart|ResizablePaneGroup|SideNavRail|TokenEditor|HealthBoard"` (34 passed)
-  - still open for tranche closure: theme extension parity is complete for `BulletChart` + `DashboardGrid` (`4e005ed`) and still pending for `QuickOpenOverlay`, `ResizablePaneGroup`, `SideNavRail`, `TokenEditor`, `HealthBoard`
+  - post-wave expansion tranche (non-M2 gate scope) landed controls: `DashboardGrid` (`8593562`), `QuickOpenOverlay` (`d91c934`), `BulletChart` (`dfd4221`), `ResizablePaneGroup` (`77cc95d`), `SideNavRail` (`d236de2`), `TokenEditor` (`7fbf7be`), `HealthBoard` (`18adc16`), `JumpList` (`187468c`), `AutocompleteInput` (`50212de` + `be23de7`), `BoxPlot` (`6ae3c5b`)
+  - targeted verification signal for the landed tranche is green on this host: `dotnet test tests/TeaSharp.Tests --no-restore --nologo --filter "DashboardGrid|QuickOpenOverlay|BulletChart|ResizablePaneGroup|SideNavRail|TokenEditor|HealthBoard|JumpList|AutocompleteInput|BoxPlot"` (48 passed)
+  - integration wiring update: `03c7a43` added theme/parity coverage for `JumpList`, `AutocompleteInput`, and `BoxPlot`
+  - still open for tranche closure: theme extension parity is now complete for `BulletChart`, `DashboardGrid`, `JumpList`, `AutocompleteInput`, and `BoxPlot`; still pending for `QuickOpenOverlay`, `ResizablePaneGroup`, `SideNavRail`, `TokenEditor`, `HealthBoard`
 - **M3: Visual Quality Full Polish Pass** -> **Done**
   - visual polish closure evidence landed:
     - `1c43dbe` -> WidgetGallery polished default theme/layout slice
@@ -96,6 +97,7 @@ Correctness is a continuous gate across all phases: fix regressions at source an
       - policy closure evidence: [post-v1-selection-naming-migration.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/post-v1-selection-naming-migration.md)
     - item `1` + item `6` additional consumer-path evidence: `896c227` -> [examples/ExternalConsumerReviewApp/ExternalConsumerReviewApp.Wave2.cs](/Users/georgetsouvaltzis/Projects/playground/teasharp/examples/ExternalConsumerReviewApp/ExternalConsumerReviewApp.Wave2.cs), [examples/ExternalConsumerReviewApp/Program.cs](/Users/georgetsouvaltzis/Projects/playground/teasharp/examples/ExternalConsumerReviewApp/Program.cs), [docs/external-consumer-review-v1.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/external-consumer-review-v1.md)
     - item `4` guardrail enforcement evidence: `0a38229` -> [tests/TeaSharp.Tests/BorderedControlParityPolicyTests.cs](/Users/georgetsouvaltzis/Projects/playground/teasharp/tests/TeaSharp.Tests/BorderedControlParityPolicyTests.cs)
+    - item `4` theme/parity integration follow-up: `03c7a43` -> [src/TeaSharp/Styles/TeaThemeControlExtensions.Navigation.cs](/Users/georgetsouvaltzis/Projects/playground/teasharp/src/TeaSharp/Styles/TeaThemeControlExtensions.Navigation.cs), [src/TeaSharp/Styles/TeaThemeControlExtensions.NavigationOverlay.cs](/Users/georgetsouvaltzis/Projects/playground/teasharp/src/TeaSharp/Styles/TeaThemeControlExtensions.NavigationOverlay.cs), [src/TeaSharp/Styles/TeaThemeControlExtensions.Plotting.cs](/Users/georgetsouvaltzis/Projects/playground/teasharp/src/TeaSharp/Styles/TeaThemeControlExtensions.Plotting.cs), [tests/TeaSharp.Tests/BorderedControlParityPolicyTests.cs](/Users/georgetsouvaltzis/Projects/playground/teasharp/tests/TeaSharp.Tests/BorderedControlParityPolicyTests.cs)
     - item `6` onboarding boundary guard evidence: `9c89036` -> [tests/TeaSharp.Tests/PublicApiBoundaryTests.cs](/Users/georgetsouvaltzis/Projects/playground/teasharp/tests/TeaSharp.Tests/PublicApiBoundaryTests.cs)
   - C4 remains open until all API freeze checklist items are marked complete
 - **M5: Performance Gate + Benchmarks + Docs Freeze** -> **Pending manual signoff**
@@ -177,7 +179,7 @@ M4 checklist status snapshot (March 22, 2026):
 - item `1`: **In progress** (consumer-path onboarding evidence exists via `c712c2a` + `896c227`; final gate closure still pending explicit checklist signoff)
 - item `2`: **In progress** (advanced seam guidance remains opt-in; no new closure stamp in this batch)
 - item `3`: **In progress** (ergonomics and naming convergence advanced via `4d4a391` + `e731edc`, but full API-surface consistency signoff remains open)
-- item `4`: **In progress** (cross-control frame/focus naming consistency and parity guardrails reinforced via `1a4fab8` + `0a38229`; final gate signoff still open)
+- item `4`: **In progress** (cross-control frame/focus naming consistency and parity guardrails reinforced via `1a4fab8` + `0a38229` + `03c7a43`; final gate signoff still open)
 - item `5`: **In progress** (latest explicit XML docs closure evidence remains `4e3a240`; no new docs-gate closure commit in this batch)
 - item `6`: **In progress** (onboarding boundary guard strength improved via `9c89036` plus consumer evidence `896c227`; final closure still pending RC checklist completion)
 

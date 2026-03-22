@@ -134,7 +134,7 @@ V1 theming is semantic-token based with override hierarchy:
 - mapped rendering text utility controls include `Badge`, `LogView`, `MarkdownView`, `MiniLog`
 - mapped modal/chart summary controls include `Dialog`, `Modal`, `BarChart`, `LineChart`, `Gauge`, `StatsCard`
 - mapped plotting controls include `Sparkline`, `AreaPlot`, `ScatterPlot`, `Histogram`, `LinePlot`, `PlotPanel`
-- expansion tranche controls (`DashboardGrid`, `QuickOpenOverlay`, `BulletChart`, `ResizablePaneGroup`, `SideNavRail`, `TokenEditor`, `HealthBoard`) are implemented with deterministic tests; theme extension defaults are currently wired for `BulletChart` and `DashboardGrid`, while the remaining controls still need typed `ApplyTheme`/`ApplyThemeDefaults` parity wiring
+- expansion tranche controls (`DashboardGrid`, `QuickOpenOverlay`, `BulletChart`, `ResizablePaneGroup`, `SideNavRail`, `TokenEditor`, `HealthBoard`, `JumpList`, `AutocompleteInput`, `BoxPlot`) are implemented with deterministic tests; theme extension defaults are wired for `BulletChart`, `DashboardGrid`, `JumpList`, `AutocompleteInput`, and `BoxPlot`, while `QuickOpenOverlay`, `ResizablePaneGroup`, `SideNavRail`, `TokenEditor`, and `HealthBoard` still need typed `ApplyTheme`/`ApplyThemeDefaults` parity wiring
 - `Dialog` and `Modal` map `BorderStyleText`/`FocusedBorderStyleText` to semantic border/focus tokens by default
 
 Focus visuals must be theme-driven (for example focused border style/color), not limited to marker suffixes.
@@ -383,6 +383,15 @@ Root controls currently include:
 - `HealthService`
 - `HealthServiceSeverity`
 - `HealthBoardGlyphSet`
+- `JumpList`
+- `JumpListItem`
+- `JumpListGlyphSet`
+- `JumpListActivatedEventArgs`
+- `AutocompleteInput`
+- `AutocompleteInputGlyphSet`
+- `AutocompleteInputSuggestionCommittedEventArgs`
+- `BoxPlot`
+- `BoxPlotSeries`
 - `ScatterPlot`
 - `ScatterPlotPoint`
 - `Histogram`

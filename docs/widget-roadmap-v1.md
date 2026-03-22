@@ -137,7 +137,7 @@ Documentation and examples:
 - canonical plotting/dashboard sample: `examples/PlottingDashboard` (add when available)
 - current stopgap references: `examples/WidgetGallery`, `examples/AdvancedWidgets`
 
-## Expansion Backlog: +36 Dashboard-First Widgets (7 Landed)
+## Expansion Backlog: +36 Dashboard-First Widgets (10 Landed)
 
 This backlog is intentionally implementation-oriented for the next growth tranche beyond the current +34 wave completion. It keeps dashboard and operational TUI use-cases first.
 
@@ -229,13 +229,16 @@ Landed controls from the expansion tranche:
 | `SideNavRail` | `d236de2` | implemented; keyboard/pointer/activation/style tests present; included in passing targeted suite |
 | `TokenEditor` | `7fbf7be` | implemented; add/remove/navigation/style tests present; currently passing in targeted suite reruns |
 | `HealthBoard` | `18adc16` | implemented; severity/selection/ack/style tests present; included in passing targeted suite |
+| `JumpList` | `187468c`, `03c7a43` | implemented; activation/navigation/style tests present in `JumpListControlTests`; included in passing targeted suite |
+| `AutocompleteInput` | `50212de`, `be23de7`, `03c7a43` | implemented; suggestion ranking/commit/style behavior stabilized; included in passing targeted suite |
+| `BoxPlot` | `6ae3c5b`, `03c7a43` | implemented; deterministic render/style tests present in `BoxPlotControlTests`; included in passing targeted suite |
 
 Targeted verification command (current host):  
-`dotnet test tests/TeaSharp.Tests --no-restore --nologo --filter "DashboardGrid|QuickOpenOverlay|BulletChart|ResizablePaneGroup|SideNavRail|TokenEditor|HealthBoard"` -> pass (34/34).
+`dotnet test tests/TeaSharp.Tests --no-restore --nologo --filter "DashboardGrid|QuickOpenOverlay|BulletChart|ResizablePaneGroup|SideNavRail|TokenEditor|HealthBoard|JumpList|AutocompleteInput|BoxPlot"` -> pass (48/48).
 
 Outstanding for this tranche (do not mark done yet):
 
-- Theme extension parity is confirmed for `BulletChart` and `DashboardGrid` only (`TeaThemeControlExtensions.DashboardMetrics.cs` via `4e005ed`).
+- Theme extension parity is confirmed for `BulletChart`, `DashboardGrid`, `JumpList`, `AutocompleteInput`, and `BoxPlot` (`4e005ed`, `03c7a43`).
 - `QuickOpenOverlay`, `ResizablePaneGroup`, `SideNavRail`, `TokenEditor`, and `HealthBoard` still need the same `ApplyTheme`/`ApplyThemeDefaults` coverage before tranche closure.
 
 ## Dependency Graph (Build Order)

@@ -187,6 +187,15 @@ Preferred public catalog:
 174. `HealthService`
 175. `HealthServiceSeverity`
 176. `HealthBoardGlyphSet`
+177. `JumpList`
+178. `JumpListItem`
+179. `JumpListGlyphSet`
+180. `JumpListActivatedEventArgs`
+181. `AutocompleteInput`
+182. `AutocompleteInputGlyphSet`
+183. `AutocompleteInputSuggestionCommittedEventArgs`
+184. `BoxPlot`
+185. `BoxPlotSeries`
 
 These live in `TeaSharp.Controls`.
 
@@ -206,6 +215,9 @@ Current landed subset from that expansion backlog:
 - `SideNavRail`
 - `TokenEditor`
 - `HealthBoard`
+- `JumpList`
+- `AutocompleteInput`
+- `BoxPlot`
 
 ### Dropdown Visual Defaults
 
