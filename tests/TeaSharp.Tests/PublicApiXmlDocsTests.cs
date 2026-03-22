@@ -18,6 +18,9 @@ internal static class PublicApiXmlDocsTests
         yield return new TestCase(
             "PublicApiXmlDocs_EntryControlsAndLayouts_HaveSummaries",
             EntryControlsAndLayouts_HaveSummaries);
+        yield return new TestCase(
+            "PublicApiXmlDocs_PlottingErgonomicsApis_HaveSummaries",
+            PlottingErgonomicsApis_HaveSummaries);
     }
 
     private static Task RootTypes_HaveSummaries()
@@ -218,6 +221,35 @@ internal static class PublicApiXmlDocsTests
             "T:TeaSharp.Components.Primitives.Canvas",
             "T:TeaSharp.Thickness",
             "T:TeaSharp.BorderStyle",
+        ];
+
+        var docs = LoadDocumentation();
+        foreach (var memberName in memberNames)
+        {
+            AssertTagHasContent(docs, memberName, "summary");
+        }
+
+        return Task.CompletedTask;
+    }
+
+    private static Task PlottingErgonomicsApis_HaveSummaries()
+    {
+        string[] memberNames =
+        [
+            "T:TeaSharp.Controls.LinePlot",
+            "T:TeaSharp.Controls.LineSeries",
+            "T:TeaSharp.Controls.LineSeriesScaleMode",
+            "T:TeaSharp.Controls.Sparkline",
+            "T:TeaSharp.Controls.ScatterPlot",
+            "M:TeaSharp.Controls.LinePlot.ConfigureAxes(System.Boolean,System.String,System.String,System.String)",
+            "M:TeaSharp.Controls.LinePlot.ConfigureGrid(System.Boolean)",
+            "M:TeaSharp.Controls.LinePlot.ConfigureLegend(System.Boolean)",
+            "M:TeaSharp.Controls.LineSeries.TrimToLast(System.Int32)",
+            "M:TeaSharp.Controls.ScatterPlot.TrimToLast(System.Int32)",
+            "M:TeaSharp.Controls.Sparkline.TrimToLast(System.Int32)",
+            "P:TeaSharp.Controls.LineSeries.Capacity",
+            "P:TeaSharp.Controls.ScatterPlot.Capacity",
+            "P:TeaSharp.Controls.LineSeries.ScaleMode",
         ];
 
         var docs = LoadDocumentation();
