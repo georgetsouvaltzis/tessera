@@ -22,7 +22,7 @@ public abstract class TeaApp
     private readonly IScreenCompiler _screenCompiler = ScreenCompilationFactory.CreateDefault();
     private ICompiledScreenInteraction? _interactiveScreen;
     private readonly List<TeaEffect> _pendingEffects = [];
-    private PointerActivationPolicy _pointerActivationPolicy = PointerActivationPolicy.SingleClick;
+    private PointerActivationPolicy _pointerActivationPolicy = PointerActivationPolicy.DoubleClick;
     private TimeSpan _doubleClickTimeout = TimeSpan.FromMilliseconds(450);
     private int _doubleClickSlop = 1;
     private DateTimeOffset _lastPointerPressUtc = DateTimeOffset.MinValue;

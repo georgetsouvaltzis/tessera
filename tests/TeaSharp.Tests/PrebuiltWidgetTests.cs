@@ -30,6 +30,7 @@ internal static class PrebuiltWidgetTests
         yield return new TestCase("Controls_Tabs_CycleAndSelectByNumber", Tabs_CycleAndSelectByNumber);
         yield return new TestCase("Controls_Tabs_ZeroShortcut_SelectsTenthTab", Tabs_ZeroShortcut_SelectsTenthTab);
         yield return new TestCase("Controls_Tabs_MouseClickSelectsTab", Tabs_MouseClickSelectsTab);
+        yield return new TestCase("Controls_Tabs_MouseMotionDoesNotSelectHoveredTab", Tabs_MouseMotionDoesNotSelectHoveredTab);
         yield return new TestCase("Controls_Tabs_SelectionChangedEvent_ReportsTab", Tabs_SelectionChangedEvent_ReportsTab);
         yield return new TestCase("Controls_Breadcrumb_NavigatesSelection", Breadcrumb_NavigatesSelection);
         yield return new TestCase("Controls_Breadcrumb_MouseClickSelectsItem", Breadcrumb_MouseClickSelectsItem);
@@ -480,6 +481,17 @@ internal static class PrebuiltWidgetTests
 
         TestAssert.True(changed, "Mouse click inside tab row should update selected tab.");
         TestAssert.Equal(1, tabs.SelectedIndex, "Tab click should select the clicked tab.");
+        return Task.CompletedTask;
+    }
+
+    private static Task Tabs_MouseMotionDoesNotSelectHoveredTab()
+    {
+        var tabs = new Tabs("Overview", "Data", "Forms");
+
+        var changed = tabs.Handle(new PointerInput(PointerEventKind.Motion, PointerButton.None, 15, 0), new Rect(0, 0, 40, 1));
+
+        TestAssert.True(changed, "Tab hover should update hover state.");
+        TestAssert.Equal(0, tabs.SelectedIndex, "Tab hover should not mutate selected tab.");
         return Task.CompletedTask;
     }
 

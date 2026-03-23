@@ -70,6 +70,28 @@ public sealed class PaneTabsControlTests
     }
 
     [Test]
+    public void Controls_PaneTabs_PointerMotionDoesNotSelectHoveredTab()
+    {
+        var control = new PaneTabs
+        {
+            Border = BorderStyle.None,
+        };
+        control.SetTabs(
+        [
+            new PaneTabItem("a", "A"),
+            new PaneTabItem("b", "B"),
+            new PaneTabItem("c", "C"),
+        ]);
+        var bounds = new Rect(0, 0, 30, 1);
+
+        var handled = control.Handle(new PointerInput(PointerEventKind.Motion, PointerButton.None, 10, 0), bounds);
+
+        Assert.That(handled, Is.True);
+        Assert.That(control.SelectedIndex, Is.EqualTo(0));
+        Assert.That(control.SelectedItem?.Id, Is.EqualTo("a"));
+    }
+
+    [Test]
     public void Controls_PaneTabs_Render_EmitsFocusMarkerAndStyles()
     {
         var focusedBorder = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(66, 77, 88));

@@ -14,6 +14,18 @@ public sealed class RuntimePointerActivationPolicyTests
     }
 
     [Test]
+    public void RuntimePointerActivationPolicy_UnconfiguredTeaApp_UsesDoubleClickActivation()
+    {
+        var app = new PolicyActivationApp();
+
+        _ = app.UpdateRuntime(new PointerInput(PointerEventKind.Press, PointerButton.Left, 0, 0));
+        Assert.That(app.ActivationCount, Is.EqualTo(0));
+
+        _ = app.UpdateRuntime(new PointerInput(PointerEventKind.Press, PointerButton.Left, 0, 0));
+        Assert.That(app.ActivationCount, Is.EqualTo(1));
+    }
+
+    [Test]
     public void RuntimePointerActivationPolicy_DefaultRuntimeOptions_UsesDoubleClickActivation()
     {
         var app = new PolicyActivationApp();

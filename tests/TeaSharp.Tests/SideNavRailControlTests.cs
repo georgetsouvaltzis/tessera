@@ -85,6 +85,27 @@ public sealed class SideNavRailControlTests
     }
 
     [Test]
+    public void SideNavRail_PointerMotion_DoesNotChangeSelection()
+    {
+        var rail = CreateRail();
+        rail.Border = BorderStyle.None;
+        rail.SetItems(
+        [
+            new NavItem("home", "Home"),
+            new NavItem("queue", "Queue"),
+            new NavItem("jobs", "Jobs"),
+        ]);
+
+        var handled = rail.Handle(
+            new PointerInput(PointerEventKind.Motion, PointerButton.None, X: 2, Y: 2),
+            new Rect(0, 0, 30, 8));
+
+        Assert.That(handled, Is.True);
+        Assert.That(rail.SelectedIndex, Is.EqualTo(0));
+        Assert.That(rail.SelectedItem?.Id, Is.EqualTo("home"));
+    }
+
+    [Test]
     public void SideNavRail_StyleAndGlyphHooks_RenderExpectedStateStyling()
     {
         var rail = CreateRail();

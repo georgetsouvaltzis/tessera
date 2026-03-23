@@ -50,6 +50,10 @@ public sealed class TeaRuntimeOptions
     /// <summary>
     /// Gets or sets pointer activation behavior for the runtime input pipeline.
     /// </summary>
+    /// <remarks>
+    /// Defaults to <see cref="TeaSharp.PointerActivationPolicy.DoubleClick"/> so hover remains visual-only until a double click.
+    /// Set to <see cref="TeaSharp.PointerActivationPolicy.SingleClick"/> to enable immediate click activation.
+    /// </remarks>
     public PointerActivationPolicy PointerActivationPolicy { get; set; } = PointerActivationPolicy.DoubleClick;
 
     /// <summary>
