@@ -54,7 +54,7 @@ internal static class PrebuiltWidgetTests
         yield return new TestCase("Controls_MenuBar_ItemActivatedEvent_ReportsItem", MenuBar_ItemActivatedEvent_ReportsItem);
         yield return new TestCase("Controls_MenuBar_TryConsumeActivation_IsSingleUse", MenuBar_TryConsumeActivation_IsSingleUse);
         yield return new TestCase("Controls_MenuBar_MouseClickActivatesItem", MenuBar_MouseClickActivatesItem);
-        yield return new TestCase("Controls_MenuBar_MouseMotionSelectsHoveredItem", MenuBar_MouseMotionSelectsHoveredItem);
+        yield return new TestCase("Controls_MenuBar_MouseMotionDoesNotSelectHoveredItem", MenuBar_MouseMotionDoesNotSelectHoveredItem);
         yield return new TestCase("Controls_MenuBar_CustomGlyphsAndFocusedBorderStyleText_Rendered", MenuBar_CustomGlyphsAndFocusedBorderStyleText_Rendered);
         yield return new TestCase("Controls_CommandBar_KeyboardNavigationAndActivation", CommandBar_KeyboardNavigationAndActivation);
         yield return new TestCase("Controls_CommandBar_ItemActivatedEvent_ReportsItem", CommandBar_ItemActivatedEvent_ReportsItem);
@@ -923,7 +923,7 @@ internal static class PrebuiltWidgetTests
         return Task.CompletedTask;
     }
 
-    private static Task MenuBar_MouseMotionSelectsHoveredItem()
+    private static Task MenuBar_MouseMotionDoesNotSelectHoveredItem()
     {
         var menu = new MenuBar();
         menu.SetItems(
@@ -935,8 +935,9 @@ internal static class PrebuiltWidgetTests
 
         var changed = menu.Handle(new PointerInput(PointerEventKind.Motion, PointerButton.None, 12, 0), new Rect(0, 0, 40, 1));
 
-        TestAssert.True(changed, "Menu hover should move selection to the hovered item.");
-        TestAssert.Equal(1, menu.SelectedIndex, "Menu hover should track the hovered item for parity with legacy menu bars.");
+        TestAssert.True(changed, "Menu hover should still update hover state.");
+        TestAssert.Equal(0, menu.SelectedIndex, "Menu hover should not mutate selected item.");
+        TestAssert.True(string.IsNullOrEmpty(menu.LastActivatedItemId), "Menu hover should not activate an item.");
         return Task.CompletedTask;
     }
 

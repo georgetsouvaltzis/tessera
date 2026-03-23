@@ -227,12 +227,6 @@ public sealed class MenuBar : Control
         var hovered = HitTestItemIndex(pointer.X, content);
         if (pointer.Kind == PointerEventKind.Motion)
         {
-            if (hovered >= 0 && _selectedIndex != hovered)
-            {
-                _selectedIndex = hovered;
-                return SetHoveredIndex(hovered) || true;
-            }
-
             return SetHoveredIndex(hovered);
         }
 
