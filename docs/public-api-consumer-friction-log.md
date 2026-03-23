@@ -30,3 +30,11 @@ Context: consumer-centric pass re-checked against current `examples/PublicApiDas
 
 ## External Consumer Findings (Open)
 No active P1/P2 open findings in this scope as of March 22, 2026.
+
+## Net-New Findings - ControlPlaneOpsDashboard (March 23, 2026)
+
+| issue | severity | repro snippet | suggested non-breaking fix |
+|---|---|---|---|
+| `ScatterPlot` frame-style parity gap (`Border`/`Padding` missing) | P2 | `var plot = new ScatterPlot { Border = BorderStyle.Rounded, Padding = Thickness.All(1) };` | Add bordered-frame aliases/hooks to `ScatterPlot` to align with other dashboard widgets. |
+| `LogView` append naming discoverability (`Append` only) | P2 | `_activity.AppendLine(\"...\");` | Add `AppendLine(string)` compatibility alias forwarding to `Append(string)`. |
+| Theme token naming ambiguity for new consumers | P2 | `theme.Border.Primary` / `theme.Focus.Primary` (not valid) | Keep current tokens; add docs crosswalk and optional alias properties for discoverability. |

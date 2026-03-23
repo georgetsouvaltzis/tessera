@@ -184,3 +184,24 @@ plot.ConfigureAxes(showAxes: true, sharedAxisLabel: "value");
 plot.ConfigureGrid(true);
 plot.ConfigureLegend(true);
 ```
+
+## Wave 4 - ControlPlaneOpsDashboard Implementation Feedback (March 23, 2026)
+
+Context: built `examples/ControlPlaneOpsDashboard` as a coherent control-plane app using only public onboarding namespaces.
+
+### What was easy
+- Cross-widget composition is strong: `Tabs`, `SideNavRail`, `DashboardGrid`, `Table`, `HealthBoard`, `Notifications`, `TaskRunnerPanel`, and overlays integrate without touching internals.
+- Runtime theme fan-out + local override flow is practical for real screens (`ApplyTheme(...)`, dashboard override bundle pattern).
+- Periodic updates are straightforward via `TeaEffects.Periodic(...)`.
+
+### Friction encountered while implementing
+- `ScatterPlot` does not expose bordered-frame hooks (`Border`, `Padding`, `BorderStyleText`, `FocusedBorderStyleText`) unlike most dashboard widgets.
+- `LogView` exposes `Append(...)` but not `AppendLine(...)`; easy to adapt, but discoverability is weaker when moving from other log/terminal APIs.
+- Theme token naming is easy to misread at first pass (`Border.Default` and `Focus.Ring` are valid; `Border.Primary` / `Focus.Primary` are not).
+
+### Top API adjustments suggested
+1. Add non-breaking frame/style parity to `ScatterPlot` (`Border`, `Padding`, border style hooks).
+2. Add `LogView.AppendLine(string)` as compatibility alias to `Append(string)`.
+3. Add a short token crosswalk in docs (`Border.Default/Strong/Focused`, `Focus.Ring/Title/Border`).
+4. Add a compact “dashboard composition cookbook” doc page with common production layouts and control bundles.
+5. Keep expanding canonical aliasing where legacy names remain (same direction as `Selected*` and title-style alias work).
