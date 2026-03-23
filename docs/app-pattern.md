@@ -183,6 +183,9 @@ Common settings:
 - `AdaptiveFramePacing`
 - `DisableRenderer`
 - `DisableInput`
+- `PointerActivationPolicy` (defaults to `DoubleClick`; set `SingleClick` to opt into immediate click activation)
+- `DoubleClickTimeout`
+- `DoubleClickSlop`
 - `EnableResizeSignals`
 - `Screen`
 
