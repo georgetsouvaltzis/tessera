@@ -48,6 +48,27 @@ public sealed class TeaRuntimeOptions
     public TimeSpan EscapeTimeout { get; set; } = TimeSpan.FromMilliseconds(50);
 
     /// <summary>
+    /// Gets or sets pointer activation behavior for the runtime input pipeline.
+    /// </summary>
+    public PointerActivationPolicy PointerActivationPolicy { get; set; } = PointerActivationPolicy.SingleClick;
+
+    /// <summary>
+    /// Gets or sets the maximum interval between consecutive clicks for double-click detection.
+    /// </summary>
+    /// <remarks>
+    /// This value is used when <see cref="PointerActivationPolicy"/> is <see cref="TeaSharp.PointerActivationPolicy.DoubleClick"/>.
+    /// </remarks>
+    public TimeSpan DoubleClickTimeout { get; set; } = TimeSpan.FromMilliseconds(450);
+
+    /// <summary>
+    /// Gets or sets the maximum pointer-cell delta allowed between consecutive clicks for double-click detection.
+    /// </summary>
+    /// <remarks>
+    /// This value is used when <see cref="PointerActivationPolicy"/> is <see cref="TeaSharp.PointerActivationPolicy.DoubleClick"/>.
+    /// </remarks>
+    public int DoubleClickSlop { get; set; } = 1;
+
+    /// <summary>
     /// Gets or sets a value indicating whether resize signals should be monitored.
     /// </summary>
     public bool EnableResizeSignals { get; set; } = true;

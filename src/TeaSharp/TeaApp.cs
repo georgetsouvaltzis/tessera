@@ -22,6 +22,15 @@ public abstract class TeaApp
     private readonly IScreenCompiler _screenCompiler = ScreenCompilationFactory.CreateDefault();
     private ICompiledScreenInteraction? _interactiveScreen;
     private readonly List<TeaEffect> _pendingEffects = [];
+    private PointerActivationPolicy _pointerActivationPolicy = PointerActivationPolicy.SingleClick;
+    private TimeSpan _doubleClickTimeout = TimeSpan.FromMilliseconds(450);
+    private int _doubleClickSlop = 1;
+    private DateTimeOffset _lastPointerPressUtc = DateTimeOffset.MinValue;
+    private int _lastPointerPressX;
+    private int _lastPointerPressY;
+    private PointerButton _lastPointerPressButton = PointerButton.None;
+    private int _lastPointerPressCount;
+    private bool _hasLastPointerPress;
 
     /// <summary>
     /// Gets the most recent screen context supplied by the runtime.
@@ -87,6 +96,10 @@ public abstract class TeaApp
         _runtimeScreenOptions = options.Screen ?? ScreenOptions.Empty;
         ConfigureRuntimeTheme(options.Theme);
         ConfigureRuntimeThemeOverrides(options.ThemeOverrides);
+        _pointerActivationPolicy = options.PointerActivationPolicy;
+        _doubleClickTimeout = options.DoubleClickTimeout < TimeSpan.Zero ? TimeSpan.Zero : options.DoubleClickTimeout;
+        _doubleClickSlop = Math.Max(0, options.DoubleClickSlop);
+        ResetPointerClickTracking();
     }
 
     internal void ConfigureRuntimeTheme(TeaTheme? theme)
@@ -106,6 +119,7 @@ public abstract class TeaApp
     internal TeaEffect? UpdateRuntime(Message mapped)
     {
         var routed = TeaPeriodicEffectMessage.TryUnwrap(mapped, out var periodic);
+        routed = NormalizePointerInputForRuntime(routed);
         var nextPeriodic = periodic is null
             ? null
             : TeaEffects.Periodic(periodic.Interval, periodic.Factory);
@@ -168,6 +182,73 @@ public abstract class TeaApp
             or PasteStarted
             or PasteEnded
             or Pasted;
+
+    private Message NormalizePointerInputForRuntime(Message message)
+    {
+        if (message is not PointerInput pointer)
+        {
+            return message;
+        }
+
+        var normalized = NormalizeClickCount(pointer);
+        if (_pointerActivationPolicy != PointerActivationPolicy.DoubleClick)
+        {
+            return normalized;
+        }
+
+        if (normalized is { Kind: PointerEventKind.Press, Button: PointerButton.Left } && normalized.ClickCount < 2)
+        {
+            return normalized with
+            {
+                Kind = PointerEventKind.Motion,
+                Button = PointerButton.None,
+                ClickCount = 0,
+            };
+        }
+
+        return normalized;
+    }
+
+    private PointerInput NormalizeClickCount(PointerInput pointer)
+    {
+        if (pointer.Kind != PointerEventKind.Press || pointer.Button == PointerButton.None)
+        {
+            return pointer;
+        }
+
+        var clickCount = pointer.ClickCount > 0 ? pointer.ClickCount : 1;
+        var now = DateTimeOffset.UtcNow;
+
+        if (_hasLastPointerPress
+            && pointer.Button == _lastPointerPressButton
+            && now - _lastPointerPressUtc <= _doubleClickTimeout
+            && Math.Abs(pointer.X - _lastPointerPressX) <= _doubleClickSlop
+            && Math.Abs(pointer.Y - _lastPointerPressY) <= _doubleClickSlop)
+        {
+            clickCount = Math.Max(clickCount, _lastPointerPressCount + 1);
+        }
+
+        _hasLastPointerPress = true;
+        _lastPointerPressUtc = now;
+        _lastPointerPressX = pointer.X;
+        _lastPointerPressY = pointer.Y;
+        _lastPointerPressButton = pointer.Button;
+        _lastPointerPressCount = clickCount;
+
+        return clickCount == pointer.ClickCount
+            ? pointer
+            : pointer with { ClickCount = clickCount };
+    }
+
+    private void ResetPointerClickTracking()
+    {
+        _hasLastPointerPress = false;
+        _lastPointerPressUtc = DateTimeOffset.MinValue;
+        _lastPointerPressX = 0;
+        _lastPointerPressY = 0;
+        _lastPointerPressButton = PointerButton.None;
+        _lastPointerPressCount = 0;
+    }
 
     private void ApplyRuntimeThemeContext()
     {

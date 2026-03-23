@@ -94,12 +94,17 @@ public sealed record WindowResized(int Width, int Height) : Message;
 /// <param name="X">The pointer X coordinate.</param>
 /// <param name="Y">The pointer Y coordinate.</param>
 /// <param name="Modifiers">The modifier keys active during the event.</param>
+/// <param name="ClickCount">
+/// The consecutive click count for press events, as normalized by runtime policy.
+/// Non-press events may report <c>0</c>.
+/// </param>
 public sealed record PointerInput(
     PointerEventKind Kind,
     PointerButton Button,
     int X,
     int Y,
-    ModifierKeys Modifiers = ModifierKeys.None) : Message;
+    ModifierKeys Modifiers = ModifierKeys.None,
+    int ClickCount = 1) : Message;
 
 /// <summary>
 /// Represents the start of a bracketed paste sequence.
@@ -234,4 +239,20 @@ public enum MouseTrackingMode
     None = 0,
     CellMotion = 1,
     AllMotion = 2,
+}
+
+/// <summary>
+/// Defines pointer activation behavior used by the runtime input pipeline.
+/// </summary>
+public enum PointerActivationPolicy
+{
+    /// <summary>
+    /// Activates pointer-driven interactions on a single click.
+    /// </summary>
+    SingleClick = 0,
+
+    /// <summary>
+    /// Activates pointer-driven interactions on double click.
+    /// </summary>
+    DoubleClick = 1,
 }
