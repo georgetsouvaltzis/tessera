@@ -3,6 +3,7 @@
     <Project Path="examples/AdvancedWidgets/AdvancedWidgets.csproj" />
     <Project Path="examples/CounterForm/CounterForm.csproj" />
     <Project Path="examples/ComboBox/ComboBox.csproj" />
+    <Project Path="examples/ControlPlaneOpsDashboard/ControlPlaneOpsDashboard.csproj" />
     <Project Path="examples/Dropdown/Dropdown.csproj" />
     <Project Path="examples/ExternalConsumerReviewApp/ExternalConsumerReviewApp.csproj" />
     <Project Path="examples/HelloWorld/HelloWorld.csproj" />
