@@ -5,6 +5,8 @@ using TeaSharp.Styles;
 
 internal sealed partial class ControlPlaneOpsDashboardApp
 {
+    private bool _quickOpenItemsDirty;
+
     private readonly JumpList _jumpList = new()
     {
         Title = "Runbook Jump List",
@@ -108,7 +110,11 @@ internal sealed partial class ControlPlaneOpsDashboardApp
         };
 
         _quickOpenOverlay.Submitted += (_, args) => HandleQuickOpenSubmitted(args);
-        _quickOpenOverlay.Cancelled += (_, _) => _statusText = "quick-open canceled";
+        _quickOpenOverlay.Cancelled += (_, _) =>
+        {
+            _statusText = "quick-open canceled";
+            RefreshQuickOpenItemsIfIdle();
+        };
 
         _automationPanes.SetPanes(
         [
@@ -120,6 +126,7 @@ internal sealed partial class ControlPlaneOpsDashboardApp
         _automationPanes.SetSplitRatio(1, 0.72d);
 
         _quickOpenOverlay.SetItems(BuildQuickOpenItems());
+        _quickOpenItemsDirty = false;
     }
 
     private Screen BuildAutomationScreen(ScreenContext context)
@@ -239,6 +246,11 @@ internal sealed partial class ControlPlaneOpsDashboardApp
 
     private void HandleQuickOpenSubmitted(QuickOpenOverlaySubmittedEventArgs args)
     {
+        if (_quickOpenOverlay.IsOpen)
+        {
+            _quickOpenOverlay.Close();
+        }
+
         var itemId = args.ItemId;
         if (itemId.StartsWith("service:", StringComparison.Ordinal))
         {
@@ -246,6 +258,8 @@ internal sealed partial class ControlPlaneOpsDashboardApp
             SelectServiceById(serviceId);
             _statusText = $"quick-open selected service {serviceId}";
             _notifications.Push($"Quick-open -> service {serviceId}", NotificationLevel.Info);
+            MarkQuickOpenItemsDirty();
+            RefreshQuickOpenItemsIfIdle();
             return;
         }
 
@@ -253,6 +267,8 @@ internal sealed partial class ControlPlaneOpsDashboardApp
         {
             _tabs.SetSelectedIndex(3);
             _statusText = $"quick-open opened analytics for {itemId["endpoint:".Length..]}";
+            MarkQuickOpenItemsDirty();
+            RefreshQuickOpenItemsIfIdle();
             return;
         }
 
@@ -269,6 +285,8 @@ internal sealed partial class ControlPlaneOpsDashboardApp
             };
             _tabs.SetSelectedIndex(tab);
             _statusText = $"quick-open switched to {_tabs.Items[tab]}";
+            MarkQuickOpenItemsDirty();
+            RefreshQuickOpenItemsIfIdle();
             return;
         }
 
@@ -276,6 +294,8 @@ internal sealed partial class ControlPlaneOpsDashboardApp
         {
             _notifications.MarkAllRead();
             _statusText = "quick-open marked all notifications read";
+            MarkQuickOpenItemsDirty();
+            RefreshQuickOpenItemsIfIdle();
             return;
         }
 
@@ -283,23 +303,31 @@ internal sealed partial class ControlPlaneOpsDashboardApp
         {
             _tokenEditor.AddToken("incident:open");
             _statusText = "quick-open appended token incident:open";
+            MarkQuickOpenItemsDirty();
+            RefreshQuickOpenItemsIfIdle();
             return;
         }
 
         if (string.Equals(itemId, "action:queue-deploy", StringComparison.Ordinal))
         {
             OpenDeployDialog();
+            MarkQuickOpenItemsDirty();
+            RefreshQuickOpenItemsIfIdle();
             return;
         }
 
         if (string.Equals(itemId, "action:ack", StringComparison.Ordinal))
         {
             AcknowledgeSelectedIncident();
+            MarkQuickOpenItemsDirty();
+            RefreshQuickOpenItemsIfIdle();
             return;
         }
 
         _statusText = $"quick-open submitted {args.Item.Label}";
         AppendActivity($"Quick-open submitted -> {args.ItemId} (query: {args.Query})");
+        MarkQuickOpenItemsDirty();
+        RefreshQuickOpenItemsIfIdle();
     }
 
     private void SelectServiceById(string serviceId)
@@ -371,7 +399,7 @@ internal sealed partial class ControlPlaneOpsDashboardApp
             return false;
         }
 
-        if (key.IsCharacter('r'))
+        if (key.IsCharacter('r', ModifierKeys.Ctrl))
         {
             if (_jumpList.SelectedItem is null || _jumpList.SelectedItem.IsDisabled)
             {
@@ -384,6 +412,23 @@ internal sealed partial class ControlPlaneOpsDashboardApp
         }
 
         return false;
+    }
+
+    private void MarkQuickOpenItemsDirty()
+    {
+        _quickOpenItemsDirty = true;
+        RefreshQuickOpenItemsIfIdle();
+    }
+
+    private void RefreshQuickOpenItemsIfIdle()
+    {
+        if (!_quickOpenItemsDirty || _quickOpenOverlay.IsOpen)
+        {
+            return;
+        }
+
+        _quickOpenOverlay.SetItems(BuildQuickOpenItems());
+        _quickOpenItemsDirty = false;
     }
 
     private void ApplyAutomationTheme(TeaTheme theme, TeaThemeOverrideBundle bundle)

@@ -205,3 +205,9 @@ Context: built `examples/ControlPlaneOpsDashboard` as a coherent control-plane a
 3. Add a short token crosswalk in docs (`Border.Default/Strong/Focused`, `Focus.Ring/Title/Border`).
 4. Add a compact “dashboard composition cookbook” doc page with common production layouts and control bundles.
 5. Keep expanding canonical aliasing where legacy names remain (same direction as `Selected*` and title-style alias work).
+
+## Wave 4 Follow-up - ControlPlaneOpsDashboard Hardening (March 23, 2026)
+
+- Implemented app-level reliability policy for shortcuts: control-plane actions now use Ctrl-chords (`Ctrl+1..5`, `Ctrl+T`, `Ctrl+P`, `Ctrl+D`, `Ctrl+A`, `Ctrl+N`, `Ctrl+R`) to avoid text-entry collisions.
+- Added bounded activity-log retention (ring-buffer policy) at app level to prevent unbounded growth while preserving UX.
+- Quick-open list refresh is now frozen while overlay is open and refreshed when idle (close/cancel/submit path), removing open-overlay churn.

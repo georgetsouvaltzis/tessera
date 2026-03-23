@@ -46,7 +46,7 @@ internal sealed partial class ControlPlaneOpsDashboardApp : TeaApp
     private readonly Button _deployButton = new()
     {
         Text = "Queue Deploy",
-        Description = "d opens confirmation",
+        Description = "Ctrl+D opens confirmation",
         Border = BorderStyle.Rounded,
         Padding = Thickness.All(1),
     };
@@ -54,7 +54,7 @@ internal sealed partial class ControlPlaneOpsDashboardApp : TeaApp
     private readonly Button _ackButton = new()
     {
         Text = "Acknowledge",
-        Description = "a acknowledges selected incident",
+        Description = "Ctrl+A acknowledges selected incident",
         Border = BorderStyle.Rounded,
         Padding = Thickness.All(1),
     };
@@ -165,9 +165,13 @@ internal sealed partial class ControlPlaneOpsDashboardApp : TeaApp
     ];
 
     private readonly HashSet<string> _acknowledgedServices = new(StringComparer.Ordinal);
+    private readonly Queue<string> _activityRing = new();
     private readonly Random _random = new(417);
 
+    private const int ActivityLogCapacity = 320;
+
     private bool _useRosePine;
+    private bool _activityNeedsRefresh;
     private int _tick;
     private string _statusText = "Ready";
     private string _selectedServiceId = "edge";
@@ -257,7 +261,7 @@ internal sealed partial class ControlPlaneOpsDashboardApp : TeaApp
 
         _notifications.Push("Control-plane dashboard booted", NotificationLevel.Success);
         _notifications.Push("Ctrl+P opens quick actions", NotificationLevel.Info);
-        _notifications.Push("Press d to queue deployment", NotificationLevel.Info);
+        _notifications.Push("Press Ctrl+D to queue deployment", NotificationLevel.Info);
         AppendActivity("Dashboard startup complete.");
 
         SeedPipelineTasks();
@@ -286,25 +290,25 @@ internal sealed partial class ControlPlaneOpsDashboardApp : TeaApp
                 return TeaEffects.Quit;
             }
 
-            if (key.IsCharacter('1')) _tabs.SetSelectedIndex(0);
-            if (key.IsCharacter('2')) _tabs.SetSelectedIndex(1);
-            if (key.IsCharacter('3')) _tabs.SetSelectedIndex(2);
-            if (key.IsCharacter('4')) _tabs.SetSelectedIndex(3);
-            if (key.IsCharacter('5')) _tabs.SetSelectedIndex(4);
+            if (key.IsCharacter('1', ModifierKeys.Ctrl)) _tabs.SetSelectedIndex(0);
+            if (key.IsCharacter('2', ModifierKeys.Ctrl)) _tabs.SetSelectedIndex(1);
+            if (key.IsCharacter('3', ModifierKeys.Ctrl)) _tabs.SetSelectedIndex(2);
+            if (key.IsCharacter('4', ModifierKeys.Ctrl)) _tabs.SetSelectedIndex(3);
+            if (key.IsCharacter('5', ModifierKeys.Ctrl)) _tabs.SetSelectedIndex(4);
 
-            if (key.IsCharacter('d'))
+            if (key.IsCharacter('d', ModifierKeys.Ctrl))
             {
                 OpenDeployDialog();
                 return null;
             }
 
-            if (key.IsCharacter('a'))
+            if (key.IsCharacter('a', ModifierKeys.Ctrl))
             {
                 AcknowledgeSelectedIncident();
                 return null;
             }
 
-            if (key.IsCharacter('n'))
+            if (key.IsCharacter('n', ModifierKeys.Ctrl))
             {
                 _notifications.Push($"manual note @ tick {_tick}", NotificationLevel.Info);
                 _statusText = "manual notification added";
@@ -316,10 +320,12 @@ internal sealed partial class ControlPlaneOpsDashboardApp : TeaApp
                 if (_quickOpenOverlay.IsOpen)
                 {
                     _quickOpenOverlay.Close();
+                    RefreshQuickOpenItemsIfIdle();
                     _statusText = "quick-open closed";
                 }
                 else
                 {
+                    RefreshQuickOpenItemsIfIdle();
                     _quickOpenOverlay.Open();
                     _statusText = "quick-open opened";
                 }
@@ -327,7 +333,7 @@ internal sealed partial class ControlPlaneOpsDashboardApp : TeaApp
                 return null;
             }
 
-            if (key.IsCharacter('t'))
+            if (key.IsCharacter('t', ModifierKeys.Ctrl))
             {
                 _useRosePine = !_useRosePine;
                 ApplyThemeAndOverrides();
@@ -349,6 +355,7 @@ internal sealed partial class ControlPlaneOpsDashboardApp : TeaApp
 
     public override Screen Build(ScreenContext context)
     {
+        RefreshActivityViewIfNeeded();
         return _tabs.SelectedIndex switch
         {
             1 => BuildFleetScreen(context),
@@ -553,7 +560,8 @@ internal sealed partial class ControlPlaneOpsDashboardApp : TeaApp
         UpdateOverviewState();
         UpdateAnalyticsState();
         UpdateAutomationState();
-        _quickOpenOverlay.SetItems(BuildQuickOpenItems());
+        MarkQuickOpenItemsDirty();
+        RefreshActivityViewIfNeeded();
 
         if (_tick % 8 == 0)
         {
@@ -671,7 +679,7 @@ internal sealed partial class ControlPlaneOpsDashboardApp : TeaApp
     private void ConfigureStatus(string viewName)
     {
         _status.LeftText = $"{CurrentThemeName()}  view={viewName}  tick={_tick:0000}  service={GetSelectedService().Name}";
-        _status.RightText = $"{_statusText}  1-5 views  t theme  Ctrl+P quick-open  d deploy  a ack  Ctrl+C quit";
+        _status.RightText = $"{_statusText}  Ctrl+1..5 views  Ctrl+T theme  Ctrl+P quick-open  Ctrl+D deploy  Ctrl+A ack  Ctrl+N note  Ctrl+C quit";
     }
 
     private void OpenDeployDialog()
@@ -766,7 +774,47 @@ internal sealed partial class ControlPlaneOpsDashboardApp : TeaApp
 
     private void AppendActivity(string line)
     {
-        _activity.Append($"[{DateTimeOffset.UtcNow:HH:mm:ss}] {line}");
+        var entry = $"[{DateTimeOffset.UtcNow:HH:mm:ss}] {line}";
+        if (_activityRing.Count >= ActivityLogCapacity)
+        {
+            _activityRing.Dequeue();
+            _activityNeedsRefresh = true;
+        }
+
+        _activityRing.Enqueue(entry);
+        if (_activity.IsPaused)
+        {
+            return;
+        }
+
+        if (_activityNeedsRefresh)
+        {
+            RefreshActivityViewIfNeeded();
+            return;
+        }
+
+        _activity.Append(entry);
+    }
+
+    private void RefreshActivityViewIfNeeded()
+    {
+        if (_activity.IsPaused)
+        {
+            return;
+        }
+
+        if (!_activityNeedsRefresh && _activity.Count == _activityRing.Count)
+        {
+            return;
+        }
+
+        _activity.Clear();
+        foreach (var entry in _activityRing)
+        {
+            _activity.Append(entry);
+        }
+
+        _activityNeedsRefresh = false;
     }
 
     private string CurrentThemeName() => _useRosePine ? "Rosé Pine" : "Catppuccin";

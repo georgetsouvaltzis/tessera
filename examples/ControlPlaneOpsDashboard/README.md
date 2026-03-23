@@ -35,13 +35,15 @@ A periodic pulse (`TeaEffects.Periodic`) updates telemetry, task status, notific
 
 ## Key Interactions
 
-- `1..5`: switch top views (`Overview`, `Fleet`, `Incidents`, `Analytics`, `Automation`)
-- `t`: switch theme (`Catppuccin` / `Rosé Pine`)
-- `Ctrl+P`: open/close quick-open overlay
-- `d`: open deployment confirmation dialog
-- `a`: acknowledge selected incident
-- `r` (Automation view): run selected jump/runbook action
-- `n`: add a manual notification
-- `Ctrl+C`: quit
+| Shortcut | Action |
+|---|---|
+| `Ctrl+1..5` | switch top views (`Overview`, `Fleet`, `Incidents`, `Analytics`, `Automation`) |
+| `Ctrl+T` | switch theme (`Catppuccin` / `Rosé Pine`) |
+| `Ctrl+P` | open/close quick-open overlay |
+| `Ctrl+D` | open deployment confirmation dialog |
+| `Ctrl+A` | acknowledge selected incident |
+| `Ctrl+R` (Automation view) | run selected jump/runbook action |
+| `Ctrl+N` | add a manual notification |
+| `Ctrl+C` | quit |
 
 Pointer interactions are enabled (`MouseTrackingMode.AllMotion`) and exercised by list/grid/board/overlay controls with hover + selection styling.
