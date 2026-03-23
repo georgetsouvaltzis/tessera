@@ -50,7 +50,7 @@ public sealed class TeaRuntimeOptions
     /// <summary>
     /// Gets or sets pointer activation behavior for the runtime input pipeline.
     /// </summary>
-    public PointerActivationPolicy PointerActivationPolicy { get; set; } = PointerActivationPolicy.SingleClick;
+    public PointerActivationPolicy PointerActivationPolicy { get; set; } = PointerActivationPolicy.DoubleClick;
 
     /// <summary>
     /// Gets or sets the maximum interval between consecutive clicks for double-click detection.
