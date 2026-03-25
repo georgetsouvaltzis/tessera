@@ -41,6 +41,34 @@ public sealed class PublicApiDashboardNavigationDiagnosticsTests
     }
 
     [Test]
+    public void PublicApiDashboardNavigationDiagnostics_AppContract_ActivityLogHoverCoordinates_DoNotMutateNavigation()
+    {
+        var tabs = new DashboardNavigationTabs("Overview", "Operations", "Audit");
+        tabs.SetSelectedIndex(2);
+        var changes = 0;
+        tabs.SelectionChanged += (_, _) => changes++;
+
+        var headerBounds = new Rect(0, 0, 120, 1);
+        var hoverCoordinates = new[]
+        {
+            (X: 6, Y: 8),
+            (X: 48, Y: 12),
+            (X: 24, Y: 20),
+        };
+
+        for (var i = 0; i < hoverCoordinates.Length; i++)
+        {
+            var handled = tabs.Handle(
+                new PointerInput(PointerEventKind.Motion, PointerButton.None, hoverCoordinates[i].X, hoverCoordinates[i].Y),
+                headerBounds);
+
+            Assert.That(handled, Is.False);
+            Assert.That(tabs.SelectedIndex, Is.EqualTo(2));
+            Assert.That(changes, Is.EqualTo(0));
+        }
+    }
+
+    [Test]
     public void PublicApiDashboardNavigationDiagnostics_DashboardTabsPointerWheel_IsBlockedWithoutSelectionMutation()
     {
         var tabs = new DashboardNavigationTabs("Overview", "Operations", "Audit");

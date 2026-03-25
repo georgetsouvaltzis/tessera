@@ -15,7 +15,7 @@ var app = Tea.CreateBuilder()
             WindowTitle = "TeaSharp Public API Dashboard",
             EnableFocusReporting = true,
             EnableBracketedPaste = true,
-            MouseTracking = MouseTrackingMode.AllMotion,
+            MouseTracking = MouseTrackingMode.CellMotion,
         };
     })
     .Build();
@@ -182,7 +182,7 @@ internal sealed class PublicApiDashboardApp : TeaApp
         _metricsTable.SetRows(BuildRowsForCurrentTab());
         _selectionSummary.Text = BuildSummaryText(context);
         _status.LeftText = $"{CurrentThemeName()}  tick={_tick:0000}  tab={_navigation.Items[_navigation.SelectedIndex]}";
-        _status.RightText = $"{_statusText}  Ctrl+D deploy  Ctrl+T theme  Ctrl+C quit  (d/t also work)";
+        _status.RightText = $"{_statusText}  click tab to switch  wheel ignored  Ctrl+D deploy  Ctrl+T theme  Ctrl+C quit";
 
         var topRow = new RowLayout
         {

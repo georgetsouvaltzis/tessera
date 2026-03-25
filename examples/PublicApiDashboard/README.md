@@ -5,10 +5,14 @@ This example simulates a realistic "external consumer" implementation using only
 - navigation via `DashboardNavigationTabs` wrapper over `Tabs`:
   - wheel navigation blocked
   - motion is hover-only (defensive guard restores selection if a future regression mutates it)
+  - runtime mouse mode uses `CellMotion` as hard fallback to prevent hover spam in noisy terminals
 - data area via `ListView<T>` and `Table`
 - operational feedback via `LogView` and `Notifications`
 - status footer via `StatusBar`
 - modal action via `Dialog` (deploy confirmation)
+- pointer semantics:
+  - click tab to switch
+  - wheel does not change tabs
 - shortcuts:
   - `Ctrl+D` (or `d`) deploy
   - `Ctrl+T` (or `t`) theme toggle
