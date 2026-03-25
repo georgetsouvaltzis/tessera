@@ -235,12 +235,18 @@ internal sealed class PublicApiDashboardApp : TeaApp
                 column.Fill(lowerRow);
             }));
             window.Footer(1, _status);
-            window.Overlay(new CenterLayout
+
+            // Keep closed dialogs out of the scene graph so pointer hit-testing does not
+            // route through an invisible overlay.
+            if (_confirmDeploy.IsVisible)
             {
-                Content = _confirmDeploy,
-                Width = Math.Min(60, Math.Max(44, context.Width - 8)),
-                Height = 9,
-            });
+                window.Overlay(new CenterLayout
+                {
+                    Content = _confirmDeploy,
+                    Width = Math.Min(60, Math.Max(44, context.Width - 8)),
+                    Height = 9,
+                });
+            }
         });
     }
 

@@ -2,6 +2,7 @@ using NUnit.Framework;
 using TeaSharp;
 using TeaSharp.Components.Primitives;
 using TeaSharp.Controls;
+using TeaSharp.Layout;
 
 namespace TeaSharp.Tests;
 
@@ -185,6 +186,16 @@ public sealed class PublicApiDashboardPointerFocusRegressionTests
             Padding = Thickness.All(1),
         };
 
+        private readonly Dialog _confirmDeploy = new()
+        {
+            Title = "Confirm Deployment",
+            BodyLines =
+            [
+                "Deploy selected service?",
+                "Enter accepts, Esc cancels.",
+            ],
+        };
+
         public DashboardPointerFocusProbeApp()
         {
             _services.SetItems(["API", "Worker", "Scheduler", "Gateway"]);
@@ -211,6 +222,15 @@ public sealed class PublicApiDashboardPointerFocusRegressionTests
                 window.Header(1, _navigation);
                 window.Left(Math.Min(36, Math.Max(28, context.Width / 4)), _services);
                 window.Body(body => body.Center(_body, width: 24, height: 5));
+                if (_confirmDeploy.IsVisible)
+                {
+                    window.Overlay(new CenterLayout
+                    {
+                        Content = _confirmDeploy,
+                        Width = Math.Min(60, Math.Max(44, context.Width - 8)),
+                        Height = 9,
+                    });
+                }
             });
         }
     }

@@ -10,8 +10,10 @@ This example simulates a realistic "external consumer" implementation using only
 - operational feedback via `LogView` and `Notifications`
 - status footer via `StatusBar`
 - modal action via `Dialog` (deploy confirmation)
+  - overlay is only composed while visible, so closed dialog state cannot intercept pointer hit-tests
 - pointer semantics:
   - runtime pointer activation policy is explicitly `SingleClick` for terminal compatibility (some terminals/paths coalesce or consume double-click)
+  - single-click on a services row selects immediately in the default dashboard composition
   - click tab to switch
   - wheel does not change tabs
 - shortcuts:
