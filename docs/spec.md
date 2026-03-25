@@ -75,7 +75,7 @@ Startup model:
 
 - minimal path: `Tea.RunAsync(new App())`
 - configured path: `Tea.CreateBuilder().UseApp<TApp>().ConfigureRuntime(...).Build()`
-- runtime pointer policy defaults to `PointerActivationPolicy.DoubleClick` so first click is hover-only by default; set `PointerActivationPolicy.SingleClick` to restore immediate click activation.
+- runtime pointer policy defaults to `PointerActivationPolicy.DoubleClick` so activation is double-click-gated by default while first click still transfers focus; set `PointerActivationPolicy.SingleClick` to restore immediate click activation.
 
 Canonical onboarding progression:
 
