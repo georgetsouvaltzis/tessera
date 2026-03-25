@@ -249,6 +249,30 @@ The intended beginner path is:
 - treat `TeaSharp.Core` as the low-level advanced lane, not default onboarding
 - use semantic theme tokens and palette-driven styling on the default path
 
+### Pointer Runtime Semantics (Tier 1)
+
+- `PointerActivationPolicy` controls click activation gating:
+  - `DoubleClick` (default): first press transfers focus, activation requires a qualifying second press.
+  - `SingleClick`: first press focuses and activates.
+- hover (`PointerEventKind.Motion`) is visual-only and should not be treated as click activation.
+- pointer terminal transport is independent from policy:
+  - policy controls activation semantics.
+  - `ScreenOptions.MouseTracking` controls requested terminal mouse reporting mode.
+
+Runtime input-path contract:
+
+- runtime keeps terminal byte-stream decoding when capabilities advertise CSI input features (`MouseReporting`, `FocusReporting`, `BracketedPaste`, or `ModeReports`), including non-raw console mode.
+- `Console.ReadKey` fallback is reserved for non-raw legacy terminals without CSI input features.
+
+Terminal prerequisites and troubleshooting:
+
+- CSI-capable terminals (Ghostty, iTerm2, Windows Terminal, macOS Terminal) should run through byte-stream decoding for pointer/focus/paste.
+- verify app requests mouse reporting (`runtime.Screen.MouseTracking = CellMotion|AllMotion`).
+- verify `DisableInput` is false.
+- verify `TEASHARP_CAPS` is not disabling mouse (`mouse=0`).
+- if using tmux, enable `set -g mouse on`.
+- if terminal text selection appears instead of app pointer behavior, run through the checklist above first.
+
 ### Notification Surface Guidance (Tier 1)
 
 - primary onboarding path: `TeaSharp.Controls.Notifications`

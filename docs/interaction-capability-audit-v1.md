@@ -24,6 +24,31 @@ Method: code + tests only (no docs-claim scoring), synced against current reposi
 - `Partially supported` means behavior exists but public selection state/contracts are limited for app-level integration.
 - `Missing` means no pointer-based path exists in current control implementation.
 
+## Runtime Pointer Policy And Terminal Prerequisites
+
+- `PointerEventKind.Motion` is hover-only and should not be treated as click activation.
+- `PointerActivationPolicy.DoubleClick` keeps activation double-click-gated; first press still transfers focus to the clicked control region.
+- `PointerActivationPolicy.SingleClick` allows activation on first press.
+- runtime input-loop policy keeps terminal byte-stream decoding when capabilities advertise CSI input features (`MouseReporting`, `FocusReporting`, `BracketedPaste`, or `ModeReports`), including non-raw console mode.
+- `Console.ReadKey` fallback is expected only for non-raw legacy terminals without CSI input features.
+
+Terminal-family expectations:
+
+- Ghostty: CSI-capable pointer/focus/paste path; byte-stream decoding required.
+- iTerm2: CSI-capable pointer/focus/paste path; byte-stream decoding required.
+- Windows Terminal: CSI-capable pointer/focus/paste path; byte-stream decoding required.
+- macOS Terminal (`Apple_Terminal`): pointer/focus/paste available; sync-updates may be unavailable but pointer path still CSI-driven.
+- legacy terminals (`TERM=dumb`, `linux*`, `vt100*`, `ansi*`): pointer interaction support is not expected.
+
+Troubleshooting text-selection symptom:
+
+- symptom: dragging/selecting with mouse highlights terminal text and app hover/click does not trigger
+- verify app requested mouse tracking (`runtime.Screen.MouseTracking = CellMotion|AllMotion`)
+- verify runtime input is enabled (`DisableInput == false`)
+- verify `TEASHARP_CAPS` does not disable mouse (`mouse=0`)
+- if running through tmux, ensure `set -g mouse on`
+- if click only moves focus without action, verify whether the app intentionally uses `DoubleClick` policy
+
 ## Typography Capability Status (Sync)
 
 - Portable text emphasis is available through ANSI SGR style flags (for example `TeaStyle.WithFontWeight(TeaFontWeight)` for normal/bold/dim intent) [`src/TeaSharp/Styles/TeaStyle.cs:39`](../src/TeaSharp/Styles/TeaStyle.cs#L39), [`src/TeaSharp/Styles/TeaFontWeight.cs:9`](../src/TeaSharp/Styles/TeaFontWeight.cs#L9).

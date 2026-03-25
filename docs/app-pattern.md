@@ -185,6 +185,9 @@ Common settings:
 - `DisableRenderer`
 - `DisableInput`
 - `PointerActivationPolicy` (defaults to `DoubleClick`; first click still transfers focus, while activation stays double-click-gated; set `SingleClick` to opt into immediate click activation)
+- `PointerEventKind.Motion` is hover-only and should not be treated as click activation
+- with `DoubleClick`, first press transfers focus to the clicked control region; activation requires a qualifying second press
+- with `SingleClick`, first press both focuses and activates the clicked target
 - pointer behavior can vary by terminal/emulator protocol details, so app code should set `PointerActivationPolicy` explicitly per UX goal (`SingleClick` for immediate selection, `DoubleClick` for guarded activation)
 - `DoubleClickTimeout`
 - `DoubleClickSlop`
@@ -200,6 +203,22 @@ Common settings:
 - `EnableBracketedPaste`
 - `EnableFocusReporting`
 - `MouseTracking`
+
+Terminal input-loop selection for pointer/focus/paste:
+
+- runtime prefers terminal byte-stream decoding when terminal capabilities indicate CSI-driven input support (`MouseReporting`, `FocusReporting`, `BracketedPaste`, or `ModeReports`)
+- this applies even in non-raw console mode, so pointer/focus/paste sequences remain available
+- `Console.ReadKey` fallback is reserved for non-raw legacy terminals that do not advertise CSI input features
+
+Troubleshooting pointer text-selection symptom:
+
+- symptom: mouse drag/select highlights terminal text instead of driving app hover/click behavior
+- confirm app requested mouse reporting: `runtime.Screen.MouseTracking = MouseTrackingMode.CellMotion` or `MouseTrackingMode.AllMotion`
+- confirm input path is enabled (`DisableInput == false`)
+- confirm capability overrides are not disabling mouse (`TEASHARP_CAPS` should not include `mouse=0`)
+- if using tmux, enable mouse forwarding (`set -g mouse on`)
+- if terminal reports legacy capabilities (`TERM=dumb`, `linux*`, `vt100*`, `ansi*`), pointer interaction is not expected
+- if click appears to "do nothing" but focus changes, verify policy: default `DoubleClick` gates activation on second press
 
 Advanced runtime seams remain available, but they now sit under `TeaSharp.Hosting` and are marked `EditorBrowsable(Advanced)`.
 

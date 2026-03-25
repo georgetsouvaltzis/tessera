@@ -78,6 +78,30 @@ Startup model:
 - runtime pointer policy defaults to `PointerActivationPolicy.DoubleClick` so activation is double-click-gated by default while first click still transfers focus; set `PointerActivationPolicy.SingleClick` to restore immediate click activation.
 - terminal pointer semantics are not uniform (for example release reports may arrive as `Button.None`, and motion/click cadence varies by terminal), so production apps should set `PointerActivationPolicy` explicitly instead of relying on defaults.
 
+Pointer semantics and runtime input-path contract:
+
+- `PointerEventKind.Motion` is hover-only and must not trigger click activation.
+- with `PointerActivationPolicy.DoubleClick`, first press transfers focus to the clicked control region; activation requires a qualifying second press.
+- with `PointerActivationPolicy.SingleClick`, first press focuses and activates.
+- runtime prefers terminal byte-stream decoding when terminal capabilities advertise CSI input features (`MouseReporting`, `FocusReporting`, `BracketedPaste`, or `ModeReports`), including non-raw console mode.
+- `Console.ReadKey` fallback is only for non-raw legacy terminals that do not advertise CSI input features.
+
+Terminal prerequisites (default detection expectations):
+
+- Ghostty: CSI-capable path; pointer/focus/paste should use byte-stream decode.
+- iTerm2: CSI-capable path; pointer/focus/paste should use byte-stream decode.
+- Windows Terminal (`WT_SESSION`): CSI-capable path; pointer/focus/paste should use byte-stream decode.
+- macOS Terminal (`Apple_Terminal`): mouse/focus/paste supported; synchronized updates may be unavailable, but pointer input still expects byte-stream decode.
+- legacy terminals (`TERM=dumb`, `linux*`, `vt100*`, `ansi*`): advanced pointer/focus/paste are not expected.
+
+Troubleshooting quick triage (text-selection instead of app pointer interaction):
+
+- verify `runtime.Screen.MouseTracking` is set (`CellMotion` or `AllMotion`)
+- verify runtime input is enabled (`DisableInput == false`)
+- verify environment overrides are not disabling mouse (`TEASHARP_CAPS` should not contain `mouse=0`)
+- verify terminal/multiplexer forwards mouse (for tmux: `set -g mouse on`)
+- if first click only focuses, confirm whether app is intentionally running with default `PointerActivationPolicy.DoubleClick`
+
 Canonical onboarding progression:
 
 1. `examples/HelloWorld`: minimal startup path.
