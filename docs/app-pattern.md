@@ -4,7 +4,7 @@ Use this pattern for normal apps:
 
 - derive from `TeaApp`
 - handle terminal input through `Message`
-- let controls route automatically; `Update(...)` handles unhandled input plus runtime messages
+- let controls route automatically; `Update(...)` always receives key messages (`KeyPressed`/`KeyReleased`) plus runtime messages
 - return a `Screen` from `Build(ScreenContext)`
 - run with `Tea.RunAsync(...)` or `TeaApplicationBuilder`
 - keep low-level composition APIs as advanced-only escape hatches
@@ -70,10 +70,11 @@ internal sealed class CounterApp : TeaApp
 `TeaApp` is the default app contract.
 
 - `Initialize()` is optional startup work
-- `Update(Message)` handles unhandled input, terminal events, and custom messages
+- `Update(Message)` handles runtime/custom messages and always receives key messages
 - `Build(ScreenContext)` creates the current frame
 - `DefaultScreenOptions` defines per-app terminal defaults
-- built-in controls route keyboard, pointer, and paste input before `Update(Message)`
+- built-in controls route input first; handled pointer/paste can stop at the control, while key messages still flow to `Update(Message)`
+- put global hotkeys in `Update(Message)` (for example `Ctrl+C`, `Esc`) because key messages are always forwarded
 - when a control event should re-enter the app state machine, call `Post(...)`
 - `Post(...)` does not call `Update(...)` immediately; it queues a follow-up message for the next runtime pass
 - `RequestEffect(...)` is available when a control event needs to trigger runtime work such as `TeaEffects.Quit`

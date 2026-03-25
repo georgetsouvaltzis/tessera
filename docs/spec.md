@@ -498,7 +498,9 @@ The old public composition engine has been removed. Remaining advanced bridges a
 Default app code uses:
 
 - automatic control input dispatch before `TeaApp.Update(...)`
-- `TeaApp.Update(...)` for unhandled input plus runtime messages
+- `TeaApp.Update(...)` for runtime messages and all key messages (`KeyPressed`/`KeyReleased`), even when controls handle them
+- handled pointer/paste messages can be swallowed by controls before reaching `TeaApp.Update(...)`
+- place app-wide hotkeys in `TeaApp.Update(...)` because key messages are always forwarded
 - `RequestEffect(...)` when a control event needs to trigger runtime work
 - typed key messages such as `KeyPressed`
 - typed pointer messages such as `PointerInput`

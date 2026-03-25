@@ -8,10 +8,12 @@ namespace TeaSharp;
 /// </summary>
 /// <remarks>
 /// The runtime calls <see cref="Initialize"/> once before the first render, <see cref="Update"/> for
-/// application-level messages, and <see cref="Build"/> whenever the screen must be re-rendered. Built-in
-/// controls usually consume their own input before it reaches <see cref="Update"/>; use
-/// <see cref="Post"/> when a control event should flow back through the application message pipeline, and
-/// <see cref="RequestEffect"/> when app logic needs to trigger runtime work directly.
+/// application-level messages, and <see cref="Build"/> whenever the screen must be re-rendered. Input
+/// routes through focused controls first. <see cref="KeyPressed"/> and <see cref="KeyReleased"/> always
+/// continue to <see cref="Update"/> even when a control handles them. Handled pointer/paste messages can be
+/// swallowed by controls. Use <see cref="Update"/> for global hotkeys, <see cref="Post"/> when a control
+/// event should flow back through the application message pipeline, and <see cref="RequestEffect"/> when
+/// app logic needs to trigger runtime work directly.
 /// </remarks>
 public abstract class TeaApp
 {
