@@ -271,7 +271,7 @@ public sealed class ContextMenu : Control
         if (pointer.Kind is PointerEventKind.Press or PointerEventKind.Release)
         {
             changed |= SetHoveredIndex(hovered);
-            var leftActivate = pointer.Button == PointerButton.Left || pointer.Kind == PointerEventKind.Release;
+            var leftActivate = pointer.Button == PointerButton.Left;
             if (leftActivate)
             {
                 var target = hovered >= 0 ? hovered : _selectedIndex;

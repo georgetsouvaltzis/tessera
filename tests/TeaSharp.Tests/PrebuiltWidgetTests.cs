@@ -66,7 +66,9 @@ internal static class PrebuiltWidgetTests
         yield return new TestCase("Controls_ContextMenu_ItemExecutedEvent_ReportsItem", ContextMenu_ItemExecutedEvent_ReportsItem);
         yield return new TestCase("Controls_ContextMenu_TryConsumeExecution_IsSingleUse", ContextMenu_TryConsumeExecution_IsSingleUse);
         yield return new TestCase("Controls_ContextMenu_MouseClickExecutesAndCloses", ContextMenu_MouseClickExecutesAndCloses);
-        yield return new TestCase("Controls_ContextMenu_MouseReleaseExecutesAndCloses", ContextMenu_MouseReleaseExecutesAndCloses);
+        yield return new TestCase("Controls_ContextMenu_MouseMotionDoesNotSelectOrExecute", ContextMenu_MouseMotionDoesNotSelectOrExecute);
+        yield return new TestCase("Controls_ContextMenu_MouseReleaseWithoutLeftButton_DoesNotExecuteOrClose", ContextMenu_MouseReleaseWithoutLeftButton_DoesNotExecuteOrClose);
+        yield return new TestCase("Controls_ContextMenu_MouseLeftReleaseExecutesAndCloses", ContextMenu_MouseLeftReleaseExecutesAndCloses);
         yield return new TestCase("Controls_ContextMenu_SetItems_RecomputesLayoutFromCachedWidths", ContextMenu_SetItems_RecomputesLayoutFromCachedWidths);
         yield return new TestCase("Controls_ContextMenu_CustomGlyphsFocusMarkerAndBorderStyleText_Rendered", ContextMenu_CustomGlyphsFocusMarkerAndBorderStyleText_Rendered);
         yield return new TestCase("Controls_ContextMenu_GlyphUpdate_RebuildsCachedRows", ContextMenu_GlyphUpdate_RebuildsCachedRows);
@@ -1185,6 +1187,52 @@ internal static class PrebuiltWidgetTests
         return Task.CompletedTask;
     }
 
+    private static Task ContextMenu_MouseMotionDoesNotSelectOrExecute()
+    {
+        var menu = new ContextMenu
+        {
+            Border = BorderStyle.None,
+        };
+        menu.SetItems(
+        [
+            new ContextMenuItem("copy", "Copy"),
+            new ContextMenuItem("paste", "Paste"),
+        ]);
+        menu.OpenAt(0, 0);
+
+        var changed = menu.Handle(new PointerInput(PointerEventKind.Motion, PointerButton.None, 0, 1), new Rect(0, 0, 20, 6));
+        TestAssert.True(changed, "Context menu mouse motion should update hover state.");
+
+        var canvas = new Canvas(20, 6);
+        menu.Render(canvas, new Rect(0, 0, 20, 6));
+        var output = canvas.Render();
+
+        TestAssert.True(output.Contains("> Copy", StringComparison.Ordinal), "Context menu motion should not change selection.");
+        TestAssert.True(string.IsNullOrEmpty(menu.LastExecutedItemId), "Context menu motion should not execute actions.");
+        return Task.CompletedTask;
+    }
+
+    private static Task ContextMenu_MouseReleaseWithoutLeftButton_DoesNotExecuteOrClose()
+    {
+        var menu = new ContextMenu
+        {
+            Border = BorderStyle.None,
+        };
+        menu.SetItems(
+        [
+            new ContextMenuItem("copy", "Copy"),
+            new ContextMenuItem("paste", "Paste"),
+        ]);
+        menu.OpenAt(0, 0);
+
+        var changed = menu.Handle(new PointerInput(PointerEventKind.Release, PointerButton.None, 0, 1), new Rect(0, 0, 20, 6));
+
+        TestAssert.True(changed, "Context menu release without left button may still update hover state.");
+        TestAssert.True(string.IsNullOrEmpty(menu.LastExecutedItemId), "Context menu should not execute on non-left release.");
+        TestAssert.True(menu.IsVisible, "Context menu should stay open on non-left release.");
+        return Task.CompletedTask;
+    }
+
     private static Task ContextMenu_TryConsumeExecution_IsSingleUse()
     {
         var menu = new ContextMenu
@@ -1228,7 +1276,7 @@ internal static class PrebuiltWidgetTests
         return Task.CompletedTask;
     }
 
-    private static Task ContextMenu_MouseReleaseExecutesAndCloses()
+    private static Task ContextMenu_MouseLeftReleaseExecutesAndCloses()
     {
         var menu = new ContextMenu
         {
@@ -1241,11 +1289,11 @@ internal static class PrebuiltWidgetTests
         ]);
         menu.OpenAt(0, 0);
 
-        var changed = menu.Handle(new PointerInput(PointerEventKind.Release, PointerButton.None, 0, 1), new Rect(0, 0, 20, 6));
+        var changed = menu.Handle(new PointerInput(PointerEventKind.Release, PointerButton.Left, 0, 1), new Rect(0, 0, 20, 6));
 
-        TestAssert.True(changed, "Context menu mouse release should execute row action.");
-        TestAssert.Equal("paste", menu.LastExecutedItemId ?? string.Empty, "Context menu release should execute hovered item.");
-        TestAssert.True(!menu.IsVisible, "Context menu should close after mouse release execute.");
+        TestAssert.True(changed, "Context menu left release should execute row action.");
+        TestAssert.Equal("paste", menu.LastExecutedItemId ?? string.Empty, "Context menu left release should execute hovered item.");
+        TestAssert.True(!menu.IsVisible, "Context menu should close after left-release execute.");
         return Task.CompletedTask;
     }
 
