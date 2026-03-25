@@ -37,6 +37,34 @@ public sealed class TerminalReaderMouseLeakRegressionTests
         AssertNoLeak(events);
     }
 
+    [Test]
+    public async Task TerminalReader_MouseLeakRegression_EscapeThenDelayedCsiMouseAcrossTimeout_DoesNotEmitCharacterFragments()
+    {
+        var stream = new TimedChunkReadStream(
+        [
+            (Encoding.UTF8.GetBytes("\u001b"), 0),
+            (Encoding.UTF8.GetBytes("[<32;83;7M"), 35),
+            (Encoding.UTF8.GetBytes("\u001b"), 35),
+            (Encoding.UTF8.GetBytes("[<0;84;7M"), 35),
+        ]);
+        var reader = new TerminalReader(stream, new EventDecoder(), TimeSpan.FromMilliseconds(10));
+        var events = new List<IMessage>();
+
+        await reader.StreamEventsAsync(events.Add, CancellationToken.None);
+
+        Assert.That(events.Count, Is.EqualTo(2), "Split ESC then delayed SGR reports should decode to two mouse events.");
+        Assert.That(
+            events[0] is MouseMotionMsg { Button: MouseButton.Left, X: 82, Y: 6 },
+            Is.True,
+            "First decoded event should be motion.");
+        Assert.That(
+            events[1] is MouseClickMsg { Button: MouseButton.Left, X: 83, Y: 6 },
+            Is.True,
+            "Second decoded event should be click.");
+
+        AssertNoLeak(events);
+    }
+
     private static void AssertNoLeak(List<IMessage> events)
     {
         foreach (var message in events)
