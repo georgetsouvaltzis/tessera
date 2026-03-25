@@ -38,7 +38,7 @@ internal static class PrebuiltWidgetTests
         yield return new TestCase("Controls_ListView_NavigatesSelection", ListView_NavigatesSelection);
         yield return new TestCase("Controls_ListView_SelectionChangedEvent_ReportsTransition", ListView_SelectionChangedEvent_ReportsTransition);
         yield return new TestCase("Controls_ListView_MouseClickSelectsRow", ListView_MouseClickSelectsRow);
-        yield return new TestCase("Controls_ListView_MouseClickOutsideLabel_DoesNotSelectRow", ListView_MouseClickOutsideLabel_DoesNotSelectRow);
+        yield return new TestCase("Controls_ListView_MouseClickRowWhitespace_SelectsRow", ListView_MouseClickRowWhitespace_SelectsRow);
         yield return new TestCase("Controls_ListView_MouseMotionShowsHoverMarker", ListView_MouseMotionShowsHoverMarker);
         yield return new TestCase("Controls_ListView_CustomRowMarkers_RenderCustomMarkers", ListView_CustomRowMarkers_RenderCustomMarkers);
         yield return new TestCase("Controls_ListView_FocusedBorderStyleText_StylesFrameGlyphs", ListView_FocusedBorderStyleText_StylesFrameGlyphs);
@@ -646,7 +646,7 @@ internal static class PrebuiltWidgetTests
         return Task.CompletedTask;
     }
 
-    private static Task ListView_MouseClickOutsideLabel_DoesNotSelectRow()
+    private static Task ListView_MouseClickRowWhitespace_SelectsRow()
     {
         var list = new ListView<string>(x => x)
         {
@@ -655,10 +655,10 @@ internal static class PrebuiltWidgetTests
         list.SetItems(["one", "two", "three"]);
 
         list.Handle(new KeyPressed(Key.Down));
-        var changed = list.Handle(new PointerInput(PointerEventKind.Press, PointerButton.Left, 18, 1), new Rect(0, 0, 20, 3));
+        var changed = list.Handle(new PointerInput(PointerEventKind.Press, PointerButton.Left, 18, 2), new Rect(0, 0, 20, 3));
 
-        TestAssert.True(!changed, "List mouse click in trailing whitespace should not report a selection change.");
-        TestAssert.Equal("two", list.SelectedItem ?? string.Empty, "List mouse click in trailing whitespace should preserve the current selection.");
+        TestAssert.True(changed, "List mouse click in trailing whitespace should select the clicked row.");
+        TestAssert.Equal("three", list.SelectedItem ?? string.Empty, "List mouse click in trailing whitespace should select the row at the clicked Y coordinate.");
         return Task.CompletedTask;
     }
 
