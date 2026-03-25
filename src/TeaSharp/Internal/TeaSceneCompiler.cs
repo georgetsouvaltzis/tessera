@@ -747,19 +747,23 @@ internal sealed class TeaSceneCompiler : IScreenCompiler
 
             if (component.Control is { } control)
             {
+                var isInteractiveVisible = IsInteractiveVisible(control);
                 render = control.Render;
-                update = control.Handle;
-                updateMouse = control.Handle;
+                update = isInteractiveVisible ? control.Handle : null;
+                updateMouse = isInteractiveVisible ? control.Handle : null;
                 setFocused = control.ApplyFocus;
-                focusable = control.CanFocus;
-                focusOnClick = true;
-                interceptsPointer = true;
-                requestedFocus = control.IsFocused;
+                focusable = isInteractiveVisible && control.CanFocus;
+                focusOnClick = isInteractiveVisible;
+                interceptsPointer = isInteractiveVisible;
+                requestedFocus = isInteractiveVisible && control.IsFocused;
 
                 if (control.TryConsumeFocusRequest(out var explicitOrder))
                 {
-                    requestedFocus = true;
-                    requestOrder = explicitOrder;
+                    if (isInteractiveVisible)
+                    {
+                        requestedFocus = true;
+                        requestOrder = explicitOrder;
+                    }
                 }
             }
             else
@@ -798,6 +802,20 @@ internal sealed class TeaSceneCompiler : IScreenCompiler
             }
 
             return true;
+        }
+
+        private static bool IsInteractiveVisible(Control control)
+        {
+            return control switch
+            {
+                Dialog dialog => dialog.IsVisible,
+                Modal modal => modal.IsVisible,
+                ContextMenu contextMenu => contextMenu.IsVisible,
+                CommandPalette commandPalette => commandPalette.IsVisible,
+                KeyBindingHelpDialog keyBindingHelpDialog => keyBindingHelpDialog.IsVisible,
+                QuickOpenOverlay quickOpenOverlay => quickOpenOverlay.IsOpen,
+                _ => true,
+            };
         }
 
         private static int ResolveSlotExtent(LayoutSlot slot, bool horizontal, in Rect availableBounds)
