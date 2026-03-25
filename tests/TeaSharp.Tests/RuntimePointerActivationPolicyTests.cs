@@ -1,5 +1,6 @@
 using NUnit.Framework;
 using TeaSharp.Controls;
+using TeaSharp.Layout;
 namespace TeaSharp.Tests;
 
 [TestFixture]
@@ -244,6 +245,25 @@ public sealed class RuntimePointerActivationPolicyTests
         Assert.That(app.Tabs.SelectedIndex, Is.EqualTo(1));
     }
 
+    [Test]
+    public void RuntimePointerActivationPolicy_DefaultDoubleClick_FirstClickFocusesClickedControlWithoutActivation()
+    {
+        var app = new FocusRoutingApp();
+        app.ConfigureRuntimeOptions(new TeaRuntimeOptions());
+        _ = app.UpdateRuntime(new WindowResized(64, 6));
+        _ = app.RenderRuntime();
+
+        Assert.That(app.LeftButton.IsFocused, Is.True);
+        Assert.That(app.RightButton.IsFocused, Is.False);
+
+        _ = app.UpdateRuntime(new PointerInput(PointerEventKind.Press, PointerButton.Left, 14, 0));
+
+        Assert.That(app.LeftButton.IsFocused, Is.False);
+        Assert.That(app.RightButton.IsFocused, Is.True);
+        Assert.That(app.LeftActivationCount, Is.EqualTo(0));
+        Assert.That(app.RightActivationCount, Is.EqualTo(0));
+    }
+
     private static (int X, int Y) ResolveSecondTabHitCoordinate()
     {
         const int width = 64;
@@ -311,5 +331,36 @@ public sealed class RuntimePointerActivationPolicyTests
         public override TeaEffect? Update(Message message) => null;
 
         public override Screen Build(ScreenContext context) => Screen.From(Tabs);
+    }
+
+    private sealed class FocusRoutingApp : TeaApp
+    {
+        public Button LeftButton { get; } = new() { Text = "Left" };
+
+        public Button RightButton { get; } = new() { Text = "Right" };
+
+        public int LeftActivationCount { get; private set; }
+
+        public int RightActivationCount { get; private set; }
+
+        public FocusRoutingApp()
+        {
+            LeftButton.Activated += (_, _) => LeftActivationCount++;
+            RightButton.Activated += (_, _) => RightActivationCount++;
+            LeftButton.RequestFocus();
+        }
+
+        public override TeaEffect? Update(Message message) => null;
+
+        public override Screen Build(ScreenContext context)
+        {
+            var row = new RowLayout
+            {
+                Gap = 2,
+            };
+            row.AddFixed(LeftButton, 12);
+            row.AddFixed(RightButton, 12);
+            return Screen.From(row);
+        }
     }
 }

@@ -904,7 +904,7 @@ internal sealed class TeaSceneCompiler : IScreenCompiler
             }
 
             var target = _regions[targetIndex];
-            if (message is { Kind: PointerEventKind.Press, Button: PointerButton.Left } && target.Focusable && target.FocusOnClick)
+            if (ShouldApplyFocusOnPointer(message) && target.Focusable && target.FocusOnClick)
             {
                 changed |= ApplyFocus(target.Id, invokeFocus: true);
             }
@@ -915,6 +915,16 @@ internal sealed class TeaSceneCompiler : IScreenCompiler
             }
 
             return changed;
+        }
+
+        private static bool ShouldApplyFocusOnPointer(PointerInput message)
+        {
+            if (message is { Kind: PointerEventKind.Press, Button: PointerButton.Left })
+            {
+                return true;
+            }
+
+            return message is { Kind: PointerEventKind.Motion, Button: PointerButton.None, ClickCount: 0 };
         }
 
         private bool FocusRelative(int step)
