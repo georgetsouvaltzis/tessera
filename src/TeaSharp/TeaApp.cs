@@ -293,7 +293,7 @@ public abstract class TeaApp
             return;
         }
 
-        if (pointer.Button == _pendingPointerPressButton)
+        if (IsReleaseCompletingPendingPress(pointer))
         {
             _hasLastCompletedPointerClick = true;
             _lastCompletedPointerReleaseUtc = DateTimeOffset.UtcNow;
@@ -308,6 +308,12 @@ public abstract class TeaApp
         _pendingPointerPressY = 0;
         _pendingPointerPressButton = PointerButton.None;
         _pendingPointerPressClickCount = 0;
+    }
+
+    private bool IsReleaseCompletingPendingPress(PointerInput pointer)
+    {
+        return pointer.Button == _pendingPointerPressButton
+            || pointer.Button == PointerButton.None;
     }
 
     private void ResetPointerClickTracking()

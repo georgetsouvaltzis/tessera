@@ -166,6 +166,56 @@ public sealed class RuntimePointerActivationPolicyTests
     }
 
     [Test]
+    public void RuntimePointerActivationPolicy_DoubleClickPolicy_ReleaseNone_CompletesCycleAndEscalatesSecondPress()
+    {
+        var app = new CaptureMessageApp();
+        app.ConfigureRuntimeOptions(
+            new TeaRuntimeOptions
+            {
+                PointerActivationPolicy = PointerActivationPolicy.DoubleClick,
+                DoubleClickTimeout = TimeSpan.FromSeconds(5),
+                DoubleClickSlop = 1,
+            });
+
+        _ = app.UpdateRuntime(new PointerInput(PointerEventKind.Press, PointerButton.Left, 1, 1));
+        _ = app.UpdateRuntime(new PointerInput(PointerEventKind.Release, PointerButton.None, 1, 1));
+        _ = app.UpdateRuntime(new PointerInput(PointerEventKind.Press, PointerButton.Left, 1, 1));
+
+        Assert.That(app.Seen.Count, Is.EqualTo(3));
+
+        var first = (PointerInput)app.Seen[0];
+        var second = (PointerInput)app.Seen[1];
+        var third = (PointerInput)app.Seen[2];
+
+        Assert.That(first.Kind, Is.EqualTo(PointerEventKind.Motion));
+        Assert.That(first.Button, Is.EqualTo(PointerButton.None));
+        Assert.That(second.Kind, Is.EqualTo(PointerEventKind.Release));
+        Assert.That(second.Button, Is.EqualTo(PointerButton.None));
+        Assert.That(third.Kind, Is.EqualTo(PointerEventKind.Press));
+        Assert.That(third.Button, Is.EqualTo(PointerButton.Left));
+        Assert.That(third.ClickCount, Is.EqualTo(2));
+    }
+
+    [Test]
+    public void RuntimePointerActivationPolicy_DoubleClickPolicy_ReleaseDifferentButton_DoesNotCompleteCycle()
+    {
+        var app = new PolicyActivationApp();
+        app.ConfigureRuntimeOptions(
+            new TeaRuntimeOptions
+            {
+                PointerActivationPolicy = PointerActivationPolicy.DoubleClick,
+                DoubleClickTimeout = TimeSpan.FromSeconds(5),
+                DoubleClickSlop = 1,
+            });
+
+        _ = app.UpdateRuntime(new PointerInput(PointerEventKind.Press, PointerButton.Left, 1, 1));
+        _ = app.UpdateRuntime(new PointerInput(PointerEventKind.Release, PointerButton.Right, 1, 1));
+        _ = app.UpdateRuntime(new PointerInput(PointerEventKind.Press, PointerButton.Left, 1, 1));
+
+        Assert.That(app.ActivationCount, Is.EqualTo(0));
+    }
+
+    [Test]
     public void RuntimePointerActivationPolicy_DoubleClickPolicy_PressOnlyNoise_DoesNotActivate()
     {
         var app = new PolicyActivationApp();
