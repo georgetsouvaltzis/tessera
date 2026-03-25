@@ -320,7 +320,7 @@ internal sealed class TeaRuntimeLoop
         }
 
         if (_runtime.Terminal is ConsoleTerminalAdapter consoleTerminal
-            && ShouldUseConsoleKeyEventLoop(_options.UseConsoleKeyEvents, consoleTerminal.IsRawModeActive))
+            && ShouldUseConsoleKeyEventLoop(_options.UseConsoleKeyEvents, consoleTerminal.IsRawModeActive, _runtime.Capabilities))
         {
             return Task.Run(() => ConsoleTerminalAdapter.StreamConsoleKeyEventsAsync(Send, token), token);
         }
@@ -329,11 +329,29 @@ internal sealed class TeaRuntimeLoop
         return Task.Run(() => _runtime.Reader.StreamEventsAsync(Send, token), token);
     }
 
-    internal static bool ShouldUseConsoleKeyEventLoop(bool useConsoleKeyEvents, bool isRawModeActive)
+    internal static bool ShouldUseConsoleKeyEventLoop(
+        bool useConsoleKeyEvents,
+        bool isRawModeActive,
+        TerminalCapabilityProfile runtimeCapabilities)
     {
+        ArgumentNullException.ThrowIfNull(runtimeCapabilities);
+
         // Raw mode should prefer terminal byte-stream decoding so mouse/focus/paste CSI
         // sequences remain available. Console.ReadKey fallback is for non-raw consoles.
-        return useConsoleKeyEvents && !isRawModeActive;
+        if (!useConsoleKeyEvents || isRawModeActive)
+        {
+            return false;
+        }
+
+        return !RequiresCsiInputDecoding(runtimeCapabilities);
+    }
+
+    private static bool RequiresCsiInputDecoding(TerminalCapabilityProfile runtimeCapabilities)
+    {
+        return runtimeCapabilities.MouseReporting
+            || runtimeCapabilities.FocusReporting
+            || runtimeCapabilities.BracketedPaste
+            || runtimeCapabilities.ModeReports;
     }
 
     private async Task RenderAsync(ScreenOutput output, CancellationToken token)

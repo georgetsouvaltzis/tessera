@@ -41,7 +41,8 @@ internal static class RuntimeLoopTests
         yield return new TestCase("Runtime_CapabilityProbe_LegacyMouseResponsePreservesMouseCapability", CapabilityProbe_LegacyMouseResponsePreservesMouseCapability);
         yield return new TestCase("Runtime_CapabilityProbe_AllResponsesPreventTimeoutFallback", CapabilityProbe_AllResponsesPreventTimeoutFallback);
         yield return new TestCase("Runtime_InputLoopSelection_RawModePrefersTerminalReader", InputLoopSelection_RawModePrefersTerminalReader);
-        yield return new TestCase("Runtime_InputLoopSelection_NonRawModeUsesConsoleKeyFallback", InputLoopSelection_NonRawModeUsesConsoleKeyFallback);
+        yield return new TestCase("Runtime_InputLoopSelection_NonRawModeWithCsiCapabilitiesPrefersTerminalReader", InputLoopSelection_NonRawModeWithCsiCapabilitiesPrefersTerminalReader);
+        yield return new TestCase("Runtime_InputLoopSelection_NonRawModeWithLegacyCapabilitiesUsesConsoleKeyFallback", InputLoopSelection_NonRawModeWithLegacyCapabilitiesUsesConsoleKeyFallback);
         yield return new TestCase("Runtime_InputLoopSelection_UseConsoleKeyDisabledPrefersTerminalReader", InputLoopSelection_UseConsoleKeyDisabledPrefersTerminalReader);
         yield return new TestCase("Runtime_ModeReport_RefinesTerminalCapabilities", ModeReport_RefinesTerminalCapabilities);
         yield return new TestCase("Runtime_ModeReport_LegacyMouseSetEnablesCapability", ModeReport_LegacyMouseSetEnablesCapability);
@@ -781,22 +782,43 @@ internal static class RuntimeLoopTests
         // Arrange / Act
         var useConsoleKeyLoop = TeaRuntimeLoop.ShouldUseConsoleKeyEventLoop(
             useConsoleKeyEvents: true,
-            isRawModeActive: true);
+            isRawModeActive: true,
+            runtimeCapabilities: TerminalCapabilityProfile.AllSupported);
 
         // Assert
         TestAssert.True(!useConsoleKeyLoop, "Raw mode should use terminal byte-stream reader so mouse/focus events remain available.");
         return Task.CompletedTask;
     }
 
-    private static Task InputLoopSelection_NonRawModeUsesConsoleKeyFallback()
+    private static Task InputLoopSelection_NonRawModeWithCsiCapabilitiesPrefersTerminalReader()
     {
         // Arrange / Act
         var useConsoleKeyLoop = TeaRuntimeLoop.ShouldUseConsoleKeyEventLoop(
             useConsoleKeyEvents: true,
-            isRawModeActive: false);
+            isRawModeActive: false,
+            runtimeCapabilities: TerminalCapabilityProfile.AllSupported);
 
         // Assert
-        TestAssert.True(useConsoleKeyLoop, "Non-raw console mode should use ConsoleKey fallback loop.");
+        TestAssert.True(!useConsoleKeyLoop, "Non-raw mode with CSI-capable terminal should preserve byte-stream decoding for mouse/focus/paste.");
+        return Task.CompletedTask;
+    }
+
+    private static Task InputLoopSelection_NonRawModeWithLegacyCapabilitiesUsesConsoleKeyFallback()
+    {
+        // Arrange / Act
+        var useConsoleKeyLoop = TeaRuntimeLoop.ShouldUseConsoleKeyEventLoop(
+            useConsoleKeyEvents: true,
+            isRawModeActive: false,
+            runtimeCapabilities: new TerminalCapabilityProfile(
+                FocusReporting: false,
+                MouseReporting: false,
+                BracketedPaste: false,
+                SynchronizedUpdates: false,
+                ModeReports: false,
+                Source: "test-legacy"));
+
+        // Assert
+        TestAssert.True(useConsoleKeyLoop, "Legacy non-CSI terminals may use ConsoleKey fallback in non-raw mode.");
         return Task.CompletedTask;
     }
 
@@ -805,7 +827,8 @@ internal static class RuntimeLoopTests
         // Arrange / Act
         var useConsoleKeyLoop = TeaRuntimeLoop.ShouldUseConsoleKeyEventLoop(
             useConsoleKeyEvents: false,
-            isRawModeActive: false);
+            isRawModeActive: false,
+            runtimeCapabilities: TerminalCapabilityProfile.AllSupported);
 
         // Assert
         TestAssert.True(!useConsoleKeyLoop, "Disabling console key events should force terminal byte-stream reader.");
