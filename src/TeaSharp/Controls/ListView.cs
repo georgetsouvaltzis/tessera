@@ -306,11 +306,6 @@ public sealed class ListView<T> : Control
             return false;
         }
 
-        if (!IsPointerWithinRowLabel(click.X, content.X, content.Width, _model.LabelFor(visibleRows[row].Item)))
-        {
-            return hoverChanged;
-        }
-
         var previousIndex = SelectedIndex;
         var previousItem = SelectedItem;
         var changed = _model.SelectFilteredIndex(visibleRows[row].Index);
@@ -411,11 +406,6 @@ public sealed class ListView<T> : Control
             return SetHoveredFilteredIndex(null);
         }
 
-        if (!IsPointerWithinRowLabel(x, content.X, content.Width, _model.LabelFor(rows[row].Item)))
-        {
-            return SetHoveredFilteredIndex(null);
-        }
-
         return SetHoveredFilteredIndex(rows[row].Index);
     }
 
@@ -428,12 +418,6 @@ public sealed class ListView<T> : Control
 
         _hoveredFilteredIndex = filteredIndex;
         return true;
-    }
-
-    private bool IsPointerWithinRowLabel(int pointerX, int contentX, int contentWidth, string label)
-    {
-        var hitWidth = Math.Min(contentWidth, ResolveMarkerPrefixWidth() + ControlTextLayout.MeasureDisplayWidth(label));
-        return pointerX >= contentX && pointerX < contentX + hitWidth;
     }
 
     private string ApplyRowStyle(string text, bool selected, bool hovered)

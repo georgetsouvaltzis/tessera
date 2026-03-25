@@ -1,4 +1,6 @@
 using NUnit.Framework;
+using TeaSharp;
+using TeaSharp.Components.Primitives;
 using TeaSharp.Controls;
 
 namespace TeaSharp.Tests;
@@ -59,5 +61,37 @@ public sealed class ListViewSelectionApiTests
         Assert.That(events[1].SelectedIndex, Is.EqualTo(1));
         Assert.That(events[1].PreviousItem, Is.EqualTo("gamma"));
         Assert.That(events[1].SelectedItem, Is.EqualTo("beta"));
+    }
+
+    [Test]
+    public void ListViewSelectionApi_PointerPressInsideRowLane_SelectsRowBeyondLabelGlyphWidth()
+    {
+        var control = new ListView<string>(static item => item)
+        {
+            Border = BorderStyle.None,
+        };
+        control.SetItems(["a", "b", "c"]);
+
+        var changed = control.Handle(
+            new PointerInput(PointerEventKind.Press, PointerButton.Left, X: 19, Y: 1),
+            new Rect(0, 0, 20, 4));
+
+        Assert.That(changed, Is.True);
+        Assert.That(control.SelectedIndex, Is.EqualTo(1));
+        Assert.That(control.SelectedItem, Is.EqualTo("b"));
+    }
+
+    [Test]
+    public void ListViewSelectionApi_KeyboardNavigation_RemainsUnchangedAfterPointerHitAreaUpdate()
+    {
+        var control = new ListView<string>(static item => item);
+        control.SetItems(["alpha", "beta", "gamma"]);
+        control.IsFocused = true;
+
+        Assert.That(control.SelectedIndex, Is.EqualTo(0));
+        Assert.That(control.Handle(new KeyPressed(Key.Down)), Is.True);
+        Assert.That(control.SelectedIndex, Is.EqualTo(1));
+        Assert.That(control.Handle(new KeyPressed(Key.Up)), Is.True);
+        Assert.That(control.SelectedIndex, Is.EqualTo(0));
     }
 }
