@@ -1,4 +1,5 @@
 using NUnit.Framework;
+using TeaSharp.Controls;
 namespace TeaSharp.Tests;
 
 [TestFixture]
@@ -206,6 +207,41 @@ public sealed class RuntimePointerActivationPolicyTests
         Assert.That(pressWithDoubleCount, Is.False);
     }
 
+    [Test]
+    public void RuntimePointerActivationPolicy_DefaultDoubleClick_TabsFirstPressDoesNotSwitchSelection()
+    {
+        var app = new TabsInteractionApp();
+        app.ConfigureRuntimeOptions(new TeaRuntimeOptions());
+        _ = app.UpdateRuntime(new WindowResized(64, 6));
+        _ = app.RenderRuntime();
+
+        _ = app.UpdateRuntime(new PointerInput(PointerEventKind.Press, PointerButton.Left, 15, 0));
+
+        Assert.That(app.Tabs.SelectedIndex, Is.EqualTo(0));
+        _ = app.UpdateRuntime(new PointerInput(PointerEventKind.Release, PointerButton.Left, 15, 0));
+        _ = app.UpdateRuntime(new PointerInput(PointerEventKind.Press, PointerButton.Left, 15, 0));
+        Assert.That(app.Tabs.SelectedIndex, Is.EqualTo(1));
+    }
+
+    [Test]
+    public void RuntimePointerActivationPolicy_SingleClickOptBack_TabsFirstPressSwitchesSelection()
+    {
+        var app = new TabsInteractionApp();
+        app.ConfigureRuntimeOptions(
+            new TeaRuntimeOptions
+            {
+                PointerActivationPolicy = PointerActivationPolicy.SingleClick,
+                DoubleClickTimeout = TimeSpan.FromSeconds(5),
+                DoubleClickSlop = 1,
+            });
+        _ = app.UpdateRuntime(new WindowResized(64, 6));
+        _ = app.RenderRuntime();
+
+        _ = app.UpdateRuntime(new PointerInput(PointerEventKind.Press, PointerButton.Left, 15, 0));
+
+        Assert.That(app.Tabs.SelectedIndex, Is.EqualTo(1));
+    }
+
     private sealed class PolicyActivationApp : TeaApp
     {
         public int ActivationCount { get; private set; }
@@ -234,5 +270,14 @@ public sealed class RuntimePointerActivationPolicyTests
         }
 
         public override Screen Build(ScreenContext context) => Screen.From("capture");
+    }
+
+    private sealed class TabsInteractionApp : TeaApp
+    {
+        public Tabs Tabs { get; } = new("Overview", "Operations", "Audit");
+
+        public override TeaEffect? Update(Message message) => null;
+
+        public override Screen Build(ScreenContext context) => Screen.From(Tabs);
     }
 }
