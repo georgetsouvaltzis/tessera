@@ -165,7 +165,10 @@ internal sealed class TeaCapabilityProbe
         {
             1000 or 1002 or 1003 => current with { MouseReporting = true, ModeReports = true },
             1004 => current with { FocusReporting = supported, ModeReports = true },
-            1006 => current with { MouseReporting = supported, ModeReports = true },
+            // Keep mouse capability sticky when 1006 explicitly reports Unsupported.
+            // Some terminals emit false-negative mode-report states even though mouse
+            // reporting works, so avoid demoting from true based on this signal alone.
+            1006 => current with { MouseReporting = supported ? true : current.MouseReporting, ModeReports = true },
             2004 => current with { BracketedPaste = supported, ModeReports = true },
             2026 => current with { SynchronizedUpdates = supported, ModeReports = true },
             _ => current,

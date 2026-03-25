@@ -37,6 +37,7 @@ internal static class RuntimeLoopTests
         yield return new TestCase("Runtime_CapabilityProbe_WritesModeQueries", CapabilityProbe_WritesModeQueries);
         yield return new TestCase("Runtime_CapabilityProbe_TimeoutDisablesModeReportsWhenNoResponses", CapabilityProbe_TimeoutDisablesModeReportsWhenNoResponses);
         yield return new TestCase("Runtime_CapabilityProbe_PartialResponseKeepsMouseReportingForInterop", CapabilityProbe_PartialResponseKeepsMouseReportingForInterop);
+        yield return new TestCase("Runtime_CapabilityProbe_1006UnsupportedResponse_PreservesMouseCapability", CapabilityProbe_1006UnsupportedResponse_PreservesMouseCapability);
         yield return new TestCase("Runtime_CapabilityProbe_LegacyMouseResponsePreservesMouseCapability", CapabilityProbe_LegacyMouseResponsePreservesMouseCapability);
         yield return new TestCase("Runtime_CapabilityProbe_AllResponsesPreventTimeoutFallback", CapabilityProbe_AllResponsesPreventTimeoutFallback);
         yield return new TestCase("Runtime_InputLoopSelection_RawModePrefersTerminalReader", InputLoopSelection_RawModePrefersTerminalReader);
@@ -44,7 +45,7 @@ internal static class RuntimeLoopTests
         yield return new TestCase("Runtime_InputLoopSelection_UseConsoleKeyDisabledPrefersTerminalReader", InputLoopSelection_UseConsoleKeyDisabledPrefersTerminalReader);
         yield return new TestCase("Runtime_ModeReport_RefinesTerminalCapabilities", ModeReport_RefinesTerminalCapabilities);
         yield return new TestCase("Runtime_ModeReport_LegacyMouseSetEnablesCapability", ModeReport_LegacyMouseSetEnablesCapability);
-        yield return new TestCase("Runtime_ModeReport_UnsupportedDisablesCapability", ModeReport_UnsupportedDisablesCapability);
+        yield return new TestCase("Runtime_ModeReport_UnsupportedMouseState_PreservesStickyCapability", ModeReport_UnsupportedMouseState_PreservesStickyCapability);
         yield return new TestCase("Runtime_ModeReport_PropagatesCapabilitiesToRenderer", ModeReport_PropagatesCapabilitiesToRenderer);
         yield return new TestCase("Runtime_ResizeLoop_EmitsWindowSizeChanges", ResizeLoop_EmitsWindowSizeChanges);
         yield return new TestCase("Runtime_ResizeSignalsDisabled_SkipsSignalRegistration", ResizeSignalsDisabled_SkipsSignalRegistration);
@@ -651,6 +652,43 @@ internal static class RuntimeLoopTests
         TestAssert.True(final.SynchronizedUpdates, "Mode report reset should retain synchronized update support while reporting current reset state.");
     }
 
+    private static async Task CapabilityProbe_1006UnsupportedResponse_PreservesMouseCapability()
+    {
+        // Arrange
+        var terminal = new InteractiveProbeTerminalAdapter();
+        var model = new CapabilityProbeResponseModel(
+            TimeSpan.FromMilliseconds(180),
+            [new ModeReportMsg(1006, ModeReportState.Unsupported)]);
+        var initial = new TerminalCapabilityProfile(
+            FocusReporting: true,
+            MouseReporting: true,
+            BracketedPaste: true,
+            SynchronizedUpdates: true,
+            ModeReports: true,
+            Source: "probe-1006-unsupported-test");
+        var program = new TestRuntimeDriver(model, new TeaRuntimeLoopOptions
+        {
+            DisableRenderer = true,
+            DisableInput = false,
+            Terminal = terminal,
+            TerminalCapabilities = initial,
+            EnableCapabilityProbe = true,
+            CapabilityProbeTimeout = TimeSpan.FromMilliseconds(30),
+        });
+
+        // Act
+        await program.RunAsync().WaitAsync(TimeSpan.FromSeconds(2));
+
+        // Assert
+        TestAssert.True(model.Seen.Count >= 3, "1006 unsupported response should still flow through mode-report and partial-timeout refinements.");
+        var final = model.Seen[^1];
+        TestAssert.True(final.MouseReporting, "1006 unsupported mode-report should not demote mouse capability.");
+        TestAssert.True(
+            final.Source.Contains("+mode-report-unsupported", StringComparison.Ordinal)
+            && final.Source.Contains("+probe-partial-timeout", StringComparison.Ordinal),
+            "1006 unsupported path should be annotated as mode-report unsupported plus probe partial-timeout.");
+    }
+
     private static async Task CapabilityProbe_LegacyMouseResponsePreservesMouseCapability()
     {
         // Arrange
@@ -840,7 +878,7 @@ internal static class RuntimeLoopTests
             "Legacy mouse refinement should annotate source.");
     }
 
-    private static async Task ModeReport_UnsupportedDisablesCapability()
+    private static async Task ModeReport_UnsupportedMouseState_PreservesStickyCapability()
     {
         // Arrange
         var initial = new TerminalCapabilityProfile(
@@ -865,7 +903,7 @@ internal static class RuntimeLoopTests
         // Assert
         TestAssert.Equal(2, model.Seen.Count, "Program should emit initial and refined capability messages.");
         var refined = model.Seen[1];
-        TestAssert.True(!refined.MouseReporting, "Unsupported mode-report state should downgrade mouse reporting.");
+        TestAssert.True(refined.MouseReporting, "Unsupported 1006 mode-report state should preserve sticky mouse capability.");
         TestAssert.True(
             refined.Source.Contains("+mode-report", StringComparison.Ordinal)
             && refined.Source.Contains("+mode-report-unsupported", StringComparison.Ordinal),
@@ -897,7 +935,7 @@ internal static class RuntimeLoopTests
 
         // Assert
         TestAssert.True(renderer.Updates.Count >= 2, "Renderer should receive initial and refined capability updates.");
-        TestAssert.True(!renderer.Updates[^1].MouseReporting, "Renderer should receive refined unsupported mouse capability state.");
+        TestAssert.True(renderer.Updates[^1].MouseReporting, "Renderer should preserve sticky mouse capability for 1006 unsupported mode-report state.");
     }
 
     private static async Task ResizeSignal_EmitsWindowSizeChanges()
