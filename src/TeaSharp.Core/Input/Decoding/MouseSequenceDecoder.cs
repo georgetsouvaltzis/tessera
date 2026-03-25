@@ -16,9 +16,10 @@ internal static class MouseSequenceDecoder
     {
         if (buffer.Length < 6)
         {
-            return timeoutExpired
-                ? new DecodeResult(1, new KeyPressMsg(KeyCode.Escape), false)
-                : new DecodeResult(0, null, true);
+            _ = timeoutExpired;
+            // Keep partial X10 reports buffered so split mouse packets cannot degrade
+            // into Escape/character fragments on timeout boundaries.
+            return new DecodeResult(0, null, true);
         }
 
         var cb = buffer[3] - 32;

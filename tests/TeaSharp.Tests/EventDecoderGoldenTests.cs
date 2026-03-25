@@ -21,6 +21,7 @@ internal static class EventDecoderGoldenTests
         yield return new TestCase("Decoder_WindowResizeSequence_Parses", WindowResizeSequence_ParsesExpectedSize);
         yield return new TestCase("Decoder_ModeReportSequence_Parses", ModeReportSequence_ParsesExpectedMessage);
         yield return new TestCase("Decoder_MouseSequences_Parse", MouseSequences_ParseExpectedMessages);
+        yield return new TestCase("Decoder_MouseTopLeftCoordinates_Parse", MouseTopLeftCoordinates_ParseExpectedZeroBasedValues);
         yield return new TestCase("Decoder_MouseExtendedSequences_Parse", MouseExtendedSequences_ParseExpectedMessages);
         yield return new TestCase("Decoder_OscSequences_ParseKnownCapabilityMessages", OscSequences_ParseKnownCapabilityMessages);
         yield return new TestCase("Decoder_OscClipboardSequence_IgnoresTrailingSegments", OscClipboardSequence_IgnoresTrailingSegments);
@@ -228,6 +229,21 @@ internal static class EventDecoderGoldenTests
         AssertMouse<MouseClickMsg>(sgrCtrlClick, MouseEventType.Press, MouseButton.Left, 10, 6, KeyModifiers.Ctrl);
         AssertMouse<MouseClickMsg>(x10Press, MouseEventType.Press, MouseButton.Left, 10, 5, KeyModifiers.None);
 
+        return Task.CompletedTask;
+    }
+
+    private static Task MouseTopLeftCoordinates_ParseExpectedZeroBasedValues()
+    {
+        // Arrange
+        var decoder = new EventDecoder();
+
+        // Act
+        var sgrTopLeft = Decode(decoder, "\u001b[<0;1;1M");
+        var x10TopLeft = decoder.Decode(new byte[] { 0x1B, (byte)'[', (byte)'M', (byte)' ', (byte)'!', (byte)'!' }, timeoutExpired: false);
+
+        // Assert
+        AssertMouse<MouseClickMsg>(sgrTopLeft, MouseEventType.Press, MouseButton.Left, 0, 0, KeyModifiers.None);
+        AssertMouse<MouseClickMsg>(x10TopLeft, MouseEventType.Press, MouseButton.Left, 0, 0, KeyModifiers.None);
         return Task.CompletedTask;
     }
 
