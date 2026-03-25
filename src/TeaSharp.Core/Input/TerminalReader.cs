@@ -10,6 +10,7 @@ namespace TeaSharp.Core.Input;
 internal sealed class TerminalReader(Stream input, IEventDecoder decoder, TimeSpan escapeTimeout)
 {
     private const int DefaultReadBufferSize = 4096;
+    private const int FinalTimeoutDrainRetries = 4;
 
     public async Task StreamEventsAsync(Action<IMessage> onEvent, CancellationToken cancellationToken = default)
     {
@@ -74,7 +75,15 @@ internal sealed class TerminalReader(Stream input, IEventDecoder decoder, TimeSp
             if (pending.Count > 0)
             {
                 await Task.Delay(escapeTimeout, cancellationToken).ConfigureAwait(false);
-                Drain(pending, onEvent, state, timeoutExpired: true);
+                for (var attempt = 0; attempt < FinalTimeoutDrainRetries && pending.Count > 0; attempt++)
+                {
+                    var before = pending.Count;
+                    Drain(pending, onEvent, state, timeoutExpired: true);
+                    if (pending.Count < before)
+                    {
+                        attempt = -1;
+                    }
+                }
             }
         }
         finally
