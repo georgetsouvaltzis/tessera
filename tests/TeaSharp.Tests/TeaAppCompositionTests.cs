@@ -32,11 +32,14 @@ internal static class TeaAppCompositionTests
             "TeaAppComposition_AutomaticallyRoutesMenuBarActivation",
             AutomaticallyRoutesMenuBarActivation);
         yield return new TestCase(
-            "TeaAppComposition_HandledControlInput_DoesNotReachDefaultUpdate",
-            HandledControlInput_DoesNotReachDefaultUpdate);
+            "TeaAppComposition_HandledControlKeyInput_StillReachesAppUpdate",
+            HandledControlKeyInput_StillReachesAppUpdate);
         yield return new TestCase(
             "TeaAppComposition_RequestEffect_AllowsHandledControlInputToTriggerRuntimeEffect",
             RequestEffect_AllowsHandledControlInputToTriggerRuntimeEffect);
+        yield return new TestCase(
+            "TeaAppComposition_GlobalHotkeys_ReachAppUpdate_WhenFocusedControlConsumesKeyEvents",
+            GlobalHotkeys_ReachAppUpdate_WhenFocusedControlConsumesKeyEvents);
         yield return new TestCase(
             "TeaAppComposition_VisibleOverlayCanClaimFocusThroughRootLayouts",
             VisibleOverlayCanClaimFocusThroughRootLayouts);
@@ -166,7 +169,7 @@ internal static class TeaAppCompositionTests
         TestAssert.Equal("refresh", app.LastActivatedItemId, "MenuBar activation should preserve the configured item id.");
     }
 
-    private static Task HandledControlInput_DoesNotReachDefaultUpdate()
+    private static Task HandledControlKeyInput_StillReachesAppUpdate()
     {
         var app = new FilteredInputApp();
         var screen = new TeaAppDriver(app);
@@ -175,7 +178,7 @@ internal static class TeaAppCompositionTests
         screen.Render();
         screen.Update(new KeyPressMsg(KeyCode.Enter));
 
-        TestAssert.Equal(0, app.KeyUpdateCount, "Handled control input should not flow into the default Update method.");
+        TestAssert.Equal(1, app.KeyUpdateCount, "Handled key input should still flow into app Update for global hotkey handling.");
         TestAssert.Equal(1, app.ActivationCount, "The control should still receive the handled key.");
         return Task.CompletedTask;
     }
@@ -190,7 +193,24 @@ internal static class TeaAppCompositionTests
         var effect = screen.Update(new KeyPressMsg(KeyCode.Enter));
 
         TestAssert.True(effect is not null, "Handled control input should still be able to schedule runtime effects.");
-        TestAssert.Equal(0, app.KeyUpdateCount, "Handled control input should not reach the default Update method.");
+        TestAssert.Equal(1, app.KeyUpdateCount, "Handled key input should still reach app Update while preserving control-side effects.");
+        return Task.CompletedTask;
+    }
+
+    private static Task GlobalHotkeys_ReachAppUpdate_WhenFocusedControlConsumesKeyEvents()
+    {
+        var app = new GlobalHotkeyApp();
+        var screen = new TeaAppDriver(app);
+
+        screen.Update(new WindowSizeMsg(80, 24));
+        screen.Render();
+        screen.Update(new KeyPressMsg(KeyCode.Character, "c", KeyModifiers.Ctrl));
+        screen.Update(new KeyPressMsg(KeyCode.Character, "t"));
+        screen.Update(new KeyReleaseMsg(KeyCode.Character, "t"));
+
+        TestAssert.True(app.QuitRequested, "Ctrl+C should reach app Update even when a focused control consumes key messages.");
+        TestAssert.Equal(1, app.ThemeToggleCount, "Theme hotkey should reach app Update even when the focused control consumes key messages.");
+        TestAssert.Equal(1, app.KeyReleaseCount, "Key release should reach app Update under the same conditions.");
         return Task.CompletedTask;
     }
 
@@ -683,6 +703,55 @@ internal static class TeaAppCompositionTests
             {
                 Body = new CenterLayout(Button, width: 16, height: 3),
             });
+    }
+
+    private sealed class GlobalHotkeyApp : TeaApp
+    {
+        public ConsumingKeyControl Control { get; } = new();
+
+        public bool QuitRequested { get; private set; }
+
+        public int ThemeToggleCount { get; private set; }
+
+        public int KeyReleaseCount { get; private set; }
+
+        public override TeaEffect? Update(Message message)
+        {
+            if (message is KeyPressed key)
+            {
+                if (key.IsCharacter('c', ModifierKeys.Ctrl))
+                {
+                    QuitRequested = true;
+                }
+
+                if (key.IsCharacter('t'))
+                {
+                    ThemeToggleCount++;
+                }
+            }
+
+            if (message is KeyReleased)
+            {
+                KeyReleaseCount++;
+            }
+
+            return null;
+        }
+
+        public override Screen Build(ScreenContext context) =>
+            Screen.From(new WindowLayout
+            {
+                Body = new CenterLayout(Control, width: 18, height: 3),
+            });
+    }
+
+    private sealed class ConsumingKeyControl : Control
+    {
+        public override void Render(Canvas canvas, Rect rect)
+        {
+        }
+
+        public override bool Handle(Message message) => message is KeyPressed or KeyReleased;
     }
 
     private sealed class OverlayPaletteApp : TeaApp

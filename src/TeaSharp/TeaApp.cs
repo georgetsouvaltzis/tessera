@@ -141,7 +141,7 @@ public abstract class TeaApp
 
         var handledInput = _interactiveScreen?.Handle(routed) ?? false;
         var effect =
-            handledInput && IsUserInputMessage(routed)
+            handledInput && ShouldSkipAppUpdateForHandledInput(routed)
                 ? null
                 : Update(routed);
 
@@ -187,6 +187,16 @@ public abstract class TeaApp
             or PasteStarted
             or PasteEnded
             or Pasted;
+
+    private static bool ShouldSkipAppUpdateForHandledInput(Message message)
+    {
+        if (message is KeyPressed or KeyReleased)
+        {
+            return false;
+        }
+
+        return IsUserInputMessage(message);
+    }
 
     private Message NormalizePointerInputForRuntime(Message message)
     {
