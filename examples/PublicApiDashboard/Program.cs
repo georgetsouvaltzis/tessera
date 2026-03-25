@@ -28,7 +28,7 @@ internal sealed class PublicApiDashboardApp : TeaApp
 {
     internal static readonly TeaTheme DefaultTheme = TeaThemes.Catppuccin(CatppuccinVariant.Macchiato);
 
-    private readonly Tabs _navigation = new("Overview", "Operations", "Audit")
+    private readonly DashboardNavigationTabs _navigation = new("Overview", "Operations", "Audit")
     {
         Title = "Public API Dashboard",
         FocusMarker = "◆",

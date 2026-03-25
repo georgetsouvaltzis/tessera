@@ -1,0 +1,98 @@
+using TeaSharp.Components.Primitives;
+using TeaSharp.Controls;
+using TeaSharp.Styles;
+using TeaSharp;
+
+internal sealed class DashboardNavigationTabs : Control
+{
+    private readonly Tabs _inner;
+
+    public DashboardNavigationTabs(params string[] items)
+    {
+        _inner = new Tabs(items);
+    }
+
+    public event EventHandler<SelectionChangedEventArgs>? SelectionChanged
+    {
+        add => _inner.SelectionChanged += value;
+        remove => _inner.SelectionChanged -= value;
+    }
+
+    public IReadOnlyList<string> Items => _inner.Items;
+
+    public int SelectedIndex => _inner.SelectedIndex;
+
+    public string Title
+    {
+        get => _inner.Title;
+        set => _inner.Title = value ?? string.Empty;
+    }
+
+    public string FocusMarker
+    {
+        get => _inner.FocusMarker;
+        set => _inner.FocusMarker = value ?? string.Empty;
+    }
+
+    public bool ShowFocusMarker
+    {
+        get => _inner.ShowFocusMarker;
+        set => _inner.ShowFocusMarker = value;
+    }
+
+    public TeaStyle TitleStyle
+    {
+        get => _inner.TitleStyle;
+        set => _inner.TitleStyle = value;
+    }
+
+    public TeaStyle FocusedTitleStyle
+    {
+        get => _inner.FocusedTitleStyle;
+        set => _inner.FocusedTitleStyle = value;
+    }
+
+    public override bool IsFocused
+    {
+        get => _inner.IsFocused;
+        set => _inner.IsFocused = value;
+    }
+
+    public override bool IsDisabled
+    {
+        get => _inner.IsDisabled;
+        set => _inner.IsDisabled = value;
+    }
+
+    public override bool IsReadOnly
+    {
+        get => _inner.IsReadOnly;
+        set => _inner.IsReadOnly = value;
+    }
+
+    public void ApplyTheme(TeaTheme theme) => _inner.ApplyTheme(theme);
+
+    public bool SetSelectedIndex(int index) => _inner.SetSelectedIndex(index);
+
+    public override bool Handle(Message message)
+    {
+        if (message is PointerInput { Kind: PointerEventKind.Wheel })
+        {
+            return false;
+        }
+
+        return _inner.Handle(message);
+    }
+
+    public override bool Handle(Message message, Rect bounds)
+    {
+        if (message is PointerInput { Kind: PointerEventKind.Wheel })
+        {
+            return false;
+        }
+
+        return _inner.Handle(message, bounds);
+    }
+
+    public override void Render(Canvas canvas, Rect rect) => _inner.Render(canvas, rect);
+}

@@ -2,7 +2,7 @@
 
 This example simulates a realistic "external consumer" implementation using only public TeaSharp APIs:
 
-- navigation via `Tabs`
+- navigation via `Tabs` (wheel switching disabled in this app to avoid accidental touchpad scroll tab changes)
 - data area via `ListView<T>` and `Table`
 - operational feedback via `LogView` and `Notifications`
 - status footer via `StatusBar`
