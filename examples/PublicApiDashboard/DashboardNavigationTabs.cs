@@ -76,9 +76,9 @@ internal sealed class DashboardNavigationTabs : Control
 
     public override bool Handle(Message message)
     {
-        if (message is PointerInput { Kind: PointerEventKind.Wheel })
+        if (message is PointerInput pointer && IsBlockedNavigationPointer(pointer))
         {
-            return false;
+            return true;
         }
 
         return _inner.Handle(message);
@@ -86,13 +86,44 @@ internal sealed class DashboardNavigationTabs : Control
 
     public override bool Handle(Message message, Rect bounds)
     {
-        if (message is PointerInput { Kind: PointerEventKind.Wheel })
+        if (message is not PointerInput pointer)
         {
-            return false;
+            return _inner.Handle(message, bounds);
+        }
+
+        if (IsBlockedNavigationPointer(pointer))
+        {
+            return true;
+        }
+
+        if (pointer.Kind == PointerEventKind.Motion)
+        {
+            var selectedBefore = _inner.SelectedIndex;
+            var handled = _inner.Handle(message, bounds);
+            if (_inner.SelectedIndex != selectedBefore)
+            {
+                _inner.SetSelectedIndex(selectedBefore);
+                return true;
+            }
+
+            return handled;
         }
 
         return _inner.Handle(message, bounds);
     }
 
     public override void Render(Canvas canvas, Rect rect) => _inner.Render(canvas, rect);
+
+    private static bool IsBlockedNavigationPointer(PointerInput pointer)
+    {
+        if (pointer.Kind == PointerEventKind.Wheel)
+        {
+            return true;
+        }
+
+        return pointer.Button is PointerButton.WheelDown
+            or PointerButton.WheelUp
+            or PointerButton.WheelLeft
+            or PointerButton.WheelRight;
+    }
 }

@@ -134,7 +134,7 @@ internal sealed class PublicApiDashboardApp : TeaApp
         _confirmDeploy.Dismissed += (_, _) => ConfirmDeployment(accepted: false);
 
         _notifications.Push("Dashboard initialized", NotificationLevel.Info);
-        _notifications.Push("Press d to deploy selected service", NotificationLevel.Success);
+        _notifications.Push("Press Ctrl+D (or d) to deploy selected service", NotificationLevel.Success);
         AppendAudit("Dashboard boot complete.");
         ApplyThemeAndOverrides();
     }
@@ -146,18 +146,18 @@ internal sealed class PublicApiDashboardApp : TeaApp
     {
         if (message is KeyPressed key)
         {
-            if (key.IsCharacter('c', ModifierKeys.Ctrl))
+            if (IsQuitShortcut(key))
             {
                 return TeaEffects.Quit;
             }
 
-            if (key.IsCharacter('d'))
+            if (IsDeployShortcut(key))
             {
                 OpenDeployDialog();
                 return null;
             }
 
-            if (key.IsCharacter('t'))
+            if (IsThemeShortcut(key))
             {
                 _useRosePine = !_useRosePine;
                 ApplyThemeAndOverrides();
@@ -182,7 +182,7 @@ internal sealed class PublicApiDashboardApp : TeaApp
         _metricsTable.SetRows(BuildRowsForCurrentTab());
         _selectionSummary.Text = BuildSummaryText(context);
         _status.LeftText = $"{CurrentThemeName()}  tick={_tick:0000}  tab={_navigation.Items[_navigation.SelectedIndex]}";
-        _status.RightText = $"{_statusText}  d deploy  t theme  Ctrl+C quit";
+        _status.RightText = $"{_statusText}  Ctrl+D deploy  Ctrl+T theme  Ctrl+C quit  (d/t also work)";
 
         var topRow = new RowLayout
         {
@@ -339,6 +339,32 @@ internal sealed class PublicApiDashboardApp : TeaApp
     private void AppendAudit(string line)
     {
         _activityLog.Append(line);
+    }
+
+    private static bool IsQuitShortcut(KeyPressed key)
+    {
+        return key.IsCharacter('c', ModifierKeys.Ctrl) || IsControlCharacter(key, '\u0003');
+    }
+
+    private static bool IsDeployShortcut(KeyPressed key)
+    {
+        return key.IsCharacter('d')
+            || key.IsCharacter('d', ModifierKeys.Ctrl)
+            || IsControlCharacter(key, '\u0004');
+    }
+
+    private static bool IsThemeShortcut(KeyPressed key)
+    {
+        return key.IsCharacter('t')
+            || key.IsCharacter('t', ModifierKeys.Ctrl)
+            || IsControlCharacter(key, '\u0014');
+    }
+
+    private static bool IsControlCharacter(KeyPressed key, char controlChar)
+    {
+        return key.Key == Key.Character
+            && key.Text.Length == 1
+            && key.Text[0] == controlChar;
     }
 
     private string CurrentThemeName() => _useRosePine ? "Rose Pine" : "Catppuccin";
