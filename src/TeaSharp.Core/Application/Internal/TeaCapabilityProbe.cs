@@ -84,7 +84,6 @@ internal sealed class TeaCapabilityProbe
 
         var sawAnyResponse = _state.SawAnyResponse;
         var unresolvedModes = _state.PendingModes.Where(IsCapabilityRepresentativeProbeMode).ToArray();
-        var hasLegacyMouseSupport = _state.SupportedModes.Any(IsLegacyMouseProbeMode);
         _state = null;
 
         if (!sawAnyResponse)
@@ -116,8 +115,10 @@ internal sealed class TeaCapabilityProbe
             next = unresolvedMode switch
             {
                 1004 => next with { FocusReporting = false },
-                1006 when hasLegacyMouseSupport => next,
-                1006 => next with { MouseReporting = false },
+                // Do not downgrade mouse capability from unresolved 1006 probe timeouts.
+                // Some terminals support mouse reporting but do not answer mode reports
+                // consistently, and false negatives here disable app mouse interaction.
+                1006 => next,
                 2004 => next with { BracketedPaste = false },
                 2026 => next with { SynchronizedUpdates = false },
                 _ => next,

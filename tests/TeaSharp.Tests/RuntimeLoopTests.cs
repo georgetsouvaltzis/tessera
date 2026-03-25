@@ -36,7 +36,7 @@ internal static class RuntimeLoopTests
         yield return new TestCase("Runtime_AnsiRendererOptions_DisableModeQueries", AnsiRendererOptions_DisableModeQueries);
         yield return new TestCase("Runtime_CapabilityProbe_WritesModeQueries", CapabilityProbe_WritesModeQueries);
         yield return new TestCase("Runtime_CapabilityProbe_TimeoutDisablesModeReportsWhenNoResponses", CapabilityProbe_TimeoutDisablesModeReportsWhenNoResponses);
-        yield return new TestCase("Runtime_CapabilityProbe_PartialResponseDisablesUnresolvedModes", CapabilityProbe_PartialResponseDisablesUnresolvedModes);
+        yield return new TestCase("Runtime_CapabilityProbe_PartialResponseKeepsMouseReportingForInterop", CapabilityProbe_PartialResponseKeepsMouseReportingForInterop);
         yield return new TestCase("Runtime_CapabilityProbe_LegacyMouseResponsePreservesMouseCapability", CapabilityProbe_LegacyMouseResponsePreservesMouseCapability);
         yield return new TestCase("Runtime_CapabilityProbe_AllResponsesPreventTimeoutFallback", CapabilityProbe_AllResponsesPreventTimeoutFallback);
         yield return new TestCase("Runtime_ModeReport_RefinesTerminalCapabilities", ModeReport_RefinesTerminalCapabilities);
@@ -608,7 +608,7 @@ internal static class RuntimeLoopTests
             "Timeout-refined capabilities should annotate source with probe-timeout.");
     }
 
-    private static async Task CapabilityProbe_PartialResponseDisablesUnresolvedModes()
+    private static async Task CapabilityProbe_PartialResponseKeepsMouseReportingForInterop()
     {
         // Arrange
         var terminal = new InteractiveProbeTerminalAdapter();
@@ -643,7 +643,7 @@ internal static class RuntimeLoopTests
             final.Source.Contains("+probe-partial-timeout", StringComparison.Ordinal),
             "Partial probe timeout should annotate source.");
         TestAssert.True(!final.FocusReporting, "Unresolved focus probe should downgrade focus reporting.");
-        TestAssert.True(!final.MouseReporting, "Unresolved mouse probe should downgrade mouse reporting.");
+        TestAssert.True(final.MouseReporting, "Unresolved mouse probe should preserve mouse reporting to avoid false-negative interop downgrades.");
         TestAssert.True(!final.BracketedPaste, "Unresolved paste probe should downgrade bracketed paste support.");
         TestAssert.True(final.SynchronizedUpdates, "Mode report reset should retain synchronized update support while reporting current reset state.");
     }
