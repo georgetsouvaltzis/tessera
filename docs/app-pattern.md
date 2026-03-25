@@ -185,6 +185,7 @@ Common settings:
 - `DisableRenderer`
 - `DisableInput`
 - `PointerActivationPolicy` (defaults to `DoubleClick`; first click still transfers focus, while activation stays double-click-gated; set `SingleClick` to opt into immediate click activation)
+- pointer behavior can vary by terminal/emulator protocol details, so app code should set `PointerActivationPolicy` explicitly per UX goal (`SingleClick` for immediate selection, `DoubleClick` for guarded activation)
 - `DoubleClickTimeout`
 - `DoubleClickSlop`
 - `EnableResizeSignals`

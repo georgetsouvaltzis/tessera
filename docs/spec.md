@@ -76,6 +76,7 @@ Startup model:
 - minimal path: `Tea.RunAsync(new App())`
 - configured path: `Tea.CreateBuilder().UseApp<TApp>().ConfigureRuntime(...).Build()`
 - runtime pointer policy defaults to `PointerActivationPolicy.DoubleClick` so activation is double-click-gated by default while first click still transfers focus; set `PointerActivationPolicy.SingleClick` to restore immediate click activation.
+- terminal pointer semantics are not uniform (for example release reports may arrive as `Button.None`, and motion/click cadence varies by terminal), so production apps should set `PointerActivationPolicy` explicitly instead of relying on defaults.
 
 Canonical onboarding progression:
 
