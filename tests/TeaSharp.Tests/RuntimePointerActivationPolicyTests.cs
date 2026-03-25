@@ -1,4 +1,5 @@
 using NUnit.Framework;
+using System.Text;
 using TeaSharp.Controls;
 namespace TeaSharp.Tests;
 
@@ -213,13 +214,14 @@ public sealed class RuntimePointerActivationPolicyTests
         var app = new TabsInteractionApp();
         app.ConfigureRuntimeOptions(new TeaRuntimeOptions());
         _ = app.UpdateRuntime(new WindowResized(64, 6));
-        _ = app.RenderRuntime();
+        var initialFrame = app.RenderRuntime().Output.Frame.Content;
+        var target = ResolveTextHitCoordinate(initialFrame, "Operations");
 
-        _ = app.UpdateRuntime(new PointerInput(PointerEventKind.Press, PointerButton.Left, 15, 0));
+        _ = app.UpdateRuntime(new PointerInput(PointerEventKind.Press, PointerButton.Left, target.X, target.Y));
 
         Assert.That(app.Tabs.SelectedIndex, Is.EqualTo(0));
-        _ = app.UpdateRuntime(new PointerInput(PointerEventKind.Release, PointerButton.Left, 15, 0));
-        _ = app.UpdateRuntime(new PointerInput(PointerEventKind.Press, PointerButton.Left, 15, 0));
+        _ = app.UpdateRuntime(new PointerInput(PointerEventKind.Release, PointerButton.Left, target.X, target.Y));
+        _ = app.UpdateRuntime(new PointerInput(PointerEventKind.Press, PointerButton.Left, target.X, target.Y));
         Assert.That(app.Tabs.SelectedIndex, Is.EqualTo(1));
     }
 
@@ -235,11 +237,91 @@ public sealed class RuntimePointerActivationPolicyTests
                 DoubleClickSlop = 1,
             });
         _ = app.UpdateRuntime(new WindowResized(64, 6));
-        _ = app.RenderRuntime();
+        var initialFrame = app.RenderRuntime().Output.Frame.Content;
+        var target = ResolveTextHitCoordinate(initialFrame, "Operations");
 
-        _ = app.UpdateRuntime(new PointerInput(PointerEventKind.Press, PointerButton.Left, 15, 0));
+        _ = app.UpdateRuntime(new PointerInput(PointerEventKind.Press, PointerButton.Left, target.X, target.Y));
 
         Assert.That(app.Tabs.SelectedIndex, Is.EqualTo(1));
+    }
+
+    private static (int X, int Y) ResolveTextHitCoordinate(string frame, string text)
+    {
+        var lines = frame.Split('\n');
+        for (var y = 0; y < lines.Length; y++)
+        {
+            var line = StripAnsiSequences(lines[y]);
+            var start = line.IndexOf(text, StringComparison.Ordinal);
+            if (start < 0)
+            {
+                continue;
+            }
+
+            return (start + (text.Length / 2), y);
+        }
+
+        throw new AssertionException($"Unable to locate tab label '{text}' in runtime frame.");
+    }
+
+    private static string StripAnsiSequences(string line)
+    {
+        if (string.IsNullOrEmpty(line) || line.IndexOf('\u001b') < 0)
+        {
+            return line;
+        }
+
+        var builder = new StringBuilder(line.Length);
+        for (var index = 0; index < line.Length; index++)
+        {
+            if (line[index] != '\u001b')
+            {
+                builder.Append(line[index]);
+                continue;
+            }
+
+            if (index + 1 >= line.Length)
+            {
+                break;
+            }
+
+            index++;
+            if (line[index] == '[')
+            {
+                while (index + 1 < line.Length)
+                {
+                    index++;
+                    var next = line[index];
+                    if (next is >= '@' and <= '~')
+                    {
+                        break;
+                    }
+                }
+
+                continue;
+            }
+
+            if (line[index] == ']')
+            {
+                while (index + 1 < line.Length)
+                {
+                    index++;
+                    if (line[index] == '\a')
+                    {
+                        break;
+                    }
+
+                    if (line[index] == '\u001b'
+                        && index + 1 < line.Length
+                        && line[index + 1] == '\\')
+                    {
+                        index++;
+                        break;
+                    }
+                }
+            }
+        }
+
+        return builder.ToString();
     }
 
     private sealed class PolicyActivationApp : TeaApp
