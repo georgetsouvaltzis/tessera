@@ -25,7 +25,7 @@ internal sealed class EventDecoder : IEventDecoder
         return DecodePlain(buffer, timeoutExpired);
     }
 
-    private DecodeResult DecodeEscape(ReadOnlySpan<byte> buffer, bool timeoutExpired)
+    private DecodeResult DecodeEscape(ReadOnlySpan<byte> buffer, bool timeoutExpired, bool allowTimeoutDeferral = true)
     {
         if (buffer.Length == 1)
         {
@@ -34,7 +34,7 @@ internal sealed class EventDecoder : IEventDecoder
                 return new DecodeResult(0, null, true);
             }
 
-            if (_bareEscapeTimeoutCount < BareEscapeTimeoutDeferrals)
+            if (allowTimeoutDeferral && _bareEscapeTimeoutCount < BareEscapeTimeoutDeferrals)
             {
                 _bareEscapeTimeoutCount++;
                 return new DecodeResult(0, null, true);
@@ -44,13 +44,17 @@ internal sealed class EventDecoder : IEventDecoder
             return new DecodeResult(1, new KeyPressMsg(KeyCode.Escape), false);
         }
 
-        if (_bareEscapeTimeoutCount > 0 && !IsEscapeControlLead(buffer[1]))
+        if (_bareEscapeTimeoutCount > 0)
         {
+            if (!allowTimeoutDeferral || !IsEscapeControlLead(buffer[1]))
+            {
+                _bareEscapeTimeoutCount = 0;
+                return new DecodeResult(1, new KeyPressMsg(KeyCode.Escape), false);
+            }
+
             _bareEscapeTimeoutCount = 0;
-            return new DecodeResult(1, new KeyPressMsg(KeyCode.Escape), false);
         }
 
-        _bareEscapeTimeoutCount = 0;
         return buffer[1] switch
         {
             (byte)'[' => DecodeCsi(buffer, timeoutExpired),
@@ -75,7 +79,7 @@ internal sealed class EventDecoder : IEventDecoder
 
         if (buffer.Length >= 2 && buffer[1] == 0x1B)
         {
-            var nested = DecodeEscape(buffer[1..], timeoutExpired);
+            var nested = DecodeEscape(buffer[1..], timeoutExpired, allowTimeoutDeferral: false);
             if (nested.NeedMoreData && nested.Consumed == 0)
             {
                 return new DecodeResult(0, null, true);
