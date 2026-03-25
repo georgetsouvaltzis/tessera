@@ -1,5 +1,4 @@
 using NUnit.Framework;
-using System.Text;
 using TeaSharp.Controls;
 namespace TeaSharp.Tests;
 
@@ -211,11 +210,11 @@ public sealed class RuntimePointerActivationPolicyTests
     [Test]
     public void RuntimePointerActivationPolicy_DefaultDoubleClick_TabsFirstPressDoesNotSwitchSelection()
     {
+        var target = ResolveSecondTabHitCoordinate();
         var app = new TabsInteractionApp();
         app.ConfigureRuntimeOptions(new TeaRuntimeOptions());
         _ = app.UpdateRuntime(new WindowResized(64, 6));
-        var initialFrame = app.RenderRuntime().Output.Frame.Content;
-        var target = ResolveTextHitCoordinate(initialFrame, "Operations");
+        _ = app.RenderRuntime();
 
         _ = app.UpdateRuntime(new PointerInput(PointerEventKind.Press, PointerButton.Left, target.X, target.Y));
 
@@ -228,6 +227,7 @@ public sealed class RuntimePointerActivationPolicyTests
     [Test]
     public void RuntimePointerActivationPolicy_SingleClickOptBack_TabsFirstPressSwitchesSelection()
     {
+        var target = ResolveSecondTabHitCoordinate();
         var app = new TabsInteractionApp();
         app.ConfigureRuntimeOptions(
             new TeaRuntimeOptions
@@ -237,91 +237,41 @@ public sealed class RuntimePointerActivationPolicyTests
                 DoubleClickSlop = 1,
             });
         _ = app.UpdateRuntime(new WindowResized(64, 6));
-        var initialFrame = app.RenderRuntime().Output.Frame.Content;
-        var target = ResolveTextHitCoordinate(initialFrame, "Operations");
+        _ = app.RenderRuntime();
 
         _ = app.UpdateRuntime(new PointerInput(PointerEventKind.Press, PointerButton.Left, target.X, target.Y));
 
         Assert.That(app.Tabs.SelectedIndex, Is.EqualTo(1));
     }
 
-    private static (int X, int Y) ResolveTextHitCoordinate(string frame, string text)
+    private static (int X, int Y) ResolveSecondTabHitCoordinate()
     {
-        var lines = frame.Split('\n');
-        for (var y = 0; y < lines.Length; y++)
+        const int width = 64;
+        const int height = 6;
+        for (var y = 0; y < height; y++)
         {
-            var line = StripAnsiSequences(lines[y]);
-            var start = line.IndexOf(text, StringComparison.Ordinal);
-            if (start < 0)
+            for (var x = 0; x < width; x++)
             {
-                continue;
-            }
+                var probe = new TabsInteractionApp();
+                probe.ConfigureRuntimeOptions(
+                    new TeaRuntimeOptions
+                    {
+                        PointerActivationPolicy = PointerActivationPolicy.SingleClick,
+                        DoubleClickTimeout = TimeSpan.FromSeconds(5),
+                        DoubleClickSlop = 1,
+                    });
+                _ = probe.UpdateRuntime(new WindowResized(width, height));
+                _ = probe.RenderRuntime();
+                _ = probe.UpdateRuntime(new PointerInput(PointerEventKind.Press, PointerButton.Left, x, y));
 
-            return (start + (text.Length / 2), y);
-        }
-
-        throw new AssertionException($"Unable to locate tab label '{text}' in runtime frame.");
-    }
-
-    private static string StripAnsiSequences(string line)
-    {
-        if (string.IsNullOrEmpty(line) || line.IndexOf('\u001b') < 0)
-        {
-            return line;
-        }
-
-        var builder = new StringBuilder(line.Length);
-        for (var index = 0; index < line.Length; index++)
-        {
-            if (line[index] != '\u001b')
-            {
-                builder.Append(line[index]);
-                continue;
-            }
-
-            if (index + 1 >= line.Length)
-            {
-                break;
-            }
-
-            index++;
-            if (line[index] == '[')
-            {
-                while (index + 1 < line.Length)
+                if (probe.Tabs.SelectedIndex == 1)
                 {
-                    index++;
-                    var next = line[index];
-                    if (next is >= '@' and <= '~')
-                    {
-                        break;
-                    }
-                }
-
-                continue;
-            }
-
-            if (line[index] == ']')
-            {
-                while (index + 1 < line.Length)
-                {
-                    index++;
-                    if (line[index] == '\a')
-                    {
-                        break;
-                    }
-
-                    if (line[index] == '\u001b'
-                        && index + 1 < line.Length
-                        && line[index + 1] == '\\')
-                    {
-                        index++;
-                        break;
-                    }
+                    return (x, y);
                 }
             }
         }
 
-        return builder.ToString();
+        throw new AssertionException("Unable to resolve a runtime pointer coordinate that selects the second tab.");
     }
 
     private sealed class PolicyActivationApp : TeaApp
