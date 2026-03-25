@@ -62,6 +62,37 @@ public sealed class PublicApiDashboardPointerFocusRegressionTests
         Assert.That(app.Navigation.SelectedIndex, Is.EqualTo(0), "Service row click flow should not switch dashboard tab.");
     }
 
+    [Test]
+    public void PublicApiDashboard_SingleClickPolicy_FirstPressOnServicesRow_ChangesSelection()
+    {
+        var target = ResolveServicesRowHitCoordinate(rowIndex: 1);
+        var app = new DashboardPointerFocusProbeApp();
+        app.ConfigureRuntimeOptions(
+            new TeaRuntimeOptions
+            {
+                PointerActivationPolicy = PointerActivationPolicy.SingleClick,
+                DoubleClickTimeout = TimeSpan.FromSeconds(5),
+                DoubleClickSlop = 1,
+            });
+
+        _ = app.UpdateRuntime(new WindowResized(120, 36));
+        _ = app.RenderRuntime();
+
+        Assert.That(app.Services.SelectedIndex, Is.EqualTo(0), "Precondition: first service should be selected initially.");
+
+        _ = app.UpdateRuntime(new PointerInput(PointerEventKind.Press, PointerButton.Left, target.X, target.Y));
+
+        Assert.That(
+            app.Services.SelectedIndex,
+            Is.EqualTo(1),
+            "Single-click pointer policy should select the second service row on first press.");
+        Assert.That(
+            app.ServiceSelectionChanges,
+            Is.GreaterThanOrEqualTo(1),
+            "Service selection change event should fire when row selection changes.");
+        Assert.That(app.Navigation.SelectedIndex, Is.EqualTo(0), "Service row click should not switch dashboard tab.");
+    }
+
     private static (int X, int Y) ResolveServicesHitCoordinate()
     {
         const int width = 120;

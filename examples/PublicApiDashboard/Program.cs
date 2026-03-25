@@ -9,6 +9,7 @@ var app = Tea.CreateBuilder()
     .ConfigureRuntime(static runtime =>
     {
         runtime.Theme = PublicApiDashboardApp.DefaultTheme;
+        runtime.PointerActivationPolicy = PointerActivationPolicy.SingleClick;
         runtime.Screen = new ScreenOptions
         {
             AltScreen = true,
@@ -182,7 +183,7 @@ internal sealed class PublicApiDashboardApp : TeaApp
         _metricsTable.SetRows(BuildRowsForCurrentTab());
         _selectionSummary.Text = BuildSummaryText(context);
         _status.LeftText = $"{CurrentThemeName()}  tick={_tick:0000}  tab={_navigation.Items[_navigation.SelectedIndex]}";
-        _status.RightText = $"{_statusText}  click tab to switch  wheel ignored  Ctrl+D deploy  Ctrl+T theme  Ctrl+C quit";
+        _status.RightText = $"{_statusText}  single-click pointer mode  click tab to switch  wheel ignored  Ctrl+D deploy  Ctrl+T theme  Ctrl+C quit";
 
         var topRow = new RowLayout
         {

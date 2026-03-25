@@ -11,6 +11,7 @@ This example simulates a realistic "external consumer" implementation using only
 - status footer via `StatusBar`
 - modal action via `Dialog` (deploy confirmation)
 - pointer semantics:
+  - runtime pointer activation policy is explicitly `SingleClick` for terminal compatibility (some terminals/paths coalesce or consume double-click)
   - click tab to switch
   - wheel does not change tabs
 - shortcuts:
