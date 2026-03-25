@@ -6,16 +6,19 @@ using TeaSharp;
 internal sealed class DashboardNavigationTabs : Control
 {
     private readonly Tabs _inner;
+    private event EventHandler<SelectionChangedEventArgs>? SelectionChangedCore;
+    private bool _suppressSelectionChanged;
 
     public DashboardNavigationTabs(params string[] items)
     {
         _inner = new Tabs(items);
+        _inner.SelectionChanged += OnInnerSelectionChanged;
     }
 
     public event EventHandler<SelectionChangedEventArgs>? SelectionChanged
     {
-        add => _inner.SelectionChanged += value;
-        remove => _inner.SelectionChanged -= value;
+        add => SelectionChangedCore += value;
+        remove => SelectionChangedCore -= value;
     }
 
     public IReadOnlyList<string> Items => _inner.Items;
@@ -99,20 +102,38 @@ internal sealed class DashboardNavigationTabs : Control
         if (pointer.Kind == PointerEventKind.Motion)
         {
             var selectedBefore = _inner.SelectedIndex;
-            var handled = _inner.Handle(message, bounds);
-            if (_inner.SelectedIndex != selectedBefore)
+            _suppressSelectionChanged = true;
+            try
             {
-                _inner.SetSelectedIndex(selectedBefore);
-                return true;
-            }
+                var handled = _inner.Handle(message, bounds);
+                if (_inner.SelectedIndex != selectedBefore)
+                {
+                    _inner.SetSelectedIndex(selectedBefore);
+                    return true;
+                }
 
-            return handled;
+                return handled;
+            }
+            finally
+            {
+                _suppressSelectionChanged = false;
+            }
         }
 
         return _inner.Handle(message, bounds);
     }
 
     public override void Render(Canvas canvas, Rect rect) => _inner.Render(canvas, rect);
+
+    private void OnInnerSelectionChanged(object? sender, SelectionChangedEventArgs args)
+    {
+        if (_suppressSelectionChanged)
+        {
+            return;
+        }
+
+        SelectionChangedCore?.Invoke(this, args);
+    }
 
     private static bool IsBlockedNavigationPointer(PointerInput pointer)
     {
