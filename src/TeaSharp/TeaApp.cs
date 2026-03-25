@@ -25,12 +25,17 @@ public abstract class TeaApp
     private PointerActivationPolicy _pointerActivationPolicy = PointerActivationPolicy.DoubleClick;
     private TimeSpan _doubleClickTimeout = TimeSpan.FromMilliseconds(450);
     private int _doubleClickSlop = 1;
-    private DateTimeOffset _lastPointerPressUtc = DateTimeOffset.MinValue;
-    private int _lastPointerPressX;
-    private int _lastPointerPressY;
-    private PointerButton _lastPointerPressButton = PointerButton.None;
-    private int _lastPointerPressCount;
-    private bool _hasLastPointerPress;
+    private DateTimeOffset _lastCompletedPointerReleaseUtc = DateTimeOffset.MinValue;
+    private int _lastCompletedPointerX;
+    private int _lastCompletedPointerY;
+    private PointerButton _lastCompletedPointerButton = PointerButton.None;
+    private int _lastCompletedPointerClickCount;
+    private bool _hasLastCompletedPointerClick;
+    private bool _hasPendingPointerPress;
+    private int _pendingPointerPressX;
+    private int _pendingPointerPressY;
+    private PointerButton _pendingPointerPressButton = PointerButton.None;
+    private int _pendingPointerPressClickCount;
 
     /// <summary>
     /// Gets the most recent screen context supplied by the runtime.
@@ -211,43 +216,101 @@ public abstract class TeaApp
 
     private PointerInput NormalizeClickCount(PointerInput pointer)
     {
-        if (pointer.Kind != PointerEventKind.Press || pointer.Button == PointerButton.None)
+        if (pointer.Kind == PointerEventKind.Press)
         {
-            return pointer;
+            if (pointer.Button == PointerButton.None)
+            {
+                return pointer;
+            }
+
+            var now = DateTimeOffset.UtcNow;
+            var clickCount = ResolvePressClickCount(pointer, now);
+            TrackPendingPress(pointer, clickCount);
+            return clickCount == pointer.ClickCount
+                ? pointer
+                : pointer with { ClickCount = clickCount };
         }
 
-        var clickCount = pointer.ClickCount > 0 ? pointer.ClickCount : 1;
-        var now = DateTimeOffset.UtcNow;
-
-        if (_hasLastPointerPress
-            && pointer.Button == _lastPointerPressButton
-            && now - _lastPointerPressUtc <= _doubleClickTimeout
-            && Math.Abs(pointer.X - _lastPointerPressX) <= _doubleClickSlop
-            && Math.Abs(pointer.Y - _lastPointerPressY) <= _doubleClickSlop)
+        if (pointer.Kind == PointerEventKind.Release)
         {
-            clickCount = Math.Max(clickCount, _lastPointerPressCount + 1);
+            CompletePendingClickCycle(pointer);
         }
 
-        _hasLastPointerPress = true;
-        _lastPointerPressUtc = now;
-        _lastPointerPressX = pointer.X;
-        _lastPointerPressY = pointer.Y;
-        _lastPointerPressButton = pointer.Button;
-        _lastPointerPressCount = clickCount;
+        return pointer;
+    }
 
-        return clickCount == pointer.ClickCount
-            ? pointer
-            : pointer with { ClickCount = clickCount };
+    private int ResolvePressClickCount(PointerInput pointer, DateTimeOffset now)
+    {
+        if (!_hasLastCompletedPointerClick)
+        {
+            return 1;
+        }
+
+        if (pointer.Button != _lastCompletedPointerButton)
+        {
+            return 1;
+        }
+
+        if (now - _lastCompletedPointerReleaseUtc > _doubleClickTimeout)
+        {
+            return 1;
+        }
+
+        if (Math.Abs(pointer.X - _lastCompletedPointerX) > _doubleClickSlop
+            || Math.Abs(pointer.Y - _lastCompletedPointerY) > _doubleClickSlop)
+        {
+            return 1;
+        }
+
+        return Math.Max(2, _lastCompletedPointerClickCount + 1);
+    }
+
+    private void TrackPendingPress(PointerInput pointer, int clickCount)
+    {
+        _hasPendingPointerPress = true;
+        _pendingPointerPressX = pointer.X;
+        _pendingPointerPressY = pointer.Y;
+        _pendingPointerPressButton = pointer.Button;
+        _pendingPointerPressClickCount = clickCount;
+    }
+
+    private void CompletePendingClickCycle(PointerInput pointer)
+    {
+        if (!_hasPendingPointerPress)
+        {
+            return;
+        }
+
+        if (pointer.Button == _pendingPointerPressButton)
+        {
+            _hasLastCompletedPointerClick = true;
+            _lastCompletedPointerReleaseUtc = DateTimeOffset.UtcNow;
+            _lastCompletedPointerX = _pendingPointerPressX;
+            _lastCompletedPointerY = _pendingPointerPressY;
+            _lastCompletedPointerButton = _pendingPointerPressButton;
+            _lastCompletedPointerClickCount = _pendingPointerPressClickCount;
+        }
+
+        _hasPendingPointerPress = false;
+        _pendingPointerPressX = 0;
+        _pendingPointerPressY = 0;
+        _pendingPointerPressButton = PointerButton.None;
+        _pendingPointerPressClickCount = 0;
     }
 
     private void ResetPointerClickTracking()
     {
-        _hasLastPointerPress = false;
-        _lastPointerPressUtc = DateTimeOffset.MinValue;
-        _lastPointerPressX = 0;
-        _lastPointerPressY = 0;
-        _lastPointerPressButton = PointerButton.None;
-        _lastPointerPressCount = 0;
+        _hasLastCompletedPointerClick = false;
+        _lastCompletedPointerReleaseUtc = DateTimeOffset.MinValue;
+        _lastCompletedPointerX = 0;
+        _lastCompletedPointerY = 0;
+        _lastCompletedPointerButton = PointerButton.None;
+        _lastCompletedPointerClickCount = 0;
+        _hasPendingPointerPress = false;
+        _pendingPointerPressX = 0;
+        _pendingPointerPressY = 0;
+        _pendingPointerPressButton = PointerButton.None;
+        _pendingPointerPressClickCount = 0;
     }
 
     private void ApplyRuntimeThemeContext()
