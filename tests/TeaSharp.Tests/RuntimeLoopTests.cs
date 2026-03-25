@@ -39,6 +39,9 @@ internal static class RuntimeLoopTests
         yield return new TestCase("Runtime_CapabilityProbe_PartialResponseKeepsMouseReportingForInterop", CapabilityProbe_PartialResponseKeepsMouseReportingForInterop);
         yield return new TestCase("Runtime_CapabilityProbe_LegacyMouseResponsePreservesMouseCapability", CapabilityProbe_LegacyMouseResponsePreservesMouseCapability);
         yield return new TestCase("Runtime_CapabilityProbe_AllResponsesPreventTimeoutFallback", CapabilityProbe_AllResponsesPreventTimeoutFallback);
+        yield return new TestCase("Runtime_InputLoopSelection_RawModePrefersTerminalReader", InputLoopSelection_RawModePrefersTerminalReader);
+        yield return new TestCase("Runtime_InputLoopSelection_NonRawModeUsesConsoleKeyFallback", InputLoopSelection_NonRawModeUsesConsoleKeyFallback);
+        yield return new TestCase("Runtime_InputLoopSelection_UseConsoleKeyDisabledPrefersTerminalReader", InputLoopSelection_UseConsoleKeyDisabledPrefersTerminalReader);
         yield return new TestCase("Runtime_ModeReport_RefinesTerminalCapabilities", ModeReport_RefinesTerminalCapabilities);
         yield return new TestCase("Runtime_ModeReport_LegacyMouseSetEnablesCapability", ModeReport_LegacyMouseSetEnablesCapability);
         yield return new TestCase("Runtime_ModeReport_UnsupportedDisablesCapability", ModeReport_UnsupportedDisablesCapability);
@@ -733,6 +736,42 @@ internal static class RuntimeLoopTests
             !final.Source.Contains("+probe-timeout", StringComparison.Ordinal)
             && !final.Source.Contains("+probe-partial-timeout", StringComparison.Ordinal),
             "Full probe responses should avoid timeout fallback annotations.");
+    }
+
+    private static Task InputLoopSelection_RawModePrefersTerminalReader()
+    {
+        // Arrange / Act
+        var useConsoleKeyLoop = TeaRuntimeLoop.ShouldUseConsoleKeyEventLoop(
+            useConsoleKeyEvents: true,
+            isRawModeActive: true);
+
+        // Assert
+        TestAssert.True(!useConsoleKeyLoop, "Raw mode should use terminal byte-stream reader so mouse/focus events remain available.");
+        return Task.CompletedTask;
+    }
+
+    private static Task InputLoopSelection_NonRawModeUsesConsoleKeyFallback()
+    {
+        // Arrange / Act
+        var useConsoleKeyLoop = TeaRuntimeLoop.ShouldUseConsoleKeyEventLoop(
+            useConsoleKeyEvents: true,
+            isRawModeActive: false);
+
+        // Assert
+        TestAssert.True(useConsoleKeyLoop, "Non-raw console mode should use ConsoleKey fallback loop.");
+        return Task.CompletedTask;
+    }
+
+    private static Task InputLoopSelection_UseConsoleKeyDisabledPrefersTerminalReader()
+    {
+        // Arrange / Act
+        var useConsoleKeyLoop = TeaRuntimeLoop.ShouldUseConsoleKeyEventLoop(
+            useConsoleKeyEvents: false,
+            isRawModeActive: false);
+
+        // Assert
+        TestAssert.True(!useConsoleKeyLoop, "Disabling console key events should force terminal byte-stream reader.");
+        return Task.CompletedTask;
     }
 
     private static async Task ModeReport_RefinesTerminalCapabilities()

@@ -320,13 +320,20 @@ internal sealed class TeaRuntimeLoop
         }
 
         if (_runtime.Terminal is ConsoleTerminalAdapter consoleTerminal
-            && (_options.UseConsoleKeyEvents || !consoleTerminal.IsRawModeActive))
+            && ShouldUseConsoleKeyEventLoop(_options.UseConsoleKeyEvents, consoleTerminal.IsRawModeActive))
         {
             return Task.Run(() => ConsoleTerminalAdapter.StreamConsoleKeyEventsAsync(Send, token), token);
         }
 
         _runtime.Reader = new TerminalReader(_runtime.Terminal.Input, _options.EventDecoder ?? new EventDecoder(), _options.EscapeTimeout);
         return Task.Run(() => _runtime.Reader.StreamEventsAsync(Send, token), token);
+    }
+
+    internal static bool ShouldUseConsoleKeyEventLoop(bool useConsoleKeyEvents, bool isRawModeActive)
+    {
+        // Raw mode should prefer terminal byte-stream decoding so mouse/focus/paste CSI
+        // sequences remain available. Console.ReadKey fallback is for non-raw consoles.
+        return useConsoleKeyEvents && !isRawModeActive;
     }
 
     private async Task RenderAsync(ScreenOutput output, CancellationToken token)
