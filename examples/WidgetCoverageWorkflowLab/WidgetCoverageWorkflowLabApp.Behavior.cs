@@ -90,9 +90,6 @@ internal sealed partial class WidgetCoverageWorkflowLabApp
         ]);
         _approvalInbox.Select(0);
         _wizard.RequestFocus();
-
-        _lastTagSnapshot = CreateTagSnapshot();
-        _lastReviewerSnapshot = CreateReviewerSnapshot();
     }
 
     private void WireEvents()
@@ -149,6 +146,18 @@ internal sealed partial class WidgetCoverageWorkflowLabApp
             RunValidation("runbook-commit");
         };
 
+        _riskTags.TagsChanged += (_, args) =>
+        {
+            _statusText = $"risk tags changed ({args.Tags.Count})";
+            RunValidation("tag-input");
+        };
+
+        _reviewers.TokensChanged += (_, args) =>
+        {
+            _statusText = $"reviewers changed ({args.Tokens.Count})";
+            RunValidation("token-editor");
+        };
+
         _policySearch.QueryChanged += (_, args) => HandlePolicySearchQuery(args.Query);
         _policySearch.NavigationRequested += (_, args) => HandlePolicyNavigation(args.Direction);
 
@@ -193,6 +202,16 @@ internal sealed partial class WidgetCoverageWorkflowLabApp
             }
 
             _statusText = $"activity selected -> {args.SelectedItem.Message}";
+        };
+
+        _approvalInbox.SelectionChanged += (_, args) =>
+        {
+            if (args.SelectedItem is null)
+            {
+                return;
+            }
+
+            _statusText = $"approval selected -> {args.SelectedItem.Message}";
         };
     }
 

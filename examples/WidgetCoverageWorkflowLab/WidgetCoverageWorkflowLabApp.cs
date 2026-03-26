@@ -220,8 +220,6 @@ internal sealed partial class WidgetCoverageWorkflowLabApp : TeaApp
     private int _policyMatchIndex;
     private int _issueRouteCount;
     private string _statusText = "Ready";
-    private string _lastTagSnapshot = string.Empty;
-    private string _lastReviewerSnapshot = string.Empty;
 
     public WidgetCoverageWorkflowLabApp()
     {
@@ -274,7 +272,6 @@ internal sealed partial class WidgetCoverageWorkflowLabApp : TeaApp
             }
         }
 
-        DetectEditorStateChanges();
         return null;
     }
 

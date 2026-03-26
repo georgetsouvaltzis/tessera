@@ -203,25 +203,6 @@ internal sealed partial class WidgetCoverageWorkflowLabApp
         _policySearch.SetMatchState(matchCount, _policyMatchIndex);
     }
 
-    private void DetectEditorStateChanges()
-    {
-        var tagSnapshot = CreateTagSnapshot();
-        if (!string.Equals(tagSnapshot, _lastTagSnapshot, StringComparison.Ordinal))
-        {
-            _lastTagSnapshot = tagSnapshot;
-            _statusText = $"risk tags changed ({_riskTags.Tags.Count})";
-            RunValidation("tag-input");
-        }
-
-        var reviewerSnapshot = CreateReviewerSnapshot();
-        if (!string.Equals(reviewerSnapshot, _lastReviewerSnapshot, StringComparison.Ordinal))
-        {
-            _lastReviewerSnapshot = reviewerSnapshot;
-            _statusText = $"reviewers changed ({_reviewers.Tokens.Count})";
-            RunValidation("token-editor");
-        }
-    }
-
     private void RefreshDerivedViews()
     {
         _reviewForm.SetFields(
@@ -264,7 +245,7 @@ internal sealed partial class WidgetCoverageWorkflowLabApp
         editorSection.AddField("tags", _riskTags.Tags.Count.ToString(CultureInfo.InvariantCulture));
         editorSection.AddField("reviewers", _reviewers.Tokens.Count.ToString(CultureInfo.InvariantCulture));
         editorSection.AddField("runbook", string.IsNullOrWhiteSpace(_runbookInput.Text) ? "(unset)" : _runbookInput.Text);
-        editorSection.AddDetail("TagInput/TokenEditor are polled for change detection in this app.");
+        editorSection.AddDetail("TagInput/TokenEditor changes are event-driven in this app.");
 
         _inspector.SetSections([workflowSection, rolloutSection, editorSection]);
     }
@@ -282,16 +263,6 @@ internal sealed partial class WidgetCoverageWorkflowLabApp
     private string CurrentStepLabel()
     {
         return _wizard.SelectedStep?.Title ?? "n/a";
-    }
-
-    private string CreateTagSnapshot()
-    {
-        return string.Join('|', _riskTags.Tags);
-    }
-
-    private string CreateReviewerSnapshot()
-    {
-        return string.Join('|', _reviewers.Tokens.Select(static token => token.Value));
     }
 
     private static bool LooksLikeWindow(string value)
