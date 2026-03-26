@@ -51,16 +51,20 @@ internal sealed class TagInputLabApp : TeaApp
         MaxItems = 80,
     };
 
-    private readonly Button _addApiTagButton = new() { Text = "Add API Tag", Description = "a", Border = BorderStyle.Rounded, Padding = Thickness.All(1) };
-    private readonly Button _seedButton = new() { Text = "Seed Tags", Description = "Ctrl+R", Border = BorderStyle.Rounded, Padding = Thickness.All(1) };
+    private readonly Button _addApiTagButton = new() { Text = "Add API", Description = "a", Border = BorderStyle.Rounded, Padding = Thickness.All(1) };
+    private readonly Button _seedButton = new() { Text = "Seed", Description = "Ctrl+R", Border = BorderStyle.Rounded, Padding = Thickness.All(1) };
     private readonly Button _clearButton = new() { Text = "Clear", Description = "Ctrl+E", Border = BorderStyle.Rounded, Padding = Thickness.All(1) };
-    private readonly Button _rulesButton = new() { Text = "Toggle Rules", Description = "Ctrl+D/M", Border = BorderStyle.Rounded, Padding = Thickness.All(1) };
-    private readonly Button _styleButton = new() { Text = "Toggle Style", Description = "Ctrl+T", Border = BorderStyle.Rounded, Padding = Thickness.All(1) };
+    private readonly Button _rulesButton = new() { Text = "Rules", Description = "Ctrl+D/M", Border = BorderStyle.Rounded, Padding = Thickness.All(1) };
+    private readonly Button _readOnlyButton = new() { Text = "ReadOnly", Description = "Ctrl+O", Border = BorderStyle.Rounded, Padding = Thickness.All(1) };
+    private readonly Button _disabledButton = new() { Text = "Disabled", Description = "Ctrl+I", Border = BorderStyle.Rounded, Padding = Thickness.All(1) };
+    private readonly Button _styleButton = new() { Text = "Style", Description = "Ctrl+T", Border = BorderStyle.Rounded, Padding = Thickness.All(1) };
 
     private readonly StatusBar _status = new();
 
     private bool _allowDuplicates;
     private int _maxTags = 6;
+    private bool _isReadOnly;
+    private bool _isDisabled;
     private bool _styleAlt;
     private int _changedCount;
     private int _apiTagCounter;
@@ -127,6 +131,24 @@ internal sealed class TagInputLabApp : TeaApp
             return null;
         }
 
+        if (key.IsCharacter('o', ModifierKeys.Ctrl))
+        {
+            _isReadOnly = !_isReadOnly;
+            ApplyInteractionMode();
+            _statusText = $"read-only -> {_isReadOnly}";
+            _events.Push(_statusText, NotificationLevel.Info);
+            return null;
+        }
+
+        if (key.IsCharacter('i', ModifierKeys.Ctrl))
+        {
+            _isDisabled = !_isDisabled;
+            ApplyInteractionMode();
+            _statusText = $"disabled -> {_isDisabled}";
+            _events.Push(_statusText, NotificationLevel.Info);
+            return null;
+        }
+
         if (key.IsCharacter('a'))
         {
             AddApiTag();
@@ -142,8 +164,8 @@ internal sealed class TagInputLabApp : TeaApp
         RefreshStateView();
 
         _status.LeftText =
-            $"tags={_tagInput.Tags.Count} selected={_tagInput.SelectedTagIndex} changes={_changedCount} dup={_allowDuplicates} max={_maxTags}";
-        _status.RightText = $"{_statusText}  Ctrl+R seed  Ctrl+E clear  Ctrl+D/M rules  Ctrl+T style  Ctrl+C quit";
+            $"tags={_tagInput.Tags.Count} selected={_tagInput.SelectedTagIndex} changes={_changedCount} dup={_allowDuplicates} max={_maxTags} ro={_isReadOnly} dis={_isDisabled}";
+        _status.RightText = $"{_statusText}  Ctrl+R seed  Ctrl+E clear  Ctrl+D/M rules  Ctrl+O read-only  Ctrl+I disable  Ctrl+T style  Ctrl+C quit";
 
         Control statePanel = _tagInput.Tags.Count == 0 ? _emptyState : _stateView;
 
@@ -152,11 +174,13 @@ internal sealed class TagInputLabApp : TeaApp
             Gap = 1,
             Items =
             {
-                new LayoutSlot { Content = _addApiTagButton, Length = 14 },
-                new LayoutSlot { Content = _seedButton, Length = 13 },
+                new LayoutSlot { Content = _addApiTagButton, Length = 11 },
+                new LayoutSlot { Content = _seedButton, Length = 9 },
                 new LayoutSlot { Content = _clearButton, Length = 10 },
-                new LayoutSlot { Content = _rulesButton, Length = 15 },
-                new LayoutSlot { Content = _styleButton, Length = 14 },
+                new LayoutSlot { Content = _rulesButton, Length = 10 },
+                new LayoutSlot { Content = _readOnlyButton, Length = 12 },
+                new LayoutSlot { Content = _disabledButton, Length = 11 },
+                new LayoutSlot { Content = _styleButton, Length = 9 },
             },
         };
 
@@ -227,6 +251,22 @@ internal sealed class TagInputLabApp : TeaApp
             _statusText = _styleAlt ? "style -> alternate" : "style -> default";
             _events.Push(_statusText, NotificationLevel.Info);
         };
+
+        _readOnlyButton.Activated += (_, _) =>
+        {
+            _isReadOnly = !_isReadOnly;
+            ApplyInteractionMode();
+            _statusText = $"read-only -> {_isReadOnly}";
+            _events.Push(_statusText, NotificationLevel.Info);
+        };
+
+        _disabledButton.Activated += (_, _) =>
+        {
+            _isDisabled = !_isDisabled;
+            ApplyInteractionMode();
+            _statusText = $"disabled -> {_isDisabled}";
+            _events.Push(_statusText, NotificationLevel.Info);
+        };
     }
 
     private void ApplyTheme()
@@ -242,6 +282,8 @@ internal sealed class TagInputLabApp : TeaApp
             _seedButton,
             _clearButton,
             _rulesButton,
+            _readOnlyButton,
+            _disabledButton,
             _styleButton,
             _status);
 
@@ -257,6 +299,7 @@ internal sealed class TagInputLabApp : TeaApp
         _tagInput.FocusedTagStyle = selected;
         _tagInput.HoveredTagStyle = accent;
         _tagInput.ErrorTagStyle = theme.State.Error.WithBold();
+        _tagInput.DisabledTagStyle = theme.Text.Muted.WithDim();
         _tagInput.HasError = _tagInput.Tags.Count >= _maxTags;
 
         _emptyState.DefaultStyle = theme.Text.Secondary;
@@ -283,7 +326,15 @@ internal sealed class TagInputLabApp : TeaApp
         _seedButton.LabelStyle = buttonStyle;
         _clearButton.LabelStyle = buttonStyle;
         _rulesButton.LabelStyle = buttonStyle;
+        _readOnlyButton.LabelStyle = buttonStyle;
+        _disabledButton.LabelStyle = buttonStyle;
         _styleButton.LabelStyle = buttonStyle;
+    }
+
+    private void ApplyInteractionMode()
+    {
+        _tagInput.IsReadOnly = _isReadOnly;
+        _tagInput.IsDisabled = _isDisabled;
     }
 
     private void ApplyTagRules()
@@ -337,13 +388,16 @@ internal sealed class TagInputLabApp : TeaApp
             $"Input value: {_tagInput.InputValue}",
             $"Allow duplicates: {_allowDuplicates}",
             $"Max tags: {_maxTags}",
+            $"Read only: {_isReadOnly}",
+            $"Disabled: {_isDisabled}",
             $"Has error flag: {_tagInput.HasError}",
+            "Interaction: Ctrl+O toggles read-only, Ctrl+I toggles disabled",
             "Pointer: click tag chips to select",
             "Keyboard: Enter/comma add, arrows select, backspace/delete remove",
         ]);
     }
 
-    private string BuildInstructionsText()
+    private static string BuildInstructionsText()
     {
         return
             "Focus TagInput and try these:\n"
@@ -352,6 +406,7 @@ internal sealed class TagInputLabApp : TeaApp
             + "3) Click chips with pointer to test selection/focus\n"
             + "4) Ctrl+R seed edge values (duplicates + blanks)\n"
             + "5) Ctrl+D toggle duplicate rule, Ctrl+M toggle max tags\n"
-            + "6) Watch footer + event feed for TagsChanged payload";
+            + "6) Ctrl+O toggle read-only, Ctrl+I toggle disabled\n"
+            + "7) Watch footer + event feed for TagsChanged payload";
     }
 }
