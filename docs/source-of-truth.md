@@ -33,6 +33,7 @@ Unresolved until manually signed off:
 Interpretation rule:
 - “agreement implemented in code” is not equivalent to “RC approved”
 - RC is approved only after the manual signoff items above are marked complete in the master plan/checklist
+- any bug-fix train landed after the checklist evidence SHA (for example pointer/raw-input fixes) invalidates prior candidate evidence for release approval; rerun the checklist/perf gates on the new candidate SHA
 
 ## Product Position
 

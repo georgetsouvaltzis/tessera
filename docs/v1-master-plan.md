@@ -107,12 +107,14 @@ Correctness is a continuous gate across all phases: fix regressions at source an
     - item `2` + item `6` hosting opt-in boundary enforcement follow-up: `83f0258` -> [tests/TeaSharp.Tests/PublicApiBoundaryTests.cs](/Users/georgetsouvaltzis/Projects/playground/teasharp/tests/TeaSharp.Tests/PublicApiBoundaryTests.cs), [docs/public-api-guidelines.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/public-api-guidelines.md)
     - item `5` XML docs gate follow-up for plotting ergonomics surface: `3986c8b` -> [tests/TeaSharp.Tests/PublicApiXmlDocsTests.cs](/Users/georgetsouvaltzis/Projects/playground/teasharp/tests/TeaSharp.Tests/PublicApiXmlDocsTests.cs)
   - latest local API-gate command evidence (March 22, 2026): `dotnet test tests/TeaSharp.Tests --no-restore --nologo --filter "ApiErgonomics|PublicApiBoundary|PublicApiXmlDocs"` PASS (`42/42`), `dotnet test TeaSharp.slnx --no-restore --nologo --tl:off -v minimal` PASS (`TeaSharp.Tests 873/873`, `TeaSharp.IntegrationTests 10/10`)
+  - HEAD delta note: API/RC evidence above is anchored to `3986c8b` (March 22, 2026). Commits through current HEAD `b5f1479` include pointer/raw-input correctness fixes (`4041515`, `054eaa2`, `94f1487`, `906999d`, `206032a`, `738dc65`, `b5abf26`, `64d0a1a`, `0ed53cc`, `cdeb960`, `c2a9cdc`, `e2781dc`, `f3e2c54`). RC verification must be rerun on the final candidate SHA before closure.
   - C4 implementation evidence is complete; explicit checklist owner/date signoff is still required before closing C4
 - **M5: Performance Gate + Benchmarks + Docs Freeze** -> **Pending manual signoff**
   - perf-gate harness scaffolding landed in `35b8fdc` -> [benchmarks/TeaSharp.Benchmarks/SloLatencyBenchmarks.cs](/Users/georgetsouvaltzis/Projects/playground/teasharp/benchmarks/TeaSharp.Benchmarks/SloLatencyBenchmarks.cs), [benchmarks/TeaSharp.Benchmarks/PerfGateRunner.cs](/Users/georgetsouvaltzis/Projects/playground/teasharp/benchmarks/TeaSharp.Benchmarks/PerfGateRunner.cs), [scripts/perf_gate_v1.sh](/Users/georgetsouvaltzis/Projects/playground/teasharp/scripts/perf_gate_v1.sh), [docs/perf-baselines/v1-slo-gate-baseline.json](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/perf-baselines/v1-slo-gate-baseline.json)
   - recent perf slices landed in `78b3024` + `1469de3` (input decoding benchmark coverage + decoder/render allocation improvements)
   - verification evidence capture expanded in `5784559` (full-suite sanity evidence recorded in this plan)
   - latest local run evidence (March 22, 2026): `dotnet build TeaSharp.slnx --no-restore --nologo -v minimal` PASS, `dotnet test TeaSharp.slnx --no-restore --nologo --tl:off -v minimal` PASS (TeaSharp.Tests `873/873`, Integration `10/10`), `dotnet build TeaSharp.Examples.slnx --no-restore --nologo -v minimal` currently blocked by in-flight `ControlPlaneOpsDashboard` compile issues, targeted canonical builds (`HelloWorld`, `CounterForm`, `WorkspaceApp`) PASS, `scripts/smoke_examples_v1.sh 4` PASS (`pass=3 fail=0`)
+  - staleness note: the March 22 snapshot predates the pointer/raw-input fix train listed under M4 (`3986c8b` -> `b5f1479`); checklist/perf/manual signoff rows remain open until rerun evidence is attached for the final RC candidate SHA.
   - latest perf evidence (March 22, 2026): direct gate dry-run PASS via `dotnet benchmarks/TeaSharp.Benchmarks/bin/Release/net10.0/TeaSharp.Benchmarks.dll --perf-gate --baseline docs/perf-baselines/v1-slo-gate-baseline.json --output docs/perf-baselines/latest-slo-gate-result.json --dry-run`; input decoding snapshot from `InputDecodingBenchmarks` = osc clipboard `44.65 ns / 208 B`, osc color `60.15 ns / 136 B`, dcs capability `49.52 ns / 272 B`
   - open script note: `scripts/perf_gate_v1.sh dry-run` intermittently stalls after printing the `dotnet build ...TeaSharp.Benchmarks.csproj...` line with no further output; direct DLL command above is the current deterministic workaround until wrapper behavior is stabilized
   - outstanding: explicit regression-budget pass/fail verdict against the accepted baseline is not yet attached for the final RC candidate SHA
@@ -247,7 +249,7 @@ M4 checklist status snapshot (March 22, 2026):
 
 ## Parallelization Constraints
 - Parallel work is allowed only within the active phase in the authoritative execution order.
-- Current active phase: **M4 API Freeze + Cleanup** (M3 closed).
+- Current active phase: **M4 API Freeze + Cleanup (manual signoff + evidence refresh lane)** (M3 closed).
 - Do not start phase N+1 before phase N exit criteria are satisfied.
 - Within a phase:
   - parallelize only with disjoint file ownership.

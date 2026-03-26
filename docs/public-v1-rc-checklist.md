@@ -77,7 +77,7 @@ Do not mark a checkbox complete unless command output/evidence is attached.
 
 ## Remaining-To-Ship Snapshot (HEAD Audit)
 
-Audit basis: current checklist state + [v1-master-plan.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/v1-master-plan.md) gate rows + recent HEAD history through `f3e2c54` and `b5f1479`.
+Audit basis: current checklist state + [v1-master-plan.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/v1-master-plan.md) gate rows + recent HEAD history through `e2781dc`, `f3e2c54`, and `b5f1479`.
 
 ### Implemented (landed and evidenced)
 
