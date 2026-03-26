@@ -1,5 +1,11 @@
 # ConsumerTelemetryLab Friction Notes
 
+## Pre-RC follow-up: DataForm keyed selection
+
+- New additive public API available: `DataForm<T>.SelectField(string key)`.
+- Relevance to this app: indirect only (this app currently uses list/table drilldowns, not `DataForm`).
+- Outcome: form-focused consumers can now select fields by stable key without index coupling.
+
 ## 1) Incident table drilldown cannot hard-select a row by API
 
 - Current workaround in app:

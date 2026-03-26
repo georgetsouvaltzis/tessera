@@ -95,6 +95,57 @@ public sealed class DataFormControlTests
     }
 
     [Test]
+    public void Controls_DataForm_SelectFieldByKey_SelectsMatchingFieldAndRaisesSelectionChanged()
+    {
+        var model = new TestModel { Name = "A", Email = "B", Team = "C" };
+        var control = new DataForm<TestModel>
+        {
+            Border = BorderStyle.None,
+            Title = string.Empty,
+        };
+        control.RegisterField("name", "Name", m => m.Name, (m, value) => m.Name = value);
+        control.RegisterField("email", "Email", m => m.Email, (m, value) => m.Email = value);
+        control.RegisterField("team", "Team", m => m.Team, (m, value) => m.Team = value);
+        control.SetModel(model);
+
+        DataFormSelectionChangedEventArgs<TestModel>? changed = null;
+        control.SelectionChanged += (_, args) => changed = args;
+
+        var selected = control.SelectField("team");
+
+        Assert.That(selected, Is.True);
+        Assert.That(control.SelectedIndex, Is.EqualTo(2));
+        Assert.That(control.SelectedField?.Key, Is.EqualTo("team"));
+        Assert.That(changed, Is.Not.Null);
+        Assert.That(changed!.PreviousField?.Key, Is.EqualTo("name"));
+        Assert.That(changed.SelectedField?.Key, Is.EqualTo("team"));
+    }
+
+    [Test]
+    public void Controls_DataForm_SelectFieldByKey_ReturnsFalse_WhenMissingOrAlreadySelected()
+    {
+        var model = new TestModel { Name = "A", Email = "B" };
+        var control = new DataForm<TestModel>
+        {
+            Border = BorderStyle.None,
+            Title = string.Empty,
+        };
+        control.RegisterField("name", "Name", m => m.Name, (m, value) => m.Name = value);
+        control.RegisterField("email", "Email", m => m.Email, (m, value) => m.Email = value);
+        control.SetModel(model);
+
+        var missing = control.SelectField("missing");
+        var alreadySelected = control.SelectField("name");
+        var moved = control.SelectField("email");
+        var alreadySelectedAfterMove = control.SelectField("email");
+
+        Assert.That(missing, Is.False);
+        Assert.That(alreadySelected, Is.False);
+        Assert.That(moved, Is.True);
+        Assert.That(alreadySelectedAfterMove, Is.False);
+    }
+
+    [Test]
     public void Controls_DataForm_DefaultRender_IsDeterministicAndMonochrome()
     {
         var model = new TestModel { Name = "Alice", Email = string.Empty };

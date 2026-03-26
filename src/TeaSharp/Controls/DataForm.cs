@@ -224,6 +224,29 @@ public sealed class DataForm<TModel> : Control
         return true;
     }
 
+    /// <summary>
+    /// Selects the first field with a matching <see cref="DataFormField{TModel}.Key"/>.
+    /// </summary>
+    /// <param name="key">Stable field key to select.</param>
+    /// <returns>
+    /// <see langword="true"/> when a matching field exists and selection changed;
+    /// otherwise <see langword="false"/>.
+    /// </returns>
+    public bool SelectField(string key)
+    {
+        ArgumentNullException.ThrowIfNull(key);
+
+        for (var index = 0; index < _fields.Count; index++)
+        {
+            if (string.Equals(_fields[index].Key, key, StringComparison.Ordinal))
+            {
+                return SelectField(index);
+            }
+        }
+
+        return false;
+    }
+
     /// <summary>Selects next field.</summary>
     public bool NextField() => SelectField(_selectedIndex + 1);
 
