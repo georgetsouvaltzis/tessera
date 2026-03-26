@@ -75,6 +75,43 @@ Do not mark a checkbox complete unless command output/evidence is attached.
   - check: default path remains `Tea.RunAsync(...)` / `Tea.CreateBuilder().UseApp<TApp>()`
   - evidence: `Docs continue to enforce no-DI default onboarding path.`
 
+## Remaining-To-Ship Snapshot (HEAD Audit)
+
+Audit basis: current checklist state + [v1-master-plan.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/v1-master-plan.md) gate rows + recent HEAD history through `f3e2c54` and `b5f1479`.
+
+### Implemented (landed and evidenced)
+
+- M1 terminal compatibility matrix: done.
+- M2 widget expansion tranche: done.
+- M3 visual polish gate: done.
+- M4 implementation evidence: complete (still pending owner/date signoff closure).
+- Runtime pointer-policy correctness hardening landed in HEAD history (double-click focus transfer, hover-only motion, sticky mouse capability, non-raw CSI byte-stream input path).
+- Core verification evidence is green for `TeaSharp.slnx` build/test + canonical onboarding builds/smoke.
+
+### Pending Manual Signoff (release-gating)
+
+- RC metadata ownership fields still open (`RC tag/branch`, `Owner`).
+- M4 checklist closure still requires explicit owner/date signoff evidence.
+- M5 closure still requires explicit owner/date signoff evidence:
+  - RC checklist closure
+  - verification matrix rerun on final RC candidate SHA
+  - perf gate approval vs accepted baseline for final RC candidate SHA
+  - docs-freeze coherence approval
+- Final signoff rows remain open:
+  - Engineering sign-off
+  - Product/release sign-off
+  - RC approved for publish
+
+### Still Technically Blocked (current workspace state)
+
+- Full examples solution build (`TeaSharp.Examples.slnx --no-restore`) remains blocked by in-flight `ControlPlaneOpsDashboard` issues (`NETSDK1004` missing assets under no-restore and `CS0246` unresolved `ScreenContext`/`Screen`).
+- `scripts/perf_gate_v1.sh dry-run` is intermittently stalled after benchmark build line emission; direct benchmark DLL perf-gate command is the active deterministic workaround.
+
+### Nice-To-Have (Not V1-Gating)
+
+- `ControlPlaneOpsDashboard` net-new friction items are documented as P2 ergonomic follow-ups in [public-api-consumer-friction-log.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/public-api-consumer-friction-log.md): `ScatterPlot` frame-style parity, `LogView.AppendLine` alias discoverability, theme-token naming crosswalk clarity.
+- Native-host manual verification on terminals not installed on this machine (iTerm2/WezTerm/Kitty/Windows Terminal) remains useful for confidence but is not currently modeled as an open V1 gate because deterministic tests/spec evidence is already attached.
+
 ## Sign-off (placeholder)
 
 - [ ] Engineering sign-off: `<fill>`
