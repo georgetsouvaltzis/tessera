@@ -44,10 +44,10 @@ For each component or tightly-related component family:
 
 ## Current Loop
 
-- Active component: `TagInput`
-- Human lab target: `examples/TagInput`
+- Active component: `TokenEditor`
+- Human lab target: `examples/TokenEditor`
 - Owner lane: `Owner Lane A - Input + Selection`
-- Round goal: single-widget example layout is in place; manual test steps and visual-review readiness are ready for user review
+- Round goal: land the strict widget-only `TokenEditor` lab, verify public-api ergonomics, and prepare manual test steps for visual review
 
 ## Matrix
 
@@ -58,7 +58,7 @@ For each component or tightly-related component family:
 | `Choice` | `Owner Lane A` | Environment selector with keyboard + pointer open/select flow. | `examples/Choice` | `Not Started` | `Not Started` | `Not Started` | `Not Started` | |
 | `ComboBox` | `Owner Lane A` | Region picker with type-to-filter and explicit selection summary. | `examples/ComboBox` | `Not Started` | `Not Started` | `Not Started` | `Not Started` | |
 | `TagInput` | `Owner Lane A` | Incident label editor: add, dedupe, cap, remove, pointer select, style toggle. | `examples/TagInput` | `Approved` | `Approved` | `Not Started` | `Ready To Test` | Footer steps now explicitly prove `SetTags`/`AddTag`/`RemoveTagAt`, wrapped vertical growth, and pointer selection on wrapped rows. |
-| `TokenEditor` | `Owner Lane A` | Assignee/chip editor with selection and token mutation feed. | `examples/TokenEditor` | `Not Started` | `Not Started` | `Not Started` | `Not Started` | Next after `TagInput`. |
+| `TokenEditor` | `Owner Lane A` | Assignee/chip editor with selection and token mutation feed. | `examples/TokenEditor` | `Approved` | `Approved` | `Not Started` | `Ready To Test` | Widget-only lab landed; footer proves typing, selection, delete, glyph/style seam, disabled-token styling, and `SetTokens`/`AddToken`/`RemoveSelectedToken`. |
 | `AutocompleteInput` | `Owner Lane A` | Command/search suggestion bar with commit and fallback typing. | `examples/AutocompleteInput` | `Not Started` | `Not Started` | `Not Started` | `Not Started` | |
 | `ListView<T>` | `Owner Lane B` | Simple queue list with programmatic reselect and detail pane. | `examples/ListView` | `Not Started` | `Not Started` | `Not Started` | `Not Started` | |
 | `Table` | `Owner Lane B` | Service table with row selection, mutation, and drilldown summary. | `examples/Table` | `Not Started` | `Not Started` | `Not Started` | `Not Started` | |
