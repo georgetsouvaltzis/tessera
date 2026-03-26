@@ -150,6 +150,55 @@ public sealed class Choice : Control
         RaiseSelectionChangedIfNeeded(previousIndex, previousItem);
     }
 
+    /// <summary>
+    /// Sets the selected item index using bounds clamping.
+    /// </summary>
+    /// <param name="index">The requested index.</param>
+    /// <returns><see langword="true"/> when selection changed; otherwise <see langword="false"/>.</returns>
+    public bool SetSelectedIndex(int index)
+    {
+        if (_options.Count == 0)
+        {
+            return false;
+        }
+
+        var clamped = Math.Clamp(index, 0, _options.Count - 1);
+        var previousIndex = SelectedIndex;
+        var previousItem = SelectedItem;
+        var changed = _options.SetSelectedIndex(clamped);
+        if (!changed)
+        {
+            return false;
+        }
+
+        _options.AlignHighlightToSelectionOrStart();
+        RaiseSelectionChanged(previousIndex, previousItem);
+        return true;
+    }
+
+    /// <summary>
+    /// Attempts to select the first item matching <paramref name="item"/> using ordinal comparison.
+    /// </summary>
+    /// <param name="item">The item value to select.</param>
+    /// <returns><see langword="true"/> when selection changed; otherwise <see langword="false"/>.</returns>
+    public bool TrySetSelectedItem(string item)
+    {
+        if (item is null)
+        {
+            return false;
+        }
+
+        for (var index = 0; index < _options.Items.Count; index++)
+        {
+            if (string.Equals(_options.Items[index], item, StringComparison.Ordinal))
+            {
+                return SetSelectedIndex(index);
+            }
+        }
+
+        return false;
+    }
+
     public override bool Handle(Message message)
     {
         if (!IsFocused || IsDisabled || IsReadOnly || _options.Count == 0 || message is not KeyPressed key)

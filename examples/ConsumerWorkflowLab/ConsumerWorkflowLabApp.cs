@@ -641,8 +641,8 @@ internal sealed class ConsumerWorkflowLabApp : TeaApp
             $"Validation warnings: {warningCount}",
             $"Approver set: {(!string.IsNullOrWhiteSpace(_approver) ? "yes" : "no")}",
             $"Ticket format ok: {(_draft.ChangeTicket.StartsWith("CHG-", StringComparison.OrdinalIgnoreCase) ? "yes" : "no")}",
-            $"Choice workaround runs: {_choiceStressIndex}",
-            $"Combo workaround runs: {_comboStressIndex}",
+            $"Choice selection API runs: {_choiceStressIndex}",
+            $"ComboBox selection API runs: {_comboStressIndex}",
             $"DataForm key-map jumps: {_dataFormStressIndex}",
         ]);
 
@@ -985,7 +985,7 @@ internal sealed class ConsumerWorkflowLabApp : TeaApp
         var target = EnvironmentOptions[_choiceStressIndex % EnvironmentOptions.Length];
         _choiceStressIndex++;
         var success = ForceChoiceSelection(target);
-        AppendSelectionTrace($"choice workaround ({source}) -> {target} ({(success ? "ok" : "failed")})");
+        AppendSelectionTrace($"choice selection API ({source}) -> {target} ({(success ? "ok" : "failed")})");
     }
 
     private void CycleComboSelection(string source)
@@ -993,7 +993,7 @@ internal sealed class ConsumerWorkflowLabApp : TeaApp
         var target = TemplateOptions[_comboStressIndex % TemplateOptions.Length];
         _comboStressIndex++;
         var success = ForceComboSelection(target);
-        AppendSelectionTrace($"combo workaround ({source}) -> {target} ({(success ? "ok" : "failed")})");
+        AppendSelectionTrace($"combo selection API ({source}) -> {target} ({(success ? "ok" : "failed")})");
     }
 
     private void CycleDataFormSelection(string source)
@@ -1022,35 +1022,8 @@ internal sealed class ConsumerWorkflowLabApp : TeaApp
             return true;
         }
 
-        var previousFocus = _environmentChoice.IsFocused;
-        _environmentChoice.IsFocused = true;
-
-        _environmentChoice.Handle(new KeyPressed(Key.Enter));
-        var currentIndex = Array.IndexOf(EnvironmentOptions, _environmentChoice.SelectedItem);
-        if (currentIndex < 0)
-        {
-            currentIndex = 0;
-        }
-
-        var targetIndex = Array.IndexOf(EnvironmentOptions, target);
-        var forwardSteps = (targetIndex - currentIndex + EnvironmentOptions.Length) % EnvironmentOptions.Length;
-        for (var step = 0; step < forwardSteps; step++)
-        {
-            _environmentChoice.Handle(new KeyPressed(Key.Down));
-        }
-
-        _environmentChoice.Handle(new KeyPressed(Key.Enter));
-        _environmentChoice.IsFocused = previousFocus;
-
-        if (string.Equals(_environmentChoice.SelectedItem, target, StringComparison.Ordinal))
-        {
-            return true;
-        }
-
-        // Fallback workaround: reset items to empty and reapply with preferred item first.
-        _environmentChoice.SetItems(Array.Empty<string>());
-        _environmentChoice.SetItems(BuildPreferredFirstOrder(target, EnvironmentOptions));
-        return string.Equals(_environmentChoice.SelectedItem, target, StringComparison.Ordinal);
+        return _environmentChoice.TrySetSelectedItem(target)
+            || string.Equals(_environmentChoice.SelectedItem, target, StringComparison.Ordinal);
     }
 
     private bool ForceComboSelection(string target)
@@ -1065,27 +1038,8 @@ internal sealed class ConsumerWorkflowLabApp : TeaApp
             return true;
         }
 
-        var previousFocus = _templateCombo.IsFocused;
-        _templateCombo.IsFocused = true;
-        _templateCombo.SetFilterText(target);
-        _templateCombo.Handle(new KeyPressed(Key.Down));
-        _templateCombo.Handle(new KeyPressed(Key.Enter));
-        _templateCombo.SetFilterText(string.Empty);
-        _templateCombo.IsFocused = previousFocus;
-
-        if (string.Equals(_templateCombo.SelectedItem, target, StringComparison.Ordinal))
-        {
-            return true;
-        }
-
-        // Fallback workaround: reorder items with target first, then synthesize down+enter.
-        _templateCombo.SetItems(Array.Empty<string>());
-        _templateCombo.SetItems(BuildPreferredFirstOrder(target, TemplateOptions));
-        _templateCombo.IsFocused = true;
-        _templateCombo.Handle(new KeyPressed(Key.Down));
-        _templateCombo.Handle(new KeyPressed(Key.Enter));
-        _templateCombo.IsFocused = previousFocus;
-        return string.Equals(_templateCombo.SelectedItem, target, StringComparison.Ordinal);
+        return _templateCombo.TrySetSelectedItem(target)
+            || string.Equals(_templateCombo.SelectedItem, target, StringComparison.Ordinal);
     }
 
     private bool SelectDataFormFieldByKey(string key)
@@ -1154,22 +1108,6 @@ internal sealed class ConsumerWorkflowLabApp : TeaApp
         _statusText = $"template applied -> {templateName}";
         AppendActivity($"Applied template ({reason}): {templateName}");
         RunValidation("template-applied");
-    }
-
-    private static string[] BuildPreferredFirstOrder(string preferred, IReadOnlyList<string> source)
-    {
-        var ordered = new List<string>(source.Count);
-        ordered.Add(preferred);
-        for (var index = 0; index < source.Count; index++)
-        {
-            var item = source[index];
-            if (!string.Equals(item, preferred, StringComparison.Ordinal))
-            {
-                ordered.Add(item);
-            }
-        }
-
-        return [.. ordered];
     }
 
     private static int ParseRollout(string raw)
