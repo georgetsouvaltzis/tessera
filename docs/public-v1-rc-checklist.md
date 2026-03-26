@@ -47,6 +47,7 @@ Do not mark a checkbox complete unless command output/evidence is attached.
 - [ ] Regression budget check completed vs previous baseline
   - baseline doc: `docs/perf-baseline-v1.md` (`before: d30df85076ee`, `after: 842aaaf8ba64`)
   - latest accepted evidence: `PASS` (`worst time regression: +1.51%`, `worst alloc regression: +0.00%`, all six gate scenarios pass in both modes; input latency p95 budget remains not measured in that shortlist lane)
+  - latest SLO gate evidence at current `HEAD` (`b5f1479`): `dotnet benchmarks/TeaSharp.Benchmarks/bin/Release/net10.0/TeaSharp.Benchmarks.dll --perf-gate --baseline docs/perf-baselines/v1-slo-gate-baseline.json --output docs/perf-baselines/latest-slo-gate-result.json` -> `Status: pass` (`startup p95: 0.282 ms`, `input normal p95: 0.132 ms`, `input heavy p95: 6.741 ms`, generated `2026-03-26T08:00:09.196138+00:00`)
   - pending for RC closure: rerun and attach explicit budget verdict for final RC candidate SHA.
 
 ## Docs and Public API Commenting
@@ -129,6 +130,7 @@ Audit basis: current checklist state + [v1-master-plan.md](/Users/georgetsouvalt
 - `scripts/smoke_examples_v1.sh 4` -> `PASS HelloWorld`, `PASS CounterForm`, `PASS WorkspaceApp`, `SUMMARY pass=3 fail=0` (bounded startup probe; processes intentionally terminated after 4s).
 - `dotnet run --project benchmarks/TeaSharp.Benchmarks/TeaSharp.Benchmarks.csproj --no-build -- --list flat` -> listed 20 benchmark entries (`render`, `render-only`, SLO, and input decoding suites).
 - `scripts/perf_gate_v1.sh dry-run` -> intermittent wrapper stall reproduced: command prints the benchmark `dotnet build ...TeaSharp.Benchmarks.csproj...` line and may not progress.
-- `dotnet benchmarks/TeaSharp.Benchmarks/bin/Release/net10.0/TeaSharp.Benchmarks.dll --perf-gate --baseline docs/perf-baselines/v1-slo-gate-baseline.json --output docs/perf-baselines/latest-slo-gate-result.json --dry-run` -> `Status: dry-run`, all SLO scenarios `Pass: true`; artifact updated at `2026-03-22T15:10:24.457564+00:00`.
+- `dotnet benchmarks/TeaSharp.Benchmarks/bin/Release/net10.0/TeaSharp.Benchmarks.dll --perf-gate --baseline docs/perf-baselines/v1-slo-gate-baseline.json --output docs/perf-baselines/latest-slo-gate-result.json --dry-run` -> `Status: dry-run`, all SLO scenarios `Pass: true`; artifact updated at `2026-03-26T07:59:39.470008+00:00`.
+- `dotnet benchmarks/TeaSharp.Benchmarks/bin/Release/net10.0/TeaSharp.Benchmarks.dll --perf-gate --baseline docs/perf-baselines/v1-slo-gate-baseline.json --output docs/perf-baselines/latest-slo-gate-result.json` -> `Status: pass`; SLO scenarios `Pass: true` (`startup p95: 0.282 ms`, `input normal p95: 0.132 ms`, `input heavy p95: 6.741 ms`); artifact updated at `2026-03-26T08:00:09.196138+00:00`.
 - `dotnet benchmarks/TeaSharp.Benchmarks/bin/Release/net10.0/TeaSharp.Benchmarks.dll --inProcess --filter "*InputDecodingBenchmarks*"` -> osc clipboard `44.65 ns / 208 B`, osc color `60.15 ns / 136 B`, dcs capability `49.52 ns / 272 B`.
 - regression budget decision reference (latest accepted baseline comparison): [perf-baseline-v1.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/perf-baseline-v1.md) remains `PASS` (`worst time regression: +1.51%`, `worst alloc regression: +0.00%`); final RC-candidate rerun still pending manual signoff.
