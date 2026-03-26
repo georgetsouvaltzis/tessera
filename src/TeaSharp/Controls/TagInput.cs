@@ -367,40 +367,16 @@ public sealed partial class TagInput : Control
     }
     private int HitTagIndex(int pointerX, Rect content)
     {
-        var inputAreaWidth = ResolveVisibleInputAreaWidth(content.Width);
-        var renderTagArea = _tags.Count > 0 && inputAreaWidth < content.Width;
-        var gapWidth = renderTagArea && content.Width - inputAreaWidth > 1 ? 1 : 0;
-        var tagAreaWidth = Math.Max(0, content.Width - inputAreaWidth - gapWidth);
-        if (tagAreaWidth <= 0 || pointerX < content.X || pointerX >= content.X + tagAreaWidth)
-        {
-            return -1;
-        }
-
-        var (start, end) = ResolveVisibleTagWindow(tagAreaWidth);
-        if (start < 0 || end < start)
+        var layout = ResolveInlineFlowLayout(content.Width);
+        if (layout.VisibleTagCount == 0 || pointerX < content.X || pointerX >= content.X + layout.InputX)
         {
             return -1;
         }
 
         var cursor = content.X;
-        var right = content.X + tagAreaWidth;
-        if (start > 0)
+        for (var index = 0; index < layout.VisibleTagCount; index++)
         {
-            var leftIndicatorWidth = ControlTextLayout.MeasureDisplayWidth(OverflowIndicator);
-            if (pointerX >= cursor && pointerX < cursor + leftIndicatorWidth)
-            {
-                return -1;
-            }
-
-            cursor += leftIndicatorWidth;
-        }
-
-        var rightIndicatorColumn = end < _tags.Count - 1
-            ? right - ControlTextLayout.MeasureDisplayWidth(OverflowIndicator)
-            : right;
-        for (var index = start; index <= end && cursor < rightIndicatorColumn; index++)
-        {
-            if (index > start)
+            if (index > 0)
             {
                 if (pointerX == cursor)
                 {
@@ -411,7 +387,7 @@ public sealed partial class TagInput : Control
             }
 
             var tagWidth = MeasureTagWidth(index);
-            var visibleRight = Math.Min(rightIndicatorColumn, cursor + tagWidth);
+            var visibleRight = cursor + tagWidth;
             if (pointerX >= cursor && pointerX < visibleRight)
             {
                 return index;

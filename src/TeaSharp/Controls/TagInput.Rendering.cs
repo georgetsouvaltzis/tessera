@@ -13,6 +13,8 @@ public sealed partial class TagInput
     private const int MinimumVisibleInputWidth = 8;
     private const string OverflowIndicator = "…";
 
+    private readonly record struct InlineFlowLayout(int VisibleTagCount, bool ShowOverflow, int InputX, int InputWidth);
+
     public override void Render(Canvas canvas, Rect rect)
     {
         var clipped = Rect.Intersect(rect, canvas.Bounds);
@@ -69,65 +71,45 @@ public sealed partial class TagInput
 
     private void RenderSingleLine(Canvas canvas, Rect content)
     {
-        var inputAreaWidth = ResolveVisibleInputAreaWidth(content.Width);
-        var renderTagArea = _tags.Count > 0 && inputAreaWidth < content.Width;
-        var gapWidth = renderTagArea && content.Width - inputAreaWidth > 1 ? 1 : 0;
-        var tagAreaWidth = Math.Max(0, content.Width - inputAreaWidth - gapWidth);
-        var inputX = content.Right - inputAreaWidth;
-
-        if (tagAreaWidth > 0)
-        {
-            RenderTags(canvas, content.X, content.Y, tagAreaWidth);
-        }
-
-        if (gapWidth > 0)
-        {
-            canvas.Set(inputX - 1, content.Y, ' ');
-        }
-
-        RenderInput(canvas, inputX, content.Y, inputAreaWidth);
+        var layout = ResolveInlineFlowLayout(content.Width);
+        RenderTags(canvas, content.X, content.Y, layout);
+        RenderInput(canvas, content.X + layout.InputX, content.Y, layout.InputWidth);
     }
 
-    private void RenderTags(Canvas canvas, int x, int y, int width)
+    private void RenderTags(Canvas canvas, int x, int y, InlineFlowLayout layout)
     {
-        if (width <= 0 || _tags.Count == 0)
+        if ((layout.VisibleTagCount == 0 && !layout.ShowOverflow) || _tags.Count == 0)
         {
             return;
         }
 
-        var (start, end) = ResolveVisibleTagWindow(width);
-        if (start < 0 || end < start)
-        {
-            RenderTextSegment(canvas, x, y, OverflowIndicator, ResolveBorderStyleText(), width);
-            return;
-        }
-
-        var showLeftOverflow = start > 0;
-        var showRightOverflow = end < _tags.Count - 1;
         var cursor = x;
-        var right = x + width;
-
-        if (showLeftOverflow && cursor < right)
+        for (var index = 0; index < layout.VisibleTagCount; index++)
         {
-            cursor += RenderTextSegment(canvas, cursor, y, OverflowIndicator, ResolveBorderStyleText(), right - cursor);
-        }
-
-        var rightIndicatorColumn = showRightOverflow ? right - 1 : right;
-        for (var index = start; index <= end && cursor < rightIndicatorColumn; index++)
-        {
-            if (index > start && cursor < rightIndicatorColumn)
+            if (index > 0)
             {
                 canvas.Set(cursor, y, ' ');
                 cursor++;
             }
 
             var token = BuildTagToken(_tags[index]);
-            cursor += RenderTextSegment(canvas, cursor, y, token, ResolveTagStyle(index), rightIndicatorColumn - cursor);
+            cursor += RenderTextSegment(canvas, cursor, y, token, ResolveTagStyle(index), layout.InputX - (cursor - x));
         }
 
-        if (showRightOverflow && right - 1 >= x)
+        if (layout.ShowOverflow)
         {
-            RenderTextSegment(canvas, right - 1, y, OverflowIndicator, ResolveBorderStyleText(), 1);
+            if (cursor > x)
+            {
+                canvas.Set(cursor, y, ' ');
+                cursor++;
+            }
+
+            cursor += RenderTextSegment(canvas, cursor, y, OverflowIndicator, ResolveBorderStyleText(), 1);
+        }
+
+        if (layout.InputX > 0 && cursor < x + layout.InputX)
+        {
+            canvas.Set(cursor, y, ' ');
         }
     }
 
@@ -186,77 +168,107 @@ public sealed partial class TagInput
         return Math.Clamp(desiredInnerWidth + (inputPadding * 2), 1, maxInputWidth);
     }
 
-    private (int Start, int End) ResolveVisibleTagWindow(int availableWidth)
+    private InlineFlowLayout ResolveInlineFlowLayout(int totalWidth)
     {
-        if (_tags.Count == 0 || availableWidth <= 0)
+        if (totalWidth <= 0)
         {
-            return (-1, -1);
+            return default;
         }
 
-        if (_input.Value.Length == 0 && _selectedTagIndex >= 0 && _selectedTagIndex < _tags.Count)
+        if (_tags.Count == 0)
         {
-            return FitVisibleTagsAroundSelection(_selectedTagIndex, availableWidth);
+            return new InlineFlowLayout(0, false, 0, totalWidth);
         }
 
-        return FitTrailingVisibleTags(availableWidth);
+        var minimumInlineInputWidth = ResolveMinimumInlineInputWidth(totalWidth);
+        var visibleTagCount = ResolveVisibleTagCount(totalWidth, minimumInlineInputWidth);
+        var prefixWidth = MeasureVisiblePrefixWidth(visibleTagCount);
+        var showOverflow = visibleTagCount < _tags.Count
+            && ResolveTotalInlineWidth(prefixWidth, hasHiddenTags: true, minimumInlineInputWidth) <= totalWidth;
+
+        var inputX = prefixWidth;
+        if (showOverflow)
+        {
+            if (inputX > 0)
+            {
+                inputX++;
+            }
+
+            inputX += ControlTextLayout.MeasureDisplayWidth(OverflowIndicator);
+        }
+
+        if (inputX > 0)
+        {
+            inputX++;
+        }
+
+        inputX = Math.Min(inputX, totalWidth - 1);
+        return new InlineFlowLayout(
+            visibleTagCount,
+            showOverflow,
+            inputX,
+            Math.Max(1, totalWidth - inputX));
     }
 
-    private (int Start, int End) FitTrailingVisibleTags(int availableWidth)
+    private int ResolveVisibleTagCount(int totalWidth, int minimumInlineInputWidth)
     {
-        var end = _tags.Count - 1;
-        var start = end;
-        var used = 0;
-
-        for (var index = end; index >= 0; index--)
+        var visibleTagCount = 0;
+        var prefixWidth = 0;
+        for (var index = 0; index < _tags.Count; index++)
         {
-            var nextWidth = MeasureTagWidth(index) + (index == end ? 0 : 1);
-            if (used > 0 && used + nextWidth > availableWidth)
+            var nextPrefixWidth = prefixWidth + (visibleTagCount > 0 ? 1 : 0) + MeasureTagWidth(index);
+            var hasHiddenTags = index < _tags.Count - 1;
+            if (ResolveTotalInlineWidth(nextPrefixWidth, hasHiddenTags, minimumInlineInputWidth) > totalWidth)
             {
                 break;
             }
 
-            used += nextWidth;
-            start = index;
-            if (used >= availableWidth)
-            {
-                break;
-            }
+            prefixWidth = nextPrefixWidth;
+            visibleTagCount++;
         }
 
-        return (start, end);
+        return visibleTagCount;
     }
 
-    private (int Start, int End) FitVisibleTagsAroundSelection(int selectedIndex, int availableWidth)
+    private int ResolveMinimumInlineInputWidth(int totalWidth)
     {
-        var start = selectedIndex;
-        var end = selectedIndex;
-        var used = MeasureTagWidth(selectedIndex);
+        var inputPadding = Math.Max(0, InputPadding);
+        return Math.Clamp((inputPadding * 2) + 1, 1, totalWidth);
+    }
 
-        for (var index = selectedIndex + 1; index < _tags.Count; index++)
+    private int MeasureVisiblePrefixWidth(int visibleTagCount)
+    {
+        var width = 0;
+        for (var index = 0; index < visibleTagCount; index++)
         {
-            var nextWidth = MeasureTagWidth(index) + 1;
-            if (used + nextWidth > availableWidth)
+            width += MeasureTagWidth(index);
+            if (index > 0)
             {
-                break;
+                width++;
             }
-
-            used += nextWidth;
-            end = index;
         }
 
-        for (var index = selectedIndex - 1; index >= 0; index--)
-        {
-            var nextWidth = MeasureTagWidth(index) + 1;
-            if (used + nextWidth > availableWidth)
-            {
-                break;
-            }
+        return width;
+    }
 
-            used += nextWidth;
-            start = index;
+    private static int ResolveTotalInlineWidth(int prefixWidth, bool hasHiddenTags, int minimumInputWidth)
+    {
+        var width = prefixWidth + minimumInputWidth;
+        if (hasHiddenTags)
+        {
+            width += ControlTextLayout.MeasureDisplayWidth(OverflowIndicator);
+            if (prefixWidth > 0)
+            {
+                width++;
+            }
         }
 
-        return (start, end);
+        if (prefixWidth > 0 || hasHiddenTags)
+        {
+            width++;
+        }
+
+        return width;
     }
 
     private int MeasureTagWidth(int index)

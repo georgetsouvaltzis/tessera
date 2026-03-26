@@ -1,4 +1,5 @@
 using NUnit.Framework;
+using System.Text.RegularExpressions;
 using TeaSharp.Components.Primitives;
 using TeaSharp.Controls;
 using TeaSharp.Styles;
@@ -163,6 +164,26 @@ public sealed class TagInputControlTests
 
         TestAssert.True(output.Contains("38;2;71;72;73", StringComparison.Ordinal), "Placeholder style should render.");
         TestAssert.True(output.Contains("  tag  ", StringComparison.Ordinal), "Input padding should surround the placeholder text.");
+        TestAssert.Equal(1, output.Split("tag", StringSplitOptions.None).Length - 1, "Placeholder text should render exactly once.");
+    }
+
+    [Test]
+    public void Controls_TagInput_EmptyFocusedState_StartsInputAtLeftOrigin()
+    {
+        var control = new TagInput
+        {
+            IsFocused = true,
+            Border = BorderStyle.None,
+            InputPadding = 1,
+            Placeholder = "tag",
+            CaretGlyph = "|",
+        };
+        var canvas = new Canvas(12, 2, CanvasTextMode.GraphemeAware);
+
+        control.Render(canvas, new Rect(0, 0, 12, 2));
+        var output = StripAnsi(canvas.Render());
+
+        TestAssert.True(output.StartsWith(" |ag", StringComparison.Ordinal), "Empty focused state should start from the left padded input origin.");
     }
 
     [Test]
@@ -211,7 +232,8 @@ public sealed class TagInputControlTests
         var output = canvas.Render();
 
         TestAssert.True(output.Contains("…", StringComparison.Ordinal), "Overflow indicator should render when tags exceed width.");
-        TestAssert.True(output.Contains("didate", StringComparison.Ordinal), "Visible input tail should remain rendered when tags overflow.");
+        TestAssert.True(output.Contains("alpha", StringComparison.Ordinal), "Visible tag flow should start from the left-most chip.");
+        TestAssert.True(output.Contains("idate", StringComparison.Ordinal), "Visible input tail should remain rendered when tags overflow.");
         TestAssert.True(output.Contains("|", StringComparison.Ordinal), "Caret glyph should remain visible in the input area.");
         TestAssert.True(output.Contains("38;2;81;82;83", StringComparison.Ordinal), "Caret style should render.");
     }
@@ -235,5 +257,10 @@ public sealed class TagInputControlTests
 
         TestAssert.Equal(first, second, "Tag input render should be deterministic.");
         TestAssert.True(!first.Contains("\u001b[", StringComparison.Ordinal), "Default tag input should render monochrome output.");
+    }
+
+    private static string StripAnsi(string value)
+    {
+        return Regex.Replace(value, "\u001B\\[[0-9;]*m", string.Empty);
     }
 }
