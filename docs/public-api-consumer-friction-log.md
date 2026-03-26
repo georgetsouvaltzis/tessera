@@ -1,6 +1,6 @@
 # Public API Consumer Friction Log
 
-Context: consumer-centric pass re-checked against current `examples/PublicApiDashboard` and latest control/theme commits.
+Context: consumer-centric pass re-checked against `examples/PublicApiDashboard` plus proof-loop consumers (`ConsumerTelemetryLab`, `ConsumerWorkflowLab`, `ConsumerOpsStudio`) and latest control/theme commits.
 
 ## Status Matrix
 
@@ -10,7 +10,10 @@ Context: consumer-centric pass re-checked against current `examples/PublicApiDas
 | Dialog result handling shape | Resolved | Typed `Closed` event landed; consumers can branch on one event payload (`DialogResult`) instead of wiring both events manually. | `184e3ae`, `src/TeaSharp/Controls/Dialog.cs:32`, `src/TeaSharp/Controls/DialogClosedEventArgs.cs`, `tests/TeaSharp.Tests/DialogClosedEventTests.cs` |
 | Table data binding loop | Resolved | Incremental row mutation APIs landed (`AddRow`, `ReplaceRow`, `RemoveRowAt`, `ClearRows`) while keeping `SetRows`. | `ff557e6`, `src/TeaSharp/Controls/Table.cs:191`, `src/TeaSharp/Controls/Table.cs:206`, `src/TeaSharp/Controls/Table.cs:220`, `tests/TeaSharp.Tests/TableRowMutationApiTests.cs` |
 | Table selection state/event access | Resolved | Additive table selection APIs landed for external synchronization (`SelectedRowIndex`, `SelectedRow`, `TryGetSelectedRow(...)`, `SelectionChanged`). | `51d46a3`, `src/TeaSharp/Controls/Table.cs`, `tests/TeaSharp.Tests/TableSelectionApiTests.cs` |
+| Table programmatic row selection for drilldown/reselect flows | Resolved | `Table.SetSelectedIndex(int)` landed and was adopted by consumer proof apps; row-anchor workaround removed. | `a58cc64`, `38d75e6`, `147859c`, `src/TeaSharp/Controls/Table.cs`, `examples/ConsumerTelemetryLab/ConsumerTelemetryLabApp.Data.cs`, `examples/ConsumerOpsStudio/ConsumerOpsStudioApp.Simulation.cs` |
 | ListView programmatic selection setter | Resolved | Canonical setter landed (`SetSelectedIndex(int)`), with `Select(int)` retained as compatibility wrapper. | `a9f774f`, `src/TeaSharp/Controls/ListView.cs`, `tests/TeaSharp.Tests/ListViewSelectionApiTests.cs` |
+| Choice/ComboBox direct programmatic selection | Resolved | Direct setters/probes landed and removed synthetic key-message orchestration from consumer workflow stress paths. | `91a5ecb`, `src/TeaSharp/Controls/Choice.cs`, `src/TeaSharp/Controls/ComboBox.cs`, `tests/TeaSharp.Tests/ChoiceSelectionApiTests.cs`, `tests/TeaSharp.Tests/ComboBoxSelectionApiTests.cs`, `examples/ConsumerWorkflowLab/ConsumerWorkflowLabApp.cs` |
+| DataForm keyed field selection | Resolved | `DataForm<TModel>.SelectField(string key)` landed; consumer workflow app removed key-to-index routing map pressure. | `c0c3c34`, `f8fb80c`, `src/TeaSharp/Controls/DataForm.cs`, `tests/TeaSharp.Tests/DataFormControlTests.cs`, `examples/ConsumerWorkflowLab/ConsumerWorkflowLabApp.cs` |
 | Cross-control focus/selection conventions | Resolved | For the dashboard control set, focus/title/row style hooks are now coherent and theme/focus-marker parity checks exist. | `src/TeaSharp/Controls/ListView.cs:45`, `src/TeaSharp/Controls/Table.cs:38`, `src/TeaSharp/Controls/Notifications.cs:23`, `src/TeaSharp/Controls/LogView.cs:30`, `tests/TeaSharp.Tests/ThemeFocusMarkerParityPolicyTests.cs`, `tests/TeaSharp.Tests/BorderedControlParityPolicyTests.cs` |
 | Theme + local override workflow | Resolved | Reusable dashboard override-bundle API landed and is used by the consumer example. | `d067b1d`, `src/TeaSharp/Styles/TeaThemeOverrideBundle.cs:10`, `src/TeaSharp/Styles/TeaThemeOverrideBundleExtensions.cs:17`, `examples/PublicApiDashboard/Program.cs:351`, `tests/TeaSharp.Tests/ThemeOverrideBundleApiErgonomicsTests.cs` |
 | Runtime theme switch fan-out | Resolved | First-party aggregate theme apply helper landed (`ThemeScope.Apply(...)`) for multi-control runtime switching. | `8ff286d`, `src/TeaSharp/Styles/ThemeScope.cs`, `tests/TeaSharp.Tests/ThemeScopeApiErgonomicsTests.cs` |
@@ -24,12 +27,12 @@ Context: consumer-centric pass re-checked against current `examples/PublicApiDas
 
 ## Next Top 3 Ergonomic Priorities
 
-1. No active P1/P2 ergonomic blockers remain from this external-consumer tranche after `51d46a3`, `a9f774f`, and `8ff286d`.
+1. No active pre-RC P1/P2 ergonomic blockers remain after the consumer proof loop (`c0c3c34`, `a58cc64`, `91a5ecb`, `147859c`, `38d75e6`, `f8fb80c`).
 2. Keep new selection/theme helper APIs under regression coverage as controls expand.
 3. Re-open this log only for externally reproducible friction with concrete API repro snippets.
 
 ## External Consumer Findings (Open)
-No active P1/P2 open findings in this scope as of March 22, 2026.
+No active P1/P2 open findings in this scope as of March 26, 2026.
 
 ## Net-New Findings - ControlPlaneOpsDashboard (March 23, 2026)
 

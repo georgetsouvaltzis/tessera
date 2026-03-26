@@ -303,6 +303,19 @@ Canonical selection naming for docs/examples is `Selected*`:
 
 Compatibility names such as `Current*` remain supported in V1 where present and are governed by the phased migration policy in [post-v1-selection-naming-migration.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/post-v1-selection-naming-migration.md).
 
+### Selection Ergonomics Additions (Tier 1)
+
+Additive selection APIs now available on the default path:
+
+- `Table.SetSelectedIndex(int)`
+- `Choice.SetSelectedIndex(int)`
+- `Choice.TrySetSelectedItem(string)`
+- `ComboBox.SetSelectedIndex(int)`
+- `ComboBox.TrySetSelectedItem(string)`
+- `DataForm<TModel>.SelectField(string key)`
+
+These close the consumer proof-loop selection pressure without breaking existing APIs.
+
 ## Tier 2: Advanced But Supported
 
 These APIs remain public because they still offer real value, but they should not dominate the default path.

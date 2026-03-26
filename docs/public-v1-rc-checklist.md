@@ -86,6 +86,7 @@ Audit basis: current checklist state + [v1-master-plan.md](/Users/georgetsouvalt
 - M2 widget expansion tranche: done.
 - M3 visual polish gate: done.
 - M4 implementation evidence: complete (still pending owner/date signoff closure).
+- Consumer-pressure proof loop closure: additive selection APIs landed and were adopted in consumer examples (`c0c3c34`, `a58cc64`, `91a5ecb`, `147859c`, `38d75e6`, `f8fb80c`); no remaining pre-RC blockers from that lane.
 - Runtime pointer-policy correctness hardening landed in HEAD history (double-click focus transfer, hover-only motion, sticky mouse capability, non-raw CSI byte-stream input path).
 - Core verification evidence is green for `TeaSharp.slnx` build/test + canonical onboarding builds/smoke.
 

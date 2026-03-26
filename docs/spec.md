@@ -449,6 +449,17 @@ These types provide the default control vocabulary. Most promoted legacy `*Compo
 - `RemoveSelected()`
 - `Push(...)` remains supported for append-by-message workflows
 
+### Selection Ergonomics (Consumer Pressure)
+
+Additive selection APIs on the default public path:
+
+- `Table.SetSelectedIndex(int)` for programmatic reselection after `SetRows(...)` refreshes.
+- `Choice.SetSelectedIndex(int)` and `Choice.TrySetSelectedItem(string)` for direct selection without synthetic key-message flows.
+- `ComboBox.SetSelectedIndex(int)` and `ComboBox.TrySetSelectedItem(string)` for direct selection without filter+key orchestration.
+- `DataForm<TModel>.SelectField(string key)` for stable keyed field routing in validation/workflow flows.
+
+Consumer proof-loop adoption (`c0c3c34`, `a58cc64`, `91a5ecb`, `147859c`, `38d75e6`, `f8fb80c`) reports no remaining pre-RC blockers in this lane.
+
 ### Plotting and Dashboard Authoring Guidance
 
 Recommended control selection:
