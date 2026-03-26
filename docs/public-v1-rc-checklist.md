@@ -6,21 +6,21 @@ Do not mark a checkbox complete unless command output/evidence is attached.
 ## RC Metadata (placeholder)
 
 - [ ] RC tag/branch: `<fill>`
-- [x] Date (UTC): `2026-03-22`
-- [x] Commit SHA: `3986c8b5fc24` (pre-doc-sync head)
+- [x] Date (UTC): `2026-03-26`
+- [x] Commit SHA: `b5f1479` (current verification head)
 - [ ] Owner: `<fill>`
 
 ## Build, Test, Examples
 
 - [x] Solution build passed
-  - command: `dotnet build TeaSharp.slnx --no-restore --nologo`
-  - evidence: `Build succeeded. 0 Warning(s), 0 Error(s).`
+  - command: `dotnet build TeaSharp.slnx`
+  - evidence: `Build succeeded. 279 Warning(s), 0 Error(s).`
 - [x] Full test suite passed
-  - command: `dotnet test TeaSharp.slnx --no-restore --nologo --tl:off -v minimal`
-  - evidence: `Passed: TeaSharp.Tests 873/873, TeaSharp.IntegrationTests 10/10.`
-- [ ] Canonical examples build passed
-  - command: `dotnet build TeaSharp.Examples.slnx --no-restore --nologo`
-  - evidence: `Currently blocked on in-flight workspace project ControlPlaneOpsDashboard (`NETSDK1004` under no-restore and `CS0246` unresolved types).`
+  - command: `dotnet test TeaSharp.slnx`
+  - evidence: `Passed: TeaSharp.Tests 924/924, TeaSharp.IntegrationTests 10/10.`
+- [x] Canonical examples build passed
+  - command: `dotnet build TeaSharp.Examples.slnx`
+  - evidence: `Build succeeded. 0 Warning(s), 0 Error(s).`
 - [x] Canonical onboarding examples build passed (targeted)
   - commands:
     - `dotnet build examples/HelloWorld/HelloWorld.csproj --no-restore --nologo -v minimal`
@@ -104,7 +104,6 @@ Audit basis: current checklist state + [v1-master-plan.md](/Users/georgetsouvalt
 
 ### Still Technically Blocked (current workspace state)
 
-- Full examples solution build (`TeaSharp.Examples.slnx --no-restore`) remains blocked by in-flight `ControlPlaneOpsDashboard` issues (`NETSDK1004` missing assets under no-restore and `CS0246` unresolved `ScreenContext`/`Screen`).
 - `scripts/perf_gate_v1.sh dry-run` is intermittently stalled after benchmark build line emission; direct benchmark DLL perf-gate command is the active deterministic workaround.
 
 ### Nice-To-Have (Not V1-Gating)
@@ -120,15 +119,13 @@ Audit basis: current checklist state + [v1-master-plan.md](/Users/georgetsouvalt
 
 ## Evidence Snapshot (this run)
 
-- `dotnet build TeaSharp.slnx --no-restore --nologo -v minimal` -> `Build succeeded. 0 Warning(s), 0 Error(s).`
-- `dotnet test TeaSharp.slnx --no-restore --nologo --tl:off -v minimal` -> `TeaSharp.Tests: 873 passed; TeaSharp.IntegrationTests: 10 passed.`
+- `dotnet build TeaSharp.slnx` -> `Build succeeded. 279 Warning(s), 0 Error(s).`
+- `dotnet test TeaSharp.slnx` -> `TeaSharp.Tests: 924 passed; TeaSharp.IntegrationTests: 10 passed.`
 - `dotnet test tests/TeaSharp.Tests --no-restore --nologo --filter "ApiErgonomics|PublicApiBoundary|PublicApiXmlDocs"` -> `Passed: 42, Failed: 0.`
 - `dotnet test tests/TeaSharp.Tests --no-restore --nologo --filter "PublicApiXmlDocs_"` -> `Passed: 5, Failed: 0.`
 - `dotnet test tests/TeaSharp.Tests --no-restore --nologo --filter "PublicApiBoundary_"` -> `Passed: 12, Failed: 0.`
-- `dotnet build TeaSharp.Examples.slnx --no-restore --nologo -v minimal` -> `Build FAILED` (`NETSDK1004` missing assets for `ControlPlaneOpsDashboard` under no-restore; `CS0246` unresolved `ScreenContext`/`Screen` in `ControlPlaneOpsDashboard.Analytics.cs`).
-- `dotnet build examples/HelloWorld/HelloWorld.csproj --no-restore --nologo -v minimal` -> `Build succeeded. 0 Warning(s), 0 Error(s).`
-- `dotnet build examples/CounterForm/CounterForm.csproj --no-restore --nologo -v minimal` -> `Build succeeded. 0 Warning(s), 0 Error(s).`
-- `dotnet build examples/WorkspaceApp/WorkspaceApp.csproj --no-restore --nologo -v minimal` -> `Build succeeded. 0 Warning(s), 0 Error(s).`
+- `dotnet build TeaSharp.Examples.slnx` -> `Build succeeded. 0 Warning(s), 0 Error(s).`
+- canonical onboarding project builds were not rerun in this pass because the full examples solution is green.
 - `scripts/smoke_examples_v1.sh 4` -> `PASS HelloWorld`, `PASS CounterForm`, `PASS WorkspaceApp`, `SUMMARY pass=3 fail=0` (bounded startup probe; processes intentionally terminated after 4s).
 - `dotnet run --project benchmarks/TeaSharp.Benchmarks/TeaSharp.Benchmarks.csproj --no-build -- --list flat` -> listed 20 benchmark entries (`render`, `render-only`, SLO, and input decoding suites).
 - `scripts/perf_gate_v1.sh dry-run` -> intermittent wrapper stall reproduced: command prints the benchmark `dotnet build ...TeaSharp.Benchmarks.csproj...` line and may not progress.
