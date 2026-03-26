@@ -16,6 +16,8 @@ internal sealed class ConsumerWorkflowLabApp : TeaApp
 
     private static readonly string[] TemplateOptions = ["Blank", "Blue/Green API", "Batch Worker", "Emergency Rollback"];
 
+    private static readonly string[] DataFormSelectionKeys = ["ownerEmail", "region", "rollback", "rollout", "service", "ticket", "window"];
+
     private readonly Dictionary<string, WorkflowTemplate> _templates = new(StringComparer.Ordinal)
     {
         ["Blank"] = new WorkflowTemplate("Blank", "Development", "us-east-1", "09:00-11:00", 20, "Use previous stable image.", "CHG-000000"),
@@ -190,7 +192,6 @@ internal sealed class ConsumerWorkflowLabApp : TeaApp
     };
 
     private readonly StatusBar _status = new();
-    private readonly Dictionary<string, int> _fieldIndexByKey = new(StringComparer.Ordinal);
     private readonly List<string> _selectionTraceEntries = [];
 
     private bool _useAlternateTheme;
@@ -501,7 +502,6 @@ internal sealed class ConsumerWorkflowLabApp : TeaApp
         string placeholder,
         Func<string, string?> validator)
     {
-        _fieldIndexByKey[key] = _fieldIndexByKey.Count;
         _dataForm.RegisterField(key, label, readValue, writeValue, placeholder: placeholder, validator: validator);
     }
 
@@ -643,7 +643,7 @@ internal sealed class ConsumerWorkflowLabApp : TeaApp
             $"Ticket format ok: {(_draft.ChangeTicket.StartsWith("CHG-", StringComparison.OrdinalIgnoreCase) ? "yes" : "no")}",
             $"Choice selection API runs: {_choiceStressIndex}",
             $"ComboBox selection API runs: {_comboStressIndex}",
-            $"DataForm key-map jumps: {_dataFormStressIndex}",
+            $"DataForm selection API runs: {_dataFormStressIndex}",
         ]);
 
         _selectionTrace.SetItems(_selectionTraceEntries);
@@ -998,16 +998,15 @@ internal sealed class ConsumerWorkflowLabApp : TeaApp
 
     private void CycleDataFormSelection(string source)
     {
-        var keys = _fieldIndexByKey.Keys.OrderBy(static value => value, StringComparer.Ordinal).ToArray();
-        if (keys.Length == 0)
+        if (DataFormSelectionKeys.Length == 0)
         {
             return;
         }
 
-        var targetKey = keys[_dataFormStressIndex % keys.Length];
+        var targetKey = DataFormSelectionKeys[_dataFormStressIndex % DataFormSelectionKeys.Length];
         _dataFormStressIndex++;
         var success = SelectDataFormFieldByKey(targetKey);
-        AppendSelectionTrace($"dataform key-map ({source}) -> {targetKey} ({(success ? "ok" : "failed")})");
+        AppendSelectionTrace($"dataform selection API ({source}) -> {targetKey} ({(success ? "ok" : "failed")})");
     }
 
     private bool ForceChoiceSelection(string target)
@@ -1044,13 +1043,13 @@ internal sealed class ConsumerWorkflowLabApp : TeaApp
 
     private bool SelectDataFormFieldByKey(string key)
     {
-        if (!_fieldIndexByKey.TryGetValue(key, out var index))
+        if (string.IsNullOrWhiteSpace(key))
         {
             return false;
         }
 
         _dataForm.RequestFocus();
-        var changed = _dataForm.SelectField(index);
+        var changed = _dataForm.SelectField(key);
         return changed || string.Equals(_dataForm.SelectedField?.Key, key, StringComparison.Ordinal);
     }
 

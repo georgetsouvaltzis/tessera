@@ -26,7 +26,7 @@ dotnet run --project examples/ConsumerWorkflowLab/ConsumerWorkflowLab.csproj
 - `Ctrl+N` / `Ctrl+B`: next/back step
 - `Ctrl+1`: cycle environment (`Choice` selection API path)
 - `Ctrl+2`: cycle template (`ComboBox` selection API path)
-- `Ctrl+3`: cycle `DataForm` field by key-map lookup
+- `Ctrl+3`: cycle `DataForm` field (`SelectField(string key)` path)
 - `Ctrl+S`: run combined selection stress pass
 - `d`: attempt submit (opens dialog when valid + on final step)
 - `Ctrl+C`: quit
