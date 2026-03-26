@@ -73,7 +73,7 @@ internal sealed partial class ConsumerTelemetryLabApp
                 service.ReqPerSec.ToString("0", CultureInfo.InvariantCulture),
             ]));
 
-        var incidentRows = VisibleIncidentsForTable().ToList();
+        var incidentRows = SortedIncidentsForTable();
         _incidentTable.SetRows(incidentRows.Select(static incident =>
             (IReadOnlyList<string>)
             [
@@ -84,6 +84,16 @@ internal sealed partial class ConsumerTelemetryLabApp
                 $"{incident.MinutesOpen}m",
                 incident.Summary,
             ]));
+
+        if (!string.IsNullOrWhiteSpace(_selectedIncidentId))
+        {
+            var selectedIndex = incidentRows.FindIndex(incident =>
+                string.Equals(incident.Id, _selectedIncidentId, StringComparison.Ordinal));
+            if (selectedIndex >= 0)
+            {
+                _incidentTable.SetSelectedIndex(selectedIndex);
+            }
+        }
     }
 
     private IEnumerable<ServiceState> FilteredServices()
@@ -93,28 +103,13 @@ internal sealed partial class ConsumerTelemetryLabApp
             : _services.Where(service => string.Equals(service.Cluster, _activeCluster, StringComparison.Ordinal));
     }
 
-    private IEnumerable<IncidentState> VisibleIncidentsForTable()
+    private List<IncidentState> SortedIncidentsForTable()
     {
-        var incidents = _incidents
+        return _incidents
             .OrderByDescending(static incident => incident.State == "Open")
             .ThenByDescending(static incident => incident.SeverityRank)
             .ThenByDescending(static incident => incident.MinutesOpen)
             .ToList();
-
-        if (string.IsNullOrWhiteSpace(_incidentSortAnchorId))
-        {
-            return incidents;
-        }
-
-        var anchor = incidents.FirstOrDefault(incident =>
-            string.Equals(incident.Id, _incidentSortAnchorId, StringComparison.Ordinal));
-        if (anchor is null)
-        {
-            return incidents;
-        }
-
-        // Workaround: no public Table API for programmatic row selection, so keep drilldown target at top.
-        return [anchor, .. incidents.Where(incident => !ReferenceEquals(incident, anchor))];
     }
 
     private void SyncServiceListSelection()
@@ -179,9 +174,8 @@ internal sealed partial class ConsumerTelemetryLabApp
     private void RequestIncidentDrilldown(string incidentId, string source)
     {
         _selectedIncidentId = incidentId;
-        _incidentSortAnchorId = incidentId;
-        _tableSyncNote = $"table sync workaround: anchored {incidentId} via {source}; click row to hard-select";
         RefreshListsAndTables();
+        _tableSyncNote = $"table sync: SetSelectedIndex({incidentId}) via {source}";
     }
 
     private string BuildIncidentDetail(ScreenContext context)

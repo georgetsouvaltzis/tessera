@@ -179,7 +179,6 @@ internal sealed partial class ConsumerTelemetryLabApp : TeaApp
     private string _activeCluster = "all";
     private string _selectedServiceId = "api";
     private string? _selectedIncidentId;
-    private string? _incidentSortAnchorId;
     private string _tableSyncNote = "table sync: direct (user click)";
     private bool _paused;
     private int _tick;

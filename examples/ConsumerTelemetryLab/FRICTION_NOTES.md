@@ -6,26 +6,29 @@
 - Relevance to this app: indirect only (this app currently uses list/table drilldowns, not `DataForm`).
 - Outcome: form-focused consumers can now select fields by stable key without index coupling.
 
-## 1) Incident table drilldown cannot hard-select a row by API
+## Resolved in this slice
 
-- Current workaround in app:
-  - Store requested incident id as `_incidentSortAnchorId`.
-  - Reorder incident rows so the anchor incident is placed at row `0`.
-  - Prompt user to click row for hard selection.
+### Incident drilldown table sync via selection API
+
+- Previous workaround removed:
+  - no `_incidentSortAnchorId`
+  - no row reordering/anchor-to-top behavior
+- Current behavior:
+  - incident rows remain sorted by state/severity/age
+  - drilldown sync calls `Table.SetSelectedIndex(...)` after `SetRows(...)`
 - Evidence:
-  - `ConsumerTelemetryLabApp.Data.cs` (`VisibleIncidentsForTable`, `RequestIncidentDrilldown`)
-- Why this exists:
-  - Public `Table` API in current surface does not expose programmatic selected-row setter by index/key.
+  - `ConsumerTelemetryLabApp.Data.cs` (`RefreshListsAndTables`, `SortedIncidentsForTable`, `RequestIncidentDrilldown`)
 
 Additive API candidates:
 
-- `Table.SetSelectedIndex(int index)`
 - `Table.SetSelectedKey(string key)` with key selector supplied at row binding time
 - `Table.TryEnsureVisible(int index)` to keep selected row in viewport
 
-## 2) Selection sync depends on row text conventions
+## Still open friction
 
-- Current workaround in app:
+### 1) Selection sync depends on row text conventions
+
+- Current workaround:
   - On table selection event, parse first column as id/name and map back to domain model.
 - Evidence:
   - `ConsumerTelemetryLabApp.cs` (`_serviceTable.SelectionChanged`, `_incidentTable.SelectionChanged`)
@@ -37,7 +40,7 @@ Additive API candidates:
 - Generic typed table variant, e.g. `Table<T>`
 - Selection event payload carrying `RowIndex` and optional user key/object
 
-## 3) Plot/dashboard styling parity across controls is uneven
+### 2) Plot/dashboard styling parity across controls is uneven
 
 - Current app impact:
   - `ScatterPlot` and `Histogram` are composed cleanly in `PlotPanel`, but style/frame knobs are not symmetric with some other controls.
