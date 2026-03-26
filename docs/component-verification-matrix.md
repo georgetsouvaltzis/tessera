@@ -44,10 +44,10 @@ For each component or tightly-related component family:
 
 ## Current Loop
 
-- Active component: `NotificationInbox`
-- Human lab target: `examples/NotificationInbox`
-- Owner lane: `Owner Lane B - Data + Explorer`
-- Round goal: land the strict widget-only `NotificationInbox` lab, verify public-api ergonomics, and prepare manual test steps for visual review
+- Active component: `DataForm<T>`
+- Human lab target: `examples/DataForm`
+- Owner lane: `Owner Lane C - Shell + Workflow + Visuals`
+- Round goal: land the strict widget-only `DataForm` lab, verify public-api ergonomics, and prepare manual test steps for visual review
 
 ## Matrix
 
@@ -64,7 +64,7 @@ For each component or tightly-related component family:
 | `Table` | `Owner Lane B` | Service table with row selection, mutation, and drilldown summary. | `examples/Table` | `Not Started` | `Not Started` | `Not Started` | `Not Started` | |
 | `Notifications` | `Owner Lane C` | Live toast/feed center with selection and remove/clear actions. | `examples/Notifications` | `Not Started` | `Not Started` | `Not Started` | `Not Started` | |
 | `NotificationInbox` | `Owner Lane B` | Persistent inbox with unread/severity state and selection review. | `examples/NotificationInbox` | `Approved` | `Not Started` | `Not Started` | `In Progress` | Widget-only first pass landed; footer proves select/read/pin/delete flows and `SetItems`/`Add`/`Select`/`MarkAllRead`/`Clear`. |
-| `DataForm<T>` | `Owner Lane C` | Small settings editor with keyed field selection and validation state. | `examples/DataForm` | `Not Started` | `Not Started` | `Not Started` | `Not Started` | |
+| `DataForm<T>` | `Owner Lane C` | Small settings editor with keyed field selection and validation state. | `examples/DataForm` | `Approved` | `Not Started` | `Not Started` | `In Progress` | Widget-only first pass landed; footer proves bind/clear model, keyed field selection, validation failure, commit, and read-only field behavior. |
 | `ValidationSummary` | `Owner Lane C` | Compact error stack fed by a fake save attempt. | `examples/ValidationSummary` | `Not Started` | `Not Started` | `Not Started` | `Not Started` | |
 | `Form` / `FieldSet` | `Owner Lane C` | Bordered account form with grouped sections and submit footer. | `examples/ComponentLabs/FormFieldSetLab` | `Not Started` | `Not Started` | `Not Started` | `Not Started` | |
 | `Wizard` / `Stepper` | `Owner Lane C` | Three-step setup flow with next/back and status recap. | `examples/ComponentLabs/WizardStepperLab` | `Not Started` | `Not Started` | `Not Started` | `Not Started` | |
