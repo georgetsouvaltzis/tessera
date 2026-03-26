@@ -260,7 +260,7 @@ public sealed class DataFormControlTests
         Assert.That(control.SelectedIndex, Is.EqualTo(0));
         Assert.That(control.LastCommitError, Is.EqualTo("min 3 chars"));
         Assert.That(model.Name, Is.EqualTo("Ada"));
-        Assert.That(output.Contains("Error: min 3 chars", StringComparison.Ordinal), Is.True);
+        Assert.That(output.Contains("Validation failed: min 3 chars", StringComparison.Ordinal), Is.True);
         Assert.That(output.Contains("A|", StringComparison.Ordinal), Is.True);
     }
 

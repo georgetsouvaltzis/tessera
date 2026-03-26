@@ -459,6 +459,7 @@ Additive selection APIs on the default public path:
 - `Choice.SetSelectedIndex(int)` and `Choice.TrySetSelectedItem(string)` for direct selection without synthetic key-message flows.
 - `ComboBox.SetSelectedIndex(int)` and `ComboBox.TrySetSelectedItem(string)` for direct selection without filter+key orchestration.
 - `DataForm<TModel>.SelectField(string key)` for stable keyed field routing in validation/workflow flows.
+- `DataForm<TModel>` uses explicit edit mode on the default path: row selection first, `Enter` to edit, `Enter` to commit, `Esc` to cancel, and failed commits render a dedicated validation line inside the widget.
 - `DataForm<TModel>.BeginEdit()` / `CancelEdit()` plus `IsEditing` for explicit selection-first form editing flows.
 
 `DataForm<TModel>` default interaction contract is selection-first:

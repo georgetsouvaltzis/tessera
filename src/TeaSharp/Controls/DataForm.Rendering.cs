@@ -133,8 +133,8 @@ public sealed partial class DataForm<TModel>
 
         if (!string.IsNullOrWhiteSpace(_lastCommitError))
         {
-            text = string.Concat("Error: ", _lastCommitError);
-            style = ValueStyle.Merge(ErrorStyle);
+            text = string.Concat("! Validation failed: ", _lastCommitError);
+            style = SelectedFieldStyle.Merge(FocusedSelectedFieldStyle).Merge(ErrorStyle);
             return true;
         }
 
@@ -199,16 +199,8 @@ public sealed partial class DataForm<TModel>
     {
         if (index == _selectedIndex && _isEditing)
         {
-            var current = _editBuffer;
-            if (string.IsNullOrEmpty(current))
-            {
-                var placeholder = string.IsNullOrWhiteSpace(field.Placeholder) ? NoModelText : field.Placeholder;
-                isPlaceholder = true;
-                return string.Concat(placeholder, " |");
-            }
-
             isPlaceholder = false;
-            return string.Concat(current, "|");
+            return string.Concat(_editBuffer, "|");
         }
 
         if (Model is null)
@@ -276,10 +268,13 @@ public sealed partial class DataForm<TModel>
 
         if (index == _selectedIndex)
         {
-            style = style.Merge(SelectedFieldStyle);
-            if (IsFocused && !_isEditing)
+            if (!_isEditing)
             {
-                style = style.Merge(FocusedSelectedFieldStyle);
+                style = style.Merge(SelectedFieldStyle);
+                if (IsFocused)
+                {
+                    style = style.Merge(FocusedSelectedFieldStyle);
+                }
             }
         }
 
@@ -306,10 +301,13 @@ public sealed partial class DataForm<TModel>
 
         if (index == _selectedIndex)
         {
-            style = style.Merge(SelectedFieldStyle);
-            if (IsFocused)
+            if (_isEditing)
             {
-                style = style.Merge(FocusedSelectedFieldStyle);
+                style = style.Merge(SelectedFieldStyle);
+                if (IsFocused)
+                {
+                    style = style.Merge(FocusedSelectedFieldStyle);
+                }
             }
         }
 

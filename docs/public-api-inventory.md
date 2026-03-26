@@ -313,6 +313,7 @@ Additive selection APIs now available on the default path:
 - `ComboBox.SetSelectedIndex(int)`
 - `ComboBox.TrySetSelectedItem(string)`
 - `DataForm<TModel>.SelectField(string key)`
+- `DataForm<TModel>` uses explicit edit mode on the default path: row selection first, `Enter` to edit, `Enter` to commit, `Esc` to cancel, and failed commits render a dedicated validation line inside the widget
 - `DataForm<TModel>.BeginEdit()`
 - `DataForm<TModel>.CancelEdit()`
 - `DataForm<TModel>.IsEditing`

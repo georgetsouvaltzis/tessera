@@ -235,14 +235,7 @@ public sealed partial class DataForm<TModel>
             return false;
         }
 
-        if (backspace)
-        {
-            _editBuffer = _editBuffer[..^1];
-        }
-        else
-        {
-            _editBuffer = _editBuffer.Length == 1 ? string.Empty : _editBuffer[1..];
-        }
+        _editBuffer = _editBuffer[..^1];
 
         _isDirty = true;
         _lastCommitError = string.Empty;

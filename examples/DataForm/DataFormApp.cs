@@ -219,7 +219,7 @@ internal sealed class DataFormApp : TeaApp
         }
 
         _status.LeftText =
-            $"field={selected} buf={_form.EditBuffer} commits={_commitCount} sch={_selectionChanges}";
+            $"field={selected} mode={(_form.IsEditing ? "edit" : "select")} buf={_form.EditBuffer} commits={_commitCount} sch={_selectionChanges}";
         _status.RightText =
             $"{status} | {modelState} | select row Up/Down j/k or click, Enter edit, type, Enter commit, Esc cancel | ^R set-model ^U clear-model ^G team ^K owner ^T style ^O ro ^I dis ^C quit";
     }
