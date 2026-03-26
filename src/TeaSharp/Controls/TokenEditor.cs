@@ -22,6 +22,11 @@ public sealed partial class TokenEditor : Control
     public event EventHandler<TokenEditorSelectionChangedEventArgs>? SelectionChanged;
 
     /// <summary>
+    /// Occurs when the token collection changes.
+    /// </summary>
+    public event EventHandler<TokenEditorTokensChangedEventArgs>? TokensChanged;
+
+    /// <summary>
     /// Control title rendered on the frame.
     /// </summary>
     public string Title
@@ -169,6 +174,7 @@ public sealed partial class TokenEditor : Control
     public void SetTokens(IEnumerable<TokenItem> tokens)
     {
         ArgumentNullException.ThrowIfNull(tokens);
+        var previousTokens = SnapshotTokens();
         var previousIndex = _selectedTokenIndex;
         var previousToken = SelectedToken;
 
@@ -194,6 +200,7 @@ public sealed partial class TokenEditor : Control
             _hoveredTokenIndex = Math.Clamp(_hoveredTokenIndex, -1, _tokens.Count - 1);
         }
 
+        RaiseTokensChangedIfNeeded(previousTokens);
         RaiseSelectionChangedIfNeeded(previousIndex, previousToken);
     }
 
@@ -210,6 +217,7 @@ public sealed partial class TokenEditor : Control
             return false;
         }
 
+        var previousTokens = SnapshotTokens();
         var previousIndex = _selectedTokenIndex;
         var previousToken = SelectedToken;
         _tokens.Add(new TokenItem(normalized.ToString()));
@@ -218,6 +226,7 @@ public sealed partial class TokenEditor : Control
             _selectedTokenIndex = 0;
         }
 
+        RaiseTokensChangedIfNeeded(previousTokens);
         RaiseSelectionChangedIfNeeded(previousIndex, previousToken);
         return true;
     }
@@ -233,6 +242,7 @@ public sealed partial class TokenEditor : Control
             return false;
         }
 
+        var previousTokens = SnapshotTokens();
         var previousIndex = _selectedTokenIndex;
         var previousToken = SelectedToken;
         _tokens.RemoveAt(_selectedTokenIndex);
@@ -248,6 +258,7 @@ public sealed partial class TokenEditor : Control
             _hoveredTokenIndex = Math.Clamp(_hoveredTokenIndex, -1, _tokens.Count - 1);
         }
 
+        RaiseTokensChangedIfNeeded(previousTokens);
         RaiseSelectionChangedIfNeeded(previousIndex, previousToken);
         return true;
     }
@@ -432,6 +443,27 @@ public sealed partial class TokenEditor : Control
         return new TokenItem(token.Value, token.IsDisabled);
     }
 
+    private TokenItem[] SnapshotTokens()
+    {
+        var snapshot = new TokenItem[_tokens.Count];
+        for (var index = 0; index < _tokens.Count; index++)
+        {
+            snapshot[index] = Clone(_tokens[index]);
+        }
+
+        return snapshot;
+    }
+
+    private void RaiseTokensChangedIfNeeded(IReadOnlyList<TokenItem> previousTokens)
+    {
+        if (AreTokensEqual(previousTokens, _tokens))
+        {
+            return;
+        }
+
+        TokensChanged?.Invoke(this, new TokenEditorTokensChangedEventArgs(previousTokens, _tokens));
+    }
+
     private void RaiseSelectionChangedIfNeeded(int previousIndex, TokenItem? previousToken)
     {
         var selected = SelectedToken;
@@ -469,5 +501,24 @@ public sealed partial class TokenEditor : Control
         return style.IsEmpty || string.IsNullOrEmpty(text)
             ? text
             : style.Render(text);
+    }
+
+    private static bool AreTokensEqual(IReadOnlyList<TokenItem> previousTokens, IReadOnlyList<TokenItem> currentTokens)
+    {
+        if (previousTokens.Count != currentTokens.Count)
+        {
+            return false;
+        }
+
+        for (var index = 0; index < previousTokens.Count; index++)
+        {
+            if (!string.Equals(previousTokens[index].Value, currentTokens[index].Value, StringComparison.Ordinal)
+                || previousTokens[index].IsDisabled != currentTokens[index].IsDisabled)
+            {
+                return false;
+            }
+        }
+
+        return true;
     }
 }

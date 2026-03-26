@@ -14,6 +14,11 @@ public sealed class TagInput : Control
     private readonly TextInputModel _input = new();
     private int _selectedTagIndex = -1;
     private int _hoveredTagIndex = -1;
+
+    /// <summary>
+    /// Occurs when the committed tag collection changes.
+    /// </summary>
+    public event EventHandler<TagInputTagsChangedEventArgs>? TagsChanged;
     public TagInput()
     {
         Placeholder = "Add tag...";
@@ -48,6 +53,7 @@ public sealed class TagInput : Control
     public void SetTags(IEnumerable<string> tags)
     {
         ArgumentNullException.ThrowIfNull(tags);
+        var previousTags = SnapshotTags();
         _tags.Clear();
         foreach (var tag in tags)
         {
@@ -63,14 +69,30 @@ public sealed class TagInput : Control
             _selectedTagIndex = Math.Clamp(_selectedTagIndex, 0, _tags.Count - 1);
             _hoveredTagIndex = Math.Clamp(_hoveredTagIndex, -1, _tags.Count - 1);
         }
+
+        RaiseTagsChangedIfNeeded(previousTags);
     }
-    public bool AddTag(string tag) => TryAddTagCore((tag ?? string.Empty).AsSpan());
+
+    public bool AddTag(string tag)
+    {
+        var previousTags = SnapshotTags();
+        var changed = TryAddTagCore((tag ?? string.Empty).AsSpan());
+        if (changed)
+        {
+            RaiseTagsChangedIfNeeded(previousTags);
+        }
+
+        return changed;
+    }
+
     public bool RemoveTagAt(int index)
     {
         if ((uint)index >= (uint)_tags.Count)
         {
             return false;
         }
+
+        var previousTags = SnapshotTags();
         _tags.RemoveAt(index);
         if (_tags.Count == 0)
         {
@@ -82,6 +104,8 @@ public sealed class TagInput : Control
             _selectedTagIndex = Math.Clamp(_selectedTagIndex, 0, _tags.Count - 1);
             _hoveredTagIndex = Math.Clamp(_hoveredTagIndex, -1, _tags.Count - 1);
         }
+
+        RaiseTagsChangedIfNeeded(previousTags);
         return true;
     }
     public override bool Handle(Message message)
@@ -299,6 +323,8 @@ public sealed class TagInput : Control
         {
             return false;
         }
+
+        var previousTags = SnapshotTags();
         var changed = false;
         var separator = options.Separator;
         if (separator == '\0')
@@ -319,6 +345,11 @@ public sealed class TagInput : Control
             }
         }
         _input.Clear();
+        if (changed)
+        {
+            RaiseTagsChangedIfNeeded(previousTags);
+        }
+
         return changed;
     }
     private bool TryAddTagCore(ReadOnlySpan<char> rawTag)
@@ -496,5 +527,38 @@ public sealed class TagInput : Control
         return style.IsEmpty || string.IsNullOrEmpty(text)
             ? text
             : style.Render(text);
+    }
+
+    private string[] SnapshotTags()
+    {
+        return [.. _tags];
+    }
+
+    private void RaiseTagsChangedIfNeeded(IReadOnlyList<string> previousTags)
+    {
+        if (AreTagsEqual(previousTags, _tags))
+        {
+            return;
+        }
+
+        TagsChanged?.Invoke(this, new TagInputTagsChangedEventArgs(previousTags, _tags));
+    }
+
+    private static bool AreTagsEqual(IReadOnlyList<string> previousTags, IReadOnlyList<string> currentTags)
+    {
+        if (previousTags.Count != currentTags.Count)
+        {
+            return false;
+        }
+
+        for (var index = 0; index < previousTags.Count; index++)
+        {
+            if (!string.Equals(previousTags[index], currentTags[index], StringComparison.Ordinal))
+            {
+                return false;
+            }
+        }
+
+        return true;
     }
 }

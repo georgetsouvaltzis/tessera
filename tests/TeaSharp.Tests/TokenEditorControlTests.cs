@@ -10,6 +10,50 @@ namespace TeaSharp.Tests;
 public sealed class TokenEditorControlTests
 {
     [Test]
+    public void Controls_TokenEditor_TokensChanged_RaisesForSetAddRemoveWithSnapshots()
+    {
+        var control = new TokenEditor();
+        var events = new List<TokenEditorTokensChangedEventArgs>();
+        control.TokensChanged += (_, args) => events.Add(args);
+
+        control.SetTokens([new TokenItem("one"), new TokenItem("two", isDisabled: true)]);
+        var added = control.AddToken("three");
+        _ = control.SetSelectedTokenIndex(2);
+        var removed = control.RemoveSelectedToken();
+
+        Assert.That(added, Is.True);
+        Assert.That(removed, Is.True);
+        Assert.That(events, Has.Count.EqualTo(3));
+
+        Assert.That(events[0].PreviousTokens, Is.Empty);
+        Assert.That(events[0].Tokens.Select(static token => token.Value), Is.EqualTo(new[] { "one", "two" }));
+        Assert.That(events[0].Tokens[1].IsDisabled, Is.True);
+
+        Assert.That(events[1].PreviousTokens.Select(static token => token.Value), Is.EqualTo(new[] { "one", "two" }));
+        Assert.That(events[1].Tokens.Select(static token => token.Value), Is.EqualTo(new[] { "one", "two", "three" }));
+
+        Assert.That(events[2].PreviousTokens.Select(static token => token.Value), Is.EqualTo(new[] { "one", "two", "three" }));
+        Assert.That(events[2].Tokens.Select(static token => token.Value), Is.EqualTo(new[] { "one", "two" }));
+    }
+
+    [Test]
+    public void Controls_TokenEditor_TokensChanged_DoesNotRaiseForSelectionOnlyOrNoOpMutations()
+    {
+        var control = new TokenEditor();
+        var events = 0;
+        control.SetTokens([new TokenItem("one"), new TokenItem("two")]);
+        control.TokensChanged += (_, _) => events++;
+
+        var selected = control.SetSelectedTokenIndex(1);
+        var duplicateWhitespace = control.AddToken("   ");
+        control.SetTokens([new TokenItem("one"), new TokenItem("two")]);
+
+        Assert.That(selected, Is.True);
+        Assert.That(duplicateWhitespace, Is.False);
+        Assert.That(events, Is.Zero);
+    }
+
+    [Test]
     public void Controls_TokenEditor_SetTokensAddRemoveAndSelectionEvent_Work()
     {
         var control = new TokenEditor();

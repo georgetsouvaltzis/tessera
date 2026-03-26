@@ -10,6 +10,46 @@ namespace TeaSharp.Tests;
 public sealed class TagInputControlTests
 {
     [Test]
+    public void Controls_TagInput_TagsChanged_RaisesForSetAddRemoveWithSnapshots()
+    {
+        var control = new TagInput();
+        var events = new List<TagInputTagsChangedEventArgs>();
+        control.TagsChanged += (_, args) => events.Add(args);
+
+        control.SetTags(["ops", "infra"]);
+        var added = control.AddTag("alerts");
+        var removed = control.RemoveTagAt(1);
+
+        Assert.That(added, Is.True);
+        Assert.That(removed, Is.True);
+        Assert.That(events, Has.Count.EqualTo(3));
+
+        Assert.That(events[0].PreviousTags, Is.Empty);
+        Assert.That(events[0].Tags, Is.EqualTo(new[] { "ops", "infra" }));
+        Assert.That(events[1].PreviousTags, Is.EqualTo(new[] { "ops", "infra" }));
+        Assert.That(events[1].Tags, Is.EqualTo(new[] { "ops", "infra", "alerts" }));
+        Assert.That(events[2].PreviousTags, Is.EqualTo(new[] { "ops", "infra", "alerts" }));
+        Assert.That(events[2].Tags, Is.EqualTo(new[] { "ops", "alerts" }));
+    }
+
+    [Test]
+    public void Controls_TagInput_TagsChanged_DoesNotRaiseForNoOpMutations()
+    {
+        var control = new TagInput();
+        var events = 0;
+        control.TagsChanged += (_, _) => events++;
+
+        control.SetTags(["ops"]);
+        var duplicateAdded = control.AddTag("ops");
+        var invalidRemoved = control.RemoveTagAt(9);
+        control.SetTags(["ops"]);
+
+        Assert.That(duplicateAdded, Is.False);
+        Assert.That(invalidRemoved, Is.False);
+        Assert.That(events, Is.EqualTo(1));
+    }
+
+    [Test]
     public void Controls_TagInput_EnterCommitsTag()
     {
         var control = new TagInput
