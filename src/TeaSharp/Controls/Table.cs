@@ -212,6 +212,23 @@ public sealed class Table : Control
         return true;
     }
 
+    /// <summary>
+    /// Sets the selected row index in the current visible page using bounds clamping.
+    /// </summary>
+    /// <param name="index">The requested visible-row index.</param>
+    /// <returns><see langword="true"/> when selection changed; otherwise <see langword="false"/>.</returns>
+    public bool SetSelectedIndex(int index)
+    {
+        var state = BuildState();
+        if (state.VisibleRows.Count == 0)
+        {
+            return false;
+        }
+
+        var next = Math.Clamp(index, 0, state.VisibleRows.Count - 1);
+        return SetSelectedVisibleRow(next, state);
+    }
+
     public void SetRows(IEnumerable<IReadOnlyList<string>> rows)
     {
         ArgumentNullException.ThrowIfNull(rows);
