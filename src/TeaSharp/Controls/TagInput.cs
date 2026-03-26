@@ -247,6 +247,7 @@ public sealed partial class TagInput : Control
         }
         if (pointer.Kind == PointerEventKind.Press && pointer.Button == PointerButton.Left)
         {
+            IsFocused = true;
             RequestFocus();
             var changed = SetHoveredTagIndex(hovered);
             changed |= SetSelectedTagIndex(hovered);
@@ -374,10 +375,12 @@ public sealed partial class TagInput : Control
         }
 
         var layout = BuildFlowLayout(content.Width);
+        var windowTop = ResolveVisibleWindowTop(layout, content.Height);
+        var logicalY = relativeY + windowTop;
         for (var index = 0; index < layout.Tags.Count; index++)
         {
             var placement = layout.Tags[index];
-            if (placement.Y != relativeY)
+            if (placement.Y != logicalY)
             {
                 continue;
             }

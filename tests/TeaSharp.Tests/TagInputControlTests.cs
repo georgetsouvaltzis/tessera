@@ -242,6 +242,31 @@ public sealed class TagInputControlTests
     }
 
     [Test]
+    public void Controls_TagInput_LongInput_KeepsActiveTailVisible_WhenHeightIsConstrained()
+    {
+        var control = new TagInput
+        {
+            IsFocused = true,
+            Border = BorderStyle.None,
+            InputPadding = 0,
+            Placeholder = string.Empty,
+            CaretGlyph = "|",
+        };
+        foreach (var character in "abcdefghijkl")
+        {
+            _ = control.Handle(new KeyPressed(Key.Character, character.ToString()));
+        }
+
+        var canvas = new Canvas(4, 2, CanvasTextMode.GraphemeAware);
+        control.Render(canvas, new Rect(0, 0, 4, 2));
+        var output = StripAnsi(canvas.Render());
+
+        TestAssert.True(output.Contains("ijkl", StringComparison.Ordinal), "Constrained height should keep the newest input tail visible.");
+        TestAssert.True(output.Contains("|", StringComparison.Ordinal), "Visible viewport should keep the active caret visible.");
+        TestAssert.True(!output.Contains("abcd", StringComparison.Ordinal), "Viewport should follow the active typing region instead of pinning the earliest input rows.");
+    }
+
+    [Test]
     public void Controls_TagInput_Measure_GrowsHeight_WhenFlowWraps()
     {
         var control = new TagInput
@@ -281,6 +306,23 @@ public sealed class TagInputControlTests
         _ = control.Handle(new PointerInput(PointerEventKind.Press, PointerButton.Left, 1, 1), bounds);
 
         TestAssert.Equal(1, control.SelectedTagIndex, "Pointer selection should resolve tags on wrapped rows.");
+    }
+
+    [Test]
+    public void Controls_TagInput_PointerPress_AppliesFocusImmediately()
+    {
+        var control = new TagInput
+        {
+            Border = BorderStyle.None,
+        };
+        control.SetTags(["alpha"]);
+        var bounds = new Rect(0, 0, 12, 2);
+
+        var handled = control.Handle(new PointerInput(PointerEventKind.Press, PointerButton.Left, 1, 0), bounds);
+
+        TestAssert.True(handled, "Pointer press inside the control should be handled.");
+        TestAssert.True(control.IsFocused, "Pointer press should apply focus immediately.");
+        TestAssert.Equal(0, control.SelectedTagIndex, "Pointer press should also keep selection coherent with the hit tag.");
     }
 
     [Test]

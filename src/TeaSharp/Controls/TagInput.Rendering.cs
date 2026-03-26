@@ -66,10 +66,12 @@ public sealed partial class TagInput
     private void RenderWrappedFlow(Canvas canvas, Rect content)
     {
         var flow = BuildFlowLayout(content.Width);
+        var windowTop = ResolveVisibleWindowTop(flow, content.Height);
         for (var index = 0; index < flow.Tags.Count; index++)
         {
             var placement = flow.Tags[index];
-            if (placement.Y >= content.Height)
+            var visibleY = placement.Y - windowTop;
+            if (visibleY < 0 || visibleY >= content.Height)
             {
                 continue;
             }
@@ -77,7 +79,7 @@ public sealed partial class TagInput
             RenderTextSegment(
                 canvas,
                 content.X + placement.X,
-                content.Y + placement.Y,
+                content.Y + visibleY,
                 placement.Text,
                 placement.Style,
                 placement.Width);
@@ -86,7 +88,8 @@ public sealed partial class TagInput
         for (var index = 0; index < flow.TextRuns.Count; index++)
         {
             var placement = flow.TextRuns[index];
-            if (placement.Y >= content.Height)
+            var visibleY = placement.Y - windowTop;
+            if (visibleY < 0 || visibleY >= content.Height)
             {
                 continue;
             }
@@ -94,7 +97,7 @@ public sealed partial class TagInput
             RenderTextSegment(
                 canvas,
                 content.X + placement.X,
-                content.Y + placement.Y,
+                content.Y + visibleY,
                 placement.Text,
                 placement.Style,
                 placement.Width);
@@ -281,6 +284,22 @@ public sealed partial class TagInput
         }
 
         return Math.Min(MinimumWrappedInputStartWidth, Math.Max(1, width));
+    }
+
+    private static int ResolveVisibleWindowTop(FlowLayoutResult flow, int visibleHeight)
+    {
+        if (visibleHeight <= 0 || flow.Height <= visibleHeight)
+        {
+            return 0;
+        }
+
+        var anchorY = flow.Height - 1;
+        if (flow.TextRuns.Count > 0)
+        {
+            anchorY = flow.TextRuns[^1].Y;
+        }
+
+        return Math.Clamp(anchorY - visibleHeight + 1, 0, Math.Max(0, flow.Height - visibleHeight));
     }
 
     private static void AppendSpaceElements(List<FlowInlineElement> elements, int count, TeaStyle style)
