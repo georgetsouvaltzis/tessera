@@ -142,6 +142,7 @@ internal sealed partial class ConsumerOpsStudioApp
 
     private void RefreshWorkRows()
     {
+        var previousSelectedId = ResolveCurrentTabSelectionId();
         _visibleWorkItemIds.Clear();
 
         var rows = (OpsPanelTab)_tabs.SelectedIndex switch
@@ -152,6 +153,43 @@ internal sealed partial class ConsumerOpsStudioApp
         };
 
         _workTable.SetRows(rows);
+        SyncWorkTableSelection(previousSelectedId);
+    }
+
+    private string ResolveCurrentTabSelectionId()
+    {
+        return (OpsPanelTab)_tabs.SelectedIndex switch
+        {
+            OpsPanelTab.Incidents => _selectedIncidentId,
+            OpsPanelTab.Deployments => _selectedDeploymentId,
+            OpsPanelTab.Slo => _selectedServiceId,
+            _ => string.Empty,
+        };
+    }
+
+    private void SyncWorkTableSelection(string previousSelectedId)
+    {
+        if (_visibleWorkItemIds.Count == 0)
+        {
+            return;
+        }
+
+        var selectedIndex = 0;
+        if (!string.IsNullOrEmpty(previousSelectedId))
+        {
+            for (var index = 0; index < _visibleWorkItemIds.Count; index++)
+            {
+                if (!string.Equals(_visibleWorkItemIds[index], previousSelectedId, StringComparison.Ordinal))
+                {
+                    continue;
+                }
+
+                selectedIndex = index;
+                break;
+            }
+        }
+
+        _ = _workTable.SetSelectedIndex(selectedIndex);
     }
 
     private List<IReadOnlyList<string>> BuildIncidentRows()
