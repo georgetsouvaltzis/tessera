@@ -44,10 +44,10 @@ For each component or tightly-related component family:
 
 ## Current Loop
 
-- Active component: `TokenEditor`
-- Human lab target: `examples/TokenEditor`
-- Owner lane: `Owner Lane A - Input + Selection`
-- Round goal: land the strict widget-only `TokenEditor` lab, verify public-api ergonomics, and prepare manual test steps for visual review
+- Active component: `NotificationInbox`
+- Human lab target: `examples/NotificationInbox`
+- Owner lane: `Owner Lane B - Data + Explorer`
+- Round goal: land the strict widget-only `NotificationInbox` lab, verify public-api ergonomics, and prepare manual test steps for visual review
 
 ## Matrix
 
@@ -63,7 +63,7 @@ For each component or tightly-related component family:
 | `ListView<T>` | `Owner Lane B` | Simple queue list with programmatic reselect and detail pane. | `examples/ListView` | `Not Started` | `Not Started` | `Not Started` | `Not Started` | |
 | `Table` | `Owner Lane B` | Service table with row selection, mutation, and drilldown summary. | `examples/Table` | `Not Started` | `Not Started` | `Not Started` | `Not Started` | |
 | `Notifications` | `Owner Lane C` | Live toast/feed center with selection and remove/clear actions. | `examples/Notifications` | `Not Started` | `Not Started` | `Not Started` | `Not Started` | |
-| `NotificationInbox` | `Owner Lane B` | Persistent inbox with unread/severity state and selection review. | `examples/NotificationInbox` | `Not Started` | `Not Started` | `Not Started` | `Not Started` | |
+| `NotificationInbox` | `Owner Lane B` | Persistent inbox with unread/severity state and selection review. | `examples/NotificationInbox` | `Approved` | `Not Started` | `Not Started` | `In Progress` | Widget-only first pass landed; footer proves select/read/pin/delete flows and `SetItems`/`Add`/`Select`/`MarkAllRead`/`Clear`. |
 | `DataForm<T>` | `Owner Lane C` | Small settings editor with keyed field selection and validation state. | `examples/DataForm` | `Not Started` | `Not Started` | `Not Started` | `Not Started` | |
 | `ValidationSummary` | `Owner Lane C` | Compact error stack fed by a fake save attempt. | `examples/ValidationSummary` | `Not Started` | `Not Started` | `Not Started` | `Not Started` | |
 | `Form` / `FieldSet` | `Owner Lane C` | Bordered account form with grouped sections and submit footer. | `examples/ComponentLabs/FormFieldSetLab` | `Not Started` | `Not Started` | `Not Started` | `Not Started` | |
