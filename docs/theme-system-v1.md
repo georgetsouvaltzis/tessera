@@ -316,6 +316,8 @@ split.FocusedDividerStyle = TeaStyle.Empty.WithBold().WithForeground(AnsiColor.B
 
 Bordered controls in this set (`VirtualizedListView<T>`, `GroupedListView<TGroup,TItem>`, `PivotTable`, `QueryBuilder`, `KanbanBoard`, `TagInput`, `RichTextView`) map `BorderStyleText` and `FocusedBorderStyleText` to semantic border/focus tokens by default.
 
+`TagInput` also maps `CaretStyle` to `theme.Focus.Ring` by default, while placeholder tint remains controllable through `PlaceholderTextStyle`.
+
 ```csharp
 using TeaSharp.Controls;
 using TeaSharp.Styles;

@@ -90,6 +90,7 @@ internal static partial class ThemeOverridesTests
         TestAssert.Equal(theme.Text.Secondary, tagInput.TagStyle, "TagInput tag style should map to Text.Secondary.");
         TestAssert.Equal(theme.Text.Primary, tagInput.ValueTextStyle, "TagInput value style should map to Text.Primary.");
         TestAssert.Equal(theme.Text.Muted, tagInput.PlaceholderTextStyle, "TagInput placeholder style should map to Text.Muted.");
+        TestAssert.Equal(theme.Focus.Ring, tagInput.CaretStyle, "TagInput caret style should map to Focus.Ring.");
         TestAssert.Equal(theme.Border.Focused.Merge(theme.Focus.Border), tagInput.FocusedBorderStyleText, "TagInput focused border style should map to focused border tokens.");
 
         TestAssert.Equal(theme.Text.Secondary, calendar.MonthHeaderStyle, "CalendarMonthView month header style should map to Text.Secondary.");
@@ -175,6 +176,7 @@ internal static partial class ThemeOverridesTests
 
         TestAssert.Equal(explicitStyle, tagInput.TagStyle, "Defaults should not overwrite explicit TagInput.TagStyle.");
         TestAssert.Equal(theme.Text.Primary, tagInput.ValueTextStyle, "Defaults should fill empty TagInput.ValueTextStyle.");
+        TestAssert.Equal(theme.Focus.Ring, tagInput.CaretStyle, "Defaults should fill empty TagInput.CaretStyle.");
         TestAssert.Equal(explicitStyle, tagInput.BorderStyleText, "Defaults should not overwrite explicit TagInput.BorderStyleText.");
         TestAssert.Equal(theme.Border.Focused.Merge(theme.Focus.Border), tagInput.FocusedBorderStyleText, "Defaults should fill empty TagInput.FocusedBorderStyleText.");
 

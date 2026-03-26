@@ -236,6 +236,7 @@ public static partial class TeaThemeControlExtensions
         control.ErrorTagStyle = theme.State.Error;
         control.ValueTextStyle = theme.Text.Primary;
         control.PlaceholderTextStyle = theme.Text.Muted;
+        control.CaretStyle = theme.Focus.Ring;
         control.BorderStyleText = theme.Border.Default;
         control.FocusedBorderStyleText = theme.Border.Focused.Merge(theme.Focus.Border);
         control.FocusMarker = theme.Focus.Marker;
@@ -275,6 +276,7 @@ public static partial class TeaThemeControlExtensions
         control.ErrorTagStyle = ApplyDefault(control.ErrorTagStyle, theme.State.Error);
         control.ValueTextStyle = ApplyDefault(control.ValueTextStyle, theme.Text.Primary);
         control.PlaceholderTextStyle = ApplyDefault(control.PlaceholderTextStyle, theme.Text.Muted);
+        control.CaretStyle = ApplyDefault(control.CaretStyle, theme.Focus.Ring);
         control.BorderStyleText = ApplyDefault(control.BorderStyleText, theme.Border.Default);
         control.FocusedBorderStyleText = ApplyDefault(control.FocusedBorderStyleText, theme.Border.Focused.Merge(theme.Focus.Border));
         control.FocusMarker = ApplyDefault(control.FocusMarker, theme.Focus.Marker);

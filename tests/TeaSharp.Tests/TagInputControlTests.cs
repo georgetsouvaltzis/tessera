@@ -146,6 +146,77 @@ public sealed class TagInputControlTests
     }
 
     [Test]
+    public void Controls_TagInput_PlaceholderPaddingAndStyle_RenderExpectedOutput()
+    {
+        var control = new TagInput
+        {
+            Border = BorderStyle.None,
+            InputPadding = 2,
+            Placeholder = "tag",
+            ShowCaret = false,
+            PlaceholderTextStyle = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(71, 72, 73)),
+        };
+        var canvas = new Canvas(16, 2, CanvasTextMode.GraphemeAware);
+
+        control.Render(canvas, new Rect(0, 0, 16, 2));
+        var output = canvas.Render();
+
+        TestAssert.True(output.Contains("38;2;71;72;73", StringComparison.Ordinal), "Placeholder style should render.");
+        TestAssert.True(output.Contains("  tag  ", StringComparison.Ordinal), "Input padding should surround the placeholder text.");
+    }
+
+    [Test]
+    public void Controls_TagInput_ChipStyleWithoutBrackets_RendersFilledTags()
+    {
+        var control = new TagInput
+        {
+            Border = BorderStyle.None,
+            TagPadding = 1,
+            TagStyle = TeaStyle.Empty.WithBackground(AnsiColor.Rgb(11, 12, 13)).WithForeground(AnsiColor.Rgb(241, 242, 243)),
+            Options = new TagInputOptions(TagPrefix: string.Empty, TagSuffix: string.Empty),
+        };
+        control.SetTags(["alpha"]);
+        var canvas = new Canvas(24, 2, CanvasTextMode.GraphemeAware);
+
+        control.Render(canvas, new Rect(0, 0, 24, 2));
+        var output = canvas.Render();
+
+        TestAssert.True(output.Contains(" alpha ", StringComparison.Ordinal), "Chip mode should render padded text without bracket glyphs.");
+        TestAssert.True(!output.Contains("[alpha]", StringComparison.Ordinal), "Chip mode should not force bracket fallback.");
+        TestAssert.True(output.Contains("48;2;11;12;13", StringComparison.Ordinal), "Chip background style should render.");
+    }
+
+    [Test]
+    public void Controls_TagInput_OverflowWindow_PreservesIndicatorAndVisibleInput()
+    {
+        var control = new TagInput
+        {
+            IsFocused = true,
+            Border = BorderStyle.None,
+            TagPadding = 1,
+            InputPadding = 1,
+            Placeholder = "x",
+            CaretGlyph = "|",
+            CaretStyle = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(81, 82, 83)),
+            Options = new TagInputOptions(TagPrefix: string.Empty, TagSuffix: string.Empty),
+        };
+        control.SetTags(["alpha", "beta", "gamma", "delta"]);
+        foreach (var character in "release-candidate")
+        {
+            _ = control.Handle(new KeyPressed(Key.Character, character.ToString()));
+        }
+
+        var canvas = new Canvas(18, 2, CanvasTextMode.GraphemeAware);
+        control.Render(canvas, new Rect(0, 0, 18, 2));
+        var output = canvas.Render();
+
+        TestAssert.True(output.Contains("…", StringComparison.Ordinal), "Overflow indicator should render when tags exceed width.");
+        TestAssert.True(output.Contains("didate", StringComparison.Ordinal), "Visible input tail should remain rendered when tags overflow.");
+        TestAssert.True(output.Contains("|", StringComparison.Ordinal), "Caret glyph should remain visible in the input area.");
+        TestAssert.True(output.Contains("38;2;81;82;83", StringComparison.Ordinal), "Caret style should render.");
+    }
+
+    [Test]
     public void Controls_TagInput_DefaultRender_IsDeterministicAndMonochrome()
     {
         var control = new TagInput

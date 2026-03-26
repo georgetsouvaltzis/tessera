@@ -1,10 +1,11 @@
 using TeaSharp.Components.Primitives;
 using TeaSharp.Components.Primitives.Internal;
 using TeaSharp.Controls.Internal;
-using TeaSharp.Layout;
 using TeaSharp.Styles;
 using TeaSharp.Widgets;
+
 namespace TeaSharp.Controls;
+
 /// <summary>
 /// Editable tag input control with separator-based commit behavior.
 ///
@@ -12,7 +13,7 @@ namespace TeaSharp.Controls;
 /// <see cref="AddTag(string)"/>, and <see cref="RemoveTagAt(int)"/>. The
 /// <see cref="IsDisabled"/> and <see cref="IsReadOnly"/> guards only affect user interaction.
 /// </summary>
-public sealed class TagInput : Control
+public sealed partial class TagInput : Control
 {
     private readonly List<string> _tags = [];
     private readonly TextInputModel _input = new();
@@ -42,11 +43,33 @@ public sealed class TagInput : Control
     public TeaStyle ErrorTagStyle { get; set; } = TeaStyle.Empty;
     public TeaStyle ValueTextStyle { get; set; } = TeaStyle.Empty;
     public TeaStyle PlaceholderTextStyle { get; set; } = TeaStyle.Empty;
+    /// <summary>
+    /// Gets or sets the style used for the rendered caret indicator.
+    /// </summary>
+    public TeaStyle CaretStyle { get; set; } = TeaStyle.Empty;
     public BorderStyle Border { get; set; } = BorderStyle.SingleLine;
     public Thickness Padding { get; set; }
+    /// <summary>
+    /// Gets or sets the horizontal padding inserted inside each rendered tag chip.
+    /// </summary>
+    public int TagPadding { get; set; }
+
+    /// <summary>
+    /// Gets or sets the horizontal padding inserted around the input/placeholder text.
+    /// </summary>
+    public int InputPadding { get; set; }
     public TeaStyle BorderStyleText { get; set; } = TeaStyle.Empty;
     public TeaStyle FocusedBorderStyleText { get; set; } = TeaStyle.Empty;
     public bool HasError { get; set; }
+    /// <summary>
+    /// Gets or sets a value indicating whether a caret indicator should be rendered while focused.
+    /// </summary>
+    public bool ShowCaret { get; set; } = true;
+
+    /// <summary>
+    /// Gets or sets the glyph used for the caret indicator.
+    /// </summary>
+    public string CaretGlyph { get; set => field = value ?? string.Empty; } = "|";
     public IReadOnlyList<string> Tags => _tags;
     public string InputValue => _input.Value;
     public int SelectedTagIndex => _selectedTagIndex;
@@ -231,111 +254,6 @@ public sealed class TagInput : Control
         }
         return false;
     }
-    public override void Render(Canvas canvas, Rect rect)
-    {
-        var clipped = Rect.Intersect(rect, canvas.Bounds);
-        if (clipped.IsEmpty)
-        {
-            return;
-        }
-        var content = FrameLayout.DrawFrameAndResolveContent(
-            canvas,
-            clipped,
-            Border == BorderStyle.None ? null : RenderTitle(),
-            Border,
-            Padding,
-            ResolveBorderStyleText());
-        if (content.IsEmpty)
-        {
-            return;
-        }
-        RenderSingleLine(canvas, content);
-    }
-    internal override LayoutMeasurement Measure(in Rect availableBounds)
-    {
-        var options = Options;
-        var prefix = string.IsNullOrEmpty(options.TagPrefix) ? "[" : options.TagPrefix;
-        var suffix = string.IsNullOrEmpty(options.TagSuffix) ? "]" : options.TagSuffix;
-        var prefixWidth = ControlTextLayout.MeasureDisplayWidth(prefix);
-        var suffixWidth = ControlTextLayout.MeasureDisplayWidth(suffix);
-        var width = Math.Max(16, ControlTextLayout.MeasureDisplayWidth(FormatTitleText()) + 4);
-        for (var index = 0; index < _tags.Count; index++)
-        {
-            var tagWidth = prefixWidth + ControlTextLayout.MeasureDisplayWidth(_tags[index]) + suffixWidth;
-            width += tagWidth + 1;
-        }
-        width += 8;
-        width += Padding.Horizontal;
-        if (Border != BorderStyle.None)
-        {
-            width += 2;
-        }
-        var height = Padding.Vertical + 1;
-        if (Border != BorderStyle.None)
-        {
-            height += 2;
-        }
-        return new LayoutMeasurement(
-            Math.Clamp(width, 0, availableBounds.Width),
-            Math.Clamp(height, 0, availableBounds.Height));
-    }
-    private void RenderSingleLine(Canvas canvas, Rect content)
-    {
-        var options = Options;
-        var prefix = string.IsNullOrEmpty(options.TagPrefix) ? "[" : options.TagPrefix;
-        var suffix = string.IsNullOrEmpty(options.TagSuffix) ? "]" : options.TagSuffix;
-        var prefixWidth = ControlTextLayout.MeasureDisplayWidth(prefix);
-        var suffixWidth = ControlTextLayout.MeasureDisplayWidth(suffix);
-        var x = content.X;
-        var y = content.Y;
-        var right = content.Right;
-        for (var index = 0; index < _tags.Count && x < right; index++)
-        {
-            var tag = _tags[index];
-            var tagWidth = prefixWidth + ControlTextLayout.MeasureDisplayWidth(tag) + suffixWidth;
-            if (tagWidth <= 0 || x + tagWidth > right)
-            {
-                break;
-            }
-            var tagStyle = ResolveTagStyle(index);
-            if (tagStyle.IsEmpty)
-            {
-                canvas.WriteText(x, y, prefix, right - x);
-                x += prefixWidth;
-                canvas.WriteText(x, y, tag, right - x);
-                x += ControlTextLayout.MeasureDisplayWidth(tag);
-                canvas.WriteText(x, y, suffix, right - x);
-                x += suffixWidth;
-            }
-            else
-            {
-                var token = string.Concat(prefix, tag, suffix);
-                canvas.WriteText(x, y, tagStyle.Render(token), right - x);
-                x += tagWidth;
-            }
-            if (x < right)
-            {
-                canvas.Set(x, y, ' ');
-                x++;
-            }
-        }
-        var inputWidth = right - x;
-        if (inputWidth <= 0)
-        {
-            return;
-        }
-        var frame = _input.BuildFrame(inputWidth);
-        var inputStyle = frame.PlaceholderVisible ? PlaceholderTextStyle : ValueTextStyle;
-        if (IsDisabled)
-        {
-            inputStyle = inputStyle.Merge(DisabledTagStyle);
-        }
-        if (HasError)
-        {
-            inputStyle = inputStyle.Merge(ErrorTagStyle);
-        }
-        canvas.WriteText(x, y, ApplyStyle(frame.Text, inputStyle), inputWidth);
-    }
     private bool MoveSelectedTag(int delta)
     {
         if (_tags.Count == 0 || delta == 0)
@@ -449,29 +367,59 @@ public sealed class TagInput : Control
     }
     private int HitTagIndex(int pointerX, Rect content)
     {
-        var options = Options;
-        var prefix = string.IsNullOrEmpty(options.TagPrefix) ? "[" : options.TagPrefix;
-        var suffix = string.IsNullOrEmpty(options.TagSuffix) ? "]" : options.TagSuffix;
-        var prefixWidth = ControlTextLayout.MeasureDisplayWidth(prefix);
-        var suffixWidth = ControlTextLayout.MeasureDisplayWidth(suffix);
-        var x = content.X;
-        for (var index = 0; index < _tags.Count; index++)
+        var inputAreaWidth = ResolveVisibleInputAreaWidth(content.Width);
+        var renderTagArea = _tags.Count > 0 && inputAreaWidth < content.Width;
+        var gapWidth = renderTagArea && content.Width - inputAreaWidth > 1 ? 1 : 0;
+        var tagAreaWidth = Math.Max(0, content.Width - inputAreaWidth - gapWidth);
+        if (tagAreaWidth <= 0 || pointerX < content.X || pointerX >= content.X + tagAreaWidth)
         {
-            var width = prefixWidth + ControlTextLayout.MeasureDisplayWidth(_tags[index]) + suffixWidth;
-            if (width <= 0)
+            return -1;
+        }
+
+        var (start, end) = ResolveVisibleTagWindow(tagAreaWidth);
+        if (start < 0 || end < start)
+        {
+            return -1;
+        }
+
+        var cursor = content.X;
+        var right = content.X + tagAreaWidth;
+        if (start > 0)
+        {
+            var leftIndicatorWidth = ControlTextLayout.MeasureDisplayWidth(OverflowIndicator);
+            if (pointerX >= cursor && pointerX < cursor + leftIndicatorWidth)
             {
-                continue;
+                return -1;
             }
-            if (pointerX >= x && pointerX < x + width)
+
+            cursor += leftIndicatorWidth;
+        }
+
+        var rightIndicatorColumn = end < _tags.Count - 1
+            ? right - ControlTextLayout.MeasureDisplayWidth(OverflowIndicator)
+            : right;
+        for (var index = start; index <= end && cursor < rightIndicatorColumn; index++)
+        {
+            if (index > start)
+            {
+                if (pointerX == cursor)
+                {
+                    return -1;
+                }
+
+                cursor++;
+            }
+
+            var tagWidth = MeasureTagWidth(index);
+            var visibleRight = Math.Min(rightIndicatorColumn, cursor + tagWidth);
+            if (pointerX >= cursor && pointerX < visibleRight)
             {
                 return index;
             }
-            x += width + 1;
-            if (x >= content.Right)
-            {
-                break;
-            }
+
+            cursor += tagWidth;
         }
+
         return -1;
     }
     private bool SetSelectedTagIndex(int index)
@@ -497,60 +445,6 @@ public sealed class TagInput : Control
         }
         _hoveredTagIndex = normalized;
         return true;
-    }
-    private TeaStyle ResolveTagStyle(int tagIndex)
-    {
-        var style = TagStyle;
-        if (tagIndex == _selectedTagIndex)
-        {
-            style = style.Merge(SelectedTagStyle);
-            if (IsFocused)
-            {
-                style = style.Merge(FocusedTagStyle);
-            }
-        }
-        if (tagIndex == _hoveredTagIndex)
-        {
-            style = style.Merge(HoveredTagStyle);
-        }
-        if (IsDisabled)
-        {
-            style = style.Merge(DisabledTagStyle);
-        }
-        if (HasError)
-        {
-            style = style.Merge(ErrorTagStyle);
-        }
-        return style;
-    }
-    private TeaStyle ResolveBorderStyleText()
-    {
-        var style = BorderStyleText;
-        if (IsFocused)
-        {
-            style = style.Merge(FocusedBorderStyleText);
-        }
-        if (IsDisabled)
-        {
-            style = style.Merge(DisabledTagStyle);
-        }
-        if (HasError)
-        {
-            style = style.Merge(ErrorTagStyle);
-        }
-        return style;
-    }
-    private string RenderTitle()
-    {
-        return ApplyStyle(
-            FormatTitleText(),
-            IsFocused ? FocusedTitleStyle : TitleStyle);
-    }
-    private string FormatTitleText()
-    {
-        return string.IsNullOrEmpty(Title)
-            ? string.Empty
-            : IsFocused && ShowFocusMarker && !string.IsNullOrWhiteSpace(FocusMarker) ? $"{Title} {FocusMarker}" : Title;
     }
     private static ReadOnlySpan<char> Trim(ReadOnlySpan<char> value)
     {
