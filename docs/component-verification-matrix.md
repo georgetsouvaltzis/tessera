@@ -20,43 +20,52 @@ Review gates:
 For each component or tightly-related component family:
 
 1. Implementator builds a minimal lab app using only the public API.
+   - one widget per app
+   - lab path format: `examples/<WidgetName>`
 2. Implementator reports what was easy, hard, awkward, or ambiguous.
-3. Engineering fixes justified issues and adds tests as needed.
-4. Implementator retests against the updated API/widget behavior.
-5. User reviews the lab manually.
-6. Component is marked `Approved` only after all three lanes agree.
+3. Implementator provides exact manual test steps for the user.
+4. Engineering fixes justified issues and adds tests as needed.
+5. Implementator retests against the updated API/widget behavior.
+6. User reviews the lab manually.
+7. Component is marked `Approved` only after all three lanes agree.
 
 ## Coordinator Lanes
 
-- `Human Lane`: builds or audits minimal labs under `examples/ComponentLabs/*` using only `Tea`, `TeaSharp.Controls`, `TeaSharp.Layout`, and `TeaSharp.Styles`; reports easiest path, hardest path, and any ambiguous API.
+- `Human Lane`: builds or audits minimal labs under `examples/<WidgetName>` using only `Tea`, `TeaSharp.Controls`, `TeaSharp.Layout`, and `TeaSharp.Styles`; reports easiest path, hardest path, and any ambiguous API.
 - `Owner Lane A - Input + Selection`: `TextInput`, `SearchBox`, `Choice`, `ComboBox`, `TagInput`, `TokenEditor`, `AutocompleteInput`, `CommandPalette`, `QuickOpenOverlay`, `JumpList`.
 - `Owner Lane B - Data + Explorer`: `ListView<T>`, `Table`, `NotificationInbox`, `CalendarMonthView`, `SchedulerTimeline`, `KanbanBoard`, `QueryBuilder`, `JsonTreeView`, `SearchResultsView`, `ProcessListView`, `TraceViewer`, `LogTailPanel`.
 - `Owner Lane C - Shell + Workflow + Visuals`: `Notifications`, `DataForm<T>`, `ValidationSummary`, `Form`, `FieldSet`, `Wizard`, `Stepper`, `Dialog`, `InspectorPanel`, plotting widgets, KPI widgets, matrix/data-viz widgets, workspace layout widgets, and navigation/layout composition widgets.
 
+## Lab Layout Rule
+
+- Final lab path shape is `examples/<WidgetName>`.
+- One widget per lab app. If the backlog still shows grouped placeholder rows, split them before implementation starts.
+- Implementator handoff is incomplete without a short manual test checklist for the user.
+
 ## Current Loop
 
 - Active component: `TagInput`
-- Human lab: `examples/ComponentLabs/TagInputLab`
+- Human lab target: `examples/TagInput`
 - Owner lane: `Owner Lane A - Input + Selection`
-- Round goal: prove add/remove/edit/select/styling behavior from clean public API usage; human + engineering lanes are complete, pending user visual review before advancing to `TokenEditor`
+- Round goal: single-widget example layout is in place; manual test steps and visual-review readiness are ready for user review
 
 ## Matrix
 
 | Component | Owner Lane | Minimal Lab Idea | Lab App | Implementator | Engineering | User Review | Final Status | Notes |
 |---|---|---|---|---|---|---|---|---|
-| `TextInput` | `Owner Lane A` | Single-field command box with submit/cancel and validation hint. | `examples/ComponentLabs/TextInputLab` | `Not Started` | `Not Started` | `Not Started` | `Not Started` | |
-| `SearchBox` | `Owner Lane A` | Search bar driving a tiny result count/status panel. | `examples/ComponentLabs/SearchBoxLab` | `Not Started` | `Not Started` | `Not Started` | `Not Started` | |
-| `Choice` | `Owner Lane A` | Environment selector with keyboard + pointer open/select flow. | `examples/ComponentLabs/ChoiceLab` | `Not Started` | `Not Started` | `Not Started` | `Not Started` | |
-| `ComboBox` | `Owner Lane A` | Region picker with type-to-filter and explicit selection summary. | `examples/ComponentLabs/ComboBoxLab` | `Not Started` | `Not Started` | `Not Started` | `Not Started` | |
-| `TagInput` | `Owner Lane A` | Incident label editor: add, dedupe, cap, remove, pointer select, style toggle. | `examples/ComponentLabs/TagInputLab` | `Approved` | `Approved` | `Not Started` | `Ready To Test` | Human lab tightened; interaction contract clarified in docs/tests. |
-| `TokenEditor` | `Owner Lane A` | Assignee/chip editor with selection and token mutation feed. | `examples/ComponentLabs/TokenEditorLab` | `Not Started` | `Not Started` | `Not Started` | `Not Started` | Next after `TagInput`. |
-| `AutocompleteInput` | `Owner Lane A` | Command/search suggestion bar with commit and fallback typing. | `examples/ComponentLabs/AutocompleteInputLab` | `Not Started` | `Not Started` | `Not Started` | `Not Started` | |
-| `ListView<T>` | `Owner Lane B` | Simple queue list with programmatic reselect and detail pane. | `examples/ComponentLabs/ListViewLab` | `Not Started` | `Not Started` | `Not Started` | `Not Started` | |
-| `Table` | `Owner Lane B` | Service table with row selection, mutation, and drilldown summary. | `examples/ComponentLabs/TableLab` | `Not Started` | `Not Started` | `Not Started` | `Not Started` | |
-| `Notifications` | `Owner Lane C` | Live toast/feed center with selection and remove/clear actions. | `examples/ComponentLabs/NotificationsLab` | `Not Started` | `Not Started` | `Not Started` | `Not Started` | |
-| `NotificationInbox` | `Owner Lane B` | Persistent inbox with unread/severity state and selection review. | `examples/ComponentLabs/NotificationInboxLab` | `Not Started` | `Not Started` | `Not Started` | `Not Started` | |
-| `DataForm<T>` | `Owner Lane C` | Small settings editor with keyed field selection and validation state. | `examples/ComponentLabs/DataFormLab` | `Not Started` | `Not Started` | `Not Started` | `Not Started` | |
-| `ValidationSummary` | `Owner Lane C` | Compact error stack fed by a fake save attempt. | `examples/ComponentLabs/ValidationSummaryLab` | `Not Started` | `Not Started` | `Not Started` | `Not Started` | |
+| `TextInput` | `Owner Lane A` | Single-field command box with submit/cancel and validation hint. | `examples/TextInput` | `Not Started` | `Not Started` | `Not Started` | `Not Started` | |
+| `SearchBox` | `Owner Lane A` | Search bar driving a tiny result count/status panel. | `examples/SearchBox` | `Not Started` | `Not Started` | `Not Started` | `Not Started` | |
+| `Choice` | `Owner Lane A` | Environment selector with keyboard + pointer open/select flow. | `examples/Choice` | `Not Started` | `Not Started` | `Not Started` | `Not Started` | |
+| `ComboBox` | `Owner Lane A` | Region picker with type-to-filter and explicit selection summary. | `examples/ComboBox` | `Not Started` | `Not Started` | `Not Started` | `Not Started` | |
+| `TagInput` | `Owner Lane A` | Incident label editor: add, dedupe, cap, remove, pointer select, style toggle. | `examples/TagInput` | `Approved` | `Approved` | `Not Started` | `Ready To Test` | Single-widget example path landed; manual test steps ready for user. |
+| `TokenEditor` | `Owner Lane A` | Assignee/chip editor with selection and token mutation feed. | `examples/TokenEditor` | `Not Started` | `Not Started` | `Not Started` | `Not Started` | Next after `TagInput`. |
+| `AutocompleteInput` | `Owner Lane A` | Command/search suggestion bar with commit and fallback typing. | `examples/AutocompleteInput` | `Not Started` | `Not Started` | `Not Started` | `Not Started` | |
+| `ListView<T>` | `Owner Lane B` | Simple queue list with programmatic reselect and detail pane. | `examples/ListView` | `Not Started` | `Not Started` | `Not Started` | `Not Started` | |
+| `Table` | `Owner Lane B` | Service table with row selection, mutation, and drilldown summary. | `examples/Table` | `Not Started` | `Not Started` | `Not Started` | `Not Started` | |
+| `Notifications` | `Owner Lane C` | Live toast/feed center with selection and remove/clear actions. | `examples/Notifications` | `Not Started` | `Not Started` | `Not Started` | `Not Started` | |
+| `NotificationInbox` | `Owner Lane B` | Persistent inbox with unread/severity state and selection review. | `examples/NotificationInbox` | `Not Started` | `Not Started` | `Not Started` | `Not Started` | |
+| `DataForm<T>` | `Owner Lane C` | Small settings editor with keyed field selection and validation state. | `examples/DataForm` | `Not Started` | `Not Started` | `Not Started` | `Not Started` | |
+| `ValidationSummary` | `Owner Lane C` | Compact error stack fed by a fake save attempt. | `examples/ValidationSummary` | `Not Started` | `Not Started` | `Not Started` | `Not Started` | |
 | `Form` / `FieldSet` | `Owner Lane C` | Bordered account form with grouped sections and submit footer. | `examples/ComponentLabs/FormFieldSetLab` | `Not Started` | `Not Started` | `Not Started` | `Not Started` | |
 | `Wizard` / `Stepper` | `Owner Lane C` | Three-step setup flow with next/back and status recap. | `examples/ComponentLabs/WizardStepperLab` | `Not Started` | `Not Started` | `Not Started` | `Not Started` | |
 | `Dialog` | `Owner Lane C` | Confirm/cancel destructive action with typed close result readback. | `examples/ComponentLabs/DialogLab` | `Not Started` | `Not Started` | `Not Started` | `Not Started` | |

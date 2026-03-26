@@ -3,13 +3,13 @@ using TeaSharp.Controls;
 using TeaSharp.Layout;
 using TeaSharp.Styles;
 
-internal sealed class TagInputLabApp : TeaApp
+internal sealed class TagInputApp : TeaApp
 {
     public static readonly TeaTheme DefaultTheme = TeaThemes.Catppuccin(CatppuccinVariant.Macchiato);
 
     private readonly Label _instructions = new()
     {
-        Title = "TagInput Lab",
+        Title = "TagInput",
         Border = BorderStyle.Rounded,
         Padding = Thickness.All(1),
     };
@@ -70,14 +70,14 @@ internal sealed class TagInputLabApp : TeaApp
     private int _apiTagCounter;
     private string _statusText = "Ready";
 
-    public TagInputLabApp()
+    public TagInputApp()
     {
         ApplyTagRules();
         WireEvents();
         ApplyTheme();
         _instructions.Text = BuildInstructionsText();
         _tagInput.RequestFocus();
-        _events.Push("TagInput lab ready", NotificationLevel.Info);
+        _events.Push("TagInput example ready", NotificationLevel.Info);
     }
 
     public override TeaEffect? Update(Message message)
