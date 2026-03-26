@@ -313,8 +313,13 @@ Additive selection APIs now available on the default path:
 - `ComboBox.SetSelectedIndex(int)`
 - `ComboBox.TrySetSelectedItem(string)`
 - `DataForm<TModel>.SelectField(string key)`
+- `DataForm<TModel>.BeginEdit()`
+- `DataForm<TModel>.CancelEdit()`
+- `DataForm<TModel>.IsEditing`
 
 These close the consumer proof-loop selection pressure without breaking existing APIs.
+
+`DataForm<TModel>` now defaults to selection-first interaction: row selection does not mutate values, `Enter` enters edit mode, `Enter` commits, `Esc` cancels, and validation failure remains visible inside the control.
 
 ## Tier 2: Advanced But Supported
 

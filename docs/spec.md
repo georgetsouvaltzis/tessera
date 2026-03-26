@@ -459,6 +459,15 @@ Additive selection APIs on the default public path:
 - `Choice.SetSelectedIndex(int)` and `Choice.TrySetSelectedItem(string)` for direct selection without synthetic key-message flows.
 - `ComboBox.SetSelectedIndex(int)` and `ComboBox.TrySetSelectedItem(string)` for direct selection without filter+key orchestration.
 - `DataForm<TModel>.SelectField(string key)` for stable keyed field routing in validation/workflow flows.
+- `DataForm<TModel>.BeginEdit()` / `CancelEdit()` plus `IsEditing` for explicit selection-first form editing flows.
+
+`DataForm<TModel>` default interaction contract is selection-first:
+
+- arrow keys / pointer move selection only
+- `Enter` enters value-edit mode on the selected field with the caret at the end of the current value
+- `Enter` in edit mode commits
+- `Esc` cancels the in-flight edit
+- validation failure stays visible inside the widget until the value is fixed or edit mode is cancelled
 
 Consumer proof-loop adoption (`c0c3c34`, `a58cc64`, `91a5ecb`, `147859c`, `38d75e6`, `f8fb80c`) reports no remaining pre-RC blockers in this lane.
 

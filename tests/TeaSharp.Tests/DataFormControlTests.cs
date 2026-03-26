@@ -32,7 +32,33 @@ public sealed class DataFormControlTests
     }
 
     [Test]
-    public void Controls_DataForm_TextEntryAndEnterCommit_UpdatesModelAndRaisesFieldCommitted()
+    public void Controls_DataForm_SelectionMode_IgnoresTyping_UntilEnterStartsEditing()
+    {
+        var model = new TestModel { Name = string.Empty };
+        var control = new DataForm<TestModel>
+        {
+            Border = BorderStyle.None,
+            Title = string.Empty,
+            IsFocused = true,
+        };
+        control.RegisterField("name", "Name", m => m.Name, (m, value) => m.Name = value, placeholder: "name");
+        control.SetModel(model);
+
+        var typedWhileSelected = control.Handle(new KeyPressed(Key.Character, "A"));
+
+        Assert.That(typedWhileSelected, Is.False);
+        Assert.That(control.IsEditing, Is.False);
+        Assert.That(control.EditBuffer, Is.EqualTo(string.Empty));
+        Assert.That(model.Name, Is.EqualTo(string.Empty));
+
+        var output = Render(control, width: 48, height: 4);
+
+        Assert.That(output.Contains("Press Enter to edit.", StringComparison.Ordinal), Is.True);
+        Assert.That(output.Contains("name |", StringComparison.Ordinal), Is.False);
+    }
+
+    [Test]
+    public void Controls_DataForm_EnterStartsEditing_AndEnterCommit_UpdatesModelAndRaisesFieldCommitted()
     {
         var model = new TestModel { Name = string.Empty };
         var control = new DataForm<TestModel>
@@ -47,18 +73,50 @@ public sealed class DataFormControlTests
         DataFormFieldCommittedEventArgs<TestModel>? committed = null;
         control.FieldCommitted += (_, args) => committed = args;
 
+        var beginHandled = control.Handle(new KeyPressed(Key.Enter));
         _ = control.Handle(new KeyPressed(Key.Character, "A"));
         _ = control.Handle(new KeyPressed(Key.Character, "d"));
         _ = control.Handle(new KeyPressed(Key.Character, "a"));
         var handled = control.Handle(new KeyPressed(Key.Enter));
 
+        Assert.That(beginHandled, Is.True);
         Assert.That(handled, Is.True);
+        Assert.That(control.IsEditing, Is.False);
         Assert.That(model.Name, Is.EqualTo("Ada"));
         Assert.That(committed, Is.Not.Null);
         Assert.That(committed!.Success, Is.True);
         Assert.That(committed.PreviousValue, Is.EqualTo(string.Empty));
         Assert.That(committed.CommittedValue, Is.EqualTo("Ada"));
         Assert.That(committed.Field.Key, Is.EqualTo("name"));
+    }
+
+    [Test]
+    public void Controls_DataForm_EscapeCancelsEditing_AndRestoresCommittedValue()
+    {
+        var model = new TestModel { Name = "Ada" };
+        var control = new DataForm<TestModel>
+        {
+            Border = BorderStyle.None,
+            Title = string.Empty,
+            IsFocused = true,
+        };
+        control.RegisterField("name", "Name", m => m.Name, (m, value) => m.Name = value);
+        control.SetModel(model);
+
+        _ = control.Handle(new KeyPressed(Key.Enter));
+        _ = control.Handle(new KeyPressed(Key.Character, "!"));
+
+        var outputWhileEditing = Render(control, width: 48, height: 4);
+        var cancelHandled = control.Handle(new KeyPressed(Key.Escape));
+        var outputAfterCancel = Render(control, width: 48, height: 4);
+
+        Assert.That(outputWhileEditing.Contains("Ada!|", StringComparison.Ordinal), Is.True);
+        Assert.That(cancelHandled, Is.True);
+        Assert.That(control.IsEditing, Is.False);
+        Assert.That(control.EditBuffer, Is.EqualTo("Ada"));
+        Assert.That(model.Name, Is.EqualTo("Ada"));
+        Assert.That(outputAfterCancel.Contains("Ada!|", StringComparison.Ordinal), Is.False);
+        Assert.That(outputAfterCancel.Contains("Press Enter to edit.", StringComparison.Ordinal), Is.True);
     }
 
     [Test]
@@ -163,6 +221,47 @@ public sealed class DataFormControlTests
 
         Assert.That(first, Is.EqualTo(second));
         Assert.That(first.Contains("\u001b[", StringComparison.Ordinal), Is.False);
+    }
+
+    [Test]
+    public void Controls_DataForm_CommitFailure_RendersVisibleError_AndKeepsEditMode()
+    {
+        var model = new TestModel { Name = "Ada", Email = "tea@example.dev" };
+        var control = new DataForm<TestModel>
+        {
+            Border = BorderStyle.None,
+            Title = string.Empty,
+            IsFocused = true,
+        };
+        control.RegisterField(
+            "name",
+            "Name",
+            m => m.Name,
+            (m, value) => m.Name = value,
+            validator: value => value.Trim().Length >= 3 ? null : "min 3 chars");
+        control.RegisterField("email", "Email", m => m.Email, (m, value) => m.Email = value);
+        control.SetModel(model);
+
+        DataFormFieldCommittedEventArgs<TestModel>? committed = null;
+        control.FieldCommitted += (_, args) => committed = args;
+
+        _ = control.Handle(new KeyPressed(Key.Enter));
+        _ = control.Handle(new KeyPressed(Key.Backspace));
+        _ = control.Handle(new KeyPressed(Key.Backspace));
+        var commitHandled = control.Handle(new KeyPressed(Key.Enter));
+        var moveHandled = control.Handle(new KeyPressed(Key.Down));
+        var output = Render(control, width: 56, height: 5);
+
+        Assert.That(commitHandled, Is.True);
+        Assert.That(moveHandled, Is.True);
+        Assert.That(committed, Is.Not.Null);
+        Assert.That(committed!.Success, Is.False);
+        Assert.That(control.IsEditing, Is.True);
+        Assert.That(control.SelectedIndex, Is.EqualTo(0));
+        Assert.That(control.LastCommitError, Is.EqualTo("min 3 chars"));
+        Assert.That(model.Name, Is.EqualTo("Ada"));
+        Assert.That(output.Contains("Error: min 3 chars", StringComparison.Ordinal), Is.True);
+        Assert.That(output.Contains("A|", StringComparison.Ordinal), Is.True);
     }
 
     private static string Render(DataForm<TestModel> control, int width, int height)

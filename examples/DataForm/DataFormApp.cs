@@ -25,7 +25,7 @@ internal sealed class DataFormApp : TeaApp
     private bool _styleAlt;
     private int _selectionChanges;
     private int _commitCount;
-    private string _statusText = "widget-only proof: bind model, edit/commit, keyed select, validation";
+    private string _statusText = "widget-only proof: select row, Enter to edit, commit/cancel, keyed select, validation";
 
     public DataFormApp()
     {
@@ -64,7 +64,7 @@ internal sealed class DataFormApp : TeaApp
         if (key.IsCharacter('r', ModifierKeys.Ctrl))
         {
             ResetModel();
-            _statusText = "api SetModel(seed): edit fields or click rows";
+            _statusText = "api SetModel(seed): select rows, press Enter to edit";
             return null;
         }
 
@@ -221,7 +221,7 @@ internal sealed class DataFormApp : TeaApp
         _status.LeftText =
             $"field={selected} buf={_form.EditBuffer} commits={_commitCount} sch={_selectionChanges}";
         _status.RightText =
-            $"{status} | {modelState} | type edit Enter commit Esc cancel Up/Down j/k nav click row ^R set-model ^U clear-model ^G team ^K owner ^T style ^O ro ^I dis ^C quit";
+            $"{status} | {modelState} | select row Up/Down j/k or click, Enter edit, type, Enter commit, Esc cancel | ^R set-model ^U clear-model ^G team ^K owner ^T style ^O ro ^I dis ^C quit";
     }
 
     private sealed class ServiceProfile
