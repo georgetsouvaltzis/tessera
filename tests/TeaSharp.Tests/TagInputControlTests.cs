@@ -50,6 +50,33 @@ public sealed class TagInputControlTests
     }
 
     [Test]
+    public void Controls_TagInput_InteractionGuards_BlockHandle_ButNotProgrammaticMutation()
+    {
+        var control = new TagInput
+        {
+            IsFocused = true,
+            IsDisabled = true,
+            IsReadOnly = true,
+            Border = BorderStyle.None,
+        };
+        var events = 0;
+        control.TagsChanged += (_, _) => events++;
+
+        control.SetTags(["ops"]);
+
+        var handled = control.Handle(new KeyPressed(Key.Character, "x"));
+        var added = control.AddTag("infra");
+        var removed = control.RemoveTagAt(0);
+
+        Assert.That(handled, Is.False);
+        Assert.That(added, Is.True);
+        Assert.That(removed, Is.True);
+        Assert.That(control.InputValue, Is.Empty);
+        Assert.That(control.Tags, Is.EqualTo(new[] { "infra" }));
+        Assert.That(events, Is.EqualTo(3));
+    }
+
+    [Test]
     public void Controls_TagInput_EnterCommitsTag()
     {
         var control = new TagInput

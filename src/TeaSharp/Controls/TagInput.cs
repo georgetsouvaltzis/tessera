@@ -7,6 +7,10 @@ using TeaSharp.Widgets;
 namespace TeaSharp.Controls;
 /// <summary>
 /// Editable tag input control with separator-based commit behavior.
+///
+/// Programmatic mutation stays available through <see cref="SetTags(IEnumerable{string})"/>,
+/// <see cref="AddTag(string)"/>, and <see cref="RemoveTagAt(int)"/>. The
+/// <see cref="IsDisabled"/> and <see cref="IsReadOnly"/> guards only affect user interaction.
 /// </summary>
 public sealed class TagInput : Control
 {
@@ -48,8 +52,32 @@ public sealed class TagInput : Control
     public int SelectedTagIndex => _selectedTagIndex;
     public string SelectedTag => _selectedTagIndex >= 0 && _selectedTagIndex < _tags.Count ? _tags[_selectedTagIndex] : string.Empty;
     public override bool IsFocused { get; set; }
+
+    /// <summary>
+    /// Gets or sets whether user interaction is ignored.
+    /// </summary>
+    /// <remarks>
+    /// Programmatic mutation APIs such as <see cref="SetTags(IEnumerable{string})"/>,
+    /// <see cref="AddTag(string)"/>, and <see cref="RemoveTagAt(int)"/> still work.
+    /// </remarks>
     public override bool IsDisabled { get; set; }
+
+    /// <summary>
+    /// Gets or sets whether user interaction is read-only.
+    /// </summary>
+    /// <remarks>
+    /// Programmatic mutation APIs such as <see cref="SetTags(IEnumerable{string})"/>,
+    /// <see cref="AddTag(string)"/>, and <see cref="RemoveTagAt(int)"/> still work.
+    /// </remarks>
     public override bool IsReadOnly { get; set; }
+
+    /// <summary>
+    /// Replaces the current tag collection programmatically.
+    /// </summary>
+    /// <param name="tags">The new tag values.</param>
+    /// <remarks>
+    /// This bypasses interaction guards and raises <see cref="TagsChanged"/> when the tag snapshot changes.
+    /// </remarks>
     public void SetTags(IEnumerable<string> tags)
     {
         ArgumentNullException.ThrowIfNull(tags);
@@ -73,6 +101,14 @@ public sealed class TagInput : Control
         RaiseTagsChangedIfNeeded(previousTags);
     }
 
+    /// <summary>
+    /// Adds a tag programmatically.
+    /// </summary>
+    /// <param name="tag">The tag value to add.</param>
+    /// <returns><c>true</c> when the tag was added; otherwise <c>false</c>.</returns>
+    /// <remarks>
+    /// This bypasses interaction guards and still respects duplicate and max-tag rules.
+    /// </remarks>
     public bool AddTag(string tag)
     {
         var previousTags = SnapshotTags();
@@ -85,6 +121,14 @@ public sealed class TagInput : Control
         return changed;
     }
 
+    /// <summary>
+    /// Removes a tag programmatically by index.
+    /// </summary>
+    /// <param name="index">The zero-based tag index.</param>
+    /// <returns><c>true</c> when a tag was removed; otherwise <c>false</c>.</returns>
+    /// <remarks>
+    /// This bypasses interaction guards.
+    /// </remarks>
     public bool RemoveTagAt(int index)
     {
         if ((uint)index >= (uint)_tags.Count)

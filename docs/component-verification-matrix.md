@@ -38,7 +38,7 @@ For each component or tightly-related component family:
 - Active component: `TagInput`
 - Human lab: `examples/ComponentLabs/TagInputLab`
 - Owner lane: `Owner Lane A - Input + Selection`
-- Round goal: prove add/remove/edit/select/styling behavior from clean public API usage; collect friction before advancing to `TokenEditor`
+- Round goal: prove add/remove/edit/select/styling behavior from clean public API usage; human + engineering lanes are complete, pending user visual review before advancing to `TokenEditor`
 
 ## Matrix
 
@@ -48,7 +48,7 @@ For each component or tightly-related component family:
 | `SearchBox` | `Owner Lane A` | Search bar driving a tiny result count/status panel. | `examples/ComponentLabs/SearchBoxLab` | `Not Started` | `Not Started` | `Not Started` | `Not Started` | |
 | `Choice` | `Owner Lane A` | Environment selector with keyboard + pointer open/select flow. | `examples/ComponentLabs/ChoiceLab` | `Not Started` | `Not Started` | `Not Started` | `Not Started` | |
 | `ComboBox` | `Owner Lane A` | Region picker with type-to-filter and explicit selection summary. | `examples/ComponentLabs/ComboBoxLab` | `Not Started` | `Not Started` | `Not Started` | `Not Started` | |
-| `TagInput` | `Owner Lane A` | Incident label editor: add, dedupe, cap, remove, pointer select, style toggle. | `examples/ComponentLabs/TagInputLab` | `In Progress` | `Not Started` | `Not Started` | `In Progress` | Active loop. |
+| `TagInput` | `Owner Lane A` | Incident label editor: add, dedupe, cap, remove, pointer select, style toggle. | `examples/ComponentLabs/TagInputLab` | `Approved` | `Approved` | `Not Started` | `Ready To Test` | Human lab tightened; interaction contract clarified in docs/tests. |
 | `TokenEditor` | `Owner Lane A` | Assignee/chip editor with selection and token mutation feed. | `examples/ComponentLabs/TokenEditorLab` | `Not Started` | `Not Started` | `Not Started` | `Not Started` | Next after `TagInput`. |
 | `AutocompleteInput` | `Owner Lane A` | Command/search suggestion bar with commit and fallback typing. | `examples/ComponentLabs/AutocompleteInputLab` | `Not Started` | `Not Started` | `Not Started` | `Not Started` | |
 | `ListView<T>` | `Owner Lane B` | Simple queue list with programmatic reselect and detail pane. | `examples/ComponentLabs/ListViewLab` | `Not Started` | `Not Started` | `Not Started` | `Not Started` | |
