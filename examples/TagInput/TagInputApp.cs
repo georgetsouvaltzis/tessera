@@ -27,7 +27,7 @@ internal sealed class TagInputApp : TeaApp
     private bool _isDisabled;
     private bool _styleAlt;
     private int _changedCount;
-    private string _statusText = "filled chips, overflow window, caret, duplicate/max validation";
+    private string _statusText = "widget-only proof: api mutation, wrapped chips, wrapped-row pointer selection";
 
     public TagInputApp()
     {
@@ -57,7 +57,7 @@ internal sealed class TagInputApp : TeaApp
         if (key.IsCharacter('r', ModifierKeys.Ctrl))
         {
             _tagInput.SetTags(["alpha", "beta", "gamma", "delta", "release"]);
-            _statusText = "seeded overflow tags";
+            _statusText = "api SetTags(seed): wrapped rows ready; click gamma/delta below row 1";
             UpdateErrorFlag();
             return null;
         }
@@ -65,7 +65,26 @@ internal sealed class TagInputApp : TeaApp
         if (key.IsCharacter('e', ModifierKeys.Ctrl))
         {
             _tagInput.SetTags(Array.Empty<string>());
-            _statusText = "cleared";
+            _statusText = "api SetTags(empty): cleared";
+            UpdateErrorFlag();
+            return null;
+        }
+
+        if (key.IsCharacter('a', ModifierKeys.Ctrl))
+        {
+            var added = _tagInput.AddTag("api-tag");
+            _statusText = $"api AddTag(api-tag)={added}";
+            UpdateErrorFlag();
+            return null;
+        }
+
+        if (key.IsCharacter('x', ModifierKeys.Ctrl))
+        {
+            var index = _tagInput.SelectedTagIndex >= 0
+                ? _tagInput.SelectedTagIndex
+                : _tagInput.Tags.Count > 1 ? 1 : _tagInput.Tags.Count - 1;
+            var removed = index >= 0 && _tagInput.RemoveTagAt(index);
+            _statusText = $"api RemoveTagAt({Math.Max(index, 0)})={removed}";
             UpdateErrorFlag();
             return null;
         }
@@ -167,7 +186,6 @@ internal sealed class TagInputApp : TeaApp
             AllowDuplicates: _allowDuplicates,
             CaseSensitive: false,
             MaxTags: _maxTags,
-            ShowTagCount: true,
             TagPrefix: string.Empty,
             TagSuffix: string.Empty);
 
@@ -224,6 +242,6 @@ internal sealed class TagInputApp : TeaApp
         _status.LeftText =
             $"count={_tagInput.Tags.Count} sel={selected} dup={_allowDuplicates} max={_maxTags} ro={_isReadOnly} dis={_isDisabled} chg={_changedCount}";
         _status.RightText =
-            $"{reason} | ^R seed ^E clear ^D dup ^M max ^O ro ^I dis ^T style ^C quit";
+            $"{reason} | ^R SetTags(seed/wrap) click row2 chip ^A AddTag ^X RemoveTagAt(sel) ^E SetTags(empty) ^D dup ^M max ^O ro ^I dis ^T style ^C quit";
     }
 }

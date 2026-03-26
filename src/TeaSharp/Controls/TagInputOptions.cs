@@ -11,6 +11,5 @@ public readonly record struct TagInputOptions(
     bool AllowDuplicates = false,
     bool CaseSensitive = false,
     int MaxTags = 0,
-    bool ShowTagCount = false,
     string TagPrefix = "[",
     string TagSuffix = "]");

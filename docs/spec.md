@@ -149,7 +149,7 @@ V1 theming is semantic-token based with override hierarchy:
 - mapped planning/boards controls include `VirtualizedListView<T>`, `GroupedListView<TGroup,TItem>`, `KanbanBoard`, `TagInput`, `CalendarMonthView`, `SchedulerTimeline`
 - bordered planning/boards controls (`VirtualizedListView<T>`, `GroupedListView<TGroup,TItem>`, `KanbanBoard`, `TagInput`) map `BorderStyleText`/`FocusedBorderStyleText` to semantic border/focus tokens by default
 - `TagInput` editing stays input-buffer driven for user interaction, while `SetTags(...)`, `AddTag(...)`, and `RemoveTagAt(...)` remain the programmatic mutation path; `IsDisabled` and `IsReadOnly` only gate interaction handling
-- `TagInput` supports placeholder tinting, explicit caret hooks (`CaretGlyph`, `CaretStyle`, `ShowCaret`), chip/input padding (`TagPadding`, `InputPadding`), and single-line overflow windowing that preserves a visible input area with overflow indicators when tags exceed width
+- `TagInput` supports placeholder tinting, explicit caret hooks (`CaretGlyph`, `CaretStyle`, `ShowCaret`), chip/input padding (`TagPadding`, `InputPadding`), and wrapped chip/input flow that grows vertically when width is exhausted instead of collapsing behind overflow indicators
 - mapped query/analytics controls include `PivotTable`, `QueryBuilder`, `RichTextView`
 - bordered query/analytics controls (`PivotTable`, `QueryBuilder`, `RichTextView`) map `BorderStyleText`/`FocusedBorderStyleText` to semantic border/focus tokens by default
 - mapped explorer/feedback controls include `DiffView`, `PropertyGrid`, `FileExplorer`, `FuzzyFinder`, `ToastCenter`
