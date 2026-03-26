@@ -267,6 +267,42 @@ public sealed class TagInputControlTests
     }
 
     [Test]
+    public void Controls_TagInput_Commit_ResetsViewportFollow_AfterInputClears()
+    {
+        var control = new TagInput
+        {
+            IsFocused = true,
+            Border = BorderStyle.None,
+            InputPadding = 0,
+            Placeholder = string.Empty,
+            ShowCaret = false,
+            Options = new TagInputOptions(TagPrefix: string.Empty, TagSuffix: string.Empty),
+        };
+        control.SetTags(["alpha"]);
+
+        foreach (var character in "abcdefghijkl")
+        {
+            _ = control.Handle(new KeyPressed(Key.Character, character.ToString()));
+        }
+
+        var beforeCanvas = new Canvas(5, 2, CanvasTextMode.GraphemeAware);
+        control.Render(beforeCanvas, new Rect(0, 0, 5, 2));
+        var before = StripAnsi(beforeCanvas.Render());
+        var beforeLines = before.Split('\n');
+
+        _ = control.Handle(new KeyPressed(Key.Enter));
+
+        var afterCanvas = new Canvas(5, 2, CanvasTextMode.GraphemeAware);
+        control.Render(afterCanvas, new Rect(0, 0, 5, 2));
+        var after = StripAnsi(afterCanvas.Render());
+
+        TestAssert.True(!before.Contains("alpha", StringComparison.Ordinal), "Pre-commit viewport should be following the input tail, not the top-aligned committed tags.");
+        TestAssert.True(beforeLines[0].Contains("fghij", StringComparison.Ordinal) || beforeLines[1].Contains("kl", StringComparison.Ordinal), "Pre-commit viewport should include the latest wrapped input rows.");
+        TestAssert.True(after.Contains("alpha", StringComparison.Ordinal), "After commit, the viewport should reset to the normal top-aligned wrapped tag view.");
+        TestAssert.True(!after.Contains("fghij", StringComparison.Ordinal), "After commit, stale input-tail viewport state should not persist.");
+    }
+
+    [Test]
     public void Controls_TagInput_Measure_GrowsHeight_WhenFlowWraps()
     {
         var control = new TagInput

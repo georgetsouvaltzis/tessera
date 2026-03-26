@@ -286,9 +286,14 @@ public sealed partial class TagInput
         return Math.Min(MinimumWrappedInputStartWidth, Math.Max(1, width));
     }
 
-    private static int ResolveVisibleWindowTop(FlowLayoutResult flow, int visibleHeight)
+    private int ResolveVisibleWindowTop(FlowLayoutResult flow, int visibleHeight)
     {
         if (visibleHeight <= 0 || flow.Height <= visibleHeight)
+        {
+            return 0;
+        }
+
+        if (_input.Value.Length == 0)
         {
             return 0;
         }
