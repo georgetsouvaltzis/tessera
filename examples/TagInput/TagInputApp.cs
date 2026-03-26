@@ -124,7 +124,6 @@ internal sealed class TagInputApp : TeaApp
             {
                 Content = _tagInput,
                 Width = Math.Min(48, Math.Max(36, context.Width - 4)),
-                Height = 5,
             });
             window.Footer(1, _status);
         });

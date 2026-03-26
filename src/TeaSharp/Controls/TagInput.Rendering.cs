@@ -10,10 +10,19 @@ namespace TeaSharp.Controls;
 
 public sealed partial class TagInput
 {
-    private const int MinimumVisibleInputWidth = 8;
-    private const string OverflowIndicator = "…";
+    private const int MinimumInlineWidth = 1;
+    private const int MinimumWrappedInputStartWidth = 4;
 
-    private readonly record struct InlineFlowLayout(int VisibleTagCount, bool ShowOverflow, int InputX, int InputWidth);
+    private readonly record struct FlowInlineElement(string Text, TeaStyle Style, int Width);
+    private readonly record struct TagPlacement(int Index, int X, int Y, string Text, TeaStyle Style, int Width);
+    private readonly record struct TextPlacement(int X, int Y, string Text, TeaStyle Style, int Width);
+
+    private sealed class FlowLayoutResult
+    {
+        public List<TagPlacement> Tags { get; } = [];
+        public List<TextPlacement> TextRuns { get; } = [];
+        public int Height { get; set; } = 1;
+    }
 
     public override void Render(Canvas canvas, Rect rect)
     {
@@ -35,211 +44,136 @@ public sealed partial class TagInput
             return;
         }
 
-        RenderSingleLine(canvas, content);
+        RenderWrappedFlow(canvas, content);
     }
 
     internal override LayoutMeasurement Measure(in Rect availableBounds)
     {
-        var width = Math.Max(16, ControlTextLayout.MeasureDisplayWidth(FormatTitleText()) + 4);
-        for (var index = 0; index < _tags.Count; index++)
-        {
-            width += MeasureTagWidth(index);
-            if (index > 0)
-            {
-                width++;
-            }
-        }
-
-        width += Math.Max(MinimumVisibleInputWidth, ControlTextLayout.MeasureDisplayWidth(_input.Value.Length == 0 ? Placeholder : _input.Value));
-        width += Math.Max(0, InputPadding) * 2;
-        width += Padding.Horizontal;
-        if (Border != BorderStyle.None)
-        {
-            width += 2;
-        }
-
-        var height = Padding.Vertical + 1;
-        if (Border != BorderStyle.None)
-        {
-            height += 2;
-        }
+        var frameWidth = Math.Max(16, ControlTextLayout.MeasureDisplayWidth(FormatTitleText()) + 4);
+        var naturalTotalWidth = Math.Max(frameWidth, ResolveNaturalContentWidth() + Padding.Horizontal + ResolveBorderChrome());
+        var measuredWidth = availableBounds.Width > 0
+            ? Math.Min(naturalTotalWidth, availableBounds.Width)
+            : naturalTotalWidth;
+        var contentWidth = ResolveContentWidth(measuredWidth);
+        var flow = BuildFlowLayout(contentWidth);
+        var height = flow.Height + Padding.Vertical + ResolveBorderChrome();
 
         return new LayoutMeasurement(
-            Math.Clamp(width, 0, availableBounds.Width),
+            Math.Clamp(measuredWidth, 0, availableBounds.Width),
             Math.Clamp(height, 0, availableBounds.Height));
     }
 
-    private void RenderSingleLine(Canvas canvas, Rect content)
+    private void RenderWrappedFlow(Canvas canvas, Rect content)
     {
-        var layout = ResolveInlineFlowLayout(content.Width);
-        RenderTags(canvas, content.X, content.Y, layout);
-        RenderInput(canvas, content.X + layout.InputX, content.Y, layout.InputWidth);
-    }
-
-    private void RenderTags(Canvas canvas, int x, int y, InlineFlowLayout layout)
-    {
-        if ((layout.VisibleTagCount == 0 && !layout.ShowOverflow) || _tags.Count == 0)
+        var flow = BuildFlowLayout(content.Width);
+        for (var index = 0; index < flow.Tags.Count; index++)
         {
-            return;
-        }
-
-        var cursor = x;
-        for (var index = 0; index < layout.VisibleTagCount; index++)
-        {
-            if (index > 0)
+            var placement = flow.Tags[index];
+            if (placement.Y >= content.Height)
             {
-                canvas.Set(cursor, y, ' ');
-                cursor++;
+                continue;
             }
 
-            var token = BuildTagToken(_tags[index]);
-            cursor += RenderTextSegment(canvas, cursor, y, token, ResolveTagStyle(index), layout.InputX - (cursor - x));
+            RenderTextSegment(
+                canvas,
+                content.X + placement.X,
+                content.Y + placement.Y,
+                placement.Text,
+                placement.Style,
+                placement.Width);
         }
 
-        if (layout.ShowOverflow)
+        for (var index = 0; index < flow.TextRuns.Count; index++)
         {
-            if (cursor > x)
+            var placement = flow.TextRuns[index];
+            if (placement.Y >= content.Height)
             {
-                canvas.Set(cursor, y, ' ');
-                cursor++;
+                continue;
             }
 
-            cursor += RenderTextSegment(canvas, cursor, y, OverflowIndicator, ResolveBorderStyleText(), 1);
-        }
-
-        if (layout.InputX > 0 && cursor < x + layout.InputX)
-        {
-            canvas.Set(cursor, y, ' ');
+            RenderTextSegment(
+                canvas,
+                content.X + placement.X,
+                content.Y + placement.Y,
+                placement.Text,
+                placement.Style,
+                placement.Width);
         }
     }
 
-    private void RenderInput(Canvas canvas, int x, int y, int width)
+    private FlowLayoutResult BuildFlowLayout(int width)
     {
-        if (width <= 0)
-        {
-            return;
-        }
+        width = Math.Max(MinimumInlineWidth, width);
+        var result = new FlowLayoutResult();
+        var cursorX = 0;
+        var cursorY = 0;
 
-        var inputPadding = Math.Max(0, InputPadding);
-        var innerWidth = Math.Max(1, width - (inputPadding * 2));
-        var frame = _input.BuildFrame(innerWidth);
-        var inputStyle = ResolveInputStyle(frame.PlaceholderVisible);
-        var inputText = string.Concat(new string(' ', inputPadding), frame.Text, new string(' ', inputPadding));
-        RenderTextSegment(canvas, x, y, inputText, inputStyle, width);
-
-        if (!ShowCaret || !IsFocused || IsDisabled || IsReadOnly)
-        {
-            return;
-        }
-
-        var caretX = x + inputPadding + Math.Clamp(frame.CursorColumn, 0, Math.Max(0, innerWidth - 1));
-        if (caretX < x || caretX >= x + width)
-        {
-            return;
-        }
-
-        var caretGlyph = ResolveCaretGlyph(frame);
-        if (string.IsNullOrEmpty(caretGlyph))
-        {
-            return;
-        }
-
-        RenderTextSegment(canvas, caretX, y, caretGlyph, ResolveCaretStyle(inputStyle), 1);
-    }
-
-    private int ResolveVisibleInputAreaWidth(int totalWidth)
-    {
-        if (totalWidth <= 0)
-        {
-            return 0;
-        }
-
-        var inputPadding = Math.Max(0, InputPadding);
-        var maxInputWidth = _tags.Count > 0
-            ? Math.Max(1, totalWidth - 1)
-            : totalWidth;
-        var visibleText = _input.Value.Length == 0 ? Placeholder : _input.Value;
-        var desiredInnerWidth = Math.Max(
-            1,
-            Math.Min(
-                maxInputWidth - (inputPadding * 2),
-                Math.Max(MinimumVisibleInputWidth, ControlTextLayout.MeasureDisplayWidth(visibleText))));
-
-        return Math.Clamp(desiredInnerWidth + (inputPadding * 2), 1, maxInputWidth);
-    }
-
-    private InlineFlowLayout ResolveInlineFlowLayout(int totalWidth)
-    {
-        if (totalWidth <= 0)
-        {
-            return default;
-        }
-
-        if (_tags.Count == 0)
-        {
-            return new InlineFlowLayout(0, false, 0, totalWidth);
-        }
-
-        var minimumInlineInputWidth = ResolveMinimumInlineInputWidth(totalWidth);
-        var visibleTagCount = ResolveVisibleTagCount(totalWidth, minimumInlineInputWidth);
-        var prefixWidth = MeasureVisiblePrefixWidth(visibleTagCount);
-        var showOverflow = visibleTagCount < _tags.Count
-            && ResolveTotalInlineWidth(prefixWidth, hasHiddenTags: true, minimumInlineInputWidth) <= totalWidth;
-
-        var inputX = prefixWidth;
-        if (showOverflow)
-        {
-            if (inputX > 0)
-            {
-                inputX++;
-            }
-
-            inputX += ControlTextLayout.MeasureDisplayWidth(OverflowIndicator);
-        }
-
-        if (inputX > 0)
-        {
-            inputX++;
-        }
-
-        inputX = Math.Min(inputX, totalWidth - 1);
-        return new InlineFlowLayout(
-            visibleTagCount,
-            showOverflow,
-            inputX,
-            Math.Max(1, totalWidth - inputX));
-    }
-
-    private int ResolveVisibleTagCount(int totalWidth, int minimumInlineInputWidth)
-    {
-        var visibleTagCount = 0;
-        var prefixWidth = 0;
         for (var index = 0; index < _tags.Count; index++)
         {
-            var nextPrefixWidth = prefixWidth + (visibleTagCount > 0 ? 1 : 0) + MeasureTagWidth(index);
-            var hasHiddenTags = index < _tags.Count - 1;
-            if (ResolveTotalInlineWidth(nextPrefixWidth, hasHiddenTags, minimumInlineInputWidth) > totalWidth)
+            var token = BuildTagToken(_tags[index]);
+            var tokenWidth = Math.Max(1, ControlTextLayout.MeasureDisplayWidth(token));
+            if (cursorX > 0 && cursorX + 1 + tokenWidth > width)
             {
-                break;
+                cursorY++;
+                cursorX = 0;
             }
 
-            prefixWidth = nextPrefixWidth;
-            visibleTagCount++;
+            if (cursorX > 0)
+            {
+                cursorX++;
+            }
+
+            result.Tags.Add(new TagPlacement(
+                index,
+                cursorX,
+                cursorY,
+                token,
+                ResolveTagStyle(index),
+                Math.Min(tokenWidth, width)));
+            cursorX = Math.Min(width, cursorX + tokenWidth);
         }
 
-        return visibleTagCount;
+        var inputElements = BuildInputElements();
+        if (inputElements.Count > 0 && cursorX > 0)
+        {
+            var remainingWidth = width - cursorX - 1;
+            if (cursorX + 1 > width || remainingWidth < ResolveMinimumInputStartWidth(inputElements))
+            {
+                cursorY++;
+                cursorX = 0;
+            }
+            else
+            {
+                cursorX++;
+            }
+        }
+
+        for (var index = 0; index < inputElements.Count; index++)
+        {
+            var element = inputElements[index];
+            if (cursorX > 0 && cursorX + element.Width > width)
+            {
+                cursorY++;
+                cursorX = 0;
+            }
+
+            result.TextRuns.Add(new TextPlacement(cursorX, cursorY, element.Text, element.Style, element.Width));
+            cursorX += element.Width;
+            if (cursorX >= width)
+            {
+                cursorY++;
+                cursorX = 0;
+            }
+        }
+
+        result.Height = Math.Max(1, cursorY + (cursorX > 0 || result.TextRuns.Count == 0 && result.Tags.Count == 0 ? 1 : 0));
+        return result;
     }
 
-    private int ResolveMinimumInlineInputWidth(int totalWidth)
-    {
-        var inputPadding = Math.Max(0, InputPadding);
-        return Math.Clamp((inputPadding * 2) + 1, 1, totalWidth);
-    }
-
-    private int MeasureVisiblePrefixWidth(int visibleTagCount)
+    private int ResolveNaturalContentWidth()
     {
         var width = 0;
-        for (var index = 0; index < visibleTagCount; index++)
+        for (var index = 0; index < _tags.Count; index++)
         {
             width += MeasureTagWidth(index);
             if (index > 0)
@@ -248,27 +182,128 @@ public sealed partial class TagInput
             }
         }
 
-        return width;
-    }
-
-    private static int ResolveTotalInlineWidth(int prefixWidth, bool hasHiddenTags, int minimumInputWidth)
-    {
-        var width = prefixWidth + minimumInputWidth;
-        if (hasHiddenTags)
-        {
-            width += ControlTextLayout.MeasureDisplayWidth(OverflowIndicator);
-            if (prefixWidth > 0)
-            {
-                width++;
-            }
-        }
-
-        if (prefixWidth > 0 || hasHiddenTags)
+        var inputElements = BuildInputElements();
+        if (inputElements.Count > 0 && width > 0)
         {
             width++;
         }
 
-        return width;
+        for (var index = 0; index < inputElements.Count; index++)
+        {
+            width += inputElements[index].Width;
+        }
+
+        return Math.Max(MinimumInlineWidth, width);
+    }
+
+    private int ResolveContentWidth(int totalWidth)
+    {
+        return Math.Max(MinimumInlineWidth, totalWidth - Padding.Horizontal - ResolveBorderChrome());
+    }
+
+    private int ResolveBorderChrome()
+    {
+        return Border == BorderStyle.None ? 0 : 2;
+    }
+
+    private List<FlowInlineElement> BuildInputElements()
+    {
+        var elements = new List<FlowInlineElement>();
+        var placeholderVisible = _input.Value.Length == 0;
+        var inputStyle = ResolveInputStyle(placeholderVisible);
+        var renderCaret = ShowCaret && IsFocused && !IsDisabled && !IsReadOnly;
+        var caretGlyph = renderCaret ? ResolveCaretGlyph() : string.Empty;
+        var caretStyle = ResolveCaretStyle(inputStyle);
+        var inputPadding = Math.Max(0, InputPadding);
+
+        AppendSpaceElements(elements, inputPadding, inputStyle);
+        if (placeholderVisible)
+        {
+            if (!string.IsNullOrEmpty(caretGlyph))
+            {
+                elements.Add(new FlowInlineElement(caretGlyph, caretStyle, ControlTextLayout.MeasureDisplayWidth(caretGlyph)));
+            }
+
+            AppendTextElements(elements, Placeholder, inputStyle);
+        }
+        else
+        {
+            var value = _input.Value;
+            var cursor = Math.Clamp(_input.Cursor, 0, value.Length);
+            var insertedCaret = false;
+            var enumerator = StringInfo.GetTextElementEnumerator(value);
+            while (enumerator.MoveNext())
+            {
+                var element = enumerator.GetTextElement();
+                var start = enumerator.ElementIndex;
+                var end = start + element.Length;
+                if (!insertedCaret && !string.IsNullOrEmpty(caretGlyph) && cursor <= start)
+                {
+                    elements.Add(new FlowInlineElement(caretGlyph, caretStyle, ControlTextLayout.MeasureDisplayWidth(caretGlyph)));
+                    insertedCaret = true;
+                }
+
+                elements.Add(new FlowInlineElement(element, inputStyle, ControlTextLayout.MeasureDisplayWidth(element)));
+                if (!insertedCaret && !string.IsNullOrEmpty(caretGlyph) && cursor == end)
+                {
+                    elements.Add(new FlowInlineElement(caretGlyph, caretStyle, ControlTextLayout.MeasureDisplayWidth(caretGlyph)));
+                    insertedCaret = true;
+                }
+            }
+
+            if (!insertedCaret && !string.IsNullOrEmpty(caretGlyph))
+            {
+                elements.Add(new FlowInlineElement(caretGlyph, caretStyle, ControlTextLayout.MeasureDisplayWidth(caretGlyph)));
+            }
+        }
+
+        AppendSpaceElements(elements, inputPadding, inputStyle);
+        return elements;
+    }
+
+    private static int ResolveMinimumInputStartWidth(IReadOnlyList<FlowInlineElement> inputElements)
+    {
+        var width = 0;
+        var countedVisibleGlyph = false;
+        for (var index = 0; index < inputElements.Count; index++)
+        {
+            var element = inputElements[index];
+            width += element.Width;
+            if (!string.IsNullOrWhiteSpace(element.Text))
+            {
+                countedVisibleGlyph = true;
+            }
+
+            if (countedVisibleGlyph && width >= MinimumWrappedInputStartWidth)
+            {
+                return MinimumWrappedInputStartWidth;
+            }
+        }
+
+        return Math.Min(MinimumWrappedInputStartWidth, Math.Max(1, width));
+    }
+
+    private static void AppendSpaceElements(List<FlowInlineElement> elements, int count, TeaStyle style)
+    {
+        for (var index = 0; index < count; index++)
+        {
+            elements.Add(new FlowInlineElement(" ", style, 1));
+        }
+    }
+
+    private static void AppendTextElements(List<FlowInlineElement> elements, string text, TeaStyle style)
+    {
+        if (string.IsNullOrEmpty(text))
+        {
+            return;
+        }
+
+        var enumerator = StringInfo.GetTextElementEnumerator(text);
+        while (enumerator.MoveNext())
+        {
+            var element = enumerator.GetTextElement();
+            elements.Add(new FlowInlineElement(element, style, ControlTextLayout.MeasureDisplayWidth(element)));
+        }
     }
 
     private int MeasureTagWidth(int index)
@@ -381,20 +416,14 @@ public sealed partial class TagInput
             : IsFocused && ShowFocusMarker && !string.IsNullOrWhiteSpace(FocusMarker) ? $"{Title} {FocusMarker}" : Title;
     }
 
-    private string ResolveCaretGlyph(TextInputFrame frame)
+    private string ResolveCaretGlyph()
     {
         if (!string.IsNullOrEmpty(CaretGlyph))
         {
             return FirstTextElement(CaretGlyph);
         }
 
-        if (frame.Text.Length == 0)
-        {
-            return string.Empty;
-        }
-
-        var cursor = Math.Clamp(frame.CursorColumn, 0, Math.Max(0, frame.Text.Length - 1));
-        return frame.Text[cursor].ToString();
+        return string.Empty;
     }
 
     private static int RenderTextSegment(Canvas canvas, int x, int y, string text, TeaStyle style, int maxWidth)

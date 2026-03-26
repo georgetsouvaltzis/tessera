@@ -161,10 +161,11 @@ public sealed class TagInputControlTests
 
         control.Render(canvas, new Rect(0, 0, 16, 2));
         var output = canvas.Render();
+        var stripped = StripAnsi(output);
 
         TestAssert.True(output.Contains("38;2;71;72;73", StringComparison.Ordinal), "Placeholder style should render.");
-        TestAssert.True(output.Contains("  tag  ", StringComparison.Ordinal), "Input padding should surround the placeholder text.");
-        TestAssert.Equal(1, output.Split("tag", StringSplitOptions.None).Length - 1, "Placeholder text should render exactly once.");
+        TestAssert.True(stripped.Contains("  tag  ", StringComparison.Ordinal), "Input padding should surround the placeholder text.");
+        TestAssert.Equal(1, stripped.Split("tag", StringSplitOptions.None).Length - 1, "Placeholder text should render exactly once.");
     }
 
     [Test]
@@ -175,15 +176,15 @@ public sealed class TagInputControlTests
             IsFocused = true,
             Border = BorderStyle.None,
             InputPadding = 1,
-            Placeholder = "tag",
+            Placeholder = "Type a tag...",
             CaretGlyph = "|",
         };
-        var canvas = new Canvas(12, 2, CanvasTextMode.GraphemeAware);
+        var canvas = new Canvas(20, 2, CanvasTextMode.GraphemeAware);
 
-        control.Render(canvas, new Rect(0, 0, 12, 2));
+        control.Render(canvas, new Rect(0, 0, 20, 2));
         var output = StripAnsi(canvas.Render());
 
-        TestAssert.True(output.StartsWith(" |ag", StringComparison.Ordinal), "Empty focused state should start from the left padded input origin.");
+        TestAssert.True(output.StartsWith(" |Type a tag...", StringComparison.Ordinal), "Empty focused state should start from the left padded input origin without swallowing the first glyph.");
     }
 
     [Test]
@@ -208,7 +209,7 @@ public sealed class TagInputControlTests
     }
 
     [Test]
-    public void Controls_TagInput_OverflowWindow_PreservesIndicatorAndVisibleInput()
+    public void Controls_TagInput_WrapsTagsAndInputAcrossLines_WithoutEllipsis()
     {
         var control = new TagInput
         {
@@ -227,15 +228,59 @@ public sealed class TagInputControlTests
             _ = control.Handle(new KeyPressed(Key.Character, character.ToString()));
         }
 
-        var canvas = new Canvas(18, 2, CanvasTextMode.GraphemeAware);
-        control.Render(canvas, new Rect(0, 0, 18, 2));
-        var output = canvas.Render();
+        var canvas = new Canvas(18, 6, CanvasTextMode.GraphemeAware);
+        control.Render(canvas, new Rect(0, 0, 18, 6));
+        var output = StripAnsi(canvas.Render());
+        var lines = output.Split('\n');
 
-        TestAssert.True(output.Contains("…", StringComparison.Ordinal), "Overflow indicator should render when tags exceed width.");
-        TestAssert.True(output.Contains("alpha", StringComparison.Ordinal), "Visible tag flow should start from the left-most chip.");
-        TestAssert.True(output.Contains("idate", StringComparison.Ordinal), "Visible input tail should remain rendered when tags overflow.");
-        TestAssert.True(output.Contains("|", StringComparison.Ordinal), "Caret glyph should remain visible in the input area.");
-        TestAssert.True(output.Contains("38;2;81;82;83", StringComparison.Ordinal), "Caret style should render.");
+        TestAssert.True(!output.Contains("…", StringComparison.Ordinal), "Wrapped TagInput should not collapse overflow behind ellipsis.");
+        TestAssert.True(lines[0].Contains("alpha", StringComparison.Ordinal), "Tag flow should start from the left-most chip.");
+        TestAssert.True(lines[1].Contains("gamma", StringComparison.Ordinal) || lines[1].Contains("delta", StringComparison.Ordinal), "Tags should continue on later rows when width is exhausted.");
+        TestAssert.True(lines[2].StartsWith(" release", StringComparison.Ordinal), "Input should wrap to a fresh line instead of starting in a tiny tail slot.");
+        TestAssert.True(output.Contains("release", StringComparison.Ordinal), "Typed input should render from its true origin instead of only showing a clipped tail.");
+        TestAssert.True(output.Contains("candidate", StringComparison.Ordinal), "Wrapped input should preserve the later part of the typed value as full content, not a nonsense fragment.");
+    }
+
+    [Test]
+    public void Controls_TagInput_Measure_GrowsHeight_WhenFlowWraps()
+    {
+        var control = new TagInput
+        {
+            IsFocused = true,
+            Border = BorderStyle.None,
+            TagPadding = 1,
+            InputPadding = 1,
+            Placeholder = "x",
+            Options = new TagInputOptions(TagPrefix: string.Empty, TagSuffix: string.Empty),
+        };
+        control.SetTags(["alpha", "beta", "gamma", "delta"]);
+        foreach (var character in "release-candidate")
+        {
+            _ = control.Handle(new KeyPressed(Key.Character, character.ToString()));
+        }
+
+        var measurement = control.Measure(new Rect(0, 0, 18, 10));
+
+        TestAssert.True(measurement.Height >= 4, "Wrapped tag flow should increase measured height instead of compressing content behind ellipsis.");
+    }
+
+    [Test]
+    public void Controls_TagInput_PointerSelection_UsesWrappedRowPlacements()
+    {
+        var control = new TagInput
+        {
+            Border = BorderStyle.None,
+            TagPadding = 0,
+            Placeholder = string.Empty,
+            ShowCaret = false,
+            Options = new TagInputOptions(TagPrefix: string.Empty, TagSuffix: string.Empty),
+        };
+        control.SetTags(["alpha", "beta", "gamma"]);
+        var bounds = new Rect(0, 0, 6, 4);
+
+        _ = control.Handle(new PointerInput(PointerEventKind.Press, PointerButton.Left, 1, 1), bounds);
+
+        TestAssert.Equal(1, control.SelectedTagIndex, "Pointer selection should resolve tags on wrapped rows.");
     }
 
     [Test]

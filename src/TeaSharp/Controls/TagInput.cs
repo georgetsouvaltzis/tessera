@@ -233,14 +233,14 @@ public sealed partial class TagInput : Control
         {
             return false;
         }
-        var inside = content.Contains(pointer.X, pointer.Y) && pointer.Y == content.Y;
+        var inside = content.Contains(pointer.X, pointer.Y);
         if (!inside)
         {
             return pointer.Kind is PointerEventKind.Motion or PointerEventKind.Press
                 ? SetHoveredTagIndex(-1)
                 : false;
         }
-        var hovered = HitTagIndex(pointer.X, content);
+        var hovered = HitTagIndex(pointer.X, pointer.Y, content);
         if (pointer.Kind == PointerEventKind.Motion)
         {
             return SetHoveredTagIndex(hovered);
@@ -365,35 +365,29 @@ public sealed partial class TagInput : Control
         var separator = Options.Separator;
         return separator != '\0' && key.Text[0] == separator;
     }
-    private int HitTagIndex(int pointerX, Rect content)
+    private int HitTagIndex(int pointerX, int pointerY, Rect content)
     {
-        var layout = ResolveInlineFlowLayout(content.Width);
-        if (layout.VisibleTagCount == 0 || pointerX < content.X || pointerX >= content.X + layout.InputX)
+        var relativeY = pointerY - content.Y;
+        if (relativeY < 0)
         {
             return -1;
         }
 
-        var cursor = content.X;
-        for (var index = 0; index < layout.VisibleTagCount; index++)
+        var layout = BuildFlowLayout(content.Width);
+        for (var index = 0; index < layout.Tags.Count; index++)
         {
-            if (index > 0)
+            var placement = layout.Tags[index];
+            if (placement.Y != relativeY)
             {
-                if (pointerX == cursor)
-                {
-                    return -1;
-                }
-
-                cursor++;
+                continue;
             }
 
-            var tagWidth = MeasureTagWidth(index);
-            var visibleRight = cursor + tagWidth;
-            if (pointerX >= cursor && pointerX < visibleRight)
+            var left = content.X + placement.X;
+            var right = left + placement.Width;
+            if (pointerX >= left && pointerX < right)
             {
-                return index;
+                return placement.Index;
             }
-
-            cursor += tagWidth;
         }
 
         return -1;
