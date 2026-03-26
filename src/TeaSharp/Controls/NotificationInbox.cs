@@ -16,6 +16,11 @@ public sealed class NotificationInbox : Control
     private int _hoveredIndex = -1;
     private int _lastViewportRows = 8;
 
+    /// <summary>
+    /// Occurs when the selected inbox item changes.
+    /// </summary>
+    public event EventHandler<ListSelectionChangedEventArgs<InboxItem>>? SelectionChanged;
+
     public string Title
     {
         get;
@@ -73,6 +78,8 @@ public sealed class NotificationInbox : Control
     public void SetItems(IEnumerable<InboxItem> items)
     {
         ArgumentNullException.ThrowIfNull(items);
+        var previousIndex = SelectedIndex;
+        var previousItem = SelectedItem;
         _items.Clear();
         foreach (var item in items)
         {
@@ -86,6 +93,7 @@ public sealed class NotificationInbox : Control
         _selectedIndex = _items.Count == 0 ? 0 : Math.Clamp(_selectedIndex, 0, _items.Count - 1);
         _scrollOffset = Math.Clamp(_scrollOffset, 0, Math.Max(0, _items.Count - 1));
         _hoveredIndex = Math.Clamp(_hoveredIndex, -1, Math.Max(-1, _items.Count - 1));
+        RaiseSelectionChangedIfNeeded(previousIndex, previousItem);
     }
 
     public void Add(
@@ -95,6 +103,8 @@ public sealed class NotificationInbox : Control
         string? id = null,
         DateTimeOffset? createdAt = null)
     {
+        var previousIndex = SelectedIndex;
+        var previousItem = SelectedItem;
         _items.Add(new InboxItem(
             id ?? Guid.NewGuid().ToString("n"),
             message ?? string.Empty,
@@ -106,6 +116,7 @@ public sealed class NotificationInbox : Control
         TrimToMaxItems();
         _selectedIndex = Math.Max(0, _items.Count - 1);
         EnsureSelectionVisible(_lastViewportRows);
+        RaiseSelectionChangedIfNeeded(previousIndex, previousItem);
     }
 
     public void MarkAllRead()
@@ -118,10 +129,13 @@ public sealed class NotificationInbox : Control
 
     public void Clear()
     {
+        var previousIndex = SelectedIndex;
+        var previousItem = SelectedItem;
         _items.Clear();
         _selectedIndex = 0;
         _scrollOffset = 0;
         _hoveredIndex = -1;
+        RaiseSelectionChangedIfNeeded(previousIndex, previousItem);
     }
 
     public bool Select(int index)
@@ -411,10 +425,13 @@ public sealed class NotificationInbox : Control
             return false;
         }
 
+        var previousIndex = _selectedIndex;
+        var previousItem = _items[_selectedIndex];
         _items.RemoveAt(_selectedIndex);
         _selectedIndex = Math.Clamp(_selectedIndex, 0, Math.Max(0, _items.Count - 1));
         _hoveredIndex = Math.Clamp(_hoveredIndex, -1, Math.Max(-1, _items.Count - 1));
         EnsureSelectionVisible(_lastViewportRows);
+        RaiseSelectionChangedIfNeeded(previousIndex, previousItem);
         return true;
     }
 
@@ -431,8 +448,11 @@ public sealed class NotificationInbox : Control
             return false;
         }
 
+        var previousIndex = _selectedIndex;
+        var previousItem = _items[_selectedIndex];
         _selectedIndex = next;
         EnsureSelectionVisible(_lastViewportRows);
+        RaiseSelectionChanged(previousIndex, previousItem, _selectedIndex, _items[_selectedIndex]);
         return true;
     }
 
@@ -487,6 +507,41 @@ public sealed class NotificationInbox : Control
     {
         return new InboxItem(item.Id, item.Message, item.Level, item.CreatedAt, item.Source, item.IsRead, item.IsPinned);
     }
+
+    private void RaiseSelectionChangedIfNeeded(int previousIndex, InboxItem? previousItem)
+    {
+        var selectedIndex = SelectedIndex;
+        var selectedItem = SelectedItem;
+        if (previousIndex == selectedIndex && IsSameItem(previousItem, selectedItem))
+        {
+            return;
+        }
+
+        RaiseSelectionChanged(previousIndex, previousItem, selectedIndex, selectedItem);
+    }
+
+    private void RaiseSelectionChanged(int previousIndex, InboxItem? previousItem, int selectedIndex, InboxItem? selectedItem)
+    {
+        SelectionChanged?.Invoke(
+            this,
+            new ListSelectionChangedEventArgs<InboxItem>(previousIndex, selectedIndex, previousItem, selectedItem));
+    }
+
+    private static bool IsSameItem(InboxItem? left, InboxItem? right)
+    {
+        if (left is null && right is null)
+        {
+            return true;
+        }
+
+        if (left is null || right is null)
+        {
+            return false;
+        }
+
+        return string.Equals(left.Id, right.Id, StringComparison.Ordinal);
+    }
+
     private static string ApplyStyle(string text, TeaStyle style)
     {
         if (string.IsNullOrEmpty(text) || style.IsEmpty)
