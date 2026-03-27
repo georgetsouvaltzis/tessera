@@ -26,7 +26,7 @@ internal sealed class GitConsoleApp : TeaApp
 
     private readonly ActivityFeed _output = new()
     {
-        Title = "Output",
+        Title = "Ops Log",
         Border = BorderStyle.Rounded,
         Padding = Thickness.All(1),
         FocusMarker = "◆",
@@ -34,15 +34,17 @@ internal sealed class GitConsoleApp : TeaApp
         ShowTimestamp = true,
     };
 
+    private readonly StatusBar _headline = new();
     private readonly StatusBar _status = new();
     private readonly List<RepoFile> _repoFiles = CreateRepoFiles();
     private readonly Control[] _focusOrder;
+    private string _lastAction = "workspace ready";
 
     public GitConsoleApp()
     {
         _focusOrder = [_files, _diff, _output];
 
-        ThemeScope.Apply(DefaultTheme, _files, _diff, _output, _status);
+        ThemeScope.Apply(DefaultTheme, _files, _diff, _output, _headline, _status);
         ConfigureTheme();
 
         _files.SelectionChanged += (_, _) => SyncDiffToSelection();
@@ -105,12 +107,13 @@ internal sealed class GitConsoleApp : TeaApp
 
     public override Screen Build(ScreenContext context)
     {
-        UpdateFooter();
+        UpdateChrome();
 
         return Screen.Build(window =>
         {
             window.Padding(1);
             window.Gap(1);
+            window.HeaderRow(1, row => row.Fill(_headline));
             window.Body(body => body.Row(row =>
             {
                 row.Fixed(Math.Min(42, Math.Max(34, context.Width / 3)), _files);
@@ -163,6 +166,16 @@ internal sealed class GitConsoleApp : TeaApp
         _output.MutedItemStyle = theme.Text.Muted.WithDim();
         _output.DisabledItemStyle = theme.Text.Muted.WithDim();
         _output.TimestampStyle = theme.Text.Secondary;
+
+        _headline.LeftTextStyle = theme.Text.Primary.WithBold();
+        _headline.RightTextStyle = theme.Text.Secondary;
+        _headline.FillStyle = theme.Surface.Base.Merge(theme.Border.Default);
+        _headline.Fill = ' ';
+
+        _status.LeftTextStyle = theme.Text.Secondary;
+        _status.RightTextStyle = theme.Text.Muted;
+        _status.FillStyle = theme.Surface.Base;
+        _status.Fill = ' ';
     }
 
     private void ResetFileList()
@@ -181,12 +194,13 @@ internal sealed class GitConsoleApp : TeaApp
         var selected = _files.SelectedItem;
         if (selected is null)
         {
-            _diff.Title = "Diff";
+            _diff.Title = "Patch View | clean tree";
             _diff.SetTexts(string.Empty, string.Empty);
             return;
         }
 
-        _diff.Title = $"{selected.Path} {(selected.IsStaged ? "[staged]" : "[working]")}";
+        _diff.Title =
+            $"{selected.StatusLabel} {selected.Path} | {(selected.IsStaged ? "index" : "worktree")} | +{selected.AddedLines}/-{selected.RemovedLines}";
         _diff.SetTexts(selected.OldText, selected.NewText);
     }
 
@@ -196,10 +210,12 @@ internal sealed class GitConsoleApp : TeaApp
         if (selected is null)
         {
             AppendOutput("git", "stage skipped", "no file selected", kind: ActivityFeedItemKind.Warning);
+            _lastAction = "stage skipped";
             return;
         }
 
         selected.IsStaged = !selected.IsStaged;
+        _lastAction = selected.IsStaged ? $"staged {selected.Path}" : $"unstaged {selected.Path}";
         AppendOutput(
             "git",
             selected.IsStaged ? "staged" : "unstaged",
@@ -215,11 +231,13 @@ internal sealed class GitConsoleApp : TeaApp
         if (selected is null)
         {
             AppendOutput("git", "revert skipped", "no file selected", kind: ActivityFeedItemKind.Warning);
+            _lastAction = "revert skipped";
             return;
         }
 
         selected.IsChanged = false;
         selected.IsStaged = false;
+        _lastAction = $"reverted {selected.Path}";
         AppendOutput("git", "reverted", selected.Path, selected.StatusLabel, kind: ActivityFeedItemKind.Warning);
         RefreshFilePane(selected.Path);
     }
@@ -230,6 +248,7 @@ internal sealed class GitConsoleApp : TeaApp
         if (staged.Length == 0)
         {
             AppendOutput("git", "commit skipped", "nothing staged", kind: ActivityFeedItemKind.Warning);
+            _lastAction = "commit skipped";
             return;
         }
 
@@ -239,7 +258,8 @@ internal sealed class GitConsoleApp : TeaApp
             file.IsStaged = false;
         }
 
-        AppendOutput("git", "commit", $"{staged.Length} files", "feat: tidy working tree", ActivityFeedItemKind.Success);
+        _lastAction = $"committed {staged.Length} files";
+        AppendOutput("git", "commit", $"{staged.Length} files", "feat: tighten public-v1 examples", ActivityFeedItemKind.Success);
         ResetFileList();
     }
 
@@ -265,15 +285,17 @@ internal sealed class GitConsoleApp : TeaApp
     {
         _output.SetItems(
         [
-            new ActivityFeedItem("git", "status", "working tree", "5 files changed", ActivityFeedItemKind.Info, new DateTimeOffset(2026, 3, 27, 8, 10, 0, TimeSpan.Zero))
+            new ActivityFeedItem("git", "status", "feature/public-v1", "6 files changed, 2 staged", ActivityFeedItemKind.Info, new DateTimeOffset(2026, 3, 27, 8, 10, 0, TimeSpan.Zero))
             {
                 IsUnread = false,
             },
-            new ActivityFeedItem("git", "fetch", "origin/main", "up to date", ActivityFeedItemKind.Success, new DateTimeOffset(2026, 3, 27, 8, 12, 0, TimeSpan.Zero))
+            new ActivityFeedItem("git", "fetch", "origin/main", "up to date, 1 review thread still open", ActivityFeedItemKind.Success, new DateTimeOffset(2026, 3, 27, 8, 12, 0, TimeSpan.Zero))
             {
                 IsUnread = false,
             },
-            new ActivityFeedItem("ci", "warned", "gateway", "snapshot drift pending", ActivityFeedItemKind.Warning, new DateTimeOffset(2026, 3, 27, 8, 14, 0, TimeSpan.Zero)),
+            new ActivityFeedItem("ci", "warned", "widget-labs", "snapshot drift pending for TagInput", ActivityFeedItemKind.Warning, new DateTimeOffset(2026, 3, 27, 8, 14, 0, TimeSpan.Zero)),
+            new ActivityFeedItem("review", "requested", "GitConsole", "focus keys and pane chrome need polish", ActivityFeedItemKind.Info, new DateTimeOffset(2026, 3, 27, 8, 16, 0, TimeSpan.Zero)),
+            new ActivityFeedItem("merge", "blocked", "feature/public-v1", "follow-up visual review still pending", ActivityFeedItemKind.Warning, new DateTimeOffset(2026, 3, 27, 8, 18, 0, TimeSpan.Zero)),
         ]);
     }
 
@@ -287,17 +309,27 @@ internal sealed class GitConsoleApp : TeaApp
         _output.Append(actor, action, target, details, kind, DateTimeOffset.UtcNow);
     }
 
-    private void UpdateFooter()
+    private void UpdateChrome()
     {
         var focus = ResolveFocusName();
         var changed = _repoFiles.Count(static file => file.IsChanged);
         var staged = _repoFiles.Count(static file => file.IsChanged && file.IsStaged);
-        var file = _files.SelectedItem?.Path ?? "-";
+        var selected = _files.SelectedItem;
+        var file = selected?.Path ?? "-";
+        var mode = selected?.IsStaged == true ? "index" : "worktree";
+
+        _headline.LeftText =
+            $"repo=teasharp branch=feature/public-v1 head=edff77f changed={changed} staged={staged}";
+        _headline.RightText =
+            $"ci=warning review=2 pending last={_lastAction}";
+
+        _files.Title = $"Working Tree | {changed} changed | {staged} staged";
+        _output.Title = $"Ops Log | {_output.Items.Count} events";
 
         _status.LeftText =
-            $"branch=feature/public-v1 changed={changed} staged={staged} focus={focus} file={file}";
+            $"focus={focus} file={file} mode={mode}";
         _status.RightText =
-            $"F1 files F2 diff F3 output | Ctrl+1/2/3 best-effort | Ctrl+S stage/unstage Ctrl+R revert Ctrl+K commit | diff Tab mode | Ctrl+C quit";
+            $"F1 files F2 diff F3 output | Ctrl+S stage/unstage Ctrl+R revert Ctrl+K commit | diff Tab mode | Ctrl+C quit";
     }
 
     private string ResolveFocusName()
@@ -327,7 +359,7 @@ internal sealed class GitConsoleApp : TeaApp
 
     private static List<RepoFile> CreateRepoFiles() =>
     [
-        new("src/TeaSharp/Controls/TagInput.cs", "M",
+        new("src/TeaSharp/Controls/TagInput.cs", "M", 3, 0,
             """
             public bool AllowDuplicates => _options.AllowDuplicates;
             public int? MaxTags => _options.MaxTags;
@@ -336,8 +368,11 @@ internal sealed class GitConsoleApp : TeaApp
             public bool AllowDuplicates => _options.AllowDuplicates;
             public int? MaxTags => _options.MaxTags;
             public bool PreserveViewportOnCommit => _options.PreserveViewportOnCommit;
-            """),
-        new("examples/DeployConsole/DeployConsoleApp.cs", "A",
+            """)
+        {
+            IsStaged = true,
+        },
+        new("examples/DeployConsole/DeployConsoleApp.cs", "A", 18, 0,
             string.Empty,
             """
             private void StartDeployment()
@@ -346,15 +381,18 @@ internal sealed class GitConsoleApp : TeaApp
                 _deploy.SetRunning(true);
             }
             """),
-        new("tests/TeaSharp.Tests/SpinnerControlTests.cs", "M",
+        new("tests/TeaSharp.Tests/SpinnerControlTests.cs", "M", 1, 0,
             """
             Assert.That(spinner.Running, Is.True);
             """,
             """
             Assert.That(spinner.Running, Is.True);
             Assert.That(spinner.Frames.Count, Is.EqualTo(3));
-            """),
-        new("docs/spec.md", "M",
+            """)
+        {
+            IsStaged = true,
+        },
+        new("docs/spec.md", "M", 2, 1,
             """
             - spinner exposes Frames
             """,
@@ -362,18 +400,30 @@ internal sealed class GitConsoleApp : TeaApp
             - spinner exposes Frames
             - spinner supports runtime SetFrames(...) swaps
             """),
-        new("src/TeaSharp/Controls/Choice.cs", "D",
+        new("examples/GitConsole/GitConsoleApp.cs", "M", 12, 3,
+            """
+            _status.RightText = "Ctrl+1 files Ctrl+2 diff Ctrl+3 output";
+            """,
+            """
+            _headline.RightText = "ci=warning review=2 pending last=workspace ready";
+            _status.RightText = "F1 files F2 diff F3 output | Ctrl+S stage/unstage";
+            """),
+        new("src/TeaSharp/Controls/Choice.cs", "D", 0, 6,
             """
             public bool LegacySelection { get; set; }
             """,
             string.Empty),
     ];
 
-    private sealed class RepoFile(string path, string statusLabel, string oldText, string newText)
+    private sealed class RepoFile(string path, string statusLabel, int addedLines, int removedLines, string oldText, string newText)
     {
         public string Path { get; } = path;
 
         public string StatusLabel { get; } = statusLabel;
+
+        public int AddedLines { get; } = Math.Max(0, addedLines);
+
+        public int RemovedLines { get; } = Math.Max(0, removedLines);
 
         public string OldText { get; } = oldText;
 
@@ -386,7 +436,7 @@ internal sealed class GitConsoleApp : TeaApp
         public string RenderLabel()
         {
             var stage = IsStaged ? "●" : " ";
-            return $"{stage} {StatusLabel,-2} {Path}";
+            return $"{stage} {StatusLabel,-2} +{AddedLines,-2}/-{RemovedLines,-2} {Path}";
         }
     }
 }
