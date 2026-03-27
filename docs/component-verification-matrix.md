@@ -44,10 +44,10 @@ For each component or tightly-related component family:
 
 ## Current Loop
 
-- Active component: `Table`
-- Human lab target: `examples/Table`
-- Owner lane: `Owner Lane B - Data + Explorer`
-- Round goal: land the strict widget-only `Table` lab, verify paging/sort/selection/mutation flows, and prepare manual test steps for visual review
+- Active component: `Spinner`
+- Human lab target: `examples/Spinner`
+- Owner lane: `Owner Lane C - Shell + Workflow + Visuals`
+- Round goal: land the tiny standalone spinner/status demo, verify runtime animation and frame-family swaps, and prepare manual test steps for visual review
 
 ## Matrix
 
@@ -55,6 +55,7 @@ For each component or tightly-related component family:
 |---|---|---|---|---|---|---|---|---|
 | `TextInput` | `Owner Lane A` | Single-field command box with submit/cancel and validation hint. | `examples/TextInput` | `Not Started` | `Not Started` | `Not Started` | `Not Started` | |
 | `SearchBox` | `Owner Lane A` | Search bar driving a tiny result count/status panel. | `examples/SearchBox` | `Not Started` | `Not Started` | `Not Started` | `Not Started` | |
+| `Spinner` | `Owner Lane C` | Tiny status run with animated frames, phase text, and runtime spinner-family swaps. | `examples/Spinner` | `Approved` | `Not Started` | `Not Started` | `In Progress` | Standalone first pass landed; footer proves auto-run phases, runtime `SetFrames(...)` swaps, themed phase colors, and restart/pause behavior. |
 | `Choice` | `Owner Lane A` | Environment selector with keyboard + pointer open/select flow. | `examples/Choice` | `Approved` | `Not Started` | `Not Started` | `In Progress` | Widget-only first pass landed; footer proves open/select via keyboard and pointer plus `SetItems`/`SetSelectedIndex`/`TrySetSelectedItem`. |
 | `ComboBox` | `Owner Lane A` | Region picker with type-to-filter and explicit selection summary. | `examples/ComboBox` | `Approved` | `Not Started` | `Not Started` | `In Progress` | Widget-only first pass landed; footer proves typing/filtering, no-match state, pointer/wheel selection, and `SetItems`/`SetFilterText`/`SetSelectedIndex`/`TrySetSelectedItem`. |
 | `TagInput` | `Owner Lane A` | Incident label editor: add, dedupe, cap, remove, pointer select, style toggle. | `examples/TagInput` | `Approved` | `Approved` | `Not Started` | `Ready To Test` | Footer steps now explicitly prove `SetTags`/`AddTag`/`RemoveTagAt`, wrapped vertical growth, and pointer selection on wrapped rows. |
