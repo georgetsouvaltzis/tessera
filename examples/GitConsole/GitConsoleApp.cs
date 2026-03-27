@@ -64,21 +64,21 @@ internal sealed class GitConsoleApp : TeaApp
             return TeaEffects.Quit;
         }
 
-        if (key.IsCharacter('1', ModifierKeys.Ctrl))
+        if (key.Is(Key.F1) || key.IsCharacter('1', ModifierKeys.Ctrl))
         {
-            _files.RequestFocus();
+            FocusPane(_files);
             return null;
         }
 
-        if (key.IsCharacter('2', ModifierKeys.Ctrl))
+        if (key.Is(Key.F2) || key.IsCharacter('2', ModifierKeys.Ctrl))
         {
-            _diff.RequestFocus();
+            FocusPane(_diff);
             return null;
         }
 
-        if (key.IsCharacter('3', ModifierKeys.Ctrl))
+        if (key.Is(Key.F3) || key.IsCharacter('3', ModifierKeys.Ctrl))
         {
-            _output.RequestFocus();
+            FocusPane(_output);
             return null;
         }
 
@@ -297,7 +297,7 @@ internal sealed class GitConsoleApp : TeaApp
         _status.LeftText =
             $"branch=feature/public-v1 changed={changed} staged={staged} focus={focus} file={file}";
         _status.RightText =
-            $"Ctrl+1 files Ctrl+2 diff Ctrl+3 output | Ctrl+S stage/unstage Ctrl+R revert Ctrl+K commit | diff Tab mode | Ctrl+C quit";
+            $"F1 files F2 diff F3 output | Ctrl+1/2/3 best-effort | Ctrl+S stage/unstage Ctrl+R revert Ctrl+K commit | diff Tab mode | Ctrl+C quit";
     }
 
     private string ResolveFocusName()
@@ -318,6 +318,11 @@ internal sealed class GitConsoleApp : TeaApp
         }
 
         return "-";
+    }
+
+    private static void FocusPane(Control target)
+    {
+        target.RequestFocus();
     }
 
     private static List<RepoFile> CreateRepoFiles() =>
