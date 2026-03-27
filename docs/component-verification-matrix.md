@@ -44,10 +44,10 @@ For each component or tightly-related component family:
 
 ## Current Loop
 
-- Active component: `ComboBox`
-- Human lab target: `examples/ComboBox`
-- Owner lane: `Owner Lane A - Input + Selection`
-- Round goal: land the strict widget-only `ComboBox` lab, verify filter/open/select/pointer/api flows, and prepare manual test steps for visual review
+- Active component: `Table`
+- Human lab target: `examples/Table`
+- Owner lane: `Owner Lane B - Data + Explorer`
+- Round goal: land the strict widget-only `Table` lab, verify paging/sort/selection/mutation flows, and prepare manual test steps for visual review
 
 ## Matrix
 
@@ -61,7 +61,7 @@ For each component or tightly-related component family:
 | `TokenEditor` | `Owner Lane A` | Assignee/chip editor with selection and token mutation feed. | `examples/TokenEditor` | `Approved` | `Approved` | `Not Started` | `Ready To Test` | Widget-only lab landed; footer proves typing, selection, delete, glyph/style seam, disabled-token styling, and `SetTokens`/`AddToken`/`RemoveSelectedToken`. |
 | `AutocompleteInput` | `Owner Lane A` | Command/search suggestion bar with commit and fallback typing. | `examples/AutocompleteInput` | `Not Started` | `Not Started` | `Not Started` | `Not Started` | |
 | `ListView<T>` | `Owner Lane B` | Simple queue list with programmatic reselect and detail pane. | `examples/ListView` | `Not Started` | `Not Started` | `Not Started` | `Not Started` | |
-| `Table` | `Owner Lane B` | Service table with row selection, mutation, and drilldown summary. | `examples/Table` | `Not Started` | `Not Started` | `Not Started` | `Not Started` | |
+| `Table` | `Owner Lane B` | Service table with row selection, mutation, and drilldown summary. | `examples/Table` | `Approved` | `Not Started` | `Not Started` | `In Progress` | Widget-only first pass landed; footer proves page/sort flow, pointer row selection, and `SetRows`/`AddRow`/`ReplaceRow`/`RemoveRowAt`/`ClearRows`/`SetSelectedIndex`. |
 | `Notifications` | `Owner Lane C` | Live toast/feed center with selection and remove/clear actions. | `examples/Notifications` | `Not Started` | `Not Started` | `Not Started` | `Not Started` | |
 | `NotificationInbox` | `Owner Lane B` | Persistent inbox with unread/severity state and selection review. | `examples/NotificationInbox` | `Approved` | `Not Started` | `Not Started` | `In Progress` | Widget-only first pass landed; footer proves select/read/pin/delete flows and `SetItems`/`Add`/`Select`/`MarkAllRead`/`Clear`. |
 | `DataForm<T>` | `Owner Lane C` | Small settings editor with keyed field selection and validation state. | `examples/DataForm` | `Approved` | `Not Started` | `Not Started` | `In Progress` | Widget-only first pass landed; footer proves bind/clear model, keyed field selection, validation failure, commit, and read-only field behavior. |
