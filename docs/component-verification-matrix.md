@@ -44,10 +44,10 @@ For each component or tightly-related component family:
 
 ## Current Loop
 
-- Active component: `DataForm<T>`
-- Human lab target: `examples/DataForm`
-- Owner lane: `Owner Lane C - Shell + Workflow + Visuals`
-- Round goal: land the strict widget-only `DataForm` lab, verify public-api ergonomics, and prepare manual test steps for visual review
+- Active component: `Choice`
+- Human lab target: `examples/Choice`
+- Owner lane: `Owner Lane A - Input + Selection`
+- Round goal: land the strict widget-only `Choice` lab, verify open/select/pointer/api flows, and prepare manual test steps for visual review
 
 ## Matrix
 
@@ -55,7 +55,7 @@ For each component or tightly-related component family:
 |---|---|---|---|---|---|---|---|---|
 | `TextInput` | `Owner Lane A` | Single-field command box with submit/cancel and validation hint. | `examples/TextInput` | `Not Started` | `Not Started` | `Not Started` | `Not Started` | |
 | `SearchBox` | `Owner Lane A` | Search bar driving a tiny result count/status panel. | `examples/SearchBox` | `Not Started` | `Not Started` | `Not Started` | `Not Started` | |
-| `Choice` | `Owner Lane A` | Environment selector with keyboard + pointer open/select flow. | `examples/Choice` | `Not Started` | `Not Started` | `Not Started` | `Not Started` | |
+| `Choice` | `Owner Lane A` | Environment selector with keyboard + pointer open/select flow. | `examples/Choice` | `Approved` | `Not Started` | `Not Started` | `In Progress` | Widget-only first pass landed; footer proves open/select via keyboard and pointer plus `SetItems`/`SetSelectedIndex`/`TrySetSelectedItem`. |
 | `ComboBox` | `Owner Lane A` | Region picker with type-to-filter and explicit selection summary. | `examples/ComboBox` | `Not Started` | `Not Started` | `Not Started` | `Not Started` | |
 | `TagInput` | `Owner Lane A` | Incident label editor: add, dedupe, cap, remove, pointer select, style toggle. | `examples/TagInput` | `Approved` | `Approved` | `Not Started` | `Ready To Test` | Footer steps now explicitly prove `SetTags`/`AddTag`/`RemoveTagAt`, wrapped vertical growth, and pointer selection on wrapped rows. |
 | `TokenEditor` | `Owner Lane A` | Assignee/chip editor with selection and token mutation feed. | `examples/TokenEditor` | `Approved` | `Approved` | `Not Started` | `Ready To Test` | Widget-only lab landed; footer proves typing, selection, delete, glyph/style seam, disabled-token styling, and `SetTokens`/`AddToken`/`RemoveSelectedToken`. |
