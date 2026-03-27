@@ -95,6 +95,11 @@ public sealed class Spinner : Control
         set => field = value ?? string.Empty;
     } = "loading";
 
+    /// <summary>
+    /// Gets the current animation frames used by the spinner.
+    /// </summary>
+    public IReadOnlyList<string> Frames => _frames;
+
     public bool Running
     {
         get;
@@ -129,6 +134,37 @@ public sealed class Spinner : Control
     {
         get;
         set;
+    }
+
+    /// <summary>
+    /// Replaces the animation frames used by the spinner.
+    /// </summary>
+    /// <param name="frames">A non-empty sequence of non-empty frame strings.</param>
+    /// <exception cref="ArgumentNullException"><paramref name="frames"/> is <see langword="null"/>.</exception>
+    /// <exception cref="ArgumentException"><paramref name="frames"/> is empty or contains an empty frame.</exception>
+    public void SetFrames(IEnumerable<string> frames)
+    {
+        ArgumentNullException.ThrowIfNull(frames);
+
+        var nextFrames = new List<string>();
+        foreach (var frame in frames)
+        {
+            if (string.IsNullOrEmpty(frame))
+            {
+                throw new ArgumentException("Spinner frames must be non-empty strings.", nameof(frames));
+            }
+
+            nextFrames.Add(frame);
+        }
+
+        if (nextFrames.Count == 0)
+        {
+            throw new ArgumentException("Spinner frames must contain at least one frame.", nameof(frames));
+        }
+
+        _frames.Clear();
+        _frames.AddRange(nextFrames);
+        _frameIndex %= _frames.Count;
     }
 
     public void SetRunning(bool running) => Running = running;
@@ -277,7 +313,17 @@ public sealed class Spinner : Control
 
     internal override LayoutMeasurement Measure(in Rect availableBounds)
     {
-        var width = Math.Max(12, ControlTextLayout.MeasureDisplayWidth(FormatTitleForMeasure()) + Label.Length + 6);
+        var titleWidth = ControlTextLayout.MeasureDisplayWidth(FormatTitleForMeasure());
+        var labelWidth = ControlTextLayout.MeasureDisplayWidth(Label);
+        var frameWidth = 1;
+        for (var index = 0; index < _frames.Count; index++)
+        {
+            frameWidth = Math.Max(frameWidth, ControlTextLayout.MeasureDisplayWidth(_frames[index]));
+        }
+
+        var contentWidth = Math.Max(titleWidth, frameWidth + 1 + labelWidth);
+        var frameWidthWithChrome = contentWidth + Padding.Horizontal + (Border == BorderStyle.None ? 0 : 2);
+        var width = Math.Max(12, frameWidthWithChrome);
         var height = Border == BorderStyle.None ? 1 + Padding.Vertical : 3 + Padding.Vertical;
         return new LayoutMeasurement(
             Math.Clamp(width, 0, availableBounds.Width),

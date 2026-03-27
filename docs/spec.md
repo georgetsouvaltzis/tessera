@@ -131,6 +131,7 @@ V1 theming is semantic-token based with override hierarchy:
 - `TreeView` marker customization is explicit through `TreeViewGlyphSet`
 - `TextArea`, `NumberInput`, `DatePicker`, and `TimePicker` map `BorderStyleText`/`FocusedBorderStyleText` to semantic border/focus tokens by default
 - `Toggle`, `Slider`, `Spinner`, and `ProgressBar` map `BorderStyleText`/`FocusedBorderStyleText` to semantic border/focus tokens by default
+- `Spinner` exposes `Frames` plus `SetFrames(...)` so apps can swap spinner families at runtime on a single instance
 - `MenuBar`, `ContextMenu`, and `CommandPalette` map border text hooks and expose typed glyph-set customization
 - `Notifications`, `LogView`, and `MarkdownView` map `BorderStyleText`/`FocusedBorderStyleText` to semantic border/focus tokens by default
 - `DiffView`, `PropertyGrid`, `FileExplorer`, `FuzzyFinder`, and `ToastCenter` map `BorderStyleText`/`FocusedBorderStyleText` to semantic border/focus tokens by default

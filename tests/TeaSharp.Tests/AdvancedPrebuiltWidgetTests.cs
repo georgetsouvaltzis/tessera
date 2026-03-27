@@ -17,6 +17,8 @@ internal static class AdvancedPrebuiltWidgetTests
         yield return new TestCase("Controls_Slider_DragUpdatesValue", Slider_DragUpdatesValue);
         yield return new TestCase("Controls_Slider_FocusedBorderStyleText_StylesFrameGlyphs", Slider_FocusedBorderStyleText_StylesFrameGlyphs);
         yield return new TestCase("Controls_Spinner_AdvancesFrame", Spinner_AdvancesFrame);
+        yield return new TestCase("Controls_Spinner_SetFrames_SwapsFamiliesDuringRun", Spinner_SetFrames_SwapsFamiliesDuringRun);
+        yield return new TestCase("Controls_Spinner_SetFrames_RejectsEmptyFamilies", Spinner_SetFrames_RejectsEmptyFamilies);
         yield return new TestCase("Controls_Spinner_MouseClickTogglesRunning", Spinner_MouseClickTogglesRunning);
         yield return new TestCase("Controls_Spinner_MouseWheelAdvancesFrame", Spinner_MouseWheelAdvancesFrame);
         yield return new TestCase("Controls_Spinner_FocusedBorderStyleText_StylesFrameGlyphs", Spinner_FocusedBorderStyleText_StylesFrameGlyphs);
@@ -204,6 +206,42 @@ internal static class AdvancedPrebuiltWidgetTests
         TestAssert.True(!string.Equals(before, after, StringComparison.Ordinal), "Spinner should advance when running.");
         spinner.Handle(new KeyPressed(Key.Enter));
         TestAssert.True(!spinner.Running, "Spinner should stop when toggled.");
+        return Task.CompletedTask;
+    }
+
+    private static Task Spinner_SetFrames_SwapsFamiliesDuringRun()
+    {
+        var spinner = new Spinner
+        {
+            Border = BorderStyle.None,
+            Label = "syncing",
+            IsFocused = true,
+        };
+
+        spinner.Advance();
+        spinner.SetFrames(["⠁", "⠂", "⠄"]);
+
+        var swappedCanvas = new Canvas(24, 1, CanvasTextMode.GraphemeAware);
+        spinner.Render(swappedCanvas, new Rect(0, 0, 24, 1));
+        var swapped = swappedCanvas.Render();
+
+        spinner.Advance();
+        var advancedCanvas = new Canvas(24, 1, CanvasTextMode.GraphemeAware);
+        spinner.Render(advancedCanvas, new Rect(0, 0, 24, 1));
+        var advanced = advancedCanvas.Render();
+
+        TestAssert.Equal(3, spinner.Frames.Count, "Spinner should expose the replaced frame family.");
+        TestAssert.True(swapped.Contains("⠂ syncing", StringComparison.Ordinal), "Spinner should render the swapped family at the current animation index.");
+        TestAssert.True(advanced.Contains("⠄ syncing", StringComparison.Ordinal), "Spinner should continue advancing within the swapped family.");
+        return Task.CompletedTask;
+    }
+
+    private static Task Spinner_SetFrames_RejectsEmptyFamilies()
+    {
+        var spinner = new Spinner();
+
+        _ = NUnit.Framework.Assert.Throws<ArgumentException>(() => spinner.SetFrames([]), "Spinner should reject empty frame families.");
+        _ = NUnit.Framework.Assert.Throws<ArgumentException>(() => spinner.SetFrames(["ok", string.Empty]), "Spinner should reject empty frame entries.");
         return Task.CompletedTask;
     }
 

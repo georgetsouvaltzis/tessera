@@ -583,6 +583,7 @@ Input/value controls with direct token mappings:
 
 - `TextInput`, `TextArea`, `Toggle`, `Slider`, `Spinner`, `ProgressBar`, `NumberInput`, `DatePicker`, `TimePicker`
 - `TextInput` maps value/placeholder/focused-title styling; focus title marker is configurable through `FocusMarker` + `ShowFocusMarker`
+- `Spinner` exposes `Frames` and `SetFrames(...)` for runtime spinner-family swaps without replacing the control instance
 - `Toggle`, `Slider`, `Spinner`, and `ProgressBar` map `BorderStyleText` -> `Border.Default` and `FocusedBorderStyleText` -> `Border.Focused + Focus.Border`
 - `TextArea`, `NumberInput`, `DatePicker`, and `TimePicker` map `BorderStyleText` -> `Border.Default` and `FocusedBorderStyleText` -> `Border.Focused + Focus.Border`
 

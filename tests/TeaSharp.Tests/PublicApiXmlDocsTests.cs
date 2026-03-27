@@ -360,6 +360,8 @@ internal static class PublicApiXmlDocsTests
             "M:TeaSharp.Controls.ScatterPlot.Append(TeaSharp.Controls.ScatterPlotPoint)",
             "M:TeaSharp.Controls.Sparkline.SetSamples(System.Collections.Generic.IEnumerable{System.Double})",
             "M:TeaSharp.Controls.Sparkline.Append(System.Double)",
+            "P:TeaSharp.Controls.Spinner.Frames",
+            "M:TeaSharp.Controls.Spinner.SetFrames(System.Collections.Generic.IEnumerable{System.String})",
         ];
 
         var docs = LoadDocumentation();
