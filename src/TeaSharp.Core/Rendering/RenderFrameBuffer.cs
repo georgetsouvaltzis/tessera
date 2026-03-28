@@ -30,7 +30,7 @@ internal sealed class RenderFrameBuffer
         var maxColumns = Math.Max(previous.ColumnCountAt(row), ColumnCountAt(row));
         for (var column = 0; column < maxColumns; column++)
         {
-            if (!string.Equals(previous.SignatureAt(row, column), SignatureAt(row, column), StringComparison.Ordinal))
+            if (!CellEquals(previous, row, column))
             {
                 return false;
             }
@@ -47,6 +47,18 @@ internal sealed class RenderFrameBuffer
     public string SignatureAt(int row, int column)
     {
         return row < 0 || row >= _rows.Count ? string.Empty : _rows[row].SignatureAt(column);
+    }
+
+    public bool CellEquals(RenderFrameBuffer other, int row, int column)
+    {
+        var hasThis = row >= 0 && row < _rows.Count;
+        var hasOther = row >= 0 && row < other._rows.Count;
+        if (!hasThis || !hasOther)
+        {
+            return !hasThis && !hasOther;
+        }
+
+        return _rows[row].CellEquals(other._rows[row], column);
     }
 
     public string? CellAt(int row, int column)

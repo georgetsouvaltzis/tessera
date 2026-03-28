@@ -69,6 +69,28 @@ internal sealed class RenderFrameRow
             : $"{cell.Style}\u001f{cell.Text}";
     }
 
+    public bool CellEquals(RenderFrameRow other, int column)
+    {
+        if (column < 0)
+        {
+            return false;
+        }
+
+        var hasThis = column < _cells.Length;
+        var hasOther = column < other._cells.Length;
+        if (!hasThis || !hasOther)
+        {
+            return !hasThis && !hasOther;
+        }
+
+        var left = _cells[column];
+        var right = other._cells[column];
+        return left.Continuation == right.Continuation
+            && left.Width == right.Width
+            && string.Equals(left.Style, right.Style, StringComparison.Ordinal)
+            && string.Equals(left.Text, right.Text, StringComparison.Ordinal);
+    }
+
     public string? CellAt(int column)
     {
         if (column < 0 || column >= _cells.Length)

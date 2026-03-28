@@ -44,10 +44,7 @@ internal static class AnsiFrameDiffer
         var runStart = -1;
         for (var column = 0; column < max; column++)
         {
-            var changed = !string.Equals(
-                previousFrame.SignatureAt(row, column),
-                nextFrame.SignatureAt(row, column),
-                StringComparison.Ordinal);
+            var changed = !nextFrame.CellEquals(previousFrame, row, column);
 
             if (changed && runStart < 0)
             {
