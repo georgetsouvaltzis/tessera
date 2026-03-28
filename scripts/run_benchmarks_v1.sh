@@ -16,6 +16,7 @@ Usage:
   scripts/run_benchmarks_v1.sh shortlist-render-only
   scripts/run_benchmarks_v1.sh shortlist-materialize
   scripts/run_benchmarks_v1.sh iteration-template
+  scripts/run_benchmarks_v1.sh runtime-e2e
 
 Modes:
   list      List benchmarks (--list flat)
@@ -26,6 +27,7 @@ Modes:
   shortlist-render-only   Run six render-only methods (current "*Only" suffix)
   shortlist-materialize   Run six materialize methods (current non-"Only" names)
   iteration-template      Print compact before/after report template
+  runtime-e2e             Run supplemental runtime-loop + decode + renderer-flush probe
 EOF
 }
 
@@ -142,6 +144,10 @@ case "$MODE" in
   shortlist-materialize)
     ensure_build_if_missing
     run_materialize_shortlist
+    ;;
+  runtime-e2e)
+    ensure_build_if_missing
+    run dotnet "$OUTPUT_DLL" --runtime-e2e --output "$ROOT_DIR/docs/perf-baselines/latest-runtime-e2e-result.json"
     ;;
   *)
     usage

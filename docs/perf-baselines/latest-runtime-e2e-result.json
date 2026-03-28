@@ -1,0 +1,15 @@
+{
+  "Schema": "teasharp-runtime-e2e-result-v1",
+  "Status": "measured",
+  "GeneratedAtUtc": "2026-03-28T17:58:17.52531+00:00",
+  "WarmupCount": 2,
+  "MeasurementCount": 10,
+  "InputEventsPerRun": 24,
+  "StartupFirstFlushMeanMs": 0.08194,
+  "StartupFirstFlushP95Ms": 0.1302,
+  "TotalRunMeanMs": 284.41103000000004,
+  "TotalRunP95Ms": 297.3893,
+  "MeanFlushCount": 28,
+  "MeanOutputBytes": 3161,
+  "DecodedInputsPerRun": 24
+}

@@ -68,7 +68,8 @@ Measurement rules:
 - benchmark project enables Release-only `AllowUnsafeBlocks` for BenchmarkDotNet-generated harness compatibility
 - same terminal profile and dimensions per comparison
 - warmup included before recorded samples
-- minimum 10 measured iterations per scenario
+- explicit release-gate runner uses `2` warmups + `10` measured iterations per scenario
+- BenchmarkDotNet trend lanes (`all|scenario|shortlist*`) keep BenchmarkDotNet-managed iteration selection unless a lane explicitly overrides it
 
 Benchmark modes:
 - render-only mode:
@@ -102,13 +103,17 @@ Harness quick commands:
   - `scripts/run_benchmarks_v1.sh list|all|scenario "<filter>"|shortlist`
   - `scripts/run_benchmarks_v1.sh shortlist-render-only`
   - `scripts/run_benchmarks_v1.sh shortlist-materialize`
+  - `scripts/run_benchmarks_v1.sh runtime-e2e`
   - `scripts/run_benchmarks_v1.sh iteration-template`
   - `scripts/perf_gate_v1.sh run`
   - `scripts/perf_gate_v1.sh dry-run`
+  - `scripts/perf_gate_v1.sh runtime-e2e`
   - script execution modes (`all|scenario|shortlist*`) run with `--inProcess` for trend/gate stability
   - script performs lazy build (build only when benchmark output is missing)
   - SLO gate baseline input: `docs/perf-baselines/v1-slo-gate-baseline.json`
   - SLO gate machine-readable output: `docs/perf-baselines/latest-slo-gate-result.json`
+  - runtime e2e machine-readable output: `docs/perf-baselines/latest-runtime-e2e-result.json`
+  - `scripts/perf_gate_v1.sh` now follows the same lazy-build policy as `run_benchmarks_v1.sh` to avoid wrapper-only build stalls
 
 BenchmarkDotNet artifacts/report directory:
 - `benchmarks/TeaSharp.Benchmarks/bin/Release/net10.0/BenchmarkDotNet.Artifacts/`
@@ -159,6 +164,10 @@ Release gate for Public V1:
 - no metric exceeds regression budget
 - SLO targets met or variance explained with approved mitigation plan
 - perf report attached to release checklist
+
+Supplemental release-confidence lane:
+- runtime e2e probe executes through the public hosting seam (`TeaHost` + terminal adapter + decoder + renderer flush)
+- current V1 policy: collect and attach the runtime e2e result, but do not fail RC solely on that lane until a baseline policy is accepted
 
 ## Iteration Reporting (Before/After)
 

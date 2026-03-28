@@ -25,6 +25,12 @@ public static class Program
             return;
         }
 
+        if (RuntimeEndToEndRunner.TryRun(args, out exitCode))
+        {
+            Environment.ExitCode = exitCode;
+            return;
+        }
+
         BenchmarkSwitcher.FromTypes(BenchmarkTypes).Run(args);
     }
 }

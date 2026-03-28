@@ -1,10 +1,4 @@
 using System.Text.Json;
-using BenchmarkDotNet.Configs;
-using BenchmarkDotNet.Jobs;
-using BenchmarkDotNet.Loggers;
-using BenchmarkDotNet.Reports;
-using BenchmarkDotNet.Running;
-using BenchmarkDotNet.Toolchains.InProcess.Emit;
 
 namespace TeaSharp.Benchmarks;
 
@@ -12,6 +6,8 @@ internal static class PerfGateRunner
 {
     private const string GateFlag = "--perf-gate";
     private const string BaselineSchema = "teasharp-perf-gate-baseline-v1";
+    private const int WarmupCount = 2;
+    private const int MeasurementCount = 10;
     private static readonly JsonSerializerOptions JsonOptions = new()
     {
         PropertyNameCaseInsensitive = true,
@@ -78,46 +74,92 @@ internal static class PerfGateRunner
 
     private static PerfGateExecutionResult ExecuteGate(string baselinePath, PerfGateBaseline baseline)
     {
-        var config = CreateGateConfig();
-        var summary = BenchmarkRunner.Run<SloLatencyBenchmarks>(config);
-        var measurements = CollectMeasurements(summary);
+        var measurements = CollectMeasurements();
         return CompareAgainstBaseline(baselinePath, baseline, measurements);
     }
 
-    private static ManualConfig CreateGateConfig()
+    private static Dictionary<string, PerfGateMeasurement> CollectMeasurements()
     {
-        var job = Job.Default
-            .WithId("slo-gate")
-            .WithLaunchCount(1)
-            .WithWarmupCount(1)
-            .WithIterationCount(8)
-            .WithToolchain(InProcessEmitToolchain.Instance);
-
-        return ManualConfig
-            .Create(DefaultConfig.Instance)
-            .AddLogger(ConsoleLogger.Default)
-            .AddJob(job);
-    }
-
-    private static Dictionary<string, PerfGateMeasurement> CollectMeasurements(Summary summary)
-    {
-        var measurements = new Dictionary<string, PerfGateMeasurement>(StringComparer.Ordinal);
-        foreach (var report in summary.Reports)
+        var scenarios = new PerfGateScenario[]
         {
-            var statistics = report.ResultStatistics;
-            if (statistics is null)
-            {
-                continue;
-            }
+            new(
+                "SloLatencyBenchmarks.StartupFirstFrameP95Ms",
+                static () =>
+                {
+                    var benchmarks = new SloLatencyBenchmarks();
+                    benchmarks.Setup();
+                    return benchmarks.StartupFirstFrameP95Ms;
+                }),
+            new(
+                "SloLatencyBenchmarks.InputLatencyNormalP95Ms",
+                static () =>
+                {
+                    var benchmarks = new SloLatencyBenchmarks();
+                    benchmarks.Setup();
+                    return benchmarks.InputLatencyNormalP95Ms;
+                }),
+            new(
+                "SloLatencyBenchmarks.InputLatencyHeavyP95Ms",
+                static () =>
+                {
+                    var benchmarks = new SloLatencyBenchmarks();
+                    benchmarks.Setup();
+                    return benchmarks.InputLatencyHeavyP95Ms;
+                }),
+        };
 
-            var descriptor = report.BenchmarkCase.Descriptor;
-            var benchmarkId = string.Concat(descriptor.Type.Name, ".", descriptor.WorkloadMethod.Name);
-            var meanMs = statistics.Mean / 1_000_000d;
-            var allocatedBytes = ResolveAllocatedBytesPerOperation(report.GcStats);
-            measurements[benchmarkId] = new PerfGateMeasurement(benchmarkId, meanMs, allocatedBytes);
+        var measurements = new Dictionary<string, PerfGateMeasurement>(scenarios.Length, StringComparer.Ordinal);
+        for (var index = 0; index < scenarios.Length; index++)
+        {
+            var scenario = scenarios[index];
+            measurements[scenario.BenchmarkId] = MeasureScenario(scenario);
         }
 
         return measurements;
+    }
+
+    private static PerfGateMeasurement MeasureScenario(PerfGateScenario scenario)
+    {
+        var execute = scenario.CreateWorkload();
+        for (var warmup = 0; warmup < WarmupCount; warmup++)
+        {
+            _ = execute();
+        }
+
+        GC.Collect();
+        GC.WaitForPendingFinalizers();
+        GC.Collect();
+
+        Span<double> samples = stackalloc double[MeasurementCount];
+        Span<double> allocationSamples = stackalloc double[MeasurementCount];
+        for (var measurement = 0; measurement < MeasurementCount; measurement++)
+        {
+            var beforeAlloc = GC.GetAllocatedBytesForCurrentThread();
+            samples[measurement] = execute();
+            var afterAlloc = GC.GetAllocatedBytesForCurrentThread();
+            allocationSamples[measurement] = afterAlloc - beforeAlloc;
+        }
+
+        return new PerfGateMeasurement(
+            scenario.BenchmarkId,
+            ResolveMean(samples),
+            ResolveMean(allocationSamples));
+    }
+
+    private static double ResolveMean(ReadOnlySpan<double> samples)
+    {
+        if (samples.Length == 0)
+        {
+            return 0d;
+        }
+
+        var total = 0d;
+        for (var index = 0; index < samples.Length; index++)
+        {
+            total += samples[index];
+        }
+
+        return total / samples.Length;
     }
 
     private static PerfGateExecutionResult CompareAgainstBaseline(
@@ -171,6 +213,9 @@ internal static class PerfGateRunner
             Status = allPassed ? "pass" : "fail",
             BaselinePath = baselinePath,
             GeneratedAtUtc = DateTimeOffset.UtcNow,
+            Runner = "direct-slo-runner",
+            WarmupCount = WarmupCount,
+            MeasurementCount = MeasurementCount,
             ScenarioResults = scenarioResults,
         };
     }
@@ -196,6 +241,9 @@ internal static class PerfGateRunner
             Status = "dry-run",
             BaselinePath = baselinePath,
             GeneratedAtUtc = DateTimeOffset.UtcNow,
+            Runner = "direct-slo-runner",
+            WarmupCount = WarmupCount,
+            MeasurementCount = MeasurementCount,
             ScenarioResults = scenarioResults,
         };
     }
@@ -232,58 +280,6 @@ internal static class PerfGateRunner
         }
 
         File.WriteAllText(outputPath, json);
-    }
-
-    private static double ResolveAllocatedBytesPerOperation(object gcStats)
-    {
-        var type = gcStats.GetType();
-        var bytes = TryReadDoubleProperty(type, gcStats, "BytesAllocatedPerOperation");
-        if (bytes.HasValue)
-        {
-            return bytes.Value;
-        }
-
-        bytes = TryReadDoubleProperty(type, gcStats, "AllocatedBytes");
-        if (bytes.HasValue)
-        {
-            return bytes.Value;
-        }
-
-        var totalBytes = TryReadDoubleProperty(type, gcStats, "TotalOperations");
-        var operations = TryReadDoubleProperty(type, gcStats, "Operations");
-        if (totalBytes.HasValue && operations.HasValue && operations.Value > 0d)
-        {
-            return totalBytes.Value / operations.Value;
-        }
-
-        return 0d;
-    }
-
-    private static double? TryReadDoubleProperty(Type type, object instance, string propertyName)
-    {
-        var property = type.GetProperty(propertyName);
-        if (property is null)
-        {
-            return null;
-        }
-
-        var value = property.GetValue(instance);
-        return value switch
-        {
-            null => null,
-            byte numeric => numeric,
-            sbyte numeric => numeric,
-            short numeric => numeric,
-            ushort numeric => numeric,
-            int numeric => numeric,
-            uint numeric => numeric,
-            long numeric => numeric,
-            ulong numeric => numeric,
-            float numeric => numeric,
-            double numeric => numeric,
-            decimal numeric => (double)numeric,
-            _ => null,
-        };
     }
 
     private static PerfGateBaseline LoadBaseline(string baselinePath)
@@ -347,6 +343,10 @@ internal static class PerfGateRunner
     }
 }
 
+internal readonly record struct PerfGateScenario(
+    string BenchmarkId,
+    Func<Func<double>> CreateWorkload);
+
 internal sealed class PerfGateBaseline
 {
     public string Schema { get; init; } = string.Empty;
@@ -379,6 +379,12 @@ internal sealed class PerfGateExecutionResult
     public string BaselinePath { get; init; } = string.Empty;
 
     public DateTimeOffset GeneratedAtUtc { get; init; }
+
+    public string Runner { get; init; } = string.Empty;
+
+    public int WarmupCount { get; init; }
+
+    public int MeasurementCount { get; init; }
 
     public List<PerfGateScenarioResult> ScenarioResults { get; init; } = [];
 }

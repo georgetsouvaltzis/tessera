@@ -32,6 +32,7 @@ Notes:
 - priority-setting warnings on this host (`Permission denied` / `Operation not permitted`) are non-fatal noise
 - values above are from `inProcess` mode and represent single-host snapshots
 - table captures both mode families for the same scenario set
+- these shortlist snapshots are BenchmarkDotNet trend lanes, not the direct SLO gate lane
 
 ## Regression Budget Check (2026-03-20)
 
@@ -61,7 +62,7 @@ Measured deltas vs accepted baseline:
 
 Conclusion:
 - measured benchmark budgets: `pass` (worst time regression `+1.51%`, worst allocation regression `+0.00%`)
-- input latency p95 budget: `not measured` in current BenchmarkDotNet shortlist lane
+- input latency p95 budget: measured by the separate direct SLO gate lane, not this shortlist table
 
 ## Iteration 3 Spotlight (2026-03-19)
 

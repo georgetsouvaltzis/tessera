@@ -7,7 +7,8 @@ BenchmarkDotNet harness used by Public V1 perf gates.
 Two BenchmarkDotNet mode families are tracked:
 - render-only: control render path only; excludes final `canvas.Render()` materialization
 - render+materialize: includes `canvas.Render()` to measure full frame/output cost
-- SLO gate mode: startup/input-latency p95 thresholds compared against a baseline file
+- direct SLO gate mode: startup/input-latency p95 thresholds compared against a baseline file without invoking BenchmarkDotNet at gate time
+- runtime e2e mode: public hosting path, runtime loop, input decode, renderer flush, and terminal output in one deterministic probe
 
 Why both:
 - render-only isolates renderer/layout regressions
@@ -16,7 +17,9 @@ Why both:
 Gating:
 - render-only gates renderer/layout regression budget
 - render+materialize gates release-facing frame/allocation budgets
-- V1 perf gate requires both mode families to stay within budget
+- direct SLO gate validates startup/input-latency thresholds with `2` warmups + `10` measured iterations
+- runtime e2e is supplemental confidence evidence and is non-gating for V1
+- V1 perf gate requires both mode families plus the SLO gate to stay within budget
 
 ## Deterministic Execution Commands
 
@@ -49,8 +52,10 @@ scripts/run_benchmarks_v1.sh shortlist
 scripts/run_benchmarks_v1.sh shortlist-render-only
 scripts/run_benchmarks_v1.sh shortlist-materialize
 scripts/run_benchmarks_v1.sh iteration-template
+scripts/run_benchmarks_v1.sh runtime-e2e
 scripts/perf_gate_v1.sh run
 scripts/perf_gate_v1.sh dry-run
+scripts/perf_gate_v1.sh runtime-e2e
 ```
 
 ## Before/After Reporting Workflow
@@ -70,6 +75,10 @@ Mode guidance:
   - baseline: `docs/perf-baselines/v1-slo-gate-baseline.json`
   - run: `scripts/perf_gate_v1.sh run`
   - output: `docs/perf-baselines/latest-slo-gate-result.json`
+  - wrapper behavior: reuses the existing Release benchmark DLL and only builds if the DLL is missing
+- runtime e2e probe:
+  - run: `scripts/perf_gate_v1.sh runtime-e2e`
+  - output: `docs/perf-baselines/latest-runtime-e2e-result.json`
 
 ## Artifacts Location
 

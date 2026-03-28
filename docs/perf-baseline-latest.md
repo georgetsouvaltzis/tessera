@@ -11,6 +11,7 @@ Environment:
 Commands executed:
 - `scripts/run_benchmarks_v1.sh list`
 - `scripts/run_benchmarks_v1.sh all`
+- `scripts/perf_gate_v1.sh run`
 
 ## Current Snapshot (absolute, .NET 10)
 
@@ -56,6 +57,7 @@ Conclusion:
 - Regression budget verdict vs last accepted snapshot: `PASS`
 - Worst time regression: `+6.50%` (`LogTail` render-only), within `+10%` budget
 - Worst allocation regression: `+0.02%` (normalized `MB -> KB` conversion in materialize rows), within `+15%` budget
+- Startup/input-latency SLO evidence lives in `docs/perf-baselines/latest-slo-gate-result.json` via the direct gate runner
 
 ## Findings For Recent String/Core Optimizations
 
