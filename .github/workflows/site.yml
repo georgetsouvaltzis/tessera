@@ -40,15 +40,7 @@ jobs:
           cache: npm
           cache-dependency-path: site/package-lock.json
 
-      - name: Setup Pages with auto-enable
-        if: ${{ secrets.PAGES_ENABLEMENT_TOKEN != '' }}
-        uses: actions/configure-pages@v5
-        with:
-          token: ${{ secrets.PAGES_ENABLEMENT_TOKEN }}
-          enablement: true
-
       - name: Setup Pages
-        if: ${{ secrets.PAGES_ENABLEMENT_TOKEN == '' }}
         uses: actions/configure-pages@v5
 
       - name: Install dependencies
