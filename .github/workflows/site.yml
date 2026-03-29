@@ -3,6 +3,7 @@ name: site
 on:
   push:
     branches:
+      - master
       - main
     paths:
       - '.github/workflows/site.yml'
@@ -65,7 +66,7 @@ jobs:
           path: site/build
 
   deploy:
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/master' || github.ref == 'refs/heads/main')
     needs: build
     runs-on: ubuntu-latest
     environment:
