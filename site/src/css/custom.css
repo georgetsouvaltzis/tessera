@@ -1,0 +1,82 @@
+:root {
+  --ifm-color-primary: #89b4fa;
+  --ifm-color-primary-dark: #6ea4f8;
+  --ifm-color-primary-darker: #5f9cf7;
+  --ifm-color-primary-darkest: #3884f4;
+  --ifm-color-primary-light: #a4c4fc;
+  --ifm-color-primary-lighter: #b3cdfc;
+  --ifm-color-primary-lightest: #dde9fe;
+  --ifm-background-color: #0b1020;
+  --ifm-background-surface-color: #111827;
+  --ifm-navbar-background-color: rgba(11, 16, 32, 0.88);
+  --ifm-footer-background-color: #09101c;
+  --ifm-font-family-base: "IBM Plex Sans", "Segoe UI", sans-serif;
+  --ifm-font-family-monospace: "Iosevka", "IBM Plex Mono", monospace;
+  --ifm-heading-font-family: "Space Grotesk", "IBM Plex Sans", sans-serif;
+  --ifm-code-font-size: 95%;
+  --ifm-line-height-base: 1.65;
+  --ifm-global-radius: 16px;
+  --ifm-heading-color: #f3f4f6;
+  --ifm-font-color-base: #d6deee;
+  --ifm-color-content-secondary: #a6adc8;
+  --docusaurus-highlighted-code-line-bg: rgba(137, 180, 250, 0.08);
+}
+
+[data-theme='light'] {
+  --ifm-background-color: #f4efe8;
+  --ifm-background-surface-color: #fffaf3;
+  --ifm-navbar-background-color: rgba(244, 239, 232, 0.92);
+  --ifm-footer-background-color: #efe5d7;
+  --ifm-heading-color: #1d2432;
+  --ifm-font-color-base: #2d3646;
+  --ifm-color-content-secondary: #556074;
+  --docusaurus-highlighted-code-line-bg: rgba(58, 108, 217, 0.08);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-feature-settings: "ss01" 1, "ss03" 1;
+}
+
+.navbar {
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(148, 163, 184, 0.12);
+}
+
+.navbar__title,
+.hero__title,
+h1,
+h2,
+h3,
+h4 {
+  font-family: var(--ifm-heading-font-family);
+  letter-spacing: -0.03em;
+}
+
+.footer {
+  border-top: 1px solid rgba(148, 163, 184, 0.12);
+}
+
+.table-of-contents__link--active,
+.menu__link--active,
+.pagination-nav__label,
+a {
+  font-weight: 600;
+}
+
+.theme-doc-sidebar-container {
+  border-right: 1px solid rgba(148, 163, 184, 0.12);
+}
+
+.theme-code-block,
+pre {
+  border-radius: 16px;
+}
+
+.card,
+.pagination-nav__link {
+  border-radius: 16px;
+}

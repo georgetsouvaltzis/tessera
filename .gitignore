@@ -8,3 +8,6 @@ obj/
 .artifacts/
 BenchmarkDotNet.Artifacts/
 coord/
+site/node_modules/
+site/.docusaurus/
+site/build/

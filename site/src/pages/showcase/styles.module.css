@@ -1,0 +1,41 @@
+.page {
+  min-height: 100%;
+  background: linear-gradient(180deg, #0b1020 0%, #0f1727 100%);
+}
+
+.shell {
+  width: min(1120px, calc(100vw - 2rem));
+  margin: 0 auto;
+  padding: 4rem 0;
+}
+
+.header {
+  margin-bottom: 2rem;
+  max-width: 42rem;
+}
+
+.kicker {
+  margin: 0 0 0.5rem;
+  color: #89b4fa;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-size: 0.82rem;
+}
+
+.grid {
+  display: grid;
+  gap: 1rem;
+}
+
+.card {
+  border: 1px solid rgba(148, 163, 184, 0.15);
+  border-radius: 1rem;
+  padding: 1.2rem;
+  background: rgba(14, 23, 38, 0.72);
+}
+
+@media (min-width: 860px) {
+  .grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
