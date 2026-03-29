@@ -43,14 +43,15 @@ public sealed partial class LogTailPanel
         ArgumentNullException.ThrowIfNull(entry);
         var previousIndex = _selectedIndex;
         var previousItem = SelectedEntry?.Message ?? string.Empty;
-        _entries.Add(
-            new LogEntry(entry.Message, entry.Level, entry.Timestamp, entry.Source)
-            {
-                IsMuted = entry.IsMuted,
-                HasError = entry.HasError,
-            });
+        var appendedEntry = new LogEntry(entry.Message, entry.Level, entry.Timestamp, entry.Source)
+        {
+            IsMuted = entry.IsMuted,
+            HasError = entry.HasError,
+        };
+        _entries.Add(appendedEntry);
 
-        _entryBodyCache.Add(string.Empty);
+        var cacheStayedWarm = !_entryCacheDirty && _entryBodyCache.Count == _entries.Count - 1;
+        _entryBodyCache.Add(cacheStayedWarm ? BuildEntryBody(appendedEntry) : string.Empty);
         TrimToMaxEntries();
         if (_entries.Count == 0)
         {
@@ -67,7 +68,7 @@ public sealed partial class LogTailPanel
             NormalizeSelection();
         }
 
-        _entryCacheDirty = true;
+        _entryCacheDirty = !cacheStayedWarm;
         RaiseSelectionChangedIfNeeded(previousIndex, previousItem);
     }
 

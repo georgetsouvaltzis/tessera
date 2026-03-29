@@ -17,6 +17,7 @@ internal static class WidgetStateTests
         yield return new TestCase("Widgets_Viewport_ScrollAndHorizontalOffset", Viewport_ScrollAndHorizontalOffset);
         yield return new TestCase("Widgets_Viewport_WrapMode_SoftWrapsRows", Viewport_WrapMode_SoftWrapsRows);
         yield return new TestCase("Widgets_Viewport_NoDecoration_NoClip_ReusesOriginalLineReferences", Viewport_NoDecoration_NoClip_ReusesOriginalLineReferences);
+        yield return new TestCase("Widgets_Viewport_AppendRawLine_PreservesExistingRowsAndAddsNewTailRow", Viewport_AppendRawLine_PreservesExistingRowsAndAddsNewTailRow);
         yield return new TestCase("Widgets_Viewport_NoDecoration_HorizontalOffsetBeyondLineRendersEmpty", Viewport_NoDecoration_HorizontalOffsetBeyondLineRendersEmpty);
         yield return new TestCase("Widgets_Viewport_GutterAndHighlight_RenderDecorations", Viewport_GutterAndHighlight_RenderDecorations);
         yield return new TestCase("Widgets_Viewport_HighlightWithoutGutter_PreservesMarkerPrefix", Viewport_HighlightWithoutGutter_PreservesMarkerPrefix);
@@ -164,6 +165,26 @@ internal static class WidgetStateTests
 
         // Assert
         TestAssert.Equal(string.Empty, lines[0], "No-decoration path should return empty output when horizontal offset exceeds line length.");
+        return Task.CompletedTask;
+    }
+
+    private static Task Viewport_AppendRawLine_PreservesExistingRowsAndAddsNewTailRow()
+    {
+        // Arrange
+        var viewport = new ViewportModel();
+        viewport.Resize(width: 16, height: 3);
+        viewport.SetWrap(false);
+        viewport.SetLines(["alpha", "beta"]);
+        _ = viewport.RenderLines();
+
+        // Act
+        viewport.AppendRawLine("gamma");
+        var lines = viewport.RenderLines();
+
+        // Assert
+        TestAssert.Equal("alpha", lines[0], "Append should preserve existing first row content.");
+        TestAssert.Equal("beta", lines[1], "Append should preserve existing second row content.");
+        TestAssert.Equal("gamma", lines[2], "Append should expose new tail row without requiring a full reset.");
         return Task.CompletedTask;
     }
 

@@ -17,8 +17,7 @@ internal static class ViewportVisualLineBuilder
         {
             foreach (var line in sourceLines)
             {
-                target.Add(line);
-                maxVisualWidth = Math.Max(maxVisualWidth, line.Length);
+                AppendLine(line, wrap, width, target, ref maxVisualWidth);
             }
 
             return;
@@ -26,18 +25,30 @@ internal static class ViewportVisualLineBuilder
 
         foreach (var sourceLine in sourceLines)
         {
-            if (sourceLine.Length == 0)
-            {
-                target.Add(string.Empty);
-                continue;
-            }
+            AppendLine(sourceLine, wrap, width, target, ref maxVisualWidth);
+        }
+    }
 
-            for (var i = 0; i < sourceLine.Length; i += width)
-            {
-                var length = Math.Min(width, sourceLine.Length - i);
-                target.Add(sourceLine.Substring(i, length));
-                maxVisualWidth = Math.Max(maxVisualWidth, length);
-            }
+    public static void AppendLine(string sourceLine, bool wrap, int width, List<string> target, ref int maxVisualWidth)
+    {
+        if (!wrap || width <= 0)
+        {
+            target.Add(sourceLine);
+            maxVisualWidth = Math.Max(maxVisualWidth, sourceLine.Length);
+            return;
+        }
+
+        if (sourceLine.Length == 0)
+        {
+            target.Add(string.Empty);
+            return;
+        }
+
+        for (var index = 0; index < sourceLine.Length; index += width)
+        {
+            var length = Math.Min(width, sourceLine.Length - index);
+            target.Add(sourceLine.Substring(index, length));
+            maxVisualWidth = Math.Max(maxVisualWidth, length);
         }
     }
 }

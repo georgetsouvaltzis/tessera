@@ -97,6 +97,29 @@ public sealed class LogTailPanelControlTests
         Assert.That(first.Contains("\u001b[", StringComparison.Ordinal), Is.False);
     }
 
+    [Test]
+    public void Controls_LogTailPanel_DisplayToggle_RebuildsCachedBodies()
+    {
+        var control = new LogTailPanel
+        {
+            Border = BorderStyle.None,
+            ShowTimestamp = false,
+            ShowLevel = false,
+            ShowSource = false,
+        };
+        control.Append("startup complete", LogLevel.Info, DateTimeOffset.UnixEpoch, "api");
+
+        var plain = Render(control, width: 80, height: 2);
+
+        control.ShowLevel = true;
+        control.ShowSource = true;
+        var enriched = Render(control, width: 80, height: 2);
+
+        Assert.That(plain.Contains("startup complete", StringComparison.Ordinal), Is.True);
+        Assert.That(plain.Contains("INF api:", StringComparison.Ordinal), Is.False);
+        Assert.That(enriched.Contains("INF api: startup complete", StringComparison.Ordinal), Is.True);
+    }
+
     private static string Render(LogTailPanel control, int width, int height)
     {
         var canvas = new Canvas(width, height, CanvasTextMode.GraphemeAware);

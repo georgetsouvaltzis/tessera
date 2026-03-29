@@ -71,16 +71,12 @@ internal sealed class ViewportModel
 
     public void AppendLine(string line)
     {
-        _sourceLines.Add(ViewportLineFormatter.NormalizeInlineLine(line ?? string.Empty));
-        _visualCacheDirty = true;
-        ClampOffsets();
+        AppendSourceLine(ViewportLineFormatter.NormalizeInlineLine(line ?? string.Empty));
     }
 
     public void AppendRawLine(string line)
     {
-        _sourceLines.Add(line ?? string.Empty);
-        _visualCacheDirty = true;
-        ClampOffsets();
+        AppendSourceLine(line ?? string.Empty);
     }
 
     public void Clear()
@@ -173,8 +169,21 @@ internal sealed class ViewportModel
 
     private void ClampOffsets()
     {
-        var lines = GetVisualLines();
-        YOffset = ViewportOffsets.ClampY(YOffset, lines.Count, Height);
-        XOffset = ViewportOffsets.ClampX(Wrap, ShowLineNumbers, XOffset, Width, lines.Count, _maxVisualWidth);
+        var visualLineCount = _visualCacheDirty ? GetVisualLines().Count : Math.Max(1, _visualLinesCache.Count);
+        YOffset = ViewportOffsets.ClampY(YOffset, visualLineCount, Height);
+        XOffset = ViewportOffsets.ClampX(Wrap, ShowLineNumbers, XOffset, Width, visualLineCount, _maxVisualWidth);
+    }
+
+    private void AppendSourceLine(string line)
+    {
+        _sourceLines.Add(line);
+        if (_visualCacheDirty)
+        {
+            ClampOffsets();
+            return;
+        }
+
+        ViewportVisualLineBuilder.AppendLine(line, Wrap, Width, _visualLinesCache, ref _maxVisualWidth);
+        ClampOffsets();
     }
 }
