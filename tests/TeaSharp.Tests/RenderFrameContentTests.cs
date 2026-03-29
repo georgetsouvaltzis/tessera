@@ -21,4 +21,29 @@ public sealed class RenderFrameContentTests
 
         Assert.That(lines, Is.EqualTo(new[] { "alpha", string.Empty }));
     }
+
+    [Test]
+    public void BuildRows_HeightClip_KeepsBottomWrappedRows()
+    {
+        var rows = RenderFrameContent.BuildRows("abcd\nefgh", width: 2, height: 2);
+
+        Assert.That(rows, Has.Count.EqualTo(2));
+        Assert.That(RowText(rows[0]), Is.EqualTo("ef"));
+        Assert.That(RowText(rows[1]), Is.EqualTo("gh"));
+    }
+
+    private static string RowText(RenderFrameRow row)
+    {
+        var parts = new List<string>();
+        for (var column = 0; column < row.ColumnCount; column++)
+        {
+            var cell = row.CellAt(column);
+            if (cell is not null)
+            {
+                parts.Add(cell);
+            }
+        }
+
+        return string.Concat(parts);
+    }
 }

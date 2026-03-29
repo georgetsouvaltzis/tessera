@@ -18,6 +18,8 @@ internal sealed class RenderFrameRow
         _cells = cells;
     }
 
+    public static RenderFrameRow Empty { get; } = new([]);
+
     public int ColumnCount => _cells.Length;
 
     public static RenderFrameRow FromDisplayLine(DisplayLine line, int maxWidth)
@@ -30,7 +32,7 @@ internal sealed class RenderFrameRow
 
         if (columnCount == 0)
         {
-            return new RenderFrameRow([]);
+            return Empty;
         }
 
         var cells = new RenderCell[columnCount];

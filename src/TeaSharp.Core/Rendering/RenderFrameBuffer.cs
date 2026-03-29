@@ -15,14 +15,7 @@ internal sealed class RenderFrameBuffer
 
     public static RenderFrameBuffer FromContent(string content, int width, int height)
     {
-        var normalized = RenderFrameContent.NormalizeLines(content);
-        var wrapped = RenderFrameContent.WrapLines(normalized, width);
-        if (height > 0 && wrapped.Count > height)
-        {
-            wrapped = wrapped.GetRange(wrapped.Count - height, height);
-        }
-
-        return new RenderFrameBuffer(RenderFrameContent.ToRows(wrapped, width));
+        return new RenderFrameBuffer(RenderFrameContent.BuildRows(content, width, height));
     }
 
     public bool RowEquals(RenderFrameBuffer previous, int row)
