@@ -32,6 +32,34 @@ Support two startup lanes:
 
 TeaSharp is a library-first TUI framework. Default startup should not require DI containers or Generic Host wiring.
 
+Minimal app shape for docs/examples:
+
+1. derive from `TeaApp`
+2. handle app/runtime input through `Message`
+3. let built-in controls route handled input before `Update(...)`
+4. return a `Screen` from `Build(ScreenContext)`
+
+Typical configured startup:
+
+```csharp
+var app = Tea.CreateBuilder()
+    .UseApp<MyApp>()
+    .ConfigureRuntime(static runtime =>
+    {
+        runtime.MaxFps = 60;
+        runtime.Theme = TeaThemes.Catppuccin(CatppuccinVariant.Mocha);
+        runtime.Screen = new ScreenOptions
+        {
+            AltScreen = true,
+            WindowTitle = "MyApp",
+            EnableFocusReporting = true,
+        };
+    })
+    .Build();
+
+await app.RunAsync();
+```
+
 ## Canonical Example Progression
 
 Teach examples in this sequence:
@@ -72,8 +100,17 @@ Default composition path:
 - `Screen.Build(...)` + `WindowBuilder`
 - root controls from `TeaSharp.Controls`
 - root layouts from `TeaSharp.Layout`
+- drawing primitives only when needed: `TeaSharp.Components.Primitives`
 
 Alternative composition surfaces may remain public for advanced scenarios, but docs and starter examples should teach the default path first.
+
+Preferred default imports:
+
+```csharp
+using TeaSharp;
+using TeaSharp.Controls;
+using TeaSharp.Layout;
+```
 
 ## Boundary Rules
 

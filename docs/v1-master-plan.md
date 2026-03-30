@@ -1,374 +1,123 @@
-# TeaSharp Public V1 Master Plan
+# TeaSharp Public V1 Remaining Work
 
-This document is the authoritative execution plan for Public V1.
-All agents must treat this file as the source of truth for scope, sequencing, ownership, and done criteria.
-Release-candidate execution checklist: [public-v1-rc-checklist.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/public-v1-rc-checklist.md).
+This document tracks only the work still required before TeaSharp can be called Public V1.
+Anything already implemented and accepted should live in the product docs, tests, and code, not here.
 
-## Vision
-- Ship a C#-first TUI library with a small default API, strong extensibility, and polished visuals.
-- Keep `TeaSharp` as the default app-authoring surface.
-- Keep `TeaSharp.Core` as low-level advanced product, supported but not onboarding-first.
-- Ensure advanced teams can build complex apps without internal forks.
+## Current State
 
-## Non-Goals
-- No rewrite of the runtime loop or renderer internals unless required by correctness/perf defects.
-- No dependency-injection-first public startup model for normal apps.
-- No image rendering support in Public V1 (scheduled for V1.1).
+Implemented in code already:
 
-## Scope Split
-### Public V1 (in scope)
-- Public API decoupling and boundary cleanup.
-- No-DI startup path standardization.
-- Theming/styling architecture and implementation for core controls.
-- Widget expansion toward a broad built-in catalog.
-- Regression tests, docs alignment, and baseline benchmarks.
+- terminal compatibility model
+- widget expansion tranche
+- visual polish pass
+- API cleanup and naming convergence
+- benchmark harness and perf gate foundation
+- Docusaurus site bootstrap
 
-### V1.1 (out of scope for V1)
-- Image embedding (`kitty`, `iTerm2`, `wezterm`, `ghostty`) with capability fallback.
-- Advanced image render modes (native, pixelated block fallback).
+Public V1 is still not closed because release evidence and signoff are incomplete.
 
-## Authoritative Execution Order (Do Not Reorder)
-Correctness is a continuous gate across all phases: fix regressions at source and add regression tests for touched bug classes.
+## Remaining Release Gates
 
-1. **(2) Terminal Compatibility Verification Matrix**
-   - Verify Ghostty, iTerm2, WezTerm, Kitty, and Windows Terminal behavior.
-   - Document support model for `ScreenOptions.FontSpec` (best-effort request, terminal-dependent).
-   - Exit criteria: matrix complete + unsupported terminals verified as safe no-op (no crash, no broken frame output).
-2. **(4) Widget Expansion**
-   - Deliver planned built-in widget tranche with consistent theming/state hooks.
-   - Exit criteria: widget tranche targets met per roadmap and covered by render/theme tests.
-3. **(3) Visual Quality Full Polish Pass**
-   - Execute full visual refinement after the widget tranche is implemented.
-   - Keep only minimum visual contract enforcement during widget build-out (state hooks, override path, monochrome readability).
-   - Exit criteria: polish checklist complete for expanded widget surface; visual regressions closed.
-4. **(1) API Freeze + Cleanup**
-   - Freeze public naming/shape, remove ambiguity, cleanup dead or duplicate paths.
-   - Exit criteria: naming clarity gate pass + API commenting gate pass + cleanup diffs validated.
-5. **(5) Performance Gate + Benchmarks**
-   - Run V1 benchmark gate and finalize docs/release checklist.
-   - Exit criteria: perf gates pass, benchmark evidence attached, docs/release coherence signoff complete.
+### 1. Choose The Candidate
 
-## Current Progress
-- **Status Legend (for this file)**
-  - `Done` = implementation landed and merged.
-  - `In progress` = active execution, not yet at phase exit criteria.
-  - `Pending manual signoff` = release-gate evidence still required; RC is not closed.
-  - `Blocked` = open issue prevents phase exit.
-- **M1: Terminal Compatibility Verification Matrix** -> **Done**
-  - cross-terminal font capability doc added (`xterm`, `iTerm2`, `Kitty`, `WezTerm`, `Ghostty`, Windows terminals)
-  - verification evidence captured in [terminal-compatibility-evidence-v1.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/terminal-compatibility-evidence-v1.md)
-  - explicit environment note: iTerm2/WezTerm/Kitty/Windows Terminal binaries are not installed on this host; their verification uses deterministic tests + official specs; Ghostty has host evidence
-  - capability-gated no-op fallback behavior is covered by deterministic tests for unsupported terminals
-- **M2: Widget Expansion** -> **Done**
-  - widget roadmap backlog is zero across Waves 1-4 in [widget-roadmap-v1.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/widget-roadmap-v1.md)
-  - Wave 1 app-shell/forms tranche integrated in docs+catalog/theme coverage (`Form`, `FieldSet`, `DataForm<TModel>`, `Wizard`, `SplitView`, `InspectorPanel`)
-  - Wave 4 batch A + B integrated in docs+catalog/theme coverage (`DockWorkspace`, `PaneTabs`, `PaletteEditor`, `Heatmap`, `TreeMapChart`, `TerminalPanel`, `ProcessListView`)
-  - forward-looking expansion backlog (post-current V1 tranche) documented with dependency/lanes plan in `6887517` -> [docs/widget-roadmap-v1.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/widget-roadmap-v1.md), [docs/prebuilt-widgets.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/prebuilt-widgets.md)
-  - post-wave expansion tranche (non-M2 gate scope) landed controls: `DashboardGrid` (`8593562`), `QuickOpenOverlay` (`d91c934`), `BulletChart` (`dfd4221`), `ResizablePaneGroup` (`77cc95d`), `SideNavRail` (`d236de2`), `TokenEditor` (`7fbf7be`), `HealthBoard` (`18adc16`), `JumpList` (`187468c`), `AutocompleteInput` (`50212de` + `be23de7`), `BoxPlot` (`6ae3c5b`)
-  - targeted verification signal for the landed tranche is green on this host: `dotnet test tests/TeaSharp.Tests --no-restore --nologo --filter "DashboardGrid|QuickOpenOverlay|BulletChart|ResizablePaneGroup|SideNavRail|TokenEditor|HealthBoard|JumpList|AutocompleteInput|BoxPlot"` (48 passed)
-  - integration wiring updates: `4e005ed` + `1c1b748` + `03c7a43` + `db63e01` add theme/parity coverage for all currently landed tranche controls (`BulletChart`, `DashboardGrid`, `HealthBoard`, `ResizablePaneGroup`, `SideNavRail`, `TokenEditor`, `JumpList`, `AutocompleteInput`, `BoxPlot`, `QuickOpenOverlay`)
-  - tranche parity status: fully wired for all currently landed expansion controls; remaining backlog items are unimplemented controls from the expansion list
-- **M3: Visual Quality Full Polish Pass** -> **Done**
-  - visual polish closure evidence landed:
-    - `1c43dbe` -> WidgetGallery polished default theme/layout slice
-    - `d3d7065` -> Choice/ComboBox/TreeView border+glyph+focus-marker token override slice
-    - `9ea516e` + `8e778d1` -> cross-control focus-marker parity wiring follow-up
-    - `1dba5bc` + `3731c50` -> visual regression/assertion updates and decoder leak fix
-    - `cf3e8a1` -> focus-marker policy/regression test follow-up
-  - runtime visual sanity artifacts exist under `.artifacts/screenshots/*`; current text-capture scans show no `<...;...M` leakage patterns
-  - latest workspace verification on March 21, 2026 is green (`dotnet build TeaSharp.slnx --no-restore --nologo -v minimal`, `dotnet test TeaSharp.slnx --no-restore --nologo`, `dotnet build TeaSharp.Examples.slnx --no-restore --nologo -v minimal`); WorkspaceApp non-interactive launch smoke also passed (`dotnet run --project examples/WorkspaceApp --no-build --nologo`, short timed start/stop).
-- **M4: API Freeze + Cleanup** -> **Pending manual signoff**
-  - checklist evidence updates from recent commits:
-    - item `1` + item `6` evidence: `c712c2a` -> [examples/PublicApiDashboard/Program.cs](/Users/georgetsouvaltzis/Projects/playground/teasharp/examples/PublicApiDashboard/Program.cs), [docs/public-api-consumer-friction-log.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/public-api-consumer-friction-log.md), [examples/PublicApiDashboard/README.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/examples/PublicApiDashboard/README.md)
-    - item `4` focused-border naming/behavior consistency evidence: `1a4fab8` -> [src/TeaSharp/Controls/SearchResultsView.Rendering.cs](/Users/georgetsouvaltzis/Projects/playground/teasharp/src/TeaSharp/Controls/SearchResultsView.Rendering.cs), [tests/TeaSharp.Tests/SearchResultsViewControlTests.cs](/Users/georgetsouvaltzis/Projects/playground/teasharp/tests/TeaSharp.Tests/SearchResultsViewControlTests.cs)
-    - item `3` + item `6` docs sync evidence: `ed4449d` -> [docs/public-api-inventory.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/public-api-inventory.md), [docs/theme-system-v1.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/theme-system-v1.md), [docs/spec.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/spec.md)
-    - item `5` XML docs pass evidence: `4e3a240` -> [src/TeaSharp/Styles/TeaStyle.cs](/Users/georgetsouvaltzis/Projects/playground/teasharp/src/TeaSharp/Styles/TeaStyle.cs), [src/TeaSharp/Styles/TeaThemeControlExtensions.DevOpsAndWorkflows.cs](/Users/georgetsouvaltzis/Projects/playground/teasharp/src/TeaSharp/Styles/TeaThemeControlExtensions.DevOpsAndWorkflows.cs)
-    - item `3` consumer-ergonomics closure evidence:
-      - `184e3ae` -> [src/TeaSharp/Controls/Dialog.cs](/Users/georgetsouvaltzis/Projects/playground/teasharp/src/TeaSharp/Controls/Dialog.cs), [src/TeaSharp/Controls/DialogClosedEventArgs.cs](/Users/georgetsouvaltzis/Projects/playground/teasharp/src/TeaSharp/Controls/DialogClosedEventArgs.cs), [tests/TeaSharp.Tests/DialogClosedEventTests.cs](/Users/georgetsouvaltzis/Projects/playground/teasharp/tests/TeaSharp.Tests/DialogClosedEventTests.cs)
-      - `ff557e6` -> [src/TeaSharp/Controls/Table.cs](/Users/georgetsouvaltzis/Projects/playground/teasharp/src/TeaSharp/Controls/Table.cs), [tests/TeaSharp.Tests/TableRowMutationApiTests.cs](/Users/georgetsouvaltzis/Projects/playground/teasharp/tests/TeaSharp.Tests/TableRowMutationApiTests.cs)
-      - `9cf07b2` -> [src/TeaSharp/Layout/ScreenBuilder.cs](/Users/georgetsouvaltzis/Projects/playground/teasharp/src/TeaSharp/Layout/ScreenBuilder.cs), [tests/TeaSharp.Tests/WindowBuilderHeaderRowCompositionTests.cs](/Users/georgetsouvaltzis/Projects/playground/teasharp/tests/TeaSharp.Tests/WindowBuilderHeaderRowCompositionTests.cs)
-      - `d067b1d` -> [src/TeaSharp/Styles/TeaThemeOverrideBundle.cs](/Users/georgetsouvaltzis/Projects/playground/teasharp/src/TeaSharp/Styles/TeaThemeOverrideBundle.cs), [src/TeaSharp/Styles/TeaThemeOverrideBundleExtensions.cs](/Users/georgetsouvaltzis/Projects/playground/teasharp/src/TeaSharp/Styles/TeaThemeOverrideBundleExtensions.cs), [examples/PublicApiDashboard/Program.cs](/Users/georgetsouvaltzis/Projects/playground/teasharp/examples/PublicApiDashboard/Program.cs), [tests/TeaSharp.Tests/ThemeOverrideBundleApiErgonomicsTests.cs](/Users/georgetsouvaltzis/Projects/playground/teasharp/tests/TeaSharp.Tests/ThemeOverrideBundleApiErgonomicsTests.cs)
-      - `07ae666` -> [src/TeaSharp/TeaEffects.cs](/Users/georgetsouvaltzis/Projects/playground/teasharp/src/TeaSharp/TeaEffects.cs), [src/TeaSharp/TeaApp.cs](/Users/georgetsouvaltzis/Projects/playground/teasharp/src/TeaSharp/TeaApp.cs), [src/TeaSharp/Internal/TeaPeriodicEffectMessage.cs](/Users/georgetsouvaltzis/Projects/playground/teasharp/src/TeaSharp/Internal/TeaPeriodicEffectMessage.cs), [tests/TeaSharp.Tests/TeaEffectsPeriodicApiErgonomicsTests.cs](/Users/georgetsouvaltzis/Projects/playground/teasharp/tests/TeaSharp.Tests/TeaEffectsPeriodicApiErgonomicsTests.cs)
-      - `c21a6ce` -> `StatsCard` bordered styling parity and theme wiring in [src/TeaSharp/Controls/StatsCard.cs](/Users/georgetsouvaltzis/Projects/playground/teasharp/src/TeaSharp/Controls/StatsCard.cs), [src/TeaSharp/Styles/TeaThemeControlExtensions.DataAndFlow.cs](/Users/georgetsouvaltzis/Projects/playground/teasharp/src/TeaSharp/Styles/TeaThemeControlExtensions.DataAndFlow.cs), [tests/TeaSharp.Tests/StatsCardControlTests.cs](/Users/georgetsouvaltzis/Projects/playground/teasharp/tests/TeaSharp.Tests/StatsCardControlTests.cs)
-      - `4fc0ca3` + `1781ee7` -> plotting ergonomics (`LineSeries.Capacity/TrimToLast`, `ScaleMode`, `LinePlot.ConfigureAxes/Grid/Legend`, `ScatterPlot`/`Sparkline` retention APIs) in [src/TeaSharp/Controls/LineSeries.cs](/Users/georgetsouvaltzis/Projects/playground/teasharp/src/TeaSharp/Controls/LineSeries.cs), [src/TeaSharp/Controls/LinePlot.cs](/Users/georgetsouvaltzis/Projects/playground/teasharp/src/TeaSharp/Controls/LinePlot.cs), [src/TeaSharp/Controls/ScatterPlot.cs](/Users/georgetsouvaltzis/Projects/playground/teasharp/src/TeaSharp/Controls/ScatterPlot.cs), [src/TeaSharp/Controls/Sparkline.cs](/Users/georgetsouvaltzis/Projects/playground/teasharp/src/TeaSharp/Controls/Sparkline.cs)
-      - `86df879` -> [src/TeaSharp/Controls/Notifications.cs](/Users/georgetsouvaltzis/Projects/playground/teasharp/src/TeaSharp/Controls/Notifications.cs), [src/TeaSharp/Controls/InboxItem.cs](/Users/georgetsouvaltzis/Projects/playground/teasharp/src/TeaSharp/Controls/InboxItem.cs), [tests/TeaSharp.Tests/NotificationsPrimaryApiTests.cs](/Users/georgetsouvaltzis/Projects/playground/teasharp/tests/TeaSharp.Tests/NotificationsPrimaryApiTests.cs), [docs/public-api-consumer-friction-log.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/public-api-consumer-friction-log.md)
-      - `4d4a391` -> `Notifications.SelectionChanged` event hook landed on primary API path with coverage/docs sync in [src/TeaSharp/Controls/Notifications.cs](/Users/georgetsouvaltzis/Projects/playground/teasharp/src/TeaSharp/Controls/Notifications.cs), [tests/TeaSharp.Tests/NotificationsSelectionChangedEventTests.cs](/Users/georgetsouvaltzis/Projects/playground/teasharp/tests/TeaSharp.Tests/NotificationsSelectionChangedEventTests.cs), [docs/public-api-inventory.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/public-api-inventory.md), [docs/spec.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/spec.md)
-      - `e731edc` -> stepper/wizard selection naming convergence (`Selected*` canonical + compatibility aliases) in [src/TeaSharp/Controls/StepperCurrentStepChangedEventArgs.cs](/Users/georgetsouvaltzis/Projects/playground/teasharp/src/TeaSharp/Controls/StepperCurrentStepChangedEventArgs.cs), [src/TeaSharp/Controls/WizardStepChangedEventArgs.cs](/Users/georgetsouvaltzis/Projects/playground/teasharp/src/TeaSharp/Controls/WizardStepChangedEventArgs.cs), [tests/TeaSharp.Tests/SelectionApiConvergenceTests.cs](/Users/georgetsouvaltzis/Projects/playground/teasharp/tests/TeaSharp.Tests/SelectionApiConvergenceTests.cs)
-      - `51d46a3` -> table selection state/event surface (`SelectedRowIndex`, `SelectedRow`, `TryGetSelectedRow(...)`, `SelectionChanged`) in [src/TeaSharp/Controls/Table.cs](/Users/georgetsouvaltzis/Projects/playground/teasharp/src/TeaSharp/Controls/Table.cs), [tests/TeaSharp.Tests/TableSelectionApiTests.cs](/Users/georgetsouvaltzis/Projects/playground/teasharp/tests/TeaSharp.Tests/TableSelectionApiTests.cs)
-      - `a9f774f` -> canonical list selection setter in [src/TeaSharp/Controls/ListView.cs](/Users/georgetsouvaltzis/Projects/playground/teasharp/src/TeaSharp/Controls/ListView.cs), [tests/TeaSharp.Tests/ListViewSelectionApiTests.cs](/Users/georgetsouvaltzis/Projects/playground/teasharp/tests/TeaSharp.Tests/ListViewSelectionApiTests.cs)
-      - `8ff286d` -> first-party multi-control theme fan-out helper (`ThemeScope.Apply(...)`) in [src/TeaSharp/Styles/ThemeScope.cs](/Users/georgetsouvaltzis/Projects/playground/teasharp/src/TeaSharp/Styles/ThemeScope.cs), [tests/TeaSharp.Tests/ThemeScopeApiErgonomicsTests.cs](/Users/georgetsouvaltzis/Projects/playground/teasharp/tests/TeaSharp.Tests/ThemeScopeApiErgonomicsTests.cs)
-      - `refactor: normalize setselectedindex across list controls` -> selection mutation API pass across list-like controls (`SetSelectedIndex` normalization surface)
-      - `refactor: add selected aliases for selection event args` -> [src/TeaSharp/Controls/KeyValueListSelectionChangedEventArgs.cs](/Users/georgetsouvaltzis/Projects/playground/teasharp/src/TeaSharp/Controls/KeyValueListSelectionChangedEventArgs.cs), [src/TeaSharp/Controls/PropertyGridSelectionChangedEventArgs.cs](/Users/georgetsouvaltzis/Projects/playground/teasharp/src/TeaSharp/Controls/PropertyGridSelectionChangedEventArgs.cs), [src/TeaSharp/Controls/ValidationSelectionChangedEventArgs.cs](/Users/georgetsouvaltzis/Projects/playground/teasharp/src/TeaSharp/Controls/ValidationSelectionChangedEventArgs.cs), [src/TeaSharp/Controls/JsonTreeSelectionChangedEventArgs.cs](/Users/georgetsouvaltzis/Projects/playground/teasharp/src/TeaSharp/Controls/JsonTreeSelectionChangedEventArgs.cs)
-      - policy closure evidence: [post-v1-selection-naming-migration.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/post-v1-selection-naming-migration.md)
-    - item `1` + item `6` additional consumer-path evidence: `896c227` -> [examples/ExternalConsumerReviewApp/ExternalConsumerReviewApp.Wave2.cs](/Users/georgetsouvaltzis/Projects/playground/teasharp/examples/ExternalConsumerReviewApp/ExternalConsumerReviewApp.Wave2.cs), [examples/ExternalConsumerReviewApp/Program.cs](/Users/georgetsouvaltzis/Projects/playground/teasharp/examples/ExternalConsumerReviewApp/Program.cs), [docs/external-consumer-review-v1.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/external-consumer-review-v1.md)
-    - item `4` guardrail enforcement evidence: `0a38229` -> [tests/TeaSharp.Tests/BorderedControlParityPolicyTests.cs](/Users/georgetsouvaltzis/Projects/playground/teasharp/tests/TeaSharp.Tests/BorderedControlParityPolicyTests.cs)
-    - item `4` theme/parity integration follow-up: `03c7a43` -> [src/TeaSharp/Styles/TeaThemeControlExtensions.Navigation.cs](/Users/georgetsouvaltzis/Projects/playground/teasharp/src/TeaSharp/Styles/TeaThemeControlExtensions.Navigation.cs), [src/TeaSharp/Styles/TeaThemeControlExtensions.NavigationOverlay.cs](/Users/georgetsouvaltzis/Projects/playground/teasharp/src/TeaSharp/Styles/TeaThemeControlExtensions.NavigationOverlay.cs), [src/TeaSharp/Styles/TeaThemeControlExtensions.Plotting.cs](/Users/georgetsouvaltzis/Projects/playground/teasharp/src/TeaSharp/Styles/TeaThemeControlExtensions.Plotting.cs), [tests/TeaSharp.Tests/BorderedControlParityPolicyTests.cs](/Users/georgetsouvaltzis/Projects/playground/teasharp/tests/TeaSharp.Tests/BorderedControlParityPolicyTests.cs)
-    - item `6` onboarding boundary guard evidence: `9c89036` -> [tests/TeaSharp.Tests/PublicApiBoundaryTests.cs](/Users/georgetsouvaltzis/Projects/playground/teasharp/tests/TeaSharp.Tests/PublicApiBoundaryTests.cs)
-    - item `2` + item `6` hosting opt-in boundary enforcement follow-up: `83f0258` -> [tests/TeaSharp.Tests/PublicApiBoundaryTests.cs](/Users/georgetsouvaltzis/Projects/playground/teasharp/tests/TeaSharp.Tests/PublicApiBoundaryTests.cs), [docs/public-api-guidelines.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/public-api-guidelines.md)
-    - item `5` XML docs gate follow-up for plotting ergonomics surface: `3986c8b` -> [tests/TeaSharp.Tests/PublicApiXmlDocsTests.cs](/Users/georgetsouvaltzis/Projects/playground/teasharp/tests/TeaSharp.Tests/PublicApiXmlDocsTests.cs)
-  - latest local API-gate command evidence (March 22, 2026): `dotnet test tests/TeaSharp.Tests --no-restore --nologo --filter "ApiErgonomics|PublicApiBoundary|PublicApiXmlDocs"` PASS (`42/42`), `dotnet test TeaSharp.slnx --no-restore --nologo --tl:off -v minimal` PASS (`TeaSharp.Tests 873/873`, `TeaSharp.IntegrationTests 10/10`)
-  - HEAD delta note: API/RC evidence above is anchored to `3986c8b` (March 22, 2026). Commits through current HEAD `b5f1479` include pointer/raw-input correctness fixes (`4041515`, `054eaa2`, `94f1487`, `906999d`, `206032a`, `738dc65`, `b5abf26`, `64d0a1a`, `0ed53cc`, `cdeb960`, `c2a9cdc`, `e2781dc`, `f3e2c54`). RC verification must be rerun on the final candidate SHA before closure.
-  - C4 implementation evidence is complete; explicit checklist owner/date signoff is still required before closing C4
-- **M5: Performance Gate + Benchmarks + Docs Freeze** -> **Pending manual signoff**
-  - perf-gate harness scaffolding landed in `35b8fdc` -> [benchmarks/TeaSharp.Benchmarks/SloLatencyBenchmarks.cs](/Users/georgetsouvaltzis/Projects/playground/teasharp/benchmarks/TeaSharp.Benchmarks/SloLatencyBenchmarks.cs), [benchmarks/TeaSharp.Benchmarks/PerfGateRunner.cs](/Users/georgetsouvaltzis/Projects/playground/teasharp/benchmarks/TeaSharp.Benchmarks/PerfGateRunner.cs), [scripts/perf_gate_v1.sh](/Users/georgetsouvaltzis/Projects/playground/teasharp/scripts/perf_gate_v1.sh), [docs/perf-baselines/v1-slo-gate-baseline.json](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/perf-baselines/v1-slo-gate-baseline.json)
-  - recent perf slices landed in `78b3024` + `1469de3` (input decoding benchmark coverage + decoder/render allocation improvements)
-  - verification evidence capture expanded in `5784559` (full-suite sanity evidence recorded in this plan)
-  - latest local run evidence (March 26, 2026; verified code SHA `b5f1479` per RC checklist): `dotnet build TeaSharp.slnx` PASS (`279` warnings, `0` errors), `dotnet test TeaSharp.slnx` PASS (TeaSharp.Tests `924/924`, Integration `10/10`), `dotnet build TeaSharp.Examples.slnx` PASS (`0` warnings, `0` errors), `scripts/smoke_examples_v1.sh 4` PASS (`pass=3 fail=0`)
-  - latest perf evidence: direct DLL perf-gate pass evidence exists for the verified candidate lane via `dotnet benchmarks/TeaSharp.Benchmarks/bin/Release/net10.0/TeaSharp.Benchmarks.dll --perf-gate --baseline docs/perf-baselines/v1-slo-gate-baseline.json --output docs/perf-baselines/latest-slo-gate-result.json --dry-run`; checklist/perf/manual signoff rows remain open until owner/date closure on the final RC candidate SHA.
-  - open script note: `scripts/perf_gate_v1.sh dry-run` intermittently stalls after printing the `dotnet build ...TeaSharp.Benchmarks.csproj...` line with no further output; direct DLL command above is the current deterministic workaround until wrapper behavior is stabilized
-  - outstanding: explicit regression-budget pass/fail verdict against the accepted baseline is not yet attached for the final RC candidate SHA
-  - outstanding: RC checklist/manual signoff rows remain open until owner/date evidence is filled
+Still needed:
 
-## RC Closure Manual Signoffs (Unresolved Until Checked)
-Public V1 RC must not be declared closed from this document alone. The gates below require explicit human signoff with evidence links.
+- final candidate branch or tag
+- final candidate commit SHA
+- release owner
 
-| Gate | Required Evidence | Current Status |
-|---|---|---|
-| RC checklist closure | Completed entries in [public-v1-rc-checklist.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/public-v1-rc-checklist.md) with owner/date | Pending manual signoff |
-| Verification matrix rerun on RC candidate SHA | Command output + pass/fail summary for unit, integration, full suite, and example smoke from the exact candidate SHA | Pending manual signoff |
-| Performance gate approval | Benchmark report links and pass/fail verdict per [perf-plan-v1.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/perf-plan-v1.md) | Pending manual signoff |
-| Docs freeze coherence approval | Final docs diff review confirming `v1-master-plan.md` + `source-of-truth.md` + API docs are aligned | Pending manual signoff |
+Without those, none of the remaining evidence is final.
 
-Release approval rule: M5 is only complete when all four rows above are moved from `Pending manual signoff` to `Done` with owner/date evidence.
+### 2. Reconcile Repo Consistency Blockers
 
-## Workstreams
-### WS-A: Public API and Runtime Boundaries
-- Remove DI-centric startup from the default app path.
-- Keep startup library-first (`Tea.RunAsync(...)`, `Tea.CreateBuilder()`, `UseApp(...)`, runtime options).
-- Standardize namespace boundaries and advanced lane guidance.
-- Add API guardrails and compatibility checks.
+Current repo blockers still referenced by tests and release flow:
 
-### WS-B: Theming and Styling
-- Define semantic theme tokens and palette model.
-- Implement override hierarchy:
-  1. global theme
-  2. control-type defaults
-  3. control instance overrides
-  4. per-state overrides (`focused`, `selected`, `hovered`, `disabled`, `error`, etc.)
-- Replace hardcoded focus affordances with theme-driven behavior.
-- Cover top controls first, then broaden.
+- `examples/HelloWorld/HelloWorld.csproj`
+- `examples/CounterForm/CounterForm.csproj`
+- `examples/WorkspaceApp/WorkspaceApp.csproj`
+- `TeaSharp.Examples.slnx`
 
-### WS-C: Widgets and UX Depth
-- Expand built-in widgets (10-15 in V1 tranche).
-- Ensure widget APIs follow consistent control/event/style patterns.
-- Keep customization/theming first-class for all new widgets.
-- Execution scope and inventory are tracked in [widget-roadmap-v1.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/widget-roadmap-v1.md).
+These must either:
 
-### WS-D: Quality, Performance, and Docs
-- Full-cycle validation: unit, integration, example smoke, docs sync.
-- Cleanup pass: remove dead/legacy paths, simplify logic, optimize hot allocations.
-- Benchmark harness and baseline comparisons per [perf-plan-v1.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/perf-plan-v1.md).
-- Public API docs and examples as release gate.
+- exist again and be kept current
+- or the tests, docs, and release flow must be updated to stop treating them as canonical
 
-## API Simplification Contract
-- Keep default app-authoring surface in `TeaSharp`, `TeaSharp.Controls`, `TeaSharp.Layout`.
-- Generalize recurring control patterns:
-  - consistent `Title`, `FocusMarker`, `ShowFocusMarker`, `Border`, `Padding`, and style hook naming.
-  - consistent event payload conventions (`SelectionChanged`, submit/cancel, activate/execute).
-  - consistent state naming (`IsOpen`, `IsFocused`, `IsDisabled`, `IsReadOnly`) and semantics.
-- Hide complex internals from default path:
-  - avoid exposing low-level runtime/compiler/renderer details in onboarding docs/examples.
-  - keep advanced APIs in explicit advanced namespaces/docs.
-- No breaking API reshapes in V1 unless they remove ambiguity and are migration-documented in the same change.
+Until that is resolved, V1 verification remains noisy and future agents will keep getting mixed signals.
 
-## API Freeze/Cleanup Checklist (Phase 4 Gate)
-1. Default path remains no-DI: `Tea.RunAsync(new App())` and `Tea.CreateBuilder().UseApp<TApp>().ConfigureRuntime(...)`.
-2. Advanced seams (`TeaSharp.Hosting`, renderer/terminal adapters) stay documented as opt-in only.
-3. Public control APIs follow C# conventions:
-   - noun properties for state/config (`Title`, `IsOpen`, `SelectedIndex`)
-   - verb methods for actions (`SetItems`, `ApplyTheme`, `Clear`)
-   - `Try*` only for non-throwing probe/consume patterns
-4. Cross-control naming is normalized:
-   - focus/title: `FocusMarker`, `ShowFocusMarker`, `TitleStyle`, `FocusedTitleStyle`
-   - frame styling: `BorderStyleText`, `FocusedBorderStyleText` where border glyph styling exists
-   - selection semantics: `SelectedIndex`, `SelectedItem`, `SelectionChanged`
-   - compatibility-bearing `Current*` names follow the explicit post-V1 migration policy in [post-v1-selection-naming-migration.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/post-v1-selection-naming-migration.md)
-5. Public XML docs match runtime behavior for any changed API before merge.
-6. Starter docs/examples do not import `TeaSharp.Core.*`.
+### 3. Rerun Verification On The Exact Candidate SHA
 
-M4 checklist status snapshot (March 22, 2026):
+Required commands on the chosen candidate:
 
-- item `1`: **Evidence complete** (consumer-path onboarding/no-DI coverage via `c712c2a` + `896c227`; pending manual checklist signoff)
-- item `2`: **Evidence complete** (advanced seam remains opt-in with explicit hosting-boundary enforcement in `83f0258`; pending manual checklist signoff)
-- item `3`: **Evidence complete** (ergonomics and naming convergence covered by `4d4a391` + `e731edc` + `51d46a3` + `a9f774f` + `8ff286d`; pending manual checklist signoff)
-- item `4`: **Evidence complete** (cross-control frame/focus naming consistency and parity guardrails reinforced via `1a4fab8` + `0a38229` + `03c7a43`; pending manual checklist signoff)
-- item `5`: **Evidence complete** (XML docs gate strengthened by `4e3a240` + `3986c8b`; pending manual checklist signoff)
-- item `6`: **Evidence complete** (onboarding boundary guard evidence via `9c89036` + `83f0258` + `896c227`; pending manual checklist signoff)
+- `dotnet build TeaSharp.slnx`
+- `dotnet test TeaSharp.slnx`
+- `dotnet build TeaSharp.Examples.slnx`
+- `scripts/smoke_examples_v1.sh 4`
 
-## Naming Clarity Gate
-- Public names must be unambiguous to C# developers without reading internals.
-- Gate checklist for every new/renamed public symbol:
-  - Name matches behavior and scope (no overloaded meaning like "Manager", "Helper", "Context" without domain prefix).
-  - Method intent is obvious from signature (`Set*`, `Apply*`, `Try*`, `Create*`, `Render*` used consistently).
-  - Option/state names avoid double negatives and hidden side effects.
-  - Similar controls use the same term for the same concept (for example `SelectedItem` vs `CurrentItem` must be standardized).
-  - Ambiguous names require rename before merge or explicit documented exception.
+Goal:
 
-## Public API Commenting Gate
-- All public APIs changed for V1 must have meaningful XML docs.
-- Minimum bar:
-  - `<summary>` explains behavior and intent, not type restatement.
-  - `<param>` documents constraints/default behavior where non-obvious.
-  - `<returns>` for non-void methods with semantic meaning.
-  - `<remarks>` where side effects, lifecycle, or ordering matter.
-  - `<exception>` where caller-actionable exceptions are expected.
-- Gate enforcement:
-  - PR fails if new/changed public APIs are undocumented or copy-template comments.
-  - Docs must match actual runtime behavior in examples/tests.
+- one final verified evidence set, all from the exact release candidate SHA
 
-## Visual Quality Baseline Contract (Applied During Phase 2 Widget Build-Out)
-1. Override hierarchy remains enforced and documented:
-   - global theme -> control-type defaults -> control instance -> state.
-2. Focus visuals are fully overrideable (marker + title + border), not marker-only.
-3. Border/text styling hooks are wired for shipped interactive controls:
-   - `Choice`, `ComboBox`, `TextInput`, `SearchBox`, `Table`, `TreeView`.
-4. Glyph customization hooks are available where symbolic affordances are core UX:
-   - `DropdownGlyphSet` for `Choice`/`ComboBox`
-   - `TreeViewGlyphSet` for `TreeView`.
-5. Navigation/listing controls expose coherent title-focus options:
-   - `ListView<T>`, `Table`, `TreeView`, `TextInput`, `SearchBox`.
-6. Theme mappings cover current V1 control groups:
-   - `Basic`, `InputValue`, `Navigation`, `NavigationOverlay`, `NavigationPrimitives`, `DataAndFlow`, `ExplorerAndFeedback`, `RenderingTextUtilities`, `ModalAndCharts`.
-7. Monochrome rendering remains readable when style hooks are empty.
+### 4. Final Performance Approval
 
-## Visual Quality Full Polish Checklist (Phase 3 Gate)
-1. Expanded widget set receives spacing/contrast/passive-state polish review.
-2. Focus, hover, selected, and error visuals are consistent across new widgets.
-3. Default visuals feel cohesive across built-ins with no hardcoded focus marker assumptions.
-4. WidgetGallery/Showcase outputs are updated to demonstrate polished defaults.
-5. Regression snapshots/text assertions are updated for intentional visual deltas only.
+Required:
 
-## Open V1 Visual Parity Gaps (Current)
-- Closed: cookbook examples for overlay glyph APIs, border overrides, dropdown/tree glyph sets, and data widget separator/marker hooks (`edf676c`, `dcdc51f`).
-- Closed: visual edge-case regression assertions for parity-sensitive rendering paths (`7caa741`).
-- Closed: overlay/input token-consistency enforcement in theme mappings (`74751e6`).
-- Closed: bordered-control parity rollout for existing shipped controls (including Group1/Group2 additions) (`52e7574`, `91f07b9`, `33b22d5`, `4a3a103`, `135065e`, `98a6d7d`).
-- Closed (policy guardrail): bordered/focusable parity policy tests landed (`0a38229`).
-- Remaining (forward-only): any newly added bordered public control must continue to satisfy the enforced parity policy (`BorderStyleText`/`FocusedBorderStyleText`, token mapping, regression coverage) in the same slice.
+- rerun the perf gate on the exact candidate SHA
+- attach explicit regression-budget verdict against the accepted baseline
+- keep direct runner evidence as the primary release artifact
 
-## Parallelization Constraints
-- Parallel work is allowed only within the active phase in the authoritative execution order.
-- Current active phase: **M4 API Freeze + Cleanup (manual signoff + evidence refresh lane)** (M3 closed).
-- Do not start phase N+1 before phase N exit criteria are satisfied.
-- Within a phase:
-  - parallelize only with disjoint file ownership.
-  - central coordinator validates gate status before opening next checkpoint.
+Reference:
 
-## Milestones and Acceptance Criteria
-### M1: Terminal Compatibility Verification Matrix
-- Acceptance:
-  - matrix coverage complete for Ghostty, iTerm2, WezTerm, Kitty, and Windows Terminal
-  - `ScreenOptions.FontSpec` support model is explicit (best-effort, terminal-dependent)
-  - unsupported terminals are validated as no-op fallback for font requests (safe output; no frame corruption)
-  - touched-area unit/integration checks pass
+- [perf-plan-v1.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/perf-plan-v1.md)
+- `docs/perf-baselines/latest-slo-gate-result.json`
+- `docs/perf-baselines/latest-runtime-e2e-result.json`
 
-### M2: Widget Expansion
-- Acceptance:
-  - V1 widget tranche target from `docs/widget-roadmap-v1.md` is complete
-  - new widgets follow existing API/style naming and theme-token conventions
-  - minimum visual baseline contract is enforced for every added widget
+Open caveat:
 
-### M3: Visual Quality Full Polish Pass
-- Acceptance:
-  - full polish checklist is complete for expanded widget surface
-  - theme/default/override behavior is validated across new widgets
-  - intentional visual expectation updates are captured in tests
+- `scripts/perf_gate_v1.sh` has had wrapper flakiness; the direct benchmark DLL path remains the trusted release path
 
-### M4: API Freeze + Cleanup
-- Acceptance:
-  - API freeze/cleanup checklist is satisfied for touched public surfaces
-  - naming clarity gate passes for all new/renamed public symbols
-  - default onboarding path remains `TeaSharp`-first with no new `TeaSharp.Core` leakage
-  - public API commenting gate passes for V1-touching APIs
+### 5. Docs Freeze Coherence
 
-### M5: Performance Gate + Benchmarks + Docs Freeze (Release Candidate)
-- Acceptance:
-  - perf gates from `docs/perf-plan-v1.md` pass with benchmark report attached
-  - docs/examples/release checklist are coherent and frozen for RC
-  - RC manual signoff rows are all moved to `Done` with owner/date evidence
+Before V1 signoff, do one final docs pass confirming that these files agree:
 
-## Dependency Graph and Critical Path
-1. Terminal compatibility verification matrix
-2. Widget expansion
-3. Visual quality full polish pass
-4. API freeze + cleanup
-5. Performance gate + benchmarks + docs freeze
+- [spec.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/spec.md)
+- [public-api-guidelines.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/public-api-guidelines.md)
+- [public-api-inventory.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/public-api-inventory.md)
+- [theme-system-v1.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/theme-system-v1.md)
+- [widget-roadmap-v1.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/widget-roadmap-v1.md)
+- [perf-plan-v1.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/perf-plan-v1.md)
 
-Critical path: Phase 1 -> Phase 2 -> Phase 3 -> Phase 4 -> Phase 5 (strict order).
+Goal:
 
-## Agent Ownership Matrix (3-Lane Model)
-| Lane | Primary Responsibility | Typical Files |
-|---|---|---|
-| Lane A | API boundaries, startup model, runtime-facing public surface | `src/TeaSharp/*`, startup examples, API tests |
-| Lane B | Theme/styling architecture and rollout | `src/TeaSharp/Styles*`, control rendering paths, style docs |
-| Lane C | Master plan, docs coherence, guardrails, release checklist | `docs/*`, `AGENTS.md`, boundary tests |
+- no stale canonical paths
+- no references to removed docs
+- no mismatch between product contract and release contract
 
-Coordination rules:
-- One lane per logical task.
-- Parallel where file ownership is disjoint.
-- Merge checkpoints at each milestone.
+### 6. Final Manual Signoff
 
-## Agent Coordination Checkpoints
-Current active checkpoint: **C4: API Freeze Exit**.
+Still required:
 
-- **C0: Matrix Ready**
-  - Required: lane ownership map confirmed and terminal verification inputs agreed.
-  - Exit: terminal compatibility phase can begin.
-- **C1: Terminal Matrix Exit**
-  - Required: compatibility matrix complete for Ghostty/iTerm2/WezTerm/Kitty/Windows Terminal.
-  - Required: `FontSpec` unsupported paths verified as safe no-op.
-  - Exit: widget expansion phase can begin.
-- **C2: Widget Expansion Exit**
-  - Required: widget tranche target met with render/theme coverage.
-  - Required: full polish backlog for expanded widgets captured.
-  - Exit: visual full-polish phase can begin.
-- **C3: Visual Full-Polish Exit**
-  - Required: full visual polish checklist pass for expanded widgets.
-  - Required: visual regression assertions updated for intentional changes.
-  - Exit: API freeze/cleanup phase can begin.
-- **C4: API Freeze Exit**
-  - Required: API freeze/cleanup checklist pass + naming clarity gate pass + XML docs pass.
-  - Required: public API diff reviewed and migration notes updated.
-  - Exit: perf/docs-freeze phase can begin.
-- **C5: Release Candidate Exit**
-  - Required: perf gates pass per `docs/perf-plan-v1.md` and benchmark evidence attached.
-  - Required: final verification matrix run and RC manual signoff rows closed.
-  - Exit: Public V1 release approval.
+- engineering signoff
+- product or release signoff
+- explicit approval for publish
 
-## Risk Register
-| Risk | Impact | Mitigation |
-|---|---|---|
-| Theme model churn | delayed widget rollout | freeze token contract before broad widget updates |
-| Public API drift | onboarding confusion | boundary tests + docs source-of-truth updates per merge |
-| Performance regressions from styling | runtime latency | benchmark before/after on styled high-churn scenarios |
-| Widget inconsistency | poor DX | enforce widget API/style checklist in PR review |
-| Scope creep | delayed V1 | strict V1 vs V1.1 scope gate (images deferred) |
+V1 is not closed until those are written against the final candidate SHA.
 
-## Verification Matrix
-| Area | Command/Check | Gate |
-|---|---|---|
-| Unit tests | `dotnet test tests/TeaSharp.Tests --no-restore` | must pass |
-| Integration | `dotnet test tests/TeaSharp.IntegrationTests --no-restore` | must pass |
-| Full suite | `dotnet test TeaSharp.slnx --no-restore` | must pass |
-| Example smoke | build/run canonical + advanced examples | must pass |
-| Benchmarks | benchmark suite report committed to docs/artifacts | must exist |
-| Docs | public API + examples + migration guidance consistent; RC checklist completed | must pass review |
+## Non-Gating Follow-Up
 
-## Weekly Checkpoint Format
-- Week label:
-- Milestone target:
-- Completed:
-- In progress:
-- Blockers:
-- Risks changed:
-- Verification run summary:
-- Next week commitments:
+Useful, but not V1-blocking:
 
-## Definition of Done: Public V1
-- V1 scope complete, V1.1 scope excluded.
-- No-DI default public startup path finalized.
-- Theme system stable with built-in and custom palettes.
-- Core widget tranche delivered and theme-aware.
-- Boundary tests, full tests, and example smoke all green.
-- Benchmark report produced and reviewed.
-- Public docs/API guidance coherent and release-ready.
+- `ScatterPlot` frame-style parity follow-up
+- `LogView.AppendLine` discoverability alias
+- theme-token naming crosswalk clarity
+- additional native-host manual verification on terminals not installed on this machine
+
+## Release Rule
+
+TeaSharp Public V1 is ready only when:
+
+1. candidate metadata is filled
+2. repo consistency blockers are resolved
+3. build, test, examples, and smoke are rerun on the exact candidate SHA
+4. perf gate is rerun and accepted on that same SHA
+5. docs coherence pass is done
+6. engineering and product signoff are recorded

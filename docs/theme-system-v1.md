@@ -68,6 +68,28 @@ runtime.Screen = new ScreenOptions
 Cross-terminal support and terminal-specific caveats:
 `docs/terminal-font-capability-matrix.md`.
 
+## ANSI Style Foundations
+
+Low-level ANSI style composition lives in `TeaSharp.Styles`:
+
+- `AnsiColor`
+  - `Indexed(0..255)`
+  - `Rgb(r, g, b)`
+- `TeaStyle`
+  - `WithBold`
+  - `WithUnderline`
+  - `WithForeground`
+  - `WithBackground`
+  - `WithItalic`
+  - `WithDim`
+  - `WithInverse`
+  - `WithFontWeight(...)`
+  - `Merge(...)`
+  - `ToEscapeSequence()`
+  - `Render(string text)`
+
+Use `TeaStyle` as the primitive value type behind theme tokens and per-control overrides. Public docs should treat raw ANSI styling as the foundation layer, and theme tokens as the preferred application-facing layer.
+
 ## Public API Names (V1 Foundations)
 
 Theme primitives use the following public types:

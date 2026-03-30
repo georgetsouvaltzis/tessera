@@ -1,51 +1,120 @@
-# TeaSharp Design Spec
-
-## Overview
+# TeaSharp Design Contract
 
 TeaSharp is a `.NET 10` terminal UI framework for state-driven applications.
 
-Current design center:
+This document is the live product contract.
+It describes what TeaSharp is, how the public API should feel, and what still belongs outside V1.
+It should not act as a historical log or implementation diary.
+
+## Product Position
+
+TeaSharp is:
+
+- a .NET-native framework for building state-driven terminal applications
+- small on the public path
+- explicit and strongly typed
+- extensible without leaking internal engine details
+
+TeaSharp is not:
+
+- a Generic-Host-first framework
+- a Terminal.Gui clone
+- a Spectre.Console clone
+- a Bubble Tea port
+- a nested layout DSL disguised as C#
+
+TeaSharp is still pre-public.
+Breaking changes are acceptable when they simplify the long-term API and improve the default authoring path.
+
+## V1 Design Center
+
+V1 centers on:
 
 - small root API
 - explicit C# object model
 - TeaSharp-owned startup
 - screen/layout/control composition
 - stable custom control contract
+- semantic theming and override layers
 - advanced runtime seams kept separate from the default path
 
-TeaSharp is pre-public. Breaking changes are allowed when they simplify the long-term API.
+## Non-Negotiable Rules
 
-## Goals
+### Default Surface
 
-- Keep the default authoring model learnable in one sitting.
-- Prefer explicit object models over nested mini-DSLs.
-- Let normal apps build screens without region ids, input scopes, or manual terminal bookkeeping.
-- Preserve strong extensibility for custom widgets and advanced hosting.
-- Keep rendering deterministic and testable.
-
-## Non-Goals
-
-- Generic Host as the framework identity.
-- Prompt-style console helpers.
-- Reproducing Terminal.Gui or Spectre.Console API shape.
-- Requiring application architecture patterns such as repository, MVVM, CQRS, or mediator.
-
-## Public Architecture
-
-### Root Surface
-
-Default namespaces:
+Normal apps should primarily live in:
 
 - `TeaSharp`
 - `TeaSharp.Controls`
 - `TeaSharp.Layout`
 - `TeaSharp.Styles`
 
-Advanced namespace:
+Advanced seams belong in opt-in lanes such as `TeaSharp.Hosting`.
+Normal onboarding must not require `TeaSharp.Core.*`.
 
-- `TeaSharp.Hosting`
+### Startup
 
-The normal app path should not import `TeaSharp.Core.*`.
+Preferred entry points:
+
+- `Tea.RunAsync(...)`
+- `Tea.CreateBuilder()`
+- `TeaApplicationBuilder`
+- `TeaApplication`
+- `TeaRuntimeOptions`
+
+Preferred startup forms:
+
+- minimal: `Tea.RunAsync(new App())`
+- configured: `Tea.CreateBuilder().UseApp<TApp>().ConfigureRuntime(...).Build()`
+
+TeaSharp must not depend on Generic Host as the default framework identity.
+
+### Authoring Style
+
+TeaSharp should feel like idiomatic C#.
+
+Preferred shape:
+
+- explicit object models
+- object initializers
+- shallow builders when they help readability
+- strong types over stringly-typed control contracts
+
+Rejected shape:
+
+- nested static layout mini-languages
+- constructor trees that force users to parse screen structure by indentation
+- bool-heavy orchestration APIs instead of typed options or smaller objects
+
+### No Framework-Imposed App Architecture
+
+TeaSharp must not require or imply:
+
+- repository
+- CQRS
+- MVVM
+- mediator
+- unit of work
+
+Those are application-level decisions.
+
+### Extensibility
+
+Custom widgets remain a core requirement.
+
+Default path:
+
+- built-in controls
+- typed messages/effects
+- screen/layout composition
+
+Advanced path:
+
+- custom controls/widgets
+- low-level runtime seams
+- advanced rendering/input behavior
+
+## Public Architecture
 
 ### Application Model
 
@@ -55,7 +124,6 @@ Primary app contract:
 - `Tea.RunAsync(...)`
 - `Tea.CreateBuilder()`
 - `TeaApplicationBuilder.UseApp<TApp>()`
-- `TeaApplicationBuilder`
 - `TeaApplication`
 - `TeaRuntimeOptions`
 - `Screen`
@@ -65,164 +133,32 @@ Primary app contract:
 - `TeaEffect`
 - `TeaEffects`
 
-App model shape:
+Default app shape:
 
-1. `Initialize()` optionally returns the first effect.
-2. `Update(Message)` handles typed input/runtime messages.
-3. `Build(ScreenContext)` returns the next assembled screen.
+1. `Initialize()` may return the first effect.
+2. `Update(Message)` handles typed app/runtime input.
+3. `Build(ScreenContext)` returns the next screen.
 
-Startup model:
+Canonical example progression:
 
-- minimal path: `Tea.RunAsync(new App())`
-- configured path: `Tea.CreateBuilder().UseApp<TApp>().ConfigureRuntime(...).Build()`
-- runtime pointer policy defaults to `PointerActivationPolicy.DoubleClick` so activation is double-click-gated by default while first click still transfers focus; set `PointerActivationPolicy.SingleClick` to restore immediate click activation.
-- terminal pointer semantics are not uniform (for example release reports may arrive as `Button.None`, and motion/click cadence varies by terminal), so production apps should set `PointerActivationPolicy` explicitly instead of relying on defaults.
+1. `examples/HelloWorld`
+2. `examples/CounterForm`
+3. `examples/WorkspaceApp`
+4. `examples/AdvancedWidgets` / `examples/WidgetGallery`
 
-Pointer semantics and runtime input-path contract:
+### Interaction Contract
 
-- `PointerEventKind.Motion` is hover-only and must not trigger click activation.
-- with `PointerActivationPolicy.DoubleClick`, first press transfers focus to the clicked control region; activation requires a qualifying second press.
-- with `PointerActivationPolicy.SingleClick`, first press focuses and activates.
-- runtime prefers terminal byte-stream decoding when terminal capabilities advertise CSI input features (`MouseReporting`, `FocusReporting`, `BracketedPaste`, or `ModeReports`), including non-raw console mode.
-- `Console.ReadKey` fallback is only for non-raw legacy terminals that do not advertise CSI input features.
+Runtime pointer/input rules:
 
-Terminal prerequisites (default detection expectations):
+- `PointerEventKind.Motion` is hover-only
+- `PointerActivationPolicy.DoubleClick` transfers focus on first press and activates on qualifying second press
+- `PointerActivationPolicy.SingleClick` focuses and activates on first press
+- runtime prefers CSI byte-stream decoding when terminal capabilities advertise pointer/focus/paste support
+- `Console.ReadKey` fallback is for legacy non-CSI terminals only
 
-- Ghostty: CSI-capable path; pointer/focus/paste should use byte-stream decode.
-- iTerm2: CSI-capable path; pointer/focus/paste should use byte-stream decode.
-- Windows Terminal (`WT_SESSION`): CSI-capable path; pointer/focus/paste should use byte-stream decode.
-- macOS Terminal (`Apple_Terminal`): mouse/focus/paste supported; synchronized updates may be unavailable, but pointer input still expects byte-stream decode.
-- legacy terminals (`TERM=dumb`, `linux*`, `vt100*`, `ansi*`): advanced pointer/focus/paste are not expected.
+### Composition Contract
 
-Troubleshooting quick triage (text-selection instead of app pointer interaction):
-
-- verify `runtime.Screen.MouseTracking` is set (`CellMotion` or `AllMotion`)
-- verify runtime input is enabled (`DisableInput == false`)
-- verify environment overrides are not disabling mouse (`TEASHARP_CAPS` should not contain `mouse=0`)
-- verify terminal/multiplexer forwards mouse (for tmux: `set -g mouse on`)
-- if first click only focuses, confirm whether app is intentionally running with default `PointerActivationPolicy.DoubleClick`
-
-Canonical onboarding progression:
-
-1. `examples/HelloWorld`: minimal startup path.
-2. `examples/CounterForm`: configured startup path (`UseApp<TApp>()` + `ConfigureRuntime(...)`).
-3. `examples/WorkspaceApp`: stateful multi-pane coordination with app-level messages/effects.
-4. Advanced interaction lane: `examples/AdvancedWidgets` and `examples/WidgetGallery`.
-
-Default onboarding remains in `TeaSharp`. `TeaSharp.Core` is a low-level advanced product lane.
-
-### Theme Model
-
-V1 theming is semantic-token based with override hierarchy:
-
-- semantic tokens for text/surface/border/state/focus/selection/accent
-- `Focus.Marker` is first-class and wired across focus-marker controls (controls exposing `FocusMarker`/`ShowFocusMarker`)
-- built-in palettes (Catppuccin, Rosé Pine) plus custom palette
-- override precedence: global theme -> control type -> control instance -> state
-- consumer hook quick-lookup matrix is documented in [public-api-inventory.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/public-api-inventory.md)
-- `TeaThemeControlExtensions` is split by domain (`Basic`, `InputValue`, `Navigation`, `NavigationOverlay`, `NavigationPrimitives`, `DataAndFlow`, `PlanningAndBoards`, `QueryAndRichText`, `ExplorerAndFeedback`, `RenderingTextUtilities`, `ModalAndCharts`, `Plotting`, `DevOpsAndWorkflows`, `Workspace`, `FormsAndShell`)
-- mapped input/value controls include `TextInput`, `TextArea`, `Toggle`, `Slider`, `Spinner`, `ProgressBar`, `NumberInput`, `DatePicker`, `TimePicker`
-- mapped basic controls include `Label`, `Button`, `ListView<T>`, `StatusBar`, `TextInput`, `Table`, `Tabs`
-- mapped navigation controls include `Breadcrumb`, `Paginator`, `Toolbar`, `CommandBar`, `SearchBox`, `SearchResultsView`
-- mapped navigation/overlay controls include `Choice`, `ComboBox`, `TreeView`, `MenuBar`, `ContextMenu`, `CommandPalette`, `Notifications`, `SearchBox`
-- `Choice` and `ComboBox` map `BorderStyleText`/`FocusedBorderStyleText` to semantic border/focus tokens by default
-- dropdown marker customization is explicit through `DropdownGlyphSet` on `Choice` and `ComboBox`
-- `Table` and `TreeView` map `BorderStyleText`/`FocusedBorderStyleText` to semantic border/focus tokens by default
-- `TreeView` marker customization is explicit through `TreeViewGlyphSet`
-- `TextArea`, `NumberInput`, `DatePicker`, and `TimePicker` map `BorderStyleText`/`FocusedBorderStyleText` to semantic border/focus tokens by default
-- `Toggle`, `Slider`, `Spinner`, and `ProgressBar` map `BorderStyleText`/`FocusedBorderStyleText` to semantic border/focus tokens by default
-- `Spinner` exposes `Frames` plus `SetFrames(...)` so apps can swap spinner families at runtime on a single instance
-- `MenuBar`, `ContextMenu`, and `CommandPalette` map border text hooks and expose typed glyph-set customization
-- `Notifications`, `LogView`, and `MarkdownView` map `BorderStyleText`/`FocusedBorderStyleText` to semantic border/focus tokens by default
-- `DiffView`, `PropertyGrid`, `FileExplorer`, `FuzzyFinder`, and `ToastCenter` map `BorderStyleText`/`FocusedBorderStyleText` to semantic border/focus tokens by default
-- `ListView<T>` and `TreeView` expose `FocusMarker` + `ShowFocusMarker` for explicit focus-title rendering
-- `TextInput` and `SearchBox` expose focus-title marker customization plus title/value/placeholder and border style hooks
-- `SearchResultsView` exposes focus-title markers, row-state styles, border style hooks, and typed marker customization through `SearchResultsGlyphSet`
-- `DataGrid` and `TreeTable` map `BorderStyleText`/`FocusedBorderStyleText` to semantic border/focus tokens by default
-- `DataGrid` and `TreeTable` expose explicit text-based visual hooks for separators and selection/sort/tree markers
-- `KeyValueList` and `Timeline` map `BorderStyleText`/`FocusedBorderStyleText` to semantic border/focus tokens by default
-- `ContextMenu` preserves focused title marker text when rendering bordered titles
-- parity rule: any new bordered public control must ship border-style hooks, token mappings, and parity regression coverage in the same change
-- mapped navigation primitive controls include `Accordion`, `MultiSelect`, `RadioGroup`
-- mapped app-shell/forms controls include `Form`, `FieldSet`, `DataForm<TModel>`, `Wizard`, `SplitView`, `InspectorPanel`
-- bordered app-shell/forms controls (`Form`, `FieldSet`, `DataForm<TModel>`, `Wizard`, `SplitView`, `InspectorPanel`) map `BorderStyleText`/`FocusedBorderStyleText` to semantic border/focus tokens by default
-- mapped data/flow controls include `DataGrid`, `TreeTable`, `KeyValueList`, `Timeline`, `Stepper`
-- mapped planning/boards controls include `VirtualizedListView<T>`, `GroupedListView<TGroup,TItem>`, `KanbanBoard`, `TagInput`, `CalendarMonthView`, `SchedulerTimeline`
-- bordered planning/boards controls (`VirtualizedListView<T>`, `GroupedListView<TGroup,TItem>`, `KanbanBoard`, `TagInput`) map `BorderStyleText`/`FocusedBorderStyleText` to semantic border/focus tokens by default
-- `TagInput` editing stays input-buffer driven for user interaction, while `SetTags(...)`, `AddTag(...)`, and `RemoveTagAt(...)` remain the programmatic mutation path; `IsDisabled` and `IsReadOnly` only gate interaction handling
-- `TagInput` supports placeholder tinting, explicit caret hooks (`CaretGlyph`, `CaretStyle`, `ShowCaret`), chip/input padding (`TagPadding`, `InputPadding`), and wrapped chip/input flow that grows vertically when width is exhausted instead of collapsing behind overflow indicators
-- mapped query/analytics controls include `PivotTable`, `QueryBuilder`, `RichTextView`
-- bordered query/analytics controls (`PivotTable`, `QueryBuilder`, `RichTextView`) map `BorderStyleText`/`FocusedBorderStyleText` to semantic border/focus tokens by default
-- mapped explorer/feedback controls include `DiffView`, `PropertyGrid`, `FileExplorer`, `FuzzyFinder`, `ToastCenter`
-- mapped dev/ops workflow controls include `JsonTreeView`, `TraceViewer`, `CommandOutput`, `LogTailPanel`, `TaskRunnerPanel`, `ActivityFeed`, `NotificationInbox`, `KeyBindingHelpDialog`
-- notification guidance: use `Notifications` as the default/onboarding notification feed; treat `NotificationInbox` as advanced/devops workflow surface
-- selection naming guidance: treat `Selected*` as canonical; compatibility `Current*` members remain in V1 where present and follow [post-v1-selection-naming-migration.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/post-v1-selection-naming-migration.md)
-- bordered dev/ops workflow controls (`JsonTreeView`, `TraceViewer`, `CommandOutput`, `LogTailPanel`, `TaskRunnerPanel`, `ActivityFeed`) map `BorderStyleText`/`FocusedBorderStyleText` to semantic border/focus tokens by default
-- mapped workspace/visual-data controls include `DockWorkspace`, `PaneTabs`, `PaletteEditor`, `Heatmap`, `TreeMapChart`, `TerminalPanel`, `ProcessListView`
-- `TeaThemeControlExtensions.Workspace.cs` maps all workspace/visual-data controls in this set
-- mapped rendering text utility controls include `Badge`, `LogView`, `MarkdownView`, `MiniLog`
-- mapped modal/chart summary controls include `Dialog`, `Modal`, `BarChart`, `LineChart`, `Gauge`, `StatsCard`
-- mapped plotting controls include `Sparkline`, `AreaPlot`, `ScatterPlot`, `Histogram`, `LinePlot`, `PlotPanel`
-- expansion tranche controls (`DashboardGrid`, `QuickOpenOverlay`, `BulletChart`, `ResizablePaneGroup`, `SideNavRail`, `TokenEditor`, `HealthBoard`, `JumpList`, `AutocompleteInput`, `BoxPlot`) are implemented with deterministic tests; theme extension defaults are wired for all of them (commit evidence: `4e005ed`, `1c1b748`, `03c7a43`, `db63e01`)
-- `Dialog` and `Modal` map `BorderStyleText`/`FocusedBorderStyleText` to semantic border/focus tokens by default
-
-Focus visuals must be theme-driven (for example focused border style/color), not limited to marker suffixes.
-
-Visual polish override recipe for navigation inputs:
-
-- set frame hooks first (`BorderStyleText`, `FocusedBorderStyleText`)
-- set typed markers second (`DropdownGlyphSet` for `Choice`/`ComboBox`, `TreeViewGlyphSet` for `TreeView`)
-- set title/row text state hooks third (`TitleStyle`, `FocusedTitleStyle`, selected/hovered styles)
-
-Minimal C# pattern:
-
-```csharp
-var choice = new Choice
-{
-    BorderStyleText = TeaStyle.Empty.WithForeground(AnsiColor.BrightBlack),
-    FocusedBorderStyleText = TeaStyle.Empty.WithBold().WithForeground(AnsiColor.BrightGreen),
-    Glyphs = new DropdownGlyphSet("▾", "▴", ">", "✓"),
-};
-
-var tree = new TreeView
-{
-    BorderStyleText = TeaStyle.Empty.WithForeground(AnsiColor.BrightBlack),
-    FocusedBorderStyleText = TeaStyle.Empty.WithBold().WithForeground(AnsiColor.BrightMagenta),
-    Glyphs = new TreeViewGlyphSet("▼", "▶", "•"),
-};
-```
-
-Image rendering is planned for V1.1.
-
-### Typography Portability
-
-- Portable typography in TeaSharp is ANSI SGR emphasis intent (for example bold/dim) and should be treated as styling intent, not a real font engine contract.
-- Terminal-facing font requests are best-effort and explicitly opt-in through `ScreenOptions`:
-  - `FontSpec`: legacy/explicit raw request lane.
-  - `FontFamily` + `FontSize`: structured request lane.
-  - `Iterm2Profile`: iTerm2 profile-switch lane.
-- Behavior is capability-gated by terminal detection flags:
-  - `SupportsOsc50FontRequests`
-  - `SupportsIterm2ProfileRequests`
-- Preference rule: when `Iterm2Profile` is set and `SupportsIterm2ProfileRequests` is true, renderer prefers iTerm2 profile switching over OSC 50 font requests.
-- Reset semantics remain conservative: TeaSharp does not force unknown font restore.
-- Terminal-by-terminal guidance lives in [terminal-font-capability-matrix.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/terminal-font-capability-matrix.md).
-
-Preferred C# usage:
-
-```csharp
-runtime.Screen = new ScreenOptions
-{
-    FontSpec = "JetBrains Mono 13", // legacy/raw OSC 50 request
-    FontFamily = "JetBrains Mono",  // structured request
-    FontSize = 13,
-    Iterm2Profile = "TeaSharp",
-};
-```
-
-### Composition Model
-
-TeaSharp uses an object-based screen model.
+TeaSharp uses explicit screen assembly.
 
 Core default layout types:
 
@@ -234,356 +170,51 @@ Core default layout types:
 - `LayoutSlot`
 - `LayoutLength`
 
-The default authoring model should read like explicit screen assembly, not nested layout-tree construction.
+The default authoring model should read like explicit screen composition, not a foreign DSL.
 
-### Control Model
+### Control Contract
 
-Root controls currently include:
+The public control surface is tracked in [public-api-inventory.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/public-api-inventory.md).
 
-- `Label`
-- `Button`
-- `Breadcrumb`
-- `TextInput`
-- `TextArea`
-- `Choice`
-- `ComboBox`
-- `DropdownGlyphSet`
-- `Dialog`
-- `CommandPalette`
-- `CommandPaletteGlyphSet`
-- `ContextMenu`
-- `ContextMenuGlyphSet`
-- `Notifications`
-- `Toggle`
-- `Slider`
-- `Spinner`
-- `StatusBar`
-- `Tabs`
-- `ListView<T>`
-- `VirtualizedListView<T>`
-- `VirtualizedListViewOptions`
-- `GroupedListView<TGroup,TItem>`
-- `GroupedListViewGroup<TGroup,TItem>`
-- `GroupedListSelectionChangedEventArgs<TGroup,TItem>`
-- `Table`
-- `KanbanBoard`
-- `KanbanLane`
-- `KanbanCard`
-- `KanbanSelectionChangedEventArgs`
-- `TagInput`
-- `CalendarMonthView`
-- `CalendarDayCell`
-- `CalendarDateSelectedEventArgs`
-- `SchedulerTimeline`
-- `SchedulerEntry`
-- `SchedulerSelectionChangedEventArgs`
-- `PivotTable`
-- `PivotTableColumn`
-- `PivotTableCell`
-- `PivotSortDirection`
-- `PivotSortRequestedEventArgs`
-- `QueryBuilder`
-- `QueryGroup`
-- `QueryRule`
-- `QueryOperator`
-- `QueryChangedEventArgs`
-- `RichTextView`
-- `RichTextSegment`
-- `RichTextStyleKind`
-- `JsonTreeView`
-- `JsonTreeNode`
-- `JsonTreeNodeKind`
-- `JsonTreeSelectionChangedEventArgs`
-- `TraceViewer`
-- `TraceEntry`
-- `TraceSelectionChangedEventArgs`
-- `CommandOutput`
-- `CommandOutputLine`
-- `CommandOutputChannel`
-- `LogTailPanel`
-- `LogEntry`
-- `LogLevel`
-- `TaskRunnerPanel`
-- `TaskRunItem`
-- `TaskRunnerSelectionChangedEventArgs`
-- `DockWorkspace`
-- `DockPane`
-- `DockPanePosition`
-- `PaneTabs`
-- `PaneTabItem`
-- `PaneTabSelectionChangedEventArgs`
-- `PaletteEditor`
-- `PaletteSwatch`
-- `PaletteSelectionChangedEventArgs`
-- `Heatmap`
-- `HeatmapCell`
-- `HeatmapLegend`
-- `TreeMapChart`
-- `TreeMapNode`
-- `TerminalPanel`
-- `TerminalPanelLine`
-- `TerminalPanelChannel`
-- `ProcessListView`
-- `ProcessListEntry`
-- `ProcessListStatus`
-- `ProcessListSelectionChangedEventArgs`
-- `ActivityFeed`
-- `ActivityFeedItem`
-- `ActivityFeedItemKind`
-- `NotificationInbox` (advanced dev/ops inbox surface)
-- `InboxItem`
-- `KeyBindingHelpDialog`
-- `KeyBindingItem`
-- `DataGrid`
-- `TreeTable`
-- `KeyValueList`
-- `Timeline`
-- `Stepper`
-- `TreeItem`
-- `TreeView`
-- `TreeViewGlyphSet`
-- `MenuBar`
-- `MenuBarGlyphSet`
-- `Toolbar`
-- `CommandBar`
-- `NumberInput`
-- `DatePicker`
-- `TimePicker`
-- `MarkdownView`
-- `MultiSelect`
-- `Paginator`
-- `SearchBox`
-- `SearchResultsView`
-- `SearchResultsGlyphSet`
-- `Form`
-- `FormField`
-- `DataForm<TModel>`
-- `DataFormField<TModel>`
-- `DataFormSelectionChangedEventArgs<TModel>`
-- `DataFormFieldCommittedEventArgs<TModel>`
-- `FieldSet`
-- `SplitView`
-- `SplitViewOrientation`
-- `InspectorPanel`
-- `InspectorSection`
-- `InspectorField`
-- `Wizard`
-- `WizardStep`
-- `WizardStepChangedEventArgs`
-- `DiffView`
-- `PropertyGrid`
-- `FileExplorer`
-- `FuzzyFinder`
-- `ToastCenter`
-- `RadioGroup`
-- `ProgressBar`
-- `LogView`
-- `Badge`
-- `Accordion`
-- `Modal`
-- `Gauge`
-- `MiniLog`
-- `StatsCard`
-- `BarChart`
-- `LineChart`
-- `Sparkline`
-- `AreaPlot`
-- `BulletChart`
-- `BulletRange`
-- `BulletRangeKind`
-- `DashboardGrid`
-- `DashboardTile`
-- `QuickOpenOverlay`
-- `QuickOpenItem`
-- `QuickOpenOverlayGlyphSet`
-- `QuickOpenOverlaySubmittedEventArgs`
-- `ResizablePaneGroup`
-- `PaneSpec`
-- `SideNavRail`
-- `NavItem`
-- `SideNavRailGlyphSet`
-- `SideNavRailSelectionChangedEventArgs`
-- `SideNavRailActivatedEventArgs`
-- `TokenEditor`
-- `TokenItem`
-- `TokenEditorGlyphSet`
-- `TokenEditorSelectionChangedEventArgs`
-- `HealthBoard`
-- `HealthService`
-- `HealthServiceSeverity`
-- `HealthBoardGlyphSet`
-- `JumpList`
-- `JumpListItem`
-- `JumpListGlyphSet`
-- `JumpListActivatedEventArgs`
-- `AutocompleteInput`
-- `AutocompleteInputGlyphSet`
-- `AutocompleteInputSuggestionCommittedEventArgs`
-- `BoxPlot`
-- `BoxPlotSeries`
-- `ScatterPlot`
-- `ScatterPlotPoint`
-- `Histogram`
-- `HistogramBucket`
-- `LinePlot`
-- `LineSeries`
-- `LinePlotOptions`
-- `PlotPanel`
-- `PlotPanelOptions`
+High-level rules:
 
-These types provide the default control vocabulary. Most promoted legacy `*Component` names are now internal bridges behind these controls.
+- `Notifications` is the default/onboarding notification feed
+- `NotificationInbox` is the advanced/dev-ops inbox surface
+- `Selected*` is canonical naming
+- existing `Current*` members remain compatibility aliases only where already shipped
+- new bordered controls must ship border-style hooks, theme-token mapping, and regression coverage in the same slice
 
-### Notification Surface Guidance
+Custom-widget authoring remains supported through [custom-components.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/custom-components.md).
 
-- primary path: `Notifications`
-- advanced path: `NotificationInbox`
-- shared item model: `InboxItem`
+## Theme And Style Contract
 
-`Notifications` primary API includes:
+V1 theming is semantic-token based with override hierarchy:
 
-- `Items`
-- `SelectedIndex`
-- `SelectedItem`
-- `SelectionChanged`
-- `SetItems(IEnumerable<InboxItem>)`
-- `Add(InboxItem)`
-- `SetSelectedIndex(int)` / `Select(int)`
-- `MarkAllRead()`
-- `RemoveSelected()`
-- `Push(...)` remains supported for append-by-message workflows
+- semantic tokens for text, surface, border, state, focus, selection, and accent
+- built-in palettes plus custom palette support
+- precedence: global theme -> control type -> control instance -> state
+- focus visuals must be theme-driven, not marker-only
 
-### Selection Ergonomics (Consumer Pressure)
+Typography contract:
 
-Additive selection APIs on the default public path:
+- ANSI emphasis intent is portable (`TeaStyle`, `TeaFontWeight`)
+- terminal font requests are best-effort only
+- terminal-specific caveats live in [terminal-font-capability-matrix.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/terminal-font-capability-matrix.md)
 
-- `Table.SetSelectedIndex(int)` for programmatic reselection after `SetRows(...)` refreshes.
-- `Choice.SetSelectedIndex(int)` and `Choice.TrySetSelectedItem(string)` for direct selection without synthetic key-message flows.
-- `ComboBox.SetSelectedIndex(int)` and `ComboBox.TrySetSelectedItem(string)` for direct selection without filter+key orchestration.
-- `DataForm<TModel>.SelectField(string key)` for stable keyed field routing in validation/workflow flows.
-- `DataForm<TModel>` uses explicit edit mode on the default path: row selection first, `Enter` to edit, `Enter` to commit, `Esc` to cancel, and failed commits render a dedicated validation line inside the widget.
-- `DataForm<TModel>.BeginEdit()` / `CancelEdit()` plus `IsEditing` for explicit selection-first form editing flows.
+Detailed token and hook mapping lives in [theme-system-v1.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/theme-system-v1.md).
 
-`DataForm<TModel>` default interaction contract is selection-first:
+## V1 Boundaries
 
-- arrow keys / pointer move selection only
-- `Enter` enters value-edit mode on the selected field with the caret at the end of the current value
-- `Enter` in edit mode commits
-- `Esc` cancels the in-flight edit
-- validation failure stays visible inside the widget until the value is fixed or edit mode is cancelled
+In scope for V1:
 
-Consumer proof-loop adoption (`c0c3c34`, `a58cc64`, `91a5ecb`, `147859c`, `38d75e6`, `f8fb80c`) reports no remaining pre-RC blockers in this lane.
+- public API simplification and boundary cleanup
+- no-DI startup standardization
+- theming/styling architecture for shipped controls
+- broad built-in widget catalog
+- regression tests, perf gates, docs alignment
 
-### Plotting and Dashboard Authoring Guidance
+Out of scope for V1:
 
-Recommended control selection:
-
-- `Sparkline`: compact single metric, fast append path, bounded by constructor capacity.
-- `AreaPlot`: single metric with fill semantics.
-- `LinePlot` + `LineSeries`: multi-series trend dashboards.
-- `ScatterPlot`: correlation analysis (X/Y points).
-- `Histogram`: bucketed distributions.
-- `PlotPanel`: container for composing multiple plot controls in grid-like dashboards.
-
-Streaming guidance:
-
-- Keep producers bounded. For `Sparkline`/`AreaPlot`, use capacity constructors and `Append`.
-- For `LinePlot`, keep bounded external buffers per series and call `LineSeries.SetSamples(...)`.
-- Reuse control instances and update data only; avoid rebuilding controls each frame.
-
-Theming guidance:
-
-- Apply semantic defaults first (`ApplyThemeDefaults`), then instance overrides.
-- Bordered plotting controls expose `BorderStyleText` and `FocusedBorderStyleText`; use those hooks for focus emphasis instead of hardcoded symbols.
-
-Reference example:
-
-- `examples/PlottingDashboard` is the planned canonical plotting dashboard sample once available.
-
-### Custom Control Model
-
-Custom widgets extend `TeaSharp.Controls.Control`.
-
-That contract gives:
-
-- render hook through `Render(Canvas, Rect)`
-- typed message hook through `Handle(Message)`
-- optional pointer-aware hook through `Handle(Message, Rect)`
-- automatic bridge into the current runtime/composition engine without exposing the legacy component interfaces on the default path
-
-The legacy component contracts still exist for advanced interop, but they are intentionally marked advanced and are no longer part of the normal custom-widget story.
-
-Design rule:
-
-- users should be able to write custom widgets without understanding `ScreenComposer`, routing scopes, or terminal protocol details
-
-## Internal Architecture
-
-### Runtime
-
-The current runtime still uses the original core engine:
-
-- internal `TeaRuntimeLoop`
-- terminal adapters
-- decoder
-- renderer
-- effect scheduling
-
-Those remain the execution backend while the new root API compiles into them.
-
-### Screen Compilation
-
-The root screen model compiles through:
-
-1. layout tree normalization
-2. scene graph compilation
-3. focus/input routing
-4. canvas rendering
-5. terminal output emission
-
-The old public composition engine has been removed. Remaining advanced bridges are internal implementation details, not part of the app contract.
-
-### Interaction
-
-Default app code uses:
-
-- automatic control input dispatch before `TeaApp.Update(...)`
-- `TeaApp.Update(...)` for runtime messages and all key messages (`KeyPressed`/`KeyReleased`), even when controls handle them
-- handled pointer/paste messages can be swallowed by controls before reaching `TeaApp.Update(...)`
-- place app-wide hotkeys in `TeaApp.Update(...)` because key messages are always forwarded
-- `RequestEffect(...)` when a control event needs to trigger runtime work
-- typed key messages such as `KeyPressed`
-- typed pointer messages such as `PointerInput`
-- `TeaEffects` for quit/tick/sequence/batch behavior
-
-Normal apps should not manually configure `InputRouter`, `InputScope`, or screen region chains.
-
-## Advanced Layer
-
-Advanced/custom-host scenarios can still reach:
-
-- low-level renderers
-- terminal capability probes
-- decoder seams
-- raw canvas drawing
-- legacy composition helpers
-- legacy `*Component` types without root wrappers yet
-
-Most promoted legacy `*Component` families are now internal bridges behind root `TeaSharp.Controls` wrappers. The remaining public advanced layer is mainly hosting/runtime seams plus a smaller set of explicit interop contracts.
-
-## Repo Profile
-
-- SDK pinned: `10.0.103`
-- main solution: `TeaSharp.slnx`
-- test projects:
-  - `tests/TeaSharp.Tests`
-  - `tests/TeaSharp.IntegrationTests`
-
-## Design Rules
-
-- One obvious startup path.
-- One obvious composition path.
-- One obvious root control catalog.
-- No namespace/type collisions on the public path.
-- No stringly-typed routing identifiers on the normal path.
-- No bool-heavy public orchestration APIs when a stronger object model is available.
-- Simplicity for common apps; power for advanced users through deliberate extension points.
+- image rendering
+- advanced native image modes
+- anything that requires turning TeaSharp into a host-framework-first product

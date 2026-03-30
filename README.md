@@ -104,16 +104,14 @@ Current V1 widget expansion includes `Breadcrumb` and `Paginator`.
 
 ## Docs
 
-- app model and startup: [docs/app-pattern.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/app-pattern.md)
 - theme system and palette cookbook: [docs/theme-system-v1.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/theme-system-v1.md)
 - widget expansion roadmap: [docs/widget-roadmap-v1.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/widget-roadmap-v1.md)
 - C#-first public API policy: [docs/public-api-guidelines.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/public-api-guidelines.md)
 - custom widgets: [docs/custom-components.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/custom-components.md)
 - public API tiers: [docs/public-api-inventory.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/public-api-inventory.md)
-- legacy-to-new map: [docs/migration-map.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/migration-map.md)
 - canonical progression: [examples/HelloWorld/Program.cs](/Users/georgetsouvaltzis/Projects/playground/teasharp/examples/HelloWorld/Program.cs), [examples/CounterForm/Program.cs](/Users/georgetsouvaltzis/Projects/playground/teasharp/examples/CounterForm/Program.cs), [examples/WorkspaceApp/Program.cs](/Users/georgetsouvaltzis/Projects/playground/teasharp/examples/WorkspaceApp/Program.cs)
-- engine and namespace notes: [docs/spec.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/spec.md), [docs/namespace-migration.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/namespace-migration.md)
-- control catalog: [docs/prebuilt-widgets.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/prebuilt-widgets.md)
+- engine and namespace notes: [docs/spec.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/spec.md)
+- control catalog and API tiers: [docs/public-api-inventory.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/public-api-inventory.md)
 
 ## Build
 
