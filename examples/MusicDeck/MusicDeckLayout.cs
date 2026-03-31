@@ -17,12 +17,14 @@ internal sealed partial class MusicDeckApp
             {
                 column.Fixed(7, _nowPlaying);
                 column.Fixed(4, _progress);
-                column.Fixed(3, transport => transport.Row(buttons =>
+                column.Fixed(5, transport => transport.Row(buttons =>
                 {
-                    buttons.Fixed(10, _backButton);
-                    buttons.Fixed(11, _playPauseButton);
-                    buttons.Fixed(10, _nextButton);
-                    buttons.Fixed(11, _detailButton);
+                    buttons.Fill(_transportLeftSpacer);
+                    buttons.Fixed(11, _backButton, new Thickness(0, 0, 1, 0));
+                    buttons.Fixed(12, _playPauseButton, new Thickness(0, 0, 1, 0));
+                    buttons.Fixed(11, _nextButton, new Thickness(0, 0, 1, 0));
+                    buttons.Fixed(12, _detailButton);
+                    buttons.Fill(_transportRightSpacer);
                 }));
                 column.Fixed(4, stats => stats.Row(cards =>
                 {
