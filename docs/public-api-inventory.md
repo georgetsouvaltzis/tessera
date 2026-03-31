@@ -349,6 +349,7 @@ These APIs remain public because they still offer real value, but they should no
 - `TeaSharp.Controls.BarChartOptions`
 - `TeaSharp.Controls.LineChartOptions`
 - `TeaSharp.Controls.LinePlotOptions`
+- `TeaSharp.Controls.LinePlotRenderMode`
 - `TeaSharp.Controls.PlotPanelOptions`
 - `ICanvasComponent` as a render-only advanced seam
 - renderer, terminal, and capability-probing seams

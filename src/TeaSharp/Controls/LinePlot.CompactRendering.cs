@@ -6,8 +6,20 @@ namespace TeaSharp.Controls;
 public sealed partial class LinePlot
 {
     private static ReadOnlySpan<char> BlockGlyphs => "▁▂▃▄▅▆▇█";
+    private const byte UpMask = 0x01;
+    private const byte RightMask = 0x02;
+    private const byte DownMask = 0x04;
+    private const byte LeftMask = 0x08;
 
-    private bool TryRenderCompactSeries(Canvas canvas, Rect plotArea, int maxSampleCount, int visibleCount, int offset, double min, double max)
+    private bool TryRenderCompactSeries(
+        Canvas canvas,
+        Rect plotArea,
+        int maxSampleCount,
+        int visibleCount,
+        int offset,
+        double min,
+        double max,
+        LinePlotRenderMode renderMode)
     {
         if (_series.Count != 1)
         {
@@ -20,9 +32,80 @@ public sealed partial class LinePlot
             return false;
         }
 
-        return plotArea.Width >= 2 && plotArea.Height >= 2
-            ? RenderCompactBrailleSeries(canvas, plotArea, series, maxSampleCount, visibleCount, offset, seriesMin, seriesMax)
-            : RenderCompactBlockSeries(canvas, plotArea, series, maxSampleCount, visibleCount, offset, seriesMin, seriesMax);
+        return renderMode switch
+        {
+            LinePlotRenderMode.CompactBraille => plotArea.Width >= 2 && plotArea.Height >= 2
+                ? RenderCompactBrailleSeries(canvas, plotArea, series, maxSampleCount, visibleCount, offset, seriesMin, seriesMax)
+                : RenderCompactBlockSeries(canvas, plotArea, series, maxSampleCount, visibleCount, offset, seriesMin, seriesMax),
+            _ => plotArea.Width >= 2 && plotArea.Height >= 2
+                ? RenderCompactLineSeries(canvas, plotArea, series, maxSampleCount, visibleCount, offset, seriesMin, seriesMax)
+                : RenderCompactBlockSeries(canvas, plotArea, series, maxSampleCount, visibleCount, offset, seriesMin, seriesMax),
+        };
+    }
+
+    private bool RenderCompactLineSeries(
+        Canvas canvas,
+        Rect plotArea,
+        LineSeries series,
+        int maxSampleCount,
+        int visibleCount,
+        int offset,
+        double min,
+        double max)
+    {
+        if (plotArea.Width < 2 || plotArea.Height < 2)
+        {
+            return RenderCompactBlockSeries(canvas, plotArea, series, maxSampleCount, visibleCount, offset, min, max);
+        }
+
+        var masks = new byte[plotArea.Width * plotArea.Height];
+        var previousX = -1;
+        var previousY = -1;
+        var hasPoint = false;
+
+        for (var cellX = 0; cellX < plotArea.Width; cellX++)
+        {
+            var globalIndex = ResolveCompactCellSampleIndex(plotArea.Width, visibleCount, offset, cellX);
+            if (!TryGetSeriesValue(series, maxSampleCount, globalIndex, out var value))
+            {
+                previousX = -1;
+                previousY = -1;
+                continue;
+            }
+
+            hasPoint = true;
+            var cellY = NormalizeCellY(value, min, max, plotArea.Height);
+            if (previousX >= 0)
+            {
+                RasterizeCompactCellConnections(masks, plotArea.Width, plotArea.Height, previousX, previousY, cellX, cellY);
+            }
+
+            previousX = cellX;
+            previousY = cellY;
+        }
+
+        if (!hasPoint)
+        {
+            return false;
+        }
+
+        var style = ResolveStyled(series.Style);
+        for (var cellY = 0; cellY < plotArea.Height; cellY++)
+        {
+            for (var cellX = 0; cellX < plotArea.Width; cellX++)
+            {
+                var mask = masks[(cellY * plotArea.Width) + cellX];
+                if (mask == 0)
+                {
+                    continue;
+                }
+
+                var glyph = ResolveCompactLineGlyph(mask);
+                WriteGlyph(canvas, plotArea.X + cellX, plotArea.Y + cellY, glyph, RenderGlyph(glyph, style));
+            }
+        }
+
+        return true;
     }
 
     private bool RenderCompactBrailleSeries(
@@ -128,6 +211,24 @@ public sealed partial class LinePlot
         return hasPoint;
     }
 
+    private static int ResolveCompactCellSampleIndex(int width, int visibleCount, int offset, int cellX)
+    {
+        if (width <= 1 || visibleCount <= 1)
+        {
+            return offset;
+        }
+
+        return offset + (int)Math.Round(
+            cellX * (visibleCount - 1) / (double)(width - 1),
+            MidpointRounding.AwayFromZero);
+    }
+
+    private static int NormalizeCellY(double value, double min, double max, int height)
+    {
+        var normalized = NormalizeValue(value, min, max);
+        return (height - 1) - (int)Math.Round(normalized * (height - 1), MidpointRounding.AwayFromZero);
+    }
+
     private static int NormalizeVirtualY(double value, double min, double max, int virtualHeight)
     {
         var normalized = NormalizeValue(value, min, max);
@@ -143,6 +244,93 @@ public sealed partial class LinePlot
         }
 
         return Math.Clamp((value - min) / range, 0d, 1d);
+    }
+
+    private static void RasterizeCompactCellConnections(byte[] masks, int width, int height, int x0, int y0, int x1, int y1)
+    {
+        x0 = Math.Clamp(x0, 0, width - 1);
+        x1 = Math.Clamp(x1, 0, width - 1);
+        y0 = Math.Clamp(y0, 0, height - 1);
+        y1 = Math.Clamp(y1, 0, height - 1);
+
+        var dx = Math.Abs(x1 - x0);
+        var dy = Math.Abs(y1 - y0);
+        var sx = x0 < x1 ? 1 : -1;
+        var sy = y0 < y1 ? 1 : -1;
+        var err = dx - dy;
+        var currentX = x0;
+        var currentY = y0;
+
+        while (currentX != x1 || currentY != y1)
+        {
+            var nextX = currentX;
+            var nextY = currentY;
+            var err2 = err * 2;
+            if (err2 > -dy)
+            {
+                err -= dy;
+                nextX += sx;
+            }
+
+            if (err2 < dx)
+            {
+                err += dx;
+                nextY += sy;
+            }
+
+            AddCompactConnection(masks, width, height, currentX, currentY, nextX - currentX, nextY - currentY);
+            AddCompactConnection(masks, width, height, nextX, nextY, currentX - nextX, currentY - nextY);
+            currentX = nextX;
+            currentY = nextY;
+        }
+    }
+
+    private static void AddCompactConnection(byte[] masks, int width, int height, int x, int y, int dx, int dy)
+    {
+        if (x < 0 || x >= width || y < 0 || y >= height)
+        {
+            return;
+        }
+
+        byte mask = 0;
+        if (dx < 0)
+        {
+            mask |= LeftMask;
+        }
+        else if (dx > 0)
+        {
+            mask |= RightMask;
+        }
+
+        if (dy < 0)
+        {
+            mask |= UpMask;
+        }
+        else if (dy > 0)
+        {
+            mask |= DownMask;
+        }
+
+        masks[(y * width) + x] |= mask;
+    }
+
+    private static char ResolveCompactLineGlyph(byte mask)
+    {
+        return mask switch
+        {
+            LeftMask or RightMask or LeftMask | RightMask => '─',
+            UpMask or DownMask or UpMask | DownMask => '│',
+            RightMask | DownMask => '╭',
+            LeftMask | DownMask => '╮',
+            LeftMask | UpMask => '╯',
+            RightMask | UpMask => '╰',
+            LeftMask | RightMask | DownMask => '┬',
+            LeftMask | RightMask | UpMask => '┴',
+            UpMask | DownMask | RightMask => '├',
+            UpMask | DownMask | LeftMask => '┤',
+            UpMask | DownMask | LeftMask | RightMask => '┼',
+            _ => '─',
+        };
     }
 
     private static void RasterizeCompactLine(byte[] masks, int width, int height, int x0, int y0, int x1, int y1)

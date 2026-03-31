@@ -345,8 +345,8 @@ public sealed partial class LinePlot : Control
             DrawGrid(canvas, plotArea, ResolveStyled(GridStyle));
         }
 
-        if (options.RenderMode == LinePlotRenderMode.Compact
-            && TryRenderCompactSeries(canvas, plotArea, maxSampleCount, visibleCount, offset, min, max))
+        if (options.RenderMode is LinePlotRenderMode.Compact or LinePlotRenderMode.CompactBraille
+            && TryRenderCompactSeries(canvas, plotArea, maxSampleCount, visibleCount, offset, min, max, options.RenderMode))
         {
             // Compact mode handles its own plot body for dense telemetry cards.
         }

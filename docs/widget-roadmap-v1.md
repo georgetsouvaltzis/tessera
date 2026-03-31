@@ -121,7 +121,7 @@ All shipped plotting controls follow the strict theming contract (state styles, 
 Use the shipped plotting controls by intent:
 
 - `Sparkline`/`AreaPlot` for bounded streaming single-series telemetry
-- `LinePlot` for multi-series trend dashboards
+- `LinePlot` for multi-series trend dashboards and compact multi-row telemetry cards (`LinePlotRenderMode.Compact` for line-first cards, `CompactBraille` when subcell density matters more than terminal portability)
 - `ScatterPlot` for correlation
 - `Histogram` for distribution buckets
 - `PlotPanel` to compose multiple plotting controls into one screen region

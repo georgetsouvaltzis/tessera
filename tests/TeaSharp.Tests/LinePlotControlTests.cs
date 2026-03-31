@@ -183,7 +183,7 @@ public sealed class LinePlotControlTests
     }
 
     [Test]
-    public void LinePlotRender_CompactMode_UsesBrailleCellsForDenseSingleSeriesTelemetry()
+    public void LinePlotRender_CompactMode_UsesLineGlyphsForDenseSingleSeriesTelemetry()
     {
         var control = new LinePlot
         {
@@ -197,8 +197,26 @@ public sealed class LinePlotControlTests
 
         var output = Render(control, width: 10, height: 4);
 
-        Assert.That(output.Any(IsBrailleCharacter), Is.True, "Compact mode should emit braille cells for dense telemetry traces.");
-        Assert.That(output.Contains('╱') || output.Contains('╲') || output.Contains('─'), Is.False, "Compact mode should avoid coarse line glyphs.");
+        Assert.That(output.Any(IsCompactLineCharacter), Is.True, "Compact mode should emit compact line glyphs for dense telemetry traces.");
+        Assert.That(output.Any(IsBrailleCharacter), Is.False, "Default compact mode should avoid terminal-dependent braille output.");
+    }
+
+    [Test]
+    public void LinePlotRender_CompactBrailleMode_UsesBrailleCellsForDenseSingleSeriesTelemetry()
+    {
+        var control = new LinePlot
+        {
+            Border = BorderStyle.None,
+            Options = new LinePlotOptions(ShowAxes: false, ShowGrid: false, ShowLegend: false, ShowStats: false, RenderMode: LinePlotRenderMode.CompactBraille),
+        };
+        control.SetSeries(
+        [
+            new LineSeries("cpu", [12, 26, 14, 38, 30, 46, 28, 62, 54, 70, 58, 74]),
+        ]);
+
+        var output = Render(control, width: 10, height: 4);
+
+        Assert.That(output.Any(IsBrailleCharacter), Is.True, "Braille compact mode should preserve subcell telemetry rendering.");
     }
 
     [Test]
@@ -220,6 +238,8 @@ public sealed class LinePlotControlTests
     }
 
     private static bool IsBrailleCharacter(char value) => value is >= '\u2801' and <= '\u28FF';
+
+    private static bool IsCompactLineCharacter(char value) => value is '─' or '│' or '╭' or '╮' or '╯' or '╰' or '┬' or '┴' or '├' or '┤' or '┼';
 
     private static bool IsBlockSparkCharacter(char value) => value is '▁' or '▂' or '▃' or '▄' or '▅' or '▆' or '▇' or '█';
 
