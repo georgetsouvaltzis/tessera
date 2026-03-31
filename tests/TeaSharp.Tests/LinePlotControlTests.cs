@@ -199,6 +199,7 @@ public sealed class LinePlotControlTests
 
         Assert.That(output.Any(IsCompactLineCharacter), Is.True, "Compact mode should emit compact line glyphs for dense telemetry traces.");
         Assert.That(output.Any(IsBrailleCharacter), Is.False, "Default compact mode should avoid terminal-dependent braille output.");
+        Assert.That(output.Any(IsCornerOrJunctionCharacter), Is.False, "Compact mode should prefer continuous polyline glyphs over stair-step corners.");
     }
 
     [Test]
@@ -239,7 +240,9 @@ public sealed class LinePlotControlTests
 
     private static bool IsBrailleCharacter(char value) => value is >= '\u2801' and <= '\u28FF';
 
-    private static bool IsCompactLineCharacter(char value) => value is '─' or '│' or '╭' or '╮' or '╯' or '╰' or '┬' or '┴' or '├' or '┤' or '┼';
+    private static bool IsCompactLineCharacter(char value) => value is '─' or '│' or '╱' or '╲' or '•';
+
+    private static bool IsCornerOrJunctionCharacter(char value) => value is '╭' or '╮' or '╯' or '╰' or '┬' or '┴' or '├' or '┤' or '┼';
 
     private static bool IsBlockSparkCharacter(char value) => value is '▁' or '▂' or '▃' or '▄' or '▅' or '▆' or '▇' or '█';
 
