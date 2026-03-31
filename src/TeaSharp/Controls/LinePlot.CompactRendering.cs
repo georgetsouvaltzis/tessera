@@ -56,11 +56,10 @@ public sealed partial class LinePlot
             return RenderCompactBlockSeries(canvas, plotArea, series, maxSampleCount, visibleCount, offset, min, max);
         }
 
-        var cells = new CompactTraceCell[plotArea.Width * plotArea.Height];
+        var masks = new ushort[plotArea.Width * plotArea.Height];
         var previousX = -1;
         var previousY = -1;
         var hasPoint = false;
-        var order = 0;
         var virtualWidth = plotArea.Width * CompactVirtualWidthPerCell;
         var virtualHeight = plotArea.Height * CompactVirtualHeightPerCell;
 
@@ -81,19 +80,18 @@ public sealed partial class LinePlot
             var virtualY = NormalizeVirtualY(value, min, max, virtualHeight);
             if (previousX >= 0)
             {
-                order = RasterizeCompactPolyline(
-                    cells,
+                RasterizeCompactPolyline(
+                    masks,
                     plotArea.Width,
                     plotArea.Height,
                     previousX,
                     previousY,
                     virtualX,
-                    virtualY,
-                    order);
+                    virtualY);
             }
             else
             {
-                RecordCompactTracePoint(cells, plotArea.Width, plotArea.Height, virtualX, virtualY, order++);
+                SetCompactDot(masks, plotArea.Width, plotArea.Height, virtualX, virtualY);
             }
 
             previousX = virtualX;
@@ -110,13 +108,13 @@ public sealed partial class LinePlot
         {
             for (var cellX = 0; cellX < plotArea.Width; cellX++)
             {
-                ref var cell = ref cells[(cellY * plotArea.Width) + cellX];
-                if (!cell.HasPoint)
+                var mask = masks[(cellY * plotArea.Width) + cellX];
+                if (mask == 0)
                 {
                     continue;
                 }
 
-                var glyph = ResolveCompactLineGlyph(cell);
+                var glyph = ResolveCompactLineGlyph(mask);
                 WriteGlyph(canvas, plotArea.X + cellX, plotArea.Y + cellY, glyph, RenderGlyph(glyph, style));
             }
         }
@@ -244,15 +242,14 @@ public sealed partial class LinePlot
         return Math.Clamp((value - min) / range, 0d, 1d);
     }
 
-    private static int RasterizeCompactPolyline(
-        CompactTraceCell[] cells,
+    private static void RasterizeCompactPolyline(
+        ushort[] masks,
         int width,
         int height,
         int x0,
         int y0,
         int x1,
-        int y1,
-        int order)
+        int y1)
     {
         var dx = Math.Abs(x1 - x0);
         var dy = Math.Abs(y1 - y0);
@@ -279,16 +276,14 @@ public sealed partial class LinePlot
                 nextY += sy;
             }
 
-            RecordCompactTracePoint(cells, width, height, currentX, currentY, order++);
+            SetCompactDot(masks, width, height, currentX, currentY);
             currentX = nextX;
             currentY = nextY;
         }
-
-        RecordCompactTracePoint(cells, width, height, currentX, currentY, order++);
-        return order;
+        SetCompactDot(masks, width, height, currentX, currentY);
     }
 
-    private static void RecordCompactTracePoint(CompactTraceCell[] cells, int width, int height, int virtualX, int virtualY, int order)
+    private static void SetCompactDot(ushort[] masks, int width, int height, int virtualX, int virtualY)
     {
         if (width <= 0 || height <= 0)
         {
@@ -304,33 +299,73 @@ public sealed partial class LinePlot
         var cellY = virtualY / CompactVirtualHeightPerCell;
         var localX = virtualX % CompactVirtualWidthPerCell;
         var localY = virtualY % CompactVirtualHeightPerCell;
-        ref var cell = ref cells[(cellY * width) + cellX];
-        cell.Record(localX, localY, order);
+        masks[(cellY * width) + cellX] |= ResolveCompactMask(localX, localY);
     }
 
-    private static char ResolveCompactLineGlyph(CompactTraceCell cell)
+    private static char ResolveCompactLineGlyph(ushort mask)
     {
-        var dx = cell.LastX - cell.FirstX;
-        var dy = cell.LastY - cell.FirstY;
-        var absDx = Math.Abs(dx);
-        var absDy = Math.Abs(dy);
+        var left = HasCompactColumn(mask, 0);
+        var right = HasCompactColumn(mask, CompactVirtualWidthPerCell - 1);
+        var top = HasCompactRow(mask, 0);
+        var bottom = HasCompactRow(mask, CompactVirtualHeightPerCell - 1);
+        var minX = CompactVirtualWidthPerCell;
+        var maxX = -1;
+        var minY = CompactVirtualHeightPerCell;
+        var maxY = -1;
+        var positiveScore = 0;
+        var negativeScore = 0;
 
-        if (absDx == 0 && absDy == 0)
+        for (var y = 0; y < CompactVirtualHeightPerCell; y++)
         {
-            return '•';
+            for (var x = 0; x < CompactVirtualWidthPerCell; x++)
+            {
+                if ((mask & ResolveCompactMask(x, y)) == 0)
+                {
+                    continue;
+                }
+
+                minX = Math.Min(minX, x);
+                maxX = Math.Max(maxX, x);
+                minY = Math.Min(minY, y);
+                maxY = Math.Max(maxY, y);
+                positiveScore += x + y;
+                negativeScore += x + ((CompactVirtualHeightPerCell - 1) - y);
+            }
         }
 
-        if (absDy <= 1 && absDx > 0)
+        if (maxX < 0)
+        {
+            return ' ';
+        }
+
+        var spanX = maxX - minX;
+        var spanY = maxY - minY;
+        if ((left && right) || (spanX >= 2 && spanY <= 1))
         {
             return '─';
         }
 
-        if (absDx <= 1 && absDy > 0)
+        if ((top && bottom) || (spanY >= 2 && spanX <= 1))
         {
             return '│';
         }
 
-        return dx * dy < 0 ? '╱' : '╲';
+        if ((left || right) && (top || bottom))
+        {
+            return negativeScore >= positiveScore ? '╱' : '╲';
+        }
+
+        if (spanX >= spanY)
+        {
+            return '─';
+        }
+
+        if (spanY > spanX)
+        {
+            return '│';
+        }
+
+        return negativeScore >= positiveScore ? '╱' : '╲';
     }
 
     private static void RasterizeCompactLine(byte[] masks, int width, int height, int x0, int y0, int x1, int y1)
@@ -398,43 +433,35 @@ public sealed partial class LinePlot
         };
     }
 
-    private struct CompactTraceCell
+    private static ushort ResolveCompactMask(int localX, int localY)
     {
-        public bool HasPoint { get; private set; }
-        public int FirstOrder { get; private set; }
-        public int LastOrder { get; private set; }
-        public int FirstX { get; private set; }
-        public int FirstY { get; private set; }
-        public int LastX { get; private set; }
-        public int LastY { get; private set; }
+        var bit = (localY * CompactVirtualWidthPerCell) + localX;
+        return (ushort)(1 << bit);
+    }
 
-        public void Record(int localX, int localY, int order)
+    private static bool HasCompactColumn(ushort mask, int column)
+    {
+        for (var y = 0; y < CompactVirtualHeightPerCell; y++)
         {
-            if (!HasPoint)
+            if ((mask & ResolveCompactMask(column, y)) != 0)
             {
-                HasPoint = true;
-                FirstOrder = order;
-                LastOrder = order;
-                FirstX = localX;
-                FirstY = localY;
-                LastX = localX;
-                LastY = localY;
-                return;
-            }
-
-            if (order < FirstOrder)
-            {
-                FirstOrder = order;
-                FirstX = localX;
-                FirstY = localY;
-            }
-
-            if (order >= LastOrder)
-            {
-                LastOrder = order;
-                LastX = localX;
-                LastY = localY;
+                return true;
             }
         }
+
+        return false;
+    }
+
+    private static bool HasCompactRow(ushort mask, int row)
+    {
+        for (var x = 0; x < CompactVirtualWidthPerCell; x++)
+        {
+            if ((mask & ResolveCompactMask(x, row)) != 0)
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 }
