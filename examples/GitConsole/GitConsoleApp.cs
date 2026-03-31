@@ -1,442 +1,445 @@
-using TeaSharp;
+using System.Globalization;
 using TeaSharp.Controls;
 using TeaSharp.Layout;
 using TeaSharp.Styles;
 
-internal sealed class GitConsoleApp : TeaApp
+namespace TeaSharp.Examples.GitConsole;
+
+internal sealed partial class GitConsoleApp : TeaApp
 {
-    public static readonly TeaTheme DefaultTheme = TeaThemes.Catppuccin(CatppuccinVariant.Macchiato);
+    private static readonly string[] PulseFrames = ["syncing", "scanning", "reviewing", "steady"];
 
-    private readonly ListView<RepoFile> _files = new(static file => file.RenderLabel())
-    {
-        Title = "Changed Files",
-        Border = BorderStyle.Rounded,
-        Padding = Thickness.All(1),
-        FocusMarker = "◆",
-        PageSize = 14,
-    };
+    private readonly TeaTheme _theme = GitConsoleTheme.DefaultTheme;
+    private readonly GitConsoleState _state = GitConsoleState.CreateSeed();
 
-    private readonly DiffView _diff = new()
-    {
-        Title = "Diff",
-        Border = BorderStyle.Rounded,
-        Padding = Thickness.All(1),
-        FocusMarker = "◆",
-    };
-
-    private readonly ActivityFeed _output = new()
-    {
-        Title = "Ops Log",
-        Border = BorderStyle.Rounded,
-        Padding = Thickness.All(1),
-        FocusMarker = "◆",
-        AutoFollow = true,
-        ShowTimestamp = true,
-    };
-
-    private readonly StatusBar _headline = new();
-    private readonly StatusBar _status = new();
-    private readonly List<RepoFile> _repoFiles = CreateRepoFiles();
-    private readonly Control[] _focusOrder;
-    private string _lastAction = "workspace ready";
+    private readonly GitRepoHeaderControl _repoHeader = new();
+    private readonly StatsCard _flowCard = new() { Title = "Flow Pulse", Border = BorderStyle.Rounded, Padding = Thickness.All(1) };
+    private readonly StatsCard _queueCard = new() { Title = "Queue", Border = BorderStyle.Rounded, Padding = Thickness.All(1) };
+    private readonly StatsCard _syncCard = new() { Title = "Sync", Border = BorderStyle.Rounded, Padding = Thickness.All(1) };
+    private readonly SideNavRail _scopeRail = new() { Title = "Lanes", Border = BorderStyle.Rounded, Padding = Thickness.All(1), FocusMarker = "◆" };
+    private readonly GitWorktreeControl _worktree = new() { Title = "Worktree Radar", FocusMarker = "◆" };
+    private readonly PaneTabs _diffTabs = new() { Border = BorderStyle.Rounded, Padding = Thickness.All(1), FocusMarker = "◆", Title = "View" };
+    private readonly DiffView _diff = new() { Border = BorderStyle.Rounded, Padding = Thickness.All(1), FocusMarker = "◆" };
+    private readonly TextInput _subjectInput = new() { Title = "Commit Subject", Border = BorderStyle.Rounded, Padding = Thickness.All(1), FocusMarker = "◆", Placeholder = "ship: tighten flagship git shell" };
+    private readonly TextArea _notesInput = new() { Title = "Operator Notes", Border = BorderStyle.Rounded, Padding = Thickness.All(1), FocusMarker = "◆", ShowLineNumbers = false, Wrap = true };
+    private readonly CommandOutput _history = new() { Title = "Command / Action History", Border = BorderStyle.Rounded, Padding = Thickness.All(1), FocusMarker = "◆", AutoFollow = true, ShowTimestamp = true };
+    private readonly StatusBar _footer = new() { Fill = ' ' };
+    private readonly Button _stageButton = new() { Text = "Stage / Unstage", Description = "Toggle selected file", Border = BorderStyle.Rounded, Padding = Thickness.All(1) };
+    private readonly Button _discardButton = new() { Text = "Discard", Description = "Drop selected patch", Border = BorderStyle.Rounded, Padding = Thickness.All(1) };
+    private readonly Button _modeButton = new() { Text = "Toggle Diff", Description = "Inline vs patch radar", Border = BorderStyle.Rounded, Padding = Thickness.All(1) };
+    private readonly Button _commitButton = new() { Text = "Commit", Description = "Ship staged queue", Border = BorderStyle.Rounded, Padding = Thickness.All(1) };
+    private readonly Button _syncButton = new() { Text = "Sync", Description = "Push / fetch pulse", Border = BorderStyle.Rounded, Padding = Thickness.All(1) };
+    private readonly Label _rightHeader = new() { Border = BorderStyle.None };
 
     public GitConsoleApp()
     {
-        _focusOrder = [_files, _diff, _output];
-
-        ThemeScope.Apply(DefaultTheme, _files, _diff, _output, _headline, _status);
         ConfigureTheme();
+        WireEvents();
+        SeedControls();
 
-        _files.SelectionChanged += (_, _) => SyncDiffToSelection();
-
-        ResetFileList();
-        SeedOutput();
-        _files.RequestFocus();
+        _worktree.RequestFocus();
     }
+
+    public override TeaEffect? Initialize() =>
+        TeaEffects.Periodic(TimeSpan.FromMilliseconds(900), _ => new PulseTickMessage());
 
     public override TeaEffect? Update(Message message)
     {
-        if (message is not KeyPressed key)
+        switch (message)
         {
-            return null;
+            case KeyPressed key:
+                return HandleKey(key);
+            case AppActionMessage action:
+                ExecuteAction(action.Kind);
+                return null;
+            case PulseTickMessage:
+                _state.AdvancePulse();
+                return null;
+            default:
+                return null;
         }
+    }
 
+    public override Screen Build(ScreenContext context)
+    {
+        RefreshChrome();
+        RefreshControls();
+
+        return Screen.Build(window =>
+        {
+            window.Padding(1);
+            window.Gap(1);
+            ConfigureHeader(window, context);
+            window.Body(body => ConfigureBody(body, context));
+            window.Footer(1, _footer);
+        });
+    }
+
+    private TeaEffect? HandleKey(KeyPressed key)
+    {
         if (key.IsCharacter('c', ModifierKeys.Ctrl))
         {
             return TeaEffects.Quit;
         }
 
-        if (key.Is(Key.F1) || key.IsCharacter('1', ModifierKeys.Ctrl))
+        if (key.Is(Key.F1))
         {
-            FocusPane(_files);
+            _worktree.RequestFocus();
             return null;
         }
 
-        if (key.Is(Key.F2) || key.IsCharacter('2', ModifierKeys.Ctrl))
+        if (key.Is(Key.F2))
         {
-            FocusPane(_diff);
+            _diff.RequestFocus();
             return null;
         }
 
-        if (key.Is(Key.F3) || key.IsCharacter('3', ModifierKeys.Ctrl))
+        if (key.Is(Key.F3))
         {
-            FocusPane(_output);
+            _subjectInput.RequestFocus();
             return null;
         }
 
-        if (key.IsCharacter('s', ModifierKeys.Ctrl))
+        if (key.Is(Key.F4))
         {
-            ToggleStageSelected();
+            _history.RequestFocus();
             return null;
         }
 
-        if (key.IsCharacter('r', ModifierKeys.Ctrl))
+        if (IsEditingText())
         {
-            RevertSelected();
             return null;
         }
 
-        if (key.IsCharacter('k', ModifierKeys.Ctrl))
+        if (key.IsCharacter('s'))
         {
-            CommitStaged();
+            ExecuteAction(GitConsoleAction.ToggleStage);
+            return null;
+        }
+
+        if (key.IsCharacter('x'))
+        {
+            ExecuteAction(GitConsoleAction.DiscardSelected);
+            return null;
+        }
+
+        if (key.IsCharacter('d'))
+        {
+            ExecuteAction(GitConsoleAction.ToggleDiffMode);
+            return null;
+        }
+
+        if (key.IsCharacter('u'))
+        {
+            ExecuteAction(GitConsoleAction.Sync);
             return null;
         }
 
         return null;
     }
 
-    public override Screen Build(ScreenContext context)
+    private void WireEvents()
     {
-        UpdateChrome();
-
-        return Screen.Build(window =>
+        _scopeRail.SelectionChanged += (_, args) =>
         {
-            window.Padding(1);
-            window.Gap(1);
-            window.HeaderRow(1, row => row.Fill(_headline));
-            window.Body(body => body.Row(row =>
+            if (args.SelectedItem is not null && _state.SetScope(args.SelectedItem.Id))
             {
-                row.Fixed(Math.Min(42, Math.Max(34, context.Width / 3)), _files);
-                row.Fill(content => content.Column(column =>
-                {
-                    column.Weighted(3, _diff);
-                    column.Weighted(2, _output);
-                }));
-            }));
-            window.Footer(1, _status);
-        });
+                RefreshControls();
+            }
+        };
+
+        _worktree.SelectionChanged += (_, args) =>
+        {
+            if (args.SelectedItem is not null && _state.SelectFile(args.SelectedItem.Id))
+            {
+                RefreshDiff();
+            }
+        };
+
+        _diffTabs.SelectionChanged += (_, _) => RefreshDiff();
+
+        _stageButton.Activated += (_, _) => Post(new AppActionMessage(GitConsoleAction.ToggleStage));
+        _discardButton.Activated += (_, _) => Post(new AppActionMessage(GitConsoleAction.DiscardSelected));
+        _modeButton.Activated += (_, _) => Post(new AppActionMessage(GitConsoleAction.ToggleDiffMode));
+        _commitButton.Activated += (_, _) => Post(new AppActionMessage(GitConsoleAction.CommitStaged));
+        _syncButton.Activated += (_, _) => Post(new AppActionMessage(GitConsoleAction.Sync));
+    }
+
+    private void SeedControls()
+    {
+        _scopeRail.SetItems(_state.BuildNavItems());
+        _scopeRail.SetSelectedIndex(0);
+        _diffTabs.SetTabs(
+        [
+            new PaneTabItem("working", "Working Copy"),
+            new PaneTabItem("staged", "Staged Snapshot"),
+            new PaneTabItem("radar", "Patch Radar"),
+        ]);
+        _diffTabs.SetSelectedIndex(0);
+        _history.SetLines(GitConsoleState.BuildSeedHistory());
+        _notesInput.SetValue("- verify staged files\n- visually review diff rhythm\n");
+        RefreshControls();
     }
 
     private void ConfigureTheme()
     {
-        var theme = DefaultTheme;
-        var focusedBorder = theme.Border.Focused.Merge(theme.Focus.Border);
+        _scopeRail.ApplyTheme(_theme);
+        _diffTabs.ApplyTheme(_theme);
+        _diff.ApplyTheme(_theme);
+        _subjectInput.ApplyTheme(_theme);
+        _notesInput.ApplyTheme(_theme);
+        _history.ApplyTheme(_theme);
+        _flowCard.ApplyTheme(_theme);
+        _queueCard.ApplyTheme(_theme);
+        _syncCard.ApplyTheme(_theme);
+        _stageButton.ApplyTheme(_theme);
+        _discardButton.ApplyTheme(_theme);
+        _modeButton.ApplyTheme(_theme);
+        _commitButton.ApplyTheme(_theme);
+        _syncButton.ApplyTheme(_theme);
+        _footer.ApplyTheme(_theme);
 
-        _files.TitleStyle = theme.Text.Primary;
-        _files.FocusedTitleStyle = focusedBorder.WithBold();
-        _files.BorderStyleText = theme.Border.Strong;
-        _files.FocusedBorderStyleText = focusedBorder;
-        _files.DefaultRowStyle = theme.Text.Primary;
-        _files.HoveredRowStyle = theme.Accent.Secondary.WithUnderline();
-        _files.SelectedRowStyle = theme.Selection.Foreground.Merge(theme.Selection.Background).WithBold();
-        _files.RowMarkers = new ListViewMarkerSet("·", "▶", "▸");
+        _scopeRail.TitleStyle = _theme.Text.Primary;
+        _scopeRail.FocusedTitleStyle = _theme.Focus.Title;
+        _scopeRail.BorderStyleText = _theme.Border.Strong;
+        _scopeRail.FocusedBorderStyleText = _theme.Border.Focused.Merge(_theme.Focus.Border);
+        _scopeRail.ItemStyle = _theme.Text.Primary;
+        _scopeRail.HoveredItemStyle = _theme.Accent.Secondary;
+        _scopeRail.SelectedItemStyle = _theme.Selection.Foreground.Merge(_theme.Selection.Background).WithBold();
+        _scopeRail.FocusedSelectedItemStyle = _theme.Selection.Foreground.Merge(_theme.Selection.Background).WithBold();
 
-        _diff.TitleStyle = theme.Text.Primary;
-        _diff.FocusedTitleStyle = focusedBorder.WithBold();
-        _diff.BorderStyleText = theme.Border.Strong;
-        _diff.FocusedBorderStyleText = focusedBorder;
-        _diff.HeaderStyle = theme.Text.Secondary.WithBold();
-        _diff.AddedLineStyle = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(166, 227, 161));
-        _diff.RemovedLineStyle = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(243, 139, 168));
-        _diff.UnchangedLineStyle = theme.Text.Primary;
-        _diff.SelectedLineStyle = theme.Selection.Foreground.Merge(theme.Selection.Background);
+        _diff.TitleStyle = _theme.Text.Primary.WithBold();
+        _diff.FocusedTitleStyle = _theme.Focus.Title;
+        _diff.BorderStyleText = _theme.Border.Strong;
+        _diff.FocusedBorderStyleText = _theme.Border.Focused.Merge(_theme.Focus.Border);
+        _diff.SelectedLineStyle = _theme.Selection.Foreground.Merge(_theme.Selection.Background).WithBold();
 
-        _output.TitleStyle = theme.Text.Primary;
-        _output.FocusedTitleStyle = focusedBorder.WithBold();
-        _output.BorderStyleText = theme.Border.Strong;
-        _output.FocusedBorderStyleText = focusedBorder;
-        _output.InfoItemStyle = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(137, 180, 250));
-        _output.SuccessItemStyle = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(166, 227, 161));
-        _output.WarningItemStyle = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(249, 226, 175));
-        _output.ErrorItemStyle = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(243, 139, 168));
-        _output.HoveredItemStyle = theme.Accent.Secondary.WithUnderline();
-        _output.SelectedItemStyle = theme.Selection.Foreground.Merge(theme.Selection.Background);
-        _output.FocusedSelectedItemStyle = theme.Selection.Foreground.Merge(theme.Selection.Background).WithBold();
-        _output.UnreadItemStyle = theme.Accent.Primary.WithBold();
-        _output.MutedItemStyle = theme.Text.Muted.WithDim();
-        _output.DisabledItemStyle = theme.Text.Muted.WithDim();
-        _output.TimestampStyle = theme.Text.Secondary;
+        _flowCard.TitleStyle = _theme.Text.Secondary;
+        _flowCard.ValueStyle = _theme.Accent.Primary.WithBold();
+        _flowCard.BorderStyleText = _theme.Border.Strong;
+        _queueCard.ValueStyle = _theme.State.Warning.WithBold();
+        _queueCard.BorderStyleText = _theme.Border.Strong;
+        _syncCard.ValueStyle = _theme.State.Info.WithBold();
+        _syncCard.BorderStyleText = _theme.Border.Strong;
 
-        _headline.LeftTextStyle = theme.Text.Primary.WithBold();
-        _headline.RightTextStyle = theme.Text.Secondary;
-        _headline.FillStyle = theme.Surface.Base.Merge(theme.Border.Default);
-        _headline.Fill = ' ';
+        _subjectInput.ValueTextStyle = _theme.Text.Primary;
+        _subjectInput.BorderStyleText = _theme.Border.Strong;
+        _subjectInput.FocusedBorderStyleText = _theme.Border.Focused.Merge(_theme.Focus.Border);
+        _subjectInput.PlaceholderTextStyle = _theme.Text.Muted;
 
-        _status.LeftTextStyle = theme.Text.Secondary;
-        _status.RightTextStyle = theme.Text.Muted;
-        _status.FillStyle = theme.Surface.Base;
-        _status.Fill = ' ';
+        _notesInput.ValueTextStyle = _theme.Text.Primary;
+        _notesInput.DisabledValueTextStyle = _theme.Text.Muted;
+        _notesInput.BorderStyleText = _theme.Border.Strong;
+        _notesInput.FocusedBorderStyleText = _theme.Border.Focused.Merge(_theme.Focus.Border);
+
+        _history.BorderStyleText = _theme.Border.Strong;
+        _history.FocusedBorderStyleText = _theme.Border.Focused.Merge(_theme.Focus.Border);
+        _history.TitleStyle = _theme.Text.Primary.WithBold();
+
+        _footer.LeftTextStyle = _theme.Text.Secondary;
+        _footer.RightTextStyle = _theme.Text.Muted;
+        _footer.FillStyle = _theme.Surface.Base;
+
+        _rightHeader.TextStyle = _theme.Text.Secondary;
+        _rightHeader.Text = string.Empty;
+
+        _repoHeader.TitleStyle = _theme.Text.Secondary.WithBold();
+        _repoHeader.BorderStyleText = _theme.Border.Strong;
+        _repoHeader.NameStyle = _theme.Text.Primary.WithBold();
+        _repoHeader.BranchStyle = GitConsoleTheme.Chip(0x091018, 0x7AE2CF, bold: true);
+        _repoHeader.PathStyle = _theme.Text.Muted;
+        _repoHeader.PulseStyle = GitConsoleTheme.Chip(0x091018, 0x67C6FF, bold: true);
+        _repoHeader.ActionStyle = _theme.Accent.Secondary.WithBold();
+        _repoHeader.DetailStyle = _theme.Text.Secondary;
+
+        _worktree.TitleStyle = _theme.Text.Secondary.WithBold();
+        _worktree.FocusedTitleStyle = _theme.Focus.Title;
+        _worktree.BorderStyleText = _theme.Border.Strong;
+        _worktree.FocusedBorderStyleText = _theme.Border.Focused.Merge(_theme.Focus.Border);
+        _worktree.GroupStyle = _theme.Text.Muted.WithBold();
+        _worktree.DefaultRowStyle = _theme.Text.Primary;
+        _worktree.SelectedRowStyle = _theme.Selection.Foreground.Merge(_theme.Selection.Background);
+        _worktree.FocusedSelectedRowStyle = _theme.Focus.Ring;
+        _worktree.SecondaryStyle = _theme.Text.Secondary;
+        _worktree.StagedStyle = GitConsoleTheme.Chip(0x091018, 0x61E294, bold: true);
+        _worktree.ReviewStyle = GitConsoleTheme.Chip(0x091018, 0xF2C572, bold: true);
+        _worktree.AddedStyle = _theme.State.Success;
+        _worktree.RemovedStyle = _theme.State.Error;
+        _worktree.EmptyStyle = _theme.Text.Muted;
+
+        var buttonBorder = _theme.Border.Strong;
+        var buttonFocus = _theme.Border.Focused.Merge(_theme.Focus.Border);
+        foreach (var button in new[] { _stageButton, _discardButton, _modeButton, _commitButton, _syncButton })
+        {
+            button.LabelStyle = _theme.Text.Primary.WithBold();
+            button.FocusedLabelStyle = _theme.Accent.Primary.WithBold();
+            button.BorderStyleText = buttonBorder;
+            button.FocusedBorderStyleText = buttonFocus;
+            button.PressedLabelStyle = _theme.Selection.Foreground.Merge(_theme.Selection.Background).WithBold();
+        }
     }
 
-    private void ResetFileList()
+    private void RefreshChrome()
     {
-        _files.SetItems(_repoFiles.Where(static file => file.IsChanged).ToArray());
-        if (_files.Count > 0)
-        {
-            _files.SetSelectedIndex(0);
-        }
+        var metrics = _state.GetMetrics();
+        _repoHeader.RepositoryName = _state.RepositoryName;
+        _repoHeader.RepositoryPath = _state.RepositoryPath;
+        _repoHeader.BranchName = _state.BranchName;
+        _repoHeader.RemoteName = _state.RemoteName;
+        _repoHeader.PulseText = PulseFrames[_state.PulseIndex];
+        _repoHeader.LastAction = _state.LastAction;
+        _repoHeader.LastActionDetail = _state.LastActionDetail;
+        _repoHeader.Ahead = _state.Ahead;
+        _repoHeader.Behind = _state.Behind;
 
-        SyncDiffToSelection();
-    }
-
-    private void SyncDiffToSelection()
-    {
-        var selected = _files.SelectedItem;
-        if (selected is null)
-        {
-            _diff.Title = "Patch View | clean tree";
-            _diff.SetTexts(string.Empty, string.Empty);
-            return;
-        }
-
-        _diff.Title =
-            $"{selected.StatusLabel} {selected.Path} | {(selected.IsStaged ? "index" : "worktree")} | +{selected.AddedLines}/-{selected.RemovedLines}";
-        _diff.SetTexts(selected.OldText, selected.NewText);
-    }
-
-    private void ToggleStageSelected()
-    {
-        var selected = _files.SelectedItem;
-        if (selected is null)
-        {
-            AppendOutput("git", "stage skipped", "no file selected", kind: ActivityFeedItemKind.Warning);
-            _lastAction = "stage skipped";
-            return;
-        }
-
-        selected.IsStaged = !selected.IsStaged;
-        _lastAction = selected.IsStaged ? $"staged {selected.Path}" : $"unstaged {selected.Path}";
-        AppendOutput(
-            "git",
-            selected.IsStaged ? "staged" : "unstaged",
-            selected.Path,
-            selected.StatusLabel,
-            kind: selected.IsStaged ? ActivityFeedItemKind.Success : ActivityFeedItemKind.Info);
-        RefreshFilePane(selected.Path);
-    }
-
-    private void RevertSelected()
-    {
-        var selected = _files.SelectedItem;
-        if (selected is null)
-        {
-            AppendOutput("git", "revert skipped", "no file selected", kind: ActivityFeedItemKind.Warning);
-            _lastAction = "revert skipped";
-            return;
-        }
-
-        selected.IsChanged = false;
-        selected.IsStaged = false;
-        _lastAction = $"reverted {selected.Path}";
-        AppendOutput("git", "reverted", selected.Path, selected.StatusLabel, kind: ActivityFeedItemKind.Warning);
-        RefreshFilePane(selected.Path);
-    }
-
-    private void CommitStaged()
-    {
-        var staged = _repoFiles.Where(static file => file.IsChanged && file.IsStaged).ToArray();
-        if (staged.Length == 0)
-        {
-            AppendOutput("git", "commit skipped", "nothing staged", kind: ActivityFeedItemKind.Warning);
-            _lastAction = "commit skipped";
-            return;
-        }
-
-        foreach (var file in staged)
-        {
-            file.IsChanged = false;
-            file.IsStaged = false;
-        }
-
-        _lastAction = $"committed {staged.Length} files";
-        AppendOutput("git", "commit", $"{staged.Length} files", "feat: tighten public-v1 examples", ActivityFeedItemKind.Success);
-        ResetFileList();
-    }
-
-    private void RefreshFilePane(string? preferredPath)
-    {
-        var visible = _repoFiles.Where(static file => file.IsChanged).ToArray();
-        _files.SetItems(visible);
-
-        if (visible.Length == 0)
-        {
-            SyncDiffToSelection();
-            return;
-        }
-
-        var preferredIndex = preferredPath is null
-            ? -1
-            : Array.FindIndex(visible, file => string.Equals(file.Path, preferredPath, StringComparison.Ordinal));
-        _files.SetSelectedIndex(preferredIndex >= 0 ? preferredIndex : Math.Min(_files.SelectedIndex, visible.Length - 1));
-        SyncDiffToSelection();
-    }
-
-    private void SeedOutput()
-    {
-        _output.SetItems(
+        _flowCard.SetItems(
         [
-            new ActivityFeedItem("git", "status", "feature/public-v1", "6 files changed, 2 staged", ActivityFeedItemKind.Info, new DateTimeOffset(2026, 3, 27, 8, 10, 0, TimeSpan.Zero))
-            {
-                IsUnread = false,
-            },
-            new ActivityFeedItem("git", "fetch", "origin/main", "up to date, 1 review thread still open", ActivityFeedItemKind.Success, new DateTimeOffset(2026, 3, 27, 8, 12, 0, TimeSpan.Zero))
-            {
-                IsUnread = false,
-            },
-            new ActivityFeedItem("ci", "warned", "widget-labs", "snapshot drift pending for TagInput", ActivityFeedItemKind.Warning, new DateTimeOffset(2026, 3, 27, 8, 14, 0, TimeSpan.Zero)),
-            new ActivityFeedItem("review", "requested", "GitConsole", "focus keys and pane chrome need polish", ActivityFeedItemKind.Info, new DateTimeOffset(2026, 3, 27, 8, 16, 0, TimeSpan.Zero)),
-            new ActivityFeedItem("merge", "blocked", "feature/public-v1", "follow-up visual review still pending", ActivityFeedItemKind.Warning, new DateTimeOffset(2026, 3, 27, 8, 18, 0, TimeSpan.Zero)),
+            new StatItem("active", _state.LastAction.Split(' ', 2)[0].ToUpperInvariant()),
+            new StatItem("focus", FocusLabel()),
         ]);
+        _queueCard.SetItems(
+        [
+            new StatItem("staged", metrics.Staged.ToString("00", CultureInfo.InvariantCulture)),
+            new StatItem("review", metrics.Review.ToString("00", CultureInfo.InvariantCulture)),
+        ]);
+        _syncCard.SetItems(
+        [
+            new StatItem("ahead", _state.Ahead.ToString("00", CultureInfo.InvariantCulture)),
+            new StatItem("behind", _state.Behind.ToString("00", CultureInfo.InvariantCulture)),
+        ]);
+
+        _rightHeader.Text =
+            "Commit lane visible. Use buttons or pointer.";
+        _footer.LeftText =
+            "F1 tree  F2 diff  F3 commit  F4 history  |  s stage  x discard  d mode  u sync  ctrl+c quit";
+        _footer.RightText = $"{_state.Scope} · {_state.LastAction.Split(' ', 2)[0]}";
     }
 
-    private void AppendOutput(
-        string actor,
-        string action,
-        string? target = null,
-        string? details = null,
-        ActivityFeedItemKind kind = ActivityFeedItemKind.Info)
+    private void RefreshControls()
     {
-        _output.Append(actor, action, target, details, kind, DateTimeOffset.UtcNow);
-    }
+        _scopeRail.SetItems(_state.BuildNavItems());
+        _scopeRail.SetSelectedIndex((int)_state.Scope);
 
-    private void UpdateChrome()
-    {
-        var focus = ResolveFocusName();
-        var changed = _repoFiles.Count(static file => file.IsChanged);
-        var staged = _repoFiles.Count(static file => file.IsChanged && file.IsStaged);
-        var selected = _files.SelectedItem;
-        var file = selected?.Path ?? "-";
-        var mode = selected?.IsStaged == true ? "index" : "worktree";
-
-        _headline.LeftText =
-            $"repo=teasharp branch=feature/public-v1 head=edff77f changed={changed} staged={staged}";
-        _headline.RightText =
-            $"ci=warning review=2 pending last={_lastAction}";
-
-        _files.Title = $"Working Tree | {changed} changed | {staged} staged";
-        _output.Title = $"Ops Log | {_output.Items.Count} events";
-
-        _status.LeftText =
-            $"focus={focus} file={file} mode={mode}";
-        _status.RightText =
-            $"F1 files F2 diff F3 output | Ctrl+S stage/unstage Ctrl+R revert Ctrl+K commit | diff Tab mode | Ctrl+C quit";
-    }
-
-    private string ResolveFocusName()
-    {
-        if (_files.IsFocused)
+        _worktree.SetSections(_state.BuildSections());
+        if (_state.SelectedFileId is not null)
         {
-            return "files";
+            _worktree.SelectById(_state.SelectedFileId);
+        }
+
+        RefreshDiff();
+    }
+
+    private void RefreshDiff()
+    {
+        var snapshot = _state.BuildDiffSnapshot(CurrentDiffTab());
+        _diff.Title = snapshot.Title;
+        _diff.Mode = snapshot.Mode;
+        _diff.SetTexts(snapshot.OldText, snapshot.NewText);
+    }
+
+    private void ExecuteAction(GitConsoleAction action)
+    {
+        GitActionResult result;
+        switch (action)
+        {
+            case GitConsoleAction.ToggleStage:
+                result = _state.ToggleStageSelected();
+                RefreshControls();
+                break;
+            case GitConsoleAction.DiscardSelected:
+                result = _state.DiscardSelected();
+                RefreshControls();
+                break;
+            case GitConsoleAction.CommitStaged:
+                result = _state.CommitStaged(_subjectInput.Value, _notesInput.Value);
+                if (result.Success)
+                {
+                    _subjectInput.Clear();
+                    _notesInput.SetValue("- note follow-up reviewer\n");
+                }
+                RefreshControls();
+                break;
+            case GitConsoleAction.Sync:
+                result = _state.Sync();
+                RefreshChrome();
+                break;
+            default:
+                CycleDiffTab();
+                result = GitActionResult.InfoResult("View mode changed", _diffTabs.SelectedItem?.Title ?? "Diff view updated.");
+                RefreshDiff();
+                break;
+        }
+
+        AppendHistory(result);
+    }
+
+    private void AppendHistory(GitActionResult result)
+    {
+        var text = $"{result.Title} · {result.Detail}";
+        switch (result.Channel)
+        {
+            case CommandOutputChannel.StdOut:
+                _history.AppendStdOut(text);
+                break;
+            case CommandOutputChannel.StdErr:
+                _history.AppendStdErr(text);
+                break;
+            default:
+                _history.AppendSystem(text);
+                break;
+        }
+    }
+
+    private bool IsEditingText() => _subjectInput.IsFocused || _notesInput.IsFocused;
+
+    private GitDiffTab CurrentDiffTab() => _diffTabs.SelectedItem?.Id switch
+    {
+        "staged" => GitDiffTab.StagedSnapshot,
+        "radar" => GitDiffTab.PatchRadar,
+        _ => GitDiffTab.WorkingCopy,
+    };
+
+    private void CycleDiffTab()
+    {
+        var next = (_diffTabs.SelectedIndex + 1) % Math.Max(1, _diffTabs.Tabs.Count);
+        _diffTabs.SetSelectedIndex(next);
+    }
+
+    private string FocusLabel()
+    {
+        if (_worktree.IsFocused)
+        {
+            return "WORKTREE";
         }
 
         if (_diff.IsFocused)
         {
-            return "diff";
+            return "DIFF";
         }
 
-        if (_output.IsFocused)
+        if (_subjectInput.IsFocused || _notesInput.IsFocused)
         {
-            return "output";
+            return "COMMIT";
         }
 
-        return "-";
+        if (_history.IsFocused)
+        {
+            return "HISTORY";
+        }
+
+        return "SHELL";
     }
 
-    private static void FocusPane(Control target)
+    private sealed record PulseTickMessage : Message;
+
+    private sealed record AppActionMessage(GitConsoleAction Kind) : Message;
+
+    private enum GitConsoleAction
     {
-        target.RequestFocus();
-    }
-
-    private static List<RepoFile> CreateRepoFiles() =>
-    [
-        new("src/TeaSharp/Controls/TagInput.cs", "M", 3, 0,
-            """
-            public bool AllowDuplicates => _options.AllowDuplicates;
-            public int? MaxTags => _options.MaxTags;
-            """,
-            """
-            public bool AllowDuplicates => _options.AllowDuplicates;
-            public int? MaxTags => _options.MaxTags;
-            public bool PreserveViewportOnCommit => _options.PreserveViewportOnCommit;
-            """)
-        {
-            IsStaged = true,
-        },
-        new("examples/DeployConsole/DeployConsoleApp.cs", "A", 18, 0,
-            string.Empty,
-            """
-            private void StartDeployment()
-            {
-                _deployTarget = _services.SelectedItem;
-                _deploy.SetRunning(true);
-            }
-            """),
-        new("tests/TeaSharp.Tests/SpinnerControlTests.cs", "M", 1, 0,
-            """
-            Assert.That(spinner.Running, Is.True);
-            """,
-            """
-            Assert.That(spinner.Running, Is.True);
-            Assert.That(spinner.Frames.Count, Is.EqualTo(3));
-            """)
-        {
-            IsStaged = true,
-        },
-        new("docs/spec.md", "M", 2, 1,
-            """
-            - spinner exposes Frames
-            """,
-            """
-            - spinner exposes Frames
-            - spinner supports runtime SetFrames(...) swaps
-            """),
-        new("examples/GitConsole/GitConsoleApp.cs", "M", 12, 3,
-            """
-            _status.RightText = "Ctrl+1 files Ctrl+2 diff Ctrl+3 output";
-            """,
-            """
-            _headline.RightText = "ci=warning review=2 pending last=workspace ready";
-            _status.RightText = "F1 files F2 diff F3 output | Ctrl+S stage/unstage";
-            """),
-        new("src/TeaSharp/Controls/Choice.cs", "D", 0, 6,
-            """
-            public bool LegacySelection { get; set; }
-            """,
-            string.Empty),
-    ];
-
-    private sealed class RepoFile(string path, string statusLabel, int addedLines, int removedLines, string oldText, string newText)
-    {
-        public string Path { get; } = path;
-
-        public string StatusLabel { get; } = statusLabel;
-
-        public int AddedLines { get; } = Math.Max(0, addedLines);
-
-        public int RemovedLines { get; } = Math.Max(0, removedLines);
-
-        public string OldText { get; } = oldText;
-
-        public string NewText { get; } = newText;
-
-        public bool IsChanged { get; set; } = true;
-
-        public bool IsStaged { get; set; }
-
-        public string RenderLabel()
-        {
-            var stage = IsStaged ? "●" : " ";
-            return $"{stage} {StatusLabel,-2} +{AddedLines,-2}/-{RemovedLines,-2} {Path}";
-        }
+        ToggleStage,
+        DiscardSelected,
+        ToggleDiffMode,
+        CommitStaged,
+        Sync,
     }
 }

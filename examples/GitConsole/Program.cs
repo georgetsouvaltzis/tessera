@@ -1,11 +1,13 @@
 using TeaSharp;
 using TeaSharp.Controls;
 
+using TeaSharp.Examples.GitConsole;
+
 var app = Tea.CreateBuilder()
     .UseApp<GitConsoleApp>()
     .ConfigureRuntime(static runtime =>
     {
-        runtime.Theme = GitConsoleApp.DefaultTheme;
+        runtime.Theme = GitConsoleTheme.DefaultTheme;
         runtime.PointerActivationPolicy = PointerActivationPolicy.SingleClick;
         runtime.Screen = new ScreenOptions
         {
