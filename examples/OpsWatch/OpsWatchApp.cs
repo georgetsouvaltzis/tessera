@@ -419,13 +419,13 @@ internal sealed partial class OpsWatchApp : TeaApp
         _runbook.BorderStyleText = theme.Border.Strong;
         _runbook.TextStyle = theme.Text.Secondary;
 
-        ConfigureActionButton(_restartButton, OpsWatchTheme.Chip(palette.HeroBadgeForeground, palette.PulseTertiaryColor), palette);
-        ConfigureActionButton(_drainButton, OpsWatchTheme.Chip(palette.HeroBadgeForeground, palette.PulseSecondaryColor), palette);
-        ConfigureActionButton(_muteButton, OpsWatchTheme.Chip(palette.HeroBadgeForeground, palette.FrameStrongColor), palette);
-        ConfigureActionButton(_scaleButton, OpsWatchTheme.Chip(palette.HeroBadgeForeground, palette.PulsePrimaryColor), palette);
-        ConfigureActionButton(_inspectButton, OpsWatchTheme.Chip(palette.HeroBadgeForeground, palette.MemoryColor), palette);
-        ConfigureActionButton(_failoverButton, OpsWatchTheme.Chip(palette.HeroBadgeForeground, palette.DiskColor), palette);
-        ConfigureActionButton(_ackButton, OpsWatchTheme.Chip(palette.HeroBadgeForeground, palette.CpuColor), palette);
+        ConfigureActionButton(_restartButton, palette.HeroBadgeForeground, palette.PulseTertiaryColor, palette);
+        ConfigureActionButton(_drainButton, palette.HeroBadgeForeground, palette.PulseSecondaryColor, palette);
+        ConfigureActionButton(_muteButton, palette.HeroBadgeForeground, palette.FrameStrongColor, palette);
+        ConfigureActionButton(_scaleButton, palette.HeroBadgeForeground, palette.PulsePrimaryColor, palette);
+        ConfigureActionButton(_inspectButton, palette.HeroBadgeForeground, palette.MemoryColor, palette);
+        ConfigureActionButton(_failoverButton, palette.HeroBadgeForeground, palette.DiskColor, palette);
+        ConfigureActionButton(_ackButton, palette.HeroBadgeForeground, palette.CpuColor, palette);
 
         ConfigureThemeButton(_veridianThemeButton, OpsWatchThemeKind.Veridian);
         ConfigureThemeButton(_tidalThemeButton, OpsWatchThemeKind.Tidal);
@@ -440,15 +440,25 @@ internal sealed partial class OpsWatchApp : TeaApp
     {
         var isSelected = _palette.Kind == kind;
         button.LabelStyle = isSelected
-            ? OpsWatchTheme.Chip(_palette.HeroBadgeForeground, _palette.HeroBadgeBackground)
+            ? OpsWatchTheme.Foreground(_palette.HeroBadgeForeground).WithBold()
             : _palette.Theme.Text.Secondary.WithBold();
         button.FocusedLabelStyle = isSelected
-            ? OpsWatchTheme.Chip(_palette.HeroBadgeForeground, _palette.FooterChipBackground)
-            : _palette.Theme.Focus.Title;
+            ? OpsWatchTheme.Foreground(_palette.HeroBadgeForeground).WithBold()
+            : _palette.Theme.Text.Secondary.WithBold();
+        button.PressedLabelStyle = button.LabelStyle;
+        button.SurfaceStyle = isSelected
+            ? OpsWatchTheme.Background(_palette.HeroBadgeBackground)
+            : _palette.Theme.Surface.Overlay;
+        button.FocusedSurfaceStyle = button.SurfaceStyle;
+        button.PressedSurfaceStyle = isSelected
+            ? OpsWatchTheme.Background(_palette.FooterChipBackground)
+            : _palette.Theme.Selection.Background;
         button.BorderStyleText = isSelected
             ? OpsWatchTheme.Foreground(_palette.FrameStrongColor).WithBold()
             : OpsWatchTheme.Foreground(_palette.FrameMutedColor);
         button.FocusedBorderStyleText = OpsWatchTheme.Foreground(_palette.FooterChipBackground).WithBold();
+        button.LabelPrefix = string.Empty;
+        button.LabelSuffix = string.Empty;
     }
 
     private static void ConfigurePulseCard(StatsCard card, TeaStyle valueStyle, OpsWatchThemePalette palette)
@@ -481,12 +491,20 @@ internal sealed partial class OpsWatchApp : TeaApp
         spark.MaxValue = null;
     }
 
-    private static void ConfigureActionButton(Button button, TeaStyle labelStyle, OpsWatchThemePalette palette)
+    private static void ConfigureActionButton(Button button, int foregroundRgb, int backgroundRgb, OpsWatchThemePalette palette)
     {
+        var labelStyle = OpsWatchTheme.Foreground(foregroundRgb).WithBold();
+        var surfaceStyle = OpsWatchTheme.Background(backgroundRgb);
         button.LabelStyle = labelStyle.WithBold();
         button.FocusedLabelStyle = labelStyle.WithBold();
+        button.PressedLabelStyle = labelStyle.WithBold();
+        button.SurfaceStyle = surfaceStyle;
+        button.FocusedSurfaceStyle = surfaceStyle;
+        button.PressedSurfaceStyle = surfaceStyle;
         button.BorderStyleText = OpsWatchTheme.Foreground(palette.FrameMutedColor);
         button.FocusedBorderStyleText = palette.Theme.Focus.Border;
+        button.LabelPrefix = string.Empty;
+        button.LabelSuffix = string.Empty;
     }
 
     private void ConfigureBullet(BulletChart chart, string unit)

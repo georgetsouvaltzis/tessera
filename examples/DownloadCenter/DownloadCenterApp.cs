@@ -232,10 +232,10 @@ internal sealed partial class DownloadCenterApp : TeaApp
         _feed.FocusedSelectedItemStyle = DownloadCenterTheme.Chip(0xF7FBFF, 0x375E99);
         _feed.TimestampStyle = _theme.Text.Muted;
 
-        ConfigureAction(_pauseButton, DownloadCenterTheme.Chip(0x08101F, 0x7FDBFF));
-        ConfigureAction(_retryButton, DownloadCenterTheme.Chip(0x08101F, 0xFF9B71));
-        ConfigureAction(_boostButton, DownloadCenterTheme.Chip(0x08101F, 0xD5B3FF));
-        ConfigureAction(_purgeButton, DownloadCenterTheme.Chip(0x08101F, 0x5EF0A5));
+        ConfigureAction(_pauseButton, 0x08101F, 0x7FDBFF);
+        ConfigureAction(_retryButton, 0x08101F, 0xFF9B71);
+        ConfigureAction(_boostButton, 0x08101F, 0xD5B3FF);
+        ConfigureAction(_purgeButton, 0x08101F, 0x5EF0A5);
 
         _footer.LeftTextStyle = DownloadCenterTheme.Chip(0xF7FBFF, 0x234A77);
         _footer.RightTextStyle = _theme.Text.Secondary;
@@ -260,12 +260,20 @@ internal sealed partial class DownloadCenterApp : TeaApp
         chart.FocusedBorderStyleText = DownloadCenterTheme.Foreground(0xFF9B71).WithBold();
     }
 
-    private static void ConfigureAction(Button button, TeaStyle labelStyle)
+    private static void ConfigureAction(Button button, int foregroundRgb, int backgroundRgb)
     {
+        var labelStyle = DownloadCenterTheme.Foreground(foregroundRgb).WithBold();
+        var surfaceStyle = DownloadCenterTheme.Background(backgroundRgb);
         button.LabelStyle = labelStyle;
         button.FocusedLabelStyle = labelStyle;
+        button.PressedLabelStyle = labelStyle;
+        button.SurfaceStyle = surfaceStyle;
+        button.FocusedSurfaceStyle = surfaceStyle;
+        button.PressedSurfaceStyle = surfaceStyle;
         button.BorderStyleText = DownloadCenterTheme.Foreground(0x34517B);
         button.FocusedBorderStyleText = DownloadCenterTheme.Foreground(0xFF9B71).WithBold();
+        button.LabelPrefix = string.Empty;
+        button.LabelSuffix = string.Empty;
     }
 }
 

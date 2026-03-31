@@ -21,9 +21,9 @@ internal sealed partial class DataWorkbenchApp
                 column.Fill(nav => nav.Row(row =>
                 {
                     row.Weighted(3, _pageTabs);
-                    row.Weighted(1, _citrineButton);
-                    row.Weighted(1, _cobaltButton);
-                    row.Weighted(1, _emberButton);
+                    row.Fixed(12, _citrineButton, new Thickness(0, 0, 1, 0));
+                    row.Fixed(11, _cobaltButton, new Thickness(0, 0, 1, 0));
+                    row.Fixed(10, _emberButton);
                 }));
             }));
             return;
@@ -41,9 +41,9 @@ internal sealed partial class DataWorkbenchApp
             column.Fill(nav => nav.Row(row =>
             {
                 row.Weighted(4, _pageTabs);
-                row.Weighted(1, _citrineButton);
-                row.Weighted(1, _cobaltButton);
-                row.Weighted(1, _emberButton);
+                row.Fixed(12, _citrineButton, new Thickness(0, 0, 1, 0));
+                row.Fixed(11, _cobaltButton, new Thickness(0, 0, 1, 0));
+                row.Fixed(10, _emberButton);
             }));
         }));
     }

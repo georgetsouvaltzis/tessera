@@ -254,12 +254,12 @@ internal sealed partial class IncidentDeskApp : TeaApp
         _notes.BorderStyleText = _theme.Border.Strong;
         _notes.FocusedBorderStyleText = _theme.Border.Focused.Merge(_theme.Focus.Border);
 
-        ConfigureActionButton(_ackButton, IncidentDeskTheme.Chip(0xF4F7E9, 0x35533A));
-        ConfigureActionButton(_assignButton, IncidentDeskTheme.Chip(0xFFF4E8, 0x604236));
-        ConfigureActionButton(_escalateButton, IncidentDeskTheme.Chip(0xFFF4E8, 0x8D3228));
-        ConfigureActionButton(_resolveButton, IncidentDeskTheme.Chip(0xF4F7E9, 0x2C604B));
-        ConfigureActionButton(_reopenButton, IncidentDeskTheme.Chip(0xFFF4E8, 0x6F4A33));
-        ConfigureActionButton(_syncButton, IncidentDeskTheme.Chip(0xF3F7FF, 0x3F5165));
+        ConfigureActionButton(_ackButton, 0xF4F7E9, 0x35533A);
+        ConfigureActionButton(_assignButton, 0xFFF4E8, 0x604236);
+        ConfigureActionButton(_escalateButton, 0xFFF4E8, 0x8D3228);
+        ConfigureActionButton(_resolveButton, 0xF4F7E9, 0x2C604B);
+        ConfigureActionButton(_reopenButton, 0xFFF4E8, 0x6F4A33);
+        ConfigureActionButton(_syncButton, 0xF3F7FF, 0x3F5165);
 
         _logs.TitleStyle = _theme.Text.Secondary.WithBold();
         _logs.FocusedTitleStyle = _theme.Focus.Title;
@@ -433,14 +433,21 @@ internal sealed partial class IncidentDeskApp : TeaApp
         card.FocusedBorderStyleText = IncidentDeskTheme.Foreground(0xF3B276).WithBold();
     }
 
-    private static void ConfigureActionButton(Button button, TeaStyle labelStyle)
+    private static void ConfigureActionButton(Button button, int foregroundRgb, int backgroundRgb)
     {
+        var labelStyle = IncidentDeskTheme.Foreground(foregroundRgb).WithBold();
+        var surfaceStyle = IncidentDeskTheme.Background(backgroundRgb);
         button.LabelStyle = labelStyle;
         button.FocusedLabelStyle = labelStyle;
         button.PressedLabelStyle = labelStyle.WithUnderline();
+        button.SurfaceStyle = surfaceStyle;
+        button.FocusedSurfaceStyle = surfaceStyle;
+        button.PressedSurfaceStyle = surfaceStyle;
         button.DisabledLabelStyle = IncidentDeskTheme.Foreground(0x8E7A74);
         button.BorderStyleText = IncidentDeskTheme.Foreground(0x8B5A46);
         button.FocusedBorderStyleText = IncidentDeskTheme.Foreground(0xF3B276).WithBold();
+        button.LabelPrefix = string.Empty;
+        button.LabelSuffix = string.Empty;
     }
 
     private static TeaStyle SeverityChipStyle(IncidentSeverity severity) => severity switch

@@ -19,10 +19,10 @@ internal sealed partial class DownloadCenterApp
                 }));
                 column.Fill(actions => actions.Row(row =>
                 {
-                    row.Weighted(1, _pauseButton);
-                    row.Weighted(1, _retryButton);
-                    row.Weighted(1, _boostButton);
-                    row.Weighted(1, _purgeButton);
+                    row.Fixed(18, _pauseButton, new Thickness(0, 0, 1, 0));
+                    row.Fixed(16, _retryButton, new Thickness(0, 0, 1, 0));
+                    row.Fixed(17, _boostButton, new Thickness(0, 0, 1, 0));
+                    row.Fixed(16, _purgeButton);
                 }));
             }));
     }

@@ -21,9 +21,9 @@ internal sealed partial class OpsWatchApp
                     }));
                     column.Fill(themes => themes.Row(row =>
                     {
-                        row.Weighted(1, _veridianThemeButton);
-                        row.Weighted(1, _tidalThemeButton);
-                        row.Weighted(1, _redlineThemeButton);
+                        row.Fixed(14, _veridianThemeButton, new Thickness(0, 0, 1, 0));
+                        row.Fixed(11, _tidalThemeButton, new Thickness(0, 0, 1, 0));
+                        row.Fixed(13, _redlineThemeButton);
                     }));
                 }));
             return;
@@ -42,9 +42,9 @@ internal sealed partial class OpsWatchApp
                 }));
                 column.Fill(themes => themes.Row(row =>
                 {
-                    row.Weighted(1, _veridianThemeButton);
-                    row.Weighted(1, _tidalThemeButton);
-                    row.Weighted(1, _redlineThemeButton);
+                    row.Fixed(14, _veridianThemeButton, new Thickness(0, 0, 1, 0));
+                    row.Fixed(11, _tidalThemeButton, new Thickness(0, 0, 1, 0));
+                    row.Fixed(13, _redlineThemeButton);
                 }));
             }));
     }
@@ -94,18 +94,18 @@ internal sealed partial class OpsWatchApp
                     stack.Fixed(4, _diskBullet);
                     stack.Fixed(5, actions => actions.Row(buttons =>
                     {
-                        buttons.Weighted(1, _restartButton);
-                        buttons.Weighted(1, _drainButton);
+                        buttons.Fixed(17, _restartButton, new Thickness(0, 0, 1, 0));
+                        buttons.Fixed(15, _drainButton);
                     }));
                     stack.Fixed(5, actions => actions.Row(buttons =>
                     {
-                        buttons.Weighted(1, _muteButton);
-                        buttons.Weighted(1, _scaleButton);
+                        buttons.Fixed(17, _muteButton, new Thickness(0, 0, 1, 0));
+                        buttons.Fixed(15, _scaleButton);
                     }));
                     stack.Fixed(5, actions => actions.Row(buttons =>
                     {
-                        buttons.Weighted(1, _inspectButton);
-                        buttons.Weighted(1, _failoverButton);
+                        buttons.Fixed(17, _inspectButton, new Thickness(0, 0, 1, 0));
+                        buttons.Fixed(15, _failoverButton);
                     }));
                     stack.Fixed(5, _ackButton);
                     stack.Fill(_runbook);

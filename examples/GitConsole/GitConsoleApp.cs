@@ -307,11 +307,16 @@ internal sealed partial class GitConsoleApp : TeaApp
         foreach (var button in new[] { _stageButton, _discardButton, _modeButton, _commitButton, _syncButton })
         {
             button.LabelStyle = _theme.Text.Primary.WithBold();
-            button.FocusedLabelStyle = _theme.Accent.Primary.WithBold();
+            button.FocusedLabelStyle = _theme.Text.Primary.WithBold();
             button.DisabledLabelStyle = _theme.Text.Muted;
+            button.PressedLabelStyle = _theme.Text.Primary.WithBold();
+            button.SurfaceStyle = _theme.Surface.Overlay;
+            button.FocusedSurfaceStyle = _theme.Surface.Overlay;
+            button.PressedSurfaceStyle = _theme.Selection.Background;
             button.BorderStyleText = buttonBorder;
             button.FocusedBorderStyleText = buttonFocus;
-            button.PressedLabelStyle = _theme.Selection.Foreground.Merge(_theme.Selection.Background).WithBold();
+            button.LabelPrefix = string.Empty;
+            button.LabelSuffix = string.Empty;
         }
     }
 

@@ -292,11 +292,11 @@ internal sealed partial class DataWorkbenchApp
         ConfigureInspector(_output, theme, palette);
         ConfigureInspector(_savedViews, theme, palette);
 
-        ConfigureAction(_runButton, DataWorkbenchTheme.Chip(palette.HeroBadgeForeground, palette.HighlightA));
-        ConfigureAction(_pinButton, DataWorkbenchTheme.Chip(palette.HeroBadgeForeground, palette.HighlightB));
-        ConfigureAction(_saveButton, DataWorkbenchTheme.Chip(palette.HeroBadgeForeground, palette.HighlightC));
-        ConfigureAction(_exportButton, DataWorkbenchTheme.Chip(palette.HeroBadgeForeground, palette.StatTertiary));
-        ConfigureAction(_clearButton, DataWorkbenchTheme.Chip(palette.HeroBadgeForeground, palette.FrameStrong));
+        ConfigureAction(_runButton, palette.HeroBadgeForeground, palette.HighlightA);
+        ConfigureAction(_pinButton, palette.HeroBadgeForeground, palette.HighlightB);
+        ConfigureAction(_saveButton, palette.HeroBadgeForeground, palette.HighlightC);
+        ConfigureAction(_exportButton, palette.HeroBadgeForeground, palette.StatTertiary);
+        ConfigureAction(_clearButton, palette.HeroBadgeForeground, palette.FrameStrong);
         ConfigureThemeButton(_citrineButton, DataWorkbenchThemeKind.Citrine);
         ConfigureThemeButton(_cobaltButton, DataWorkbenchThemeKind.Cobalt);
         ConfigureThemeButton(_emberButton, DataWorkbenchThemeKind.Ember);
@@ -347,26 +347,44 @@ internal sealed partial class DataWorkbenchApp
         }
     }
 
-    private void ConfigureAction(Button button, TeaStyle labelStyle)
+    private void ConfigureAction(Button button, int foregroundRgb, int backgroundRgb)
     {
+        var labelStyle = DataWorkbenchTheme.Foreground(foregroundRgb).WithBold();
+        var surfaceStyle = DataWorkbenchTheme.Background(backgroundRgb);
         button.LabelStyle = labelStyle.WithBold();
         button.FocusedLabelStyle = labelStyle.WithBold();
+        button.PressedLabelStyle = labelStyle.WithBold();
+        button.SurfaceStyle = surfaceStyle;
+        button.FocusedSurfaceStyle = surfaceStyle;
+        button.PressedSurfaceStyle = surfaceStyle;
         button.BorderStyleText = DataWorkbenchTheme.Foreground(_palette.FrameStrong);
         button.FocusedBorderStyleText = _palette.Theme.Focus.Border;
+        button.LabelPrefix = string.Empty;
+        button.LabelSuffix = string.Empty;
     }
 
     private void ConfigureThemeButton(Button button, DataWorkbenchThemeKind kind)
     {
         var isSelected = _palette.Kind == kind;
         button.LabelStyle = isSelected
-            ? DataWorkbenchTheme.Chip(_palette.HeroBadgeForeground, _palette.HeroBadgeBackground)
+            ? DataWorkbenchTheme.Foreground(_palette.HeroBadgeForeground).WithBold()
             : _palette.Theme.Text.Secondary.WithBold();
         button.FocusedLabelStyle = isSelected
-            ? DataWorkbenchTheme.Chip(_palette.HeroBadgeForeground, _palette.FooterChipBackground)
-            : _palette.Theme.Focus.Title;
+            ? DataWorkbenchTheme.Foreground(_palette.HeroBadgeForeground).WithBold()
+            : _palette.Theme.Text.Secondary.WithBold();
+        button.PressedLabelStyle = button.LabelStyle;
+        button.SurfaceStyle = isSelected
+            ? DataWorkbenchTheme.Background(_palette.HeroBadgeBackground)
+            : _palette.Theme.Surface.Overlay;
+        button.FocusedSurfaceStyle = button.SurfaceStyle;
+        button.PressedSurfaceStyle = isSelected
+            ? DataWorkbenchTheme.Background(_palette.FooterChipBackground)
+            : _palette.Theme.Selection.Background;
         button.BorderStyleText = isSelected
             ? DataWorkbenchTheme.Foreground(_palette.FrameStrong).WithBold()
             : DataWorkbenchTheme.Foreground(_palette.FrameMuted);
         button.FocusedBorderStyleText = _palette.Theme.Focus.Border;
+        button.LabelPrefix = string.Empty;
+        button.LabelSuffix = string.Empty;
     }
 }
