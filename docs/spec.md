@@ -226,9 +226,3 @@ Out of scope for V1:
 - image rendering
 - advanced native image modes
 - anything that requires turning TeaSharp into a host-framework-first product
-Buttons use a single-shell box model:
-- one outer border shell
-- one uniform body fill
-- centered label inside fixed inner padding
-- label styling is text-only
-- focus should read through border/ring first, with optional subtle body tint

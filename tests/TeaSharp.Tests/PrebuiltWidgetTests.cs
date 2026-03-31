@@ -21,6 +21,7 @@ internal static class PrebuiltWidgetTests
         yield return new TestCase("Controls_Button_MouseClickOnPadding_ActivatesWithinButtonBox", Button_MouseClickOnPadding_ActivatesWithinButtonBox);
         yield return new TestCase("Controls_Button_LabelChrome_CanBeRemoved", Button_LabelChrome_CanBeRemoved);
         yield return new TestCase("Controls_Button_SurfaceStyle_FillsPaddedInterior", Button_SurfaceStyle_FillsPaddedInterior);
+        yield return new TestCase("Controls_Button_LabelStyles_DoNotCreateNestedBackgroundChrome", Button_LabelStyles_DoNotCreateNestedBackgroundChrome);
         yield return new TestCase("Controls_TextInput_SubmitsValue", TextInput_SubmitsValue);
         yield return new TestCase("Controls_TextInput_Events_ReportSubmitAndCancelValues", TextInput_Events_ReportSubmitAndCancelValues);
         yield return new TestCase("Controls_TextInput_TryConsumeSubmissionAndCancellation_AreSingleUse", TextInput_TryConsumeSubmissionAndCancellation_AreSingleUse);
@@ -314,6 +315,36 @@ internal static class PrebuiltWidgetTests
         var output = canvas.Render();
 
         TestAssert.True(output.Contains(surfaceStyle.Render(new string(' ', 14)), StringComparison.Ordinal), "Button surface style should paint the whole inner box, including padding, not only the label row.");
+        return Task.CompletedTask;
+    }
+
+    private static Task Button_LabelStyles_DoNotCreateNestedBackgroundChrome()
+    {
+        var labelStyle = TeaStyle.Empty
+            .WithForeground(AnsiColor.Rgb(230, 220, 210))
+            .WithBackground(AnsiColor.Rgb(90, 40, 40))
+            .WithBold();
+        var expectedLabelStyle = TeaStyle.Empty
+            .WithForeground(AnsiColor.Rgb(230, 220, 210))
+            .WithBold();
+        var surfaceStyle = TeaStyle.Empty.WithBackground(AnsiColor.Rgb(30, 20, 20));
+        var button = new Button
+        {
+            Text = "Play",
+            LabelPrefix = string.Empty,
+            LabelSuffix = string.Empty,
+            Border = BorderStyle.Rounded,
+            Padding = Thickness.Symmetric(2, 1),
+            LabelStyle = labelStyle,
+            SurfaceStyle = surfaceStyle,
+        };
+        var canvas = new Canvas(18, 5, CanvasTextMode.GraphemeAware);
+
+        button.Render(canvas, new Rect(0, 0, 18, 5));
+        var output = canvas.Render();
+
+        TestAssert.True(output.Contains(expectedLabelStyle.Render("Play"), StringComparison.Ordinal), "Button label should keep text styling.");
+        TestAssert.True(!output.Contains(labelStyle.Render("Play"), StringComparison.Ordinal), "Button label should ignore nested background chrome from label styles.");
         return Task.CompletedTask;
     }
 

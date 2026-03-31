@@ -84,6 +84,7 @@ public sealed class Button : Control
 
     /// <summary>
     /// Gets or sets the base style applied to the button label.
+    /// Background-like facets are ignored so the button body remains a single surface.
     /// </summary>
     public TeaStyle LabelStyle
     {
@@ -93,6 +94,7 @@ public sealed class Button : Control
 
     /// <summary>
     /// Gets or sets the style merged into the label style when the button is focused.
+    /// Background-like facets are ignored so focus remains shell-led instead of creating an inner chip.
     /// </summary>
     public TeaStyle FocusedLabelStyle
     {
@@ -102,6 +104,7 @@ public sealed class Button : Control
 
     /// <summary>
     /// Gets or sets the style merged into the label style when the button is disabled.
+    /// Background-like facets are ignored so the button body remains a single surface.
     /// </summary>
     public TeaStyle DisabledLabelStyle
     {
@@ -111,6 +114,7 @@ public sealed class Button : Control
 
     /// <summary>
     /// Gets or sets the style merged into the label style when the button is pressed.
+    /// Background-like facets are ignored so pressed state stays surface-led.
     /// </summary>
     public TeaStyle PressedLabelStyle
     {
@@ -349,20 +353,20 @@ public sealed class Button : Control
 
     private string ApplyLabelStyle(string label)
     {
-        var style = LabelStyle;
+        var style = SanitizeLabelStyle(LabelStyle);
         if (IsFocused)
         {
-            style = style.Merge(FocusedLabelStyle);
+            style = style.Merge(SanitizeLabelStyle(FocusedLabelStyle));
         }
 
         if (IsDisabled)
         {
-            style = style.Merge(DisabledLabelStyle);
+            style = style.Merge(SanitizeLabelStyle(DisabledLabelStyle));
         }
 
         if (_pressed)
         {
-            style = style.Merge(PressedLabelStyle);
+            style = style.Merge(SanitizeLabelStyle(PressedLabelStyle));
         }
 
         if (style.IsEmpty)
@@ -438,5 +442,22 @@ public sealed class Button : Control
         }
 
         return style;
+    }
+
+    private static TeaStyle SanitizeLabelStyle(TeaStyle style)
+    {
+        if (style.IsEmpty)
+        {
+            return style;
+        }
+
+        return style with
+        {
+            Background = null,
+            Inverse = null,
+            Framed = null,
+            Encircled = null,
+            Conceal = null,
+        };
     }
 }
