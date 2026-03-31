@@ -18,6 +18,8 @@ internal static class PrebuiltWidgetTests
         yield return new TestCase("Controls_Button_TryConsumeActivation_IsSingleUse", Button_TryConsumeActivation_IsSingleUse);
         yield return new TestCase("Controls_Button_RendersBorderedState", Button_RendersBorderedState);
         yield return new TestCase("Controls_Button_FocusedBorderStyleText_StylesFrameGlyphs", Button_FocusedBorderStyleText_StylesFrameGlyphs);
+        yield return new TestCase("Controls_Button_LabelChrome_CanBeRemoved", Button_LabelChrome_CanBeRemoved);
+        yield return new TestCase("Controls_Button_SurfaceStyle_FillsPaddedInterior", Button_SurfaceStyle_FillsPaddedInterior);
         yield return new TestCase("Controls_TextInput_SubmitsValue", TextInput_SubmitsValue);
         yield return new TestCase("Controls_TextInput_Events_ReportSubmitAndCancelValues", TextInput_Events_ReportSubmitAndCancelValues);
         yield return new TestCase("Controls_TextInput_TryConsumeSubmissionAndCancellation_AreSingleUse", TextInput_TryConsumeSubmissionAndCancellation_AreSingleUse);
@@ -252,6 +254,46 @@ internal static class PrebuiltWidgetTests
         var output = canvas.Render();
 
         TestAssert.True(output.Contains(focusedBorderStyle.Render("┌"), StringComparison.Ordinal), "Button should style focused border glyphs.");
+        return Task.CompletedTask;
+    }
+
+    private static Task Button_LabelChrome_CanBeRemoved()
+    {
+        var button = new Button
+        {
+            Text = "Play",
+            LabelPrefix = string.Empty,
+            LabelSuffix = string.Empty,
+            Border = BorderStyle.Rounded,
+            Padding = Thickness.Symmetric(2, 1),
+        };
+        var canvas = new Canvas(18, 5, CanvasTextMode.GraphemeAware);
+
+        button.Render(canvas, new Rect(0, 0, 18, 5));
+        var output = canvas.Render();
+
+        TestAssert.True(output.Contains("Play", StringComparison.Ordinal), "Button should render plain label text when label chrome is disabled.");
+        TestAssert.True(!output.Contains("[Play]", StringComparison.Ordinal), "Button should not force bracket chrome when prefix and suffix are empty.");
+        TestAssert.True(output.Contains("╭", StringComparison.Ordinal), "Rounded button should render rounded shell glyphs.");
+        return Task.CompletedTask;
+    }
+
+    private static Task Button_SurfaceStyle_FillsPaddedInterior()
+    {
+        var surfaceStyle = TeaStyle.Empty.WithBackground(AnsiColor.Rgb(40, 30, 20));
+        var button = new Button
+        {
+            Text = "Go",
+            Border = BorderStyle.Rounded,
+            Padding = Thickness.Symmetric(2, 1),
+            SurfaceStyle = surfaceStyle,
+        };
+        var canvas = new Canvas(16, 5, CanvasTextMode.GraphemeAware);
+
+        button.Render(canvas, new Rect(0, 0, 16, 5));
+        var output = canvas.Render();
+
+        TestAssert.True(output.Contains(surfaceStyle.Render("   "), StringComparison.Ordinal), "Button surface style should paint padded body area, not only label text.");
         return Task.CompletedTask;
     }
 

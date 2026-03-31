@@ -15,9 +15,12 @@ public static partial class TeaThemeControlExtensions
         control.LabelStyle = ApplyDefault(control.LabelStyle, theme.Text.Primary);
         control.FocusedLabelStyle = ApplyDefault(control.FocusedLabelStyle, theme.Focus.Ring);
         control.DisabledLabelStyle = ApplyDefault(control.DisabledLabelStyle, theme.Text.Muted);
+        control.SurfaceStyle = ApplyDefault(control.SurfaceStyle, theme.Surface.Panel);
+        control.FocusedSurfaceStyle = ApplyDefault(control.FocusedSurfaceStyle, theme.Surface.Panel.Merge(theme.Focus.Border));
         control.PressedLabelStyle = ApplyDefault(
             control.PressedLabelStyle,
             theme.Selection.Foreground.Merge(theme.Selection.Background));
+        control.PressedSurfaceStyle = ApplyDefault(control.PressedSurfaceStyle, theme.Selection.Background);
         control.BorderStyleText = ApplyDefault(control.BorderStyleText, theme.Border.Default);
         control.FocusedBorderStyleText = ApplyDefault(control.FocusedBorderStyleText, theme.Border.Focused.Merge(theme.Focus.Border));
         return control;
@@ -48,7 +51,10 @@ public static partial class TeaThemeControlExtensions
         control.LabelStyle = theme.Text.Primary;
         control.FocusedLabelStyle = theme.Focus.Ring;
         control.DisabledLabelStyle = theme.Text.Muted;
+        control.SurfaceStyle = theme.Surface.Panel;
+        control.FocusedSurfaceStyle = theme.Surface.Panel.Merge(theme.Focus.Border);
         control.PressedLabelStyle = theme.Selection.Foreground.Merge(theme.Selection.Background);
+        control.PressedSurfaceStyle = theme.Selection.Background;
         control.BorderStyleText = theme.Border.Default;
         control.FocusedBorderStyleText = theme.Border.Focused.Merge(theme.Focus.Border);
         return control;

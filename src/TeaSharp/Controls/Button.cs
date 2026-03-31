@@ -36,6 +36,26 @@ public sealed class Button : Control
     } = string.Empty;
 
     /// <summary>
+    /// Gets or sets text rendered before <see cref="Text"/> inside the button label.
+    /// Set to an empty string to remove the default leading bracket chrome.
+    /// </summary>
+    public string LabelPrefix
+    {
+        get;
+        set => field = value ?? string.Empty;
+    } = "[";
+
+    /// <summary>
+    /// Gets or sets text rendered after <see cref="Text"/> inside the button label.
+    /// Set to an empty string to remove the default trailing bracket chrome.
+    /// </summary>
+    public string LabelSuffix
+    {
+        get;
+        set => field = value ?? string.Empty;
+    } = "]";
+
+    /// <summary>
     /// Gets or sets the optional secondary description shown with the button.
     /// </summary>
     public string? Description
@@ -97,6 +117,33 @@ public sealed class Button : Control
         get;
         set;
     } = TeaStyle.Empty.WithInverse().WithBold();
+
+    /// <summary>
+    /// Gets or sets the style applied to the button body across the padded content area.
+    /// </summary>
+    public TeaStyle SurfaceStyle
+    {
+        get;
+        set;
+    } = TeaStyle.Empty;
+
+    /// <summary>
+    /// Gets or sets the style merged into <see cref="SurfaceStyle"/> while the button is focused.
+    /// </summary>
+    public TeaStyle FocusedSurfaceStyle
+    {
+        get;
+        set;
+    } = TeaStyle.Empty;
+
+    /// <summary>
+    /// Gets or sets the style merged into <see cref="SurfaceStyle"/> while the button is pressed.
+    /// </summary>
+    public TeaStyle PressedSurfaceStyle
+    {
+        get;
+        set;
+    } = TeaStyle.Empty;
 
     /// <summary>
     /// Gets or sets the style applied to border glyphs when the control is not focused.
@@ -231,7 +278,9 @@ public sealed class Button : Control
             return;
         }
 
-        var label = $"[{Text}]";
+        FillSurface(canvas, content);
+
+        var label = $"{LabelPrefix}{Text}{LabelSuffix}";
         if (IsDisabled)
         {
             label += " (disabled)";
@@ -249,7 +298,7 @@ public sealed class Button : Control
 
     internal override LayoutMeasurement Measure(in Rect availableBounds)
     {
-        var width = ControlTextLayout.MeasureDisplayWidth($"[{Text}]") + Padding.Horizontal;
+        var width = ControlTextLayout.MeasureDisplayWidth($"{LabelPrefix}{Text}{LabelSuffix}") + Padding.Horizontal;
         var height = Padding.Vertical + (string.IsNullOrWhiteSpace(Description) ? 1 : 2);
         if (IsDisabled)
         {
@@ -323,6 +372,21 @@ public sealed class Button : Control
         return style.Render(label);
     }
 
+    private void FillSurface(Canvas canvas, Rect content)
+    {
+        var style = ResolveSurfaceStyle();
+        if (style.IsEmpty)
+        {
+            return;
+        }
+
+        var fill = style.Render(new string(' ', Math.Max(0, content.Width)));
+        for (var y = content.Y; y < content.Bottom; y++)
+        {
+            canvas.WriteText(content.X, y, fill, content.Width);
+        }
+    }
+
     private static void WriteCenteredLabel(Canvas canvas, Rect content, int y, string plainLabel, string renderedLabel)
     {
         if (y < content.Y || y > content.Bottom)
@@ -354,6 +418,22 @@ public sealed class Button : Control
         if (IsDisabled)
         {
             style = style.Merge(DisabledLabelStyle);
+        }
+
+        return style;
+    }
+
+    private TeaStyle ResolveSurfaceStyle()
+    {
+        var style = SurfaceStyle;
+        if (IsFocused)
+        {
+            style = style.Merge(FocusedSurfaceStyle);
+        }
+
+        if (_pressed)
+        {
+            style = style.Merge(PressedSurfaceStyle);
         }
 
         return style;

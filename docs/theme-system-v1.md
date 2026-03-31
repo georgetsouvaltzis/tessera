@@ -184,6 +184,10 @@ var button = new Button
 {
     LabelStyle = TeaStyle.Empty.WithForeground(AnsiColor.BrightWhite),
     FocusedLabelStyle = TeaStyle.Empty.WithBold().WithForeground(AnsiColor.BrightYellow),
+    LabelPrefix = string.Empty,
+    LabelSuffix = string.Empty,
+    SurfaceStyle = TeaStyle.Empty.WithBackground(AnsiColor.Rgb(36, 24, 30)),
+    FocusedSurfaceStyle = TeaStyle.Empty.WithBackground(AnsiColor.Rgb(255, 184, 108)).WithForeground(AnsiColor.Rgb(24, 16, 18)),
 };
 
 var list = new ListView<string>()
@@ -556,6 +560,7 @@ Basic mapping coverage includes:
 
 - `Label`, `Button`, `ListView<T>`, `StatusBar`, `TextInput`, `Table`, `Tabs`
 - `Label` and `Button` map `BorderStyleText` -> `theme.Border.Default` and `FocusedBorderStyleText` -> `theme.Border.Focused.Merge(theme.Focus.Border)`
+- `Button` also maps `SurfaceStyle` -> `theme.Surface.Panel`, `FocusedSurfaceStyle` -> `theme.Surface.Panel.Merge(theme.Focus.Border)`, and `PressedSurfaceStyle` -> `theme.Selection.Background`
 - `Table` maps `BorderStyleText` -> `theme.Border.Default` and `FocusedBorderStyleText` -> `theme.Border.Focused.Merge(theme.Focus.Border)`
 
 Navigation mapping coverage includes:

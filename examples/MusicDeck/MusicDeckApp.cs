@@ -222,8 +222,13 @@ internal sealed partial class MusicDeckApp : TeaApp
     {
         button.LabelStyle = labelStyle.WithBold();
         button.FocusedLabelStyle = MusicDeckTheme.Chip(0x1B1010, 0xF3C77A);
+        button.SurfaceStyle = MusicDeckTheme.ForegroundBackground(0xFFF4DE, 0x2A1820);
+        button.FocusedSurfaceStyle = MusicDeckTheme.ForegroundBackground(0x1B1010, 0xF3C77A);
+        button.PressedSurfaceStyle = MusicDeckTheme.ForegroundBackground(0x1B1010, 0xF1B577);
         button.BorderStyleText = MusicDeckTheme.Foreground(0x6C4454);
         button.FocusedBorderStyleText = MusicDeckTheme.Foreground(0xF3C77A).WithBold();
+        button.LabelPrefix = string.Empty;
+        button.LabelSuffix = string.Empty;
     }
 
     private static void ConfigureCard(StatsCard card, TeaStyle valueStyle)

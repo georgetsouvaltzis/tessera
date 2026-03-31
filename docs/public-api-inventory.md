@@ -396,6 +396,8 @@ The first root controls that already own their implementation directly are:
 
 - `Label`
 - `Button`
+  - label chrome can be customized with `LabelPrefix` and `LabelSuffix`
+  - padded button body can be styled via `SurfaceStyle`, `FocusedSurfaceStyle`, and `PressedSurfaceStyle`
 - `TextInput`
 - `TextArea`
 - `Breadcrumb`
