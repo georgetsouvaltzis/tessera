@@ -198,7 +198,7 @@ internal sealed partial class MusicDeckApp : TeaApp
         _progress.LabelStyle = theme.Text.Secondary.WithBold();
 
         ConfigureButton(_backButton, MusicDeckTheme.Foreground(0xFFF4DE).WithBold(), MusicDeckTheme.Foreground(0x1B1010).WithBold());
-        ConfigureButton(_playPauseButton, MusicDeckTheme.Foreground(0x1B1010).WithBold(), MusicDeckTheme.Foreground(0x1B1010).WithBold());
+        ConfigureButton(_playPauseButton, MusicDeckTheme.Foreground(0xFFF4DE).WithBold(), MusicDeckTheme.Foreground(0x1B1010).WithBold());
         ConfigureButton(_nextButton, MusicDeckTheme.Foreground(0xFFF4DE).WithBold(), MusicDeckTheme.Foreground(0x1B1010).WithBold());
         ConfigureButton(_detailButton, MusicDeckTheme.Foreground(0xFFF4DE).WithBold(), MusicDeckTheme.Foreground(0x1B1010).WithBold());
 
