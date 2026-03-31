@@ -168,6 +168,9 @@ public static class TeaThemeOverrideBundleExtensions
         control.LabelStyle = bundle.ActionLabelStyle;
         control.FocusedLabelStyle = bundle.FocusedActionLabelStyle;
         control.PressedLabelStyle = bundle.PressedActionLabelStyle;
+        control.SurfaceStyle = bundle.ActionSurfaceStyle;
+        control.FocusedSurfaceStyle = bundle.FocusedActionSurfaceStyle;
+        control.PressedSurfaceStyle = bundle.PressedActionSurfaceStyle;
         return control;
     }
 

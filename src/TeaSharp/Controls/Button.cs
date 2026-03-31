@@ -303,12 +303,17 @@ public sealed class Button : Control
 
     internal override LayoutMeasurement Measure(in Rect availableBounds)
     {
-        var width = ControlTextLayout.MeasureDisplayWidth($"{LabelPrefix}{Text}{LabelSuffix}") + Padding.Horizontal;
+        var labelWidth = ControlTextLayout.MeasureDisplayWidth($"{LabelPrefix}{Text}{LabelSuffix}");
         var height = Padding.Vertical + (string.IsNullOrWhiteSpace(Description) ? 1 : 2);
         if (IsDisabled)
         {
-            width += ControlTextLayout.MeasureDisplayWidth(" (disabled)");
+            labelWidth += ControlTextLayout.MeasureDisplayWidth(" (disabled)");
         }
+
+        var descriptionWidth = string.IsNullOrWhiteSpace(Description)
+            ? 0
+            : ControlTextLayout.MeasureDisplayWidth(Description);
+        var width = Math.Max(labelWidth, descriptionWidth) + Padding.Horizontal;
 
         if (Border != BorderStyle.None)
         {
@@ -418,11 +423,6 @@ public sealed class Button : Control
         if (IsFocused)
         {
             style = style.Merge(FocusedBorderStyleText);
-        }
-
-        if (IsDisabled)
-        {
-            style = style.Merge(DisabledLabelStyle);
         }
 
         return style;

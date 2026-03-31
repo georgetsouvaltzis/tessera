@@ -12,15 +12,16 @@ public static partial class TeaThemeControlExtensions
         ArgumentNullException.ThrowIfNull(control);
         ArgumentNullException.ThrowIfNull(theme);
 
+        var buttonSurface = ResolveButtonSurface(theme);
         control.LabelStyle = ApplyDefault(control.LabelStyle, theme.Text.Primary);
-        control.FocusedLabelStyle = ApplyDefault(control.FocusedLabelStyle, theme.Focus.Ring);
+        control.FocusedLabelStyle = ApplyDefault(control.FocusedLabelStyle, theme.Text.Primary.WithBold());
         control.DisabledLabelStyle = ApplyDefault(control.DisabledLabelStyle, theme.Text.Muted);
-        control.SurfaceStyle = ApplyDefault(control.SurfaceStyle, theme.Surface.Panel);
-        control.FocusedSurfaceStyle = ApplyDefault(control.FocusedSurfaceStyle, theme.Surface.Panel.Merge(theme.Focus.Border));
+        control.SurfaceStyle = ApplyDefault(control.SurfaceStyle, buttonSurface);
+        control.FocusedSurfaceStyle = ApplyDefault(control.FocusedSurfaceStyle, buttonSurface);
         control.PressedLabelStyle = ApplyDefault(
             control.PressedLabelStyle,
-            theme.Selection.Foreground.Merge(theme.Selection.Background));
-        control.PressedSurfaceStyle = ApplyDefault(control.PressedSurfaceStyle, theme.Selection.Background);
+            theme.Text.Primary.WithBold());
+        control.PressedSurfaceStyle = ApplyDefault(control.PressedSurfaceStyle, ResolvePressedButtonSurface(theme, buttonSurface));
         control.BorderStyleText = ApplyDefault(control.BorderStyleText, theme.Border.Default);
         control.FocusedBorderStyleText = ApplyDefault(control.FocusedBorderStyleText, theme.Border.Focused.Merge(theme.Focus.Border));
         return control;
@@ -48,16 +49,31 @@ public static partial class TeaThemeControlExtensions
         ArgumentNullException.ThrowIfNull(control);
         ArgumentNullException.ThrowIfNull(theme);
 
+        var buttonSurface = ResolveButtonSurface(theme);
         control.LabelStyle = theme.Text.Primary;
-        control.FocusedLabelStyle = theme.Focus.Ring;
+        control.FocusedLabelStyle = theme.Text.Primary.WithBold();
         control.DisabledLabelStyle = theme.Text.Muted;
-        control.SurfaceStyle = theme.Surface.Panel;
-        control.FocusedSurfaceStyle = theme.Surface.Panel.Merge(theme.Focus.Border);
-        control.PressedLabelStyle = theme.Selection.Foreground.Merge(theme.Selection.Background);
-        control.PressedSurfaceStyle = theme.Selection.Background;
+        control.SurfaceStyle = buttonSurface;
+        control.FocusedSurfaceStyle = buttonSurface;
+        control.PressedLabelStyle = theme.Text.Primary.WithBold();
+        control.PressedSurfaceStyle = ResolvePressedButtonSurface(theme, buttonSurface);
         control.BorderStyleText = theme.Border.Default;
         control.FocusedBorderStyleText = theme.Border.Focused.Merge(theme.Focus.Border);
         return control;
+    }
+
+    private static TeaStyle ResolveButtonSurface(TeaTheme theme)
+    {
+        return theme.Surface.Overlay.IsEmpty
+            ? theme.Surface.Panel
+            : theme.Surface.Overlay;
+    }
+
+    private static TeaStyle ResolvePressedButtonSurface(TeaTheme theme, TeaStyle fallback)
+    {
+        return theme.Selection.Background.IsEmpty
+            ? fallback
+            : theme.Selection.Background;
     }
 
     /// <summary>

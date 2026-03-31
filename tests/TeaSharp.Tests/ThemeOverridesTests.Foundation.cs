@@ -87,15 +87,15 @@ internal static partial class ThemeOverridesTests
         var statusBar = new StatusBar().ApplyTheme(theme);
 
         TestAssert.Equal(theme.Text.Primary, button.LabelStyle, "Button label style should map to Text.Primary.");
-        TestAssert.Equal(theme.Focus.Ring, button.FocusedLabelStyle, "Button focused style should map to Focus.Ring.");
+        TestAssert.Equal(theme.Text.Primary.WithBold(), button.FocusedLabelStyle, "Button focused label style should stay text-only.");
         TestAssert.Equal(theme.Text.Muted, button.DisabledLabelStyle, "Button disabled style should map to Text.Muted.");
-        TestAssert.Equal(theme.Surface.Panel, button.SurfaceStyle, "Button surface style should map to Surface.Panel.");
-        TestAssert.Equal(theme.Surface.Panel.Merge(theme.Focus.Border), button.FocusedSurfaceStyle, "Button focused surface style should map to focused surface tokens.");
+        TestAssert.Equal(theme.Surface.Panel, button.SurfaceStyle, "Button surface style should map to the resolved button surface.");
+        TestAssert.Equal(theme.Surface.Panel, button.FocusedSurfaceStyle, "Button focused surface style should keep the resolved button surface.");
         TestAssert.Equal(
-            theme.Selection.Foreground.Merge(theme.Selection.Background),
+            theme.Text.Primary.WithBold(),
             button.PressedLabelStyle,
-            "Button pressed style should map to merged Selection styles.");
-        TestAssert.Equal(theme.Selection.Background, button.PressedSurfaceStyle, "Button pressed surface style should map to Selection.Background.");
+            "Button pressed label style should stay text-only.");
+        TestAssert.Equal(theme.Selection.Background, button.PressedSurfaceStyle, "Button pressed surface style should use the pressed selection surface.");
         TestAssert.Equal(theme.Border.Default, button.BorderStyleText, "Button border style should map to Border.Default.");
         TestAssert.Equal(theme.Border.Focused.Merge(theme.Focus.Border), button.FocusedBorderStyleText, "Button focused border style should map to focused border tokens.");
 

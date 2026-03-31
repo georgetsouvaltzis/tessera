@@ -84,6 +84,9 @@ public sealed class ThemeOverrideBundleApiErgonomicsTests
         Assert.That(button.LabelStyle, Is.EqualTo(bundle.ActionLabelStyle));
         Assert.That(button.FocusedLabelStyle, Is.EqualTo(bundle.FocusedActionLabelStyle));
         Assert.That(button.PressedLabelStyle, Is.EqualTo(bundle.PressedActionLabelStyle));
+        Assert.That(button.SurfaceStyle, Is.EqualTo(bundle.ActionSurfaceStyle));
+        Assert.That(button.FocusedSurfaceStyle, Is.EqualTo(bundle.FocusedActionSurfaceStyle));
+        Assert.That(button.PressedSurfaceStyle, Is.EqualTo(bundle.PressedActionSurfaceStyle));
 
         Assert.That(dialog.FocusMarker, Is.EqualTo(bundle.FocusMarker));
         Assert.That(dialog.BorderStyleText, Is.EqualTo(bundle.BorderStyleText));

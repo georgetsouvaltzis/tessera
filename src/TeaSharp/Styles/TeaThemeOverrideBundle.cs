@@ -26,8 +26,11 @@ public sealed class TeaThemeOverrideBundle
         HoveredItemStyle = theme.Accent.Secondary.WithUnderline();
         UnreadItemStyle = theme.Text.Primary.WithBold();
         ActionLabelStyle = theme.Text.Primary.WithBold();
-        FocusedActionLabelStyle = theme.Accent.Primary.WithBold();
-        PressedActionLabelStyle = selected.WithBold();
+        FocusedActionLabelStyle = theme.Text.Primary.WithBold();
+        PressedActionLabelStyle = theme.Selection.Foreground.WithBold();
+        ActionSurfaceStyle = theme.Surface.Overlay.IsEmpty ? theme.Surface.Panel : theme.Surface.Overlay;
+        FocusedActionSurfaceStyle = ActionSurfaceStyle;
+        PressedActionSurfaceStyle = theme.Selection.Background.IsEmpty ? ActionSurfaceStyle : theme.Selection.Background;
         BodyTextStyle = theme.Text.Primary;
         EntryTextStyle = theme.Text.Secondary;
     }
@@ -101,6 +104,21 @@ public sealed class TeaThemeOverrideBundle
     /// Gets the pressed action label style override for action controls.
     /// </summary>
     public TeaStyle PressedActionLabelStyle { get; }
+
+    /// <summary>
+    /// Gets the default action body surface override for action controls.
+    /// </summary>
+    public TeaStyle ActionSurfaceStyle { get; }
+
+    /// <summary>
+    /// Gets the focused action body surface override for action controls.
+    /// </summary>
+    public TeaStyle FocusedActionSurfaceStyle { get; }
+
+    /// <summary>
+    /// Gets the pressed action body surface override for action controls.
+    /// </summary>
+    public TeaStyle PressedActionSurfaceStyle { get; }
 
     /// <summary>
     /// Gets the default body text style override.

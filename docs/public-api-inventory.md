@@ -401,6 +401,7 @@ The first root controls that already own their implementation directly are:
   - label styles are text-only; body/background semantics belong to button surface styles
   - surface styling is expected to cover the whole inner button box, including padding, not only the post-padding content rect
   - rounded buttons are expected to read as one coherent pill/button surface with centered content, not nested visual layers
+  - measurement must account for the widest rendered line across label and description
 - `TextInput`
 - `TextArea`
 - `Breadcrumb`

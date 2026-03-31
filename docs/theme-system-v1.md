@@ -198,6 +198,7 @@ Use `SurfaceStyle` / `FocusedSurfaceStyle` / `PressedSurfaceStyle` for button-bo
 Background-like label facets are ignored so rounded pills stay a single shell with a single body.
 For pill/button-style controls, prefer a single coherent body surface plus border-led focus treatment.
 Avoid layering a second chip-like background behind the label, because it breaks the intended box-model read and makes padding visually disappear.
+Default button focus should come primarily from the shell/ring treatment; body fill should remain stable unless an app explicitly opts into a stronger pressed/focused tint.
 
 var list = new ListView<string>()
 {

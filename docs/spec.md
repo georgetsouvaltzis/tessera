@@ -188,6 +188,7 @@ High-level rules:
   - centered content inside the padded rect
   - rounded-border buttons should read as a single pill/button surface, not nested chips or mini-cards
   - focus should be ring/border-led; surface tint may increase slightly, but focus must not create inner bands or competing layers
+  - label styling, body styling, and shell styling are separate domains and must not bleed into one another
 - `Selected*` is canonical naming
 - existing `Current*` members remain compatibility aliases only where already shipped
 - new bordered controls must ship border-style hooks, theme-token mapping, and regression coverage in the same slice

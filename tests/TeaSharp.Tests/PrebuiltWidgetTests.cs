@@ -22,6 +22,8 @@ internal static class PrebuiltWidgetTests
         yield return new TestCase("Controls_Button_LabelChrome_CanBeRemoved", Button_LabelChrome_CanBeRemoved);
         yield return new TestCase("Controls_Button_SurfaceStyle_FillsPaddedInterior", Button_SurfaceStyle_FillsPaddedInterior);
         yield return new TestCase("Controls_Button_LabelStyles_DoNotCreateNestedBackgroundChrome", Button_LabelStyles_DoNotCreateNestedBackgroundChrome);
+        yield return new TestCase("Controls_Button_Measure_UsesLongestLineAcrossLabelAndDescription", Button_Measure_UsesLongestLineAcrossLabelAndDescription);
+        yield return new TestCase("Controls_Button_DisabledBorder_DoesNotBorrowLabelStyle", Button_DisabledBorder_DoesNotBorrowLabelStyle);
         yield return new TestCase("Controls_TextInput_SubmitsValue", TextInput_SubmitsValue);
         yield return new TestCase("Controls_TextInput_Events_ReportSubmitAndCancelValues", TextInput_Events_ReportSubmitAndCancelValues);
         yield return new TestCase("Controls_TextInput_TryConsumeSubmissionAndCancellation_AreSingleUse", TextInput_TryConsumeSubmissionAndCancellation_AreSingleUse);
@@ -345,6 +347,43 @@ internal static class PrebuiltWidgetTests
 
         TestAssert.True(output.Contains(expectedLabelStyle.Render("Play"), StringComparison.Ordinal), "Button label should keep text styling.");
         TestAssert.True(!output.Contains(labelStyle.Render("Play"), StringComparison.Ordinal), "Button label should ignore nested background chrome from label styles.");
+        return Task.CompletedTask;
+    }
+
+    private static Task Button_Measure_UsesLongestLineAcrossLabelAndDescription()
+    {
+        var button = new Button
+        {
+            Text = "Go",
+            Description = "click or press enter",
+            Border = BorderStyle.Rounded,
+            Padding = Thickness.Symmetric(2, 1),
+        };
+
+        var measurement = button.Measure(new Rect(0, 0, 80, 10));
+        var expectedWidth = ControlTextLayout.MeasureDisplayWidth("click or press enter") + button.Padding.Horizontal + 2;
+
+        TestAssert.Equal(expectedWidth, measurement.Width, "Button measure should size to the widest rendered line.");
+        return Task.CompletedTask;
+    }
+
+    private static Task Button_DisabledBorder_DoesNotBorrowLabelStyle()
+    {
+        var button = new Button
+        {
+            Text = "Run",
+            IsDisabled = true,
+            Border = BorderStyle.SingleLine,
+            BorderStyleText = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(10, 20, 30)),
+            DisabledLabelStyle = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(200, 100, 50)).WithDim(),
+        };
+        var canvas = new Canvas(18, 5, CanvasTextMode.GraphemeAware);
+
+        button.Render(canvas, new Rect(0, 0, 18, 5));
+        var output = canvas.Render();
+
+        TestAssert.True(output.Contains(button.BorderStyleText.Render("┌"), StringComparison.Ordinal), "Disabled button should keep border-domain styling.");
+        TestAssert.True(!output.Contains(button.DisabledLabelStyle.Render("┌"), StringComparison.Ordinal), "Disabled label style should not leak into the border shell.");
         return Task.CompletedTask;
     }
 
