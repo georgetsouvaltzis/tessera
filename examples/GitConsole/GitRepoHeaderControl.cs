@@ -6,7 +6,7 @@ namespace TeaSharp.Examples.GitConsole;
 
 internal sealed class GitRepoHeaderControl : Control
 {
-    public string Title { get; set; } = "Repository";
+    public string Title { get; set; } = "Flight Deck";
     public string RepositoryName { get; set; } = "teasharp";
     public string RepositoryPath { get; set; } = string.Empty;
     public string BranchName { get; set; } = "main";
@@ -26,6 +26,8 @@ internal sealed class GitRepoHeaderControl : Control
     public TeaStyle PulseStyle { get; set; } = TeaStyle.Empty;
     public TeaStyle ActionStyle { get; set; } = TeaStyle.Empty;
     public TeaStyle DetailStyle { get; set; } = TeaStyle.Empty;
+    public TeaStyle MetaStyle { get; set; } = TeaStyle.Empty;
+    public TeaStyle HighlightStyle { get; set; } = TeaStyle.Empty;
 
     public override void Render(Canvas canvas, Rect rect)
     {
@@ -44,12 +46,46 @@ internal sealed class GitRepoHeaderControl : Control
             return;
         }
 
-        WriteLine(canvas, content, 0, $"{Render(NameStyle, RepositoryName)}  {Render(BranchStyle, BranchName)}  {Render(PulseStyle, PulseText)}");
-        WriteLine(canvas, content, 1, $"{Render(PathStyle, RepositoryPath)}  {Render(DetailStyle, $"{RemoteName} ⇅ +{Ahead}/-{Behind}")}");
-        WriteLine(canvas, content, 2, Render(ActionStyle, LastAction));
-        if (content.Height > 3)
+        if (content.Height >= 6 && content.Width >= 32)
         {
-            WriteLine(canvas, content, 3, Render(DetailStyle, LastActionDetail));
+            var summaryRect = new Rect(content.X, content.Y + 2, content.Width, Math.Min(4, content.Height - 2));
+            canvas.DrawBox(summaryRect, null, BorderStyle.Rounded, BorderStyleText);
+            var summaryContent = summaryRect.Inset(1, 1);
+
+            WriteLine(
+                canvas,
+                content,
+                0,
+                $"{Render(NameStyle, RepositoryName)}  {Render(BranchStyle, BranchName)}  {Render(PulseStyle, PulseText)}");
+            WriteLine(
+                canvas,
+                content,
+                1,
+                $"{Render(PathStyle, RepositoryPath)}  {Render(MetaStyle, $"{RemoteName}  ahead {Ahead:00}  behind {Behind:00}")}");
+            WriteLine(canvas, summaryContent, 0, $"{Render(HighlightStyle, "Last move")}  {Render(ActionStyle, LastAction)}");
+            if (summaryContent.Height > 1)
+            {
+                WriteLine(canvas, summaryContent, 1, Render(DetailStyle, LastActionDetail));
+            }
+            return;
+        }
+
+        WriteLine(
+            canvas,
+            content,
+            0,
+            $"{Render(NameStyle, RepositoryName)}  {Render(BranchStyle, BranchName)}  {Render(PulseStyle, PulseText)}");
+        if (content.Height > 1)
+        {
+            WriteLine(
+                canvas,
+                content,
+                1,
+                $"{Render(ActionStyle, LastAction)}  {Render(MetaStyle, $"{RemoteName} +{Ahead}/-{Behind}")}");
+        }
+        if (content.Height > 2)
+        {
+            WriteLine(canvas, content, 2, Render(DetailStyle, LastActionDetail));
         }
     }
 

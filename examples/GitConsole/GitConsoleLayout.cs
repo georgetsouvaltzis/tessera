@@ -9,7 +9,7 @@ internal sealed partial class GitConsoleApp
         if (context.Width < 110)
         {
             window.Header(
-                4,
+                8,
                 header => header.Row(row =>
                 {
                     row.Weighted(4, _repoHeader);
@@ -19,7 +19,7 @@ internal sealed partial class GitConsoleApp
         }
 
         window.Header(
-            5,
+            8,
             header => header.Row(row =>
             {
                 row.Weighted(3, _repoHeader);
@@ -43,11 +43,13 @@ internal sealed partial class GitConsoleApp
                 row.Fill(right => right.Column(column =>
                 {
                     column.Auto(_diffTabs);
+                    column.Auto(_diffBriefing);
                     column.Fixed(5, _diff);
                     column.Fill(bottom => bottom.Row(bottomRow =>
                     {
                         bottomRow.Fixed(26, commit => commit.Column(commitColumn =>
                         {
+                            commitColumn.Auto(_rightHeader);
                             commitColumn.Auto(_subjectInput);
                             commitColumn.Auto(actions => actions.Row(actionRow =>
                             {
@@ -81,6 +83,7 @@ internal sealed partial class GitConsoleApp
             row.Weighted(3, content => content.Column(column =>
             {
                 column.Auto(_diffTabs);
+                column.Auto(_diffBriefing);
                 column.Fill(_diff);
                 column.Auto(actions => actions.Row(actionRow =>
                 {

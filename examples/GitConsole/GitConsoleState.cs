@@ -45,9 +45,9 @@ internal sealed class GitConsoleState
 
     public string RemoteName { get; } = "origin";
 
-    public string LastAction { get; private set; } = "Workspace steady. Review queue warm.";
+    public string LastAction { get; private set; } = "Queue primed for release handoff.";
 
-    public string LastActionDetail { get; private set; } = "2 staged paths ready for commit; sync lane waiting for push.";
+    public string LastActionDetail { get; private set; } = "Two staged paths are ready; remote is one commit behind local intent.";
 
     public int Ahead { get; private set; } = 2;
 
@@ -164,17 +164,17 @@ internal sealed class GitConsoleState
         return tab switch
         {
             GitDiffTab.StagedSnapshot => new GitDiffSnapshot(
-                $"Index Snapshot | {selected.Path} | {(selected.IsStaged ? "ready" : "not staged")} | +{selected.AddedLines}/-{selected.RemovedLines}",
+                $"Index Snapshot | {selected.Path}",
                 selected.HeadText,
                 selected.IsStaged ? selected.IndexText : selected.HeadText,
                 DiffViewMode.Inline),
             GitDiffTab.PatchRadar => new GitDiffSnapshot(
-                $"Patch Radar | {selected.Path} | owner {selected.Owner} | review {(selected.IsReviewCritical ? "hot" : "steady")}",
+                $"Patch Radar | {selected.Path}",
                 selected.HeadText,
                 selected.WorktreeText,
                 DiffViewMode.SideBySide),
             _ => new GitDiffSnapshot(
-                $"Working Copy | {selected.Path} | {(selected.IsStaged ? "index -> worktree" : "head -> worktree")} | +{selected.AddedLines}/-{selected.RemovedLines}",
+                $"Working Copy | {selected.Path}",
                 selected.IsStaged ? selected.IndexText : selected.HeadText,
                 selected.WorktreeText,
                 DiffViewMode.Inline),
@@ -187,11 +187,11 @@ internal sealed class GitConsoleState
         return
         [
             new CommandOutputLine("scan workspace --hydrate diff cache", CommandOutputChannel.System, now.AddMinutes(-8)),
-            new CommandOutputLine("review lane warmed; 2 critical paths detected", CommandOutputChannel.StdOut, now.AddMinutes(-7)),
-            new CommandOutputLine("stage docs/public-api-inventory.md", CommandOutputChannel.StdOut, now.AddMinutes(-5)),
-            new CommandOutputLine("lint: examples cleared; rebuilding flagship lane", CommandOutputChannel.System, now.AddMinutes(-4)),
-            new CommandOutputLine("origin/public-v1 updated by +1 commit", CommandOutputChannel.StdErr, now.AddMinutes(-2)),
-            new CommandOutputLine("commit queue idle; waiting for message", CommandOutputChannel.System, now.AddSeconds(-40)),
+            new CommandOutputLine("review lane warmed; 2 high-signal patches detected", CommandOutputChannel.StdOut, now.AddMinutes(-7)),
+            new CommandOutputLine("queue docs/public-api-inventory.md for the release train", CommandOutputChannel.StdOut, now.AddMinutes(-5)),
+            new CommandOutputLine("rebuild flagship shell after examples reset", CommandOutputChannel.System, now.AddMinutes(-4)),
+            new CommandOutputLine("origin/public-v1 moved +1 commit ahead of the local base", CommandOutputChannel.StdErr, now.AddMinutes(-2)),
+            new CommandOutputLine("commit deck armed; waiting for intent", CommandOutputChannel.System, now.AddSeconds(-40)),
         ];
     }
 
