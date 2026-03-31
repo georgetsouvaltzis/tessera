@@ -70,7 +70,7 @@ internal sealed partial class DataWorkbenchState
         return query.OrderByDescending(record => record.Score).ThenByDescending(record => record.UpdatedAt).ToArray();
     }
 
-    public IReadOnlyList<DataGridColumn> BuildColumns()
+    public static IReadOnlyList<DataGridColumn> BuildColumns()
     {
         return
         [
@@ -85,7 +85,7 @@ internal sealed partial class DataWorkbenchState
         ];
     }
 
-    public IReadOnlyList<IReadOnlyList<string>> BuildRows(IReadOnlyList<WorkbenchRecord> records)
+    public static IReadOnlyList<IReadOnlyList<string>> BuildRows(IReadOnlyList<WorkbenchRecord> records)
     {
         return records
             .Select(record => (IReadOnlyList<string>)
@@ -107,7 +107,7 @@ internal sealed partial class DataWorkbenchState
         return GetSource(sourceId).Records.FirstOrDefault(record => string.Equals(record.Id, recordId, StringComparison.Ordinal));
     }
 
-    public string BuildSummary(WorkbenchRecord? record)
+    public static string BuildSummary(WorkbenchRecord? record)
     {
         if (record is null)
         {
@@ -123,7 +123,7 @@ internal sealed partial class DataWorkbenchState
             $"Narrative   {record.Summary}");
     }
 
-    public string BuildTrace(WorkbenchRecord? record)
+    public static string BuildTrace(WorkbenchRecord? record)
     {
         if (record is null)
         {
@@ -138,7 +138,7 @@ internal sealed partial class DataWorkbenchState
             $"{record.Id} :: compare key {record.CompareKey} now eligible for side-by-side diff");
     }
 
-    public string BuildCompareSummary(WorkbenchRecord? left, WorkbenchRecord? right)
+    public static string BuildCompareSummary(WorkbenchRecord? left, WorkbenchRecord? right)
     {
         if (left is null || right is null)
         {
@@ -162,14 +162,14 @@ internal sealed partial class DataWorkbenchState
         return $"{source.SourceTag}  {source.Description}  ·  {records.Count:00} visible rows  ·  top pressure {hotText}";
     }
 
-    public string BuildPrompt(WorkbenchRecord? record)
+    public static string BuildPrompt(WorkbenchRecord? record)
     {
         return record is null
             ? "Operator prompt: choose a source, sculpt the slice, then pin a record for compare."
             : $"Operator prompt: follow {record.Id}, validate {record.Workflow}, and decide if {record.Entity} deserves a saved view.";
     }
 
-    public IReadOnlyList<StatItem> BuildPulseItems(IReadOnlyList<WorkbenchRecord> visible)
+    public static IReadOnlyList<StatItem> BuildPulseItems(IReadOnlyList<WorkbenchRecord> visible)
     {
         return
         [
@@ -179,7 +179,7 @@ internal sealed partial class DataWorkbenchState
         ];
     }
 
-    public IReadOnlyList<StatItem> BuildVelocityItems(IReadOnlyList<WorkbenchRecord> visible)
+    public static IReadOnlyList<StatItem> BuildVelocityItems(IReadOnlyList<WorkbenchRecord> visible)
     {
         var medianLatency = visible.Count == 0 ? 0 : (int)visible.OrderBy(static record => record.LatencyMs).ElementAt(visible.Count / 2).LatencyMs;
         return
@@ -190,7 +190,7 @@ internal sealed partial class DataWorkbenchState
         ];
     }
 
-    public IReadOnlyList<StatItem> BuildCompareItems(WorkbenchRecord? pinned, WorkbenchRecord? current)
+    public static IReadOnlyList<StatItem> BuildCompareItems(WorkbenchRecord? pinned, WorkbenchRecord? current)
     {
         return
         [

@@ -296,16 +296,16 @@ internal sealed partial class DataWorkbenchApp : TeaApp
         _query.ShowQueryPreview = true;
         _query.SelectedMarker = "◆";
         _query.UnselectedMarker = "·";
-        _results.SetColumns(_state.BuildColumns());
+        _results.SetColumns(DataWorkbenchState.BuildColumns());
         _activity.MaxItems = 96;
-        _activity.SetItems(_state.BuildSeedActivities());
-        _output.SetLines(_state.BuildSeedOutput());
+        _activity.SetItems(DataWorkbenchState.BuildSeedActivities());
+        _output.SetLines(DataWorkbenchState.BuildSeedOutput());
     }
 
     private void RefreshData()
     {
         _visibleRecords = _state.FilterRecords(_sourceId, _search.QueryText, _query.Rules);
-        _results.SetRows(_state.BuildRows(_visibleRecords));
+        _results.SetRows(DataWorkbenchState.BuildRows(_visibleRecords));
         _search.SetMatchState(_visibleRecords.Count, _visibleRecords.Count == 0 ? null : 0);
     }
 
@@ -320,11 +320,11 @@ internal sealed partial class DataWorkbenchApp : TeaApp
         _header.SourceText = source.Label;
         _header.ViewText = _page.ToString().ToLowerInvariant();
         _header.SummaryText = _state.BuildWorkspaceSummary(_sourceId, _visibleRecords);
-        _header.PromptText = _state.BuildPrompt(current);
+        _header.PromptText = DataWorkbenchState.BuildPrompt(current);
 
-        _slicePulse.SetItems(_state.BuildPulseItems(_visibleRecords));
-        _velocityPulse.SetItems(_state.BuildVelocityItems(_visibleRecords));
-        _comparePulse.SetItems(_state.BuildCompareItems(PinnedRecord(), current));
+        _slicePulse.SetItems(DataWorkbenchState.BuildPulseItems(_visibleRecords));
+        _velocityPulse.SetItems(DataWorkbenchState.BuildVelocityItems(_visibleRecords));
+        _comparePulse.SetItems(DataWorkbenchState.BuildCompareItems(PinnedRecord(), current));
 
         _footer.LeftText = $"dataworkbench  {_palette.Label.ToLowerInvariant()}  {source.SourceTag}  rows {_visibleRecords.Count:00}  pinned {(PinnedRecord()?.Id ?? "none")}";
         _footer.RightText = "1-4 pages  7/8/9 themes  / search  q rules  r run  p pin  b save  e export  F1/F2/F3/F4 focus";
@@ -335,13 +335,13 @@ internal sealed partial class DataWorkbenchApp : TeaApp
         var current = SelectedRecord();
         var pinned = PinnedRecord();
 
-        _profileView.SetPlainText(_state.BuildSummary(current));
+        _profileView.SetPlainText(DataWorkbenchState.BuildSummary(current));
         _traceView.SetLines(BuildTraceLines(current));
         RefreshJson(current);
 
-        _compareLeft.SetPlainText(_state.BuildSummary(pinned));
-        _compareRight.SetPlainText(_state.BuildSummary(current));
-        _compareSummary.SetPlainText(_state.BuildCompareSummary(pinned, current));
+        _compareLeft.SetPlainText(DataWorkbenchState.BuildSummary(pinned));
+        _compareRight.SetPlainText(DataWorkbenchState.BuildSummary(current));
+        _compareSummary.SetPlainText(DataWorkbenchState.BuildCompareSummary(pinned, current));
 
         _savedPreview.SetPlainText(BuildSavedViewPreview());
         _savedRunbook.SetPlainText(BuildRunbookText());

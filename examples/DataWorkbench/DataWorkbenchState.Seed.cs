@@ -74,7 +74,7 @@ internal sealed partial class DataWorkbenchState
         ]);
     }
 
-    public IReadOnlyList<ActivityFeedItem> BuildSeedActivities()
+    public static IReadOnlyList<ActivityFeedItem> BuildSeedActivities()
     {
         return
         [
@@ -86,7 +86,7 @@ internal sealed partial class DataWorkbenchState
         ];
     }
 
-    public IReadOnlyList<CommandOutputLine> BuildSeedOutput()
+    public static IReadOnlyList<CommandOutputLine> BuildSeedOutput()
     {
         return
         [

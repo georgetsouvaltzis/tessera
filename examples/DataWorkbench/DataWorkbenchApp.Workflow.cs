@@ -47,7 +47,7 @@ internal sealed partial class DataWorkbenchApp
     {
         _search.ClearQuery();
         _query.SetRules(DefaultRulesForSource(sourceId));
-        _results.SetColumns(_state.BuildColumns());
+        _results.SetColumns(DataWorkbenchState.BuildColumns());
         _sourceRail.SetItems(_state.BuildNavItems(sourceId));
         var selectedIndex = _state.Sources
             .Select((source, index) => new { source.Id, index })
@@ -55,7 +55,7 @@ internal sealed partial class DataWorkbenchApp
         _sourceRail.SetSelectedIndex(selectedIndex);
     }
 
-    private IReadOnlyList<QueryRule> DefaultRulesForSource(string sourceId)
+    private static IReadOnlyList<QueryRule> DefaultRulesForSource(string sourceId)
     {
         return sourceId switch
         {
@@ -103,14 +103,14 @@ internal sealed partial class DataWorkbenchApp
             .ToArray();
     }
 
-    private CommandOutputLine[] BuildTraceLines(WorkbenchRecord? record)
+    private static CommandOutputLine[] BuildTraceLines(WorkbenchRecord? record)
     {
         if (record is null)
         {
             return [new CommandOutputLine("trace unavailable", CommandOutputChannel.System, DateTimeOffset.UtcNow)];
         }
 
-        return _state.BuildTrace(record)
+        return DataWorkbenchState.BuildTrace(record)
             .Split('\n', StringSplitOptions.RemoveEmptyEntries)
             .Select(line => new CommandOutputLine(line, CommandOutputChannel.StdOut, DateTimeOffset.UtcNow))
             .ToArray();
