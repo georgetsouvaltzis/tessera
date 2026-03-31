@@ -197,30 +197,10 @@ internal sealed partial class MusicDeckApp : TeaApp
         _progress.TrackStyle = MusicDeckTheme.ForegroundBackground(0xA08172, 0x2A1820);
         _progress.LabelStyle = theme.Text.Secondary.WithBold();
 
-        ConfigureButton(
-            _backButton,
-            MusicDeckTheme.Foreground(0xFFF4DE).WithBold(),
-            MusicDeckTheme.Foreground(0xFFF4DE).WithBold(),
-            MusicDeckTheme.ForegroundBackground(0xFFF4DE, 0x5E3346),
-            MusicDeckTheme.ForegroundBackground(0x1B1010, 0xF1B577));
-        ConfigureButton(
-            _playPauseButton,
-            MusicDeckTheme.Foreground(0x1B1010).WithBold(),
-            MusicDeckTheme.Foreground(0x1B1010).WithBold(),
-            MusicDeckTheme.ForegroundBackground(0x1B1010, 0xF1B577),
-            MusicDeckTheme.ForegroundBackground(0x1B1010, 0xE7A95C));
-        ConfigureButton(
-            _nextButton,
-            MusicDeckTheme.Foreground(0xFFF4DE).WithBold(),
-            MusicDeckTheme.Foreground(0xFFF4DE).WithBold(),
-            MusicDeckTheme.ForegroundBackground(0xFFF4DE, 0x7A3F4D),
-            MusicDeckTheme.ForegroundBackground(0x1B1010, 0xF1B577));
-        ConfigureButton(
-            _detailButton,
-            MusicDeckTheme.Foreground(0xFFF4DE).WithBold(),
-            MusicDeckTheme.Foreground(0xFFF4DE).WithBold(),
-            MusicDeckTheme.ForegroundBackground(0xFFF4DE, 0x6F594E),
-            MusicDeckTheme.ForegroundBackground(0x1B1010, 0xF1B577));
+        ConfigureButton(_backButton);
+        ConfigureButton(_playPauseButton);
+        ConfigureButton(_nextButton);
+        ConfigureButton(_detailButton);
 
         ConfigureCard(_deckStats, theme.Accent.Primary.WithBold());
         ConfigureCard(_trackStats, theme.Accent.Secondary.WithBold());
@@ -240,19 +220,14 @@ internal sealed partial class MusicDeckApp : TeaApp
         _footer.FillStyle = theme.Surface.Panel;
     }
 
-    private static void ConfigureButton(
-        Button button,
-        TeaStyle labelStyle,
-        TeaStyle focusedLabelStyle,
-        TeaStyle surfaceStyle,
-        TeaStyle pressedSurfaceStyle)
+    private static void ConfigureButton(Button button)
     {
-        button.LabelStyle = labelStyle;
-        button.FocusedLabelStyle = focusedLabelStyle;
-        button.SurfaceStyle = surfaceStyle;
-        button.FocusedSurfaceStyle = TeaStyle.Empty;
-        button.PressedSurfaceStyle = pressedSurfaceStyle;
-        button.BorderStyleText = MusicDeckTheme.Foreground(0x6C4454);
+        button.LabelStyle = MusicDeckTheme.Foreground(0xFFF4DE).WithBold();
+        button.FocusedLabelStyle = MusicDeckTheme.Foreground(0xFFF4DE).WithBold();
+        button.SurfaceStyle = MusicDeckTheme.Background(0x34202B);
+        button.FocusedSurfaceStyle = MusicDeckTheme.Background(0x39232E);
+        button.PressedSurfaceStyle = MusicDeckTheme.Background(0x4A2D3A);
+        button.BorderStyleText = MusicDeckTheme.Foreground(0x7A4E5E);
         button.FocusedBorderStyleText = MusicDeckTheme.Foreground(0xF3C77A).WithBold();
         button.LabelPrefix = string.Empty;
         button.LabelSuffix = string.Empty;
