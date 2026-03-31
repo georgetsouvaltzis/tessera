@@ -56,7 +56,7 @@ public sealed partial class LinePlot
             return RenderCompactBlockSeries(canvas, plotArea, series, maxSampleCount, visibleCount, offset, min, max);
         }
 
-        var masks = new ushort[plotArea.Width * plotArea.Height];
+        var topology = new CompactCellTopology[plotArea.Width * plotArea.Height];
         var previousX = -1;
         var previousY = -1;
         var hasPoint = false;
@@ -81,7 +81,7 @@ public sealed partial class LinePlot
             if (previousX >= 0)
             {
                 RasterizeCompactPolyline(
-                    masks,
+                    topology,
                     plotArea.Width,
                     plotArea.Height,
                     previousX,
@@ -91,7 +91,7 @@ public sealed partial class LinePlot
             }
             else
             {
-                SetCompactDot(masks, plotArea.Width, plotArea.Height, virtualX, virtualY);
+                MarkCompactPoint(topology, plotArea.Width, plotArea.Height, virtualX, virtualY);
             }
 
             previousX = virtualX;
@@ -108,13 +108,13 @@ public sealed partial class LinePlot
         {
             for (var cellX = 0; cellX < plotArea.Width; cellX++)
             {
-                var mask = masks[(cellY * plotArea.Width) + cellX];
-                if (mask == 0)
+                var cell = topology[(cellY * plotArea.Width) + cellX];
+                if (!cell.HasPath)
                 {
                     continue;
                 }
 
-                var glyph = ResolveCompactLineGlyph(mask);
+                var glyph = ResolveCompactLineGlyph(cell);
                 WriteGlyph(canvas, plotArea.X + cellX, plotArea.Y + cellY, glyph, RenderGlyph(glyph, style));
             }
         }
@@ -243,7 +243,7 @@ public sealed partial class LinePlot
     }
 
     private static void RasterizeCompactPolyline(
-        ushort[] masks,
+        CompactCellTopology[] topology,
         int width,
         int height,
         int x0,
@@ -258,6 +258,7 @@ public sealed partial class LinePlot
         var err = dx - dy;
         var currentX = x0;
         var currentY = y0;
+        MarkCompactPoint(topology, width, height, currentX, currentY);
 
         while (currentX != x1 || currentY != y1)
         {
@@ -276,96 +277,114 @@ public sealed partial class LinePlot
                 nextY += sy;
             }
 
-            SetCompactDot(masks, width, height, currentX, currentY);
+            var stepX = Math.Sign(nextX - currentX);
+            var stepY = Math.Sign(nextY - currentY);
+            MarkCompactStep(topology, width, height, currentX, currentY, stepX, stepY);
+            RecordCompactTransition(topology, width, height, currentX, currentY, nextX, nextY);
             currentX = nextX;
             currentY = nextY;
         }
-        SetCompactDot(masks, width, height, currentX, currentY);
+
+        MarkCompactPoint(topology, width, height, currentX, currentY);
     }
 
-    private static void SetCompactDot(ushort[] masks, int width, int height, int virtualX, int virtualY)
+    private static void MarkCompactPoint(CompactCellTopology[] topology, int width, int height, int virtualX, int virtualY)
     {
-        if (width <= 0 || height <= 0)
+        if (!TryResolveCompactCell(width, height, virtualX, virtualY, out var cellX, out var cellY))
         {
             return;
         }
 
-        var maxVirtualX = (width * CompactVirtualWidthPerCell) - 1;
-        var maxVirtualY = (height * CompactVirtualHeightPerCell) - 1;
-        virtualX = Math.Clamp(virtualX, 0, maxVirtualX);
-        virtualY = Math.Clamp(virtualY, 0, maxVirtualY);
-
-        var cellX = virtualX / CompactVirtualWidthPerCell;
-        var cellY = virtualY / CompactVirtualHeightPerCell;
-        var localX = virtualX % CompactVirtualWidthPerCell;
-        var localY = virtualY % CompactVirtualHeightPerCell;
-        masks[(cellY * width) + cellX] |= ResolveCompactMask(localX, localY);
+        ref var cell = ref topology[(cellY * width) + cellX];
+        cell.HasPath = true;
     }
 
-    private static char ResolveCompactLineGlyph(ushort mask)
+    private static void MarkCompactStep(CompactCellTopology[] topology, int width, int height, int virtualX, int virtualY, int stepX, int stepY)
     {
-        var left = HasCompactColumn(mask, 0);
-        var right = HasCompactColumn(mask, CompactVirtualWidthPerCell - 1);
-        var top = HasCompactRow(mask, 0);
-        var bottom = HasCompactRow(mask, CompactVirtualHeightPerCell - 1);
-        var minX = CompactVirtualWidthPerCell;
-        var maxX = -1;
-        var minY = CompactVirtualHeightPerCell;
-        var maxY = -1;
-        var positiveScore = 0;
-        var negativeScore = 0;
-
-        for (var y = 0; y < CompactVirtualHeightPerCell; y++)
+        if (!TryResolveCompactCell(width, height, virtualX, virtualY, out var cellX, out var cellY))
         {
-            for (var x = 0; x < CompactVirtualWidthPerCell; x++)
-            {
-                if ((mask & ResolveCompactMask(x, y)) == 0)
-                {
-                    continue;
-                }
+            return;
+        }
 
-                minX = Math.Min(minX, x);
-                maxX = Math.Max(maxX, x);
-                minY = Math.Min(minY, y);
-                maxY = Math.Max(maxY, y);
-                positiveScore += x + y;
-                negativeScore += x + ((CompactVirtualHeightPerCell - 1) - y);
+        ref var cell = ref topology[(cellY * width) + cellX];
+        cell.HasPath = true;
+        cell.RecordDirection(stepX, stepY);
+    }
+
+    private static void RecordCompactTransition(
+        CompactCellTopology[] topology,
+        int width,
+        int height,
+        int currentX,
+        int currentY,
+        int nextX,
+        int nextY)
+    {
+        if (!TryResolveCompactCell(width, height, currentX, currentY, out var currentCellX, out var currentCellY)
+            || !TryResolveCompactCell(width, height, nextX, nextY, out var nextCellX, out var nextCellY))
+        {
+            return;
+        }
+
+        if (currentCellX == nextCellX && currentCellY == nextCellY)
+        {
+            return;
+        }
+
+        var dx = nextCellX - currentCellX;
+        var dy = nextCellY - currentCellY;
+        var exitPort = ResolveExitPort(dx, dy);
+        var entryPort = ResolveOppositePort(exitPort);
+
+        ref var currentCell = ref topology[(currentCellY * width) + currentCellX];
+        ref var nextCell = ref topology[(nextCellY * width) + nextCellX];
+        currentCell.HasPath = true;
+        nextCell.HasPath = true;
+        currentCell.RecordExit(exitPort);
+        nextCell.RecordEntry(entryPort);
+    }
+
+    private static char ResolveCompactLineGlyph(CompactCellTopology cell)
+    {
+        if (cell.Entry != CompactPort.None && cell.Exit != CompactPort.None)
+        {
+            if (TryResolveOrthogonalCornerGlyph(cell.Entry, cell.Exit, out var corner))
+            {
+                return corner;
+            }
+
+            if (TryResolveLinearGlyph(cell.Entry, cell.Exit, out var linear))
+            {
+                return linear;
+            }
+
+            if (TryResolveDiagonalGlyph(cell.Entry, cell.Exit, out var diagonal))
+            {
+                return diagonal;
             }
         }
 
-        if (maxX < 0)
+        if (cell.DiagonalUpVotes > cell.HorizontalVotes && cell.DiagonalUpVotes >= cell.DiagonalDownVotes)
         {
-            return ' ';
+            return '╱';
         }
 
-        var spanX = maxX - minX;
-        var spanY = maxY - minY;
-        if ((left && right) || (spanX >= 2 && spanY <= 1))
+        if (cell.DiagonalDownVotes > cell.HorizontalVotes && cell.DiagonalDownVotes > cell.DiagonalUpVotes)
         {
-            return '─';
+            return '╲';
         }
 
-        if ((top && bottom) || (spanY >= 2 && spanX <= 1))
-        {
-            return '│';
-        }
-
-        if ((left || right) && (top || bottom))
-        {
-            return negativeScore >= positiveScore ? '╱' : '╲';
-        }
-
-        if (spanX >= spanY)
+        if (cell.HorizontalVotes >= cell.VerticalVotes && cell.HorizontalVotes > 0)
         {
             return '─';
         }
 
-        if (spanY > spanX)
+        if (cell.VerticalVotes > 0)
         {
             return '│';
         }
 
-        return negativeScore >= positiveScore ? '╱' : '╲';
+        return '•';
     }
 
     private static void RasterizeCompactLine(byte[] masks, int width, int height, int x0, int y0, int x1, int y1)
@@ -433,35 +452,178 @@ public sealed partial class LinePlot
         };
     }
 
-    private static ushort ResolveCompactMask(int localX, int localY)
+    private static bool TryResolveCompactCell(int width, int height, int virtualX, int virtualY, out int cellX, out int cellY)
     {
-        var bit = (localY * CompactVirtualWidthPerCell) + localX;
-        return (ushort)(1 << bit);
+        cellX = 0;
+        cellY = 0;
+        if (width <= 0 || height <= 0)
+        {
+            return false;
+        }
+
+        var maxVirtualX = (width * CompactVirtualWidthPerCell) - 1;
+        var maxVirtualY = (height * CompactVirtualHeightPerCell) - 1;
+        virtualX = Math.Clamp(virtualX, 0, maxVirtualX);
+        virtualY = Math.Clamp(virtualY, 0, maxVirtualY);
+        cellX = virtualX / CompactVirtualWidthPerCell;
+        cellY = virtualY / CompactVirtualHeightPerCell;
+        return true;
     }
 
-    private static bool HasCompactColumn(ushort mask, int column)
+    private static CompactPort ResolveExitPort(int dx, int dy)
     {
-        for (var y = 0; y < CompactVirtualHeightPerCell; y++)
+        return (dx, dy) switch
         {
-            if ((mask & ResolveCompactMask(column, y)) != 0)
+            (1, 0) => CompactPort.East,
+            (-1, 0) => CompactPort.West,
+            (0, 1) => CompactPort.South,
+            (0, -1) => CompactPort.North,
+            (1, 1) => CompactPort.SouthEast,
+            (1, -1) => CompactPort.NorthEast,
+            (-1, 1) => CompactPort.SouthWest,
+            (-1, -1) => CompactPort.NorthWest,
+            _ => CompactPort.None,
+        };
+    }
+
+    private static CompactPort ResolveOppositePort(CompactPort port)
+    {
+        return port switch
+        {
+            CompactPort.West => CompactPort.East,
+            CompactPort.East => CompactPort.West,
+            CompactPort.North => CompactPort.South,
+            CompactPort.South => CompactPort.North,
+            CompactPort.NorthWest => CompactPort.SouthEast,
+            CompactPort.NorthEast => CompactPort.SouthWest,
+            CompactPort.SouthWest => CompactPort.NorthEast,
+            CompactPort.SouthEast => CompactPort.NorthWest,
+            _ => CompactPort.None,
+        };
+    }
+
+    private static bool TryResolveLinearGlyph(CompactPort entry, CompactPort exit, out char glyph)
+    {
+        var ports = entry | exit;
+        glyph = ports switch
+        {
+            CompactPort.West or CompactPort.East or CompactPort.West | CompactPort.East => '─',
+            CompactPort.North or CompactPort.South or CompactPort.North | CompactPort.South => '│',
+            _ => default,
+        };
+        return glyph != default;
+    }
+
+    private static bool TryResolveDiagonalGlyph(CompactPort entry, CompactPort exit, out char glyph)
+    {
+        var ports = entry | exit;
+        glyph = ports switch
+        {
+            CompactPort.SouthWest | CompactPort.NorthEast => '╱',
+            CompactPort.NorthWest | CompactPort.SouthEast => '╲',
+            _ => ResolveSideCornerDiagonal(entry, exit),
+        };
+        return glyph != default;
+    }
+
+    private static char ResolveSideCornerDiagonal(CompactPort entry, CompactPort exit)
+    {
+        var (a, b) = NormalizePortPair(entry, exit);
+        return (a, b) switch
+        {
+            (CompactPort.West, CompactPort.NorthEast) => '╱',
+            (CompactPort.SouthWest, CompactPort.East) => '╱',
+            (CompactPort.SouthWest, CompactPort.North) => '╱',
+            (CompactPort.South, CompactPort.NorthEast) => '╱',
+            (CompactPort.West, CompactPort.SouthEast) => '╲',
+            (CompactPort.NorthWest, CompactPort.East) => '╲',
+            (CompactPort.NorthWest, CompactPort.South) => '╲',
+            (CompactPort.North, CompactPort.SouthEast) => '╲',
+            _ => default,
+        };
+    }
+
+    private static bool TryResolveOrthogonalCornerGlyph(CompactPort entry, CompactPort exit, out char glyph)
+    {
+        var (a, b) = NormalizePortPair(entry, exit);
+        glyph = (a, b) switch
+        {
+            (CompactPort.North, CompactPort.East) => '╰',
+            (CompactPort.North, CompactPort.West) => '╯',
+            (CompactPort.South, CompactPort.East) => '╭',
+            (CompactPort.South, CompactPort.West) => '╮',
+            _ => default,
+        };
+        return glyph != default;
+    }
+
+    private static (CompactPort first, CompactPort second) NormalizePortPair(CompactPort entry, CompactPort exit)
+    {
+        return entry <= exit ? (entry, exit) : (exit, entry);
+    }
+
+    private enum CompactPort : ushort
+    {
+        None = 0,
+        West = 1,
+        East = 2,
+        North = 4,
+        South = 8,
+        NorthWest = 16,
+        NorthEast = 32,
+        SouthWest = 64,
+        SouthEast = 128,
+    }
+
+    private struct CompactCellTopology
+    {
+        public bool HasPath;
+        public CompactPort Entry;
+        public CompactPort Exit;
+        public int HorizontalVotes;
+        public int VerticalVotes;
+        public int DiagonalUpVotes;
+        public int DiagonalDownVotes;
+
+        public void RecordEntry(CompactPort port)
+        {
+            if (Entry == CompactPort.None)
             {
-                return true;
+                Entry = port;
             }
         }
 
-        return false;
-    }
-
-    private static bool HasCompactRow(ushort mask, int row)
-    {
-        for (var x = 0; x < CompactVirtualWidthPerCell; x++)
+        public void RecordExit(CompactPort port)
         {
-            if ((mask & ResolveCompactMask(x, row)) != 0)
-            {
-                return true;
-            }
+            Exit = port;
         }
 
-        return false;
+        public void RecordDirection(int dx, int dy)
+        {
+            if (dx == 0 && dy == 0)
+            {
+                return;
+            }
+
+            if (dy == 0)
+            {
+                HorizontalVotes++;
+                return;
+            }
+
+            if (dx == 0)
+            {
+                VerticalVotes++;
+                return;
+            }
+
+            if (dx * dy < 0)
+            {
+                DiagonalUpVotes++;
+                return;
+            }
+
+            DiagonalDownVotes++;
+        }
     }
 }

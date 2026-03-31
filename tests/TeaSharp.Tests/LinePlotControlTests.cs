@@ -185,21 +185,11 @@ public sealed class LinePlotControlTests
     [Test]
     public void LinePlotRender_CompactMode_UsesLineGlyphsForDenseSingleSeriesTelemetry()
     {
-        var control = new LinePlot
-        {
-            Border = BorderStyle.None,
-            Options = new LinePlotOptions(ShowAxes: false, ShowGrid: false, ShowLegend: false, ShowStats: false, RenderMode: LinePlotRenderMode.Compact),
-        };
-        control.SetSeries(
-        [
-            new LineSeries("cpu", [12, 26, 14, 38, 30, 46, 28, 62, 54, 70, 58, 74]),
-        ]);
-
-        var output = Render(control, width: 10, height: 4);
+        var output = RenderCompact([12, 26, 14, 38, 30, 46, 28, 62, 54, 70, 58, 74], width: 10, height: 4);
 
         Assert.That(output.Any(IsCompactLineCharacter), Is.True, "Compact mode should emit compact line glyphs for dense telemetry traces.");
         Assert.That(output.Any(IsBrailleCharacter), Is.False, "Default compact mode should avoid terminal-dependent braille output.");
-        Assert.That(output.Any(IsCornerOrJunctionCharacter), Is.False, "Compact mode should prefer continuous polyline glyphs over stair-step corners.");
+        AssertNoEmptyColumns(output);
     }
 
     [Test]
@@ -223,28 +213,122 @@ public sealed class LinePlotControlTests
     [Test]
     public void LinePlotRender_CompactMode_FallsBackToBlockMicroChartWhenHeightIsTiny()
     {
+        var output = RenderCompact([10, 30, 20, 50, 40, 70, 60, 90], width: 8, height: 1);
+
+        Assert.That(output.Any(IsBlockSparkCharacter), Is.True, "Compact mode should fall back to block spark glyphs in one-row plots.");
+    }
+
+    [Test]
+    public void LinePlotRender_CompactMode_MonotoneRise_StaysContinuous()
+    {
+        var output = RenderCompact([10, 20, 30, 40, 50, 60, 70, 80], width: 12, height: 4);
+
+        Assert.That(output.Any(static value => value is '╱' or '─'), Is.True);
+        AssertNoEmptyColumns(output);
+    }
+
+    [Test]
+    public void LinePlotRender_CompactMode_MonotoneFall_StaysContinuous()
+    {
+        var output = RenderCompact([80, 70, 60, 50, 40, 30, 20, 10], width: 12, height: 4);
+
+        Assert.That(output.Any(static value => value is '╲' or '─'), Is.True);
+        AssertNoEmptyColumns(output);
+    }
+
+    [Test]
+    public void LinePlotRender_CompactMode_ShallowSlope_StaysContinuous()
+    {
+        var output = RenderCompact([40, 42, 44, 46, 47, 48, 50, 52], width: 12, height: 4);
+
+        AssertNoEmptyColumns(output);
+    }
+
+    [Test]
+    public void LinePlotRender_CompactMode_Valley_StaysContinuous()
+    {
+        var output = RenderCompact([70, 55, 40, 24, 36, 52, 68], width: 12, height: 4);
+
+        AssertNoEmptyColumns(output);
+    }
+
+    [Test]
+    public void LinePlotRender_CompactMode_Peak_StaysContinuous()
+    {
+        var output = RenderCompact([24, 40, 58, 72, 56, 38, 20], width: 12, height: 4);
+
+        AssertNoEmptyColumns(output);
+    }
+
+    private static bool IsBrailleCharacter(char value) => value is >= '\u2801' and <= '\u28FF';
+
+    private static bool IsCompactLineCharacter(char value) => value is '─' or '│' or '╱' or '╲' or '╭' or '╮' or '╯' or '╰' or '•';
+
+    private static bool IsCornerOrJunctionCharacter(char value) => value is '╭' or '╮' or '╯' or '╰' or '┬' or '┴' or '├' or '┤' or '┼';
+
+    private static bool IsBlockSparkCharacter(char value) => value is '▁' or '▂' or '▃' or '▄' or '▅' or '▆' or '▇' or '█';
+
+    private static string RenderCompact(IEnumerable<double> samples, int width, int height)
+    {
         var control = new LinePlot
         {
             Border = BorderStyle.None,
             Options = new LinePlotOptions(ShowAxes: false, ShowGrid: false, ShowLegend: false, ShowStats: false, RenderMode: LinePlotRenderMode.Compact),
         };
-        control.SetSeries(
-        [
-            new LineSeries("cpu", [10, 30, 20, 50, 40, 70, 60, 90]),
-        ]);
-
-        var output = Render(control, width: 8, height: 1);
-
-        Assert.That(output.Any(IsBlockSparkCharacter), Is.True, "Compact mode should fall back to block spark glyphs in one-row plots.");
+        control.SetSeries([new LineSeries("cpu", samples)]);
+        return Render(control, width, height);
     }
 
-    private static bool IsBrailleCharacter(char value) => value is >= '\u2801' and <= '\u28FF';
+    private static void AssertNoEmptyColumns(string output)
+    {
+        var lines = output
+            .Split('\n', StringSplitOptions.None)
+            .Select(static line => line.TrimEnd('\r'))
+            .ToArray();
+        var width = lines.Max(static line => line.Length);
+        var first = -1;
+        var last = -1;
 
-    private static bool IsCompactLineCharacter(char value) => value is '─' or '│' or '╱' or '╲' or '•';
+        for (var column = 0; column < width; column++)
+        {
+            if (!ColumnContainsTrace(lines, column))
+            {
+                continue;
+            }
 
-    private static bool IsCornerOrJunctionCharacter(char value) => value is '╭' or '╮' or '╯' or '╰' or '┬' or '┴' or '├' or '┤' or '┼';
+            if (first < 0)
+            {
+                first = column;
+            }
 
-    private static bool IsBlockSparkCharacter(char value) => value is '▁' or '▂' or '▃' or '▄' or '▅' or '▆' or '▇' or '█';
+            last = column;
+        }
+
+        Assert.That(first, Is.GreaterThanOrEqualTo(0), "Expected compact render output to contain trace glyphs.");
+        for (var column = first; column <= last; column++)
+        {
+            Assert.That(ColumnContainsTrace(lines, column), Is.True, $"Expected compact trace continuity at column {column}.");
+        }
+    }
+
+    private static bool ColumnContainsTrace(string[] lines, int column)
+    {
+        for (var row = 0; row < lines.Length; row++)
+        {
+            if (column >= lines[row].Length)
+            {
+                continue;
+            }
+
+            var value = lines[row][column];
+            if (IsCompactLineCharacter(value) || IsBlockSparkCharacter(value))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
 
     private static string Render(LinePlot control, int width, int height)
     {
