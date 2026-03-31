@@ -108,6 +108,7 @@ Wave 4 integration status (batch A + B):
 These controls are already shipped on the public path and are not part of the +34 backlog count:
 
 - `Sparkline`
+- `TelemetryChart`
 - `AreaPlot`
 - `ScatterPlot`
 - `Histogram`
@@ -120,8 +121,10 @@ All shipped plotting controls follow the strict theming contract (state styles, 
 
 Use the shipped plotting controls by intent:
 
-- `Sparkline`/`AreaPlot` for bounded streaming single-series telemetry
-- `LinePlot` for multi-series trend dashboards and compact multi-row telemetry cards (`LinePlotRenderMode.Compact` for line-first cards, `CompactBraille` when subcell density matters more than terminal portability)
+- `Sparkline` for inline single-row trend hints
+- `TelemetryChart` for tiny multi-row dashboard telemetry cards (braille-first compact coverage with block/area fallbacks)
+- `AreaPlot` for bounded single-series filled plots when the plot region is larger than a telemetry card
+- `LinePlot` for multi-series trend dashboards and larger/coarser single-series plots
 - `ScatterPlot` for correlation
 - `Histogram` for distribution buckets
 - `PlotPanel` to compose multiple plotting controls into one screen region

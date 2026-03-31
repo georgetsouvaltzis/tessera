@@ -539,7 +539,7 @@ Mapped controls expose:
 
 - `ApplyTheme(TeaTheme theme)`
 - `ApplyThemeDefaults(TeaTheme theme)`
-- plotting mappings: `Sparkline`, `AreaPlot`, `ScatterPlot`, `Histogram`, `LinePlot`, `PlotPanel`
+- plotting mappings: `Sparkline`, `TelemetryChart`, `AreaPlot`, `ScatterPlot`, `Histogram`, `LinePlot`, `PlotPanel`
 - workspace mappings: `DockWorkspace`, `PaneTabs`, `PaletteEditor`, `Heatmap`, `TreeMapChart`, `TerminalPanel`, `ProcessListView`
 - app-shell/forms mappings: `Form`, `FieldSet`, `DataForm<TModel>`, `Wizard`, `SplitView`, `InspectorPanel`
 - overloads taking `TeaThemeOverrides`, `baseTheme`, and `TeaThemeVisualState`

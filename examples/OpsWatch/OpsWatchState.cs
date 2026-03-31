@@ -17,6 +17,7 @@ internal enum OpsWatchAction
 internal sealed class OpsWatchState
 {
     private readonly Random _random = new(1447);
+    private readonly DateTimeOffset _simulatedStartUtc = DateTimeOffset.UtcNow;
     private readonly List<OpsCluster> _clusters;
     private readonly List<ActivityFeedItem> _feed = [];
     private readonly List<double> _cpuTrend = [];
@@ -89,7 +90,7 @@ internal sealed class OpsWatchState
     public IReadOnlyList<double> DiskTrend => _diskTrend;
     public IReadOnlyList<ActivityFeedItem> FeedItems => _feed;
 
-    public string ClockText => DateTimeOffset.UtcNow.AddMinutes(_tick).ToString("HH:mm:ss 'UTC'", CultureInfo.InvariantCulture);
+    public string ClockText => DateTimeOffset.UtcNow.ToString("HH:mm:ss 'UTC'", CultureInfo.InvariantCulture);
     public string FleetBadge => $"{SelectedClusterName} / {CurrentNodes.Count} live";
     public string ModeBadge => $"autonomy {AutomationMode}";
     public string RouteBadge => $"route {ActiveRoute}";
@@ -131,7 +132,7 @@ internal sealed class OpsWatchState
             {
                 IsAcknowledged = node.IsAcknowledged,
                 IsMuted = node.IsMuted,
-                ObservedAt = DateTimeOffset.UtcNow.AddSeconds(-node.AgeSeconds),
+                ObservedAt = SimulatedUtcNow.AddSeconds(-node.AgeSeconds),
             })
             .ToArray();
     }
@@ -324,6 +325,8 @@ internal sealed class OpsWatchState
 
     private List<OpsNode> CurrentNodes => SelectedCluster.Nodes;
 
+    private DateTimeOffset SimulatedUtcNow => _simulatedStartUtc.AddSeconds(_tick);
+
     private void SeedTrends()
     {
         for (var index = 0; index < 32; index++)
@@ -407,7 +410,7 @@ internal sealed class OpsWatchState
 
     private void PushFeed(string actor, string action, string target, string details, ActivityFeedItemKind kind)
     {
-        _feed.Insert(0, new ActivityFeedItem(actor, action, target, details, kind, DateTimeOffset.UtcNow.AddSeconds(_tick))
+        _feed.Insert(0, new ActivityFeedItem(actor, action, target, details, kind, SimulatedUtcNow)
         {
             IsUnread = kind is ActivityFeedItemKind.Warning or ActivityFeedItemKind.Error,
         });

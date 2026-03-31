@@ -63,6 +63,9 @@ These are the types new applications should discover first.
 - `TeaSharp.Controls.BarChart`
 - `TeaSharp.Controls.LineChart`
 - `TeaSharp.Controls.Sparkline`
+- `TeaSharp.Controls.TelemetryChart`
+- `TeaSharp.Controls.TelemetryChartOptions`
+- `TeaSharp.Controls.TelemetryChartRenderMode`
 - `TeaSharp.Controls.AreaPlot`
 - `TeaSharp.Controls.ScatterPlotPoint`
 - `TeaSharp.Controls.ScatterPlot`

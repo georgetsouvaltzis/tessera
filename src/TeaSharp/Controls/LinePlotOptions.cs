@@ -30,14 +30,14 @@ public enum LinePlotRenderMode
     Coarse = 0,
 
     /// <summary>
-    /// Uses compact terminal-native line rendering optimized for dense single-series telemetry cards.
-    /// Falls back to a block micro-chart when the plot area is too small for multi-row rendering.
+    /// Uses compact terminal-native line rendering for coarse single-series plots in tight spaces.
+    /// Prefer <see cref="TelemetryChart"/> for tiny dashboard telemetry cards.
     /// </summary>
     Compact = 1,
 
     /// <summary>
-    /// Uses compact braille/subcell plotting optimized for dense single-series telemetry cards.
-    /// Falls back to a block micro-chart when the plot area is too small for braille rasterization.
+    /// Uses compact braille/subcell plotting for dense single-series plots where braille coverage is preferred.
+    /// Prefer <see cref="TelemetryChart"/> for tiny dashboard telemetry cards.
     /// </summary>
     CompactBraille = 2,
 }

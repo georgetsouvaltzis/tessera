@@ -4,6 +4,58 @@ namespace TeaSharp.Styles;
 
 public static partial class TeaThemeControlExtensions
 {
+    public static TelemetryChart ApplyTheme(this TelemetryChart control, TeaTheme theme)
+    {
+        ArgumentNullException.ThrowIfNull(control);
+        ArgumentNullException.ThrowIfNull(theme);
+
+        control.TitleStyle = theme.Text.Secondary;
+        control.FocusedTitleStyle = theme.Focus.Title;
+        control.FillStyle = theme.Accent.Primary;
+        control.MetaStyle = theme.Text.Secondary;
+        control.EmptyTextStyle = theme.Text.Muted;
+        control.DisabledStyle = theme.Text.Muted;
+        control.BorderStyleText = theme.Border.Default;
+        control.FocusedBorderStyleText = theme.Border.Focused.Merge(theme.Focus.Border);
+        return control;
+    }
+
+    public static TelemetryChart ApplyTheme(
+        this TelemetryChart control,
+        TeaThemeOverrides overrides,
+        TeaTheme baseTheme,
+        TeaThemeVisualState state = TeaThemeVisualState.Default)
+    {
+        ArgumentNullException.ThrowIfNull(overrides);
+        return control.ApplyTheme(overrides.Resolve(control, baseTheme, state));
+    }
+
+    public static TelemetryChart ApplyThemeDefaults(this TelemetryChart control, TeaTheme theme)
+    {
+        ArgumentNullException.ThrowIfNull(control);
+        ArgumentNullException.ThrowIfNull(theme);
+
+        control.TitleStyle = ApplyDefault(control.TitleStyle, theme.Text.Secondary);
+        control.FocusedTitleStyle = ApplyDefault(control.FocusedTitleStyle, theme.Focus.Title);
+        control.FillStyle = ApplyDefault(control.FillStyle, theme.Accent.Primary);
+        control.MetaStyle = ApplyDefault(control.MetaStyle, theme.Text.Secondary);
+        control.EmptyTextStyle = ApplyDefault(control.EmptyTextStyle, theme.Text.Muted);
+        control.DisabledStyle = ApplyDefault(control.DisabledStyle, theme.Text.Muted);
+        control.BorderStyleText = ApplyDefault(control.BorderStyleText, theme.Border.Default);
+        control.FocusedBorderStyleText = ApplyDefault(control.FocusedBorderStyleText, theme.Border.Focused.Merge(theme.Focus.Border));
+        return control;
+    }
+
+    public static TelemetryChart ApplyThemeDefaults(
+        this TelemetryChart control,
+        TeaThemeOverrides overrides,
+        TeaTheme baseTheme,
+        TeaThemeVisualState state = TeaThemeVisualState.Default)
+    {
+        ArgumentNullException.ThrowIfNull(overrides);
+        return control.ApplyThemeDefaults(overrides.Resolve(control, baseTheme, state));
+    }
+
     public static Sparkline ApplyTheme(this Sparkline control, TeaTheme theme)
     {
         ArgumentNullException.ThrowIfNull(control);

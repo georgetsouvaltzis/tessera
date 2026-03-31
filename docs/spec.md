@@ -180,6 +180,7 @@ High-level rules:
 
 - `Notifications` is the default/onboarding notification feed
 - `NotificationInbox` is the advanced/dev-ops inbox surface
+- `TelemetryChart` is the tiny-card telemetry control; `LinePlot` remains the larger plot surface
 - `Selected*` is canonical naming
 - existing `Current*` members remain compatibility aliases only where already shipped
 - new bordered controls must ship border-style hooks, theme-token mapping, and regression coverage in the same slice
