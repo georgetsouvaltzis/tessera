@@ -48,10 +48,10 @@ internal sealed partial class OpsWatchApp : TeaApp
     private readonly Button _redlineThemeButton = new() { Text = "Redline", Description = "3", Border = BorderStyle.Rounded, Padding = Thickness.All(1) };
 
     private readonly StatusBar _footer = new() { Fill = ' ' };
-    private readonly LineSeries _cpuSeries = new("cpu") { Capacity = 64, PointGlyph = '─' };
-    private readonly LineSeries _memorySeries = new("mem") { Capacity = 64, PointGlyph = '─' };
-    private readonly LineSeries _networkSeries = new("net") { Capacity = 64, PointGlyph = '─' };
-    private readonly LineSeries _diskSeries = new("disk") { Capacity = 64, PointGlyph = '─' };
+    private readonly LineSeries _cpuSeries = new("cpu") { Capacity = 64, PointGlyph = '─', ScaleMode = LineSeriesScaleMode.Normalized };
+    private readonly LineSeries _memorySeries = new("mem") { Capacity = 64, PointGlyph = '─', ScaleMode = LineSeriesScaleMode.Normalized };
+    private readonly LineSeries _networkSeries = new("net") { Capacity = 64, PointGlyph = '─', ScaleMode = LineSeriesScaleMode.Normalized };
+    private readonly LineSeries _diskSeries = new("disk") { Capacity = 64, PointGlyph = '─', ScaleMode = LineSeriesScaleMode.Normalized };
 
     private bool _syncingFleetSelection;
     private bool _syncingNodeSelection;
@@ -494,8 +494,8 @@ internal sealed partial class OpsWatchApp : TeaApp
         spark.EmptyTextStyle = palette.Theme.Text.Muted;
         spark.BorderStyleText = OpsWatchTheme.Foreground(palette.FrameMutedColor);
         spark.FocusedBorderStyleText = palette.Theme.Focus.Border;
-        spark.MinValue = 0;
-        spark.MaxValue = 100;
+        spark.MinValue = null;
+        spark.MaxValue = null;
     }
 
     private static void ConfigureActionButton(Button button, TeaStyle labelStyle, OpsWatchThemePalette palette)
