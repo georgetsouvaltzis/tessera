@@ -197,10 +197,10 @@ internal sealed partial class MusicDeckApp : TeaApp
         _progress.TrackStyle = MusicDeckTheme.ForegroundBackground(0xA08172, 0x2A1820);
         _progress.LabelStyle = theme.Text.Secondary.WithBold();
 
-        ConfigureButton(_backButton, MusicDeckTheme.Chip(0xFFF4DE, 0x5E3346));
-        ConfigureButton(_playPauseButton, MusicDeckTheme.Chip(0x1B1010, 0xF1B577));
-        ConfigureButton(_nextButton, MusicDeckTheme.Chip(0xFFF4DE, 0x7A3F4D));
-        ConfigureButton(_detailButton, MusicDeckTheme.Chip(0xFFF4DE, 0x6F594E));
+        ConfigureButton(_backButton, MusicDeckTheme.Foreground(0xFFF4DE).WithBold(), MusicDeckTheme.Foreground(0x1B1010).WithBold());
+        ConfigureButton(_playPauseButton, MusicDeckTheme.Foreground(0x1B1010).WithBold(), MusicDeckTheme.Foreground(0x1B1010).WithBold());
+        ConfigureButton(_nextButton, MusicDeckTheme.Foreground(0xFFF4DE).WithBold(), MusicDeckTheme.Foreground(0x1B1010).WithBold());
+        ConfigureButton(_detailButton, MusicDeckTheme.Foreground(0xFFF4DE).WithBold(), MusicDeckTheme.Foreground(0x1B1010).WithBold());
 
         ConfigureCard(_deckStats, theme.Accent.Primary.WithBold());
         ConfigureCard(_trackStats, theme.Accent.Secondary.WithBold());
@@ -220,10 +220,10 @@ internal sealed partial class MusicDeckApp : TeaApp
         _footer.FillStyle = theme.Surface.Panel;
     }
 
-    private static void ConfigureButton(Button button, TeaStyle labelStyle)
+    private static void ConfigureButton(Button button, TeaStyle labelStyle, TeaStyle focusedLabelStyle)
     {
-        button.LabelStyle = labelStyle.WithBold();
-        button.FocusedLabelStyle = MusicDeckTheme.Chip(0x1B1010, 0xF3C77A);
+        button.LabelStyle = labelStyle;
+        button.FocusedLabelStyle = focusedLabelStyle;
         button.SurfaceStyle = MusicDeckTheme.ForegroundBackground(0xFFF4DE, 0x2A1820);
         button.FocusedSurfaceStyle = MusicDeckTheme.ForegroundBackground(0x1B1010, 0xF3C77A);
         button.PressedSurfaceStyle = MusicDeckTheme.ForegroundBackground(0x1B1010, 0xF1B577);
