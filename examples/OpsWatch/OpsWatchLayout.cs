@@ -56,7 +56,7 @@ internal sealed partial class OpsWatchApp
 
         body.Column(column =>
         {
-            column.Fixed(12, top => top.Row(row =>
+            column.Fixed(13, top => top.Row(row =>
             {
                 row.Weighted(1, deck => deck.Column(stack =>
                 {

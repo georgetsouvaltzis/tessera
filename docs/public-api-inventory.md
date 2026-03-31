@@ -525,6 +525,7 @@ Plotting/dashboard controls on the default app path:
 - correlation analysis: `ScatterPlot`
 - distribution analysis: `Histogram`
 - dashboard composition: `PlotPanel`
+- dense telemetry cards: `LinePlotOptions.RenderMode = Compact`
 
 Operational pattern:
 

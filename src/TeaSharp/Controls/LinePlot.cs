@@ -12,7 +12,7 @@ namespace TeaSharp.Controls;
 /// <summary>
 /// Represents a multi-series line plot control.
 /// </summary>
-public sealed class LinePlot : Control
+public sealed partial class LinePlot : Control
 {
     private const string EmptySeriesText = "(no series)";
     private readonly List<LineSeries> _series = [];
@@ -345,7 +345,15 @@ public sealed class LinePlot : Control
             DrawGrid(canvas, plotArea, ResolveStyled(GridStyle));
         }
 
-        RenderSeries(canvas, plotArea, maxSampleCount, visibleCount, offset, min, max);
+        if (options.RenderMode == LinePlotRenderMode.Compact
+            && TryRenderCompactSeries(canvas, plotArea, maxSampleCount, visibleCount, offset, min, max))
+        {
+            // Compact mode handles its own plot body for dense telemetry cards.
+        }
+        else
+        {
+            RenderSeries(canvas, plotArea, maxSampleCount, visibleCount, offset, min, max);
+        }
         if (options.ShowAxes && plot.Width >= 3 && plot.Height >= 3)
         {
             RenderAxisLabels(canvas, plot, options);

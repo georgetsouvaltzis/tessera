@@ -182,6 +182,47 @@ public sealed class LinePlotControlTests
         Assert.That(output.Contains("t", StringComparison.Ordinal), Is.True);
     }
 
+    [Test]
+    public void LinePlotRender_CompactMode_UsesBrailleCellsForDenseSingleSeriesTelemetry()
+    {
+        var control = new LinePlot
+        {
+            Border = BorderStyle.None,
+            Options = new LinePlotOptions(ShowAxes: false, ShowGrid: false, ShowLegend: false, ShowStats: false, RenderMode: LinePlotRenderMode.Compact),
+        };
+        control.SetSeries(
+        [
+            new LineSeries("cpu", [12, 26, 14, 38, 30, 46, 28, 62, 54, 70, 58, 74]),
+        ]);
+
+        var output = Render(control, width: 10, height: 4);
+
+        Assert.That(output.Any(IsBrailleCharacter), Is.True, "Compact mode should emit braille cells for dense telemetry traces.");
+        Assert.That(output.Contains('╱') || output.Contains('╲') || output.Contains('─'), Is.False, "Compact mode should avoid coarse line glyphs.");
+    }
+
+    [Test]
+    public void LinePlotRender_CompactMode_FallsBackToBlockMicroChartWhenHeightIsTiny()
+    {
+        var control = new LinePlot
+        {
+            Border = BorderStyle.None,
+            Options = new LinePlotOptions(ShowAxes: false, ShowGrid: false, ShowLegend: false, ShowStats: false, RenderMode: LinePlotRenderMode.Compact),
+        };
+        control.SetSeries(
+        [
+            new LineSeries("cpu", [10, 30, 20, 50, 40, 70, 60, 90]),
+        ]);
+
+        var output = Render(control, width: 8, height: 1);
+
+        Assert.That(output.Any(IsBlockSparkCharacter), Is.True, "Compact mode should fall back to block spark glyphs in one-row plots.");
+    }
+
+    private static bool IsBrailleCharacter(char value) => value is >= '\u2801' and <= '\u28FF';
+
+    private static bool IsBlockSparkCharacter(char value) => value is '▁' or '▂' or '▃' or '▄' or '▅' or '▆' or '▇' or '█';
+
     private static string Render(LinePlot control, int width, int height)
     {
         var canvas = new Canvas(width, height, CanvasTextMode.GraphemeAware);

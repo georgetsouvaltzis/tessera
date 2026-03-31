@@ -23,10 +23,10 @@ internal sealed partial class OpsWatchApp : TeaApp
     private readonly StatsCard _networkCard = new() { Title = "Network Flux", Border = BorderStyle.Rounded, Padding = Thickness.Symmetric(1, 0) };
     private readonly StatsCard _diskCard = new() { Title = "Disk Pressure", Border = BorderStyle.Rounded, Padding = Thickness.Symmetric(1, 0) };
 
-    private readonly LinePlot _cpuSpark = new() { Title = "cpu trace", Border = BorderStyle.Rounded, Padding = new Thickness(0, 0, 0, 0), FocusMarker = "*" };
-    private readonly LinePlot _memorySpark = new() { Title = "mem trace", Border = BorderStyle.Rounded, Padding = new Thickness(0, 0, 0, 0), FocusMarker = "*" };
-    private readonly LinePlot _networkSpark = new() { Title = "net trace", Border = BorderStyle.Rounded, Padding = new Thickness(0, 0, 0, 0), FocusMarker = "*" };
-    private readonly LinePlot _diskSpark = new() { Title = "disk trace", Border = BorderStyle.Rounded, Padding = new Thickness(0, 0, 0, 0), FocusMarker = "*" };
+    private readonly LinePlot _cpuSpark = new() { Title = "cpu trace", Border = BorderStyle.Rounded, Padding = new Thickness(1, 0, 1, 0), FocusMarker = "*" };
+    private readonly LinePlot _memorySpark = new() { Title = "mem trace", Border = BorderStyle.Rounded, Padding = new Thickness(1, 0, 1, 0), FocusMarker = "*" };
+    private readonly LinePlot _networkSpark = new() { Title = "net trace", Border = BorderStyle.Rounded, Padding = new Thickness(1, 0, 1, 0), FocusMarker = "*" };
+    private readonly LinePlot _diskSpark = new() { Title = "disk trace", Border = BorderStyle.Rounded, Padding = new Thickness(1, 0, 1, 0), FocusMarker = "*" };
 
     private readonly StatsCard _focusStats = new() { Title = "Node Focus", Border = BorderStyle.Rounded, Padding = Thickness.All(1) };
     private readonly Label _focusSummary = new() { Title = "Focus Readout", Border = BorderStyle.Rounded, Padding = Thickness.All(1) };
@@ -484,7 +484,7 @@ internal sealed partial class OpsWatchApp : TeaApp
 
     private static void ConfigureSpark(LinePlot spark, TeaStyle dataStyle, OpsWatchThemePalette palette)
     {
-        spark.Options = new LinePlotOptions(ShowAxes: false, ShowGrid: false, ShowLegend: false, ShowStats: false);
+        spark.Options = new LinePlotOptions(ShowAxes: false, ShowGrid: false, ShowLegend: false, ShowStats: false, RenderMode: LinePlotRenderMode.Compact);
         spark.TitleStyle = palette.Theme.Text.Secondary.WithBold();
         spark.FocusedTitleStyle = palette.Theme.Focus.Title;
         spark.AxisStyle = palette.Theme.Text.Muted;
@@ -492,8 +492,8 @@ internal sealed partial class OpsWatchApp : TeaApp
         spark.LegendStyle = palette.Theme.Text.Muted;
         spark.StatsStyle = palette.Theme.Text.Muted;
         spark.EmptyTextStyle = palette.Theme.Text.Muted;
-        spark.BorderStyleText = OpsWatchTheme.Foreground(palette.FrameMutedColor);
-        spark.FocusedBorderStyleText = palette.Theme.Focus.Border;
+        spark.BorderStyleText = OpsWatchTheme.Foreground(palette.FrameStrongColor);
+        spark.FocusedBorderStyleText = palette.Theme.Focus.Border.Merge(dataStyle);
         spark.MinValue = null;
         spark.MaxValue = null;
     }
