@@ -23,10 +23,10 @@ internal sealed partial class OpsWatchApp : TeaApp
     private readonly StatsCard _networkCard = new() { Title = "Network Flux", Border = BorderStyle.Rounded, Padding = Thickness.Symmetric(1, 0) };
     private readonly StatsCard _diskCard = new() { Title = "Disk Pressure", Border = BorderStyle.Rounded, Padding = Thickness.Symmetric(1, 0) };
 
-    private readonly Sparkline _cpuSpark = new(capacity: 64) { Title = "cpu trace", Border = BorderStyle.Rounded, Padding = Thickness.All(1), FocusMarker = "*" };
-    private readonly Sparkline _memorySpark = new(capacity: 64) { Title = "mem trace", Border = BorderStyle.Rounded, Padding = Thickness.All(1), FocusMarker = "*" };
-    private readonly Sparkline _networkSpark = new(capacity: 64) { Title = "net trace", Border = BorderStyle.Rounded, Padding = Thickness.All(1), FocusMarker = "*" };
-    private readonly Sparkline _diskSpark = new(capacity: 64) { Title = "disk trace", Border = BorderStyle.Rounded, Padding = Thickness.All(1), FocusMarker = "*" };
+    private readonly LinePlot _cpuSpark = new() { Title = "cpu trace", Border = BorderStyle.Rounded, Padding = Thickness.All(1), FocusMarker = "*" };
+    private readonly LinePlot _memorySpark = new() { Title = "mem trace", Border = BorderStyle.Rounded, Padding = Thickness.All(1), FocusMarker = "*" };
+    private readonly LinePlot _networkSpark = new() { Title = "net trace", Border = BorderStyle.Rounded, Padding = Thickness.All(1), FocusMarker = "*" };
+    private readonly LinePlot _diskSpark = new() { Title = "disk trace", Border = BorderStyle.Rounded, Padding = Thickness.All(1), FocusMarker = "*" };
 
     private readonly StatsCard _focusStats = new() { Title = "Node Focus", Border = BorderStyle.Rounded, Padding = Thickness.All(1) };
     private readonly Label _focusSummary = new() { Title = "Focus Readout", Border = BorderStyle.Rounded, Padding = Thickness.All(1) };
@@ -48,6 +48,10 @@ internal sealed partial class OpsWatchApp : TeaApp
     private readonly Button _redlineThemeButton = new() { Text = "Redline", Description = "3", Border = BorderStyle.Rounded, Padding = Thickness.All(1) };
 
     private readonly StatusBar _footer = new() { Fill = ' ' };
+    private readonly LineSeries _cpuSeries = new("cpu") { Capacity = 64, PointGlyph = '─' };
+    private readonly LineSeries _memorySeries = new("mem") { Capacity = 64, PointGlyph = '─' };
+    private readonly LineSeries _networkSeries = new("net") { Capacity = 64, PointGlyph = '─' };
+    private readonly LineSeries _diskSeries = new("disk") { Capacity = 64, PointGlyph = '─' };
 
     private bool _syncingFleetSelection;
     private bool _syncingNodeSelection;
@@ -195,6 +199,10 @@ internal sealed partial class OpsWatchApp : TeaApp
         _healthBoard.SetServices(_state.BuildServices());
         _feed.MaxItems = 48;
         _feed.SetItems(_state.FeedItems);
+        _cpuSpark.SetSeries([_cpuSeries]);
+        _memorySpark.SetSeries([_memorySeries]);
+        _networkSpark.SetSeries([_networkSeries]);
+        _diskSpark.SetSeries([_diskSeries]);
 
         ConfigureBullet(_cpuBullet, "cpu");
         ConfigureBullet(_memoryBullet, "mem");
@@ -303,10 +311,10 @@ internal sealed partial class OpsWatchApp : TeaApp
         _networkCard.SetItems(OpsWatchState.BuildMetricCardItems("net", _state.NetworkAverage, DeltaText(_state.NetworkTrend)));
         _diskCard.SetItems(OpsWatchState.BuildMetricCardItems("disk", _state.DiskAverage, DeltaText(_state.DiskTrend)));
 
-        _cpuSpark.SetSamples(_state.CpuTrend);
-        _memorySpark.SetSamples(_state.MemoryTrend);
-        _networkSpark.SetSamples(_state.NetworkTrend);
-        _diskSpark.SetSamples(_state.DiskTrend);
+        _cpuSeries.SetSamples(_state.CpuTrend);
+        _memorySeries.SetSamples(_state.MemoryTrend);
+        _networkSeries.SetSamples(_state.NetworkTrend);
+        _diskSeries.SetSamples(_state.DiskTrend);
 
         SyncBullet(_cpuBullet, _state.SelectedNode.Cpu, 72, 90);
         SyncBullet(_memoryBullet, _state.SelectedNode.Memory, 74, 92);
@@ -380,6 +388,10 @@ internal sealed partial class OpsWatchApp : TeaApp
         ConfigureSpark(_memorySpark, OpsWatchTheme.Foreground(palette.MemoryColor), palette);
         ConfigureSpark(_networkSpark, OpsWatchTheme.Foreground(palette.NetworkColor), palette);
         ConfigureSpark(_diskSpark, OpsWatchTheme.Foreground(palette.DiskColor), palette);
+        _cpuSeries.Style = OpsWatchTheme.Foreground(palette.CpuColor).WithBold();
+        _memorySeries.Style = OpsWatchTheme.Foreground(palette.MemoryColor).WithBold();
+        _networkSeries.Style = OpsWatchTheme.Foreground(palette.NetworkColor).WithBold();
+        _diskSeries.Style = OpsWatchTheme.Foreground(palette.DiskColor).WithBold();
 
         _fleetRail.BorderStyleText = theme.Border.Strong;
         _fleetRail.FocusedBorderStyleText = theme.Border.Focused.Merge(theme.Focus.Border);
@@ -470,15 +482,20 @@ internal sealed partial class OpsWatchApp : TeaApp
         card.BorderStyleText = OpsWatchTheme.Foreground(palette.FrameMutedColor);
     }
 
-    private static void ConfigureSpark(Sparkline spark, TeaStyle dataStyle, OpsWatchThemePalette palette)
+    private static void ConfigureSpark(LinePlot spark, TeaStyle dataStyle, OpsWatchThemePalette palette)
     {
+        spark.Options = new LinePlotOptions(ShowAxes: false, ShowGrid: false, ShowLegend: false, ShowStats: false);
         spark.TitleStyle = palette.Theme.Text.Secondary.WithBold();
         spark.FocusedTitleStyle = palette.Theme.Focus.Title;
-        spark.DataStyle = dataStyle;
-        spark.MetaStyle = palette.Theme.Text.Muted;
+        spark.AxisStyle = palette.Theme.Text.Muted;
+        spark.GridStyle = palette.Theme.Text.Muted;
+        spark.LegendStyle = palette.Theme.Text.Muted;
+        spark.StatsStyle = palette.Theme.Text.Muted;
         spark.EmptyTextStyle = palette.Theme.Text.Muted;
         spark.BorderStyleText = OpsWatchTheme.Foreground(palette.FrameMutedColor);
         spark.FocusedBorderStyleText = palette.Theme.Focus.Border;
+        spark.MinValue = 0;
+        spark.MaxValue = 100;
     }
 
     private static void ConfigureActionButton(Button button, TeaStyle labelStyle, OpsWatchThemePalette palette)
