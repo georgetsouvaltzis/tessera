@@ -10,10 +10,10 @@ internal sealed partial class MusicDeckApp : TeaApp
     private readonly MusicDeckNowPlayingControl _nowPlaying = new() { Border = BorderStyle.Rounded, Padding = Thickness.All(1) };
     private readonly MusicDeckQueueControl _queue = new() { Title = "Queue · F1", Border = BorderStyle.Rounded, Padding = Thickness.All(1) };
     private readonly ProgressBar _progress = new() { Title = "Playback Drift", Border = BorderStyle.Rounded, Padding = Thickness.All(1), FocusMarker = "✦" };
-    private readonly Button _backButton = new() { Text = "Back", Description = "p", Border = BorderStyle.None, Padding = Thickness.Symmetric(2, 1) };
-    private readonly Button _playPauseButton = new() { Text = "Pause", Description = "space", Border = BorderStyle.None, Padding = Thickness.Symmetric(2, 1) };
-    private readonly Button _nextButton = new() { Text = "Next", Description = "n", Border = BorderStyle.None, Padding = Thickness.Symmetric(2, 1) };
-    private readonly Button _detailButton = new() { Text = "Notes", Description = "l", Border = BorderStyle.None, Padding = Thickness.Symmetric(2, 1) };
+    private readonly Button _backButton = new() { Text = "Back", Description = "p", Border = BorderStyle.Rounded, Padding = Thickness.Symmetric(3, 1) };
+    private readonly Button _playPauseButton = new() { Text = "Pause", Description = "space", Border = BorderStyle.Rounded, Padding = Thickness.Symmetric(3, 1) };
+    private readonly Button _nextButton = new() { Text = "Next", Description = "n", Border = BorderStyle.Rounded, Padding = Thickness.Symmetric(3, 1) };
+    private readonly Button _detailButton = new() { Text = "Notes", Description = "l", Border = BorderStyle.Rounded, Padding = Thickness.Symmetric(3, 1) };
     private readonly StatsCard _deckStats = new() { Title = "Playback Stats", Border = BorderStyle.Rounded, Padding = Thickness.All(1) };
     private readonly StatsCard _trackStats = new() { Title = "Track Details", Border = BorderStyle.Rounded, Padding = Thickness.All(1) };
     private readonly Label _sessionMeta = new() { Title = "Session Notes", Border = BorderStyle.Rounded, Padding = Thickness.Symmetric(2, 1) };
@@ -222,8 +222,8 @@ internal sealed partial class MusicDeckApp : TeaApp
     {
         button.LabelStyle = labelStyle.WithBold();
         button.FocusedLabelStyle = MusicDeckTheme.Chip(0x1B1010, 0xF3C77A);
-        button.BorderStyleText = TeaStyle.Empty;
-        button.FocusedBorderStyleText = TeaStyle.Empty;
+        button.BorderStyleText = MusicDeckTheme.Foreground(0x6C4454);
+        button.FocusedBorderStyleText = MusicDeckTheme.Foreground(0xF3C77A).WithBold();
     }
 
     private static void ConfigureCard(StatsCard card, TeaStyle valueStyle)
