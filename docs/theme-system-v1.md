@@ -183,12 +183,21 @@ using TeaSharp.Styles;
 var button = new Button
 {
     LabelStyle = TeaStyle.Empty.WithForeground(AnsiColor.BrightWhite),
-    FocusedLabelStyle = TeaStyle.Empty.WithBold().WithForeground(AnsiColor.BrightYellow),
+    FocusedLabelStyle = TeaStyle.Empty.WithBold().WithForeground(AnsiColor.BrightWhite),
     LabelPrefix = string.Empty,
     LabelSuffix = string.Empty,
     SurfaceStyle = TeaStyle.Empty.WithBackground(AnsiColor.Rgb(36, 24, 30)),
-    FocusedSurfaceStyle = TeaStyle.Empty.WithBackground(AnsiColor.Rgb(255, 184, 108)).WithForeground(AnsiColor.Rgb(24, 16, 18)),
+    FocusedSurfaceStyle = TeaStyle.Empty.WithBackground(AnsiColor.Rgb(54, 36, 44)),
+    BorderStyleText = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(108, 68, 84)),
+    FocusedBorderStyleText = TeaStyle.Empty.WithBold().WithForeground(AnsiColor.Rgb(255, 184, 108)),
 };
+
+`Button` treats label styles as text-only semantics.
+Use `LabelStyle` / `FocusedLabelStyle` / `PressedLabelStyle` for foreground and emphasis.
+Use `SurfaceStyle` / `FocusedSurfaceStyle` / `PressedSurfaceStyle` for button-body fill.
+Background-like label facets are ignored so rounded pills stay a single shell with a single body.
+For pill/button-style controls, prefer a single coherent body surface plus border-led focus treatment.
+Avoid layering a second chip-like background behind the label, because it breaks the intended box-model read and makes padding visually disappear.
 
 var list = new ListView<string>()
 {
@@ -561,6 +570,7 @@ Basic mapping coverage includes:
 - `Label`, `Button`, `ListView<T>`, `StatusBar`, `TextInput`, `Table`, `Tabs`
 - `Label` and `Button` map `BorderStyleText` -> `theme.Border.Default` and `FocusedBorderStyleText` -> `theme.Border.Focused.Merge(theme.Focus.Border)`
 - `Button` also maps `SurfaceStyle` -> `theme.Surface.Panel`, `FocusedSurfaceStyle` -> `theme.Surface.Panel.Merge(theme.Focus.Border)`, and `PressedSurfaceStyle` -> `theme.Selection.Background`
+- `Button` label styles are text-only; body/background comes from button surface styles
 - `Table` maps `BorderStyleText` -> `theme.Border.Default` and `FocusedBorderStyleText` -> `theme.Border.Focused.Merge(theme.Focus.Border)`
 
 Navigation mapping coverage includes:

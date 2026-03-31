@@ -398,6 +398,9 @@ The first root controls that already own their implementation directly are:
 - `Button`
   - label chrome can be customized with `LabelPrefix` and `LabelSuffix`
   - padded button body can be styled via `SurfaceStyle`, `FocusedSurfaceStyle`, and `PressedSurfaceStyle`
+  - label styles are text-only; body/background semantics belong to button surface styles
+  - surface styling is expected to cover the whole inner button box, including padding, not only the post-padding content rect
+  - rounded buttons are expected to read as one coherent pill/button surface with centered content, not nested visual layers
 - `TextInput`
 - `TextArea`
 - `Breadcrumb`

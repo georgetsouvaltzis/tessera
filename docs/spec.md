@@ -181,6 +181,13 @@ High-level rules:
 - `Notifications` is the default/onboarding notification feed
 - `NotificationInbox` is the advanced/dev-ops inbox surface
 - `TelemetryChart` is the tiny-card telemetry control; `LinePlot` remains the larger plot surface
+- `Button` must follow a terminal-equivalent box model:
+  - one outer border/shell
+  - one coherent inner body/background
+  - fixed inner X/Y padding around content
+  - centered content inside the padded rect
+  - rounded-border buttons should read as a single pill/button surface, not nested chips or mini-cards
+  - focus should be ring/border-led; surface tint may increase slightly, but focus must not create inner bands or competing layers
 - `Selected*` is canonical naming
 - existing `Current*` members remain compatibility aliases only where already shipped
 - new bordered controls must ship border-style hooks, theme-token mapping, and regression coverage in the same slice
@@ -219,3 +226,9 @@ Out of scope for V1:
 - image rendering
 - advanced native image modes
 - anything that requires turning TeaSharp into a host-framework-first product
+Buttons use a single-shell box model:
+- one outer border shell
+- one uniform body fill
+- centered label inside fixed inner padding
+- label styling is text-only
+- focus should read through border/ring first, with optional subtle body tint
