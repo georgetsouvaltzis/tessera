@@ -23,10 +23,10 @@ internal sealed partial class OpsWatchApp : TeaApp
     private readonly StatsCard _networkCard = new() { Title = "Network Flux", Border = BorderStyle.Rounded, Padding = Thickness.Symmetric(1, 0) };
     private readonly StatsCard _diskCard = new() { Title = "Disk Pressure", Border = BorderStyle.Rounded, Padding = Thickness.Symmetric(1, 0) };
 
-    private readonly LinePlot _cpuSpark = new() { Title = "cpu trace", Border = BorderStyle.Rounded, Padding = Thickness.All(1), FocusMarker = "*" };
-    private readonly LinePlot _memorySpark = new() { Title = "mem trace", Border = BorderStyle.Rounded, Padding = Thickness.All(1), FocusMarker = "*" };
-    private readonly LinePlot _networkSpark = new() { Title = "net trace", Border = BorderStyle.Rounded, Padding = Thickness.All(1), FocusMarker = "*" };
-    private readonly LinePlot _diskSpark = new() { Title = "disk trace", Border = BorderStyle.Rounded, Padding = Thickness.All(1), FocusMarker = "*" };
+    private readonly LinePlot _cpuSpark = new() { Title = "cpu trace", Border = BorderStyle.Rounded, Padding = new Thickness(0, 0, 0, 0), FocusMarker = "*" };
+    private readonly LinePlot _memorySpark = new() { Title = "mem trace", Border = BorderStyle.Rounded, Padding = new Thickness(0, 0, 0, 0), FocusMarker = "*" };
+    private readonly LinePlot _networkSpark = new() { Title = "net trace", Border = BorderStyle.Rounded, Padding = new Thickness(0, 0, 0, 0), FocusMarker = "*" };
+    private readonly LinePlot _diskSpark = new() { Title = "disk trace", Border = BorderStyle.Rounded, Padding = new Thickness(0, 0, 0, 0), FocusMarker = "*" };
 
     private readonly StatsCard _focusStats = new() { Title = "Node Focus", Border = BorderStyle.Rounded, Padding = Thickness.All(1) };
     private readonly Label _focusSummary = new() { Title = "Focus Readout", Border = BorderStyle.Rounded, Padding = Thickness.All(1) };
