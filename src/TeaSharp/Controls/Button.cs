@@ -224,13 +224,13 @@ public sealed class Button : Control
             return Handle(message);
         }
 
-        var content = FrameLayout.ResolveContentRect(bounds, Border, Padding);
-        if (content.IsEmpty)
+        var box = FrameLayout.ResolveInnerRect(bounds, Border);
+        if (box.IsEmpty)
         {
             return false;
         }
 
-        var inside = content.Contains(pointer.X, pointer.Y);
+        var inside = box.Contains(pointer.X, pointer.Y);
         var changed = false;
         if (!inside)
         {
@@ -266,6 +266,7 @@ public sealed class Button : Control
             return;
         }
 
+        var box = FrameLayout.ResolveInnerRect(clipped, Border);
         var content = FrameLayout.DrawFrameAndResolveContent(
             canvas,
             clipped,
@@ -273,12 +274,12 @@ public sealed class Button : Control
             Border,
             Padding,
             ResolveBorderStyleText());
-        if (content.IsEmpty || content.Height < 1)
+        if (box.IsEmpty || content.IsEmpty || content.Height < 1)
         {
             return;
         }
 
-        FillSurface(canvas, content);
+        FillSurface(canvas, box);
 
         var label = $"{LabelPrefix}{Text}{LabelSuffix}";
         if (IsDisabled)
@@ -372,7 +373,7 @@ public sealed class Button : Control
         return style.Render(label);
     }
 
-    private void FillSurface(Canvas canvas, Rect content)
+    private void FillSurface(Canvas canvas, Rect box)
     {
         var style = ResolveSurfaceStyle();
         if (style.IsEmpty)
@@ -380,10 +381,10 @@ public sealed class Button : Control
             return;
         }
 
-        var fill = style.Render(new string(' ', Math.Max(0, content.Width)));
-        for (var y = content.Y; y < content.Bottom; y++)
+        var fill = style.Render(new string(' ', Math.Max(0, box.Width)));
+        for (var y = box.Y; y < box.Bottom; y++)
         {
-            canvas.WriteText(content.X, y, fill, content.Width);
+            canvas.WriteText(box.X, y, fill, box.Width);
         }
     }
 

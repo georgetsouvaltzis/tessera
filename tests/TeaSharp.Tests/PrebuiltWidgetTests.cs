@@ -18,6 +18,7 @@ internal static class PrebuiltWidgetTests
         yield return new TestCase("Controls_Button_TryConsumeActivation_IsSingleUse", Button_TryConsumeActivation_IsSingleUse);
         yield return new TestCase("Controls_Button_RendersBorderedState", Button_RendersBorderedState);
         yield return new TestCase("Controls_Button_FocusedBorderStyleText_StylesFrameGlyphs", Button_FocusedBorderStyleText_StylesFrameGlyphs);
+        yield return new TestCase("Controls_Button_MouseClickOnPadding_ActivatesWithinButtonBox", Button_MouseClickOnPadding_ActivatesWithinButtonBox);
         yield return new TestCase("Controls_Button_LabelChrome_CanBeRemoved", Button_LabelChrome_CanBeRemoved);
         yield return new TestCase("Controls_Button_SurfaceStyle_FillsPaddedInterior", Button_SurfaceStyle_FillsPaddedInterior);
         yield return new TestCase("Controls_TextInput_SubmitsValue", TextInput_SubmitsValue);
@@ -189,6 +190,25 @@ internal static class PrebuiltWidgetTests
         return Task.CompletedTask;
     }
 
+    private static Task Button_MouseClickOnPadding_ActivatesWithinButtonBox()
+    {
+        var button = new Button
+        {
+            Text = "Deploy",
+            Border = BorderStyle.Rounded,
+            Padding = Thickness.Symmetric(3, 1),
+        };
+        var bounds = new Rect(0, 0, 18, 5);
+
+        var clickChanged = button.Handle(new PointerInput(PointerEventKind.Press, PointerButton.Left, 1, 1), bounds);
+        var releaseChanged = button.Handle(new PointerInput(PointerEventKind.Release, PointerButton.Left, 1, 1), bounds);
+
+        TestAssert.True(clickChanged, "Mouse press inside the padded button box should activate the button.");
+        TestAssert.True(releaseChanged, "Mouse release inside the padded button box should clear the pressed state.");
+        TestAssert.Equal(1, button.ActivationCount, "Padding area should remain part of the clickable button box.");
+        return Task.CompletedTask;
+    }
+
     private static Task Button_TryConsumeActivation_IsSingleUse()
     {
         var button = new Button
@@ -293,7 +313,7 @@ internal static class PrebuiltWidgetTests
         button.Render(canvas, new Rect(0, 0, 16, 5));
         var output = canvas.Render();
 
-        TestAssert.True(output.Contains(surfaceStyle.Render("   "), StringComparison.Ordinal), "Button surface style should paint padded body area, not only label text.");
+        TestAssert.True(output.Contains(surfaceStyle.Render(new string(' ', 14)), StringComparison.Ordinal), "Button surface style should paint the whole inner box, including padding, not only the label row.");
         return Task.CompletedTask;
     }
 

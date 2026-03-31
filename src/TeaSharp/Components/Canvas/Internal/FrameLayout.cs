@@ -4,12 +4,16 @@ namespace TeaSharp.Components.Primitives.Internal;
 
 internal static class FrameLayout
 {
-    public static Rect ResolveContentRect(Rect bounds, BorderStyle border, Thickness padding)
+    public static Rect ResolveInnerRect(Rect bounds, BorderStyle border)
     {
-        var content = border == BorderStyle.None
+        return border == BorderStyle.None
             ? bounds
             : bounds.Inset(1, 1);
-        return content.Inset(padding);
+    }
+
+    public static Rect ResolveContentRect(Rect bounds, BorderStyle border, Thickness padding)
+    {
+        return ResolveInnerRect(bounds, border).Inset(padding);
     }
 
     public static Rect DrawFrameAndResolveContent(Canvas canvas, Rect bounds, string? title, BorderStyle border, Thickness padding)
