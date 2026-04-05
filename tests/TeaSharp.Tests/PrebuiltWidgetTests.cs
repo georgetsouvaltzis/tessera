@@ -400,15 +400,16 @@ internal static class PrebuiltWidgetTests
             SurfaceStyle = surfaceStyle,
         };
         var measurement = button.Measure(new Rect(0, 0, 18, 5));
-        var canvas = new Canvas(measurement.Width, 1, CanvasTextMode.GraphemeAware);
+        var canvas = new Canvas(measurement.Width, measurement.Height, CanvasTextMode.GraphemeAware);
 
         TestAssert.Equal(8, measurement.Width, "Borderless surface-styled buttons should reserve symmetric chip width without example hints.");
+        TestAssert.Equal(3, measurement.Height, "Borderless surface-styled buttons should reserve rounded-shell height when surface chrome is present.");
 
-        button.Render(canvas, new Rect(0, 0, measurement.Width, 1));
+        button.Render(canvas, new Rect(0, 0, measurement.Width, measurement.Height));
         var output = canvas.Render();
-        var expectedCenteredSurface = surfaceStyle.Render("  Play  ");
 
-        TestAssert.True(output.Contains(expectedCenteredSurface, StringComparison.Ordinal), "Filled button surface should remain continuous on both sides of centered label.");
+        TestAssert.True(output.Contains("╭", StringComparison.Ordinal), "Surface-chromed borderless buttons should render a rounded shell.");
+        TestAssert.True(output.Contains("╯", StringComparison.Ordinal), "Surface-chromed borderless buttons should render a rounded shell.");
         return Task.CompletedTask;
     }
 

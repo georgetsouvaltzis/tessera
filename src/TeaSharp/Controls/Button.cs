@@ -228,7 +228,8 @@ public sealed class Button : Control
             return Handle(message);
         }
 
-        var box = FrameLayout.ResolveInnerRect(bounds, Border);
+        var shellBorder = ResolveShellBorderStyle();
+        var box = FrameLayout.ResolveInnerRect(bounds, shellBorder);
         if (box.IsEmpty)
         {
             return false;
@@ -270,12 +271,13 @@ public sealed class Button : Control
             return;
         }
 
-        var box = FrameLayout.ResolveInnerRect(clipped, Border);
+        var shellBorder = ResolveShellBorderStyle();
+        var box = FrameLayout.ResolveInnerRect(clipped, shellBorder);
         var content = FrameLayout.DrawFrameAndResolveContent(
             canvas,
             clipped,
             null,
-            Border,
+            shellBorder,
             Padding,
             ResolveBorderStyleText());
         if (box.IsEmpty || content.IsEmpty || content.Height < 1)
@@ -315,12 +317,15 @@ public sealed class Button : Control
             : ControlTextLayout.MeasureDisplayWidth(Description);
         var width = Math.Max(labelWidth, descriptionWidth) + Padding.Horizontal;
 
-        if (Border != BorderStyle.None)
+        var shellBorder = ResolveShellBorderStyle();
+
+        if (shellBorder != BorderStyle.None)
         {
             width += 2;
             height += 2;
         }
-        else if (HasSurfaceChrome() && Padding.Horizontal == 0)
+
+        if (shellBorder != BorderStyle.None && HasSurfaceChrome() && Padding.Horizontal == 0)
         {
             // Borderless chip-style buttons should still reserve symmetric interior breathing room
             // so centered labels do not depend on example-level width guessing.
@@ -478,5 +483,12 @@ public sealed class Button : Control
     private bool HasSurfaceChrome()
     {
         return !SurfaceStyle.IsEmpty || !FocusedSurfaceStyle.IsEmpty || !PressedSurfaceStyle.IsEmpty;
+    }
+
+    private BorderStyle ResolveShellBorderStyle()
+    {
+        return Border != BorderStyle.None || !HasSurfaceChrome()
+            ? Border
+            : BorderStyle.Rounded;
     }
 }
