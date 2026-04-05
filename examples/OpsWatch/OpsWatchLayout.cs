@@ -21,9 +21,9 @@ internal sealed partial class OpsWatchApp
                     }));
                     column.Fixed(1, themes => themes.Row(row =>
                     {
-                        row.Fixed(16, _veridianThemeButton, new Thickness(0, 0, 1, 0));
-                        row.Fixed(13, _tidalThemeButton, new Thickness(0, 0, 1, 0));
-                        row.Fixed(15, _redlineThemeButton);
+                        row.Auto(_veridianThemeButton, new Thickness(0, 0, 1, 0));
+                        row.Auto(_tidalThemeButton, new Thickness(0, 0, 1, 0));
+                        row.Auto(_redlineThemeButton);
                     }));
                 }));
             return;
@@ -42,9 +42,9 @@ internal sealed partial class OpsWatchApp
                 }));
                 column.Fixed(1, themes => themes.Row(row =>
                 {
-                    row.Fixed(16, _veridianThemeButton, new Thickness(0, 0, 1, 0));
-                    row.Fixed(13, _tidalThemeButton, new Thickness(0, 0, 1, 0));
-                    row.Fixed(15, _redlineThemeButton);
+                    row.Auto(_veridianThemeButton, new Thickness(0, 0, 1, 0));
+                    row.Auto(_tidalThemeButton, new Thickness(0, 0, 1, 0));
+                    row.Auto(_redlineThemeButton);
                 }));
             }));
     }
