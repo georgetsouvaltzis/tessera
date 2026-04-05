@@ -21,11 +21,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Include="..\..\examples\PublicApiDashboard\DashboardNavigationTabs.cs" Link="PublicApiDashboard\DashboardNavigationTabs.cs" />
-  </ItemGroup>
-
-  <ItemGroup>
     <Compile Remove="ShowcaseInteractionTests.cs" />
+    <Compile Include="..\..\examples\GitConsole\GitConsoleState.cs" Link="GitConsole\GitConsoleState.cs" />
   </ItemGroup>
 
 </Project>

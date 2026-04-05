@@ -356,9 +356,27 @@ private async Task RenderLoopAsync(CancellationToken cancellationToken)
                 owner: "docs",
                 isStaged: true,
                 isReviewCritical: false,
-                headText: "## Examples\n- HelloWorld\n- CounterForm\n- WorkspaceApp\n",
-                indexText: "## Examples\n- GitConsole\n- Public flagship workflow shell\n",
-                worktreeText: "## Examples\n- GitConsole\n- Public flagship workflow shell\n"),
+                headText:
+"""
+## Examples
+- HelloWorld
+- CounterForm
+- WorkspaceApp
+""",
+                indexText:
+"""
+## Examples
+- DataWorkbench
+- OpsWatch
+- GitConsole
+""",
+                worktreeText:
+"""
+## Examples
+- DataWorkbench
+- OpsWatch
+- GitConsole
+"""),
             new GitFileEntry(
                 "gitconsole-app",
                 "examples/GitConsole/GitConsoleApp.cs",
