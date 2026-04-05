@@ -43,9 +43,9 @@ internal sealed partial class OpsWatchApp : TeaApp
     private readonly Button _inspectButton = new() { Text = "Inspect", Description = "i", Border = BorderStyle.Rounded, Padding = Thickness.All(1) };
     private readonly Button _failoverButton = new() { Text = "Failover", Description = "f", Border = BorderStyle.Rounded, Padding = Thickness.All(1) };
     private readonly Button _ackButton = new() { Text = "Acknowledge", Description = "a", Border = BorderStyle.Rounded, Padding = Thickness.All(1) };
-    private readonly Button _veridianThemeButton = new() { Text = "Veridian", Description = "1", Border = BorderStyle.Rounded, Padding = Thickness.All(1) };
-    private readonly Button _tidalThemeButton = new() { Text = "Tidal", Description = "2", Border = BorderStyle.Rounded, Padding = Thickness.All(1) };
-    private readonly Button _redlineThemeButton = new() { Text = "Redline", Description = "3", Border = BorderStyle.Rounded, Padding = Thickness.All(1) };
+    private readonly Button _veridianThemeButton = new() { Text = "1 Veridian", Description = string.Empty, Border = BorderStyle.Rounded, Padding = Thickness.Symmetric(2, 0) };
+    private readonly Button _tidalThemeButton = new() { Text = "2 Tidal", Description = string.Empty, Border = BorderStyle.Rounded, Padding = Thickness.Symmetric(2, 0) };
+    private readonly Button _redlineThemeButton = new() { Text = "3 Redline", Description = string.Empty, Border = BorderStyle.Rounded, Padding = Thickness.Symmetric(2, 0) };
 
     private readonly StatusBar _footer = new() { Fill = ' ' };
     private bool _syncingFleetSelection;
