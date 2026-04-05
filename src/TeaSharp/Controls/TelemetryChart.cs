@@ -211,10 +211,10 @@ public sealed partial class TelemetryChart : Control
         }
 
         var options = Options ?? new TelemetryChartOptions();
-        var statsHeight = options.ShowStats && content.Height > 2 ? 1 : 0;
+        var statsHeight = ResolveStatsHeight(content, options.Legend);
         if (statsHeight > 0)
         {
-            RenderStatsRow(canvas, content, options.Legend);
+            RenderStatsRows(canvas, content, options.Legend, statsHeight);
         }
 
         var chartArea = statsHeight == 0
@@ -264,21 +264,61 @@ public sealed partial class TelemetryChart : Control
             ResolveBorderStyle());
     }
 
-    private void RenderStatsRow(Canvas canvas, Rect content, string? legend)
+    private int ResolveStatsHeight(Rect content, string? legend)
+    {
+        var options = Options ?? new TelemetryChartOptions();
+        if (!options.ShowStats || content.Height <= 2)
+        {
+            return 0;
+        }
+
+        var statsWidth = ResolveStatsTextWidth(legend);
+        if (content.Width >= statsWidth)
+        {
+            return 1;
+        }
+
+        return content.Height > 3 ? 2 : 1;
+    }
+
+    private void RenderStatsRows(Canvas canvas, Rect content, string? legend, int statsHeight)
     {
         var current = _samples.Count == 0 ? 0d : _samples[^1];
         var (min, max) = ResolveBounds();
-        var left = $"now:{FormatStat(current)} min:{FormatStat(min)} max:{FormatStat(max)}";
-        canvas.WriteText(content.X, content.Y, ApplyStyle(left, ResolveStyled(MetaStyle)), content.Width);
+        var style = ResolveStyled(MetaStyle);
+        var legendText = string.IsNullOrWhiteSpace(legend) ? string.Empty : legend.Trim();
 
-        var right = string.IsNullOrWhiteSpace(legend) ? null : legend.Trim();
-        if (string.IsNullOrEmpty(right))
+        if (statsHeight == 1)
         {
+            var left = $"now:{FormatStat(current)} min:{FormatStat(min)} max:{FormatStat(max)}";
+            canvas.WriteText(content.X, content.Y, ApplyStyle(left, style), content.Width);
+
+            if (!string.IsNullOrEmpty(legendText))
+            {
+                var rightX = Math.Max(content.X, content.Right - legendText.Length);
+                canvas.WriteText(rightX, content.Y, ApplyStyle(legendText, style), content.Right - rightX);
+            }
+
             return;
         }
 
-        var rightX = Math.Max(content.X, content.Right - right.Length);
-        canvas.WriteText(rightX, content.Y, ApplyStyle(right, ResolveStyled(MetaStyle)), content.Right - rightX);
+        canvas.WriteText(content.X, content.Y, ApplyStyle($"now:{FormatStat(current)}", style), content.Width);
+        canvas.WriteText(content.X, content.Y + 1, ApplyStyle($"min:{FormatStat(min)} max:{FormatStat(max)}", style), content.Width);
+
+        if (!string.IsNullOrEmpty(legendText))
+        {
+            var rightX = Math.Max(content.X, content.Right - legendText.Length);
+            canvas.WriteText(rightX, content.Y + 1, ApplyStyle(legendText, style), content.Right - rightX);
+        }
+    }
+
+    private int ResolveStatsTextWidth(string? legend)
+    {
+        var current = _samples.Count == 0 ? 0d : _samples[^1];
+        var (min, max) = ResolveBounds();
+        var stats = $"now:{FormatStat(current)} min:{FormatStat(min)} max:{FormatStat(max)}";
+        var legendText = string.IsNullOrWhiteSpace(legend) ? string.Empty : legend.Trim();
+        return stats.Length + (legendText.Length > 0 ? legendText.Length + 1 : 0);
     }
 
     private (double Min, double Max) ResolveBounds()

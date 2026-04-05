@@ -136,6 +136,28 @@ public sealed class TelemetryChartControlTests
         Assert.That(output.Contains("cpu", StringComparison.Ordinal), Is.True);
     }
 
+    [Test]
+    public void TelemetryChartStatsRow_NarrowCard_FallsBackToTwoRows()
+    {
+        var control = new TelemetryChart
+        {
+            Border = BorderStyle.None,
+            Options = new TelemetryChartOptions(ShowStats: true, Legend: "cpu"),
+        };
+        control.SetSamples([10, 12, 16, 20]);
+
+        var output = Render(control, width: 24, height: 4);
+        var lines = output.Split('\n', StringSplitOptions.None)
+            .Select(static line => line.TrimEnd('\r'))
+            .ToArray();
+
+        Assert.That(lines.Length, Is.GreaterThanOrEqualTo(2));
+        Assert.That(lines[0], Does.Contain("now:20.0"));
+        Assert.That(lines[1], Does.Contain("min:10.0"));
+        Assert.That(lines[1], Does.Contain("max:20.0"));
+        Assert.That(lines[1], Does.Contain("cpu"));
+    }
+
     private static string Render(TelemetryChart control, int width, int height)
     {
         var canvas = new Canvas(width, height, CanvasTextMode.GraphemeAware);
