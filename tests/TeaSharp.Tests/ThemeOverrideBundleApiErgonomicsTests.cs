@@ -26,6 +26,7 @@ public sealed class ThemeOverrideBundleApiErgonomicsTests
         Assert.That(bundle.HeaderStyle, Is.EqualTo(theme.Text.Primary.WithBold()));
         Assert.That(bundle.HoveredItemStyle, Is.EqualTo(theme.Accent.Secondary.WithUnderline()));
         Assert.That(bundle.UnreadItemStyle, Is.EqualTo(theme.Text.Primary.WithBold()));
+        Assert.That(bundle.ActionBorder, Is.EqualTo(BorderStyle.Rounded));
     }
 
     [Test]
@@ -81,6 +82,7 @@ public sealed class ThemeOverrideBundleApiErgonomicsTests
 
         Assert.That(button.BorderStyleText, Is.EqualTo(bundle.BorderStyleText));
         Assert.That(button.FocusedBorderStyleText, Is.EqualTo(bundle.FocusedBorderStyleText));
+        Assert.That(button.Border, Is.EqualTo(bundle.ActionBorder));
         Assert.That(button.LabelStyle, Is.EqualTo(bundle.ActionLabelStyle));
         Assert.That(button.FocusedLabelStyle, Is.EqualTo(bundle.FocusedActionLabelStyle));
         Assert.That(button.PressedLabelStyle, Is.EqualTo(bundle.PressedActionLabelStyle));
@@ -92,6 +94,21 @@ public sealed class ThemeOverrideBundleApiErgonomicsTests
         Assert.That(dialog.BorderStyleText, Is.EqualTo(bundle.BorderStyleText));
         Assert.That(dialog.FocusedBorderStyleText, Is.EqualTo(bundle.FocusedBorderStyleText));
         Assert.That(dialog.BodyTextStyle, Is.EqualTo(bundle.BodyTextStyle));
+    }
+
+    [Test]
+    public void Theme_ApiErgonomics_ButtonDashboardOverrides_UseRoundedBorderShape()
+    {
+        var theme = TeaThemes.Catppuccin(CatppuccinVariant.Macchiato);
+        var bundle = TeaThemeOverrideBundle.CreateDashboardBundle(theme, focusMarker: "◆");
+        var button = new Button
+        {
+            Text = "Launch",
+        };
+
+        button.ApplyDashboardOverrides(bundle);
+
+        Assert.That(button.Border, Is.EqualTo(BorderStyle.Rounded));
     }
 
     [Test]

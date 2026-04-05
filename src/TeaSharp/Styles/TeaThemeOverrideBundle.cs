@@ -28,6 +28,7 @@ public sealed class TeaThemeOverrideBundle
         ActionLabelStyle = theme.Text.Primary.WithBold();
         FocusedActionLabelStyle = theme.Text.Primary.WithBold();
         PressedActionLabelStyle = theme.Selection.Foreground.WithBold();
+        ActionBorder = BorderStyle.Rounded;
         ActionSurfaceStyle = theme.Surface.Overlay.IsEmpty ? theme.Surface.Panel : theme.Surface.Overlay;
         FocusedActionSurfaceStyle = ActionSurfaceStyle;
         PressedActionSurfaceStyle = theme.Selection.Background.IsEmpty ? ActionSurfaceStyle : theme.Selection.Background;
@@ -104,6 +105,11 @@ public sealed class TeaThemeOverrideBundle
     /// Gets the pressed action label style override for action controls.
     /// </summary>
     public TeaStyle PressedActionLabelStyle { get; }
+
+    /// <summary>
+    /// Gets the default border shape override for action buttons and chips.
+    /// </summary>
+    public BorderStyle ActionBorder { get; }
 
     /// <summary>
     /// Gets the default action body surface override for action controls.
