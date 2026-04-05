@@ -51,16 +51,22 @@ internal sealed partial class GitConsoleApp
                         {
                             commitColumn.Auto(_rightHeader);
                             commitColumn.Auto(_subjectInput);
-                            commitColumn.Auto(actions => actions.Row(actionRow =>
+                            commitColumn.Fixed(3, actions => actions.Row(actionRow =>
                             {
                                 actionRow.Weighted(1, _stageButton);
                                 actionRow.Weighted(1, _discardButton);
-                                actionRow.Weighted(1, _modeButton);
                             }));
-                            commitColumn.Auto(actions => actions.Row(actionRow =>
+                            commitColumn.Fixed(3, actions => actions.Row(actionRow =>
                             {
-                                actionRow.Weighted(1, _commitButton);
-                                actionRow.Weighted(1, _syncButton);
+                                actionRow.Fill(_modeButton);
+                            }));
+                            commitColumn.Fixed(3, actions => actions.Row(actionRow =>
+                            {
+                                actionRow.Fill(_commitButton);
+                            }));
+                            commitColumn.Fixed(3, actions => actions.Row(actionRow =>
+                            {
+                                actionRow.Fill(_syncButton);
                             }));
                         }));
                         bottomRow.Fill(_history);
@@ -85,7 +91,7 @@ internal sealed partial class GitConsoleApp
                 column.Auto(_diffTabs);
                 column.Auto(_diffBriefing);
                 column.Fill(_diff);
-                column.Auto(actions => actions.Row(actionRow =>
+                column.Fixed(3, actions => actions.Row(actionRow =>
                 {
                     actionRow.Weighted(1, _stageButton);
                     actionRow.Weighted(1, _discardButton);
@@ -97,10 +103,13 @@ internal sealed partial class GitConsoleApp
                 column.Auto(_rightHeader);
                 column.Auto(_subjectInput);
                 column.Fixed(8, _notesInput);
-                column.Auto(actions => actions.Row(actionRow =>
+                column.Fixed(3, actions => actions.Row(actionRow =>
                 {
-                    actionRow.Weighted(1, _commitButton);
-                    actionRow.Weighted(1, _syncButton);
+                    actionRow.Fill(_commitButton);
+                }));
+                column.Fixed(3, actions => actions.Row(actionRow =>
+                {
+                    actionRow.Fill(_syncButton);
                 }));
                 column.Fill(_history);
             }));

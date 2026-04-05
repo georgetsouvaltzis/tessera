@@ -25,11 +25,11 @@ internal sealed partial class GitConsoleApp : TeaApp
     private readonly TextArea _notesInput = new() { Title = "Commit Notes", Border = BorderStyle.Rounded, Padding = Thickness.All(1), FocusMarker = "◆", ShowLineNumbers = false, Wrap = true };
     private readonly CommandOutput _history = new() { Title = "Action History · F4", Border = BorderStyle.Rounded, Padding = Thickness.All(1), FocusMarker = "◆", AutoFollow = true, ShowTimestamp = true };
     private readonly StatusBar _footer = new() { Fill = ' ' };
-    private readonly Button _stageButton = new() { Text = "Stage / Unstage", Description = "s · queue selected path", Border = BorderStyle.Rounded, Padding = Thickness.All(1) };
-    private readonly Button _discardButton = new() { Text = "Discard", Description = "x · drop worktree patch", Border = BorderStyle.Rounded, Padding = Thickness.All(1) };
-    private readonly Button _modeButton = new() { Text = "Cycle Lens", Description = "d · working / staged / radar", Border = BorderStyle.Rounded, Padding = Thickness.All(1) };
-    private readonly Button _commitButton = new() { Text = "Ship Commit", Description = "ctrl+enter · ship staged intent", Border = BorderStyle.Rounded, Padding = Thickness.All(1) };
-    private readonly Button _syncButton = new() { Text = "Sync Branch", Description = "u · push and fetch", Border = BorderStyle.Rounded, Padding = Thickness.All(1) };
+    private readonly Button _stageButton = new() { Text = "Stage", Description = "s queue", Border = BorderStyle.Rounded, Padding = Thickness.Symmetric(2, 0) };
+    private readonly Button _discardButton = new() { Text = "Discard", Description = "x drop", Border = BorderStyle.Rounded, Padding = Thickness.Symmetric(2, 0) };
+    private readonly Button _modeButton = new() { Text = "Lens", Description = "d cycle", Border = BorderStyle.Rounded, Padding = Thickness.Symmetric(2, 0) };
+    private readonly Button _commitButton = new() { Text = "Commit", Description = "ctrl+enter", Border = BorderStyle.Rounded, Padding = Thickness.Symmetric(2, 0) };
+    private readonly Button _syncButton = new() { Text = "Sync", Description = "u fetch", Border = BorderStyle.Rounded, Padding = Thickness.Symmetric(2, 0) };
     private readonly Label _rightHeader = new() { Title = "Commit Flow · F3", Border = BorderStyle.Rounded, Padding = Thickness.Symmetric(1, 0) };
 
     public GitConsoleApp()
@@ -351,7 +351,7 @@ internal sealed partial class GitConsoleApp : TeaApp
 
         _rightHeader.Text = BuildCommitGuide(metrics);
         _footer.LeftText = BuildFocusHint(metrics);
-        _footer.RightText = $"Focus {FocusLabel()} · {_state.Scope} · {CommitStatus(metrics)}";
+        _footer.RightText = $"{FocusLabel()} · {CommitStatus(metrics)}";
     }
 
     private void RefreshControls()
@@ -380,10 +380,10 @@ internal sealed partial class GitConsoleApp : TeaApp
         _modeButton.Description = $"d · {CurrentDiffTabLabel()}";
         _commitButton.IsDisabled = metrics.Staged == 0 || string.IsNullOrWhiteSpace(_subjectInput.Value);
         _commitButton.Description = metrics.Staged == 0
-            ? "queue a path before shipping"
+            ? "queue path first"
             : string.IsNullOrWhiteSpace(_subjectInput.Value)
-                ? "add a subject to unlock ctrl+enter"
-                : "ctrl+enter · ship staged intent";
+                ? "add subject"
+                : "ctrl+enter ship";
 
         RefreshDiff();
     }
@@ -524,27 +524,27 @@ internal sealed partial class GitConsoleApp : TeaApp
     {
         if (_worktree.IsFocused)
         {
-            return "WORKTREE · ↑↓ select  s queue  x discard  click to lock focus";
+            return "WORKTREE · ↑↓ select  s stage  x discard";
         }
 
         if (_diff.IsFocused)
         {
-            return $"PATCH DECK · ↑↓ inspect  d cycle lens  current {CurrentDiffTabLabel()}";
+            return "PATCH DECK · ↑↓ inspect  d lens";
         }
 
         if (_subjectInput.IsFocused || _notesInput.IsFocused)
         {
             return metrics.Staged == 0
-                ? "COMMIT FLOW · queue a path first, then write subject and press ctrl+enter"
-                : "COMMIT FLOW · Enter moves to notes  ctrl+enter ships staged intent";
+                ? "COMMIT FLOW · queue a path, then write subject"
+                : "COMMIT FLOW · Enter notes  Ctrl+Enter commit";
         }
 
         if (_history.IsFocused)
         {
-            return "ACTION HISTORY · review the last move, then jump back with F1 or F3";
+            return "HISTORY · review recent moves";
         }
 
-        return "F1 tree  F2 diff  F3 commit  F4 history  |  s stage  x discard  d mode  u sync  ctrl+enter commit  ctrl+c quit";
+        return "F1 tree  F2 diff  F3 commit  F4 history";
     }
 
     private string CommitStatus(GitRepoMetrics metrics)
