@@ -320,6 +320,17 @@ public sealed class Button : Control
             width += 2;
             height += 2;
         }
+        else if (HasSurfaceChrome() && Padding.Horizontal == 0)
+        {
+            // Borderless chip-style buttons should still reserve symmetric interior breathing room
+            // so centered labels do not depend on example-level width guessing.
+            width = Math.Max(width, labelWidth + 2);
+        }
+
+        if (width > labelWidth && ((width - labelWidth) & 1) != 0)
+        {
+            width++;
+        }
 
         return new LayoutMeasurement(
             Math.Clamp(width, 0, availableBounds.Width),
@@ -390,7 +401,7 @@ public sealed class Button : Control
             return;
         }
 
-        var fill = style.Render(new string(' ', Math.Max(0, box.Width)));
+        var fill = style.Render(new string(' ', box.Width));
         for (var y = box.Y; y < box.Bottom; y++)
         {
             canvas.WriteText(box.X, y, fill, box.Width);
@@ -405,16 +416,19 @@ public sealed class Button : Control
         }
 
         var displayWidth = ControlTextLayout.MeasureDisplayWidth(plainLabel);
+        if (displayWidth <= 0)
+        {
+            return;
+        }
+
         var x = content.X;
-        var width = content.Width;
         if (displayWidth < content.Width)
         {
             var offset = (content.Width - displayWidth) / 2;
             x += offset;
-            width -= offset;
         }
 
-        canvas.WriteText(x, y, renderedLabel, width);
+        canvas.WriteText(x, y, renderedLabel, displayWidth);
     }
 
     private TeaStyle ResolveBorderStyleText()
@@ -459,5 +473,10 @@ public sealed class Button : Control
             Encircled = null,
             Conceal = null,
         };
+    }
+
+    private bool HasSurfaceChrome()
+    {
+        return !SurfaceStyle.IsEmpty || !FocusedSurfaceStyle.IsEmpty || !PressedSurfaceStyle.IsEmpty;
     }
 }

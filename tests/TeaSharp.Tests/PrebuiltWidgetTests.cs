@@ -24,6 +24,7 @@ internal static class PrebuiltWidgetTests
         yield return new TestCase("Controls_Button_LabelStyles_DoNotCreateNestedBackgroundChrome", Button_LabelStyles_DoNotCreateNestedBackgroundChrome);
         yield return new TestCase("Controls_Button_Measure_UsesLongestLineAcrossLabelAndDescription", Button_Measure_UsesLongestLineAcrossLabelAndDescription);
         yield return new TestCase("Controls_Button_DisabledBorder_DoesNotBorrowLabelStyle", Button_DisabledBorder_DoesNotBorrowLabelStyle);
+        yield return new TestCase("Controls_Button_CenteredLabel_DoesNotBreakFilledSurface", Button_CenteredLabel_DoesNotBreakFilledSurface);
         yield return new TestCase("Controls_TextInput_SubmitsValue", TextInput_SubmitsValue);
         yield return new TestCase("Controls_TextInput_Events_ReportSubmitAndCancelValues", TextInput_Events_ReportSubmitAndCancelValues);
         yield return new TestCase("Controls_TextInput_TryConsumeSubmissionAndCancellation_AreSingleUse", TextInput_TryConsumeSubmissionAndCancellation_AreSingleUse);
@@ -361,7 +362,7 @@ internal static class PrebuiltWidgetTests
         };
 
         var measurement = button.Measure(new Rect(0, 0, 80, 10));
-        var expectedWidth = ControlTextLayout.MeasureDisplayWidth("click or press enter") + button.Padding.Horizontal + 2;
+        var expectedWidth = "click or press enter".Length + button.Padding.Horizontal + 2;
 
         TestAssert.Equal(expectedWidth, measurement.Width, "Button measure should size to the widest rendered line.");
         return Task.CompletedTask;
@@ -384,6 +385,30 @@ internal static class PrebuiltWidgetTests
 
         TestAssert.True(output.Contains(button.BorderStyleText.Render("┌"), StringComparison.Ordinal), "Disabled button should keep border-domain styling.");
         TestAssert.True(!output.Contains(button.DisabledLabelStyle.Render("┌"), StringComparison.Ordinal), "Disabled label style should not leak into the border shell.");
+        return Task.CompletedTask;
+    }
+
+    private static Task Button_CenteredLabel_DoesNotBreakFilledSurface()
+    {
+        var surfaceStyle = TeaStyle.Empty.WithBackground(AnsiColor.Rgb(30, 20, 20));
+        var button = new Button
+        {
+            Text = "Play",
+            LabelPrefix = string.Empty,
+            LabelSuffix = string.Empty,
+            Border = BorderStyle.None,
+            SurfaceStyle = surfaceStyle,
+        };
+        var measurement = button.Measure(new Rect(0, 0, 18, 5));
+        var canvas = new Canvas(measurement.Width, 1, CanvasTextMode.GraphemeAware);
+
+        TestAssert.Equal(6, measurement.Width, "Borderless surface-styled buttons should reserve symmetric chip width without example hints.");
+
+        button.Render(canvas, new Rect(0, 0, measurement.Width, 1));
+        var output = canvas.Render();
+        var expectedCenteredSurface = surfaceStyle.Render(" Play ");
+
+        TestAssert.True(output.Contains(expectedCenteredSurface, StringComparison.Ordinal), "Filled button surface should remain continuous on both sides of centered label.");
         return Task.CompletedTask;
     }
 
