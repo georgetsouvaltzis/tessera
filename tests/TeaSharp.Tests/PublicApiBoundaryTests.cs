@@ -22,11 +22,18 @@ internal static class PublicApiBoundaryTests
     private static readonly Regex TeaSharpHostingImportRegex = new(@"(?m)^\s*using\s+.*TeaSharp\.Hosting.*;", RegexOptions.Compiled);
     private static readonly Regex DependencyInjectionImportRegex = new(@"(?m)^\s*using\s+.*Microsoft\.Extensions\.DependencyInjection.*;", RegexOptions.Compiled);
 
-    private static readonly string[] CanonicalExampleProjectPaths =
+    private static readonly string[] FlagshipExampleProjectPaths =
     [
-        "examples/HelloWorld/HelloWorld.csproj",
-        "examples/CounterForm/CounterForm.csproj",
-        "examples/WorkspaceApp/WorkspaceApp.csproj",
+        "examples/DataWorkbench/DataWorkbench.csproj",
+        "examples/OpsWatch/OpsWatch.csproj",
+        "examples/GitConsole/GitConsole.csproj",
+    ];
+
+    private static readonly string[] SmokeScriptExpectedExamplePaths =
+    [
+        "DataWorkbench:examples/DataWorkbench/DataWorkbench.csproj",
+        "OpsWatch:examples/OpsWatch/OpsWatch.csproj",
+        "GitConsole:examples/GitConsole/GitConsole.csproj",
     ];
 
     private static readonly string[] CoreImportAllowList =
@@ -54,26 +61,26 @@ internal static class PublicApiBoundaryTests
             "PublicApiBoundary_PublicApiGuidelinesExistAndDescribeCSharpFirstBoundaries",
             PublicApiGuidelines_ExistAndDescribeCSharpFirstBoundaries);
         yield return new TestCase(
-            "PublicApiBoundary_CanonicalExampleProjectsExist",
-            CanonicalExampleProjects_Exist);
+            "PublicApiBoundary_FlagshipExampleProjectsExist",
+            FlagshipExampleProjects_Exist);
         yield return new TestCase(
-            "PublicApiBoundary_CanonicalExampleProgramsDoNotImportTeaSharpCore",
-            CanonicalExamplePrograms_DoNotImportTeaSharpCore);
+            "PublicApiBoundary_FlagshipExampleProgramsDoNotImportTeaSharpCore",
+            FlagshipExamplePrograms_DoNotImportTeaSharpCore);
         yield return new TestCase(
-            "PublicApiBoundary_CanonicalExampleProgramsDoNotImportDependencyInjection",
-            CanonicalExamplePrograms_DoNotImportDependencyInjection);
+            "PublicApiBoundary_FlagshipExampleProgramsDoNotImportDependencyInjection",
+            FlagshipExamplePrograms_DoNotImportDependencyInjection);
         yield return new TestCase(
-            "PublicApiBoundary_CanonicalExampleProgramsDoNotImportTeaSharpHosting",
-            CanonicalExamplePrograms_DoNotImportTeaSharpHosting);
-        yield return new TestCase(
-            "PublicApiBoundary_ExamplesSolutionIncludesCanonicalProjects",
-            ExamplesSolution_IncludesCanonicalProjects);
+            "PublicApiBoundary_FlagshipExampleProgramsDoNotImportTeaSharpHosting",
+            FlagshipExamplePrograms_DoNotImportTeaSharpHosting);
         yield return new TestCase(
             "PublicApiBoundary_OnboardingSourceFilesDoNotReferenceTeaSharpCore",
             OnboardingSourceFiles_DoNotReferenceTeaSharpCore);
         yield return new TestCase(
-            "PublicApiBoundary_CanonicalExampleProjectsDoNotReferenceTeaSharpCoreProject",
-            CanonicalExampleProjects_DoNotReferenceTeaSharpCoreProject);
+            "PublicApiBoundary_FlagshipExampleProjectsDoNotReferenceTeaSharpCoreProject",
+            FlagshipExampleProjects_DoNotReferenceTeaSharpCoreProject);
+        yield return new TestCase(
+            "PublicApiBoundary_SmokeExamplesScriptUsesRepoLocalArtifactsAndCurrentExamples",
+            SmokeExamplesScript_UsesRepoLocalArtifactsAndCurrentExamples);
         yield return new TestCase(
             "PublicApiBoundary_PublicTeaSharpAssemblySurfaceDoesNotExposeTeaSharpCoreTypes",
             PublicTeaSharpAssemblySurface_DoesNotExposeTeaSharpCoreTypes);
@@ -143,24 +150,24 @@ internal static class PublicApiBoundaryTests
         return Task.CompletedTask;
     }
 
-    private static Task CanonicalExampleProjects_Exist()
+    private static Task FlagshipExampleProjects_Exist()
     {
         var repoRoot = GetRepoRoot();
-        var missing = CanonicalExampleProjectPaths
+        var missing = FlagshipExampleProjectPaths
             .Where(path => !File.Exists(Path.Combine(repoRoot, path)))
             .ToArray();
 
         TestAssert.True(
             missing.Length == 0,
-            $"Canonical example projects are missing: {string.Join(", ", missing)}.");
+            $"Flagship example projects are missing: {string.Join(", ", missing)}.");
 
         return Task.CompletedTask;
     }
 
-    private static Task CanonicalExamplePrograms_DoNotImportTeaSharpCore()
+    private static Task FlagshipExamplePrograms_DoNotImportTeaSharpCore()
     {
         var repoRoot = GetRepoRoot();
-        var offenders = CanonicalExampleProjectPaths
+        var offenders = FlagshipExampleProjectPaths
             .Select(path => path.Replace(".csproj", "/Program.cs", StringComparison.Ordinal))
             .Where(path => File.Exists(Path.Combine(repoRoot, path)))
             .Where(path => TeaSharpCoreImportRegex.IsMatch(File.ReadAllText(Path.Combine(repoRoot, path))))
@@ -168,15 +175,15 @@ internal static class PublicApiBoundaryTests
 
         TestAssert.True(
             offenders.Length == 0,
-            $"Canonical examples must not import TeaSharp.Core.*. Offenders: {string.Join(", ", offenders)}.");
+            $"Flagship examples must not import TeaSharp.Core.*. Offenders: {string.Join(", ", offenders)}.");
 
         return Task.CompletedTask;
     }
 
-    private static Task CanonicalExamplePrograms_DoNotImportDependencyInjection()
+    private static Task FlagshipExamplePrograms_DoNotImportDependencyInjection()
     {
         var repoRoot = GetRepoRoot();
-        var offenders = CanonicalExampleProjectPaths
+        var offenders = FlagshipExampleProjectPaths
             .Select(path => path.Replace(".csproj", "/Program.cs", StringComparison.Ordinal))
             .Where(path => File.Exists(Path.Combine(repoRoot, path)))
             .Where(path => DependencyInjectionImportRegex.IsMatch(File.ReadAllText(Path.Combine(repoRoot, path))))
@@ -184,15 +191,15 @@ internal static class PublicApiBoundaryTests
 
         TestAssert.True(
             offenders.Length == 0,
-            $"Canonical examples should not depend on Microsoft.Extensions.DependencyInjection. Offenders: {string.Join(", ", offenders)}.");
+            $"Flagship examples should not depend on Microsoft.Extensions.DependencyInjection. Offenders: {string.Join(", ", offenders)}.");
 
         return Task.CompletedTask;
     }
 
-    private static Task CanonicalExamplePrograms_DoNotImportTeaSharpHosting()
+    private static Task FlagshipExamplePrograms_DoNotImportTeaSharpHosting()
     {
         var repoRoot = GetRepoRoot();
-        var offenders = CanonicalExampleProjectPaths
+        var offenders = FlagshipExampleProjectPaths
             .Select(path => path.Replace(".csproj", "/Program.cs", StringComparison.Ordinal))
             .Where(path => File.Exists(Path.Combine(repoRoot, path)))
             .Where(path => TeaSharpHostingImportRegex.IsMatch(File.ReadAllText(Path.Combine(repoRoot, path))))
@@ -200,26 +207,7 @@ internal static class PublicApiBoundaryTests
 
         TestAssert.True(
             offenders.Length == 0,
-            $"Canonical examples should not import TeaSharp.Hosting in the default onboarding path. Offenders: {string.Join(", ", offenders)}.");
-
-        return Task.CompletedTask;
-    }
-
-    private static Task ExamplesSolution_IncludesCanonicalProjects()
-    {
-        var repoRoot = GetRepoRoot();
-        var solutionPath = Path.Combine(repoRoot, "TeaSharp.Examples.slnx");
-        TestAssert.True(File.Exists(solutionPath), "Expected TeaSharp.Examples.slnx at repository root.");
-
-        var solutionText = File.ReadAllText(solutionPath);
-        var missing = CanonicalExampleProjectPaths
-            .Where(path => !solutionText.Contains(path.Replace('/', Path.DirectorySeparatorChar), StringComparison.Ordinal)
-                && !solutionText.Contains(path, StringComparison.Ordinal))
-            .ToArray();
-
-        TestAssert.True(
-            missing.Length == 0,
-            $"TeaSharp.Examples.slnx must include canonical example projects. Missing: {string.Join(", ", missing)}.");
+            $"Flagship examples should not import TeaSharp.Hosting in the default public path. Offenders: {string.Join(", ", offenders)}.");
 
         return Task.CompletedTask;
     }
@@ -254,17 +242,45 @@ internal static class PublicApiBoundaryTests
         return Task.CompletedTask;
     }
 
-    private static Task CanonicalExampleProjects_DoNotReferenceTeaSharpCoreProject()
+    private static Task FlagshipExampleProjects_DoNotReferenceTeaSharpCoreProject()
     {
         var repoRoot = GetRepoRoot();
-        var offenders = CanonicalExampleProjectPaths
+        var offenders = FlagshipExampleProjectPaths
             .Where(path => File.Exists(Path.Combine(repoRoot, path)))
             .Where(path => File.ReadAllText(Path.Combine(repoRoot, path)).Contains("TeaSharp.Core.csproj", StringComparison.Ordinal))
             .ToArray();
 
         TestAssert.True(
             offenders.Length == 0,
-            $"Canonical example projects must not reference TeaSharp.Core.csproj directly. Offenders: {string.Join(", ", offenders)}.");
+            $"Flagship example projects must not reference TeaSharp.Core.csproj directly. Offenders: {string.Join(", ", offenders)}.");
+
+        return Task.CompletedTask;
+    }
+
+    private static Task SmokeExamplesScript_UsesRepoLocalArtifactsAndCurrentExamples()
+    {
+        var repoRoot = GetRepoRoot();
+        var scriptPath = Path.Combine(repoRoot, "scripts", "smoke_examples_v1.sh");
+        TestAssert.True(File.Exists(scriptPath), $"Expected smoke script at {ToRepoRelativePath(scriptPath)}.");
+
+        var text = File.ReadAllText(scriptPath);
+
+        foreach (var expectedPath in SmokeScriptExpectedExamplePaths)
+        {
+            TestAssert.True(
+                text.Contains(expectedPath, StringComparison.Ordinal),
+                $"Expected {ToRepoRelativePath(scriptPath)} to include {expectedPath}.");
+        }
+
+        TestAssert.True(
+            text.Contains(".artifacts/smoke_examples_v1", StringComparison.Ordinal),
+            $"Expected {ToRepoRelativePath(scriptPath)} to write logs under ./.artifacts.");
+        TestAssert.True(
+            !text.Contains("mktemp", StringComparison.Ordinal),
+            $"Expected {ToRepoRelativePath(scriptPath)} to avoid mktemp and repo temp directories.");
+        TestAssert.True(
+            !text.Contains("/var/folders", StringComparison.Ordinal),
+            $"Expected {ToRepoRelativePath(scriptPath)} to avoid /var/folders paths.");
 
         return Task.CompletedTask;
     }
