@@ -359,8 +359,6 @@ internal sealed partial class DataWorkbenchApp
         button.PressedSurfaceStyle = surfaceStyle;
         button.BorderStyleText = DataWorkbenchTheme.Foreground(_palette.FrameStrong);
         button.FocusedBorderStyleText = _palette.Theme.Focus.Border;
-        button.LabelPrefix = string.Empty;
-        button.LabelSuffix = string.Empty;
     }
 
     private void ConfigureThemeButton(Button button, DataWorkbenchThemeKind kind)
@@ -384,7 +382,5 @@ internal sealed partial class DataWorkbenchApp
             ? DataWorkbenchTheme.Foreground(_palette.FrameStrong).WithBold()
             : DataWorkbenchTheme.Foreground(_palette.FrameMuted);
         button.FocusedBorderStyleText = _palette.Theme.Focus.Border;
-        button.LabelPrefix = string.Empty;
-        button.LabelSuffix = string.Empty;
     }
 }

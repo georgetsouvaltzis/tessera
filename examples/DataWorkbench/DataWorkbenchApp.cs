@@ -35,14 +35,14 @@ internal sealed partial class DataWorkbenchApp : TeaApp
     private readonly RichTextView _savedPreview = new() { Title = "View Briefing", Border = BorderStyle.Rounded, Padding = Thickness.All(1) };
     private readonly RichTextView _savedRunbook = new() { Title = "Re-entry Runbook", Border = BorderStyle.Rounded, Padding = Thickness.All(1) };
 
-    private readonly Button _runButton = new() { Text = "Run Slice", Description = "r", Border = BorderStyle.Rounded, Padding = Thickness.All(1) };
-    private readonly Button _pinButton = new() { Text = "Pin Compare", Description = "p", Border = BorderStyle.Rounded, Padding = Thickness.All(1) };
-    private readonly Button _saveButton = new() { Text = "Save View", Description = "b", Border = BorderStyle.Rounded, Padding = Thickness.All(1) };
-    private readonly Button _exportButton = new() { Text = "Export Slice", Description = "e", Border = BorderStyle.Rounded, Padding = Thickness.All(1) };
-    private readonly Button _clearButton = new() { Text = "Clear Search", Description = "/", Border = BorderStyle.Rounded, Padding = Thickness.All(1) };
-    private readonly Button _citrineButton = new() { Text = "Citrine", Description = "7", Border = BorderStyle.Rounded, Padding = Thickness.All(1) };
-    private readonly Button _cobaltButton = new() { Text = "Cobalt", Description = "8", Border = BorderStyle.Rounded, Padding = Thickness.All(1) };
-    private readonly Button _emberButton = new() { Text = "Ember", Description = "9", Border = BorderStyle.Rounded, Padding = Thickness.All(1) };
+    private readonly Button _runButton = new() { Text = "Run", Border = BorderStyle.None };
+    private readonly Button _pinButton = new() { Text = "Pin", Border = BorderStyle.None };
+    private readonly Button _saveButton = new() { Text = "Save", Border = BorderStyle.None };
+    private readonly Button _exportButton = new() { Text = "Export", Border = BorderStyle.None };
+    private readonly Button _clearButton = new() { Text = "Clear", Border = BorderStyle.None };
+    private readonly Button _citrineButton = new() { Text = "Citrine", Border = BorderStyle.None };
+    private readonly Button _cobaltButton = new() { Text = "Cobalt", Border = BorderStyle.None };
+    private readonly Button _emberButton = new() { Text = "Ember", Border = BorderStyle.None };
 
     private readonly StatusBar _footer = new() { Fill = ' ' };
 

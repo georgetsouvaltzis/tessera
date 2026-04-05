@@ -93,11 +93,11 @@ internal sealed partial class DataWorkbenchApp
                 column.Fixed(5, _query);
                 column.Auto(actions => actions.Row(actionRow =>
                 {
-                    actionRow.Weighted(1, _runButton);
-                    actionRow.Weighted(1, _pinButton);
-                    actionRow.Weighted(1, _saveButton);
-                    actionRow.Weighted(1, _exportButton);
-                    actionRow.Weighted(1, _clearButton);
+                    actionRow.Fixed(5, _runButton, new Thickness(0, 0, 1, 0));
+                    actionRow.Fixed(5, _pinButton, new Thickness(0, 0, 1, 0));
+                    actionRow.Fixed(6, _saveButton, new Thickness(0, 0, 1, 0));
+                    actionRow.Fixed(8, _exportButton, new Thickness(0, 0, 1, 0));
+                    actionRow.Fixed(7, _clearButton);
                 }));
                 column.Fill(_results);
             }));
@@ -138,8 +138,8 @@ internal sealed partial class DataWorkbenchApp
             {
                 column.Auto(actions => actions.Row(actionRow =>
                 {
-                    actionRow.Weighted(1, _pinButton);
-                    actionRow.Weighted(1, _saveButton);
+                    actionRow.Fixed(5, _pinButton, new Thickness(0, 0, 1, 0));
+                    actionRow.Fixed(6, _saveButton);
                 }));
                 column.Fill(_traceView);
             }));
