@@ -324,7 +324,7 @@ public sealed class Button : Control
         {
             // Borderless chip-style buttons should still reserve symmetric interior breathing room
             // so centered labels do not depend on example-level width guessing.
-            width = Math.Max(width, labelWidth + 2);
+            width = Math.Max(width, labelWidth + 4);
         }
 
         if (width > labelWidth && ((width - labelWidth) & 1) != 0)

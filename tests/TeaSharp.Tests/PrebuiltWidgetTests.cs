@@ -402,11 +402,11 @@ internal static class PrebuiltWidgetTests
         var measurement = button.Measure(new Rect(0, 0, 18, 5));
         var canvas = new Canvas(measurement.Width, 1, CanvasTextMode.GraphemeAware);
 
-        TestAssert.Equal(6, measurement.Width, "Borderless surface-styled buttons should reserve symmetric chip width without example hints.");
+        TestAssert.Equal(8, measurement.Width, "Borderless surface-styled buttons should reserve symmetric chip width without example hints.");
 
         button.Render(canvas, new Rect(0, 0, measurement.Width, 1));
         var output = canvas.Render();
-        var expectedCenteredSurface = surfaceStyle.Render(" Play ");
+        var expectedCenteredSurface = surfaceStyle.Render("  Play  ");
 
         TestAssert.True(output.Contains(expectedCenteredSurface, StringComparison.Ordinal), "Filled button surface should remain continuous on both sides of centered label.");
         return Task.CompletedTask;
