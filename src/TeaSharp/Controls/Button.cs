@@ -365,9 +365,9 @@ public sealed class Button : Control
 
         if (shellBorder == BorderStyle.Rounded && HasSurfaceChrome() && RoundedSurfaceMode == ButtonRoundedSurfaceMode.UnifiedShell)
         {
-            // A visibly rounded filled pill also needs dedicated top and bottom cap rows.
-            // At 3 rows the shell only reads as a clipped rectangle with chamfered corners.
-            height = Math.Max(height, 5);
+            // Label-only filled pills need extra shoulder rows to read as rounded instead of clipped octagons.
+            // Description-bearing buttons stay on the tighter 5-row contract so action rows do not balloon.
+            height = Math.Max(height, ShouldUseTallUnifiedShell() ? 7 : 5);
         }
 
         if (width > labelWidth && ((width - labelWidth) & 1) != 0)
@@ -778,5 +778,11 @@ public sealed class Button : Control
         return Border != BorderStyle.None || !HasSurfaceChrome()
             ? Border
             : BorderStyle.Rounded;
+    }
+
+    private bool ShouldUseTallUnifiedShell()
+    {
+        return RoundedSurfaceMode == ButtonRoundedSurfaceMode.UnifiedShell
+            && string.IsNullOrWhiteSpace(Description);
     }
 }

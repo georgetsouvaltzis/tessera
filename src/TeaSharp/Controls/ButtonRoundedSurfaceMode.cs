@@ -7,6 +7,7 @@ public enum ButtonRoundedSurfaceMode
 {
     /// <summary>
     /// Uses a unified rounded shell where border and fill read as one pill surface with inset cap and shoulder rows.
+    /// Label-only pills reserve a taller silhouette than description-bearing action buttons.
     /// </summary>
     UnifiedShell = 0,
 

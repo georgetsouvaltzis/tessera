@@ -29,6 +29,7 @@ internal static class PrebuiltWidgetTests
         yield return new TestCase("Controls_Button_NarrowSurfaceShell_DropsChromeBeforeClippingLabel", Button_NarrowSurfaceShell_DropsChromeBeforeClippingLabel);
         yield return new TestCase("Controls_Button_CompactSurfaceShell_FallsBackToReadableFilledLabel", Button_CompactSurfaceShell_FallsBackToReadableFilledLabel);
         yield return new TestCase("Controls_Button_CompactRoundedSurface_ClampsPaddingToKeepLabelVisible", Button_CompactRoundedSurface_ClampsPaddingToKeepLabelVisible);
+        yield return new TestCase("Controls_Button_UnifiedShell_LabelOnly_ReservesSevenRowHeight", Button_UnifiedShell_LabelOnly_ReservesSevenRowHeight);
         yield return new TestCase("Controls_Button_RoundedSurfaceMode_InsetBody_RendersBorderAndInsetFill", Button_RoundedSurfaceMode_InsetBody_RendersBorderAndInsetFill);
         yield return new TestCase("Controls_Button_RoundedSurfaceMode_InsetBody_CompactHeight_FallsBackToReadableFilledLabel", Button_RoundedSurfaceMode_InsetBody_CompactHeight_FallsBackToReadableFilledLabel);
         yield return new TestCase("Controls_Button_RoundedSurfaceMode_InsetBody_DefaultChrome_UsesPlainLabelAndBreathingRoom", Button_RoundedSurfaceMode_InsetBody_DefaultChrome_UsesPlainLabelAndBreathingRoom);
@@ -322,9 +323,9 @@ internal static class PrebuiltWidgetTests
             SurfaceStyle = surfaceStyle,
             BorderStyleText = borderStyle,
         };
-        var canvas = new Canvas(16, 5, CanvasTextMode.GraphemeAware);
+        var canvas = new Canvas(16, 7, CanvasTextMode.GraphemeAware);
 
-        button.Render(canvas, new Rect(0, 0, 16, 5));
+        button.Render(canvas, new Rect(0, 0, 16, 7));
         var output = canvas.Render();
         var visibleOutput = StripAnsi(output);
         var visibleLines = visibleOutput.Split('\n');
@@ -332,11 +333,13 @@ internal static class PrebuiltWidgetTests
 
         TestAssert.True(output.Contains(surfaceStyle.Render("[Go]"), StringComparison.Ordinal), "Button surface style should keep the label row on the same filled surface as the rounded shell.");
         TestAssert.True(output.Contains(capStyle.Render("▄"), StringComparison.Ordinal), "Filled rounded buttons should render shaped cap glyphs using the surface color.");
-        TestAssert.Equal("  ▗▄▄▄▄▄▄▄▄▄▄▖  ", visibleLines[0], "Filled rounded buttons should reserve a narrower top cap so the silhouette reads as a pill instead of an octagon.");
-        TestAssert.Equal(" ▗            ▖ ", visibleLines[1], "Filled rounded buttons should inset the shoulder row by one cell to keep the shell visibly curved.");
-        TestAssert.Equal("▐     [Go]     ▌", visibleLines[2], "Filled rounded buttons should keep the label centered inside the unified filled shell.");
-        TestAssert.Equal(" ▝            ▘ ", visibleLines[3], "Filled rounded buttons should inset the lower shoulder row by one cell to keep the shell visibly curved.");
-        TestAssert.Equal("  ▝▀▀▀▀▀▀▀▀▀▀▘  ", visibleLines[4], "Filled rounded buttons should reserve a narrower bottom cap so the silhouette reads as a pill instead of an octagon.");
+        TestAssert.Equal("  ▗▄▄▄▄▄▄▄▄▄▄▖  ", visibleLines[0], "Label-only filled pills should use a taller rounded silhouette instead of the compact 5-row cutout.");
+        TestAssert.Equal(" ▗            ▖ ", visibleLines[1], "Label-only filled pills should keep the upper shoulder row inside the taller shell.");
+        TestAssert.Equal("▐              ▌", visibleLines[2], "Label-only filled pills should keep an upper body row above the centered label.");
+        TestAssert.Equal("▐     [Go]     ▌", visibleLines[3], "Label-only filled pills should keep the label centered on the full middle row.");
+        TestAssert.Equal("▐              ▌", visibleLines[4], "Label-only filled pills should keep a lower body row below the centered label.");
+        TestAssert.Equal(" ▝            ▘ ", visibleLines[5], "Label-only filled pills should keep the lower shoulder row inside the taller shell.");
+        TestAssert.Equal("  ▝▀▀▀▀▀▀▀▀▀▀▘  ", visibleLines[6], "Label-only filled pills should end with the taller rounded bottom cap.");
         return Task.CompletedTask;
     }
 
@@ -420,11 +423,11 @@ internal static class PrebuiltWidgetTests
             SurfaceStyle = surfaceStyle,
             BorderStyleText = borderStyle,
         };
-        var measurement = button.Measure(new Rect(0, 0, 18, 5));
+        var measurement = button.Measure(new Rect(0, 0, 18, 10));
         var canvas = new Canvas(measurement.Width, measurement.Height, CanvasTextMode.GraphemeAware);
 
         TestAssert.Equal(8, measurement.Width, "Borderless surface-styled buttons should reserve symmetric chip width without example hints.");
-        TestAssert.Equal(5, measurement.Height, "Borderless surface-styled buttons should reserve enough height for a visibly rounded shell when surface chrome is present.");
+        TestAssert.Equal(7, measurement.Height, "Borderless surface-styled buttons without descriptions should reserve the taller rounded-pill contract.");
 
         button.Render(canvas, new Rect(0, 0, measurement.Width, measurement.Height));
         var output = canvas.Render();
@@ -433,11 +436,13 @@ internal static class PrebuiltWidgetTests
         var capStyle = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(30, 20, 20));
 
         TestAssert.True(output.Contains(capStyle.Render("▄"), StringComparison.Ordinal), "Surface-chromed borderless buttons should use the shaped filled-shell glyph contract.");
-        TestAssert.Equal(" ▗▄▄▄▄▖ ", visibleLines[0], "Surface-chromed borderless buttons should reserve a narrower top cap so the chip reads as a pill.");
-        TestAssert.Equal(" ▗    ▖ ", visibleLines[1], "Surface-chromed borderless buttons should inset the shoulder row by one cell above the label.");
-        TestAssert.Equal("▐ Play ▌", visibleLines[2], "Surface-chromed borderless buttons should keep centered labels inside the filled chip body.");
-        TestAssert.Equal(" ▝    ▘ ", visibleLines[3], "Surface-chromed borderless buttons should inset the shoulder row by one cell below the label.");
-        TestAssert.Equal(" ▝▀▀▀▀▘ ", visibleLines[4], "Surface-chromed borderless buttons should reserve a narrower bottom cap so the chip reads as a pill.");
+        TestAssert.Equal(" ▗▄▄▄▄▖ ", visibleLines[0], "Surface-chromed borderless pills should use the taller rounded silhouette instead of the compact 5-row cutout.");
+        TestAssert.Equal(" ▗    ▖ ", visibleLines[1], "Surface-chromed borderless pills should widen through the upper shoulder row.");
+        TestAssert.Equal("▐      ▌", visibleLines[2], "Surface-chromed borderless pills should keep an upper body row before the centered label.");
+        TestAssert.Equal("▐ Play ▌", visibleLines[3], "Surface-chromed borderless pills should keep centered labels inside the full middle row.");
+        TestAssert.Equal("▐      ▌", visibleLines[4], "Surface-chromed borderless pills should keep a lower body row after the centered label.");
+        TestAssert.Equal(" ▝    ▘ ", visibleLines[5], "Surface-chromed borderless pills should taper through the lower shoulder row.");
+        TestAssert.Equal(" ▝▀▀▀▀▘ ", visibleLines[6], "Surface-chromed borderless pills should end with the taller rounded bottom cap.");
         return Task.CompletedTask;
     }
 
@@ -503,6 +508,23 @@ internal static class PrebuiltWidgetTests
 
         TestAssert.True(output.Contains("Run", StringComparison.Ordinal), "Compact rounded surface buttons should clamp vertical padding instead of losing the label row.");
         TestAssert.True(!output.Contains(" r ", StringComparison.Ordinal), "Compact rounded surface buttons should prefer the primary label when there is only room for one content row.");
+        return Task.CompletedTask;
+    }
+
+    private static Task Button_UnifiedShell_LabelOnly_ReservesSevenRowHeight()
+    {
+        var button = new Button
+        {
+            Text = "Run",
+            LabelPrefix = string.Empty,
+            LabelSuffix = string.Empty,
+            Border = BorderStyle.None,
+            SurfaceStyle = TeaStyle.Empty.WithBackground(AnsiColor.Rgb(30, 20, 20)),
+        };
+
+        var measurement = button.Measure(new Rect(0, 0, 18, 10));
+
+        TestAssert.Equal(7, measurement.Height, "Label-only unified-shell buttons should reserve the taller 7-row rounded-pill contract.");
         return Task.CompletedTask;
     }
 
