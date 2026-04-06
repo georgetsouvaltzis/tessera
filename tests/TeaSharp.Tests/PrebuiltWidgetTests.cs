@@ -28,6 +28,7 @@ internal static class PrebuiltWidgetTests
         yield return new TestCase("Controls_Button_CenteredLabel_DoesNotBreakFilledSurface", Button_CenteredLabel_DoesNotBreakFilledSurface);
         yield return new TestCase("Controls_Button_NarrowSurfaceShell_DropsChromeBeforeClippingLabel", Button_NarrowSurfaceShell_DropsChromeBeforeClippingLabel);
         yield return new TestCase("Controls_Button_CompactSurfaceShell_FallsBackToReadableFilledLabel", Button_CompactSurfaceShell_FallsBackToReadableFilledLabel);
+        yield return new TestCase("Controls_Button_CompactRoundedSurface_ClampsPaddingToKeepLabelVisible", Button_CompactRoundedSurface_ClampsPaddingToKeepLabelVisible);
         yield return new TestCase("Controls_Button_RoundedSurfaceMode_InsetBody_RendersBorderAndInsetFill", Button_RoundedSurfaceMode_InsetBody_RendersBorderAndInsetFill);
         yield return new TestCase("Controls_Button_RoundedSurfaceMode_InsetBody_ReservesTallerAutoRoundedHeight", Button_RoundedSurfaceMode_InsetBody_ReservesTallerAutoRoundedHeight);
         yield return new TestCase("Controls_TextInput_SubmitsValue", TextInput_SubmitsValue);
@@ -475,6 +476,27 @@ internal static class PrebuiltWidgetTests
 
         TestAssert.True(output.Contains("Run", StringComparison.Ordinal), "Compact surface buttons should preserve readable text when the rounded shell lacks a dedicated middle row.");
         TestAssert.True(!visibleOutput.Contains('▛'), "Compact surface buttons should fall back to a filled label row instead of drawing an empty rounded shell.");
+        return Task.CompletedTask;
+    }
+
+    private static Task Button_CompactRoundedSurface_ClampsPaddingToKeepLabelVisible()
+    {
+        var button = new Button
+        {
+            Text = "Run",
+            Description = "r",
+            Border = BorderStyle.Rounded,
+            Padding = Thickness.All(1),
+            SurfaceStyle = TeaStyle.Empty.WithBackground(AnsiColor.Rgb(30, 20, 20)),
+            BorderStyleText = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(180, 150, 120)),
+        };
+        var canvas = new Canvas(8, 3, CanvasTextMode.GraphemeAware);
+
+        button.Render(canvas, new Rect(0, 0, 8, 3));
+        var output = canvas.Render();
+
+        TestAssert.True(output.Contains("Run", StringComparison.Ordinal), "Compact rounded surface buttons should clamp vertical padding instead of losing the label row.");
+        TestAssert.True(!output.Contains(" r ", StringComparison.Ordinal), "Compact rounded surface buttons should prefer the primary label when there is only room for one content row.");
         return Task.CompletedTask;
     }
 

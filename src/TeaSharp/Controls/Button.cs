@@ -424,7 +424,7 @@ public sealed class Button : Control
         TeaStyle surfaceStyle)
     {
         var box = FrameLayout.ResolveInnerRect(clipped, shellBorder);
-        var content = FrameLayout.DrawFrameAndResolveContent(
+        FrameLayout.DrawFrameAndResolveContent(
             canvas,
             clipped,
             null,
@@ -436,7 +436,7 @@ public sealed class Button : Control
             FillSurface(canvas, box, surfaceStyle);
         }
 
-        return content;
+        return ResolveContentRect(box, Padding);
     }
 
     private Rect DrawFilledRoundedShell(Canvas canvas, Rect clipped, TeaStyle borderStyleText, TeaStyle surfaceStyle)
@@ -444,7 +444,7 @@ public sealed class Button : Control
         if (clipped.Width < 2 || clipped.Height < 3)
         {
             FillSurface(canvas, clipped, surfaceStyle);
-            return clipped.Inset(Padding);
+            return ResolveContentRect(clipped, Padding);
         }
 
         var fillRect = new Rect(clipped.X + 1, clipped.Y + 1, clipped.Width - 2, clipped.Height - 2);
@@ -471,7 +471,7 @@ public sealed class Button : Control
             WriteBorderGlyph(canvas, clipped.Right - 1, y, '▐', shellStyle);
         }
 
-        return fillRect.Inset(Padding);
+        return ResolveContentRect(fillRect, Padding);
     }
 
     private void FillSurface(Canvas canvas, Rect box, TeaStyle surfaceStyle)
@@ -495,6 +495,35 @@ public sealed class Button : Control
         }
 
         canvas.FillRect(box, ' ');
+    }
+
+    private static Rect ResolveContentRect(Rect box, Thickness padding)
+    {
+        if (box.IsEmpty)
+        {
+            return box;
+        }
+
+        var left = ClampInset(padding.Left, box.Width);
+        var right = ClampInset(padding.Right, box.Width - left);
+        var top = ClampInset(padding.Top, box.Height);
+        var bottom = ClampInset(padding.Bottom, box.Height - top);
+
+        return new Rect(
+            box.X + left,
+            box.Y + top,
+            Math.Max(1, box.Width - left - right),
+            Math.Max(1, box.Height - top - bottom));
+    }
+
+    private static int ClampInset(int requested, int available)
+    {
+        if (requested <= 0 || available <= 1)
+        {
+            return 0;
+        }
+
+        return Math.Min(requested, available - 1);
     }
 
     private Rect ResolveInteractiveRect(Rect bounds, BorderStyle shellBorder)
