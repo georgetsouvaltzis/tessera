@@ -363,6 +363,13 @@ public sealed class Button : Control
             height = Math.Max(height, 5);
         }
 
+        if (shellBorder == BorderStyle.Rounded && HasSurfaceChrome() && RoundedSurfaceMode == ButtonRoundedSurfaceMode.UnifiedShell)
+        {
+            // A visibly rounded filled pill also needs dedicated top and bottom cap rows.
+            // At 3 rows the shell only reads as a clipped rectangle with chamfered corners.
+            height = Math.Max(height, 5);
+        }
+
         if (width > labelWidth && ((width - labelWidth) & 1) != 0)
         {
             width++;

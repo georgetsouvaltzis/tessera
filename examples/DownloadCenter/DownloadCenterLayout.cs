@@ -7,7 +7,7 @@ internal sealed partial class DownloadCenterApp
     private void ConfigureHeader(WindowBuilder window, ScreenContext context)
     {
         window.Header(
-            context.Width < 132 ? 12 : 8,
+            context.Width < 132 ? 11 : 10,
             header => header.Column(column =>
             {
                 column.Fixed(context.Width < 132 ? 6 : 5, top => top.Row(row =>
@@ -17,7 +17,7 @@ internal sealed partial class DownloadCenterApp
                     row.Weighted(1, _pipePulse);
                     row.Weighted(1, _retryPulse);
                 }));
-                column.Fill(actions => actions.Row(row =>
+                column.Fixed(5, actions => actions.Row(row =>
                 {
                     row.Fixed(18, _pauseButton, new Thickness(0, 0, 1, 0));
                     row.Fixed(16, _retryButton, new Thickness(0, 0, 1, 0));

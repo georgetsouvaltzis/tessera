@@ -189,6 +189,7 @@ High-level rules:
   - rounded-border buttons should read as a single pill/button surface, not nested chips or mini-cards
   - when apps need a distinct rounded outline plus inset body, `Button.RoundedSurfaceMode = InsetBody` should reserve enough inner height for that bordered-body treatment instead of collapsing back to a 3-row pill
   - `InsetBody` should also own plain-label chrome and minimum inner X breathing room when apps leave the default `Button` chrome settings in place
+  - `UnifiedShell` should reserve enough height for visible rounded caps; a 3-row surfaced button is only a compact fallback, not the intended rounded-pill presentation
   - focus should be ring/border-led; surface tint may increase slightly, but focus must not create inner bands or competing layers
   - label styling, body styling, and shell styling are separate domains and must not bleed into one another
 - `Selected*` is canonical naming

@@ -424,7 +424,7 @@ internal static class PrebuiltWidgetTests
         var canvas = new Canvas(measurement.Width, measurement.Height, CanvasTextMode.GraphemeAware);
 
         TestAssert.Equal(8, measurement.Width, "Borderless surface-styled buttons should reserve symmetric chip width without example hints.");
-        TestAssert.Equal(3, measurement.Height, "Borderless surface-styled buttons should reserve rounded-shell height when surface chrome is present.");
+        TestAssert.Equal(5, measurement.Height, "Borderless surface-styled buttons should reserve enough height for a visibly rounded shell when surface chrome is present.");
 
         button.Render(canvas, new Rect(0, 0, measurement.Width, measurement.Height));
         var output = canvas.Render();
@@ -434,8 +434,10 @@ internal static class PrebuiltWidgetTests
 
         TestAssert.True(output.Contains(capStyle.Render("▄"), StringComparison.Ordinal), "Surface-chromed borderless buttons should use the shaped filled-shell glyph contract.");
         TestAssert.Equal(" ▄▄▄▄▄▄ ", visibleLines[0], "Surface-chromed borderless buttons should leave the top corners open so the pill silhouette reads as rounded.");
-        TestAssert.Equal("▐ Play ▌", visibleLines[1], "Surface-chromed borderless buttons should keep centered labels inside the filled chip body.");
-        TestAssert.Equal(" ▀▀▀▀▀▀ ", visibleLines[2], "Surface-chromed borderless buttons should leave the bottom corners open so the pill silhouette reads as rounded.");
+        TestAssert.Equal("▐      ▌", visibleLines[1], "Surface-chromed borderless buttons should reserve a filled upper body row inside the pill.");
+        TestAssert.Equal("▐ Play ▌", visibleLines[2], "Surface-chromed borderless buttons should keep centered labels inside the filled chip body.");
+        TestAssert.Equal("▐      ▌", visibleLines[3], "Surface-chromed borderless buttons should reserve a filled lower body row inside the pill.");
+        TestAssert.Equal(" ▀▀▀▀▀▀ ", visibleLines[4], "Surface-chromed borderless buttons should leave the bottom corners open so the pill silhouette reads as rounded.");
         return Task.CompletedTask;
     }
 
