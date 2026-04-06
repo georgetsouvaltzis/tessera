@@ -1,7 +1,7 @@
 {
   "Schema": "teasharp-perf-gate-result-v1",
   "Status": "pass",
-  "BaselinePath": "/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/perf-baselines/v1-slo-gate-baseline.json",
+  "BaselinePath": "docs/perf-baselines/v1-slo-gate-baseline.json",
   "GeneratedAtUtc": "2026-03-28T17:58:04.654684+00:00",
   "Runner": "direct-slo-runner",
   "WarmupCount": 2,

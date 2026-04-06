@@ -4,13 +4,13 @@ This guide is the default onboarding path for TeaSharp public alpha.
 
 If you are evaluating TeaSharp for a product, follow this order:
 
-1. read the quick-start snippet in [README.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/README.md)
+1. read the quick-start snippet in [README.md](../README.md)
 2. run `HelloWorld`
 3. run `CounterForm`
 4. run `WorkspaceApp`
-5. read [theme-system-v1.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/theme-system-v1.md) if you care about look and feel
+5. read [theme-system-v1.md](theme-system-v1.md) if you care about look and feel
 6. then open the flagship showcases
-7. read [architecture-overview.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/architecture-overview.md) if you want to contribute or extend the framework
+7. read [architecture-overview.md](architecture-overview.md) if you want to contribute or extend the framework
 
 ## Prerequisites
 
@@ -77,9 +77,9 @@ dotnet run --project examples/DataWorkbench/DataWorkbench.csproj
 
 ## Where To Go Next
 
-- product contract: [spec.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/spec.md)
-- theme model: [theme-system-v1.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/theme-system-v1.md)
-- public API boundaries: [public-api-guidelines.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/public-api-guidelines.md)
-- API surface map: [public-api-inventory.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/public-api-inventory.md)
-- custom controls: [custom-components.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/custom-components.md)
-- contributing: [CONTRIBUTING.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/CONTRIBUTING.md)
+- product contract: [spec.md](spec.md)
+- theme model: [theme-system-v1.md](theme-system-v1.md)
+- public API boundaries: [public-api-guidelines.md](public-api-guidelines.md)
+- API surface map: [public-api-inventory.md](public-api-inventory.md)
+- custom controls: [custom-components.md](custom-components.md)
+- contributing: [CONTRIBUTING.md](../CONTRIBUTING.md)

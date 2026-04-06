@@ -5,6 +5,7 @@ namespace TeaSharp.Tests;
 internal static class PublicReleaseDocsTests
 {
     private static readonly Regex SemVerHeadingRegex = new(@"^## \[(\d+)\.(\d+)\.(\d+)(?:-[0-9A-Za-z.-]+)?\] - \d{4}-\d{2}-\d{2}$", RegexOptions.Multiline | RegexOptions.Compiled);
+    private static readonly Regex LocalPathLeakRegex = new(@"(?:/Users/[^)\s""']+|[A-Za-z]:\\[^)\s""']+|file://|vscode://)", RegexOptions.Compiled);
 
     public static IEnumerable<TestCase> Cases()
     {
@@ -17,6 +18,9 @@ internal static class PublicReleaseDocsTests
         yield return new TestCase(
             "PublicReleaseDocs_ExamplesSolutionExists_UnderExamples",
             ExamplesSolutionExists_UnderExamples);
+        yield return new TestCase(
+            "PublicReleaseDocs_PublicDocs_DoNotContainLocalAbsolutePathsOrEditorUris",
+            PublicDocs_DoNotContainLocalAbsolutePathsOrEditorUris);
     }
 
     private static Task ChangelogExists_AndUsesSemVerHeadings()
@@ -94,6 +98,40 @@ internal static class PublicReleaseDocsTests
         }
 
         return Task.CompletedTask;
+    }
+
+    private static Task PublicDocs_DoNotContainLocalAbsolutePathsOrEditorUris()
+    {
+        var repoRoot = GetRepoRoot();
+        var documents = EnumeratePublicDocuments(repoRoot);
+        var offenders = documents
+            .Where(path => LocalPathLeakRegex.IsMatch(File.ReadAllText(path)))
+            .Select(path => Path.GetRelativePath(repoRoot, path).Replace(Path.DirectorySeparatorChar, '/'))
+            .ToArray();
+
+        TestAssert.True(
+            offenders.Length == 0,
+            $"Public docs and release artifacts must not contain local absolute paths or editor URIs. Offenders: {string.Join(", ", offenders)}.");
+
+        return Task.CompletedTask;
+    }
+
+    private static IEnumerable<string> EnumeratePublicDocuments(string repoRoot)
+    {
+        foreach (var path in Directory.EnumerateFiles(repoRoot, "*.md", SearchOption.TopDirectoryOnly))
+        {
+            yield return path;
+        }
+
+        foreach (var path in Directory.EnumerateFiles(Path.Combine(repoRoot, "docs"), "*.md", SearchOption.AllDirectories))
+        {
+            yield return path;
+        }
+
+        foreach (var path in Directory.EnumerateFiles(Path.Combine(repoRoot, "docs", "perf-baselines"), "*.json", SearchOption.TopDirectoryOnly))
+        {
+            yield return path;
+        }
     }
 
     private static string GetRepoRoot()

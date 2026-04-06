@@ -2,19 +2,19 @@
 
 TeaSharp is developed in public. Contributions are welcome, but this repo is still in alpha and we will prefer API clarity over compatibility when necessary.
 
-Release-facing changes should also be reflected in [CHANGELOG.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/CHANGELOG.md).
+Release-facing changes should also be reflected in [CHANGELOG.md](CHANGELOG.md).
 
 ## Before You Start
 
-- read [README.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/README.md)
-- read [docs/getting-started.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/getting-started.md)
-- read [docs/architecture-overview.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/architecture-overview.md)
-- read [docs/public-api-guidelines.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/public-api-guidelines.md)
-- read [SUPPORT.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/SUPPORT.md) for the public issue/support contract
+- read [README.md](README.md)
+- read [docs/getting-started.md](docs/getting-started.md)
+- read [docs/architecture-overview.md](docs/architecture-overview.md)
+- read [docs/public-api-guidelines.md](docs/public-api-guidelines.md)
+- read [SUPPORT.md](SUPPORT.md) for the public issue/support contract
 
 ## Development Prerequisites
 
-- `.NET 10.0.103` SDK from [global.json](/Users/georgetsouvaltzis/Projects/playground/teasharp/global.json)
+- `.NET 10.0.103` SDK from [global.json](global.json)
 - a terminal with strong ANSI/CSI behavior for manual app checks
 
 ## Repo Layout
@@ -37,7 +37,7 @@ dotnet test TeaSharp.slnx
 scripts/smoke_examples_v1.sh 4
 ```
 
-If your change touches perf-sensitive code or release-track behavior, also follow [docs/perf-plan-v1.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/perf-plan-v1.md).
+If your change touches perf-sensitive code or release-track behavior, also follow [docs/perf-plan-v1.md](docs/perf-plan-v1.md).
 
 ## Contribution Rules
 
@@ -52,13 +52,13 @@ If your change touches perf-sensitive code or release-track behavior, also follo
 
 If you change a public API or public behavior, update the same slice:
 
-- [README.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/README.md)
-- [CHANGELOG.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/CHANGELOG.md)
-- [docs/spec.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/spec.md)
-- [docs/public-api-guidelines.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/public-api-guidelines.md)
-- [docs/public-api-inventory.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/public-api-inventory.md)
-- [docs/theme-system-v1.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/theme-system-v1.md) when styling/theming behavior changes
-- [docs/examples.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/examples.md) when the example lineup changes
+- [README.md](README.md)
+- [CHANGELOG.md](CHANGELOG.md)
+- [docs/spec.md](docs/spec.md)
+- [docs/public-api-guidelines.md](docs/public-api-guidelines.md)
+- [docs/public-api-inventory.md](docs/public-api-inventory.md)
+- [docs/theme-system-v1.md](docs/theme-system-v1.md) when styling/theming behavior changes
+- [docs/examples.md](docs/examples.md) when the example lineup changes
 
 ## Pull Request Expectations
 

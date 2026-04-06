@@ -58,7 +58,7 @@ TeaSharp theming is semantic-token based:
 - instance overrides
 - state overrides
 
-The full token and override map lives in [theme-system-v1.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/theme-system-v1.md).
+The full token and override map lives in [theme-system-v1.md](theme-system-v1.md).
 
 ## Where To Work
 

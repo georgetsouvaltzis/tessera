@@ -40,7 +40,7 @@ Use these naming patterns on the no-DI public path (`Tea.RunAsync(new App())` or
 | Navigation/list (`ListView<T>`, `TreeView`, `Choice`, `ComboBox`) | title focus hooks + marker hooks | `SelectedIndex`/`SelectedItem` + `Selected*Style` | `Hovered*Style` | `BorderStyleText`, `FocusedBorderStyleText` |
 | Data/forms (`Table`, `DataGrid`, `TreeTable`, `Form`, `FieldSet`, `DataForm<TModel>`, `ValidationSummary`) | focused title/marker hooks | `Selected*Style` and row/cell markers | `Hovered*Style` | `BorderStyleText`, `FocusedBorderStyleText` |
 
-Extended family-by-family matrix lives in [public-api-inventory.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/public-api-inventory.md).
+Extended family-by-family matrix lives in [public-api-inventory.md](public-api-inventory.md).
 
 ## Typography Emphasis Intent
 

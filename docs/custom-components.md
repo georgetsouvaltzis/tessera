@@ -1,6 +1,6 @@
 # TeaSharp Custom Components
 
-For the default app shell, startup pattern, and default composition path, see [public-api-guidelines.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/public-api-guidelines.md).
+For the default app shell, startup pattern, and default composition path, see [public-api-guidelines.md](public-api-guidelines.md).
 
 TeaSharp keeps custom widgets available, but through a smaller contract than the full runtime engine.
 

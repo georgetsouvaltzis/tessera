@@ -13,7 +13,7 @@ Support is best-effort, in public, and optimized for reproducible reports.
 - feature requests and API ideas:
   - open a GitHub Issue
 - security reports:
-  - follow [SECURITY.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/SECURITY.md)
+  - follow [SECURITY.md](SECURITY.md)
 
 TeaSharp does not currently provide private product support or response-time guarantees.
 
@@ -21,10 +21,10 @@ TeaSharp does not currently provide private product support or response-time gua
 
 Please check these first:
 
-- [README.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/README.md)
-- [docs/getting-started.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/getting-started.md)
-- [docs/examples.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/examples.md)
-- [CHANGELOG.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/CHANGELOG.md)
+- [README.md](README.md)
+- [docs/getting-started.md](docs/getting-started.md)
+- [docs/examples.md](docs/examples.md)
+- [CHANGELOG.md](CHANGELOG.md)
 
 If you can, verify against the current public baseline:
 

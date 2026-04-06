@@ -64,9 +64,9 @@ await app.RunAsync();
 
 Public onboarding should teach one story:
 
-1. start with [README.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/README.md)
-2. follow [getting-started.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/getting-started.md)
-3. use the starter example order in [examples.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/examples.md): `HelloWorld` -> `CounterForm` -> `WorkspaceApp`
+1. start with [README.md](../README.md)
+2. follow [getting-started.md](getting-started.md)
+3. use the starter example order in [examples.md](examples.md): `HelloWorld` -> `CounterForm` -> `WorkspaceApp`
 4. use the flagship examples only after the starter ladder is clear
 
 Keep examples in `TeaSharp` namespaces. `TeaSharp.Core` is the low-level advanced lane and should not appear in the starter or flagship public examples.

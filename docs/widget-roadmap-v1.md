@@ -310,5 +310,5 @@ Execution rules:
 
 ## Coordination Notes
 
-- Source-of-truth milestone mapping stays in [v1-master-plan.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/v1-master-plan.md).
-- Public API and theme consistency remain aligned with [public-api-inventory.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/public-api-inventory.md) and [theme-system-v1.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/theme-system-v1.md).
+- Source-of-truth milestone mapping stays in [v1-master-plan.md](v1-master-plan.md).
+- Public API and theme consistency remain aligned with [public-api-inventory.md](public-api-inventory.md) and [theme-system-v1.md](theme-system-v1.md).

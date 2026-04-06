@@ -141,9 +141,9 @@ Default app shape:
 
 Canonical learning path:
 
-1. [README.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/README.md)
-2. [getting-started.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/getting-started.md)
-3. [examples.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/examples.md)
+1. [README.md](../README.md)
+2. [getting-started.md](getting-started.md)
+3. [examples.md](examples.md)
 
 ### Interaction Contract
 
@@ -173,7 +173,7 @@ The default authoring model should read like explicit screen composition, not a 
 
 ### Control Contract
 
-The public control surface is tracked in [public-api-inventory.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/public-api-inventory.md).
+The public control surface is tracked in [public-api-inventory.md](public-api-inventory.md).
 
 High-level rules:
 
@@ -192,7 +192,7 @@ High-level rules:
 - existing `Current*` members remain compatibility aliases only where already shipped
 - new bordered controls must ship border-style hooks, theme-token mapping, and regression coverage in the same slice
 
-Custom-widget authoring remains supported through [custom-components.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/custom-components.md).
+Custom-widget authoring remains supported through [custom-components.md](custom-components.md).
 
 ## Theme And Style Contract
 
@@ -207,9 +207,9 @@ Typography contract:
 
 - ANSI emphasis intent is portable (`TeaStyle`, `TeaFontWeight`)
 - terminal font requests are best-effort only
-- terminal-specific caveats live in [terminal-font-capability-matrix.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/terminal-font-capability-matrix.md)
+- terminal-specific caveats live in [terminal-font-capability-matrix.md](terminal-font-capability-matrix.md)
 
-Detailed token and hook mapping lives in [theme-system-v1.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/theme-system-v1.md).
+Detailed token and hook mapping lives in [theme-system-v1.md](theme-system-v1.md).
 
 ## V1 Boundaries
 

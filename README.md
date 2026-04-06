@@ -26,11 +26,11 @@ TeaSharp is in public alpha. It is ready for evaluation, experimentation, and co
 
 ## Start Here
 
-1. Read [docs/getting-started.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/getting-started.md).
-2. Run the onboarding ladder from [docs/examples.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/examples.md): `HelloWorld`, `CounterForm`, `WorkspaceApp`.
-3. Use [docs/theme-system-v1.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/theme-system-v1.md) for theming and [docs/custom-components.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/custom-components.md) for custom controls.
+1. Read [docs/getting-started.md](docs/getting-started.md).
+2. Run the onboarding ladder from [docs/examples.md](docs/examples.md): `HelloWorld`, `CounterForm`, `WorkspaceApp`.
+3. Use [docs/theme-system-v1.md](docs/theme-system-v1.md) for theming and [docs/custom-components.md](docs/custom-components.md) for custom controls.
 4. Then open the flagship showcases to see larger product-like surfaces.
-5. If you want to contribute, read [CONTRIBUTING.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/CONTRIBUTING.md) and [docs/architecture-overview.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/architecture-overview.md).
+5. If you want to contribute, read [CONTRIBUTING.md](CONTRIBUTING.md) and [docs/architecture-overview.md](docs/architecture-overview.md).
 
 ## Quick Start
 
@@ -150,7 +150,7 @@ Supporting demos:
 - `examples/MusicDeck`
 - `examples/TransitBoard`
 
-The full guide lives in [docs/examples.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/examples.md).
+The full guide lives in [docs/examples.md](docs/examples.md).
 
 ## Repo Layout
 
@@ -163,23 +163,23 @@ The full guide lives in [docs/examples.md](/Users/georgetsouvaltzis/Projects/pla
 
 ## Docs
 
-- onboarding guide: [docs/getting-started.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/getting-started.md)
-- example guide: [docs/examples.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/examples.md)
-- architecture overview: [docs/architecture-overview.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/architecture-overview.md)
-- design contract: [docs/spec.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/spec.md)
-- public API guidelines: [docs/public-api-guidelines.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/public-api-guidelines.md)
-- public API inventory: [docs/public-api-inventory.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/public-api-inventory.md)
-- theme system: [docs/theme-system-v1.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/theme-system-v1.md)
-- custom controls: [docs/custom-components.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/custom-components.md)
-- changelog: [CHANGELOG.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/CHANGELOG.md)
-- contributor guide: [CONTRIBUTING.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/CONTRIBUTING.md)
-- support policy: [SUPPORT.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/SUPPORT.md)
-- code of conduct: [CODE_OF_CONDUCT.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/CODE_OF_CONDUCT.md)
-- security policy: [SECURITY.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/SECURITY.md)
+- onboarding guide: [docs/getting-started.md](docs/getting-started.md)
+- example guide: [docs/examples.md](docs/examples.md)
+- architecture overview: [docs/architecture-overview.md](docs/architecture-overview.md)
+- design contract: [docs/spec.md](docs/spec.md)
+- public API guidelines: [docs/public-api-guidelines.md](docs/public-api-guidelines.md)
+- public API inventory: [docs/public-api-inventory.md](docs/public-api-inventory.md)
+- theme system: [docs/theme-system-v1.md](docs/theme-system-v1.md)
+- custom controls: [docs/custom-components.md](docs/custom-components.md)
+- changelog: [CHANGELOG.md](CHANGELOG.md)
+- contributor guide: [CONTRIBUTING.md](CONTRIBUTING.md)
+- support policy: [SUPPORT.md](SUPPORT.md)
+- code of conduct: [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md)
+- security policy: [SECURITY.md](SECURITY.md)
 
 ## Build And Verify
 
-TeaSharp uses the `.NET 10.0.103` SDK pinned in [global.json](/Users/georgetsouvaltzis/Projects/playground/teasharp/global.json).
+TeaSharp uses the `.NET 10.0.103` SDK pinned in [global.json](global.json).
 
 Primary repo verification commands:
 
@@ -192,4 +192,4 @@ scripts/smoke_examples_v1.sh 4
 
 ## Contributing
 
-TeaSharp is being shaped in public. If you want to contribute, start with [CONTRIBUTING.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/CONTRIBUTING.md).
+TeaSharp is being shaped in public. If you want to contribute, start with [CONTRIBUTING.md](CONTRIBUTING.md).

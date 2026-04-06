@@ -52,8 +52,8 @@ Examples in this repository should:
 
 If a new example becomes part of the public learning path, update:
 
-- [README.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/README.md)
-- [getting-started.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/getting-started.md)
-- [public-api-guidelines.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/public-api-guidelines.md)
-- [spec.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/spec.md)
+- [README.md](../README.md)
+- [getting-started.md](getting-started.md)
+- [public-api-guidelines.md](public-api-guidelines.md)
+- [spec.md](spec.md)
 - `scripts/smoke_examples_v1.sh`

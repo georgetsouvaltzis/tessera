@@ -66,7 +66,7 @@ Required:
 
 Reference:
 
-- [perf-plan-v1.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/perf-plan-v1.md)
+- [perf-plan-v1.md](perf-plan-v1.md)
 - `docs/perf-baselines/latest-slo-gate-result.json`
 - `docs/perf-baselines/latest-runtime-e2e-result.json`
 
@@ -78,22 +78,22 @@ Open caveat:
 
 Before public alpha signoff, do one final docs pass confirming that these files agree:
 
-- [README.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/README.md)
-- [CHANGELOG.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/CHANGELOG.md)
-- [SUPPORT.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/SUPPORT.md)
-- [getting-started.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/getting-started.md)
-- [examples.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/examples.md)
-- [architecture-overview.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/architecture-overview.md)
-- [CONTRIBUTING.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/CONTRIBUTING.md)
-- [CODE_OF_CONDUCT.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/CODE_OF_CONDUCT.md)
-- [SECURITY.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/SECURITY.md)
+- [README.md](../README.md)
+- [CHANGELOG.md](../CHANGELOG.md)
+- [SUPPORT.md](../SUPPORT.md)
+- [getting-started.md](getting-started.md)
+- [examples.md](examples.md)
+- [architecture-overview.md](architecture-overview.md)
+- [CONTRIBUTING.md](../CONTRIBUTING.md)
+- [CODE_OF_CONDUCT.md](../CODE_OF_CONDUCT.md)
+- [SECURITY.md](../SECURITY.md)
 
-- [spec.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/spec.md)
-- [public-api-guidelines.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/public-api-guidelines.md)
-- [public-api-inventory.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/public-api-inventory.md)
-- [theme-system-v1.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/theme-system-v1.md)
-- [widget-roadmap-v1.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/widget-roadmap-v1.md)
-- [perf-plan-v1.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/perf-plan-v1.md)
+- [spec.md](spec.md)
+- [public-api-guidelines.md](public-api-guidelines.md)
+- [public-api-inventory.md](public-api-inventory.md)
+- [theme-system-v1.md](theme-system-v1.md)
+- [widget-roadmap-v1.md](widget-roadmap-v1.md)
+- [perf-plan-v1.md](perf-plan-v1.md)
 
 Goal:
 
