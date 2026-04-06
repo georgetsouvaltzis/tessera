@@ -39,6 +39,9 @@ internal static class PublicReleaseDocsTests
             changelog.Contains("1.0.0-alpha.1", StringComparison.Ordinal),
             "CHANGELOG.md should record the first public alpha as 1.0.0-alpha.1.");
         TestAssert.True(
+            !changelog.Contains("## [Unreleased]", StringComparison.Ordinal),
+            "CHANGELOG.md should accumulate pre-live changes under the active alpha heading instead of an [Unreleased] bucket.");
+        TestAssert.True(
             SemVerHeadingRegex.IsMatch(changelog),
             "CHANGELOG.md should contain at least one SemVer heading in the form ## [x.y.z] - YYYY-MM-DD or ## [x.y.z-prerelease] - YYYY-MM-DD.");
 

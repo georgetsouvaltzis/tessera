@@ -5,22 +5,10 @@ All notable changes to TeaSharp should be recorded here.
 TeaSharp uses `major.minor.patch` versioning with SemVer prerelease labels during alpha:
 
 - the public alpha line starts at `1.0.0-alpha.1`
+- until TeaSharp is publicly live, keep all notable changes under the active public alpha heading instead of using a separate `Unreleased` bucket
 - prerelease increments (`1.0.0-alpha.2`) track additional alpha cuts on the same intended stable line
 - if the intended stable target changes meaningfully before release, the prerelease line can move accordingly (`1.1.0-alpha.1`)
 - `1.0.0` is still the first stability line where stricter compatibility expectations apply
-
-## [Unreleased]
-
-### Added
-
-- root-level [SUPPORT.md](SUPPORT.md) for the public issue and support contract
-- `examples/TeaSharp.Examples.slnx` for building the public examples as one separate solution
-
-### Changed
-
-- README and contributor guidance now point to the support policy
-- repo verification guidance now includes `dotnet build examples/TeaSharp.Examples.slnx`
-- public docs and release artifacts now use repo-relative paths instead of local machine filesystem links
 
 ## [1.0.0-alpha.1] - 2026-04-07
 
@@ -35,12 +23,17 @@ TeaSharp uses `major.minor.patch` versioning with SemVer prerelease labels durin
   - `CONTRIBUTING.md`
   - `CODE_OF_CONDUCT.md`
   - `SECURITY.md`
+- root-level [SUPPORT.md](SUPPORT.md) for the public issue and support contract
+- `examples/TeaSharp.Examples.slnx` for building the public examples as one separate solution
 
 ### Changed
 
 - public docs now teach the starter ladder before the flagship showcases
 - `README.md` now acts as a stronger public-facing front page for GitHub visitors
 - button visuals now default to flat filled rectangular action surfaces on the public path
+- README and contributor guidance now point to the support policy
+- repo verification guidance now includes `dotnet build examples/TeaSharp.Examples.slnx`
+- public docs and release artifacts now use repo-relative paths instead of local machine filesystem links
 
 ### Fixed
 
