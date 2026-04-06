@@ -22,6 +22,7 @@ internal static class PrebuiltWidgetTests
         yield return new TestCase("Controls_Button_MouseClickOnPadding_ActivatesWithinButtonBox", Button_MouseClickOnPadding_ActivatesWithinButtonBox);
         yield return new TestCase("Controls_Button_LabelChrome_CanBeRemoved", Button_LabelChrome_CanBeRemoved);
         yield return new TestCase("Controls_Button_SurfaceStyle_FillsPaddedInterior", Button_SurfaceStyle_FillsPaddedInterior);
+        yield return new TestCase("Controls_Button_HeavySurfaceBorder_FillsBodyThroughBorderCells", Button_HeavySurfaceBorder_FillsBodyThroughBorderCells);
         yield return new TestCase("Controls_Button_LabelStyles_DoNotCreateNestedBackgroundChrome", Button_LabelStyles_DoNotCreateNestedBackgroundChrome);
         yield return new TestCase("Controls_Button_Measure_UsesLongestLineAcrossLabelAndDescription", Button_Measure_UsesLongestLineAcrossLabelAndDescription);
         yield return new TestCase("Controls_Button_DisabledBorder_DoesNotBorrowLabelStyle", Button_DisabledBorder_DoesNotBorrowLabelStyle);
@@ -340,6 +341,41 @@ internal static class PrebuiltWidgetTests
         TestAssert.Equal("▐              ▌", visibleLines[4], "Label-only filled pills should keep a lower body row below the centered label.");
         TestAssert.Equal(" ▝            ▘ ", visibleLines[5], "Label-only filled pills should keep the lower shoulder row inside the taller shell.");
         TestAssert.Equal("  ▝▀▀▀▀▀▀▀▀▀▀▘  ", visibleLines[6], "Label-only filled pills should end with the taller rounded bottom cap.");
+        return Task.CompletedTask;
+    }
+
+    private static Task Button_HeavySurfaceBorder_FillsBodyThroughBorderCells()
+    {
+        var background = AnsiColor.Rgb(40, 30, 20);
+        var surfaceStyle = TeaStyle.Empty.WithBackground(background);
+        var borderStyle = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(210, 180, 150)).WithBold();
+        var button = new Button
+        {
+            Text = "Go",
+            LabelPrefix = string.Empty,
+            LabelSuffix = string.Empty,
+            Border = BorderStyle.Heavy,
+            Padding = Thickness.Symmetric(1, 0),
+            SurfaceStyle = surfaceStyle,
+            BorderStyleText = borderStyle,
+        };
+
+        var measurement = button.Measure(new Rect(0, 0, 20, 5));
+        var canvas = new Canvas(measurement.Width, measurement.Height, CanvasTextMode.GraphemeAware);
+
+        TestAssert.Equal(6, measurement.Width, "Compact heavy bordered buttons should keep a tight 3-row footprint.");
+        TestAssert.Equal(3, measurement.Height, "Compact heavy bordered buttons should stay on the rectangular 3-row contract.");
+
+        button.Render(canvas, new Rect(0, 0, measurement.Width, measurement.Height));
+        var output = canvas.Render();
+        var visibleLines = StripAnsi(output).Split('\n');
+        var filledBorderStyle = borderStyle with { Background = background };
+
+        TestAssert.True(output.Contains(filledBorderStyle.Render("┏"), StringComparison.Ordinal), "Heavy bordered surface buttons should paint the top-left border cell on the same filled body.");
+        TestAssert.True(output.Contains(filledBorderStyle.Render("┃"), StringComparison.Ordinal), "Heavy bordered surface buttons should paint the side border cells on the same filled body.");
+        TestAssert.Equal("┏━━━━┓", visibleLines[0], "Heavy bordered surface buttons should render a compact full-width top border.");
+        TestAssert.Equal("┃ Go ┃", visibleLines[1], "Heavy bordered surface buttons should keep the label centered inside the filled bordered body.");
+        TestAssert.Equal("┗━━━━┛", visibleLines[2], "Heavy bordered surface buttons should render a compact full-width bottom border.");
         return Task.CompletedTask;
     }
 

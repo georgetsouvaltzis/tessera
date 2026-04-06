@@ -401,6 +401,8 @@ The first root controls that already own their implementation directly are:
   - rounded surface buttons can choose between `RoundedSurfaceMode = UnifiedShell` and `RoundedSurfaceMode = InsetBody`
   - `UnifiedShell` reserves a taller filled-pill silhouette with inset cap and shoulder rows so the shell reads as a rounded pill instead of collapsing to a 3-row cutout or clipped octagon; label-only pills use the taller 7-row contract while description-bearing action buttons stay on the tighter 5-row contract
   - `InsetBody` suppresses the default bracket label chrome and adds minimum inner X breathing room when apps keep the built-in button label defaults
+  - compact `SingleLine`/`Heavy` surfaced buttons fill through the border cells so 3-row rectangular buttons still read as one coherent bordered body
+  - `BorderStyleText` colors button borders; `BorderStyle.Heavy` is the thicker compact-border affordance
   - label styles are text-only; body/background semantics belong to button surface styles
   - surface styling is expected to cover the whole inner button box, including padding, not only the post-padding content rect
   - rounded buttons are expected to read as one coherent pill/button surface with centered content, not nested visual layers

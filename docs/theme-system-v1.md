@@ -197,6 +197,8 @@ Background-like label facets are ignored so rounded pills stay a single shell wi
 For pill/button-style controls, prefer a single coherent body surface plus border-led focus treatment.
 Avoid layering a second chip-like background behind the label, because it breaks the intended box-model read and makes padding visually disappear.
 Default button focus should come primarily from the shell/ring treatment; body fill should remain stable unless an app explicitly opts into a stronger pressed/focused tint.
+For compact rectangular buttons, use `BorderStyle.SingleLine` or `BorderStyle.Heavy`; surfaced buttons now carry the body fill through the border cells so the control still reads as one filled bordered body at 3 rows.
+Use `BorderStyleText` / `FocusedBorderStyleText` to color that border chrome; `BorderStyle.Heavy` is the thicker compact-affordance option.
 If an app needs a distinct rounded outline with a separately filled inner body, set `RoundedSurfaceMode = ButtonRoundedSurfaceMode.InsetBody`.
 That mode reserves a taller rounded box so the border shell and the filled body remain visually separate.
 When the app keeps the default button label chrome, `InsetBody` also suppresses the default `[` `]` bracket treatment and adds minimum inner X breathing room automatically.

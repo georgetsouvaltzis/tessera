@@ -439,10 +439,10 @@ internal sealed partial class OpsWatchApp : TeaApp
     private void ConfigureThemeButton(Button button, OpsWatchThemeKind kind)
     {
         var isSelected = _palette.Kind == kind;
+        button.Border = BorderStyle.SingleLine;
         button.LabelPrefix = string.Empty;
         button.LabelSuffix = string.Empty;
         button.Padding = Thickness.Symmetric(1, 0);
-        button.RoundedSurfaceMode = ButtonRoundedSurfaceMode.UnifiedShell;
         button.LabelStyle = isSelected
             ? OpsWatchTheme.Foreground(_palette.HeroBadgeForeground).WithBold()
             : _palette.Theme.Text.Secondary.WithBold();
@@ -457,8 +457,10 @@ internal sealed partial class OpsWatchApp : TeaApp
         button.PressedSurfaceStyle = isSelected
             ? OpsWatchTheme.Background(_palette.FooterChipBackground)
             : _palette.Theme.Selection.Background;
-        button.BorderStyleText = TeaStyle.Empty;
-        button.FocusedBorderStyleText = TeaStyle.Empty;
+        button.BorderStyleText = isSelected
+            ? OpsWatchTheme.Foreground(_palette.FrameStrongColor).WithBold()
+            : OpsWatchTheme.Foreground(_palette.FrameMutedColor);
+        button.FocusedBorderStyleText = _palette.Theme.Focus.Border;
     }
 
     private static void ConfigurePulseCard(StatsCard card, TeaStyle valueStyle, OpsWatchThemePalette palette)
@@ -495,10 +497,10 @@ internal sealed partial class OpsWatchApp : TeaApp
     {
         var labelStyle = OpsWatchTheme.Foreground(foregroundRgb).WithBold();
         var surfaceStyle = OpsWatchTheme.Background(backgroundRgb);
+        button.Border = BorderStyle.Heavy;
         button.LabelPrefix = string.Empty;
         button.LabelSuffix = string.Empty;
         button.Padding = Thickness.Symmetric(1, 0);
-        button.RoundedSurfaceMode = ButtonRoundedSurfaceMode.UnifiedShell;
         button.LabelStyle = labelStyle.WithBold();
         button.FocusedLabelStyle = labelStyle.WithBold();
         button.PressedLabelStyle = labelStyle.WithBold();

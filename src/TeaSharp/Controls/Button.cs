@@ -295,7 +295,9 @@ public sealed class Button : Control
         var content = ShouldRenderFilledRoundedShell(shellBorder, surfaceStyle, RoundedSurfaceMode)
             || ShouldFallbackInsetBodyToUnifiedShell(shellBorder, surfaceStyle, RoundedSurfaceMode, clipped)
             ? DrawFilledRoundedShell(canvas, clipped, borderStyleText, surfaceStyle, padding)
-            : DrawDefaultShell(canvas, clipped, shellBorder, borderStyleText, surfaceStyle, padding);
+            : ShouldRenderFilledBorderedShell(shellBorder, surfaceStyle)
+                ? DrawFilledBorderedShell(canvas, clipped, shellBorder, borderStyleText, surfaceStyle, padding)
+                : DrawDefaultShell(canvas, clipped, shellBorder, borderStyleText, surfaceStyle, padding);
         if (content.IsEmpty || content.Height < 1)
         {
             return;
@@ -351,7 +353,7 @@ public sealed class Button : Control
 
         if (shellBorder != BorderStyle.None && HasSurfaceChrome() && padding.Horizontal == 0)
         {
-            // Borderless chip-style buttons should still reserve symmetric interior breathing room
+            // Surface-styled bordered buttons should still reserve symmetric interior breathing room
             // so centered labels do not depend on example-level width guessing.
             width = Math.Max(width, labelWidth + 4);
         }
@@ -458,6 +460,25 @@ public sealed class Button : Control
         }
 
         return ResolveContentRect(box, padding);
+    }
+
+    private Rect DrawFilledBorderedShell(
+        Canvas canvas,
+        Rect clipped,
+        BorderStyle shellBorder,
+        TeaStyle borderStyleText,
+        TeaStyle surfaceStyle,
+        Thickness padding)
+    {
+        FillSurface(canvas, clipped, surfaceStyle);
+        var filledBorderStyle = ResolveFilledBorderStyle(surfaceStyle, borderStyleText);
+        return FrameLayout.DrawFrameAndResolveContent(
+            canvas,
+            clipped,
+            null,
+            shellBorder,
+            padding,
+            filledBorderStyle);
     }
 
     private Rect DrawFilledRoundedShell(Canvas canvas, Rect clipped, TeaStyle borderStyleText, TeaStyle surfaceStyle, Thickness padding)
@@ -730,6 +751,13 @@ public sealed class Button : Control
             && clipped.Height < 5;
     }
 
+    private static bool ShouldRenderFilledBorderedShell(BorderStyle shellBorder, TeaStyle surfaceStyle)
+    {
+        return shellBorder != BorderStyle.None
+            && shellBorder != BorderStyle.Rounded
+            && !surfaceStyle.IsEmpty;
+    }
+
     private bool ShouldUseInsetBodyDefaults(BorderStyle shellBorder, TeaStyle surfaceStyle)
     {
         return shellBorder == BorderStyle.Rounded
@@ -753,6 +781,13 @@ public sealed class Button : Control
         }
 
         return borderStyleText;
+    }
+
+    private static TeaStyle ResolveFilledBorderStyle(TeaStyle surfaceStyle, TeaStyle borderStyleText)
+    {
+        return surfaceStyle.Background is AnsiColor background
+            ? borderStyleText with { Background = background }
+            : borderStyleText;
     }
 
     private Thickness ResolveEffectivePadding(BorderStyle shellBorder, TeaStyle surfaceStyle)
