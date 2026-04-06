@@ -190,8 +190,8 @@ High-level rules:
   - when apps need a distinct rounded outline plus inset body, `Button.RoundedSurfaceMode = InsetBody` should reserve enough inner height for that bordered-body treatment instead of collapsing back to a 3-row pill
   - `InsetBody` should also own plain-label chrome and minimum inner X breathing room when apps leave the default `Button` chrome settings in place
   - `UnifiedShell` should reserve enough height and horizontal shoulder/cap inset so the shell reads as a rounded pill instead of a clipped octagon; label-only pills should use the taller 7-row silhouette while description-bearing action buttons can stay on the tighter 5-row contract
-  - compact `SingleLine`/`Heavy` surfaced buttons should fill through the border cells so a 3-row rectangular button still reads as one coherent bordered body instead of a dark moat around an inner chip
-  - `BorderStyleText` owns button border color; `BorderStyle.Heavy` is the thicker compact border option when apps need stronger button affordance
+  - compact filled rectangular buttons should prefer `BorderStyle.Heavy`; thin `SingleLine` borders plus full-cell surface fill can read like the fill escapes past the stroke on a terminal grid
+  - `BorderStyleText` owns button border color; `BorderStyle.Heavy` is the compact bordered-button option when apps need stronger button affordance without the rounded-pill tradeoff
   - focus should be ring/border-led; surface tint may increase slightly, but focus must not create inner bands or competing layers
   - label styling, body styling, and shell styling are separate domains and must not bleed into one another
 - `Selected*` is canonical naming
