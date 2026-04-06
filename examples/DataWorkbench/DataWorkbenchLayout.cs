@@ -9,7 +9,7 @@ internal sealed partial class DataWorkbenchApp
         var compactHeight = context.Height < 34;
         if (context.Width < 120)
         {
-            window.Header(compactHeight ? 10 : 12, header => header.Column(column =>
+            window.Header(compactHeight ? 13 : 14, header => header.Column(column =>
             {
                 column.Fixed(compactHeight ? 5 : 6, _header);
                 column.Fixed(3, stats => stats.Row(row =>
@@ -18,18 +18,18 @@ internal sealed partial class DataWorkbenchApp
                     row.Weighted(1, _velocityPulse);
                     row.Weighted(1, _comparePulse);
                 }));
-                column.Fill(nav => nav.Row(row =>
+                column.Fixed(5, nav => nav.Row(row =>
                 {
                     row.Weighted(3, _pageTabs);
-                    row.Fixed(12, _citrineButton, new Thickness(0, 0, 1, 0));
-                    row.Fixed(11, _cobaltButton, new Thickness(0, 0, 1, 0));
-                    row.Fixed(10, _emberButton);
+                    row.Auto(_citrineButton, new Thickness(0, 0, 1, 0));
+                    row.Auto(_cobaltButton, new Thickness(0, 0, 1, 0));
+                    row.Auto(_emberButton);
                 }));
             }));
             return;
         }
 
-        window.Header(compactHeight ? 8 : 10, header => header.Column(column =>
+        window.Header(compactHeight ? 10 : 11, header => header.Column(column =>
         {
             column.Fixed(compactHeight ? 5 : 6, top => top.Row(row =>
             {
@@ -38,12 +38,12 @@ internal sealed partial class DataWorkbenchApp
                 row.Weighted(1, _velocityPulse);
                 row.Weighted(1, _comparePulse);
             }));
-            column.Fill(nav => nav.Row(row =>
+            column.Fixed(5, nav => nav.Row(row =>
             {
                 row.Weighted(4, _pageTabs);
-                row.Fixed(12, _citrineButton, new Thickness(0, 0, 1, 0));
-                row.Fixed(11, _cobaltButton, new Thickness(0, 0, 1, 0));
-                row.Fixed(10, _emberButton);
+                row.Auto(_citrineButton, new Thickness(0, 0, 1, 0));
+                row.Auto(_cobaltButton, new Thickness(0, 0, 1, 0));
+                row.Auto(_emberButton);
             }));
         }));
     }
@@ -93,11 +93,11 @@ internal sealed partial class DataWorkbenchApp
                 column.Fixed(5, _query);
                 column.Auto(actions => actions.Row(actionRow =>
                 {
-                    actionRow.Fixed(5, _runButton, new Thickness(0, 0, 1, 0));
-                    actionRow.Fixed(5, _pinButton, new Thickness(0, 0, 1, 0));
-                    actionRow.Fixed(6, _saveButton, new Thickness(0, 0, 1, 0));
-                    actionRow.Fixed(8, _exportButton, new Thickness(0, 0, 1, 0));
-                    actionRow.Fixed(7, _clearButton);
+                    actionRow.Auto(_runButton, new Thickness(0, 0, 1, 0));
+                    actionRow.Auto(_pinButton, new Thickness(0, 0, 1, 0));
+                    actionRow.Auto(_saveButton, new Thickness(0, 0, 1, 0));
+                    actionRow.Auto(_exportButton, new Thickness(0, 0, 1, 0));
+                    actionRow.Auto(_clearButton);
                 }));
                 column.Fill(_results);
             }));
@@ -138,8 +138,8 @@ internal sealed partial class DataWorkbenchApp
             {
                 column.Auto(actions => actions.Row(actionRow =>
                 {
-                    actionRow.Fixed(5, _pinButton, new Thickness(0, 0, 1, 0));
-                    actionRow.Fixed(6, _saveButton);
+                    actionRow.Auto(_pinButton, new Thickness(0, 0, 1, 0));
+                    actionRow.Auto(_saveButton);
                 }));
                 column.Fill(_traceView);
             }));
