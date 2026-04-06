@@ -468,11 +468,6 @@ public sealed class Button : Control
         }
 
         var capStyle = ResolveFilledRoundedShellCapStyle(surfaceStyle, borderStyleText);
-        WriteBorderGlyph(canvas, clipped.X, clipped.Y, '▗', capStyle);
-        WriteBorderGlyph(canvas, clipped.Right - 1, clipped.Y, '▖', capStyle);
-        WriteBorderGlyph(canvas, clipped.X, clipped.Bottom - 1, '▝', capStyle);
-        WriteBorderGlyph(canvas, clipped.Right - 1, clipped.Bottom - 1, '▘', capStyle);
-
         for (var x = clipped.X + 1; x < clipped.Right - 1; x++)
         {
             WriteBorderGlyph(canvas, x, clipped.Y, '▄', capStyle);
