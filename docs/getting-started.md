@@ -5,9 +5,12 @@ This guide is the default onboarding path for TeaSharp public alpha.
 If you are evaluating TeaSharp for a product, follow this order:
 
 1. read the quick-start snippet in [README.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/README.md)
-2. run one flagship example from [examples.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/examples.md)
-3. read [theme-system-v1.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/theme-system-v1.md) if you care about look and feel
-4. read [architecture-overview.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/architecture-overview.md) if you want to contribute or extend the framework
+2. run `HelloWorld`
+3. run `CounterForm`
+4. run `WorkspaceApp`
+5. read [theme-system-v1.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/theme-system-v1.md) if you care about look and feel
+6. then open the flagship showcases
+7. read [architecture-overview.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/architecture-overview.md) if you want to contribute or extend the framework
 
 ## Prerequisites
 
@@ -43,21 +46,30 @@ using TeaSharp.Layout;
 
 Recommended learning order:
 
-1. `examples/GitConsole`
-   - best first real app
-   - teaches command workflows, navigation, selection, and action handling
-2. `examples/OpsWatch`
-   - best first dashboard app
-   - teaches telemetry surfaces, status-heavy layouts, and action rails
-3. `examples/DataWorkbench`
-   - best full-shell example
-   - teaches multi-pane composition, richer state orchestration, and pointer-ready runtime configuration
+1. `examples/HelloWorld`
+   - smallest visual starter
+   - teaches the basic `TeaApp` loop, centered layout, button events, and status text
+2. `examples/CounterForm`
+   - first interactive app
+   - teaches text input, numeric input, choice, progress, and message-driven updates
+3. `examples/WorkspaceApp`
+   - first multi-pane starter
+   - teaches navigation, editing, preview, and action flow inside one centered shell
+4. `examples/GitConsole`
+   - first larger workflow app
+5. `examples/OpsWatch`
+   - first larger dashboard app
+6. `examples/DataWorkbench`
+   - first richer workbench shell
 
 Supporting demos such as `DownloadCenter`, `IncidentDesk`, `MusicDeck`, and `TransitBoard` are useful after the flagship path.
 
 ## Run The Examples
 
 ```bash
+dotnet run --project examples/HelloWorld/HelloWorld.csproj
+dotnet run --project examples/CounterForm/CounterForm.csproj
+dotnet run --project examples/WorkspaceApp/WorkspaceApp.csproj
 dotnet run --project examples/GitConsole/GitConsole.csproj
 dotnet run --project examples/OpsWatch/OpsWatch.csproj
 dotnet run --project examples/DataWorkbench/DataWorkbench.csproj

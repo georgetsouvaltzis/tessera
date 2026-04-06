@@ -248,7 +248,7 @@ The intended beginner path is:
 - return `Screen` from `Build(ScreenContext)`
 - assemble screens with `Screen.Build(...)` and shallow builder callbacks
 - keep configuration in `TeaRuntimeOptions` and `ScreenOptions`
-- follow the public onboarding path in [getting-started.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/getting-started.md) and the flagship example order in [examples.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/examples.md)
+- follow the public onboarding path in [getting-started.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/getting-started.md), starting with `HelloWorld`, `CounterForm`, and `WorkspaceApp` before the flagship showcases in [examples.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/examples.md)
 - treat `TeaSharp.Core` as the low-level advanced lane, not default onboarding
 - use semantic theme tokens and palette-driven styling on the default path
 

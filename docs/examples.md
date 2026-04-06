@@ -1,9 +1,18 @@
 # TeaSharp Example Guide
 
-TeaSharp ships two example groups:
+TeaSharp ships three example groups:
 
-- flagship examples: the main public learning and evaluation path
+- starter examples: the main public learning path
+- flagship examples: the main public evaluation path after the starter ladder
 - supporting demos: narrower domain-focused showcase apps
+
+## Starter Ladder
+
+| Example | Run | What It Teaches |
+| --- | --- | --- |
+| `HelloWorld` | `dotnet run --project examples/HelloWorld/HelloWorld.csproj` | smallest centered app, button activation, status text, visual theme intent |
+| `CounterForm` | `dotnet run --project examples/CounterForm/CounterForm.csproj` | inputs, choice, progress, and message-driven state changes |
+| `WorkspaceApp` | `dotnet run --project examples/WorkspaceApp/WorkspaceApp.csproj` | multi-pane composition, editing, preview, and action flow in one shell |
 
 ## Flagship Examples
 
@@ -15,9 +24,12 @@ TeaSharp ships two example groups:
 
 Recommended order:
 
-1. `GitConsole`
-2. `OpsWatch`
-3. `DataWorkbench`
+1. `HelloWorld`
+2. `CounterForm`
+3. `WorkspaceApp`
+4. `GitConsole`
+5. `OpsWatch`
+6. `DataWorkbench`
 
 ## Supporting Demos
 
@@ -38,7 +50,7 @@ Examples in this repository should:
 - remain visually intentional, not default-terminal placeholders
 - update docs when the public learning path changes
 
-If a new example becomes part of the flagship learning path, update:
+If a new example becomes part of the public learning path, update:
 
 - [README.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/README.md)
 - [getting-started.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/getting-started.md)

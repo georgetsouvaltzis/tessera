@@ -1,0 +1,145 @@
+using TeaSharp.Styles;
+
+namespace TeaSharp.Examples.CounterForm;
+
+internal sealed record CounterFormPalette(
+    string Name,
+    TeaTheme Theme,
+    TeaStyle CountStyle,
+    TeaStyle SummaryStyle,
+    TeaStyle PositiveButtonStyle,
+    TeaStyle NegativeButtonStyle,
+    TeaStyle NeutralButtonStyle);
+
+internal static class CounterFormTheme
+{
+    public static CounterFormPalette Default => Aurora;
+
+    public static CounterFormPalette Aurora { get; } = CreatePalette(
+        "Aurora",
+        baseRgb: 0x100E1D,
+        panelRgb: 0x17142A,
+        overlayRgb: 0x241F42,
+        borderRgb: 0x6654C8,
+        accentRgb: 0x92F7D6,
+        secondaryRgb: 0xFF8F6B,
+        countBackgroundRgb: 0xA78BFA);
+
+    public static CounterFormPalette Ember { get; } = CreatePalette(
+        "Ember",
+        baseRgb: 0x160D0B,
+        panelRgb: 0x261310,
+        overlayRgb: 0x351D1A,
+        borderRgb: 0xF08548,
+        accentRgb: 0xFFD07A,
+        secondaryRgb: 0xFF6E6E,
+        countBackgroundRgb: 0xFFAE63);
+
+    public static CounterFormPalette Tide { get; } = CreatePalette(
+        "Tide",
+        baseRgb: 0x09131B,
+        panelRgb: 0x0D1D29,
+        overlayRgb: 0x123043,
+        borderRgb: 0x3F87B7,
+        accentRgb: 0x83E8FF,
+        secondaryRgb: 0x8DF7C4,
+        countBackgroundRgb: 0x4FC3F7);
+
+    public static IReadOnlyList<CounterFormPalette> All { get; } = [Aurora, Ember, Tide];
+
+    public static CounterFormPalette Resolve(string? name)
+    {
+        foreach (var palette in All)
+        {
+            if (string.Equals(palette.Name, name, StringComparison.Ordinal))
+            {
+                return palette;
+            }
+        }
+
+        return Default;
+    }
+
+    public static TeaStyle Foreground(int rgb) => TeaStyle.Empty.WithForeground(Hex(rgb));
+
+    public static TeaStyle Background(int rgb) => TeaStyle.Empty.WithBackground(Hex(rgb));
+
+    public static TeaStyle Surface(int foregroundRgb, int backgroundRgb)
+        => Foreground(foregroundRgb).Merge(Background(backgroundRgb));
+
+    private static CounterFormPalette CreatePalette(
+        string name,
+        int baseRgb,
+        int panelRgb,
+        int overlayRgb,
+        int borderRgb,
+        int accentRgb,
+        int secondaryRgb,
+        int countBackgroundRgb)
+    {
+        var theme = new TeaTheme
+        {
+            Text = new TeaThemeTextTokens
+            {
+                Primary = Foreground(0xF7F7FF),
+                Secondary = Foreground(0xC9C4EF),
+                Muted = Foreground(0x8A82B7),
+                Inverse = Foreground(0x090C16),
+            },
+            Surface = new TeaThemeSurfaceTokens
+            {
+                Base = Background(baseRgb),
+                Panel = Background(panelRgb),
+                Overlay = Background(overlayRgb),
+            },
+            Border = new TeaThemeBorderTokens
+            {
+                Default = Foreground(borderRgb),
+                Strong = Foreground(accentRgb),
+                Focused = Foreground(accentRgb).WithBold(),
+                Error = Foreground(0xFF7B7B).WithBold(),
+            },
+            State = new TeaThemeStateTokens
+            {
+                Success = Foreground(accentRgb).WithBold(),
+                Warning = Foreground(0xFFD166).WithBold(),
+                Error = Foreground(0xFF7B7B).WithBold(),
+                Info = Foreground(secondaryRgb).WithBold(),
+            },
+            Accent = new TeaThemeAccentTokens
+            {
+                Primary = Foreground(accentRgb).WithBold(),
+                Secondary = Foreground(secondaryRgb).WithBold(),
+            },
+            Selection = new TeaThemeSelectionTokens
+            {
+                Background = Background(borderRgb),
+                Foreground = Foreground(0xF7FAFF).WithBold(),
+            },
+            Focus = new TeaThemeFocusTokens
+            {
+                Ring = Foreground(secondaryRgb).WithBold(),
+                Title = Foreground(secondaryRgb).WithBold(),
+                Border = Foreground(accentRgb).WithBold(),
+                Marker = "◆",
+            },
+        };
+
+        return new CounterFormPalette(
+            name,
+            theme,
+            Surface(0x090C16, countBackgroundRgb).WithBold(),
+            Foreground(accentRgb),
+            Surface(0x091016, accentRgb).WithBold(),
+            Surface(0x0D0F16, secondaryRgb).WithBold(),
+            Surface(0x090C16, 0xFFFFFF).WithBold());
+    }
+
+    private static AnsiColor Hex(int rgb)
+    {
+        var r = (byte)((rgb >> 16) & 0xFF);
+        var g = (byte)((rgb >> 8) & 0xFF);
+        var b = (byte)(rgb & 0xFF);
+        return AnsiColor.Rgb(r, g, b);
+    }
+}

@@ -21,15 +21,16 @@ TeaSharp is in public alpha. It is ready for evaluation, experimentation, and co
 - default authoring namespaces: `TeaSharp`, `TeaSharp.Controls`, `TeaSharp.Layout`, `TeaSharp.Styles`
 - a broad built-in widget catalog for dashboards, forms, workflows, data surfaces, and overlays
 - semantic theme tokens and override layers
-- public examples that cover dashboards, workbench shells, and command-heavy apps
+- public examples that cover starter apps, dashboards, workbench shells, and command-heavy apps
 - regression and integration coverage around the public contract
 
 ## Start Here
 
 1. Read [docs/getting-started.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/getting-started.md).
-2. Run a flagship example from [docs/examples.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/examples.md).
+2. Run the onboarding ladder from [docs/examples.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/examples.md): `HelloWorld`, `CounterForm`, `WorkspaceApp`.
 3. Use [docs/theme-system-v1.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/theme-system-v1.md) for theming and [docs/custom-components.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/custom-components.md) for custom controls.
-4. If you want to contribute, read [CONTRIBUTING.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/CONTRIBUTING.md) and [docs/architecture-overview.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/architecture-overview.md).
+4. Then open the flagship showcases to see larger product-like surfaces.
+5. If you want to contribute, read [CONTRIBUTING.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/CONTRIBUTING.md) and [docs/architecture-overview.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/architecture-overview.md).
 
 ## Quick Start
 
@@ -97,7 +98,13 @@ await Tea.RunAsync(new MyApp());
 
 ## Run Something Real
 
-Flagship examples:
+Starter ladder:
+
+- `dotnet run --project examples/HelloWorld/HelloWorld.csproj`
+- `dotnet run --project examples/CounterForm/CounterForm.csproj`
+- `dotnet run --project examples/WorkspaceApp/WorkspaceApp.csproj`
+
+Then tour the flagship examples:
 
 - `dotnet run --project examples/GitConsole/GitConsole.csproj`
 - `dotnet run --project examples/OpsWatch/OpsWatch.csproj`
@@ -111,6 +118,18 @@ Supporting demos:
 - `dotnet run --project examples/TransitBoard/TransitBoard.csproj`
 
 ## Example Lineup
+
+### Starter Ladder
+
+- `examples/HelloWorld`
+  - smallest centered starter
+  - first contact with `TeaApp`, layout centering, buttons, and status
+- `examples/CounterForm`
+  - interactive form-first starter
+  - inputs, choice, progress, and message-driven state
+- `examples/WorkspaceApp`
+  - first multi-pane app
+  - navigation, editing, preview, and action flow in one centered shell
 
 ### Flagship
 

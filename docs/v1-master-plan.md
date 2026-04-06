@@ -31,7 +31,11 @@ Without those, none of the remaining evidence is final.
 
 ### 2. Reconcile Public Repo Contract
 
-Current flagship verification contract:
+Current public example contract:
+
+- onboarding ladder: `examples/HelloWorld/HelloWorld.csproj`
+- onboarding ladder: `examples/CounterForm/CounterForm.csproj`
+- onboarding ladder: `examples/WorkspaceApp/WorkspaceApp.csproj`
 
 - flagship examples: `examples/DataWorkbench/DataWorkbench.csproj`
 - flagship examples: `examples/OpsWatch/OpsWatch.csproj`
