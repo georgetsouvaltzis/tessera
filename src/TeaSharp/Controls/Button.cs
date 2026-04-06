@@ -229,7 +229,7 @@ public sealed class Button : Control
         }
 
         var shellBorder = ResolveShellBorderStyle();
-        var box = FrameLayout.ResolveInnerRect(bounds, shellBorder);
+        var box = ResolveInteractiveRect(bounds, shellBorder);
         if (box.IsEmpty)
         {
             return false;
@@ -272,26 +272,15 @@ public sealed class Button : Control
         }
 
         var shellBorder = ResolveShellBorderStyle();
-        var box = FrameLayout.ResolveInnerRect(clipped, shellBorder);
         var surfaceStyle = ResolveSurfaceStyle();
         var borderStyleText = ResolveBorderStyleText();
-        if (!surfaceStyle.IsEmpty && shellBorder != BorderStyle.None)
-        {
-            borderStyleText = borderStyleText.Merge(surfaceStyle);
-        }
-        var content = FrameLayout.DrawFrameAndResolveContent(
-            canvas,
-            clipped,
-            null,
-            shellBorder,
-            Padding,
-            borderStyleText);
-        if (box.IsEmpty || content.IsEmpty || content.Height < 1)
+        var content = ShouldRenderFilledRoundedShell(shellBorder, surfaceStyle)
+            ? DrawFilledRoundedShell(canvas, clipped, borderStyleText, surfaceStyle)
+            : DrawDefaultShell(canvas, clipped, shellBorder, borderStyleText, surfaceStyle);
+        if (content.IsEmpty || content.Height < 1)
         {
             return;
         }
-
-        FillSurface(canvas, box, surfaceStyle);
 
         var label = $"{LabelPrefix}{Text}{LabelSuffix}";
         if (IsDisabled)
@@ -404,6 +393,54 @@ public sealed class Button : Control
         return style.Render(label);
     }
 
+    private Rect DrawDefaultShell(
+        Canvas canvas,
+        Rect clipped,
+        BorderStyle shellBorder,
+        TeaStyle borderStyleText,
+        TeaStyle surfaceStyle)
+    {
+        var box = FrameLayout.ResolveInnerRect(clipped, shellBorder);
+        var content = FrameLayout.DrawFrameAndResolveContent(
+            canvas,
+            clipped,
+            null,
+            shellBorder,
+            Padding,
+            borderStyleText);
+        if (!box.IsEmpty)
+        {
+            FillSurface(canvas, box, surfaceStyle);
+        }
+
+        return content;
+    }
+
+    private Rect DrawFilledRoundedShell(Canvas canvas, Rect clipped, TeaStyle borderStyleText, TeaStyle surfaceStyle)
+    {
+        if (clipped.Width < 2 || clipped.Height < 2)
+        {
+            FillSurface(canvas, clipped, surfaceStyle);
+            return clipped.Inset(Padding);
+        }
+
+        var fillRect = new Rect(clipped.X + 1, clipped.Y, clipped.Width - 2, clipped.Height);
+        FillSurface(canvas, fillRect, surfaceStyle);
+
+        WriteBorderGlyph(canvas, clipped.X, clipped.Y, '╭', borderStyleText);
+        WriteBorderGlyph(canvas, clipped.Right - 1, clipped.Y, '╮', borderStyleText);
+        WriteBorderGlyph(canvas, clipped.X, clipped.Bottom - 1, '╰', borderStyleText);
+        WriteBorderGlyph(canvas, clipped.Right - 1, clipped.Bottom - 1, '╯', borderStyleText);
+
+        for (var y = clipped.Y + 1; y < clipped.Bottom - 1; y++)
+        {
+            WriteBorderGlyph(canvas, clipped.X, y, '│', borderStyleText);
+            WriteBorderGlyph(canvas, clipped.Right - 1, y, '│', borderStyleText);
+        }
+
+        return fillRect.Inset(Padding);
+    }
+
     private void FillSurface(Canvas canvas, Rect box, TeaStyle surfaceStyle)
     {
         if (surfaceStyle.IsEmpty)
@@ -425,6 +462,18 @@ public sealed class Button : Control
         }
 
         canvas.FillRect(box, ' ');
+    }
+
+    private Rect ResolveInteractiveRect(Rect bounds, BorderStyle shellBorder)
+    {
+        if (ShouldRenderFilledRoundedShell(shellBorder, ResolveSurfaceStyle()))
+        {
+            return bounds.Width < 2
+                ? bounds
+                : new Rect(bounds.X + 1, bounds.Y, Math.Max(0, bounds.Width - 2), bounds.Height);
+        }
+
+        return FrameLayout.ResolveInnerRect(bounds, shellBorder);
     }
 
     private static void WriteCenteredLabel(Canvas canvas, Rect content, int y, string plainLabel, string renderedLabel)
@@ -497,6 +546,19 @@ public sealed class Button : Control
     private bool HasSurfaceChrome()
     {
         return !SurfaceStyle.IsEmpty || !FocusedSurfaceStyle.IsEmpty || !PressedSurfaceStyle.IsEmpty;
+    }
+
+    private static bool ShouldRenderFilledRoundedShell(BorderStyle shellBorder, TeaStyle surfaceStyle)
+    {
+        return shellBorder == BorderStyle.Rounded && !surfaceStyle.IsEmpty;
+    }
+
+    private static void WriteBorderGlyph(Canvas canvas, int x, int y, char glyph, TeaStyle borderStyleText)
+    {
+        var token = borderStyleText.IsEmpty
+            ? glyph.ToString()
+            : borderStyleText.Render(glyph.ToString());
+        canvas.WriteText(x, y, token, 1);
     }
 
     private BorderStyle ResolveShellBorderStyle()
