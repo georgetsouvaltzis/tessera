@@ -456,8 +456,6 @@ internal sealed partial class OpsWatchApp : TeaApp
             : _palette.Theme.Selection.Background;
         button.BorderStyleText = TeaStyle.Empty;
         button.FocusedBorderStyleText = TeaStyle.Empty;
-        button.LabelPrefix = string.Empty;
-        button.LabelSuffix = string.Empty;
     }
 
     private static void ConfigurePulseCard(StatsCard card, TeaStyle valueStyle, OpsWatchThemePalette palette)
@@ -494,7 +492,6 @@ internal sealed partial class OpsWatchApp : TeaApp
     {
         var labelStyle = OpsWatchTheme.Foreground(foregroundRgb).WithBold();
         var surfaceStyle = OpsWatchTheme.Background(backgroundRgb);
-        button.Padding = Thickness.Symmetric(1, 0);
         button.RoundedSurfaceMode = ButtonRoundedSurfaceMode.InsetBody;
         button.LabelStyle = labelStyle.WithBold();
         button.FocusedLabelStyle = labelStyle.WithBold();
@@ -504,8 +501,6 @@ internal sealed partial class OpsWatchApp : TeaApp
         button.PressedSurfaceStyle = surfaceStyle;
         button.BorderStyleText = OpsWatchTheme.Foreground(palette.FrameMutedColor);
         button.FocusedBorderStyleText = palette.Theme.Focus.Border;
-        button.LabelPrefix = string.Empty;
-        button.LabelSuffix = string.Empty;
     }
 
     private void ConfigureBullet(BulletChart chart, string unit)

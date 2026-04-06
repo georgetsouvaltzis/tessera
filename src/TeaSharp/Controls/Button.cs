@@ -38,6 +38,7 @@ public sealed class Button : Control
     /// <summary>
     /// Gets or sets text rendered before <see cref="Text"/> inside the button label.
     /// Set to an empty string to remove the default leading bracket chrome.
+    /// Rounded inset-body surface buttons suppress the default bracket chrome automatically unless customized.
     /// </summary>
     public string LabelPrefix
     {
@@ -48,6 +49,7 @@ public sealed class Button : Control
     /// <summary>
     /// Gets or sets text rendered after <see cref="Text"/> inside the button label.
     /// Set to an empty string to remove the default trailing bracket chrome.
+    /// Rounded inset-body surface buttons suppress the default bracket chrome automatically unless customized.
     /// </summary>
     public string LabelSuffix
     {
@@ -173,6 +175,8 @@ public sealed class Button : Control
     /// <remarks>
     /// <see cref="ButtonRoundedSurfaceMode.UnifiedShell"/> keeps rounded pills as a single filled surface.
     /// <see cref="ButtonRoundedSurfaceMode.InsetBody"/> renders a distinct rounded outline with a separately filled inner body.
+    /// Inset-body buttons also drop the default bracket label chrome and reserve minimum horizontal breathing room when
+    /// apps keep the built-in button label defaults.
     /// </remarks>
     public ButtonRoundedSurfaceMode RoundedSurfaceMode
     {
@@ -287,16 +291,20 @@ public sealed class Button : Control
         var shellBorder = ResolveShellBorderStyle();
         var surfaceStyle = ResolveSurfaceStyle();
         var borderStyleText = ResolveBorderStyleText();
+        var padding = ResolveEffectivePadding(shellBorder, surfaceStyle);
         var content = ShouldRenderFilledRoundedShell(shellBorder, surfaceStyle, RoundedSurfaceMode)
             || ShouldFallbackInsetBodyToUnifiedShell(shellBorder, surfaceStyle, RoundedSurfaceMode, clipped)
-            ? DrawFilledRoundedShell(canvas, clipped, borderStyleText, surfaceStyle)
-            : DrawDefaultShell(canvas, clipped, shellBorder, borderStyleText, surfaceStyle);
+            ? DrawFilledRoundedShell(canvas, clipped, borderStyleText, surfaceStyle, padding)
+            : DrawDefaultShell(canvas, clipped, shellBorder, borderStyleText, surfaceStyle, padding);
         if (content.IsEmpty || content.Height < 1)
         {
             return;
         }
 
-        var label = $"{LabelPrefix}{Text}{LabelSuffix}";
+        var plainChrome = ShouldUseInsetBodyDefaults(shellBorder, surfaceStyle);
+        var labelPrefix = plainChrome ? string.Empty : LabelPrefix;
+        var labelSuffix = plainChrome ? string.Empty : LabelSuffix;
+        var label = $"{labelPrefix}{Text}{labelSuffix}";
         var plainLabel = Text;
         if (IsDisabled)
         {
@@ -317,8 +325,14 @@ public sealed class Button : Control
 
     internal override LayoutMeasurement Measure(in Rect availableBounds)
     {
-        var labelWidth = ControlTextLayout.MeasureDisplayWidth($"{LabelPrefix}{Text}{LabelSuffix}");
-        var height = Padding.Vertical + (string.IsNullOrWhiteSpace(Description) ? 1 : 2);
+        var shellBorder = ResolveShellBorderStyle();
+        var surfaceStyle = ResolveSurfaceStyle();
+        var padding = ResolveEffectivePadding(shellBorder, surfaceStyle);
+        var plainChrome = ShouldUseInsetBodyDefaults(shellBorder, surfaceStyle);
+        var labelPrefix = plainChrome ? string.Empty : LabelPrefix;
+        var labelSuffix = plainChrome ? string.Empty : LabelSuffix;
+        var labelWidth = ControlTextLayout.MeasureDisplayWidth($"{labelPrefix}{Text}{labelSuffix}");
+        var height = padding.Vertical + (string.IsNullOrWhiteSpace(Description) ? 1 : 2);
         if (IsDisabled)
         {
             labelWidth += ControlTextLayout.MeasureDisplayWidth(" (disabled)");
@@ -327,9 +341,7 @@ public sealed class Button : Control
         var descriptionWidth = string.IsNullOrWhiteSpace(Description)
             ? 0
             : ControlTextLayout.MeasureDisplayWidth(Description);
-        var width = Math.Max(labelWidth, descriptionWidth) + Padding.Horizontal;
-
-        var shellBorder = ResolveShellBorderStyle();
+        var width = Math.Max(labelWidth, descriptionWidth) + padding.Horizontal;
 
         if (shellBorder != BorderStyle.None)
         {
@@ -337,7 +349,7 @@ public sealed class Button : Control
             height += 2;
         }
 
-        if (shellBorder != BorderStyle.None && HasSurfaceChrome() && Padding.Horizontal == 0)
+        if (shellBorder != BorderStyle.None && HasSurfaceChrome() && padding.Horizontal == 0)
         {
             // Borderless chip-style buttons should still reserve symmetric interior breathing room
             // so centered labels do not depend on example-level width guessing.
@@ -422,7 +434,8 @@ public sealed class Button : Control
         Rect clipped,
         BorderStyle shellBorder,
         TeaStyle borderStyleText,
-        TeaStyle surfaceStyle)
+        TeaStyle surfaceStyle,
+        Thickness padding)
     {
         var box = FrameLayout.ResolveInnerRect(clipped, shellBorder);
         FrameLayout.DrawFrameAndResolveContent(
@@ -430,22 +443,22 @@ public sealed class Button : Control
             clipped,
             null,
             shellBorder,
-            Padding,
+            padding,
             borderStyleText);
         if (!box.IsEmpty)
         {
             FillSurface(canvas, box, surfaceStyle);
         }
 
-        return ResolveContentRect(box, Padding);
+        return ResolveContentRect(box, padding);
     }
 
-    private Rect DrawFilledRoundedShell(Canvas canvas, Rect clipped, TeaStyle borderStyleText, TeaStyle surfaceStyle)
+    private Rect DrawFilledRoundedShell(Canvas canvas, Rect clipped, TeaStyle borderStyleText, TeaStyle surfaceStyle, Thickness padding)
     {
         if (clipped.Width < 2 || clipped.Height < 3)
         {
             FillSurface(canvas, clipped, surfaceStyle);
-            return ResolveContentRect(clipped, Padding);
+            return ResolveContentRect(clipped, padding);
         }
 
         var fillRect = new Rect(clipped.X + 1, clipped.Y + 1, clipped.Width - 2, clipped.Height - 2);
@@ -472,7 +485,7 @@ public sealed class Button : Control
             WriteBorderGlyph(canvas, clipped.Right - 1, y, '▐', shellStyle);
         }
 
-        return ResolveContentRect(fillRect, Padding);
+        return ResolveContentRect(fillRect, padding);
     }
 
     private void FillSurface(Canvas canvas, Rect box, TeaStyle surfaceStyle)
@@ -654,6 +667,25 @@ public sealed class Button : Control
             && !surfaceStyle.IsEmpty
             && roundedSurfaceMode == ButtonRoundedSurfaceMode.InsetBody
             && clipped.Height < 5;
+    }
+
+    private bool ShouldUseInsetBodyDefaults(BorderStyle shellBorder, TeaStyle surfaceStyle)
+    {
+        return shellBorder == BorderStyle.Rounded
+            && !surfaceStyle.IsEmpty
+            && RoundedSurfaceMode == ButtonRoundedSurfaceMode.InsetBody
+            && LabelPrefix == "["
+            && LabelSuffix == "]";
+    }
+
+    private Thickness ResolveEffectivePadding(BorderStyle shellBorder, TeaStyle surfaceStyle)
+    {
+        if (!ShouldUseInsetBodyDefaults(shellBorder, surfaceStyle) || Padding.Horizontal > 0)
+        {
+            return Padding;
+        }
+
+        return new Thickness(1, Padding.Top, 1, Padding.Bottom);
     }
 
     private static void WriteBorderGlyph(Canvas canvas, int x, int y, char glyph, TeaStyle borderStyleText)

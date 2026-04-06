@@ -12,7 +12,8 @@ public enum ButtonRoundedSurfaceMode
 
     /// <summary>
     /// Uses a distinct rounded outline with a separately filled inner body.
-    /// This mode reserves enough height for a bordered shell plus centered inset fill.
+    /// This mode reserves enough height for a bordered shell plus centered inset fill, and it suppresses the
+    /// default bracket label chrome when apps keep the built-in button label defaults.
     /// </summary>
     InsetBody = 1,
 }

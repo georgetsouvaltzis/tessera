@@ -184,8 +184,6 @@ var button = new Button
 {
     LabelStyle = TeaStyle.Empty.WithForeground(AnsiColor.BrightWhite),
     FocusedLabelStyle = TeaStyle.Empty.WithBold().WithForeground(AnsiColor.BrightWhite),
-    LabelPrefix = string.Empty,
-    LabelSuffix = string.Empty,
     SurfaceStyle = TeaStyle.Empty.WithBackground(AnsiColor.Rgb(36, 24, 30)),
     FocusedSurfaceStyle = TeaStyle.Empty.WithBackground(AnsiColor.Rgb(54, 36, 44)),
     BorderStyleText = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(108, 68, 84)),
@@ -201,6 +199,7 @@ Avoid layering a second chip-like background behind the label, because it breaks
 Default button focus should come primarily from the shell/ring treatment; body fill should remain stable unless an app explicitly opts into a stronger pressed/focused tint.
 If an app needs a distinct rounded outline with a separately filled inner body, set `RoundedSurfaceMode = ButtonRoundedSurfaceMode.InsetBody`.
 That mode reserves a taller rounded box so the border shell and the filled body remain visually separate.
+When the app keeps the default button label chrome, `InsetBody` also suppresses the default `[` `]` bracket treatment and adds minimum inner X breathing room automatically.
 
 var list = new ListView<string>()
 {
