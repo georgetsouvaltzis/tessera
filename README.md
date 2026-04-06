@@ -171,6 +171,7 @@ The full guide lives in [docs/examples.md](/Users/georgetsouvaltzis/Projects/pla
 - public API inventory: [docs/public-api-inventory.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/public-api-inventory.md)
 - theme system: [docs/theme-system-v1.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/theme-system-v1.md)
 - custom controls: [docs/custom-components.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/custom-components.md)
+- changelog: [CHANGELOG.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/CHANGELOG.md)
 - contributor guide: [CONTRIBUTING.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/CONTRIBUTING.md)
 - code of conduct: [CODE_OF_CONDUCT.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/CODE_OF_CONDUCT.md)
 - security policy: [SECURITY.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/SECURITY.md)

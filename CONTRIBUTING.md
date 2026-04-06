@@ -2,6 +2,8 @@
 
 TeaSharp is developed in public. Contributions are welcome, but this repo is still in alpha and we will prefer API clarity over compatibility when necessary.
 
+Release-facing changes should also be reflected in [CHANGELOG.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/CHANGELOG.md).
+
 ## Before You Start
 
 - read [README.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/README.md)
@@ -49,6 +51,7 @@ If your change touches perf-sensitive code or release-track behavior, also follo
 If you change a public API or public behavior, update the same slice:
 
 - [README.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/README.md)
+- [CHANGELOG.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/CHANGELOG.md)
 - [docs/spec.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/spec.md)
 - [docs/public-api-guidelines.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/public-api-guidelines.md)
 - [docs/public-api-inventory.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/public-api-inventory.md)
