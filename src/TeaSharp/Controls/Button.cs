@@ -288,6 +288,7 @@ public sealed class Button : Control
         var surfaceStyle = ResolveSurfaceStyle();
         var borderStyleText = ResolveBorderStyleText();
         var content = ShouldRenderFilledRoundedShell(shellBorder, surfaceStyle, RoundedSurfaceMode)
+            || ShouldFallbackInsetBodyToUnifiedShell(shellBorder, surfaceStyle, RoundedSurfaceMode, clipped)
             ? DrawFilledRoundedShell(canvas, clipped, borderStyleText, surfaceStyle)
             : DrawDefaultShell(canvas, clipped, shellBorder, borderStyleText, surfaceStyle);
         if (content.IsEmpty || content.Height < 1)
@@ -641,6 +642,18 @@ public sealed class Button : Control
         return shellBorder == BorderStyle.Rounded
             && !surfaceStyle.IsEmpty
             && roundedSurfaceMode == ButtonRoundedSurfaceMode.UnifiedShell;
+    }
+
+    private static bool ShouldFallbackInsetBodyToUnifiedShell(
+        BorderStyle shellBorder,
+        TeaStyle surfaceStyle,
+        ButtonRoundedSurfaceMode roundedSurfaceMode,
+        in Rect clipped)
+    {
+        return shellBorder == BorderStyle.Rounded
+            && !surfaceStyle.IsEmpty
+            && roundedSurfaceMode == ButtonRoundedSurfaceMode.InsetBody
+            && clipped.Height < 5;
     }
 
     private static void WriteBorderGlyph(Canvas canvas, int x, int y, char glyph, TeaStyle borderStyleText)

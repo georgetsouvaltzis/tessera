@@ -30,6 +30,7 @@ internal static class PrebuiltWidgetTests
         yield return new TestCase("Controls_Button_CompactSurfaceShell_FallsBackToReadableFilledLabel", Button_CompactSurfaceShell_FallsBackToReadableFilledLabel);
         yield return new TestCase("Controls_Button_CompactRoundedSurface_ClampsPaddingToKeepLabelVisible", Button_CompactRoundedSurface_ClampsPaddingToKeepLabelVisible);
         yield return new TestCase("Controls_Button_RoundedSurfaceMode_InsetBody_RendersBorderAndInsetFill", Button_RoundedSurfaceMode_InsetBody_RendersBorderAndInsetFill);
+        yield return new TestCase("Controls_Button_RoundedSurfaceMode_InsetBody_CompactHeight_FallsBackToReadableFilledLabel", Button_RoundedSurfaceMode_InsetBody_CompactHeight_FallsBackToReadableFilledLabel);
         yield return new TestCase("Controls_Button_RoundedSurfaceMode_InsetBody_ReservesTallerAutoRoundedHeight", Button_RoundedSurfaceMode_InsetBody_ReservesTallerAutoRoundedHeight);
         yield return new TestCase("Controls_TextInput_SubmitsValue", TextInput_SubmitsValue);
         yield return new TestCase("Controls_TextInput_Events_ReportSubmitAndCancelValues", TextInput_Events_ReportSubmitAndCancelValues);
@@ -526,6 +527,31 @@ internal static class PrebuiltWidgetTests
         TestAssert.True(visibleOutput.Contains("│              │", StringComparison.Ordinal), "Inset-body rounded buttons should keep a full inner body between the border rails.");
         TestAssert.True(visibleOutput.Contains("│     [Go]     │", StringComparison.Ordinal), "Inset-body rounded buttons should center the label inside the filled body.");
         TestAssert.True(visibleOutput.Contains("╰──────────────╯", StringComparison.Ordinal), "Inset-body rounded buttons should render a pure rounded bottom border.");
+        return Task.CompletedTask;
+    }
+
+    private static Task Button_RoundedSurfaceMode_InsetBody_CompactHeight_FallsBackToReadableFilledLabel()
+    {
+        var surfaceStyle = TeaStyle.Empty.WithBackground(AnsiColor.Rgb(40, 30, 20));
+        var button = new Button
+        {
+            Text = "Run",
+            LabelPrefix = string.Empty,
+            LabelSuffix = string.Empty,
+            Border = BorderStyle.None,
+            Padding = Thickness.Symmetric(1, 0),
+            SurfaceStyle = surfaceStyle,
+            RoundedSurfaceMode = ButtonRoundedSurfaceMode.InsetBody,
+        };
+        var canvas = new Canvas(7, 1, CanvasTextMode.GraphemeAware);
+
+        button.Render(canvas, new Rect(0, 0, 7, 1));
+        var output = canvas.Render();
+        var visibleOutput = StripAnsi(output);
+
+        TestAssert.True(output.Contains(surfaceStyle.Render(" "), StringComparison.Ordinal), "Compact inset-body buttons should keep the filled surface when the bordered shell cannot fit.");
+        TestAssert.True(visibleOutput.Contains(" Run ", StringComparison.Ordinal), "Compact inset-body buttons should fall back to a readable filled label row.");
+        TestAssert.True(!visibleOutput.Contains('╭'), "Compact inset-body buttons should not draw an empty border ring when there is no room for it.");
         return Task.CompletedTask;
     }
 
