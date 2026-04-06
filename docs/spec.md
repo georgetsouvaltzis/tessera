@@ -23,8 +23,8 @@ TeaSharp is not:
 - a Bubble Tea port
 - a nested layout DSL disguised as C#
 
-TeaSharp is still pre-public.
-Breaking changes are acceptable when they simplify the long-term API and improve the default authoring path.
+TeaSharp is in public alpha.
+Breaking changes are still acceptable when they simplify the long-term API and improve the default authoring path.
 
 ## V1 Design Center
 
@@ -139,12 +139,11 @@ Default app shape:
 2. `Update(Message)` handles typed app/runtime input.
 3. `Build(ScreenContext)` returns the next screen.
 
-Canonical example progression:
+Canonical learning path:
 
-1. `examples/HelloWorld`
-2. `examples/CounterForm`
-3. `examples/WorkspaceApp`
-4. `examples/AdvancedWidgets` / `examples/WidgetGallery`
+1. [README.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/README.md)
+2. [getting-started.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/getting-started.md)
+3. [examples.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/examples.md)
 
 ### Interaction Contract
 

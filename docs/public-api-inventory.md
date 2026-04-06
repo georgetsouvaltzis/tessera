@@ -2,7 +2,7 @@
 
 ## Purpose
 
-This document tracks the public API tiers so the pre-release redesign stays deliberate.
+This document tracks the public API tiers so the public alpha surface stays deliberate.
 
 ## Freeze Status
 
@@ -10,7 +10,7 @@ The current working freeze line is:
 
 - Tier 1 is the supported default consumer path
 - Tier 2 is the supported advanced escape-hatch path
-- anything outside those tiers is still a candidate for internalization or deletion before first public release
+- anything outside those tiers is still a candidate for internalization or deletion before stable release
 
 Examples, README guidance, and starter docs should teach Tier 1 first. Tier 2 may remain public, but it should not be the default onboarding story.
 
@@ -248,7 +248,7 @@ The intended beginner path is:
 - return `Screen` from `Build(ScreenContext)`
 - assemble screens with `Screen.Build(...)` and shallow builder callbacks
 - keep configuration in `TeaRuntimeOptions` and `ScreenOptions`
-- follow canonical onboarding examples in order: `examples/HelloWorld` -> `examples/CounterForm` -> `examples/WorkspaceApp`
+- follow the public onboarding path in [getting-started.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/getting-started.md) and the flagship example order in [examples.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/examples.md)
 - treat `TeaSharp.Core` as the low-level advanced lane, not default onboarding
 - use semantic theme tokens and palette-driven styling on the default path
 

@@ -1,7 +1,8 @@
-# TeaSharp Public V1 Remaining Work
+# TeaSharp Public Alpha Release Checklist
 
-This document tracks only the work still required before TeaSharp can be called Public V1.
-Anything already implemented and accepted should live in the product docs, tests, and code, not here.
+This document tracks the remaining work required before TeaSharp can be treated as a public alpha release on GitHub.
+Implemented features belong in the product docs, code, and tests.
+This file tracks only the release-closing work.
 
 ## Current State
 
@@ -14,9 +15,9 @@ Implemented in code already:
 - benchmark harness and perf gate foundation
 - Docusaurus site bootstrap
 
-Public V1 is still not closed because release evidence and signoff are incomplete.
+TeaSharp is close to public alpha, but it is not release-closed until the repo contract, verification evidence, and signoff are all tied to the same candidate SHA.
 
-## Remaining Release Gates
+## Remaining Alpha Gates
 
 ### 1. Choose The Candidate
 
@@ -28,21 +29,16 @@ Still needed:
 
 Without those, none of the remaining evidence is final.
 
-### 2. Reconcile Repo Consistency Blockers
+### 2. Reconcile Public Repo Contract
 
-Current repo blockers still referenced by tests and release flow:
+Current flagship verification contract:
 
-- `examples/HelloWorld/HelloWorld.csproj`
-- `examples/CounterForm/CounterForm.csproj`
-- `examples/WorkspaceApp/WorkspaceApp.csproj`
-- `TeaSharp.Examples.slnx`
+- flagship examples: `examples/DataWorkbench/DataWorkbench.csproj`
+- flagship examples: `examples/OpsWatch/OpsWatch.csproj`
+- flagship examples: `examples/GitConsole/GitConsole.csproj`
+- supporting domain demos remain documented but are not part of the primary smoke gate
 
-These must either:
-
-- exist again and be kept current
-- or the tests, docs, and release flow must be updated to stop treating them as canonical
-
-Until that is resolved, V1 verification remains noisy and future agents will keep getting mixed signals.
+README, onboarding docs, API docs, smoke scripts, and tests must agree on that contract and must not reference removed example paths or removed solution files.
 
 ### 3. Rerun Verification On The Exact Candidate SHA
 
@@ -50,12 +46,11 @@ Required commands on the chosen candidate:
 
 - `dotnet build TeaSharp.slnx`
 - `dotnet test TeaSharp.slnx`
-- `dotnet build TeaSharp.Examples.slnx`
 - `scripts/smoke_examples_v1.sh 4`
 
 Goal:
 
-- one final verified evidence set, all from the exact release candidate SHA
+- one final verified evidence set, all from the exact public alpha candidate SHA
 
 ### 4. Final Performance Approval
 
@@ -77,7 +72,15 @@ Open caveat:
 
 ### 5. Docs Freeze Coherence
 
-Before V1 signoff, do one final docs pass confirming that these files agree:
+Before public alpha signoff, do one final docs pass confirming that these files agree:
+
+- [README.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/README.md)
+- [getting-started.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/getting-started.md)
+- [examples.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/examples.md)
+- [architecture-overview.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/architecture-overview.md)
+- [CONTRIBUTING.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/CONTRIBUTING.md)
+- [CODE_OF_CONDUCT.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/CODE_OF_CONDUCT.md)
+- [SECURITY.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/SECURITY.md)
 
 - [spec.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/spec.md)
 - [public-api-guidelines.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/public-api-guidelines.md)
@@ -100,11 +103,11 @@ Still required:
 - product or release signoff
 - explicit approval for publish
 
-V1 is not closed until those are written against the final candidate SHA.
+Public alpha is not closed until those are written against the final candidate SHA.
 
 ## Non-Gating Follow-Up
 
-Useful, but not V1-blocking:
+Useful, but not alpha-blocking:
 
 - `ScatterPlot` frame-style parity follow-up
 - `LogView.AppendLine` discoverability alias
@@ -113,7 +116,7 @@ Useful, but not V1-blocking:
 
 ## Release Rule
 
-TeaSharp Public V1 is ready only when:
+TeaSharp public alpha is ready only when:
 
 1. candidate metadata is filled
 2. repo consistency blockers are resolved

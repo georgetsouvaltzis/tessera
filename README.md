@@ -1,20 +1,23 @@
 # TeaSharp
 
-TeaSharp is a message-driven terminal UI library for .NET.
+TeaSharp is a C#-first terminal UI framework for building state-driven terminal applications on `.NET 10`.
 
-The default app path is intentionally small:
+TeaSharp is now in public alpha. The repository is ready for evaluation, experimentation, and contribution, but API cleanup is still allowed when it improves the long-term public authoring path.
 
-- derive from `TeaApp`
-- run apps with `Tea.RunAsync(...)` for minimal startup, or `Tea.CreateBuilder()` for configured startup
-- choose the app with `UseApp(...)`, then configure runtime with `ConfigureRuntime(...)`
-- let built-in controls route automatically; `Update(...)` handles unhandled input plus runtime messages
-- return `Screen` from `Build(ScreenContext)`
-- assemble screens with `Screen.Build(...)` and shallow builder callbacks
-- use first-class controls from `TeaSharp.Controls`
-- configure runtime behavior with `TeaRuntimeOptions`
-- keep low-level runtime wiring under `TeaSharp.Hosting` only when you truly need advanced seams
+## Why TeaSharp
 
-If you need custom runtime wiring, explicit region routing, or low-level component composition, those APIs still exist under `TeaSharp.Hosting` or advanced namespaces, but they are marked `EditorBrowsable(Advanced)` and are no longer the starter path.
+- small default app model
+- explicit C# object model instead of a nested DSL
+- no DI container or Generic Host required for the normal path
+- built-in controls, layouts, themes, and runtime options
+- advanced hosting/runtime seams available, but not required
+
+## Start Here
+
+1. Read [docs/getting-started.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/getting-started.md).
+2. Run the examples listed in [docs/examples.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/examples.md).
+3. Use [docs/theme-system-v1.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/theme-system-v1.md) for theming and [docs/custom-components.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/custom-components.md) for custom controls.
+4. If you want to contribute, read [CONTRIBUTING.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/CONTRIBUTING.md) and [docs/architecture-overview.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/architecture-overview.md).
 
 ## Quick Start
 
@@ -46,6 +49,7 @@ internal sealed class CounterApp : TeaApp
         Text = "Increment",
     };
     private readonly StatusBar _status = new();
+
     public CounterApp() => _increment.Activated += (_, _) => _state.Count++;
 
     public override TeaEffect? Update(Message message)
@@ -73,49 +77,68 @@ internal sealed class CounterState
 }
 ```
 
-For tiny apps, the short path also exists:
+For the minimal path, `await Tea.RunAsync(new App());` remains supported.
 
-```csharp
-await Tea.RunAsync(new HelloApp());
+## Example Lineup
 
-internal sealed class HelloApp : TeaApp
-{
-    public override TeaEffect? Update(Message message)
-        => message is KeyPressed key && key.IsCharacter('c', ModifierKeys.Ctrl)
-            ? TeaEffects.Quit
-            : null;
+Flagship examples:
 
-    public override Screen Build(ScreenContext context)
-        => Screen.From("Hello from TeaSharp");
-}
-```
+- `examples/GitConsole`: workflow-heavy command surface with editing, diff review, and action history
+- `examples/OpsWatch`: dashboard-first operations surface with alerts, telemetry, and action rails
+- `examples/DataWorkbench`: multi-pane workbench shell with pointer-ready runtime configuration
 
-## Example Progression
+Supporting demos:
 
-Follow examples in this order:
+- `examples/DownloadCenter`
+- `examples/IncidentDesk`
+- `examples/MusicDeck`
+- `examples/TransitBoard`
 
-1. `examples/HelloWorld`: minimal startup with `Tea.RunAsync(new App())`.
-2. `examples/CounterForm`: configured startup with `Tea.CreateBuilder()`, `UseApp(...)`, and `ConfigureRuntime(...)`.
-3. `examples/WorkspaceApp`: stateful multi-pane app using app-level messages/effects for coordinated flows.
-4. Advanced interaction lane: `examples/AdvancedWidgets` and `examples/WidgetGallery` for richer overlays, command surfaces, and advanced behavior.
-
-Default onboarding should stay in `TeaSharp` namespaces. `TeaSharp.Core` is the low-level advanced lane.
-Current V1 widget expansion includes `Breadcrumb` and `Paginator`.
+The full example guide lives in [docs/examples.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/examples.md).
 
 ## Docs
 
-- theme system and palette cookbook: [docs/theme-system-v1.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/theme-system-v1.md)
-- widget expansion roadmap: [docs/widget-roadmap-v1.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/widget-roadmap-v1.md)
-- C#-first public API policy: [docs/public-api-guidelines.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/public-api-guidelines.md)
-- custom widgets: [docs/custom-components.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/custom-components.md)
-- public API tiers: [docs/public-api-inventory.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/public-api-inventory.md)
-- canonical progression: [examples/HelloWorld/Program.cs](/Users/georgetsouvaltzis/Projects/playground/teasharp/examples/HelloWorld/Program.cs), [examples/CounterForm/Program.cs](/Users/georgetsouvaltzis/Projects/playground/teasharp/examples/CounterForm/Program.cs), [examples/WorkspaceApp/Program.cs](/Users/georgetsouvaltzis/Projects/playground/teasharp/examples/WorkspaceApp/Program.cs)
-- engine and namespace notes: [docs/spec.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/spec.md)
-- control catalog and API tiers: [docs/public-api-inventory.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/public-api-inventory.md)
+- onboarding guide: [docs/getting-started.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/getting-started.md)
+- example guide: [docs/examples.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/examples.md)
+- architecture overview: [docs/architecture-overview.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/architecture-overview.md)
+- design contract: [docs/spec.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/spec.md)
+- public API guidelines: [docs/public-api-guidelines.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/public-api-guidelines.md)
+- public API inventory: [docs/public-api-inventory.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/public-api-inventory.md)
+- theme system: [docs/theme-system-v1.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/theme-system-v1.md)
+- custom controls: [docs/custom-components.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/custom-components.md)
+- contributor guide: [CONTRIBUTING.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/CONTRIBUTING.md)
+- code of conduct: [CODE_OF_CONDUCT.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/CODE_OF_CONDUCT.md)
+- security policy: [SECURITY.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/SECURITY.md)
 
-## Build
+## Build And Verify
 
-The solution files remain useful for IDE navigation:
+TeaSharp uses the `.NET 10.0.103` SDK pinned in [global.json](/Users/georgetsouvaltzis/Projects/playground/teasharp/global.json).
 
-- `TeaSharp.slnx`
-- `TeaSharp.Examples.slnx`
+Primary repo verification commands:
+
+```bash
+dotnet build TeaSharp.slnx
+dotnet test TeaSharp.slnx
+scripts/smoke_examples_v1.sh 4
+```
+
+Example-specific commands:
+
+```bash
+dotnet run --project examples/GitConsole/GitConsole.csproj
+dotnet run --project examples/OpsWatch/OpsWatch.csproj
+dotnet run --project examples/DataWorkbench/DataWorkbench.csproj
+```
+
+## Repo Layout
+
+- `src/TeaSharp`: default public app-authoring API
+- `src/TeaSharp.Core`: advanced low-level runtime layer
+- `tests/TeaSharp.Tests`: unit, contract, and regression tests
+- `tests/TeaSharp.IntegrationTests`: integration coverage
+- `examples`: public examples and showcase apps
+- `docs`: product, architecture, release, and contributor docs
+
+## Contributing
+
+TeaSharp is being shaped in public. If you want to contribute, start with [CONTRIBUTING.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/CONTRIBUTING.md).

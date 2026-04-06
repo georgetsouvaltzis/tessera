@@ -60,16 +60,15 @@ var app = Tea.CreateBuilder()
 await app.RunAsync();
 ```
 
-## Canonical Example Progression
+## Canonical Learning Path
 
-Teach examples in this sequence:
+Public onboarding should teach one story:
 
-1. `examples/HelloWorld`: minimal startup path (`Tea.RunAsync(new App())`).
-2. `examples/CounterForm`: configured startup (`Tea.CreateBuilder().UseApp<TApp>().ConfigureRuntime(...).Build()`).
-3. `examples/WorkspaceApp`: stateful app with coordinated message/effect flows.
-4. Advanced interaction lane: `examples/AdvancedWidgets` and `examples/WidgetGallery`.
+1. start with [README.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/README.md)
+2. follow [getting-started.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/getting-started.md)
+3. use the flagship example order in [examples.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/examples.md)
 
-Keep onboarding in `TeaSharp` namespaces. `TeaSharp.Core` is the low-level advanced lane and should not appear in starter examples.
+Keep examples in `TeaSharp` namespaces. `TeaSharp.Core` is the low-level advanced lane and should not appear in the flagship public examples.
 
 ## Canonical Theme Pattern
 
