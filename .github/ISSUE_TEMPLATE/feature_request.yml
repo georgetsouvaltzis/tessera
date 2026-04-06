@@ -1,0 +1,64 @@
+name: Feature request
+description: Propose a new control, API, example, or workflow improvement for Tessera.
+title: "[feature] "
+labels:
+  - enhancement
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Tessera is still in alpha. Feature requests are welcome, but clarity of the public path matters more than raw surface area.
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem to solve
+      description: Describe the user problem first, not the implementation.
+      placeholder: I can build a dashboard, but I cannot express a compact filter-strip workflow without reimplementing a lot of focus logic.
+    validations:
+      required: true
+  - type: textarea
+    id: proposed
+    attributes:
+      label: Proposed direction
+      description: Describe the API, control, or example change you want.
+      placeholder: Add a dedicated filter strip control with typed selection events and theme hooks.
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      placeholder: I tried composing Buttons and Choice, but the focus and selection model becomes repetitive across apps.
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - starter examples
+        - flagship examples
+        - controls
+        - layout
+        - theming
+        - runtime/hosting
+        - docs
+        - tooling
+        - other
+    validations:
+      required: true
+  - type: textarea
+    id: adoption
+    attributes:
+      label: Expected user value
+      description: Explain how this helps public users build products on top of Tessera.
+      placeholder: This would remove repeated custom code from dashboard apps and make filter-driven layouts easier to ship.
+    validations:
+      required: true
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Checklist
+      options:
+        - label: I checked the existing docs and examples first.
+          required: true
+        - label: This request is framed around user value, not only implementation preference.
+          required: true

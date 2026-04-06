@@ -72,4 +72,6 @@ Good PRs are:
 - explicit about user-facing impact
 - explicit about breaking changes during alpha
 
+Use the repository PR template when opening a pull request.
+
 If you are unsure where something belongs, open the issue or draft PR with the smallest reproducible example you can provide.

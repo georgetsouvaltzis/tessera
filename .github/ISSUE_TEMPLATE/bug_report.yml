@@ -1,0 +1,98 @@
+name: Bug report
+description: Report a crash, regression, rendering problem, or incorrect behavior in Tessera.
+title: "[bug] "
+labels:
+  - bug
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting a bug.
+
+        Before you file, please check `SUPPORT.md` and confirm the issue still reproduces on the current public alpha baseline.
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      description: One clear sentence about what is wrong.
+      placeholder: The CounterForm progress bar no longer updates after clicking Count +.
+    validations:
+      required: true
+  - type: textarea
+    id: repro
+    attributes:
+      label: Reproduction
+      description: Exact steps to reproduce the issue.
+      placeholder: |
+        1. Run `dotnet run --project examples/CounterForm/CounterForm.csproj`
+        2. Press Tab until Count + is focused
+        3. Press Enter three times
+        4. Observe ...
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected result
+      placeholder: The count and progress preview should advance together.
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual result
+      placeholder: The count changes, but the progress preview stays stale.
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Tessera version or commit
+      placeholder: 1.0.0-alpha.1 or commit SHA
+    validations:
+      required: true
+  - type: input
+    id: sdk
+    attributes:
+      label: .NET SDK
+      placeholder: 10.0.103
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: OS and terminal
+      placeholder: macOS 15.4, Ghostty 1.2.0
+    validations:
+      required: true
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - starter example
+        - flagship example
+        - supporting demo
+        - public API
+        - runtime/rendering
+        - docs/onboarding
+        - other
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Evidence
+      description: Paste error text, stack trace, screenshots, or ANSI excerpts if relevant.
+      placeholder: Include the exact exception or a screenshot if the issue is visual.
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Local checks
+      options:
+        - label: I read `SUPPORT.md`.
+          required: true
+        - label: I verified this on the current public alpha baseline or latest default-branch commit.
+          required: true
+        - label: I included exact reproduction steps.
+          required: true

@@ -7,11 +7,11 @@ Support is best-effort, in public, and optimized for reproducible reports.
 ## Where To Ask
 
 - bugs, regressions, crashes, and incorrect rendering:
-  - open a GitHub Issue
+  - open a GitHub Issue with the bug report template
 - docs confusion, onboarding gaps, and example problems:
   - open a GitHub Issue
 - feature requests and API ideas:
-  - open a GitHub Issue
+  - open a GitHub Issue with the feature request template when it fits
 - security reports:
   - follow [SECURITY.md](SECURITY.md)
 
