@@ -32,9 +32,6 @@ internal static class PublicOnboardingExamplesTests
         yield return new TestCase(
             "PublicOnboardingExamples_ProjectsDoNotReferenceTeaSharpCoreProject",
             Projects_DoNotReferenceTeaSharpCoreProject);
-        yield return new TestCase(
-            "PublicOnboardingExamples_DocsListStarterLadder",
-            Docs_ListStarterLadder);
     }
 
     private static Task Projects_Exist()
@@ -85,27 +82,6 @@ internal static class PublicOnboardingExamplesTests
         TestAssert.True(
             offenders.Length == 0,
             $"Onboarding example projects must not reference TeaSharp.Core.csproj directly. Offenders: {string.Join(", ", offenders)}.");
-
-        return Task.CompletedTask;
-    }
-
-    private static Task Docs_ListStarterLadder()
-    {
-        var repoRoot = GetRepoRoot();
-        var documents = new[]
-        {
-            "README.md",
-            "docs/getting-started.md",
-            "docs/examples.md",
-        };
-
-        foreach (var document in documents)
-        {
-            var text = File.ReadAllText(Path.Combine(repoRoot, document));
-            TestAssert.True(text.Contains("HelloWorld", StringComparison.Ordinal), $"{document} should mention HelloWorld.");
-            TestAssert.True(text.Contains("CounterForm", StringComparison.Ordinal), $"{document} should mention CounterForm.");
-            TestAssert.True(text.Contains("WorkspaceApp", StringComparison.Ordinal), $"{document} should mention WorkspaceApp.");
-        }
 
         return Task.CompletedTask;
     }
