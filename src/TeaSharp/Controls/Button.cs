@@ -461,31 +461,25 @@ public sealed class Button : Control
             return ResolveContentRect(clipped, padding);
         }
 
-        var fillRect = new Rect(clipped.X + 1, clipped.Y + 1, clipped.Width - 2, clipped.Height - 2);
-        if (!fillRect.IsEmpty)
+        var bodyRect = new Rect(clipped.X, clipped.Y + 1, clipped.Width, clipped.Height - 2);
+        if (!bodyRect.IsEmpty)
         {
-            FillSurface(canvas, fillRect, surfaceStyle);
+            FillSurface(canvas, bodyRect, surfaceStyle);
         }
 
-        var shellStyle = borderStyleText.Merge(surfaceStyle);
-        WriteBorderGlyph(canvas, clipped.X, clipped.Y, '▛', shellStyle);
-        WriteBorderGlyph(canvas, clipped.Right - 1, clipped.Y, '▜', shellStyle);
-        WriteBorderGlyph(canvas, clipped.X, clipped.Bottom - 1, '▙', shellStyle);
-        WriteBorderGlyph(canvas, clipped.Right - 1, clipped.Bottom - 1, '▟', shellStyle);
+        var capStyle = ResolveFilledRoundedShellCapStyle(surfaceStyle, borderStyleText);
+        WriteBorderGlyph(canvas, clipped.X, clipped.Y, '▟', capStyle);
+        WriteBorderGlyph(canvas, clipped.Right - 1, clipped.Y, '▙', capStyle);
+        WriteBorderGlyph(canvas, clipped.X, clipped.Bottom - 1, '▜', capStyle);
+        WriteBorderGlyph(canvas, clipped.Right - 1, clipped.Bottom - 1, '▛', capStyle);
 
         for (var x = clipped.X + 1; x < clipped.Right - 1; x++)
         {
-            WriteBorderGlyph(canvas, x, clipped.Y, '▀', shellStyle);
-            WriteBorderGlyph(canvas, x, clipped.Bottom - 1, '▄', shellStyle);
+            WriteBorderGlyph(canvas, x, clipped.Y, '▄', capStyle);
+            WriteBorderGlyph(canvas, x, clipped.Bottom - 1, '▀', capStyle);
         }
 
-        for (var y = clipped.Y + 1; y < clipped.Bottom - 1; y++)
-        {
-            WriteBorderGlyph(canvas, clipped.X, y, '▌', shellStyle);
-            WriteBorderGlyph(canvas, clipped.Right - 1, y, '▐', shellStyle);
-        }
-
-        return ResolveContentRect(fillRect, padding);
+        return ResolveContentRect(bodyRect, padding);
     }
 
     private void FillSurface(Canvas canvas, Rect box, TeaStyle surfaceStyle)
@@ -676,6 +670,22 @@ public sealed class Button : Control
             && RoundedSurfaceMode == ButtonRoundedSurfaceMode.InsetBody
             && LabelPrefix == "["
             && LabelSuffix == "]";
+    }
+
+    private static TeaStyle ResolveFilledRoundedShellCapStyle(TeaStyle surfaceStyle, TeaStyle borderStyleText)
+    {
+        var capStyle = borderStyleText with
+        {
+            Foreground = null,
+            Background = null,
+        };
+
+        if (surfaceStyle.Background is AnsiColor background)
+        {
+            return capStyle.WithForeground(background);
+        }
+
+        return borderStyleText;
     }
 
     private Thickness ResolveEffectivePadding(BorderStyle shellBorder, TeaStyle surfaceStyle)
