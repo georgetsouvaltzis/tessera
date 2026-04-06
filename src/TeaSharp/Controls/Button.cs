@@ -306,7 +306,7 @@ public sealed class Button : Control
             label += " (disabled)";
         }
 
-        var renderedLabel = ApplyLabelStyle(label);
+        var renderedLabel = ApplyLabelStyle(label, surfaceStyle);
         var rowCount = string.IsNullOrWhiteSpace(Description) || content.Height < 2 ? 1 : 2;
         var top = content.Y + Math.Max(0, (content.Height - rowCount) / 2);
         WriteCenteredLabel(canvas, content, top, label, renderedLabel);
@@ -385,9 +385,9 @@ public sealed class Button : Control
         return true;
     }
 
-    private string ApplyLabelStyle(string label)
+    private string ApplyLabelStyle(string label, TeaStyle surfaceStyle)
     {
-        var style = SanitizeLabelStyle(LabelStyle);
+        var style = surfaceStyle.Merge(SanitizeLabelStyle(LabelStyle));
         if (IsFocused)
         {
             style = style.Merge(SanitizeLabelStyle(FocusedLabelStyle));

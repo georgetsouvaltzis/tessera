@@ -316,12 +316,14 @@ internal static class PrebuiltWidgetTests
         var canvas = new Canvas(16, 5, CanvasTextMode.GraphemeAware);
 
         button.Render(canvas, new Rect(0, 0, 16, 5));
-        var output = StripAnsi(canvas.Render());
+        var output = canvas.Render();
+        var visibleOutput = StripAnsi(output);
 
-        TestAssert.True(output.Contains("│              │", StringComparison.Ordinal), "Button surface style should paint the full rounded interior, not only the label row.");
-        TestAssert.True(output.Contains("│     [Go]     │", StringComparison.Ordinal), "Button surface style should keep the label centered inside the fully filled shell.");
-        TestAssert.True(output.Contains("╭", StringComparison.Ordinal), "Button surface style should paint the rounded shell itself, not only the centered label row.");
-        TestAssert.True(output.Contains("╯", StringComparison.Ordinal), "Button surface style should paint the rounded shell itself, not only the centered label row.");
+        TestAssert.True(output.Contains(surfaceStyle.Render("[Go]"), StringComparison.Ordinal), "Button surface style should keep the label row on the same filled surface as the rounded shell.");
+        TestAssert.True(visibleOutput.Contains("│              │", StringComparison.Ordinal), "Button surface style should paint the full rounded interior, not only the label row.");
+        TestAssert.True(visibleOutput.Contains("│     [Go]     │", StringComparison.Ordinal), "Button surface style should keep the label centered inside the fully filled shell.");
+        TestAssert.True(visibleOutput.Contains("╭", StringComparison.Ordinal), "Button surface style should paint the rounded shell itself, not only the centered label row.");
+        TestAssert.True(visibleOutput.Contains("╯", StringComparison.Ordinal), "Button surface style should paint the rounded shell itself, not only the centered label row.");
         return Task.CompletedTask;
     }
 
