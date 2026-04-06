@@ -3,6 +3,7 @@ using TeaSharp.Components.Styling;
 using TeaSharp.Controls;
 using TeaSharp.Styles;
 using System.Globalization;
+using System.Text.RegularExpressions;
 using TeaSharp.Core.Messages;
 namespace TeaSharp.Tests;
 
@@ -315,9 +316,12 @@ internal static class PrebuiltWidgetTests
         var canvas = new Canvas(16, 5, CanvasTextMode.GraphemeAware);
 
         button.Render(canvas, new Rect(0, 0, 16, 5));
-        var output = canvas.Render();
+        var output = StripAnsi(canvas.Render());
 
-        TestAssert.True(output.Contains(surfaceStyle.Render(new string(' ', 14)), StringComparison.Ordinal), "Button surface style should paint the whole inner box, including padding, not only the label row.");
+        TestAssert.True(output.Contains("│              │", StringComparison.Ordinal), "Button surface style should paint the full rounded interior, not only the label row.");
+        TestAssert.True(output.Contains("│     [Go]     │", StringComparison.Ordinal), "Button surface style should keep the label centered inside the fully filled shell.");
+        TestAssert.True(output.Contains("╭", StringComparison.Ordinal), "Button surface style should paint the rounded shell itself, not only the centered label row.");
+        TestAssert.True(output.Contains("╯", StringComparison.Ordinal), "Button surface style should paint the rounded shell itself, not only the centered label row.");
         return Task.CompletedTask;
     }
 
@@ -413,6 +417,11 @@ internal static class PrebuiltWidgetTests
         TestAssert.True(output.Contains("╭", StringComparison.Ordinal), "Surface-chromed borderless buttons should render a rounded shell.");
         TestAssert.True(output.Contains("╯", StringComparison.Ordinal), "Surface-chromed borderless buttons should render a rounded shell.");
         return Task.CompletedTask;
+    }
+
+    private static string StripAnsi(string value)
+    {
+        return Regex.Replace(value, "\u001B\\[[0-9;]*m", string.Empty);
     }
 
     private static Task TextInput_SubmitsValue()

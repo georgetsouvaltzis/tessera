@@ -279,6 +279,10 @@ public sealed class Button : Control
         {
             borderStyleText = borderStyleText.Merge(surfaceStyle);
         }
+        if (shellBorder == BorderStyle.Rounded)
+        {
+            FillSurface(canvas, clipped, surfaceStyle);
+        }
         var content = FrameLayout.DrawFrameAndResolveContent(
             canvas,
             clipped,
@@ -291,7 +295,10 @@ public sealed class Button : Control
             return;
         }
 
-        FillSurface(canvas, box, surfaceStyle);
+        if (shellBorder != BorderStyle.Rounded)
+        {
+            FillSurface(canvas, box, surfaceStyle);
+        }
 
         var label = $"{LabelPrefix}{Text}{LabelSuffix}";
         if (IsDisabled)
@@ -411,11 +418,20 @@ public sealed class Button : Control
             return;
         }
 
-        var fill = surfaceStyle.Render(new string(' ', box.Width));
-        for (var y = box.Y; y < box.Bottom; y++)
+        if (canvas.TextMode == CanvasTextMode.GraphemeAware)
         {
-            canvas.WriteText(box.X, y, fill, box.Width);
+            var fill = surfaceStyle.Render(" ");
+            for (var y = box.Y; y < box.Bottom; y++)
+            {
+                for (var x = box.X; x < box.Right; x++)
+                {
+                    canvas.WriteText(x, y, fill, 1);
+                }
+            }
+            return;
         }
+
+        canvas.FillRect(box, ' ');
     }
 
     private static void WriteCenteredLabel(Canvas canvas, Rect content, int y, string plainLabel, string renderedLabel)
