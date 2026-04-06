@@ -408,6 +408,8 @@ internal static class PrebuiltWidgetTests
         button.Render(canvas, new Rect(0, 0, measurement.Width, measurement.Height));
         var output = canvas.Render();
 
+        TestAssert.True(output.Contains(surfaceStyle.Render("╭"), StringComparison.Ordinal), "Rounded surface buttons should carry the fill color through the border shell.");
+        TestAssert.True(output.Contains(surfaceStyle.Render("╯"), StringComparison.Ordinal), "Rounded surface buttons should carry the fill color through the border shell.");
         TestAssert.True(output.Contains("╭", StringComparison.Ordinal), "Surface-chromed borderless buttons should render a rounded shell.");
         TestAssert.True(output.Contains("╯", StringComparison.Ordinal), "Surface-chromed borderless buttons should render a rounded shell.");
         return Task.CompletedTask;

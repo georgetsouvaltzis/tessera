@@ -273,19 +273,25 @@ public sealed class Button : Control
 
         var shellBorder = ResolveShellBorderStyle();
         var box = FrameLayout.ResolveInnerRect(clipped, shellBorder);
+        var surfaceStyle = ResolveSurfaceStyle();
+        var borderStyleText = ResolveBorderStyleText();
+        if (shellBorder == BorderStyle.Rounded && !surfaceStyle.IsEmpty)
+        {
+            borderStyleText = borderStyleText.Merge(surfaceStyle);
+        }
         var content = FrameLayout.DrawFrameAndResolveContent(
             canvas,
             clipped,
             null,
             shellBorder,
             Padding,
-            ResolveBorderStyleText());
+            borderStyleText);
         if (box.IsEmpty || content.IsEmpty || content.Height < 1)
         {
             return;
         }
 
-        FillSurface(canvas, box);
+        FillSurface(canvas, box, surfaceStyle);
 
         var label = $"{LabelPrefix}{Text}{LabelSuffix}";
         if (IsDisabled)
@@ -398,15 +404,14 @@ public sealed class Button : Control
         return style.Render(label);
     }
 
-    private void FillSurface(Canvas canvas, Rect box)
+    private void FillSurface(Canvas canvas, Rect box, TeaStyle surfaceStyle)
     {
-        var style = ResolveSurfaceStyle();
-        if (style.IsEmpty)
+        if (surfaceStyle.IsEmpty)
         {
             return;
         }
 
-        var fill = style.Render(new string(' ', box.Width));
+        var fill = surfaceStyle.Render(new string(' ', box.Width));
         for (var y = box.Y; y < box.Bottom; y++)
         {
             canvas.WriteText(box.X, y, fill, box.Width);
