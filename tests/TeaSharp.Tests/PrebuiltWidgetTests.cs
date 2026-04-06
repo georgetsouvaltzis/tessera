@@ -332,11 +332,11 @@ internal static class PrebuiltWidgetTests
 
         TestAssert.True(output.Contains(surfaceStyle.Render("[Go]"), StringComparison.Ordinal), "Button surface style should keep the label row on the same filled surface as the rounded shell.");
         TestAssert.True(output.Contains(capStyle.Render("▄"), StringComparison.Ordinal), "Filled rounded buttons should render shaped cap glyphs using the surface color.");
-        TestAssert.Equal("▟▄▄▄▄▄▄▄▄▄▄▄▄▄▄▙", visibleLines[0], "Filled rounded buttons should taper the top cap instead of painting a square top slab.");
-        TestAssert.Equal(new string(' ', 16), visibleLines[1], "Filled rounded buttons should keep the upper body row on the same filled surface.");
-        TestAssert.Equal("      [Go]      ", visibleLines[2], "Filled rounded buttons should keep the label centered inside the unified filled shell.");
-        TestAssert.Equal(new string(' ', 16), visibleLines[3], "Filled rounded buttons should keep the lower body row on the same filled surface.");
-        TestAssert.Equal("▜▀▀▀▀▀▀▀▀▀▀▀▀▀▀▛", visibleLines[4], "Filled rounded buttons should taper the bottom cap instead of painting a square bottom slab.");
+        TestAssert.Equal("▗▄▄▄▄▄▄▄▄▄▄▄▄▄▄▖", visibleLines[0], "Filled rounded buttons should taper the top cap instead of painting a square top slab.");
+        TestAssert.Equal("▐              ▌", visibleLines[1], "Filled rounded buttons should keep the upper body row on the same filled surface.");
+        TestAssert.Equal("▐     [Go]     ▌", visibleLines[2], "Filled rounded buttons should keep the label centered inside the unified filled shell.");
+        TestAssert.Equal("▐              ▌", visibleLines[3], "Filled rounded buttons should keep the lower body row on the same filled surface.");
+        TestAssert.Equal("▝▀▀▀▀▀▀▀▀▀▀▀▀▀▀▘", visibleLines[4], "Filled rounded buttons should taper the bottom cap instead of painting a square bottom slab.");
         return Task.CompletedTask;
     }
 
@@ -433,9 +433,9 @@ internal static class PrebuiltWidgetTests
         var capStyle = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(30, 20, 20));
 
         TestAssert.True(output.Contains(capStyle.Render("▄"), StringComparison.Ordinal), "Surface-chromed borderless buttons should use the shaped filled-shell glyph contract.");
-        TestAssert.Equal("▟▄▄▄▄▄▄▙", visibleLines[0], "Surface-chromed borderless buttons should render a tapered top shell row.");
-        TestAssert.Equal("  Play  ", visibleLines[1], "Surface-chromed borderless buttons should keep centered labels inside the filled chip body.");
-        TestAssert.Equal("▜▀▀▀▀▀▀▛", visibleLines[2], "Surface-chromed borderless buttons should render a tapered bottom shell row.");
+        TestAssert.Equal("▗▄▄▄▄▄▄▖", visibleLines[0], "Surface-chromed borderless buttons should render a tapered top shell row.");
+        TestAssert.Equal("▐ Play ▌", visibleLines[1], "Surface-chromed borderless buttons should keep centered labels inside the filled chip body.");
+        TestAssert.Equal("▝▀▀▀▀▀▀▘", visibleLines[2], "Surface-chromed borderless buttons should render a tapered bottom shell row.");
         return Task.CompletedTask;
     }
 

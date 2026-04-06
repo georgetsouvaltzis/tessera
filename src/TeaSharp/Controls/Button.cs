@@ -461,17 +461,17 @@ public sealed class Button : Control
             return ResolveContentRect(clipped, padding);
         }
 
-        var bodyRect = new Rect(clipped.X, clipped.Y + 1, clipped.Width, clipped.Height - 2);
-        if (!bodyRect.IsEmpty)
+        var fillRect = new Rect(clipped.X + 1, clipped.Y + 1, clipped.Width - 2, clipped.Height - 2);
+        if (!fillRect.IsEmpty)
         {
-            FillSurface(canvas, bodyRect, surfaceStyle);
+            FillSurface(canvas, fillRect, surfaceStyle);
         }
 
         var capStyle = ResolveFilledRoundedShellCapStyle(surfaceStyle, borderStyleText);
-        WriteBorderGlyph(canvas, clipped.X, clipped.Y, '▟', capStyle);
-        WriteBorderGlyph(canvas, clipped.Right - 1, clipped.Y, '▙', capStyle);
-        WriteBorderGlyph(canvas, clipped.X, clipped.Bottom - 1, '▜', capStyle);
-        WriteBorderGlyph(canvas, clipped.Right - 1, clipped.Bottom - 1, '▛', capStyle);
+        WriteBorderGlyph(canvas, clipped.X, clipped.Y, '▗', capStyle);
+        WriteBorderGlyph(canvas, clipped.Right - 1, clipped.Y, '▖', capStyle);
+        WriteBorderGlyph(canvas, clipped.X, clipped.Bottom - 1, '▝', capStyle);
+        WriteBorderGlyph(canvas, clipped.Right - 1, clipped.Bottom - 1, '▘', capStyle);
 
         for (var x = clipped.X + 1; x < clipped.Right - 1; x++)
         {
@@ -479,7 +479,14 @@ public sealed class Button : Control
             WriteBorderGlyph(canvas, x, clipped.Bottom - 1, '▀', capStyle);
         }
 
-        return ResolveContentRect(bodyRect, padding);
+        for (var y = clipped.Y + 1; y < clipped.Bottom - 1; y++)
+        {
+            WriteBorderGlyph(canvas, clipped.X, y, '▐', capStyle);
+            WriteBorderGlyph(canvas, clipped.Right - 1, y, '▌', capStyle);
+        }
+
+        var contentRect = new Rect(clipped.X, clipped.Y + 1, clipped.Width, clipped.Height - 2);
+        return ResolveContentRect(contentRect, padding);
     }
 
     private void FillSurface(Canvas canvas, Rect box, TeaStyle surfaceStyle)
