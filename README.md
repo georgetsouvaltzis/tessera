@@ -173,6 +173,7 @@ The full guide lives in [docs/examples.md](/Users/georgetsouvaltzis/Projects/pla
 - custom controls: [docs/custom-components.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/custom-components.md)
 - changelog: [CHANGELOG.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/CHANGELOG.md)
 - contributor guide: [CONTRIBUTING.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/CONTRIBUTING.md)
+- support policy: [SUPPORT.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/SUPPORT.md)
 - code of conduct: [CODE_OF_CONDUCT.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/CODE_OF_CONDUCT.md)
 - security policy: [SECURITY.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/SECURITY.md)
 
@@ -184,6 +185,7 @@ Primary repo verification commands:
 
 ```bash
 dotnet build TeaSharp.slnx
+dotnet build examples/TeaSharp.Examples.slnx
 dotnet test TeaSharp.slnx
 scripts/smoke_examples_v1.sh 4
 ```

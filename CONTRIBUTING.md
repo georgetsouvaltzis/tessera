@@ -10,6 +10,7 @@ Release-facing changes should also be reflected in [CHANGELOG.md](/Users/georget
 - read [docs/getting-started.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/getting-started.md)
 - read [docs/architecture-overview.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/architecture-overview.md)
 - read [docs/public-api-guidelines.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/public-api-guidelines.md)
+- read [SUPPORT.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/SUPPORT.md) for the public issue/support contract
 
 ## Development Prerequisites
 
@@ -31,6 +32,7 @@ Before asking for review, run:
 
 ```bash
 dotnet build TeaSharp.slnx
+dotnet build examples/TeaSharp.Examples.slnx
 dotnet test TeaSharp.slnx
 scripts/smoke_examples_v1.sh 4
 ```

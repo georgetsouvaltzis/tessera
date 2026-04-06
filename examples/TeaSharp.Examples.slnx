@@ -1,0 +1,12 @@
+<Solution>
+  <Project Path="HelloWorld/HelloWorld.csproj" />
+  <Project Path="CounterForm/CounterForm.csproj" />
+  <Project Path="WorkspaceApp/WorkspaceApp.csproj" />
+  <Project Path="GitConsole/GitConsole.csproj" />
+  <Project Path="OpsWatch/OpsWatch.csproj" />
+  <Project Path="DataWorkbench/DataWorkbench.csproj" />
+  <Project Path="DownloadCenter/DownloadCenter.csproj" />
+  <Project Path="IncidentDesk/IncidentDesk.csproj" />
+  <Project Path="MusicDeck/MusicDeck.csproj" />
+  <Project Path="TransitBoard/TransitBoard.csproj" />
+</Solution>

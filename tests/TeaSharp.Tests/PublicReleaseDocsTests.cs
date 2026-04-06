@@ -11,6 +11,12 @@ internal static class PublicReleaseDocsTests
         yield return new TestCase(
             "PublicReleaseDocs_ChangelogExists_AndUsesSemVerHeadings",
             ChangelogExists_AndUsesSemVerHeadings);
+        yield return new TestCase(
+            "PublicReleaseDocs_SupportDocExists_AndReadmeLinksIt",
+            SupportDocExists_AndReadmeLinksIt);
+        yield return new TestCase(
+            "PublicReleaseDocs_ExamplesSolutionExists_UnderExamples",
+            ExamplesSolutionExists_UnderExamples);
     }
 
     private static Task ChangelogExists_AndUsesSemVerHeadings()
@@ -36,6 +42,56 @@ internal static class PublicReleaseDocsTests
         TestAssert.True(
             readme.Contains("CHANGELOG.md", StringComparison.Ordinal),
             "README docs section should link CHANGELOG.md.");
+
+        return Task.CompletedTask;
+    }
+
+    private static Task SupportDocExists_AndReadmeLinksIt()
+    {
+        var repoRoot = GetRepoRoot();
+        var supportPath = Path.Combine(repoRoot, "SUPPORT.md");
+        var readmePath = Path.Combine(repoRoot, "README.md");
+
+        TestAssert.True(File.Exists(supportPath), "Expected root SUPPORT.md to exist.");
+
+        var support = File.ReadAllText(supportPath);
+        TestAssert.True(
+            support.Contains("GitHub Issue", StringComparison.Ordinal),
+            "SUPPORT.md should direct users to GitHub Issues.");
+        TestAssert.True(
+            support.Contains("examples/TeaSharp.Examples.slnx", StringComparison.Ordinal),
+            "SUPPORT.md should mention the examples solution build path.");
+
+        var readme = File.ReadAllText(readmePath);
+        TestAssert.True(
+            readme.Contains("SUPPORT.md", StringComparison.Ordinal),
+            "README docs section should link SUPPORT.md.");
+
+        return Task.CompletedTask;
+    }
+
+    private static Task ExamplesSolutionExists_UnderExamples()
+    {
+        var repoRoot = GetRepoRoot();
+        var solutionPath = Path.Combine(repoRoot, "examples", "TeaSharp.Examples.slnx");
+
+        TestAssert.True(File.Exists(solutionPath), "Expected examples/TeaSharp.Examples.slnx to exist.");
+
+        var solution = File.ReadAllText(solutionPath);
+        foreach (var path in new[]
+                 {
+                     "HelloWorld/HelloWorld.csproj",
+                     "CounterForm/CounterForm.csproj",
+                     "WorkspaceApp/WorkspaceApp.csproj",
+                     "GitConsole/GitConsole.csproj",
+                     "OpsWatch/OpsWatch.csproj",
+                     "DataWorkbench/DataWorkbench.csproj",
+                 })
+        {
+            TestAssert.True(
+                solution.Contains(path, StringComparison.Ordinal),
+                $"Expected examples solution to include {path}.");
+        }
 
         return Task.CompletedTask;
     }

@@ -11,10 +11,15 @@ TeaSharp uses `major.minor.patch` versioning with SemVer prerelease labels durin
 
 ## [Unreleased]
 
-### Planned
+### Added
 
-- next public-alpha prerelease tag and final release SHA
-- perf-gate evidence tied to the chosen release candidate
+- root-level [SUPPORT.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/SUPPORT.md) for the public issue and support contract
+- `examples/TeaSharp.Examples.slnx` for building the public examples as one separate solution
+
+### Changed
+
+- README and contributor guidance now point to the support policy
+- repo verification guidance now includes `dotnet build examples/TeaSharp.Examples.slnx`
 
 ## [1.0.0-alpha.1] - 2026-04-07
 

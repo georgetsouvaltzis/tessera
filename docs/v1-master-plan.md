@@ -80,6 +80,7 @@ Before public alpha signoff, do one final docs pass confirming that these files 
 
 - [README.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/README.md)
 - [CHANGELOG.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/CHANGELOG.md)
+- [SUPPORT.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/SUPPORT.md)
 - [getting-started.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/getting-started.md)
 - [examples.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/examples.md)
 - [architecture-overview.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/architecture-overview.md)
