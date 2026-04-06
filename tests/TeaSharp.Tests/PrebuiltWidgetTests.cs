@@ -320,6 +320,8 @@ internal static class PrebuiltWidgetTests
         var visibleOutput = StripAnsi(output);
 
         TestAssert.True(output.Contains(surfaceStyle.Render("[Go]"), StringComparison.Ordinal), "Button surface style should keep the label row on the same filled surface as the rounded shell.");
+        TestAssert.True(!output.Contains(surfaceStyle.Render("╭"), StringComparison.Ordinal), "Button surface style should not paint an extra outer filled rectangle around the rounded shell.");
+        TestAssert.True(!output.Contains(surfaceStyle.Render("╯"), StringComparison.Ordinal), "Button surface style should not paint an extra outer filled rectangle around the rounded shell.");
         TestAssert.True(visibleOutput.Contains("│              │", StringComparison.Ordinal), "Button surface style should paint the full rounded interior, not only the label row.");
         TestAssert.True(visibleOutput.Contains("│     [Go]     │", StringComparison.Ordinal), "Button surface style should keep the label centered inside the fully filled shell.");
         TestAssert.True(visibleOutput.Contains("╭", StringComparison.Ordinal), "Button surface style should paint the rounded shell itself, not only the centered label row.");
@@ -414,8 +416,8 @@ internal static class PrebuiltWidgetTests
         button.Render(canvas, new Rect(0, 0, measurement.Width, measurement.Height));
         var output = canvas.Render();
 
-        TestAssert.True(output.Contains(surfaceStyle.Render("╭"), StringComparison.Ordinal), "Rounded surface buttons should carry the fill color through the border shell.");
-        TestAssert.True(output.Contains(surfaceStyle.Render("╯"), StringComparison.Ordinal), "Rounded surface buttons should carry the fill color through the border shell.");
+        TestAssert.True(!output.Contains(surfaceStyle.Render("╭"), StringComparison.Ordinal), "Rounded surface buttons should not paint an extra outer filled rectangle around the shell.");
+        TestAssert.True(!output.Contains(surfaceStyle.Render("╯"), StringComparison.Ordinal), "Rounded surface buttons should not paint an extra outer filled rectangle around the shell.");
         TestAssert.True(output.Contains("╭", StringComparison.Ordinal), "Surface-chromed borderless buttons should render a rounded shell.");
         TestAssert.True(output.Contains("╯", StringComparison.Ordinal), "Surface-chromed borderless buttons should render a rounded shell.");
         return Task.CompletedTask;

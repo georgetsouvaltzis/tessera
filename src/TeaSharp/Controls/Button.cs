@@ -275,14 +275,6 @@ public sealed class Button : Control
         var box = FrameLayout.ResolveInnerRect(clipped, shellBorder);
         var surfaceStyle = ResolveSurfaceStyle();
         var borderStyleText = ResolveBorderStyleText();
-        if (shellBorder == BorderStyle.Rounded && !surfaceStyle.IsEmpty)
-        {
-            borderStyleText = borderStyleText.Merge(surfaceStyle);
-        }
-        if (shellBorder == BorderStyle.Rounded)
-        {
-            FillSurface(canvas, clipped, surfaceStyle);
-        }
         var content = FrameLayout.DrawFrameAndResolveContent(
             canvas,
             clipped,
@@ -295,10 +287,7 @@ public sealed class Button : Control
             return;
         }
 
-        if (shellBorder != BorderStyle.Rounded)
-        {
-            FillSurface(canvas, box, surfaceStyle);
-        }
+        FillSurface(canvas, box, surfaceStyle);
 
         var label = $"{LabelPrefix}{Text}{LabelSuffix}";
         if (IsDisabled)
