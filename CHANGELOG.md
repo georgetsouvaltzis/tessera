@@ -2,21 +2,21 @@
 
 All notable changes to TeaSharp should be recorded here.
 
-TeaSharp uses `major.minor.patch` versioning:
+TeaSharp uses `major.minor.patch` versioning with SemVer prerelease labels during alpha:
 
-- `0.y.z` while the project is still in alpha
-- patch releases (`0.1.1`) for fixes, docs corrections, and non-breaking polish
-- minor releases (`0.2.0`) for meaningful feature additions or intentional public-path reshaping during alpha
-- `1.0.0` is the first stability line where stricter compatibility expectations apply
+- the public alpha line starts at `1.0.0-alpha.1`
+- prerelease increments (`1.0.0-alpha.2`) track additional alpha cuts on the same intended stable line
+- if the intended stable target changes meaningfully before release, the prerelease line can move accordingly (`1.1.0-alpha.1`)
+- `1.0.0` is still the first stability line where stricter compatibility expectations apply
 
 ## [Unreleased]
 
 ### Planned
 
-- next public-alpha candidate tag and final release SHA
+- next public-alpha prerelease tag and final release SHA
 - perf-gate evidence tied to the chosen release candidate
 
-## [0.1.0] - 2026-04-07
+## [1.0.0-alpha.1] - 2026-04-07
 
 ### Added
 
@@ -43,5 +43,5 @@ TeaSharp uses `major.minor.patch` versioning:
 
 ### Notes
 
-- `0.1.0` is the intended public alpha baseline, not a stable compatibility promise
+- `1.0.0-alpha.1` is the first public alpha baseline, not a stable compatibility promise
 - breaking changes can still happen before `1.0.0`, but they should be reflected here

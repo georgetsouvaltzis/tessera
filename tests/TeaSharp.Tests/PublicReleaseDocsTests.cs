@@ -4,7 +4,7 @@ namespace TeaSharp.Tests;
 
 internal static class PublicReleaseDocsTests
 {
-    private static readonly Regex SemVerHeadingRegex = new(@"^## \[(\d+)\.(\d+)\.(\d+)\] - \d{4}-\d{2}-\d{2}$", RegexOptions.Multiline | RegexOptions.Compiled);
+    private static readonly Regex SemVerHeadingRegex = new(@"^## \[(\d+)\.(\d+)\.(\d+)(?:-[0-9A-Za-z.-]+)?\] - \d{4}-\d{2}-\d{2}$", RegexOptions.Multiline | RegexOptions.Compiled);
 
     public static IEnumerable<TestCase> Cases()
     {
@@ -26,8 +26,11 @@ internal static class PublicReleaseDocsTests
             changelog.Contains("major.minor.patch", StringComparison.Ordinal),
             "CHANGELOG.md should describe the versioning scheme.");
         TestAssert.True(
+            changelog.Contains("1.0.0-alpha.1", StringComparison.Ordinal),
+            "CHANGELOG.md should record the first public alpha as 1.0.0-alpha.1.");
+        TestAssert.True(
             SemVerHeadingRegex.IsMatch(changelog),
-            "CHANGELOG.md should contain at least one SemVer heading in the form ## [x.y.z] - YYYY-MM-DD.");
+            "CHANGELOG.md should contain at least one SemVer heading in the form ## [x.y.z] - YYYY-MM-DD or ## [x.y.z-prerelease] - YYYY-MM-DD.");
 
         var readme = File.ReadAllText(readmePath);
         TestAssert.True(
