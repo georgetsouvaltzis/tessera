@@ -424,13 +424,22 @@ public sealed class Button : Control
             return clipped.Inset(Padding);
         }
 
-        var fillRect = new Rect(clipped.X + 1, clipped.Y, clipped.Width - 2, clipped.Height);
-        FillSurface(canvas, fillRect, surfaceStyle);
+        var fillRect = new Rect(clipped.X + 1, clipped.Y + 1, clipped.Width - 2, clipped.Height - 2);
+        if (!fillRect.IsEmpty)
+        {
+            FillSurface(canvas, fillRect, surfaceStyle);
+        }
 
         WriteBorderGlyph(canvas, clipped.X, clipped.Y, '╭', borderStyleText);
         WriteBorderGlyph(canvas, clipped.Right - 1, clipped.Y, '╮', borderStyleText);
         WriteBorderGlyph(canvas, clipped.X, clipped.Bottom - 1, '╰', borderStyleText);
         WriteBorderGlyph(canvas, clipped.Right - 1, clipped.Bottom - 1, '╯', borderStyleText);
+
+        for (var x = clipped.X + 1; x < clipped.Right - 1; x++)
+        {
+            WriteBorderGlyph(canvas, x, clipped.Y, '─', borderStyleText);
+            WriteBorderGlyph(canvas, x, clipped.Bottom - 1, '─', borderStyleText);
+        }
 
         for (var y = clipped.Y + 1; y < clipped.Bottom - 1; y++)
         {
