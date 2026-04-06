@@ -1,7 +1,7 @@
-using TeaSharp;
-using TeaSharp.Examples.TransitBoard;
+using Tessera;
+using Tessera.Examples.TransitBoard;
 
-var app = Tea.CreateBuilder()
+var app = TesseraApplication.CreateBuilder()
     .UseApp<TransitBoardApp>()
     .ConfigureRuntime(static runtime =>
     {
@@ -10,7 +10,7 @@ var app = Tea.CreateBuilder()
         runtime.Screen = new ScreenOptions
         {
             AltScreen = true,
-            WindowTitle = "TeaSharp TransitBoard",
+            WindowTitle = "Tessera TransitBoard",
             EnableFocusReporting = true,
             EnableBracketedPaste = true,
             MouseTracking = MouseTrackingMode.AllMotion,

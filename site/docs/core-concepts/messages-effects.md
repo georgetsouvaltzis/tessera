@@ -2,7 +2,7 @@
 title: Messages and Effects
 ---
 
-TeaSharp uses typed runtime messages and explicit effects.
+Tessera uses typed runtime messages and explicit effects.
 
 ## Common messages
 
@@ -15,12 +15,12 @@ TeaSharp uses typed runtime messages and explicit effects.
 
 ## Common effects
 
-- `TeaEffects.Quit`
-- `TeaEffects.Interrupt`
-- `TeaEffects.Emit(...)`
-- `TeaEffects.Batch(...)`
-- `TeaEffects.Sequence(...)`
-- `TeaEffects.Periodic(...)`
+- `TesseraEffects.Quit`
+- `TesseraEffects.Interrupt`
+- `TesseraEffects.Emit(...)`
+- `TesseraEffects.Batch(...)`
+- `TesseraEffects.Sequence(...)`
+- `TesseraEffects.Periodic(...)`
 
 ## Practical split
 

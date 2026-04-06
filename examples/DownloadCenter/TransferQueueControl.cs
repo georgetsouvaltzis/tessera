@@ -1,8 +1,8 @@
-using TeaSharp.Components.Primitives;
-using TeaSharp.Controls;
-using TeaSharp.Styles;
+using Tessera.Components.Primitives;
+using Tessera.Controls;
+using Tessera.Styles;
 
-namespace TeaSharp.Examples.DownloadCenter;
+namespace Tessera.Examples.DownloadCenter;
 
 internal sealed class TransferQueueControl : Control
 {
@@ -14,18 +14,18 @@ internal sealed class TransferQueueControl : Control
     public BorderStyle Border { get; set; } = BorderStyle.Rounded;
     public Thickness Padding { get; set; } = Thickness.All(1);
     public string SelectedId { get; set; } = string.Empty;
-    public TeaStyle TitleStyle { get; set; } = TeaStyle.Empty;
-    public TeaStyle FocusedTitleStyle { get; set; } = TeaStyle.Empty;
-    public TeaStyle BorderStyleText { get; set; } = TeaStyle.Empty;
-    public TeaStyle FocusedBorderStyleText { get; set; } = TeaStyle.Empty;
-    public TeaStyle SectionStyle { get; set; } = TeaStyle.Empty;
-    public TeaStyle MetaStyle { get; set; } = TeaStyle.Empty;
-    public TeaStyle ItemStyle { get; set; } = TeaStyle.Empty;
-    public TeaStyle SelectedItemStyle { get; set; } = TeaStyle.Empty;
-    public TeaStyle ActiveStyle { get; set; } = TeaStyle.Empty;
-    public TeaStyle RetryStyle { get; set; } = TeaStyle.Empty;
-    public TeaStyle CompleteStyle { get; set; } = TeaStyle.Empty;
-    public TeaStyle QueuedStyle { get; set; } = TeaStyle.Empty;
+    public TesseraStyle TitleStyle { get; set; } = TesseraStyle.Empty;
+    public TesseraStyle FocusedTitleStyle { get; set; } = TesseraStyle.Empty;
+    public TesseraStyle BorderStyleText { get; set; } = TesseraStyle.Empty;
+    public TesseraStyle FocusedBorderStyleText { get; set; } = TesseraStyle.Empty;
+    public TesseraStyle SectionStyle { get; set; } = TesseraStyle.Empty;
+    public TesseraStyle MetaStyle { get; set; } = TesseraStyle.Empty;
+    public TesseraStyle ItemStyle { get; set; } = TesseraStyle.Empty;
+    public TesseraStyle SelectedItemStyle { get; set; } = TesseraStyle.Empty;
+    public TesseraStyle ActiveStyle { get; set; } = TesseraStyle.Empty;
+    public TesseraStyle RetryStyle { get; set; } = TesseraStyle.Empty;
+    public TesseraStyle CompleteStyle { get; set; } = TesseraStyle.Empty;
+    public TesseraStyle QueuedStyle { get; set; } = TesseraStyle.Empty;
 
     public void SetSections(IEnumerable<DownloadQueueSection> sections)
     {
@@ -102,21 +102,21 @@ internal sealed class TransferQueueControl : Control
             : Title;
     }
 
-    private TeaStyle ResolveBorderStyle()
+    private TesseraStyle ResolveBorderStyle()
     {
         return IsFocused
             ? BorderStyleText.Merge(FocusedBorderStyleText)
             : BorderStyleText;
     }
 
-    private TeaStyle ResolveItemStyle(DownloadQueueItem item)
+    private TesseraStyle ResolveItemStyle(DownloadQueueItem item)
     {
         return item.Id == SelectedId
             ? SelectedItemStyle
             : ItemStyle.Merge(ResolveTone(item));
     }
 
-    private TeaStyle ResolveTone(DownloadQueueItem item)
+    private TesseraStyle ResolveTone(DownloadQueueItem item)
     {
         return item.Phase switch
         {
@@ -158,7 +158,7 @@ internal sealed class TransferQueueControl : Control
         return left.PadRight(Math.Max(0, width - right.Length)) + right;
     }
 
-    private static string ApplyStyle(string text, TeaStyle style)
+    private static string ApplyStyle(string text, TesseraStyle style)
     {
         return string.IsNullOrEmpty(text) || style.IsEmpty ? text : style.Render(text);
     }

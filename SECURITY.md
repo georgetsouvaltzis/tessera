@@ -18,4 +18,4 @@ Include:
 
 ## Alpha Status
 
-TeaSharp is in public alpha. Security fixes will be addressed, but the repository does not yet publish a long-term support policy or stable-version support matrix.
+Tessera is in public alpha. Security fixes will be addressed, but the repository does not yet publish a long-term support policy or stable-version support matrix.

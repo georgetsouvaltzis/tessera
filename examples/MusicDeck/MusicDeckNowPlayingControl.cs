@@ -1,9 +1,9 @@
-using TeaSharp.Components.Primitives;
-using TeaSharp.Controls;
-using TeaSharp.Layout;
-using TeaSharp.Styles;
+using Tessera.Components.Primitives;
+using Tessera.Controls;
+using Tessera.Layout;
+using Tessera.Styles;
 
-namespace TeaSharp.Examples.MusicDeck;
+namespace Tessera.Examples.MusicDeck;
 
 internal sealed class MusicDeckNowPlayingControl : Control
 {
@@ -18,13 +18,13 @@ internal sealed class MusicDeckNowPlayingControl : Control
     public string SummaryLine { get; set; } = string.Empty;
     public BorderStyle Border { get; set; } = BorderStyle.Rounded;
     public Thickness Padding { get; set; } = Thickness.All(1);
-    public TeaStyle TitleStyle { get; set; } = TeaStyle.Empty;
-    public TeaStyle TrackStyle { get; set; } = TeaStyle.Empty;
-    public TeaStyle ArtistStyle { get; set; } = TeaStyle.Empty;
-    public TeaStyle ChipStyle { get; set; } = TeaStyle.Empty;
-    public TeaStyle SummaryStyle { get; set; } = TeaStyle.Empty;
-    public TeaStyle ProgressStyle { get; set; } = TeaStyle.Empty;
-    public TeaStyle BorderStyleText { get; set; } = TeaStyle.Empty;
+    public TesseraStyle TitleStyle { get; set; } = TesseraStyle.Empty;
+    public TesseraStyle TrackStyle { get; set; } = TesseraStyle.Empty;
+    public TesseraStyle ArtistStyle { get; set; } = TesseraStyle.Empty;
+    public TesseraStyle ChipStyle { get; set; } = TesseraStyle.Empty;
+    public TesseraStyle SummaryStyle { get; set; } = TesseraStyle.Empty;
+    public TesseraStyle ProgressStyle { get; set; } = TesseraStyle.Empty;
+    public TesseraStyle BorderStyleText { get; set; } = TesseraStyle.Empty;
 
     public override void Render(Canvas canvas, Rect rect)
     {
@@ -58,5 +58,5 @@ internal sealed class MusicDeckNowPlayingControl : Control
         canvas.WriteText(content.X, content.Y + row, text, content.Width);
     }
 
-    private static string Render(TeaStyle style, string text) => style.IsEmpty || string.IsNullOrEmpty(text) ? text : style.Render(text);
+    private static string Render(TesseraStyle style, string text) => style.IsEmpty || string.IsNullOrEmpty(text) ? text : style.Render(text);
 }

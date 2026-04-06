@@ -1,0 +1,20 @@
+namespace Tessera.Core.Abstractions;
+
+public readonly record struct TerminalOutput
+{
+    public bool AltScreen { get; init; }
+    public bool EnableBracketedPaste { get; init; }
+    public bool EnableFocusReporting { get; init; }
+    public bool EnableSynchronizedUpdates { get; init; }
+    public MouseMode MouseMode { get; init; }
+    public KeyboardEnhancementOptions KeyboardEnhancements { get; init; }
+    public string? CursorColor { get; init; }
+    public string? ForegroundColor { get; init; }
+    public string? BackgroundColor { get; init; }
+    public TerminalProgress? Progress { get; init; }
+    public string? WindowTitle { get; init; }
+    public string? FontSpec { get; init; }
+    public string? FontFamily { get; init; }
+    public int? FontSize { get; init; }
+    public string? Iterm2Profile { get; init; }
+}

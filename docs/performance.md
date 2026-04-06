@@ -1,4 +1,4 @@
-# TeaSharp Performance Plan
+# Tessera Performance Plan
 
 This plan defines V1 performance goals, measurement methodology, and release gates.
 
@@ -86,51 +86,51 @@ Gating policy by mode:
 
 Harness quick commands:
 - List benchmarks:
-  - `dotnet run --project benchmarks/TeaSharp.Benchmarks --configuration Release -- --list flat`
+  - `dotnet run --project benchmarks/Tessera.Benchmarks --configuration Release -- --list flat`
 - Run all benchmarks in Release:
-  - `dotnet run --project benchmarks/TeaSharp.Benchmarks --configuration Release -- --inProcess --filter "*"`
+  - `dotnet run --project benchmarks/Tessera.Benchmarks --configuration Release -- --inProcess --filter "*"`
 - Run a single benchmark scenario filter:
-  - `dotnet run --project benchmarks/TeaSharp.Benchmarks --configuration Release -- --inProcess --filter "*LargeTable*"`
+  - `dotnet run --project benchmarks/Tessera.Benchmarks --configuration Release -- --inProcess --filter "*LargeTable*"`
 - Mode-specific examples (dual-mode instrumentation):
-  - render-only slice: `dotnet run --project benchmarks/TeaSharp.Benchmarks --configuration Release -- --inProcess --filter "*Only"`
-  - render+materialize slice: `dotnet run --project benchmarks/TeaSharp.Benchmarks --configuration Release -- --inProcess --filter "*Frame" --filter "*ScrollLogTail" --filter "*FirstFrameRender" --filter "*OverlayStressFrames" --filter "*ResizeStormFrames"`
-  - viewport slice: `dotnet run --project benchmarks/TeaSharp.Benchmarks --configuration Release -- --inProcess --filter "*Viewport*"`
+  - render-only slice: `dotnet run --project benchmarks/Tessera.Benchmarks --configuration Release -- --inProcess --filter "*Only"`
+  - render+materialize slice: `dotnet run --project benchmarks/Tessera.Benchmarks --configuration Release -- --inProcess --filter "*Frame" --filter "*ScrollLogTail" --filter "*FirstFrameRender" --filter "*OverlayStressFrames" --filter "*ResizeStormFrames"`
+  - viewport slice: `dotnet run --project benchmarks/Tessera.Benchmarks --configuration Release -- --inProcess --filter "*Viewport*"`
 - Future V1 gate scenario filters (when benchmark classes are present):
-  - `dotnet run --project benchmarks/TeaSharp.Benchmarks --configuration Release -- --filter "*Resize*"`
-  - `dotnet run --project benchmarks/TeaSharp.Benchmarks --configuration Release -- --filter "*Overlay*"`
-  - `dotnet run --project benchmarks/TeaSharp.Benchmarks --configuration Release -- --filter "*LogTail*"`
+  - `dotnet run --project benchmarks/Tessera.Benchmarks --configuration Release -- --filter "*Resize*"`
+  - `dotnet run --project benchmarks/Tessera.Benchmarks --configuration Release -- --filter "*Overlay*"`
+  - `dotnet run --project benchmarks/Tessera.Benchmarks --configuration Release -- --filter "*LogTail*"`
 - Direct gate path:
   - SLO gate baseline input: `docs/perf-baselines/v1-slo-gate-baseline.json`
   - SLO gate machine-readable output: `docs/perf-baselines/latest-slo-gate-result.json`
   - runtime e2e machine-readable output: `docs/perf-baselines/latest-runtime-e2e-result.json`
   - SLO gate run:
-    - `dotnet run --project benchmarks/TeaSharp.Benchmarks --configuration Release -- --perf-gate --baseline docs/perf-baselines/v1-slo-gate-baseline.json --output docs/perf-baselines/latest-slo-gate-result.json`
+    - `dotnet run --project benchmarks/Tessera.Benchmarks --configuration Release -- --perf-gate --baseline docs/perf-baselines/v1-slo-gate-baseline.json --output docs/perf-baselines/latest-slo-gate-result.json`
   - SLO gate dry-run:
-    - `dotnet run --project benchmarks/TeaSharp.Benchmarks --configuration Release -- --perf-gate --baseline docs/perf-baselines/v1-slo-gate-baseline.json --output docs/perf-baselines/latest-slo-gate-result.json --dry-run`
+    - `dotnet run --project benchmarks/Tessera.Benchmarks --configuration Release -- --perf-gate --baseline docs/perf-baselines/v1-slo-gate-baseline.json --output docs/perf-baselines/latest-slo-gate-result.json --dry-run`
   - runtime e2e:
-    - `dotnet run --project benchmarks/TeaSharp.Benchmarks --configuration Release -- --runtime-e2e --output docs/perf-baselines/latest-runtime-e2e-result.json`
+    - `dotnet run --project benchmarks/Tessera.Benchmarks --configuration Release -- --runtime-e2e --output docs/perf-baselines/latest-runtime-e2e-result.json`
 
 BenchmarkDotNet artifacts/report directory:
-- `benchmarks/TeaSharp.Benchmarks/bin/Release/net10.0/BenchmarkDotNet.Artifacts/`
+- `benchmarks/Tessera.Benchmarks/bin/Release/net10.0/BenchmarkDotNet.Artifacts/`
 
 Expected `--list flat` scenarios:
-- `TeaSharp.Benchmarks.StartupRenderBenchmarks.StartupLikeFirstFrameRender`
-- `TeaSharp.Benchmarks.StartupRenderBenchmarks.StartupLikeFirstFrameRenderOnly`
-- `TeaSharp.Benchmarks.LogTailStreamBenchmarks.AppendAndScrollLogTail`
-- `TeaSharp.Benchmarks.LogTailStreamBenchmarks.AppendAndScrollLogTailOnly`
-- `TeaSharp.Benchmarks.LargeTableBenchmarks.RenderLargeTableFrame`
-- `TeaSharp.Benchmarks.LargeTableBenchmarks.RenderLargeTableFrameOnly`
-- `TeaSharp.Benchmarks.OverlayStressBenchmarks.RenderOverlayStressFrames`
-- `TeaSharp.Benchmarks.OverlayStressBenchmarks.RenderOverlayStressFramesOnly`
-- `TeaSharp.Benchmarks.ResizeStormBenchmarks.RenderResizeStormFrames`
-- `TeaSharp.Benchmarks.ResizeStormBenchmarks.RenderResizeStormFramesOnly`
-- `TeaSharp.Benchmarks.StyledHeavyOutputBenchmarks.RenderStyledHeavyFrame`
-- `TeaSharp.Benchmarks.StyledHeavyOutputBenchmarks.RenderStyledHeavyFrameOnly`
-- `TeaSharp.Benchmarks.ViewportRenderBenchmarks.RenderViewportNoDecoration`
-- `TeaSharp.Benchmarks.ViewportRenderBenchmarks.RenderViewportNoDecorationOnly`
-- `TeaSharp.Benchmarks.SloLatencyBenchmarks.StartupFirstFrameP95Ms`
-- `TeaSharp.Benchmarks.SloLatencyBenchmarks.InputLatencyNormalP95Ms`
-- `TeaSharp.Benchmarks.SloLatencyBenchmarks.InputLatencyHeavyP95Ms`
+- `Tessera.Benchmarks.StartupRenderBenchmarks.StartupLikeFirstFrameRender`
+- `Tessera.Benchmarks.StartupRenderBenchmarks.StartupLikeFirstFrameRenderOnly`
+- `Tessera.Benchmarks.LogTailStreamBenchmarks.AppendAndScrollLogTail`
+- `Tessera.Benchmarks.LogTailStreamBenchmarks.AppendAndScrollLogTailOnly`
+- `Tessera.Benchmarks.LargeTableBenchmarks.RenderLargeTableFrame`
+- `Tessera.Benchmarks.LargeTableBenchmarks.RenderLargeTableFrameOnly`
+- `Tessera.Benchmarks.OverlayStressBenchmarks.RenderOverlayStressFrames`
+- `Tessera.Benchmarks.OverlayStressBenchmarks.RenderOverlayStressFramesOnly`
+- `Tessera.Benchmarks.ResizeStormBenchmarks.RenderResizeStormFrames`
+- `Tessera.Benchmarks.ResizeStormBenchmarks.RenderResizeStormFramesOnly`
+- `Tessera.Benchmarks.StyledHeavyOutputBenchmarks.RenderStyledHeavyFrame`
+- `Tessera.Benchmarks.StyledHeavyOutputBenchmarks.RenderStyledHeavyFrameOnly`
+- `Tessera.Benchmarks.ViewportRenderBenchmarks.RenderViewportNoDecoration`
+- `Tessera.Benchmarks.ViewportRenderBenchmarks.RenderViewportNoDecorationOnly`
+- `Tessera.Benchmarks.SloLatencyBenchmarks.StartupFirstFrameP95Ms`
+- `Tessera.Benchmarks.SloLatencyBenchmarks.InputLatencyNormalP95Ms`
+- `Tessera.Benchmarks.SloLatencyBenchmarks.InputLatencyHeavyP95Ms`
 
 ## Comparison Protocol vs Other TUIs
 
@@ -161,7 +161,7 @@ Release gate for Public V1:
 - perf report attached to release checklist
 
 Supplemental release-confidence lane:
-- runtime e2e probe executes through the public hosting seam (`TeaHost` + terminal adapter + decoder + renderer flush)
+- runtime e2e probe executes through the public hosting seam (`TesseraHost` + terminal adapter + decoder + renderer flush)
 - current V1 policy: collect and attach the runtime e2e result, but do not fail RC solely on that lane until a baseline policy is accepted
 
 ## Iteration Reporting (Before/After)

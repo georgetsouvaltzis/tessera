@@ -1,7 +1,7 @@
-using TeaSharp.Controls;
-using TeaSharp.Styles;
+using Tessera.Controls;
+using Tessera.Styles;
 
-namespace TeaSharp.Examples.DataWorkbench;
+namespace Tessera.Examples.DataWorkbench;
 
 internal sealed partial class DataWorkbenchApp
 {
@@ -306,13 +306,13 @@ internal sealed partial class DataWorkbenchApp
         _footer.FillStyle = theme.Surface.Panel;
     }
 
-    private static void ConfigurePulse(StatsCard card, TeaStyle valueStyle)
+    private static void ConfigurePulse(StatsCard card, TesseraStyle valueStyle)
     {
         card.ValueStyle = valueStyle;
         card.BorderStyleText = valueStyle;
     }
 
-    private static void ConfigureInspector(Control control, TeaTheme theme, DataWorkbenchPalette palette)
+    private static void ConfigureInspector(Control control, TesseraTheme theme, DataWorkbenchPalette palette)
     {
         switch (control)
         {

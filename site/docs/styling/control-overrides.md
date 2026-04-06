@@ -2,7 +2,7 @@
 title: Control Overrides
 ---
 
-TeaSharp exposes typed visual hooks instead of forcing raw ANSI strings everywhere.
+Tessera exposes typed visual hooks instead of forcing raw ANSI strings everywhere.
 
 ## Common override patterns
 
@@ -16,8 +16,8 @@ TeaSharp exposes typed visual hooks instead of forcing raw ANSI strings everywhe
 ```csharp
 var choice = new Choice
 {
-    BorderStyleText = TeaStyle.Empty.WithForeground(AnsiColor.BrightBlack),
-    FocusedBorderStyleText = TeaStyle.Empty.WithBold().WithForeground(AnsiColor.BrightGreen),
+    BorderStyleText = TesseraStyle.Empty.WithForeground(AnsiColor.BrightBlack),
+    FocusedBorderStyleText = TesseraStyle.Empty.WithBold().WithForeground(AnsiColor.BrightGreen),
     Glyphs = new DropdownGlyphSet("▾", "▴", ">", "✓"),
 };
 ```

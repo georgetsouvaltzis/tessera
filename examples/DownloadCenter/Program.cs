@@ -1,8 +1,8 @@
-using TeaSharp;
-using TeaSharp.Controls;
-using TeaSharp.Examples.DownloadCenter;
+using Tessera;
+using Tessera.Controls;
+using Tessera.Examples.DownloadCenter;
 
-var app = Tea.CreateBuilder()
+var app = TesseraApplication.CreateBuilder()
     .UseApp<DownloadCenterApp>()
     .ConfigureRuntime(static runtime =>
     {
@@ -11,7 +11,7 @@ var app = Tea.CreateBuilder()
         runtime.Screen = new ScreenOptions
         {
             AltScreen = true,
-            WindowTitle = "TeaSharp DownloadCenter",
+            WindowTitle = "Tessera DownloadCenter",
             EnableFocusReporting = true,
             EnableBracketedPaste = true,
             MouseTracking = MouseTrackingMode.AllMotion,

@@ -1,13 +1,13 @@
-using TeaSharp.Components.Primitives;
-using TeaSharp.Controls;
-using TeaSharp.Styles;
+using Tessera.Components.Primitives;
+using Tessera.Controls;
+using Tessera.Styles;
 
-namespace TeaSharp.Examples.GitConsole;
+namespace Tessera.Examples.GitConsole;
 
 internal sealed class GitRepoHeaderControl : Control
 {
     public string Title { get; set; } = "Flight Deck";
-    public string RepositoryName { get; set; } = "teasharp";
+    public string RepositoryName { get; set; } = "tessera";
     public string RepositoryPath { get; set; } = string.Empty;
     public string BranchName { get; set; } = "main";
     public string RemoteName { get; set; } = "origin";
@@ -18,16 +18,16 @@ internal sealed class GitRepoHeaderControl : Control
     public int Behind { get; set; }
     public BorderStyle Border { get; set; } = BorderStyle.Rounded;
     public Thickness Padding { get; set; } = Thickness.All(1);
-    public TeaStyle TitleStyle { get; set; } = TeaStyle.Empty;
-    public TeaStyle BorderStyleText { get; set; } = TeaStyle.Empty;
-    public TeaStyle NameStyle { get; set; } = TeaStyle.Empty;
-    public TeaStyle BranchStyle { get; set; } = TeaStyle.Empty;
-    public TeaStyle PathStyle { get; set; } = TeaStyle.Empty;
-    public TeaStyle PulseStyle { get; set; } = TeaStyle.Empty;
-    public TeaStyle ActionStyle { get; set; } = TeaStyle.Empty;
-    public TeaStyle DetailStyle { get; set; } = TeaStyle.Empty;
-    public TeaStyle MetaStyle { get; set; } = TeaStyle.Empty;
-    public TeaStyle HighlightStyle { get; set; } = TeaStyle.Empty;
+    public TesseraStyle TitleStyle { get; set; } = TesseraStyle.Empty;
+    public TesseraStyle BorderStyleText { get; set; } = TesseraStyle.Empty;
+    public TesseraStyle NameStyle { get; set; } = TesseraStyle.Empty;
+    public TesseraStyle BranchStyle { get; set; } = TesseraStyle.Empty;
+    public TesseraStyle PathStyle { get; set; } = TesseraStyle.Empty;
+    public TesseraStyle PulseStyle { get; set; } = TesseraStyle.Empty;
+    public TesseraStyle ActionStyle { get; set; } = TesseraStyle.Empty;
+    public TesseraStyle DetailStyle { get; set; } = TesseraStyle.Empty;
+    public TesseraStyle MetaStyle { get; set; } = TesseraStyle.Empty;
+    public TesseraStyle HighlightStyle { get; set; } = TesseraStyle.Empty;
 
     public override void Render(Canvas canvas, Rect rect)
     {
@@ -99,5 +99,5 @@ internal sealed class GitRepoHeaderControl : Control
         canvas.WriteText(content.X, content.Y + row, text, content.Width);
     }
 
-    private static string Render(TeaStyle style, string text) => style.IsEmpty ? text : style.Render(text);
+    private static string Render(TesseraStyle style, string text) => style.IsEmpty ? text : style.Render(text);
 }

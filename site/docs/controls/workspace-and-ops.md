@@ -15,4 +15,4 @@ Workspace and operational controls:
 - `ProcessListView`
 - `TerminalPanel`
 
-This is the strongest differentiator in TeaSharp’s current control surface.
+This is the strongest differentiator in Tessera’s current control surface.

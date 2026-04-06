@@ -1,8 +1,8 @@
-using TeaSharp.Components.Primitives;
-using TeaSharp.Controls;
-using TeaSharp.Styles;
+using Tessera.Components.Primitives;
+using Tessera.Controls;
+using Tessera.Styles;
 
-namespace TeaSharp.Examples.GitConsole;
+namespace Tessera.Examples.GitConsole;
 
 internal sealed class GitWorktreeControl : Control
 {
@@ -19,20 +19,20 @@ internal sealed class GitWorktreeControl : Control
     public bool ShowFocusMarker { get; set; } = true;
     public BorderStyle Border { get; set; } = BorderStyle.Rounded;
     public Thickness Padding { get; set; } = Thickness.All(1);
-    public TeaStyle TitleStyle { get; set; } = TeaStyle.Empty;
-    public TeaStyle FocusedTitleStyle { get; set; } = TeaStyle.Empty;
-    public TeaStyle BorderStyleText { get; set; } = TeaStyle.Empty;
-    public TeaStyle FocusedBorderStyleText { get; set; } = TeaStyle.Empty;
-    public TeaStyle GroupStyle { get; set; } = TeaStyle.Empty;
-    public TeaStyle DefaultRowStyle { get; set; } = TeaStyle.Empty;
-    public TeaStyle SelectedRowStyle { get; set; } = TeaStyle.Empty;
-    public TeaStyle FocusedSelectedRowStyle { get; set; } = TeaStyle.Empty;
-    public TeaStyle SecondaryStyle { get; set; } = TeaStyle.Empty;
-    public TeaStyle StagedStyle { get; set; } = TeaStyle.Empty;
-    public TeaStyle ReviewStyle { get; set; } = TeaStyle.Empty;
-    public TeaStyle AddedStyle { get; set; } = TeaStyle.Empty;
-    public TeaStyle RemovedStyle { get; set; } = TeaStyle.Empty;
-    public TeaStyle EmptyStyle { get; set; } = TeaStyle.Empty;
+    public TesseraStyle TitleStyle { get; set; } = TesseraStyle.Empty;
+    public TesseraStyle FocusedTitleStyle { get; set; } = TesseraStyle.Empty;
+    public TesseraStyle BorderStyleText { get; set; } = TesseraStyle.Empty;
+    public TesseraStyle FocusedBorderStyleText { get; set; } = TesseraStyle.Empty;
+    public TesseraStyle GroupStyle { get; set; } = TesseraStyle.Empty;
+    public TesseraStyle DefaultRowStyle { get; set; } = TesseraStyle.Empty;
+    public TesseraStyle SelectedRowStyle { get; set; } = TesseraStyle.Empty;
+    public TesseraStyle FocusedSelectedRowStyle { get; set; } = TesseraStyle.Empty;
+    public TesseraStyle SecondaryStyle { get; set; } = TesseraStyle.Empty;
+    public TesseraStyle StagedStyle { get; set; } = TesseraStyle.Empty;
+    public TesseraStyle ReviewStyle { get; set; } = TesseraStyle.Empty;
+    public TesseraStyle AddedStyle { get; set; } = TesseraStyle.Empty;
+    public TesseraStyle RemovedStyle { get; set; } = TesseraStyle.Empty;
+    public TesseraStyle EmptyStyle { get; set; } = TesseraStyle.Empty;
 
     public GitFileEntry? SelectedItem => _selectedIndex >= 0 && _selectedIndex < _visibleItems.Count ? _visibleItems[_selectedIndex] : null;
 
@@ -288,9 +288,9 @@ internal sealed class GitWorktreeControl : Control
         return Render(IsFocused ? FocusedTitleStyle : TitleStyle, title);
     }
 
-    private TeaStyle ResolveBorderStyle() => IsFocused ? BorderStyleText.Merge(FocusedBorderStyleText) : BorderStyleText;
+    private TesseraStyle ResolveBorderStyle() => IsFocused ? BorderStyleText.Merge(FocusedBorderStyleText) : BorderStyleText;
 
-    private TeaStyle ResolveRowStyle(bool selected)
+    private TesseraStyle ResolveRowStyle(bool selected)
     {
         if (!selected)
         {
@@ -300,7 +300,7 @@ internal sealed class GitWorktreeControl : Control
         return IsFocused ? SelectedRowStyle.Merge(FocusedSelectedRowStyle) : SelectedRowStyle;
     }
 
-    private static string Render(TeaStyle style, string text) => style.IsEmpty ? text : style.Render(text);
+    private static string Render(TesseraStyle style, string text) => style.IsEmpty ? text : style.Render(text);
 
     private sealed record GitWorktreeVisualRow(int ItemIndex, string Text);
 }

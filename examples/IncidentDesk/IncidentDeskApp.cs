@@ -1,12 +1,12 @@
-using TeaSharp.Controls;
-using TeaSharp.Layout;
-using TeaSharp.Styles;
+using Tessera.Controls;
+using Tessera.Layout;
+using Tessera.Styles;
 
-namespace TeaSharp.Examples.IncidentDesk;
+namespace Tessera.Examples.IncidentDesk;
 
-internal sealed partial class IncidentDeskApp : TeaApp
+internal sealed partial class IncidentDeskApp : TesseraApp
 {
-    private readonly TeaTheme _theme = IncidentDeskTheme.DefaultTheme;
+    private readonly TesseraTheme _theme = IncidentDeskTheme.DefaultTheme;
     private readonly IncidentDeskState _state = IncidentDeskState.CreateSeed();
 
     private readonly IncidentHeroControl _hero = new() { Title = "Incident Command Deck", Border = BorderStyle.Rounded, Padding = Thickness.Symmetric(1, 0) };
@@ -37,7 +37,7 @@ internal sealed partial class IncidentDeskApp : TeaApp
         _queue.RequestFocus();
     }
 
-    public override TeaEffect? Update(Message message)
+    public override TesseraEffect? Update(Message message)
     {
         switch (message)
         {
@@ -64,11 +64,11 @@ internal sealed partial class IncidentDeskApp : TeaApp
         });
     }
 
-    private TeaEffect? HandleKey(KeyPressed key)
+    private TesseraEffect? HandleKey(KeyPressed key)
     {
         if (key.IsCharacter('c', ModifierKeys.Ctrl))
         {
-            return TeaEffects.Quit;
+            return TesseraEffects.Quit;
         }
 
         if (key.Is(Key.F1))
@@ -424,7 +424,7 @@ internal sealed partial class IncidentDeskApp : TeaApp
 
     private bool IsEditingNotes() => _notes.IsFocused;
 
-    private static void ConfigurePulseCard(Label card, TeaStyle textStyle)
+    private static void ConfigurePulseCard(Label card, TesseraStyle textStyle)
     {
         card.TextStyle = textStyle;
         card.TitleStyle = IncidentDeskTheme.Foreground(0xD6BFAF).WithBold();
@@ -446,7 +446,7 @@ internal sealed partial class IncidentDeskApp : TeaApp
         button.DisabledLabelStyle = IncidentDeskTheme.Foreground(0x8E7A74);
     }
 
-    private static TeaStyle SeverityChipStyle(IncidentSeverity severity) => severity switch
+    private static TesseraStyle SeverityChipStyle(IncidentSeverity severity) => severity switch
     {
         IncidentSeverity.Critical => IncidentDeskTheme.Chip(0xFFF4E8, 0x8D3228),
         IncidentSeverity.High => IncidentDeskTheme.Chip(0xFFF4E8, 0x7B4A28),
@@ -454,7 +454,7 @@ internal sealed partial class IncidentDeskApp : TeaApp
         _ => IncidentDeskTheme.Chip(0xEAF7EF, 0x345043),
     };
 
-    private static TeaStyle StatusChipStyle(IncidentStatus status) => status switch
+    private static TesseraStyle StatusChipStyle(IncidentStatus status) => status switch
     {
         IncidentStatus.Escalated => IncidentDeskTheme.Chip(0xFFF4E8, 0x6D231E),
         IncidentStatus.Investigating => IncidentDeskTheme.Chip(0xFFF4E8, 0x5D4335),

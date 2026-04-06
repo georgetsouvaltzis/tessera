@@ -1,15 +1,15 @@
-# TeaSharp Public API Guidelines
+# Tessera Public API Guidelines
 
-This document is the implementation policy for a C#-first TeaSharp API.
+This document is the implementation policy for a C#-first Tessera API.
 
 ## Audience And Layers
 
-TeaSharp supports two intentional product layers:
+Tessera supports two intentional product layers:
 
-- `TeaSharp`: primary app-authoring surface for most C# developers building TUIs.
-- `TeaSharp.Core`: low-level product for expert/runtime-driven scenarios.
+- `Tessera`: primary app-authoring surface for most C# developers building TUIs.
+- `Tessera.Core`: low-level product for expert/runtime-driven scenarios.
 
-Advanced host seams (`TeaSharp.Hosting`) remain supported as an opt-in lane, but they are not the beginner path.
+Advanced host seams (`Tessera.Hosting`) remain supported as an opt-in lane, but they are not the beginner path.
 
 ## C#-First Rules
 
@@ -27,14 +27,14 @@ Avoid framework-specific patterns when BCL conventions already solve the problem
 
 Support two startup lanes:
 
-- minimal: `await Tea.RunAsync(new App());`
-- configured: `Tea.CreateBuilder().UseApp<TApp>().ConfigureRuntime(...).Build()`
+- minimal: `await TesseraApplication.RunAsync(new App());`
+- configured: `TesseraApplication.CreateBuilder().UseApp<TApp>().ConfigureRuntime(...).Build()`
 
-TeaSharp is a library-first TUI framework. Default startup should not require DI containers or Generic Host wiring.
+Tessera is a library-first TUI framework. Default startup should not require DI containers or Generic Host wiring.
 
 Minimal app shape for docs/examples:
 
-1. derive from `TeaApp`
+1. derive from `TesseraApp`
 2. handle app/runtime input through `Message`
 3. let built-in controls route handled input before `Update(...)`
 4. return a `Screen` from `Build(ScreenContext)`
@@ -42,12 +42,12 @@ Minimal app shape for docs/examples:
 Typical configured startup:
 
 ```csharp
-var app = Tea.CreateBuilder()
+var app = TesseraApplication.CreateBuilder()
     .UseApp<MyApp>()
     .ConfigureRuntime(static runtime =>
     {
         runtime.MaxFps = 60;
-        runtime.Theme = TeaThemes.Catppuccin(CatppuccinVariant.Mocha);
+        runtime.Theme = TesseraThemes.Catppuccin(CatppuccinVariant.Mocha);
         runtime.Screen = new ScreenOptions
         {
             AltScreen = true,
@@ -69,7 +69,7 @@ Public onboarding should teach one story:
 3. use the starter example order in [examples.md](examples.md): `HelloWorld` -> `CounterForm` -> `WorkspaceApp`
 4. use the flagship examples only after the starter ladder is clear
 
-Keep examples in `TeaSharp` namespaces. `TeaSharp.Core` is the low-level advanced lane and should not appear in the starter or flagship public examples.
+Keep examples in `Tessera` namespaces. `Tessera.Core` is the low-level advanced lane and should not appear in the starter or flagship public examples.
 
 ## Canonical Theme Pattern
 
@@ -98,25 +98,25 @@ For tiny demos, direct event mutation is acceptable. Production examples should 
 Default composition path:
 
 - `Screen.Build(...)` + `WindowBuilder`
-- root controls from `TeaSharp.Controls`
-- root layouts from `TeaSharp.Layout`
-- drawing primitives only when needed: `TeaSharp.Components.Primitives`
+- root controls from `Tessera.Controls`
+- root layouts from `Tessera.Layout`
+- drawing primitives only when needed: `Tessera.Components.Primitives`
 
 Alternative composition surfaces may remain public for advanced scenarios, but docs and starter examples should teach the default path first.
 
 Preferred default imports:
 
 ```csharp
-using TeaSharp;
-using TeaSharp.Controls;
-using TeaSharp.Layout;
+using Tessera;
+using Tessera.Controls;
+using Tessera.Layout;
 ```
 
 ## Boundary Rules
 
-- Normal app examples should not import `TeaSharp.Core.*`.
-- Public docs should use `TeaSharp.Styles` (not legacy namespace names).
-- Runtime knobs for advanced hosting should live under `TeaSharp.Hosting` discoverability as opt-in APIs, not the default path.
+- Normal app examples should not import `Tessera.Core.*`.
+- Public docs should use `Tessera.Styles` (not legacy namespace names).
+- Runtime knobs for advanced hosting should live under `Tessera.Hosting` discoverability as opt-in APIs, not the default path.
 - Images are V1.1 scope, not V1 scope.
 
 ## Review Checklist

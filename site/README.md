@@ -1,6 +1,6 @@
-# TeaSharp Site
+# Tessera Site
 
-This directory contains the Docusaurus-based public docs and marketing site for TeaSharp.
+This directory contains the Docusaurus-based public docs and marketing site for Tessera.
 
 ## Local development
 
@@ -29,7 +29,7 @@ The repository is configured for GitHub Pages via GitHub Actions.
 
 The current config assumes project-pages hosting at:
 
-- `https://georgetsouvaltzis.github.io/teasharp/`
+- `https://georgetsouvaltzis.github.io/tessera/`
 
 For a brand-new repository, GitHub Pages may still need one repo setting enabled before the first deploy:
 

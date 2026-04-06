@@ -1,8 +1,8 @@
-using TeaSharp.Components.Primitives;
-using TeaSharp.Controls;
-using TeaSharp.Styles;
+using Tessera.Components.Primitives;
+using Tessera.Controls;
+using Tessera.Styles;
 
-namespace TeaSharp.Examples.TransitBoard;
+namespace Tessera.Examples.TransitBoard;
 
 internal sealed class TransitDepartureBoardControl : Control
 {
@@ -14,19 +14,19 @@ internal sealed class TransitDepartureBoardControl : Control
     public event EventHandler<TransitServiceChangedEventArgs>? SelectionChanged;
 
     public string Title { get; set; } = "Live Board";
-    public TeaStyle TitleStyle { get; set; } = TeaStyle.Empty;
-    public TeaStyle FocusedTitleStyle { get; set; } = TeaStyle.Empty;
-    public TeaStyle DividerStyle { get; set; } = TeaStyle.Empty;
-    public TeaStyle EmptyStyle { get; set; } = TeaStyle.Empty;
-    public TeaStyle PrimaryTextStyle { get; set; } = TeaStyle.Empty;
-    public TeaStyle SecondaryTextStyle { get; set; } = TeaStyle.Empty;
-    public TeaStyle SelectedRowStyle { get; set; } = TeaStyle.Empty;
-    public TeaStyle SelectedSecondaryStyle { get; set; } = TeaStyle.Empty;
-    public TeaStyle DelayStyle { get; set; } = TeaStyle.Empty;
-    public TeaStyle WarningStyle { get; set; } = TeaStyle.Empty;
-    public TeaStyle SuccessStyle { get; set; } = TeaStyle.Empty;
-    public TeaStyle PlatformStyle { get; set; } = TeaStyle.Empty;
-    public TeaStyle RouteStyle { get; set; } = TeaStyle.Empty;
+    public TesseraStyle TitleStyle { get; set; } = TesseraStyle.Empty;
+    public TesseraStyle FocusedTitleStyle { get; set; } = TesseraStyle.Empty;
+    public TesseraStyle DividerStyle { get; set; } = TesseraStyle.Empty;
+    public TesseraStyle EmptyStyle { get; set; } = TesseraStyle.Empty;
+    public TesseraStyle PrimaryTextStyle { get; set; } = TesseraStyle.Empty;
+    public TesseraStyle SecondaryTextStyle { get; set; } = TesseraStyle.Empty;
+    public TesseraStyle SelectedRowStyle { get; set; } = TesseraStyle.Empty;
+    public TesseraStyle SelectedSecondaryStyle { get; set; } = TesseraStyle.Empty;
+    public TesseraStyle DelayStyle { get; set; } = TesseraStyle.Empty;
+    public TesseraStyle WarningStyle { get; set; } = TesseraStyle.Empty;
+    public TesseraStyle SuccessStyle { get; set; } = TesseraStyle.Empty;
+    public TesseraStyle PlatformStyle { get; set; } = TesseraStyle.Empty;
+    public TesseraStyle RouteStyle { get; set; } = TesseraStyle.Empty;
     public string FocusMarker { get; set; } = "◆";
 
     public TransitService? SelectedService => _selectedIndex >= 0 && _selectedIndex < _services.Count ? _services[_selectedIndex] : null;
@@ -237,7 +237,7 @@ internal sealed class TransitDepartureBoardControl : Control
         }
     }
 
-    private TeaStyle ResolveMarkerStyle(TransitService service, bool selected)
+    private TesseraStyle ResolveMarkerStyle(TransitService service, bool selected)
     {
         if (selected)
         {
@@ -265,7 +265,7 @@ internal sealed class TransitDepartureBoardControl : Control
         };
     }
 
-    private static string Render(TeaStyle style, string text) => style.IsEmpty ? text : style.Render(text);
+    private static string Render(TesseraStyle style, string text) => style.IsEmpty ? text : style.Render(text);
 }
 
 internal sealed record TransitServiceChangedEventArgs(TransitService? Previous, TransitService? Selected);

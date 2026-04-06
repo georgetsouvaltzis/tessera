@@ -1,6 +1,6 @@
-using TeaSharp.Layout;
+using Tessera.Layout;
 
-namespace TeaSharp.Examples.TransitBoard;
+namespace Tessera.Examples.TransitBoard;
 
 internal sealed partial class TransitBoardApp
 {

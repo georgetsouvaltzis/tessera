@@ -1,6 +1,6 @@
-using TeaSharp.Layout;
+using Tessera.Layout;
 
-namespace TeaSharp.Examples.GitConsole;
+namespace Tessera.Examples.GitConsole;
 
 internal sealed partial class GitConsoleApp
 {

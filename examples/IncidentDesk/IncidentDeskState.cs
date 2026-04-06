@@ -1,6 +1,6 @@
-using TeaSharp.Controls;
+using Tessera.Controls;
 
-namespace TeaSharp.Examples.IncidentDesk;
+namespace Tessera.Examples.IncidentDesk;
 
 internal enum IncidentSeverity
 {

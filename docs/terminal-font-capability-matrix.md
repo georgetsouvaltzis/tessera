@@ -1,4 +1,4 @@
-# Terminal Font Capability Matrix (TeaSharp V1)
+# Terminal Font Capability Matrix (Tessera V1)
 
 This matrix covers whether a TUI app can change terminal font family/size through output sequences.
 Scope is runtime behavior from app output, not manual user settings.
@@ -15,12 +15,12 @@ Scope is runtime behavior from app output, not manual user settings.
 | Windows Terminal | No (VT) | No (VT) | `settings.json` profile (`font.face`, `font.size`) | Profile/config driven; not exposed as VT font sequence. |
 | Windows Console (conhost) | No (VT) | No (VT) | Host settings / Win32 APIs | Console VT sequence docs do not define font-family/font-size OSC control. |
 
-## TeaSharp Recommendations
+## Tessera Recommendations
 
 - Keep `ScreenOptions.FontSpec` explicitly best-effort and optional.
 - Do not treat font requests as cross-terminal contract; treat them as advisory.
 - Emit font request only on change/startup, never per frame.
-- Keep sanitization and no forced restore behavior (current TeaSharp policy).
+- Keep sanitization and no forced restore behavior (current Tessera policy).
 - For predictable typography, recommend profile/config setup in app docs instead of runtime font mutation.
 
 ## Official Sources

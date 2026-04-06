@@ -5,7 +5,7 @@ authors: [default]
 tags: [docs, site]
 ---
 
-The TeaSharp repository now includes a deployable Docusaurus site under `site/`.
+The Tessera repository now includes a deployable Docusaurus site under `site/`.
 
 This first pass focuses on:
 

@@ -1,9 +1,9 @@
-using TeaSharp.Controls;
-using TeaSharp.Styles;
+using Tessera.Controls;
+using Tessera.Styles;
 
-namespace TeaSharp.Examples.TransitBoard;
+namespace Tessera.Examples.TransitBoard;
 
-internal sealed partial class TransitBoardApp : TeaApp
+internal sealed partial class TransitBoardApp : TesseraApp
 {
     private TransitBoardPalette _palette = TransitBoardTheme.Default;
     private readonly TransitBoardState _state = TransitBoardState.CreateSeed();
@@ -31,10 +31,10 @@ internal sealed partial class TransitBoardApp : TeaApp
         _board.RequestFocus();
     }
 
-    public override TeaEffect? Initialize() =>
-        TeaEffects.Periodic(TimeSpan.FromSeconds(1), _ => new TransitBoardTickMessage());
+    public override TesseraEffect? Initialize() =>
+        TesseraEffects.Periodic(TimeSpan.FromSeconds(1), _ => new TransitBoardTickMessage());
 
-    public override TeaEffect? Update(Message message)
+    public override TesseraEffect? Update(Message message)
     {
         switch (message)
         {
@@ -63,11 +63,11 @@ internal sealed partial class TransitBoardApp : TeaApp
         });
     }
 
-    private TeaEffect? HandleKey(KeyPressed key)
+    private TesseraEffect? HandleKey(KeyPressed key)
     {
         if (key.IsCharacter('c', ModifierKeys.Ctrl))
         {
-            return TeaEffects.Quit;
+            return TesseraEffects.Quit;
         }
 
         if (key.Is(Key.Tab))
@@ -330,7 +330,7 @@ internal sealed partial class TransitBoardApp : TeaApp
         _footer.FillStyle = theme.Surface.Panel;
     }
 
-    private static void ConfigureChipStrip(TransitChipStripControl control, TeaTheme theme)
+    private static void ConfigureChipStrip(TransitChipStripControl control, TesseraTheme theme)
     {
         control.TitleStyle = theme.Text.Muted;
         control.FocusedTitleStyle = theme.Focus.Title;

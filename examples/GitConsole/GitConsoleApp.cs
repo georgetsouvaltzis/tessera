@@ -1,15 +1,15 @@
 using System.Globalization;
-using TeaSharp.Controls;
-using TeaSharp.Layout;
-using TeaSharp.Styles;
+using Tessera.Controls;
+using Tessera.Layout;
+using Tessera.Styles;
 
-namespace TeaSharp.Examples.GitConsole;
+namespace Tessera.Examples.GitConsole;
 
-internal sealed partial class GitConsoleApp : TeaApp
+internal sealed partial class GitConsoleApp : TesseraApp
 {
     private static readonly string[] PulseFrames = ["syncing", "scanning", "reviewing", "steady"];
 
-    private readonly TeaTheme _theme = GitConsoleTheme.DefaultTheme;
+    private readonly TesseraTheme _theme = GitConsoleTheme.DefaultTheme;
     private readonly GitConsoleState _state = GitConsoleState.CreateSeed();
 
     private readonly GitRepoHeaderControl _repoHeader = new() { Padding = Thickness.Symmetric(1, 0) };
@@ -41,10 +41,10 @@ internal sealed partial class GitConsoleApp : TeaApp
         _worktree.RequestFocus();
     }
 
-    public override TeaEffect? Initialize() =>
-        TeaEffects.Periodic(TimeSpan.FromMilliseconds(900), _ => new PulseTickMessage());
+    public override TesseraEffect? Initialize() =>
+        TesseraEffects.Periodic(TimeSpan.FromMilliseconds(900), _ => new PulseTickMessage());
 
-    public override TeaEffect? Update(Message message)
+    public override TesseraEffect? Update(Message message)
     {
         switch (message)
         {
@@ -76,11 +76,11 @@ internal sealed partial class GitConsoleApp : TeaApp
         });
     }
 
-    private TeaEffect? HandleKey(KeyPressed key)
+    private TesseraEffect? HandleKey(KeyPressed key)
     {
         if (key.IsCharacter('c', ModifierKeys.Ctrl))
         {
-            return TeaEffects.Quit;
+            return TesseraEffects.Quit;
         }
 
         if (key.Is(Key.F1))

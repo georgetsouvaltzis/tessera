@@ -29,11 +29,11 @@ const showcaseCards = [
   },
 ];
 
-const codeSample = `using TeaSharp;
-using TeaSharp.Controls;
-using TeaSharp.Layout;
+const codeSample = `using Tessera;
+using Tessera.Controls;
+using Tessera.Layout;
 
-var app = Tea.CreateBuilder()
+var app = Tessera.CreateBuilder()
     .UseApp<CounterApp>()
     .ConfigureRuntime(static runtime =>
     {
@@ -76,12 +76,12 @@ export default function Home() {
   return (
     <Layout
       title="Premium terminal UI for .NET"
-      description="TeaSharp is a C#-native terminal UI framework for modern, themeable, state-driven terminal apps."
+      description="Tessera is a C#-native terminal UI framework for modern, themeable, state-driven terminal apps."
     >
       <main className={styles.page}>
         <section className={styles.hero}>
           <div className={styles.heroCopy}>
-            <p className={styles.kicker}>TeaSharp for .NET 10</p>
+            <p className={styles.kicker}>Tessera for .NET 10</p>
             <Heading as="h1" className={styles.heroTitle}>
               Premium terminal UI.
               <br />
@@ -110,13 +110,13 @@ export default function Home() {
 
         <section className={styles.section}>
           <div className={styles.sectionHeader}>
-            <p className={styles.kicker}>Why TeaSharp</p>
+            <p className={styles.kicker}>Why Tessera</p>
             <Heading as="h2">A public path built for real terminal products</Heading>
           </div>
           <div className={styles.featureGrid}>
             <article>
               <Heading as="h3">Small default surface</Heading>
-              <p>`TeaApp`, `Tea.RunAsync(...)`, `Tea.CreateBuilder()`, `Screen.Build(...)`, and first-class controls.</p>
+              <p>`TesseraApp`, `Tessera.RunAsync(...)`, `Tessera.CreateBuilder()`, `Screen.Build(...)`, and first-class controls.</p>
             </article>
             <article>
               <Heading as="h3">Modern TUI aesthetic</Heading>
@@ -134,7 +134,7 @@ export default function Home() {
             <p className={styles.kicker}>Starter API</p>
             <Heading as="h2">The first app stays readable</Heading>
             <p>
-              TeaSharp favors explicit object models and shallow composition over nested mini-DSLs.
+              Tessera favors explicit object models and shallow composition over nested mini-DSLs.
             </p>
           </div>
           <pre className={styles.codeBlock}>

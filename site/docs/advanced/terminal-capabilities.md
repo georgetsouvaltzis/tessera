@@ -2,7 +2,7 @@
 title: Terminal Capabilities
 ---
 
-TeaSharp can adapt to varying terminal capabilities, but richer UX depends on the host.
+Tessera can adapt to varying terminal capabilities, but richer UX depends on the host.
 
 Key capability areas:
 

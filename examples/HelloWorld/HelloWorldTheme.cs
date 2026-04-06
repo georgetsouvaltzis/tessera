@@ -1,49 +1,49 @@
-using TeaSharp.Styles;
+using Tessera.Styles;
 
-namespace TeaSharp.Examples.HelloWorld;
+namespace Tessera.Examples.HelloWorld;
 
 internal static class HelloWorldTheme
 {
-    public static TeaTheme Default => new()
+    public static TesseraTheme Default => new()
     {
-        Text = new TeaThemeTextTokens
+        Text = new TesseraThemeTextTokens
         {
             Primary = Foreground(0xF6F8FF),
             Secondary = Foreground(0xA8B2D8),
             Muted = Foreground(0x6E7597),
             Inverse = Foreground(0x0A1020),
         },
-        Surface = new TeaThemeSurfaceTokens
+        Surface = new TesseraThemeSurfaceTokens
         {
             Base = Background(0x090D1A),
             Panel = Background(0x11172C),
             Overlay = Background(0x18203D),
         },
-        Border = new TeaThemeBorderTokens
+        Border = new TesseraThemeBorderTokens
         {
             Default = Foreground(0x394A7C),
             Strong = Foreground(0x6D84FF),
             Focused = Foreground(0x67F7C7).WithBold(),
             Error = Foreground(0xFF8E72).WithBold(),
         },
-        State = new TeaThemeStateTokens
+        State = new TesseraThemeStateTokens
         {
             Success = Foreground(0x67F7C7).WithBold(),
             Warning = Foreground(0xFFD166).WithBold(),
             Error = Foreground(0xFF8E72).WithBold(),
             Info = Foreground(0x8AD8FF).WithBold(),
         },
-        Accent = new TeaThemeAccentTokens
+        Accent = new TesseraThemeAccentTokens
         {
             Primary = Foreground(0x67F7C7).WithBold(),
             Secondary = Foreground(0xFFB86B).WithBold(),
         },
-        Selection = new TeaThemeSelectionTokens
+        Selection = new TesseraThemeSelectionTokens
         {
             Background = Background(0x293B67),
             Foreground = Foreground(0xF8FBFF).WithBold(),
         },
-        Focus = new TeaThemeFocusTokens
+        Focus = new TesseraThemeFocusTokens
         {
             Ring = Foreground(0xFFB86B).WithBold(),
             Title = Foreground(0xFFB86B).WithBold(),
@@ -52,11 +52,11 @@ internal static class HelloWorldTheme
         },
     };
 
-    public static TeaStyle Foreground(int rgb) => TeaStyle.Empty.WithForeground(Hex(rgb));
+    public static TesseraStyle Foreground(int rgb) => TesseraStyle.Empty.WithForeground(Hex(rgb));
 
-    public static TeaStyle Background(int rgb) => TeaStyle.Empty.WithBackground(Hex(rgb));
+    public static TesseraStyle Background(int rgb) => TesseraStyle.Empty.WithBackground(Hex(rgb));
 
-    public static TeaStyle Surface(int foregroundRgb, int backgroundRgb)
+    public static TesseraStyle Surface(int foregroundRgb, int backgroundRgb)
         => Foreground(foregroundRgb).Merge(Background(backgroundRgb));
 
     private static AnsiColor Hex(int rgb)

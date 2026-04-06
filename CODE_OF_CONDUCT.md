@@ -1,6 +1,6 @@
 # Code Of Conduct
 
-TeaSharp is a public project. Treat the repo as a professional engineering space.
+Tessera is a public project. Treat the repo as a professional engineering space.
 
 ## Expected Behavior
 

@@ -1,24 +1,24 @@
-# TeaSharp
+# Tessera
 
 Build terminal apps that feel like real products, not throwaway demos.
 
-TeaSharp is a C#-first terminal UI framework for `.NET 10`. It gives you a small public app model, first-class controls and layouts, semantic theming, and enough structure to build serious terminal software without dragging you into a host-heavy framework story.
+Tessera is a C#-first terminal UI framework for `.NET 10`. It gives you a small public app model, first-class controls and layouts, semantic theming, and enough structure to build serious terminal software without dragging you into a host-heavy framework story.
 
-TeaSharp is in public alpha. It is ready for evaluation, experimentation, and contribution. Breaking changes are still allowed when they simplify the long-term public path.
+Tessera is in public alpha. It is ready for evaluation, experimentation, and contribution. Breaking changes are still allowed when they simplify the long-term public path.
 
-## Why TeaSharp
+## Why Tessera
 
 - explicit C# object model instead of a nested layout DSL
 - no DI container or Generic Host required for the normal path
 - built-in controls, layouts, themes, and runtime options
-- state-driven app model with `TeaApp`, `Update(...)`, and `Build(...)`
+- state-driven app model with `TesseraApp`, `Update(...)`, and `Build(...)`
 - advanced hosting seams available when needed, but not forced on beginners
 - public examples that aim to look like products, not widget dumps
 
 ## What You Get
 
-- a small startup story: `Tea.RunAsync(...)` or `Tea.CreateBuilder()`
-- default authoring namespaces: `TeaSharp`, `TeaSharp.Controls`, `TeaSharp.Layout`, `TeaSharp.Styles`
+- a small startup story: `TesseraApplication.RunAsync(...)` or `TesseraApplication.CreateBuilder()`
+- default authoring namespaces: `Tessera`, `Tessera.Controls`, `Tessera.Layout`, `Tessera.Styles`
 - a broad built-in widget catalog for dashboards, forms, workflows, data surfaces, and overlays
 - semantic theme tokens and override layers
 - public examples that cover starter apps, dashboards, workbench shells, and command-heavy apps
@@ -35,11 +35,11 @@ TeaSharp is in public alpha. It is ready for evaluation, experimentation, and co
 ## Quick Start
 
 ```csharp
-using TeaSharp;
-using TeaSharp.Controls;
-using TeaSharp.Layout;
+using Tessera;
+using Tessera.Controls;
+using Tessera.Layout;
 
-var app = Tea.CreateBuilder()
+var app = TesseraApplication.CreateBuilder()
     .UseApp<CounterApp>()
     .ConfigureRuntime(static runtime =>
     {
@@ -54,7 +54,7 @@ var app = Tea.CreateBuilder()
 
 await app.RunAsync();
 
-internal sealed class CounterApp : TeaApp
+internal sealed class CounterApp : TesseraApp
 {
     private readonly CounterState _state = new();
     private readonly Button _increment = new()
@@ -65,9 +65,9 @@ internal sealed class CounterApp : TeaApp
 
     public CounterApp() => _increment.Activated += (_, _) => _state.Count++;
 
-    public override TeaEffect? Update(Message message)
+    public override TesseraEffect? Update(Message message)
         => message is KeyPressed key && key.IsCharacter('c', ModifierKeys.Ctrl)
-            ? TeaEffects.Quit
+            ? TesseraEffects.Quit
             : null;
 
     public override Screen Build(ScreenContext context)
@@ -93,7 +93,7 @@ internal sealed class CounterState
 Minimal path still exists:
 
 ```csharp
-await Tea.RunAsync(new MyApp());
+await TesseraApplication.RunAsync(new MyApp());
 ```
 
 ## Run Something Real
@@ -123,7 +123,7 @@ Supporting demos:
 
 - `examples/HelloWorld`
   - smallest centered starter
-  - first contact with `TeaApp`, layout centering, buttons, and status
+  - first contact with `TesseraApp`, layout centering, buttons, and status
 - `examples/CounterForm`
   - interactive form-first starter
   - inputs, choice, progress, and message-driven state
@@ -154,10 +154,10 @@ The full guide lives in [docs/examples.md](docs/examples.md).
 
 ## Repo Layout
 
-- `src/TeaSharp`: default public app-authoring API
-- `src/TeaSharp.Core`: advanced low-level runtime layer
-- `tests/TeaSharp.Tests`: unit, contract, and regression tests
-- `tests/TeaSharp.IntegrationTests`: integration coverage
+- `src/Tessera`: default public app-authoring API
+- `src/Tessera.Core`: advanced low-level runtime layer
+- `tests/Tessera.Tests`: unit, contract, and regression tests
+- `tests/Tessera.IntegrationTests`: integration coverage
 - `examples`: public examples and showcase apps
 - `docs`: product, architecture, release, and contributor docs
 
@@ -179,14 +179,14 @@ The full guide lives in [docs/examples.md](docs/examples.md).
 
 ## Build And Verify
 
-TeaSharp uses the `.NET 10.0.103` SDK pinned in [global.json](global.json).
+Tessera uses the `.NET 10.0.103` SDK pinned in [global.json](global.json).
 
 Primary repo verification commands:
 
 ```bash
-dotnet build TeaSharp.slnx
-dotnet build examples/TeaSharp.Examples.slnx
-dotnet test TeaSharp.slnx
+dotnet build Tessera.slnx
+dotnet build examples/Tessera.Examples.slnx
+dotnet test Tessera.slnx
 dotnet run --project examples/DataWorkbench/DataWorkbench.csproj --no-build
 dotnet run --project examples/OpsWatch/OpsWatch.csproj --no-build
 dotnet run --project examples/GitConsole/GitConsole.csproj --no-build
@@ -194,4 +194,4 @@ dotnet run --project examples/GitConsole/GitConsole.csproj --no-build
 
 ## Contributing
 
-TeaSharp is being shaped in public. If you want to contribute, start with [CONTRIBUTING.md](CONTRIBUTING.md).
+Tessera is being shaped in public. If you want to contribute, start with [CONTRIBUTING.md](CONTRIBUTING.md).

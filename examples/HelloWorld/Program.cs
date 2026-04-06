@@ -1,7 +1,7 @@
-using TeaSharp;
-using TeaSharp.Examples.HelloWorld;
+using Tessera;
+using Tessera.Examples.HelloWorld;
 
-var app = Tea.CreateBuilder()
+var app = TesseraApplication.CreateBuilder()
     .UseApp<HelloWorldApp>()
     .ConfigureRuntime(static runtime =>
     {
@@ -10,7 +10,7 @@ var app = Tea.CreateBuilder()
         runtime.Screen = new ScreenOptions
         {
             AltScreen = true,
-            WindowTitle = "TeaSharp HelloWorld",
+            WindowTitle = "Tessera HelloWorld",
             EnableFocusReporting = true,
             EnableBracketedPaste = true,
             MouseTracking = MouseTrackingMode.AllMotion,

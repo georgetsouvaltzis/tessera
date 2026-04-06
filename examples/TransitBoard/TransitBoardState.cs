@@ -1,8 +1,8 @@
 using System.Globalization;
-using TeaSharp.Controls;
-using TeaSharp.Styles;
+using Tessera.Controls;
+using Tessera.Styles;
 
-namespace TeaSharp.Examples.TransitBoard;
+namespace Tessera.Examples.TransitBoard;
 
 internal enum TransitBoardMode
 {
@@ -283,4 +283,4 @@ internal sealed class TransitService(
 
 internal sealed record TransitNotice(string Tone, string Label, string Message);
 internal sealed record TransitCall(string Stop, DateTimeOffset Time);
-internal sealed record TransitChipItem(string Id, string Label, string Subtitle, TeaStyle PrimaryStyle, TeaStyle SecondaryStyle);
+internal sealed record TransitChipItem(string Id, string Label, string Subtitle, TesseraStyle PrimaryStyle, TesseraStyle SecondaryStyle);

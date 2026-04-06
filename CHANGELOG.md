@@ -1,11 +1,11 @@
 # Changelog
 
-All notable changes to TeaSharp should be recorded here.
+All notable changes to Tessera should be recorded here.
 
-TeaSharp uses `major.minor.patch` versioning with SemVer prerelease labels during alpha:
+Tessera uses `major.minor.patch` versioning with SemVer prerelease labels during alpha:
 
 - the public alpha line starts at `1.0.0-alpha.1`
-- until TeaSharp is publicly live, keep all notable changes under the active public alpha heading instead of using a separate `Unreleased` bucket
+- until Tessera is publicly live, keep all notable changes under the active public alpha heading instead of using a separate `Unreleased` bucket
 - prerelease increments (`1.0.0-alpha.2`) track additional alpha cuts on the same intended stable line
 - if the intended stable target changes meaningfully before release, the prerelease line can move accordingly (`1.1.0-alpha.1`)
 - `1.0.0` is still the first stability line where stricter compatibility expectations apply
@@ -24,7 +24,7 @@ TeaSharp uses `major.minor.patch` versioning with SemVer prerelease labels durin
   - `CODE_OF_CONDUCT.md`
   - `SECURITY.md`
 - root-level [SUPPORT.md](SUPPORT.md) for the public issue and support contract
-- `examples/TeaSharp.Examples.slnx` for building the public examples as one separate solution
+- `examples/Tessera.Examples.slnx` for building the public examples as one separate solution
 
 ### Changed
 
@@ -32,7 +32,7 @@ TeaSharp uses `major.minor.patch` versioning with SemVer prerelease labels durin
 - `README.md` now acts as a stronger public-facing front page for GitHub visitors
 - button visuals now default to flat filled rectangular action surfaces on the public path
 - README and contributor guidance now point to the support policy
-- repo verification guidance now includes `dotnet build examples/TeaSharp.Examples.slnx`
+- repo verification guidance now includes `dotnet build examples/Tessera.Examples.slnx`
 - public docs and release artifacts now use repo-relative paths instead of local machine filesystem links
 - public docs and release entrypoints now use simpler names without `v1` suffixes
 - shell-wrapper verification scripts were removed in favor of direct `dotnet` commands

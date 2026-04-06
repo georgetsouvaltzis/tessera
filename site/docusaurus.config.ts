@@ -2,16 +2,16 @@ import type { Config } from '@docusaurus/types';
 import type * as Preset from '@docusaurus/preset-classic';
 
 const config: Config = {
-  title: 'TeaSharp',
+  title: 'Tessera',
   tagline: 'Premium terminal UI for .NET',
   favicon: 'img/favicon.svg',
   future: {
     v4: true,
   },
   url: 'https://georgetsouvaltzis.github.io',
-  baseUrl: '/teasharp/',
+  baseUrl: '/tessera/',
   organizationName: 'georgetsouvaltzis',
-  projectName: 'teasharp',
+  projectName: 'tessera',
   trailingSlash: false,
   onBrokenLinks: 'throw',
   i18n: {
@@ -31,16 +31,16 @@ const config: Config = {
           path: 'docs',
           routeBasePath: 'docs',
           sidebarPath: './sidebars.ts',
-          editUrl: 'https://github.com/georgetsouvaltzis/teasharp/tree/main/site/',
+          editUrl: 'https://github.com/georgetsouvaltzis/tessera/tree/main/site/',
         },
         blog: {
           path: 'blog',
           routeBasePath: 'updates',
           showReadingTime: true,
           onUntruncatedBlogPosts: 'ignore',
-          blogTitle: 'TeaSharp Updates',
-          blogDescription: 'Release notes and documentation updates for TeaSharp.',
-          editUrl: 'https://github.com/georgetsouvaltzis/teasharp/tree/main/site/',
+          blogTitle: 'Tessera Updates',
+          blogDescription: 'Release notes and documentation updates for Tessera.',
+          editUrl: 'https://github.com/georgetsouvaltzis/tessera/tree/main/site/',
         },
         theme: {
           customCss: './src/css/custom.css',
@@ -51,9 +51,9 @@ const config: Config = {
   themeConfig: {
     image: 'img/social-card.svg',
     navbar: {
-      title: 'TeaSharp',
+      title: 'Tessera',
       logo: {
-        alt: 'TeaSharp logo',
+        alt: 'Tessera logo',
         src: 'img/logo.svg',
       },
       items: [
@@ -84,7 +84,7 @@ const config: Config = {
           position: 'left',
         },
         {
-          href: 'https://github.com/georgetsouvaltzis/teasharp',
+          href: 'https://github.com/georgetsouvaltzis/tessera',
           label: 'GitHub',
           position: 'right',
         },
@@ -132,16 +132,16 @@ const config: Config = {
           items: [
             {
               label: 'Repository',
-              href: 'https://github.com/georgetsouvaltzis/teasharp',
+              href: 'https://github.com/georgetsouvaltzis/tessera',
             },
             {
               label: 'Issues',
-              href: 'https://github.com/georgetsouvaltzis/teasharp/issues',
+              href: 'https://github.com/georgetsouvaltzis/tessera/issues',
             },
           ],
         },
       ],
-      copyright: `Copyright © ${new Date().getFullYear()} TeaSharp.`,
+      copyright: `Copyright © ${new Date().getFullYear()} Tessera.`,
     },
     prism: {
       theme: {
@@ -210,7 +210,7 @@ const config: Config = {
     metadata: [
       {
         name: 'keywords',
-        content: 'TeaSharp, .NET terminal UI, C#, TUI, console UI',
+        content: 'Tessera, .NET terminal UI, C#, TUI, console UI',
       },
     ],
   } satisfies Preset.ThemeConfig,

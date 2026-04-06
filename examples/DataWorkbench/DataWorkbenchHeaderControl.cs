@@ -1,9 +1,9 @@
-using TeaSharp.Components.Primitives;
-using TeaSharp.Controls;
-using TeaSharp.Layout;
-using TeaSharp.Styles;
+using Tessera.Components.Primitives;
+using Tessera.Controls;
+using Tessera.Layout;
+using Tessera.Styles;
 
-namespace TeaSharp.Examples.DataWorkbench;
+namespace Tessera.Examples.DataWorkbench;
 
 internal sealed class DataWorkbenchHeaderControl : Control
 {
@@ -16,13 +16,13 @@ internal sealed class DataWorkbenchHeaderControl : Control
     public string PromptText { get; set; } = string.Empty;
     public BorderStyle Border { get; set; } = BorderStyle.Rounded;
     public Thickness Padding { get; set; }
-    public TeaStyle TitleStyle { get; set; } = TeaStyle.Empty;
-    public TeaStyle ClockStyle { get; set; } = TeaStyle.Empty;
-    public TeaStyle BadgeStyle { get; set; } = TeaStyle.Empty;
-    public TeaStyle SummaryStyle { get; set; } = TeaStyle.Empty;
-    public TeaStyle PromptStyle { get; set; } = TeaStyle.Empty;
-    public TeaStyle BorderStyleText { get; set; } = TeaStyle.Empty;
-    public TeaStyle FocusedBorderStyleText { get; set; } = TeaStyle.Empty;
+    public TesseraStyle TitleStyle { get; set; } = TesseraStyle.Empty;
+    public TesseraStyle ClockStyle { get; set; } = TesseraStyle.Empty;
+    public TesseraStyle BadgeStyle { get; set; } = TesseraStyle.Empty;
+    public TesseraStyle SummaryStyle { get; set; } = TesseraStyle.Empty;
+    public TesseraStyle PromptStyle { get; set; } = TesseraStyle.Empty;
+    public TesseraStyle BorderStyleText { get; set; } = TesseraStyle.Empty;
+    public TesseraStyle FocusedBorderStyleText { get; set; } = TesseraStyle.Empty;
     public override bool IsFocused { get; set; }
     public override bool IsDisabled { get; set; }
 
@@ -64,12 +64,12 @@ internal sealed class DataWorkbenchHeaderControl : Control
         }
     }
 
-    private TeaStyle ResolveBorderStyle()
+    private TesseraStyle ResolveBorderStyle()
     {
         return IsFocused ? BorderStyleText.Merge(FocusedBorderStyleText) : BorderStyleText;
     }
 
-    private static string ApplyStyle(string value, TeaStyle style)
+    private static string ApplyStyle(string value, TesseraStyle style)
     {
         return string.IsNullOrEmpty(value) || style.IsEmpty ? value : style.Render(value);
     }

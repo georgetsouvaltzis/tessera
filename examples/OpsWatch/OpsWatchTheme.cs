@@ -1,6 +1,6 @@
-using TeaSharp.Styles;
+using Tessera.Styles;
 
-namespace TeaSharp.Examples.OpsWatch;
+namespace Tessera.Examples.OpsWatch;
 
 internal enum OpsWatchThemeKind
 {
@@ -12,7 +12,7 @@ internal enum OpsWatchThemeKind
 internal sealed record OpsWatchThemePalette(
     OpsWatchThemeKind Kind,
     string Label,
-    TeaTheme Theme,
+    TesseraTheme Theme,
     int HeroTitleColor,
     int HeroClockColor,
     int HeroBadgeForeground,
@@ -169,34 +169,34 @@ internal static class OpsWatchTheme
         };
     }
 
-    public static TeaStyle Foreground(int color)
+    public static TesseraStyle Foreground(int color)
     {
         var (red, green, blue) = Split(color);
-        return TeaStyle.Empty.WithForeground(AnsiColor.Rgb(red, green, blue));
+        return TesseraStyle.Empty.WithForeground(AnsiColor.Rgb(red, green, blue));
     }
 
-    public static TeaStyle Background(int color)
+    public static TesseraStyle Background(int color)
     {
         var (red, green, blue) = Split(color);
-        return TeaStyle.Empty.WithBackground(AnsiColor.Rgb(red, green, blue));
+        return TesseraStyle.Empty.WithBackground(AnsiColor.Rgb(red, green, blue));
     }
 
-    public static TeaStyle ForegroundBackground(int foreground, int background)
+    public static TesseraStyle ForegroundBackground(int foreground, int background)
     {
         var (fgRed, fgGreen, fgBlue) = Split(foreground);
         var (bgRed, bgGreen, bgBlue) = Split(background);
-        return TeaStyle.Empty
+        return TesseraStyle.Empty
             .WithForeground(AnsiColor.Rgb(fgRed, fgGreen, fgBlue))
             .WithBackground(AnsiColor.Rgb(bgRed, bgGreen, bgBlue));
     }
 
-    public static TeaStyle Chip(int foreground, int background, bool bold = true)
+    public static TesseraStyle Chip(int foreground, int background, bool bold = true)
     {
         var style = ForegroundBackground(foreground, background);
         return bold ? style.WithBold() : style;
     }
 
-    private static TeaTheme CreateTheme(
+    private static TesseraTheme CreateTheme(
         int textPrimary,
         int textSecondary,
         int textMuted,
@@ -218,46 +218,46 @@ internal static class OpsWatchTheme
         int selectionForeground,
         int selectionBackground)
     {
-        return new TeaTheme
+        return new TesseraTheme
         {
-            Text = new TeaThemeTextTokens
+            Text = new TesseraThemeTextTokens
             {
                 Primary = Foreground(textPrimary),
                 Secondary = Foreground(textSecondary),
                 Muted = Foreground(textMuted),
                 Inverse = ForegroundBackground(inverseForeground, inverseBackground),
             },
-            Surface = new TeaThemeSurfaceTokens
+            Surface = new TesseraThemeSurfaceTokens
             {
                 Base = Background(surfaceBase),
                 Panel = Background(surfacePanel),
                 Overlay = Background(surfaceOverlay),
             },
-            Border = new TeaThemeBorderTokens
+            Border = new TesseraThemeBorderTokens
             {
                 Default = Foreground(borderDefault),
                 Strong = Foreground(borderStrong),
                 Focused = Foreground(borderFocused),
                 Error = Foreground(borderError),
             },
-            State = new TeaThemeStateTokens
+            State = new TesseraThemeStateTokens
             {
                 Success = Foreground(success),
                 Warning = Foreground(warning),
                 Error = Foreground(error),
                 Info = Foreground(info),
             },
-            Accent = new TeaThemeAccentTokens
+            Accent = new TesseraThemeAccentTokens
             {
                 Primary = Foreground(accentPrimary),
                 Secondary = Foreground(accentSecondary),
             },
-            Selection = new TeaThemeSelectionTokens
+            Selection = new TesseraThemeSelectionTokens
             {
                 Foreground = Foreground(selectionForeground),
                 Background = Background(selectionBackground),
             },
-            Focus = new TeaThemeFocusTokens
+            Focus = new TesseraThemeFocusTokens
             {
                 Ring = Foreground(borderFocused).WithBold(),
                 Title = Foreground(borderFocused).WithBold(),

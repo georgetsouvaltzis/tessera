@@ -1,6 +1,6 @@
-# TeaSharp Example Guide
+# Tessera Example Guide
 
-TeaSharp ships three example groups:
+Tessera ships three example groups:
 
 - starter examples: the main public learning path
 - flagship examples: the main public evaluation path after the starter ladder
@@ -44,8 +44,8 @@ Recommended order:
 
 Examples in this repository should:
 
-- stay in `TeaSharp` namespaces on the default path
-- avoid leaking `TeaSharp.Core.*` into public onboarding
+- stay in `Tessera` namespaces on the default path
+- avoid leaking `Tessera.Core.*` into public onboarding
 - teach one clear idea per example
 - remain visually intentional, not default-terminal placeholders
 - update docs when the public learning path changes
@@ -56,5 +56,5 @@ If a new example becomes part of the public learning path, update:
 - [getting-started.md](getting-started.md)
 - [public-api-guidelines.md](public-api-guidelines.md)
 - [spec.md](spec.md)
-- `examples/TeaSharp.Examples.slnx`
+- `examples/Tessera.Examples.slnx`
 - [alpha-release-checklist.md](alpha-release-checklist.md)

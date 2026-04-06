@@ -1,6 +1,6 @@
-# TeaSharp Public Alpha Release Checklist
+# Tessera Public Alpha Release Checklist
 
-This document tracks the remaining work required before TeaSharp can be treated as a public alpha release on GitHub.
+This document tracks the remaining work required before Tessera can be treated as a public alpha release on GitHub.
 Implemented features belong in the product docs, code, and tests.
 This file tracks only the release-closing work.
 
@@ -15,7 +15,7 @@ Implemented in code already:
 - benchmark harness and perf gate foundation
 - Docusaurus site bootstrap
 
-TeaSharp is close to public alpha, but it is not release-closed until the repo contract, verification evidence, and signoff are all tied to the same candidate SHA.
+Tessera is close to public alpha, but it is not release-closed until the repo contract, verification evidence, and signoff are all tied to the same candidate SHA.
 
 ## Remaining Alpha Gates
 
@@ -48,9 +48,9 @@ README, onboarding docs, API docs, the examples solution, and tests must agree o
 
 Required commands on the chosen candidate:
 
-- `dotnet build TeaSharp.slnx`
-- `dotnet build examples/TeaSharp.Examples.slnx`
-- `dotnet test TeaSharp.slnx`
+- `dotnet build Tessera.slnx`
+- `dotnet build examples/Tessera.Examples.slnx`
+- `dotnet test Tessera.slnx`
 - `dotnet run --project examples/DataWorkbench/DataWorkbench.csproj --no-build`
 - `dotnet run --project examples/OpsWatch/OpsWatch.csproj --no-build`
 - `dotnet run --project examples/GitConsole/GitConsole.csproj --no-build`
@@ -125,7 +125,7 @@ Useful, but not alpha-blocking:
 
 ## Release Rule
 
-TeaSharp public alpha is ready only when:
+Tessera public alpha is ready only when:
 
 1. candidate metadata is filled
 2. repo consistency blockers are resolved

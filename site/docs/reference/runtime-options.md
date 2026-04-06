@@ -2,7 +2,7 @@
 title: Runtime Options
 ---
 
-Key `TeaRuntimeOptions` properties include:
+Key `TesseraRuntimeOptions` properties include:
 
 - `MaxFps`
 - `AdaptiveFramePacing`

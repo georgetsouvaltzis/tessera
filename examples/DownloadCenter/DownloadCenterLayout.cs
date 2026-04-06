@@ -1,6 +1,6 @@
-using TeaSharp.Layout;
+using Tessera.Layout;
 
-namespace TeaSharp.Examples.DownloadCenter;
+namespace Tessera.Examples.DownloadCenter;
 
 internal sealed partial class DownloadCenterApp
 {

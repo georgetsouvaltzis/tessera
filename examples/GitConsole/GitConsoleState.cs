@@ -1,7 +1,7 @@
 using System.Globalization;
-using TeaSharp.Controls;
+using Tessera.Controls;
 
-namespace TeaSharp.Examples.GitConsole;
+namespace Tessera.Examples.GitConsole;
 
 internal enum GitScope
 {
@@ -37,9 +37,9 @@ internal sealed class GitConsoleState
         SelectedFileId = files.FirstOrDefault()?.Id;
     }
 
-    public string RepositoryName { get; } = "teasharp";
+    public string RepositoryName { get; } = "tessera";
 
-    public string RepositoryPath { get; } = "~/work/tea/public-v1/teasharp";
+    public string RepositoryPath { get; } = "~/work/tea/public-v1/tessera";
 
     public string BranchName { get; private set; } = "release/public-v1";
 
@@ -305,7 +305,7 @@ internal sealed class GitConsoleState
         [
             new GitFileEntry(
                 "runtime-loop",
-                "src/TeaSharp/Internal/TeaRuntimeBridge.cs",
+                "src/Tessera/Internal/TesseraRuntimeBridge.cs",
                 GitChangeKind.Modified,
                 "Throttle idle redraws under mouse-motion load",
                 18,
@@ -391,7 +391,7 @@ private async Task RenderLoopAsync(CancellationToken cancellationToken)
                 indexText: string.Empty,
                 worktreeText:
 """
-internal sealed class GitConsoleApp : TeaApp
+internal sealed class GitConsoleApp : TesseraApp
 {
     // flagship shell wiring here
 }
@@ -417,7 +417,7 @@ internal sealed class GitWorktreeControl : Control
 """),
             new GitFileEntry(
                 "perf-gate-runner",
-                "benchmarks/TeaSharp.Benchmarks/PerfGateRunner.cs",
+                "benchmarks/Tessera.Benchmarks/PerfGateRunner.cs",
                 GitChangeKind.Modified,
                 "Direct perf gate runner; baseline-backed startup and latency checks",
                 48,
@@ -425,9 +425,9 @@ internal sealed class GitWorktreeControl : Control
                 owner: "perf",
                 isStaged: false,
                 isReviewCritical: false,
-                headText: "dotnet run --project benchmarks/TeaSharp.Benchmarks -- --perf-gate\n",
-                indexText: "dotnet run --project benchmarks/TeaSharp.Benchmarks -- --perf-gate\n",
-                worktreeText: "dotnet run --project benchmarks/TeaSharp.Benchmarks --configuration Release -- --perf-gate --baseline docs/perf-baselines/v1-slo-gate-baseline.json --output docs/perf-baselines/latest-slo-gate-result.json\n"),
+                headText: "dotnet run --project benchmarks/Tessera.Benchmarks -- --perf-gate\n",
+                indexText: "dotnet run --project benchmarks/Tessera.Benchmarks -- --perf-gate\n",
+                worktreeText: "dotnet run --project benchmarks/Tessera.Benchmarks --configuration Release -- --perf-gate --baseline docs/perf-baselines/v1-slo-gate-baseline.json --output docs/perf-baselines/latest-slo-gate-result.json\n"),
             new GitFileEntry(
                 "release-notes",
                 "docs/alpha-release-checklist.md",

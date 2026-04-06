@@ -1,12 +1,12 @@
-# TeaSharp Custom Components
+# Tessera Custom Components
 
 For the default app shell, startup pattern, and default composition path, see [public-api-guidelines.md](public-api-guidelines.md).
 
-TeaSharp keeps custom widgets available, but through a smaller contract than the full runtime engine.
+Tessera keeps custom widgets available, but through a smaller contract than the full runtime engine.
 
 ## Default Contract
 
-Use `TeaSharp.Controls.Control` when you want a reusable interactive widget.
+Use `Tessera.Controls.Control` when you want a reusable interactive widget.
 
 `Control` already bridges into the existing component/runtime pipeline and gives you:
 
@@ -23,9 +23,9 @@ The bridge into the older component/runtime pipeline is now internal, so custom 
 ## Minimal Custom Control
 
 ```csharp
-using TeaSharp;
-using TeaSharp.Controls;
-using TeaSharp.Components.Primitives;
+using Tessera;
+using Tessera.Controls;
+using Tessera.Components.Primitives;
 
 public sealed class CounterBadge : Control
 {

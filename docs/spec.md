@@ -1,28 +1,28 @@
-# TeaSharp Design Contract
+# Tessera Design Contract
 
-TeaSharp is a `.NET 10` terminal UI framework for state-driven applications.
+Tessera is a `.NET 10` terminal UI framework for state-driven applications.
 
 This document is the live product contract.
-It describes what TeaSharp is, how the public API should feel, and what still belongs outside V1.
+It describes what Tessera is, how the public API should feel, and what still belongs outside V1.
 It should not act as a historical log or implementation diary.
 
 ## Product Position
 
-TeaSharp is:
+Tessera is:
 
 - a .NET-native framework for building state-driven terminal applications
 - small on the public path
 - explicit and strongly typed
 - extensible without leaking internal engine details
 
-TeaSharp is not:
+Tessera is not:
 
 - a Generic-Host-first framework
 - a copycat framework shaped around another terminal UI library
 - a port of another ecosystem's framework contract
 - a nested layout DSL disguised as C#
 
-TeaSharp is in public alpha.
+Tessera is in public alpha.
 Breaking changes are still acceptable when they simplify the long-term API and improve the default authoring path.
 
 ## V1 Design Center
@@ -31,7 +31,7 @@ V1 centers on:
 
 - small root API
 - explicit C# object model
-- TeaSharp-owned startup
+- Tessera-owned startup
 - screen/layout/control composition
 - stable custom control contract
 - semantic theming and override layers
@@ -43,34 +43,34 @@ V1 centers on:
 
 Normal apps should primarily live in:
 
-- `TeaSharp`
-- `TeaSharp.Controls`
-- `TeaSharp.Layout`
-- `TeaSharp.Styles`
+- `Tessera`
+- `Tessera.Controls`
+- `Tessera.Layout`
+- `Tessera.Styles`
 
-Advanced seams belong in opt-in lanes such as `TeaSharp.Hosting`.
-Normal onboarding must not require `TeaSharp.Core.*`.
+Advanced seams belong in opt-in lanes such as `Tessera.Hosting`.
+Normal onboarding must not require `Tessera.Core.*`.
 
 ### Startup
 
 Preferred entry points:
 
-- `Tea.RunAsync(...)`
-- `Tea.CreateBuilder()`
-- `TeaApplicationBuilder`
-- `TeaApplication`
-- `TeaRuntimeOptions`
+- `TesseraApplication.RunAsync(...)`
+- `TesseraApplication.CreateBuilder()`
+- `TesseraApplicationBuilder`
+- `TesseraApplication`
+- `TesseraRuntimeOptions`
 
 Preferred startup forms:
 
-- minimal: `Tea.RunAsync(new App())`
-- configured: `Tea.CreateBuilder().UseApp<TApp>().ConfigureRuntime(...).Build()`
+- minimal: `TesseraApplication.RunAsync(new App())`
+- configured: `TesseraApplication.CreateBuilder().UseApp<TApp>().ConfigureRuntime(...).Build()`
 
-TeaSharp must not depend on Generic Host as the default framework identity.
+Tessera must not depend on Generic Host as the default framework identity.
 
 ### Authoring Style
 
-TeaSharp should feel like idiomatic C#.
+Tessera should feel like idiomatic C#.
 
 Preferred shape:
 
@@ -87,7 +87,7 @@ Rejected shape:
 
 ### No Framework-Imposed App Architecture
 
-TeaSharp must not require or imply:
+Tessera must not require or imply:
 
 - repository
 - CQRS
@@ -119,18 +119,18 @@ Advanced path:
 
 Primary app contract:
 
-- `TeaApp`
-- `Tea.RunAsync(...)`
-- `Tea.CreateBuilder()`
-- `TeaApplicationBuilder.UseApp<TApp>()`
-- `TeaApplication`
-- `TeaRuntimeOptions`
+- `TesseraApp`
+- `TesseraApplication.RunAsync(...)`
+- `TesseraApplication.CreateBuilder()`
+- `TesseraApplicationBuilder.UseApp<TApp>()`
+- `TesseraApplication`
+- `TesseraRuntimeOptions`
 - `Screen`
 - `ScreenContext`
 - `ScreenOptions`
 - `Message`
-- `TeaEffect`
-- `TeaEffects`
+- `TesseraEffect`
+- `TesseraEffects`
 
 Default app shape:
 
@@ -156,7 +156,7 @@ Runtime pointer/input rules:
 
 ### Composition Contract
 
-TeaSharp uses explicit screen assembly.
+Tessera uses explicit screen assembly.
 
 Core default layout types:
 
@@ -204,7 +204,7 @@ V1 theming is semantic-token based with override hierarchy:
 
 Typography contract:
 
-- ANSI emphasis intent is portable (`TeaStyle`, `TeaFontWeight`)
+- ANSI emphasis intent is portable (`TesseraStyle`, `TesseraFontWeight`)
 - terminal font requests are best-effort only
 - terminal-specific caveats live in [terminal-font-capability-matrix.md](terminal-font-capability-matrix.md)
 
@@ -224,4 +224,4 @@ Out of scope for V1:
 
 - image rendering
 - advanced native image modes
-- anything that requires turning TeaSharp into a host-framework-first product
+- anything that requires turning Tessera into a host-framework-first product

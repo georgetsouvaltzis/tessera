@@ -1,7 +1,7 @@
-using TeaSharp;
-using TeaSharp.Examples.DataWorkbench;
+using Tessera;
+using Tessera.Examples.DataWorkbench;
 
-var app = Tea.CreateBuilder()
+var app = TesseraApplication.CreateBuilder()
     .UseApp<DataWorkbenchApp>()
     .ConfigureRuntime(static runtime =>
     {
@@ -10,7 +10,7 @@ var app = Tea.CreateBuilder()
         runtime.Screen = new ScreenOptions
         {
             AltScreen = true,
-            WindowTitle = "TeaSharp DataWorkbench",
+            WindowTitle = "Tessera DataWorkbench",
             EnableFocusReporting = true,
             EnableBracketedPaste = true,
             MouseTracking = MouseTrackingMode.AllMotion,

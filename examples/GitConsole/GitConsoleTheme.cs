@@ -1,49 +1,49 @@
-using TeaSharp.Styles;
+using Tessera.Styles;
 
-namespace TeaSharp.Examples.GitConsole;
+namespace Tessera.Examples.GitConsole;
 
 internal static class GitConsoleTheme
 {
-    public static TeaTheme DefaultTheme { get; } = new()
+    public static TesseraTheme DefaultTheme { get; } = new()
     {
-        Text = new TeaThemeTextTokens
+        Text = new TesseraThemeTextTokens
         {
             Primary = Foreground(0xE6EEF7),
             Secondary = Foreground(0x9DB1C7),
             Muted = Foreground(0x6C8097),
             Inverse = ForegroundBackground(0x0E1620, 0xE6EEF7),
         },
-        Surface = new TeaThemeSurfaceTokens
+        Surface = new TesseraThemeSurfaceTokens
         {
             Base = Background(0x091018),
             Panel = Background(0x0E1620),
             Overlay = Background(0x13202D),
         },
-        Border = new TeaThemeBorderTokens
+        Border = new TesseraThemeBorderTokens
         {
             Default = Foreground(0x2A425B),
             Strong = Foreground(0x4B6D8F),
             Focused = Foreground(0x86D1FF),
             Error = Foreground(0xFF7D81),
         },
-        State = new TeaThemeStateTokens
+        State = new TesseraThemeStateTokens
         {
             Success = Foreground(0x61E294),
             Warning = Foreground(0xF2C572),
             Error = Foreground(0xFF7D81),
             Info = Foreground(0x67C6FF),
         },
-        Accent = new TeaThemeAccentTokens
+        Accent = new TesseraThemeAccentTokens
         {
             Primary = Foreground(0x7AE2CF),
             Secondary = Foreground(0x92B4FF),
         },
-        Selection = new TeaThemeSelectionTokens
+        Selection = new TesseraThemeSelectionTokens
         {
             Foreground = Foreground(0xF4FAFF),
             Background = Background(0x1F5A7A),
         },
-        Focus = new TeaThemeFocusTokens
+        Focus = new TesseraThemeFocusTokens
         {
             Ring = Foreground(0x86D1FF).WithBold(),
             Title = Foreground(0x86D1FF).WithBold(),
@@ -52,28 +52,28 @@ internal static class GitConsoleTheme
         },
     };
 
-    public static TeaStyle Foreground(int color)
+    public static TesseraStyle Foreground(int color)
     {
         var (red, green, blue) = Split(color);
-        return TeaStyle.Empty.WithForeground(AnsiColor.Rgb(red, green, blue));
+        return TesseraStyle.Empty.WithForeground(AnsiColor.Rgb(red, green, blue));
     }
 
-    public static TeaStyle Background(int color)
+    public static TesseraStyle Background(int color)
     {
         var (red, green, blue) = Split(color);
-        return TeaStyle.Empty.WithBackground(AnsiColor.Rgb(red, green, blue));
+        return TesseraStyle.Empty.WithBackground(AnsiColor.Rgb(red, green, blue));
     }
 
-    public static TeaStyle ForegroundBackground(int foreground, int background)
+    public static TesseraStyle ForegroundBackground(int foreground, int background)
     {
         var (fgRed, fgGreen, fgBlue) = Split(foreground);
         var (bgRed, bgGreen, bgBlue) = Split(background);
-        return TeaStyle.Empty
+        return TesseraStyle.Empty
             .WithForeground(AnsiColor.Rgb(fgRed, fgGreen, fgBlue))
             .WithBackground(AnsiColor.Rgb(bgRed, bgGreen, bgBlue));
     }
 
-    public static TeaStyle Chip(int foreground, int background, bool bold = false)
+    public static TesseraStyle Chip(int foreground, int background, bool bold = false)
     {
         var style = ForegroundBackground(foreground, background);
         return bold ? style.WithBold() : style;

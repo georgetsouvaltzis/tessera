@@ -1,10 +1,10 @@
-using TeaSharp.Controls;
-using TeaSharp.Layout;
-using TeaSharp.Styles;
+using Tessera.Controls;
+using Tessera.Layout;
+using Tessera.Styles;
 
-namespace TeaSharp.Examples.OpsWatch;
+namespace Tessera.Examples.OpsWatch;
 
-internal sealed partial class OpsWatchApp : TeaApp
+internal sealed partial class OpsWatchApp : TesseraApp
 {
     private OpsWatchThemePalette _palette = OpsWatchTheme.Default;
     private readonly OpsWatchState _state = OpsWatchState.CreateSeed();
@@ -60,10 +60,10 @@ internal sealed partial class OpsWatchApp : TeaApp
         _healthBoard.RequestFocus();
     }
 
-    public override TeaEffect? Initialize() =>
-        TeaEffects.Periodic(TimeSpan.FromMilliseconds(850), _ => new OpsWatchTickMessage());
+    public override TesseraEffect? Initialize() =>
+        TesseraEffects.Periodic(TimeSpan.FromMilliseconds(850), _ => new OpsWatchTickMessage());
 
-    public override TeaEffect? Update(Message message)
+    public override TesseraEffect? Update(Message message)
     {
         switch (message)
         {
@@ -99,11 +99,11 @@ internal sealed partial class OpsWatchApp : TeaApp
         });
     }
 
-    private TeaEffect? HandleKey(KeyPressed key)
+    private TesseraEffect? HandleKey(KeyPressed key)
     {
         if (key.IsCharacter('c', ModifierKeys.Ctrl))
         {
-            return TeaEffects.Quit;
+            return TesseraEffects.Quit;
         }
 
         if (key.Is(Key.F1))
@@ -455,7 +455,7 @@ internal sealed partial class OpsWatchApp : TeaApp
             : _palette.Theme.Selection.Background;
     }
 
-    private static void ConfigurePulseCard(StatsCard card, TeaStyle valueStyle, OpsWatchThemePalette palette)
+    private static void ConfigurePulseCard(StatsCard card, TesseraStyle valueStyle, OpsWatchThemePalette palette)
     {
         card.TitleStyle = palette.Theme.Text.Secondary.WithBold();
         card.ValueStyle = valueStyle;
@@ -463,7 +463,7 @@ internal sealed partial class OpsWatchApp : TeaApp
         card.BorderStyleText = OpsWatchTheme.Foreground(palette.FrameStrongColor);
     }
 
-    private static void ConfigureMetricCard(StatsCard card, TeaStyle valueStyle, OpsWatchThemePalette palette)
+    private static void ConfigureMetricCard(StatsCard card, TesseraStyle valueStyle, OpsWatchThemePalette palette)
     {
         card.TitleStyle = palette.Theme.Text.Secondary.WithBold();
         card.ValueStyle = valueStyle;
@@ -471,7 +471,7 @@ internal sealed partial class OpsWatchApp : TeaApp
         card.BorderStyleText = OpsWatchTheme.Foreground(palette.FrameMutedColor);
     }
 
-    private static void ConfigureSpark(TelemetryChart spark, TeaStyle dataStyle, OpsWatchThemePalette palette)
+    private static void ConfigureSpark(TelemetryChart spark, TesseraStyle dataStyle, OpsWatchThemePalette palette)
     {
         spark.Options = new TelemetryChartOptions(ShowStats: false, RenderMode: TelemetryChartRenderMode.Braille);
         spark.TitleStyle = palette.Theme.Text.Secondary.WithBold();

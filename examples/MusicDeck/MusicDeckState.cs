@@ -1,6 +1,6 @@
-using TeaSharp.Controls;
+using Tessera.Controls;
 
-namespace TeaSharp.Examples.MusicDeck;
+namespace Tessera.Examples.MusicDeck;
 
 internal sealed class MusicDeckState
 {

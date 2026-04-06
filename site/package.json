@@ -1,8 +1,8 @@
 {
-  "name": "teasharp-site",
+  "name": "tessera-site",
   "private": true,
   "version": "0.1.0",
-  "description": "TeaSharp documentation and marketing site",
+  "description": "Tessera documentation and marketing site",
   "scripts": {
     "start": "docusaurus start",
     "build": "docusaurus build",

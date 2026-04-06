@@ -1,7 +1,7 @@
 using System.Globalization;
-using TeaSharp.Controls;
+using Tessera.Controls;
 
-namespace TeaSharp.Examples.DataWorkbench;
+namespace Tessera.Examples.DataWorkbench;
 
 internal enum DataWorkbenchPage
 {

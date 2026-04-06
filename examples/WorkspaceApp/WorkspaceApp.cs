@@ -1,12 +1,12 @@
-using TeaSharp.Controls;
-using TeaSharp.Layout;
-using TeaSharp.Styles;
+using Tessera.Controls;
+using Tessera.Layout;
+using Tessera.Styles;
 
-namespace TeaSharp.Examples.WorkspaceApp;
+namespace Tessera.Examples.WorkspaceApp;
 
-internal sealed class WorkspaceApp : TeaApp
+internal sealed class WorkspaceApp : TesseraApp
 {
-    private readonly TeaTheme _theme = WorkspaceTheme.Default;
+    private readonly TesseraTheme _theme = WorkspaceTheme.Default;
     private readonly Label _eyebrow = new() { Border = BorderStyle.None, HorizontalAlignment = HorizontalAlignment.Center };
     private readonly Label _headline = new() { Border = BorderStyle.None, HorizontalAlignment = HorizontalAlignment.Center };
     private readonly Label _viewChip = new() { Border = BorderStyle.None, HorizontalAlignment = HorizontalAlignment.Center };
@@ -51,12 +51,12 @@ internal sealed class WorkspaceApp : TeaApp
         _views.RequestFocus();
     }
 
-    public override TeaEffect? Update(Message message)
+    public override TesseraEffect? Update(Message message)
     {
         switch (message)
         {
             case KeyPressed key when key.IsCharacter('c', ModifierKeys.Ctrl):
-                return TeaEffects.Quit;
+                return TesseraEffects.Quit;
             case KeyPressed key when key.Is(Key.Tab):
                 FocusNext();
                 return null;

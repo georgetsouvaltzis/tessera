@@ -2,7 +2,7 @@
 title: Installation
 ---
 
-TeaSharp currently targets `.NET 10`.
+Tessera currently targets `.NET 10`.
 
 ## Prerequisites
 
@@ -12,7 +12,7 @@ TeaSharp currently targets `.NET 10`.
 ## Add the package
 
 ```bash
-dotnet add package TeaSharp
+dotnet add package Tessera
 ```
 
 ## Verify the environment
@@ -25,7 +25,7 @@ For the current repo, the pinned SDK is `10.0.103`.
 
 ## Terminal notes
 
-TeaSharp works best when the terminal supports modern input reporting:
+Tessera works best when the terminal supports modern input reporting:
 
 - focus reporting
 - bracketed paste

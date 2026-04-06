@@ -1,15 +1,15 @@
-using TeaSharp.Styles;
+using Tessera.Styles;
 
-namespace TeaSharp.Examples.CounterForm;
+namespace Tessera.Examples.CounterForm;
 
 internal sealed record CounterFormPalette(
     string Name,
-    TeaTheme Theme,
-    TeaStyle CountStyle,
-    TeaStyle SummaryStyle,
-    TeaStyle PositiveButtonStyle,
-    TeaStyle NegativeButtonStyle,
-    TeaStyle NeutralButtonStyle);
+    TesseraTheme Theme,
+    TesseraStyle CountStyle,
+    TesseraStyle SummaryStyle,
+    TesseraStyle PositiveButtonStyle,
+    TesseraStyle NegativeButtonStyle,
+    TesseraStyle NeutralButtonStyle);
 
 internal static class CounterFormTheme
 {
@@ -60,11 +60,11 @@ internal static class CounterFormTheme
         return Default;
     }
 
-    public static TeaStyle Foreground(int rgb) => TeaStyle.Empty.WithForeground(Hex(rgb));
+    public static TesseraStyle Foreground(int rgb) => TesseraStyle.Empty.WithForeground(Hex(rgb));
 
-    public static TeaStyle Background(int rgb) => TeaStyle.Empty.WithBackground(Hex(rgb));
+    public static TesseraStyle Background(int rgb) => TesseraStyle.Empty.WithBackground(Hex(rgb));
 
-    public static TeaStyle Surface(int foregroundRgb, int backgroundRgb)
+    public static TesseraStyle Surface(int foregroundRgb, int backgroundRgb)
         => Foreground(foregroundRgb).Merge(Background(backgroundRgb));
 
     private static CounterFormPalette CreatePalette(
@@ -77,46 +77,46 @@ internal static class CounterFormTheme
         int secondaryRgb,
         int countBackgroundRgb)
     {
-        var theme = new TeaTheme
+        var theme = new TesseraTheme
         {
-            Text = new TeaThemeTextTokens
+            Text = new TesseraThemeTextTokens
             {
                 Primary = Foreground(0xF7F7FF),
                 Secondary = Foreground(0xC9C4EF),
                 Muted = Foreground(0x8A82B7),
                 Inverse = Foreground(0x090C16),
             },
-            Surface = new TeaThemeSurfaceTokens
+            Surface = new TesseraThemeSurfaceTokens
             {
                 Base = Background(baseRgb),
                 Panel = Background(panelRgb),
                 Overlay = Background(overlayRgb),
             },
-            Border = new TeaThemeBorderTokens
+            Border = new TesseraThemeBorderTokens
             {
                 Default = Foreground(borderRgb),
                 Strong = Foreground(accentRgb),
                 Focused = Foreground(accentRgb).WithBold(),
                 Error = Foreground(0xFF7B7B).WithBold(),
             },
-            State = new TeaThemeStateTokens
+            State = new TesseraThemeStateTokens
             {
                 Success = Foreground(accentRgb).WithBold(),
                 Warning = Foreground(0xFFD166).WithBold(),
                 Error = Foreground(0xFF7B7B).WithBold(),
                 Info = Foreground(secondaryRgb).WithBold(),
             },
-            Accent = new TeaThemeAccentTokens
+            Accent = new TesseraThemeAccentTokens
             {
                 Primary = Foreground(accentRgb).WithBold(),
                 Secondary = Foreground(secondaryRgb).WithBold(),
             },
-            Selection = new TeaThemeSelectionTokens
+            Selection = new TesseraThemeSelectionTokens
             {
                 Background = Background(borderRgb),
                 Foreground = Foreground(0xF7FAFF).WithBold(),
             },
-            Focus = new TeaThemeFocusTokens
+            Focus = new TesseraThemeFocusTokens
             {
                 Ring = Foreground(secondaryRgb).WithBold(),
                 Title = Foreground(secondaryRgb).WithBold(),

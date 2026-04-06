@@ -2,7 +2,7 @@
 title: Migration Notes
 ---
 
-TeaSharp is still pre-public.
+Tessera is still pre-public.
 
 Implications:
 

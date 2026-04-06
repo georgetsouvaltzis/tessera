@@ -1,9 +1,9 @@
-using TeaSharp.Components.Primitives;
-using TeaSharp.Controls;
-using TeaSharp.Layout;
-using TeaSharp.Styles;
+using Tessera.Components.Primitives;
+using Tessera.Controls;
+using Tessera.Layout;
+using Tessera.Styles;
 
-namespace TeaSharp.Examples.DownloadCenter;
+namespace Tessera.Examples.DownloadCenter;
 
 internal sealed class DownloadHeroControl : Control
 {
@@ -15,12 +15,12 @@ internal sealed class DownloadHeroControl : Control
     public string CommandText { get; set; } = string.Empty;
     public BorderStyle Border { get; set; } = BorderStyle.Rounded;
     public Thickness Padding { get; set; } = Thickness.All(1);
-    public TeaStyle TitleStyle { get; set; } = TeaStyle.Empty;
-    public TeaStyle ClockStyle { get; set; } = TeaStyle.Empty;
-    public TeaStyle BadgeStyle { get; set; } = TeaStyle.Empty;
-    public TeaStyle MetaStyle { get; set; } = TeaStyle.Empty;
-    public TeaStyle CommandStyle { get; set; } = TeaStyle.Empty;
-    public TeaStyle BorderStyleText { get; set; } = TeaStyle.Empty;
+    public TesseraStyle TitleStyle { get; set; } = TesseraStyle.Empty;
+    public TesseraStyle ClockStyle { get; set; } = TesseraStyle.Empty;
+    public TesseraStyle BadgeStyle { get; set; } = TesseraStyle.Empty;
+    public TesseraStyle MetaStyle { get; set; } = TesseraStyle.Empty;
+    public TesseraStyle CommandStyle { get; set; } = TesseraStyle.Empty;
+    public TesseraStyle BorderStyleText { get; set; } = TesseraStyle.Empty;
 
     public override void Render(Canvas canvas, Rect rect)
     {
@@ -53,7 +53,7 @@ internal sealed class DownloadHeroControl : Control
         canvas.WriteText(content.X, content.Y + row, text, content.Width);
     }
 
-    private static string ApplyStyle(string text, TeaStyle style)
+    private static string ApplyStyle(string text, TesseraStyle style)
     {
         return string.IsNullOrEmpty(text) || style.IsEmpty ? text : style.Render(text);
     }

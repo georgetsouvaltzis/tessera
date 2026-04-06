@@ -1,7 +1,7 @@
-using TeaSharp;
-using TeaSharp.Examples.WorkspaceApp;
+using Tessera;
+using Tessera.Examples.WorkspaceApp;
 
-var app = Tea.CreateBuilder()
+var app = TesseraApplication.CreateBuilder()
     .UseApp<WorkspaceApp>()
     .ConfigureRuntime(static runtime =>
     {
@@ -10,7 +10,7 @@ var app = Tea.CreateBuilder()
         runtime.Screen = new ScreenOptions
         {
             AltScreen = true,
-            WindowTitle = "TeaSharp WorkspaceApp",
+            WindowTitle = "Tessera WorkspaceApp",
             EnableFocusReporting = true,
             EnableBracketedPaste = true,
             MouseTracking = MouseTrackingMode.AllMotion,

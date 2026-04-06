@@ -2,7 +2,7 @@
 title: Screens and Layout
 ---
 
-TeaSharp favors explicit screen assembly over nested mini-DSLs.
+Tessera favors explicit screen assembly over nested mini-DSLs.
 
 ## Default tools
 

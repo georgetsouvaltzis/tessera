@@ -1,8 +1,8 @@
-using TeaSharp;
-using TeaSharp.Controls;
-using TeaSharp.Examples.IncidentDesk;
+using Tessera;
+using Tessera.Controls;
+using Tessera.Examples.IncidentDesk;
 
-var app = Tea.CreateBuilder()
+var app = TesseraApplication.CreateBuilder()
     .UseApp<IncidentDeskApp>()
     .ConfigureRuntime(static runtime =>
     {
@@ -11,7 +11,7 @@ var app = Tea.CreateBuilder()
         runtime.Screen = new ScreenOptions
         {
             AltScreen = true,
-            WindowTitle = "TeaSharp IncidentDesk",
+            WindowTitle = "Tessera IncidentDesk",
             EnableFocusReporting = true,
             EnableBracketedPaste = true,
             MouseTracking = MouseTrackingMode.AllMotion,

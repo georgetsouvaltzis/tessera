@@ -4,14 +4,14 @@ title: Overview
 slug: /getting-started
 ---
 
-TeaSharp is a .NET-native terminal UI framework for teams that want modern, state-driven apps without a web stack.
+Tessera is a .NET-native terminal UI framework for teams that want modern, state-driven apps without a web stack.
 
 What defines the public path:
 
-- `TeaApp` as the app model
-- `Tea.RunAsync(...)` or `Tea.CreateBuilder()`
+- `TesseraApp` as the app model
+- `Tessera.RunAsync(...)` or `Tessera.CreateBuilder()`
 - `Screen.Build(...)` and shallow composition
-- built-in controls under `TeaSharp.Controls`
+- built-in controls under `Tessera.Controls`
 - theme tokens and explicit per-control overrides
 
 Start here if you want the shortest route from package install to a polished terminal app.

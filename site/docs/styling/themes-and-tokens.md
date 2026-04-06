@@ -2,7 +2,7 @@
 title: Themes and Tokens
 ---
 
-TeaSharp uses semantic theme tokens, not hardcoded colors in app code.
+Tessera uses semantic theme tokens, not hardcoded colors in app code.
 
 ## Token families
 
@@ -26,4 +26,4 @@ TeaSharp uses semantic theme tokens, not hardcoded colors in app code.
 3. control instance overrides
 4. state-specific overrides
 
-This is the core visual model for TeaSharp V1.
+This is the core visual model for Tessera V1.

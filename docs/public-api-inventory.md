@@ -1,4 +1,4 @@
-# TeaSharp Public API Inventory
+# Tessera Public API Inventory
 
 ## Purpose
 
@@ -18,238 +18,238 @@ Examples, README guidance, and starter docs should teach Tier 1 first. Tier 2 ma
 
 These are the types new applications should discover first.
 
-- `Tea`
-- `TeaApp`
-- `TeaApplication`
-- `TeaApplicationBuilder`
-- `TeaRuntimeOptions`
-- `TeaEffect`
-- `TeaEffects`
-- `TeaEffects.Periodic(...)` for auto-rescheduling interval updates
-- `Message` and the typed message records in `TeaSharp`
-- `TeaSharp.Styles.TeaStyle`
-- `TeaSharp.Styles.AnsiColor`
-- `TeaSharp.Styles.TeaFontWeight`
-- `TeaSharp.Styles.TeaThemeOverrideBundle`
-- `TeaSharp.Styles.TeaThemeOverrideBundleExtensions`
+- `Tessera`
+- `TesseraApp`
+- `TesseraApplication`
+- `TesseraApplicationBuilder`
+- `TesseraRuntimeOptions`
+- `TesseraEffect`
+- `TesseraEffects`
+- `TesseraEffects.Periodic(...)` for auto-rescheduling interval updates
+- `Message` and the typed message records in `Tessera`
+- `Tessera.Styles.TesseraStyle`
+- `Tessera.Styles.AnsiColor`
+- `Tessera.Styles.TesseraFontWeight`
+- `Tessera.Styles.TesseraThemeOverrideBundle`
+- `Tessera.Styles.TesseraThemeOverrideBundleExtensions`
 - `Screen`
 - `ScreenContext`
 - `ScreenOptions`
 - `Screen.Build(...)`
-- `TeaSharp.Layout.*` object-model types
-- `TeaSharp.Controls.Button`
-- `TeaSharp.Controls.Breadcrumb`
-- `TeaSharp.Controls.Label`
-- `TeaSharp.Controls.Badge`
-- `TeaSharp.Controls.BadgeTone`
-- `TeaSharp.Controls.Accordion`
-- `TeaSharp.Controls.AccordionSection`
-- `TeaSharp.Controls.TextInput`
-- `TeaSharp.Controls.TextArea`
-- `TeaSharp.Controls.Choice`
-- `TeaSharp.Controls.ComboBox`
-- `TeaSharp.Controls.DropdownGlyphSet`
-- `TeaSharp.Controls.CommandPalette`
-- `TeaSharp.Controls.CommandPaletteItem`
-- `TeaSharp.Controls.CommandPaletteGlyphSet`
-- `TeaSharp.Controls.Dialog`
-- `TeaSharp.Controls.DialogResult`
-- `TeaSharp.Controls.DialogClosedEventArgs`
-- `TeaSharp.Controls.ContextMenu`
-- `TeaSharp.Controls.ContextMenuItem`
-- `TeaSharp.Controls.ContextMenuGlyphSet`
-- `TeaSharp.Controls.ProgressBar`
-- `TeaSharp.Controls.BarPoint`
-- `TeaSharp.Controls.BarChart`
-- `TeaSharp.Controls.LineChart`
-- `TeaSharp.Controls.Sparkline`
-- `TeaSharp.Controls.TelemetryChart`
-- `TeaSharp.Controls.TelemetryChartOptions`
-- `TeaSharp.Controls.TelemetryChartRenderMode`
-- `TeaSharp.Controls.AreaPlot`
-- `TeaSharp.Controls.ScatterPlotPoint`
-- `TeaSharp.Controls.ScatterPlot`
-- `TeaSharp.Controls.HistogramBucket`
-- `TeaSharp.Controls.Histogram`
-- `TeaSharp.Controls.LineSeries`
-- `TeaSharp.Controls.LinePlot`
-- `TeaSharp.Controls.PlotPanel`
-- `TeaSharp.Controls.BulletChart`
-- `TeaSharp.Controls.BulletRange`
-- `TeaSharp.Controls.BulletRangeKind`
-- `TeaSharp.Controls.DashboardGrid`
-- `TeaSharp.Controls.DashboardTile`
-- `TeaSharp.Controls.QuickOpenOverlay`
-- `TeaSharp.Controls.QuickOpenItem`
-- `TeaSharp.Controls.QuickOpenOverlayGlyphSet`
-- `TeaSharp.Controls.QuickOpenOverlaySubmittedEventArgs`
-- `TeaSharp.Controls.ResizablePaneGroup`
-- `TeaSharp.Controls.PaneSpec`
-- `TeaSharp.Controls.SideNavRail`
-- `TeaSharp.Controls.NavItem`
-- `TeaSharp.Controls.SideNavRailGlyphSet`
-- `TeaSharp.Controls.SideNavRailSelectionChangedEventArgs`
-- `TeaSharp.Controls.SideNavRailActivatedEventArgs`
-- `TeaSharp.Controls.TokenEditor`
-- `TeaSharp.Controls.TokenItem`
-- `TeaSharp.Controls.TokenEditorGlyphSet`
-- `TeaSharp.Controls.TokenEditorSelectionChangedEventArgs`
-- `TeaSharp.Controls.HealthBoard`
-- `TeaSharp.Controls.HealthService`
-- `TeaSharp.Controls.HealthServiceSeverity`
-- `TeaSharp.Controls.HealthBoardGlyphSet`
-- `TeaSharp.Controls.JumpList`
-- `TeaSharp.Controls.JumpListItem`
-- `TeaSharp.Controls.JumpListGlyphSet`
-- `TeaSharp.Controls.JumpListActivatedEventArgs`
-- `TeaSharp.Controls.AutocompleteInput`
-- `TeaSharp.Controls.AutocompleteInputGlyphSet`
-- `TeaSharp.Controls.AutocompleteInputSuggestionCommittedEventArgs`
-- `TeaSharp.Controls.BoxPlot`
-- `TeaSharp.Controls.BoxPlotSeries`
-- `TeaSharp.Controls.Gauge`
-- `TeaSharp.Controls.MiniLog`
-- `TeaSharp.Controls.StatItem`
-- `TeaSharp.Controls.StatsCard`
-- `TeaSharp.Controls.NumberInput`
-- `TeaSharp.Controls.DatePicker`
-- `TeaSharp.Controls.TimePicker`
-- `TeaSharp.Controls.MarkdownView`
-- `TeaSharp.Controls.MultiSelect`
-- `TeaSharp.Controls.Paginator`
-- `TeaSharp.Controls.RadioGroup`
-- `TeaSharp.Controls.LogView`
-- `TeaSharp.Controls.Modal`
-- `TeaSharp.Controls.Notifications` (primary notification feed API)
-- `TeaSharp.Controls.Toggle`
-- `TeaSharp.Controls.Slider`
-- `TeaSharp.Controls.Spinner`
-- `TeaSharp.Controls.StatusBar`
-- `TeaSharp.Controls.Tabs`
-- `TeaSharp.Controls.ListView<T>`
-- `TeaSharp.Controls.VirtualizedListView<T>`
-- `TeaSharp.Controls.VirtualizedListViewOptions`
-- `TeaSharp.Controls.GroupedListView<TGroup,TItem>`
-- `TeaSharp.Controls.GroupedListViewGroup<TGroup,TItem>`
-- `TeaSharp.Controls.GroupedListSelectionChangedEventArgs<TGroup,TItem>`
-- `TeaSharp.Controls.Table`
-- `TeaSharp.Controls.KanbanBoard`
-- `TeaSharp.Controls.KanbanLane`
-- `TeaSharp.Controls.KanbanCard`
-- `TeaSharp.Controls.KanbanSelectionChangedEventArgs`
-- `TeaSharp.Controls.TagInput`
-- `TeaSharp.Controls.CalendarMonthView`
-- `TeaSharp.Controls.CalendarDayCell`
-- `TeaSharp.Controls.CalendarDateSelectedEventArgs`
-- `TeaSharp.Controls.SchedulerTimeline`
-- `TeaSharp.Controls.SchedulerEntry`
-- `TeaSharp.Controls.SchedulerSelectionChangedEventArgs`
-- `TeaSharp.Controls.PivotTable`
-- `TeaSharp.Controls.PivotTableColumn`
-- `TeaSharp.Controls.PivotTableCell`
-- `TeaSharp.Controls.PivotSortDirection`
-- `TeaSharp.Controls.PivotSortRequestedEventArgs`
-- `TeaSharp.Controls.QueryBuilder`
-- `TeaSharp.Controls.QueryGroup`
-- `TeaSharp.Controls.QueryRule`
-- `TeaSharp.Controls.QueryOperator`
-- `TeaSharp.Controls.QueryChangedEventArgs`
-- `TeaSharp.Controls.RichTextView`
-- `TeaSharp.Controls.RichTextSegment`
-- `TeaSharp.Controls.RichTextStyleKind`
-- `TeaSharp.Controls.JsonTreeView`
-- `TeaSharp.Controls.JsonTreeNode`
-- `TeaSharp.Controls.JsonTreeNodeKind`
-- `TeaSharp.Controls.JsonTreeSelectionChangedEventArgs`
-- `TeaSharp.Controls.TraceViewer`
-- `TeaSharp.Controls.TraceEntry`
-- `TeaSharp.Controls.TraceSelectionChangedEventArgs`
-- `TeaSharp.Controls.CommandOutput`
-- `TeaSharp.Controls.CommandOutputLine`
-- `TeaSharp.Controls.CommandOutputChannel`
-- `TeaSharp.Controls.LogTailPanel`
-- `TeaSharp.Controls.LogEntry`
-- `TeaSharp.Controls.LogLevel`
-- `TeaSharp.Controls.TaskRunnerPanel`
-- `TeaSharp.Controls.TaskRunItem`
-- `TeaSharp.Controls.TaskRunnerSelectionChangedEventArgs`
-- `TeaSharp.Controls.DockWorkspace`
-- `TeaSharp.Controls.DockPane`
-- `TeaSharp.Controls.DockPanePosition`
-- `TeaSharp.Controls.PaneTabs`
-- `TeaSharp.Controls.PaneTabItem`
-- `TeaSharp.Controls.PaneTabSelectionChangedEventArgs`
-- `TeaSharp.Controls.PaletteEditor`
-- `TeaSharp.Controls.PaletteSwatch`
-- `TeaSharp.Controls.PaletteSelectionChangedEventArgs`
-- `TeaSharp.Controls.Heatmap`
-- `TeaSharp.Controls.HeatmapCell`
-- `TeaSharp.Controls.HeatmapLegend`
-- `TeaSharp.Controls.TreeMapChart`
-- `TeaSharp.Controls.TreeMapNode`
-- `TeaSharp.Controls.TerminalPanel`
-- `TeaSharp.Controls.TerminalPanelLine`
-- `TeaSharp.Controls.TerminalPanelChannel`
-- `TeaSharp.Controls.ProcessListView`
-- `TeaSharp.Controls.ProcessListEntry`
-- `TeaSharp.Controls.ProcessListStatus`
-- `TeaSharp.Controls.ProcessListSelectionChangedEventArgs`
-- `TeaSharp.Controls.ActivityFeed`
-- `TeaSharp.Controls.ActivityFeedItem`
-- `TeaSharp.Controls.ActivityFeedItemKind`
-- `TeaSharp.Controls.InboxItem`
-- `TeaSharp.Controls.KeyBindingHelpDialog`
-- `TeaSharp.Controls.KeyBindingItem`
-- `TeaSharp.Controls.DataGrid`
-- `TeaSharp.Controls.TreeTable`
-- `TeaSharp.Controls.KeyValueList`
-- `TeaSharp.Controls.Timeline`
-- `TeaSharp.Controls.Stepper`
-- `TeaSharp.Controls.TreeItem`
-- `TeaSharp.Controls.TreeView` (native)
-- `TeaSharp.Controls.TreeViewGlyphSet`
-- `TeaSharp.Controls.MenuBar`
-- `TeaSharp.Controls.MenuBarGlyphSet`
-- `TeaSharp.Controls.Toolbar`
-- `TeaSharp.Controls.CommandBar`
-- `TeaSharp.Controls.SearchBox`
-- `TeaSharp.Controls.SearchResultsView`
-- `TeaSharp.Controls.SearchResultsGlyphSet`
-- `TeaSharp.Controls.Form`
-- `TeaSharp.Controls.FormField`
-- `TeaSharp.Controls.DataForm<TModel>`
-- `TeaSharp.Controls.DataFormField<TModel>`
-- `TeaSharp.Controls.DataFormSelectionChangedEventArgs<TModel>`
-- `TeaSharp.Controls.DataFormFieldCommittedEventArgs<TModel>`
-- `TeaSharp.Controls.FieldSet`
-- `TeaSharp.Controls.SplitView`
-- `TeaSharp.Controls.SplitViewOrientation`
-- `TeaSharp.Controls.InspectorPanel`
-- `TeaSharp.Controls.InspectorSection`
-- `TeaSharp.Controls.InspectorField`
-- `TeaSharp.Controls.Wizard`
-- `TeaSharp.Controls.WizardStep`
-- `TeaSharp.Controls.WizardStepChangedEventArgs`
-- `TeaSharp.Controls.EmptyState`
-- `TeaSharp.Controls.ValidationSummary`
-- `TeaSharp.Controls.DiffView`
-- `TeaSharp.Controls.PropertyGrid`
-- `TeaSharp.Controls.FileExplorer`
-- `TeaSharp.Controls.FuzzyFinder`
-- `TeaSharp.Controls.ToastCenter`
-- `TeaSharp.Controls.MenuItem`
-- `TeaSharp.Controls.Control`
+- `Tessera.Layout.*` object-model types
+- `Tessera.Controls.Button`
+- `Tessera.Controls.Breadcrumb`
+- `Tessera.Controls.Label`
+- `Tessera.Controls.Badge`
+- `Tessera.Controls.BadgeTone`
+- `Tessera.Controls.Accordion`
+- `Tessera.Controls.AccordionSection`
+- `Tessera.Controls.TextInput`
+- `Tessera.Controls.TextArea`
+- `Tessera.Controls.Choice`
+- `Tessera.Controls.ComboBox`
+- `Tessera.Controls.DropdownGlyphSet`
+- `Tessera.Controls.CommandPalette`
+- `Tessera.Controls.CommandPaletteItem`
+- `Tessera.Controls.CommandPaletteGlyphSet`
+- `Tessera.Controls.Dialog`
+- `Tessera.Controls.DialogResult`
+- `Tessera.Controls.DialogClosedEventArgs`
+- `Tessera.Controls.ContextMenu`
+- `Tessera.Controls.ContextMenuItem`
+- `Tessera.Controls.ContextMenuGlyphSet`
+- `Tessera.Controls.ProgressBar`
+- `Tessera.Controls.BarPoint`
+- `Tessera.Controls.BarChart`
+- `Tessera.Controls.LineChart`
+- `Tessera.Controls.Sparkline`
+- `Tessera.Controls.TelemetryChart`
+- `Tessera.Controls.TelemetryChartOptions`
+- `Tessera.Controls.TelemetryChartRenderMode`
+- `Tessera.Controls.AreaPlot`
+- `Tessera.Controls.ScatterPlotPoint`
+- `Tessera.Controls.ScatterPlot`
+- `Tessera.Controls.HistogramBucket`
+- `Tessera.Controls.Histogram`
+- `Tessera.Controls.LineSeries`
+- `Tessera.Controls.LinePlot`
+- `Tessera.Controls.PlotPanel`
+- `Tessera.Controls.BulletChart`
+- `Tessera.Controls.BulletRange`
+- `Tessera.Controls.BulletRangeKind`
+- `Tessera.Controls.DashboardGrid`
+- `Tessera.Controls.DashboardTile`
+- `Tessera.Controls.QuickOpenOverlay`
+- `Tessera.Controls.QuickOpenItem`
+- `Tessera.Controls.QuickOpenOverlayGlyphSet`
+- `Tessera.Controls.QuickOpenOverlaySubmittedEventArgs`
+- `Tessera.Controls.ResizablePaneGroup`
+- `Tessera.Controls.PaneSpec`
+- `Tessera.Controls.SideNavRail`
+- `Tessera.Controls.NavItem`
+- `Tessera.Controls.SideNavRailGlyphSet`
+- `Tessera.Controls.SideNavRailSelectionChangedEventArgs`
+- `Tessera.Controls.SideNavRailActivatedEventArgs`
+- `Tessera.Controls.TokenEditor`
+- `Tessera.Controls.TokenItem`
+- `Tessera.Controls.TokenEditorGlyphSet`
+- `Tessera.Controls.TokenEditorSelectionChangedEventArgs`
+- `Tessera.Controls.HealthBoard`
+- `Tessera.Controls.HealthService`
+- `Tessera.Controls.HealthServiceSeverity`
+- `Tessera.Controls.HealthBoardGlyphSet`
+- `Tessera.Controls.JumpList`
+- `Tessera.Controls.JumpListItem`
+- `Tessera.Controls.JumpListGlyphSet`
+- `Tessera.Controls.JumpListActivatedEventArgs`
+- `Tessera.Controls.AutocompleteInput`
+- `Tessera.Controls.AutocompleteInputGlyphSet`
+- `Tessera.Controls.AutocompleteInputSuggestionCommittedEventArgs`
+- `Tessera.Controls.BoxPlot`
+- `Tessera.Controls.BoxPlotSeries`
+- `Tessera.Controls.Gauge`
+- `Tessera.Controls.MiniLog`
+- `Tessera.Controls.StatItem`
+- `Tessera.Controls.StatsCard`
+- `Tessera.Controls.NumberInput`
+- `Tessera.Controls.DatePicker`
+- `Tessera.Controls.TimePicker`
+- `Tessera.Controls.MarkdownView`
+- `Tessera.Controls.MultiSelect`
+- `Tessera.Controls.Paginator`
+- `Tessera.Controls.RadioGroup`
+- `Tessera.Controls.LogView`
+- `Tessera.Controls.Modal`
+- `Tessera.Controls.Notifications` (primary notification feed API)
+- `Tessera.Controls.Toggle`
+- `Tessera.Controls.Slider`
+- `Tessera.Controls.Spinner`
+- `Tessera.Controls.StatusBar`
+- `Tessera.Controls.Tabs`
+- `Tessera.Controls.ListView<T>`
+- `Tessera.Controls.VirtualizedListView<T>`
+- `Tessera.Controls.VirtualizedListViewOptions`
+- `Tessera.Controls.GroupedListView<TGroup,TItem>`
+- `Tessera.Controls.GroupedListViewGroup<TGroup,TItem>`
+- `Tessera.Controls.GroupedListSelectionChangedEventArgs<TGroup,TItem>`
+- `Tessera.Controls.Table`
+- `Tessera.Controls.KanbanBoard`
+- `Tessera.Controls.KanbanLane`
+- `Tessera.Controls.KanbanCard`
+- `Tessera.Controls.KanbanSelectionChangedEventArgs`
+- `Tessera.Controls.TagInput`
+- `Tessera.Controls.CalendarMonthView`
+- `Tessera.Controls.CalendarDayCell`
+- `Tessera.Controls.CalendarDateSelectedEventArgs`
+- `Tessera.Controls.SchedulerTimeline`
+- `Tessera.Controls.SchedulerEntry`
+- `Tessera.Controls.SchedulerSelectionChangedEventArgs`
+- `Tessera.Controls.PivotTable`
+- `Tessera.Controls.PivotTableColumn`
+- `Tessera.Controls.PivotTableCell`
+- `Tessera.Controls.PivotSortDirection`
+- `Tessera.Controls.PivotSortRequestedEventArgs`
+- `Tessera.Controls.QueryBuilder`
+- `Tessera.Controls.QueryGroup`
+- `Tessera.Controls.QueryRule`
+- `Tessera.Controls.QueryOperator`
+- `Tessera.Controls.QueryChangedEventArgs`
+- `Tessera.Controls.RichTextView`
+- `Tessera.Controls.RichTextSegment`
+- `Tessera.Controls.RichTextStyleKind`
+- `Tessera.Controls.JsonTreeView`
+- `Tessera.Controls.JsonTreeNode`
+- `Tessera.Controls.JsonTreeNodeKind`
+- `Tessera.Controls.JsonTreeSelectionChangedEventArgs`
+- `Tessera.Controls.TraceViewer`
+- `Tessera.Controls.TraceEntry`
+- `Tessera.Controls.TraceSelectionChangedEventArgs`
+- `Tessera.Controls.CommandOutput`
+- `Tessera.Controls.CommandOutputLine`
+- `Tessera.Controls.CommandOutputChannel`
+- `Tessera.Controls.LogTailPanel`
+- `Tessera.Controls.LogEntry`
+- `Tessera.Controls.LogLevel`
+- `Tessera.Controls.TaskRunnerPanel`
+- `Tessera.Controls.TaskRunItem`
+- `Tessera.Controls.TaskRunnerSelectionChangedEventArgs`
+- `Tessera.Controls.DockWorkspace`
+- `Tessera.Controls.DockPane`
+- `Tessera.Controls.DockPanePosition`
+- `Tessera.Controls.PaneTabs`
+- `Tessera.Controls.PaneTabItem`
+- `Tessera.Controls.PaneTabSelectionChangedEventArgs`
+- `Tessera.Controls.PaletteEditor`
+- `Tessera.Controls.PaletteSwatch`
+- `Tessera.Controls.PaletteSelectionChangedEventArgs`
+- `Tessera.Controls.Heatmap`
+- `Tessera.Controls.HeatmapCell`
+- `Tessera.Controls.HeatmapLegend`
+- `Tessera.Controls.TreeMapChart`
+- `Tessera.Controls.TreeMapNode`
+- `Tessera.Controls.TerminalPanel`
+- `Tessera.Controls.TerminalPanelLine`
+- `Tessera.Controls.TerminalPanelChannel`
+- `Tessera.Controls.ProcessListView`
+- `Tessera.Controls.ProcessListEntry`
+- `Tessera.Controls.ProcessListStatus`
+- `Tessera.Controls.ProcessListSelectionChangedEventArgs`
+- `Tessera.Controls.ActivityFeed`
+- `Tessera.Controls.ActivityFeedItem`
+- `Tessera.Controls.ActivityFeedItemKind`
+- `Tessera.Controls.InboxItem`
+- `Tessera.Controls.KeyBindingHelpDialog`
+- `Tessera.Controls.KeyBindingItem`
+- `Tessera.Controls.DataGrid`
+- `Tessera.Controls.TreeTable`
+- `Tessera.Controls.KeyValueList`
+- `Tessera.Controls.Timeline`
+- `Tessera.Controls.Stepper`
+- `Tessera.Controls.TreeItem`
+- `Tessera.Controls.TreeView` (native)
+- `Tessera.Controls.TreeViewGlyphSet`
+- `Tessera.Controls.MenuBar`
+- `Tessera.Controls.MenuBarGlyphSet`
+- `Tessera.Controls.Toolbar`
+- `Tessera.Controls.CommandBar`
+- `Tessera.Controls.SearchBox`
+- `Tessera.Controls.SearchResultsView`
+- `Tessera.Controls.SearchResultsGlyphSet`
+- `Tessera.Controls.Form`
+- `Tessera.Controls.FormField`
+- `Tessera.Controls.DataForm<TModel>`
+- `Tessera.Controls.DataFormField<TModel>`
+- `Tessera.Controls.DataFormSelectionChangedEventArgs<TModel>`
+- `Tessera.Controls.DataFormFieldCommittedEventArgs<TModel>`
+- `Tessera.Controls.FieldSet`
+- `Tessera.Controls.SplitView`
+- `Tessera.Controls.SplitViewOrientation`
+- `Tessera.Controls.InspectorPanel`
+- `Tessera.Controls.InspectorSection`
+- `Tessera.Controls.InspectorField`
+- `Tessera.Controls.Wizard`
+- `Tessera.Controls.WizardStep`
+- `Tessera.Controls.WizardStepChangedEventArgs`
+- `Tessera.Controls.EmptyState`
+- `Tessera.Controls.ValidationSummary`
+- `Tessera.Controls.DiffView`
+- `Tessera.Controls.PropertyGrid`
+- `Tessera.Controls.FileExplorer`
+- `Tessera.Controls.FuzzyFinder`
+- `Tessera.Controls.ToastCenter`
+- `Tessera.Controls.MenuItem`
+- `Tessera.Controls.Control`
 
 The intended beginner path is:
 
-- build an app by deriving from `TeaApp`
-- run it with the minimal startup lane (`Tea.RunAsync(new App())`) or configured startup lane (`Tea.CreateBuilder().UseApp<TApp>().ConfigureRuntime(...).Build()`)
+- build an app by deriving from `TesseraApp`
+- run it with the minimal startup lane (`TesseraApplication.RunAsync(new App())`) or configured startup lane (`TesseraApplication.CreateBuilder().UseApp<TApp>().ConfigureRuntime(...).Build()`)
 - rely on automatic control routing; `Update(...)` handles only unhandled input plus runtime messages
 - return `Screen` from `Build(ScreenContext)`
 - assemble screens with `Screen.Build(...)` and shallow builder callbacks
-- keep configuration in `TeaRuntimeOptions` and `ScreenOptions`
+- keep configuration in `TesseraRuntimeOptions` and `ScreenOptions`
 - follow the public onboarding path in [getting-started.md](getting-started.md), starting with `HelloWorld`, `CounterForm`, and `WorkspaceApp` before the flagship showcases in [examples.md](examples.md)
-- treat `TeaSharp.Core` as the low-level advanced lane, not default onboarding
+- treat `Tessera.Core` as the low-level advanced lane, not default onboarding
 - use semantic theme tokens and palette-driven styling on the default path
 
 ### Pointer Runtime Semantics (Tier 1)
@@ -272,15 +272,15 @@ Terminal prerequisites and troubleshooting:
 - CSI-capable terminals (Ghostty, iTerm2, Windows Terminal, macOS Terminal) should run through byte-stream decoding for pointer/focus/paste.
 - verify app requests mouse reporting (`runtime.Screen.MouseTracking = CellMotion|AllMotion`).
 - verify `DisableInput` is false.
-- verify `TEASHARP_CAPS` is not disabling mouse (`mouse=0`).
+- verify `TESSERA_CAPS` is not disabling mouse (`mouse=0`).
 - if using tmux, enable `set -g mouse on`.
 - if terminal text selection appears instead of app pointer behavior, run through the checklist above first.
 
 ### Notification Surface Guidance (Tier 1)
 
-- primary onboarding path: `TeaSharp.Controls.Notifications`
-- advanced/devops path: `TeaSharp.Controls.NotificationInbox` (Tier 2)
-- shared item model: `TeaSharp.Controls.InboxItem`
+- primary onboarding path: `Tessera.Controls.Notifications`
+- advanced/devops path: `Tessera.Controls.NotificationInbox` (Tier 2)
+- shared item model: `Tessera.Controls.InboxItem`
 
 Current `Notifications` primary API surface:
 
@@ -329,31 +329,31 @@ These close the consumer proof-loop selection pressure without breaking existing
 
 These APIs remain public because they still offer real value, but they should not dominate the default path.
 
-- `TeaSharp.Hosting.TeaHostingOptions`
-- `TeaSharp.Hosting.TeaHost.CreateApplication(...)`
-- `TeaSharp.Hosting.TeaHost.RunAsync(...)`
-- `TeaSharp.Hosting.IProgramRenderer`
-- `TeaSharp.Hosting.RenderOutput`
-- `TeaSharp.Hosting.AnsiRendererOptions`
-- `TeaSharp.Hosting.AnsiDiffRenderer`
-- `TeaSharp.Hosting.NullRenderer`
-- `TeaSharp.Hosting.ITerminalAdapter`
-- `TeaSharp.Hosting.TerminalSize`
-- `TeaSharp.Hosting.TerminalCapabilityProfile`
-- `TeaSharp.Hosting.TerminalColorProfile`
-- `TeaSharp.Hosting.ConsoleTerminalAdapter`
-- `TeaSharp.Hosting.TerminalCapabilityDetector`
-- `TeaSharp.Hosting.TerminalColorProfileDetector`
-- `TeaSharp.Hosting.IEventDecoder`
-- `TeaSharp.Hosting.EventDecodeResult`
-- `TeaSharp.Hosting.EventDecoder`
-- `TeaSharp.Hosting.TerminalCursorStyle`
-- `TeaSharp.Controls.NotificationInbox` (advanced dev/ops inbox workflow)
-- `TeaSharp.Controls.BarChartOptions`
-- `TeaSharp.Controls.LineChartOptions`
-- `TeaSharp.Controls.LinePlotOptions`
-- `TeaSharp.Controls.LinePlotRenderMode`
-- `TeaSharp.Controls.PlotPanelOptions`
+- `Tessera.Hosting.TesseraHostingOptions`
+- `Tessera.Hosting.TesseraHost.CreateApplication(...)`
+- `Tessera.Hosting.TesseraHost.RunAsync(...)`
+- `Tessera.Hosting.IProgramRenderer`
+- `Tessera.Hosting.RenderOutput`
+- `Tessera.Hosting.AnsiRendererOptions`
+- `Tessera.Hosting.AnsiDiffRenderer`
+- `Tessera.Hosting.NullRenderer`
+- `Tessera.Hosting.ITerminalAdapter`
+- `Tessera.Hosting.TerminalSize`
+- `Tessera.Hosting.TerminalCapabilityProfile`
+- `Tessera.Hosting.TerminalColorProfile`
+- `Tessera.Hosting.ConsoleTerminalAdapter`
+- `Tessera.Hosting.TerminalCapabilityDetector`
+- `Tessera.Hosting.TerminalColorProfileDetector`
+- `Tessera.Hosting.IEventDecoder`
+- `Tessera.Hosting.EventDecodeResult`
+- `Tessera.Hosting.EventDecoder`
+- `Tessera.Hosting.TerminalCursorStyle`
+- `Tessera.Controls.NotificationInbox` (advanced dev/ops inbox workflow)
+- `Tessera.Controls.BarChartOptions`
+- `Tessera.Controls.LineChartOptions`
+- `Tessera.Controls.LinePlotOptions`
+- `Tessera.Controls.LinePlotRenderMode`
+- `Tessera.Controls.PlotPanelOptions`
 - `ICanvasComponent` as a render-only advanced seam
 - renderer, terminal, and capability-probing seams
 
@@ -367,28 +367,28 @@ These areas still expose more mechanism than the long-term public design should:
 - runtime seams that most apps never need
 - duplicate terminology between root app types and older core/runtime types
 - the remaining advanced component namespaces that still expose an alternate engine-shaped control story
-- lower-level runtime/input helpers that still live deeper than the preferred TeaSharp-owned hosting surface
-- overlap between `TeaSharp` and `TeaSharp.Core` mental models when boundaries are not documented clearly
+- lower-level runtime/input helpers that still live deeper than the preferred Tessera-owned hosting surface
+- overlap between `Tessera` and `Tessera.Core` mental models when boundaries are not documented clearly
 
 ## Current Direction
 
-TeaSharp is shifting from:
+Tessera is shifting from:
 
 - `InteractiveScreenModel`
 - `InputRouter`
 
 to:
 
-- `Tea.RunAsync(...)`
-- `TeaApplicationBuilder`
-- `TeaApp`
+- `TesseraApplication.RunAsync(...)`
+- `TesseraApplicationBuilder`
+- `TesseraApp`
 - `Screen`
 - `ScreenContext`
-- `TeaRuntimeOptions`
+- `TesseraRuntimeOptions`
 - `WindowLayout`, `RowLayout`, `ColumnLayout`, `PanelLayout`, `CenterLayout`, `LayoutSlot`
-- root `TeaSharp.Controls` wrappers
+- root `Tessera.Controls` wrappers
 
-The old `TeaHost.CreateProgram(...)` / `TeaProgramOptions` / `IScreen` program-hosting path has been removed.
+The old `TesseraHost.CreateProgram(...)` / `TesseraProgramOptions` / `IScreen` program-hosting path has been removed.
 
 The old `ScreenComposer` composition bridge has been removed. The previous static layout helper DSL is internal-only, and root layouts now compile through the scene compiler/runtime loop.
 
@@ -487,27 +487,27 @@ The first root controls that already own their implementation directly are:
 - `FuzzyFinder`
 - `ToastCenter`
 
-Their old `TeaSharp.Components.Prebuilt.*` counterparts have been removed instead of kept as compatibility wrappers.
+Their old `Tessera.Components.Prebuilt.*` counterparts have been removed instead of kept as compatibility wrappers.
 
 ## Design Constraints
 
-- normal apps should stay in `TeaSharp`
-- normal apps should not import `TeaSharp.Core.*`
+- normal apps should stay in `Tessera`
+- normal apps should not import `Tessera.Core.*`
 - normal apps should not manage terminal size manually
 - normal apps should not manage input scopes or region routing manually
 - custom widgets should remain possible through a small stable contract
 
 ## Theme Mapping Status
 
-Current shipped theme mapping is centralized in `TeaSharp.Styles.TeaThemeControlExtensions` and split into domain partial files (`Basic`, `InputValue`, `Navigation`, `NavigationOverlay`, `NavigationPrimitives`, `DataAndFlow`, `PlanningAndBoards`, `QueryAndRichText`, `ExplorerAndFeedback`, `RenderingTextUtilities`, `ModalAndCharts`, `Plotting`, `DevOpsAndWorkflows`, `Workspace`, `FormsAndShell`).
+Current shipped theme mapping is centralized in `Tessera.Styles.TesseraThemeControlExtensions` and split into domain partial files (`Basic`, `InputValue`, `Navigation`, `NavigationOverlay`, `NavigationPrimitives`, `DataAndFlow`, `PlanningAndBoards`, `QueryAndRichText`, `ExplorerAndFeedback`, `RenderingTextUtilities`, `ModalAndCharts`, `Plotting`, `DevOpsAndWorkflows`, `Workspace`, `FormsAndShell`).
 Overlay glyph cookbook snippets for `MenuBarGlyphSet`, `ContextMenuGlyphSet`, and `CommandPaletteGlyphSet` are documented in [theme-system.md](theme-system.md).
 Border override, dropdown/tree glyph-set, and data marker/separator cookbook snippets are documented in [theme-system.md](theme-system.md).
 Wave 2 query/analytics controls (`PivotTable`, `QueryBuilder`, `RichTextView`) are mapped with the same semantic-token and border-style contract.
 Wave 3 dev/ops controls (`JsonTreeView`, `CommandOutput`, `LogTailPanel`, `ActivityFeed`, `NotificationInbox`, `KeyBindingHelpDialog`) are mapped with the same semantic-token contract. For onboarding/default app flows, use `Notifications`; treat `NotificationInbox` as advanced dev/ops surface.
-Wave 4 batch A + B controls (`DockWorkspace`, `PaneTabs`, `PaletteEditor`, `Heatmap`, `TreeMapChart`, `TerminalPanel`, `ProcessListView`) are integrated and mapped in `TeaThemeControlExtensions.Workspace.cs`.
-Wave 1 app-shell/forms controls (`Form`, `FieldSet`, `DataForm<TModel>`, `Wizard`, `SplitView`, `InspectorPanel`) are integrated and mapped in `TeaThemeControlExtensions.FormsAndShell.cs`.
-Expansion tranche controls (`DashboardGrid`, `QuickOpenOverlay`, `BulletChart`, `ResizablePaneGroup`, `SideNavRail`, `TokenEditor`, `HealthBoard`, `JumpList`, `AutocompleteInput`, `BoxPlot`) are implemented with dedicated tests; theme extension mapping is wired for all of them across `TeaThemeControlExtensions.DashboardMetrics.cs`, `TeaThemeControlExtensions.FormsAndShell.cs`, `TeaThemeControlExtensions.Navigation.cs`, `TeaThemeControlExtensions.NavigationOverlay.cs`, `TeaThemeControlExtensions.PlanningAndBoards.cs`, and `TeaThemeControlExtensions.Plotting.cs` (commit evidence: `4e005ed`, `1c1b748`, `03c7a43`, `db63e01`).
-Reusable consumer-level override helpers are available via `TeaThemeOverrideBundle.CreateDashboardBundle(...)` and `ApplyThemeAndDashboardOverrides(...)` extensions for `ListView<T>`, `Table`, `Notifications`, `LogView`, `Button`, and `Dialog`.
+Wave 4 batch A + B controls (`DockWorkspace`, `PaneTabs`, `PaletteEditor`, `Heatmap`, `TreeMapChart`, `TerminalPanel`, `ProcessListView`) are integrated and mapped in `TesseraThemeControlExtensions.Workspace.cs`.
+Wave 1 app-shell/forms controls (`Form`, `FieldSet`, `DataForm<TModel>`, `Wizard`, `SplitView`, `InspectorPanel`) are integrated and mapped in `TesseraThemeControlExtensions.FormsAndShell.cs`.
+Expansion tranche controls (`DashboardGrid`, `QuickOpenOverlay`, `BulletChart`, `ResizablePaneGroup`, `SideNavRail`, `TokenEditor`, `HealthBoard`, `JumpList`, `AutocompleteInput`, `BoxPlot`) are implemented with dedicated tests; theme extension mapping is wired for all of them across `TesseraThemeControlExtensions.DashboardMetrics.cs`, `TesseraThemeControlExtensions.FormsAndShell.cs`, `TesseraThemeControlExtensions.Navigation.cs`, `TesseraThemeControlExtensions.NavigationOverlay.cs`, `TesseraThemeControlExtensions.PlanningAndBoards.cs`, and `TesseraThemeControlExtensions.Plotting.cs` (commit evidence: `4e005ed`, `1c1b748`, `03c7a43`, `db63e01`).
+Reusable consumer-level override helpers are available via `TesseraThemeOverrideBundle.CreateDashboardBundle(...)` and `ApplyThemeAndDashboardOverrides(...)` extensions for `ListView<T>`, `Table`, `Notifications`, `LogView`, `Button`, and `Dialog`.
 
 ## State-Style Naming Matrix (Tier 1 Consumer Quick Lookup)
 
@@ -547,7 +547,7 @@ Planned reference sample: `examples/PlottingDashboard` (once available).
 
 ## Typography Capability Status
 
-- Portable typography lane: `TeaStyle.WithFontWeight(TeaFontWeight)` for ANSI SGR emphasis intent (normal/bold/dim), not real font engine control.
+- Portable typography lane: `TesseraStyle.WithFontWeight(TesseraFontWeight)` for ANSI SGR emphasis intent (normal/bold/dim), not real font engine control.
 - Terminal request lanes:
   - `ScreenOptions.FontSpec` (legacy/explicit raw request).
   - `ScreenOptions.FontFamily` + `ScreenOptions.FontSize` (structured request).
@@ -567,11 +567,11 @@ runtime.Screen = new ScreenOptions
     FontSpec = "JetBrains Mono 13", // legacy/raw
     FontFamily = "JetBrains Mono",  // structured
     FontSize = 13,
-    Iterm2Profile = "TeaSharp",
+    Iterm2Profile = "Tessera",
 };
 ```
 
-Support matrix (TeaSharp V1 contract):
+Support matrix (Tessera V1 contract):
 
 - sequence emission: capability-gated (`SupportsOsc50FontRequests` / `SupportsIterm2ProfileRequests`)
 - sanitization: `BEL`, `ESC`, `\`, and control chars are stripped before emission
@@ -581,7 +581,7 @@ Support matrix (TeaSharp V1 contract):
 Bordered control parity policy:
 
 - any public control with bordered frame rendering must expose `BorderStyleText` and `FocusedBorderStyleText`
-- each bordered control must have `ApplyTheme`/`ApplyThemeDefaults` token mapping in the corresponding `TeaThemeControlExtensions` domain file
+- each bordered control must have `ApplyTheme`/`ApplyThemeDefaults` token mapping in the corresponding `TesseraThemeControlExtensions` domain file
 - parity is enforced through theme mapping tests plus visual edge-case assertions before merge
 
 Basic controls with direct token mappings:
@@ -663,7 +663,7 @@ Modal/chart summary controls with direct token mappings:
 
 1. keep moving control authoring toward a single obvious configuration style
 2. review Tier 2 periodically and internalize anything that is public only by inertia
-3. keep `TeaSharp.Core` as the intentional low-level product and keep docs/examples explicit about when app authors should prefer `TeaSharp` instead
-4. keep custom widget extensibility stable while internal runtime details continue to shrink and stay behind TeaSharp-owned internal adapters
+3. keep `Tessera.Core` as the intentional low-level product and keep docs/examples explicit about when app authors should prefer `Tessera` instead
+4. keep custom widget extensibility stable while internal runtime details continue to shrink and stay behind Tessera-owned internal adapters
 5. preserve discoverability and parity policy tests (for example `BorderedControlParityPolicyTests.cs`) so new bordered controls cannot drift from required hook/mapping coverage
 6. keep V1 image scope out of the V1 default path docs (image rendering planned for V1.1)

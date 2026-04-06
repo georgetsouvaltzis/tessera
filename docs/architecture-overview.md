@@ -1,6 +1,6 @@
-# TeaSharp Architecture Overview
+# Tessera Architecture Overview
 
-This document is the shortest contributor-facing map of the TeaSharp codebase.
+This document is the shortest contributor-facing map of the Tessera codebase.
 
 ## Product Layers
 
@@ -8,10 +8,10 @@ This document is the shortest contributor-facing map of the TeaSharp codebase.
 
 Normal app authors should live here:
 
-- `TeaSharp`
-- `TeaSharp.Controls`
-- `TeaSharp.Layout`
-- `TeaSharp.Styles`
+- `Tessera`
+- `Tessera.Controls`
+- `Tessera.Layout`
+- `Tessera.Styles`
 
 This is the public product identity.
 
@@ -19,13 +19,13 @@ This is the public product identity.
 
 Use this only when you need custom runtime seams:
 
-- `TeaSharp.Hosting`
+- `Tessera.Hosting`
 
 This layer remains public, but it is not the beginner path.
 
 ### 3. Low-Level Runtime Layer
 
-- `TeaSharp.Core`
+- `Tessera.Core`
 
 This is the engine-adjacent layer. It should not leak into normal onboarding, README snippets, or flagship public examples.
 
@@ -41,17 +41,17 @@ Built-in controls route handled input before `Update(...)` sees the remaining me
 
 ## Composition Model
 
-TeaSharp composes screens explicitly:
+Tessera composes screens explicitly:
 
 - `Screen.Build(...)`
-- controls from `TeaSharp.Controls`
-- layouts from `TeaSharp.Layout`
+- controls from `Tessera.Controls`
+- layouts from `Tessera.Layout`
 
 The framework should read like explicit screen composition in C#, not like a custom nested DSL.
 
 ## Theming Model
 
-TeaSharp theming is semantic-token based:
+Tessera theming is semantic-token based:
 
 - global theme
 - control-type defaults
@@ -62,10 +62,10 @@ The full token and override map lives in [theme-system.md](theme-system.md).
 
 ## Where To Work
 
-- public API and controls: `src/TeaSharp`
-- low-level runtime/engine work: `src/TeaSharp.Core`
-- regression and contract tests: `tests/TeaSharp.Tests`
-- runtime/integration flows: `tests/TeaSharp.IntegrationTests`
+- public API and controls: `src/Tessera`
+- low-level runtime/engine work: `src/Tessera.Core`
+- regression and contract tests: `tests/Tessera.Tests`
+- runtime/integration flows: `tests/Tessera.IntegrationTests`
 - public examples: `examples`
 - product and contributor docs: `docs`
 
@@ -76,4 +76,4 @@ When changing public behavior:
 1. update tests
 2. update public docs in the same slice
 3. keep the default public path simpler, not more clever
-4. avoid moving public guidance toward `TeaSharp.Core`
+4. avoid moving public guidance toward `Tessera.Core`

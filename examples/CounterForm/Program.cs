@@ -1,7 +1,7 @@
-using TeaSharp;
-using TeaSharp.Examples.CounterForm;
+using Tessera;
+using Tessera.Examples.CounterForm;
 
-var app = Tea.CreateBuilder()
+var app = TesseraApplication.CreateBuilder()
     .UseApp<CounterFormApp>()
     .ConfigureRuntime(static runtime =>
     {
@@ -10,7 +10,7 @@ var app = Tea.CreateBuilder()
         runtime.Screen = new ScreenOptions
         {
             AltScreen = true,
-            WindowTitle = "TeaSharp CounterForm",
+            WindowTitle = "Tessera CounterForm",
             EnableFocusReporting = true,
             EnableBracketedPaste = true,
             MouseTracking = MouseTrackingMode.AllMotion,

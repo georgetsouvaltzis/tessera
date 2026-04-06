@@ -1,5 +1,5 @@
 {
-  "schema": "teasharp-perf-gate-baseline-v1",
+  "schema": "tessera-perf-gate-baseline-v1",
   "version": "2026-03-21",
   "scenarios": [
     {

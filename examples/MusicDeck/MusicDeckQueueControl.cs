@@ -1,9 +1,9 @@
-using TeaSharp.Components.Primitives;
-using TeaSharp.Controls;
-using TeaSharp.Layout;
-using TeaSharp.Styles;
+using Tessera.Components.Primitives;
+using Tessera.Controls;
+using Tessera.Layout;
+using Tessera.Styles;
 
-namespace TeaSharp.Examples.MusicDeck;
+namespace Tessera.Examples.MusicDeck;
 
 internal sealed class MusicDeckQueueControl : Control
 {
@@ -15,14 +15,14 @@ internal sealed class MusicDeckQueueControl : Control
     public Thickness Padding { get; set; } = Thickness.All(1);
     public int CurrentIndex { get; set; }
     public int SelectedIndex { get; set; }
-    public TeaStyle TitleStyle { get; set; } = TeaStyle.Empty;
-    public TeaStyle FocusedTitleStyle { get; set; } = TeaStyle.Empty;
-    public TeaStyle ItemStyle { get; set; } = TeaStyle.Empty;
-    public TeaStyle CurrentItemStyle { get; set; } = TeaStyle.Empty;
-    public TeaStyle SelectedItemStyle { get; set; } = TeaStyle.Empty;
-    public TeaStyle MetaStyle { get; set; } = TeaStyle.Empty;
-    public TeaStyle BorderStyleText { get; set; } = TeaStyle.Empty;
-    public TeaStyle FocusedBorderStyleText { get; set; } = TeaStyle.Empty;
+    public TesseraStyle TitleStyle { get; set; } = TesseraStyle.Empty;
+    public TesseraStyle FocusedTitleStyle { get; set; } = TesseraStyle.Empty;
+    public TesseraStyle ItemStyle { get; set; } = TesseraStyle.Empty;
+    public TesseraStyle CurrentItemStyle { get; set; } = TesseraStyle.Empty;
+    public TesseraStyle SelectedItemStyle { get; set; } = TesseraStyle.Empty;
+    public TesseraStyle MetaStyle { get; set; } = TesseraStyle.Empty;
+    public TesseraStyle BorderStyleText { get; set; } = TesseraStyle.Empty;
+    public TesseraStyle FocusedBorderStyleText { get; set; } = TesseraStyle.Empty;
 
     public void SetItems(IReadOnlyList<MusicTrack> items)
     {
@@ -66,6 +66,6 @@ internal sealed class MusicDeckQueueControl : Control
         }
     }
 
-    private TeaStyle ResolveBorderStyle() => IsFocused ? BorderStyleText.Merge(FocusedBorderStyleText) : BorderStyleText;
-    private static string Render(TeaStyle style, string text) => style.IsEmpty || string.IsNullOrEmpty(text) ? text : style.Render(text);
+    private TesseraStyle ResolveBorderStyle() => IsFocused ? BorderStyleText.Merge(FocusedBorderStyleText) : BorderStyleText;
+    private static string Render(TesseraStyle style, string text) => style.IsEmpty || string.IsNullOrEmpty(text) ? text : style.Render(text);
 }

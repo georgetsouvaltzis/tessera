@@ -1,9 +1,9 @@
-using TeaSharp;
-using TeaSharp.Controls;
+using Tessera;
+using Tessera.Controls;
 
-using TeaSharp.Examples.MusicDeck;
+using Tessera.Examples.MusicDeck;
 
-var app = Tea.CreateBuilder()
+var app = TesseraApplication.CreateBuilder()
     .UseApp<MusicDeckApp>()
     .ConfigureRuntime(static runtime =>
     {
@@ -12,7 +12,7 @@ var app = Tea.CreateBuilder()
         runtime.Screen = new ScreenOptions
         {
             AltScreen = true,
-            WindowTitle = "TeaSharp MusicDeck",
+            WindowTitle = "Tessera MusicDeck",
             EnableFocusReporting = true,
             EnableBracketedPaste = true,
             MouseTracking = MouseTrackingMode.AllMotion,

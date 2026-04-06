@@ -1,6 +1,6 @@
 # Support
 
-TeaSharp is in public alpha.
+Tessera is in public alpha.
 
 Support is best-effort, in public, and optimized for reproducible reports.
 
@@ -15,7 +15,7 @@ Support is best-effort, in public, and optimized for reproducible reports.
 - security reports:
   - follow [SECURITY.md](SECURITY.md)
 
-TeaSharp does not currently provide private product support or response-time guarantees.
+Tessera does not currently provide private product support or response-time guarantees.
 
 ## Before Opening An Issue
 
@@ -34,9 +34,9 @@ If you can, verify against the current public baseline:
 Useful local checks before filing:
 
 ```bash
-dotnet build TeaSharp.slnx
-dotnet test TeaSharp.slnx
-dotnet build examples/TeaSharp.Examples.slnx
+dotnet build Tessera.slnx
+dotnet test Tessera.slnx
+dotnet build examples/Tessera.Examples.slnx
 dotnet run --project examples/DataWorkbench/DataWorkbench.csproj --no-build
 dotnet run --project examples/OpsWatch/OpsWatch.csproj --no-build
 dotnet run --project examples/GitConsole/GitConsole.csproj --no-build
@@ -46,7 +46,7 @@ dotnet run --project examples/GitConsole/GitConsole.csproj --no-build
 
 Strong issues usually include:
 
-- TeaSharp version or commit SHA
+- Tessera version or commit SHA
 - .NET SDK version
 - operating system and terminal emulator
 - exact example or project path involved
@@ -63,7 +63,7 @@ For example-related reports, say whether the problem is in:
 
 ## Alpha Expectations
 
-TeaSharp is already usable, but the public contract is still tightening.
+Tessera is already usable, but the public contract is still tightening.
 
 That means:
 

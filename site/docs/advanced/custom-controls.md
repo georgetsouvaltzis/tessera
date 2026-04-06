@@ -2,7 +2,7 @@
 title: Custom Controls
 ---
 
-TeaSharp keeps custom widgets on the public path through `TeaSharp.Controls.Control`.
+Tessera keeps custom widgets on the public path through `Tessera.Controls.Control`.
 
 Use this when you need:
 

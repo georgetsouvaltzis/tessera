@@ -1,8 +1,8 @@
-# TeaSharp Theme System
+# Tessera Theme System
 
 ## Scope
 
-This document defines the V1 theming/styling contract for `TeaSharp` without DI and without engine leakage.
+This document defines the V1 theming/styling contract for `Tessera` without DI and without engine leakage.
 
 Goals:
 
@@ -27,12 +27,12 @@ Theme values should be semantic, not control-specific:
 - `Selection.Background`, `Selection.Foreground`
 - `Focus.Ring`, `Focus.Title`, `Focus.Border`, `Focus.Marker`
 
-All tokens map to `TeaStyle` values and are consumable by controls without raw ANSI strings in app code.
+All tokens map to `TesseraStyle` values and are consumable by controls without raw ANSI strings in app code.
 `Focus.Marker` is a first-class token and should drive focus-marker rendering for controls that expose marker hooks (`FocusMarker`/`ShowFocusMarker`), rather than hardcoded marker styling.
 
 ## Consumer Hook Matrix (Quick Lookup)
 
-Use these naming patterns on the no-DI public path (`Tea.RunAsync(new App())` or `Tea.CreateBuilder().UseApp<TApp>()...`):
+Use these naming patterns on the no-DI public path (`TesseraApplication.RunAsync(new App())` or `TesseraApplication.CreateBuilder().UseApp<TApp>()...`):
 
 | Family | Focus | Selected | Hovered | Border |
 |---|---|---|---|---|
@@ -44,7 +44,7 @@ Extended family-by-family matrix lives in [public-api-inventory.md](public-api-i
 
 ## Typography Emphasis Intent
 
-TeaSharp supports lightweight typography intent through `TeaFontWeight` and `TeaStyle.WithFontWeight(...)`.
+Tessera supports lightweight typography intent through `TesseraFontWeight` and `TesseraStyle.WithFontWeight(...)`.
 This maps to ANSI SGR emphasis flags only (`Normal`, `Bold`, `Dim`).
 
 It does **not** control terminal font engines, real font families, font sizes, or ligature behavior.
@@ -58,7 +58,7 @@ runtime.Screen = new ScreenOptions
 };
 ```
 
-`FontSpec` behavior in TeaSharp V1:
+`FontSpec` behavior in Tessera V1:
 
 - null/empty: no sequence emitted
 - non-empty: renderer emits OSC 50 when value changes
@@ -70,12 +70,12 @@ Cross-terminal support and terminal-specific caveats:
 
 ## ANSI Style Foundations
 
-Low-level ANSI style composition lives in `TeaSharp.Styles`:
+Low-level ANSI style composition lives in `Tessera.Styles`:
 
 - `AnsiColor`
   - `Indexed(0..255)`
   - `Rgb(r, g, b)`
-- `TeaStyle`
+- `TesseraStyle`
   - `WithBold`
   - `WithUnderline`
   - `WithForeground`
@@ -88,43 +88,43 @@ Low-level ANSI style composition lives in `TeaSharp.Styles`:
   - `ToEscapeSequence()`
   - `Render(string text)`
 
-Use `TeaStyle` as the primitive value type behind theme tokens and per-control overrides. Public docs should treat raw ANSI styling as the foundation layer, and theme tokens as the preferred application-facing layer.
+Use `TesseraStyle` as the primitive value type behind theme tokens and per-control overrides. Public docs should treat raw ANSI styling as the foundation layer, and theme tokens as the preferred application-facing layer.
 
 ## Public API Names (V1 Foundations)
 
 Theme primitives use the following public types:
 
-- `TeaTheme`
-- `TeaThemeTextTokens`
-- `TeaThemeSurfaceTokens`
-- `TeaThemeBorderTokens`
-- `TeaThemeStateTokens`
-- `TeaThemeAccentTokens`
-- `TeaThemeSelectionTokens`
-- `TeaThemeFocusTokens`
-- `TeaThemes.Catppuccin(CatppuccinVariant)`
-- `TeaThemes.RosePine(RosePineVariant)`
-- `TeaThemeOverrides`
-- `TeaThemeVisualState`
-- `TeaThemeControlExtensions.ApplyTheme(...)`
-- `TeaRuntimeOptions.Theme`
+- `TesseraTheme`
+- `TesseraThemeTextTokens`
+- `TesseraThemeSurfaceTokens`
+- `TesseraThemeBorderTokens`
+- `TesseraThemeStateTokens`
+- `TesseraThemeAccentTokens`
+- `TesseraThemeSelectionTokens`
+- `TesseraThemeFocusTokens`
+- `TesseraThemes.Catppuccin(CatppuccinVariant)`
+- `TesseraThemes.RosePine(RosePineVariant)`
+- `TesseraThemeOverrides`
+- `TesseraThemeVisualState`
+- `TesseraThemeControlExtensions.ApplyTheme(...)`
+- `TesseraRuntimeOptions.Theme`
 - `ScreenOptions.FontSpec` (experimental best-effort terminal font request)
-- `TeaFontWeight`
-- `TeaStyle.WithFontWeight(TeaFontWeight)`
+- `TesseraFontWeight`
+- `TesseraStyle.WithFontWeight(TesseraFontWeight)`
 
 ## Theme Cookbook
 
 ### Select Catppuccin
 
 ```csharp
-using TeaSharp;
-using TeaSharp.Styles;
+using Tessera;
+using Tessera.Styles;
 
-var app = Tea.CreateBuilder()
+var app = TesseraApplication.CreateBuilder()
     .UseApp<MyApp>()
     .ConfigureRuntime(static runtime =>
     {
-        runtime.Theme = TeaThemes.Catppuccin(CatppuccinVariant.Mocha);
+        runtime.Theme = TesseraThemes.Catppuccin(CatppuccinVariant.Mocha);
     })
     .Build();
 ```
@@ -132,14 +132,14 @@ var app = Tea.CreateBuilder()
 ### Select Rosé Pine
 
 ```csharp
-using TeaSharp;
-using TeaSharp.Styles;
+using Tessera;
+using Tessera.Styles;
 
-var app = Tea.CreateBuilder()
+var app = TesseraApplication.CreateBuilder()
     .UseApp<MyApp>()
     .ConfigureRuntime(static runtime =>
     {
-        runtime.Theme = TeaThemes.RosePine(RosePineVariant.Main);
+        runtime.Theme = TesseraThemes.RosePine(RosePineVariant.Main);
     })
     .Build();
 ```
@@ -147,19 +147,19 @@ var app = Tea.CreateBuilder()
 ### Set a Custom Theme
 
 ```csharp
-using TeaSharp;
-using TeaSharp.Styles;
+using Tessera;
+using Tessera.Styles;
 
-var baseTheme = TeaThemes.Catppuccin(CatppuccinVariant.Macchiato);
-var customTheme = new TeaTheme
+var baseTheme = TesseraThemes.Catppuccin(CatppuccinVariant.Macchiato);
+var customTheme = new TesseraTheme
 {
     Text = baseTheme.Text,
     Surface = baseTheme.Surface,
-    Border = new TeaThemeBorderTokens
+    Border = new TesseraThemeBorderTokens
     {
         Default = baseTheme.Border.Default,
         Strong = baseTheme.Border.Strong,
-        Focused = TeaStyle.Empty.WithBold().WithForeground(AnsiColor.Rgb(255, 184, 108)),
+        Focused = TesseraStyle.Empty.WithBold().WithForeground(AnsiColor.Rgb(255, 184, 108)),
         Error = baseTheme.Border.Error,
     },
     State = baseTheme.State,
@@ -168,7 +168,7 @@ var customTheme = new TeaTheme
     Focus = baseTheme.Focus,
 };
 
-var app = Tea.CreateBuilder()
+var app = TesseraApplication.CreateBuilder()
     .UseApp<MyApp>()
     .ConfigureRuntime(runtime => runtime.Theme = customTheme)
     .Build();
@@ -177,15 +177,15 @@ var app = Tea.CreateBuilder()
 ### Per-Control Overrides
 
 ```csharp
-using TeaSharp.Controls;
-using TeaSharp.Styles;
+using Tessera.Controls;
+using Tessera.Styles;
 
 var button = new Button
 {
-    LabelStyle = TeaStyle.Empty.WithForeground(AnsiColor.BrightWhite),
-    FocusedLabelStyle = TeaStyle.Empty.WithBold().WithForeground(AnsiColor.BrightWhite),
-    SurfaceStyle = TeaStyle.Empty.WithBackground(AnsiColor.Rgb(36, 24, 30)),
-    FocusedSurfaceStyle = TeaStyle.Empty.WithBackground(AnsiColor.Rgb(54, 36, 44)),
+    LabelStyle = TesseraStyle.Empty.WithForeground(AnsiColor.BrightWhite),
+    FocusedLabelStyle = TesseraStyle.Empty.WithBold().WithForeground(AnsiColor.BrightWhite),
+    SurfaceStyle = TesseraStyle.Empty.WithBackground(AnsiColor.Rgb(36, 24, 30)),
+    FocusedSurfaceStyle = TesseraStyle.Empty.WithBackground(AnsiColor.Rgb(54, 36, 44)),
 };
 
 `Button` treats label styles as text-only semantics.
@@ -198,23 +198,23 @@ Default button focus should come primarily from label emphasis; body fill may sh
 
 var list = new ListView<string>()
 {
-    DefaultRowStyle = TeaStyle.Empty.WithForeground(AnsiColor.BrightWhite),
-    HoveredRowStyle = TeaStyle.Empty.WithUnderline().WithForeground(AnsiColor.BrightCyan),
-    SelectedRowStyle = TeaStyle.Empty.WithBold().WithForeground(AnsiColor.BrightGreen),
+    DefaultRowStyle = TesseraStyle.Empty.WithForeground(AnsiColor.BrightWhite),
+    HoveredRowStyle = TesseraStyle.Empty.WithUnderline().WithForeground(AnsiColor.BrightCyan),
+    SelectedRowStyle = TesseraStyle.Empty.WithBold().WithForeground(AnsiColor.BrightGreen),
 };
 
 var input = new TextInput
 {
-    ValueTextStyle = TeaStyle.Empty.WithForeground(AnsiColor.BrightWhite),
-    PlaceholderTextStyle = TeaStyle.Empty.WithDim().WithForeground(AnsiColor.BrightBlack),
-    FocusedTitleStyle = TeaStyle.Empty.WithBold().WithForeground(AnsiColor.BrightYellow),
+    ValueTextStyle = TesseraStyle.Empty.WithForeground(AnsiColor.BrightWhite),
+    PlaceholderTextStyle = TesseraStyle.Empty.WithDim().WithForeground(AnsiColor.BrightBlack),
+    FocusedTitleStyle = TesseraStyle.Empty.WithBold().WithForeground(AnsiColor.BrightYellow),
 };
 ```
 
 ### Overlay Glyph APIs (MenuBar, ContextMenu, CommandPalette)
 
 ```csharp
-using TeaSharp.Controls;
+using Tessera.Controls;
 
 var menuBar = new MenuBar
 {
@@ -240,25 +240,25 @@ var commandPalette = new CommandPalette
 ### Border Override APIs (High-Use Controls)
 
 ```csharp
-using TeaSharp.Controls;
-using TeaSharp.Styles;
+using Tessera.Controls;
+using Tessera.Styles;
 
 var input = new TextInput
 {
-    BorderStyleText = TeaStyle.Empty.WithForeground(AnsiColor.BrightBlack),
-    FocusedBorderStyleText = TeaStyle.Empty.WithBold().WithForeground(AnsiColor.BrightCyan),
+    BorderStyleText = TesseraStyle.Empty.WithForeground(AnsiColor.BrightBlack),
+    FocusedBorderStyleText = TesseraStyle.Empty.WithBold().WithForeground(AnsiColor.BrightCyan),
 };
 
 var choice = new Choice
 {
-    BorderStyleText = TeaStyle.Empty.WithForeground(AnsiColor.BrightBlack),
-    FocusedBorderStyleText = TeaStyle.Empty.WithBold().WithForeground(AnsiColor.BrightGreen),
+    BorderStyleText = TesseraStyle.Empty.WithForeground(AnsiColor.BrightBlack),
+    FocusedBorderStyleText = TesseraStyle.Empty.WithBold().WithForeground(AnsiColor.BrightGreen),
 };
 
 var grid = new DataGrid
 {
-    BorderStyleText = TeaStyle.Empty.WithForeground(AnsiColor.BrightBlack),
-    FocusedBorderStyleText = TeaStyle.Empty.WithBold().WithForeground(AnsiColor.BrightYellow),
+    BorderStyleText = TesseraStyle.Empty.WithForeground(AnsiColor.BrightBlack),
+    FocusedBorderStyleText = TesseraStyle.Empty.WithBold().WithForeground(AnsiColor.BrightYellow),
 };
 ```
 
@@ -271,38 +271,38 @@ Use the same three-layer pattern for polished defaults and app-specific override
 3. text-state override (`TitleStyle`, `FocusedTitleStyle`, row/item styles)
 
 ```csharp
-using TeaSharp.Controls;
-using TeaSharp.Styles;
+using Tessera.Controls;
+using Tessera.Styles;
 
 var choice = new Choice
 {
-    BorderStyleText = TeaStyle.Empty.WithForeground(AnsiColor.BrightBlack),
-    FocusedBorderStyleText = TeaStyle.Empty.WithBold().WithForeground(AnsiColor.BrightGreen),
+    BorderStyleText = TesseraStyle.Empty.WithForeground(AnsiColor.BrightBlack),
+    FocusedBorderStyleText = TesseraStyle.Empty.WithBold().WithForeground(AnsiColor.BrightGreen),
     Glyphs = new DropdownGlyphSet("▾", "▴", ">", "✓"),
-    TitleStyle = TeaStyle.Empty.WithForeground(AnsiColor.BrightWhite),
-    FocusedTitleStyle = TeaStyle.Empty.WithBold().WithForeground(AnsiColor.BrightCyan),
+    TitleStyle = TesseraStyle.Empty.WithForeground(AnsiColor.BrightWhite),
+    FocusedTitleStyle = TesseraStyle.Empty.WithBold().WithForeground(AnsiColor.BrightCyan),
 };
 
 var comboBox = new ComboBox
 {
-    BorderStyleText = TeaStyle.Empty.WithForeground(AnsiColor.BrightBlack),
-    FocusedBorderStyleText = TeaStyle.Empty.WithBold().WithForeground(AnsiColor.BrightYellow),
+    BorderStyleText = TesseraStyle.Empty.WithForeground(AnsiColor.BrightBlack),
+    FocusedBorderStyleText = TesseraStyle.Empty.WithBold().WithForeground(AnsiColor.BrightYellow),
     Glyphs = new DropdownGlyphSet("▼", "▲", "•", "✓"),
 };
 
 var treeView = new TreeView
 {
-    BorderStyleText = TeaStyle.Empty.WithForeground(AnsiColor.BrightBlack),
-    FocusedBorderStyleText = TeaStyle.Empty.WithBold().WithForeground(AnsiColor.BrightMagenta),
+    BorderStyleText = TesseraStyle.Empty.WithForeground(AnsiColor.BrightBlack),
+    FocusedBorderStyleText = TesseraStyle.Empty.WithBold().WithForeground(AnsiColor.BrightMagenta),
     Glyphs = new TreeViewGlyphSet("▼", "▶", "•"),
-    TitleStyle = TeaStyle.Empty.WithForeground(AnsiColor.BrightWhite),
-    FocusedTitleStyle = TeaStyle.Empty.WithBold().WithForeground(AnsiColor.BrightMagenta),
+    TitleStyle = TesseraStyle.Empty.WithForeground(AnsiColor.BrightWhite),
+    FocusedTitleStyle = TesseraStyle.Empty.WithBold().WithForeground(AnsiColor.BrightMagenta),
 };
 ```
 
 ### Wave 1 App Shell + Forms Theme Hooks
 
-`TeaThemeControlExtensions.FormsAndShell.cs` includes explicit mappings for:
+`TesseraThemeControlExtensions.FormsAndShell.cs` includes explicit mappings for:
 
 - `Form`
 - `FieldSet`
@@ -314,27 +314,27 @@ var treeView = new TreeView
 These controls map `BorderStyleText` and `FocusedBorderStyleText` to semantic border/focus tokens by default.
 
 ```csharp
-using TeaSharp.Controls;
-using TeaSharp.Styles;
+using Tessera.Controls;
+using Tessera.Styles;
 
-var theme = TeaThemes.Catppuccin(CatppuccinVariant.Frappe);
+var theme = TesseraThemes.Catppuccin(CatppuccinVariant.Frappe);
 
 var form = new Form().ApplyThemeDefaults(theme);
-form.RequiredMarkerStyle = TeaStyle.Empty.WithBold().WithForeground(AnsiColor.BrightRed);
+form.RequiredMarkerStyle = TesseraStyle.Empty.WithBold().WithForeground(AnsiColor.BrightRed);
 
 var dataForm = new DataForm<object>().ApplyThemeDefaults(theme);
-dataForm.ErrorStyle = TeaStyle.Empty.WithBold().WithForeground(AnsiColor.BrightRed);
+dataForm.ErrorStyle = TesseraStyle.Empty.WithBold().WithForeground(AnsiColor.BrightRed);
 
 var wizard = new Wizard().ApplyThemeDefaults(theme);
-wizard.ActiveStepStyle = TeaStyle.Empty.WithBold().WithForeground(AnsiColor.BrightCyan);
+wizard.ActiveStepStyle = TesseraStyle.Empty.WithBold().WithForeground(AnsiColor.BrightCyan);
 
 var split = new SplitView().ApplyThemeDefaults(theme);
-split.FocusedDividerStyle = TeaStyle.Empty.WithBold().WithForeground(AnsiColor.BrightYellow);
+split.FocusedDividerStyle = TesseraStyle.Empty.WithBold().WithForeground(AnsiColor.BrightYellow);
 ```
 
 ### Wave 2 Data/Planning/Query Theme Hooks
 
-`TeaThemeControlExtensions` includes explicit mappings for:
+`TesseraThemeControlExtensions` includes explicit mappings for:
 
 - `VirtualizedListView<T>`
 - `GroupedListView<TGroup,TItem>`
@@ -351,28 +351,28 @@ Bordered controls in this set (`VirtualizedListView<T>`, `GroupedListView<TGroup
 `TagInput` also maps `CaretStyle` to `theme.Focus.Ring` by default, while placeholder tint remains controllable through `PlaceholderTextStyle`.
 
 ```csharp
-using TeaSharp.Controls;
-using TeaSharp.Styles;
+using Tessera.Controls;
+using Tessera.Styles;
 
-var theme = TeaThemes.Catppuccin(CatppuccinVariant.Mocha);
+var theme = TesseraThemes.Catppuccin(CatppuccinVariant.Mocha);
 
 var kanban = new KanbanBoard().ApplyThemeDefaults(theme);
-kanban.BorderStyleText = TeaStyle.Empty.WithForeground(AnsiColor.BrightBlack);
-kanban.FocusedBorderStyleText = TeaStyle.Empty.WithBold().WithForeground(AnsiColor.BrightYellow);
+kanban.BorderStyleText = TesseraStyle.Empty.WithForeground(AnsiColor.BrightBlack);
+kanban.FocusedBorderStyleText = TesseraStyle.Empty.WithBold().WithForeground(AnsiColor.BrightYellow);
 
 var scheduler = new SchedulerTimeline().ApplyThemeDefaults(theme);
-scheduler.ConflictRowStyle = TeaStyle.Empty.WithBold().WithForeground(AnsiColor.BrightRed);
+scheduler.ConflictRowStyle = TesseraStyle.Empty.WithBold().WithForeground(AnsiColor.BrightRed);
 
 var query = new QueryBuilder().ApplyThemeDefaults(theme);
-query.ErrorRuleStyle = TeaStyle.Empty.WithBold().WithForeground(AnsiColor.BrightRed);
+query.ErrorRuleStyle = TesseraStyle.Empty.WithBold().WithForeground(AnsiColor.BrightRed);
 
 var richText = new RichTextView().ApplyThemeDefaults(theme);
-richText.InlineCodeStyle = TeaStyle.Empty.WithBackground(AnsiColor.BrightBlack).WithForeground(AnsiColor.BrightWhite);
+richText.InlineCodeStyle = TesseraStyle.Empty.WithBackground(AnsiColor.BrightBlack).WithForeground(AnsiColor.BrightWhite);
 ```
 
 ### Wave 3 Dev/Ops Theme Hooks
 
-`TeaThemeControlExtensions` includes explicit mappings for:
+`TesseraThemeControlExtensions` includes explicit mappings for:
 
 - `JsonTreeView`
 - `TraceViewer`
@@ -386,31 +386,31 @@ richText.InlineCodeStyle = TeaStyle.Empty.WithBackground(AnsiColor.BrightBlack).
 Bordered controls in this set (`JsonTreeView`, `TraceViewer`, `CommandOutput`, `LogTailPanel`, `TaskRunnerPanel`, `ActivityFeed`) map `BorderStyleText` and `FocusedBorderStyleText` to semantic border/focus tokens by default.
 
 ```csharp
-using TeaSharp.Controls;
-using TeaSharp.Styles;
+using Tessera.Controls;
+using Tessera.Styles;
 
-var theme = TeaThemes.RosePine(RosePineVariant.Main);
+var theme = TesseraThemes.RosePine(RosePineVariant.Main);
 
 var logs = new LogTailPanel().ApplyThemeDefaults(theme);
-logs.BorderStyleText = TeaStyle.Empty.WithForeground(AnsiColor.BrightBlack);
-logs.FocusedBorderStyleText = TeaStyle.Empty.WithBold().WithForeground(AnsiColor.BrightYellow);
+logs.BorderStyleText = TesseraStyle.Empty.WithForeground(AnsiColor.BrightBlack);
+logs.FocusedBorderStyleText = TesseraStyle.Empty.WithBold().WithForeground(AnsiColor.BrightYellow);
 
 var trace = new TraceViewer().ApplyThemeDefaults(theme);
-trace.WarningRowStyle = TeaStyle.Empty.WithBold().WithForeground(AnsiColor.BrightYellow);
+trace.WarningRowStyle = TesseraStyle.Empty.WithBold().WithForeground(AnsiColor.BrightYellow);
 
 var tasks = new TaskRunnerPanel().ApplyThemeDefaults(theme);
-tasks.FailedStatusStyle = TeaStyle.Empty.WithBold().WithForeground(AnsiColor.BrightRed);
+tasks.FailedStatusStyle = TesseraStyle.Empty.WithBold().WithForeground(AnsiColor.BrightRed);
 
 var inbox = new NotificationInbox().ApplyThemeDefaults(theme);
-inbox.PinnedItemStyle = TeaStyle.Empty.WithBold().WithForeground(AnsiColor.BrightCyan);
+inbox.PinnedItemStyle = TesseraStyle.Empty.WithBold().WithForeground(AnsiColor.BrightCyan);
 
 var help = new KeyBindingHelpDialog().ApplyThemeDefaults(theme);
-help.KeysStyle = TeaStyle.Empty.WithBold().WithForeground(AnsiColor.BrightWhite);
+help.KeysStyle = TesseraStyle.Empty.WithBold().WithForeground(AnsiColor.BrightWhite);
 ```
 
 ### Wave 4 Workspace + Visual Data Theme Hooks (Batch A + B)
 
-`TeaThemeControlExtensions.Workspace.cs` includes explicit mappings for:
+`TesseraThemeControlExtensions.Workspace.cs` includes explicit mappings for:
 
 - `DockWorkspace`
 - `PaneTabs`
@@ -423,31 +423,31 @@ help.KeysStyle = TeaStyle.Empty.WithBold().WithForeground(AnsiColor.BrightWhite)
 Bordered controls in this set (`DockWorkspace`, `PaneTabs`, `Heatmap`, `TreeMapChart`, `ProcessListView`) map `BorderStyleText` and `FocusedBorderStyleText` to semantic border/focus tokens by default.
 
 ```csharp
-using TeaSharp.Controls;
-using TeaSharp.Styles;
+using Tessera.Controls;
+using Tessera.Styles;
 
-var theme = TeaThemes.Catppuccin(CatppuccinVariant.Macchiato);
+var theme = TesseraThemes.Catppuccin(CatppuccinVariant.Macchiato);
 
 var workspace = new DockWorkspace().ApplyThemeDefaults(theme);
-workspace.FocusedPaneBorderStyleText = TeaStyle.Empty.WithBold().WithForeground(AnsiColor.BrightYellow);
+workspace.FocusedPaneBorderStyleText = TesseraStyle.Empty.WithBold().WithForeground(AnsiColor.BrightYellow);
 
 var tabs = new PaneTabs().ApplyThemeDefaults(theme);
-tabs.HoveredTabStyle = TeaStyle.Empty.WithUnderline().WithForeground(AnsiColor.BrightCyan);
+tabs.HoveredTabStyle = TesseraStyle.Empty.WithUnderline().WithForeground(AnsiColor.BrightCyan);
 
 var heatmap = new Heatmap().ApplyThemeDefaults(theme);
-heatmap.PeakCellStyle = TeaStyle.Empty.WithBold().WithForeground(AnsiColor.BrightGreen);
+heatmap.PeakCellStyle = TesseraStyle.Empty.WithBold().WithForeground(AnsiColor.BrightGreen);
 
 var processList = new ProcessListView().ApplyThemeDefaults(theme);
-processList.HeaderStyle = TeaStyle.Empty.WithBold().WithForeground(AnsiColor.BrightWhite);
+processList.HeaderStyle = TesseraStyle.Empty.WithBold().WithForeground(AnsiColor.BrightWhite);
 
 var terminal = new TerminalPanel().ApplyThemeDefaults(theme);
-terminal.StandardErrorStyle = TeaStyle.Empty.WithBold().WithForeground(AnsiColor.BrightRed);
+terminal.StandardErrorStyle = TesseraStyle.Empty.WithBold().WithForeground(AnsiColor.BrightRed);
 ```
 
 ### Dropdown and Tree Glyph Sets
 
 ```csharp
-using TeaSharp.Controls;
+using Tessera.Controls;
 
 var combo = new ComboBox
 {
@@ -463,7 +463,7 @@ var tree = new TreeView
 ### Search Results Glyph Set
 
 ```csharp
-using TeaSharp.Controls;
+using Tessera.Controls;
 
 var results = new SearchResultsView
 {
@@ -475,7 +475,7 @@ var results = new SearchResultsView
 ### Data Widget Marker and Separator APIs
 
 ```csharp
-using TeaSharp.Controls;
+using Tessera.Controls;
 
 var dataGrid = new DataGrid
 {
@@ -503,7 +503,7 @@ V1 ships with:
 - Rosé Pine variants (`Main`, `Moon`, `Dawn`)
 - custom user palette from strongly typed theme objects
 
-Palette selection is runtime-configurable and does not require app architecture patterns beyond `TeaApp` + `TeaRuntimeOptions`.
+Palette selection is runtime-configurable and does not require app architecture patterns beyond `TesseraApp` + `TesseraRuntimeOptions`.
 
 ## Override Hierarchy
 
@@ -529,30 +529,30 @@ Default policy for all controls:
 
 ## Implemented Extension Layout
 
-`TeaThemeControlExtensions` is split into domain partial files:
+`TesseraThemeControlExtensions` is split into domain partial files:
 
-- `TeaThemeControlExtensions.Basic.cs`
-- `TeaThemeControlExtensions.InputValue.cs`
-- `TeaThemeControlExtensions.Navigation.cs`
-- `TeaThemeControlExtensions.NavigationOverlay.cs`
-- `TeaThemeControlExtensions.NavigationPrimitives.cs`
-- `TeaThemeControlExtensions.DataAndFlow.cs`
-- `TeaThemeControlExtensions.ExplorerAndFeedback.cs`
-- `TeaThemeControlExtensions.RenderingTextUtilities.cs`
-- `TeaThemeControlExtensions.ModalAndCharts.cs`
-- `TeaThemeControlExtensions.Plotting.cs`
-- `TeaThemeControlExtensions.DevOpsAndWorkflows.cs`
-- `TeaThemeControlExtensions.Workspace.cs`
-- `TeaThemeControlExtensions.FormsAndShell.cs`
+- `TesseraThemeControlExtensions.Basic.cs`
+- `TesseraThemeControlExtensions.InputValue.cs`
+- `TesseraThemeControlExtensions.Navigation.cs`
+- `TesseraThemeControlExtensions.NavigationOverlay.cs`
+- `TesseraThemeControlExtensions.NavigationPrimitives.cs`
+- `TesseraThemeControlExtensions.DataAndFlow.cs`
+- `TesseraThemeControlExtensions.ExplorerAndFeedback.cs`
+- `TesseraThemeControlExtensions.RenderingTextUtilities.cs`
+- `TesseraThemeControlExtensions.ModalAndCharts.cs`
+- `TesseraThemeControlExtensions.Plotting.cs`
+- `TesseraThemeControlExtensions.DevOpsAndWorkflows.cs`
+- `TesseraThemeControlExtensions.Workspace.cs`
+- `TesseraThemeControlExtensions.FormsAndShell.cs`
 
 Mapped controls expose:
 
-- `ApplyTheme(TeaTheme theme)`
-- `ApplyThemeDefaults(TeaTheme theme)`
+- `ApplyTheme(TesseraTheme theme)`
+- `ApplyThemeDefaults(TesseraTheme theme)`
 - plotting mappings: `Sparkline`, `TelemetryChart`, `AreaPlot`, `ScatterPlot`, `Histogram`, `LinePlot`, `PlotPanel`
 - workspace mappings: `DockWorkspace`, `PaneTabs`, `PaletteEditor`, `Heatmap`, `TreeMapChart`, `TerminalPanel`, `ProcessListView`
 - app-shell/forms mappings: `Form`, `FieldSet`, `DataForm<TModel>`, `Wizard`, `SplitView`, `InspectorPanel`
-- overloads taking `TeaThemeOverrides`, `baseTheme`, and `TeaThemeVisualState`
+- overloads taking `TesseraThemeOverrides`, `baseTheme`, and `TesseraThemeVisualState`
 
 Input/value mapping coverage includes:
 
@@ -652,7 +652,7 @@ Acceptance criteria:
 - focus, hover, selection, disabled, and error styles are configurable
 - Catppuccin + Rosé Pine + custom palette can be applied without control-level rewiring
 - docs and examples demonstrate global theme selection and per-control override
-- `TeaSharp.Core.*` remains out of starter theming docs
+- `Tessera.Core.*` remains out of starter theming docs
 
 ## V1.1 Note
 

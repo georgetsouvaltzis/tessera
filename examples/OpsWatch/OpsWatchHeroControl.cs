@@ -1,9 +1,9 @@
-using TeaSharp.Components.Primitives;
-using TeaSharp.Controls;
-using TeaSharp.Layout;
-using TeaSharp.Styles;
+using Tessera.Components.Primitives;
+using Tessera.Controls;
+using Tessera.Layout;
+using Tessera.Styles;
 
-namespace TeaSharp.Examples.OpsWatch;
+namespace Tessera.Examples.OpsWatch;
 
 internal sealed class OpsWatchHeroControl : Control
 {
@@ -59,19 +59,19 @@ internal sealed class OpsWatchHeroControl : Control
 
     public Thickness Padding { get; set; } = Thickness.All(1);
 
-    public TeaStyle TitleStyle { get; set; } = TeaStyle.Empty;
+    public TesseraStyle TitleStyle { get; set; } = TesseraStyle.Empty;
 
-    public TeaStyle ClockStyle { get; set; } = TeaStyle.Empty;
+    public TesseraStyle ClockStyle { get; set; } = TesseraStyle.Empty;
 
-    public TeaStyle BadgeStyle { get; set; } = TeaStyle.Empty;
+    public TesseraStyle BadgeStyle { get; set; } = TesseraStyle.Empty;
 
-    public TeaStyle MetaStyle { get; set; } = TeaStyle.Empty;
+    public TesseraStyle MetaStyle { get; set; } = TesseraStyle.Empty;
 
-    public TeaStyle CommandStyle { get; set; } = TeaStyle.Empty;
+    public TesseraStyle CommandStyle { get; set; } = TesseraStyle.Empty;
 
-    public TeaStyle BorderStyleText { get; set; } = TeaStyle.Empty;
+    public TesseraStyle BorderStyleText { get; set; } = TesseraStyle.Empty;
 
-    public TeaStyle FocusedBorderStyleText { get; set; } = TeaStyle.Empty;
+    public TesseraStyle FocusedBorderStyleText { get; set; } = TesseraStyle.Empty;
 
     public override void Render(Canvas canvas, Rect rect)
     {
@@ -104,7 +104,7 @@ internal sealed class OpsWatchHeroControl : Control
         canvas.WriteText(content.X, content.Y + row, text, content.Width);
     }
 
-    private TeaStyle ResolveBorderStyle()
+    private TesseraStyle ResolveBorderStyle()
     {
         var style = BorderStyleText;
         if (IsFocused)
@@ -115,7 +115,7 @@ internal sealed class OpsWatchHeroControl : Control
         return style;
     }
 
-    private static string ApplyStyle(string text, TeaStyle style)
+    private static string ApplyStyle(string text, TesseraStyle style)
     {
         return string.IsNullOrEmpty(text) || style.IsEmpty ? text : style.Render(text);
     }

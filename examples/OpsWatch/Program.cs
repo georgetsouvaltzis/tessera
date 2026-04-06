@@ -1,8 +1,8 @@
-using TeaSharp;
-using TeaSharp.Controls;
-using TeaSharp.Examples.OpsWatch;
+using Tessera;
+using Tessera.Controls;
+using Tessera.Examples.OpsWatch;
 
-var app = Tea.CreateBuilder()
+var app = TesseraApplication.CreateBuilder()
     .UseApp<OpsWatchApp>()
     .ConfigureRuntime(static runtime =>
     {
@@ -11,7 +11,7 @@ var app = Tea.CreateBuilder()
         runtime.Screen = new ScreenOptions
         {
             AltScreen = true,
-            WindowTitle = "TeaSharp OpsWatch",
+            WindowTitle = "Tessera OpsWatch",
             EnableFocusReporting = true,
             EnableBracketedPaste = true,
             MouseTracking = MouseTrackingMode.AllMotion,

@@ -1,49 +1,49 @@
-using TeaSharp.Styles;
+using Tessera.Styles;
 
-namespace TeaSharp.Examples.WorkspaceApp;
+namespace Tessera.Examples.WorkspaceApp;
 
 internal static class WorkspaceTheme
 {
-    public static TeaTheme Default => new()
+    public static TesseraTheme Default => new()
     {
-        Text = new TeaThemeTextTokens
+        Text = new TesseraThemeTextTokens
         {
             Primary = Foreground(0xEEF7FF),
             Secondary = Foreground(0xAFC4DE),
             Muted = Foreground(0x67829E),
             Inverse = Foreground(0x0A1320),
         },
-        Surface = new TeaThemeSurfaceTokens
+        Surface = new TesseraThemeSurfaceTokens
         {
             Base = Background(0x09111C),
             Panel = Background(0x101C2C),
             Overlay = Background(0x16263C),
         },
-        Border = new TeaThemeBorderTokens
+        Border = new TesseraThemeBorderTokens
         {
             Default = Foreground(0x345A82),
             Strong = Foreground(0x5F92D1),
             Focused = Foreground(0x7DE3FF).WithBold(),
             Error = Foreground(0xFF8D74).WithBold(),
         },
-        State = new TeaThemeStateTokens
+        State = new TesseraThemeStateTokens
         {
             Success = Foreground(0x86F4B5).WithBold(),
             Warning = Foreground(0xFFD46B).WithBold(),
             Error = Foreground(0xFF8D74).WithBold(),
             Info = Foreground(0x7DE3FF).WithBold(),
         },
-        Accent = new TeaThemeAccentTokens
+        Accent = new TesseraThemeAccentTokens
         {
             Primary = Foreground(0x7DE3FF).WithBold(),
             Secondary = Foreground(0xFFD46B).WithBold(),
         },
-        Selection = new TeaThemeSelectionTokens
+        Selection = new TesseraThemeSelectionTokens
         {
             Background = Background(0x244566),
             Foreground = Foreground(0xF7FBFF).WithBold(),
         },
-        Focus = new TeaThemeFocusTokens
+        Focus = new TesseraThemeFocusTokens
         {
             Ring = Foreground(0xFFD46B).WithBold(),
             Title = Foreground(0xFFD46B).WithBold(),
@@ -52,11 +52,11 @@ internal static class WorkspaceTheme
         },
     };
 
-    public static TeaStyle Foreground(int rgb) => TeaStyle.Empty.WithForeground(Hex(rgb));
+    public static TesseraStyle Foreground(int rgb) => TesseraStyle.Empty.WithForeground(Hex(rgb));
 
-    public static TeaStyle Background(int rgb) => TeaStyle.Empty.WithBackground(Hex(rgb));
+    public static TesseraStyle Background(int rgb) => TesseraStyle.Empty.WithBackground(Hex(rgb));
 
-    public static TeaStyle Surface(int foregroundRgb, int backgroundRgb)
+    public static TesseraStyle Surface(int foregroundRgb, int backgroundRgb)
         => Foreground(foregroundRgb).Merge(Background(backgroundRgb));
 
     private static AnsiColor Hex(int rgb)

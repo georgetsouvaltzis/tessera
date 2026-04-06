@@ -1,6 +1,6 @@
-# Contributing To TeaSharp
+# Contributing To Tessera
 
-TeaSharp is developed in public. Contributions are welcome, but this repo is still in alpha and we will prefer API clarity over compatibility when necessary.
+Tessera is developed in public. Contributions are welcome, but this repo is still in alpha and we will prefer API clarity over compatibility when necessary.
 
 Release-facing changes should also be reflected in [CHANGELOG.md](CHANGELOG.md).
 
@@ -19,10 +19,10 @@ Release-facing changes should also be reflected in [CHANGELOG.md](CHANGELOG.md).
 
 ## Repo Layout
 
-- `src/TeaSharp`: default public API
-- `src/TeaSharp.Core`: advanced runtime internals
-- `tests/TeaSharp.Tests`: unit, regression, and contract tests
-- `tests/TeaSharp.IntegrationTests`: integration/runtime coverage
+- `src/Tessera`: default public API
+- `src/Tessera.Core`: advanced runtime internals
+- `tests/Tessera.Tests`: unit, regression, and contract tests
+- `tests/Tessera.IntegrationTests`: integration/runtime coverage
 - `examples`: public examples and showcase apps
 - `docs`: product and contributor docs
 
@@ -31,9 +31,9 @@ Release-facing changes should also be reflected in [CHANGELOG.md](CHANGELOG.md).
 Before asking for review, run:
 
 ```bash
-dotnet build TeaSharp.slnx
-dotnet build examples/TeaSharp.Examples.slnx
-dotnet test TeaSharp.slnx
+dotnet build Tessera.slnx
+dotnet build examples/Tessera.Examples.slnx
+dotnet test Tessera.slnx
 dotnet run --project examples/DataWorkbench/DataWorkbench.csproj --no-build
 dotnet run --project examples/OpsWatch/OpsWatch.csproj --no-build
 dotnet run --project examples/GitConsole/GitConsole.csproj --no-build
@@ -45,8 +45,8 @@ If your change touches perf-sensitive code or release-track behavior, also follo
 
 - fix root causes, not temporary patches
 - add regression tests when fixing bugs
-- keep the default public path in `TeaSharp`, `TeaSharp.Controls`, `TeaSharp.Layout`, and `TeaSharp.Styles`
-- do not move onboarding toward `TeaSharp.Core`
+- keep the default public path in `Tessera`, `Tessera.Controls`, `Tessera.Layout`, and `Tessera.Styles`
+- do not move onboarding toward `Tessera.Core`
 - update docs when public behavior or public examples change
 - use conventional commits when maintainers ask for commit-ready slices
 

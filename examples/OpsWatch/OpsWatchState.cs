@@ -1,7 +1,7 @@
 using System.Globalization;
-using TeaSharp.Controls;
+using Tessera.Controls;
 
-namespace TeaSharp.Examples.OpsWatch;
+namespace Tessera.Examples.OpsWatch;
 
 internal enum OpsWatchAction
 {

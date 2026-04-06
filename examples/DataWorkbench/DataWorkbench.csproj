@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\TeaSharp\TeaSharp.csproj" />
+    <ProjectReference Include="..\..\src\Tessera\Tessera.csproj" />
   </ItemGroup>
 
   <PropertyGroup>

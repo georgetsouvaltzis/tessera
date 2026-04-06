@@ -7,6 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\TeaSharp\TeaSharp.csproj" />
+    <ProjectReference Include="..\..\src\Tessera\Tessera.csproj" />
   </ItemGroup>
 </Project>

@@ -29,12 +29,12 @@ const items = [
 
 export default function ShowcasePage() {
   return (
-    <Layout title="Showcase" description="Representative TeaSharp examples and workflows.">
+    <Layout title="Showcase" description="Representative Tessera examples and workflows.">
       <main className={styles.page}>
         <div className={styles.shell}>
           <header className={styles.header}>
             <p className={styles.kicker}>Showcase</p>
-            <Heading as="h1">Representative TeaSharp workflows</Heading>
+            <Heading as="h1">Representative Tessera workflows</Heading>
             <p>
               The starter site keeps the showcase curated: a few examples that demonstrate layout depth, control polish, and operator-oriented UX.
             </p>

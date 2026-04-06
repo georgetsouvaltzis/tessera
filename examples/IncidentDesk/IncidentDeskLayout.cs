@@ -1,6 +1,6 @@
-using TeaSharp.Layout;
+using Tessera.Layout;
 
-namespace TeaSharp.Examples.IncidentDesk;
+namespace Tessera.Examples.IncidentDesk;
 
 internal sealed partial class IncidentDeskApp
 {

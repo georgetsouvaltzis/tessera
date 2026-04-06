@@ -1,9 +1,9 @@
-using TeaSharp;
-using TeaSharp.Controls;
+using Tessera;
+using Tessera.Controls;
 
-using TeaSharp.Examples.GitConsole;
+using Tessera.Examples.GitConsole;
 
-var app = Tea.CreateBuilder()
+var app = TesseraApplication.CreateBuilder()
     .UseApp<GitConsoleApp>()
     .ConfigureRuntime(static runtime =>
     {
@@ -12,7 +12,7 @@ var app = Tea.CreateBuilder()
         runtime.Screen = new ScreenOptions
         {
             AltScreen = true,
-            WindowTitle = "TeaSharp GitConsole",
+            WindowTitle = "Tessera GitConsole",
             EnableFocusReporting = true,
             EnableBracketedPaste = true,
             MouseTracking = MouseTrackingMode.AllMotion,

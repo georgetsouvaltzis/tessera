@@ -1,7 +1,7 @@
 using System.Globalization;
-using TeaSharp.Controls;
+using Tessera.Controls;
 
-namespace TeaSharp.Examples.DownloadCenter;
+namespace Tessera.Examples.DownloadCenter;
 
 internal enum DownloadCenterAction
 {

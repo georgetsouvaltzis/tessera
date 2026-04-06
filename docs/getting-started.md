@@ -1,8 +1,8 @@
-# Getting Started With TeaSharp
+# Getting Started With Tessera
 
-This guide is the default onboarding path for TeaSharp public alpha.
+This guide is the default onboarding path for Tessera public alpha.
 
-If you are evaluating TeaSharp for a product, follow this order:
+If you are evaluating Tessera for a product, follow this order:
 
 1. read the quick-start snippet in [README.md](../README.md)
 2. run `HelloWorld`
@@ -21,25 +21,25 @@ If you are evaluating TeaSharp for a product, follow this order:
   - Windows Terminal
   - macOS Terminal
 
-TeaSharp is a library-first framework. You do not need ASP.NET hosting, dependency injection, or Generic Host wiring for the normal app path.
+Tessera is a library-first framework. You do not need ASP.NET hosting, dependency injection, or Generic Host wiring for the normal app path.
 
 ## The Public App Model
 
 The public path is intentionally small:
 
-1. derive from `TeaApp`
+1. derive from `TesseraApp`
 2. build screens with `Screen.Build(...)`
-3. use controls from `TeaSharp.Controls`
-4. use layouts from `TeaSharp.Layout`
+3. use controls from `Tessera.Controls`
+4. use layouts from `Tessera.Layout`
 5. handle domain/runtime messages in `Update(Message)`
-6. run with `Tea.RunAsync(...)` or `Tea.CreateBuilder()`
+6. run with `TesseraApplication.RunAsync(...)` or `TesseraApplication.CreateBuilder()`
 
 Preferred imports:
 
 ```csharp
-using TeaSharp;
-using TeaSharp.Controls;
-using TeaSharp.Layout;
+using Tessera;
+using Tessera.Controls;
+using Tessera.Layout;
 ```
 
 ## Choose Your First Example
@@ -48,7 +48,7 @@ Recommended learning order:
 
 1. `examples/HelloWorld`
    - smallest visual starter
-   - teaches the basic `TeaApp` loop, centered layout, button events, and status text
+   - teaches the basic `TesseraApp` loop, centered layout, button events, and status text
 2. `examples/CounterForm`
    - first interactive app
    - teaches text input, numeric input, choice, progress, and message-driven updates

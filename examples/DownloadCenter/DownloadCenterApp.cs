@@ -1,12 +1,12 @@
-using TeaSharp.Controls;
-using TeaSharp.Layout;
-using TeaSharp.Styles;
+using Tessera.Controls;
+using Tessera.Layout;
+using Tessera.Styles;
 
-namespace TeaSharp.Examples.DownloadCenter;
+namespace Tessera.Examples.DownloadCenter;
 
-internal sealed partial class DownloadCenterApp : TeaApp
+internal sealed partial class DownloadCenterApp : TesseraApp
 {
-    private readonly TeaTheme _theme = DownloadCenterTheme.Default;
+    private readonly TesseraTheme _theme = DownloadCenterTheme.Default;
     private readonly DownloadCenterState _state = DownloadCenterState.CreateSeed();
 
     private readonly DownloadHeroControl _hero = new() { Border = BorderStyle.Rounded, Padding = Thickness.Symmetric(1, 0) };
@@ -33,10 +33,10 @@ internal sealed partial class DownloadCenterApp : TeaApp
         SeedControls();
     }
 
-    public override TeaEffect? Initialize() =>
-        TeaEffects.Periodic(TimeSpan.FromMilliseconds(900), _ => new DownloadCenterTickMessage());
+    public override TesseraEffect? Initialize() =>
+        TesseraEffects.Periodic(TimeSpan.FromMilliseconds(900), _ => new DownloadCenterTickMessage());
 
-    public override TeaEffect? Update(Message message)
+    public override TesseraEffect? Update(Message message)
     {
         switch (message)
         {
@@ -66,11 +66,11 @@ internal sealed partial class DownloadCenterApp : TeaApp
         });
     }
 
-    private TeaEffect? HandleKey(KeyPressed key)
+    private TesseraEffect? HandleKey(KeyPressed key)
     {
         if (key.IsCharacter('c', ModifierKeys.Ctrl))
         {
-            return TeaEffects.Quit;
+            return TesseraEffects.Quit;
         }
 
         if (key.Is(Key.Up) || key.IsCharacter('k'))
@@ -242,7 +242,7 @@ internal sealed partial class DownloadCenterApp : TeaApp
         _footer.FillStyle = _theme.Surface.Panel;
     }
 
-    private static void ConfigurePulse(StatsCard card, TeaStyle valueStyle)
+    private static void ConfigurePulse(StatsCard card, TesseraStyle valueStyle)
     {
         card.TitleStyle = DownloadCenterTheme.Foreground(0xA5B4D4).WithBold();
         card.ValueStyle = valueStyle;
@@ -250,7 +250,7 @@ internal sealed partial class DownloadCenterApp : TeaApp
         card.BorderStyleText = DownloadCenterTheme.Foreground(0x34517B);
     }
 
-    private static void ConfigureTelemetry(TelemetryChart chart, TeaStyle fillStyle, string legend)
+    private static void ConfigureTelemetry(TelemetryChart chart, TesseraStyle fillStyle, string legend)
     {
         chart.Options = new TelemetryChartOptions(ShowStats: true, Legend: legend, RenderMode: TelemetryChartRenderMode.Braille);
         chart.TitleStyle = DownloadCenterTheme.Foreground(0xA5B4D4).WithBold();

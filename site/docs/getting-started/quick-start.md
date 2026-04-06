@@ -2,14 +2,14 @@
 title: Quick Start
 ---
 
-This is the shortest practical TeaSharp app: one app type, one button, one status bar.
+This is the shortest practical Tessera app: one app type, one button, one status bar.
 
 ```csharp
-using TeaSharp;
-using TeaSharp.Controls;
-using TeaSharp.Layout;
+using Tessera;
+using Tessera.Controls;
+using Tessera.Layout;
 
-var app = Tea.CreateBuilder()
+var app = Tessera.CreateBuilder()
     .UseApp<CounterApp>()
     .ConfigureRuntime(static runtime =>
     {
@@ -24,7 +24,7 @@ var app = Tea.CreateBuilder()
 
 await app.RunAsync();
 
-internal sealed class CounterApp : TeaApp
+internal sealed class CounterApp : TesseraApp
 {
     private int _count;
     private readonly Button _increment = new() { Text = "Increment" };
@@ -32,9 +32,9 @@ internal sealed class CounterApp : TeaApp
 
     public CounterApp() => _increment.Activated += (_, _) => _count++;
 
-    public override TeaEffect? Update(Message message)
+    public override TesseraEffect? Update(Message message)
         => message is KeyPressed key && key.IsCharacter('c', ModifierKeys.Ctrl)
-            ? TeaEffects.Quit
+            ? TesseraEffects.Quit
             : null;
 
     public override Screen Build(ScreenContext context)
@@ -54,10 +54,10 @@ internal sealed class CounterApp : TeaApp
 
 ## What this shows
 
-- `Tea.CreateBuilder()` for configured startup
-- `TeaApp` as the default app model
+- `Tessera.CreateBuilder()` for configured startup
+- `TesseraApp` as the default app model
 - `Update(...)` for hotkeys and runtime messages
 - `Screen.Build(...)` for layout
-- `TeaSharp.Controls` for built-in UI
+- `Tessera.Controls` for built-in UI
 
 Next: read the app model and then apply theming.

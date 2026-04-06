@@ -1,8 +1,8 @@
-using TeaSharp.Components.Primitives;
-using TeaSharp.Controls;
-using TeaSharp.Styles;
+using Tessera.Components.Primitives;
+using Tessera.Controls;
+using Tessera.Styles;
 
-namespace TeaSharp.Examples.TransitBoard;
+namespace Tessera.Examples.TransitBoard;
 
 internal sealed class TransitHeroControl : Control
 {
@@ -11,12 +11,12 @@ internal sealed class TransitHeroControl : Control
     public string SummaryText { get; set; } = string.Empty;
     public string AdvisoryText { get; set; } = string.Empty;
     public string NoticeText { get; set; } = string.Empty;
-    public TeaStyle TitleStyle { get; set; } = TeaStyle.Empty;
-    public TeaStyle ClockStyle { get; set; } = TeaStyle.Empty;
-    public TeaStyle SummaryStyle { get; set; } = TeaStyle.Empty;
-    public TeaStyle AdvisoryStyle { get; set; } = TeaStyle.Empty;
-    public TeaStyle NoticeStyle { get; set; } = TeaStyle.Empty;
-    public TeaStyle DividerStyle { get; set; } = TeaStyle.Empty;
+    public TesseraStyle TitleStyle { get; set; } = TesseraStyle.Empty;
+    public TesseraStyle ClockStyle { get; set; } = TesseraStyle.Empty;
+    public TesseraStyle SummaryStyle { get; set; } = TesseraStyle.Empty;
+    public TesseraStyle AdvisoryStyle { get; set; } = TesseraStyle.Empty;
+    public TesseraStyle NoticeStyle { get; set; } = TesseraStyle.Empty;
+    public TesseraStyle DividerStyle { get; set; } = TesseraStyle.Empty;
 
     public override void Render(Canvas canvas, Rect rect)
     {
@@ -47,5 +47,5 @@ internal sealed class TransitHeroControl : Control
         canvas.WriteText(rect.X, rect.Y + row, text, rect.Width);
     }
 
-    private static string Render(TeaStyle style, string text) => style.IsEmpty ? text : style.Render(text);
+    private static string Render(TesseraStyle style, string text) => style.IsEmpty ? text : style.Render(text);
 }

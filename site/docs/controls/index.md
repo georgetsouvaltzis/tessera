@@ -4,7 +4,7 @@ title: Control Catalog
 slug: /controls
 ---
 
-TeaSharp has a broad built-in control surface. The public site groups controls by job instead of exposing one flat inventory first.
+Tessera has a broad built-in control surface. The public site groups controls by job instead of exposing one flat inventory first.
 
 ## Families
 

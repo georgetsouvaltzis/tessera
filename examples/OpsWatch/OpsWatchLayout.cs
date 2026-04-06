@@ -1,6 +1,6 @@
-using TeaSharp.Layout;
+using Tessera.Layout;
 
-namespace TeaSharp.Examples.OpsWatch;
+namespace Tessera.Examples.OpsWatch;
 
 internal sealed partial class OpsWatchApp
 {

@@ -1,10 +1,10 @@
-using TeaSharp.Controls;
-using TeaSharp.Layout;
-using TeaSharp.Styles;
+using Tessera.Controls;
+using Tessera.Layout;
+using Tessera.Styles;
 
-namespace TeaSharp.Examples.HelloWorld;
+namespace Tessera.Examples.HelloWorld;
 
-internal sealed class HelloWorldApp : TeaApp
+internal sealed class HelloWorldApp : TesseraApp
 {
     private readonly Label _eyebrow = new() { Border = BorderStyle.None, HorizontalAlignment = HorizontalAlignment.Center };
     private readonly Label _headline = new() { Border = BorderStyle.None, HorizontalAlignment = HorizontalAlignment.Center };
@@ -30,7 +30,7 @@ internal sealed class HelloWorldApp : TeaApp
         _incrementButton.RequestFocus();
     }
 
-    public override TeaEffect? Update(Message message)
+    public override TesseraEffect? Update(Message message)
     {
         if (message is not KeyPressed key)
         {
@@ -39,7 +39,7 @@ internal sealed class HelloWorldApp : TeaApp
 
         if (key.IsCharacter('c', ModifierKeys.Ctrl))
         {
-            return TeaEffects.Quit;
+            return TesseraEffects.Quit;
         }
 
         if (key.Is(Key.Tab))
@@ -155,7 +155,7 @@ internal sealed class HelloWorldApp : TeaApp
         _runtimeChip.Text = "  click ready  ";
         _countChip.Text = $"   {_count:D2} sparks in orbit   ";
         _hint.Text = "Tab moves focus  |  Enter activates  |  + increments  |  0 resets";
-        _footer.LeftText = "TeaSharp HelloWorld";
+        _footer.LeftText = "Tessera HelloWorld";
         _footer.RightText = "Start here, then open CounterForm";
     }
 }

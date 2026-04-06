@@ -1,20 +1,20 @@
 using System.Globalization;
-using TeaSharp.Components.Primitives;
-using TeaSharp.Controls;
-using TeaSharp.Styles;
+using Tessera.Components.Primitives;
+using Tessera.Controls;
+using Tessera.Styles;
 
-namespace TeaSharp.Examples.TransitBoard;
+namespace Tessera.Examples.TransitBoard;
 
 internal sealed class TransitJourneyControl : Control
 {
     public string Title { get; set; } = "Service Path";
     public TransitService? Service { get; set; }
-    public TeaStyle TitleStyle { get; set; } = TeaStyle.Empty;
-    public TeaStyle DividerStyle { get; set; } = TeaStyle.Empty;
-    public TeaStyle PrimaryStyle { get; set; } = TeaStyle.Empty;
-    public TeaStyle SecondaryStyle { get; set; } = TeaStyle.Empty;
-    public TeaStyle AccentStyle { get; set; } = TeaStyle.Empty;
-    public TeaStyle MutedStyle { get; set; } = TeaStyle.Empty;
+    public TesseraStyle TitleStyle { get; set; } = TesseraStyle.Empty;
+    public TesseraStyle DividerStyle { get; set; } = TesseraStyle.Empty;
+    public TesseraStyle PrimaryStyle { get; set; } = TesseraStyle.Empty;
+    public TesseraStyle SecondaryStyle { get; set; } = TesseraStyle.Empty;
+    public TesseraStyle AccentStyle { get; set; } = TesseraStyle.Empty;
+    public TesseraStyle MutedStyle { get; set; } = TesseraStyle.Empty;
 
     public override void Render(Canvas canvas, Rect rect)
     {
@@ -53,5 +53,5 @@ internal sealed class TransitJourneyControl : Control
         }
     }
 
-    private static string Render(TeaStyle style, string text) => style.IsEmpty ? text : style.Render(text);
+    private static string Render(TesseraStyle style, string text) => style.IsEmpty ? text : style.Render(text);
 }

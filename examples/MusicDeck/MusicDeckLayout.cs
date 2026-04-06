@@ -1,6 +1,6 @@
-using TeaSharp.Layout;
+using Tessera.Layout;
 
-namespace TeaSharp.Examples.MusicDeck;
+namespace Tessera.Examples.MusicDeck;
 
 internal sealed partial class MusicDeckApp
 {

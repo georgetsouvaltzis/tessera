@@ -1,10 +1,10 @@
-using TeaSharp.Controls;
-using TeaSharp.Layout;
-using TeaSharp.Styles;
+using Tessera.Controls;
+using Tessera.Layout;
+using Tessera.Styles;
 
-namespace TeaSharp.Examples.DataWorkbench;
+namespace Tessera.Examples.DataWorkbench;
 
-internal sealed partial class DataWorkbenchApp : TeaApp
+internal sealed partial class DataWorkbenchApp : TesseraApp
 {
     private DataWorkbenchPalette _palette = DataWorkbenchTheme.Default;
     private readonly DataWorkbenchState _state = DataWorkbenchState.CreateSeed();
@@ -62,10 +62,10 @@ internal sealed partial class DataWorkbenchApp : TeaApp
         _results.RequestFocus();
     }
 
-    public override TeaEffect? Initialize() =>
-        TeaEffects.Periodic(TimeSpan.FromMilliseconds(1400), _ => new DataWorkbenchTickMessage());
+    public override TesseraEffect? Initialize() =>
+        TesseraEffects.Periodic(TimeSpan.FromMilliseconds(1400), _ => new DataWorkbenchTickMessage());
 
-    public override TeaEffect? Update(Message message)
+    public override TesseraEffect? Update(Message message)
     {
         switch (message)
         {
@@ -101,11 +101,11 @@ internal sealed partial class DataWorkbenchApp : TeaApp
         });
     }
 
-    private TeaEffect? HandleKey(KeyPressed key)
+    private TesseraEffect? HandleKey(KeyPressed key)
     {
         if (key.IsCharacter('c', ModifierKeys.Ctrl))
         {
-            return TeaEffects.Quit;
+            return TesseraEffects.Quit;
         }
 
         if (key.Is(Key.F1))

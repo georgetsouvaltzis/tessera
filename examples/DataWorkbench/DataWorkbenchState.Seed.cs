@@ -1,7 +1,7 @@
 using System.Text.Json;
-using TeaSharp.Controls;
+using Tessera.Controls;
 
-namespace TeaSharp.Examples.DataWorkbench;
+namespace Tessera.Examples.DataWorkbench;
 
 internal sealed partial class DataWorkbenchState
 {

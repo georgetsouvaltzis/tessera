@@ -1,10 +1,10 @@
-using TeaSharp.Controls;
-using TeaSharp.Layout;
-using TeaSharp.Styles;
+using Tessera.Controls;
+using Tessera.Layout;
+using Tessera.Styles;
 
-namespace TeaSharp.Examples.MusicDeck;
+namespace Tessera.Examples.MusicDeck;
 
-internal sealed partial class MusicDeckApp : TeaApp
+internal sealed partial class MusicDeckApp : TesseraApp
 {
     private readonly MusicDeckState _state = MusicDeckState.CreateSeed();
     private readonly MusicDeckNowPlayingControl _nowPlaying = new() { Border = BorderStyle.Rounded, Padding = Thickness.All(1) };
@@ -29,9 +29,9 @@ internal sealed partial class MusicDeckApp : TeaApp
         _queue.RequestFocus();
     }
 
-    public override TeaEffect? Initialize() => TeaEffects.Periodic(TimeSpan.FromMilliseconds(1000), _ => new MusicDeckTickMessage());
+    public override TesseraEffect? Initialize() => TesseraEffects.Periodic(TimeSpan.FromMilliseconds(1000), _ => new MusicDeckTickMessage());
 
-    public override TeaEffect? Update(Message message)
+    public override TesseraEffect? Update(Message message)
     {
         switch (message)
         {
@@ -57,11 +57,11 @@ internal sealed partial class MusicDeckApp : TeaApp
         });
     }
 
-    private TeaEffect? HandleKey(KeyPressed key)
+    private TesseraEffect? HandleKey(KeyPressed key)
     {
         if (key.IsCharacter('c', ModifierKeys.Ctrl))
         {
-            return TeaEffects.Quit;
+            return TesseraEffects.Quit;
         }
 
         if (key.Is(Key.F1))
@@ -229,7 +229,7 @@ internal sealed partial class MusicDeckApp : TeaApp
         button.PressedSurfaceStyle = MusicDeckTheme.Background(0x4A2D3A);
     }
 
-    private static void ConfigureCard(StatsCard card, TeaStyle valueStyle)
+    private static void ConfigureCard(StatsCard card, TesseraStyle valueStyle)
     {
         card.TitleStyle = MusicDeckTheme.DefaultTheme.Text.Secondary.WithBold();
         card.ValueStyle = valueStyle;

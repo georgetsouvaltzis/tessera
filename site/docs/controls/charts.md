@@ -14,4 +14,4 @@ Charting controls:
 - `Heatmap`
 - `TreeMapChart`
 
-TeaSharp charts are built for dashboards and operator workflows, not just decorative output.
+Tessera charts are built for dashboards and operator workflows, not just decorative output.

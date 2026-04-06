@@ -8,19 +8,19 @@
 - Execute work in strict phase order from `alpha-release-checklist.md`: correctness -> API simplification -> visual polish -> expansion/perf/docs freeze.
 
 ## Project Structure
-- `src/TeaSharp`: default public app-authoring API.
-- `src/TeaSharp.Core`: advanced low-level runtime layer, supported but not onboarding-first.
-- `tests/TeaSharp.Tests`: unit/contract/regression tests.
-- `tests/TeaSharp.IntegrationTests`: runtime/integration flows.
+- `src/Tessera`: default public app-authoring API.
+- `src/Tessera.Core`: advanced low-level runtime layer, supported but not onboarding-first.
+- `tests/Tessera.Tests`: unit/contract/regression tests.
+- `tests/Tessera.IntegrationTests`: runtime/integration flows.
 - `examples/HelloWorld`, `examples/CounterForm`, `examples/WorkspaceApp`: canonical onboarding progression.
 - `examples/DataWorkbench`, `examples/OpsWatch`, `examples/GitConsole`: flagship public evaluation path.
 - `examples/IncidentDesk`, `examples/DownloadCenter`, `examples/TransitBoard`, `examples/MusicDeck`: supporting domain demos.
 
 ## Public API Boundaries
 - Public app path is library-first and no-DI by default.
-- Keep starter guidance in `TeaSharp`, `TeaSharp.Controls`, and `TeaSharp.Layout`.
-- Do not leak `TeaSharp.Core.*` into onboarding examples/docs.
-- Advanced hosting/runtime seams stay under `TeaSharp.Hosting`/advanced docs.
+- Keep starter guidance in `Tessera`, `Tessera.Controls`, and `Tessera.Layout`.
+- Do not leak `Tessera.Core.*` into onboarding examples/docs.
+- Advanced hosting/runtime seams stay under `Tessera.Hosting`/advanced docs.
 
 ## Styling/Theming Direction
 - Theme and style are first-class Public V1 concerns.
@@ -38,9 +38,9 @@
 ## Build/Test Commands
 Use .NET 10 from `global.json`.
 
-- `dotnet build TeaSharp.slnx`
-- `dotnet build examples/TeaSharp.Examples.slnx`
-- `dotnet test TeaSharp.slnx`
+- `dotnet build Tessera.slnx`
+- `dotnet build examples/Tessera.Examples.slnx`
+- `dotnet test Tessera.slnx`
 - `dotnet run --project examples/HelloWorld`
 - `dotnet run --project examples/CounterForm`
 - `dotnet run --project examples/WorkspaceApp`

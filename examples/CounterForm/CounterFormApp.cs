@@ -1,10 +1,10 @@
-using TeaSharp.Controls;
-using TeaSharp.Layout;
-using TeaSharp.Styles;
+using Tessera.Controls;
+using Tessera.Layout;
+using Tessera.Styles;
 
-namespace TeaSharp.Examples.CounterForm;
+namespace Tessera.Examples.CounterForm;
 
-internal sealed class CounterFormApp : TeaApp
+internal sealed class CounterFormApp : TesseraApp
 {
     private readonly Label _eyebrow = new() { Border = BorderStyle.None, HorizontalAlignment = HorizontalAlignment.Center };
     private readonly Label _headline = new() { Border = BorderStyle.None, HorizontalAlignment = HorizontalAlignment.Center };
@@ -39,12 +39,12 @@ internal sealed class CounterFormApp : TeaApp
         _labelInput.RequestFocus();
     }
 
-    public override TeaEffect? Update(Message message)
+    public override TesseraEffect? Update(Message message)
     {
         switch (message)
         {
             case KeyPressed key when key.IsCharacter('c', ModifierKeys.Ctrl):
-                return TeaEffects.Quit;
+                return TesseraEffects.Quit;
             case KeyPressed key when key.Is(Key.Tab):
                 FocusNext();
                 return null;

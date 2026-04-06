@@ -1,4 +1,4 @@
-# TeaSharp Widget Roadmap
+# Tessera Widget Roadmap
 
 This roadmap expands the widget catalog by **+34 additional widgets** in delivery waves, keeping the public C# API cohesive and theme-first.
 
@@ -16,7 +16,7 @@ Each widget in this roadmap must implement the same minimum visual contract from
 - hover/focus/selected behavior: visually distinct in both color and monochrome terminals; `Focus` must not be hidden by `Hover`
 - glyph hooks: widget-specific glyph set properties (no hardcoded glyph literals in render path)
 - override layers: global theme -> control type defaults -> instance overrides -> state overrides
-- API shape: explicit C# properties/events; no `TeaSharp.Core.*` leakage in default authoring path
+- API shape: explicit C# properties/events; no `Tessera.Core.*` leakage in default authoring path
 
 ## Delivery Waves (+34 Widgets)
 
@@ -100,7 +100,7 @@ Wave 3 integration status (current lane):
 Wave 4 integration status (batch A + B):
 
 - Shipped and integrated: `DockWorkspace`, `PaneTabs`, `PaletteEditor`, `Heatmap`, `TreeMapChart`, `TerminalPanel`, `ProcessListView`.
-- Theme extension domain file `TeaThemeControlExtensions.Workspace.cs` is active for Wave 4 workspace/visual-data mappings.
+- Theme extension domain file `TesseraThemeControlExtensions.Workspace.cs` is active for Wave 4 workspace/visual-data mappings.
 - Remaining Wave 4 backlog: none (`Sparkline` already shipped in plotting baseline).
 
 ## Shipped Plotting Baseline (Current V1 Track)
@@ -237,7 +237,7 @@ Landed controls from the expansion tranche:
 | `BoxPlot` | `6ae3c5b`, `03c7a43` | implemented; deterministic render/style tests present in `BoxPlotControlTests`; included in passing targeted suite |
 
 Targeted verification command (current host):  
-`dotnet test tests/TeaSharp.Tests --no-restore --nologo --filter "DashboardGrid|QuickOpenOverlay|BulletChart|ResizablePaneGroup|SideNavRail|TokenEditor|HealthBoard|JumpList|AutocompleteInput|BoxPlot"` -> pass (48/48).
+`dotnet test tests/Tessera.Tests --no-restore --nologo --filter "DashboardGrid|QuickOpenOverlay|BulletChart|ResizablePaneGroup|SideNavRail|TokenEditor|HealthBoard|JumpList|AutocompleteInput|BoxPlot"` -> pass (48/48).
 
 Outstanding for this tranche (do not mark done yet):
 
