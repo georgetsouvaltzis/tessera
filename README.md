@@ -1,21 +1,33 @@
 # TeaSharp
 
-TeaSharp is a C#-first terminal UI framework for building state-driven terminal applications on `.NET 10`.
+Build terminal apps that feel like real products, not throwaway demos.
 
-TeaSharp is now in public alpha. The repository is ready for evaluation, experimentation, and contribution, but API cleanup is still allowed when it improves the long-term public authoring path.
+TeaSharp is a C#-first terminal UI framework for `.NET 10`. It gives you a small public app model, first-class controls and layouts, semantic theming, and enough structure to build serious terminal software without dragging you into a host-heavy framework story.
+
+TeaSharp is in public alpha. It is ready for evaluation, experimentation, and contribution. Breaking changes are still allowed when they simplify the long-term public path.
 
 ## Why TeaSharp
 
-- small default app model
-- explicit C# object model instead of a nested DSL
+- explicit C# object model instead of a nested layout DSL
 - no DI container or Generic Host required for the normal path
 - built-in controls, layouts, themes, and runtime options
-- advanced hosting/runtime seams available, but not required
+- state-driven app model with `TeaApp`, `Update(...)`, and `Build(...)`
+- advanced hosting seams available when needed, but not forced on beginners
+- public examples that aim to look like products, not widget dumps
+
+## What You Get
+
+- a small startup story: `Tea.RunAsync(...)` or `Tea.CreateBuilder()`
+- default authoring namespaces: `TeaSharp`, `TeaSharp.Controls`, `TeaSharp.Layout`, `TeaSharp.Styles`
+- a broad built-in widget catalog for dashboards, forms, workflows, data surfaces, and overlays
+- semantic theme tokens and override layers
+- public examples that cover dashboards, workbench shells, and command-heavy apps
+- regression and integration coverage around the public contract
 
 ## Start Here
 
 1. Read [docs/getting-started.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/getting-started.md).
-2. Run the examples listed in [docs/examples.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/examples.md).
+2. Run a flagship example from [docs/examples.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/examples.md).
 3. Use [docs/theme-system-v1.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/theme-system-v1.md) for theming and [docs/custom-components.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/custom-components.md) for custom controls.
 4. If you want to contribute, read [CONTRIBUTING.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/CONTRIBUTING.md) and [docs/architecture-overview.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/architecture-overview.md).
 
@@ -77,24 +89,58 @@ internal sealed class CounterState
 }
 ```
 
-For the minimal path, `await Tea.RunAsync(new App());` remains supported.
+Minimal path still exists:
 
-## Example Lineup
+```csharp
+await Tea.RunAsync(new MyApp());
+```
+
+## Run Something Real
 
 Flagship examples:
 
-- `examples/GitConsole`: workflow-heavy command surface with editing, diff review, and action history
-- `examples/OpsWatch`: dashboard-first operations surface with alerts, telemetry, and action rails
-- `examples/DataWorkbench`: multi-pane workbench shell with pointer-ready runtime configuration
+- `dotnet run --project examples/GitConsole/GitConsole.csproj`
+- `dotnet run --project examples/OpsWatch/OpsWatch.csproj`
+- `dotnet run --project examples/DataWorkbench/DataWorkbench.csproj`
 
 Supporting demos:
+
+- `dotnet run --project examples/DownloadCenter/DownloadCenter.csproj`
+- `dotnet run --project examples/IncidentDesk/IncidentDesk.csproj`
+- `dotnet run --project examples/MusicDeck/MusicDeck.csproj`
+- `dotnet run --project examples/TransitBoard/TransitBoard.csproj`
+
+## Example Lineup
+
+### Flagship
+
+- `examples/GitConsole`
+  - command-driven workflow surface
+  - editing, navigation, diff review, action history
+- `examples/OpsWatch`
+  - dashboard-first operations surface
+  - alerts, telemetry, health, action rails
+- `examples/DataWorkbench`
+  - multi-pane workbench shell
+  - richer composition and pointer-ready runtime configuration
+
+### Supporting
 
 - `examples/DownloadCenter`
 - `examples/IncidentDesk`
 - `examples/MusicDeck`
 - `examples/TransitBoard`
 
-The full example guide lives in [docs/examples.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/examples.md).
+The full guide lives in [docs/examples.md](/Users/georgetsouvaltzis/Projects/playground/teasharp/docs/examples.md).
+
+## Repo Layout
+
+- `src/TeaSharp`: default public app-authoring API
+- `src/TeaSharp.Core`: advanced low-level runtime layer
+- `tests/TeaSharp.Tests`: unit, contract, and regression tests
+- `tests/TeaSharp.IntegrationTests`: integration coverage
+- `examples`: public examples and showcase apps
+- `docs`: product, architecture, release, and contributor docs
 
 ## Docs
 
@@ -121,23 +167,6 @@ dotnet build TeaSharp.slnx
 dotnet test TeaSharp.slnx
 scripts/smoke_examples_v1.sh 4
 ```
-
-Example-specific commands:
-
-```bash
-dotnet run --project examples/GitConsole/GitConsole.csproj
-dotnet run --project examples/OpsWatch/OpsWatch.csproj
-dotnet run --project examples/DataWorkbench/DataWorkbench.csproj
-```
-
-## Repo Layout
-
-- `src/TeaSharp`: default public app-authoring API
-- `src/TeaSharp.Core`: advanced low-level runtime layer
-- `tests/TeaSharp.Tests`: unit, contract, and regression tests
-- `tests/TeaSharp.IntegrationTests`: integration coverage
-- `examples`: public examples and showcase apps
-- `docs`: product, architecture, release, and contributor docs
 
 ## Contributing
 
