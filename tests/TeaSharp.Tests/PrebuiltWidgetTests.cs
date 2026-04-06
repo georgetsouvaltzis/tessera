@@ -306,27 +306,29 @@ internal static class PrebuiltWidgetTests
     private static Task Button_SurfaceStyle_FillsPaddedInterior()
     {
         var surfaceStyle = TeaStyle.Empty.WithBackground(AnsiColor.Rgb(40, 30, 20));
+        var borderStyle = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(210, 180, 150));
         var button = new Button
         {
             Text = "Go",
             Border = BorderStyle.Rounded,
             Padding = Thickness.Symmetric(2, 1),
             SurfaceStyle = surfaceStyle,
+            BorderStyleText = borderStyle,
         };
         var canvas = new Canvas(16, 5, CanvasTextMode.GraphemeAware);
 
         button.Render(canvas, new Rect(0, 0, 16, 5));
         var output = canvas.Render();
         var visibleOutput = StripAnsi(output);
+        var shellStyle = borderStyle.Merge(surfaceStyle);
 
         TestAssert.True(output.Contains(surfaceStyle.Render("[Go]"), StringComparison.Ordinal), "Button surface style should keep the label row on the same filled surface as the rounded shell.");
-        TestAssert.True(!output.Contains(surfaceStyle.Render("╭"), StringComparison.Ordinal), "Button surface style should not paint an extra outer filled rectangle around the rounded shell.");
-        TestAssert.True(!output.Contains(surfaceStyle.Render("─"), StringComparison.Ordinal), "Filled rounded buttons should not leak surface background into the border row cells.");
-        TestAssert.True(!output.Contains(surfaceStyle.Render("╯"), StringComparison.Ordinal), "Button surface style should not paint an extra outer filled rectangle around the rounded shell.");
-        TestAssert.True(visibleOutput.Contains("╭──────────────╮", StringComparison.Ordinal), "Filled rounded buttons should render a visible top border on the filled shell.");
-        TestAssert.True(visibleOutput.Contains("│              │", StringComparison.Ordinal), "Button surface style should paint the full rounded interior, not only the label row.");
-        TestAssert.True(visibleOutput.Contains("│     [Go]     │", StringComparison.Ordinal), "Button surface style should keep the label centered inside the fully filled shell.");
-        TestAssert.True(visibleOutput.Contains("╰──────────────╯", StringComparison.Ordinal), "Filled rounded buttons should render a visible bottom border on the filled shell.");
+        TestAssert.True(output.Contains(shellStyle.Render("▀"), StringComparison.Ordinal), "Filled rounded buttons should merge shell border styling with the surface fill.");
+        TestAssert.True(output.Contains(shellStyle.Render("▌"), StringComparison.Ordinal), "Filled rounded buttons should merge side rails with the surface fill.");
+        TestAssert.True(visibleOutput.Contains("▛▀▀▀▀▀▀▀▀▀▀▀▀▀▀▜", StringComparison.Ordinal), "Filled rounded buttons should render a filled top shell row.");
+        TestAssert.True(visibleOutput.Contains("▌              ▐", StringComparison.Ordinal), "Filled rounded buttons should render filled interior rows between the shell rails.");
+        TestAssert.True(visibleOutput.Contains("▌     [Go]     ▐", StringComparison.Ordinal), "Filled rounded buttons should keep the label centered inside the unified filled shell.");
+        TestAssert.True(visibleOutput.Contains("▙▄▄▄▄▄▄▄▄▄▄▄▄▄▄▟", StringComparison.Ordinal), "Filled rounded buttons should render a filled bottom shell row.");
         return Task.CompletedTask;
     }
 
@@ -400,6 +402,7 @@ internal static class PrebuiltWidgetTests
     private static Task Button_CenteredLabel_DoesNotBreakFilledSurface()
     {
         var surfaceStyle = TeaStyle.Empty.WithBackground(AnsiColor.Rgb(30, 20, 20));
+        var borderStyle = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(190, 180, 170));
         var button = new Button
         {
             Text = "Play",
@@ -407,6 +410,7 @@ internal static class PrebuiltWidgetTests
             LabelSuffix = string.Empty,
             Border = BorderStyle.None,
             SurfaceStyle = surfaceStyle,
+            BorderStyleText = borderStyle,
         };
         var measurement = button.Measure(new Rect(0, 0, 18, 5));
         var canvas = new Canvas(measurement.Width, measurement.Height, CanvasTextMode.GraphemeAware);
@@ -417,12 +421,12 @@ internal static class PrebuiltWidgetTests
         button.Render(canvas, new Rect(0, 0, measurement.Width, measurement.Height));
         var output = canvas.Render();
         var visibleOutput = StripAnsi(output);
+        var shellStyle = borderStyle.Merge(surfaceStyle);
 
-        TestAssert.True(!output.Contains(surfaceStyle.Render("╭"), StringComparison.Ordinal), "Rounded surface buttons should not paint an extra outer filled rectangle around the shell.");
-        TestAssert.True(!output.Contains(surfaceStyle.Render("─"), StringComparison.Ordinal), "Rounded surface buttons should keep border rows outside the filled chip body.");
-        TestAssert.True(!output.Contains(surfaceStyle.Render("╯"), StringComparison.Ordinal), "Rounded surface buttons should not paint an extra outer filled rectangle around the shell.");
-        TestAssert.True(visibleOutput.Contains("╭──────╮", StringComparison.Ordinal), "Surface-chromed borderless buttons should render a visible top border on the rounded shell.");
-        TestAssert.True(visibleOutput.Contains("╰──────╯", StringComparison.Ordinal), "Surface-chromed borderless buttons should render a visible bottom border on the rounded shell.");
+        TestAssert.True(output.Contains(shellStyle.Render("▀"), StringComparison.Ordinal), "Surface-chromed borderless buttons should use the filled shell glyph contract.");
+        TestAssert.True(visibleOutput.Contains("▛▀▀▀▀▀▀▜", StringComparison.Ordinal), "Surface-chromed borderless buttons should render a filled top shell row.");
+        TestAssert.True(visibleOutput.Contains("▌ Play ▐", StringComparison.Ordinal), "Surface-chromed borderless buttons should keep centered labels inside the filled chip body.");
+        TestAssert.True(visibleOutput.Contains("▙▄▄▄▄▄▄▟", StringComparison.Ordinal), "Surface-chromed borderless buttons should render a filled bottom shell row.");
         return Task.CompletedTask;
     }
 

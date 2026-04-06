@@ -430,21 +430,22 @@ public sealed class Button : Control
             FillSurface(canvas, fillRect, surfaceStyle);
         }
 
-        WriteBorderGlyph(canvas, clipped.X, clipped.Y, '╭', borderStyleText);
-        WriteBorderGlyph(canvas, clipped.Right - 1, clipped.Y, '╮', borderStyleText);
-        WriteBorderGlyph(canvas, clipped.X, clipped.Bottom - 1, '╰', borderStyleText);
-        WriteBorderGlyph(canvas, clipped.Right - 1, clipped.Bottom - 1, '╯', borderStyleText);
+        var shellStyle = borderStyleText.Merge(surfaceStyle);
+        WriteBorderGlyph(canvas, clipped.X, clipped.Y, '▛', shellStyle);
+        WriteBorderGlyph(canvas, clipped.Right - 1, clipped.Y, '▜', shellStyle);
+        WriteBorderGlyph(canvas, clipped.X, clipped.Bottom - 1, '▙', shellStyle);
+        WriteBorderGlyph(canvas, clipped.Right - 1, clipped.Bottom - 1, '▟', shellStyle);
 
         for (var x = clipped.X + 1; x < clipped.Right - 1; x++)
         {
-            WriteBorderGlyph(canvas, x, clipped.Y, '─', borderStyleText);
-            WriteBorderGlyph(canvas, x, clipped.Bottom - 1, '─', borderStyleText);
+            WriteBorderGlyph(canvas, x, clipped.Y, '▀', shellStyle);
+            WriteBorderGlyph(canvas, x, clipped.Bottom - 1, '▄', shellStyle);
         }
 
         for (var y = clipped.Y + 1; y < clipped.Bottom - 1; y++)
         {
-            WriteBorderGlyph(canvas, clipped.X, y, '│', borderStyleText);
-            WriteBorderGlyph(canvas, clipped.Right - 1, y, '│', borderStyleText);
+            WriteBorderGlyph(canvas, clipped.X, y, '▌', shellStyle);
+            WriteBorderGlyph(canvas, clipped.Right - 1, y, '▐', shellStyle);
         }
 
         return fillRect.Inset(Padding);
