@@ -187,6 +187,7 @@ High-level rules:
   - fixed inner X/Y padding around content
   - centered content inside the padded rect
   - rounded-border buttons should read as a single pill/button surface, not nested chips or mini-cards
+  - when apps need a distinct rounded outline plus inset body, `Button.RoundedSurfaceMode = InsetBody` should reserve enough inner height for that bordered-body treatment instead of collapsing back to a 3-row pill
   - focus should be ring/border-led; surface tint may increase slightly, but focus must not create inner bands or competing layers
   - label styling, body styling, and shell styling are separate domains and must not bleed into one another
 - `Selected*` is canonical naming

@@ -168,6 +168,19 @@ public sealed class Button : Control
     } = TeaStyle.Empty;
 
     /// <summary>
+    /// Gets or sets how rounded surface-styled buttons compose their border shell and body fill.
+    /// </summary>
+    /// <remarks>
+    /// <see cref="ButtonRoundedSurfaceMode.UnifiedShell"/> keeps rounded pills as a single filled surface.
+    /// <see cref="ButtonRoundedSurfaceMode.InsetBody"/> renders a distinct rounded outline with a separately filled inner body.
+    /// </remarks>
+    public ButtonRoundedSurfaceMode RoundedSurfaceMode
+    {
+        get;
+        set;
+    } = ButtonRoundedSurfaceMode.UnifiedShell;
+
+    /// <summary>
     /// Gets how many activations have been observed.
     /// </summary>
     public int ActivationCount => _activationCount;
@@ -274,7 +287,7 @@ public sealed class Button : Control
         var shellBorder = ResolveShellBorderStyle();
         var surfaceStyle = ResolveSurfaceStyle();
         var borderStyleText = ResolveBorderStyleText();
-        var content = ShouldRenderFilledRoundedShell(shellBorder, surfaceStyle)
+        var content = ShouldRenderFilledRoundedShell(shellBorder, surfaceStyle, RoundedSurfaceMode)
             ? DrawFilledRoundedShell(canvas, clipped, borderStyleText, surfaceStyle)
             : DrawDefaultShell(canvas, clipped, shellBorder, borderStyleText, surfaceStyle);
         if (content.IsEmpty || content.Height < 1)
@@ -283,11 +296,14 @@ public sealed class Button : Control
         }
 
         var label = $"{LabelPrefix}{Text}{LabelSuffix}";
+        var plainLabel = Text;
         if (IsDisabled)
         {
             label += " (disabled)";
+            plainLabel += " (disabled)";
         }
 
+        label = ResolveRenderedLabel(label, plainLabel, content.Width, shellBorder, surfaceStyle);
         var renderedLabel = ApplyLabelStyle(label, surfaceStyle);
         var rowCount = string.IsNullOrWhiteSpace(Description) || content.Height < 2 ? 1 : 2;
         var top = content.Y + Math.Max(0, (content.Height - rowCount) / 2);
@@ -325,6 +341,13 @@ public sealed class Button : Control
             // Borderless chip-style buttons should still reserve symmetric interior breathing room
             // so centered labels do not depend on example-level width guessing.
             width = Math.Max(width, labelWidth + 4);
+        }
+
+        if (shellBorder == BorderStyle.Rounded && HasSurfaceChrome() && RoundedSurfaceMode == ButtonRoundedSurfaceMode.InsetBody)
+        {
+            // A distinct bordered shell plus inset body needs enough height to show
+            // top/bottom fill rows around the centered label instead of collapsing to a 3-row chip.
+            height = Math.Max(height, 5);
         }
 
         if (width > labelWidth && ((width - labelWidth) & 1) != 0)
@@ -418,7 +441,7 @@ public sealed class Button : Control
 
     private Rect DrawFilledRoundedShell(Canvas canvas, Rect clipped, TeaStyle borderStyleText, TeaStyle surfaceStyle)
     {
-        if (clipped.Width < 2 || clipped.Height < 2)
+        if (clipped.Width < 2 || clipped.Height < 3)
         {
             FillSurface(canvas, clipped, surfaceStyle);
             return clipped.Inset(Padding);
@@ -476,7 +499,7 @@ public sealed class Button : Control
 
     private Rect ResolveInteractiveRect(Rect bounds, BorderStyle shellBorder)
     {
-        if (ShouldRenderFilledRoundedShell(shellBorder, ResolveSurfaceStyle()))
+        if (ShouldRenderFilledRoundedShell(shellBorder, ResolveSurfaceStyle(), RoundedSurfaceMode))
         {
             return bounds.Width < 2
                 ? bounds
@@ -553,14 +576,42 @@ public sealed class Button : Control
         };
     }
 
+    private static string ResolveRenderedLabel(
+        string chromeLabel,
+        string plainLabel,
+        int contentWidth,
+        BorderStyle shellBorder,
+        TeaStyle surfaceStyle)
+    {
+        if (chromeLabel == plainLabel || contentWidth <= 0)
+        {
+            return chromeLabel;
+        }
+
+        if (shellBorder != BorderStyle.Rounded || surfaceStyle.IsEmpty)
+        {
+            return chromeLabel;
+        }
+
+        return ControlTextLayout.MeasureDisplayWidth(chromeLabel) > contentWidth
+            && ControlTextLayout.MeasureDisplayWidth(plainLabel) <= contentWidth
+                ? plainLabel
+                : chromeLabel;
+    }
+
     private bool HasSurfaceChrome()
     {
         return !SurfaceStyle.IsEmpty || !FocusedSurfaceStyle.IsEmpty || !PressedSurfaceStyle.IsEmpty;
     }
 
-    private static bool ShouldRenderFilledRoundedShell(BorderStyle shellBorder, TeaStyle surfaceStyle)
+    private static bool ShouldRenderFilledRoundedShell(
+        BorderStyle shellBorder,
+        TeaStyle surfaceStyle,
+        ButtonRoundedSurfaceMode roundedSurfaceMode)
     {
-        return shellBorder == BorderStyle.Rounded && !surfaceStyle.IsEmpty;
+        return shellBorder == BorderStyle.Rounded
+            && !surfaceStyle.IsEmpty
+            && roundedSurfaceMode == ButtonRoundedSurfaceMode.UnifiedShell;
     }
 
     private static void WriteBorderGlyph(Canvas canvas, int x, int y, char glyph, TeaStyle borderStyleText)

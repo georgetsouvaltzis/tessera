@@ -26,6 +26,10 @@ internal static class PrebuiltWidgetTests
         yield return new TestCase("Controls_Button_Measure_UsesLongestLineAcrossLabelAndDescription", Button_Measure_UsesLongestLineAcrossLabelAndDescription);
         yield return new TestCase("Controls_Button_DisabledBorder_DoesNotBorrowLabelStyle", Button_DisabledBorder_DoesNotBorrowLabelStyle);
         yield return new TestCase("Controls_Button_CenteredLabel_DoesNotBreakFilledSurface", Button_CenteredLabel_DoesNotBreakFilledSurface);
+        yield return new TestCase("Controls_Button_NarrowSurfaceShell_DropsChromeBeforeClippingLabel", Button_NarrowSurfaceShell_DropsChromeBeforeClippingLabel);
+        yield return new TestCase("Controls_Button_CompactSurfaceShell_FallsBackToReadableFilledLabel", Button_CompactSurfaceShell_FallsBackToReadableFilledLabel);
+        yield return new TestCase("Controls_Button_RoundedSurfaceMode_InsetBody_RendersBorderAndInsetFill", Button_RoundedSurfaceMode_InsetBody_RendersBorderAndInsetFill);
+        yield return new TestCase("Controls_Button_RoundedSurfaceMode_InsetBody_ReservesTallerAutoRoundedHeight", Button_RoundedSurfaceMode_InsetBody_ReservesTallerAutoRoundedHeight);
         yield return new TestCase("Controls_TextInput_SubmitsValue", TextInput_SubmitsValue);
         yield return new TestCase("Controls_TextInput_Events_ReportSubmitAndCancelValues", TextInput_Events_ReportSubmitAndCancelValues);
         yield return new TestCase("Controls_TextInput_TryConsumeSubmissionAndCancellation_AreSingleUse", TextInput_TryConsumeSubmissionAndCancellation_AreSingleUse);
@@ -357,7 +361,7 @@ internal static class PrebuiltWidgetTests
         button.Render(canvas, new Rect(0, 0, 18, 5));
         var output = canvas.Render();
 
-        TestAssert.True(output.Contains(expectedLabelStyle.Render("Play"), StringComparison.Ordinal), "Button label should keep text styling.");
+        TestAssert.True(output.Contains(surfaceStyle.Merge(expectedLabelStyle).Render("Play"), StringComparison.Ordinal), "Button label should keep text styling while the surface owns the background.");
         TestAssert.True(!output.Contains(labelStyle.Render("Play"), StringComparison.Ordinal), "Button label should ignore nested background chrome from label styles.");
         return Task.CompletedTask;
     }
@@ -427,6 +431,98 @@ internal static class PrebuiltWidgetTests
         TestAssert.True(visibleOutput.Contains("▛▀▀▀▀▀▀▜", StringComparison.Ordinal), "Surface-chromed borderless buttons should render a filled top shell row.");
         TestAssert.True(visibleOutput.Contains("▌ Play ▐", StringComparison.Ordinal), "Surface-chromed borderless buttons should keep centered labels inside the filled chip body.");
         TestAssert.True(visibleOutput.Contains("▙▄▄▄▄▄▄▟", StringComparison.Ordinal), "Surface-chromed borderless buttons should render a filled bottom shell row.");
+        return Task.CompletedTask;
+    }
+
+    private static Task Button_NarrowSurfaceShell_DropsChromeBeforeClippingLabel()
+    {
+        var surfaceStyle = TeaStyle.Empty.WithBackground(AnsiColor.Rgb(30, 20, 20));
+        var labelStyle = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(220, 210, 200)).WithBold();
+        var button = new Button
+        {
+            Text = "Run",
+            Border = BorderStyle.None,
+            SurfaceStyle = surfaceStyle,
+            LabelStyle = labelStyle,
+            BorderStyleText = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(180, 150, 120)),
+        };
+        var canvas = new Canvas(5, 3, CanvasTextMode.GraphemeAware);
+
+        button.Render(canvas, new Rect(0, 0, 5, 3));
+        var output = canvas.Render();
+        var visibleOutput = StripAnsi(output);
+
+        TestAssert.True(visibleOutput.Contains("▌Run▐", StringComparison.Ordinal), "Narrow rounded surface buttons should keep the readable label instead of clipping it behind default chrome.");
+        TestAssert.True(!visibleOutput.Contains("[Run]", StringComparison.Ordinal), "Narrow rounded surface buttons should drop decorative chrome before it clips the label.");
+        return Task.CompletedTask;
+    }
+
+    private static Task Button_CompactSurfaceShell_FallsBackToReadableFilledLabel()
+    {
+        var surfaceStyle = TeaStyle.Empty.WithBackground(AnsiColor.Rgb(30, 20, 20));
+        var button = new Button
+        {
+            Text = "Run",
+            Border = BorderStyle.None,
+            SurfaceStyle = surfaceStyle,
+            BorderStyleText = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(180, 150, 120)),
+        };
+        var canvas = new Canvas(5, 2, CanvasTextMode.GraphemeAware);
+
+        button.Render(canvas, new Rect(0, 0, 5, 2));
+        var output = canvas.Render();
+        var visibleOutput = StripAnsi(output);
+
+        TestAssert.True(output.Contains("Run", StringComparison.Ordinal), "Compact surface buttons should preserve readable text when the rounded shell lacks a dedicated middle row.");
+        TestAssert.True(!visibleOutput.Contains('▛'), "Compact surface buttons should fall back to a filled label row instead of drawing an empty rounded shell.");
+        return Task.CompletedTask;
+    }
+
+    private static Task Button_RoundedSurfaceMode_InsetBody_RendersBorderAndInsetFill()
+    {
+        var surfaceStyle = TeaStyle.Empty.WithBackground(AnsiColor.Rgb(40, 30, 20));
+        var borderStyle = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(210, 180, 150));
+        var button = new Button
+        {
+            Text = "Go",
+            Border = BorderStyle.Rounded,
+            Padding = Thickness.Symmetric(2, 1),
+            SurfaceStyle = surfaceStyle,
+            BorderStyleText = borderStyle,
+            RoundedSurfaceMode = ButtonRoundedSurfaceMode.InsetBody,
+        };
+        var canvas = new Canvas(16, 5, CanvasTextMode.GraphemeAware);
+
+        button.Render(canvas, new Rect(0, 0, 16, 5));
+        var output = canvas.Render();
+        var visibleOutput = StripAnsi(output);
+
+        TestAssert.True(output.Contains(borderStyle.Render("╭"), StringComparison.Ordinal), "Inset-body rounded buttons should keep a distinct border ring.");
+        TestAssert.True(!output.Contains(surfaceStyle.Render("╭"), StringComparison.Ordinal), "Inset-body rounded buttons should not tint the border ring with the body fill.");
+        TestAssert.True(output.Contains(surfaceStyle.Render("[Go]"), StringComparison.Ordinal), "Inset-body rounded buttons should still render the label on the filled inner body.");
+        TestAssert.True(visibleOutput.Contains("╭──────────────╮", StringComparison.Ordinal), "Inset-body rounded buttons should render a pure rounded top border.");
+        TestAssert.True(visibleOutput.Contains("│              │", StringComparison.Ordinal), "Inset-body rounded buttons should keep a full inner body between the border rails.");
+        TestAssert.True(visibleOutput.Contains("│     [Go]     │", StringComparison.Ordinal), "Inset-body rounded buttons should center the label inside the filled body.");
+        TestAssert.True(visibleOutput.Contains("╰──────────────╯", StringComparison.Ordinal), "Inset-body rounded buttons should render a pure rounded bottom border.");
+        return Task.CompletedTask;
+    }
+
+    private static Task Button_RoundedSurfaceMode_InsetBody_ReservesTallerAutoRoundedHeight()
+    {
+        var button = new Button
+        {
+            Text = "Play",
+            LabelPrefix = string.Empty,
+            LabelSuffix = string.Empty,
+            Border = BorderStyle.None,
+            SurfaceStyle = TeaStyle.Empty.WithBackground(AnsiColor.Rgb(30, 20, 20)),
+            RoundedSurfaceMode = ButtonRoundedSurfaceMode.InsetBody,
+        };
+
+        var measurement = button.Measure(new Rect(0, 0, 18, 8));
+
+        TestAssert.Equal(8, measurement.Width, "Inset-body surface buttons should preserve the shared symmetric chip width contract.");
+        TestAssert.Equal(5, measurement.Height, "Inset-body surface buttons should reserve enough height for a bordered shell plus inset body.");
         return Task.CompletedTask;
     }
 
