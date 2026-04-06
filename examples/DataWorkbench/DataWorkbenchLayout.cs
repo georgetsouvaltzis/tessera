@@ -6,10 +6,10 @@ internal sealed partial class DataWorkbenchApp
 {
     private void ConfigureHeader(WindowBuilder window, ScreenContext context)
     {
-        var compactHeight = context.Height < 34;
+        var compactHeight = context.Height < 38;
         if (context.Width < 120)
         {
-            window.Header(compactHeight ? 11 : 12, header => header.Column(column =>
+            window.Header(compactHeight ? 15 : 16, header => header.Column(column =>
             {
                 column.Fixed(compactHeight ? 5 : 6, _header);
                 column.Fixed(3, stats => stats.Row(row =>
@@ -18,7 +18,7 @@ internal sealed partial class DataWorkbenchApp
                     row.Weighted(1, _velocityPulse);
                     row.Weighted(1, _comparePulse);
                 }));
-                column.Fixed(3, nav => nav.Row(row =>
+                column.Fixed(7, nav => nav.Row(row =>
                 {
                     row.Weighted(3, _pageTabs);
                     row.Auto(_citrineButton, new Thickness(0, 0, 1, 0));
@@ -29,7 +29,7 @@ internal sealed partial class DataWorkbenchApp
             return;
         }
 
-        window.Header(compactHeight ? 8 : 9, header => header.Column(column =>
+        window.Header(compactHeight ? 12 : 13, header => header.Column(column =>
         {
             column.Fixed(compactHeight ? 5 : 6, top => top.Row(row =>
             {
@@ -38,7 +38,7 @@ internal sealed partial class DataWorkbenchApp
                 row.Weighted(1, _velocityPulse);
                 row.Weighted(1, _comparePulse);
             }));
-            column.Fixed(3, nav => nav.Row(row =>
+            column.Fixed(7, nav => nav.Row(row =>
             {
                 row.Weighted(4, _pageTabs);
                 row.Auto(_citrineButton, new Thickness(0, 0, 1, 0));
@@ -52,7 +52,7 @@ internal sealed partial class DataWorkbenchApp
     {
         var railWidth = Math.Clamp(context.Width / 6, 22, 26);
         var rightWidth = Math.Clamp(context.Width / 3, 30, 38);
-        var outputHeight = context.Height < 32 ? 5 : 9;
+        var outputHeight = context.Height < 38 ? 7 : 9;
 
         body.Column(column =>
         {
