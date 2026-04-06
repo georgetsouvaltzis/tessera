@@ -99,21 +99,16 @@ Harness quick commands:
   - `dotnet run --project benchmarks/TeaSharp.Benchmarks --configuration Release -- --filter "*Resize*"`
   - `dotnet run --project benchmarks/TeaSharp.Benchmarks --configuration Release -- --filter "*Overlay*"`
   - `dotnet run --project benchmarks/TeaSharp.Benchmarks --configuration Release -- --filter "*LogTail*"`
-- Scripted path (optional):
-  - `scripts/run_benchmarks.sh list|all|scenario "<filter>"|shortlist`
-  - `scripts/run_benchmarks.sh shortlist-render-only`
-  - `scripts/run_benchmarks.sh shortlist-materialize`
-  - `scripts/run_benchmarks.sh runtime-e2e`
-  - `scripts/run_benchmarks.sh iteration-template`
-  - `scripts/perf_gate.sh run`
-  - `scripts/perf_gate.sh dry-run`
-  - `scripts/perf_gate.sh runtime-e2e`
-  - script execution modes (`all|scenario|shortlist*`) run with `--inProcess` for trend/gate stability
-  - script performs lazy build (build only when benchmark output is missing)
+- Direct gate path:
   - SLO gate baseline input: `docs/perf-baselines/v1-slo-gate-baseline.json`
   - SLO gate machine-readable output: `docs/perf-baselines/latest-slo-gate-result.json`
   - runtime e2e machine-readable output: `docs/perf-baselines/latest-runtime-e2e-result.json`
-  - `scripts/perf_gate.sh` now follows the same lazy-build policy as `run_benchmarks.sh` to avoid wrapper-only build stalls
+  - SLO gate run:
+    - `dotnet run --project benchmarks/TeaSharp.Benchmarks --configuration Release -- --perf-gate --baseline docs/perf-baselines/v1-slo-gate-baseline.json --output docs/perf-baselines/latest-slo-gate-result.json`
+  - SLO gate dry-run:
+    - `dotnet run --project benchmarks/TeaSharp.Benchmarks --configuration Release -- --perf-gate --baseline docs/perf-baselines/v1-slo-gate-baseline.json --output docs/perf-baselines/latest-slo-gate-result.json --dry-run`
+  - runtime e2e:
+    - `dotnet run --project benchmarks/TeaSharp.Benchmarks --configuration Release -- --runtime-e2e --output docs/perf-baselines/latest-runtime-e2e-result.json`
 
 BenchmarkDotNet artifacts/report directory:
 - `benchmarks/TeaSharp.Benchmarks/bin/Release/net10.0/BenchmarkDotNet.Artifacts/`

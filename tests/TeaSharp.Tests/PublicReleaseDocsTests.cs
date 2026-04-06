@@ -12,10 +12,10 @@ internal static class PublicReleaseDocsTests
         "perf-plan" + "-v1.md",
         "widget-roadmap" + "-v1.md",
         "v1-master" + "-plan.md",
-        "smoke_examples" + "_v1.sh",
-        "run_benchmarks" + "_v1.sh",
-        "perf_gate" + "_v1.sh",
-        "verify_terminal_matrix" + "_v1.sh",
+        "smoke_examples" + "_v1",
+        "run_benchmarks" + "_v1",
+        "perf_gate" + "_v1",
+        "verify_terminal_matrix" + "_v1",
         "Terminal" + ".Gui",
         "Spectre" + ".Console",
         "spectre" + "-console",
@@ -39,6 +39,9 @@ internal static class PublicReleaseDocsTests
         yield return new TestCase(
             "PublicReleaseDocs_PublicDocs_DoNotContainLegacyV1NamesOrThirdPartyComparisons",
             PublicDocs_DoNotContainLegacyV1NamesOrThirdPartyComparisons);
+        yield return new TestCase(
+            "PublicReleaseDocs_ScriptsDirectoryDoesNotContainRepoWrapperFiles",
+            ScriptsDirectory_DoesNotContainRepoWrapperFiles);
     }
 
     private static Task ChangelogExists_AndUsesSemVerHeadings()
@@ -157,6 +160,26 @@ internal static class PublicReleaseDocsTests
         return Task.CompletedTask;
     }
 
+    private static Task ScriptsDirectory_DoesNotContainRepoWrapperFiles()
+    {
+        var repoRoot = GetRepoRoot();
+        var scriptsPath = Path.Combine(repoRoot, "scripts");
+        if (!Directory.Exists(scriptsPath))
+        {
+            return Task.CompletedTask;
+        }
+
+        var offenders = Directory.EnumerateFiles(scriptsPath, "*", SearchOption.TopDirectoryOnly)
+            .Select(path => Path.GetRelativePath(repoRoot, path).Replace(Path.DirectorySeparatorChar, '/'))
+            .ToArray();
+
+        TestAssert.True(
+            offenders.Length == 0,
+            $"Public repo should not ship repo-local wrapper files under the scripts directory. Offenders: {string.Join(", ", offenders)}.");
+
+        return Task.CompletedTask;
+    }
+
     private static IEnumerable<string> EnumeratePublicDocuments(string repoRoot)
     {
         foreach (var path in Directory.EnumerateFiles(repoRoot, "*.md", SearchOption.TopDirectoryOnly))
@@ -174,10 +197,6 @@ internal static class PublicReleaseDocsTests
             yield return path;
         }
 
-        foreach (var path in Directory.EnumerateFiles(Path.Combine(repoRoot, "scripts"), "*.sh", SearchOption.TopDirectoryOnly))
-        {
-            yield return path;
-        }
     }
 
     private static string GetRepoRoot()

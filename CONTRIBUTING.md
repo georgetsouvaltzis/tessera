@@ -34,7 +34,9 @@ Before asking for review, run:
 dotnet build TeaSharp.slnx
 dotnet build examples/TeaSharp.Examples.slnx
 dotnet test TeaSharp.slnx
-scripts/smoke_examples.sh 4
+dotnet run --project examples/DataWorkbench/DataWorkbench.csproj --no-build
+dotnet run --project examples/OpsWatch/OpsWatch.csproj --no-build
+dotnet run --project examples/GitConsole/GitConsole.csproj --no-build
 ```
 
 If your change touches perf-sensitive code or release-track behavior, also follow [docs/performance.md](docs/performance.md).

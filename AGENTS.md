@@ -44,7 +44,9 @@ Use .NET 10 from `global.json`.
 - `dotnet run --project examples/HelloWorld`
 - `dotnet run --project examples/CounterForm`
 - `dotnet run --project examples/WorkspaceApp`
-- `scripts/smoke_examples.sh 4`
+- `dotnet run --project examples/DataWorkbench/DataWorkbench.csproj --no-build`
+- `dotnet run --project examples/OpsWatch/OpsWatch.csproj --no-build`
+- `dotnet run --project examples/GitConsole/GitConsole.csproj --no-build`
 
 Before handoff, run full cycle (build/tests/examples/docs consistency) and report exact commands/results.
 For performance-sensitive or release-track slices, run checks required by `docs/performance.md` and report outcomes.

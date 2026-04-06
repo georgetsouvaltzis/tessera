@@ -42,20 +42,12 @@ dotnet run --project benchmarks/TeaSharp.Benchmarks --configuration Release -- -
 dotnet run --project benchmarks/TeaSharp.Benchmarks --configuration Release -- --inProcess --filter "*Frame" --filter "*ScrollLogTail" --filter "*FirstFrameRender" --filter "*OverlayStressFrames" --filter "*ResizeStormFrames"
 ```
 
-Optional helper:
+Direct gate path:
 
 ```bash
-scripts/run_benchmarks.sh list
-scripts/run_benchmarks.sh all
-scripts/run_benchmarks.sh scenario "*Overlay*"
-scripts/run_benchmarks.sh shortlist
-scripts/run_benchmarks.sh shortlist-render-only
-scripts/run_benchmarks.sh shortlist-materialize
-scripts/run_benchmarks.sh iteration-template
-scripts/run_benchmarks.sh runtime-e2e
-scripts/perf_gate.sh run
-scripts/perf_gate.sh dry-run
-scripts/perf_gate.sh runtime-e2e
+dotnet run --project benchmarks/TeaSharp.Benchmarks --configuration Release -- --perf-gate --baseline docs/perf-baselines/v1-slo-gate-baseline.json --output docs/perf-baselines/latest-slo-gate-result.json
+dotnet run --project benchmarks/TeaSharp.Benchmarks --configuration Release -- --perf-gate --baseline docs/perf-baselines/v1-slo-gate-baseline.json --output docs/perf-baselines/latest-slo-gate-result.json --dry-run
+dotnet run --project benchmarks/TeaSharp.Benchmarks --configuration Release -- --runtime-e2e --output docs/perf-baselines/latest-runtime-e2e-result.json
 ```
 
 ## Before/After Reporting Workflow
@@ -69,15 +61,12 @@ Use the same host/terminal/configuration for both runs.
 Mode guidance:
 - `shortlist-render-only`: runs the six `*Only` methods (renderer/layout gate signals)
 - `shortlist-materialize`: runs the six non-`Only` methods (end-to-end frame/allocation gate signals)
-- helper execution modes (`all|scenario|shortlist*`) use `--inProcess` by default
-- helper uses lazy build; it builds only when benchmark output is missing
 - SLO baseline gate:
   - baseline: `docs/perf-baselines/v1-slo-gate-baseline.json`
-  - run: `scripts/perf_gate.sh run`
+  - run: `dotnet run --project benchmarks/TeaSharp.Benchmarks --configuration Release -- --perf-gate --baseline docs/perf-baselines/v1-slo-gate-baseline.json --output docs/perf-baselines/latest-slo-gate-result.json`
   - output: `docs/perf-baselines/latest-slo-gate-result.json`
-  - wrapper behavior: reuses the existing Release benchmark DLL and only builds if the DLL is missing
 - runtime e2e probe:
-  - run: `scripts/perf_gate.sh runtime-e2e`
+  - run: `dotnet run --project benchmarks/TeaSharp.Benchmarks --configuration Release -- --runtime-e2e --output docs/perf-baselines/latest-runtime-e2e-result.json`
   - output: `docs/perf-baselines/latest-runtime-e2e-result.json`
 
 ## Artifacts Location

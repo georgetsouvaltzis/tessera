@@ -18,7 +18,7 @@ public sealed class QuickOpenOverlayControlTests
         [
             new QuickOpenItem("readme", "README.md", "docs"),
             new QuickOpenItem("roadmap", "widget-roadmap.md", "docs"),
-            new QuickOpenItem("build", "build.sh", "scripts"),
+            new QuickOpenItem("build", "TeaSharp.slnx", "repo"),
         ]);
         overlay.Open();
 

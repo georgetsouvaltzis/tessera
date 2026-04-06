@@ -42,15 +42,18 @@ Current public example contract:
 - flagship examples: `examples/GitConsole/GitConsole.csproj`
 - supporting domain demos remain documented but are not part of the primary smoke gate
 
-README, onboarding docs, API docs, smoke scripts, and tests must agree on that contract and must not reference removed example paths or removed solution files.
+README, onboarding docs, API docs, the examples solution, and tests must agree on that contract and must not reference removed example paths or removed solution files.
 
 ### 3. Rerun Verification On The Exact Candidate SHA
 
 Required commands on the chosen candidate:
 
 - `dotnet build TeaSharp.slnx`
+- `dotnet build examples/TeaSharp.Examples.slnx`
 - `dotnet test TeaSharp.slnx`
-- `scripts/smoke_examples.sh 4`
+- `dotnet run --project examples/DataWorkbench/DataWorkbench.csproj --no-build`
+- `dotnet run --project examples/OpsWatch/OpsWatch.csproj --no-build`
+- `dotnet run --project examples/GitConsole/GitConsole.csproj --no-build`
 
 Goal:
 
@@ -72,7 +75,7 @@ Reference:
 
 Open caveat:
 
-- `scripts/perf_gate.sh` has had wrapper flakiness; the direct benchmark DLL path remains the trusted release path
+- the direct benchmark host path is the trusted release path; do not hide release evidence behind repo-local wrapper scripts
 
 ### 5. Docs Freeze Coherence
 

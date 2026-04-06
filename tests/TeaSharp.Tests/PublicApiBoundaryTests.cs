@@ -29,13 +29,6 @@ internal static class PublicApiBoundaryTests
         "examples/GitConsole/GitConsole.csproj",
     ];
 
-    private static readonly string[] SmokeScriptExpectedExamplePaths =
-    [
-        "DataWorkbench:examples/DataWorkbench/DataWorkbench.csproj",
-        "OpsWatch:examples/OpsWatch/OpsWatch.csproj",
-        "GitConsole:examples/GitConsole/GitConsole.csproj",
-    ];
-
     private static readonly string[] CoreImportAllowList =
     [
     ];
@@ -78,9 +71,6 @@ internal static class PublicApiBoundaryTests
         yield return new TestCase(
             "PublicApiBoundary_FlagshipExampleProjectsDoNotReferenceTeaSharpCoreProject",
             FlagshipExampleProjects_DoNotReferenceTeaSharpCoreProject);
-        yield return new TestCase(
-            "PublicApiBoundary_SmokeExamplesScriptUsesRepoLocalArtifactsAndCurrentExamples",
-            SmokeExamplesScript_UsesRepoLocalArtifactsAndCurrentExamples);
         yield return new TestCase(
             "PublicApiBoundary_PublicTeaSharpAssemblySurfaceDoesNotExposeTeaSharpCoreTypes",
             PublicTeaSharpAssemblySurface_DoesNotExposeTeaSharpCoreTypes);
@@ -253,34 +243,6 @@ internal static class PublicApiBoundaryTests
         TestAssert.True(
             offenders.Length == 0,
             $"Flagship example projects must not reference TeaSharp.Core.csproj directly. Offenders: {string.Join(", ", offenders)}.");
-
-        return Task.CompletedTask;
-    }
-
-    private static Task SmokeExamplesScript_UsesRepoLocalArtifactsAndCurrentExamples()
-    {
-        var repoRoot = GetRepoRoot();
-        var scriptPath = Path.Combine(repoRoot, "scripts", "smoke_examples.sh");
-        TestAssert.True(File.Exists(scriptPath), $"Expected smoke script at {ToRepoRelativePath(scriptPath)}.");
-
-        var text = File.ReadAllText(scriptPath);
-
-        foreach (var expectedPath in SmokeScriptExpectedExamplePaths)
-        {
-            TestAssert.True(
-                text.Contains(expectedPath, StringComparison.Ordinal),
-                $"Expected {ToRepoRelativePath(scriptPath)} to include {expectedPath}.");
-        }
-
-        TestAssert.True(
-            text.Contains(".artifacts/smoke_examples", StringComparison.Ordinal),
-            $"Expected {ToRepoRelativePath(scriptPath)} to write logs under ./.artifacts.");
-        TestAssert.True(
-            !text.Contains("mktemp", StringComparison.Ordinal),
-            $"Expected {ToRepoRelativePath(scriptPath)} to avoid mktemp and repo temp directories.");
-        TestAssert.True(
-            !text.Contains("/var/folders", StringComparison.Ordinal),
-            $"Expected {ToRepoRelativePath(scriptPath)} to avoid /var/folders paths.");
 
         return Task.CompletedTask;
     }

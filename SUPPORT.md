@@ -37,7 +37,9 @@ Useful local checks before filing:
 dotnet build TeaSharp.slnx
 dotnet test TeaSharp.slnx
 dotnet build examples/TeaSharp.Examples.slnx
-scripts/smoke_examples.sh 4
+dotnet run --project examples/DataWorkbench/DataWorkbench.csproj --no-build
+dotnet run --project examples/OpsWatch/OpsWatch.csproj --no-build
+dotnet run --project examples/GitConsole/GitConsole.csproj --no-build
 ```
 
 ## What To Include

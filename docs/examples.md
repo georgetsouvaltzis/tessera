@@ -56,4 +56,5 @@ If a new example becomes part of the public learning path, update:
 - [getting-started.md](getting-started.md)
 - [public-api-guidelines.md](public-api-guidelines.md)
 - [spec.md](spec.md)
-- `scripts/smoke_examples.sh`
+- `examples/TeaSharp.Examples.slnx`
+- [alpha-release-checklist.md](alpha-release-checklist.md)
