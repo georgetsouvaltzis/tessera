@@ -34,6 +34,7 @@ TeaSharp uses `major.minor.patch` versioning with SemVer prerelease labels durin
 - README and contributor guidance now point to the support policy
 - repo verification guidance now includes `dotnet build examples/TeaSharp.Examples.slnx`
 - public docs and release artifacts now use repo-relative paths instead of local machine filesystem links
+- public docs and script entrypoints now use simpler names without `v1` suffixes
 
 ### Fixed
 

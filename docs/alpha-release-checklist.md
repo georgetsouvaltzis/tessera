@@ -50,7 +50,7 @@ Required commands on the chosen candidate:
 
 - `dotnet build TeaSharp.slnx`
 - `dotnet test TeaSharp.slnx`
-- `scripts/smoke_examples_v1.sh 4`
+- `scripts/smoke_examples.sh 4`
 
 Goal:
 
@@ -66,13 +66,13 @@ Required:
 
 Reference:
 
-- [perf-plan-v1.md](perf-plan-v1.md)
+- [performance.md](performance.md)
 - `docs/perf-baselines/latest-slo-gate-result.json`
 - `docs/perf-baselines/latest-runtime-e2e-result.json`
 
 Open caveat:
 
-- `scripts/perf_gate_v1.sh` has had wrapper flakiness; the direct benchmark DLL path remains the trusted release path
+- `scripts/perf_gate.sh` has had wrapper flakiness; the direct benchmark DLL path remains the trusted release path
 
 ### 5. Docs Freeze Coherence
 
@@ -91,9 +91,9 @@ Before public alpha signoff, do one final docs pass confirming that these files 
 - [spec.md](spec.md)
 - [public-api-guidelines.md](public-api-guidelines.md)
 - [public-api-inventory.md](public-api-inventory.md)
-- [theme-system-v1.md](theme-system-v1.md)
-- [widget-roadmap-v1.md](widget-roadmap-v1.md)
-- [perf-plan-v1.md](perf-plan-v1.md)
+- [theme-system.md](theme-system.md)
+- [widget-roadmap.md](widget-roadmap.md)
+- [performance.md](performance.md)
 
 Goal:
 

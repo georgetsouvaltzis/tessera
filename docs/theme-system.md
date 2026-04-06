@@ -1,4 +1,4 @@
-# TeaSharp Theme System V1
+# TeaSharp Theme System
 
 ## Scope
 

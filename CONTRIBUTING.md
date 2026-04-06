@@ -34,10 +34,10 @@ Before asking for review, run:
 dotnet build TeaSharp.slnx
 dotnet build examples/TeaSharp.Examples.slnx
 dotnet test TeaSharp.slnx
-scripts/smoke_examples_v1.sh 4
+scripts/smoke_examples.sh 4
 ```
 
-If your change touches perf-sensitive code or release-track behavior, also follow [docs/perf-plan-v1.md](docs/perf-plan-v1.md).
+If your change touches perf-sensitive code or release-track behavior, also follow [docs/performance.md](docs/performance.md).
 
 ## Contribution Rules
 
@@ -57,7 +57,7 @@ If you change a public API or public behavior, update the same slice:
 - [docs/spec.md](docs/spec.md)
 - [docs/public-api-guidelines.md](docs/public-api-guidelines.md)
 - [docs/public-api-inventory.md](docs/public-api-inventory.md)
-- [docs/theme-system-v1.md](docs/theme-system-v1.md) when styling/theming behavior changes
+- [docs/theme-system.md](docs/theme-system.md) when styling/theming behavior changes
 - [docs/examples.md](docs/examples.md) when the example lineup changes
 
 ## Pull Request Expectations

@@ -1,4 +1,4 @@
-# TeaSharp Widget Roadmap V1
+# TeaSharp Widget Roadmap
 
 This roadmap expands the widget catalog by **+34 additional widgets** in delivery waves, keeping the public C# API cohesive and theme-first.
 
@@ -138,7 +138,7 @@ Recommended implementation pattern:
 Documentation and examples:
 
 - canonical plotting/dashboard sample: `examples/PlottingDashboard` (add when available)
-- current stopgap references: `examples/WidgetGallery`, `examples/AdvancedWidgets`
+- current stopgap references: `examples/OpsWatch`, `examples/DownloadCenter`
 
 ## Expansion Backlog: +36 Dashboard-First Widgets (10 Landed)
 
@@ -310,5 +310,5 @@ Execution rules:
 
 ## Coordination Notes
 
-- Source-of-truth milestone mapping stays in [v1-master-plan.md](v1-master-plan.md).
-- Public API and theme consistency remain aligned with [public-api-inventory.md](public-api-inventory.md) and [theme-system-v1.md](theme-system-v1.md).
+- Source-of-truth milestone mapping stays in [alpha-release-checklist.md](alpha-release-checklist.md).
+- Public API and theme consistency remain aligned with [public-api-inventory.md](public-api-inventory.md) and [theme-system.md](theme-system.md).

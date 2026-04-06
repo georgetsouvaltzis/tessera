@@ -9,14 +9,14 @@ OUTPUT_DLL="$ROOT_DIR/benchmarks/TeaSharp.Benchmarks/bin/$CONFIGURATION/net10.0/
 usage() {
   cat <<'EOF'
 Usage:
-  scripts/run_benchmarks_v1.sh list
-  scripts/run_benchmarks_v1.sh all
-  scripts/run_benchmarks_v1.sh scenario "<filter>"
-  scripts/run_benchmarks_v1.sh shortlist
-  scripts/run_benchmarks_v1.sh shortlist-render-only
-  scripts/run_benchmarks_v1.sh shortlist-materialize
-  scripts/run_benchmarks_v1.sh iteration-template
-  scripts/run_benchmarks_v1.sh runtime-e2e
+  scripts/run_benchmarks.sh list
+  scripts/run_benchmarks.sh all
+  scripts/run_benchmarks.sh scenario "<filter>"
+  scripts/run_benchmarks.sh shortlist
+  scripts/run_benchmarks.sh shortlist-render-only
+  scripts/run_benchmarks.sh shortlist-materialize
+  scripts/run_benchmarks.sh iteration-template
+  scripts/run_benchmarks.sh runtime-e2e
 
 Modes:
   list      List benchmarks (--list flat)

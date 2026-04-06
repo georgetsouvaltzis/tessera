@@ -38,9 +38,9 @@ run_check \
   dotnet test tests/TeaSharp.Tests --no-restore --nologo --filter "CapabilityDetector_HostEnvironment_Ghostty_EvidenceHook"
 
 if [[ "$FAILURES" -eq 0 ]]; then
-  echo "PASS | terminal-matrix-v1"
+  echo "PASS | terminal-matrix"
 else
-  echo "FAIL | terminal-matrix-v1"
+  echo "FAIL | terminal-matrix"
 fi
 
 exit "$FAILURES"

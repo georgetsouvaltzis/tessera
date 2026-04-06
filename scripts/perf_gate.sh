@@ -11,9 +11,9 @@ RUNTIME_E2E_OUTPUT_PATH="$ROOT_DIR/docs/perf-baselines/latest-runtime-e2e-result
 usage() {
   cat <<'EOF'
 Usage:
-  scripts/perf_gate_v1.sh run
-  scripts/perf_gate_v1.sh dry-run
-  scripts/perf_gate_v1.sh runtime-e2e
+  scripts/perf_gate.sh run
+  scripts/perf_gate.sh dry-run
+  scripts/perf_gate.sh runtime-e2e
 
 Modes:
   run      Execute startup/input-latency gate benchmarks and compare against baseline thresholds.

@@ -56,4 +56,4 @@ If a new example becomes part of the public learning path, update:
 - [getting-started.md](getting-started.md)
 - [public-api-guidelines.md](public-api-guidelines.md)
 - [spec.md](spec.md)
-- `scripts/smoke_examples_v1.sh`
+- `scripts/smoke_examples.sh`

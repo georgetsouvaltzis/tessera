@@ -45,17 +45,17 @@ dotnet run --project benchmarks/TeaSharp.Benchmarks --configuration Release -- -
 Optional helper:
 
 ```bash
-scripts/run_benchmarks_v1.sh list
-scripts/run_benchmarks_v1.sh all
-scripts/run_benchmarks_v1.sh scenario "*Overlay*"
-scripts/run_benchmarks_v1.sh shortlist
-scripts/run_benchmarks_v1.sh shortlist-render-only
-scripts/run_benchmarks_v1.sh shortlist-materialize
-scripts/run_benchmarks_v1.sh iteration-template
-scripts/run_benchmarks_v1.sh runtime-e2e
-scripts/perf_gate_v1.sh run
-scripts/perf_gate_v1.sh dry-run
-scripts/perf_gate_v1.sh runtime-e2e
+scripts/run_benchmarks.sh list
+scripts/run_benchmarks.sh all
+scripts/run_benchmarks.sh scenario "*Overlay*"
+scripts/run_benchmarks.sh shortlist
+scripts/run_benchmarks.sh shortlist-render-only
+scripts/run_benchmarks.sh shortlist-materialize
+scripts/run_benchmarks.sh iteration-template
+scripts/run_benchmarks.sh runtime-e2e
+scripts/perf_gate.sh run
+scripts/perf_gate.sh dry-run
+scripts/perf_gate.sh runtime-e2e
 ```
 
 ## Before/After Reporting Workflow
@@ -64,7 +64,7 @@ Use the same host/terminal/configuration for both runs.
 
 1. checkout baseline commit and run shortlist for the target mode
 2. checkout candidate commit and run the same shortlist mode
-3. copy results into the iteration log template from `docs/perf-baseline-v1.md`
+3. copy results into the iteration log template from `docs/performance.md`
 
 Mode guidance:
 - `shortlist-render-only`: runs the six `*Only` methods (renderer/layout gate signals)
@@ -73,11 +73,11 @@ Mode guidance:
 - helper uses lazy build; it builds only when benchmark output is missing
 - SLO baseline gate:
   - baseline: `docs/perf-baselines/v1-slo-gate-baseline.json`
-  - run: `scripts/perf_gate_v1.sh run`
+  - run: `scripts/perf_gate.sh run`
   - output: `docs/perf-baselines/latest-slo-gate-result.json`
   - wrapper behavior: reuses the existing Release benchmark DLL and only builds if the DLL is missing
 - runtime e2e probe:
-  - run: `scripts/perf_gate_v1.sh runtime-e2e`
+  - run: `scripts/perf_gate.sh runtime-e2e`
   - output: `docs/perf-baselines/latest-runtime-e2e-result.json`
 
 ## Artifacts Location

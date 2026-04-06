@@ -260,7 +260,7 @@ internal static class PublicApiBoundaryTests
     private static Task SmokeExamplesScript_UsesRepoLocalArtifactsAndCurrentExamples()
     {
         var repoRoot = GetRepoRoot();
-        var scriptPath = Path.Combine(repoRoot, "scripts", "smoke_examples_v1.sh");
+        var scriptPath = Path.Combine(repoRoot, "scripts", "smoke_examples.sh");
         TestAssert.True(File.Exists(scriptPath), $"Expected smoke script at {ToRepoRelativePath(scriptPath)}.");
 
         var text = File.ReadAllText(scriptPath);
@@ -273,7 +273,7 @@ internal static class PublicApiBoundaryTests
         }
 
         TestAssert.True(
-            text.Contains(".artifacts/smoke_examples_v1", StringComparison.Ordinal),
+            text.Contains(".artifacts/smoke_examples", StringComparison.Ordinal),
             $"Expected {ToRepoRelativePath(scriptPath)} to write logs under ./.artifacts.");
         TestAssert.True(
             !text.Contains("mktemp", StringComparison.Ordinal),

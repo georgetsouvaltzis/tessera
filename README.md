@@ -28,7 +28,7 @@ TeaSharp is in public alpha. It is ready for evaluation, experimentation, and co
 
 1. Read [docs/getting-started.md](docs/getting-started.md).
 2. Run the onboarding ladder from [docs/examples.md](docs/examples.md): `HelloWorld`, `CounterForm`, `WorkspaceApp`.
-3. Use [docs/theme-system-v1.md](docs/theme-system-v1.md) for theming and [docs/custom-components.md](docs/custom-components.md) for custom controls.
+3. Use [docs/theme-system.md](docs/theme-system.md) for theming and [docs/custom-components.md](docs/custom-components.md) for custom controls.
 4. Then open the flagship showcases to see larger product-like surfaces.
 5. If you want to contribute, read [CONTRIBUTING.md](CONTRIBUTING.md) and [docs/architecture-overview.md](docs/architecture-overview.md).
 
@@ -169,7 +169,7 @@ The full guide lives in [docs/examples.md](docs/examples.md).
 - design contract: [docs/spec.md](docs/spec.md)
 - public API guidelines: [docs/public-api-guidelines.md](docs/public-api-guidelines.md)
 - public API inventory: [docs/public-api-inventory.md](docs/public-api-inventory.md)
-- theme system: [docs/theme-system-v1.md](docs/theme-system-v1.md)
+- theme system: [docs/theme-system.md](docs/theme-system.md)
 - custom controls: [docs/custom-components.md](docs/custom-components.md)
 - changelog: [CHANGELOG.md](CHANGELOG.md)
 - contributor guide: [CONTRIBUTING.md](CONTRIBUTING.md)
@@ -187,7 +187,7 @@ Primary repo verification commands:
 dotnet build TeaSharp.slnx
 dotnet build examples/TeaSharp.Examples.slnx
 dotnet test TeaSharp.slnx
-scripts/smoke_examples_v1.sh 4
+scripts/smoke_examples.sh 4
 ```
 
 ## Contributing

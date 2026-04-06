@@ -7,7 +7,7 @@ BOUNDED_SECONDS="${1:-4}"
 usage() {
   cat <<'EOF'
 Usage:
-  scripts/smoke_examples_v1.sh [bounded-seconds]
+  scripts/smoke_examples.sh [bounded-seconds]
 
 Behavior:
   Runs canonical examples with a bounded startup window.
@@ -34,7 +34,7 @@ EXAMPLES=(
   "GitConsole:examples/GitConsole/GitConsole.csproj"
 )
 
-ARTIFACT_DIR="${ROOT_DIR}/.artifacts/smoke_examples_v1"
+ARTIFACT_DIR="${ROOT_DIR}/.artifacts/smoke_examples"
 mkdir -p "${ARTIFACT_DIR}"
 
 PASS_COUNT=0

@@ -8,7 +8,7 @@ If you are evaluating TeaSharp for a product, follow this order:
 2. run `HelloWorld`
 3. run `CounterForm`
 4. run `WorkspaceApp`
-5. read [theme-system-v1.md](theme-system-v1.md) if you care about look and feel
+5. read [theme-system.md](theme-system.md) if you care about look and feel
 6. then open the flagship showcases
 7. read [architecture-overview.md](architecture-overview.md) if you want to contribute or extend the framework
 
@@ -78,7 +78,7 @@ dotnet run --project examples/DataWorkbench/DataWorkbench.csproj
 ## Where To Go Next
 
 - product contract: [spec.md](spec.md)
-- theme model: [theme-system-v1.md](theme-system-v1.md)
+- theme model: [theme-system.md](theme-system.md)
 - public API boundaries: [public-api-guidelines.md](public-api-guidelines.md)
 - API surface map: [public-api-inventory.md](public-api-inventory.md)
 - custom controls: [custom-components.md](custom-components.md)

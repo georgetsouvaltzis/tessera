@@ -17,7 +17,7 @@ public sealed class QuickOpenOverlayControlTests
         overlay.SetItems(
         [
             new QuickOpenItem("readme", "README.md", "docs"),
-            new QuickOpenItem("roadmap", "widget-roadmap-v1.md", "docs"),
+            new QuickOpenItem("roadmap", "widget-roadmap.md", "docs"),
             new QuickOpenItem("build", "build.sh", "scripts"),
         ]);
         overlay.Open();
@@ -60,7 +60,7 @@ public sealed class QuickOpenOverlayControlTests
         overlay.SetItems(
         [
             new QuickOpenItem("readme", "README.md", "docs"),
-            new QuickOpenItem("roadmap", "widget-roadmap-v1.md", "docs"),
+            new QuickOpenItem("roadmap", "widget-roadmap.md", "docs"),
         ]);
         overlay.Open();
 

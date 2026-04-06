@@ -1,4 +1,4 @@
-# TeaSharp Performance Plan V1
+# TeaSharp Performance Plan
 
 This plan defines V1 performance goals, measurement methodology, and release gates.
 
@@ -11,8 +11,8 @@ Primary metrics:
 - p95 input latency
 
 SLO targets (Release build, local terminal, same machine profile per run):
-- Startup (HelloWorld): <= 120 ms to first frame
-- Startup (WorkspaceApp): <= 250 ms to first frame
+- Startup (DataWorkbench): <= 250 ms to first frame
+- Startup (OpsWatch): <= 250 ms to first frame
 - Frame time p95 (normal UI load): <= 16 ms
 - Frame time p95 (heavy styled output): <= 33 ms
 - Allocations/frame (normal UI load): <= 32 KB
@@ -100,20 +100,20 @@ Harness quick commands:
   - `dotnet run --project benchmarks/TeaSharp.Benchmarks --configuration Release -- --filter "*Overlay*"`
   - `dotnet run --project benchmarks/TeaSharp.Benchmarks --configuration Release -- --filter "*LogTail*"`
 - Scripted path (optional):
-  - `scripts/run_benchmarks_v1.sh list|all|scenario "<filter>"|shortlist`
-  - `scripts/run_benchmarks_v1.sh shortlist-render-only`
-  - `scripts/run_benchmarks_v1.sh shortlist-materialize`
-  - `scripts/run_benchmarks_v1.sh runtime-e2e`
-  - `scripts/run_benchmarks_v1.sh iteration-template`
-  - `scripts/perf_gate_v1.sh run`
-  - `scripts/perf_gate_v1.sh dry-run`
-  - `scripts/perf_gate_v1.sh runtime-e2e`
+  - `scripts/run_benchmarks.sh list|all|scenario "<filter>"|shortlist`
+  - `scripts/run_benchmarks.sh shortlist-render-only`
+  - `scripts/run_benchmarks.sh shortlist-materialize`
+  - `scripts/run_benchmarks.sh runtime-e2e`
+  - `scripts/run_benchmarks.sh iteration-template`
+  - `scripts/perf_gate.sh run`
+  - `scripts/perf_gate.sh dry-run`
+  - `scripts/perf_gate.sh runtime-e2e`
   - script execution modes (`all|scenario|shortlist*`) run with `--inProcess` for trend/gate stability
   - script performs lazy build (build only when benchmark output is missing)
   - SLO gate baseline input: `docs/perf-baselines/v1-slo-gate-baseline.json`
   - SLO gate machine-readable output: `docs/perf-baselines/latest-slo-gate-result.json`
   - runtime e2e machine-readable output: `docs/perf-baselines/latest-runtime-e2e-result.json`
-  - `scripts/perf_gate_v1.sh` now follows the same lazy-build policy as `run_benchmarks_v1.sh` to avoid wrapper-only build stalls
+  - `scripts/perf_gate.sh` now follows the same lazy-build policy as `run_benchmarks.sh` to avoid wrapper-only build stalls
 
 BenchmarkDotNet artifacts/report directory:
 - `benchmarks/TeaSharp.Benchmarks/bin/Release/net10.0/BenchmarkDotNet.Artifacts/`

@@ -417,7 +417,7 @@ internal sealed class GitWorktreeControl : Control
 """),
             new GitFileEntry(
                 "perf-gate-script",
-                "scripts/perf_gate_v1.sh",
+                "scripts/perf_gate.sh",
                 GitChangeKind.Modified,
                 "Pin direct runner path and lazy-build benchmark host",
                 21,
@@ -430,7 +430,7 @@ internal sealed class GitWorktreeControl : Control
                 worktreeText: "dotnet exec benchmarks/TeaSharp.Benchmarks/bin/Release/net10.0/TeaSharp.Benchmarks.dll run\n"),
             new GitFileEntry(
                 "release-notes",
-                "docs/v1-master-plan.md",
+                "docs/alpha-release-checklist.md",
                 GitChangeKind.Modified,
                 "Capture flagship-example Alpha gate follow-up",
                 12,

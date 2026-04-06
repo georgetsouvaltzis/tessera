@@ -500,8 +500,8 @@ Their old `TeaSharp.Components.Prebuilt.*` counterparts have been removed instea
 ## Theme Mapping Status
 
 Current shipped theme mapping is centralized in `TeaSharp.Styles.TeaThemeControlExtensions` and split into domain partial files (`Basic`, `InputValue`, `Navigation`, `NavigationOverlay`, `NavigationPrimitives`, `DataAndFlow`, `PlanningAndBoards`, `QueryAndRichText`, `ExplorerAndFeedback`, `RenderingTextUtilities`, `ModalAndCharts`, `Plotting`, `DevOpsAndWorkflows`, `Workspace`, `FormsAndShell`).
-Overlay glyph cookbook snippets for `MenuBarGlyphSet`, `ContextMenuGlyphSet`, and `CommandPaletteGlyphSet` are documented in [theme-system-v1.md](theme-system-v1.md).
-Border override, dropdown/tree glyph-set, and data marker/separator cookbook snippets are documented in [theme-system-v1.md](theme-system-v1.md).
+Overlay glyph cookbook snippets for `MenuBarGlyphSet`, `ContextMenuGlyphSet`, and `CommandPaletteGlyphSet` are documented in [theme-system.md](theme-system.md).
+Border override, dropdown/tree glyph-set, and data marker/separator cookbook snippets are documented in [theme-system.md](theme-system.md).
 Wave 2 query/analytics controls (`PivotTable`, `QueryBuilder`, `RichTextView`) are mapped with the same semantic-token and border-style contract.
 Wave 3 dev/ops controls (`JsonTreeView`, `CommandOutput`, `LogTailPanel`, `ActivityFeed`, `NotificationInbox`, `KeyBindingHelpDialog`) are mapped with the same semantic-token contract. For onboarding/default app flows, use `Notifications`; treat `NotificationInbox` as advanced dev/ops surface.
 Wave 4 batch A + B controls (`DockWorkspace`, `PaneTabs`, `PaletteEditor`, `Heatmap`, `TreeMapChart`, `TerminalPanel`, `ProcessListView`) are integrated and mapped in `TeaThemeControlExtensions.Workspace.cs`.

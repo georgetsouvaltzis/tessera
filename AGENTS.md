@@ -1,11 +1,11 @@
 # Repository Guidelines
 
 ## Source Of Truth
-- `docs/v1-master-plan.md` is the authoritative execution plan for Public V1.
-- `docs/widget-roadmap-v1.md` is the authoritative widget scope contract for M3.
-- `docs/perf-plan-v1.md` is the authoritative performance strategy and release-gate policy.
-- If a task conflicts with older docs, follow `v1-master-plan.md` and update outdated docs in the same change.
-- Execute work in strict phase order from `v1-master-plan.md`: correctness -> API simplification -> visual polish -> expansion/perf/docs freeze.
+- `docs/alpha-release-checklist.md` is the authoritative execution plan for Public Alpha.
+- `docs/widget-roadmap.md` is the authoritative widget scope contract for M3.
+- `docs/performance.md` is the authoritative performance strategy and release-gate policy.
+- If a task conflicts with older docs, follow `alpha-release-checklist.md` and update outdated docs in the same change.
+- Execute work in strict phase order from `alpha-release-checklist.md`: correctness -> API simplification -> visual polish -> expansion/perf/docs freeze.
 
 ## Project Structure
 - `src/TeaSharp`: default public app-authoring API.
@@ -13,7 +13,8 @@
 - `tests/TeaSharp.Tests`: unit/contract/regression tests.
 - `tests/TeaSharp.IntegrationTests`: runtime/integration flows.
 - `examples/HelloWorld`, `examples/CounterForm`, `examples/WorkspaceApp`: canonical onboarding progression.
-- `examples/AdvancedWidgets`, `examples/WidgetGallery`: advanced interaction lane.
+- `examples/DataWorkbench`, `examples/OpsWatch`, `examples/GitConsole`: flagship public evaluation path.
+- `examples/IncidentDesk`, `examples/DownloadCenter`, `examples/TransitBoard`, `examples/MusicDeck`: supporting domain demos.
 
 ## Public API Boundaries
 - Public app path is library-first and no-DI by default.
@@ -30,22 +31,23 @@
 ## Coordination Model
 - One logical task per agent lane.
 - Parallelize only when file ownership is disjoint.
-- Use milestone checkpoints defined in `docs/v1-master-plan.md`.
+- Use milestone checkpoints defined in `docs/alpha-release-checklist.md`.
 - Keep notes short and update docs when behavior/API changes.
-- When new controls ship, sync `docs/widget-roadmap-v1.md`, `docs/prebuilt-widgets.md`, `docs/public-api-inventory.md`, `docs/spec.md`, and `docs/theme-system-v1.md` in the same slice.
+- When new controls ship, sync `docs/widget-roadmap.md`, `docs/prebuilt-widgets.md`, `docs/public-api-inventory.md`, `docs/spec.md`, and `docs/theme-system.md` in the same slice.
 
 ## Build/Test Commands
 Use .NET 10 from `global.json`.
 
 - `dotnet build TeaSharp.slnx`
+- `dotnet build examples/TeaSharp.Examples.slnx`
 - `dotnet test TeaSharp.slnx`
-- `dotnet build TeaSharp.Examples.slnx`
 - `dotnet run --project examples/HelloWorld`
 - `dotnet run --project examples/CounterForm`
 - `dotnet run --project examples/WorkspaceApp`
+- `scripts/smoke_examples.sh 4`
 
 Before handoff, run full cycle (build/tests/examples/docs consistency) and report exact commands/results.
-For performance-sensitive or release-track slices, run checks required by `docs/perf-plan-v1.md` and report outcomes.
+For performance-sensitive or release-track slices, run checks required by `docs/performance.md` and report outcomes.
 
 ## Coding Rules
 - Follow C# conventions already in repo: 4-space indent, nullable enabled, file-scoped namespaces.

@@ -37,7 +37,7 @@ Useful local checks before filing:
 dotnet build TeaSharp.slnx
 dotnet test TeaSharp.slnx
 dotnet build examples/TeaSharp.Examples.slnx
-scripts/smoke_examples_v1.sh 4
+scripts/smoke_examples.sh 4
 ```
 
 ## What To Include

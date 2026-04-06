@@ -18,9 +18,8 @@ TeaSharp is:
 TeaSharp is not:
 
 - a Generic-Host-first framework
-- a Terminal.Gui clone
-- a Spectre.Console clone
-- a Bubble Tea port
+- a copycat framework shaped around another terminal UI library
+- a port of another ecosystem's framework contract
 - a nested layout DSL disguised as C#
 
 TeaSharp is in public alpha.
@@ -209,7 +208,7 @@ Typography contract:
 - terminal font requests are best-effort only
 - terminal-specific caveats live in [terminal-font-capability-matrix.md](terminal-font-capability-matrix.md)
 
-Detailed token and hook mapping lives in [theme-system-v1.md](theme-system-v1.md).
+Detailed token and hook mapping lives in [theme-system.md](theme-system.md).
 
 ## V1 Boundaries
 
