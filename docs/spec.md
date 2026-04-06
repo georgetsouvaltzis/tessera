@@ -182,19 +182,13 @@ High-level rules:
 - `NotificationInbox` is the advanced/dev-ops inbox surface
 - `TelemetryChart` is the tiny-card telemetry control; `LinePlot` remains the larger plot surface
 - `Button` must follow a terminal-equivalent box model:
-  - one outer border/shell
-  - one coherent inner body/background
+  - one coherent rectangular body/background
   - fixed inner X/Y padding around content
   - centered content inside the padded rect
-  - rounded-border buttons should read as a single pill/button surface, not nested chips or mini-cards
-  - `Button.RoundedSurfaceMode = FlatFill` keeps borderless surfaced buttons as plain rectangular fills instead of auto-promoting them to pill shells
-  - when apps need a distinct rounded outline plus inset body, `Button.RoundedSurfaceMode = InsetBody` should reserve enough inner height for that bordered-body treatment instead of collapsing back to a 3-row pill
-  - `InsetBody` should also own plain-label chrome and minimum inner X breathing room when apps leave the default `Button` chrome settings in place
-  - `UnifiedShell` should reserve enough height and horizontal shoulder/cap inset so the shell reads as a rounded pill instead of a clipped octagon; label-only pills should use the taller 7-row silhouette while description-bearing action buttons can stay on the tighter 5-row contract
-  - compact rectangular buttons should prefer the normal `BorderStyle.SingleLine` contract; it keeps the button outline simple and predictable while the body fill stays on the inner row/box rather than trying to merge into the border cells
-  - `BorderStyleText` owns button border color; `BorderStyle.SingleLine` is the default compact bordered-button option when apps need stronger button affordance without the rounded-pill tradeoff
-  - focus should be ring/border-led; surface tint may increase slightly, but focus must not create inner bands or competing layers
-  - label styling, body styling, and shell styling are separate domains and must not bleed into one another
+  - built-in defaults should own plain label chrome plus symmetric horizontal breathing room so examples do not need to restate them
+  - surface styling must cover the whole allocated button body, including padded rows/columns, not just the post-padding content rect
+  - focus should come from label emphasis and optional surface tint, not a second shell layer or border chrome
+  - label styling and body styling are separate domains and must not bleed into one another
 - `Selected*` is canonical naming
 - existing `Current*` members remain compatibility aliases only where already shipped
 - new bordered controls must ship border-style hooks, theme-token mapping, and regression coverage in the same slice

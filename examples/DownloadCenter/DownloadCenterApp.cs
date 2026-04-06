@@ -20,10 +20,10 @@ internal sealed partial class DownloadCenterApp : TeaApp
     private readonly TelemetryChart _throughputChart = new(64) { Title = "throughput crest", Border = BorderStyle.Rounded, Padding = Thickness.All(1) };
     private readonly TelemetryChart _retryChart = new(64) { Title = "retry turbulence", Border = BorderStyle.Rounded, Padding = Thickness.All(1) };
     private readonly ActivityFeed _feed = new() { Title = "Transfer Feed · F2", Border = BorderStyle.Rounded, Padding = Thickness.All(1), FocusMarker = "◈", ShowTimestamp = true };
-    private readonly Button _pauseButton = new() { Text = "Pause/Resume", Description = "p", Border = BorderStyle.Rounded, Padding = Thickness.All(1) };
-    private readonly Button _retryButton = new() { Text = "Retry Now", Description = "r", Border = BorderStyle.Rounded, Padding = Thickness.All(1) };
-    private readonly Button _boostButton = new() { Text = "Boost Lane", Description = "b", Border = BorderStyle.Rounded, Padding = Thickness.All(1) };
-    private readonly Button _purgeButton = new() { Text = "Purge Done", Description = "u", Border = BorderStyle.Rounded, Padding = Thickness.All(1) };
+    private readonly Button _pauseButton = new() { Text = "Pause/Resume", Description = "p", Padding = Thickness.All(1) };
+    private readonly Button _retryButton = new() { Text = "Retry Now", Description = "r", Padding = Thickness.All(1) };
+    private readonly Button _boostButton = new() { Text = "Boost Lane", Description = "b", Padding = Thickness.All(1) };
+    private readonly Button _purgeButton = new() { Text = "Purge Done", Description = "u", Padding = Thickness.All(1) };
     private readonly StatusBar _footer = new() { Fill = ' ' };
 
     public DownloadCenterApp()
@@ -232,10 +232,10 @@ internal sealed partial class DownloadCenterApp : TeaApp
         _feed.FocusedSelectedItemStyle = DownloadCenterTheme.Chip(0xF7FBFF, 0x375E99);
         _feed.TimestampStyle = _theme.Text.Muted;
 
-        ConfigureAction(_pauseButton, 0x08101F, 0x7FDBFF);
-        ConfigureAction(_retryButton, 0x08101F, 0xFF9B71);
-        ConfigureAction(_boostButton, 0x08101F, 0xD5B3FF);
-        ConfigureAction(_purgeButton, 0x08101F, 0x5EF0A5);
+        ConfigureAction(_pauseButton, 0xEAF2FF, 0x2E89C7);
+        ConfigureAction(_retryButton, 0xFFF4EC, 0xC96A3D);
+        ConfigureAction(_boostButton, 0xF7F0FF, 0x8767C8);
+        ConfigureAction(_purgeButton, 0xECFFF5, 0x2FAF68);
 
         _footer.LeftTextStyle = DownloadCenterTheme.Chip(0xF7FBFF, 0x234A77);
         _footer.RightTextStyle = _theme.Text.Secondary;
@@ -263,17 +263,13 @@ internal sealed partial class DownloadCenterApp : TeaApp
     private static void ConfigureAction(Button button, int foregroundRgb, int backgroundRgb)
     {
         var labelStyle = DownloadCenterTheme.Foreground(foregroundRgb).WithBold();
-        var surfaceStyle = DownloadCenterTheme.Background(backgroundRgb);
+        var surfaceStyle = DownloadCenterTheme.Foreground(foregroundRgb).Merge(DownloadCenterTheme.Background(backgroundRgb));
         button.LabelStyle = labelStyle;
         button.FocusedLabelStyle = labelStyle;
         button.PressedLabelStyle = labelStyle;
         button.SurfaceStyle = surfaceStyle;
         button.FocusedSurfaceStyle = surfaceStyle;
         button.PressedSurfaceStyle = surfaceStyle;
-        button.BorderStyleText = DownloadCenterTheme.Foreground(0x34517B);
-        button.FocusedBorderStyleText = DownloadCenterTheme.Foreground(0xFF9B71).WithBold();
-        button.LabelPrefix = string.Empty;
-        button.LabelSuffix = string.Empty;
     }
 }
 

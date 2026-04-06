@@ -15,7 +15,6 @@ internal static class BorderedControlParityPolicyTests
         typeof(AreaPlot),
         typeof(BoxPlot),
         typeof(BulletChart),
-        typeof(Button),
         typeof(Choice),
         typeof(ComboBox),
         typeof(CommandOutput),
@@ -134,7 +133,7 @@ internal static class BorderedControlParityPolicyTests
 
         foreach (var controlType in borderedControls)
         {
-            var borderStyleProperty = controlType.GetProperty(nameof(Button.BorderStyleText), BindingFlags.Instance | BindingFlags.Public);
+            var borderStyleProperty = controlType.GetProperty("BorderStyleText", BindingFlags.Instance | BindingFlags.Public);
             if (borderStyleProperty?.PropertyType != typeof(TeaStyle))
             {
                 missingBorderStyleText.Add(FormatTypeName(controlType));
@@ -144,7 +143,7 @@ internal static class BorderedControlParityPolicyTests
                 missingBorderStyleSetter.Add(FormatTypeName(controlType));
             }
 
-            var focusedBorderStyleProperty = controlType.GetProperty(nameof(Button.FocusedBorderStyleText), BindingFlags.Instance | BindingFlags.Public);
+            var focusedBorderStyleProperty = controlType.GetProperty("FocusedBorderStyleText", BindingFlags.Instance | BindingFlags.Public);
             if (focusedBorderStyleProperty?.PropertyType != typeof(TeaStyle))
             {
                 missingFocusedBorderStyleText.Add(FormatTypeName(controlType));
@@ -236,8 +235,8 @@ internal static class BorderedControlParityPolicyTests
                 .ToArray();
             var nonBorderStyleProperties = teaStyleProperties
                 .Where(static property =>
-                    !string.Equals(property.Name, nameof(Button.BorderStyleText), StringComparison.Ordinal)
-                    && !string.Equals(property.Name, nameof(Button.FocusedBorderStyleText), StringComparison.Ordinal))
+                    !string.Equals(property.Name, "BorderStyleText", StringComparison.Ordinal)
+                    && !string.Equals(property.Name, "FocusedBorderStyleText", StringComparison.Ordinal))
                 .ToArray();
 
             if (nonBorderStyleProperties.Length == 0)

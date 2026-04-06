@@ -25,11 +25,11 @@ internal sealed partial class GitConsoleApp : TeaApp
     private readonly TextArea _notesInput = new() { Title = "Commit Notes", Border = BorderStyle.Rounded, Padding = Thickness.All(1), FocusMarker = "◆", ShowLineNumbers = false, Wrap = true };
     private readonly CommandOutput _history = new() { Title = "Action History · F4", Border = BorderStyle.Rounded, Padding = Thickness.All(1), FocusMarker = "◆", AutoFollow = true, ShowTimestamp = true };
     private readonly StatusBar _footer = new() { Fill = ' ' };
-    private readonly Button _stageButton = new() { Text = "Stage", Description = "s queue", Border = BorderStyle.Rounded, Padding = Thickness.Symmetric(2, 0) };
-    private readonly Button _discardButton = new() { Text = "Discard", Description = "x drop", Border = BorderStyle.Rounded, Padding = Thickness.Symmetric(2, 0) };
-    private readonly Button _modeButton = new() { Text = "Lens", Description = "d cycle", Border = BorderStyle.Rounded, Padding = Thickness.Symmetric(2, 0) };
-    private readonly Button _commitButton = new() { Text = "Commit", Description = "ctrl+enter", Border = BorderStyle.Rounded, Padding = Thickness.Symmetric(2, 0) };
-    private readonly Button _syncButton = new() { Text = "Sync", Description = "u fetch", Border = BorderStyle.Rounded, Padding = Thickness.Symmetric(2, 0) };
+    private readonly Button _stageButton = new() { Text = "Stage", Description = "s queue", Padding = Thickness.Symmetric(2, 0) };
+    private readonly Button _discardButton = new() { Text = "Discard", Description = "x drop", Padding = Thickness.Symmetric(2, 0) };
+    private readonly Button _modeButton = new() { Text = "Lens", Description = "d cycle", Padding = Thickness.Symmetric(2, 0) };
+    private readonly Button _commitButton = new() { Text = "Commit", Description = "ctrl+enter", Padding = Thickness.Symmetric(2, 0) };
+    private readonly Button _syncButton = new() { Text = "Sync", Description = "u fetch", Padding = Thickness.Symmetric(2, 0) };
     private readonly Label _rightHeader = new() { Title = "Commit Flow · F3", Border = BorderStyle.Rounded, Padding = Thickness.Symmetric(1, 0) };
 
     public GitConsoleApp()
@@ -302,8 +302,6 @@ internal sealed partial class GitConsoleApp : TeaApp
         _worktree.RemovedStyle = _theme.State.Error;
         _worktree.EmptyStyle = _theme.Text.Muted;
 
-        var buttonBorder = _theme.Border.Strong;
-        var buttonFocus = _theme.Border.Focused.Merge(_theme.Focus.Border);
         foreach (var button in new[] { _stageButton, _discardButton, _modeButton, _commitButton, _syncButton })
         {
             button.LabelStyle = _theme.Text.Primary.WithBold();
@@ -313,10 +311,6 @@ internal sealed partial class GitConsoleApp : TeaApp
             button.SurfaceStyle = _theme.Surface.Overlay;
             button.FocusedSurfaceStyle = _theme.Surface.Overlay;
             button.PressedSurfaceStyle = _theme.Selection.Background;
-            button.BorderStyleText = buttonBorder;
-            button.FocusedBorderStyleText = buttonFocus;
-            button.LabelPrefix = string.Empty;
-            button.LabelSuffix = string.Empty;
         }
     }
 

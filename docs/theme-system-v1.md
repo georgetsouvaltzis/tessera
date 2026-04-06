@@ -186,24 +186,15 @@ var button = new Button
     FocusedLabelStyle = TeaStyle.Empty.WithBold().WithForeground(AnsiColor.BrightWhite),
     SurfaceStyle = TeaStyle.Empty.WithBackground(AnsiColor.Rgb(36, 24, 30)),
     FocusedSurfaceStyle = TeaStyle.Empty.WithBackground(AnsiColor.Rgb(54, 36, 44)),
-    BorderStyleText = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(108, 68, 84)),
-    FocusedBorderStyleText = TeaStyle.Empty.WithBold().WithForeground(AnsiColor.Rgb(255, 184, 108)),
 };
 
 `Button` treats label styles as text-only semantics.
 Use `LabelStyle` / `FocusedLabelStyle` / `PressedLabelStyle` for foreground and emphasis.
 Use `SurfaceStyle` / `FocusedSurfaceStyle` / `PressedSurfaceStyle` for button-body fill.
-Background-like label facets are ignored so rounded pills stay a single shell with a single body.
-For pill/button-style controls, prefer a single coherent body surface plus border-led focus treatment.
+Background-like label facets are ignored so the button stays a single flat body.
+Buttons now default to plain label chrome plus built-in horizontal breathing room.
 Avoid layering a second chip-like background behind the label, because it breaks the intended box-model read and makes padding visually disappear.
-Default button focus should come primarily from the shell/ring treatment; body fill should remain stable unless an app explicitly opts into a stronger pressed/focused tint.
-For compact rectangular buttons, prefer the normal `BorderStyle.SingleLine` contract; it keeps the outline predictable and lets the body fill stay on the inner row/box instead of trying to merge into border cells on a terminal grid.
-Use `BorderStyleText` / `FocusedBorderStyleText` to color that border chrome; `BorderStyle.SingleLine` is the compact bordered-button affordance.
-If an app needs a distinct rounded outline with a separately filled inner body, set `RoundedSurfaceMode = ButtonRoundedSurfaceMode.InsetBody`.
-That mode reserves a taller rounded box so the border shell and the filled body remain visually separate.
-When the app keeps the default button label chrome, `InsetBody` also suppresses the default `[` `]` bracket treatment and adds minimum inner X breathing room automatically.
-If an app wants a plain rectangular fill with no border chrome at all, set `RoundedSurfaceMode = ButtonRoundedSurfaceMode.FlatFill`.
-`RoundedSurfaceMode = ButtonRoundedSurfaceMode.UnifiedShell` is the filled-pill mode and should reserve enough vertical space plus inset shoulder/cap rows so the shell reads as a rounded pill instead of collapsing into a 3-row cutout or clipped octagon. Label-only pills use the taller 7-row silhouette; description-bearing action buttons stay on the tighter 5-row silhouette.
+Default button focus should come primarily from label emphasis; body fill may shift slightly for focused/pressed states, but the control should remain one coherent rectangle.
 
 var list = new ListView<string>()
 {
@@ -574,8 +565,7 @@ Input/value mapping coverage includes:
 Basic mapping coverage includes:
 
 - `Label`, `Button`, `ListView<T>`, `StatusBar`, `TextInput`, `Table`, `Tabs`
-- `Label` and `Button` map `BorderStyleText` -> `theme.Border.Default` and `FocusedBorderStyleText` -> `theme.Border.Focused.Merge(theme.Focus.Border)`
-- `Button` also maps `SurfaceStyle` -> `theme.Surface.Panel`, `FocusedSurfaceStyle` -> `theme.Surface.Panel.Merge(theme.Focus.Border)`, and `PressedSurfaceStyle` -> `theme.Selection.Background`
+- `Button` maps `SurfaceStyle` -> `theme.Surface.Panel`, `FocusedSurfaceStyle` -> `theme.Surface.Panel`, and `PressedSurfaceStyle` -> `theme.Selection.Background`
 - `Button` label styles are text-only; body/background comes from button surface styles
 - `Table` maps `BorderStyleText` -> `theme.Border.Default` and `FocusedBorderStyleText` -> `theme.Border.Focused.Merge(theme.Focus.Border)`
 

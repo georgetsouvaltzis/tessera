@@ -96,8 +96,6 @@ internal static partial class ThemeOverridesTests
             button.PressedLabelStyle,
             "Button pressed label style should stay text-only.");
         TestAssert.Equal(theme.Selection.Background, button.PressedSurfaceStyle, "Button pressed surface style should use the pressed selection surface.");
-        TestAssert.Equal(theme.Border.Default, button.BorderStyleText, "Button border style should map to Border.Default.");
-        TestAssert.Equal(theme.Border.Focused.Merge(theme.Focus.Border), button.FocusedBorderStyleText, "Button focused border style should map to focused border tokens.");
 
         TestAssert.Equal(theme.Text.Primary, statusBar.LeftTextStyle, "StatusBar left style should map to Text.Primary.");
         TestAssert.Equal(theme.Text.Secondary, statusBar.RightTextStyle, "StatusBar right style should map to Text.Secondary.");
@@ -136,7 +134,6 @@ internal static partial class ThemeOverridesTests
         var button = new Button
         {
             LabelStyle = explicitStyle,
-            BorderStyleText = explicitStyle,
         };
         var statusBar = new StatusBar
         {
@@ -147,8 +144,6 @@ internal static partial class ThemeOverridesTests
         statusBar.ApplyThemeDefaults(theme);
 
         TestAssert.Equal(explicitStyle, button.LabelStyle, "Defaults should not overwrite explicit Button.LabelStyle.");
-        TestAssert.Equal(explicitStyle, button.BorderStyleText, "Defaults should not overwrite explicit Button.BorderStyleText.");
-        TestAssert.Equal(theme.Border.Focused.Merge(theme.Focus.Border), button.FocusedBorderStyleText, "Defaults should fill empty Button.FocusedBorderStyleText.");
         TestAssert.Equal(explicitStyle, statusBar.LeftTextStyle, "Defaults should not overwrite explicit StatusBar.LeftTextStyle.");
         TestAssert.Equal(theme.Text.Secondary, statusBar.RightTextStyle, "Defaults should fill empty StatusBar.RightTextStyle.");
 

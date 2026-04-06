@@ -36,16 +36,16 @@ internal sealed partial class OpsWatchApp : TeaApp
     private readonly BulletChart _networkBullet = new() { Title = "Traffic burn", Border = BorderStyle.Rounded, Padding = Thickness.All(1), FocusMarker = "*" };
     private readonly BulletChart _diskBullet = new() { Title = "Disk burn", Border = BorderStyle.Rounded, Padding = Thickness.All(1), FocusMarker = "*" };
 
-    private readonly Button _restartButton = new() { Text = "Restart", Description = "r", Border = BorderStyle.Rounded, Padding = Thickness.All(1) };
-    private readonly Button _drainButton = new() { Text = "Drain", Description = "d", Border = BorderStyle.Rounded, Padding = Thickness.All(1) };
-    private readonly Button _muteButton = new() { Text = "Mute Alerts", Description = "m", Border = BorderStyle.Rounded, Padding = Thickness.All(1) };
-    private readonly Button _scaleButton = new() { Text = "Scale", Description = "s", Border = BorderStyle.Rounded, Padding = Thickness.All(1) };
-    private readonly Button _inspectButton = new() { Text = "Inspect", Description = "i", Border = BorderStyle.Rounded, Padding = Thickness.All(1) };
-    private readonly Button _failoverButton = new() { Text = "Failover", Description = "f", Border = BorderStyle.Rounded, Padding = Thickness.All(1) };
-    private readonly Button _ackButton = new() { Text = "Acknowledge", Description = "a", Border = BorderStyle.Rounded, Padding = Thickness.All(1) };
-    private readonly Button _veridianThemeButton = new() { Text = "1 Veridian", Description = string.Empty, Border = BorderStyle.Rounded, Padding = Thickness.Symmetric(1, 0) };
-    private readonly Button _tidalThemeButton = new() { Text = "2 Tidal", Description = string.Empty, Border = BorderStyle.Rounded, Padding = Thickness.Symmetric(1, 0) };
-    private readonly Button _redlineThemeButton = new() { Text = "3 Redline", Description = string.Empty, Border = BorderStyle.Rounded, Padding = Thickness.Symmetric(1, 0) };
+    private readonly Button _restartButton = new() { Text = "Restart", Description = "r", Padding = Thickness.All(1) };
+    private readonly Button _drainButton = new() { Text = "Drain", Description = "d", Padding = Thickness.All(1) };
+    private readonly Button _muteButton = new() { Text = "Mute Alerts", Description = "m", Padding = Thickness.All(1) };
+    private readonly Button _scaleButton = new() { Text = "Scale", Description = "s", Padding = Thickness.All(1) };
+    private readonly Button _inspectButton = new() { Text = "Inspect", Description = "i", Padding = Thickness.All(1) };
+    private readonly Button _failoverButton = new() { Text = "Failover", Description = "f", Padding = Thickness.All(1) };
+    private readonly Button _ackButton = new() { Text = "Acknowledge", Description = "a", Padding = Thickness.All(1) };
+    private readonly Button _veridianThemeButton = new() { Text = "1 Veridian", Description = string.Empty, Padding = Thickness.Symmetric(1, 0) };
+    private readonly Button _tidalThemeButton = new() { Text = "2 Tidal", Description = string.Empty, Padding = Thickness.Symmetric(1, 0) };
+    private readonly Button _redlineThemeButton = new() { Text = "3 Redline", Description = string.Empty, Padding = Thickness.Symmetric(1, 0) };
 
     private readonly StatusBar _footer = new() { Fill = ' ' };
     private bool _syncingFleetSelection;
@@ -439,11 +439,6 @@ internal sealed partial class OpsWatchApp : TeaApp
     private void ConfigureThemeButton(Button button, OpsWatchThemeKind kind)
     {
         var isSelected = _palette.Kind == kind;
-        button.Border = BorderStyle.None;
-        button.LabelPrefix = string.Empty;
-        button.LabelSuffix = string.Empty;
-        button.Padding = Thickness.Symmetric(1, 0);
-        button.RoundedSurfaceMode = ButtonRoundedSurfaceMode.FlatFill;
         button.LabelStyle = isSelected
             ? OpsWatchTheme.Foreground(_palette.HeroBadgeForeground).WithBold()
             : _palette.Theme.Text.Secondary.WithBold();
@@ -458,10 +453,6 @@ internal sealed partial class OpsWatchApp : TeaApp
         button.PressedSurfaceStyle = isSelected
             ? OpsWatchTheme.Background(_palette.FooterChipBackground)
             : _palette.Theme.Selection.Background;
-        button.BorderStyleText = isSelected
-            ? OpsWatchTheme.Foreground(_palette.FrameStrongColor).WithBold()
-            : OpsWatchTheme.Foreground(_palette.FrameMutedColor);
-        button.FocusedBorderStyleText = _palette.Theme.Focus.Border;
     }
 
     private static void ConfigurePulseCard(StatsCard card, TeaStyle valueStyle, OpsWatchThemePalette palette)
@@ -498,19 +489,12 @@ internal sealed partial class OpsWatchApp : TeaApp
     {
         var labelStyle = OpsWatchTheme.Foreground(foregroundRgb).WithBold();
         var surfaceStyle = OpsWatchTheme.Background(backgroundRgb);
-        button.Border = BorderStyle.Rounded;
-        button.LabelPrefix = string.Empty;
-        button.LabelSuffix = string.Empty;
-        button.Padding = Thickness.Symmetric(1, 0);
-        button.RoundedSurfaceMode = ButtonRoundedSurfaceMode.UnifiedShell;
         button.LabelStyle = labelStyle.WithBold();
         button.FocusedLabelStyle = labelStyle.WithBold();
         button.PressedLabelStyle = labelStyle.WithBold();
         button.SurfaceStyle = surfaceStyle;
         button.FocusedSurfaceStyle = surfaceStyle;
         button.PressedSurfaceStyle = surfaceStyle;
-        button.BorderStyleText = OpsWatchTheme.Foreground(palette.FrameMutedColor);
-        button.FocusedBorderStyleText = palette.Theme.Focus.Border;
     }
 
     private void ConfigureBullet(BulletChart chart, string unit)

@@ -18,12 +18,12 @@ internal sealed partial class IncidentDeskApp : TeaApp
     private readonly ActivityFeed _timeline = new() { Title = "Event Narrative · F2", Border = BorderStyle.Rounded, Padding = Thickness.All(1), FocusMarker = "◈", ShowTimestamp = true };
     private readonly Label _responderCard = new() { Title = "Responder Lane", Border = BorderStyle.Rounded, Padding = Thickness.All(1) };
     private readonly TextArea _notes = new() { Title = "Operator Notes · F3", Border = BorderStyle.Rounded, Padding = Thickness.All(1), FocusMarker = "◈", Wrap = true, ShowLineNumbers = false };
-    private readonly Button _ackButton = new() { Text = "Acknowledge", Description = "a · take command", Border = BorderStyle.Rounded, Padding = Thickness.All(1) };
-    private readonly Button _assignButton = new() { Text = "Assign", Description = "g · cycle owner", Border = BorderStyle.Rounded, Padding = Thickness.All(1) };
-    private readonly Button _escalateButton = new() { Text = "Escalate", Description = "e · raise severity", Border = BorderStyle.Rounded, Padding = Thickness.All(1) };
-    private readonly Button _resolveButton = new() { Text = "Resolve", Description = "v · verify recovery", Border = BorderStyle.Rounded, Padding = Thickness.All(1) };
-    private readonly Button _reopenButton = new() { Text = "Reopen", Description = "o · restore active mode", Border = BorderStyle.Rounded, Padding = Thickness.All(1) };
-    private readonly Button _syncButton = new() { Text = "Sync", Description = "s · refresh telemetry", Border = BorderStyle.Rounded, Padding = Thickness.All(1) };
+    private readonly Button _ackButton = new() { Text = "Acknowledge", Description = "a · take command", Padding = Thickness.All(1) };
+    private readonly Button _assignButton = new() { Text = "Assign", Description = "g · cycle owner", Padding = Thickness.All(1) };
+    private readonly Button _escalateButton = new() { Text = "Escalate", Description = "e · raise severity", Padding = Thickness.All(1) };
+    private readonly Button _resolveButton = new() { Text = "Resolve", Description = "v · verify recovery", Padding = Thickness.All(1) };
+    private readonly Button _reopenButton = new() { Text = "Reopen", Description = "o · restore active mode", Padding = Thickness.All(1) };
+    private readonly Button _syncButton = new() { Text = "Sync", Description = "s · refresh telemetry", Padding = Thickness.All(1) };
     private readonly LogTailPanel _logs = new() { Title = "Live Telemetry · F4", Border = BorderStyle.Rounded, Padding = Thickness.All(1), FocusMarker = "◈", ShowTimestamp = true, ShowSource = true, ShowLevel = true, AutoFollow = true };
     private readonly StatusBar _footer = new() { Fill = ' ' };
 
@@ -444,10 +444,6 @@ internal sealed partial class IncidentDeskApp : TeaApp
         button.FocusedSurfaceStyle = surfaceStyle;
         button.PressedSurfaceStyle = surfaceStyle;
         button.DisabledLabelStyle = IncidentDeskTheme.Foreground(0x8E7A74);
-        button.BorderStyleText = IncidentDeskTheme.Foreground(0x8B5A46);
-        button.FocusedBorderStyleText = IncidentDeskTheme.Foreground(0xF3B276).WithBold();
-        button.LabelPrefix = string.Empty;
-        button.LabelSuffix = string.Empty;
     }
 
     private static TeaStyle SeverityChipStyle(IncidentSeverity severity) => severity switch

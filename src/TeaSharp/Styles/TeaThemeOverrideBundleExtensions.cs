@@ -163,9 +163,6 @@ public static class TeaThemeOverrideBundleExtensions
         ArgumentNullException.ThrowIfNull(control);
         ArgumentNullException.ThrowIfNull(bundle);
 
-        control.BorderStyleText = bundle.BorderStyleText;
-        control.FocusedBorderStyleText = bundle.FocusedBorderStyleText;
-        control.Border = bundle.ActionBorder;
         control.LabelStyle = bundle.ActionLabelStyle;
         control.FocusedLabelStyle = bundle.FocusedActionLabelStyle;
         control.PressedLabelStyle = bundle.PressedActionLabelStyle;

@@ -14,7 +14,9 @@ public static partial class TeaThemeControlExtensions
 
         var buttonSurface = ResolveButtonSurface(theme);
         control.LabelStyle = ApplyDefault(control.LabelStyle, theme.Text.Primary);
-        control.FocusedLabelStyle = ApplyDefault(control.FocusedLabelStyle, theme.Text.Primary.WithBold());
+        control.FocusedLabelStyle = ApplyDefault(
+            control.FocusedLabelStyle,
+            control.LabelStyle.IsEmpty ? theme.Text.Primary.WithBold() : TeaStyle.Empty);
         control.DisabledLabelStyle = ApplyDefault(control.DisabledLabelStyle, theme.Text.Muted);
         control.SurfaceStyle = ApplyDefault(control.SurfaceStyle, buttonSurface);
         control.FocusedSurfaceStyle = ApplyDefault(control.FocusedSurfaceStyle, buttonSurface);
@@ -22,8 +24,6 @@ public static partial class TeaThemeControlExtensions
             control.PressedLabelStyle,
             theme.Text.Primary.WithBold());
         control.PressedSurfaceStyle = ApplyDefault(control.PressedSurfaceStyle, ResolvePressedButtonSurface(theme, buttonSurface));
-        control.BorderStyleText = ApplyDefault(control.BorderStyleText, theme.Border.Default);
-        control.FocusedBorderStyleText = ApplyDefault(control.FocusedBorderStyleText, theme.Border.Focused.Merge(theme.Focus.Border));
         return control;
     }
 
@@ -57,8 +57,6 @@ public static partial class TeaThemeControlExtensions
         control.FocusedSurfaceStyle = buttonSurface;
         control.PressedLabelStyle = theme.Text.Primary.WithBold();
         control.PressedSurfaceStyle = ResolvePressedButtonSurface(theme, buttonSurface);
-        control.BorderStyleText = theme.Border.Default;
-        control.FocusedBorderStyleText = theme.Border.Focused.Merge(theme.Focus.Border);
         return control;
     }
 

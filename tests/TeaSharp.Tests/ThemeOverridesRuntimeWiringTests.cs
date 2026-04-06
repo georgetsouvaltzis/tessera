@@ -16,7 +16,6 @@ public sealed class ThemeOverridesRuntimeWiringTests
         var app = new RuntimeProbeApp(new Button
         {
             Text = "Ship",
-            Border = BorderStyle.None,
         });
 
         _ = Tea.CreateApplication(
@@ -37,7 +36,6 @@ public sealed class ThemeOverridesRuntimeWiringTests
         var button = new Button
         {
             Text = "Deploy",
-            Border = BorderStyle.None,
             IsFocused = true,
         };
 
@@ -65,7 +63,6 @@ public sealed class ThemeOverridesRuntimeWiringTests
         var button = new Button
         {
             Text = "Run",
-            Border = BorderStyle.None,
             IsFocused = true,
             LabelStyle = explicitLabelStyle,
         };
@@ -85,7 +82,6 @@ public sealed class ThemeOverridesRuntimeWiringTests
         var button = new Button
         {
             Text = "Focus",
-            Border = BorderStyle.None,
             IsFocused = true,
         };
 

@@ -63,8 +63,8 @@ public sealed class ThemeScopeApiErgonomicsTests
         Assert.That(applied, Is.EqualTo(2));
         Assert.That(button.LabelStyle, Is.EqualTo(expectedButton.LabelStyle));
         Assert.That(button.FocusedLabelStyle, Is.EqualTo(expectedButton.FocusedLabelStyle));
-        Assert.That(button.BorderStyleText, Is.EqualTo(expectedButton.BorderStyleText));
-        Assert.That(button.FocusedBorderStyleText, Is.EqualTo(expectedButton.FocusedBorderStyleText));
+        Assert.That(button.SurfaceStyle, Is.EqualTo(expectedButton.SurfaceStyle));
+        Assert.That(button.FocusedSurfaceStyle, Is.EqualTo(expectedButton.FocusedSurfaceStyle));
 
         Assert.That(list.DefaultRowStyle, Is.EqualTo(expectedList.DefaultRowStyle));
         Assert.That(list.HoveredRowStyle, Is.EqualTo(expectedList.HoveredRowStyle));

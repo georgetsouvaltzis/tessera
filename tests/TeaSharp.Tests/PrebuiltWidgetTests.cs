@@ -17,25 +17,15 @@ internal static class PrebuiltWidgetTests
         yield return new TestCase("Controls_Button_MouseClickActivatesAndTracksState", Button_MouseClickActivatesAndTracksState);
         yield return new TestCase("Controls_Button_ActivatedEvent_FiresOnActivation", Button_ActivatedEvent_FiresOnActivation);
         yield return new TestCase("Controls_Button_TryConsumeActivation_IsSingleUse", Button_TryConsumeActivation_IsSingleUse);
-        yield return new TestCase("Controls_Button_RendersBorderedState", Button_RendersBorderedState);
-        yield return new TestCase("Controls_Button_FocusedBorderStyleText_StylesFrameGlyphs", Button_FocusedBorderStyleText_StylesFrameGlyphs);
         yield return new TestCase("Controls_Button_MouseClickOnPadding_ActivatesWithinButtonBox", Button_MouseClickOnPadding_ActivatesWithinButtonBox);
-        yield return new TestCase("Controls_Button_LabelChrome_CanBeRemoved", Button_LabelChrome_CanBeRemoved);
-        yield return new TestCase("Controls_Button_SurfaceStyle_FillsPaddedInterior", Button_SurfaceStyle_FillsPaddedInterior);
-        yield return new TestCase("Controls_Button_SingleLineSurfaceBorder_UsesOutlineFirstShell", Button_SingleLineSurfaceBorder_UsesOutlineFirstShell);
-        yield return new TestCase("Controls_Button_FlatFillSurfaceMode_RendersRectangularFilledBody", Button_FlatFillSurfaceMode_RendersRectangularFilledBody);
+        yield return new TestCase("Controls_Button_LabelChrome_DefaultsToPlainText", Button_LabelChrome_DefaultsToPlainText);
+        yield return new TestCase("Controls_Button_SurfaceStyle_FillsAllocatedRect", Button_SurfaceStyle_FillsAllocatedRect);
+        yield return new TestCase("Controls_Button_DefaultSurfaceButtons_RenderRectangularBody", Button_DefaultSurfaceButtons_RenderRectangularBody);
         yield return new TestCase("Controls_Button_LabelStyles_DoNotCreateNestedBackgroundChrome", Button_LabelStyles_DoNotCreateNestedBackgroundChrome);
         yield return new TestCase("Controls_Button_Measure_UsesLongestLineAcrossLabelAndDescription", Button_Measure_UsesLongestLineAcrossLabelAndDescription);
-        yield return new TestCase("Controls_Button_DisabledBorder_DoesNotBorrowLabelStyle", Button_DisabledBorder_DoesNotBorrowLabelStyle);
+        yield return new TestCase("Controls_Button_DefaultPadding_ProvidesSymmetricBreathingRoom", Button_DefaultPadding_ProvidesSymmetricBreathingRoom);
         yield return new TestCase("Controls_Button_CenteredLabel_DoesNotBreakFilledSurface", Button_CenteredLabel_DoesNotBreakFilledSurface);
-        yield return new TestCase("Controls_Button_NarrowSurfaceShell_DropsChromeBeforeClippingLabel", Button_NarrowSurfaceShell_DropsChromeBeforeClippingLabel);
-        yield return new TestCase("Controls_Button_CompactSurfaceShell_FallsBackToReadableFilledLabel", Button_CompactSurfaceShell_FallsBackToReadableFilledLabel);
-        yield return new TestCase("Controls_Button_CompactRoundedSurface_ClampsPaddingToKeepLabelVisible", Button_CompactRoundedSurface_ClampsPaddingToKeepLabelVisible);
-        yield return new TestCase("Controls_Button_UnifiedShell_LabelOnly_ReservesSevenRowHeight", Button_UnifiedShell_LabelOnly_ReservesSevenRowHeight);
-        yield return new TestCase("Controls_Button_RoundedSurfaceMode_InsetBody_RendersBorderAndInsetFill", Button_RoundedSurfaceMode_InsetBody_RendersBorderAndInsetFill);
-        yield return new TestCase("Controls_Button_RoundedSurfaceMode_InsetBody_CompactHeight_FallsBackToReadableFilledLabel", Button_RoundedSurfaceMode_InsetBody_CompactHeight_FallsBackToReadableFilledLabel);
-        yield return new TestCase("Controls_Button_RoundedSurfaceMode_InsetBody_DefaultChrome_UsesPlainLabelAndBreathingRoom", Button_RoundedSurfaceMode_InsetBody_DefaultChrome_UsesPlainLabelAndBreathingRoom);
-        yield return new TestCase("Controls_Button_RoundedSurfaceMode_InsetBody_ReservesTallerAutoRoundedHeight", Button_RoundedSurfaceMode_InsetBody_ReservesTallerAutoRoundedHeight);
+        yield return new TestCase("Controls_Button_CompactSurface_KeepsPrimaryLabelReadable", Button_CompactSurface_KeepsPrimaryLabelReadable);
         yield return new TestCase("Controls_TextInput_SubmitsValue", TextInput_SubmitsValue);
         yield return new TestCase("Controls_TextInput_Events_ReportSubmitAndCancelValues", TextInput_Events_ReportSubmitAndCancelValues);
         yield return new TestCase("Controls_TextInput_TryConsumeSubmissionAndCancellation_AreSingleUse", TextInput_TryConsumeSubmissionAndCancellation_AreSingleUse);
@@ -187,7 +177,6 @@ internal static class PrebuiltWidgetTests
         var button = new Button
         {
             Text = "Deploy",
-            Border = BorderStyle.SingleLine,
         };
         var bounds = new Rect(0, 0, 18, 5);
 
@@ -210,7 +199,6 @@ internal static class PrebuiltWidgetTests
         var button = new Button
         {
             Text = "Deploy",
-            Border = BorderStyle.Rounded,
             Padding = Thickness.Symmetric(3, 1),
         };
         var bounds = new Rect(0, 0, 18, 5);
@@ -254,164 +242,72 @@ internal static class PrebuiltWidgetTests
         return Task.CompletedTask;
     }
 
-    private static Task Button_RendersBorderedState()
-    {
-        var button = new Button
-        {
-            Text = "Start",
-            Description = "click or press enter",
-            Border = BorderStyle.SingleLine,
-        };
-        var canvas = new Canvas(24, 5);
-
-        button.Render(canvas, new Rect(0, 0, 24, 5));
-        var output = canvas.Render();
-
-        TestAssert.True(output.Contains("[Start]", StringComparison.Ordinal), "Bordered button should render its label.");
-        TestAssert.True(output.Contains("click or press enter", StringComparison.Ordinal), "Bordered button should render its description.");
-        return Task.CompletedTask;
-    }
-
-    private static Task Button_FocusedBorderStyleText_StylesFrameGlyphs()
-    {
-        var focusedBorderStyle = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(128, 72, 44)).WithBold();
-        var button = new Button
-        {
-            IsFocused = true,
-            Border = BorderStyle.SingleLine,
-            BorderStyleText = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(30, 30, 30)),
-            FocusedBorderStyleText = focusedBorderStyle,
-            Text = "Run",
-        };
-        var canvas = new Canvas(20, 5, CanvasTextMode.GraphemeAware);
-
-        button.Render(canvas, new Rect(0, 0, 20, 5));
-        var output = canvas.Render();
-
-        TestAssert.True(output.Contains(focusedBorderStyle.Render("┌"), StringComparison.Ordinal), "Button should style focused border glyphs.");
-        return Task.CompletedTask;
-    }
-
-    private static Task Button_LabelChrome_CanBeRemoved()
+    private static Task Button_LabelChrome_DefaultsToPlainText()
     {
         var button = new Button
         {
             Text = "Play",
-            LabelPrefix = string.Empty,
-            LabelSuffix = string.Empty,
-            Border = BorderStyle.Rounded,
             Padding = Thickness.Symmetric(2, 1),
         };
-        var canvas = new Canvas(18, 5, CanvasTextMode.GraphemeAware);
+        var canvas = new Canvas(12, 3, CanvasTextMode.GraphemeAware);
 
-        button.Render(canvas, new Rect(0, 0, 18, 5));
+        button.Render(canvas, new Rect(0, 0, 12, 3));
         var output = canvas.Render();
 
-        TestAssert.True(output.Contains("Play", StringComparison.Ordinal), "Button should render plain label text when label chrome is disabled.");
-        TestAssert.True(!output.Contains("[Play]", StringComparison.Ordinal), "Button should not force bracket chrome when prefix and suffix are empty.");
-        TestAssert.True(output.Contains("╭", StringComparison.Ordinal), "Rounded button should render rounded shell glyphs.");
+        TestAssert.True(output.Contains("Play", StringComparison.Ordinal), "Buttons should render plain label text by default.");
+        TestAssert.True(!output.Contains("[Play]", StringComparison.Ordinal), "Buttons should no longer inject default bracket chrome.");
         return Task.CompletedTask;
     }
 
-    private static Task Button_SurfaceStyle_FillsPaddedInterior()
+    private static Task Button_SurfaceStyle_FillsAllocatedRect()
     {
         var surfaceStyle = TeaStyle.Empty.WithBackground(AnsiColor.Rgb(40, 30, 20));
-        var borderStyle = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(210, 180, 150));
         var button = new Button
         {
             Text = "Go",
-            Border = BorderStyle.Rounded,
             Padding = Thickness.Symmetric(2, 1),
             SurfaceStyle = surfaceStyle,
-            BorderStyleText = borderStyle,
         };
-        var canvas = new Canvas(16, 7, CanvasTextMode.GraphemeAware);
+        var canvas = new Canvas(10, 3, CanvasTextMode.GraphemeAware);
 
-        button.Render(canvas, new Rect(0, 0, 16, 7));
-        var output = canvas.Render();
-        var visibleOutput = StripAnsi(output);
-        var visibleLines = visibleOutput.Split('\n');
-        var capStyle = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(40, 30, 20));
-
-        TestAssert.True(output.Contains(surfaceStyle.Render("[Go]"), StringComparison.Ordinal), "Button surface style should keep the label row on the same filled surface as the rounded shell.");
-        TestAssert.True(output.Contains(capStyle.Render("▄"), StringComparison.Ordinal), "Filled rounded buttons should render shaped cap glyphs using the surface color.");
-        TestAssert.Equal("  ▗▄▄▄▄▄▄▄▄▄▄▖  ", visibleLines[0], "Label-only filled pills should use a taller rounded silhouette instead of the compact 5-row cutout.");
-        TestAssert.Equal(" ▗            ▖ ", visibleLines[1], "Label-only filled pills should keep the upper shoulder row inside the taller shell.");
-        TestAssert.Equal("▐              ▌", visibleLines[2], "Label-only filled pills should keep an upper body row above the centered label.");
-        TestAssert.Equal("▐     [Go]     ▌", visibleLines[3], "Label-only filled pills should keep the label centered on the full middle row.");
-        TestAssert.Equal("▐              ▌", visibleLines[4], "Label-only filled pills should keep a lower body row below the centered label.");
-        TestAssert.Equal(" ▝            ▘ ", visibleLines[5], "Label-only filled pills should keep the lower shoulder row inside the taller shell.");
-        TestAssert.Equal("  ▝▀▀▀▀▀▀▀▀▀▀▘  ", visibleLines[6], "Label-only filled pills should end with the taller rounded bottom cap.");
-        return Task.CompletedTask;
-    }
-
-    private static Task Button_SingleLineSurfaceBorder_UsesOutlineFirstShell()
-    {
-        var background = AnsiColor.Rgb(40, 30, 20);
-        var surfaceStyle = TeaStyle.Empty.WithBackground(background);
-        var borderStyle = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(210, 180, 150));
-        var button = new Button
-        {
-            Text = "Go",
-            LabelPrefix = string.Empty,
-            LabelSuffix = string.Empty,
-            Border = BorderStyle.SingleLine,
-            Padding = Thickness.Symmetric(1, 0),
-            SurfaceStyle = surfaceStyle,
-            BorderStyleText = borderStyle,
-        };
-
-        var measurement = button.Measure(new Rect(0, 0, 20, 5));
-        var canvas = new Canvas(measurement.Width, measurement.Height, CanvasTextMode.GraphemeAware);
-
-        TestAssert.Equal(6, measurement.Width, "Compact single-line bordered buttons should keep a tight 3-row footprint.");
-        TestAssert.Equal(3, measurement.Height, "Compact single-line bordered buttons should stay on the rectangular 3-row contract.");
-
-        button.Render(canvas, new Rect(0, 0, measurement.Width, measurement.Height));
+        button.Render(canvas, new Rect(0, 0, 10, 3));
         var output = canvas.Render();
         var visibleLines = StripAnsi(output).Split('\n');
 
-        TestAssert.True(output.Contains(surfaceStyle.Render("Go"), StringComparison.Ordinal), "Single-line bordered surface buttons should keep the label on the filled inner row.");
-        TestAssert.True(output.Contains(borderStyle.Render("┌"), StringComparison.Ordinal), "Single-line bordered surface buttons should keep the standard outline-first shell.");
-        TestAssert.True(!output.Contains(borderStyle.WithBackground(background).Render("┌"), StringComparison.Ordinal), "Single-line bordered surface buttons should not tint the border cells with the body fill.");
-        TestAssert.Equal("┌────┐", visibleLines[0], "Single-line bordered surface buttons should render the standard compact top border.");
-        TestAssert.Equal("│ Go │", visibleLines[1], "Single-line bordered surface buttons should center the label inside the filled inner row.");
-        TestAssert.Equal("└────┘", visibleLines[2], "Single-line bordered surface buttons should render the standard compact bottom border.");
+        TestAssert.True(output.Contains(surfaceStyle.Render(" "), StringComparison.Ordinal), "Button surface style should paint the whole allocated rectangle.");
+        TestAssert.Equal("          ", visibleLines[0], "Top row should stay part of the filled button body.");
+        TestAssert.Equal("    Go    ", visibleLines[1], "Label should stay centered inside the rectangular fill.");
+        TestAssert.Equal("          ", visibleLines[2], "Bottom row should stay part of the filled button body.");
         return Task.CompletedTask;
     }
 
-    private static Task Button_FlatFillSurfaceMode_RendersRectangularFilledBody()
+    private static Task Button_DefaultSurfaceButtons_RenderRectangularBody()
     {
         var surfaceStyle = TeaStyle.Empty.WithBackground(AnsiColor.Rgb(40, 30, 20));
         var labelStyle = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(210, 180, 150)).WithBold();
         var button = new Button
         {
             Text = "Go",
-            LabelPrefix = string.Empty,
-            LabelSuffix = string.Empty,
-            Border = BorderStyle.None,
-            Padding = Thickness.Symmetric(1, 0),
             SurfaceStyle = surfaceStyle,
             LabelStyle = labelStyle,
-            RoundedSurfaceMode = ButtonRoundedSurfaceMode.FlatFill,
         };
 
         var measurement = button.Measure(new Rect(0, 0, 20, 5));
         var canvas = new Canvas(6, 3, CanvasTextMode.GraphemeAware);
 
-        TestAssert.Equal(4, measurement.Width, "Flat-fill surface buttons should measure to a compact rectangular width without auto-rounded chrome.");
-        TestAssert.Equal(1, measurement.Height, "Flat-fill surface buttons should keep a one-row label contract when no border or description is present.");
+        TestAssert.Equal(4, measurement.Width, "Surface buttons should keep a compact rectangular width with built-in horizontal breathing room.");
+        TestAssert.Equal(1, measurement.Height, "Surface buttons should keep a one-row label contract when no description is present.");
 
         button.Render(canvas, new Rect(0, 0, 6, 3));
         var output = canvas.Render();
         var visibleLines = StripAnsi(output).Split('\n');
 
-        TestAssert.True(output.Contains(surfaceStyle.Render(" "), StringComparison.Ordinal), "Flat-fill surface buttons should paint a plain rectangular background across the allocated box.");
-        TestAssert.True(!output.Contains("▐", StringComparison.Ordinal), "Flat-fill surface buttons should not render rounded shell side glyphs.");
-        TestAssert.True(!output.Contains("╭", StringComparison.Ordinal), "Flat-fill surface buttons should not render border glyphs.");
-        TestAssert.Equal("      ", visibleLines[0], "Flat-fill surface buttons should keep the top row as a plain filled rectangle.");
-        TestAssert.Equal("  Go  ", visibleLines[1], "Flat-fill surface buttons should center the label inside the rectangular fill.");
-        TestAssert.Equal("      ", visibleLines[2], "Flat-fill surface buttons should keep the bottom row as a plain filled rectangle.");
+        TestAssert.True(output.Contains(surfaceStyle.Render(" "), StringComparison.Ordinal), "Surface buttons should paint a plain rectangular background across the allocated box.");
+        TestAssert.True(!output.Contains("▐", StringComparison.Ordinal), "Surface buttons should not render rounded shell side glyphs.");
+        TestAssert.True(!output.Contains("╭", StringComparison.Ordinal), "Surface buttons should not render border glyphs.");
+        TestAssert.Equal("      ", visibleLines[0], "Top row should remain part of the rectangular button fill.");
+        TestAssert.Equal("  Go  ", visibleLines[1], "Surface buttons should center the label inside the rectangular fill.");
+        TestAssert.Equal("      ", visibleLines[2], "Bottom row should remain part of the rectangular button fill.");
         return Task.CompletedTask;
     }
 
@@ -428,16 +324,13 @@ internal static class PrebuiltWidgetTests
         var button = new Button
         {
             Text = "Play",
-            LabelPrefix = string.Empty,
-            LabelSuffix = string.Empty,
-            Border = BorderStyle.Rounded,
             Padding = Thickness.Symmetric(2, 1),
             LabelStyle = labelStyle,
             SurfaceStyle = surfaceStyle,
         };
-        var canvas = new Canvas(18, 5, CanvasTextMode.GraphemeAware);
+        var canvas = new Canvas(10, 3, CanvasTextMode.GraphemeAware);
 
-        button.Render(canvas, new Rect(0, 0, 18, 5));
+        button.Render(canvas, new Rect(0, 0, 10, 3));
         var output = canvas.Render();
 
         TestAssert.True(output.Contains(surfaceStyle.Merge(expectedLabelStyle).Render("Play"), StringComparison.Ordinal), "Button label should keep text styling while the surface owns the background.");
@@ -451,250 +344,77 @@ internal static class PrebuiltWidgetTests
         {
             Text = "Go",
             Description = "click or press enter",
-            Border = BorderStyle.Rounded,
-            Padding = Thickness.Symmetric(2, 1),
         };
 
         var measurement = button.Measure(new Rect(0, 0, 80, 10));
-        var expectedWidth = "click or press enter".Length + button.Padding.Horizontal + 2;
+        var expectedWidth = "click or press enter".Length + button.Padding.Horizontal;
 
         TestAssert.Equal(expectedWidth, measurement.Width, "Button measure should size to the widest rendered line.");
         return Task.CompletedTask;
     }
 
-    private static Task Button_DisabledBorder_DoesNotBorrowLabelStyle()
+    private static Task Button_DefaultPadding_ProvidesSymmetricBreathingRoom()
     {
         var button = new Button
         {
             Text = "Run",
-            IsDisabled = true,
-            Border = BorderStyle.SingleLine,
-            BorderStyleText = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(10, 20, 30)),
-            DisabledLabelStyle = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(200, 100, 50)).WithDim(),
         };
-        var canvas = new Canvas(18, 5, CanvasTextMode.GraphemeAware);
+        var measurement = button.Measure(new Rect(0, 0, 20, 5));
+        var canvas = new Canvas(measurement.Width, 1, CanvasTextMode.GraphemeAware);
 
-        button.Render(canvas, new Rect(0, 0, 18, 5));
+        button.Render(canvas, new Rect(0, 0, measurement.Width, 1));
         var output = canvas.Render();
+        var visibleOutput = StripAnsi(output);
 
-        TestAssert.True(output.Contains(button.BorderStyleText.Render("┌"), StringComparison.Ordinal), "Disabled button should keep border-domain styling.");
-        TestAssert.True(!output.Contains(button.DisabledLabelStyle.Render("┌"), StringComparison.Ordinal), "Disabled label style should not leak into the border shell.");
+        TestAssert.Equal(5, measurement.Width, "Buttons should own symmetric horizontal breathing room by default.");
+        TestAssert.Equal(1, measurement.Height, "Plain buttons should keep the compact one-row height by default.");
+        TestAssert.True(visibleOutput.Contains(" Run ", StringComparison.Ordinal), "Default padding should center the label between one cell of left/right breathing room.");
         return Task.CompletedTask;
     }
 
     private static Task Button_CenteredLabel_DoesNotBreakFilledSurface()
     {
         var surfaceStyle = TeaStyle.Empty.WithBackground(AnsiColor.Rgb(30, 20, 20));
-        var borderStyle = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(190, 180, 170));
         var button = new Button
         {
             Text = "Play",
-            LabelPrefix = string.Empty,
-            LabelSuffix = string.Empty,
-            Border = BorderStyle.None,
             SurfaceStyle = surfaceStyle,
-            BorderStyleText = borderStyle,
         };
         var measurement = button.Measure(new Rect(0, 0, 18, 10));
-        var canvas = new Canvas(measurement.Width, measurement.Height, CanvasTextMode.GraphemeAware);
+        var canvas = new Canvas(8, 3, CanvasTextMode.GraphemeAware);
 
-        TestAssert.Equal(8, measurement.Width, "Borderless surface-styled buttons should reserve symmetric chip width without example hints.");
-        TestAssert.Equal(7, measurement.Height, "Borderless surface-styled buttons without descriptions should reserve the taller rounded-pill contract.");
+        TestAssert.Equal(6, measurement.Width, "Surface buttons should reserve symmetric rectangular width without example hints.");
+        TestAssert.Equal(1, measurement.Height, "Surface buttons without descriptions should stay on the compact one-row contract.");
 
-        button.Render(canvas, new Rect(0, 0, measurement.Width, measurement.Height));
+        button.Render(canvas, new Rect(0, 0, 8, 3));
         var output = canvas.Render();
         var visibleOutput = StripAnsi(output);
         var visibleLines = visibleOutput.Split('\n');
-        var capStyle = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(30, 20, 20));
 
-        TestAssert.True(output.Contains(capStyle.Render("▄"), StringComparison.Ordinal), "Surface-chromed borderless buttons should use the shaped filled-shell glyph contract.");
-        TestAssert.Equal(" ▗▄▄▄▄▖ ", visibleLines[0], "Surface-chromed borderless pills should use the taller rounded silhouette instead of the compact 5-row cutout.");
-        TestAssert.Equal(" ▗    ▖ ", visibleLines[1], "Surface-chromed borderless pills should widen through the upper shoulder row.");
-        TestAssert.Equal("▐      ▌", visibleLines[2], "Surface-chromed borderless pills should keep an upper body row before the centered label.");
-        TestAssert.Equal("▐ Play ▌", visibleLines[3], "Surface-chromed borderless pills should keep centered labels inside the full middle row.");
-        TestAssert.Equal("▐      ▌", visibleLines[4], "Surface-chromed borderless pills should keep a lower body row after the centered label.");
-        TestAssert.Equal(" ▝    ▘ ", visibleLines[5], "Surface-chromed borderless pills should taper through the lower shoulder row.");
-        TestAssert.Equal(" ▝▀▀▀▀▘ ", visibleLines[6], "Surface-chromed borderless pills should end with the taller rounded bottom cap.");
+        TestAssert.True(output.Contains(surfaceStyle.Render(" "), StringComparison.Ordinal), "Centered surface buttons should keep the fill continuous across the entire rectangle.");
+        TestAssert.Equal("        ", visibleLines[0], "Top row should remain part of the filled button body.");
+        TestAssert.Equal("  Play  ", visibleLines[1], "Centered label should stay on the same filled surface as the surrounding body.");
+        TestAssert.Equal("        ", visibleLines[2], "Bottom row should remain part of the filled button body.");
         return Task.CompletedTask;
     }
 
-    private static Task Button_NarrowSurfaceShell_DropsChromeBeforeClippingLabel()
+    private static Task Button_CompactSurface_KeepsPrimaryLabelReadable()
     {
         var surfaceStyle = TeaStyle.Empty.WithBackground(AnsiColor.Rgb(30, 20, 20));
-        var labelStyle = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(220, 210, 200)).WithBold();
-        var button = new Button
-        {
-            Text = "Run",
-            Border = BorderStyle.None,
-            SurfaceStyle = surfaceStyle,
-            LabelStyle = labelStyle,
-            BorderStyleText = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(180, 150, 120)),
-        };
-        var canvas = new Canvas(4, 3, CanvasTextMode.GraphemeAware);
-
-        button.Render(canvas, new Rect(0, 0, 4, 3));
-        var output = canvas.Render();
-        var visibleOutput = StripAnsi(output);
-
-        TestAssert.True(visibleOutput.Contains("Run", StringComparison.Ordinal), "Narrow rounded surface buttons should keep the readable label visible instead of clipping it behind default chrome.");
-        TestAssert.True(!visibleOutput.Contains("[Run]", StringComparison.Ordinal), "Narrow rounded surface buttons should drop decorative chrome before it clips the label.");
-        return Task.CompletedTask;
-    }
-
-    private static Task Button_CompactSurfaceShell_FallsBackToReadableFilledLabel()
-    {
-        var surfaceStyle = TeaStyle.Empty.WithBackground(AnsiColor.Rgb(30, 20, 20));
-        var button = new Button
-        {
-            Text = "Run",
-            Border = BorderStyle.None,
-            SurfaceStyle = surfaceStyle,
-            BorderStyleText = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(180, 150, 120)),
-        };
-        var canvas = new Canvas(5, 2, CanvasTextMode.GraphemeAware);
-
-        button.Render(canvas, new Rect(0, 0, 5, 2));
-        var output = canvas.Render();
-        var visibleOutput = StripAnsi(output);
-
-        TestAssert.True(output.Contains("Run", StringComparison.Ordinal), "Compact surface buttons should preserve readable text when the rounded shell lacks a dedicated middle row.");
-        TestAssert.True(!visibleOutput.Contains('▛'), "Compact surface buttons should fall back to a filled label row instead of drawing an empty rounded shell.");
-        return Task.CompletedTask;
-    }
-
-    private static Task Button_CompactRoundedSurface_ClampsPaddingToKeepLabelVisible()
-    {
         var button = new Button
         {
             Text = "Run",
             Description = "r",
-            Border = BorderStyle.Rounded,
-            Padding = Thickness.All(1),
-            SurfaceStyle = TeaStyle.Empty.WithBackground(AnsiColor.Rgb(30, 20, 20)),
-            BorderStyleText = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(180, 150, 120)),
-        };
-        var canvas = new Canvas(8, 3, CanvasTextMode.GraphemeAware);
-
-        button.Render(canvas, new Rect(0, 0, 8, 3));
-        var output = canvas.Render();
-
-        TestAssert.True(output.Contains("Run", StringComparison.Ordinal), "Compact rounded surface buttons should clamp vertical padding instead of losing the label row.");
-        TestAssert.True(!output.Contains(" r ", StringComparison.Ordinal), "Compact rounded surface buttons should prefer the primary label when there is only room for one content row.");
-        return Task.CompletedTask;
-    }
-
-    private static Task Button_UnifiedShell_LabelOnly_ReservesSevenRowHeight()
-    {
-        var button = new Button
-        {
-            Text = "Run",
-            LabelPrefix = string.Empty,
-            LabelSuffix = string.Empty,
-            Border = BorderStyle.None,
-            SurfaceStyle = TeaStyle.Empty.WithBackground(AnsiColor.Rgb(30, 20, 20)),
-        };
-
-        var measurement = button.Measure(new Rect(0, 0, 18, 10));
-
-        TestAssert.Equal(7, measurement.Height, "Label-only unified-shell buttons should reserve the taller 7-row rounded-pill contract.");
-        return Task.CompletedTask;
-    }
-
-    private static Task Button_RoundedSurfaceMode_InsetBody_RendersBorderAndInsetFill()
-    {
-        var surfaceStyle = TeaStyle.Empty.WithBackground(AnsiColor.Rgb(40, 30, 20));
-        var borderStyle = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(210, 180, 150));
-        var button = new Button
-        {
-            Text = "Go",
-            Border = BorderStyle.Rounded,
-            Padding = Thickness.Symmetric(2, 1),
             SurfaceStyle = surfaceStyle,
-            BorderStyleText = borderStyle,
-            RoundedSurfaceMode = ButtonRoundedSurfaceMode.InsetBody,
         };
-        var canvas = new Canvas(16, 5, CanvasTextMode.GraphemeAware);
+        var canvas = new Canvas(5, 1, CanvasTextMode.GraphemeAware);
 
-        button.Render(canvas, new Rect(0, 0, 16, 5));
+        button.Render(canvas, new Rect(0, 0, 5, 1));
         var output = canvas.Render();
         var visibleOutput = StripAnsi(output);
 
-        TestAssert.True(output.Contains(borderStyle.Render("╭"), StringComparison.Ordinal), "Inset-body rounded buttons should keep a distinct border ring.");
-        TestAssert.True(!output.Contains(surfaceStyle.Render("╭"), StringComparison.Ordinal), "Inset-body rounded buttons should not tint the border ring with the body fill.");
-        TestAssert.True(output.Contains(surfaceStyle.Render("Go"), StringComparison.Ordinal), "Inset-body rounded buttons should still render the label on the filled inner body.");
-        TestAssert.True(visibleOutput.Contains("╭──────────────╮", StringComparison.Ordinal), "Inset-body rounded buttons should render a pure rounded top border.");
-        TestAssert.True(visibleOutput.Contains("│              │", StringComparison.Ordinal), "Inset-body rounded buttons should keep a full inner body between the border rails.");
-        TestAssert.True(visibleOutput.Contains("│      Go      │", StringComparison.Ordinal), "Inset-body rounded buttons should center the label inside the filled body.");
-        TestAssert.True(visibleOutput.Contains("╰──────────────╯", StringComparison.Ordinal), "Inset-body rounded buttons should render a pure rounded bottom border.");
-        return Task.CompletedTask;
-    }
-
-    private static Task Button_RoundedSurfaceMode_InsetBody_CompactHeight_FallsBackToReadableFilledLabel()
-    {
-        var surfaceStyle = TeaStyle.Empty.WithBackground(AnsiColor.Rgb(40, 30, 20));
-        var button = new Button
-        {
-            Text = "Run",
-            LabelPrefix = string.Empty,
-            LabelSuffix = string.Empty,
-            Border = BorderStyle.None,
-            Padding = Thickness.Symmetric(1, 0),
-            SurfaceStyle = surfaceStyle,
-            RoundedSurfaceMode = ButtonRoundedSurfaceMode.InsetBody,
-        };
-        var canvas = new Canvas(7, 1, CanvasTextMode.GraphemeAware);
-
-        button.Render(canvas, new Rect(0, 0, 7, 1));
-        var output = canvas.Render();
-        var visibleOutput = StripAnsi(output);
-
-        TestAssert.True(output.Contains(surfaceStyle.Render(" "), StringComparison.Ordinal), "Compact inset-body buttons should keep the filled surface when the bordered shell cannot fit.");
-        TestAssert.True(visibleOutput.Contains(" Run ", StringComparison.Ordinal), "Compact inset-body buttons should fall back to a readable filled label row.");
-        TestAssert.True(!visibleOutput.Contains('╭'), "Compact inset-body buttons should not draw an empty border ring when there is no room for it.");
-        return Task.CompletedTask;
-    }
-
-    private static Task Button_RoundedSurfaceMode_InsetBody_DefaultChrome_UsesPlainLabelAndBreathingRoom()
-    {
-        var button = new Button
-        {
-            Text = "Run",
-            Border = BorderStyle.None,
-            SurfaceStyle = TeaStyle.Empty.WithBackground(AnsiColor.Rgb(40, 30, 20)),
-            BorderStyleText = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(210, 180, 150)),
-            RoundedSurfaceMode = ButtonRoundedSurfaceMode.InsetBody,
-        };
-
-        var measurement = button.Measure(new Rect(0, 0, 18, 8));
-        var canvas = new Canvas(measurement.Width, measurement.Height, CanvasTextMode.GraphemeAware);
-
-        button.Render(canvas, new Rect(0, 0, measurement.Width, measurement.Height));
-        var output = canvas.Render();
-        var visibleOutput = StripAnsi(output);
-
-        TestAssert.Equal(7, measurement.Width, "Inset-body rounded buttons should own minimum horizontal breathing room even when examples do not set padding.");
-        TestAssert.Equal(5, measurement.Height, "Inset-body rounded buttons should keep the taller bordered-body contract.");
-        TestAssert.True(visibleOutput.Contains("│ Run │", StringComparison.Ordinal), "Inset-body rounded buttons should use a plain centered label by default.");
-        TestAssert.True(!visibleOutput.Contains("[Run]", StringComparison.Ordinal), "Inset-body rounded buttons should not require manual bracket-chrome removal.");
-        return Task.CompletedTask;
-    }
-
-    private static Task Button_RoundedSurfaceMode_InsetBody_ReservesTallerAutoRoundedHeight()
-    {
-        var button = new Button
-        {
-            Text = "Play",
-            LabelPrefix = string.Empty,
-            LabelSuffix = string.Empty,
-            Border = BorderStyle.None,
-            SurfaceStyle = TeaStyle.Empty.WithBackground(AnsiColor.Rgb(30, 20, 20)),
-            RoundedSurfaceMode = ButtonRoundedSurfaceMode.InsetBody,
-        };
-
-        var measurement = button.Measure(new Rect(0, 0, 18, 8));
-
-        TestAssert.Equal(8, measurement.Width, "Inset-body surface buttons should preserve the shared symmetric chip width contract.");
-        TestAssert.Equal(5, measurement.Height, "Inset-body surface buttons should reserve enough height for a bordered shell plus inset body.");
+        TestAssert.True(visibleOutput.Contains(" Run ", StringComparison.Ordinal), "Compact buttons should keep the primary label readable even when the description row cannot fit.");
+        TestAssert.True(!visibleOutput.Contains(" r ", StringComparison.Ordinal), "Compact buttons should drop the secondary description when there is room for only one row.");
         return Task.CompletedTask;
     }
 

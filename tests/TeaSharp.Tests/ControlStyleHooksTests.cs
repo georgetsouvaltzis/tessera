@@ -109,7 +109,6 @@ internal static class ControlStyleHooksTests
     {
         var button = new Button
         {
-            Border = BorderStyle.None,
             Text = "Run",
             LabelStyle = TeaStyle.Empty.WithForeground(AnsiColor.BrightCyan),
             FocusedLabelStyle = TeaStyle.Empty.WithUnderline(),

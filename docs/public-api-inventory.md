@@ -397,16 +397,10 @@ The first root controls that already own their implementation directly are:
 - `Label`
 - `Button`
   - label chrome can be customized with `LabelPrefix` and `LabelSuffix`
+  - defaults to plain label chrome plus built-in symmetric horizontal breathing room
   - padded button body can be styled via `SurfaceStyle`, `FocusedSurfaceStyle`, and `PressedSurfaceStyle`
-  - rounded surface buttons can choose between `RoundedSurfaceMode = UnifiedShell` and `RoundedSurfaceMode = InsetBody`
-  - `RoundedSurfaceMode = FlatFill` keeps borderless surfaced buttons as plain rectangular fills with no pill shell
-  - `UnifiedShell` reserves a taller filled-pill silhouette with inset cap and shoulder rows so the shell reads as a rounded pill instead of collapsing to a 3-row cutout or clipped octagon; label-only pills use the taller 7-row contract while description-bearing action buttons stay on the tighter 5-row contract
-  - `InsetBody` suppresses the default bracket label chrome and adds minimum inner X breathing room when apps keep the built-in button label defaults
-  - compact rectangular buttons should prefer the normal `BorderStyle.SingleLine` contract; it keeps the outline predictable and the body fill on the inner row/box instead of trying to merge into border cells on a terminal grid
-  - `BorderStyleText` colors button borders; `BorderStyle.SingleLine` is the compact bordered-button affordance
   - label styles are text-only; body/background semantics belong to button surface styles
-  - surface styling is expected to cover the whole inner button box, including padding, not only the post-padding content rect
-  - rounded buttons are expected to read as one coherent pill/button surface with centered content, not nested visual layers
+  - surface styling is expected to cover the whole allocated button box, including padding, not only the post-padding content rect
   - measurement must account for the widest rendered line across label and description
 - `TextInput`
 - `TextArea`
@@ -593,7 +587,7 @@ Bordered control parity policy:
 Basic controls with direct token mappings:
 
 - `Label`, `Button`, `ListView<T>`, `StatusBar`, `TextInput`, `Table`, `Tabs`
-- `Label` and `Button` map `BorderStyleText` -> `Border.Default` and `FocusedBorderStyleText` -> `Border.Focused + Focus.Border`
+- `Button` maps `SurfaceStyle` -> `Surface.Panel`, `FocusedSurfaceStyle` -> `Surface.Panel`, and `PressedSurfaceStyle` -> `Selection.Background`
 - `TextInput` and `Table` map `BorderStyleText` -> `Border.Default` and `FocusedBorderStyleText` -> `Border.Focused + Focus.Border`
 
 Input/value controls with direct token mappings:

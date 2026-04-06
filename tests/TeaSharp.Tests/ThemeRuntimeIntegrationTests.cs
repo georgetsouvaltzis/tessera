@@ -74,7 +74,6 @@ internal static class ThemeRuntimeIntegrationTests
         var button = new Button
         {
             Text = "Ship",
-            Border = BorderStyle.None,
             LabelStyle = TeaStyle.Empty.WithForeground(AnsiColor.BrightMagenta),
         };
 

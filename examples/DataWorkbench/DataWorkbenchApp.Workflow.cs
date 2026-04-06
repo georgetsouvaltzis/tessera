@@ -351,29 +351,17 @@ internal sealed partial class DataWorkbenchApp
     {
         var labelStyle = DataWorkbenchTheme.Foreground(foregroundRgb).WithBold();
         var surfaceStyle = DataWorkbenchTheme.Background(backgroundRgb);
-        button.Border = BorderStyle.Rounded;
-        button.LabelPrefix = string.Empty;
-        button.LabelSuffix = string.Empty;
-        button.Padding = Thickness.Symmetric(1, 0);
-        button.RoundedSurfaceMode = ButtonRoundedSurfaceMode.UnifiedShell;
         button.LabelStyle = labelStyle.WithBold();
         button.FocusedLabelStyle = labelStyle.WithBold();
         button.PressedLabelStyle = labelStyle.WithBold();
         button.SurfaceStyle = surfaceStyle;
         button.FocusedSurfaceStyle = surfaceStyle;
         button.PressedSurfaceStyle = surfaceStyle;
-        button.BorderStyleText = DataWorkbenchTheme.Foreground(_palette.FrameStrong);
-        button.FocusedBorderStyleText = _palette.Theme.Focus.Border;
     }
 
     private void ConfigureThemeButton(Button button, DataWorkbenchThemeKind kind)
     {
         var isSelected = _palette.Kind == kind;
-        button.Border = BorderStyle.None;
-        button.LabelPrefix = string.Empty;
-        button.LabelSuffix = string.Empty;
-        button.Padding = Thickness.Symmetric(1, 0);
-        button.RoundedSurfaceMode = ButtonRoundedSurfaceMode.FlatFill;
         button.LabelStyle = isSelected
             ? DataWorkbenchTheme.Foreground(_palette.HeroBadgeForeground).WithBold()
             : _palette.Theme.Text.Secondary.WithBold();
@@ -388,9 +376,5 @@ internal sealed partial class DataWorkbenchApp
         button.PressedSurfaceStyle = isSelected
             ? DataWorkbenchTheme.Background(_palette.FooterChipBackground)
             : _palette.Theme.Selection.Background;
-        button.BorderStyleText = isSelected
-            ? DataWorkbenchTheme.Foreground(_palette.FrameStrong).WithBold()
-            : DataWorkbenchTheme.Foreground(_palette.FrameMuted);
-        button.FocusedBorderStyleText = _palette.Theme.Focus.Border;
     }
 }

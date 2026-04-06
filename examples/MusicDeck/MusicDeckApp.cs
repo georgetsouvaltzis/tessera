@@ -10,10 +10,10 @@ internal sealed partial class MusicDeckApp : TeaApp
     private readonly MusicDeckNowPlayingControl _nowPlaying = new() { Border = BorderStyle.Rounded, Padding = Thickness.All(1) };
     private readonly MusicDeckQueueControl _queue = new() { Title = "Queue · F1", Border = BorderStyle.Rounded, Padding = Thickness.All(1) };
     private readonly ProgressBar _progress = new() { Title = "Playback Drift", Border = BorderStyle.Rounded, Padding = Thickness.All(1), FocusMarker = "✦" };
-    private readonly Button _backButton = new() { Text = "Back", Border = BorderStyle.Rounded, Padding = Thickness.Symmetric(2, 1) };
-    private readonly Button _playPauseButton = new() { Text = "Pause", Border = BorderStyle.Rounded, Padding = Thickness.Symmetric(2, 1) };
-    private readonly Button _nextButton = new() { Text = "Next", Border = BorderStyle.Rounded, Padding = Thickness.Symmetric(2, 1) };
-    private readonly Button _detailButton = new() { Text = "Notes", Border = BorderStyle.Rounded, Padding = Thickness.Symmetric(2, 1) };
+    private readonly Button _backButton = new() { Text = "Back", Padding = Thickness.Symmetric(2, 1) };
+    private readonly Button _playPauseButton = new() { Text = "Pause", Padding = Thickness.Symmetric(2, 1) };
+    private readonly Button _nextButton = new() { Text = "Next", Padding = Thickness.Symmetric(2, 1) };
+    private readonly Button _detailButton = new() { Text = "Notes", Padding = Thickness.Symmetric(2, 1) };
     private readonly Label _transportLeftSpacer = new() { Border = BorderStyle.None, Text = string.Empty };
     private readonly Label _transportRightSpacer = new() { Border = BorderStyle.None, Text = string.Empty };
     private readonly StatsCard _deckStats = new() { Title = "Playback Stats", Border = BorderStyle.Rounded, Padding = Thickness.All(1) };
@@ -227,10 +227,6 @@ internal sealed partial class MusicDeckApp : TeaApp
         button.SurfaceStyle = MusicDeckTheme.Background(0x34202B);
         button.FocusedSurfaceStyle = MusicDeckTheme.Background(0x39232E);
         button.PressedSurfaceStyle = MusicDeckTheme.Background(0x4A2D3A);
-        button.BorderStyleText = MusicDeckTheme.Foreground(0x7A4E5E);
-        button.FocusedBorderStyleText = MusicDeckTheme.Foreground(0xF3C77A).WithBold();
-        button.LabelPrefix = string.Empty;
-        button.LabelSuffix = string.Empty;
     }
 
     private static void ConfigureCard(StatsCard card, TeaStyle valueStyle)
