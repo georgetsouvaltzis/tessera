@@ -275,6 +275,10 @@ public sealed class Button : Control
         var box = FrameLayout.ResolveInnerRect(clipped, shellBorder);
         var surfaceStyle = ResolveSurfaceStyle();
         var borderStyleText = ResolveBorderStyleText();
+        if (!surfaceStyle.IsEmpty && shellBorder != BorderStyle.None)
+        {
+            borderStyleText = borderStyleText.Merge(surfaceStyle);
+        }
         var content = FrameLayout.DrawFrameAndResolveContent(
             canvas,
             clipped,
