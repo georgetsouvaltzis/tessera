@@ -295,8 +295,6 @@ public sealed class Button : Control
         var content = ShouldRenderFilledRoundedShell(shellBorder, surfaceStyle, RoundedSurfaceMode)
             || ShouldFallbackInsetBodyToUnifiedShell(shellBorder, surfaceStyle, RoundedSurfaceMode, clipped)
             ? DrawFilledRoundedShell(canvas, clipped, borderStyleText, surfaceStyle, padding)
-            : ShouldRenderFilledHeavySurfaceShell(canvas, shellBorder, surfaceStyle)
-                ? DrawFilledHeavySurfaceShell(canvas, clipped, borderStyleText, surfaceStyle, padding)
             : DrawDefaultShell(canvas, clipped, shellBorder, borderStyleText, surfaceStyle, padding);
         if (content.IsEmpty || content.Height < 1)
         {
@@ -551,47 +549,6 @@ public sealed class Button : Control
         return ResolveContentRect(contentRect, padding);
     }
 
-    private Rect DrawFilledHeavySurfaceShell(
-        Canvas canvas,
-        Rect clipped,
-        TeaStyle borderStyleText,
-        TeaStyle surfaceStyle,
-        Thickness padding)
-    {
-        if (clipped.Width < 3 || clipped.Height < 3)
-        {
-            return DrawDefaultShell(canvas, clipped, BorderStyle.Heavy, borderStyleText, surfaceStyle, padding);
-        }
-
-        var shellStyle = ResolveFilledHeavyShellStyle(surfaceStyle, borderStyleText);
-
-        WriteBorderGlyph(canvas, clipped.X, clipped.Y, '▛', shellStyle);
-        WriteBorderGlyph(canvas, clipped.Right - 1, clipped.Y, '▜', shellStyle);
-        WriteBorderGlyph(canvas, clipped.X, clipped.Bottom - 1, '▙', shellStyle);
-        WriteBorderGlyph(canvas, clipped.Right - 1, clipped.Bottom - 1, '▟', shellStyle);
-
-        for (var x = clipped.X + 1; x < clipped.Right - 1; x++)
-        {
-            WriteBorderGlyph(canvas, x, clipped.Y, '▀', shellStyle);
-            WriteBorderGlyph(canvas, x, clipped.Bottom - 1, '▄', shellStyle);
-        }
-
-        for (var y = clipped.Y + 1; y < clipped.Bottom - 1; y++)
-        {
-            WriteBorderGlyph(canvas, clipped.X, y, '▌', shellStyle);
-            WriteBorderGlyph(canvas, clipped.Right - 1, y, '▐', shellStyle);
-
-            var fillRect = new Rect(clipped.X + 1, y, clipped.Width - 2, 1);
-            if (!fillRect.IsEmpty)
-            {
-                FillSurface(canvas, fillRect, surfaceStyle);
-            }
-        }
-
-        var contentRect = new Rect(clipped.X + 1, clipped.Y + 1, clipped.Width - 2, clipped.Height - 2);
-        return ResolveContentRect(contentRect, padding);
-    }
-
     private void FillSurface(Canvas canvas, Rect box, TeaStyle surfaceStyle)
     {
         if (surfaceStyle.IsEmpty)
@@ -761,16 +718,6 @@ public sealed class Button : Control
             && roundedSurfaceMode == ButtonRoundedSurfaceMode.UnifiedShell;
     }
 
-    private static bool ShouldRenderFilledHeavySurfaceShell(
-        Canvas canvas,
-        BorderStyle shellBorder,
-        TeaStyle surfaceStyle)
-    {
-        return shellBorder == BorderStyle.Heavy
-            && surfaceStyle.Background is not null
-            && canvas.TextMode == CanvasTextMode.GraphemeAware;
-    }
-
     private static bool ShouldFallbackInsetBodyToUnifiedShell(
         BorderStyle shellBorder,
         TeaStyle surfaceStyle,
@@ -806,13 +753,6 @@ public sealed class Button : Control
         }
 
         return borderStyleText;
-    }
-
-    private static TeaStyle ResolveFilledHeavyShellStyle(TeaStyle surfaceStyle, TeaStyle borderStyleText)
-    {
-        return surfaceStyle.Background is AnsiColor background
-            ? borderStyleText with { Background = background }
-            : borderStyleText;
     }
 
     private Thickness ResolveEffectivePadding(BorderStyle shellBorder, TeaStyle surfaceStyle)

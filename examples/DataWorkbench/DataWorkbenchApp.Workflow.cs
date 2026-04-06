@@ -351,7 +351,7 @@ internal sealed partial class DataWorkbenchApp
     {
         var labelStyle = DataWorkbenchTheme.Foreground(foregroundRgb).WithBold();
         var surfaceStyle = DataWorkbenchTheme.Background(backgroundRgb);
-        button.Border = BorderStyle.Heavy;
+        button.Border = BorderStyle.SingleLine;
         button.LabelPrefix = string.Empty;
         button.LabelSuffix = string.Empty;
         button.Padding = Thickness.Symmetric(1, 0);
@@ -368,7 +368,7 @@ internal sealed partial class DataWorkbenchApp
     private void ConfigureThemeButton(Button button, DataWorkbenchThemeKind kind)
     {
         var isSelected = _palette.Kind == kind;
-        button.Border = BorderStyle.Heavy;
+        button.Border = BorderStyle.SingleLine;
         button.LabelPrefix = string.Empty;
         button.LabelSuffix = string.Empty;
         button.Padding = Thickness.Symmetric(1, 0);

@@ -22,7 +22,7 @@ internal static class PrebuiltWidgetTests
         yield return new TestCase("Controls_Button_MouseClickOnPadding_ActivatesWithinButtonBox", Button_MouseClickOnPadding_ActivatesWithinButtonBox);
         yield return new TestCase("Controls_Button_LabelChrome_CanBeRemoved", Button_LabelChrome_CanBeRemoved);
         yield return new TestCase("Controls_Button_SurfaceStyle_FillsPaddedInterior", Button_SurfaceStyle_FillsPaddedInterior);
-        yield return new TestCase("Controls_Button_HeavySurfaceBorder_ComposesBorderAndFillInSameShell", Button_HeavySurfaceBorder_ComposesBorderAndFillInSameShell);
+        yield return new TestCase("Controls_Button_SingleLineSurfaceBorder_UsesOutlineFirstShell", Button_SingleLineSurfaceBorder_UsesOutlineFirstShell);
         yield return new TestCase("Controls_Button_LabelStyles_DoNotCreateNestedBackgroundChrome", Button_LabelStyles_DoNotCreateNestedBackgroundChrome);
         yield return new TestCase("Controls_Button_Measure_UsesLongestLineAcrossLabelAndDescription", Button_Measure_UsesLongestLineAcrossLabelAndDescription);
         yield return new TestCase("Controls_Button_DisabledBorder_DoesNotBorrowLabelStyle", Button_DisabledBorder_DoesNotBorrowLabelStyle);
@@ -344,17 +344,17 @@ internal static class PrebuiltWidgetTests
         return Task.CompletedTask;
     }
 
-    private static Task Button_HeavySurfaceBorder_ComposesBorderAndFillInSameShell()
+    private static Task Button_SingleLineSurfaceBorder_UsesOutlineFirstShell()
     {
         var background = AnsiColor.Rgb(40, 30, 20);
         var surfaceStyle = TeaStyle.Empty.WithBackground(background);
-        var borderStyle = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(210, 180, 150)).WithBold();
+        var borderStyle = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(210, 180, 150));
         var button = new Button
         {
             Text = "Go",
             LabelPrefix = string.Empty,
             LabelSuffix = string.Empty,
-            Border = BorderStyle.Heavy,
+            Border = BorderStyle.SingleLine,
             Padding = Thickness.Symmetric(1, 0),
             SurfaceStyle = surfaceStyle,
             BorderStyleText = borderStyle,
@@ -363,21 +363,19 @@ internal static class PrebuiltWidgetTests
         var measurement = button.Measure(new Rect(0, 0, 20, 5));
         var canvas = new Canvas(measurement.Width, measurement.Height, CanvasTextMode.GraphemeAware);
 
-        TestAssert.Equal(6, measurement.Width, "Compact heavy bordered buttons should keep a tight 3-row footprint.");
-        TestAssert.Equal(3, measurement.Height, "Compact heavy bordered buttons should stay on the rectangular 3-row contract.");
+        TestAssert.Equal(6, measurement.Width, "Compact single-line bordered buttons should keep a tight 3-row footprint.");
+        TestAssert.Equal(3, measurement.Height, "Compact single-line bordered buttons should stay on the rectangular 3-row contract.");
 
         button.Render(canvas, new Rect(0, 0, measurement.Width, measurement.Height));
         var output = canvas.Render();
         var visibleLines = StripAnsi(output).Split('\n');
-        var shellStyle = borderStyle with { Background = background };
 
-        TestAssert.True(output.Contains(surfaceStyle.Render("Go"), StringComparison.Ordinal), "Heavy bordered surface buttons should keep the label on the filled inner row.");
-        TestAssert.True(output.Contains(shellStyle.Render("▀"), StringComparison.Ordinal), "Heavy bordered surface buttons should render the top edge on the same composite shell as the body fill.");
-        TestAssert.True(output.Contains(shellStyle.Render("▌"), StringComparison.Ordinal), "Heavy bordered surface buttons should render the side rails on the same composite shell as the body fill.");
-        TestAssert.True(!output.Contains(borderStyle.Render("┏"), StringComparison.Ordinal), "Heavy bordered surface buttons should stop using the outline-only line-box shell for filled bodies.");
-        TestAssert.Equal("▛▀▀▀▀▜", visibleLines[0], "Heavy bordered surface buttons should use a compact composed top edge so the fill visually reaches the border.");
-        TestAssert.Equal("▌ Go ▐", visibleLines[1], "Heavy bordered surface buttons should keep the label centered inside the composed bordered body.");
-        TestAssert.Equal("▙▄▄▄▄▟", visibleLines[2], "Heavy bordered surface buttons should use a compact composed bottom edge so the fill visually reaches the border.");
+        TestAssert.True(output.Contains(surfaceStyle.Render("Go"), StringComparison.Ordinal), "Single-line bordered surface buttons should keep the label on the filled inner row.");
+        TestAssert.True(output.Contains(borderStyle.Render("┌"), StringComparison.Ordinal), "Single-line bordered surface buttons should keep the standard outline-first shell.");
+        TestAssert.True(!output.Contains(borderStyle.WithBackground(background).Render("┌"), StringComparison.Ordinal), "Single-line bordered surface buttons should not tint the border cells with the body fill.");
+        TestAssert.Equal("┌────┐", visibleLines[0], "Single-line bordered surface buttons should render the standard compact top border.");
+        TestAssert.Equal("│ Go │", visibleLines[1], "Single-line bordered surface buttons should center the label inside the filled inner row.");
+        TestAssert.Equal("└────┘", visibleLines[2], "Single-line bordered surface buttons should render the standard compact bottom border.");
         return Task.CompletedTask;
     }
 

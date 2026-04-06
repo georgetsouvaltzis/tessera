@@ -439,7 +439,7 @@ internal sealed partial class OpsWatchApp : TeaApp
     private void ConfigureThemeButton(Button button, OpsWatchThemeKind kind)
     {
         var isSelected = _palette.Kind == kind;
-        button.Border = BorderStyle.Heavy;
+        button.Border = BorderStyle.SingleLine;
         button.LabelPrefix = string.Empty;
         button.LabelSuffix = string.Empty;
         button.Padding = Thickness.Symmetric(1, 0);
@@ -497,7 +497,7 @@ internal sealed partial class OpsWatchApp : TeaApp
     {
         var labelStyle = OpsWatchTheme.Foreground(foregroundRgb).WithBold();
         var surfaceStyle = OpsWatchTheme.Background(backgroundRgb);
-        button.Border = BorderStyle.Heavy;
+        button.Border = BorderStyle.SingleLine;
         button.LabelPrefix = string.Empty;
         button.LabelSuffix = string.Empty;
         button.Padding = Thickness.Symmetric(1, 0);
