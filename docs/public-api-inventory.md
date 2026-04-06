@@ -399,6 +399,7 @@ The first root controls that already own their implementation directly are:
   - label chrome can be customized with `LabelPrefix` and `LabelSuffix`
   - padded button body can be styled via `SurfaceStyle`, `FocusedSurfaceStyle`, and `PressedSurfaceStyle`
   - rounded surface buttons can choose between `RoundedSurfaceMode = UnifiedShell` and `RoundedSurfaceMode = InsetBody`
+  - `RoundedSurfaceMode = FlatFill` keeps borderless surfaced buttons as plain rectangular fills with no pill shell
   - `UnifiedShell` reserves a taller filled-pill silhouette with inset cap and shoulder rows so the shell reads as a rounded pill instead of collapsing to a 3-row cutout or clipped octagon; label-only pills use the taller 7-row contract while description-bearing action buttons stay on the tighter 5-row contract
   - `InsetBody` suppresses the default bracket label chrome and adds minimum inner X breathing room when apps keep the built-in button label defaults
   - compact rectangular buttons should prefer the normal `BorderStyle.SingleLine` contract; it keeps the outline predictable and the body fill on the inner row/box instead of trying to merge into border cells on a terminal grid

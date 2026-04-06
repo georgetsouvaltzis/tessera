@@ -6,6 +6,12 @@ namespace TeaSharp.Controls;
 public enum ButtonRoundedSurfaceMode
 {
     /// <summary>
+    /// Uses a plain rectangular filled body when the button has surface chrome but no explicit border.
+    /// This keeps the button as a flat fill box instead of auto-promoting it to a rounded pill shell.
+    /// </summary>
+    FlatFill = 2,
+
+    /// <summary>
     /// Uses a unified rounded shell where border and fill read as one pill surface with inset cap and shoulder rows.
     /// Label-only pills reserve a taller silhouette than description-bearing action buttons.
     /// </summary>

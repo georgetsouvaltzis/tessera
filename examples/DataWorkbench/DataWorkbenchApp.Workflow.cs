@@ -369,11 +369,11 @@ internal sealed partial class DataWorkbenchApp
     private void ConfigureThemeButton(Button button, DataWorkbenchThemeKind kind)
     {
         var isSelected = _palette.Kind == kind;
-        button.Border = BorderStyle.Rounded;
+        button.Border = BorderStyle.None;
         button.LabelPrefix = string.Empty;
         button.LabelSuffix = string.Empty;
         button.Padding = Thickness.Symmetric(1, 0);
-        button.RoundedSurfaceMode = ButtonRoundedSurfaceMode.UnifiedShell;
+        button.RoundedSurfaceMode = ButtonRoundedSurfaceMode.FlatFill;
         button.LabelStyle = isSelected
             ? DataWorkbenchTheme.Foreground(_palette.HeroBadgeForeground).WithBold()
             : _palette.Theme.Text.Secondary.WithBold();

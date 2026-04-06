@@ -187,6 +187,7 @@ High-level rules:
   - fixed inner X/Y padding around content
   - centered content inside the padded rect
   - rounded-border buttons should read as a single pill/button surface, not nested chips or mini-cards
+  - `Button.RoundedSurfaceMode = FlatFill` keeps borderless surfaced buttons as plain rectangular fills instead of auto-promoting them to pill shells
   - when apps need a distinct rounded outline plus inset body, `Button.RoundedSurfaceMode = InsetBody` should reserve enough inner height for that bordered-body treatment instead of collapsing back to a 3-row pill
   - `InsetBody` should also own plain-label chrome and minimum inner X breathing room when apps leave the default `Button` chrome settings in place
   - `UnifiedShell` should reserve enough height and horizontal shoulder/cap inset so the shell reads as a rounded pill instead of a clipped octagon; label-only pills should use the taller 7-row silhouette while description-bearing action buttons can stay on the tighter 5-row contract

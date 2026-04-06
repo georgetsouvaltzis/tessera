@@ -23,6 +23,7 @@ internal static class PrebuiltWidgetTests
         yield return new TestCase("Controls_Button_LabelChrome_CanBeRemoved", Button_LabelChrome_CanBeRemoved);
         yield return new TestCase("Controls_Button_SurfaceStyle_FillsPaddedInterior", Button_SurfaceStyle_FillsPaddedInterior);
         yield return new TestCase("Controls_Button_SingleLineSurfaceBorder_UsesOutlineFirstShell", Button_SingleLineSurfaceBorder_UsesOutlineFirstShell);
+        yield return new TestCase("Controls_Button_FlatFillSurfaceMode_RendersRectangularFilledBody", Button_FlatFillSurfaceMode_RendersRectangularFilledBody);
         yield return new TestCase("Controls_Button_LabelStyles_DoNotCreateNestedBackgroundChrome", Button_LabelStyles_DoNotCreateNestedBackgroundChrome);
         yield return new TestCase("Controls_Button_Measure_UsesLongestLineAcrossLabelAndDescription", Button_Measure_UsesLongestLineAcrossLabelAndDescription);
         yield return new TestCase("Controls_Button_DisabledBorder_DoesNotBorrowLabelStyle", Button_DisabledBorder_DoesNotBorrowLabelStyle);
@@ -376,6 +377,41 @@ internal static class PrebuiltWidgetTests
         TestAssert.Equal("┌────┐", visibleLines[0], "Single-line bordered surface buttons should render the standard compact top border.");
         TestAssert.Equal("│ Go │", visibleLines[1], "Single-line bordered surface buttons should center the label inside the filled inner row.");
         TestAssert.Equal("└────┘", visibleLines[2], "Single-line bordered surface buttons should render the standard compact bottom border.");
+        return Task.CompletedTask;
+    }
+
+    private static Task Button_FlatFillSurfaceMode_RendersRectangularFilledBody()
+    {
+        var surfaceStyle = TeaStyle.Empty.WithBackground(AnsiColor.Rgb(40, 30, 20));
+        var labelStyle = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(210, 180, 150)).WithBold();
+        var button = new Button
+        {
+            Text = "Go",
+            LabelPrefix = string.Empty,
+            LabelSuffix = string.Empty,
+            Border = BorderStyle.None,
+            Padding = Thickness.Symmetric(1, 0),
+            SurfaceStyle = surfaceStyle,
+            LabelStyle = labelStyle,
+            RoundedSurfaceMode = ButtonRoundedSurfaceMode.FlatFill,
+        };
+
+        var measurement = button.Measure(new Rect(0, 0, 20, 5));
+        var canvas = new Canvas(6, 3, CanvasTextMode.GraphemeAware);
+
+        TestAssert.Equal(4, measurement.Width, "Flat-fill surface buttons should measure to a compact rectangular width without auto-rounded chrome.");
+        TestAssert.Equal(1, measurement.Height, "Flat-fill surface buttons should keep a one-row label contract when no border or description is present.");
+
+        button.Render(canvas, new Rect(0, 0, 6, 3));
+        var output = canvas.Render();
+        var visibleLines = StripAnsi(output).Split('\n');
+
+        TestAssert.True(output.Contains(surfaceStyle.Render(" "), StringComparison.Ordinal), "Flat-fill surface buttons should paint a plain rectangular background across the allocated box.");
+        TestAssert.True(!output.Contains("▐", StringComparison.Ordinal), "Flat-fill surface buttons should not render rounded shell side glyphs.");
+        TestAssert.True(!output.Contains("╭", StringComparison.Ordinal), "Flat-fill surface buttons should not render border glyphs.");
+        TestAssert.Equal("      ", visibleLines[0], "Flat-fill surface buttons should keep the top row as a plain filled rectangle.");
+        TestAssert.Equal("  Go  ", visibleLines[1], "Flat-fill surface buttons should center the label inside the rectangular fill.");
+        TestAssert.Equal("      ", visibleLines[2], "Flat-fill surface buttons should keep the bottom row as a plain filled rectangle.");
         return Task.CompletedTask;
     }
 

@@ -173,6 +173,7 @@ public sealed class Button : Control
     /// Gets or sets how rounded surface-styled buttons compose their border shell and body fill.
     /// </summary>
     /// <remarks>
+    /// <see cref="ButtonRoundedSurfaceMode.FlatFill"/> keeps borderless surfaced buttons as plain rectangular fills.
     /// <see cref="ButtonRoundedSurfaceMode.UnifiedShell"/> keeps rounded pills as a single filled surface.
     /// <see cref="ButtonRoundedSurfaceMode.InsetBody"/> renders a distinct rounded outline with a separately filled inner body.
     /// Inset-body buttons also drop the default bracket label chrome and reserve minimum horizontal breathing room when
@@ -775,8 +776,13 @@ public sealed class Button : Control
 
     private BorderStyle ResolveShellBorderStyle()
     {
-        return Border != BorderStyle.None || !HasSurfaceChrome()
-            ? Border
+        if (Border != BorderStyle.None || !HasSurfaceChrome())
+        {
+            return Border;
+        }
+
+        return RoundedSurfaceMode == ButtonRoundedSurfaceMode.FlatFill
+            ? BorderStyle.None
             : BorderStyle.Rounded;
     }
 

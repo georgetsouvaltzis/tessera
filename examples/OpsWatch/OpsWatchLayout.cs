@@ -19,7 +19,7 @@ internal sealed partial class OpsWatchApp
                         row.Weighted(1, _trafficPulse);
                         row.Weighted(1, _routePulse);
                     }));
-                    column.Fixed(7, themes => themes.Row(row =>
+                    column.Fixed(1, themes => themes.Row(row =>
                     {
                         row.Auto(_veridianThemeButton, new Thickness(0, 0, 1, 0));
                         row.Auto(_tidalThemeButton, new Thickness(0, 0, 1, 0));
@@ -30,7 +30,7 @@ internal sealed partial class OpsWatchApp
         }
 
         window.Header(
-            14,
+            10,
             header => header.Column(column =>
             {
                 column.Fixed(7, top => top.Row(row =>
@@ -40,7 +40,7 @@ internal sealed partial class OpsWatchApp
                     row.Weighted(1, _trafficPulse);
                     row.Weighted(1, _routePulse);
                 }));
-                column.Fixed(7, themes => themes.Row(row =>
+                column.Fixed(1, themes => themes.Row(row =>
                 {
                     row.Auto(_veridianThemeButton, new Thickness(0, 0, 1, 0));
                     row.Auto(_tidalThemeButton, new Thickness(0, 0, 1, 0));
