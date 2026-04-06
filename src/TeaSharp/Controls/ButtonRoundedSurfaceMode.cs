@@ -6,7 +6,7 @@ namespace TeaSharp.Controls;
 public enum ButtonRoundedSurfaceMode
 {
     /// <summary>
-    /// Uses a unified rounded shell where border and fill read as one pill surface.
+    /// Uses a unified rounded shell where border and fill read as one pill surface with inset cap and shoulder rows.
     /// </summary>
     UnifiedShell = 0,
 

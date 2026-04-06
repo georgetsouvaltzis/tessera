@@ -200,7 +200,7 @@ Default button focus should come primarily from the shell/ring treatment; body f
 If an app needs a distinct rounded outline with a separately filled inner body, set `RoundedSurfaceMode = ButtonRoundedSurfaceMode.InsetBody`.
 That mode reserves a taller rounded box so the border shell and the filled body remain visually separate.
 When the app keeps the default button label chrome, `InsetBody` also suppresses the default `[` `]` bracket treatment and adds minimum inner X breathing room automatically.
-`RoundedSurfaceMode = ButtonRoundedSurfaceMode.UnifiedShell` is the filled-pill mode and should reserve enough vertical space for visible rounded caps instead of collapsing into a 3-row cutout.
+`RoundedSurfaceMode = ButtonRoundedSurfaceMode.UnifiedShell` is the filled-pill mode and should reserve enough vertical space plus inset shoulder/cap rows so the shell reads as a rounded pill instead of collapsing into a 3-row cutout or clipped octagon.
 
 var list = new ListView<string>()
 {

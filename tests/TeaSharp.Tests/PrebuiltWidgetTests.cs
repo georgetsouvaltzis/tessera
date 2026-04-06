@@ -332,11 +332,11 @@ internal static class PrebuiltWidgetTests
 
         TestAssert.True(output.Contains(surfaceStyle.Render("[Go]"), StringComparison.Ordinal), "Button surface style should keep the label row on the same filled surface as the rounded shell.");
         TestAssert.True(output.Contains(capStyle.Render("▄"), StringComparison.Ordinal), "Filled rounded buttons should render shaped cap glyphs using the surface color.");
-        TestAssert.Equal(" ▄▄▄▄▄▄▄▄▄▄▄▄▄▄ ", visibleLines[0], "Filled rounded buttons should leave the top corners open so the pill silhouette reads as rounded.");
-        TestAssert.Equal("▐              ▌", visibleLines[1], "Filled rounded buttons should keep the upper body row on the same filled surface.");
+        TestAssert.Equal("  ▗▄▄▄▄▄▄▄▄▄▄▖  ", visibleLines[0], "Filled rounded buttons should reserve a narrower top cap so the silhouette reads as a pill instead of an octagon.");
+        TestAssert.Equal(" ▗            ▖ ", visibleLines[1], "Filled rounded buttons should inset the shoulder row by one cell to keep the shell visibly curved.");
         TestAssert.Equal("▐     [Go]     ▌", visibleLines[2], "Filled rounded buttons should keep the label centered inside the unified filled shell.");
-        TestAssert.Equal("▐              ▌", visibleLines[3], "Filled rounded buttons should keep the lower body row on the same filled surface.");
-        TestAssert.Equal(" ▀▀▀▀▀▀▀▀▀▀▀▀▀▀ ", visibleLines[4], "Filled rounded buttons should leave the bottom corners open so the pill silhouette reads as rounded.");
+        TestAssert.Equal(" ▝            ▘ ", visibleLines[3], "Filled rounded buttons should inset the lower shoulder row by one cell to keep the shell visibly curved.");
+        TestAssert.Equal("  ▝▀▀▀▀▀▀▀▀▀▀▘  ", visibleLines[4], "Filled rounded buttons should reserve a narrower bottom cap so the silhouette reads as a pill instead of an octagon.");
         return Task.CompletedTask;
     }
 
@@ -433,11 +433,11 @@ internal static class PrebuiltWidgetTests
         var capStyle = TeaStyle.Empty.WithForeground(AnsiColor.Rgb(30, 20, 20));
 
         TestAssert.True(output.Contains(capStyle.Render("▄"), StringComparison.Ordinal), "Surface-chromed borderless buttons should use the shaped filled-shell glyph contract.");
-        TestAssert.Equal(" ▄▄▄▄▄▄ ", visibleLines[0], "Surface-chromed borderless buttons should leave the top corners open so the pill silhouette reads as rounded.");
-        TestAssert.Equal("▐      ▌", visibleLines[1], "Surface-chromed borderless buttons should reserve a filled upper body row inside the pill.");
+        TestAssert.Equal(" ▗▄▄▄▄▖ ", visibleLines[0], "Surface-chromed borderless buttons should reserve a narrower top cap so the chip reads as a pill.");
+        TestAssert.Equal(" ▗    ▖ ", visibleLines[1], "Surface-chromed borderless buttons should inset the shoulder row by one cell above the label.");
         TestAssert.Equal("▐ Play ▌", visibleLines[2], "Surface-chromed borderless buttons should keep centered labels inside the filled chip body.");
-        TestAssert.Equal("▐      ▌", visibleLines[3], "Surface-chromed borderless buttons should reserve a filled lower body row inside the pill.");
-        TestAssert.Equal(" ▀▀▀▀▀▀ ", visibleLines[4], "Surface-chromed borderless buttons should leave the bottom corners open so the pill silhouette reads as rounded.");
+        TestAssert.Equal(" ▝    ▘ ", visibleLines[3], "Surface-chromed borderless buttons should inset the shoulder row by one cell below the label.");
+        TestAssert.Equal(" ▝▀▀▀▀▘ ", visibleLines[4], "Surface-chromed borderless buttons should reserve a narrower bottom cap so the chip reads as a pill.");
         return Task.CompletedTask;
     }
 

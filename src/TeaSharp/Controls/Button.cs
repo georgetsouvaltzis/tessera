@@ -468,23 +468,81 @@ public sealed class Button : Control
             return ResolveContentRect(clipped, padding);
         }
 
-        var fillRect = new Rect(clipped.X + 1, clipped.Y + 1, clipped.Width - 2, clipped.Height - 2);
-        if (!fillRect.IsEmpty)
-        {
-            FillSurface(canvas, fillRect, surfaceStyle);
-        }
-
         var capStyle = ResolveFilledRoundedShellCapStyle(surfaceStyle, borderStyleText);
-        for (var x = clipped.X + 1; x < clipped.Right - 1; x++)
+        if (clipped.Height >= 5)
         {
-            WriteBorderGlyph(canvas, x, clipped.Y, '▄', capStyle);
-            WriteBorderGlyph(canvas, x, clipped.Bottom - 1, '▀', capStyle);
-        }
+            var capInset = clipped.Width >= 10 ? 2 : 1;
+            var shoulderInset = clipped.Width >= 6 ? 1 : 0;
+            var capLeft = clipped.X + capInset;
+            var capRight = clipped.Right - capInset - 1;
+            var shoulderLeft = clipped.X + shoulderInset;
+            var shoulderRight = clipped.Right - shoulderInset - 1;
 
-        for (var y = clipped.Y + 1; y < clipped.Bottom - 1; y++)
+            if (capLeft <= capRight)
+            {
+                for (var x = capLeft + 1; x < capRight; x++)
+                {
+                    WriteBorderGlyph(canvas, x, clipped.Y, '▄', capStyle);
+                    WriteBorderGlyph(canvas, x, clipped.Bottom - 1, '▀', capStyle);
+                }
+
+                if (capLeft < capRight)
+                {
+                    WriteBorderGlyph(canvas, capLeft, clipped.Y, '▗', capStyle);
+                    WriteBorderGlyph(canvas, capRight, clipped.Y, '▖', capStyle);
+                    WriteBorderGlyph(canvas, capLeft, clipped.Bottom - 1, '▝', capStyle);
+                    WriteBorderGlyph(canvas, capRight, clipped.Bottom - 1, '▘', capStyle);
+                }
+                else
+                {
+                    WriteBorderGlyph(canvas, capLeft, clipped.Y, '▄', capStyle);
+                    WriteBorderGlyph(canvas, capLeft, clipped.Bottom - 1, '▀', capStyle);
+                }
+            }
+
+            if (shoulderLeft <= shoulderRight)
+            {
+                if (shoulderLeft < shoulderRight)
+                {
+                    WriteBorderGlyph(canvas, shoulderLeft, clipped.Y + 1, '▗', capStyle);
+                    WriteBorderGlyph(canvas, shoulderRight, clipped.Y + 1, '▖', capStyle);
+                    WriteBorderGlyph(canvas, shoulderLeft, clipped.Bottom - 2, '▝', capStyle);
+                    WriteBorderGlyph(canvas, shoulderRight, clipped.Bottom - 2, '▘', capStyle);
+                }
+
+                var shoulderFill = new Rect(shoulderLeft + 1, clipped.Y + 1, Math.Max(0, shoulderRight - shoulderLeft - 1), 1);
+                if (!shoulderFill.IsEmpty)
+                {
+                    FillSurface(canvas, shoulderFill, surfaceStyle);
+                    FillSurface(canvas, new Rect(shoulderFill.X, clipped.Bottom - 2, shoulderFill.Width, 1), surfaceStyle);
+                }
+            }
+
+            for (var y = clipped.Y + 2; y < clipped.Bottom - 2; y++)
+            {
+                var fillRow = new Rect(clipped.X + 1, y, Math.Max(0, clipped.Width - 2), 1);
+                if (!fillRow.IsEmpty)
+                {
+                    FillSurface(canvas, fillRow, surfaceStyle);
+                }
+
+                WriteBorderGlyph(canvas, clipped.X, y, '▐', capStyle);
+                WriteBorderGlyph(canvas, clipped.Right - 1, y, '▌', capStyle);
+            }
+        }
+        else
         {
-            WriteBorderGlyph(canvas, clipped.X, y, '▐', capStyle);
-            WriteBorderGlyph(canvas, clipped.Right - 1, y, '▌', capStyle);
+            var fillRect = new Rect(clipped.X + 1, clipped.Y + 1, clipped.Width - 2, clipped.Height - 2);
+            if (!fillRect.IsEmpty)
+            {
+                FillSurface(canvas, fillRect, surfaceStyle);
+            }
+
+            for (var y = clipped.Y + 1; y < clipped.Bottom - 1; y++)
+            {
+                WriteBorderGlyph(canvas, clipped.X, y, '▐', capStyle);
+                WriteBorderGlyph(canvas, clipped.Right - 1, y, '▌', capStyle);
+            }
         }
 
         var contentRect = new Rect(clipped.X, clipped.Y + 1, clipped.Width, clipped.Height - 2);
