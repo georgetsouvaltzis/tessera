@@ -1,6 +1,5 @@
 using System.Text;
 using Tessera.Components.Primitives;
-using Tessera.Controls.Internal;
 using Tessera.Styles;
 
 namespace Tessera.Controls;

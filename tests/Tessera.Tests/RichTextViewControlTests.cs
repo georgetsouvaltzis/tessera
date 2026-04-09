@@ -11,7 +11,7 @@ namespace Tessera.Tests;
 public sealed class RichTextViewControlTests
 {
     [Test]
-    public void RichTextView_RendersHeadingsListMarkersQuotesAndInlineEmphasis()
+    public void RichTextViewRendersHeadingsListMarkersQuotesAndInlineEmphasis()
     {
         var control = new RichTextView
         {
@@ -32,7 +32,7 @@ public sealed class RichTextViewControlTests
     }
 
     [Test]
-    public void RichTextView_StyleHooks_EmitAnsiForSemanticKinds()
+    public void RichTextViewStyleHooksEmitAnsiForSemanticKinds()
     {
         var control = new RichTextView
         {
@@ -71,7 +71,7 @@ public sealed class RichTextViewControlTests
     }
 
     [Test]
-    public void RichTextView_DefaultRender_IsDeterministicAndMonochrome()
+    public void RichTextViewDefaultRenderIsDeterministicAndMonochrome()
     {
         var control = new RichTextView
         {
@@ -97,7 +97,7 @@ public sealed class RichTextViewControlTests
     }
 
     [Test]
-    public void RichTextView_WrapAndKeyboardScrolling_AreDeterministic()
+    public void RichTextViewWrapAndKeyboardScrollingAreDeterministic()
     {
         var control = new RichTextView
         {

@@ -216,7 +216,7 @@ public sealed class Toggle : Control
 
         if (pointer is { Kind: PointerEventKind.Press, Button: PointerButton.Left })
         {
-            changed |= SetHovered(true);
+            _ = SetHovered(true);
             Value = !Value;
             return true;
         }

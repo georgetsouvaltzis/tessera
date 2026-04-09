@@ -90,7 +90,7 @@ internal sealed class OpsWatchState
     public IReadOnlyList<double> DiskTrend => _diskTrend;
     public IReadOnlyList<ActivityFeedItem> FeedItems => _feed;
 
-    public string ClockText => DateTimeOffset.UtcNow.ToString("HH:mm:ss 'UTC'", CultureInfo.InvariantCulture);
+    public static string ClockText => DateTimeOffset.UtcNow.ToString("HH:mm:ss 'UTC'", CultureInfo.InvariantCulture);
     public string FleetBadge => $"{SelectedClusterName} / {CurrentNodes.Count} live";
     public string ModeBadge => $"autonomy {AutomationMode}";
     public string RouteBadge => $"route {ActiveRoute}";

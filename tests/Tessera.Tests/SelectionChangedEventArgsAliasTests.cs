@@ -8,7 +8,7 @@ namespace Tessera.Tests;
 public sealed class SelectionChangedEventArgsAliasTests
 {
     [Test]
-    public void SelectionChangedEventArgs_JsonTree_SelectedAliases_ForwardToCurrentValues()
+    public void SelectionChangedEventArgsJsonTreeSelectedAliasesForwardToCurrentValues()
     {
         var previousNode = new JsonTreeNode("previous", "1", JsonTreeNodeKind.Value);
         var currentNode = new JsonTreeNode("current", "2", JsonTreeNodeKind.Value);
@@ -19,7 +19,7 @@ public sealed class SelectionChangedEventArgsAliasTests
     }
 
     [Test]
-    public void SelectionChangedEventArgs_KeyValueList_SelectedAliases_ForwardToCurrentValues()
+    public void SelectionChangedEventArgsKeyValueListSelectedAliasesForwardToCurrentValues()
     {
         var previousItem = new KeyValueListEntry("a", "1");
         var currentItem = new KeyValueListEntry("b", "2");
@@ -30,7 +30,7 @@ public sealed class SelectionChangedEventArgsAliasTests
     }
 
     [Test]
-    public void SelectionChangedEventArgs_PropertyGrid_SelectedAliases_ForwardToCurrentValues()
+    public void SelectionChangedEventArgsPropertyGridSelectedAliasesForwardToCurrentValues()
     {
         var previousProperty = new PropertyGridProperty("Alpha", "1");
         var currentProperty = new PropertyGridProperty("Beta", "2");
@@ -41,7 +41,7 @@ public sealed class SelectionChangedEventArgsAliasTests
     }
 
     [Test]
-    public void SelectionChangedEventArgs_Validation_SelectedAliases_ForwardToCurrentValues()
+    public void SelectionChangedEventArgsValidationSelectedAliasesForwardToCurrentValues()
     {
         var previousIssue = new ValidationIssue("previous", ValidationSeverity.Warning, "FieldA");
         var currentIssue = new ValidationIssue("current", ValidationSeverity.Error, "FieldB");
@@ -52,7 +52,7 @@ public sealed class SelectionChangedEventArgsAliasTests
     }
 
     [Test]
-    public void SelectionChangedEventArgs_GroupedList_SelectedAliases_ForwardToCurrentValues()
+    public void SelectionChangedEventArgsGroupedListSelectedAliasesForwardToCurrentValues()
     {
         var args = new GroupedListSelectionChangedEventArgs<string, string>(
             previousRowIndex: 1,
@@ -71,7 +71,7 @@ public sealed class SelectionChangedEventArgsAliasTests
     }
 
     [Test]
-    public void SelectionChangedEventArgs_FileExplorer_SelectedAliases_ForwardToCurrentValues()
+    public void SelectionChangedEventArgsFileExplorerSelectedAliasesForwardToCurrentValues()
     {
         var previousItem = new FileExplorerItem("old.txt", isDirectory: false, path: "/tmp/old.txt");
         var currentItem = new FileExplorerItem("new.txt", isDirectory: false, path: "/tmp/new.txt");
@@ -86,7 +86,7 @@ public sealed class SelectionChangedEventArgsAliasTests
     }
 
     [Test]
-    public void SelectionChangedEventArgs_Stepper_SelectedAliases_ForwardToCurrentValues()
+    public void SelectionChangedEventArgsStepperSelectedAliasesForwardToCurrentValues()
     {
         var previousStep = new StepperStep("intro", "Intro");
         var currentStep = new StepperStep("done", "Done");
@@ -97,7 +97,7 @@ public sealed class SelectionChangedEventArgsAliasTests
     }
 
     [Test]
-    public void SelectionChangedEventArgs_Wizard_SelectedAliases_ForwardToCurrentValues()
+    public void SelectionChangedEventArgsWizardSelectedAliasesForwardToCurrentValues()
     {
         var previousStep = new WizardStep("intro", "Intro");
         var currentStep = new WizardStep("done", "Done");

@@ -1,4 +1,4 @@
-namespace Tessera.Core.Rendering;
+namespace Tessera.Core.Rendering.Internal;
 
 internal static class RenderFrameContent
 {
@@ -12,11 +12,13 @@ internal static class RenderFrameContent
             : null;
 
         var start = 0;
-        for (var index = 0; index < content.Length; index++)
+        var index = 0;
+        while (index < content.Length)
         {
             var current = content[index];
             if (current is not ('\r' or '\n'))
             {
+                index++;
                 continue;
             }
 
@@ -27,6 +29,7 @@ internal static class RenderFrameContent
             }
 
             start = index + 1;
+            index++;
         }
 
         AppendWrappedRows(content[start..], width, height, rows, clippedRows);
@@ -58,11 +61,13 @@ internal static class RenderFrameContent
 
         var lines = new List<string>(EstimateLineCount(content));
         var start = 0;
-        for (var index = 0; index < content.Length; index++)
+        var index = 0;
+        while (index < content.Length)
         {
             var current = content[index];
             if (current is not ('\r' or '\n'))
             {
+                index++;
                 continue;
             }
 
@@ -73,6 +78,7 @@ internal static class RenderFrameContent
             }
 
             start = index + 1;
+            index++;
         }
 
         lines.Add(content[start..]);

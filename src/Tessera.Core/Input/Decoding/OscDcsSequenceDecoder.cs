@@ -1,8 +1,7 @@
-using System;
 using System.Text;
 using Tessera.Core.Messages;
 
-namespace Tessera.Core.Input;
+namespace Tessera.Core.Input.Decoding;
 
 internal static class OscDcsSequenceDecoder
 {

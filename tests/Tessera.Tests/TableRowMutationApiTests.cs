@@ -9,7 +9,7 @@ namespace Tessera.Tests;
 public sealed class TableRowMutationApiTests
 {
     [Test]
-    public void Controls_Table_AddRow_AppendsRow()
+    public void ControlsTableAddRowAppendsRow()
     {
         var table = new Table("Service", "State")
         {
@@ -28,7 +28,7 @@ public sealed class TableRowMutationApiTests
     }
 
     [Test]
-    public void Controls_Table_ReplaceRow_UpdatesRowAndValidatesArguments()
+    public void ControlsTableReplaceRowUpdatesRowAndValidatesArguments()
     {
         var table = new Table("Service", "State")
         {
@@ -58,7 +58,7 @@ public sealed class TableRowMutationApiTests
     }
 
     [Test]
-    public void Controls_Table_RemoveRowAt_RemovesRowAndNormalizesPage()
+    public void ControlsTableRemoveRowAtRemovesRowAndNormalizesPage()
     {
         var table = new Table("Name")
         {
@@ -92,7 +92,7 @@ public sealed class TableRowMutationApiTests
     }
 
     [Test]
-    public void Controls_Table_ClearRows_ClearsAndKeepsPointerHandlingSafe()
+    public void ControlsTableClearRowsClearsAndKeepsPointerHandlingSafe()
     {
         var table = new Table("Name")
         {
@@ -125,7 +125,7 @@ public sealed class TableRowMutationApiTests
     }
 
     [Test]
-    public void Controls_Table_AddRow_ValidatesArguments()
+    public void ControlsTableAddRowValidatesArguments()
     {
         var table = new Table("Name");
         Assert.That(() => table.AddRow(null!), Throws.TypeOf<ArgumentNullException>());

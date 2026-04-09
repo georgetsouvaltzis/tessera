@@ -1,8 +1,8 @@
-namespace Tessera.Core.Terminal;
-
 using System.ComponentModel;
 using Tessera.Core.Abstractions;
 using Tessera.Core.Messages;
+
+namespace Tessera.Core.Terminal.Adapters;
 
 [EditorBrowsable(EditorBrowsableState.Advanced)]
 internal sealed class ConsoleTerminalAdapter : ITerminalAdapter
@@ -199,6 +199,7 @@ internal sealed class ConsoleTerminalAdapter : ITerminalAdapter
         }
         catch
         {
+            // Stream disposal is best-effort during terminal teardown.
         }
     }
 

@@ -294,7 +294,7 @@ public sealed class CalendarMonthView : Control
         }
     }
 
-    private bool TryResolveGridLayout(Rect content, out CalendarGridLayout layout)
+    private static bool TryResolveGridLayout(Rect content, out CalendarGridLayout layout)
     {
         if (content.Width < CalendarColumns * 2 || content.Height < 2 + CalendarRows)
         {

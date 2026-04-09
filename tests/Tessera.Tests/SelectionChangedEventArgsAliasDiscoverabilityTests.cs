@@ -10,7 +10,7 @@ namespace Tessera.Tests;
 public sealed class SelectionChangedEventArgsAliasDiscoverabilityTests
 {
     [Test]
-    public void SelectionChangedEventArgsAlias_CurrentProperties_AreEditorBrowsableAdvanced()
+    public void SelectionChangedEventArgsAliasCurrentPropertiesAreEditorBrowsableAdvanced()
     {
         AssertEditorBrowsableAdvanced(typeof(JsonTreeSelectionChangedEventArgs), "CurrentIndex");
         AssertEditorBrowsableAdvanced(typeof(JsonTreeSelectionChangedEventArgs), "CurrentNode");
@@ -41,7 +41,7 @@ public sealed class SelectionChangedEventArgsAliasDiscoverabilityTests
     }
 
     [Test]
-    public void SelectionChangedEventArgsAlias_SelectedProperties_RemainPrimaryInIntelliSense()
+    public void SelectionChangedEventArgsAliasSelectedPropertiesRemainPrimaryInIntelliSense()
     {
         AssertEditorBrowsableMissing(typeof(JsonTreeSelectionChangedEventArgs), "SelectedIndex");
         AssertEditorBrowsableMissing(typeof(JsonTreeSelectionChangedEventArgs), "SelectedNode");

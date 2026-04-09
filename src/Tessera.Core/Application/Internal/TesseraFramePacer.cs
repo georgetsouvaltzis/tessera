@@ -1,4 +1,4 @@
-namespace Tessera.Core.Application;
+namespace Tessera.Core.Application.Internal;
 
 internal static class TesseraFramePacer
 {

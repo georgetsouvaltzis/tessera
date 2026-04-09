@@ -4,7 +4,6 @@ using Tessera.Components.Primitives.Internal;
 using Tessera.Controls.Internal;
 using Tessera.Layout;
 using Tessera.Styles;
-using Tessera.Widgets;
 
 namespace Tessera.Controls;
 

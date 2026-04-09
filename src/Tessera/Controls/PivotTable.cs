@@ -696,11 +696,11 @@ public sealed partial class PivotTable : Control
         return new ColumnWidths(rowHeader, valueWidths);
     }
 
-    private static int HitTestValueColumn(int pointerX, int contentX, int rowHeaderWidth, IReadOnlyList<int> valueWidths)
+    private static int HitTestValueColumn(int pointerX, int contentX, int rowHeaderWidth, int[] valueWidths)
     {
         var cursor = contentX + rowHeaderWidth;
         cursor++; // separator after row-header
-        for (var columnIndex = 0; columnIndex < valueWidths.Count; columnIndex++)
+        for (var columnIndex = 0; columnIndex < valueWidths.Length; columnIndex++)
         {
             var width = Math.Max(0, valueWidths[columnIndex]);
             if (pointerX >= cursor && pointerX < cursor + width)
@@ -709,7 +709,7 @@ public sealed partial class PivotTable : Control
             }
 
             cursor += width;
-            if (columnIndex < valueWidths.Count - 1)
+            if (columnIndex < valueWidths.Length - 1)
             {
                 cursor++;
             }

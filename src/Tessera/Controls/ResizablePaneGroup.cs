@@ -1,6 +1,5 @@
 using Tessera.Components.Primitives;
 using Tessera.Components.Primitives.Internal;
-using Tessera.Layout;
 using Tessera.Styles;
 
 namespace Tessera.Controls;
@@ -121,7 +120,7 @@ public sealed partial class ResizablePaneGroup : Control
     /// <summary>
     /// Gets or sets divider glyph. Use <c>'\0'</c> for orientation default.
     /// </summary>
-    public char DividerGlyph { get; set; } = '\0';
+    public char DividerGlyph { get; set; }
 
     /// <summary>
     /// Gets or sets divider thickness in cells.

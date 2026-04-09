@@ -10,7 +10,7 @@ namespace Tessera.Tests;
 public sealed class CommandOutputControlTests
 {
     [Test]
-    public void Controls_CommandOutput_AppendsAndRendersChannelTags()
+    public void ControlsCommandOutputAppendsAndRendersChannelTags()
     {
         var control = new CommandOutput
         {
@@ -29,7 +29,7 @@ public sealed class CommandOutputControlTests
     }
 
     [Test]
-    public void Controls_CommandOutput_KeyboardAndPointerSelection_RaisesSelectionChanged()
+    public void ControlsCommandOutputKeyboardAndPointerSelectionRaisesSelectionChanged()
     {
         var control = new CommandOutput
         {
@@ -57,7 +57,7 @@ public sealed class CommandOutputControlTests
     }
 
     [Test]
-    public void Controls_CommandOutput_StateStylesEmitAnsi_AndDefaultRenderDeterministic()
+    public void ControlsCommandOutputStateStylesEmitAnsiAndDefaultRenderDeterministic()
     {
         var styled = new CommandOutput
         {

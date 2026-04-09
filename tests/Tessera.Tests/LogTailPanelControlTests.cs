@@ -10,7 +10,7 @@ namespace Tessera.Tests;
 public sealed class LogTailPanelControlTests
 {
     [Test]
-    public void Controls_LogTailPanel_RendersEntriesWithLevelAndSource()
+    public void ControlsLogTailPanelRendersEntriesWithLevelAndSource()
     {
         var control = new LogTailPanel
         {
@@ -30,7 +30,7 @@ public sealed class LogTailPanelControlTests
     }
 
     [Test]
-    public void Controls_LogTailPanel_KeyboardAndPointerSelection_RaisesSelectionChanged()
+    public void ControlsLogTailPanelKeyboardAndPointerSelectionRaisesSelectionChanged()
     {
         var control = new LogTailPanel
         {
@@ -59,7 +59,7 @@ public sealed class LogTailPanelControlTests
     }
 
     [Test]
-    public void Controls_LogTailPanel_StateStylesEmitAnsi_AndDefaultRenderDeterministic()
+    public void ControlsLogTailPanelStateStylesEmitAnsiAndDefaultRenderDeterministic()
     {
         var styled = new LogTailPanel
         {
@@ -98,7 +98,7 @@ public sealed class LogTailPanelControlTests
     }
 
     [Test]
-    public void Controls_LogTailPanel_DisplayToggle_RebuildsCachedBodies()
+    public void ControlsLogTailPanelDisplayToggleRebuildsCachedBodies()
     {
         var control = new LogTailPanel
         {

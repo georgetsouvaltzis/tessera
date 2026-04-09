@@ -433,7 +433,7 @@ public sealed class ProcessListView : Control
             mem.PadLeft(7));
     }
 
-    private string ResolveStatusText(ProcessListStatus status)
+    private static string ResolveStatusText(ProcessListStatus status)
     {
         return status switch
         {

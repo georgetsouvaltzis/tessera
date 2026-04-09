@@ -11,7 +11,7 @@ namespace Tessera.Tests;
 public sealed class SideNavRailControlTests
 {
     [Test]
-    public void SideNavRail_KeyboardNavigation_SkipsDisabledAndRaisesSelectionChanged()
+    public void SideNavRailKeyboardNavigationSkipsDisabledAndRaisesSelectionChanged()
     {
         var rail = CreateRail();
         rail.SetItems(
@@ -37,7 +37,7 @@ public sealed class SideNavRailControlTests
     }
 
     [Test]
-    public void SideNavRail_Enter_RaisesActivatedForSelectedItem()
+    public void SideNavRailEnterRaisesActivatedForSelectedItem()
     {
         var rail = CreateRail();
         rail.SetItems(
@@ -59,7 +59,7 @@ public sealed class SideNavRailControlTests
     }
 
     [Test]
-    public void SideNavRail_PointerClick_SelectsAndActivates()
+    public void SideNavRailPointerClickSelectsAndActivates()
     {
         var rail = CreateRail();
         rail.Border = BorderStyle.None;
@@ -85,7 +85,7 @@ public sealed class SideNavRailControlTests
     }
 
     [Test]
-    public void SideNavRail_PointerMotion_DoesNotChangeSelection()
+    public void SideNavRailPointerMotionDoesNotChangeSelection()
     {
         var rail = CreateRail();
         rail.Border = BorderStyle.None;
@@ -106,7 +106,7 @@ public sealed class SideNavRailControlTests
     }
 
     [Test]
-    public void SideNavRail_StyleAndGlyphHooks_RenderExpectedStateStyling()
+    public void SideNavRailStyleAndGlyphHooksRenderExpectedStateStyling()
     {
         var rail = CreateRail();
         rail.Border = BorderStyle.SingleLine;
@@ -143,7 +143,7 @@ public sealed class SideNavRailControlTests
     }
 
     [Test]
-    public void SideNavRail_DefaultRender_IsMonochromeAndDeterministic()
+    public void SideNavRailDefaultRenderIsMonochromeAndDeterministic()
     {
         var rail = CreateRail();
         rail.Border = BorderStyle.None;

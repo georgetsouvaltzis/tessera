@@ -1,3 +1,5 @@
+using System.Diagnostics.CodeAnalysis;
+
 namespace Tessera.Controls;
 
 /// <summary>
@@ -8,6 +10,7 @@ public enum JsonTreeNodeKind
     /// <summary>
     /// JSON object container.
     /// </summary>
+    [SuppressMessage("Naming", "CA1720:Identifier contains type name", Justification = "JSON object is canonical domain terminology.")]
     Object = 0,
 
     /// <summary>

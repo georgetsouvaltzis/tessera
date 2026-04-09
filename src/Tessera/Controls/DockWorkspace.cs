@@ -309,9 +309,9 @@ public sealed class DockWorkspace : Control
         }
     }
 
-    private static int HitTestPane(int x, int y, IReadOnlyList<Rect> paneRects)
+    private static int HitTestPane(int x, int y, Rect[] paneRects)
     {
-        for (var index = 0; index < paneRects.Count; index++)
+        for (var index = 0; index < paneRects.Length; index++)
         {
             if (paneRects[index].Contains(x, y)) return index;
         }

@@ -347,7 +347,7 @@ internal sealed partial class DataWorkbenchApp
         }
     }
 
-    private void ConfigureAction(Button button, int foregroundRgb, int backgroundRgb)
+    private static void ConfigureAction(Button button, int foregroundRgb, int backgroundRgb)
     {
         var labelStyle = DataWorkbenchTheme.Foreground(foregroundRgb).WithBold();
         var surfaceStyle = DataWorkbenchTheme.Background(backgroundRgb);

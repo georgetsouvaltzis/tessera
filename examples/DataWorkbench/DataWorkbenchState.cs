@@ -181,7 +181,7 @@ internal sealed partial class DataWorkbenchState
 
     public static IReadOnlyList<StatItem> BuildVelocityItems(IReadOnlyList<WorkbenchRecord> visible)
     {
-        var medianLatency = visible.Count == 0 ? 0 : (int)visible.OrderBy(static record => record.LatencyMs).ElementAt(visible.Count / 2).LatencyMs;
+        var medianLatency = visible.Count == 0 ? 0 : visible.OrderBy(static record => record.LatencyMs).ElementAt(visible.Count / 2).LatencyMs;
         return
         [
             new StatItem("Median", $"{medianLatency}ms"),

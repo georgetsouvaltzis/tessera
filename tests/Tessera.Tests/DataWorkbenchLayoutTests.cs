@@ -6,7 +6,7 @@ namespace Tessera.Tests;
 public sealed class DataWorkbenchLayoutTests
 {
     [Test]
-    public void InitialExploreScreen_RendersReadableButtonLabels()
+    public void InitialExploreScreenRendersReadableButtonLabels()
     {
         var app = new DataWorkbenchApp();
         _ = app.UpdateRuntime(new WindowResized(120, 36));

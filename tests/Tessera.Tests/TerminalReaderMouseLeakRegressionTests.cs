@@ -11,7 +11,7 @@ namespace Tessera.Tests;
 public sealed class TerminalReaderMouseLeakRegressionTests
 {
     [Test]
-    public async Task TerminalReader_MouseLeakRegression_SplitEscBracketAcrossTimeout_DoesNotEmitCharacterFragments()
+    public async Task TerminalReaderMouseLeakRegressionSplitEscBracketAcrossTimeoutDoesNotEmitCharacterFragments()
     {
         var stream = new TimedChunkReadStream(
         [
@@ -38,7 +38,7 @@ public sealed class TerminalReaderMouseLeakRegressionTests
     }
 
     [Test]
-    public async Task TerminalReader_MouseLeakRegression_EscapeThenDelayedCsiMouseAcrossTimeout_DoesNotEmitCharacterFragments()
+    public async Task TerminalReaderMouseLeakRegressionEscapeThenDelayedCsiMouseAcrossTimeoutDoesNotEmitCharacterFragments()
     {
         var stream = new TimedChunkReadStream(
         [
@@ -66,7 +66,7 @@ public sealed class TerminalReaderMouseLeakRegressionTests
     }
 
     [Test]
-    public async Task TerminalReader_MouseLeakRegression_SplitX10AcrossTimeout_DoesNotLeakAndStaysZeroBased()
+    public async Task TerminalReaderMouseLeakRegressionSplitX10AcrossTimeoutDoesNotLeakAndStaysZeroBased()
     {
         var stream = new TimedChunkReadStream(
         [
@@ -87,7 +87,7 @@ public sealed class TerminalReaderMouseLeakRegressionTests
     }
 
     [Test]
-    public async Task TerminalReader_MouseLeakRegression_SplitX10MotionAcrossTimeout_DoesNotEmitPress()
+    public async Task TerminalReaderMouseLeakRegressionSplitX10MotionAcrossTimeoutDoesNotEmitPress()
     {
         var stream = new TimedChunkReadStream(
         [

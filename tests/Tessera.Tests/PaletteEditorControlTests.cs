@@ -10,7 +10,7 @@ namespace Tessera.Tests;
 public sealed class PaletteEditorControlTests
 {
     [Test]
-    public void Controls_PaletteEditor_RendersGridPreviewAndHex()
+    public void ControlsPaletteEditorRendersGridPreviewAndHex()
     {
         var control = new PaletteEditor
         {
@@ -36,7 +36,7 @@ public sealed class PaletteEditorControlTests
     }
 
     [Test]
-    public void Controls_PaletteEditor_KeyboardAndPointerSelection_RaisesSelectionChanged()
+    public void ControlsPaletteEditorKeyboardAndPointerSelectionRaisesSelectionChanged()
     {
         var control = new PaletteEditor
         {
@@ -67,7 +67,7 @@ public sealed class PaletteEditorControlTests
     }
 
     [Test]
-    public void Controls_PaletteEditor_StyleHooks_RenderAnsi()
+    public void ControlsPaletteEditorStyleHooksRenderAnsi()
     {
         var control = new PaletteEditor
         {
@@ -97,7 +97,7 @@ public sealed class PaletteEditorControlTests
     }
 
     [Test]
-    public void Controls_PaletteEditor_DefaultRender_IsDeterministicAndMonochrome()
+    public void ControlsPaletteEditorDefaultRenderIsDeterministicAndMonochrome()
     {
         var control = new PaletteEditor
         {
@@ -114,7 +114,7 @@ public sealed class PaletteEditorControlTests
     }
 
     [Test]
-    public void Controls_PaletteEditor_EmptyState_RendersConfiguredText()
+    public void ControlsPaletteEditorEmptyStateRendersConfiguredText()
     {
         var control = new PaletteEditor
         {

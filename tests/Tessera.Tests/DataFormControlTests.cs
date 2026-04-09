@@ -9,7 +9,7 @@ namespace Tessera.Tests;
 public sealed class DataFormControlTests
 {
     [Test]
-    public void Controls_DataForm_RendersBorderTitleAndFields()
+    public void ControlsDataFormRendersBorderTitleAndFields()
     {
         var model = new TestModel { Name = string.Empty, Email = "tea@example.dev" };
         var control = new DataForm<TestModel>
@@ -32,7 +32,7 @@ public sealed class DataFormControlTests
     }
 
     [Test]
-    public void Controls_DataForm_SelectionMode_IgnoresTyping_UntilEnterStartsEditing()
+    public void ControlsDataFormSelectionModeIgnoresTypingUntilEnterStartsEditing()
     {
         var model = new TestModel { Name = string.Empty };
         var control = new DataForm<TestModel>
@@ -58,7 +58,7 @@ public sealed class DataFormControlTests
     }
 
     [Test]
-    public void Controls_DataForm_EnterStartsEditing_AndEnterCommit_UpdatesModelAndRaisesFieldCommitted()
+    public void ControlsDataFormEnterStartsEditingAndEnterCommitUpdatesModelAndRaisesFieldCommitted()
     {
         var model = new TestModel { Name = string.Empty };
         var control = new DataForm<TestModel>
@@ -91,7 +91,7 @@ public sealed class DataFormControlTests
     }
 
     [Test]
-    public void Controls_DataForm_EscapeCancelsEditing_AndRestoresCommittedValue()
+    public void ControlsDataFormEscapeCancelsEditingAndRestoresCommittedValue()
     {
         var model = new TestModel { Name = "Ada" };
         var control = new DataForm<TestModel>
@@ -120,7 +120,7 @@ public sealed class DataFormControlTests
     }
 
     [Test]
-    public void Controls_DataForm_KeyboardAndPointerNavigation_RaisesSelectionChanged()
+    public void ControlsDataFormKeyboardAndPointerNavigationRaisesSelectionChanged()
     {
         var model = new TestModel { Name = "A", Email = "B", Team = "C" };
         var control = new DataForm<TestModel>
@@ -153,7 +153,7 @@ public sealed class DataFormControlTests
     }
 
     [Test]
-    public void Controls_DataForm_SelectFieldByKey_SelectsMatchingFieldAndRaisesSelectionChanged()
+    public void ControlsDataFormSelectFieldByKeySelectsMatchingFieldAndRaisesSelectionChanged()
     {
         var model = new TestModel { Name = "A", Email = "B", Team = "C" };
         var control = new DataForm<TestModel>
@@ -180,7 +180,7 @@ public sealed class DataFormControlTests
     }
 
     [Test]
-    public void Controls_DataForm_SelectFieldByKey_ReturnsFalse_WhenMissingOrAlreadySelected()
+    public void ControlsDataFormSelectFieldByKeyReturnsFalseWhenMissingOrAlreadySelected()
     {
         var model = new TestModel { Name = "A", Email = "B" };
         var control = new DataForm<TestModel>
@@ -204,7 +204,7 @@ public sealed class DataFormControlTests
     }
 
     [Test]
-    public void Controls_DataForm_DefaultRender_IsDeterministicAndMonochrome()
+    public void ControlsDataFormDefaultRenderIsDeterministicAndMonochrome()
     {
         var model = new TestModel { Name = "Alice", Email = string.Empty };
         var control = new DataForm<TestModel>
@@ -224,7 +224,7 @@ public sealed class DataFormControlTests
     }
 
     [Test]
-    public void Controls_DataForm_CommitFailure_RendersVisibleError_AndKeepsEditMode()
+    public void ControlsDataFormCommitFailureRendersVisibleErrorAndKeepsEditMode()
     {
         var model = new TestModel { Name = "Ada", Email = "tea@example.dev" };
         var control = new DataForm<TestModel>

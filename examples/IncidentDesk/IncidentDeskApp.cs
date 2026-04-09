@@ -1,6 +1,7 @@
 using Tessera.Controls;
 using Tessera.Layout;
 using Tessera.Styles;
+using System.Text;
 
 namespace Tessera.Examples.IncidentDesk;
 
@@ -490,21 +491,22 @@ internal sealed partial class IncidentDeskApp : TesseraApp
         }
 
         var lines = new List<string>();
-        var current = words[0];
+        var current = new StringBuilder(words[0]);
         for (var index = 1; index < words.Length; index++)
         {
             var next = words[index];
             if (current.Length + 1 + next.Length <= width)
             {
-                current += $" {next}";
+                current.Append(' ').Append(next);
                 continue;
             }
 
-            lines.Add(current);
-            current = next;
+            lines.Add(current.ToString());
+            current.Clear();
+            current.Append(next);
         }
 
-        lines.Add(current);
+        lines.Add(current.ToString());
         return lines;
     }
 

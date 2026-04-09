@@ -10,7 +10,7 @@ namespace Tessera.Tests;
 public sealed class ListViewSelectionApiTests
 {
     [Test]
-    public void ListViewSelectionApi_SetSelectedIndex_AndSelect_UseCanonicalClampingSemantics()
+    public void ListViewSelectionApiSetSelectedIndexAndSelectUseCanonicalClampingSemantics()
     {
         var control = new ListView<string>(static item => item);
         control.SetItems(["alpha", "beta", "gamma"]);
@@ -28,7 +28,7 @@ public sealed class ListViewSelectionApiTests
     }
 
     [Test]
-    public void ListViewSelectionApi_EmptyList_SetSelectedIndexAndSelect_ReturnFalse()
+    public void ListViewSelectionApiEmptyListSetSelectedIndexAndSelectReturnFalse()
     {
         var control = new ListView<string>(static item => item);
 
@@ -41,7 +41,7 @@ public sealed class ListViewSelectionApiTests
     }
 
     [Test]
-    public void ListViewSelectionApi_SetSelectedIndex_RaisesSelectionChanged_OnSelectionTransitionsOnly()
+    public void ListViewSelectionApiSetSelectedIndexRaisesSelectionChangedOnSelectionTransitionsOnly()
     {
         var control = new ListView<string>(static item => item);
         control.SetItems(["alpha", "beta", "gamma"]);
@@ -64,7 +64,7 @@ public sealed class ListViewSelectionApiTests
     }
 
     [Test]
-    public void ListViewSelectionApi_PointerPressInsideRowLane_SelectsRowBeyondLabelGlyphWidth()
+    public void ListViewSelectionApiPointerPressInsideRowLaneSelectsRowBeyondLabelGlyphWidth()
     {
         var control = new ListView<string>(static item => item)
         {
@@ -82,7 +82,7 @@ public sealed class ListViewSelectionApiTests
     }
 
     [Test]
-    public void ListViewSelectionApi_KeyboardNavigation_RemainsUnchangedAfterPointerHitAreaUpdate()
+    public void ListViewSelectionApiKeyboardNavigationRemainsUnchangedAfterPointerHitAreaUpdate()
     {
         var control = new ListView<string>(static item => item);
         control.SetItems(["alpha", "beta", "gamma"]);

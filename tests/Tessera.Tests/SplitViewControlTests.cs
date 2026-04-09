@@ -10,7 +10,7 @@ namespace Tessera.Tests;
 public sealed class SplitViewControlTests
 {
     [Test]
-    public void Controls_SplitView_KeyboardFocusHandoff_ForwardsToActivePane()
+    public void ControlsSplitViewKeyboardFocusHandoffForwardsToActivePane()
     {
         var first = new SpyControl("left");
         var second = new SpyControl("right");
@@ -36,7 +36,7 @@ public sealed class SplitViewControlTests
     }
 
     [Test]
-    public void Controls_SplitView_PointerDividerDrag_UpdatesRatio()
+    public void ControlsSplitViewPointerDividerDragUpdatesRatio()
     {
         var control = new SplitView
         {
@@ -61,7 +61,7 @@ public sealed class SplitViewControlTests
     }
 
     [Test]
-    public void Controls_SplitView_PointerPress_SelectsPaneAndForwardsBounds()
+    public void ControlsSplitViewPointerPressSelectsPaneAndForwardsBounds()
     {
         var first = new SpyControl("first");
         var second = new SpyControl("second");
@@ -85,7 +85,7 @@ public sealed class SplitViewControlTests
     }
 
     [Test]
-    public void Controls_SplitView_FocusedStyles_EmitAnsi()
+    public void ControlsSplitViewFocusedStylesEmitAnsi()
     {
         var borderStyle = TesseraStyle.Empty.WithForeground(AnsiColor.Rgb(91, 81, 71));
         var dividerStyle = TesseraStyle.Empty.WithForeground(AnsiColor.Rgb(11, 21, 31));
@@ -106,7 +106,7 @@ public sealed class SplitViewControlTests
     }
 
     [Test]
-    public void Controls_SplitView_DefaultRender_IsDeterministicAndMonochrome()
+    public void ControlsSplitViewDefaultRenderIsDeterministicAndMonochrome()
     {
         var control = new SplitView
         {

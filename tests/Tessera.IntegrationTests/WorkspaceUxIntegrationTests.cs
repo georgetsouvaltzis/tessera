@@ -2,7 +2,7 @@ using Tessera.Components.Composition;
 using Tessera.Components.Primitives;
 using Tessera.Components.Styling;
 using NUnit.Framework;
-using Tessera.TestFixtures;
+using Tessera.IntegrationFixtureApp;
 using Tessera.Core.Messages;
 
 namespace Tessera.IntegrationTests;

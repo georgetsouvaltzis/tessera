@@ -9,7 +9,7 @@ namespace Tessera.Hosting;
 [EditorBrowsable(EditorBrowsableState.Advanced)]
 public sealed class ConsoleTerminalAdapter : ITerminalAdapter
 {
-    private readonly global::Tessera.Core.Terminal.ConsoleTerminalAdapter _inner = new();
+    private readonly global::Tessera.Core.Terminal.Adapters.ConsoleTerminalAdapter _inner = new();
 
     public Stream Input => _inner.Input;
 

@@ -3,11 +3,14 @@ using Tessera.Core.Abstractions;
 using Tessera.Core.Input;
 using Tessera.Core.Messages;
 using Tessera.Core.Rendering;
-using Tessera.Core.Terminal;
 
-namespace Tessera.Core.Application;
+namespace Tessera.Core.Application.Internal;
 
-internal sealed class TesseraRuntimeLoop
+internal sealed class TesseraRuntimeLoop(
+    Func<Effect?>? initialize,
+    Func<IMessage, Effect?> update,
+    Func<ScreenOutput> render,
+    TesseraRuntimeLoopOptions? options = null)
 {
     private static readonly UnboundedChannelOptions MessageChannelOptions = new()
     {
@@ -23,31 +26,17 @@ internal sealed class TesseraRuntimeLoop
         AllowSynchronousContinuations = true,
     };
 
-    private readonly Func<Effect?>? _initialize;
-    private readonly Func<IMessage, Effect?> _update;
-    private readonly Func<ScreenOutput> _render;
-    private readonly TesseraRuntimeLoopOptions _options;
-    private readonly Channel<IMessage> _messages;
-    private readonly Channel<Effect> _effects;
+    private readonly Func<Effect?>? _initialize = initialize;
+    private readonly Func<IMessage, Effect?> _update = update ?? throw new ArgumentNullException(nameof(update));
+    private readonly Func<ScreenOutput> _render = render ?? throw new ArgumentNullException(nameof(render));
+    private readonly TesseraRuntimeLoopOptions _options = options ?? new TesseraRuntimeLoopOptions();
+    private readonly Channel<IMessage> _messages = Channel.CreateUnbounded<IMessage>(MessageChannelOptions);
+    private readonly Channel<Effect> _effects = Channel.CreateUnbounded<Effect>(EffectChannelOptions);
     private readonly object _stateLock = new();
     private readonly TesseraCapabilityProbe _capabilityProbe = new();
     private readonly TesseraRuntimeState _runtime = new();
     private CancellationTokenSource? _cts;
     private bool _running;
-
-    public TesseraRuntimeLoop(
-        Func<Effect?>? initialize,
-        Func<IMessage, Effect?> update,
-        Func<ScreenOutput> render,
-        TesseraRuntimeLoopOptions? options = null)
-    {
-        _initialize = initialize;
-        _update = update ?? throw new ArgumentNullException(nameof(update));
-        _render = render ?? throw new ArgumentNullException(nameof(render));
-        _options = options ?? new TesseraRuntimeLoopOptions();
-        _messages = Channel.CreateUnbounded<IMessage>(MessageChannelOptions);
-        _effects = Channel.CreateUnbounded<Effect>(EffectChannelOptions);
-    }
 
     public void Send(IMessage message)
     {
@@ -146,7 +135,7 @@ internal sealed class TesseraRuntimeLoop
             return;
         }
 
-        _cts.Cancel();
+        await _cts.CancelAsync().ConfigureAwait(false);
         await ShutdownAsync(kill, cancellationToken).ConfigureAwait(false);
     }
 
@@ -181,7 +170,11 @@ internal sealed class TesseraRuntimeLoop
 
                 if (filtered is QuitMsg)
                 {
-                    _cts?.Cancel();
+                    if (_cts is { } quitCts)
+                    {
+                        await quitCts.CancelAsync().ConfigureAwait(false);
+                    }
+
                     await TesseraBackgroundLoops.AwaitAsync(commandLoop, inputLoop, resizeLoop).ConfigureAwait(false);
                     await ShutdownAsync(kill: false, CancellationToken.None).ConfigureAwait(false);
                     return;
@@ -251,7 +244,11 @@ internal sealed class TesseraRuntimeLoop
             }
         }
 
-        _cts?.Cancel();
+        if (_cts is { } completionCts)
+        {
+            await completionCts.CancelAsync().ConfigureAwait(false);
+        }
+
         await TesseraBackgroundLoops.AwaitAsync(commandLoop, inputLoop, resizeLoop).ConfigureAwait(false);
         await ShutdownAsync(kill: false, CancellationToken.None).ConfigureAwait(false);
     }
@@ -312,11 +309,11 @@ internal sealed class TesseraRuntimeLoop
         return false;
     }
 
-    private Task? StartInputLoop(CancellationToken token)
+    private Task StartInputLoop(CancellationToken token)
     {
         if (_options.DisableInput || _runtime.Terminal is null || !_runtime.Terminal.IsInputInteractive)
         {
-            return null;
+            return Task.CompletedTask;
         }
 
         if (_runtime.Terminal is ConsoleTerminalAdapter consoleTerminal

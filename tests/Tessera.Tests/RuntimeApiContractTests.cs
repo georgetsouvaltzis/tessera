@@ -192,23 +192,23 @@ internal static class RuntimeApiContractTests
             !typeof(Tessera.Hosting.ITerminalAdapter).IsAssignableTo(typeof(global::Tessera.Core.Terminal.ITerminalAdapter)),
             "Tessera.Hosting.ITerminalAdapter should be Tessera-owned, not a core interface alias.");
         TestAssert.True(
-            !typeof(Tessera.Hosting.IEventDecoder).IsAssignableTo(typeof(global::Tessera.Core.Input.IEventDecoder)),
+            !typeof(Tessera.Hosting.IEventDecoder).IsAssignableTo(typeof(global::Tessera.Core.Input.Decoding.IEventDecoder)),
             "Tessera.Hosting.IEventDecoder should be Tessera-owned, not a core interface alias.");
         return Task.CompletedTask;
     }
 
     private static Task CoreInputDecoders_AreInternalized()
     {
-        TestAssert.True(typeof(global::Tessera.Core.Input.EventDecoder).IsNotPublic, "Tessera.Core.Input.EventDecoder should be internal.");
-        TestAssert.True(typeof(global::Tessera.Core.Input.IEventDecoder).IsNotPublic, "Tessera.Core.Input.IEventDecoder should be internal.");
-        TestAssert.True(typeof(global::Tessera.Core.Input.DecodeResult).IsNotPublic, "Tessera.Core.Input.DecodeResult should be internal.");
+        TestAssert.True(typeof(global::Tessera.Core.Input.Decoding.EventDecoder).IsNotPublic, "Tessera.Core.Input.Decoding.EventDecoder should be internal.");
+        TestAssert.True(typeof(global::Tessera.Core.Input.Decoding.IEventDecoder).IsNotPublic, "Tessera.Core.Input.Decoding.IEventDecoder should be internal.");
+        TestAssert.True(typeof(global::Tessera.Core.Input.Decoding.DecodeResult).IsNotPublic, "Tessera.Core.Input.Decoding.DecodeResult should be internal.");
         return Task.CompletedTask;
     }
 
     private static Task CoreTerminalDetectors_AreInternalized()
     {
-        TestAssert.True(typeof(global::Tessera.Core.Terminal.TerminalCapabilityDetector).IsNotPublic, "Tessera.Core.Terminal.TerminalCapabilityDetector should be internal.");
-        TestAssert.True(typeof(global::Tessera.Core.Terminal.TerminalColorProfileDetector).IsNotPublic, "Tessera.Core.Terminal.TerminalColorProfileDetector should be internal.");
+        TestAssert.True(typeof(global::Tessera.Core.Terminal.Capabilities.TerminalCapabilityDetector).IsNotPublic, "Tessera.Core.Terminal.Capabilities.TerminalCapabilityDetector should be internal.");
+        TestAssert.True(typeof(global::Tessera.Core.Terminal.Capabilities.TerminalColorProfileDetector).IsNotPublic, "Tessera.Core.Terminal.Capabilities.TerminalColorProfileDetector should be internal.");
         return Task.CompletedTask;
     }
 
@@ -219,7 +219,7 @@ internal static class RuntimeApiContractTests
         TestAssert.True(typeof(global::Tessera.Core.Rendering.NullRenderer).IsNotPublic, "Tessera.Core.Rendering.NullRenderer should be internal.");
         TestAssert.True(typeof(global::Tessera.Core.Rendering.AnsiRendererOptions).IsNotPublic, "Tessera.Core.Rendering.AnsiRendererOptions should be internal.");
         TestAssert.True(typeof(global::Tessera.Core.Terminal.ITerminalAdapter).IsNotPublic, "Tessera.Core.Terminal.ITerminalAdapter should be internal.");
-        TestAssert.True(typeof(global::Tessera.Core.Terminal.ConsoleTerminalAdapter).IsNotPublic, "Tessera.Core.Terminal.ConsoleTerminalAdapter should be internal.");
+        TestAssert.True(typeof(global::Tessera.Core.Terminal.Adapters.ConsoleTerminalAdapter).IsNotPublic, "Tessera.Core.Terminal.Adapters.ConsoleTerminalAdapter should be internal.");
         return Task.CompletedTask;
     }
 

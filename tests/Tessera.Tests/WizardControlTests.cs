@@ -10,7 +10,7 @@ namespace Tessera.Tests;
 public sealed class WizardControlTests
 {
     [Test]
-    public void Controls_Wizard_RendersMarkersAndStepContent()
+    public void ControlsWizardRendersMarkersAndStepContent()
     {
         var wizard = new Wizard
         {
@@ -37,7 +37,7 @@ public sealed class WizardControlTests
     }
 
     [Test]
-    public void Controls_Wizard_KeyboardAndPointerNavigation_RaisesStepChanged()
+    public void ControlsWizardKeyboardAndPointerNavigationRaisesStepChanged()
     {
         var wizard = new Wizard
         {
@@ -80,7 +80,7 @@ public sealed class WizardControlTests
     }
 
     [Test]
-    public void Controls_Wizard_DefaultRender_IsDeterministicAndMonochrome()
+    public void ControlsWizardDefaultRenderIsDeterministicAndMonochrome()
     {
         var wizard = new Wizard
         {
@@ -102,7 +102,7 @@ public sealed class WizardControlTests
     }
 
     [Test]
-    public void Controls_Wizard_StyleHooks_EmitAnsi()
+    public void ControlsWizardStyleHooksEmitAnsi()
     {
         var wizard = new Wizard
         {

@@ -8,7 +8,7 @@ namespace Tessera.Tests;
 public sealed class SelectionApiConvergenceTests
 {
     [Test]
-    public void SelectionApiConvergence_Stepper_SelectedAliasesAndEvents_RemainInSync()
+    public void SelectionApiConvergenceStepperSelectedAliasesAndEventsRemainInSync()
     {
         var control = new Stepper();
         control.SetSteps(
@@ -36,7 +36,7 @@ public sealed class SelectionApiConvergenceTests
     }
 
     [Test]
-    public void SelectionApiConvergence_Wizard_SelectedAliasesAndEvents_RemainInSync()
+    public void SelectionApiConvergenceWizardSelectedAliasesAndEventsRemainInSync()
     {
         var control = new Wizard();
         control.SetSteps(

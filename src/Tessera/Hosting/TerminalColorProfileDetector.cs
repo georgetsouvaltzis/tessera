@@ -10,5 +10,5 @@ namespace Tessera.Hosting;
 public static class TerminalColorProfileDetector
 {
     public static TerminalColorProfile Detect() =>
-        global::Tessera.Core.Terminal.TerminalColorProfileDetector.Detect().AsHosting();
+        global::Tessera.Core.Terminal.Capabilities.TerminalColorProfileDetector.Detect().AsHosting();
 }

@@ -8,7 +8,7 @@ namespace Tessera.Tests;
 public sealed class DialogClosedEventTests
 {
     [Test]
-    public void Dialog_ClosedEvent_Accept_RaisesAcceptedThenClosedOnce()
+    public void DialogClosedEventAcceptRaisesAcceptedThenClosedOnce()
     {
         var dialog = CreateVisibleFocusedDialog();
         var sequence = new List<string>();
@@ -45,7 +45,7 @@ public sealed class DialogClosedEventTests
     }
 
     [Test]
-    public void Dialog_ClosedEvent_Dismiss_RaisesDismissedThenClosedOnce()
+    public void DialogClosedEventDismissRaisesDismissedThenClosedOnce()
     {
         var dialog = CreateVisibleFocusedDialog();
         var sequence = new List<string>();
@@ -82,7 +82,7 @@ public sealed class DialogClosedEventTests
     }
 
     [Test]
-    public void Dialog_ClosedEvent_FiresPerDecision_AndTryConsumeResultRemainsSingleUse()
+    public void DialogClosedEventFiresPerDecisionAndTryConsumeResultRemainsSingleUse()
     {
         var dialog = CreateVisibleFocusedDialog();
         var acceptedCount = 0;

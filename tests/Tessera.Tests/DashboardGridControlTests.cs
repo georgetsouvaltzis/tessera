@@ -10,7 +10,7 @@ namespace Tessera.Tests;
 public sealed class DashboardGridControlTests
 {
     [Test]
-    public void Controls_DashboardGrid_KeyboardSelection_RaisesSelectionChanged()
+    public void ControlsDashboardGridKeyboardSelectionRaisesSelectionChanged()
     {
         var control = new DashboardGrid
         {
@@ -37,7 +37,7 @@ public sealed class DashboardGridControlTests
     }
 
     [Test]
-    public void Controls_DashboardGrid_PointerPress_SelectsHitTile()
+    public void ControlsDashboardGridPointerPressSelectsHitTile()
     {
         var control = new DashboardGrid();
         control.SetTiles(
@@ -55,7 +55,7 @@ public sealed class DashboardGridControlTests
     }
 
     [Test]
-    public void Controls_DashboardGrid_MoveAndResizeTile_UpdateState()
+    public void ControlsDashboardGridMoveAndResizeTileUpdateState()
     {
         var control = new DashboardGrid();
         control.SetTiles(
@@ -80,7 +80,7 @@ public sealed class DashboardGridControlTests
     }
 
     [Test]
-    public void Controls_DashboardGrid_CanonicalTitleStyleAliases_StayInSync()
+    public void ControlsDashboardGridCanonicalTitleStyleAliasesStayInSync()
     {
         var control = new DashboardGrid();
         var titleStyle = TesseraStyle.Empty.WithForeground(AnsiColor.Rgb(12, 34, 56));
@@ -96,7 +96,7 @@ public sealed class DashboardGridControlTests
     }
 
     [Test]
-    public void Controls_DashboardGrid_StyleHooks_EmitAnsiAndFocusMarker()
+    public void ControlsDashboardGridStyleHooksEmitAnsiAndFocusMarker()
     {
         var control = new DashboardGrid
         {
@@ -121,7 +121,7 @@ public sealed class DashboardGridControlTests
     }
 
     [Test]
-    public void Controls_DashboardGrid_DefaultRender_IsDeterministicAndMonochrome()
+    public void ControlsDashboardGridDefaultRenderIsDeterministicAndMonochrome()
     {
         var control = new DashboardGrid();
         control.SetTiles(

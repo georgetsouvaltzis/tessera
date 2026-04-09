@@ -1,5 +1,7 @@
 using System.Text.Json;
 
+using System.Diagnostics.CodeAnalysis;
+
 namespace Tessera.Benchmarks;
 
 internal static class PerfGateRunner
@@ -118,6 +120,7 @@ internal static class PerfGateRunner
         return measurements;
     }
 
+    [SuppressMessage("Sonar", "S1215", Justification = "The perf gate forces a full collection between warmup and timed samples to stabilize allocation baselines.")]
     private static PerfGateMeasurement MeasureScenario(PerfGateScenario scenario)
     {
         var execute = scenario.CreateWorkload();

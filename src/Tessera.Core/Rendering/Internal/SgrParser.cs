@@ -1,6 +1,6 @@
 using System.Buffers;
 
-namespace Tessera.Core.Rendering;
+namespace Tessera.Core.Rendering.Internal;
 
 internal static class SgrParser
 {

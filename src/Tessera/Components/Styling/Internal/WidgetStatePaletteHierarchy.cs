@@ -1,4 +1,3 @@
-using Tessera.Components.Styling;
 namespace Tessera.Components.Styling.Internal;
 
 internal static class WidgetStatePaletteHierarchy

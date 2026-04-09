@@ -80,7 +80,7 @@ public sealed class SplitView : Control
     /// <summary>
     /// Gets or sets divider glyph. Use <c>'\0'</c> to auto-select by orientation.
     /// </summary>
-    public char DividerGlyph { get; set; } = '\0';
+    public char DividerGlyph { get; set; }
 
     /// <summary>
     /// Gets or sets border style.
@@ -214,8 +214,17 @@ public sealed class SplitView : Control
 
         if (pointer.Kind == PointerEventKind.Wheel && layout.Divider.Contains(pointer.X, pointer.Y))
         {
-            var delta = pointer.Button == PointerButton.WheelDown ? +0.05d : pointer.Button == PointerButton.WheelUp ? -0.05d : 0d;
-            return delta != 0d && SetRatio(Ratio + delta);
+            if (pointer.Button == PointerButton.WheelDown)
+            {
+                return SetRatio(Ratio + 0.05d);
+            }
+
+            if (pointer.Button == PointerButton.WheelUp)
+            {
+                return SetRatio(Ratio - 0.05d);
+            }
+
+            return false;
         }
 
         if (layout.First.Contains(pointer.X, pointer.Y))

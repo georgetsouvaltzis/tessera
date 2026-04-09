@@ -1,4 +1,5 @@
 using Tessera.Core.Application;
+using Tessera.Core.Application.Internal;
 
 namespace Tessera.Internal;
 
@@ -127,7 +128,7 @@ internal sealed class TesseraAppRuntime : ITeaRuntime
 
         public void Resize(int width, int height) => inner.Resize(width, height);
 
-        public void UpdateCapabilities(global::Tessera.Core.Terminal.TerminalCapabilityProfile capabilities) =>
+        public void UpdateCapabilities(global::Tessera.Core.Terminal.Capabilities.TerminalCapabilityProfile capabilities) =>
             inner.UpdateCapabilities(capabilities.AsHosting());
 
         public void Render(global::Tessera.Core.Abstractions.ScreenOutput output) =>
@@ -146,9 +147,9 @@ internal sealed class TesseraAppRuntime : ITeaRuntime
     }
 
     private sealed class HostingEventDecoderAdapter(global::Tessera.Hosting.IEventDecoder inner)
-        : global::Tessera.Core.Input.IEventDecoder
+        : global::Tessera.Core.Input.Decoding.IEventDecoder
     {
-        public global::Tessera.Core.Input.DecodeResult Decode(ReadOnlySpan<byte> buffer, bool timeoutExpired) =>
+        public global::Tessera.Core.Input.Decoding.DecodeResult Decode(ReadOnlySpan<byte> buffer, bool timeoutExpired) =>
             inner.Decode(buffer, timeoutExpired).ToCore();
     }
 }

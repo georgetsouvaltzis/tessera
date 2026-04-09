@@ -10,7 +10,7 @@ namespace Tessera.Tests;
 public sealed class BoxPlotControlTests
 {
     [Test]
-    public void Controls_BoxPlot_RendersSeriesAndDistributionGlyphs()
+    public void ControlsBoxPlotRendersSeriesAndDistributionGlyphs()
     {
         var control = new BoxPlot
         {
@@ -31,7 +31,7 @@ public sealed class BoxPlotControlTests
     }
 
     [Test]
-    public void Controls_BoxPlot_KeyboardAndPointerSelection_RaisesSelectionChanged()
+    public void ControlsBoxPlotKeyboardAndPointerSelectionRaisesSelectionChanged()
     {
         var control = new BoxPlot
         {
@@ -67,7 +67,7 @@ public sealed class BoxPlotControlTests
     }
 
     [Test]
-    public void Controls_BoxPlot_StyleHooksAndFocusedBorder_EmitAnsi()
+    public void ControlsBoxPlotStyleHooksAndFocusedBorderEmitAnsi()
     {
         var control = new BoxPlot
         {
@@ -101,7 +101,7 @@ public sealed class BoxPlotControlTests
     }
 
     [Test]
-    public void Controls_BoxPlot_DefaultRender_IsDeterministicAndMonochrome()
+    public void ControlsBoxPlotDefaultRenderIsDeterministicAndMonochrome()
     {
         var control = new BoxPlot
         {

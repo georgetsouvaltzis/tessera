@@ -10,7 +10,7 @@ namespace Tessera.Tests;
 public sealed class TreeMapChartControlTests
 {
     [Test]
-    public void Controls_TreeMapChart_RendersTitleCellsAndLabels()
+    public void ControlsTreeMapChartRendersTitleCellsAndLabels()
     {
         var control = new TreeMapChart
         {
@@ -38,7 +38,7 @@ public sealed class TreeMapChartControlTests
     }
 
     [Test]
-    public void Controls_TreeMapChart_KeyboardAndPointerSelection_RaisesSelectionChanged()
+    public void ControlsTreeMapChartKeyboardAndPointerSelectionRaisesSelectionChanged()
     {
         var control = new TreeMapChart
         {
@@ -68,7 +68,7 @@ public sealed class TreeMapChartControlTests
     }
 
     [Test]
-    public void Controls_TreeMapChart_StyledNodeAndFocusedBorder_EmitAnsi()
+    public void ControlsTreeMapChartStyledNodeAndFocusedBorderEmitAnsi()
     {
         var focusedBorderStyle = TesseraStyle.Empty.WithForeground(AnsiColor.Rgb(90, 80, 70));
         var peakStyle = TesseraStyle.Empty.WithForeground(AnsiColor.Rgb(11, 22, 33));
@@ -95,7 +95,7 @@ public sealed class TreeMapChartControlTests
     }
 
     [Test]
-    public void Controls_TreeMapChart_DefaultRender_IsDeterministicAndMonochrome()
+    public void ControlsTreeMapChartDefaultRenderIsDeterministicAndMonochrome()
     {
         var control = new TreeMapChart
         {

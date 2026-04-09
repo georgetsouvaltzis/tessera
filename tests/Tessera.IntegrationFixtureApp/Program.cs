@@ -1,5 +1,5 @@
 using Tessera;
-using Tessera.TestFixtures;
+using Tessera.IntegrationFixtureApp;
 
 await TesseraApplication.RunAsync(new CounterFixtureApp(), new TesseraRuntimeOptions
 {

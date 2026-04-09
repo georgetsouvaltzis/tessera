@@ -189,7 +189,7 @@ public sealed class RichTextView : Control
 
         var pageSize = Math.Max(1, _lastContentHeight);
         var maxOffset = CalculateMaxScrollOffset();
-        var nextOffset = _scrollOffset;
+        int nextOffset;
 
         switch (key.Key)
         {
@@ -360,7 +360,7 @@ public sealed class RichTextView : Control
         return visualLines;
     }
 
-    private static List<RichTextSegment> TruncateSegmentsToWidth(IReadOnlyList<RichTextSegment> line, int width)
+    private static List<RichTextSegment> TruncateSegmentsToWidth(List<RichTextSegment> line, int width)
     {
         var truncated = new List<RichTextSegment>(line.Count);
         var remaining = width;
@@ -381,7 +381,7 @@ public sealed class RichTextView : Control
         return truncated;
     }
 
-    private string RenderVisualLine(IReadOnlyList<RichTextSegment> line, int width)
+    private string RenderVisualLine(List<RichTextSegment> line, int width)
     {
         if (line.Count == 0)
         {

@@ -2,7 +2,7 @@ using System.Buffers;
 using System.Globalization;
 using System.Text;
 
-namespace Tessera.Core.Rendering;
+namespace Tessera.Core.Rendering.Internal;
 
 internal static class DisplayWidth
 {

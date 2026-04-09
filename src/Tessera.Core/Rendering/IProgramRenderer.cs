@@ -1,6 +1,5 @@
 using System.ComponentModel;
 using Tessera.Core.Abstractions;
-using Tessera.Core.Terminal;
 
 namespace Tessera.Core.Rendering;
 

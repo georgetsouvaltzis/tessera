@@ -9,7 +9,7 @@ namespace Tessera.Tests;
 public sealed class ProcessListViewControlTests
 {
     [Test]
-    public void Controls_ProcessListView_RendersStatusCpuAndMemoryColumns()
+    public void ControlsProcessListViewRendersStatusCpuAndMemoryColumns()
     {
         var control = new ProcessListView
         {
@@ -39,7 +39,7 @@ public sealed class ProcessListViewControlTests
     }
 
     [Test]
-    public void Controls_ProcessListView_KeyboardAndPointerSelection_RaisesSelectionChanged()
+    public void ControlsProcessListViewKeyboardAndPointerSelectionRaisesSelectionChanged()
     {
         var control = new ProcessListView
         {
@@ -75,7 +75,7 @@ public sealed class ProcessListViewControlTests
     }
 
     [Test]
-    public void Controls_ProcessListView_DefaultRender_IsDeterministicAndMonochrome()
+    public void ControlsProcessListViewDefaultRenderIsDeterministicAndMonochrome()
     {
         var control = new ProcessListView
         {

@@ -10,7 +10,7 @@ namespace Tessera.Tests;
 public sealed class TaskRunnerPanelControlTests
 {
     [Test]
-    public void Controls_TaskRunnerPanel_RendersStatusMarkersAndRows()
+    public void ControlsTaskRunnerPanelRendersStatusMarkersAndRows()
     {
         var control = new TaskRunnerPanel
         {
@@ -32,7 +32,7 @@ public sealed class TaskRunnerPanelControlTests
     }
 
     [Test]
-    public void Controls_TaskRunnerPanel_KeyboardAndPointerSelection_RaisesSelectionChanged()
+    public void ControlsTaskRunnerPanelKeyboardAndPointerSelectionRaisesSelectionChanged()
     {
         var control = new TaskRunnerPanel
         {
@@ -66,7 +66,7 @@ public sealed class TaskRunnerPanelControlTests
     }
 
     [Test]
-    public void Controls_TaskRunnerPanel_HoverStyle_RendersOnPointerMotion()
+    public void ControlsTaskRunnerPanelHoverStyleRendersOnPointerMotion()
     {
         var hoveredStyle = TesseraStyle.Empty.WithForeground(AnsiColor.Rgb(18, 52, 86));
         var control = new TaskRunnerPanel
@@ -89,7 +89,7 @@ public sealed class TaskRunnerPanelControlTests
     }
 
     [Test]
-    public void Controls_TaskRunnerPanel_StyleHooks_RenderAnsiAndFocusedBorder()
+    public void ControlsTaskRunnerPanelStyleHooksRenderAnsiAndFocusedBorder()
     {
         var focusedBorderStyle = TesseraStyle.Empty.WithForeground(AnsiColor.Rgb(120, 90, 40));
         var control = new TaskRunnerPanel
@@ -112,7 +112,7 @@ public sealed class TaskRunnerPanelControlTests
     }
 
     [Test]
-    public void Controls_TaskRunnerPanel_Render_IsDeterministicWithoutStyles()
+    public void ControlsTaskRunnerPanelRenderIsDeterministicWithoutStyles()
     {
         var control = new TaskRunnerPanel
         {

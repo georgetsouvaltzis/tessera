@@ -10,7 +10,7 @@ namespace Tessera.Tests;
 public sealed class ScatterPlotControlTests
 {
     [Test]
-    public void Controls_ScatterPlot_RendersAxesLegendLabelsAndPoints()
+    public void ControlsScatterPlotRendersAxesLegendLabelsAndPoints()
     {
         var control = new ScatterPlot
         {
@@ -43,7 +43,7 @@ public sealed class ScatterPlotControlTests
     }
 
     [Test]
-    public void Controls_ScatterPlot_DefaultRender_IsMonochromeAndDeterministic()
+    public void ControlsScatterPlotDefaultRenderIsMonochromeAndDeterministic()
     {
         var control = new ScatterPlot();
         control.SetPoints(
@@ -66,7 +66,7 @@ public sealed class ScatterPlotControlTests
     }
 
     [Test]
-    public void Controls_ScatterPlot_StyledPointAndLabel_EmitAnsiSequences()
+    public void ControlsScatterPlotStyledPointAndLabelEmitAnsiSequences()
     {
         var pointStyle = TesseraStyle.Empty.WithForeground(AnsiColor.Rgb(120, 40, 30));
         var labelStyle = TesseraStyle.Empty.WithBold();
@@ -87,7 +87,7 @@ public sealed class ScatterPlotControlTests
     }
 
     [Test]
-    public void Controls_ScatterPlot_CapacityAndTrimToLast_KeepTrailingPoints()
+    public void ControlsScatterPlotCapacityAndTrimToLastKeepTrailingPoints()
     {
         var control = new ScatterPlot
         {

@@ -1,6 +1,4 @@
 using Tessera.Core.Abstractions;
-using Tessera.Core.Input;
-
 namespace Tessera.Internal;
 
 internal static class TesseraHostingAdapter
@@ -17,10 +15,10 @@ internal static class TesseraHostingAdapter
         };
     }
 
-    public static global::Tessera.Core.Terminal.TerminalCapabilityProfile ToCore(this Hosting.TerminalCapabilityProfile profile)
+    public static global::Tessera.Core.Terminal.Capabilities.TerminalCapabilityProfile ToCore(this Hosting.TerminalCapabilityProfile profile)
     {
         ArgumentNullException.ThrowIfNull(profile);
-        return new global::Tessera.Core.Terminal.TerminalCapabilityProfile(
+        return new global::Tessera.Core.Terminal.Capabilities.TerminalCapabilityProfile(
             profile.FocusReporting,
             profile.MouseReporting,
             profile.BracketedPaste,
@@ -31,7 +29,7 @@ internal static class TesseraHostingAdapter
             profile.Source);
     }
 
-    public static Hosting.TerminalCapabilityProfile AsHosting(this global::Tessera.Core.Terminal.TerminalCapabilityProfile profile)
+    public static Hosting.TerminalCapabilityProfile AsHosting(this global::Tessera.Core.Terminal.Capabilities.TerminalCapabilityProfile profile)
     {
         ArgumentNullException.ThrowIfNull(profile);
         return new Hosting.TerminalCapabilityProfile(
@@ -66,18 +64,24 @@ internal static class TesseraHostingAdapter
     public static global::Tessera.Core.Terminal.TerminalSize ToCore(this Hosting.TerminalSize size) =>
         new(size.Width, size.Height);
 
-    public static ValueTask<Hosting.TerminalSize> AsHosting(this ValueTask<global::Tessera.Core.Terminal.TerminalSize> pending) =>
-        pending.IsCompletedSuccessfully
-            ? new ValueTask<Hosting.TerminalSize>(pending.Result.AsHosting())
-            : AwaitSizeAsync(pending);
+    public static ValueTask<Hosting.TerminalSize> AsHosting(this ValueTask<global::Tessera.Core.Terminal.TerminalSize> pending)
+    {
+        if (pending.IsCompletedSuccessfully)
+        {
+            var size = pending.Result;
+            return new ValueTask<Hosting.TerminalSize>(size.AsHosting());
+        }
+
+        return AwaitSizeAsync(pending);
+    }
 
     public static Hosting.TerminalSize AsHosting(this global::Tessera.Core.Terminal.TerminalSize size) =>
         new(size.Width, size.Height);
 
-    public static Hosting.EventDecodeResult ToHosting(this DecodeResult result) =>
+    public static Hosting.EventDecodeResult ToHosting(this global::Tessera.Core.Input.Decoding.DecodeResult result) =>
         new(result.Consumed, result.Message is null ? null : TesseraMessageAdapter.ToPublic(result.Message), result.NeedMoreData);
 
-    public static DecodeResult ToCore(this Hosting.EventDecodeResult result) =>
+    public static global::Tessera.Core.Input.Decoding.DecodeResult ToCore(this Hosting.EventDecodeResult result) =>
         new(result.Consumed, result.Message is null ? null : TesseraMessageAdapter.ToCore(result.Message), result.NeedMoreData);
 
     public static Hosting.RenderOutput ToHosting(this ScreenOutput output) =>

@@ -1,16 +1,10 @@
 namespace Tessera.Core.Rendering;
 
-internal sealed class DisplayLine
+internal sealed class DisplayLine(string?[] cells, string?[] styles)
 {
     private const string ContinuationMarker = "\u0000";
-    private readonly string?[] _cells;
-    private readonly string?[] _styles;
-
-    public DisplayLine(string?[] cells, string?[] styles)
-    {
-        _cells = cells;
-        _styles = styles;
-    }
+    private readonly string?[] _cells = cells;
+    private readonly string?[] _styles = styles;
 
     public int ColumnCount => _cells.Length;
 

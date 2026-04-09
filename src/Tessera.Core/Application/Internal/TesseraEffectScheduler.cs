@@ -3,7 +3,7 @@ using System.Runtime.ExceptionServices;
 using Tessera.Core.Abstractions;
 using Tessera.Core.Messages;
 
-namespace Tessera.Core.Application;
+namespace Tessera.Core.Application.Internal;
 
 internal sealed class TesseraEffectScheduler : IDisposable
 {
@@ -80,6 +80,7 @@ internal sealed class TesseraEffectScheduler : IDisposable
             }
             catch
             {
+                // Individual effect failures are tracked separately and re-surfaced through messages.
             }
         }
     }
@@ -105,6 +106,7 @@ internal sealed class TesseraEffectScheduler : IDisposable
         }
         catch (OperationCanceledException) when (token.IsCancellationRequested)
         {
+            // Effect cancellation is expected during shutdown.
         }
         catch (Exception ex)
         {

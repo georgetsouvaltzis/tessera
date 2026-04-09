@@ -9,7 +9,7 @@ namespace Tessera.Tests;
 public sealed class TesseraEffectsPeriodicApiErgonomicsTests
 {
     [Test]
-    public async Task TesseraEffects_Periodic_AutoReschedulesWithoutAppSelfScheduling()
+    public async Task TesseraEffectsPeriodicAutoReschedulesWithoutAppSelfScheduling()
     {
         var app = new PeriodicCounterApp();
         var effect = app.InitializeRuntime();
@@ -28,7 +28,7 @@ public sealed class TesseraEffectsPeriodicApiErgonomicsTests
     }
 
     [Test]
-    public async Task TesseraEffects_TickAndEvery_RemainSingleShotWithoutRuntimeAutoReschedule()
+    public async Task TesseraEffectsTickAndEveryRemainSingleShotWithoutRuntimeAutoReschedule()
     {
         var app = new PassiveUpdateApp();
 
@@ -47,7 +47,7 @@ public sealed class TesseraEffectsPeriodicApiErgonomicsTests
     }
 
     [Test]
-    public async Task TesseraEffects_Periodic_UpdateRuntimeAddsSinglePeriodicFollowUp()
+    public async Task TesseraEffectsPeriodicUpdateRuntimeAddsSinglePeriodicFollowUp()
     {
         var app = new PeriodicWithAppEffectApp();
         var initial = app.InitializeRuntime();

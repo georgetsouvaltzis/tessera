@@ -11,7 +11,7 @@ namespace Tessera.Tests;
 public sealed class TelemetryChartControlTests
 {
     [Test]
-    public void TelemetryChartRender_AutoMode_UsesBrailleCoverageForTinyCards()
+    public void TelemetryChartRenderAutoModeUsesBrailleCoverageForTinyCards()
     {
         var control = new TelemetryChart
         {
@@ -26,7 +26,7 @@ public sealed class TelemetryChartControlTests
     }
 
     [Test]
-    public void TelemetryChartRender_AreaMode_UsesFilledBlockCoverage()
+    public void TelemetryChartRenderAreaModeUsesFilledBlockCoverage()
     {
         var control = new TelemetryChart
         {
@@ -42,7 +42,7 @@ public sealed class TelemetryChartControlTests
     }
 
     [Test]
-    public void TelemetryChartRender_BlockMode_UsesThinnerRibbonThanAreaMode()
+    public void TelemetryChartRenderBlockModeUsesThinnerRibbonThanAreaMode()
     {
         var area = new TelemetryChart
         {
@@ -65,7 +65,7 @@ public sealed class TelemetryChartControlTests
     }
 
     [Test]
-    public void TelemetryChartRender_OneRowAutoMode_FallsBackToBlocks()
+    public void TelemetryChartRenderOneRowAutoModeFallsBackToBlocks()
     {
         var control = new TelemetryChart
         {
@@ -119,7 +119,7 @@ public sealed class TelemetryChartControlTests
     }
 
     [Test]
-    public void TelemetryChartStatsRow_RendersNowMinMaxAndLegend()
+    public void TelemetryChartStatsRowRendersNowMinMaxAndLegend()
     {
         var control = new TelemetryChart
         {
@@ -137,7 +137,7 @@ public sealed class TelemetryChartControlTests
     }
 
     [Test]
-    public void TelemetryChartStatsRow_NarrowCard_FallsBackToTwoRows()
+    public void TelemetryChartStatsRowNarrowCardFallsBackToTwoRows()
     {
         var control = new TelemetryChart
         {

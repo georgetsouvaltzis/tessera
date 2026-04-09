@@ -8,7 +8,7 @@ namespace Tessera.Tests;
 public sealed class RuntimePointerActivationPolicyTests
 {
     [Test]
-    public void RuntimePointerActivationPolicy_PointerInput_BackwardCompatibleClickCountDefaultsToOne()
+    public void RuntimePointerActivationPolicyPointerInputBackwardCompatibleClickCountDefaultsToOne()
     {
         var pointer = new PointerInput(PointerEventKind.Press, PointerButton.Left, 3, 4);
 
@@ -16,7 +16,7 @@ public sealed class RuntimePointerActivationPolicyTests
     }
 
     [Test]
-    public void RuntimePointerActivationPolicy_UnconfiguredTeaApp_UsesDoubleClickActivation()
+    public void RuntimePointerActivationPolicyUnconfiguredTeaAppUsesDoubleClickActivation()
     {
         var app = new PolicyActivationApp();
 
@@ -29,7 +29,7 @@ public sealed class RuntimePointerActivationPolicyTests
     }
 
     [Test]
-    public void RuntimePointerActivationPolicy_DefaultRuntimeOptions_UsesDoubleClickActivation()
+    public void RuntimePointerActivationPolicyDefaultRuntimeOptionsUsesDoubleClickActivation()
     {
         var app = new PolicyActivationApp();
         app.ConfigureRuntimeOptions(new TesseraRuntimeOptions());
@@ -43,7 +43,7 @@ public sealed class RuntimePointerActivationPolicyTests
     }
 
     [Test]
-    public void RuntimePointerActivationPolicy_DoubleClickPolicy_BlocksSingleClickButtonActivation()
+    public void RuntimePointerActivationPolicyDoubleClickPolicyBlocksSingleClickButtonActivation()
     {
         var app = new PolicyActivationApp();
         app.ConfigureRuntimeOptions(
@@ -65,7 +65,7 @@ public sealed class RuntimePointerActivationPolicyTests
     }
 
     [Test]
-    public void RuntimePointerActivationPolicy_DoubleClickPolicy_RespectsSlopThreshold()
+    public void RuntimePointerActivationPolicyDoubleClickPolicyRespectsSlopThreshold()
     {
         var app = new PolicyActivationApp();
         app.ConfigureRuntimeOptions(
@@ -84,7 +84,7 @@ public sealed class RuntimePointerActivationPolicyTests
     }
 
     [Test]
-    public void RuntimePointerActivationPolicy_SingleClickPolicy_PreservesPressRoutingAndAddsClickCount()
+    public void RuntimePointerActivationPolicySingleClickPolicyPreservesPressRoutingAndAddsClickCount()
     {
         var app = new CaptureMessageApp();
         app.ConfigureRuntimeOptions(
@@ -115,7 +115,7 @@ public sealed class RuntimePointerActivationPolicyTests
     }
 
     [Test]
-    public void RuntimePointerActivationPolicy_SingleClickPolicy_PressOnlyInputStillActivatesImmediately()
+    public void RuntimePointerActivationPolicySingleClickPolicyPressOnlyInputStillActivatesImmediately()
     {
         var app = new PolicyActivationApp();
         app.ConfigureRuntimeOptions(
@@ -133,7 +133,7 @@ public sealed class RuntimePointerActivationPolicyTests
     }
 
     [Test]
-    public void RuntimePointerActivationPolicy_DoubleClickPolicy_RoutesSingleClickAsMotionAndSecondAsPress()
+    public void RuntimePointerActivationPolicyDoubleClickPolicyRoutesSingleClickAsMotionAndSecondAsPress()
     {
         var app = new CaptureMessageApp();
         app.ConfigureRuntimeOptions(
@@ -166,7 +166,7 @@ public sealed class RuntimePointerActivationPolicyTests
     }
 
     [Test]
-    public void RuntimePointerActivationPolicy_DoubleClickPolicy_ReleaseNone_CompletesCycleAndEscalatesSecondPress()
+    public void RuntimePointerActivationPolicyDoubleClickPolicyReleaseNoneCompletesCycleAndEscalatesSecondPress()
     {
         var app = new CaptureMessageApp();
         app.ConfigureRuntimeOptions(
@@ -197,7 +197,7 @@ public sealed class RuntimePointerActivationPolicyTests
     }
 
     [Test]
-    public void RuntimePointerActivationPolicy_DoubleClickPolicy_ReleaseDifferentButton_DoesNotCompleteCycle()
+    public void RuntimePointerActivationPolicyDoubleClickPolicyReleaseDifferentButtonDoesNotCompleteCycle()
     {
         var app = new PolicyActivationApp();
         app.ConfigureRuntimeOptions(
@@ -216,7 +216,7 @@ public sealed class RuntimePointerActivationPolicyTests
     }
 
     [Test]
-    public void RuntimePointerActivationPolicy_DoubleClickPolicy_PressOnlyNoise_DoesNotActivate()
+    public void RuntimePointerActivationPolicyDoubleClickPolicyPressOnlyNoiseDoesNotActivate()
     {
         var app = new PolicyActivationApp();
         app.ConfigureRuntimeOptions(
@@ -235,7 +235,7 @@ public sealed class RuntimePointerActivationPolicyTests
     }
 
     [Test]
-    public void RuntimePointerActivationPolicy_DoubleClickPolicy_MotionAndNoReleaseCannotEscalateClickCount()
+    public void RuntimePointerActivationPolicyDoubleClickPolicyMotionAndNoReleaseCannotEscalateClickCount()
     {
         var app = new CaptureMessageApp();
         app.ConfigureRuntimeOptions(
@@ -259,7 +259,7 @@ public sealed class RuntimePointerActivationPolicyTests
     }
 
     [Test]
-    public void RuntimePointerActivationPolicy_DefaultDoubleClick_TabsFirstPressDoesNotSwitchSelection()
+    public void RuntimePointerActivationPolicyDefaultDoubleClickTabsFirstPressDoesNotSwitchSelection()
     {
         var target = ResolveSecondTabHitCoordinate();
         var app = new TabsInteractionApp();
@@ -276,7 +276,7 @@ public sealed class RuntimePointerActivationPolicyTests
     }
 
     [Test]
-    public void RuntimePointerActivationPolicy_SingleClickOptBack_TabsFirstPressSwitchesSelection()
+    public void RuntimePointerActivationPolicySingleClickOptBackTabsFirstPressSwitchesSelection()
     {
         var target = ResolveSecondTabHitCoordinate();
         var app = new TabsInteractionApp();
@@ -296,7 +296,7 @@ public sealed class RuntimePointerActivationPolicyTests
     }
 
     [Test]
-    public void RuntimePointerActivationPolicy_DefaultDoubleClick_FirstClickFocusesClickedControlWithoutActivation()
+    public void RuntimePointerActivationPolicyDefaultDoubleClickFirstClickFocusesClickedControlWithoutActivation()
     {
         var app = new FocusRoutingApp();
         app.ConfigureRuntimeOptions(new TesseraRuntimeOptions());

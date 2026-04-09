@@ -1,4 +1,4 @@
-namespace Tessera.Core.Rendering;
+namespace Tessera.Core.Rendering.Internal;
 
 internal sealed class RenderFrameRow
 {

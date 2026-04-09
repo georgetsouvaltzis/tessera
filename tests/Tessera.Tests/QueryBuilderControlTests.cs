@@ -10,7 +10,7 @@ namespace Tessera.Tests;
 public sealed class QueryBuilderControlTests
 {
     [Test]
-    public void Controls_QueryBuilder_RendersRulesAndPreview()
+    public void ControlsQueryBuilderRendersRulesAndPreview()
     {
         var control = new QueryBuilder
         {
@@ -33,7 +33,7 @@ public sealed class QueryBuilderControlTests
     }
 
     [Test]
-    public void Controls_QueryBuilder_ApiMutations_RaiseQueryChanged()
+    public void ControlsQueryBuilderApiMutationsRaiseQueryChanged()
     {
         var control = new QueryBuilder();
         var changes = 0;
@@ -57,7 +57,7 @@ public sealed class QueryBuilderControlTests
     }
 
     [Test]
-    public void Controls_QueryBuilder_KeyboardAndPointerNavigation_UpdateSelection()
+    public void ControlsQueryBuilderKeyboardAndPointerNavigationUpdateSelection()
     {
         var control = new QueryBuilder
         {
@@ -82,7 +82,7 @@ public sealed class QueryBuilderControlTests
     }
 
     [Test]
-    public void Controls_QueryBuilder_StateStyles_RenderExpectedAnsi()
+    public void ControlsQueryBuilderStateStylesRenderExpectedAnsi()
     {
         var control = new QueryBuilder
         {
@@ -122,7 +122,7 @@ public sealed class QueryBuilderControlTests
     }
 
     [Test]
-    public void Controls_QueryBuilder_DefaultRender_IsDeterministicAndMonochrome()
+    public void ControlsQueryBuilderDefaultRenderIsDeterministicAndMonochrome()
     {
         var control = new QueryBuilder
         {

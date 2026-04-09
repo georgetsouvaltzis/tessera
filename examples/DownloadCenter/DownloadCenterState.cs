@@ -59,7 +59,7 @@ internal sealed class DownloadCenterState
     public IReadOnlyList<ActivityFeedItem> FeedItems => _feed;
     public IReadOnlyList<double> ThroughputTrend => _throughputTrend;
     public IReadOnlyList<double> RetryTrend => _retryTrend;
-    public string ClockText => DateTimeOffset.UtcNow.ToString("HH:mm:ss 'UTC'", CultureInfo.InvariantCulture);
+    public static string ClockText => DateTimeOffset.UtcNow.ToString("HH:mm:ss 'UTC'", CultureInfo.InvariantCulture);
     public string LastAction => _lastAction;
     public int ActiveCount => _jobs.Count(static job => job.Phase is DownloadJobPhase.Active or DownloadJobPhase.Verifying);
     public int RetryCount => _jobs.Count(static job => job.Phase is DownloadJobPhase.Retrying or DownloadJobPhase.Failed);
@@ -284,7 +284,7 @@ internal sealed class DownloadCenterState
             .ToList();
     }
 
-    private IReadOnlyList<DownloadQueueItem> BuildItems(params DownloadJobPhase[] phases)
+    private DownloadQueueItem[] BuildItems(params DownloadJobPhase[] phases)
     {
         return OrderedJobs()
             .Where(job => phases.Contains(job.Phase))

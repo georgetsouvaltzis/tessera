@@ -131,7 +131,7 @@ internal sealed partial class DownloadCenterApp : TesseraApp
     private void RefreshControls()
     {
         _hero.Title = "Download Center // Kinetic Relay";
-        _hero.ClockText = _state.ClockText;
+        _hero.ClockText = DownloadCenterState.ClockText;
         _hero.SummaryText = _state.SummaryBadge;
         _hero.ThroughputText = _state.ThroughputBadge;
         _hero.PressureText = _state.PressureBadge;

@@ -20,7 +20,7 @@ internal sealed class TerminalReader(Stream input, IEventDecoder decoder, TimeSp
         try
         {
             var state = new PasteState();
-            var readTask = input.ReadAsync(readBuffer.AsMemory(0, DefaultReadBufferSize), cancellationToken).AsTask();
+            Task<int> readTask = ReadNextAsync(input, readBuffer, cancellationToken);
 
             while (!cancellationToken.IsCancellationRequested)
             {
@@ -69,13 +69,14 @@ internal sealed class TerminalReader(Stream input, IEventDecoder decoder, TimeSp
 
                 pending.Append(readBuffer.AsSpan(0, read));
                 Drain(pending, onEvent, state, timeoutExpired: false);
-                readTask = input.ReadAsync(readBuffer.AsMemory(0, DefaultReadBufferSize), cancellationToken).AsTask();
+                readTask = ReadNextAsync(input, readBuffer, cancellationToken);
             }
 
             if (pending.Count > 0)
             {
                 await Task.Delay(escapeTimeout, cancellationToken).ConfigureAwait(false);
-                for (var attempt = 0; attempt < FinalTimeoutDrainRetries && pending.Count > 0; attempt++)
+                var attempt = 0;
+                while (attempt < FinalTimeoutDrainRetries && pending.Count > 0)
                 {
                     var before = pending.Count;
                     Drain(pending, onEvent, state, timeoutExpired: true);
@@ -83,6 +84,8 @@ internal sealed class TerminalReader(Stream input, IEventDecoder decoder, TimeSp
                     {
                         attempt = -1;
                     }
+
+                    attempt++;
                 }
             }
         }
@@ -133,6 +136,11 @@ internal sealed class TerminalReader(Stream input, IEventDecoder decoder, TimeSp
 
             pending.Consume(result.Consumed);
         }
+    }
+
+    private static Task<int> ReadNextAsync(Stream input, byte[] readBuffer, CancellationToken cancellationToken)
+    {
+        return input.ReadAsync(readBuffer.AsMemory(0, DefaultReadBufferSize), cancellationToken).AsTask();
     }
 
     private static void AppendPasteFragment(StringBuilder buffer, IMessage message)

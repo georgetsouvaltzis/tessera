@@ -7,7 +7,7 @@ namespace Tessera.Tests;
 public sealed class RenderFrameContentTests
 {
     [Test]
-    public void NormalizeLines_MixedLineEndings_AreNormalizedWithoutDataLoss()
+    public void NormalizeLinesMixedLineEndingsAreNormalizedWithoutDataLoss()
     {
         var lines = RenderFrameContent.NormalizeLines("alpha\r\nbeta\rgamma\ndelta");
 
@@ -15,7 +15,7 @@ public sealed class RenderFrameContentTests
     }
 
     [Test]
-    public void NormalizeLines_TrailingBreak_ProducesTrailingEmptyRow()
+    public void NormalizeLinesTrailingBreakProducesTrailingEmptyRow()
     {
         var lines = RenderFrameContent.NormalizeLines("alpha\n");
 
@@ -23,7 +23,7 @@ public sealed class RenderFrameContentTests
     }
 
     [Test]
-    public void BuildRows_HeightClip_KeepsBottomWrappedRows()
+    public void BuildRowsHeightClipKeepsBottomWrappedRows()
     {
         var rows = RenderFrameContent.BuildRows("abcd\nefgh", width: 2, height: 2);
 

@@ -122,11 +122,7 @@ public sealed class LogView : Control
 
         var value = line ?? string.Empty;
         _entries.Add(value);
-        if (!HasActiveFilter())
-        {
-            _viewport.AppendRawLine(value);
-        }
-        else if (value.Contains(_filter, StringComparison.OrdinalIgnoreCase))
+        if (!HasActiveFilter() || value.Contains(_filter, StringComparison.OrdinalIgnoreCase))
         {
             _viewport.AppendRawLine(value);
         }

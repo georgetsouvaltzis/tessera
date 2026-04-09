@@ -50,8 +50,6 @@ internal sealed partial class OpsWatchApp : TesseraApp
     private readonly StatusBar _footer = new() { Fill = ' ' };
     private bool _syncingFleetSelection;
     private bool _syncingNodeSelection;
-    private string _lastAction = "steady watch";
-
     public OpsWatchApp()
     {
         ApplyTheme(_palette);
@@ -70,11 +68,10 @@ internal sealed partial class OpsWatchApp : TesseraApp
             case KeyPressed key:
                 return HandleKey(key);
             case OpsWatchActionMessage action:
-                _lastAction = _state.Execute(action.Action);
+                _ = _state.Execute(action.Action);
                 return null;
             case OpsWatchThemeMessage theme:
                 ApplyTheme(OpsWatchTheme.Resolve(theme.Theme));
-                _lastAction = $"scene changed to {_palette.Label.ToLowerInvariant()}";
                 return null;
             case OpsWatchTickMessage:
                 _state.Advance();
@@ -194,10 +191,10 @@ internal sealed partial class OpsWatchApp : TesseraApp
         _healthBoard.SetServices(_state.BuildServices());
         _feed.MaxItems = 48;
         _feed.SetItems(_state.FeedItems);
-        ConfigureBullet(_cpuBullet, "cpu");
-        ConfigureBullet(_memoryBullet, "mem");
-        ConfigureBullet(_networkBullet, "net");
-        ConfigureBullet(_diskBullet, "disk");
+        ConfigureBullet(_cpuBullet);
+        ConfigureBullet(_memoryBullet);
+        ConfigureBullet(_networkBullet);
+        ConfigureBullet(_diskBullet);
     }
 
     private void WireEvents()
@@ -210,7 +207,6 @@ internal sealed partial class OpsWatchApp : TesseraApp
             }
 
             _state.SelectCluster(args.SelectedItem.Id);
-            _lastAction = $"tracking {args.SelectedItem.Label}";
         };
 
         _healthBoard.SelectionChanged += (_, args) =>
@@ -221,7 +217,6 @@ internal sealed partial class OpsWatchApp : TesseraApp
             }
 
             _state.SelectNode(args.SelectedItem.Id);
-            _lastAction = $"focus on {args.SelectedItem.Name}";
         };
 
         _restartButton.Activated += (_, _) => Post(new OpsWatchActionMessage(OpsWatchAction.Restart));
@@ -239,7 +234,7 @@ internal sealed partial class OpsWatchApp : TesseraApp
     private void RefreshChrome()
     {
         _hero.Title = "OpsWatch // Control Floor";
-        _hero.ClockText = _state.ClockText;
+        _hero.ClockText = OpsWatchState.ClockText;
         _hero.FleetText = _state.FleetBadge;
         _hero.ModeText = _state.ModeBadge;
         _hero.RouteText = _state.RouteBadge;
@@ -419,13 +414,13 @@ internal sealed partial class OpsWatchApp : TesseraApp
         _runbook.BorderStyleText = theme.Border.Strong;
         _runbook.TextStyle = theme.Text.Secondary;
 
-        ConfigureActionButton(_restartButton, palette.HeroBadgeForeground, palette.PulseTertiaryColor, palette);
-        ConfigureActionButton(_drainButton, palette.HeroBadgeForeground, palette.PulseSecondaryColor, palette);
-        ConfigureActionButton(_muteButton, palette.HeroBadgeForeground, palette.FrameStrongColor, palette);
-        ConfigureActionButton(_scaleButton, palette.HeroBadgeForeground, palette.PulsePrimaryColor, palette);
-        ConfigureActionButton(_inspectButton, palette.HeroBadgeForeground, palette.MemoryColor, palette);
-        ConfigureActionButton(_failoverButton, palette.HeroBadgeForeground, palette.DiskColor, palette);
-        ConfigureActionButton(_ackButton, palette.HeroBadgeForeground, palette.CpuColor, palette);
+        ConfigureActionButton(_restartButton, palette.HeroBadgeForeground, palette.PulseTertiaryColor);
+        ConfigureActionButton(_drainButton, palette.HeroBadgeForeground, palette.PulseSecondaryColor);
+        ConfigureActionButton(_muteButton, palette.HeroBadgeForeground, palette.FrameStrongColor);
+        ConfigureActionButton(_scaleButton, palette.HeroBadgeForeground, palette.PulsePrimaryColor);
+        ConfigureActionButton(_inspectButton, palette.HeroBadgeForeground, palette.MemoryColor);
+        ConfigureActionButton(_failoverButton, palette.HeroBadgeForeground, palette.DiskColor);
+        ConfigureActionButton(_ackButton, palette.HeroBadgeForeground, palette.CpuColor);
 
         ConfigureThemeButton(_veridianThemeButton, OpsWatchThemeKind.Veridian);
         ConfigureThemeButton(_tidalThemeButton, OpsWatchThemeKind.Tidal);
@@ -485,7 +480,7 @@ internal sealed partial class OpsWatchApp : TesseraApp
         spark.MaxValue = null;
     }
 
-    private static void ConfigureActionButton(Button button, int foregroundRgb, int backgroundRgb, OpsWatchThemePalette palette)
+    private static void ConfigureActionButton(Button button, int foregroundRgb, int backgroundRgb)
     {
         var labelStyle = OpsWatchTheme.Foreground(foregroundRgb).WithBold();
         var surfaceStyle = OpsWatchTheme.Background(backgroundRgb);
@@ -497,7 +492,7 @@ internal sealed partial class OpsWatchApp : TesseraApp
         button.PressedSurfaceStyle = surfaceStyle;
     }
 
-    private void ConfigureBullet(BulletChart chart, string unit)
+    private void ConfigureBullet(BulletChart chart)
     {
         chart.SetRanges(
         [

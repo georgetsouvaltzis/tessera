@@ -19,14 +19,7 @@ public static class Effects
 
     public static Effect? Compact(params Effect?[] effects)
     {
-        var valid = new List<Effect>(effects.Length);
-        foreach (var effect in effects)
-        {
-            if (effect is not null)
-            {
-                valid.Add(effect);
-            }
-        }
+        var valid = effects.OfType<Effect>().ToList();
 
         return valid.Count switch
         {
@@ -116,16 +109,7 @@ public static class Effects
 
     private static List<Effect> GetValid(IEnumerable<Effect?> effects)
     {
-        var valid = new List<Effect>();
-        foreach (var effect in effects)
-        {
-            if (effect is not null)
-            {
-                valid.Add(effect);
-            }
-        }
-
-        return valid;
+        return effects.OfType<Effect>().ToList();
     }
 
     private static string BuildClipboardWriteSequence(string content, char selection)

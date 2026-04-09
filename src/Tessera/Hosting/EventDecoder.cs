@@ -9,7 +9,7 @@ namespace Tessera.Hosting;
 [EditorBrowsable(EditorBrowsableState.Advanced)]
 public sealed class EventDecoder : IEventDecoder
 {
-    private readonly global::Tessera.Core.Input.EventDecoder _inner = new();
+    private readonly global::Tessera.Core.Input.Decoding.EventDecoder _inner = new();
 
     public EventDecodeResult Decode(ReadOnlySpan<byte> buffer, bool timeoutExpired) =>
         _inner.Decode(buffer, timeoutExpired).ToHosting();

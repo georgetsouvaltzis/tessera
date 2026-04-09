@@ -10,7 +10,7 @@ namespace Tessera.Tests;
 public sealed class ThemeScopeApiErgonomicsTests
 {
     [Test]
-    public void ThemeScope_Apply_NullTheme_Throws()
+    public void ThemeScopeApplyNullThemeThrows()
     {
         var controls = new Control[]
         {
@@ -21,7 +21,7 @@ public sealed class ThemeScopeApiErgonomicsTests
     }
 
     [Test]
-    public void ThemeScope_Apply_NullControls_Throws()
+    public void ThemeScopeApplyNullControlsThrows()
     {
         var theme = TesseraThemes.Catppuccin();
         Control[]? controls = null;
@@ -32,7 +32,7 @@ public sealed class ThemeScopeApiErgonomicsTests
     }
 
     [Test]
-    public void ThemeScope_Apply_EmptyAndUnsupportedControls_ReturnZero()
+    public void ThemeScopeApplyEmptyAndUnsupportedControlsReturnZero()
     {
         var theme = TesseraThemes.Catppuccin();
         var emptyApplied = ThemeScope.Apply(theme, Array.Empty<Control>());
@@ -48,7 +48,7 @@ public sealed class ThemeScopeApiErgonomicsTests
     }
 
     [Test]
-    public void ThemeScope_Apply_DelegatesToPerControlApplyTheme_ForConcreteAndGenericControls()
+    public void ThemeScopeApplyDelegatesToPerControlApplyThemeForConcreteAndGenericControls()
     {
         var theme = TesseraThemes.RosePine();
 

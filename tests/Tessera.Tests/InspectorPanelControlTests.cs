@@ -10,7 +10,7 @@ namespace Tessera.Tests;
 public sealed class InspectorPanelControlTests
 {
     [Test]
-    public void Controls_InspectorPanel_RendersSectionsAndRows()
+    public void ControlsInspectorPanelRendersSectionsAndRows()
     {
         var general = new InspectorSection("General", isExpanded: true);
         general.AddField("Name", "Tessera");
@@ -34,7 +34,7 @@ public sealed class InspectorPanelControlTests
     }
 
     [Test]
-    public void Controls_InspectorPanel_KeyboardNavigation_AndToggleSection()
+    public void ControlsInspectorPanelKeyboardNavigationAndToggleSection()
     {
         var section = new InspectorSection("Build", isExpanded: false);
         section.AddField("Target", "Release");
@@ -58,7 +58,7 @@ public sealed class InspectorPanelControlTests
     }
 
     [Test]
-    public void Controls_InspectorPanel_PointerSelection_AndToggleSection()
+    public void ControlsInspectorPanelPointerSelectionAndToggleSection()
     {
         var section = new InspectorSection("Env", isExpanded: false);
         section.AddField("Region", "eu-west");
@@ -78,7 +78,7 @@ public sealed class InspectorPanelControlTests
     }
 
     [Test]
-    public void Controls_InspectorPanel_FocusedStyles_EmitAnsi()
+    public void ControlsInspectorPanelFocusedStylesEmitAnsi()
     {
         var section = new InspectorSection("Runtime", isExpanded: true);
         section.AddField("Status", "ok");
@@ -100,7 +100,7 @@ public sealed class InspectorPanelControlTests
     }
 
     [Test]
-    public void Controls_InspectorPanel_DefaultRender_IsDeterministicAndMonochrome()
+    public void ControlsInspectorPanelDefaultRenderIsDeterministicAndMonochrome()
     {
         var section = new InspectorSection("Config", isExpanded: true);
         section.AddField("Mode", "safe");

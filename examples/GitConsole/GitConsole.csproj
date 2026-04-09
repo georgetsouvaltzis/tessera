@@ -9,6 +9,7 @@
     <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <RootNamespace>Tessera.Examples.GitConsole</RootNamespace>
     <BuildInParallel>false</BuildInParallel>
   </PropertyGroup>
 

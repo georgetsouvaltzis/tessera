@@ -240,7 +240,7 @@ public sealed class Spinner : Control
 
         if (pointer is { Kind: PointerEventKind.Press, Button: PointerButton.Left })
         {
-            changed |= SetHovered(true);
+            _ = SetHovered(true);
             Running = !Running;
             return true;
         }

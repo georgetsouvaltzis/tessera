@@ -1,4 +1,3 @@
-using System.ComponentModel;
 using Tessera.Styles;
 
 namespace Tessera;

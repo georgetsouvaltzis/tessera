@@ -8,7 +8,7 @@ namespace Tessera.Tests;
 public sealed class ComboBoxSelectionApiTests
 {
     [Test]
-    public void ComboBoxSelectionApi_SetSelectedIndex_UsesCanonicalClamping_AndUpdatesFilterText()
+    public void ComboBoxSelectionApiSetSelectedIndexUsesCanonicalClampingAndUpdatesFilterText()
     {
         var control = new ComboBox();
         control.SetItems(["alpha", "beta", "gamma"]);
@@ -38,7 +38,7 @@ public sealed class ComboBoxSelectionApiTests
     }
 
     [Test]
-    public void ComboBoxSelectionApi_TrySetSelectedItem_UsesOrdinalLookupAndSelectionChangeSemantics()
+    public void ComboBoxSelectionApiTrySetSelectedItemUsesOrdinalLookupAndSelectionChangeSemantics()
     {
         var control = new ComboBox();
         control.SetItems(["alpha", "Beta", "gamma"]);
@@ -53,7 +53,7 @@ public sealed class ComboBoxSelectionApiTests
     }
 
     [Test]
-    public void ComboBoxSelectionApi_EmptyControl_SetSelectedApisReturnFalse()
+    public void ComboBoxSelectionApiEmptyControlSetSelectedApisReturnFalse()
     {
         var control = new ComboBox();
 

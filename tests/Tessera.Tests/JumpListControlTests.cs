@@ -10,7 +10,7 @@ namespace Tessera.Tests;
 public sealed class JumpListControlTests
 {
     [Test]
-    public void Controls_JumpList_KeyboardSelection_RaisesSelectionChanged()
+    public void ControlsJumpListKeyboardSelectionRaisesSelectionChanged()
     {
         var control = new JumpList
         {
@@ -38,7 +38,7 @@ public sealed class JumpListControlTests
     }
 
     [Test]
-    public void Controls_JumpList_Activation_RaisesActivated_FromKeyboardAndPointer()
+    public void ControlsJumpListActivationRaisesActivatedFromKeyboardAndPointer()
     {
         var control = new JumpList
         {
@@ -72,7 +72,7 @@ public sealed class JumpListControlTests
     }
 
     [Test]
-    public void Controls_JumpList_PointerSelection_UpdatesSelectedItem()
+    public void ControlsJumpListPointerSelectionUpdatesSelectedItem()
     {
         var control = new JumpList
         {
@@ -95,7 +95,7 @@ public sealed class JumpListControlTests
     }
 
     [Test]
-    public void Controls_JumpList_StyleHooks_EmitAnsi()
+    public void ControlsJumpListStyleHooksEmitAnsi()
     {
         var control = new JumpList
         {
@@ -124,7 +124,7 @@ public sealed class JumpListControlTests
     }
 
     [Test]
-    public void Controls_JumpList_DefaultRender_IsDeterministicAndMonochrome()
+    public void ControlsJumpListDefaultRenderIsDeterministicAndMonochrome()
     {
         var control = new JumpList
         {

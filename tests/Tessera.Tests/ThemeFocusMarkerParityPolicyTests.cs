@@ -10,7 +10,7 @@ namespace Tessera.Tests;
 public sealed class ThemeFocusMarkerParityPolicyTests
 {
     [Test]
-    public void ThemeFocusMarker_ApplyTheme_MapsMarker_ForPolicyControls()
+    public void ThemeFocusMarkerApplyThemeMapsMarkerForPolicyControls()
     {
         var theme = new TesseraTheme
         {
@@ -34,7 +34,7 @@ public sealed class ThemeFocusMarkerParityPolicyTests
     }
 
     [Test]
-    public void ThemeFocusMarker_ApplyThemeDefaults_FillsEmptyAndPreservesExplicit_ForPolicyControls()
+    public void ThemeFocusMarkerApplyThemeDefaultsFillsEmptyAndPreservesExplicitForPolicyControls()
     {
         var theme = new TesseraTheme
         {

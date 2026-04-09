@@ -4,14 +4,12 @@ using Tessera.Core.Messages;
 using Tessera.Core.Rendering;
 using Tessera.Core.Terminal;
 
-namespace Tessera.Core.Application;
+namespace Tessera.Core.Application.Internal;
 
 internal sealed class TesseraCapabilityProbe
 {
     private static readonly int[] DefaultCapabilityProbeModes = [1000, 1002, 1003, 1004, 1006, 2004, 2026];
     private static readonly int[] CapabilityProbeRepresentativeModes = [1004, 1006, 2004, 2026];
-    private static readonly int[] LegacyMouseProbeModes = [1000, 1002, 1003];
-
     private CapabilityProbeState? _state;
 
     public async Task StartAsync(
@@ -52,6 +50,7 @@ internal sealed class TesseraCapabilityProbe
             }
             catch (OperationCanceledException)
             {
+                // Probe timeout task is cancelled when the runtime shuts down early.
             }
         }, CancellationToken.None);
     }
@@ -168,7 +167,7 @@ internal sealed class TesseraCapabilityProbe
             // Keep mouse capability sticky when 1006 explicitly reports Unsupported.
             // Some terminals emit false-negative mode-report states even though mouse
             // reporting works, so avoid demoting from true based on this signal alone.
-            1006 => current with { MouseReporting = supported ? true : current.MouseReporting, ModeReports = true },
+            1006 => current with { MouseReporting = supported || current.MouseReporting, ModeReports = true },
             2004 => current with { BracketedPaste = supported, ModeReports = true },
             2026 => current with { SynchronizedUpdates = supported, ModeReports = true },
             _ => current,
@@ -247,6 +246,7 @@ internal sealed class TesseraCapabilityProbe
         }
         catch
         {
+            // Capability probing is opportunistic; terminals may reject or ignore the write.
         }
     }
 
@@ -286,38 +286,18 @@ internal sealed class TesseraCapabilityProbe
         return false;
     }
 
-    private static bool IsLegacyMouseProbeMode(int mode)
-    {
-        for (var i = 0; i < LegacyMouseProbeModes.Length; i++)
-        {
-            if (LegacyMouseProbeModes[i] == mode)
-            {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
     internal sealed class CapabilityProbeTimeoutMsg(Guid probeId) : IMessage
     {
         public Guid ProbeId { get; } = probeId;
     }
 
-    private sealed class CapabilityProbeState
+    private sealed class CapabilityProbeState(Guid id, IReadOnlyList<int> modes)
     {
-        public CapabilityProbeState(Guid id, IReadOnlyList<int> modes)
-        {
-            Id = id;
-            PendingModes = new HashSet<int>(modes);
-            SupportedModes = new HashSet<int>();
-        }
+        public Guid Id { get; } = id;
 
-        public Guid Id { get; }
+        public HashSet<int> PendingModes { get; } = new(modes);
 
-        public HashSet<int> PendingModes { get; }
-
-        public HashSet<int> SupportedModes { get; }
+        public HashSet<int> SupportedModes { get; } = [];
 
         public bool SawAnyResponse { get; set; }
     }

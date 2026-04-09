@@ -1,6 +1,6 @@
 using System.Runtime.InteropServices;
 
-namespace Tessera.Core.Terminal;
+namespace Tessera.Core.Terminal.Adapters.Internal;
 
 internal static class WindowsConsoleSession
 {
@@ -88,6 +88,7 @@ internal static class WindowsConsoleSession
             }
             catch
             {
+                // Watcher completion is best-effort during disposal.
             }
 
             cts.Dispose();
@@ -147,6 +148,7 @@ internal static class WindowsConsoleSession
                 }
                 catch
                 {
+                    // Resize callbacks must not tear down the watcher.
                 }
 
                 break;

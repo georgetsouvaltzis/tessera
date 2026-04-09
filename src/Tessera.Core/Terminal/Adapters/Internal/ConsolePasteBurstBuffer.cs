@@ -2,7 +2,7 @@ using System.Text;
 using Tessera.Core.Abstractions;
 using Tessera.Core.Messages;
 
-namespace Tessera.Core.Terminal;
+namespace Tessera.Core.Terminal.Adapters.Internal;
 
 internal sealed class ConsolePasteBurstBuffer
 {

@@ -10,7 +10,7 @@ namespace Tessera.Tests;
 public sealed class ActivityFeedControlTests
 {
     [Test]
-    public void Controls_ActivityFeed_RendersTimelineRowsAndKinds()
+    public void ControlsActivityFeedRendersTimelineRowsAndKinds()
     {
         var control = new ActivityFeed
         {
@@ -34,7 +34,7 @@ public sealed class ActivityFeedControlTests
     }
 
     [Test]
-    public void Controls_ActivityFeed_KeyboardAndPointerSelection_RaisesSelectionChanged()
+    public void ControlsActivityFeedKeyboardAndPointerSelectionRaisesSelectionChanged()
     {
         var control = new ActivityFeed
         {
@@ -62,7 +62,7 @@ public sealed class ActivityFeedControlTests
     }
 
     [Test]
-    public void Controls_ActivityFeed_StateStylesEmitAnsi_AndDefaultRenderDeterministic()
+    public void ControlsActivityFeedStateStylesEmitAnsiAndDefaultRenderDeterministic()
     {
         var styled = new ActivityFeed
         {

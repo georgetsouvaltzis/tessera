@@ -1,5 +1,4 @@
 using Tessera.Components.Primitives;
-using Tessera.Styles;
 
 namespace Tessera.Controls;
 
@@ -562,6 +561,7 @@ public sealed partial class LinePlot
         return entry <= exit ? (entry, exit) : (exit, entry);
     }
 
+    [Flags]
     private enum CompactPort : ushort
     {
         None = 0,

@@ -1,6 +1,5 @@
 using Tessera.Components.Primitives;
 using Tessera.Components.Primitives.Internal;
-using Tessera.Components.Styling;
 namespace Tessera.Controls.Internal;
 
 internal static class DatePickerCalendar

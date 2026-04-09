@@ -11,7 +11,7 @@ namespace Tessera.Tests;
 public sealed class TraceViewerControlTests
 {
     [Test]
-    public void Controls_TraceViewer_RendersSortedRowsSeverityAndDuration()
+    public void ControlsTraceViewerRendersSortedRowsSeverityAndDuration()
     {
         var day = new DateTimeOffset(2026, 3, 21, 9, 0, 0, TimeSpan.Zero);
         var control = new TraceViewer
@@ -40,7 +40,7 @@ public sealed class TraceViewerControlTests
     }
 
     [Test]
-    public void Controls_TraceViewer_KeyboardNavigation_RaisesSelectionChanged()
+    public void ControlsTraceViewerKeyboardNavigationRaisesSelectionChanged()
     {
         var control = new TraceViewer
         {
@@ -65,7 +65,7 @@ public sealed class TraceViewerControlTests
     }
 
     [Test]
-    public void Controls_TraceViewer_PointerHoverClickAndWheel_UpdateSelection()
+    public void ControlsTraceViewerPointerHoverClickAndWheelUpdateSelection()
     {
         var control = new TraceViewer
         {
@@ -86,7 +86,7 @@ public sealed class TraceViewerControlTests
     }
 
     [Test]
-    public void Controls_TraceViewer_SeverityAndStateStyles_EmitAnsi()
+    public void ControlsTraceViewerSeverityAndStateStylesEmitAnsi()
     {
         var control = new TraceViewer
         {
@@ -114,7 +114,7 @@ public sealed class TraceViewerControlTests
     }
 
     [Test]
-    public void Controls_TraceViewer_DefaultRender_IsDeterministicAndMonochrome()
+    public void ControlsTraceViewerDefaultRenderIsDeterministicAndMonochrome()
     {
         var control = new TraceViewer
         {

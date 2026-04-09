@@ -10,7 +10,7 @@ namespace Tessera.Tests;
 public sealed class SearchResultsViewControlTests
 {
     [Test]
-    public void Controls_SearchResultsView_RendersRankMatchAndSelectionMarkers()
+    public void ControlsSearchResultsViewRendersRankMatchAndSelectionMarkers()
     {
         var control = new SearchResultsView
         {
@@ -30,7 +30,7 @@ public sealed class SearchResultsViewControlTests
     }
 
     [Test]
-    public void Controls_SearchResultsView_KeyboardNavigation_UpdatesSelectionAndRaisesEvent()
+    public void ControlsSearchResultsViewKeyboardNavigationUpdatesSelectionAndRaisesEvent()
     {
         var control = new SearchResultsView
         {
@@ -52,7 +52,7 @@ public sealed class SearchResultsViewControlTests
     }
 
     [Test]
-    public void Controls_SearchResultsView_DisabledPointerInput_DoesNotHoverOrSelect()
+    public void ControlsSearchResultsViewDisabledPointerInputDoesNotHoverOrSelect()
     {
         var control = new SearchResultsView
         {
@@ -81,7 +81,7 @@ public sealed class SearchResultsViewControlTests
     }
 
     [Test]
-    public void Controls_SearchResultsView_StateStyles_ApplyFocusedHoveredPressedAndError()
+    public void ControlsSearchResultsViewStateStylesApplyFocusedHoveredPressedAndError()
     {
         var control = new SearchResultsView
         {
@@ -116,7 +116,7 @@ public sealed class SearchResultsViewControlTests
     }
 
     [Test]
-    public void Controls_SearchResultsView_FocusedBorder_MergesBaseAndFocusedStyles()
+    public void ControlsSearchResultsViewFocusedBorderMergesBaseAndFocusedStyles()
     {
         var control = new SearchResultsView
         {
@@ -136,7 +136,7 @@ public sealed class SearchResultsViewControlTests
     }
 
     [Test]
-    public void Theme_SearchResultsView_ApplyAndDefaults_MapExpectedTokens_AndPreserveExplicitStyles()
+    public void ThemeSearchResultsViewApplyAndDefaultsMapExpectedTokensAndPreserveExplicitStyles()
     {
         var theme = new TesseraTheme
         {

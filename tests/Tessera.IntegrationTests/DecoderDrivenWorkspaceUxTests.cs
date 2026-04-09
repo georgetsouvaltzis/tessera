@@ -5,7 +5,7 @@ using System.Text;
 using NUnit.Framework;
 using Tessera;
 using Tessera.Hosting;
-using Tessera.TestFixtures;
+using Tessera.IntegrationFixtureApp;
 using Tessera.Core.Abstractions;
 using Tessera.Core.Messages;
 

@@ -1,4 +1,3 @@
-using Tessera.Components.Primitives;
 using Tessera.Controls;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;

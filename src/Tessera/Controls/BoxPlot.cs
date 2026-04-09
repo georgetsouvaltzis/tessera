@@ -495,7 +495,7 @@ public sealed class BoxPlot : Control
             if (normalized.Maximum > max) max = normalized.Maximum;
         }
 
-        if (min == double.PositiveInfinity)
+        if (double.IsPositiveInfinity(min))
         {
             min = 0;
             max = 1;

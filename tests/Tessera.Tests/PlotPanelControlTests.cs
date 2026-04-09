@@ -9,7 +9,7 @@ namespace Tessera.Tests;
 public sealed class PlotPanelControlTests
 {
     [Test]
-    public void PlotPanelRender_ArrangesChildrenAcrossConfiguredColumns()
+    public void PlotPanelRenderArrangesChildrenAcrossConfiguredColumns()
     {
         var first = new LinePlot
         {
@@ -43,7 +43,7 @@ public sealed class PlotPanelControlTests
     }
 
     [Test]
-    public void PlotPanelRender_EmptyTextShownWhenNoPlotsConfigured()
+    public void PlotPanelRenderEmptyTextShownWhenNoPlotsConfigured()
     {
         var panel = new PlotPanel
         {
@@ -57,7 +57,7 @@ public sealed class PlotPanelControlTests
     }
 
     [Test]
-    public void PlotPanelHandle_PointerIsForwardedToContainingCellOnly()
+    public void PlotPanelHandlePointerIsForwardedToContainingCellOnly()
     {
         var left = new SpyControl();
         var right = new SpyControl();

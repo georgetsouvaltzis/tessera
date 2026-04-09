@@ -11,7 +11,7 @@ namespace Tessera.Tests;
 public sealed class BulletChartControlTests
 {
     [Test]
-    public void BulletChart_Api_SetRangesNormalizesAndSettersUpdateValues()
+    public void BulletChartApiSetRangesNormalizesAndSettersUpdateValues()
     {
         var control = new BulletChart();
         control.SetRanges(
@@ -33,7 +33,7 @@ public sealed class BulletChartControlTests
     }
 
     [Test]
-    public void BulletChart_DefaultRender_IsMonochromeAndDeterministic()
+    public void BulletChartDefaultRenderIsMonochromeAndDeterministic()
     {
         var control = new BulletChart
         {
@@ -64,7 +64,7 @@ public sealed class BulletChartControlTests
     }
 
     [Test]
-    public void BulletChart_StyleHooks_EmitAnsiForSegmentsValueAndTarget()
+    public void BulletChartStyleHooksEmitAnsiForSegmentsValueAndTarget()
     {
         var control = new BulletChart
         {
@@ -95,7 +95,7 @@ public sealed class BulletChartControlTests
     }
 
     [Test]
-    public void BulletChart_FocusedTitleAndBorderHooks_RenderStyledOutput()
+    public void BulletChartFocusedTitleAndBorderHooksRenderStyledOutput()
     {
         var focusedTitle = TesseraStyle.Empty.WithForeground(AnsiColor.BrightMagenta).WithUnderline();
         var focusedBorder = TesseraStyle.Empty.WithForeground(AnsiColor.BrightGreen);

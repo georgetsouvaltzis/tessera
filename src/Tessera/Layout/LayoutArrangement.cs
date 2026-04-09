@@ -66,22 +66,4 @@ internal static class LayoutArrangement
             Math.Clamp(height + layout.Padding.Vertical, 0, availableBounds.Height));
     }
 
-    private static int ResolveSlotExtent(LayoutSlot slot, bool horizontal, in Rect availableBounds)
-    {
-        var marginPrimary = horizontal ? slot.Margin.Horizontal : slot.Margin.Vertical;
-        var measured = slot.Content.Measure(availableBounds);
-        var availablePrimary = horizontal ? availableBounds.Width : availableBounds.Height;
-        var measuredPrimary = horizontal ? measured.Width : measured.Height;
-
-        var content = slot.Length.Kind switch
-        {
-            LayoutLengthKind.Fixed => slot.Length.Value,
-            LayoutLengthKind.Weighted => Math.Max(0, (availablePrimary - marginPrimary) * slot.Length.Value),
-            LayoutLengthKind.Fill => Math.Max(0, availablePrimary - marginPrimary),
-            _ => measuredPrimary,
-        };
-
-        return Math.Clamp(content + marginPrimary, 0, availablePrimary);
-    }
-
 }

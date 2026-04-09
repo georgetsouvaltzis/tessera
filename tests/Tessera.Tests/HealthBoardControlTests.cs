@@ -10,7 +10,7 @@ namespace Tessera.Tests;
 public sealed class HealthBoardControlTests
 {
     [Test]
-    public void Controls_HealthBoard_RendersSeverityGlyphsAndSummary()
+    public void ControlsHealthBoardRendersSeverityGlyphsAndSummary()
     {
         var control = new HealthBoard
         {
@@ -32,7 +32,7 @@ public sealed class HealthBoardControlTests
     }
 
     [Test]
-    public void Controls_HealthBoard_KeyboardAndPointerSelection_RaisesSelectionChanged()
+    public void ControlsHealthBoardKeyboardAndPointerSelectionRaisesSelectionChanged()
     {
         var control = new HealthBoard
         {
@@ -68,7 +68,7 @@ public sealed class HealthBoardControlTests
     }
 
     [Test]
-    public void Controls_HealthBoard_Acknowledge_ChangesExpectedRow()
+    public void ControlsHealthBoardAcknowledgeChangesExpectedRow()
     {
         var control = new HealthBoard();
         control.SetServices(
@@ -88,7 +88,7 @@ public sealed class HealthBoardControlTests
     }
 
     [Test]
-    public void Controls_HealthBoard_StyleAndGlyphHooks_RenderExpectedAnsiAndCustomMarkers()
+    public void ControlsHealthBoardStyleAndGlyphHooksRenderExpectedAnsiAndCustomMarkers()
     {
         var control = new HealthBoard
         {
@@ -126,7 +126,7 @@ public sealed class HealthBoardControlTests
     }
 
     [Test]
-    public void Controls_HealthBoard_DefaultRender_IsDeterministicAndMonochrome()
+    public void ControlsHealthBoardDefaultRenderIsDeterministicAndMonochrome()
     {
         var control = new HealthBoard
         {

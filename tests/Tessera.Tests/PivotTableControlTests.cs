@@ -10,7 +10,7 @@ namespace Tessera.Tests;
 public sealed class PivotTableControlTests
 {
     [Test]
-    public void Controls_PivotTable_RendersHeadersValuesAndSortMarker()
+    public void ControlsPivotTableRendersHeadersValuesAndSortMarker()
     {
         var control = CreateSortableControl();
         var sorted = control.SortByColumn(0, PivotSortDirection.Ascending);
@@ -24,7 +24,7 @@ public sealed class PivotTableControlTests
     }
 
     [Test]
-    public void Controls_PivotTable_KeyboardNavigationAndEnterSort_Work()
+    public void ControlsPivotTableKeyboardNavigationAndEnterSortWork()
     {
         var control = CreateSortableControl();
         control.IsFocused = true;
@@ -44,7 +44,7 @@ public sealed class PivotTableControlTests
     }
 
     [Test]
-    public void Controls_PivotTable_SortRequestedEvent_AllowsExternalSortHandling()
+    public void ControlsPivotTableSortRequestedEventAllowsExternalSortHandling()
     {
         var control = new PivotTable();
         control.SetColumns([new PivotTableColumn("latency", "Latency") { IsSortable = true }]);
@@ -73,7 +73,7 @@ public sealed class PivotTableControlTests
     }
 
     [Test]
-    public void Controls_PivotTable_PointerHeaderSortAndBodyClickSelectsCell()
+    public void ControlsPivotTablePointerHeaderSortAndBodyClickSelectsCell()
     {
         var control = CreateSortableControl();
         control.Border = BorderStyle.SingleLine;
@@ -90,7 +90,7 @@ public sealed class PivotTableControlTests
     }
 
     [Test]
-    public void Controls_PivotTable_DefaultRender_IsDeterministicAndMonochrome()
+    public void ControlsPivotTableDefaultRenderIsDeterministicAndMonochrome()
     {
         var control = CreateSortableControl();
 

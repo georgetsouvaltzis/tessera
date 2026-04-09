@@ -267,7 +267,7 @@ public sealed partial class LogTailPanel
         return builder.ToString();
     }
 
-    private void WriteStyledLine(Canvas canvas, int x, int y, int width, string line, TesseraStyle style)
+    private static void WriteStyledLine(Canvas canvas, int x, int y, int width, string line, TesseraStyle style)
     {
         canvas.WriteText(x, y, style.IsEmpty ? line : style.Render(line), width);
     }

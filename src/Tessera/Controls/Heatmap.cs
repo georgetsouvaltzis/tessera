@@ -427,7 +427,7 @@ public sealed class Heatmap : Control
             if (v > max) max = v;
         }
 
-        if (min == double.PositiveInfinity) (min, max) = (0, 1);
+        if (double.IsPositiveInfinity(min)) (min, max) = (0, 1);
         else if (Math.Abs(max - min) < double.Epsilon) max = min + 1;
     }
 

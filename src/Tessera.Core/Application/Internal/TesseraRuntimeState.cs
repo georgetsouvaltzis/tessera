@@ -3,7 +3,7 @@ using Tessera.Core.Input;
 using Tessera.Core.Rendering;
 using Tessera.Core.Terminal;
 
-namespace Tessera.Core.Application;
+namespace Tessera.Core.Application.Internal;
 
 internal sealed class TesseraRuntimeState
 {

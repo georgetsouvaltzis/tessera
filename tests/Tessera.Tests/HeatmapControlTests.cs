@@ -10,7 +10,7 @@ namespace Tessera.Tests;
 public sealed class HeatmapControlTests
 {
     [Test]
-    public void Controls_Heatmap_RendersTitleHeadersLegendAndCells()
+    public void ControlsHeatmapRendersTitleHeadersLegendAndCells()
     {
         var control = new Heatmap
         {
@@ -33,7 +33,7 @@ public sealed class HeatmapControlTests
     }
 
     [Test]
-    public void Controls_Heatmap_KeyboardAndPointerSelection_RaisesSelectionChanged()
+    public void ControlsHeatmapKeyboardAndPointerSelectionRaisesSelectionChanged()
     {
         var control = new Heatmap
         {
@@ -63,7 +63,7 @@ public sealed class HeatmapControlTests
     }
 
     [Test]
-    public void Controls_Heatmap_StyledCellAndFocusedBorder_EmitAnsi()
+    public void ControlsHeatmapStyledCellAndFocusedBorderEmitAnsi()
     {
         var highStyle = TesseraStyle.Empty.WithForeground(AnsiColor.Rgb(11, 22, 33));
         var selectedStyle = TesseraStyle.Empty.WithBackground(AnsiColor.Rgb(44, 55, 66));
@@ -92,7 +92,7 @@ public sealed class HeatmapControlTests
     }
 
     [Test]
-    public void Controls_Heatmap_DefaultRender_IsDeterministicAndMonochrome()
+    public void ControlsHeatmapDefaultRenderIsDeterministicAndMonochrome()
     {
         var control = new Heatmap
         {
@@ -110,7 +110,7 @@ public sealed class HeatmapControlTests
     }
 
     [Test]
-    public void Controls_Heatmap_CustomLegend_AppliesGlyphsAndStyles()
+    public void ControlsHeatmapCustomLegendAppliesGlyphsAndStyles()
     {
         var coldStyle = TesseraStyle.Empty.WithForeground(AnsiColor.Rgb(10, 60, 110));
         var hotStyle = TesseraStyle.Empty.WithForeground(AnsiColor.Rgb(200, 90, 30));

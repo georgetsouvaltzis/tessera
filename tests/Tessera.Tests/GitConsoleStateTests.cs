@@ -8,7 +8,7 @@ namespace Tessera.Tests;
 public sealed class GitConsoleStateTests
 {
     [Test]
-    public void GitConsoleSeed_PublicApiDocsEntry_ShowsAnActualStagedDiff()
+    public void GitConsoleSeedPublicApiDocsEntryShowsAnActualStagedDiff()
     {
         var state = GitConsoleState.CreateSeed();
 

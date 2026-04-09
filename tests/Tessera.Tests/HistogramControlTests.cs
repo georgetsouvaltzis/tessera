@@ -10,7 +10,7 @@ namespace Tessera.Tests;
 public sealed class HistogramControlTests
 {
     [Test]
-    public void Controls_Histogram_RendersBarsAxesLegendAndScale()
+    public void ControlsHistogramRendersBarsAxesLegendAndScale()
     {
         var control = new Histogram
         {
@@ -44,7 +44,7 @@ public sealed class HistogramControlTests
     }
 
     [Test]
-    public void Controls_Histogram_WithScale_RendersMaxText()
+    public void ControlsHistogramWithScaleRendersMaxText()
     {
         var control = new Histogram
         {
@@ -64,7 +64,7 @@ public sealed class HistogramControlTests
     }
 
     [Test]
-    public void Controls_Histogram_SetValue_UpdatesExistingBucket()
+    public void ControlsHistogramSetValueUpdatesExistingBucket()
     {
         var control = new Histogram();
         control.SetBuckets(
@@ -80,7 +80,7 @@ public sealed class HistogramControlTests
     }
 
     [Test]
-    public void Controls_Histogram_DefaultRender_IsMonochromeAndDeterministic()
+    public void ControlsHistogramDefaultRenderIsMonochromeAndDeterministic()
     {
         var control = new Histogram();
         control.SetBuckets(
@@ -103,7 +103,7 @@ public sealed class HistogramControlTests
     }
 
     [Test]
-    public void Controls_Histogram_BarStyle_EmitsAnsiSequences()
+    public void ControlsHistogramBarStyleEmitsAnsiSequences()
     {
         var barStyle = TesseraStyle.Empty.WithForeground(AnsiColor.Rgb(66, 77, 88));
         var control = new Histogram

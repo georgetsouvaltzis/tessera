@@ -1,6 +1,6 @@
 using System.ComponentModel;
 
-namespace Tessera.Core.Terminal;
+namespace Tessera.Core.Terminal.Capabilities;
 
 [EditorBrowsable(EditorBrowsableState.Advanced)]
 internal static class TerminalColorProfileDetector

@@ -1,7 +1,7 @@
 using Tessera.Core.Abstractions;
 using Tessera.Core.Messages;
 
-namespace Tessera.Core.Input;
+namespace Tessera.Core.Input.Decoding;
 
 internal static class MouseSequenceDecoder
 {
@@ -32,13 +32,23 @@ internal static class MouseSequenceDecoder
 
         var isWheel = (cb & MouseWheelMask) != 0;
         var isMotion = !isWheel && (cb & MouseMotionMask) != 0;
-        var eventType = isWheel
-            ? MouseEventType.Wheel
-            : isMotion
-                ? MouseEventType.Motion
-                : (cb & 0b11) == 0b11
-                    ? MouseEventType.Release
-                    : MouseEventType.Press;
+        MouseEventType eventType;
+        if (isWheel)
+        {
+            eventType = MouseEventType.Wheel;
+        }
+        else if (isMotion)
+        {
+            eventType = MouseEventType.Motion;
+        }
+        else if ((cb & 0b11) == 0b11)
+        {
+            eventType = MouseEventType.Release;
+        }
+        else
+        {
+            eventType = MouseEventType.Press;
+        }
         var (button, modifiers) = DecodeMouseButtonAndModifiers(cb, isWheel);
 
         return new DecodeResult(6, CreateMouseMessage(eventType, button, cx - 1, cy - 1, modifiers), false);
@@ -60,13 +70,23 @@ internal static class MouseSequenceDecoder
 
         var isWheel = (cb & MouseWheelMask) != 0;
         var isMotion = !isWheel && (cb & MouseMotionMask) != 0;
-        var eventType = isWheel
-            ? MouseEventType.Wheel
-            : isMotion
-                ? MouseEventType.Motion
-                : final == 'm'
-                    ? MouseEventType.Release
-                    : MouseEventType.Press;
+        MouseEventType eventType;
+        if (isWheel)
+        {
+            eventType = MouseEventType.Wheel;
+        }
+        else if (isMotion)
+        {
+            eventType = MouseEventType.Motion;
+        }
+        else if (final == 'm')
+        {
+            eventType = MouseEventType.Release;
+        }
+        else
+        {
+            eventType = MouseEventType.Press;
+        }
         var (button, modifiers) = DecodeMouseButtonAndModifiers(cb, isWheel);
 
         message = CreateMouseMessage(eventType, button, cx - 1, cy - 1, modifiers);

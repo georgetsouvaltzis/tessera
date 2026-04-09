@@ -1,4 +1,3 @@
-using Tessera.Components.Composition;
 using Tessera.Components.Primitives;
 using Tessera.Components.Primitives.Internal;
 using Tessera.Controls;
@@ -6,6 +5,7 @@ using Tessera.Core.Abstractions;
 using Tessera.Layout;
 using Tessera.Styles;
 using System.Collections.Concurrent;
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 
 namespace Tessera.Internal;
@@ -323,6 +323,7 @@ internal sealed class TesseraSceneCompiler : IScreenCompiler
             ?? throw new InvalidOperationException("Failed to build ListView<T> theme+override applier delegate."));
     }
 
+    [SuppressMessage("Sonar", "S3011", Justification = "The compiler intentionally resolves private generic factory helpers declared on the same type.")]
     private static MethodInfo ResolveListViewThemeDefaultsApplierFactoryMethodDefinition()
     {
         return typeof(TesseraSceneCompiler).GetMethod(
@@ -331,6 +332,7 @@ internal sealed class TesseraSceneCompiler : IScreenCompiler
             ?? throw new InvalidOperationException("Unable to resolve ListView<T> theme applier factory method.");
     }
 
+    [SuppressMessage("Sonar", "S3011", Justification = "The compiler intentionally resolves private generic factory helpers declared on the same type.")]
     private static MethodInfo ResolveListViewThemeDefaultsWithOverridesApplierFactoryMethodDefinition()
     {
         return typeof(TesseraSceneCompiler).GetMethod(
@@ -437,7 +439,7 @@ internal sealed class TesseraSceneCompiler : IScreenCompiler
             {
                 var measured = ResolveSlotExtent(header, horizontal: false, working);
                 var outer = new Rect(working.X, working.Y, working.Width, measured);
-                if (!TryBuildDockSlot(header, outer, horizontal: false, $"{path}/header"))
+                if (!TryBuildDockSlot(header, outer, $"{path}/header"))
                 {
                     return false;
                 }
@@ -449,7 +451,7 @@ internal sealed class TesseraSceneCompiler : IScreenCompiler
             {
                 var measured = ResolveSlotExtent(footer, horizontal: false, working);
                 var outer = new Rect(working.X, Math.Max(working.Y, working.Bottom - measured), working.Width, measured);
-                if (!TryBuildDockSlot(footer, outer, horizontal: false, $"{path}/footer"))
+                if (!TryBuildDockSlot(footer, outer, $"{path}/footer"))
                 {
                     return false;
                 }
@@ -461,7 +463,7 @@ internal sealed class TesseraSceneCompiler : IScreenCompiler
             {
                 var measured = ResolveSlotExtent(left, horizontal: true, working);
                 var outer = new Rect(working.X, working.Y, measured, working.Height);
-                if (!TryBuildDockSlot(left, outer, horizontal: true, $"{path}/left"))
+                if (!TryBuildDockSlot(left, outer, $"{path}/left"))
                 {
                     return false;
                 }
@@ -473,7 +475,7 @@ internal sealed class TesseraSceneCompiler : IScreenCompiler
             {
                 var measured = ResolveSlotExtent(right, horizontal: true, working);
                 var outer = new Rect(Math.Max(working.X, working.Right - measured), working.Y, measured, working.Height);
-                if (!TryBuildDockSlot(right, outer, horizontal: true, $"{path}/right"))
+                if (!TryBuildDockSlot(right, outer, $"{path}/right"))
                 {
                     return false;
                 }
@@ -560,7 +562,7 @@ internal sealed class TesseraSceneCompiler : IScreenCompiler
             {
                 var measured = ResolveSlotExtent(top, horizontal: false, working);
                 var outer = new Rect(working.X, working.Y, working.Width, measured);
-                if (!TryBuildDockSlot(top, outer, horizontal: false, $"{path}/top"))
+                if (!TryBuildDockSlot(top, outer, $"{path}/top"))
                 {
                     return false;
                 }
@@ -572,7 +574,7 @@ internal sealed class TesseraSceneCompiler : IScreenCompiler
             {
                 var measured = ResolveSlotExtent(bottom, horizontal: false, working);
                 var outer = new Rect(working.X, Math.Max(working.Y, working.Bottom - measured), working.Width, measured);
-                if (!TryBuildDockSlot(bottom, outer, horizontal: false, $"{path}/bottom"))
+                if (!TryBuildDockSlot(bottom, outer, $"{path}/bottom"))
                 {
                     return false;
                 }
@@ -584,7 +586,7 @@ internal sealed class TesseraSceneCompiler : IScreenCompiler
             {
                 var measured = ResolveSlotExtent(left, horizontal: true, working);
                 var outer = new Rect(working.X, working.Y, measured, working.Height);
-                if (!TryBuildDockSlot(left, outer, horizontal: true, $"{path}/left"))
+                if (!TryBuildDockSlot(left, outer, $"{path}/left"))
                 {
                     return false;
                 }
@@ -596,7 +598,7 @@ internal sealed class TesseraSceneCompiler : IScreenCompiler
             {
                 var measured = ResolveSlotExtent(right, horizontal: true, working);
                 var outer = new Rect(Math.Max(working.X, working.Right - measured), working.Y, measured, working.Height);
-                if (!TryBuildDockSlot(right, outer, horizontal: true, $"{path}/right"))
+                if (!TryBuildDockSlot(right, outer, $"{path}/right"))
                 {
                     return false;
                 }
@@ -604,7 +606,7 @@ internal sealed class TesseraSceneCompiler : IScreenCompiler
                 working = new Rect(working.X, working.Y, Math.Max(0, working.Width - measured - dock.Gap), working.Height);
             }
 
-            return dock.Fill is null || working.IsEmpty || TryBuildDockSlot(dock.Fill, working, horizontal: true, $"{path}/fill");
+            return dock.Fill is null || working.IsEmpty || TryBuildDockSlot(dock.Fill, working, $"{path}/fill");
         }
 
         private bool TryBuildStack(bool horizontal, IReadOnlyList<LayoutSlot> children, int gap, Thickness padding, in Rect bounds, string path)
@@ -717,7 +719,7 @@ internal sealed class TesseraSceneCompiler : IScreenCompiler
             return true;
         }
 
-        private bool TryBuildDockSlot(LayoutSlot slot, in Rect outerBounds, bool horizontal, string path)
+        private bool TryBuildDockSlot(LayoutSlot slot, in Rect outerBounds, string path)
         {
             var bounds = new Rect(
                 outerBounds.X + slot.Margin.Left,

@@ -99,7 +99,18 @@ public sealed class Paginator : Control
     public int PageIndex
     {
         get => _pageIndex;
-        set => SetPage(value);
+        set
+        {
+            var clamped = Math.Clamp(value, 0, _pageCount - 1);
+            if (clamped == _pageIndex)
+            {
+                return;
+            }
+
+            var previous = _pageIndex;
+            _pageIndex = clamped;
+            PageChanged?.Invoke(this, new PageChangedEventArgs(previous, _pageIndex));
+        }
     }
 
     /// <summary>
@@ -278,16 +289,9 @@ public sealed class Paginator : Control
 
     private bool TrySetPage(int requestedPageIndex)
     {
-        var clamped = Math.Clamp(requestedPageIndex, 0, _pageCount - 1);
-        if (clamped == _pageIndex)
-        {
-            return false;
-        }
-
         var previous = _pageIndex;
-        _pageIndex = clamped;
-        PageChanged?.Invoke(this, new PageChangedEventArgs(previous, _pageIndex));
-        return true;
+        PageIndex = requestedPageIndex;
+        return previous != _pageIndex;
     }
 
     private bool CanMovePrevious() => _pageIndex > 0;

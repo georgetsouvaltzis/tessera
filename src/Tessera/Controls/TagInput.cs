@@ -1,6 +1,5 @@
 using Tessera.Components.Primitives;
 using Tessera.Components.Primitives.Internal;
-using Tessera.Controls.Internal;
 using Tessera.Styles;
 using Tessera.Widgets;
 
@@ -455,7 +454,7 @@ public sealed partial class TagInput : Control
         TagsChanged?.Invoke(this, new TagInputTagsChangedEventArgs(previousTags, _tags));
     }
 
-    private static bool AreTagsEqual(IReadOnlyList<string> previousTags, IReadOnlyList<string> currentTags)
+    private static bool AreTagsEqual(IReadOnlyList<string> previousTags, List<string> currentTags)
     {
         if (previousTags.Count != currentTags.Count)
         {

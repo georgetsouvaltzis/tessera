@@ -10,7 +10,7 @@ namespace Tessera.Tests;
 public sealed class PaneTabsControlTests
 {
     [Test]
-    public void Controls_PaneTabs_KeyboardNavigationSkipsDisabledAndRaisesEvent()
+    public void ControlsPaneTabsKeyboardNavigationSkipsDisabledAndRaisesEvent()
     {
         var control = new PaneTabs
         {
@@ -40,7 +40,7 @@ public sealed class PaneTabsControlTests
     }
 
     [Test]
-    public void Controls_PaneTabs_PointerClickSelectsTab()
+    public void ControlsPaneTabsPointerClickSelectsTab()
     {
         var control = new PaneTabs
         {
@@ -70,7 +70,7 @@ public sealed class PaneTabsControlTests
     }
 
     [Test]
-    public void Controls_PaneTabs_PointerMotionDoesNotSelectHoveredTab()
+    public void ControlsPaneTabsPointerMotionDoesNotSelectHoveredTab()
     {
         var control = new PaneTabs
         {
@@ -92,7 +92,7 @@ public sealed class PaneTabsControlTests
     }
 
     [Test]
-    public void Controls_PaneTabs_Render_EmitsFocusMarkerAndStyles()
+    public void ControlsPaneTabsRenderEmitsFocusMarkerAndStyles()
     {
         var focusedBorder = TesseraStyle.Empty.WithForeground(AnsiColor.Rgb(66, 77, 88));
         var selectedStyle = TesseraStyle.Empty.WithBold();
@@ -116,7 +116,7 @@ public sealed class PaneTabsControlTests
     }
 
     [Test]
-    public void Controls_PaneTabs_EmptyStateRendersText()
+    public void ControlsPaneTabsEmptyStateRendersText()
     {
         var control = new PaneTabs
         {

@@ -9,7 +9,7 @@ namespace Tessera.Tests;
 public sealed class ThemeOverridesFocusMarkerWiringTests
 {
     [Test]
-    public void ThemeOverrides_ApplyTheme_MapsFocusMarker_ForChoiceComboBoxAndTreeView()
+    public void ThemeOverridesApplyThemeMapsFocusMarkerForChoiceComboBoxAndTreeView()
     {
         var theme = new TesseraTheme
         {
@@ -29,7 +29,7 @@ public sealed class ThemeOverridesFocusMarkerWiringTests
     }
 
     [Test]
-    public void ThemeOverrides_ApplyThemeDefaults_OnlyFillsEmptyFocusMarker_ForChoiceComboBoxAndTreeView()
+    public void ThemeOverridesApplyThemeDefaultsOnlyFillsEmptyFocusMarkerForChoiceComboBoxAndTreeView()
     {
         var theme = new TesseraTheme
         {

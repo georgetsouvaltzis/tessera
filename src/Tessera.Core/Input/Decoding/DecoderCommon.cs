@@ -3,7 +3,7 @@ using System.Text;
 using Tessera.Core.Abstractions;
 using Tessera.Core.Messages;
 
-namespace Tessera.Core.Input;
+namespace Tessera.Core.Input.Decoding;
 
 internal static class DecoderCommon
 {

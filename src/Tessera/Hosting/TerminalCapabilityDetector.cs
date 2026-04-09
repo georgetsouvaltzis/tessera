@@ -10,5 +10,5 @@ namespace Tessera.Hosting;
 public static class TerminalCapabilityDetector
 {
     public static TerminalCapabilityProfile Detect() =>
-        global::Tessera.Core.Terminal.TerminalCapabilityDetector.Detect().AsHosting();
+        global::Tessera.Core.Terminal.Capabilities.TerminalCapabilityDetector.Detect().AsHosting();
 }

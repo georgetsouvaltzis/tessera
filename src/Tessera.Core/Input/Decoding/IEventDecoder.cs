@@ -1,6 +1,6 @@
 using System.ComponentModel;
 
-namespace Tessera.Core.Input;
+namespace Tessera.Core.Input.Decoding;
 
 [EditorBrowsable(EditorBrowsableState.Advanced)]
 internal interface IEventDecoder

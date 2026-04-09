@@ -1,9 +1,19 @@
 namespace Tessera.Core.Application;
 
-internal sealed class TesseraRuntimeInterruptedException : Exception
+public sealed class TesseraRuntimeInterruptedException : Exception
 {
-    internal TesseraRuntimeInterruptedException()
+    public TesseraRuntimeInterruptedException()
         : base("Runtime interrupted.")
+    {
+    }
+
+    public TesseraRuntimeInterruptedException(string message)
+        : base(message)
+    {
+    }
+
+    public TesseraRuntimeInterruptedException(string message, Exception innerException)
+        : base(message, innerException)
     {
     }
 }

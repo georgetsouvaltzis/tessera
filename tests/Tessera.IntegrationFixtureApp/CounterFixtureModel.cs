@@ -3,7 +3,7 @@ using Tessera.Core.Abstractions;
 using Tessera.Core.Input;
 using Tessera.Core.Messages;
 
-namespace Tessera.TestFixtures;
+namespace Tessera.IntegrationFixtureApp;
 
 public sealed class CounterFixtureModel
 {

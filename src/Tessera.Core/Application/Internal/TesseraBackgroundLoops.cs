@@ -1,4 +1,4 @@
-namespace Tessera.Core.Application;
+namespace Tessera.Core.Application.Internal;
 
 internal static class TesseraBackgroundLoops
 {
@@ -10,6 +10,7 @@ internal static class TesseraBackgroundLoops
         }
         catch
         {
+            // Shutdown is best-effort; command-loop failures are surfaced earlier.
         }
 
         if (inputLoop is not null)
@@ -20,6 +21,7 @@ internal static class TesseraBackgroundLoops
             }
             catch
             {
+                // Input-loop teardown is best-effort during shutdown.
             }
         }
 
@@ -31,6 +33,7 @@ internal static class TesseraBackgroundLoops
             }
             catch
             {
+                // Resize-loop teardown is best-effort during shutdown.
             }
         }
     }

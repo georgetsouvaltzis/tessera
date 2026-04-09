@@ -8,7 +8,7 @@ namespace Tessera.Tests;
 public sealed class TesseraSceneCompilerPointerVisibilityTests
 {
     [Test]
-    public void TesseraSceneCompiler_HiddenDialogOverlay_DoesNotInterceptPointerPress()
+    public void TesseraSceneCompilerHiddenDialogOverlayDoesNotInterceptPointerPress()
     {
         var app = new OverlayPointerProbeApp(showDialog: false);
         app.ConfigureRuntimeOptions(
@@ -29,7 +29,7 @@ public sealed class TesseraSceneCompilerPointerVisibilityTests
     }
 
     [Test]
-    public void TesseraSceneCompiler_VisibleDialogOverlay_ContinuesToInterceptPointerPress()
+    public void TesseraSceneCompilerVisibleDialogOverlayContinuesToInterceptPointerPress()
     {
         var app = new OverlayPointerProbeApp(showDialog: true);
         app.ConfigureRuntimeOptions(

@@ -10,7 +10,7 @@ namespace Tessera.Tests;
 public sealed class DockWorkspaceControlTests
 {
     [Test]
-    public void Controls_DockWorkspace_KeyboardNavigationSkipsDisabledAndRaisesEvent()
+    public void ControlsDockWorkspaceKeyboardNavigationSkipsDisabledAndRaisesEvent()
     {
         var control = new DockWorkspace
         {
@@ -40,7 +40,7 @@ public sealed class DockWorkspaceControlTests
     }
 
     [Test]
-    public void Controls_DockWorkspace_PointerClickSelectsPane()
+    public void ControlsDockWorkspacePointerClickSelectsPane()
     {
         var control = new DockWorkspace
         {
@@ -64,7 +64,7 @@ public sealed class DockWorkspaceControlTests
     }
 
     [Test]
-    public void Controls_DockWorkspace_Render_ShowsPaneTitlesAndSelectionMarker()
+    public void ControlsDockWorkspaceRenderShowsPaneTitlesAndSelectionMarker()
     {
         var control = new DockWorkspace
         {
@@ -85,7 +85,7 @@ public sealed class DockWorkspaceControlTests
     }
 
     [Test]
-    public void Controls_DockWorkspace_FocusAndBorderStyles_EmitAnsi()
+    public void ControlsDockWorkspaceFocusAndBorderStylesEmitAnsi()
     {
         var focusedBorder = TesseraStyle.Empty.WithForeground(AnsiColor.Rgb(120, 70, 33));
         var focusedPaneBorder = TesseraStyle.Empty.WithForeground(AnsiColor.Rgb(41, 91, 131));

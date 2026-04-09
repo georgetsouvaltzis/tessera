@@ -2,15 +2,15 @@ using System.ComponentModel;
 using System.Globalization;
 using System.Text;
 using Tessera.Core.Abstractions;
-using Tessera.Core.Rendering.Internal;
-using Tessera.Core.Terminal;
 
 namespace Tessera.Core.Rendering;
 
 [EditorBrowsable(EditorBrowsableState.Advanced)]
-internal sealed class AnsiDiffRenderer : IProgramRenderer
+internal sealed class AnsiDiffRenderer(
+    TerminalCapabilityProfile? capabilities = null,
+    AnsiRendererOptions? options = null) : IProgramRenderer
 {
-    private readonly AnsiRendererOptions _options;
+    private readonly AnsiRendererOptions _options = options ?? new AnsiRendererOptions();
     private Stream? _output;
     private StreamWriter? _writer;
     private RenderFrameBuffer _previousFrame = RenderFrameBuffer.Empty;
@@ -33,15 +33,7 @@ internal sealed class AnsiDiffRenderer : IProgramRenderer
     private int _width;
     private int _height;
     private bool _fullRepaintRequired;
-    private TerminalCapabilityProfile _capabilities;
-
-    public AnsiDiffRenderer(
-        TerminalCapabilityProfile? capabilities = null,
-        AnsiRendererOptions? options = null)
-    {
-        _capabilities = capabilities ?? TerminalCapabilityProfile.AllSupported;
-        _options = options ?? new AnsiRendererOptions();
-    }
+    private TerminalCapabilityProfile _capabilities = capabilities ?? TerminalCapabilityProfile.AllSupported;
 
     public ValueTask InitializeAsync(Stream output, CancellationToken cancellationToken)
     {

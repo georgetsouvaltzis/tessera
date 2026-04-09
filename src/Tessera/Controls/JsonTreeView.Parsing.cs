@@ -4,7 +4,7 @@ namespace Tessera.Controls;
 
 public sealed partial class JsonTreeView
 {
-    private static IReadOnlyList<JsonTreeNode> ParseJson(string json)
+    private static List<JsonTreeNode> ParseJson(string json)
     {
         using var document = JsonDocument.Parse(json ?? string.Empty);
         var nodes = new List<JsonTreeNode>();

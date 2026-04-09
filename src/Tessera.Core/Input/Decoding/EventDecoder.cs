@@ -1,7 +1,7 @@
 using System.ComponentModel;
 using Tessera.Core.Messages;
 
-namespace Tessera.Core.Input;
+namespace Tessera.Core.Input.Decoding;
 
 [EditorBrowsable(EditorBrowsableState.Advanced)]
 internal sealed class EventDecoder : IEventDecoder
@@ -134,7 +134,7 @@ internal sealed class EventDecoder : IEventDecoder
             }
         }
 
-        if (DecoderCommon.TryDecodeRune(buffer[1..], out var ch, out var runeLen, out var needMoreData))
+        if (DecoderCommon.TryDecodeRune(buffer[1..], out var ch, out var runeLen, out _))
         {
             return new DecodeResult(1 + runeLen, new KeyPressMsg(KeyCode.Character, ch, KeyModifiers.Alt), false);
         }
@@ -144,9 +144,7 @@ internal sealed class EventDecoder : IEventDecoder
             return new DecodeResult(0, null, true);
         }
 
-        return needMoreData
-            ? new DecodeResult(1, new KeyPressMsg(KeyCode.Escape), false)
-            : new DecodeResult(1, new KeyPressMsg(KeyCode.Escape), false);
+        return new DecodeResult(1, new KeyPressMsg(KeyCode.Escape), false);
     }
 
     private static DecodeResult DecodeCsi(ReadOnlySpan<byte> buffer, bool timeoutExpired)

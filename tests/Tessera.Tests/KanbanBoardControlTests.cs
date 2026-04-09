@@ -10,7 +10,7 @@ namespace Tessera.Tests;
 public sealed class KanbanBoardControlTests
 {
     [Test]
-    public void Controls_KanbanBoard_RendersLanesAndSelectedCardMarker()
+    public void ControlsKanbanBoardRendersLanesAndSelectedCardMarker()
     {
         var todo = new KanbanLane("Todo");
         todo.AddCard(new KanbanCard("Investigate"));
@@ -35,7 +35,7 @@ public sealed class KanbanBoardControlTests
     }
 
     [Test]
-    public void Controls_KanbanBoard_KeyboardNavigation_UpdatesSelectionAndRaisesEvent()
+    public void ControlsKanbanBoardKeyboardNavigationUpdatesSelectionAndRaisesEvent()
     {
         var todo = new KanbanLane("Todo");
         todo.AddCard(new KanbanCard("A"));
@@ -65,7 +65,7 @@ public sealed class KanbanBoardControlTests
     }
 
     [Test]
-    public void Controls_KanbanBoard_PointerHoverAndStateStyles_RenderExpectedAnsi()
+    public void ControlsKanbanBoardPointerHoverAndStateStylesRenderExpectedAnsi()
     {
         var lane = new KanbanLane("Todo");
         lane.AddCard(new KanbanCard("A"));
@@ -103,7 +103,7 @@ public sealed class KanbanBoardControlTests
     }
 
     [Test]
-    public void Controls_KanbanBoard_DefaultRender_IsDeterministicAndMonochrome()
+    public void ControlsKanbanBoardDefaultRenderIsDeterministicAndMonochrome()
     {
         var lane = new KanbanLane("Lane");
         lane.AddCard(new KanbanCard("One"));

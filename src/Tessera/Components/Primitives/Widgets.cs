@@ -1,4 +1,3 @@
-using Tessera.Components.Primitives.Internal;
 namespace Tessera.Components.Primitives;
 
 internal static class Widgets

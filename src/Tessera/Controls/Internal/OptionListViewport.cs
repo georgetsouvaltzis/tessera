@@ -1,5 +1,4 @@
 using Tessera.Components.Primitives;
-using Tessera.Components.Styling;
 namespace Tessera.Controls.Internal;
 
 internal static class OptionListViewport

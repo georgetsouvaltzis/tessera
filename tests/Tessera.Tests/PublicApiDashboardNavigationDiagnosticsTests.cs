@@ -8,7 +8,7 @@ namespace Tessera.Tests;
 public sealed class PublicApiDashboardNavigationDiagnosticsTests
 {
     [Test]
-    public void PublicApiDashboardNavigationDiagnostics_DashboardTabsPointerMotion_DoesNotRaiseSelectionChangedOrMutateSelection()
+    public void PublicApiDashboardNavigationDiagnosticsDashboardTabsPointerMotionDoesNotRaiseSelectionChangedOrMutateSelection()
     {
         var tabs = new DashboardNavigationTabs("Overview", "Operations", "Audit");
         var changes = 0;
@@ -24,7 +24,7 @@ public sealed class PublicApiDashboardNavigationDiagnosticsTests
     }
 
     [Test]
-    public void PublicApiDashboardNavigationDiagnostics_DashboardTabsPointerMotion_OutsideHeaderBounds_DoesNotRaiseSelectionChangedOrMutateSelection()
+    public void PublicApiDashboardNavigationDiagnosticsDashboardTabsPointerMotionOutsideHeaderBoundsDoesNotRaiseSelectionChangedOrMutateSelection()
     {
         var tabs = new DashboardNavigationTabs("Overview", "Operations", "Audit");
         tabs.SetSelectedIndex(1);
@@ -41,7 +41,7 @@ public sealed class PublicApiDashboardNavigationDiagnosticsTests
     }
 
     [Test]
-    public void PublicApiDashboardNavigationDiagnostics_AppContract_ActivityLogHoverCoordinates_DoNotMutateNavigation()
+    public void PublicApiDashboardNavigationDiagnosticsAppContractActivityLogHoverCoordinatesDoNotMutateNavigation()
     {
         var tabs = new DashboardNavigationTabs("Overview", "Operations", "Audit");
         tabs.SetSelectedIndex(2);
@@ -69,7 +69,7 @@ public sealed class PublicApiDashboardNavigationDiagnosticsTests
     }
 
     [Test]
-    public void PublicApiDashboardNavigationDiagnostics_DashboardTabsPointerWheel_IsBlockedWithoutSelectionMutation()
+    public void PublicApiDashboardNavigationDiagnosticsDashboardTabsPointerWheelIsBlockedWithoutSelectionMutation()
     {
         var tabs = new DashboardNavigationTabs("Overview", "Operations", "Audit");
         var changes = 0;
@@ -85,7 +85,7 @@ public sealed class PublicApiDashboardNavigationDiagnosticsTests
     }
 
     [Test]
-    public void PublicApiDashboardNavigationDiagnostics_Regression_HoverFloodOutsideHeader_DoesNotSwitchTabsOrRaiseSelectionChanged()
+    public void PublicApiDashboardNavigationDiagnosticsRegressionHoverFloodOutsideHeaderDoesNotSwitchTabsOrRaiseSelectionChanged()
     {
         var tabs = new DashboardNavigationTabs("Overview", "Operations", "Audit");
         var changes = 0;
@@ -125,7 +125,7 @@ public sealed class PublicApiDashboardNavigationDiagnosticsTests
     }
 
     [Test]
-    public void PublicApiDashboardNavigationDiagnostics_DashboardTabsPointerPress_ChangesSelectionOnce()
+    public void PublicApiDashboardNavigationDiagnosticsDashboardTabsPointerPressChangesSelectionOnce()
     {
         var tabs = new DashboardNavigationTabs("Overview", "Operations", "Audit");
         var changes = 0;

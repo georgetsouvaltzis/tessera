@@ -4,7 +4,7 @@ using System.Threading.Channels;
 using Tessera.Core.Messages;
 using Tessera.Core.Terminal;
 
-namespace Tessera.Core.Application;
+namespace Tessera.Core.Application.Internal;
 
 internal static class TesseraResizeMonitor
 {
@@ -49,6 +49,7 @@ internal static class TesseraResizeMonitor
 
                     while (signalTicks.Reader.TryRead(out _))
                     {
+                        // Drain coalesced resize ticks so only the freshest size is observed.
                     }
 
                     var current = await terminal.GetSizeAsync(token).ConfigureAwait(false);
@@ -64,6 +65,7 @@ internal static class TesseraResizeMonitor
                 }
                 catch
                 {
+                    // Resize polling is best-effort; terminal backends can transiently fail.
                 }
             }
         }, token);
@@ -85,6 +87,7 @@ internal static class TesseraResizeMonitor
         }
         catch (TimeoutException)
         {
+            // Poll interval elapsed without a signal; caller will re-check terminal size.
         }
     }
 
@@ -103,6 +106,7 @@ internal static class TesseraResizeMonitor
             }
             catch
             {
+                // Custom registrations are optional; fall back to polling when they fail.
                 return null;
             }
         }
@@ -131,11 +135,13 @@ internal static class TesseraResizeMonitor
                 }
                 catch
                 {
+                    // Signal callbacks are best-effort and must not crash the watcher.
                 }
             });
         }
         catch
         {
+            // SIGWINCH is not guaranteed to be available; polling remains as fallback.
             return null;
         }
     }

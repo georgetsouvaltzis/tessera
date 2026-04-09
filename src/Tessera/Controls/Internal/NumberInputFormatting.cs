@@ -1,5 +1,3 @@
-using Tessera.Components.Primitives;
-using Tessera.Components.Styling;
 using System.Globalization;
 
 namespace Tessera.Controls.Internal;

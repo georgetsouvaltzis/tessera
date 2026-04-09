@@ -10,7 +10,7 @@ namespace Tessera.Tests;
 public sealed class JsonTreeViewControlTests
 {
     [Test]
-    public void Controls_JsonTreeView_SetJson_RendersHierarchy()
+    public void ControlsJsonTreeViewSetJsonRendersHierarchy()
     {
         var control = new JsonTreeView
         {
@@ -26,7 +26,7 @@ public sealed class JsonTreeViewControlTests
     }
 
     [Test]
-    public void Controls_JsonTreeView_KeyboardNavigationExpandCollapseAndSelectionEvents()
+    public void ControlsJsonTreeViewKeyboardNavigationExpandCollapseAndSelectionEvents()
     {
         var control = new JsonTreeView
         {
@@ -57,7 +57,7 @@ public sealed class JsonTreeViewControlTests
     }
 
     [Test]
-    public void Controls_JsonTreeView_PointerHoverAndClick_SelectNode()
+    public void ControlsJsonTreeViewPointerHoverAndClickSelectNode()
     {
         var control = new JsonTreeView
         {
@@ -75,7 +75,7 @@ public sealed class JsonTreeViewControlTests
     }
 
     [Test]
-    public void Controls_JsonTreeView_TrySetJson_ReturnsFalseForInvalidJson()
+    public void ControlsJsonTreeViewTrySetJsonReturnsFalseForInvalidJson()
     {
         var control = new JsonTreeView();
 
@@ -86,7 +86,7 @@ public sealed class JsonTreeViewControlTests
     }
 
     [Test]
-    public void Controls_JsonTreeView_StateStylesRenderAnsi_AndDefaultRenderIsDeterministic()
+    public void ControlsJsonTreeViewStateStylesRenderAnsiAndDefaultRenderIsDeterministic()
     {
         var control = new JsonTreeView
         {

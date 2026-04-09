@@ -11,7 +11,7 @@ namespace Tessera.Tests;
 public sealed class QuickOpenOverlayControlTests
 {
     [Test]
-    public void Controls_QuickOpenOverlay_KeyboardFilterAndSubmit_RaisesSubmitted()
+    public void ControlsQuickOpenOverlayKeyboardFilterAndSubmitRaisesSubmitted()
     {
         var overlay = CreateOverlay();
         overlay.SetItems(
@@ -37,7 +37,7 @@ public sealed class QuickOpenOverlayControlTests
     }
 
     [Test]
-    public void Controls_QuickOpenOverlay_EscapeCancelsAndCloses()
+    public void ControlsQuickOpenOverlayEscapeCancelsAndCloses()
     {
         var overlay = CreateOverlay();
         overlay.SetItems([new QuickOpenItem("readme", "README.md")]);
@@ -54,7 +54,7 @@ public sealed class QuickOpenOverlayControlTests
     }
 
     [Test]
-    public void Controls_QuickOpenOverlay_PointerPressSelectsAndSubmits()
+    public void ControlsQuickOpenOverlayPointerPressSelectsAndSubmits()
     {
         var overlay = CreateOverlay();
         overlay.SetItems(
@@ -78,7 +78,7 @@ public sealed class QuickOpenOverlayControlTests
     }
 
     [Test]
-    public void Controls_QuickOpenOverlay_StyleAndGlyphHooks_RenderExpectedAnsi()
+    public void ControlsQuickOpenOverlayStyleAndGlyphHooksRenderExpectedAnsi()
     {
         var overlay = CreateOverlay();
         overlay.Title = "Open";
@@ -107,7 +107,7 @@ public sealed class QuickOpenOverlayControlTests
     }
 
     [Test]
-    public void Controls_QuickOpenOverlay_DefaultRender_IsDeterministicAndMonochrome()
+    public void ControlsQuickOpenOverlayDefaultRenderIsDeterministicAndMonochrome()
     {
         var overlay = CreateOverlay();
         overlay.SetItems([new QuickOpenItem("readme", "README.md", "docs")]);

@@ -1,4 +1,3 @@
-using System.Text;
 using Tessera.Core.Abstractions;
 
 namespace Tessera.Core.Messages;

@@ -10,7 +10,7 @@ namespace Tessera.Tests;
 public sealed class StatsCardBorderedStyleTests
 {
     [Test]
-    public void Controls_StatsCard_FocusStateTransition_RendersFocusedMarkerAndMergedBorderStyles()
+    public void ControlsStatsCardFocusStateTransitionRendersFocusedMarkerAndMergedBorderStyles()
     {
         var control = new StatsCard
         {
@@ -43,7 +43,7 @@ public sealed class StatsCardBorderedStyleTests
     }
 
     [Test]
-    public void Controls_StatsCard_PointerPress_RequestsFocusInsideBounds()
+    public void ControlsStatsCardPointerPressRequestsFocusInsideBounds()
     {
         var control = new StatsCard
         {
@@ -66,7 +66,7 @@ public sealed class StatsCardBorderedStyleTests
     }
 
     [Test]
-    public void Controls_StatsCard_DefaultRender_IsDeterministicAndMonochrome()
+    public void ControlsStatsCardDefaultRenderIsDeterministicAndMonochrome()
     {
         var control = new StatsCard
         {
@@ -87,7 +87,7 @@ public sealed class StatsCardBorderedStyleTests
     }
 
     [Test]
-    public void Theme_StatsCard_ApplyTheme_MapsBorderAndValueTokens()
+    public void ThemeStatsCardApplyThemeMapsBorderAndValueTokens()
     {
         var theme = new TesseraTheme
         {
@@ -121,7 +121,7 @@ public sealed class StatsCardBorderedStyleTests
     }
 
     [Test]
-    public void Theme_StatsCard_ApplyThemeDefaults_PreservesExplicitOverridesAndFillsEmpty()
+    public void ThemeStatsCardApplyThemeDefaultsPreservesExplicitOverridesAndFillsEmpty()
     {
         var explicitStyle = TesseraStyle.Empty.WithForeground(AnsiColor.Rgb(41, 42, 43));
         var theme = new TesseraTheme

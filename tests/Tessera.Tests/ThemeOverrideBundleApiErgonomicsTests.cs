@@ -10,7 +10,7 @@ namespace Tessera.Tests;
 public sealed class ThemeOverrideBundleApiErgonomicsTests
 {
     [Test]
-    public void Theme_ApiErgonomics_CreateDashboardBundle_ComputesExpectedStyles()
+    public void ThemeApiErgonomicsCreateDashboardBundleComputesExpectedStyles()
     {
         var theme = TesseraThemes.Catppuccin(CatppuccinVariant.Macchiato);
 
@@ -29,7 +29,7 @@ public sealed class ThemeOverrideBundleApiErgonomicsTests
     }
 
     [Test]
-    public void Theme_ApiErgonomics_ListView_Table_Notifications_LogView_ApplyDashboardOverrides_SetExpectedProperties()
+    public void ThemeApiErgonomicsListViewTableNotificationsLogViewApplyDashboardOverridesSetExpectedProperties()
     {
         var theme = TesseraThemes.RosePine(RosePineVariant.Moon);
         var bundle = TesseraThemeOverrideBundle.CreateDashboardBundle(theme, focusMarker: "◆");
@@ -93,7 +93,7 @@ public sealed class ThemeOverrideBundleApiErgonomicsTests
     }
 
     [Test]
-    public void Theme_ApiErgonomics_ButtonDashboardOverrides_LeaveButtonsBorderless()
+    public void ThemeApiErgonomicsButtonDashboardOverridesLeaveButtonsBorderless()
     {
         var theme = TesseraThemes.Catppuccin(CatppuccinVariant.Macchiato);
         var bundle = TesseraThemeOverrideBundle.CreateDashboardBundle(theme, focusMarker: "◆");
@@ -108,7 +108,7 @@ public sealed class ThemeOverrideBundleApiErgonomicsTests
     }
 
     [Test]
-    public void Theme_PublicApiDashboard_TableBundleApply_IsDeterministicAcrossRepeatedCalls()
+    public void ThemePublicApiDashboardTableBundleApplyIsDeterministicAcrossRepeatedCalls()
     {
         var theme = TesseraThemes.Catppuccin(CatppuccinVariant.Macchiato);
         var bundle = TesseraThemeOverrideBundle.CreateDashboardBundle(theme, focusMarker: "◆");

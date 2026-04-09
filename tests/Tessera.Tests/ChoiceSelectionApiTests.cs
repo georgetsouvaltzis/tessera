@@ -8,7 +8,7 @@ namespace Tessera.Tests;
 public sealed class ChoiceSelectionApiTests
 {
     [Test]
-    public void ChoiceSelectionApi_SetSelectedIndex_UsesCanonicalClampingAndRaisesEventsOnTransitions()
+    public void ChoiceSelectionApiSetSelectedIndexUsesCanonicalClampingAndRaisesEventsOnTransitions()
     {
         var control = new Choice();
         control.SetItems(["dev", "stage", "prod"]);
@@ -38,7 +38,7 @@ public sealed class ChoiceSelectionApiTests
     }
 
     [Test]
-    public void ChoiceSelectionApi_TrySetSelectedItem_UsesOrdinalLookupAndSelectionChangeSemantics()
+    public void ChoiceSelectionApiTrySetSelectedItemUsesOrdinalLookupAndSelectionChangeSemantics()
     {
         var control = new Choice();
         control.SetItems(["alpha", "Beta", "gamma"]);
@@ -53,7 +53,7 @@ public sealed class ChoiceSelectionApiTests
     }
 
     [Test]
-    public void ChoiceSelectionApi_EmptyControl_SetSelectedApisReturnFalse()
+    public void ChoiceSelectionApiEmptyControlSetSelectedApisReturnFalse()
     {
         var control = new Choice();
 

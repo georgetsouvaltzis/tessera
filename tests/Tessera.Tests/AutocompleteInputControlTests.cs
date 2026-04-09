@@ -11,7 +11,7 @@ namespace Tessera.Tests;
 public sealed class AutocompleteInputControlTests
 {
     [Test]
-    public void AutocompleteInput_Api_SetSuggestionsAndSelectedSuggestionIndex_Work()
+    public void AutocompleteInputApiSetSuggestionsAndSelectedSuggestionIndexWork()
     {
         var control = CreateControl();
         control.SetSuggestions(["alpha", "beta", "gamma"]);
@@ -26,7 +26,7 @@ public sealed class AutocompleteInputControlTests
     }
 
     [Test]
-    public void AutocompleteInput_KeyboardCommit_RaisesSuggestionCommitted()
+    public void AutocompleteInputKeyboardCommitRaisesSuggestionCommitted()
     {
         var control = CreateControl();
         control.SetSuggestions(["alpha", "beta", "bravo"]);
@@ -49,7 +49,7 @@ public sealed class AutocompleteInputControlTests
     }
 
     [Test]
-    public void AutocompleteInput_PointerClick_SelectsAndCommitsSuggestion()
+    public void AutocompleteInputPointerClickSelectsAndCommitsSuggestion()
     {
         var control = CreateControl();
         control.Border = BorderStyle.None;
@@ -69,7 +69,7 @@ public sealed class AutocompleteInputControlTests
     }
 
     [Test]
-    public void AutocompleteInput_StyleAndGlyphHooks_RenderExpectedAnsi()
+    public void AutocompleteInputStyleAndGlyphHooksRenderExpectedAnsi()
     {
         var control = CreateControl();
         control.Title = "AC";
@@ -101,7 +101,7 @@ public sealed class AutocompleteInputControlTests
     }
 
     [Test]
-    public void AutocompleteInput_DefaultRender_IsDeterministicAndMonochrome()
+    public void AutocompleteInputDefaultRenderIsDeterministicAndMonochrome()
     {
         var control = CreateControl();
         control.Border = BorderStyle.None;

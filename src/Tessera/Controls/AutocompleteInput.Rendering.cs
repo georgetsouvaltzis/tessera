@@ -93,7 +93,7 @@ public sealed partial class AutocompleteInput
                 : emptyPrefix;
             var line = string.Concat(prefix, suggestion);
 
-            var style = ResolveSuggestionStyle(row, hovered, selected);
+            var style = ResolveSuggestionStyle(hovered, selected);
             canvas.WriteText(content.X, y, ApplyStyle(line, style), content.Width);
         }
     }
@@ -140,7 +140,7 @@ public sealed partial class AutocompleteInput
         return ResolveDisabledStyle(style);
     }
 
-    private TesseraStyle ResolveSuggestionStyle(int index, bool hovered, bool selected)
+    private TesseraStyle ResolveSuggestionStyle(bool hovered, bool selected)
     {
         var style = PopupStyle.Merge(SuggestionStyle);
         if (hovered)

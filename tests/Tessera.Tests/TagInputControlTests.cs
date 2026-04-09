@@ -11,7 +11,7 @@ namespace Tessera.Tests;
 public sealed class TagInputControlTests
 {
     [Test]
-    public void Controls_TagInput_TagsChanged_RaisesForSetAddRemoveWithSnapshots()
+    public void ControlsTagInputTagsChangedRaisesForSetAddRemoveWithSnapshots()
     {
         var control = new TagInput();
         var events = new List<TagInputTagsChangedEventArgs>();
@@ -34,7 +34,7 @@ public sealed class TagInputControlTests
     }
 
     [Test]
-    public void Controls_TagInput_TagsChanged_DoesNotRaiseForNoOpMutations()
+    public void ControlsTagInputTagsChangedDoesNotRaiseForNoOpMutations()
     {
         var control = new TagInput();
         var events = 0;
@@ -51,7 +51,7 @@ public sealed class TagInputControlTests
     }
 
     [Test]
-    public void Controls_TagInput_InteractionGuards_BlockHandle_ButNotProgrammaticMutation()
+    public void ControlsTagInputInteractionGuardsBlockHandleButNotProgrammaticMutation()
     {
         var control = new TagInput
         {
@@ -78,7 +78,7 @@ public sealed class TagInputControlTests
     }
 
     [Test]
-    public void Controls_TagInput_EnterCommitsTag()
+    public void ControlsTagInputEnterCommitsTag()
     {
         var control = new TagInput
         {
@@ -96,7 +96,7 @@ public sealed class TagInputControlTests
     }
 
     [Test]
-    public void Controls_TagInput_SeparatorCommitAndBackspaceRemoval_Work()
+    public void ControlsTagInputSeparatorCommitAndBackspaceRemovalWork()
     {
         var control = new TagInput
         {
@@ -117,7 +117,7 @@ public sealed class TagInputControlTests
     }
 
     [Test]
-    public void Controls_TagInput_PointerSelectionAndStateStyles_RenderExpectedAnsi()
+    public void ControlsTagInputPointerSelectionAndStateStylesRenderExpectedAnsi()
     {
         var control = new TagInput
         {
@@ -147,7 +147,7 @@ public sealed class TagInputControlTests
     }
 
     [Test]
-    public void Controls_TagInput_PlaceholderPaddingAndStyle_RenderExpectedOutput()
+    public void ControlsTagInputPlaceholderPaddingAndStyleRenderExpectedOutput()
     {
         var control = new TagInput
         {
@@ -169,7 +169,7 @@ public sealed class TagInputControlTests
     }
 
     [Test]
-    public void Controls_TagInput_EmptyFocusedState_StartsInputAtLeftOrigin()
+    public void ControlsTagInputEmptyFocusedStateStartsInputAtLeftOrigin()
     {
         var control = new TagInput
         {
@@ -188,7 +188,7 @@ public sealed class TagInputControlTests
     }
 
     [Test]
-    public void Controls_TagInput_ChipStyleWithoutBrackets_RendersFilledTags()
+    public void ControlsTagInputChipStyleWithoutBracketsRendersFilledTags()
     {
         var control = new TagInput
         {
@@ -209,7 +209,7 @@ public sealed class TagInputControlTests
     }
 
     [Test]
-    public void Controls_TagInput_WrapsTagsAndInputAcrossLines_WithoutEllipsis()
+    public void ControlsTagInputWrapsTagsAndInputAcrossLinesWithoutEllipsis()
     {
         var control = new TagInput
         {
@@ -242,7 +242,7 @@ public sealed class TagInputControlTests
     }
 
     [Test]
-    public void Controls_TagInput_LongInput_KeepsActiveTailVisible_WhenHeightIsConstrained()
+    public void ControlsTagInputLongInputKeepsActiveTailVisibleWhenHeightIsConstrained()
     {
         var control = new TagInput
         {
@@ -267,7 +267,7 @@ public sealed class TagInputControlTests
     }
 
     [Test]
-    public void Controls_TagInput_Commit_ResetsViewportFollow_AfterInputClears()
+    public void ControlsTagInputCommitResetsViewportFollowAfterInputClears()
     {
         var control = new TagInput
         {
@@ -303,7 +303,7 @@ public sealed class TagInputControlTests
     }
 
     [Test]
-    public void Controls_TagInput_Measure_GrowsHeight_WhenFlowWraps()
+    public void ControlsTagInputMeasureGrowsHeightWhenFlowWraps()
     {
         var control = new TagInput
         {
@@ -326,7 +326,7 @@ public sealed class TagInputControlTests
     }
 
     [Test]
-    public void Controls_TagInput_PointerSelection_UsesWrappedRowPlacements()
+    public void ControlsTagInputPointerSelectionUsesWrappedRowPlacements()
     {
         var control = new TagInput
         {
@@ -345,7 +345,7 @@ public sealed class TagInputControlTests
     }
 
     [Test]
-    public void Controls_TagInput_PointerPress_AppliesFocusImmediately()
+    public void ControlsTagInputPointerPressAppliesFocusImmediately()
     {
         var control = new TagInput
         {
@@ -362,7 +362,7 @@ public sealed class TagInputControlTests
     }
 
     [Test]
-    public void Controls_TagInput_DefaultRender_IsDeterministicAndMonochrome()
+    public void ControlsTagInputDefaultRenderIsDeterministicAndMonochrome()
     {
         var control = new TagInput
         {

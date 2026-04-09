@@ -1,6 +1,6 @@
 using System.ComponentModel;
 
-namespace Tessera.Core.Terminal;
+namespace Tessera.Core.Terminal.Capabilities;
 
 [EditorBrowsable(EditorBrowsableState.Advanced)]
 public sealed record TerminalCapabilityProfile(

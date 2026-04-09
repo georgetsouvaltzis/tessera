@@ -119,7 +119,7 @@ internal static class ScreenOptionsAdapterTests
 
     private static Task CoreCapabilityProfile_AsHosting_MapsFontFlags()
     {
-        var coreProfile = new Tessera.Core.Terminal.TerminalCapabilityProfile(
+        var coreProfile = new Tessera.Core.Terminal.Capabilities.TerminalCapabilityProfile(
             FocusReporting: true,
             MouseReporting: true,
             BracketedPaste: true,

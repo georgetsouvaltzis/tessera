@@ -321,11 +321,6 @@ internal static class RuntimeEndToEndRunner
 
         public override Task FlushAsync(CancellationToken cancellationToken) => _inner.FlushAsync(cancellationToken);
 
-        protected override void Dispose(bool disposing)
-        {
-            // Keep the buffer readable after runtime cleanup so the probe can report flushed bytes.
-            base.Dispose(disposing);
-        }
     }
 
     private sealed class MeasuringRenderer(RunStopwatch stopwatch) : IProgramRenderer

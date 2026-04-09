@@ -8,7 +8,7 @@ namespace Tessera.Tests;
 public sealed class SelectionMutatorNormalizationTests
 {
     [Test]
-    public void Selection_SchedulerTimeline_SetSelectedIndex_AndSelectWrapper_Work()
+    public void SelectionSchedulerTimelineSetSelectedIndexAndSelectWrapperWork()
     {
         var control = new SchedulerTimeline();
         control.SetEntries(CreateSchedulerEntries());
@@ -24,7 +24,7 @@ public sealed class SelectionMutatorNormalizationTests
     }
 
     [Test]
-    public void Selection_Timeline_SetSelectedIndex_AndSelectWrapper_Work()
+    public void SelectionTimelineSetSelectedIndexAndSelectWrapperWork()
     {
         var control = new Timeline();
         control.SetEntries(CreateTimelineEntries());
@@ -40,7 +40,7 @@ public sealed class SelectionMutatorNormalizationTests
     }
 
     [Test]
-    public void Selection_TraceViewer_SetSelectedIndex_AndSelectWrapper_Work()
+    public void SelectionTraceViewerSetSelectedIndexAndSelectWrapperWork()
     {
         var control = new TraceViewer();
         control.SetEntries(CreateTraceEntries());
@@ -56,7 +56,7 @@ public sealed class SelectionMutatorNormalizationTests
     }
 
     [Test]
-    public void Selection_ProcessListView_SetSelectedIndex_AndSelectWrapper_Work()
+    public void SelectionProcessListViewSetSelectedIndexAndSelectWrapperWork()
     {
         var control = new ProcessListView();
         control.SetEntries(CreateProcessEntries());
@@ -72,7 +72,7 @@ public sealed class SelectionMutatorNormalizationTests
     }
 
     [Test]
-    public void Selection_PaletteEditor_SetSelectedIndex_AndSelectWrapper_Work()
+    public void SelectionPaletteEditorSetSelectedIndexAndSelectWrapperWork()
     {
         var control = new PaletteEditor();
         control.SetSwatches(CreateSwatches());
@@ -88,7 +88,7 @@ public sealed class SelectionMutatorNormalizationTests
     }
 
     [Test]
-    public void Selection_Tabs_SetSelectedIndex_IsCanonical_AndSelectForwards()
+    public void SelectionTabsSetSelectedIndexIsCanonicalAndSelectForwards()
     {
         var tabs = new Tabs("Overview", "Logs", "Metrics");
 
@@ -105,7 +105,7 @@ public sealed class SelectionMutatorNormalizationTests
     }
 
     [Test]
-    public void Selection_Toolbar_SetSelectedIndex_UsesExistingClampingSemantics()
+    public void SelectionToolbarSetSelectedIndexUsesExistingClampingSemantics()
     {
         var control = new Toolbar();
         control.SetItems(
@@ -123,7 +123,7 @@ public sealed class SelectionMutatorNormalizationTests
     }
 
     [Test]
-    public void Selection_PaneTabs_SetSelectedIndex_PreservesDisabledAndRangeRules()
+    public void SelectionPaneTabsSetSelectedIndexPreservesDisabledAndRangeRules()
     {
         var control = new PaneTabs();
         control.SetTabs(

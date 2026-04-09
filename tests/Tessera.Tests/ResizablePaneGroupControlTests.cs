@@ -10,7 +10,7 @@ namespace Tessera.Tests;
 public sealed class ResizablePaneGroupControlTests
 {
     [Test]
-    public void Controls_ResizablePaneGroup_KeyboardSelection_RaisesSelectionChanged()
+    public void ControlsResizablePaneGroupKeyboardSelectionRaisesSelectionChanged()
     {
         var control = new ResizablePaneGroup
         {
@@ -38,7 +38,7 @@ public sealed class ResizablePaneGroupControlTests
     }
 
     [Test]
-    public void Controls_ResizablePaneGroup_CanonicalSelectionAliases_StayInSync()
+    public void ControlsResizablePaneGroupCanonicalSelectionAliasesStayInSync()
     {
         var control = new ResizablePaneGroup();
         control.SetPanes(
@@ -61,7 +61,7 @@ public sealed class ResizablePaneGroupControlTests
     }
 
     [Test]
-    public void Controls_ResizablePaneGroup_CanonicalTitleStyleAliases_StayInSync()
+    public void ControlsResizablePaneGroupCanonicalTitleStyleAliasesStayInSync()
     {
         var control = new ResizablePaneGroup();
         var titleStyle = TesseraStyle.Empty.WithForeground(AnsiColor.Rgb(17, 27, 37));
@@ -77,7 +77,7 @@ public sealed class ResizablePaneGroupControlTests
     }
 
     [Test]
-    public void Controls_ResizablePaneGroup_KeyboardResize_UpdatesRenderedPaneWidths()
+    public void ControlsResizablePaneGroupKeyboardResizeUpdatesRenderedPaneWidths()
     {
         var first = new SpyPaneControl("first");
         var second = new SpyPaneControl("second");
@@ -104,7 +104,7 @@ public sealed class ResizablePaneGroupControlTests
     }
 
     [Test]
-    public void Controls_ResizablePaneGroup_PointerResizeAndSelection_Work()
+    public void ControlsResizablePaneGroupPointerResizeAndSelectionWork()
     {
         var first = new SpyPaneControl("first");
         var second = new SpyPaneControl("second");
@@ -140,7 +140,7 @@ public sealed class ResizablePaneGroupControlTests
     }
 
     [Test]
-    public void Controls_ResizablePaneGroup_StyleHooks_EmitAnsiAndFocusMarker()
+    public void ControlsResizablePaneGroupStyleHooksEmitAnsiAndFocusMarker()
     {
         var control = new ResizablePaneGroup
         {
@@ -165,7 +165,7 @@ public sealed class ResizablePaneGroupControlTests
     }
 
     [Test]
-    public void Controls_ResizablePaneGroup_DefaultRender_IsDeterministicAndMonochrome()
+    public void ControlsResizablePaneGroupDefaultRenderIsDeterministicAndMonochrome()
     {
         var control = new ResizablePaneGroup
         {

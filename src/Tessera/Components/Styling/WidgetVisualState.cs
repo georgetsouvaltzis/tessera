@@ -1,5 +1,3 @@
-using Tessera.Components.Styling.Internal;
-using Tessera.Styles;
 using System.ComponentModel;
 
 namespace Tessera.Components.Styling;

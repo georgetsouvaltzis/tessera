@@ -32,8 +32,8 @@ public sealed partial class DataForm<TModel>
         if (key.Is(Key.Enter)) return _isEditing ? CommitCurrentField(out _) : BeginEditCore();
         if (key.Is(Key.Escape)) return CancelCurrentEdit();
         if (!_isEditing || !CanEditCurrentField()) return false;
-        if (key.Is(Key.Backspace)) return RemoveFromBuffer(backspace: true);
-        if (key.Is(Key.Delete)) return RemoveFromBuffer(backspace: false);
+        if (key.Is(Key.Backspace)) return RemoveFromBuffer();
+        if (key.Is(Key.Delete)) return RemoveFromBuffer();
 
         if (key.Key == Key.Character
             && !string.IsNullOrEmpty(key.Text)
@@ -228,7 +228,7 @@ public sealed partial class DataForm<TModel>
         return !string.Equals(previous, _editBuffer, StringComparison.Ordinal) || !string.IsNullOrEmpty(_lastCommitError);
     }
 
-    private bool RemoveFromBuffer(bool backspace)
+    private bool RemoveFromBuffer()
     {
         if (_editBuffer.Length == 0)
         {

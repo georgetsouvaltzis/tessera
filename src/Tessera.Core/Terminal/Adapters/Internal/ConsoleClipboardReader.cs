@@ -1,6 +1,6 @@
 using System.Diagnostics;
 
-namespace Tessera.Core.Terminal;
+namespace Tessera.Core.Terminal.Adapters.Internal;
 
 internal static class ConsoleClipboardReader
 {
@@ -66,6 +66,7 @@ internal static class ConsoleClipboardReader
                 }
                 catch
                 {
+                    // Clipboard helper already timed out; failed kill is safe to ignore.
                 }
 
                 return false;
@@ -81,6 +82,7 @@ internal static class ConsoleClipboardReader
         }
         catch
         {
+            // Clipboard helpers are optional and platform-dependent.
             return false;
         }
     }

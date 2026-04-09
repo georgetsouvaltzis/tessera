@@ -10,7 +10,7 @@ namespace Tessera.Tests;
 public sealed class TokenEditorControlTests
 {
     [Test]
-    public void Controls_TokenEditor_TokensChanged_RaisesForSetAddRemoveWithSnapshots()
+    public void ControlsTokenEditorTokensChangedRaisesForSetAddRemoveWithSnapshots()
     {
         var control = new TokenEditor();
         var events = new List<TokenEditorTokensChangedEventArgs>();
@@ -37,7 +37,7 @@ public sealed class TokenEditorControlTests
     }
 
     [Test]
-    public void Controls_TokenEditor_TokensChanged_DoesNotRaiseForSelectionOnlyOrNoOpMutations()
+    public void ControlsTokenEditorTokensChangedDoesNotRaiseForSelectionOnlyOrNoOpMutations()
     {
         var control = new TokenEditor();
         var events = 0;
@@ -54,7 +54,7 @@ public sealed class TokenEditorControlTests
     }
 
     [Test]
-    public void Controls_TokenEditor_SetTokensAddRemoveAndSelectionEvent_Work()
+    public void ControlsTokenEditorSetTokensAddRemoveAndSelectionEventWork()
     {
         var control = new TokenEditor();
         TokenEditorSelectionChangedEventArgs? lastEvent = null;
@@ -78,7 +78,7 @@ public sealed class TokenEditorControlTests
     }
 
     [Test]
-    public void Controls_TokenEditor_KeyboardInputNavigationAndDelete_Work()
+    public void ControlsTokenEditorKeyboardInputNavigationAndDeleteWork()
     {
         var control = new TokenEditor
         {
@@ -102,7 +102,7 @@ public sealed class TokenEditorControlTests
     }
 
     [Test]
-    public void Controls_TokenEditor_PointerClickSelectsToken_AndRaisesEvent()
+    public void ControlsTokenEditorPointerClickSelectsTokenAndRaisesEvent()
     {
         var control = new TokenEditor
         {
@@ -131,7 +131,7 @@ public sealed class TokenEditorControlTests
     }
 
     [Test]
-    public void Controls_TokenEditor_CustomGlyphsAndStateStyles_RenderExpectedAnsi()
+    public void ControlsTokenEditorCustomGlyphsAndStateStylesRenderExpectedAnsi()
     {
         var control = new TokenEditor
         {
@@ -170,7 +170,7 @@ public sealed class TokenEditorControlTests
     }
 
     [Test]
-    public void Controls_TokenEditor_DefaultRender_IsDeterministicAndMonochrome()
+    public void ControlsTokenEditorDefaultRenderIsDeterministicAndMonochrome()
     {
         var control = new TokenEditor
         {

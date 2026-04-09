@@ -503,7 +503,7 @@ public sealed partial class TokenEditor : Control
             : style.Render(text);
     }
 
-    private static bool AreTokensEqual(IReadOnlyList<TokenItem> previousTokens, IReadOnlyList<TokenItem> currentTokens)
+    private static bool AreTokensEqual(IReadOnlyList<TokenItem> previousTokens, List<TokenItem> currentTokens)
     {
         if (previousTokens.Count != currentTokens.Count)
         {

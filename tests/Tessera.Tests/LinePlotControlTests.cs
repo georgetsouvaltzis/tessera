@@ -11,7 +11,7 @@ namespace Tessera.Tests;
 public sealed class LinePlotControlTests
 {
     [Test]
-    public void LinePlotRender_MultiSeriesLegendAndStatsRendered()
+    public void LinePlotRenderMultiSeriesLegendAndStatsRendered()
     {
         var cpu = new LineSeries("cpu", [12, 18, 24, 20, 16])
         {
@@ -38,7 +38,7 @@ public sealed class LinePlotControlTests
     }
 
     [Test]
-    public void LinePlotRender_FocusedTitleAndBorderStyleApplied()
+    public void LinePlotRenderFocusedTitleAndBorderStyleApplied()
     {
         var borderStyle = TesseraStyle.Empty.WithForeground(AnsiColor.BrightGreen);
         var focusedTitle = TesseraStyle.Empty.WithUnderline().WithForeground(AnsiColor.BrightMagenta);
@@ -61,7 +61,7 @@ public sealed class LinePlotControlTests
     }
 
     [Test]
-    public void LinePlotApi_AppendRemoveAndClearSeriesBehaves()
+    public void LinePlotApiAppendRemoveAndClearSeriesBehaves()
     {
         var control = new LinePlot();
         control.AddSeries(new LineSeries("a", [1, 2]));
@@ -77,7 +77,7 @@ public sealed class LinePlotControlTests
     }
 
     [Test]
-    public void LinePlotZoomOffset_ShiftsVisibleStatsWindow()
+    public void LinePlotZoomOffsetShiftsVisibleStatsWindow()
     {
         var samples = Enumerable.Range(0, 20).Select(static value => (double)value).ToArray();
         var series = new LineSeries("s0", samples);
@@ -104,7 +104,7 @@ public sealed class LinePlotControlTests
     }
 
     [Test]
-    public void LineSeriesRetention_CapacityAndTrimToLast_KeepTrailingSamples()
+    public void LineSeriesRetentionCapacityAndTrimToLastKeepTrailingSamples()
     {
         var series = new LineSeries("req")
         {
@@ -118,7 +118,7 @@ public sealed class LinePlotControlTests
     }
 
     [Test]
-    public void LinePlotConfigureHelpers_UpdateAdvancedOptionsWithoutDirectReplacement()
+    public void LinePlotConfigureHelpersUpdateAdvancedOptionsWithoutDirectReplacement()
     {
         var control = new LinePlot();
 
@@ -136,7 +136,7 @@ public sealed class LinePlotControlTests
     }
 
     [Test]
-    public void LinePlotRender_NormalizedSeries_UsesPerSeriesScaleForMixedUnits()
+    public void LinePlotRenderNormalizedSeriesUsesPerSeriesScaleForMixedUnits()
     {
         var requests = new LineSeries("Req/s", [0, 10, 20]) { PointGlyph = '●' };
         var latency = new LineSeries("P95", [1000, 1001, 1002])
@@ -160,7 +160,7 @@ public sealed class LinePlotControlTests
     }
 
     [Test]
-    public void LinePlotRender_NormalizedAxisLabel_IsRenderedWhenConfigured()
+    public void LinePlotRenderNormalizedAxisLabelIsRenderedWhenConfigured()
     {
         var control = new LinePlot
         {
@@ -183,7 +183,7 @@ public sealed class LinePlotControlTests
     }
 
     [Test]
-    public void LinePlotRender_CompactMode_UsesLineGlyphsForDenseSingleSeriesTelemetry()
+    public void LinePlotRenderCompactModeUsesLineGlyphsForDenseSingleSeriesTelemetry()
     {
         var output = RenderCompact([12, 26, 14, 38, 30, 46, 28, 62, 54, 70, 58, 74], width: 10, height: 4);
 
@@ -193,7 +193,7 @@ public sealed class LinePlotControlTests
     }
 
     [Test]
-    public void LinePlotRender_CompactBrailleMode_UsesBrailleCellsForDenseSingleSeriesTelemetry()
+    public void LinePlotRenderCompactBrailleModeUsesBrailleCellsForDenseSingleSeriesTelemetry()
     {
         var control = new LinePlot
         {
@@ -211,7 +211,7 @@ public sealed class LinePlotControlTests
     }
 
     [Test]
-    public void LinePlotRender_CompactMode_FallsBackToBlockMicroChartWhenHeightIsTiny()
+    public void LinePlotRenderCompactModeFallsBackToBlockMicroChartWhenHeightIsTiny()
     {
         var output = RenderCompact([10, 30, 20, 50, 40, 70, 60, 90], width: 8, height: 1);
 
@@ -219,7 +219,7 @@ public sealed class LinePlotControlTests
     }
 
     [Test]
-    public void LinePlotRender_CompactMode_MonotoneRise_StaysContinuous()
+    public void LinePlotRenderCompactModeMonotoneRiseStaysContinuous()
     {
         var output = RenderCompact([10, 20, 30, 40, 50, 60, 70, 80], width: 12, height: 4);
 
@@ -228,7 +228,7 @@ public sealed class LinePlotControlTests
     }
 
     [Test]
-    public void LinePlotRender_CompactMode_MonotoneFall_StaysContinuous()
+    public void LinePlotRenderCompactModeMonotoneFallStaysContinuous()
     {
         var output = RenderCompact([80, 70, 60, 50, 40, 30, 20, 10], width: 12, height: 4);
 
@@ -237,7 +237,7 @@ public sealed class LinePlotControlTests
     }
 
     [Test]
-    public void LinePlotRender_CompactMode_ShallowSlope_StaysContinuous()
+    public void LinePlotRenderCompactModeShallowSlopeStaysContinuous()
     {
         var output = RenderCompact([40, 42, 44, 46, 47, 48, 50, 52], width: 12, height: 4);
 
@@ -245,7 +245,7 @@ public sealed class LinePlotControlTests
     }
 
     [Test]
-    public void LinePlotRender_CompactMode_Valley_StaysContinuous()
+    public void LinePlotRenderCompactModeValleyStaysContinuous()
     {
         var output = RenderCompact([70, 55, 40, 24, 36, 52, 68], width: 12, height: 4);
 
@@ -253,7 +253,7 @@ public sealed class LinePlotControlTests
     }
 
     [Test]
-    public void LinePlotRender_CompactMode_Peak_StaysContinuous()
+    public void LinePlotRenderCompactModePeakStaysContinuous()
     {
         var output = RenderCompact([24, 40, 58, 72, 56, 38, 20], width: 12, height: 4);
 

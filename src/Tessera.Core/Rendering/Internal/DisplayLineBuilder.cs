@@ -1,6 +1,6 @@
 using System.Globalization;
 
-namespace Tessera.Core.Rendering;
+namespace Tessera.Core.Rendering.Internal;
 
 internal static class DisplayLineBuilder
 {

@@ -1,4 +1,3 @@
-using Tessera.Components.Primitives.Internal;
 namespace Tessera.Components.Primitives;
 
 public readonly record struct Rect(int X, int Y, int Width, int Height)

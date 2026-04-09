@@ -9,7 +9,7 @@ namespace Tessera.Tests;
 public sealed class TableSelectionApiTests
 {
     [Test]
-    public void Controls_Table_SelectionApis_AreSafeWhenNoSelectionExists()
+    public void ControlsTableSelectionApisAreSafeWhenNoSelectionExists()
     {
         var table = new Table("Name")
         {
@@ -30,7 +30,7 @@ public sealed class TableSelectionApiTests
     }
 
     [Test]
-    public void Controls_Table_PointerSelection_UpdatesPublicSelectionState_AndRaisesEvent()
+    public void ControlsTablePointerSelectionUpdatesPublicSelectionStateAndRaisesEvent()
     {
         var table = new Table("Name")
         {
@@ -73,7 +73,7 @@ public sealed class TableSelectionApiTests
     }
 
     [Test]
-    public void Controls_Table_ReSelectingSameRow_DoesNotRaiseSelectionChangedAgain()
+    public void ControlsTableReSelectingSameRowDoesNotRaiseSelectionChangedAgain()
     {
         var table = new Table("Name")
         {
@@ -98,7 +98,7 @@ public sealed class TableSelectionApiTests
     }
 
     [Test]
-    public void Controls_Table_ClearRows_ResetsSelectionApis()
+    public void ControlsTableClearRowsResetsSelectionApis()
     {
         var table = new Table("Name")
         {
@@ -124,7 +124,7 @@ public sealed class TableSelectionApiTests
     }
 
     [Test]
-    public void Controls_Table_SetSelectedIndex_SelectsRowAndRaisesEvent()
+    public void ControlsTableSetSelectedIndexSelectsRowAndRaisesEvent()
     {
         var table = new Table("Name")
         {
@@ -162,7 +162,7 @@ public sealed class TableSelectionApiTests
     }
 
     [Test]
-    public void Controls_Table_SetSelectedIndex_ClampsAndNoopsWhenUnchanged()
+    public void ControlsTableSetSelectedIndexClampsAndNoopsWhenUnchanged()
     {
         var table = new Table("Name")
         {
@@ -189,7 +189,7 @@ public sealed class TableSelectionApiTests
     }
 
     [Test]
-    public void Controls_Table_SetSelectedIndex_ReturnsFalseWhenNoVisibleRows()
+    public void ControlsTableSetSelectedIndexReturnsFalseWhenNoVisibleRows()
     {
         var table = new Table("Name")
         {

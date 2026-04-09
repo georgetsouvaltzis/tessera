@@ -95,13 +95,6 @@ internal sealed class TransferQueueControl : Control
             : Title;
     }
 
-    private string FormatTitleForMeasure()
-    {
-        return ShowFocusMarker && !string.IsNullOrWhiteSpace(FocusMarker)
-            ? $"{Title} {FocusMarker}"
-            : Title;
-    }
-
     private TesseraStyle ResolveBorderStyle()
     {
         return IsFocused

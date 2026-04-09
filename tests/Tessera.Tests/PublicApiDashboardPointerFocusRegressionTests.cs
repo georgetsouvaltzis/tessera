@@ -11,7 +11,7 @@ namespace Tessera.Tests;
 public sealed class PublicApiDashboardPointerFocusRegressionTests
 {
     [Test]
-    public void PublicApiDashboard_FirstClickInServicesRegion_FocusesServices_WithoutNavigationMutation()
+    public void PublicApiDashboardFirstClickInServicesRegionFocusesServicesWithoutNavigationMutation()
     {
         var target = ResolveServicesHitCoordinate();
         var app = new DashboardPointerFocusProbeApp();
@@ -37,7 +37,7 @@ public sealed class PublicApiDashboardPointerFocusRegressionTests
     }
 
     [Test]
-    public void PublicApiDashboard_DefaultDoubleClick_PressReleaseNonePress_OnServicesRow_ChangesSelection()
+    public void PublicApiDashboardDefaultDoubleClickPressReleaseNonePressOnServicesRowChangesSelection()
     {
         var target = ResolveServicesRowHitCoordinate(rowIndex: 1);
         var app = new DashboardPointerFocusProbeApp();
@@ -64,7 +64,7 @@ public sealed class PublicApiDashboardPointerFocusRegressionTests
     }
 
     [Test]
-    public void PublicApiDashboard_SingleClickPolicy_FirstPressOnServicesRow_ChangesSelection()
+    public void PublicApiDashboardSingleClickPolicyFirstPressOnServicesRowChangesSelection()
     {
         var target = ResolveServicesRowHitCoordinate(rowIndex: 1);
         var app = new DashboardPointerFocusProbeApp();
