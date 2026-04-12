@@ -1,4 +1,4 @@
-using Tessera.Components.Primitives;
+﻿using Tessera.Components.Primitives;
 using Tessera.Components.Primitives.Internal;
 using Tessera.Components.Styling;
 using Tessera.Controls.Internal;
@@ -17,54 +17,81 @@ public sealed class Spinner : Control
     private bool _hovered;
     private int _frameIndex;
 
+    /// <summary>
+    /// Represents title.
+    /// </summary>
     public string Title
     {
         get;
         set => field = value ?? string.Empty;
     } = "Spinner";
 
+    /// <summary>
+    /// Represents focus marker.
+    /// </summary>
     public string FocusMarker
     {
         get;
         set => field = value ?? string.Empty;
     } = "*";
 
+    /// <summary>
+    /// Represents show focus marker.
+    /// </summary>
     public bool ShowFocusMarker
     {
         get;
         set;
     } = true;
 
+    /// <summary>
+    /// Represents title style.
+    /// </summary>
     public TesseraStyle TitleStyle
     {
         get;
         set;
     } = TesseraStyle.Empty;
 
+    /// <summary>
+    /// Represents focused title style.
+    /// </summary>
     public TesseraStyle FocusedTitleStyle
     {
         get;
         set;
     } = TesseraStyle.Empty;
 
+    /// <summary>
+    /// Represents value style.
+    /// </summary>
     public TesseraStyle ValueStyle
     {
         get;
         set;
     } = TesseraStyle.Empty;
 
+    /// <summary>
+    /// Represents running value style.
+    /// </summary>
     public TesseraStyle RunningValueStyle
     {
         get;
         set;
     } = TesseraStyle.Empty;
 
+    /// <summary>
+    /// Represents stopped value style.
+    /// </summary>
     public TesseraStyle StoppedValueStyle
     {
         get;
         set;
     } = TesseraStyle.Empty;
 
+    /// <summary>
+    /// Represents disabled value style.
+    /// </summary>
     public TesseraStyle DisabledValueStyle
     {
         get;
@@ -89,6 +116,9 @@ public sealed class Spinner : Control
         set;
     } = TesseraStyle.Empty;
 
+    /// <summary>
+    /// Represents label.
+    /// </summary>
     public string Label
     {
         get;
@@ -100,36 +130,48 @@ public sealed class Spinner : Control
     /// </summary>
     public IReadOnlyList<string> Frames => _frames;
 
+    /// <summary>
+    /// Represents running.
+    /// </summary>
     public bool Running
     {
         get;
         private set;
     } = true;
 
+    /// <summary>
+    /// Represents border.
+    /// </summary>
     public BorderStyle Border
     {
         get;
         set;
     } = BorderStyle.SingleLine;
 
+    /// <summary>
+    /// Represents padding.
+    /// </summary>
     public Thickness Padding
     {
         get;
         set;
     }
 
+    /// <inheritdoc />
     public override bool IsFocused
     {
         get;
         set;
     }
 
+    /// <inheritdoc />
     public override bool IsDisabled
     {
         get;
         set;
     }
 
+    /// <inheritdoc />
     public override bool IsReadOnly
     {
         get;
@@ -167,8 +209,15 @@ public sealed class Spinner : Control
         _frameIndex %= _frames.Count;
     }
 
+    /// <summary>
+    /// Executes set running.
+    /// </summary>
+    /// <param name="running">The running value.</param>
     public void SetRunning(bool running) => Running = running;
 
+    /// <summary>
+    /// Executes advance.
+    /// </summary>
     public void Advance()
     {
         if (_frames.Count == 0)
@@ -179,6 +228,7 @@ public sealed class Spinner : Control
         _frameIndex = (_frameIndex + 1) % _frames.Count;
     }
 
+    /// <inheritdoc />
     public override bool Handle(Message message)
     {
         if (!IsFocused || IsDisabled || IsReadOnly || message is not KeyPressed key)
@@ -201,6 +251,7 @@ public sealed class Spinner : Control
         return false;
     }
 
+    /// <inheritdoc />
     public override bool Handle(Message message, Rect bounds)
     {
         if (IsDisabled || IsReadOnly || message is not PointerInput pointer)
@@ -248,6 +299,7 @@ public sealed class Spinner : Control
         return Handle(message);
     }
 
+    /// <inheritdoc />
     public override void Render(Canvas canvas, Rect rect)
     {
         var clipped = Rect.Intersect(rect, canvas.Bounds);
@@ -365,9 +417,15 @@ public sealed class Spinner : Control
 
     private TesseraStyle ResolveValueStyle()
     {
-        var style = Running
-            ? (RunningValueStyle.IsEmpty ? ValueStyle : RunningValueStyle)
-            : (StoppedValueStyle.IsEmpty ? ValueStyle : StoppedValueStyle);
+        TesseraStyle style;
+        if (Running)
+        {
+            style = RunningValueStyle.IsEmpty ? ValueStyle : RunningValueStyle;
+        }
+        else
+        {
+            style = StoppedValueStyle.IsEmpty ? ValueStyle : StoppedValueStyle;
+        }
 
         if ((IsDisabled || IsReadOnly) && !DisabledValueStyle.IsEmpty)
         {

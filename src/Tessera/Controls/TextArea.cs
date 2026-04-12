@@ -1,4 +1,4 @@
-using Tessera.Components.Primitives;
+﻿using Tessera.Components.Primitives;
 using Tessera.Components.Primitives.Internal;
 using Tessera.Controls.Internal;
 using Tessera.Layout;
@@ -16,42 +16,63 @@ public sealed class TextArea : Control
     private readonly TextInputModel _input = new() { Multiline = true };
     private string _lastViewportValue = string.Empty;
 
+    /// <summary>
+    /// Represents title.
+    /// </summary>
     public string Title
     {
         get;
         set => field = value ?? string.Empty;
     } = "Text Area";
 
+    /// <summary>
+    /// Represents focus marker.
+    /// </summary>
     public string FocusMarker
     {
         get;
         set => field = value ?? string.Empty;
     } = "*";
 
+    /// <summary>
+    /// Represents show focus marker.
+    /// </summary>
     public bool ShowFocusMarker
     {
         get;
         set;
     } = true;
 
+    /// <summary>
+    /// Represents title style.
+    /// </summary>
     public TesseraStyle TitleStyle
     {
         get;
         set;
     } = TesseraStyle.Empty;
 
+    /// <summary>
+    /// Represents focused title style.
+    /// </summary>
     public TesseraStyle FocusedTitleStyle
     {
         get;
         set;
     } = TesseraStyle.Empty;
 
+    /// <summary>
+    /// Represents value text style.
+    /// </summary>
     public TesseraStyle ValueTextStyle
     {
         get;
         set;
     } = TesseraStyle.Empty;
 
+    /// <summary>
+    /// Represents disabled value text style.
+    /// </summary>
     public TesseraStyle DisabledValueTextStyle
     {
         get;
@@ -76,50 +97,74 @@ public sealed class TextArea : Control
         set;
     } = TesseraStyle.Empty;
 
+    /// <summary>
+    /// Represents value.
+    /// </summary>
     public string Value => _input.Value;
 
+    /// <summary>
+    /// Represents border.
+    /// </summary>
     public BorderStyle Border
     {
         get;
         set;
     } = BorderStyle.SingleLine;
 
+    /// <summary>
+    /// Represents padding.
+    /// </summary>
     public Thickness Padding
     {
         get;
         set;
     }
 
+    /// <summary>
+    /// Represents show line numbers.
+    /// </summary>
     public bool ShowLineNumbers
     {
         get => _viewport.ShowLineNumbers;
         set => _viewport.ShowLineNumbers = value;
     }
 
+    /// <summary>
+    /// Represents wrap.
+    /// </summary>
     public bool Wrap
     {
         get => _viewport.Wrap;
         set => _viewport.SetWrap(value);
     }
 
+    /// <inheritdoc />
     public override bool IsFocused
     {
         get;
         set;
     }
 
+    /// <summary>
+    /// Executes set value.
+    /// </summary>
+    /// <param name="value">The value value.</param>
     public void SetValue(string value)
     {
         _input.SetValue(value ?? string.Empty);
         SyncViewport();
     }
 
+    /// <summary>
+    /// Executes clear.
+    /// </summary>
     public void Clear()
     {
         _input.Clear();
         SyncViewport();
     }
 
+    /// <inheritdoc />
     public override bool Handle(Message message)
     {
         if (IsDisabled || !IsFocused)
@@ -144,6 +189,7 @@ public sealed class TextArea : Control
         return changed;
     }
 
+    /// <inheritdoc />
     public override void Render(Canvas canvas, Rect rect)
     {
         var clipped = Rect.Intersect(rect, canvas.Bounds);

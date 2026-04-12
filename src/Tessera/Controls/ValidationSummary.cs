@@ -212,12 +212,9 @@ public sealed class ValidationSummary : Control
         var previousItem = SelectedItem;
 
         _issues.Clear();
-        foreach (var issue in issues)
+        foreach (var issue in issues.Where(static issue => issue is not null))
         {
-            if (issue is not null)
-            {
-                _issues.Add(issue);
-            }
+            _issues.Add(issue);
         }
 
         if (_issues.Count == 0)

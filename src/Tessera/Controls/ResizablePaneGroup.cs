@@ -193,12 +193,9 @@ public sealed partial class ResizablePaneGroup : Control
         var previousId = previousPane?.Id;
 
         _panes.Clear();
-        foreach (var pane in panes)
+        foreach (var pane in panes.Where(static pane => pane is not null))
         {
-            if (pane is not null)
-            {
-                _panes.Add(pane with { });
-            }
+            _panes.Add(pane with { });
         }
 
         RebuildEvenSplits();

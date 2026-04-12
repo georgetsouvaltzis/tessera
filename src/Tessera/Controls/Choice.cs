@@ -1,4 +1,4 @@
-using Tessera.Controls.Internal;
+﻿using Tessera.Controls.Internal;
 using Tessera.Components.Primitives;
 using Tessera.Components.Primitives.Internal;
 using Tessera.Layout;
@@ -28,18 +28,33 @@ public sealed class Choice : Control
         set => field = value ?? string.Empty;
     } = "Choice";
 
+    /// <summary>
+    /// Represents focus marker.
+    /// </summary>
     public string FocusMarker
     {
         get;
         set => field = value ?? string.Empty;
     } = "*";
 
+    /// <summary>
+    /// Gets or sets whether show focus marker.
+    /// </summary>
     public bool ShowFocusMarker { get; set; } = true;
 
+    /// <summary>
+    /// Gets or sets the title style.
+    /// </summary>
     public TesseraStyle TitleStyle { get; set; } = TesseraStyle.Empty;
 
+    /// <summary>
+    /// Gets or sets the focused title style.
+    /// </summary>
     public TesseraStyle FocusedTitleStyle { get; set; } = TesseraStyle.Empty;
 
+    /// <summary>
+    /// Gets or sets the value style.
+    /// </summary>
     public TesseraStyle ValueStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
@@ -47,14 +62,29 @@ public sealed class Choice : Control
     /// </summary>
     public TesseraStyle HoveredValueStyle { get; set; } = TesseraStyle.Empty;
 
+    /// <summary>
+    /// Gets or sets the option style.
+    /// </summary>
     public TesseraStyle OptionStyle { get; set; } = TesseraStyle.Empty;
 
+    /// <summary>
+    /// Gets or sets the selected option style.
+    /// </summary>
     public TesseraStyle SelectedOptionStyle { get; set; } = TesseraStyle.Empty;
 
+    /// <summary>
+    /// Gets or sets the hovered option style.
+    /// </summary>
     public TesseraStyle HoveredOptionStyle { get; set; } = TesseraStyle.Empty;
 
+    /// <summary>
+    /// Gets or sets the muted style.
+    /// </summary>
     public TesseraStyle MutedStyle { get; set; } = TesseraStyle.Empty;
 
+    /// <summary>
+    /// Gets or sets the disabled style.
+    /// </summary>
     public TesseraStyle DisabledStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
@@ -114,18 +144,21 @@ public sealed class Choice : Control
     /// </summary>
     public string SelectedItem => _options.SelectedItem;
 
+    /// <inheritdoc />
     public override bool IsFocused
     {
         get;
         set;
     }
 
+    /// <inheritdoc />
     public override bool IsDisabled
     {
         get;
         set;
     }
 
+    /// <inheritdoc />
     public override bool IsReadOnly
     {
         get;
@@ -199,6 +232,7 @@ public sealed class Choice : Control
         return false;
     }
 
+    /// <inheritdoc />
     public override bool Handle(Message message)
     {
         if (!IsFocused || IsDisabled || IsReadOnly || _options.Count == 0 || message is not KeyPressed key)
@@ -238,14 +272,15 @@ public sealed class Choice : Control
 
         if (key.Is(Key.Enter) || key.IsCharacter(' '))
         {
-            var changed = SelectHighlighted();
+            _ = SelectHighlighted();
             IsOpen = false;
-            return changed || true;
+            return true;
         }
 
         return false;
     }
 
+    /// <inheritdoc />
     public override bool Handle(Message message, Rect bounds)
     {
         if (IsDisabled || IsReadOnly || _options.Count == 0 || message is not PointerInput pointer)
@@ -328,9 +363,9 @@ public sealed class Choice : Control
 
                 if (IsOpen && hoveredOptionIndex >= 0)
                 {
-                    changed |= SelectVisible(hoveredOptionIndex);
+                    _ = SelectVisible(hoveredOptionIndex);
                     IsOpen = false;
-                    return changed || true;
+                    return true;
                 }
 
                 break;
@@ -339,6 +374,7 @@ public sealed class Choice : Control
         return changed || Handle(message);
     }
 
+    /// <inheritdoc />
     public override void Render(Canvas canvas, Rect rect)
     {
         var clipped = Rect.Intersect(rect, canvas.Bounds);

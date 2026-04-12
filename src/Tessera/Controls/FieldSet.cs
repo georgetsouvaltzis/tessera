@@ -187,7 +187,15 @@ public sealed class FieldSet : Control
             _items.Add(item ?? string.Empty);
         }
 
-        _selectedIndex = _items.Count == 0 ? -1 : Math.Clamp(_selectedIndex < 0 ? 0 : _selectedIndex, 0, _items.Count - 1);
+        if (_items.Count == 0)
+        {
+            _selectedIndex = -1;
+        }
+        else
+        {
+            var seedIndex = _selectedIndex < 0 ? 0 : _selectedIndex;
+            _selectedIndex = Math.Clamp(seedIndex, 0, _items.Count - 1);
+        }
         _hoveredIndex = -1;
         _scrollOffset = 0;
     }

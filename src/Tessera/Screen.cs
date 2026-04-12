@@ -70,19 +70,6 @@ public sealed class Screen
         new(layout: new ComponentLayout(control ?? throw new ArgumentNullException(nameof(control))));
 
     /// <summary>
-    /// Builds a screen through the imperative window builder facade.
-    /// </summary>
-    /// <param name="configure">The window builder callback.</param>
-    /// <returns>A screen that renders the configured window layout.</returns>
-    public static Screen Build(Action<WindowBuilder> configure)
-    {
-        ArgumentNullException.ThrowIfNull(configure);
-        var builder = new WindowBuilder();
-        configure(builder);
-        return From(builder.Build());
-    }
-
-    /// <summary>
     /// Creates a screen from an advanced canvas component.
     /// </summary>
     /// <param name="component">The component to render.</param>
@@ -94,6 +81,19 @@ public sealed class Screen
     [EditorBrowsable(EditorBrowsableState.Advanced)]
     public static Screen From(ICanvasComponent component) =>
         new(layout: new ComponentLayout(component ?? throw new ArgumentNullException(nameof(component))));
+
+    /// <summary>
+    /// Builds a screen through the imperative window builder facade.
+    /// </summary>
+    /// <param name="configure">The window builder callback.</param>
+    /// <returns>A screen that renders the configured window layout.</returns>
+    public static Screen Build(Action<WindowBuilder> configure)
+    {
+        ArgumentNullException.ThrowIfNull(configure);
+        var builder = new WindowBuilder();
+        configure(builder);
+        return From(builder.Build());
+    }
 
     internal ScreenRenderResult Compile(IScreenCompiler compiler, ScreenContext context, ScreenOptions defaults)
     {

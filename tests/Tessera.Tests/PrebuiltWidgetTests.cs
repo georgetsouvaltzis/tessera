@@ -303,8 +303,8 @@ internal static class PrebuiltWidgetTests
         var visibleLines = StripAnsi(output).Split('\n');
 
         TestAssert.True(output.Contains(surfaceStyle.Render(" "), StringComparison.Ordinal), "Surface buttons should paint a plain rectangular background across the allocated box.");
-        TestAssert.True(!output.Contains("▐", StringComparison.Ordinal), "Surface buttons should not render rounded shell side glyphs.");
-        TestAssert.True(!output.Contains("╭", StringComparison.Ordinal), "Surface buttons should not render border glyphs.");
+        TestAssert.True(!output.Contains('▐'), "Surface buttons should not render rounded shell side glyphs.");
+        TestAssert.True(!output.Contains('╭'), "Surface buttons should not render border glyphs.");
         TestAssert.Equal("      ", visibleLines[0], "Top row should remain part of the rectangular button fill.");
         TestAssert.Equal("  Go  ", visibleLines[1], "Surface buttons should center the label inside the rectangular fill.");
         TestAssert.Equal("      ", visibleLines[2], "Bottom row should remain part of the rectangular button fill.");

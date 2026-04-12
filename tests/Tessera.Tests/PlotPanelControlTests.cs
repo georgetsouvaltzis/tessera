@@ -35,7 +35,7 @@ public sealed class PlotPanelControlTests
         };
         panel.SetPlots([first, second]);
 
-        var output = Render(panel, width: 72, height: 16);
+        var output = RenderControl(panel, width: 72, height: 16);
 
         Assert.That(output.Contains("Dashboard", StringComparison.Ordinal), Is.True);
         Assert.That(output.Contains("P1", StringComparison.Ordinal), Is.True);
@@ -51,7 +51,7 @@ public sealed class PlotPanelControlTests
             Border = BorderStyle.SingleLine,
         };
 
-        var output = Render(panel, width: 30, height: 6);
+        var output = RenderControl(panel, width: 30, height: 6);
 
         Assert.That(output.Contains("nothing", StringComparison.Ordinal), Is.True);
     }
@@ -77,7 +77,7 @@ public sealed class PlotPanelControlTests
         Assert.That(right.PointerCalls, Is.EqualTo(1));
     }
 
-    private static string Render(PlotPanel control, int width, int height)
+    private static string RenderControl(PlotPanel control, int width, int height)
     {
         var canvas = new Canvas(width, height);
         control.Render(canvas, new Rect(0, 0, width, height));

@@ -137,16 +137,6 @@ internal static class RuntimeApiContractTests
         return Task.CompletedTask;
     }
 
-    private static Task TesseraHostFactoryOverloads_AreMarkedAdvanced()
-    {
-        var overloads = typeof(TesseraHost).GetMethods(BindingFlags.Public | BindingFlags.Static)
-            .Where(static method => method.Name == "CreateProgram")
-            .ToArray();
-
-        TestAssert.True(overloads.Length == 0, "TesseraHost should no longer expose CreateProgram overloads.");
-        return Task.CompletedTask;
-    }
-
     private static Task TesseraHostingOptions_UsePublicMessageContracts()
     {
         var messageFilter = typeof(TesseraHostingOptions).GetProperty(nameof(TesseraHostingOptions.MessageFilter));

@@ -117,12 +117,12 @@ public sealed partial class FuzzyFinder
         {
             if (pointer.Button == PointerButton.WheelDown)
             {
-                return changed | MoveSelection(1);
+                return changed || MoveSelection(1);
             }
 
             if (pointer.Button == PointerButton.WheelUp)
             {
-                return changed | MoveSelection(-1);
+                return changed || MoveSelection(-1);
             }
         }
 
@@ -147,7 +147,7 @@ public sealed partial class FuzzyFinder
         changed |= SetHoveredIndex(index);
         if (index < 0)
         {
-            return changed || true;
+            return true;
         }
 
         changed |= SetSelectedIndex(index);

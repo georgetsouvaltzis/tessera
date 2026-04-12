@@ -54,9 +54,10 @@ public sealed class NUnitCaseAdapters
     }
 
     [TestCaseSource(nameof(Cases))]
-    public Task Execute(global::Tessera.Tests.TestCase testCase)
+    public async Task Execute(global::Tessera.Tests.TestCase testCase)
     {
-        return testCase.Execute();
+        Assert.That(testCase, Is.Not.Null);
+        await testCase.Execute();
     }
 
     private static TestCaseData ToCaseData(global::Tessera.Tests.TestCase testCase)

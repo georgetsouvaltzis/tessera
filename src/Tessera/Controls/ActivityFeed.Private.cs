@@ -114,7 +114,16 @@ public sealed partial class ActivityFeed
 
     private string FormatLine(ActivityFeedItem item, bool selected)
     {
-        var marker = selected ? SelectedMarker : item.IsUnread ? UnreadMarker : UnselectedMarker;
+        var marker = UnselectedMarker;
+        if (selected)
+        {
+            marker = SelectedMarker;
+        }
+        else if (item.IsUnread)
+        {
+            marker = UnreadMarker;
+        }
+
         return string.Concat(marker, " ", BuildBody(item));
     }
 

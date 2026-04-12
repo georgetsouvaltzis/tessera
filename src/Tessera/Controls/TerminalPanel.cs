@@ -131,8 +131,10 @@ public sealed class TerminalPanel : Control
     {
         ArgumentNullException.ThrowIfNull(lines);
         _lines.Clear();
-        foreach (var line in lines)
-            if (line is not null) _lines.Add(CloneLine(line));
+        foreach (var line in lines.Where(static line => line is not null))
+        {
+            _lines.Add(CloneLine(line));
+        }
 
         TrimToMaxLines();
         if (_lines.Count == 0) { _selectedIndex = -1; _hoveredIndex = -1; _scrollOffset = 0; return; }
@@ -183,8 +185,10 @@ public sealed class TerminalPanel : Control
     public void AppendRange(IEnumerable<TerminalPanelLine> lines)
     {
         ArgumentNullException.ThrowIfNull(lines);
-        foreach (var line in lines)
-            if (line is not null) _lines.Add(CloneLine(line));
+        foreach (var line in lines.Where(static line => line is not null))
+        {
+            _lines.Add(CloneLine(line));
+        }
 
         TrimToMaxLines();
         if (_lines.Count == 0) { _selectedIndex = -1; _hoveredIndex = -1; _scrollOffset = 0; return; }

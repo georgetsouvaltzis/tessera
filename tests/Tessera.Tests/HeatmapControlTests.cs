@@ -19,7 +19,7 @@ public sealed class HeatmapControlTests
             ShowRowLabels = true,
             ShowColumnLabels = true,
         };
-        control.SetMatrix(new double[,] { { 1, 2, 3 }, { 4, 5, 9 } });
+        control.SetMatrix(Matrix([1, 2, 3], [4, 5, 9]));
         control.SetRowLabels(["api", "db"]);
         control.SetColumnLabels(["n1", "n2", "n3"]);
 
@@ -27,7 +27,7 @@ public sealed class HeatmapControlTests
 
         TestAssert.True(output.Contains(" Utilization ", StringComparison.Ordinal), "Heatmap should render title.");
         TestAssert.True(output.Contains("api", StringComparison.Ordinal), "Heatmap should render row labels.");
-        TestAssert.True(output.Contains("n", StringComparison.Ordinal), "Heatmap should render column label glyphs.");
+        TestAssert.True(output.Contains('n'), "Heatmap should render column label glyphs.");
         TestAssert.True(output.Contains("low", StringComparison.Ordinal), "Heatmap should render implicit legend text.");
         TestAssert.True(output.Contains('█') || output.Contains('▓') || output.Contains('▒') || output.Contains('░'), "Heatmap should render heat glyphs.");
     }
@@ -43,7 +43,7 @@ public sealed class HeatmapControlTests
             ShowColumnLabels = false,
             IsFocused = true,
         };
-        control.SetMatrix(new double[,] { { 1, 2, 3 }, { 4, 5, 6 }, { 7, 8, 9 } });
+        control.SetMatrix(Matrix([1, 2, 3], [4, 5, 6], [7, 8, 9]));
 
         var changes = 0;
         control.SelectionChanged += (_, _) => changes++;
@@ -81,7 +81,7 @@ public sealed class HeatmapControlTests
             BorderStyleText = TesseraStyle.Empty.WithForeground(AnsiColor.Rgb(1, 2, 3)),
             FocusedBorderStyleText = focusedBorderStyle,
         };
-        control.SetMatrix(new double[,] { { 1, 9 } });
+        control.SetMatrix(Matrix([1, 9]));
         _ = control.SetSelectedCell(0, 1);
 
         var output = Render(control, 24, 8, CanvasTextMode.GraphemeAware);
@@ -100,7 +100,7 @@ public sealed class HeatmapControlTests
             ShowRowLabels = false,
             ShowColumnLabels = false,
         };
-        control.SetMatrix(new double[,] { { 1, 4, 9 }, { 2, 5, 8 } });
+        control.SetMatrix(Matrix([1, 4, 9], [2, 5, 8]));
 
         var first = Render(control, 20, 8);
         var second = Render(control, 20, 8);
@@ -127,7 +127,7 @@ public sealed class HeatmapControlTests
             new HeatmapLegend("cold", 0, 4.99, 'c', coldStyle),
             new HeatmapLegend("hot", 5, 10, 'h', hotStyle),
         ]);
-        control.SetMatrix(new double[,] { { 1, 9 } });
+        control.SetMatrix(Matrix([1, 9]));
 
         var output = Render(control, 28, 6, CanvasTextMode.GraphemeAware);
 
@@ -141,5 +141,10 @@ public sealed class HeatmapControlTests
         var canvas = new Canvas(width, height, mode);
         control.Render(canvas, new Rect(0, 0, width, height));
         return canvas.Render();
+    }
+
+    private static double[][] Matrix(params double[][] rows)
+    {
+        return rows;
     }
 }

@@ -1,4 +1,4 @@
-using Tessera.Components.Primitives;
+﻿using Tessera.Components.Primitives;
 using Tessera.Components.Primitives.Internal;
 using System.ComponentModel;
 using Tessera.Controls.Internal;
@@ -139,12 +139,16 @@ public sealed class Dialog : Control
         set;
     }
 
+    /// <inheritdoc />
     public override bool IsFocused
     {
         get;
         set;
     }
 
+    /// <summary>
+    /// Gets or sets the last result.
+    /// </summary>
     public DialogResult LastResult { get; private set; }
 
     /// <summary>
@@ -187,6 +191,7 @@ public sealed class Dialog : Control
         return true;
     }
 
+    /// <inheritdoc />
     public override bool Handle(Message message)
     {
         if (!IsVisible || !IsFocused || message is not KeyPressed key)
@@ -207,6 +212,7 @@ public sealed class Dialog : Control
         return false;
     }
 
+    /// <inheritdoc />
     public override void Render(Canvas canvas, Rect rect)
     {
         if (!IsVisible)

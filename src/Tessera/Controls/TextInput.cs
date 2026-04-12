@@ -1,4 +1,4 @@
-using Tessera.Components.Primitives;
+﻿using Tessera.Components.Primitives;
 using Tessera.Components.Primitives.Internal;
 using Tessera.Controls.Internal;
 using Tessera.Layout;
@@ -33,6 +33,10 @@ public sealed class TextInput : Control
     /// </summary>
     public event EventHandler<TextInputCancelledEventArgs>? Cancelled;
 
+    /// <summary>
+    /// Executes text input.
+    /// </summary>
+    /// <returns>The result of text input.</returns>
     public TextInput()
     {
     }
@@ -195,6 +199,7 @@ public sealed class TextInput : Control
         set => _input.MaskCharacter = value;
     }
 
+    /// <inheritdoc />
     public override bool IsFocused
     {
         get;
@@ -250,14 +255,27 @@ public sealed class TextInput : Control
         return true;
     }
 
+    /// <summary>
+    /// Gets or sets the last submitted value.
+    /// </summary>
     public string LastSubmittedValue { get; private set; } = string.Empty;
 
+    /// <summary>
+    /// Gets or sets the last cancelled value.
+    /// </summary>
     public string LastCancelledValue { get; private set; } = string.Empty;
 
+    /// <summary>
+    /// Represents submit count.
+    /// </summary>
     public int SubmitCount => _submitCount;
 
+    /// <summary>
+    /// Represents cancel count.
+    /// </summary>
     public int CancelCount => _cancelCount;
 
+    /// <inheritdoc />
     public override bool Handle(Message message)
     {
         if (IsDisabled || !IsFocused)
@@ -295,6 +313,7 @@ public sealed class TextInput : Control
         return true;
     }
 
+    /// <inheritdoc />
     public override void Render(Canvas canvas, Rect rect)
     {
         var clipped = Rect.Intersect(rect, canvas.Bounds);

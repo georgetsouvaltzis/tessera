@@ -75,6 +75,12 @@ public sealed class GroupedListSelectionChangedEventArgs<TGroup, TItem> : EventA
     public int? SelectedGroupIndex => CurrentGroupIndex;
 
     /// <summary>
+    /// Gets the group-key type carried by the owning grouped list.
+    /// </summary>
+    [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Advanced)]
+    public Type GroupKeyType => typeof(TGroup);
+
+    /// <summary>
     /// Gets previous selected item index within its group, when any.
     /// </summary>
     public int? PreviousItemIndex { get; }

@@ -1,4 +1,4 @@
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using Tessera.Components.Primitives;
 using Tessera.Components.Primitives.Internal;
 using Tessera.Controls.Internal;
@@ -20,50 +20,77 @@ public sealed class NumberInput : Control
     private long _submitVersion;
     private long _consumedSubmitVersion;
 
+    /// <summary>
+    /// Represents submitted.
+    /// </summary>
     public event EventHandler<NumberInputSubmittedEventArgs>? Submitted;
 
+    /// <summary>
+    /// Represents title.
+    /// </summary>
     public string Title
     {
         get;
         set => field = value ?? string.Empty;
     } = "Number Input";
 
+    /// <summary>
+    /// Represents focus marker.
+    /// </summary>
     public string FocusMarker
     {
         get;
         set => field = value ?? string.Empty;
     } = "*";
 
+    /// <summary>
+    /// Represents show focus marker.
+    /// </summary>
     public bool ShowFocusMarker
     {
         get;
         set;
     } = true;
 
+    /// <summary>
+    /// Represents title style.
+    /// </summary>
     public TesseraStyle TitleStyle
     {
         get;
         set;
     } = TesseraStyle.Empty;
 
+    /// <summary>
+    /// Represents focused title style.
+    /// </summary>
     public TesseraStyle FocusedTitleStyle
     {
         get;
         set;
     } = TesseraStyle.Empty;
 
+    /// <summary>
+    /// Represents value text style.
+    /// </summary>
     public TesseraStyle ValueTextStyle
     {
         get;
         set;
     } = TesseraStyle.Empty;
 
+    /// <summary>
+    /// Represents summary text style.
+    /// </summary>
     public TesseraStyle SummaryTextStyle
     {
         get;
         set;
     } = TesseraStyle.Empty;
 
+    /// <summary>
+    /// Represents disabled text style.
+    /// </summary>
     public TesseraStyle DisabledTextStyle
     {
         get;
@@ -88,72 +115,111 @@ public sealed class NumberInput : Control
         set;
     } = TesseraStyle.Empty;
 
+    /// <summary>
+    /// Represents border.
+    /// </summary>
     public BorderStyle Border
     {
         get;
         set;
     } = BorderStyle.SingleLine;
 
+    /// <summary>
+    /// Represents padding.
+    /// </summary>
     public Thickness Padding
     {
         get;
         set;
     }
 
+    /// <summary>
+    /// Represents min.
+    /// </summary>
     public double Min
     {
         get;
         set;
     }
 
+    /// <summary>
+    /// Represents max.
+    /// </summary>
     public double Max
     {
         get;
         set;
     } = 100.0;
 
+    /// <summary>
+    /// Represents step.
+    /// </summary>
     public double Step
     {
         get;
         set;
     } = 1.0;
 
+    /// <summary>
+    /// Represents precision.
+    /// </summary>
     public int Precision
     {
         get;
         set;
     } = 2;
 
+    /// <summary>
+    /// Gets or sets the value.
+    /// </summary>
     public double Value { get; private set; }
 
+    /// <summary>
+    /// Represents text.
+    /// </summary>
     public string Text => _input.Value;
 
+    /// <summary>
+    /// Gets or sets the last submitted value.
+    /// </summary>
     public double? LastSubmittedValue { get; private set; }
 
+    /// <inheritdoc />
     public override bool IsFocused
     {
         get;
         set;
     }
 
+    /// <inheritdoc />
     public override bool IsDisabled
     {
         get;
         set;
     }
 
+    /// <inheritdoc />
     public override bool IsReadOnly
     {
         get;
         set;
     }
 
+    /// <summary>
+    /// Executes set value.
+    /// </summary>
+    /// <param name="value">The value value.</param>
     public void SetValue(double value)
     {
         Value = NumberInputFormatting.Clamp(value, Min, Max);
         SyncInput();
     }
 
+    /// <summary>
+    /// Executes try consume submission.
+    /// </summary>
+    /// <param name="value">The value value.</param>
+    /// <returns><see langword="true" /> when try consume submission succeeds.</returns>
     [EditorBrowsable(EditorBrowsableState.Advanced)]
     public bool TryConsumeSubmission(out double value)
     {
@@ -168,6 +234,7 @@ public sealed class NumberInput : Control
         return true;
     }
 
+    /// <inheritdoc />
     public override bool Handle(Message message)
     {
         if (!IsFocused || IsDisabled || IsReadOnly)
@@ -238,6 +305,7 @@ public sealed class NumberInput : Control
         return result.Changed || result.Submitted;
     }
 
+    /// <inheritdoc />
     public override void Render(Canvas canvas, Rect rect)
     {
         var clipped = Rect.Intersect(rect, canvas.Bounds);

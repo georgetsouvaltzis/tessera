@@ -1,4 +1,4 @@
-using Tessera.Components.Primitives;
+﻿using Tessera.Components.Primitives;
 using Tessera.Components.Primitives.Internal;
 using Tessera.Controls.Internal;
 using Tessera.Components.Styling;
@@ -16,62 +16,95 @@ public sealed class TimePicker : Control
     private readonly WidgetStatePalette _fieldStatePalette = WidgetStatePalette.CreateDefault();
     private TimeField? _hoveredField;
 
+    /// <summary>
+    /// Represents value changed.
+    /// </summary>
     public event EventHandler<TimeValueChangedEventArgs>? ValueChanged;
 
+    /// <summary>
+    /// Represents title.
+    /// </summary>
     public string Title
     {
         get;
         set => field = value ?? string.Empty;
     } = "Time Picker";
 
+    /// <summary>
+    /// Represents focus marker.
+    /// </summary>
     public string FocusMarker
     {
         get;
         set => field = value ?? string.Empty;
     } = "*";
 
+    /// <summary>
+    /// Represents show focus marker.
+    /// </summary>
     public bool ShowFocusMarker
     {
         get;
         set;
     } = true;
 
+    /// <summary>
+    /// Represents title style.
+    /// </summary>
     public TesseraStyle TitleStyle
     {
         get;
         set;
     } = TesseraStyle.Empty;
 
+    /// <summary>
+    /// Represents focused title style.
+    /// </summary>
     public TesseraStyle FocusedTitleStyle
     {
         get;
         set;
     } = TesseraStyle.Empty;
 
+    /// <summary>
+    /// Represents value text style.
+    /// </summary>
     public TesseraStyle ValueTextStyle
     {
         get;
         set;
     } = TesseraStyle.Empty;
 
+    /// <summary>
+    /// Represents active field style.
+    /// </summary>
     public TesseraStyle ActiveFieldStyle
     {
         get;
         set;
     } = TesseraStyle.Empty;
 
+    /// <summary>
+    /// Represents hovered field style.
+    /// </summary>
     public TesseraStyle HoveredFieldStyle
     {
         get;
         set;
     } = TesseraStyle.Empty;
 
+    /// <summary>
+    /// Represents disabled value style.
+    /// </summary>
     public TesseraStyle DisabledValueStyle
     {
         get;
         set;
     } = TesseraStyle.Empty;
 
+    /// <summary>
+    /// Represents separator style.
+    /// </summary>
     public TesseraStyle SeparatorStyle
     {
         get;
@@ -96,60 +129,91 @@ public sealed class TimePicker : Control
         set;
     } = TesseraStyle.Empty;
 
+    /// <summary>
+    /// Represents border.
+    /// </summary>
     public BorderStyle Border
     {
         get;
         set;
     } = BorderStyle.SingleLine;
 
+    /// <summary>
+    /// Represents padding.
+    /// </summary>
     public Thickness Padding
     {
         get;
         set;
     }
 
+    /// <summary>
+    /// Gets or sets the value.
+    /// </summary>
     public TimeOnly Value { get; private set; } = TimeOnly.FromDateTime(DateTime.UtcNow);
 
+    /// <summary>
+    /// Gets or sets the last committed time.
+    /// </summary>
     public TimeOnly? LastCommittedTime { get; private set; }
 
+    /// <summary>
+    /// Gets or sets the active field.
+    /// </summary>
     public TimeField ActiveField { get; private set; }
 
+    /// <summary>
+    /// Represents hour step.
+    /// </summary>
     public int HourStep
     {
         get;
         set;
     } = 1;
 
+    /// <summary>
+    /// Represents minute step.
+    /// </summary>
     public int MinuteStep
     {
         get;
         set;
     } = 1;
 
+    /// <summary>
+    /// Represents second step.
+    /// </summary>
     public int SecondStep
     {
         get;
         set;
     } = 5;
 
+    /// <inheritdoc />
     public override bool IsFocused
     {
         get;
         set;
     }
 
+    /// <inheritdoc />
     public override bool IsDisabled
     {
         get;
         set;
     }
 
+    /// <inheritdoc />
     public override bool IsReadOnly
     {
         get;
         set;
     }
 
+    /// <summary>
+    /// Executes set value.
+    /// </summary>
+    /// <param name="time">The time value.</param>
     public void SetValue(TimeOnly time)
     {
         var previousValue = Value;
@@ -160,6 +224,7 @@ public sealed class TimePicker : Control
         }
     }
 
+    /// <inheritdoc />
     public override bool Handle(Message message)
     {
         if (!IsFocused || IsDisabled || IsReadOnly || message is not KeyPressed key)
@@ -200,6 +265,7 @@ public sealed class TimePicker : Control
         return false;
     }
 
+    /// <inheritdoc />
     public override bool Handle(Message message, Rect bounds)
     {
         if (IsDisabled || IsReadOnly || message is not PointerInput pointer)
@@ -265,6 +331,7 @@ public sealed class TimePicker : Control
         return changed || Handle(message);
     }
 
+    /// <inheritdoc />
     public override void Render(Canvas canvas, Rect rect)
     {
         var clipped = Rect.Intersect(rect, canvas.Bounds);

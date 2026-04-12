@@ -1,4 +1,4 @@
-using Tessera.Controls.Internal;
+﻿using Tessera.Controls.Internal;
 using Tessera.Components.Primitives;
 using Tessera.Components.Primitives.Internal;
 using Tessera.Layout;
@@ -33,20 +33,38 @@ public sealed class ComboBox : Control
         set => field = value ?? string.Empty;
     } = "ComboBox";
 
+    /// <summary>
+    /// Represents focus marker.
+    /// </summary>
     public string FocusMarker
     {
         get;
         set => field = value ?? string.Empty;
     } = "*";
 
+    /// <summary>
+    /// Gets or sets whether show focus marker.
+    /// </summary>
     public bool ShowFocusMarker { get; set; } = true;
 
+    /// <summary>
+    /// Gets or sets the title style.
+    /// </summary>
     public TesseraStyle TitleStyle { get; set; } = TesseraStyle.Empty;
 
+    /// <summary>
+    /// Gets or sets the focused title style.
+    /// </summary>
     public TesseraStyle FocusedTitleStyle { get; set; } = TesseraStyle.Empty;
 
+    /// <summary>
+    /// Gets or sets the value text style.
+    /// </summary>
     public TesseraStyle ValueTextStyle { get; set; } = TesseraStyle.Empty;
 
+    /// <summary>
+    /// Gets or sets the placeholder text style.
+    /// </summary>
     public TesseraStyle PlaceholderTextStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
@@ -54,14 +72,29 @@ public sealed class ComboBox : Control
     /// </summary>
     public TesseraStyle HoveredValueStyle { get; set; } = TesseraStyle.Empty;
 
+    /// <summary>
+    /// Gets or sets the option style.
+    /// </summary>
     public TesseraStyle OptionStyle { get; set; } = TesseraStyle.Empty;
 
+    /// <summary>
+    /// Gets or sets the selected option style.
+    /// </summary>
     public TesseraStyle SelectedOptionStyle { get; set; } = TesseraStyle.Empty;
 
+    /// <summary>
+    /// Gets or sets the hovered option style.
+    /// </summary>
     public TesseraStyle HoveredOptionStyle { get; set; } = TesseraStyle.Empty;
 
+    /// <summary>
+    /// Gets or sets the muted style.
+    /// </summary>
     public TesseraStyle MutedStyle { get; set; } = TesseraStyle.Empty;
 
+    /// <summary>
+    /// Gets or sets the disabled style.
+    /// </summary>
     public TesseraStyle DisabledStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
@@ -130,18 +163,21 @@ public sealed class ComboBox : Control
         set;
     }
 
+    /// <inheritdoc />
     public override bool IsFocused
     {
         get;
         set;
     }
 
+    /// <inheritdoc />
     public override bool IsDisabled
     {
         get;
         set;
     }
 
+    /// <inheritdoc />
     public override bool IsReadOnly
     {
         get;
@@ -222,6 +258,7 @@ public sealed class ComboBox : Control
         return false;
     }
 
+    /// <inheritdoc />
     public override bool Handle(Message message)
     {
         if (!IsFocused || IsDisabled || IsReadOnly)
@@ -278,6 +315,7 @@ public sealed class ComboBox : Control
         return inputResult.Submitted;
     }
 
+    /// <inheritdoc />
     public override bool Handle(Message message, Rect bounds)
     {
         if (IsDisabled || IsReadOnly || message is not PointerInput pointer)
@@ -360,9 +398,9 @@ public sealed class ComboBox : Control
 
                 if (IsOpen && hoveredOption >= 0)
                 {
-                    changed |= SetHighlightedVisibleIndex(hoveredOption);
-                    changed |= SelectHighlighted();
-                    return changed || true;
+                    _ = SetHighlightedVisibleIndex(hoveredOption);
+                    _ = SelectHighlighted();
+                    return true;
                 }
 
                 break;
@@ -371,6 +409,7 @@ public sealed class ComboBox : Control
         return changed || Handle(message);
     }
 
+    /// <inheritdoc />
     public override void Render(Canvas canvas, Rect rect)
     {
         var clipped = Rect.Intersect(rect, canvas.Bounds);

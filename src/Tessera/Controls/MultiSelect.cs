@@ -11,8 +11,12 @@ namespace Tessera.Controls;
 public sealed class MultiSelect : Control
 {
     private readonly List<(string Label, bool Checked)> _items = [];
+    private readonly List<string> _checkedItems = [];
     private int _hoveredIndex = -1;
 
+    /// <summary>
+    /// Represents title.
+    /// </summary>
     public string Title
     {
         get;
@@ -136,27 +140,45 @@ public sealed class MultiSelect : Control
         set => field = value ?? string.Empty;
     } = "[ ]";
 
+    /// <summary>
+    /// Gets or sets the selected index.
+    /// </summary>
     public int SelectedIndex { get; private set; }
 
+    /// <summary>
+    /// Represents selected item.
+    /// </summary>
     public string? SelectedItem =>
         SelectedIndex >= 0 && SelectedIndex < _items.Count
             ? _items[SelectedIndex].Label
             : null;
 
-    public IReadOnlyList<string> CheckedItems =>
-        _items.Where(static item => item.Checked).Select(static item => item.Label).ToArray();
+    /// <summary>
+    /// Represents checked items.
+    /// </summary>
+    public IReadOnlyList<string> CheckedItems => _checkedItems;
 
+    /// <summary>
+    /// Executes set items.
+    /// </summary>
+    /// <param name="items">The items value.</param>
     public void SetItems(IEnumerable<string> items)
     {
         ArgumentNullException.ThrowIfNull(items);
         SetItems(items.Select(static item => (item, false)));
     }
 
+    /// <summary>
+    /// Executes set items.
+    /// </summary>
+    /// <param name="items">The items value.</param>
+    /// <returns><see langword="true" /> when set items succeeds.</returns>
     public void SetItems(IEnumerable<(string Label, bool Checked)> items)
     {
         ArgumentNullException.ThrowIfNull(items);
         _items.Clear();
         _items.AddRange(items);
+        RebuildCheckedItems();
         if (SelectedIndex >= _items.Count)
         {
             SelectedIndex = Math.Max(0, _items.Count - 1);
@@ -165,6 +187,7 @@ public sealed class MultiSelect : Control
         _hoveredIndex = Math.Clamp(_hoveredIndex, -1, _items.Count - 1);
     }
 
+    /// <inheritdoc />
     public override bool Handle(Message message)
     {
         if (!IsFocused || IsDisabled || IsReadOnly || _items.Count == 0 || message is not KeyPressed key)
@@ -200,12 +223,14 @@ public sealed class MultiSelect : Control
         {
             var item = _items[SelectedIndex];
             _items[SelectedIndex] = (item.Label, !item.Checked);
+            RebuildCheckedItems();
             return true;
         }
 
         return false;
     }
 
+    /// <inheritdoc />
     public override bool Handle(Message message, Rect bounds)
     {
         if (IsDisabled || IsReadOnly || _items.Count == 0 || message is not PointerInput pointer || bounds.IsEmpty)
@@ -250,9 +275,11 @@ public sealed class MultiSelect : Control
 
         var item = _items[hovered];
         _items[hovered] = (item.Label, !item.Checked);
+        RebuildCheckedItems();
         return true;
     }
 
+    /// <inheritdoc />
     public override void Render(Canvas canvas, Rect rect)
     {
         canvas.DrawBox(rect, RenderTitle());
@@ -363,5 +390,17 @@ public sealed class MultiSelect : Control
 
         _hoveredIndex = index;
         return true;
+    }
+
+    private void RebuildCheckedItems()
+    {
+        _checkedItems.Clear();
+        foreach (var item in _items)
+        {
+            if (item.Checked)
+            {
+                _checkedItems.Add(item.Label);
+            }
+        }
     }
 }

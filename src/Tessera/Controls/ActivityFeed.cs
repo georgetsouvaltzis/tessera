@@ -225,12 +225,9 @@ public sealed partial class ActivityFeed : Control
     {
         ArgumentNullException.ThrowIfNull(items);
         _items.Clear();
-        foreach (var item in items)
+        foreach (var item in items.Where(static item => item is not null))
         {
-            if (item is not null)
-            {
-                _items.Add(Clone(item));
-            }
+            _items.Add(Clone(item));
         }
 
         if (_items.Count == 0)

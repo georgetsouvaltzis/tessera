@@ -1,4 +1,4 @@
-using Tessera.Components.Primitives;
+﻿using Tessera.Components.Primitives;
 using Tessera.Components.Primitives.Internal;
 using Tessera.Controls.Internal;
 using Tessera.Layout;
@@ -14,51 +14,136 @@ public sealed class KanbanBoard : Control
     private int _selectedCardIndex = -1;
     private int _hoveredLaneIndex = -1;
     private int _hoveredCardIndex = -1;
+    /// <summary>
+    /// Represents selection changed.
+    /// </summary>
     public event EventHandler<KanbanSelectionChangedEventArgs>? SelectionChanged;
+    /// <summary>
+    /// Represents title.
+    /// </summary>
     public string Title
     {
         get;
         set => field = value ?? string.Empty;
     } = "Kanban Board";
+    /// <summary>
+    /// Represents focus marker.
+    /// </summary>
     public string FocusMarker
     {
         get;
         set => field = value ?? string.Empty;
     } = "*";
+    /// <summary>
+    /// Gets or sets whether show focus marker.
+    /// </summary>
     public bool ShowFocusMarker { get; set; } = true;
+    /// <summary>
+    /// Represents selected card marker.
+    /// </summary>
     public string SelectedCardMarker
     {
         get;
         set => field = value ?? string.Empty;
     } = "▸";
+    /// <summary>
+    /// Represents unselected card marker.
+    /// </summary>
     public string UnselectedCardMarker
     {
         get;
         set => field = value ?? string.Empty;
     } = " ";
+    /// <summary>
+    /// Gets or sets the title style.
+    /// </summary>
     public TesseraStyle TitleStyle { get; set; } = TesseraStyle.Empty;
+    /// <summary>
+    /// Gets or sets the focused title style.
+    /// </summary>
     public TesseraStyle FocusedTitleStyle { get; set; } = TesseraStyle.Empty;
+    /// <summary>
+    /// Gets or sets the lane header style.
+    /// </summary>
     public TesseraStyle LaneHeaderStyle { get; set; } = TesseraStyle.Empty;
+    /// <summary>
+    /// Gets or sets the selected lane header style.
+    /// </summary>
     public TesseraStyle SelectedLaneHeaderStyle { get; set; } = TesseraStyle.Empty;
+    /// <summary>
+    /// Gets or sets the card style.
+    /// </summary>
     public TesseraStyle CardStyle { get; set; } = TesseraStyle.Empty;
+    /// <summary>
+    /// Gets or sets the selected card style.
+    /// </summary>
     public TesseraStyle SelectedCardStyle { get; set; } = TesseraStyle.Empty;
+    /// <summary>
+    /// Gets or sets the focused card style.
+    /// </summary>
     public TesseraStyle FocusedCardStyle { get; set; } = TesseraStyle.Empty;
+    /// <summary>
+    /// Gets or sets the hovered card style.
+    /// </summary>
     public TesseraStyle HoveredCardStyle { get; set; } = TesseraStyle.Empty;
+    /// <summary>
+    /// Gets or sets the disabled card style.
+    /// </summary>
     public TesseraStyle DisabledCardStyle { get; set; } = TesseraStyle.Empty;
+    /// <summary>
+    /// Gets or sets the error card style.
+    /// </summary>
     public TesseraStyle ErrorCardStyle { get; set; } = TesseraStyle.Empty;
+    /// <summary>
+    /// Gets or sets the border.
+    /// </summary>
     public BorderStyle Border { get; set; } = BorderStyle.SingleLine;
+    /// <summary>
+    /// Gets or sets the padding.
+    /// </summary>
     public Thickness Padding { get; set; }
+    /// <summary>
+    /// Gets or sets the border style text.
+    /// </summary>
     public TesseraStyle BorderStyleText { get; set; } = TesseraStyle.Empty;
+    /// <summary>
+    /// Gets or sets the focused border style text.
+    /// </summary>
     public TesseraStyle FocusedBorderStyleText { get; set; } = TesseraStyle.Empty;
+    /// <summary>
+    /// Gets or sets whether has error.
+    /// </summary>
     public bool HasError { get; set; }
+    /// <inheritdoc />
     public override bool IsFocused { get; set; }
+    /// <inheritdoc />
     public override bool IsDisabled { get; set; }
+    /// <inheritdoc />
     public override bool IsReadOnly { get; set; }
+    /// <summary>
+    /// Represents lanes.
+    /// </summary>
     public IReadOnlyList<KanbanLane> Lanes => _lanes;
+    /// <summary>
+    /// Represents selected lane index.
+    /// </summary>
     public int SelectedLaneIndex => _selectedLaneIndex;
+    /// <summary>
+    /// Represents selected card index.
+    /// </summary>
     public int SelectedCardIndex => _selectedCardIndex;
+    /// <summary>
+    /// Represents selected lane.
+    /// </summary>
     public KanbanLane? SelectedLane => _selectedLaneIndex >= 0 && _selectedLaneIndex < _lanes.Count ? _lanes[_selectedLaneIndex] : null;
+    /// <summary>
+    /// Represents selected card.
+    /// </summary>
     public KanbanCard? SelectedCard => SelectedLane is { } lane && _selectedCardIndex >= 0 && _selectedCardIndex < lane.Count ? lane.Cards[_selectedCardIndex] : null;
+    /// <summary>
+    /// Executes set lanes.
+    /// </summary>
+    /// <param name="lanes">The lanes value.</param>
     public void SetLanes(IEnumerable<KanbanLane> lanes)
     {
         ArgumentNullException.ThrowIfNull(lanes);
@@ -67,16 +152,19 @@ public sealed class KanbanBoard : Control
         var previousLane = SelectedLane;
         var previousCard = SelectedCard;
         _lanes.Clear();
-        foreach (var lane in lanes)
+        foreach (var lane in lanes.Where(static lane => lane is not null))
         {
-            if (lane is not null)
-            {
-                _lanes.Add(lane);
-            }
+            _lanes.Add(lane);
         }
         NormalizeSelection();
         RaiseSelectionChangedIfNeeded(previousLaneIndex, previousCardIndex, previousLane, previousCard);
     }
+    /// <summary>
+    /// Executes set selected.
+    /// </summary>
+    /// <param name="laneIndex">The lane index value.</param>
+    /// <param name="cardIndex">The card index value.</param>
+    /// <returns><see langword="true" /> when set selected succeeds.</returns>
     public bool SetSelected(int laneIndex, int cardIndex)
     {
         if (_lanes.Count == 0)
@@ -98,6 +186,7 @@ public sealed class KanbanBoard : Control
         RaiseSelectionChangedIfNeeded(previousLaneIndex, previousCardIndex, previousLane, previousCard);
         return true;
     }
+    /// <inheritdoc />
     public override bool Handle(Message message)
     {
         if (IsDisabled || IsReadOnly || !IsFocused || _lanes.Count == 0 || message is not KeyPressed key)
@@ -130,6 +219,7 @@ public sealed class KanbanBoard : Control
         }
         return false;
     }
+    /// <inheritdoc />
     public override bool Handle(Message message, Rect bounds)
     {
         if (message is not PointerInput pointer || bounds.IsEmpty || _lanes.Count == 0)
@@ -160,8 +250,7 @@ public sealed class KanbanBoard : Control
         if (!content.Contains(pointer.X, pointer.Y))
         {
             return pointer.Kind is PointerEventKind.Motion or PointerEventKind.Press
-                ? SetHovered(-1, -1)
-                : false;
+                && SetHovered(-1, -1);
         }
         var hit = TryHitLaneCard(content, pointer.X, pointer.Y, out var laneIndex, out var cardIndex);
         if (pointer.Kind == PointerEventKind.Motion)
@@ -176,11 +265,12 @@ public sealed class KanbanBoard : Control
             {
                 return changed;
             }
-            changed |= SetSelected(laneIndex, cardIndex >= 0 ? cardIndex : _selectedCardIndex);
-            return changed || true;
+            _ = SetSelected(laneIndex, cardIndex >= 0 ? cardIndex : _selectedCardIndex);
+            return true;
         }
         return false;
     }
+    /// <inheritdoc />
     public override void Render(Canvas canvas, Rect rect)
     {
         var clipped = Rect.Intersect(rect, canvas.Bounds);
@@ -326,9 +416,14 @@ public sealed class KanbanBoard : Control
     }
     private string FormatTitleText()
     {
-        return string.IsNullOrEmpty(Title)
-            ? string.Empty
-            : IsFocused && ShowFocusMarker && !string.IsNullOrWhiteSpace(FocusMarker) ? $"{Title} {FocusMarker}" : Title;
+        if (string.IsNullOrEmpty(Title))
+        {
+            return string.Empty;
+        }
+
+        return IsFocused && ShowFocusMarker && !string.IsNullOrWhiteSpace(FocusMarker)
+            ? $"{Title} {FocusMarker}"
+            : Title;
     }
     private string FormatTitleForMeasure()
     {

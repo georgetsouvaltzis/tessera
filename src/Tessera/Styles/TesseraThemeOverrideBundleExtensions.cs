@@ -1,11 +1,12 @@
-using Tessera.Controls;
+﻿using Tessera.Controls;
 
 namespace Tessera.Styles;
 
 /// <summary>
 /// Applies <see cref="TesseraThemeOverrideBundle" /> values to common dashboard-oriented controls.
 /// </summary>
-public static class TesseraThemeOverrideBundleExtensions
+
+public static class TesseraThemeOverrideBundleDashboardExtensions
 {
     /// <summary>
     /// Applies dashboard overrides to a <see cref="ListView{T}" />.
@@ -28,22 +29,6 @@ public static class TesseraThemeOverrideBundleExtensions
         control.HoveredRowStyle = bundle.HoveredItemStyle;
         control.SelectedRowStyle = bundle.SelectedItemStyle;
         return control;
-    }
-
-    /// <summary>
-    /// Applies the bundle theme, then dashboard overrides to a <see cref="ListView{T}" />.
-    /// </summary>
-    /// <typeparam name="T">The item type.</typeparam>
-    /// <param name="control">The list view instance.</param>
-    /// <param name="bundle">The override bundle to apply.</param>
-    /// <returns>The same <paramref name="control" /> instance.</returns>
-    public static ListView<T> ApplyThemeAndDashboardOverrides<T>(this ListView<T> control, TesseraThemeOverrideBundle bundle)
-    {
-        ArgumentNullException.ThrowIfNull(control);
-        ArgumentNullException.ThrowIfNull(bundle);
-
-        control.ApplyTheme(bundle.Theme);
-        return control.ApplyDashboardOverrides(bundle);
     }
 
     /// <summary>
@@ -70,21 +55,6 @@ public static class TesseraThemeOverrideBundleExtensions
     }
 
     /// <summary>
-    /// Applies the bundle theme, then dashboard overrides to a <see cref="Table" />.
-    /// </summary>
-    /// <param name="control">The table instance.</param>
-    /// <param name="bundle">The override bundle to apply.</param>
-    /// <returns>The same <paramref name="control" /> instance.</returns>
-    public static Table ApplyThemeAndDashboardOverrides(this Table control, TesseraThemeOverrideBundle bundle)
-    {
-        ArgumentNullException.ThrowIfNull(control);
-        ArgumentNullException.ThrowIfNull(bundle);
-
-        control.ApplyTheme(bundle.Theme);
-        return control.ApplyDashboardOverrides(bundle);
-    }
-
-    /// <summary>
     /// Applies dashboard overrides to a <see cref="Notifications" /> control.
     /// </summary>
     /// <param name="control">The notifications instance.</param>
@@ -105,21 +75,6 @@ public static class TesseraThemeOverrideBundleExtensions
     }
 
     /// <summary>
-    /// Applies the bundle theme, then dashboard overrides to a <see cref="Notifications" /> control.
-    /// </summary>
-    /// <param name="control">The notifications instance.</param>
-    /// <param name="bundle">The override bundle to apply.</param>
-    /// <returns>The same <paramref name="control" /> instance.</returns>
-    public static Notifications ApplyThemeAndDashboardOverrides(this Notifications control, TesseraThemeOverrideBundle bundle)
-    {
-        ArgumentNullException.ThrowIfNull(control);
-        ArgumentNullException.ThrowIfNull(bundle);
-
-        control.ApplyTheme(bundle.Theme);
-        return control.ApplyDashboardOverrides(bundle);
-    }
-
-    /// <summary>
     /// Applies dashboard overrides to a <see cref="LogView" />.
     /// </summary>
     /// <param name="control">The log view instance.</param>
@@ -135,21 +90,6 @@ public static class TesseraThemeOverrideBundleExtensions
         control.FocusedBorderStyleText = bundle.FocusedBorderStyleText;
         control.EntryStyle = bundle.EntryTextStyle;
         return control;
-    }
-
-    /// <summary>
-    /// Applies the bundle theme, then dashboard overrides to a <see cref="LogView" />.
-    /// </summary>
-    /// <param name="control">The log view instance.</param>
-    /// <param name="bundle">The override bundle to apply.</param>
-    /// <returns>The same <paramref name="control" /> instance.</returns>
-    public static LogView ApplyThemeAndDashboardOverrides(this LogView control, TesseraThemeOverrideBundle bundle)
-    {
-        ArgumentNullException.ThrowIfNull(control);
-        ArgumentNullException.ThrowIfNull(bundle);
-
-        control.ApplyTheme(bundle.Theme);
-        return control.ApplyDashboardOverrides(bundle);
     }
 
     /// <summary>
@@ -173,21 +113,6 @@ public static class TesseraThemeOverrideBundleExtensions
     }
 
     /// <summary>
-    /// Applies the bundle theme, then dashboard overrides to a <see cref="Button" />.
-    /// </summary>
-    /// <param name="control">The button instance.</param>
-    /// <param name="bundle">The override bundle to apply.</param>
-    /// <returns>The same <paramref name="control" /> instance.</returns>
-    public static Button ApplyThemeAndDashboardOverrides(this Button control, TesseraThemeOverrideBundle bundle)
-    {
-        ArgumentNullException.ThrowIfNull(control);
-        ArgumentNullException.ThrowIfNull(bundle);
-
-        control.ApplyTheme(bundle.Theme);
-        return control.ApplyDashboardOverrides(bundle);
-    }
-
-    /// <summary>
     /// Applies dashboard overrides to a <see cref="Dialog" />.
     /// </summary>
     /// <param name="control">The dialog instance.</param>
@@ -203,6 +128,88 @@ public static class TesseraThemeOverrideBundleExtensions
         control.FocusedBorderStyleText = bundle.FocusedBorderStyleText;
         control.BodyTextStyle = bundle.BodyTextStyle;
         return control;
+    }
+}
+
+/// <summary>
+/// Represents tessera theme override bundle theme and dashboard extensions.
+/// </summary>
+public static class TesseraThemeOverrideBundleThemeAndDashboardExtensions
+{
+    /// <summary>
+    /// Applies the bundle theme, then dashboard overrides to a <see cref="ListView{T}" />.
+    /// </summary>
+    /// <typeparam name="T">The item type.</typeparam>
+    /// <param name="control">The list view instance.</param>
+    /// <param name="bundle">The override bundle to apply.</param>
+    /// <returns>The same <paramref name="control" /> instance.</returns>
+    public static ListView<T> ApplyThemeAndDashboardOverrides<T>(this ListView<T> control, TesseraThemeOverrideBundle bundle)
+    {
+        ArgumentNullException.ThrowIfNull(control);
+        ArgumentNullException.ThrowIfNull(bundle);
+
+        control.ApplyTheme(bundle.Theme);
+        return control.ApplyDashboardOverrides(bundle);
+    }
+
+    /// <summary>
+    /// Applies the bundle theme, then dashboard overrides to a <see cref="Table" />.
+    /// </summary>
+    /// <param name="control">The table instance.</param>
+    /// <param name="bundle">The override bundle to apply.</param>
+    /// <returns>The same <paramref name="control" /> instance.</returns>
+    public static Table ApplyThemeAndDashboardOverrides(this Table control, TesseraThemeOverrideBundle bundle)
+    {
+        ArgumentNullException.ThrowIfNull(control);
+        ArgumentNullException.ThrowIfNull(bundle);
+
+        control.ApplyTheme(bundle.Theme);
+        return control.ApplyDashboardOverrides(bundle);
+    }
+
+    /// <summary>
+    /// Applies the bundle theme, then dashboard overrides to a <see cref="Notifications" /> control.
+    /// </summary>
+    /// <param name="control">The notifications instance.</param>
+    /// <param name="bundle">The override bundle to apply.</param>
+    /// <returns>The same <paramref name="control" /> instance.</returns>
+    public static Notifications ApplyThemeAndDashboardOverrides(this Notifications control, TesseraThemeOverrideBundle bundle)
+    {
+        ArgumentNullException.ThrowIfNull(control);
+        ArgumentNullException.ThrowIfNull(bundle);
+
+        control.ApplyTheme(bundle.Theme);
+        return control.ApplyDashboardOverrides(bundle);
+    }
+
+    /// <summary>
+    /// Applies the bundle theme, then dashboard overrides to a <see cref="LogView" />.
+    /// </summary>
+    /// <param name="control">The log view instance.</param>
+    /// <param name="bundle">The override bundle to apply.</param>
+    /// <returns>The same <paramref name="control" /> instance.</returns>
+    public static LogView ApplyThemeAndDashboardOverrides(this LogView control, TesseraThemeOverrideBundle bundle)
+    {
+        ArgumentNullException.ThrowIfNull(control);
+        ArgumentNullException.ThrowIfNull(bundle);
+
+        control.ApplyTheme(bundle.Theme);
+        return control.ApplyDashboardOverrides(bundle);
+    }
+
+    /// <summary>
+    /// Applies the bundle theme, then dashboard overrides to a <see cref="Button" />.
+    /// </summary>
+    /// <param name="control">The button instance.</param>
+    /// <param name="bundle">The override bundle to apply.</param>
+    /// <returns>The same <paramref name="control" /> instance.</returns>
+    public static Button ApplyThemeAndDashboardOverrides(this Button control, TesseraThemeOverrideBundle bundle)
+    {
+        ArgumentNullException.ThrowIfNull(control);
+        ArgumentNullException.ThrowIfNull(bundle);
+
+        control.ApplyTheme(bundle.Theme);
+        return control.ApplyDashboardOverrides(bundle);
     }
 
     /// <summary>

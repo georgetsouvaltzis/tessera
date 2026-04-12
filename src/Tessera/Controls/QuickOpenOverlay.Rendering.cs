@@ -57,19 +57,19 @@ public sealed partial class QuickOpenOverlay
             var marker = ResolveRowMarker(filteredIndex);
             var hasQuery = _query.Length > 0;
             var matchMarker = hasQuery
-                ? ApplyStyle(_glyphs.MatchMarker, MatchMarkerStyle.Merge(rowStyle))
+                ? ApplyStyle(Glyphs.MatchMarker, MatchMarkerStyle.Merge(rowStyle))
                 : string.Empty;
             var summary = BuildSummary(item);
             var line = hasQuery
-                ? string.Concat(marker, _glyphs.MarkerSeparator, matchMarker, _glyphs.MarkerSeparator, ApplyStyle(summary, rowStyle))
-                : string.Concat(marker, _glyphs.MarkerSeparator, ApplyStyle(summary, rowStyle));
+                ? string.Concat(marker, Glyphs.MarkerSeparator, matchMarker, Glyphs.MarkerSeparator, ApplyStyle(summary, rowStyle))
+                : string.Concat(marker, Glyphs.MarkerSeparator, ApplyStyle(summary, rowStyle));
             canvas.WriteText(content.X, content.Y + 1 + row, line, content.Width);
         }
     }
 
     private void RenderQuery(Canvas canvas, Rect content)
     {
-        var prompt = string.Concat(_glyphs.QueryPrompt, _glyphs.MarkerSeparator);
+        var prompt = string.Concat(Glyphs.QueryPrompt, Glyphs.MarkerSeparator);
         var visibleText = string.IsNullOrEmpty(_query) ? Placeholder : _query;
         var queryStyle = string.IsNullOrEmpty(_query) ? PlaceholderStyle : QueryTextStyle;
         if (IsDisabled)
@@ -145,15 +145,15 @@ public sealed partial class QuickOpenOverlay
     {
         if (filteredIndex == _selectedFilteredIndex)
         {
-            return _glyphs.SelectedRowMarker;
+            return Glyphs.SelectedRowMarker;
         }
 
         if (filteredIndex == _hoveredFilteredIndex)
         {
-            return _glyphs.HoveredRowMarker;
+            return Glyphs.HoveredRowMarker;
         }
 
-        return _glyphs.NormalRowMarker;
+        return Glyphs.NormalRowMarker;
     }
 
     private static string ClipToWidth(string text, int width)

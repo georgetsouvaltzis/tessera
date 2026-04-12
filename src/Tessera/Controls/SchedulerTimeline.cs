@@ -1,4 +1,4 @@
-using System.Globalization;
+﻿using System.Globalization;
 using Tessera.Components.Primitives;
 using Tessera.Controls.Internal;
 using Tessera.Layout;
@@ -30,72 +30,141 @@ public sealed class SchedulerTimeline : Control
         set => field = value ?? string.Empty;
     } = "Schedule";
 
+    /// <summary>
+    /// Represents focus marker.
+    /// </summary>
     public string FocusMarker
     {
         get;
         set => field = value ?? string.Empty;
     } = "*";
 
+    /// <summary>
+    /// Gets or sets whether show focus marker.
+    /// </summary>
     public bool ShowFocusMarker { get; set; } = true;
 
+    /// <summary>
+    /// Gets or sets the title style.
+    /// </summary>
     public TesseraStyle TitleStyle { get; set; } = TesseraStyle.Empty;
 
+    /// <summary>
+    /// Gets or sets the focused title style.
+    /// </summary>
     public TesseraStyle FocusedTitleStyle { get; set; } = TesseraStyle.Empty;
 
+    /// <summary>
+    /// Gets or sets the time text style.
+    /// </summary>
     public TesseraStyle TimeTextStyle { get; set; } = TesseraStyle.Empty;
 
+    /// <summary>
+    /// Gets or sets the entry text style.
+    /// </summary>
     public TesseraStyle EntryTextStyle { get; set; } = TesseraStyle.Empty;
 
+    /// <summary>
+    /// Gets or sets the meta text style.
+    /// </summary>
     public TesseraStyle MetaTextStyle { get; set; } = TesseraStyle.Empty;
 
+    /// <summary>
+    /// Gets or sets the selected row style.
+    /// </summary>
     public TesseraStyle SelectedRowStyle { get; set; } = TesseraStyle.Empty;
 
+    /// <summary>
+    /// Gets or sets the muted row style.
+    /// </summary>
     public TesseraStyle MutedRowStyle { get; set; } = TesseraStyle.Empty;
 
+    /// <summary>
+    /// Gets or sets the conflict row style.
+    /// </summary>
     public TesseraStyle ConflictRowStyle { get; set; } = TesseraStyle.Empty;
 
+    /// <summary>
+    /// Gets or sets the disabled style.
+    /// </summary>
     public TesseraStyle DisabledStyle { get; set; } = TesseraStyle.Empty;
 
+    /// <summary>
+    /// Gets or sets the padding.
+    /// </summary>
     public Thickness Padding { get; set; }
 
+    /// <summary>
+    /// Gets or sets the page size.
+    /// </summary>
     public int PageSize { get; set; } = 8;
 
+    /// <summary>
+    /// Gets or sets whether show duration.
+    /// </summary>
     public bool ShowDuration { get; set; } = true;
 
+    /// <summary>
+    /// Represents time format.
+    /// </summary>
     public string TimeFormat
     {
         get;
         set => field = string.IsNullOrWhiteSpace(value) ? "HH:mm" : value;
     } = "HH:mm";
 
+    /// <summary>
+    /// Represents selected marker.
+    /// </summary>
     public string SelectedMarker
     {
         get;
         set => field = value ?? string.Empty;
     } = ">";
 
+    /// <summary>
+    /// Represents unselected marker.
+    /// </summary>
     public string UnselectedMarker
     {
         get;
         set => field = value ?? string.Empty;
     } = " ";
 
+    /// <summary>
+    /// Represents conflict marker.
+    /// </summary>
     public string ConflictMarker
     {
         get;
         set => field = value ?? string.Empty;
     } = "!";
 
+    /// <summary>
+    /// Represents empty text.
+    /// </summary>
     public string EmptyText
     {
         get;
         set => field = value ?? string.Empty;
     } = "(no entries)";
 
+    /// <summary>
+    /// Gets or sets the empty text style.
+    /// </summary>
     public TesseraStyle EmptyTextStyle { get; set; } = TesseraStyle.Empty;
 
+    /// <summary>
+    /// Represents entries.
+    /// </summary>
     public IReadOnlyList<SchedulerEntry> Entries => _entries;
+    /// <summary>
+    /// Represents selected index.
+    /// </summary>
     public int SelectedIndex => _entries.Count == 0 ? -1 : _selectedIndex;
+    /// <summary>
+    /// Represents selected entry.
+    /// </summary>
     public SchedulerEntry? SelectedEntry => _entries.Count == 0 ? null : _entries[_selectedIndex];
 
     /// <inheritdoc />
@@ -134,6 +203,10 @@ public sealed class SchedulerTimeline : Control
         RaiseSelectionChangedIfNeeded(previousIndex, previousEntry);
     }
 
+    /// <summary>
+    /// Executes add entry.
+    /// </summary>
+    /// <param name="entry">The entry value.</param>
     public void AddEntry(SchedulerEntry entry)
     {
         ArgumentNullException.ThrowIfNull(entry);
@@ -143,6 +216,9 @@ public sealed class SchedulerTimeline : Control
         _scrollOffset = Math.Clamp(_scrollOffset, 0, Math.Max(0, _entries.Count - 1));
     }
 
+    /// <summary>
+    /// Executes clear.
+    /// </summary>
     public void Clear()
     {
         var previousIndex = SelectedIndex;

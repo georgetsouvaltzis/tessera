@@ -1,4 +1,4 @@
-using Tessera.Components.Primitives;
+﻿using Tessera.Components.Primitives;
 using Tessera.Components.Primitives.Internal;
 using Tessera.Controls.Internal;
 using Tessera.Layout;
@@ -132,17 +132,20 @@ public sealed class KeyValueList : Control
         var previousItem = SelectedItem;
 
         _entries.Clear();
-        foreach (var entry in entries)
+        foreach (var entry in entries.Where(static entry => entry is not null))
         {
-            if (entry is not null)
-            {
-                _entries.Add(entry);
-            }
+            _entries.Add(entry);
         }
 
-        _selectedIndex = _entries.Count == 0
-            ? -1
-            : Math.Clamp(_selectedIndex < 0 ? 0 : _selectedIndex, 0, _entries.Count - 1);
+        if (_entries.Count == 0)
+        {
+            _selectedIndex = -1;
+        }
+        else
+        {
+            var seedIndex = _selectedIndex < 0 ? 0 : _selectedIndex;
+            _selectedIndex = Math.Clamp(seedIndex, 0, _entries.Count - 1);
+        }
         _scrollOffset = 0;
         RaiseSelectionChangedIfNeeded(previousIndex, previousItem);
     }
@@ -172,6 +175,7 @@ public sealed class KeyValueList : Control
         return true;
     }
 
+    /// <inheritdoc />
     public override bool Handle(Message message)
     {
         if (IsDisabled || IsReadOnly || !IsFocused || _entries.Count == 0 || message is not KeyPressed key)
@@ -202,6 +206,7 @@ public sealed class KeyValueList : Control
         return false;
     }
 
+    /// <inheritdoc />
     public override bool Handle(Message message, Rect bounds)
     {
         if (IsDisabled || IsReadOnly || message is not PointerInput pointer || bounds.IsEmpty)
@@ -247,6 +252,7 @@ public sealed class KeyValueList : Control
         return index >= 0 && index < _entries.Count && SetSelectedIndex(index);
     }
 
+    /// <inheritdoc />
     public override void Render(Canvas canvas, Rect rect)
     {
         var clipped = Rect.Intersect(rect, canvas.Bounds);

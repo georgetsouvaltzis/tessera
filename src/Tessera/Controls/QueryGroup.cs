@@ -30,12 +30,9 @@ public sealed class QueryGroup
     {
         ArgumentNullException.ThrowIfNull(rules);
         _rules.Clear();
-        foreach (var rule in rules)
+        foreach (var rule in rules.Where(static rule => rule is not null))
         {
-            if (rule is not null)
-            {
-                _rules.Add(rule);
-            }
+            _rules.Add(rule);
         }
     }
 

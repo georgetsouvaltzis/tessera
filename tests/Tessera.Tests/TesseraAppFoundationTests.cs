@@ -162,29 +162,6 @@ internal static class TesseraAppFoundationTests
         public override Screen Build(ScreenContext context) => Screen.From(_booted ? "booted" : "cold");
     }
 
-    private sealed class RecordingControl : Control
-    {
-        public Message? LastMessage { get; private set; }
-
-        public Message? LastPointer { get; private set; }
-
-        public override void Render(Canvas canvas, Rect rect)
-        {
-        }
-
-        public override bool Handle(Message message)
-        {
-            LastMessage = message;
-            return true;
-        }
-
-        public override bool Handle(Message message, Rect bounds)
-        {
-            LastPointer = message;
-            return true;
-        }
-    }
-
     private sealed record IncrementRequested : Message;
 
     private sealed class TesseraAppDriver

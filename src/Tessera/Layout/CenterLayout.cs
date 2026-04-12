@@ -1,4 +1,4 @@
-using Tessera.Components.Primitives;
+﻿using Tessera.Components.Primitives;
 using Tessera.Controls;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
@@ -34,6 +34,14 @@ public sealed class CenterLayout : LayoutNode
         Margin = margin;
     }
 
+    /// <summary>
+    /// Executes center layout.
+    /// </summary>
+    /// <param name="component">The component value.</param>
+    /// <param name="width">The width value.</param>
+    /// <param name="height">The height value.</param>
+    /// <param name="margin">The margin value.</param>
+    /// <returns>The result of center layout.</returns>
     [EditorBrowsable(EditorBrowsableState.Advanced)]
     [SetsRequiredMembers]
     public CenterLayout(

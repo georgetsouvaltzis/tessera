@@ -1,4 +1,5 @@
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using NUnit.Framework;
 using Tessera.Controls;
 using Tessera.Styles;
@@ -67,9 +68,14 @@ public sealed class ThemeFocusMarkerParityPolicyTests
         }
     }
 
-    private static IReadOnlyList<MarkerPolicy> ResolvePolicies()
+    private static List<MarkerPolicy> ResolvePolicies()
     {
-        var extensionMethods = typeof(TesseraThemeControlExtensions).GetMethods(BindingFlags.Public | BindingFlags.Static);
+        var extensionMethods = typeof(TesseraThemeControlExtensions).Assembly
+            .GetTypes()
+            .Where(static type => type.IsSealed && type.IsAbstract)
+            .SelectMany(static type => type.GetMethods(BindingFlags.Public | BindingFlags.Static))
+            .Where(static method => method.IsDefined(typeof(ExtensionAttribute), inherit: false))
+            .ToArray();
         var policies = new List<MarkerPolicy>(capacity: PolicyControlTypes.Length);
 
         for (var index = 0; index < PolicyControlTypes.Length; index++)
@@ -81,8 +87,8 @@ public sealed class ThemeFocusMarkerParityPolicyTests
                 continue;
             }
 
-            var applyTheme = FindExtensionMethod(extensionMethods, nameof(TesseraThemeControlExtensions.ApplyTheme), controlType);
-            var applyThemeDefaults = FindExtensionMethod(extensionMethods, nameof(TesseraThemeControlExtensions.ApplyThemeDefaults), controlType);
+            var applyTheme = FindExtensionMethod(extensionMethods, "ApplyTheme", controlType);
+            var applyThemeDefaults = FindExtensionMethod(extensionMethods, "ApplyThemeDefaults", controlType);
             if (applyTheme is null || applyThemeDefaults is null)
             {
                 continue;

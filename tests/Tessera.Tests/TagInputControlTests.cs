@@ -25,12 +25,15 @@ public sealed class TagInputControlTests
         Assert.That(removed, Is.True);
         Assert.That(events, Has.Count.EqualTo(3));
 
+        var initialTags = new[] { "ops", "infra" };
+        var updatedTags = new[] { "ops", "infra", "alerts" };
+        var finalTags = new[] { "ops", "alerts" };
         Assert.That(events[0].PreviousTags, Is.Empty);
-        Assert.That(events[0].Tags, Is.EqualTo(new[] { "ops", "infra" }));
-        Assert.That(events[1].PreviousTags, Is.EqualTo(new[] { "ops", "infra" }));
-        Assert.That(events[1].Tags, Is.EqualTo(new[] { "ops", "infra", "alerts" }));
-        Assert.That(events[2].PreviousTags, Is.EqualTo(new[] { "ops", "infra", "alerts" }));
-        Assert.That(events[2].Tags, Is.EqualTo(new[] { "ops", "alerts" }));
+        Assert.That(events[0].Tags, Is.EqualTo(initialTags));
+        Assert.That(events[1].PreviousTags, Is.EqualTo(initialTags));
+        Assert.That(events[1].Tags, Is.EqualTo(updatedTags));
+        Assert.That(events[2].PreviousTags, Is.EqualTo(updatedTags));
+        Assert.That(events[2].Tags, Is.EqualTo(finalTags));
     }
 
     [Test]
@@ -73,7 +76,8 @@ public sealed class TagInputControlTests
         Assert.That(added, Is.True);
         Assert.That(removed, Is.True);
         Assert.That(control.InputValue, Is.Empty);
-        Assert.That(control.Tags, Is.EqualTo(new[] { "infra" }));
+        var expectedTags = new[] { "infra" };
+        Assert.That(control.Tags, Is.EqualTo(expectedTags));
         Assert.That(events, Is.EqualTo(3));
     }
 
@@ -233,7 +237,7 @@ public sealed class TagInputControlTests
         var output = StripAnsi(canvas.Render());
         var lines = output.Split('\n');
 
-        TestAssert.True(!output.Contains("…", StringComparison.Ordinal), "Wrapped TagInput should not collapse overflow behind ellipsis.");
+        TestAssert.True(!output.Contains('…'), "Wrapped TagInput should not collapse overflow behind ellipsis.");
         TestAssert.True(lines[0].Contains("alpha", StringComparison.Ordinal), "Tag flow should start from the left-most chip.");
         TestAssert.True(lines[1].Contains("gamma", StringComparison.Ordinal) || lines[1].Contains("delta", StringComparison.Ordinal), "Tags should continue on later rows when width is exhausted.");
         TestAssert.True(lines[2].StartsWith(" release", StringComparison.Ordinal), "Input should wrap to a fresh line instead of starting in a tiny tail slot.");
@@ -262,7 +266,7 @@ public sealed class TagInputControlTests
         var output = StripAnsi(canvas.Render());
 
         TestAssert.True(output.Contains("ijkl", StringComparison.Ordinal), "Constrained height should keep the newest input tail visible.");
-        TestAssert.True(output.Contains("|", StringComparison.Ordinal), "Visible viewport should keep the active caret visible.");
+        TestAssert.True(output.Contains('|'), "Visible viewport should keep the active caret visible.");
         TestAssert.True(!output.Contains("abcd", StringComparison.Ordinal), "Viewport should follow the active typing region instead of pinning the earliest input rows.");
     }
 

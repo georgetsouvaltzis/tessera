@@ -29,9 +29,12 @@ internal static class TextInputFrameBuilder
             visible = visible[currentLineRange.Start..currentLineRange.End];
         }
 
-        var lineCursor = isPlaceholder
-            ? 0
-            : Math.Clamp(multiline ? cursor - currentLineRange.Start : cursor, 0, visible.Length);
+        var lineCursor = 0;
+        if (!isPlaceholder)
+        {
+            var unclampedCursor = multiline ? cursor - currentLineRange.Start : cursor;
+            lineCursor = Math.Clamp(unclampedCursor, 0, visible.Length);
+        }
 
         var start = 0;
         if (lineCursor >= width)

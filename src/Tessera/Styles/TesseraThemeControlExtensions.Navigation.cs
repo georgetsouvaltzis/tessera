@@ -1,8 +1,11 @@
-using Tessera.Controls;
+﻿using Tessera.Controls;
 
 namespace Tessera.Styles;
 
-public static partial class TesseraThemeControlExtensions
+/// <summary>
+/// Represents tessera theme control extensions navigation apply extensions.
+/// </summary>
+public static class TesseraThemeControlExtensionsNavigationApplyExtensions
 {
     /// <summary>
     /// Applies a resolved theme to a <see cref="Breadcrumb"/>.
@@ -33,39 +36,6 @@ public static partial class TesseraThemeControlExtensions
         ArgumentNullException.ThrowIfNull(overrides);
         var resolved = overrides.Resolve(control, baseTheme, state);
         return control.ApplyTheme(resolved);
-    }
-
-    /// <summary>
-    /// Applies theme defaults to a <see cref="Breadcrumb"/> without overwriting explicit non-empty styles.
-    /// </summary>
-    public static Breadcrumb ApplyThemeDefaults(this Breadcrumb control, TesseraTheme theme)
-    {
-        ArgumentNullException.ThrowIfNull(control);
-        ArgumentNullException.ThrowIfNull(theme);
-
-        control.TitleStyle = ApplyDefault(control.TitleStyle, theme.Text.Secondary);
-        control.FocusedTitleStyle = ApplyDefault(control.FocusedTitleStyle, theme.Focus.Title);
-        control.FocusMarker = ApplyDefault(control.FocusMarker, theme.Focus.Marker);
-        control.ItemStyle = ApplyDefault(control.ItemStyle, theme.Text.Primary);
-        control.SelectedItemStyle = ApplyDefault(
-            control.SelectedItemStyle,
-            theme.Selection.Foreground.Merge(theme.Selection.Background));
-        control.SeparatorStyle = ApplyDefault(control.SeparatorStyle, theme.Text.Muted);
-        return control;
-    }
-
-    /// <summary>
-    /// Resolves and applies hierarchical defaults to a <see cref="Breadcrumb"/> without overwriting explicit non-empty styles.
-    /// </summary>
-    public static Breadcrumb ApplyThemeDefaults(
-        this Breadcrumb control,
-        TesseraThemeOverrides overrides,
-        TesseraTheme baseTheme,
-        TesseraThemeVisualState state = TesseraThemeVisualState.Default)
-    {
-        ArgumentNullException.ThrowIfNull(overrides);
-        var resolved = overrides.Resolve(control, baseTheme, state);
-        return control.ApplyThemeDefaults(resolved);
     }
 
     /// <summary>
@@ -100,38 +70,11 @@ public static partial class TesseraThemeControlExtensions
     }
 
     /// <summary>
-    /// Applies theme defaults to a <see cref="Paginator"/> without overwriting explicit non-empty styles.
+    /// Executes apply theme.
     /// </summary>
-    public static Paginator ApplyThemeDefaults(this Paginator control, TesseraTheme theme)
-    {
-        ArgumentNullException.ThrowIfNull(control);
-        ArgumentNullException.ThrowIfNull(theme);
-
-        control.TitleStyle = ApplyDefault(control.TitleStyle, theme.Text.Secondary);
-        control.FocusedTitleStyle = ApplyDefault(control.FocusedTitleStyle, theme.Focus.Title);
-        control.FocusMarker = ApplyDefault(control.FocusMarker, theme.Focus.Marker);
-        control.LabelStyle = ApplyDefault(control.LabelStyle, theme.Text.Primary);
-        control.ActivePageLabelStyle = ApplyDefault(
-            control.ActivePageLabelStyle,
-            theme.Selection.Foreground.Merge(theme.Selection.Background));
-        control.DisabledNavigationLabelStyle = ApplyDefault(control.DisabledNavigationLabelStyle, theme.Text.Muted);
-        return control;
-    }
-
-    /// <summary>
-    /// Resolves and applies hierarchical defaults to a <see cref="Paginator"/> without overwriting explicit non-empty styles.
-    /// </summary>
-    public static Paginator ApplyThemeDefaults(
-        this Paginator control,
-        TesseraThemeOverrides overrides,
-        TesseraTheme baseTheme,
-        TesseraThemeVisualState state = TesseraThemeVisualState.Default)
-    {
-        ArgumentNullException.ThrowIfNull(overrides);
-        var resolved = overrides.Resolve(control, baseTheme, state);
-        return control.ApplyThemeDefaults(resolved);
-    }
-
+    /// <param name="control">The control value.</param>
+    /// <param name="theme">The theme value.</param>
+    /// <returns>The result of apply theme.</returns>
     public static Toolbar ApplyTheme(this Toolbar control, TesseraTheme theme)
     {
         ArgumentNullException.ThrowIfNull(control);
@@ -147,6 +90,14 @@ public static partial class TesseraThemeControlExtensions
         return control;
     }
 
+    /// <summary>
+    /// Executes apply theme.
+    /// </summary>
+    /// <param name="control">The control value.</param>
+    /// <param name="overrides">The overrides value.</param>
+    /// <param name="baseTheme">The base theme value.</param>
+    /// <param name="state">The state value.</param>
+    /// <returns>The result of apply theme.</returns>
     public static Toolbar ApplyTheme(
         this Toolbar control,
         TesseraThemeOverrides overrides,
@@ -157,33 +108,12 @@ public static partial class TesseraThemeControlExtensions
         return control.ApplyTheme(overrides.Resolve(control, baseTheme, state));
     }
 
-    public static Toolbar ApplyThemeDefaults(this Toolbar control, TesseraTheme theme)
-    {
-        ArgumentNullException.ThrowIfNull(control);
-        ArgumentNullException.ThrowIfNull(theme);
-
-        control.TitleStyle = ApplyDefault(control.TitleStyle, theme.Text.Secondary);
-        control.FocusedTitleStyle = ApplyDefault(control.FocusedTitleStyle, theme.Focus.Title);
-        control.FocusMarker = ApplyDefault(control.FocusMarker, theme.Focus.Marker);
-        control.ItemStyle = ApplyDefault(control.ItemStyle, theme.Text.Primary);
-        control.SelectedItemStyle = ApplyDefault(
-            control.SelectedItemStyle,
-            theme.Selection.Foreground.Merge(theme.Selection.Background));
-        control.FocusedItemStyle = ApplyDefault(control.FocusedItemStyle, theme.Focus.Ring);
-        control.SeparatorStyle = ApplyDefault(control.SeparatorStyle, theme.Text.Muted);
-        return control;
-    }
-
-    public static Toolbar ApplyThemeDefaults(
-        this Toolbar control,
-        TesseraThemeOverrides overrides,
-        TesseraTheme baseTheme,
-        TesseraThemeVisualState state = TesseraThemeVisualState.Default)
-    {
-        ArgumentNullException.ThrowIfNull(overrides);
-        return control.ApplyThemeDefaults(overrides.Resolve(control, baseTheme, state));
-    }
-
+    /// <summary>
+    /// Executes apply theme.
+    /// </summary>
+    /// <param name="control">The control value.</param>
+    /// <param name="theme">The theme value.</param>
+    /// <returns>The result of apply theme.</returns>
     public static CommandBar ApplyTheme(this CommandBar control, TesseraTheme theme)
     {
         ArgumentNullException.ThrowIfNull(control);
@@ -200,6 +130,14 @@ public static partial class TesseraThemeControlExtensions
         return control;
     }
 
+    /// <summary>
+    /// Executes apply theme.
+    /// </summary>
+    /// <param name="control">The control value.</param>
+    /// <param name="overrides">The overrides value.</param>
+    /// <param name="baseTheme">The base theme value.</param>
+    /// <param name="state">The state value.</param>
+    /// <returns>The result of apply theme.</returns>
     public static CommandBar ApplyTheme(
         this CommandBar control,
         TesseraThemeOverrides overrides,
@@ -210,34 +148,12 @@ public static partial class TesseraThemeControlExtensions
         return control.ApplyTheme(overrides.Resolve(control, baseTheme, state));
     }
 
-    public static CommandBar ApplyThemeDefaults(this CommandBar control, TesseraTheme theme)
-    {
-        ArgumentNullException.ThrowIfNull(control);
-        ArgumentNullException.ThrowIfNull(theme);
-
-        control.TitleStyle = ApplyDefault(control.TitleStyle, theme.Text.Secondary);
-        control.FocusedTitleStyle = ApplyDefault(control.FocusedTitleStyle, theme.Focus.Title);
-        control.FocusMarker = ApplyDefault(control.FocusMarker, theme.Focus.Marker);
-        control.ItemStyle = ApplyDefault(control.ItemStyle, theme.Text.Primary);
-        control.HoveredItemStyle = ApplyDefault(control.HoveredItemStyle, theme.Accent.Secondary);
-        control.SelectedItemStyle = ApplyDefault(
-            control.SelectedItemStyle,
-            theme.Selection.Foreground.Merge(theme.Selection.Background));
-        control.DisabledItemStyle = ApplyDefault(control.DisabledItemStyle, theme.Text.Muted);
-        control.SeparatorStyle = ApplyDefault(control.SeparatorStyle, theme.Text.Muted);
-        return control;
-    }
-
-    public static CommandBar ApplyThemeDefaults(
-        this CommandBar control,
-        TesseraThemeOverrides overrides,
-        TesseraTheme baseTheme,
-        TesseraThemeVisualState state = TesseraThemeVisualState.Default)
-    {
-        ArgumentNullException.ThrowIfNull(overrides);
-        return control.ApplyThemeDefaults(overrides.Resolve(control, baseTheme, state));
-    }
-
+    /// <summary>
+    /// Executes apply theme.
+    /// </summary>
+    /// <param name="control">The control value.</param>
+    /// <param name="theme">The theme value.</param>
+    /// <returns>The result of apply theme.</returns>
     public static SearchBox ApplyTheme(this SearchBox control, TesseraTheme theme)
     {
         ArgumentNullException.ThrowIfNull(control);
@@ -257,6 +173,14 @@ public static partial class TesseraThemeControlExtensions
         return control;
     }
 
+    /// <summary>
+    /// Executes apply theme.
+    /// </summary>
+    /// <param name="control">The control value.</param>
+    /// <param name="overrides">The overrides value.</param>
+    /// <param name="baseTheme">The base theme value.</param>
+    /// <param name="state">The state value.</param>
+    /// <returns>The result of apply theme.</returns>
     public static SearchBox ApplyTheme(
         this SearchBox control,
         TesseraThemeOverrides overrides,
@@ -265,35 +189,6 @@ public static partial class TesseraThemeControlExtensions
     {
         ArgumentNullException.ThrowIfNull(overrides);
         return control.ApplyTheme(overrides.Resolve(control, baseTheme, state));
-    }
-
-    public static SearchBox ApplyThemeDefaults(this SearchBox control, TesseraTheme theme)
-    {
-        ArgumentNullException.ThrowIfNull(control);
-        ArgumentNullException.ThrowIfNull(theme);
-
-        control.TitleStyle = ApplyDefault(control.TitleStyle, theme.Text.Secondary);
-        control.FocusedTitleStyle = ApplyDefault(control.FocusedTitleStyle, theme.Focus.Title);
-        control.FocusMarker = ApplyDefault(control.FocusMarker, theme.Focus.Marker);
-        control.ValueTextStyle = ApplyDefault(control.ValueTextStyle, theme.Text.Primary);
-        control.PlaceholderTextStyle = ApplyDefault(control.PlaceholderTextStyle, theme.Text.Muted);
-        control.MatchCounterStyle = ApplyDefault(control.MatchCounterStyle, theme.Text.Secondary);
-        control.MatchHighlightStyle = ApplyDefault(control.MatchHighlightStyle, theme.Accent.Primary);
-        control.NavigationLabelStyle = ApplyDefault(control.NavigationLabelStyle, theme.Accent.Secondary);
-        control.DisabledNavigationLabelStyle = ApplyDefault(control.DisabledNavigationLabelStyle, theme.Text.Muted);
-        control.BorderStyleText = ApplyDefault(control.BorderStyleText, theme.Border.Default);
-        control.FocusedBorderStyleText = ApplyDefault(control.FocusedBorderStyleText, theme.Border.Focused.Merge(theme.Focus.Border));
-        return control;
-    }
-
-    public static SearchBox ApplyThemeDefaults(
-        this SearchBox control,
-        TesseraThemeOverrides overrides,
-        TesseraTheme baseTheme,
-        TesseraThemeVisualState state = TesseraThemeVisualState.Default)
-    {
-        ArgumentNullException.ThrowIfNull(overrides);
-        return control.ApplyThemeDefaults(overrides.Resolve(control, baseTheme, state));
     }
 
     /// <summary>
@@ -333,46 +228,6 @@ public static partial class TesseraThemeControlExtensions
     }
 
     /// <summary>
-    /// Applies theme defaults to a <see cref="SearchResultsView"/> without overwriting explicit non-empty styles.
-    /// </summary>
-    public static SearchResultsView ApplyThemeDefaults(this SearchResultsView control, TesseraTheme theme)
-    {
-        ArgumentNullException.ThrowIfNull(control);
-        ArgumentNullException.ThrowIfNull(theme);
-
-        control.TitleStyle = ApplyDefault(control.TitleStyle, theme.Text.Secondary);
-        control.FocusedTitleStyle = ApplyDefault(control.FocusedTitleStyle, theme.Focus.Title);
-        control.FocusMarker = ApplyDefault(control.FocusMarker, theme.Focus.Marker);
-        control.DefaultRowStyle = ApplyDefault(control.DefaultRowStyle, theme.Text.Primary);
-        control.HoveredRowStyle = ApplyDefault(control.HoveredRowStyle, theme.Accent.Secondary);
-        control.SelectedRowStyle = ApplyDefault(
-            control.SelectedRowStyle,
-            theme.Selection.Foreground.Merge(theme.Selection.Background));
-        control.FocusedSelectedRowStyle = ApplyDefault(control.FocusedSelectedRowStyle, theme.Focus.Ring);
-        control.PressedRowStyle = ApplyDefault(control.PressedRowStyle, theme.Focus.Ring.Merge(theme.Selection.Foreground));
-        control.DisabledRowStyle = ApplyDefault(control.DisabledRowStyle, theme.Text.Muted);
-        control.ErrorRowStyle = ApplyDefault(control.ErrorRowStyle, theme.State.Error);
-        control.BorderStyleText = ApplyDefault(control.BorderStyleText, theme.Border.Default);
-        control.FocusedBorderStyleText = ApplyDefault(
-            control.FocusedBorderStyleText,
-            theme.Border.Focused.Merge(theme.Focus.Border));
-        return control;
-    }
-
-    /// <summary>
-    /// Resolves and applies hierarchical defaults to a <see cref="SearchResultsView"/> without overwriting explicit non-empty styles.
-    /// </summary>
-    public static SearchResultsView ApplyThemeDefaults(
-        this SearchResultsView control,
-        TesseraThemeOverrides overrides,
-        TesseraTheme baseTheme,
-        TesseraThemeVisualState state = TesseraThemeVisualState.Default)
-    {
-        ArgumentNullException.ThrowIfNull(overrides);
-        return control.ApplyThemeDefaults(overrides.Resolve(control, baseTheme, state));
-    }
-
-    /// <summary>
     /// Applies a resolved theme to a <see cref="JumpList"/>.
     /// </summary>
     public static JumpList ApplyTheme(this JumpList control, TesseraTheme theme)
@@ -409,44 +264,6 @@ public static partial class TesseraThemeControlExtensions
     }
 
     /// <summary>
-    /// Applies theme defaults to a <see cref="JumpList"/> without overwriting explicit non-empty styles.
-    /// </summary>
-    public static JumpList ApplyThemeDefaults(this JumpList control, TesseraTheme theme)
-    {
-        ArgumentNullException.ThrowIfNull(control);
-        ArgumentNullException.ThrowIfNull(theme);
-
-        control.TitleStyle = ApplyDefault(control.TitleStyle, theme.Text.Secondary);
-        control.FocusedTitleStyle = ApplyDefault(control.FocusedTitleStyle, theme.Focus.Title);
-        control.BorderStyleText = ApplyDefault(control.BorderStyleText, theme.Border.Default);
-        control.FocusedBorderStyleText = ApplyDefault(control.FocusedBorderStyleText, theme.Border.Focused.Merge(theme.Focus.Border));
-        control.ItemStyle = ApplyDefault(control.ItemStyle, theme.Text.Primary);
-        control.HoveredItemStyle = ApplyDefault(control.HoveredItemStyle, theme.Accent.Secondary);
-        control.SelectedItemStyle = ApplyDefault(
-            control.SelectedItemStyle,
-            theme.Selection.Foreground.Merge(theme.Selection.Background));
-        control.FocusedSelectedItemStyle = ApplyDefault(control.FocusedSelectedItemStyle, theme.Focus.Ring);
-        control.DisabledItemStyle = ApplyDefault(control.DisabledItemStyle, theme.Text.Muted);
-        control.PinnedMarkerStyle = ApplyDefault(control.PinnedMarkerStyle, theme.Accent.Primary);
-        control.RecentMarkerStyle = ApplyDefault(control.RecentMarkerStyle, theme.Accent.Secondary);
-        control.FocusMarker = ApplyDefault(control.FocusMarker, theme.Focus.Marker);
-        return control;
-    }
-
-    /// <summary>
-    /// Resolves and applies hierarchical defaults to a <see cref="JumpList"/> without overwriting explicit non-empty styles.
-    /// </summary>
-    public static JumpList ApplyThemeDefaults(
-        this JumpList control,
-        TesseraThemeOverrides overrides,
-        TesseraTheme baseTheme,
-        TesseraThemeVisualState state = TesseraThemeVisualState.Default)
-    {
-        ArgumentNullException.ThrowIfNull(overrides);
-        return control.ApplyThemeDefaults(overrides.Resolve(control, baseTheme, state));
-    }
-
-    /// <summary>
     /// Applies a resolved theme to a <see cref="SideNavRail"/>.
     /// </summary>
     public static SideNavRail ApplyTheme(this SideNavRail control, TesseraTheme theme)
@@ -479,6 +296,282 @@ public static partial class TesseraThemeControlExtensions
         ArgumentNullException.ThrowIfNull(overrides);
         return control.ApplyTheme(overrides.Resolve(control, baseTheme, state));
     }
+}
+
+/// <summary>
+/// Represents tessera theme control extensions navigation default extensions.
+/// </summary>
+public static class TesseraThemeControlExtensionsNavigationDefaultExtensions
+{
+    /// <summary>
+    /// Applies theme defaults to a <see cref="Breadcrumb"/> without overwriting explicit non-empty styles.
+    /// </summary>
+    public static Breadcrumb ApplyThemeDefaults(this Breadcrumb control, TesseraTheme theme)
+    {
+        ArgumentNullException.ThrowIfNull(control);
+        ArgumentNullException.ThrowIfNull(theme);
+
+        control.TitleStyle = TesseraThemeControlExtensions.ApplyDefault(control.TitleStyle, theme.Text.Secondary);
+        control.FocusedTitleStyle = TesseraThemeControlExtensions.ApplyDefault(control.FocusedTitleStyle, theme.Focus.Title);
+        control.FocusMarker = TesseraThemeControlExtensions.ApplyDefault(control.FocusMarker, theme.Focus.Marker);
+        control.ItemStyle = TesseraThemeControlExtensions.ApplyDefault(control.ItemStyle, theme.Text.Primary);
+        control.SelectedItemStyle = TesseraThemeControlExtensions.ApplyDefault(
+            control.SelectedItemStyle,
+            theme.Selection.Foreground.Merge(theme.Selection.Background));
+        control.SeparatorStyle = TesseraThemeControlExtensions.ApplyDefault(control.SeparatorStyle, theme.Text.Muted);
+        return control;
+    }
+
+    /// <summary>
+    /// Resolves and applies hierarchical defaults to a <see cref="Breadcrumb"/> without overwriting explicit non-empty styles.
+    /// </summary>
+    public static Breadcrumb ApplyThemeDefaults(
+        this Breadcrumb control,
+        TesseraThemeOverrides overrides,
+        TesseraTheme baseTheme,
+        TesseraThemeVisualState state = TesseraThemeVisualState.Default)
+    {
+        ArgumentNullException.ThrowIfNull(overrides);
+        var resolved = overrides.Resolve(control, baseTheme, state);
+        return control.ApplyThemeDefaults(resolved);
+    }
+
+    /// <summary>
+    /// Applies theme defaults to a <see cref="Paginator"/> without overwriting explicit non-empty styles.
+    /// </summary>
+    public static Paginator ApplyThemeDefaults(this Paginator control, TesseraTheme theme)
+    {
+        ArgumentNullException.ThrowIfNull(control);
+        ArgumentNullException.ThrowIfNull(theme);
+
+        control.TitleStyle = TesseraThemeControlExtensions.ApplyDefault(control.TitleStyle, theme.Text.Secondary);
+        control.FocusedTitleStyle = TesseraThemeControlExtensions.ApplyDefault(control.FocusedTitleStyle, theme.Focus.Title);
+        control.FocusMarker = TesseraThemeControlExtensions.ApplyDefault(control.FocusMarker, theme.Focus.Marker);
+        control.LabelStyle = TesseraThemeControlExtensions.ApplyDefault(control.LabelStyle, theme.Text.Primary);
+        control.ActivePageLabelStyle = TesseraThemeControlExtensions.ApplyDefault(
+            control.ActivePageLabelStyle,
+            theme.Selection.Foreground.Merge(theme.Selection.Background));
+        control.DisabledNavigationLabelStyle = TesseraThemeControlExtensions.ApplyDefault(control.DisabledNavigationLabelStyle, theme.Text.Muted);
+        return control;
+    }
+
+    /// <summary>
+    /// Resolves and applies hierarchical defaults to a <see cref="Paginator"/> without overwriting explicit non-empty styles.
+    /// </summary>
+    public static Paginator ApplyThemeDefaults(
+        this Paginator control,
+        TesseraThemeOverrides overrides,
+        TesseraTheme baseTheme,
+        TesseraThemeVisualState state = TesseraThemeVisualState.Default)
+    {
+        ArgumentNullException.ThrowIfNull(overrides);
+        var resolved = overrides.Resolve(control, baseTheme, state);
+        return control.ApplyThemeDefaults(resolved);
+    }
+
+    /// <summary>
+    /// Executes apply theme defaults.
+    /// </summary>
+    /// <param name="control">The control value.</param>
+    /// <param name="theme">The theme value.</param>
+    /// <returns>The result of apply theme defaults.</returns>
+    public static Toolbar ApplyThemeDefaults(this Toolbar control, TesseraTheme theme)
+    {
+        ArgumentNullException.ThrowIfNull(control);
+        ArgumentNullException.ThrowIfNull(theme);
+
+        control.TitleStyle = TesseraThemeControlExtensions.ApplyDefault(control.TitleStyle, theme.Text.Secondary);
+        control.FocusedTitleStyle = TesseraThemeControlExtensions.ApplyDefault(control.FocusedTitleStyle, theme.Focus.Title);
+        control.FocusMarker = TesseraThemeControlExtensions.ApplyDefault(control.FocusMarker, theme.Focus.Marker);
+        control.ItemStyle = TesseraThemeControlExtensions.ApplyDefault(control.ItemStyle, theme.Text.Primary);
+        control.SelectedItemStyle = TesseraThemeControlExtensions.ApplyDefault(
+            control.SelectedItemStyle,
+            theme.Selection.Foreground.Merge(theme.Selection.Background));
+        control.FocusedItemStyle = TesseraThemeControlExtensions.ApplyDefault(control.FocusedItemStyle, theme.Focus.Ring);
+        control.SeparatorStyle = TesseraThemeControlExtensions.ApplyDefault(control.SeparatorStyle, theme.Text.Muted);
+        return control;
+    }
+
+    /// <summary>
+    /// Executes apply theme defaults.
+    /// </summary>
+    /// <param name="control">The control value.</param>
+    /// <param name="overrides">The overrides value.</param>
+    /// <param name="baseTheme">The base theme value.</param>
+    /// <param name="state">The state value.</param>
+    /// <returns>The result of apply theme defaults.</returns>
+    public static Toolbar ApplyThemeDefaults(
+        this Toolbar control,
+        TesseraThemeOverrides overrides,
+        TesseraTheme baseTheme,
+        TesseraThemeVisualState state = TesseraThemeVisualState.Default)
+    {
+        ArgumentNullException.ThrowIfNull(overrides);
+        return control.ApplyThemeDefaults(overrides.Resolve(control, baseTheme, state));
+    }
+
+    /// <summary>
+    /// Executes apply theme defaults.
+    /// </summary>
+    /// <param name="control">The control value.</param>
+    /// <param name="theme">The theme value.</param>
+    /// <returns>The result of apply theme defaults.</returns>
+    public static CommandBar ApplyThemeDefaults(this CommandBar control, TesseraTheme theme)
+    {
+        ArgumentNullException.ThrowIfNull(control);
+        ArgumentNullException.ThrowIfNull(theme);
+
+        control.TitleStyle = TesseraThemeControlExtensions.ApplyDefault(control.TitleStyle, theme.Text.Secondary);
+        control.FocusedTitleStyle = TesseraThemeControlExtensions.ApplyDefault(control.FocusedTitleStyle, theme.Focus.Title);
+        control.FocusMarker = TesseraThemeControlExtensions.ApplyDefault(control.FocusMarker, theme.Focus.Marker);
+        control.ItemStyle = TesseraThemeControlExtensions.ApplyDefault(control.ItemStyle, theme.Text.Primary);
+        control.HoveredItemStyle = TesseraThemeControlExtensions.ApplyDefault(control.HoveredItemStyle, theme.Accent.Secondary);
+        control.SelectedItemStyle = TesseraThemeControlExtensions.ApplyDefault(
+            control.SelectedItemStyle,
+            theme.Selection.Foreground.Merge(theme.Selection.Background));
+        control.DisabledItemStyle = TesseraThemeControlExtensions.ApplyDefault(control.DisabledItemStyle, theme.Text.Muted);
+        control.SeparatorStyle = TesseraThemeControlExtensions.ApplyDefault(control.SeparatorStyle, theme.Text.Muted);
+        return control;
+    }
+
+    /// <summary>
+    /// Executes apply theme defaults.
+    /// </summary>
+    /// <param name="control">The control value.</param>
+    /// <param name="overrides">The overrides value.</param>
+    /// <param name="baseTheme">The base theme value.</param>
+    /// <param name="state">The state value.</param>
+    /// <returns>The result of apply theme defaults.</returns>
+    public static CommandBar ApplyThemeDefaults(
+        this CommandBar control,
+        TesseraThemeOverrides overrides,
+        TesseraTheme baseTheme,
+        TesseraThemeVisualState state = TesseraThemeVisualState.Default)
+    {
+        ArgumentNullException.ThrowIfNull(overrides);
+        return control.ApplyThemeDefaults(overrides.Resolve(control, baseTheme, state));
+    }
+
+    /// <summary>
+    /// Executes apply theme defaults.
+    /// </summary>
+    /// <param name="control">The control value.</param>
+    /// <param name="theme">The theme value.</param>
+    /// <returns>The result of apply theme defaults.</returns>
+    public static SearchBox ApplyThemeDefaults(this SearchBox control, TesseraTheme theme)
+    {
+        ArgumentNullException.ThrowIfNull(control);
+        ArgumentNullException.ThrowIfNull(theme);
+
+        control.TitleStyle = TesseraThemeControlExtensions.ApplyDefault(control.TitleStyle, theme.Text.Secondary);
+        control.FocusedTitleStyle = TesseraThemeControlExtensions.ApplyDefault(control.FocusedTitleStyle, theme.Focus.Title);
+        control.FocusMarker = TesseraThemeControlExtensions.ApplyDefault(control.FocusMarker, theme.Focus.Marker);
+        control.ValueTextStyle = TesseraThemeControlExtensions.ApplyDefault(control.ValueTextStyle, theme.Text.Primary);
+        control.PlaceholderTextStyle = TesseraThemeControlExtensions.ApplyDefault(control.PlaceholderTextStyle, theme.Text.Muted);
+        control.MatchCounterStyle = TesseraThemeControlExtensions.ApplyDefault(control.MatchCounterStyle, theme.Text.Secondary);
+        control.MatchHighlightStyle = TesseraThemeControlExtensions.ApplyDefault(control.MatchHighlightStyle, theme.Accent.Primary);
+        control.NavigationLabelStyle = TesseraThemeControlExtensions.ApplyDefault(control.NavigationLabelStyle, theme.Accent.Secondary);
+        control.DisabledNavigationLabelStyle = TesseraThemeControlExtensions.ApplyDefault(control.DisabledNavigationLabelStyle, theme.Text.Muted);
+        control.BorderStyleText = TesseraThemeControlExtensions.ApplyDefault(control.BorderStyleText, theme.Border.Default);
+        control.FocusedBorderStyleText = TesseraThemeControlExtensions.ApplyDefault(control.FocusedBorderStyleText, theme.Border.Focused.Merge(theme.Focus.Border));
+        return control;
+    }
+
+    /// <summary>
+    /// Executes apply theme defaults.
+    /// </summary>
+    /// <param name="control">The control value.</param>
+    /// <param name="overrides">The overrides value.</param>
+    /// <param name="baseTheme">The base theme value.</param>
+    /// <param name="state">The state value.</param>
+    /// <returns>The result of apply theme defaults.</returns>
+    public static SearchBox ApplyThemeDefaults(
+        this SearchBox control,
+        TesseraThemeOverrides overrides,
+        TesseraTheme baseTheme,
+        TesseraThemeVisualState state = TesseraThemeVisualState.Default)
+    {
+        ArgumentNullException.ThrowIfNull(overrides);
+        return control.ApplyThemeDefaults(overrides.Resolve(control, baseTheme, state));
+    }
+
+    /// <summary>
+    /// Applies theme defaults to a <see cref="SearchResultsView"/> without overwriting explicit non-empty styles.
+    /// </summary>
+    public static SearchResultsView ApplyThemeDefaults(this SearchResultsView control, TesseraTheme theme)
+    {
+        ArgumentNullException.ThrowIfNull(control);
+        ArgumentNullException.ThrowIfNull(theme);
+
+        control.TitleStyle = TesseraThemeControlExtensions.ApplyDefault(control.TitleStyle, theme.Text.Secondary);
+        control.FocusedTitleStyle = TesseraThemeControlExtensions.ApplyDefault(control.FocusedTitleStyle, theme.Focus.Title);
+        control.FocusMarker = TesseraThemeControlExtensions.ApplyDefault(control.FocusMarker, theme.Focus.Marker);
+        control.DefaultRowStyle = TesseraThemeControlExtensions.ApplyDefault(control.DefaultRowStyle, theme.Text.Primary);
+        control.HoveredRowStyle = TesseraThemeControlExtensions.ApplyDefault(control.HoveredRowStyle, theme.Accent.Secondary);
+        control.SelectedRowStyle = TesseraThemeControlExtensions.ApplyDefault(
+            control.SelectedRowStyle,
+            theme.Selection.Foreground.Merge(theme.Selection.Background));
+        control.FocusedSelectedRowStyle = TesseraThemeControlExtensions.ApplyDefault(control.FocusedSelectedRowStyle, theme.Focus.Ring);
+        control.PressedRowStyle = TesseraThemeControlExtensions.ApplyDefault(control.PressedRowStyle, theme.Focus.Ring.Merge(theme.Selection.Foreground));
+        control.DisabledRowStyle = TesseraThemeControlExtensions.ApplyDefault(control.DisabledRowStyle, theme.Text.Muted);
+        control.ErrorRowStyle = TesseraThemeControlExtensions.ApplyDefault(control.ErrorRowStyle, theme.State.Error);
+        control.BorderStyleText = TesseraThemeControlExtensions.ApplyDefault(control.BorderStyleText, theme.Border.Default);
+        control.FocusedBorderStyleText = TesseraThemeControlExtensions.ApplyDefault(
+            control.FocusedBorderStyleText,
+            theme.Border.Focused.Merge(theme.Focus.Border));
+        return control;
+    }
+
+    /// <summary>
+    /// Resolves and applies hierarchical defaults to a <see cref="SearchResultsView"/> without overwriting explicit non-empty styles.
+    /// </summary>
+    public static SearchResultsView ApplyThemeDefaults(
+        this SearchResultsView control,
+        TesseraThemeOverrides overrides,
+        TesseraTheme baseTheme,
+        TesseraThemeVisualState state = TesseraThemeVisualState.Default)
+    {
+        ArgumentNullException.ThrowIfNull(overrides);
+        return control.ApplyThemeDefaults(overrides.Resolve(control, baseTheme, state));
+    }
+
+    /// <summary>
+    /// Applies theme defaults to a <see cref="JumpList"/> without overwriting explicit non-empty styles.
+    /// </summary>
+    public static JumpList ApplyThemeDefaults(this JumpList control, TesseraTheme theme)
+    {
+        ArgumentNullException.ThrowIfNull(control);
+        ArgumentNullException.ThrowIfNull(theme);
+
+        control.TitleStyle = TesseraThemeControlExtensions.ApplyDefault(control.TitleStyle, theme.Text.Secondary);
+        control.FocusedTitleStyle = TesseraThemeControlExtensions.ApplyDefault(control.FocusedTitleStyle, theme.Focus.Title);
+        control.BorderStyleText = TesseraThemeControlExtensions.ApplyDefault(control.BorderStyleText, theme.Border.Default);
+        control.FocusedBorderStyleText = TesseraThemeControlExtensions.ApplyDefault(control.FocusedBorderStyleText, theme.Border.Focused.Merge(theme.Focus.Border));
+        control.ItemStyle = TesseraThemeControlExtensions.ApplyDefault(control.ItemStyle, theme.Text.Primary);
+        control.HoveredItemStyle = TesseraThemeControlExtensions.ApplyDefault(control.HoveredItemStyle, theme.Accent.Secondary);
+        control.SelectedItemStyle = TesseraThemeControlExtensions.ApplyDefault(
+            control.SelectedItemStyle,
+            theme.Selection.Foreground.Merge(theme.Selection.Background));
+        control.FocusedSelectedItemStyle = TesseraThemeControlExtensions.ApplyDefault(control.FocusedSelectedItemStyle, theme.Focus.Ring);
+        control.DisabledItemStyle = TesseraThemeControlExtensions.ApplyDefault(control.DisabledItemStyle, theme.Text.Muted);
+        control.PinnedMarkerStyle = TesseraThemeControlExtensions.ApplyDefault(control.PinnedMarkerStyle, theme.Accent.Primary);
+        control.RecentMarkerStyle = TesseraThemeControlExtensions.ApplyDefault(control.RecentMarkerStyle, theme.Accent.Secondary);
+        control.FocusMarker = TesseraThemeControlExtensions.ApplyDefault(control.FocusMarker, theme.Focus.Marker);
+        return control;
+    }
+
+    /// <summary>
+    /// Resolves and applies hierarchical defaults to a <see cref="JumpList"/> without overwriting explicit non-empty styles.
+    /// </summary>
+    public static JumpList ApplyThemeDefaults(
+        this JumpList control,
+        TesseraThemeOverrides overrides,
+        TesseraTheme baseTheme,
+        TesseraThemeVisualState state = TesseraThemeVisualState.Default)
+    {
+        ArgumentNullException.ThrowIfNull(overrides);
+        return control.ApplyThemeDefaults(overrides.Resolve(control, baseTheme, state));
+    }
 
     /// <summary>
     /// Applies theme defaults to a <see cref="SideNavRail"/> without overwriting explicit non-empty styles.
@@ -488,20 +581,20 @@ public static partial class TesseraThemeControlExtensions
         ArgumentNullException.ThrowIfNull(control);
         ArgumentNullException.ThrowIfNull(theme);
 
-        control.TitleStyle = ApplyDefault(control.TitleStyle, theme.Text.Secondary);
-        control.FocusedTitleStyle = ApplyDefault(control.FocusedTitleStyle, theme.Focus.Title);
-        control.ItemStyle = ApplyDefault(control.ItemStyle, theme.Text.Primary);
-        control.HoveredItemStyle = ApplyDefault(control.HoveredItemStyle, theme.Accent.Secondary);
-        control.SelectedItemStyle = ApplyDefault(
+        control.TitleStyle = TesseraThemeControlExtensions.ApplyDefault(control.TitleStyle, theme.Text.Secondary);
+        control.FocusedTitleStyle = TesseraThemeControlExtensions.ApplyDefault(control.FocusedTitleStyle, theme.Focus.Title);
+        control.ItemStyle = TesseraThemeControlExtensions.ApplyDefault(control.ItemStyle, theme.Text.Primary);
+        control.HoveredItemStyle = TesseraThemeControlExtensions.ApplyDefault(control.HoveredItemStyle, theme.Accent.Secondary);
+        control.SelectedItemStyle = TesseraThemeControlExtensions.ApplyDefault(
             control.SelectedItemStyle,
             theme.Selection.Foreground.Merge(theme.Selection.Background));
-        control.FocusedSelectedItemStyle = ApplyDefault(control.FocusedSelectedItemStyle, theme.Focus.Ring);
-        control.DisabledItemStyle = ApplyDefault(control.DisabledItemStyle, theme.Text.Muted);
-        control.BorderStyleText = ApplyDefault(control.BorderStyleText, theme.Border.Default);
-        control.FocusedBorderStyleText = ApplyDefault(
+        control.FocusedSelectedItemStyle = TesseraThemeControlExtensions.ApplyDefault(control.FocusedSelectedItemStyle, theme.Focus.Ring);
+        control.DisabledItemStyle = TesseraThemeControlExtensions.ApplyDefault(control.DisabledItemStyle, theme.Text.Muted);
+        control.BorderStyleText = TesseraThemeControlExtensions.ApplyDefault(control.BorderStyleText, theme.Border.Default);
+        control.FocusedBorderStyleText = TesseraThemeControlExtensions.ApplyDefault(
             control.FocusedBorderStyleText,
             theme.Border.Focused.Merge(theme.Focus.Border));
-        control.FocusMarker = ApplyDefault(control.FocusMarker, theme.Focus.Marker);
+        control.FocusMarker = TesseraThemeControlExtensions.ApplyDefault(control.FocusMarker, theme.Focus.Marker);
         return control;
     }
 

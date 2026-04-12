@@ -1,15 +1,33 @@
-namespace Tessera.Controls;
+﻿namespace Tessera.Controls;
 
 /// <summary>
 /// Defines severity for a <see cref="LogEntry"/>.
 /// </summary>
 public enum LogLevel
 {
+    /// <summary>
+    /// The trace value.
+    /// </summary>
     Trace = 0,
+    /// <summary>
+    /// The debug value.
+    /// </summary>
     Debug = 1,
+    /// <summary>
+    /// The informational state.
+    /// </summary>
     Info = 2,
+    /// <summary>
+    /// The warning state.
+    /// </summary>
     Warning = 3,
+    /// <summary>
+    /// The error state.
+    /// </summary>
     Error = 4,
+    /// <summary>
+    /// The critical value.
+    /// </summary>
     Critical = 5,
 }
 

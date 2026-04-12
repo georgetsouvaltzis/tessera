@@ -121,7 +121,7 @@ public sealed class SearchResultsViewControlTests
         var control = new SearchResultsView
         {
             IsFocused = true,
-            Border = BorderStyle.Single,
+            Border = BorderStyle.SingleLine,
             BorderStyleText = TesseraStyle.Empty.WithBackground(AnsiColor.Rgb(9, 8, 7)),
             FocusedBorderStyleText = TesseraStyle.Empty.WithForeground(AnsiColor.Rgb(1, 2, 3)),
         };

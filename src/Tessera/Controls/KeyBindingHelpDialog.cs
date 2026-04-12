@@ -1,4 +1,4 @@
-using Tessera.Components.Primitives;
+﻿using Tessera.Components.Primitives;
 using Tessera.Controls.Internal;
 using Tessera.Layout;
 using Tessera.Styles;
@@ -25,54 +25,111 @@ public sealed class KeyBindingHelpDialog : Control
         set => field = value ?? string.Empty;
     } = "Keyboard Shortcuts";
 
+    /// <summary>
+    /// Represents focus marker.
+    /// </summary>
     public string FocusMarker
     {
         get;
         set => field = value ?? string.Empty;
     } = "*";
 
+    /// <summary>
+    /// Gets or sets whether show focus marker.
+    /// </summary>
     public bool ShowFocusMarker { get; set; } = true;
 
+    /// <summary>
+    /// Gets or sets the title style.
+    /// </summary>
     public TesseraStyle TitleStyle { get; set; } = TesseraStyle.Empty;
 
+    /// <summary>
+    /// Gets or sets the focused title style.
+    /// </summary>
     public TesseraStyle FocusedTitleStyle { get; set; } = TesseraStyle.Empty;
 
+    /// <summary>
+    /// Gets or sets the group style.
+    /// </summary>
     public TesseraStyle GroupStyle { get; set; } = TesseraStyle.Empty;
 
+    /// <summary>
+    /// Gets or sets the keys style.
+    /// </summary>
     public TesseraStyle KeysStyle { get; set; } = TesseraStyle.Empty;
 
+    /// <summary>
+    /// Gets or sets the description style.
+    /// </summary>
     public TesseraStyle DescriptionStyle { get; set; } = TesseraStyle.Empty;
 
+    /// <summary>
+    /// Gets or sets the selected row style.
+    /// </summary>
     public TesseraStyle SelectedRowStyle { get; set; } = TesseraStyle.Empty;
 
+    /// <summary>
+    /// Gets or sets the hovered row style.
+    /// </summary>
     public TesseraStyle HoveredRowStyle { get; set; } = TesseraStyle.Empty;
 
+    /// <summary>
+    /// Gets or sets the global binding style.
+    /// </summary>
     public TesseraStyle GlobalBindingStyle { get; set; } = TesseraStyle.Empty;
 
+    /// <summary>
+    /// Gets or sets the disabled style.
+    /// </summary>
     public TesseraStyle DisabledStyle { get; set; } = TesseraStyle.Empty;
 
+    /// <summary>
+    /// Gets or sets the empty text style.
+    /// </summary>
     public TesseraStyle EmptyTextStyle { get; set; } = TesseraStyle.Empty;
 
+    /// <summary>
+    /// Gets or sets the padding.
+    /// </summary>
     public Thickness Padding { get; set; }
 
+    /// <summary>
+    /// Gets or sets whether show groups.
+    /// </summary>
     public bool ShowGroups { get; set; } = true;
 
+    /// <summary>
+    /// Gets or sets the page size.
+    /// </summary>
     public int PageSize { get; set; } = 8;
 
+    /// <summary>
+    /// Gets or sets the key column width.
+    /// </summary>
     public int KeyColumnWidth { get; set; } = 14;
 
+    /// <summary>
+    /// Represents selected marker.
+    /// </summary>
     public string SelectedMarker
     {
         get;
         set => field = value ?? string.Empty;
     } = ">";
 
+    /// <summary>
+    /// Represents unselected marker.
+    /// </summary>
     public string UnselectedMarker
     {
         get;
         set => field = value ?? string.Empty;
     } = " ";
 
+    /// <summary>
+    /// Represents empty text.
+    /// </summary>
     public string EmptyText
     {
         get;
@@ -116,12 +173,9 @@ public sealed class KeyBindingHelpDialog : Control
     {
         ArgumentNullException.ThrowIfNull(items);
         _items.Clear();
-        foreach (var item in items)
+        foreach (var item in items.Where(static item => item is not null))
         {
-            if (item is not null)
-            {
-                _items.Add(Clone(item));
-            }
+            _items.Add(Clone(item));
         }
 
         _selectedIndex = _items.Count == 0 ? 0 : Math.Clamp(_selectedIndex, 0, _items.Count - 1);

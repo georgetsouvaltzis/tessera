@@ -333,14 +333,32 @@ public sealed class GroupedListView<TGroup, TItem> : Control
 
     private string BuildHeaderText(RowEntry row, bool selected, bool hovered)
     {
-        var prefix = selected ? "> " : hovered ? "~ " : "  ";
+        var prefix = "  ";
+        if (selected)
+        {
+            prefix = "> ";
+        }
+        else if (hovered)
+        {
+            prefix = "~ ";
+        }
+
         var marker = _groups[row.GroupIndex].IsCollapsed ? "▶ " : "▼ ";
         return string.Concat(prefix, marker, _groupTextSelector(_groups[row.GroupIndex].Group));
     }
 
     private string BuildItemText(RowEntry row, bool selected, bool hovered)
     {
-        var prefix = selected ? "> " : hovered ? "~ " : "  ";
+        var prefix = "  ";
+        if (selected)
+        {
+            prefix = "> ";
+        }
+        else if (hovered)
+        {
+            prefix = "~ ";
+        }
+
         return string.Concat(prefix, "  ", _itemTextSelector(_groups[row.GroupIndex].Items[row.ItemIndex]));
     }
 

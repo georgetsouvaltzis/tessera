@@ -1,4 +1,4 @@
-using System.Globalization;
+﻿using System.Globalization;
 using Tessera.Components.Primitives;
 using Tessera.Controls.Internal;
 using Tessera.Layout;
@@ -21,72 +21,160 @@ public sealed class NotificationInbox : Control
     /// </summary>
     public event EventHandler<ListSelectionChangedEventArgs<InboxItem>>? SelectionChanged;
 
+    /// <summary>
+    /// Represents title.
+    /// </summary>
     public string Title
     {
         get;
         set => field = value ?? string.Empty;
     } = "Notification Inbox";
 
+    /// <summary>
+    /// Represents focus marker.
+    /// </summary>
     public string FocusMarker
     {
         get;
         set => field = value ?? string.Empty;
     } = "*";
+    /// <summary>
+    /// Gets or sets whether show focus marker.
+    /// </summary>
     public bool ShowFocusMarker { get; set; } = true;
+    /// <summary>
+    /// Gets or sets the title style.
+    /// </summary>
     public TesseraStyle TitleStyle { get; set; } = TesseraStyle.Empty;
+    /// <summary>
+    /// Gets or sets the focused title style.
+    /// </summary>
     public TesseraStyle FocusedTitleStyle { get; set; } = TesseraStyle.Empty;
+    /// <summary>
+    /// Gets or sets the item style.
+    /// </summary>
     public TesseraStyle ItemStyle { get; set; } = TesseraStyle.Empty;
+    /// <summary>
+    /// Gets or sets the selected item style.
+    /// </summary>
     public TesseraStyle SelectedItemStyle { get; set; } = TesseraStyle.Empty;
+    /// <summary>
+    /// Gets or sets the hovered item style.
+    /// </summary>
     public TesseraStyle HoveredItemStyle { get; set; } = TesseraStyle.Empty;
+    /// <summary>
+    /// Gets or sets the unread item style.
+    /// </summary>
     public TesseraStyle UnreadItemStyle { get; set; } = TesseraStyle.Empty;
+    /// <summary>
+    /// Gets or sets the muted item style.
+    /// </summary>
     public TesseraStyle MutedItemStyle { get; set; } = TesseraStyle.Empty;
+    /// <summary>
+    /// Gets or sets the info item style.
+    /// </summary>
     public TesseraStyle InfoItemStyle { get; set; } = TesseraStyle.Empty;
+    /// <summary>
+    /// Gets or sets the success item style.
+    /// </summary>
     public TesseraStyle SuccessItemStyle { get; set; } = TesseraStyle.Empty;
+    /// <summary>
+    /// Gets or sets the warning item style.
+    /// </summary>
     public TesseraStyle WarningItemStyle { get; set; } = TesseraStyle.Empty;
+    /// <summary>
+    /// Gets or sets the error item style.
+    /// </summary>
     public TesseraStyle ErrorItemStyle { get; set; } = TesseraStyle.Empty;
+    /// <summary>
+    /// Gets or sets the pinned item style.
+    /// </summary>
     public TesseraStyle PinnedItemStyle { get; set; } = TesseraStyle.Empty;
+    /// <summary>
+    /// Gets or sets the disabled style.
+    /// </summary>
     public TesseraStyle DisabledStyle { get; set; } = TesseraStyle.Empty;
+    /// <summary>
+    /// Gets or sets the empty text style.
+    /// </summary>
     public TesseraStyle EmptyTextStyle { get; set; } = TesseraStyle.Empty;
+    /// <summary>
+    /// Gets or sets the padding.
+    /// </summary>
     public Thickness Padding { get; set; }
+    /// <summary>
+    /// Gets or sets the page size.
+    /// </summary>
     public int PageSize { get; set; } = 8;
+    /// <summary>
+    /// Gets or sets the max items.
+    /// </summary>
     public int MaxItems { get; set; } = 256;
+    /// <summary>
+    /// Gets or sets whether show timestamp.
+    /// </summary>
     public bool ShowTimestamp { get; set; } = true;
+    /// <summary>
+    /// Gets or sets whether show source.
+    /// </summary>
     public bool ShowSource { get; set; } = true;
 
+    /// <summary>
+    /// Represents selected marker.
+    /// </summary>
     public string SelectedMarker
     {
         get;
         set => field = value ?? string.Empty;
     } = ">";
+    /// <summary>
+    /// Represents unselected marker.
+    /// </summary>
     public string UnselectedMarker
     {
         get;
         set => field = value ?? string.Empty;
     } = " ";
 
+    /// <summary>
+    /// Represents empty text.
+    /// </summary>
     public string EmptyText
     {
         get;
         set => field = value ?? string.Empty;
     } = "(no notifications)";
+    /// <summary>
+    /// Represents items.
+    /// </summary>
     public IReadOnlyList<InboxItem> Items => _items;
+    /// <summary>
+    /// Represents selected index.
+    /// </summary>
     public int SelectedIndex => _items.Count == 0 ? -1 : _selectedIndex;
+    /// <summary>
+    /// Represents selected item.
+    /// </summary>
     public InboxItem? SelectedItem => _items.Count == 0 ? null : _items[_selectedIndex];
+    /// <inheritdoc />
     public override bool IsFocused { get; set; }
+    /// <inheritdoc />
     public override bool IsDisabled { get; set; }
+    /// <inheritdoc />
     public override bool IsReadOnly { get; set; }
+    /// <summary>
+    /// Executes set items.
+    /// </summary>
+    /// <param name="items">The items value.</param>
     public void SetItems(IEnumerable<InboxItem> items)
     {
         ArgumentNullException.ThrowIfNull(items);
         var previousIndex = SelectedIndex;
         var previousItem = SelectedItem;
         _items.Clear();
-        foreach (var item in items)
+        foreach (var item in items.Where(static item => item is not null))
         {
-            if (item is not null)
-            {
-                _items.Add(Clone(item));
-            }
+            _items.Add(Clone(item));
         }
 
         TrimToMaxItems();
@@ -96,6 +184,14 @@ public sealed class NotificationInbox : Control
         RaiseSelectionChangedIfNeeded(previousIndex, previousItem);
     }
 
+    /// <summary>
+    /// Executes add.
+    /// </summary>
+    /// <param name="message">The message value.</param>
+    /// <param name="level">The level value.</param>
+    /// <param name="source">The source value.</param>
+    /// <param name="id">The id value.</param>
+    /// <param name="createdAt">The created at value.</param>
     public void Add(
         string message,
         NotificationLevel level = NotificationLevel.Info,
@@ -119,6 +215,9 @@ public sealed class NotificationInbox : Control
         RaiseSelectionChangedIfNeeded(previousIndex, previousItem);
     }
 
+    /// <summary>
+    /// Executes mark all read.
+    /// </summary>
     public void MarkAllRead()
     {
         for (var i = 0; i < _items.Count; i++)
@@ -127,6 +226,9 @@ public sealed class NotificationInbox : Control
         }
     }
 
+    /// <summary>
+    /// Executes clear.
+    /// </summary>
     public void Clear()
     {
         var previousIndex = SelectedIndex;
@@ -138,10 +240,16 @@ public sealed class NotificationInbox : Control
         RaiseSelectionChangedIfNeeded(previousIndex, previousItem);
     }
 
+    /// <summary>
+    /// Executes select.
+    /// </summary>
+    /// <param name="index">The index value.</param>
+    /// <returns><see langword="true" /> when select succeeds.</returns>
     public bool Select(int index)
     {
         return SetSelectedIndex(index);
     }
+    /// <inheritdoc />
     public override bool Handle(Message message)
     {
         if (IsDisabled || IsReadOnly || !IsFocused || message is not KeyPressed key)
@@ -231,6 +339,7 @@ public sealed class NotificationInbox : Control
         }
         return false;
     }
+    /// <inheritdoc />
     public override bool Handle(Message message, Rect bounds)
     {
         if (IsDisabled || IsReadOnly || message is not PointerInput pointer)
@@ -311,6 +420,7 @@ public sealed class NotificationInbox : Control
         return Handle(message);
     }
 
+    /// <inheritdoc />
     public override void Render(Canvas canvas, Rect rect)
     {
         var clipped = Rect.Intersect(rect, canvas.Bounds);

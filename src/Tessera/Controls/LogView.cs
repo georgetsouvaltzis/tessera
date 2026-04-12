@@ -1,4 +1,4 @@
-using Tessera.Components.Primitives;
+﻿using Tessera.Components.Primitives;
 using Tessera.Components.Primitives.Internal;
 using Tessera.Controls.Internal;
 using Tessera.Layout;
@@ -16,47 +16,72 @@ public sealed class LogView : Control
     private readonly List<string> _entries = [];
     private string _filter = string.Empty;
 
+    /// <summary>
+    /// Executes log view.
+    /// </summary>
+    /// <returns>The result of log view.</returns>
     public LogView()
     {
         _viewport.SetWrap(false);
     }
 
+    /// <summary>
+    /// Represents title.
+    /// </summary>
     public string Title
     {
         get;
         set => field = value ?? string.Empty;
     } = "Logs";
 
+    /// <summary>
+    /// Represents focus marker.
+    /// </summary>
     public string FocusMarker
     {
         get;
         set => field = value ?? string.Empty;
     } = "*";
 
+    /// <summary>
+    /// Represents show focus marker.
+    /// </summary>
     public bool ShowFocusMarker
     {
         get;
         set;
     } = true;
 
+    /// <summary>
+    /// Represents title style.
+    /// </summary>
     public TesseraStyle TitleStyle
     {
         get;
         set;
     } = TesseraStyle.Empty;
 
+    /// <summary>
+    /// Represents focused title style.
+    /// </summary>
     public TesseraStyle FocusedTitleStyle
     {
         get;
         set;
     } = TesseraStyle.Empty;
 
+    /// <summary>
+    /// Represents entry style.
+    /// </summary>
     public TesseraStyle EntryStyle
     {
         get;
         set;
     } = TesseraStyle.Empty;
 
+    /// <summary>
+    /// Represents paused title style.
+    /// </summary>
     public TesseraStyle PausedTitleStyle
     {
         get;
@@ -81,38 +106,58 @@ public sealed class LogView : Control
         set;
     } = TesseraStyle.Empty;
 
+    /// <summary>
+    /// Represents border.
+    /// </summary>
     public BorderStyle Border
     {
         get;
         set;
     } = BorderStyle.SingleLine;
 
+    /// <summary>
+    /// Represents padding.
+    /// </summary>
     public Thickness Padding
     {
         get;
         set;
     }
 
+    /// <summary>
+    /// Represents auto scroll.
+    /// </summary>
     public bool AutoScroll
     {
         get;
         set;
     } = true;
 
+    /// <summary>
+    /// Represents is paused.
+    /// </summary>
     public bool IsPaused
     {
         get;
         private set;
     }
 
+    /// <summary>
+    /// Represents count.
+    /// </summary>
     public int Count => _entries.Count;
 
+    /// <inheritdoc />
     public override bool IsFocused
     {
         get;
         set;
     }
 
+    /// <summary>
+    /// Executes append.
+    /// </summary>
+    /// <param name="line">The line value.</param>
     public void Append(string line)
     {
         if (IsPaused)
@@ -133,12 +178,19 @@ public sealed class LogView : Control
         }
     }
 
+    /// <summary>
+    /// Executes clear.
+    /// </summary>
     public void Clear()
     {
         _entries.Clear();
         _viewport.Clear();
     }
 
+    /// <summary>
+    /// Executes set filter.
+    /// </summary>
+    /// <param name="filter">The filter value.</param>
     public void SetFilter(string filter)
     {
         var normalized = filter ?? string.Empty;
@@ -151,6 +203,7 @@ public sealed class LogView : Control
         RefreshViewport();
     }
 
+    /// <inheritdoc />
     public override bool Handle(Message message)
     {
         if (message is KeyPressed key)
@@ -171,6 +224,7 @@ public sealed class LogView : Control
         return _viewport.Update(message, ViewportKeyMap.Default);
     }
 
+    /// <inheritdoc />
     public override void Render(Canvas canvas, Rect rect)
     {
         var clipped = Rect.Intersect(rect, canvas.Bounds);

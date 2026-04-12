@@ -1,4 +1,4 @@
-using Tessera.Components.Primitives;
+﻿using Tessera.Components.Primitives;
 using Tessera.Controls.Internal;
 using Tessera.Layout;
 using Tessera.Styles;
@@ -12,6 +12,9 @@ public sealed class Accordion : Control
 {
     private readonly List<AccordionSection> _sections = [];
 
+    /// <summary>
+    /// Represents title.
+    /// </summary>
     public string Title
     {
         get;
@@ -135,10 +138,20 @@ public sealed class Accordion : Control
         set => field = value ?? string.Empty;
     } = "▸";
 
+    /// <summary>
+    /// Gets or sets the selected index.
+    /// </summary>
     public int SelectedIndex { get; private set; }
 
+    /// <summary>
+    /// Represents sections.
+    /// </summary>
     public IReadOnlyList<AccordionSection> Sections => _sections;
 
+    /// <summary>
+    /// Executes set sections.
+    /// </summary>
+    /// <param name="sections">The sections value.</param>
     public void SetSections(IEnumerable<AccordionSection> sections)
     {
         ArgumentNullException.ThrowIfNull(sections);
@@ -151,6 +164,10 @@ public sealed class Accordion : Control
         }
     }
 
+    /// <summary>
+    /// Executes move next.
+    /// </summary>
+    /// <returns><see langword="true" /> when move next succeeds.</returns>
     public bool MoveNext()
     {
         if (_sections.Count == 0)
@@ -168,6 +185,10 @@ public sealed class Accordion : Control
         return true;
     }
 
+    /// <summary>
+    /// Executes move previous.
+    /// </summary>
+    /// <returns><see langword="true" /> when move previous succeeds.</returns>
     public bool MovePrevious()
     {
         if (_sections.Count == 0)
@@ -185,6 +206,10 @@ public sealed class Accordion : Control
         return true;
     }
 
+    /// <summary>
+    /// Executes toggle selected.
+    /// </summary>
+    /// <returns><see langword="true" /> when toggle selected succeeds.</returns>
     public bool ToggleSelected()
     {
         if (_sections.Count == 0)
@@ -197,6 +222,7 @@ public sealed class Accordion : Control
         return true;
     }
 
+    /// <inheritdoc />
     public override bool Handle(Message message)
     {
         if (!IsFocused || IsDisabled || IsReadOnly || message is not KeyPressed key)
@@ -222,6 +248,7 @@ public sealed class Accordion : Control
         return false;
     }
 
+    /// <inheritdoc />
     public override void Render(Canvas canvas, Rect rect)
     {
         canvas.DrawBox(rect, RenderTitle());

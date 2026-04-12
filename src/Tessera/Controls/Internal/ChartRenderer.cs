@@ -215,7 +215,12 @@ internal static class ChartRenderer
 
         var dx = x1 - x0;
         var dy = y1 - y0;
-        var step = Math.Abs(dy) <= 1 ? '─' : dy > 0 ? '╲' : '╱';
+        var step = '─';
+        if (Math.Abs(dy) > 1)
+        {
+            step = dy > 0 ? '╲' : '╱';
+        }
+
         for (var x = Math.Min(x0, x1) + 1; x < Math.Max(x0, x1); x++)
         {
             canvas.Set(x, y0 + ((x - x0) * dy / dx), step);

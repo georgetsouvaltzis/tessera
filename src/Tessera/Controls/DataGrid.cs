@@ -215,12 +215,9 @@ public sealed partial class DataGrid : Control
     {
         ArgumentNullException.ThrowIfNull(columns);
         _columns.Clear();
-        foreach (var column in columns)
+        foreach (var column in columns.Where(static column => column is not null))
         {
-            if (column is not null)
-            {
-                _columns.Add(column);
-            }
+            _columns.Add(column);
         }
 
         if (_columns.Count == 0)
@@ -432,19 +429,19 @@ public sealed partial class DataGrid : Control
 
             var hoveredColumn = ResolveHoveredColumnIndex(pointer.X, content);
             var hoveredRow = ResolveHoveredRowIndex(pointer.Y, content);
-            return changed | SetHoveredCell(hoveredRow, hoveredColumn);
+            return changed || SetHoveredCell(hoveredRow, hoveredColumn);
         }
 
         if (pointer.Kind == PointerEventKind.Wheel)
         {
             if (pointer.Button == PointerButton.WheelDown)
             {
-                return changed | SetSelectedCell(_selectedRowIndex + 1, _selectedColumnIndex);
+                return changed || SetSelectedCell(_selectedRowIndex + 1, _selectedColumnIndex);
             }
 
             if (pointer.Button == PointerButton.WheelUp)
             {
-                return changed | SetSelectedCell(_selectedRowIndex - 1, _selectedColumnIndex);
+                return changed || SetSelectedCell(_selectedRowIndex - 1, _selectedColumnIndex);
             }
 
             return changed;
@@ -487,7 +484,8 @@ public sealed partial class DataGrid : Control
         EnsureSelectionVisible(_lastViewportRowCount);
         var rowIndex = _scrollOffset + (pointer.Y - firstRowY);
         changed |= SetHoveredCell(rowIndex, columnIndex);
-        return changed | SetSelectedCell(rowIndex, columnIndex);
+        var rowSelectionChanged = SetSelectedCell(rowIndex, columnIndex);
+        return changed || rowSelectionChanged;
     }
 
     private DataGridSortDirection ResolveSortDirection(int columnIndex)

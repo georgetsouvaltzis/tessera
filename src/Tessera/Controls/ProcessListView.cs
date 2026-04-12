@@ -146,9 +146,9 @@ public sealed class ProcessListView : Control
         var previousIndex = _selectedIndex;
         var previousEntry = SelectedEntry;
         _entries.Clear();
-        foreach (var entry in entries)
+        foreach (var entry in entries.Where(static entry => entry is not null))
         {
-            if (entry is not null) _entries.Add(CloneEntry(entry));
+            _entries.Add(CloneEntry(entry));
         }
 
         if (_entries.Count == 0)

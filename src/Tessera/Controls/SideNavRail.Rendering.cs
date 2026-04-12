@@ -114,11 +114,16 @@ public sealed partial class SideNavRail
     private string FormatItemLine(int index, bool hovered, bool selected)
     {
         var item = _items[index];
-        var marker = selected
-            ? Glyphs.SelectedItemMarker
-            : hovered
-                ? Glyphs.HoveredItemMarker
-                : Glyphs.NormalItemMarker;
+        var marker = Glyphs.NormalItemMarker;
+        if (selected)
+        {
+            marker = Glyphs.SelectedItemMarker;
+        }
+        else if (hovered)
+        {
+            marker = Glyphs.HoveredItemMarker;
+        }
+
         return string.Concat(marker, Glyphs.ItemMarkerSeparator, FormatItemBody(item));
     }
 

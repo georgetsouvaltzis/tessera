@@ -1,6 +1,7 @@
 using System.Collections.Concurrent;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using Tessera.Controls;
 
 namespace Tessera.Styles;
@@ -15,6 +16,17 @@ namespace Tessera.Styles;
 public static class ThemeScope
 {
     private static readonly ConcurrentDictionary<Type, Action<Control, TesseraTheme>?> ApplyThemeDispatchCache = new();
+    private static readonly MethodInfo[] ApplyThemeMethods = typeof(ThemeScope)
+        .Assembly
+        .GetTypes()
+        .Where(static type =>
+            type.IsAbstract
+            && type.IsSealed
+            && type.Namespace == typeof(ThemeScope).Namespace
+            && type.Name.StartsWith("TesseraThemeControlExtensions", StringComparison.Ordinal))
+        .SelectMany(static type => type.GetMethods(BindingFlags.Public | BindingFlags.Static))
+        .Where(static method => method.IsDefined(typeof(ExtensionAttribute), inherit: false))
+        .ToArray();
 
     /// <summary>
     /// Applies <paramref name="theme" /> across the provided controls.
@@ -90,13 +102,12 @@ public static class ThemeScope
 
     private static MethodInfo? ResolveApplyThemeMethod(Type controlType)
     {
-        var methods = typeof(TesseraThemeControlExtensions).GetMethods(BindingFlags.Public | BindingFlags.Static);
         MethodInfo? assignableMatch = null;
 
-        for (var index = 0; index < methods.Length; index++)
+        for (var index = 0; index < ApplyThemeMethods.Length; index++)
         {
-            var method = methods[index];
-            if (!string.Equals(method.Name, nameof(TesseraThemeControlExtensions.ApplyTheme), StringComparison.Ordinal))
+            var method = ApplyThemeMethods[index];
+            if (!string.Equals(method.Name, "ApplyTheme", StringComparison.Ordinal))
             {
                 continue;
             }

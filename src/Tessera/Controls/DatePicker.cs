@@ -1,4 +1,4 @@
-using Tessera.Components.Primitives;
+﻿using Tessera.Components.Primitives;
 using Tessera.Components.Primitives.Internal;
 using Tessera.Controls.Internal;
 using Tessera.Components.Styling;
@@ -16,68 +16,104 @@ public sealed class DatePicker : Control
     private readonly WidgetStatePalette _dayStatePalette = WidgetStatePalette.CreateDefault();
     private DateOnly? _hoveredDate;
 
+    /// <summary>
+    /// Represents date changed.
+    /// </summary>
     public event EventHandler<DateChangedEventArgs>? DateChanged;
 
+    /// <summary>
+    /// Represents title.
+    /// </summary>
     public string Title
     {
         get;
         set => field = value ?? string.Empty;
     } = "Date Picker";
 
+    /// <summary>
+    /// Represents focus marker.
+    /// </summary>
     public string FocusMarker
     {
         get;
         set => field = value ?? string.Empty;
     } = "*";
 
+    /// <summary>
+    /// Represents show focus marker.
+    /// </summary>
     public bool ShowFocusMarker
     {
         get;
         set;
     } = true;
 
+    /// <summary>
+    /// Represents title style.
+    /// </summary>
     public TesseraStyle TitleStyle
     {
         get;
         set;
     } = TesseraStyle.Empty;
 
+    /// <summary>
+    /// Represents focused title style.
+    /// </summary>
     public TesseraStyle FocusedTitleStyle
     {
         get;
         set;
     } = TesseraStyle.Empty;
 
+    /// <summary>
+    /// Represents month header style.
+    /// </summary>
     public TesseraStyle MonthHeaderStyle
     {
         get;
         set;
     } = TesseraStyle.Empty;
 
+    /// <summary>
+    /// Represents weekday header style.
+    /// </summary>
     public TesseraStyle WeekdayHeaderStyle
     {
         get;
         set;
     } = TesseraStyle.Empty;
 
+    /// <summary>
+    /// Represents day style.
+    /// </summary>
     public TesseraStyle DayStyle
     {
         get;
         set;
     } = TesseraStyle.Empty;
 
+    /// <summary>
+    /// Represents selected day style.
+    /// </summary>
     public TesseraStyle SelectedDayStyle
     {
         get;
         set;
     } = TesseraStyle.Empty;
 
+    /// <summary>
+    /// Represents hovered day style.
+    /// </summary>
     public TesseraStyle HoveredDayStyle
     {
         get;
         set;
     } = TesseraStyle.Empty;
 
+    /// <summary>
+    /// Represents disabled day style.
+    /// </summary>
     public TesseraStyle DisabledDayStyle
     {
         get;
@@ -102,42 +138,64 @@ public sealed class DatePicker : Control
         set;
     } = TesseraStyle.Empty;
 
+    /// <summary>
+    /// Represents border.
+    /// </summary>
     public BorderStyle Border
     {
         get;
         set;
     } = BorderStyle.SingleLine;
 
+    /// <summary>
+    /// Represents padding.
+    /// </summary>
     public Thickness Padding
     {
         get;
         set;
     }
 
+    /// <summary>
+    /// Gets or sets the selected date.
+    /// </summary>
     public DateOnly SelectedDate { get; private set; } = DateOnly.FromDateTime(DateTime.UtcNow.Date);
 
+    /// <summary>
+    /// Gets or sets the current month.
+    /// </summary>
     public DateOnly CurrentMonth { get; private set; } = new(DateTime.UtcNow.Year, DateTime.UtcNow.Month, 1);
 
+    /// <summary>
+    /// Gets or sets the last committed date.
+    /// </summary>
     public DateOnly? LastCommittedDate { get; private set; }
 
+    /// <inheritdoc />
     public override bool IsFocused
     {
         get;
         set;
     }
 
+    /// <inheritdoc />
     public override bool IsDisabled
     {
         get;
         set;
     }
 
+    /// <inheritdoc />
     public override bool IsReadOnly
     {
         get;
         set;
     }
 
+    /// <summary>
+    /// Executes set date.
+    /// </summary>
+    /// <param name="date">The date value.</param>
     public void SetDate(DateOnly date)
     {
         var previousDate = SelectedDate;
@@ -149,6 +207,7 @@ public sealed class DatePicker : Control
         }
     }
 
+    /// <inheritdoc />
     public override bool Handle(Message message)
     {
         if (!IsFocused || IsDisabled || IsReadOnly || message is not KeyPressed key)
@@ -201,6 +260,7 @@ public sealed class DatePicker : Control
         return false;
     }
 
+    /// <inheritdoc />
     public override bool Handle(Message message, Rect bounds)
     {
         if (IsDisabled || IsReadOnly || message is not PointerInput pointer)
@@ -269,6 +329,7 @@ public sealed class DatePicker : Control
         return changed || Handle(message);
     }
 
+    /// <inheritdoc />
     public override void Render(Canvas canvas, Rect rect)
     {
         var clipped = Rect.Intersect(rect, canvas.Bounds);

@@ -99,7 +99,7 @@ public sealed class SplitViewControlTests
             FocusedDividerStyle = dividerStyle,
         };
 
-        var output = Render(control, 40, 8, CanvasTextMode.GraphemeAware);
+        var output = RenderControl(control, 40, 8, CanvasTextMode.GraphemeAware);
 
         TestAssert.True(output.Contains(borderStyle.Render("┌"), StringComparison.Ordinal), "Focused border style should apply to border glyphs.");
         TestAssert.True(output.Contains(dividerStyle.Render("│"), StringComparison.Ordinal), "Focused divider style should apply to divider glyphs.");
@@ -115,14 +115,14 @@ public sealed class SplitViewControlTests
             Second = new Label { Text = "right pane", Border = BorderStyle.None },
         };
 
-        var first = Render(control, 44, 9);
-        var second = Render(control, 44, 9);
+        var first = RenderControl(control, 44, 9);
+        var second = RenderControl(control, 44, 9);
 
         TestAssert.Equal(first, second, "SplitView should render deterministically for identical state.");
         TestAssert.True(!first.Contains("\u001b[", StringComparison.Ordinal), "Default SplitView output should remain monochrome.");
     }
 
-    private static string Render(SplitView control, int width, int height, CanvasTextMode mode = CanvasTextMode.Fast)
+    private static string RenderControl(SplitView control, int width, int height, CanvasTextMode mode = CanvasTextMode.Fast)
     {
         var canvas = new Canvas(width, height, mode);
         control.Render(canvas, new Rect(0, 0, width, height));

@@ -1,4 +1,4 @@
-using Tessera.Components.Primitives;
+﻿using Tessera.Components.Primitives;
 using Tessera.Controls.Internal;
 using Tessera.Layout;
 using Tessera.Styles;
@@ -13,8 +13,14 @@ public sealed class RadioGroup : Control
     private readonly List<string> _items = [];
     private int _hoveredIndex = -1;
 
+    /// <summary>
+    /// Represents selection changed.
+    /// </summary>
     public event EventHandler<SelectionChangedEventArgs>? SelectionChanged;
 
+    /// <summary>
+    /// Represents title.
+    /// </summary>
     public string Title
     {
         get;
@@ -111,13 +117,23 @@ public sealed class RadioGroup : Control
         set => field = value ?? string.Empty;
     } = "( )";
 
+    /// <summary>
+    /// Gets or sets the selected index.
+    /// </summary>
     public int SelectedIndex { get; private set; }
 
+    /// <summary>
+    /// Represents selected item.
+    /// </summary>
     public string SelectedItem =>
         SelectedIndex >= 0 && SelectedIndex < _items.Count
             ? _items[SelectedIndex]
             : string.Empty;
 
+    /// <summary>
+    /// Executes set items.
+    /// </summary>
+    /// <param name="items">The items value.</param>
     public void SetItems(IEnumerable<string> items)
     {
         ArgumentNullException.ThrowIfNull(items);
@@ -131,6 +147,7 @@ public sealed class RadioGroup : Control
         _hoveredIndex = Math.Clamp(_hoveredIndex, -1, _items.Count - 1);
     }
 
+    /// <inheritdoc />
     public override bool Handle(Message message)
     {
         if (!IsFocused || IsDisabled || IsReadOnly)
@@ -163,6 +180,7 @@ public sealed class RadioGroup : Control
         return changed;
     }
 
+    /// <inheritdoc />
     public override bool Handle(Message message, Rect bounds)
     {
         if (IsDisabled || IsReadOnly || _items.Count == 0 || message is not PointerInput pointer || bounds.IsEmpty)
@@ -212,6 +230,7 @@ public sealed class RadioGroup : Control
         return true;
     }
 
+    /// <inheritdoc />
     public override void Render(Canvas canvas, Rect rect)
     {
         canvas.DrawBox(rect, RenderTitle());

@@ -436,8 +436,7 @@ public sealed class QueryBuilder : Control
         if (!content.Contains(pointer.X, pointer.Y))
         {
             return pointer.Kind is PointerEventKind.Motion or PointerEventKind.Press
-                ? SetHoveredIndex(-1)
-                : false;
+                && SetHoveredIndex(-1);
         }
 
         var rulesTop = ShowQueryPreview && content.Height > 1 ? content.Y + 1 : content.Y;
@@ -451,13 +450,13 @@ public sealed class QueryBuilder : Control
         if (pointer.Kind == PointerEventKind.Press && pointer.Button == PointerButton.Left)
         {
             RequestFocus();
-            var changed = SetHoveredIndex(hit);
+            _ = SetHoveredIndex(hit);
             if (hit >= 0)
             {
-                changed |= SetSelectedIndex(hit);
+                _ = SetSelectedIndex(hit);
             }
 
-            return changed || true;
+            return true;
         }
 
         return false;

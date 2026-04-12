@@ -1,4 +1,4 @@
-using Tessera.Components.Primitives;
+﻿using Tessera.Components.Primitives;
 using Tessera.Controls.Internal;
 using Tessera.Layout;
 using Tessera.Styles;
@@ -125,18 +125,21 @@ public sealed class Paginator : Control
         set => SetPageCount(value);
     }
 
+    /// <inheritdoc />
     public override bool IsFocused
     {
         get;
         set;
     }
 
+    /// <inheritdoc />
     public override bool IsDisabled
     {
         get;
         set;
     }
 
+    /// <inheritdoc />
     public override bool IsReadOnly
     {
         get;
@@ -159,6 +162,7 @@ public sealed class Paginator : Control
     /// <param name="pageIndex">The requested page index.</param>
     public void SetPage(int pageIndex) => TrySetPage(pageIndex);
 
+    /// <inheritdoc />
     public override bool Handle(Message message)
     {
         if (IsDisabled || IsReadOnly || !IsFocused || message is not KeyPressed key)
@@ -189,6 +193,7 @@ public sealed class Paginator : Control
         return false;
     }
 
+    /// <inheritdoc />
     public override bool Handle(Message message, Rect bounds)
     {
         if (IsDisabled || IsReadOnly || message is not PointerInput pointer || bounds.IsEmpty)
@@ -220,6 +225,7 @@ public sealed class Paginator : Control
         return false;
     }
 
+    /// <inheritdoc />
     public override void Render(Canvas canvas, Rect rect)
     {
         var clipped = Rect.Intersect(rect, canvas.Bounds);

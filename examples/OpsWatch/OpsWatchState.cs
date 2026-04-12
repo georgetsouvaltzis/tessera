@@ -112,7 +112,23 @@ internal sealed class OpsWatchState
     public int DrainingCount => CurrentNodes.Count(static node => node.IsDraining);
     public int ActiveAlertCount => CurrentNodes.Count(static node => node.Severity != HealthServiceSeverity.Healthy);
     public int AckCount => CurrentNodes.Count(static node => node.IsAcknowledged);
-    public string AlertPressureLabel => ActiveAlertCount >= 4 ? "severe" : ActiveAlertCount >= 2 ? "elevated" : "controlled";
+    public string AlertPressureLabel
+    {
+        get
+        {
+            if (ActiveAlertCount >= 4)
+            {
+                return "severe";
+            }
+
+            if (ActiveAlertCount >= 2)
+            {
+                return "elevated";
+            }
+
+            return "controlled";
+        }
+    }
 
     public IReadOnlyList<NavItem> BuildNavItems()
     {
@@ -169,11 +185,25 @@ internal sealed class OpsWatchState
 
     public static IReadOnlyList<StatItem> BuildMetricCardItems(string label, double value, string delta)
     {
+        string ceiling;
+        if (value >= 85)
+        {
+            ceiling = "hot";
+        }
+        else if (value >= 65)
+        {
+            ceiling = "watch";
+        }
+        else
+        {
+            ceiling = "green";
+        }
+
         return
         [
             new StatItem("Now", $"{value:0}%"),
             new StatItem("Drift", delta),
-            new StatItem("Ceil", value >= 85 ? "hot" : value >= 65 ? "watch" : "green"),
+            new StatItem("Ceil", ceiling),
         ];
     }
 
@@ -248,12 +278,9 @@ internal sealed class OpsWatchState
     public void Advance()
     {
         _tick++;
-        foreach (var cluster in _clusters)
+        foreach (var node in _clusters.SelectMany(static cluster => cluster.Nodes))
         {
-            for (var index = 0; index < cluster.Nodes.Count; index++)
-            {
-                UpdateNode(cluster.Nodes[index]);
-            }
+            UpdateNode(node);
         }
 
         if (_tick % 5 == 0)
@@ -261,7 +288,19 @@ internal sealed class OpsWatchState
             EmitSystemFeed();
         }
 
-        _automationMode = ActiveAlertCount >= 4 ? "containment" : ActiveAlertCount >= 2 ? "assisted" : "steady hand";
+        if (ActiveAlertCount >= 4)
+        {
+            _automationMode = "containment";
+        }
+        else if (ActiveAlertCount >= 2)
+        {
+            _automationMode = "assisted";
+        }
+        else
+        {
+            _automationMode = "steady hand";
+        }
+
         CaptureTrends();
         SyncSelection();
     }

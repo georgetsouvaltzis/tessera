@@ -1,5 +1,3 @@
-using System.Diagnostics.CodeAnalysis;
-
 namespace Tessera.Controls;
 
 /// <summary>
@@ -10,8 +8,7 @@ public enum JsonTreeNodeKind
     /// <summary>
     /// JSON object container.
     /// </summary>
-    [SuppressMessage("Naming", "CA1720:Identifier contains type name", Justification = "JSON object is canonical domain terminology.")]
-    Object = 0,
+    ObjectNode = 0,
 
     /// <summary>
     /// JSON array container.
@@ -47,12 +44,9 @@ public sealed class JsonTreeNode
         Kind = kind;
         if (children is not null)
         {
-            foreach (var child in children)
+            foreach (var child in children.Where(static child => child is not null))
             {
-                if (child is not null)
-                {
-                    Children.Add(child);
-                }
+                Children.Add(child);
             }
         }
     }
@@ -85,5 +79,5 @@ public sealed class JsonTreeNode
     /// <summary>
     /// Gets a value indicating whether the node is a container.
     /// </summary>
-    public bool IsContainer => Kind is JsonTreeNodeKind.Object or JsonTreeNodeKind.Array;
+    public bool IsContainer => Kind is JsonTreeNodeKind.ObjectNode or JsonTreeNodeKind.Array;
 }

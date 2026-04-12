@@ -120,7 +120,6 @@ internal static class PerfGateRunner
         return measurements;
     }
 
-    [SuppressMessage("Sonar", "S1215", Justification = "The perf gate forces a full collection between warmup and timed samples to stabilize allocation baselines.")]
     private static PerfGateMeasurement MeasureScenario(PerfGateScenario scenario)
     {
         var execute = scenario.CreateWorkload();
@@ -128,10 +127,6 @@ internal static class PerfGateRunner
         {
             _ = execute();
         }
-
-        GC.Collect();
-        GC.WaitForPendingFinalizers();
-        GC.Collect();
 
         Span<double> samples = stackalloc double[MeasurementCount];
         Span<double> allocationSamples = stackalloc double[MeasurementCount];

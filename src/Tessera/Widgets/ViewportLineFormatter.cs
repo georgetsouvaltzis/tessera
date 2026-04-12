@@ -129,11 +129,13 @@ internal static class ViewportLineFormatter
 
         var lines = new List<string>();
         var start = 0;
-        for (var index = 0; index < content.Length; index++)
+        var index = 0;
+        while (index < content.Length)
         {
             var current = content[index];
             if (current != '\n' && current != '\r')
             {
+                index++;
                 continue;
             }
 
@@ -144,6 +146,7 @@ internal static class ViewportLineFormatter
             }
 
             start = index + 1;
+            index++;
         }
 
         lines.Add(content[start..]);

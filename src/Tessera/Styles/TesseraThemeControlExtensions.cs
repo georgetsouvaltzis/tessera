@@ -5,12 +5,12 @@ namespace Tessera.Styles;
 /// </summary>
 public static partial class TesseraThemeControlExtensions
 {
-    private static TesseraStyle ApplyDefault(TesseraStyle current, TesseraStyle fallback)
+    internal static TesseraStyle ApplyDefault(TesseraStyle current, TesseraStyle fallback)
     {
         return current.IsEmpty ? fallback : current;
     }
 
-    private static string ApplyDefault(string current, string fallback)
+    internal static string ApplyDefault(string current, string fallback)
     {
         return string.IsNullOrEmpty(current) ? fallback : current;
     }

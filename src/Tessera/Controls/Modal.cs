@@ -1,4 +1,4 @@
-using Tessera.Components.Primitives;
+﻿using Tessera.Components.Primitives;
 using Tessera.Components.Primitives.Internal;
 using Tessera.Controls.Internal;
 using Tessera.Layout;
@@ -13,36 +13,54 @@ public sealed class Modal : Control
 {
     private List<string> _bodyLines = ["(empty)"];
 
+    /// <summary>
+    /// Represents title.
+    /// </summary>
     public string Title
     {
         get;
         set => field = value ?? string.Empty;
     } = "Modal";
 
+    /// <summary>
+    /// Represents is visible.
+    /// </summary>
     public bool IsVisible
     {
         get;
         set;
     }
 
+    /// <summary>
+    /// Represents border.
+    /// </summary>
     public BorderStyle Border
     {
         get;
         set;
     } = BorderStyle.Rounded;
 
+    /// <summary>
+    /// Represents padding.
+    /// </summary>
     public Thickness Padding
     {
         get;
         set;
     }
 
+    /// <summary>
+    /// Represents body lines.
+    /// </summary>
     public IReadOnlyList<string> BodyLines
     {
         get => _bodyLines;
         set => _bodyLines = [.. (value ?? ["(empty)"])];
     }
 
+    /// <summary>
+    /// Represents backdrop fill.
+    /// </summary>
     public char BackdropFill
     {
         get;
@@ -88,6 +106,7 @@ public sealed class Modal : Control
     /// </summary>
     public TesseraStyle FocusedBorderStyleText { get; set; } = TesseraStyle.Empty;
 
+    /// <inheritdoc />
     public override void Render(Canvas canvas, Rect rect)
     {
         if (!IsVisible)
@@ -134,6 +153,10 @@ public sealed class Modal : Control
         }
     }
 
+    /// <summary>
+    /// Executes set body lines.
+    /// </summary>
+    /// <param name="lines">The lines value.</param>
     public void SetBodyLines(IEnumerable<string> lines)
     {
         ArgumentNullException.ThrowIfNull(lines);

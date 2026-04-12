@@ -113,34 +113,34 @@ public sealed partial class HealthBoard
         var summary = string.IsNullOrWhiteSpace(service.Summary)
             ? string.Empty
             : string.Concat(" - ", service.Summary);
-        var acknowledged = service.IsAcknowledged && _glyphs.AcknowledgedGlyph.Length > 0
-            ? string.Concat(" [", _glyphs.AcknowledgedGlyph, "]")
+        var acknowledged = service.IsAcknowledged && Glyphs.AcknowledgedGlyph.Length > 0
+            ? string.Concat(" [", Glyphs.AcknowledgedGlyph, "]")
             : string.Empty;
-        return string.Concat(marker, _glyphs.MarkerSeparator, severityGlyph, _glyphs.MarkerSeparator, service.Name, summary, acknowledged);
+        return string.Concat(marker, Glyphs.MarkerSeparator, severityGlyph, Glyphs.MarkerSeparator, service.Name, summary, acknowledged);
     }
 
     private string ResolveRowMarker(int index)
     {
         if (index == _selectedIndex)
         {
-            return _glyphs.SelectedRowMarker;
+            return Glyphs.SelectedRowMarker;
         }
 
         if (index == _hoveredIndex)
         {
-            return _glyphs.HoveredRowMarker;
+            return Glyphs.HoveredRowMarker;
         }
 
-        return _glyphs.NormalRowMarker;
+        return Glyphs.NormalRowMarker;
     }
 
     private string ResolveSeverityGlyph(HealthServiceSeverity severity)
     {
         return severity switch
         {
-            HealthServiceSeverity.Degraded => _glyphs.DegradedGlyph,
-            HealthServiceSeverity.Outage => _glyphs.OutageGlyph,
-            _ => _glyphs.HealthyGlyph,
+            HealthServiceSeverity.Degraded => Glyphs.DegradedGlyph,
+            HealthServiceSeverity.Outage => Glyphs.OutageGlyph,
+            _ => Glyphs.HealthyGlyph,
         };
     }
 

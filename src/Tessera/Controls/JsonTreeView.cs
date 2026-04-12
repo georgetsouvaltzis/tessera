@@ -162,12 +162,9 @@ public sealed partial class JsonTreeView : Control
     {
         ArgumentNullException.ThrowIfNull(roots);
         _roots.Clear();
-        foreach (var node in roots)
+        foreach (var node in roots.Where(static node => node is not null))
         {
-            if (node is not null)
-            {
-                _roots.Add(Clone(node));
-            }
+            _roots.Add(Clone(node));
         }
 
         RefreshVisible();

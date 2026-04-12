@@ -11,7 +11,6 @@ public sealed partial class QuickOpenOverlay : Control
 {
     private readonly List<QuickOpenItem> _items = [];
     private readonly List<int> _filteredIndices = [];
-    private QuickOpenOverlayGlyphSet _glyphs = QuickOpenOverlayGlyphSet.Default;
     private int _selectedFilteredIndex;
     private int _hoveredFilteredIndex = -1;
     private string _query = string.Empty;
@@ -134,11 +133,7 @@ public sealed partial class QuickOpenOverlay : Control
     /// <summary>
     /// Gets or sets glyphs used by query and row rendering.
     /// </summary>
-    public QuickOpenOverlayGlyphSet Glyphs
-    {
-        get => _glyphs;
-        set => _glyphs = value;
-    }
+    public QuickOpenOverlayGlyphSet Glyphs { get; set; } = QuickOpenOverlayGlyphSet.Default;
 
     /// <summary>
     /// Gets or sets overlay border style.
@@ -205,12 +200,9 @@ public sealed partial class QuickOpenOverlay : Control
         ArgumentNullException.ThrowIfNull(items);
 
         _items.Clear();
-        foreach (var item in items)
+        foreach (var item in items.Where(static item => item is not null))
         {
-            if (item is not null)
-            {
-                _items.Add(item);
-            }
+            _items.Add(item);
         }
 
         RefreshFilter();

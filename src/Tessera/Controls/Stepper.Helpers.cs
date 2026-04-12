@@ -116,13 +116,20 @@ public sealed partial class Stepper
     private string FormatStepLabel(int index)
     {
         var step = _steps[index];
-        var prefix = step.IsDisabled
-            ? "[-]"
-            : step.IsCompleted
-                ? "[x]"
-                : index == _currentIndex
-                    ? "[>]"
-                    : "[ ]";
+        var prefix = "[ ]";
+        if (step.IsDisabled)
+        {
+            prefix = "[-]";
+        }
+        else if (step.IsCompleted)
+        {
+            prefix = "[x]";
+        }
+        else if (index == _currentIndex)
+        {
+            prefix = "[>]";
+        }
+
         return $"{prefix} {step.Label}";
     }
 

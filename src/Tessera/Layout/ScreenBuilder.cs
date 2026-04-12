@@ -293,28 +293,16 @@ public sealed class StackBuilder
         Add(LayoutSlot.Auto(content, margin));
 
     /// <summary>
-    /// Adds a fixed-size item.
-    /// </summary>
-    public StackBuilder Fixed(int size, LayoutNode content, Thickness margin = default) =>
-        Add(LayoutSlot.Fixed(content, size, margin));
-
-    /// <summary>
-    /// Adds a fill item.
-    /// </summary>
-    public StackBuilder Fill(LayoutNode content, Thickness margin = default) =>
-        Add(LayoutSlot.Fill(content, margin));
-
-    /// <summary>
-    /// Adds a weighted item.
-    /// </summary>
-    public StackBuilder Weighted(int weight, LayoutNode content, Thickness margin = default) =>
-        Add(LayoutSlot.Weighted(content, weight, margin));
-
-    /// <summary>
     /// Adds an auto-sized nested item built imperatively.
     /// </summary>
     public StackBuilder Auto(Action<ContentBuilder> configure, Thickness margin = default) =>
         Auto(BuildContent(configure), margin);
+
+    /// <summary>
+    /// Adds a fixed-size item.
+    /// </summary>
+    public StackBuilder Fixed(int size, LayoutNode content, Thickness margin = default) =>
+        Add(LayoutSlot.Fixed(content, size, margin));
 
     /// <summary>
     /// Adds a fixed-size nested item built imperatively.
@@ -323,10 +311,22 @@ public sealed class StackBuilder
         Fixed(size, BuildContent(configure), margin);
 
     /// <summary>
+    /// Adds a fill item.
+    /// </summary>
+    public StackBuilder Fill(LayoutNode content, Thickness margin = default) =>
+        Add(LayoutSlot.Fill(content, margin));
+
+    /// <summary>
     /// Adds a fill nested item built imperatively.
     /// </summary>
     public StackBuilder Fill(Action<ContentBuilder> configure, Thickness margin = default) =>
         Fill(BuildContent(configure), margin);
+
+    /// <summary>
+    /// Adds a weighted item.
+    /// </summary>
+    public StackBuilder Weighted(int weight, LayoutNode content, Thickness margin = default) =>
+        Add(LayoutSlot.Weighted(content, weight, margin));
 
     /// <summary>
     /// Adds a weighted nested item built imperatively.

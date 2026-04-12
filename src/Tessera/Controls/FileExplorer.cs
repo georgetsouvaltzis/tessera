@@ -1,4 +1,4 @@
-using Tessera.Components.Primitives;
+﻿using Tessera.Components.Primitives;
 using Tessera.Components.Primitives.Internal;
 using Tessera.Controls.Internal;
 using Tessera.Layout;
@@ -115,8 +115,11 @@ public sealed partial class FileExplorer : Control
         ? _visible[_selectedVisibleIndex].Item
         : null;
 
+    /// <inheritdoc />
     public override bool IsFocused { get; set; }
+    /// <inheritdoc />
     public override bool IsDisabled { get; set; }
+    /// <inheritdoc />
     public override bool IsReadOnly { get; set; }
 
     /// <summary>
@@ -130,12 +133,9 @@ public sealed partial class FileExplorer : Control
         var previousItem = SelectedItem;
 
         _roots.Clear();
-        foreach (var item in items)
+        foreach (var item in items.Where(static item => item is not null))
         {
-            if (item is not null)
-            {
-                _roots.Add(Clone(item));
-            }
+            _roots.Add(Clone(item));
         }
 
         RefreshVisible();
@@ -203,6 +203,7 @@ public sealed partial class FileExplorer : Control
         return true;
     }
 
+    /// <inheritdoc />
     public override bool Handle(Message message)
     {
         if (IsDisabled || IsReadOnly || !IsFocused || _visible.Count == 0 || message is not KeyPressed key)
@@ -238,6 +239,7 @@ public sealed partial class FileExplorer : Control
         return false;
     }
 
+    /// <inheritdoc />
     public override bool Handle(Message message, Rect bounds)
     {
         if (IsDisabled || IsReadOnly || message is not PointerInput pointer || bounds.IsEmpty || _visible.Count == 0)
@@ -266,12 +268,12 @@ public sealed partial class FileExplorer : Control
         {
             if (pointer.Button == PointerButton.WheelDown)
             {
-                return changed | SetSelectedVisibleIndex(Math.Min(_visible.Count - 1, _selectedVisibleIndex + 1));
+                return changed || SetSelectedVisibleIndex(Math.Min(_visible.Count - 1, _selectedVisibleIndex + 1));
             }
 
             if (pointer.Button == PointerButton.WheelUp)
             {
-                return changed | SetSelectedVisibleIndex(Math.Max(0, _selectedVisibleIndex - 1));
+                return changed || SetSelectedVisibleIndex(Math.Max(0, _selectedVisibleIndex - 1));
             }
 
             return false;
@@ -294,12 +296,14 @@ public sealed partial class FileExplorer : Control
         changed |= SetHoveredVisibleIndex(hoveredVisibleIndex);
         if (hoveredVisibleIndex < 0)
         {
-            return changed || true;
+            return true;
         }
 
-        return changed | SetSelectedVisibleIndex(hoveredVisibleIndex);
+        var selectionChanged = SetSelectedVisibleIndex(hoveredVisibleIndex);
+        return changed || selectionChanged;
     }
 
+    /// <inheritdoc />
     public override void Render(Canvas canvas, Rect rect)
     {
         var clipped = Rect.Intersect(rect, canvas.Bounds);
@@ -335,9 +339,11 @@ public sealed partial class FileExplorer : Control
             var entry = _visible[index];
             var marker = index == _selectedVisibleIndex ? ">" : " ";
             var indent = new string(' ', entry.Depth * 2);
-            var glyph = entry.Item.IsDirectory
-                ? entry.Item.IsExpanded ? "▾" : "▸"
-                : "•";
+            var glyph = "•";
+            if (entry.Item.IsDirectory)
+            {
+                glyph = entry.Item.IsExpanded ? "▾" : "▸";
+            }
             var style = entry.Item.IsDirectory ? DirectoryStyle : FileStyle;
             if (index == _hoveredVisibleIndex)
             {

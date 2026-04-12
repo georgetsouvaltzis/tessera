@@ -91,7 +91,7 @@ public sealed class AutocompleteInputControlTests
         var output = Render(control, width: 40, height: 8);
 
         Assert.That(output.Contains("AC !", StringComparison.Ordinal), Is.True);
-        Assert.That(output.Contains("!"), Is.True);
+        Assert.That(output.Contains('!'), Is.True);
         Assert.That(output.Contains("~|bravo", StringComparison.Ordinal), Is.True);
         Assert.That(output.Contains("38;2;10;20;30", StringComparison.Ordinal), Is.True);
         Assert.That(output.Contains("38;2;40;50;60", StringComparison.Ordinal), Is.True);
@@ -114,7 +114,7 @@ public sealed class AutocompleteInputControlTests
         Assert.That(first, Is.EqualTo(second));
         Assert.That(first.Contains("\u001b[", StringComparison.Ordinal), Is.False);
         Assert.That(first.Contains('>'), Is.True);
-        Assert.That(first.Contains("↵", StringComparison.Ordinal), Is.True);
+        Assert.That(first.Contains('↵'), Is.True);
     }
 
     private static AutocompleteInput CreateControl()

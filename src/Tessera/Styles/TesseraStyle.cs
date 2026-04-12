@@ -13,10 +13,10 @@ namespace Tessera.Styles;
 /// </remarks>
 public readonly record struct TesseraStyle
 {
-    private const string ResetSequence = "\u001b[0m";
+    private const string ResetSgrSequence = "\u001b[0m";
     private static readonly ConcurrentDictionary<TesseraStyle, RenderSequences> SequenceCache = new();
 
-    private readonly record struct RenderSequences(string OpenSequence, string ResetSequence);
+    private readonly record struct RenderSequences(string OpenSequence, string CloseSequence);
 
     /// <summary>
     /// Gets an empty style that does not emit any SGR parameters.
@@ -266,14 +266,14 @@ public readonly record struct TesseraStyle
         }
 
         var sequences = GetSequences();
-        return string.Concat(sequences.OpenSequence, text, sequences.ResetSequence);
+        return string.Concat(sequences.OpenSequence, text, sequences.CloseSequence);
     }
 
     private RenderSequences GetSequences()
     {
         return SequenceCache.GetOrAdd(
             this,
-            static style => new RenderSequences(BuildEscapeSequence(style), ResetSequence));
+            static style => new RenderSequences(BuildEscapeSequence(style), ResetSgrSequence));
     }
 
     private static string BuildEscapeSequence(TesseraStyle style)

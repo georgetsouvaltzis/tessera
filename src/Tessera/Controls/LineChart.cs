@@ -1,4 +1,4 @@
-using Tessera.Components.Primitives;
+﻿using Tessera.Components.Primitives;
 using Tessera.Controls.Internal;
 using Tessera.Layout;
 using Tessera.Styles;
@@ -174,6 +174,7 @@ public sealed class LineChart : Control
         Offset = Math.Max(0, Offset + delta);
     }
 
+    /// <inheritdoc />
     public override void Render(Canvas canvas, Rect rect)
     {
         var options = (Options ?? new LineChartOptions()) with

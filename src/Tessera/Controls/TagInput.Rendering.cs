@@ -1,4 +1,4 @@
-using System.Globalization;
+﻿using System.Globalization;
 using Tessera.Components.Primitives;
 using Tessera.Components.Primitives.Internal;
 using Tessera.Controls.Internal;
@@ -23,6 +23,7 @@ public sealed partial class TagInput
         public int Height { get; set; } = 1;
     }
 
+    /// <inheritdoc />
     public override void Render(Canvas canvas, Rect rect)
     {
         var clipped = Rect.Intersect(rect, canvas.Bounds);
@@ -434,9 +435,14 @@ public sealed partial class TagInput
 
     private string FormatTitleText()
     {
-        return string.IsNullOrEmpty(Title)
-            ? string.Empty
-            : IsFocused && ShowFocusMarker && !string.IsNullOrWhiteSpace(FocusMarker) ? $"{Title} {FocusMarker}" : Title;
+        if (string.IsNullOrEmpty(Title))
+        {
+            return string.Empty;
+        }
+
+        return IsFocused && ShowFocusMarker && !string.IsNullOrWhiteSpace(FocusMarker)
+            ? $"{Title} {FocusMarker}"
+            : Title;
     }
 
     private string ResolveCaretGlyph()
@@ -449,21 +455,20 @@ public sealed partial class TagInput
         return string.Empty;
     }
 
-    private static int RenderTextSegment(Canvas canvas, int x, int y, string text, TesseraStyle style, int maxWidth)
+    private static void RenderTextSegment(Canvas canvas, int x, int y, string text, TesseraStyle style, int maxWidth)
     {
         if (maxWidth <= 0)
         {
-            return 0;
+            return;
         }
 
         var visible = SliceToDisplayWidth(text, maxWidth);
         if (string.IsNullOrEmpty(visible))
         {
-            return 0;
+            return;
         }
 
         canvas.WriteText(x, y, ApplyStyle(visible, style), maxWidth);
-        return ControlTextLayout.MeasureDisplayWidth(visible);
     }
 
     private static string SliceToDisplayWidth(string text, int maxWidth)

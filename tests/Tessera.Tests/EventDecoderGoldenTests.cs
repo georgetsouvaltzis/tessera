@@ -491,14 +491,6 @@ internal static class EventDecoderGoldenTests
         }
     }
 
-    private static void AssertNoMessage(DecodeResult result)
-    {
-        if (result.Message is not null)
-        {
-            throw new InvalidOperationException($"Expected null message but got {result.Message.GetType().Name}.");
-        }
-    }
-
     private static void AssertConsumed(DecodeResult result, int expected)
     {
         if (result.Consumed != expected)

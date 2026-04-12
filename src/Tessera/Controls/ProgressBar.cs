@@ -1,4 +1,4 @@
-using Tessera.Components.Primitives;
+﻿using Tessera.Components.Primitives;
 using Tessera.Components.Primitives.Internal;
 using Tessera.Controls.Internal;
 using Tessera.Layout;
@@ -11,54 +11,81 @@ namespace Tessera.Controls;
 /// </summary>
 public sealed class ProgressBar : Control
 {
+    /// <summary>
+    /// Represents title.
+    /// </summary>
     public string Title
     {
         get;
         set => field = value ?? string.Empty;
     } = "Progress";
 
+    /// <summary>
+    /// Represents focus marker.
+    /// </summary>
     public string FocusMarker
     {
         get;
         set => field = value ?? string.Empty;
     } = "*";
 
+    /// <summary>
+    /// Represents show focus marker.
+    /// </summary>
     public bool ShowFocusMarker
     {
         get;
         set;
     } = true;
 
+    /// <summary>
+    /// Represents title style.
+    /// </summary>
     public TesseraStyle TitleStyle
     {
         get;
         set;
     } = TesseraStyle.Empty;
 
+    /// <summary>
+    /// Represents focused title style.
+    /// </summary>
     public TesseraStyle FocusedTitleStyle
     {
         get;
         set;
     } = TesseraStyle.Empty;
 
+    /// <summary>
+    /// Represents fill style.
+    /// </summary>
     public TesseraStyle FillStyle
     {
         get;
         set;
     } = TesseraStyle.Empty;
 
+    /// <summary>
+    /// Represents track style.
+    /// </summary>
     public TesseraStyle TrackStyle
     {
         get;
         set;
     } = TesseraStyle.Empty;
 
+    /// <summary>
+    /// Represents label style.
+    /// </summary>
     public TesseraStyle LabelStyle
     {
         get;
         set;
     } = TesseraStyle.Empty;
 
+    /// <summary>
+    /// Represents disabled style.
+    /// </summary>
     public TesseraStyle DisabledStyle
     {
         get;
@@ -83,46 +110,66 @@ public sealed class ProgressBar : Control
         set;
     } = TesseraStyle.Empty;
 
+    /// <summary>
+    /// Gets or sets the value.
+    /// </summary>
     public double Value { get; private set; }
 
+    /// <summary>
+    /// Represents step.
+    /// </summary>
     public double Step
     {
         get;
         set;
     } = 0.05;
 
+    /// <summary>
+    /// Represents border.
+    /// </summary>
     public BorderStyle Border
     {
         get;
         set;
     } = BorderStyle.SingleLine;
 
+    /// <summary>
+    /// Represents padding.
+    /// </summary>
     public Thickness Padding
     {
         get;
         set;
     }
 
+    /// <inheritdoc />
     public override bool IsFocused
     {
         get;
         set;
     }
 
+    /// <inheritdoc />
     public override bool IsDisabled
     {
         get;
         set;
     }
 
+    /// <inheritdoc />
     public override bool IsReadOnly
     {
         get;
         set;
     }
 
+    /// <summary>
+    /// Executes set value.
+    /// </summary>
+    /// <param name="value)">The value value.</param>
     public void SetValue(double value) => Value = Math.Clamp(value, 0.0, 1.0);
 
+    /// <inheritdoc />
     public override bool Handle(Message message)
     {
         if (!IsFocused || IsDisabled || IsReadOnly || message is not KeyPressed key)
@@ -145,6 +192,7 @@ public sealed class ProgressBar : Control
         return false;
     }
 
+    /// <inheritdoc />
     public override void Render(Canvas canvas, Rect rect)
     {
         var clipped = Rect.Intersect(rect, canvas.Bounds);

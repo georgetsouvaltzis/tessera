@@ -41,7 +41,8 @@ public sealed class DialogClosedEventTests
         Assert.That(acceptedCount, Is.EqualTo(1));
         Assert.That(dismissedCount, Is.EqualTo(0));
         Assert.That(closedCount, Is.EqualTo(1));
-        Assert.That(sequence, Is.EqualTo(new[] { "accepted", "closed:Accepted" }));
+        var expectedSequence = new[] { "accepted", "closed:Accepted" };
+        Assert.That(sequence, Is.EqualTo(expectedSequence));
     }
 
     [Test]
@@ -78,7 +79,8 @@ public sealed class DialogClosedEventTests
         Assert.That(acceptedCount, Is.EqualTo(0));
         Assert.That(dismissedCount, Is.EqualTo(1));
         Assert.That(closedCount, Is.EqualTo(1));
-        Assert.That(sequence, Is.EqualTo(new[] { "dismissed", "closed:Dismissed" }));
+        var expectedSequence = new[] { "dismissed", "closed:Dismissed" };
+        Assert.That(sequence, Is.EqualTo(expectedSequence));
     }
 
     [Test]
@@ -107,7 +109,8 @@ public sealed class DialogClosedEventTests
 
         Assert.That(acceptedCount, Is.EqualTo(1));
         Assert.That(dismissedCount, Is.EqualTo(1));
-        Assert.That(closedResults, Is.EqualTo(new[] { DialogResult.Accepted, DialogResult.Dismissed }));
+        var expectedClosedResults = new[] { DialogResult.Accepted, DialogResult.Dismissed };
+        Assert.That(closedResults, Is.EqualTo(expectedClosedResults));
     }
 
     private static Dialog CreateVisibleFocusedDialog()

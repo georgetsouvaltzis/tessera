@@ -159,12 +159,9 @@ public sealed class Timeline : Control
         var previousItem = SelectedItem;
 
         _entries.Clear();
-        foreach (var entry in entries)
+        foreach (var entry in entries.Where(static entry => entry is not null))
         {
-            if (entry is not null)
-            {
-                _entries.Add(entry);
-            }
+            _entries.Add(entry);
         }
 
         _selectedIndex = _entries.Count == 0 ? 0 : Math.Clamp(_selectedIndex, 0, _entries.Count - 1);

@@ -1,4 +1,4 @@
-using Tessera.Components.Primitives;
+﻿using Tessera.Components.Primitives;
 using Tessera.Components.Primitives.Internal;
 using Tessera.Controls.Internal;
 using Tessera.Layout;
@@ -171,18 +171,21 @@ public sealed class ListView<T> : Control
     /// </summary>
     public T? SelectedItem => _model.SelectedItem;
 
+    /// <inheritdoc />
     public override bool IsFocused
     {
         get;
         set;
     }
 
+    /// <inheritdoc />
     public override bool IsDisabled
     {
         get;
         set;
     }
 
+    /// <inheritdoc />
     public override bool IsReadOnly
     {
         get;
@@ -237,6 +240,7 @@ public sealed class ListView<T> : Control
         return SetSelectedIndex(index);
     }
 
+    /// <inheritdoc />
     public override bool Handle(Message message)
     {
         if (IsDisabled)
@@ -251,6 +255,7 @@ public sealed class ListView<T> : Control
         return changed;
     }
 
+    /// <inheritdoc />
     public override bool Handle(Message message, Rect bounds)
     {
         if (IsDisabled || message is not PointerInput pointer)
@@ -276,8 +281,7 @@ public sealed class ListView<T> : Control
 
         _model.PageSize = Math.Max(1, content.Height);
         var hoverChanged = pointer.Kind is PointerEventKind.Motion or PointerEventKind.Press
-            ? SetHoveredByPointer(pointer.X, pointer.Y, content)
-            : false;
+            && SetHoveredByPointer(pointer.X, pointer.Y, content);
 
         if (pointer.Kind == PointerEventKind.Motion)
         {
@@ -286,7 +290,7 @@ public sealed class ListView<T> : Control
 
         if (pointer.Kind == PointerEventKind.Wheel)
         {
-            return hoverChanged | Handle(message);
+            return hoverChanged || Handle(message);
         }
 
         if (pointer is not { Kind: PointerEventKind.Press, Button: PointerButton.Left } click || !content.Contains(click.X, click.Y))
@@ -310,9 +314,10 @@ public sealed class ListView<T> : Control
         var previousItem = SelectedItem;
         var changed = _model.SelectFilteredIndex(visibleRows[row].Index);
         RaiseSelectionChangedIfNeeded(previousIndex, previousItem);
-        return hoverChanged | changed;
+        return hoverChanged || changed;
     }
 
+    /// <inheritdoc />
     public override void Render(Canvas canvas, Rect rect)
     {
         var clipped = Rect.Intersect(rect, canvas.Bounds);
@@ -345,9 +350,16 @@ public sealed class ListView<T> : Control
         {
             var visible = rows[row];
             var hovered = _hoveredFilteredIndex == visible.Index;
-            var marker = visible.Selected
-                ? RowMarkers.SelectedRowMarker
-                : hovered ? RowMarkers.HoveredRowMarker : RowMarkers.DefaultRowMarker;
+            var marker = RowMarkers.DefaultRowMarker;
+            if (visible.Selected)
+            {
+                marker = RowMarkers.SelectedRowMarker;
+            }
+            else if (hovered)
+            {
+                marker = RowMarkers.HoveredRowMarker;
+            }
+
             var text = $"{marker} {_model.LabelFor(visible.Item)}";
             canvas.WriteText(content.X, content.Y + row, ApplyRowStyle(text, visible.Selected, hovered), content.Width);
         }

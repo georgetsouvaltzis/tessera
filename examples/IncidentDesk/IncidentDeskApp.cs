@@ -282,7 +282,20 @@ internal sealed partial class IncidentDeskApp : TesseraApp
     {
         var incident = _state.SelectedIncident;
         var summary = _state.BuildSummary();
-        var detailWidth = context.Width >= 140 ? 56 : context.Width >= 110 ? 46 : 38;
+        int detailWidth;
+        if (context.Width >= 140)
+        {
+            detailWidth = 56;
+        }
+        else if (context.Width >= 110)
+        {
+            detailWidth = 46;
+        }
+        else
+        {
+            detailWidth = 38;
+        }
+
         var sideWidth = context.Width >= 140 ? 34 : 28;
 
         _hero.IncidentId = incident.Id;

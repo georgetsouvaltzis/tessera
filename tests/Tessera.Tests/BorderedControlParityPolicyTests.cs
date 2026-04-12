@@ -167,8 +167,7 @@ internal static class BorderedControlParityPolicyTests
     private static Task BorderedControls_HaveThemeApplyAndDefaultsExtensions()
     {
         var borderedControls = DiscoverBorderedControls();
-        var extensionMethods = typeof(TesseraThemeControlExtensions)
-            .GetMethods(BindingFlags.Public | BindingFlags.Static);
+        var extensionMethods = DiscoverThemeExtensionMethods();
         var missingApplyTheme = new List<string>();
         var missingApplyThemeDefaults = new List<string>();
 
@@ -195,8 +194,7 @@ internal static class BorderedControlParityPolicyTests
     private static Task BorderedControls_HaveThemeOverrideExtensions()
     {
         var borderedControls = DiscoverBorderedControls();
-        var extensionMethods = typeof(TesseraThemeControlExtensions)
-            .GetMethods(BindingFlags.Public | BindingFlags.Static);
+        var extensionMethods = DiscoverThemeExtensionMethods();
         var missingApplyThemeOverride = new List<string>();
         var missingApplyThemeDefaultsOverride = new List<string>();
 
@@ -350,16 +348,21 @@ internal static class BorderedControlParityPolicyTests
         return [.. result];
     }
 
+    private static MethodInfo[] DiscoverThemeExtensionMethods()
+    {
+        return typeof(TesseraThemeControlExtensions).Assembly
+            .GetTypes()
+            .Where(static type => type.IsSealed && type.IsAbstract)
+            .SelectMany(static type => type.GetMethods(BindingFlags.Public | BindingFlags.Static))
+            .Where(static method => method.IsDefined(typeof(ExtensionAttribute), inherit: false))
+            .ToArray();
+    }
+
     private static bool HasThemeMethod(MethodInfo[] extensionMethods, string methodName, Type controlType)
     {
         foreach (var method in extensionMethods)
         {
             if (!string.Equals(method.Name, methodName, StringComparison.Ordinal))
-            {
-                continue;
-            }
-
-            if (!method.IsDefined(typeof(ExtensionAttribute), inherit: false))
             {
                 continue;
             }
@@ -386,11 +389,6 @@ internal static class BorderedControlParityPolicyTests
         foreach (var method in extensionMethods)
         {
             if (!string.Equals(method.Name, methodName, StringComparison.Ordinal))
-            {
-                continue;
-            }
-
-            if (!method.IsDefined(typeof(ExtensionAttribute), inherit: false))
             {
                 continue;
             }

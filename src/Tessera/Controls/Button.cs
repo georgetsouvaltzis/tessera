@@ -1,4 +1,4 @@
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using Tessera.Components.Primitives;
 using Tessera.Controls.Internal;
 using Tessera.Layout;
@@ -111,8 +111,10 @@ public sealed class Button : Control
     /// </summary>
     public bool IsPressed => _pressed;
 
+    /// <inheritdoc />
     public override bool IsFocused { get; set; }
 
+    /// <inheritdoc />
     public override bool IsDisabled { get; set; }
 
     /// <summary>
@@ -131,6 +133,7 @@ public sealed class Button : Control
         return true;
     }
 
+    /// <inheritdoc />
     public override bool Handle(Message message)
     {
         if (IsDisabled || !IsFocused || message is not KeyPressed key)
@@ -147,6 +150,7 @@ public sealed class Button : Control
         return true;
     }
 
+    /// <inheritdoc />
     public override bool Handle(Message message, Rect bounds)
     {
         if (IsDisabled || message is not PointerInput pointer)
@@ -181,6 +185,7 @@ public sealed class Button : Control
         }
     }
 
+    /// <inheritdoc />
     public override void Render(Canvas canvas, Rect rect)
     {
         var clipped = Rect.Intersect(rect, canvas.Bounds);

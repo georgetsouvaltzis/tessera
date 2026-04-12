@@ -15,7 +15,6 @@ public sealed partial class AutocompleteInput : Control
     private readonly List<string> _suggestions = [];
     private readonly List<int> _filteredSuggestionIndices = [];
     private readonly List<(int SourceIndex, int MatchIndex)> _matchBuffer = [];
-    private AutocompleteInputGlyphSet _glyphs = AutocompleteInputGlyphSet.Default;
     private int _selectedSuggestionIndex = -1;
     private int _hoveredSuggestionIndex = -1;
 
@@ -165,11 +164,7 @@ public sealed partial class AutocompleteInput : Control
     /// <summary>
     /// Gets or sets glyphs used by selected suggestion and commit hint markers.
     /// </summary>
-    public AutocompleteInputGlyphSet Glyphs
-    {
-        get => _glyphs;
-        set => _glyphs = value;
-    }
+    public AutocompleteInputGlyphSet Glyphs { get; set; } = AutocompleteInputGlyphSet.Default;
 
     /// <inheritdoc />
     public override bool IsFocused { get; set; }
@@ -199,12 +194,9 @@ public sealed partial class AutocompleteInput : Control
         ArgumentNullException.ThrowIfNull(suggestions);
 
         _suggestions.Clear();
-        foreach (var suggestion in suggestions)
+        foreach (var suggestion in suggestions.Where(static suggestion => suggestion is not null))
         {
-            if (suggestion is not null)
-            {
-                _suggestions.Add(suggestion);
-            }
+            _suggestions.Add(suggestion);
         }
 
         RefreshFilteredSuggestions();

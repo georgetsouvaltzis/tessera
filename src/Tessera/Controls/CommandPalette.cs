@@ -181,12 +181,17 @@ public sealed class CommandPalette : Control
     /// </summary>
     public IReadOnlyList<CommandPaletteItem> Items => _items;
 
+    /// <inheritdoc />
     public override bool IsFocused
     {
         get;
         set;
     }
 
+    /// <summary>
+    /// Replaces the palette command entries.
+    /// </summary>
+    /// <param name="items">The command entries to expose.</param>
     public void SetItems(IEnumerable<CommandPaletteItem> items)
     {
         ArgumentNullException.ThrowIfNull(items);
@@ -206,8 +211,14 @@ public sealed class CommandPalette : Control
         RefreshFilter();
     }
 
+    /// <summary>
+    /// Clears the current query text.
+    /// </summary>
     public void ClearQuery() => SetQueryText(string.Empty);
 
+    /// <summary>
+    /// Opens the palette and requests focus.
+    /// </summary>
     public void Open()
     {
         RequestFocus();
@@ -220,17 +231,25 @@ public sealed class CommandPalette : Control
         ClearQuery();
     }
 
+    /// <summary>
+    /// Closes the palette.
+    /// </summary>
     public void Close()
     {
         IsVisible = false;
     }
 
+    /// <summary>
+    /// Replaces the current query text.
+    /// </summary>
+    /// <param name="query">The query value.</param>
     public void SetQueryText(string query)
     {
         _query.SetValue(query ?? string.Empty);
         RefreshFilter();
     }
 
+    /// <inheritdoc />
     public override bool Handle(Message message)
     {
         if (!IsFocused)
@@ -285,6 +304,7 @@ public sealed class CommandPalette : Control
         return inputResult.Submitted && ExecuteSelected();
     }
 
+    /// <inheritdoc />
     public override bool Handle(Message message, Rect bounds)
     {
         if (!IsVisible || message is not PointerInput pointer || !TryResolveModal(bounds, out var modal, out var content))
@@ -351,6 +371,11 @@ public sealed class CommandPalette : Control
         return changed;
     }
 
+    /// <summary>
+    /// Executes try consume execution.
+    /// </summary>
+    /// <param name="itemId">The item id value.</param>
+    /// <returns><see langword="true" /> when try consume execution succeeds.</returns>
     [EditorBrowsable(EditorBrowsableState.Advanced)]
     public bool TryConsumeExecution(out string itemId)
     {
@@ -365,6 +390,7 @@ public sealed class CommandPalette : Control
         return true;
     }
 
+    /// <inheritdoc />
     public override void Render(Canvas canvas, Rect rect)
     {
         if (!IsVisible)

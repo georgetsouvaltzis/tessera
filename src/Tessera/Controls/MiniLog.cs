@@ -1,4 +1,4 @@
-using Tessera.Components.Primitives;
+﻿using Tessera.Components.Primitives;
 using Tessera.Layout;
 using Tessera.Styles;
 
@@ -101,11 +101,13 @@ public sealed class MiniLog : Control
     private void AppendNormalizedLines(string line)
     {
         var start = 0;
-        for (var index = 0; index < line.Length; index++)
+        var index = 0;
+        while (index < line.Length)
         {
             var current = line[index];
             if (current is not ('\n' or '\r'))
             {
+                index++;
                 continue;
             }
 
@@ -116,6 +118,7 @@ public sealed class MiniLog : Control
             }
 
             start = index + 1;
+            index++;
         }
 
         AddEntry(line.AsSpan(start));
@@ -135,6 +138,7 @@ public sealed class MiniLog : Control
     /// </summary>
     public void Clear() => _entries.Clear();
 
+    /// <inheritdoc />
     public override void Render(Canvas canvas, Rect rect)
     {
         var clipped = Rect.Intersect(rect, canvas.Bounds);

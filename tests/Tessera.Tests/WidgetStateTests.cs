@@ -396,9 +396,9 @@ internal static class WidgetStateTests
         var list = new ListModel<string>([], item => item);
 
         // Act
-        var first = list.ReloadAsync(token => Slow("old-a", "old-b", token)).AsTask();
+        var first = ReloadAsync(list, token => Slow("old-a", "old-b", token));
         await Task.Delay(5);
-        var second = list.ReloadAsync(token => Fast("new-a", "new-b", "new-c", token)).AsTask();
+        var second = ReloadAsync(list, token => Fast("new-a", "new-b", "new-c", token));
         await Task.WhenAll(first, second);
         var rows = list.VisibleRows();
 
@@ -424,6 +424,11 @@ internal static class WidgetStateTests
             yield return a;
             yield return b;
             yield return c;
+        }
+
+        static Task ReloadAsync(ListModel<string> listModel, Func<CancellationToken, IAsyncEnumerable<string>> loader)
+        {
+            return listModel.ReloadAsync(loader).AsTask();
         }
     }
 }

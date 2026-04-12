@@ -1,4 +1,4 @@
-using Tessera.Components.Primitives;
+﻿using Tessera.Components.Primitives;
 using Tessera.Components.Primitives.Internal;
 using Tessera.Components.Styling;
 using Tessera.Controls.Internal;
@@ -16,54 +16,81 @@ public sealed class Slider : Control
     private bool _dragging;
     private readonly WidgetStatePalette _statePalette = WidgetStatePalette.CreateDefault();
 
+    /// <summary>
+    /// Represents title.
+    /// </summary>
     public string Title
     {
         get;
         set => field = value ?? string.Empty;
     } = "Slider";
 
+    /// <summary>
+    /// Represents focus marker.
+    /// </summary>
     public string FocusMarker
     {
         get;
         set => field = value ?? string.Empty;
     } = "*";
 
+    /// <summary>
+    /// Represents show focus marker.
+    /// </summary>
     public bool ShowFocusMarker
     {
         get;
         set;
     } = true;
 
+    /// <summary>
+    /// Represents title style.
+    /// </summary>
     public TesseraStyle TitleStyle
     {
         get;
         set;
     } = TesseraStyle.Empty;
 
+    /// <summary>
+    /// Represents focused title style.
+    /// </summary>
     public TesseraStyle FocusedTitleStyle
     {
         get;
         set;
     } = TesseraStyle.Empty;
 
+    /// <summary>
+    /// Represents value label style.
+    /// </summary>
     public TesseraStyle ValueLabelStyle
     {
         get;
         set;
     } = TesseraStyle.Empty;
 
+    /// <summary>
+    /// Represents fill style.
+    /// </summary>
     public TesseraStyle FillStyle
     {
         get;
         set;
     } = TesseraStyle.Empty;
 
+    /// <summary>
+    /// Represents track style.
+    /// </summary>
     public TesseraStyle TrackStyle
     {
         get;
         set;
     } = TesseraStyle.Empty;
 
+    /// <summary>
+    /// Represents disabled style.
+    /// </summary>
     public TesseraStyle DisabledStyle
     {
         get;
@@ -88,62 +115,88 @@ public sealed class Slider : Control
         set;
     } = TesseraStyle.Empty;
 
+    /// <summary>
+    /// Represents min.
+    /// </summary>
     public double Min
     {
         get;
         set;
     }
 
+    /// <summary>
+    /// Represents max.
+    /// </summary>
     public double Max
     {
         get;
         set;
     } = 100.0;
 
+    /// <summary>
+    /// Represents step.
+    /// </summary>
     public double Step
     {
         get;
         set;
     } = 1.0;
 
+    /// <summary>
+    /// Represents value.
+    /// </summary>
     public double Value
     {
         get;
         private set;
     }
 
+    /// <summary>
+    /// Represents border.
+    /// </summary>
     public BorderStyle Border
     {
         get;
         set;
     } = BorderStyle.SingleLine;
 
+    /// <summary>
+    /// Represents padding.
+    /// </summary>
     public Thickness Padding
     {
         get;
         set;
     }
 
+    /// <inheritdoc />
     public override bool IsFocused
     {
         get;
         set;
     }
 
+    /// <inheritdoc />
     public override bool IsDisabled
     {
         get;
         set;
     }
 
+    /// <inheritdoc />
     public override bool IsReadOnly
     {
         get;
         set;
     }
 
+    /// <summary>
+    /// Executes set value.
+    /// </summary>
+    /// <param name="value)">The value value.</param>
     public void SetValue(double value) => Value = Clamp(value);
 
+    /// <inheritdoc />
     public override bool Handle(Message message)
     {
         if (!IsFocused || IsDisabled || IsReadOnly || message is not KeyPressed key)
@@ -168,6 +221,7 @@ public sealed class Slider : Control
         return false;
     }
 
+    /// <inheritdoc />
     public override bool Handle(Message message, Rect bounds)
     {
         if (IsDisabled || IsReadOnly || message is not PointerInput pointer)
@@ -240,6 +294,7 @@ public sealed class Slider : Control
         return Handle(message);
     }
 
+    /// <inheritdoc />
     public override void Render(Canvas canvas, Rect rect)
     {
         var clipped = Rect.Intersect(rect, canvas.Bounds);

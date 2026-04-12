@@ -1,4 +1,4 @@
-using Tessera.Components.Primitives;
+﻿using Tessera.Components.Primitives;
 using Tessera.Components.Primitives.Internal;
 using Tessera.Styles;
 using Tessera.Widgets;
@@ -23,30 +23,85 @@ public sealed partial class TagInput : Control
     /// Occurs when the committed tag collection changes.
     /// </summary>
     public event EventHandler<TagInputTagsChangedEventArgs>? TagsChanged;
+    /// <summary>
+    /// Executes tag input.
+    /// </summary>
+    /// <returns>The result of tag input.</returns>
     public TagInput()
     {
         Placeholder = "Add tag...";
     }
+    /// <summary>
+    /// Gets the title.
+    /// </summary>
     public string Title { get; set => field = value ?? string.Empty; } = "Tags";
+    /// <summary>
+    /// Gets the focus marker.
+    /// </summary>
     public string FocusMarker { get; set => field = value ?? string.Empty; } = "*";
+    /// <summary>
+    /// Gets or sets whether show focus marker.
+    /// </summary>
     public bool ShowFocusMarker { get; set; } = true;
+    /// <summary>
+    /// Represents placeholder.
+    /// </summary>
     public string Placeholder { get => _input.Placeholder; set => _input.Placeholder = value ?? string.Empty; }
+    /// <summary>
+    /// Gets or sets the options.
+    /// </summary>
     public TagInputOptions Options { get; set; }
+    /// <summary>
+    /// Gets or sets the title style.
+    /// </summary>
     public TesseraStyle TitleStyle { get; set; } = TesseraStyle.Empty;
+    /// <summary>
+    /// Gets or sets the focused title style.
+    /// </summary>
     public TesseraStyle FocusedTitleStyle { get; set; } = TesseraStyle.Empty;
+    /// <summary>
+    /// Gets or sets the tag style.
+    /// </summary>
     public TesseraStyle TagStyle { get; set; } = TesseraStyle.Empty;
+    /// <summary>
+    /// Gets or sets the selected tag style.
+    /// </summary>
     public TesseraStyle SelectedTagStyle { get; set; } = TesseraStyle.Empty;
+    /// <summary>
+    /// Gets or sets the focused tag style.
+    /// </summary>
     public TesseraStyle FocusedTagStyle { get; set; } = TesseraStyle.Empty;
+    /// <summary>
+    /// Gets or sets the hovered tag style.
+    /// </summary>
     public TesseraStyle HoveredTagStyle { get; set; } = TesseraStyle.Empty;
+    /// <summary>
+    /// Gets or sets the disabled tag style.
+    /// </summary>
     public TesseraStyle DisabledTagStyle { get; set; } = TesseraStyle.Empty;
+    /// <summary>
+    /// Gets or sets the error tag style.
+    /// </summary>
     public TesseraStyle ErrorTagStyle { get; set; } = TesseraStyle.Empty;
+    /// <summary>
+    /// Gets or sets the value text style.
+    /// </summary>
     public TesseraStyle ValueTextStyle { get; set; } = TesseraStyle.Empty;
+    /// <summary>
+    /// Gets or sets the placeholder text style.
+    /// </summary>
     public TesseraStyle PlaceholderTextStyle { get; set; } = TesseraStyle.Empty;
     /// <summary>
     /// Gets or sets the style used for the rendered caret indicator.
     /// </summary>
     public TesseraStyle CaretStyle { get; set; } = TesseraStyle.Empty;
+    /// <summary>
+    /// Gets or sets the border.
+    /// </summary>
     public BorderStyle Border { get; set; } = BorderStyle.SingleLine;
+    /// <summary>
+    /// Gets or sets the padding.
+    /// </summary>
     public Thickness Padding { get; set; }
     /// <summary>
     /// Gets or sets the horizontal padding inserted inside each rendered tag chip.
@@ -57,8 +112,17 @@ public sealed partial class TagInput : Control
     /// Gets or sets the horizontal padding inserted around the input/placeholder text.
     /// </summary>
     public int InputPadding { get; set; }
+    /// <summary>
+    /// Gets or sets the border style text.
+    /// </summary>
     public TesseraStyle BorderStyleText { get; set; } = TesseraStyle.Empty;
+    /// <summary>
+    /// Gets or sets the focused border style text.
+    /// </summary>
     public TesseraStyle FocusedBorderStyleText { get; set; } = TesseraStyle.Empty;
+    /// <summary>
+    /// Gets or sets whether has error.
+    /// </summary>
     public bool HasError { get; set; }
     /// <summary>
     /// Gets or sets a value indicating whether a caret indicator should be rendered while focused.
@@ -69,10 +133,23 @@ public sealed partial class TagInput : Control
     /// Gets or sets the glyph used for the caret indicator.
     /// </summary>
     public string CaretGlyph { get; set => field = value ?? string.Empty; } = "|";
+    /// <summary>
+    /// Represents tags.
+    /// </summary>
     public IReadOnlyList<string> Tags => _tags;
+    /// <summary>
+    /// Represents input value.
+    /// </summary>
     public string InputValue => _input.Value;
+    /// <summary>
+    /// Represents selected tag index.
+    /// </summary>
     public int SelectedTagIndex => _selectedTagIndex;
+    /// <summary>
+    /// Represents selected tag.
+    /// </summary>
     public string SelectedTag => _selectedTagIndex >= 0 && _selectedTagIndex < _tags.Count ? _tags[_selectedTagIndex] : string.Empty;
+    /// <inheritdoc />
     public override bool IsFocused { get; set; }
 
     /// <summary>
@@ -174,6 +251,7 @@ public sealed partial class TagInput : Control
         RaiseTagsChangedIfNeeded(previousTags);
         return true;
     }
+    /// <inheritdoc />
     public override bool Handle(Message message)
     {
         if (IsDisabled || IsReadOnly || !IsFocused)
@@ -207,7 +285,8 @@ public sealed partial class TagInput : Control
             }
             if (key.Is(Key.Enter))
             {
-                return CommitInput() || true;
+                CommitInput();
+                return true;
             }
         }
         var update = _input.Update(message);
@@ -215,8 +294,10 @@ public sealed partial class TagInput : Control
         {
             return update.Changed;
         }
-        return CommitInput() || true;
+        CommitInput();
+        return true;
     }
+    /// <inheritdoc />
     public override bool Handle(Message message, Rect bounds)
     {
         if (message is not PointerInput pointer || bounds.IsEmpty)
@@ -236,8 +317,7 @@ public sealed partial class TagInput : Control
         if (!inside)
         {
             return pointer.Kind is PointerEventKind.Motion or PointerEventKind.Press
-                ? SetHoveredTagIndex(-1)
-                : false;
+                && SetHoveredTagIndex(-1);
         }
         var hovered = HitTagIndex(pointer.X, pointer.Y, content);
         if (pointer.Kind == PointerEventKind.Motion)
@@ -248,9 +328,9 @@ public sealed partial class TagInput : Control
         {
             IsFocused = true;
             RequestFocus();
-            var changed = SetHoveredTagIndex(hovered);
-            changed |= SetSelectedTagIndex(hovered);
-            return changed || true;
+            _ = SetHoveredTagIndex(hovered);
+            _ = SetSelectedTagIndex(hovered);
+            return true;
         }
         return false;
     }

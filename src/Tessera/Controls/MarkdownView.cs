@@ -1,4 +1,4 @@
-using Tessera.Components.Primitives;
+﻿using Tessera.Components.Primitives;
 using Tessera.Components.Primitives.Internal;
 using Tessera.Controls.Internal;
 using Tessera.Layout;
@@ -15,36 +15,54 @@ public sealed class MarkdownView : Control
     private readonly ViewportModel _viewport = new();
     private string _markdown = string.Empty;
 
+    /// <summary>
+    /// Represents title.
+    /// </summary>
     public string Title
     {
         get;
         set => field = value ?? string.Empty;
     } = "Markdown";
 
+    /// <summary>
+    /// Represents focus marker.
+    /// </summary>
     public string FocusMarker
     {
         get;
         set => field = value ?? string.Empty;
     } = "*";
 
+    /// <summary>
+    /// Represents show focus marker.
+    /// </summary>
     public bool ShowFocusMarker
     {
         get;
         set;
     } = true;
 
+    /// <summary>
+    /// Represents title style.
+    /// </summary>
     public TesseraStyle TitleStyle
     {
         get;
         set;
     } = TesseraStyle.Empty;
 
+    /// <summary>
+    /// Represents focused title style.
+    /// </summary>
     public TesseraStyle FocusedTitleStyle
     {
         get;
         set;
     } = TesseraStyle.Empty;
 
+    /// <summary>
+    /// Represents content style.
+    /// </summary>
     public TesseraStyle ContentStyle
     {
         get;
@@ -69,47 +87,66 @@ public sealed class MarkdownView : Control
         set;
     } = TesseraStyle.Empty;
 
+    /// <summary>
+    /// Represents border.
+    /// </summary>
     public BorderStyle Border
     {
         get;
         set;
     } = BorderStyle.SingleLine;
 
+    /// <summary>
+    /// Represents padding.
+    /// </summary>
     public Thickness Padding
     {
         get;
         set;
     }
 
+    /// <summary>
+    /// Represents wrap.
+    /// </summary>
     public bool Wrap
     {
         get => _viewport.Wrap;
         set => _viewport.SetWrap(value);
     }
 
+    /// <summary>
+    /// Represents show line numbers.
+    /// </summary>
     public bool ShowLineNumbers
     {
         get => _viewport.ShowLineNumbers;
         set => _viewport.ShowLineNumbers = value;
     }
 
+    /// <inheritdoc />
     public override bool IsFocused
     {
         get;
         set;
     }
 
+    /// <summary>
+    /// Executes set markdown.
+    /// </summary>
+    /// <param name="markdown">The markdown value.</param>
     public void SetMarkdown(string markdown)
     {
         _markdown = markdown ?? string.Empty;
         _viewport.SetLines(MarkdownLineRenderer.Render(_markdown));
     }
 
+    /// <inheritdoc />
     public override bool Handle(Message message)
     {
         return _viewport.Update(message, ViewportKeyMap.Default);
     }
 
+    /// <inheritdoc />
     public override void Render(Canvas canvas, Rect rect)
     {
         var clipped = Rect.Intersect(rect, canvas.Bounds);

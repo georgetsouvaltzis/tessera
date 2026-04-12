@@ -329,7 +329,8 @@ public sealed partial class SearchResultsView : Control
 
             _ = SetHoveredIndex(row);
             _ = SetPressedIndex(row);
-            return SetSelectedIndex(row) || true;
+            _ = SetSelectedIndex(row);
+            return true;
         }
 
         if (pointer.Kind == PointerEventKind.Release && pointer.Button == PointerButton.Left)
@@ -372,9 +373,16 @@ public sealed partial class SearchResultsView : Control
             var selected = row == _selectedIndex;
             var hovered = row == _hoveredIndex;
             var pressed = row == _pressedIndex;
-            var marker = selected
-                ? Glyphs.SelectedRowMarker
-                : hovered ? Glyphs.HoveredRowMarker : Glyphs.DefaultRowMarker;
+            var marker = Glyphs.DefaultRowMarker;
+            if (selected)
+            {
+                marker = Glyphs.SelectedRowMarker;
+            }
+            else if (hovered)
+            {
+                marker = Glyphs.HoveredRowMarker;
+            }
+
             var rank = ShowRankMarker ? $"{row + 1}{Glyphs.RankSeparator} " : string.Empty;
             var match = HasQueryMatch(_items[row]) ? $"{Glyphs.MatchMarker} " : string.Empty;
             var text = $"{marker} {rank}{match}{_items[row]}";

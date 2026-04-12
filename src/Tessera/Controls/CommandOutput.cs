@@ -177,12 +177,9 @@ public sealed partial class CommandOutput : Control
     {
         ArgumentNullException.ThrowIfNull(lines);
         _lines.Clear();
-        foreach (var line in lines)
+        foreach (var line in lines.Where(static line => line is not null))
         {
-            if (line is not null)
-            {
-                _lines.Add(new CommandOutputLine(line.Text, line.Channel, line.Timestamp));
-            }
+            _lines.Add(new CommandOutputLine(line.Text, line.Channel, line.Timestamp));
         }
 
         if (_lines.Count == 0)

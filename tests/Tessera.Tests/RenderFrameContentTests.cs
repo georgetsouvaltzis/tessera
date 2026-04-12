@@ -11,7 +11,8 @@ public sealed class RenderFrameContentTests
     {
         var lines = RenderFrameContent.NormalizeLines("alpha\r\nbeta\rgamma\ndelta");
 
-        Assert.That(lines, Is.EqualTo(new[] { "alpha", "beta", "gamma", "delta" }));
+        var expected = new[] { "alpha", "beta", "gamma", "delta" };
+        Assert.That(lines, Is.EqualTo(expected));
     }
 
     [Test]
@@ -19,7 +20,8 @@ public sealed class RenderFrameContentTests
     {
         var lines = RenderFrameContent.NormalizeLines("alpha\n");
 
-        Assert.That(lines, Is.EqualTo(new[] { "alpha", string.Empty }));
+        var expected = new[] { "alpha", string.Empty };
+        Assert.That(lines, Is.EqualTo(expected));
     }
 
     [Test]

@@ -1,5 +1,4 @@
 using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
 
 namespace Tessera.Core.Terminal.Adapters.Internal;
@@ -16,6 +15,7 @@ internal sealed class UnixRawModeSession
     private const int LinuxVMin = 6;
     private const int DarwinVMin = 16;
     private const int DarwinVTime = 17;
+    private static readonly byte[] DevTtyPath = "/dev/tty\0"u8.ToArray();
 
     private string? _unixSttyState;
     private string? _unixRawModeProbe;
@@ -107,7 +107,7 @@ internal sealed class UnixRawModeSession
             return false;
         }
 
-        _unixTtyFd = Open("/dev/tty", OpenReadWrite);
+        _unixTtyFd = Open(DevTtyPath, OpenReadWrite);
         if (_unixTtyFd < 0)
         {
             error = "termios-open-failed";
@@ -429,12 +429,8 @@ internal sealed class UnixRawModeSession
         public ulong c_ospeed;
     }
 
-    [SuppressMessage(
-        "Interoperability",
-        "CA2101:Specify marshaling for P/Invoke string arguments",
-        Justification = "libc open consumes a POSIX path on Unix platforms; analyzer-compliant LibraryImport alternatives require unsafe code, which Tessera forbids.")]
-    [DllImport("libc", EntryPoint = "open", SetLastError = true, CharSet = CharSet.Ansi)]
-    private static extern int Open(string path, int flags);
+    [DllImport("libc", EntryPoint = "open", SetLastError = true)]
+    private static extern int Open(byte[] path, int flags);
 
     [DllImport("libc", EntryPoint = "close", SetLastError = true)]
     private static extern int Close(int fd);

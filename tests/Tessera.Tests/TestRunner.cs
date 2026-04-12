@@ -28,25 +28,25 @@ internal sealed class TestRunner
             try
             {
                 await testCase.Execute();
-                Console.WriteLine($"[PASS] {testCase.Name}");
+                await Console.Out.WriteLineAsync($"[PASS] {testCase.Name}");
             }
             catch (Exception ex)
             {
                 failures.Add($"{testCase.Name}: {ex.Message}");
-                Console.WriteLine($"[FAIL] {testCase.Name}");
+                await Console.Out.WriteLineAsync($"[FAIL] {testCase.Name}");
             }
         }
 
         if (failures.Count == 0)
         {
-            Console.WriteLine("Tessera tests passed.");
+            await Console.Out.WriteLineAsync("Tessera tests passed.");
             return 0;
         }
 
-        Console.Error.WriteLine("Tessera tests failed:");
+        await Console.Error.WriteLineAsync("Tessera tests failed:");
         foreach (var failure in failures)
         {
-            Console.Error.WriteLine($"- {failure}");
+            await Console.Error.WriteLineAsync($"- {failure}");
         }
 
         return 1;

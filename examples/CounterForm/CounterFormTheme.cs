@@ -49,15 +49,8 @@ internal static class CounterFormTheme
 
     public static CounterFormPalette Resolve(string? name)
     {
-        foreach (var palette in All)
-        {
-            if (string.Equals(palette.Name, name, StringComparison.Ordinal))
-            {
-                return palette;
-            }
-        }
-
-        return Default;
+        return All.FirstOrDefault(palette => string.Equals(palette.Name, name, StringComparison.Ordinal))
+            ?? Default;
     }
 
     public static TesseraStyle Foreground(int rgb) => TesseraStyle.Empty.WithForeground(Hex(rgb));

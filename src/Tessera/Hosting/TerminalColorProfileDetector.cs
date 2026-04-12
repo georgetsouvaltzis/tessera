@@ -1,4 +1,4 @@
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using Tessera.Internal;
 
 namespace Tessera.Hosting;
@@ -9,6 +9,10 @@ namespace Tessera.Hosting;
 [EditorBrowsable(EditorBrowsableState.Advanced)]
 public static class TerminalColorProfileDetector
 {
+    /// <summary>
+    /// Executes detect.
+    /// </summary>
+    /// <returns>The result of detect.</returns>
     public static TerminalColorProfile Detect() =>
         global::Tessera.Core.Terminal.Capabilities.TerminalColorProfileDetector.Detect().AsHosting();
 }

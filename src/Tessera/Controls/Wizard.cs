@@ -331,7 +331,11 @@ public sealed class Wizard : Control
         {
             return false;
         }
-        var origin = _currentIndex >= 0 ? _currentIndex : (direction > 0 ? -1 : _steps.Count);
+        var origin = _currentIndex;
+        if (origin < 0)
+        {
+            origin = direction > 0 ? -1 : _steps.Count;
+        }
         return TryFindEnabledFrom(origin + direction, direction, out var target) && SelectStep(target);
     }
     private bool SelectEdge(bool selectLast)

@@ -362,22 +362,35 @@ internal sealed partial class GitConsoleApp : TesseraApp
         }
 
         _stageButton.IsDisabled = selected is null;
-        _stageButton.Description = selected is null
-            ? "select a path first"
-            : selected.IsStaged
+        if (selected is null)
+        {
+            _stageButton.Description = "select a path first";
+        }
+        else
+        {
+            _stageButton.Description = selected.IsStaged
                 ? "s · return selected path to worktree"
                 : "s · queue selected path";
+        }
+
         _discardButton.IsDisabled = selected is null;
         _discardButton.Description = selected is null
             ? "select a path first"
             : "x · drop selected patch";
         _modeButton.Description = $"d · {CurrentDiffTabLabel()}";
         _commitButton.IsDisabled = metrics.Staged == 0 || string.IsNullOrWhiteSpace(_subjectInput.Value);
-        _commitButton.Description = metrics.Staged == 0
-            ? "queue path first"
-            : string.IsNullOrWhiteSpace(_subjectInput.Value)
-                ? "add subject"
-                : "ctrl+enter ship";
+        if (metrics.Staged == 0)
+        {
+            _commitButton.Description = "queue path first";
+        }
+        else if (string.IsNullOrWhiteSpace(_subjectInput.Value))
+        {
+            _commitButton.Description = "add subject";
+        }
+        else
+        {
+            _commitButton.Description = "ctrl+enter ship";
+        }
 
         RefreshDiff();
     }

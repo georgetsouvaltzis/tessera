@@ -97,9 +97,9 @@ public sealed class QuickOpenOverlayControlTests
         var output = canvas.Render();
 
         Assert.That(output.Contains("Open !", StringComparison.Ordinal), Is.True);
-        Assert.That(output.Contains("?", StringComparison.Ordinal), Is.True);
-        Assert.That(output.Contains("▶", StringComparison.Ordinal), Is.True);
-        Assert.That(output.Contains("*", StringComparison.Ordinal), Is.True);
+        Assert.That(output.Contains('?'), Is.True);
+        Assert.That(output.Contains('▶'), Is.True);
+        Assert.That(output.Contains('*'), Is.True);
         Assert.That(output.Contains("README.md - docs", StringComparison.Ordinal), Is.True);
         Assert.That(output.Contains("38;2;40;50;60", StringComparison.Ordinal), Is.True);
         Assert.That(output.Contains("38;2;70;80;90", StringComparison.Ordinal), Is.True);

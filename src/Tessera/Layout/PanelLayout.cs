@@ -1,4 +1,4 @@
-using Tessera.Components.Primitives;
+﻿using Tessera.Components.Primitives;
 using Tessera.Components.Primitives.Internal;
 using Tessera.Controls;
 using System.ComponentModel;
@@ -40,6 +40,15 @@ public sealed class PanelLayout : LayoutNode
         Margin = margin;
     }
 
+    /// <summary>
+    /// Executes panel layout.
+    /// </summary>
+    /// <param name="component">The component value.</param>
+    /// <param name="title">The title value.</param>
+    /// <param name="border">The border value.</param>
+    /// <param name="padding">The padding value.</param>
+    /// <param name="margin">The margin value.</param>
+    /// <returns>The result of panel layout.</returns>
     [EditorBrowsable(EditorBrowsableState.Advanced)]
     [SetsRequiredMembers]
     public PanelLayout(

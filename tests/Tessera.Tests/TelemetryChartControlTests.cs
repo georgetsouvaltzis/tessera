@@ -107,12 +107,15 @@ public sealed class TelemetryChartControlTests
     {
         var control = new TelemetryChart(capacity: 4);
         control.SetSamples([1, 2, 3, 4, 5, 6]);
-        Assert.That(control.Samples, Is.EqualTo(new[] { 3d, 4d, 5d, 6d }));
+        var expectedAfterSet = new[] { 3d, 4d, 5d, 6d };
+        Assert.That(control.Samples, Is.EqualTo(expectedAfterSet));
 
         control.Append(7);
-        Assert.That(control.Samples, Is.EqualTo(new[] { 4d, 5d, 6d, 7d }));
+        var expectedAfterAppend = new[] { 4d, 5d, 6d, 7d };
+        Assert.That(control.Samples, Is.EqualTo(expectedAfterAppend));
         control.TrimToLast(2);
-        Assert.That(control.Samples, Is.EqualTo(new[] { 6d, 7d }));
+        var expectedAfterTrim = new[] { 6d, 7d };
+        Assert.That(control.Samples, Is.EqualTo(expectedAfterTrim));
 
         control.Clear();
         Assert.That(control.Samples.Count, Is.EqualTo(0));

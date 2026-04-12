@@ -179,12 +179,9 @@ public sealed partial class PivotTable : Control
             _ = EnsureRowMap(rowKey);
         }
 
-        foreach (var cell in cells)
+        foreach (var cell in cells.Where(static cell => cell is not null))
         {
-            if (cell is not null)
-            {
-                SetValue(cell.RowKey, cell.ColumnKey, cell.Value);
-            }
+            SetValue(cell.RowKey, cell.ColumnKey, cell.Value);
         }
     }
 
@@ -300,43 +297,43 @@ public sealed partial class PivotTable : Control
 
         if (key.Is(Key.Left))
         {
-            return SetSelectedCell(_selectedRowIndex, _selectedColumnIndex - 1);
+            return SelectCell(_selectedRowIndex, _selectedColumnIndex - 1);
         }
 
         if (key.Is(Key.Right))
         {
-            return SetSelectedCell(_selectedRowIndex, _selectedColumnIndex + 1);
+            return SelectCell(_selectedRowIndex, _selectedColumnIndex + 1);
         }
 
         if (key.Is(Key.Up))
         {
-            return SetSelectedCell(_selectedRowIndex - 1, _selectedColumnIndex);
+            return SelectCell(_selectedRowIndex - 1, _selectedColumnIndex);
         }
 
         if (key.Is(Key.Down))
         {
-            return SetSelectedCell(_selectedRowIndex + 1, _selectedColumnIndex);
+            return SelectCell(_selectedRowIndex + 1, _selectedColumnIndex);
         }
 
         if (key.Is(Key.Home))
         {
-            return SetSelectedCell(0, 0);
+            return SelectCell(0, 0);
         }
 
         if (key.Is(Key.End))
         {
-            return SetSelectedCell(Math.Max(0, _rowKeys.Count - 1), Math.Max(0, _columns.Count - 1));
+            return SelectCell(Math.Max(0, _rowKeys.Count - 1), Math.Max(0, _columns.Count - 1));
         }
 
         var page = Math.Max(1, _lastViewportRows > 0 ? _lastViewportRows : PageSize);
         if (key.Is(Key.PageUp))
         {
-            return SetSelectedCell(_selectedRowIndex - page, _selectedColumnIndex);
+            return SelectCell(_selectedRowIndex - page, _selectedColumnIndex);
         }
 
         if (key.Is(Key.PageDown))
         {
-            return SetSelectedCell(_selectedRowIndex + page, _selectedColumnIndex);
+            return SelectCell(_selectedRowIndex + page, _selectedColumnIndex);
         }
 
         if (!IsReadOnly && (key.Is(Key.Enter) || key.IsCharacter('s')))
@@ -368,12 +365,12 @@ public sealed partial class PivotTable : Control
         {
             if (pointer.Button == PointerButton.WheelDown)
             {
-                return SetSelectedCell(_selectedRowIndex + 1, _selectedColumnIndex);
+                return SelectCell(_selectedRowIndex + 1, _selectedColumnIndex);
             }
 
             if (pointer.Button == PointerButton.WheelUp)
             {
-                return SetSelectedCell(_selectedRowIndex - 1, _selectedColumnIndex);
+                return SelectCell(_selectedRowIndex - 1, _selectedColumnIndex);
             }
         }
 
@@ -417,7 +414,7 @@ public sealed partial class PivotTable : Control
             selectedColumn = _selectedColumnIndex;
         }
 
-        return SetSelectedCell(rowIndex, selectedColumn);
+        return SelectCell(rowIndex, selectedColumn);
     }
 
     /// <inheritdoc />
@@ -515,26 +512,6 @@ public sealed partial class PivotTable : Control
         }
 
         return PivotSortDirection.Ascending;
-    }
-
-    private bool SetSelectedCell(int rowIndex, int columnIndex)
-    {
-        if (_rowKeys.Count == 0 || _columns.Count == 0)
-        {
-            return false;
-        }
-
-        var normalizedRow = Math.Clamp(rowIndex, 0, _rowKeys.Count - 1);
-        var normalizedColumn = Math.Clamp(columnIndex, 0, _columns.Count - 1);
-        if (normalizedRow == _selectedRowIndex && normalizedColumn == _selectedColumnIndex)
-        {
-            return false;
-        }
-
-        _selectedRowIndex = normalizedRow;
-        _selectedColumnIndex = normalizedColumn;
-        EnsureSelectionVisible(_lastViewportRows);
-        return true;
     }
 
     private void EnsureSelectionVisible(int rowCapacity)

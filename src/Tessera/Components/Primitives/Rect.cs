@@ -1,18 +1,46 @@
-namespace Tessera.Components.Primitives;
+﻿namespace Tessera.Components.Primitives;
 
+/// <summary>
+/// Represents rect y.
+/// </summary>
+/// <param name="X">The x value.</param>
+/// <param name="Y">The y value.</param>
+/// <param name="Width">The width value.</param>
+/// <param name="Height">The height value.</param>
 public readonly record struct Rect(int X, int Y, int Width, int Height)
 {
+    /// <summary>
+    /// Represents right.
+    /// </summary>
     public int Right => X + Width;
 
+    /// <summary>
+    /// Represents bottom.
+    /// </summary>
     public int Bottom => Y + Height;
 
+    /// <summary>
+    /// Represents is empty.
+    /// </summary>
     public bool IsEmpty => Width <= 0 || Height <= 0;
 
+    /// <summary>
+    /// Executes contains.
+    /// </summary>
+    /// <param name="x">The x value.</param>
+    /// <param name="y">The y value.</param>
+    /// <returns><see langword="true" /> when contains succeeds.</returns>
     public bool Contains(int x, int y)
     {
         return !IsEmpty && x >= X && x < Right && y >= Y && y < Bottom;
     }
 
+    /// <summary>
+    /// Executes inset.
+    /// </summary>
+    /// <param name="horizontal">The horizontal value.</param>
+    /// <param name="vertical">The vertical value.</param>
+    /// <returns>The result of inset.</returns>
     public Rect Inset(int horizontal, int vertical)
     {
         return new Rect(
@@ -22,6 +50,11 @@ public readonly record struct Rect(int X, int Y, int Width, int Height)
             Height - (vertical * 2));
     }
 
+    /// <summary>
+    /// Executes inset.
+    /// </summary>
+    /// <param name="thickness">The thickness value.</param>
+    /// <returns>The result of inset.</returns>
     public Rect Inset(Thickness thickness)
     {
         return new Rect(
@@ -31,6 +64,12 @@ public readonly record struct Rect(int X, int Y, int Width, int Height)
             Height - thickness.Vertical);
     }
 
+    /// <summary>
+    /// Executes intersect.
+    /// </summary>
+    /// <param name="a">The a value.</param>
+    /// <param name="b">The b value.</param>
+    /// <returns>The result of intersect.</returns>
     public static Rect Intersect(Rect a, Rect b)
     {
         var x = Math.Max(a.X, b.X);

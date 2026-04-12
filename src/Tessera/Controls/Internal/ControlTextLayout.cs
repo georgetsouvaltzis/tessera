@@ -88,9 +88,9 @@ internal static class ControlTextLayout
     private static string[] SplitLinesWithCarriageNormalization(string value)
     {
         var estimatedLines = 1;
-        for (var index = 0; index < value.Length; index++)
+        for (var scanIndex = 0; scanIndex < value.Length; scanIndex++)
         {
-            var current = value[index];
+            var current = value[scanIndex];
             if (current is '\n' or '\r')
             {
                 estimatedLines++;
@@ -99,11 +99,13 @@ internal static class ControlTextLayout
 
         var lines = new List<string>(estimatedLines);
         var start = 0;
-        for (var index = 0; index < value.Length; index++)
+        var index = 0;
+        while (index < value.Length)
         {
             var current = value[index];
             if (current is not ('\n' or '\r'))
             {
+                index++;
                 continue;
             }
 
@@ -114,6 +116,7 @@ internal static class ControlTextLayout
             }
 
             start = index + 1;
+            index++;
         }
 
         lines.Add(value[start..]);

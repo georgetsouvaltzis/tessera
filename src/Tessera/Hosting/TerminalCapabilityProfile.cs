@@ -1,4 +1,4 @@
-using System.ComponentModel;
+﻿using System.ComponentModel;
 
 namespace Tessera.Hosting;
 
@@ -16,5 +16,8 @@ public sealed record TerminalCapabilityProfile(
     bool SupportsIterm2ProfileRequests = false,
     string Source = "assumed-supported")
 {
+    /// <summary>
+    /// Gets the all supported.
+    /// </summary>
     public static TerminalCapabilityProfile AllSupported { get; } = new();
 }

@@ -27,11 +27,13 @@ internal static class Widgets
         var row = 0;
         var value = content ?? string.Empty;
         var start = 0;
-        for (var index = 0; index < value.Length && row < contentRect.Height; index++)
+        var index = 0;
+        while (index < value.Length && row < contentRect.Height)
         {
             var current = value[index];
             if (current is not ('\n' or '\r'))
             {
+                index++;
                 continue;
             }
 
@@ -43,6 +45,7 @@ internal static class Widgets
             }
 
             start = index + 1;
+            index++;
         }
 
         if (row < contentRect.Height)
@@ -176,9 +179,11 @@ internal static class Widgets
         }
 
         var showBorder = border != BorderStyle.None;
-        var minHeight = showBorder
-            ? 4
-            : string.IsNullOrWhiteSpace(title) ? 3 : 4;
+        var minHeight = 4;
+        if (!showBorder && string.IsNullOrWhiteSpace(title))
+        {
+            minHeight = 3;
+        }
         var minWidth = showBorder
             ? (headers.Count * 2) + 1
             : (headers.Count * 2) - 1;

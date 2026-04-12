@@ -1,4 +1,4 @@
-using Tessera.Components.Primitives;
+﻿using Tessera.Components.Primitives;
 using Tessera.Components.Primitives.Internal;
 using Tessera.Controls.Internal;
 using Tessera.Layout;
@@ -11,42 +11,63 @@ namespace Tessera.Controls;
 /// </summary>
 public sealed class Label : Control
 {
+    /// <summary>
+    /// Represents text.
+    /// </summary>
     public string Text
     {
         get;
         set => field = value ?? string.Empty;
     } = string.Empty;
 
+    /// <summary>
+    /// Represents title.
+    /// </summary>
     public string? Title
     {
         get;
         set;
     }
 
+    /// <summary>
+    /// Represents border.
+    /// </summary>
     public BorderStyle Border
     {
         get;
         set;
     } = BorderStyle.SingleLine;
 
+    /// <summary>
+    /// Represents padding.
+    /// </summary>
     public Thickness Padding
     {
         get;
         set;
     }
 
+    /// <summary>
+    /// Represents text style.
+    /// </summary>
     public TesseraStyle TextStyle
     {
         get;
         set;
     } = TesseraStyle.Empty;
 
+    /// <summary>
+    /// Represents title style.
+    /// </summary>
     public TesseraStyle TitleStyle
     {
         get;
         set;
     } = TesseraStyle.Empty;
 
+    /// <summary>
+    /// Represents focused title style.
+    /// </summary>
     public TesseraStyle FocusedTitleStyle
     {
         get;
@@ -71,18 +92,25 @@ public sealed class Label : Control
         set;
     } = TesseraStyle.Empty;
 
+    /// <summary>
+    /// Represents horizontal alignment.
+    /// </summary>
     public global::Tessera.Layout.HorizontalAlignment HorizontalAlignment
     {
         get;
         set;
     }
 
+    /// <summary>
+    /// Represents vertical alignment.
+    /// </summary>
     public global::Tessera.Layout.VerticalAlignment VerticalAlignment
     {
         get;
         set;
     }
 
+    /// <inheritdoc />
     public override void Render(Canvas canvas, Rect rect)
     {
         var clipped = Rect.Intersect(rect, canvas.Bounds);

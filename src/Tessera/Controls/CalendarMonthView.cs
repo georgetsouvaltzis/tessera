@@ -1,4 +1,4 @@
-using System.Globalization;
+﻿using System.Globalization;
 using Tessera.Components.Primitives;
 using Tessera.Controls.Internal;
 using Tessera.Layout;
@@ -30,34 +30,100 @@ public sealed class CalendarMonthView : Control
         set => field = value ?? string.Empty;
     } = "Calendar";
 
+    /// <summary>
+    /// Represents focus marker.
+    /// </summary>
     public string FocusMarker
     {
         get;
         set => field = value ?? string.Empty;
     } = "*";
 
+    /// <summary>
+    /// Gets or sets whether show focus marker.
+    /// </summary>
     public bool ShowFocusMarker { get; set; } = true;
+    /// <summary>
+    /// Gets or sets the title style.
+    /// </summary>
     public TesseraStyle TitleStyle { get; set; } = TesseraStyle.Empty;
+    /// <summary>
+    /// Gets or sets the focused title style.
+    /// </summary>
     public TesseraStyle FocusedTitleStyle { get; set; } = TesseraStyle.Empty;
+    /// <summary>
+    /// Gets or sets the month header style.
+    /// </summary>
     public TesseraStyle MonthHeaderStyle { get; set; } = TesseraStyle.Empty;
+    /// <summary>
+    /// Gets or sets the weekday header style.
+    /// </summary>
     public TesseraStyle WeekdayHeaderStyle { get; set; } = TesseraStyle.Empty;
+    /// <summary>
+    /// Gets or sets the day style.
+    /// </summary>
     public TesseraStyle DayStyle { get; set; } = TesseraStyle.Empty;
+    /// <summary>
+    /// Gets or sets the outside month day style.
+    /// </summary>
     public TesseraStyle OutsideMonthDayStyle { get; set; } = TesseraStyle.Empty;
+    /// <summary>
+    /// Gets or sets the today day style.
+    /// </summary>
     public TesseraStyle TodayDayStyle { get; set; } = TesseraStyle.Empty;
+    /// <summary>
+    /// Gets or sets the selected day style.
+    /// </summary>
     public TesseraStyle SelectedDayStyle { get; set; } = TesseraStyle.Empty;
+    /// <summary>
+    /// Gets or sets the hovered day style.
+    /// </summary>
     public TesseraStyle HoveredDayStyle { get; set; } = TesseraStyle.Empty;
+    /// <summary>
+    /// Gets or sets the disabled day style.
+    /// </summary>
     public TesseraStyle DisabledDayStyle { get; set; } = TesseraStyle.Empty;
+    /// <summary>
+    /// Gets or sets the disabled style.
+    /// </summary>
     public TesseraStyle DisabledStyle { get; set; } = TesseraStyle.Empty;
+    /// <summary>
+    /// Gets or sets the padding.
+    /// </summary>
     public Thickness Padding { get; set; }
+    /// <summary>
+    /// Gets or sets the first day of week.
+    /// </summary>
     public DayOfWeek FirstDayOfWeek { get; set; } = DayOfWeek.Monday;
+    /// <summary>
+    /// Gets or sets whether show adjacent month days.
+    /// </summary>
     public bool ShowAdjacentMonthDays { get; set; } = true;
+    /// <summary>
+    /// Gets or sets the min date.
+    /// </summary>
     public DateOnly? MinDate { get; set; }
+    /// <summary>
+    /// Gets or sets the max date.
+    /// </summary>
     public DateOnly? MaxDate { get; set; }
+    /// <summary>
+    /// Gets or sets the today.
+    /// </summary>
     public DateOnly Today { get; set; } = DateOnly.FromDateTime(DateTime.UtcNow.Date);
+    /// <summary>
+    /// Gets or sets the selected date.
+    /// </summary>
     public DateOnly SelectedDate { get; private set; } = DateOnly.FromDateTime(DateTime.UtcNow.Date);
+    /// <summary>
+    /// Gets or sets the display month.
+    /// </summary>
     public DateOnly DisplayMonth { get; private set; } = new(DateTime.UtcNow.Year, DateTime.UtcNow.Month, 1);
+    /// <inheritdoc />
     public override bool IsFocused { get; set; }
+    /// <inheritdoc />
     public override bool IsDisabled { get; set; }
+    /// <inheritdoc />
     public override bool IsReadOnly { get; set; }
 
     /// <summary>

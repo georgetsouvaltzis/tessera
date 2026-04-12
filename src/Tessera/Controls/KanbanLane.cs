@@ -44,12 +44,9 @@ public sealed class KanbanLane
     {
         ArgumentNullException.ThrowIfNull(cards);
         _cards.Clear();
-        foreach (var card in cards)
+        foreach (var card in cards.Where(static card => card is not null))
         {
-            if (card is not null)
-            {
-                _cards.Add(card);
-            }
+            _cards.Add(card);
         }
     }
 

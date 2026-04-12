@@ -13,7 +13,10 @@ public abstract class LayoutNode
     /// </summary>
     /// <param name="control">The control to wrap as layout content.</param>
     public static implicit operator LayoutNode(Control control)
-        => new ComponentLayout(control ?? throw new ArgumentNullException(nameof(control)));
+    {
+        ArgumentNullException.ThrowIfNull(control);
+        return new ComponentLayout(control);
+    }
 
     internal abstract LayoutMeasurement Measure(in Rect availableBounds);
 }

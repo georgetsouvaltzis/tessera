@@ -21,6 +21,15 @@ internal abstract class TestRuntimeModel
     public abstract ModelView Render();
 }
 
+internal static class TestDoubleAsync
+{
+    public static ValueTask Completed(CancellationToken cancellationToken)
+    {
+        _ = cancellationToken;
+        return ValueTask.CompletedTask;
+    }
+}
+
 internal sealed class InitQuitModel : TestRuntimeModel
 {
     public override Effect? Init() => Effects.Quit;
@@ -531,9 +540,9 @@ internal sealed class CapabilityAwareRendererSpy : IProgramRenderer
         Updates.Add(capabilities);
     }
 
-    public void Render(ModelView view)
+    public void Render(ModelView output)
     {
-        _ = view;
+        _ = output;
     }
 
     public ValueTask WriteRawAsync(string content, CancellationToken cancellationToken)
@@ -543,17 +552,9 @@ internal sealed class CapabilityAwareRendererSpy : IProgramRenderer
         return ValueTask.CompletedTask;
     }
 
-    public ValueTask FlushAsync(CancellationToken cancellationToken)
-    {
-        _ = cancellationToken;
-        return ValueTask.CompletedTask;
-    }
+    public ValueTask FlushAsync(CancellationToken cancellationToken) => TestDoubleAsync.Completed(cancellationToken);
 
-    public ValueTask ResetAsync(CancellationToken cancellationToken)
-    {
-        _ = cancellationToken;
-        return ValueTask.CompletedTask;
-    }
+    public ValueTask ResetAsync(CancellationToken cancellationToken) => FlushAsync(cancellationToken);
 
     public ValueTask DisposeAsync()
     {
@@ -587,9 +588,9 @@ internal sealed class RenderCountingRendererSpy : IProgramRenderer
         _ = capabilities;
     }
 
-    public void Render(ModelView view)
+    public void Render(ModelView output)
     {
-        _ = view;
+        _ = output;
         RenderCalls++;
     }
 
@@ -608,11 +609,7 @@ internal sealed class RenderCountingRendererSpy : IProgramRenderer
         return ValueTask.CompletedTask;
     }
 
-    public ValueTask ResetAsync(CancellationToken cancellationToken)
-    {
-        _ = cancellationToken;
-        return ValueTask.CompletedTask;
-    }
+    public ValueTask ResetAsync(CancellationToken cancellationToken) => TestDoubleAsync.Completed(cancellationToken);
 
     public ValueTask DisposeAsync()
     {
@@ -660,11 +657,7 @@ internal sealed class DisposeOrderingTerminalAdapter : ITerminalAdapter
         return ValueTask.CompletedTask;
     }
 
-    public ValueTask RestoreAsync(CancellationToken cancellationToken)
-    {
-        _ = cancellationToken;
-        return ValueTask.CompletedTask;
-    }
+    public ValueTask RestoreAsync(CancellationToken cancellationToken) => PrepareAsync(cancellationToken);
 
     public ValueTask<TerminalSize> GetSizeAsync(CancellationToken cancellationToken)
     {
@@ -762,11 +755,7 @@ internal sealed class FakeTerminalAdapter : ITerminalAdapter
         return ValueTask.CompletedTask;
     }
 
-    public ValueTask RestoreAsync(CancellationToken cancellationToken)
-    {
-        _ = cancellationToken;
-        return ValueTask.CompletedTask;
-    }
+    public ValueTask RestoreAsync(CancellationToken cancellationToken) => PrepareAsync(cancellationToken);
 
     public ValueTask<TerminalSize> GetSizeAsync(CancellationToken cancellationToken)
     {
@@ -795,11 +784,7 @@ internal sealed class ResizingFakeTerminal : ITerminalAdapter
         return ValueTask.CompletedTask;
     }
 
-    public ValueTask RestoreAsync(CancellationToken cancellationToken)
-    {
-        _ = cancellationToken;
-        return ValueTask.CompletedTask;
-    }
+    public ValueTask RestoreAsync(CancellationToken cancellationToken) => PrepareAsync(cancellationToken);
 
     public ValueTask<TerminalSize> GetSizeAsync(CancellationToken cancellationToken)
     {
@@ -837,11 +822,7 @@ internal sealed class SignalDrivenFakeTerminal : ITerminalAdapter
         return ValueTask.CompletedTask;
     }
 
-    public ValueTask RestoreAsync(CancellationToken cancellationToken)
-    {
-        _ = cancellationToken;
-        return ValueTask.CompletedTask;
-    }
+    public ValueTask RestoreAsync(CancellationToken cancellationToken) => PrepareAsync(cancellationToken);
 
     public ValueTask<TerminalSize> GetSizeAsync(CancellationToken cancellationToken)
     {
@@ -883,11 +864,7 @@ internal sealed class InteractiveProbeTerminalAdapter : ITerminalAdapter
         return ValueTask.CompletedTask;
     }
 
-    public ValueTask RestoreAsync(CancellationToken cancellationToken)
-    {
-        _ = cancellationToken;
-        return ValueTask.CompletedTask;
-    }
+    public ValueTask RestoreAsync(CancellationToken cancellationToken) => PrepareAsync(cancellationToken);
 
     public ValueTask<TerminalSize> GetSizeAsync(CancellationToken cancellationToken)
     {
@@ -921,11 +898,7 @@ internal sealed class InteractiveInputTerminalAdapter : ITerminalAdapter
         return ValueTask.CompletedTask;
     }
 
-    public ValueTask RestoreAsync(CancellationToken cancellationToken)
-    {
-        _ = cancellationToken;
-        return ValueTask.CompletedTask;
-    }
+    public ValueTask RestoreAsync(CancellationToken cancellationToken) => PrepareAsync(cancellationToken);
 
     public ValueTask<TerminalSize> GetSizeAsync(CancellationToken cancellationToken)
     {

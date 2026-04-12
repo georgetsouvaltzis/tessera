@@ -1,4 +1,4 @@
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using Tessera.Components.Primitives;
 using Tessera.Components.Primitives.Internal;
 using Tessera.Controls.Internal;
@@ -52,18 +52,39 @@ public sealed class ContextMenu : Control
     /// </remarks>
     public bool ShowFocusMarker { get; set; }
 
+    /// <summary>
+    /// Gets or sets the title style.
+    /// </summary>
     public TesseraStyle TitleStyle { get; set; } = TesseraStyle.Empty;
 
+    /// <summary>
+    /// Gets or sets the focused title style.
+    /// </summary>
     public TesseraStyle FocusedTitleStyle { get; set; } = TesseraStyle.Empty;
 
+    /// <summary>
+    /// Gets or sets the item style.
+    /// </summary>
     public TesseraStyle ItemStyle { get; set; } = TesseraStyle.Empty;
 
+    /// <summary>
+    /// Gets or sets the selected item style.
+    /// </summary>
     public TesseraStyle SelectedItemStyle { get; set; } = TesseraStyle.Empty;
 
+    /// <summary>
+    /// Gets or sets the hovered item style.
+    /// </summary>
     public TesseraStyle HoveredItemStyle { get; set; } = TesseraStyle.Empty;
 
+    /// <summary>
+    /// Gets or sets the disabled item style.
+    /// </summary>
     public TesseraStyle DisabledItemStyle { get; set; } = TesseraStyle.Empty;
 
+    /// <summary>
+    /// Gets or sets the muted item style.
+    /// </summary>
     public TesseraStyle MutedItemStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
@@ -94,46 +115,74 @@ public sealed class ContextMenu : Control
         }
     }
 
+    /// <summary>
+    /// Gets or sets whether is visible.
+    /// </summary>
     public bool IsVisible { get; private set; }
 
+    /// <summary>
+    /// Represents border.
+    /// </summary>
     public BorderStyle Border
     {
         get;
         set;
     } = BorderStyle.Rounded;
 
+    /// <summary>
+    /// Represents padding.
+    /// </summary>
     public Thickness Padding
     {
         get;
         set;
     }
 
+    /// <summary>
+    /// Gets or sets the anchor x.
+    /// </summary>
     public int AnchorX { get; private set; }
 
+    /// <summary>
+    /// Gets or sets the anchor y.
+    /// </summary>
     public int AnchorY { get; private set; }
 
+    /// <summary>
+    /// Gets or sets the last executed item id.
+    /// </summary>
     public string? LastExecutedItemId { get; private set; }
 
+    /// <summary>
+    /// Represents items.
+    /// </summary>
     public IReadOnlyList<ContextMenuItem> Items => _items;
 
+    /// <inheritdoc />
     public override bool IsFocused
     {
         get;
         set;
     }
 
+    /// <inheritdoc />
     public override bool IsDisabled
     {
         get;
         set;
     }
 
+    /// <inheritdoc />
     public override bool IsReadOnly
     {
         get;
         set;
     }
 
+    /// <summary>
+    /// Executes set items.
+    /// </summary>
+    /// <param name="items">The items value.</param>
     public void SetItems(IEnumerable<ContextMenuItem> items)
     {
         ArgumentNullException.ThrowIfNull(items);
@@ -154,6 +203,11 @@ public sealed class ContextMenu : Control
         _hoveredIndex = -1;
     }
 
+    /// <summary>
+    /// Executes open at.
+    /// </summary>
+    /// <param name="x">The x value.</param>
+    /// <param name="y">The y value.</param>
     public void OpenAt(int x, int y)
     {
         RequestFocus();
@@ -163,11 +217,15 @@ public sealed class ContextMenu : Control
         _selectedIndex = Math.Clamp(_selectedIndex, 0, Math.Max(0, _items.Count - 1));
     }
 
+    /// <summary>
+    /// Executes close.
+    /// </summary>
     public void Close()
     {
         IsVisible = false;
     }
 
+    /// <inheritdoc />
     public override bool Handle(Message message)
     {
         if (!IsVisible || !IsFocused || IsDisabled || message is not KeyPressed key)
@@ -207,6 +265,7 @@ public sealed class ContextMenu : Control
         return false;
     }
 
+    /// <inheritdoc />
     public override bool Handle(Message message, Rect bounds)
     {
         if (!IsVisible || IsDisabled || message is not PointerInput pointer || !TryResolveMenuBounds(bounds, out var menuBounds, out var content))
@@ -297,6 +356,11 @@ public sealed class ContextMenu : Control
         return changed;
     }
 
+    /// <summary>
+    /// Executes try consume execution.
+    /// </summary>
+    /// <param name="itemId">The item id value.</param>
+    /// <returns><see langword="true" /> when try consume execution succeeds.</returns>
     [EditorBrowsable(EditorBrowsableState.Advanced)]
     public bool TryConsumeExecution(out string itemId)
     {
@@ -311,6 +375,7 @@ public sealed class ContextMenu : Control
         return true;
     }
 
+    /// <inheritdoc />
     public override void Render(Canvas canvas, Rect rect)
     {
         if (!IsVisible)
@@ -514,16 +579,6 @@ public sealed class ContextMenu : Control
         return row.NormalRowText;
     }
 
-    private static int ResolveMinimumRowWidth(string title, ContextMenuGlyphSet glyphs)
-    {
-        var markerWidth = Math.Max(
-            ControlTextLayout.MeasureDisplayWidth(glyphs.NormalRowMarker),
-            Math.Max(
-                ControlTextLayout.MeasureDisplayWidth(glyphs.SelectedRowMarker),
-                ControlTextLayout.MeasureDisplayWidth(glyphs.HoveredRowMarker)));
-        return markerWidth + ControlTextLayout.MeasureDisplayWidth(glyphs.MarkerSeparator) + ControlTextLayout.MeasureDisplayWidth(title) + 2;
-    }
-
     private void ExecuteItem(int index)
     {
         var item = _items[index];
@@ -549,6 +604,19 @@ public sealed class ContextMenu : Control
                 string.Concat(glyphs.SelectedRowMarker, glyphs.MarkerSeparator, safeTitle),
                 string.Concat(glyphs.HoveredRowMarker, glyphs.MarkerSeparator, safeTitle),
                 ResolveMinimumRowWidth(safeTitle, glyphs));
+        }
+
+        private static int ResolveMinimumRowWidth(string title, ContextMenuGlyphSet glyphs)
+        {
+            var markerWidth = Math.Max(
+                ControlTextLayout.MeasureDisplayWidth(glyphs.NormalRowMarker),
+                Math.Max(
+                    ControlTextLayout.MeasureDisplayWidth(glyphs.SelectedRowMarker),
+                    ControlTextLayout.MeasureDisplayWidth(glyphs.HoveredRowMarker)));
+            return markerWidth
+                + ControlTextLayout.MeasureDisplayWidth(glyphs.MarkerSeparator)
+                + ControlTextLayout.MeasureDisplayWidth(title)
+                + 2;
         }
     }
 }

@@ -84,15 +84,21 @@ public sealed class InspectorPanel : Control
     {
         ArgumentNullException.ThrowIfNull(sections);
         _sections.Clear();
-        foreach (var section in sections)
+        foreach (var section in sections.Where(static section => section is not null))
         {
-            if (section is not null)
-            {
-                _sections.Add(Clone(section));
-            }
+            _sections.Add(Clone(section));
         }
 
-        _selectedRowIndex = BuildRows().Count == 0 ? -1 : Math.Clamp(_selectedRowIndex < 0 ? 0 : _selectedRowIndex, 0, BuildRows().Count - 1);
+        var rowCount = BuildRows().Count;
+        if (rowCount == 0)
+        {
+            _selectedRowIndex = -1;
+        }
+        else
+        {
+            var seedIndex = _selectedRowIndex < 0 ? 0 : _selectedRowIndex;
+            _selectedRowIndex = Math.Clamp(seedIndex, 0, rowCount - 1);
+        }
         _scrollOffset = 0;
     }
 

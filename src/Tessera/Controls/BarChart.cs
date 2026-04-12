@@ -1,4 +1,4 @@
-using Tessera.Components.Primitives;
+﻿using Tessera.Components.Primitives;
 using Tessera.Controls.Internal;
 using Tessera.Layout;
 using Tessera.Styles;
@@ -114,6 +114,7 @@ public sealed class BarChart : Control
         _bars.Add(new BarPoint(normalizedLabel, value));
     }
 
+    /// <inheritdoc />
     public override void Render(Canvas canvas, Rect rect)
     {
         var barsToRender = CreateRenderBars();

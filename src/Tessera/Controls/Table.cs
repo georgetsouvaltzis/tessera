@@ -1,4 +1,4 @@
-using System.Text;
+﻿using System.Text;
 using Tessera.Components.Primitives;
 using Tessera.Controls.Internal;
 using Tessera.Layout;
@@ -21,16 +21,29 @@ public sealed class Table : Control
     /// </summary>
     public event EventHandler<ListSelectionChangedEventArgs<IReadOnlyList<string>>>? SelectionChanged;
 
+    /// <summary>
+    /// Executes table.
+    /// </summary>
+    /// <param name="columns">The columns value.</param>
+    /// <returns>The result of table.</returns>
     public Table(IReadOnlyList<string> columns)
     {
         _columns = columns ?? Array.Empty<string>();
     }
 
+    /// <summary>
+    /// Executes table.
+    /// </summary>
+    /// <param name="columns">The columns value.</param>
+    /// <returns>The result of table.</returns>
     public Table(params string[] columns)
         : this((IReadOnlyList<string>)columns)
     {
     }
 
+    /// <summary>
+    /// Represents title.
+    /// </summary>
     public string Title
     {
         get;
@@ -145,24 +158,36 @@ public sealed class Table : Control
         set;
     }
 
+    /// <summary>
+    /// Represents page size.
+    /// </summary>
     public int PageSize
     {
         get;
         set;
     } = 8;
 
+    /// <summary>
+    /// Represents page index.
+    /// </summary>
     public int PageIndex
     {
         get;
         private set;
     }
 
+    /// <summary>
+    /// Represents sort column.
+    /// </summary>
     public int SortColumn
     {
         get;
         private set;
     }
 
+    /// <summary>
+    /// Represents sort descending.
+    /// </summary>
     public bool SortDescending
     {
         get;
@@ -188,6 +213,7 @@ public sealed class Table : Control
     /// </summary>
     public IReadOnlyList<string>? SelectedRow => TryGetSelectedRow(out var selectedRow) ? selectedRow : null;
 
+    /// <inheritdoc />
     public override bool IsFocused
     {
         get;
@@ -229,6 +255,10 @@ public sealed class Table : Control
         return SetSelectedVisibleRow(next, state);
     }
 
+    /// <summary>
+    /// Executes set rows.
+    /// </summary>
+    /// <param name="rows">The rows value.</param>
     public void SetRows(IEnumerable<IReadOnlyList<string>> rows)
     {
         ArgumentNullException.ThrowIfNull(rows);
@@ -293,6 +323,7 @@ public sealed class Table : Control
         NormalizeAfterRowMutation();
     }
 
+    /// <inheritdoc />
     public override bool Handle(Message message)
     {
         if (!IsFocused || _columns.Count == 0 || _rows.Count == 0 || message is not KeyPressed key)
@@ -329,6 +360,7 @@ public sealed class Table : Control
         return false;
     }
 
+    /// <inheritdoc />
     public override bool Handle(Message message, Rect bounds)
     {
         if (_columns.Count == 0 || _rows.Count == 0 || message is not PointerInput pointer || bounds.IsEmpty)
@@ -406,13 +438,16 @@ public sealed class Table : Control
             var row = TableViewState.RowFromPointer(content, pointer.Y, state.VisibleRowCount);
             if (row >= 0)
             {
-                return SetHoveredVisibleRow(row) | SetSelectedVisibleRow(row, state);
+                var hoverChanged = SetHoveredVisibleRow(row);
+                var selectionChanged = SetSelectedVisibleRow(row, state);
+                return hoverChanged || selectionChanged;
             }
         }
 
         return changed || Handle(message);
     }
 
+    /// <inheritdoc />
     public override void Render(Canvas canvas, Rect rect)
     {
         var clipped = Rect.Intersect(rect, canvas.Bounds);

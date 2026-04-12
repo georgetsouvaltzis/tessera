@@ -114,7 +114,8 @@ public sealed class LinePlotControlTests
         series.Append(6);
         series.TrimToLast(2);
 
-        Assert.That(series.Samples, Is.EqualTo(new[] { 5d, 6d }));
+        var expectedSamples = new[] { 5d, 6d };
+        Assert.That(series.Samples, Is.EqualTo(expectedSamples));
     }
 
     [Test]
@@ -179,7 +180,7 @@ public sealed class LinePlotControlTests
 
         Assert.That(output.Contains("req/s", StringComparison.Ordinal), Is.True);
         Assert.That(output.Contains("norm", StringComparison.Ordinal), Is.True);
-        Assert.That(output.Contains("t", StringComparison.Ordinal), Is.True);
+        Assert.That(output.Contains('t'), Is.True);
     }
 
     [Test]
@@ -263,8 +264,6 @@ public sealed class LinePlotControlTests
     private static bool IsBrailleCharacter(char value) => value is >= '\u2801' and <= '\u28FF';
 
     private static bool IsCompactLineCharacter(char value) => value is '─' or '│' or '╱' or '╲' or '╭' or '╮' or '╯' or '╰' or '•';
-
-    private static bool IsCornerOrJunctionCharacter(char value) => value is '╭' or '╮' or '╯' or '╰' or '┬' or '┴' or '├' or '┤' or '┼';
 
     private static bool IsBlockSparkCharacter(char value) => value is '▁' or '▂' or '▃' or '▄' or '▅' or '▆' or '▇' or '█';
 

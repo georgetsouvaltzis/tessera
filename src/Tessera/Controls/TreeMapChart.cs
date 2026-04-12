@@ -99,12 +99,9 @@ public sealed class TreeMapChart : Control
         var previousIndex = _selectedIndex;
         var previousNode = SelectedNode;
         _roots.Clear();
-        foreach (var node in nodes)
+        foreach (var node in nodes.Where(static node => node is not null))
         {
-            if (node is not null)
-            {
-                _roots.Add(Clone(node));
-            }
+            _roots.Add(Clone(node));
         }
 
         RebuildLeaves();
@@ -195,7 +192,9 @@ public sealed class TreeMapChart : Control
             return SetSelectedIndex(hit) || changed;
         }
 
-        return hit < 0 && pointer.Kind is PointerEventKind.Press or PointerEventKind.Release ? SetHoveredIndex(-1) : false;
+        return hit < 0
+            && pointer.Kind is PointerEventKind.Press or PointerEventKind.Release
+            && SetHoveredIndex(-1);
     }
 
     /// <inheritdoc />

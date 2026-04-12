@@ -1,4 +1,4 @@
-using Tessera.Components.Primitives;
+﻿using Tessera.Components.Primitives;
 using Tessera.Components.Primitives.Internal;
 using Tessera.Controls.Internal;
 using Tessera.Layout;
@@ -86,8 +86,11 @@ public sealed class PropertyGrid : Control
         ? _properties[_selectedIndex]
         : null;
 
+    /// <inheritdoc />
     public override bool IsFocused { get; set; }
+    /// <inheritdoc />
     public override bool IsDisabled { get; set; }
+    /// <inheritdoc />
     public override bool IsReadOnly { get; set; }
 
     /// <summary>Replaces all property rows.</summary>
@@ -99,17 +102,20 @@ public sealed class PropertyGrid : Control
         var previousProperty = SelectedProperty;
 
         _properties.Clear();
-        foreach (var property in properties)
+        foreach (var property in properties.Where(static property => property is not null))
         {
-            if (property is not null)
-            {
-                _properties.Add(property);
-            }
+            _properties.Add(property);
         }
 
-        _selectedIndex = _properties.Count == 0
-            ? -1
-            : Math.Clamp(_selectedIndex < 0 ? 0 : _selectedIndex, 0, _properties.Count - 1);
+        if (_properties.Count == 0)
+        {
+            _selectedIndex = -1;
+        }
+        else
+        {
+            var seedIndex = _selectedIndex < 0 ? 0 : _selectedIndex;
+            _selectedIndex = Math.Clamp(seedIndex, 0, _properties.Count - 1);
+        }
         _scrollOffset = 0;
         RaiseSelectionChangedIfNeeded(previousIndex, previousProperty);
     }
@@ -137,6 +143,7 @@ public sealed class PropertyGrid : Control
         return true;
     }
 
+    /// <inheritdoc />
     public override bool Handle(Message message)
     {
         if (IsDisabled || IsReadOnly || !IsFocused || _properties.Count == 0 || message is not KeyPressed key)
@@ -167,6 +174,7 @@ public sealed class PropertyGrid : Control
         return false;
     }
 
+    /// <inheritdoc />
     public override bool Handle(Message message, Rect bounds)
     {
         if (IsDisabled || IsReadOnly || message is not PointerInput pointer || bounds.IsEmpty)
@@ -225,6 +233,7 @@ public sealed class PropertyGrid : Control
         return displayRow.PropertyIndex >= 0 && SetSelectedIndex(displayRow.PropertyIndex);
     }
 
+    /// <inheritdoc />
     public override void Render(Canvas canvas, Rect rect)
     {
         var clipped = Rect.Intersect(rect, canvas.Bounds);

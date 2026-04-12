@@ -9,7 +9,6 @@ namespace Tessera.Controls;
 public sealed partial class SideNavRail : Control
 {
     private readonly List<NavItem> _items = [];
-    private SideNavRailGlyphSet _glyphs = SideNavRailGlyphSet.Default;
     private int _selectedIndex = -1;
     private int _hoveredIndex = -1;
 
@@ -109,11 +108,7 @@ public sealed partial class SideNavRail : Control
     /// <summary>
     /// Gets or sets glyphs used by title and item rendering.
     /// </summary>
-    public SideNavRailGlyphSet Glyphs
-    {
-        get => _glyphs;
-        set => _glyphs = value;
-    }
+    public SideNavRailGlyphSet Glyphs { get; set; } = SideNavRailGlyphSet.Default;
 
     /// <summary>
     /// Gets currently configured navigation items.
@@ -152,12 +147,9 @@ public sealed partial class SideNavRail : Control
         var previousId = previousItem?.Id;
 
         _items.Clear();
-        foreach (var item in items)
+        foreach (var item in items.Where(static item => item is not null))
         {
-            if (item is not null)
-            {
-                _items.Add(item);
-            }
+            _items.Add(item);
         }
 
         _hoveredIndex = -1;

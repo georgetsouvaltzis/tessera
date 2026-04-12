@@ -143,12 +143,9 @@ public sealed class Form : Control
     {
         ArgumentNullException.ThrowIfNull(fields);
         _fields.Clear();
-        foreach (var field in fields)
+        foreach (var field in fields.Where(static field => field is not null))
         {
-            if (field is not null)
-            {
-                _fields.Add(new FormField(field.Name, field.Label, field.Value, field.HelperText, field.IsRequired, field.IsDisabled));
-            }
+            _fields.Add(new FormField(field.Name, field.Label, field.Value, field.HelperText, field.IsRequired, field.IsDisabled));
         }
 
         _selectedIndex = ResolveFirstSelectable();
@@ -305,7 +302,11 @@ public sealed class Form : Control
             return false;
         }
 
-        var index = _selectedIndex < 0 ? (direction > 0 ? -1 : _fields.Count) : _selectedIndex;
+        var index = _selectedIndex;
+        if (index < 0)
+        {
+            index = direction > 0 ? -1 : _fields.Count;
+        }
         for (var i = 0; i < _fields.Count; i++)
         {
             index += direction;

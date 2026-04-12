@@ -36,10 +36,7 @@ public sealed class ThemeScopeApiErgonomicsTests
     {
         var theme = TesseraThemes.Catppuccin();
         var emptyApplied = ThemeScope.Apply(theme, Array.Empty<Control>());
-        var unsupportedApplied = ThemeScope.Apply(theme, new Control[]
-        {
-            new NoThemeControl(),
-        });
+        var unsupportedApplied = ThemeScope.Apply(theme, new NoThemeControl());
         var nullElementApplied = ThemeScope.Apply(theme, (IEnumerable<Control?>)new Control?[] { null });
 
         Assert.That(emptyApplied, Is.EqualTo(0));

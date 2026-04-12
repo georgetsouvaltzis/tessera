@@ -33,12 +33,9 @@ public sealed class TreeTableNode
 
         if (children is not null)
         {
-            foreach (var child in children)
+            foreach (var child in children.Where(static child => child is not null))
             {
-                if (child is not null)
-                {
-                    _children.Add(child);
-                }
+                _children.Add(child);
             }
         }
     }

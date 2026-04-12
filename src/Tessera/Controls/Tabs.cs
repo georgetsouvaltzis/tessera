@@ -1,4 +1,4 @@
-using Tessera.Components.Primitives;
+﻿using Tessera.Components.Primitives;
 using Tessera.Controls.Internal;
 using Tessera.Layout;
 using Tessera.Styles;
@@ -14,20 +14,39 @@ public sealed class Tabs : Control
     private int _selectedIndex;
     private int _hoveredIndex = -1;
 
+    /// <summary>
+    /// Executes tabs.
+    /// </summary>
+    /// <param name="items">The items value.</param>
+    /// <returns>The result of tabs.</returns>
     public Tabs(IEnumerable<string> items)
     {
         SetItems(items ?? Array.Empty<string>());
     }
 
+    /// <summary>
+    /// Executes tabs.
+    /// </summary>
+    /// <param name="items">The items value.</param>
+    /// <returns>The result of tabs.</returns>
     public Tabs(params string[] items)
         : this((IEnumerable<string>)items)
     {
     }
 
+    /// <summary>
+    /// Represents selection changed.
+    /// </summary>
     public event EventHandler<SelectionChangedEventArgs>? SelectionChanged;
 
+    /// <summary>
+    /// Represents items.
+    /// </summary>
     public IReadOnlyList<string> Items => _items;
 
+    /// <summary>
+    /// Represents selected index.
+    /// </summary>
     public int SelectedIndex => _selectedIndex;
 
     /// <summary>
@@ -75,12 +94,17 @@ public sealed class Tabs : Control
         set;
     } = TesseraStyle.Empty;
 
+    /// <inheritdoc />
     public override bool IsFocused
     {
         get;
         set;
     }
 
+    /// <summary>
+    /// Executes set items.
+    /// </summary>
+    /// <param name="items">The items value.</param>
     public void SetItems(IEnumerable<string> items)
     {
         ArgumentNullException.ThrowIfNull(items);
@@ -126,6 +150,7 @@ public sealed class Tabs : Control
         _ = SetSelectedIndex(index);
     }
 
+    /// <inheritdoc />
     public override bool Handle(Message message)
     {
         if (!IsFocused || _items.Count == 0 || message is not KeyPressed key)
@@ -158,6 +183,7 @@ public sealed class Tabs : Control
         return false;
     }
 
+    /// <inheritdoc />
     public override bool Handle(Message message, Rect bounds)
     {
         if (_items.Count == 0 || message is not PointerInput pointer || bounds.IsEmpty)
@@ -203,6 +229,7 @@ public sealed class Tabs : Control
         return Handle(message);
     }
 
+    /// <inheritdoc />
     public override void Render(Canvas canvas, Rect rect)
     {
         var clipped = Rect.Intersect(rect, canvas.Bounds);

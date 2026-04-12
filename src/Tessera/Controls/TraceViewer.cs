@@ -203,12 +203,9 @@ public sealed partial class TraceViewer : Control
         var previousIndex = SelectedIndex;
         var previousEntry = SelectedEntry;
         _entries.Clear();
-        foreach (var entry in entries)
+        foreach (var entry in entries.Where(static entry => entry is not null))
         {
-            if (entry is not null)
-            {
-                _entries.Add(CloneEntry(entry));
-            }
+            _entries.Add(CloneEntry(entry));
         }
 
         SortEntries();

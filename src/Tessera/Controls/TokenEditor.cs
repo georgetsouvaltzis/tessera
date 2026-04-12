@@ -179,12 +179,9 @@ public sealed partial class TokenEditor : Control
         var previousToken = SelectedToken;
 
         _tokens.Clear();
-        foreach (var token in tokens)
+        foreach (var token in tokens.Where(static token => token is not null))
         {
-            if (token is not null)
-            {
-                _tokens.Add(Clone(token));
-            }
+            _tokens.Add(Clone(token));
         }
 
         if (_tokens.Count == 0)
@@ -315,7 +312,8 @@ public sealed partial class TokenEditor : Control
 
             if (key.Is(Key.Enter))
             {
-                return CommitInput() || true;
+                CommitInput();
+                return true;
             }
         }
 
@@ -325,7 +323,8 @@ public sealed partial class TokenEditor : Control
             return result.Changed;
         }
 
-        return CommitInput() || true;
+        CommitInput();
+        return true;
     }
 
     /// <inheritdoc />
@@ -351,8 +350,7 @@ public sealed partial class TokenEditor : Control
         if (!insideRow)
         {
             return pointer.Kind is PointerEventKind.Motion or PointerEventKind.Press
-                ? SetHoveredTokenIndex(-1)
-                : false;
+                && SetHoveredTokenIndex(-1);
         }
 
         var hovered = HitTokenIndex(pointer.X, content);
@@ -364,9 +362,9 @@ public sealed partial class TokenEditor : Control
         if (pointer.Kind == PointerEventKind.Press && pointer.Button == PointerButton.Left)
         {
             RequestFocus();
-            var changed = SetHoveredTokenIndex(hovered);
-            changed |= SetSelectedTokenIndex(hovered);
-            return changed || true;
+            _ = SetHoveredTokenIndex(hovered);
+            _ = SetSelectedTokenIndex(hovered);
+            return true;
         }
 
         return false;
@@ -384,11 +382,10 @@ public sealed partial class TokenEditor : Control
         return SetSelectedTokenIndex(next);
     }
 
-    private bool CommitInput()
+    private void CommitInput()
     {
-        var changed = AddToken(_input.Value);
+        _ = AddToken(_input.Value);
         _input.Clear();
-        return changed;
     }
 
     private int HitTokenIndex(int pointerX, Rect content)

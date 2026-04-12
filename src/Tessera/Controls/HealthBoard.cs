@@ -12,7 +12,6 @@ public sealed partial class HealthBoard : Control
     private int _hoveredIndex = -1;
     private int _scrollOffset;
     private int _lastViewportRows = 8;
-    private HealthBoardGlyphSet _glyphs = HealthBoardGlyphSet.Default;
 
     /// <summary>
     /// Occurs when selected service changes.
@@ -139,11 +138,7 @@ public sealed partial class HealthBoard : Control
     /// <summary>
     /// Gets or sets glyphs used for row markers and severity symbols.
     /// </summary>
-    public HealthBoardGlyphSet Glyphs
-    {
-        get => _glyphs;
-        set => _glyphs = value;
-    }
+    public HealthBoardGlyphSet Glyphs { get; set; } = HealthBoardGlyphSet.Default;
 
     /// <summary>
     /// Gets configured service rows.
@@ -183,12 +178,9 @@ public sealed partial class HealthBoard : Control
         var previousItem = SelectedItem;
 
         _services.Clear();
-        foreach (var service in services)
+        foreach (var service in services.Where(static service => service is not null))
         {
-            if (service is not null)
-            {
-                _services.Add(Clone(service));
-            }
+            _services.Add(Clone(service));
         }
 
         if (_services.Count == 0)

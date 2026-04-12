@@ -29,9 +29,9 @@ public sealed partial class FileExplorer
     private bool TryFindPath(string path, out List<FileExplorerItem> chain)
     {
         chain = [];
-        foreach (var root in _roots)
+        for (var index = 0; index < _roots.Count; index++)
         {
-            if (TryFindPathRecursive(root, path, chain))
+            if (TryFindPathRecursive(_roots[index], path, chain))
             {
                 return true;
             }

@@ -28,7 +28,7 @@ public sealed class InspectorSection
     /// <summary>
     /// Gets or sets whether the section is expanded.
     /// </summary>
-    public bool IsExpanded { get; set; } = true;
+    public bool IsExpanded { get; set; }
 
     /// <summary>
     /// Gets key/value fields rendered in this section.

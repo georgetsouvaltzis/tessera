@@ -22,6 +22,54 @@ public sealed record LayoutSlot
     }
 
     /// <summary>
+    /// Creates a slot for the provided Tessera component.
+    /// </summary>
+    [EditorBrowsable(EditorBrowsableState.Advanced)]
+    [SetsRequiredMembers]
+    public LayoutSlot(
+        ICanvasComponent component,
+        LayoutLength length,
+        Thickness margin = default)
+        : this(
+            new ComponentLayout(component),
+            length,
+            margin)
+    {
+    }
+
+    /// <summary>
+    /// Creates a slot for the provided control.
+    /// </summary>
+    /// <param name="control">The control to place in the slot.</param>
+    /// <param name="length">The primary-axis sizing rule.</param>
+    /// <param name="margin">The outer margin applied around the slot content.</param>
+    [SetsRequiredMembers]
+    public LayoutSlot(
+        Control control,
+        LayoutLength length,
+        Thickness margin = default)
+        : this(
+            new ComponentLayout(control),
+            length,
+            margin)
+    {
+    }
+
+    /// <summary>
+    /// Creates a slot for the provided content.
+    /// </summary>
+    /// <param name="content">The layout content.</param>
+    /// <param name="length">The primary-axis sizing rule.</param>
+    /// <param name="margin">The outer margin applied around the slot content.</param>
+    [SetsRequiredMembers]
+    public LayoutSlot(LayoutNode content, LayoutLength length, Thickness margin = default)
+    {
+        Content = content ?? throw new ArgumentNullException(nameof(content));
+        Length = length;
+        Margin = margin;
+    }
+
+    /// <summary>
     /// Creates an auto-sized slot for layout content.
     /// </summary>
     /// <param name="content">The content placed in the slot.</param>
@@ -144,54 +192,6 @@ public sealed record LayoutSlot
     /// </remarks>
     public static LayoutSlot Weighted(Control control, int weight, Thickness margin = default) =>
         new(control, LayoutLength.Weighted(weight), margin);
-
-    /// <summary>
-    /// Creates a slot for the provided Tessera component.
-    /// </summary>
-    [EditorBrowsable(EditorBrowsableState.Advanced)]
-    [SetsRequiredMembers]
-    public LayoutSlot(
-        ICanvasComponent component,
-        LayoutLength length,
-        Thickness margin = default)
-        : this(
-            new ComponentLayout(component),
-            length,
-            margin)
-    {
-    }
-
-    /// <summary>
-    /// Creates a slot for the provided control.
-    /// </summary>
-    /// <param name="control">The control to place in the slot.</param>
-    /// <param name="length">The primary-axis sizing rule.</param>
-    /// <param name="margin">The outer margin applied around the slot content.</param>
-    [SetsRequiredMembers]
-    public LayoutSlot(
-        Control control,
-        LayoutLength length,
-        Thickness margin = default)
-        : this(
-            new ComponentLayout(control),
-            length,
-            margin)
-    {
-    }
-
-    /// <summary>
-    /// Creates a slot for the provided content.
-    /// </summary>
-    /// <param name="content">The layout content.</param>
-    /// <param name="length">The primary-axis sizing rule.</param>
-    /// <param name="margin">The outer margin applied around the slot content.</param>
-    [SetsRequiredMembers]
-    public LayoutSlot(LayoutNode content, LayoutLength length, Thickness margin = default)
-    {
-        Content = content ?? throw new ArgumentNullException(nameof(content));
-        Length = length;
-        Margin = margin;
-    }
 
     /// <summary>
     /// Gets the slot content.

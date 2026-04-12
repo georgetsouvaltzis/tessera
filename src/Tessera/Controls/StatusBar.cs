@@ -1,4 +1,4 @@
-using Tessera.Components.Primitives;
+﻿using Tessera.Components.Primitives;
 using Tessera.Layout;
 using Tessera.Styles;
 
@@ -9,18 +9,27 @@ namespace Tessera.Controls;
 /// </summary>
 public sealed class StatusBar : Control
 {
+    /// <summary>
+    /// Represents left text.
+    /// </summary>
     public string LeftText
     {
         get;
         set => field = value ?? string.Empty;
     } = string.Empty;
 
+    /// <summary>
+    /// Represents right text.
+    /// </summary>
     public string RightText
     {
         get;
         set => field = value ?? string.Empty;
     } = string.Empty;
 
+    /// <summary>
+    /// Represents fill.
+    /// </summary>
     public char Fill
     {
         get;
@@ -54,6 +63,7 @@ public sealed class StatusBar : Control
         set;
     } = TesseraStyle.Empty;
 
+    /// <inheritdoc />
     public override void Render(Canvas canvas, Rect rect)
     {
         var clipped = Rect.Intersect(rect, canvas.Bounds);

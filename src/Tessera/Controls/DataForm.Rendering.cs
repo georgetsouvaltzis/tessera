@@ -266,15 +266,12 @@ public sealed partial class DataForm<TModel>
             style = style.Merge(HoveredFieldStyle);
         }
 
-        if (index == _selectedIndex)
+        if (index == _selectedIndex && !_isEditing)
         {
-            if (!_isEditing)
+            style = style.Merge(SelectedFieldStyle);
+            if (IsFocused)
             {
-                style = style.Merge(SelectedFieldStyle);
-                if (IsFocused)
-                {
-                    style = style.Merge(FocusedSelectedFieldStyle);
-                }
+                style = style.Merge(FocusedSelectedFieldStyle);
             }
         }
 
@@ -299,15 +296,12 @@ public sealed partial class DataForm<TModel>
             style = style.Merge(HoveredFieldStyle);
         }
 
-        if (index == _selectedIndex)
+        if (index == _selectedIndex && _isEditing)
         {
-            if (_isEditing)
+            style = style.Merge(SelectedFieldStyle);
+            if (IsFocused)
             {
-                style = style.Merge(SelectedFieldStyle);
-                if (IsFocused)
-                {
-                    style = style.Merge(FocusedSelectedFieldStyle);
-                }
+                style = style.Merge(FocusedSelectedFieldStyle);
             }
         }
 

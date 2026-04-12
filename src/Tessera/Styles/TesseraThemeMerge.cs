@@ -70,11 +70,16 @@ internal static class TesseraThemeMerge
                     Ring = source.Focus.Ring.Merge(overlay.Focus.Ring),
                     Title = source.Focus.Title.Merge(overlay.Focus.Title),
                     Border = source.Focus.Border.Merge(overlay.Focus.Border),
-                    Marker = string.IsNullOrEmpty(overlay.Focus.Marker)
-                        ? source.Focus.Marker
-                        : overlay.Focus.Marker,
+                    Marker = ResolveMarker(source.Focus.Marker, overlay.Focus.Marker),
                 },
         };
+    }
+
+    private static string ResolveMarker(string sourceMarker, string overlayMarker)
+    {
+        return string.IsNullOrEmpty(overlayMarker)
+            ? sourceMarker
+            : overlayMarker;
     }
 
     private static bool IsEmpty(TesseraTheme theme)

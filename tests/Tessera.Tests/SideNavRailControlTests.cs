@@ -133,7 +133,7 @@ public sealed class SideNavRailControlTests
         var output = Render(rail, width: 36, height: 8);
 
         Assert.That(output.Contains("Rail !", StringComparison.Ordinal), Is.True);
-        Assert.That(output.Contains("v", StringComparison.Ordinal), Is.True);
+        Assert.That(output.Contains('v'), Is.True);
         Assert.That(output.Contains("{1}", StringComparison.Ordinal), Is.True);
         Assert.That(output.Contains("38;2;44;55;66", StringComparison.Ordinal), Is.True);
         Assert.That(output.Contains("38;2;77;88;99", StringComparison.Ordinal), Is.True);
@@ -158,8 +158,8 @@ public sealed class SideNavRailControlTests
 
         Assert.That(first, Is.EqualTo(second));
         Assert.That(first.Contains("\u001b[", StringComparison.Ordinal), Is.False);
-        Assert.That(first.Contains("▼", StringComparison.Ordinal), Is.True);
-        Assert.That(first.Contains("●", StringComparison.Ordinal), Is.True);
+        Assert.That(first.Contains('▼'), Is.True);
+        Assert.That(first.Contains('●'), Is.True);
     }
 
     private static SideNavRail CreateRail()

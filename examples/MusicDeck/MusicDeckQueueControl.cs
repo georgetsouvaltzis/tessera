@@ -57,8 +57,30 @@ internal sealed class MusicDeckQueueControl : Control
         {
             var index = start + row;
             var item = _items[index];
-            var prefix = index == CurrentIndex ? "●" : index == SelectedIndex ? "◆" : "·";
-            var style = index == SelectedIndex ? SelectedItemStyle : index == CurrentIndex ? CurrentItemStyle : ItemStyle;
+            string prefix;
+            if (index == CurrentIndex)
+            {
+                prefix = "●";
+            }
+            else if (index == SelectedIndex)
+            {
+                prefix = "◆";
+            }
+            else
+            {
+                prefix = "·";
+            }
+
+            var style = ItemStyle;
+            if (index == SelectedIndex)
+            {
+                style = SelectedItemStyle;
+            }
+            else if (index == CurrentIndex)
+            {
+                style = CurrentItemStyle;
+            }
+
             var text = $"{prefix} {item.Title}";
             canvas.WriteText(content.X, content.Y + row, Render(style, text), Math.Max(0, content.Width - 7));
             var durationX = Math.Max(content.X, content.Right - item.DisplayDuration.Length);

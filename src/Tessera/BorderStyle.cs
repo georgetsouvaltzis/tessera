@@ -1,6 +1,3 @@
-using System.ComponentModel;
-using System.Diagnostics.CodeAnalysis;
-
 namespace Tessera;
 
 /// <summary>
@@ -13,15 +10,9 @@ public enum BorderStyle
     /// </summary>
     None = -1,
     /// <summary>
-    /// Compatibility alias for <see cref="SingleLine"/>.
-    /// </summary>
-    [EditorBrowsable(EditorBrowsableState.Never)]
-    [SuppressMessage("Naming", "CA1720:Identifier contains type name", Justification = "Compatibility alias retained for existing consumers. Prefer SingleLine for new code.")]
-    Single = 0,
-    /// <summary>
     /// Single-line box drawing border.
     /// </summary>
-    SingleLine = Single,
+    SingleLine = 0,
     /// <summary>
     /// Rounded box drawing border.
     /// </summary>

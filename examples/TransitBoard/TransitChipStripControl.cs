@@ -113,9 +113,17 @@ internal sealed class TransitChipStripControl : Control
         _hitZones.Clear();
 
         var titleStyle = IsFocused && !FocusedTitleStyle.IsEmpty ? FocusedTitleStyle : TitleStyle;
-        var titleText = string.IsNullOrEmpty(Title)
-            ? string.Empty
-            : Render(titleStyle, IsFocused ? $"{Title} {FocusMarker}" : Title);
+        string titleText;
+        if (string.IsNullOrEmpty(Title))
+        {
+            titleText = string.Empty;
+        }
+        else
+        {
+            var label = IsFocused ? $"{Title} {FocusMarker}" : Title;
+            titleText = Render(titleStyle, label);
+        }
+
         var chipY = clipped.Y;
         if (!string.IsNullOrEmpty(titleText))
         {

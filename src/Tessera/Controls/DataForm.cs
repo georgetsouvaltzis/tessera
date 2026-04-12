@@ -164,12 +164,9 @@ public sealed partial class DataForm<TModel> : Control
         var previousIndex = _selectedIndex;
         var previousField = SelectedField;
         _fields.Clear();
-        foreach (var field in fields)
+        foreach (var field in fields.Where(static field => field is not null))
         {
-            if (field is not null)
-            {
-                _fields.Add(field);
-            }
+            _fields.Add(field);
         }
 
         if (_fields.Count == 0)

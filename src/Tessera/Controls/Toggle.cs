@@ -1,4 +1,4 @@
-using Tessera.Components.Primitives;
+﻿using Tessera.Components.Primitives;
 using Tessera.Components.Primitives.Internal;
 using Tessera.Components.Styling;
 using Tessera.Controls.Internal;
@@ -15,54 +15,81 @@ public sealed class Toggle : Control
     private readonly WidgetStatePalette _statePalette = WidgetStatePalette.CreateDefault();
     private bool _hovered;
 
+    /// <summary>
+    /// Represents title.
+    /// </summary>
     public string Title
     {
         get;
         set => field = value ?? string.Empty;
     } = "Toggle";
 
+    /// <summary>
+    /// Represents focus marker.
+    /// </summary>
     public string FocusMarker
     {
         get;
         set => field = value ?? string.Empty;
     } = "*";
 
+    /// <summary>
+    /// Represents show focus marker.
+    /// </summary>
     public bool ShowFocusMarker
     {
         get;
         set;
     } = true;
 
+    /// <summary>
+    /// Represents title style.
+    /// </summary>
     public TesseraStyle TitleStyle
     {
         get;
         set;
     } = TesseraStyle.Empty;
 
+    /// <summary>
+    /// Represents focused title style.
+    /// </summary>
     public TesseraStyle FocusedTitleStyle
     {
         get;
         set;
     } = TesseraStyle.Empty;
 
+    /// <summary>
+    /// Represents value style.
+    /// </summary>
     public TesseraStyle ValueStyle
     {
         get;
         set;
     } = TesseraStyle.Empty;
 
+    /// <summary>
+    /// Represents on value style.
+    /// </summary>
     public TesseraStyle OnValueStyle
     {
         get;
         set;
     } = TesseraStyle.Empty;
 
+    /// <summary>
+    /// Represents off value style.
+    /// </summary>
     public TesseraStyle OffValueStyle
     {
         get;
         set;
     } = TesseraStyle.Empty;
 
+    /// <summary>
+    /// Represents disabled value style.
+    /// </summary>
     public TesseraStyle DisabledValueStyle
     {
         get;
@@ -87,56 +114,79 @@ public sealed class Toggle : Control
         set;
     } = TesseraStyle.Empty;
 
+    /// <summary>
+    /// Represents on text.
+    /// </summary>
     public string OnText
     {
         get;
         set => field = value ?? string.Empty;
     } = "ON";
 
+    /// <summary>
+    /// Represents off text.
+    /// </summary>
     public string OffText
     {
         get;
         set => field = value ?? string.Empty;
     } = "OFF";
 
+    /// <summary>
+    /// Represents value.
+    /// </summary>
     public bool Value
     {
         get;
         private set;
     }
 
+    /// <summary>
+    /// Represents border.
+    /// </summary>
     public BorderStyle Border
     {
         get;
         set;
     } = BorderStyle.SingleLine;
 
+    /// <summary>
+    /// Represents padding.
+    /// </summary>
     public Thickness Padding
     {
         get;
         set;
     }
 
+    /// <inheritdoc />
     public override bool IsFocused
     {
         get;
         set;
     }
 
+    /// <inheritdoc />
     public override bool IsDisabled
     {
         get;
         set;
     }
 
+    /// <inheritdoc />
     public override bool IsReadOnly
     {
         get;
         set;
     }
 
+    /// <summary>
+    /// Executes set value.
+    /// </summary>
+    /// <param name="value">The value value.</param>
     public void SetValue(bool value) => Value = value;
 
+    /// <inheritdoc />
     public override bool Handle(Message message)
     {
         if (!IsFocused || IsDisabled || IsReadOnly || message is not KeyPressed key)
@@ -167,6 +217,7 @@ public sealed class Toggle : Control
         return false;
     }
 
+    /// <inheritdoc />
     public override bool Handle(Message message, Rect bounds)
     {
         if (IsDisabled || IsReadOnly || message is not PointerInput pointer)
@@ -224,6 +275,7 @@ public sealed class Toggle : Control
         return Handle(message);
     }
 
+    /// <inheritdoc />
     public override void Render(Canvas canvas, Rect rect)
     {
         var clipped = Rect.Intersect(rect, canvas.Bounds);
@@ -341,9 +393,15 @@ public sealed class Toggle : Control
 
     private TesseraStyle ResolveValueStyle()
     {
-        var style = Value
-            ? (OnValueStyle.IsEmpty ? ValueStyle : OnValueStyle)
-            : (OffValueStyle.IsEmpty ? ValueStyle : OffValueStyle);
+        TesseraStyle style;
+        if (Value)
+        {
+            style = OnValueStyle.IsEmpty ? ValueStyle : OnValueStyle;
+        }
+        else
+        {
+            style = OffValueStyle.IsEmpty ? ValueStyle : OffValueStyle;
+        }
 
         if (IsDisabled && !DisabledValueStyle.IsEmpty)
         {

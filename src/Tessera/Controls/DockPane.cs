@@ -68,12 +68,12 @@ public sealed class DockPane
     /// <summary>
     /// Gets or sets pane docking position.
     /// </summary>
-    public DockPanePosition Position { get; set; } = DockPanePosition.Center;
+    public DockPanePosition Position { get; set; }
 
     /// <summary>
     /// Gets or sets preferred size for edge-docked panes.
     /// </summary>
-    public int Size { get; set; } = 8;
+    public int Size { get; set; }
 
     /// <summary>
     /// Gets or sets pane body lines when <see cref="Content" /> is not provided.

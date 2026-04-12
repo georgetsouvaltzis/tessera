@@ -92,11 +92,11 @@ public sealed class ResizablePaneGroupControlTests
             new PaneSpec("right", second),
         ]);
 
-        Render(control, width: 64, height: 8);
+        RenderControl(control, width: 64, height: 8);
         var before = first.LastRenderBounds.Width;
 
         var handled = control.Handle(new KeyPressed(Key.Right, Modifiers: ModifierKeys.Ctrl));
-        Render(control, width: 64, height: 8);
+        RenderControl(control, width: 64, height: 8);
         var after = first.LastRenderBounds.Width;
 
         Assert.That(handled, Is.True);
@@ -119,14 +119,14 @@ public sealed class ResizablePaneGroupControlTests
         ]);
 
         var bounds = new Rect(0, 0, 60, 8);
-        Render(control, 60, 8);
+        RenderControl(control, 60, 8);
         var before = first.LastRenderBounds.Width;
 
         var pressDivider = control.Handle(new PointerInput(PointerEventKind.Press, PointerButton.Left, 30, 2), bounds);
         var dragDivider = control.Handle(new PointerInput(PointerEventKind.Motion, PointerButton.None, 42, 2), bounds);
         var releaseDivider = control.Handle(new PointerInput(PointerEventKind.Release, PointerButton.Left, 42, 2), bounds);
 
-        Render(control, 60, 8);
+        RenderControl(control, 60, 8);
         var after = first.LastRenderBounds.Width;
 
         var selectSecond = control.Handle(new PointerInput(PointerEventKind.Press, PointerButton.Left, 52, 2), bounds);
@@ -157,7 +157,7 @@ public sealed class ResizablePaneGroupControlTests
             new PaneSpec("right", title: "Right"),
         ]);
 
-        var output = Render(control, width: 56, height: 8);
+        var output = RenderControl(control, width: 56, height: 8);
 
         Assert.That(output.Contains("Resizable Pane Group *", StringComparison.Ordinal), Is.True);
         Assert.That(output.Contains("38;2;44;55;66", StringComparison.Ordinal), Is.True);
@@ -178,14 +178,14 @@ public sealed class ResizablePaneGroupControlTests
             new PaneSpec("tail", title: "Tail"),
         ]);
 
-        var first = Render(control, width: 56, height: 8);
-        var second = Render(control, width: 56, height: 8);
+        var first = RenderControl(control, width: 56, height: 8);
+        var second = RenderControl(control, width: 56, height: 8);
 
         Assert.That(first, Is.EqualTo(second));
         Assert.That(first.Contains("\u001b[", StringComparison.Ordinal), Is.False);
     }
 
-    private static string Render(ResizablePaneGroup control, int width, int height)
+    private static string RenderControl(ResizablePaneGroup control, int width, int height)
     {
         var canvas = new Canvas(width, height, CanvasTextMode.GraphemeAware);
         control.Render(canvas, new Rect(0, 0, width, height));

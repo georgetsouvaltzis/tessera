@@ -1,4 +1,4 @@
-using Tessera.Components.Primitives;
+﻿using Tessera.Components.Primitives;
 using Tessera.Components.Primitives.Internal;
 using Tessera.Controls.Internal;
 using Tessera.Layout;
@@ -94,24 +94,30 @@ public sealed class MenuBar : Control
         set;
     }
 
+    /// <inheritdoc />
     public override bool IsFocused
     {
         get;
         set;
     }
 
+    /// <inheritdoc />
     public override bool IsDisabled
     {
         get;
         set;
     }
 
+    /// <inheritdoc />
     public override bool IsReadOnly
     {
         get;
         set;
     }
 
+    /// <summary>
+    /// Gets or sets the last activated item id.
+    /// </summary>
     public string? LastActivatedItemId { get; private set; }
 
     /// <summary>
@@ -136,6 +142,7 @@ public sealed class MenuBar : Control
         _hoveredIndex = -1;
     }
 
+    /// <inheritdoc />
     public override bool Handle(Message message)
     {
         if (!IsFocused || IsDisabled || _items.Count == 0 || message is not KeyPressed key)
@@ -184,6 +191,7 @@ public sealed class MenuBar : Control
         return false;
     }
 
+    /// <inheritdoc />
     public override bool Handle(Message message, Rect bounds)
     {
         if (IsDisabled || _items.Count == 0 || message is not PointerInput pointer || bounds.IsEmpty)
@@ -271,6 +279,7 @@ public sealed class MenuBar : Control
         return true;
     }
 
+    /// <inheritdoc />
     public override void Render(Canvas canvas, Rect rect)
     {
         var clipped = Rect.Intersect(rect, canvas.Bounds);

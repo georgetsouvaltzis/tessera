@@ -25,15 +25,17 @@ public sealed class TokenEditorControlTests
         Assert.That(removed, Is.True);
         Assert.That(events, Has.Count.EqualTo(3));
 
+        var initialTokens = new[] { "one", "two" };
+        var updatedTokens = new[] { "one", "two", "three" };
         Assert.That(events[0].PreviousTokens, Is.Empty);
-        Assert.That(events[0].Tokens.Select(static token => token.Value), Is.EqualTo(new[] { "one", "two" }));
+        Assert.That(events[0].Tokens.Select(static token => token.Value), Is.EqualTo(initialTokens));
         Assert.That(events[0].Tokens[1].IsDisabled, Is.True);
 
-        Assert.That(events[1].PreviousTokens.Select(static token => token.Value), Is.EqualTo(new[] { "one", "two" }));
-        Assert.That(events[1].Tokens.Select(static token => token.Value), Is.EqualTo(new[] { "one", "two", "three" }));
+        Assert.That(events[1].PreviousTokens.Select(static token => token.Value), Is.EqualTo(initialTokens));
+        Assert.That(events[1].Tokens.Select(static token => token.Value), Is.EqualTo(updatedTokens));
 
-        Assert.That(events[2].PreviousTokens.Select(static token => token.Value), Is.EqualTo(new[] { "one", "two", "three" }));
-        Assert.That(events[2].Tokens.Select(static token => token.Value), Is.EqualTo(new[] { "one", "two" }));
+        Assert.That(events[2].PreviousTokens.Select(static token => token.Value), Is.EqualTo(updatedTokens));
+        Assert.That(events[2].Tokens.Select(static token => token.Value), Is.EqualTo(initialTokens));
     }
 
     [Test]

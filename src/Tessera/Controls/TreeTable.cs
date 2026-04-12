@@ -237,12 +237,9 @@ public sealed partial class TreeTable : Control
         var selectedId = previousItem?.Id;
 
         _roots.Clear();
-        foreach (var item in items)
+        foreach (var item in items.Where(static item => item is not null))
         {
-            if (item is not null)
-            {
-                _roots.Add(Clone(item));
-            }
+            _roots.Add(Clone(item));
         }
 
         RefreshVisible();
@@ -350,12 +347,12 @@ public sealed partial class TreeTable : Control
         {
             if (pointer.Button == PointerButton.WheelDown)
             {
-                return changed | SetSelectedVisibleIndex(Math.Min(_visible.Count - 1, _selectedVisibleIndex + 1));
+                return changed || SetSelectedVisibleIndex(Math.Min(_visible.Count - 1, _selectedVisibleIndex + 1));
             }
 
             if (pointer.Button == PointerButton.WheelUp)
             {
-                return changed | SetSelectedVisibleIndex(Math.Max(0, _selectedVisibleIndex - 1));
+                return changed || SetSelectedVisibleIndex(Math.Max(0, _selectedVisibleIndex - 1));
             }
 
             return false;
@@ -381,10 +378,11 @@ public sealed partial class TreeTable : Control
         changed |= SetHoveredVisibleIndex(hoveredVisibleIndex);
         if (hoveredVisibleIndex < 0)
         {
-            return changed || true;
+            return true;
         }
 
-        return changed | SetSelectedVisibleIndex(hoveredVisibleIndex);
+        var selectionChanged = SetSelectedVisibleIndex(hoveredVisibleIndex);
+        return changed || selectionChanged;
     }
 
     /// <inheritdoc />

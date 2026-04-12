@@ -16,6 +16,9 @@ public abstract class Control
     private bool _focusRequestPending;
     private long _focusRequestOrder;
 
+    /// <summary>
+    /// Initializes a new control instance.
+    /// </summary>
     protected Control()
     {
     }

@@ -39,10 +39,12 @@ public sealed class AreaPlotControlTests
     {
         var control = new AreaPlot(capacity: 3);
         control.SetSamples([1, 2, 3, 4, 5]);
-        Assert.That(control.Samples, Is.EqualTo(new[] { 3d, 4d, 5d }));
+        var expectedAfterSet = new[] { 3d, 4d, 5d };
+        Assert.That(control.Samples, Is.EqualTo(expectedAfterSet));
 
         control.Append(6);
-        Assert.That(control.Samples, Is.EqualTo(new[] { 4d, 5d, 6d }));
+        var expectedAfterAppend = new[] { 4d, 5d, 6d };
+        Assert.That(control.Samples, Is.EqualTo(expectedAfterAppend));
 
         control.Clear();
         Assert.That(control.Samples.Count, Is.EqualTo(0));
@@ -66,7 +68,7 @@ public sealed class AreaPlotControlTests
 
         Assert.That(output.Contains("min:10.0 max:40.0", StringComparison.Ordinal), Is.True);
         Assert.That(output.Contains("mem", StringComparison.Ordinal), Is.True);
-        Assert.That(output.Contains("=", StringComparison.Ordinal), Is.True);
+        Assert.That(output.Contains('='), Is.True);
     }
 
     [Test]

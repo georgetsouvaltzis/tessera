@@ -215,7 +215,15 @@ public sealed class VirtualizedListView<T> : Control
             var index = _scrollOffset + row;
             if (!TryResolve(index, out var item)) continue;
             var text = _textSelector(item);
-            var prefix = index == _selectedIndex ? "> " : index == _hoveredIndex ? "~ " : "  ";
+            var prefix = "  ";
+            if (index == _selectedIndex)
+            {
+                prefix = "> ";
+            }
+            else if (index == _hoveredIndex)
+            {
+                prefix = "~ ";
+            }
             canvas.WriteText(
                 content.X,
                 content.Y + row,

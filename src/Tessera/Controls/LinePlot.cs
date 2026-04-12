@@ -190,12 +190,9 @@ public sealed partial class LinePlot : Control
         ArgumentNullException.ThrowIfNull(series);
 
         _series.Clear();
-        foreach (var item in series)
+        foreach (var item in series.Where(static item => item is not null))
         {
-            if (item is not null)
-            {
-                _series.Add(item);
-            }
+            _series.Add(item);
         }
     }
 
@@ -778,12 +775,13 @@ public sealed partial class LinePlot : Control
 
         var dx = x1 - x0;
         var dy = y1 - y0;
-        var glyph = Math.Abs(dy) <= 1
-            ? horizontalGlyph
-            : dy > 0 ? downwardGlyph : upwardGlyph;
-        var fallback = Math.Abs(dy) <= 1
-            ? '─'
-            : dy > 0 ? '╲' : '╱';
+        var glyph = horizontalGlyph;
+        var fallback = '─';
+        if (Math.Abs(dy) > 1)
+        {
+            glyph = dy > 0 ? downwardGlyph : upwardGlyph;
+            fallback = dy > 0 ? '╲' : '╱';
+        }
 
         for (var x = Math.Min(x0, x1) + 1; x < Math.Max(x0, x1); x++)
         {

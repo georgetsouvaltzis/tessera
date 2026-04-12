@@ -7,6 +7,16 @@ namespace Tessera.Controls.Internal;
 
 internal static class NumberInputRenderer
 {
+    private static string? ResolveTitle(BorderStyle border, bool focused, string title)
+    {
+        if (border == BorderStyle.None)
+        {
+            return null;
+        }
+
+        return focused ? $"{title} *" : title;
+    }
+
     public static void Render(
         Canvas canvas,
         Rect rect,
@@ -32,7 +42,7 @@ internal static class NumberInputRenderer
         var content = FrameLayout.DrawFrameAndResolveContent(
             canvas,
             clipped,
-            border == BorderStyle.None ? null : focused ? $"{title} *" : title,
+            ResolveTitle(border, focused, title),
             border,
             padding);
 

@@ -23,7 +23,7 @@ public sealed class NotificationInboxControlTests
 
         Assert.That(output.Contains("Notification Inbox", StringComparison.Ordinal), Is.True);
         Assert.That(output.Contains("10:05", StringComparison.Ordinal), Is.True);
-        Assert.That(output.Contains("•", StringComparison.Ordinal), Is.True);
+        Assert.That(output.Contains('•'), Is.True);
         Assert.That(output.Contains("Build finished", StringComparison.Ordinal), Is.True);
     }
 

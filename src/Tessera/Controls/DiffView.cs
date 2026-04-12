@@ -298,7 +298,8 @@ public sealed class DiffView : Control
         }
 
         var index = _scrollOffset + row;
-        return SetSelection(index) || true;
+        _ = SetSelection(index);
+        return true;
     }
 
     /// <inheritdoc />

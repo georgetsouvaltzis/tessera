@@ -45,7 +45,7 @@ public sealed partial class JsonTreeView
                 children.Add(ParseElement(property.Name, property.Value));
             }
 
-            return new JsonTreeNode(key, "{...}", JsonTreeNodeKind.Object, children)
+            return new JsonTreeNode(key, "{...}", JsonTreeNodeKind.ObjectNode, children)
             {
                 Expanded = true,
             };

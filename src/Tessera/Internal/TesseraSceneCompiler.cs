@@ -5,7 +5,6 @@ using Tessera.Core.Abstractions;
 using Tessera.Layout;
 using Tessera.Styles;
 using System.Collections.Concurrent;
-using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 
 namespace Tessera.Internal;
@@ -323,25 +322,23 @@ internal sealed class TesseraSceneCompiler : IScreenCompiler
             ?? throw new InvalidOperationException("Failed to build ListView<T> theme+override applier delegate."));
     }
 
-    [SuppressMessage("Sonar", "S3011", Justification = "The compiler intentionally resolves private generic factory helpers declared on the same type.")]
     private static MethodInfo ResolveListViewThemeDefaultsApplierFactoryMethodDefinition()
     {
         return typeof(TesseraSceneCompiler).GetMethod(
             nameof(CreateListViewThemeDefaultsApplierCore),
-            BindingFlags.NonPublic | BindingFlags.Static)
+            BindingFlags.Public | BindingFlags.Static)
             ?? throw new InvalidOperationException("Unable to resolve ListView<T> theme applier factory method.");
     }
 
-    [SuppressMessage("Sonar", "S3011", Justification = "The compiler intentionally resolves private generic factory helpers declared on the same type.")]
     private static MethodInfo ResolveListViewThemeDefaultsWithOverridesApplierFactoryMethodDefinition()
     {
         return typeof(TesseraSceneCompiler).GetMethod(
             nameof(CreateListViewThemeDefaultsWithOverridesApplierCore),
-            BindingFlags.NonPublic | BindingFlags.Static)
+            BindingFlags.Public | BindingFlags.Static)
             ?? throw new InvalidOperationException("Unable to resolve ListView<T> theme+override applier factory method.");
     }
 
-    private static Action<Control, TesseraTheme> CreateListViewThemeDefaultsApplierCore<TItem>()
+    public static Action<Control, TesseraTheme> CreateListViewThemeDefaultsApplierCore<TItem>()
     {
         return static (control, theme) =>
         {
@@ -352,7 +349,7 @@ internal sealed class TesseraSceneCompiler : IScreenCompiler
         };
     }
 
-    private static Action<Control, TesseraThemeOverrides, TesseraTheme, TesseraThemeVisualState> CreateListViewThemeDefaultsWithOverridesApplierCore<TItem>()
+    public static Action<Control, TesseraThemeOverrides, TesseraTheme, TesseraThemeVisualState> CreateListViewThemeDefaultsWithOverridesApplierCore<TItem>()
     {
         return static (control, overrides, theme, state) =>
         {
@@ -759,13 +756,10 @@ internal sealed class TesseraSceneCompiler : IScreenCompiler
                 interceptsPointer = isInteractiveVisible;
                 requestedFocus = isInteractiveVisible && control.IsFocused;
 
-                if (control.TryConsumeFocusRequest(out var explicitOrder))
+                if (isInteractiveVisible && control.TryConsumeFocusRequest(out var explicitOrder))
                 {
-                    if (isInteractiveVisible)
-                    {
-                        requestedFocus = true;
-                        requestOrder = explicitOrder;
-                    }
+                    requestedFocus = true;
+                    requestOrder = explicitOrder;
                 }
             }
             else
@@ -954,9 +948,12 @@ internal sealed class TesseraSceneCompiler : IScreenCompiler
                 return false;
             }
 
-            var startIndex = TryGetFocusedRegionIndex(out var focusedIndex)
-                ? focusedIndex
-                : step > 0 ? -1 : _regions.Count;
+            var hasFocusedRegion = TryGetFocusedRegionIndex(out var focusedIndex);
+            var startIndex = hasFocusedRegion ? focusedIndex : _regions.Count;
+            if (!hasFocusedRegion && step > 0)
+            {
+                startIndex = -1;
+            }
 
             var targetIndex = FindFocusableIndex(startIndex, step);
             return targetIndex >= 0 && ApplyFocus(_regions[targetIndex].Id, invokeFocus: true);

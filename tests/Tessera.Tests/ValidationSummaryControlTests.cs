@@ -200,8 +200,9 @@ public sealed class ValidationSummaryControlNUnitAdapter
     }
 
     [TestCaseSource(nameof(Cases))]
-    public Task Execute(TestCase testCase)
+    public async Task Execute(TestCase testCase)
     {
-        return testCase.Execute();
+        Assert.That(testCase, Is.Not.Null);
+        await testCase.Execute();
     }
 }

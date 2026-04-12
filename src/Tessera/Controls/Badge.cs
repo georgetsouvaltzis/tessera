@@ -1,4 +1,4 @@
-using Tessera.Components.Primitives;
+﻿using Tessera.Components.Primitives;
 using Tessera.Components.Styling;
 using Tessera.Controls.Internal;
 using Tessera.Layout;
@@ -11,50 +11,75 @@ namespace Tessera.Controls;
 /// </summary>
 public sealed class Badge : Control
 {
+    /// <summary>
+    /// Represents text.
+    /// </summary>
     public string Text
     {
         get;
         set => field = value ?? string.Empty;
     } = "Badge";
 
+    /// <summary>
+    /// Represents show brackets.
+    /// </summary>
     public bool ShowBrackets
     {
         get;
         set;
     } = true;
 
+    /// <summary>
+    /// Gets or sets the tone.
+    /// </summary>
     public BadgeTone Tone { get; set; }
 
+    /// <summary>
+    /// Represents text style.
+    /// </summary>
     public TesseraStyle TextStyle
     {
         get;
         set;
     } = TesseraStyle.Empty;
 
+    /// <summary>
+    /// Represents focused text style.
+    /// </summary>
     public TesseraStyle FocusedTextStyle
     {
         get;
         set;
     } = TesseraStyle.Empty;
 
+    /// <summary>
+    /// Represents success text style.
+    /// </summary>
     public TesseraStyle SuccessTextStyle
     {
         get;
         set;
     } = TesseraStyle.Empty;
 
+    /// <summary>
+    /// Represents warning text style.
+    /// </summary>
     public TesseraStyle WarningTextStyle
     {
         get;
         set;
     } = TesseraStyle.Empty;
 
+    /// <summary>
+    /// Represents error text style.
+    /// </summary>
     public TesseraStyle ErrorTextStyle
     {
         get;
         set;
     } = TesseraStyle.Empty;
 
+    /// <inheritdoc />
     public override void Render(Canvas canvas, Rect rect)
     {
         var clipped = Rect.Intersect(rect, canvas.Bounds);

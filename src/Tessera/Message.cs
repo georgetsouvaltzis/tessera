@@ -1,4 +1,4 @@
-
+﻿
 namespace Tessera;
 
 /// <summary>
@@ -144,33 +144,117 @@ public sealed record ExternalMessage(object Raw) : Message;
 /// </summary>
 public enum Key
 {
+    /// <summary>
+    /// The value could not be determined.
+    /// </summary>
     Unknown = 0,
+    /// <summary>
+    /// The character value.
+    /// </summary>
     Character,
+    /// <summary>
+    /// The enter value.
+    /// </summary>
     Enter,
+    /// <summary>
+    /// The tab value.
+    /// </summary>
     Tab,
+    /// <summary>
+    /// The escape value.
+    /// </summary>
     Escape,
+    /// <summary>
+    /// The backspace value.
+    /// </summary>
     Backspace,
+    /// <summary>
+    /// The up value.
+    /// </summary>
     Up,
+    /// <summary>
+    /// The down value.
+    /// </summary>
     Down,
+    /// <summary>
+    /// The left value.
+    /// </summary>
     Left,
+    /// <summary>
+    /// The right value.
+    /// </summary>
     Right,
+    /// <summary>
+    /// The home value.
+    /// </summary>
     Home,
+    /// <summary>
+    /// The end value.
+    /// </summary>
     End,
+    /// <summary>
+    /// The page up value.
+    /// </summary>
     PageUp,
+    /// <summary>
+    /// The page down value.
+    /// </summary>
     PageDown,
+    /// <summary>
+    /// The insert value.
+    /// </summary>
     Insert,
+    /// <summary>
+    /// The delete value.
+    /// </summary>
     Delete,
+    /// <summary>
+    /// The f 1 value.
+    /// </summary>
     F1,
+    /// <summary>
+    /// The f 2 value.
+    /// </summary>
     F2,
+    /// <summary>
+    /// The f 3 value.
+    /// </summary>
     F3,
+    /// <summary>
+    /// The f 4 value.
+    /// </summary>
     F4,
+    /// <summary>
+    /// The f 5 value.
+    /// </summary>
     F5,
+    /// <summary>
+    /// The f 6 value.
+    /// </summary>
     F6,
+    /// <summary>
+    /// The f 7 value.
+    /// </summary>
     F7,
+    /// <summary>
+    /// The f 8 value.
+    /// </summary>
     F8,
+    /// <summary>
+    /// The f 9 value.
+    /// </summary>
     F9,
+    /// <summary>
+    /// The f 10 value.
+    /// </summary>
     F10,
+    /// <summary>
+    /// The f 11 value.
+    /// </summary>
     F11,
+    /// <summary>
+    /// The f 12 value.
+    /// </summary>
     F12,
 }
 
@@ -180,10 +264,25 @@ public enum Key
 [Flags]
 public enum ModifierKeys
 {
+    /// <summary>
+    /// No value is selected.
+    /// </summary>
     None = 0,
+    /// <summary>
+    /// The shift value.
+    /// </summary>
     Shift = 1 << 0,
+    /// <summary>
+    /// The alt value.
+    /// </summary>
     Alt = 1 << 1,
+    /// <summary>
+    /// The ctrl value.
+    /// </summary>
     Ctrl = 1 << 2,
+    /// <summary>
+    /// The meta value.
+    /// </summary>
     Meta = 1 << 3,
 }
 
@@ -192,9 +291,21 @@ public enum ModifierKeys
 /// </summary>
 public enum PointerEventKind
 {
+    /// <summary>
+    /// The press value.
+    /// </summary>
     Press = 0,
+    /// <summary>
+    /// The release value.
+    /// </summary>
     Release = 1,
+    /// <summary>
+    /// The motion value.
+    /// </summary>
     Motion = 2,
+    /// <summary>
+    /// The wheel value.
+    /// </summary>
     Wheel = 3,
 }
 
@@ -203,30 +314,105 @@ public enum PointerEventKind
 /// </summary>
 public enum PointerButton
 {
+    /// <summary>
+    /// No value is selected.
+    /// </summary>
     None = 0,
+    /// <summary>
+    /// The left value.
+    /// </summary>
     Left = 1,
+    /// <summary>
+    /// The middle value.
+    /// </summary>
     Middle = 2,
+    /// <summary>
+    /// The right value.
+    /// </summary>
     Right = 3,
+    /// <summary>
+    /// The wheel up value.
+    /// </summary>
     WheelUp = 4,
+    /// <summary>
+    /// The wheel down value.
+    /// </summary>
     WheelDown = 5,
+    /// <summary>
+    /// The wheel left value.
+    /// </summary>
     WheelLeft = 6,
+    /// <summary>
+    /// The wheel right value.
+    /// </summary>
     WheelRight = 7,
+    /// <summary>
+    /// The backward value.
+    /// </summary>
     Backward = 8,
+    /// <summary>
+    /// The forward value.
+    /// </summary>
     Forward = 9,
+    /// <summary>
+    /// The button 10 value.
+    /// </summary>
     Button10 = 10,
+    /// <summary>
+    /// The button 11 value.
+    /// </summary>
     Button11 = 11,
+    /// <summary>
+    /// The button 12 value.
+    /// </summary>
     Button12 = 12,
+    /// <summary>
+    /// The button 13 value.
+    /// </summary>
     Button13 = 13,
+    /// <summary>
+    /// The button 14 value.
+    /// </summary>
     Button14 = 14,
+    /// <summary>
+    /// The button 15 value.
+    /// </summary>
     Button15 = 15,
+    /// <summary>
+    /// The button 16 value.
+    /// </summary>
     Button16 = 16,
+    /// <summary>
+    /// The button 17 value.
+    /// </summary>
     Button17 = 17,
+    /// <summary>
+    /// The button 18 value.
+    /// </summary>
     Button18 = 18,
+    /// <summary>
+    /// The button 19 value.
+    /// </summary>
     Button19 = 19,
+    /// <summary>
+    /// The button 20 value.
+    /// </summary>
     Button20 = 20,
+    /// <summary>
+    /// The button 21 value.
+    /// </summary>
     Button21 = 21,
+    /// <summary>
+    /// The button 22 value.
+    /// </summary>
     Button22 = 22,
+    /// <summary>
+    /// The button 23 value.
+    /// </summary>
     Button23 = 23,
+    /// <summary>
+    /// The button 24 value.
+    /// </summary>
     Button24 = 24,
 }
 
@@ -235,8 +421,17 @@ public enum PointerButton
 /// </summary>
 public enum MouseTrackingMode
 {
+    /// <summary>
+    /// No value is selected.
+    /// </summary>
     None = 0,
+    /// <summary>
+    /// The cell motion value.
+    /// </summary>
     CellMotion = 1,
+    /// <summary>
+    /// The all motion value.
+    /// </summary>
     AllMotion = 2,
 }
 

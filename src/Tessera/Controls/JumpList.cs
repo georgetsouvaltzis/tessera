@@ -164,12 +164,9 @@ public sealed partial class JumpList : Control
         var selectedId = previousItem?.Id;
 
         _items.Clear();
-        foreach (var item in items)
+        foreach (var item in items.Where(static item => item is not null))
         {
-            if (item is not null)
-            {
-                _items.Add(item with { });
-            }
+            _items.Add(item with { });
         }
 
         if (_items.Count == 0)

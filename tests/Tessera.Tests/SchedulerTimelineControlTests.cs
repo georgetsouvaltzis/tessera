@@ -81,7 +81,7 @@ public sealed class SchedulerTimelineControlTests
 
         Assert.That(handled, Is.True);
         Assert.That(control.SelectedIndex, Is.EqualTo(1));
-        Assert.That(output.Contains("!", StringComparison.Ordinal), Is.True);
+        Assert.That(output.Contains('!'), Is.True);
     }
 
     [Test]

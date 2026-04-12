@@ -4,19 +4,41 @@ using Tessera.Core.Messages;
 
 namespace Tessera.Core.Commands;
 
+/// <summary>
+/// Creates common runtime effects for quitting, scheduling, terminal queries, and raw output.
+/// </summary>
 public static class Effects
 {
+    /// <summary>
+    /// Represents the absence of a scheduled effect.
+    /// </summary>
     public static Effect? None => null;
 
+    /// <summary>
+    /// Produces an effect that requests runtime shutdown.
+    /// </summary>
     public static Effect Quit =>
         _ => ValueTask.FromResult<IMessage?>(new QuitMsg());
 
+    /// <summary>
+    /// Produces an effect that interrupts the runtime loop.
+    /// </summary>
     public static Effect Interrupt =>
         _ => ValueTask.FromResult<IMessage?>(new InterruptMsg());
 
+    /// <summary>
+    /// Wraps a message as an effect.
+    /// </summary>
+    /// <param name="message">The message to emit.</param>
+    /// <returns>An effect that returns the supplied message.</returns>
     public static Effect FromMessage(IMessage message) =>
         _ => ValueTask.FromResult<IMessage?>(message);
 
+    /// <summary>
+    /// Removes null effects and collapses the result to the smallest useful form.
+    /// </summary>
+    /// <param name="effects">The effect set to compact.</param>
+    /// <returns><see langword="null" />, a single effect, or a batched effect.</returns>
     public static Effect? Compact(params Effect?[] effects)
     {
         var valid = effects.OfType<Effect>().ToList();
@@ -29,6 +51,11 @@ public static class Effects
         };
     }
 
+    /// <summary>
+    /// Produces a batch effect that emits all valid child effects together.
+    /// </summary>
+    /// <param name="effects">The effects to batch.</param>
+    /// <returns>A batch effect, a single effect, or <see langword="null" />.</returns>
     public static Effect? Batch(params Effect?[] effects)
     {
         var compact = Compact(effects);
@@ -40,6 +67,11 @@ public static class Effects
         return _ => ValueTask.FromResult<IMessage?>(new BatchMsg(GetValid(effects)));
     }
 
+    /// <summary>
+    /// Produces an effect sequence that preserves the order of valid child effects.
+    /// </summary>
+    /// <param name="effects">The effects to sequence.</param>
+    /// <returns>A sequence effect, a single effect, or <see langword="null" />.</returns>
     public static Effect? Sequence(params Effect?[] effects)
     {
         var valid = GetValid(effects);
@@ -51,6 +83,12 @@ public static class Effects
         };
     }
 
+    /// <summary>
+    /// Schedules a one-shot effect that fires after the specified delay.
+    /// </summary>
+    /// <param name="delay">The delay before the message is created.</param>
+    /// <param name="factory">Creates the message to emit when the delay elapses.</param>
+    /// <returns>An asynchronous delayed effect.</returns>
     public static Effect Tick(TimeSpan delay, Func<DateTimeOffset, IMessage> factory)
     {
         return async cancellationToken =>
@@ -60,6 +98,12 @@ public static class Effects
         };
     }
 
+    /// <summary>
+    /// Schedules an effect aligned to the next cadence boundary.
+    /// </summary>
+    /// <param name="cadence">The recurring cadence to align against.</param>
+    /// <param name="factory">Creates the message to emit on the next cadence tick.</param>
+    /// <returns>An asynchronous cadence-aligned effect.</returns>
     public static Effect Every(TimeSpan cadence, Func<DateTimeOffset, IMessage> factory)
     {
         return async cancellationToken =>
@@ -76,9 +120,19 @@ public static class Effects
         };
     }
 
+    /// <summary>
+    /// Emits a raw terminal escape sequence.
+    /// </summary>
+    /// <param name="content">The raw content to write to the terminal.</param>
+    /// <returns>An effect that emits the raw content.</returns>
     public static Effect Raw(string content) =>
         _ => ValueTask.FromResult<IMessage?>(new RawOutputMsg(content));
 
+    /// <summary>
+    /// Requests a terminal capability report using the XTGETTCAP protocol.
+    /// </summary>
+    /// <param name="capabilityName">The capability name to request.</param>
+    /// <returns>An effect that emits the capability query.</returns>
     public static Effect RequestCapability(string capabilityName)
     {
         var name = capabilityName?.Trim() ?? string.Empty;
@@ -86,24 +140,54 @@ public static class Effects
         return Raw($"\u001bP+q{payload}\u001b\\");
     }
 
+    /// <summary>
+    /// Writes text to the standard clipboard selection.
+    /// </summary>
+    /// <param name="content">The clipboard text to publish.</param>
+    /// <returns>An effect that emits the clipboard write sequence.</returns>
     public static Effect SetClipboard(string content) =>
         Raw(BuildClipboardWriteSequence(content, selection: 'c'));
 
+    /// <summary>
+    /// Requests the current standard clipboard contents.
+    /// </summary>
+    /// <returns>An effect that emits the clipboard read sequence.</returns>
     public static Effect ReadClipboard() =>
         Raw(BuildClipboardReadSequence(selection: 'c'));
 
+    /// <summary>
+    /// Writes text to the primary selection.
+    /// </summary>
+    /// <param name="content">The primary-selection text to publish.</param>
+    /// <returns>An effect that emits the primary-selection write sequence.</returns>
     public static Effect SetPrimaryClipboard(string content) =>
         Raw(BuildClipboardWriteSequence(content, selection: 'p'));
 
+    /// <summary>
+    /// Requests the current primary selection contents.
+    /// </summary>
+    /// <returns>An effect that emits the primary-selection read sequence.</returns>
     public static Effect ReadPrimaryClipboard() =>
         Raw(BuildClipboardReadSequence(selection: 'p'));
 
+    /// <summary>
+    /// Requests the terminal foreground color.
+    /// </summary>
+    /// <returns>An effect that emits the foreground-color query.</returns>
     public static Effect RequestForegroundColor() =>
         Raw("\u001b]10;?\u001b\\");
 
+    /// <summary>
+    /// Requests the terminal background color.
+    /// </summary>
+    /// <returns>An effect that emits the background-color query.</returns>
     public static Effect RequestBackgroundColor() =>
         Raw("\u001b]11;?\u001b\\");
 
+    /// <summary>
+    /// Requests the terminal cursor color.
+    /// </summary>
+    /// <returns>An effect that emits the cursor-color query.</returns>
     public static Effect RequestCursorColor() =>
         Raw("\u001b]12;?\u001b\\");
 

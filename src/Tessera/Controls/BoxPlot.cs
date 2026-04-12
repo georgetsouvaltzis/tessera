@@ -209,12 +209,9 @@ public sealed class BoxPlot : Control
         var previousSeries = SelectedSeries;
 
         _series.Clear();
-        foreach (var entry in series)
+        foreach (var entry in series.Where(static entry => entry is not null))
         {
-            if (entry is not null)
-            {
-                _series.Add(Clone(entry));
-            }
+            _series.Add(Clone(entry));
         }
 
         NormalizeSelectionState();

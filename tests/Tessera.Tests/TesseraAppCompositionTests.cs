@@ -516,7 +516,7 @@ internal static class TesseraAppCompositionTests
         public global::Tessera.Core.Abstractions.Effect? Update(global::Tessera.Core.Abstractions.IMessage message) =>
             TesseraEffectAdapter.ToCore(_app.UpdateRuntime(TesseraMessageAdapter.ToPublic(message)));
 
-        public global::Tessera.Core.Abstractions.ScreenOutput Render() => _app.RenderRuntime().Output;
+        public void Render() => _ = _app.RenderRuntime().Output;
     }
 
     private sealed class ButtonApp : TesseraApp

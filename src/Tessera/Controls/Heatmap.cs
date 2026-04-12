@@ -107,21 +107,26 @@ public sealed class Heatmap : Control
     /// <inheritdoc />
     public override bool IsReadOnly { get; set; }
 
-    /// <summary>Replaces matrix values from a 2D array.</summary>
-    /// <param name="values">Matrix values indexed by <c>[row, column]</c>.</param>
-    public void SetMatrix(double[,] values)
+    /// <summary>Replaces matrix values from row-major data.</summary>
+    /// <param name="values">Matrix values indexed by row, then column.</param>
+    public void SetMatrix(IReadOnlyList<IReadOnlyList<double>> values)
     {
         ArgumentNullException.ThrowIfNull(values);
         var previousIndex = ToLinear(_selectedRow, _selectedColumn);
         var previousCell = SelectedCell;
-        _rows = values.GetLength(0);
-        _columns = values.GetLength(1);
+        _rows = values.Count;
+        _columns = _rows == 0 ? 0 : values[0].Count;
         _cells.Clear();
         for (var row = 0; row < _rows; row++)
         {
+            if (values[row].Count != _columns)
+            {
+                throw new ArgumentException("All heatmap rows must have the same column count.", nameof(values));
+            }
+
             for (var column = 0; column < _columns; column++)
             {
-                _cells.Add(new HeatmapCell(row, column, values[row, column]));
+                _cells.Add(new HeatmapCell(row, column, values[row][column]));
             }
         }
 
@@ -489,11 +494,56 @@ public sealed class Heatmap : Control
     }
 
     private int ToLinear(int row, int column) => TryIndex(row, column, out var i) ? i : -1;
-    private static void ReplaceLabels(IEnumerable<string> labels, List<string> target) { ArgumentNullException.ThrowIfNull(labels); target.Clear(); foreach (var l in labels) target.Add(l ?? string.Empty); }
-    private static int MaxLabelWidth(List<string> labels) { var max = 0; for (var i = 0; i < labels.Count; i++) max = Math.Max(max, ControlTextLayout.MeasureDisplayWidth(labels[i])); return max; }
-    private static char HeaderGlyph(string label, int fallback) { for (var i = 0; i < label.Length; i++) if (!char.IsWhiteSpace(label[i])) return label[i]; return (char)('0' + ((fallback + 1) % 10)); }
-    private static string Glyph(char glyph) => glyph switch { '░' => "░", '▒' => "▒", '▓' => "▓", '█' => "█", _ => glyph.ToString() };
-    private static string StyleText(string text, TesseraStyle style) => style.IsEmpty ? text : style.Render(text);
-    private static void Write(Canvas canvas, int x, int y, string text, TesseraStyle style, int width) => canvas.WriteText(x, y, StyleText(text, style), width);
+
+    private static void ReplaceLabels(IEnumerable<string> labels, List<string> target)
+    {
+        ArgumentNullException.ThrowIfNull(labels);
+        target.Clear();
+        foreach (var label in labels)
+        {
+            target.Add(label ?? string.Empty);
+        }
+    }
+
+    private static int MaxLabelWidth(List<string> labels)
+    {
+        var max = 0;
+        for (var index = 0; index < labels.Count; index++)
+        {
+            max = Math.Max(max, ControlTextLayout.MeasureDisplayWidth(labels[index]));
+        }
+
+        return max;
+    }
+
+    private static char HeaderGlyph(string label, int fallback)
+    {
+        for (var index = 0; index < label.Length; index++)
+        {
+            if (!char.IsWhiteSpace(label[index]))
+            {
+                return label[index];
+            }
+        }
+
+        return (char)('0' + ((fallback + 1) % 10));
+    }
+
+    private static string Glyph(char glyph) =>
+        glyph switch
+        {
+            '░' => "░",
+            '▒' => "▒",
+            '▓' => "▓",
+            '█' => "█",
+            _ => glyph.ToString(),
+        };
+
+    private static string StyleText(string text, TesseraStyle style) =>
+        style.IsEmpty ? text : style.Render(text);
+
+    private static void Write(Canvas canvas, int x, int y, string text, TesseraStyle style, int width) =>
+        canvas.WriteText(x, y, StyleText(text, style), width);
+
     private readonly record struct PlotLayout(Rect Plot, int VisibleRows, int VisibleColumns, int RowLabelX, int RowLabelWidth, int ColumnY, int LegendY);
 }
