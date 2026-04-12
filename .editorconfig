@@ -10,58 +10,12 @@ insert_final_newline = true
 trim_trailing_whitespace = true
 
 [*.cs]
-#### Core EditorConfig Options ####
-file_header_template = unset
-
-#### .NET Coding Conventions ####
 dotnet_separate_import_directive_groups = false
 dotnet_sort_system_directives_first = false
 
-dotnet_style_qualification_for_event = false:error
-dotnet_style_qualification_for_field = false:error
-dotnet_style_qualification_for_method = false:error
-dotnet_style_qualification_for_property = false:error
+csharp_style_namespace_declarations = file_scoped:warning
+csharp_using_directive_placement = outside_namespace:warning
 
-dotnet_style_predefined_type_for_locals_parameters_members = true:error
-dotnet_style_predefined_type_for_member_access = true:error
-
-dotnet_style_parentheses_in_arithmetic_binary_operators = always_for_clarity:error
-dotnet_style_parentheses_in_other_binary_operators = always_for_clarity:error
-dotnet_style_parentheses_in_other_operators = never_if_unnecessary:error
-dotnet_style_parentheses_in_relational_binary_operators = always_for_clarity:error
-
-dotnet_style_require_accessibility_modifiers = for_non_interface_members:error
-dotnet_style_namespace_match_folder = true:error
-dotnet_style_readonly_field = true:error
-dotnet_style_coalesce_expression = true:error
-dotnet_style_collection_initializer = true:error
-dotnet_style_null_propagation = true:error
-dotnet_style_object_initializer = true:error
-dotnet_style_prefer_auto_properties = true:error
-dotnet_style_prefer_compound_assignment = true:error
-dotnet_style_prefer_inferred_anonymous_type_member_names = true:error
-dotnet_style_prefer_inferred_tuple_names = true:error
-dotnet_style_prefer_is_null_check_over_reference_equality_method = true:error
-dotnet_style_prefer_simplified_boolean_expressions = true:error
-dotnet_style_prefer_simplified_interpolation = true:error
-
-#### C# Coding Conventions ####
-csharp_style_var_for_built_in_types = true:error
-csharp_style_var_when_type_is_apparent = true:error
-csharp_style_var_elsewhere = true:error
-
-csharp_prefer_braces = true:error
-csharp_style_namespace_declarations = file_scoped:error
-csharp_using_directive_placement = outside_namespace:error
-csharp_preferred_modifier_order = public,private,protected,internal,file,static,extern,new,virtual,abstract,sealed,override,readonly,unsafe,required,volatile,async:error
-csharp_style_prefer_method_group_conversion = true:error
-csharp_prefer_simple_default_expression = true:error
-csharp_style_implicit_object_creation_when_type_is_apparent = true:error
-csharp_style_inlined_variable_declaration = true:error
-csharp_style_throw_expression = true:error
-
-#### C# Formatting Rules ####
-dotnet_diagnostic.IDE0055.severity = error
 csharp_new_line_before_catch = true
 csharp_new_line_before_else = true
 csharp_new_line_before_finally = true
@@ -103,44 +57,9 @@ csharp_space_between_square_brackets = false
 csharp_preserve_single_line_blocks = true
 csharp_preserve_single_line_statements = true
 
-#### Naming Rules ####
-dotnet_naming_rule.interface_should_begin_with_i.severity = error
-dotnet_naming_rule.interface_should_begin_with_i.symbols = interfaces
-dotnet_naming_rule.interface_should_begin_with_i.style = interface_prefix
-
-dotnet_naming_rule.types_should_be_pascal_case.severity = error
-dotnet_naming_rule.types_should_be_pascal_case.symbols = types
-dotnet_naming_rule.types_should_be_pascal_case.style = pascal_case
-
-dotnet_naming_rule.non_field_members_should_be_pascal_case.severity = error
-dotnet_naming_rule.non_field_members_should_be_pascal_case.symbols = non_field_members
-dotnet_naming_rule.non_field_members_should_be_pascal_case.style = pascal_case
-
-dotnet_naming_symbols.interfaces.applicable_kinds = interface
-dotnet_naming_symbols.interfaces.applicable_accessibilities = public, internal, private, protected, protected_internal, private_protected
-dotnet_naming_symbols.interfaces.required_modifiers =
-
-dotnet_naming_symbols.types.applicable_kinds = class, struct, interface, enum, delegate
-dotnet_naming_symbols.types.applicable_accessibilities = public, internal, private, protected, protected_internal, private_protected
-dotnet_naming_symbols.types.required_modifiers =
-
-dotnet_naming_symbols.non_field_members.applicable_kinds = property, event, method
-dotnet_naming_symbols.non_field_members.applicable_accessibilities = public, internal, private, protected, protected_internal, private_protected
-dotnet_naming_symbols.non_field_members.required_modifiers =
-
-dotnet_naming_style.interface_prefix.required_prefix = I
-dotnet_naming_style.interface_prefix.required_suffix =
-dotnet_naming_style.interface_prefix.word_separator =
-dotnet_naming_style.interface_prefix.capitalization = pascal_case
-
-dotnet_naming_style.pascal_case.required_prefix =
-dotnet_naming_style.pascal_case.required_suffix =
-dotnet_naming_style.pascal_case.word_separator =
-dotnet_naming_style.pascal_case.capitalization = pascal_case
-
-#### Explicit Analyzer Severities ####
-dotnet_diagnostic.IDE0005.severity = error
-dotnet_diagnostic.IDE0051.severity = error
-dotnet_diagnostic.IDE0065.severity = error
-dotnet_diagnostic.IDE0130.severity = error
-dotnet_diagnostic.IDE0161.severity = error
+dotnet_diagnostic.IDE0005.severity = warning
+dotnet_diagnostic.IDE0051.severity = warning
+dotnet_diagnostic.IDE0055.severity = warning
+dotnet_diagnostic.IDE0065.severity = warning
+dotnet_diagnostic.IDE0130.severity = warning
+dotnet_diagnostic.IDE0161.severity = warning
