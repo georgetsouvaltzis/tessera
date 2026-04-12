@@ -419,27 +419,27 @@ internal sealed partial class GitConsoleApp : TesseraApp
                 RefreshControls();
                 break;
             case GitConsoleAction.CommitStaged:
-            {
-                var stagedBeforeCommit = _state.GetMetrics().Staged;
-                var subjectWasBlank = string.IsNullOrWhiteSpace(_subjectInput.Value);
-                result = _state.CommitStaged(_subjectInput.Value, _notesInput.Value);
-                if (result.Success)
                 {
-                    _subjectInput.Clear();
-                    _notesInput.SetValue("- tag follow-up reviewer\n");
-                    _history.RequestFocus();
+                    var stagedBeforeCommit = _state.GetMetrics().Staged;
+                    var subjectWasBlank = string.IsNullOrWhiteSpace(_subjectInput.Value);
+                    result = _state.CommitStaged(_subjectInput.Value, _notesInput.Value);
+                    if (result.Success)
+                    {
+                        _subjectInput.Clear();
+                        _notesInput.SetValue("- tag follow-up reviewer\n");
+                        _history.RequestFocus();
+                    }
+                    else if (stagedBeforeCommit == 0)
+                    {
+                        _worktree.RequestFocus();
+                    }
+                    else if (subjectWasBlank)
+                    {
+                        _subjectInput.RequestFocus();
+                    }
+                    RefreshControls();
+                    break;
                 }
-                else if (stagedBeforeCommit == 0)
-                {
-                    _worktree.RequestFocus();
-                }
-                else if (subjectWasBlank)
-                {
-                    _subjectInput.RequestFocus();
-                }
-                RefreshControls();
-                break;
-            }
             case GitConsoleAction.Sync:
                 result = _state.Sync();
                 RefreshChrome();

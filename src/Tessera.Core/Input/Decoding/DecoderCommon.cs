@@ -26,11 +26,11 @@ internal static class DecoderCommon
             case 0x0B:
             case 0x0C:
             case >= 0x0E and <= 0x1A:
-            {
-                var text = ((char)('a' + value - 1)).ToString();
-                message = new KeyPressMsg(KeyCode.Character, text, KeyModifiers.Ctrl);
-                return true;
-            }
+                {
+                    var text = ((char)('a' + value - 1)).ToString();
+                    message = new KeyPressMsg(KeyCode.Character, text, KeyModifiers.Ctrl);
+                    return true;
+                }
             case 0x1C:
                 message = new KeyPressMsg(KeyCode.Character, "\\", KeyModifiers.Ctrl);
                 return true;
