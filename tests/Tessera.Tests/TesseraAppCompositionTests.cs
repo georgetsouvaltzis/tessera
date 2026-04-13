@@ -580,7 +580,7 @@ internal static class TesseraAppCompositionTests
             Button.Activated += (_, _) => ActivationCount++;
         }
 
-        public Button Button { get; } = new() { Text = "Run" };
+        private Button Button { get; } = new() { Text = "Run" };
 
         public int ActivationCount { get; private set; }
 
@@ -602,7 +602,7 @@ internal static class TesseraAppCompositionTests
             Input.Submitted += (_, args) => LastSubmittedValue = args.Value;
         }
 
-        public Button Button { get; } = new() { Text = "Send" };
+        private Button Button { get; } = new() { Text = "Send" };
 
         public TextInput Input { get; } = new() { Title = "Command" };
 
@@ -692,7 +692,7 @@ internal static class TesseraAppCompositionTests
             Menu.ItemActivated += (_, args) => LastActivatedItemId = args.ItemId;
         }
 
-        public MenuBar Menu { get; } = new();
+        private MenuBar Menu { get; } = new();
 
         public string LastActivatedItemId { get; private set; } = string.Empty;
 
@@ -714,7 +714,7 @@ internal static class TesseraAppCompositionTests
             Button.Activated += (_, _) => ActivationCount++;
         }
 
-        public Button Button { get; } = new() { Text = "Run" };
+        private Button Button { get; } = new() { Text = "Run" };
 
         public int ActivationCount { get; private set; }
 
@@ -743,7 +743,7 @@ internal static class TesseraAppCompositionTests
             Button.Activated += (_, _) => RequestEffect(TesseraEffects.Quit);
         }
 
-        public Button Button { get; } = new() { Text = "Quit" };
+        private Button Button { get; } = new() { Text = "Quit" };
 
         public int KeyUpdateCount { get; private set; }
 
@@ -765,7 +765,7 @@ internal static class TesseraAppCompositionTests
 
     private sealed class GlobalHotkeyApp : TesseraApp
     {
-        public ConsumingKeyControl Control { get; } = new();
+        private ConsumingKeyControl Control { get; } = new();
 
         public bool QuitRequested { get; private set; }
 
@@ -829,7 +829,7 @@ internal static class TesseraAppCompositionTests
             Palette.QueryText = "roll";
         }
 
-        public Button Button { get; } = new() { Text = "Base" };
+        private Button Button { get; } = new() { Text = "Base" };
 
         public CommandPalette Palette { get; } = new() { Title = "Actions" };
 
@@ -863,9 +863,9 @@ internal static class TesseraAppCompositionTests
             LeftButton.RequestFocus();
         }
 
-        public Button LeftButton { get; } = new() { Text = "Left" };
+        private Button LeftButton { get; } = new() { Text = "Left" };
 
-        public Button RightButton { get; } = new() { Text = "Right" };
+        private Button RightButton { get; } = new() { Text = "Right" };
 
         public int LeftActivationCount { get; private set; }
 
@@ -894,7 +894,7 @@ internal static class TesseraAppCompositionTests
             Dialog.Show("Confirm", "Apply changes?");
         }
 
-        public Button Button { get; } = new() { Text = "Primary" };
+        private Button Button { get; } = new() { Text = "Primary" };
 
         public Dialog Dialog { get; } = new() { Padding = Thickness.All(1) };
 
@@ -924,9 +924,9 @@ internal static class TesseraAppCompositionTests
             LeftButton.RequestFocus();
         }
 
-        public Button LeftButton { get; } = new() { Text = "Left" };
+        private Button LeftButton { get; } = new() { Text = "Left" };
 
-        public Button RightButton { get; } = new() { Text = "Right" };
+        private Button RightButton { get; } = new() { Text = "Right" };
 
         public int LeftActivationCount { get; private set; }
 

@@ -155,7 +155,7 @@ internal static class TesseraAppFoundationTests
     {
         private bool _booted;
 
-        public override TesseraEffect? Initialize()
+        public override TesseraEffect Initialize()
         {
             return TesseraEffects.Emit(new Booted());
         }

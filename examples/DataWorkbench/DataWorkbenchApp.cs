@@ -188,7 +188,7 @@ internal sealed partial class DataWorkbenchApp : TesseraApp
         _results.RequestFocus();
     }
 
-    public override TesseraEffect? Initialize()
+    public override TesseraEffect Initialize()
     {
         return TesseraEffects.Periodic(TimeSpan.FromMilliseconds(1400), _ => new DataWorkbenchTickMessage());
     }

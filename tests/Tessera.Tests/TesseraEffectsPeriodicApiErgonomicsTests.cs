@@ -92,7 +92,7 @@ public sealed class TesseraEffectsPeriodicApiErgonomicsTests
     {
         public int PeriodicUpdateCount { get; private set; }
 
-        public override TesseraEffect? Initialize()
+        public override TesseraEffect Initialize()
         {
             return TesseraEffects.Periodic(TimeSpan.FromMilliseconds(1), _ => new PeriodicPayloadMessage());
         }
@@ -141,7 +141,7 @@ public sealed class TesseraEffectsPeriodicApiErgonomicsTests
 
     private sealed class PeriodicWithAppEffectApp : TesseraApp
     {
-        public override TesseraEffect? Initialize()
+        public override TesseraEffect Initialize()
         {
             return TesseraEffects.Periodic(TimeSpan.FromMilliseconds(1), _ => new PeriodicPayloadMessage());
         }
