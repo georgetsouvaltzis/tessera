@@ -39,6 +39,7 @@ dotnet build Tessera.slnx
 dotnet test Tessera.slnx
 dotnet build examples/Tessera.Examples.slnx
 dotnet jb inspectcode Tessera.slnx -e=HINT --build
+dotnet build Tessera.slnx -p:TesseraInspectCodeEnabled=true
 dotnet run --project examples/DataWorkbench/DataWorkbench.csproj --no-build
 dotnet run --project examples/OpsWatch/OpsWatch.csproj --no-build
 dotnet run --project examples/GitConsole/GitConsole.csproj --no-build

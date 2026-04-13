@@ -1,0 +1,24 @@
+<Project>
+  <PropertyGroup>
+    <TesseraInspectCodeEnabled Condition="'$(TesseraInspectCodeEnabled)' == ''">false</TesseraInspectCodeEnabled>
+    <TesseraInspectCodeSeverity Condition="'$(TesseraInspectCodeSeverity)' == ''">INFO</TesseraInspectCodeSeverity>
+    <TesseraInspectCodeReportFile Condition="'$(TesseraInspectCodeReportFile)' == ''">$(SolutionDir)obj\inspectcode.xml</TesseraInspectCodeReportFile>
+  </PropertyGroup>
+
+  <Target Name="TesseraInspectCode"
+          AfterTargets="Build"
+          Condition="'$(TesseraInspectCodeEnabled)' == 'true' and '$(DesignTimeBuild)' != 'true' and '$(TesseraSkipInspectCode)' != 'true'">
+    <Message Importance="High" Text="Running ReSharper InspectCode for $(SolutionFileName). Report: $(TesseraInspectCodeReportFile)" />
+    <MakeDir Directories="$([System.IO.Path]::GetDirectoryName('$(TesseraInspectCodeReportFile)'))" />
+    <Exec Command="dotnet jb inspectcode &quot;$(SolutionPath)&quot; --no-build -e=$(TesseraInspectCodeSeverity) -f=xml -o=&quot;$(TesseraInspectCodeReportFile)&quot;" />
+    <XmlPeek XmlInputPath="$(TesseraInspectCodeReportFile)" Query="/Report/Issues/Project/Issue">
+      <Output TaskParameter="Result" ItemName="TesseraInspectCodeIssue" />
+    </XmlPeek>
+    <PropertyGroup>
+      <TesseraInspectCodeIssueCount>@(TesseraInspectCodeIssue->Count())</TesseraInspectCodeIssueCount>
+    </PropertyGroup>
+    <Error Condition="'$(TesseraInspectCodeIssueCount)' != '' and '$(TesseraInspectCodeIssueCount)' != '0'"
+           Text="ReSharper InspectCode reported $(TesseraInspectCodeIssueCount) issues for $(SolutionFileName). See $(TesseraInspectCodeReportFile)." />
+    <Delete Files="$(TesseraInspectCodeReportFile)" Condition="'$(TesseraInspectCodeIssueCount)' == '0'" />
+  </Target>
+</Project>
