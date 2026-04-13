@@ -7,20 +7,16 @@ namespace Tessera.Benchmarks;
 [MemoryDiagnoser]
 public class LargeTableBenchmarks
 {
-    private readonly DataGrid _grid = new()
-    {
-        Border = BorderStyle.SingleLine,
-        ShowHeader = true,
-    };
-
     private readonly Rect _bounds = new(0, 0, 180, 44);
+
+    private readonly DataGrid _grid = new() { Border = BorderStyle.SingleLine, ShowHeader = true };
 
     [GlobalSetup]
     public void Setup()
     {
-        _grid.SetColumns(BenchmarkDataFactory.CreateColumns(count: 16, width: 10));
-        _grid.SetRows(BenchmarkDataFactory.CreateRows(rowCount: 2_000, columnCount: 16, seed: 4242));
-        _grid.SelectCell(rowIndex: 500, columnIndex: 8);
+        _grid.SetColumns(BenchmarkDataFactory.CreateColumns(16, 10));
+        _grid.SetRows(BenchmarkDataFactory.CreateRows(2_000, 16, 4242));
+        _grid.SelectCell(500, 8);
     }
 
     [Benchmark(Description = "large-table render (2k x 16)")]

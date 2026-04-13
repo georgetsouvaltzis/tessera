@@ -3,159 +3,141 @@ using Tessera.Styles;
 namespace Tessera.Controls;
 
 /// <summary>
-/// Represents a selectable service health board for operational dashboards.
+///     Represents a selectable service health board for operational dashboards.
 /// </summary>
 public sealed partial class HealthBoard : Control
 {
     private readonly List<HealthService> _services = [];
-    private int _selectedIndex = -1;
     private int _hoveredIndex = -1;
-    private int _scrollOffset;
     private int _lastViewportRows = 8;
+    private int _scrollOffset;
 
     /// <summary>
-    /// Occurs when selected service changes.
+    ///     Gets or sets control title text.
     /// </summary>
-    public event EventHandler<ListSelectionChangedEventArgs<HealthService>>? SelectionChanged;
+    public string Title { get; set; } = "Health";
 
     /// <summary>
-    /// Gets or sets control title text.
+    ///     Gets or sets marker appended to title while focused and <see cref="ShowFocusMarker" /> is enabled.
     /// </summary>
-    public string Title
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = "Health";
+    public string FocusMarker { get; set; } = "*";
 
     /// <summary>
-    /// Gets or sets marker appended to title while focused and <see cref="ShowFocusMarker" /> is enabled.
-    /// </summary>
-    public string FocusMarker
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = "*";
-
-    /// <summary>
-    /// Gets or sets a value indicating whether <see cref="FocusMarker" /> is rendered while focused.
+    ///     Gets or sets a value indicating whether <see cref="FocusMarker" /> is rendered while focused.
     /// </summary>
     public bool ShowFocusMarker { get; set; } = true;
 
     /// <summary>
-    /// Gets or sets text rendered when no services are configured.
+    ///     Gets or sets text rendered when no services are configured.
     /// </summary>
-    public string EmptyText
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = "(no services)";
+    public string EmptyText { get; set; } = "(no services)";
 
     /// <summary>
-    /// Gets or sets title style while not focused.
+    ///     Gets or sets title style while not focused.
     /// </summary>
     public TesseraStyle TitleStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets title style while focused.
+    ///     Gets or sets title style while focused.
     /// </summary>
     public TesseraStyle FocusedTitleStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets border glyph style while not focused.
+    ///     Gets or sets border glyph style while not focused.
     /// </summary>
     public TesseraStyle BorderStyleText { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets border glyph style while focused.
+    ///     Gets or sets border glyph style while focused.
     /// </summary>
     public TesseraStyle FocusedBorderStyleText { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets base row style.
+    ///     Gets or sets base row style.
     /// </summary>
     public TesseraStyle ServiceStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets style merged for healthy rows.
+    ///     Gets or sets style merged for healthy rows.
     /// </summary>
     public TesseraStyle HealthyServiceStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets style merged for degraded rows.
+    ///     Gets or sets style merged for degraded rows.
     /// </summary>
     public TesseraStyle DegradedServiceStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets style merged for outage rows.
+    ///     Gets or sets style merged for outage rows.
     /// </summary>
     public TesseraStyle OutageServiceStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets style merged for hovered rows.
+    ///     Gets or sets style merged for hovered rows.
     /// </summary>
     public TesseraStyle HoveredServiceStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets style merged for selected rows.
+    ///     Gets or sets style merged for selected rows.
     /// </summary>
     public TesseraStyle SelectedServiceStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets style merged for selected rows while focused.
+    ///     Gets or sets style merged for selected rows while focused.
     /// </summary>
     public TesseraStyle FocusedSelectedServiceStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets style merged for acknowledged rows.
+    ///     Gets or sets style merged for acknowledged rows.
     /// </summary>
     public TesseraStyle AcknowledgedServiceStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets style merged for muted rows.
+    ///     Gets or sets style merged for muted rows.
     /// </summary>
     public TesseraStyle MutedServiceStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets style merged while disabled.
+    ///     Gets or sets style merged while disabled.
     /// </summary>
     public TesseraStyle DisabledServiceStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets style for empty-state text.
+    ///     Gets or sets style for empty-state text.
     /// </summary>
     public TesseraStyle EmptyStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets frame border style.
+    ///     Gets or sets frame border style.
     /// </summary>
     public BorderStyle Border { get; set; } = BorderStyle.SingleLine;
 
     /// <summary>
-    /// Gets or sets inner frame padding.
+    ///     Gets or sets inner frame padding.
     /// </summary>
     public Thickness Padding { get; set; }
 
     /// <summary>
-    /// Gets or sets glyphs used for row markers and severity symbols.
+    ///     Gets or sets glyphs used for row markers and severity symbols.
     /// </summary>
     public HealthBoardGlyphSet Glyphs { get; set; } = HealthBoardGlyphSet.Default;
 
     /// <summary>
-    /// Gets configured service rows.
+    ///     Gets configured service rows.
     /// </summary>
     public IReadOnlyList<HealthService> Services => _services;
 
     /// <summary>
-    /// Gets selected row index, or <c>-1</c> when empty.
+    ///     Gets selected row index, or <c>-1</c> when empty.
     /// </summary>
-    public int SelectedIndex => _selectedIndex;
+    public int SelectedIndex { get; private set; } = -1;
 
     /// <summary>
-    /// Gets selected service row, if any.
+    ///     Gets selected service row, if any.
     /// </summary>
     public HealthService? SelectedItem =>
-        _selectedIndex >= 0 && _selectedIndex < _services.Count
-            ? _services[_selectedIndex]
+        SelectedIndex >= 0 && SelectedIndex < _services.Count
+            ? _services[SelectedIndex]
             : null;
 
     /// <inheritdoc />
@@ -168,13 +150,18 @@ public sealed partial class HealthBoard : Control
     public override bool IsReadOnly { get; set; }
 
     /// <summary>
-    /// Replaces all services shown by the control.
+    ///     Occurs when selected service changes.
+    /// </summary>
+    public event EventHandler<ListSelectionChangedEventArgs<HealthService>>? SelectionChanged;
+
+    /// <summary>
+    ///     Replaces all services shown by the control.
     /// </summary>
     /// <param name="services">Service rows to render.</param>
     public void SetServices(IEnumerable<HealthService> services)
     {
         ArgumentNullException.ThrowIfNull(services);
-        var previousIndex = _selectedIndex;
+        var previousIndex = SelectedIndex;
         var previousItem = SelectedItem;
 
         _services.Clear();
@@ -185,13 +172,13 @@ public sealed partial class HealthBoard : Control
 
         if (_services.Count == 0)
         {
-            _selectedIndex = -1;
+            SelectedIndex = -1;
             _hoveredIndex = -1;
             _scrollOffset = 0;
         }
         else
         {
-            _selectedIndex = Math.Clamp(_selectedIndex < 0 ? 0 : _selectedIndex, 0, _services.Count - 1);
+            SelectedIndex = Math.Clamp(SelectedIndex < 0 ? 0 : SelectedIndex, 0, _services.Count - 1);
             _hoveredIndex = Math.Clamp(_hoveredIndex, -1, _services.Count - 1);
             EnsureSelectionVisible(_lastViewportRows);
         }
@@ -200,7 +187,7 @@ public sealed partial class HealthBoard : Control
     }
 
     /// <summary>
-    /// Sets selected row index using bounds clamping.
+    ///     Sets selected row index using bounds clamping.
     /// </summary>
     /// <param name="index">Requested index.</param>
     /// <returns><see langword="true" /> when selection changed; otherwise <see langword="false" />.</returns>
@@ -212,21 +199,21 @@ public sealed partial class HealthBoard : Control
         }
 
         var clamped = Math.Clamp(index, 0, _services.Count - 1);
-        if (clamped == _selectedIndex)
+        if (clamped == SelectedIndex)
         {
             return false;
         }
 
-        var previousIndex = _selectedIndex;
+        var previousIndex = SelectedIndex;
         var previousItem = SelectedItem;
-        _selectedIndex = clamped;
+        SelectedIndex = clamped;
         EnsureSelectionVisible(_lastViewportRows);
-        RaiseSelectionChanged(previousIndex, previousItem, _selectedIndex, SelectedItem);
+        RaiseSelectionChanged(previousIndex, previousItem, SelectedIndex, SelectedItem);
         return true;
     }
 
     /// <summary>
-    /// Compatibility alias for <see cref="SetSelectedIndex" />.
+    ///     Compatibility alias for <see cref="SetSelectedIndex" />.
     /// </summary>
     /// <param name="index">Requested index.</param>
     /// <returns><see langword="true" /> when selection changed; otherwise <see langword="false" />.</returns>
@@ -236,7 +223,7 @@ public sealed partial class HealthBoard : Control
     }
 
     /// <summary>
-    /// Marks a service as acknowledged.
+    ///     Marks a service as acknowledged.
     /// </summary>
     /// <param name="serviceId">Service identifier to acknowledge.</param>
     /// <returns><see langword="true" /> when service was found and changed; otherwise <see langword="false" />.</returns>
@@ -281,18 +268,18 @@ public sealed partial class HealthBoard : Control
             return;
         }
 
-        if (_selectedIndex < 0)
+        if (SelectedIndex < 0)
         {
-            _selectedIndex = 0;
+            SelectedIndex = 0;
         }
 
-        if (_selectedIndex < _scrollOffset)
+        if (SelectedIndex < _scrollOffset)
         {
-            _scrollOffset = _selectedIndex;
+            _scrollOffset = SelectedIndex;
         }
-        else if (_selectedIndex >= _scrollOffset + viewportRows)
+        else if (SelectedIndex >= _scrollOffset + viewportRows)
         {
-            _scrollOffset = _selectedIndex - viewportRows + 1;
+            _scrollOffset = SelectedIndex - viewportRows + 1;
         }
 
         _scrollOffset = Math.Clamp(_scrollOffset, 0, Math.Max(0, _services.Count - viewportRows));
@@ -310,9 +297,11 @@ public sealed partial class HealthBoard : Control
         RaiseSelectionChanged(previousIndex, previousItem, selectedIndex, selectedItem);
     }
 
-    private void RaiseSelectionChanged(int previousIndex, HealthService? previousItem, int selectedIndex, HealthService? selectedItem)
+    private void RaiseSelectionChanged(int previousIndex, HealthService? previousItem, int selectedIndex,
+        HealthService? selectedItem)
     {
-        SelectionChanged?.Invoke(this, new ListSelectionChangedEventArgs<HealthService>(previousIndex, selectedIndex, previousItem, selectedItem));
+        SelectionChanged?.Invoke(this,
+            new ListSelectionChangedEventArgs<HealthService>(previousIndex, selectedIndex, previousItem, selectedItem));
     }
 
     private static bool IsSameService(HealthService? left, HealthService? right)
@@ -335,7 +324,7 @@ public sealed partial class HealthBoard : Control
         return new HealthService(service.Id, service.Name, service.Severity, service.Summary, service.ObservedAt)
         {
             IsAcknowledged = service.IsAcknowledged,
-            IsMuted = service.IsMuted,
+            IsMuted = service.IsMuted
         };
     }
 }

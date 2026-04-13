@@ -6,26 +6,57 @@ namespace Tessera.Examples.CounterForm;
 
 internal sealed class CounterFormApp : TesseraApp
 {
-    private readonly Label _eyebrow = new() { Border = BorderStyle.None, HorizontalAlignment = HorizontalAlignment.Center };
-    private readonly Label _headline = new() { Border = BorderStyle.None, HorizontalAlignment = HorizontalAlignment.Center };
-    private readonly Label _countChip = new() { Border = BorderStyle.None, HorizontalAlignment = HorizontalAlignment.Center };
-    private readonly Label _labelChip = new() { Border = BorderStyle.None, HorizontalAlignment = HorizontalAlignment.Center };
-    private readonly Label _stepChip = new() { Border = BorderStyle.None, HorizontalAlignment = HorizontalAlignment.Center };
-    private readonly Label _paletteChip = new() { Border = BorderStyle.None, HorizontalAlignment = HorizontalAlignment.Center };
-    private readonly TextInput _labelInput = new() { Title = "Pulse Name", Placeholder = "Name this pulse", Padding = Thickness.Symmetric(1, 0) };
-    private readonly NumberInput _stepInput = new() { Title = "Step", Min = 1, Max = 9, Precision = 0, Padding = Thickness.Symmetric(1, 0) };
-    private readonly Choice _themeChoice = new() { Title = "Palette", Padding = Thickness.Symmetric(1, 0) };
-    private readonly ProgressBar _meter = new() { Title = "Momentum", Padding = Thickness.Symmetric(1, 0) };
-    private readonly Button _downButton = new() { Text = "Count -", Padding = Thickness.Symmetric(3, 0) };
-    private readonly Button _upButton = new() { Text = "Count +", Padding = Thickness.Symmetric(3, 0) };
-    private readonly Button _resetButton = new() { Text = "Reset", Padding = Thickness.Symmetric(3, 0) };
-    private readonly Label _summary = new() { Border = BorderStyle.None, HorizontalAlignment = HorizontalAlignment.Center };
-    private readonly StatusBar _footer = new() { Fill = ' ' };
+    private readonly Label _countChip =
+        new() { Border = BorderStyle.None, HorizontalAlignment = HorizontalAlignment.Center };
+
+    private readonly Button _downButton = new() { Text = "Count -", Padding = Thickness.Symmetric(3) };
+
+    private readonly Label _eyebrow =
+        new() { Border = BorderStyle.None, HorizontalAlignment = HorizontalAlignment.Center };
 
     private readonly Control[] _focusOrder;
-    private CounterFormPalette _palette = CounterFormTheme.Default;
-    private int _focusIndex;
+    private readonly StatusBar _footer = new() { Fill = ' ' };
+
+    private readonly Label _headline =
+        new() { Border = BorderStyle.None, HorizontalAlignment = HorizontalAlignment.Center };
+
+    private readonly Label _labelChip =
+        new() { Border = BorderStyle.None, HorizontalAlignment = HorizontalAlignment.Center };
+
+    private readonly TextInput _labelInput = new()
+    {
+        Title = "Pulse Name",
+        Placeholder = "Name this pulse",
+        Padding = Thickness.Symmetric(1)
+    };
+
+    private readonly ProgressBar _meter = new() { Title = "Momentum", Padding = Thickness.Symmetric(1) };
+
+    private readonly Label _paletteChip =
+        new() { Border = BorderStyle.None, HorizontalAlignment = HorizontalAlignment.Center };
+
+    private readonly Button _resetButton = new() { Text = "Reset", Padding = Thickness.Symmetric(3) };
+
+    private readonly Label _stepChip =
+        new() { Border = BorderStyle.None, HorizontalAlignment = HorizontalAlignment.Center };
+
+    private readonly NumberInput _stepInput = new()
+    {
+        Title = "Step",
+        Min = 1,
+        Max = 9,
+        Precision = 0,
+        Padding = Thickness.Symmetric(1)
+    };
+
+    private readonly Label _summary =
+        new() { Border = BorderStyle.None, HorizontalAlignment = HorizontalAlignment.Center };
+
+    private readonly Choice _themeChoice = new() { Title = "Palette", Padding = Thickness.Symmetric(1) };
+    private readonly Button _upButton = new() { Text = "Count +", Padding = Thickness.Symmetric(3) };
     private int _count = 12;
+    private int _focusIndex;
+    private CounterFormPalette _palette = CounterFormTheme.Default;
 
     public CounterFormApp()
     {
@@ -100,18 +131,17 @@ internal sealed class CounterFormApp : TesseraApp
                         chips.Auto(_paletteChip);
                     })));
                     column.Fixed(4, meter => meter.Center(row => row.Row(stack => stack.Fixed(38, _meter))));
-                    column.Fixed(3, actions => actions.Center(
-                        row => row.Row(stack =>
-                        {
-                            stack.Gap(2);
-                            stack.Fixed(14, _downButton);
-                            stack.Fixed(14, _upButton);
-                            stack.Fixed(14, _resetButton);
-                        })));
+                    column.Fixed(3, actions => actions.Center(row => row.Row(stack =>
+                    {
+                        stack.Gap(2);
+                        stack.Fixed(14, _downButton);
+                        stack.Fixed(14, _upButton);
+                        stack.Fixed(14, _resetButton);
+                    })));
                     column.Auto(content => content.Center(_summary));
                 }),
-                width: cardWidth,
-                height: cardHeight));
+                cardWidth,
+                cardHeight));
             window.Footer(1, _footer);
         });
     }

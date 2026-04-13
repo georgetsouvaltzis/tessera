@@ -7,11 +7,9 @@ namespace Tessera.Examples.TransitBoard;
 internal sealed class TransitDepartureBoardControl : Control
 {
     private readonly List<TransitService> _services = [];
-    private int _selectedIndex;
-    private int _scrollOffset;
     private int _lastViewportRows = 4;
-
-    public event EventHandler<TransitServiceChangedEventArgs>? SelectionChanged;
+    private int _scrollOffset;
+    private int _selectedIndex;
 
     public string Title { get; set; } = "Live Board";
     public TesseraStyle TitleStyle { get; set; } = TesseraStyle.Empty;
@@ -29,7 +27,10 @@ internal sealed class TransitDepartureBoardControl : Control
     public TesseraStyle RouteStyle { get; set; } = TesseraStyle.Empty;
     public string FocusMarker { get; set; } = "◆";
 
-    public TransitService? SelectedService => _selectedIndex >= 0 && _selectedIndex < _services.Count ? _services[_selectedIndex] : null;
+    public TransitService? SelectedService =>
+        _selectedIndex >= 0 && _selectedIndex < _services.Count ? _services[_selectedIndex] : null;
+
+    public event EventHandler<TransitServiceChangedEventArgs>? SelectionChanged;
 
     public void SetServices(IEnumerable<TransitService> services)
     {
@@ -116,7 +117,8 @@ internal sealed class TransitDepartureBoardControl : Control
             }
         }
 
-        if (pointer.Kind == PointerEventKind.Press && pointer.Button == PointerButton.Left && bounds.Contains(pointer.X, pointer.Y))
+        if (pointer.Kind == PointerEventKind.Press && pointer.Button == PointerButton.Left &&
+            bounds.Contains(pointer.X, pointer.Y))
         {
             RequestFocus();
             var row = pointer.Y - bounds.Y - 2;
@@ -125,7 +127,7 @@ internal sealed class TransitDepartureBoardControl : Control
                 return false;
             }
 
-            var serviceIndex = _scrollOffset + (row / 3);
+            var serviceIndex = _scrollOffset + row / 3;
             return SetSelectedIndex(serviceIndex);
         }
 
@@ -141,18 +143,22 @@ internal sealed class TransitDepartureBoardControl : Control
         }
 
         var title = IsFocused ? $"{Title} {FocusMarker}" : Title;
-        canvas.WriteText(clipped.X, clipped.Y, Render(IsFocused ? FocusedTitleStyle : TitleStyle, title), clipped.Width);
+        canvas.WriteText(clipped.X, clipped.Y, Render(IsFocused ? FocusedTitleStyle : TitleStyle, title),
+            clipped.Width);
         if (clipped.Height > 1)
         {
-            canvas.WriteText(clipped.X, clipped.Y + 1, Render(DividerStyle, new string('─', clipped.Width)), clipped.Width);
+            canvas.WriteText(clipped.X, clipped.Y + 1, Render(DividerStyle, new string('─', clipped.Width)),
+                clipped.Width);
         }
 
         if (_services.Count == 0)
         {
             if (clipped.Height > 2)
             {
-                canvas.WriteText(clipped.X, clipped.Y + 2, Render(EmptyStyle, "No live services in this slice."), clipped.Width);
+                canvas.WriteText(clipped.X, clipped.Y + 2, Render(EmptyStyle, "No live services in this slice."),
+                    clipped.Width);
             }
+
             return;
         }
 
@@ -174,7 +180,7 @@ internal sealed class TransitDepartureBoardControl : Control
 
     private void RenderRow(Canvas canvas, Rect rect, int rowIndex, TransitService service, bool selected)
     {
-        var y = rect.Y + 2 + (rowIndex * 3);
+        var y = rect.Y + 2 + rowIndex * 3;
         if (y >= rect.Bottom)
         {
             return;
@@ -186,15 +192,18 @@ internal sealed class TransitDepartureBoardControl : Control
         var routeStyle = selected ? SelectedRowStyle : RouteStyle;
         var platformStyle = selected ? SelectedRowStyle : PlatformStyle;
 
-        var lineOne = $"{Render(primaryStyle, service.DisplayTime.PadRight(6))} {Render(routeStyle, $"[{service.RouteCode}]")} {Render(primaryStyle, service.Destination)}";
-        var rightText = $"{Render(platformStyle, $"PF {service.Platform}")}  {Render(markerStyle, StatusText(service))}";
+        var lineOne =
+            $"{Render(primaryStyle, service.DisplayTime.PadRight(6))} {Render(routeStyle, $"[{service.RouteCode}]")} {Render(primaryStyle, service.Destination)}";
+        var rightText =
+            $"{Render(platformStyle, $"PF {service.Platform}")}  {Render(markerStyle, StatusText(service))}";
         canvas.WriteText(rect.X, y, lineOne, rect.Width);
         var rightX = Math.Max(rect.X, rect.Right - Math.Min(rightText.Length, rect.Width / 3));
         canvas.WriteText(rightX, y, rightText, rect.Right - rightX);
 
         if (y + 1 < rect.Bottom)
         {
-            var lineTwo = $"{Render(secondaryStyle, service.Via)}  {Render(secondaryStyle, service.Concourse)}  {Render(markerStyle, service.MarkerText)}";
+            var lineTwo =
+                $"{Render(secondaryStyle, service.Via)}  {Render(secondaryStyle, service.Concourse)}  {Render(markerStyle, service.MarkerText)}";
             canvas.WriteText(rect.X, y + 1, lineTwo, rect.Width);
         }
 
@@ -249,7 +258,7 @@ internal sealed class TransitDepartureBoardControl : Control
             >= 8 => DelayStyle,
             > 0 => WarningStyle,
             _ when string.Equals(service.Status, "final call", StringComparison.OrdinalIgnoreCase) => WarningStyle,
-            _ => SuccessStyle,
+            _ => SuccessStyle
         };
     }
 
@@ -261,11 +270,14 @@ internal sealed class TransitDepartureBoardControl : Control
             _ when string.Equals(service.Status, "final call", StringComparison.OrdinalIgnoreCase) => "FINAL",
             _ when string.Equals(service.Status, "boarding", StringComparison.OrdinalIgnoreCase) => "BOARD",
             _ when service.IsArrival => "IN",
-            _ => "OT",
+            _ => "OT"
         };
     }
 
-    private static string Render(TesseraStyle style, string text) => style.IsEmpty ? text : style.Render(text);
+    private static string Render(TesseraStyle style, string text)
+    {
+        return style.IsEmpty ? text : style.Render(text);
+    }
 }
 
 internal sealed record TransitServiceChangedEventArgs(TransitService? Previous, TransitService? Selected);

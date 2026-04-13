@@ -7,22 +7,17 @@ using Tessera.Styles;
 namespace Tessera.Controls;
 
 /// <summary>
-/// Represents a pivot-style analytical table with row headers, value columns, and optional sort hooks.
+///     Represents a pivot-style analytical table with row headers, value columns, and optional sort hooks.
 /// </summary>
-public sealed partial class PivotTable : Control
+public sealed class PivotTable : Control
 {
+    private readonly Dictionary<string, Dictionary<string, string>> _cells = new(StringComparer.Ordinal);
     private readonly List<PivotTableColumn> _columns = [];
     private readonly List<string> _rowKeys = [];
-    private readonly Dictionary<string, Dictionary<string, string>> _cells = new(StringComparer.Ordinal);
-    private int _selectedRowIndex;
-    private int _selectedColumnIndex;
-    private int _scrollOffset;
     private int _lastViewportRows = 8;
-    private int _sortColumnIndex = -1;
-    private bool _sortDescending;
-
-    /// <summary>Occurs when sorting is requested for a column without a built-in comparer.</summary>
-    public event EventHandler<PivotSortRequestedEventArgs>? SortRequested;
+    private int _scrollOffset;
+    private int _selectedColumnIndex;
+    private int _selectedRowIndex;
 
     /// <summary>Gets or sets the title rendered in the control frame.</summary>
     public string Title { get; set; } = "Pivot Table";
@@ -93,14 +88,14 @@ public sealed partial class PivotTable : Control
     /// <summary>Gets selected value-column index, or <c>-1</c> when there are no columns.</summary>
     public int SelectedColumnIndex => _columns.Count == 0 ? -1 : _selectedColumnIndex;
 
-    /// <summary>Gets selected value, or <see langword="null"/> when selection is invalid.</summary>
+    /// <summary>Gets selected value, or <see langword="null" /> when selection is invalid.</summary>
     public string? SelectedCellValue => TryGetCellValue(_selectedRowIndex, _selectedColumnIndex);
 
     /// <summary>Gets current sort column index, or <c>-1</c> when not sorted.</summary>
-    public int SortColumnIndex => _sortColumnIndex;
+    public int SortColumnIndex { get; private set; } = -1;
 
     /// <summary>Gets a value indicating whether the active sort direction is descending.</summary>
-    public bool SortDescending => _sortDescending;
+    public bool SortDescending { get; private set; }
 
     /// <inheritdoc />
     public override bool IsFocused { get; set; }
@@ -111,8 +106,11 @@ public sealed partial class PivotTable : Control
     /// <inheritdoc />
     public override bool IsReadOnly { get; set; }
 
+    /// <summary>Occurs when sorting is requested for a column without a built-in comparer.</summary>
+    public event EventHandler<PivotSortRequestedEventArgs>? SortRequested;
+
     /// <summary>
-    /// Replaces pivot value columns.
+    ///     Replaces pivot value columns.
     /// </summary>
     /// <param name="columns">Columns in display order.</param>
     public void SetColumns(IEnumerable<PivotTableColumn> columns)
@@ -129,20 +127,20 @@ public sealed partial class PivotTable : Control
             _columns.Add(new PivotTableColumn(column.Key, column.Header)
             {
                 IsSortable = column.IsSortable,
-                SortComparer = column.SortComparer,
+                SortComparer = column.SortComparer
             });
         }
 
         _selectedColumnIndex = _columns.Count == 0 ? 0 : Math.Clamp(_selectedColumnIndex, 0, _columns.Count - 1);
-        if (_sortColumnIndex < 0 || _sortColumnIndex >= _columns.Count)
+        if (SortColumnIndex < 0 || SortColumnIndex >= _columns.Count)
         {
-            _sortColumnIndex = -1;
-            _sortDescending = false;
+            SortColumnIndex = -1;
+            SortDescending = false;
         }
     }
 
     /// <summary>
-    /// Replaces row keys in display order.
+    ///     Replaces row keys in display order.
     /// </summary>
     /// <param name="rowKeys">Row keys.</param>
     public void SetRows(IEnumerable<string> rowKeys)
@@ -152,7 +150,7 @@ public sealed partial class PivotTable : Control
         var seen = new HashSet<string>(StringComparer.Ordinal);
         foreach (var rowKey in rowKeys)
         {
-            var safe = rowKey ?? string.Empty;
+            var safe = rowKey;
             if (!seen.Add(safe))
             {
                 continue;
@@ -167,7 +165,7 @@ public sealed partial class PivotTable : Control
     }
 
     /// <summary>
-    /// Replaces pivot values.
+    ///     Replaces pivot values.
     /// </summary>
     /// <param name="cells">Pivot values.</param>
     public void SetCells(IEnumerable<PivotTableCell> cells)
@@ -186,30 +184,30 @@ public sealed partial class PivotTable : Control
     }
 
     /// <summary>
-    /// Sets one pivot value.
+    ///     Sets one pivot value.
     /// </summary>
     /// <param name="rowKey">Row key.</param>
     /// <param name="columnKey">Column key.</param>
     /// <param name="value">Display value.</param>
     public void SetValue(string rowKey, string columnKey, string value)
     {
-        var safeRow = rowKey ?? string.Empty;
-        var safeColumn = columnKey ?? string.Empty;
+        var safeRow = rowKey;
+        var safeColumn = columnKey;
         if (!_rowKeys.Contains(safeRow, StringComparer.Ordinal))
         {
             _rowKeys.Add(safeRow);
         }
 
         var rowMap = EnsureRowMap(safeRow);
-        rowMap[safeColumn] = value ?? string.Empty;
+        rowMap[safeColumn] = value;
     }
 
     /// <summary>
-    /// Selects a cell by row and value-column index.
+    ///     Selects a cell by row and value-column index.
     /// </summary>
     /// <param name="rowIndex">Target row index.</param>
     /// <param name="columnIndex">Target value-column index.</param>
-    /// <returns><see langword="true"/> when selection changed; otherwise <see langword="false"/>.</returns>
+    /// <returns><see langword="true" /> when selection changed; otherwise <see langword="false" />.</returns>
     public bool SelectCell(int rowIndex, int columnIndex)
     {
         if (_rowKeys.Count == 0 || _columns.Count == 0)
@@ -231,11 +229,11 @@ public sealed partial class PivotTable : Control
     }
 
     /// <summary>
-    /// Sorts by one value column.
+    ///     Sorts by one value column.
     /// </summary>
     /// <param name="columnIndex">Target column index.</param>
     /// <param name="direction">Optional explicit direction.</param>
-    /// <returns><see langword="true"/> when sorting was applied or handled; otherwise <see langword="false"/>.</returns>
+    /// <returns><see langword="true" /> when sorting was applied or handled; otherwise <see langword="false" />.</returns>
     public bool SortByColumn(int columnIndex, PivotSortDirection? direction = null)
     {
         if (columnIndex < 0 || columnIndex >= _columns.Count)
@@ -275,8 +273,8 @@ public sealed partial class PivotTable : Control
             return false;
         }
 
-        _sortColumnIndex = columnIndex;
-        _sortDescending = descending;
+        SortColumnIndex = columnIndex;
+        SortDescending = descending;
         _selectedRowIndex = _rowKeys.Count == 0 ? 0 : Math.Clamp(_selectedRowIndex, 0, _rowKeys.Count - 1);
         EnsureSelectionVisible(_lastViewportRows);
         return true;
@@ -440,7 +438,8 @@ public sealed partial class PivotTable : Control
 
         if (_columns.Count == 0)
         {
-            canvas.WriteText(content.X, content.Y, ApplyStyle("(no columns)", ResolveBodyStyle(selected: false, focusedCell: false)), content.Width);
+            canvas.WriteText(content.X, content.Y, ApplyStyle("(no columns)", ResolveBodyStyle(false, false)),
+                content.Width);
             return;
         }
 
@@ -450,7 +449,8 @@ public sealed partial class PivotTable : Control
         {
             if (content.Height > 1)
             {
-                canvas.WriteText(content.X, content.Y + 1, ApplyStyle(EmptyText, ResolveBodyStyle(selected: false, focusedCell: false)), content.Width);
+                canvas.WriteText(content.X, content.Y + 1, ApplyStyle(EmptyText, ResolveBodyStyle(false, false)),
+                    content.Width);
             }
 
             return;
@@ -506,9 +506,9 @@ public sealed partial class PivotTable : Control
 
     private PivotSortDirection ResolveSortDirection(int columnIndex)
     {
-        if (_sortColumnIndex == columnIndex)
+        if (SortColumnIndex == columnIndex)
         {
-            return _sortDescending ? PivotSortDirection.Ascending : PivotSortDirection.Descending;
+            return SortDescending ? PivotSortDirection.Ascending : PivotSortDirection.Descending;
         }
 
         return PivotSortDirection.Ascending;
@@ -535,7 +535,10 @@ public sealed partial class PivotTable : Control
         _scrollOffset = Math.Clamp(_scrollOffset, 0, Math.Max(0, _rowKeys.Count - safeCapacity));
     }
 
-    private static int ResolveVisibleRowCapacity(int contentHeight) => Math.Max(1, contentHeight - 1);
+    private static int ResolveVisibleRowCapacity(int contentHeight)
+    {
+        return Math.Max(1, contentHeight - 1);
+    }
 
     private string? TryGetCellValue(int rowIndex, int columnIndex)
     {
@@ -554,7 +557,7 @@ public sealed partial class PivotTable : Control
             return string.Empty;
         }
 
-        return value ?? string.Empty;
+        return value;
     }
 
     private Dictionary<string, string> EnsureRowMap(string rowKey)
@@ -599,11 +602,11 @@ public sealed partial class PivotTable : Control
         var rowKey = _rowKeys[rowIndex];
         var selectedRow = rowIndex == _selectedRowIndex;
         var x = content.X;
-        WriteCell(canvas, x, y, rowKey, widths.RowHeader, ResolveBodyStyle(selectedRow, focusedCell: false), content.Right - x);
+        WriteCell(canvas, x, y, rowKey, widths.RowHeader, ResolveBodyStyle(selectedRow, false), content.Right - x);
         x += widths.RowHeader;
         if (x < content.Right)
         {
-            WriteCell(canvas, x, y, " ", 1, ResolveBodyStyle(selectedRow, focusedCell: false), content.Right - x);
+            WriteCell(canvas, x, y, " ", 1, ResolveBodyStyle(selectedRow, false), content.Right - x);
             x++;
         }
 
@@ -616,7 +619,7 @@ public sealed partial class PivotTable : Control
             x += width;
             if (columnIndex < _columns.Count - 1 && x < content.Right)
             {
-                WriteCell(canvas, x, y, " ", 1, ResolveBodyStyle(selectedRow, focusedCell: false), content.Right - x);
+                WriteCell(canvas, x, y, " ", 1, ResolveBodyStyle(selectedRow, false), content.Right - x);
                 x++;
             }
         }
@@ -638,7 +641,8 @@ public sealed partial class PivotTable : Control
         var valueWidths = new int[_columns.Count];
         for (var columnIndex = 0; columnIndex < _columns.Count; columnIndex++)
         {
-            valueWidths[columnIndex] = Math.Max(3, ControlTextLayout.MeasureDisplayWidth(RenderHeaderText(columnIndex)));
+            valueWidths[columnIndex] =
+                Math.Max(3, ControlTextLayout.MeasureDisplayWidth(RenderHeaderText(columnIndex)));
         }
 
         var separators = _columns.Count; // one between row header and first value, then between value columns
@@ -698,9 +702,9 @@ public sealed partial class PivotTable : Control
     private string RenderHeaderText(int columnIndex)
     {
         var text = _columns[columnIndex].Header;
-        if (columnIndex == _sortColumnIndex)
+        if (columnIndex == SortColumnIndex)
         {
-            var marker = _sortDescending ? SortDescendingMarker : SortAscendingMarker;
+            var marker = SortDescending ? SortDescendingMarker : SortAscendingMarker;
             if (!string.IsNullOrEmpty(marker))
             {
                 text = string.Concat(text, " ", marker);
@@ -798,7 +802,7 @@ public sealed partial class PivotTable : Control
 
     private static string PadToWidth(string value, int width)
     {
-        var text = value ?? string.Empty;
+        var text = value;
         if (width <= 0)
         {
             return string.Empty;

@@ -1,145 +1,145 @@
 namespace Tessera.Styles;
 
 /// <summary>
-/// Provides built-in Tessera theme palettes.
+///     Provides built-in Tessera theme palettes.
 /// </summary>
 public static class TesseraThemes
 {
     /// <summary>
-    /// Creates a Catppuccin theme variant.
+    ///     Creates a Catppuccin theme variant.
     /// </summary>
     /// <param name="variant">The Catppuccin variant.</param>
-    /// <returns>A <see cref="TesseraTheme"/> configured from the selected Catppuccin palette.</returns>
+    /// <returns>A <see cref="TesseraTheme" /> configured from the selected Catppuccin palette.</returns>
     public static TesseraTheme Catppuccin(CatppuccinVariant variant = CatppuccinVariant.Mocha)
     {
         var palette = variant switch
         {
             CatppuccinVariant.Latte => new Palette(
-                baseSurface: 0xEFF1F5,
-                panelSurface: 0xE6E9EF,
-                overlaySurface: 0xDCE0E8,
-                textPrimary: 0x4C4F69,
-                textSecondary: 0x5C5F77,
-                textMuted: 0x6C6F85,
-                borderDefault: 0x9CA0B0,
-                borderStrong: 0x8C8FA1,
-                focus: 0x1E66F5,
-                accentPrimary: 0x8839EF,
-                accentSecondary: 0xEA76CB,
-                info: 0x209FB5,
-                success: 0x40A02B,
-                warning: 0xDF8E1D,
-                error: 0xD20F39),
+                0xEFF1F5,
+                0xE6E9EF,
+                0xDCE0E8,
+                0x4C4F69,
+                0x5C5F77,
+                0x6C6F85,
+                0x9CA0B0,
+                0x8C8FA1,
+                0x1E66F5,
+                0x8839EF,
+                0xEA76CB,
+                0x209FB5,
+                0x40A02B,
+                0xDF8E1D,
+                0xD20F39),
             CatppuccinVariant.Frappe => new Palette(
-                baseSurface: 0x303446,
-                panelSurface: 0x292C3C,
-                overlaySurface: 0x232634,
-                textPrimary: 0xC6D0F5,
-                textSecondary: 0xB5BFE2,
-                textMuted: 0xA5ADCE,
-                borderDefault: 0x737994,
-                borderStrong: 0x838BA7,
-                focus: 0x8CAAEE,
-                accentPrimary: 0xCA9EE6,
-                accentSecondary: 0xF4B8E4,
-                info: 0x85C1DC,
-                success: 0xA6D189,
-                warning: 0xE5C890,
-                error: 0xE78284),
+                0x303446,
+                0x292C3C,
+                0x232634,
+                0xC6D0F5,
+                0xB5BFE2,
+                0xA5ADCE,
+                0x737994,
+                0x838BA7,
+                0x8CAAEE,
+                0xCA9EE6,
+                0xF4B8E4,
+                0x85C1DC,
+                0xA6D189,
+                0xE5C890,
+                0xE78284),
             CatppuccinVariant.Macchiato => new Palette(
-                baseSurface: 0x24273A,
-                panelSurface: 0x1E2030,
-                overlaySurface: 0x181926,
-                textPrimary: 0xCAD3F5,
-                textSecondary: 0xB8C0E0,
-                textMuted: 0xA5ADCB,
-                borderDefault: 0x6E738D,
-                borderStrong: 0x8087A2,
-                focus: 0x8AADF4,
-                accentPrimary: 0xC6A0F6,
-                accentSecondary: 0xF5BDE6,
-                info: 0x7DC4E4,
-                success: 0xA6DA95,
-                warning: 0xEED49F,
-                error: 0xED8796),
+                0x24273A,
+                0x1E2030,
+                0x181926,
+                0xCAD3F5,
+                0xB8C0E0,
+                0xA5ADCB,
+                0x6E738D,
+                0x8087A2,
+                0x8AADF4,
+                0xC6A0F6,
+                0xF5BDE6,
+                0x7DC4E4,
+                0xA6DA95,
+                0xEED49F,
+                0xED8796),
             _ => new Palette(
-                baseSurface: 0x1E1E2E,
-                panelSurface: 0x181825,
-                overlaySurface: 0x11111B,
-                textPrimary: 0xCDD6F4,
-                textSecondary: 0xBAC2DE,
-                textMuted: 0xA6ADC8,
-                borderDefault: 0x6C7086,
-                borderStrong: 0x7F849C,
-                focus: 0x89B4FA,
-                accentPrimary: 0xCBA6F7,
-                accentSecondary: 0xF5C2E7,
-                info: 0x74C7EC,
-                success: 0xA6E3A1,
-                warning: 0xF9E2AF,
-                error: 0xF38BA8),
+                0x1E1E2E,
+                0x181825,
+                0x11111B,
+                0xCDD6F4,
+                0xBAC2DE,
+                0xA6ADC8,
+                0x6C7086,
+                0x7F849C,
+                0x89B4FA,
+                0xCBA6F7,
+                0xF5C2E7,
+                0x74C7EC,
+                0xA6E3A1,
+                0xF9E2AF,
+                0xF38BA8)
         };
 
         return CreateTheme(palette);
     }
 
     /// <summary>
-    /// Creates a Rosé Pine theme variant.
+    ///     Creates a Rosé Pine theme variant.
     /// </summary>
     /// <param name="variant">The Rosé Pine variant.</param>
-    /// <returns>A <see cref="TesseraTheme"/> configured from the selected Rosé Pine palette.</returns>
+    /// <returns>A <see cref="TesseraTheme" /> configured from the selected Rosé Pine palette.</returns>
     public static TesseraTheme RosePine(RosePineVariant variant = RosePineVariant.Main)
     {
         var palette = variant switch
         {
             RosePineVariant.Moon => new Palette(
-                baseSurface: 0x232136,
-                panelSurface: 0x2A273F,
-                overlaySurface: 0x393552,
-                textPrimary: 0xE0DEF4,
-                textSecondary: 0xC4A7E7,
-                textMuted: 0x908CAA,
-                borderDefault: 0x6E6A86,
-                borderStrong: 0x908CAA,
-                focus: 0x9CCFD8,
-                accentPrimary: 0xC4A7E7,
-                accentSecondary: 0xEA9A97,
-                info: 0x3E8FB0,
-                success: 0x9CCFD8,
-                warning: 0xF6C177,
-                error: 0xEB6F92),
+                0x232136,
+                0x2A273F,
+                0x393552,
+                0xE0DEF4,
+                0xC4A7E7,
+                0x908CAA,
+                0x6E6A86,
+                0x908CAA,
+                0x9CCFD8,
+                0xC4A7E7,
+                0xEA9A97,
+                0x3E8FB0,
+                0x9CCFD8,
+                0xF6C177,
+                0xEB6F92),
             RosePineVariant.Dawn => new Palette(
-                baseSurface: 0xFAF4ED,
-                panelSurface: 0xFFF8F0,
-                overlaySurface: 0xF2E9DE,
-                textPrimary: 0x575279,
-                textSecondary: 0x797593,
-                textMuted: 0x9893A5,
-                borderDefault: 0xBEBBCB,
-                borderStrong: 0x9893A5,
-                focus: 0x56949F,
-                accentPrimary: 0x907AA9,
-                accentSecondary: 0xD7827E,
-                info: 0x286983,
-                success: 0x56949F,
-                warning: 0xEA9D34,
-                error: 0xB4637A),
+                0xFAF4ED,
+                0xFFF8F0,
+                0xF2E9DE,
+                0x575279,
+                0x797593,
+                0x9893A5,
+                0xBEBBCB,
+                0x9893A5,
+                0x56949F,
+                0x907AA9,
+                0xD7827E,
+                0x286983,
+                0x56949F,
+                0xEA9D34,
+                0xB4637A),
             _ => new Palette(
-                baseSurface: 0x191724,
-                panelSurface: 0x1F1D2E,
-                overlaySurface: 0x26233A,
-                textPrimary: 0xE0DEF4,
-                textSecondary: 0xC4A7E7,
-                textMuted: 0x908CAA,
-                borderDefault: 0x6E6A86,
-                borderStrong: 0x908CAA,
-                focus: 0x9CCFD8,
-                accentPrimary: 0xC4A7E7,
-                accentSecondary: 0xEBBCBA,
-                info: 0x31748F,
-                success: 0x9CCFD8,
-                warning: 0xF6C177,
-                error: 0xEB6F92),
+                0x191724,
+                0x1F1D2E,
+                0x26233A,
+                0xE0DEF4,
+                0xC4A7E7,
+                0x908CAA,
+                0x6E6A86,
+                0x908CAA,
+                0x9CCFD8,
+                0xC4A7E7,
+                0xEBBCBA,
+                0x31748F,
+                0x9CCFD8,
+                0xF6C177,
+                0xEB6F92)
         };
 
         return CreateTheme(palette);
@@ -152,50 +152,55 @@ public static class TesseraThemes
 
         return new TesseraTheme
         {
-            Text = new TesseraThemeTextTokens
-            {
-                Primary = baseForeground,
-                Secondary = StyleForeground(palette.TextSecondary),
-                Muted = StyleForeground(palette.TextMuted),
-                Inverse = StyleForegroundBackground(palette.BaseSurface, palette.TextPrimary),
-            },
-            Surface = new TesseraThemeSurfaceTokens
-            {
-                Base = baseBackground,
-                Panel = StyleBackground(palette.PanelSurface),
-                Overlay = StyleBackground(palette.OverlaySurface),
-            },
-            Border = new TesseraThemeBorderTokens
-            {
-                Default = StyleForeground(palette.BorderDefault),
-                Strong = StyleForeground(palette.BorderStrong),
-                Focused = StyleForeground(palette.Focus),
-                Error = StyleForeground(palette.Error),
-            },
-            State = new TesseraThemeStateTokens
-            {
-                Success = StyleForeground(palette.Success),
-                Warning = StyleForeground(palette.Warning),
-                Error = StyleForeground(palette.Error),
-                Info = StyleForeground(palette.Info),
-            },
-            Accent = new TesseraThemeAccentTokens
-            {
-                Primary = StyleForeground(palette.AccentPrimary),
-                Secondary = StyleForeground(palette.AccentSecondary),
-            },
+            Text =
+                new TesseraThemeTextTokens
+                {
+                    Primary = baseForeground,
+                    Secondary = StyleForeground(palette.TextSecondary),
+                    Muted = StyleForeground(palette.TextMuted),
+                    Inverse = StyleForegroundBackground(palette.BaseSurface, palette.TextPrimary)
+                },
+            Surface =
+                new TesseraThemeSurfaceTokens
+                {
+                    Base = baseBackground,
+                    Panel = StyleBackground(palette.PanelSurface),
+                    Overlay = StyleBackground(palette.OverlaySurface)
+                },
+            Border =
+                new TesseraThemeBorderTokens
+                {
+                    Default = StyleForeground(palette.BorderDefault),
+                    Strong = StyleForeground(palette.BorderStrong),
+                    Focused = StyleForeground(palette.Focus),
+                    Error = StyleForeground(palette.Error)
+                },
+            State =
+                new TesseraThemeStateTokens
+                {
+                    Success = StyleForeground(palette.Success),
+                    Warning = StyleForeground(palette.Warning),
+                    Error = StyleForeground(palette.Error),
+                    Info = StyleForeground(palette.Info)
+                },
+            Accent =
+                new TesseraThemeAccentTokens
+                {
+                    Primary = StyleForeground(palette.AccentPrimary),
+                    Secondary = StyleForeground(palette.AccentSecondary)
+                },
             Selection = new TesseraThemeSelectionTokens
             {
                 Foreground = StyleForeground(palette.TextPrimary),
-                Background = StyleBackground(palette.Focus),
+                Background = StyleBackground(palette.Focus)
             },
             Focus = new TesseraThemeFocusTokens
             {
                 Ring = StyleForeground(palette.Focus),
                 Title = StyleForeground(palette.Focus).WithBold(),
                 Border = StyleForeground(palette.Focus).WithBold(),
-                Marker = "*",
-            },
+                Marker = "*"
+            }
         };
     }
 

@@ -1,25 +1,31 @@
 using Tessera.Core.Abstractions;
+using Tessera.Core.Input.Decoding;
+using Tessera.Hosting;
+using AnsiRendererOptions = Tessera.Core.Rendering.AnsiRendererOptions;
+using TerminalCapabilityProfile = Tessera.Core.Terminal.Capabilities.TerminalCapabilityProfile;
+using TerminalColorProfile = Tessera.Core.Terminal.TerminalColorProfile;
+using TerminalSize = Tessera.Core.Terminal.TerminalSize;
 
 namespace Tessera.Internal;
 
 internal static class TesseraHostingAdapter
 {
-    public static global::Tessera.Core.Rendering.AnsiRendererOptions ToCore(this Hosting.AnsiRendererOptions options)
+    public static AnsiRendererOptions ToCore(this Hosting.AnsiRendererOptions options)
     {
         ArgumentNullException.ThrowIfNull(options);
-        return new global::Tessera.Core.Rendering.AnsiRendererOptions
+        return new AnsiRendererOptions
         {
             FlushTimeout = options.FlushTimeout,
             QueryModeReports = options.QueryModeReports,
             QueryModeReportsOncePerMode = options.QueryModeReportsOncePerMode,
-            IncludeKittyKeyboardBaseFlag = options.IncludeKittyKeyboardBaseFlag,
+            IncludeKittyKeyboardBaseFlag = options.IncludeKittyKeyboardBaseFlag
         };
     }
 
-    public static global::Tessera.Core.Terminal.Capabilities.TerminalCapabilityProfile ToCore(this Hosting.TerminalCapabilityProfile profile)
+    public static TerminalCapabilityProfile ToCore(this Hosting.TerminalCapabilityProfile profile)
     {
         ArgumentNullException.ThrowIfNull(profile);
-        return new global::Tessera.Core.Terminal.Capabilities.TerminalCapabilityProfile(
+        return new TerminalCapabilityProfile(
             profile.FocusReporting,
             profile.MouseReporting,
             profile.BracketedPaste,
@@ -30,44 +36,54 @@ internal static class TesseraHostingAdapter
             profile.Source);
     }
 
-    public static global::Tessera.Core.Terminal.TerminalColorProfile ToCore(this Hosting.TerminalColorProfile profile) =>
-        profile switch
+    public static TerminalColorProfile ToCore(this Hosting.TerminalColorProfile profile)
+    {
+        return profile switch
         {
-            Hosting.TerminalColorProfile.Ansi16 => global::Tessera.Core.Terminal.TerminalColorProfile.Ansi16,
-            Hosting.TerminalColorProfile.Ansi256 => global::Tessera.Core.Terminal.TerminalColorProfile.Ansi256,
-            Hosting.TerminalColorProfile.TrueColor => global::Tessera.Core.Terminal.TerminalColorProfile.TrueColor,
-            _ => global::Tessera.Core.Terminal.TerminalColorProfile.Unknown,
+            Hosting.TerminalColorProfile.Ansi16 => TerminalColorProfile.Ansi16,
+            Hosting.TerminalColorProfile.Ansi256 => TerminalColorProfile.Ansi256,
+            Hosting.TerminalColorProfile.TrueColor => TerminalColorProfile.TrueColor,
+            _ => TerminalColorProfile.Unknown
         };
+    }
 
-    public static global::Tessera.Core.Terminal.TerminalSize ToCore(this Hosting.TerminalSize size) =>
-        new(size.Width, size.Height);
+    public static TerminalSize ToCore(this Hosting.TerminalSize size)
+    {
+        return new TerminalSize(size.Width, size.Height);
+    }
 
-    public static global::Tessera.Core.Input.Decoding.DecodeResult ToCore(this Hosting.EventDecodeResult result) =>
-        new(result.Consumed, result.Message is null ? null : TesseraMessageAdapter.ToCore(result.Message), result.NeedMoreData);
+    public static DecodeResult ToCore(this EventDecodeResult result)
+    {
+        return new DecodeResult(result.Consumed,
+            result.Message is null ? null : TesseraMessageAdapter.ToCore(result.Message),
+            result.NeedMoreData);
+    }
 
-    public static global::Tessera.Core.Abstractions.CursorStyle ToCore(this Hosting.TerminalCursorStyle style) =>
-        style switch
+    public static CursorStyle ToCore(this TerminalCursorStyle style)
+    {
+        return style switch
         {
-            Hosting.TerminalCursorStyle.BlinkingBlock => global::Tessera.Core.Abstractions.CursorStyle.BlinkingBlock,
-            Hosting.TerminalCursorStyle.SteadyBlock => global::Tessera.Core.Abstractions.CursorStyle.SteadyBlock,
-            Hosting.TerminalCursorStyle.BlinkingUnderline => global::Tessera.Core.Abstractions.CursorStyle.BlinkingUnderline,
-            Hosting.TerminalCursorStyle.SteadyUnderline => global::Tessera.Core.Abstractions.CursorStyle.SteadyUnderline,
-            Hosting.TerminalCursorStyle.BlinkingBar => global::Tessera.Core.Abstractions.CursorStyle.BlinkingBar,
-            _ => global::Tessera.Core.Abstractions.CursorStyle.SteadyBar,
+            TerminalCursorStyle.BlinkingBlock => CursorStyle.BlinkingBlock,
+            TerminalCursorStyle.SteadyBlock => CursorStyle.SteadyBlock,
+            TerminalCursorStyle.BlinkingUnderline => CursorStyle.BlinkingUnderline,
+            TerminalCursorStyle.SteadyUnderline => CursorStyle.SteadyUnderline,
+            TerminalCursorStyle.BlinkingBar => CursorStyle.BlinkingBar,
+            _ => CursorStyle.SteadyBar
         };
+    }
 
-    public static ScreenOutput ToCore(this Hosting.RenderOutput output) =>
-        new(new ScreenFrame(output.Content)
+    public static ScreenOutput ToCore(this RenderOutput output)
+    {
+        return new ScreenOutput(new ScreenFrame(output.Content)
         {
             CursorX = output.CursorX,
             CursorY = output.CursorY,
-            CursorStyle = output.CursorStyle?.ToCore(),
+            CursorStyle = output.CursorStyle?.ToCore()
         })
-        {
-            Terminal = output.ScreenOptions.ToTerminalOutput(),
-        };
+        { Terminal = output.ScreenOptions.ToTerminalOutput() };
+    }
 
-    public static Hosting.TerminalCapabilityProfile AsHosting(this global::Tessera.Core.Terminal.Capabilities.TerminalCapabilityProfile profile)
+    public static Hosting.TerminalCapabilityProfile AsHosting(this TerminalCapabilityProfile profile)
     {
         ArgumentNullException.ThrowIfNull(profile);
         return new Hosting.TerminalCapabilityProfile(
@@ -81,16 +97,18 @@ internal static class TesseraHostingAdapter
             profile.Source);
     }
 
-    public static Hosting.TerminalColorProfile AsHosting(this global::Tessera.Core.Terminal.TerminalColorProfile profile) =>
-        profile switch
+    public static Hosting.TerminalColorProfile AsHosting(this TerminalColorProfile profile)
+    {
+        return profile switch
         {
-            global::Tessera.Core.Terminal.TerminalColorProfile.Ansi16 => Hosting.TerminalColorProfile.Ansi16,
-            global::Tessera.Core.Terminal.TerminalColorProfile.Ansi256 => Hosting.TerminalColorProfile.Ansi256,
-            global::Tessera.Core.Terminal.TerminalColorProfile.TrueColor => Hosting.TerminalColorProfile.TrueColor,
-            _ => Hosting.TerminalColorProfile.Unknown,
+            TerminalColorProfile.Ansi16 => Hosting.TerminalColorProfile.Ansi16,
+            TerminalColorProfile.Ansi256 => Hosting.TerminalColorProfile.Ansi256,
+            TerminalColorProfile.TrueColor => Hosting.TerminalColorProfile.TrueColor,
+            _ => Hosting.TerminalColorProfile.Unknown
         };
+    }
 
-    public static ValueTask<Hosting.TerminalSize> AsHosting(this ValueTask<global::Tessera.Core.Terminal.TerminalSize> pending)
+    public static ValueTask<Hosting.TerminalSize> AsHosting(this ValueTask<TerminalSize> pending)
     {
         if (pending.IsCompletedSuccessfully)
         {
@@ -101,32 +119,44 @@ internal static class TesseraHostingAdapter
         return AwaitSizeAsync(pending);
     }
 
-    public static Hosting.TerminalSize AsHosting(this global::Tessera.Core.Terminal.TerminalSize size) =>
-        new(size.Width, size.Height);
+    public static Hosting.TerminalSize AsHosting(this TerminalSize size)
+    {
+        return new Hosting.TerminalSize(size.Width, size.Height);
+    }
 
-    public static Hosting.TerminalCursorStyle AsHosting(this global::Tessera.Core.Abstractions.CursorStyle style) =>
-        style switch
+    public static TerminalCursorStyle AsHosting(this CursorStyle style)
+    {
+        return style switch
         {
-            global::Tessera.Core.Abstractions.CursorStyle.BlinkingBlock => Hosting.TerminalCursorStyle.BlinkingBlock,
-            global::Tessera.Core.Abstractions.CursorStyle.SteadyBlock => Hosting.TerminalCursorStyle.SteadyBlock,
-            global::Tessera.Core.Abstractions.CursorStyle.BlinkingUnderline => Hosting.TerminalCursorStyle.BlinkingUnderline,
-            global::Tessera.Core.Abstractions.CursorStyle.SteadyUnderline => Hosting.TerminalCursorStyle.SteadyUnderline,
-            global::Tessera.Core.Abstractions.CursorStyle.BlinkingBar => Hosting.TerminalCursorStyle.BlinkingBar,
-            _ => Hosting.TerminalCursorStyle.SteadyBar,
+            CursorStyle.BlinkingBlock => TerminalCursorStyle.BlinkingBlock,
+            CursorStyle.SteadyBlock => TerminalCursorStyle.SteadyBlock,
+            CursorStyle.BlinkingUnderline => TerminalCursorStyle.BlinkingUnderline,
+            CursorStyle.SteadyUnderline => TerminalCursorStyle.SteadyUnderline,
+            CursorStyle.BlinkingBar => TerminalCursorStyle.BlinkingBar,
+            _ => TerminalCursorStyle.SteadyBar
         };
+    }
 
-    public static Hosting.EventDecodeResult ToHosting(this global::Tessera.Core.Input.Decoding.DecodeResult result) =>
-        new(result.Consumed, result.Message is null ? null : TesseraMessageAdapter.ToPublic(result.Message), result.NeedMoreData);
+    public static EventDecodeResult ToHosting(this DecodeResult result)
+    {
+        return new EventDecodeResult(result.Consumed,
+            result.Message is null ? null : TesseraMessageAdapter.ToPublic(result.Message),
+            result.NeedMoreData);
+    }
 
-    public static Hosting.RenderOutput ToHosting(this ScreenOutput output) =>
-        new(output.Frame.Content)
+    public static RenderOutput ToHosting(this ScreenOutput output)
+    {
+        return new RenderOutput(output.Frame.Content)
         {
             CursorX = output.Frame.CursorX,
             CursorY = output.Frame.CursorY,
             CursorStyle = output.Frame.CursorStyle?.AsHosting(),
-            ScreenOptions = output.Terminal.ToScreenOptions(),
+            ScreenOptions = output.Terminal.ToScreenOptions()
         };
+    }
 
-    private static async ValueTask<Hosting.TerminalSize> AwaitSizeAsync(ValueTask<global::Tessera.Core.Terminal.TerminalSize> pending) =>
-        (await pending.ConfigureAwait(false)).AsHosting();
+    private static async ValueTask<Hosting.TerminalSize> AwaitSizeAsync(ValueTask<TerminalSize> pending)
+    {
+        return (await pending.ConfigureAwait(false)).AsHosting();
+    }
 }

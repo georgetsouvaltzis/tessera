@@ -9,47 +9,31 @@ public class OverlayStressBenchmarks
 {
     private const int FrameCount = 48;
     private static readonly KeyPressed DownKey = new(Key.Down);
-    private readonly DataGrid _grid = new()
-    {
-        Border = BorderStyle.SingleLine,
-        ShowHeader = true,
-    };
+    private readonly Canvas _canvas = new(160, 46);
 
-    private readonly CommandPalette _commandPalette = new()
-    {
-        IsFocused = true,
-        MaxVisibleItems = 10,
-    };
+    private readonly CommandPalette _commandPalette = new() { IsFocused = true, MaxVisibleItems = 10 };
 
-    private readonly ContextMenu _contextMenu = new()
-    {
-        IsFocused = true,
-        Border = BorderStyle.Rounded,
-    };
+    private readonly ContextMenu _contextMenu = new() { IsFocused = true, Border = BorderStyle.Rounded };
 
-    private readonly Dialog _dialog = new()
-    {
-        IsFocused = true,
-    };
+    private readonly Dialog _dialog = new() { IsFocused = true };
 
-    private readonly StatusBar _statusBar = new()
-    {
-        LeftText = "overlay stress",
-        RightText = "palette/context/dialog",
-    };
+    private readonly DataGrid _grid = new() { Border = BorderStyle.SingleLine, ShowHeader = true };
+
+    private readonly Rect _gridBounds = new(0, 0, 160, 45);
+    private readonly string[] _queries = ["op", "deploy", "open", "refresh", "toggle"];
 
     private readonly Rect _rootBounds = new(0, 0, 160, 46);
-    private readonly Rect _gridBounds = new(0, 0, 160, 45);
+
+    private readonly StatusBar _statusBar = new() { LeftText = "overlay stress", RightText = "palette/context/dialog" };
+
     private readonly Rect _statusBounds = new(0, 45, 160, 1);
-    private readonly string[] _queries = ["op", "deploy", "open", "refresh", "toggle"];
-    private readonly Canvas _canvas = new(160, 46);
 
     [GlobalSetup]
     public void Setup()
     {
-        _grid.SetColumns(BenchmarkDataFactory.CreateColumns(count: 8, width: 14));
-        _grid.SetRows(BenchmarkDataFactory.CreateRows(rowCount: 640, columnCount: 8, seed: 8701));
-        _grid.SelectCell(rowIndex: 120, columnIndex: 3);
+        _grid.SetColumns(BenchmarkDataFactory.CreateColumns(8, 14));
+        _grid.SetRows(BenchmarkDataFactory.CreateRows(640, 8, 8701));
+        _grid.SelectCell(120, 3);
 
         _commandPalette.SetItems(
         [
@@ -58,7 +42,7 @@ public class OverlayStressBenchmarks
             new CommandPaletteItem("refresh", "Refresh Data", "Reload dashboard state"),
             new CommandPaletteItem("logs", "Open Logs", "Switch to logs panel"),
             new CommandPaletteItem("help", "Show Help", "Display command cheat sheet"),
-            new CommandPaletteItem("theme", "Theme Picker", "Switch active palette"),
+            new CommandPaletteItem("theme", "Theme Picker", "Switch active palette")
         ]);
 
         _contextMenu.SetItems(
@@ -67,7 +51,7 @@ public class OverlayStressBenchmarks
             new ContextMenuItem("paste", "Paste"),
             new ContextMenuItem("rename", "Rename"),
             new ContextMenuItem("delete", "Delete"),
-            new ContextMenuItem("open", "Open"),
+            new ContextMenuItem("open", "Open")
         ]);
 
         _dialog.Title = "Confirm Action";
@@ -77,13 +61,13 @@ public class OverlayStressBenchmarks
     [Benchmark(Description = "overlay stress with palette/context/dialog layers")]
     public int RenderOverlayStressFrames()
     {
-        return RenderOverlayStressFramesCore(materialize: true);
+        return RenderOverlayStressFramesCore(true);
     }
 
     [Benchmark(Description = "overlay stress render-only with palette/context/dialog layers")]
     public int RenderOverlayStressFramesOnly()
     {
-        return RenderOverlayStressFramesCore(materialize: false);
+        return RenderOverlayStressFramesCore(false);
     }
 
     private int RenderOverlayStressFramesCore(bool materialize)
@@ -101,7 +85,7 @@ public class OverlayStressBenchmarks
             _commandPalette.Handle(DownKey);
             _commandPalette.Render(_canvas, _rootBounds);
 
-            _contextMenu.OpenAt(2 + (frame % 24), 3 + (frame % 11));
+            _contextMenu.OpenAt(2 + frame % 24, 3 + frame % 11);
             _contextMenu.Handle(DownKey);
             _contextMenu.Render(_canvas, _rootBounds);
 

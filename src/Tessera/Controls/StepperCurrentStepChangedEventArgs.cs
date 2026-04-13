@@ -1,12 +1,14 @@
+using System.ComponentModel;
+
 namespace Tessera.Controls;
 
 /// <summary>
-/// Provides details when the current step changes.
+///     Provides details when the current step changes.
 /// </summary>
 public sealed class StepperCurrentStepChangedEventArgs : EventArgs
 {
     /// <summary>
-    /// Initializes a new step transition payload.
+    ///     Initializes a new step transition payload.
     /// </summary>
     /// <param name="previousIndex">Previous current step index.</param>
     /// <param name="currentIndex">Current step index.</param>
@@ -25,38 +27,38 @@ public sealed class StepperCurrentStepChangedEventArgs : EventArgs
     }
 
     /// <summary>
-    /// Gets the previous step index.
+    ///     Gets the previous step index.
     /// </summary>
     public int PreviousIndex { get; }
 
     /// <summary>
-    /// Gets the selected step index after the change.
-    /// Compatibility alias for <see cref="SelectedIndex" />.
+    ///     Gets the selected step index after the change.
+    ///     Compatibility alias for <see cref="SelectedIndex" />.
     /// </summary>
-    [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Advanced)]
+    [EditorBrowsable(EditorBrowsableState.Advanced)]
     public int CurrentIndex { get; }
 
     /// <summary>
-    /// Gets the selected step index after the change.
-    /// Canonical property for selection access.
+    ///     Gets the selected step index after the change.
+    ///     Canonical property for selection access.
     /// </summary>
     public int SelectedIndex => CurrentIndex;
 
     /// <summary>
-    /// Gets the previous step.
+    ///     Gets the previous step.
     /// </summary>
     public StepperStep? PreviousStep { get; }
 
     /// <summary>
-    /// Gets the selected step after the change.
-    /// Compatibility alias for <see cref="SelectedStep" />.
+    ///     Gets the selected step after the change.
+    ///     Compatibility alias for <see cref="SelectedStep" />.
     /// </summary>
-    [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Advanced)]
+    [EditorBrowsable(EditorBrowsableState.Advanced)]
     public StepperStep? CurrentStep { get; }
 
     /// <summary>
-    /// Gets the selected step after the change.
-    /// Canonical property for selection access.
+    ///     Gets the selected step after the change.
+    ///     Canonical property for selection access.
     /// </summary>
     public StepperStep? SelectedStep => CurrentStep;
 }

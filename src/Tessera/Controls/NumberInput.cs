@@ -1,8 +1,8 @@
-﻿using System.ComponentModel;
+using System.ComponentModel;
 using Tessera.Components.Primitives;
 using Tessera.Components.Primitives.Internal;
-using Tessera.Controls.Internal;
 using Tessera.Components.Styling;
+using Tessera.Controls.Internal;
 using Tessera.Layout;
 using Tessera.Styles;
 using Tessera.Widgets;
@@ -10,41 +10,28 @@ using Tessera.Widgets;
 namespace Tessera.Controls;
 
 /// <summary>
-/// Represents a numeric text input with parsed submission events.
+///     Represents a numeric text input with parsed submission events.
 /// </summary>
 public sealed class NumberInput : Control
 {
     private readonly TextInputModel _input = new();
     private readonly WidgetStatePalette _statePalette = WidgetStatePalette.CreateDefault();
+    private long _consumedSubmitVersion;
     private bool _replaceOnNextCharacter = true;
     private long _submitVersion;
-    private long _consumedSubmitVersion;
 
     /// <summary>
-    /// Represents submitted.
+    ///     Represents title.
     /// </summary>
-    public event EventHandler<NumberInputSubmittedEventArgs>? Submitted;
+    public string Title { get; set; } = "Number Input";
 
     /// <summary>
-    /// Represents title.
+    ///     Represents focus marker.
     /// </summary>
-    public string Title
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = "Number Input";
+    public string FocusMarker { get; set; } = "*";
 
     /// <summary>
-    /// Represents focus marker.
-    /// </summary>
-    public string FocusMarker
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = "*";
-
-    /// <summary>
-    /// Represents show focus marker.
+    ///     Represents show focus marker.
     /// </summary>
     public bool ShowFocusMarker
     {
@@ -53,7 +40,7 @@ public sealed class NumberInput : Control
     } = true;
 
     /// <summary>
-    /// Represents title style.
+    ///     Represents title style.
     /// </summary>
     public TesseraStyle TitleStyle
     {
@@ -62,7 +49,7 @@ public sealed class NumberInput : Control
     } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Represents focused title style.
+    ///     Represents focused title style.
     /// </summary>
     public TesseraStyle FocusedTitleStyle
     {
@@ -71,7 +58,7 @@ public sealed class NumberInput : Control
     } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Represents value text style.
+    ///     Represents value text style.
     /// </summary>
     public TesseraStyle ValueTextStyle
     {
@@ -80,7 +67,7 @@ public sealed class NumberInput : Control
     } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Represents summary text style.
+    ///     Represents summary text style.
     /// </summary>
     public TesseraStyle SummaryTextStyle
     {
@@ -89,7 +76,7 @@ public sealed class NumberInput : Control
     } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Represents disabled text style.
+    ///     Represents disabled text style.
     /// </summary>
     public TesseraStyle DisabledTextStyle
     {
@@ -98,7 +85,7 @@ public sealed class NumberInput : Control
     } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the style applied to border glyphs when the control is not focused.
+    ///     Gets or sets the style applied to border glyphs when the control is not focused.
     /// </summary>
     public TesseraStyle BorderStyleText
     {
@@ -107,7 +94,7 @@ public sealed class NumberInput : Control
     } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the style applied to border glyphs when the control is focused.
+    ///     Gets or sets the style applied to border glyphs when the control is focused.
     /// </summary>
     public TesseraStyle FocusedBorderStyleText
     {
@@ -116,7 +103,7 @@ public sealed class NumberInput : Control
     } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Represents border.
+    ///     Represents border.
     /// </summary>
     public BorderStyle Border
     {
@@ -125,7 +112,7 @@ public sealed class NumberInput : Control
     } = BorderStyle.SingleLine;
 
     /// <summary>
-    /// Represents padding.
+    ///     Represents padding.
     /// </summary>
     public Thickness Padding
     {
@@ -134,7 +121,7 @@ public sealed class NumberInput : Control
     }
 
     /// <summary>
-    /// Represents min.
+    ///     Represents min.
     /// </summary>
     public double Min
     {
@@ -143,7 +130,7 @@ public sealed class NumberInput : Control
     }
 
     /// <summary>
-    /// Represents max.
+    ///     Represents max.
     /// </summary>
     public double Max
     {
@@ -152,7 +139,7 @@ public sealed class NumberInput : Control
     } = 100.0;
 
     /// <summary>
-    /// Represents step.
+    ///     Represents step.
     /// </summary>
     public double Step
     {
@@ -161,7 +148,7 @@ public sealed class NumberInput : Control
     } = 1.0;
 
     /// <summary>
-    /// Represents precision.
+    ///     Represents precision.
     /// </summary>
     public int Precision
     {
@@ -170,17 +157,17 @@ public sealed class NumberInput : Control
     } = 2;
 
     /// <summary>
-    /// Gets or sets the value.
+    ///     Gets or sets the value.
     /// </summary>
     public double Value { get; private set; }
 
     /// <summary>
-    /// Represents text.
+    ///     Represents text.
     /// </summary>
     public string Text => _input.Value;
 
     /// <summary>
-    /// Gets or sets the last submitted value.
+    ///     Gets or sets the last submitted value.
     /// </summary>
     public double? LastSubmittedValue { get; private set; }
 
@@ -206,7 +193,12 @@ public sealed class NumberInput : Control
     }
 
     /// <summary>
-    /// Executes set value.
+    ///     Represents submitted.
+    /// </summary>
+    public event EventHandler<NumberInputSubmittedEventArgs>? Submitted;
+
+    /// <summary>
+    ///     Executes set value.
     /// </summary>
     /// <param name="value">The value value.</param>
     public void SetValue(double value)
@@ -216,7 +208,7 @@ public sealed class NumberInput : Control
     }
 
     /// <summary>
-    /// Executes try consume submission.
+    ///     Executes try consume submission.
     /// </summary>
     /// <param name="value">The value value.</param>
     /// <returns><see langword="true" /> when try consume submission succeeds.</returns>
@@ -348,7 +340,8 @@ public sealed class NumberInput : Control
         canvas.WriteText(content.X, content.Y, valueText, content.Width);
         if (content.Height > 1)
         {
-            var summary = $"value={NumberInputFormatting.Format(Value, Precision)} range=[{NumberInputFormatting.Format(Min, Precision)}, {NumberInputFormatting.Format(Max, Precision)}]";
+            var summary =
+                $"value={NumberInputFormatting.Format(Value, Precision)} range=[{NumberInputFormatting.Format(Min, Precision)}, {NumberInputFormatting.Format(Max, Precision)}]";
             summary = _statePalette.Render(summary, states);
             var summaryStyle = ResolveSummaryStyle();
             if (!summaryStyle.IsEmpty)

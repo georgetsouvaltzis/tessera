@@ -1,8 +1,9 @@
 using System.ComponentModel;
+
 namespace Tessera.Controls;
 
 /// <summary>
-/// Defines advanced rendering options for a <see cref="LineChart"/>.
+///     Defines advanced rendering options for a <see cref="LineChart" />.
 /// </summary>
 [EditorBrowsable(EditorBrowsableState.Advanced)]
 public readonly record struct LineChartOptions(

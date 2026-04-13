@@ -1,9 +1,9 @@
 namespace Tessera.Styles;
 
 /// <summary>
-/// Applies semantic theme tokens to style-enabled controls.
+///     Applies semantic theme tokens to style-enabled controls.
 /// </summary>
-public static partial class TesseraThemeControlExtensions
+public static class TesseraThemeControlExtensions
 {
     internal static TesseraStyle ApplyDefault(TesseraStyle current, TesseraStyle fallback)
     {

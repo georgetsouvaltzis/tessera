@@ -14,13 +14,7 @@ public sealed class SplitViewControlTests
     {
         var first = new SpyControl("left");
         var second = new SpyControl("right");
-        var control = new SplitView
-        {
-            Border = BorderStyle.None,
-            IsFocused = true,
-            First = first,
-            Second = second,
-        };
+        var control = new SplitView { Border = BorderStyle.None, IsFocused = true, First = first, Second = second };
 
         var firstHandled = control.Handle(new KeyPressed(Key.Down));
         var tabHandled = control.Handle(new KeyPressed(Key.Tab));
@@ -46,13 +40,13 @@ public sealed class SplitViewControlTests
             Ratio = 0.5d,
             Orientation = SplitViewOrientation.Horizontal,
             First = new Label { Text = "first", Border = BorderStyle.None },
-            Second = new Label { Text = "second", Border = BorderStyle.None },
+            Second = new Label { Text = "second", Border = BorderStyle.None }
         };
         var bounds = new Rect(0, 0, 40, 8);
 
-        var press = control.Handle(new PointerInput(PointerEventKind.Press, PointerButton.Left, X: 20, Y: 1), bounds);
-        var move = control.Handle(new PointerInput(PointerEventKind.Motion, PointerButton.None, X: 30, Y: 1), bounds);
-        var release = control.Handle(new PointerInput(PointerEventKind.Release, PointerButton.Left, X: 30, Y: 1), bounds);
+        var press = control.Handle(new PointerInput(PointerEventKind.Press, PointerButton.Left, 20, 1), bounds);
+        var move = control.Handle(new PointerInput(PointerEventKind.Motion, PointerButton.None, 30, 1), bounds);
+        var release = control.Handle(new PointerInput(PointerEventKind.Release, PointerButton.Left, 30, 1), bounds);
 
         TestAssert.True(press, "Press on divider should start drag.");
         TestAssert.True(move, "Drag motion should update ratio.");
@@ -71,11 +65,11 @@ public sealed class SplitViewControlTests
             Orientation = SplitViewOrientation.Horizontal,
             Ratio = 0.5d,
             First = first,
-            Second = second,
+            Second = second
         };
         var bounds = new Rect(0, 0, 40, 8);
 
-        var changed = control.Handle(new PointerInput(PointerEventKind.Press, PointerButton.Left, X: 30, Y: 2), bounds);
+        var changed = control.Handle(new PointerInput(PointerEventKind.Press, PointerButton.Left, 30, 2), bounds);
 
         TestAssert.True(changed, "Pointer press in second pane should be handled.");
         TestAssert.Equal(1, control.ActivePaneIndex, "Second pane should become active.");
@@ -96,13 +90,15 @@ public sealed class SplitViewControlTests
             First = new Label { Text = "alpha", Border = BorderStyle.None },
             Second = new Label { Text = "beta", Border = BorderStyle.None },
             FocusedBorderStyleText = borderStyle,
-            FocusedDividerStyle = dividerStyle,
+            FocusedDividerStyle = dividerStyle
         };
 
         var output = RenderControl(control, 40, 8, CanvasTextMode.GraphemeAware);
 
-        TestAssert.True(output.Contains(borderStyle.Render("┌"), StringComparison.Ordinal), "Focused border style should apply to border glyphs.");
-        TestAssert.True(output.Contains(dividerStyle.Render("│"), StringComparison.Ordinal), "Focused divider style should apply to divider glyphs.");
+        TestAssert.True(output.Contains(borderStyle.Render("┌"), StringComparison.Ordinal),
+            "Focused border style should apply to border glyphs.");
+        TestAssert.True(output.Contains(dividerStyle.Render("│"), StringComparison.Ordinal),
+            "Focused divider style should apply to divider glyphs.");
     }
 
     [Test]
@@ -112,17 +108,19 @@ public sealed class SplitViewControlTests
         {
             Border = BorderStyle.None,
             First = new Label { Text = "left pane", Border = BorderStyle.None },
-            Second = new Label { Text = "right pane", Border = BorderStyle.None },
+            Second = new Label { Text = "right pane", Border = BorderStyle.None }
         };
 
         var first = RenderControl(control, 44, 9);
         var second = RenderControl(control, 44, 9);
 
         TestAssert.Equal(first, second, "SplitView should render deterministically for identical state.");
-        TestAssert.True(!first.Contains("\u001b[", StringComparison.Ordinal), "Default SplitView output should remain monochrome.");
+        TestAssert.True(!first.Contains("\e[", StringComparison.Ordinal),
+            "Default SplitView output should remain monochrome.");
     }
 
-    private static string RenderControl(SplitView control, int width, int height, CanvasTextMode mode = CanvasTextMode.Fast)
+    private static string RenderControl(SplitView control, int width, int height,
+        CanvasTextMode mode = CanvasTextMode.Fast)
     {
         var canvas = new Canvas(width, height, mode);
         control.Render(canvas, new Rect(0, 0, width, height));
@@ -133,7 +131,7 @@ public sealed class SplitViewControlTests
     {
         public int KeyHandleCount { get; private set; }
         public int PointerHandleCount { get; private set; }
-        public Rect LastBounds { get; private set; } = new Rect(0, 0, 0, 0);
+        public Rect LastBounds { get; private set; } = new(0, 0, 0, 0);
 
         public override bool Handle(Message message)
         {

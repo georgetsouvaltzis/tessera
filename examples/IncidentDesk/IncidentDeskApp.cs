@@ -1,32 +1,108 @@
-using Tessera.Controls;
-using Tessera.Layout;
-using Tessera.Styles;
 using System.Text;
+using Tessera.Controls;
+using Tessera.Styles;
 
 namespace Tessera.Examples.IncidentDesk;
 
 internal sealed partial class IncidentDeskApp : TesseraApp
 {
-    private readonly TesseraTheme _theme = IncidentDeskTheme.DefaultTheme;
+    private readonly Button _ackButton =
+        new() { Text = "Acknowledge", Description = "a · take command", Padding = Thickness.All(1) };
+
+    private readonly Button _assignButton =
+        new() { Text = "Assign", Description = "g · cycle owner", Padding = Thickness.All(1) };
+
+    private readonly Label _briefing = new()
+    {
+        Title = "Incident Briefing",
+        Border = BorderStyle.Rounded,
+        Padding = Thickness.All(1)
+    };
+
+    private readonly Label _crewPulse = new()
+    {
+        Title = "Crew Footprint",
+        Border = BorderStyle.Rounded,
+        Padding = Thickness.Symmetric(1)
+    };
+
+    private readonly Button _escalateButton =
+        new() { Text = "Escalate", Description = "e · raise severity", Padding = Thickness.All(1) };
+
+    private readonly Label _escalationPulse = new()
+    {
+        Title = "Escalation Pressure",
+        Border = BorderStyle.Rounded,
+        Padding = Thickness.Symmetric(1)
+    };
+
+    private readonly StatusBar _footer = new() { Fill = ' ' };
+
+    private readonly IncidentHeroControl _hero = new()
+    {
+        Title = "Incident Command Deck",
+        Border = BorderStyle.Rounded,
+        Padding = Thickness.Symmetric(1)
+    };
+
+    private readonly LogTailPanel _logs = new()
+    {
+        Title = "Live Telemetry · F4",
+        Border = BorderStyle.Rounded,
+        Padding = Thickness.All(1),
+        FocusMarker = "◈",
+        ShowTimestamp = true,
+        ShowSource = true,
+        ShowLevel = true,
+        AutoFollow = true
+    };
+
+    private readonly TextArea _notes = new()
+    {
+        Title = "Operator Notes · F3",
+        Border = BorderStyle.Rounded,
+        Padding = Thickness.All(1),
+        FocusMarker = "◈",
+        Wrap = true,
+        ShowLineNumbers = false
+    };
+
+    private readonly NotificationInbox _queue = new()
+    {
+        Title = "Incident Queue · F1",
+        Padding = Thickness.Symmetric(1),
+        FocusMarker = "◈",
+        ShowSource = true,
+        ShowTimestamp = true
+    };
+
+    private readonly Label _queuePulse =
+        new() { Title = "Open Queue", Border = BorderStyle.Rounded, Padding = Thickness.Symmetric(1) };
+
+    private readonly Button _reopenButton =
+        new() { Text = "Reopen", Description = "o · restore active mode", Padding = Thickness.All(1) };
+
+    private readonly Button _resolveButton =
+        new() { Text = "Resolve", Description = "v · verify recovery", Padding = Thickness.All(1) };
+
+    private readonly Label _responderCard =
+        new() { Title = "Responder Lane", Border = BorderStyle.Rounded, Padding = Thickness.All(1) };
+
     private readonly IncidentDeskState _state = IncidentDeskState.CreateSeed();
 
-    private readonly IncidentHeroControl _hero = new() { Title = "Incident Command Deck", Border = BorderStyle.Rounded, Padding = Thickness.Symmetric(1, 0) };
-    private readonly Label _queuePulse = new() { Title = "Open Queue", Border = BorderStyle.Rounded, Padding = Thickness.Symmetric(1, 0) };
-    private readonly Label _escalationPulse = new() { Title = "Escalation Pressure", Border = BorderStyle.Rounded, Padding = Thickness.Symmetric(1, 0) };
-    private readonly Label _crewPulse = new() { Title = "Crew Footprint", Border = BorderStyle.Rounded, Padding = Thickness.Symmetric(1, 0) };
-    private readonly NotificationInbox _queue = new() { Title = "Incident Queue · F1", Padding = Thickness.Symmetric(1, 0), FocusMarker = "◈", ShowSource = true, ShowTimestamp = true };
-    private readonly Label _briefing = new() { Title = "Incident Briefing", Border = BorderStyle.Rounded, Padding = Thickness.All(1) };
-    private readonly ActivityFeed _timeline = new() { Title = "Event Narrative · F2", Border = BorderStyle.Rounded, Padding = Thickness.All(1), FocusMarker = "◈", ShowTimestamp = true };
-    private readonly Label _responderCard = new() { Title = "Responder Lane", Border = BorderStyle.Rounded, Padding = Thickness.All(1) };
-    private readonly TextArea _notes = new() { Title = "Operator Notes · F3", Border = BorderStyle.Rounded, Padding = Thickness.All(1), FocusMarker = "◈", Wrap = true, ShowLineNumbers = false };
-    private readonly Button _ackButton = new() { Text = "Acknowledge", Description = "a · take command", Padding = Thickness.All(1) };
-    private readonly Button _assignButton = new() { Text = "Assign", Description = "g · cycle owner", Padding = Thickness.All(1) };
-    private readonly Button _escalateButton = new() { Text = "Escalate", Description = "e · raise severity", Padding = Thickness.All(1) };
-    private readonly Button _resolveButton = new() { Text = "Resolve", Description = "v · verify recovery", Padding = Thickness.All(1) };
-    private readonly Button _reopenButton = new() { Text = "Reopen", Description = "o · restore active mode", Padding = Thickness.All(1) };
-    private readonly Button _syncButton = new() { Text = "Sync", Description = "s · refresh telemetry", Padding = Thickness.All(1) };
-    private readonly LogTailPanel _logs = new() { Title = "Live Telemetry · F4", Border = BorderStyle.Rounded, Padding = Thickness.All(1), FocusMarker = "◈", ShowTimestamp = true, ShowSource = true, ShowLevel = true, AutoFollow = true };
-    private readonly StatusBar _footer = new() { Fill = ' ' };
+    private readonly Button _syncButton =
+        new() { Text = "Sync", Description = "s · refresh telemetry", Padding = Thickness.All(1) };
+
+    private readonly TesseraTheme _theme = IncidentDeskTheme.DefaultTheme;
+
+    private readonly ActivityFeed _timeline = new()
+    {
+        Title = "Event Narrative · F2",
+        Border = BorderStyle.Rounded,
+        Padding = Thickness.All(1),
+        FocusMarker = "◈",
+        ShowTimestamp = true
+    };
 
     private bool _syncingQueueSelection;
 
@@ -314,7 +390,8 @@ internal sealed partial class IncidentDeskApp : TesseraApp
         _hero.StatusStyle = StatusChipStyle(incident.Status);
 
         _queuePulse.Text = $"Open\n{summary.OpenCount:00} active incidents";
-        _escalationPulse.Text = $"Critical / escalated\n{summary.CriticalCount:00} sev1  ·  {summary.EscalatedCount:00} escalated";
+        _escalationPulse.Text =
+            $"Critical / escalated\n{summary.CriticalCount:00} sev1  ·  {summary.EscalatedCount:00} escalated";
         _crewPulse.Text = $"Responders online\n{summary.ActiveResponders:00} crew  ·  {incident.PrimaryOwner} driving";
 
         RefreshQueue();
@@ -342,8 +419,8 @@ internal sealed partial class IncidentDeskApp : TesseraApp
                 IncidentDeskState.NotificationLevel(incident.Severity),
                 incident.OpenedAt,
                 $"{IncidentDeskState.StatusText(incident.Status)} · {incident.PrimaryOwner}",
-                isRead: !incident.HasUnreadUpdate,
-                isPinned: incident.IsPinned))
+                !incident.HasUnreadUpdate,
+                incident.IsPinned))
             .ToList();
 
         _syncingQueueSelection = true;
@@ -396,15 +473,18 @@ internal sealed partial class IncidentDeskApp : TesseraApp
     {
         _ackButton.IsDisabled = incident.Status == IncidentStatus.Resolved;
         _assignButton.IsDisabled = false;
-        _escalateButton.IsDisabled = incident.Status == IncidentStatus.Resolved && incident.Severity == IncidentSeverity.Critical;
+        _escalateButton.IsDisabled =
+            incident.Status == IncidentStatus.Resolved && incident.Severity == IncidentSeverity.Critical;
         _resolveButton.IsDisabled = incident.Status == IncidentStatus.Resolved;
-        _reopenButton.IsDisabled = incident.Status != IncidentStatus.Resolved && incident.Status != IncidentStatus.Monitoring;
+        _reopenButton.IsDisabled =
+            incident.Status != IncidentStatus.Resolved && incident.Status != IncidentStatus.Monitoring;
         _syncButton.IsDisabled = false;
     }
 
     private void RefreshFooter(IncidentRecord incident)
     {
-        _footer.LeftText = $"{incident.Id}  {IncidentDeskState.SeverityText(incident.Severity)}  {IncidentDeskState.StatusText(incident.Status)}  owner {incident.PrimaryOwner}  {IncidentDeskState.SlaText(incident)}";
+        _footer.LeftText =
+            $"{incident.Id}  {IncidentDeskState.SeverityText(incident.Severity)}  {IncidentDeskState.StatusText(incident.Status)}  owner {incident.PrimaryOwner}  {IncidentDeskState.SlaText(incident)}";
         _footer.RightText = $"F1 queue  F2 timeline  F3 notes  F4 logs  a g e v o s  ·  {_state.LastCommand}";
     }
 
@@ -436,7 +516,10 @@ internal sealed partial class IncidentDeskApp : TesseraApp
         RefreshSelectionState();
     }
 
-    private bool IsEditingNotes() => _notes.IsFocused;
+    private bool IsEditingNotes()
+    {
+        return _notes.IsFocused;
+    }
 
     private static void ConfigurePulseCard(Label card, TesseraStyle textStyle)
     {
@@ -460,22 +543,28 @@ internal sealed partial class IncidentDeskApp : TesseraApp
         button.DisabledLabelStyle = IncidentDeskTheme.Foreground(0x8E7A74);
     }
 
-    private static TesseraStyle SeverityChipStyle(IncidentSeverity severity) => severity switch
+    private static TesseraStyle SeverityChipStyle(IncidentSeverity severity)
     {
-        IncidentSeverity.Critical => IncidentDeskTheme.Chip(0xFFF4E8, 0x8D3228),
-        IncidentSeverity.High => IncidentDeskTheme.Chip(0xFFF4E8, 0x7B4A28),
-        IncidentSeverity.Medium => IncidentDeskTheme.Chip(0xFFF4E8, 0x5C5447),
-        _ => IncidentDeskTheme.Chip(0xEAF7EF, 0x345043),
-    };
+        return severity switch
+        {
+            IncidentSeverity.Critical => IncidentDeskTheme.Chip(0xFFF4E8, 0x8D3228),
+            IncidentSeverity.High => IncidentDeskTheme.Chip(0xFFF4E8, 0x7B4A28),
+            IncidentSeverity.Medium => IncidentDeskTheme.Chip(0xFFF4E8, 0x5C5447),
+            _ => IncidentDeskTheme.Chip(0xEAF7EF, 0x345043)
+        };
+    }
 
-    private static TesseraStyle StatusChipStyle(IncidentStatus status) => status switch
+    private static TesseraStyle StatusChipStyle(IncidentStatus status)
     {
-        IncidentStatus.Escalated => IncidentDeskTheme.Chip(0xFFF4E8, 0x6D231E),
-        IncidentStatus.Investigating => IncidentDeskTheme.Chip(0xFFF4E8, 0x5D4335),
-        IncidentStatus.Acknowledged => IncidentDeskTheme.Chip(0xFFF4E8, 0x4B5640),
-        IncidentStatus.Monitoring => IncidentDeskTheme.Chip(0xF4F7E9, 0x385548),
-        _ => IncidentDeskTheme.Chip(0xEAF7EF, 0x345043),
-    };
+        return status switch
+        {
+            IncidentStatus.Escalated => IncidentDeskTheme.Chip(0xFFF4E8, 0x6D231E),
+            IncidentStatus.Investigating => IncidentDeskTheme.Chip(0xFFF4E8, 0x5D4335),
+            IncidentStatus.Acknowledged => IncidentDeskTheme.Chip(0xFFF4E8, 0x4B5640),
+            IncidentStatus.Monitoring => IncidentDeskTheme.Chip(0xF4F7E9, 0x385548),
+            _ => IncidentDeskTheme.Chip(0xEAF7EF, 0x345043)
+        };
+    }
 
     private static IEnumerable<string> ComposeBlock(string label, string value, int width)
     {
@@ -549,7 +638,7 @@ internal enum IncidentDeskAction
     Escalate,
     Resolve,
     Reopen,
-    Sync,
+    Sync
 }
 
 internal sealed record IncidentDeskActionMessage(IncidentDeskAction Action) : Message;

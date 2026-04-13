@@ -1,6 +1,5 @@
 using Tessera.Components.Primitives;
 using Tessera.Controls;
-using Tessera.Layout;
 using Tessera.Styles;
 
 namespace Tessera.Examples.DownloadCenter;
@@ -37,9 +36,12 @@ internal sealed class DownloadHeroControl : Control
             return;
         }
 
-        WriteLine(canvas, content, 0, $"{ApplyStyle(Title.ToUpperInvariant(), TitleStyle)}  {ApplyStyle(ClockText, ClockStyle)}");
-        WriteLine(canvas, content, 1, $"{ApplyStyle($"[{SummaryText}]", BadgeStyle)} {ApplyStyle($"[{ThroughputText}]", BadgeStyle)} {ApplyStyle($"[{PressureText}]", BadgeStyle)}");
-        WriteLine(canvas, content, 2, ApplyStyle("transfer lanes, retry choreography, and orbit cache pressure aligned", MetaStyle));
+        WriteLine(canvas, content, 0,
+            $"{ApplyStyle(Title.ToUpperInvariant(), TitleStyle)}  {ApplyStyle(ClockText, ClockStyle)}");
+        WriteLine(canvas, content, 1,
+            $"{ApplyStyle($"[{SummaryText}]", BadgeStyle)} {ApplyStyle($"[{ThroughputText}]", BadgeStyle)} {ApplyStyle($"[{PressureText}]", BadgeStyle)}");
+        WriteLine(canvas, content, 2,
+            ApplyStyle("transfer lanes, retry choreography, and orbit cache pressure aligned", MetaStyle));
         WriteLine(canvas, content, 3, ApplyStyle(CommandText, CommandStyle));
     }
 

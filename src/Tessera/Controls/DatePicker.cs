@@ -1,15 +1,15 @@
-﻿using Tessera.Components.Primitives;
+using System.Globalization;
+using Tessera.Components.Primitives;
 using Tessera.Components.Primitives.Internal;
-using Tessera.Controls.Internal;
 using Tessera.Components.Styling;
+using Tessera.Controls.Internal;
 using Tessera.Layout;
 using Tessera.Styles;
-using System.Globalization;
 
 namespace Tessera.Controls;
 
 /// <summary>
-/// Represents a control for selecting a calendar date.
+///     Represents a control for selecting a calendar date.
 /// </summary>
 public sealed class DatePicker : Control
 {
@@ -17,30 +17,17 @@ public sealed class DatePicker : Control
     private DateOnly? _hoveredDate;
 
     /// <summary>
-    /// Represents date changed.
+    ///     Represents title.
     /// </summary>
-    public event EventHandler<DateChangedEventArgs>? DateChanged;
+    public string Title { get; set; } = "Date Picker";
 
     /// <summary>
-    /// Represents title.
+    ///     Represents focus marker.
     /// </summary>
-    public string Title
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = "Date Picker";
+    public string FocusMarker { get; set; } = "*";
 
     /// <summary>
-    /// Represents focus marker.
-    /// </summary>
-    public string FocusMarker
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = "*";
-
-    /// <summary>
-    /// Represents show focus marker.
+    ///     Represents show focus marker.
     /// </summary>
     public bool ShowFocusMarker
     {
@@ -49,7 +36,7 @@ public sealed class DatePicker : Control
     } = true;
 
     /// <summary>
-    /// Represents title style.
+    ///     Represents title style.
     /// </summary>
     public TesseraStyle TitleStyle
     {
@@ -58,7 +45,7 @@ public sealed class DatePicker : Control
     } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Represents focused title style.
+    ///     Represents focused title style.
     /// </summary>
     public TesseraStyle FocusedTitleStyle
     {
@@ -67,7 +54,7 @@ public sealed class DatePicker : Control
     } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Represents month header style.
+    ///     Represents month header style.
     /// </summary>
     public TesseraStyle MonthHeaderStyle
     {
@@ -76,7 +63,7 @@ public sealed class DatePicker : Control
     } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Represents weekday header style.
+    ///     Represents weekday header style.
     /// </summary>
     public TesseraStyle WeekdayHeaderStyle
     {
@@ -85,7 +72,7 @@ public sealed class DatePicker : Control
     } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Represents day style.
+    ///     Represents day style.
     /// </summary>
     public TesseraStyle DayStyle
     {
@@ -94,7 +81,7 @@ public sealed class DatePicker : Control
     } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Represents selected day style.
+    ///     Represents selected day style.
     /// </summary>
     public TesseraStyle SelectedDayStyle
     {
@@ -103,7 +90,7 @@ public sealed class DatePicker : Control
     } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Represents hovered day style.
+    ///     Represents hovered day style.
     /// </summary>
     public TesseraStyle HoveredDayStyle
     {
@@ -112,7 +99,7 @@ public sealed class DatePicker : Control
     } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Represents disabled day style.
+    ///     Represents disabled day style.
     /// </summary>
     public TesseraStyle DisabledDayStyle
     {
@@ -121,7 +108,7 @@ public sealed class DatePicker : Control
     } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the style applied to border glyphs when the control is not focused.
+    ///     Gets or sets the style applied to border glyphs when the control is not focused.
     /// </summary>
     public TesseraStyle BorderStyleText
     {
@@ -130,7 +117,7 @@ public sealed class DatePicker : Control
     } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the style applied to border glyphs when the control is focused.
+    ///     Gets or sets the style applied to border glyphs when the control is focused.
     /// </summary>
     public TesseraStyle FocusedBorderStyleText
     {
@@ -139,7 +126,7 @@ public sealed class DatePicker : Control
     } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Represents border.
+    ///     Represents border.
     /// </summary>
     public BorderStyle Border
     {
@@ -148,7 +135,7 @@ public sealed class DatePicker : Control
     } = BorderStyle.SingleLine;
 
     /// <summary>
-    /// Represents padding.
+    ///     Represents padding.
     /// </summary>
     public Thickness Padding
     {
@@ -157,17 +144,17 @@ public sealed class DatePicker : Control
     }
 
     /// <summary>
-    /// Gets or sets the selected date.
+    ///     Gets or sets the selected date.
     /// </summary>
     public DateOnly SelectedDate { get; private set; } = DateOnly.FromDateTime(DateTime.UtcNow.Date);
 
     /// <summary>
-    /// Gets or sets the current month.
+    ///     Gets or sets the current month.
     /// </summary>
     public DateOnly CurrentMonth { get; private set; } = new(DateTime.UtcNow.Year, DateTime.UtcNow.Month, 1);
 
     /// <summary>
-    /// Gets or sets the last committed date.
+    ///     Gets or sets the last committed date.
     /// </summary>
     public DateOnly? LastCommittedDate { get; private set; }
 
@@ -193,7 +180,12 @@ public sealed class DatePicker : Control
     }
 
     /// <summary>
-    /// Executes set date.
+    ///     Represents date changed.
+    /// </summary>
+    public event EventHandler<DateChangedEventArgs>? DateChanged;
+
+    /// <summary>
+    ///     Executes set date.
     /// </summary>
     /// <param name="date">The date value.</param>
     public void SetDate(DateOnly date)
@@ -388,7 +380,7 @@ public sealed class DatePicker : Control
         var startOffset = ((int)first.DayOfWeek + 6) % 7;
         var daysInMonth = DateTime.DaysInMonth(CurrentMonth.Year, CurrentMonth.Month);
         var day = 1;
-        for (var row = 0; row < 6 && (content.Y + 2 + row) < content.Bottom; row++)
+        for (var row = 0; row < 6 && content.Y + 2 + row < content.Bottom; row++)
         {
             for (var col = 0; col < 7; col++)
             {
@@ -398,7 +390,7 @@ public sealed class DatePicker : Control
                     continue;
                 }
 
-                var x = content.X + (col * 3);
+                var x = content.X + col * 3;
                 if (x + 1 >= content.Right)
                 {
                     continue;
@@ -406,7 +398,8 @@ public sealed class DatePicker : Control
 
                 var date = new DateOnly(CurrentMonth.Year, CurrentMonth.Month, day);
                 var states = DatePickerStateResolver.ResolveDayStates(IsFocused, SelectedDate, _hoveredDate, date);
-                var dayText = _dayStatePalette.Render(day.ToString(CultureInfo.InvariantCulture).PadLeft(2, ' '), states);
+                var dayText =
+                    _dayStatePalette.Render(day.ToString(CultureInfo.InvariantCulture).PadLeft(2, ' '), states);
                 var dayStyle = ResolveDayStyle(date);
                 if (!dayStyle.IsEmpty)
                 {
@@ -425,7 +418,8 @@ public sealed class DatePicker : Control
 
     internal override LayoutMeasurement Measure(in Rect availableBounds)
     {
-        var width = Math.Max(20, ControlTextLayout.MeasureDisplayWidth(FormatTitleForMeasure()) + 4) + Padding.Horizontal;
+        var width = Math.Max(20, ControlTextLayout.MeasureDisplayWidth(FormatTitleForMeasure()) + 4) +
+                    Padding.Horizontal;
         var height = 8 + Padding.Vertical;
         if (Border != BorderStyle.None)
         {

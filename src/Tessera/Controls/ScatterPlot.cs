@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using Tessera.Components.Primitives;
 using Tessera.Controls.Internal;
 using Tessera.Layout;
@@ -6,7 +7,7 @@ using Tessera.Styles;
 namespace Tessera.Controls;
 
 /// <summary>
-/// Represents a scatter plot control for telemetry and analytical point series.
+///     Represents a scatter plot control for telemetry and analytical point series.
 /// </summary>
 public sealed class ScatterPlot : Control
 {
@@ -14,94 +15,86 @@ public sealed class ScatterPlot : Control
     private int? _capacity;
 
     /// <summary>
-    /// Gets or sets the chart title.
+    ///     Gets or sets the chart title.
     /// </summary>
-    public string Title
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = "Scatter Plot";
+    public string Title { get; set; } = "Scatter Plot";
 
     /// <summary>
-    /// Gets or sets the marker shown in the title when focused.
+    ///     Gets or sets the marker shown in the title when focused.
     /// </summary>
-    public string FocusMarker
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = "*";
+    public string FocusMarker { get; set; } = "*";
 
     /// <summary>
-    /// Gets or sets whether focused title marker text is rendered.
+    ///     Gets or sets whether focused title marker text is rendered.
     /// </summary>
     public bool ShowFocusMarker { get; set; } = true;
 
     /// <summary>
-    /// Gets or sets style used for title text when not focused.
+    ///     Gets or sets style used for title text when not focused.
     /// </summary>
     public TesseraStyle TitleStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets style used for title text when focused.
+    ///     Gets or sets style used for title text when focused.
     /// </summary>
     public TesseraStyle FocusedTitleStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets style used for plotted points.
+    ///     Gets or sets style used for plotted points.
     /// </summary>
     public TesseraStyle PointStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets style used for axis lines and axis labels.
+    ///     Gets or sets style used for axis lines and axis labels.
     /// </summary>
     public TesseraStyle AxisStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets style used for optional point labels.
+    ///     Gets or sets style used for optional point labels.
     /// </summary>
     public TesseraStyle LabelStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets style used for optional legend text.
+    ///     Gets or sets style used for optional legend text.
     /// </summary>
     public TesseraStyle LegendStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets an optional explicit minimum X value for scaling.
+    ///     Gets or sets an optional explicit minimum X value for scaling.
     /// </summary>
     public double? MinX { get; set; }
 
     /// <summary>
-    /// Gets or sets an optional explicit maximum X value for scaling.
+    ///     Gets or sets an optional explicit maximum X value for scaling.
     /// </summary>
     public double? MaxX { get; set; }
 
     /// <summary>
-    /// Gets or sets an optional explicit minimum Y value for scaling.
+    ///     Gets or sets an optional explicit minimum Y value for scaling.
     /// </summary>
     public double? MinY { get; set; }
 
     /// <summary>
-    /// Gets or sets an optional explicit maximum Y value for scaling.
+    ///     Gets or sets an optional explicit maximum Y value for scaling.
     /// </summary>
     public double? MaxY { get; set; }
 
     /// <summary>
-    /// Gets or sets advanced scatter rendering options.
+    ///     Gets or sets advanced scatter rendering options.
     /// </summary>
-    [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Advanced)]
+    [EditorBrowsable(EditorBrowsableState.Advanced)]
     public ScatterPlotOptions? Options { get; set; }
 
     /// <summary>
-    /// Gets currently configured points.
+    ///     Gets currently configured points.
     /// </summary>
     public IReadOnlyList<ScatterPlotPoint> Points => _points;
 
     /// <summary>
-    /// Gets or sets an optional retained point capacity.
+    ///     Gets or sets an optional retained point capacity.
     /// </summary>
     /// <remarks>
-    /// When set, older points are trimmed automatically after <see cref="SetPoints"/> and <see cref="Append"/>.
+    ///     When set, older points are trimmed automatically after <see cref="SetPoints" /> and <see cref="Append" />.
     /// </remarks>
     /// <exception cref="ArgumentOutOfRangeException">Thrown when the value is less than 1.</exception>
     public int? Capacity
@@ -120,7 +113,7 @@ public sealed class ScatterPlot : Control
     }
 
     /// <summary>
-    /// Replaces current points.
+    ///     Replaces current points.
     /// </summary>
     /// <param name="points">Point values to render.</param>
     public void SetPoints(IEnumerable<ScatterPlotPoint> points)
@@ -136,7 +129,7 @@ public sealed class ScatterPlot : Control
     }
 
     /// <summary>
-    /// Appends one point.
+    ///     Appends one point.
     /// </summary>
     /// <param name="point">The point to append.</param>
     public void Append(ScatterPlotPoint point)
@@ -146,10 +139,10 @@ public sealed class ScatterPlot : Control
     }
 
     /// <summary>
-    /// Trims retained points to the last <paramref name="count"/> values.
+    ///     Trims retained points to the last <paramref name="count" /> values.
     /// </summary>
     /// <param name="count">The number of trailing points to keep.</param>
-    /// <exception cref="ArgumentOutOfRangeException">Thrown when <paramref name="count"/> is negative.</exception>
+    /// <exception cref="ArgumentOutOfRangeException">Thrown when <paramref name="count" /> is negative.</exception>
     public void TrimToLast(int count)
     {
         if (count < 0)
@@ -170,7 +163,7 @@ public sealed class ScatterPlot : Control
     }
 
     /// <summary>
-    /// Clears all points.
+    ///     Clears all points.
     /// </summary>
     public void Clear()
     {
@@ -349,7 +342,7 @@ public sealed class ScatterPlot : Control
     {
         if (AxisStyle.IsEmpty)
         {
-            canvas.DrawVerticalLine(x, y, height, '│');
+            canvas.DrawVerticalLine(x, y, height);
             return;
         }
 
@@ -364,7 +357,7 @@ public sealed class ScatterPlot : Control
     {
         if (AxisStyle.IsEmpty)
         {
-            canvas.DrawHorizontalLine(x, y, width, '─');
+            canvas.DrawHorizontalLine(x, y, width);
             return;
         }
 
@@ -418,7 +411,7 @@ public sealed class ScatterPlot : Control
 
     private static string ApplyStyle(string text, TesseraStyle style)
     {
-        return style.IsEmpty ? text : style.Render(text ?? string.Empty);
+        return style.IsEmpty ? text : style.Render(text);
     }
 
     private void TrimToCapacity()

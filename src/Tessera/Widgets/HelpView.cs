@@ -1,5 +1,5 @@
-using Tessera.Widgets.Internal;
 using System.ComponentModel;
+using Tessera.Widgets.Internal;
 
 namespace Tessera.Widgets;
 

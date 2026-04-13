@@ -1,7 +1,7 @@
+using System.Globalization;
 using Tessera.Components.Primitives;
 using Tessera.Components.Primitives.Internal;
 using Tessera.Components.Styling;
-using System.Globalization;
 
 namespace Tessera.Controls.Internal;
 
@@ -49,9 +49,12 @@ internal static class TimePickerRenderer
             return;
         }
 
-        var hour = RenderField(value.Hour.ToString("D2", CultureInfo.InvariantCulture), TimeField.Hour, focused, disabled, readOnly, activeField, hoveredField, fieldStatePalette);
-        var minute = RenderField(value.Minute.ToString("D2", CultureInfo.InvariantCulture), TimeField.Minute, focused, disabled, readOnly, activeField, hoveredField, fieldStatePalette);
-        var second = RenderField(value.Second.ToString("D2", CultureInfo.InvariantCulture), TimeField.Second, focused, disabled, readOnly, activeField, hoveredField, fieldStatePalette);
+        var hour = RenderField(value.Hour.ToString("D2", CultureInfo.InvariantCulture), TimeField.Hour, focused,
+            disabled, readOnly, activeField, hoveredField, fieldStatePalette);
+        var minute = RenderField(value.Minute.ToString("D2", CultureInfo.InvariantCulture), TimeField.Minute, focused,
+            disabled, readOnly, activeField, hoveredField, fieldStatePalette);
+        var second = RenderField(value.Second.ToString("D2", CultureInfo.InvariantCulture), TimeField.Second, focused,
+            disabled, readOnly, activeField, hoveredField, fieldStatePalette);
         canvas.WriteText(content.X, content.Y, $"{hour}:{minute}:{second}", content.Width);
     }
 
@@ -65,7 +68,8 @@ internal static class TimePickerRenderer
         TimeField? hoveredField,
         WidgetStatePalette fieldStatePalette)
     {
-        var states = TimePickerStateResolver.ResolveFieldStates(focused, disabled, readOnly, activeField, hoveredField, field);
+        var states =
+            TimePickerStateResolver.ResolveFieldStates(focused, disabled, readOnly, activeField, hoveredField, field);
         return fieldStatePalette.Render(value, states);
     }
 }

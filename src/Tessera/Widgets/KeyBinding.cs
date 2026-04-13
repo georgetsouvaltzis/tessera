@@ -1,4 +1,5 @@
 using System.ComponentModel;
+using Tessera.Core.Messages;
 using Tessera.Internal;
 
 namespace Tessera.Widgets;
@@ -16,7 +17,8 @@ internal sealed class KeyBinding
 
         if (chords.Length == 0)
         {
-            foreach (var chord in keys.Split('/', StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries))
+            foreach (var chord in keys.Split('/',
+                         StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries))
             {
                 AddChord(chord);
             }
@@ -39,7 +41,7 @@ internal sealed class KeyBinding
         return KeyChord.TryFromKeyPress(key, out var chord) && _chords.Contains(chord);
     }
 
-    public bool Matches(global::Tessera.Core.Messages.KeyPressMsg key)
+    public bool Matches(KeyPressMsg key)
     {
         return TesseraMessageAdapter.ToPublic(key) is KeyPressed mapped && Matches(mapped);
     }
@@ -148,7 +150,7 @@ internal sealed class KeyBinding
                 "alt" => ModifierKeys.Alt,
                 "shift" => ModifierKeys.Shift,
                 "meta" => ModifierKeys.Meta,
-                _ => ModifierKeys.None,
+                _ => ModifierKeys.None
             };
 
             return modifier != ModifierKeys.None;
@@ -187,7 +189,7 @@ internal sealed class KeyBinding
                 "f12" => Key.F12,
                 "space" => Key.Character,
                 "plus" => Key.Character,
-                _ => Key.Unknown,
+                _ => Key.Unknown
             };
 
             if (keyCode == Key.Unknown)

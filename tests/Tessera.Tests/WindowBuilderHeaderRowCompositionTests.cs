@@ -10,19 +10,20 @@ public sealed class WindowBuilderHeaderRowCompositionTests
     [Test]
     public void WindowBuilderHeaderRowComposesConfiguredRowContent()
     {
-        var output = Render(new HeaderLayoutApp(useHeaderRowApi: true), width: 56, height: 8);
+        var output = Render(new HeaderLayoutApp(true), 56, 8);
         var firstLine = output.Split('\n', 2)[0];
 
         Assert.That(firstLine.Contains("Status", StringComparison.Ordinal), Is.True);
         Assert.That(firstLine.Contains("Actions", StringComparison.Ordinal), Is.True);
-        Assert.That(firstLine.IndexOf("Status", StringComparison.Ordinal), Is.LessThan(firstLine.IndexOf("Actions", StringComparison.Ordinal)));
+        Assert.That(firstLine.IndexOf("Status", StringComparison.Ordinal),
+            Is.LessThan(firstLine.IndexOf("Actions", StringComparison.Ordinal)));
     }
 
     [Test]
     public void WindowBuilderHeaderRowRemainsCompatibleWithExistingHeaderContentBuilderUsage()
     {
-        var headerRowOutput = Render(new HeaderLayoutApp(useHeaderRowApi: true), width: 56, height: 8);
-        var legacyHeaderOutput = Render(new HeaderLayoutApp(useHeaderRowApi: false), width: 56, height: 8);
+        var headerRowOutput = Render(new HeaderLayoutApp(true), 56, 8);
+        var legacyHeaderOutput = Render(new HeaderLayoutApp(false), 56, 8);
 
         Assert.That(headerRowOutput, Is.EqualTo(legacyHeaderOutput));
     }
@@ -35,25 +36,16 @@ public sealed class WindowBuilderHeaderRowCompositionTests
 
     private sealed class HeaderLayoutApp(bool useHeaderRowApi) : TesseraApp
     {
-        private readonly Label _status = new()
-        {
-            Border = BorderStyle.None,
-            Text = "Status",
-        };
+        private readonly Label _actions = new() { Border = BorderStyle.None, Text = "Actions" };
 
-        private readonly Label _actions = new()
-        {
-            Border = BorderStyle.None,
-            Text = "Actions",
-        };
+        private readonly Label _body = new() { Border = BorderStyle.None, Text = "Body" };
 
-        private readonly Label _body = new()
-        {
-            Border = BorderStyle.None,
-            Text = "Body",
-        };
+        private readonly Label _status = new() { Border = BorderStyle.None, Text = "Status" };
 
-        public override TesseraEffect? Update(Message message) => null;
+        public override TesseraEffect? Update(Message message)
+        {
+            return null;
+        }
 
         public override Screen Build(ScreenContext context)
         {
@@ -74,13 +66,12 @@ public sealed class WindowBuilderHeaderRowCompositionTests
                 {
                     window.Header(
                         1,
-                        header => header.Row(
-                            row =>
-                            {
-                                row.Gap(2);
-                                row.Auto(_status);
-                                row.Auto(_actions);
-                            }));
+                        header => header.Row(row =>
+                        {
+                            row.Gap(2);
+                            row.Auto(_status);
+                            row.Auto(_actions);
+                        }));
                 }
 
                 window.Body(_body);

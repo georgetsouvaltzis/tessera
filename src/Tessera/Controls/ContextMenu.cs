@@ -1,4 +1,4 @@
-﻿using System.ComponentModel;
+using System.ComponentModel;
 using Tessera.Components.Primitives;
 using Tessera.Components.Primitives.Internal;
 using Tessera.Controls.Internal;
@@ -8,97 +8,84 @@ using Tessera.Styles;
 namespace Tessera.Controls;
 
 /// <summary>
-/// Represents a pointer-anchored menu of contextual actions.
+///     Represents a pointer-anchored menu of contextual actions.
 /// </summary>
 public sealed class ContextMenu : Control
 {
-    private readonly List<ContextMenuItem> _items = [];
     private readonly List<ContextMenuRenderCache> _itemRenderCache = [];
-    private int _selectedIndex;
-    private int _hoveredIndex = -1;
+    private readonly List<ContextMenuItem> _items = [];
     private int _cachedItemWidth = 12;
-    private long _executionVersion;
     private long _consumedExecutionVersion;
+    private long _executionVersion;
     private ContextMenuGlyphSet _glyphs = ContextMenuGlyphSet.Default;
+    private int _hoveredIndex = -1;
+    private int _selectedIndex;
 
     /// <summary>
-    /// Occurs when a menu item is executed.
+    ///     Gets or sets the menu title.
     /// </summary>
-    public event EventHandler<ContextMenuItemExecutedEventArgs>? ItemExecuted;
+    public string Title { get; set; } = "Context";
 
     /// <summary>
-    /// Gets or sets the menu title.
+    ///     Gets or sets the marker appended to the title while focused when <see cref="ShowFocusMarker" /> is enabled.
     /// </summary>
-    public string Title
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = "Context";
+    public string FocusMarker { get; set; } = "*";
 
     /// <summary>
-    /// Gets or sets the marker appended to the title while focused when <see cref="ShowFocusMarker"/> is enabled.
-    /// </summary>
-    public string FocusMarker
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = "*";
-
-    /// <summary>
-    /// Gets or sets a value indicating whether the focus marker should be shown while focused.
+    ///     Gets or sets a value indicating whether the focus marker should be shown while focused.
     /// </summary>
     /// <remarks>
-    /// Defaults to <see langword="false"/> to preserve previous context-menu title output.
+    ///     Defaults to <see langword="false" /> to preserve previous context-menu title output.
     /// </remarks>
     public bool ShowFocusMarker { get; set; }
 
     /// <summary>
-    /// Gets or sets the title style.
+    ///     Gets or sets the title style.
     /// </summary>
     public TesseraStyle TitleStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the focused title style.
+    ///     Gets or sets the focused title style.
     /// </summary>
     public TesseraStyle FocusedTitleStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the item style.
+    ///     Gets or sets the item style.
     /// </summary>
     public TesseraStyle ItemStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the selected item style.
+    ///     Gets or sets the selected item style.
     /// </summary>
     public TesseraStyle SelectedItemStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the hovered item style.
+    ///     Gets or sets the hovered item style.
     /// </summary>
     public TesseraStyle HoveredItemStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the disabled item style.
+    ///     Gets or sets the disabled item style.
     /// </summary>
     public TesseraStyle DisabledItemStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the muted item style.
+    ///     Gets or sets the muted item style.
     /// </summary>
     public TesseraStyle MutedItemStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the style applied to border glyphs when the control is not focused.
+    ///     Gets or sets the style applied to border glyphs when the control is not focused.
     /// </summary>
     public TesseraStyle BorderStyleText { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the style applied to border glyphs when the control is focused.
+    ///     Gets or sets the style applied to border glyphs when the control is focused.
     /// </summary>
     public TesseraStyle FocusedBorderStyleText { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets row marker glyphs used for rendering.
+    ///     Gets or sets row marker glyphs used for rendering.
     /// </summary>
     public ContextMenuGlyphSet Glyphs
     {
@@ -116,12 +103,12 @@ public sealed class ContextMenu : Control
     }
 
     /// <summary>
-    /// Gets or sets whether is visible.
+    ///     Gets or sets whether is visible.
     /// </summary>
     public bool IsVisible { get; private set; }
 
     /// <summary>
-    /// Represents border.
+    ///     Represents border.
     /// </summary>
     public BorderStyle Border
     {
@@ -130,7 +117,7 @@ public sealed class ContextMenu : Control
     } = BorderStyle.Rounded;
 
     /// <summary>
-    /// Represents padding.
+    ///     Represents padding.
     /// </summary>
     public Thickness Padding
     {
@@ -139,22 +126,22 @@ public sealed class ContextMenu : Control
     }
 
     /// <summary>
-    /// Gets or sets the anchor x.
+    ///     Gets or sets the anchor x.
     /// </summary>
     public int AnchorX { get; private set; }
 
     /// <summary>
-    /// Gets or sets the anchor y.
+    ///     Gets or sets the anchor y.
     /// </summary>
     public int AnchorY { get; private set; }
 
     /// <summary>
-    /// Gets or sets the last executed item id.
+    ///     Gets or sets the last executed item id.
     /// </summary>
     public string? LastExecutedItemId { get; private set; }
 
     /// <summary>
-    /// Represents items.
+    ///     Represents items.
     /// </summary>
     public IReadOnlyList<ContextMenuItem> Items => _items;
 
@@ -180,7 +167,12 @@ public sealed class ContextMenu : Control
     }
 
     /// <summary>
-    /// Executes set items.
+    ///     Occurs when a menu item is executed.
+    /// </summary>
+    public event EventHandler<ContextMenuItemExecutedEventArgs>? ItemExecuted;
+
+    /// <summary>
+    ///     Executes set items.
     /// </summary>
     /// <param name="items">The items value.</param>
     public void SetItems(IEnumerable<ContextMenuItem> items)
@@ -204,7 +196,7 @@ public sealed class ContextMenu : Control
     }
 
     /// <summary>
-    /// Executes open at.
+    ///     Executes open at.
     /// </summary>
     /// <param name="x">The x value.</param>
     /// <param name="y">The y value.</param>
@@ -218,7 +210,7 @@ public sealed class ContextMenu : Control
     }
 
     /// <summary>
-    /// Executes close.
+    ///     Executes close.
     /// </summary>
     public void Close()
     {
@@ -268,7 +260,8 @@ public sealed class ContextMenu : Control
     /// <inheritdoc />
     public override bool Handle(Message message, Rect bounds)
     {
-        if (!IsVisible || IsDisabled || message is not PointerInput pointer || !TryResolveMenuBounds(bounds, out var menuBounds, out var content))
+        if (!IsVisible || IsDisabled || message is not PointerInput pointer ||
+            !TryResolveMenuBounds(bounds, out var menuBounds, out var content))
         {
             return Handle(message);
         }
@@ -357,7 +350,7 @@ public sealed class ContextMenu : Control
     }
 
     /// <summary>
-    /// Executes try consume execution.
+    ///     Executes try consume execution.
     /// </summary>
     /// <param name="itemId">The item id value.</param>
     /// <returns><see langword="true" /> when try consume execution succeeds.</returns>
@@ -512,9 +505,9 @@ public sealed class ContextMenu : Control
     private static bool ContainsWithRightTolerance(Rect rect, int x, int y)
     {
         return y >= rect.Y
-            && y < rect.Bottom
-            && x >= rect.X
-            && x <= rect.Right;
+               && y < rect.Bottom
+               && x >= rect.X
+               && x <= rect.Right;
     }
 
     private bool TryResolveMenuBounds(Rect bounds, out Rect menuBounds, out Rect content)
@@ -555,9 +548,9 @@ public sealed class ContextMenu : Control
         var width = Math.Max(12, _cachedItemWidth);
 
         if (Border != BorderStyle.None)
+        // DrawBox writes title as $" {title} " inside a width-4 slot.
+        // Reserve enough room so focused markers in titles are not clipped.
         {
-            // DrawBox writes title as $" {title} " inside a width-4 slot.
-            // Reserve enough room so focused markers in titles are not clipped.
             width = Math.Max(width, ControlTextLayout.MeasureDisplayWidth(FormatTitleText()) + 6);
         }
 
@@ -597,7 +590,7 @@ public sealed class ContextMenu : Control
     {
         public static ContextMenuRenderCache Create(string title, ContextMenuGlyphSet glyphs)
         {
-            var safeTitle = title ?? string.Empty;
+            var safeTitle = title;
             return new ContextMenuRenderCache(
                 safeTitle,
                 string.Concat(glyphs.NormalRowMarker, glyphs.MarkerSeparator, safeTitle),
@@ -614,9 +607,9 @@ public sealed class ContextMenu : Control
                     ControlTextLayout.MeasureDisplayWidth(glyphs.SelectedRowMarker),
                     ControlTextLayout.MeasureDisplayWidth(glyphs.HoveredRowMarker)));
             return markerWidth
-                + ControlTextLayout.MeasureDisplayWidth(glyphs.MarkerSeparator)
-                + ControlTextLayout.MeasureDisplayWidth(title)
-                + 2;
+                   + ControlTextLayout.MeasureDisplayWidth(glyphs.MarkerSeparator)
+                   + ControlTextLayout.MeasureDisplayWidth(title)
+                   + 2;
         }
     }
 }

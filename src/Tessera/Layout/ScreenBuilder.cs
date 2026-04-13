@@ -1,15 +1,14 @@
-
 namespace Tessera.Layout;
 
 /// <summary>
-/// Imperative builder for window-shaped default screens.
+///     Imperative builder for window-shaped default screens.
 /// </summary>
 public sealed class WindowBuilder
 {
     private readonly WindowLayout _layout = new();
 
     /// <summary>
-    /// Sets the gap between named window sections.
+    ///     Sets the gap between named window sections.
     /// </summary>
     public WindowBuilder Gap(int gap)
     {
@@ -18,7 +17,7 @@ public sealed class WindowBuilder
     }
 
     /// <summary>
-    /// Sets the inner window padding.
+    ///     Sets the inner window padding.
     /// </summary>
     public WindowBuilder Padding(Thickness padding)
     {
@@ -27,12 +26,15 @@ public sealed class WindowBuilder
     }
 
     /// <summary>
-    /// Sets uniform inner window padding.
+    ///     Sets uniform inner window padding.
     /// </summary>
-    public WindowBuilder Padding(int all) => Padding(Thickness.All(all));
+    public WindowBuilder Padding(int all)
+    {
+        return Padding(Thickness.All(all));
+    }
 
     /// <summary>
-    /// Sets the top section to a fixed-height content block.
+    ///     Sets the top section to a fixed-height content block.
     /// </summary>
     public WindowBuilder Header(int height, LayoutNode content, Thickness margin = default)
     {
@@ -41,23 +43,27 @@ public sealed class WindowBuilder
     }
 
     /// <summary>
-    /// Builds the top section with an imperative content builder.
+    ///     Builds the top section with an imperative content builder.
     /// </summary>
-    public WindowBuilder Header(int height, Action<ContentBuilder> configure, Thickness margin = default) =>
-        Header(height, BuildContent(configure), margin);
+    public WindowBuilder Header(int height, Action<ContentBuilder> configure, Thickness margin = default)
+    {
+        return Header(height, BuildContent(configure), margin);
+    }
 
     /// <summary>
-    /// Builds the top section as a horizontal row of layout slots.
+    ///     Builds the top section as a horizontal row of layout slots.
     /// </summary>
     /// <param name="height">The fixed header height in rows.</param>
     /// <param name="configure">The callback that configures row items.</param>
     /// <param name="margin">Optional outer margin applied to the header slot.</param>
     /// <returns>The current builder instance for chaining.</returns>
-    public WindowBuilder HeaderRow(int height, Action<StackBuilder> configure, Thickness margin = default) =>
-        Header(height, StackBuilder.BuildRow(configure), margin);
+    public WindowBuilder HeaderRow(int height, Action<StackBuilder> configure, Thickness margin = default)
+    {
+        return Header(height, StackBuilder.BuildRow(configure), margin);
+    }
 
     /// <summary>
-    /// Sets the bottom section to a fixed-height content block.
+    ///     Sets the bottom section to a fixed-height content block.
     /// </summary>
     public WindowBuilder Footer(int height, LayoutNode content, Thickness margin = default)
     {
@@ -66,13 +72,15 @@ public sealed class WindowBuilder
     }
 
     /// <summary>
-    /// Builds the bottom section with an imperative content builder.
+    ///     Builds the bottom section with an imperative content builder.
     /// </summary>
-    public WindowBuilder Footer(int height, Action<ContentBuilder> configure, Thickness margin = default) =>
-        Footer(height, BuildContent(configure), margin);
+    public WindowBuilder Footer(int height, Action<ContentBuilder> configure, Thickness margin = default)
+    {
+        return Footer(height, BuildContent(configure), margin);
+    }
 
     /// <summary>
-    /// Sets the left section to a fixed-width content block.
+    ///     Sets the left section to a fixed-width content block.
     /// </summary>
     public WindowBuilder Left(int width, LayoutNode content, Thickness margin = default)
     {
@@ -81,19 +89,23 @@ public sealed class WindowBuilder
     }
 
     /// <summary>
-    /// Builds the left section with an imperative content builder.
+    ///     Builds the left section with an imperative content builder.
     /// </summary>
-    public WindowBuilder Left(int width, Action<ContentBuilder> configure, Thickness margin = default) =>
-        Left(width, BuildContent(configure), margin);
+    public WindowBuilder Left(int width, Action<ContentBuilder> configure, Thickness margin = default)
+    {
+        return Left(width, BuildContent(configure), margin);
+    }
 
     /// <summary>
-    /// Builds the left section as a panel.
+    ///     Builds the left section as a panel.
     /// </summary>
-    public WindowBuilder Left(int width, Action<PanelBuilder> configure, Thickness margin = default) =>
-        Left(width, BuildPanel(configure), margin);
+    public WindowBuilder Left(int width, Action<PanelBuilder> configure, Thickness margin = default)
+    {
+        return Left(width, BuildPanel(configure), margin);
+    }
 
     /// <summary>
-    /// Sets the right section to a fixed-width content block.
+    ///     Sets the right section to a fixed-width content block.
     /// </summary>
     public WindowBuilder Right(int width, LayoutNode content, Thickness margin = default)
     {
@@ -102,19 +114,23 @@ public sealed class WindowBuilder
     }
 
     /// <summary>
-    /// Builds the right section with an imperative content builder.
+    ///     Builds the right section with an imperative content builder.
     /// </summary>
-    public WindowBuilder Right(int width, Action<ContentBuilder> configure, Thickness margin = default) =>
-        Right(width, BuildContent(configure), margin);
+    public WindowBuilder Right(int width, Action<ContentBuilder> configure, Thickness margin = default)
+    {
+        return Right(width, BuildContent(configure), margin);
+    }
 
     /// <summary>
-    /// Builds the right section as a panel.
+    ///     Builds the right section as a panel.
     /// </summary>
-    public WindowBuilder Right(int width, Action<PanelBuilder> configure, Thickness margin = default) =>
-        Right(width, BuildPanel(configure), margin);
+    public WindowBuilder Right(int width, Action<PanelBuilder> configure, Thickness margin = default)
+    {
+        return Right(width, BuildPanel(configure), margin);
+    }
 
     /// <summary>
-    /// Sets the main body content.
+    ///     Sets the main body content.
     /// </summary>
     public WindowBuilder Body(LayoutNode content)
     {
@@ -123,12 +139,15 @@ public sealed class WindowBuilder
     }
 
     /// <summary>
-    /// Builds the main body content imperatively.
+    ///     Builds the main body content imperatively.
     /// </summary>
-    public WindowBuilder Body(Action<ContentBuilder> configure) => Body(BuildContent(configure));
+    public WindowBuilder Body(Action<ContentBuilder> configure)
+    {
+        return Body(BuildContent(configure));
+    }
 
     /// <summary>
-    /// Sets the overlay content.
+    ///     Sets the overlay content.
     /// </summary>
     public WindowBuilder Overlay(LayoutNode content)
     {
@@ -137,11 +156,17 @@ public sealed class WindowBuilder
     }
 
     /// <summary>
-    /// Builds the overlay content imperatively.
+    ///     Builds the overlay content imperatively.
     /// </summary>
-    public WindowBuilder Overlay(Action<ContentBuilder> configure) => Overlay(BuildContent(configure));
+    public WindowBuilder Overlay(Action<ContentBuilder> configure)
+    {
+        return Overlay(BuildContent(configure));
+    }
 
-    internal WindowLayout Build() => _layout;
+    internal WindowLayout Build()
+    {
+        return _layout;
+    }
 
     private static LayoutNode BuildContent(Action<ContentBuilder> configure)
     {
@@ -161,14 +186,14 @@ public sealed class WindowBuilder
 }
 
 /// <summary>
-/// Imperative builder for nested layout content.
+///     Imperative builder for nested layout content.
 /// </summary>
 public sealed class ContentBuilder
 {
     private LayoutNode? _content;
 
     /// <summary>
-    /// Uses the supplied layout content directly.
+    ///     Uses the supplied layout content directly.
     /// </summary>
     public ContentBuilder Use(LayoutNode content)
     {
@@ -177,7 +202,7 @@ public sealed class ContentBuilder
     }
 
     /// <summary>
-    /// Centers content within the available bounds.
+    ///     Centers content within the available bounds.
     /// </summary>
     public ContentBuilder Center(LayoutNode content, int? width = null, int? height = null, Thickness margin = default)
     {
@@ -186,16 +211,17 @@ public sealed class ContentBuilder
     }
 
     /// <summary>
-    /// Builds centered content imperatively.
+    ///     Builds centered content imperatively.
     /// </summary>
-    public ContentBuilder Center(Action<ContentBuilder> configure, int? width = null, int? height = null, Thickness margin = default)
+    public ContentBuilder Center(Action<ContentBuilder> configure, int? width = null, int? height = null,
+        Thickness margin = default)
     {
         _content = new CenterLayout(BuildNestedContent(configure), width, height, margin);
         return this;
     }
 
     /// <summary>
-    /// Wraps content in a panel.
+    ///     Wraps content in a panel.
     /// </summary>
     public ContentBuilder Panel(Action<PanelBuilder> configure)
     {
@@ -206,7 +232,7 @@ public sealed class ContentBuilder
     }
 
     /// <summary>
-    /// Builds a horizontal content row.
+    ///     Builds a horizontal content row.
     /// </summary>
     public ContentBuilder Row(Action<StackBuilder> configure)
     {
@@ -215,7 +241,7 @@ public sealed class ContentBuilder
     }
 
     /// <summary>
-    /// Builds a vertical content column.
+    ///     Builds a vertical content column.
     /// </summary>
     public ContentBuilder Column(Action<StackBuilder> configure)
     {
@@ -223,8 +249,10 @@ public sealed class ContentBuilder
         return this;
     }
 
-    internal LayoutNode Build() =>
-        _content ?? throw new InvalidOperationException("Content builder requires content to be configured.");
+    internal LayoutNode Build()
+    {
+        return _content ?? throw new InvalidOperationException("Content builder requires content to be configured.");
+    }
 
     private static LayoutNode BuildNestedContent(Action<ContentBuilder> configure)
     {
@@ -236,19 +264,27 @@ public sealed class ContentBuilder
 }
 
 /// <summary>
-/// Imperative builder for row and column content.
+///     Imperative builder for row and column content.
 /// </summary>
 public sealed class StackBuilder
 {
-    private readonly RowLayout? _row;
     private readonly ColumnLayout? _column;
+    private readonly RowLayout? _row;
 
-    private StackBuilder(RowLayout row) => _row = row;
+    private ColumnLayout Column => _column ?? throw new InvalidOperationException("Column builder is not active.");
 
-    private StackBuilder(ColumnLayout column) => _column = column;
+    private StackBuilder(RowLayout row)
+    {
+        _row = row;
+    }
+
+    private StackBuilder(ColumnLayout column)
+    {
+        _column = column;
+    }
 
     /// <summary>
-    /// Sets the gap between items.
+    ///     Sets the gap between items.
     /// </summary>
     public StackBuilder Gap(int gap)
     {
@@ -258,14 +294,14 @@ public sealed class StackBuilder
         }
         else
         {
-            _column!.Gap = gap;
+            Column.Gap = gap;
         }
 
         return this;
     }
 
     /// <summary>
-    /// Sets inner padding for the stack.
+    ///     Sets inner padding for the stack.
     /// </summary>
     public StackBuilder Padding(Thickness padding)
     {
@@ -275,64 +311,83 @@ public sealed class StackBuilder
         }
         else
         {
-            _column!.Padding = padding;
+            Column.Padding = padding;
         }
 
         return this;
     }
 
     /// <summary>
-    /// Sets uniform inner padding for the stack.
+    ///     Sets uniform inner padding for the stack.
     /// </summary>
-    public StackBuilder Padding(int all) => Padding(Thickness.All(all));
+    public StackBuilder Padding(int all)
+    {
+        return Padding(Thickness.All(all));
+    }
 
     /// <summary>
-    /// Adds an auto-sized item.
+    ///     Adds an auto-sized item.
     /// </summary>
-    public StackBuilder Auto(LayoutNode content, Thickness margin = default) =>
-        Add(LayoutSlot.Auto(content, margin));
+    public StackBuilder Auto(LayoutNode content, Thickness margin = default)
+    {
+        return Add(LayoutSlot.Auto(content, margin));
+    }
 
     /// <summary>
-    /// Adds an auto-sized nested item built imperatively.
+    ///     Adds an auto-sized nested item built imperatively.
     /// </summary>
-    public StackBuilder Auto(Action<ContentBuilder> configure, Thickness margin = default) =>
-        Auto(BuildContent(configure), margin);
+    public StackBuilder Auto(Action<ContentBuilder> configure, Thickness margin = default)
+    {
+        return Auto(BuildContent(configure), margin);
+    }
 
     /// <summary>
-    /// Adds a fixed-size item.
+    ///     Adds a fixed-size item.
     /// </summary>
-    public StackBuilder Fixed(int size, LayoutNode content, Thickness margin = default) =>
-        Add(LayoutSlot.Fixed(content, size, margin));
+    public StackBuilder Fixed(int size, LayoutNode content, Thickness margin = default)
+    {
+        return Add(LayoutSlot.Fixed(content, size, margin));
+    }
 
     /// <summary>
-    /// Adds a fixed-size nested item built imperatively.
+    ///     Adds a fixed-size nested item built imperatively.
     /// </summary>
-    public StackBuilder Fixed(int size, Action<ContentBuilder> configure, Thickness margin = default) =>
-        Fixed(size, BuildContent(configure), margin);
+    public StackBuilder Fixed(int size, Action<ContentBuilder> configure, Thickness margin = default)
+    {
+        return Fixed(size, BuildContent(configure), margin);
+    }
 
     /// <summary>
-    /// Adds a fill item.
+    ///     Adds a fill item.
     /// </summary>
-    public StackBuilder Fill(LayoutNode content, Thickness margin = default) =>
-        Add(LayoutSlot.Fill(content, margin));
+    public StackBuilder Fill(LayoutNode content, Thickness margin = default)
+    {
+        return Add(LayoutSlot.Fill(content, margin));
+    }
 
     /// <summary>
-    /// Adds a fill nested item built imperatively.
+    ///     Adds a fill nested item built imperatively.
     /// </summary>
-    public StackBuilder Fill(Action<ContentBuilder> configure, Thickness margin = default) =>
-        Fill(BuildContent(configure), margin);
+    public StackBuilder Fill(Action<ContentBuilder> configure, Thickness margin = default)
+    {
+        return Fill(BuildContent(configure), margin);
+    }
 
     /// <summary>
-    /// Adds a weighted item.
+    ///     Adds a weighted item.
     /// </summary>
-    public StackBuilder Weighted(int weight, LayoutNode content, Thickness margin = default) =>
-        Add(LayoutSlot.Weighted(content, weight, margin));
+    public StackBuilder Weighted(int weight, LayoutNode content, Thickness margin = default)
+    {
+        return Add(LayoutSlot.Weighted(content, weight, margin));
+    }
 
     /// <summary>
-    /// Adds a weighted nested item built imperatively.
+    ///     Adds a weighted nested item built imperatively.
     /// </summary>
-    public StackBuilder Weighted(int weight, Action<ContentBuilder> configure, Thickness margin = default) =>
-        Weighted(weight, BuildContent(configure), margin);
+    public StackBuilder Weighted(int weight, Action<ContentBuilder> configure, Thickness margin = default)
+    {
+        return Weighted(weight, BuildContent(configure), margin);
+    }
 
     internal static RowLayout BuildRow(Action<StackBuilder> configure)
     {
@@ -358,7 +413,7 @@ public sealed class StackBuilder
         }
         else
         {
-            _column!.Items.Add(slot);
+            Column.Items.Add(slot);
         }
 
         return this;
@@ -374,18 +429,18 @@ public sealed class StackBuilder
 }
 
 /// <summary>
-/// Imperative builder for framed panel content.
+///     Imperative builder for framed panel content.
 /// </summary>
 public sealed class PanelBuilder
 {
-    private LayoutNode? _content;
-    private string? _title;
     private BorderStyle _border;
-    private Thickness _padding;
+    private LayoutNode? _content;
     private Thickness _margin;
+    private Thickness _padding;
+    private string? _title;
 
     /// <summary>
-    /// Sets the panel title.
+    ///     Sets the panel title.
     /// </summary>
     public PanelBuilder Title(string? title)
     {
@@ -394,7 +449,7 @@ public sealed class PanelBuilder
     }
 
     /// <summary>
-    /// Sets the panel border style.
+    ///     Sets the panel border style.
     /// </summary>
     public PanelBuilder Border(BorderStyle style = BorderStyle.SingleLine)
     {
@@ -403,7 +458,7 @@ public sealed class PanelBuilder
     }
 
     /// <summary>
-    /// Sets the panel padding.
+    ///     Sets the panel padding.
     /// </summary>
     public PanelBuilder Padding(Thickness padding)
     {
@@ -412,12 +467,15 @@ public sealed class PanelBuilder
     }
 
     /// <summary>
-    /// Sets uniform panel padding.
+    ///     Sets uniform panel padding.
     /// </summary>
-    public PanelBuilder Padding(int all) => Padding(Thickness.All(all));
+    public PanelBuilder Padding(int all)
+    {
+        return Padding(Thickness.All(all));
+    }
 
     /// <summary>
-    /// Sets the outer panel margin.
+    ///     Sets the outer panel margin.
     /// </summary>
     public PanelBuilder Margin(Thickness margin)
     {
@@ -426,7 +484,7 @@ public sealed class PanelBuilder
     }
 
     /// <summary>
-    /// Sets the panel content directly.
+    ///     Sets the panel content directly.
     /// </summary>
     public PanelBuilder Content(LayoutNode content)
     {
@@ -435,7 +493,7 @@ public sealed class PanelBuilder
     }
 
     /// <summary>
-    /// Builds the panel content imperatively.
+    ///     Builds the panel content imperatively.
     /// </summary>
     public PanelBuilder Content(Action<ContentBuilder> configure)
     {
@@ -446,6 +504,10 @@ public sealed class PanelBuilder
         return this;
     }
 
-    internal PanelLayout Build() =>
-        new(_content ?? throw new InvalidOperationException("Panel builder requires content to be configured."), _title, _border, _padding, _margin);
+    internal PanelLayout Build()
+    {
+        return new PanelLayout(
+            _content ?? throw new InvalidOperationException("Panel builder requires content to be configured."),
+            _title, _border, _padding, _margin);
+    }
 }

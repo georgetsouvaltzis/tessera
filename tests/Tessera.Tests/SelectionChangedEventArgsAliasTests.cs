@@ -55,14 +55,14 @@ public sealed class SelectionChangedEventArgsAliasTests
     public void SelectionChangedEventArgsGroupedListSelectedAliasesForwardToCurrentValues()
     {
         var args = new GroupedListSelectionChangedEventArgs<string, string>(
-            previousRowIndex: 1,
-            currentRowIndex: 2,
-            previousGroupIndex: 0,
-            currentGroupIndex: 1,
-            previousItemIndex: 2,
-            currentItemIndex: 3,
-            previousItem: "A",
-            currentItem: "B");
+            1,
+            2,
+            0,
+            1,
+            2,
+            3,
+            "A",
+            "B");
 
         Assert.That(args.SelectedRowIndex, Is.EqualTo(args.CurrentRowIndex));
         Assert.That(args.SelectedGroupIndex, Is.EqualTo(args.CurrentGroupIndex));
@@ -73,13 +73,13 @@ public sealed class SelectionChangedEventArgsAliasTests
     [Test]
     public void SelectionChangedEventArgsFileExplorerSelectedAliasesForwardToCurrentValues()
     {
-        var previousItem = new FileExplorerItem("old.txt", isDirectory: false, path: "/tmp/old.txt");
-        var currentItem = new FileExplorerItem("new.txt", isDirectory: false, path: "/tmp/new.txt");
+        var previousItem = new FileExplorerItem("old.txt", false, "/tmp/old.txt");
+        var currentItem = new FileExplorerItem("new.txt", false, "/tmp/new.txt");
         var args = new FileExplorerSelectionChangedEventArgs(
-            previousPath: previousItem.Path,
-            currentPath: currentItem.Path,
-            previousItem: previousItem,
-            currentItem: currentItem);
+            previousItem.Path,
+            currentItem.Path,
+            previousItem,
+            currentItem);
 
         Assert.That(args.SelectedPath, Is.EqualTo(args.CurrentPath));
         Assert.That(args.SelectedItem, Is.SameAs(args.CurrentItem));

@@ -1,6 +1,5 @@
 using Tessera.Components.Primitives;
 using Tessera.Controls;
-using System.Globalization;
 
 namespace Tessera.Tests;
 
@@ -9,11 +8,14 @@ internal static class ChartComponentTests
     public static IEnumerable<TestCase> Cases()
     {
         yield return new TestCase("Charts_LineChart_RendersPointsAndStats", LineChart_RendersPointsAndStats);
-        yield return new TestCase("Charts_LineChart_WithAxesAndLegend_RendersAxisElements", LineChart_WithAxesAndLegend_RendersAxisElements);
+        yield return new TestCase("Charts_LineChart_WithAxesAndLegend_RendersAxisElements",
+            LineChart_WithAxesAndLegend_RendersAxisElements);
         yield return new TestCase("Charts_BarChart_RendersLabelsAndBars", BarChart_RendersLabelsAndBars);
-        yield return new TestCase("Charts_BarChart_WithScaleAndLegend_RendersScaleText", BarChart_WithScaleAndLegend_RendersScaleText);
+        yield return new TestCase("Charts_BarChart_WithScaleAndLegend_RendersScaleText",
+            BarChart_WithScaleAndLegend_RendersScaleText);
         yield return new TestCase("Charts_LineChartComponent_HonorsCapacity", LineChartComponent_HonorsCapacity);
-        yield return new TestCase("Charts_LineChart_WithZoomAndOffset_ShiftsWindow", LineChart_WithZoomAndOffset_ShiftsWindow);
+        yield return new TestCase("Charts_LineChart_WithZoomAndOffset_ShiftsWindow",
+            LineChart_WithZoomAndOffset_ShiftsWindow);
     }
 
     private static Task LineChart_RendersPointsAndStats()
@@ -21,10 +23,7 @@ internal static class ChartComponentTests
         // Arrange
         var canvas = new Canvas(30, 10);
         var samples = new[] { 1.0, 2.0, 3.5, 2.4, 5.2, 4.1, 6.0 };
-        var chart = new LineChart
-        {
-            Title = "CPU",
-        };
+        var chart = new LineChart { Title = "CPU" };
         chart.SetSamples(samples);
 
         // Act
@@ -46,12 +45,9 @@ internal static class ChartComponentTests
         [
             new("ok", 80),
             new("warn", 20),
-            new("crit", 10),
+            new("crit", 10)
         ];
-        var chart = new BarChart
-        {
-            Title = "Status",
-        };
+        var chart = new BarChart { Title = "Status" };
         chart.SetBars(bars);
 
         // Act
@@ -74,10 +70,10 @@ internal static class ChartComponentTests
         {
             Title = "Latency",
             Options = new LineChartOptions(
-                ShowAxes: true,
-                Legend: "p95",
-                XLabel: "time",
-                YLabel: "ms"),
+                true,
+                "p95",
+                "time",
+                "ms")
         };
         chart.SetSamples(samples);
 
@@ -86,7 +82,8 @@ internal static class ChartComponentTests
         var output = canvas.Render();
 
         // Assert
-        TestAssert.True(output.Contains(" Latency ", StringComparison.Ordinal), "Line chart should render title with options.");
+        TestAssert.True(output.Contains(" Latency ", StringComparison.Ordinal),
+            "Line chart should render title with options.");
         TestAssert.True(output.Contains('└'), "Line chart with axes should render axis corner.");
         TestAssert.True(output.Contains("p95", StringComparison.Ordinal), "Line chart should render legend text.");
         TestAssert.True(output.Contains("time", StringComparison.Ordinal), "Line chart should render x-axis label.");
@@ -101,14 +98,14 @@ internal static class ChartComponentTests
         [
             new("ok", 90),
             new("warn", 35),
-            new("crit", 10),
+            new("crit", 10)
         ];
         var chart = new BarChart
         {
             Title = "Health",
             Options = new BarChartOptions(
-                ShowScale: true,
-                Legend: "req/s"),
+                true,
+                "req/s")
         };
         chart.SetBars(bars);
 
@@ -126,7 +123,7 @@ internal static class ChartComponentTests
     private static Task LineChartComponent_HonorsCapacity()
     {
         // Arrange
-        var chart = new LineChart(capacity: 4);
+        var chart = new LineChart(4);
 
         // Act
         chart.Append(1);
@@ -148,21 +145,9 @@ internal static class ChartComponentTests
         var samples = Enumerable.Range(0, 20).Select(i => (double)i).ToArray();
         var baseCanvas = new Canvas(32, 10);
         var zoomedCanvas = new Canvas(32, 10);
-        var baselineChart = new LineChart
-        {
-            Title = "Zoom",
-            Options = new LineChartOptions(),
-            Zoom = 1.0,
-            Offset = 0,
-        };
+        var baselineChart = new LineChart { Title = "Zoom", Options = new LineChartOptions(), Zoom = 1.0, Offset = 0 };
         baselineChart.SetSamples(samples);
-        var shiftedChart = new LineChart
-        {
-            Title = "Zoom",
-            Options = new LineChartOptions(),
-            Zoom = 2.0,
-            Offset = 6,
-        };
+        var shiftedChart = new LineChart { Title = "Zoom", Options = new LineChartOptions(), Zoom = 2.0, Offset = 6 };
         shiftedChart.SetSamples(samples);
 
         // Act
@@ -172,10 +157,12 @@ internal static class ChartComponentTests
         var zoomed = zoomedCanvas.Render();
 
         // Assert
-        TestAssert.True(baseline.Contains("min:0.0", StringComparison.Ordinal), "Baseline chart should include first sample in stats.");
-        TestAssert.True(!zoomed.Contains("min:0.0", StringComparison.Ordinal), "Zoom+offset chart should shift visible window away from zero baseline.");
-        TestAssert.True(zoomed.Contains("max:", StringComparison.Ordinal), "Zoom+offset chart should keep stats rendering.");
+        TestAssert.True(baseline.Contains("min:0.0", StringComparison.Ordinal),
+            "Baseline chart should include first sample in stats.");
+        TestAssert.True(!zoomed.Contains("min:0.0", StringComparison.Ordinal),
+            "Zoom+offset chart should shift visible window away from zero baseline.");
+        TestAssert.True(zoomed.Contains("max:", StringComparison.Ordinal),
+            "Zoom+offset chart should keep stats rendering.");
         return Task.CompletedTask;
     }
-
 }

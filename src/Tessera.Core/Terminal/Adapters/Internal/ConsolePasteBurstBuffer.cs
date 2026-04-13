@@ -6,8 +6,8 @@ namespace Tessera.Core.Terminal.Adapters.Internal;
 
 internal sealed class ConsolePasteBurstBuffer
 {
-    private static readonly TimeSpan PasteBurstGap = TimeSpan.FromMilliseconds(28);
     private const int PasteBurstMinimumChars = 12;
+    private static readonly TimeSpan PasteBurstGap = TimeSpan.FromMilliseconds(28);
 
     private readonly List<KeyPressMsg> _burst = new(64);
     private DateTimeOffset _lastBurstInputAt = DateTimeOffset.MinValue;
@@ -20,7 +20,7 @@ internal sealed class ConsolePasteBurstBuffer
         }
 
         var now = DateTimeOffset.UtcNow;
-        if (_burst.Count > 0 && (now - _lastBurstInputAt) > PasteBurstGap)
+        if (_burst.Count > 0 && now - _lastBurstInputAt > PasteBurstGap)
         {
             Flush(onEvent);
         }
@@ -37,7 +37,7 @@ internal sealed class ConsolePasteBurstBuffer
             return;
         }
 
-        if ((DateTimeOffset.UtcNow - _lastBurstInputAt) <= PasteBurstGap)
+        if (DateTimeOffset.UtcNow - _lastBurstInputAt <= PasteBurstGap)
         {
             return;
         }
@@ -87,6 +87,7 @@ internal sealed class ConsolePasteBurstBuffer
                             distinctChars.Add(ch);
                         }
                     }
+
                     break;
                 case KeyCode.Enter:
                     sb.Append('\n');

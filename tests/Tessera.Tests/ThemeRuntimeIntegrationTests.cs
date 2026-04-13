@@ -20,22 +20,21 @@ internal static class ThemeRuntimeIntegrationTests
 
     private static Task RuntimeOptionsTheme_PropagatesToContext()
     {
-        var theme = TesseraThemes.RosePine(RosePineVariant.Main);
+        var theme = TesseraThemes.RosePine();
         var app = new ContextThemeProbeApp();
 
         app.ConfigureRuntimeOptions(
-            new TesseraRuntimeOptions
-            {
-                Theme = theme,
-            });
+            new TesseraRuntimeOptions { Theme = theme });
 
         _ = app.UpdateRuntime(new WindowResized(120, 40));
         _ = app.UpdateRuntime(new FocusChanged(false));
         _ = app.RenderRuntime();
 
         TestAssert.ReferenceSame(theme, app.Context.Theme!, "Runtime options theme should propagate to ScreenContext.");
-        TestAssert.ReferenceSame(theme, app.LastBuildTheme!, "Build should receive the runtime theme through ScreenContext.");
-        TestAssert.True(app.Context.Width == 120 && app.Context.Height == 40, "Context size should still track resize updates.");
+        TestAssert.ReferenceSame(theme, app.LastBuildTheme!,
+            "Build should receive the runtime theme through ScreenContext.");
+        TestAssert.True(app.Context.Width == 120 && app.Context.Height == 40,
+            "Context size should still track resize updates.");
         TestAssert.True(!app.Context.HasFocus, "Context focus should still track focus updates.");
         return Task.CompletedTask;
     }
@@ -44,20 +43,14 @@ internal static class ThemeRuntimeIntegrationTests
     {
         var theme = new TesseraTheme
         {
-            Text = new TesseraThemeTextTokens
-            {
-                Primary = TesseraStyle.Empty.WithForeground(AnsiColor.BrightGreen),
-            },
+            Text = new TesseraThemeTextTokens { Primary = TesseraStyle.Empty.WithForeground(AnsiColor.BrightGreen) }
         };
 
-        var listView = new ListView<string>(static value => value)
-        {
-            Border = BorderStyle.None,
-        };
+        var listView = new ListView<string>(static value => value) { Border = BorderStyle.None };
         listView.SetItems(["alpha", "beta"]);
 
-        var output = Render(new ControlThemeProbeApp(listView), theme, width: 28, height: 3);
-        AssertContains(output, "\u001b[38;5;10m");
+        var output = Render(new ControlThemeProbeApp(listView), theme, 28, 3);
+        AssertContains(output, "\e[38;5;10m");
         return Task.CompletedTask;
     }
 
@@ -65,31 +58,25 @@ internal static class ThemeRuntimeIntegrationTests
     {
         var theme = new TesseraTheme
         {
-            Text = new TesseraThemeTextTokens
-            {
-                Primary = TesseraStyle.Empty.WithForeground(AnsiColor.BrightGreen),
-            },
+            Text = new TesseraThemeTextTokens { Primary = TesseraStyle.Empty.WithForeground(AnsiColor.BrightGreen) }
         };
 
         var button = new Button
         {
             Text = "Ship",
-            LabelStyle = TesseraStyle.Empty.WithForeground(AnsiColor.BrightMagenta),
+            LabelStyle = TesseraStyle.Empty.WithForeground(AnsiColor.BrightMagenta)
         };
 
-        var output = Render(new ControlThemeProbeApp(button), theme, width: 28, height: 2);
-        AssertContains(output, "\u001b[38;5;13m");
-        AssertNotContains(output, "\u001b[38;5;10m");
+        var output = Render(new ControlThemeProbeApp(button), theme, 28, 2);
+        AssertContains(output, "\e[38;5;13m");
+        AssertNotContains(output, "\e[38;5;10m");
         return Task.CompletedTask;
     }
 
     private static string Render(TesseraApp app, TesseraTheme theme, int width, int height)
     {
         app.ConfigureRuntimeOptions(
-            new TesseraRuntimeOptions
-            {
-                Theme = theme,
-            });
+            new TesseraRuntimeOptions { Theme = theme });
         _ = app.UpdateRuntime(new WindowResized(width, height));
         return app.RenderRuntime().Output.Frame.Content;
     }
@@ -113,7 +100,7 @@ internal static class ThemeRuntimeIntegrationTests
     private static string Escape(string text)
     {
         return text
-            .Replace("\u001b", "\\u001b", StringComparison.Ordinal)
+            .Replace("\e", "\\e", StringComparison.Ordinal)
             .Replace("\r", "\\r", StringComparison.Ordinal)
             .Replace("\n", "\\n", StringComparison.Ordinal);
     }
@@ -122,7 +109,10 @@ internal static class ThemeRuntimeIntegrationTests
     {
         public TesseraTheme? LastBuildTheme { get; private set; }
 
-        public override TesseraEffect? Update(Message message) => null;
+        public override TesseraEffect? Update(Message message)
+        {
+            return null;
+        }
 
         public override Screen Build(ScreenContext context)
         {
@@ -140,8 +130,14 @@ internal static class ThemeRuntimeIntegrationTests
             _control = control;
         }
 
-        public override TesseraEffect? Update(Message message) => null;
+        public override TesseraEffect? Update(Message message)
+        {
+            return null;
+        }
 
-        public override Screen Build(ScreenContext context) => Screen.From(_control);
+        public override Screen Build(ScreenContext context)
+        {
+            return Screen.From(_control);
+        }
     }
 }

@@ -1,12 +1,12 @@
 namespace Tessera.Controls;
 
 /// <summary>
-/// Provides previous/current tag snapshots for <see cref="TagInput.TagsChanged" />.
+///     Provides previous/current tag snapshots for <see cref="TagInput.TagsChanged" />.
 /// </summary>
 public sealed class TagInputTagsChangedEventArgs : EventArgs
 {
     /// <summary>
-    /// Initializes a tag collection change payload.
+    ///     Initializes a tag collection change payload.
     /// </summary>
     /// <param name="previousTags">Tag values before the change.</param>
     /// <param name="tags">Tag values after the change.</param>
@@ -17,12 +17,12 @@ public sealed class TagInputTagsChangedEventArgs : EventArgs
     }
 
     /// <summary>
-    /// Gets the tag values before the change.
+    ///     Gets the tag values before the change.
     /// </summary>
     public IReadOnlyList<string> PreviousTags { get; }
 
     /// <summary>
-    /// Gets the current tag values.
+    ///     Gets the current tag values.
     /// </summary>
     public IReadOnlyList<string> Tags { get; }
 }

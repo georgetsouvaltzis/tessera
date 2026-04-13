@@ -12,17 +12,12 @@ public sealed class DataFormControlTests
     public void ControlsDataFormRendersBorderTitleAndFields()
     {
         var model = new TestModel { Name = string.Empty, Email = "tea@example.dev" };
-        var control = new DataForm<TestModel>
-        {
-            Title = "Profile",
-            FocusMarker = "!",
-            IsFocused = true,
-        };
-        control.RegisterField("name", "Name", m => m.Name, (m, value) => m.Name = value, placeholder: "type name");
+        var control = new DataForm<TestModel> { Title = "Profile", FocusMarker = "!", IsFocused = true };
+        control.RegisterField("name", "Name", m => m.Name, (m, value) => m.Name = value, "type name");
         control.RegisterField("email", "Email", m => m.Email, (m, value) => m.Email = value);
         control.SetModel(model);
 
-        var output = Render(control, width: 52, height: 8);
+        var output = Render(control, 52, 8);
 
         Assert.That(output.Contains("Profile !", StringComparison.Ordinal), Is.True);
         Assert.That(output.Contains("Name", StringComparison.Ordinal), Is.True);
@@ -35,13 +30,8 @@ public sealed class DataFormControlTests
     public void ControlsDataFormSelectionModeIgnoresTypingUntilEnterStartsEditing()
     {
         var model = new TestModel { Name = string.Empty };
-        var control = new DataForm<TestModel>
-        {
-            Border = BorderStyle.None,
-            Title = string.Empty,
-            IsFocused = true,
-        };
-        control.RegisterField("name", "Name", m => m.Name, (m, value) => m.Name = value, placeholder: "name");
+        var control = new DataForm<TestModel> { Border = BorderStyle.None, Title = string.Empty, IsFocused = true };
+        control.RegisterField("name", "Name", m => m.Name, (m, value) => m.Name = value, "name");
         control.SetModel(model);
 
         var typedWhileSelected = control.Handle(new KeyPressed(Key.Character, "A"));
@@ -51,7 +41,7 @@ public sealed class DataFormControlTests
         Assert.That(control.EditBuffer, Is.EqualTo(string.Empty));
         Assert.That(model.Name, Is.EqualTo(string.Empty));
 
-        var output = Render(control, width: 48, height: 4);
+        var output = Render(control, 48, 4);
 
         Assert.That(output.Contains("Press Enter to edit.", StringComparison.Ordinal), Is.True);
         Assert.That(output.Contains("name |", StringComparison.Ordinal), Is.False);
@@ -61,13 +51,8 @@ public sealed class DataFormControlTests
     public void ControlsDataFormEnterStartsEditingAndEnterCommitUpdatesModelAndRaisesFieldCommitted()
     {
         var model = new TestModel { Name = string.Empty };
-        var control = new DataForm<TestModel>
-        {
-            Border = BorderStyle.None,
-            Title = string.Empty,
-            IsFocused = true,
-        };
-        control.RegisterField("name", "Name", m => m.Name, (m, value) => m.Name = value, placeholder: "name");
+        var control = new DataForm<TestModel> { Border = BorderStyle.None, Title = string.Empty, IsFocused = true };
+        control.RegisterField("name", "Name", m => m.Name, (m, value) => m.Name = value, "name");
         control.SetModel(model);
 
         DataFormFieldCommittedEventArgs<TestModel>? committed = null;
@@ -94,21 +79,16 @@ public sealed class DataFormControlTests
     public void ControlsDataFormEscapeCancelsEditingAndRestoresCommittedValue()
     {
         var model = new TestModel { Name = "Ada" };
-        var control = new DataForm<TestModel>
-        {
-            Border = BorderStyle.None,
-            Title = string.Empty,
-            IsFocused = true,
-        };
+        var control = new DataForm<TestModel> { Border = BorderStyle.None, Title = string.Empty, IsFocused = true };
         control.RegisterField("name", "Name", m => m.Name, (m, value) => m.Name = value);
         control.SetModel(model);
 
         _ = control.Handle(new KeyPressed(Key.Enter));
         _ = control.Handle(new KeyPressed(Key.Character, "!"));
 
-        var outputWhileEditing = Render(control, width: 48, height: 4);
+        var outputWhileEditing = Render(control, 48, 4);
         var cancelHandled = control.Handle(new KeyPressed(Key.Escape));
-        var outputAfterCancel = Render(control, width: 48, height: 4);
+        var outputAfterCancel = Render(control, 48, 4);
 
         Assert.That(outputWhileEditing.Contains("Ada!|", StringComparison.Ordinal), Is.True);
         Assert.That(cancelHandled, Is.True);
@@ -123,12 +103,7 @@ public sealed class DataFormControlTests
     public void ControlsDataFormKeyboardAndPointerNavigationRaisesSelectionChanged()
     {
         var model = new TestModel { Name = "A", Email = "B", Team = "C" };
-        var control = new DataForm<TestModel>
-        {
-            Border = BorderStyle.None,
-            Title = string.Empty,
-            IsFocused = true,
-        };
+        var control = new DataForm<TestModel> { Border = BorderStyle.None, Title = string.Empty, IsFocused = true };
         control.RegisterField("name", "Name", m => m.Name, (m, value) => m.Name = value);
         control.RegisterField("email", "Email", m => m.Email, (m, value) => m.Email = value);
         control.RegisterField("team", "Team", m => m.Team, (m, value) => m.Team = value);
@@ -140,7 +115,7 @@ public sealed class DataFormControlTests
         var downHandled = control.Handle(new KeyPressed(Key.Down));
         var upHandled = control.Handle(new KeyPressed(Key.Up));
         var clickHandled = control.Handle(
-            new PointerInput(PointerEventKind.Press, PointerButton.Left, X: 1, Y: 2),
+            new PointerInput(PointerEventKind.Press, PointerButton.Left, 1, 2),
             new Rect(0, 0, 60, 4));
 
         Assert.That(downHandled, Is.True);
@@ -156,11 +131,7 @@ public sealed class DataFormControlTests
     public void ControlsDataFormSelectFieldByKeySelectsMatchingFieldAndRaisesSelectionChanged()
     {
         var model = new TestModel { Name = "A", Email = "B", Team = "C" };
-        var control = new DataForm<TestModel>
-        {
-            Border = BorderStyle.None,
-            Title = string.Empty,
-        };
+        var control = new DataForm<TestModel> { Border = BorderStyle.None, Title = string.Empty };
         control.RegisterField("name", "Name", m => m.Name, (m, value) => m.Name = value);
         control.RegisterField("email", "Email", m => m.Email, (m, value) => m.Email = value);
         control.RegisterField("team", "Team", m => m.Team, (m, value) => m.Team = value);
@@ -183,11 +154,7 @@ public sealed class DataFormControlTests
     public void ControlsDataFormSelectFieldByKeyReturnsFalseWhenMissingOrAlreadySelected()
     {
         var model = new TestModel { Name = "A", Email = "B" };
-        var control = new DataForm<TestModel>
-        {
-            Border = BorderStyle.None,
-            Title = string.Empty,
-        };
+        var control = new DataForm<TestModel> { Border = BorderStyle.None, Title = string.Empty };
         control.RegisterField("name", "Name", m => m.Name, (m, value) => m.Name = value);
         control.RegisterField("email", "Email", m => m.Email, (m, value) => m.Email = value);
         control.SetModel(model);
@@ -207,32 +174,23 @@ public sealed class DataFormControlTests
     public void ControlsDataFormDefaultRenderIsDeterministicAndMonochrome()
     {
         var model = new TestModel { Name = "Alice", Email = string.Empty };
-        var control = new DataForm<TestModel>
-        {
-            Border = BorderStyle.None,
-            Title = string.Empty,
-        };
+        var control = new DataForm<TestModel> { Border = BorderStyle.None, Title = string.Empty };
         control.RegisterField("name", "Name", m => m.Name, (m, value) => m.Name = value);
-        control.RegisterField("email", "Email", m => m.Email, (m, value) => m.Email = value, placeholder: "n/a");
+        control.RegisterField("email", "Email", m => m.Email, (m, value) => m.Email = value, "n/a");
         control.SetModel(model);
 
-        var first = Render(control, width: 60, height: 4);
-        var second = Render(control, width: 60, height: 4);
+        var first = Render(control, 60, 4);
+        var second = Render(control, 60, 4);
 
         Assert.That(first, Is.EqualTo(second));
-        Assert.That(first.Contains("\u001b[", StringComparison.Ordinal), Is.False);
+        Assert.That(first.Contains("\e[", StringComparison.Ordinal), Is.False);
     }
 
     [Test]
     public void ControlsDataFormCommitFailureRendersVisibleErrorAndKeepsEditMode()
     {
         var model = new TestModel { Name = "Ada", Email = "tea@example.dev" };
-        var control = new DataForm<TestModel>
-        {
-            Border = BorderStyle.None,
-            Title = string.Empty,
-            IsFocused = true,
-        };
+        var control = new DataForm<TestModel> { Border = BorderStyle.None, Title = string.Empty, IsFocused = true };
         control.RegisterField(
             "name",
             "Name",
@@ -250,7 +208,7 @@ public sealed class DataFormControlTests
         _ = control.Handle(new KeyPressed(Key.Backspace));
         var commitHandled = control.Handle(new KeyPressed(Key.Enter));
         var moveHandled = control.Handle(new KeyPressed(Key.Down));
-        var output = Render(control, width: 56, height: 5);
+        var output = Render(control, 56, 5);
 
         Assert.That(commitHandled, Is.True);
         Assert.That(moveHandled, Is.True);

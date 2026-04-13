@@ -1,12 +1,12 @@
 namespace Tessera.Controls;
 
 /// <summary>
-/// Represents one node in a <see cref="TreeMapChart"/> hierarchy.
+///     Represents one node in a <see cref="TreeMapChart" /> hierarchy.
 /// </summary>
 public sealed class TreeMapNode
 {
     /// <summary>
-    /// Initializes a new treemap node.
+    ///     Initializes a new treemap node.
     /// </summary>
     /// <param name="name">Display name rendered for the node.</param>
     /// <param name="value">Numeric value used for area weighting when the node has no children.</param>
@@ -17,7 +17,7 @@ public sealed class TreeMapNode
     }
 
     /// <summary>
-    /// Initializes a new treemap node with child nodes.
+    ///     Initializes a new treemap node with child nodes.
     /// </summary>
     /// <param name="name">Display name rendered for the node.</param>
     /// <param name="children">Child nodes.</param>
@@ -33,31 +33,27 @@ public sealed class TreeMapNode
     }
 
     /// <summary>
-    /// Gets or sets display name rendered for this node.
+    ///     Gets or sets display name rendered for this node.
     /// </summary>
-    public string Name
-    {
-        get;
-        set => field = value ?? string.Empty;
-    }
+    public string Name { get; set; }
 
     /// <summary>
-    /// Gets or sets numeric value used for leaf weighting.
+    ///     Gets or sets numeric value used for leaf weighting.
     /// </summary>
     public double Value { get; set; }
 
     /// <summary>
-    /// Gets child nodes.
+    ///     Gets child nodes.
     /// </summary>
     public IList<TreeMapNode> Children { get; } = new List<TreeMapNode>();
 
     /// <summary>
-    /// Gets whether the node currently has child nodes.
+    ///     Gets whether the node currently has child nodes.
     /// </summary>
     public bool HasChildren => Children.Count > 0;
 
     /// <summary>
-    /// Adds one child node.
+    ///     Adds one child node.
     /// </summary>
     /// <param name="child">Node to append.</param>
     public void AddChild(TreeMapNode child)

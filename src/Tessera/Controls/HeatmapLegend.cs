@@ -3,12 +3,12 @@ using Tessera.Styles;
 namespace Tessera.Controls;
 
 /// <summary>
-/// Represents one legend band used by <see cref="Heatmap"/>.
+///     Represents one legend band used by <see cref="Heatmap" />.
 /// </summary>
 public readonly record struct HeatmapLegend
 {
     /// <summary>
-    /// Initializes a new legend band.
+    ///     Initializes a new legend band.
     /// </summary>
     /// <param name="label">Legend label shown in the footer row.</param>
     /// <param name="minInclusive">Minimum value in range, inclusive.</param>
@@ -30,27 +30,27 @@ public readonly record struct HeatmapLegend
     }
 
     /// <summary>
-    /// Gets legend label text.
+    ///     Gets legend label text.
     /// </summary>
     public string Label { get; init; }
 
     /// <summary>
-    /// Gets minimum value in range, inclusive.
+    ///     Gets minimum value in range, inclusive.
     /// </summary>
     public double MinInclusive { get; init; }
 
     /// <summary>
-    /// Gets maximum value in range, inclusive.
+    ///     Gets maximum value in range, inclusive.
     /// </summary>
     public double MaxInclusive { get; init; }
 
     /// <summary>
-    /// Gets glyph rendered for the range.
+    ///     Gets glyph rendered for the range.
     /// </summary>
     public char Glyph { get; init; }
 
     /// <summary>
-    /// Gets style merged for this legend band.
+    ///     Gets style merged for this legend band.
     /// </summary>
     public TesseraStyle Style { get; init; }
 }

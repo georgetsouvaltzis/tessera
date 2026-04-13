@@ -12,24 +12,25 @@ public sealed class QueryBuilderControlTests
     [Test]
     public void ControlsQueryBuilderRendersRulesAndPreview()
     {
-        var control = new QueryBuilder
-        {
-            Border = BorderStyle.None,
-        };
+        var control = new QueryBuilder { Border = BorderStyle.None };
         control.SetRules(
         [
             new QueryRule("status", QueryOperator.Equals, "open"),
-            new QueryRule("title", QueryOperator.Contains, "error budget"),
+            new QueryRule("title", QueryOperator.Contains, "error budget")
         ]);
         var canvas = new Canvas(64, 6);
 
         control.Render(canvas, new Rect(0, 0, 64, 6));
         var output = canvas.Render();
 
-        TestAssert.True(output.Contains("AND status = open", StringComparison.Ordinal), "Preview row should include combinator and first rule.");
-        TestAssert.True(output.Contains("▸ status = open", StringComparison.Ordinal), "Selected rule row should render marker and expression.");
-        TestAssert.True(output.Contains("title ~ error budget", StringComparison.Ordinal), "Second rule row should render operator and value.");
-        TestAssert.True(control.QueryText.Contains("title ~ \"error budget\"", StringComparison.Ordinal), "Query text should quote whitespace values.");
+        TestAssert.True(output.Contains("AND status = open", StringComparison.Ordinal),
+            "Preview row should include combinator and first rule.");
+        TestAssert.True(output.Contains("▸ status = open", StringComparison.Ordinal),
+            "Selected rule row should render marker and expression.");
+        TestAssert.True(output.Contains("title ~ error budget", StringComparison.Ordinal),
+            "Second rule row should render operator and value.");
+        TestAssert.True(control.QueryText.Contains("title ~ \"error budget\"", StringComparison.Ordinal),
+            "Query text should quote whitespace values.");
     }
 
     [Test]
@@ -59,17 +60,12 @@ public sealed class QueryBuilderControlTests
     [Test]
     public void ControlsQueryBuilderKeyboardAndPointerNavigationUpdateSelection()
     {
-        var control = new QueryBuilder
-        {
-            Border = BorderStyle.None,
-            ShowQueryPreview = false,
-            IsFocused = true,
-        };
+        var control = new QueryBuilder { Border = BorderStyle.None, ShowQueryPreview = false, IsFocused = true };
         control.SetRules(
         [
             new QueryRule("a", QueryOperator.Equals, "1"),
             new QueryRule("b", QueryOperator.Equals, "2"),
-            new QueryRule("c", QueryOperator.Equals, "3"),
+            new QueryRule("c", QueryOperator.Equals, "3")
         ]);
 
         _ = control.Handle(new KeyPressed(Key.Down));
@@ -94,16 +90,12 @@ public sealed class QueryBuilderControlTests
             FocusedRuleStyle = TesseraStyle.Empty.WithItalic(),
             HoveredRuleStyle = TesseraStyle.Empty.WithUnderline(),
             DisabledRuleStyle = TesseraStyle.Empty.WithDim(),
-            ErrorRuleStyle = TesseraStyle.Empty.WithForeground(AnsiColor.Rgb(31, 32, 33)),
+            ErrorRuleStyle = TesseraStyle.Empty.WithForeground(AnsiColor.Rgb(31, 32, 33))
         };
         control.SetRules(
         [
             new QueryRule("status", QueryOperator.Equals, "open"),
-            new QueryRule("team", QueryOperator.Equals, "core")
-            {
-                IsDisabled = true,
-                HasError = true,
-            },
+            new QueryRule("team", QueryOperator.Equals, "core") { IsDisabled = true, HasError = true }
         ]);
         var bounds = new Rect(0, 0, 48, 5);
         _ = control.Handle(new PointerInput(PointerEventKind.Motion, PointerButton.None, 1, 1), bounds);
@@ -124,14 +116,11 @@ public sealed class QueryBuilderControlTests
     [Test]
     public void ControlsQueryBuilderDefaultRenderIsDeterministicAndMonochrome()
     {
-        var control = new QueryBuilder
-        {
-            Border = BorderStyle.None,
-        };
+        var control = new QueryBuilder { Border = BorderStyle.None };
         control.SetRules(
         [
             new QueryRule("region", QueryOperator.Equals, "eu"),
-            new QueryRule("latency", QueryOperator.LessThan, "100"),
+            new QueryRule("latency", QueryOperator.LessThan, "100")
         ]);
         var bounds = new Rect(0, 0, 40, 5);
         var firstCanvas = new Canvas(40, 5);
@@ -143,6 +132,7 @@ public sealed class QueryBuilderControlTests
         var second = secondCanvas.Render();
 
         TestAssert.Equal(first, second, "QueryBuilder render should be deterministic.");
-        TestAssert.True(!first.Contains("\u001b[", StringComparison.Ordinal), "Default QueryBuilder output should remain monochrome.");
+        TestAssert.True(!first.Contains("\e[", StringComparison.Ordinal),
+            "Default QueryBuilder output should remain monochrome.");
     }
 }

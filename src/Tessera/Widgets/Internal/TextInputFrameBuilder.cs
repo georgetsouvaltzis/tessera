@@ -13,7 +13,7 @@ internal static class TextInputFrameBuilder
     {
         if (width <= 0)
         {
-            return new TextInputFrame(string.Empty, 0, PlaceholderVisible: false);
+            return new TextInputFrame(string.Empty, 0, false);
         }
 
         var isPlaceholder = value.Length == 0;

@@ -12,16 +12,12 @@ public sealed class PaneTabsControlTests
     [Test]
     public void ControlsPaneTabsKeyboardNavigationSkipsDisabledAndRaisesEvent()
     {
-        var control = new PaneTabs
-        {
-            IsFocused = true,
-            Border = BorderStyle.None,
-        };
+        var control = new PaneTabs { IsFocused = true, Border = BorderStyle.None };
         control.SetTabs(
         [
             new PaneTabItem("home", "Home"),
-            new PaneTabItem("logs", "Logs", isDisabled: true),
-            new PaneTabItem("diag", "Diagnostics"),
+            new PaneTabItem("logs", "Logs", true),
+            new PaneTabItem("diag", "Diagnostics")
         ]);
 
         PaneTabSelectionChangedEventArgs? args = null;
@@ -42,15 +38,12 @@ public sealed class PaneTabsControlTests
     [Test]
     public void ControlsPaneTabsPointerClickSelectsTab()
     {
-        var control = new PaneTabs
-        {
-            Border = BorderStyle.None,
-        };
+        var control = new PaneTabs { Border = BorderStyle.None };
         control.SetTabs(
         [
             new PaneTabItem("a", "A"),
             new PaneTabItem("b", "B"),
-            new PaneTabItem("c", "C"),
+            new PaneTabItem("c", "C")
         ]);
         var bounds = new Rect(0, 0, 30, 1);
 
@@ -72,15 +65,12 @@ public sealed class PaneTabsControlTests
     [Test]
     public void ControlsPaneTabsPointerMotionDoesNotSelectHoveredTab()
     {
-        var control = new PaneTabs
-        {
-            Border = BorderStyle.None,
-        };
+        var control = new PaneTabs { Border = BorderStyle.None };
         control.SetTabs(
         [
             new PaneTabItem("a", "A"),
             new PaneTabItem("b", "B"),
-            new PaneTabItem("c", "C"),
+            new PaneTabItem("c", "C")
         ]);
         var bounds = new Rect(0, 0, 30, 1);
 
@@ -103,28 +93,26 @@ public sealed class PaneTabsControlTests
             Border = BorderStyle.SingleLine,
             FocusedBorderStyleText = focusedBorder,
             SelectedTabStyle = selectedStyle,
-            FocusedSelectedTabStyle = TesseraStyle.Empty.WithUnderline(),
+            FocusedSelectedTabStyle = TesseraStyle.Empty.WithUnderline()
         };
         control.SetTabs([new PaneTabItem("home", "Home")]);
 
-        var output = Render(control, width: 40, height: 4);
+        var output = Render(control, 40, 4);
 
         Assert.That(output.Contains("Pane *", StringComparison.Ordinal), Is.True);
         Assert.That(output.Contains(focusedBorder.Render("┌"), StringComparison.Ordinal), Is.True);
         Assert.That(output.Contains("[Home]", StringComparison.Ordinal), Is.True);
-        Assert.That(output.Contains("[1;", StringComparison.Ordinal) || output.Contains(";1;", StringComparison.Ordinal) || output.Contains("[1m", StringComparison.Ordinal), Is.True);
+        Assert.That(
+            output.Contains("[1;", StringComparison.Ordinal) || output.Contains(";1;", StringComparison.Ordinal) ||
+            output.Contains("[1m", StringComparison.Ordinal), Is.True);
     }
 
     [Test]
     public void ControlsPaneTabsEmptyStateRendersText()
     {
-        var control = new PaneTabs
-        {
-            Border = BorderStyle.None,
-            EmptyText = "(empty)",
-        };
+        var control = new PaneTabs { Border = BorderStyle.None, EmptyText = "(empty)" };
 
-        var output = Render(control, width: 24, height: 1);
+        var output = Render(control, 24, 1);
         Assert.That(output.Contains("(empty)", StringComparison.Ordinal), Is.True);
     }
 

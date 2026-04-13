@@ -16,17 +16,16 @@ internal sealed class UnixRawModeSession
     private const int DarwinVMin = 16;
     private const int DarwinVTime = 17;
     private static readonly byte[] DevTtyPath = "/dev/tty\0"u8.ToArray();
+    private DarwinTermios _darwinOriginalTermios;
+    private LinuxTermios _linuxOriginalTermios;
+    private string? _unixRawModeError;
+    private string? _unixRawModeProbe;
 
     private string? _unixSttyState;
-    private string? _unixRawModeProbe;
-    private string? _unixRawModeError;
-    private bool _unixRawModeEnabled;
-    private int _unixTtyFd = -1;
     private bool _unixTermiosPrepared;
-    private LinuxTermios _linuxOriginalTermios;
-    private DarwinTermios _darwinOriginalTermios;
+    private int _unixTtyFd = -1;
 
-    public bool IsRawModeActive => _unixRawModeEnabled;
+    public bool IsRawModeActive { get; private set; }
 
     public string RawModeDiagnostics => _unixRawModeProbe ?? "n/a";
 
@@ -45,7 +44,7 @@ internal sealed class UnixRawModeSession
         {
             _unixRawModeProbe = termiosProbe;
             _unixRawModeError = termiosError ?? "none";
-            _unixRawModeEnabled = true;
+            IsRawModeActive = true;
             return;
         }
 
@@ -71,8 +70,8 @@ internal sealed class UnixRawModeSession
         }
 
         _unixRawModeProbe = string.IsNullOrWhiteSpace(probe) ? "probe-unavailable" : probe;
-        _unixRawModeEnabled = IsRawProbeEnabled(probe);
-        if (!_unixRawModeEnabled && string.IsNullOrWhiteSpace(_unixRawModeError))
+        IsRawModeActive = IsRawProbeEnabled(probe);
+        if (!IsRawModeActive && string.IsNullOrWhiteSpace(_unixRawModeError))
         {
             _unixRawModeError = probeError ?? "probe-check-failed";
         }
@@ -93,7 +92,7 @@ internal sealed class UnixRawModeSession
 
         _unixRawModeProbe = null;
         _unixRawModeError = null;
-        _unixRawModeEnabled = false;
+        IsRawModeActive = false;
     }
 
     private bool TryEnableWithTermios(out string probe, out string? error)
@@ -125,7 +124,6 @@ internal sealed class UnixRawModeSession
             }
 
             var current = _darwinOriginalTermios;
-            current.c_cc ??= new byte[20];
             current.c_lflag &= ~(DarwinEcho | DarwinICanon);
             current.c_cc[DarwinVMin] = 1;
             current.c_cc[DarwinVTime] = 0;
@@ -165,7 +163,6 @@ internal sealed class UnixRawModeSession
         }
 
         var linuxCurrent = _linuxOriginalTermios;
-        linuxCurrent.c_cc ??= new byte[32];
         linuxCurrent.c_lflag &= ~(LinuxEcho | LinuxICanon);
         linuxCurrent.c_cc[LinuxVMin] = 1;
         linuxCurrent.c_cc[LinuxVTime] = 0;
@@ -271,16 +268,19 @@ internal sealed class UnixRawModeSession
             .Replace("\n", " ", StringComparison.Ordinal);
         var tokens = normalized.Split(' ', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
 
-        var hasNoEcho = tokens.Contains("-echo", StringComparer.Ordinal) && !tokens.Contains("echo", StringComparer.Ordinal);
+        var hasNoEcho = tokens.Contains("-echo", StringComparer.Ordinal) &&
+                        !tokens.Contains("echo", StringComparer.Ordinal);
         var hasNonCanonical = tokens.Contains("-icanon", StringComparer.Ordinal)
-            || tokens.Contains("raw", StringComparer.Ordinal)
-            || tokens.Contains("cbreak", StringComparer.Ordinal)
-            || (normalized.Contains("min = 1", StringComparison.Ordinal) && normalized.Contains("time = 0", StringComparison.Ordinal));
+                              || tokens.Contains("raw", StringComparer.Ordinal)
+                              || tokens.Contains("cbreak", StringComparer.Ordinal)
+                              || (normalized.Contains("min = 1", StringComparison.Ordinal) &&
+                                  normalized.Contains("time = 0", StringComparison.Ordinal));
 
         return hasNoEcho && hasNonCanonical;
     }
 
-    private static bool TryRunStty(string sttyExecutable, string arguments, string[]? explicitTtyArgs, out string output, out string? error)
+    private static bool TryRunStty(string sttyExecutable, string arguments, string[]? explicitTtyArgs,
+        out string output, out string? error)
     {
         output = string.Empty;
         error = null;
@@ -295,8 +295,8 @@ internal sealed class UnixRawModeSession
                     UseShellExecute = false,
                     RedirectStandardOutput = true,
                     RedirectStandardError = true,
-                    CreateNoWindow = true,
-                },
+                    CreateNoWindow = true
+                }
             };
 
             if (explicitTtyArgs is not null)
@@ -356,8 +356,8 @@ internal sealed class UnixRawModeSession
                     UseShellExecute = false,
                     RedirectStandardOutput = true,
                     RedirectStandardError = true,
-                    CreateNoWindow = true,
-                },
+                    CreateNoWindow = true
+                }
             };
 
             if (!process.Start())
@@ -402,33 +402,6 @@ internal sealed class UnixRawModeSession
         return "stty";
     }
 
-    [StructLayout(LayoutKind.Sequential)]
-    private struct LinuxTermios
-    {
-        public uint c_iflag;
-        public uint c_oflag;
-        public uint c_cflag;
-        public uint c_lflag;
-        public byte c_line;
-        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 32)]
-        public byte[] c_cc;
-        public uint c_ispeed;
-        public uint c_ospeed;
-    }
-
-    [StructLayout(LayoutKind.Sequential)]
-    private struct DarwinTermios
-    {
-        public ulong c_iflag;
-        public ulong c_oflag;
-        public ulong c_cflag;
-        public ulong c_lflag;
-        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 20)]
-        public byte[] c_cc;
-        public ulong c_ispeed;
-        public ulong c_ospeed;
-    }
-
     [DllImport("libc", EntryPoint = "open", SetLastError = true)]
     private static extern int Open(byte[] path, int flags);
 
@@ -446,4 +419,35 @@ internal sealed class UnixRawModeSession
 
     [DllImport("libc", EntryPoint = "tcsetattr", SetLastError = true)]
     private static extern int TcSetAttrDarwin(int fd, int optionalActions, ref DarwinTermios termios);
+
+    [StructLayout(LayoutKind.Sequential)]
+    private struct LinuxTermios
+    {
+        public uint c_iflag;
+        public uint c_oflag;
+        public uint c_cflag;
+        public uint c_lflag;
+        public byte c_line;
+
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 32)]
+        public byte[] c_cc;
+
+        public uint c_ispeed;
+        public uint c_ospeed;
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    private struct DarwinTermios
+    {
+        public ulong c_iflag;
+        public ulong c_oflag;
+        public ulong c_cflag;
+        public ulong c_lflag;
+
+        [MarshalAs(UnmanagedType.ByValArray, SizeConst = 20)]
+        public byte[] c_cc;
+
+        public ulong c_ispeed;
+        public ulong c_ospeed;
+    }
 }

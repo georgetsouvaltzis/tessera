@@ -115,10 +115,6 @@ public sealed class DialogClosedEventTests
 
     private static Dialog CreateVisibleFocusedDialog()
     {
-        return new Dialog
-        {
-            IsVisible = true,
-            IsFocused = true,
-        };
+        return new Dialog { IsVisible = true, IsFocused = true };
     }
 }

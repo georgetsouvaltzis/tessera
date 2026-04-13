@@ -35,7 +35,8 @@ internal static class TesseraApplicationBuilderContractTests
             .UseApp(() => created)
             .Build();
 
-        TestAssert.ReferenceSame(created, application.App, "UseApp(Func<TesseraApp>) should use the returned app instance.");
+        TestAssert.ReferenceSame(created, application.App,
+            "UseApp(Func<TesseraApp>) should use the returned app instance.");
         return Task.CompletedTask;
     }
 
@@ -46,7 +47,8 @@ internal static class TesseraApplicationBuilderContractTests
             .UseApp(app)
             .Build();
 
-        TestAssert.ReferenceSame(app, application.App, "UseApp(TesseraApp) should continue using the supplied app instance.");
+        TestAssert.ReferenceSame(app, application.App,
+            "UseApp(TesseraApp) should continue using the supplied app instance.");
         return Task.CompletedTask;
     }
 
@@ -71,15 +73,27 @@ internal static class TesseraApplicationBuilderContractTests
 
     private sealed class FactoryApp : TesseraApp
     {
-        public override TesseraEffect? Update(Message message) => null;
+        public override TesseraEffect? Update(Message message)
+        {
+            return null;
+        }
 
-        public override Screen Build(ScreenContext context) => Screen.From("factory");
+        public override Screen Build(ScreenContext context)
+        {
+            return Screen.From("factory");
+        }
     }
 
     private sealed class InstanceApp : TesseraApp
     {
-        public override TesseraEffect? Update(Message message) => null;
+        public override TesseraEffect? Update(Message message)
+        {
+            return null;
+        }
 
-        public override Screen Build(ScreenContext context) => Screen.From("instance");
+        public override Screen Build(ScreenContext context)
+        {
+            return Screen.From("instance");
+        }
     }
 }

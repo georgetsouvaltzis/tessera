@@ -11,13 +11,9 @@ public sealed class TerminalPanelControlTests
     [Test]
     public void TerminalPanelAppendAndRenderUsesMarkersAndBoundedBuffer()
     {
-        var control = new TerminalPanel
-        {
-            MaxLines = 3,
-            FollowTail = true,
-        };
+        var control = new TerminalPanel { MaxLines = 3, FollowTail = true };
 
-        control.Append("one", TerminalPanelChannel.StandardOutput);
+        control.Append("one");
         control.Append("two", TerminalPanelChannel.StandardError);
         control.Append("three", TerminalPanelChannel.Command);
         control.Append("four", TerminalPanelChannel.System);
@@ -26,7 +22,7 @@ public sealed class TerminalPanelControlTests
         Assert.That(control.SelectedIndex, Is.EqualTo(2));
         Assert.That(control.SelectedLine?.Text, Is.EqualTo("four"));
 
-        var output = Render(control, width: 64, height: 4);
+        var output = Render(control, 64, 4);
         Assert.That(output.Contains("one", StringComparison.Ordinal), Is.False);
         Assert.That(output.Contains("0001 ERR two", StringComparison.Ordinal), Is.True);
         Assert.That(output.Contains("0002 CMD three", StringComparison.Ordinal), Is.True);
@@ -36,16 +32,12 @@ public sealed class TerminalPanelControlTests
     [Test]
     public void TerminalPanelKeyboardAndPointerSelectionRaisesSelectionChanged()
     {
-        var control = new TerminalPanel
-        {
-            IsFocused = true,
-            FollowTail = false,
-        };
+        var control = new TerminalPanel { IsFocused = true, FollowTail = false };
         control.SetLines(
         [
             new TerminalPanelLine("first"),
             new TerminalPanelLine("second"),
-            new TerminalPanelLine("third"),
+            new TerminalPanelLine("third")
         ]);
 
         ListSelectionChangedEventArgs<TerminalPanelLine>? lastArgs = null;
@@ -74,14 +66,14 @@ public sealed class TerminalPanelControlTests
         control.AppendRange(
         [
             new TerminalPanelLine("alpha"),
-            new TerminalPanelLine("beta", TerminalPanelChannel.StandardError),
+            new TerminalPanelLine("beta", TerminalPanelChannel.StandardError)
         ]);
 
-        var first = Render(control, width: 40, height: 4);
-        var second = Render(control, width: 40, height: 4);
+        var first = Render(control, 40, 4);
+        var second = Render(control, 40, 4);
 
         Assert.That(first, Is.EqualTo(second));
-        Assert.That(first.Contains("\u001b[", StringComparison.Ordinal), Is.False);
+        Assert.That(first.Contains("\e[", StringComparison.Ordinal), Is.False);
     }
 
     private static string Render(TerminalPanel control, int width, int height)

@@ -3,6 +3,7 @@ using System.Reflection;
 using Tessera.Components.Composition;
 using Tessera.Components.Primitives;
 using Tessera.Controls;
+using Tessera.Core.Abstractions;
 using Tessera.Core.Messages;
 using Tessera.Internal;
 using Tessera.Layout;
@@ -93,7 +94,8 @@ internal static class TesseraAppCompositionTests
         screen.Render();
         screen.Update(new KeyPressMsg(KeyCode.Enter));
 
-        TestAssert.Equal(1, app.ActivationCount, "Enter should activate the focused button automatically before Update.");
+        TestAssert.Equal(1, app.ActivationCount,
+            "Enter should activate the focused button automatically before Update.");
         return Task.CompletedTask;
     }
 
@@ -108,7 +110,8 @@ internal static class TesseraAppCompositionTests
         screen.Update(new KeyPressMsg(KeyCode.Character, "x"));
         screen.Update(new KeyPressMsg(KeyCode.Enter));
 
-        TestAssert.Equal("x", app.Input.Value, "Tab should move focus to the next control and route typing into the text input.");
+        TestAssert.Equal("x", app.Input.Value,
+            "Tab should move focus to the next control and route typing into the text input.");
         TestAssert.Equal("x", app.LastSubmittedValue, "Enter should raise submission through the routed text input.");
         return Task.CompletedTask;
     }
@@ -124,7 +127,8 @@ internal static class TesseraAppCompositionTests
         screen.Update(new KeyPressMsg(KeyCode.Down));
         screen.Update(new KeyPressMsg(KeyCode.Enter));
 
-        TestAssert.Equal("History", app.Choice.SelectedItem, "Choice should route open, navigate, and confirm through the compiled screen.");
+        TestAssert.Equal("History", app.Choice.SelectedItem,
+            "Choice should route open, navigate, and confirm through the compiled screen.");
         return Task.CompletedTask;
     }
 
@@ -139,7 +143,8 @@ internal static class TesseraAppCompositionTests
         screen.Update(new KeyPressMsg(KeyCode.Down));
         screen.Update(new KeyPressMsg(KeyCode.Enter));
 
-        TestAssert.Equal("west", app.ComboBox.SelectedItem, "ComboBox should route filter, navigate, and confirm through the compiled screen.");
+        TestAssert.Equal("west", app.ComboBox.SelectedItem,
+            "ComboBox should route filter, navigate, and confirm through the compiled screen.");
         return Task.CompletedTask;
     }
 
@@ -166,7 +171,8 @@ internal static class TesseraAppCompositionTests
         screen.Update(new KeyPressMsg(KeyCode.Character, "r"));
 
         await Task.Yield();
-        TestAssert.Equal("refresh", app.LastActivatedItemId, "MenuBar activation should preserve the configured item id.");
+        TestAssert.Equal("refresh", app.LastActivatedItemId,
+            "MenuBar activation should preserve the configured item id.");
     }
 
     private static Task HandledControlKeyInput_StillReachesAppUpdate()
@@ -178,7 +184,8 @@ internal static class TesseraAppCompositionTests
         screen.Render();
         screen.Update(new KeyPressMsg(KeyCode.Enter));
 
-        TestAssert.Equal(1, app.KeyUpdateCount, "Handled key input should still flow into app Update for global hotkey handling.");
+        TestAssert.Equal(1, app.KeyUpdateCount,
+            "Handled key input should still flow into app Update for global hotkey handling.");
         TestAssert.Equal(1, app.ActivationCount, "The control should still receive the handled key.");
         return Task.CompletedTask;
     }
@@ -193,7 +200,8 @@ internal static class TesseraAppCompositionTests
         var effect = screen.Update(new KeyPressMsg(KeyCode.Enter));
 
         TestAssert.True(effect is not null, "Handled control input should still be able to schedule runtime effects.");
-        TestAssert.Equal(1, app.KeyUpdateCount, "Handled key input should still reach app Update while preserving control-side effects.");
+        TestAssert.Equal(1, app.KeyUpdateCount,
+            "Handled key input should still reach app Update while preserving control-side effects.");
         return Task.CompletedTask;
     }
 
@@ -208,8 +216,10 @@ internal static class TesseraAppCompositionTests
         screen.Update(new KeyPressMsg(KeyCode.Character, "t"));
         screen.Update(new KeyReleaseMsg(KeyCode.Character, "t"));
 
-        TestAssert.True(app.QuitRequested, "Ctrl+C should reach app Update even when a focused control consumes key messages.");
-        TestAssert.Equal(1, app.ThemeToggleCount, "Theme hotkey should reach app Update even when the focused control consumes key messages.");
+        TestAssert.True(app.QuitRequested,
+            "Ctrl+C should reach app Update even when a focused control consumes key messages.");
+        TestAssert.Equal(1, app.ThemeToggleCount,
+            "Theme hotkey should reach app Update even when the focused control consumes key messages.");
         TestAssert.Equal(1, app.KeyReleaseCount, "Key release should reach app Update under the same conditions.");
         return Task.CompletedTask;
     }
@@ -224,8 +234,10 @@ internal static class TesseraAppCompositionTests
         TestAssert.True(app.Palette.IsFocused, "Visible overlay should own focus after the screen is composed.");
         screen.Update(new KeyPressMsg(KeyCode.Enter));
 
-        TestAssert.Equal("rollback", app.LastExecutedItemId, "Visible overlays should be able to claim focus through the root layout model.");
-        TestAssert.Equal(0, app.ButtonActivationCount, "Overlay focus should keep the underlying body control from activating.");
+        TestAssert.Equal("rollback", app.LastExecutedItemId,
+            "Visible overlays should be able to claim focus through the root layout model.");
+        TestAssert.Equal(0, app.ButtonActivationCount,
+            "Overlay focus should keep the underlying body control from activating.");
         return Task.CompletedTask;
     }
 
@@ -239,8 +251,10 @@ internal static class TesseraAppCompositionTests
         TestAssert.True(app.Dialog.IsFocused, "Dialog.Show should request focus for the next composition pass.");
         screen.Update(new KeyPressMsg(KeyCode.Enter));
 
-        TestAssert.True(app.Dialog.LastResult == DialogResult.Accepted, "Enter should be routed into the shown dialog.");
-        TestAssert.Equal(0, app.ButtonActivationCount, "Dialog focus should keep the underlying body control from activating.");
+        TestAssert.True(app.Dialog.LastResult == DialogResult.Accepted,
+            "Enter should be routed into the shown dialog.");
+        TestAssert.Equal(0, app.ButtonActivationCount,
+            "Dialog focus should keep the underlying body control from activating.");
         return Task.CompletedTask;
     }
 
@@ -253,7 +267,8 @@ internal static class TesseraAppCompositionTests
         screen.Render();
         screen.Update(new KeyPressMsg(KeyCode.Enter));
 
-        TestAssert.Equal(1, app.LeftActivationCount, "The most recent RequestFocus call should win even when the control is composed earlier.");
+        TestAssert.Equal(1, app.LeftActivationCount,
+            "The most recent RequestFocus call should win even when the control is composed earlier.");
         TestAssert.Equal(0, app.RightActivationCount, "Composition order should not override focus request order.");
         return Task.CompletedTask;
     }
@@ -269,8 +284,10 @@ internal static class TesseraAppCompositionTests
         screen.Render();
         screen.Update(new KeyPressMsg(KeyCode.Enter));
 
-        TestAssert.Equal(0, app.LeftActivationCount, "Consumed focus requests should not steal focus back on later builds.");
-        TestAssert.Equal(1, app.RightActivationCount, "User focus changes should persist after a one-shot focus request is consumed.");
+        TestAssert.Equal(0, app.LeftActivationCount,
+            "Consumed focus requests should not steal focus back on later builds.");
+        TestAssert.Equal(1, app.RightActivationCount,
+            "User focus changes should persist after a one-shot focus request is consumed.");
         return Task.CompletedTask;
     }
 
@@ -283,7 +300,8 @@ internal static class TesseraAppCompositionTests
         screen.Render();
         screen.Update(new KeyPressMsg(KeyCode.Enter));
 
-        TestAssert.Equal(1, app.ActivationCount, "The imperative Screen.Build path should still compile into routable default controls.");
+        TestAssert.Equal(1, app.ActivationCount,
+            "The imperative Screen.Build path should still compile into routable default controls.");
         return Task.CompletedTask;
     }
 
@@ -310,13 +328,13 @@ internal static class TesseraAppCompositionTests
         var assembly = typeof(TesseraApp).Assembly;
 
         TestAssert.True(
-            assembly.GetType("Tessera.Internal.HybridScreenCompiler", throwOnError: false) is null,
+            assembly.GetType("Tessera.Internal.HybridScreenCompiler", false) is null,
             "HybridScreenCompiler should be removed once built-in root layouts compile directly through TesseraSceneCompiler.");
         TestAssert.True(
-            assembly.GetType("Tessera.Internal.LegacyScreenCompiler", throwOnError: false) is null,
+            assembly.GetType("Tessera.Internal.LegacyScreenCompiler", false) is null,
             "LegacyScreenCompiler should no longer exist as a silent fallback in the default compiler path.");
         TestAssert.True(
-            assembly.GetType("Tessera.Internal.LegacyCompiledScreen", throwOnError: false) is null,
+            assembly.GetType("Tessera.Internal.LegacyCompiledScreen", false) is null,
             "LegacyCompiledScreen should be removed once root layout interaction is handled by the new scene compiler.");
         return Task.CompletedTask;
     }
@@ -331,15 +349,16 @@ internal static class TesseraAppCompositionTests
             "Tessera.Layout.Dock",
             "Tessera.Layout.Overlay",
             "Tessera.Layout.Center",
-            "Tessera.Layout.Slot",
+            "Tessera.Layout.Slot"
         ];
 
         var assembly = typeof(LayoutSlot).Assembly;
 
         foreach (var helperTypeName in helperTypeNames)
         {
-            var helperType = assembly.GetType(helperTypeName, throwOnError: false);
-            TestAssert.True(helperType is null, $"{helperTypeName} should be removed once object-based layout assembly is the only supported path.");
+            var helperType = assembly.GetType(helperTypeName, false);
+            TestAssert.True(helperType is null,
+                $"{helperTypeName} should be removed once object-based layout assembly is the only supported path.");
         }
 
         return Task.CompletedTask;
@@ -350,22 +369,37 @@ internal static class TesseraAppCompositionTests
         var removedCtors =
             new (Type Type, Type[] Parameters)[]
             {
-                (typeof(LayoutSlot), [typeof(ICanvasComponent), typeof(LayoutLength), typeof(Thickness), typeof(int?), typeof(int?), typeof(bool?), typeof(bool), typeof(bool), typeof(int), typeof(Action)]),
-                (typeof(CenterLayout), [typeof(ICanvasComponent), typeof(int?), typeof(int?), typeof(Thickness), typeof(bool?), typeof(bool), typeof(bool), typeof(int), typeof(Action)]),
-                (typeof(PanelLayout), [typeof(ICanvasComponent), typeof(string), typeof(BorderStyle), typeof(Thickness), typeof(Thickness), typeof(int?), typeof(int?), typeof(bool?), typeof(bool), typeof(bool), typeof(int), typeof(Action)]),
+                (typeof(LayoutSlot),
+                [
+                    typeof(ICanvasComponent), typeof(LayoutLength), typeof(Thickness), typeof(int?), typeof(int?),
+                    typeof(bool?), typeof(bool), typeof(bool), typeof(int), typeof(Action)
+                ]),
+                (typeof(CenterLayout),
+                [
+                    typeof(ICanvasComponent), typeof(int?), typeof(int?), typeof(Thickness), typeof(bool?),
+                    typeof(bool), typeof(bool), typeof(int), typeof(Action)
+                ]),
+                (typeof(PanelLayout),
+                [
+                    typeof(ICanvasComponent), typeof(string), typeof(BorderStyle), typeof(Thickness),
+                    typeof(Thickness), typeof(int?), typeof(int?), typeof(bool?), typeof(bool), typeof(bool),
+                    typeof(int), typeof(Action)
+                ])
             };
 
         foreach (var (type, parameters) in removedCtors)
         {
             var publicCtor = type.GetConstructor(parameters);
-            TestAssert.True(publicCtor is null, $"{type.Name} legacy advanced canvas bridge constructor should be removed.");
+            TestAssert.True(publicCtor is null,
+                $"{type.Name} legacy advanced canvas bridge constructor should be removed.");
 
             var internalCtor = type.GetConstructor(
                 BindingFlags.Instance | BindingFlags.NonPublic,
-                binder: null,
-                types: parameters,
-                modifiers: null);
-            TestAssert.True(internalCtor is null, $"{type.Name} legacy advanced canvas bridge constructor should be removed instead of kept internal.");
+                null,
+                parameters,
+                null);
+            TestAssert.True(internalCtor is null,
+                $"{type.Name} legacy advanced canvas bridge constructor should be removed instead of kept internal.");
         }
 
         return Task.CompletedTask;
@@ -377,44 +411,62 @@ internal static class TesseraAppCompositionTests
             new (Type Type, string Name, Type[] Parameters)[]
             {
                 (typeof(Screen), nameof(Screen.From), [typeof(ICanvasComponent)]),
-                (typeof(LayoutSlot), nameof(LayoutSlot.Auto), [typeof(ICanvasComponent), typeof(Thickness)]),
-                (typeof(LayoutSlot), nameof(LayoutSlot.Fixed), [typeof(ICanvasComponent), typeof(int), typeof(Thickness)]),
-                (typeof(LayoutSlot), nameof(LayoutSlot.Fill), [typeof(ICanvasComponent), typeof(Thickness)]),
-                (typeof(LayoutSlot), nameof(LayoutSlot.Weighted), [typeof(ICanvasComponent), typeof(int), typeof(Thickness)]),
-                (typeof(RowLayout), nameof(RowLayout.AddAuto), [typeof(ICanvasComponent), typeof(Thickness)]),
-                (typeof(RowLayout), nameof(RowLayout.AddFixed), [typeof(ICanvasComponent), typeof(int), typeof(Thickness)]),
-                (typeof(RowLayout), nameof(RowLayout.AddFill), [typeof(ICanvasComponent), typeof(Thickness)]),
-                (typeof(RowLayout), nameof(RowLayout.AddWeighted), [typeof(ICanvasComponent), typeof(int), typeof(Thickness)]),
-                (typeof(ColumnLayout), nameof(ColumnLayout.AddAuto), [typeof(ICanvasComponent), typeof(Thickness)]),
-                (typeof(ColumnLayout), nameof(ColumnLayout.AddFixed), [typeof(ICanvasComponent), typeof(int), typeof(Thickness)]),
-                (typeof(ColumnLayout), nameof(ColumnLayout.AddFill), [typeof(ICanvasComponent), typeof(Thickness)]),
-                (typeof(ColumnLayout), nameof(ColumnLayout.AddWeighted), [typeof(ICanvasComponent), typeof(int), typeof(Thickness)]),
+                (typeof(LayoutSlot), nameof(LayoutSlot.Auto), [typeof(ICanvasComponent), typeof(Thickness)]), (
+                    typeof(LayoutSlot), nameof(LayoutSlot.Fixed),
+                    [typeof(ICanvasComponent), typeof(int), typeof(Thickness)]),
+                (typeof(LayoutSlot), nameof(LayoutSlot.Fill), [typeof(ICanvasComponent), typeof(Thickness)]), (
+                    typeof(LayoutSlot), nameof(LayoutSlot.Weighted),
+                    [typeof(ICanvasComponent), typeof(int), typeof(Thickness)]),
+                (typeof(RowLayout), nameof(RowLayout.AddAuto), [typeof(ICanvasComponent), typeof(Thickness)]), (
+                    typeof(RowLayout), nameof(RowLayout.AddFixed),
+                    [typeof(ICanvasComponent), typeof(int), typeof(Thickness)]),
+                (typeof(RowLayout), nameof(RowLayout.AddFill), [typeof(ICanvasComponent), typeof(Thickness)]), (
+                    typeof(RowLayout), nameof(RowLayout.AddWeighted),
+                    [typeof(ICanvasComponent), typeof(int), typeof(Thickness)]),
+                (typeof(ColumnLayout), nameof(ColumnLayout.AddAuto), [typeof(ICanvasComponent), typeof(Thickness)]), (
+                    typeof(ColumnLayout), nameof(ColumnLayout.AddFixed),
+                    [typeof(ICanvasComponent), typeof(int), typeof(Thickness)]),
+                (typeof(ColumnLayout), nameof(ColumnLayout.AddFill), [typeof(ICanvasComponent), typeof(Thickness)]), (
+                    typeof(ColumnLayout), nameof(ColumnLayout.AddWeighted),
+                    [typeof(ICanvasComponent), typeof(int), typeof(Thickness)])
             };
 
         foreach (var (type, name, parameters) in advancedMethods)
         {
             var method = type.GetMethod(name, parameters);
-            TestAssert.True(method is not null, $"{type.Name}.{name} legacy component overload should exist for advanced callers.");
-            var attribute = (EditorBrowsableAttribute?)Attribute.GetCustomAttribute(method!, typeof(EditorBrowsableAttribute));
-            TestAssert.True(attribute is not null, $"{type.Name}.{name} legacy component overload should be marked advanced.");
-            TestAssert.True(attribute!.State == EditorBrowsableState.Advanced, $"{type.Name}.{name} legacy component overload should be hidden from the default path.");
+            TestAssert.True(method is not null,
+                $"{type.Name}.{name} legacy component overload should exist for advanced callers.");
+            var attribute =
+                (EditorBrowsableAttribute?)Attribute.GetCustomAttribute(method!, typeof(EditorBrowsableAttribute));
+            TestAssert.True(attribute is not null,
+                $"{type.Name}.{name} legacy component overload should be marked advanced.");
+            TestAssert.True(attribute!.State == EditorBrowsableState.Advanced,
+                $"{type.Name}.{name} legacy component overload should be hidden from the default path.");
         }
 
         var advancedCtors =
             new (Type Type, Type[] Parameters)[]
             {
                 (typeof(LayoutSlot), [typeof(ICanvasComponent), typeof(LayoutLength), typeof(Thickness)]),
-                (typeof(CenterLayout), [typeof(ICanvasComponent), typeof(int?), typeof(int?), typeof(Thickness)]),
-                (typeof(PanelLayout), [typeof(ICanvasComponent), typeof(string), typeof(BorderStyle), typeof(Thickness), typeof(Thickness)]),
+                (typeof(CenterLayout), [typeof(ICanvasComponent), typeof(int?), typeof(int?), typeof(Thickness)]), (
+                    typeof(PanelLayout),
+                    [
+                        typeof(ICanvasComponent), typeof(string), typeof(BorderStyle), typeof(Thickness),
+                        typeof(Thickness)
+                    ])
             };
 
         foreach (var (type, parameters) in advancedCtors)
         {
             var ctor = type.GetConstructor(parameters);
-            TestAssert.True(ctor is not null, $"{type.Name} legacy component constructor should exist for advanced callers.");
-            var attribute = (EditorBrowsableAttribute?)Attribute.GetCustomAttribute(ctor!, typeof(EditorBrowsableAttribute));
-            TestAssert.True(attribute is not null, $"{type.Name} legacy component constructor should be marked advanced.");
-            TestAssert.True(attribute!.State == EditorBrowsableState.Advanced, $"{type.Name} legacy component constructor should be hidden from the default path.");
+            TestAssert.True(ctor is not null,
+                $"{type.Name} legacy component constructor should exist for advanced callers.");
+            var attribute =
+                (EditorBrowsableAttribute?)Attribute.GetCustomAttribute(ctor!, typeof(EditorBrowsableAttribute));
+            TestAssert.True(attribute is not null,
+                $"{type.Name} legacy component constructor should be marked advanced.");
+            TestAssert.True(attribute!.State == EditorBrowsableState.Advanced,
+                $"{type.Name} legacy component constructor should be hidden from the default path.");
         }
 
         return Task.CompletedTask;
@@ -428,22 +480,24 @@ internal static class TesseraAppCompositionTests
             typeof(EditorBrowsableAttribute));
 
         TestAssert.True(canvasAttribute is not null, "ICanvasComponent should remain explicitly marked as advanced.");
-        TestAssert.True(canvasAttribute!.State == EditorBrowsableState.Advanced, "ICanvasComponent should stay hidden from the default custom-widget path.");
+        TestAssert.True(canvasAttribute!.State == EditorBrowsableState.Advanced,
+            "ICanvasComponent should stay hidden from the default custom-widget path.");
 
         string[] contractNames =
         [
             "Tessera.Components.Composition.IStatefulComponent",
             "Tessera.Components.Composition.IMouseStatefulComponent",
             "Tessera.Components.Composition.IFocusableComponent",
-            "Tessera.Components.Composition.IInteractiveComponent",
+            "Tessera.Components.Composition.IInteractiveComponent"
         ];
 
         var assembly = typeof(Screen).Assembly;
 
         foreach (var contractName in contractNames)
         {
-            var contract = assembly.GetType(contractName, throwOnError: false);
-            TestAssert.True(contract is null, $"{contractName} should be removed once the scene compiler owns control interaction directly.");
+            var contract = assembly.GetType(contractName, false);
+            TestAssert.True(contract is null,
+                $"{contractName} should be removed once the scene compiler owns control interaction directly.");
         }
 
         return Task.CompletedTask;
@@ -457,14 +511,14 @@ internal static class TesseraAppCompositionTests
             "Tessera.Layout.SplitLayout",
             "Tessera.Layout.DockLayout",
             "Tessera.Layout.OverlayLayout",
-            "Tessera.Layout.LayoutOrientation",
+            "Tessera.Layout.LayoutOrientation"
         ];
 
         var assembly = typeof(Screen).Assembly;
 
         foreach (var typeName in layoutTypeNames)
         {
-            var type = assembly.GetType(typeName, throwOnError: false);
+            var type = assembly.GetType(typeName, false);
             TestAssert.True(type is not null, $"{typeName} should continue to exist as an internal bridge.");
             TestAssert.True(type!.IsNotPublic, $"{typeName} should no longer be public on the root layout path.");
         }
@@ -474,7 +528,7 @@ internal static class TesseraAppCompositionTests
 
     private static Task ComponentLayout_IsInternalized()
     {
-        var type = typeof(LayoutSlot).Assembly.GetType("Tessera.Layout.ComponentLayout", throwOnError: false);
+        var type = typeof(LayoutSlot).Assembly.GetType("Tessera.Layout.ComponentLayout", false);
         TestAssert.True(type is not null, "ComponentLayout should continue to exist as an internal bridge leaf.");
         TestAssert.True(type!.IsNotPublic, "ComponentLayout should no longer be public.");
         return Task.CompletedTask;
@@ -489,7 +543,7 @@ internal static class TesseraAppCompositionTests
             typeof(ColumnLayout),
             typeof(PanelLayout),
             typeof(CenterLayout),
-            typeof(LayoutSlot),
+            typeof(LayoutSlot)
         ];
 
         foreach (var type in layoutTypes)
@@ -513,153 +567,164 @@ internal static class TesseraAppCompositionTests
             _app = app;
         }
 
-        public global::Tessera.Core.Abstractions.Effect? Update(global::Tessera.Core.Abstractions.IMessage message) =>
-            TesseraEffectAdapter.ToCore(_app.UpdateRuntime(TesseraMessageAdapter.ToPublic(message)));
+        public Effect? Update(IMessage message)
+        {
+            return TesseraEffectAdapter.ToCore(_app.UpdateRuntime(TesseraMessageAdapter.ToPublic(message)));
+        }
 
-        public void Render() => _ = _app.RenderRuntime().Output;
+        public void Render()
+        {
+            _ = _app.RenderRuntime().Output;
+        }
     }
 
     private sealed class ButtonApp : TesseraApp
     {
-        public Button Button { get; } = new() { Text = "Run" };
-
-        public int ActivationCount { get; private set; }
-
         public ButtonApp()
         {
             Button.Activated += (_, _) => ActivationCount++;
         }
 
-        public override TesseraEffect? Update(Message message) => null;
+        public Button Button { get; } = new() { Text = "Run" };
 
-        public override Screen Build(ScreenContext context) =>
-            Screen.From(new WindowLayout
-            {
-                Body = new CenterLayout(Button, width: 16, height: 3),
-            });
+        public int ActivationCount { get; private set; }
+
+        public override TesseraEffect? Update(Message message)
+        {
+            return null;
+        }
+
+        public override Screen Build(ScreenContext context)
+        {
+            return Screen.From(new WindowLayout { Body = new CenterLayout(Button, 16, 3) });
+        }
     }
 
     private sealed class FormApp : TesseraApp
     {
+        public FormApp()
+        {
+            Input.Submitted += (_, args) => LastSubmittedValue = args.Value;
+        }
+
         public Button Button { get; } = new() { Text = "Send" };
 
         public TextInput Input { get; } = new() { Title = "Command" };
 
         public string LastSubmittedValue { get; private set; } = string.Empty;
 
-        public FormApp()
+        public override TesseraEffect? Update(Message message)
         {
-            Input.Submitted += (_, args) => LastSubmittedValue = args.Value;
+            return null;
         }
-
-        public override TesseraEffect? Update(Message message) => null;
 
         public override Screen Build(ScreenContext context)
         {
-            var fields = new ColumnLayout
-            {
-                Gap = 1,
-            };
+            var fields = new ColumnLayout { Gap = 1 };
             fields.AddFixed(Button, 3);
             fields.AddFixed(Input, 3);
 
             return Screen.From(new WindowLayout
             {
                 Body = new CenterLayout(
-                    new PanelLayout(fields, title: "Form", border: BorderStyle.SingleLine, padding: Thickness.All(1)),
-                    width: 28,
-                    height: 10),
+                    new PanelLayout(fields, "Form", BorderStyle.SingleLine, Thickness.All(1)),
+                    28,
+                    10)
             });
         }
     }
 
     private sealed class ChoiceApp : TesseraApp
     {
-        public Choice Choice { get; } = new() { Title = "Tab" };
-
         public ChoiceApp()
         {
             Choice.SetItems(["Open", "History", "Archived"]);
         }
 
-        public override TesseraEffect? Update(Message message) => null;
+        public Choice Choice { get; } = new() { Title = "Tab" };
 
-        public override Screen Build(ScreenContext context) =>
-            Screen.From(new WindowLayout
-            {
-                Body = new CenterLayout(Choice, width: 28, height: 6),
-            });
+        public override TesseraEffect? Update(Message message)
+        {
+            return null;
+        }
+
+        public override Screen Build(ScreenContext context)
+        {
+            return Screen.From(new WindowLayout { Body = new CenterLayout(Choice, 28, 6) });
+        }
     }
 
     private sealed class TabsApp : TesseraApp
     {
         public Tabs Tabs { get; } = new("Open", "History", "Archived");
 
-        public override TesseraEffect? Update(Message message) => null;
+        public override TesseraEffect? Update(Message message)
+        {
+            return null;
+        }
 
-        public override Screen Build(ScreenContext context) =>
-            Screen.From(new WindowLayout
-            {
-                Body = new CenterLayout(Tabs, width: 36, height: 1),
-            });
+        public override Screen Build(ScreenContext context)
+        {
+            return Screen.From(new WindowLayout { Body = new CenterLayout(Tabs, 36, 1) });
+        }
     }
 
     private sealed class ComboBoxApp : TesseraApp
     {
-        public ComboBox ComboBox { get; } = new()
-        {
-            Title = "Regions",
-            IsFocused = true,
-        };
-
         public ComboBoxApp()
         {
             ComboBox.SetItems(["east", "west", "north"]);
         }
 
-        public override TesseraEffect? Update(Message message) => null;
+        public ComboBox ComboBox { get; } = new() { Title = "Regions", IsFocused = true };
 
-        public override Screen Build(ScreenContext context) =>
-            Screen.From(new WindowLayout
-            {
-                Body = new CenterLayout(ComboBox, width: 28, height: 6),
-            });
+        public override TesseraEffect? Update(Message message)
+        {
+            return null;
+        }
+
+        public override Screen Build(ScreenContext context)
+        {
+            return Screen.From(new WindowLayout { Body = new CenterLayout(ComboBox, 28, 6) });
+        }
     }
 
     private sealed class MenuApp : TesseraApp
     {
-        public MenuBar Menu { get; } = new();
-
-        public string LastActivatedItemId { get; private set; } = string.Empty;
-
         public MenuApp()
         {
             Menu.SetItems([new MenuItem("refresh", "Refresh", 'r')]);
             Menu.ItemActivated += (_, args) => LastActivatedItemId = args.ItemId;
         }
 
-        public override TesseraEffect? Update(Message message) => null;
+        public MenuBar Menu { get; } = new();
 
-        public override Screen Build(ScreenContext context) =>
-            Screen.From(new WindowLayout
-            {
-                Body = new CenterLayout(Menu, width: 24, height: 1),
-            });
+        public string LastActivatedItemId { get; private set; } = string.Empty;
+
+        public override TesseraEffect? Update(Message message)
+        {
+            return null;
+        }
+
+        public override Screen Build(ScreenContext context)
+        {
+            return Screen.From(new WindowLayout { Body = new CenterLayout(Menu, 24, 1) });
+        }
     }
 
     private sealed class FilteredInputApp : TesseraApp
     {
+        public FilteredInputApp()
+        {
+            Button.Activated += (_, _) => ActivationCount++;
+        }
+
         public Button Button { get; } = new() { Text = "Run" };
 
         public int ActivationCount { get; private set; }
 
         public int KeyUpdateCount { get; private set; }
 
-        public FilteredInputApp()
-        {
-            Button.Activated += (_, _) => ActivationCount++;
-        }
-
         public override TesseraEffect? Update(Message message)
         {
             if (message is KeyPressed)
@@ -670,24 +735,23 @@ internal static class TesseraAppCompositionTests
             return null;
         }
 
-        public override Screen Build(ScreenContext context) =>
-            Screen.From(new WindowLayout
-            {
-                Body = new CenterLayout(Button, width: 16, height: 3),
-            });
+        public override Screen Build(ScreenContext context)
+        {
+            return Screen.From(new WindowLayout { Body = new CenterLayout(Button, 16, 3) });
+        }
     }
 
     private sealed class RequestedEffectApp : TesseraApp
     {
-        public Button Button { get; } = new() { Text = "Quit" };
-
-        public int KeyUpdateCount { get; private set; }
-
         public RequestedEffectApp()
         {
             Button.Activated += (_, _) => RequestEffect(TesseraEffects.Quit);
         }
 
+        public Button Button { get; } = new() { Text = "Quit" };
+
+        public int KeyUpdateCount { get; private set; }
+
         public override TesseraEffect? Update(Message message)
         {
             if (message is KeyPressed)
@@ -698,11 +762,10 @@ internal static class TesseraAppCompositionTests
             return null;
         }
 
-        public override Screen Build(ScreenContext context) =>
-            Screen.From(new WindowLayout
-            {
-                Body = new CenterLayout(Button, width: 16, height: 3),
-            });
+        public override Screen Build(ScreenContext context)
+        {
+            return Screen.From(new WindowLayout { Body = new CenterLayout(Button, 16, 3) });
+        }
     }
 
     private sealed class GlobalHotkeyApp : TesseraApp
@@ -738,11 +801,10 @@ internal static class TesseraAppCompositionTests
             return null;
         }
 
-        public override Screen Build(ScreenContext context) =>
-            Screen.From(new WindowLayout
-            {
-                Body = new CenterLayout(Control, width: 18, height: 3),
-            });
+        public override Screen Build(ScreenContext context)
+        {
+            return Screen.From(new WindowLayout { Body = new CenterLayout(Control, 18, 3) });
+        }
     }
 
     private sealed class ConsumingKeyControl : Control
@@ -751,55 +813,52 @@ internal static class TesseraAppCompositionTests
         {
         }
 
-        public override bool Handle(Message message) => message is KeyPressed or KeyReleased;
+        public override bool Handle(Message message)
+        {
+            return message is KeyPressed or KeyReleased;
+        }
     }
 
     private sealed class OverlayPaletteApp : TesseraApp
     {
-        public Button Button { get; } = new() { Text = "Base" };
-
-        public CommandPalette Palette { get; } = new()
-        {
-            Title = "Actions",
-        };
-
-        public int ButtonActivationCount { get; private set; }
-
-        public string LastExecutedItemId { get; private set; } = string.Empty;
-
         public OverlayPaletteApp()
         {
             Button.Activated += (_, _) => ButtonActivationCount++;
             Palette.SetItems(
             [
-                new global::Tessera.Controls.CommandPaletteItem("deploy", "Deploy", "publish release"),
-                new global::Tessera.Controls.CommandPaletteItem("rollback", "Rollback", "restore previous"),
+                new CommandPaletteItem("deploy", "Deploy", "publish release"),
+                new CommandPaletteItem("rollback", "Rollback", "restore previous")
             ]);
             Palette.ItemExecuted += (_, args) => LastExecutedItemId = args.ItemId;
             Palette.Open();
             Palette.QueryText = "roll";
         }
 
-        public override TesseraEffect? Update(Message message) => null;
+        public Button Button { get; } = new() { Text = "Base" };
 
-        public override Screen Build(ScreenContext context) =>
-            Screen.From(new WindowLayout
+        public CommandPalette Palette { get; } = new() { Title = "Actions" };
+
+        public int ButtonActivationCount { get; private set; }
+
+        public string LastExecutedItemId { get; private set; } = string.Empty;
+
+        public override TesseraEffect? Update(Message message)
+        {
+            return null;
+        }
+
+        public override Screen Build(ScreenContext context)
+        {
+            return Screen.From(new WindowLayout
             {
-                Body = new CenterLayout(Button, width: 16, height: 3),
-                Overlay = new CenterLayout(Palette, width: 48, height: 10),
+                Body = new CenterLayout(Button, 16, 3),
+                Overlay = new CenterLayout(Palette, 48, 10)
             });
+        }
     }
 
     private sealed class FocusRequestOrderingApp : TesseraApp
     {
-        public Button LeftButton { get; } = new() { Text = "Left" };
-
-        public Button RightButton { get; } = new() { Text = "Right" };
-
-        public int LeftActivationCount { get; private set; }
-
-        public int RightActivationCount { get; private set; }
-
         public FocusRequestOrderingApp()
         {
             LeftButton.Activated += (_, _) => LeftActivationCount++;
@@ -809,53 +868,6 @@ internal static class TesseraAppCompositionTests
             LeftButton.RequestFocus();
         }
 
-        public override TesseraEffect? Update(Message message) => null;
-
-        public override Screen Build(ScreenContext context)
-        {
-            var row = new RowLayout
-            {
-                Gap = 2,
-            };
-            row.AddFixed(LeftButton, 12);
-            row.AddFixed(RightButton, 12);
-
-            return Screen.From(new WindowLayout
-            {
-                Body = new CenterLayout(row, width: 28, height: 3),
-            });
-        }
-    }
-
-    private sealed class OverlayDialogApp : TesseraApp
-    {
-        public Button Button { get; } = new() { Text = "Primary" };
-
-        public Dialog Dialog { get; } = new()
-        {
-            Padding = Thickness.All(1),
-        };
-
-        public int ButtonActivationCount { get; private set; }
-
-        public OverlayDialogApp()
-        {
-            Button.Activated += (_, _) => ButtonActivationCount++;
-            Dialog.Show("Confirm", "Apply changes?");
-        }
-
-        public override TesseraEffect? Update(Message message) => null;
-
-        public override Screen Build(ScreenContext context) =>
-            Screen.From(new WindowLayout
-            {
-                Body = new CenterLayout(Button, width: 18, height: 3),
-                Overlay = new CenterLayout(Dialog, width: 48, height: 10),
-            });
-    }
-
-    private sealed class OneShotFocusRequestApp : TesseraApp
-    {
         public Button LeftButton { get; } = new() { Text = "Left" };
 
         public Button RightButton { get; } = new() { Text = "Right" };
@@ -864,6 +876,52 @@ internal static class TesseraAppCompositionTests
 
         public int RightActivationCount { get; private set; }
 
+        public override TesseraEffect? Update(Message message)
+        {
+            return null;
+        }
+
+        public override Screen Build(ScreenContext context)
+        {
+            var row = new RowLayout { Gap = 2 };
+            row.AddFixed(LeftButton, 12);
+            row.AddFixed(RightButton, 12);
+
+            return Screen.From(new WindowLayout { Body = new CenterLayout(row, 28, 3) });
+        }
+    }
+
+    private sealed class OverlayDialogApp : TesseraApp
+    {
+        public OverlayDialogApp()
+        {
+            Button.Activated += (_, _) => ButtonActivationCount++;
+            Dialog.Show("Confirm", "Apply changes?");
+        }
+
+        public Button Button { get; } = new() { Text = "Primary" };
+
+        public Dialog Dialog { get; } = new() { Padding = Thickness.All(1) };
+
+        public int ButtonActivationCount { get; private set; }
+
+        public override TesseraEffect? Update(Message message)
+        {
+            return null;
+        }
+
+        public override Screen Build(ScreenContext context)
+        {
+            return Screen.From(new WindowLayout
+            {
+                Body = new CenterLayout(Button, 18, 3),
+                Overlay = new CenterLayout(Dialog, 48, 10)
+            });
+        }
+    }
+
+    private sealed class OneShotFocusRequestApp : TesseraApp
+    {
         public OneShotFocusRequestApp()
         {
             LeftButton.Activated += (_, _) => LeftActivationCount++;
@@ -871,21 +929,26 @@ internal static class TesseraAppCompositionTests
             LeftButton.RequestFocus();
         }
 
-        public override TesseraEffect? Update(Message message) => null;
+        public Button LeftButton { get; } = new() { Text = "Left" };
+
+        public Button RightButton { get; } = new() { Text = "Right" };
+
+        public int LeftActivationCount { get; private set; }
+
+        public int RightActivationCount { get; private set; }
+
+        public override TesseraEffect? Update(Message message)
+        {
+            return null;
+        }
 
         public override Screen Build(ScreenContext context)
         {
-            var row = new RowLayout
-            {
-                Gap = 2,
-            };
+            var row = new RowLayout { Gap = 2 };
             row.AddFixed(LeftButton, 12);
             row.AddFixed(RightButton, 12);
 
-            return Screen.From(new WindowLayout
-            {
-                Body = new CenterLayout(row, width: 28, height: 3),
-            });
+            return Screen.From(new WindowLayout { Body = new CenterLayout(row, 28, 3) });
         }
     }
 
@@ -902,7 +965,10 @@ internal static class TesseraAppCompositionTests
 
         public int ActivationCount { get; private set; }
 
-        public override TesseraEffect? Update(Message message) => null;
+        public override TesseraEffect? Update(Message message)
+        {
+            return null;
+        }
 
         public override Screen Build(ScreenContext context)
         {
@@ -913,7 +979,7 @@ internal static class TesseraAppCompositionTests
             {
                 window.Padding(1);
                 window.Footer(1, _status);
-                window.Body(body => body.Center(_button, width: 18, height: 3));
+                window.Body(body => body.Center(_button, 18, 3));
             });
         }
     }

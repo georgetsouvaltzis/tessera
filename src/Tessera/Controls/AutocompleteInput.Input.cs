@@ -83,10 +83,10 @@ public sealed partial class AutocompleteInput
         var popupStartY = content.Y + 1;
         var visibleSuggestions = ResolveVisibleSuggestionCount(content.Height);
         var withinPopup = IsPopupVisible
-            && pointer.X >= content.X
-            && pointer.X <= content.Right
-            && pointer.Y >= popupStartY
-            && pointer.Y < popupStartY + visibleSuggestions;
+                          && pointer.X >= content.X
+                          && pointer.X <= content.Right
+                          && pointer.Y >= popupStartY
+                          && pointer.Y < popupStartY + visibleSuggestions;
 
         if (!withinPopup)
         {

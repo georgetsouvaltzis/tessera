@@ -1,3 +1,4 @@
+using System.Globalization;
 using Tessera.Components.Primitives;
 
 namespace Tessera.Controls.Internal;
@@ -30,8 +31,8 @@ internal static class ChartRenderer
         var plot = content;
         if (chartOptions.ShowAxes && content.Width >= 6 && content.Height >= 4)
         {
-            canvas.DrawVerticalLine(content.X, content.Y, content.Height, '│');
-            canvas.DrawHorizontalLine(content.X, content.Bottom - 1, content.Width, '─');
+            canvas.DrawVerticalLine(content.X, content.Y, content.Height);
+            canvas.DrawHorizontalLine(content.X, content.Bottom - 1, content.Width);
             canvas.Set(content.X, content.Bottom - 1, '└');
             plot = new Rect(content.X + 1, content.Y, content.Width - 1, content.Height - 1);
         }
@@ -223,14 +224,14 @@ internal static class ChartRenderer
 
         for (var x = Math.Min(x0, x1) + 1; x < Math.Max(x0, x1); x++)
         {
-            canvas.Set(x, y0 + ((x - x0) * dy / dx), step);
+            canvas.Set(x, y0 + (x - x0) * dy / dx, step);
         }
     }
 
     private static string FormatStat(double value)
     {
         return Math.Abs(value) >= 100
-            ? value.ToString("0", System.Globalization.CultureInfo.InvariantCulture)
-            : value.ToString("0.0", System.Globalization.CultureInfo.InvariantCulture);
+            ? value.ToString("0", CultureInfo.InvariantCulture)
+            : value.ToString("0.0", CultureInfo.InvariantCulture);
     }
 }

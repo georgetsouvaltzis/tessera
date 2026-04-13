@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using Tessera.Components.Primitives;
 using Tessera.Components.Primitives.Internal;
 using Tessera.Controls.Internal;
@@ -12,71 +13,93 @@ public sealed class VirtualizedListView<T> : Control
 {
     private static readonly IReadOnlyList<T> Empty = Array.Empty<T>();
     private readonly Func<T, string> _textSelector;
+    private int _hoveredIndex = -1;
     private IReadOnlyList<T> _items = Empty;
     private Func<int, T>? _resolver;
-    private int _count;
-    private int _selectedIndex = -1;
-    private int _hoveredIndex = -1;
     private int _scrollOffset;
     private int _viewportHeight = 1;
 
     /// <summary>Creates a list with an optional text selector.</summary>
-    public VirtualizedListView(Func<T, string>? textSelector = null) => _textSelector = textSelector ?? DefaultText;
+    public VirtualizedListView(Func<T, string>? textSelector = null)
+    {
+        _textSelector = textSelector ?? DefaultText;
+    }
+
+    /// <summary>List title.</summary>
+    public string Title { get; set; } = "Virtualized List";
+
+    /// <summary>Focused title marker.</summary>
+    public string FocusMarker { get; set; } = "*";
+
+    /// <summary>Whether to show <see cref="FocusMarker" />.</summary>
+    public bool ShowFocusMarker { get; set; } = true;
+
+    /// <summary>Title style when unfocused.</summary>
+    public TesseraStyle TitleStyle { get; set; } = TesseraStyle.Empty;
+
+    /// <summary>Title style when focused.</summary>
+    public TesseraStyle FocusedTitleStyle { get; set; } = TesseraStyle.Empty;
+
+    /// <summary>Base row style.</summary>
+    public TesseraStyle DefaultRowStyle { get; set; } = TesseraStyle.Empty;
+
+    /// <summary>Hovered row style merge.</summary>
+    public TesseraStyle HoveredRowStyle { get; set; } = TesseraStyle.Empty;
+
+    /// <summary>Selected row style merge.</summary>
+    public TesseraStyle SelectedRowStyle { get; set; } = TesseraStyle.Empty;
+
+    /// <summary>Disabled row style merge.</summary>
+    public TesseraStyle DisabledRowStyle { get; set; } = TesseraStyle.Empty;
+
+    /// <summary>Unfocused border style.</summary>
+    public TesseraStyle BorderStyleText { get; set; } = TesseraStyle.Empty;
+
+    /// <summary>Focused border style merge.</summary>
+    public TesseraStyle FocusedBorderStyleText { get; set; } = TesseraStyle.Empty;
+
+    /// <summary>Text rendered when no rows exist.</summary>
+    public string EmptyText { get; set; } = "(empty)";
+
+    /// <summary>Frame border style.</summary>
+    public BorderStyle Border { get; set; } = BorderStyle.SingleLine;
+
+    /// <summary>Inner content padding.</summary>
+    public Thickness Padding { get; set; }
+
+    /// <summary>Advanced behavior options.</summary>
+    [EditorBrowsable(EditorBrowsableState.Advanced)]
+    public VirtualizedListViewOptions Options { get; set; } = new();
+
+    /// <summary>Total item count.</summary>
+    public int Count { get; private set; }
+
+    /// <summary>Selected index or <c>-1</c>.</summary>
+    public int SelectedIndex { get; private set; } = -1;
+
+    /// <summary>Selected item when available.</summary>
+    public T? SelectedItem => TryResolve(SelectedIndex, out var item) ? item : default;
+
+    /// <inheritdoc />
+    public override bool IsFocused { get; set; }
+
+    /// <inheritdoc />
+    public override bool IsDisabled { get; set; }
+
+    /// <inheritdoc />
+    public override bool IsReadOnly { get; set; }
 
     /// <summary>Raised when selection changes.</summary>
     public event EventHandler<ListSelectionChangedEventArgs<T>>? SelectionChanged;
-    /// <summary>List title.</summary>
-    public string Title { get; set; } = "Virtualized List";
-    /// <summary>Focused title marker.</summary>
-    public string FocusMarker { get; set; } = "*";
-    /// <summary>Whether to show <see cref="FocusMarker"/>.</summary>
-    public bool ShowFocusMarker { get; set; } = true;
-    /// <summary>Title style when unfocused.</summary>
-    public TesseraStyle TitleStyle { get; set; } = TesseraStyle.Empty;
-    /// <summary>Title style when focused.</summary>
-    public TesseraStyle FocusedTitleStyle { get; set; } = TesseraStyle.Empty;
-    /// <summary>Base row style.</summary>
-    public TesseraStyle DefaultRowStyle { get; set; } = TesseraStyle.Empty;
-    /// <summary>Hovered row style merge.</summary>
-    public TesseraStyle HoveredRowStyle { get; set; } = TesseraStyle.Empty;
-    /// <summary>Selected row style merge.</summary>
-    public TesseraStyle SelectedRowStyle { get; set; } = TesseraStyle.Empty;
-    /// <summary>Disabled row style merge.</summary>
-    public TesseraStyle DisabledRowStyle { get; set; } = TesseraStyle.Empty;
-    /// <summary>Unfocused border style.</summary>
-    public TesseraStyle BorderStyleText { get; set; } = TesseraStyle.Empty;
-    /// <summary>Focused border style merge.</summary>
-    public TesseraStyle FocusedBorderStyleText { get; set; } = TesseraStyle.Empty;
-    /// <summary>Text rendered when no rows exist.</summary>
-    public string EmptyText { get; set; } = "(empty)";
-    /// <summary>Frame border style.</summary>
-    public BorderStyle Border { get; set; } = BorderStyle.SingleLine;
-    /// <summary>Inner content padding.</summary>
-    public Thickness Padding { get; set; }
-    /// <summary>Advanced behavior options.</summary>
-    [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Advanced)]
-    public VirtualizedListViewOptions Options { get; set; } = new();
-    /// <summary>Total item count.</summary>
-    public int Count => _count;
-    /// <summary>Selected index or <c>-1</c>.</summary>
-    public int SelectedIndex => _selectedIndex;
-    /// <summary>Selected item when available.</summary>
-    public T? SelectedItem => TryResolve(_selectedIndex, out var item) ? item : default;
-    /// <inheritdoc />
-    public override bool IsFocused { get; set; }
-    /// <inheritdoc />
-    public override bool IsDisabled { get; set; }
-    /// <inheritdoc />
-    public override bool IsReadOnly { get; set; }
 
     /// <summary>Sets in-memory items.</summary>
     public void SetItems(IReadOnlyList<T> items)
     {
         ArgumentNullException.ThrowIfNull(items);
-        var prev = (_selectedIndex, CaptureSelectedItemForEvent());
+        var prev = (SelectedIndex, CaptureSelectedItemForEvent());
         _resolver = null;
         _items = items;
-        _count = items.Count;
+        Count = items.Count;
         NormalizeAfterSourceChange();
         RaiseSelectionChangedIfNeeded(prev.Item1, prev.Item2);
     }
@@ -92,10 +115,10 @@ public sealed class VirtualizedListView<T> : Control
     public void SetDataSource(int count, Func<int, T> itemResolver)
     {
         ArgumentNullException.ThrowIfNull(itemResolver);
-        var prev = (_selectedIndex, CaptureSelectedItemForEvent());
+        var prev = (SelectedIndex, CaptureSelectedItemForEvent());
         _items = Empty;
         _resolver = itemResolver;
-        _count = Math.Max(0, count);
+        Count = Math.Max(0, count);
         NormalizeAfterSourceChange();
         RaiseSelectionChangedIfNeeded(prev.Item1, prev.Item2);
     }
@@ -103,11 +126,11 @@ public sealed class VirtualizedListView<T> : Control
     /// <summary>Clears data and selection.</summary>
     public void Clear()
     {
-        var prev = (_selectedIndex, CaptureSelectedItemForEvent());
+        var prev = (SelectedIndex, CaptureSelectedItemForEvent());
         _items = Empty;
         _resolver = null;
-        _count = 0;
-        _selectedIndex = -1;
+        Count = 0;
+        SelectedIndex = -1;
         _hoveredIndex = -1;
         _scrollOffset = 0;
         RaiseSelectionChangedIfNeeded(prev.Item1, prev.Item2);
@@ -116,19 +139,19 @@ public sealed class VirtualizedListView<T> : Control
     /// <summary>Sets selected index with bounds clamping.</summary>
     public bool SetSelectedIndex(int index)
     {
-        if (_count <= 0)
+        if (Count <= 0)
         {
             return false;
         }
 
-        var next = Math.Clamp(index, 0, _count - 1);
-        if (next == _selectedIndex)
+        var next = Math.Clamp(index, 0, Count - 1);
+        if (next == SelectedIndex)
         {
             return false;
         }
 
-        var prev = (_selectedIndex, CaptureSelectedItemForEvent());
-        _selectedIndex = next;
+        var prev = (SelectedIndex, CaptureSelectedItemForEvent());
+        SelectedIndex = next;
         EnsureSelectionVisible(_viewportHeight);
         RaiseSelectionChangedIfNeeded(prev.Item1, prev.Item2);
         return true;
@@ -137,26 +160,57 @@ public sealed class VirtualizedListView<T> : Control
     /// <inheritdoc />
     public override bool Handle(Message message)
     {
-        if (IsDisabled || IsReadOnly || !IsFocused || _count == 0 || message is not KeyPressed key)
+        if (IsDisabled || IsReadOnly || !IsFocused || Count == 0 || message is not KeyPressed key)
         {
             return false;
         }
 
-        if (key.Is(Key.Down) || key.IsCharacter('j')) return SetSelectedIndex(_selectedIndex + 1);
-        if (key.Is(Key.Up) || key.IsCharacter('k')) return SetSelectedIndex(_selectedIndex - 1);
-        if (key.Is(Key.PageDown)) return SetSelectedIndex(_selectedIndex + Math.Max(1, _viewportHeight));
-        if (key.Is(Key.PageUp)) return SetSelectedIndex(_selectedIndex - Math.Max(1, _viewportHeight));
-        if (key.Is(Key.Home)) return SetSelectedIndex(0);
-        if (key.Is(Key.End)) return SetSelectedIndex(_count - 1);
+        if (key.Is(Key.Down) || key.IsCharacter('j'))
+        {
+            return SetSelectedIndex(SelectedIndex + 1);
+        }
+
+        if (key.Is(Key.Up) || key.IsCharacter('k'))
+        {
+            return SetSelectedIndex(SelectedIndex - 1);
+        }
+
+        if (key.Is(Key.PageDown))
+        {
+            return SetSelectedIndex(SelectedIndex + Math.Max(1, _viewportHeight));
+        }
+
+        if (key.Is(Key.PageUp))
+        {
+            return SetSelectedIndex(SelectedIndex - Math.Max(1, _viewportHeight));
+        }
+
+        if (key.Is(Key.Home))
+        {
+            return SetSelectedIndex(0);
+        }
+
+        if (key.Is(Key.End))
+        {
+            return SetSelectedIndex(Count - 1);
+        }
+
         return false;
     }
 
     /// <inheritdoc />
     public override bool Handle(Message message, Rect bounds)
     {
-        if (IsDisabled || IsReadOnly || message is not PointerInput pointer || bounds.IsEmpty) return Handle(message);
+        if (IsDisabled || IsReadOnly || message is not PointerInput pointer || bounds.IsEmpty)
+        {
+            return Handle(message);
+        }
+
         var content = FrameLayout.ResolveContentRect(bounds, Border, Padding);
-        if (content.IsEmpty) return Handle(message);
+        if (content.IsEmpty)
+        {
+            return Handle(message);
+        }
 
         _viewportHeight = Math.Max(1, content.Height);
         var inside = content.Contains(pointer.X, pointer.Y);
@@ -169,19 +223,38 @@ public sealed class VirtualizedListView<T> : Control
         if (pointer.Kind == PointerEventKind.Wheel)
         {
             var step = Math.Clamp(Options.WheelStep, 1, 32);
-            if (pointer.Button == PointerButton.WheelDown) return SetSelectedIndex(_selectedIndex + step) || changed;
-            if (pointer.Button == PointerButton.WheelUp) return SetSelectedIndex(_selectedIndex - step) || changed;
+            if (pointer.Button == PointerButton.WheelDown)
+            {
+                return SetSelectedIndex(SelectedIndex + step) || changed;
+            }
+
+            if (pointer.Button == PointerButton.WheelUp)
+            {
+                return SetSelectedIndex(SelectedIndex - step) || changed;
+            }
+
             return changed;
         }
 
-        if (!inside || _count == 0) return changed;
+        if (!inside || Count == 0)
+        {
+            return changed;
+        }
+
         var hovered = ResolveIndexFromPointer(content, pointer.Y);
-        if (pointer.Kind == PointerEventKind.Motion) return SetHovered(hovered);
+        if (pointer.Kind == PointerEventKind.Motion)
+        {
+            return SetHovered(hovered);
+        }
+
         if (pointer.Kind == PointerEventKind.Press && pointer.Button == PointerButton.Left)
         {
             RequestFocus();
             changed |= SetHovered(hovered);
-            if (hovered >= 0) changed |= SetSelectedIndex(hovered);
+            if (hovered >= 0)
+            {
+                changed |= SetSelectedIndex(hovered);
+            }
         }
 
         return changed;
@@ -191,7 +264,11 @@ public sealed class VirtualizedListView<T> : Control
     public override void Render(Canvas canvas, Rect rect)
     {
         var clipped = Rect.Intersect(rect, canvas.Bounds);
-        if (clipped.IsEmpty) return;
+        if (clipped.IsEmpty)
+        {
+            return;
+        }
+
         var content = FrameLayout.DrawFrameAndResolveContent(
             canvas,
             clipped,
@@ -199,24 +276,31 @@ public sealed class VirtualizedListView<T> : Control
             Border,
             Padding,
             ResolveBorderStyle());
-        if (content.IsEmpty) return;
+        if (content.IsEmpty)
+        {
+            return;
+        }
 
         _viewportHeight = Math.Max(1, content.Height);
-        if (_count == 0)
+        if (Count == 0)
         {
-            canvas.WriteText(content.X, content.Y, ApplyStyle(EmptyText, ResolveRowStyle(selected: false, hovered: false)), content.Width);
+            canvas.WriteText(content.X, content.Y, ApplyStyle(EmptyText, ResolveRowStyle(false, false)), content.Width);
             return;
         }
 
         EnsureSelectionVisible(content.Height);
-        var visibleRows = Math.Min(content.Height, _count - _scrollOffset);
+        var visibleRows = Math.Min(content.Height, Count - _scrollOffset);
         for (var row = 0; row < visibleRows; row++)
         {
             var index = _scrollOffset + row;
-            if (!TryResolve(index, out var item)) continue;
+            if (!TryResolve(index, out var item))
+            {
+                continue;
+            }
+
             var text = _textSelector(item);
             var prefix = "  ";
-            if (index == _selectedIndex)
+            if (index == SelectedIndex)
             {
                 prefix = "> ";
             }
@@ -224,10 +308,12 @@ public sealed class VirtualizedListView<T> : Control
             {
                 prefix = "~ ";
             }
+
             canvas.WriteText(
                 content.X,
                 content.Y + row,
-                ApplyStyle(string.Concat(prefix, text), ResolveRowStyle(index == _selectedIndex, index == _hoveredIndex)),
+                ApplyStyle(string.Concat(prefix, text),
+                    ResolveRowStyle(index == SelectedIndex, index == _hoveredIndex)),
                 content.Width);
         }
     }
@@ -237,12 +323,13 @@ public sealed class VirtualizedListView<T> : Control
         var width = Math.Max(12, ControlTextLayout.MeasureDisplayWidth(MeasureTitle()) + 4);
         var height = 6 + Padding.Vertical + (Border == BorderStyle.None ? 0 : 2);
         width += Padding.Horizontal + (Border == BorderStyle.None ? 0 : 2);
-        return new LayoutMeasurement(Math.Clamp(width, 0, availableBounds.Width), Math.Clamp(height, 0, availableBounds.Height));
+        return new LayoutMeasurement(Math.Clamp(width, 0, availableBounds.Width),
+            Math.Clamp(height, 0, availableBounds.Height));
     }
 
     private bool TryResolve(int index, out T item)
     {
-        if (index < 0 || index >= _count)
+        if (index < 0 || index >= Count)
         {
             item = default!;
             return false;
@@ -260,68 +347,108 @@ public sealed class VirtualizedListView<T> : Control
 
     private void NormalizeAfterSourceChange()
     {
-        if (_count == 0)
+        if (Count == 0)
         {
-            _selectedIndex = -1;
+            SelectedIndex = -1;
             _hoveredIndex = -1;
             _scrollOffset = 0;
             return;
         }
 
-        _selectedIndex = Math.Clamp(_selectedIndex < 0 ? 0 : _selectedIndex, 0, _count - 1);
-        _hoveredIndex = Math.Clamp(_hoveredIndex, -1, _count - 1);
+        SelectedIndex = Math.Clamp(SelectedIndex < 0 ? 0 : SelectedIndex, 0, Count - 1);
+        _hoveredIndex = Math.Clamp(_hoveredIndex, -1, Count - 1);
         EnsureSelectionVisible(Math.Max(1, _viewportHeight));
     }
 
     private void EnsureSelectionVisible(int viewportHeight)
     {
-        if (_count == 0 || viewportHeight <= 0)
+        if (Count == 0 || viewportHeight <= 0)
         {
             _scrollOffset = 0;
             return;
         }
 
-        if (_selectedIndex < 0) _selectedIndex = 0;
+        if (SelectedIndex < 0)
+        {
+            SelectedIndex = 0;
+        }
+
         if (Options.KeepSelectionCentered && viewportHeight > 1)
         {
-            var centered = _selectedIndex - (viewportHeight / 2);
-            _scrollOffset = Math.Clamp(centered, 0, Math.Max(0, _count - viewportHeight));
+            var centered = SelectedIndex - viewportHeight / 2;
+            _scrollOffset = Math.Clamp(centered, 0, Math.Max(0, Count - viewportHeight));
             return;
         }
 
-        if (_selectedIndex < _scrollOffset) _scrollOffset = _selectedIndex;
-        else if (_selectedIndex >= _scrollOffset + viewportHeight) _scrollOffset = _selectedIndex - viewportHeight + 1;
-        _scrollOffset = Math.Clamp(_scrollOffset, 0, Math.Max(0, _count - viewportHeight));
+        if (SelectedIndex < _scrollOffset)
+        {
+            _scrollOffset = SelectedIndex;
+        }
+        else if (SelectedIndex >= _scrollOffset + viewportHeight)
+        {
+            _scrollOffset = SelectedIndex - viewportHeight + 1;
+        }
+
+        _scrollOffset = Math.Clamp(_scrollOffset, 0, Math.Max(0, Count - viewportHeight));
     }
 
     private int ResolveIndexFromPointer(Rect content, int y)
     {
-        if (y < content.Y || y >= content.Bottom) return -1;
+        if (y < content.Y || y >= content.Bottom)
+        {
+            return -1;
+        }
+
         var index = _scrollOffset + (y - content.Y);
-        return index >= 0 && index < _count ? index : -1;
+        return index >= 0 && index < Count ? index : -1;
     }
 
     private bool SetHovered(int index)
     {
-        if (_hoveredIndex == index) return false;
+        if (_hoveredIndex == index)
+        {
+            return false;
+        }
+
         _hoveredIndex = index;
         return true;
     }
 
     private void RaiseSelectionChangedIfNeeded(int previousIndex, T? previousItem)
     {
-        if (SelectionChanged is null) return;
+        if (SelectionChanged is null)
+        {
+            return;
+        }
+
         var currentItem = SelectedItem;
-        if (previousIndex == _selectedIndex && ReferenceEquals(previousItem, currentItem)) return;
-        SelectionChanged.Invoke(this, new ListSelectionChangedEventArgs<T>(previousIndex, _selectedIndex, previousItem, currentItem));
+        if (previousIndex == SelectedIndex && ReferenceEquals(previousItem, currentItem))
+        {
+            return;
+        }
+
+        SelectionChanged.Invoke(this,
+            new ListSelectionChangedEventArgs<T>(previousIndex, SelectedIndex, previousItem, currentItem));
     }
 
     private TesseraStyle ResolveRowStyle(bool selected, bool hovered)
     {
         var style = DefaultRowStyle;
-        if (hovered) style = style.Merge(HoveredRowStyle);
-        if (selected) style = style.Merge(SelectedRowStyle);
-        if (IsDisabled) style = style.Merge(DisabledRowStyle);
+        if (hovered)
+        {
+            style = style.Merge(HoveredRowStyle);
+        }
+
+        if (selected)
+        {
+            style = style.Merge(SelectedRowStyle);
+        }
+
+        if (IsDisabled)
+        {
+            style = style.Merge(DisabledRowStyle);
+        }
+
         return style;
     }
 
@@ -331,15 +458,37 @@ public sealed class VirtualizedListView<T> : Control
         return IsDisabled ? style.Merge(DisabledRowStyle) : style;
     }
 
-    private string RenderTitle() => ApplyStyle(CurrentTitle(), IsFocused ? FocusedTitleStyle : TitleStyle);
+    private string RenderTitle()
+    {
+        return ApplyStyle(CurrentTitle(), IsFocused ? FocusedTitleStyle : TitleStyle);
+    }
 
-    private string CurrentTitle() => IsFocused && ShowFocusMarker && !string.IsNullOrWhiteSpace(FocusMarker) ? $"{Title} {FocusMarker}" : Title ?? string.Empty;
+    private string CurrentTitle()
+    {
+        return IsFocused && ShowFocusMarker && !string.IsNullOrWhiteSpace(FocusMarker)
+            ? $"{Title} {FocusMarker}"
+            : Title;
+    }
 
-    private string MeasureTitle() => ShowFocusMarker && !string.IsNullOrWhiteSpace(FocusMarker) ? $"{Title} {FocusMarker}" : Title ?? string.Empty;
+    private string MeasureTitle()
+    {
+        return ShowFocusMarker && !string.IsNullOrWhiteSpace(FocusMarker)
+            ? $"{Title} {FocusMarker}"
+            : Title;
+    }
 
-    private static string ApplyStyle(string text, TesseraStyle style) => string.IsNullOrEmpty(text) || style.IsEmpty ? text : style.Render(text);
+    private static string ApplyStyle(string text, TesseraStyle style)
+    {
+        return string.IsNullOrEmpty(text) || style.IsEmpty ? text : style.Render(text);
+    }
 
-    private static string DefaultText(T item) => item?.ToString() ?? string.Empty;
+    private static string DefaultText(T item)
+    {
+        return item?.ToString() ?? string.Empty;
+    }
 
-    private T? CaptureSelectedItemForEvent() => SelectionChanged is null ? default : SelectedItem;
+    private T? CaptureSelectedItemForEvent()
+    {
+        return SelectionChanged is null ? default : SelectedItem;
+    }
 }

@@ -53,7 +53,7 @@ internal static class TextElementWidth
         (0xFFE0, 0xFFE6),
         (0x1F300, 0x1FAFF),
         (0x20000, 0x2FFFD),
-        (0x30000, 0x3FFFD),
+        (0x30000, 0x3FFFD)
     ];
 
     public static int Measure(string textElement)

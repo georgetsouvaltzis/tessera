@@ -1,17 +1,12 @@
 namespace Tessera.Controls;
 
 /// <summary>
-/// Defines label wrappers and shortcut delimiters used by <see cref="MenuBar"/>.
+///     Defines label wrappers and shortcut delimiters used by <see cref="MenuBar" />.
 /// </summary>
 public readonly record struct MenuBarGlyphSet
 {
     /// <summary>
-    /// Gets the default glyph set used by menu bars.
-    /// </summary>
-    public static MenuBarGlyphSet Default => new();
-
-    /// <summary>
-    /// Initializes a new glyph set with built-in menu bar wrappers.
+    ///     Initializes a new glyph set with built-in menu bar wrappers.
     /// </summary>
     public MenuBarGlyphSet()
     {
@@ -26,7 +21,7 @@ public readonly record struct MenuBarGlyphSet
     }
 
     /// <summary>
-    /// Initializes a new glyph set.
+    ///     Initializes a new glyph set.
     /// </summary>
     /// <param name="selectedPrefix">Prefix used around selected menu labels.</param>
     /// <param name="selectedSuffix">Suffix used around selected menu labels.</param>
@@ -46,53 +41,58 @@ public readonly record struct MenuBarGlyphSet
         string shortcutOpen,
         string shortcutClose)
     {
-        SelectedPrefix = selectedPrefix ?? string.Empty;
-        SelectedSuffix = selectedSuffix ?? string.Empty;
-        UnselectedPrefix = unselectedPrefix ?? string.Empty;
-        UnselectedSuffix = unselectedSuffix ?? string.Empty;
-        HoveredPrefix = hoveredPrefix ?? string.Empty;
-        HoveredSuffix = hoveredSuffix ?? string.Empty;
-        ShortcutOpen = shortcutOpen ?? string.Empty;
-        ShortcutClose = shortcutClose ?? string.Empty;
+        SelectedPrefix = selectedPrefix;
+        SelectedSuffix = selectedSuffix;
+        UnselectedPrefix = unselectedPrefix;
+        UnselectedSuffix = unselectedSuffix;
+        HoveredPrefix = hoveredPrefix;
+        HoveredSuffix = hoveredSuffix;
+        ShortcutOpen = shortcutOpen;
+        ShortcutClose = shortcutClose;
     }
 
     /// <summary>
-    /// Gets the prefix used around selected menu labels.
+    ///     Gets the default glyph set used by menu bars.
+    /// </summary>
+    public static MenuBarGlyphSet Default => new();
+
+    /// <summary>
+    ///     Gets the prefix used around selected menu labels.
     /// </summary>
     public string SelectedPrefix { get; init; }
 
     /// <summary>
-    /// Gets the suffix used around selected menu labels.
+    ///     Gets the suffix used around selected menu labels.
     /// </summary>
     public string SelectedSuffix { get; init; }
 
     /// <summary>
-    /// Gets the prefix used around unselected menu labels.
+    ///     Gets the prefix used around unselected menu labels.
     /// </summary>
     public string UnselectedPrefix { get; init; }
 
     /// <summary>
-    /// Gets the suffix used around unselected menu labels.
+    ///     Gets the suffix used around unselected menu labels.
     /// </summary>
     public string UnselectedSuffix { get; init; }
 
     /// <summary>
-    /// Gets the prefix used around hovered unselected menu labels.
+    ///     Gets the prefix used around hovered unselected menu labels.
     /// </summary>
     public string HoveredPrefix { get; init; }
 
     /// <summary>
-    /// Gets the suffix used around hovered unselected menu labels.
+    ///     Gets the suffix used around hovered unselected menu labels.
     /// </summary>
     public string HoveredSuffix { get; init; }
 
     /// <summary>
-    /// Gets the opening delimiter used for menu shortcuts.
+    ///     Gets the opening delimiter used for menu shortcuts.
     /// </summary>
     public string ShortcutOpen { get; init; }
 
     /// <summary>
-    /// Gets the closing delimiter used for menu shortcuts.
+    ///     Gets the closing delimiter used for menu shortcuts.
     /// </summary>
     public string ShortcutClose { get; init; }
 }

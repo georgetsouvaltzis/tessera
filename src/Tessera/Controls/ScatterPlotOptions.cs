@@ -3,7 +3,7 @@ using System.ComponentModel;
 namespace Tessera.Controls;
 
 /// <summary>
-/// Defines advanced rendering options for a <see cref="ScatterPlot"/>.
+///     Defines advanced rendering options for a <see cref="ScatterPlot" />.
 /// </summary>
 [EditorBrowsable(EditorBrowsableState.Advanced)]
 public readonly record struct ScatterPlotOptions(

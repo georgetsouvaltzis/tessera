@@ -1,4 +1,4 @@
-﻿using Tessera.Components.Primitives;
+using Tessera.Components.Primitives;
 using Tessera.Controls.Internal;
 using Tessera.Layout;
 using Tessera.Styles;
@@ -6,153 +6,133 @@ using Tessera.Styles;
 namespace Tessera.Controls;
 
 /// <summary>
-/// Represents a keyboard-shortcut help dialog for discoverability.
+///     Represents a keyboard-shortcut help dialog for discoverability.
 /// </summary>
 public sealed class KeyBindingHelpDialog : Control
 {
     private readonly List<KeyBindingItem> _items = [];
-    private int _selectedIndex;
     private int _hoveredIndex = -1;
-    private int _scrollOffset;
     private int _lastViewportRows = 8;
+    private int _scrollOffset;
+    private int _selectedIndex;
 
     /// <summary>
-    /// Gets or sets dialog title text.
+    ///     Gets or sets dialog title text.
     /// </summary>
-    public string Title
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = "Keyboard Shortcuts";
+    public string Title { get; set; } = "Keyboard Shortcuts";
 
     /// <summary>
-    /// Represents focus marker.
+    ///     Represents focus marker.
     /// </summary>
-    public string FocusMarker
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = "*";
+    public string FocusMarker { get; set; } = "*";
 
     /// <summary>
-    /// Gets or sets whether show focus marker.
+    ///     Gets or sets whether show focus marker.
     /// </summary>
     public bool ShowFocusMarker { get; set; } = true;
 
     /// <summary>
-    /// Gets or sets the title style.
+    ///     Gets or sets the title style.
     /// </summary>
     public TesseraStyle TitleStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the focused title style.
+    ///     Gets or sets the focused title style.
     /// </summary>
     public TesseraStyle FocusedTitleStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the group style.
+    ///     Gets or sets the group style.
     /// </summary>
     public TesseraStyle GroupStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the keys style.
+    ///     Gets or sets the keys style.
     /// </summary>
     public TesseraStyle KeysStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the description style.
+    ///     Gets or sets the description style.
     /// </summary>
     public TesseraStyle DescriptionStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the selected row style.
+    ///     Gets or sets the selected row style.
     /// </summary>
     public TesseraStyle SelectedRowStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the hovered row style.
+    ///     Gets or sets the hovered row style.
     /// </summary>
     public TesseraStyle HoveredRowStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the global binding style.
+    ///     Gets or sets the global binding style.
     /// </summary>
     public TesseraStyle GlobalBindingStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the disabled style.
+    ///     Gets or sets the disabled style.
     /// </summary>
     public TesseraStyle DisabledStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the empty text style.
+    ///     Gets or sets the empty text style.
     /// </summary>
     public TesseraStyle EmptyTextStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the padding.
+    ///     Gets or sets the padding.
     /// </summary>
     public Thickness Padding { get; set; }
 
     /// <summary>
-    /// Gets or sets whether show groups.
+    ///     Gets or sets whether show groups.
     /// </summary>
     public bool ShowGroups { get; set; } = true;
 
     /// <summary>
-    /// Gets or sets the page size.
+    ///     Gets or sets the page size.
     /// </summary>
     public int PageSize { get; set; } = 8;
 
     /// <summary>
-    /// Gets or sets the key column width.
+    ///     Gets or sets the key column width.
     /// </summary>
     public int KeyColumnWidth { get; set; } = 14;
 
     /// <summary>
-    /// Represents selected marker.
+    ///     Represents selected marker.
     /// </summary>
-    public string SelectedMarker
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = ">";
+    public string SelectedMarker { get; set; } = ">";
 
     /// <summary>
-    /// Represents unselected marker.
+    ///     Represents unselected marker.
     /// </summary>
-    public string UnselectedMarker
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = " ";
+    public string UnselectedMarker { get; set; } = " ";
 
     /// <summary>
-    /// Represents empty text.
+    ///     Represents empty text.
     /// </summary>
-    public string EmptyText
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = "(no key bindings)";
+    public string EmptyText { get; set; } = "(no key bindings)";
 
     /// <summary>
-    /// Gets or sets whether dialog is visible.
+    ///     Gets or sets whether dialog is visible.
     /// </summary>
     public bool IsVisible { get; set; }
 
     /// <summary>
-    /// Gets current key-binding rows.
+    ///     Gets current key-binding rows.
     /// </summary>
     public IReadOnlyList<KeyBindingItem> Items => _items;
 
     /// <summary>
-    /// Gets selected row index, or <c>-1</c> when empty.
+    ///     Gets selected row index, or <c>-1</c> when empty.
     /// </summary>
     public int SelectedIndex => _items.Count == 0 ? -1 : _selectedIndex;
 
     /// <summary>
-    /// Gets selected row, or <see langword="null" /> when empty.
+    ///     Gets selected row, or <see langword="null" /> when empty.
     /// </summary>
     public KeyBindingItem? SelectedItem => _items.Count == 0 ? null : _items[_selectedIndex];
 
@@ -166,7 +146,7 @@ public sealed class KeyBindingHelpDialog : Control
     public override bool IsReadOnly { get; set; }
 
     /// <summary>
-    /// Replaces key-binding rows.
+    ///     Replaces key-binding rows.
     /// </summary>
     /// <param name="items">Rows to show.</param>
     public void SetItems(IEnumerable<KeyBindingItem> items)
@@ -184,7 +164,7 @@ public sealed class KeyBindingHelpDialog : Control
     }
 
     /// <summary>
-    /// Clears all key-binding rows.
+    ///     Clears all key-binding rows.
     /// </summary>
     public void Clear()
     {
@@ -195,7 +175,7 @@ public sealed class KeyBindingHelpDialog : Control
     }
 
     /// <summary>
-    /// Shows the dialog and requests focus.
+    ///     Shows the dialog and requests focus.
     /// </summary>
     public void Show()
     {
@@ -204,7 +184,7 @@ public sealed class KeyBindingHelpDialog : Control
     }
 
     /// <summary>
-    /// Hides the dialog.
+    ///     Hides the dialog.
     /// </summary>
     public void Hide()
     {
@@ -212,7 +192,7 @@ public sealed class KeyBindingHelpDialog : Control
     }
 
     /// <summary>
-    /// Selects a row by index.
+    ///     Selects a row by index.
     /// </summary>
     /// <param name="index">Requested row index.</param>
     /// <returns><see langword="true" /> when selection changed; otherwise <see langword="false" />.</returns>
@@ -415,7 +395,7 @@ public sealed class KeyBindingHelpDialog : Control
         var keyWidth = Math.Max(6, KeyColumnWidth);
         for (var i = 0; i < _items.Count; i++)
         {
-            width = Math.Max(width, ControlTextLayout.MeasureDisplayWidth(BuildLine(_items[i], selected: false, keyWidth)));
+            width = Math.Max(width, ControlTextLayout.MeasureDisplayWidth(BuildLine(_items[i], false, keyWidth)));
         }
 
         var height = (HasTitle() ? 1 : 0) + Math.Max(1, Math.Min(PageSize, Math.Max(_items.Count, 1)));
@@ -507,12 +487,13 @@ public sealed class KeyBindingHelpDialog : Control
     private int ResolveKeyColumnWidth(int contentWidth)
     {
         var width = Math.Max(6, KeyColumnWidth);
-        return Math.Min(width, Math.Max(6, (contentWidth / 2) - 2));
+        return Math.Min(width, Math.Max(6, contentWidth / 2 - 2));
     }
 
     private string FormatTitle()
     {
-        if (!IsFocused || !ShowFocusMarker || string.IsNullOrWhiteSpace(FocusMarker) || string.IsNullOrEmpty(Title))
+        if (!IsFocused || !ShowFocusMarker || string.IsNullOrWhiteSpace(FocusMarker) ||
+            string.IsNullOrEmpty(Title))
         {
             return Title;
         }

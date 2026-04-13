@@ -4,12 +4,12 @@ using Tessera.Styles;
 namespace Tessera.Controls;
 
 /// <summary>
-/// Represents one operation/request trace row.
+///     Represents one operation/request trace row.
 /// </summary>
 public sealed class TraceEntry
 {
     /// <summary>
-    /// Initializes a trace entry.
+    ///     Initializes a trace entry.
     /// </summary>
     /// <param name="id">Stable trace identifier.</param>
     /// <param name="timestamp">Trace timestamp.</param>
@@ -29,10 +29,10 @@ public sealed class TraceEntry
         string? metadata = null,
         bool isMuted = false)
     {
-        Id = id ?? string.Empty;
+        Id = id;
         Timestamp = timestamp;
-        Operation = operation ?? string.Empty;
-        Message = message ?? string.Empty;
+        Operation = operation;
+        Message = message;
         Severity = severity;
         DurationMs = durationMs;
         Metadata = metadata ?? string.Empty;
@@ -40,54 +40,42 @@ public sealed class TraceEntry
     }
 
     /// <summary>
-    /// Gets stable trace identifier.
+    ///     Gets stable trace identifier.
     /// </summary>
     public string Id { get; }
 
     /// <summary>
-    /// Gets or sets trace timestamp.
+    ///     Gets or sets trace timestamp.
     /// </summary>
     public DateTimeOffset Timestamp { get; set; }
 
     /// <summary>
-    /// Gets or sets operation/request name.
+    ///     Gets or sets operation/request name.
     /// </summary>
-    public string Operation
-    {
-        get;
-        set => field = value ?? string.Empty;
-    }
+    public string Operation { get; set; }
 
     /// <summary>
-    /// Gets or sets trace message text.
+    ///     Gets or sets trace message text.
     /// </summary>
-    public string Message
-    {
-        get;
-        set => field = value ?? string.Empty;
-    }
+    public string Message { get; set; }
 
     /// <summary>
-    /// Gets or sets severity.
+    ///     Gets or sets severity.
     /// </summary>
     public TraceSeverity Severity { get; set; }
 
     /// <summary>
-    /// Gets or sets optional duration in milliseconds.
+    ///     Gets or sets optional duration in milliseconds.
     /// </summary>
     public double? DurationMs { get; set; }
 
     /// <summary>
-    /// Gets or sets optional metadata.
+    ///     Gets or sets optional metadata.
     /// </summary>
-    public string Metadata
-    {
-        get;
-        set => field = value ?? string.Empty;
-    }
+    public string Metadata { get; set; }
 
     /// <summary>
-    /// Gets or sets whether row should render muted.
+    ///     Gets or sets whether row should render muted.
     /// </summary>
     public bool IsMuted { get; set; }
 }
@@ -95,7 +83,7 @@ public sealed class TraceEntry
 public sealed partial class TraceViewer
 {
     /// <summary>
-    /// Sets the selected entry index using bounds clamping.
+    ///     Sets the selected entry index using bounds clamping.
     /// </summary>
     /// <param name="index">Requested index.</param>
     /// <returns><see langword="true" /> when selection changed; otherwise <see langword="false" />.</returns>
@@ -156,9 +144,17 @@ public sealed partial class TraceViewer
         _entries.Sort(static (left, right) =>
         {
             var compare = left.Timestamp.CompareTo(right.Timestamp);
-            if (compare != 0) return compare;
+            if (compare != 0)
+            {
+                return compare;
+            }
+
             compare = string.Compare(left.Operation, right.Operation, StringComparison.Ordinal);
-            if (compare != 0) return compare;
+            if (compare != 0)
+            {
+                return compare;
+            }
+
             return string.Compare(left.Id, right.Id, StringComparison.Ordinal);
         });
     }
@@ -185,7 +181,8 @@ public sealed partial class TraceViewer
             return;
         }
 
-        SelectionChanged?.Invoke(this, new TraceSelectionChangedEventArgs(previousIndex, selectedIndex, previousEntry, selectedEntry));
+        SelectionChanged?.Invoke(this,
+            new TraceSelectionChangedEventArgs(previousIndex, selectedIndex, previousEntry, selectedEntry));
     }
 
     private string FormatLine(TraceEntry entry, bool selected)
@@ -215,7 +212,7 @@ public sealed partial class TraceViewer
             TraceSeverity.Warning => "WRN",
             TraceSeverity.Error => "ERR",
             TraceSeverity.Critical => "CRT",
-            _ => "INF",
+            _ => "INF"
         };
     }
 
@@ -257,7 +254,7 @@ public sealed partial class TraceViewer
             TraceSeverity.Warning => WarningRowStyle,
             TraceSeverity.Error => ErrorRowStyle,
             TraceSeverity.Critical => CriticalRowStyle,
-            _ => InfoRowStyle,
+            _ => InfoRowStyle
         };
     }
 

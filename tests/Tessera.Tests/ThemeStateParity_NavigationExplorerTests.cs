@@ -30,14 +30,22 @@ internal static class ThemeStateParity_NavigationExplorerTests
         var table = new Table("A").ApplyTheme(theme);
         var treeTable = new TreeTable().ApplyTheme(theme);
 
-        TestAssert.Equal(theme.Accent.Secondary, choice.HoveredValueStyle, "Choice hovered field style should map to Accent.Secondary.");
-        TestAssert.Equal(theme.Accent.Secondary, comboBox.HoveredValueStyle, "ComboBox hovered field style should map to Accent.Secondary.");
-        TestAssert.Equal(theme.Accent.Secondary, fuzzyFinder.HoveredItemStyle, "FuzzyFinder hovered row style should map to Accent.Secondary.");
-        TestAssert.Equal(theme.Accent.Secondary, fileExplorer.HoveredStyle, "FileExplorer hovered row style should map to Accent.Secondary.");
-        TestAssert.Equal(theme.Accent.Secondary, table.HoveredRowStyle, "Table hovered row style should map to Accent.Secondary.");
-        TestAssert.Equal(mergedSelection, table.SelectedRowStyle, "Table selected row style should map to merged Selection tokens.");
-        TestAssert.Equal(theme.Accent.Secondary, treeTable.HoveredRowStyle, "TreeTable hovered row style should map to Accent.Secondary.");
-        TestAssert.Equal(mergedSelection, treeTable.SelectedRowStyle, "TreeTable selected row style should map to merged Selection tokens.");
+        TestAssert.Equal(theme.Accent.Secondary, choice.HoveredValueStyle,
+            "Choice hovered field style should map to Accent.Secondary.");
+        TestAssert.Equal(theme.Accent.Secondary, comboBox.HoveredValueStyle,
+            "ComboBox hovered field style should map to Accent.Secondary.");
+        TestAssert.Equal(theme.Accent.Secondary, fuzzyFinder.HoveredItemStyle,
+            "FuzzyFinder hovered row style should map to Accent.Secondary.");
+        TestAssert.Equal(theme.Accent.Secondary, fileExplorer.HoveredStyle,
+            "FileExplorer hovered row style should map to Accent.Secondary.");
+        TestAssert.Equal(theme.Accent.Secondary, table.HoveredRowStyle,
+            "Table hovered row style should map to Accent.Secondary.");
+        TestAssert.Equal(mergedSelection, table.SelectedRowStyle,
+            "Table selected row style should map to merged Selection tokens.");
+        TestAssert.Equal(theme.Accent.Secondary, treeTable.HoveredRowStyle,
+            "TreeTable hovered row style should map to Accent.Secondary.");
+        TestAssert.Equal(mergedSelection, treeTable.SelectedRowStyle,
+            "TreeTable selected row style should map to merged Selection tokens.");
         return Task.CompletedTask;
     }
 
@@ -60,12 +68,18 @@ internal static class ThemeStateParity_NavigationExplorerTests
         table.ApplyThemeDefaults(theme);
         treeTable.ApplyThemeDefaults(theme);
 
-        TestAssert.Equal(explicitStyle, choice.HoveredValueStyle, "Choice defaults should not overwrite explicit hovered field style.");
-        TestAssert.Equal(explicitStyle, comboBox.HoveredValueStyle, "ComboBox defaults should not overwrite explicit hovered field style.");
-        TestAssert.Equal(explicitStyle, fuzzyFinder.HoveredItemStyle, "FuzzyFinder defaults should not overwrite explicit hovered row style.");
-        TestAssert.Equal(explicitStyle, fileExplorer.HoveredStyle, "FileExplorer defaults should not overwrite explicit hovered row style.");
-        TestAssert.Equal(explicitStyle, table.HoveredRowStyle, "Table defaults should not overwrite explicit hovered row style.");
-        TestAssert.Equal(explicitStyle, treeTable.HoveredRowStyle, "TreeTable defaults should not overwrite explicit hovered row style.");
+        TestAssert.Equal(explicitStyle, choice.HoveredValueStyle,
+            "Choice defaults should not overwrite explicit hovered field style.");
+        TestAssert.Equal(explicitStyle, comboBox.HoveredValueStyle,
+            "ComboBox defaults should not overwrite explicit hovered field style.");
+        TestAssert.Equal(explicitStyle, fuzzyFinder.HoveredItemStyle,
+            "FuzzyFinder defaults should not overwrite explicit hovered row style.");
+        TestAssert.Equal(explicitStyle, fileExplorer.HoveredStyle,
+            "FileExplorer defaults should not overwrite explicit hovered row style.");
+        TestAssert.Equal(explicitStyle, table.HoveredRowStyle,
+            "Table defaults should not overwrite explicit hovered row style.");
+        TestAssert.Equal(explicitStyle, treeTable.HoveredRowStyle,
+            "TreeTable defaults should not overwrite explicit hovered row style.");
         return Task.CompletedTask;
     }
 
@@ -88,12 +102,18 @@ internal static class ThemeStateParity_NavigationExplorerTests
         var table = new Table("A").ApplyTheme(overrides, baseTheme);
         var treeTable = new TreeTable().ApplyTheme(overrides, baseTheme);
 
-        TestAssert.Equal(typeTheme.Accent.Secondary, choice.HoveredValueStyle, "Choice override apply should map hovered field style.");
-        TestAssert.Equal(typeTheme.Accent.Secondary, comboBox.HoveredValueStyle, "ComboBox override apply should map hovered field style.");
-        TestAssert.Equal(typeTheme.Accent.Secondary, fuzzyFinder.HoveredItemStyle, "FuzzyFinder override apply should map hovered row style.");
-        TestAssert.Equal(typeTheme.Accent.Secondary, fileExplorer.HoveredStyle, "FileExplorer override apply should map hovered row style.");
-        TestAssert.Equal(typeTheme.Accent.Secondary, table.HoveredRowStyle, "Table override apply should map hovered row style.");
-        TestAssert.Equal(typeTheme.Accent.Secondary, treeTable.HoveredRowStyle, "TreeTable override apply should map hovered row style.");
+        TestAssert.Equal(typeTheme.Accent.Secondary, choice.HoveredValueStyle,
+            "Choice override apply should map hovered field style.");
+        TestAssert.Equal(typeTheme.Accent.Secondary, comboBox.HoveredValueStyle,
+            "ComboBox override apply should map hovered field style.");
+        TestAssert.Equal(typeTheme.Accent.Secondary, fuzzyFinder.HoveredItemStyle,
+            "FuzzyFinder override apply should map hovered row style.");
+        TestAssert.Equal(typeTheme.Accent.Secondary, fileExplorer.HoveredStyle,
+            "FileExplorer override apply should map hovered row style.");
+        TestAssert.Equal(typeTheme.Accent.Secondary, table.HoveredRowStyle,
+            "Table override apply should map hovered row style.");
+        TestAssert.Equal(typeTheme.Accent.Secondary, treeTable.HoveredRowStyle,
+            "TreeTable override apply should map hovered row style.");
         return Task.CompletedTask;
     }
 
@@ -101,32 +121,35 @@ internal static class ThemeStateParity_NavigationExplorerTests
     {
         return new TesseraTheme
         {
-            Text = new TesseraThemeTextTokens
-            {
-                Primary = TesseraStyle.Empty.WithForeground(AnsiColor.Rgb(21, 22, 23)),
-                Secondary = TesseraStyle.Empty.WithForeground(AnsiColor.Rgb(31, 32, 33)),
-                Muted = TesseraStyle.Empty.WithForeground(AnsiColor.Rgb(41, 42, 43)),
-            },
-            Accent = new TesseraThemeAccentTokens
-            {
-                Primary = TesseraStyle.Empty.WithForeground(AnsiColor.Rgb(51, 52, 53)),
-                Secondary = TesseraStyle.Empty.WithForeground(AnsiColor.Rgb(61, 62, 63)),
-            },
-            Selection = new TesseraThemeSelectionTokens
-            {
-                Foreground = TesseraStyle.Empty.WithForeground(AnsiColor.Rgb(71, 72, 73)),
-                Background = TesseraStyle.Empty.WithBackground(AnsiColor.Rgb(81, 82, 83)),
-            },
+            Text =
+                new TesseraThemeTextTokens
+                {
+                    Primary = TesseraStyle.Empty.WithForeground(AnsiColor.Rgb(21, 22, 23)),
+                    Secondary = TesseraStyle.Empty.WithForeground(AnsiColor.Rgb(31, 32, 33)),
+                    Muted = TesseraStyle.Empty.WithForeground(AnsiColor.Rgb(41, 42, 43))
+                },
+            Accent =
+                new TesseraThemeAccentTokens
+                {
+                    Primary = TesseraStyle.Empty.WithForeground(AnsiColor.Rgb(51, 52, 53)),
+                    Secondary = TesseraStyle.Empty.WithForeground(AnsiColor.Rgb(61, 62, 63))
+                },
+            Selection =
+                new TesseraThemeSelectionTokens
+                {
+                    Foreground = TesseraStyle.Empty.WithForeground(AnsiColor.Rgb(71, 72, 73)),
+                    Background = TesseraStyle.Empty.WithBackground(AnsiColor.Rgb(81, 82, 83))
+                },
             Border = new TesseraThemeBorderTokens
             {
                 Default = TesseraStyle.Empty.WithForeground(AnsiColor.Rgb(91, 92, 93)),
-                Focused = TesseraStyle.Empty.WithForeground(AnsiColor.Rgb(101, 102, 103)),
+                Focused = TesseraStyle.Empty.WithForeground(AnsiColor.Rgb(101, 102, 103))
             },
             Focus = new TesseraThemeFocusTokens
             {
                 Title = TesseraStyle.Empty.WithForeground(AnsiColor.Rgb(111, 112, 113)),
-                Border = TesseraStyle.Empty.WithForeground(AnsiColor.Rgb(121, 122, 123)),
-            },
+                Border = TesseraStyle.Empty.WithForeground(AnsiColor.Rgb(121, 122, 123))
+            }
         };
     }
 }

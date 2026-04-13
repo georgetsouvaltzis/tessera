@@ -21,6 +21,6 @@ internal sealed class ListKeyMap : IWidgetKeyMap
         PageUp,
         PageDown,
         Home,
-        End,
+        End
     ];
 }

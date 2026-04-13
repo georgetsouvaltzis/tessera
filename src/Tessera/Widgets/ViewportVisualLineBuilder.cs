@@ -2,7 +2,8 @@ namespace Tessera.Widgets;
 
 internal static class ViewportVisualLineBuilder
 {
-    public static void Build(IReadOnlyList<string> sourceLines, bool wrap, int width, List<string> target, out int maxVisualWidth)
+    public static void Build(IReadOnlyList<string> sourceLines, bool wrap, int width, List<string> target,
+        out int maxVisualWidth)
     {
         target.Clear();
         maxVisualWidth = 0;

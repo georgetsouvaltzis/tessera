@@ -1,12 +1,12 @@
 namespace Tessera.Controls;
 
 /// <summary>
-/// Provides previous/current state when <see cref="TraceViewer" /> selection changes.
+///     Provides previous/current state when <see cref="TraceViewer" /> selection changes.
 /// </summary>
 public sealed class TraceSelectionChangedEventArgs : EventArgs
 {
     /// <summary>
-    /// Initializes selection payload.
+    ///     Initializes selection payload.
     /// </summary>
     /// <param name="previousIndex">Selection index before change.</param>
     /// <param name="selectedIndex">Selection index after change.</param>
@@ -25,22 +25,22 @@ public sealed class TraceSelectionChangedEventArgs : EventArgs
     }
 
     /// <summary>
-    /// Gets selection index before change.
+    ///     Gets selection index before change.
     /// </summary>
     public int PreviousIndex { get; }
 
     /// <summary>
-    /// Gets selection index after change.
+    ///     Gets selection index after change.
     /// </summary>
     public int SelectedIndex { get; }
 
     /// <summary>
-    /// Gets selected entry before change.
+    ///     Gets selected entry before change.
     /// </summary>
     public TraceEntry? PreviousEntry { get; }
 
     /// <summary>
-    /// Gets selected entry after change.
+    ///     Gets selected entry after change.
     /// </summary>
     public TraceEntry? SelectedEntry { get; }
 }

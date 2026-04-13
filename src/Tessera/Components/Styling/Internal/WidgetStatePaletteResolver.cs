@@ -49,7 +49,7 @@ internal static class WidgetStatePaletteResolver
             TextStyle = style,
             Uppercase = upper,
             Prefix = prefix,
-            Suffix = suffix,
+            Suffix = suffix
         };
         return true;
     }
@@ -61,7 +61,7 @@ internal static class WidgetStatePaletteResolver
         IReadOnlyList<WidgetStatePalette> hierarchy,
         Func<WidgetStatePalette, WidgetVisualState, WidgetStateAppearance?> resolver)
     {
-        var source = text ?? string.Empty;
+        var source = text;
         var active = new HashSet<WidgetVisualState>(activeStates);
 
         var style = TesseraStyle.Empty;

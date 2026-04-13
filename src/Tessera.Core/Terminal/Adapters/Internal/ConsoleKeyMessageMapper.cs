@@ -45,7 +45,7 @@ internal static class ConsoleKeyMessageMapper
             ConsoleKey.F10 => new KeyPressMsg(KeyCode.F10, string.Empty, modifiers),
             ConsoleKey.F11 => new KeyPressMsg(KeyCode.F11, string.Empty, modifiers),
             ConsoleKey.F12 => new KeyPressMsg(KeyCode.F12, string.Empty, modifiers),
-            _ => ToCharacterMessage(key, modifiers),
+            _ => ToCharacterMessage(key, modifiers)
         };
     }
 

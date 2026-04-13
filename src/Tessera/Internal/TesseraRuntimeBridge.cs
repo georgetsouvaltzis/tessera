@@ -1,5 +1,11 @@
+using Tessera.Core.Abstractions;
 using Tessera.Core.Application;
 using Tessera.Core.Application.Internal;
+using Tessera.Core.Input.Decoding;
+using Tessera.Hosting;
+using IEventDecoder = Tessera.Hosting.IEventDecoder;
+using TerminalCapabilityProfile = Tessera.Core.Terminal.Capabilities.TerminalCapabilityProfile;
+using TerminalSize = Tessera.Core.Terminal.TerminalSize;
 
 namespace Tessera.Internal;
 
@@ -14,7 +20,7 @@ internal interface ITeaRuntime
 
 internal static class TesseraRuntimeFactory
 {
-    public static ITeaRuntime Create(TesseraApp app, TesseraRuntimeOptions options, global::Tessera.Hosting.TesseraHostingOptions? hosting)
+    public static ITeaRuntime Create(TesseraApp app, TesseraRuntimeOptions options, TesseraHostingOptions? hosting)
     {
         ArgumentNullException.ThrowIfNull(app);
         ArgumentNullException.ThrowIfNull(options);
@@ -26,7 +32,7 @@ internal sealed class TesseraAppRuntime : ITeaRuntime
 {
     private readonly TesseraRuntimeLoop _runtime;
 
-    public TesseraAppRuntime(TesseraApp app, TesseraRuntimeOptions options, global::Tessera.Hosting.TesseraHostingOptions? hosting)
+    public TesseraAppRuntime(TesseraApp app, TesseraRuntimeOptions options, TesseraHostingOptions? hosting)
     {
         app.ConfigureRuntimeOptions(options);
         _runtime = new TesseraRuntimeLoop(
@@ -52,7 +58,8 @@ internal sealed class TesseraAppRuntime : ITeaRuntime
         return _runtime.StopAsync(kill, cancellationToken);
     }
 
-    private static TesseraRuntimeLoopOptions CreateRuntimeLoopOptions(TesseraApp app, TesseraRuntimeOptions options, global::Tessera.Hosting.TesseraHostingOptions? hosting)
+    private static TesseraRuntimeLoopOptions CreateRuntimeLoopOptions(TesseraApp app, TesseraRuntimeOptions options,
+        TesseraHostingOptions? hosting)
     {
         return new TesseraRuntimeLoopOptions
         {
@@ -95,12 +102,12 @@ internal sealed class TesseraAppRuntime : ITeaRuntime
                 ? null
                 : () => hosting.ColorProfileDetector().ToCore(),
             EventDecoder = hosting?.EventDecoder is null ? null : new HostingEventDecoderAdapter(hosting.EventDecoder),
-            CapabilityProbeModes = hosting?.CapabilityProbeModes,
+            CapabilityProbeModes = hosting?.CapabilityProbeModes
         };
     }
 
-    private sealed class HostingTerminalAdapter(global::Tessera.Hosting.ITerminalAdapter inner)
-        : global::Tessera.Core.Terminal.ITerminalAdapter
+    private sealed class HostingTerminalAdapter(ITerminalAdapter inner)
+        : Core.Terminal.ITerminalAdapter
     {
         public Stream Input => inner.Input;
 
@@ -110,46 +117,77 @@ internal sealed class TesseraAppRuntime : ITeaRuntime
 
         public bool IsOutputInteractive => inner.IsOutputInteractive;
 
-        public ValueTask PrepareAsync(CancellationToken cancellationToken) => inner.PrepareAsync(cancellationToken);
+        public ValueTask PrepareAsync(CancellationToken cancellationToken)
+        {
+            return inner.PrepareAsync(cancellationToken);
+        }
 
-        public ValueTask RestoreAsync(CancellationToken cancellationToken) => inner.RestoreAsync(cancellationToken);
+        public ValueTask RestoreAsync(CancellationToken cancellationToken)
+        {
+            return inner.RestoreAsync(cancellationToken);
+        }
 
-        public async ValueTask<global::Tessera.Core.Terminal.TerminalSize> GetSizeAsync(CancellationToken cancellationToken) =>
-            (await inner.GetSizeAsync(cancellationToken).ConfigureAwait(false)).ToCore();
+        public async ValueTask<TerminalSize> GetSizeAsync(CancellationToken cancellationToken)
+        {
+            return (await inner.GetSizeAsync(cancellationToken).ConfigureAwait(false)).ToCore();
+        }
 
-        public ValueTask DisposeAsync() => inner.DisposeAsync();
+        public ValueTask DisposeAsync()
+        {
+            return inner.DisposeAsync();
+        }
     }
 
-    private sealed class HostingRendererAdapter(global::Tessera.Hosting.IProgramRenderer inner)
-        : global::Tessera.Core.Rendering.IProgramRenderer
+    private sealed class HostingRendererAdapter(IProgramRenderer inner)
+        : Core.Rendering.IProgramRenderer
     {
-        public ValueTask InitializeAsync(Stream output, CancellationToken cancellationToken) =>
-            inner.InitializeAsync(output, cancellationToken);
+        public ValueTask InitializeAsync(Stream output, CancellationToken cancellationToken)
+        {
+            return inner.InitializeAsync(output, cancellationToken);
+        }
 
-        public void Resize(int width, int height) => inner.Resize(width, height);
+        public void Resize(int width, int height)
+        {
+            inner.Resize(width, height);
+        }
 
-        public void UpdateCapabilities(global::Tessera.Core.Terminal.Capabilities.TerminalCapabilityProfile capabilities) =>
+        public void UpdateCapabilities(TerminalCapabilityProfile capabilities)
+        {
             inner.UpdateCapabilities(capabilities.AsHosting());
+        }
 
-        public void Render(global::Tessera.Core.Abstractions.ScreenOutput output) =>
+        public void Render(ScreenOutput output)
+        {
             inner.Render(output.ToHosting());
+        }
 
-        public ValueTask WriteRawAsync(string content, CancellationToken cancellationToken) =>
-            inner.WriteRawAsync(content, cancellationToken);
+        public ValueTask WriteRawAsync(string content, CancellationToken cancellationToken)
+        {
+            return inner.WriteRawAsync(content, cancellationToken);
+        }
 
-        public ValueTask FlushAsync(CancellationToken cancellationToken) =>
-            inner.FlushAsync(cancellationToken);
+        public ValueTask FlushAsync(CancellationToken cancellationToken)
+        {
+            return inner.FlushAsync(cancellationToken);
+        }
 
-        public ValueTask ResetAsync(CancellationToken cancellationToken) =>
-            inner.ResetAsync(cancellationToken);
+        public ValueTask ResetAsync(CancellationToken cancellationToken)
+        {
+            return inner.ResetAsync(cancellationToken);
+        }
 
-        public ValueTask DisposeAsync() => inner.DisposeAsync();
+        public ValueTask DisposeAsync()
+        {
+            return inner.DisposeAsync();
+        }
     }
 
-    private sealed class HostingEventDecoderAdapter(global::Tessera.Hosting.IEventDecoder inner)
-        : global::Tessera.Core.Input.Decoding.IEventDecoder
+    private sealed class HostingEventDecoderAdapter(IEventDecoder inner)
+        : Core.Input.Decoding.IEventDecoder
     {
-        public global::Tessera.Core.Input.Decoding.DecodeResult Decode(ReadOnlySpan<byte> buffer, bool timeoutExpired) =>
-            inner.Decode(buffer, timeoutExpired).ToCore();
+        public DecodeResult Decode(ReadOnlySpan<byte> buffer, bool timeoutExpired)
+        {
+            return inner.Decode(buffer, timeoutExpired).ToCore();
+        }
     }
 }

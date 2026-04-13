@@ -8,11 +8,7 @@ internal static class TextInputSelection
         int? anchor = extendSelection
             ? state.SelectionAnchor ?? state.Cursor
             : null;
-        return state with
-        {
-            Cursor = clamped,
-            SelectionAnchor = anchor,
-        };
+        return state with { Cursor = clamped, SelectionAnchor = anchor };
     }
 
     public static (int Start, int End) Range(TextInputBufferState state)

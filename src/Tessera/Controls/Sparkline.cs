@@ -1,4 +1,5 @@
 using System.Buffers;
+using System.ComponentModel;
 using System.Globalization;
 using Tessera.Components.Primitives;
 using Tessera.Components.Primitives.Internal;
@@ -9,7 +10,7 @@ using Tessera.Styles;
 namespace Tessera.Controls;
 
 /// <summary>
-/// Represents an inline trend sparkline control.
+///     Represents an inline trend sparkline control.
 /// </summary>
 public sealed class Sparkline : Control
 {
@@ -17,7 +18,7 @@ public sealed class Sparkline : Control
     private readonly List<double> _samples = [];
 
     /// <summary>
-    /// Initializes a new sparkline with the provided retained sample capacity.
+    ///     Initializes a new sparkline with the provided retained sample capacity.
     /// </summary>
     /// <param name="capacity">The maximum number of retained samples.</param>
     public Sparkline(int capacity = 240)
@@ -26,115 +27,103 @@ public sealed class Sparkline : Control
     }
 
     /// <summary>
-    /// Gets the maximum number of retained samples.
+    ///     Gets the maximum number of retained samples.
     /// </summary>
     public int Capacity { get; }
 
     /// <summary>
-    /// Gets or sets the sparkline title.
+    ///     Gets or sets the sparkline title.
     /// </summary>
-    public string Title
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = "Sparkline";
+    public string Title { get; set; } = "Sparkline";
 
     /// <summary>
-    /// Gets or sets the marker appended to the title while focused.
+    ///     Gets or sets the marker appended to the title while focused.
     /// </summary>
-    public string FocusMarker
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = "*";
+    public string FocusMarker { get; set; } = "*";
 
     /// <summary>
-    /// Gets or sets a value indicating whether <see cref="FocusMarker" /> should be shown while focused.
+    ///     Gets or sets a value indicating whether <see cref="FocusMarker" /> should be shown while focused.
     /// </summary>
     public bool ShowFocusMarker { get; set; } = true;
 
     /// <summary>
-    /// Gets or sets the title style used when not focused.
+    ///     Gets or sets the title style used when not focused.
     /// </summary>
     public TesseraStyle TitleStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the title style used when focused.
+    ///     Gets or sets the title style used when focused.
     /// </summary>
     public TesseraStyle FocusedTitleStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the style used for rendered sparkline glyphs.
+    ///     Gets or sets the style used for rendered sparkline glyphs.
     /// </summary>
     public TesseraStyle DataStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the style used for stats/legend rows when enabled by options.
+    ///     Gets or sets the style used for stats/legend rows when enabled by options.
     /// </summary>
     public TesseraStyle MetaStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets style merged into rendered output while <see cref="Control.IsDisabled" /> is <see langword="true" />.
+    ///     Gets or sets style merged into rendered output while <see cref="Control.IsDisabled" /> is <see langword="true" />.
     /// </summary>
     public TesseraStyle DisabledStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the style applied to empty text when there are no samples.
+    ///     Gets or sets the style applied to empty text when there are no samples.
     /// </summary>
     public TesseraStyle EmptyTextStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the style applied to border glyphs when the control is not focused.
+    ///     Gets or sets the style applied to border glyphs when the control is not focused.
     /// </summary>
     public TesseraStyle BorderStyleText { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the style applied to border glyphs when the control is focused.
+    ///     Gets or sets the style applied to border glyphs when the control is focused.
     /// </summary>
     public TesseraStyle FocusedBorderStyleText { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the frame border style.
+    ///     Gets or sets the frame border style.
     /// </summary>
     public BorderStyle Border { get; set; } = BorderStyle.None;
 
     /// <summary>
-    /// Gets or sets inner padding applied to chart content.
+    ///     Gets or sets inner padding applied to chart content.
     /// </summary>
     public Thickness Padding { get; set; }
 
     /// <summary>
-    /// Gets or sets optional explicit minimum value used for normalization.
+    ///     Gets or sets optional explicit minimum value used for normalization.
     /// </summary>
     public double? MinValue { get; set; }
 
     /// <summary>
-    /// Gets or sets optional explicit maximum value used for normalization.
+    ///     Gets or sets optional explicit maximum value used for normalization.
     /// </summary>
     public double? MaxValue { get; set; }
 
     /// <summary>
-    /// Gets or sets text shown when no samples are present.
+    ///     Gets or sets text shown when no samples are present.
     /// </summary>
-    public string EmptyText
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = "(no samples)";
+    public string EmptyText { get; set; } = "(no samples)";
 
     /// <summary>
-    /// Gets or sets advanced sparkline options.
+    ///     Gets or sets advanced sparkline options.
     /// </summary>
-    [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Advanced)]
+    [EditorBrowsable(EditorBrowsableState.Advanced)]
     public SparklineOptions? Options { get; set; }
 
     /// <summary>
-    /// Gets retained sample values.
+    ///     Gets retained sample values.
     /// </summary>
     public IReadOnlyList<double> Samples => _samples;
 
     /// <summary>
-    /// Replaces the current sample values.
+    ///     Replaces the current sample values.
     /// </summary>
     /// <param name="samples">The sample values to render.</param>
     public void SetSamples(IEnumerable<double> samples)
@@ -151,7 +140,7 @@ public sealed class Sparkline : Control
     }
 
     /// <summary>
-    /// Appends one sample.
+    ///     Appends one sample.
     /// </summary>
     /// <param name="sample">The sample value.</param>
     public void Append(double sample)
@@ -161,10 +150,10 @@ public sealed class Sparkline : Control
     }
 
     /// <summary>
-    /// Trims retained samples to the last <paramref name="count"/> values.
+    ///     Trims retained samples to the last <paramref name="count" /> values.
     /// </summary>
     /// <param name="count">The number of trailing samples to keep.</param>
-    /// <exception cref="ArgumentOutOfRangeException">Thrown when <paramref name="count"/> is negative.</exception>
+    /// <exception cref="ArgumentOutOfRangeException">Thrown when <paramref name="count" /> is negative.</exception>
     public void TrimToLast(int count)
     {
         if (count < 0)
@@ -185,7 +174,7 @@ public sealed class Sparkline : Control
     }
 
     /// <summary>
-    /// Clears all samples.
+    ///     Clears all samples.
     /// </summary>
     public void Clear()
     {
@@ -230,7 +219,7 @@ public sealed class Sparkline : Control
         var titleWidth = ControlTextLayout.MeasureDisplayWidth(FormatTitleForMeasure());
         var preferredWidth = Math.Max(8, Math.Min(Capacity, 64));
         var width = Math.Max(preferredWidth, titleWidth + 4);
-        var height = (Options?.ShowStats ?? false) ? 2 : 1;
+        var height = Options?.ShowStats ?? false ? 2 : 1;
 
         width += Padding.Horizontal;
         height += Padding.Vertical;
@@ -268,7 +257,8 @@ public sealed class Sparkline : Control
             return;
         }
 
-        var (min, max) = ResolveBounds(_samples.Count, Math.Max(0, _samples.Count - Math.Min(_samples.Count, content.Width)));
+        var (min, max) = ResolveBounds(_samples.Count,
+            Math.Max(0, _samples.Count - Math.Min(_samples.Count, content.Width)));
         var left = $"min:{FormatStat(min)} max:{FormatStat(max)}";
         var styled = ApplyStyle(left, ResolveStyled(MetaStyle));
         canvas.WriteText(content.X, content.Y, styled, content.Width);
@@ -279,7 +269,8 @@ public sealed class Sparkline : Control
             if (legendText.Length > 0)
             {
                 var rightX = Math.Max(content.X, content.Right - legendText.Length);
-                canvas.WriteText(rightX, content.Y, ApplyStyle(legendText, ResolveStyled(MetaStyle)), content.Right - rightX);
+                canvas.WriteText(rightX, content.Y, ApplyStyle(legendText, ResolveStyled(MetaStyle)),
+                    content.Right - rightX);
             }
         }
     }

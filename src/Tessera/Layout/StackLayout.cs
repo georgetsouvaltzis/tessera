@@ -4,7 +4,8 @@ namespace Tessera.Layout;
 
 internal sealed class StackLayout : LayoutNode
 {
-    public StackLayout(LayoutOrientation orientation, IReadOnlyList<LayoutSlot> children, int gap = 0, Thickness padding = default)
+    public StackLayout(LayoutOrientation orientation, IReadOnlyList<LayoutSlot> children, int gap = 0,
+        Thickness padding = default)
     {
         Orientation = orientation;
         Children = children ?? throw new ArgumentNullException(nameof(children));
@@ -12,8 +13,9 @@ internal sealed class StackLayout : LayoutNode
         Padding = padding;
     }
 
-    public StackLayout(LayoutOrientation orientation, int gap = 0, Thickness padding = default, params LayoutSlot[] children)
-        : this(orientation, (IReadOnlyList<LayoutSlot>)children, gap, padding)
+    public StackLayout(LayoutOrientation orientation, int gap = 0, Thickness padding = default,
+        params LayoutSlot[] children)
+        : this(orientation, children, gap, padding)
     {
     }
 
@@ -26,27 +28,29 @@ internal sealed class StackLayout : LayoutNode
     }
 
     /// <summary>
-    /// Gets a value indicating whether the stack flows horizontally or vertically.
+    ///     Gets a value indicating whether the stack flows horizontally or vertically.
     /// </summary>
     public LayoutOrientation Orientation { get; }
 
     public bool IsHorizontal => Orientation == LayoutOrientation.Horizontal;
 
     /// <summary>
-    /// Gets the stack children in layout order.
+    ///     Gets the stack children in layout order.
     /// </summary>
     public IReadOnlyList<LayoutSlot> Children { get; }
 
     /// <summary>
-    /// Gets the inter-item gap.
+    ///     Gets the inter-item gap.
     /// </summary>
     public int Gap { get; }
 
     /// <summary>
-    /// Gets the inner padding applied to the arranged content.
+    ///     Gets the inner padding applied to the arranged content.
     /// </summary>
     public Thickness Padding { get; }
 
-    internal override LayoutMeasurement Measure(in Rect availableBounds) =>
-        LayoutArrangement.MeasureStack(IsHorizontal, Children, Gap, Padding, availableBounds);
+    internal override LayoutMeasurement Measure(in Rect availableBounds)
+    {
+        return LayoutArrangement.MeasureStack(IsHorizontal, Children, Gap, Padding, availableBounds);
+    }
 }

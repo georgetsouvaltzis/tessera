@@ -8,143 +8,117 @@ using Tessera.Styles;
 namespace Tessera.Controls;
 
 /// <summary>
-/// Interactive query composition control for rule-based filtering.
+///     Interactive query composition control for rule-based filtering.
 /// </summary>
 public sealed class QueryBuilder : Control
 {
     private readonly QueryGroup _group = new();
-    private int _selectedIndex = -1;
     private int _hoveredIndex = -1;
     private string _queryCache = string.Empty;
     private bool _queryDirty = true;
 
     /// <summary>
-    /// Occurs when query composition changes.
+    ///     Gets or sets title text.
     /// </summary>
-    public event EventHandler<QueryChangedEventArgs>? QueryChanged;
+    public string Title { get; set; } = "Query Builder";
 
     /// <summary>
-    /// Gets or sets title text.
+    ///     Gets or sets marker appended to <see cref="Title" /> while focused.
     /// </summary>
-    public string Title
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = "Query Builder";
+    public string FocusMarker { get; set; } = "*";
 
     /// <summary>
-    /// Gets or sets marker appended to <see cref="Title"/> while focused.
-    /// </summary>
-    public string FocusMarker
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = "*";
-
-    /// <summary>
-    /// Gets or sets whether <see cref="FocusMarker"/> is shown while focused.
+    ///     Gets or sets whether <see cref="FocusMarker" /> is shown while focused.
     /// </summary>
     public bool ShowFocusMarker { get; set; } = true;
 
     /// <summary>
-    /// Gets or sets marker for selected rule rows.
+    ///     Gets or sets marker for selected rule rows.
     /// </summary>
-    public string SelectedMarker
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = "▸";
+    public string SelectedMarker { get; set; } = "▸";
 
     /// <summary>
-    /// Gets or sets marker for non-selected rule rows.
+    ///     Gets or sets marker for non-selected rule rows.
     /// </summary>
-    public string UnselectedMarker
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = " ";
+    public string UnselectedMarker { get; set; } = " ";
 
     /// <summary>
-    /// Gets or sets text rendered when no rules exist.
+    ///     Gets or sets text rendered when no rules exist.
     /// </summary>
-    public string EmptyText
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = "(no rules)";
+    public string EmptyText { get; set; } = "(no rules)";
 
     /// <summary>
-    /// Gets or sets whether preview row should be shown.
+    ///     Gets or sets whether preview row should be shown.
     /// </summary>
     public bool ShowQueryPreview { get; set; } = true;
 
     /// <summary>
-    /// Gets or sets border style.
+    ///     Gets or sets border style.
     /// </summary>
     public BorderStyle Border { get; set; } = BorderStyle.SingleLine;
 
     /// <summary>
-    /// Gets or sets inner padding.
+    ///     Gets or sets inner padding.
     /// </summary>
     public Thickness Padding { get; set; }
 
     /// <summary>
-    /// Gets or sets title style while unfocused.
+    ///     Gets or sets title style while unfocused.
     /// </summary>
     public TesseraStyle TitleStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets title style while focused.
+    ///     Gets or sets title style while focused.
     /// </summary>
     public TesseraStyle FocusedTitleStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets rule base style.
+    ///     Gets or sets rule base style.
     /// </summary>
     public TesseraStyle RuleStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets style merged into selected rules.
+    ///     Gets or sets style merged into selected rules.
     /// </summary>
     public TesseraStyle SelectedRuleStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets style merged into selected rules while focused.
+    ///     Gets or sets style merged into selected rules while focused.
     /// </summary>
     public TesseraStyle FocusedRuleStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets style merged into hovered rules.
+    ///     Gets or sets style merged into hovered rules.
     /// </summary>
     public TesseraStyle HoveredRuleStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets style merged when disabled.
+    ///     Gets or sets style merged when disabled.
     /// </summary>
     public TesseraStyle DisabledRuleStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets style merged when error state is active.
+    ///     Gets or sets style merged when error state is active.
     /// </summary>
     public TesseraStyle ErrorRuleStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets preview-row style.
+    ///     Gets or sets preview-row style.
     /// </summary>
     public TesseraStyle PreviewStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets border style while unfocused.
+    ///     Gets or sets border style while unfocused.
     /// </summary>
     public TesseraStyle BorderStyleText { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets border style while focused.
+    ///     Gets or sets border style while focused.
     /// </summary>
     public TesseraStyle FocusedBorderStyleText { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets whether control error state is active.
+    ///     Gets or sets whether control error state is active.
     /// </summary>
     public bool HasError { get; set; }
 
@@ -158,22 +132,23 @@ public sealed class QueryBuilder : Control
     public override bool IsReadOnly { get; set; }
 
     /// <summary>
-    /// Gets current query rules.
+    ///     Gets current query rules.
     /// </summary>
     public IReadOnlyList<QueryRule> Rules => _group.Rules;
 
     /// <summary>
-    /// Gets current selected rule index.
+    ///     Gets current selected rule index.
     /// </summary>
-    public int SelectedIndex => _selectedIndex;
+    public int SelectedIndex { get; private set; } = -1;
 
     /// <summary>
-    /// Gets current selected rule.
+    ///     Gets current selected rule.
     /// </summary>
-    public QueryRule? SelectedRule => _selectedIndex >= 0 && _selectedIndex < _group.Count ? _group.Rules[_selectedIndex] : null;
+    public QueryRule? SelectedRule =>
+        SelectedIndex >= 0 && SelectedIndex < _group.Count ? _group.Rules[SelectedIndex] : null;
 
     /// <summary>
-    /// Gets or sets whether group combinator is OR.
+    ///     Gets or sets whether group combinator is OR.
     /// </summary>
     public bool UseOr
     {
@@ -182,12 +157,17 @@ public sealed class QueryBuilder : Control
     }
 
     /// <summary>
-    /// Gets current query text.
+    ///     Gets current query text.
     /// </summary>
     public string QueryText => EnsureQueryText();
 
     /// <summary>
-    /// Replaces rules.
+    ///     Occurs when query composition changes.
+    /// </summary>
+    public event EventHandler<QueryChangedEventArgs>? QueryChanged;
+
+    /// <summary>
+    ///     Replaces rules.
     /// </summary>
     /// <param name="rules">Rules to set.</param>
     public void SetRules(IEnumerable<QueryRule> rules)
@@ -200,7 +180,7 @@ public sealed class QueryBuilder : Control
     }
 
     /// <summary>
-    /// Adds one rule.
+    ///     Adds one rule.
     /// </summary>
     /// <param name="field">Rule field.</param>
     /// <param name="operator">Rule operator.</param>
@@ -212,7 +192,7 @@ public sealed class QueryBuilder : Control
     }
 
     /// <summary>
-    /// Adds one rule.
+    ///     Adds one rule.
     /// </summary>
     /// <param name="rule">Rule to add.</param>
     /// <returns>Added rule index.</returns>
@@ -221,9 +201,9 @@ public sealed class QueryBuilder : Control
         ArgumentNullException.ThrowIfNull(rule);
         var previous = EnsureQueryText();
         _group.AddRule(rule);
-        if (_selectedIndex < 0)
+        if (SelectedIndex < 0)
         {
-            _selectedIndex = _group.Count - 1;
+            SelectedIndex = _group.Count - 1;
         }
 
         OnRulesChanged(previous);
@@ -231,10 +211,10 @@ public sealed class QueryBuilder : Control
     }
 
     /// <summary>
-    /// Removes one rule by index.
+    ///     Removes one rule by index.
     /// </summary>
     /// <param name="index">Rule index.</param>
-    /// <returns><see langword="true"/> when removed.</returns>
+    /// <returns><see langword="true" /> when removed.</returns>
     public bool RemoveRuleAt(int index)
     {
         if ((uint)index >= (uint)_group.Count)
@@ -254,7 +234,7 @@ public sealed class QueryBuilder : Control
     }
 
     /// <summary>
-    /// Clears all rules.
+    ///     Clears all rules.
     /// </summary>
     public void ClearRules()
     {
@@ -265,13 +245,13 @@ public sealed class QueryBuilder : Control
 
         var previous = EnsureQueryText();
         _group.ClearRules();
-        _selectedIndex = -1;
+        SelectedIndex = -1;
         _hoveredIndex = -1;
         OnRulesChanged(previous);
     }
 
     /// <summary>
-    /// Updates one rule by index.
+    ///     Updates one rule by index.
     /// </summary>
     /// <param name="index">Rule index.</param>
     /// <param name="field">Optional replacement field.</param>
@@ -279,7 +259,7 @@ public sealed class QueryBuilder : Control
     /// <param name="value">Optional replacement value.</param>
     /// <param name="isDisabled">Optional replacement disabled state.</param>
     /// <param name="hasError">Optional replacement error state.</param>
-    /// <returns><see langword="true"/> when any value changed.</returns>
+    /// <returns><see langword="true" /> when any value changed.</returns>
     public bool UpdateRule(
         int index,
         string? field = null,
@@ -335,24 +315,24 @@ public sealed class QueryBuilder : Control
     }
 
     /// <summary>
-    /// Sets selected rule index.
+    ///     Sets selected rule index.
     /// </summary>
     /// <param name="index">Index to select.</param>
-    /// <returns><see langword="true"/> when selection changed.</returns>
+    /// <returns><see langword="true" /> when selection changed.</returns>
     public bool SetSelectedIndex(int index)
     {
         var normalized = _group.Count == 0 ? -1 : Math.Clamp(index, 0, _group.Count - 1);
-        if (normalized == _selectedIndex)
+        if (normalized == SelectedIndex)
         {
             return false;
         }
 
-        _selectedIndex = normalized;
+        SelectedIndex = normalized;
         return true;
     }
 
     /// <summary>
-    /// Toggles current combinator.
+    ///     Toggles current combinator.
     /// </summary>
     public void ToggleCombinator()
     {
@@ -380,12 +360,12 @@ public sealed class QueryBuilder : Control
 
         if (key.Is(Key.Down) || key.IsCharacter('j'))
         {
-            return SetSelectedIndex(_selectedIndex + 1);
+            return SetSelectedIndex(SelectedIndex + 1);
         }
 
         if (key.Is(Key.Up) || key.IsCharacter('k'))
         {
-            return SetSelectedIndex(_selectedIndex - 1);
+            return SetSelectedIndex(SelectedIndex - 1);
         }
 
         if (key.Is(Key.Home))
@@ -400,7 +380,7 @@ public sealed class QueryBuilder : Control
 
         if (key.Is(Key.Backspace) || key.Is(Key.Delete))
         {
-            return RemoveRuleAt(_selectedIndex);
+            return RemoveRuleAt(SelectedIndex);
         }
 
         return false;
@@ -424,19 +404,19 @@ public sealed class QueryBuilder : Control
         {
             if (pointer.Button == PointerButton.WheelDown)
             {
-                return SetSelectedIndex(_selectedIndex + 1);
+                return SetSelectedIndex(SelectedIndex + 1);
             }
 
             if (pointer.Button == PointerButton.WheelUp)
             {
-                return SetSelectedIndex(_selectedIndex - 1);
+                return SetSelectedIndex(SelectedIndex - 1);
             }
         }
 
         if (!content.Contains(pointer.X, pointer.Y))
         {
             return pointer.Kind is PointerEventKind.Motion or PointerEventKind.Press
-                && SetHoveredIndex(-1);
+                   && SetHoveredIndex(-1);
         }
 
         var rulesTop = ShowQueryPreview && content.Height > 1 ? content.Y + 1 : content.Y;
@@ -510,7 +490,7 @@ public sealed class QueryBuilder : Control
         for (var index = 0; index < visibleRules; index++)
         {
             var rule = _group.Rules[index];
-            var marker = index == _selectedIndex ? SelectedMarker : UnselectedMarker;
+            var marker = index == SelectedIndex ? SelectedMarker : UnselectedMarker;
             var line = BuildDisplayLine(marker, rule);
             canvas.WriteText(
                 content.X,
@@ -525,9 +505,11 @@ public sealed class QueryBuilder : Control
         var width = Math.Max(26, ControlTextLayout.MeasureDisplayWidth(FormatTitleForMeasure()) + 4);
         for (var index = 0; index < _group.Count; index++)
         {
-            var markerWidth = Math.Max(ControlTextLayout.MeasureDisplayWidth(SelectedMarker), ControlTextLayout.MeasureDisplayWidth(UnselectedMarker));
+            var markerWidth = Math.Max(ControlTextLayout.MeasureDisplayWidth(SelectedMarker),
+                ControlTextLayout.MeasureDisplayWidth(UnselectedMarker));
             var rule = _group.Rules[index];
-            var rowWidth = markerWidth + 1 + ControlTextLayout.MeasureDisplayWidth(rule.Field) + 1 + ControlTextLayout.MeasureDisplayWidth(OperatorText(rule.Operator));
+            var rowWidth = markerWidth + 1 + ControlTextLayout.MeasureDisplayWidth(rule.Field) + 1 +
+                           ControlTextLayout.MeasureDisplayWidth(OperatorText(rule.Operator));
             if (rule.RequiresValue)
             {
                 rowWidth += 1 + ControlTextLayout.MeasureDisplayWidth(rule.Value);
@@ -542,7 +524,8 @@ public sealed class QueryBuilder : Control
             height += 2;
         }
 
-        return new LayoutMeasurement(Math.Clamp(width, 0, availableBounds.Width), Math.Clamp(height, 0, availableBounds.Height));
+        return new LayoutMeasurement(Math.Clamp(width, 0, availableBounds.Width),
+            Math.Clamp(height, 0, availableBounds.Height));
     }
 
     private void SetCombinator(bool useOr)
@@ -561,12 +544,12 @@ public sealed class QueryBuilder : Control
     {
         if (_group.Count == 0)
         {
-            _selectedIndex = -1;
+            SelectedIndex = -1;
             _hoveredIndex = -1;
             return;
         }
 
-        _selectedIndex = _selectedIndex < 0 ? 0 : Math.Clamp(_selectedIndex, 0, _group.Count - 1);
+        SelectedIndex = SelectedIndex < 0 ? 0 : Math.Clamp(SelectedIndex, 0, _group.Count - 1);
         _hoveredIndex = Math.Clamp(_hoveredIndex, -1, _group.Count - 1);
     }
 
@@ -685,7 +668,7 @@ public sealed class QueryBuilder : Control
     private TesseraStyle ResolveRuleStyle(int index, int hoveredIndex, QueryRule? rule)
     {
         var style = RuleStyle;
-        if (index >= 0 && index == _selectedIndex)
+        if (index >= 0 && index == SelectedIndex)
         {
             style = style.Merge(SelectedRuleStyle);
             if (IsFocused)
@@ -791,7 +774,7 @@ public sealed class QueryBuilder : Control
             QueryOperator.NotIn => "NOT IN",
             QueryOperator.IsEmpty => "IS EMPTY",
             QueryOperator.IsNotEmpty => "IS NOT EMPTY",
-            _ => "=",
+            _ => "="
         };
     }
 

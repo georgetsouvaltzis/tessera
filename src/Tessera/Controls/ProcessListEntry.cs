@@ -3,29 +3,33 @@ using Tessera.Styles;
 namespace Tessera.Controls;
 
 /// <summary>
-/// Represents process lifecycle status for <see cref="ProcessListView"/> rows.
+///     Represents process lifecycle status for <see cref="ProcessListView" /> rows.
 /// </summary>
 public enum ProcessListStatus
 {
     /// <summary>Process is currently running.</summary>
     Running,
+
     /// <summary>Process is sleeping or waiting.</summary>
     Sleeping,
+
     /// <summary>Process is stopped.</summary>
     Stopped,
+
     /// <summary>Process is zombie/defunct.</summary>
     Zombie,
+
     /// <summary>Process status is unknown.</summary>
-    Unknown,
+    Unknown
 }
 
 /// <summary>
-/// Represents one process row rendered by <see cref="ProcessListView"/>.
+///     Represents one process row rendered by <see cref="ProcessListView" />.
 /// </summary>
 public sealed class ProcessListEntry
 {
     /// <summary>
-    /// Initializes a process row.
+    ///     Initializes a process row.
     /// </summary>
     /// <param name="pid">Process identifier.</param>
     /// <param name="name">Display name.</param>
@@ -40,7 +44,7 @@ public sealed class ProcessListEntry
         double memoryMb = 0)
     {
         Pid = pid;
-        Name = name ?? string.Empty;
+        Name = name;
         Status = status;
         CpuPercent = cpuPercent;
         MemoryMb = memoryMb;
@@ -50,11 +54,7 @@ public sealed class ProcessListEntry
     public int Pid { get; set; }
 
     /// <summary>Gets or sets display name.</summary>
-    public string Name
-    {
-        get;
-        set => field = value ?? string.Empty;
-    }
+    public string Name { get; set; }
 
     /// <summary>Gets or sets process status.</summary>
     public ProcessListStatus Status { get; set; }
@@ -73,12 +73,12 @@ public sealed class ProcessListEntry
 }
 
 /// <summary>
-/// Provides previous/current values when <see cref="ProcessListView.SelectionChanged"/> fires.
+///     Provides previous/current values when <see cref="ProcessListView.SelectionChanged" /> fires.
 /// </summary>
 public sealed class ProcessListSelectionChangedEventArgs : EventArgs
 {
     /// <summary>
-    /// Initializes selection payload.
+    ///     Initializes selection payload.
     /// </summary>
     /// <param name="previousIndex">Previously selected index.</param>
     /// <param name="selectedIndex">Current selected index.</param>

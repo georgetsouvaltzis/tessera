@@ -10,70 +10,92 @@ namespace Tessera.Controls;
 public sealed class PaneTabs : Control
 {
     private readonly List<PaneTabItem> _tabs = [];
-    private int _selectedIndex;
     private int _hoveredIndex = -1;
-
-    /// <summary>Occurs when selected tab changes.</summary>
-    public event EventHandler<PaneTabSelectionChangedEventArgs>? SelectionChanged;
+    private int _selectedIndex;
 
     /// <summary>Gets or sets optional title rendered before tab labels.</summary>
-    public string Title { get; set => field = value ?? string.Empty; } = string.Empty;
+    public string Title { get; set; } = string.Empty;
+
     /// <summary>Gets or sets marker appended to title while focused.</summary>
-    public string FocusMarker { get; set => field = value ?? string.Empty; } = "*";
+    public string FocusMarker { get; set; } = "*";
+
     /// <summary>Gets or sets whether the focus marker is shown while focused.</summary>
     public bool ShowFocusMarker { get; set; } = true;
 
     /// <summary>Gets or sets title style while unfocused.</summary>
     public TesseraStyle TitleStyle { get; set; } = TesseraStyle.Empty;
+
     /// <summary>Gets or sets title style while focused.</summary>
     public TesseraStyle FocusedTitleStyle { get; set; } = TesseraStyle.Empty;
+
     /// <summary>Gets or sets base tab style.</summary>
     public TesseraStyle TabStyle { get; set; } = TesseraStyle.Empty;
+
     /// <summary>Gets or sets selected-tab style.</summary>
     public TesseraStyle SelectedTabStyle { get; set; } = TesseraStyle.Empty;
+
     /// <summary>Gets or sets selected-tab style while focused.</summary>
     public TesseraStyle FocusedSelectedTabStyle { get; set; } = TesseraStyle.Empty;
+
     /// <summary>Gets or sets hovered-tab style.</summary>
     public TesseraStyle HoveredTabStyle { get; set; } = TesseraStyle.Empty;
+
     /// <summary>Gets or sets disabled-tab style.</summary>
     public TesseraStyle DisabledTabStyle { get; set; } = TesseraStyle.Empty;
+
     /// <summary>Gets or sets style applied to separators between tabs.</summary>
     public TesseraStyle SeparatorStyle { get; set; } = TesseraStyle.Empty;
+
     /// <summary>Gets or sets border style while unfocused.</summary>
     public TesseraStyle BorderStyleText { get; set; } = TesseraStyle.Empty;
+
     /// <summary>Gets or sets border style while focused.</summary>
     public TesseraStyle FocusedBorderStyleText { get; set; } = TesseraStyle.Empty;
+
     /// <summary>Gets or sets style merged while control is disabled.</summary>
     public TesseraStyle DisabledStyle { get; set; } = TesseraStyle.Empty;
+
     /// <summary>Gets or sets style used for empty-state text.</summary>
     public TesseraStyle EmptyTextStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>Gets or sets border style.</summary>
     public BorderStyle Border { get; set; } = BorderStyle.SingleLine;
+
     /// <summary>Gets or sets inner padding.</summary>
     public Thickness Padding { get; set; }
+
     /// <summary>Gets or sets separator rendered between tabs.</summary>
     public string Separator { get; set; } = "│";
+
     /// <summary>Gets or sets selected-tab prefix marker.</summary>
     public string SelectedPrefix { get; set; } = "[";
+
     /// <summary>Gets or sets selected-tab suffix marker.</summary>
     public string SelectedSuffix { get; set; } = "]";
+
     /// <summary>Gets or sets text shown when no tabs are configured.</summary>
     public string EmptyText { get; set; } = "(no tabs)";
 
     /// <summary>Gets configured tabs.</summary>
     public IReadOnlyList<PaneTabItem> Tabs => _tabs;
+
     /// <summary>Gets selected index, or <c>-1</c> when no tabs exist.</summary>
     public int SelectedIndex => _tabs.Count == 0 ? -1 : _selectedIndex;
+
     /// <summary>Gets selected tab, if any.</summary>
     public PaneTabItem? SelectedItem => _tabs.Count == 0 ? null : _tabs[_selectedIndex];
 
     /// <inheritdoc />
     public override bool IsFocused { get; set; }
+
     /// <inheritdoc />
     public override bool IsDisabled { get; set; }
+
     /// <inheritdoc />
     public override bool IsReadOnly { get; set; }
+
+    /// <summary>Occurs when selected tab changes.</summary>
+    public event EventHandler<PaneTabSelectionChangedEventArgs>? SelectionChanged;
 
     /// <summary>Replaces tab items.</summary>
     /// <param name="tabs">Tabs in visual order.</param>
@@ -83,7 +105,11 @@ public sealed class PaneTabs : Control
         _tabs.Clear();
         foreach (var tab in tabs)
         {
-            if (tab is null) continue;
+            if (tab is null)
+            {
+                continue;
+            }
+
             _tabs.Add(new PaneTabItem(tab.Id, tab.Title, tab.IsDisabled) { IsDirty = tab.IsDirty });
         }
 
@@ -99,6 +125,7 @@ public sealed class PaneTabs : Control
         {
             _selectedIndex = ResolveNextEnabled(_selectedIndex, +1) ?? ResolveNextEnabled(_selectedIndex, -1) ?? 0;
         }
+
         _hoveredIndex = Math.Clamp(_hoveredIndex, -1, _tabs.Count - 1);
     }
 
@@ -110,13 +137,22 @@ public sealed class PaneTabs : Control
             return false;
         }
 
-        if (key.Is(Key.Left) || key.IsCharacter('h')) return MoveSelection(-1);
-        if (key.Is(Key.Right) || key.IsCharacter('l')) return MoveSelection(+1);
+        if (key.Is(Key.Left) || key.IsCharacter('h'))
+        {
+            return MoveSelection(-1);
+        }
+
+        if (key.Is(Key.Right) || key.IsCharacter('l'))
+        {
+            return MoveSelection(+1);
+        }
+
         if (key.Is(Key.Home))
         {
             var firstEnabled = ResolveNextEnabled(-1, +1);
             return firstEnabled.HasValue && SetSelectedIndex(firstEnabled.Value);
         }
+
         if (key.Is(Key.End))
         {
             var lastEnabled = ResolveNextEnabled(_tabs.Count, -1);
@@ -135,7 +171,10 @@ public sealed class PaneTabs : Control
         }
 
         var content = FrameLayout.ResolveContentRect(bounds, Border, Padding);
-        if (content.IsEmpty) return Handle(message);
+        if (content.IsEmpty)
+        {
+            return Handle(message);
+        }
 
         var inRow = content.Contains(pointer.X, pointer.Y) && pointer.Y == content.Y;
         if (!inRow)
@@ -150,14 +189,27 @@ public sealed class PaneTabs : Control
 
         if (pointer.Kind == PointerEventKind.Wheel)
         {
-            if (pointer.Button == PointerButton.WheelDown) return MoveSelection(+1);
-            if (pointer.Button == PointerButton.WheelUp) return MoveSelection(-1);
+            if (pointer.Button == PointerButton.WheelDown)
+            {
+                return MoveSelection(+1);
+            }
+
+            if (pointer.Button == PointerButton.WheelUp)
+            {
+                return MoveSelection(-1);
+            }
+
             return false;
         }
 
         var hit = HitTestTab(pointer.X, content);
-        if (pointer.Kind == PointerEventKind.Motion) return SetHoveredIndex(hit);
-        if (pointer.Kind == PointerEventKind.Press && pointer.Button == PointerButton.Left && hit >= 0 && !_tabs[hit].IsDisabled)
+        if (pointer.Kind == PointerEventKind.Motion)
+        {
+            return SetHoveredIndex(hit);
+        }
+
+        if (pointer.Kind == PointerEventKind.Press && pointer.Button == PointerButton.Left && hit >= 0 &&
+            !_tabs[hit].IsDisabled)
         {
             RequestFocus();
             return SetSelectedIndex(hit);
@@ -170,7 +222,10 @@ public sealed class PaneTabs : Control
     public override void Render(Canvas canvas, Rect rect)
     {
         var clipped = Rect.Intersect(rect, canvas.Bounds);
-        if (clipped.IsEmpty) return;
+        if (clipped.IsEmpty)
+        {
+            return;
+        }
 
         var content = FrameLayout.DrawFrameAndResolveContent(
             canvas,
@@ -179,7 +234,10 @@ public sealed class PaneTabs : Control
             Border,
             Padding,
             ResolveBorderStyle());
-        if (content.IsEmpty) return;
+        if (content.IsEmpty)
+        {
+            return;
+        }
 
         if (_tabs.Count == 0)
         {
@@ -205,14 +263,24 @@ public sealed class PaneTabs : Control
     internal override LayoutMeasurement Measure(in Rect availableBounds)
     {
         var width = ControlTextLayout.MeasureDisplayWidth(MeasureTitle());
-        if (width > 0 && _tabs.Count > 0) width += 1;
+        if (width > 0 && _tabs.Count > 0)
+        {
+            width += 1;
+        }
+
         for (var index = 0; index < _tabs.Count; index++)
         {
             width += ControlTextLayout.MeasureDisplayWidth(FormatLabel(index));
-            if (index < _tabs.Count - 1) width += ControlTextLayout.MeasureDisplayWidth(Separator);
+            if (index < _tabs.Count - 1)
+            {
+                width += ControlTextLayout.MeasureDisplayWidth(Separator);
+            }
         }
 
-        if (_tabs.Count == 0) width = Math.Max(width, ControlTextLayout.MeasureDisplayWidth(EmptyText));
+        if (_tabs.Count == 0)
+        {
+            width = Math.Max(width, ControlTextLayout.MeasureDisplayWidth(EmptyText));
+        }
 
         var height = 1;
         if (Border != BorderStyle.None)
@@ -221,26 +289,45 @@ public sealed class PaneTabs : Control
             height += 2 + Padding.Vertical;
         }
 
-        return new LayoutMeasurement(Math.Clamp(Math.Max(width, 8), 0, availableBounds.Width), Math.Clamp(height, 0, availableBounds.Height));
+        return new LayoutMeasurement(Math.Clamp(Math.Max(width, 8), 0, availableBounds.Width),
+            Math.Clamp(height, 0, availableBounds.Height));
     }
 
     private bool MoveSelection(int direction)
     {
-        if (_tabs.Count == 0) return false;
+        if (_tabs.Count == 0)
+        {
+            return false;
+        }
+
         var next = ResolveNextEnabled(_selectedIndex, direction);
         return next.HasValue && SetSelectedIndex(next.Value);
     }
 
     private int? ResolveNextEnabled(int start, int direction)
     {
-        if (_tabs.Count == 0) return null;
+        if (_tabs.Count == 0)
+        {
+            return null;
+        }
+
         var index = start;
         for (var i = 0; i < _tabs.Count; i++)
         {
             index += direction;
-            if (index < 0) index = _tabs.Count - 1;
-            else if (index >= _tabs.Count) index = 0;
-            if (!_tabs[index].IsDisabled) return index;
+            if (index < 0)
+            {
+                index = _tabs.Count - 1;
+            }
+            else if (index >= _tabs.Count)
+            {
+                index = 0;
+            }
+
+            if (!_tabs[index].IsDisabled)
+            {
+                return index;
+            }
         }
 
         return null;
@@ -248,14 +335,19 @@ public sealed class PaneTabs : Control
 
     /// <summary>Sets the selected tab index.</summary>
     /// <param name="index">Requested index.</param>
-    /// <returns><see langword="true"/> when selection changed; otherwise <see langword="false"/>.</returns>
+    /// <returns><see langword="true" /> when selection changed; otherwise <see langword="false" />.</returns>
     public bool SetSelectedIndex(int index)
     {
-        if (index < 0 || index >= _tabs.Count || _tabs[index].IsDisabled || index == _selectedIndex) return false;
+        if (index < 0 || index >= _tabs.Count || _tabs[index].IsDisabled || index == _selectedIndex)
+        {
+            return false;
+        }
+
         var previous = _selectedIndex;
         var previousItem = SelectedItem;
         _selectedIndex = index;
-        SelectionChanged?.Invoke(this, new PaneTabSelectionChangedEventArgs(previous, _selectedIndex, previousItem, SelectedItem));
+        SelectionChanged?.Invoke(this,
+            new PaneTabSelectionChangedEventArgs(previous, _selectedIndex, previousItem, SelectedItem));
         return true;
     }
 
@@ -266,9 +358,16 @@ public sealed class PaneTabs : Control
         {
             var label = FormatLabel(index);
             var width = ControlTextLayout.MeasureDisplayWidth(label);
-            if (x >= cursor && x < cursor + width) return index;
+            if (x >= cursor && x < cursor + width)
+            {
+                return index;
+            }
+
             cursor += width;
-            if (index < _tabs.Count - 1) cursor += ControlTextLayout.MeasureDisplayWidth(Separator);
+            if (index < _tabs.Count - 1)
+            {
+                cursor += ControlTextLayout.MeasureDisplayWidth(Separator);
+            }
         }
 
         return -1;
@@ -276,7 +375,11 @@ public sealed class PaneTabs : Control
 
     private bool SetHoveredIndex(int index)
     {
-        if (_hoveredIndex == index) return false;
+        if (_hoveredIndex == index)
+        {
+            return false;
+        }
+
         _hoveredIndex = index;
         return true;
     }
@@ -295,29 +398,48 @@ public sealed class PaneTabs : Control
         if (index == _selectedIndex)
         {
             style = style.Merge(SelectedTabStyle);
-            if (IsFocused) style = style.Merge(FocusedSelectedTabStyle);
+            if (IsFocused)
+            {
+                style = style.Merge(FocusedSelectedTabStyle);
+            }
         }
         else if (index == _hoveredIndex)
         {
             style = style.Merge(HoveredTabStyle);
         }
 
-        if (tab.IsDisabled) style = style.Merge(DisabledTabStyle);
-        if (IsDisabled) style = style.Merge(DisabledStyle);
+        if (tab.IsDisabled)
+        {
+            style = style.Merge(DisabledTabStyle);
+        }
+
+        if (IsDisabled)
+        {
+            style = style.Merge(DisabledStyle);
+        }
+
         return style;
     }
 
     private TesseraStyle ResolveSeparatorStyle()
     {
         var style = SeparatorStyle;
-        if (IsDisabled) style = style.Merge(DisabledStyle);
+        if (IsDisabled)
+        {
+            style = style.Merge(DisabledStyle);
+        }
+
         return style;
     }
 
     private TesseraStyle ResolveBorderStyle()
     {
         var style = IsFocused ? BorderStyleText.Merge(FocusedBorderStyleText) : BorderStyleText;
-        if (IsDisabled) style = style.Merge(DisabledStyle);
+        if (IsDisabled)
+        {
+            style = style.Merge(DisabledStyle);
+        }
+
         return style;
     }
 
@@ -325,15 +447,28 @@ public sealed class PaneTabs : Control
     {
         var title = MeasureTitle();
         var style = IsFocused ? FocusedTitleStyle : TitleStyle;
-        if (IsDisabled) style = style.Merge(DisabledStyle);
+        if (IsDisabled)
+        {
+            style = style.Merge(DisabledStyle);
+        }
+
         return ApplyStyle(title, style);
     }
 
     private string MeasureTitle()
     {
-        if (string.IsNullOrEmpty(Title)) return string.Empty;
-        return IsFocused && ShowFocusMarker && !string.IsNullOrWhiteSpace(FocusMarker) ? $"{Title} {FocusMarker}" : Title;
+        if (string.IsNullOrEmpty(Title))
+        {
+            return string.Empty;
+        }
+
+        return IsFocused && ShowFocusMarker && !string.IsNullOrWhiteSpace(FocusMarker)
+            ? $"{Title} {FocusMarker}"
+            : Title;
     }
 
-    private static string ApplyStyle(string value, TesseraStyle style) => style.IsEmpty ? value : style.Render(value);
+    private static string ApplyStyle(string value, TesseraStyle style)
+    {
+        return style.IsEmpty ? value : style.Render(value);
+    }
 }

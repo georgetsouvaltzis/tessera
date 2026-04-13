@@ -1,6 +1,5 @@
 using NUnit.Framework;
 using Tessera.Components.Primitives;
-using Tessera.Components.Styling;
 using Tessera.Controls;
 using Tessera.Styles;
 
@@ -18,7 +17,7 @@ public sealed class SideNavRailControlTests
         [
             new NavItem("home", "Home"),
             new NavItem("ops", "Operations", isDisabled: true),
-            new NavItem("logs", "Logs"),
+            new NavItem("logs", "Logs")
         ]);
 
         SideNavRailSelectionChangedEventArgs? args = null;
@@ -43,7 +42,7 @@ public sealed class SideNavRailControlTests
         rail.SetItems(
         [
             new NavItem("home", "Home"),
-            new NavItem("metrics", "Metrics"),
+            new NavItem("metrics", "Metrics")
         ]);
         rail.SetSelectedIndex(1);
 
@@ -67,14 +66,14 @@ public sealed class SideNavRailControlTests
         [
             new NavItem("home", "Home"),
             new NavItem("queue", "Queue"),
-            new NavItem("jobs", "Jobs"),
+            new NavItem("jobs", "Jobs")
         ]);
 
         SideNavRailActivatedEventArgs? activated = null;
         rail.Activated += (_, eventArgs) => activated = eventArgs;
 
         var handled = rail.Handle(
-            new PointerInput(PointerEventKind.Press, PointerButton.Left, X: 2, Y: 2),
+            new PointerInput(PointerEventKind.Press, PointerButton.Left, 2, 2),
             new Rect(0, 0, 30, 8));
 
         Assert.That(handled, Is.True);
@@ -93,11 +92,11 @@ public sealed class SideNavRailControlTests
         [
             new NavItem("home", "Home"),
             new NavItem("queue", "Queue"),
-            new NavItem("jobs", "Jobs"),
+            new NavItem("jobs", "Jobs")
         ]);
 
         var handled = rail.Handle(
-            new PointerInput(PointerEventKind.Motion, PointerButton.None, X: 2, Y: 2),
+            new PointerInput(PointerEventKind.Motion, PointerButton.None, 2, 2),
             new Rect(0, 0, 30, 8));
 
         Assert.That(handled, Is.True);
@@ -123,14 +122,14 @@ public sealed class SideNavRailControlTests
         rail.Glyphs = new SideNavRailGlyphSet("v", ">", ".", "~", "*", ":", "{", "}", "|");
         rail.SetItems(
         [
-            new NavItem("home", "Home", icon: "H", badge: "1"),
-            new NavItem("queue", "Queue", icon: "Q"),
-            new NavItem("audit", "Audit", icon: "A", isDisabled: true),
+            new NavItem("home", "Home", "H", "1"),
+            new NavItem("queue", "Queue", "Q"),
+            new NavItem("audit", "Audit", "A", isDisabled: true)
         ]);
         rail.SetSelectedIndex(0);
-        rail.Handle(new PointerInput(PointerEventKind.Motion, PointerButton.None, X: 2, Y: 3), new Rect(0, 0, 36, 8));
+        rail.Handle(new PointerInput(PointerEventKind.Motion, PointerButton.None, 2, 3), new Rect(0, 0, 36, 8));
 
-        var output = Render(rail, width: 36, height: 8);
+        var output = Render(rail, 36, 8);
 
         Assert.That(output.Contains("Rail !", StringComparison.Ordinal), Is.True);
         Assert.That(output.Contains('v'), Is.True);
@@ -139,7 +138,9 @@ public sealed class SideNavRailControlTests
         Assert.That(output.Contains("38;2;77;88;99", StringComparison.Ordinal), Is.True);
         Assert.That(output.Contains("38;2;12;34;56", StringComparison.Ordinal), Is.True);
         Assert.That(output.Contains("38;2;98;76;54", StringComparison.Ordinal), Is.True);
-        Assert.That(output.Contains("[1;", StringComparison.Ordinal) || output.Contains(";1;", StringComparison.Ordinal) || output.Contains("[1m", StringComparison.Ordinal), Is.True);
+        Assert.That(
+            output.Contains("[1;", StringComparison.Ordinal) || output.Contains(";1;", StringComparison.Ordinal) ||
+            output.Contains("[1m", StringComparison.Ordinal), Is.True);
     }
 
     [Test]
@@ -150,24 +151,21 @@ public sealed class SideNavRailControlTests
         rail.SetItems(
         [
             new NavItem("home", "Home"),
-            new NavItem("metrics", "Metrics"),
+            new NavItem("metrics", "Metrics")
         ]);
 
-        var first = Render(rail, width: 28, height: 6);
-        var second = Render(rail, width: 28, height: 6);
+        var first = Render(rail, 28, 6);
+        var second = Render(rail, 28, 6);
 
         Assert.That(first, Is.EqualTo(second));
-        Assert.That(first.Contains("\u001b[", StringComparison.Ordinal), Is.False);
+        Assert.That(first.Contains("\e[", StringComparison.Ordinal), Is.False);
         Assert.That(first.Contains('▼'), Is.True);
         Assert.That(first.Contains('●'), Is.True);
     }
 
     private static SideNavRail CreateRail()
     {
-        return new SideNavRail
-        {
-            IsFocused = true,
-        };
+        return new SideNavRail { IsFocused = true };
     }
 
     private static string Render(SideNavRail rail, int width, int height)

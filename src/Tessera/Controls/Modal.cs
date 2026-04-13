@@ -1,4 +1,4 @@
-﻿using Tessera.Components.Primitives;
+using Tessera.Components.Primitives;
 using Tessera.Components.Primitives.Internal;
 using Tessera.Controls.Internal;
 using Tessera.Layout;
@@ -7,23 +7,19 @@ using Tessera.Styles;
 namespace Tessera.Controls;
 
 /// <summary>
-/// Represents a dismissible overlay panel.
+///     Represents a dismissible overlay panel.
 /// </summary>
 public sealed class Modal : Control
 {
     private List<string> _bodyLines = ["(empty)"];
 
     /// <summary>
-    /// Represents title.
+    ///     Represents title.
     /// </summary>
-    public string Title
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = "Modal";
+    public string Title { get; set; } = "Modal";
 
     /// <summary>
-    /// Represents is visible.
+    ///     Represents is visible.
     /// </summary>
     public bool IsVisible
     {
@@ -32,7 +28,7 @@ public sealed class Modal : Control
     }
 
     /// <summary>
-    /// Represents border.
+    ///     Represents border.
     /// </summary>
     public BorderStyle Border
     {
@@ -41,7 +37,7 @@ public sealed class Modal : Control
     } = BorderStyle.Rounded;
 
     /// <summary>
-    /// Represents padding.
+    ///     Represents padding.
     /// </summary>
     public Thickness Padding
     {
@@ -50,16 +46,16 @@ public sealed class Modal : Control
     }
 
     /// <summary>
-    /// Represents body lines.
+    ///     Represents body lines.
     /// </summary>
     public IReadOnlyList<string> BodyLines
     {
         get => _bodyLines;
-        set => _bodyLines = [.. (value ?? ["(empty)"])];
+        set => _bodyLines = [.. value];
     }
 
     /// <summary>
-    /// Represents backdrop fill.
+    ///     Represents backdrop fill.
     /// </summary>
     public char BackdropFill
     {
@@ -68,41 +64,37 @@ public sealed class Modal : Control
     } = '·';
 
     /// <summary>
-    /// Gets or sets the marker shown in the title when focused.
+    ///     Gets or sets the marker shown in the title when focused.
     /// </summary>
-    public string FocusMarker
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = "*";
+    public string FocusMarker { get; set; } = "*";
 
     /// <summary>
-    /// Gets or sets whether the focused title marker should be rendered.
+    ///     Gets or sets whether the focused title marker should be rendered.
     /// </summary>
     public bool ShowFocusMarker { get; set; } = true;
 
     /// <summary>
-    /// Gets or sets the title style used when not focused.
+    ///     Gets or sets the title style used when not focused.
     /// </summary>
     public TesseraStyle TitleStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the title style used when focused.
+    ///     Gets or sets the title style used when focused.
     /// </summary>
     public TesseraStyle FocusedTitleStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets body text style.
+    ///     Gets or sets body text style.
     /// </summary>
     public TesseraStyle BodyTextStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets style applied to border glyphs when the control is not focused.
+    ///     Gets or sets style applied to border glyphs when the control is not focused.
     /// </summary>
     public TesseraStyle BorderStyleText { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets style merged into border glyphs while the control is focused.
+    ///     Gets or sets style merged into border glyphs while the control is focused.
     /// </summary>
     public TesseraStyle FocusedBorderStyleText { get; set; } = TesseraStyle.Empty;
 
@@ -140,7 +132,8 @@ public sealed class Modal : Control
         var modal = new Rect(modalX, modalY, modalWidth, modalHeight);
 
         FillRect(canvas, modal, ' ');
-        var body = FrameLayout.DrawFrameAndResolveContent(canvas, modal, RenderTitle(), Border, Padding, ResolveBorderStyleText());
+        var body = FrameLayout.DrawFrameAndResolveContent(canvas, modal, RenderTitle(), Border, Padding,
+            ResolveBorderStyleText());
         if (body.IsEmpty)
         {
             return;
@@ -154,7 +147,7 @@ public sealed class Modal : Control
     }
 
     /// <summary>
-    /// Executes set body lines.
+    ///     Executes set body lines.
     /// </summary>
     /// <param name="lines">The lines value.</param>
     public void SetBodyLines(IEnumerable<string> lines)
@@ -166,7 +159,8 @@ public sealed class Modal : Control
     internal override LayoutMeasurement Measure(in Rect availableBounds)
     {
         var longest = _bodyLines.Count == 0 ? 8 : _bodyLines.Max(ControlTextLayout.MeasureDisplayWidth);
-        var width = Math.Max(ControlTextLayout.MeasureDisplayWidth(FormatTitleForMeasure()) + 4, longest + Padding.Horizontal) + 2;
+        var width = Math.Max(ControlTextLayout.MeasureDisplayWidth(FormatTitleForMeasure()) + 4,
+            longest + Padding.Horizontal) + 2;
         var height = Math.Max(4, _bodyLines.Count + Padding.Vertical + 2);
         return new LayoutMeasurement(
             Math.Clamp(width, 0, availableBounds.Width),

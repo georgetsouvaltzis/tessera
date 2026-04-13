@@ -1,13 +1,13 @@
 namespace Tessera.Controls;
 
 /// <summary>
-/// Represents one explicitly registered field in a <see cref="DataForm{TModel}"/>.
+///     Represents one explicitly registered field in a <see cref="DataForm{TModel}" />.
 /// </summary>
 /// <typeparam name="TModel">Bound model type.</typeparam>
 public sealed class DataFormField<TModel>
 {
     /// <summary>
-    /// Initializes a field definition.
+    ///     Initializes a field definition.
     /// </summary>
     /// <param name="key">Stable field key.</param>
     /// <param name="label">Display label text.</param>
@@ -26,8 +26,8 @@ public sealed class DataFormField<TModel>
         Func<string, string?>? validator = null)
     {
         ArgumentNullException.ThrowIfNull(readValue);
-        Key = key ?? string.Empty;
-        Label = label ?? string.Empty;
+        Key = key;
+        Label = label;
         ReadValue = readValue;
         WriteValue = writeValue;
         Placeholder = placeholder ?? string.Empty;
@@ -87,13 +87,13 @@ public sealed class DataFormField<TModel>
 }
 
 /// <summary>
-/// Provides previous/current values when <see cref="DataForm{TModel}.SelectionChanged"/> fires.
+///     Provides previous/current values when <see cref="DataForm{TModel}.SelectionChanged" /> fires.
 /// </summary>
 /// <typeparam name="TModel">Bound model type.</typeparam>
 public sealed class DataFormSelectionChangedEventArgs<TModel> : EventArgs
 {
     /// <summary>
-    /// Initializes selection-change payload.
+    ///     Initializes selection-change payload.
     /// </summary>
     /// <param name="previousIndex">Previously selected field index.</param>
     /// <param name="selectedIndex">Current selected field index.</param>
@@ -125,13 +125,13 @@ public sealed class DataFormSelectionChangedEventArgs<TModel> : EventArgs
 }
 
 /// <summary>
-/// Provides commit results when <see cref="DataForm{TModel}.FieldCommitted"/> fires.
+///     Provides commit results when <see cref="DataForm{TModel}.FieldCommitted" /> fires.
 /// </summary>
 /// <typeparam name="TModel">Bound model type.</typeparam>
 public sealed class DataFormFieldCommittedEventArgs<TModel> : EventArgs
 {
     /// <summary>
-    /// Initializes commit payload.
+    ///     Initializes commit payload.
     /// </summary>
     /// <param name="model">Bound model instance.</param>
     /// <param name="fieldIndex">Committed field index.</param>
@@ -176,6 +176,6 @@ public sealed class DataFormFieldCommittedEventArgs<TModel> : EventArgs
     /// <summary>Gets whether commit succeeded.</summary>
     public bool Success { get; }
 
-    /// <summary>Gets commit error text when <see cref="Success"/> is <see langword="false"/>.</summary>
+    /// <summary>Gets commit error text when <see cref="Success" /> is <see langword="false" />.</summary>
     public string Error { get; }
 }

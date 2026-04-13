@@ -11,14 +11,11 @@ public sealed class FormControlTests
     [Test]
     public void FormRenderShowsFieldsMarkersAndHelperText()
     {
-        var control = new Form
-        {
-            Border = BorderStyle.None,
-        };
+        var control = new Form { Border = BorderStyle.None };
         control.SetFields(
         [
-            new FormField("email", "Email", "user@example.com", "Used for login", isRequired: true),
-            new FormField("name", "Name", "User"),
+            new FormField("email", "Email", "user@example.com", "Used for login", true),
+            new FormField("name", "Name", "User")
         ]);
 
         var output = Render(control, 80, 6);
@@ -29,16 +26,12 @@ public sealed class FormControlTests
     [Test]
     public void FormKeyboardAndPointerSelectionRaisesEvent()
     {
-        var control = new Form
-        {
-            IsFocused = true,
-            Border = BorderStyle.None,
-        };
+        var control = new Form { IsFocused = true, Border = BorderStyle.None };
         control.SetFields(
         [
             new FormField("a", "A", "1"),
             new FormField("b", "B", "2", isDisabled: true),
-            new FormField("c", "C", "3"),
+            new FormField("c", "C", "3")
         ]);
 
         ListSelectionChangedEventArgs<FormField>? lastArgs = null;
@@ -61,21 +54,18 @@ public sealed class FormControlTests
     [Test]
     public void FormDefaultRenderIsDeterministicAndMonochrome()
     {
-        var control = new Form
-        {
-            Border = BorderStyle.None,
-        };
+        var control = new Form { Border = BorderStyle.None };
         control.SetFields(
         [
             new FormField("host", "Host", "localhost"),
-            new FormField("port", "Port", "5432"),
+            new FormField("port", "Port", "5432")
         ]);
 
         var first = Render(control, 64, 4);
         var second = Render(control, 64, 4);
 
         Assert.That(first, Is.EqualTo(second));
-        Assert.That(first.Contains("\u001b[", StringComparison.Ordinal), Is.False);
+        Assert.That(first.Contains("\e[", StringComparison.Ordinal), Is.False);
     }
 
     private static string Render(Form control, int width, int height)

@@ -11,25 +11,22 @@ internal enum OpsWatchAction
     Scale,
     Inspect,
     Failover,
-    Acknowledge,
+    Acknowledge
 }
 
 internal sealed class OpsWatchState
 {
-    private readonly Random _random = new(1447);
-    private readonly DateTimeOffset _simulatedStartUtc = DateTimeOffset.UtcNow;
     private readonly List<OpsCluster> _clusters;
-    private readonly List<ActivityFeedItem> _feed = [];
     private readonly List<double> _cpuTrend = [];
+    private readonly List<double> _diskTrend = [];
+    private readonly List<ActivityFeedItem> _feed = [];
     private readonly List<double> _memoryTrend = [];
     private readonly List<double> _networkTrend = [];
-    private readonly List<double> _diskTrend = [];
-    private int _tick;
+    private readonly Random _random = new(1447);
+    private readonly DateTimeOffset _simulatedStartUtc = DateTimeOffset.UtcNow;
     private string _selectedClusterId;
     private string _selectedNodeId;
-    private string _activeRoute = "north-atlantic -> dr-equinox";
-    private string _automationMode = "steady hand";
-    private string _commandText = "Watch captain: hold traffic on atlas-west, rehearse failover but keep canary live.";
+    private int _tick;
 
     private OpsWatchState(List<OpsCluster> clusters)
     {
@@ -40,44 +37,6 @@ internal sealed class OpsWatchState
         SeedTrends();
         SeedFeed();
         SyncSelection();
-    }
-
-    public static OpsWatchState CreateSeed()
-    {
-        return new OpsWatchState(
-        [
-            new OpsCluster("atl", "Atlas Ring", "AT", 14, "north-atlantic", 7,
-            [
-                new OpsNode("atl-api-01", "api-gw-01", "api-gw", "eu-1", 48, 52, 61, 45),
-                new OpsNode("atl-api-02", "api-gw-02", "api-gw", "eu-2", 56, 58, 63, 48),
-                new OpsNode("atl-stream-01", "stream-01", "stream", "eu-1", 67, 62, 74, 56),
-                new OpsNode("atl-queue-01", "queue-01", "queue", "eu-3", 43, 54, 41, 64),
-                new OpsNode("atl-cache-01", "cache-01", "cache", "eu-2", 29, 71, 26, 38),
-            ]),
-            new OpsCluster("boreal", "Boreal Edge", "BO", 9, "coastal-edge", 5,
-            [
-                new OpsNode("bor-edge-01", "edge-01", "edge", "us-1", 62, 47, 82, 39),
-                new OpsNode("bor-edge-02", "edge-02", "edge", "us-2", 58, 44, 77, 36),
-                new OpsNode("bor-api-01", "api-01", "api-gw", "us-1", 49, 55, 58, 41),
-                new OpsNode("bor-job-01", "jobs-01", "batch", "us-3", 38, 49, 22, 61),
-                new OpsNode("bor-cache-01", "cache-01", "cache", "us-2", 27, 68, 19, 35),
-            ]),
-            new OpsCluster("cinder", "Cinder Relay", "CI", 11, "relay-fabric", 3,
-            [
-                new OpsNode("cin-relay-01", "relay-01", "relay", "edge-a", 72, 63, 69, 58),
-                new OpsNode("cin-relay-02", "relay-02", "relay", "edge-b", 64, 59, 71, 54),
-                new OpsNode("cin-dns-01", "dns-01", "dns", "edge-a", 41, 38, 65, 29),
-                new OpsNode("cin-auth-01", "auth-01", "auth", "edge-c", 52, 61, 47, 43),
-                new OpsNode("cin-store-01", "store-01", "store", "edge-b", 47, 66, 31, 72),
-            ]),
-            new OpsCluster("drift", "Drift Reserve", "DR", 6, "failover-reserve", 1,
-            [
-                new OpsNode("drf-api-01", "reserve-api-01", "api-gw", "dr-1", 22, 37, 19, 24),
-                new OpsNode("drf-api-02", "reserve-api-02", "api-gw", "dr-2", 19, 34, 21, 25),
-                new OpsNode("drf-cache-01", "reserve-cache-01", "cache", "dr-1", 17, 49, 11, 22),
-                new OpsNode("drf-queue-01", "reserve-queue-01", "queue", "dr-2", 14, 31, 9, 18),
-            ]),
-        ]);
     }
 
     public string SelectedClusterName => SelectedCluster.Name;
@@ -95,10 +54,16 @@ internal sealed class OpsWatchState
     public string ModeBadge => $"autonomy {AutomationMode}";
     public string RouteBadge => $"route {ActiveRoute}";
     public string PressureText => $"alert pressure {AlertPressureLabel}  {ActiveAlertCount:00} hot";
-    public string CrewText => $"operators {SelectedCluster.OperatorCount:00}  canaries {SelectedCluster.CanaryCount:00}  muted {MutedCount:00}";
-    public string CommandText => _commandText;
-    public string AutomationMode => _automationMode;
-    public string ActiveRoute => _activeRoute;
+
+    public string CrewText =>
+        $"operators {SelectedCluster.OperatorCount:00}  canaries {SelectedCluster.CanaryCount:00}  muted {MutedCount:00}";
+
+    public string CommandText { get; private set; } =
+        "Watch captain: hold traffic on atlas-west, rehearse failover but keep canary live.";
+
+    public string AutomationMode { get; private set; } = "steady hand";
+
+    public string ActiveRoute { get; private set; } = "north-atlantic -> dr-equinox";
 
     public double CpuAverage => Average(CurrentNodes, static node => node.Cpu);
     public double MemoryAverage => Average(CurrentNodes, static node => node.Memory);
@@ -112,6 +77,7 @@ internal sealed class OpsWatchState
     public int DrainingCount => CurrentNodes.Count(static node => node.IsDraining);
     public int ActiveAlertCount => CurrentNodes.Count(static node => node.Severity != HealthServiceSeverity.Healthy);
     public int AckCount => CurrentNodes.Count(static node => node.IsAcknowledged);
+
     public string AlertPressureLabel
     {
         get
@@ -130,26 +96,73 @@ internal sealed class OpsWatchState
         }
     }
 
+    private OpsCluster SelectedCluster =>
+        _clusters.First(cluster => string.Equals(cluster.Id, _selectedClusterId, StringComparison.Ordinal));
+
+    private List<OpsNode> CurrentNodes => SelectedCluster.Nodes;
+
+    private DateTimeOffset SimulatedUtcNow => _simulatedStartUtc.AddSeconds(_tick);
+
+    public static OpsWatchState CreateSeed()
+    {
+        return new OpsWatchState(
+        [
+            new OpsCluster("atl", "Atlas Ring", "AT", 14, "north-atlantic", 7,
+            [
+                new OpsNode("atl-api-01", "api-gw-01", "api-gw", "eu-1", 48, 52, 61, 45),
+                new OpsNode("atl-api-02", "api-gw-02", "api-gw", "eu-2", 56, 58, 63, 48),
+                new OpsNode("atl-stream-01", "stream-01", "stream", "eu-1", 67, 62, 74, 56),
+                new OpsNode("atl-queue-01", "queue-01", "queue", "eu-3", 43, 54, 41, 64),
+                new OpsNode("atl-cache-01", "cache-01", "cache", "eu-2", 29, 71, 26, 38)
+            ]),
+            new OpsCluster("boreal", "Boreal Edge", "BO", 9, "coastal-edge", 5,
+            [
+                new OpsNode("bor-edge-01", "edge-01", "edge", "us-1", 62, 47, 82, 39),
+                new OpsNode("bor-edge-02", "edge-02", "edge", "us-2", 58, 44, 77, 36),
+                new OpsNode("bor-api-01", "api-01", "api-gw", "us-1", 49, 55, 58, 41),
+                new OpsNode("bor-job-01", "jobs-01", "batch", "us-3", 38, 49, 22, 61),
+                new OpsNode("bor-cache-01", "cache-01", "cache", "us-2", 27, 68, 19, 35)
+            ]),
+            new OpsCluster("cinder", "Cinder Relay", "CI", 11, "relay-fabric", 3,
+            [
+                new OpsNode("cin-relay-01", "relay-01", "relay", "edge-a", 72, 63, 69, 58),
+                new OpsNode("cin-relay-02", "relay-02", "relay", "edge-b", 64, 59, 71, 54),
+                new OpsNode("cin-dns-01", "dns-01", "dns", "edge-a", 41, 38, 65, 29),
+                new OpsNode("cin-auth-01", "auth-01", "auth", "edge-c", 52, 61, 47, 43),
+                new OpsNode("cin-store-01", "store-01", "store", "edge-b", 47, 66, 31, 72)
+            ]),
+            new OpsCluster("drift", "Drift Reserve", "DR", 6, "failover-reserve", 1,
+            [
+                new OpsNode("drf-api-01", "reserve-api-01", "api-gw", "dr-1", 22, 37, 19, 24),
+                new OpsNode("drf-api-02", "reserve-api-02", "api-gw", "dr-2", 19, 34, 21, 25),
+                new OpsNode("drf-cache-01", "reserve-cache-01", "cache", "dr-1", 17, 49, 11, 22),
+                new OpsNode("drf-queue-01", "reserve-queue-01", "queue", "dr-2", 14, 31, 9, 18)
+            ])
+        ]);
+    }
+
     public IReadOnlyList<NavItem> BuildNavItems()
     {
         return _clusters
             .Select(cluster => new NavItem(
                 cluster.Id,
                 cluster.Name,
-                icon: cluster.Code,
-                badge: cluster.Nodes.Count(node => node.Severity != HealthServiceSeverity.Healthy).ToString("00", CultureInfo.InvariantCulture)))
+                cluster.Code,
+                cluster.Nodes.Count(node => node.Severity != HealthServiceSeverity.Healthy)
+                    .ToString("00", CultureInfo.InvariantCulture)))
             .ToArray();
     }
 
     public IReadOnlyList<HealthService> BuildServices()
     {
         return CurrentNodes
-            .Select(node => new HealthService(node.Id, $"{node.Name}  {node.Role}", node.Severity, BuildNodeSummary(node))
-            {
-                IsAcknowledged = node.IsAcknowledged,
-                IsMuted = node.IsMuted,
-                ObservedAt = SimulatedUtcNow.AddSeconds(-node.AgeSeconds),
-            })
+            .Select(node =>
+                new HealthService(node.Id, $"{node.Name}  {node.Role}", node.Severity, BuildNodeSummary(node))
+                {
+                    IsAcknowledged = node.IsAcknowledged,
+                    IsMuted = node.IsMuted,
+                    ObservedAt = SimulatedUtcNow.AddSeconds(-node.AgeSeconds)
+                })
             .ToArray();
     }
 
@@ -159,7 +172,7 @@ internal sealed class OpsWatchState
         [
             new StatItem("Nodes", CurrentNodes.Count.ToString("00", CultureInfo.InvariantCulture)),
             new StatItem("Health", $"{HealthyCount:00}/{CurrentNodes.Count:00}"),
-            new StatItem("Ack", $"{AckCount:00}/{ActiveAlertCount:00}"),
+            new StatItem("Ack", $"{AckCount:00}/{ActiveAlertCount:00}")
         ];
     }
 
@@ -169,7 +182,7 @@ internal sealed class OpsWatchState
         [
             new StatItem("RX/TX", $"{NetworkAverage:0}%"),
             new StatItem("Drain", $"{DrainingCount:00}"),
-            new StatItem("Scale", $"+{SelectedCluster.ScaleTarget - SelectedCluster.BaseScaleTarget:0}"),
+            new StatItem("Scale", $"+{SelectedCluster.ScaleTarget - SelectedCluster.BaseScaleTarget:0}")
         ];
     }
 
@@ -179,7 +192,7 @@ internal sealed class OpsWatchState
         [
             new StatItem("Route", SelectedCluster.RouteCode),
             new StatItem("Mode", AutomationMode),
-            new StatItem("Feed", $"{_feed.Count:000}"),
+            new StatItem("Feed", $"{_feed.Count:000}")
         ];
     }
 
@@ -203,7 +216,7 @@ internal sealed class OpsWatchState
         [
             new StatItem("Now", $"{value:0}%"),
             new StatItem("Drift", delta),
-            new StatItem("Ceil", ceiling),
+            new StatItem("Ceil", ceiling)
         ];
     }
 
@@ -218,7 +231,7 @@ internal sealed class OpsWatchState
             new StatItem("MEM", $"{node.Memory:0}%"),
             new StatItem("NET", $"{node.Network:0}%"),
             new StatItem("DISK", $"{node.Disk:0}%"),
-            new StatItem("Flags", BuildFlags(node)),
+            new StatItem("Flags", BuildFlags(node))
         ];
     }
 
@@ -243,7 +256,7 @@ internal sealed class OpsWatchState
             $"1. hold traffic on {node.Zone}",
             $"2. sample {node.Role} queue depth",
             $"3. keep failover path {ActiveRoute}",
-            $"4. ack or drain before restart");
+            "4. ack or drain before restart");
     }
 
     public void SelectCluster(string clusterId)
@@ -261,7 +274,8 @@ internal sealed class OpsWatchState
         }
 
         SyncSelection();
-        _commandText = $"Watch captain: shift focus to {SelectedCluster.Name}, preserve headroom and keep route {SelectedCluster.RouteCode}.";
+        CommandText =
+            $"Watch captain: shift focus to {SelectedCluster.Name}, preserve headroom and keep route {SelectedCluster.RouteCode}.";
     }
 
     public void SelectNode(string nodeId)
@@ -290,15 +304,15 @@ internal sealed class OpsWatchState
 
         if (ActiveAlertCount >= 4)
         {
-            _automationMode = "containment";
+            AutomationMode = "containment";
         }
         else if (ActiveAlertCount >= 2)
         {
-            _automationMode = "assisted";
+            AutomationMode = "assisted";
         }
         else
         {
-            _automationMode = "steady hand";
+            AutomationMode = "steady hand";
         }
 
         CaptureTrends();
@@ -323,18 +337,21 @@ internal sealed class OpsWatchState
                 node.IsDraining = !node.IsDraining;
                 node.LastOperatorAction = node.IsDraining ? "drain armed" : "drain released";
                 message = node.IsDraining ? $"traffic draining from {node.Name}" : $"drain released for {node.Name}";
-                PushFeed("ops", node.IsDraining ? "draining" : "resumed", node.Name, node.IsDraining ? "sessions evacuating" : "traffic restored", ActivityFeedItemKind.Info);
+                PushFeed("ops", node.IsDraining ? "draining" : "resumed", node.Name,
+                    node.IsDraining ? "sessions evacuating" : "traffic restored", ActivityFeedItemKind.Info);
                 break;
             case OpsWatchAction.MuteAlerts:
                 node.IsMuted = !node.IsMuted;
                 node.LastOperatorAction = node.IsMuted ? "alerts muted" : "alerts audible";
                 message = node.IsMuted ? $"alerts muted for {node.Name}" : $"alerts restored for {node.Name}";
-                PushFeed("ops", node.IsMuted ? "muted" : "unmuted", node.Name, "operator preference updated", ActivityFeedItemKind.Info);
+                PushFeed("ops", node.IsMuted ? "muted" : "unmuted", node.Name, "operator preference updated",
+                    ActivityFeedItemKind.Info);
                 break;
             case OpsWatchAction.Scale:
                 SelectedCluster.ScaleTarget++;
                 message = $"scale target raised for {SelectedCluster.Name}";
-                PushFeed("autoscaler", "scaled", SelectedCluster.Name, $"+1 replica to {SelectedCluster.ScaleTarget}", ActivityFeedItemKind.Success);
+                PushFeed("autoscaler", "scaled", SelectedCluster.Name, $"+1 replica to {SelectedCluster.ScaleTarget}",
+                    ActivityFeedItemKind.Success);
                 break;
             case OpsWatchAction.Inspect:
                 node.LastOperatorAction = "deep inspect";
@@ -342,29 +359,24 @@ internal sealed class OpsWatchState
                 PushFeed("ops", "inspected", node.Name, "profiling and queue trace armed", ActivityFeedItemKind.Info);
                 break;
             case OpsWatchAction.Failover:
-                _activeRoute = _activeRoute == "north-atlantic -> dr-equinox"
+                ActiveRoute = ActiveRoute == "north-atlantic -> dr-equinox"
                     ? "north-atlantic -> boreal-edge"
                     : "north-atlantic -> dr-equinox";
-                message = $"failover path switched to {_activeRoute}";
-                PushFeed("control", "rerouted", SelectedCluster.Name, _activeRoute, ActivityFeedItemKind.Warning);
+                message = $"failover path switched to {ActiveRoute}";
+                PushFeed("control", "rerouted", SelectedCluster.Name, ActiveRoute, ActivityFeedItemKind.Warning);
                 break;
             default:
                 node.IsAcknowledged = true;
                 node.LastOperatorAction = "alert acknowledged";
                 message = $"acknowledged {node.Name}";
-                PushFeed("ops", "acknowledged", node.Name, "operator absorbed current alert", ActivityFeedItemKind.Success);
+                PushFeed("ops", "acknowledged", node.Name, "operator absorbed current alert",
+                    ActivityFeedItemKind.Success);
                 break;
         }
 
         SyncSelection();
         return message;
     }
-
-    private OpsCluster SelectedCluster => _clusters.First(cluster => string.Equals(cluster.Id, _selectedClusterId, StringComparison.Ordinal));
-
-    private List<OpsNode> CurrentNodes => SelectedCluster.Nodes;
-
-    private DateTimeOffset SimulatedUtcNow => _simulatedStartUtc.AddSeconds(_tick);
 
     private void SeedTrends()
     {
@@ -424,7 +436,10 @@ internal sealed class OpsWatchState
         if (node.Severity > priorSeverity)
         {
             node.IsAcknowledged = false;
-            PushFeed("sentinel", "escalated", node.Name, BuildNodeSummary(node), node.Severity == HealthServiceSeverity.Outage ? ActivityFeedItemKind.Error : ActivityFeedItemKind.Warning);
+            PushFeed("sentinel", "escalated", node.Name, BuildNodeSummary(node),
+                node.Severity == HealthServiceSeverity.Outage
+                    ? ActivityFeedItemKind.Error
+                    : ActivityFeedItemKind.Warning);
         }
 
         node.AgeSeconds = Math.Min(999, node.AgeSeconds + _random.Next(4, 9));
@@ -434,25 +449,29 @@ internal sealed class OpsWatchState
     {
         if (OutageCount > 0)
         {
-            PushFeed("control", "contain", SelectedCluster.Name, "failover rehearsed, manual hold remains active", ActivityFeedItemKind.Warning);
+            PushFeed("control", "contain", SelectedCluster.Name, "failover rehearsed, manual hold remains active",
+                ActivityFeedItemKind.Warning);
             return;
         }
 
         if (DegradedCount > 0)
         {
-            PushFeed("sentinel", "observe", SelectedCluster.Name, "degraded lane holding under operator watch", ActivityFeedItemKind.Info);
+            PushFeed("sentinel", "observe", SelectedCluster.Name, "degraded lane holding under operator watch",
+                ActivityFeedItemKind.Info);
             return;
         }
 
-        PushFeed("telemetry", "steady", SelectedCluster.Name, "load curve stable and canaries green", ActivityFeedItemKind.Success);
+        PushFeed("telemetry", "steady", SelectedCluster.Name, "load curve stable and canaries green",
+            ActivityFeedItemKind.Success);
     }
 
     private void PushFeed(string actor, string action, string target, string details, ActivityFeedItemKind kind)
     {
-        _feed.Insert(0, new ActivityFeedItem(actor, action, target, details, kind, SimulatedUtcNow)
-        {
-            IsUnread = kind is ActivityFeedItemKind.Warning or ActivityFeedItemKind.Error,
-        });
+        _feed.Insert(0,
+            new ActivityFeedItem(actor, action, target, details, kind, SimulatedUtcNow)
+            {
+                IsUnread = kind is ActivityFeedItemKind.Warning or ActivityFeedItemKind.Error
+            });
         if (_feed.Count > 48)
         {
             _feed.RemoveRange(48, _feed.Count - 48);
@@ -551,7 +570,7 @@ internal sealed class OpsWatchState
 
     private static double Damp(double value, double toward)
     {
-        return value + ((toward - value) * 0.55);
+        return value + (toward - value) * 0.55;
     }
 
     private sealed class OpsCluster(

@@ -161,29 +161,6 @@ internal static class WindowsConsoleSession
         return handle == IntPtr.Zero || handle == new IntPtr(-1);
     }
 
-    [StructLayout(LayoutKind.Sequential)]
-    private struct Coord
-    {
-        public short X;
-        public short Y;
-    }
-
-    [StructLayout(LayoutKind.Sequential)]
-    private struct WindowBufferSizeRecord
-    {
-        public Coord Size;
-    }
-
-    [StructLayout(LayoutKind.Explicit)]
-    private struct InputRecord
-    {
-        [FieldOffset(0)]
-        public ushort EventType;
-
-        [FieldOffset(4)]
-        public WindowBufferSizeRecord WindowBufferSizeEvent;
-    }
-
     [DllImport("kernel32.dll", SetLastError = true)]
     private static extern IntPtr GetStdHandle(int nStdHandle);
 
@@ -201,8 +178,30 @@ internal static class WindowsConsoleSession
 
     [DllImport("kernel32.dll", SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)]
-    private static extern bool PeekConsoleInput(IntPtr hConsoleInput, [Out] InputRecord[] lpBuffer, uint nLength, out uint lpNumberOfEventsRead);
+    private static extern bool PeekConsoleInput(IntPtr hConsoleInput, [Out] InputRecord[] lpBuffer, uint nLength,
+        out uint lpNumberOfEventsRead);
 
     [DllImport("kernel32.dll", SetLastError = true)]
     private static extern uint WaitForSingleObject(IntPtr hHandle, uint dwMilliseconds);
+
+    [StructLayout(LayoutKind.Sequential)]
+    private struct Coord
+    {
+        public short X;
+        public short Y;
+    }
+
+    [StructLayout(LayoutKind.Sequential)]
+    private struct WindowBufferSizeRecord
+    {
+        public Coord Size;
+    }
+
+    [StructLayout(LayoutKind.Explicit)]
+    private struct InputRecord
+    {
+        [FieldOffset(0)] public ushort EventType;
+
+        [FieldOffset(4)] public WindowBufferSizeRecord WindowBufferSizeEvent;
+    }
 }

@@ -30,5 +30,5 @@ internal enum WidgetVisualState
     Completed = 22,
     FilteredOut = 23,
     New = 24,
-    Stale = 25,
+    Stale = 25
 }

@@ -6,34 +6,26 @@ using Tessera.Styles;
 namespace Tessera.Controls;
 
 /// <summary>
-/// Represents a control for choosing multiple items from a list.
+///     Represents a control for choosing multiple items from a list.
 /// </summary>
 public sealed class MultiSelect : Control
 {
-    private readonly List<(string Label, bool Checked)> _items = [];
     private readonly List<string> _checkedItems = [];
+    private readonly List<(string Label, bool Checked)> _items = [];
     private int _hoveredIndex = -1;
 
     /// <summary>
-    /// Represents title.
+    ///     Represents title.
     /// </summary>
-    public string Title
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = "Checklist";
+    public string Title { get; set; } = "Checklist";
 
     /// <summary>
-    /// Gets or sets the marker shown in the title when the control is focused.
+    ///     Gets or sets the marker shown in the title when the control is focused.
     /// </summary>
-    public string FocusMarker
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = "*";
+    public string FocusMarker { get; set; } = "*";
 
     /// <summary>
-    /// Gets or sets a value indicating whether the title focus marker should be rendered.
+    ///     Gets or sets a value indicating whether the title focus marker should be rendered.
     /// </summary>
     public bool ShowFocusMarker
     {
@@ -42,7 +34,7 @@ public sealed class MultiSelect : Control
     } = true;
 
     /// <summary>
-    /// Gets or sets the title style applied when not focused.
+    ///     Gets or sets the title style applied when not focused.
     /// </summary>
     public TesseraStyle TitleStyle
     {
@@ -51,7 +43,7 @@ public sealed class MultiSelect : Control
     } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the title style applied when focused.
+    ///     Gets or sets the title style applied when focused.
     /// </summary>
     public TesseraStyle FocusedTitleStyle
     {
@@ -60,7 +52,7 @@ public sealed class MultiSelect : Control
     } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the base style applied to item rows.
+    ///     Gets or sets the base style applied to item rows.
     /// </summary>
     public TesseraStyle ItemStyle
     {
@@ -69,7 +61,7 @@ public sealed class MultiSelect : Control
     } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the style merged into selected item rows.
+    ///     Gets or sets the style merged into selected item rows.
     /// </summary>
     public TesseraStyle SelectedItemStyle
     {
@@ -78,7 +70,7 @@ public sealed class MultiSelect : Control
     } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the style merged into hovered item rows.
+    ///     Gets or sets the style merged into hovered item rows.
     /// </summary>
     public TesseraStyle HoveredItemStyle
     {
@@ -87,7 +79,7 @@ public sealed class MultiSelect : Control
     } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the style merged into checked item rows.
+    ///     Gets or sets the style merged into checked item rows.
     /// </summary>
     public TesseraStyle CheckedItemStyle
     {
@@ -96,7 +88,7 @@ public sealed class MultiSelect : Control
     } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the style merged when the control is disabled.
+    ///     Gets or sets the style merged when the control is disabled.
     /// </summary>
     public TesseraStyle DisabledItemStyle
     {
@@ -105,48 +97,32 @@ public sealed class MultiSelect : Control
     } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the marker shown before the selected row.
+    ///     Gets or sets the marker shown before the selected row.
     /// </summary>
-    public string SelectedMarker
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = "›";
+    public string SelectedMarker { get; set; } = "›";
 
     /// <summary>
-    /// Gets or sets the marker shown before unselected rows.
+    ///     Gets or sets the marker shown before unselected rows.
     /// </summary>
-    public string UnselectedMarker
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = " ";
+    public string UnselectedMarker { get; set; } = " ";
 
     /// <summary>
-    /// Gets or sets the marker shown for checked rows.
+    ///     Gets or sets the marker shown for checked rows.
     /// </summary>
-    public string CheckedMarker
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = "[x]";
+    public string CheckedMarker { get; set; } = "[x]";
 
     /// <summary>
-    /// Gets or sets the marker shown for unchecked rows.
+    ///     Gets or sets the marker shown for unchecked rows.
     /// </summary>
-    public string UncheckedMarker
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = "[ ]";
+    public string UncheckedMarker { get; set; } = "[ ]";
 
     /// <summary>
-    /// Gets or sets the selected index.
+    ///     Gets or sets the selected index.
     /// </summary>
     public int SelectedIndex { get; private set; }
 
     /// <summary>
-    /// Represents selected item.
+    ///     Represents selected item.
     /// </summary>
     public string? SelectedItem =>
         SelectedIndex >= 0 && SelectedIndex < _items.Count
@@ -154,12 +130,12 @@ public sealed class MultiSelect : Control
             : null;
 
     /// <summary>
-    /// Represents checked items.
+    ///     Represents checked items.
     /// </summary>
     public IReadOnlyList<string> CheckedItems => _checkedItems;
 
     /// <summary>
-    /// Executes set items.
+    ///     Executes set items.
     /// </summary>
     /// <param name="items">The items value.</param>
     public void SetItems(IEnumerable<string> items)
@@ -169,7 +145,7 @@ public sealed class MultiSelect : Control
     }
 
     /// <summary>
-    /// Executes set items.
+    ///     Executes set items.
     /// </summary>
     /// <param name="items">The items value.</param>
     /// <returns><see langword="true" /> when set items succeeds.</returns>
@@ -296,21 +272,22 @@ public sealed class MultiSelect : Control
             var selected = row == SelectedIndex ? SelectedMarker : UnselectedMarker;
             var marker = item.Checked ? CheckedMarker : UncheckedMarker;
             var line = $"{selected} {marker} {item.Label}";
-            canvas.WriteText(content.X, content.Y + row, ApplyStyle(line, ResolveItemStyle(row, item.Checked, row == _hoveredIndex)), content.Width);
+            canvas.WriteText(content.X, content.Y + row,
+                ApplyStyle(line, ResolveItemStyle(row, item.Checked, row == _hoveredIndex)), content.Width);
         }
     }
 
     internal override LayoutMeasurement Measure(in Rect availableBounds)
     {
-        var width = ControlTextLayout.MeasureDisplayWidth(FormatTitleText(includeFocusMarkerWhenUnfocused: true)) + 4;
+        var width = ControlTextLayout.MeasureDisplayWidth(FormatTitleText(true)) + 4;
         var prefixWidth = Math.Max(
-                ControlTextLayout.MeasureDisplayWidth(SelectedMarker),
-                ControlTextLayout.MeasureDisplayWidth(UnselectedMarker))
-            + 1
-            + Math.Max(
-                ControlTextLayout.MeasureDisplayWidth(CheckedMarker),
-                ControlTextLayout.MeasureDisplayWidth(UncheckedMarker))
-            + 1;
+                              ControlTextLayout.MeasureDisplayWidth(SelectedMarker),
+                              ControlTextLayout.MeasureDisplayWidth(UnselectedMarker))
+                          + 1
+                          + Math.Max(
+                              ControlTextLayout.MeasureDisplayWidth(CheckedMarker),
+                              ControlTextLayout.MeasureDisplayWidth(UncheckedMarker))
+                          + 1;
         for (var index = 0; index < _items.Count; index++)
         {
             width = Math.Max(width, prefixWidth + ControlTextLayout.MeasureDisplayWidth(_items[index].Label) + 2);
@@ -324,7 +301,8 @@ public sealed class MultiSelect : Control
 
     private string FormatTitleText(bool includeFocusMarkerWhenUnfocused = false)
     {
-        if ((IsFocused || includeFocusMarkerWhenUnfocused) && ShowFocusMarker && !string.IsNullOrWhiteSpace(FocusMarker))
+        if ((IsFocused || includeFocusMarkerWhenUnfocused) && ShowFocusMarker &&
+            !string.IsNullOrWhiteSpace(FocusMarker))
         {
             return $"{Title} {FocusMarker}";
         }

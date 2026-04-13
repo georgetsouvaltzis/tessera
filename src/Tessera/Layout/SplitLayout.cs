@@ -4,7 +4,8 @@ namespace Tessera.Layout;
 
 internal sealed class SplitLayout : LayoutNode
 {
-    public SplitLayout(LayoutOrientation orientation, LayoutSlot first, LayoutSlot second, int gap = 0, Thickness padding = default)
+    public SplitLayout(LayoutOrientation orientation, LayoutSlot first, LayoutSlot second, int gap = 0,
+        Thickness padding = default)
     {
         Orientation = orientation;
         First = first ?? throw new ArgumentNullException(nameof(first));
@@ -23,38 +24,39 @@ internal sealed class SplitLayout : LayoutNode
     }
 
     /// <summary>
-    /// Gets a value indicating whether the split flows horizontally (`left/right`) or vertically (`top/bottom`).
+    ///     Gets a value indicating whether the split flows horizontally (`left/right`) or vertically (`top/bottom`).
     /// </summary>
     public LayoutOrientation Orientation { get; }
 
     public bool IsHorizontal => Orientation == LayoutOrientation.Horizontal;
 
     /// <summary>
-    /// Gets the first slot.
+    ///     Gets the first slot.
     /// </summary>
     public LayoutSlot First { get; }
 
     /// <summary>
-    /// Gets the second slot.
+    ///     Gets the second slot.
     /// </summary>
     public LayoutSlot Second { get; }
 
     /// <summary>
-    /// Gets the inter-slot gap.
+    ///     Gets the inter-slot gap.
     /// </summary>
     public int Gap { get; }
 
     /// <summary>
-    /// Gets the inner padding applied before arranging the split.
+    ///     Gets the inner padding applied before arranging the split.
     /// </summary>
     public Thickness Padding { get; }
 
-    internal override LayoutMeasurement Measure(in Rect availableBounds) =>
-        LayoutArrangement.MeasureStack(
+    internal override LayoutMeasurement Measure(in Rect availableBounds)
+    {
+        return LayoutArrangement.MeasureStack(
             IsHorizontal,
             new[] { First, Second },
             Gap,
             Padding,
             availableBounds);
-
+    }
 }

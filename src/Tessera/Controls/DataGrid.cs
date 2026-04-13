@@ -5,198 +5,171 @@ using Tessera.Styles;
 namespace Tessera.Controls;
 
 /// <summary>
-/// Represents a grid control with column definitions, row data, selection, and optional sorting hooks.
+///     Represents a grid control with column definitions, row data, selection, and optional sorting hooks.
 /// </summary>
 public sealed partial class DataGrid : Control
 {
     private readonly List<DataGridColumn> _columns = [];
     private readonly List<IReadOnlyList<string>> _rows = [];
-    private int _selectedRowIndex;
-    private int _selectedColumnIndex;
-    private int _hoveredRowIndex = -1;
     private int _hoveredColumnIndex = -1;
-    private int _scrollOffset;
-    private int _sortColumnIndex = -1;
-    private bool _sortDescending;
+    private int _hoveredRowIndex = -1;
     private int _lastViewportRowCount = 8;
+    private int _scrollOffset;
+    private int _selectedColumnIndex;
+    private int _selectedRowIndex;
 
     /// <summary>
-    /// Occurs when a sort action is requested for a column that does not provide a built-in comparer.
+    ///     Gets or sets the optional title rendered in the frame.
     /// </summary>
-    public event EventHandler<DataGridSortRequestedEventArgs>? SortRequested;
+    public string Title { get; set; } = "Data Grid";
 
     /// <summary>
-    /// Gets or sets the optional title rendered in the frame.
+    ///     Gets or sets the marker shown in the title when focused.
     /// </summary>
-    public string Title
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = "Data Grid";
+    public string FocusMarker { get; set; } = "*";
 
     /// <summary>
-    /// Gets or sets the marker shown in the title when focused.
-    /// </summary>
-    public string FocusMarker
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = "*";
-
-    /// <summary>
-    /// Gets or sets whether the focus marker should be rendered.
+    ///     Gets or sets whether the focus marker should be rendered.
     /// </summary>
     public bool ShowFocusMarker { get; set; } = true;
 
     /// <summary>
-    /// Gets or sets title style when the control is not focused.
+    ///     Gets or sets title style when the control is not focused.
     /// </summary>
     public TesseraStyle TitleStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets title style when the control is focused.
+    ///     Gets or sets title style when the control is focused.
     /// </summary>
     public TesseraStyle FocusedTitleStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets style used for header cells.
+    ///     Gets or sets style used for header cells.
     /// </summary>
     public TesseraStyle HeaderStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets style used for normal row cells.
+    ///     Gets or sets style used for normal row cells.
     /// </summary>
     public TesseraStyle RowStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets style merged into the selected row.
+    ///     Gets or sets style merged into the selected row.
     /// </summary>
     public TesseraStyle SelectedRowStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets style merged into the selected cell.
+    ///     Gets or sets style merged into the selected cell.
     /// </summary>
     public TesseraStyle SelectedCellStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets style merged into the hovered row.
+    ///     Gets or sets style merged into the hovered row.
     /// </summary>
     public TesseraStyle HoveredRowStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets style merged into the hovered cell.
+    ///     Gets or sets style merged into the hovered cell.
     /// </summary>
     public TesseraStyle HoveredCellStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets style merged into muted rows.
+    ///     Gets or sets style merged into muted rows.
     /// </summary>
     public TesseraStyle MutedStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets style merged into all output while disabled.
+    ///     Gets or sets style merged into all output while disabled.
     /// </summary>
     public TesseraStyle DisabledStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets style applied to border glyphs when the control is not focused.
+    ///     Gets or sets style applied to border glyphs when the control is not focused.
     /// </summary>
     public TesseraStyle BorderStyleText { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets style applied to border glyphs when the control is focused.
+    ///     Gets or sets style applied to border glyphs when the control is focused.
     /// </summary>
     public TesseraStyle FocusedBorderStyleText { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the separator text rendered between columns.
+    ///     Gets or sets the separator text rendered between columns.
     /// </summary>
-    public string ColumnSeparatorText
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = "|";
+    public string ColumnSeparatorText { get; set; } = "|";
 
     /// <summary>
-    /// Gets or sets the marker appended to sorted headers in ascending mode.
+    ///     Gets or sets the marker appended to sorted headers in ascending mode.
     /// </summary>
-    public string SortAscendingMarker
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = "▲";
+    public string SortAscendingMarker { get; set; } = "▲";
 
     /// <summary>
-    /// Gets or sets the marker appended to sorted headers in descending mode.
+    ///     Gets or sets the marker appended to sorted headers in descending mode.
     /// </summary>
-    public string SortDescendingMarker
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = "▼";
+    public string SortDescendingMarker { get; set; } = "▼";
 
     /// <summary>
-    /// Gets or sets border style.
+    ///     Gets or sets border style.
     /// </summary>
     public BorderStyle Border { get; set; } = BorderStyle.SingleLine;
 
     /// <summary>
-    /// Gets or sets inner padding.
+    ///     Gets or sets inner padding.
     /// </summary>
     public Thickness Padding { get; set; }
 
     /// <summary>
-    /// Gets or sets whether the header row should be rendered.
+    ///     Gets or sets whether the header row should be rendered.
     /// </summary>
     public bool ShowHeader { get; set; } = true;
 
     /// <summary>
-    /// Gets or sets fallback page size used by PageUp/PageDown navigation.
+    ///     Gets or sets fallback page size used by PageUp/PageDown navigation.
     /// </summary>
     public int PageSize { get; set; } = 8;
 
     /// <summary>
-    /// Gets or sets an optional predicate that marks rows as muted.
+    ///     Gets or sets an optional predicate that marks rows as muted.
     /// </summary>
     public Func<int, IReadOnlyList<string>, bool>? MutedRowPredicate { get; set; }
 
     /// <summary>
-    /// Gets configured column definitions.
+    ///     Gets configured column definitions.
     /// </summary>
     public IReadOnlyList<DataGridColumn> Columns => _columns;
 
     /// <summary>
-    /// Gets configured row data.
+    ///     Gets configured row data.
     /// </summary>
     public IReadOnlyList<IReadOnlyList<string>> Rows => _rows;
 
     /// <summary>
-    /// Gets selected row index.
-    /// Returns <c>-1</c> when there are no rows.
+    ///     Gets selected row index.
+    ///     Returns <c>-1</c> when there are no rows.
     /// </summary>
     public int SelectedRowIndex => _rows.Count == 0 ? -1 : _selectedRowIndex;
 
     /// <summary>
-    /// Gets selected column index.
-    /// Returns <c>-1</c> when there are no columns.
+    ///     Gets selected column index.
+    ///     Returns <c>-1</c> when there are no columns.
     /// </summary>
     public int SelectedColumnIndex => _columns.Count == 0 ? -1 : _selectedColumnIndex;
 
     /// <summary>
-    /// Gets selected cell text when row/column are available.
+    ///     Gets selected cell text when row/column are available.
     /// </summary>
     public string? SelectedCellValue => TryGetCellValue(_selectedRowIndex, _selectedColumnIndex);
 
     /// <summary>
-    /// Gets the current sort column index.
-    /// Returns <c>-1</c> when no sort has been requested.
+    ///     Gets the current sort column index.
+    ///     Returns <c>-1</c> when no sort has been requested.
     /// </summary>
-    public int SortColumnIndex => _sortColumnIndex;
+    public int SortColumnIndex { get; private set; } = -1;
 
     /// <summary>
-    /// Gets a value indicating whether current sort direction is descending.
+    ///     Gets a value indicating whether current sort direction is descending.
     /// </summary>
-    public bool SortDescending => _sortDescending;
+    public bool SortDescending { get; private set; }
 
     /// <inheritdoc />
     public override bool IsFocused { get; set; }
@@ -208,7 +181,12 @@ public sealed partial class DataGrid : Control
     public override bool IsReadOnly { get; set; }
 
     /// <summary>
-    /// Replaces grid columns.
+    ///     Occurs when a sort action is requested for a column that does not provide a built-in comparer.
+    /// </summary>
+    public event EventHandler<DataGridSortRequestedEventArgs>? SortRequested;
+
+    /// <summary>
+    ///     Replaces grid columns.
     /// </summary>
     /// <param name="columns">The new columns in display order.</param>
     public void SetColumns(IEnumerable<DataGridColumn> columns)
@@ -224,23 +202,23 @@ public sealed partial class DataGrid : Control
         {
             _selectedColumnIndex = 0;
             _hoveredColumnIndex = -1;
-            _sortColumnIndex = -1;
-            _sortDescending = false;
+            SortColumnIndex = -1;
+            SortDescending = false;
         }
         else
         {
             _selectedColumnIndex = Math.Clamp(_selectedColumnIndex, 0, _columns.Count - 1);
             _hoveredColumnIndex = Math.Clamp(_hoveredColumnIndex, -1, _columns.Count - 1);
-            if (_sortColumnIndex < 0 || _sortColumnIndex >= _columns.Count)
+            if (SortColumnIndex < 0 || SortColumnIndex >= _columns.Count)
             {
-                _sortColumnIndex = -1;
-                _sortDescending = false;
+                SortColumnIndex = -1;
+                SortDescending = false;
             }
         }
     }
 
     /// <summary>
-    /// Replaces grid rows.
+    ///     Replaces grid rows.
     /// </summary>
     /// <param name="rows">The new row data.</param>
     public void SetRows(IEnumerable<IReadOnlyList<string>> rows)
@@ -257,7 +235,7 @@ public sealed partial class DataGrid : Control
             var snapshot = new string[row.Count];
             for (var index = 0; index < row.Count; index++)
             {
-                snapshot[index] = row[index] ?? string.Empty;
+                snapshot[index] = row[index];
             }
 
             _rows.Add(snapshot);
@@ -269,7 +247,7 @@ public sealed partial class DataGrid : Control
     }
 
     /// <summary>
-    /// Selects a specific row/column.
+    ///     Selects a specific row/column.
     /// </summary>
     /// <param name="rowIndex">Requested row index.</param>
     /// <param name="columnIndex">Requested column index.</param>
@@ -280,9 +258,9 @@ public sealed partial class DataGrid : Control
     }
 
     /// <summary>
-    /// Requests sorting for a column.
-    /// Uses built-in sorting when the column defines <see cref="DataGridColumn.SortComparer" />; otherwise raises
-    /// <see cref="SortRequested" /> so application code can handle sorting externally.
+    ///     Requests sorting for a column.
+    ///     Uses built-in sorting when the column defines <see cref="DataGridColumn.SortComparer" />; otherwise raises
+    ///     <see cref="SortRequested" /> so application code can handle sorting externally.
     /// </summary>
     /// <param name="columnIndex">The target column index.</param>
     /// <param name="direction">Optional explicit sort direction.</param>
@@ -327,8 +305,8 @@ public sealed partial class DataGrid : Control
             return false;
         }
 
-        _sortColumnIndex = columnIndex;
-        _sortDescending = descending;
+        SortColumnIndex = columnIndex;
+        SortDescending = descending;
         _selectedRowIndex = Math.Clamp(_selectedRowIndex, 0, Math.Max(0, _rows.Count - 1));
         _scrollOffset = Math.Clamp(_scrollOffset, 0, Math.Max(0, _rows.Count - 1));
         return true;
@@ -490,9 +468,9 @@ public sealed partial class DataGrid : Control
 
     private DataGridSortDirection ResolveSortDirection(int columnIndex)
     {
-        if (_sortColumnIndex == columnIndex)
+        if (SortColumnIndex == columnIndex)
         {
-            return _sortDescending ? DataGridSortDirection.Ascending : DataGridSortDirection.Descending;
+            return SortDescending ? DataGridSortDirection.Ascending : DataGridSortDirection.Descending;
         }
 
         return DataGridSortDirection.Ascending;
@@ -589,6 +567,6 @@ public sealed partial class DataGrid : Control
             return string.Empty;
         }
 
-        return row[columnIndex] ?? string.Empty;
+        return row[columnIndex];
     }
 }

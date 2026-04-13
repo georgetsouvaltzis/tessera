@@ -233,7 +233,8 @@ public sealed partial class DataGrid
         }
     }
 
-    private void WriteRow(Canvas canvas, Rect content, int y, int[] widths, int rowIndex, string separator, int separatorWidth)
+    private void WriteRow(Canvas canvas, Rect content, int y, int[] widths, int rowIndex, string separator,
+        int separatorWidth)
     {
         var x = content.X;
         var row = _rows[rowIndex];
@@ -291,9 +292,9 @@ public sealed partial class DataGrid
     private string RenderHeaderText(int columnIndex)
     {
         var text = _columns[columnIndex].Header;
-        if (columnIndex == _sortColumnIndex)
+        if (columnIndex == SortColumnIndex)
         {
-            var marker = _sortDescending ? SortDescendingMarker : SortAscendingMarker;
+            var marker = SortDescending ? SortDescendingMarker : SortAscendingMarker;
             if (!string.IsNullOrEmpty(marker))
             {
                 text = string.Concat(text, " ", marker);
@@ -339,18 +340,26 @@ public sealed partial class DataGrid
         return style;
     }
 
-    private static int ResolveColumnSeparatorWidth(string separator) =>
-        string.IsNullOrEmpty(separator)
+    private static int ResolveColumnSeparatorWidth(string separator)
+    {
+        return string.IsNullOrEmpty(separator)
             ? 0
             : ControlTextLayout.MeasureDisplayWidth(separator);
+    }
 
-    private int ResolveColumnSeparatorWidth() => ResolveColumnSeparatorWidth(ResolveColumnSeparatorText());
+    private int ResolveColumnSeparatorWidth()
+    {
+        return ResolveColumnSeparatorWidth(ResolveColumnSeparatorText());
+    }
 
-    private string ResolveColumnSeparatorText() => ColumnSeparatorText;
+    private string ResolveColumnSeparatorText()
+    {
+        return ColumnSeparatorText;
+    }
 
     private static string PadToWidth(string value, int width)
     {
-        var text = value ?? string.Empty;
+        var text = value;
         if (width <= 0)
         {
             return string.Empty;

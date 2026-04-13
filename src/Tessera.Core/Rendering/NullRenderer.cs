@@ -6,7 +6,10 @@ namespace Tessera.Core.Rendering;
 [EditorBrowsable(EditorBrowsableState.Advanced)]
 internal sealed class NullRenderer : IProgramRenderer
 {
-    public ValueTask InitializeAsync(Stream output, CancellationToken cancellationToken) => ValueTask.CompletedTask;
+    public ValueTask InitializeAsync(Stream output, CancellationToken cancellationToken)
+    {
+        return ValueTask.CompletedTask;
+    }
 
     public void Resize(int width, int height)
     {
@@ -31,9 +34,18 @@ internal sealed class NullRenderer : IProgramRenderer
         return ValueTask.CompletedTask;
     }
 
-    public ValueTask FlushAsync(CancellationToken cancellationToken) => ValueTask.CompletedTask;
+    public ValueTask FlushAsync(CancellationToken cancellationToken)
+    {
+        return ValueTask.CompletedTask;
+    }
 
-    public ValueTask ResetAsync(CancellationToken cancellationToken) => ValueTask.CompletedTask;
+    public ValueTask ResetAsync(CancellationToken cancellationToken)
+    {
+        return ValueTask.CompletedTask;
+    }
 
-    public ValueTask DisposeAsync() => ValueTask.CompletedTask;
+    public ValueTask DisposeAsync()
+    {
+        return ValueTask.CompletedTask;
+    }
 }

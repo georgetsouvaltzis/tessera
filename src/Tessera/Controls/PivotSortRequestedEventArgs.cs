@@ -1,28 +1,28 @@
 namespace Tessera.Controls;
 
 /// <summary>
-/// Identifies sort direction in <see cref="PivotTable" /> requests.
+///     Identifies sort direction in <see cref="PivotTable" /> requests.
 /// </summary>
 public enum PivotSortDirection
 {
     /// <summary>
-    /// Sort ascending.
+    ///     Sort ascending.
     /// </summary>
     Ascending = 0,
 
     /// <summary>
-    /// Sort descending.
+    ///     Sort descending.
     /// </summary>
-    Descending = 1,
+    Descending = 1
 }
 
 /// <summary>
-/// Provides details when <see cref="PivotTable" /> requests sorting for a column.
+///     Provides details when <see cref="PivotTable" /> requests sorting for a column.
 /// </summary>
 public sealed class PivotSortRequestedEventArgs : EventArgs
 {
     /// <summary>
-    /// Initializes a sort request payload.
+    ///     Initializes a sort request payload.
     /// </summary>
     /// <param name="columnIndex">Column index.</param>
     /// <param name="column">Column metadata.</param>
@@ -35,22 +35,22 @@ public sealed class PivotSortRequestedEventArgs : EventArgs
     }
 
     /// <summary>
-    /// Gets requested column index.
+    ///     Gets requested column index.
     /// </summary>
     public int ColumnIndex { get; }
 
     /// <summary>
-    /// Gets requested column metadata.
+    ///     Gets requested column metadata.
     /// </summary>
     public PivotTableColumn Column { get; }
 
     /// <summary>
-    /// Gets requested sort direction.
+    ///     Gets requested sort direction.
     /// </summary>
     public PivotSortDirection Direction { get; }
 
     /// <summary>
-    /// Gets or sets whether sorting was handled externally.
+    ///     Gets or sets whether sorting was handled externally.
     /// </summary>
     public bool Handled { get; set; }
 }

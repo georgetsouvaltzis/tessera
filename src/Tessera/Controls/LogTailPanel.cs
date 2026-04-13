@@ -5,73 +5,47 @@ using Tessera.Styles;
 namespace Tessera.Controls;
 
 /// <summary>
-/// Represents a selectable log tail view for streaming operational output.
+///     Represents a selectable log tail view for streaming operational output.
 /// </summary>
 public sealed partial class LogTailPanel : Control
 {
     private readonly List<LogEntry> _entries = [];
     private readonly List<string> _entryBodyCache = [];
-    private int _selectedIndex = -1;
-    private int _hoveredIndex = -1;
     private bool _entryCacheDirty;
+    private int _hoveredIndex = -1;
 
     /// <summary>
-    /// Occurs when selected row changes.
+    ///     Gets or sets control title.
     /// </summary>
-    public event EventHandler<SelectionChangedEventArgs>? SelectionChanged;
+    public string Title { get; set; } = "Log Tail";
 
     /// <summary>
-    /// Gets or sets control title.
+    ///     Gets or sets focus marker appended to <see cref="Title" /> when focused.
     /// </summary>
-    public string Title
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = "Log Tail";
+    public string FocusMarker { get; set; } = "*";
 
     /// <summary>
-    /// Gets or sets focus marker appended to <see cref="Title"/> when focused.
-    /// </summary>
-    public string FocusMarker
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = "*";
-
-    /// <summary>
-    /// Gets or sets whether focus marker is shown while focused.
+    ///     Gets or sets whether focus marker is shown while focused.
     /// </summary>
     public bool ShowFocusMarker { get; set; } = true;
 
     /// <summary>
-    /// Gets or sets text shown when no entries are present.
+    ///     Gets or sets text shown when no entries are present.
     /// </summary>
-    public string EmptyText
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = "(no logs)";
+    public string EmptyText { get; set; } = "(no logs)";
 
     /// <summary>
-    /// Gets or sets marker for selected rows.
+    ///     Gets or sets marker for selected rows.
     /// </summary>
-    public string SelectedMarker
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = "▸";
+    public string SelectedMarker { get; set; } = "▸";
 
     /// <summary>
-    /// Gets or sets marker for unselected rows.
+    ///     Gets or sets marker for unselected rows.
     /// </summary>
-    public string UnselectedMarker
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = " ";
+    public string UnselectedMarker { get; set; } = " ";
 
     /// <summary>
-    /// Gets or sets whether timestamps are rendered.
+    ///     Gets or sets whether timestamps are rendered.
     /// </summary>
     public bool ShowTimestamp
     {
@@ -89,7 +63,7 @@ public sealed partial class LogTailPanel : Control
     } = true;
 
     /// <summary>
-    /// Gets or sets whether level tags are rendered.
+    ///     Gets or sets whether level tags are rendered.
     /// </summary>
     public bool ShowLevel
     {
@@ -107,7 +81,7 @@ public sealed partial class LogTailPanel : Control
     } = true;
 
     /// <summary>
-    /// Gets or sets whether source labels are rendered.
+    ///     Gets or sets whether source labels are rendered.
     /// </summary>
     public bool ShowSource
     {
@@ -125,12 +99,12 @@ public sealed partial class LogTailPanel : Control
     } = true;
 
     /// <summary>
-    /// Gets or sets whether appending should keep selection on newest row.
+    ///     Gets or sets whether appending should keep selection on newest row.
     /// </summary>
     public bool AutoFollow { get; set; } = true;
 
     /// <summary>
-    /// Gets or sets maximum number of retained entries.
+    ///     Gets or sets maximum number of retained entries.
     /// </summary>
     public int MaxEntries
     {
@@ -139,117 +113,118 @@ public sealed partial class LogTailPanel : Control
     } = 1024;
 
     /// <summary>
-    /// Gets or sets whether control-level error style is active.
+    ///     Gets or sets whether control-level error style is active.
     /// </summary>
     public bool HasError { get; set; }
 
     /// <summary>
-    /// Gets or sets title style while not focused.
+    ///     Gets or sets title style while not focused.
     /// </summary>
     public TesseraStyle TitleStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets title style while focused.
+    ///     Gets or sets title style while focused.
     /// </summary>
     public TesseraStyle FocusedTitleStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets base row style.
+    ///     Gets or sets base row style.
     /// </summary>
     public TesseraStyle EntryStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets style merged into hovered rows.
+    ///     Gets or sets style merged into hovered rows.
     /// </summary>
     public TesseraStyle HoveredEntryStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets style merged into selected rows.
+    ///     Gets or sets style merged into selected rows.
     /// </summary>
     public TesseraStyle SelectedEntryStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets style merged into selected rows while focused.
+    ///     Gets or sets style merged into selected rows while focused.
     /// </summary>
     public TesseraStyle FocusedSelectedEntryStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets style merged into muted rows.
+    ///     Gets or sets style merged into muted rows.
     /// </summary>
     public TesseraStyle MutedEntryStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets trace-level style.
+    ///     Gets or sets trace-level style.
     /// </summary>
     public TesseraStyle TraceEntryStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets debug-level style.
+    ///     Gets or sets debug-level style.
     /// </summary>
     public TesseraStyle DebugEntryStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets info-level style.
+    ///     Gets or sets info-level style.
     /// </summary>
     public TesseraStyle InfoEntryStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets warning-level style.
+    ///     Gets or sets warning-level style.
     /// </summary>
     public TesseraStyle WarningEntryStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets error-level style.
+    ///     Gets or sets error-level style.
     /// </summary>
     public TesseraStyle ErrorEntryStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets critical-level style.
+    ///     Gets or sets critical-level style.
     /// </summary>
     public TesseraStyle CriticalEntryStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets style merged when control is disabled.
+    ///     Gets or sets style merged when control is disabled.
     /// </summary>
     public TesseraStyle DisabledEntryStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets border style applied while not focused.
+    ///     Gets or sets border style applied while not focused.
     /// </summary>
     public TesseraStyle BorderStyleText { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets border style merged while focused.
+    ///     Gets or sets border style merged while focused.
     /// </summary>
     public TesseraStyle FocusedBorderStyleText { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets border style.
+    ///     Gets or sets border style.
     /// </summary>
     public BorderStyle Border { get; set; } = BorderStyle.SingleLine;
 
     /// <summary>
-    /// Gets or sets inner padding.
+    ///     Gets or sets inner padding.
     /// </summary>
     public Thickness Padding { get; set; }
 
     /// <summary>
-    /// Gets current entry list.
+    ///     Gets current entry list.
     /// </summary>
     public IReadOnlyList<LogEntry> Entries => _entries;
 
     /// <summary>
-    /// Gets current selected index.
+    ///     Gets current selected index.
     /// </summary>
-    public int SelectedIndex => _selectedIndex;
+    public int SelectedIndex { get; private set; } = -1;
 
     /// <summary>
-    /// Gets current selected entry.
+    ///     Gets current selected entry.
     /// </summary>
-    public LogEntry? SelectedEntry => _selectedIndex >= 0 && _selectedIndex < _entries.Count ? _entries[_selectedIndex] : null;
+    public LogEntry? SelectedEntry =>
+        SelectedIndex >= 0 && SelectedIndex < _entries.Count ? _entries[SelectedIndex] : null;
 
     /// <summary>
-    /// Gets current entry count.
+    ///     Gets current entry count.
     /// </summary>
     public int Count => _entries.Count;
 
@@ -262,6 +237,11 @@ public sealed partial class LogTailPanel : Control
     /// <inheritdoc />
     public override bool IsReadOnly { get; set; }
 
+    /// <summary>
+    ///     Occurs when selected row changes.
+    /// </summary>
+    public event EventHandler<SelectionChangedEventArgs>? SelectionChanged;
+
     /// <inheritdoc />
     public override bool Handle(Message message)
     {
@@ -272,12 +252,12 @@ public sealed partial class LogTailPanel : Control
 
         if (key.Is(Key.Down) || key.IsCharacter('j'))
         {
-            return SetSelectedIndex(_selectedIndex + 1);
+            return SetSelectedIndex(SelectedIndex + 1);
         }
 
         if (key.Is(Key.Up) || key.IsCharacter('k'))
         {
-            return SetSelectedIndex(_selectedIndex - 1);
+            return SetSelectedIndex(SelectedIndex - 1);
         }
 
         if (key.Is(Key.Home))
@@ -317,12 +297,12 @@ public sealed partial class LogTailPanel : Control
         {
             if (pointer.Button == PointerButton.WheelDown)
             {
-                return SetSelectedIndex(_selectedIndex + 1);
+                return SetSelectedIndex(SelectedIndex + 1);
             }
 
             if (pointer.Button == PointerButton.WheelUp)
             {
-                return SetSelectedIndex(_selectedIndex - 1);
+                return SetSelectedIndex(SelectedIndex - 1);
             }
         }
 
@@ -382,25 +362,25 @@ public sealed partial class LogTailPanel : Control
             return 0;
         }
 
-        if (AutoFollow && _selectedIndex >= _entries.Count - 1)
+        if (AutoFollow && SelectedIndex >= _entries.Count - 1)
         {
             return _entries.Count - rows;
         }
 
         var end = _entries.Count - rows;
-        return Math.Clamp(_selectedIndex - rows + 1, 0, end);
+        return Math.Clamp(SelectedIndex - rows + 1, 0, end);
     }
 
     private void NormalizeSelection()
     {
         if (_entries.Count == 0)
         {
-            _selectedIndex = -1;
+            SelectedIndex = -1;
             _hoveredIndex = -1;
             return;
         }
 
-        _selectedIndex = _selectedIndex < 0 ? _entries.Count - 1 : Math.Clamp(_selectedIndex, 0, _entries.Count - 1);
+        SelectedIndex = SelectedIndex < 0 ? _entries.Count - 1 : Math.Clamp(SelectedIndex, 0, _entries.Count - 1);
         _hoveredIndex = Math.Clamp(_hoveredIndex, -1, _entries.Count - 1);
     }
 
@@ -414,15 +394,15 @@ public sealed partial class LogTailPanel : Control
 
         _entries.RemoveRange(0, overflow);
         _entryBodyCache.RemoveRange(0, overflow);
-        _selectedIndex -= overflow;
+        SelectedIndex -= overflow;
         _hoveredIndex -= overflow;
-        _selectedIndex = Math.Clamp(_selectedIndex, -1, _entries.Count - 1);
+        SelectedIndex = Math.Clamp(SelectedIndex, -1, _entries.Count - 1);
         _hoveredIndex = Math.Clamp(_hoveredIndex, -1, _entries.Count - 1);
     }
 
     private void RaiseSelectionChangedIfNeeded(int previousIndex, string previousItem)
     {
-        if (previousIndex == _selectedIndex)
+        if (previousIndex == SelectedIndex)
         {
             return;
         }
@@ -431,9 +411,8 @@ public sealed partial class LogTailPanel : Control
             this,
             new SelectionChangedEventArgs(
                 previousIndex,
-                _selectedIndex,
+                SelectedIndex,
                 previousItem,
                 SelectedEntry?.Message ?? string.Empty));
     }
-
 }

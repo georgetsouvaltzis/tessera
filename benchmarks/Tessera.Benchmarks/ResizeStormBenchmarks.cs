@@ -8,34 +8,25 @@ namespace Tessera.Benchmarks;
 public class ResizeStormBenchmarks
 {
     private const int ResizeIterations = 72;
-    private readonly DataGrid _grid = new()
-    {
-        Border = BorderStyle.SingleLine,
-        ShowHeader = true,
-    };
 
-    private readonly MarkdownView _markdownView = new()
-    {
-        Border = BorderStyle.SingleLine,
-        ShowLineNumbers = true,
-    };
+    private readonly DataGrid _grid = new() { Border = BorderStyle.SingleLine, ShowHeader = true };
 
-    private readonly MiniLog _miniLog = new(capacity: 80);
-    private readonly StatusBar _statusBar = new()
-    {
-        LeftText = "resize storm",
-        RightText = "recompose",
-    };
+    private readonly MarkdownView _markdownView = new() { Border = BorderStyle.SingleLine, ShowLineNumbers = true };
+
+    private readonly MiniLog _miniLog = new(80);
 
     private readonly ResizeSnapshot[] _snapshots = BuildSnapshots();
+
+    private readonly StatusBar _statusBar = new() { LeftText = "resize storm", RightText = "recompose" };
+
     private Canvas[] _snapshotCanvases = [];
 
     [GlobalSetup]
     public void Setup()
     {
-        _grid.SetColumns(BenchmarkDataFactory.CreateColumns(count: 10, width: 10));
-        _grid.SetRows(BenchmarkDataFactory.CreateRows(rowCount: 900, columnCount: 10, seed: 6060));
-        _grid.SelectCell(rowIndex: 220, columnIndex: 4);
+        _grid.SetColumns(BenchmarkDataFactory.CreateColumns(10, 10));
+        _grid.SetRows(BenchmarkDataFactory.CreateRows(900, 10, 6060));
+        _grid.SelectCell(220, 4);
 
         _markdownView.SetMarkdown(
             """
@@ -58,13 +49,13 @@ public class ResizeStormBenchmarks
     [Benchmark(Description = "resize storm repeated recomposition")]
     public int RenderResizeStormFrames()
     {
-        return RenderResizeStormFramesCore(materialize: true);
+        return RenderResizeStormFramesCore(true);
     }
 
     [Benchmark(Description = "resize storm repeated recomposition render-only")]
     public int RenderResizeStormFramesOnly()
     {
-        return RenderResizeStormFramesCore(materialize: false);
+        return RenderResizeStormFramesCore(false);
     }
 
     private int RenderResizeStormFramesCore(bool materialize)
@@ -99,8 +90,8 @@ public class ResizeStormBenchmarks
         var snapshots = new ResizeSnapshot[12];
         for (var index = 0; index < snapshots.Length; index++)
         {
-            var width = 90 + ((index * 17) % 70);
-            var height = 24 + ((index * 11) % 20);
+            var width = 90 + index * 17 % 70;
+            var height = 24 + index * 11 % 20;
             var statusBounds = new Rect(0, height - 1, width, 1);
             var bodyHeight = Math.Max(1, height - 1);
             var topHeight = Math.Max(6, bodyHeight * 2 / 3);

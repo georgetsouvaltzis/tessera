@@ -7,135 +7,118 @@ using Tessera.Styles;
 namespace Tessera.Controls;
 
 /// <summary>
-/// Represents a selectable timeline of temporal entries.
+///     Represents a selectable timeline of temporal entries.
 /// </summary>
 public sealed class Timeline : Control
 {
     private readonly List<TimelineEntry> _entries = [];
-    private int _selectedIndex;
-    private int _scrollOffset;
     private int _lastViewportRows = 8;
+    private int _scrollOffset;
+    private int _selectedIndex;
 
     /// <summary>
-    /// Occurs when the selected timeline entry changes.
+    ///     Gets or sets timeline title.
     /// </summary>
-    public event EventHandler<TimelineSelectionChangedEventArgs>? SelectionChanged;
+    public string Title { get; set; } = "Timeline";
 
     /// <summary>
-    /// Gets or sets timeline title.
+    ///     Gets or sets marker appended to title while focused.
     /// </summary>
-    public string Title
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = "Timeline";
+    public string FocusMarker { get; set; } = "*";
 
     /// <summary>
-    /// Gets or sets marker appended to title while focused.
-    /// </summary>
-    public string FocusMarker
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = "*";
-
-    /// <summary>
-    /// Gets or sets whether focus marker should be rendered.
+    ///     Gets or sets whether focus marker should be rendered.
     /// </summary>
     public bool ShowFocusMarker { get; set; } = true;
 
     /// <summary>
-    /// Gets or sets title style when not focused.
+    ///     Gets or sets title style when not focused.
     /// </summary>
     public TesseraStyle TitleStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets title style when focused.
+    ///     Gets or sets title style when focused.
     /// </summary>
     public TesseraStyle FocusedTitleStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets style for timestamp text.
+    ///     Gets or sets style for timestamp text.
     /// </summary>
     public TesseraStyle TimestampStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets style for entry label text.
+    ///     Gets or sets style for entry label text.
     /// </summary>
     public TesseraStyle LabelStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets style for additional content text.
+    ///     Gets or sets style for additional content text.
     /// </summary>
     public TesseraStyle ContentStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets style merged into selected rows.
+    ///     Gets or sets style merged into selected rows.
     /// </summary>
     public TesseraStyle SelectedRowStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets style for separators and status text.
+    ///     Gets or sets style for separators and status text.
     /// </summary>
     public TesseraStyle SeparatorStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets style merged into muted rows.
+    ///     Gets or sets style merged into muted rows.
     /// </summary>
     public TesseraStyle MutedStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets style merged when control is disabled.
+    ///     Gets or sets style merged when control is disabled.
     /// </summary>
     public TesseraStyle DisabledStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets style applied to border glyphs when the control is not focused.
+    ///     Gets or sets style applied to border glyphs when the control is not focused.
     /// </summary>
     public TesseraStyle BorderStyleText { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets style merged into border glyphs while the control is focused.
+    ///     Gets or sets style merged into border glyphs while the control is focused.
     /// </summary>
     public TesseraStyle FocusedBorderStyleText { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets border style.
+    ///     Gets or sets border style.
     /// </summary>
     public BorderStyle Border { get; set; } = BorderStyle.SingleLine;
 
     /// <summary>
-    /// Gets or sets inner padding.
+    ///     Gets or sets inner padding.
     /// </summary>
     public Thickness Padding { get; set; }
 
     /// <summary>
-    /// Gets or sets fallback page size used by PageUp/PageDown navigation.
+    ///     Gets or sets fallback page size used by PageUp/PageDown navigation.
     /// </summary>
     public int PageSize { get; set; } = 8;
 
     /// <summary>
-    /// Gets or sets separator shown between timestamp and label.
+    ///     Gets or sets separator shown between timestamp and label.
     /// </summary>
-    public string Separator
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = " | ";
+    public string Separator { get; set; } = " | ";
 
     /// <summary>
-    /// Gets configured entries.
+    ///     Gets configured entries.
     /// </summary>
     public IReadOnlyList<TimelineEntry> Entries => _entries;
 
     /// <summary>
-    /// Gets selected index.
-    /// Returns <c>-1</c> when there are no entries.
+    ///     Gets selected index.
+    ///     Returns <c>-1</c> when there are no entries.
     /// </summary>
     public int SelectedIndex => _entries.Count == 0 ? -1 : _selectedIndex;
 
     /// <summary>
-    /// Gets selected entry.
+    ///     Gets selected entry.
     /// </summary>
     public TimelineEntry? SelectedItem => _entries.Count == 0 ? null : _entries[_selectedIndex];
 
@@ -149,7 +132,12 @@ public sealed class Timeline : Control
     public override bool IsReadOnly { get; set; }
 
     /// <summary>
-    /// Replaces timeline entries.
+    ///     Occurs when the selected timeline entry changes.
+    /// </summary>
+    public event EventHandler<TimelineSelectionChangedEventArgs>? SelectionChanged;
+
+    /// <summary>
+    ///     Replaces timeline entries.
     /// </summary>
     /// <param name="entries">Entries in display order.</param>
     public void SetEntries(IEnumerable<TimelineEntry> entries)
@@ -170,7 +158,7 @@ public sealed class Timeline : Control
     }
 
     /// <summary>
-    /// Selects an entry by index.
+    ///     Selects an entry by index.
     /// </summary>
     /// <param name="index">The requested selected index.</param>
     /// <returns><see langword="true" /> when selection changed; otherwise <see langword="false" />.</returns>
@@ -180,7 +168,7 @@ public sealed class Timeline : Control
     }
 
     /// <summary>
-    /// Sets the selected entry index using bounds clamping.
+    ///     Sets the selected entry index using bounds clamping.
     /// </summary>
     /// <param name="index">The requested selected index.</param>
     /// <returns><see langword="true" /> when selection changed; otherwise <see langword="false" />.</returns>
@@ -203,7 +191,8 @@ public sealed class Timeline : Control
         EnsureSelectionVisible(_lastViewportRows);
         SelectionChanged?.Invoke(
             this,
-            new TimelineSelectionChangedEventArgs(previousIndex, _selectedIndex, previousItem, _entries[_selectedIndex]));
+            new TimelineSelectionChangedEventArgs(previousIndex, _selectedIndex, previousItem,
+                _entries[_selectedIndex]));
         return true;
     }
 
@@ -307,7 +296,8 @@ public sealed class Timeline : Control
         }
 
         var title = Border == BorderStyle.None ? null : RenderTitle();
-        var content = FrameLayout.DrawFrameAndResolveContent(canvas, clipped, title, Border, Padding, ResolveBorderStyleText());
+        var content =
+            FrameLayout.DrawFrameAndResolveContent(canvas, clipped, title, Border, Padding, ResolveBorderStyleText());
         if (content.IsEmpty)
         {
             return;
@@ -338,7 +328,7 @@ public sealed class Timeline : Control
         for (var index = 0; index < _entries.Count; index++)
         {
             var entry = _entries[index];
-            var line = BuildPlainEntryLine(entry, selected: false);
+            var line = BuildPlainEntryLine(entry, false);
             width = Math.Max(width, ControlTextLayout.MeasureDisplayWidth(line));
         }
 

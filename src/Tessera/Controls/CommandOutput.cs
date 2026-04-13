@@ -5,159 +5,145 @@ using Tessera.Styles;
 namespace Tessera.Controls;
 
 /// <summary>
-/// Represents a selectable command stream output viewer.
+///     Represents a selectable command stream output viewer.
 /// </summary>
 public sealed partial class CommandOutput : Control
 {
     private readonly List<CommandOutputLine> _lines = [];
-    private int _selectedIndex = -1;
     private int _hoveredIndex = -1;
-    private int _scrollOffset;
     private int _lastViewportRows = 8;
+    private int _scrollOffset;
 
     /// <summary>
-    /// Occurs when selected line changes.
+    ///     Gets or sets control title.
     /// </summary>
-    public event EventHandler<ListSelectionChangedEventArgs<CommandOutputLine>>? SelectionChanged;
+    public string Title { get; set; } = "Command Output";
 
     /// <summary>
-    /// Gets or sets control title.
+    ///     Gets or sets marker appended to title while focused.
     /// </summary>
-    public string Title
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = "Command Output";
+    public string FocusMarker { get; set; } = "*";
 
     /// <summary>
-    /// Gets or sets marker appended to title while focused.
-    /// </summary>
-    public string FocusMarker
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = "*";
-
-    /// <summary>
-    /// Gets or sets whether <see cref="FocusMarker" /> is rendered while focused.
+    ///     Gets or sets whether <see cref="FocusMarker" /> is rendered while focused.
     /// </summary>
     public bool ShowFocusMarker { get; set; } = true;
 
     /// <summary>
-    /// Gets or sets title style when not focused.
+    ///     Gets or sets title style when not focused.
     /// </summary>
     public TesseraStyle TitleStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets title style when focused.
+    ///     Gets or sets title style when focused.
     /// </summary>
     public TesseraStyle FocusedTitleStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets border style when not focused.
+    ///     Gets or sets border style when not focused.
     /// </summary>
     public TesseraStyle BorderStyleText { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets border style when focused.
+    ///     Gets or sets border style when focused.
     /// </summary>
     public TesseraStyle FocusedBorderStyleText { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets style for standard output lines.
+    ///     Gets or sets style for standard output lines.
     /// </summary>
     public TesseraStyle StdOutStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets style for standard error lines.
+    ///     Gets or sets style for standard error lines.
     /// </summary>
     public TesseraStyle StdErrStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets style for system/meta lines.
+    ///     Gets or sets style for system/meta lines.
     /// </summary>
     public TesseraStyle SystemStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets style merged into hovered rows.
+    ///     Gets or sets style merged into hovered rows.
     /// </summary>
     public TesseraStyle HoveredLineStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets style merged into selected rows.
+    ///     Gets or sets style merged into selected rows.
     /// </summary>
     public TesseraStyle SelectedLineStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets style merged into selected rows while focused.
+    ///     Gets or sets style merged into selected rows while focused.
     /// </summary>
     public TesseraStyle FocusedSelectedLineStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets style merged into rendered rows while disabled.
+    ///     Gets or sets style merged into rendered rows while disabled.
     /// </summary>
     public TesseraStyle DisabledStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets style used for timestamp text.
+    ///     Gets or sets style used for timestamp text.
     /// </summary>
     public TesseraStyle TimestampStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets style for empty-state text.
+    ///     Gets or sets style for empty-state text.
     /// </summary>
     public TesseraStyle EmptyStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets border style.
+    ///     Gets or sets border style.
     /// </summary>
     public BorderStyle Border { get; set; } = BorderStyle.SingleLine;
 
     /// <summary>
-    /// Gets or sets inner padding.
+    ///     Gets or sets inner padding.
     /// </summary>
     public Thickness Padding { get; set; }
 
     /// <summary>
-    /// Gets or sets a value indicating whether timestamps are rendered.
+    ///     Gets or sets a value indicating whether timestamps are rendered.
     /// </summary>
     public bool ShowTimestamp { get; set; } = true;
 
     /// <summary>
-    /// Gets or sets timestamp format string.
+    ///     Gets or sets timestamp format string.
     /// </summary>
     public string TimestampFormat { get; set; } = "HH:mm:ss";
 
     /// <summary>
-    /// Gets or sets a value indicating whether appending auto-selects the latest row.
+    ///     Gets or sets a value indicating whether appending auto-selects the latest row.
     /// </summary>
     public bool AutoFollow { get; set; } = true;
 
     /// <summary>
-    /// Gets or sets maximum retained lines. Use <c>0</c> for unlimited.
+    ///     Gets or sets maximum retained lines. Use <c>0</c> for unlimited.
     /// </summary>
     public int MaxLines { get; set; } = 2000;
 
     /// <summary>
-    /// Gets or sets text rendered when there are no lines.
+    ///     Gets or sets text rendered when there are no lines.
     /// </summary>
     public string EmptyText { get; set; } = "(no output)";
 
     /// <summary>
-    /// Gets output lines.
+    ///     Gets output lines.
     /// </summary>
     public IReadOnlyList<CommandOutputLine> Lines => _lines;
 
     /// <summary>
-    /// Gets selected index, or <c>-1</c> when empty.
+    ///     Gets selected index, or <c>-1</c> when empty.
     /// </summary>
-    public int SelectedIndex => _selectedIndex;
+    public int SelectedIndex { get; private set; } = -1;
 
     /// <summary>
-    /// Gets selected line, if any.
+    ///     Gets selected line, if any.
     /// </summary>
-    public CommandOutputLine? SelectedLine => _selectedIndex >= 0 && _selectedIndex < _lines.Count
-        ? _lines[_selectedIndex]
+    public CommandOutputLine? SelectedLine => SelectedIndex >= 0 && SelectedIndex < _lines.Count
+        ? _lines[SelectedIndex]
         : null;
 
     /// <inheritdoc />
@@ -170,7 +156,12 @@ public sealed partial class CommandOutput : Control
     public override bool IsReadOnly { get; set; }
 
     /// <summary>
-    /// Replaces all output lines.
+    ///     Occurs when selected line changes.
+    /// </summary>
+    public event EventHandler<ListSelectionChangedEventArgs<CommandOutputLine>>? SelectionChanged;
+
+    /// <summary>
+    ///     Replaces all output lines.
     /// </summary>
     /// <param name="lines">Output lines.</param>
     public void SetLines(IEnumerable<CommandOutputLine> lines)
@@ -184,20 +175,20 @@ public sealed partial class CommandOutput : Control
 
         if (_lines.Count == 0)
         {
-            _selectedIndex = -1;
+            SelectedIndex = -1;
             _hoveredIndex = -1;
             _scrollOffset = 0;
         }
         else
         {
-            _selectedIndex = Math.Clamp(_selectedIndex < 0 ? 0 : _selectedIndex, 0, _lines.Count - 1);
+            SelectedIndex = Math.Clamp(SelectedIndex < 0 ? 0 : SelectedIndex, 0, _lines.Count - 1);
             _hoveredIndex = Math.Clamp(_hoveredIndex, -1, _lines.Count - 1);
             _scrollOffset = Math.Clamp(_scrollOffset, 0, _lines.Count - 1);
         }
     }
 
     /// <summary>
-    /// Appends one pre-built output line.
+    ///     Appends one pre-built output line.
     /// </summary>
     /// <param name="line">Output line.</param>
     public void Append(CommandOutputLine line)
@@ -210,14 +201,14 @@ public sealed partial class CommandOutput : Control
             _ = SetSelectedIndex(_lines.Count - 1);
             EnsureSelectionVisible(_lastViewportRows);
         }
-        else if (_selectedIndex < 0 && _lines.Count > 0)
+        else if (SelectedIndex < 0 && _lines.Count > 0)
         {
-            _selectedIndex = 0;
+            SelectedIndex = 0;
         }
     }
 
     /// <summary>
-    /// Appends a standard output line.
+    ///     Appends a standard output line.
     /// </summary>
     /// <param name="text">Line text.</param>
     /// <param name="timestamp">Optional timestamp.</param>
@@ -227,7 +218,7 @@ public sealed partial class CommandOutput : Control
     }
 
     /// <summary>
-    /// Appends a standard error line.
+    ///     Appends a standard error line.
     /// </summary>
     /// <param name="text">Line text.</param>
     /// <param name="timestamp">Optional timestamp.</param>
@@ -237,7 +228,7 @@ public sealed partial class CommandOutput : Control
     }
 
     /// <summary>
-    /// Appends a system/meta line.
+    ///     Appends a system/meta line.
     /// </summary>
     /// <param name="text">Line text.</param>
     /// <param name="timestamp">Optional timestamp.</param>
@@ -247,21 +238,21 @@ public sealed partial class CommandOutput : Control
     }
 
     /// <summary>
-    /// Clears all lines.
+    ///     Clears all lines.
     /// </summary>
     public void Clear()
     {
         _lines.Clear();
-        _selectedIndex = -1;
+        SelectedIndex = -1;
         _hoveredIndex = -1;
         _scrollOffset = 0;
     }
 
     /// <summary>
-    /// Sets selected row using bounds clamping.
+    ///     Sets selected row using bounds clamping.
     /// </summary>
     /// <param name="index">Requested index.</param>
-    /// <returns><see langword="true"/> when selection changed; otherwise <see langword="false"/>.</returns>
+    /// <returns><see langword="true" /> when selection changed; otherwise <see langword="false" />.</returns>
     public bool SetSelectedIndex(int index)
     {
         if (_lines.Count == 0)
@@ -270,15 +261,17 @@ public sealed partial class CommandOutput : Control
         }
 
         var clamped = Math.Clamp(index, 0, _lines.Count - 1);
-        if (clamped == _selectedIndex)
+        if (clamped == SelectedIndex)
         {
             return false;
         }
 
-        var previousIndex = _selectedIndex;
+        var previousIndex = SelectedIndex;
         var previousLine = SelectedLine;
-        _selectedIndex = clamped;
-        SelectionChanged?.Invoke(this, new ListSelectionChangedEventArgs<CommandOutputLine>(previousIndex, _selectedIndex, previousLine, SelectedLine));
+        SelectedIndex = clamped;
+        SelectionChanged?.Invoke(this,
+            new ListSelectionChangedEventArgs<CommandOutputLine>(previousIndex, SelectedIndex, previousLine,
+                SelectedLine));
         return true;
     }
 
@@ -291,12 +284,36 @@ public sealed partial class CommandOutput : Control
         }
 
         var page = Math.Max(1, _lastViewportRows > 0 ? _lastViewportRows : 8);
-        if (key.Is(Key.Down) || key.IsCharacter('j')) return SetSelectedIndex(_selectedIndex + 1);
-        if (key.Is(Key.Up) || key.IsCharacter('k')) return SetSelectedIndex(_selectedIndex - 1);
-        if (key.Is(Key.Home)) return SetSelectedIndex(0);
-        if (key.Is(Key.End)) return SetSelectedIndex(_lines.Count - 1);
-        if (key.Is(Key.PageDown)) return SetSelectedIndex(_selectedIndex + page);
-        if (key.Is(Key.PageUp)) return SetSelectedIndex(_selectedIndex - page);
+        if (key.Is(Key.Down) || key.IsCharacter('j'))
+        {
+            return SetSelectedIndex(SelectedIndex + 1);
+        }
+
+        if (key.Is(Key.Up) || key.IsCharacter('k'))
+        {
+            return SetSelectedIndex(SelectedIndex - 1);
+        }
+
+        if (key.Is(Key.Home))
+        {
+            return SetSelectedIndex(0);
+        }
+
+        if (key.Is(Key.End))
+        {
+            return SetSelectedIndex(_lines.Count - 1);
+        }
+
+        if (key.Is(Key.PageDown))
+        {
+            return SetSelectedIndex(SelectedIndex + page);
+        }
+
+        if (key.Is(Key.PageUp))
+        {
+            return SetSelectedIndex(SelectedIndex - page);
+        }
+
         return false;
     }
 
@@ -325,12 +342,12 @@ public sealed partial class CommandOutput : Control
         {
             if (pointer.Button == PointerButton.WheelDown)
             {
-                return SetSelectedIndex(_selectedIndex + 1) || changed;
+                return SetSelectedIndex(SelectedIndex + 1) || changed;
             }
 
             if (pointer.Button == PointerButton.WheelUp)
             {
-                return SetSelectedIndex(_selectedIndex - 1) || changed;
+                return SetSelectedIndex(SelectedIndex - 1) || changed;
             }
         }
 
@@ -371,7 +388,7 @@ public sealed partial class CommandOutput : Control
 
         var remove = _lines.Count - MaxLines;
         _lines.RemoveRange(0, remove);
-        _selectedIndex = _selectedIndex < 0 ? -1 : Math.Max(0, _selectedIndex - remove);
+        SelectedIndex = SelectedIndex < 0 ? -1 : Math.Max(0, SelectedIndex - remove);
         _hoveredIndex = _hoveredIndex < 0 ? -1 : Math.Max(0, _hoveredIndex - remove);
         _scrollOffset = Math.Max(0, _scrollOffset - remove);
     }
@@ -395,21 +412,20 @@ public sealed partial class CommandOutput : Control
             return;
         }
 
-        if (_selectedIndex < 0)
+        if (SelectedIndex < 0)
         {
-            _selectedIndex = 0;
+            SelectedIndex = 0;
         }
 
-        if (_selectedIndex < _scrollOffset)
+        if (SelectedIndex < _scrollOffset)
         {
-            _scrollOffset = _selectedIndex;
+            _scrollOffset = SelectedIndex;
         }
-        else if (_selectedIndex >= _scrollOffset + viewportRows)
+        else if (SelectedIndex >= _scrollOffset + viewportRows)
         {
-            _scrollOffset = _selectedIndex - viewportRows + 1;
+            _scrollOffset = SelectedIndex - viewportRows + 1;
         }
 
         _scrollOffset = Math.Clamp(_scrollOffset, 0, Math.Max(0, _lines.Count - viewportRows));
     }
-
 }

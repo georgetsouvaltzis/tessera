@@ -5,10 +5,10 @@ namespace Tessera.Components.Primitives.Internal;
 
 internal sealed class CanvasGraphemeBuffer
 {
-    private readonly int _width;
-    private readonly int _height;
     private readonly string?[] _cells;
     private readonly bool[] _continuations;
+    private readonly int _height;
+    private readonly int _width;
 
     public CanvasGraphemeBuffer(int width, int height)
     {
@@ -36,7 +36,7 @@ internal sealed class CanvasGraphemeBuffer
 
     public void Set(int x, int y, char value)
     {
-        SetCell(x, y, value.ToString(), width: 1);
+        SetCell(x, y, value.ToString(), 1);
     }
 
     public char Get(int x, int y)
@@ -46,7 +46,7 @@ internal sealed class CanvasGraphemeBuffer
             return '\0';
         }
 
-        var index = (y * _width) + x;
+        var index = y * _width + x;
         if (_continuations[index] || _cells[index] is not string element || element.Length == 0)
         {
             return '\0';
@@ -72,7 +72,7 @@ internal sealed class CanvasGraphemeBuffer
                 sawAnsi = true;
                 if (lastColumn >= 0)
                 {
-                    var previousIndex = (y * _width) + lastColumn;
+                    var previousIndex = y * _width + lastColumn;
                     if (_cells[previousIndex] is string previous)
                     {
                         _cells[previousIndex] = ConcatSlice(previous, text, index, consumed);
@@ -100,7 +100,7 @@ internal sealed class CanvasGraphemeBuffer
             {
                 if (lastColumn >= 0)
                 {
-                    var previousIndex = (y * _width) + lastColumn;
+                    var previousIndex = y * _width + lastColumn;
                     if (_cells[previousIndex] is string previous)
                     {
                         _cells[previousIndex] = string.Concat(previous, element);
@@ -150,21 +150,22 @@ internal sealed class CanvasGraphemeBuffer
         {
             if (lastColumn >= 0)
             {
-                var previousIndex = (y * _width) + lastColumn;
-                if (_cells[previousIndex] is string previous && !previous.EndsWith("\u001b[0m", StringComparison.Ordinal))
+                var previousIndex = y * _width + lastColumn;
+                if (_cells[previousIndex] is string previous &&
+                    !previous.EndsWith("\e[0m", StringComparison.Ordinal))
                 {
-                    _cells[previousIndex] = string.Concat(previous, "\u001b[0m");
+                    _cells[previousIndex] = string.Concat(previous, "\e[0m");
                 }
             }
             else
             {
-                pendingZeroWidth = string.Concat(pendingZeroWidth, "\u001b[0m");
+                pendingZeroWidth = string.Concat(pendingZeroWidth, "\e[0m");
             }
         }
 
         if (pendingZeroWidth.Length > 0 && lastColumn >= 0)
         {
-            var previousIndex = (y * _width) + lastColumn;
+            var previousIndex = y * _width + lastColumn;
             if (_cells[previousIndex] is string previous)
             {
                 _cells[previousIndex] = string.Concat(previous, pendingZeroWidth);
@@ -205,7 +206,7 @@ internal sealed class CanvasGraphemeBuffer
             return;
         }
 
-        var index = (y * _width) + x;
+        var index = y * _width + x;
         ClearCell(index);
         _cells[index] = value;
         _continuations[index] = false;
@@ -221,7 +222,7 @@ internal sealed class CanvasGraphemeBuffer
             return;
         }
 
-        var nextIndex = (y * _width) + nextColumn;
+        var nextIndex = y * _width + nextColumn;
         ClearCell(nextIndex);
         _cells[nextIndex] = null;
         _continuations[nextIndex] = true;
@@ -232,7 +233,7 @@ internal sealed class CanvasGraphemeBuffer
         if (_continuations[index])
         {
             var previous = index - 1;
-            if (previous >= 0 && (previous / _width) == (index / _width))
+            if (previous >= 0 && previous / _width == index / _width)
             {
                 _cells[previous] = null;
                 _continuations[previous] = false;
@@ -246,7 +247,7 @@ internal sealed class CanvasGraphemeBuffer
         if (_cells[index] is string existing && TextElementWidth.Measure(existing) > 1)
         {
             var next = index + 1;
-            if (next < _cells.Length && (next / _width) == (index / _width) && _continuations[next])
+            if (next < _cells.Length && next / _width == index / _width && _continuations[next])
             {
                 _continuations[next] = false;
                 _cells[next] = null;

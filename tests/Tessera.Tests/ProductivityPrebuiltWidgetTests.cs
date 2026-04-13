@@ -9,55 +9,75 @@ internal static class ProductivityPrebuiltWidgetTests
     public static IEnumerable<TestCase> Cases()
     {
         yield return new TestCase("Controls_NumberInput_AdjustsAndSubmits", NumberInput_AdjustsAndSubmits);
-        yield return new TestCase("Controls_NumberInput_SubmittedEvent_ReportsValue", NumberInput_SubmittedEvent_ReportsValue);
-        yield return new TestCase("Controls_NumberInput_TryConsumeSubmission_IsSingleUse", NumberInput_TryConsumeSubmission_IsSingleUse);
-        yield return new TestCase("Controls_NumberInput_BorderStyleHooks_Rendered", NumberInput_BorderStyleHooks_Rendered);
+        yield return new TestCase("Controls_NumberInput_SubmittedEvent_ReportsValue",
+            NumberInput_SubmittedEvent_ReportsValue);
+        yield return new TestCase("Controls_NumberInput_TryConsumeSubmission_IsSingleUse",
+            NumberInput_TryConsumeSubmission_IsSingleUse);
+        yield return new TestCase("Controls_NumberInput_BorderStyleHooks_Rendered",
+            NumberInput_BorderStyleHooks_Rendered);
         yield return new TestCase("Controls_DatePicker_MovesDate", DatePicker_MovesDate);
-        yield return new TestCase("Controls_DatePicker_DateChangedEvent_ReportsTransition", DatePicker_DateChangedEvent_ReportsTransition);
+        yield return new TestCase("Controls_DatePicker_DateChangedEvent_ReportsTransition",
+            DatePicker_DateChangedEvent_ReportsTransition);
         yield return new TestCase("Controls_DatePicker_MouseClickSelectsDate", DatePicker_MouseClickSelectsDate);
-        yield return new TestCase("Controls_DatePicker_BorderStyleHooks_Rendered", DatePicker_BorderStyleHooks_Rendered);
+        yield return new TestCase("Controls_DatePicker_BorderStyleHooks_Rendered",
+            DatePicker_BorderStyleHooks_Rendered);
         yield return new TestCase("Controls_TimePicker_AdjustsField", TimePicker_AdjustsField);
-        yield return new TestCase("Controls_TimePicker_ValueChangedEvent_ReportsTransition", TimePicker_ValueChangedEvent_ReportsTransition);
+        yield return new TestCase("Controls_TimePicker_ValueChangedEvent_ReportsTransition",
+            TimePicker_ValueChangedEvent_ReportsTransition);
         yield return new TestCase("Controls_TimePicker_MouseWheelAdjustsField", TimePicker_MouseWheelAdjustsField);
-        yield return new TestCase("Controls_TimePicker_BorderStyleHooks_Rendered", TimePicker_BorderStyleHooks_Rendered);
-        yield return new TestCase("Controls_Paginator_KeyboardNavigationAndBoundsClamping", Paginator_KeyboardNavigationAndBoundsClamping);
-        yield return new TestCase("Controls_Paginator_PageChangedEvent_ReportsTransition", Paginator_PageChangedEvent_ReportsTransition);
-        yield return new TestCase("Controls_Paginator_MousePressOnHitTargets_ChangesPage", Paginator_MousePressOnHitTargets_ChangesPage);
-        yield return new TestCase("Controls_Paginator_RendersCompactOneLineLayout", Paginator_RendersCompactOneLineLayout);
+        yield return new TestCase("Controls_TimePicker_BorderStyleHooks_Rendered",
+            TimePicker_BorderStyleHooks_Rendered);
+        yield return new TestCase("Controls_Paginator_KeyboardNavigationAndBoundsClamping",
+            Paginator_KeyboardNavigationAndBoundsClamping);
+        yield return new TestCase("Controls_Paginator_PageChangedEvent_ReportsTransition",
+            Paginator_PageChangedEvent_ReportsTransition);
+        yield return new TestCase("Controls_Paginator_MousePressOnHitTargets_ChangesPage",
+            Paginator_MousePressOnHitTargets_ChangesPage);
+        yield return new TestCase("Controls_Paginator_RendersCompactOneLineLayout",
+            Paginator_RendersCompactOneLineLayout);
         yield return new TestCase("Controls_FuzzyFinder_SetQuery_FiltersResults", FuzzyFinder_SetQuery_FiltersResults);
-        yield return new TestCase("Controls_FuzzyFinder_KeyboardNavigationAndEnter_RaisesSelection", FuzzyFinder_KeyboardNavigationAndEnter_RaisesSelection);
+        yield return new TestCase("Controls_FuzzyFinder_KeyboardNavigationAndEnter_RaisesSelection",
+            FuzzyFinder_KeyboardNavigationAndEnter_RaisesSelection);
         yield return new TestCase("Controls_FuzzyFinder_Escape_ClearsThenCloses", FuzzyFinder_Escape_ClearsThenCloses);
-        yield return new TestCase("Controls_FuzzyFinder_MousePress_SelectsAndActivatesRow", FuzzyFinder_MousePress_SelectsAndActivatesRow);
-        yield return new TestCase("Controls_FuzzyFinder_RendersPlaceholderAndSelectedMarker", FuzzyFinder_RendersPlaceholderAndSelectedMarker);
-        yield return new TestCase("Controls_Stepper_KeyboardNavigationCompletionAndBounds", Stepper_KeyboardNavigationCompletionAndBounds);
-        yield return new TestCase("Controls_Stepper_CurrentStepChangedEvent_ReportsTransition", Stepper_CurrentStepChangedEvent_ReportsTransition);
+        yield return new TestCase("Controls_FuzzyFinder_MousePress_SelectsAndActivatesRow",
+            FuzzyFinder_MousePress_SelectsAndActivatesRow);
+        yield return new TestCase("Controls_FuzzyFinder_RendersPlaceholderAndSelectedMarker",
+            FuzzyFinder_RendersPlaceholderAndSelectedMarker);
+        yield return new TestCase("Controls_Stepper_KeyboardNavigationCompletionAndBounds",
+            Stepper_KeyboardNavigationCompletionAndBounds);
+        yield return new TestCase("Controls_Stepper_CurrentStepChangedEvent_ReportsTransition",
+            Stepper_CurrentStepChangedEvent_ReportsTransition);
         yield return new TestCase("Controls_Stepper_MousePressSelectsStep", Stepper_MousePressSelectsStep);
         yield return new TestCase("Controls_Stepper_RendersFlowAndStyles", Stepper_RendersFlowAndStyles);
-        yield return new TestCase("Controls_PropertyGrid_KeyboardNavigationAndReadOnlySemantics", PropertyGrid_KeyboardNavigationAndReadOnlySemantics);
-        yield return new TestCase("Controls_PropertyGrid_SelectionChangedEvent_ReportsTransition", PropertyGrid_SelectionChangedEvent_ReportsTransition);
-        yield return new TestCase("Controls_PropertyGrid_RendersHeadersCategoriesAndSelection", PropertyGrid_RendersHeadersCategoriesAndSelection);
-        yield return new TestCase("Controls_PropertyGrid_StyleHooks_EmitSgrFragments", PropertyGrid_StyleHooks_EmitSgrFragments);
-        yield return new TestCase("Controls_KeyValueList_KeyboardNavigationAndBounds", KeyValueList_KeyboardNavigationAndBounds);
-        yield return new TestCase("Controls_KeyValueList_SelectionChangedEvent_ReportsTransition", KeyValueList_SelectionChangedEvent_ReportsTransition);
+        yield return new TestCase("Controls_PropertyGrid_KeyboardNavigationAndReadOnlySemantics",
+            PropertyGrid_KeyboardNavigationAndReadOnlySemantics);
+        yield return new TestCase("Controls_PropertyGrid_SelectionChangedEvent_ReportsTransition",
+            PropertyGrid_SelectionChangedEvent_ReportsTransition);
+        yield return new TestCase("Controls_PropertyGrid_RendersHeadersCategoriesAndSelection",
+            PropertyGrid_RendersHeadersCategoriesAndSelection);
+        yield return new TestCase("Controls_PropertyGrid_StyleHooks_EmitSgrFragments",
+            PropertyGrid_StyleHooks_EmitSgrFragments);
+        yield return new TestCase("Controls_KeyValueList_KeyboardNavigationAndBounds",
+            KeyValueList_KeyboardNavigationAndBounds);
+        yield return new TestCase("Controls_KeyValueList_SelectionChangedEvent_ReportsTransition",
+            KeyValueList_SelectionChangedEvent_ReportsTransition);
         yield return new TestCase("Controls_KeyValueList_MousePressSelectsRow", KeyValueList_MousePressSelectsRow);
         yield return new TestCase("Controls_KeyValueList_StyleHooks_Rendered", KeyValueList_StyleHooks_Rendered);
-        yield return new TestCase("Controls_SearchBox_UpdatesQueryAndRaisesEvent", SearchBox_UpdatesQueryAndRaisesEvent);
-        yield return new TestCase("Controls_SearchBox_NavigationCommands_UpdateIndexAndRaiseEvent", SearchBox_NavigationCommands_UpdateIndexAndRaiseEvent);
-        yield return new TestCase("Controls_SearchBox_MousePressOnHitTargets_Navigates", SearchBox_MousePressOnHitTargets_Navigates);
-        yield return new TestCase("Controls_SearchBox_RendersPlaceholderAndMatchCounter", SearchBox_RendersPlaceholderAndMatchCounter);
+        yield return new TestCase("Controls_SearchBox_UpdatesQueryAndRaisesEvent",
+            SearchBox_UpdatesQueryAndRaisesEvent);
+        yield return new TestCase("Controls_SearchBox_NavigationCommands_UpdateIndexAndRaiseEvent",
+            SearchBox_NavigationCommands_UpdateIndexAndRaiseEvent);
+        yield return new TestCase("Controls_SearchBox_MousePressOnHitTargets_Navigates",
+            SearchBox_MousePressOnHitTargets_Navigates);
+        yield return new TestCase("Controls_SearchBox_RendersPlaceholderAndMatchCounter",
+            SearchBox_RendersPlaceholderAndMatchCounter);
         yield return new TestCase("Controls_SearchBox_BorderStyleHooks_Rendered", SearchBox_BorderStyleHooks_Rendered);
         yield return new TestCase("Controls_MarkdownView_RendersMarkdown", MarkdownView_RendersMarkdown);
     }
 
     private static Task NumberInput_AdjustsAndSubmits()
     {
-        var input = new NumberInput
-        {
-            IsFocused = true,
-            Min = 0,
-            Max = 10,
-            Step = 2,
-        };
+        var input = new NumberInput { IsFocused = true, Min = 0, Max = 10, Step = 2 };
         input.SetValue(2);
         input.Handle(new KeyPressed(Key.Up));
         input.Handle(new KeyPressed(Key.Up));
@@ -73,21 +93,20 @@ internal static class ProductivityPrebuiltWidgetTests
         input.Handle(new KeyPressed(Key.Character, "5"));
         input.Handle(new KeyPressed(Key.Enter));
 
-        TestAssert.True(Math.Abs(input.Value - 10) < 0.0001, "Number input should parse decimal text entry and clamp to range.");
+        TestAssert.True(Math.Abs(input.Value - 10) < 0.0001,
+            "Number input should parse decimal text entry and clamp to range.");
         return Task.CompletedTask;
     }
 
     private static Task NumberInput_TryConsumeSubmission_IsSingleUse()
     {
-        var input = new NumberInput
-        {
-            IsFocused = true,
-        };
+        var input = new NumberInput { IsFocused = true };
         input.SetValue(3);
 
         input.Handle(new KeyPressed(Key.Enter));
 
-        TestAssert.True(input.TryConsumeSubmission(out var submitted), "Number input should expose one-shot submit consumption.");
+        TestAssert.True(input.TryConsumeSubmission(out var submitted),
+            "Number input should expose one-shot submit consumption.");
         TestAssert.True(Math.Abs(submitted - 3) < 0.0001, "Number input should consume the submitted numeric value.");
         TestAssert.True(!input.TryConsumeSubmission(out _), "Number input should not report the same submit twice.");
         return Task.CompletedTask;
@@ -95,17 +114,15 @@ internal static class ProductivityPrebuiltWidgetTests
 
     private static Task NumberInput_SubmittedEvent_ReportsValue()
     {
-        var input = new NumberInput
-        {
-            IsFocused = true,
-        };
+        var input = new NumberInput { IsFocused = true };
         input.SetValue(3);
         double submitted = -1;
         input.Submitted += (_, args) => submitted = args.Value;
 
         input.Handle(new KeyPressed(Key.Enter));
 
-        TestAssert.True(Math.Abs(submitted - 3) < 0.0001, "Number input submit event should expose the submitted numeric value.");
+        TestAssert.True(Math.Abs(submitted - 3) < 0.0001,
+            "Number input submit event should expose the submitted numeric value.");
         return Task.CompletedTask;
     }
 
@@ -120,7 +137,7 @@ internal static class ProductivityPrebuiltWidgetTests
             Border = BorderStyle.SingleLine,
             BorderStyleText = TesseraStyle.Empty.WithForeground(AnsiColor.BrightBlue),
             FocusedBorderStyleText = TesseraStyle.Empty.WithBold(),
-            DisabledTextStyle = TesseraStyle.Empty.WithForeground(AnsiColor.BrightBlack),
+            DisabledTextStyle = TesseraStyle.Empty.WithForeground(AnsiColor.BrightBlack)
         };
         input.SetValue(42);
 
@@ -128,9 +145,12 @@ internal static class ProductivityPrebuiltWidgetTests
         input.Render(focusedCanvas, new Rect(0, 0, 40, 4));
         var focusedOutput = focusedCanvas.Render();
 
-        TestAssert.True(focusedOutput.Contains("Number !", StringComparison.Ordinal), "NumberInput should render custom focus marker in title.");
-        TestAssert.True(ContainsBoldSgr(focusedOutput), "NumberInput should merge focused border style into border glyph rendering.");
-        TestAssert.True(ContainsBlueForegroundSgr(focusedOutput), "NumberInput should apply configured border color style.");
+        TestAssert.True(focusedOutput.Contains("Number !", StringComparison.Ordinal),
+            "NumberInput should render custom focus marker in title.");
+        TestAssert.True(ContainsBoldSgr(focusedOutput),
+            "NumberInput should merge focused border style into border glyph rendering.");
+        TestAssert.True(ContainsBlueForegroundSgr(focusedOutput),
+            "NumberInput should apply configured border color style.");
 
         input.IsFocused = false;
         input.IsDisabled = true;
@@ -138,45 +158,40 @@ internal static class ProductivityPrebuiltWidgetTests
         input.Render(disabledCanvas, new Rect(0, 0, 40, 4));
         var disabledOutput = disabledCanvas.Render();
 
-        TestAssert.True(ContainsMutedForegroundSgr(disabledOutput), "NumberInput disabled border should merge muted styling.");
+        TestAssert.True(ContainsMutedForegroundSgr(disabledOutput),
+            "NumberInput disabled border should merge muted styling.");
         return Task.CompletedTask;
     }
 
     private static Task DatePicker_MovesDate()
     {
-        var picker = new DatePicker
-        {
-            IsFocused = true,
-        };
+        var picker = new DatePicker { IsFocused = true };
         picker.SetDate(new DateOnly(2026, 3, 8));
         picker.Handle(new KeyPressed(Key.Right));
         picker.Handle(new KeyPressed(Key.Down));
 
-        TestAssert.Equal(new DateOnly(2026, 3, 16), picker.SelectedDate, "Date picker should move day and week correctly.");
+        TestAssert.Equal(new DateOnly(2026, 3, 16), picker.SelectedDate,
+            "Date picker should move day and week correctly.");
         return Task.CompletedTask;
     }
 
     private static Task DatePicker_MouseClickSelectsDate()
     {
-        var picker = new DatePicker
-        {
-            Border = BorderStyle.None,
-        };
+        var picker = new DatePicker { Border = BorderStyle.None };
         picker.SetDate(new DateOnly(2026, 3, 8));
 
-        var changed = picker.Handle(new PointerInput(PointerEventKind.Press, PointerButton.Left, 0, 4), new Rect(0, 0, 24, 10));
+        var changed = picker.Handle(new PointerInput(PointerEventKind.Press, PointerButton.Left, 0, 4),
+            new Rect(0, 0, 24, 10));
 
         TestAssert.True(changed, "Date picker click should select day under pointer.");
-        TestAssert.Equal(new DateOnly(2026, 3, 9), picker.SelectedDate, "Date picker click should select correct calendar date.");
+        TestAssert.Equal(new DateOnly(2026, 3, 9), picker.SelectedDate,
+            "Date picker click should select correct calendar date.");
         return Task.CompletedTask;
     }
 
     private static Task DatePicker_DateChangedEvent_ReportsTransition()
     {
-        var picker = new DatePicker
-        {
-            IsFocused = true,
-        };
+        var picker = new DatePicker { IsFocused = true };
         picker.SetDate(new DateOnly(2026, 3, 8));
         DateChangedEventArgs? args = null;
         picker.DateChanged += (_, eventArgs) => args = eventArgs;
@@ -184,8 +199,10 @@ internal static class ProductivityPrebuiltWidgetTests
         picker.Handle(new KeyPressed(Key.Right));
 
         TestAssert.True(args is not null, "Date picker should raise date changed when the selected date changes.");
-        TestAssert.Equal(new DateOnly(2026, 3, 8), args!.PreviousDate, "Date picker event should expose the previous date.");
-        TestAssert.Equal(new DateOnly(2026, 3, 9), args.SelectedDate, "Date picker event should expose the selected date.");
+        TestAssert.Equal(new DateOnly(2026, 3, 8), args!.PreviousDate,
+            "Date picker event should expose the previous date.");
+        TestAssert.Equal(new DateOnly(2026, 3, 9), args.SelectedDate,
+            "Date picker event should expose the selected date.");
         return Task.CompletedTask;
     }
 
@@ -200,7 +217,7 @@ internal static class ProductivityPrebuiltWidgetTests
             Border = BorderStyle.SingleLine,
             BorderStyleText = TesseraStyle.Empty.WithForeground(AnsiColor.BrightBlue),
             FocusedBorderStyleText = TesseraStyle.Empty.WithBold(),
-            DisabledDayStyle = TesseraStyle.Empty.WithForeground(AnsiColor.BrightBlack),
+            DisabledDayStyle = TesseraStyle.Empty.WithForeground(AnsiColor.BrightBlack)
         };
         picker.SetDate(new DateOnly(2026, 3, 8));
 
@@ -208,9 +225,12 @@ internal static class ProductivityPrebuiltWidgetTests
         picker.Render(focusedCanvas, new Rect(0, 0, 28, 10));
         var focusedOutput = focusedCanvas.Render();
 
-        TestAssert.True(focusedOutput.Contains("Date !", StringComparison.Ordinal), "DatePicker should render custom focus marker in title.");
-        TestAssert.True(ContainsBoldSgr(focusedOutput), "DatePicker should merge focused border style into border glyph rendering.");
-        TestAssert.True(ContainsBlueForegroundSgr(focusedOutput), "DatePicker should apply configured border color style.");
+        TestAssert.True(focusedOutput.Contains("Date !", StringComparison.Ordinal),
+            "DatePicker should render custom focus marker in title.");
+        TestAssert.True(ContainsBoldSgr(focusedOutput),
+            "DatePicker should merge focused border style into border glyph rendering.");
+        TestAssert.True(ContainsBlueForegroundSgr(focusedOutput),
+            "DatePicker should apply configured border color style.");
 
         picker.IsFocused = false;
         picker.IsDisabled = true;
@@ -218,17 +238,14 @@ internal static class ProductivityPrebuiltWidgetTests
         picker.Render(disabledCanvas, new Rect(0, 0, 28, 10));
         var disabledOutput = disabledCanvas.Render();
 
-        TestAssert.True(ContainsMutedForegroundSgr(disabledOutput), "DatePicker disabled border should merge muted styling.");
+        TestAssert.True(ContainsMutedForegroundSgr(disabledOutput),
+            "DatePicker disabled border should merge muted styling.");
         return Task.CompletedTask;
     }
 
     private static Task TimePicker_AdjustsField()
     {
-        var picker = new TimePicker
-        {
-            IsFocused = true,
-            MinuteStep = 5,
-        };
+        var picker = new TimePicker { IsFocused = true, MinuteStep = 5 };
         picker.SetValue(new TimeOnly(10, 0, 0));
         picker.Handle(new KeyPressed(Key.Right));
         picker.Handle(new KeyPressed(Key.Up));
@@ -239,28 +256,22 @@ internal static class ProductivityPrebuiltWidgetTests
 
     private static Task TimePicker_MouseWheelAdjustsField()
     {
-        var picker = new TimePicker
-        {
-            Border = BorderStyle.None,
-            MinuteStep = 5,
-        };
+        var picker = new TimePicker { Border = BorderStyle.None, MinuteStep = 5 };
         picker.SetValue(new TimeOnly(10, 0, 0));
 
         picker.Handle(new PointerInput(PointerEventKind.Press, PointerButton.Left, 3, 0), new Rect(0, 0, 12, 1));
-        var changed = picker.Handle(new PointerInput(PointerEventKind.Wheel, PointerButton.WheelUp, 3, 0), new Rect(0, 0, 12, 1));
+        var changed = picker.Handle(new PointerInput(PointerEventKind.Wheel, PointerButton.WheelUp, 3, 0),
+            new Rect(0, 0, 12, 1));
 
         TestAssert.True(changed, "Time picker wheel should adjust hovered/active field.");
-        TestAssert.Equal(new TimeOnly(10, 5, 0), picker.Value, "Time picker wheel should increase minute field by configured step.");
+        TestAssert.Equal(new TimeOnly(10, 5, 0), picker.Value,
+            "Time picker wheel should increase minute field by configured step.");
         return Task.CompletedTask;
     }
 
     private static Task TimePicker_ValueChangedEvent_ReportsTransition()
     {
-        var picker = new TimePicker
-        {
-            IsFocused = true,
-            MinuteStep = 5,
-        };
+        var picker = new TimePicker { IsFocused = true, MinuteStep = 5 };
         picker.SetValue(new TimeOnly(10, 0, 0));
         TimeValueChangedEventArgs? args = null;
         picker.ValueChanged += (_, eventArgs) => args = eventArgs;
@@ -269,7 +280,8 @@ internal static class ProductivityPrebuiltWidgetTests
         picker.Handle(new KeyPressed(Key.Up));
 
         TestAssert.True(args is not null, "Time picker should raise value changed when the selected time changes.");
-        TestAssert.Equal(new TimeOnly(10, 0, 0), args!.PreviousValue, "Time picker event should expose the previous value.");
+        TestAssert.Equal(new TimeOnly(10, 0, 0), args!.PreviousValue,
+            "Time picker event should expose the previous value.");
         TestAssert.Equal(new TimeOnly(10, 5, 0), args.Value, "Time picker event should expose the current value.");
         return Task.CompletedTask;
     }
@@ -285,7 +297,7 @@ internal static class ProductivityPrebuiltWidgetTests
             Border = BorderStyle.SingleLine,
             BorderStyleText = TesseraStyle.Empty.WithForeground(AnsiColor.BrightBlue),
             FocusedBorderStyleText = TesseraStyle.Empty.WithBold(),
-            DisabledValueStyle = TesseraStyle.Empty.WithForeground(AnsiColor.BrightBlack),
+            DisabledValueStyle = TesseraStyle.Empty.WithForeground(AnsiColor.BrightBlack)
         };
         picker.SetValue(new TimeOnly(10, 30, 0));
 
@@ -293,9 +305,12 @@ internal static class ProductivityPrebuiltWidgetTests
         picker.Render(focusedCanvas, new Rect(0, 0, 32, 4));
         var focusedOutput = focusedCanvas.Render();
 
-        TestAssert.True(focusedOutput.Contains("Time !", StringComparison.Ordinal), "TimePicker should render custom focus marker in title.");
-        TestAssert.True(ContainsBoldSgr(focusedOutput), "TimePicker should merge focused border style into border glyph rendering.");
-        TestAssert.True(ContainsBlueForegroundSgr(focusedOutput), "TimePicker should apply configured border color style.");
+        TestAssert.True(focusedOutput.Contains("Time !", StringComparison.Ordinal),
+            "TimePicker should render custom focus marker in title.");
+        TestAssert.True(ContainsBoldSgr(focusedOutput),
+            "TimePicker should merge focused border style into border glyph rendering.");
+        TestAssert.True(ContainsBlueForegroundSgr(focusedOutput),
+            "TimePicker should apply configured border color style.");
 
         picker.IsFocused = false;
         picker.IsDisabled = true;
@@ -303,17 +318,14 @@ internal static class ProductivityPrebuiltWidgetTests
         picker.Render(disabledCanvas, new Rect(0, 0, 32, 4));
         var disabledOutput = disabledCanvas.Render();
 
-        TestAssert.True(ContainsMutedForegroundSgr(disabledOutput), "TimePicker disabled border should merge muted styling.");
+        TestAssert.True(ContainsMutedForegroundSgr(disabledOutput),
+            "TimePicker disabled border should merge muted styling.");
         return Task.CompletedTask;
     }
 
     private static Task Paginator_KeyboardNavigationAndBoundsClamping()
     {
-        var paginator = new Paginator
-        {
-            IsFocused = true,
-            PageCount = 3,
-        };
+        var paginator = new Paginator { IsFocused = true, PageCount = 3 };
 
         var leftChanged = paginator.Handle(new KeyPressed(Key.Left));
         TestAssert.True(!leftChanged, "Paginator should not move left from the first page.");
@@ -340,10 +352,7 @@ internal static class ProductivityPrebuiltWidgetTests
 
     private static Task Paginator_PageChangedEvent_ReportsTransition()
     {
-        var paginator = new Paginator
-        {
-            PageCount = 4,
-        };
+        var paginator = new Paginator { PageCount = 4 };
         PageChangedEventArgs? args = null;
         paginator.PageChanged += (_, eventArgs) => args = eventArgs;
 
@@ -357,10 +366,7 @@ internal static class ProductivityPrebuiltWidgetTests
 
     private static Task Paginator_MousePressOnHitTargets_ChangesPage()
     {
-        var paginator = new Paginator
-        {
-            PageCount = 3,
-        };
+        var paginator = new Paginator { PageCount = 3 };
         var bounds = new Rect(0, 0, 40, 1);
 
         var nextChanged = paginator.Handle(new PointerInput(PointerEventKind.Press, PointerButton.Left, 16, 0), bounds);
@@ -371,7 +377,8 @@ internal static class ProductivityPrebuiltWidgetTests
         TestAssert.True(prevChanged, "Paginator previous hit target click should move to previous page.");
         TestAssert.Equal(0, paginator.PageIndex, "Paginator previous hit target should select the previous page.");
 
-        var prevDisabledChanged = paginator.Handle(new PointerInput(PointerEventKind.Press, PointerButton.Left, 0, 0), bounds);
+        var prevDisabledChanged =
+            paginator.Handle(new PointerInput(PointerEventKind.Press, PointerButton.Left, 0, 0), bounds);
         TestAssert.True(!prevDisabledChanged, "Paginator previous hit target should not move before the first page.");
         TestAssert.Equal(0, paginator.PageIndex, "Paginator should stay on first page after disabled previous click.");
         return Task.CompletedTask;
@@ -379,10 +386,7 @@ internal static class ProductivityPrebuiltWidgetTests
 
     private static Task Paginator_RendersCompactOneLineLayout()
     {
-        var paginator = new Paginator
-        {
-            PageCount = 12,
-        };
+        var paginator = new Paginator { PageCount = 12 };
         paginator.SetPage(4);
         var canvas = new Canvas(40, 1);
 
@@ -397,21 +401,18 @@ internal static class ProductivityPrebuiltWidgetTests
 
     private static Task FuzzyFinder_SetQuery_FiltersResults()
     {
-        var finder = new FuzzyFinder
-        {
-            IsFocused = true,
-            Border = BorderStyle.None,
-        };
+        var finder = new FuzzyFinder { IsFocused = true, Border = BorderStyle.None };
         finder.SetItems(
         [
             new FuzzyFinderItem("api", "ApiClient.cs", "src/Tessera"),
             new FuzzyFinderItem("fuzzy", "FuzzyFinder.cs", "src/Tessera/Controls"),
-            new FuzzyFinderItem("readme", "README.md", "docs"),
+            new FuzzyFinderItem("readme", "README.md", "docs")
         ]);
 
         finder.SetQuery("ffc");
 
-        TestAssert.Equal(1, finder.ResultCount, "FuzzyFinder should keep only matching results for a restrictive query.");
+        TestAssert.Equal(1, finder.ResultCount,
+            "FuzzyFinder should keep only matching results for a restrictive query.");
         TestAssert.True(finder.SelectedItem is not null, "FuzzyFinder should keep a selected item when results exist.");
         TestAssert.Equal("fuzzy", finder.SelectedItem!.Id, "FuzzyFinder should surface the matched item.");
         return Task.CompletedTask;
@@ -419,11 +420,7 @@ internal static class ProductivityPrebuiltWidgetTests
 
     private static Task FuzzyFinder_KeyboardNavigationAndEnter_RaisesSelection()
     {
-        var finder = new FuzzyFinder
-        {
-            IsFocused = true,
-            Border = BorderStyle.None,
-        };
+        var finder = new FuzzyFinder { IsFocused = true, Border = BorderStyle.None };
         finder.SetItems(["alpha", "beta", "gamma"]);
 
         FuzzyFinderSelectionChangedEventArgs? selectionChangedArgs = null;
@@ -436,9 +433,12 @@ internal static class ProductivityPrebuiltWidgetTests
         finder.Handle(new KeyPressed(Key.Enter));
 
         TestAssert.Equal(2, finder.SelectedIndex, "FuzzyFinder should move selection with keyboard navigation.");
-        TestAssert.True(selectionChangedArgs is not null, "FuzzyFinder should raise selection-changed when highlight moves.");
-        TestAssert.True(selectedArgs is not null, "FuzzyFinder should raise selected event when Enter activates a row.");
-        TestAssert.Equal("gamma", selectedArgs!.ItemId, "FuzzyFinder selected payload should include the selected item id.");
+        TestAssert.True(selectionChangedArgs is not null,
+            "FuzzyFinder should raise selection-changed when highlight moves.");
+        TestAssert.True(selectedArgs is not null,
+            "FuzzyFinder should raise selected event when Enter activates a row.");
+        TestAssert.Equal("gamma", selectedArgs!.ItemId,
+            "FuzzyFinder selected payload should include the selected item id.");
         TestAssert.True(
             string.Equals("gamma", finder.LastSelectedItemId, StringComparison.Ordinal),
             "FuzzyFinder should track the last activated item id.");
@@ -447,11 +447,7 @@ internal static class ProductivityPrebuiltWidgetTests
 
     private static Task FuzzyFinder_Escape_ClearsThenCloses()
     {
-        var finder = new FuzzyFinder
-        {
-            IsFocused = true,
-            Border = BorderStyle.None,
-        };
+        var finder = new FuzzyFinder { IsFocused = true, Border = BorderStyle.None };
         finder.SetItems(["alpha", "beta"]);
         finder.SetQuery("a");
 
@@ -469,10 +465,7 @@ internal static class ProductivityPrebuiltWidgetTests
 
     private static Task FuzzyFinder_MousePress_SelectsAndActivatesRow()
     {
-        var finder = new FuzzyFinder
-        {
-            Border = BorderStyle.None,
-        };
+        var finder = new FuzzyFinder { Border = BorderStyle.None };
         finder.SetItems(["one", "two", "three"]);
 
         FuzzyFinderItemSelectedEventArgs? selectedArgs = null;
@@ -482,7 +475,8 @@ internal static class ProductivityPrebuiltWidgetTests
         var changed = finder.Handle(new PointerInput(PointerEventKind.Press, PointerButton.Left, 2, 2), bounds);
 
         TestAssert.True(changed, "FuzzyFinder mouse press should select and activate a result row.");
-        TestAssert.Equal(1, finder.SelectedIndex, "FuzzyFinder mouse press should map row coordinates to selected index.");
+        TestAssert.Equal(1, finder.SelectedIndex,
+            "FuzzyFinder mouse press should map row coordinates to selected index.");
         TestAssert.True(selectedArgs is not null, "FuzzyFinder mouse press should raise item selected payload.");
         TestAssert.Equal("two", selectedArgs!.ItemId, "FuzzyFinder mouse press should activate clicked item.");
         return Task.CompletedTask;
@@ -495,7 +489,7 @@ internal static class ProductivityPrebuiltWidgetTests
             Border = BorderStyle.None,
             Placeholder = "search files",
             PlaceholderTextStyle = TesseraStyle.Empty.WithForeground(AnsiColor.BrightYellow),
-            SelectedItemStyle = TesseraStyle.Empty.WithBold(),
+            SelectedItemStyle = TesseraStyle.Empty.WithBold()
         };
         finder.SetItems(["alpha", "beta"]);
         var canvas = new Canvas(40, 4);
@@ -503,23 +497,23 @@ internal static class ProductivityPrebuiltWidgetTests
         finder.Render(canvas, new Rect(0, 0, 40, 4));
         var output = canvas.Render();
 
-        TestAssert.True(output.Contains("search files", StringComparison.Ordinal), "FuzzyFinder should render placeholder text.");
-        TestAssert.True(output.Contains("> alpha", StringComparison.Ordinal), "FuzzyFinder should render selected row marker.");
-        TestAssert.True(output.Contains("\u001b[38;5;11m", StringComparison.Ordinal), "FuzzyFinder should apply placeholder style SGR.");
+        TestAssert.True(output.Contains("search files", StringComparison.Ordinal),
+            "FuzzyFinder should render placeholder text.");
+        TestAssert.True(output.Contains("> alpha", StringComparison.Ordinal),
+            "FuzzyFinder should render selected row marker.");
+        TestAssert.True(output.Contains("\e[38;5;11m", StringComparison.Ordinal),
+            "FuzzyFinder should apply placeholder style SGR.");
         return Task.CompletedTask;
     }
 
     private static Task Stepper_KeyboardNavigationCompletionAndBounds()
     {
-        var stepper = new Stepper
-        {
-            IsFocused = true,
-        };
+        var stepper = new Stepper { IsFocused = true };
         stepper.SetSteps(
         [
             new StepperStep("intro", "Intro"),
             new StepperStep("review", "Review", isDisabled: true),
-            new StepperStep("finish", "Finish"),
+            new StepperStep("finish", "Finish")
         ]);
 
         TestAssert.Equal(0, stepper.CurrentIndex, "Stepper should select the first enabled step.");
@@ -544,15 +538,12 @@ internal static class ProductivityPrebuiltWidgetTests
 
     private static Task Stepper_CurrentStepChangedEvent_ReportsTransition()
     {
-        var stepper = new Stepper
-        {
-            IsFocused = true,
-        };
+        var stepper = new Stepper { IsFocused = true };
         stepper.SetSteps(
         [
             new StepperStep("intro", "Intro"),
             new StepperStep("config", "Config"),
-            new StepperStep("finish", "Finish"),
+            new StepperStep("finish", "Finish")
         ]);
 
         StepperCurrentStepChangedEventArgs? args = null;
@@ -563,29 +554,30 @@ internal static class ProductivityPrebuiltWidgetTests
         TestAssert.True(args is not null, "Stepper should raise current-step changed when the current step changes.");
         TestAssert.Equal(0, args!.PreviousIndex, "Stepper event should expose previous index.");
         TestAssert.Equal(2, args.CurrentIndex, "Stepper event should expose current index.");
-        TestAssert.Equal("intro", args.PreviousStep?.Id ?? string.Empty, "Stepper event should expose previous step id.");
-        TestAssert.Equal("finish", args.CurrentStep?.Id ?? string.Empty, "Stepper event should expose current step id.");
+        TestAssert.Equal("intro", args.PreviousStep?.Id ?? string.Empty,
+            "Stepper event should expose previous step id.");
+        TestAssert.Equal("finish", args.CurrentStep?.Id ?? string.Empty,
+            "Stepper event should expose current step id.");
         return Task.CompletedTask;
     }
 
     private static Task Stepper_MousePressSelectsStep()
     {
-        var stepper = new Stepper
-        {
-            Title = string.Empty,
-        };
+        var stepper = new Stepper { Title = string.Empty };
         stepper.SetSteps(
         [
             new StepperStep("intro", "Intro"),
             new StepperStep("config", "Config"),
-            new StepperStep("finish", "Finish"),
+            new StepperStep("finish", "Finish")
         ]);
 
-        var changed = stepper.Handle(new PointerInput(PointerEventKind.Press, PointerButton.Left, 15, 0), new Rect(0, 0, 80, 1));
+        var changed = stepper.Handle(new PointerInput(PointerEventKind.Press, PointerButton.Left, 15, 0),
+            new Rect(0, 0, 80, 1));
 
         TestAssert.True(changed, "Stepper click should update current step.");
         TestAssert.Equal(1, stepper.CurrentIndex, "Stepper click should select the step under pointer.");
-        TestAssert.Equal("config", stepper.CurrentStep?.Id ?? string.Empty, "Stepper click should expose selected step id.");
+        TestAssert.Equal("config", stepper.CurrentStep?.Id ?? string.Empty,
+            "Stepper click should expose selected step id.");
         return Task.CompletedTask;
     }
 
@@ -599,13 +591,13 @@ internal static class ProductivityPrebuiltWidgetTests
             CompletedStepStyle = TesseraStyle.Empty.WithForeground(AnsiColor.BrightGreen),
             ActiveStepStyle = TesseraStyle.Empty.WithForeground(AnsiColor.BrightCyan).WithBold(),
             PendingStepStyle = TesseraStyle.Empty.WithForeground(AnsiColor.BrightWhite),
-            DisabledStepStyle = TesseraStyle.Empty.WithDim(),
+            DisabledStepStyle = TesseraStyle.Empty.WithDim()
         };
         stepper.SetSteps(
         [
             new StepperStep("intro", "Intro"),
             new StepperStep("config", "Configure"),
-            new StepperStep("done", "Done", isDisabled: true),
+            new StepperStep("done", "Done", isDisabled: true)
         ]);
         stepper.SetStepCompleted(0);
         TestAssert.True(stepper.Steps[0].IsCompleted, "Stepper should mark the first step as completed for rendering.");
@@ -615,26 +607,27 @@ internal static class ProductivityPrebuiltWidgetTests
         stepper.Render(canvas, new Rect(0, 0, 120, 1));
         var output = canvas.Render();
 
-        TestAssert.True(output.Contains("Wizard *", StringComparison.Ordinal), "Stepper should render focused title marker.");
+        TestAssert.True(output.Contains("Wizard *", StringComparison.Ordinal),
+            "Stepper should render focused title marker.");
         TestAssert.Equal(1, stepper.CurrentIndex, "Stepper should keep active step index while rendering.");
         TestAssert.True(stepper.Steps[2].IsDisabled, "Stepper should keep disabled step state while rendering.");
-        TestAssert.Equal(TesseraStyle.Empty.WithForeground(AnsiColor.BrightYellow), stepper.ConnectorStyle, "Stepper should retain connector style hook value.");
-        TestAssert.Equal(TesseraStyle.Empty.WithForeground(AnsiColor.BrightGreen), stepper.CompletedStepStyle, "Stepper should retain completed-step style hook value.");
-        TestAssert.Equal(TesseraStyle.Empty.WithDim(), stepper.DisabledStepStyle, "Stepper should retain disabled-step style hook value.");
+        TestAssert.Equal(TesseraStyle.Empty.WithForeground(AnsiColor.BrightYellow), stepper.ConnectorStyle,
+            "Stepper should retain connector style hook value.");
+        TestAssert.Equal(TesseraStyle.Empty.WithForeground(AnsiColor.BrightGreen), stepper.CompletedStepStyle,
+            "Stepper should retain completed-step style hook value.");
+        TestAssert.Equal(TesseraStyle.Empty.WithDim(), stepper.DisabledStepStyle,
+            "Stepper should retain disabled-step style hook value.");
         return Task.CompletedTask;
     }
 
     private static Task PropertyGrid_KeyboardNavigationAndReadOnlySemantics()
     {
-        var grid = new PropertyGrid
-        {
-            IsFocused = true,
-        };
+        var grid = new PropertyGrid { IsFocused = true };
         grid.SetProperties(
         [
             new PropertyGridProperty("Host", "localhost", "General"),
             new PropertyGridProperty("Port", "5432", "General"),
-            new PropertyGridProperty("Timeout", "30s", "Network"),
+            new PropertyGridProperty("Timeout", "30s", "Network")
         ]);
 
         var upAtStart = grid.Handle(new KeyPressed(Key.Up));
@@ -658,14 +651,11 @@ internal static class ProductivityPrebuiltWidgetTests
 
     private static Task PropertyGrid_SelectionChangedEvent_ReportsTransition()
     {
-        var grid = new PropertyGrid
-        {
-            IsFocused = true,
-        };
+        var grid = new PropertyGrid { IsFocused = true };
         grid.SetProperties(
         [
             new PropertyGridProperty("User", "tea"),
-            new PropertyGridProperty("Retries", "3"),
+            new PropertyGridProperty("Retries", "3")
         ]);
 
         PropertyGridSelectionChangedEventArgs? args = null;
@@ -678,22 +668,21 @@ internal static class ProductivityPrebuiltWidgetTests
         TestAssert.Equal(1, args.CurrentIndex, "PropertyGrid event should expose current index.");
         TestAssert.True(args.PreviousProperty is not null, "PropertyGrid event should expose previous property.");
         TestAssert.True(args.CurrentProperty is not null, "PropertyGrid event should expose current property.");
-        TestAssert.Equal("User", args.PreviousProperty!.Name, "PropertyGrid event previous property should match previous selection.");
-        TestAssert.Equal("Retries", args.CurrentProperty!.Name, "PropertyGrid event current property should match new selection.");
+        TestAssert.Equal("User", args.PreviousProperty!.Name,
+            "PropertyGrid event previous property should match previous selection.");
+        TestAssert.Equal("Retries", args.CurrentProperty!.Name,
+            "PropertyGrid event current property should match new selection.");
         return Task.CompletedTask;
     }
 
     private static Task PropertyGrid_RendersHeadersCategoriesAndSelection()
     {
-        var grid = new PropertyGrid
-        {
-            Border = BorderStyle.None,
-        };
+        var grid = new PropertyGrid { Border = BorderStyle.None };
         grid.SetProperties(
         [
             new PropertyGridProperty("Host", "localhost", "General"),
             new PropertyGridProperty("Port", "5432", "General"),
-            new PropertyGridProperty("Timeout", "30s", "Network"),
+            new PropertyGridProperty("Timeout", "30s", "Network")
         ]);
         grid.SetSelectedIndex(1);
         var canvas = new Canvas(52, 8);
@@ -701,10 +690,14 @@ internal static class ProductivityPrebuiltWidgetTests
         grid.Render(canvas, new Rect(0, 0, 52, 8));
         var output = canvas.Render();
 
-        TestAssert.True(output.Contains("Property", StringComparison.Ordinal), "PropertyGrid should render key column header.");
-        TestAssert.True(output.Contains("Value", StringComparison.Ordinal), "PropertyGrid should render value column header.");
-        TestAssert.True(output.Contains("[General]", StringComparison.Ordinal), "PropertyGrid should render category header.");
-        TestAssert.True(output.Contains("> Port", StringComparison.Ordinal), "PropertyGrid should render selected row marker.");
+        TestAssert.True(output.Contains("Property", StringComparison.Ordinal),
+            "PropertyGrid should render key column header.");
+        TestAssert.True(output.Contains("Value", StringComparison.Ordinal),
+            "PropertyGrid should render value column header.");
+        TestAssert.True(output.Contains("[General]", StringComparison.Ordinal),
+            "PropertyGrid should render category header.");
+        TestAssert.True(output.Contains("> Port", StringComparison.Ordinal),
+            "PropertyGrid should render selected row marker.");
         return Task.CompletedTask;
     }
 
@@ -716,12 +709,12 @@ internal static class ProductivityPrebuiltWidgetTests
             HeaderStyle = TesseraStyle.Empty.WithForeground(AnsiColor.BrightBlue),
             KeyStyle = TesseraStyle.Empty.WithForeground(AnsiColor.BrightCyan),
             ValueStyle = TesseraStyle.Empty.WithForeground(AnsiColor.BrightGreen),
-            SelectedRowStyle = TesseraStyle.Empty.WithUnderline().WithBold(),
+            SelectedRowStyle = TesseraStyle.Empty.WithUnderline().WithBold()
         };
         grid.SetProperties(
         [
             new PropertyGridProperty("Mode", "prod", "Runtime"),
-            new PropertyGridProperty("Workers", "8", "Runtime"),
+            new PropertyGridProperty("Workers", "8", "Runtime")
         ]);
         grid.SetSelectedIndex(1);
         var canvas = new Canvas(52, 6);
@@ -729,15 +722,18 @@ internal static class ProductivityPrebuiltWidgetTests
         grid.Render(canvas, new Rect(0, 0, 52, 6));
         var output = canvas.Render();
 
-        TestAssert.True(output.Contains("\u001b[38;5;12m", StringComparison.Ordinal), "PropertyGrid header style should emit SGR fragments.");
-        TestAssert.True(output.Contains("\u001b[38;5;14m", StringComparison.Ordinal), "PropertyGrid key style should emit SGR fragments.");
-        TestAssert.True(output.Contains("\u001b[38;5;10m", StringComparison.Ordinal), "PropertyGrid value style should emit SGR fragments.");
-        var hasCombinedBoldUnderline = output.Contains("\u001b[1;4m", StringComparison.Ordinal)
-            || output.Contains("\u001b[4;1m", StringComparison.Ordinal)
-            || output.Contains("\u001b[1;4;", StringComparison.Ordinal)
-            || output.Contains("\u001b[4;1;", StringComparison.Ordinal);
-        var hasSeparateBoldUnderline = output.Contains("\u001b[1;", StringComparison.Ordinal)
-            && output.Contains(";4m", StringComparison.Ordinal);
+        TestAssert.True(output.Contains("\e[38;5;12m", StringComparison.Ordinal),
+            "PropertyGrid header style should emit SGR fragments.");
+        TestAssert.True(output.Contains("\e[38;5;14m", StringComparison.Ordinal),
+            "PropertyGrid key style should emit SGR fragments.");
+        TestAssert.True(output.Contains("\e[38;5;10m", StringComparison.Ordinal),
+            "PropertyGrid value style should emit SGR fragments.");
+        var hasCombinedBoldUnderline = output.Contains("\e[1;4m", StringComparison.Ordinal)
+                                       || output.Contains("\e[4;1m", StringComparison.Ordinal)
+                                       || output.Contains("\e[1;4;", StringComparison.Ordinal)
+                                       || output.Contains("\e[4;1;", StringComparison.Ordinal);
+        var hasSeparateBoldUnderline = output.Contains("\e[1;", StringComparison.Ordinal)
+                                       && output.Contains(";4m", StringComparison.Ordinal);
         TestAssert.True(
             hasCombinedBoldUnderline || hasSeparateBoldUnderline,
             "PropertyGrid selected row style should merge into row rendering.");
@@ -746,15 +742,12 @@ internal static class ProductivityPrebuiltWidgetTests
 
     private static Task KeyValueList_KeyboardNavigationAndBounds()
     {
-        var list = new KeyValueList
-        {
-            IsFocused = true,
-        };
+        var list = new KeyValueList { IsFocused = true };
         list.SetEntries(
         [
             new KeyValueListEntry("Host", "localhost"),
             new KeyValueListEntry("Port", "5432"),
-            new KeyValueListEntry("Timeout", "30s"),
+            new KeyValueListEntry("Timeout", "30s")
         ]);
 
         var upAtStart = list.Handle(new KeyPressed(Key.Up));
@@ -778,14 +771,11 @@ internal static class ProductivityPrebuiltWidgetTests
 
     private static Task KeyValueList_SelectionChangedEvent_ReportsTransition()
     {
-        var list = new KeyValueList
-        {
-            IsFocused = true,
-        };
+        var list = new KeyValueList { IsFocused = true };
         list.SetEntries(
         [
             new KeyValueListEntry("User", "tea"),
-            new KeyValueListEntry("Retries", "3"),
+            new KeyValueListEntry("Retries", "3")
         ]);
 
         KeyValueListSelectionChangedEventArgs? args = null;
@@ -798,25 +788,24 @@ internal static class ProductivityPrebuiltWidgetTests
         TestAssert.Equal(1, args.CurrentIndex, "KeyValueList event should expose current index.");
         TestAssert.True(args.PreviousItem is not null, "KeyValueList event should expose previous item.");
         TestAssert.True(args.CurrentItem is not null, "KeyValueList event should expose current item.");
-        TestAssert.Equal("User", args.PreviousItem!.Key, "KeyValueList previous item key should match previous selection.");
+        TestAssert.Equal("User", args.PreviousItem!.Key,
+            "KeyValueList previous item key should match previous selection.");
         TestAssert.Equal("Retries", args.CurrentItem!.Key, "KeyValueList current item key should match new selection.");
         return Task.CompletedTask;
     }
 
     private static Task KeyValueList_MousePressSelectsRow()
     {
-        var list = new KeyValueList
-        {
-            Border = BorderStyle.None,
-        };
+        var list = new KeyValueList { Border = BorderStyle.None };
         list.SetEntries(
         [
             new KeyValueListEntry("Host", "localhost"),
             new KeyValueListEntry("Port", "5432"),
-            new KeyValueListEntry("Timeout", "30s"),
+            new KeyValueListEntry("Timeout", "30s")
         ]);
 
-        var changed = list.Handle(new PointerInput(PointerEventKind.Press, PointerButton.Left, 0, 1), new Rect(0, 0, 48, 3));
+        var changed = list.Handle(new PointerInput(PointerEventKind.Press, PointerButton.Left, 0, 1),
+            new Rect(0, 0, 48, 3));
 
         TestAssert.True(changed, "KeyValueList click should update selected row.");
         TestAssert.Equal(1, list.SelectedIndex, "KeyValueList click should select row by pointer Y offset.");
@@ -833,12 +822,12 @@ internal static class ProductivityPrebuiltWidgetTests
             KeyStyle = TesseraStyle.Empty.WithForeground(AnsiColor.BrightCyan),
             ValueStyle = TesseraStyle.Empty.WithForeground(AnsiColor.BrightGreen),
             SeparatorStyle = TesseraStyle.Empty.WithForeground(AnsiColor.BrightYellow),
-            SelectedRowStyle = TesseraStyle.Empty.WithBold(),
+            SelectedRowStyle = TesseraStyle.Empty.WithBold()
         };
         list.SetEntries(
         [
             new KeyValueListEntry("Host", "localhost"),
-            new KeyValueListEntry("Port", "5432"),
+            new KeyValueListEntry("Port", "5432")
         ]);
         list.SetSelectedIndex(1);
         var canvas = new Canvas(48, 3);
@@ -846,20 +835,21 @@ internal static class ProductivityPrebuiltWidgetTests
         list.Render(canvas, new Rect(0, 0, 48, 3));
         var output = canvas.Render();
 
-        var hasSelectedMarker = output.Contains("> ", StringComparison.Ordinal) && output.Contains("Port", StringComparison.Ordinal);
+        var hasSelectedMarker = output.Contains("> ", StringComparison.Ordinal) &&
+                                output.Contains("Port", StringComparison.Ordinal);
         TestAssert.True(hasSelectedMarker, "KeyValueList should render selected row marker.");
-        var hasKeyColor = output.Contains("\u001b[38;5;14m", StringComparison.Ordinal)
-            || output.Contains(";5;14m", StringComparison.Ordinal)
-            || output.Contains("\u001b[96m", StringComparison.Ordinal)
-            || output.Contains(";96m", StringComparison.Ordinal)
-            || output.Contains("\u001b[36m", StringComparison.Ordinal)
-            || output.Contains(";36m", StringComparison.Ordinal);
-        var hasSeparatorColor = output.Contains("\u001b[38;5;11m", StringComparison.Ordinal)
-            || output.Contains(";5;11m", StringComparison.Ordinal)
-            || output.Contains("\u001b[93m", StringComparison.Ordinal)
-            || output.Contains(";93m", StringComparison.Ordinal)
-            || output.Contains("\u001b[33m", StringComparison.Ordinal)
-            || output.Contains(";33m", StringComparison.Ordinal);
+        var hasKeyColor = output.Contains("\e[38;5;14m", StringComparison.Ordinal)
+                          || output.Contains(";5;14m", StringComparison.Ordinal)
+                          || output.Contains("\e[96m", StringComparison.Ordinal)
+                          || output.Contains(";96m", StringComparison.Ordinal)
+                          || output.Contains("\e[36m", StringComparison.Ordinal)
+                          || output.Contains(";36m", StringComparison.Ordinal);
+        var hasSeparatorColor = output.Contains("\e[38;5;11m", StringComparison.Ordinal)
+                                || output.Contains(";5;11m", StringComparison.Ordinal)
+                                || output.Contains("\e[93m", StringComparison.Ordinal)
+                                || output.Contains(";93m", StringComparison.Ordinal)
+                                || output.Contains("\e[33m", StringComparison.Ordinal)
+                                || output.Contains(";33m", StringComparison.Ordinal);
         TestAssert.True(hasKeyColor, "KeyValueList key style should emit SGR fragments.");
         TestAssert.True(hasSeparatorColor, "KeyValueList separator style should emit SGR fragments.");
         return Task.CompletedTask;
@@ -867,10 +857,7 @@ internal static class ProductivityPrebuiltWidgetTests
 
     private static Task SearchBox_UpdatesQueryAndRaisesEvent()
     {
-        var search = new SearchBox
-        {
-            IsFocused = true,
-        };
+        var search = new SearchBox { IsFocused = true };
         SearchBoxQueryChangedEventArgs? args = null;
         var raised = 0;
         search.QueryChanged += (_, eventArgs) =>
@@ -892,10 +879,7 @@ internal static class ProductivityPrebuiltWidgetTests
 
     private static Task SearchBox_NavigationCommands_UpdateIndexAndRaiseEvent()
     {
-        var search = new SearchBox
-        {
-            IsFocused = true,
-        };
+        var search = new SearchBox { IsFocused = true };
         search.SetMatchState(5, 0);
 
         SearchBoxNavigationRequestedEventArgs? args = null;
@@ -911,9 +895,11 @@ internal static class ProductivityPrebuiltWidgetTests
         search.Handle(new KeyPressed(Key.F3, string.Empty, ModifierKeys.Shift));
 
         TestAssert.Equal(3, raised, "SearchBox should raise navigation requested per navigation command.");
-        TestAssert.Equal(1, search.CurrentMatchIndex ?? -1, "SearchBox should update current match index based on navigation.");
+        TestAssert.Equal(1, search.CurrentMatchIndex ?? -1,
+            "SearchBox should update current match index based on navigation.");
         TestAssert.True(args is not null, "SearchBox should expose navigation payload details.");
-        TestAssert.True(args!.Direction == SearchNavigationDirection.Previous, "SearchBox should report previous direction on Shift+F3.");
+        TestAssert.True(args!.Direction == SearchNavigationDirection.Previous,
+            "SearchBox should report previous direction on Shift+F3.");
         TestAssert.Equal(2, args.PreviousMatchIndex ?? -1, "SearchBox should report previous index before navigation.");
         TestAssert.Equal(1, args.CurrentMatchIndex ?? -1, "SearchBox should report current index after navigation.");
         return Task.CompletedTask;
@@ -921,10 +907,7 @@ internal static class ProductivityPrebuiltWidgetTests
 
     private static Task SearchBox_MousePressOnHitTargets_Navigates()
     {
-        var search = new SearchBox
-        {
-            Border = BorderStyle.None,
-        };
+        var search = new SearchBox { Border = BorderStyle.None };
         search.SetMatchState(3, 0);
         var bounds = new Rect(0, 0, 30, 1);
 
@@ -932,29 +915,31 @@ internal static class ProductivityPrebuiltWidgetTests
         TestAssert.True(nextChanged, "SearchBox next hit target click should be handled.");
         TestAssert.Equal(1, search.CurrentMatchIndex ?? -1, "SearchBox next hit target should move to next match.");
 
-        var previousChanged = search.Handle(new PointerInput(PointerEventKind.Press, PointerButton.Left, 21, 0), bounds);
+        var previousChanged =
+            search.Handle(new PointerInput(PointerEventKind.Press, PointerButton.Left, 21, 0), bounds);
         TestAssert.True(previousChanged, "SearchBox previous hit target click should be handled.");
-        TestAssert.Equal(0, search.CurrentMatchIndex ?? -1, "SearchBox previous hit target should move to previous match.");
+        TestAssert.Equal(0, search.CurrentMatchIndex ?? -1,
+            "SearchBox previous hit target should move to previous match.");
         return Task.CompletedTask;
     }
 
     private static Task SearchBox_RendersPlaceholderAndMatchCounter()
     {
-        var search = new SearchBox
-        {
-            Border = BorderStyle.None,
-            Placeholder = "find text",
-        };
+        var search = new SearchBox { Border = BorderStyle.None, Placeholder = "find text" };
         search.SetMatchState(8, 2);
         var canvas = new Canvas(36, 1);
 
         search.Render(canvas, new Rect(0, 0, 36, 1));
         var output = canvas.Render();
 
-        TestAssert.True(output.Contains("find text", StringComparison.Ordinal), "SearchBox should render placeholder text when query is empty.");
-        TestAssert.True(output.Contains("3/8", StringComparison.Ordinal), "SearchBox should render current/total match label.");
-        TestAssert.True(output.Contains("Prev", StringComparison.Ordinal), "SearchBox should render previous navigation label.");
-        TestAssert.True(output.Contains("Next", StringComparison.Ordinal), "SearchBox should render next navigation label.");
+        TestAssert.True(output.Contains("find text", StringComparison.Ordinal),
+            "SearchBox should render placeholder text when query is empty.");
+        TestAssert.True(output.Contains("3/8", StringComparison.Ordinal),
+            "SearchBox should render current/total match label.");
+        TestAssert.True(output.Contains("Prev", StringComparison.Ordinal),
+            "SearchBox should render previous navigation label.");
+        TestAssert.True(output.Contains("Next", StringComparison.Ordinal),
+            "SearchBox should render next navigation label.");
         return Task.CompletedTask;
     }
 
@@ -969,7 +954,7 @@ internal static class ProductivityPrebuiltWidgetTests
             Border = BorderStyle.SingleLine,
             BorderStyleText = TesseraStyle.Empty.WithForeground(AnsiColor.BrightBlue),
             FocusedBorderStyleText = TesseraStyle.Empty.WithBold(),
-            DisabledNavigationLabelStyle = TesseraStyle.Empty.WithForeground(AnsiColor.BrightBlack),
+            DisabledNavigationLabelStyle = TesseraStyle.Empty.WithForeground(AnsiColor.BrightBlack)
         };
         search.SetQueryText("abc");
 
@@ -977,9 +962,12 @@ internal static class ProductivityPrebuiltWidgetTests
         search.Render(focusedCanvas, new Rect(0, 0, 40, 3));
         var focusedOutput = focusedCanvas.Render();
 
-        TestAssert.True(focusedOutput.Contains("Search !", StringComparison.Ordinal), "SearchBox should render custom focus marker in title.");
-        TestAssert.True(ContainsBoldSgr(focusedOutput), "SearchBox should merge focused border style into border glyph rendering.");
-        TestAssert.True(ContainsBlueForegroundSgr(focusedOutput), "SearchBox should apply configured border color style.");
+        TestAssert.True(focusedOutput.Contains("Search !", StringComparison.Ordinal),
+            "SearchBox should render custom focus marker in title.");
+        TestAssert.True(ContainsBoldSgr(focusedOutput),
+            "SearchBox should merge focused border style into border glyph rendering.");
+        TestAssert.True(ContainsBlueForegroundSgr(focusedOutput),
+            "SearchBox should apply configured border color style.");
 
         search.IsFocused = false;
         search.IsDisabled = true;
@@ -987,16 +975,14 @@ internal static class ProductivityPrebuiltWidgetTests
         search.Render(disabledCanvas, new Rect(0, 0, 40, 3));
         var disabledOutput = disabledCanvas.Render();
 
-        TestAssert.True(ContainsMutedForegroundSgr(disabledOutput), "SearchBox disabled border should merge muted styling.");
+        TestAssert.True(ContainsMutedForegroundSgr(disabledOutput),
+            "SearchBox disabled border should merge muted styling.");
         return Task.CompletedTask;
     }
 
     private static Task MarkdownView_RendersMarkdown()
     {
-        var viewer = new MarkdownView
-        {
-            Border = BorderStyle.None,
-        };
+        var viewer = new MarkdownView { Border = BorderStyle.None };
         viewer.SetMarkdown("# title\n- one\n```\ncode\n```");
         var canvas = new Canvas(40, 8);
 
@@ -1005,35 +991,36 @@ internal static class ProductivityPrebuiltWidgetTests
 
         TestAssert.True(output.Contains("# TITLE", StringComparison.Ordinal), "Markdown viewer should render heading.");
         TestAssert.True(output.Contains("• one", StringComparison.Ordinal), "Markdown viewer should render bullets.");
-        TestAssert.True(output.Contains("code", StringComparison.Ordinal), "Markdown viewer should render code block content.");
+        TestAssert.True(output.Contains("code", StringComparison.Ordinal),
+            "Markdown viewer should render code block content.");
         return Task.CompletedTask;
     }
 
     private static bool ContainsBoldSgr(string value)
     {
-        return value.Contains("\u001b[1m", StringComparison.Ordinal)
-            || value.Contains(";1m", StringComparison.Ordinal)
-            || value.Contains("[1;", StringComparison.Ordinal)
-            || value.Contains(";1;", StringComparison.Ordinal);
+        return value.Contains("\e[1m", StringComparison.Ordinal)
+               || value.Contains(";1m", StringComparison.Ordinal)
+               || value.Contains("[1;", StringComparison.Ordinal)
+               || value.Contains(";1;", StringComparison.Ordinal);
     }
 
     private static bool ContainsBlueForegroundSgr(string value)
     {
-        return value.Contains("\u001b[94m", StringComparison.Ordinal)
-            || value.Contains(";94m", StringComparison.Ordinal)
-            || value.Contains("\u001b[38;5;12m", StringComparison.Ordinal)
-            || value.Contains(";5;12m", StringComparison.Ordinal)
-            || value.Contains("\u001b[34m", StringComparison.Ordinal)
-            || value.Contains(";34m", StringComparison.Ordinal);
+        return value.Contains("\e[94m", StringComparison.Ordinal)
+               || value.Contains(";94m", StringComparison.Ordinal)
+               || value.Contains("\e[38;5;12m", StringComparison.Ordinal)
+               || value.Contains(";5;12m", StringComparison.Ordinal)
+               || value.Contains("\e[34m", StringComparison.Ordinal)
+               || value.Contains(";34m", StringComparison.Ordinal);
     }
 
     private static bool ContainsMutedForegroundSgr(string value)
     {
-        return value.Contains("\u001b[90m", StringComparison.Ordinal)
-            || value.Contains(";90m", StringComparison.Ordinal)
-            || value.Contains("\u001b[38;5;8m", StringComparison.Ordinal)
-            || value.Contains(";5;8m", StringComparison.Ordinal)
-            || value.Contains("\u001b[30m", StringComparison.Ordinal)
-            || value.Contains(";30m", StringComparison.Ordinal);
+        return value.Contains("\e[90m", StringComparison.Ordinal)
+               || value.Contains(";90m", StringComparison.Ordinal)
+               || value.Contains("\e[38;5;8m", StringComparison.Ordinal)
+               || value.Contains(";5;8m", StringComparison.Ordinal)
+               || value.Contains("\e[30m", StringComparison.Ordinal)
+               || value.Contains(";30m", StringComparison.Ordinal);
     }
 }

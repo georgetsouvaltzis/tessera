@@ -1,22 +1,22 @@
 namespace Tessera.Controls;
 
 /// <summary>
-/// Represents the severity level of a validation issue.
+///     Represents the severity level of a validation issue.
 /// </summary>
 public enum ValidationSeverity
 {
     /// <summary>
-    /// Informational issue.
+    ///     Informational issue.
     /// </summary>
     Info = 0,
 
     /// <summary>
-    /// Warning issue.
+    ///     Warning issue.
     /// </summary>
     Warning = 1,
 
     /// <summary>
-    /// Error issue.
+    ///     Error issue.
     /// </summary>
-    Error = 2,
+    Error = 2
 }

@@ -1,5 +1,4 @@
 using NUnit.Framework;
-using Tessera.Components.Primitives;
 using Tessera.Controls;
 
 namespace Tessera.Tests;
@@ -16,7 +15,7 @@ public sealed class NotificationInboxSelectionChangedEventTests
         [
             new InboxItem("a", "alpha", NotificationLevel.Info, DateTimeOffset.UnixEpoch),
             new InboxItem("b", "beta", NotificationLevel.Warning, DateTimeOffset.UnixEpoch),
-            new InboxItem("c", "gamma", NotificationLevel.Error, DateTimeOffset.UnixEpoch),
+            new InboxItem("c", "gamma", NotificationLevel.Error, DateTimeOffset.UnixEpoch)
         ]);
 
         ListSelectionChangedEventArgs<InboxItem>? observed = null;
@@ -39,7 +38,7 @@ public sealed class NotificationInboxSelectionChangedEventTests
         control.SetItems(
         [
             new InboxItem("a", "alpha", NotificationLevel.Info, DateTimeOffset.UnixEpoch),
-            new InboxItem("b", "beta", NotificationLevel.Warning, DateTimeOffset.UnixEpoch),
+            new InboxItem("b", "beta", NotificationLevel.Warning, DateTimeOffset.UnixEpoch)
         ]);
 
         ListSelectionChangedEventArgs<InboxItem>? observed = null;
@@ -57,14 +56,11 @@ public sealed class NotificationInboxSelectionChangedEventTests
     [Test]
     public void NotificationInboxSelectionChangedEventRemoveSelectedRaisesTransitionToRemainingItem()
     {
-        var control = new NotificationInbox
-        {
-            IsFocused = true,
-        };
+        var control = new NotificationInbox { IsFocused = true };
         control.SetItems(
         [
             new InboxItem("a", "alpha", NotificationLevel.Info, DateTimeOffset.UnixEpoch),
-            new InboxItem("b", "beta", NotificationLevel.Warning, DateTimeOffset.UnixEpoch),
+            new InboxItem("b", "beta", NotificationLevel.Warning, DateTimeOffset.UnixEpoch)
         ]);
         control.Select(1);
 

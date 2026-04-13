@@ -1,4 +1,4 @@
-﻿using Tessera.Components.Primitives;
+using Tessera.Components.Primitives;
 using Tessera.Components.Primitives.Internal;
 using Tessera.Controls.Internal;
 using Tessera.Layout;
@@ -7,30 +7,22 @@ using Tessera.Styles;
 namespace Tessera.Controls;
 
 /// <summary>
-/// Represents a bounded progress indicator.
+///     Represents a bounded progress indicator.
 /// </summary>
 public sealed class ProgressBar : Control
 {
     /// <summary>
-    /// Represents title.
+    ///     Represents title.
     /// </summary>
-    public string Title
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = "Progress";
+    public string Title { get; set; } = "Progress";
 
     /// <summary>
-    /// Represents focus marker.
+    ///     Represents focus marker.
     /// </summary>
-    public string FocusMarker
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = "*";
+    public string FocusMarker { get; set; } = "*";
 
     /// <summary>
-    /// Represents show focus marker.
+    ///     Represents show focus marker.
     /// </summary>
     public bool ShowFocusMarker
     {
@@ -39,7 +31,7 @@ public sealed class ProgressBar : Control
     } = true;
 
     /// <summary>
-    /// Represents title style.
+    ///     Represents title style.
     /// </summary>
     public TesseraStyle TitleStyle
     {
@@ -48,7 +40,7 @@ public sealed class ProgressBar : Control
     } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Represents focused title style.
+    ///     Represents focused title style.
     /// </summary>
     public TesseraStyle FocusedTitleStyle
     {
@@ -57,7 +49,7 @@ public sealed class ProgressBar : Control
     } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Represents fill style.
+    ///     Represents fill style.
     /// </summary>
     public TesseraStyle FillStyle
     {
@@ -66,7 +58,7 @@ public sealed class ProgressBar : Control
     } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Represents track style.
+    ///     Represents track style.
     /// </summary>
     public TesseraStyle TrackStyle
     {
@@ -75,7 +67,7 @@ public sealed class ProgressBar : Control
     } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Represents label style.
+    ///     Represents label style.
     /// </summary>
     public TesseraStyle LabelStyle
     {
@@ -84,7 +76,7 @@ public sealed class ProgressBar : Control
     } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Represents disabled style.
+    ///     Represents disabled style.
     /// </summary>
     public TesseraStyle DisabledStyle
     {
@@ -93,7 +85,7 @@ public sealed class ProgressBar : Control
     } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the style applied to border glyphs when the control is not focused.
+    ///     Gets or sets the style applied to border glyphs when the control is not focused.
     /// </summary>
     public TesseraStyle BorderStyleText
     {
@@ -102,7 +94,7 @@ public sealed class ProgressBar : Control
     } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the style applied to border glyphs when the control is focused.
+    ///     Gets or sets the style applied to border glyphs when the control is focused.
     /// </summary>
     public TesseraStyle FocusedBorderStyleText
     {
@@ -111,12 +103,12 @@ public sealed class ProgressBar : Control
     } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the value.
+    ///     Gets or sets the value.
     /// </summary>
     public double Value { get; private set; }
 
     /// <summary>
-    /// Represents step.
+    ///     Represents step.
     /// </summary>
     public double Step
     {
@@ -125,7 +117,7 @@ public sealed class ProgressBar : Control
     } = 0.05;
 
     /// <summary>
-    /// Represents border.
+    ///     Represents border.
     /// </summary>
     public BorderStyle Border
     {
@@ -134,7 +126,7 @@ public sealed class ProgressBar : Control
     } = BorderStyle.SingleLine;
 
     /// <summary>
-    /// Represents padding.
+    ///     Represents padding.
     /// </summary>
     public Thickness Padding
     {
@@ -164,10 +156,13 @@ public sealed class ProgressBar : Control
     }
 
     /// <summary>
-    /// Executes set value.
+    ///     Executes set value.
     /// </summary>
     /// <param name="value)">The value value.</param>
-    public void SetValue(double value) => Value = Math.Clamp(value, 0.0, 1.0);
+    public void SetValue(double value)
+    {
+        Value = Math.Clamp(value, 0.0, 1.0);
+    }
 
     /// <inheritdoc />
     public override bool Handle(Message message)
@@ -240,7 +235,8 @@ public sealed class ProgressBar : Control
 
     internal override LayoutMeasurement Measure(in Rect availableBounds)
     {
-        var width = Math.Max(12, ControlTextLayout.MeasureDisplayWidth(FormatTitleForMeasure()) + 4) + Padding.Horizontal;
+        var width = Math.Max(12, ControlTextLayout.MeasureDisplayWidth(FormatTitleForMeasure()) + 4) +
+                    Padding.Horizontal;
         var height = Padding.Vertical + 2;
         if (Border != BorderStyle.None)
         {

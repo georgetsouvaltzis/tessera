@@ -1,7 +1,7 @@
 namespace Tessera.Controls;
 
 /// <summary>
-/// Represents one rendered day cell in a <see cref="CalendarMonthView" /> grid.
+///     Represents one rendered day cell in a <see cref="CalendarMonthView" /> grid.
 /// </summary>
 public readonly record struct CalendarDayCell(
     DateOnly Date,

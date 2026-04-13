@@ -219,7 +219,8 @@ public sealed partial class FuzzyFinder
         var previousIndex = SelectedIndex;
         var previousItem = SelectedItem;
         _selectedIndex = clamped;
-        SelectionChanged?.Invoke(this, new FuzzyFinderSelectionChangedEventArgs(previousIndex, _selectedIndex, previousItem, SelectedItem));
+        SelectionChanged?.Invoke(this,
+            new FuzzyFinderSelectionChangedEventArgs(previousIndex, _selectedIndex, previousItem, SelectedItem));
         return true;
     }
 

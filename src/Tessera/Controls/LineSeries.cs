@@ -3,7 +3,7 @@ using Tessera.Styles;
 namespace Tessera.Controls;
 
 /// <summary>
-/// Represents one named series in a <see cref="LinePlot"/>.
+///     Represents one named series in a <see cref="LinePlot" />.
 /// </summary>
 public sealed class LineSeries
 {
@@ -11,16 +11,16 @@ public sealed class LineSeries
     private int? _capacity;
 
     /// <summary>
-    /// Initializes an empty line series.
+    ///     Initializes an empty line series.
     /// </summary>
     /// <param name="name">Series display name.</param>
     public LineSeries(string name = "")
     {
-        Name = name ?? string.Empty;
+        Name = name;
     }
 
     /// <summary>
-    /// Initializes a line series with initial samples.
+    ///     Initializes a line series with initial samples.
     /// </summary>
     /// <param name="name">Series display name.</param>
     /// <param name="samples">Initial sample values.</param>
@@ -31,16 +31,12 @@ public sealed class LineSeries
     }
 
     /// <summary>
-    /// Gets or sets the series display name.
+    ///     Gets or sets the series display name.
     /// </summary>
-    public string Name
-    {
-        get;
-        set => field = value ?? string.Empty;
-    }
+    public string Name { get; set; }
 
     /// <summary>
-    /// Gets or sets the style used for this series line and legend text.
+    ///     Gets or sets the style used for this series line and legend text.
     /// </summary>
     public TesseraStyle Style
     {
@@ -49,7 +45,7 @@ public sealed class LineSeries
     } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the glyph used for plotted points.
+    ///     Gets or sets the glyph used for plotted points.
     /// </summary>
     public char PointGlyph
     {
@@ -58,15 +54,15 @@ public sealed class LineSeries
     } = '●';
 
     /// <summary>
-    /// Gets or sets the per-series scaling mode used by <see cref="LinePlot"/>.
+    ///     Gets or sets the per-series scaling mode used by <see cref="LinePlot" />.
     /// </summary>
     public LineSeriesScaleMode ScaleMode { get; set; } = LineSeriesScaleMode.Shared;
 
     /// <summary>
-    /// Gets or sets an optional retained sample capacity.
+    ///     Gets or sets an optional retained sample capacity.
     /// </summary>
     /// <remarks>
-    /// When set, older samples are trimmed automatically after <see cref="SetSamples"/> and <see cref="Append"/>.
+    ///     When set, older samples are trimmed automatically after <see cref="SetSamples" /> and <see cref="Append" />.
     /// </remarks>
     /// <exception cref="ArgumentOutOfRangeException">Thrown when the value is less than 1.</exception>
     public int? Capacity
@@ -85,12 +81,12 @@ public sealed class LineSeries
     }
 
     /// <summary>
-    /// Gets the retained sample values.
+    ///     Gets the retained sample values.
     /// </summary>
     public IReadOnlyList<double> Samples => _samples;
 
     /// <summary>
-    /// Replaces the current sample values.
+    ///     Replaces the current sample values.
     /// </summary>
     /// <param name="samples">Values in display order.</param>
     public void SetSamples(IEnumerable<double> samples)
@@ -107,7 +103,7 @@ public sealed class LineSeries
     }
 
     /// <summary>
-    /// Appends one sample value.
+    ///     Appends one sample value.
     /// </summary>
     /// <param name="sample">Sample value.</param>
     public void Append(double sample)
@@ -117,10 +113,10 @@ public sealed class LineSeries
     }
 
     /// <summary>
-    /// Trims retained samples to the last <paramref name="count"/> values.
+    ///     Trims retained samples to the last <paramref name="count" /> values.
     /// </summary>
     /// <param name="count">The number of trailing samples to keep.</param>
-    /// <exception cref="ArgumentOutOfRangeException">Thrown when <paramref name="count"/> is negative.</exception>
+    /// <exception cref="ArgumentOutOfRangeException">Thrown when <paramref name="count" /> is negative.</exception>
     public void TrimToLast(int count)
     {
         if (count < 0)
@@ -141,7 +137,7 @@ public sealed class LineSeries
     }
 
     /// <summary>
-    /// Clears all sample values.
+    ///     Clears all sample values.
     /// </summary>
     public void Clear()
     {
@@ -158,17 +154,17 @@ public sealed class LineSeries
 }
 
 /// <summary>
-/// Defines how a <see cref="LineSeries"/> is scaled when rendered inside a <see cref="LinePlot"/>.
+///     Defines how a <see cref="LineSeries" /> is scaled when rendered inside a <see cref="LinePlot" />.
 /// </summary>
 public enum LineSeriesScaleMode
 {
     /// <summary>
-    /// Uses the shared visible Y-range across all shared-scale series.
+    ///     Uses the shared visible Y-range across all shared-scale series.
     /// </summary>
     Shared = 0,
 
     /// <summary>
-    /// Uses an independent normalized Y-range based on the series' own visible samples.
+    ///     Uses an independent normalized Y-range based on the series' own visible samples.
     /// </summary>
-    Normalized = 1,
+    Normalized = 1
 }

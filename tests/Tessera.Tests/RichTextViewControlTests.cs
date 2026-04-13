@@ -1,6 +1,5 @@
 using NUnit.Framework;
 using Tessera.Components.Primitives;
-using Tessera.Components.Styling;
 using Tessera.Controls;
 using Tessera.Styles;
 
@@ -13,22 +12,28 @@ public sealed class RichTextViewControlTests
     [Test]
     public void RichTextViewRendersHeadingsListMarkersQuotesAndInlineEmphasis()
     {
-        var control = new RichTextView
-        {
-            Border = BorderStyle.None,
-        };
+        var control = new RichTextView { Border = BorderStyle.None };
         control.SetLines(
         [
             [RichTextSegment.Heading("Quick Start", 2)],
-            [RichTextSegment.ListMarker("-"), RichTextSegment.Plain("Install "), RichTextSegment.Emphasis("Tessera"), RichTextSegment.Plain(" package")],
-            [RichTextSegment.QuoteMarker(">"), RichTextSegment.Plain("Use "), RichTextSegment.Strong("Tab"), RichTextSegment.Plain(" to move focus.")],
+            [
+                RichTextSegment.ListMarker(), RichTextSegment.Plain("Install "), RichTextSegment.Emphasis("Tessera"),
+                RichTextSegment.Plain(" package")
+            ],
+            [
+                RichTextSegment.QuoteMarker(), RichTextSegment.Plain("Use "), RichTextSegment.Strong("Tab"),
+                RichTextSegment.Plain(" to move focus.")
+            ]
         ]);
 
-        var output = Render(control, width: 64, height: 6);
+        var output = Render(control, 64, 6);
 
-        TestAssert.True(output.Contains("## Quick Start", StringComparison.Ordinal), "Heading should render with heading marker text.");
-        TestAssert.True(output.Contains("- Install Tessera package", StringComparison.Ordinal), "List marker and inline emphasis content should render in-order.");
-        TestAssert.True(output.Contains("> Use Tab to move focus.", StringComparison.Ordinal), "Quote marker and strong inline content should render in-order.");
+        TestAssert.True(output.Contains("## Quick Start", StringComparison.Ordinal),
+            "Heading should render with heading marker text.");
+        TestAssert.True(output.Contains("- Install Tessera package", StringComparison.Ordinal),
+            "List marker and inline emphasis content should render in-order.");
+        TestAssert.True(output.Contains("> Use Tab to move focus.", StringComparison.Ordinal),
+            "Quote marker and strong inline content should render in-order.");
     }
 
     [Test]
@@ -43,16 +48,20 @@ public sealed class RichTextViewControlTests
             QuoteMarkerStyle = TesseraStyle.Empty.WithForeground(AnsiColor.Rgb(31, 32, 33)),
             EmphasisStyle = TesseraStyle.Empty.WithItalic(),
             StrongStyle = TesseraStyle.Empty.WithUnderline(),
-            InlineCodeStyle = TesseraStyle.Empty.WithBackground(AnsiColor.Rgb(41, 42, 43)),
+            InlineCodeStyle = TesseraStyle.Empty.WithBackground(AnsiColor.Rgb(41, 42, 43))
         };
         control.SetLines(
         [
-            [RichTextSegment.Heading("Title", 1)],
-            [RichTextSegment.ListMarker("*"), RichTextSegment.Plain("plain "), RichTextSegment.Emphasis("em"), RichTextSegment.Plain(" "), RichTextSegment.Strong("strong"), RichTextSegment.Plain(" "), RichTextSegment.InlineCode("code")],
-            [RichTextSegment.QuoteMarker(">"), RichTextSegment.Plain("quote")],
+            [RichTextSegment.Heading("Title")],
+            [
+                RichTextSegment.ListMarker("*"), RichTextSegment.Plain("plain "), RichTextSegment.Emphasis("em"),
+                RichTextSegment.Plain(" "), RichTextSegment.Strong("strong"), RichTextSegment.Plain(" "),
+                RichTextSegment.InlineCode("code")
+            ],
+            [RichTextSegment.QuoteMarker(), RichTextSegment.Plain("quote")]
         ]);
 
-        var output = Render(control, width: 80, height: 8, textMode: CanvasTextMode.GraphemeAware);
+        var output = Render(control, 80, 8, CanvasTextMode.GraphemeAware);
         var headingExpected = control.TextStyle.Merge(control.HeadingStyle).Render("# Title");
         var listMarkerExpected = control.TextStyle.Merge(control.ListMarkerStyle).Render("* ");
         var quoteMarkerExpected = control.TextStyle.Merge(control.QuoteMarkerStyle).Render("> ");
@@ -61,27 +70,31 @@ public sealed class RichTextViewControlTests
         var strongExpected = control.TextStyle.Merge(control.StrongStyle).Render("strong");
         var codeExpected = control.TextStyle.Merge(control.InlineCodeStyle).Render("code");
 
-        TestAssert.True(output.Contains(headingExpected, StringComparison.Ordinal), "HeadingStyle should apply to heading segments.");
-        TestAssert.True(output.Contains(listMarkerExpected, StringComparison.Ordinal), "ListMarkerStyle should apply to list marker segments.");
-        TestAssert.True(output.Contains(quoteMarkerExpected, StringComparison.Ordinal), "QuoteMarkerStyle should apply to quote marker segments.");
-        TestAssert.True(output.Contains(plainExpected, StringComparison.Ordinal), "TextStyle should apply to plain segments.");
-        TestAssert.True(output.Contains(emphasisExpected, StringComparison.Ordinal), "EmphasisStyle should apply to inline-emphasis segments.");
-        TestAssert.True(output.Contains(strongExpected, StringComparison.Ordinal), "StrongStyle should apply to strong inline segments.");
-        TestAssert.True(output.Contains(codeExpected, StringComparison.Ordinal), "InlineCodeStyle should apply to inline-code segments.");
+        TestAssert.True(output.Contains(headingExpected, StringComparison.Ordinal),
+            "HeadingStyle should apply to heading segments.");
+        TestAssert.True(output.Contains(listMarkerExpected, StringComparison.Ordinal),
+            "ListMarkerStyle should apply to list marker segments.");
+        TestAssert.True(output.Contains(quoteMarkerExpected, StringComparison.Ordinal),
+            "QuoteMarkerStyle should apply to quote marker segments.");
+        TestAssert.True(output.Contains(plainExpected, StringComparison.Ordinal),
+            "TextStyle should apply to plain segments.");
+        TestAssert.True(output.Contains(emphasisExpected, StringComparison.Ordinal),
+            "EmphasisStyle should apply to inline-emphasis segments.");
+        TestAssert.True(output.Contains(strongExpected, StringComparison.Ordinal),
+            "StrongStyle should apply to strong inline segments.");
+        TestAssert.True(output.Contains(codeExpected, StringComparison.Ordinal),
+            "InlineCodeStyle should apply to inline-code segments.");
     }
 
     [Test]
     public void RichTextViewDefaultRenderIsDeterministicAndMonochrome()
     {
-        var control = new RichTextView
-        {
-            Border = BorderStyle.None,
-        };
+        var control = new RichTextView { Border = BorderStyle.None };
         control.SetLines(
         [
-            [RichTextSegment.Heading("Docs", 1)],
-            [RichTextSegment.ListMarker("-"), RichTextSegment.Plain("first item")],
-            [RichTextSegment.QuoteMarker(">"), RichTextSegment.Plain("note")],
+            [RichTextSegment.Heading("Docs")],
+            [RichTextSegment.ListMarker(), RichTextSegment.Plain("first item")],
+            [RichTextSegment.QuoteMarker(), RichTextSegment.Plain("note")]
         ]);
         var bounds = new Rect(0, 0, 40, 6);
         var firstCanvas = new Canvas(40, 6);
@@ -93,18 +106,14 @@ public sealed class RichTextViewControlTests
         var second = secondCanvas.Render();
 
         TestAssert.Equal(first, second, "RichTextView should render deterministically for identical state.");
-        TestAssert.True(!first.Contains("\u001b[", StringComparison.Ordinal), "Default RichTextView output should be monochrome.");
+        TestAssert.True(!first.Contains("\e[", StringComparison.Ordinal),
+            "Default RichTextView output should be monochrome.");
     }
 
     [Test]
     public void RichTextViewWrapAndKeyboardScrollingAreDeterministic()
     {
-        var control = new RichTextView
-        {
-            Border = BorderStyle.None,
-            Wrap = true,
-            IsFocused = true,
-        };
+        var control = new RichTextView { Border = BorderStyle.None, Wrap = true, IsFocused = true };
         control.SetLines(
         [
             [RichTextSegment.Plain("line 0000 long content for wrap")],
@@ -112,10 +121,10 @@ public sealed class RichTextViewControlTests
             [RichTextSegment.Plain("line 0002 long content for wrap")],
             [RichTextSegment.Plain("line 0003 long content for wrap")],
             [RichTextSegment.Plain("line 0004 long content for wrap")],
-            [RichTextSegment.Plain("line 0005 long content for wrap")],
+            [RichTextSegment.Plain("line 0005 long content for wrap")]
         ]);
 
-        _ = Render(control, width: 14, height: 3);
+        _ = Render(control, 14, 3);
 
         var downHandled = control.Handle(new KeyPressed(Key.Down));
         var endHandled = control.Handle(new KeyPressed(Key.End));
@@ -129,7 +138,8 @@ public sealed class RichTextViewControlTests
         TestAssert.Equal(0, control.ScrollOffset, "Home should reset scroll offset.");
     }
 
-    private static string Render(RichTextView control, int width, int height, CanvasTextMode textMode = CanvasTextMode.Fast)
+    private static string Render(RichTextView control, int width, int height,
+        CanvasTextMode textMode = CanvasTextMode.Fast)
     {
         var canvas = new Canvas(width, height, textMode);
         control.Render(canvas, new Rect(0, 0, width, height));

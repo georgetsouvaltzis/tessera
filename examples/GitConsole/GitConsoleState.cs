@@ -8,14 +8,14 @@ internal enum GitScope
     Overview,
     Changes,
     ReviewQueue,
-    Shiproom,
+    Shiproom
 }
 
 internal enum GitDiffTab
 {
     WorkingCopy,
     StagedSnapshot,
-    PatchRadar,
+    PatchRadar
 }
 
 internal enum GitChangeKind
@@ -23,7 +23,7 @@ internal enum GitChangeKind
     Modified,
     Added,
     Deleted,
-    Renamed,
+    Renamed
 }
 
 internal sealed class GitConsoleState
@@ -41,13 +41,14 @@ internal sealed class GitConsoleState
 
     public string RepositoryPath { get; } = "~/work/tea/public-v1/tessera";
 
-    public string BranchName { get; private set; } = "release/public-v1";
+    public string BranchName { get; } = "release/public-v1";
 
     public string RemoteName { get; } = "origin";
 
     public string LastAction { get; private set; } = "Queue primed for release handoff.";
 
-    public string LastActionDetail { get; private set; } = "Two staged paths are ready; remote is one commit behind local intent.";
+    public string LastActionDetail { get; private set; } =
+        "Two staged paths are ready; remote is one commit behind local intent.";
 
     public int Ahead { get; private set; } = 2;
 
@@ -61,9 +62,13 @@ internal sealed class GitConsoleState
 
     public string? SelectedFileId { get; private set; }
 
-    public GitFileEntry? SelectedFile => _files.FirstOrDefault(file => string.Equals(file.Id, SelectedFileId, StringComparison.Ordinal));
+    public GitFileEntry? SelectedFile =>
+        _files.FirstOrDefault(file => string.Equals(file.Id, SelectedFileId, StringComparison.Ordinal));
 
-    public static GitConsoleState CreateSeed() => new(CreateSeedFiles());
+    public static GitConsoleState CreateSeed()
+    {
+        return new GitConsoleState(CreateSeedFiles());
+    }
 
     public GitRepoMetrics GetMetrics()
     {
@@ -84,7 +89,7 @@ internal sealed class GitConsoleState
             new NavItem("overview", "Overview", "◆", _files.Count.ToString("00", CultureInfo.InvariantCulture)),
             new NavItem("changes", "Changes", "Δ", changed.ToString("00", CultureInfo.InvariantCulture)),
             new NavItem("review", "Review Queue", "!", review.ToString("00", CultureInfo.InvariantCulture)),
-            new NavItem("shiproom", "Shiproom", "↑", staged.ToString("00", CultureInfo.InvariantCulture)),
+            new NavItem("shiproom", "Shiproom", "↑", staged.ToString("00", CultureInfo.InvariantCulture))
         ];
     }
 
@@ -95,7 +100,7 @@ internal sealed class GitConsoleState
             "changes" => GitScope.Changes,
             "review" => GitScope.ReviewQueue,
             "shiproom" => GitScope.Shiproom,
-            _ => GitScope.Overview,
+            _ => GitScope.Overview
         };
 
         if (Scope == next)
@@ -137,15 +142,16 @@ internal sealed class GitConsoleState
             return new[]
             {
                 BuildSection("Review Hotspots", visible.Where(static file => file.IsReviewCritical).ToArray()),
-                BuildSection("Ready To Land", visible.Where(static file => file.IsStaged).ToArray()),
+                BuildSection("Ready To Land", visible.Where(static file => file.IsStaged).ToArray())
             }.Where(static section => section.Items.Count > 0).ToArray();
         }
 
         return new[]
         {
-            BuildSection("Staged", visible.Where(static file => file.IsStaged).ToArray()),
-            BuildSection("Modified", visible.Where(static file => !file.IsStaged && file.Kind != GitChangeKind.Added).ToArray()),
-            BuildSection("Untracked", visible.Where(static file => !file.IsStaged && file.Kind == GitChangeKind.Added).ToArray()),
+            BuildSection("Staged", visible.Where(static file => file.IsStaged).ToArray()), BuildSection("Modified",
+                visible.Where(static file => !file.IsStaged && file.Kind != GitChangeKind.Added).ToArray()),
+            BuildSection("Untracked",
+                visible.Where(static file => !file.IsStaged && file.Kind == GitChangeKind.Added).ToArray())
         }.Where(static section => section.Items.Count > 0).ToArray();
     }
 
@@ -177,7 +183,7 @@ internal sealed class GitConsoleState
                 $"Working Copy | {selected.Path}",
                 selected.IsStaged ? selected.IndexText : selected.HeadText,
                 selected.WorktreeText,
-                DiffViewMode.Inline),
+                DiffViewMode.Inline)
         };
     }
 
@@ -186,12 +192,18 @@ internal sealed class GitConsoleState
         var now = DateTimeOffset.UtcNow;
         return
         [
-            new CommandOutputLine("scan workspace --hydrate diff cache", CommandOutputChannel.System, now.AddMinutes(-8)),
-            new CommandOutputLine("review lane warmed; 2 high-signal patches detected", CommandOutputChannel.StdOut, now.AddMinutes(-7)),
-            new CommandOutputLine("queue docs/public-api-inventory.md for the release train", CommandOutputChannel.StdOut, now.AddMinutes(-5)),
-            new CommandOutputLine("rebuild flagship shell after examples reset", CommandOutputChannel.System, now.AddMinutes(-4)),
-            new CommandOutputLine("origin/public-v1 moved +1 commit ahead of the local base", CommandOutputChannel.StdErr, now.AddMinutes(-2)),
-            new CommandOutputLine("commit deck armed; waiting for intent", CommandOutputChannel.System, now.AddSeconds(-40)),
+            new CommandOutputLine("scan workspace --hydrate diff cache", CommandOutputChannel.System,
+                now.AddMinutes(-8)),
+            new CommandOutputLine("review lane warmed; 2 high-signal patches detected", CommandOutputChannel.StdOut,
+                now.AddMinutes(-7)),
+            new CommandOutputLine("queue docs/public-api-inventory.md for the release train",
+                CommandOutputChannel.StdOut, now.AddMinutes(-5)),
+            new CommandOutputLine("rebuild flagship shell after examples reset", CommandOutputChannel.System,
+                now.AddMinutes(-4)),
+            new CommandOutputLine("origin/public-v1 moved +1 commit ahead of the local base",
+                CommandOutputChannel.StdErr, now.AddMinutes(-2)),
+            new CommandOutputLine("commit deck armed; waiting for intent", CommandOutputChannel.System,
+                now.AddSeconds(-40))
         ];
     }
 
@@ -207,7 +219,7 @@ internal sealed class GitConsoleState
         LastAction = selected.IsStaged ? $"Staged {selected.Path}" : $"Moved {selected.Path} back to working tree";
         LastActionDetail = selected.IsStaged
             ? $"Queued {selected.Summary.ToLowerInvariant()} for the next commit."
-            : $"Keeping edits live in the worktree for another pass.";
+            : "Keeping edits live in the worktree for another pass.";
         NormalizeSelection();
         return selected.IsStaged
             ? GitActionResult.SuccessResult("Staged file", $"{selected.Path} is now in the shiproom queue.")
@@ -251,9 +263,11 @@ internal sealed class GitConsoleState
         Ahead++;
         Behind = Math.Max(0, Behind - 1);
         LastAction = $"Committed {staged.Length} file{(staged.Length == 1 ? string.Empty : "s")}";
-        LastActionDetail = $"[{BranchName} {CommitSequence:X6}] {subject.Trim()}" + (string.IsNullOrWhiteSpace(body) ? string.Empty : " + notes");
+        LastActionDetail = $"[{BranchName} {CommitSequence:X6}] {subject.Trim()}" +
+                           (string.IsNullOrWhiteSpace(body) ? string.Empty : " + notes");
         NormalizeSelection();
-        return GitActionResult.SuccessResult("Commit created", $"{subject.Trim()} ({staged.Length} file{(staged.Length == 1 ? string.Empty : "s")}).");
+        return GitActionResult.SuccessResult("Commit created",
+            $"{subject.Trim()} ({staged.Length} file{(staged.Length == 1 ? string.Empty : "s")}).");
     }
 
     public GitActionResult Sync()
@@ -280,13 +294,14 @@ internal sealed class GitConsoleState
             GitScope.Changes => _files,
             GitScope.ReviewQueue => _files.Where(static file => file.IsReviewCritical || file.IsStaged),
             GitScope.Shiproom => _files.Where(static file => file.IsStaged),
-            _ => _files,
+            _ => _files
         };
     }
 
     private void NormalizeSelection()
     {
-        if (SelectedFileId is not null && GetVisibleFiles().Any(file => string.Equals(file.Id, SelectedFileId, StringComparison.Ordinal)))
+        if (SelectedFileId is not null && GetVisibleFiles()
+                .Any(file => string.Equals(file.Id, SelectedFileId, StringComparison.Ordinal)))
         {
             return;
         }
@@ -310,42 +325,39 @@ internal sealed class GitConsoleState
                 "Throttle idle redraws under mouse-motion load",
                 18,
                 4,
-                owner: "runtime",
-                isStaged: true,
-                isReviewCritical: true,
-                headText:
-"""
-private async Task RenderLoopAsync(CancellationToken cancellationToken)
-{
-    while (!cancellationToken.IsCancellationRequested)
-    {
-        await RenderFrameAsync(cancellationToken).ConfigureAwait(false);
-        await Task.Delay(_options.FrameDelay, cancellationToken).ConfigureAwait(false);
-    }
-}
-""",
-                indexText:
-"""
-private async Task RenderLoopAsync(CancellationToken cancellationToken)
-{
-    while (!cancellationToken.IsCancellationRequested)
-    {
-        await RenderFrameAsync(cancellationToken).ConfigureAwait(false);
-        await DelayForFrameBudgetAsync(cancellationToken).ConfigureAwait(false);
-    }
-}
-""",
-                worktreeText:
-"""
-private async Task RenderLoopAsync(CancellationToken cancellationToken)
-{
-    while (!cancellationToken.IsCancellationRequested)
-    {
-        await RenderFrameAsync(cancellationToken).ConfigureAwait(false);
-        await DelayForFrameBudgetAsync(cancellationToken).ConfigureAwait(false);
-    }
-}
-"""),
+                "runtime",
+                true,
+                true,
+                """
+                private async Task RenderLoopAsync(CancellationToken cancellationToken)
+                {
+                    while (!cancellationToken.IsCancellationRequested)
+                    {
+                        await RenderFrameAsync(cancellationToken).ConfigureAwait(false);
+                        await Task.Delay(_options.FrameDelay, cancellationToken).ConfigureAwait(false);
+                    }
+                }
+                """,
+                """
+                private async Task RenderLoopAsync(CancellationToken cancellationToken)
+                {
+                    while (!cancellationToken.IsCancellationRequested)
+                    {
+                        await RenderFrameAsync(cancellationToken).ConfigureAwait(false);
+                        await DelayForFrameBudgetAsync(cancellationToken).ConfigureAwait(false);
+                    }
+                }
+                """,
+                """
+                private async Task RenderLoopAsync(CancellationToken cancellationToken)
+                {
+                    while (!cancellationToken.IsCancellationRequested)
+                    {
+                        await RenderFrameAsync(cancellationToken).ConfigureAwait(false);
+                        await DelayForFrameBudgetAsync(cancellationToken).ConfigureAwait(false);
+                    }
+                }
+                """),
             new GitFileEntry(
                 "public-api-docs",
                 "docs/public-api-inventory.md",
@@ -353,30 +365,27 @@ private async Task RenderLoopAsync(CancellationToken cancellationToken)
                 "Tighten onboarding and flagship-example wording",
                 27,
                 9,
-                owner: "docs",
-                isStaged: true,
-                isReviewCritical: false,
-                headText:
-"""
-## Examples
-- HelloWorld
-- CounterForm
-- WorkspaceApp
-""",
-                indexText:
-"""
-## Examples
-- DataWorkbench
-- OpsWatch
-- GitConsole
-""",
-                worktreeText:
-"""
-## Examples
-- DataWorkbench
-- OpsWatch
-- GitConsole
-"""),
+                "docs",
+                true,
+                false,
+                """
+                ## Examples
+                - HelloWorld
+                - CounterForm
+                - WorkspaceApp
+                """,
+                """
+                ## Examples
+                - DataWorkbench
+                - OpsWatch
+                - GitConsole
+                """,
+                """
+                ## Examples
+                - DataWorkbench
+                - OpsWatch
+                - GitConsole
+                """),
             new GitFileEntry(
                 "gitconsole-app",
                 "examples/GitConsole/GitConsoleApp.cs",
@@ -384,18 +393,17 @@ private async Task RenderLoopAsync(CancellationToken cancellationToken)
                 "Flagship app shell, orchestration, seeded repo state",
                 196,
                 0,
-                owner: "examples",
-                isStaged: false,
-                isReviewCritical: true,
-                headText: string.Empty,
-                indexText: string.Empty,
-                worktreeText:
-"""
-internal sealed class GitConsoleApp : TesseraApp
-{
-    // flagship shell wiring here
-}
-"""),
+                "examples",
+                false,
+                true,
+                string.Empty,
+                string.Empty,
+                """
+                internal sealed class GitConsoleApp : TesseraApp
+                {
+                    // flagship shell wiring here
+                }
+                """),
             new GitFileEntry(
                 "worktree-control",
                 "examples/GitConsole/GitWorktreeControl.cs",
@@ -403,18 +411,17 @@ internal sealed class GitConsoleApp : TesseraApp
                 "Grouped worktree list with badges and review heat",
                 143,
                 0,
-                owner: "examples",
-                isStaged: false,
-                isReviewCritical: false,
-                headText: string.Empty,
-                indexText: string.Empty,
-                worktreeText:
-"""
-internal sealed class GitWorktreeControl : Control
-{
-    // grouped selection surface
-}
-"""),
+                "examples",
+                false,
+                false,
+                string.Empty,
+                string.Empty,
+                """
+                internal sealed class GitWorktreeControl : Control
+                {
+                    // grouped selection surface
+                }
+                """),
             new GitFileEntry(
                 "perf-gate-runner",
                 "benchmarks/Tessera.Benchmarks/PerfGateRunner.cs",
@@ -422,12 +429,12 @@ internal sealed class GitWorktreeControl : Control
                 "Direct perf gate runner; baseline-backed startup and latency checks",
                 48,
                 11,
-                owner: "perf",
-                isStaged: false,
-                isReviewCritical: false,
-                headText: "dotnet run --project benchmarks/Tessera.Benchmarks -- --perf-gate\n",
-                indexText: "dotnet run --project benchmarks/Tessera.Benchmarks -- --perf-gate\n",
-                worktreeText: "dotnet run --project benchmarks/Tessera.Benchmarks --configuration Release -- --perf-gate --baseline docs/perf-baselines/v1-slo-gate-baseline.json --output docs/perf-baselines/latest-slo-gate-result.json\n"),
+                "perf",
+                false,
+                false,
+                "dotnet run --project benchmarks/Tessera.Benchmarks -- --perf-gate\n",
+                "dotnet run --project benchmarks/Tessera.Benchmarks -- --perf-gate\n",
+                "dotnet run --project benchmarks/Tessera.Benchmarks --configuration Release -- --perf-gate --baseline docs/perf-baselines/v1-slo-gate-baseline.json --output docs/perf-baselines/latest-slo-gate-result.json\n"),
             new GitFileEntry(
                 "release-notes",
                 "docs/alpha-release-checklist.md",
@@ -435,12 +442,12 @@ internal sealed class GitWorktreeControl : Control
                 "Capture flagship-example Alpha gate follow-up",
                 12,
                 3,
-                owner: "release",
-                isStaged: false,
-                isReviewCritical: true,
-                headText: "- M4 pending manual signoff\n",
-                indexText: "- M4 pending manual signoff\n",
-                worktreeText: "- M4 pending manual signoff\n- flagship GitConsole visual review scheduled\n"),
+                "release",
+                false,
+                true,
+                "- M4 pending manual signoff\n",
+                "- M4 pending manual signoff\n",
+                "- M4 pending manual signoff\n- flagship GitConsole visual review scheduled\n")
         ];
     }
 }
@@ -481,8 +488,23 @@ internal sealed record GitDiffSnapshot(string Title, string OldText, string NewT
 
 internal sealed record GitActionResult(bool Success, string Title, string Detail, CommandOutputChannel Channel)
 {
-    public static GitActionResult SuccessResult(string title, string detail) => new(true, title, detail, CommandOutputChannel.StdOut);
-    public static GitActionResult InfoResult(string title, string detail) => new(true, title, detail, CommandOutputChannel.System);
-    public static GitActionResult WarningResult(string title, string detail) => new(false, title, detail, CommandOutputChannel.StdErr);
-    public static GitActionResult ErrorResult(string title, string detail) => new(false, title, detail, CommandOutputChannel.StdErr);
+    public static GitActionResult SuccessResult(string title, string detail)
+    {
+        return new GitActionResult(true, title, detail, CommandOutputChannel.StdOut);
+    }
+
+    public static GitActionResult InfoResult(string title, string detail)
+    {
+        return new GitActionResult(true, title, detail, CommandOutputChannel.System);
+    }
+
+    public static GitActionResult WarningResult(string title, string detail)
+    {
+        return new GitActionResult(false, title, detail, CommandOutputChannel.StdErr);
+    }
+
+    public static GitActionResult ErrorResult(string title, string detail)
+    {
+        return new GitActionResult(false, title, detail, CommandOutputChannel.StdErr);
+    }
 }

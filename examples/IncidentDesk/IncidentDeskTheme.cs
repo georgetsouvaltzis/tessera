@@ -6,50 +6,47 @@ internal static class IncidentDeskTheme
 {
     public static TesseraTheme DefaultTheme { get; } = new()
     {
-        Text = new TesseraThemeTextTokens
-        {
-            Primary = Foreground(0xF7EBDD),
-            Secondary = Foreground(0xD6BFAF),
-            Muted = Foreground(0x8E7A74),
-            Inverse = ForegroundBackground(0x130F14, 0xF7EBDD),
-        },
-        Surface = new TesseraThemeSurfaceTokens
-        {
-            Base = Background(0x130F14),
-            Panel = Background(0x1B141A),
-            Overlay = Background(0x241A22),
-        },
-        Border = new TesseraThemeBorderTokens
-        {
-            Default = Foreground(0x4B3338),
-            Strong = Foreground(0x8B5A46),
-            Focused = Foreground(0xF3B276),
-            Error = Foreground(0xFF8672),
-        },
-        State = new TesseraThemeStateTokens
-        {
-            Success = Foreground(0x8FDBA9),
-            Warning = Foreground(0xF7C36E),
-            Error = Foreground(0xFF8672),
-            Info = Foreground(0x8AC8E6),
-        },
-        Accent = new TesseraThemeAccentTokens
-        {
-            Primary = Foreground(0xF3B276),
-            Secondary = Foreground(0xE58E73),
-        },
-        Selection = new TesseraThemeSelectionTokens
-        {
-            Foreground = Foreground(0xFFF4E8),
-            Background = Background(0x6A2F22),
-        },
+        Text =
+            new TesseraThemeTextTokens
+            {
+                Primary = Foreground(0xF7EBDD),
+                Secondary = Foreground(0xD6BFAF),
+                Muted = Foreground(0x8E7A74),
+                Inverse = ForegroundBackground(0x130F14, 0xF7EBDD)
+            },
+        Surface =
+            new TesseraThemeSurfaceTokens
+            {
+                Base = Background(0x130F14),
+                Panel = Background(0x1B141A),
+                Overlay = Background(0x241A22)
+            },
+        Border =
+            new TesseraThemeBorderTokens
+            {
+                Default = Foreground(0x4B3338),
+                Strong = Foreground(0x8B5A46),
+                Focused = Foreground(0xF3B276),
+                Error = Foreground(0xFF8672)
+            },
+        State =
+            new TesseraThemeStateTokens
+            {
+                Success = Foreground(0x8FDBA9),
+                Warning = Foreground(0xF7C36E),
+                Error = Foreground(0xFF8672),
+                Info = Foreground(0x8AC8E6)
+            },
+        Accent = new TesseraThemeAccentTokens { Primary = Foreground(0xF3B276), Secondary = Foreground(0xE58E73) },
+        Selection =
+            new TesseraThemeSelectionTokens { Foreground = Foreground(0xFFF4E8), Background = Background(0x6A2F22) },
         Focus = new TesseraThemeFocusTokens
         {
             Ring = Foreground(0xF3B276).WithBold(),
             Title = Foreground(0xF3B276).WithBold(),
             Border = Foreground(0xF3B276).WithBold(),
-            Marker = "◈",
-        },
+            Marker = "◈"
+        }
     };
 
     public static TesseraStyle Foreground(int color)

@@ -3,27 +3,19 @@ using Tessera.Styles;
 namespace Tessera.Controls;
 
 /// <summary>
-/// Represents a transient toast-notification center with queueing, selection, and dismissal.
+///     Represents a transient toast-notification center with queueing, selection, and dismissal.
 /// </summary>
 public sealed partial class ToastCenter : Control
 {
     private readonly List<ToastItem> _items = [];
-    private int _selectedIndex;
     private int _hoveredIndex = -1;
+    private int _selectedIndex;
 
     /// <summary>Gets or sets the title rendered in the frame header when a border is enabled.</summary>
-    public string Title
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = "Toasts";
+    public string Title { get; set; } = "Toasts";
 
     /// <summary>Gets or sets the marker shown in the title when focused.</summary>
-    public string FocusMarker
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = "*";
+    public string FocusMarker { get; set; } = "*";
 
     /// <summary>Gets or sets a value indicating whether the title focus marker should be rendered.</summary>
     public bool ShowFocusMarker { get; set; } = true;
@@ -41,9 +33,9 @@ public sealed partial class ToastCenter : Control
     public int VisibleCapacity { get; set; } = 5;
 
     /// <summary>
-    /// Gets or sets the default timeout metadata assigned by
-    /// <see cref="Push(string, NotificationLevel, string?, TimeSpan?)" />.
-    /// Set to <see langword="null" /> for non-expiring toasts.
+    ///     Gets or sets the default timeout metadata assigned by
+    ///     <see cref="Push(string, NotificationLevel, string?, TimeSpan?)" />.
+    ///     Set to <see langword="null" /> for non-expiring toasts.
     /// </summary>
     public TimeSpan? DefaultTimeout { get; set; } = TimeSpan.FromSeconds(8);
 
@@ -108,7 +100,7 @@ public sealed partial class ToastCenter : Control
     public override bool IsReadOnly { get; set; }
 
     /// <summary>
-    /// Pushes a new toast into the queue and selects it.
+    ///     Pushes a new toast into the queue and selects it.
     /// </summary>
     /// <param name="message">Toast message text.</param>
     /// <param name="level">Toast severity level.</param>
@@ -123,7 +115,7 @@ public sealed partial class ToastCenter : Control
     {
         var item = new ToastItem(
             id ?? Guid.NewGuid().ToString("n"),
-            message ?? string.Empty,
+            message,
             level,
             DateTimeOffset.UtcNow,
             timeout ?? DefaultTimeout);

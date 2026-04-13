@@ -20,7 +20,7 @@ internal sealed class TerminalReader(Stream input, IEventDecoder decoder, TimeSp
         try
         {
             var state = new PasteState();
-            Task<int> readTask = ReadNextAsync(input, readBuffer, cancellationToken);
+            var readTask = ReadNextAsync(input, readBuffer, cancellationToken);
 
             while (!cancellationToken.IsCancellationRequested)
             {
@@ -34,7 +34,7 @@ internal sealed class TerminalReader(Stream input, IEventDecoder decoder, TimeSp
                     }
                     catch (TimeoutException)
                     {
-                        Drain(pending, onEvent, state, timeoutExpired: true);
+                        Drain(pending, onEvent, state, true);
                         continue;
                     }
                     catch (OperationCanceledException)
@@ -68,7 +68,7 @@ internal sealed class TerminalReader(Stream input, IEventDecoder decoder, TimeSp
                 }
 
                 pending.Append(readBuffer.AsSpan(0, read));
-                Drain(pending, onEvent, state, timeoutExpired: false);
+                Drain(pending, onEvent, state, false);
                 readTask = ReadNextAsync(input, readBuffer, cancellationToken);
             }
 
@@ -79,7 +79,7 @@ internal sealed class TerminalReader(Stream input, IEventDecoder decoder, TimeSp
                 while (attempt < FinalTimeoutDrainRetries && pending.Count > 0)
                 {
                     var before = pending.Count;
-                    Drain(pending, onEvent, state, timeoutExpired: true);
+                    Drain(pending, onEvent, state, true);
                     if (pending.Count < before)
                     {
                         attempt = -1;
@@ -185,8 +185,8 @@ internal sealed class TerminalReader(Stream input, IEventDecoder decoder, TimeSp
     {
         private readonly ArrayPool<byte> _pool;
         private byte[] _buffer;
-        private int _start;
         private int _end;
+        private int _start;
 
         public PendingByteBuffer(int initialCapacity)
         {
@@ -197,6 +197,14 @@ internal sealed class TerminalReader(Stream input, IEventDecoder decoder, TimeSp
         }
 
         public int Count => _end - _start;
+
+        public void Dispose()
+        {
+            _pool.Return(_buffer);
+            _buffer = [];
+            _start = 0;
+            _end = 0;
+        }
 
         public ReadOnlySpan<byte> AsSpan()
         {
@@ -287,14 +295,6 @@ internal sealed class TerminalReader(Stream input, IEventDecoder decoder, TimeSp
             _buffer.AsSpan(_start, currentCount).CopyTo(_buffer);
             _start = 0;
             _end = currentCount;
-        }
-
-        public void Dispose()
-        {
-            _pool.Return(_buffer);
-            _buffer = [];
-            _start = 0;
-            _end = 0;
         }
     }
 }

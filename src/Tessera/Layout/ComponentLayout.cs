@@ -1,12 +1,12 @@
-using Tessera.Components.Primitives;
-using Tessera.Components.Composition;
-using Tessera.Controls;
 using System.ComponentModel;
+using Tessera.Components.Composition;
+using Tessera.Components.Primitives;
+using Tessera.Controls;
 
 namespace Tessera.Layout;
 
 /// <summary>
-/// Represents a layout leaf backed by a Tessera canvas component.
+///     Represents a layout leaf backed by a Tessera canvas component.
 /// </summary>
 [EditorBrowsable(EditorBrowsableState.Advanced)]
 internal sealed class ComponentLayout : LayoutNode
@@ -28,19 +28,19 @@ internal sealed class ComponentLayout : LayoutNode
     }
 
     /// <summary>
-    /// Gets the wrapped Tessera component.
+    ///     Gets the wrapped Tessera component.
     /// </summary>
     public ICanvasComponent? CanvasComponent { get; }
 
     internal Control? Control { get; }
 
     /// <summary>
-    /// Gets the preferred width used when the layout needs an intrinsic measurement.
+    ///     Gets the preferred width used when the layout needs an intrinsic measurement.
     /// </summary>
     public int? PreferredWidth { get; }
 
     /// <summary>
-    /// Gets the preferred height used when the layout needs an intrinsic measurement.
+    ///     Gets the preferred height used when the layout needs an intrinsic measurement.
     /// </summary>
     public int? PreferredHeight { get; }
 

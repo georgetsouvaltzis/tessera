@@ -1,55 +1,190 @@
 using Tessera.Controls;
-using Tessera.Layout;
 using Tessera.Styles;
 
 namespace Tessera.Examples.OpsWatch;
 
 internal sealed partial class OpsWatchApp : TesseraApp
 {
-    private OpsWatchThemePalette _palette = OpsWatchTheme.Default;
-    private readonly OpsWatchState _state = OpsWatchState.CreateSeed();
-
-    private readonly OpsWatchHeroControl _hero = new() { Padding = Thickness.Symmetric(1, 0) };
-    private readonly StatsCard _fleetPulse = new() { Title = "Fleet Pulse", Border = BorderStyle.Rounded, Padding = Thickness.Symmetric(1, 0) };
-    private readonly StatsCard _trafficPulse = new() { Title = "Traffic Shape", Border = BorderStyle.Rounded, Padding = Thickness.Symmetric(1, 0) };
-    private readonly StatsCard _routePulse = new() { Title = "Route Pressure", Border = BorderStyle.Rounded, Padding = Thickness.Symmetric(1, 0) };
-
-    private readonly SideNavRail _fleetRail = new() { Title = "Fleets · F1", Border = BorderStyle.Rounded, Padding = Thickness.All(1), FocusMarker = "*" };
-    private readonly HealthBoard _healthBoard = new() { Title = "Node Watch Floor · F2", Border = BorderStyle.Rounded, Padding = Thickness.All(1), FocusMarker = "*" };
-    private readonly ActivityFeed _feed = new() { Title = "Incident Stream · F3", Border = BorderStyle.Rounded, Padding = Thickness.All(1), FocusMarker = "*", ShowTimestamp = true, AutoFollow = true };
-
-    private readonly StatsCard _cpuCard = new() { Title = "CPU Saturation", Border = BorderStyle.Rounded, Padding = Thickness.Symmetric(1, 0) };
-    private readonly StatsCard _memoryCard = new() { Title = "Memory Headroom", Border = BorderStyle.Rounded, Padding = Thickness.Symmetric(1, 0) };
-    private readonly StatsCard _networkCard = new() { Title = "Network Flux", Border = BorderStyle.Rounded, Padding = Thickness.Symmetric(1, 0) };
-    private readonly StatsCard _diskCard = new() { Title = "Disk Pressure", Border = BorderStyle.Rounded, Padding = Thickness.Symmetric(1, 0) };
-
-    private readonly TelemetryChart _cpuSpark = new(64) { Title = "cpu trace", Border = BorderStyle.Rounded, Padding = new Thickness(1, 0, 1, 0), FocusMarker = "*" };
-    private readonly TelemetryChart _memorySpark = new(64) { Title = "mem trace", Border = BorderStyle.Rounded, Padding = new Thickness(1, 0, 1, 0), FocusMarker = "*" };
-    private readonly TelemetryChart _networkSpark = new(64) { Title = "net trace", Border = BorderStyle.Rounded, Padding = new Thickness(1, 0, 1, 0), FocusMarker = "*" };
-    private readonly TelemetryChart _diskSpark = new(64) { Title = "disk trace", Border = BorderStyle.Rounded, Padding = new Thickness(1, 0, 1, 0), FocusMarker = "*" };
-
-    private readonly StatsCard _focusStats = new() { Title = "Node Focus", Border = BorderStyle.Rounded, Padding = Thickness.All(1) };
-    private readonly Label _focusSummary = new() { Title = "Focus Readout", Border = BorderStyle.Rounded, Padding = Thickness.All(1) };
-    private readonly Label _runbook = new() { Title = "Operator Lane", Border = BorderStyle.Rounded, Padding = Thickness.All(1) };
-    private readonly BulletChart _cpuBullet = new() { Title = "CPU ceiling", Border = BorderStyle.Rounded, Padding = Thickness.All(1), FocusMarker = "*" };
-    private readonly BulletChart _memoryBullet = new() { Title = "Memory ceiling", Border = BorderStyle.Rounded, Padding = Thickness.All(1), FocusMarker = "*" };
-    private readonly BulletChart _networkBullet = new() { Title = "Traffic burn", Border = BorderStyle.Rounded, Padding = Thickness.All(1), FocusMarker = "*" };
-    private readonly BulletChart _diskBullet = new() { Title = "Disk burn", Border = BorderStyle.Rounded, Padding = Thickness.All(1), FocusMarker = "*" };
-
-    private readonly Button _restartButton = new() { Text = "Restart", Description = "r", Padding = Thickness.All(1) };
-    private readonly Button _drainButton = new() { Text = "Drain", Description = "d", Padding = Thickness.All(1) };
-    private readonly Button _muteButton = new() { Text = "Mute Alerts", Description = "m", Padding = Thickness.All(1) };
-    private readonly Button _scaleButton = new() { Text = "Scale", Description = "s", Padding = Thickness.All(1) };
-    private readonly Button _inspectButton = new() { Text = "Inspect", Description = "i", Padding = Thickness.All(1) };
-    private readonly Button _failoverButton = new() { Text = "Failover", Description = "f", Padding = Thickness.All(1) };
     private readonly Button _ackButton = new() { Text = "Acknowledge", Description = "a", Padding = Thickness.All(1) };
-    private readonly Button _veridianThemeButton = new() { Text = "1 Veridian", Description = string.Empty, Padding = Thickness.Symmetric(1, 0) };
-    private readonly Button _tidalThemeButton = new() { Text = "2 Tidal", Description = string.Empty, Padding = Thickness.Symmetric(1, 0) };
-    private readonly Button _redlineThemeButton = new() { Text = "3 Redline", Description = string.Empty, Padding = Thickness.Symmetric(1, 0) };
+
+    private readonly BulletChart _cpuBullet = new()
+    {
+        Title = "CPU ceiling",
+        Border = BorderStyle.Rounded,
+        Padding = Thickness.All(1),
+        FocusMarker = "*"
+    };
+
+    private readonly StatsCard _cpuCard = new()
+    {
+        Title = "CPU Saturation",
+        Border = BorderStyle.Rounded,
+        Padding = Thickness.Symmetric(1)
+    };
+
+    private readonly TelemetryChart _cpuSpark = new(64)
+    {
+        Title = "cpu trace",
+        Border = BorderStyle.Rounded,
+        Padding = new Thickness(1, 0, 1, 0),
+        FocusMarker = "*"
+    };
+
+    private readonly BulletChart _diskBullet = new()
+    {
+        Title = "Disk burn",
+        Border = BorderStyle.Rounded,
+        Padding = Thickness.All(1),
+        FocusMarker = "*"
+    };
+
+    private readonly StatsCard _diskCard = new()
+    {
+        Title = "Disk Pressure",
+        Border = BorderStyle.Rounded,
+        Padding = Thickness.Symmetric(1)
+    };
+
+    private readonly TelemetryChart _diskSpark = new(64)
+    {
+        Title = "disk trace",
+        Border = BorderStyle.Rounded,
+        Padding = new Thickness(1, 0, 1, 0),
+        FocusMarker = "*"
+    };
+
+    private readonly Button _drainButton = new() { Text = "Drain", Description = "d", Padding = Thickness.All(1) };
+
+    private readonly Button _failoverButton =
+        new() { Text = "Failover", Description = "f", Padding = Thickness.All(1) };
+
+    private readonly ActivityFeed _feed = new()
+    {
+        Title = "Incident Stream · F3",
+        Border = BorderStyle.Rounded,
+        Padding = Thickness.All(1),
+        FocusMarker = "*",
+        ShowTimestamp = true,
+        AutoFollow = true
+    };
+
+    private readonly StatsCard _fleetPulse = new()
+    {
+        Title = "Fleet Pulse",
+        Border = BorderStyle.Rounded,
+        Padding = Thickness.Symmetric(1)
+    };
+
+    private readonly SideNavRail _fleetRail = new()
+    {
+        Title = "Fleets · F1",
+        Border = BorderStyle.Rounded,
+        Padding = Thickness.All(1),
+        FocusMarker = "*"
+    };
+
+    private readonly StatsCard _focusStats =
+        new() { Title = "Node Focus", Border = BorderStyle.Rounded, Padding = Thickness.All(1) };
+
+    private readonly Label _focusSummary =
+        new() { Title = "Focus Readout", Border = BorderStyle.Rounded, Padding = Thickness.All(1) };
 
     private readonly StatusBar _footer = new() { Fill = ' ' };
+
+    private readonly HealthBoard _healthBoard = new()
+    {
+        Title = "Node Watch Floor · F2",
+        Border = BorderStyle.Rounded,
+        Padding = Thickness.All(1),
+        FocusMarker = "*"
+    };
+
+    private readonly OpsWatchHeroControl _hero = new() { Padding = Thickness.Symmetric(1) };
+    private readonly Button _inspectButton = new() { Text = "Inspect", Description = "i", Padding = Thickness.All(1) };
+
+    private readonly BulletChart _memoryBullet = new()
+    {
+        Title = "Memory ceiling",
+        Border = BorderStyle.Rounded,
+        Padding = Thickness.All(1),
+        FocusMarker = "*"
+    };
+
+    private readonly StatsCard _memoryCard = new()
+    {
+        Title = "Memory Headroom",
+        Border = BorderStyle.Rounded,
+        Padding = Thickness.Symmetric(1)
+    };
+
+    private readonly TelemetryChart _memorySpark = new(64)
+    {
+        Title = "mem trace",
+        Border = BorderStyle.Rounded,
+        Padding = new Thickness(1, 0, 1, 0),
+        FocusMarker = "*"
+    };
+
+    private readonly Button _muteButton = new() { Text = "Mute Alerts", Description = "m", Padding = Thickness.All(1) };
+
+    private readonly BulletChart _networkBullet = new()
+    {
+        Title = "Traffic burn",
+        Border = BorderStyle.Rounded,
+        Padding = Thickness.All(1),
+        FocusMarker = "*"
+    };
+
+    private readonly StatsCard _networkCard = new()
+    {
+        Title = "Network Flux",
+        Border = BorderStyle.Rounded,
+        Padding = Thickness.Symmetric(1)
+    };
+
+    private readonly TelemetryChart _networkSpark = new(64)
+    {
+        Title = "net trace",
+        Border = BorderStyle.Rounded,
+        Padding = new Thickness(1, 0, 1, 0),
+        FocusMarker = "*"
+    };
+
+    private readonly Button _redlineThemeButton =
+        new() { Text = "3 Redline", Description = string.Empty, Padding = Thickness.Symmetric(1) };
+
+    private readonly Button _restartButton = new() { Text = "Restart", Description = "r", Padding = Thickness.All(1) };
+
+    private readonly StatsCard _routePulse = new()
+    {
+        Title = "Route Pressure",
+        Border = BorderStyle.Rounded,
+        Padding = Thickness.Symmetric(1)
+    };
+
+    private readonly Label _runbook =
+        new() { Title = "Operator Lane", Border = BorderStyle.Rounded, Padding = Thickness.All(1) };
+
+    private readonly Button _scaleButton = new() { Text = "Scale", Description = "s", Padding = Thickness.All(1) };
+    private readonly OpsWatchState _state = OpsWatchState.CreateSeed();
+
+    private readonly Button _tidalThemeButton =
+        new() { Text = "2 Tidal", Description = string.Empty, Padding = Thickness.Symmetric(1) };
+
+    private readonly StatsCard _trafficPulse = new()
+    {
+        Title = "Traffic Shape",
+        Border = BorderStyle.Rounded,
+        Padding = Thickness.Symmetric(1)
+    };
+
+    private readonly Button _veridianThemeButton =
+        new() { Text = "1 Veridian", Description = string.Empty, Padding = Thickness.Symmetric(1) };
+
+    private OpsWatchThemePalette _palette = OpsWatchTheme.Default;
     private bool _syncingFleetSelection;
     private bool _syncingNodeSelection;
+
     public OpsWatchApp()
     {
         ApplyTheme(_palette);
@@ -58,8 +193,10 @@ internal sealed partial class OpsWatchApp : TesseraApp
         _healthBoard.RequestFocus();
     }
 
-    public override TesseraEffect? Initialize() =>
-        TesseraEffects.Periodic(TimeSpan.FromMilliseconds(850), _ => new OpsWatchTickMessage());
+    public override TesseraEffect? Initialize()
+    {
+        return TesseraEffects.Periodic(TimeSpan.FromMilliseconds(850), _ => new OpsWatchTickMessage());
+    }
 
     public override TesseraEffect? Update(Message message)
     {
@@ -246,8 +383,10 @@ internal sealed partial class OpsWatchApp : TesseraApp
         _trafficPulse.SetItems(_state.BuildTrafficPulseItems());
         _routePulse.SetItems(_state.BuildRoutePulseItems());
 
-        _footer.LeftText = $"opswatch  {_palette.Label.ToLowerInvariant()}  {_state.SelectedClusterName}  {_state.AutomationMode}  alerts {_state.ActiveAlertCount:00}  drains {_state.DrainingCount:00}";
-        _footer.RightText = "1/2/3 theme  F1 fleets  F2 nodes  F3 feed  r restart  d drain  m mute  s scale  f failover  a ack";
+        _footer.LeftText =
+            $"opswatch  {_palette.Label.ToLowerInvariant()}  {_state.SelectedClusterName}  {_state.AutomationMode}  alerts {_state.ActiveAlertCount:00}  drains {_state.DrainingCount:00}";
+        _footer.RightText =
+            "1/2/3 theme  F1 fleets  F2 nodes  F3 feed  r restart  d drain  m mute  s scale  f failover  a ack";
     }
 
     private void RefreshControls()
@@ -266,7 +405,8 @@ internal sealed partial class OpsWatchApp : TesseraApp
         _fleetRail.SetItems(items);
         var selectedIndex = items
             .Select((item, index) => new { item, index })
-            .FirstOrDefault(entry => string.Equals(entry.item.Label, _state.SelectedClusterName, StringComparison.Ordinal))?.index ?? -1;
+            .FirstOrDefault(entry =>
+                string.Equals(entry.item.Label, _state.SelectedClusterName, StringComparison.Ordinal))?.index ?? -1;
         if (selectedIndex >= 0)
         {
             _fleetRail.SetSelectedIndex(selectedIndex);
@@ -280,7 +420,8 @@ internal sealed partial class OpsWatchApp : TesseraApp
         _syncingNodeSelection = true;
         var services = _state.BuildServices();
         _healthBoard.SetServices(services);
-        var selectedIndex = Array.FindIndex(services.ToArray(), service => string.Equals(service.Id, _state.SelectedNode.Id, StringComparison.Ordinal));
+        var selectedIndex = Array.FindIndex(services.ToArray(),
+            service => string.Equals(service.Id, _state.SelectedNode.Id, StringComparison.Ordinal));
         if (selectedIndex >= 0)
         {
             _healthBoard.SetSelectedIndex(selectedIndex);
@@ -292,8 +433,10 @@ internal sealed partial class OpsWatchApp : TesseraApp
     private void SyncMetricDeck()
     {
         _cpuCard.SetItems(OpsWatchState.BuildMetricCardItems("cpu", _state.CpuAverage, DeltaText(_state.CpuTrend)));
-        _memoryCard.SetItems(OpsWatchState.BuildMetricCardItems("mem", _state.MemoryAverage, DeltaText(_state.MemoryTrend)));
-        _networkCard.SetItems(OpsWatchState.BuildMetricCardItems("net", _state.NetworkAverage, DeltaText(_state.NetworkTrend)));
+        _memoryCard.SetItems(
+            OpsWatchState.BuildMetricCardItems("mem", _state.MemoryAverage, DeltaText(_state.MemoryTrend)));
+        _networkCard.SetItems(
+            OpsWatchState.BuildMetricCardItems("net", _state.NetworkAverage, DeltaText(_state.NetworkTrend)));
         _diskCard.SetItems(OpsWatchState.BuildMetricCardItems("disk", _state.DiskAverage, DeltaText(_state.DiskTrend)));
 
         _cpuSpark.SetSamples(_state.CpuTrend);
@@ -377,7 +520,8 @@ internal sealed partial class OpsWatchApp : TesseraApp
         _fleetRail.FocusedBorderStyleText = theme.Border.Focused.Merge(theme.Focus.Border);
         _fleetRail.ItemStyle = theme.Text.Primary;
         _fleetRail.SelectedItemStyle = OpsWatchTheme.Chip(palette.HeroBadgeForeground, palette.HeroBadgeBackground);
-        _fleetRail.FocusedSelectedItemStyle = OpsWatchTheme.Chip(palette.HeroBadgeForeground, palette.FooterChipBackground);
+        _fleetRail.FocusedSelectedItemStyle =
+            OpsWatchTheme.Chip(palette.HeroBadgeForeground, palette.FooterChipBackground);
         _fleetRail.HoveredItemStyle = theme.Accent.Secondary;
 
         _healthBoard.BorderStyleText = theme.Border.Strong;
@@ -387,8 +531,10 @@ internal sealed partial class OpsWatchApp : TesseraApp
         _healthBoard.DegradedServiceStyle = theme.State.Warning;
         _healthBoard.OutageServiceStyle = theme.State.Error.WithBold();
         _healthBoard.HoveredServiceStyle = theme.Accent.Secondary;
-        _healthBoard.SelectedServiceStyle = OpsWatchTheme.Chip(palette.HeroBadgeForeground, palette.HeroBadgeBackground);
-        _healthBoard.FocusedSelectedServiceStyle = OpsWatchTheme.Chip(palette.HeroBadgeForeground, palette.FooterChipBackground);
+        _healthBoard.SelectedServiceStyle =
+            OpsWatchTheme.Chip(palette.HeroBadgeForeground, palette.HeroBadgeBackground);
+        _healthBoard.FocusedSelectedServiceStyle =
+            OpsWatchTheme.Chip(palette.HeroBadgeForeground, palette.FooterChipBackground);
         _healthBoard.AcknowledgedServiceStyle = theme.State.Info;
         _healthBoard.MutedServiceStyle = theme.Text.Muted;
         _healthBoard.Glyphs = new HealthBoardGlyphSet(".", ">", "+", "OK", "~", "!!", "ACK", " ");
@@ -468,7 +614,7 @@ internal sealed partial class OpsWatchApp : TesseraApp
 
     private static void ConfigureSpark(TelemetryChart spark, TesseraStyle dataStyle, OpsWatchThemePalette palette)
     {
-        spark.Options = new TelemetryChartOptions(ShowStats: false, RenderMode: TelemetryChartRenderMode.Braille);
+        spark.Options = new TelemetryChartOptions(RenderMode: TelemetryChartRenderMode.Braille);
         spark.TitleStyle = palette.Theme.Text.Secondary.WithBold();
         spark.FocusedTitleStyle = palette.Theme.Focus.Title;
         spark.FillStyle = dataStyle.WithBold();
@@ -496,9 +642,9 @@ internal sealed partial class OpsWatchApp : TesseraApp
     {
         chart.SetRanges(
         [
-            new BulletRange(0, 60, BulletRangeKind.Normal),
+            new BulletRange(0, 60),
             new BulletRange(60, 82, BulletRangeKind.Warning),
-            new BulletRange(82, 100, BulletRangeKind.Critical),
+            new BulletRange(82, 100, BulletRangeKind.Critical)
         ]);
         chart.ValueLabelStyle = _palette.Theme.Text.Primary.WithBold();
         chart.BorderStyleText = OpsWatchTheme.Foreground(_palette.FrameMutedColor);

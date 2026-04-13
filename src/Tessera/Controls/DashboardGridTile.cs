@@ -1,12 +1,12 @@
 namespace Tessera.Controls;
 
 /// <summary>
-/// Describes a tile rendered by <see cref="DashboardGrid" />.
+///     Describes a tile rendered by <see cref="DashboardGrid" />.
 /// </summary>
 public sealed record DashboardTile
 {
     /// <summary>
-    /// Initializes a new tile definition.
+    ///     Initializes a new tile definition.
     /// </summary>
     /// <param name="id">Stable tile identifier.</param>
     /// <param name="title">Tile title rendered in the tile frame.</param>
@@ -17,8 +17,8 @@ public sealed record DashboardTile
     /// <param name="subtitle">Optional subtitle rendered inside the tile.</param>
     /// <exception cref="ArgumentException"><paramref name="id" /> is empty or whitespace.</exception>
     /// <exception cref="ArgumentOutOfRangeException">
-    /// <paramref name="column" />, <paramref name="row" />, <paramref name="columnSpan" />, or
-    /// <paramref name="rowSpan" /> is out of range.
+    ///     <paramref name="column" />, <paramref name="row" />, <paramref name="columnSpan" />, or
+    ///     <paramref name="rowSpan" /> is out of range.
     /// </exception>
     public DashboardTile(
         string id,
@@ -40,7 +40,7 @@ public sealed record DashboardTile
         ArgumentOutOfRangeException.ThrowIfLessThan(rowSpan, 1);
 
         Id = id;
-        Title = title ?? string.Empty;
+        Title = title;
         Column = column;
         Row = row;
         ColumnSpan = columnSpan;
@@ -49,37 +49,37 @@ public sealed record DashboardTile
     }
 
     /// <summary>
-    /// Gets tile identifier.
+    ///     Gets tile identifier.
     /// </summary>
     public string Id { get; init; }
 
     /// <summary>
-    /// Gets tile title.
+    ///     Gets tile title.
     /// </summary>
     public string Title { get; init; }
 
     /// <summary>
-    /// Gets tile column.
+    ///     Gets tile column.
     /// </summary>
     public int Column { get; init; }
 
     /// <summary>
-    /// Gets tile row.
+    ///     Gets tile row.
     /// </summary>
     public int Row { get; init; }
 
     /// <summary>
-    /// Gets tile column span.
+    ///     Gets tile column span.
     /// </summary>
     public int ColumnSpan { get; init; }
 
     /// <summary>
-    /// Gets tile row span.
+    ///     Gets tile row span.
     /// </summary>
     public int RowSpan { get; init; }
 
     /// <summary>
-    /// Gets optional subtitle rendered under the tile id.
+    ///     Gets optional subtitle rendered under the tile id.
     /// </summary>
     public string Subtitle { get; init; }
 }

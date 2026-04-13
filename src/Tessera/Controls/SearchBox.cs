@@ -12,30 +12,18 @@ public sealed class SearchBox : Control
 {
     private readonly TextInputModel _input = new();
     private int? _matchCount;
-    private int? _currentMatchIndex;
 
     /// <summary>Initializes a new search box.</summary>
-    public SearchBox() => _input.Placeholder = "Search...";
-
-    /// <summary>Occurs when <see cref="QueryText"/> changes.</summary>
-    public event EventHandler<SearchBoxQueryChangedEventArgs>? QueryChanged;
-
-    /// <summary>Occurs when next/previous navigation is requested.</summary>
-    public event EventHandler<SearchBoxNavigationRequestedEventArgs>? NavigationRequested;
+    public SearchBox()
+    {
+        _input.Placeholder = "Search...";
+    }
 
     /// <summary>Gets or sets the field title.</summary>
-    public string Title
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = "Search";
+    public string Title { get; set; } = "Search";
 
     /// <summary>Gets or sets the focus marker appended to the title.</summary>
-    public string FocusMarker
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = "*";
+    public string FocusMarker { get; set; } = "*";
 
     /// <summary>Gets or sets whether the focus marker is rendered.</summary>
     public bool ShowFocusMarker { get; set; } = true;
@@ -50,7 +38,7 @@ public sealed class SearchBox : Control
     public string Placeholder
     {
         get => _input.Placeholder;
-        set => _input.Placeholder = value ?? string.Empty;
+        set => _input.Placeholder = value;
     }
 
     /// <summary>Gets or sets the current query text.</summary>
@@ -64,7 +52,7 @@ public sealed class SearchBox : Control
     public int? MatchCount => _matchCount;
 
     /// <summary>Gets the current zero-based match index, when available.</summary>
-    public int? CurrentMatchIndex => _currentMatchIndex;
+    public int? CurrentMatchIndex { get; private set; }
 
     /// <summary>Gets or sets the border style.</summary>
     public BorderStyle Border { get; set; } = BorderStyle.SingleLine;
@@ -100,18 +88,10 @@ public sealed class SearchBox : Control
     public bool ShowNavigationLabels { get; set; } = true;
 
     /// <summary>Gets or sets the previous-match label.</summary>
-    public string PreviousLabel
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = "Prev";
+    public string PreviousLabel { get; set; } = "Prev";
 
     /// <summary>Gets or sets the next-match label.</summary>
-    public string NextLabel
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = "Next";
+    public string NextLabel { get; set; } = "Next";
 
     /// <inheritdoc />
     public override bool IsFocused { get; set; }
@@ -122,11 +102,17 @@ public sealed class SearchBox : Control
     /// <inheritdoc />
     public override bool IsReadOnly { get; set; }
 
-    /// <summary>Replaces query text and raises <see cref="QueryChanged"/> when needed.</summary>
+    /// <summary>Occurs when <see cref="QueryText" /> changes.</summary>
+    public event EventHandler<SearchBoxQueryChangedEventArgs>? QueryChanged;
+
+    /// <summary>Occurs when next/previous navigation is requested.</summary>
+    public event EventHandler<SearchBoxNavigationRequestedEventArgs>? NavigationRequested;
+
+    /// <summary>Replaces query text and raises <see cref="QueryChanged" /> when needed.</summary>
     /// <param name="query">The query text to set.</param>
     public void SetQueryText(string query)
     {
-        var normalized = query ?? string.Empty;
+        var normalized = query;
         if (string.Equals(_input.Value, normalized, StringComparison.Ordinal))
         {
             return;
@@ -138,37 +124,46 @@ public sealed class SearchBox : Control
     }
 
     /// <summary>Clears query text.</summary>
-    public void ClearQuery() => SetQueryText(string.Empty);
+    public void ClearQuery()
+    {
+        SetQueryText(string.Empty);
+    }
 
     /// <summary>Replaces optional match metadata.</summary>
-    /// <param name="matchCount">Total matches, or <see langword="null"/> to clear state.</param>
+    /// <param name="matchCount">Total matches, or <see langword="null" /> to clear state.</param>
     /// <param name="currentMatchIndex">Current zero-based index. Clamped when matches exist.</param>
     public void SetMatchState(int? matchCount, int? currentMatchIndex = null)
     {
         if (!matchCount.HasValue || matchCount.Value <= 0)
         {
             _matchCount = null;
-            _currentMatchIndex = null;
+            CurrentMatchIndex = null;
             return;
         }
 
         var count = matchCount.Value;
         _matchCount = count;
-        _currentMatchIndex = Math.Clamp(currentMatchIndex ?? _currentMatchIndex ?? 0, 0, count - 1);
+        CurrentMatchIndex = Math.Clamp(currentMatchIndex ?? CurrentMatchIndex ?? 0, 0, count - 1);
     }
 
     /// <summary>Clears optional match metadata.</summary>
     public void ClearMatchState()
     {
         _matchCount = null;
-        _currentMatchIndex = null;
+        CurrentMatchIndex = null;
     }
 
     /// <summary>Requests next match navigation.</summary>
-    public void NextMatch() => RequestNavigation(SearchNavigationDirection.Next);
+    public void NextMatch()
+    {
+        RequestNavigation(SearchNavigationDirection.Next);
+    }
 
     /// <summary>Requests previous match navigation.</summary>
-    public void PreviousMatch() => RequestNavigation(SearchNavigationDirection.Previous);
+    public void PreviousMatch()
+    {
+        RequestNavigation(SearchNavigationDirection.Previous);
+    }
 
     /// <inheritdoc />
     public override bool Handle(Message message)
@@ -327,17 +322,18 @@ public sealed class SearchBox : Control
 
     private void RequestNavigation(SearchNavigationDirection direction)
     {
-        var previous = _currentMatchIndex;
+        var previous = CurrentMatchIndex;
         if (_matchCount is > 0)
         {
             var count = _matchCount.Value;
-            var current = _currentMatchIndex ?? 0;
-            _currentMatchIndex = direction == SearchNavigationDirection.Next
+            var current = CurrentMatchIndex ?? 0;
+            CurrentMatchIndex = direction == SearchNavigationDirection.Next
                 ? (current + 1) % count
                 : (current + count - 1) % count;
         }
 
-        NavigationRequested?.Invoke(this, new SearchBoxNavigationRequestedEventArgs(direction, previous, _currentMatchIndex, _matchCount));
+        NavigationRequested?.Invoke(this,
+            new SearchBoxNavigationRequestedEventArgs(direction, previous, CurrentMatchIndex, _matchCount));
     }
 
     private TesseraStyle ResolveMatchStyle()
@@ -394,7 +390,7 @@ public sealed class SearchBox : Control
             return string.Empty;
         }
 
-        var displayIndex = Math.Clamp((_currentMatchIndex ?? 0) + 1, 1, count);
+        var displayIndex = Math.Clamp((CurrentMatchIndex ?? 0) + 1, 1, count);
         return $"{displayIndex}/{count}";
     }
 

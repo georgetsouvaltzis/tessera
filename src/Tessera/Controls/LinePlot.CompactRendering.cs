@@ -4,9 +4,9 @@ namespace Tessera.Controls;
 
 public sealed partial class LinePlot
 {
-    private static ReadOnlySpan<char> BlockGlyphs => "▁▂▃▄▅▆▇█";
     private const int CompactVirtualWidthPerCell = 4;
     private const int CompactVirtualHeightPerCell = 4;
+    private static ReadOnlySpan<char> BlockGlyphs => "▁▂▃▄▅▆▇█";
 
     private bool TryRenderCompactSeries(
         Canvas canvas,
@@ -24,7 +24,8 @@ public sealed partial class LinePlot
         }
 
         var series = _series[0];
-        if (!TryResolveSeriesScaleRange(series, maxSampleCount, visibleCount, offset, min, max, out var seriesMin, out var seriesMax))
+        if (!TryResolveSeriesScaleRange(series, maxSampleCount, visibleCount, offset, min, max, out var seriesMin,
+                out var seriesMax))
         {
             return false;
         }
@@ -32,11 +33,15 @@ public sealed partial class LinePlot
         return renderMode switch
         {
             LinePlotRenderMode.CompactBraille => plotArea.Width >= 2 && plotArea.Height >= 2
-                ? RenderCompactBrailleSeries(canvas, plotArea, series, maxSampleCount, visibleCount, offset, seriesMin, seriesMax)
-                : RenderCompactBlockSeries(canvas, plotArea, series, maxSampleCount, visibleCount, offset, seriesMin, seriesMax),
+                ? RenderCompactBrailleSeries(canvas, plotArea, series, maxSampleCount, visibleCount, offset, seriesMin,
+                    seriesMax)
+                : RenderCompactBlockSeries(canvas, plotArea, series, maxSampleCount, visibleCount, offset, seriesMin,
+                    seriesMax),
             _ => plotArea.Width >= 2 && plotArea.Height >= 2
-                ? RenderCompactLineSeries(canvas, plotArea, series, maxSampleCount, visibleCount, offset, seriesMin, seriesMax)
-                : RenderCompactBlockSeries(canvas, plotArea, series, maxSampleCount, visibleCount, offset, seriesMin, seriesMax),
+                ? RenderCompactLineSeries(canvas, plotArea, series, maxSampleCount, visibleCount, offset, seriesMin,
+                    seriesMax)
+                : RenderCompactBlockSeries(canvas, plotArea, series, maxSampleCount, visibleCount, offset, seriesMin,
+                    seriesMax)
         };
     }
 
@@ -75,7 +80,8 @@ public sealed partial class LinePlot
             hasPoint = true;
             var virtualX = visibleCount <= 1
                 ? 0
-                : (int)Math.Round(index * (virtualWidth - 1) / (double)(visibleCount - 1), MidpointRounding.AwayFromZero);
+                : (int)Math.Round(index * (virtualWidth - 1) / (double)(visibleCount - 1),
+                    MidpointRounding.AwayFromZero);
             var virtualY = NormalizeVirtualY(value, min, max, virtualHeight);
             if (previousX >= 0)
             {
@@ -107,7 +113,7 @@ public sealed partial class LinePlot
         {
             for (var cellX = 0; cellX < plotArea.Width; cellX++)
             {
-                var cell = topology[(cellY * plotArea.Width) + cellX];
+                var cell = topology[cellY * plotArea.Width + cellX];
                 if (!cell.HasPath)
                 {
                     continue;
@@ -151,7 +157,8 @@ public sealed partial class LinePlot
             hasPoint = true;
             var x = visibleCount <= 1
                 ? 0
-                : (int)Math.Round(index * (virtualWidth - 1) / (double)(visibleCount - 1), MidpointRounding.AwayFromZero);
+                : (int)Math.Round(index * (virtualWidth - 1) / (double)(visibleCount - 1),
+                    MidpointRounding.AwayFromZero);
             var y = NormalizeVirtualY(value, min, max, virtualHeight);
 
             if (previousX >= 0)
@@ -177,7 +184,7 @@ public sealed partial class LinePlot
         {
             for (var cellX = 0; cellX < plotArea.Width; cellX++)
             {
-                var mask = masks[(cellY * plotArea.Width) + cellX];
+                var mask = masks[cellY * plotArea.Width + cellX];
                 if (mask == 0)
                 {
                     continue;
@@ -208,7 +215,8 @@ public sealed partial class LinePlot
         {
             var globalIndex = plotArea.Width <= 1
                 ? offset
-                : offset + (int)Math.Round(cellX * (visibleCount - 1) / (double)Math.Max(1, plotArea.Width - 1), MidpointRounding.AwayFromZero);
+                : offset + (int)Math.Round(cellX * (visibleCount - 1) / (double)Math.Max(1, plotArea.Width - 1),
+                    MidpointRounding.AwayFromZero);
             if (!TryGetSeriesValue(series, maxSampleCount, globalIndex, out var value))
             {
                 continue;
@@ -216,7 +224,9 @@ public sealed partial class LinePlot
 
             hasPoint = true;
             var normalized = NormalizeValue(value, min, max);
-            var glyphIndex = Math.Clamp((int)Math.Round(normalized * (BlockGlyphs.Length - 1), MidpointRounding.AwayFromZero), 0, BlockGlyphs.Length - 1);
+            var glyphIndex =
+                Math.Clamp((int)Math.Round(normalized * (BlockGlyphs.Length - 1), MidpointRounding.AwayFromZero), 0,
+                    BlockGlyphs.Length - 1);
             var glyph = BlockGlyphs[glyphIndex];
             WriteGlyph(canvas, plotArea.X + cellX, plotArea.Bottom - 1, glyph, RenderGlyph(glyph, style));
         }
@@ -227,7 +237,7 @@ public sealed partial class LinePlot
     private static int NormalizeVirtualY(double value, double min, double max, int virtualHeight)
     {
         var normalized = NormalizeValue(value, min, max);
-        return (virtualHeight - 1) - (int)Math.Round(normalized * (virtualHeight - 1), MidpointRounding.AwayFromZero);
+        return virtualHeight - 1 - (int)Math.Round(normalized * (virtualHeight - 1), MidpointRounding.AwayFromZero);
     }
 
     private static double NormalizeValue(double value, double min, double max)
@@ -287,25 +297,27 @@ public sealed partial class LinePlot
         MarkCompactPoint(topology, width, height, currentX, currentY);
     }
 
-    private static void MarkCompactPoint(CompactCellTopology[] topology, int width, int height, int virtualX, int virtualY)
+    private static void MarkCompactPoint(CompactCellTopology[] topology, int width, int height, int virtualX,
+        int virtualY)
     {
         if (!TryResolveCompactCell(width, height, virtualX, virtualY, out var cellX, out var cellY))
         {
             return;
         }
 
-        ref var cell = ref topology[(cellY * width) + cellX];
+        ref var cell = ref topology[cellY * width + cellX];
         cell.HasPath = true;
     }
 
-    private static void MarkCompactStep(CompactCellTopology[] topology, int width, int height, int virtualX, int virtualY, int stepX, int stepY)
+    private static void MarkCompactStep(CompactCellTopology[] topology, int width, int height, int virtualX,
+        int virtualY, int stepX, int stepY)
     {
         if (!TryResolveCompactCell(width, height, virtualX, virtualY, out var cellX, out var cellY))
         {
             return;
         }
 
-        ref var cell = ref topology[(cellY * width) + cellX];
+        ref var cell = ref topology[cellY * width + cellX];
         cell.HasPath = true;
         cell.RecordDirection(stepX, stepY);
     }
@@ -335,8 +347,8 @@ public sealed partial class LinePlot
         var exitPort = ResolveExitPort(dx, dy);
         var entryPort = ResolveOppositePort(exitPort);
 
-        ref var currentCell = ref topology[(currentCellY * width) + currentCellX];
-        ref var nextCell = ref topology[(nextCellY * width) + nextCellX];
+        ref var currentCell = ref topology[currentCellY * width + currentCellX];
+        ref var nextCell = ref topology[nextCellY * width + nextCellX];
         currentCell.HasPath = true;
         nextCell.HasPath = true;
         currentCell.RecordExit(exitPort);
@@ -424,14 +436,14 @@ public sealed partial class LinePlot
             return;
         }
 
-        virtualX = Math.Clamp(virtualX, 0, (width * 2) - 1);
-        virtualY = Math.Clamp(virtualY, 0, (height * 4) - 1);
+        virtualX = Math.Clamp(virtualX, 0, width * 2 - 1);
+        virtualY = Math.Clamp(virtualY, 0, height * 4 - 1);
 
         var cellX = virtualX / 2;
         var cellY = virtualY / 4;
         var dotX = virtualX % 2;
         var dotY = virtualY % 4;
-        var index = (cellY * width) + cellX;
+        var index = cellY * width + cellX;
         masks[index] |= ResolveBrailleMask(dotX, dotY);
     }
 
@@ -447,11 +459,12 @@ public sealed partial class LinePlot
             (1, 1) => 0x10,
             (1, 2) => 0x20,
             (1, 3) => 0x80,
-            _ => 0x00,
+            _ => 0x00
         };
     }
 
-    private static bool TryResolveCompactCell(int width, int height, int virtualX, int virtualY, out int cellX, out int cellY)
+    private static bool TryResolveCompactCell(int width, int height, int virtualX, int virtualY, out int cellX,
+        out int cellY)
     {
         cellX = 0;
         cellY = 0;
@@ -460,8 +473,8 @@ public sealed partial class LinePlot
             return false;
         }
 
-        var maxVirtualX = (width * CompactVirtualWidthPerCell) - 1;
-        var maxVirtualY = (height * CompactVirtualHeightPerCell) - 1;
+        var maxVirtualX = width * CompactVirtualWidthPerCell - 1;
+        var maxVirtualY = height * CompactVirtualHeightPerCell - 1;
         virtualX = Math.Clamp(virtualX, 0, maxVirtualX);
         virtualY = Math.Clamp(virtualY, 0, maxVirtualY);
         cellX = virtualX / CompactVirtualWidthPerCell;
@@ -481,7 +494,7 @@ public sealed partial class LinePlot
             (1, -1) => CompactPort.NorthEast,
             (-1, 1) => CompactPort.SouthWest,
             (-1, -1) => CompactPort.NorthWest,
-            _ => CompactPort.None,
+            _ => CompactPort.None
         };
     }
 
@@ -497,7 +510,7 @@ public sealed partial class LinePlot
             CompactPort.NorthEast => CompactPort.SouthWest,
             CompactPort.SouthWest => CompactPort.NorthEast,
             CompactPort.SouthEast => CompactPort.NorthWest,
-            _ => CompactPort.None,
+            _ => CompactPort.None
         };
     }
 
@@ -508,7 +521,7 @@ public sealed partial class LinePlot
         {
             CompactPort.West or CompactPort.East or CompactPort.West | CompactPort.East => '─',
             CompactPort.North or CompactPort.South or CompactPort.North | CompactPort.South => '│',
-            _ => default,
+            _ => default
         };
         return glyph != default;
     }
@@ -520,7 +533,7 @@ public sealed partial class LinePlot
         {
             CompactPort.SouthWest | CompactPort.NorthEast => '╱',
             CompactPort.NorthWest | CompactPort.SouthEast => '╲',
-            _ => ResolveSideCornerDiagonal(entry, exit),
+            _ => ResolveSideCornerDiagonal(entry, exit)
         };
         return glyph != default;
     }
@@ -538,7 +551,7 @@ public sealed partial class LinePlot
             (CompactPort.NorthWest, CompactPort.East) => '╲',
             (CompactPort.NorthWest, CompactPort.South) => '╲',
             (CompactPort.North, CompactPort.SouthEast) => '╲',
-            _ => default,
+            _ => default
         };
     }
 
@@ -551,7 +564,7 @@ public sealed partial class LinePlot
             (CompactPort.North, CompactPort.West) => '╯',
             (CompactPort.South, CompactPort.East) => '╭',
             (CompactPort.South, CompactPort.West) => '╮',
-            _ => default,
+            _ => default
         };
         return glyph != default;
     }
@@ -572,7 +585,7 @@ public sealed partial class LinePlot
         NorthWest = 16,
         NorthEast = 32,
         SouthWest = 64,
-        SouthEast = 128,
+        SouthEast = 128
     }
 
     private struct CompactCellTopology

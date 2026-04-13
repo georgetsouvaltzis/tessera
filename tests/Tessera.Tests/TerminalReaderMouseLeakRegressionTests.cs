@@ -1,5 +1,5 @@
-using System.Text;
 using NUnit.Framework;
+using System.Text;
 using Tessera.Core.Abstractions;
 using Tessera.Core.Input;
 using Tessera.Core.Messages;
@@ -15,9 +15,9 @@ public sealed class TerminalReaderMouseLeakRegressionTests
     {
         var stream = new TimedChunkReadStream(
         [
-            (Encoding.UTF8.GetBytes("\u001b["), 0),
-            (Encoding.UTF8.GetBytes("<32;83;7M\u001b["), 35),
-            (Encoding.UTF8.GetBytes("<0;84;7M"), 35),
+            (Encoding.UTF8.GetBytes("\e["), 0),
+            (Encoding.UTF8.GetBytes("<32;83;7M\e["), 35),
+            (Encoding.UTF8.GetBytes("<0;84;7M"), 35)
         ]);
         var reader = new TerminalReader(stream, new EventDecoder(), TimeSpan.FromMilliseconds(10));
         var events = new List<IMessage>();
@@ -38,21 +38,23 @@ public sealed class TerminalReaderMouseLeakRegressionTests
     }
 
     [Test]
-    public async Task TerminalReaderMouseLeakRegressionEscapeThenDelayedCsiMouseAcrossTimeoutDoesNotEmitCharacterFragments()
+    public async Task
+        TerminalReaderMouseLeakRegressionEscapeThenDelayedCsiMouseAcrossTimeoutDoesNotEmitCharacterFragments()
     {
         var stream = new TimedChunkReadStream(
         [
-            (Encoding.UTF8.GetBytes("\u001b"), 0),
+            (Encoding.UTF8.GetBytes("\e"), 0),
             (Encoding.UTF8.GetBytes("[<32;83;7M"), 35),
-            (Encoding.UTF8.GetBytes("\u001b"), 35),
-            (Encoding.UTF8.GetBytes("[<0;84;7M"), 35),
+            (Encoding.UTF8.GetBytes("\e"), 35),
+            (Encoding.UTF8.GetBytes("[<0;84;7M"), 35)
         ]);
         var reader = new TerminalReader(stream, new EventDecoder(), TimeSpan.FromMilliseconds(10));
         var events = new List<IMessage>();
 
         await reader.StreamEventsAsync(events.Add, CancellationToken.None);
 
-        Assert.That(events.Count, Is.EqualTo(2), "Split ESC then delayed SGR reports should decode to two mouse events.");
+        Assert.That(events.Count, Is.EqualTo(2),
+            "Split ESC then delayed SGR reports should decode to two mouse events.");
         Assert.That(
             events[0] is MouseMotionMsg { Button: MouseButton.Left, X: 82, Y: 6 },
             Is.True,
@@ -71,7 +73,7 @@ public sealed class TerminalReaderMouseLeakRegressionTests
         var stream = new TimedChunkReadStream(
         [
             (new byte[] { 0x1B, (byte)'[', (byte)'M', (byte)' ' }, 0),
-            (new byte[] { (byte)'!', (byte)'!' }, 35),
+            (new[] { (byte)'!', (byte)'!' }, 35)
         ]);
         var reader = new TerminalReader(stream, new EventDecoder(), TimeSpan.FromMilliseconds(10));
         var events = new List<IMessage>();
@@ -92,7 +94,7 @@ public sealed class TerminalReaderMouseLeakRegressionTests
         var stream = new TimedChunkReadStream(
         [
             (new byte[] { 0x1B, (byte)'[', (byte)'M', (byte)'C' }, 0),
-            (new byte[] { (byte)'!', (byte)'!' }, 35),
+            (new[] { (byte)'!', (byte)'!' }, 35)
         ]);
         var reader = new TerminalReader(stream, new EventDecoder(), TimeSpan.FromMilliseconds(10));
         var events = new List<IMessage>();
@@ -145,7 +147,8 @@ public sealed class TerminalReaderMouseLeakRegressionTests
             throw new NotSupportedException();
         }
 
-        public override async ValueTask<int> ReadAsync(Memory<byte> buffer, CancellationToken cancellationToken = default)
+        public override async ValueTask<int> ReadAsync(Memory<byte> buffer,
+            CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
             if (_chunkIndex >= chunks.Length)

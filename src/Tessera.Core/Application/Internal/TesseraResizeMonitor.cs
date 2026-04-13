@@ -1,6 +1,6 @@
-using Tessera.Core.Abstractions;
 using System.Runtime.InteropServices;
 using System.Threading.Channels;
+using Tessera.Core.Abstractions;
 using Tessera.Core.Messages;
 using Tessera.Core.Terminal;
 
@@ -13,7 +13,7 @@ internal static class TesseraResizeMonitor
         SingleReader = true,
         SingleWriter = false,
         FullMode = BoundedChannelFullMode.DropOldest,
-        AllowSynchronousContinuations = true,
+        AllowSynchronousContinuations = true
     };
 
     public static (Task? Loop, IDisposable? SignalRegistration) Start(
@@ -73,7 +73,8 @@ internal static class TesseraResizeMonitor
         return (loop, registration);
     }
 
-    private static async Task WaitForSignalOrPollIntervalAsync(ChannelReader<bool> signalTicks, TimeSpan interval, CancellationToken token)
+    private static async Task WaitForSignalOrPollIntervalAsync(ChannelReader<bool> signalTicks, TimeSpan interval,
+        CancellationToken token)
     {
         var waitForSignal = signalTicks.WaitToReadAsync(token);
         if (waitForSignal.IsCompletedSuccessfully)
@@ -91,7 +92,8 @@ internal static class TesseraResizeMonitor
         }
     }
 
-    private static IDisposable? TryRegisterResizeSignal(ITerminalAdapter terminal, TesseraRuntimeLoopOptions options, Action onResize)
+    private static IDisposable? TryRegisterResizeSignal(ITerminalAdapter terminal, TesseraRuntimeLoopOptions options,
+        Action onResize)
     {
         if (!options.EnableResizeSignals)
         {

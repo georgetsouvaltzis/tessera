@@ -56,7 +56,8 @@ internal static class NumberInputRenderer
         canvas.WriteText(content.X, content.Y, statePalette.Render(frame.Text, states), content.Width);
         if (content.Height > 1)
         {
-            var summary = $"value={NumberInputFormatting.Format(value, precision)} range=[{NumberInputFormatting.Format(min, precision)}, {NumberInputFormatting.Format(max, precision)}]";
+            var summary =
+                $"value={NumberInputFormatting.Format(value, precision)} range=[{NumberInputFormatting.Format(min, precision)}, {NumberInputFormatting.Format(max, precision)}]";
             canvas.WriteText(content.X, content.Y + 1, statePalette.Render(summary, states), content.Width);
         }
     }

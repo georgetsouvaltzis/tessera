@@ -1,7 +1,7 @@
 namespace Tessera.Controls;
 
 /// <summary>
-/// Represents one hierarchical row in a <see cref="TreeTable"/>.
+///     Represents one hierarchical row in a <see cref="TreeTable" />.
 /// </summary>
 public sealed class TreeTableNode
 {
@@ -9,7 +9,7 @@ public sealed class TreeTableNode
     private readonly List<string> _values = [];
 
     /// <summary>
-    /// Initializes a new tree-table node.
+    ///     Initializes a new tree-table node.
     /// </summary>
     /// <param name="id">Stable node identifier.</param>
     /// <param name="label">Primary label rendered in the tree column.</param>
@@ -21,13 +21,13 @@ public sealed class TreeTableNode
         IEnumerable<string>? values = null,
         IEnumerable<TreeTableNode>? children = null)
     {
-        Id = id ?? string.Empty;
-        Label = label ?? string.Empty;
+        Id = id;
+        Label = label;
         if (values is not null)
         {
             foreach (var value in values)
             {
-                _values.Add(value ?? string.Empty);
+                _values.Add(value);
             }
         }
 
@@ -41,37 +41,37 @@ public sealed class TreeTableNode
     }
 
     /// <summary>
-    /// Gets the stable node identifier.
+    ///     Gets the stable node identifier.
     /// </summary>
     public string Id { get; }
 
     /// <summary>
-    /// Gets or sets the display label for the tree column.
+    ///     Gets or sets the display label for the tree column.
     /// </summary>
     public string Label { get; set; }
 
     /// <summary>
-    /// Gets a value indicating whether this node currently has child rows.
+    ///     Gets a value indicating whether this node currently has child rows.
     /// </summary>
     public bool IsBranch => _children.Count > 0;
 
     /// <summary>
-    /// Gets or sets a value indicating whether child rows are visible.
+    ///     Gets or sets a value indicating whether child rows are visible.
     /// </summary>
     public bool IsExpanded { get; set; } = true;
 
     /// <summary>
-    /// Gets the non-tree column values for this row.
+    ///     Gets the non-tree column values for this row.
     /// </summary>
     public IReadOnlyList<string> Values => _values;
 
     /// <summary>
-    /// Gets child rows.
+    ///     Gets child rows.
     /// </summary>
     public IReadOnlyList<TreeTableNode> Children => _children;
 
     /// <summary>
-    /// Adds a child row.
+    ///     Adds a child row.
     /// </summary>
     /// <param name="child">Child row to add.</param>
     public void AddChild(TreeTableNode child)
@@ -81,7 +81,7 @@ public sealed class TreeTableNode
     }
 
     /// <summary>
-    /// Replaces all non-tree column values.
+    ///     Replaces all non-tree column values.
     /// </summary>
     /// <param name="values">New values.</param>
     public void SetValues(IEnumerable<string> values)
@@ -90,7 +90,7 @@ public sealed class TreeTableNode
         _values.Clear();
         foreach (var value in values)
         {
-            _values.Add(value ?? string.Empty);
+            _values.Add(value);
         }
     }
 }

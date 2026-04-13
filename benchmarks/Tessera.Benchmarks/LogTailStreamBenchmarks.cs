@@ -10,27 +10,24 @@ public class LogTailStreamBenchmarks
     private const int AppendBatchSize = 2_048;
     private static readonly KeyPressed UpKey = new(Key.Up);
     private static readonly KeyPressed DownKey = new(Key.Down);
-    private readonly string[] _seedLines = CreateSeedLines();
-    private readonly LogView _logView = new()
-    {
-        Border = BorderStyle.SingleLine,
-        AutoScroll = true,
-        IsFocused = true,
-    };
 
     private readonly Rect _bounds = new(0, 0, 160, 42);
     private readonly Canvas _canvas = new(160, 42);
 
+    private readonly LogView _logView = new() { Border = BorderStyle.SingleLine, AutoScroll = true, IsFocused = true };
+
+    private readonly string[] _seedLines = CreateSeedLines();
+
     [Benchmark(Description = "log-tail stream append + scroll workload")]
     public int AppendAndScrollLogTail()
     {
-        return AppendAndScrollLogTailCore(materialize: true);
+        return AppendAndScrollLogTailCore(true);
     }
 
     [Benchmark(Description = "log-tail stream append + scroll render-only (no materialization)")]
     public int AppendAndScrollLogTailOnly()
     {
-        return AppendAndScrollLogTailCore(materialize: false);
+        return AppendAndScrollLogTailCore(false);
     }
 
     private int AppendAndScrollLogTailCore(bool materialize)
@@ -68,7 +65,7 @@ public class LogTailStreamBenchmarks
                 1 => "DEBUG",
                 2 => "INFO",
                 3 => "WARN",
-                _ => "ERROR",
+                _ => "ERROR"
             };
             lines[index] = $"[{level}] stream={index % 9:D2} msg={index:D4} token={(index * 17 + 13) % 10_000:D4}";
         }

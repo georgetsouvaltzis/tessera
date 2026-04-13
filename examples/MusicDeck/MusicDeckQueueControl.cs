@@ -1,6 +1,5 @@
 using Tessera.Components.Primitives;
 using Tessera.Controls;
-using Tessera.Layout;
 using Tessera.Styles;
 
 namespace Tessera.Examples.MusicDeck;
@@ -50,7 +49,7 @@ internal sealed class MusicDeckQueueControl : Control
         var start = 0;
         if (_items.Count > content.Height)
         {
-            start = Math.Clamp(SelectedIndex - (content.Height / 2), 0, _items.Count - content.Height);
+            start = Math.Clamp(SelectedIndex - content.Height / 2, 0, _items.Count - content.Height);
         }
 
         for (var row = 0; row < content.Height && start + row < _items.Count; row++)
@@ -84,10 +83,18 @@ internal sealed class MusicDeckQueueControl : Control
             var text = $"{prefix} {item.Title}";
             canvas.WriteText(content.X, content.Y + row, Render(style, text), Math.Max(0, content.Width - 7));
             var durationX = Math.Max(content.X, content.Right - item.DisplayDuration.Length);
-            canvas.WriteText(durationX, content.Y + row, Render(MetaStyle, item.DisplayDuration), content.Right - durationX);
+            canvas.WriteText(durationX, content.Y + row, Render(MetaStyle, item.DisplayDuration),
+                content.Right - durationX);
         }
     }
 
-    private TesseraStyle ResolveBorderStyle() => IsFocused ? BorderStyleText.Merge(FocusedBorderStyleText) : BorderStyleText;
-    private static string Render(TesseraStyle style, string text) => style.IsEmpty || string.IsNullOrEmpty(text) ? text : style.Render(text);
+    private TesseraStyle ResolveBorderStyle()
+    {
+        return IsFocused ? BorderStyleText.Merge(FocusedBorderStyleText) : BorderStyleText;
+    }
+
+    private static string Render(TesseraStyle style, string text)
+    {
+        return style.IsEmpty || string.IsNullOrEmpty(text) ? text : style.Render(text);
+    }
 }

@@ -1,12 +1,12 @@
 namespace Tessera.Controls;
 
 /// <summary>
-/// Provides old/new state when <see cref="Timeline" /> selection changes.
+///     Provides old/new state when <see cref="Timeline" /> selection changes.
 /// </summary>
 public sealed class TimelineSelectionChangedEventArgs : EventArgs
 {
     /// <summary>
-    /// Initializes a timeline selection-change payload.
+    ///     Initializes a timeline selection-change payload.
     /// </summary>
     /// <param name="previousIndex">The selected index before the change, or <c>-1</c> when none was selected.</param>
     /// <param name="selectedIndex">The selected index after the change, or <c>-1</c> when none is selected.</param>
@@ -25,22 +25,22 @@ public sealed class TimelineSelectionChangedEventArgs : EventArgs
     }
 
     /// <summary>
-    /// Gets the selected index before the change.
+    ///     Gets the selected index before the change.
     /// </summary>
     public int PreviousIndex { get; }
 
     /// <summary>
-    /// Gets the selected index after the change.
+    ///     Gets the selected index after the change.
     /// </summary>
     public int SelectedIndex { get; }
 
     /// <summary>
-    /// Gets the selected item before the change.
+    ///     Gets the selected item before the change.
     /// </summary>
     public TimelineEntry? PreviousItem { get; }
 
     /// <summary>
-    /// Gets the selected item after the change.
+    ///     Gets the selected item after the change.
     /// </summary>
     public TimelineEntry? SelectedItem { get; }
 }

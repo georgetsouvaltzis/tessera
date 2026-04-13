@@ -15,7 +15,7 @@ internal static class DisplayWidth
         (0x2728, 0x2728), (0x274C, 0x274C), (0x274E, 0x274E), (0x2753, 0x2755), (0x2757, 0x2757), (0x2795, 0x2797),
         (0x27B0, 0x27B0), (0x27BF, 0x27BF), (0x2B1B, 0x2B1C), (0x2B50, 0x2B50), (0x2B55, 0x2B55), (0x2E80, 0x303E),
         (0x3040, 0xA4CF), (0xAC00, 0xD7A3), (0xF900, 0xFAFF), (0xFE10, 0xFE19), (0xFE30, 0xFE6F), (0xFF00, 0xFF60),
-        (0xFFE0, 0xFFE6), (0x1F300, 0x1FAFF), (0x20000, 0x2FFFD), (0x30000, 0x3FFFD),
+        (0xFFE0, 0xFFE6), (0x1F300, 0x1FAFF), (0x20000, 0x2FFFD), (0x30000, 0x3FFFD)
     ];
 
     public static int MeasureTextElementWidth(string textElement)
@@ -36,7 +36,8 @@ internal static class DisplayWidth
         }
 
         var category = Rune.GetUnicodeCategory(rune);
-        if (category is UnicodeCategory.NonSpacingMark or UnicodeCategory.EnclosingMark or UnicodeCategory.Format)
+        if (category is UnicodeCategory.NonSpacingMark or UnicodeCategory.EnclosingMark
+            or UnicodeCategory.Format)
         {
             return 0;
         }

@@ -1,7 +1,7 @@
 namespace Tessera.Controls;
 
 /// <summary>
-/// Represents one toast entry tracked by <see cref="ToastCenter" />.
+///     Represents one toast entry tracked by <see cref="ToastCenter" />.
 /// </summary>
 /// <param name="Id">Stable toast identifier.</param>
 /// <param name="Message">Toast message text.</param>

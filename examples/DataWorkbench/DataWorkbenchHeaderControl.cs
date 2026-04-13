@@ -1,6 +1,5 @@
 using Tessera.Components.Primitives;
 using Tessera.Controls;
-using Tessera.Layout;
 using Tessera.Styles;
 
 namespace Tessera.Examples.DataWorkbench;
@@ -41,7 +40,8 @@ internal sealed class DataWorkbenchHeaderControl : Control
             return;
         }
 
-        canvas.WriteText(content.X, content.Y, ApplyStyle($"{Title}  {ClockText}", TitleStyle.Merge(ClockStyle)), content.Width);
+        canvas.WriteText(content.X, content.Y, ApplyStyle($"{Title}  {ClockText}", TitleStyle.Merge(ClockStyle)),
+            content.Width);
 
         var badgeLine = string.Join(
             " ",

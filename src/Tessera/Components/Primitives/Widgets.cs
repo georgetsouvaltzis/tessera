@@ -1,3 +1,5 @@
+using Tessera.Styles;
+
 namespace Tessera.Components.Primitives;
 
 internal static class Widgets
@@ -25,7 +27,7 @@ internal static class Widgets
         }
 
         var row = 0;
-        var value = content ?? string.Empty;
+        var value = content;
         var start = 0;
         var index = 0;
         while (index < value.Length && row < contentRect.Height)
@@ -80,10 +82,12 @@ internal static class Widgets
         }
     }
 
-    public static void DrawSparkline(Canvas canvas, Rect rect, IReadOnlyList<int> values, int minValue = 0, int maxValue = 100)
+    public static void DrawSparkline(Canvas canvas, Rect rect, IReadOnlyList<int> values, int minValue = 0,
+        int maxValue = 100)
     {
         var clipped = Rect.Intersect(rect, canvas.Bounds);
-        if (clipped.IsEmpty || clipped.Width <= 0 || clipped.Height <= 0 || values.Count == 0 || minValue >= maxValue)
+        if (clipped.IsEmpty || clipped.Width <= 0 || clipped.Height <= 0 || values.Count == 0 ||
+            minValue >= maxValue)
         {
             return;
         }
@@ -150,7 +154,8 @@ internal static class Widgets
         string? title = null,
         BorderStyle border = BorderStyle.SingleLine,
         Thickness padding = default)
-        => DrawTable(
+    {
+        DrawTable(
             canvas,
             rect,
             headers,
@@ -159,7 +164,8 @@ internal static class Widgets
             title,
             border,
             padding,
-            borderStyleText: default);
+            default);
+    }
 
     public static void DrawTable(
         Canvas canvas,
@@ -170,7 +176,7 @@ internal static class Widgets
         string? title,
         BorderStyle border,
         Thickness padding,
-        global::Tessera.Styles.TesseraStyle borderStyleText)
+        TesseraStyle borderStyleText)
     {
         var clipped = Rect.Intersect(rect, canvas.Bounds);
         if (clipped.IsEmpty || headers.Count == 0)
@@ -184,9 +190,10 @@ internal static class Widgets
         {
             minHeight = 3;
         }
+
         var minWidth = showBorder
-            ? (headers.Count * 2) + 1
-            : (headers.Count * 2) - 1;
+            ? headers.Count * 2 + 1
+            : headers.Count * 2 - 1;
         if (clipped.Width < minWidth || clipped.Height < minHeight)
         {
             return;
@@ -217,10 +224,10 @@ internal static class Widgets
         var availableWidth = Math.Max(headers.Count, contentRect.Width - separatorCount);
         var widths = ComputeColumnWidths(availableWidth, headers.Count);
 
-        DrawTableRow(canvas, contentRect.X, contentRect.Y, widths, headers, isSelected: false);
+        DrawTableRow(canvas, contentRect.X, contentRect.Y, widths, headers, false);
 
         var dividerY = contentRect.Y + 1;
-        canvas.DrawHorizontalLine(contentRect.X, dividerY, contentRect.Width, '─');
+        canvas.DrawHorizontalLine(contentRect.X, dividerY, contentRect.Width);
         var separatorX = contentRect.X;
         for (var i = 0; i < widths.Length - 1; i++)
         {
@@ -233,7 +240,7 @@ internal static class Widgets
         for (var i = 0; i < maxRows; i++)
         {
             var y = contentRect.Y + 2 + i;
-            DrawTableRow(canvas, contentRect.X, y, widths, rows[i], isSelected: i == selectedRow);
+            DrawTableRow(canvas, contentRect.X, y, widths, rows[i], i == selectedRow);
         }
     }
 

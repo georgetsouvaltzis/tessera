@@ -12,13 +12,10 @@ public sealed class JsonTreeViewControlTests
     [Test]
     public void ControlsJsonTreeViewSetJsonRendersHierarchy()
     {
-        var control = new JsonTreeView
-        {
-            Border = BorderStyle.None,
-        };
+        var control = new JsonTreeView { Border = BorderStyle.None };
         control.SetJson("""{"user":{"name":"anna","role":"admin"},"ok":true}""");
 
-        var output = Render(control, width: 64, height: 6);
+        var output = Render(control, 64, 6);
 
         Assert.That(output.Contains("> ▼ user: {...}", StringComparison.Ordinal), Is.True);
         Assert.That(output.Contains("• name: \"anna\"", StringComparison.Ordinal), Is.True);
@@ -28,11 +25,7 @@ public sealed class JsonTreeViewControlTests
     [Test]
     public void ControlsJsonTreeViewKeyboardNavigationExpandCollapseAndSelectionEvents()
     {
-        var control = new JsonTreeView
-        {
-            IsFocused = true,
-            Border = BorderStyle.None,
-        };
+        var control = new JsonTreeView { IsFocused = true, Border = BorderStyle.None };
         control.SetJson("""{"user":{"name":"anna","role":"admin"},"ok":true}""");
         JsonTreeSelectionChangedEventArgs? args = null;
         control.SelectionChanged += (_, eventArgs) => args = eventArgs;
@@ -40,9 +33,9 @@ public sealed class JsonTreeViewControlTests
         var down = control.Handle(new KeyPressed(Key.Down));
         var up = control.Handle(new KeyPressed(Key.Up));
         var collapse = control.Handle(new KeyPressed(Key.Enter));
-        var collapsedOutput = Render(control, width: 64, height: 6);
+        var collapsedOutput = Render(control, 64, 6);
         var expand = control.Handle(new KeyPressed(Key.Enter));
-        var expandedOutput = Render(control, width: 64, height: 6);
+        var expandedOutput = Render(control, 64, 6);
 
         Assert.That(down, Is.True);
         Assert.That(up, Is.True);
@@ -59,10 +52,7 @@ public sealed class JsonTreeViewControlTests
     [Test]
     public void ControlsJsonTreeViewPointerHoverAndClickSelectNode()
     {
-        var control = new JsonTreeView
-        {
-            Border = BorderStyle.SingleLine,
-        };
+        var control = new JsonTreeView { Border = BorderStyle.SingleLine };
         control.SetJson("""{"user":{"name":"anna","role":"admin"},"ok":true}""");
         var bounds = new Rect(0, 0, 64, 8);
 
@@ -96,26 +86,23 @@ public sealed class JsonTreeViewControlTests
             ValueStyle = TesseraStyle.Empty.WithForeground(AnsiColor.Rgb(20, 21, 22)),
             SelectedRowStyle = TesseraStyle.Empty.WithBold(),
             FocusedSelectedRowStyle = TesseraStyle.Empty.WithUnderline(),
-            HoveredRowStyle = TesseraStyle.Empty.WithItalic(),
+            HoveredRowStyle = TesseraStyle.Empty.WithItalic()
         };
         control.SetJson("""{"user":{"name":"anna"},"ok":true}""");
         _ = control.Handle(new PointerInput(PointerEventKind.Motion, PointerButton.None, 2, 1), new Rect(0, 0, 64, 5));
 
-        var first = Render(control, width: 64, height: 5);
-        var second = Render(control, width: 64, height: 5);
+        var first = Render(control, 64, 5);
+        var second = Render(control, 64, 5);
 
         Assert.That(first, Is.EqualTo(second));
         Assert.That(first.Contains("38;2;10;11;12", StringComparison.Ordinal), Is.True);
         Assert.That(first.Contains("38;2;20;21;22", StringComparison.Ordinal), Is.True);
-        Assert.That(first.Contains("\u001b[", StringComparison.Ordinal), Is.True);
+        Assert.That(first.Contains("\e[", StringComparison.Ordinal), Is.True);
 
-        var plain = new JsonTreeView
-        {
-            Border = BorderStyle.None,
-        };
+        var plain = new JsonTreeView { Border = BorderStyle.None };
         plain.SetJson("""{"a":1}""");
-        var plainOutput = Render(plain, width: 32, height: 3);
-        Assert.That(plainOutput.Contains("\u001b[", StringComparison.Ordinal), Is.False);
+        var plainOutput = Render(plain, 32, 3);
+        Assert.That(plainOutput.Contains("\e[", StringComparison.Ordinal), Is.False);
     }
 
     private static string Render(JsonTreeView control, int width, int height)

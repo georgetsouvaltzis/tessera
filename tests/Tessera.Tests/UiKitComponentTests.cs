@@ -1,8 +1,5 @@
-using Tessera.Components.Composition;
 using Tessera.Components.Primitives;
-using Tessera.Components.Styling;
 using Tessera.Controls;
-using Tessera.Core.Messages;
 
 namespace Tessera.Tests;
 
@@ -10,13 +7,16 @@ internal static class UiKitComponentTests
 {
     public static IEnumerable<TestCase> Cases()
     {
-        yield return new TestCase("UiKit_Canvas_DrawBox_BorderStyles_RenderExpectedCorners", Canvas_DrawBox_BorderStyles_RenderExpectedCorners);
+        yield return new TestCase("UiKit_Canvas_DrawBox_BorderStyles_RenderExpectedCorners",
+            Canvas_DrawBox_BorderStyles_RenderExpectedCorners);
         yield return new TestCase("Controls_StatusBar_PlacesLeftAndRightText", StatusBar_PlacesLeftAndRightText);
         yield return new TestCase("Controls_StatusBar_UsesFillCharacter", StatusBar_UsesFillCharacter);
         yield return new TestCase("Controls_FormComponents_RespondToInput", FormComponents_RespondToInput);
         yield return new TestCase("Controls_Modal_VisibleStateControlsRendering", Modal_VisibleStateControlsRendering);
-        yield return new TestCase("Controls_Modal_BackdropOccludesUnderlyingContent", Modal_BackdropOccludesUnderlyingContent);
-        yield return new TestCase("Controls_Modal_BackdropOccludesUnderlyingContent_GraphemeAwareCanvas", Modal_BackdropOccludesUnderlyingContent_GraphemeAwareCanvas);
+        yield return new TestCase("Controls_Modal_BackdropOccludesUnderlyingContent",
+            Modal_BackdropOccludesUnderlyingContent);
+        yield return new TestCase("Controls_Modal_BackdropOccludesUnderlyingContent_GraphemeAwareCanvas",
+            Modal_BackdropOccludesUnderlyingContent_GraphemeAwareCanvas);
     }
 
     private static Task Canvas_DrawBox_BorderStyles_RenderExpectedCorners()
@@ -41,11 +41,7 @@ internal static class UiKitComponentTests
     private static Task StatusBar_PlacesLeftAndRightText()
     {
         // Arrange
-        var statusBar = new StatusBar
-        {
-            LeftText = "left",
-            RightText = "right",
-        };
+        var statusBar = new StatusBar { LeftText = "left", RightText = "right" };
         var canvas = new Canvas(24, 1);
 
         // Act
@@ -53,20 +49,17 @@ internal static class UiKitComponentTests
         var output = canvas.Render();
 
         // Assert
-        TestAssert.True(output.StartsWith("left", StringComparison.Ordinal), "Status bar should place left text at row start.");
-        TestAssert.True(output.EndsWith("right", StringComparison.Ordinal), "Status bar should align right text to row end.");
+        TestAssert.True(output.StartsWith("left", StringComparison.Ordinal),
+            "Status bar should place left text at row start.");
+        TestAssert.True(output.EndsWith("right", StringComparison.Ordinal),
+            "Status bar should align right text to row end.");
         return Task.CompletedTask;
     }
 
     private static Task StatusBar_UsesFillCharacter()
     {
         // Arrange
-        var statusBar = new StatusBar
-        {
-            LeftText = "L",
-            RightText = "R",
-            Fill = '.',
-        };
+        var statusBar = new StatusBar { LeftText = "L", RightText = "R", Fill = '.' };
         var canvas = new Canvas(16, 1);
 
         // Act
@@ -81,16 +74,10 @@ internal static class UiKitComponentTests
     private static Task FormComponents_RespondToInput()
     {
         // Arrange
-        var checklist = new MultiSelect
-        {
-            IsFocused = true,
-        };
+        var checklist = new MultiSelect { IsFocused = true };
         checklist.SetItems([("focus", true), ("mouse", false)]);
 
-        var radio = new RadioGroup
-        {
-            IsFocused = true,
-        };
+        var radio = new RadioGroup { IsFocused = true };
         radio.SetItems(["a", "b", "c"]);
 
         // Act
@@ -99,7 +86,8 @@ internal static class UiKitComponentTests
         radio.Handle(new KeyPressed(Key.Right));
 
         // Assert
-        TestAssert.True(checklist.CheckedItems.Contains("mouse", StringComparer.Ordinal), "Checklist enter key should toggle selected item.");
+        TestAssert.True(checklist.CheckedItems.Contains("mouse", StringComparer.Ordinal),
+            "Checklist enter key should toggle selected item.");
         TestAssert.Equal(1, radio.SelectedIndex, "Radio group should advance selection on right arrow.");
         return Task.CompletedTask;
     }
@@ -109,12 +97,7 @@ internal static class UiKitComponentTests
         // Arrange
         var hiddenCanvas = new Canvas(30, 10);
         var shownCanvas = new Canvas(30, 10);
-        var modal = new Modal
-        {
-            Title = "Help",
-            BodyLines = ["line one", "line two"],
-            BackdropFill = ':',
-        };
+        var modal = new Modal { Title = "Help", BodyLines = ["line one", "line two"], BackdropFill = ':' };
 
         // Act
         modal.IsVisible = false;
@@ -126,9 +109,11 @@ internal static class UiKitComponentTests
         var shown = shownCanvas.Render();
 
         // Assert
-        TestAssert.True(!hidden.Contains("line one", StringComparison.Ordinal), "Hidden modal should not draw modal content.");
+        TestAssert.True(!hidden.Contains("line one", StringComparison.Ordinal),
+            "Hidden modal should not draw modal content.");
         TestAssert.True(shown.Contains(" Help ", StringComparison.Ordinal), "IsVisible modal should render title.");
-        TestAssert.True(shown.Contains("line one", StringComparison.Ordinal), "IsVisible modal should render body lines.");
+        TestAssert.True(shown.Contains("line one", StringComparison.Ordinal),
+            "IsVisible modal should render body lines.");
         TestAssert.True(shown.Contains(':'), "IsVisible modal should apply themed backdrop fill.");
         return Task.CompletedTask;
     }
@@ -145,7 +130,7 @@ internal static class UiKitComponentTests
             IsVisible = true,
             Title = "Dialog",
             BodyLines = ["confirm action"],
-            BackdropFill = ':',
+            BackdropFill = ':'
         };
 
         // Act
@@ -153,9 +138,12 @@ internal static class UiKitComponentTests
         var output = canvas.Render();
 
         // Assert
-        TestAssert.True(!output.Contains("UNDERLAY-TEXT", StringComparison.Ordinal), "Modal backdrop should hide pre-rendered base content.");
-        TestAssert.True(!output.Contains("underlay", StringComparison.Ordinal), "Modal backdrop should hide underlay frame/title.");
-        TestAssert.True(output.Contains(" Dialog ", StringComparison.Ordinal), "Modal title should be rendered above backdrop.");
+        TestAssert.True(!output.Contains("UNDERLAY-TEXT", StringComparison.Ordinal),
+            "Modal backdrop should hide pre-rendered base content.");
+        TestAssert.True(!output.Contains("underlay", StringComparison.Ordinal),
+            "Modal backdrop should hide underlay frame/title.");
+        TestAssert.True(output.Contains(" Dialog ", StringComparison.Ordinal),
+            "Modal title should be rendered above backdrop.");
         return Task.CompletedTask;
     }
 
@@ -171,7 +159,7 @@ internal static class UiKitComponentTests
             IsVisible = true,
             Title = "Dialog",
             BodyLines = ["confirm action"],
-            BackdropFill = ':',
+            BackdropFill = ':'
         };
 
         // Act
@@ -179,10 +167,14 @@ internal static class UiKitComponentTests
         var output = canvas.Render();
 
         // Assert
-        TestAssert.True(!output.Contains("UNDERLAY-TEXT", StringComparison.Ordinal), "Modal backdrop should hide pre-rendered base content on grapheme-aware canvases.");
-        TestAssert.True(!output.Contains("underlay", StringComparison.Ordinal), "Modal backdrop should hide underlay frame/title on grapheme-aware canvases.");
-        TestAssert.True(output.Contains(" Dialog ", StringComparison.Ordinal), "Modal title should still render on grapheme-aware canvases.");
-        TestAssert.True(output.Contains("::", StringComparison.Ordinal), "Modal backdrop should render a solid visible fill.");
+        TestAssert.True(!output.Contains("UNDERLAY-TEXT", StringComparison.Ordinal),
+            "Modal backdrop should hide pre-rendered base content on grapheme-aware canvases.");
+        TestAssert.True(!output.Contains("underlay", StringComparison.Ordinal),
+            "Modal backdrop should hide underlay frame/title on grapheme-aware canvases.");
+        TestAssert.True(output.Contains(" Dialog ", StringComparison.Ordinal),
+            "Modal title should still render on grapheme-aware canvases.");
+        TestAssert.True(output.Contains("::", StringComparison.Ordinal),
+            "Modal backdrop should render a solid visible fill.");
         return Task.CompletedTask;
     }
 }

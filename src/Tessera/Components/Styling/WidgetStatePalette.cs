@@ -48,7 +48,7 @@ internal sealed class WidgetStatePalette
         WidgetVisualState.DropTarget,
         WidgetVisualState.New,
         WidgetVisualState.Stale,
-        WidgetVisualState.FilteredOut,
+        WidgetVisualState.FilteredOut
     ];
 
     public WidgetStateAppearance this[WidgetVisualState state]
@@ -63,7 +63,7 @@ internal sealed class WidgetStatePalette
 
             return appearance;
         }
-        set => _appearances[state] = value ?? new WidgetStateAppearance();
+        set => _appearances[state] = value;
     }
 
     public bool TryGet(WidgetVisualState state, out WidgetStateAppearance appearance)
@@ -83,7 +83,7 @@ internal sealed class WidgetStatePalette
 
     public void Set(WidgetVisualState state, WidgetStateAppearance appearance)
     {
-        _appearances[state] = appearance ?? new WidgetStateAppearance();
+        _appearances[state] = appearance;
     }
 
     public void Clear(WidgetVisualState state)
@@ -116,70 +116,35 @@ internal sealed class WidgetStatePalette
     public static WidgetStatePalette CreateDefault()
     {
         var palette = new WidgetStatePalette();
-        palette.Set(WidgetVisualState.Focused, new WidgetStateAppearance
-        {
-            TextStyle = TesseraStyle.Empty.WithBold(),
-        });
-        palette.Set(WidgetVisualState.Cursor, new WidgetStateAppearance
-        {
-            TextStyle = TesseraStyle.Empty.WithInverse(),
-        });
-        palette.Set(WidgetVisualState.Hovered, new WidgetStateAppearance
-        {
-            TextStyle = TesseraStyle.Empty.WithUnderline(),
-        });
-        palette.Set(WidgetVisualState.Selected, new WidgetStateAppearance
-        {
-            TextStyle = TesseraStyle.Empty.WithUnderline(),
-        });
-        palette.Set(WidgetVisualState.Disabled, new WidgetStateAppearance
-        {
-            TextStyle = TesseraStyle.Empty.WithDim(),
-        });
-        palette.Set(WidgetVisualState.ReadOnly, new WidgetStateAppearance
-        {
-            TextStyle = TesseraStyle.Empty.WithDim(),
-            Suffix = " (ro)",
-        });
-        palette.Set(WidgetVisualState.Loading, new WidgetStateAppearance
-        {
-            TextStyle = TesseraStyle.Empty.WithItalic(),
-            Suffix = " …",
-        });
-        palette.Set(WidgetVisualState.Success, new WidgetStateAppearance
-        {
-            TextStyle = TesseraStyle.Empty.WithForeground(AnsiColor.BrightGreen),
-        });
-        palette.Set(WidgetVisualState.Warning, new WidgetStateAppearance
-        {
-            TextStyle = TesseraStyle.Empty.WithForeground(AnsiColor.BrightYellow),
-        });
-        palette.Set(WidgetVisualState.Error, new WidgetStateAppearance
-        {
-            TextStyle = TesseraStyle.Empty.WithForeground(AnsiColor.BrightRed),
-        });
-        palette.Set(WidgetVisualState.Empty, new WidgetStateAppearance
-        {
-            TextStyle = TesseraStyle.Empty.WithDim(),
-        });
-        palette.Set(WidgetVisualState.Completed, new WidgetStateAppearance
-        {
-            TextStyle = TesseraStyle.Empty.WithStrikethrough().WithDim(),
-            Prefix = "[x] ",
-        });
-        palette.Set(WidgetVisualState.Marked, new WidgetStateAppearance
-        {
-            Prefix = "[*] ",
-        });
-        palette.Set(WidgetVisualState.New, new WidgetStateAppearance
-        {
-            Prefix = "• ",
-        });
-        palette.Set(WidgetVisualState.Stale, new WidgetStateAppearance
-        {
-            TextStyle = TesseraStyle.Empty.WithDim(),
-            Prefix = "⌛ ",
-        });
+        palette.Set(WidgetVisualState.Focused, new WidgetStateAppearance { TextStyle = TesseraStyle.Empty.WithBold() });
+        palette.Set(WidgetVisualState.Cursor,
+            new WidgetStateAppearance { TextStyle = TesseraStyle.Empty.WithInverse() });
+        palette.Set(WidgetVisualState.Hovered,
+            new WidgetStateAppearance { TextStyle = TesseraStyle.Empty.WithUnderline() });
+        palette.Set(WidgetVisualState.Selected,
+            new WidgetStateAppearance { TextStyle = TesseraStyle.Empty.WithUnderline() });
+        palette.Set(WidgetVisualState.Disabled, new WidgetStateAppearance { TextStyle = TesseraStyle.Empty.WithDim() });
+        palette.Set(WidgetVisualState.ReadOnly,
+            new WidgetStateAppearance { TextStyle = TesseraStyle.Empty.WithDim(), Suffix = " (ro)" });
+        palette.Set(WidgetVisualState.Loading,
+            new WidgetStateAppearance { TextStyle = TesseraStyle.Empty.WithItalic(), Suffix = " …" });
+        palette.Set(WidgetVisualState.Success,
+            new WidgetStateAppearance { TextStyle = TesseraStyle.Empty.WithForeground(AnsiColor.BrightGreen) });
+        palette.Set(WidgetVisualState.Warning,
+            new WidgetStateAppearance { TextStyle = TesseraStyle.Empty.WithForeground(AnsiColor.BrightYellow) });
+        palette.Set(WidgetVisualState.Error,
+            new WidgetStateAppearance { TextStyle = TesseraStyle.Empty.WithForeground(AnsiColor.BrightRed) });
+        palette.Set(WidgetVisualState.Empty, new WidgetStateAppearance { TextStyle = TesseraStyle.Empty.WithDim() });
+        palette.Set(WidgetVisualState.Completed,
+            new WidgetStateAppearance
+            {
+                TextStyle = TesseraStyle.Empty.WithStrikethrough().WithDim(),
+                Prefix = "[x] "
+            });
+        palette.Set(WidgetVisualState.Marked, new WidgetStateAppearance { Prefix = "[*] " });
+        palette.Set(WidgetVisualState.New, new WidgetStateAppearance { Prefix = "• " });
+        palette.Set(WidgetVisualState.Stale,
+            new WidgetStateAppearance { TextStyle = TesseraStyle.Empty.WithDim(), Prefix = "⌛ " });
         return palette;
     }
 

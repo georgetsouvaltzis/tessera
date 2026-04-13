@@ -1,4 +1,4 @@
-﻿using System.ComponentModel;
+using System.ComponentModel;
 using Tessera.Components.Primitives;
 using Tessera.Controls.Internal;
 using Tessera.Layout;
@@ -7,109 +7,90 @@ using Tessera.Styles;
 namespace Tessera.Controls;
 
 /// <summary>
-/// Represents an activatable push button.
+///     Represents an activatable push button.
 /// </summary>
 /// <remarks>
-/// Buttons are rectangular action surfaces. Surface styling owns the whole button body, while label styles
-/// remain text-only semantics layered on top of that body.
+///     Buttons are rectangular action surfaces. Surface styling owns the whole button body, while label styles
+///     remain text-only semantics layered on top of that body.
 /// </remarks>
 public sealed class Button : Control
 {
     private bool _hovered;
-    private bool _pressed;
-    private int _activationCount;
     private bool _pendingActivation;
 
     /// <summary>
-    /// Occurs when the button is activated by input.
+    ///     Gets or sets the button label.
     /// </summary>
-    public event EventHandler? Activated;
+    public string Text { get; set; } = string.Empty;
 
     /// <summary>
-    /// Gets or sets the button label.
+    ///     Gets or sets text rendered before <see cref="Text" /> inside the button label.
     /// </summary>
-    public string Text
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = string.Empty;
+    public string LabelPrefix { get; set; } = string.Empty;
 
     /// <summary>
-    /// Gets or sets text rendered before <see cref="Text"/> inside the button label.
+    ///     Gets or sets text rendered after <see cref="Text" /> inside the button label.
     /// </summary>
-    public string LabelPrefix
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = string.Empty;
+    public string LabelSuffix { get; set; } = string.Empty;
 
     /// <summary>
-    /// Gets or sets text rendered after <see cref="Text"/> inside the button label.
-    /// </summary>
-    public string LabelSuffix
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = string.Empty;
-
-    /// <summary>
-    /// Gets or sets the optional secondary description shown with the button.
+    ///     Gets or sets the optional secondary description shown with the button.
     /// </summary>
     public string? Description { get; set; }
 
     /// <summary>
-    /// Gets or sets the inner padding applied to the button body.
+    ///     Gets or sets the inner padding applied to the button body.
     /// </summary>
-    public Thickness Padding { get; set; } = Thickness.Symmetric(1, 0);
+    public Thickness Padding { get; set; } = Thickness.Symmetric(1);
 
     /// <summary>
-    /// Gets or sets the base style applied to the button label.
-    /// Background-like facets are ignored so the button body remains a single surface.
+    ///     Gets or sets the base style applied to the button label.
+    ///     Background-like facets are ignored so the button body remains a single surface.
     /// </summary>
     public TesseraStyle LabelStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the style merged into the label style when the button is focused.
-    /// Background-like facets are ignored so focus remains label-led instead of creating an inner chip.
+    ///     Gets or sets the style merged into the label style when the button is focused.
+    ///     Background-like facets are ignored so focus remains label-led instead of creating an inner chip.
     /// </summary>
     public TesseraStyle FocusedLabelStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the style merged into the label style when the button is disabled.
-    /// Background-like facets are ignored so the button body remains a single surface.
+    ///     Gets or sets the style merged into the label style when the button is disabled.
+    ///     Background-like facets are ignored so the button body remains a single surface.
     /// </summary>
     public TesseraStyle DisabledLabelStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the style merged into the label style when the button is pressed.
-    /// Background-like facets are ignored so pressed state stays surface-led.
+    ///     Gets or sets the style merged into the label style when the button is pressed.
+    ///     Background-like facets are ignored so pressed state stays surface-led.
     /// </summary>
     public TesseraStyle PressedLabelStyle { get; set; } = TesseraStyle.Empty.WithInverse().WithBold();
 
     /// <summary>
-    /// Gets or sets the style applied to the button body across the padded content area.
+    ///     Gets or sets the style applied to the button body across the padded content area.
     /// </summary>
     public TesseraStyle SurfaceStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the style merged into <see cref="SurfaceStyle"/> while the button is focused.
+    ///     Gets or sets the style merged into <see cref="SurfaceStyle" /> while the button is focused.
     /// </summary>
     public TesseraStyle FocusedSurfaceStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the style merged into <see cref="SurfaceStyle"/> while the button is pressed.
+    ///     Gets or sets the style merged into <see cref="SurfaceStyle" /> while the button is pressed.
     /// </summary>
     public TesseraStyle PressedSurfaceStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets how many activations have been observed.
+    ///     Gets how many activations have been observed.
     /// </summary>
-    public int ActivationCount => _activationCount;
+    public int ActivationCount { get; private set; }
 
     /// <summary>
-    /// Gets a value indicating whether the button is currently pressed.
+    ///     Gets a value indicating whether the button is currently pressed.
     /// </summary>
-    public bool IsPressed => _pressed;
+    public bool IsPressed { get; private set; }
 
     /// <inheritdoc />
     public override bool IsFocused { get; set; }
@@ -118,9 +99,14 @@ public sealed class Button : Control
     public override bool IsDisabled { get; set; }
 
     /// <summary>
-    /// Attempts to consume a pending activation.
+    ///     Occurs when the button is activated by input.
     /// </summary>
-    /// <returns><see langword="true"/> when an activation was consumed; otherwise, <see langword="false"/>.</returns>
+    public event EventHandler? Activated;
+
+    /// <summary>
+    ///     Attempts to consume a pending activation.
+    /// </summary>
+    /// <returns><see langword="true" /> when an activation was consumed; otherwise, <see langword="false" />.</returns>
     [EditorBrowsable(EditorBrowsableState.Advanced)]
     public bool TryConsumeActivation()
     {
@@ -146,7 +132,7 @@ public sealed class Button : Control
             return false;
         }
 
-        Activate(pressed: false);
+        Activate(false);
         return true;
     }
 
@@ -176,7 +162,7 @@ public sealed class Button : Control
                 return SetHovered(true);
             case PointerEventKind.Press when pointer.Button == PointerButton.Left:
                 SetHovered(true);
-                Activate(pressed: true);
+                Activate(true);
                 return true;
             case PointerEventKind.Release when pointer.Button == PointerButton.Left:
                 return SetPressed(false);
@@ -246,7 +232,7 @@ public sealed class Button : Control
 
     private void Activate(bool pressed)
     {
-        _activationCount++;
+        ActivationCount++;
         _pendingActivation = true;
         Activated?.Invoke(this, EventArgs.Empty);
         SetPressed(pressed);
@@ -265,12 +251,12 @@ public sealed class Button : Control
 
     private bool SetPressed(bool pressed)
     {
-        if (_pressed == pressed)
+        if (IsPressed == pressed)
         {
             return false;
         }
 
-        _pressed = pressed;
+        IsPressed = pressed;
         return true;
     }
 
@@ -287,7 +273,7 @@ public sealed class Button : Control
             style = style.Merge(SanitizeLabelStyle(DisabledLabelStyle));
         }
 
-        if (_pressed)
+        if (IsPressed)
         {
             style = style.Merge(SanitizeLabelStyle(PressedLabelStyle));
         }
@@ -303,7 +289,7 @@ public sealed class Button : Control
             style = style.Merge(FocusedSurfaceStyle);
         }
 
-        if (_pressed)
+        if (IsPressed)
         {
             style = style.Merge(PressedSurfaceStyle);
         }
@@ -324,7 +310,7 @@ public sealed class Button : Control
             Inverse = null,
             Framed = null,
             Encircled = null,
-            Conceal = null,
+            Conceal = null
         };
     }
 

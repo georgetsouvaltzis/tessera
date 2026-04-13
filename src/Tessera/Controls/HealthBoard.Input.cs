@@ -16,12 +16,12 @@ public sealed partial class HealthBoard
         var page = Math.Max(1, _lastViewportRows);
         if (key.Is(Key.Down) || key.IsCharacter('j'))
         {
-            return SetSelectedIndex(_selectedIndex + 1);
+            return SetSelectedIndex(SelectedIndex + 1);
         }
 
         if (key.Is(Key.Up) || key.IsCharacter('k'))
         {
-            return SetSelectedIndex(_selectedIndex - 1);
+            return SetSelectedIndex(SelectedIndex - 1);
         }
 
         if (key.Is(Key.Home))
@@ -36,12 +36,12 @@ public sealed partial class HealthBoard
 
         if (key.Is(Key.PageDown))
         {
-            return SetSelectedIndex(_selectedIndex + page);
+            return SetSelectedIndex(SelectedIndex + page);
         }
 
         if (key.Is(Key.PageUp))
         {
-            return SetSelectedIndex(_selectedIndex - page);
+            return SetSelectedIndex(SelectedIndex - page);
         }
 
         return false;
@@ -72,12 +72,12 @@ public sealed partial class HealthBoard
         {
             if (pointer.Button == PointerButton.WheelDown)
             {
-                return SetSelectedIndex(_selectedIndex + 1) || changed;
+                return SetSelectedIndex(SelectedIndex + 1) || changed;
             }
 
             if (pointer.Button == PointerButton.WheelUp)
             {
-                return SetSelectedIndex(_selectedIndex - 1) || changed;
+                return SetSelectedIndex(SelectedIndex - 1) || changed;
             }
         }
 

@@ -51,7 +51,7 @@ internal static class HelpViewLayout
             var line = new StringBuilder(maxWidth);
             for (var column = 0; column < columns; column++)
             {
-                var index = row + (column * rows);
+                var index = row + column * rows;
                 if (index >= chunks.Count)
                 {
                     continue;

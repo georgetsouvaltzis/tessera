@@ -1,6 +1,5 @@
 using NUnit.Framework;
 using Tessera.Components.Primitives;
-using Tessera.Components.Styling;
 using Tessera.Controls;
 using Tessera.Styles;
 
@@ -17,7 +16,7 @@ public sealed class BulletChartControlTests
         control.SetRanges(
         [
             new BulletRange(80, 40, BulletRangeKind.Warning, "warn"),
-            new BulletRange(20, 30, BulletRangeKind.Normal, "ok"),
+            new BulletRange(20, 30, BulletRangeKind.Normal, "ok")
         ]);
 
         control.SetValue(64.5);
@@ -35,15 +34,12 @@ public sealed class BulletChartControlTests
     [Test]
     public void BulletChartDefaultRenderIsMonochromeAndDeterministic()
     {
-        var control = new BulletChart
-        {
-            Border = BorderStyle.None,
-        };
+        var control = new BulletChart { Border = BorderStyle.None };
         control.SetRanges(
         [
-            new BulletRange(0, 60, BulletRangeKind.Normal),
+            new BulletRange(0, 60),
             new BulletRange(60, 80, BulletRangeKind.Warning),
-            new BulletRange(80, 100, BulletRangeKind.Critical),
+            new BulletRange(80, 100, BulletRangeKind.Critical)
         ]);
         control.SetValue(65);
         control.SetTarget(82);
@@ -58,7 +54,7 @@ public sealed class BulletChartControlTests
         var second = secondCanvas.Render();
 
         Assert.That(first, Is.EqualTo(second));
-        Assert.That(first.Contains("\u001b[", StringComparison.Ordinal), Is.False);
+        Assert.That(first.Contains("\e[", StringComparison.Ordinal), Is.False);
         Assert.That(first.Contains('█'), Is.True);
         Assert.That(first.Contains('│'), Is.True);
     }
@@ -73,13 +69,13 @@ public sealed class BulletChartControlTests
             WarningRangeStyle = TesseraStyle.Empty.WithForeground(AnsiColor.Rgb(40, 50, 60)),
             CriticalRangeStyle = TesseraStyle.Empty.WithForeground(AnsiColor.Rgb(70, 80, 90)),
             ValueBarStyle = TesseraStyle.Empty.WithForeground(AnsiColor.Rgb(100, 110, 120)),
-            TargetMarkerStyle = TesseraStyle.Empty.WithForeground(AnsiColor.Rgb(130, 140, 150)),
+            TargetMarkerStyle = TesseraStyle.Empty.WithForeground(AnsiColor.Rgb(130, 140, 150))
         };
         control.SetRanges(
         [
-            new BulletRange(0, 50, BulletRangeKind.Normal),
+            new BulletRange(0, 50),
             new BulletRange(50, 80, BulletRangeKind.Warning),
-            new BulletRange(80, 100, BulletRangeKind.Critical),
+            new BulletRange(80, 100, BulletRangeKind.Critical)
         ]);
         control.SetValue(10);
         control.SetTarget(91);
@@ -107,7 +103,7 @@ public sealed class BulletChartControlTests
             IsFocused = true,
             Border = BorderStyle.SingleLine,
             FocusedTitleStyle = focusedTitle,
-            FocusedBorderStyleText = focusedBorder,
+            FocusedBorderStyleText = focusedBorder
         };
         control.SetRanges([new BulletRange(0, 100)]);
         control.SetValue(42);

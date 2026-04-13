@@ -1,4 +1,5 @@
-﻿using Tessera.Components.Primitives;
+using System.ComponentModel;
+using Tessera.Components.Primitives;
 using Tessera.Controls.Internal;
 using Tessera.Layout;
 using Tessera.Styles;
@@ -6,57 +7,49 @@ using Tessera.Styles;
 namespace Tessera.Controls;
 
 /// <summary>
-/// Represents a simple bar chart control.
+///     Represents a simple bar chart control.
 /// </summary>
 public sealed class BarChart : Control
 {
     private readonly List<BarPoint> _bars = [];
 
     /// <summary>
-    /// Gets or sets the chart title.
+    ///     Gets or sets the chart title.
     /// </summary>
-    public string Title
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = "Bar Chart";
+    public string Title { get; set; } = "Bar Chart";
 
     /// <summary>
-    /// Gets or sets the marker shown in the title when focused.
+    ///     Gets or sets the marker shown in the title when focused.
     /// </summary>
-    public string FocusMarker
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = "*";
+    public string FocusMarker { get; set; } = "*";
 
     /// <summary>
-    /// Gets or sets whether the focused title marker should be rendered.
+    ///     Gets or sets whether the focused title marker should be rendered.
     /// </summary>
     public bool ShowFocusMarker { get; set; } = true;
 
     /// <summary>
-    /// Gets or sets the title style used when not focused.
+    ///     Gets or sets the title style used when not focused.
     /// </summary>
     public TesseraStyle TitleStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the title style used when focused.
+    ///     Gets or sets the title style used when focused.
     /// </summary>
     public TesseraStyle FocusedTitleStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets style used for bar labels.
+    ///     Gets or sets style used for bar labels.
     /// </summary>
     public TesseraStyle LabelStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets style used for legend text.
+    ///     Gets or sets style used for legend text.
     /// </summary>
     public TesseraStyle LegendStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the optional maximum value used when scaling bars.
+    ///     Gets or sets the optional maximum value used when scaling bars.
     /// </summary>
     public double? MaxValue
     {
@@ -65,14 +58,14 @@ public sealed class BarChart : Control
     }
 
     /// <summary>
-    /// Gets the current chart values.
+    ///     Gets the current chart values.
     /// </summary>
     public IReadOnlyList<BarPoint> Bars => _bars;
 
     /// <summary>
-    /// Gets or sets advanced chart rendering options.
+    ///     Gets or sets advanced chart rendering options.
     /// </summary>
-    [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Advanced)]
+    [EditorBrowsable(EditorBrowsableState.Advanced)]
     public BarChartOptions? Options
     {
         get;
@@ -80,7 +73,7 @@ public sealed class BarChart : Control
     }
 
     /// <summary>
-    /// Replaces the current chart values.
+    ///     Replaces the current chart values.
     /// </summary>
     /// <param name="bars">The bar values to render.</param>
     public void SetBars(IEnumerable<BarPoint> bars)
@@ -90,18 +83,18 @@ public sealed class BarChart : Control
         _bars.Clear();
         foreach (var bar in bars)
         {
-            _bars.Add(new BarPoint(bar.Label ?? string.Empty, bar.Value));
+            _bars.Add(new BarPoint(bar.Label, bar.Value));
         }
     }
 
     /// <summary>
-    /// Sets or updates one bar value by label.
+    ///     Sets or updates one bar value by label.
     /// </summary>
     /// <param name="label">The bar label.</param>
     /// <param name="value">The bar value.</param>
     public void SetValue(string label, double value)
     {
-        var normalizedLabel = label ?? string.Empty;
+        var normalizedLabel = label;
         for (var i = 0; i < _bars.Count; i++)
         {
             if (string.Equals(_bars[i].Label, normalizedLabel, StringComparison.Ordinal))
@@ -119,7 +112,8 @@ public sealed class BarChart : Control
     {
         var barsToRender = CreateRenderBars();
         var options = Options;
-        if (!LegendStyle.IsEmpty && options is BarChartOptions chartOptions && !string.IsNullOrWhiteSpace(chartOptions.Legend))
+        if (!LegendStyle.IsEmpty && options is BarChartOptions chartOptions &&
+            !string.IsNullOrWhiteSpace(chartOptions.Legend))
         {
             options = chartOptions with { Legend = ApplyStyle(chartOptions.Legend, LegendStyle) };
         }
@@ -191,6 +185,6 @@ public sealed class BarChart : Control
 
     private static string ApplyStyle(string text, TesseraStyle style)
     {
-        return style.IsEmpty ? text : style.Render(text ?? string.Empty);
+        return style.IsEmpty ? text : style.Render(text);
     }
 }

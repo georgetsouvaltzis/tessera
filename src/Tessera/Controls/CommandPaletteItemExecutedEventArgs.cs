@@ -1,12 +1,12 @@
-﻿namespace Tessera.Controls;
+namespace Tessera.Controls;
 
 /// <summary>
-/// Provides the executed <see cref="CommandPaletteItem"/> for a command palette action.
+///     Provides the executed <see cref="CommandPaletteItem" /> for a command palette action.
 /// </summary>
 public sealed class CommandPaletteItemExecutedEventArgs : EventArgs
 {
     /// <summary>
-    /// Executes command palette item executed event args.
+    ///     Executes command palette item executed event args.
     /// </summary>
     /// <param name="item">The item value.</param>
     /// <returns>The result of command palette item executed event args.</returns>
@@ -16,12 +16,12 @@ public sealed class CommandPaletteItemExecutedEventArgs : EventArgs
     }
 
     /// <summary>
-    /// Gets the item.
+    ///     Gets the item.
     /// </summary>
     public CommandPaletteItem Item { get; }
 
     /// <summary>
-    /// Represents item id.
+    ///     Represents item id.
     /// </summary>
     public string ItemId => Item.Id;
 }

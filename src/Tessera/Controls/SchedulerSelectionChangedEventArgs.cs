@@ -1,12 +1,12 @@
 namespace Tessera.Controls;
 
 /// <summary>
-/// Provides old/new state when <see cref="SchedulerTimeline" /> selection changes.
+///     Provides old/new state when <see cref="SchedulerTimeline" /> selection changes.
 /// </summary>
 public sealed class SchedulerSelectionChangedEventArgs : EventArgs
 {
     /// <summary>
-    /// Initializes a scheduler selection-change payload.
+    ///     Initializes a scheduler selection-change payload.
     /// </summary>
     /// <param name="previousIndex">The selected index before the change, or <c>-1</c> when none was selected.</param>
     /// <param name="selectedIndex">The selected index after the change, or <c>-1</c> when none is selected.</param>
@@ -25,22 +25,22 @@ public sealed class SchedulerSelectionChangedEventArgs : EventArgs
     }
 
     /// <summary>
-    /// Gets the selected index before the change.
+    ///     Gets the selected index before the change.
     /// </summary>
     public int PreviousIndex { get; }
 
     /// <summary>
-    /// Gets the selected index after the change.
+    ///     Gets the selected index after the change.
     /// </summary>
     public int SelectedIndex { get; }
 
     /// <summary>
-    /// Gets the selected entry before the change.
+    ///     Gets the selected entry before the change.
     /// </summary>
     public SchedulerEntry? PreviousEntry { get; }
 
     /// <summary>
-    /// Gets the selected entry after the change.
+    ///     Gets the selected entry after the change.
     /// </summary>
     public SchedulerEntry? SelectedEntry { get; }
 }

@@ -1,4 +1,5 @@
 using System.ComponentModel;
+using Tessera.Core.Abstractions;
 using Tessera.Internal;
 using Tessera.Widgets.Internal;
 
@@ -10,10 +11,10 @@ internal readonly record struct ListRow<T>(T Item, int Index, bool Selected);
 [EditorBrowsable(EditorBrowsableState.Advanced)]
 internal sealed class ListModel<T>
 {
-    private readonly Func<T, string> _toText;
     private readonly List<T> _allItems = [];
     private readonly List<int> _filteredIndexes = [];
     private readonly ListModelLoadCoordinator _loadCoordinator = new();
+    private readonly Func<T, string> _toText;
     private int _offset;
 
     public ListModel(IEnumerable<T> items, Func<T, string> toText)
@@ -54,7 +55,8 @@ internal sealed class ListModel<T>
         ApplyFilter();
     }
 
-    public async ValueTask<int> AppendItemsAsync(IAsyncEnumerable<T> items, CancellationToken cancellationToken = default)
+    public async ValueTask<int> AppendItemsAsync(IAsyncEnumerable<T> items,
+        CancellationToken cancellationToken = default)
     {
         var before = _allItems.Count;
         await ListModelAsyncLoader.AppendItemsAsync(_allItems, items, cancellationToken).ConfigureAwait(false);
@@ -62,12 +64,14 @@ internal sealed class ListModel<T>
         return _allItems.Count - before;
     }
 
-    public async ValueTask<int> ReloadAsync(Func<CancellationToken, IAsyncEnumerable<T>> loader, CancellationToken cancellationToken = default)
+    public async ValueTask<int> ReloadAsync(Func<CancellationToken, IAsyncEnumerable<T>> loader,
+        CancellationToken cancellationToken = default)
     {
         var (version, linkedToken, disposer) = _loadCoordinator.Begin(cancellationToken);
         try
         {
-            var loaded = await ListModelAsyncLoader.MaterializeAsync(loader(linkedToken), linkedToken).ConfigureAwait(false);
+            var loaded = await ListModelAsyncLoader.MaterializeAsync(loader(linkedToken), linkedToken)
+                .ConfigureAwait(false);
             if (!_loadCoordinator.IsCurrent(version))
             {
                 return 0;
@@ -76,7 +80,8 @@ internal sealed class ListModel<T>
             SetItems(loaded);
             return _allItems.Count;
         }
-        catch (OperationCanceledException) when (!cancellationToken.IsCancellationRequested && !_loadCoordinator.IsCurrent(version))
+        catch (OperationCanceledException) when (!cancellationToken.IsCancellationRequested &&
+                                                 !_loadCoordinator.IsCurrent(version))
         {
             return 0;
         }
@@ -86,12 +91,14 @@ internal sealed class ListModel<T>
         }
     }
 
-    public async ValueTask<int> AppendAsync(Func<CancellationToken, IAsyncEnumerable<T>> loader, CancellationToken cancellationToken = default)
+    public async ValueTask<int> AppendAsync(Func<CancellationToken, IAsyncEnumerable<T>> loader,
+        CancellationToken cancellationToken = default)
     {
         var (version, linkedToken, disposer) = _loadCoordinator.Begin(cancellationToken);
         try
         {
-            var loaded = await ListModelAsyncLoader.MaterializeAsync(loader(linkedToken), linkedToken).ConfigureAwait(false);
+            var loaded = await ListModelAsyncLoader.MaterializeAsync(loader(linkedToken), linkedToken)
+                .ConfigureAwait(false);
             if (!_loadCoordinator.IsCurrent(version))
             {
                 return 0;
@@ -101,7 +108,8 @@ internal sealed class ListModel<T>
             ApplyFilter();
             return loaded.Count;
         }
-        catch (OperationCanceledException) when (!cancellationToken.IsCancellationRequested && !_loadCoordinator.IsCurrent(version))
+        catch (OperationCanceledException) when (!cancellationToken.IsCancellationRequested &&
+                                                 !_loadCoordinator.IsCurrent(version))
         {
             return 0;
         }
@@ -113,11 +121,11 @@ internal sealed class ListModel<T>
 
     public void SetFilter(string filter)
     {
-        Filter = filter ?? string.Empty;
+        Filter = filter;
         ApplyFilter();
     }
 
-    public bool Update(global::Tessera.Core.Abstractions.IMessage message, ListKeyMap? keyMap = null)
+    public bool Update(IMessage message, ListKeyMap? keyMap = null)
     {
         return Update(TesseraMessageAdapter.ToPublic(message), keyMap);
     }
@@ -130,17 +138,41 @@ internal sealed class ListModel<T>
 
         if (message is KeyPressed key)
         {
-            if (keyMap.Up.Matches(key)) MoveSelection(-1);
-            else if (keyMap.Down.Matches(key)) MoveSelection(1);
-            else if (keyMap.PageUp.Matches(key)) MoveSelection(-Math.Max(1, PageSize));
-            else if (keyMap.PageDown.Matches(key)) MoveSelection(Math.Max(1, PageSize));
-            else if (keyMap.Home.Matches(key)) Select(0);
-            else if (keyMap.End.Matches(key)) Select(Math.Max(0, _filteredIndexes.Count - 1));
+            if (keyMap.Up.Matches(key))
+            {
+                MoveSelection(-1);
+            }
+            else if (keyMap.Down.Matches(key))
+            {
+                MoveSelection(1);
+            }
+            else if (keyMap.PageUp.Matches(key))
+            {
+                MoveSelection(-Math.Max(1, PageSize));
+            }
+            else if (keyMap.PageDown.Matches(key))
+            {
+                MoveSelection(Math.Max(1, PageSize));
+            }
+            else if (keyMap.Home.Matches(key))
+            {
+                Select(0);
+            }
+            else if (keyMap.End.Matches(key))
+            {
+                Select(Math.Max(0, _filteredIndexes.Count - 1));
+            }
         }
         else if (message is PointerInput { Kind: PointerEventKind.Wheel } wheel)
         {
-            if (wheel.Button == PointerButton.WheelUp) MoveSelection(-1);
-            else if (wheel.Button == PointerButton.WheelDown) MoveSelection(1);
+            if (wheel.Button == PointerButton.WheelUp)
+            {
+                MoveSelection(-1);
+            }
+            else if (wheel.Button == PointerButton.WheelDown)
+            {
+                MoveSelection(1);
+            }
         }
 
         return beforeSelection != SelectedIndex || beforeOffset != _offset;
@@ -151,7 +183,10 @@ internal sealed class ListModel<T>
         return ListModelWindowing.VisibleRows(_allItems, _filteredIndexes, _offset, PageSize, SelectedIndex);
     }
 
-    public string LabelFor(T item) => _toText(item);
+    public string LabelFor(T item)
+    {
+        return _toText(item);
+    }
 
     public bool SelectFilteredIndex(int filteredIndex)
     {
@@ -209,5 +244,4 @@ internal sealed class ListModel<T>
         SelectedIndex = Math.Clamp(SelectedIndex, 0, _filteredIndexes.Count - 1);
         ListModelWindowing.EnsureSelectionVisible(SelectedIndex, _filteredIndexes.Count, PageSize, ref _offset);
     }
-
 }

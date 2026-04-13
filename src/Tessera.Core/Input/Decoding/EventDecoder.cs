@@ -61,7 +61,7 @@ internal sealed class EventDecoder : IEventDecoder
             (byte)'O' => DecodeSs3(buffer, timeoutExpired),
             (byte)']' => OscDcsSequenceDecoder.DecodeOsc(buffer, timeoutExpired),
             (byte)'P' => OscDcsSequenceDecoder.DecodeDcs(buffer, timeoutExpired),
-            _ => DecodeAltSequence(buffer, timeoutExpired),
+            _ => DecodeAltSequence(buffer, timeoutExpired)
         };
     }
 
@@ -79,7 +79,7 @@ internal sealed class EventDecoder : IEventDecoder
 
         if (buffer.Length >= 2 && buffer[1] == 0x1B)
         {
-            var nested = DecodeEscape(buffer[1..], timeoutExpired, allowTimeoutDeferral: false);
+            var nested = DecodeEscape(buffer[1..], timeoutExpired, false);
             if (nested.NeedMoreData && nested.Consumed == 0)
             {
                 return new DecodeResult(0, null, true);
@@ -125,7 +125,8 @@ internal sealed class EventDecoder : IEventDecoder
                 return new DecodeResult(2, new KeyPressMsg(KeyCode.Enter, string.Empty, KeyModifiers.Alt), false);
             }
 
-            if (DecoderCommon.TryDecodeControlByte(second, out var controlMessage) && controlMessage is KeyPressMsg controlKey)
+            if (DecoderCommon.TryDecodeControlByte(second, out var controlMessage) &&
+                controlMessage is KeyPressMsg controlKey)
             {
                 return new DecodeResult(
                     2,
@@ -238,7 +239,7 @@ internal sealed class EventDecoder : IEventDecoder
             0x0A => new DecodeResult(1, new KeyPressMsg(KeyCode.Enter), false),
             0x0D => new DecodeResult(1, new KeyPressMsg(KeyCode.Enter), false),
             0x7F => new DecodeResult(1, new KeyPressMsg(KeyCode.Backspace), false),
-            _ => DecodeUtf8(buffer, timeoutExpired),
+            _ => DecodeUtf8(buffer, timeoutExpired)
         };
     }
 

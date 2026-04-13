@@ -1,15 +1,15 @@
 namespace Tessera.Controls;
 
 /// <summary>
-/// Represents one collapsible section in an <see cref="InspectorPanel"/>.
+///     Represents one collapsible section in an <see cref="InspectorPanel" />.
 /// </summary>
 public sealed class InspectorSection
 {
     /// <summary>
-    /// Initializes a new section.
+    ///     Initializes a new section.
     /// </summary>
     /// <param name="title">Section title.</param>
-    /// <param name="isExpanded"><see langword="true"/> to start expanded; otherwise <see langword="false"/>.</param>
+    /// <param name="isExpanded"><see langword="true" /> to start expanded; otherwise <see langword="false" />.</param>
     public InspectorSection(string? title, bool isExpanded = true)
     {
         Title = title ?? string.Empty;
@@ -17,31 +17,27 @@ public sealed class InspectorSection
     }
 
     /// <summary>
-    /// Gets or sets section title.
+    ///     Gets or sets section title.
     /// </summary>
-    public string Title
-    {
-        get;
-        set => field = value ?? string.Empty;
-    }
+    public string Title { get; set; }
 
     /// <summary>
-    /// Gets or sets whether the section is expanded.
+    ///     Gets or sets whether the section is expanded.
     /// </summary>
     public bool IsExpanded { get; set; }
 
     /// <summary>
-    /// Gets key/value fields rendered in this section.
+    ///     Gets key/value fields rendered in this section.
     /// </summary>
     public IList<InspectorField> Fields { get; } = new List<InspectorField>();
 
     /// <summary>
-    /// Gets detail rows rendered after fields.
+    ///     Gets detail rows rendered after fields.
     /// </summary>
     public IList<string> Details { get; } = new List<string>();
 
     /// <summary>
-    /// Adds one key/value field.
+    ///     Adds one key/value field.
     /// </summary>
     /// <param name="key">Field key text.</param>
     /// <param name="value">Field value text.</param>
@@ -51,7 +47,7 @@ public sealed class InspectorSection
     }
 
     /// <summary>
-    /// Adds one detail row.
+    ///     Adds one detail row.
     /// </summary>
     /// <param name="line">Detail text.</param>
     public void AddDetail(string? line)
@@ -61,12 +57,12 @@ public sealed class InspectorSection
 }
 
 /// <summary>
-/// Represents one key/value row in <see cref="InspectorSection"/>.
+///     Represents one key/value row in <see cref="InspectorSection" />.
 /// </summary>
 public readonly record struct InspectorField
 {
     /// <summary>
-    /// Initializes a new field row.
+    ///     Initializes a new field row.
     /// </summary>
     /// <param name="key">Field key text.</param>
     /// <param name="value">Field value text.</param>
@@ -77,12 +73,12 @@ public readonly record struct InspectorField
     }
 
     /// <summary>
-    /// Gets field key text.
+    ///     Gets field key text.
     /// </summary>
     public string Key { get; init; }
 
     /// <summary>
-    /// Gets field value text.
+    ///     Gets field value text.
     /// </summary>
     public string Value { get; init; }
 }

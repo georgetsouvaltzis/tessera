@@ -3,7 +3,7 @@ using Tessera.Core.Abstractions;
 namespace Tessera.Core.Messages;
 
 /// <summary>
-/// Base contract for decoded mouse input.
+///     Base contract for decoded mouse input.
 /// </summary>
 /// <param name="Button">The button or wheel source associated with the event.</param>
 /// <param name="X">The zero-based column position.</param>
@@ -16,7 +16,7 @@ public abstract record MouseMsg(
     KeyModifiers Modifiers = KeyModifiers.None) : IMessage
 {
     /// <summary>
-    /// Gets the specific mouse event category.
+    ///     Gets the specific mouse event category.
     /// </summary>
     public abstract MouseEventType EventType { get; }
 }

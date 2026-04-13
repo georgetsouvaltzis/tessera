@@ -1,9 +1,5 @@
-using Tessera.Components.Composition;
-using Tessera.Components.Primitives;
-using Tessera.Components.Styling;
 using Tessera.Core.Abstractions;
 using Tessera.Core.Application;
-using Tessera.Core.Commands;
 using Tessera.Core.Messages;
 using Tessera.Core.Rendering;
 using Tessera.Core.Terminal;
@@ -19,40 +15,69 @@ internal static class RuntimeLoopTests
         yield return new TestCase("Runtime_SequenceCommands_ProcessInOrder", Sequence_ProcessesInOrder);
         yield return new TestCase("Runtime_BatchCommands_ProcessAll", Batch_ProcessesAllCommands);
         yield return new TestCase("Runtime_FilterBlocksFirstQuit_AllowsSecond", Filter_CanBlockQuitMessage);
-        yield return new TestCase("Runtime_CommandException_WithCatch_EmitsCommandErrorMsg", CommandException_WithCatch_EmitsCommandErrorMsg);
-        yield return new TestCase("Runtime_CommandException_WithRecovery_EmitsRecoveredMessage", CommandException_WithRecovery_EmitsRecoveredMessage);
-        yield return new TestCase("Runtime_CommandException_RecoveryFailure_EmitsCommandErrorMsg", CommandException_RecoveryFailure_EmitsCommandErrorMsg);
-        yield return new TestCase("Runtime_CommandException_WithoutCatch_Propagates", CommandException_WithoutCatch_Propagates);
-        yield return new TestCase("Runtime_AdaptiveFramePacing_BatchesBurstRenders", AdaptiveFramePacing_BatchesBurstRenders);
-        yield return new TestCase("Runtime_RawOutputMsg_WritesDirectlyToRenderer", RawOutputMsg_WritesDirectlyToRenderer);
-        yield return new TestCase("Runtime_MouseOnViewInterceptor_EnqueuesCommand", MouseOnViewInterceptor_EnqueuesCommand);
+        yield return new TestCase("Runtime_CommandException_WithCatch_EmitsCommandErrorMsg",
+            CommandException_WithCatch_EmitsCommandErrorMsg);
+        yield return new TestCase("Runtime_CommandException_WithRecovery_EmitsRecoveredMessage",
+            CommandException_WithRecovery_EmitsRecoveredMessage);
+        yield return new TestCase("Runtime_CommandException_RecoveryFailure_EmitsCommandErrorMsg",
+            CommandException_RecoveryFailure_EmitsCommandErrorMsg);
+        yield return new TestCase("Runtime_CommandException_WithoutCatch_Propagates",
+            CommandException_WithoutCatch_Propagates);
+        yield return new TestCase("Runtime_AdaptiveFramePacing_BatchesBurstRenders",
+            AdaptiveFramePacing_BatchesBurstRenders);
+        yield return new TestCase("Runtime_RawOutputMsg_WritesDirectlyToRenderer",
+            RawOutputMsg_WritesDirectlyToRenderer);
+        yield return new TestCase("Runtime_MouseOnViewInterceptor_EnqueuesCommand",
+            MouseOnViewInterceptor_EnqueuesCommand);
         yield return new TestCase("Runtime_EmitsTerminalCapabilitiesMessage", EmitsTerminalCapabilitiesMessage);
         yield return new TestCase("Runtime_EmitsColorProfileMessage", EmitsColorProfileMessage);
-        yield return new TestCase("Runtime_TerminalCapabilityDetectorDelegate_OverridesDetection", TerminalCapabilityDetectorDelegate_OverridesDetection);
-        yield return new TestCase("Runtime_ColorProfileDetectorDelegate_OverridesDetection", ColorProfileDetectorDelegate_OverridesDetection);
-        yield return new TestCase("Runtime_CapabilityProbe_CustomModeList_WritesOnlyConfiguredQueries", CapabilityProbe_CustomModeList_WritesOnlyConfiguredQueries);
-        yield return new TestCase("Runtime_EventDecoderOverride_IsUsedForInputLoop", EventDecoderOverride_IsUsedForInputLoop);
-        yield return new TestCase("Runtime_MaxConcurrentEffects_OneSerializesExecution", MaxConcurrentEffects_OneSerializesExecution);
-        yield return new TestCase("Runtime_AnsiRendererOptions_DisableModeQueries", AnsiRendererOptions_DisableModeQueries);
+        yield return new TestCase("Runtime_TerminalCapabilityDetectorDelegate_OverridesDetection",
+            TerminalCapabilityDetectorDelegate_OverridesDetection);
+        yield return new TestCase("Runtime_ColorProfileDetectorDelegate_OverridesDetection",
+            ColorProfileDetectorDelegate_OverridesDetection);
+        yield return new TestCase("Runtime_CapabilityProbe_CustomModeList_WritesOnlyConfiguredQueries",
+            CapabilityProbe_CustomModeList_WritesOnlyConfiguredQueries);
+        yield return new TestCase("Runtime_EventDecoderOverride_IsUsedForInputLoop",
+            EventDecoderOverride_IsUsedForInputLoop);
+        yield return new TestCase("Runtime_MaxConcurrentEffects_OneSerializesExecution",
+            MaxConcurrentEffects_OneSerializesExecution);
+        yield return new TestCase("Runtime_AnsiRendererOptions_DisableModeQueries",
+            AnsiRendererOptions_DisableModeQueries);
         yield return new TestCase("Runtime_CapabilityProbe_WritesModeQueries", CapabilityProbe_WritesModeQueries);
-        yield return new TestCase("Runtime_CapabilityProbe_TimeoutDisablesModeReportsWhenNoResponses", CapabilityProbe_TimeoutDisablesModeReportsWhenNoResponses);
-        yield return new TestCase("Runtime_CapabilityProbe_PartialResponseKeepsMouseReportingForInterop", CapabilityProbe_PartialResponseKeepsMouseReportingForInterop);
-        yield return new TestCase("Runtime_CapabilityProbe_1006UnsupportedResponse_PreservesMouseCapability", CapabilityProbe_1006UnsupportedResponse_PreservesMouseCapability);
-        yield return new TestCase("Runtime_CapabilityProbe_LegacyMouseResponsePreservesMouseCapability", CapabilityProbe_LegacyMouseResponsePreservesMouseCapability);
-        yield return new TestCase("Runtime_CapabilityProbe_AllResponsesPreventTimeoutFallback", CapabilityProbe_AllResponsesPreventTimeoutFallback);
-        yield return new TestCase("Runtime_InputLoopSelection_RawModePrefersTerminalReader", InputLoopSelection_RawModePrefersTerminalReader);
-        yield return new TestCase("Runtime_InputLoopSelection_NonRawModeWithCsiCapabilitiesPrefersTerminalReader", InputLoopSelection_NonRawModeWithCsiCapabilitiesPrefersTerminalReader);
-        yield return new TestCase("Runtime_InputLoopSelection_NonRawModeWithLegacyCapabilitiesUsesConsoleKeyFallback", InputLoopSelection_NonRawModeWithLegacyCapabilitiesUsesConsoleKeyFallback);
-        yield return new TestCase("Runtime_InputLoopSelection_UseConsoleKeyDisabledPrefersTerminalReader", InputLoopSelection_UseConsoleKeyDisabledPrefersTerminalReader);
-        yield return new TestCase("Runtime_ModeReport_RefinesTerminalCapabilities", ModeReport_RefinesTerminalCapabilities);
-        yield return new TestCase("Runtime_ModeReport_LegacyMouseSetEnablesCapability", ModeReport_LegacyMouseSetEnablesCapability);
-        yield return new TestCase("Runtime_ModeReport_UnsupportedMouseState_PreservesStickyCapability", ModeReport_UnsupportedMouseState_PreservesStickyCapability);
-        yield return new TestCase("Runtime_ModeReport_PropagatesCapabilitiesToRenderer", ModeReport_PropagatesCapabilitiesToRenderer);
+        yield return new TestCase("Runtime_CapabilityProbe_TimeoutDisablesModeReportsWhenNoResponses",
+            CapabilityProbe_TimeoutDisablesModeReportsWhenNoResponses);
+        yield return new TestCase("Runtime_CapabilityProbe_PartialResponseKeepsMouseReportingForInterop",
+            CapabilityProbe_PartialResponseKeepsMouseReportingForInterop);
+        yield return new TestCase("Runtime_CapabilityProbe_1006UnsupportedResponse_PreservesMouseCapability",
+            CapabilityProbe_1006UnsupportedResponse_PreservesMouseCapability);
+        yield return new TestCase("Runtime_CapabilityProbe_LegacyMouseResponsePreservesMouseCapability",
+            CapabilityProbe_LegacyMouseResponsePreservesMouseCapability);
+        yield return new TestCase("Runtime_CapabilityProbe_AllResponsesPreventTimeoutFallback",
+            CapabilityProbe_AllResponsesPreventTimeoutFallback);
+        yield return new TestCase("Runtime_InputLoopSelection_RawModePrefersTerminalReader",
+            InputLoopSelection_RawModePrefersTerminalReader);
+        yield return new TestCase("Runtime_InputLoopSelection_NonRawModeWithCsiCapabilitiesPrefersTerminalReader",
+            InputLoopSelection_NonRawModeWithCsiCapabilitiesPrefersTerminalReader);
+        yield return new TestCase("Runtime_InputLoopSelection_NonRawModeWithLegacyCapabilitiesUsesConsoleKeyFallback",
+            InputLoopSelection_NonRawModeWithLegacyCapabilitiesUsesConsoleKeyFallback);
+        yield return new TestCase("Runtime_InputLoopSelection_UseConsoleKeyDisabledPrefersTerminalReader",
+            InputLoopSelection_UseConsoleKeyDisabledPrefersTerminalReader);
+        yield return new TestCase("Runtime_ModeReport_RefinesTerminalCapabilities",
+            ModeReport_RefinesTerminalCapabilities);
+        yield return new TestCase("Runtime_ModeReport_LegacyMouseSetEnablesCapability",
+            ModeReport_LegacyMouseSetEnablesCapability);
+        yield return new TestCase("Runtime_ModeReport_UnsupportedMouseState_PreservesStickyCapability",
+            ModeReport_UnsupportedMouseState_PreservesStickyCapability);
+        yield return new TestCase("Runtime_ModeReport_PropagatesCapabilitiesToRenderer",
+            ModeReport_PropagatesCapabilitiesToRenderer);
         yield return new TestCase("Runtime_ResizeLoop_EmitsWindowSizeChanges", ResizeLoop_EmitsWindowSizeChanges);
-        yield return new TestCase("Runtime_ResizeSignalsDisabled_SkipsSignalRegistration", ResizeSignalsDisabled_SkipsSignalRegistration);
-        yield return new TestCase("Runtime_ResizeSignalFactoryFailure_FallsBackToPolling", ResizeSignalFactoryFailure_FallsBackToPolling);
+        yield return new TestCase("Runtime_ResizeSignalsDisabled_SkipsSignalRegistration",
+            ResizeSignalsDisabled_SkipsSignalRegistration);
+        yield return new TestCase("Runtime_ResizeSignalFactoryFailure_FallsBackToPolling",
+            ResizeSignalFactoryFailure_FallsBackToPolling);
         yield return new TestCase("Runtime_ResizeSignal_EmitsWindowSizeChanges", ResizeSignal_EmitsWindowSizeChanges);
-        yield return new TestCase("Runtime_QuitFromInput_CancelsBeforeTerminalDispose", QuitFromInput_CancelsBeforeTerminalDispose);
+        yield return new TestCase("Runtime_QuitFromInput_CancelsBeforeTerminalDispose",
+            QuitFromInput_CancelsBeforeTerminalDispose);
     }
 
     private static async Task InitQuitCommand_ExitsProgram()
@@ -131,7 +156,7 @@ internal static class RuntimeLoopTests
                 }
 
                 return msg;
-            },
+            }
         });
 
         // Act
@@ -155,19 +180,21 @@ internal static class RuntimeLoopTests
     {
         // Arrange
         var model = new CommandErrorCaptureModel();
-        var program = new TestRuntimeDriver(model, new TesseraRuntimeLoopOptions
-        {
-            DisableRenderer = true,
-            DisableInput = true,
-            Terminal = new FakeTerminalAdapter(),
-            CatchEffectExceptions = true,
-        });
+        var program = new TestRuntimeDriver(model,
+            new TesseraRuntimeLoopOptions
+            {
+                DisableRenderer = true,
+                DisableInput = true,
+                Terminal = new FakeTerminalAdapter(),
+                CatchEffectExceptions = true
+            });
 
         // Act
         await program.RunAsync();
 
         // Assert
-        TestAssert.True(model.CapturedError is InvalidOperationException, "EffectErrorMsg should capture command exception.");
+        TestAssert.True(model.CapturedError is InvalidOperationException,
+            "EffectErrorMsg should capture command exception.");
         TestAssert.True(
             string.Equals(model.CapturedError?.Message, CommandFaultModel.FailureMessage, StringComparison.Ordinal),
             "Captured command exception message should match source failure.");
@@ -177,13 +204,14 @@ internal static class RuntimeLoopTests
     {
         // Arrange
         var model = new CommandFaultModel();
-        var program = new TestRuntimeDriver(model, new TesseraRuntimeLoopOptions
-        {
-            DisableRenderer = true,
-            DisableInput = true,
-            Terminal = new FakeTerminalAdapter(),
-            CatchEffectExceptions = false,
-        });
+        var program = new TestRuntimeDriver(model,
+            new TesseraRuntimeLoopOptions
+            {
+                DisableRenderer = true,
+                DisableInput = true,
+                Terminal = new FakeTerminalAdapter(),
+                CatchEffectExceptions = false
+            });
 
         // Act / Assert
         try
@@ -203,40 +231,44 @@ internal static class RuntimeLoopTests
     {
         // Arrange
         var model = new CommandRecoveryModel();
-        var program = new TestRuntimeDriver(model, new TesseraRuntimeLoopOptions
-        {
-            DisableRenderer = true,
-            DisableInput = true,
-            Terminal = new FakeTerminalAdapter(),
-            CatchEffectExceptions = true,
-            MapEffectException = _ => new NumberMsg(42),
-        });
+        var program = new TestRuntimeDriver(model,
+            new TesseraRuntimeLoopOptions
+            {
+                DisableRenderer = true,
+                DisableInput = true,
+                Terminal = new FakeTerminalAdapter(),
+                CatchEffectExceptions = true,
+                MapEffectException = _ => new NumberMsg(42)
+            });
 
         // Act
         await program.RunAsync();
 
         // Assert
-        TestAssert.True(model.RecoveredValue == 42, "Recovery hook should transform command exception into a replacement message.");
+        TestAssert.True(model.RecoveredValue == 42,
+            "Recovery hook should transform command exception into a replacement message.");
     }
 
     private static async Task CommandException_RecoveryFailure_EmitsCommandErrorMsg()
     {
         // Arrange
         var model = new CommandErrorCaptureModel();
-        var program = new TestRuntimeDriver(model, new TesseraRuntimeLoopOptions
-        {
-            DisableRenderer = true,
-            DisableInput = true,
-            Terminal = new FakeTerminalAdapter(),
-            CatchEffectExceptions = true,
-            MapEffectException = _ => throw new InvalidOperationException("recovery-failure"),
-        });
+        var program = new TestRuntimeDriver(model,
+            new TesseraRuntimeLoopOptions
+            {
+                DisableRenderer = true,
+                DisableInput = true,
+                Terminal = new FakeTerminalAdapter(),
+                CatchEffectExceptions = true,
+                MapEffectException = _ => throw new InvalidOperationException("recovery-failure")
+            });
 
         // Act
         await program.RunAsync();
 
         // Assert
-        TestAssert.True(model.CapturedError is InvalidOperationException, "Recovery hook failures should be surfaced as command errors.");
+        TestAssert.True(model.CapturedError is InvalidOperationException,
+            "Recovery hook failures should be surfaced as command errors.");
         TestAssert.True(
             string.Equals(model.CapturedError?.Message, "recovery-failure", StringComparison.Ordinal),
             "Recovery hook exception message should be preserved.");
@@ -245,27 +277,29 @@ internal static class RuntimeLoopTests
     private static async Task AdaptiveFramePacing_BatchesBurstRenders()
     {
         // Arrange
-        var nonAdaptiveModel = new BurstUpdateModel(targetCount: 8);
+        var nonAdaptiveModel = new BurstUpdateModel(8);
         await using var nonAdaptiveRenderer = new RenderCountingRendererSpy();
-        var nonAdaptiveProgram = new TestRuntimeDriver(nonAdaptiveModel, new TesseraRuntimeLoopOptions
-        {
-            DisableInput = true,
-            Renderer = nonAdaptiveRenderer,
-            Terminal = new FakeTerminalAdapter(),
-            MaxFps = 120,
-            AdaptiveFramePacing = false,
-        });
+        var nonAdaptiveProgram = new TestRuntimeDriver(nonAdaptiveModel,
+            new TesseraRuntimeLoopOptions
+            {
+                DisableInput = true,
+                Renderer = nonAdaptiveRenderer,
+                Terminal = new FakeTerminalAdapter(),
+                MaxFps = 120,
+                AdaptiveFramePacing = false
+            });
 
-        var adaptiveModel = new BurstUpdateModel(targetCount: 8);
+        var adaptiveModel = new BurstUpdateModel(8);
         await using var adaptiveRenderer = new RenderCountingRendererSpy();
-        var adaptiveProgram = new TestRuntimeDriver(adaptiveModel, new TesseraRuntimeLoopOptions
-        {
-            DisableInput = true,
-            Renderer = adaptiveRenderer,
-            Terminal = new FakeTerminalAdapter(),
-            MaxFps = 120,
-            AdaptiveFramePacing = true,
-        });
+        var adaptiveProgram = new TestRuntimeDriver(adaptiveModel,
+            new TesseraRuntimeLoopOptions
+            {
+                DisableInput = true,
+                Renderer = adaptiveRenderer,
+                Terminal = new FakeTerminalAdapter(),
+                MaxFps = 120,
+                AdaptiveFramePacing = true
+            });
 
         // Act
         await nonAdaptiveProgram.RunAsync();
@@ -282,12 +316,13 @@ internal static class RuntimeLoopTests
         // Arrange
         var model = new RawOutputInitModel();
         await using var renderer = new RenderCountingRendererSpy();
-        var program = new TestRuntimeDriver(model, new TesseraRuntimeLoopOptions
-        {
-            DisableInput = true,
-            Renderer = renderer,
-            Terminal = new FakeTerminalAdapter(),
-        });
+        var program = new TestRuntimeDriver(model,
+            new TesseraRuntimeLoopOptions
+            {
+                DisableInput = true,
+                Renderer = renderer,
+                Terminal = new FakeTerminalAdapter()
+            });
 
         // Act
         await program.RunAsync();
@@ -302,12 +337,13 @@ internal static class RuntimeLoopTests
     {
         // Arrange
         var model = new MouseInterceptModel();
-        var program = new TestRuntimeDriver(model, new TesseraRuntimeLoopOptions
-        {
-            DisableRenderer = true,
-            DisableInput = true,
-            Terminal = new FakeTerminalAdapter(),
-        });
+        var program = new TestRuntimeDriver(model,
+            new TesseraRuntimeLoopOptions
+            {
+                DisableRenderer = true,
+                DisableInput = true,
+                Terminal = new FakeTerminalAdapter()
+            });
 
         // Act
         var runTask = program.RunAsync();
@@ -324,13 +360,14 @@ internal static class RuntimeLoopTests
         // Arrange
         var terminal = new ResizingFakeTerminal();
         var model = new ResizeTrackingModel();
-        var program = new TestRuntimeDriver(model, new TesseraRuntimeLoopOptions
-        {
-            DisableRenderer = true,
-            DisableInput = true,
-            Terminal = terminal,
-            ResizePollInterval = TimeSpan.FromMilliseconds(10),
-        });
+        var program = new TestRuntimeDriver(model,
+            new TesseraRuntimeLoopOptions
+            {
+                DisableRenderer = true,
+                DisableInput = true,
+                Terminal = terminal,
+                ResizePollInterval = TimeSpan.FromMilliseconds(10)
+            });
 
         // Act
         await program.RunAsync();
@@ -346,20 +383,20 @@ internal static class RuntimeLoopTests
     {
         // Arrange
         var expected = new TerminalCapabilityProfile(
-            FocusReporting: true,
-            MouseReporting: true,
-            BracketedPaste: true,
-            SynchronizedUpdates: false,
-            ModeReports: true,
+            true,
+            true,
+            true,
+            false,
             Source: "test-override");
         var model = new CapabilityTrackingModel();
-        var program = new TestRuntimeDriver(model, new TesseraRuntimeLoopOptions
-        {
-            DisableRenderer = true,
-            DisableInput = true,
-            Terminal = new FakeTerminalAdapter(),
-            TerminalCapabilities = expected,
-        });
+        var program = new TestRuntimeDriver(model,
+            new TesseraRuntimeLoopOptions
+            {
+                DisableRenderer = true,
+                DisableInput = true,
+                Terminal = new FakeTerminalAdapter(),
+                TerminalCapabilities = expected
+            });
 
         // Act
         await program.RunAsync();
@@ -373,13 +410,14 @@ internal static class RuntimeLoopTests
     {
         // Arrange
         var model = new ColorProfileTrackingModel();
-        var program = new TestRuntimeDriver(model, new TesseraRuntimeLoopOptions
-        {
-            DisableRenderer = true,
-            DisableInput = true,
-            Terminal = new FakeTerminalAdapter(),
-            ColorProfile = TerminalColorProfile.Ansi256,
-        });
+        var program = new TestRuntimeDriver(model,
+            new TesseraRuntimeLoopOptions
+            {
+                DisableRenderer = true,
+                DisableInput = true,
+                Terminal = new FakeTerminalAdapter(),
+                ColorProfile = TerminalColorProfile.Ansi256
+            });
 
         // Act
         await program.RunAsync();
@@ -394,39 +432,42 @@ internal static class RuntimeLoopTests
     {
         // Arrange
         var expected = new TerminalCapabilityProfile(
-            FocusReporting: false,
-            MouseReporting: true,
-            BracketedPaste: false,
-            SynchronizedUpdates: false,
-            ModeReports: false,
+            false,
+            true,
+            false,
+            false,
+            false,
             Source: "capability-detector-delegate");
         var model = new CapabilityTrackingModel();
-        var program = new TestRuntimeDriver(model, new TesseraRuntimeLoopOptions
-        {
-            DisableRenderer = true,
-            DisableInput = true,
-            Terminal = new FakeTerminalAdapter(),
-            TerminalCapabilityDetector = () => expected,
-        });
+        var program = new TestRuntimeDriver(model,
+            new TesseraRuntimeLoopOptions
+            {
+                DisableRenderer = true,
+                DisableInput = true,
+                Terminal = new FakeTerminalAdapter(),
+                TerminalCapabilityDetector = () => expected
+            });
 
         // Act
         await program.RunAsync();
 
         // Assert
-        TestAssert.Equal(expected, model.Seen!, "Terminal capability detector delegate should override default detection.");
+        TestAssert.Equal(expected, model.Seen!,
+            "Terminal capability detector delegate should override default detection.");
     }
 
     private static async Task ColorProfileDetectorDelegate_OverridesDetection()
     {
         // Arrange
         var model = new ColorProfileTrackingModel();
-        var program = new TestRuntimeDriver(model, new TesseraRuntimeLoopOptions
-        {
-            DisableRenderer = true,
-            DisableInput = true,
-            Terminal = new FakeTerminalAdapter(),
-            ColorProfileDetector = () => TerminalColorProfile.TrueColor,
-        });
+        var program = new TestRuntimeDriver(model,
+            new TesseraRuntimeLoopOptions
+            {
+                DisableRenderer = true,
+                DisableInput = true,
+                Terminal = new FakeTerminalAdapter(),
+                ColorProfileDetector = () => TerminalColorProfile.TrueColor
+            });
 
         // Act
         await program.RunAsync();
@@ -442,32 +483,31 @@ internal static class RuntimeLoopTests
         // Arrange
         var terminal = new InteractiveProbeTerminalAdapter();
         var model = new TimedQuitModel(TimeSpan.FromMilliseconds(90));
-        var program = new TestRuntimeDriver(model, new TesseraRuntimeLoopOptions
-        {
-            DisableRenderer = true,
-            DisableInput = false,
-            Terminal = terminal,
-            EnableCapabilityProbe = true,
-            CapabilityProbeModes = [2026],
-            TerminalCapabilities = new TerminalCapabilityProfile(
-                FocusReporting: true,
-                MouseReporting: true,
-                BracketedPaste: true,
-                SynchronizedUpdates: true,
-                ModeReports: true,
-                Source: "custom-probe-modes"),
-            CapabilityProbeTimeout = TimeSpan.FromMilliseconds(700),
-        });
+        var program = new TestRuntimeDriver(model,
+            new TesseraRuntimeLoopOptions
+            {
+                DisableRenderer = true,
+                DisableInput = false,
+                Terminal = terminal,
+                EnableCapabilityProbe = true,
+                CapabilityProbeModes = [2026],
+                TerminalCapabilities = new TerminalCapabilityProfile(Source: "custom-probe-modes"),
+                CapabilityProbeTimeout = TimeSpan.FromMilliseconds(700)
+            });
 
         // Act
         await program.RunAsync().WaitAsync(TimeSpan.FromSeconds(2));
 
         // Assert
         var output = terminal.OutputText;
-        TestAssert.True(output.Contains("\u001b[?2026$p", StringComparison.Ordinal), "Probe should query configured mode 2026.");
-        TestAssert.True(!output.Contains("\u001b[?1004$p", StringComparison.Ordinal), "Probe should not query mode 1004 when excluded.");
-        TestAssert.True(!output.Contains("\u001b[?1006$p", StringComparison.Ordinal), "Probe should not query mode 1006 when excluded.");
-        TestAssert.True(!output.Contains("\u001b[?2004$p", StringComparison.Ordinal), "Probe should not query mode 2004 when excluded.");
+        TestAssert.True(output.Contains("\e[?2026$p", StringComparison.Ordinal),
+            "Probe should query configured mode 2026.");
+        TestAssert.True(!output.Contains("\e[?1004$p", StringComparison.Ordinal),
+            "Probe should not query mode 1004 when excluded.");
+        TestAssert.True(!output.Contains("\e[?1006$p", StringComparison.Ordinal),
+            "Probe should not query mode 1006 when excluded.");
+        TestAssert.True(!output.Contains("\e[?2004$p", StringComparison.Ordinal),
+            "Probe should not query mode 2004 when excluded.");
     }
 
     private static async Task EventDecoderOverride_IsUsedForInputLoop()
@@ -475,13 +515,14 @@ internal static class RuntimeLoopTests
         // Arrange
         var terminal = new InteractiveInputTerminalAdapter("x");
         var decoder = new QuitOnFirstByteDecoder();
-        var program = new TestRuntimeDriver(new IdleModel(), new TesseraRuntimeLoopOptions
-        {
-            DisableRenderer = true,
-            DisableInput = false,
-            Terminal = terminal,
-            EventDecoder = decoder,
-        });
+        var program = new TestRuntimeDriver(new IdleModel(),
+            new TesseraRuntimeLoopOptions
+            {
+                DisableRenderer = true,
+                DisableInput = false,
+                Terminal = terminal,
+                EventDecoder = decoder
+            });
 
         // Act
         await program.RunAsync().WaitAsync(TimeSpan.FromSeconds(2));
@@ -493,14 +534,15 @@ internal static class RuntimeLoopTests
     private static async Task MaxConcurrentEffects_OneSerializesExecution()
     {
         // Arrange
-        var model = new ConcurrencyTrackingModel(commandCount: 6, delay: TimeSpan.FromMilliseconds(25));
-        var program = new TestRuntimeDriver(model, new TesseraRuntimeLoopOptions
-        {
-            DisableRenderer = true,
-            DisableInput = true,
-            Terminal = new FakeTerminalAdapter(),
-            MaxConcurrentEffects = 1,
-        });
+        var model = new ConcurrencyTrackingModel(6, TimeSpan.FromMilliseconds(25));
+        var program = new TestRuntimeDriver(model,
+            new TesseraRuntimeLoopOptions
+            {
+                DisableRenderer = true,
+                DisableInput = true,
+                Terminal = new FakeTerminalAdapter(),
+                MaxConcurrentEffects = 1
+            });
 
         // Act
         await program.RunAsync().WaitAsync(TimeSpan.FromSeconds(2));
@@ -514,34 +556,31 @@ internal static class RuntimeLoopTests
         // Arrange
         var terminal = new InteractiveProbeTerminalAdapter();
         var model = new TimedQuitProbeViewModel(TimeSpan.FromMilliseconds(60));
-        var program = new TestRuntimeDriver(model, new TesseraRuntimeLoopOptions
-        {
-            DisableInput = true,
-            Terminal = terminal,
-            EnableCapabilityProbe = false,
-            TerminalCapabilities = new TerminalCapabilityProfile(
-                FocusReporting: true,
-                MouseReporting: true,
-                BracketedPaste: true,
-                SynchronizedUpdates: true,
-                ModeReports: true,
-                Source: "ansi-renderer-options-test"),
-            AnsiRendererOptions = new AnsiRendererOptions
+        var program = new TestRuntimeDriver(model,
+            new TesseraRuntimeLoopOptions
             {
-                QueryModeReports = false,
-            },
-        });
+                DisableInput = true,
+                Terminal = terminal,
+                EnableCapabilityProbe = false,
+                TerminalCapabilities = new TerminalCapabilityProfile(Source: "ansi-renderer-options-test"),
+                AnsiRendererOptions = new AnsiRendererOptions { QueryModeReports = false }
+            });
 
         // Act
         await program.RunAsync().WaitAsync(TimeSpan.FromSeconds(2));
 
         // Assert
         var output = terminal.OutputText;
-        TestAssert.True(output.Contains("\u001b[?2004h", StringComparison.Ordinal), "Runtime should still enable bracketed paste.");
-        TestAssert.True(output.Contains("\u001b[?1004h", StringComparison.Ordinal), "Runtime should still enable focus reporting.");
-        TestAssert.True(output.Contains("\u001b[?1006h", StringComparison.Ordinal), "Runtime should still enable mouse reporting.");
-        TestAssert.True(output.Contains("\u001b[?2026h", StringComparison.Ordinal), "Runtime should still enable synchronized updates.");
-        TestAssert.True(!output.Contains("$p", StringComparison.Ordinal), "Renderer mode-report queries should be disabled by options.");
+        TestAssert.True(output.Contains("\e[?2004h", StringComparison.Ordinal),
+            "Runtime should still enable bracketed paste.");
+        TestAssert.True(output.Contains("\e[?1004h", StringComparison.Ordinal),
+            "Runtime should still enable focus reporting.");
+        TestAssert.True(output.Contains("\e[?1006h", StringComparison.Ordinal),
+            "Runtime should still enable mouse reporting.");
+        TestAssert.True(output.Contains("\e[?2026h", StringComparison.Ordinal),
+            "Runtime should still enable synchronized updates.");
+        TestAssert.True(!output.Contains("$p", StringComparison.Ordinal),
+            "Renderer mode-report queries should be disabled by options.");
     }
 
     private static async Task CapabilityProbe_WritesModeQueries()
@@ -549,34 +588,36 @@ internal static class RuntimeLoopTests
         // Arrange
         var terminal = new InteractiveProbeTerminalAdapter();
         var model = new TimedQuitModel(TimeSpan.FromMilliseconds(90));
-        var program = new TestRuntimeDriver(model, new TesseraRuntimeLoopOptions
-        {
-            DisableRenderer = true,
-            DisableInput = false,
-            Terminal = terminal,
-            TerminalCapabilities = new TerminalCapabilityProfile(
-                FocusReporting: true,
-                MouseReporting: true,
-                BracketedPaste: true,
-                SynchronizedUpdates: true,
-                ModeReports: true,
-                Source: "probe-test"),
-            EnableCapabilityProbe = true,
-            CapabilityProbeTimeout = TimeSpan.FromMilliseconds(800),
-        });
+        var program = new TestRuntimeDriver(model,
+            new TesseraRuntimeLoopOptions
+            {
+                DisableRenderer = true,
+                DisableInput = false,
+                Terminal = terminal,
+                TerminalCapabilities = new TerminalCapabilityProfile(Source: "probe-test"),
+                EnableCapabilityProbe = true,
+                CapabilityProbeTimeout = TimeSpan.FromMilliseconds(800)
+            });
 
         // Act
         await program.RunAsync().WaitAsync(TimeSpan.FromSeconds(2));
 
         // Assert
         var output = terminal.OutputText;
-        TestAssert.True(output.Contains("\u001b[?1000$p", StringComparison.Ordinal), "Startup capability probe should query mode 1000.");
-        TestAssert.True(output.Contains("\u001b[?1002$p", StringComparison.Ordinal), "Startup capability probe should query mode 1002.");
-        TestAssert.True(output.Contains("\u001b[?1003$p", StringComparison.Ordinal), "Startup capability probe should query mode 1003.");
-        TestAssert.True(output.Contains("\u001b[?1004$p", StringComparison.Ordinal), "Startup capability probe should query mode 1004.");
-        TestAssert.True(output.Contains("\u001b[?1006$p", StringComparison.Ordinal), "Startup capability probe should query mode 1006.");
-        TestAssert.True(output.Contains("\u001b[?2004$p", StringComparison.Ordinal), "Startup capability probe should query mode 2004.");
-        TestAssert.True(output.Contains("\u001b[?2026$p", StringComparison.Ordinal), "Startup capability probe should query mode 2026.");
+        TestAssert.True(output.Contains("\e[?1000$p", StringComparison.Ordinal),
+            "Startup capability probe should query mode 1000.");
+        TestAssert.True(output.Contains("\e[?1002$p", StringComparison.Ordinal),
+            "Startup capability probe should query mode 1002.");
+        TestAssert.True(output.Contains("\e[?1003$p", StringComparison.Ordinal),
+            "Startup capability probe should query mode 1003.");
+        TestAssert.True(output.Contains("\e[?1004$p", StringComparison.Ordinal),
+            "Startup capability probe should query mode 1004.");
+        TestAssert.True(output.Contains("\e[?1006$p", StringComparison.Ordinal),
+            "Startup capability probe should query mode 1006.");
+        TestAssert.True(output.Contains("\e[?2004$p", StringComparison.Ordinal),
+            "Startup capability probe should query mode 2004.");
+        TestAssert.True(output.Contains("\e[?2026$p", StringComparison.Ordinal),
+            "Startup capability probe should query mode 2026.");
     }
 
     private static async Task CapabilityProbe_TimeoutDisablesModeReportsWhenNoResponses()
@@ -584,22 +625,17 @@ internal static class RuntimeLoopTests
         // Arrange
         var terminal = new InteractiveProbeTerminalAdapter();
         var model = new CapabilityProbeTimeoutModel(TimeSpan.FromMilliseconds(260));
-        var initial = new TerminalCapabilityProfile(
-            FocusReporting: true,
-            MouseReporting: true,
-            BracketedPaste: true,
-            SynchronizedUpdates: true,
-            ModeReports: true,
-            Source: "probe-timeout-test");
-        var program = new TestRuntimeDriver(model, new TesseraRuntimeLoopOptions
-        {
-            DisableRenderer = true,
-            DisableInput = false,
-            Terminal = terminal,
-            TerminalCapabilities = initial,
-            EnableCapabilityProbe = true,
-            CapabilityProbeTimeout = TimeSpan.FromMilliseconds(35),
-        });
+        var initial = new TerminalCapabilityProfile(Source: "probe-timeout-test");
+        var program = new TestRuntimeDriver(model,
+            new TesseraRuntimeLoopOptions
+            {
+                DisableRenderer = true,
+                DisableInput = false,
+                Terminal = terminal,
+                TerminalCapabilities = initial,
+                EnableCapabilityProbe = true,
+                CapabilityProbeTimeout = TimeSpan.FromMilliseconds(35)
+            });
 
         // Act
         await program.RunAsync().WaitAsync(TimeSpan.FromSeconds(2));
@@ -620,37 +656,35 @@ internal static class RuntimeLoopTests
         var model = new CapabilityProbeResponseModel(
             TimeSpan.FromMilliseconds(140),
             [new ModeReportMsg(2026, ModeReportState.Reset)]);
-        var initial = new TerminalCapabilityProfile(
-            FocusReporting: true,
-            MouseReporting: true,
-            BracketedPaste: true,
-            SynchronizedUpdates: true,
-            ModeReports: true,
-            Source: "probe-response-test");
-        var program = new TestRuntimeDriver(model, new TesseraRuntimeLoopOptions
-        {
-            DisableRenderer = true,
-            DisableInput = false,
-            Terminal = terminal,
-            TerminalCapabilities = initial,
-            EnableCapabilityProbe = true,
-            CapabilityProbeTimeout = TimeSpan.FromMilliseconds(30),
-        });
+        var initial = new TerminalCapabilityProfile(Source: "probe-response-test");
+        var program = new TestRuntimeDriver(model,
+            new TesseraRuntimeLoopOptions
+            {
+                DisableRenderer = true,
+                DisableInput = false,
+                Terminal = terminal,
+                TerminalCapabilities = initial,
+                EnableCapabilityProbe = true,
+                CapabilityProbeTimeout = TimeSpan.FromMilliseconds(30)
+            });
 
         // Act
         await program.RunAsync().WaitAsync(TimeSpan.FromSeconds(2));
 
         // Assert
-        TestAssert.True(model.Seen.Count >= 3, "Partial probe responses should emit both mode-report and probe-timeout refinements.");
+        TestAssert.True(model.Seen.Count >= 3,
+            "Partial probe responses should emit both mode-report and probe-timeout refinements.");
         var final = model.Seen[^1];
         TestAssert.True(final.ModeReports, "Any probe response should keep mode reports enabled.");
         TestAssert.True(
             final.Source.Contains("+probe-partial-timeout", StringComparison.Ordinal),
             "Partial probe timeout should annotate source.");
         TestAssert.True(!final.FocusReporting, "Unresolved focus probe should downgrade focus reporting.");
-        TestAssert.True(final.MouseReporting, "Unresolved mouse probe should preserve mouse reporting to avoid false-negative interop downgrades.");
+        TestAssert.True(final.MouseReporting,
+            "Unresolved mouse probe should preserve mouse reporting to avoid false-negative interop downgrades.");
         TestAssert.True(!final.BracketedPaste, "Unresolved paste probe should downgrade bracketed paste support.");
-        TestAssert.True(final.SynchronizedUpdates, "Mode report reset should retain synchronized update support while reporting current reset state.");
+        TestAssert.True(final.SynchronizedUpdates,
+            "Mode report reset should retain synchronized update support while reporting current reset state.");
     }
 
     private static async Task CapabilityProbe_1006UnsupportedResponse_PreservesMouseCapability()
@@ -660,28 +694,24 @@ internal static class RuntimeLoopTests
         var model = new CapabilityProbeResponseModel(
             TimeSpan.FromMilliseconds(180),
             [new ModeReportMsg(1006, ModeReportState.Unsupported)]);
-        var initial = new TerminalCapabilityProfile(
-            FocusReporting: true,
-            MouseReporting: true,
-            BracketedPaste: true,
-            SynchronizedUpdates: true,
-            ModeReports: true,
-            Source: "probe-1006-unsupported-test");
-        var program = new TestRuntimeDriver(model, new TesseraRuntimeLoopOptions
-        {
-            DisableRenderer = true,
-            DisableInput = false,
-            Terminal = terminal,
-            TerminalCapabilities = initial,
-            EnableCapabilityProbe = true,
-            CapabilityProbeTimeout = TimeSpan.FromMilliseconds(30),
-        });
+        var initial = new TerminalCapabilityProfile(Source: "probe-1006-unsupported-test");
+        var program = new TestRuntimeDriver(model,
+            new TesseraRuntimeLoopOptions
+            {
+                DisableRenderer = true,
+                DisableInput = false,
+                Terminal = terminal,
+                TerminalCapabilities = initial,
+                EnableCapabilityProbe = true,
+                CapabilityProbeTimeout = TimeSpan.FromMilliseconds(30)
+            });
 
         // Act
         await program.RunAsync().WaitAsync(TimeSpan.FromSeconds(2));
 
         // Assert
-        TestAssert.True(model.Seen.Count >= 3, "1006 unsupported response should still flow through mode-report and partial-timeout refinements.");
+        TestAssert.True(model.Seen.Count >= 3,
+            "1006 unsupported response should still flow through mode-report and partial-timeout refinements.");
         var final = model.Seen[^1];
         TestAssert.True(final.MouseReporting, "1006 unsupported mode-report should not demote mouse capability.");
         TestAssert.True(
@@ -698,35 +728,32 @@ internal static class RuntimeLoopTests
             TimeSpan.FromMilliseconds(180),
             [
                 new ModeReportMsg(1000, ModeReportState.Set),
-                new ModeReportMsg(2026, ModeReportState.Reset),
+                new ModeReportMsg(2026, ModeReportState.Reset)
             ]);
-        var initial = new TerminalCapabilityProfile(
-            FocusReporting: true,
-            MouseReporting: true,
-            BracketedPaste: true,
-            SynchronizedUpdates: true,
-            ModeReports: true,
-            Source: "probe-legacy-mouse-test");
-        var program = new TestRuntimeDriver(model, new TesseraRuntimeLoopOptions
-        {
-            DisableRenderer = true,
-            DisableInput = false,
-            Terminal = terminal,
-            TerminalCapabilities = initial,
-            EnableCapabilityProbe = true,
-            CapabilityProbeTimeout = TimeSpan.FromMilliseconds(30),
-        });
+        var initial = new TerminalCapabilityProfile(Source: "probe-legacy-mouse-test");
+        var program = new TestRuntimeDriver(model,
+            new TesseraRuntimeLoopOptions
+            {
+                DisableRenderer = true,
+                DisableInput = false,
+                Terminal = terminal,
+                TerminalCapabilities = initial,
+                EnableCapabilityProbe = true,
+                CapabilityProbeTimeout = TimeSpan.FromMilliseconds(30)
+            });
 
         // Act
         await program.RunAsync().WaitAsync(TimeSpan.FromSeconds(2));
 
         // Assert
-        TestAssert.True(model.Seen.Count >= 3, "Legacy mouse + sync probe responses should emit refined capability updates.");
+        TestAssert.True(model.Seen.Count >= 3,
+            "Legacy mouse + sync probe responses should emit refined capability updates.");
         var final = model.Seen[^1];
         TestAssert.True(
             final.Source.Contains("+probe-partial-timeout", StringComparison.Ordinal),
             "Partial timeout should still annotate unresolved representative modes.");
-        TestAssert.True(final.MouseReporting, "Legacy mouse mode support should preserve mouse capability when 1006 stays unresolved.");
+        TestAssert.True(final.MouseReporting,
+            "Legacy mouse mode support should preserve mouse capability when 1006 stays unresolved.");
         TestAssert.True(!final.FocusReporting, "Unresolved focus probe should downgrade focus reporting.");
         TestAssert.True(!final.BracketedPaste, "Unresolved paste probe should downgrade bracketed paste support.");
     }
@@ -741,24 +768,19 @@ internal static class RuntimeLoopTests
                 new ModeReportMsg(1004, ModeReportState.Set),
                 new ModeReportMsg(1006, ModeReportState.Set),
                 new ModeReportMsg(2004, ModeReportState.Set),
-                new ModeReportMsg(2026, ModeReportState.Reset),
+                new ModeReportMsg(2026, ModeReportState.Reset)
             ]);
-        var initial = new TerminalCapabilityProfile(
-            FocusReporting: true,
-            MouseReporting: true,
-            BracketedPaste: true,
-            SynchronizedUpdates: true,
-            ModeReports: true,
-            Source: "probe-all-responses-test");
-        var program = new TestRuntimeDriver(model, new TesseraRuntimeLoopOptions
-        {
-            DisableRenderer = true,
-            DisableInput = false,
-            Terminal = terminal,
-            TerminalCapabilities = initial,
-            EnableCapabilityProbe = true,
-            CapabilityProbeTimeout = TimeSpan.FromMilliseconds(120),
-        });
+        var initial = new TerminalCapabilityProfile(Source: "probe-all-responses-test");
+        var program = new TestRuntimeDriver(model,
+            new TesseraRuntimeLoopOptions
+            {
+                DisableRenderer = true,
+                DisableInput = false,
+                Terminal = terminal,
+                TerminalCapabilities = initial,
+                EnableCapabilityProbe = true,
+                CapabilityProbeTimeout = TimeSpan.FromMilliseconds(120)
+            });
 
         // Act
         await program.RunAsync().WaitAsync(TimeSpan.FromSeconds(2));
@@ -781,12 +803,13 @@ internal static class RuntimeLoopTests
     {
         // Arrange / Act
         var useConsoleKeyLoop = TesseraRuntimeLoop.ShouldUseConsoleKeyEventLoop(
-            useConsoleKeyEvents: true,
-            isRawModeActive: true,
-            runtimeCapabilities: TerminalCapabilityProfile.AllSupported);
+            true,
+            true,
+            TerminalCapabilityProfile.AllSupported);
 
         // Assert
-        TestAssert.True(!useConsoleKeyLoop, "Raw mode should use terminal byte-stream reader so mouse/focus events remain available.");
+        TestAssert.True(!useConsoleKeyLoop,
+            "Raw mode should use terminal byte-stream reader so mouse/focus events remain available.");
         return Task.CompletedTask;
     }
 
@@ -794,12 +817,13 @@ internal static class RuntimeLoopTests
     {
         // Arrange / Act
         var useConsoleKeyLoop = TesseraRuntimeLoop.ShouldUseConsoleKeyEventLoop(
-            useConsoleKeyEvents: true,
-            isRawModeActive: false,
-            runtimeCapabilities: TerminalCapabilityProfile.AllSupported);
+            true,
+            false,
+            TerminalCapabilityProfile.AllSupported);
 
         // Assert
-        TestAssert.True(!useConsoleKeyLoop, "Non-raw mode with CSI-capable terminal should preserve byte-stream decoding for mouse/focus/paste.");
+        TestAssert.True(!useConsoleKeyLoop,
+            "Non-raw mode with CSI-capable terminal should preserve byte-stream decoding for mouse/focus/paste.");
         return Task.CompletedTask;
     }
 
@@ -807,14 +831,14 @@ internal static class RuntimeLoopTests
     {
         // Arrange / Act
         var useConsoleKeyLoop = TesseraRuntimeLoop.ShouldUseConsoleKeyEventLoop(
-            useConsoleKeyEvents: true,
-            isRawModeActive: false,
-            runtimeCapabilities: new TerminalCapabilityProfile(
-                FocusReporting: false,
-                MouseReporting: false,
-                BracketedPaste: false,
-                SynchronizedUpdates: false,
-                ModeReports: false,
+            true,
+            false,
+            new TerminalCapabilityProfile(
+                false,
+                false,
+                false,
+                false,
+                false,
                 Source: "test-legacy"));
 
         // Assert
@@ -826,9 +850,9 @@ internal static class RuntimeLoopTests
     {
         // Arrange / Act
         var useConsoleKeyLoop = TesseraRuntimeLoop.ShouldUseConsoleKeyEventLoop(
-            useConsoleKeyEvents: false,
-            isRawModeActive: false,
-            runtimeCapabilities: TerminalCapabilityProfile.AllSupported);
+            false,
+            false,
+            TerminalCapabilityProfile.AllSupported);
 
         // Assert
         TestAssert.True(!useConsoleKeyLoop, "Disabling console key events should force terminal byte-stream reader.");
@@ -838,29 +862,26 @@ internal static class RuntimeLoopTests
     private static async Task ModeReport_RefinesTerminalCapabilities()
     {
         // Arrange
-        var initial = new TerminalCapabilityProfile(
-            FocusReporting: true,
-            MouseReporting: true,
-            BracketedPaste: true,
-            SynchronizedUpdates: true,
-            ModeReports: true,
-            Source: "test-initial");
+        var initial = new TerminalCapabilityProfile(Source: "test-initial");
         var model = new CapabilityRefinementModel();
-        var program = new TestRuntimeDriver(model, new TesseraRuntimeLoopOptions
-        {
-            DisableRenderer = true,
-            DisableInput = true,
-            Terminal = new FakeTerminalAdapter(),
-            TerminalCapabilities = initial,
-        });
+        var program = new TestRuntimeDriver(model,
+            new TesseraRuntimeLoopOptions
+            {
+                DisableRenderer = true,
+                DisableInput = true,
+                Terminal = new FakeTerminalAdapter(),
+                TerminalCapabilities = initial
+            });
 
         // Act
         await program.RunAsync();
 
         // Assert
         TestAssert.Equal(2, model.Seen.Count, "Program should emit initial and refined capability messages.");
-        TestAssert.True(model.Seen[0].SynchronizedUpdates, "Initial capabilities should keep synchronized updates enabled.");
-        TestAssert.True(model.Seen[1].SynchronizedUpdates, "Mode report reset should retain synchronized update support.");
+        TestAssert.True(model.Seen[0].SynchronizedUpdates,
+            "Initial capabilities should keep synchronized updates enabled.");
+        TestAssert.True(model.Seen[1].SynchronizedUpdates,
+            "Mode report reset should retain synchronized update support.");
         TestAssert.True(
             model.Seen[1].Source.Contains("+mode-report", StringComparison.Ordinal)
             && model.Seen[1].Source.Contains("+mode-report-reset", StringComparison.Ordinal),
@@ -871,22 +892,20 @@ internal static class RuntimeLoopTests
     {
         // Arrange
         var initial = new TerminalCapabilityProfile(
-            FocusReporting: true,
-            MouseReporting: false,
-            BracketedPaste: true,
-            SynchronizedUpdates: true,
-            ModeReports: true,
+            true,
+            false,
             Source: "legacy-mode-report-test");
         var model = new CapabilityProbeResponseModel(
             TimeSpan.FromMilliseconds(120),
             [new ModeReportMsg(1000, ModeReportState.Set)]);
-        var program = new TestRuntimeDriver(model, new TesseraRuntimeLoopOptions
-        {
-            DisableRenderer = true,
-            DisableInput = true,
-            Terminal = new FakeTerminalAdapter(),
-            TerminalCapabilities = initial,
-        });
+        var program = new TestRuntimeDriver(model,
+            new TesseraRuntimeLoopOptions
+            {
+                DisableRenderer = true,
+                DisableInput = true,
+                Terminal = new FakeTerminalAdapter(),
+                TerminalCapabilities = initial
+            });
 
         // Act
         await program.RunAsync().WaitAsync(TimeSpan.FromSeconds(2));
@@ -904,21 +923,16 @@ internal static class RuntimeLoopTests
     private static async Task ModeReport_UnsupportedMouseState_PreservesStickyCapability()
     {
         // Arrange
-        var initial = new TerminalCapabilityProfile(
-            FocusReporting: true,
-            MouseReporting: true,
-            BracketedPaste: true,
-            SynchronizedUpdates: true,
-            ModeReports: true,
-            Source: "test-unsupported");
+        var initial = new TerminalCapabilityProfile(Source: "test-unsupported");
         var model = new UnsupportedModeReportRefinementModel();
-        var program = new TestRuntimeDriver(model, new TesseraRuntimeLoopOptions
-        {
-            DisableRenderer = true,
-            DisableInput = true,
-            Terminal = new FakeTerminalAdapter(),
-            TerminalCapabilities = initial,
-        });
+        var program = new TestRuntimeDriver(model,
+            new TesseraRuntimeLoopOptions
+            {
+                DisableRenderer = true,
+                DisableInput = true,
+                Terminal = new FakeTerminalAdapter(),
+                TerminalCapabilities = initial
+            });
 
         // Act
         await program.RunAsync();
@@ -926,7 +940,8 @@ internal static class RuntimeLoopTests
         // Assert
         TestAssert.Equal(2, model.Seen.Count, "Program should emit initial and refined capability messages.");
         var refined = model.Seen[1];
-        TestAssert.True(refined.MouseReporting, "Unsupported 1006 mode-report state should preserve sticky mouse capability.");
+        TestAssert.True(refined.MouseReporting,
+            "Unsupported 1006 mode-report state should preserve sticky mouse capability.");
         TestAssert.True(
             refined.Source.Contains("+mode-report", StringComparison.Ordinal)
             && refined.Source.Contains("+mode-report-unsupported", StringComparison.Ordinal),
@@ -936,35 +951,31 @@ internal static class RuntimeLoopTests
     private static async Task ModeReport_PropagatesCapabilitiesToRenderer()
     {
         // Arrange
-        var initial = new TerminalCapabilityProfile(
-            FocusReporting: true,
-            MouseReporting: true,
-            BracketedPaste: true,
-            SynchronizedUpdates: true,
-            ModeReports: true,
-            Source: "test-renderer-propagation");
+        var initial = new TerminalCapabilityProfile(Source: "test-renderer-propagation");
         var model = new UnsupportedModeReportRefinementModel();
         await using var renderer = new CapabilityAwareRendererSpy();
-        var program = new TestRuntimeDriver(model, new TesseraRuntimeLoopOptions
-        {
-            DisableInput = true,
-            Renderer = renderer,
-            Terminal = new FakeTerminalAdapter(),
-            TerminalCapabilities = initial,
-        });
+        var program = new TestRuntimeDriver(model,
+            new TesseraRuntimeLoopOptions
+            {
+                DisableInput = true,
+                Renderer = renderer,
+                Terminal = new FakeTerminalAdapter(),
+                TerminalCapabilities = initial
+            });
 
         // Act
         await program.RunAsync();
 
         // Assert
         TestAssert.True(renderer.Updates.Count >= 2, "Renderer should receive initial and refined capability updates.");
-        TestAssert.True(renderer.Updates[^1].MouseReporting, "Renderer should preserve sticky mouse capability for 1006 unsupported mode-report state.");
+        TestAssert.True(renderer.Updates[^1].MouseReporting,
+            "Renderer should preserve sticky mouse capability for 1006 unsupported mode-report state.");
     }
 
     private static async Task ResizeSignal_EmitsWindowSizeChanges()
     {
         // Arrange
-        var terminal = new SignalDrivenFakeTerminal(new Tessera.Core.Terminal.TerminalSize(80, 24));
+        var terminal = new SignalDrivenFakeTerminal(new TerminalSize(80, 24));
         var model = new ResizeTrackingModel();
         Action? raiseSignal = null;
         var program = new TestRuntimeDriver(model, new TesseraRuntimeLoopOptions
@@ -977,16 +988,18 @@ internal static class RuntimeLoopTests
             {
                 raiseSignal = onResize;
                 return new DelegateDisposable(() => { });
-            },
+            }
         });
 
         // Act
         var runTask = program.RunAsync();
-        await WaitUntilAsync(() => raiseSignal is not null, TimeSpan.FromSeconds(1), "Resize signal registration was not initialized.");
+        await WaitUntilAsync(() => raiseSignal is not null, TimeSpan.FromSeconds(1),
+            "Resize signal registration was not initialized.");
         raiseSignal?.Invoke();
         raiseSignal?.Invoke();
         await Task.Delay(30);
-        TestAssert.Equal(1, model.Seen.Count, "Resize signals without size change should not emit duplicate WindowSizeMsg events.");
+        TestAssert.Equal(1, model.Seen.Count,
+            "Resize signals without size change should not emit duplicate WindowSizeMsg events.");
         terminal.SetSize(101, 41);
         raiseSignal?.Invoke();
         await runTask;
@@ -1015,14 +1028,15 @@ internal static class RuntimeLoopTests
             {
                 registrationCalls++;
                 return new DelegateDisposable(() => { });
-            },
+            }
         });
 
         // Act
         await program.RunAsync();
 
         // Assert
-        TestAssert.Equal(0, registrationCalls, "Signal registration should be skipped when resize signals are disabled.");
+        TestAssert.Equal(0, registrationCalls,
+            "Signal registration should be skipped when resize signals are disabled.");
         TestAssert.True(model.Seen.Count >= 2, "Polling fallback should still emit resize updates.");
     }
 
@@ -1031,15 +1045,16 @@ internal static class RuntimeLoopTests
         // Arrange
         var terminal = new ResizingFakeTerminal();
         var model = new ResizeTrackingModel();
-        var program = new TestRuntimeDriver(model, new TesseraRuntimeLoopOptions
-        {
-            DisableRenderer = true,
-            DisableInput = true,
-            Terminal = terminal,
-            EnableResizeSignals = true,
-            ResizePollInterval = TimeSpan.FromMilliseconds(10),
-            ResizeSignalRegistrationFactory = _ => throw new InvalidOperationException("boom"),
-        });
+        var program = new TestRuntimeDriver(model,
+            new TesseraRuntimeLoopOptions
+            {
+                DisableRenderer = true,
+                DisableInput = true,
+                Terminal = terminal,
+                EnableResizeSignals = true,
+                ResizePollInterval = TimeSpan.FromMilliseconds(10),
+                ResizeSignalRegistrationFactory = _ => throw new InvalidOperationException("boom")
+            });
 
         // Act
         await program.RunAsync();
@@ -1053,27 +1068,32 @@ internal static class RuntimeLoopTests
         // Arrange
         var terminal = new DisposeOrderingTerminalAdapter();
         var model = new QuitOnQModel();
-        var program = new TestRuntimeDriver(model, new TesseraRuntimeLoopOptions
-        {
-            DisableRenderer = true,
-            Terminal = terminal,
-            EscapeTimeout = TimeSpan.FromMilliseconds(10),
-        });
+        var program = new TestRuntimeDriver(model,
+            new TesseraRuntimeLoopOptions
+            {
+                DisableRenderer = true,
+                Terminal = terminal,
+                EscapeTimeout = TimeSpan.FromMilliseconds(10)
+            });
 
         // Act
         await program.RunAsync().WaitAsync(TimeSpan.FromSeconds(1));
 
         // Assert
-        TestAssert.True(terminal.DisposeObservedCancellation, "Program should cancel input processing before terminal dispose.");
+        TestAssert.True(terminal.DisposeObservedCancellation,
+            "Program should cancel input processing before terminal dispose.");
     }
 
-    private static TestRuntimeDriver NewProgram(TestRuntimeModel model) =>
-        new(model, new TesseraRuntimeLoopOptions
-        {
-            DisableRenderer = true,
-            DisableInput = true,
-            Terminal = new FakeTerminalAdapter(),
-        });
+    private static TestRuntimeDriver NewProgram(TestRuntimeModel model)
+    {
+        return new TestRuntimeDriver(model,
+            new TesseraRuntimeLoopOptions
+            {
+                DisableRenderer = true,
+                DisableInput = true,
+                Terminal = new FakeTerminalAdapter()
+            });
+    }
 
     private static async Task WaitUntilAsync(Func<bool> condition, TimeSpan timeout, string failureMessage)
     {
@@ -1091,8 +1111,8 @@ internal static class RuntimeLoopTests
 
     private sealed class TestRuntimeDriver
     {
-        private readonly TestRuntimeModel _screen;
         private readonly TesseraRuntimeLoop _runtime;
+        private readonly TestRuntimeModel _screen;
 
         public TestRuntimeDriver(TestRuntimeModel screen, TesseraRuntimeLoopOptions? options = null)
         {

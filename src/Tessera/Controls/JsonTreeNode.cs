@@ -1,33 +1,33 @@
 namespace Tessera.Controls;
 
 /// <summary>
-/// Identifies the payload shape for a <see cref="JsonTreeNode" />.
+///     Identifies the payload shape for a <see cref="JsonTreeNode" />.
 /// </summary>
 public enum JsonTreeNodeKind
 {
     /// <summary>
-    /// JSON object container.
+    ///     JSON object container.
     /// </summary>
     ObjectNode = 0,
 
     /// <summary>
-    /// JSON array container.
+    ///     JSON array container.
     /// </summary>
     Array = 1,
 
     /// <summary>
-    /// Scalar JSON value.
+    ///     Scalar JSON value.
     /// </summary>
-    Value = 2,
+    Value = 2
 }
 
 /// <summary>
-/// Represents one node in a JSON inspection tree.
+///     Represents one node in a JSON inspection tree.
 /// </summary>
 public sealed class JsonTreeNode
 {
     /// <summary>
-    /// Initializes a JSON tree node.
+    ///     Initializes a JSON tree node.
     /// </summary>
     /// <param name="key">Property key or array index label.</param>
     /// <param name="displayValue">Display value for scalar nodes or container summary text.</param>
@@ -39,8 +39,8 @@ public sealed class JsonTreeNode
         JsonTreeNodeKind kind,
         IEnumerable<JsonTreeNode>? children = null)
     {
-        Key = key ?? string.Empty;
-        DisplayValue = displayValue ?? string.Empty;
+        Key = key;
+        DisplayValue = displayValue;
         Kind = kind;
         if (children is not null)
         {
@@ -52,32 +52,32 @@ public sealed class JsonTreeNode
     }
 
     /// <summary>
-    /// Gets or sets property key or array index label.
+    ///     Gets or sets property key or array index label.
     /// </summary>
     public string Key { get; set; }
 
     /// <summary>
-    /// Gets or sets display value for the node.
+    ///     Gets or sets display value for the node.
     /// </summary>
     public string DisplayValue { get; set; }
 
     /// <summary>
-    /// Gets or sets node kind.
+    ///     Gets or sets node kind.
     /// </summary>
     public JsonTreeNodeKind Kind { get; set; }
 
     /// <summary>
-    /// Gets child nodes.
+    ///     Gets child nodes.
     /// </summary>
     public List<JsonTreeNode> Children { get; } = [];
 
     /// <summary>
-    /// Gets or sets a value indicating whether child nodes are visible.
+    ///     Gets or sets a value indicating whether child nodes are visible.
     /// </summary>
     public bool Expanded { get; set; } = true;
 
     /// <summary>
-    /// Gets a value indicating whether the node is a container.
+    ///     Gets a value indicating whether the node is a container.
     /// </summary>
     public bool IsContainer => Kind is JsonTreeNodeKind.ObjectNode or JsonTreeNodeKind.Array;
 }

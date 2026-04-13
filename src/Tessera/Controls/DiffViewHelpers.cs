@@ -30,7 +30,8 @@ internal static class DiffViewHelpers
         {
             if (string.Equals(oldLines[oldIndex], newLines[newIndex], StringComparison.Ordinal))
             {
-                entries.Add(new DiffLineEntry(oldLineNumber, newLineNumber, DiffLineKind.Unchanged, oldLines[oldIndex], newLines[newIndex]));
+                entries.Add(new DiffLineEntry(oldLineNumber, newLineNumber, DiffLineKind.Unchanged, oldLines[oldIndex],
+                    newLines[newIndex]));
                 oldIndex++;
                 newIndex++;
                 oldLineNumber++;
@@ -38,7 +39,8 @@ internal static class DiffViewHelpers
             }
             else if (dp[oldIndex + 1, newIndex] >= dp[oldIndex, newIndex + 1])
             {
-                entries.Add(new DiffLineEntry(oldLineNumber, 0, DiffLineKind.Removed, oldLines[oldIndex], string.Empty));
+                entries.Add(new DiffLineEntry(oldLineNumber, 0, DiffLineKind.Removed, oldLines[oldIndex],
+                    string.Empty));
                 oldIndex++;
                 oldLineNumber++;
             }

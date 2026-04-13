@@ -7,7 +7,7 @@ internal enum IncidentSeverity
     Critical,
     High,
     Medium,
-    Low,
+    Low
 }
 
 internal enum IncidentStatus
@@ -16,10 +16,14 @@ internal enum IncidentStatus
     Acknowledged,
     Escalated,
     Monitoring,
-    Resolved,
+    Resolved
 }
 
-internal readonly record struct IncidentDeckSummary(int OpenCount, int CriticalCount, int EscalatedCount, int ActiveResponders);
+internal readonly record struct IncidentDeckSummary(
+    int OpenCount,
+    int CriticalCount,
+    int EscalatedCount,
+    int ActiveResponders);
 
 internal sealed class IncidentRecord
 {
@@ -51,7 +55,6 @@ internal sealed class IncidentDeskState
 {
     private static readonly string[] OwnerRotation = ["Mira", "Ishan", "Nika", "Sora", "Wei", "Dana"];
     private readonly List<IncidentRecord> _incidents;
-    private int _selectedIndex;
     private int _assignCursor = 1;
 
     private IncidentDeskState(List<IncidentRecord> incidents)
@@ -62,9 +65,9 @@ internal sealed class IncidentDeskState
 
     public IReadOnlyList<IncidentRecord> Incidents => _incidents;
 
-    public IncidentRecord SelectedIncident => _incidents[_selectedIndex];
+    public IncidentRecord SelectedIncident => _incidents[SelectedIndex];
 
-    public int SelectedIndex => _selectedIndex;
+    public int SelectedIndex { get; private set; }
 
     public string LastCommand { get; private set; } = "Queue synchronized with seeded ops pressure.";
 
@@ -91,22 +94,29 @@ internal sealed class IncidentDeskState
                 14,
                 ["Mira", "Nika", "Arun"],
                 [
-                    Timeline("auto-triage", "opened", "latency guard", "Checkout p95 breached 4.2s in 3 regions.", ActivityFeedItemKind.Error, now.AddMinutes(-18)),
-                    Timeline("Mira", "paged", "payments-oncall", "Primary on-call acknowledged within 48 seconds.", ActivityFeedItemKind.Warning, now.AddMinutes(-17)),
-                    Timeline("Nika", "isolated", "redis shard 04", "Connection pool utilization holding at 97%.", ActivityFeedItemKind.Warning, now.AddMinutes(-12)),
-                    Timeline("Arun", "started", "regional replay", "Synthetic orders reproducing timeout curve.", ActivityFeedItemKind.Info, now.AddMinutes(-8)),
+                    Timeline("auto-triage", "opened", "latency guard", "Checkout p95 breached 4.2s in 3 regions.",
+                        ActivityFeedItemKind.Error, now.AddMinutes(-18)),
+                    Timeline("Mira", "paged", "payments-oncall", "Primary on-call acknowledged within 48 seconds.",
+                        ActivityFeedItemKind.Warning, now.AddMinutes(-17)),
+                    Timeline("Nika", "isolated", "redis shard 04", "Connection pool utilization holding at 97%.",
+                        ActivityFeedItemKind.Warning, now.AddMinutes(-12)),
+                    Timeline("Arun", "started", "regional replay", "Synthetic orders reproducing timeout curve.",
+                        ActivityFeedItemKind.Info, now.AddMinutes(-8))
                 ],
                 [
-                    Log("Timeouts crossing 3,100 req/min on /charge", LogLevel.Critical, "edge-api", now.AddMinutes(-7)),
-                    Log("Cache miss storm detected on risk-profile reads", LogLevel.Error, "payments-api", now.AddMinutes(-6)),
-                    Log("Fallback hedging enabled for vip-checkout cohort", LogLevel.Warning, "traffic-router", now.AddMinutes(-4)),
+                    Log("Timeouts crossing 3,100 req/min on /charge", LogLevel.Critical, "edge-api",
+                        now.AddMinutes(-7)),
+                    Log("Cache miss storm detected on risk-profile reads", LogLevel.Error, "payments-api",
+                        now.AddMinutes(-6)),
+                    Log("Fallback hedging enabled for vip-checkout cohort", LogLevel.Warning, "traffic-router",
+                        now.AddMinutes(-4))
                 ],
                 """
                 - Confirm redis shard pressure with data infra.
                 - Keep customer comms in draft-only mode until retries stabilize.
                 - Prepare read-only checkout fallback if p95 stays above 4s.
                 """,
-                isPinned: true),
+                true),
             CreateIncident(
                 now,
                 "INC-1038",
@@ -125,14 +135,20 @@ internal sealed class IncidentDeskState
                 28,
                 ["Ishan", "Lia", "Jon"],
                 [
-                    Timeline("auto-triage", "opened", "refresh token alarms", "Silent refresh failure rate crossed 22%.", ActivityFeedItemKind.Error, now.AddMinutes(-46)),
-                    Timeline("Ishan", "escalated", "identity lead", "Requested issuer metadata purge on EU edge.", ActivityFeedItemKind.Warning, now.AddMinutes(-34)),
-                    Timeline("Lia", "verified", "android client", "Manual sign-in succeeds; refresh path still fails.", ActivityFeedItemKind.Info, now.AddMinutes(-27)),
+                    Timeline("auto-triage", "opened", "refresh token alarms",
+                        "Silent refresh failure rate crossed 22%.", ActivityFeedItemKind.Error, now.AddMinutes(-46)),
+                    Timeline("Ishan", "escalated", "identity lead", "Requested issuer metadata purge on EU edge.",
+                        ActivityFeedItemKind.Warning, now.AddMinutes(-34)),
+                    Timeline("Lia", "verified", "android client", "Manual sign-in succeeds; refresh path still fails.",
+                        ActivityFeedItemKind.Info, now.AddMinutes(-27))
                 ],
                 [
-                    Log("issuer kid mismatch on cached jwks bundle", LogLevel.Error, "identity-broker", now.AddMinutes(-29)),
-                    Log("edge metadata purge job queued for 2 clusters", LogLevel.Warning, "deploy-runner", now.AddMinutes(-21)),
-                    Log("ios refresh probes recovering in dublin", LogLevel.Info, "synthetic-monitor", now.AddMinutes(-8)),
+                    Log("issuer kid mismatch on cached jwks bundle", LogLevel.Error, "identity-broker",
+                        now.AddMinutes(-29)),
+                    Log("edge metadata purge job queued for 2 clusters", LogLevel.Warning, "deploy-runner",
+                        now.AddMinutes(-21)),
+                    Log("ios refresh probes recovering in dublin", LogLevel.Info, "synthetic-monitor",
+                        now.AddMinutes(-8))
                 ],
                 """
                 - Keep app-release managers in the loop before forcing logout.
@@ -156,13 +172,18 @@ internal sealed class IncidentDeskState
                 37,
                 ["Wei", "Daria", "Sam"],
                 [
-                    Timeline("auto-triage", "opened", "disk watermark", "Broker 7 crossed 90% usage.", ActivityFeedItemKind.Warning, now.AddMinutes(-59)),
-                    Timeline("Wei", "acknowledged", "streams-oncall", "Partition reassignment prepared.", ActivityFeedItemKind.Success, now.AddMinutes(-53)),
-                    Timeline("Daria", "paused", "cold analytics jobs", "Reduced non-critical ingest by 30%.", ActivityFeedItemKind.Info, now.AddMinutes(-41)),
+                    Timeline("auto-triage", "opened", "disk watermark", "Broker 7 crossed 90% usage.",
+                        ActivityFeedItemKind.Warning, now.AddMinutes(-59)),
+                    Timeline("Wei", "acknowledged", "streams-oncall", "Partition reassignment prepared.",
+                        ActivityFeedItemKind.Success, now.AddMinutes(-53)),
+                    Timeline("Daria", "paused", "cold analytics jobs", "Reduced non-critical ingest by 30%.",
+                        ActivityFeedItemKind.Info, now.AddMinutes(-41))
                 ],
                 [
-                    Log("rebalance skipped for partition analytics-44", LogLevel.Warning, "kafka-admin", now.AddMinutes(-39)),
-                    Log("disk watermark relief target 84% after migration", LogLevel.Info, "ops-bot", now.AddMinutes(-15)),
+                    Log("rebalance skipped for partition analytics-44", LogLevel.Warning, "kafka-admin",
+                        now.AddMinutes(-39)),
+                    Log("disk watermark relief target 84% after migration", LogLevel.Info, "ops-bot",
+                        now.AddMinutes(-15))
                 ],
                 """
                 - Hold BI stakeholders on yellow status.
@@ -186,13 +207,17 @@ internal sealed class IncidentDeskState
                 46,
                 ["Dana", "Mina"],
                 [
-                    Timeline("auto-triage", "opened", "catalog drift", "Price mismatch reports from Sao Paulo edge.", ActivityFeedItemKind.Warning, now.AddMinutes(-84)),
-                    Timeline("Dana", "redirected", "purge map", "Forced regional invalidation replay.", ActivityFeedItemKind.Success, now.AddMinutes(-68)),
-                    Timeline("Mina", "confirmed", "latam probes", "Freshness recovered to 98.7%.", ActivityFeedItemKind.Success, now.AddMinutes(-25)),
+                    Timeline("auto-triage", "opened", "catalog drift", "Price mismatch reports from Sao Paulo edge.",
+                        ActivityFeedItemKind.Warning, now.AddMinutes(-84)),
+                    Timeline("Dana", "redirected", "purge map", "Forced regional invalidation replay.",
+                        ActivityFeedItemKind.Success, now.AddMinutes(-68)),
+                    Timeline("Mina", "confirmed", "latam probes", "Freshness recovered to 98.7%.",
+                        ActivityFeedItemKind.Success, now.AddMinutes(-25))
                 ],
                 [
                     Log("catalog warmers caught up in gru/scl/lim", LogLevel.Info, "catalog-edge", now.AddMinutes(-22)),
-                    Log("stale price sightings now under threshold", LogLevel.Info, "synthetic-monitor", now.AddMinutes(-9)),
+                    Log("stale price sightings now under threshold", LogLevel.Info, "synthetic-monitor",
+                        now.AddMinutes(-9))
                 ],
                 """
                 - Keep merchandising informed until freshness stays green for 30m.
@@ -216,12 +241,16 @@ internal sealed class IncidentDeskState
                 51,
                 ["Sora", "Ben"],
                 [
-                    Timeline("auto-triage", "opened", "fanout delay", "Delivery latency crossed 11m.", ActivityFeedItemKind.Warning, now.AddMinutes(-31)),
-                    Timeline("Sora", "sampled", "hot shard", "Shard 3 holding 74% of in-flight work.", ActivityFeedItemKind.Info, now.AddMinutes(-18)),
+                    Timeline("auto-triage", "opened", "fanout delay", "Delivery latency crossed 11m.",
+                        ActivityFeedItemKind.Warning, now.AddMinutes(-31)),
+                    Timeline("Sora", "sampled", "hot shard", "Shard 3 holding 74% of in-flight work.",
+                        ActivityFeedItemKind.Info, now.AddMinutes(-18))
                 ],
                 [
-                    Log("worker concurrency cap still 24 on shard 3", LogLevel.Warning, "push-orchestrator", now.AddMinutes(-17)),
-                    Log("merchant promo segment generating burst writes", LogLevel.Info, "audience-service", now.AddMinutes(-14)),
+                    Log("worker concurrency cap still 24 on shard 3", LogLevel.Warning, "push-orchestrator",
+                        now.AddMinutes(-17)),
+                    Log("merchant promo segment generating burst writes", LogLevel.Info, "audience-service",
+                        now.AddMinutes(-14))
                 ],
                 """
                 - Consider temporary shard split if queue depth stays above 80k.
@@ -245,33 +274,40 @@ internal sealed class IncidentDeskState
                 68,
                 ["Nika", "Paul"],
                 [
-                    Timeline("auto-triage", "opened", "audit mismatch", "Follower promotion completed with minor audit drift.", ActivityFeedItemKind.Info, now.AddMinutes(-123)),
-                    Timeline("Nika", "resolved", "backfill job", "Audit markers replayed successfully.", ActivityFeedItemKind.Success, now.AddMinutes(-73)),
+                    Timeline("auto-triage", "opened", "audit mismatch",
+                        "Follower promotion completed with minor audit drift.", ActivityFeedItemKind.Info,
+                        now.AddMinutes(-123)),
+                    Timeline("Nika", "resolved", "backfill job", "Audit markers replayed successfully.",
+                        ActivityFeedItemKind.Success, now.AddMinutes(-73))
                 ],
                 [
-                    Log("audit replay complete for sync windows 02:18-02:24", LogLevel.Info, "warehouse-auditor", now.AddMinutes(-72)),
-                    Log("customer-facing impact: none", LogLevel.Debug, "status-bot", now.AddMinutes(-70)),
+                    Log("audit replay complete for sync windows 02:18-02:24", LogLevel.Info, "warehouse-auditor",
+                        now.AddMinutes(-72)),
+                    Log("customer-facing impact: none", LogLevel.Debug, "status-bot", now.AddMinutes(-70))
                 ],
                 """
                 - Resolved. Keep notes for release-readiness evidence.
-                """),
+                """)
         ]);
     }
 
     public bool SelectIncident(string incidentId)
     {
         var index = _incidents.FindIndex(incident => string.Equals(incident.Id, incidentId, StringComparison.Ordinal));
-        if (index < 0 || index == _selectedIndex)
+        if (index < 0 || index == SelectedIndex)
         {
             return false;
         }
 
-        _selectedIndex = index;
-        _incidents[_selectedIndex].HasUnreadUpdate = false;
+        SelectedIndex = index;
+        _incidents[SelectedIndex].HasUnreadUpdate = false;
         return true;
     }
 
-    public void CaptureDraft(string draft) => SelectedIncident.DraftNotes = draft ?? string.Empty;
+    public void CaptureDraft(string draft)
+    {
+        SelectedIncident.DraftNotes = draft ?? string.Empty;
+    }
 
     public string AcknowledgeSelected()
     {
@@ -284,7 +320,9 @@ internal sealed class IncidentDeskState
         incident.Status = IncidentStatus.Acknowledged;
         incident.HasUnreadUpdate = false;
         incident.CurrentPhase = "Responder roles locked and mitigation underway.";
-        AddEvent(incident, "desk", "acknowledged", "incident", "Command deck acknowledged the page and locked response roles.", ActivityFeedItemKind.Success, LogLevel.Info, "incident-desk");
+        AddEvent(incident, "desk", "acknowledged", "incident",
+            "Command deck acknowledged the page and locked response roles.", ActivityFeedItemKind.Success,
+            LogLevel.Info, "incident-desk");
         SortIncidents();
         return LastCommand = $"{incident.Id} acknowledged and pinned to active response.";
     }
@@ -300,7 +338,9 @@ internal sealed class IncidentDeskState
         }
 
         incident.HasUnreadUpdate = true;
-        AddEvent(incident, "desk", "assigned", incident.PrimaryOwner, $"Ownership moved to {incident.PrimaryOwner} for the next command loop.", ActivityFeedItemKind.Info, LogLevel.Info, "incident-desk");
+        AddEvent(incident, "desk", "assigned", incident.PrimaryOwner,
+            $"Ownership moved to {incident.PrimaryOwner} for the next command loop.", ActivityFeedItemKind.Info,
+            LogLevel.Info, "incident-desk");
         SortIncidents();
         return LastCommand = $"{incident.Id} reassigned to {incident.PrimaryOwner}.";
     }
@@ -318,7 +358,9 @@ internal sealed class IncidentDeskState
 
         incident.CurrentPhase = "Incident command escalated; cross-functional leads requested.";
         incident.SlaDeadline = incident.SlaDeadline.AddMinutes(-6);
-        AddEvent(incident, "desk", "escalated", "incident command", "Cross-functional bridge opened and SLA window tightened.", ActivityFeedItemKind.Error, LogLevel.Critical, "incident-desk");
+        AddEvent(incident, "desk", "escalated", "incident command",
+            "Cross-functional bridge opened and SLA window tightened.", ActivityFeedItemKind.Error, LogLevel.Critical,
+            "incident-desk");
         SortIncidents();
         return LastCommand = $"{incident.Id} escalated to {SeverityText(incident.Severity)} response.";
     }
@@ -329,7 +371,8 @@ internal sealed class IncidentDeskState
         incident.Status = IncidentStatus.Resolved;
         incident.HasUnreadUpdate = false;
         incident.CurrentPhase = "Recovery verified; watch window held for clean exit.";
-        AddEvent(incident, "desk", "resolved", "watch window", "Primary metrics recovered and customer impact cleared.", ActivityFeedItemKind.Success, LogLevel.Info, "incident-desk");
+        AddEvent(incident, "desk", "resolved", "watch window", "Primary metrics recovered and customer impact cleared.",
+            ActivityFeedItemKind.Success, LogLevel.Info, "incident-desk");
         SortIncidents();
         return LastCommand = $"{incident.Id} moved to resolved.";
     }
@@ -345,7 +388,9 @@ internal sealed class IncidentDeskState
 
         incident.HasUnreadUpdate = true;
         incident.CurrentPhase = "Signal regressed after watch window; mitigation reopened.";
-        AddEvent(incident, "desk", "reopened", "response bridge", "Monitoring signal slipped and active investigation resumed.", ActivityFeedItemKind.Warning, LogLevel.Warning, "incident-desk");
+        AddEvent(incident, "desk", "reopened", "response bridge",
+            "Monitoring signal slipped and active investigation resumed.", ActivityFeedItemKind.Warning,
+            LogLevel.Warning, "incident-desk");
         SortIncidents();
         return LastCommand = $"{incident.Id} reopened for active investigation.";
     }
@@ -369,7 +414,8 @@ internal sealed class IncidentDeskState
     public IncidentDeckSummary BuildSummary()
     {
         var open = _incidents.Count(incident => incident.Status != IncidentStatus.Resolved);
-        var critical = _incidents.Count(incident => incident.Severity == IncidentSeverity.Critical && incident.Status != IncidentStatus.Resolved);
+        var critical = _incidents.Count(incident =>
+            incident.Severity == IncidentSeverity.Critical && incident.Status != IncidentStatus.Resolved);
         var escalated = _incidents.Count(incident => incident.Status == IncidentStatus.Escalated);
         var responders = _incidents
             .SelectMany(incident => incident.Responders)
@@ -378,30 +424,39 @@ internal sealed class IncidentDeskState
         return new IncidentDeckSummary(open, critical, escalated, responders);
     }
 
-    public static string SeverityText(IncidentSeverity severity) => severity switch
+    public static string SeverityText(IncidentSeverity severity)
     {
-        IncidentSeverity.Critical => "SEV1",
-        IncidentSeverity.High => "SEV2",
-        IncidentSeverity.Medium => "SEV3",
-        _ => "SEV4",
-    };
+        return severity switch
+        {
+            IncidentSeverity.Critical => "SEV1",
+            IncidentSeverity.High => "SEV2",
+            IncidentSeverity.Medium => "SEV3",
+            _ => "SEV4"
+        };
+    }
 
-    public static string StatusText(IncidentStatus status) => status switch
+    public static string StatusText(IncidentStatus status)
     {
-        IncidentStatus.Investigating => "Investigating",
-        IncidentStatus.Acknowledged => "Acknowledged",
-        IncidentStatus.Escalated => "Escalated",
-        IncidentStatus.Monitoring => "Monitoring",
-        _ => "Resolved",
-    };
+        return status switch
+        {
+            IncidentStatus.Investigating => "Investigating",
+            IncidentStatus.Acknowledged => "Acknowledged",
+            IncidentStatus.Escalated => "Escalated",
+            IncidentStatus.Monitoring => "Monitoring",
+            _ => "Resolved"
+        };
+    }
 
-    public static NotificationLevel NotificationLevel(IncidentSeverity severity) => severity switch
+    public static NotificationLevel NotificationLevel(IncidentSeverity severity)
     {
-        IncidentSeverity.Critical => Controls.NotificationLevel.Error,
-        IncidentSeverity.High => Controls.NotificationLevel.Warning,
-        IncidentSeverity.Medium => Controls.NotificationLevel.Info,
-        _ => Controls.NotificationLevel.Success,
-    };
+        return severity switch
+        {
+            IncidentSeverity.Critical => Controls.NotificationLevel.Error,
+            IncidentSeverity.High => Controls.NotificationLevel.Warning,
+            IncidentSeverity.Medium => Controls.NotificationLevel.Info,
+            _ => Controls.NotificationLevel.Success
+        };
+    }
 
     public static string SlaText(IncidentRecord incident)
     {
@@ -454,13 +509,17 @@ internal sealed class IncidentDeskState
             Timeline = timeline,
             Logs = logs,
             DraftNotes = draftNotes.TrimEnd(),
-            IsPinned = isPinned,
+            IsPinned = isPinned
         };
     }
 
-    private static ActivityFeedItem Timeline(string actor, string action, string target, string details, ActivityFeedItemKind kind, DateTimeOffset timestamp)
+    private static ActivityFeedItem Timeline(string actor, string action, string target, string details,
+        ActivityFeedItemKind kind, DateTimeOffset timestamp)
     {
-        return new ActivityFeedItem(actor, action, target, details, kind, timestamp) { IsUnread = kind is ActivityFeedItemKind.Warning or ActivityFeedItemKind.Error };
+        return new ActivityFeedItem(actor, action, target, details, kind, timestamp)
+        {
+            IsUnread = kind is ActivityFeedItemKind.Warning or ActivityFeedItemKind.Error
+        };
     }
 
     private static LogEntry Log(string message, LogLevel level, string source, DateTimeOffset timestamp)
@@ -502,21 +561,25 @@ internal sealed class IncidentDeskState
             return right.OpenedAt.CompareTo(left.OpenedAt);
         });
 
-        _selectedIndex = _incidents.FindIndex(incident => string.Equals(incident.Id, selectedId, StringComparison.Ordinal));
-        if (_selectedIndex < 0)
+        SelectedIndex =
+            _incidents.FindIndex(incident => string.Equals(incident.Id, selectedId, StringComparison.Ordinal));
+        if (SelectedIndex < 0)
         {
-            _selectedIndex = 0;
+            SelectedIndex = 0;
         }
 
-        _incidents[_selectedIndex].HasUnreadUpdate = false;
+        _incidents[SelectedIndex].HasUnreadUpdate = false;
     }
 
-    private static int StatusRank(IncidentStatus status) => status switch
+    private static int StatusRank(IncidentStatus status)
     {
-        IncidentStatus.Escalated => 0,
-        IncidentStatus.Investigating => 1,
-        IncidentStatus.Acknowledged => 2,
-        IncidentStatus.Monitoring => 3,
-        _ => 4,
-    };
+        return status switch
+        {
+            IncidentStatus.Escalated => 0,
+            IncidentStatus.Investigating => 1,
+            IncidentStatus.Acknowledged => 2,
+            IncidentStatus.Monitoring => 3,
+            _ => 4
+        };
+    }
 }

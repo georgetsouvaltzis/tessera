@@ -6,7 +6,7 @@ internal enum OpsWatchThemeKind
 {
     Veridian,
     Tidal,
-    Redline,
+    Redline
 }
 
 internal sealed record OpsWatchThemePalette(
@@ -38,124 +38,124 @@ internal static class OpsWatchTheme
         OpsWatchThemeKind.Veridian,
         "Veridian",
         CreateTheme(
-            textPrimary: 0xE5FFF6,
-            textSecondary: 0x9FD8C8,
-            textMuted: 0x5C7D76,
-            inverseForeground: 0x04100E,
-            inverseBackground: 0xE5FFF6,
-            surfaceBase: 0x04100E,
-            surfacePanel: 0x0A1715,
-            surfaceOverlay: 0x10221F,
-            borderDefault: 0x1F5C53,
-            borderStrong: 0x37917E,
-            borderFocused: 0x7EFFD3,
-            borderError: 0xFF7B6B,
-            success: 0x7BF2AA,
-            warning: 0xFFD166,
-            error: 0xFF7B6B,
-            info: 0x57D9FF,
-            accentPrimary: 0x6CFFD1,
-            accentSecondary: 0x57D9FF,
-            selectionForeground: 0x04100E,
-            selectionBackground: 0x7EFFD3),
-        HeroTitleColor: 0xE5FFF6,
-        HeroClockColor: 0x57D9FF,
-        HeroBadgeForeground: 0x04100E,
-        HeroBadgeBackground: 0x6CFFD1,
-        HeroCommandColor: 0xFFD166,
-        FrameMutedColor: 0x1F5C53,
-        FrameStrongColor: 0x37917E,
-        PulsePrimaryColor: 0x6CFFD1,
-        PulseSecondaryColor: 0x57D9FF,
-        PulseTertiaryColor: 0xFFD166,
-        CpuColor: 0x7BF2AA,
-        MemoryColor: 0x57D9FF,
-        NetworkColor: 0xFFD166,
-        DiskColor: 0xFF7B6B,
-        FooterChipForeground: 0x04100E,
-        FooterChipBackground: 0x6CFFD1);
+            0xE5FFF6,
+            0x9FD8C8,
+            0x5C7D76,
+            0x04100E,
+            0xE5FFF6,
+            0x04100E,
+            0x0A1715,
+            0x10221F,
+            0x1F5C53,
+            0x37917E,
+            0x7EFFD3,
+            0xFF7B6B,
+            0x7BF2AA,
+            0xFFD166,
+            0xFF7B6B,
+            0x57D9FF,
+            0x6CFFD1,
+            0x57D9FF,
+            0x04100E,
+            0x7EFFD3),
+        0xE5FFF6,
+        0x57D9FF,
+        0x04100E,
+        0x6CFFD1,
+        0xFFD166,
+        0x1F5C53,
+        0x37917E,
+        0x6CFFD1,
+        0x57D9FF,
+        0xFFD166,
+        0x7BF2AA,
+        0x57D9FF,
+        0xFFD166,
+        0xFF7B6B,
+        0x04100E,
+        0x6CFFD1);
 
     public static OpsWatchThemePalette Tidal { get; } = new(
         OpsWatchThemeKind.Tidal,
         "Tidal",
         CreateTheme(
-            textPrimary: 0xF2F8FF,
-            textSecondary: 0xB7C9E8,
-            textMuted: 0x65789C,
-            inverseForeground: 0x08111F,
-            inverseBackground: 0xE8F2FF,
-            surfaceBase: 0x08111F,
-            surfacePanel: 0x111B2E,
-            surfaceOverlay: 0x162844,
-            borderDefault: 0x2A4D7A,
-            borderStrong: 0x3D7BCC,
-            borderFocused: 0x71C7FF,
-            borderError: 0xFF8F70,
-            success: 0x8AF2C3,
-            warning: 0xFFD37A,
-            error: 0xFF8F70,
-            info: 0x71C7FF,
-            accentPrimary: 0x71C7FF,
-            accentSecondary: 0xA6B7FF,
-            selectionForeground: 0x08111F,
-            selectionBackground: 0x71C7FF),
-        HeroTitleColor: 0xF2F8FF,
-        HeroClockColor: 0xA6B7FF,
-        HeroBadgeForeground: 0x08111F,
-        HeroBadgeBackground: 0x71C7FF,
-        HeroCommandColor: 0x8AF2C3,
-        FrameMutedColor: 0x2A4D7A,
-        FrameStrongColor: 0x3D7BCC,
-        PulsePrimaryColor: 0x71C7FF,
-        PulseSecondaryColor: 0xA6B7FF,
-        PulseTertiaryColor: 0x8AF2C3,
-        CpuColor: 0x8AF2C3,
-        MemoryColor: 0x71C7FF,
-        NetworkColor: 0xFFD37A,
-        DiskColor: 0xFF8F70,
-        FooterChipForeground: 0x08111F,
-        FooterChipBackground: 0x71C7FF);
+            0xF2F8FF,
+            0xB7C9E8,
+            0x65789C,
+            0x08111F,
+            0xE8F2FF,
+            0x08111F,
+            0x111B2E,
+            0x162844,
+            0x2A4D7A,
+            0x3D7BCC,
+            0x71C7FF,
+            0xFF8F70,
+            0x8AF2C3,
+            0xFFD37A,
+            0xFF8F70,
+            0x71C7FF,
+            0x71C7FF,
+            0xA6B7FF,
+            0x08111F,
+            0x71C7FF),
+        0xF2F8FF,
+        0xA6B7FF,
+        0x08111F,
+        0x71C7FF,
+        0x8AF2C3,
+        0x2A4D7A,
+        0x3D7BCC,
+        0x71C7FF,
+        0xA6B7FF,
+        0x8AF2C3,
+        0x8AF2C3,
+        0x71C7FF,
+        0xFFD37A,
+        0xFF8F70,
+        0x08111F,
+        0x71C7FF);
 
     public static OpsWatchThemePalette Redline { get; } = new(
         OpsWatchThemeKind.Redline,
         "Redline",
         CreateTheme(
-            textPrimary: 0xFFF5EC,
-            textSecondary: 0xE7C3A8,
-            textMuted: 0x8D7365,
-            inverseForeground: 0x1A0D09,
-            inverseBackground: 0xFFF5EC,
-            surfaceBase: 0x1A0D09,
-            surfacePanel: 0x26130E,
-            surfaceOverlay: 0x321A13,
-            borderDefault: 0x754436,
-            borderStrong: 0xB86A52,
-            borderFocused: 0xFFB17A,
-            borderError: 0xFF6B57,
-            success: 0xF2C572,
-            warning: 0xFFB17A,
-            error: 0xFF6B57,
-            info: 0xFF8F70,
-            accentPrimary: 0xFF8F70,
-            accentSecondary: 0xF2C572,
-            selectionForeground: 0x1A0D09,
-            selectionBackground: 0xFFB17A),
-        HeroTitleColor: 0xFFF5EC,
-        HeroClockColor: 0xF2C572,
-        HeroBadgeForeground: 0x1A0D09,
-        HeroBadgeBackground: 0xFF8F70,
-        HeroCommandColor: 0xFFB17A,
-        FrameMutedColor: 0x754436,
-        FrameStrongColor: 0xB86A52,
-        PulsePrimaryColor: 0xFF8F70,
-        PulseSecondaryColor: 0xF2C572,
-        PulseTertiaryColor: 0xFFB17A,
-        CpuColor: 0xF2C572,
-        MemoryColor: 0xFFB17A,
-        NetworkColor: 0xFF8F70,
-        DiskColor: 0xFF6B57,
-        FooterChipForeground: 0x1A0D09,
-        FooterChipBackground: 0xFF8F70);
+            0xFFF5EC,
+            0xE7C3A8,
+            0x8D7365,
+            0x1A0D09,
+            0xFFF5EC,
+            0x1A0D09,
+            0x26130E,
+            0x321A13,
+            0x754436,
+            0xB86A52,
+            0xFFB17A,
+            0xFF6B57,
+            0xF2C572,
+            0xFFB17A,
+            0xFF6B57,
+            0xFF8F70,
+            0xFF8F70,
+            0xF2C572,
+            0x1A0D09,
+            0xFFB17A),
+        0xFFF5EC,
+        0xF2C572,
+        0x1A0D09,
+        0xFF8F70,
+        0xFFB17A,
+        0x754436,
+        0xB86A52,
+        0xFF8F70,
+        0xF2C572,
+        0xFFB17A,
+        0xF2C572,
+        0xFFB17A,
+        0xFF8F70,
+        0xFF6B57,
+        0x1A0D09,
+        0xFF8F70);
 
     public static IReadOnlyList<OpsWatchThemePalette> All { get; } = [Veridian, Tidal, Redline];
 
@@ -165,7 +165,7 @@ internal static class OpsWatchTheme
         {
             OpsWatchThemeKind.Tidal => Tidal,
             OpsWatchThemeKind.Redline => Redline,
-            _ => Veridian,
+            _ => Veridian
         };
     }
 
@@ -220,50 +220,55 @@ internal static class OpsWatchTheme
     {
         return new TesseraTheme
         {
-            Text = new TesseraThemeTextTokens
-            {
-                Primary = Foreground(textPrimary),
-                Secondary = Foreground(textSecondary),
-                Muted = Foreground(textMuted),
-                Inverse = ForegroundBackground(inverseForeground, inverseBackground),
-            },
-            Surface = new TesseraThemeSurfaceTokens
-            {
-                Base = Background(surfaceBase),
-                Panel = Background(surfacePanel),
-                Overlay = Background(surfaceOverlay),
-            },
-            Border = new TesseraThemeBorderTokens
-            {
-                Default = Foreground(borderDefault),
-                Strong = Foreground(borderStrong),
-                Focused = Foreground(borderFocused),
-                Error = Foreground(borderError),
-            },
-            State = new TesseraThemeStateTokens
-            {
-                Success = Foreground(success),
-                Warning = Foreground(warning),
-                Error = Foreground(error),
-                Info = Foreground(info),
-            },
-            Accent = new TesseraThemeAccentTokens
-            {
-                Primary = Foreground(accentPrimary),
-                Secondary = Foreground(accentSecondary),
-            },
+            Text =
+                new TesseraThemeTextTokens
+                {
+                    Primary = Foreground(textPrimary),
+                    Secondary = Foreground(textSecondary),
+                    Muted = Foreground(textMuted),
+                    Inverse = ForegroundBackground(inverseForeground, inverseBackground)
+                },
+            Surface =
+                new TesseraThemeSurfaceTokens
+                {
+                    Base = Background(surfaceBase),
+                    Panel = Background(surfacePanel),
+                    Overlay = Background(surfaceOverlay)
+                },
+            Border =
+                new TesseraThemeBorderTokens
+                {
+                    Default = Foreground(borderDefault),
+                    Strong = Foreground(borderStrong),
+                    Focused = Foreground(borderFocused),
+                    Error = Foreground(borderError)
+                },
+            State =
+                new TesseraThemeStateTokens
+                {
+                    Success = Foreground(success),
+                    Warning = Foreground(warning),
+                    Error = Foreground(error),
+                    Info = Foreground(info)
+                },
+            Accent =
+                new TesseraThemeAccentTokens
+                {
+                    Primary = Foreground(accentPrimary),
+                    Secondary = Foreground(accentSecondary)
+                },
             Selection = new TesseraThemeSelectionTokens
             {
                 Foreground = Foreground(selectionForeground),
-                Background = Background(selectionBackground),
+                Background = Background(selectionBackground)
             },
             Focus = new TesseraThemeFocusTokens
             {
                 Ring = Foreground(borderFocused).WithBold(),
                 Title = Foreground(borderFocused).WithBold(),
                 Border = Foreground(borderFocused).WithBold(),
-                Marker = "*",
-            },
+                Marker = "*"
+            }
         };
     }
 

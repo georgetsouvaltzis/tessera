@@ -6,19 +6,19 @@ using Tessera.Widgets;
 namespace Tessera.Controls;
 
 /// <summary>
-/// Represents a compact fuzzy picker with query input and ranked results.
+///     Represents a compact fuzzy picker with query input and ranked results.
 /// </summary>
 public sealed partial class FuzzyFinder : Control
 {
     private readonly List<FuzzyFinderItem> _items = [];
-    private readonly List<ResultRow> _results = [];
     private readonly TextInputModel _query = new();
-    private int _selectedIndex;
-    private int _scrollOffset;
+    private readonly List<ResultRow> _results = [];
     private int _hoveredIndex = -1;
+    private int _scrollOffset;
+    private int _selectedIndex;
 
     /// <summary>
-    /// Initializes a new fuzzy finder.
+    ///     Initializes a new fuzzy finder.
     /// </summary>
     public FuzzyFinder()
     {
@@ -26,35 +26,17 @@ public sealed partial class FuzzyFinder : Control
     }
 
     /// <summary>
-    /// Occurs when the highlighted result changes.
+    ///     Gets or sets the optional title shown in the border.
     /// </summary>
-    public event EventHandler<FuzzyFinderSelectionChangedEventArgs>? SelectionChanged;
+    public string Title { get; set; } = "Fuzzy Finder";
 
     /// <summary>
-    /// Occurs when a result is selected via activation input.
+    ///     Gets or sets the marker shown in the title when focused.
     /// </summary>
-    public event EventHandler<FuzzyFinderItemSelectedEventArgs>? ItemSelected;
+    public string FocusMarker { get; set; } = "*";
 
     /// <summary>
-    /// Gets or sets the optional title shown in the border.
-    /// </summary>
-    public string Title
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = "Fuzzy Finder";
-
-    /// <summary>
-    /// Gets or sets the marker shown in the title when focused.
-    /// </summary>
-    public string FocusMarker
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = "*";
-
-    /// <summary>
-    /// Gets or sets whether the title focus marker should be shown.
+    ///     Gets or sets whether the title focus marker should be shown.
     /// </summary>
     public bool ShowFocusMarker
     {
@@ -63,7 +45,7 @@ public sealed partial class FuzzyFinder : Control
     } = true;
 
     /// <summary>
-    /// Gets or sets title style when not focused.
+    ///     Gets or sets title style when not focused.
     /// </summary>
     public TesseraStyle TitleStyle
     {
@@ -72,7 +54,7 @@ public sealed partial class FuzzyFinder : Control
     } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets title style when focused.
+    ///     Gets or sets title style when focused.
     /// </summary>
     public TesseraStyle FocusedTitleStyle
     {
@@ -81,7 +63,7 @@ public sealed partial class FuzzyFinder : Control
     } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the style applied to border glyphs when the control is not focused.
+    ///     Gets or sets the style applied to border glyphs when the control is not focused.
     /// </summary>
     public TesseraStyle BorderStyleText
     {
@@ -90,7 +72,7 @@ public sealed partial class FuzzyFinder : Control
     } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the style applied to border glyphs when the control is focused.
+    ///     Gets or sets the style applied to border glyphs when the control is focused.
     /// </summary>
     public TesseraStyle FocusedBorderStyleText
     {
@@ -99,7 +81,7 @@ public sealed partial class FuzzyFinder : Control
     } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the border style.
+    ///     Gets or sets the border style.
     /// </summary>
     public BorderStyle Border
     {
@@ -108,7 +90,7 @@ public sealed partial class FuzzyFinder : Control
     } = BorderStyle.SingleLine;
 
     /// <summary>
-    /// Gets or sets inner padding.
+    ///     Gets or sets inner padding.
     /// </summary>
     public Thickness Padding
     {
@@ -117,16 +99,16 @@ public sealed partial class FuzzyFinder : Control
     }
 
     /// <summary>
-    /// Gets or sets query text placeholder.
+    ///     Gets or sets query text placeholder.
     /// </summary>
     public string Placeholder
     {
         get => _query.Placeholder;
-        set => _query.Placeholder = value ?? string.Empty;
+        set => _query.Placeholder = value;
     }
 
     /// <summary>
-    /// Gets or sets query text.
+    ///     Gets or sets query text.
     /// </summary>
     public string QueryText
     {
@@ -135,7 +117,7 @@ public sealed partial class FuzzyFinder : Control
     }
 
     /// <summary>
-    /// Gets or sets whether results should be visible.
+    ///     Gets or sets whether results should be visible.
     /// </summary>
     public bool IsOpen
     {
@@ -144,7 +126,7 @@ public sealed partial class FuzzyFinder : Control
     } = true;
 
     /// <summary>
-    /// Gets or sets max visible result rows.
+    ///     Gets or sets max visible result rows.
     /// </summary>
     public int MaxVisibleResults
     {
@@ -153,35 +135,35 @@ public sealed partial class FuzzyFinder : Control
     } = 8;
 
     /// <summary>
-    /// Gets configured source items.
+    ///     Gets configured source items.
     /// </summary>
     public IReadOnlyList<FuzzyFinderItem> Items => _items;
 
     /// <summary>
-    /// Gets current result count.
+    ///     Gets current result count.
     /// </summary>
     public int ResultCount => _results.Count;
 
     /// <summary>
-    /// Gets selected result index.
-    /// Returns <c>-1</c> when no results are available.
+    ///     Gets selected result index.
+    ///     Returns <c>-1</c> when no results are available.
     /// </summary>
     public int SelectedIndex => _results.Count == 0 ? -1 : _selectedIndex;
 
     /// <summary>
-    /// Gets currently selected item.
+    ///     Gets currently selected item.
     /// </summary>
     public FuzzyFinderItem? SelectedItem => _results.Count == 0
         ? null
         : _items[_results[_selectedIndex].ItemIndex];
 
     /// <summary>
-    /// Gets the last selected item identifier.
+    ///     Gets the last selected item identifier.
     /// </summary>
     public string? LastSelectedItemId { get; private set; }
 
     /// <summary>
-    /// Gets or sets style for query text.
+    ///     Gets or sets style for query text.
     /// </summary>
     public TesseraStyle ValueTextStyle
     {
@@ -190,7 +172,7 @@ public sealed partial class FuzzyFinder : Control
     } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets style for query placeholder.
+    ///     Gets or sets style for query placeholder.
     /// </summary>
     public TesseraStyle PlaceholderTextStyle
     {
@@ -199,7 +181,7 @@ public sealed partial class FuzzyFinder : Control
     } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets style for non-selected result rows.
+    ///     Gets or sets style for non-selected result rows.
     /// </summary>
     public TesseraStyle ListItemStyle
     {
@@ -208,7 +190,7 @@ public sealed partial class FuzzyFinder : Control
     } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets style merged into hovered result rows.
+    ///     Gets or sets style merged into hovered result rows.
     /// </summary>
     public TesseraStyle HoveredItemStyle
     {
@@ -217,7 +199,7 @@ public sealed partial class FuzzyFinder : Control
     } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets style merged into selected result rows.
+    ///     Gets or sets style merged into selected result rows.
     /// </summary>
     public TesseraStyle SelectedItemStyle
     {
@@ -226,7 +208,7 @@ public sealed partial class FuzzyFinder : Control
     } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets style used for matched characters in result labels.
+    ///     Gets or sets style used for matched characters in result labels.
     /// </summary>
     public TesseraStyle MatchHighlightStyle
     {
@@ -256,7 +238,17 @@ public sealed partial class FuzzyFinder : Control
     }
 
     /// <summary>
-    /// Replaces the item source.
+    ///     Occurs when the highlighted result changes.
+    /// </summary>
+    public event EventHandler<FuzzyFinderSelectionChangedEventArgs>? SelectionChanged;
+
+    /// <summary>
+    ///     Occurs when a result is selected via activation input.
+    /// </summary>
+    public event EventHandler<FuzzyFinderItemSelectedEventArgs>? ItemSelected;
+
+    /// <summary>
+    ///     Replaces the item source.
     /// </summary>
     /// <param name="items">Items to index for fuzzy filtering.</param>
     public void SetItems(IEnumerable<FuzzyFinderItem> items)
@@ -277,22 +269,22 @@ public sealed partial class FuzzyFinder : Control
     }
 
     /// <summary>
-    /// Replaces the item source from plain labels.
+    ///     Replaces the item source from plain labels.
     /// </summary>
     /// <param name="items">Labels to index for fuzzy filtering.</param>
     public void SetItems(IEnumerable<string> items)
     {
         ArgumentNullException.ThrowIfNull(items);
-        SetItems(items.Select(static value => new FuzzyFinderItem(value ?? string.Empty, value ?? string.Empty)));
+        SetItems(items.Select(static value => new FuzzyFinderItem(value, value)));
     }
 
     /// <summary>
-    /// Sets query text and refreshes results.
+    ///     Sets query text and refreshes results.
     /// </summary>
     /// <param name="query">The query text.</param>
     public void SetQuery(string query)
     {
-        var normalized = query ?? string.Empty;
+        var normalized = query;
         if (string.Equals(_query.Value, normalized, StringComparison.Ordinal))
         {
             return;
@@ -304,7 +296,7 @@ public sealed partial class FuzzyFinder : Control
     }
 
     /// <summary>
-    /// Clears query text.
+    ///     Clears query text.
     /// </summary>
     public void ClearQuery()
     {
@@ -312,7 +304,7 @@ public sealed partial class FuzzyFinder : Control
     }
 
     /// <summary>
-    /// Opens the result list.
+    ///     Opens the result list.
     /// </summary>
     public void Open()
     {
@@ -321,7 +313,7 @@ public sealed partial class FuzzyFinder : Control
     }
 
     /// <summary>
-    /// Closes the result list.
+    ///     Closes the result list.
     /// </summary>
     public void Close()
     {

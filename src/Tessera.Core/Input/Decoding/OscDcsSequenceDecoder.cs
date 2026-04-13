@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Text;
 using Tessera.Core.Messages;
 
@@ -60,7 +61,7 @@ internal static class OscDcsSequenceDecoder
             10 => new DecodeResult(consumed, new ForegroundColorMsg(NormalizeOscColor(data)), false),
             11 => new DecodeResult(consumed, new BackgroundColorMsg(NormalizeOscColor(data)), false),
             12 => new DecodeResult(consumed, new CursorColorMsg(NormalizeOscColor(data)), false),
-            _ => new DecodeResult(consumed, null, false),
+            _ => new DecodeResult(consumed, null, false)
         };
     }
 
@@ -140,7 +141,7 @@ internal static class OscDcsSequenceDecoder
             return string.Empty;
         }
 
-        Span<char> chars = pairCount <= 128 ? stackalloc char[pairCount] : new char[pairCount];
+        var chars = pairCount <= 128 ? stackalloc char[pairCount] : new char[pairCount];
         for (var i = 0; i + 1 < input.Length; i += 2)
         {
             if (!TryDecodeHexPair(input[i], input[i + 1], out var value))
@@ -203,7 +204,7 @@ internal static class OscDcsSequenceDecoder
             return false;
         }
 
-        if (!ushort.TryParse(normalized, System.Globalization.NumberStyles.HexNumber, null, out var parsed))
+        if (!ushort.TryParse(normalized, NumberStyles.HexNumber, null, out var parsed))
         {
             return false;
         }
@@ -215,7 +216,7 @@ internal static class OscDcsSequenceDecoder
         }
 
         var max = normalized.Length == 3 ? 0x0FFFu : 0xFFFFu;
-        channel = (byte)Math.Round((parsed / (double)max) * 255d, MidpointRounding.AwayFromZero);
+        channel = (byte)Math.Round(parsed / (double)max * 255d, MidpointRounding.AwayFromZero);
         return true;
     }
 
@@ -241,7 +242,7 @@ internal static class OscDcsSequenceDecoder
                 return false;
             }
 
-            code = (code * 10) + (payloadBytes[index] - (byte)'0');
+            code = code * 10 + (payloadBytes[index] - (byte)'0');
         }
 
         return separator > 0;
@@ -266,7 +267,7 @@ internal static class OscDcsSequenceDecoder
             >= '0' and <= '9' => value - '0',
             >= 'a' and <= 'f' => 10 + (value - 'a'),
             >= 'A' and <= 'F' => 10 + (value - 'A'),
-            _ => -1,
+            _ => -1
         };
 
         return nibble >= 0;

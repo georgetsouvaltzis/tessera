@@ -1,20 +1,21 @@
-﻿using Tessera.Components.Primitives;
+using System.ComponentModel;
+using System.Globalization;
+using Tessera.Components.Primitives;
 using Tessera.Controls.Internal;
 using Tessera.Layout;
 using Tessera.Styles;
-using System.Globalization;
 
 namespace Tessera.Controls;
 
 /// <summary>
-/// Represents a simple line chart control.
+///     Represents a simple line chart control.
 /// </summary>
 public sealed class LineChart : Control
 {
     private readonly List<double> _samples = [];
 
     /// <summary>
-    /// Creates a line chart with the provided sample capacity.
+    ///     Creates a line chart with the provided sample capacity.
     /// </summary>
     /// <param name="capacity">The maximum number of retained samples.</param>
     public LineChart(int capacity = 240)
@@ -23,55 +24,47 @@ public sealed class LineChart : Control
     }
 
     /// <summary>
-    /// Gets the maximum number of retained samples.
+    ///     Gets the maximum number of retained samples.
     /// </summary>
     public int Capacity { get; }
 
     /// <summary>
-    /// Gets or sets the chart title.
+    ///     Gets or sets the chart title.
     /// </summary>
-    public string Title
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = "Line Chart";
+    public string Title { get; set; } = "Line Chart";
 
     /// <summary>
-    /// Gets or sets the marker shown in the title when focused.
+    ///     Gets or sets the marker shown in the title when focused.
     /// </summary>
-    public string FocusMarker
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = "*";
+    public string FocusMarker { get; set; } = "*";
 
     /// <summary>
-    /// Gets or sets whether the focused title marker should be rendered.
+    ///     Gets or sets whether the focused title marker should be rendered.
     /// </summary>
     public bool ShowFocusMarker { get; set; } = true;
 
     /// <summary>
-    /// Gets or sets the title style used when not focused.
+    ///     Gets or sets the title style used when not focused.
     /// </summary>
     public TesseraStyle TitleStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the title style used when focused.
+    ///     Gets or sets the title style used when focused.
     /// </summary>
     public TesseraStyle FocusedTitleStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets style used for min/max stat text.
+    ///     Gets or sets style used for min/max stat text.
     /// </summary>
     public TesseraStyle StatsStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets style used for legend and axis labels.
+    ///     Gets or sets style used for legend and axis labels.
     /// </summary>
     public TesseraStyle MetaTextStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the optional minimum value used when scaling samples.
+    ///     Gets or sets the optional minimum value used when scaling samples.
     /// </summary>
     public double? MinValue
     {
@@ -80,7 +73,7 @@ public sealed class LineChart : Control
     }
 
     /// <summary>
-    /// Gets or sets the optional maximum value used when scaling samples.
+    ///     Gets or sets the optional maximum value used when scaling samples.
     /// </summary>
     public double? MaxValue
     {
@@ -89,7 +82,7 @@ public sealed class LineChart : Control
     }
 
     /// <summary>
-    /// Gets or sets the current zoom factor.
+    ///     Gets or sets the current zoom factor.
     /// </summary>
     public double Zoom
     {
@@ -98,7 +91,7 @@ public sealed class LineChart : Control
     } = 1.0;
 
     /// <summary>
-    /// Gets or sets the current sample offset.
+    ///     Gets or sets the current sample offset.
     /// </summary>
     public int Offset
     {
@@ -107,14 +100,14 @@ public sealed class LineChart : Control
     }
 
     /// <summary>
-    /// Gets the retained sample values.
+    ///     Gets the retained sample values.
     /// </summary>
     public IReadOnlyList<double> Samples => _samples;
 
     /// <summary>
-    /// Gets or sets advanced chart rendering options.
+    ///     Gets or sets advanced chart rendering options.
     /// </summary>
-    [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Advanced)]
+    [EditorBrowsable(EditorBrowsableState.Advanced)]
     public LineChartOptions? Options
     {
         get;
@@ -122,20 +115,20 @@ public sealed class LineChart : Control
     }
 
     /// <summary>
-    /// Replaces the current sample values.
+    ///     Replaces the current sample values.
     /// </summary>
     /// <param name="samples">The sample values to render.</param>
     public void SetSamples(IEnumerable<double> samples)
     {
         _samples.Clear();
-        foreach (var sample in samples ?? Array.Empty<double>())
+        foreach (var sample in samples)
         {
             Append(sample);
         }
     }
 
     /// <summary>
-    /// Appends one sample to the chart.
+    ///     Appends one sample to the chart.
     /// </summary>
     /// <param name="sample">The sample value.</param>
     public void Append(double sample)
@@ -148,7 +141,7 @@ public sealed class LineChart : Control
     }
 
     /// <summary>
-    /// Zooms in by the provided step.
+    ///     Zooms in by the provided step.
     /// </summary>
     /// <param name="step">The zoom step.</param>
     public void ZoomIn(double step = 0.25)
@@ -157,7 +150,7 @@ public sealed class LineChart : Control
     }
 
     /// <summary>
-    /// Zooms out by the provided step.
+    ///     Zooms out by the provided step.
     /// </summary>
     /// <param name="step">The zoom step.</param>
     public void ZoomOut(double step = 0.25)
@@ -166,7 +159,7 @@ public sealed class LineChart : Control
     }
 
     /// <summary>
-    /// Pans the visible range by the provided delta.
+    ///     Pans the visible range by the provided delta.
     /// </summary>
     /// <param name="delta">The pan delta.</param>
     public void Pan(int delta)
@@ -177,18 +170,14 @@ public sealed class LineChart : Control
     /// <inheritdoc />
     public override void Render(Canvas canvas, Rect rect)
     {
-        var options = (Options ?? new LineChartOptions()) with
-        {
-            Zoom = Zoom,
-            Offset = Offset,
-        };
+        var options = (Options ?? new LineChartOptions()) with { Zoom = Zoom, Offset = Offset };
         if (!MetaTextStyle.IsEmpty)
         {
             options = options with
             {
                 Legend = StyleOptional(options.Legend, MetaTextStyle),
                 XLabel = StyleOptional(options.XLabel, MetaTextStyle),
-                YLabel = StyleOptional(options.YLabel, MetaTextStyle),
+                YLabel = StyleOptional(options.YLabel, MetaTextStyle)
             };
         }
 

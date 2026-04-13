@@ -1,17 +1,12 @@
 namespace Tessera.Controls;
 
 /// <summary>
-/// Defines glyphs used by <see cref="TokenEditor" />.
+///     Defines glyphs used by <see cref="TokenEditor" />.
 /// </summary>
 public readonly record struct TokenEditorGlyphSet
 {
     /// <summary>
-    /// Gets the built-in glyph set.
-    /// </summary>
-    public static TokenEditorGlyphSet Default => new();
-
-    /// <summary>
-    /// Initializes a glyph set with built-in defaults.
+    ///     Initializes a glyph set with built-in defaults.
     /// </summary>
     public TokenEditorGlyphSet()
     {
@@ -24,7 +19,7 @@ public readonly record struct TokenEditorGlyphSet
     }
 
     /// <summary>
-    /// Initializes a glyph set.
+    ///     Initializes a glyph set.
     /// </summary>
     /// <param name="selectedMarker">Marker rendered for selected chips.</param>
     /// <param name="unselectedMarker">Marker rendered for non-selected chips.</param>
@@ -40,41 +35,46 @@ public readonly record struct TokenEditorGlyphSet
         string markerSeparator,
         string tokenSeparator)
     {
-        SelectedMarker = selectedMarker ?? string.Empty;
-        UnselectedMarker = unselectedMarker ?? string.Empty;
-        TokenPrefix = tokenPrefix ?? string.Empty;
-        TokenSuffix = tokenSuffix ?? string.Empty;
-        MarkerSeparator = markerSeparator ?? string.Empty;
-        TokenSeparator = tokenSeparator ?? string.Empty;
+        SelectedMarker = selectedMarker;
+        UnselectedMarker = unselectedMarker;
+        TokenPrefix = tokenPrefix;
+        TokenSuffix = tokenSuffix;
+        MarkerSeparator = markerSeparator;
+        TokenSeparator = tokenSeparator;
     }
 
     /// <summary>
-    /// Gets the marker rendered for selected chips.
+    ///     Gets the built-in glyph set.
+    /// </summary>
+    public static TokenEditorGlyphSet Default => new();
+
+    /// <summary>
+    ///     Gets the marker rendered for selected chips.
     /// </summary>
     public string SelectedMarker { get; init; }
 
     /// <summary>
-    /// Gets the marker rendered for non-selected chips.
+    ///     Gets the marker rendered for non-selected chips.
     /// </summary>
     public string UnselectedMarker { get; init; }
 
     /// <summary>
-    /// Gets the prefix rendered before token value.
+    ///     Gets the prefix rendered before token value.
     /// </summary>
     public string TokenPrefix { get; init; }
 
     /// <summary>
-    /// Gets the suffix rendered after token value.
+    ///     Gets the suffix rendered after token value.
     /// </summary>
     public string TokenSuffix { get; init; }
 
     /// <summary>
-    /// Gets the separator rendered between marker and chip content.
+    ///     Gets the separator rendered between marker and chip content.
     /// </summary>
     public string MarkerSeparator { get; init; }
 
     /// <summary>
-    /// Gets the separator rendered between chips.
+    ///     Gets the separator rendered between chips.
     /// </summary>
     public string TokenSeparator { get; init; }
 }

@@ -16,18 +16,18 @@ public sealed class ScatterPlotControlTests
         {
             Title = "Latency",
             Options = new ScatterPlotOptions(
-                ShowAxes: true,
-                ShowLabels: true,
-                Legend: "p95",
-                XLabel: "time",
-                YLabel: "ms",
-                PointGlyph: 'x'),
+                true,
+                true,
+                "p95",
+                "time",
+                "ms",
+                'x')
         };
         control.SetPoints(
         [
             new ScatterPlotPoint(5, 20, "a"),
             new ScatterPlotPoint(10, 40, "b"),
-            new ScatterPlotPoint(15, 60, "c"),
+            new ScatterPlotPoint(15, 60, "c")
         ]);
         var canvas = new Canvas(40, 12);
 
@@ -50,7 +50,7 @@ public sealed class ScatterPlotControlTests
         [
             new ScatterPlotPoint(1, 1),
             new ScatterPlotPoint(2, 2),
-            new ScatterPlotPoint(3, 1),
+            new ScatterPlotPoint(3, 1)
         ]);
         var bounds = new Rect(0, 0, 30, 10);
         var firstCanvas = new Canvas(30, 10);
@@ -62,7 +62,8 @@ public sealed class ScatterPlotControlTests
         var second = secondCanvas.Render();
 
         TestAssert.Equal(first, second, "Scatter plot should render deterministically for identical state.");
-        TestAssert.True(!first.Contains("\u001b[", StringComparison.Ordinal), "Default scatter plot output should remain monochrome.");
+        TestAssert.True(!first.Contains("\e[", StringComparison.Ordinal),
+            "Default scatter plot output should remain monochrome.");
     }
 
     [Test]
@@ -74,7 +75,7 @@ public sealed class ScatterPlotControlTests
         {
             PointStyle = pointStyle,
             LabelStyle = labelStyle,
-            Options = new ScatterPlotOptions(ShowAxes: false, ShowLabels: true, PointGlyph: 'o'),
+            Options = new ScatterPlotOptions(false, true, PointGlyph: 'o')
         };
         control.SetPoints([new ScatterPlotPoint(1, 1, "p1")]);
         var canvas = new Canvas(24, 8, CanvasTextMode.GraphemeAware);
@@ -82,23 +83,22 @@ public sealed class ScatterPlotControlTests
         control.Render(canvas, new Rect(0, 0, 24, 8));
         var output = canvas.Render();
 
-        TestAssert.True(output.Contains("38;2;120;40;30", StringComparison.Ordinal), "Point style should render foreground ANSI sequence.");
-        TestAssert.True(output.Contains("[1m", StringComparison.Ordinal), "Label style should render bold ANSI sequence.");
+        TestAssert.True(output.Contains("38;2;120;40;30", StringComparison.Ordinal),
+            "Point style should render foreground ANSI sequence.");
+        TestAssert.True(output.Contains("[1m", StringComparison.Ordinal),
+            "Label style should render bold ANSI sequence.");
     }
 
     [Test]
     public void ControlsScatterPlotCapacityAndTrimToLastKeepTrailingPoints()
     {
-        var control = new ScatterPlot
-        {
-            Capacity = 3,
-        };
+        var control = new ScatterPlot { Capacity = 3 };
         control.SetPoints(
         [
             new ScatterPlotPoint(1, 1),
             new ScatterPlotPoint(2, 2),
             new ScatterPlotPoint(3, 3),
-            new ScatterPlotPoint(4, 4),
+            new ScatterPlotPoint(4, 4)
         ]);
         control.Append(new ScatterPlotPoint(5, 5));
         control.TrimToLast(2);

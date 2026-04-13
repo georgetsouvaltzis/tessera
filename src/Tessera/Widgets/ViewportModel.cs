@@ -1,4 +1,5 @@
 using System.ComponentModel;
+using Tessera.Core.Abstractions;
 using Tessera.Internal;
 using Tessera.Widgets.Internal;
 
@@ -71,12 +72,12 @@ internal sealed class ViewportModel
 
     public void AppendLine(string line)
     {
-        AppendSourceLine(ViewportLineFormatter.NormalizeInlineLine(line ?? string.Empty));
+        AppendSourceLine(ViewportLineFormatter.NormalizeInlineLine(line));
     }
 
     public void AppendRawLine(string line)
     {
-        AppendSourceLine(line ?? string.Empty);
+        AppendSourceLine(line);
     }
 
     public void Clear()
@@ -112,7 +113,7 @@ internal sealed class ViewportModel
         ClampOffsets();
     }
 
-    public bool Update(global::Tessera.Core.Abstractions.IMessage message, ViewportKeyMap? keyMap = null)
+    public bool Update(IMessage message, ViewportKeyMap? keyMap = null)
     {
         return Update(TesseraMessageAdapter.ToPublic(message), keyMap);
     }
@@ -125,19 +126,49 @@ internal sealed class ViewportModel
 
         if (message is KeyPressed key)
         {
-            if (keyMap.Up.Matches(key)) ScrollBy(-1);
-            else if (keyMap.Down.Matches(key)) ScrollBy(1);
-            else if (keyMap.PageUp.Matches(key)) ScrollBy(-Height);
-            else if (keyMap.PageDown.Matches(key)) ScrollBy(Height);
-            else if (keyMap.Home.Matches(key)) ScrollToTop();
-            else if (keyMap.End.Matches(key)) ScrollToBottom();
-            else if (keyMap.Left.Matches(key)) ScrollBy(0, -2);
-            else if (keyMap.Right.Matches(key)) ScrollBy(0, 2);
+            if (keyMap.Up.Matches(key))
+            {
+                ScrollBy(-1);
+            }
+            else if (keyMap.Down.Matches(key))
+            {
+                ScrollBy(1);
+            }
+            else if (keyMap.PageUp.Matches(key))
+            {
+                ScrollBy(-Height);
+            }
+            else if (keyMap.PageDown.Matches(key))
+            {
+                ScrollBy(Height);
+            }
+            else if (keyMap.Home.Matches(key))
+            {
+                ScrollToTop();
+            }
+            else if (keyMap.End.Matches(key))
+            {
+                ScrollToBottom();
+            }
+            else if (keyMap.Left.Matches(key))
+            {
+                ScrollBy(0, -2);
+            }
+            else if (keyMap.Right.Matches(key))
+            {
+                ScrollBy(0, 2);
+            }
         }
         else if (message is PointerInput { Kind: PointerEventKind.Wheel } wheel)
         {
-            if (wheel.Button == PointerButton.WheelUp) ScrollBy(-3);
-            else if (wheel.Button == PointerButton.WheelDown) ScrollBy(3);
+            if (wheel.Button == PointerButton.WheelUp)
+            {
+                ScrollBy(-3);
+            }
+            else if (wheel.Button == PointerButton.WheelDown)
+            {
+                ScrollBy(3);
+            }
         }
 
         return beforeX != XOffset || beforeY != YOffset;

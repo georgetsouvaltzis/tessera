@@ -1,7 +1,7 @@
-﻿namespace Tessera.Components.Primitives;
+namespace Tessera.Components.Primitives;
 
 /// <summary>
-/// Represents rect y.
+///     Represents rect y.
 /// </summary>
 /// <param name="X">The x value.</param>
 /// <param name="Y">The y value.</param>
@@ -10,22 +10,22 @@
 public readonly record struct Rect(int X, int Y, int Width, int Height)
 {
     /// <summary>
-    /// Represents right.
+    ///     Represents right.
     /// </summary>
     public int Right => X + Width;
 
     /// <summary>
-    /// Represents bottom.
+    ///     Represents bottom.
     /// </summary>
     public int Bottom => Y + Height;
 
     /// <summary>
-    /// Represents is empty.
+    ///     Represents is empty.
     /// </summary>
     public bool IsEmpty => Width <= 0 || Height <= 0;
 
     /// <summary>
-    /// Executes contains.
+    ///     Executes contains.
     /// </summary>
     /// <param name="x">The x value.</param>
     /// <param name="y">The y value.</param>
@@ -36,7 +36,7 @@ public readonly record struct Rect(int X, int Y, int Width, int Height)
     }
 
     /// <summary>
-    /// Executes inset.
+    ///     Executes inset.
     /// </summary>
     /// <param name="horizontal">The horizontal value.</param>
     /// <param name="vertical">The vertical value.</param>
@@ -46,12 +46,12 @@ public readonly record struct Rect(int X, int Y, int Width, int Height)
         return new Rect(
             X + horizontal,
             Y + vertical,
-            Width - (horizontal * 2),
-            Height - (vertical * 2));
+            Width - horizontal * 2,
+            Height - vertical * 2);
     }
 
     /// <summary>
-    /// Executes inset.
+    ///     Executes inset.
     /// </summary>
     /// <param name="thickness">The thickness value.</param>
     /// <returns>The result of inset.</returns>
@@ -65,7 +65,7 @@ public readonly record struct Rect(int X, int Y, int Width, int Height)
     }
 
     /// <summary>
-    /// Executes intersect.
+    ///     Executes intersect.
     /// </summary>
     /// <param name="a">The a value.</param>
     /// <param name="b">The b value.</param>

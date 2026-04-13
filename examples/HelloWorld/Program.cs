@@ -13,7 +13,7 @@ var app = TesseraApplication.CreateBuilder()
             WindowTitle = "Tessera HelloWorld",
             EnableFocusReporting = true,
             EnableBracketedPaste = true,
-            MouseTracking = MouseTrackingMode.AllMotion,
+            MouseTracking = MouseTrackingMode.AllMotion
         };
     })
     .Build();

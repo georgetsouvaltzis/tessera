@@ -4,46 +4,48 @@ using Tessera.Layout;
 namespace Tessera.Controls;
 
 /// <summary>
-/// Represents the base type for custom Tessera controls.
+///     Represents the base type for custom Tessera controls.
 /// </summary>
 /// <remarks>
-/// Derive from this type when built-in controls are not enough. Normal apps work with controls directly, while
-/// Tessera adapts them to the underlying composition/runtime engine behind the scenes.
+///     Derive from this type when built-in controls are not enough. Normal apps work with controls directly, while
+///     Tessera adapts them to the underlying composition/runtime engine behind the scenes.
 /// </remarks>
 public abstract class Control
 {
     private static long s_focusRequestCounter;
-    private bool _focusRequestPending;
     private long _focusRequestOrder;
+    private bool _focusRequestPending;
 
     /// <summary>
-    /// Initializes a new control instance.
+    ///     Initializes a new control instance.
     /// </summary>
     protected Control()
     {
     }
 
     /// <summary>
-    /// Gets or sets a value indicating whether the control currently owns focus.
+    ///     Gets or sets a value indicating whether the control currently owns focus.
     /// </summary>
     public virtual bool IsFocused { get; set; }
 
     /// <summary>
-    /// Gets or sets a value indicating whether the control should ignore interaction.
+    ///     Gets or sets a value indicating whether the control should ignore interaction.
     /// </summary>
     public virtual bool IsDisabled { get; set; }
 
     /// <summary>
-    /// Gets or sets a value indicating whether the control should remain interactive but not mutate its value.
+    ///     Gets or sets a value indicating whether the control should remain interactive but not mutate its value.
     /// </summary>
     public virtual bool IsReadOnly { get; set; }
 
+    internal virtual bool CanFocus => true;
+
     /// <summary>
-    /// Requests focus for the next composition pass.
+    ///     Requests focus for the next composition pass.
     /// </summary>
     /// <remarks>
-    /// Focus requests are one-shot. If multiple controls request focus during the same pass, the most recent
-    /// request wins.
+    ///     Focus requests are one-shot. If multiple controls request focus during the same pass, the most recent
+    ///     request wins.
     /// </remarks>
     public void RequestFocus()
     {
@@ -52,28 +54,28 @@ public abstract class Control
     }
 
     /// <summary>
-    /// Renders the control into the provided canvas bounds.
+    ///     Renders the control into the provided canvas bounds.
     /// </summary>
     /// <param name="canvas">The target canvas.</param>
     /// <param name="rect">The bounds assigned to the control.</param>
     public abstract void Render(Canvas canvas, Rect rect);
 
     /// <summary>
-    /// Handles a message that does not depend on pointer bounds.
+    ///     Handles a message that does not depend on pointer bounds.
     /// </summary>
     /// <param name="message">The message to process.</param>
-    /// <returns><see langword="true"/> when the message was handled; otherwise, <see langword="false"/>.</returns>
+    /// <returns><see langword="true" /> when the message was handled; otherwise, <see langword="false" />.</returns>
     public virtual bool Handle(Message message)
     {
         return false;
     }
 
     /// <summary>
-    /// Handles a message with the current control bounds.
+    ///     Handles a message with the current control bounds.
     /// </summary>
     /// <param name="message">The message to process.</param>
     /// <param name="bounds">The current control bounds.</param>
-    /// <returns><see langword="true"/> when the message was handled; otherwise, <see langword="false"/>.</returns>
+    /// <returns><see langword="true" /> when the message was handled; otherwise, <see langword="false" />.</returns>
     public virtual bool Handle(Message message, Rect bounds)
     {
         return Handle(message);
@@ -83,8 +85,6 @@ public abstract class Control
     {
         return new LayoutMeasurement(availableBounds.Width, availableBounds.Height);
     }
-
-    internal virtual bool CanFocus => true;
 
     internal void ApplyFocus(bool focused)
     {

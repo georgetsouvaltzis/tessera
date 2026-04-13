@@ -1,12 +1,14 @@
+using Tessera.Core.Abstractions;
+
 namespace Tessera.Internal;
 
 internal static class ScreenOptionsAdapter
 {
-    public static global::Tessera.Core.Abstractions.TerminalOutput ToTerminalOutput(this ScreenOptions options)
+    public static TerminalOutput ToTerminalOutput(this ScreenOptions options)
     {
         ArgumentNullException.ThrowIfNull(options);
 
-        return new global::Tessera.Core.Abstractions.TerminalOutput
+        return new TerminalOutput
         {
             AltScreen = options.AltScreen ?? false,
             EnableBracketedPaste = options.EnableBracketedPaste ?? false,
@@ -14,9 +16,9 @@ internal static class ScreenOptionsAdapter
             EnableSynchronizedUpdates = options.EnableSynchronizedUpdates ?? false,
             MouseMode = options.MouseTracking switch
             {
-                MouseTrackingMode.CellMotion => global::Tessera.Core.Abstractions.MouseMode.CellMotion,
-                MouseTrackingMode.AllMotion => global::Tessera.Core.Abstractions.MouseMode.AllMotion,
-                _ => global::Tessera.Core.Abstractions.MouseMode.None,
+                MouseTrackingMode.CellMotion => MouseMode.CellMotion,
+                MouseTrackingMode.AllMotion => MouseMode.AllMotion,
+                _ => MouseMode.None
             },
             CursorColor = options.CursorColor,
             ForegroundColor = options.ForegroundColor,
@@ -25,11 +27,11 @@ internal static class ScreenOptionsAdapter
             FontSpec = options.FontSpec,
             FontFamily = options.FontFamily,
             FontSize = options.FontSize,
-            Iterm2Profile = options.Iterm2Profile,
+            Iterm2Profile = options.Iterm2Profile
         };
     }
 
-    public static ScreenOptions ToScreenOptions(this global::Tessera.Core.Abstractions.TerminalOutput output)
+    public static ScreenOptions ToScreenOptions(this TerminalOutput output)
     {
         return new ScreenOptions
         {
@@ -39,9 +41,9 @@ internal static class ScreenOptionsAdapter
             EnableSynchronizedUpdates = output.EnableSynchronizedUpdates,
             MouseTracking = output.MouseMode switch
             {
-                global::Tessera.Core.Abstractions.MouseMode.CellMotion => MouseTrackingMode.CellMotion,
-                global::Tessera.Core.Abstractions.MouseMode.AllMotion => MouseTrackingMode.AllMotion,
-                _ => MouseTrackingMode.None,
+                MouseMode.CellMotion => MouseTrackingMode.CellMotion,
+                MouseMode.AllMotion => MouseTrackingMode.AllMotion,
+                _ => MouseTrackingMode.None
             },
             CursorColor = output.CursorColor,
             ForegroundColor = output.ForegroundColor,
@@ -50,7 +52,7 @@ internal static class ScreenOptionsAdapter
             FontSpec = output.FontSpec,
             FontFamily = output.FontFamily,
             FontSize = output.FontSize,
-            Iterm2Profile = output.Iterm2Profile,
+            Iterm2Profile = output.Iterm2Profile
         };
     }
 }

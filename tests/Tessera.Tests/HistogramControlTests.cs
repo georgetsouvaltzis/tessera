@@ -16,19 +16,19 @@ public sealed class HistogramControlTests
         {
             Title = "Errors",
             Options = new HistogramOptions(
-                ShowAxes: true,
-                ShowBucketLabels: true,
-                ShowScale: false,
-                Legend: "req/s",
-                XLabel: "bucket",
-                YLabel: "count",
-                BarGlyph: '#'),
+                true,
+                true,
+                false,
+                "req/s",
+                "bucket",
+                "count",
+                '#')
         };
         control.SetBuckets(
         [
             new HistogramBucket("p50", 30),
             new HistogramBucket("p95", 70),
-            new HistogramBucket("p99", 90),
+            new HistogramBucket("p99", 90)
         ]);
         var canvas = new Canvas(44, 12);
 
@@ -39,28 +39,27 @@ public sealed class HistogramControlTests
         TestAssert.True(output.Contains('└'), "Histogram should render axis corner when axes are enabled.");
         TestAssert.True(output.Contains("req/s", StringComparison.Ordinal), "Histogram should render legend.");
         TestAssert.True(output.Contains("bucket", StringComparison.Ordinal), "Histogram should render x-axis label.");
-        TestAssert.True(output.Contains("coun", StringComparison.Ordinal), "Histogram should render clipped y-axis label text.");
+        TestAssert.True(output.Contains("coun", StringComparison.Ordinal),
+            "Histogram should render clipped y-axis label text.");
         TestAssert.True(output.Contains('#'), "Histogram should render configured bar glyph.");
     }
 
     [Test]
     public void ControlsHistogramWithScaleRendersMaxText()
     {
-        var control = new Histogram
-        {
-            Options = new HistogramOptions(ShowScale: true, ShowBucketLabels: false),
-        };
+        var control = new Histogram { Options = new HistogramOptions(ShowScale: true, ShowBucketLabels: false) };
         control.SetBuckets(
         [
             new HistogramBucket("ok", 10),
-            new HistogramBucket("warn", 25),
+            new HistogramBucket("warn", 25)
         ]);
         var canvas = new Canvas(28, 10);
 
         control.Render(canvas, new Rect(0, 0, 28, 10));
         var output = canvas.Render();
 
-        TestAssert.True(output.Contains("max:", StringComparison.Ordinal), "Histogram should render max scale text when enabled.");
+        TestAssert.True(output.Contains("max:", StringComparison.Ordinal),
+            "Histogram should render max scale text when enabled.");
     }
 
     [Test]
@@ -70,7 +69,7 @@ public sealed class HistogramControlTests
         control.SetBuckets(
         [
             new HistogramBucket("ok", 10),
-            new HistogramBucket("warn", 20),
+            new HistogramBucket("warn", 20)
         ]);
 
         control.SetValue("warn", 60);
@@ -87,7 +86,7 @@ public sealed class HistogramControlTests
         [
             new HistogramBucket("a", 1),
             new HistogramBucket("b", 2),
-            new HistogramBucket("c", 3),
+            new HistogramBucket("c", 3)
         ]);
         var bounds = new Rect(0, 0, 30, 10);
         var firstCanvas = new Canvas(30, 10);
@@ -99,28 +98,26 @@ public sealed class HistogramControlTests
         var second = secondCanvas.Render();
 
         TestAssert.Equal(first, second, "Histogram should render deterministically for identical state.");
-        TestAssert.True(!first.Contains("\u001b[", StringComparison.Ordinal), "Default histogram output should remain monochrome.");
+        TestAssert.True(!first.Contains("\e[", StringComparison.Ordinal),
+            "Default histogram output should remain monochrome.");
     }
 
     [Test]
     public void ControlsHistogramBarStyleEmitsAnsiSequences()
     {
         var barStyle = TesseraStyle.Empty.WithForeground(AnsiColor.Rgb(66, 77, 88));
-        var control = new Histogram
-        {
-            BarStyle = barStyle,
-            Options = new HistogramOptions(BarGlyph: '@'),
-        };
+        var control = new Histogram { BarStyle = barStyle, Options = new HistogramOptions(BarGlyph: '@') };
         control.SetBuckets(
         [
             new HistogramBucket("x", 2),
-            new HistogramBucket("y", 4),
+            new HistogramBucket("y", 4)
         ]);
         var canvas = new Canvas(28, 10, CanvasTextMode.GraphemeAware);
 
         control.Render(canvas, new Rect(0, 0, 28, 10));
         var output = canvas.Render();
 
-        TestAssert.True(output.Contains("38;2;66;77;88", StringComparison.Ordinal), "Histogram bar style should render foreground ANSI sequence.");
+        TestAssert.True(output.Contains("38;2;66;77;88", StringComparison.Ordinal),
+            "Histogram bar style should render foreground ANSI sequence.");
     }
 }

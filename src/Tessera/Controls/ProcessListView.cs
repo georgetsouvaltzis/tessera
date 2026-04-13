@@ -8,18 +8,14 @@ using Tessera.Styles;
 namespace Tessera.Controls;
 
 /// <summary>
-/// Represents a selectable process table with status/CPU/memory columns.
+///     Represents a selectable process table with status/CPU/memory columns.
 /// </summary>
 public sealed class ProcessListView : Control
 {
     private readonly List<ProcessListEntry> _entries = [];
-    private int _selectedIndex = -1;
     private int _hoveredIndex = -1;
-    private int _scrollOffset;
     private int _lastViewportRows = 8;
-
-    /// <summary>Raised when selection changes.</summary>
-    public event EventHandler<ProcessListSelectionChangedEventArgs>? SelectionChanged;
+    private int _scrollOffset;
 
     /// <summary>Gets or sets control title text.</summary>
     public string Title { get; set; } = "Processes";
@@ -27,7 +23,7 @@ public sealed class ProcessListView : Control
     /// <summary>Gets or sets marker appended to title while focused.</summary>
     public string FocusMarker { get; set; } = "*";
 
-    /// <summary>Gets or sets whether <see cref="FocusMarker"/> is rendered while focused.</summary>
+    /// <summary>Gets or sets whether <see cref="FocusMarker" /> is rendered while focused.</summary>
     public bool ShowFocusMarker { get; set; } = true;
 
     /// <summary>Gets or sets border style.</summary>
@@ -123,11 +119,11 @@ public sealed class ProcessListView : Control
     public IReadOnlyList<ProcessListEntry> Entries => _entries;
 
     /// <summary>Gets selected index, or <c>-1</c> when empty.</summary>
-    public int SelectedIndex => _selectedIndex;
+    public int SelectedIndex { get; private set; } = -1;
 
     /// <summary>Gets selected row, if any.</summary>
     public ProcessListEntry? SelectedEntry =>
-        _selectedIndex >= 0 && _selectedIndex < _entries.Count ? _entries[_selectedIndex] : null;
+        SelectedIndex >= 0 && SelectedIndex < _entries.Count ? _entries[SelectedIndex] : null;
 
     /// <inheritdoc />
     public override bool IsFocused { get; set; }
@@ -138,12 +134,15 @@ public sealed class ProcessListView : Control
     /// <inheritdoc />
     public override bool IsReadOnly { get; set; }
 
+    /// <summary>Raised when selection changes.</summary>
+    public event EventHandler<ProcessListSelectionChangedEventArgs>? SelectionChanged;
+
     /// <summary>Replaces all rows.</summary>
     /// <param name="entries">Rows to render.</param>
     public void SetEntries(IEnumerable<ProcessListEntry> entries)
     {
         ArgumentNullException.ThrowIfNull(entries);
-        var previousIndex = _selectedIndex;
+        var previousIndex = SelectedIndex;
         var previousEntry = SelectedEntry;
         _entries.Clear();
         foreach (var entry in entries.Where(static entry => entry is not null))
@@ -153,13 +152,13 @@ public sealed class ProcessListView : Control
 
         if (_entries.Count == 0)
         {
-            _selectedIndex = -1;
+            SelectedIndex = -1;
             _hoveredIndex = -1;
             _scrollOffset = 0;
         }
         else
         {
-            _selectedIndex = Math.Clamp(_selectedIndex < 0 ? 0 : _selectedIndex, 0, _entries.Count - 1);
+            SelectedIndex = Math.Clamp(SelectedIndex < 0 ? 0 : SelectedIndex, 0, _entries.Count - 1);
             _hoveredIndex = Math.Clamp(_hoveredIndex, -1, _entries.Count - 1);
             EnsureSelectionVisible(_lastViewportRows);
         }
@@ -172,10 +171,14 @@ public sealed class ProcessListView : Control
     public void Append(ProcessListEntry entry)
     {
         ArgumentNullException.ThrowIfNull(entry);
-        var previousIndex = _selectedIndex;
+        var previousIndex = SelectedIndex;
         var previousEntry = SelectedEntry;
         _entries.Add(CloneEntry(entry));
-        if (_selectedIndex < 0) _selectedIndex = 0;
+        if (SelectedIndex < 0)
+        {
+            SelectedIndex = 0;
+        }
+
         EnsureSelectionVisible(_lastViewportRows);
         RaiseSelectionChangedIfNeeded(previousIndex, previousEntry);
     }
@@ -183,10 +186,10 @@ public sealed class ProcessListView : Control
     /// <summary>Clears rows and selection state.</summary>
     public void Clear()
     {
-        var previousIndex = _selectedIndex;
+        var previousIndex = SelectedIndex;
         var previousEntry = SelectedEntry;
         _entries.Clear();
-        _selectedIndex = -1;
+        SelectedIndex = -1;
         _hoveredIndex = -1;
         _scrollOffset = 0;
         RaiseSelectionChangedIfNeeded(previousIndex, previousEntry);
@@ -194,20 +197,31 @@ public sealed class ProcessListView : Control
 
     /// <summary>Selects by index using bounds clamping.</summary>
     /// <param name="index">Requested index.</param>
-    /// <returns><see langword="true"/> when selection changed.</returns>
-    public bool Select(int index) => SetSelectedIndex(index);
+    /// <returns><see langword="true" /> when selection changed.</returns>
+    public bool Select(int index)
+    {
+        return SetSelectedIndex(index);
+    }
 
     /// <summary>Sets the selected row index using bounds clamping.</summary>
     /// <param name="index">Requested index.</param>
-    /// <returns><see langword="true"/> when selection changed.</returns>
+    /// <returns><see langword="true" /> when selection changed.</returns>
     public bool SetSelectedIndex(int index)
     {
-        if (_entries.Count == 0) return false;
+        if (_entries.Count == 0)
+        {
+            return false;
+        }
+
         var clamped = Math.Clamp(index, 0, _entries.Count - 1);
-        if (clamped == _selectedIndex) return false;
-        var previousIndex = _selectedIndex;
+        if (clamped == SelectedIndex)
+        {
+            return false;
+        }
+
+        var previousIndex = SelectedIndex;
         var previousEntry = SelectedEntry;
-        _selectedIndex = clamped;
+        SelectedIndex = clamped;
         EnsureSelectionVisible(_lastViewportRows);
         RaiseSelectionChangedIfNeeded(previousIndex, previousEntry);
         return true;
@@ -216,23 +230,58 @@ public sealed class ProcessListView : Control
     /// <inheritdoc />
     public override bool Handle(Message message)
     {
-        if (IsDisabled || IsReadOnly || !IsFocused || _entries.Count == 0 || message is not KeyPressed key) return false;
+        if (IsDisabled || IsReadOnly || !IsFocused || _entries.Count == 0 || message is not KeyPressed key)
+        {
+            return false;
+        }
+
         var page = Math.Max(1, _lastViewportRows);
-        if (key.Is(Key.Down) || key.IsCharacter('j')) return SetSelectedIndex(_selectedIndex + 1);
-        if (key.Is(Key.Up) || key.IsCharacter('k')) return SetSelectedIndex(_selectedIndex - 1);
-        if (key.Is(Key.Home)) return SetSelectedIndex(0);
-        if (key.Is(Key.End)) return SetSelectedIndex(_entries.Count - 1);
-        if (key.Is(Key.PageDown)) return SetSelectedIndex(_selectedIndex + page);
-        if (key.Is(Key.PageUp)) return SetSelectedIndex(_selectedIndex - page);
+        if (key.Is(Key.Down) || key.IsCharacter('j'))
+        {
+            return SetSelectedIndex(SelectedIndex + 1);
+        }
+
+        if (key.Is(Key.Up) || key.IsCharacter('k'))
+        {
+            return SetSelectedIndex(SelectedIndex - 1);
+        }
+
+        if (key.Is(Key.Home))
+        {
+            return SetSelectedIndex(0);
+        }
+
+        if (key.Is(Key.End))
+        {
+            return SetSelectedIndex(_entries.Count - 1);
+        }
+
+        if (key.Is(Key.PageDown))
+        {
+            return SetSelectedIndex(SelectedIndex + page);
+        }
+
+        if (key.Is(Key.PageUp))
+        {
+            return SetSelectedIndex(SelectedIndex - page);
+        }
+
         return false;
     }
 
     /// <inheritdoc />
     public override bool Handle(Message message, Rect bounds)
     {
-        if (IsDisabled || IsReadOnly || message is not PointerInput pointer || bounds.IsEmpty) return Handle(message);
+        if (IsDisabled || IsReadOnly || message is not PointerInput pointer || bounds.IsEmpty)
+        {
+            return Handle(message);
+        }
+
         var content = FrameLayout.ResolveContentRect(bounds, Border, Padding);
-        if (content.IsEmpty) return Handle(message);
+        if (content.IsEmpty)
+        {
+            return Handle(message);
+        }
 
         var rowY = content.Y + (HasTitle() ? 1 : 0) + (ShowHeader ? 1 : 0);
         var rowsHeight = Math.Max(0, content.Bottom - rowY);
@@ -240,20 +289,41 @@ public sealed class ProcessListView : Control
 
         var inside = content.Contains(pointer.X, pointer.Y);
         var changed = false;
-        if (!inside && pointer.Kind is PointerEventKind.Motion or PointerEventKind.Press) changed |= SetHoveredIndex(-1);
+        if (!inside && pointer.Kind is PointerEventKind.Motion or PointerEventKind.Press)
+        {
+            changed |= SetHoveredIndex(-1);
+        }
 
         if (pointer.Kind == PointerEventKind.Wheel && _entries.Count > 0)
         {
-            if (pointer.Button == PointerButton.WheelDown) return SetSelectedIndex(_selectedIndex + 1) || changed;
-            if (pointer.Button == PointerButton.WheelUp) return SetSelectedIndex(_selectedIndex - 1) || changed;
+            if (pointer.Button == PointerButton.WheelDown)
+            {
+                return SetSelectedIndex(SelectedIndex + 1) || changed;
+            }
+
+            if (pointer.Button == PointerButton.WheelUp)
+            {
+                return SetSelectedIndex(SelectedIndex - 1) || changed;
+            }
         }
 
-        if (!inside || _entries.Count == 0 || pointer.Y < rowY || rowsHeight <= 0) return changed || Handle(message);
+        if (!inside || _entries.Count == 0 || pointer.Y < rowY || rowsHeight <= 0)
+        {
+            return changed || Handle(message);
+        }
+
         EnsureSelectionVisible(rowsHeight);
         var hovered = _scrollOffset + (pointer.Y - rowY);
-        if (hovered < 0 || hovered >= _entries.Count) hovered = -1;
+        if (hovered < 0 || hovered >= _entries.Count)
+        {
+            hovered = -1;
+        }
 
-        if (pointer.Kind == PointerEventKind.Motion) return SetHoveredIndex(hovered);
+        if (pointer.Kind == PointerEventKind.Motion)
+        {
+            return SetHoveredIndex(hovered);
+        }
+
         if (pointer.Kind == PointerEventKind.Press && pointer.Button == PointerButton.Left && hovered >= 0)
         {
             RequestFocus();
@@ -268,7 +338,10 @@ public sealed class ProcessListView : Control
     public override void Render(Canvas canvas, Rect rect)
     {
         var clipped = Rect.Intersect(rect, canvas.Bounds);
-        if (clipped.IsEmpty) return;
+        if (clipped.IsEmpty)
+        {
+            return;
+        }
 
         var content = FrameLayout.DrawFrameAndResolveContent(
             canvas,
@@ -277,7 +350,10 @@ public sealed class ProcessListView : Control
             Border,
             Padding,
             ResolveBorderStyle());
-        if (content.IsEmpty) return;
+        if (content.IsEmpty)
+        {
+            return;
+        }
 
         var y = content.Y;
         if (ShowHeader)
@@ -290,7 +366,11 @@ public sealed class ProcessListView : Control
         _lastViewportRows = Math.Max(1, rowsHeight);
         if (_entries.Count == 0 || rowsHeight <= 0)
         {
-            if (rowsHeight > 0) WriteStyledText(canvas, content.X, y, EmptyText, ResolveEmptyStyle(), content.Width);
+            if (rowsHeight > 0)
+            {
+                WriteStyledText(canvas, content.X, y, EmptyText, ResolveEmptyStyle(), content.Width);
+            }
+
             return;
         }
 
@@ -299,27 +379,37 @@ public sealed class ProcessListView : Control
         for (var row = 0; row < visible; row++)
         {
             var index = _scrollOffset + row;
-            WriteStyledText(canvas, content.X, y + row, BuildRow(_entries[index], index == _selectedIndex), ResolveRowStyle(index, _entries[index]), content.Width);
+            WriteStyledText(canvas, content.X, y + row, BuildRow(_entries[index], index == SelectedIndex),
+                ResolveRowStyle(index, _entries[index]), content.Width);
         }
     }
 
     internal override LayoutMeasurement Measure(in Rect availableBounds)
     {
-        var width = Math.Max(24, ControlTextLayout.MeasureDisplayWidth(BuildHeader()) + Padding.Horizontal + (Border == BorderStyle.None ? 0 : 2));
+        var width = Math.Max(24,
+            ControlTextLayout.MeasureDisplayWidth(BuildHeader()) + Padding.Horizontal +
+            (Border == BorderStyle.None ? 0 : 2));
         for (var index = 0; index < _entries.Count; index++)
         {
-            width = Math.Max(width, ControlTextLayout.MeasureDisplayWidth(BuildRow(_entries[index], selected: index == _selectedIndex)) + Padding.Horizontal + (Border == BorderStyle.None ? 0 : 2));
+            width = Math.Max(width,
+                ControlTextLayout.MeasureDisplayWidth(BuildRow(_entries[index], index == SelectedIndex)) +
+                Padding.Horizontal + (Border == BorderStyle.None ? 0 : 2));
         }
 
         var headerRows = ShowHeader ? 1 : 0;
         var rowCount = Math.Max(1, _entries.Count);
         var height = rowCount + headerRows + Padding.Vertical + (Border == BorderStyle.None ? 0 : 2);
-        return new LayoutMeasurement(Math.Clamp(width, 0, availableBounds.Width), Math.Clamp(height, 0, availableBounds.Height));
+        return new LayoutMeasurement(Math.Clamp(width, 0, availableBounds.Width),
+            Math.Clamp(height, 0, availableBounds.Height));
     }
 
     private bool SetHoveredIndex(int index)
     {
-        if (_hoveredIndex == index) return false;
+        if (_hoveredIndex == index)
+        {
+            return false;
+        }
+
         _hoveredIndex = index;
         return true;
     }
@@ -332,16 +422,32 @@ public sealed class ProcessListView : Control
             return;
         }
 
-        if (_selectedIndex < 0) _selectedIndex = 0;
-        if (_selectedIndex < _scrollOffset) _scrollOffset = _selectedIndex;
-        else if (_selectedIndex >= _scrollOffset + viewportRows) _scrollOffset = _selectedIndex - viewportRows + 1;
+        if (SelectedIndex < 0)
+        {
+            SelectedIndex = 0;
+        }
+
+        if (SelectedIndex < _scrollOffset)
+        {
+            _scrollOffset = SelectedIndex;
+        }
+        else if (SelectedIndex >= _scrollOffset + viewportRows)
+        {
+            _scrollOffset = SelectedIndex - viewportRows + 1;
+        }
+
         _scrollOffset = Math.Clamp(_scrollOffset, 0, Math.Max(0, _entries.Count - viewportRows));
     }
 
     private void RaiseSelectionChangedIfNeeded(int previousIndex, ProcessListEntry? previousEntry)
     {
-        if (previousIndex == _selectedIndex && ReferenceEquals(previousEntry, SelectedEntry)) return;
-        SelectionChanged?.Invoke(this, new ProcessListSelectionChangedEventArgs(previousIndex, _selectedIndex, previousEntry, SelectedEntry));
+        if (previousIndex == SelectedIndex && ReferenceEquals(previousEntry, SelectedEntry))
+        {
+            return;
+        }
+
+        SelectionChanged?.Invoke(this,
+            new ProcessListSelectionChangedEventArgs(previousIndex, SelectedIndex, previousEntry, SelectedEntry));
     }
 
     private TesseraStyle ResolveBorderStyle()
@@ -365,15 +471,30 @@ public sealed class ProcessListView : Control
     private TesseraStyle ResolveRowStyle(int index, ProcessListEntry entry)
     {
         var style = RowStyle.Merge(entry.Style).Merge(StatusStyle);
-        if (entry.IsMuted) style = style.Merge(MutedRowStyle);
-        if (index == _hoveredIndex) style = style.Merge(HoveredRowStyle);
-        if (index == _selectedIndex)
+        if (entry.IsMuted)
         {
-            style = style.Merge(SelectedRowStyle);
-            if (IsFocused) style = style.Merge(FocusedSelectedRowStyle);
+            style = style.Merge(MutedRowStyle);
         }
 
-        if (IsDisabled) style = style.Merge(DisabledStyle);
+        if (index == _hoveredIndex)
+        {
+            style = style.Merge(HoveredRowStyle);
+        }
+
+        if (index == SelectedIndex)
+        {
+            style = style.Merge(SelectedRowStyle);
+            if (IsFocused)
+            {
+                style = style.Merge(FocusedSelectedRowStyle);
+            }
+        }
+
+        if (IsDisabled)
+        {
+            style = style.Merge(DisabledStyle);
+        }
+
         return style;
     }
 
@@ -394,7 +515,10 @@ public sealed class ProcessListView : Control
         return Title;
     }
 
-    private bool HasTitle() => !string.IsNullOrWhiteSpace(Title);
+    private bool HasTitle()
+    {
+        return !string.IsNullOrWhiteSpace(Title);
+    }
 
     private string BuildHeader()
     {
@@ -441,7 +565,7 @@ public sealed class ProcessListView : Control
             ProcessListStatus.Sleeping => "SLP",
             ProcessListStatus.Stopped => "STP",
             ProcessListStatus.Zombie => "ZMB",
-            _ => "UNK",
+            _ => "UNK"
         };
     }
 
@@ -457,13 +581,17 @@ public sealed class ProcessListView : Control
         return new ProcessListEntry(entry.Pid, entry.Name, entry.Status, entry.CpuPercent, entry.MemoryMb)
         {
             IsMuted = entry.IsMuted,
-            Style = entry.Style,
+            Style = entry.Style
         };
     }
 
     private static void WriteStyledText(Canvas canvas, int x, int y, string text, TesseraStyle style, int width)
     {
-        if (width <= 0) return;
+        if (width <= 0)
+        {
+            return;
+        }
+
         canvas.WriteText(x, y, style.IsEmpty ? text : style.Render(text), width);
     }
 }

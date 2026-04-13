@@ -17,10 +17,10 @@ public sealed class SchedulerTimelineControlTests
         control.SetEntries(
         [
             new SchedulerEntry("b", "Standup", day.AddHours(9), day.AddHours(10)),
-            new SchedulerEntry("a", "Prep", day.AddHours(8), day.AddHours(8).AddMinutes(30)),
+            new SchedulerEntry("a", "Prep", day.AddHours(8), day.AddHours(8).AddMinutes(30))
         ]);
 
-        var output = Render(control, width: 72, height: 8);
+        var output = Render(control, 72, 8);
 
         var firstIndex = output.IndexOf("08:00-08:30", StringComparison.Ordinal);
         var secondIndex = output.IndexOf("09:00-10:00", StringComparison.Ordinal);
@@ -33,15 +33,12 @@ public sealed class SchedulerTimelineControlTests
     public void SchedulerTimelineKeyboardSelectionRaisesEvent()
     {
         var day = new DateTimeOffset(2026, 3, 21, 0, 0, 0, TimeSpan.Zero);
-        var control = new SchedulerTimeline
-        {
-            IsFocused = true,
-        };
+        var control = new SchedulerTimeline { IsFocused = true };
         control.SetEntries(
         [
             new SchedulerEntry("a", "Prep", day.AddHours(8), day.AddHours(8).AddMinutes(30)),
             new SchedulerEntry("b", "Standup", day.AddHours(9), day.AddHours(10)),
-            new SchedulerEntry("c", "Review", day.AddHours(11), day.AddHours(12)),
+            new SchedulerEntry("c", "Review", day.AddHours(11), day.AddHours(12))
         ]);
 
         var raised = false;
@@ -71,13 +68,13 @@ public sealed class SchedulerTimelineControlTests
         control.SetEntries(
         [
             new SchedulerEntry("a", "Deploy", day.AddHours(9), day.AddHours(10)),
-            new SchedulerEntry("b", "Overlap", day.AddHours(9).AddMinutes(30), day.AddHours(10).AddMinutes(30)),
+            new SchedulerEntry("b", "Overlap", day.AddHours(9).AddMinutes(30), day.AddHours(10).AddMinutes(30))
         ]);
 
         var handled = control.Handle(
-            new PointerInput(PointerEventKind.Press, PointerButton.Left, X: 8, Y: 2),
+            new PointerInput(PointerEventKind.Press, PointerButton.Left, 8, 2),
             new Rect(0, 0, 72, 8));
-        var output = Render(control, width: 72, height: 8);
+        var output = Render(control, 72, 8);
 
         Assert.That(handled, Is.True);
         Assert.That(control.SelectedIndex, Is.EqualTo(1));
@@ -90,16 +87,16 @@ public sealed class SchedulerTimelineControlTests
         var day = new DateTimeOffset(2026, 3, 21, 0, 0, 0, TimeSpan.Zero);
         var control = new SchedulerTimeline
         {
-            SelectedRowStyle = TesseraStyle.Empty.WithForeground(AnsiColor.Rgb(90, 120, 210)),
+            SelectedRowStyle = TesseraStyle.Empty.WithForeground(AnsiColor.Rgb(90, 120, 210))
         };
         control.SetEntries(
         [
             new SchedulerEntry("a", "Prep", day.AddHours(8), day.AddHours(8).AddMinutes(30)),
-            new SchedulerEntry("b", "Standup", day.AddHours(9), day.AddHours(10)),
+            new SchedulerEntry("b", "Standup", day.AddHours(9), day.AddHours(10))
         ]);
         control.Select(1);
 
-        var output = Render(control, width: 72, height: 8);
+        var output = Render(control, 72, 8);
 
         Assert.That(output.Contains("38;2;90;120;210", StringComparison.Ordinal), Is.True);
     }
@@ -112,7 +109,7 @@ public sealed class SchedulerTimelineControlTests
         control.SetEntries(
         [
             new SchedulerEntry("a", "Prep", day.AddHours(8), day.AddHours(8).AddMinutes(30)),
-            new SchedulerEntry("b", "Standup", day.AddHours(9), day.AddHours(10)),
+            new SchedulerEntry("b", "Standup", day.AddHours(9), day.AddHours(10))
         ]);
         var bounds = new Rect(0, 0, 72, 8);
         var firstCanvas = new Canvas(72, 8);
@@ -124,7 +121,7 @@ public sealed class SchedulerTimelineControlTests
         var second = secondCanvas.Render();
 
         Assert.That(first, Is.EqualTo(second));
-        Assert.That(first.Contains("\u001b[", StringComparison.Ordinal), Is.False);
+        Assert.That(first.Contains("\e[", StringComparison.Ordinal), Is.False);
     }
 
     private static string Render(SchedulerTimeline control, int width, int height)

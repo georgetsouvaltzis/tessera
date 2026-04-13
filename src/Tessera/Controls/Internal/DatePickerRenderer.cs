@@ -1,7 +1,7 @@
+using System.Globalization;
 using Tessera.Components.Primitives;
 using Tessera.Components.Primitives.Internal;
 using Tessera.Components.Styling;
-using System.Globalization;
 
 namespace Tessera.Controls.Internal;
 
@@ -63,7 +63,7 @@ internal static class DatePickerRenderer
         var startOffset = ((int)first.DayOfWeek + 6) % 7;
         var daysInMonth = DateTime.DaysInMonth(currentMonth.Year, currentMonth.Month);
         var day = 1;
-        for (var row = 0; row < 6 && (content.Y + 2 + row) < content.Bottom; row++)
+        for (var row = 0; row < 6 && content.Y + 2 + row < content.Bottom; row++)
         {
             for (var col = 0; col < 7; col++)
             {
@@ -73,7 +73,7 @@ internal static class DatePickerRenderer
                     continue;
                 }
 
-                var x = content.X + (col * 3);
+                var x = content.X + col * 3;
                 if (x + 1 >= content.Right)
                 {
                     continue;

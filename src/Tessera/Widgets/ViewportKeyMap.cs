@@ -25,6 +25,6 @@ internal sealed class ViewportKeyMap : IWidgetKeyMap
         Left,
         Right,
         Home,
-        End,
+        End
     ];
 }

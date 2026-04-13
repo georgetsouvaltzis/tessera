@@ -52,7 +52,8 @@ internal sealed class TransferQueueControl : Control
         var title = FormatTitle();
         if (!string.IsNullOrEmpty(title))
         {
-            canvas.WriteText(clipped.X + 2, clipped.Y, ApplyStyle(title, IsFocused ? FocusedTitleStyle : TitleStyle), Math.Max(0, clipped.Width - 4));
+            canvas.WriteText(clipped.X + 2, clipped.Y, ApplyStyle(title, IsFocused ? FocusedTitleStyle : TitleStyle),
+                Math.Max(0, clipped.Width - 4));
         }
 
         var y = content.Y;
@@ -116,7 +117,7 @@ internal sealed class TransferQueueControl : Control
             DownloadJobPhase.Active or DownloadJobPhase.Verifying => ActiveStyle,
             DownloadJobPhase.Retrying or DownloadJobPhase.Failed => RetryStyle,
             DownloadJobPhase.Completed => CompleteStyle,
-            _ => QueuedStyle,
+            _ => QueuedStyle
         };
     }
 
@@ -130,7 +131,7 @@ internal sealed class TransferQueueControl : Control
             DownloadJobPhase.Failed => "!",
             DownloadJobPhase.Completed => "✓",
             DownloadJobPhase.Paused => "‖",
-            _ => "·",
+            _ => "·"
         };
     }
 

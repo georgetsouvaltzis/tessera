@@ -2,7 +2,7 @@ namespace Tessera.Core.Rendering;
 
 internal sealed class DisplayLine(string?[] cells, string?[] styles)
 {
-    private const string ContinuationMarker = "\u0000";
+    private const string ContinuationMarker = "\0";
     private readonly string?[] _cells = cells;
     private readonly string?[] _styles = styles;
 

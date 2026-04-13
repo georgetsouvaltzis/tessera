@@ -76,16 +76,21 @@ public sealed partial class DataForm<TModel>
         var width = Math.Max(24, labelWidth + 18 + Padding.Horizontal + (Border == BorderStyle.None ? 0 : 2));
         if (ShouldRenderInlineTitle() || !string.IsNullOrWhiteSpace(Title))
         {
-            width = Math.Max(width, ControlTextLayout.MeasureDisplayWidth(RenderTitleText()) + Padding.Horizontal + (Border == BorderStyle.None ? 0 : 2));
+            width = Math.Max(width,
+                ControlTextLayout.MeasureDisplayWidth(RenderTitleText()) + Padding.Horizontal +
+                (Border == BorderStyle.None ? 0 : 2));
         }
 
-        var height = Math.Max(1, _fields.Count) + 1 + (ShouldRenderInlineTitle() ? 1 : 0) + Padding.Vertical + (Border == BorderStyle.None ? 0 : 2);
-        return new LayoutMeasurement(Math.Clamp(width, 0, availableBounds.Width), Math.Clamp(height, 0, availableBounds.Height));
+        var height = Math.Max(1, _fields.Count) + 1 + (ShouldRenderInlineTitle() ? 1 : 0) + Padding.Vertical +
+                     (Border == BorderStyle.None ? 0 : 2);
+        return new LayoutMeasurement(Math.Clamp(width, 0, availableBounds.Width),
+            Math.Clamp(height, 0, availableBounds.Height));
     }
 
-    private void RenderFieldRow(Canvas canvas, int x, int y, int width, int labelWidth, int index, DataFormField<TModel> field)
+    private void RenderFieldRow(Canvas canvas, int x, int y, int width, int labelWidth, int index,
+        DataFormField<TModel> field)
     {
-        var marker = index == _selectedIndex ? SelectedMarker : UnselectedMarker;
+        var marker = index == SelectedIndex ? SelectedMarker : UnselectedMarker;
         var label = NormalizeSingleLine(field.Label).PadRight(labelWidth);
         var prefix = string.Concat(marker, " ", label, FieldSeparatorText);
         var prefixStyle = ResolvePrefixStyle(index, field);
@@ -131,9 +136,9 @@ public sealed partial class DataForm<TModel>
             return true;
         }
 
-        if (!string.IsNullOrWhiteSpace(_lastCommitError))
+        if (!string.IsNullOrWhiteSpace(LastCommitError))
         {
-            text = string.Concat("! Validation failed: ", _lastCommitError);
+            text = string.Concat("! Validation failed: ", LastCommitError);
             style = SelectedFieldStyle.Merge(FocusedSelectedFieldStyle).Merge(ErrorStyle);
             return true;
         }
@@ -145,7 +150,7 @@ public sealed partial class DataForm<TModel>
             return false;
         }
 
-        if (_isEditing)
+        if (IsEditing)
         {
             text = string.Concat("Editing ", NormalizeSingleLine(SelectedField.Label), ". Enter commits, Esc cancels.");
             style = ValueStyle.Merge(FocusedSelectedFieldStyle);
@@ -182,7 +187,10 @@ public sealed partial class DataForm<TModel>
         return ShouldRenderInlineTitle() ? content.Y + 1 : content.Y;
     }
 
-    private bool ShouldRenderInlineTitle() => Border == BorderStyle.None && !string.IsNullOrWhiteSpace(Title);
+    private bool ShouldRenderInlineTitle()
+    {
+        return Border == BorderStyle.None && !string.IsNullOrWhiteSpace(Title);
+    }
 
     private int ResolveLabelWidth()
     {
@@ -197,10 +205,10 @@ public sealed partial class DataForm<TModel>
 
     private string ResolveDisplayedValue(int index, DataFormField<TModel> field, out bool isPlaceholder)
     {
-        if (index == _selectedIndex && _isEditing)
+        if (index == SelectedIndex && IsEditing)
         {
             isPlaceholder = false;
-            return string.Concat(_editBuffer, "|");
+            return string.Concat(EditBuffer, "|");
         }
 
         if (Model is null)
@@ -229,13 +237,13 @@ public sealed partial class DataForm<TModel>
             return;
         }
 
-        if (_selectedIndex < _scrollOffset)
+        if (SelectedIndex < _scrollOffset)
         {
-            _scrollOffset = _selectedIndex;
+            _scrollOffset = SelectedIndex;
         }
-        else if (_selectedIndex >= _scrollOffset + viewportRows)
+        else if (SelectedIndex >= _scrollOffset + viewportRows)
         {
-            _scrollOffset = _selectedIndex - viewportRows + 1;
+            _scrollOffset = SelectedIndex - viewportRows + 1;
         }
 
         _scrollOffset = Math.Clamp(_scrollOffset, 0, Math.Max(0, _fields.Count - viewportRows));
@@ -266,7 +274,7 @@ public sealed partial class DataForm<TModel>
             style = style.Merge(HoveredFieldStyle);
         }
 
-        if (index == _selectedIndex && !_isEditing)
+        if (index == SelectedIndex && !IsEditing)
         {
             style = style.Merge(SelectedFieldStyle);
             if (IsFocused)
@@ -291,12 +299,12 @@ public sealed partial class DataForm<TModel>
             style = style.Merge(ReadOnlyFieldStyle);
         }
 
-        if (index == _hoveredIndex && !(index == _selectedIndex && _isEditing))
+        if (index == _hoveredIndex && !(index == SelectedIndex && IsEditing))
         {
             style = style.Merge(HoveredFieldStyle);
         }
 
-        if (index == _selectedIndex && _isEditing)
+        if (index == SelectedIndex && IsEditing)
         {
             style = style.Merge(SelectedFieldStyle);
             if (IsFocused)
@@ -311,7 +319,7 @@ public sealed partial class DataForm<TModel>
         }
 
         style = style.Merge(isPlaceholder ? PlaceholderStyle : ValueStyle);
-        if (index == _selectedIndex && !string.IsNullOrWhiteSpace(_lastCommitError))
+        if (index == SelectedIndex && !string.IsNullOrWhiteSpace(LastCommitError))
         {
             style = style.Merge(ErrorStyle);
         }
@@ -343,12 +351,13 @@ public sealed partial class DataForm<TModel>
 
     private void RaiseSelectionChangedIfNeeded(int previousIndex, DataFormField<TModel>? previousField)
     {
-        if (previousIndex == _selectedIndex && ReferenceEquals(previousField, SelectedField))
+        if (previousIndex == SelectedIndex && ReferenceEquals(previousField, SelectedField))
         {
             return;
         }
 
-        SelectionChanged?.Invoke(this, new DataFormSelectionChangedEventArgs<TModel>(previousIndex, _selectedIndex, previousField, SelectedField));
+        SelectionChanged?.Invoke(this,
+            new DataFormSelectionChangedEventArgs<TModel>(previousIndex, SelectedIndex, previousField, SelectedField));
     }
 
     private static string NormalizeSingleLine(string? value)

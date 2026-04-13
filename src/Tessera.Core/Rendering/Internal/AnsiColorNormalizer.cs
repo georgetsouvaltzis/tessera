@@ -1,3 +1,5 @@
+using System.Globalization;
+
 namespace Tessera.Core.Rendering.Internal;
 
 internal static class AnsiColorNormalizer
@@ -34,17 +36,17 @@ internal static class AnsiColorNormalizer
         }
 
         if (value.Length == 3
-            && byte.TryParse(new string(value[0], 2), System.Globalization.NumberStyles.HexNumber, null, out var shortR)
-            && byte.TryParse(new string(value[1], 2), System.Globalization.NumberStyles.HexNumber, null, out var shortG)
-            && byte.TryParse(new string(value[2], 2), System.Globalization.NumberStyles.HexNumber, null, out var shortB))
+            && byte.TryParse(new string(value[0], 2), NumberStyles.HexNumber, null, out var shortR)
+            && byte.TryParse(new string(value[1], 2), NumberStyles.HexNumber, null, out var shortG)
+            && byte.TryParse(new string(value[2], 2), NumberStyles.HexNumber, null, out var shortB))
         {
             return $"#{shortR:X2}{shortG:X2}{shortB:X2}";
         }
 
         if (value.Length == 6
-            && byte.TryParse(value[..2], System.Globalization.NumberStyles.HexNumber, null, out var r6)
-            && byte.TryParse(value[2..4], System.Globalization.NumberStyles.HexNumber, null, out var g6)
-            && byte.TryParse(value[4..], System.Globalization.NumberStyles.HexNumber, null, out var b6))
+            && byte.TryParse(value[..2], NumberStyles.HexNumber, null, out var r6)
+            && byte.TryParse(value[2..4], NumberStyles.HexNumber, null, out var g6)
+            && byte.TryParse(value[4..], NumberStyles.HexNumber, null, out var b6))
         {
             return $"#{r6:X2}{g6:X2}{b6:X2}";
         }
@@ -61,7 +63,7 @@ internal static class AnsiColorNormalizer
             return false;
         }
 
-        if (!ushort.TryParse(normalized, System.Globalization.NumberStyles.HexNumber, null, out var parsed))
+        if (!ushort.TryParse(normalized, NumberStyles.HexNumber, null, out var parsed))
         {
             return false;
         }
@@ -73,7 +75,7 @@ internal static class AnsiColorNormalizer
         }
 
         var max = normalized.Length == 3 ? 0x0FFFu : 0xFFFFu;
-        result = (byte)Math.Round((parsed / (double)max) * 255d, MidpointRounding.AwayFromZero);
+        result = (byte)Math.Round(parsed / (double)max * 255d, MidpointRounding.AwayFromZero);
         return true;
     }
 }

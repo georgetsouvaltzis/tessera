@@ -4,80 +4,98 @@ using Tessera.Internal;
 namespace Tessera.Hosting;
 
 /// <summary>
-/// Wraps the built-in ANSI diff renderer for advanced Tessera hosting scenarios.
+///     Wraps the built-in ANSI diff renderer for advanced Tessera hosting scenarios.
 /// </summary>
 [EditorBrowsable(EditorBrowsableState.Advanced)]
 public sealed class AnsiDiffRenderer : IProgramRenderer
 {
-    private readonly global::Tessera.Core.Rendering.AnsiDiffRenderer _inner;
+    private readonly Core.Rendering.AnsiDiffRenderer _inner;
 
     /// <summary>
-    /// Initializes a hosting renderer wrapper over the built-in ANSI diff renderer.
+    ///     Initializes a hosting renderer wrapper over the built-in ANSI diff renderer.
     /// </summary>
     public AnsiDiffRenderer(
         TerminalCapabilityProfile? capabilities = null,
         AnsiRendererOptions? options = null)
     {
-        _inner = new global::Tessera.Core.Rendering.AnsiDiffRenderer(capabilities?.ToCore(), options?.ToCore());
+        _inner = new Core.Rendering.AnsiDiffRenderer(capabilities?.ToCore(), options?.ToCore());
     }
 
     /// <summary>
-    /// Initializes the renderer against the supplied terminal output stream.
+    ///     Initializes the renderer against the supplied terminal output stream.
     /// </summary>
     /// <param name="output">The output stream to write ANSI sequences to.</param>
     /// <param name="cancellationToken">Cancels initialization.</param>
     /// <returns>A task that completes when initialization finishes.</returns>
-    public ValueTask InitializeAsync(Stream output, CancellationToken cancellationToken) =>
-        _inner.InitializeAsync(output, cancellationToken);
+    public ValueTask InitializeAsync(Stream output, CancellationToken cancellationToken)
+    {
+        return _inner.InitializeAsync(output, cancellationToken);
+    }
 
     /// <summary>
-    /// Updates the renderer with the latest terminal dimensions.
+    ///     Updates the renderer with the latest terminal dimensions.
     /// </summary>
     /// <param name="width">The width in columns.</param>
     /// <param name="height">The height in rows.</param>
-    public void Resize(int width, int height) => _inner.Resize(width, height);
+    public void Resize(int width, int height)
+    {
+        _inner.Resize(width, height);
+    }
 
     /// <summary>
-    /// Applies the latest detected terminal capability profile.
+    ///     Applies the latest detected terminal capability profile.
     /// </summary>
     /// <param name="capabilities">The terminal capability profile.</param>
-    public void UpdateCapabilities(TerminalCapabilityProfile capabilities) =>
+    public void UpdateCapabilities(TerminalCapabilityProfile capabilities)
+    {
         _inner.UpdateCapabilities(capabilities.ToCore());
+    }
 
     /// <summary>
-    /// Renders the next composed frame.
+    ///     Renders the next composed frame.
     /// </summary>
     /// <param name="output">The composed render output.</param>
-    public void Render(RenderOutput output) =>
+    public void Render(RenderOutput output)
+    {
         _inner.Render(output.ToCore());
+    }
 
     /// <summary>
-    /// Writes raw terminal content without diffing.
+    ///     Writes raw terminal content without diffing.
     /// </summary>
     /// <param name="content">The terminal content to write directly.</param>
     /// <param name="cancellationToken">Cancels the write.</param>
     /// <returns>A task that completes when the write finishes.</returns>
-    public ValueTask WriteRawAsync(string content, CancellationToken cancellationToken) =>
-        _inner.WriteRawAsync(content, cancellationToken);
+    public ValueTask WriteRawAsync(string content, CancellationToken cancellationToken)
+    {
+        return _inner.WriteRawAsync(content, cancellationToken);
+    }
 
     /// <summary>
-    /// Flushes pending terminal output.
+    ///     Flushes pending terminal output.
     /// </summary>
     /// <param name="cancellationToken">Cancels the flush.</param>
     /// <returns>A task that completes when flushing finishes.</returns>
-    public ValueTask FlushAsync(CancellationToken cancellationToken) =>
-        _inner.FlushAsync(cancellationToken);
+    public ValueTask FlushAsync(CancellationToken cancellationToken)
+    {
+        return _inner.FlushAsync(cancellationToken);
+    }
 
     /// <summary>
-    /// Resets renderer-owned terminal state.
+    ///     Resets renderer-owned terminal state.
     /// </summary>
     /// <param name="cancellationToken">Cancels the reset.</param>
     /// <returns>A task that completes when reset finishes.</returns>
-    public ValueTask ResetAsync(CancellationToken cancellationToken) =>
-        _inner.ResetAsync(cancellationToken);
+    public ValueTask ResetAsync(CancellationToken cancellationToken)
+    {
+        return _inner.ResetAsync(cancellationToken);
+    }
 
     /// <summary>
-    /// Disposes the renderer.
+    ///     Disposes the renderer.
     /// </summary>
-    public ValueTask DisposeAsync() => _inner.DisposeAsync();
+    public ValueTask DisposeAsync()
+    {
+        return _inner.DisposeAsync();
+    }
 }

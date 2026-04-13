@@ -4,15 +4,20 @@ namespace Tessera.Tests;
 
 internal static class PublicOnboardingExamplesTests
 {
-    private static readonly Regex TesseraCoreImportRegex = new(@"(?m)^\s*using\s+.*Tessera\.Core.*;", RegexOptions.Compiled);
-    private static readonly Regex TesseraHostingImportRegex = new(@"(?m)^\s*using\s+.*Tessera\.Hosting.*;", RegexOptions.Compiled);
-    private static readonly Regex DependencyInjectionImportRegex = new(@"(?m)^\s*using\s+.*Microsoft\.Extensions\.DependencyInjection.*;", RegexOptions.Compiled);
+    private static readonly Regex TesseraCoreImportRegex =
+        new(@"(?m)^\s*using\s+.*Tessera\.Core.*;", RegexOptions.Compiled);
+
+    private static readonly Regex TesseraHostingImportRegex =
+        new(@"(?m)^\s*using\s+.*Tessera\.Hosting.*;", RegexOptions.Compiled);
+
+    private static readonly Regex DependencyInjectionImportRegex =
+        new(@"(?m)^\s*using\s+.*Microsoft\.Extensions\.DependencyInjection.*;", RegexOptions.Compiled);
 
     private static readonly string[] OnboardingExampleProjectPaths =
     [
         "examples/HelloWorld/HelloWorld.csproj",
         "examples/CounterForm/CounterForm.csproj",
-        "examples/WorkspaceApp/WorkspaceApp.csproj",
+        "examples/WorkspaceApp/WorkspaceApp.csproj"
     ];
 
     public static IEnumerable<TestCase> Cases()
@@ -76,7 +81,8 @@ internal static class PublicOnboardingExamplesTests
     {
         var repoRoot = GetRepoRoot();
         var offenders = OnboardingExampleProjectPaths
-            .Where(path => File.ReadAllText(Path.Combine(repoRoot, path)).Contains("Tessera.Core.csproj", StringComparison.Ordinal))
+            .Where(path => File.ReadAllText(Path.Combine(repoRoot, path))
+                .Contains("Tessera.Core.csproj", StringComparison.Ordinal))
             .ToArray();
 
         TestAssert.True(
@@ -102,7 +108,7 @@ internal static class PublicOnboardingExamplesTests
     private static string GetRepoRoot()
     {
         var start = Path.GetDirectoryName(typeof(PublicOnboardingExamplesTests).Assembly.Location)
-            ?? AppContext.BaseDirectory;
+                    ?? AppContext.BaseDirectory;
         var directory = new DirectoryInfo(start);
 
         while (directory is not null)

@@ -1,28 +1,28 @@
 namespace Tessera.Controls;
 
 /// <summary>
-/// Identifies a requested search navigation direction.
+///     Identifies a requested search navigation direction.
 /// </summary>
 public enum SearchNavigationDirection
 {
     /// <summary>
-    /// Navigate to the next match.
+    ///     Navigate to the next match.
     /// </summary>
     Next = 0,
 
     /// <summary>
-    /// Navigate to the previous match.
+    ///     Navigate to the previous match.
     /// </summary>
-    Previous = 1,
+    Previous = 1
 }
 
 /// <summary>
-/// Provides details when a search navigation command is requested.
+///     Provides details when a search navigation command is requested.
 /// </summary>
 public sealed class SearchBoxNavigationRequestedEventArgs : EventArgs
 {
     /// <summary>
-    /// Initializes a new navigation request payload.
+    ///     Initializes a new navigation request payload.
     /// </summary>
     /// <param name="direction">The navigation direction that was requested.</param>
     /// <param name="previousMatchIndex">The match index before navigation.</param>
@@ -41,22 +41,22 @@ public sealed class SearchBoxNavigationRequestedEventArgs : EventArgs
     }
 
     /// <summary>
-    /// Gets the requested navigation direction.
+    ///     Gets the requested navigation direction.
     /// </summary>
     public SearchNavigationDirection Direction { get; }
 
     /// <summary>
-    /// Gets the match index before navigation.
+    ///     Gets the match index before navigation.
     /// </summary>
     public int? PreviousMatchIndex { get; }
 
     /// <summary>
-    /// Gets the match index after navigation.
+    ///     Gets the match index after navigation.
     /// </summary>
     public int? CurrentMatchIndex { get; }
 
     /// <summary>
-    /// Gets the known total match count, when available.
+    ///     Gets the known total match count, when available.
     /// </summary>
     public int? MatchCount { get; }
 }

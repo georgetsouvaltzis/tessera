@@ -1,6 +1,5 @@
 using NUnit.Framework;
 using Tessera.Components.Primitives;
-using Tessera.Components.Styling;
 using Tessera.Controls;
 using Tessera.Styles;
 
@@ -60,7 +59,7 @@ public sealed class AutocompleteInputControlTests
         control.SuggestionCommitted += (_, eventArgs) => args = eventArgs;
 
         var bounds = new Rect(0, 0, 30, 6);
-        var handled = control.Handle(new PointerInput(PointerEventKind.Press, PointerButton.Left, X: 2, Y: 2), bounds);
+        var handled = control.Handle(new PointerInput(PointerEventKind.Press, PointerButton.Left, 2, 2), bounds);
 
         Assert.That(handled, Is.True);
         Assert.That(control.Text, Is.EqualTo("health"));
@@ -88,7 +87,7 @@ public sealed class AutocompleteInputControlTests
         control.Text = "b";
         control.SetSelectedSuggestionIndex(1);
 
-        var output = Render(control, width: 40, height: 8);
+        var output = Render(control, 40, 8);
 
         Assert.That(output.Contains("AC !", StringComparison.Ordinal), Is.True);
         Assert.That(output.Contains('!'), Is.True);
@@ -108,21 +107,18 @@ public sealed class AutocompleteInputControlTests
         control.SetSuggestions(["alpha", "beta"]);
         control.Text = "b";
 
-        var first = Render(control, width: 24, height: 6);
-        var second = Render(control, width: 24, height: 6);
+        var first = Render(control, 24, 6);
+        var second = Render(control, 24, 6);
 
         Assert.That(first, Is.EqualTo(second));
-        Assert.That(first.Contains("\u001b[", StringComparison.Ordinal), Is.False);
+        Assert.That(first.Contains("\e[", StringComparison.Ordinal), Is.False);
         Assert.That(first.Contains('>'), Is.True);
         Assert.That(first.Contains('↵'), Is.True);
     }
 
     private static AutocompleteInput CreateControl()
     {
-        return new AutocompleteInput
-        {
-            Placeholder = "Search...",
-        };
+        return new AutocompleteInput { Placeholder = "Search..." };
     }
 
     private static string Render(AutocompleteInput control, int width, int height)

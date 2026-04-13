@@ -7,9 +7,9 @@ namespace Tessera.Core.Terminal.Adapters;
 [EditorBrowsable(EditorBrowsableState.Advanced)]
 internal sealed class ConsoleTerminalAdapter : ITerminalAdapter
 {
-    private readonly bool _treatControlAsInputOriginal;
     private readonly bool _ownsInput;
     private readonly bool _ownsOutput;
+    private readonly bool _treatControlAsInputOriginal;
     private readonly UnixRawModeSession _unixRawMode = new();
     private uint _originalInputMode;
     private uint _originalOutputMode;
@@ -43,6 +43,12 @@ internal sealed class ConsoleTerminalAdapter : ITerminalAdapter
         _treatControlAsInputOriginal = Console.TreatControlCAsInput;
     }
 
+    public bool IsRawModeActive => _unixRawMode.IsRawModeActive;
+
+    public string RawModeDiagnostics => _unixRawMode.RawModeDiagnostics;
+
+    public string RawModeError => _unixRawMode.RawModeError;
+
     public Stream Input { get; }
 
     public Stream Output { get; }
@@ -50,12 +56,6 @@ internal sealed class ConsoleTerminalAdapter : ITerminalAdapter
     public bool IsInputInteractive { get; }
 
     public bool IsOutputInteractive { get; }
-
-    public bool IsRawModeActive => _unixRawMode.IsRawModeActive;
-
-    public string RawModeDiagnostics => _unixRawMode.RawModeDiagnostics;
-
-    public string RawModeError => _unixRawMode.RawModeError;
 
     public ValueTask PrepareAsync(CancellationToken cancellationToken)
     {
@@ -142,7 +142,7 @@ internal sealed class ConsoleTerminalAdapter : ITerminalAdapter
                     continue;
                 }
 
-                var key = Console.ReadKey(intercept: true);
+                var key = Console.ReadKey(true);
                 if (ConsoleClipboardReader.IsPasteShortcut(key)
                     && ConsoleClipboardReader.TryReadText(out var clipboard)
                     && !string.IsNullOrEmpty(clipboard))

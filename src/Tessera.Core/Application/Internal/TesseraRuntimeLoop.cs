@@ -16,25 +16,26 @@ internal sealed class TesseraRuntimeLoop(
     {
         SingleReader = true,
         SingleWriter = false,
-        AllowSynchronousContinuations = true,
+        AllowSynchronousContinuations = true
     };
 
     private static readonly UnboundedChannelOptions EffectChannelOptions = new()
     {
         SingleReader = true,
         SingleWriter = true,
-        AllowSynchronousContinuations = true,
+        AllowSynchronousContinuations = true
     };
 
-    private readonly Func<Effect?>? _initialize = initialize;
-    private readonly Func<IMessage, Effect?> _update = update ?? throw new ArgumentNullException(nameof(update));
-    private readonly Func<ScreenOutput> _render = render ?? throw new ArgumentNullException(nameof(render));
-    private readonly TesseraRuntimeLoopOptions _options = options ?? new TesseraRuntimeLoopOptions();
-    private readonly Channel<IMessage> _messages = Channel.CreateUnbounded<IMessage>(MessageChannelOptions);
-    private readonly Channel<Effect> _effects = Channel.CreateUnbounded<Effect>(EffectChannelOptions);
-    private readonly object _stateLock = new();
     private readonly TesseraCapabilityProbe _capabilityProbe = new();
+    private readonly Channel<Effect> _effects = Channel.CreateUnbounded<Effect>(EffectChannelOptions);
+
+    private readonly Func<Effect?>? _initialize = initialize;
+    private readonly Channel<IMessage> _messages = Channel.CreateUnbounded<IMessage>(MessageChannelOptions);
+    private readonly TesseraRuntimeLoopOptions _options = options ?? new TesseraRuntimeLoopOptions();
+    private readonly Func<ScreenOutput> _render = render ?? throw new ArgumentNullException(nameof(render));
     private readonly TesseraRuntimeState _runtime = new();
+    private readonly object _stateLock = new();
+    private readonly Func<IMessage, Effect?> _update = update ?? throw new ArgumentNullException(nameof(update));
     private CancellationTokenSource? _cts;
     private bool _running;
 
@@ -46,9 +47,15 @@ internal sealed class TesseraRuntimeLoop(
         }
     }
 
-    public Task RunAsync(CancellationToken cancellationToken = default) => RunLoopAsync(cancellationToken);
+    public Task RunAsync(CancellationToken cancellationToken = default)
+    {
+        return RunLoopAsync(cancellationToken);
+    }
 
-    public Task StopAsync(bool kill = false, CancellationToken cancellationToken = default) => StopLoopAsync(kill, cancellationToken);
+    public Task StopAsync(bool kill = false, CancellationToken cancellationToken = default)
+    {
+        return StopLoopAsync(kill, cancellationToken);
+    }
 
     private async Task RunLoopAsync(CancellationToken cancellationToken)
     {
@@ -71,11 +78,11 @@ internal sealed class TesseraRuntimeLoop(
         {
             _runtime.Terminal = _options.Terminal ?? new ConsoleTerminalAdapter();
             _runtime.Capabilities = _options.TerminalCapabilities
-                ?? _options.TerminalCapabilityDetector?.Invoke()
-                ?? TerminalCapabilityDetector.Detect();
+                                    ?? _options.TerminalCapabilityDetector?.Invoke()
+                                    ?? TerminalCapabilityDetector.Detect();
             _runtime.ColorProfile = _options.ColorProfile
-                ?? _options.ColorProfileDetector?.Invoke()
-                ?? TerminalColorProfileDetector.Detect();
+                                    ?? _options.ColorProfileDetector?.Invoke()
+                                    ?? TerminalColorProfileDetector.Detect();
             _runtime.Renderer = _options.DisableRenderer
                 ? new NullRenderer()
                 : _options.Renderer ?? new AnsiDiffRenderer(_runtime.Capabilities, _options.AnsiRendererOptions);
@@ -93,12 +100,14 @@ internal sealed class TesseraRuntimeLoop(
                 var size = await _runtime.Terminal.GetSizeAsync(token).ConfigureAwait(false);
                 _runtime.Renderer.Resize(size.Width, size.Height);
                 Send(new WindowSizeMsg(size.Width, size.Height));
-                (resizeLoop, resizeSignalRegistration) = TesseraResizeMonitor.Start(_runtime.Terminal, _options, size, Send, token);
+                (resizeLoop, resizeSignalRegistration) =
+                    TesseraResizeMonitor.Start(_runtime.Terminal, _options, size, Send, token);
             }
 
             var commandLoop = Task.Run(() => _runtime.EffectScheduler!.RunLoopAsync(_effects.Reader, token), token);
             var inputLoop = StartInputLoop(token);
-            await _capabilityProbe.StartAsync(_runtime.Terminal, _options, _runtime.Capabilities, Send, token).ConfigureAwait(false);
+            await _capabilityProbe.StartAsync(_runtime.Terminal, _options, _runtime.Capabilities, Send, token)
+                .ConfigureAwait(false);
 
             if (_initialize?.Invoke() is { } initEffect)
             {
@@ -113,7 +122,7 @@ internal sealed class TesseraRuntimeLoop(
             resizeSignalRegistration?.Dispose();
             if (_runtime.Terminal is not null || _runtime.Renderer is not null)
             {
-                await ShutdownAsync(kill: true, CancellationToken.None).ConfigureAwait(false);
+                await ShutdownAsync(true, CancellationToken.None).ConfigureAwait(false);
             }
 
             lock (_stateLock)
@@ -139,7 +148,8 @@ internal sealed class TesseraRuntimeLoop(
         await ShutdownAsync(kill, cancellationToken).ConfigureAwait(false);
     }
 
-    private async Task ProcessMessageLoopAsync(Task commandLoop, Task? inputLoop, Task? resizeLoop, CancellationToken token)
+    private async Task ProcessMessageLoopAsync(Task commandLoop, Task? inputLoop, Task? resizeLoop,
+        CancellationToken token)
     {
         var minFrame = TimeSpan.FromSeconds(1.0 / Math.Clamp(_options.MaxFps, 1, 120));
         var lastRender = DateTimeOffset.UtcNow;
@@ -176,7 +186,7 @@ internal sealed class TesseraRuntimeLoop(
                     }
 
                     await TesseraBackgroundLoops.AwaitAsync(commandLoop, inputLoop, resizeLoop).ConfigureAwait(false);
-                    await ShutdownAsync(kill: false, CancellationToken.None).ConfigureAwait(false);
+                    await ShutdownAsync(false, CancellationToken.None).ConfigureAwait(false);
                     return;
                 }
 
@@ -197,7 +207,8 @@ internal sealed class TesseraRuntimeLoop(
                 }
 
                 if (filtered is ModeReportMsg modeReport
-                    && TesseraCapabilityProbe.TryApplyModeReport(_runtime.Capabilities, modeReport, out var refinedCapabilities))
+                    && TesseraCapabilityProbe.TryApplyModeReport(_runtime.Capabilities, modeReport,
+                        out var refinedCapabilities))
                 {
                     _runtime.Capabilities = refinedCapabilities;
                     _runtime.Renderer?.UpdateCapabilities(refinedCapabilities);
@@ -226,10 +237,6 @@ internal sealed class TesseraRuntimeLoop(
                     token).ConfigureAwait(false);
                 lastRender = renderAttempt.LastRender;
                 pendingRender = renderAttempt.PendingRender;
-                if (renderAttempt.Rendered)
-                {
-                    continue;
-                }
             }
 
             if (_options.AdaptiveFramePacing && pendingRender)
@@ -250,7 +257,7 @@ internal sealed class TesseraRuntimeLoop(
         }
 
         await TesseraBackgroundLoops.AwaitAsync(commandLoop, inputLoop, resizeLoop).ConfigureAwait(false);
-        await ShutdownAsync(kill: false, CancellationToken.None).ConfigureAwait(false);
+        await ShutdownAsync(false, CancellationToken.None).ConfigureAwait(false);
     }
 
     private async Task<bool> TryHandleCommandEnvelopeAsync(IMessage filtered, CancellationToken token)
@@ -291,7 +298,8 @@ internal sealed class TesseraRuntimeLoop(
         }
 
         if (filtered is CapabilityMsg capability
-            && TesseraCapabilityProbe.TryRefineColorProfile(_runtime.ColorProfile, capability, out var refinedColorProfile))
+            && TesseraCapabilityProbe.TryRefineColorProfile(_runtime.ColorProfile, capability,
+                out var refinedColorProfile))
         {
             _runtime.ColorProfile = refinedColorProfile;
             Send(new ColorProfileMsg(refinedColorProfile));
@@ -317,12 +325,14 @@ internal sealed class TesseraRuntimeLoop(
         }
 
         if (_runtime.Terminal is ConsoleTerminalAdapter consoleTerminal
-            && ShouldUseConsoleKeyEventLoop(_options.UseConsoleKeyEvents, consoleTerminal.IsRawModeActive, _runtime.Capabilities))
+            && ShouldUseConsoleKeyEventLoop(_options.UseConsoleKeyEvents, consoleTerminal.IsRawModeActive,
+                _runtime.Capabilities))
         {
             return Task.Run(() => ConsoleTerminalAdapter.StreamConsoleKeyEventsAsync(Send, token), token);
         }
 
-        _runtime.Reader = new TerminalReader(_runtime.Terminal.Input, _options.EventDecoder ?? new EventDecoder(), _options.EscapeTimeout);
+        _runtime.Reader = new TerminalReader(_runtime.Terminal.Input, _options.EventDecoder ?? new EventDecoder(),
+            _options.EscapeTimeout);
         return Task.Run(() => _runtime.Reader.StreamEventsAsync(Send, token), token);
     }
 
@@ -346,9 +356,9 @@ internal sealed class TesseraRuntimeLoop(
     private static bool RequiresCsiInputDecoding(TerminalCapabilityProfile runtimeCapabilities)
     {
         return runtimeCapabilities.MouseReporting
-            || runtimeCapabilities.FocusReporting
-            || runtimeCapabilities.BracketedPaste
-            || runtimeCapabilities.ModeReports;
+               || runtimeCapabilities.FocusReporting
+               || runtimeCapabilities.BracketedPaste
+               || runtimeCapabilities.ModeReports;
     }
 
     private async Task RenderAsync(ScreenOutput output, CancellationToken token)

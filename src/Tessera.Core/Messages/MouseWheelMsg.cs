@@ -1,8 +1,7 @@
-
 namespace Tessera.Core.Messages;
 
 /// <summary>
-/// Represents a mouse wheel event.
+///     Represents a mouse wheel event.
 /// </summary>
 /// <param name="Button">The wheel direction encoded as a mouse button.</param>
 /// <param name="X">The zero-based column position.</param>

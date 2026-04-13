@@ -1,7 +1,7 @@
 namespace Tessera.Controls;
 
 /// <summary>
-/// Represents one entry shown by <see cref="QuickOpenOverlay" />.
+///     Represents one entry shown by <see cref="QuickOpenOverlay" />.
 /// </summary>
 /// <param name="Id">Stable item identifier.</param>
 /// <param name="Label">Primary item label rendered in the row.</param>

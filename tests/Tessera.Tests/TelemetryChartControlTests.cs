@@ -1,6 +1,5 @@
 using NUnit.Framework;
 using Tessera.Components.Primitives;
-using Tessera.Components.Styling;
 using Tessera.Controls;
 using Tessera.Styles;
 
@@ -16,11 +15,11 @@ public sealed class TelemetryChartControlTests
         var control = new TelemetryChart
         {
             Border = BorderStyle.None,
-            Options = new TelemetryChartOptions(RenderMode: TelemetryChartRenderMode.Auto),
+            Options = new TelemetryChartOptions(RenderMode: TelemetryChartRenderMode.Auto)
         };
         control.SetSamples([12, 26, 14, 38, 30, 46, 28, 62, 54, 70, 58, 74]);
 
-        var output = Render(control, width: 14, height: 4);
+        var output = Render(control, 14, 4);
 
         Assert.That(output.Any(IsBrailleCharacter), Is.True);
     }
@@ -31,11 +30,11 @@ public sealed class TelemetryChartControlTests
         var control = new TelemetryChart
         {
             Border = BorderStyle.None,
-            Options = new TelemetryChartOptions(RenderMode: TelemetryChartRenderMode.Area),
+            Options = new TelemetryChartOptions(RenderMode: TelemetryChartRenderMode.Area)
         };
         control.SetSamples([10, 20, 35, 48, 44, 56, 72, 68, 76]);
 
-        var output = Render(control, width: 12, height: 4);
+        var output = Render(control, 12, 4);
 
         Assert.That(output.Any(IsBlockCharacter), Is.True);
         AssertNoEmptyColumns(output, IsBlockCharacter);
@@ -47,19 +46,19 @@ public sealed class TelemetryChartControlTests
         var area = new TelemetryChart
         {
             Border = BorderStyle.None,
-            Options = new TelemetryChartOptions(RenderMode: TelemetryChartRenderMode.Area),
+            Options = new TelemetryChartOptions(RenderMode: TelemetryChartRenderMode.Area)
         };
         var block = new TelemetryChart
         {
             Border = BorderStyle.None,
-            Options = new TelemetryChartOptions(RenderMode: TelemetryChartRenderMode.Block),
+            Options = new TelemetryChartOptions(RenderMode: TelemetryChartRenderMode.Block)
         };
         var samples = new[] { 18d, 32d, 54d, 60d, 46d, 40d, 68d, 74d, 58d, 36d };
         area.SetSamples(samples);
         block.SetSamples(samples);
 
-        var areaOutput = Render(area, width: 12, height: 4);
-        var blockOutput = Render(block, width: 12, height: 4);
+        var areaOutput = Render(area, 12, 4);
+        var blockOutput = Render(block, 12, 4);
 
         Assert.That(CountTraceGlyphs(blockOutput), Is.LessThan(CountTraceGlyphs(areaOutput)));
     }
@@ -70,11 +69,11 @@ public sealed class TelemetryChartControlTests
         var control = new TelemetryChart
         {
             Border = BorderStyle.None,
-            Options = new TelemetryChartOptions(RenderMode: TelemetryChartRenderMode.Auto),
+            Options = new TelemetryChartOptions(RenderMode: TelemetryChartRenderMode.Auto)
         };
         control.SetSamples([8, 16, 14, 28, 22, 44, 40, 60]);
 
-        var output = Render(control, width: 8, height: 1);
+        var output = Render(control, 8, 1);
 
         Assert.That(output.Any(IsBlockCharacter), Is.True);
     }
@@ -92,11 +91,11 @@ public sealed class TelemetryChartControlTests
             FocusMarker = "!",
             ShowFocusMarker = true,
             FocusedTitleStyle = focusedTitle,
-            FocusedBorderStyleText = borderStyle,
+            FocusedBorderStyleText = borderStyle
         };
         control.SetSamples([1, 2, 3, 4, 5]);
 
-        var output = Render(control, width: 24, height: 6);
+        var output = Render(control, 24, 6);
 
         Assert.That(output.Contains(focusedTitle.Render("CPU !"), StringComparison.Ordinal), Is.True);
         Assert.That(output.Contains(borderStyle.Render("┌"), StringComparison.Ordinal), Is.True);
@@ -105,7 +104,7 @@ public sealed class TelemetryChartControlTests
     [Test]
     public void TelemetryChartAppendAndSetSamplesHonorCapacityAndClear()
     {
-        var control = new TelemetryChart(capacity: 4);
+        var control = new TelemetryChart(4);
         control.SetSamples([1, 2, 3, 4, 5, 6]);
         var expectedAfterSet = new[] { 3d, 4d, 5d, 6d };
         Assert.That(control.Samples, Is.EqualTo(expectedAfterSet));
@@ -127,11 +126,11 @@ public sealed class TelemetryChartControlTests
         var control = new TelemetryChart
         {
             Border = BorderStyle.None,
-            Options = new TelemetryChartOptions(ShowStats: true, Legend: "cpu"),
+            Options = new TelemetryChartOptions(true, "cpu")
         };
         control.SetSamples([10, 12, 16, 20]);
 
-        var output = Render(control, width: 24, height: 4);
+        var output = Render(control, 24, 4);
 
         Assert.That(output.Contains("now:20.0", StringComparison.Ordinal), Is.True);
         Assert.That(output.Contains("min:10.0", StringComparison.Ordinal), Is.True);
@@ -145,12 +144,12 @@ public sealed class TelemetryChartControlTests
         var control = new TelemetryChart
         {
             Border = BorderStyle.None,
-            Options = new TelemetryChartOptions(ShowStats: true, Legend: "cpu"),
+            Options = new TelemetryChartOptions(true, "cpu")
         };
         control.SetSamples([10, 12, 16, 20]);
 
-        var output = Render(control, width: 24, height: 4);
-        var lines = output.Split('\n', StringSplitOptions.None)
+        var output = Render(control, 24, 4);
+        var lines = output.Split('\n')
             .Select(static line => line.TrimEnd('\r'))
             .ToArray();
 
@@ -168,16 +167,25 @@ public sealed class TelemetryChartControlTests
         return canvas.Render();
     }
 
-    private static int CountTraceGlyphs(string output) => output.Count(value => IsBrailleCharacter(value) || IsBlockCharacter(value));
+    private static int CountTraceGlyphs(string output)
+    {
+        return output.Count(value => IsBrailleCharacter(value) || IsBlockCharacter(value));
+    }
 
-    private static bool IsBrailleCharacter(char value) => value is >= '\u2801' and <= '\u28FF';
+    private static bool IsBrailleCharacter(char value)
+    {
+        return value is >= '\u2801' and <= '\u28FF';
+    }
 
-    private static bool IsBlockCharacter(char value) => value is '▁' or '▂' or '▃' or '▄' or '▅' or '▆' or '▇' or '█';
+    private static bool IsBlockCharacter(char value)
+    {
+        return value is '▁' or '▂' or '▃' or '▄' or '▅' or '▆' or '▇' or '█';
+    }
 
     private static void AssertNoEmptyColumns(string output, Func<char, bool> predicate)
     {
         var lines = output
-            .Split('\n', StringSplitOptions.None)
+            .Split('\n')
             .Select(static line => line.TrimEnd('\r'))
             .ToArray();
         var width = lines.Max(static line => line.Length);
@@ -202,7 +210,8 @@ public sealed class TelemetryChartControlTests
         Assert.That(first, Is.GreaterThanOrEqualTo(0));
         for (var column = first; column <= last; column++)
         {
-            Assert.That(ColumnContains(lines, column, predicate), Is.True, $"Expected telemetry continuity at column {column}.");
+            Assert.That(ColumnContains(lines, column, predicate), Is.True,
+                $"Expected telemetry continuity at column {column}.");
         }
     }
 

@@ -1,6 +1,5 @@
 using NUnit.Framework;
 using Tessera.Components.Primitives;
-using Tessera.Components.Styling;
 using Tessera.Controls;
 
 namespace Tessera.Tests;
@@ -13,11 +12,7 @@ public sealed class VirtualizedListViewControlTests
     public void VirtualizedListViewRenderUsesResolverForVisibleRowsOnly()
     {
         var resolveCount = 0;
-        var control = new VirtualizedListView<string>
-        {
-            Border = BorderStyle.None,
-            IsFocused = true,
-        };
+        var control = new VirtualizedListView<string> { Border = BorderStyle.None, IsFocused = true };
         control.SetDataSource(
             1000,
             index =>
@@ -27,7 +22,7 @@ public sealed class VirtualizedListViewControlTests
             });
         _ = control.SetSelectedIndex(500);
 
-        var output = Render(control, width: 18, height: 4);
+        var output = Render(control, 18, 4);
 
         Assert.That(output.Contains("> item-500", StringComparison.Ordinal), Is.True);
         Assert.That(resolveCount, Is.EqualTo(4), "Virtualized render should resolve only visible rows.");
@@ -36,11 +31,7 @@ public sealed class VirtualizedListViewControlTests
     [Test]
     public void VirtualizedListViewKeyboardNavigationAndSelectionEvent()
     {
-        var control = new VirtualizedListView<string>
-        {
-            IsFocused = true,
-            Border = BorderStyle.None,
-        };
+        var control = new VirtualizedListView<string> { IsFocused = true, Border = BorderStyle.None };
         control.SetItems(["a", "b", "c", "d", "e"]);
 
         ListSelectionChangedEventArgs<string>? args = null;
@@ -67,10 +58,7 @@ public sealed class VirtualizedListViewControlTests
     [Test]
     public void VirtualizedListViewPointerHoverAndClickSelectsRow()
     {
-        var control = new VirtualizedListView<string>
-        {
-            Border = BorderStyle.SingleLine,
-        };
+        var control = new VirtualizedListView<string> { Border = BorderStyle.SingleLine };
         control.SetItems(["alpha", "beta", "gamma", "delta"]);
         var bounds = new Rect(0, 0, 24, 6);
 

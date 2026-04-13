@@ -6,7 +6,7 @@ public sealed partial class JsonTreeView
 {
     private static List<JsonTreeNode> ParseJson(string json)
     {
-        using var document = JsonDocument.Parse(json ?? string.Empty);
+        using var document = JsonDocument.Parse(json);
         var nodes = new List<JsonTreeNode>();
         var root = document.RootElement;
         if (root.ValueKind == JsonValueKind.Object)
@@ -45,10 +45,7 @@ public sealed partial class JsonTreeView
                 children.Add(ParseElement(property.Name, property.Value));
             }
 
-            return new JsonTreeNode(key, "{...}", JsonTreeNodeKind.ObjectNode, children)
-            {
-                Expanded = true,
-            };
+            return new JsonTreeNode(key, "{...}", JsonTreeNodeKind.ObjectNode, children) { Expanded = true };
         }
 
         if (element.ValueKind == JsonValueKind.Array)
@@ -61,10 +58,7 @@ public sealed partial class JsonTreeView
                 index++;
             }
 
-            return new JsonTreeNode(key, $"[{children.Count}]", JsonTreeNodeKind.Array, children)
-            {
-                Expanded = true,
-            };
+            return new JsonTreeNode(key, $"[{children.Count}]", JsonTreeNodeKind.Array, children) { Expanded = true };
         }
 
         return new JsonTreeNode(key, FormatScalar(element), JsonTreeNodeKind.Value);
@@ -79,7 +73,7 @@ public sealed partial class JsonTreeView
             JsonValueKind.True => "true",
             JsonValueKind.False => "false",
             JsonValueKind.Null => "null",
-            _ => element.GetRawText(),
+            _ => element.GetRawText()
         };
     }
 }

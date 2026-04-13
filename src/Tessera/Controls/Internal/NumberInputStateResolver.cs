@@ -1,4 +1,5 @@
 using Tessera.Components.Styling;
+
 namespace Tessera.Controls.Internal;
 
 internal static class NumberInputStateResolver

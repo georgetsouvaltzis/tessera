@@ -8,14 +8,14 @@ internal enum DataWorkbenchPage
     Explore,
     Compare,
     History,
-    Saved,
+    Saved
 }
 
 internal sealed partial class DataWorkbenchState
 {
-    private readonly List<WorkbenchSource> _sources;
-    private readonly List<SavedWorkbenchView> _savedViews;
     private readonly Random _random = new(1427);
+    private readonly List<SavedWorkbenchView> _savedViews;
+    private readonly List<WorkbenchSource> _sources;
     private int _tick;
 
     private DataWorkbenchState(List<WorkbenchSource> sources)
@@ -23,20 +23,26 @@ internal sealed partial class DataWorkbenchState
         _sources = sources;
         _savedViews =
         [
-            new SavedWorkbenchView("sv_atlas", "Atlas burn watch", "fraud_signals", "eu", "score >= 70", "burn-up lens for eu fraud spikes"),
-            new SavedWorkbenchView("sv_disputes", "Dispute drift", "refund_journal", "chargeback", "status contains pending", "watch refunds likely to convert into disputes"),
-            new SavedWorkbenchView("sv_ship", "Shipment gap", "fulfillment_holds", "manual", "status != shipped", "investigate manual hold pockets before cut-off"),
+            new SavedWorkbenchView("sv_atlas", "Atlas burn watch", "fraud_signals", "eu", "score >= 70",
+                "burn-up lens for eu fraud spikes"),
+            new SavedWorkbenchView("sv_disputes", "Dispute drift", "refund_journal", "chargeback",
+                "status contains pending", "watch refunds likely to convert into disputes"),
+            new SavedWorkbenchView("sv_ship", "Shipment gap", "fulfillment_holds", "manual", "status != shipped",
+                "investigate manual hold pockets before cut-off")
         ];
     }
 
     public IReadOnlyList<WorkbenchSource> Sources => _sources;
     public IReadOnlyList<SavedWorkbenchView> SavedViews => _savedViews;
-    public string ClockText => DateTimeOffset.UtcNow.AddMinutes(_tick).ToString("HH:mm:ss 'UTC'", CultureInfo.InvariantCulture);
+
+    public string ClockText =>
+        DateTimeOffset.UtcNow.AddMinutes(_tick).ToString("HH:mm:ss 'UTC'", CultureInfo.InvariantCulture);
 
     public IReadOnlyList<NavItem> BuildNavItems(string selectedSourceId)
     {
         return _sources
-            .Select(source => new NavItem(source.Id, source.Label, source.Icon, source.Records.Count(record => record.IsHot).ToString("00", CultureInfo.InvariantCulture)))
+            .Select(source => new NavItem(source.Id, source.Label, source.Icon,
+                source.Records.Count(record => record.IsHot).ToString("00", CultureInfo.InvariantCulture)))
             .ToArray();
     }
 
@@ -45,7 +51,8 @@ internal sealed partial class DataWorkbenchState
         return _sources.First(source => string.Equals(source.Id, sourceId, StringComparison.Ordinal));
     }
 
-    public IReadOnlyList<WorkbenchRecord> FilterRecords(string sourceId, string searchQuery, IReadOnlyList<QueryRule> rules)
+    public IReadOnlyList<WorkbenchRecord> FilterRecords(string sourceId, string searchQuery,
+        IReadOnlyList<QueryRule> rules)
     {
         var source = GetSource(sourceId);
         IEnumerable<WorkbenchRecord> query = source.Records;
@@ -75,13 +82,28 @@ internal sealed partial class DataWorkbenchState
         return
         [
             new DataGridColumn("id", "Record") { Width = 14, IsSortable = true, SortComparer = string.CompareOrdinal },
-            new DataGridColumn("entity", "Entity") { Width = 16, IsSortable = true, SortComparer = StringComparer.OrdinalIgnoreCase.Compare },
-            new DataGridColumn("status", "Status") { Width = 10, IsSortable = true, SortComparer = StringComparer.OrdinalIgnoreCase.Compare },
-            new DataGridColumn("region", "Region") { Width = 12, IsSortable = true, SortComparer = StringComparer.OrdinalIgnoreCase.Compare },
-            new DataGridColumn("owner", "Owner") { Width = 14, IsSortable = true, SortComparer = StringComparer.OrdinalIgnoreCase.Compare },
+            new DataGridColumn("entity", "Entity")
+            {
+                Width = 16, IsSortable = true, SortComparer = StringComparer.OrdinalIgnoreCase.Compare
+            },
+            new DataGridColumn("status", "Status")
+            {
+                Width = 10, IsSortable = true, SortComparer = StringComparer.OrdinalIgnoreCase.Compare
+            },
+            new DataGridColumn("region", "Region")
+            {
+                Width = 12, IsSortable = true, SortComparer = StringComparer.OrdinalIgnoreCase.Compare
+            },
+            new DataGridColumn("owner", "Owner")
+            {
+                Width = 14, IsSortable = true, SortComparer = StringComparer.OrdinalIgnoreCase.Compare
+            },
             new DataGridColumn("score", "Score") { Width = 7, IsSortable = true, SortComparer = CompareInt },
             new DataGridColumn("latency", "Latency") { Width = 10, IsSortable = true, SortComparer = CompareInt },
-            new DataGridColumn("updated", "Updated") { Width = 8, IsSortable = true, SortComparer = StringComparer.Ordinal.Compare },
+            new DataGridColumn("updated", "Updated")
+            {
+                Width = 8, IsSortable = true, SortComparer = StringComparer.Ordinal.Compare
+            }
         ];
     }
 
@@ -97,14 +119,15 @@ internal sealed partial class DataWorkbenchState
                 record.Owner,
                 record.Score.ToString(CultureInfo.InvariantCulture),
                 $"{record.LatencyMs}ms",
-                record.UpdatedAt.ToString("HH:mm", CultureInfo.InvariantCulture),
+                record.UpdatedAt.ToString("HH:mm", CultureInfo.InvariantCulture)
             ])
             .ToArray();
     }
 
     public WorkbenchRecord? FindRecord(string sourceId, string recordId)
     {
-        return GetSource(sourceId).Records.FirstOrDefault(record => string.Equals(record.Id, recordId, StringComparison.Ordinal));
+        return GetSource(sourceId).Records
+            .FirstOrDefault(record => string.Equals(record.Id, recordId, StringComparison.Ordinal));
     }
 
     public static string BuildSummary(WorkbenchRecord? record)
@@ -159,7 +182,8 @@ internal sealed partial class DataWorkbenchState
         var source = GetSource(sourceId);
         var hottest = records.Count > 0 ? records[0] : null;
         var hotText = hottest is null ? "no hot record selected" : $"{hottest.Id} at {hottest.Score:00}";
-        return $"{source.SourceTag}  {source.Description}  ·  {records.Count:00} visible rows  ·  top pressure {hotText}";
+        return
+            $"{source.SourceTag}  {source.Description}  ·  {records.Count:00} visible rows  ·  top pressure {hotText}";
     }
 
     public static string BuildPrompt(WorkbenchRecord? record)
@@ -174,19 +198,25 @@ internal sealed partial class DataWorkbenchState
         return
         [
             new StatItem("Rows", visible.Count.ToString("00", CultureInfo.InvariantCulture)),
-            new StatItem("Hot", visible.Count(static record => record.IsHot).ToString("00", CultureInfo.InvariantCulture)),
-            new StatItem("Regions", visible.Select(static record => record.Region).Distinct(StringComparer.Ordinal).Count().ToString("00", CultureInfo.InvariantCulture)),
+            new StatItem("Hot",
+                visible.Count(static record => record.IsHot).ToString("00", CultureInfo.InvariantCulture)),
+            new StatItem("Regions",
+                visible.Select(static record => record.Region).Distinct(StringComparer.Ordinal).Count()
+                    .ToString("00", CultureInfo.InvariantCulture))
         ];
     }
 
     public static IReadOnlyList<StatItem> BuildVelocityItems(IReadOnlyList<WorkbenchRecord> visible)
     {
-        var medianLatency = visible.Count == 0 ? 0 : visible.OrderBy(static record => record.LatencyMs).ElementAt(visible.Count / 2).LatencyMs;
+        var medianLatency = visible.Count == 0
+            ? 0
+            : visible.OrderBy(static record => record.LatencyMs).ElementAt(visible.Count / 2).LatencyMs;
         return
         [
             new StatItem("Median", $"{medianLatency}ms"),
             new StatItem("P95", $"{(visible.Count == 0 ? 0 : visible.Max(static record => record.LatencyMs))}ms"),
-            new StatItem("Spike", visible.Count(static record => record.Score >= 85).ToString("00", CultureInfo.InvariantCulture)),
+            new StatItem("Spike",
+                visible.Count(static record => record.Score >= 85).ToString("00", CultureInfo.InvariantCulture))
         ];
     }
 
@@ -196,7 +226,10 @@ internal sealed partial class DataWorkbenchState
         [
             new StatItem("Pinned", pinned?.Id ?? "none"),
             new StatItem("Current", current?.Id ?? "none"),
-            new StatItem("Gap", pinned is null || current is null ? "--" : Math.Abs(pinned.Score - current.Score).ToString("00", CultureInfo.InvariantCulture)),
+            new StatItem("Gap",
+                pinned is null || current is null
+                    ? "--"
+                    : Math.Abs(pinned.Score - current.Score).ToString("00", CultureInfo.InvariantCulture))
         ];
     }
 
@@ -252,11 +285,15 @@ internal sealed partial class DataWorkbenchState
             QueryOperator.GreaterThanOrEqual => CompareDecimal(fieldValue, rule.Value) >= 0,
             QueryOperator.LessThan => CompareDecimal(fieldValue, rule.Value) < 0,
             QueryOperator.LessThanOrEqual => CompareDecimal(fieldValue, rule.Value) <= 0,
-            QueryOperator.In => rule.Value.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries).Any(candidate => fieldValue.Equals(candidate, StringComparison.OrdinalIgnoreCase)),
-            QueryOperator.NotIn => rule.Value.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries).All(candidate => !fieldValue.Equals(candidate, StringComparison.OrdinalIgnoreCase)),
+            QueryOperator.In => rule.Value
+                .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries).Any(candidate =>
+                    fieldValue.Equals(candidate, StringComparison.OrdinalIgnoreCase)),
+            QueryOperator.NotIn => rule.Value
+                .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries).All(candidate =>
+                    !fieldValue.Equals(candidate, StringComparison.OrdinalIgnoreCase)),
             QueryOperator.IsEmpty => string.IsNullOrWhiteSpace(fieldValue),
             QueryOperator.IsNotEmpty => !string.IsNullOrWhiteSpace(fieldValue),
-            _ => false,
+            _ => false
         };
     }
 
@@ -274,7 +311,7 @@ internal sealed partial class DataWorkbenchState
             "amount" => record.Amount.ToString(CultureInfo.InvariantCulture),
             "workflow" => record.Workflow,
             "kind" => record.CompareKey,
-            _ => null,
+            _ => null
         };
     }
 
@@ -321,7 +358,6 @@ internal sealed partial class DataWorkbenchState
 
         return $"severity ({left.Score:00} vs {right.Score:00})";
     }
-
 }
 
 internal sealed record WorkbenchSource(
@@ -360,7 +396,9 @@ internal sealed class WorkbenchRecord(
     public string Workflow { get; } = workflow;
     public string CompareKey { get; } = compareKey;
     public string Json { get; } = json;
-    public bool IsHot => Score >= 80 || string.Equals(Status, "priority", StringComparison.OrdinalIgnoreCase) || string.Equals(Status, "escalated", StringComparison.OrdinalIgnoreCase);
+
+    public bool IsHot => Score >= 80 || string.Equals(Status, "priority", StringComparison.OrdinalIgnoreCase) ||
+                         string.Equals(Status, "escalated", StringComparison.OrdinalIgnoreCase);
 }
 
 internal sealed record SavedWorkbenchView(

@@ -1,12 +1,12 @@
 namespace Tessera.Controls;
 
 /// <summary>
-/// Represents one step in a <see cref="Wizard"/> flow.
+///     Represents one step in a <see cref="Wizard" /> flow.
 /// </summary>
 public sealed class WizardStep
 {
     /// <summary>
-    /// Initializes a wizard step.
+    ///     Initializes a wizard step.
     /// </summary>
     /// <param name="id">Stable step identifier.</param>
     /// <param name="title">Primary step title text.</param>
@@ -20,47 +20,35 @@ public sealed class WizardStep
         bool isCompleted = false,
         bool isDisabled = false)
     {
-        Id = id ?? string.Empty;
-        Title = title ?? string.Empty;
+        Id = id;
+        Title = title;
         Description = description ?? string.Empty;
         IsCompleted = isCompleted;
         IsDisabled = isDisabled;
     }
 
     /// <summary>
-    /// Gets or sets stable step identifier.
+    ///     Gets or sets stable step identifier.
     /// </summary>
-    public string Id
-    {
-        get;
-        set => field = value ?? string.Empty;
-    }
+    public string Id { get; set; }
 
     /// <summary>
-    /// Gets or sets step title text.
+    ///     Gets or sets step title text.
     /// </summary>
-    public string Title
-    {
-        get;
-        set => field = value ?? string.Empty;
-    }
+    public string Title { get; set; }
 
     /// <summary>
-    /// Gets or sets optional step description text.
+    ///     Gets or sets optional step description text.
     /// </summary>
-    public string Description
-    {
-        get;
-        set => field = value ?? string.Empty;
-    }
+    public string Description { get; set; }
 
     /// <summary>
-    /// Gets or sets whether the step is completed.
+    ///     Gets or sets whether the step is completed.
     /// </summary>
     public bool IsCompleted { get; set; }
 
     /// <summary>
-    /// Gets or sets whether the step is disabled.
+    ///     Gets or sets whether the step is disabled.
     /// </summary>
     public bool IsDisabled { get; set; }
 }

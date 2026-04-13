@@ -1,53 +1,45 @@
 namespace Tessera.Controls;
 
 /// <summary>
-/// Represents one field/operator/value rule in a query builder.
+///     Represents one field/operator/value rule in a query builder.
 /// </summary>
 public sealed class QueryRule
 {
     /// <summary>
-    /// Initializes a new rule.
+    ///     Initializes a new rule.
     /// </summary>
     /// <param name="field">Field name.</param>
     /// <param name="operator">Rule operator.</param>
     /// <param name="value">Optional rule value.</param>
     public QueryRule(string field, QueryOperator @operator, string? value = null)
     {
-        Field = field ?? string.Empty;
+        Field = field;
         Operator = @operator;
         Value = value ?? string.Empty;
     }
 
     /// <summary>
-    /// Gets or sets field name.
+    ///     Gets or sets field name.
     /// </summary>
-    public string Field
-    {
-        get;
-        set => field = value ?? string.Empty;
-    }
+    public string Field { get; set; }
 
     /// <summary>
-    /// Gets or sets rule operator.
+    ///     Gets or sets rule operator.
     /// </summary>
     public QueryOperator Operator { get; set; }
 
     /// <summary>
-    /// Gets or sets rule value.
+    ///     Gets or sets rule value.
     /// </summary>
-    public string Value
-    {
-        get;
-        set => field = value ?? string.Empty;
-    }
+    public string Value { get; set; }
 
     /// <summary>
-    /// Gets or sets whether this rule is disabled.
+    ///     Gets or sets whether this rule is disabled.
     /// </summary>
     public bool IsDisabled { get; set; }
 
     /// <summary>
-    /// Gets or sets whether this rule is in error state.
+    ///     Gets or sets whether this rule is in error state.
     /// </summary>
     public bool HasError { get; set; }
 

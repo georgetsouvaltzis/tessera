@@ -1,89 +1,82 @@
+using System.ComponentModel;
+using System.Globalization;
 using Tessera.Components.Primitives;
 using Tessera.Controls.Internal;
 using Tessera.Layout;
 using Tessera.Styles;
-using System.Globalization;
 
 namespace Tessera.Controls;
 
 /// <summary>
-/// Represents a histogram control for bucketed telemetry distributions.
+///     Represents a histogram control for bucketed telemetry distributions.
 /// </summary>
 public sealed class Histogram : Control
 {
     private readonly List<HistogramBucket> _buckets = [];
 
     /// <summary>
-    /// Gets or sets the chart title.
+    ///     Gets or sets the chart title.
     /// </summary>
-    public string Title
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = "Histogram";
+    public string Title { get; set; } = "Histogram";
 
     /// <summary>
-    /// Gets or sets marker shown in the title while focused.
+    ///     Gets or sets marker shown in the title while focused.
     /// </summary>
-    public string FocusMarker
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = "*";
+    public string FocusMarker { get; set; } = "*";
 
     /// <summary>
-    /// Gets or sets whether focused title marker text is rendered.
+    ///     Gets or sets whether focused title marker text is rendered.
     /// </summary>
     public bool ShowFocusMarker { get; set; } = true;
 
     /// <summary>
-    /// Gets or sets style used for title text when not focused.
+    ///     Gets or sets style used for title text when not focused.
     /// </summary>
     public TesseraStyle TitleStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets style used for title text when focused.
+    ///     Gets or sets style used for title text when focused.
     /// </summary>
     public TesseraStyle FocusedTitleStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets style used for rendered bars.
+    ///     Gets or sets style used for rendered bars.
     /// </summary>
     public TesseraStyle BarStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets style used for axis lines and axis labels.
+    ///     Gets or sets style used for axis lines and axis labels.
     /// </summary>
     public TesseraStyle AxisStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets style used for bucket labels.
+    ///     Gets or sets style used for bucket labels.
     /// </summary>
     public TesseraStyle LabelStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets style used for legend text.
+    ///     Gets or sets style used for legend text.
     /// </summary>
     public TesseraStyle LegendStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets optional explicit maximum value used for scaling bars.
+    ///     Gets or sets optional explicit maximum value used for scaling bars.
     /// </summary>
     public double? MaxValue { get; set; }
 
     /// <summary>
-    /// Gets or sets advanced histogram rendering options.
+    ///     Gets or sets advanced histogram rendering options.
     /// </summary>
-    [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Advanced)]
+    [EditorBrowsable(EditorBrowsableState.Advanced)]
     public HistogramOptions? Options { get; set; }
 
     /// <summary>
-    /// Gets current buckets.
+    ///     Gets current buckets.
     /// </summary>
     public IReadOnlyList<HistogramBucket> Buckets => _buckets;
 
     /// <summary>
-    /// Replaces current buckets.
+    ///     Replaces current buckets.
     /// </summary>
     /// <param name="buckets">The buckets to render.</param>
     public void SetBuckets(IEnumerable<HistogramBucket> buckets)
@@ -97,13 +90,13 @@ public sealed class Histogram : Control
     }
 
     /// <summary>
-    /// Sets or updates one bucket by label.
+    ///     Sets or updates one bucket by label.
     /// </summary>
     /// <param name="label">The bucket label.</param>
     /// <param name="value">The bucket value.</param>
     public void SetValue(string label, double value)
     {
-        var normalizedLabel = label ?? string.Empty;
+        var normalizedLabel = label;
         for (var index = 0; index < _buckets.Count; index++)
         {
             if (string.Equals(_buckets[index].Label, normalizedLabel, StringComparison.Ordinal))
@@ -117,7 +110,7 @@ public sealed class Histogram : Control
     }
 
     /// <summary>
-    /// Clears all buckets.
+    ///     Clears all buckets.
     /// </summary>
     public void Clear()
     {
@@ -163,7 +156,8 @@ public sealed class Histogram : Control
         {
             var x = MapBucketToX(index, _buckets.Count, plot.X, plot.Width);
             var normalized = Math.Clamp(_buckets[index].Value / max, 0, 1);
-            var height = Math.Clamp((int)Math.Round(normalized * plot.Height, MidpointRounding.AwayFromZero), 0, plot.Height);
+            var height = Math.Clamp((int)Math.Round(normalized * plot.Height, MidpointRounding.AwayFromZero), 0,
+                plot.Height);
             for (var offset = 0; offset < height; offset++)
             {
                 var y = plot.Bottom - 1 - offset;
@@ -198,7 +192,7 @@ public sealed class Histogram : Control
     internal override LayoutMeasurement Measure(in Rect availableBounds)
     {
         var width = Math.Max(12, ControlTextLayout.MeasureDisplayWidth(FormatTitleForMeasure()) + 8);
-        width = Math.Max(width, (_buckets.Count * 2) + 4);
+        width = Math.Max(width, _buckets.Count * 2 + 4);
         var height = 8;
         return new LayoutMeasurement(
             Math.Clamp(width, 0, availableBounds.Width),
@@ -229,7 +223,7 @@ public sealed class Histogram : Control
         {
             if (AxisStyle.IsEmpty)
             {
-                canvas.DrawVerticalLine(x, y, height, '│');
+                canvas.DrawVerticalLine(x, y, height);
                 return;
             }
 
@@ -244,7 +238,7 @@ public sealed class Histogram : Control
         {
             if (AxisStyle.IsEmpty)
             {
-                canvas.DrawHorizontalLine(x, y, width, '─');
+                canvas.DrawHorizontalLine(x, y, width);
                 return;
             }
 
@@ -373,6 +367,6 @@ public sealed class Histogram : Control
 
     private static string ApplyStyle(string text, TesseraStyle style)
     {
-        return style.IsEmpty ? text : style.Render(text ?? string.Empty);
+        return style.IsEmpty ? text : style.Render(text);
     }
 }

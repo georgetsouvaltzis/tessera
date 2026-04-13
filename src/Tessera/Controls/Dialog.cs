@@ -1,6 +1,6 @@
-﻿using Tessera.Components.Primitives;
-using Tessera.Components.Primitives.Internal;
 using System.ComponentModel;
+using Tessera.Components.Primitives;
+using Tessera.Components.Primitives.Internal;
 using Tessera.Controls.Internal;
 using Tessera.Layout;
 using Tessera.Styles;
@@ -8,49 +8,30 @@ using Tessera.Styles;
 namespace Tessera.Controls;
 
 /// <summary>
-/// Represents a modal dialog surface with accept and dismiss actions.
+///     Represents a modal dialog surface with accept and dismiss actions.
 /// </summary>
 public sealed class Dialog : Control
 {
-    private long _resultVersion;
-    private long _consumedResultVersion;
     private List<string> _bodyLines = ["Confirm?"];
+    private long _consumedResultVersion;
+    private long _resultVersion;
 
     /// <summary>
-    /// Occurs when the dialog is accepted.
+    ///     Gets or sets the dialog title.
     /// </summary>
-    public event EventHandler? Accepted;
+    public string Title { get; set; } = "Dialog";
 
     /// <summary>
-    /// Occurs when the dialog is dismissed.
-    /// </summary>
-    public event EventHandler? Dismissed;
-
-    /// <summary>
-    /// Occurs when the dialog closes with a concrete <see cref="DialogResult"/>.
-    /// </summary>
-    public event EventHandler<DialogClosedEventArgs>? Closed;
-
-    /// <summary>
-    /// Gets or sets the dialog title.
-    /// </summary>
-    public string Title
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = "Dialog";
-
-    /// <summary>
-    /// Gets or sets the dialog body lines.
+    ///     Gets or sets the dialog body lines.
     /// </summary>
     public IReadOnlyList<string> BodyLines
     {
         get => _bodyLines;
-        set => _bodyLines = [.. (value ?? ["Confirm?"])];
+        set => _bodyLines = [.. value];
     }
 
     /// <summary>
-    /// Gets or sets the dialog border style.
+    ///     Gets or sets the dialog border style.
     /// </summary>
     public BorderStyle Border
     {
@@ -59,7 +40,7 @@ public sealed class Dialog : Control
     } = BorderStyle.Rounded;
 
     /// <summary>
-    /// Gets or sets the inner padding applied to the dialog body.
+    ///     Gets or sets the inner padding applied to the dialog body.
     /// </summary>
     public Thickness Padding
     {
@@ -68,16 +49,12 @@ public sealed class Dialog : Control
     }
 
     /// <summary>
-    /// Gets or sets the marker shown in the title when focused.
+    ///     Gets or sets the marker shown in the title when focused.
     /// </summary>
-    public string FocusMarker
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = "*";
+    public string FocusMarker { get; set; } = "*";
 
     /// <summary>
-    /// Gets or sets whether the focused title marker should be rendered.
+    ///     Gets or sets whether the focused title marker should be rendered.
     /// </summary>
     public bool ShowFocusMarker
     {
@@ -86,7 +63,7 @@ public sealed class Dialog : Control
     } = true;
 
     /// <summary>
-    /// Gets or sets the title style used when not focused.
+    ///     Gets or sets the title style used when not focused.
     /// </summary>
     public TesseraStyle TitleStyle
     {
@@ -95,7 +72,7 @@ public sealed class Dialog : Control
     } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the title style used when focused.
+    ///     Gets or sets the title style used when focused.
     /// </summary>
     public TesseraStyle FocusedTitleStyle
     {
@@ -104,7 +81,7 @@ public sealed class Dialog : Control
     } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets body text style.
+    ///     Gets or sets body text style.
     /// </summary>
     public TesseraStyle BodyTextStyle
     {
@@ -113,7 +90,7 @@ public sealed class Dialog : Control
     } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets style applied to border glyphs when the control is not focused.
+    ///     Gets or sets style applied to border glyphs when the control is not focused.
     /// </summary>
     public TesseraStyle BorderStyleText
     {
@@ -122,7 +99,7 @@ public sealed class Dialog : Control
     } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets style merged into border glyphs while the control is focused.
+    ///     Gets or sets style merged into border glyphs while the control is focused.
     /// </summary>
     public TesseraStyle FocusedBorderStyleText
     {
@@ -131,7 +108,7 @@ public sealed class Dialog : Control
     } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets a value indicating whether the dialog is visible.
+    ///     Gets or sets a value indicating whether the dialog is visible.
     /// </summary>
     public bool IsVisible
     {
@@ -147,12 +124,27 @@ public sealed class Dialog : Control
     }
 
     /// <summary>
-    /// Gets or sets the last result.
+    ///     Gets or sets the last result.
     /// </summary>
     public DialogResult LastResult { get; private set; }
 
     /// <summary>
-    /// Shows the dialog with the supplied title and body lines.
+    ///     Occurs when the dialog is accepted.
+    /// </summary>
+    public event EventHandler? Accepted;
+
+    /// <summary>
+    ///     Occurs when the dialog is dismissed.
+    /// </summary>
+    public event EventHandler? Dismissed;
+
+    /// <summary>
+    ///     Occurs when the dialog closes with a concrete <see cref="DialogResult" />.
+    /// </summary>
+    public event EventHandler<DialogClosedEventArgs>? Closed;
+
+    /// <summary>
+    ///     Shows the dialog with the supplied title and body lines.
     /// </summary>
     /// <param name="title">The dialog title.</param>
     /// <param name="lines">The body lines to display.</param>
@@ -165,7 +157,7 @@ public sealed class Dialog : Control
     }
 
     /// <summary>
-    /// Hides the dialog.
+    ///     Hides the dialog.
     /// </summary>
     public void Hide()
     {
@@ -173,10 +165,10 @@ public sealed class Dialog : Control
     }
 
     /// <summary>
-    /// Attempts to consume the latest dialog result exactly once.
+    ///     Attempts to consume the latest dialog result exactly once.
     /// </summary>
     /// <param name="result">Receives the consumed result when available.</param>
-    /// <returns><see langword="true"/> when a result was consumed; otherwise, <see langword="false"/>.</returns>
+    /// <returns><see langword="true" /> when a result was consumed; otherwise, <see langword="false" />.</returns>
     [EditorBrowsable(EditorBrowsableState.Advanced)]
     public bool TryConsumeResult(out DialogResult result)
     {
@@ -240,7 +232,8 @@ public sealed class Dialog : Control
         var modal = new Rect(modalX, modalY, modalWidth, modalHeight);
 
         canvas.FillRect(modal, ' ');
-        var body = FrameLayout.DrawFrameAndResolveContent(canvas, modal, RenderTitle(), Border, Padding, ResolveBorderStyleText());
+        var body = FrameLayout.DrawFrameAndResolveContent(canvas, modal, RenderTitle(), Border, Padding,
+            ResolveBorderStyleText());
         if (body.IsEmpty)
         {
             return;
@@ -256,7 +249,8 @@ public sealed class Dialog : Control
     internal override LayoutMeasurement Measure(in Rect availableBounds)
     {
         var longest = _bodyLines.Count == 0 ? 8 : _bodyLines.Max(ControlTextLayout.MeasureDisplayWidth);
-        var width = Math.Max(ControlTextLayout.MeasureDisplayWidth(FormatTitleForMeasure()) + 4, longest + Padding.Horizontal) + 2;
+        var width = Math.Max(ControlTextLayout.MeasureDisplayWidth(FormatTitleForMeasure()) + 4,
+            longest + Padding.Horizontal) + 2;
         var height = Math.Max(4, _bodyLines.Count + Padding.Vertical + 2);
         return new LayoutMeasurement(
             Math.Clamp(width, 0, availableBounds.Width),

@@ -1,5 +1,4 @@
 using Tessera;
-using Tessera.Controls;
 using Tessera.Examples.IncidentDesk;
 
 var app = TesseraApplication.CreateBuilder()
@@ -14,7 +13,7 @@ var app = TesseraApplication.CreateBuilder()
             WindowTitle = "Tessera IncidentDesk",
             EnableFocusReporting = true,
             EnableBracketedPaste = true,
-            MouseTracking = MouseTrackingMode.AllMotion,
+            MouseTracking = MouseTrackingMode.AllMotion
         };
     })
     .Build();

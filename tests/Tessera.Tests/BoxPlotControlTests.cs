@@ -12,18 +12,14 @@ public sealed class BoxPlotControlTests
     [Test]
     public void ControlsBoxPlotRendersSeriesAndDistributionGlyphs()
     {
-        var control = new BoxPlot
-        {
-            Border = BorderStyle.None,
-            Title = string.Empty,
-        };
+        var control = new BoxPlot { Border = BorderStyle.None, Title = string.Empty };
         control.SetSeries(
         [
             new BoxPlotSeries("api", 10, 20, 30, 40, 50),
-            new BoxPlotSeries("db", 5, 15, 18, 25, 35),
+            new BoxPlotSeries("db", 5, 15, 18, 25, 35)
         ]);
 
-        var output = Render(control, width: 72, height: 4);
+        var output = Render(control, 72, 4);
 
         Assert.That(output.Contains("api", StringComparison.Ordinal), Is.True);
         Assert.That(output.Contains("db", StringComparison.Ordinal), Is.True);
@@ -33,17 +29,12 @@ public sealed class BoxPlotControlTests
     [Test]
     public void ControlsBoxPlotKeyboardAndPointerSelectionRaisesSelectionChanged()
     {
-        var control = new BoxPlot
-        {
-            Border = BorderStyle.None,
-            Title = string.Empty,
-            IsFocused = true,
-        };
+        var control = new BoxPlot { Border = BorderStyle.None, Title = string.Empty, IsFocused = true };
         control.SetSeries(
         [
             new BoxPlotSeries("a", 1, 2, 3, 4, 5),
             new BoxPlotSeries("b", 1, 2, 3, 4, 5),
-            new BoxPlotSeries("c", 1, 2, 3, 4, 5),
+            new BoxPlotSeries("c", 1, 2, 3, 4, 5)
         ]);
 
         var changes = 0;
@@ -56,7 +47,7 @@ public sealed class BoxPlotControlTests
 
         var downHandled = control.Handle(new KeyPressed(Key.Down));
         var clickHandled = control.Handle(
-            new PointerInput(PointerEventKind.Press, PointerButton.Left, X: 1, Y: 2),
+            new PointerInput(PointerEventKind.Press, PointerButton.Left, 1, 2),
             new Rect(0, 0, 64, 4));
 
         Assert.That(downHandled, Is.True);
@@ -80,16 +71,16 @@ public sealed class BoxPlotControlTests
             WhiskerStyle = TesseraStyle.Empty.WithForeground(AnsiColor.Rgb(100, 110, 120)),
             QuartileStyle = TesseraStyle.Empty.WithForeground(AnsiColor.Rgb(130, 140, 150)),
             MedianStyle = TesseraStyle.Empty.WithForeground(AnsiColor.Rgb(160, 170, 180)),
-            SelectedSeriesStyle = TesseraStyle.Empty.WithBackground(AnsiColor.Rgb(190, 200, 210)),
+            SelectedSeriesStyle = TesseraStyle.Empty.WithBackground(AnsiColor.Rgb(190, 200, 210))
         };
         control.SetSeries(
         [
             new BoxPlotSeries("api", 10, 20, 25, 30, 40),
-            new BoxPlotSeries("db", 5, 8, 12, 16, 20),
+            new BoxPlotSeries("db", 5, 8, 12, 16, 20)
         ]);
         _ = control.SetSelectedSeries(1);
 
-        var output = Render(control, width: 72, height: 8);
+        var output = Render(control, 72, 8);
 
         Assert.That(output.Contains("Box Plot !", StringComparison.Ordinal), Is.True);
         Assert.That(output.Contains("38;2;40;50;60", StringComparison.Ordinal), Is.True);
@@ -103,22 +94,18 @@ public sealed class BoxPlotControlTests
     [Test]
     public void ControlsBoxPlotDefaultRenderIsDeterministicAndMonochrome()
     {
-        var control = new BoxPlot
-        {
-            Border = BorderStyle.None,
-            Title = string.Empty,
-        };
+        var control = new BoxPlot { Border = BorderStyle.None, Title = string.Empty };
         control.SetSeries(
         [
             new BoxPlotSeries("api", 1, 2, 3, 4, 5),
-            new BoxPlotSeries("db", 2, 3, 4, 5, 6),
+            new BoxPlotSeries("db", 2, 3, 4, 5, 6)
         ]);
 
-        var first = Render(control, width: 64, height: 4);
-        var second = Render(control, width: 64, height: 4);
+        var first = Render(control, 64, 4);
+        var second = Render(control, 64, 4);
 
         Assert.That(first, Is.EqualTo(second));
-        Assert.That(first.Contains("\u001b[", StringComparison.Ordinal), Is.False);
+        Assert.That(first.Contains("\e[", StringComparison.Ordinal), Is.False);
     }
 
     private static string Render(BoxPlot control, int width, int height)

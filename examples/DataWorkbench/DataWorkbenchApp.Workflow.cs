@@ -10,18 +10,20 @@ internal sealed partial class DataWorkbenchApp
         switch (action)
         {
             case DataWorkbenchAction.RunSlice:
-                _output.AppendStdOut($"run slice / {_sourceId} / {_visibleRecords.Count} rows / query '{BuildQuerySummary()}'");
+                _output.AppendStdOut(
+                    $"run slice / {_sourceId} / {_visibleRecords.Count} rows / query '{BuildQuerySummary()}'");
                 _activity.SetItems(
                 [
-                    new ActivityFeedItem("query", "ran", _sourceId, $"{_visibleRecords.Count} rows / {BuildQuerySummary()}", ActivityFeedItemKind.Info),
-                    .. _activity.Items,
+                    new ActivityFeedItem("query", "ran", _sourceId,
+                        $"{_visibleRecords.Count} rows / {BuildQuerySummary()}"),
+                    .. _activity.Items
                 ]);
                 break;
             case DataWorkbenchAction.PinCompare:
                 _pinnedRecordId = SelectedRecord()?.Id;
                 _page = DataWorkbenchPage.Compare;
                 _pageTabs.SetSelectedIndex(1);
-                _output.AppendStdOut($"compare pin / {(_pinnedRecordId ?? "none")}");
+                _output.AppendStdOut($"compare pin / {_pinnedRecordId ?? "none"}");
                 break;
             case DataWorkbenchAction.SaveView:
                 var saved = _state.SaveView(_sourceId, _search.QueryText, _query.Rules);
@@ -30,11 +32,13 @@ internal sealed partial class DataWorkbenchApp
                 _output.AppendStdOut($"saved lens / {saved.Label}");
                 break;
             case DataWorkbenchAction.ExportSlice:
-                _output.AppendStdOut($"export slice / {_sourceId} / {_visibleRecords.Count} records / ndjson handoff queued");
+                _output.AppendStdOut(
+                    $"export slice / {_sourceId} / {_visibleRecords.Count} records / ndjson handoff queued");
                 _activity.SetItems(
                 [
-                    new ActivityFeedItem("export", "queued", _sourceId, $"{_visibleRecords.Count} records pushed to analyst handoff", ActivityFeedItemKind.Success),
-                    .. _activity.Items,
+                    new ActivityFeedItem("export", "queued", _sourceId,
+                        $"{_visibleRecords.Count} records pushed to analyst handoff", ActivityFeedItemKind.Success),
+                    .. _activity.Items
                 ]);
                 break;
             case DataWorkbenchAction.ClearSearch:
@@ -59,17 +63,35 @@ internal sealed partial class DataWorkbenchApp
     {
         return sourceId switch
         {
-            "fraud_signals" => [new QueryRule("score", QueryOperator.GreaterThanOrEqual, "70"), new QueryRule("region", QueryOperator.Contains, "eu")],
-            "fulfillment_holds" => [new QueryRule("status", QueryOperator.NotEquals, "cleared"), new QueryRule("latency", QueryOperator.GreaterThan, "400")],
-            "refund_journal" => [new QueryRule("status", QueryOperator.NotEquals, "posted"), new QueryRule("score", QueryOperator.GreaterThanOrEqual, "60")],
-            "catalog_drift" => [new QueryRule("status", QueryOperator.NotEquals, "clear"), new QueryRule("score", QueryOperator.GreaterThanOrEqual, "55")],
-            _ => [],
+            "fraud_signals" =>
+            [
+                new QueryRule("score", QueryOperator.GreaterThanOrEqual, "70"),
+                new QueryRule("region", QueryOperator.Contains, "eu")
+            ],
+            "fulfillment_holds" =>
+            [
+                new QueryRule("status", QueryOperator.NotEquals, "cleared"),
+                new QueryRule("latency", QueryOperator.GreaterThan, "400")
+            ],
+            "refund_journal" =>
+            [
+                new QueryRule("status", QueryOperator.NotEquals, "posted"),
+                new QueryRule("score", QueryOperator.GreaterThanOrEqual, "60")
+            ],
+            "catalog_drift" =>
+            [
+                new QueryRule("status", QueryOperator.NotEquals, "clear"),
+                new QueryRule("score", QueryOperator.GreaterThanOrEqual, "55")
+            ],
+            _ => []
         };
     }
 
     private string BuildSavedViewPreview()
     {
-        var selected = _state.SavedViews.FirstOrDefault(view => string.Equals(view.Id, _selectedSavedViewId, StringComparison.Ordinal))
+        var selected =
+            _state.SavedViews.FirstOrDefault(view =>
+                string.Equals(view.Id, _selectedSavedViewId, StringComparison.Ordinal))
             ?? (_state.SavedViews.Count > 0 ? _state.SavedViews[0] : null);
         if (selected is null)
         {
@@ -99,7 +121,8 @@ internal sealed partial class DataWorkbenchApp
     private NavItem[] BuildSavedViewItems()
     {
         return _state.SavedViews
-            .Select(view => new NavItem(view.Id, view.Label, "SV", view.SourceId[..Math.Min(2, view.SourceId.Length)].ToUpperInvariant()))
+            .Select(view => new NavItem(view.Id, view.Label, "SV",
+                view.SourceId[..Math.Min(2, view.SourceId.Length)].ToUpperInvariant()))
             .ToArray();
     }
 
@@ -154,7 +177,10 @@ internal sealed partial class DataWorkbenchApp
             _query.Rules.Count == 0 ? "no rules" : $"{_query.Rules.Count} rules");
     }
 
-    private bool IsSearchEditing() => _search.IsFocused;
+    private bool IsSearchEditing()
+    {
+        return _search.IsFocused;
+    }
 
     private void FocusInspector()
     {
@@ -201,7 +227,7 @@ internal sealed partial class DataWorkbenchApp
             DataWorkbenchPage.Compare => 1,
             DataWorkbenchPage.History => 2,
             DataWorkbenchPage.Saved => 3,
-            _ => 0,
+            _ => 0
         });
     }
 
@@ -254,26 +280,31 @@ internal sealed partial class DataWorkbenchApp
 
         _sourceRail.BorderStyleText = theme.Border.Strong;
         _sourceRail.FocusedBorderStyleText = theme.Border.Focused.Merge(theme.Focus.Border);
-        _sourceRail.SelectedItemStyle = DataWorkbenchTheme.Chip(palette.HeroBadgeForeground, palette.HeroBadgeBackground);
-        _sourceRail.FocusedSelectedItemStyle = DataWorkbenchTheme.Chip(palette.HeroBadgeForeground, palette.FooterChipBackground);
+        _sourceRail.SelectedItemStyle =
+            DataWorkbenchTheme.Chip(palette.HeroBadgeForeground, palette.HeroBadgeBackground);
+        _sourceRail.FocusedSelectedItemStyle =
+            DataWorkbenchTheme.Chip(palette.HeroBadgeForeground, palette.FooterChipBackground);
         _sourceRail.HoveredItemStyle = theme.Accent.Secondary;
 
         _pageTabs.BorderStyleText = theme.Border.Strong;
         _pageTabs.FocusedBorderStyleText = theme.Border.Focused.Merge(theme.Focus.Border);
         _pageTabs.SelectedTabStyle = DataWorkbenchTheme.Chip(palette.HeroBadgeForeground, palette.HeroBadgeBackground);
-        _pageTabs.FocusedSelectedTabStyle = DataWorkbenchTheme.Chip(palette.HeroBadgeForeground, palette.FooterChipBackground);
+        _pageTabs.FocusedSelectedTabStyle =
+            DataWorkbenchTheme.Chip(palette.HeroBadgeForeground, palette.FooterChipBackground);
         _pageTabs.HoveredTabStyle = theme.Accent.Secondary;
         _pageTabs.SeparatorStyle = theme.Text.Muted;
 
         _inspectTabs.BorderStyleText = theme.Border.Strong;
         _inspectTabs.FocusedBorderStyleText = theme.Border.Focused.Merge(theme.Focus.Border);
         _inspectTabs.SelectedTabStyle = DataWorkbenchTheme.Chip(palette.HeroBadgeForeground, palette.HighlightB);
-        _inspectTabs.FocusedSelectedTabStyle = DataWorkbenchTheme.Chip(palette.HeroBadgeForeground, palette.FooterChipBackground);
+        _inspectTabs.FocusedSelectedTabStyle =
+            DataWorkbenchTheme.Chip(palette.HeroBadgeForeground, palette.FooterChipBackground);
         _inspectTabs.HoveredTabStyle = theme.Accent.Secondary;
 
         _results.HeaderStyle = theme.Text.Secondary.WithBold();
         _results.RowStyle = theme.Text.Primary;
-        _results.SelectedRowStyle = DataWorkbenchTheme.Background(palette.HeroBadgeBackground).Merge(DataWorkbenchTheme.Foreground(palette.HeroBadgeForeground));
+        _results.SelectedRowStyle = DataWorkbenchTheme.Background(palette.HeroBadgeBackground)
+            .Merge(DataWorkbenchTheme.Foreground(palette.HeroBadgeForeground));
         _results.SelectedCellStyle = theme.Text.Primary.WithBold();
         _results.HoveredRowStyle = theme.Accent.Secondary;
         _results.HoveredCellStyle = theme.Accent.Primary.WithBold();
@@ -330,19 +361,24 @@ internal sealed partial class DataWorkbenchApp
                 output.SystemStyle = theme.Text.Muted;
                 output.StdOutStyle = theme.Text.Primary;
                 output.StdErrStyle = theme.State.Error;
-                output.SelectedLineStyle = DataWorkbenchTheme.Chip(palette.HeroBadgeForeground, palette.HeroBadgeBackground);
+                output.SelectedLineStyle =
+                    DataWorkbenchTheme.Chip(palette.HeroBadgeForeground, palette.HeroBadgeBackground);
                 break;
             case ActivityFeed feed:
                 feed.BorderStyleText = theme.Border.Strong;
                 feed.FocusedBorderStyleText = theme.Border.Focused.Merge(theme.Focus.Border);
-                feed.SelectedItemStyle = DataWorkbenchTheme.Chip(palette.HeroBadgeForeground, palette.HeroBadgeBackground);
-                feed.FocusedSelectedItemStyle = DataWorkbenchTheme.Chip(palette.HeroBadgeForeground, palette.FooterChipBackground);
+                feed.SelectedItemStyle =
+                    DataWorkbenchTheme.Chip(palette.HeroBadgeForeground, palette.HeroBadgeBackground);
+                feed.FocusedSelectedItemStyle =
+                    DataWorkbenchTheme.Chip(palette.HeroBadgeForeground, palette.FooterChipBackground);
                 break;
             case SideNavRail rail:
                 rail.BorderStyleText = theme.Border.Strong;
                 rail.FocusedBorderStyleText = theme.Border.Focused.Merge(theme.Focus.Border);
-                rail.SelectedItemStyle = DataWorkbenchTheme.Chip(palette.HeroBadgeForeground, palette.HeroBadgeBackground);
-                rail.FocusedSelectedItemStyle = DataWorkbenchTheme.Chip(palette.HeroBadgeForeground, palette.FooterChipBackground);
+                rail.SelectedItemStyle =
+                    DataWorkbenchTheme.Chip(palette.HeroBadgeForeground, palette.HeroBadgeBackground);
+                rail.FocusedSelectedItemStyle =
+                    DataWorkbenchTheme.Chip(palette.HeroBadgeForeground, palette.FooterChipBackground);
                 break;
         }
     }

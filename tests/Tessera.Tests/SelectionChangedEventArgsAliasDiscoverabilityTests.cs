@@ -1,6 +1,6 @@
+using NUnit.Framework;
 using System.ComponentModel;
 using System.Reflection;
-using NUnit.Framework;
 using Tessera.Controls;
 
 namespace Tessera.Tests;
@@ -78,7 +78,8 @@ public sealed class SelectionChangedEventArgsAliasDiscoverabilityTests
 
         var attribute = property!.GetCustomAttribute<EditorBrowsableAttribute>();
         Assert.That(attribute, Is.Not.Null, $"{type.Name}.{propertyName} should define EditorBrowsable.");
-        Assert.That(attribute!.State, Is.EqualTo(EditorBrowsableState.Advanced), $"{type.Name}.{propertyName} should be Advanced.");
+        Assert.That(attribute!.State, Is.EqualTo(EditorBrowsableState.Advanced),
+            $"{type.Name}.{propertyName} should be Advanced.");
     }
 
     private static void AssertEditorBrowsableMissing(Type type, string propertyName)
@@ -87,6 +88,7 @@ public sealed class SelectionChangedEventArgsAliasDiscoverabilityTests
         Assert.That(property, Is.Not.Null, $"{type.Name}.{propertyName} should exist.");
 
         var attribute = property!.GetCustomAttribute<EditorBrowsableAttribute>();
-        Assert.That(attribute, Is.Null, $"{type.Name}.{propertyName} should remain discoverable without EditorBrowsable.");
+        Assert.That(attribute, Is.Null,
+            $"{type.Name}.{propertyName} should remain discoverable without EditorBrowsable.");
     }
 }

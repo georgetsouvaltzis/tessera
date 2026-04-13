@@ -1,13 +1,13 @@
-﻿namespace Tessera.Controls;
+namespace Tessera.Controls;
 
 /// <summary>
-/// Provides the selected item for a list-style control.
+///     Provides the selected item for a list-style control.
 /// </summary>
 /// <typeparam name="T">The item type.</typeparam>
 public sealed class ListSelectionChangedEventArgs<T> : EventArgs
 {
     /// <summary>
-    /// Executes list selection changed event args.
+    ///     Executes list selection changed event args.
     /// </summary>
     /// <param name="previousIndex">The previous index value.</param>
     /// <param name="selectedIndex">The selected index value.</param>
@@ -23,22 +23,22 @@ public sealed class ListSelectionChangedEventArgs<T> : EventArgs
     }
 
     /// <summary>
-    /// Gets the previous index.
+    ///     Gets the previous index.
     /// </summary>
     public int PreviousIndex { get; }
 
     /// <summary>
-    /// Gets the selected index.
+    ///     Gets the selected index.
     /// </summary>
     public int SelectedIndex { get; }
 
     /// <summary>
-    /// Gets the previous item.
+    ///     Gets the previous item.
     /// </summary>
     public T? PreviousItem { get; }
 
     /// <summary>
-    /// Gets the selected item.
+    ///     Gets the selected item.
     /// </summary>
     public T? SelectedItem { get; }
 }

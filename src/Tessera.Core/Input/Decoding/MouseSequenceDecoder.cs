@@ -49,6 +49,7 @@ internal static class MouseSequenceDecoder
         {
             eventType = MouseEventType.Press;
         }
+
         var (button, modifiers) = DecodeMouseButtonAndModifiers(cb, isWheel);
 
         return new DecodeResult(6, CreateMouseMessage(eventType, button, cx - 1, cy - 1, modifiers), false);
@@ -87,6 +88,7 @@ internal static class MouseSequenceDecoder
         {
             eventType = MouseEventType.Press;
         }
+
         var (button, modifiers) = DecodeMouseButtonAndModifiers(cb, isWheel);
 
         message = CreateMouseMessage(eventType, button, cx - 1, cy - 1, modifiers);
@@ -126,7 +128,7 @@ internal static class MouseSequenceDecoder
                 1 => MouseButton.WheelDown,
                 2 => MouseButton.WheelLeft,
                 3 => MouseButton.WheelRight,
-                _ => MouseButton.None,
+                _ => MouseButton.None
             };
         }
 
@@ -141,7 +143,7 @@ internal static class MouseSequenceDecoder
             0 => MouseButton.Left,
             1 => MouseButton.Middle,
             2 => MouseButton.Right,
-            _ => MouseButton.None,
+            _ => MouseButton.None
         };
     }
 
@@ -188,7 +190,7 @@ internal static class MouseSequenceDecoder
             14 => MouseButton.Button22,
             15 => MouseButton.Button23,
             16 => MouseButton.Button24,
-            _ => MouseButton.None,
+            _ => MouseButton.None
         };
     }
 
@@ -205,7 +207,7 @@ internal static class MouseSequenceDecoder
             MouseEventType.Release => new MouseReleaseMsg(button, x, y, modifiers),
             MouseEventType.Motion => new MouseMotionMsg(button, x, y, modifiers),
             MouseEventType.Wheel => new MouseWheelMsg(button, x, y, modifiers),
-            _ => new MouseMotionMsg(button, x, y, modifiers),
+            _ => new MouseMotionMsg(button, x, y, modifiers)
         };
     }
 }

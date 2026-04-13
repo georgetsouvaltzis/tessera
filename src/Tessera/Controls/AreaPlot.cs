@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using System.Globalization;
 using Tessera.Components.Primitives;
 using Tessera.Components.Primitives.Internal;
@@ -8,14 +9,14 @@ using Tessera.Styles;
 namespace Tessera.Controls;
 
 /// <summary>
-/// Represents a filled trend graph control.
+///     Represents a filled trend graph control.
 /// </summary>
 public sealed class AreaPlot : Control
 {
     private readonly List<double> _samples = [];
 
     /// <summary>
-    /// Initializes a new area plot with the provided retained sample capacity.
+    ///     Initializes a new area plot with the provided retained sample capacity.
     /// </summary>
     /// <param name="capacity">The maximum number of retained samples.</param>
     public AreaPlot(int capacity = 240)
@@ -24,125 +25,113 @@ public sealed class AreaPlot : Control
     }
 
     /// <summary>
-    /// Gets the maximum number of retained samples.
+    ///     Gets the maximum number of retained samples.
     /// </summary>
     public int Capacity { get; }
 
     /// <summary>
-    /// Gets or sets the plot title.
+    ///     Gets or sets the plot title.
     /// </summary>
-    public string Title
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = "Area Plot";
+    public string Title { get; set; } = "Area Plot";
 
     /// <summary>
-    /// Gets or sets the marker appended to the title while focused.
+    ///     Gets or sets the marker appended to the title while focused.
     /// </summary>
-    public string FocusMarker
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = "*";
+    public string FocusMarker { get; set; } = "*";
 
     /// <summary>
-    /// Gets or sets a value indicating whether <see cref="FocusMarker" /> should be shown while focused.
+    ///     Gets or sets a value indicating whether <see cref="FocusMarker" /> should be shown while focused.
     /// </summary>
     public bool ShowFocusMarker { get; set; } = true;
 
     /// <summary>
-    /// Gets or sets the title style used when not focused.
+    ///     Gets or sets the title style used when not focused.
     /// </summary>
     public TesseraStyle TitleStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the title style used when focused.
+    ///     Gets or sets the title style used when focused.
     /// </summary>
     public TesseraStyle FocusedTitleStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets style used for area fill glyphs.
+    ///     Gets or sets style used for area fill glyphs.
     /// </summary>
     public TesseraStyle FillStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets style used for the trend line glyph.
+    ///     Gets or sets style used for the trend line glyph.
     /// </summary>
     public TesseraStyle LineStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets style used for baseline glyphs when enabled.
+    ///     Gets or sets style used for baseline glyphs when enabled.
     /// </summary>
     public TesseraStyle BaselineStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets style used for stats/legend rows.
+    ///     Gets or sets style used for stats/legend rows.
     /// </summary>
     public TesseraStyle MetaStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets style merged into rendered output while <see cref="Control.IsDisabled" /> is <see langword="true" />.
+    ///     Gets or sets style merged into rendered output while <see cref="Control.IsDisabled" /> is <see langword="true" />.
     /// </summary>
     public TesseraStyle DisabledStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the style applied to empty text when there are no samples.
+    ///     Gets or sets the style applied to empty text when there are no samples.
     /// </summary>
     public TesseraStyle EmptyTextStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the style applied to border glyphs when the control is not focused.
+    ///     Gets or sets the style applied to border glyphs when the control is not focused.
     /// </summary>
     public TesseraStyle BorderStyleText { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the style applied to border glyphs when the control is focused.
+    ///     Gets or sets the style applied to border glyphs when the control is focused.
     /// </summary>
     public TesseraStyle FocusedBorderStyleText { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets frame border style.
+    ///     Gets or sets frame border style.
     /// </summary>
     public BorderStyle Border { get; set; } = BorderStyle.SingleLine;
 
     /// <summary>
-    /// Gets or sets inner padding for chart content.
+    ///     Gets or sets inner padding for chart content.
     /// </summary>
     public Thickness Padding { get; set; }
 
     /// <summary>
-    /// Gets or sets optional explicit minimum value used for normalization.
+    ///     Gets or sets optional explicit minimum value used for normalization.
     /// </summary>
     public double? MinValue { get; set; }
 
     /// <summary>
-    /// Gets or sets optional explicit maximum value used for normalization.
+    ///     Gets or sets optional explicit maximum value used for normalization.
     /// </summary>
     public double? MaxValue { get; set; }
 
     /// <summary>
-    /// Gets or sets text shown when no samples are present.
+    ///     Gets or sets text shown when no samples are present.
     /// </summary>
-    public string EmptyText
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = "(no samples)";
+    public string EmptyText { get; set; } = "(no samples)";
 
     /// <summary>
-    /// Gets or sets advanced area-plot options.
+    ///     Gets or sets advanced area-plot options.
     /// </summary>
-    [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Advanced)]
+    [EditorBrowsable(EditorBrowsableState.Advanced)]
     public AreaPlotOptions? Options { get; set; }
 
     /// <summary>
-    /// Gets retained sample values.
+    ///     Gets retained sample values.
     /// </summary>
     public IReadOnlyList<double> Samples => _samples;
 
     /// <summary>
-    /// Replaces current samples.
+    ///     Replaces current samples.
     /// </summary>
     /// <param name="samples">The sample values to render.</param>
     public void SetSamples(IEnumerable<double> samples)
@@ -159,7 +148,7 @@ public sealed class AreaPlot : Control
     }
 
     /// <summary>
-    /// Appends one sample.
+    ///     Appends one sample.
     /// </summary>
     /// <param name="sample">The sample value.</param>
     public void Append(double sample)
@@ -172,7 +161,7 @@ public sealed class AreaPlot : Control
     }
 
     /// <summary>
-    /// Clears all samples.
+    ///     Clears all samples.
     /// </summary>
     public void Clear()
     {
@@ -220,7 +209,7 @@ public sealed class AreaPlot : Control
     {
         var titleWidth = ControlTextLayout.MeasureDisplayWidth(FormatTitleForMeasure());
         var width = Math.Max(16, Math.Max(Math.Min(Capacity, 80), titleWidth + 4));
-        var height = Math.Max(4, (Options?.ShowStats ?? false) ? 7 : 6);
+        var height = Math.Max(4, Options?.ShowStats ?? false ? 7 : 6);
 
         width += Padding.Horizontal;
         height += Padding.Vertical;

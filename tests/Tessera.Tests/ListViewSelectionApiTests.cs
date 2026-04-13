@@ -1,5 +1,4 @@
 using NUnit.Framework;
-using Tessera;
 using Tessera.Components.Primitives;
 using Tessera.Controls;
 
@@ -66,14 +65,11 @@ public sealed class ListViewSelectionApiTests
     [Test]
     public void ListViewSelectionApiPointerPressInsideRowLaneSelectsRowBeyondLabelGlyphWidth()
     {
-        var control = new ListView<string>(static item => item)
-        {
-            Border = BorderStyle.None,
-        };
+        var control = new ListView<string>(static item => item) { Border = BorderStyle.None };
         control.SetItems(["a", "b", "c"]);
 
         var changed = control.Handle(
-            new PointerInput(PointerEventKind.Press, PointerButton.Left, X: 19, Y: 1),
+            new PointerInput(PointerEventKind.Press, PointerButton.Left, 19, 1),
             new Rect(0, 0, 20, 4));
 
         Assert.That(changed, Is.True);

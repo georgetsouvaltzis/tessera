@@ -8,131 +8,123 @@ using Tessera.Styles;
 namespace Tessera.Controls;
 
 /// <summary>
-/// Represents a compact bullet chart with qualitative ranges, an actual value bar, and a target marker.
+///     Represents a compact bullet chart with qualitative ranges, an actual value bar, and a target marker.
 /// </summary>
 /// <remarks>
-/// The chart domain is inferred from configured ranges. When no ranges are configured, the default domain is 0..100.
-/// Values and targets are clamped to the resolved domain during rendering.
+///     The chart domain is inferred from configured ranges. When no ranges are configured, the default domain is 0..100.
+///     Values and targets are clamped to the resolved domain during rendering.
 /// </remarks>
 public sealed class BulletChart : Control
 {
     private readonly List<BulletRange> _ranges = [];
 
     /// <summary>
-    /// Gets or sets the chart title.
+    ///     Gets or sets the chart title.
     /// </summary>
-    public string Title
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = "Bullet Chart";
+    public string Title { get; set; } = "Bullet Chart";
 
     /// <summary>
-    /// Gets or sets the marker shown in the title when focused.
+    ///     Gets or sets the marker shown in the title when focused.
     /// </summary>
-    public string FocusMarker
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = "*";
+    public string FocusMarker { get; set; } = "*";
 
     /// <summary>
-    /// Gets or sets whether focused title marker text is rendered.
+    ///     Gets or sets whether focused title marker text is rendered.
     /// </summary>
     public bool ShowFocusMarker { get; set; } = true;
 
     /// <summary>
-    /// Gets or sets style used for title text when not focused.
+    ///     Gets or sets style used for title text when not focused.
     /// </summary>
     public TesseraStyle TitleStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets style used for title text when focused.
+    ///     Gets or sets style used for title text when focused.
     /// </summary>
     public TesseraStyle FocusedTitleStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets style used for neutral range segments.
+    ///     Gets or sets style used for neutral range segments.
     /// </summary>
     public TesseraStyle RangeStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets style used for warning range segments.
+    ///     Gets or sets style used for warning range segments.
     /// </summary>
     public TesseraStyle WarningRangeStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets style used for critical range segments.
+    ///     Gets or sets style used for critical range segments.
     /// </summary>
     public TesseraStyle CriticalRangeStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets style used for the actual value bar.
+    ///     Gets or sets style used for the actual value bar.
     /// </summary>
     public TesseraStyle ValueBarStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets style used for the target marker glyph.
+    ///     Gets or sets style used for the target marker glyph.
     /// </summary>
     public TesseraStyle TargetMarkerStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets style used for value/target label text.
+    ///     Gets or sets style used for value/target label text.
     /// </summary>
     public TesseraStyle ValueLabelStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets style applied to border glyphs when the control is not focused.
+    ///     Gets or sets style applied to border glyphs when the control is not focused.
     /// </summary>
     public TesseraStyle BorderStyleText { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets style merged into border glyphs while the control is focused.
+    ///     Gets or sets style merged into border glyphs while the control is focused.
     /// </summary>
     public TesseraStyle FocusedBorderStyleText { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the border style.
+    ///     Gets or sets the border style.
     /// </summary>
     public BorderStyle Border { get; set; } = BorderStyle.SingleLine;
 
     /// <summary>
-    /// Gets or sets inner padding.
+    ///     Gets or sets inner padding.
     /// </summary>
     public Thickness Padding { get; set; }
 
     /// <summary>
-    /// Gets or sets the glyph used for background range segments.
+    ///     Gets or sets the glyph used for background range segments.
     /// </summary>
     public char RangeGlyph { get; set; } = '░';
 
     /// <summary>
-    /// Gets or sets the glyph used for the actual value bar.
+    ///     Gets or sets the glyph used for the actual value bar.
     /// </summary>
     public char ValueGlyph { get; set; } = '█';
 
     /// <summary>
-    /// Gets or sets the glyph used for the target marker.
+    ///     Gets or sets the glyph used for the target marker.
     /// </summary>
     public char TargetGlyph { get; set; } = '│';
 
     /// <summary>
-    /// Gets currently configured ranges.
+    ///     Gets currently configured ranges.
     /// </summary>
     public IReadOnlyList<BulletRange> Ranges => _ranges;
 
     /// <summary>
-    /// Gets the current value.
+    ///     Gets the current value.
     /// </summary>
     public double Value { get; private set; }
 
     /// <summary>
-    /// Gets the target value.
+    ///     Gets the target value.
     /// </summary>
     public double Target { get; private set; }
 
     /// <summary>
-    /// Replaces chart ranges.
+    ///     Replaces chart ranges.
     /// </summary>
     /// <param name="ranges">Ranges to render.</param>
     public void SetRanges(IEnumerable<BulletRange> ranges)
@@ -155,7 +147,7 @@ public sealed class BulletChart : Control
     }
 
     /// <summary>
-    /// Sets the current value.
+    ///     Sets the current value.
     /// </summary>
     /// <param name="value">Value represented by the foreground bar.</param>
     public void SetValue(double value)
@@ -164,7 +156,7 @@ public sealed class BulletChart : Control
     }
 
     /// <summary>
-    /// Sets the target value.
+    ///     Sets the target value.
     /// </summary>
     /// <param name="target">Target marker value.</param>
     public void SetTarget(double target)
@@ -243,7 +235,7 @@ public sealed class BulletChart : Control
                 (start, end) = (end, start);
             }
 
-            var width = (end - start) + 1;
+            var width = end - start + 1;
             if (width <= 0)
             {
                 continue;
@@ -330,7 +322,7 @@ public sealed class BulletChart : Control
         {
             BulletRangeKind.Warning => RangeStyle.Merge(WarningRangeStyle),
             BulletRangeKind.Critical => RangeStyle.Merge(CriticalRangeStyle),
-            _ => RangeStyle,
+            _ => RangeStyle
         };
     }
 

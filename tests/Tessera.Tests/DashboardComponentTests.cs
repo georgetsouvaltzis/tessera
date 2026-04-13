@@ -7,15 +7,22 @@ internal static class DashboardComponentTests
 {
     public static IEnumerable<TestCase> Cases()
     {
-        yield return new TestCase("Components_Canvas_GraphemeAware_RendersWideAndCombiningText", Canvas_GraphemeAware_RendersWideAndCombiningText);
-        yield return new TestCase("Components_Canvas_GraphemeAware_PreservesLeadingAnsiEscape", Canvas_GraphemeAware_PreservesLeadingAnsiEscape);
-        yield return new TestCase("Components_Canvas_GraphemeAware_TruncatedStyledText_ResetsStyleBeforeFollowingCells", Canvas_GraphemeAware_TruncatedStyledText_ResetsStyleBeforeFollowingCells);
+        yield return new TestCase("Components_Canvas_GraphemeAware_RendersWideAndCombiningText",
+            Canvas_GraphemeAware_RendersWideAndCombiningText);
+        yield return new TestCase("Components_Canvas_GraphemeAware_PreservesLeadingAnsiEscape",
+            Canvas_GraphemeAware_PreservesLeadingAnsiEscape);
+        yield return new TestCase("Components_Canvas_GraphemeAware_TruncatedStyledText_ResetsStyleBeforeFollowingCells",
+            Canvas_GraphemeAware_TruncatedStyledText_ResetsStyleBeforeFollowingCells);
         yield return new TestCase("Components_Gauge_RendersValueAndLabel", Gauge_RendersValueAndLabel);
-        yield return new TestCase("Components_Gauge_ClampsOutOfRangeAndHandlesFlatRange", Gauge_ClampsOutOfRangeAndHandlesFlatRange);
+        yield return new TestCase("Components_Gauge_ClampsOutOfRangeAndHandlesFlatRange",
+            Gauge_ClampsOutOfRangeAndHandlesFlatRange);
         yield return new TestCase("Components_StatsCard_RendersEntries", StatsCard_RendersEntries);
-        yield return new TestCase("Components_StatsCard_SetValue_ReplacesExistingEntry", StatsCard_SetValue_ReplacesExistingEntry);
-        yield return new TestCase("Components_MiniLog_RespectsCapacityAndShowsLatest", MiniLog_RespectsCapacityAndShowsLatest);
-        yield return new TestCase("Components_MiniLog_Append_SplitsEmbeddedNewlines", MiniLog_Append_SplitsEmbeddedNewlines);
+        yield return new TestCase("Components_StatsCard_SetValue_ReplacesExistingEntry",
+            StatsCard_SetValue_ReplacesExistingEntry);
+        yield return new TestCase("Components_MiniLog_RespectsCapacityAndShowsLatest",
+            MiniLog_RespectsCapacityAndShowsLatest);
+        yield return new TestCase("Components_MiniLog_Append_SplitsEmbeddedNewlines",
+            MiniLog_Append_SplitsEmbeddedNewlines);
     }
 
     private static Task Canvas_GraphemeAware_RendersWideAndCombiningText()
@@ -28,7 +35,8 @@ internal static class DashboardComponentTests
         var output = canvas.Render();
 
         // Assert
-        TestAssert.Equal("A😀e\u0301B ", output, "Grapheme-aware mode should preserve wide and combining text while keeping layout width.");
+        TestAssert.Equal("A😀e\u0301B ", output,
+            "Grapheme-aware mode should preserve wide and combining text while keeping layout width.");
         return Task.CompletedTask;
     }
 
@@ -36,15 +44,17 @@ internal static class DashboardComponentTests
     {
         // Arrange
         var canvas = new Canvas(8, 1, CanvasTextMode.GraphemeAware);
-        var styled = "\u001b[4;7;38;5;11mX\u001b[0m";
+        var styled = "\e[4;7;38;5;11mX\e[0m";
 
         // Act
         canvas.WriteText(0, 0, styled, 8);
         var output = canvas.Render();
 
         // Assert
-        TestAssert.True(output.StartsWith("\u001b[4;7;38;5;11mX\u001b[0m", StringComparison.Ordinal), "Grapheme-aware mode should preserve leading ANSI escape sequences.");
-        TestAssert.True(!output.StartsWith("[4;7;38;5;11m", StringComparison.Ordinal), "ANSI payload should not be rendered as literal text.");
+        TestAssert.True(output.StartsWith("\e[4;7;38;5;11mX\e[0m", StringComparison.Ordinal),
+            "Grapheme-aware mode should preserve leading ANSI escape sequences.");
+        TestAssert.True(!output.StartsWith("[4;7;38;5;11m", StringComparison.Ordinal),
+            "ANSI payload should not be rendered as literal text.");
         return Task.CompletedTask;
     }
 
@@ -52,7 +62,7 @@ internal static class DashboardComponentTests
     {
         // Arrange
         var canvas = new Canvas(6, 1, CanvasTextMode.GraphemeAware);
-        var styled = "\u001b[7;38;5;11mABCDE\u001b[0m";
+        var styled = "\e[7;38;5;11mABCDE\e[0m";
 
         // Act
         canvas.WriteText(0, 0, styled, 3); // truncate styled content
@@ -60,7 +70,8 @@ internal static class DashboardComponentTests
         var output = canvas.Render();
 
         // Assert
-        TestAssert.True(output.Contains("\u001b[0mX", StringComparison.Ordinal), "Truncated styled segments should emit reset before following plain cells.");
+        TestAssert.True(output.Contains("\e[0mX", StringComparison.Ordinal),
+            "Truncated styled segments should emit reset before following plain cells.");
         return Task.CompletedTask;
     }
 
@@ -74,7 +85,7 @@ internal static class DashboardComponentTests
             MinValue = 0,
             MaxValue = 100,
             Value = 66,
-            Label = "66%",
+            Label = "66%"
         };
 
         // Act
@@ -92,15 +103,12 @@ internal static class DashboardComponentTests
     {
         // Arrange
         var canvas = new Canvas(34, 7);
-        var stats = new StatsCard
-        {
-            Title = "Stats",
-        };
+        var stats = new StatsCard { Title = "Stats" };
         stats.SetItems(
         [
             new StatItem("raw", "yes"),
             new StatItem("mouse", "yes"),
-            new StatItem("paste", "no"),
+            new StatItem("paste", "no")
         ]);
 
         // Act
@@ -121,14 +129,15 @@ internal static class DashboardComponentTests
         stats.SetItems(
         [
             new StatItem("raw", "yes"),
-            new StatItem("mouse", "yes"),
+            new StatItem("mouse", "yes")
         ]);
 
         // Act
         stats.SetValue("raw", "no");
 
         // Assert
-        TestAssert.Equal(2, stats.Items.Count, "Stats card should replace matching labels instead of appending duplicates.");
+        TestAssert.Equal(2, stats.Items.Count,
+            "Stats card should replace matching labels instead of appending duplicates.");
         TestAssert.Equal("no", stats.Items[0].Value, "Stats card should update the matching entry in place.");
         return Task.CompletedTask;
     }
@@ -137,10 +146,7 @@ internal static class DashboardComponentTests
     {
         // Arrange
         var canvas = new Canvas(30, 6);
-        var log = new MiniLog(capacity: 3)
-        {
-            Title = "Live Event",
-        };
+        var log = new MiniLog(3) { Title = "Live Event" };
         log.Append("one");
         log.Append("two");
         log.Append("three");
@@ -161,7 +167,7 @@ internal static class DashboardComponentTests
     private static Task MiniLog_Append_SplitsEmbeddedNewlines()
     {
         // Arrange
-        var log = new MiniLog(capacity: 4);
+        var log = new MiniLog(4);
 
         // Act
         log.Append("one\r\ntwo\nthree\rfour");
@@ -177,22 +183,10 @@ internal static class DashboardComponentTests
     {
         // Arrange
         var flatCanvas = new Canvas(22, 5);
-        var flatGauge = new Gauge
-        {
-            Title = "Flat",
-            MinValue = 10,
-            MaxValue = 10,
-            Value = 15,
-        };
+        var flatGauge = new Gauge { Title = "Flat", MinValue = 10, MaxValue = 10, Value = 15 };
 
         var lowCanvas = new Canvas(22, 5);
-        var lowGauge = new Gauge
-        {
-            Title = "Low",
-            MinValue = 0,
-            MaxValue = 100,
-            Value = -20,
-        };
+        var lowGauge = new Gauge { Title = "Low", MinValue = 0, MaxValue = 100, Value = -20 };
 
         // Act
         flatGauge.Render(flatCanvas, new Rect(0, 0, 22, 5));
@@ -201,7 +195,8 @@ internal static class DashboardComponentTests
         var lowOutput = lowCanvas.Render();
 
         // Assert
-        TestAssert.True(flatOutput.Contains("15", StringComparison.Ordinal), "Gauge should still render its label when the range is flat.");
+        TestAssert.True(flatOutput.Contains("15", StringComparison.Ordinal),
+            "Gauge should still render its label when the range is flat.");
         TestAssert.True(!lowOutput.Contains('█'), "Gauge should clamp values below range to an empty bar.");
         return Task.CompletedTask;
     }

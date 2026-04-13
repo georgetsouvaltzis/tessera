@@ -3,7 +3,7 @@ using System.ComponentModel;
 namespace Tessera.Controls;
 
 /// <summary>
-/// Defines advanced rendering options for a <see cref="Histogram"/>.
+///     Defines advanced rendering options for a <see cref="Histogram" />.
 /// </summary>
 [EditorBrowsable(EditorBrowsableState.Advanced)]
 public readonly record struct HistogramOptions(

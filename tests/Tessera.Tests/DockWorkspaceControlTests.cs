@@ -12,16 +12,12 @@ public sealed class DockWorkspaceControlTests
     [Test]
     public void ControlsDockWorkspaceKeyboardNavigationSkipsDisabledAndRaisesEvent()
     {
-        var control = new DockWorkspace
-        {
-            IsFocused = true,
-            Border = BorderStyle.None,
-        };
+        var control = new DockWorkspace { IsFocused = true, Border = BorderStyle.None };
         control.SetPanes(
         [
-            new DockPane("explorer", "Explorer", DockPanePosition.Left, size: 16),
-            new DockPane("debug", "Debug", DockPanePosition.Right, size: 20) { IsDisabled = true },
-            new DockPane("logs", "Logs", DockPanePosition.Bottom, size: 6),
+            new DockPane("explorer", "Explorer", DockPanePosition.Left, 16),
+            new DockPane("debug", "Debug", DockPanePosition.Right, 20) { IsDisabled = true },
+            new DockPane("logs", "Logs", DockPanePosition.Bottom, 6)
         ]);
 
         ListSelectionChangedEventArgs<DockPane>? args = null;
@@ -42,15 +38,11 @@ public sealed class DockWorkspaceControlTests
     [Test]
     public void ControlsDockWorkspacePointerClickSelectsPane()
     {
-        var control = new DockWorkspace
-        {
-            IsFocused = true,
-            Border = BorderStyle.None,
-        };
+        var control = new DockWorkspace { IsFocused = true, Border = BorderStyle.None };
         control.SetPanes(
         [
-            new DockPane("top", "Top", DockPanePosition.Top, size: 3) { Lines = ["top"] },
-            new DockPane("center", "Center", DockPanePosition.Center) { Lines = ["center"] },
+            new DockPane("top", "Top", DockPanePosition.Top, 3) { Lines = ["top"] },
+            new DockPane("center", "Center") { Lines = ["center"] }
         ]);
         _ = control.Handle(new KeyPressed(Key.Down));
 
@@ -70,15 +62,15 @@ public sealed class DockWorkspaceControlTests
         {
             Border = BorderStyle.None,
             PaneBorder = BorderStyle.SingleLine,
-            SelectedPaneMarker = ">",
+            SelectedPaneMarker = ">"
         };
         control.SetPanes(
         [
-            new DockPane("left", "Explorer", DockPanePosition.Left, size: 16) { Lines = ["files"] },
-            new DockPane("center", "Editor", DockPanePosition.Center) { Lines = ["main.cs"] },
+            new DockPane("left", "Explorer", DockPanePosition.Left, 16) { Lines = ["files"] },
+            new DockPane("center", "Editor") { Lines = ["main.cs"] }
         ]);
 
-        var output = Render(control, width: 60, height: 14);
+        var output = Render(control, 60, 14);
 
         Assert.That(output.Contains("> Explorer", StringComparison.Ordinal), Is.True);
         Assert.That(output.Contains("Editor", StringComparison.Ordinal), Is.True);
@@ -97,15 +89,15 @@ public sealed class DockWorkspaceControlTests
             PaneBorder = BorderStyle.SingleLine,
             FocusedBorderStyleText = focusedBorder,
             FocusedPaneBorderStyleText = focusedPaneBorder,
-            SelectedPaneBodyStyle = selectedBody,
+            SelectedPaneBodyStyle = selectedBody
         };
         control.SetPanes(
         [
-            new DockPane("console", "Console", DockPanePosition.Bottom, size: 5) { Lines = ["line1"] },
-            new DockPane("editor", "Editor", DockPanePosition.Center) { Lines = ["code"] },
+            new DockPane("console", "Console", DockPanePosition.Bottom, 5) { Lines = ["line1"] },
+            new DockPane("editor", "Editor") { Lines = ["code"] }
         ]);
 
-        var output = Render(control, width: 70, height: 16);
+        var output = Render(control, 70, 16);
 
         Assert.That(output.Contains(focusedBorder.Render("┌"), StringComparison.Ordinal), Is.True);
         Assert.That(output.Contains(focusedPaneBorder.Render("┌"), StringComparison.Ordinal), Is.True);

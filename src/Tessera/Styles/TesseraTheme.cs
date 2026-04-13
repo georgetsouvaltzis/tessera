@@ -1,12 +1,12 @@
-﻿namespace Tessera.Styles;
+namespace Tessera.Styles;
 
 /// <summary>
-/// Represents a semantic theme for Tessera controls.
+///     Represents a semantic theme for Tessera controls.
 /// </summary>
 public sealed class TesseraTheme
 {
     /// <summary>
-    /// Executes tessera theme.
+    ///     Executes tessera theme.
     /// </summary>
     /// <returns>The result of tessera theme.</returns>
     public TesseraTheme()
@@ -14,7 +14,7 @@ public sealed class TesseraTheme
     }
 
     /// <summary>
-    /// Executes tessera theme.
+    ///     Executes tessera theme.
     /// </summary>
     /// <param name="text">The text value.</param>
     /// <param name="surface">The surface value.</param>
@@ -43,37 +43,37 @@ public sealed class TesseraTheme
     }
 
     /// <summary>
-    /// Gets or sets the text.
+    ///     Gets or sets the text.
     /// </summary>
     public TesseraThemeTextTokens Text { get; init; } = new();
 
     /// <summary>
-    /// Gets or sets the surface.
+    ///     Gets or sets the surface.
     /// </summary>
     public TesseraThemeSurfaceTokens Surface { get; init; } = new();
 
     /// <summary>
-    /// Gets or sets the border.
+    ///     Gets or sets the border.
     /// </summary>
     public TesseraThemeBorderTokens Border { get; init; } = new();
 
     /// <summary>
-    /// Gets or sets the state.
+    ///     Gets or sets the state.
     /// </summary>
     public TesseraThemeStateTokens State { get; init; } = new();
 
     /// <summary>
-    /// Gets or sets the accent.
+    ///     Gets or sets the accent.
     /// </summary>
     public TesseraThemeAccentTokens Accent { get; init; } = new();
 
     /// <summary>
-    /// Gets or sets the selection.
+    ///     Gets or sets the selection.
     /// </summary>
     public TesseraThemeSelectionTokens Selection { get; init; } = new();
 
     /// <summary>
-    /// Gets or sets the focus.
+    ///     Gets or sets the focus.
     /// </summary>
     public TesseraThemeFocusTokens Focus { get; init; } = new();
 }

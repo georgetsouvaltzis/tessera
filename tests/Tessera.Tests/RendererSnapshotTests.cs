@@ -1,6 +1,3 @@
-using Tessera.Components.Composition;
-using Tessera.Components.Primitives;
-using Tessera.Components.Styling;
 using System.Text;
 using Tessera.Core.Abstractions;
 using Tessera.Core.Rendering;
@@ -12,7 +9,8 @@ internal static class RendererSnapshotTests
     public static IEnumerable<TestCase> Cases()
     {
         yield return new TestCase("Renderer_Snapshot_FirstFrame_ModesAndTitle", Snapshot_FirstFrame_ModesAndTitle);
-        yield return new TestCase("Renderer_Snapshot_SecondFrame_EmitsMinimalPatch", Snapshot_SecondFrame_EmitsMinimalPatch);
+        yield return new TestCase("Renderer_Snapshot_SecondFrame_EmitsMinimalPatch",
+            Snapshot_SecondFrame_EmitsMinimalPatch);
         yield return new TestCase("Renderer_Snapshot_Reset_EmitsTeardownModes", Snapshot_Reset_EmitsTeardownModes);
     }
 
@@ -22,7 +20,7 @@ internal static class RendererSnapshotTests
         await using var renderer = new AnsiDiffRenderer();
         await using var output = new MemoryStream();
         await renderer.InitializeAsync(output, CancellationToken.None);
-        renderer.Resize(width: 6, height: 3);
+        renderer.Resize(6, 3);
 
         // Act
         renderer.Render(ScreenOutput.From("ab\ncd") with
@@ -34,8 +32,8 @@ internal static class RendererSnapshotTests
                 EnableFocusReporting = true,
                 EnableSynchronizedUpdates = true,
                 MouseMode = MouseMode.AllMotion,
-                WindowTitle = "Snap",
-            },
+                WindowTitle = "Snap"
+            }
         });
         await renderer.FlushAsync(CancellationToken.None);
         var rendered = NormalizeOutput(ReadUtf8(output));
@@ -54,13 +52,10 @@ internal static class RendererSnapshotTests
         await using var renderer = new AnsiDiffRenderer();
         await using var output = new MemoryStream();
         await renderer.InitializeAsync(output, CancellationToken.None);
-        renderer.Resize(width: 6, height: 3);
+        renderer.Resize(6, 3);
         var baseView = ScreenOutput.From("ab\ncd") with
         {
-            Terminal = new TerminalOutput
-            {
-                EnableSynchronizedUpdates = true,
-            },
+            Terminal = new TerminalOutput { EnableSynchronizedUpdates = true }
         };
         renderer.Render(baseView);
         await renderer.FlushAsync(CancellationToken.None);
@@ -89,8 +84,8 @@ internal static class RendererSnapshotTests
                 AltScreen = true,
                 EnableBracketedPaste = true,
                 EnableFocusReporting = true,
-                MouseMode = MouseMode.AllMotion,
-            },
+                MouseMode = MouseMode.AllMotion
+            }
         });
         await renderer.FlushAsync(CancellationToken.None);
         var marker = output.Length;
@@ -124,8 +119,8 @@ internal static class RendererSnapshotTests
     private static string NormalizeOutput(string raw)
     {
         return raw
-            .Replace("\u001b", "<ESC>", StringComparison.Ordinal)
-            .Replace("\u0007", "<BEL>", StringComparison.Ordinal)
+            .Replace("\e", "<ESC>", StringComparison.Ordinal)
+            .Replace("\a", "<BEL>", StringComparison.Ordinal)
             .Replace("\r", "<CR>", StringComparison.Ordinal)
             .Replace("\n", "<LF>", StringComparison.Ordinal);
     }

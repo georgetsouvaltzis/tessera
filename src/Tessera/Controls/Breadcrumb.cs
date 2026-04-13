@@ -1,4 +1,4 @@
-﻿using Tessera.Components.Primitives;
+using Tessera.Components.Primitives;
 using Tessera.Controls.Internal;
 using Tessera.Layout;
 using Tessera.Styles;
@@ -6,7 +6,7 @@ using Tessera.Styles;
 namespace Tessera.Controls;
 
 /// <summary>
-/// Represents a compact single-line breadcrumb navigator.
+///     Represents a compact single-line breadcrumb navigator.
 /// </summary>
 public sealed class Breadcrumb : Control
 {
@@ -14,46 +14,33 @@ public sealed class Breadcrumb : Control
     private int _selectedIndex;
 
     /// <summary>
-    /// Occurs when the selected breadcrumb item changes.
-    /// </summary>
-    public event EventHandler<BreadcrumbSelectionChangedEventArgs>? SelectionChanged;
-
-    /// <summary>
-    /// Gets the configured breadcrumb items.
+    ///     Gets the configured breadcrumb items.
     /// </summary>
     public IReadOnlyList<BreadcrumbItem> Items => _items;
 
     /// <summary>
-    /// Gets the current selected index.
-    /// Returns <c>-1</c> when no items are configured.
+    ///     Gets the current selected index.
+    ///     Returns <c>-1</c> when no items are configured.
     /// </summary>
     public int SelectedIndex => _items.Count == 0 ? -1 : _selectedIndex;
 
     /// <summary>
-    /// Gets the current selected item.
+    ///     Gets the current selected item.
     /// </summary>
     public BreadcrumbItem? SelectedItem => _items.Count == 0 ? null : _items[_selectedIndex];
 
     /// <summary>
-    /// Gets or sets the optional title shown before breadcrumb items.
+    ///     Gets or sets the optional title shown before breadcrumb items.
     /// </summary>
-    public string Title
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = string.Empty;
+    public string Title { get; set; } = string.Empty;
 
     /// <summary>
-    /// Gets or sets the marker shown in the title when the control is focused.
+    ///     Gets or sets the marker shown in the title when the control is focused.
     /// </summary>
-    public string FocusMarker
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = "*";
+    public string FocusMarker { get; set; } = "*";
 
     /// <summary>
-    /// Gets or sets a value indicating whether the title focus marker should be rendered.
+    ///     Gets or sets a value indicating whether the title focus marker should be rendered.
     /// </summary>
     public bool ShowFocusMarker
     {
@@ -62,7 +49,7 @@ public sealed class Breadcrumb : Control
     } = true;
 
     /// <summary>
-    /// Gets or sets the style applied to the title when not focused.
+    ///     Gets or sets the style applied to the title when not focused.
     /// </summary>
     public TesseraStyle TitleStyle
     {
@@ -71,7 +58,7 @@ public sealed class Breadcrumb : Control
     } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the style applied to the title when focused.
+    ///     Gets or sets the style applied to the title when focused.
     /// </summary>
     public TesseraStyle FocusedTitleStyle
     {
@@ -80,25 +67,17 @@ public sealed class Breadcrumb : Control
     } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the separator rendered between breadcrumb items.
+    ///     Gets or sets the separator rendered between breadcrumb items.
     /// </summary>
-    public string Separator
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = "/";
+    public string Separator { get; set; } = "/";
 
     /// <summary>
-    /// Gets or sets the marker rendered in front of the selected item.
+    ///     Gets or sets the marker rendered in front of the selected item.
     /// </summary>
-    public string SelectedMarker
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = "›";
+    public string SelectedMarker { get; set; } = "›";
 
     /// <summary>
-    /// Gets or sets the base style used for breadcrumb item labels.
+    ///     Gets or sets the base style used for breadcrumb item labels.
     /// </summary>
     public TesseraStyle ItemStyle
     {
@@ -107,7 +86,7 @@ public sealed class Breadcrumb : Control
     } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the style merged on top of <see cref="ItemStyle"/> for the selected item.
+    ///     Gets or sets the style merged on top of <see cref="ItemStyle" /> for the selected item.
     /// </summary>
     public TesseraStyle SelectedItemStyle
     {
@@ -116,7 +95,7 @@ public sealed class Breadcrumb : Control
     } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the style used for separator rendering.
+    ///     Gets or sets the style used for separator rendering.
     /// </summary>
     public TesseraStyle SeparatorStyle
     {
@@ -146,7 +125,12 @@ public sealed class Breadcrumb : Control
     }
 
     /// <summary>
-    /// Replaces the breadcrumb item list.
+    ///     Occurs when the selected breadcrumb item changes.
+    /// </summary>
+    public event EventHandler<BreadcrumbSelectionChangedEventArgs>? SelectionChanged;
+
+    /// <summary>
+    ///     Replaces the breadcrumb item list.
     /// </summary>
     /// <param name="items">The items to display in order.</param>
     public void SetItems(IEnumerable<BreadcrumbItem> items)
@@ -304,7 +288,8 @@ public sealed class Breadcrumb : Control
         _selectedIndex = clamped;
         SelectionChanged?.Invoke(
             this,
-            new BreadcrumbSelectionChangedEventArgs(previousIndex, _selectedIndex, previousItem, _items[_selectedIndex]));
+            new BreadcrumbSelectionChangedEventArgs(previousIndex, _selectedIndex, previousItem,
+                _items[_selectedIndex]));
         return true;
     }
 
@@ -356,7 +341,7 @@ public sealed class Breadcrumb : Control
 
     private string FormatItemLabel(int index)
     {
-        var label = _items[index].Label ?? string.Empty;
+        var label = _items[index].Label;
         if (index == _selectedIndex && !string.IsNullOrWhiteSpace(SelectedMarker))
         {
             return $"{SelectedMarker} {label}";

@@ -1,8 +1,3 @@
-using Tessera.Components.Composition;
-using Tessera.Components.Primitives;
-using Tessera.Components.Styling;
-using Tessera.Core.Terminal;
-
 namespace Tessera.Tests;
 
 internal static class TerminalCapabilityDetectorTests
@@ -10,12 +5,16 @@ internal static class TerminalCapabilityDetectorTests
     public static IEnumerable<TestCase> Cases()
     {
         yield return new TestCase("CapabilityDetector_TERM_Dumb_DisablesAdvancedModes", TermDumb_DisablesAdvancedModes);
-        yield return new TestCase("CapabilityDetector_AppleTerminal_DisablesSyncUpdates", AppleTerminal_DisablesSyncUpdates);
+        yield return new TestCase("CapabilityDetector_AppleTerminal_DisablesSyncUpdates",
+            AppleTerminal_DisablesSyncUpdates);
         yield return new TestCase("CapabilityDetector_Xterm_EnablesAllModes", Xterm_EnablesAllModes);
-        yield return new TestCase("CapabilityDetector_Matrix_FontControlFlags_ForKnownTerminals", Matrix_FontControlFlags_ForKnownTerminals);
-        yield return new TestCase("CapabilityDetector_HostEnvironment_Ghostty_EvidenceHook", HostEnvironment_Ghostty_EvidenceHook);
+        yield return new TestCase("CapabilityDetector_Matrix_FontControlFlags_ForKnownTerminals",
+            Matrix_FontControlFlags_ForKnownTerminals);
+        yield return new TestCase("CapabilityDetector_HostEnvironment_Ghostty_EvidenceHook",
+            HostEnvironment_Ghostty_EvidenceHook);
         yield return new TestCase("CapabilityDetector_TerminfoEnrichesLinuxMouse", TerminfoEnrichesLinuxMouse);
-        yield return new TestCase("CapabilityDetector_TerminfoEnrichesVt100Extensions", TerminfoEnrichesVt100Extensions);
+        yield return new TestCase("CapabilityDetector_TerminfoEnrichesVt100Extensions",
+            TerminfoEnrichesVt100Extensions);
         yield return new TestCase("CapabilityDetector_EnvOverride_AppliesCaps", EnvOverride_AppliesCaps);
     }
 
@@ -49,8 +48,10 @@ internal static class TerminalCapabilityDetectorTests
         TestAssert.True(profile.BracketedPaste, "Apple Terminal should keep bracketed paste enabled.");
         TestAssert.True(!profile.SynchronizedUpdates, "Apple Terminal should disable synchronized updates.");
         TestAssert.True(profile.ModeReports, "Apple Terminal should keep mode reports enabled.");
-        TestAssert.True(!profile.SupportsOsc50FontRequests, "Apple Terminal should disable OSC 50 font control by default.");
-        TestAssert.True(!profile.SupportsIterm2ProfileRequests, "Apple Terminal should not enable iTerm2 profile switching.");
+        TestAssert.True(!profile.SupportsOsc50FontRequests,
+            "Apple Terminal should disable OSC 50 font control by default.");
+        TestAssert.True(!profile.SupportsIterm2ProfileRequests,
+            "Apple Terminal should not enable iTerm2 profile switching.");
         return Task.CompletedTask;
     }
 
@@ -77,38 +78,57 @@ internal static class TerminalCapabilityDetectorTests
             new
             {
                 Name = "iTerm2",
-                Env = new (string Name, string? Value)[] { ("TERM", "xterm-256color"), ("TERM_PROGRAM", "iTerm.app"), ("WT_SESSION", null) },
+                Env =
+                    new (string Name, string? Value)[]
+                    {
+                        ("TERM", "xterm-256color"), ("TERM_PROGRAM", "iTerm.app"), ("WT_SESSION", null)
+                    },
                 ExpectedOsc50 = false,
-                ExpectedIterm2 = true,
+                ExpectedIterm2 = true
             },
             new
             {
                 Name = "WezTerm",
-                Env = new (string Name, string? Value)[] { ("TERM", "xterm-256color"), ("TERM_PROGRAM", "WezTerm"), ("WT_SESSION", null) },
+                Env =
+                    new (string Name, string? Value)[]
+                    {
+                        ("TERM", "xterm-256color"), ("TERM_PROGRAM", "WezTerm"), ("WT_SESSION", null)
+                    },
                 ExpectedOsc50 = false,
-                ExpectedIterm2 = false,
+                ExpectedIterm2 = false
             },
             new
             {
                 Name = "Ghostty",
-                Env = new (string Name, string? Value)[] { ("TERM", "xterm-ghostty"), ("TERM_PROGRAM", null), ("WT_SESSION", null) },
+                Env =
+                    new (string Name, string? Value)[]
+                    {
+                        ("TERM", "xterm-ghostty"), ("TERM_PROGRAM", null), ("WT_SESSION", null)
+                    },
                 ExpectedOsc50 = false,
-                ExpectedIterm2 = false,
+                ExpectedIterm2 = false
             },
             new
             {
                 Name = "Kitty",
-                Env = new (string Name, string? Value)[] { ("TERM", "xterm-kitty"), ("TERM_PROGRAM", null), ("WT_SESSION", null) },
+                Env =
+                    new (string Name, string? Value)[]
+                    {
+                        ("TERM", "xterm-kitty"), ("TERM_PROGRAM", null), ("WT_SESSION", null)
+                    },
                 ExpectedOsc50 = false,
-                ExpectedIterm2 = false,
+                ExpectedIterm2 = false
             },
             new
             {
                 Name = "WindowsTerminal",
-                Env = new (string Name, string? Value)[] { ("TERM", "xterm-256color"), ("TERM_PROGRAM", null), ("WT_SESSION", "1") },
+                Env = new (string Name, string? Value)[]
+                {
+                    ("TERM", "xterm-256color"), ("TERM_PROGRAM", null), ("WT_SESSION", "1")
+                },
                 ExpectedOsc50 = false,
-                ExpectedIterm2 = false,
-            },
+                ExpectedIterm2 = false
+            }
         };
 
         foreach (var item in cases)
@@ -128,7 +148,8 @@ internal static class TerminalCapabilityDetectorTests
     private static Task HostEnvironment_Ghostty_EvidenceHook()
     {
         var termLower = (Environment.GetEnvironmentVariable("TERM") ?? string.Empty).Trim().ToLowerInvariant();
-        var termProgramLower = (Environment.GetEnvironmentVariable("TERM_PROGRAM") ?? string.Empty).Trim().ToLowerInvariant();
+        var termProgramLower = (Environment.GetEnvironmentVariable("TERM_PROGRAM") ?? string.Empty).Trim()
+            .ToLowerInvariant();
         var isGhosttyHost = termLower.Contains("ghostty", StringComparison.Ordinal) || termProgramLower == "ghostty";
         if (!isGhosttyHost)
         {
@@ -136,8 +157,10 @@ internal static class TerminalCapabilityDetectorTests
         }
 
         var profile = TerminalCapabilityDetector.Detect();
-        TestAssert.True(!profile.SupportsOsc50FontRequests, "Ghostty host should disable unsupported OSC 50 font control.");
-        TestAssert.True(!profile.SupportsIterm2ProfileRequests, "Ghostty host should not enable iTerm2 profile switching.");
+        TestAssert.True(!profile.SupportsOsc50FontRequests,
+            "Ghostty host should disable unsupported OSC 50 font control.");
+        TestAssert.True(!profile.SupportsIterm2ProfileRequests,
+            "Ghostty host should not enable iTerm2 profile switching.");
         return Task.CompletedTask;
     }
 
@@ -145,7 +168,7 @@ internal static class TerminalCapabilityDetectorTests
     {
         // Arrange + Act
         var profile = Detect(
-            terminfo: "linux|linux console, kmous=\\E[M,",
+            "linux|linux console, kmous=\\E[M,",
             ("TERM", "linux"));
 
         // Assert
@@ -164,7 +187,7 @@ internal static class TerminalCapabilityDetectorTests
     {
         // Arrange + Act
         var profile = Detect(
-            terminfo: "vt100|vt100, XT,",
+            "vt100|vt100, XT,",
             ("TERM", "vt100"));
 
         // Assert
@@ -190,7 +213,8 @@ internal static class TerminalCapabilityDetectorTests
         TestAssert.True(!profile.SynchronizedUpdates, "Override should disable synchronized updates.");
         TestAssert.True(!profile.ModeReports, "Override should disable mode reports.");
         TestAssert.True(!profile.SupportsOsc50FontRequests, "Override should allow disabling OSC 50 font control.");
-        TestAssert.True(profile.SupportsIterm2ProfileRequests, "Override should allow enabling iTerm2 profile switching.");
+        TestAssert.True(profile.SupportsIterm2ProfileRequests,
+            "Override should allow enabling iTerm2 profile switching.");
         TestAssert.True(
             profile.Source.Contains("+override", StringComparison.Ordinal),
             "Source should include override marker when TESSERA_CAPS applies.");
@@ -216,6 +240,6 @@ internal static class TerminalCapabilityDetectorTests
         return TerminalCapabilityDetector.Detect(
             name => env.TryGetValue(name, out var value) ? value : null,
             _ => terminfo,
-            isWindows: false);
+            false);
     }
 }

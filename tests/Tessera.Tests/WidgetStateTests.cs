@@ -1,6 +1,4 @@
-using Tessera.Components.Composition;
-using Tessera.Components.Primitives;
-using Tessera.Components.Styling;
+using System.Runtime.CompilerServices;
 using Tessera.Core.Messages;
 using Tessera.Widgets;
 using Tessera.Widgets.Internal;
@@ -13,21 +11,32 @@ internal static class WidgetStateTests
     {
         yield return new TestCase("Widgets_KeyBinding_MatchesCtrlChord", KeyBinding_MatchesCtrlChord);
         yield return new TestCase("Widgets_HelpView_RenderCompact_WrapsByWidth", HelpView_RenderCompact_WrapsByWidth);
-        yield return new TestCase("Widgets_HelpView_RenderColumns_UsesExpandedLayout", HelpView_RenderColumns_UsesExpandedLayout);
+        yield return new TestCase("Widgets_HelpView_RenderColumns_UsesExpandedLayout",
+            HelpView_RenderColumns_UsesExpandedLayout);
         yield return new TestCase("Widgets_Viewport_ScrollAndHorizontalOffset", Viewport_ScrollAndHorizontalOffset);
         yield return new TestCase("Widgets_Viewport_WrapMode_SoftWrapsRows", Viewport_WrapMode_SoftWrapsRows);
-        yield return new TestCase("Widgets_Viewport_NoDecoration_NoClip_ReusesOriginalLineReferences", Viewport_NoDecoration_NoClip_ReusesOriginalLineReferences);
-        yield return new TestCase("Widgets_Viewport_AppendRawLine_PreservesExistingRowsAndAddsNewTailRow", Viewport_AppendRawLine_PreservesExistingRowsAndAddsNewTailRow);
-        yield return new TestCase("Widgets_Viewport_NoDecoration_HorizontalOffsetBeyondLineRendersEmpty", Viewport_NoDecoration_HorizontalOffsetBeyondLineRendersEmpty);
-        yield return new TestCase("Widgets_Viewport_GutterAndHighlight_RenderDecorations", Viewport_GutterAndHighlight_RenderDecorations);
-        yield return new TestCase("Widgets_Viewport_HighlightWithoutGutter_PreservesMarkerPrefix", Viewport_HighlightWithoutGutter_PreservesMarkerPrefix);
-        yield return new TestCase("Widgets_Viewport_LineNumberPrefix_ClipsWhenViewportNarrow", Viewport_LineNumberPrefix_ClipsWhenViewportNarrow);
+        yield return new TestCase("Widgets_Viewport_NoDecoration_NoClip_ReusesOriginalLineReferences",
+            Viewport_NoDecoration_NoClip_ReusesOriginalLineReferences);
+        yield return new TestCase("Widgets_Viewport_AppendRawLine_PreservesExistingRowsAndAddsNewTailRow",
+            Viewport_AppendRawLine_PreservesExistingRowsAndAddsNewTailRow);
+        yield return new TestCase("Widgets_Viewport_NoDecoration_HorizontalOffsetBeyondLineRendersEmpty",
+            Viewport_NoDecoration_HorizontalOffsetBeyondLineRendersEmpty);
+        yield return new TestCase("Widgets_Viewport_GutterAndHighlight_RenderDecorations",
+            Viewport_GutterAndHighlight_RenderDecorations);
+        yield return new TestCase("Widgets_Viewport_HighlightWithoutGutter_PreservesMarkerPrefix",
+            Viewport_HighlightWithoutGutter_PreservesMarkerPrefix);
+        yield return new TestCase("Widgets_Viewport_LineNumberPrefix_ClipsWhenViewportNarrow",
+            Viewport_LineNumberPrefix_ClipsWhenViewportNarrow);
         yield return new TestCase("Widgets_TextInput_EditWordAndSubmit", TextInput_EditWordAndSubmit);
         yield return new TestCase("Widgets_TextInput_AltBindings_WorkForWordOps", TextInput_AltBindings_WorkForWordOps);
-        yield return new TestCase("Widgets_TextInput_Multiline_EnterAndVerticalNavigation", TextInput_Multiline_EnterAndVerticalNavigation);
-        yield return new TestCase("Widgets_TextInput_SelectAllThenPaste_ReplacesValue", TextInput_SelectAllThenPaste_ReplacesValue);
-        yield return new TestCase("Widgets_List_FilterAndPaging_MaintainSelection", List_FilterAndPaging_MaintainSelection);
-        yield return new TestCase("Widgets_List_AsyncLoaders_ApplyFilterAndSelection", List_AsyncLoaders_ApplyFilterAndSelection);
+        yield return new TestCase("Widgets_TextInput_Multiline_EnterAndVerticalNavigation",
+            TextInput_Multiline_EnterAndVerticalNavigation);
+        yield return new TestCase("Widgets_TextInput_SelectAllThenPaste_ReplacesValue",
+            TextInput_SelectAllThenPaste_ReplacesValue);
+        yield return new TestCase("Widgets_List_FilterAndPaging_MaintainSelection",
+            List_FilterAndPaging_MaintainSelection);
+        yield return new TestCase("Widgets_List_AsyncLoaders_ApplyFilterAndSelection",
+            List_AsyncLoaders_ApplyFilterAndSelection);
         yield return new TestCase("Widgets_List_ReloadAsync_CancelsStaleLoad", List_ReloadAsync_CancelsStaleLoad);
     }
 
@@ -50,17 +59,16 @@ internal static class WidgetStateTests
         // Arrange
         var bindings = new[]
         {
-            new KeyBinding("up/k", "move up"),
-            new KeyBinding("down/j", "move down"),
-            new KeyBinding("q", "quit"),
+            new KeyBinding("up/k", "move up"), new KeyBinding("down/j", "move down"), new KeyBinding("q", "quit")
         };
 
         // Act
-        var help = HelpView.RenderCompact(bindings, maxWidth: 24);
+        var help = HelpView.RenderCompact(bindings, 24);
 
         // Assert
         TestAssert.True(help.Contains('\n'), "Help output should wrap when width is constrained.");
-        TestAssert.True(help.Contains("up/k move up", StringComparison.Ordinal), "Help output should include first binding.");
+        TestAssert.True(help.Contains("up/k move up", StringComparison.Ordinal),
+            "Help output should include first binding.");
         return Task.CompletedTask;
     }
 
@@ -69,20 +77,20 @@ internal static class WidgetStateTests
         // Arrange
         var bindings = new[]
         {
-            new KeyBinding("up/k", "move up"),
-            new KeyBinding("down/j", "move down"),
-            new KeyBinding("q", "quit"),
-            new KeyBinding("?", "help"),
+            new KeyBinding("up/k", "move up"), new KeyBinding("down/j", "move down"), new KeyBinding("q", "quit"),
+            new KeyBinding("?", "help")
         };
 
         // Act
-        var help = HelpView.RenderColumns(bindings, maxWidth: 56);
+        var help = HelpView.RenderColumns(bindings, 56);
 
         // Assert
         var lines = help.Split('\n');
         TestAssert.True(lines.Length >= 2, "Expanded help should wrap to multiple rows.");
-        TestAssert.True(lines[0].Contains("up/k move up", StringComparison.Ordinal), "First row should include first binding.");
-        TestAssert.True(lines[0].Contains("q quit", StringComparison.Ordinal), "First row should include second column binding.");
+        TestAssert.True(lines[0].Contains("up/k move up", StringComparison.Ordinal),
+            "First row should include first binding.");
+        TestAssert.True(lines[0].Contains("q quit", StringComparison.Ordinal),
+            "First row should include second column binding.");
         return Task.CompletedTask;
     }
 
@@ -90,7 +98,7 @@ internal static class WidgetStateTests
     {
         // Arrange
         var viewport = new ViewportModel();
-        viewport.Resize(width: 8, height: 2);
+        viewport.Resize(8, 2);
         viewport.SetWrap(false);
         viewport.SetContent("0123456789\nabcdefghij\nklmnopqrst");
 
@@ -102,7 +110,8 @@ internal static class WidgetStateTests
         var lines = viewport.RenderLines();
 
         // Assert
-        TestAssert.Equal("23456789", firstLineAfterHorizontalScroll, "Horizontal scroll should shift viewport content.");
+        TestAssert.Equal("23456789", firstLineAfterHorizontalScroll,
+            "Horizontal scroll should shift viewport content.");
         TestAssert.Equal("cdefghij", lines[0], "Vertical scroll should move viewport to the next row.");
         TestAssert.Equal("mnopqrst", lines[1], "Viewport should render following row with same horizontal offset.");
         return Task.CompletedTask;
@@ -112,7 +121,7 @@ internal static class WidgetStateTests
     {
         // Arrange
         var viewport = new ViewportModel();
-        viewport.Resize(width: 4, height: 2);
+        viewport.Resize(4, 2);
         viewport.SetWrap(true);
         viewport.SetContent("abcdefghijkl");
 
@@ -135,7 +144,7 @@ internal static class WidgetStateTests
     {
         // Arrange
         var viewport = new ViewportModel();
-        viewport.Resize(width: 24, height: 2);
+        viewport.Resize(24, 2);
         viewport.SetWrap(false);
         var first = "alpha";
         var second = "beta";
@@ -145,8 +154,10 @@ internal static class WidgetStateTests
         var lines = viewport.RenderLines();
 
         // Assert
-        TestAssert.True(object.ReferenceEquals(first, lines[0]), "No-decoration path should reuse existing line instance when clipping is not required.");
-        TestAssert.True(object.ReferenceEquals(second, lines[1]), "No-decoration path should reuse existing line instance for subsequent rows when clipping is not required.");
+        TestAssert.True(ReferenceEquals(first, lines[0]),
+            "No-decoration path should reuse existing line instance when clipping is not required.");
+        TestAssert.True(ReferenceEquals(second, lines[1]),
+            "No-decoration path should reuse existing line instance for subsequent rows when clipping is not required.");
         return Task.CompletedTask;
     }
 
@@ -155,16 +166,17 @@ internal static class WidgetStateTests
         // Act
         var lines = ViewportRenderer.RenderLines(
             ["abc"],
-            width: 6,
-            height: 1,
-            xOffset: 10,
-            yOffset: 0,
-            wrap: false,
-            showLineNumbers: false,
-            highlightVisualLine: null);
+            6,
+            1,
+            10,
+            0,
+            false,
+            false,
+            null);
 
         // Assert
-        TestAssert.Equal(string.Empty, lines[0], "No-decoration path should return empty output when horizontal offset exceeds line length.");
+        TestAssert.Equal(string.Empty, lines[0],
+            "No-decoration path should return empty output when horizontal offset exceeds line length.");
         return Task.CompletedTask;
     }
 
@@ -172,7 +184,7 @@ internal static class WidgetStateTests
     {
         // Arrange
         var viewport = new ViewportModel();
-        viewport.Resize(width: 16, height: 3);
+        viewport.Resize(16, 3);
         viewport.SetWrap(false);
         viewport.SetLines(["alpha", "beta"]);
         _ = viewport.RenderLines();
@@ -191,32 +203,26 @@ internal static class WidgetStateTests
     private static Task Viewport_GutterAndHighlight_RenderDecorations()
     {
         // Arrange
-        var viewport = new ViewportModel
-        {
-            ShowLineNumbers = true,
-            HighlightVisualLine = 1,
-        };
-        viewport.Resize(width: 12, height: 2);
+        var viewport = new ViewportModel { ShowLineNumbers = true, HighlightVisualLine = 1 };
+        viewport.Resize(12, 2);
         viewport.SetContent("alpha\nbeta\ngamma");
 
         // Act
         var lines = viewport.RenderLines();
 
         // Assert
-        TestAssert.True(lines[0].StartsWith(" 1 ", StringComparison.Ordinal), "Viewport line numbers should prefix each visual row.");
-        TestAssert.True(lines[1].StartsWith(" 2> ", StringComparison.Ordinal), "Highlighted visual row should include marker.");
+        TestAssert.True(lines[0].StartsWith(" 1 ", StringComparison.Ordinal),
+            "Viewport line numbers should prefix each visual row.");
+        TestAssert.True(lines[1].StartsWith(" 2> ", StringComparison.Ordinal),
+            "Highlighted visual row should include marker.");
         return Task.CompletedTask;
     }
 
     private static Task Viewport_HighlightWithoutGutter_PreservesMarkerPrefix()
     {
         // Arrange
-        var viewport = new ViewportModel
-        {
-            ShowLineNumbers = false,
-            HighlightVisualLine = 0,
-        };
-        viewport.Resize(width: 4, height: 1);
+        var viewport = new ViewportModel { ShowLineNumbers = false, HighlightVisualLine = 0 };
+        viewport.Resize(4, 1);
         viewport.SetWrap(false);
         viewport.SetContent("abcdef");
 
@@ -224,25 +230,24 @@ internal static class WidgetStateTests
         var lines = viewport.RenderLines();
 
         // Assert
-        TestAssert.Equal("> abcd", lines[0], "Highlight marker should prefix clipped content even when viewport width is fully consumed.");
+        TestAssert.Equal("> abcd", lines[0],
+            "Highlight marker should prefix clipped content even when viewport width is fully consumed.");
         return Task.CompletedTask;
     }
 
     private static Task Viewport_LineNumberPrefix_ClipsWhenViewportNarrow()
     {
         // Arrange
-        var viewport = new ViewportModel
-        {
-            ShowLineNumbers = true,
-        };
-        viewport.Resize(width: 2, height: 1);
+        var viewport = new ViewportModel { ShowLineNumbers = true };
+        viewport.Resize(2, 1);
         viewport.SetContent("alpha");
 
         // Act
         var lines = viewport.RenderLines();
 
         // Assert
-        TestAssert.Equal(" 1", lines[0], "When width is smaller than gutter prefix, viewport should render clipped prefix only.");
+        TestAssert.Equal(" 1", lines[0],
+            "When width is smaller than gutter prefix, viewport should render clipped prefix only.");
         return Task.CompletedTask;
     }
 
@@ -304,10 +309,7 @@ internal static class WidgetStateTests
     private static Task TextInput_Multiline_EnterAndVerticalNavigation()
     {
         // Arrange
-        var input = new TextInputModel
-        {
-            Multiline = true,
-        };
+        var input = new TextInputModel { Multiline = true };
         var keyMap = TextInputKeyMap.Default;
         input.SetValue("alpha");
         input.Update(new KeyPressMsg(KeyCode.End), keyMap);
@@ -324,21 +326,16 @@ internal static class WidgetStateTests
 
         // Assert
         TestAssert.True(!submit.Submitted, "Enter should insert newline in multiline mode.");
-        TestAssert.Equal("alph!a\nbeta", input.Value, "Vertical navigation should preserve current column while moving between lines.");
+        TestAssert.Equal("alph!a\nbeta", input.Value,
+            "Vertical navigation should preserve current column while moving between lines.");
         return Task.CompletedTask;
     }
 
     private static Task List_FilterAndPaging_MaintainSelection()
     {
         // Arrange
-        var items = new[]
-        {
-            "alpha", "beta", "gamma", "delta", "epsilon", "zeta", "eta", "theta",
-        };
-        var list = new ListModel<string>(items, item => item)
-        {
-            PageSize = 3,
-        };
+        var items = new[] { "alpha", "beta", "gamma", "delta", "epsilon", "zeta", "eta", "theta" };
+        var list = new ListModel<string>(items, item => item) { PageSize = 3 };
 
         // Act
         list.Update(new KeyPressMsg(KeyCode.Down));
@@ -351,19 +348,18 @@ internal static class WidgetStateTests
         var rowsAfterFilter = list.VisibleRows();
 
         // Assert
-        TestAssert.Equal(2, rowsAfterScroll[0].Index, "Paging should shift first visible row as selection moves downward.");
+        TestAssert.Equal(2, rowsAfterScroll[0].Index,
+            "Paging should shift first visible row as selection moves downward.");
         TestAssert.True(rowsAfterFilter.Count > 0, "Filtered list should keep matching rows.");
-        TestAssert.True(rowsAfterFilter[0].Item.Contains("ta", StringComparison.Ordinal), "Filtered rows should match filter text.");
+        TestAssert.True(rowsAfterFilter[0].Item.Contains("ta", StringComparison.Ordinal),
+            "Filtered rows should match filter text.");
         return Task.CompletedTask;
     }
 
     private static async Task List_AsyncLoaders_ApplyFilterAndSelection()
     {
         // Arrange
-        var list = new ListModel<string>([], item => item)
-        {
-            PageSize = 2,
-        };
+        var list = new ListModel<string>([], item => item) { PageSize = 2 };
         list.SetFilter("ta");
 
         // Act
@@ -404,10 +400,11 @@ internal static class WidgetStateTests
 
         // Assert
         TestAssert.Equal(3, list.Count, "Latest tracked load should win and set new item set.");
-        TestAssert.True(rows[0].Item.StartsWith("new-", StringComparison.Ordinal), "Stale load should not overwrite latest results.");
+        TestAssert.True(rows[0].Item.StartsWith("new-", StringComparison.Ordinal),
+            "Stale load should not overwrite latest results.");
         return;
 
-        static async IAsyncEnumerable<string> Slow(string a, string b, [System.Runtime.CompilerServices.EnumeratorCancellation] CancellationToken token)
+        static async IAsyncEnumerable<string> Slow(string a, string b, [EnumeratorCancellation] CancellationToken token)
         {
             await Task.Delay(20, token);
             token.ThrowIfCancellationRequested();
@@ -417,7 +414,8 @@ internal static class WidgetStateTests
             yield return b;
         }
 
-        static async IAsyncEnumerable<string> Fast(string a, string b, string c, [System.Runtime.CompilerServices.EnumeratorCancellation] CancellationToken token)
+        static async IAsyncEnumerable<string> Fast(string a, string b, string c,
+            [EnumeratorCancellation] CancellationToken token)
         {
             await Task.Delay(1, token);
             token.ThrowIfCancellationRequested();

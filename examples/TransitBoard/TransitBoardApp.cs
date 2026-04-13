@@ -5,22 +5,22 @@ namespace Tessera.Examples.TransitBoard;
 
 internal sealed partial class TransitBoardApp : TesseraApp
 {
-    private TransitBoardPalette _palette = TransitBoardTheme.Default;
-    private readonly TransitBoardState _state = TransitBoardState.CreateSeed();
-
-    private readonly TransitHeroControl _hero = new();
-    private readonly TransitChipStripControl _modeStrip = new() { Title = string.Empty };
-    private readonly TransitChipStripControl _routeStrip = new() { Title = string.Empty };
-    private readonly TransitChipStripControl _themeStrip = new() { Title = string.Empty };
     private readonly TransitDepartureBoardControl _board = new();
-    private readonly TransitNoticeControl _notices = new();
-    private readonly TransitJourneyControl _journey = new();
     private readonly StatusBar _footer = new() { Fill = ' ' };
 
+    private readonly TransitHeroControl _hero = new();
+    private readonly TransitJourneyControl _journey = new();
+    private readonly TransitChipStripControl _modeStrip = new() { Title = string.Empty };
+    private readonly TransitNoticeControl _notices = new();
+    private readonly TransitChipStripControl _routeStrip = new() { Title = string.Empty };
+    private readonly TransitBoardState _state = TransitBoardState.CreateSeed();
+    private readonly TransitChipStripControl _themeStrip = new() { Title = string.Empty };
+    private int _focusLane;
+
     private TransitBoardMode _mode = TransitBoardMode.Departures;
+    private TransitBoardPalette _palette = TransitBoardTheme.Default;
     private string _routeId = "all";
     private string? _selectedServiceId;
-    private int _focusLane;
     private IReadOnlyList<TransitService> _visibleServices = [];
 
     public TransitBoardApp()
@@ -31,8 +31,10 @@ internal sealed partial class TransitBoardApp : TesseraApp
         _board.RequestFocus();
     }
 
-    public override TesseraEffect? Initialize() =>
-        TesseraEffects.Periodic(TimeSpan.FromSeconds(1), _ => new TransitBoardTickMessage());
+    public override TesseraEffect? Initialize()
+    {
+        return TesseraEffects.Periodic(TimeSpan.FromSeconds(1), _ => new TransitBoardTickMessage());
+    }
 
     public override TesseraEffect? Update(Message message)
     {
@@ -157,7 +159,7 @@ internal sealed partial class TransitBoardApp : TesseraApp
             {
                 "arrivals" => TransitBoardMode.Arrivals,
                 "all" => TransitBoardMode.AllBoard,
-                _ => TransitBoardMode.Departures,
+                _ => TransitBoardMode.Departures
             };
         };
 
@@ -180,7 +182,7 @@ internal sealed partial class TransitBoardApp : TesseraApp
             {
                 "harbor" => TransitBoardThemeKind.Harbor,
                 "afterglow" => TransitBoardThemeKind.Afterglow,
-                _ => TransitBoardThemeKind.Meridian,
+                _ => TransitBoardThemeKind.Meridian
             });
         };
 
@@ -204,7 +206,8 @@ internal sealed partial class TransitBoardApp : TesseraApp
         _board.SetServices(_visibleServices);
         if (!_board.SelectService(_selectedServiceId))
         {
-            _selectedServiceId = _board.SelectedService?.Id ?? (_visibleServices.Count > 0 ? _visibleServices[0].Id : null);
+            _selectedServiceId = _board.SelectedService?.Id ??
+                                 (_visibleServices.Count > 0 ? _visibleServices[0].Id : null);
             _board.SelectService(_selectedServiceId);
         }
 
@@ -217,14 +220,15 @@ internal sealed partial class TransitBoardApp : TesseraApp
         _hero.ClockText = $"{_state.ClockText} UTC";
         _hero.SummaryText = _state.BuildHeroSummary(_routeId, _mode, _visibleServices);
         _hero.AdvisoryText = TransitBoardState.BuildAdvisory(_visibleServices);
-        _hero.NoticeText = "Concourse rhythm steady  ·  airport screening adds light dwell  ·  night ferry under soft gate shift";
+        _hero.NoticeText =
+            "Concourse rhythm steady  ·  airport screening adds light dwell  ·  night ferry under soft gate shift";
 
         _modeStrip.SetItems(TransitBoardState.BuildModeItems(_mode, _palette));
         _modeStrip.SelectById(_mode switch
         {
             TransitBoardMode.Arrivals => "arrivals",
             TransitBoardMode.AllBoard => "all",
-            _ => "departures",
+            _ => "departures"
         });
 
         _routeStrip.SetItems(_state.BuildRouteItems(_routeId, _palette));
@@ -237,11 +241,13 @@ internal sealed partial class TransitBoardApp : TesseraApp
         {
             TransitBoardMode.Arrivals => "Arrivals Board · F3",
             TransitBoardMode.AllBoard => "Network Board · F3",
-            _ => "Departures Board · F3",
+            _ => "Departures Board · F3"
         };
 
-        _footer.LeftText = $"transitboard  {_palette.Label.ToLowerInvariant()}  route {_routeId}  live {_visibleServices.Count:00}";
-        _footer.RightText = "Tab focus  F1 mode  F2 lines  F3 board  F4 palette  d/a/m board  1/2/3 themes  Ctrl+C quit";
+        _footer.LeftText =
+            $"transitboard  {_palette.Label.ToLowerInvariant()}  route {_routeId}  live {_visibleServices.Count:00}";
+        _footer.RightText =
+            "Tab focus  F1 mode  F2 lines  F3 board  F4 palette  d/a/m board  1/2/3 themes  Ctrl+C quit";
     }
 
     private void SelectMode(TransitBoardMode mode)
@@ -251,7 +257,7 @@ internal sealed partial class TransitBoardApp : TesseraApp
         {
             TransitBoardMode.Arrivals => "arrivals",
             TransitBoardMode.AllBoard => "all",
-            _ => "departures",
+            _ => "departures"
         });
     }
 
@@ -303,7 +309,8 @@ internal sealed partial class TransitBoardApp : TesseraApp
         _board.PrimaryTextStyle = theme.Text.Primary.WithBold();
         _board.SecondaryTextStyle = theme.Text.Secondary;
         _board.SelectedRowStyle = TransitBoardTheme.Chip(palette.SelectionForeground, palette.SelectionBackground);
-        _board.SelectedSecondaryStyle = TransitBoardTheme.Chip(palette.SelectionForeground, palette.SelectionBackground, false);
+        _board.SelectedSecondaryStyle =
+            TransitBoardTheme.Chip(palette.SelectionForeground, palette.SelectionBackground, false);
         _board.DelayStyle = TransitBoardTheme.Foreground(palette.Delay).WithBold();
         _board.WarningStyle = TransitBoardTheme.Foreground(palette.Warning).WithBold();
         _board.SuccessStyle = TransitBoardTheme.Foreground(palette.Success).WithBold();
@@ -339,4 +346,4 @@ internal sealed partial class TransitBoardApp : TesseraApp
     }
 }
 
-internal sealed record TransitBoardTickMessage() : Message;
+internal sealed record TransitBoardTickMessage : Message;

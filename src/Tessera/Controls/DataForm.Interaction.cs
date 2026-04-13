@@ -23,17 +23,60 @@ public sealed partial class DataForm<TModel>
             return false;
         }
 
-        if (key.Is(Key.Down) || key.IsCharacter('j')) return NavigateFromCurrentSelection(NextField);
-        if (key.Is(Key.Up) || key.IsCharacter('k')) return NavigateFromCurrentSelection(PreviousField);
-        if (key.Is(Key.Home)) return NavigateFromCurrentSelection(() => SelectField(0));
-        if (key.Is(Key.End)) return NavigateFromCurrentSelection(() => SelectField(_fields.Count - 1));
-        if (key.Is(Key.PageDown)) return NavigateFromCurrentSelection(() => SelectField(_selectedIndex + Math.Max(1, _lastViewportRows)));
-        if (key.Is(Key.PageUp)) return NavigateFromCurrentSelection(() => SelectField(_selectedIndex - Math.Max(1, _lastViewportRows)));
-        if (key.Is(Key.Enter)) return _isEditing ? CommitCurrentField(out _) : BeginEditCore();
-        if (key.Is(Key.Escape)) return CancelCurrentEdit();
-        if (!_isEditing || !CanEditCurrentField()) return false;
-        if (key.Is(Key.Backspace)) return RemoveFromBuffer();
-        if (key.Is(Key.Delete)) return RemoveFromBuffer();
+        if (key.Is(Key.Down) || key.IsCharacter('j'))
+        {
+            return NavigateFromCurrentSelection(NextField);
+        }
+
+        if (key.Is(Key.Up) || key.IsCharacter('k'))
+        {
+            return NavigateFromCurrentSelection(PreviousField);
+        }
+
+        if (key.Is(Key.Home))
+        {
+            return NavigateFromCurrentSelection(() => SelectField(0));
+        }
+
+        if (key.Is(Key.End))
+        {
+            return NavigateFromCurrentSelection(() => SelectField(_fields.Count - 1));
+        }
+
+        if (key.Is(Key.PageDown))
+        {
+            return NavigateFromCurrentSelection(() => SelectField(SelectedIndex + Math.Max(1, _lastViewportRows)));
+        }
+
+        if (key.Is(Key.PageUp))
+        {
+            return NavigateFromCurrentSelection(() => SelectField(SelectedIndex - Math.Max(1, _lastViewportRows)));
+        }
+
+        if (key.Is(Key.Enter))
+        {
+            return IsEditing ? CommitCurrentField(out _) : BeginEditCore();
+        }
+
+        if (key.Is(Key.Escape))
+        {
+            return CancelCurrentEdit();
+        }
+
+        if (!IsEditing || !CanEditCurrentField())
+        {
+            return false;
+        }
+
+        if (key.Is(Key.Backspace))
+        {
+            return RemoveFromBuffer();
+        }
+
+        if (key.Is(Key.Delete))
+        {
+            return RemoveFromBuffer();
+        }
 
         if (key.Key == Key.Character
             && !string.IsNullOrEmpty(key.Text)
@@ -41,9 +84,9 @@ public sealed partial class DataForm<TModel>
             && !key.Modifiers.HasFlag(ModifierKeys.Alt)
             && !key.Modifiers.HasFlag(ModifierKeys.Meta))
         {
-            _editBuffer += key.Text;
+            EditBuffer += key.Text;
             _isDirty = true;
-            _lastCommitError = string.Empty;
+            LastCommitError = string.Empty;
             return true;
         }
 
@@ -77,8 +120,15 @@ public sealed partial class DataForm<TModel>
 
         if (pointer.Kind == PointerEventKind.Wheel && _fields.Count > 0)
         {
-            if (pointer.Button == PointerButton.WheelDown) return NavigateFromCurrentSelection(NextField) || changed;
-            if (pointer.Button == PointerButton.WheelUp) return NavigateFromCurrentSelection(PreviousField) || changed;
+            if (pointer.Button == PointerButton.WheelDown)
+            {
+                return NavigateFromCurrentSelection(NextField) || changed;
+            }
+
+            if (pointer.Button == PointerButton.WheelUp)
+            {
+                return NavigateFromCurrentSelection(PreviousField) || changed;
+            }
         }
 
         if (!inside || _fields.Count == 0 || pointer.Y < rowTop || rowsHeight <= 0)
@@ -110,33 +160,33 @@ public sealed partial class DataForm<TModel>
 
     private bool HandlePaste(Pasted pasted)
     {
-        if (!_isEditing || !CanEditCurrentField())
+        if (!IsEditing || !CanEditCurrentField())
         {
             return false;
         }
 
-        _editBuffer += pasted.Content ?? string.Empty;
+        EditBuffer += pasted.Content;
         _isDirty = true;
-        _lastCommitError = string.Empty;
+        LastCommitError = string.Empty;
         return true;
     }
 
     private bool BeginEditCore()
     {
-        if (_isEditing || !CanEditCurrentField())
+        if (IsEditing || !CanEditCurrentField())
         {
             return false;
         }
 
-        _isEditing = true;
-        _lastCommitError = string.Empty;
+        IsEditing = true;
+        LastCommitError = string.Empty;
         LoadBufferFromSelected();
         return true;
     }
 
     private bool NavigateFromCurrentSelection(Func<bool> move)
     {
-        if (_isEditing)
+        if (IsEditing)
         {
             var finalized = FinalizeEditForNavigation();
             if (!finalized)
@@ -150,30 +200,30 @@ public sealed partial class DataForm<TModel>
 
     private bool FinalizeEditForNavigation()
     {
-        if (!_isEditing)
+        if (!IsEditing)
         {
             return true;
         }
 
         if (!CanEditCurrentField())
         {
-            _isEditing = false;
+            IsEditing = false;
             _isDirty = false;
             return true;
         }
 
         if (Model is null || SelectedField is null)
         {
-            _isEditing = false;
+            IsEditing = false;
             _isDirty = false;
             return true;
         }
 
         var currentValue = SafeReadValue(SelectedField, Model);
-        if (!_isDirty && string.Equals(currentValue, _editBuffer, StringComparison.Ordinal))
+        if (!_isDirty && string.Equals(currentValue, EditBuffer, StringComparison.Ordinal))
         {
-            _isEditing = false;
-            _lastCommitError = string.Empty;
+            IsEditing = false;
+            LastCommitError = string.Empty;
             return true;
         }
 
@@ -184,61 +234,62 @@ public sealed partial class DataForm<TModel>
     private bool CommitCurrentField(out bool success)
     {
         success = false;
-        if (!_isEditing || Model is null || SelectedField is null)
+        if (!IsEditing || Model is null || SelectedField is null)
         {
             return false;
         }
 
         var previousValue = SafeReadValue(SelectedField, Model);
-        if (!_isDirty && string.Equals(previousValue, _editBuffer, StringComparison.Ordinal))
+        if (!_isDirty && string.Equals(previousValue, EditBuffer, StringComparison.Ordinal))
         {
-            _isEditing = false;
-            _lastCommitError = string.Empty;
+            IsEditing = false;
+            LastCommitError = string.Empty;
             success = true;
             return true;
         }
 
-        var committedValue = _editBuffer;
+        var committedValue = EditBuffer;
         success = SelectedField.TryCommit(Model, committedValue, out var error);
-        _lastCommitError = success ? string.Empty : (error ?? "Commit failed.");
+        LastCommitError = success ? string.Empty : error ?? "Commit failed.";
         _isDirty = !success;
 
         if (success)
         {
-            _editBuffer = SafeReadValue(SelectedField, Model);
-            _isEditing = false;
+            EditBuffer = SafeReadValue(SelectedField, Model);
+            IsEditing = false;
         }
 
         FieldCommitted?.Invoke(
             this,
-            new DataFormFieldCommittedEventArgs<TModel>(Model, _selectedIndex, SelectedField, previousValue, committedValue, success, _lastCommitError));
+            new DataFormFieldCommittedEventArgs<TModel>(Model, SelectedIndex, SelectedField, previousValue,
+                committedValue, success, LastCommitError));
         return true;
     }
 
     private bool CancelCurrentEdit()
     {
-        if (!_isEditing)
+        if (!IsEditing)
         {
             return false;
         }
 
-        var previous = _editBuffer;
+        var previous = EditBuffer;
         LoadBufferFromSelected();
-        _isEditing = false;
-        return !string.Equals(previous, _editBuffer, StringComparison.Ordinal) || !string.IsNullOrEmpty(_lastCommitError);
+        IsEditing = false;
+        return !string.Equals(previous, EditBuffer, StringComparison.Ordinal) || !string.IsNullOrEmpty(LastCommitError);
     }
 
     private bool RemoveFromBuffer()
     {
-        if (_editBuffer.Length == 0)
+        if (EditBuffer.Length == 0)
         {
             return false;
         }
 
-        _editBuffer = _editBuffer[..^1];
+        EditBuffer = EditBuffer[..^1];
 
         _isDirty = true;
-        _lastCommitError = string.Empty;
+        LastCommitError = string.Empty;
         return true;
     }
 
@@ -261,21 +312,21 @@ public sealed partial class DataForm<TModel>
     private void LoadBufferFromSelected()
     {
         _isDirty = false;
-        _lastCommitError = string.Empty;
+        LastCommitError = string.Empty;
         if (Model is null || SelectedField is null)
         {
-            _editBuffer = string.Empty;
+            EditBuffer = string.Empty;
             return;
         }
 
-        _editBuffer = SafeReadValue(SelectedField, Model);
+        EditBuffer = SafeReadValue(SelectedField, Model);
     }
 
     private static string SafeReadValue(DataFormField<TModel> field, TModel model)
     {
         try
         {
-            return field.ReadValue(model) ?? string.Empty;
+            return field.ReadValue(model);
         }
         catch
         {

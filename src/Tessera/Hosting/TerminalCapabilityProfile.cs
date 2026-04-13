@@ -1,9 +1,9 @@
-﻿using System.ComponentModel;
+using System.ComponentModel;
 
 namespace Tessera.Hosting;
 
 /// <summary>
-/// Describes the terminal capabilities available to advanced Tessera hosting seams.
+///     Describes the terminal capabilities available to advanced Tessera hosting seams.
 /// </summary>
 [EditorBrowsable(EditorBrowsableState.Advanced)]
 public sealed record TerminalCapabilityProfile(
@@ -17,7 +17,7 @@ public sealed record TerminalCapabilityProfile(
     string Source = "assumed-supported")
 {
     /// <summary>
-    /// Gets the all supported.
+    ///     Gets the all supported.
     /// </summary>
     public static TerminalCapabilityProfile AllSupported { get; } = new();
 }

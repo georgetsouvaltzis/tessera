@@ -1,20 +1,22 @@
-﻿namespace Tessera.Styles;
+namespace Tessera.Styles;
 
 /// <summary>
-/// Represents the built-in Rosé Pine palette variants.
+///     Represents the built-in Rosé Pine palette variants.
 /// </summary>
 public enum RosePineVariant
 {
     /// <summary>
-    /// The main value.
+    ///     The main value.
     /// </summary>
     Main = 0,
+
     /// <summary>
-    /// The moon value.
+    ///     The moon value.
     /// </summary>
     Moon = 1,
+
     /// <summary>
-    /// The dawn value.
+    ///     The dawn value.
     /// </summary>
-    Dawn = 2,
+    Dawn = 2
 }

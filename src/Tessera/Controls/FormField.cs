@@ -1,12 +1,12 @@
 namespace Tessera.Controls;
 
 /// <summary>
-/// Represents one logical data-entry field rendered by <see cref="Form"/>.
+///     Represents one logical data-entry field rendered by <see cref="Form" />.
 /// </summary>
 public sealed class FormField
 {
     /// <summary>
-    /// Initializes a form field row.
+    ///     Initializes a form field row.
     /// </summary>
     /// <param name="name">Stable field identifier.</param>
     /// <param name="label">Field label text.</param>
@@ -22,41 +22,41 @@ public sealed class FormField
         bool isRequired = false,
         bool isDisabled = false)
     {
-        Name = name ?? string.Empty;
-        Label = label ?? string.Empty;
-        Value = value ?? string.Empty;
+        Name = name;
+        Label = label;
+        Value = value;
         HelperText = helperText ?? string.Empty;
         IsRequired = isRequired;
         IsDisabled = isDisabled;
     }
 
     /// <summary>
-    /// Gets stable field identifier.
+    ///     Gets stable field identifier.
     /// </summary>
     public string Name { get; }
 
     /// <summary>
-    /// Gets field label text.
+    ///     Gets field label text.
     /// </summary>
     public string Label { get; }
 
     /// <summary>
-    /// Gets field value text.
+    ///     Gets field value text.
     /// </summary>
     public string Value { get; }
 
     /// <summary>
-    /// Gets optional helper text.
+    ///     Gets optional helper text.
     /// </summary>
     public string HelperText { get; }
 
     /// <summary>
-    /// Gets whether this field is required.
+    ///     Gets whether this field is required.
     /// </summary>
     public bool IsRequired { get; }
 
     /// <summary>
-    /// Gets whether this field is disabled and non-selectable.
+    ///     Gets whether this field is disabled and non-selectable.
     /// </summary>
     public bool IsDisabled { get; }
 }

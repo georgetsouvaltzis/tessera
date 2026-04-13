@@ -1,7 +1,7 @@
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Text;
-using System.ComponentModel;
 
 namespace Tessera.Core.Terminal.Capabilities;
 
@@ -51,14 +51,14 @@ internal static class TerminalCapabilityDetector
         if (string.Equals(termLower, "dumb", StringComparison.Ordinal))
         {
             return new TerminalCapabilityProfile(
-                FocusReporting: false,
-                MouseReporting: false,
-                BracketedPaste: false,
-                SynchronizedUpdates: false,
-                ModeReports: false,
-                SupportsOsc50FontRequests: false,
-                SupportsIterm2ProfileRequests: false,
-                Source: "env:TERM=dumb");
+                false,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false,
+                "env:TERM=dumb");
         }
 
         if (termLower.StartsWith("linux", StringComparison.Ordinal)
@@ -66,53 +66,53 @@ internal static class TerminalCapabilityDetector
             || termLower.StartsWith("ansi", StringComparison.Ordinal))
         {
             return new TerminalCapabilityProfile(
-                FocusReporting: false,
-                MouseReporting: false,
-                BracketedPaste: false,
-                SynchronizedUpdates: false,
-                ModeReports: false,
-                SupportsOsc50FontRequests: false,
-                SupportsIterm2ProfileRequests: false,
-                Source: $"env:TERM={termLower}");
+                false,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false,
+                $"env:TERM={termLower}");
         }
 
         if (termProgramLower == "iterm.app")
         {
             return new TerminalCapabilityProfile(
-                FocusReporting: true,
-                MouseReporting: true,
-                BracketedPaste: true,
-                SynchronizedUpdates: true,
-                ModeReports: true,
-                SupportsOsc50FontRequests: false,
-                SupportsIterm2ProfileRequests: true,
-                Source: "env:TERM_PROGRAM=iTerm.app");
+                true,
+                true,
+                true,
+                true,
+                true,
+                false,
+                true,
+                "env:TERM_PROGRAM=iTerm.app");
         }
 
         if (termProgramLower == "apple_terminal")
         {
             return new TerminalCapabilityProfile(
-                FocusReporting: true,
-                MouseReporting: true,
-                BracketedPaste: true,
-                SynchronizedUpdates: false,
-                ModeReports: true,
-                SupportsOsc50FontRequests: false,
-                SupportsIterm2ProfileRequests: false,
-                Source: "env:TERM_PROGRAM=Apple_Terminal");
+                true,
+                true,
+                true,
+                false,
+                true,
+                false,
+                false,
+                "env:TERM_PROGRAM=Apple_Terminal");
         }
 
         if (termProgramLower == "wezterm" || termProgramLower == "ghostty")
         {
             return new TerminalCapabilityProfile(
-                FocusReporting: true,
-                MouseReporting: true,
-                BracketedPaste: true,
-                SynchronizedUpdates: true,
-                ModeReports: true,
-                SupportsOsc50FontRequests: false,
-                SupportsIterm2ProfileRequests: false,
-                Source: $"env:TERM_PROGRAM={termProgramLower}");
+                true,
+                true,
+                true,
+                true,
+                true,
+                false,
+                false,
+                $"env:TERM_PROGRAM={termProgramLower}");
         }
 
         if (!string.IsNullOrWhiteSpace(wtSession))
@@ -146,7 +146,7 @@ internal static class TerminalCapabilityDetector
         {
             SupportsOsc50FontRequests = false,
             SupportsIterm2ProfileRequests = false,
-            Source = "assumed-supported",
+            Source = "assumed-supported"
         };
     }
 
@@ -171,16 +171,16 @@ internal static class TerminalCapabilityDetector
             SynchronizedUpdates = profile.SynchronizedUpdates || hasSync,
             ModeReports = profile.ModeReports || hasXt || hasXm,
             SupportsOsc50FontRequests = profile.SupportsOsc50FontRequests,
-            SupportsIterm2ProfileRequests = profile.SupportsIterm2ProfileRequests,
+            SupportsIterm2ProfileRequests = profile.SupportsIterm2ProfileRequests
         };
 
         var changed = next.FocusReporting != profile.FocusReporting
-            || next.MouseReporting != profile.MouseReporting
-            || next.BracketedPaste != profile.BracketedPaste
-            || next.SynchronizedUpdates != profile.SynchronizedUpdates
-            || next.ModeReports != profile.ModeReports
-            || next.SupportsOsc50FontRequests != profile.SupportsOsc50FontRequests
-            || next.SupportsIterm2ProfileRequests != profile.SupportsIterm2ProfileRequests;
+                      || next.MouseReporting != profile.MouseReporting
+                      || next.BracketedPaste != profile.BracketedPaste
+                      || next.SynchronizedUpdates != profile.SynchronizedUpdates
+                      || next.ModeReports != profile.ModeReports
+                      || next.SupportsOsc50FontRequests != profile.SupportsOsc50FontRequests
+                      || next.SupportsIterm2ProfileRequests != profile.SupportsIterm2ProfileRequests;
 
         if (!changed)
         {
@@ -198,7 +198,8 @@ internal static class TerminalCapabilityDetector
         }
 
         var next = profile;
-        foreach (var token in raw.Split([',', ';'], StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries))
+        foreach (var token in raw.Split([',', ';'],
+                     StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries))
         {
             var separator = token.IndexOf('=', StringComparison.Ordinal);
             if (separator <= 0 || separator >= token.Length - 1)
@@ -222,9 +223,12 @@ internal static class TerminalCapabilityDetector
                 "paste" => next with { BracketedPaste = enabled },
                 "sync" => next with { SynchronizedUpdates = enabled },
                 "decrpm" or "mode_reports" or "mode-reports" => next with { ModeReports = enabled },
-                "osc50" or "font_osc50" or "font-osc50" or "supports_osc50_font_requests" or "supports-osc50-font-requests" => next with { SupportsOsc50FontRequests = enabled },
-                "iterm2_profile" or "iterm2-profile" or "iterm_profile" or "iterm-profile" or "supports_iterm2_profile_requests" or "supports-iterm2-profile-requests" => next with { SupportsIterm2ProfileRequests = enabled },
-                _ => next,
+                "osc50" or "font_osc50" or "font-osc50" or "supports_osc50_font_requests"
+                    or "supports-osc50-font-requests" => next with { SupportsOsc50FontRequests = enabled },
+                "iterm2_profile" or "iterm2-profile" or "iterm_profile" or "iterm-profile"
+                    or "supports_iterm2_profile_requests"
+                    or "supports-iterm2-profile-requests" => next with { SupportsIterm2ProfileRequests = enabled },
+                _ => next
             };
         }
 
@@ -311,7 +315,7 @@ internal static class TerminalCapabilityDetector
                 RedirectStandardOutput = true,
                 RedirectStandardError = true,
                 UseShellExecute = false,
-                CreateNoWindow = true,
+                CreateNoWindow = true
             };
             startInfo.ArgumentList.Add("-x");
             startInfo.ArgumentList.Add(term);
@@ -329,7 +333,7 @@ internal static class TerminalCapabilityDetector
             {
                 try
                 {
-                    process.Kill(entireProcessTree: true);
+                    process.Kill(true);
                 }
                 catch
                 {

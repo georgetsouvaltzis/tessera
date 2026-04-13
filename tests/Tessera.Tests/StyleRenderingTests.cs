@@ -1,6 +1,3 @@
-using Tessera.Components.Composition;
-using Tessera.Components.Primitives;
-using Tessera.Components.Styling;
 using System.Text;
 using Tessera.Core.Abstractions;
 using Tessera.Core.Rendering;
@@ -14,18 +11,27 @@ internal static class StyleRenderingTests
     {
         yield return new TestCase("Style_Merge_ComposesAttributes", Style_Merge_ComposesAttributes);
         yield return new TestCase("Style_FontWeight_MapsToBoldAndDimFlags", Style_FontWeight_MapsToBoldAndDimFlags);
-        yield return new TestCase("Style_FontWeight_MergeOverridesWeightFlags", Style_FontWeight_MergeOverridesWeightFlags);
-        yield return new TestCase("Style_Render_BlinkAndStrikethrough_EmitsSgr", Style_Render_BlinkAndStrikethrough_EmitsSgr);
+        yield return new TestCase("Style_FontWeight_MergeOverridesWeightFlags",
+            Style_FontWeight_MergeOverridesWeightFlags);
+        yield return new TestCase("Style_Render_BlinkAndStrikethrough_EmitsSgr",
+            Style_Render_BlinkAndStrikethrough_EmitsSgr);
         yield return new TestCase("Style_Render_ConcealAndOverline_EmitsSgr", Style_Render_ConcealAndOverline_EmitsSgr);
-        yield return new TestCase("Style_Render_DoubleUnderlineAndFrame_EmitsSgr", Style_Render_DoubleUnderlineAndFrame_EmitsSgr);
-        yield return new TestCase("Style_ToEscapeSequence_CachesPerStyleValue", Style_ToEscapeSequence_CachesPerStyleValue);
-        yield return new TestCase("Style_Render_DisabledFlags_PreserveResetSemantics", Style_Render_DisabledFlags_PreserveResetSemantics);
+        yield return new TestCase("Style_Render_DoubleUnderlineAndFrame_EmitsSgr",
+            Style_Render_DoubleUnderlineAndFrame_EmitsSgr);
+        yield return new TestCase("Style_ToEscapeSequence_CachesPerStyleValue",
+            Style_ToEscapeSequence_CachesPerStyleValue);
+        yield return new TestCase("Style_Render_DisabledFlags_PreserveResetSemantics",
+            Style_Render_DisabledFlags_PreserveResetSemantics);
         yield return new TestCase("Style_Render_EmptyStyle_Passthrough", Style_Render_EmptyStyle_Passthrough);
         yield return new TestCase("Renderer_StyledContent_EmitsSgrSequences", Renderer_StyledContent_EmitsSgrSequences);
-        yield return new TestCase("Renderer_StyleOnlyChange_TriggersDiffPatch", Renderer_StyleOnlyChange_TriggersDiffPatch);
-        yield return new TestCase("Renderer_BlinkStrikethroughChange_TriggersDiffPatch", Renderer_BlinkStrikethroughChange_TriggersDiffPatch);
-        yield return new TestCase("Renderer_ConcealOverlineChange_TriggersDiffPatch", Renderer_ConcealOverlineChange_TriggersDiffPatch);
-        yield return new TestCase("Renderer_DoubleUnderlineFrameChange_TriggersDiffPatch", Renderer_DoubleUnderlineFrameChange_TriggersDiffPatch);
+        yield return new TestCase("Renderer_StyleOnlyChange_TriggersDiffPatch",
+            Renderer_StyleOnlyChange_TriggersDiffPatch);
+        yield return new TestCase("Renderer_BlinkStrikethroughChange_TriggersDiffPatch",
+            Renderer_BlinkStrikethroughChange_TriggersDiffPatch);
+        yield return new TestCase("Renderer_ConcealOverlineChange_TriggersDiffPatch",
+            Renderer_ConcealOverlineChange_TriggersDiffPatch);
+        yield return new TestCase("Renderer_DoubleUnderlineFrameChange_TriggersDiffPatch",
+            Renderer_DoubleUnderlineFrameChange_TriggersDiffPatch);
     }
 
     private static Task Style_Merge_ComposesAttributes()
@@ -44,7 +50,7 @@ internal static class StyleRenderingTests
 
         // Assert
         TestAssert.Equal(
-            "\u001b[1;4;38;5;33;48;2;10;20;30mX\u001b[0m",
+            "\e[1;4;38;5;33;48;2;10;20;30mX\e[0m",
             rendered,
             "Merged style should emit composed SGR sequence.");
         return Task.CompletedTask;
@@ -56,9 +62,12 @@ internal static class StyleRenderingTests
         var bold = TesseraStyle.Empty.WithFontWeight(TesseraFontWeight.Bold);
         var dim = TesseraStyle.Empty.WithFontWeight(TesseraFontWeight.Dim);
 
-        TestAssert.True(normal.Bold is false && normal.Dim is false, "Normal font weight should disable bold/dim emphasis flags.");
-        TestAssert.True(bold.Bold is true && bold.Dim is false, "Bold font weight should enable bold and disable dim emphasis flags.");
-        TestAssert.True(dim.Bold is false && dim.Dim is true, "Dim font weight should disable bold and enable dim emphasis flags.");
+        TestAssert.True(normal.Bold is false && normal.Dim is false,
+            "Normal font weight should disable bold/dim emphasis flags.");
+        TestAssert.True(bold.Bold is true && bold.Dim is false,
+            "Bold font weight should enable bold and disable dim emphasis flags.");
+        TestAssert.True(dim.Bold is false && dim.Dim is true,
+            "Dim font weight should disable bold and enable dim emphasis flags.");
         return Task.CompletedTask;
     }
 
@@ -71,7 +80,7 @@ internal static class StyleRenderingTests
         var rendered = merged.Render("X");
 
         TestAssert.Equal(
-            "\u001b[22;2;38;5;10mX\u001b[0m",
+            "\e[22;2;38;5;10mX\e[0m",
             rendered,
             "Font weight overlay should override prior bold emphasis using SGR weight flags.");
         return Task.CompletedTask;
@@ -103,7 +112,7 @@ internal static class StyleRenderingTests
 
         // Assert
         TestAssert.Equal(
-            "\u001b[5;9;38;5;11mwarn\u001b[0m",
+            "\e[5;9;38;5;11mwarn\e[0m",
             rendered,
             "Blink + strikethrough should be encoded in SGR output.");
         return Task.CompletedTask;
@@ -122,7 +131,7 @@ internal static class StyleRenderingTests
 
         // Assert
         TestAssert.Equal(
-            "\u001b[8;53;38;5;14mmasked\u001b[0m",
+            "\e[8;53;38;5;14mmasked\e[0m",
             rendered,
             "Conceal + overline should be encoded in SGR output.");
         return Task.CompletedTask;
@@ -141,7 +150,7 @@ internal static class StyleRenderingTests
 
         // Assert
         TestAssert.Equal(
-            "\u001b[21;51;38;5;13mboxed\u001b[0m",
+            "\e[21;51;38;5;13mboxed\e[0m",
             rendered,
             "Double underline + frame should be encoded in SGR output.");
         return Task.CompletedTask;
@@ -166,8 +175,8 @@ internal static class StyleRenderingTests
         TestAssert.True(
             !ReferenceEquals(firstA, second),
             "Distinct style values should not share cached escape string instances.");
-        TestAssert.Equal("\u001b[1;38;5;10m", firstA, "Cached style escape output should remain correct.");
-        TestAssert.Equal("\u001b[4;38;5;10m", second, "Distinct style escape output should remain correct.");
+        TestAssert.Equal("\e[1;38;5;10m", firstA, "Cached style escape output should remain correct.");
+        TestAssert.Equal("\e[4;38;5;10m", second, "Distinct style escape output should remain correct.");
         return Task.CompletedTask;
     }
 
@@ -181,7 +190,7 @@ internal static class StyleRenderingTests
 
         var rendered = style.Render("x");
         TestAssert.Equal(
-            "\u001b[22;24;27;38;5;9mx\u001b[0m",
+            "\e[22;24;27;38;5;9mx\e[0m",
             rendered,
             "Render should preserve exact reset/open semantics for explicitly disabled flags.");
         return Task.CompletedTask;
@@ -201,9 +210,9 @@ internal static class StyleRenderingTests
         var rendered = ReadUtf8(output);
 
         // Assert
-        AssertContains(rendered, "\u001b[1;38;5;10m");
+        AssertContains(rendered, "\e[1;38;5;10m");
         AssertContains(rendered, "ok");
-        AssertContains(rendered, "\u001b[0m");
+        AssertContains(rendered, "\e[0m");
     }
 
     private static async Task Renderer_BlinkStrikethroughChange_TriggersDiffPatch()
@@ -224,10 +233,10 @@ internal static class StyleRenderingTests
         var patch = ReadUtf8(output, marker);
 
         // Assert
-        AssertContains(patch, "\u001b[1;1H");
-        AssertContains(patch, "\u001b[5;9;38;5;11m");
+        AssertContains(patch, "\e[1;1H");
+        AssertContains(patch, "\e[5;9;38;5;11m");
         AssertContains(patch, "!");
-        AssertContains(patch, "\u001b[0m");
+        AssertContains(patch, "\e[0m");
     }
 
     private static async Task Renderer_ConcealOverlineChange_TriggersDiffPatch()
@@ -248,10 +257,10 @@ internal static class StyleRenderingTests
         var patch = ReadUtf8(output, marker);
 
         // Assert
-        AssertContains(patch, "\u001b[1;1H");
-        AssertContains(patch, "\u001b[8;53;38;5;14m");
+        AssertContains(patch, "\e[1;1H");
+        AssertContains(patch, "\e[8;53;38;5;14m");
         AssertContains(patch, "x");
-        AssertContains(patch, "\u001b[0m");
+        AssertContains(patch, "\e[0m");
     }
 
     private static async Task Renderer_DoubleUnderlineFrameChange_TriggersDiffPatch()
@@ -272,10 +281,10 @@ internal static class StyleRenderingTests
         var patch = ReadUtf8(output, marker);
 
         // Assert
-        AssertContains(patch, "\u001b[1;1H");
-        AssertContains(patch, "\u001b[21;51;38;5;13m");
+        AssertContains(patch, "\e[1;1H");
+        AssertContains(patch, "\e[21;51;38;5;13m");
         AssertContains(patch, "b");
-        AssertContains(patch, "\u001b[0m");
+        AssertContains(patch, "\e[0m");
     }
 
     private static async Task Renderer_StyleOnlyChange_TriggersDiffPatch()
@@ -296,10 +305,10 @@ internal static class StyleRenderingTests
         var patch = ReadUtf8(output, marker);
 
         // Assert
-        AssertContains(patch, "\u001b[1;1H");
-        AssertContains(patch, "\u001b[38;5;10m");
+        AssertContains(patch, "\e[1;1H");
+        AssertContains(patch, "\e[38;5;10m");
         AssertContains(patch, "A");
-        AssertContains(patch, "\u001b[0m");
+        AssertContains(patch, "\e[0m");
     }
 
     private static string ReadUtf8(MemoryStream output)
@@ -329,7 +338,7 @@ internal static class StyleRenderingTests
     private static string Escape(string text)
     {
         return text
-            .Replace("\u001b", "\\u001b", StringComparison.Ordinal)
+            .Replace("\e", "\\e", StringComparison.Ordinal)
             .Replace("\r", "\\r", StringComparison.Ordinal)
             .Replace("\n", "\\n", StringComparison.Ordinal);
     }

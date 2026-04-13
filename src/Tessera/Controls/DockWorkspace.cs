@@ -10,80 +10,107 @@ namespace Tessera.Controls;
 public sealed class DockWorkspace : Control
 {
     private readonly List<DockPane> _panes = [];
-    private int _selectedIndex;
     private int _hoveredIndex = -1;
-
-    /// <summary>Occurs when selected pane changes.</summary>
-    public event EventHandler<ListSelectionChangedEventArgs<DockPane>>? SelectionChanged;
+    private int _selectedIndex;
 
     /// <summary>Gets or sets layout title.</summary>
-    public string Title { get; set => field = value ?? string.Empty; } = "Workspace";
+    public string Title { get; set; } = "Workspace";
+
     /// <summary>Gets or sets marker appended to title while focused.</summary>
-    public string FocusMarker { get; set => field = value ?? string.Empty; } = "*";
+    public string FocusMarker { get; set; } = "*";
+
     /// <summary>Gets or sets whether focus marker is shown while focused.</summary>
     public bool ShowFocusMarker { get; set; } = true;
 
     /// <summary>Gets or sets title style while unfocused.</summary>
     public TesseraStyle TitleStyle { get; set; } = TesseraStyle.Empty;
+
     /// <summary>Gets or sets title style while focused.</summary>
     public TesseraStyle FocusedTitleStyle { get; set; } = TesseraStyle.Empty;
+
     /// <summary>Gets or sets outer border style while unfocused.</summary>
     public TesseraStyle BorderStyleText { get; set; } = TesseraStyle.Empty;
+
     /// <summary>Gets or sets outer border style while focused.</summary>
     public TesseraStyle FocusedBorderStyleText { get; set; } = TesseraStyle.Empty;
+
     /// <summary>Gets or sets pane title style.</summary>
     public TesseraStyle PaneTitleStyle { get; set; } = TesseraStyle.Empty;
+
     /// <summary>Gets or sets selected pane title style.</summary>
     public TesseraStyle SelectedPaneTitleStyle { get; set; } = TesseraStyle.Empty;
+
     /// <summary>Gets or sets focused selected pane title style.</summary>
     public TesseraStyle FocusedSelectedPaneTitleStyle { get; set; } = TesseraStyle.Empty;
+
     /// <summary>Gets or sets pane body style.</summary>
     public TesseraStyle PaneBodyStyle { get; set; } = TesseraStyle.Empty;
+
     /// <summary>Gets or sets selected pane body style.</summary>
     public TesseraStyle SelectedPaneBodyStyle { get; set; } = TesseraStyle.Empty;
+
     /// <summary>Gets or sets hovered pane style.</summary>
     public TesseraStyle HoveredPaneStyle { get; set; } = TesseraStyle.Empty;
+
     /// <summary>Gets or sets muted pane style.</summary>
     public TesseraStyle MutedPaneStyle { get; set; } = TesseraStyle.Empty;
+
     /// <summary>Gets or sets disabled pane style.</summary>
     public TesseraStyle DisabledPaneStyle { get; set; } = TesseraStyle.Empty;
+
     /// <summary>Gets or sets pane border style while unselected.</summary>
     public TesseraStyle PaneBorderStyleText { get; set; } = TesseraStyle.Empty;
+
     /// <summary>Gets or sets pane border style while selected and focused.</summary>
     public TesseraStyle FocusedPaneBorderStyleText { get; set; } = TesseraStyle.Empty;
+
     /// <summary>Gets or sets style merged into all rendering while disabled.</summary>
     public TesseraStyle DisabledStyle { get; set; } = TesseraStyle.Empty;
+
     /// <summary>Gets or sets empty-state style.</summary>
     public TesseraStyle EmptyTextStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>Gets or sets outer border style.</summary>
     public BorderStyle Border { get; set; } = BorderStyle.SingleLine;
+
     /// <summary>Gets or sets pane border style.</summary>
     public BorderStyle PaneBorder { get; set; } = BorderStyle.SingleLine;
+
     /// <summary>Gets or sets outer content padding.</summary>
     public Thickness Padding { get; set; }
+
     /// <summary>Gets or sets pane content padding.</summary>
     public Thickness PanePadding { get; set; }
+
     /// <summary>Gets or sets text rendered when there are no panes.</summary>
     public string EmptyText { get; set; } = "(no panes)";
+
     /// <summary>Gets or sets text rendered for empty pane body.</summary>
     public string PaneEmptyText { get; set; } = "(empty pane)";
+
     /// <summary>Gets or sets marker prefixed to selected pane title.</summary>
     public string SelectedPaneMarker { get; set; } = ">";
 
     /// <summary>Gets configured panes.</summary>
     public IReadOnlyList<DockPane> Panes => _panes;
+
     /// <summary>Gets selected pane index, or <c>-1</c> when no panes exist.</summary>
     public int SelectedIndex => _panes.Count == 0 ? -1 : _selectedIndex;
+
     /// <summary>Gets selected pane, if any.</summary>
     public DockPane? SelectedPane => _panes.Count == 0 ? null : _panes[_selectedIndex];
 
     /// <inheritdoc />
     public override bool IsFocused { get; set; }
+
     /// <inheritdoc />
     public override bool IsDisabled { get; set; }
+
     /// <inheritdoc />
     public override bool IsReadOnly { get; set; }
+
+    /// <summary>Occurs when selected pane changes.</summary>
+    public event EventHandler<ListSelectionChangedEventArgs<DockPane>>? SelectionChanged;
 
     /// <summary>Replaces panes in docking order.</summary>
     /// <param name="panes">Panes to render.</param>
@@ -108,6 +135,7 @@ public sealed class DockWorkspace : Control
         {
             _selectedIndex = ResolveNextEnabled(_selectedIndex, +1) ?? ResolveNextEnabled(_selectedIndex, -1) ?? 0;
         }
+
         _hoveredIndex = Math.Clamp(_hoveredIndex, -1, _panes.Count - 1);
     }
 
@@ -119,13 +147,22 @@ public sealed class DockWorkspace : Control
             return false;
         }
 
-        if (key.Is(Key.Left) || key.Is(Key.Up) || key.IsCharacter('h') || key.IsCharacter('k')) return MoveSelection(-1);
-        if (key.Is(Key.Right) || key.Is(Key.Down) || key.IsCharacter('l') || key.IsCharacter('j')) return MoveSelection(+1);
+        if (key.Is(Key.Left) || key.Is(Key.Up) || key.IsCharacter('h') || key.IsCharacter('k'))
+        {
+            return MoveSelection(-1);
+        }
+
+        if (key.Is(Key.Right) || key.Is(Key.Down) || key.IsCharacter('l') || key.IsCharacter('j'))
+        {
+            return MoveSelection(+1);
+        }
+
         if (key.Is(Key.Home))
         {
             var first = ResolveNextEnabled(-1, +1);
             return first.HasValue && SetSelectedIndex(first.Value);
         }
+
         if (key.Is(Key.End))
         {
             var last = ResolveNextEnabled(_panes.Count, -1);
@@ -144,19 +181,35 @@ public sealed class DockWorkspace : Control
         }
 
         var content = FrameLayout.ResolveContentRect(bounds, Border, Padding);
-        if (content.IsEmpty) return Handle(message);
+        if (content.IsEmpty)
+        {
+            return Handle(message);
+        }
 
         var paneRects = ResolvePaneRects(content);
         if (pointer.Kind == PointerEventKind.Wheel)
         {
-            if (pointer.Button == PointerButton.WheelDown) return MoveSelection(+1);
-            if (pointer.Button == PointerButton.WheelUp) return MoveSelection(-1);
+            if (pointer.Button == PointerButton.WheelDown)
+            {
+                return MoveSelection(+1);
+            }
+
+            if (pointer.Button == PointerButton.WheelUp)
+            {
+                return MoveSelection(-1);
+            }
+
             return false;
         }
 
         var hit = HitTestPane(pointer.X, pointer.Y, paneRects);
-        if (pointer.Kind == PointerEventKind.Motion) return SetHoveredIndex(hit);
-        if (pointer.Kind == PointerEventKind.Press && pointer.Button == PointerButton.Left && hit >= 0 && !_panes[hit].IsDisabled)
+        if (pointer.Kind == PointerEventKind.Motion)
+        {
+            return SetHoveredIndex(hit);
+        }
+
+        if (pointer.Kind == PointerEventKind.Press && pointer.Button == PointerButton.Left && hit >= 0 &&
+            !_panes[hit].IsDisabled)
         {
             RequestFocus();
             return SetSelectedIndex(hit);
@@ -169,7 +222,10 @@ public sealed class DockWorkspace : Control
     public override void Render(Canvas canvas, Rect rect)
     {
         var clipped = Rect.Intersect(rect, canvas.Bounds);
-        if (clipped.IsEmpty) return;
+        if (clipped.IsEmpty)
+        {
+            return;
+        }
 
         var content = FrameLayout.DrawFrameAndResolveContent(
             canvas,
@@ -178,7 +234,10 @@ public sealed class DockWorkspace : Control
             Border,
             Padding,
             ResolveOuterBorderStyle());
-        if (content.IsEmpty) return;
+        if (content.IsEmpty)
+        {
+            return;
+        }
 
         if (_panes.Count == 0)
         {
@@ -191,7 +250,10 @@ public sealed class DockWorkspace : Control
         for (var index = 0; index < _panes.Count; index++)
         {
             var paneRect = paneRects[index];
-            if (paneRect.IsEmpty) continue;
+            if (paneRect.IsEmpty)
+            {
+                continue;
+            }
 
             var pane = _panes[index];
             var paneContent = FrameLayout.DrawFrameAndResolveContent(
@@ -201,7 +263,10 @@ public sealed class DockWorkspace : Control
                 PaneBorder,
                 PanePadding,
                 ResolvePaneBorderStyle(index, pane));
-            if (paneContent.IsEmpty) continue;
+            if (paneContent.IsEmpty)
+            {
+                continue;
+            }
 
             if (pane.Content is not null)
             {
@@ -220,8 +285,15 @@ public sealed class DockWorkspace : Control
         for (var index = 0; index < _panes.Count; index++)
         {
             var pane = _panes[index];
-            if (pane.Position is DockPanePosition.Left or DockPanePosition.Right) width += Math.Max(4, pane.Size);
-            if (pane.Position is DockPanePosition.Top or DockPanePosition.Bottom) height += Math.Max(3, pane.Size);
+            if (pane.Position is DockPanePosition.Left or DockPanePosition.Right)
+            {
+                width += Math.Max(4, pane.Size);
+            }
+
+            if (pane.Position is DockPanePosition.Top or DockPanePosition.Bottom)
+            {
+                height += Math.Max(3, pane.Size);
+            }
         }
 
         if (Border != BorderStyle.None)
@@ -230,17 +302,18 @@ public sealed class DockWorkspace : Control
             height += 2 + Padding.Vertical;
         }
 
-        return new LayoutMeasurement(Math.Clamp(width, 0, availableBounds.Width), Math.Clamp(height, 0, availableBounds.Height));
+        return new LayoutMeasurement(Math.Clamp(width, 0, availableBounds.Width),
+            Math.Clamp(height, 0, availableBounds.Height));
     }
 
     private Rect[] ResolvePaneRects(Rect content)
     {
         var rects = new Rect[_panes.Count];
         var remaining = content;
-        AssignEdge(DockPanePosition.Top, ref remaining, rects, fromEnd: false);
-        AssignEdge(DockPanePosition.Bottom, ref remaining, rects, fromEnd: true);
-        AssignEdge(DockPanePosition.Left, ref remaining, rects, fromEnd: false);
-        AssignEdge(DockPanePosition.Right, ref remaining, rects, fromEnd: true);
+        AssignEdge(DockPanePosition.Top, ref remaining, rects, false);
+        AssignEdge(DockPanePosition.Bottom, ref remaining, rects, true);
+        AssignEdge(DockPanePosition.Left, ref remaining, rects, false);
+        AssignEdge(DockPanePosition.Right, ref remaining, rects, true);
         AssignCenters(remaining, rects);
         return rects;
     }
@@ -249,7 +322,10 @@ public sealed class DockWorkspace : Control
     {
         for (var index = 0; index < _panes.Count && !remaining.IsEmpty; index++)
         {
-            if (_panes[index].Position != position) continue;
+            if (_panes[index].Position != position)
+            {
+                continue;
+            }
 
             var size = position is DockPanePosition.Top or DockPanePosition.Bottom
                 ? Math.Clamp(_panes[index].Size, 1, remaining.Height)
@@ -288,10 +364,17 @@ public sealed class DockWorkspace : Control
         var centerIndexes = new List<int>();
         for (var index = 0; index < _panes.Count; index++)
         {
-            if (_panes[index].Position == DockPanePosition.Center) centerIndexes.Add(index);
+            if (_panes[index].Position == DockPanePosition.Center)
+            {
+                centerIndexes.Add(index);
+            }
         }
 
-        if (remaining.IsEmpty || centerIndexes.Count == 0) return;
+        if (remaining.IsEmpty || centerIndexes.Count == 0)
+        {
+            return;
+        }
+
         if (centerIndexes.Count == 1)
         {
             rects[centerIndexes[0]] = remaining;
@@ -313,7 +396,10 @@ public sealed class DockWorkspace : Control
     {
         for (var index = 0; index < paneRects.Length; index++)
         {
-            if (paneRects[index].Contains(x, y)) return index;
+            if (paneRects[index].Contains(x, y))
+            {
+                return index;
+            }
         }
 
         return -1;
@@ -327,14 +413,28 @@ public sealed class DockWorkspace : Control
 
     private int? ResolveNextEnabled(int start, int direction)
     {
-        if (_panes.Count == 0) return null;
+        if (_panes.Count == 0)
+        {
+            return null;
+        }
+
         var index = start;
         for (var i = 0; i < _panes.Count; i++)
         {
             index += direction;
-            if (index < 0) index = _panes.Count - 1;
-            else if (index >= _panes.Count) index = 0;
-            if (!_panes[index].IsDisabled) return index;
+            if (index < 0)
+            {
+                index = _panes.Count - 1;
+            }
+            else if (index >= _panes.Count)
+            {
+                index = 0;
+            }
+
+            if (!_panes[index].IsDisabled)
+            {
+                return index;
+            }
         }
 
         return null;
@@ -342,17 +442,26 @@ public sealed class DockWorkspace : Control
 
     private bool SetSelectedIndex(int index)
     {
-        if (index < 0 || index >= _panes.Count || _panes[index].IsDisabled || index == _selectedIndex) return false;
+        if (index < 0 || index >= _panes.Count || _panes[index].IsDisabled || index == _selectedIndex)
+        {
+            return false;
+        }
+
         var previous = _selectedIndex;
         var previousPane = SelectedPane;
         _selectedIndex = index;
-        SelectionChanged?.Invoke(this, new ListSelectionChangedEventArgs<DockPane>(previous, _selectedIndex, previousPane, SelectedPane));
+        SelectionChanged?.Invoke(this,
+            new ListSelectionChangedEventArgs<DockPane>(previous, _selectedIndex, previousPane, SelectedPane));
         return true;
     }
 
     private bool SetHoveredIndex(int index)
     {
-        if (_hoveredIndex == index) return false;
+        if (_hoveredIndex == index)
+        {
+            return false;
+        }
+
         _hoveredIndex = index;
         return true;
     }
@@ -366,8 +475,16 @@ public sealed class DockWorkspace : Control
     private TesseraStyle ResolvePaneBorderStyle(int index, DockPane pane)
     {
         var style = PaneBorderStyleText;
-        if (index == _selectedIndex && IsFocused) style = style.Merge(FocusedPaneBorderStyleText);
-        if (pane.IsDisabled || IsDisabled) style = style.Merge(DisabledPaneStyle).Merge(DisabledStyle);
+        if (index == _selectedIndex && IsFocused)
+        {
+            style = style.Merge(FocusedPaneBorderStyleText);
+        }
+
+        if (pane.IsDisabled || IsDisabled)
+        {
+            style = style.Merge(DisabledPaneStyle).Merge(DisabledStyle);
+        }
+
         return style;
     }
 
@@ -379,32 +496,64 @@ public sealed class DockWorkspace : Control
 
     private string MeasureTitle()
     {
-        if (string.IsNullOrEmpty(Title)) return string.Empty;
-        return IsFocused && ShowFocusMarker && !string.IsNullOrWhiteSpace(FocusMarker) ? $"{Title} {FocusMarker}" : Title;
+        if (string.IsNullOrEmpty(Title))
+        {
+            return string.Empty;
+        }
+
+        return IsFocused && ShowFocusMarker && !string.IsNullOrWhiteSpace(FocusMarker)
+            ? $"{Title} {FocusMarker}"
+            : Title;
     }
 
     private string RenderPaneTitle(DockPane pane, bool selected)
     {
-        var title = selected && !string.IsNullOrWhiteSpace(SelectedPaneMarker) ? $"{SelectedPaneMarker} {pane.Title}" : pane.Title;
+        var title = selected && !string.IsNullOrWhiteSpace(SelectedPaneMarker)
+            ? $"{SelectedPaneMarker} {pane.Title}"
+            : pane.Title;
         var style = PaneTitleStyle;
         if (selected)
         {
             style = style.Merge(SelectedPaneTitleStyle);
-            if (IsFocused) style = style.Merge(FocusedSelectedPaneTitleStyle);
+            if (IsFocused)
+            {
+                style = style.Merge(FocusedSelectedPaneTitleStyle);
+            }
         }
 
-        if (pane.IsDisabled || IsDisabled) style = style.Merge(DisabledPaneStyle).Merge(DisabledStyle);
-        else if (pane.IsMuted) style = style.Merge(MutedPaneStyle);
+        if (pane.IsDisabled || IsDisabled)
+        {
+            style = style.Merge(DisabledPaneStyle).Merge(DisabledStyle);
+        }
+        else if (pane.IsMuted)
+        {
+            style = style.Merge(MutedPaneStyle);
+        }
+
         return ApplyStyle(title, style);
     }
 
     private void RenderPaneLines(Canvas canvas, DockPane pane, Rect content, bool selected, bool hovered)
     {
         var style = PaneBodyStyle;
-        if (selected) style = style.Merge(SelectedPaneBodyStyle);
-        else if (hovered) style = style.Merge(HoveredPaneStyle);
-        if (pane.IsMuted) style = style.Merge(MutedPaneStyle);
-        if (pane.IsDisabled || IsDisabled) style = style.Merge(DisabledPaneStyle).Merge(DisabledStyle);
+        if (selected)
+        {
+            style = style.Merge(SelectedPaneBodyStyle);
+        }
+        else if (hovered)
+        {
+            style = style.Merge(HoveredPaneStyle);
+        }
+
+        if (pane.IsMuted)
+        {
+            style = style.Merge(MutedPaneStyle);
+        }
+
+        if (pane.IsDisabled || IsDisabled)
+        {
+            style = style.Merge(DisabledPaneStyle).Merge(DisabledStyle);
+        }
 
         if (pane.Lines.Count == 0)
         {
@@ -415,18 +564,24 @@ public sealed class DockWorkspace : Control
         var rows = Math.Min(content.Height, pane.Lines.Count);
         for (var row = 0; row < rows; row++)
         {
-            canvas.WriteText(content.X, content.Y + row, ApplyStyle(pane.Lines[row] ?? string.Empty, style), content.Width);
+            canvas.WriteText(content.X, content.Y + row, ApplyStyle(pane.Lines[row], style),
+                content.Width);
         }
     }
 
-    private static DockPane ClonePane(DockPane pane) =>
-        new(pane.Id, pane.Title, pane.Position, pane.Size)
+    private static DockPane ClonePane(DockPane pane)
+    {
+        return new DockPane(pane.Id, pane.Title, pane.Position, pane.Size)
         {
             Content = pane.Content,
             Lines = pane.Lines.ToArray(),
             IsMuted = pane.IsMuted,
-            IsDisabled = pane.IsDisabled,
+            IsDisabled = pane.IsDisabled
         };
+    }
 
-    private static string ApplyStyle(string value, TesseraStyle style) => style.IsEmpty ? value : style.Render(value);
+    private static string ApplyStyle(string value, TesseraStyle style)
+    {
+        return style.IsEmpty ? value : style.Render(value);
+    }
 }

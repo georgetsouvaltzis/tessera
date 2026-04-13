@@ -88,7 +88,7 @@ internal static class DecoderCommon
             }
 
             seen = true;
-            value = (value * 10) + (b - (byte)'0');
+            value = value * 10 + (b - (byte)'0');
         }
 
         return seen;
@@ -153,7 +153,7 @@ internal static class DecoderCommon
         {
             if (b is >= (byte)'0' and <= (byte)'9')
             {
-                value = (value * 10) + (b - (byte)'0');
+                value = value * 10 + (b - (byte)'0');
                 foundDigit = true;
                 readingDigits = true;
                 continue;
@@ -234,7 +234,7 @@ internal static class DecoderCommon
             10 or 13 => KeyCode.Enter,
             27 => KeyCode.Escape,
             127 => KeyCode.Backspace,
-            _ => KeyCode.Character,
+            _ => KeyCode.Character
         };
 
         var text = keyCode == KeyCode.Character
@@ -247,7 +247,7 @@ internal static class DecoderCommon
             return true;
         }
 
-        message = new KeyPressMsg(keyCode, text, modifiers, IsRepeat: eventType == 2);
+        message = new KeyPressMsg(keyCode, text, modifiers, eventType == 2);
         return true;
     }
 }

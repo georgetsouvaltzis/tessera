@@ -7,77 +7,99 @@ using Tessera.Styles;
 namespace Tessera.Controls;
 
 /// <summary>
-/// Represents a sectioned inspector with collapsible key/value and detail rows.
+///     Represents a sectioned inspector with collapsible key/value and detail rows.
 /// </summary>
 public sealed class InspectorPanel : Control
 {
     private readonly List<InspectorSection> _sections = [];
-    private int _selectedRowIndex = -1;
     private int _scrollOffset;
 
     /// <summary>Gets or sets panel title.</summary>
     public string Title { get; set; } = "Inspector";
-    /// <summary>Gets or sets marker appended to <see cref="Title"/> while focused.</summary>
+
+    /// <summary>Gets or sets marker appended to <see cref="Title" /> while focused.</summary>
     public string FocusMarker { get; set; } = "*";
-    /// <summary>Gets or sets whether <see cref="FocusMarker"/> is rendered while focused.</summary>
+
+    /// <summary>Gets or sets whether <see cref="FocusMarker" /> is rendered while focused.</summary>
     public bool ShowFocusMarker { get; set; } = true;
+
     /// <summary>Gets or sets marker shown for expanded sections.</summary>
     public string ExpandedMarker { get; set; } = "▾";
+
     /// <summary>Gets or sets marker shown for collapsed sections.</summary>
     public string CollapsedMarker { get; set; } = "▸";
+
     /// <summary>Gets or sets preferred key column width.</summary>
     public int PreferredKeyWidth { get; set; } = 20;
+
     /// <summary>Gets or sets text shown when no sections exist.</summary>
     public string EmptyText { get; set; } = "(empty)";
 
     /// <summary>Gets or sets border style.</summary>
     public BorderStyle Border { get; set; } = BorderStyle.SingleLine;
+
     /// <summary>Gets or sets content padding.</summary>
     public Thickness Padding { get; set; }
 
     /// <summary>Gets or sets title style while not focused.</summary>
     public TesseraStyle TitleStyle { get; set; } = TesseraStyle.Empty;
+
     /// <summary>Gets or sets title style while focused.</summary>
     public TesseraStyle FocusedTitleStyle { get; set; } = TesseraStyle.Empty;
+
     /// <summary>Gets or sets border style while not focused.</summary>
     public TesseraStyle BorderStyleText { get; set; } = TesseraStyle.Empty;
+
     /// <summary>Gets or sets border style while focused.</summary>
     public TesseraStyle FocusedBorderStyleText { get; set; } = TesseraStyle.Empty;
+
     /// <summary>Gets or sets section title style.</summary>
     public TesseraStyle SectionStyle { get; set; } = TesseraStyle.Empty;
+
     /// <summary>Gets or sets selected section title style.</summary>
     public TesseraStyle SelectedSectionStyle { get; set; } = TesseraStyle.Empty;
+
     /// <summary>Gets or sets key style for field rows.</summary>
     public TesseraStyle KeyStyle { get; set; } = TesseraStyle.Empty;
+
     /// <summary>Gets or sets value style for field rows.</summary>
     public TesseraStyle ValueStyle { get; set; } = TesseraStyle.Empty;
+
     /// <summary>Gets or sets detail style for detail rows.</summary>
     public TesseraStyle DetailStyle { get; set; } = TesseraStyle.Empty;
+
     /// <summary>Gets or sets marker style for expand/collapse glyphs.</summary>
     public TesseraStyle MarkerStyle { get; set; } = TesseraStyle.Empty;
+
     /// <summary>Gets or sets style merged into selected row text.</summary>
     public TesseraStyle SelectedRowStyle { get; set; } = TesseraStyle.Empty;
+
     /// <summary>Gets or sets style merged into selected row text while focused.</summary>
     public TesseraStyle FocusedSelectedRowStyle { get; set; } = TesseraStyle.Empty;
+
     /// <summary>Gets or sets style merged while disabled.</summary>
     public TesseraStyle DisabledStyle { get; set; } = TesseraStyle.Empty;
+
     /// <summary>Gets or sets empty-state text style.</summary>
     public TesseraStyle EmptyStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>Gets configured sections.</summary>
     public IReadOnlyList<InspectorSection> Sections => _sections;
+
     /// <summary>Gets selected visible-row index, or <c>-1</c> when empty.</summary>
-    public int SelectedRowIndex => _selectedRowIndex;
+    public int SelectedRowIndex { get; private set; } = -1;
 
     /// <inheritdoc />
     public override bool IsFocused { get; set; }
+
     /// <inheritdoc />
     public override bool IsDisabled { get; set; }
+
     /// <inheritdoc />
     public override bool IsReadOnly { get; set; }
 
     /// <summary>
-    /// Replaces panel sections.
+    ///     Replaces panel sections.
     /// </summary>
     /// <param name="sections">Sections to render.</param>
     public void SetSections(IEnumerable<InspectorSection> sections)
@@ -92,21 +114,22 @@ public sealed class InspectorPanel : Control
         var rowCount = BuildRows().Count;
         if (rowCount == 0)
         {
-            _selectedRowIndex = -1;
+            SelectedRowIndex = -1;
         }
         else
         {
-            var seedIndex = _selectedRowIndex < 0 ? 0 : _selectedRowIndex;
-            _selectedRowIndex = Math.Clamp(seedIndex, 0, rowCount - 1);
+            var seedIndex = SelectedRowIndex < 0 ? 0 : SelectedRowIndex;
+            SelectedRowIndex = Math.Clamp(seedIndex, 0, rowCount - 1);
         }
+
         _scrollOffset = 0;
     }
 
     /// <summary>
-    /// Toggles expanded state for one section.
+    ///     Toggles expanded state for one section.
     /// </summary>
     /// <param name="index">Section index.</param>
-    /// <returns><see langword="true"/> when the section was toggled.</returns>
+    /// <returns><see langword="true" /> when the section was toggled.</returns>
     public bool ToggleSection(int index)
     {
         if (index < 0 || index >= _sections.Count)
@@ -116,37 +139,37 @@ public sealed class InspectorPanel : Control
 
         _sections[index].IsExpanded = !_sections[index].IsExpanded;
         var rows = BuildRows();
-        _selectedRowIndex = rows.Count == 0 ? -1 : Math.Clamp(_selectedRowIndex, 0, rows.Count - 1);
+        SelectedRowIndex = rows.Count == 0 ? -1 : Math.Clamp(SelectedRowIndex, 0, rows.Count - 1);
         _scrollOffset = Math.Clamp(_scrollOffset, 0, Math.Max(0, rows.Count - 1));
         return true;
     }
 
     /// <summary>
-    /// Sets selected visible-row index.
+    ///     Sets selected visible-row index.
     /// </summary>
     /// <param name="index">Requested row index.</param>
-    /// <returns><see langword="true"/> when selection changed.</returns>
+    /// <returns><see langword="true" /> when selection changed.</returns>
     public bool SetSelectedRowIndex(int index)
     {
         var rows = BuildRows();
         if (rows.Count == 0)
         {
-            if (_selectedRowIndex == -1)
+            if (SelectedRowIndex == -1)
             {
                 return false;
             }
 
-            _selectedRowIndex = -1;
+            SelectedRowIndex = -1;
             return true;
         }
 
         var clamped = Math.Clamp(index, 0, rows.Count - 1);
-        if (clamped == _selectedRowIndex)
+        if (clamped == SelectedRowIndex)
         {
             return false;
         }
 
-        _selectedRowIndex = clamped;
+        SelectedRowIndex = clamped;
         return true;
     }
 
@@ -164,22 +187,39 @@ public sealed class InspectorPanel : Control
             return false;
         }
 
-        if (key.Is(Key.Down) || key.IsCharacter('j')) return SetSelectedRowIndex(_selectedRowIndex + 1);
-        if (key.Is(Key.Up) || key.IsCharacter('k')) return SetSelectedRowIndex(_selectedRowIndex - 1);
-        if (key.Is(Key.Home)) return SetSelectedRowIndex(0);
-        if (key.Is(Key.End)) return SetSelectedRowIndex(rows.Count - 1);
+        if (key.Is(Key.Down) || key.IsCharacter('j'))
+        {
+            return SetSelectedRowIndex(SelectedRowIndex + 1);
+        }
+
+        if (key.Is(Key.Up) || key.IsCharacter('k'))
+        {
+            return SetSelectedRowIndex(SelectedRowIndex - 1);
+        }
+
+        if (key.Is(Key.Home))
+        {
+            return SetSelectedRowIndex(0);
+        }
+
+        if (key.Is(Key.End))
+        {
+            return SetSelectedRowIndex(rows.Count - 1);
+        }
 
         if ((key.Is(Key.Enter) || key.IsCharacter(' ')) && TryGetSelectedSectionHeader(rows, out var sectionIndex))
         {
             return ToggleSection(sectionIndex);
         }
 
-        if (key.Is(Key.Left) && TryGetSelectedSectionOrAncestor(rows, out sectionIndex) && _sections[sectionIndex].IsExpanded)
+        if (key.Is(Key.Left) && TryGetSelectedSectionOrAncestor(rows, out sectionIndex) &&
+            _sections[sectionIndex].IsExpanded)
         {
             return ToggleSection(sectionIndex);
         }
 
-        if (key.Is(Key.Right) && TryGetSelectedSectionOrAncestor(rows, out sectionIndex) && !_sections[sectionIndex].IsExpanded)
+        if (key.Is(Key.Right) && TryGetSelectedSectionOrAncestor(rows, out sectionIndex) &&
+            !_sections[sectionIndex].IsExpanded)
         {
             return ToggleSection(sectionIndex);
         }
@@ -209,8 +249,16 @@ public sealed class InspectorPanel : Control
 
         if (pointer.Kind == PointerEventKind.Wheel)
         {
-            if (pointer.Button == PointerButton.WheelDown) return SetSelectedRowIndex(_selectedRowIndex + 1);
-            if (pointer.Button == PointerButton.WheelUp) return SetSelectedRowIndex(_selectedRowIndex - 1);
+            if (pointer.Button == PointerButton.WheelDown)
+            {
+                return SetSelectedRowIndex(SelectedRowIndex + 1);
+            }
+
+            if (pointer.Button == PointerButton.WheelUp)
+            {
+                return SetSelectedRowIndex(SelectedRowIndex - 1);
+            }
+
             return false;
         }
 
@@ -252,7 +300,8 @@ public sealed class InspectorPanel : Control
         }
 
         var title = Border == BorderStyle.None ? null : RenderTitle();
-        var content = FrameLayout.DrawFrameAndResolveContent(canvas, clipped, title, Border, Padding, ResolveBorderStyle());
+        var content =
+            FrameLayout.DrawFrameAndResolveContent(canvas, clipped, title, Border, Padding, ResolveBorderStyle());
         if (content.IsEmpty)
         {
             return;
@@ -272,7 +321,7 @@ public sealed class InspectorPanel : Control
         {
             var index = _scrollOffset + row;
             var current = rows[index];
-            RenderRow(canvas, content, content.Y + row, keyWidth, current, index == _selectedRowIndex);
+            RenderRow(canvas, content, content.Y + row, keyWidth, current, index == SelectedRowIndex);
         }
     }
 
@@ -282,7 +331,8 @@ public sealed class InspectorPanel : Control
         var width = Math.Max(20, ControlTextLayout.MeasureDisplayWidth(Title) + 4);
         var height = Math.Max(4, Math.Max(1, rows.Count) + Padding.Vertical + (Border == BorderStyle.None ? 0 : 2));
         width += Padding.Horizontal + (Border == BorderStyle.None ? 0 : 2);
-        return new LayoutMeasurement(Math.Clamp(width, 0, availableBounds.Width), Math.Clamp(height, 0, availableBounds.Height));
+        return new LayoutMeasurement(Math.Clamp(width, 0, availableBounds.Width),
+            Math.Clamp(height, 0, availableBounds.Height));
     }
 
     private void RenderRow(Canvas canvas, Rect content, int y, int keyWidth, InspectorRow row, bool selected)
@@ -292,7 +342,9 @@ public sealed class InspectorPanel : Control
         {
             var marker = _sections[row.SectionIndex].IsExpanded ? ExpandedMarker : CollapsedMarker;
             var markerText = Apply(marker, ResolveStyle(MarkerStyle.Merge(selectedStyle)));
-            var title = Apply(_sections[row.SectionIndex].Title, ResolveStyle(SectionStyle.Merge(selected ? SelectedSectionStyle : TesseraStyle.Empty).Merge(selectedStyle)));
+            var title = Apply(_sections[row.SectionIndex].Title,
+                ResolveStyle(SectionStyle.Merge(selected ? SelectedSectionStyle : TesseraStyle.Empty)
+                    .Merge(selectedStyle)));
             Write(canvas, content.X, y, string.Concat(markerText, " ", title), TesseraStyle.Empty, content.Width);
             return;
         }
@@ -340,12 +392,12 @@ public sealed class InspectorPanel : Control
     private bool TryGetSelectedSectionHeader(IReadOnlyList<InspectorRow> rows, out int sectionIndex)
     {
         sectionIndex = -1;
-        if (_selectedRowIndex < 0 || _selectedRowIndex >= rows.Count)
+        if (SelectedRowIndex < 0 || SelectedRowIndex >= rows.Count)
         {
             return false;
         }
 
-        var row = rows[_selectedRowIndex];
+        var row = rows[SelectedRowIndex];
         if (row.Kind != InspectorRowKind.SectionHeader)
         {
             return false;
@@ -358,12 +410,12 @@ public sealed class InspectorPanel : Control
     private bool TryGetSelectedSectionOrAncestor(IReadOnlyList<InspectorRow> rows, out int sectionIndex)
     {
         sectionIndex = -1;
-        if (_selectedRowIndex < 0 || _selectedRowIndex >= rows.Count)
+        if (SelectedRowIndex < 0 || SelectedRowIndex >= rows.Count)
         {
             return false;
         }
 
-        sectionIndex = rows[_selectedRowIndex].SectionIndex;
+        sectionIndex = rows[SelectedRowIndex].SectionIndex;
         return sectionIndex >= 0 && sectionIndex < _sections.Count;
     }
 
@@ -375,18 +427,18 @@ public sealed class InspectorPanel : Control
             return;
         }
 
-        if (_selectedRowIndex < 0)
+        if (SelectedRowIndex < 0)
         {
-            _selectedRowIndex = 0;
+            SelectedRowIndex = 0;
         }
 
-        if (_selectedRowIndex < _scrollOffset)
+        if (SelectedRowIndex < _scrollOffset)
         {
-            _scrollOffset = _selectedRowIndex;
+            _scrollOffset = SelectedRowIndex;
         }
-        else if (_selectedRowIndex >= _scrollOffset + viewportHeight)
+        else if (SelectedRowIndex >= _scrollOffset + viewportHeight)
         {
-            _scrollOffset = _selectedRowIndex - viewportHeight + 1;
+            _scrollOffset = SelectedRowIndex - viewportHeight + 1;
         }
 
         _scrollOffset = Math.Clamp(_scrollOffset, 0, Math.Max(0, totalRows - viewportHeight));
@@ -417,7 +469,10 @@ public sealed class InspectorPanel : Control
         return style;
     }
 
-    private TesseraStyle ResolveStyle(TesseraStyle style) => IsDisabled ? style.Merge(DisabledStyle) : style;
+    private TesseraStyle ResolveStyle(TesseraStyle style)
+    {
+        return IsDisabled ? style.Merge(DisabledStyle) : style;
+    }
 
     private static InspectorSection Clone(InspectorSection section)
     {
@@ -430,16 +485,28 @@ public sealed class InspectorPanel : Control
 
         for (var index = 0; index < section.Details.Count; index++)
         {
-            clone.Details.Add(section.Details[index] ?? string.Empty);
+            clone.Details.Add(section.Details[index]);
         }
 
         return clone;
     }
 
-    private static string Pad(string text, int width) => text.Length >= width ? text[..width] : text.PadRight(width);
-    private static string Apply(string text, TesseraStyle style) => style.IsEmpty ? text : style.Render(text);
-    private static void Write(Canvas canvas, int x, int y, string text, TesseraStyle style, int width) => canvas.WriteText(x, y, Apply(text ?? string.Empty, style), width);
+    private static string Pad(string text, int width)
+    {
+        return text.Length >= width ? text[..width] : text.PadRight(width);
+    }
+
+    private static string Apply(string text, TesseraStyle style)
+    {
+        return style.IsEmpty ? text : style.Render(text);
+    }
+
+    private static void Write(Canvas canvas, int x, int y, string text, TesseraStyle style, int width)
+    {
+        canvas.WriteText(x, y, Apply(text, style), width);
+    }
 
     private enum InspectorRowKind { SectionHeader, Field, Detail }
+
     private readonly record struct InspectorRow(int SectionIndex, InspectorRowKind Kind, int ItemIndex);
 }

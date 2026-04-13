@@ -1,25 +1,25 @@
-﻿using Tessera.Components.Primitives;
-using Tessera.Controls;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using Tessera.Components.Composition;
+using Tessera.Components.Primitives;
+using Tessera.Controls;
 
 namespace Tessera.Layout;
 
 /// <summary>
-/// Represents content centered within the available bounds.
+///     Represents content centered within the available bounds.
 /// </summary>
 public sealed class CenterLayout : LayoutNode
 {
     /// <summary>
-    /// Creates an empty centered layout for object-initializer assembly.
+    ///     Creates an empty centered layout for object-initializer assembly.
     /// </summary>
     public CenterLayout()
     {
     }
 
     /// <summary>
-    /// Creates a centered layout node around nested content.
+    ///     Creates a centered layout node around nested content.
     /// </summary>
     /// <param name="content">The content to center.</param>
     /// <param name="width">The explicit width to use, when supplied. When omitted, measured content width is used.</param>
@@ -35,7 +35,7 @@ public sealed class CenterLayout : LayoutNode
     }
 
     /// <summary>
-    /// Executes center layout.
+    ///     Executes center layout.
     /// </summary>
     /// <param name="component">The component value.</param>
     /// <param name="width">The width value.</param>
@@ -58,7 +58,7 @@ public sealed class CenterLayout : LayoutNode
     }
 
     /// <summary>
-    /// Creates a centered layout node around a control.
+    ///     Creates a centered layout node around a control.
     /// </summary>
     /// <param name="control">The control to center.</param>
     /// <param name="width">The explicit width to use, when supplied. When omitted, measured control width is used.</param>
@@ -79,22 +79,22 @@ public sealed class CenterLayout : LayoutNode
     }
 
     /// <summary>
-    /// Gets the centered content.
+    ///     Gets the centered content.
     /// </summary>
     public required LayoutNode Content { get; init; }
 
     /// <summary>
-    /// Gets the explicit content width, if provided.
+    ///     Gets the explicit content width, if provided.
     /// </summary>
     public int? Width { get; init; }
 
     /// <summary>
-    /// Gets the explicit content height, if provided.
+    ///     Gets the explicit content height, if provided.
     /// </summary>
     public int? Height { get; init; }
 
     /// <summary>
-    /// Gets the outer margin applied before centering.
+    ///     Gets the outer margin applied before centering.
     /// </summary>
     public Thickness Margin { get; init; }
 
@@ -110,5 +110,9 @@ public sealed class CenterLayout : LayoutNode
     }
 
     private LayoutNode GetContent()
-        => Content ?? throw new InvalidOperationException($"{nameof(CenterLayout)} requires {nameof(Content)} to be configured.");
+    {
+        return Content ??
+               throw new InvalidOperationException(
+                   $"{nameof(CenterLayout)} requires {nameof(Content)} to be configured.");
+    }
 }

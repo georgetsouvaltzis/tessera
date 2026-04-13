@@ -8,97 +8,85 @@ using Tessera.Styles;
 namespace Tessera.Controls;
 
 /// <summary>
-/// Represents a bordered container that arranges multiple plot controls in a grid.
+///     Represents a bordered container that arranges multiple plot controls in a grid.
 /// </summary>
 public sealed class PlotPanel : Control
 {
     private readonly List<Control> _plots = [];
 
     /// <summary>
-    /// Gets or sets the panel title.
+    ///     Gets or sets the panel title.
     /// </summary>
-    public string Title
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = "Plots";
+    public string Title { get; set; } = "Plots";
 
     /// <summary>
-    /// Gets or sets the marker appended to the title while focused.
+    ///     Gets or sets the marker appended to the title while focused.
     /// </summary>
-    public string FocusMarker
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = "*";
+    public string FocusMarker { get; set; } = "*";
 
     /// <summary>
-    /// Gets or sets a value indicating whether the focus marker is rendered while focused.
+    ///     Gets or sets a value indicating whether the focus marker is rendered while focused.
     /// </summary>
     public bool ShowFocusMarker { get; set; } = true;
 
     /// <summary>
-    /// Gets or sets style used for the title when the control is not focused.
+    ///     Gets or sets style used for the title when the control is not focused.
     /// </summary>
     public TesseraStyle TitleStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets style used for the title when the control is focused.
+    ///     Gets or sets style used for the title when the control is focused.
     /// </summary>
     public TesseraStyle FocusedTitleStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets style used for empty-state text.
+    ///     Gets or sets style used for empty-state text.
     /// </summary>
     public TesseraStyle EmptyTextStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets style merged into rendered output while <see cref="Control.IsDisabled"/> is <see langword="true"/>.
+    ///     Gets or sets style merged into rendered output while <see cref="Control.IsDisabled" /> is <see langword="true" />.
     /// </summary>
     public TesseraStyle DisabledStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the style applied to border glyphs when the control is not focused.
+    ///     Gets or sets the style applied to border glyphs when the control is not focused.
     /// </summary>
     public TesseraStyle BorderStyleText { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the style applied to border glyphs when the control is focused.
+    ///     Gets or sets the style applied to border glyphs when the control is focused.
     /// </summary>
     public TesseraStyle FocusedBorderStyleText { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the frame border style.
+    ///     Gets or sets the frame border style.
     /// </summary>
     public BorderStyle Border { get; set; } = BorderStyle.SingleLine;
 
     /// <summary>
-    /// Gets or sets inner padding applied around the plot grid.
+    ///     Gets or sets inner padding applied around the plot grid.
     /// </summary>
     public Thickness Padding { get; set; }
 
     /// <summary>
-    /// Gets or sets text shown when no plots are configured.
+    ///     Gets or sets text shown when no plots are configured.
     /// </summary>
-    public string EmptyText
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = "(no plots)";
+    public string EmptyText { get; set; } = "(no plots)";
 
     /// <summary>
-    /// Gets or sets advanced layout options.
+    ///     Gets or sets advanced layout options.
     /// </summary>
     [EditorBrowsable(EditorBrowsableState.Advanced)]
     public PlotPanelOptions? Options { get; set; }
 
     /// <summary>
-    /// Gets the configured plot controls.
+    ///     Gets the configured plot controls.
     /// </summary>
     public IReadOnlyList<Control> Plots => _plots;
 
     /// <summary>
-    /// Replaces the plot collection.
+    ///     Replaces the plot collection.
     /// </summary>
     /// <param name="plots">Plot controls to render.</param>
     public void SetPlots(IEnumerable<Control> plots)
@@ -113,7 +101,7 @@ public sealed class PlotPanel : Control
     }
 
     /// <summary>
-    /// Adds one plot control to the panel.
+    ///     Adds one plot control to the panel.
     /// </summary>
     /// <param name="plot">The plot control to add.</param>
     public void AddPlot(Control plot)
@@ -123,7 +111,7 @@ public sealed class PlotPanel : Control
     }
 
     /// <summary>
-    /// Removes all plot controls.
+    ///     Removes all plot controls.
     /// </summary>
     public void ClearPlots()
     {
@@ -245,8 +233,8 @@ public sealed class PlotPanel : Control
             cellHeight = Math.Max(cellHeight, measurement.Height);
         }
 
-        var width = (columns * cellWidth) + (Math.Max(0, columns - 1) * spacing);
-        var height = (rows * cellHeight) + (Math.Max(0, rows - 1) * spacing);
+        var width = columns * cellWidth + Math.Max(0, columns - 1) * spacing;
+        var height = rows * cellHeight + Math.Max(0, rows - 1) * spacing;
         width += Padding.Horizontal;
         height += Padding.Vertical;
         if (Border != BorderStyle.None)
@@ -328,11 +316,7 @@ public sealed class PlotPanel : Control
 
     private static PlotPanelOptions NormalizeOptions(PlotPanelOptions options)
     {
-        return options with
-        {
-            Columns = Math.Max(1, options.Columns),
-            Spacing = Math.Max(0, options.Spacing),
-        };
+        return options with { Columns = Math.Max(1, options.Columns), Spacing = Math.Max(0, options.Spacing) };
     }
 
     private TesseraStyle ResolveBorderStyleText()

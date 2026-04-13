@@ -1,40 +1,28 @@
-﻿using Tessera.Components.Primitives;
+using System.ComponentModel;
+using Tessera.Components.Primitives;
 using Tessera.Components.Primitives.Internal;
 using Tessera.Controls.Internal;
 using Tessera.Layout;
 using Tessera.Styles;
 using Tessera.Widgets;
-using System.ComponentModel;
 
 namespace Tessera.Controls;
 
 /// <summary>
-/// Represents a single-line editable text field.
+///     Represents a single-line editable text field.
 /// </summary>
 /// <remarks>
-/// Use <see cref="Submitted"/> and <see cref="Cancelled"/> as the normal interaction hooks. The advanced
-/// polling methods remain only for transitional interop.
+///     Use <see cref="Submitted" /> and <see cref="Cancelled" /> as the normal interaction hooks. The advanced
+///     polling methods remain only for transitional interop.
 /// </remarks>
 public sealed class TextInput : Control
 {
     private readonly TextInputModel _input = new();
-    private int _submitCount;
-    private int _cancelCount;
-    private int _consumedSubmitCount;
     private int _consumedCancelCount;
+    private int _consumedSubmitCount;
 
     /// <summary>
-    /// Occurs when the current value is submitted.
-    /// </summary>
-    public event EventHandler<TextInputSubmittedEventArgs>? Submitted;
-
-    /// <summary>
-    /// Occurs when editing is canceled.
-    /// </summary>
-    public event EventHandler<TextInputCancelledEventArgs>? Cancelled;
-
-    /// <summary>
-    /// Executes text input.
+    ///     Executes text input.
     /// </summary>
     /// <returns>The result of text input.</returns>
     public TextInput()
@@ -42,25 +30,17 @@ public sealed class TextInput : Control
     }
 
     /// <summary>
-    /// Gets or sets the field title.
+    ///     Gets or sets the field title.
     /// </summary>
-    public string Title
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = "Text Input";
+    public string Title { get; set; } = "Text Input";
 
     /// <summary>
-    /// Gets or sets the marker shown in the title when the control is focused.
+    ///     Gets or sets the marker shown in the title when the control is focused.
     /// </summary>
-    public string FocusMarker
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = "*";
+    public string FocusMarker { get; set; } = "*";
 
     /// <summary>
-    /// Gets or sets a value indicating whether the focus marker should be rendered in the title when focused.
+    ///     Gets or sets a value indicating whether the focus marker should be rendered in the title when focused.
     /// </summary>
     public bool ShowFocusMarker
     {
@@ -69,7 +49,7 @@ public sealed class TextInput : Control
     } = true;
 
     /// <summary>
-    /// Gets or sets the title style applied when the control is not focused.
+    ///     Gets or sets the title style applied when the control is not focused.
     /// </summary>
     public TesseraStyle TitleStyle
     {
@@ -78,21 +58,21 @@ public sealed class TextInput : Control
     } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the placeholder shown when the field is empty.
+    ///     Gets or sets the placeholder shown when the field is empty.
     /// </summary>
     public string Placeholder
     {
         get => _input.Placeholder;
-        set => _input.Placeholder = value ?? string.Empty;
+        set => _input.Placeholder = value;
     }
 
     /// <summary>
-    /// Gets the current input value.
+    ///     Gets the current input value.
     /// </summary>
     public string Value => _input.Value;
 
     /// <summary>
-    /// Gets or sets the field border style.
+    ///     Gets or sets the field border style.
     /// </summary>
     public BorderStyle Border
     {
@@ -101,7 +81,7 @@ public sealed class TextInput : Control
     } = BorderStyle.SingleLine;
 
     /// <summary>
-    /// Gets or sets the inner padding applied to the field body.
+    ///     Gets or sets the inner padding applied to the field body.
     /// </summary>
     public Thickness Padding
     {
@@ -110,7 +90,7 @@ public sealed class TextInput : Control
     }
 
     /// <summary>
-    /// Gets or sets the style used for the input value text.
+    ///     Gets or sets the style used for the input value text.
     /// </summary>
     public TesseraStyle ValueTextStyle
     {
@@ -119,7 +99,7 @@ public sealed class TextInput : Control
     } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the style used when the placeholder text is shown.
+    ///     Gets or sets the style used when the placeholder text is shown.
     /// </summary>
     public TesseraStyle PlaceholderTextStyle
     {
@@ -128,7 +108,7 @@ public sealed class TextInput : Control
     } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the style applied to the title when the input is focused.
+    ///     Gets or sets the style applied to the title when the input is focused.
     /// </summary>
     public TesseraStyle FocusedTitleStyle
     {
@@ -137,7 +117,7 @@ public sealed class TextInput : Control
     } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the style applied to border glyphs when the control is not focused.
+    ///     Gets or sets the style applied to border glyphs when the control is not focused.
     /// </summary>
     public TesseraStyle BorderStyleText
     {
@@ -146,7 +126,7 @@ public sealed class TextInput : Control
     } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the style applied to border glyphs when the control is focused.
+    ///     Gets or sets the style applied to border glyphs when the control is focused.
     /// </summary>
     public TesseraStyle FocusedBorderStyleText
     {
@@ -155,7 +135,7 @@ public sealed class TextInput : Control
     } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets a value indicating whether the field should clear after submission.
+    ///     Gets or sets a value indicating whether the field should clear after submission.
     /// </summary>
     public bool ClearOnSubmit
     {
@@ -164,7 +144,7 @@ public sealed class TextInput : Control
     }
 
     /// <summary>
-    /// Gets or sets a value indicating whether the field should clear after cancellation.
+    ///     Gets or sets a value indicating whether the field should clear after cancellation.
     /// </summary>
     public bool ClearOnCancel
     {
@@ -173,7 +153,7 @@ public sealed class TextInput : Control
     }
 
     /// <summary>
-    /// Gets or sets the maximum accepted input length.
+    ///     Gets or sets the maximum accepted input length.
     /// </summary>
     public int MaxLength
     {
@@ -182,7 +162,7 @@ public sealed class TextInput : Control
     }
 
     /// <summary>
-    /// Gets or sets a value indicating whether the field masks typed characters.
+    ///     Gets or sets a value indicating whether the field masks typed characters.
     /// </summary>
     public bool MaskInput
     {
@@ -191,7 +171,7 @@ public sealed class TextInput : Control
     }
 
     /// <summary>
-    /// Gets or sets the masking character used when <see cref="MaskInput"/> is enabled.
+    ///     Gets or sets the masking character used when <see cref="MaskInput" /> is enabled.
     /// </summary>
     public char MaskCharacter
     {
@@ -207,73 +187,89 @@ public sealed class TextInput : Control
     }
 
     /// <summary>
-    /// Replaces the current field value.
+    ///     Gets or sets the last submitted value.
+    /// </summary>
+    public string LastSubmittedValue { get; private set; } = string.Empty;
+
+    /// <summary>
+    ///     Gets or sets the last cancelled value.
+    /// </summary>
+    public string LastCancelledValue { get; private set; } = string.Empty;
+
+    /// <summary>
+    ///     Represents submit count.
+    /// </summary>
+    public int SubmitCount { get; private set; }
+
+    /// <summary>
+    ///     Represents cancel count.
+    /// </summary>
+    public int CancelCount { get; private set; }
+
+    /// <summary>
+    ///     Occurs when the current value is submitted.
+    /// </summary>
+    public event EventHandler<TextInputSubmittedEventArgs>? Submitted;
+
+    /// <summary>
+    ///     Occurs when editing is canceled.
+    /// </summary>
+    public event EventHandler<TextInputCancelledEventArgs>? Cancelled;
+
+    /// <summary>
+    ///     Replaces the current field value.
     /// </summary>
     /// <param name="value">The value to set.</param>
-    public void SetValue(string value) => _input.SetValue(value ?? string.Empty);
+    public void SetValue(string value)
+    {
+        _input.SetValue(value);
+    }
 
     /// <summary>
-    /// Clears the current field value.
+    ///     Clears the current field value.
     /// </summary>
-    public void Clear() => _input.Clear();
+    public void Clear()
+    {
+        _input.Clear();
+    }
 
     /// <summary>
-    /// Attempts to consume a pending submission.
+    ///     Attempts to consume a pending submission.
     /// </summary>
     /// <param name="value">Receives the submitted value when available.</param>
-    /// <returns><see langword="true"/> when a submission was consumed; otherwise, <see langword="false"/>.</returns>
+    /// <returns><see langword="true" /> when a submission was consumed; otherwise, <see langword="false" />.</returns>
     [EditorBrowsable(EditorBrowsableState.Advanced)]
     public bool TryConsumeSubmission(out string value)
     {
-        if (_submitCount == _consumedSubmitCount)
+        if (SubmitCount == _consumedSubmitCount)
         {
             value = string.Empty;
             return false;
         }
 
-        _consumedSubmitCount = _submitCount;
+        _consumedSubmitCount = SubmitCount;
         value = LastSubmittedValue;
         return true;
     }
 
     /// <summary>
-    /// Attempts to consume a pending cancellation.
+    ///     Attempts to consume a pending cancellation.
     /// </summary>
     /// <param name="value">Receives the canceled value when available.</param>
-    /// <returns><see langword="true"/> when a cancellation was consumed; otherwise, <see langword="false"/>.</returns>
+    /// <returns><see langword="true" /> when a cancellation was consumed; otherwise, <see langword="false" />.</returns>
     [EditorBrowsable(EditorBrowsableState.Advanced)]
     public bool TryConsumeCancellation(out string value)
     {
-        if (_cancelCount == _consumedCancelCount)
+        if (CancelCount == _consumedCancelCount)
         {
             value = string.Empty;
             return false;
         }
 
-        _consumedCancelCount = _cancelCount;
+        _consumedCancelCount = CancelCount;
         value = LastCancelledValue;
         return true;
     }
-
-    /// <summary>
-    /// Gets or sets the last submitted value.
-    /// </summary>
-    public string LastSubmittedValue { get; private set; } = string.Empty;
-
-    /// <summary>
-    /// Gets or sets the last cancelled value.
-    /// </summary>
-    public string LastCancelledValue { get; private set; } = string.Empty;
-
-    /// <summary>
-    /// Represents submit count.
-    /// </summary>
-    public int SubmitCount => _submitCount;
-
-    /// <summary>
-    /// Represents cancel count.
-    /// </summary>
-    public int CancelCount => _cancelCount;
 
     /// <inheritdoc />
     public override bool Handle(Message message)
@@ -286,7 +282,7 @@ public sealed class TextInput : Control
         if (message is KeyPressed { Key: Key.Escape })
         {
             LastCancelledValue = _input.Value;
-            _cancelCount++;
+            CancelCount++;
             if (ClearOnCancel)
             {
                 _input.Clear();
@@ -303,7 +299,7 @@ public sealed class TextInput : Control
         }
 
         LastSubmittedValue = _input.Value;
-        _submitCount++;
+        SubmitCount++;
         if (ClearOnSubmit)
         {
             _input.Clear();

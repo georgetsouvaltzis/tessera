@@ -1,29 +1,29 @@
-﻿using Tessera.Components.Primitives;
-using Tessera.Components.Primitives.Internal;
-using Tessera.Controls;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using Tessera.Components.Composition;
+using Tessera.Components.Primitives;
+using Tessera.Components.Primitives.Internal;
+using Tessera.Controls;
 
 namespace Tessera.Layout;
 
 /// <summary>
-/// Represents a grouped container with optional frame styling and nested content.
+///     Represents a grouped container with optional frame styling and nested content.
 /// </summary>
 /// <remarks>
-/// Border and padding reduce the inner content area before the nested content is measured and composed.
+///     Border and padding reduce the inner content area before the nested content is measured and composed.
 /// </remarks>
 public sealed class PanelLayout : LayoutNode
 {
     /// <summary>
-    /// Creates an empty panel layout for object-initializer assembly.
+    ///     Creates an empty panel layout for object-initializer assembly.
     /// </summary>
     public PanelLayout()
     {
     }
 
     /// <summary>
-    /// Creates a panel layout around nested content.
+    ///     Creates a panel layout around nested content.
     /// </summary>
     /// <param name="content">The content shown inside the panel.</param>
     /// <param name="title">The optional panel title.</param>
@@ -31,7 +31,8 @@ public sealed class PanelLayout : LayoutNode
     /// <param name="padding">The inner panel padding.</param>
     /// <param name="margin">The outer panel margin.</param>
     [SetsRequiredMembers]
-    public PanelLayout(LayoutNode content, string? title = null, BorderStyle border = BorderStyle.None, Thickness padding = default, Thickness margin = default)
+    public PanelLayout(LayoutNode content, string? title = null, BorderStyle border = BorderStyle.None,
+        Thickness padding = default, Thickness margin = default)
     {
         Content = content ?? throw new ArgumentNullException(nameof(content));
         Title = title;
@@ -41,7 +42,7 @@ public sealed class PanelLayout : LayoutNode
     }
 
     /// <summary>
-    /// Executes panel layout.
+    ///     Executes panel layout.
     /// </summary>
     /// <param name="component">The component value.</param>
     /// <param name="title">The title value.</param>
@@ -67,7 +68,7 @@ public sealed class PanelLayout : LayoutNode
     }
 
     /// <summary>
-    /// Creates a panel layout around a control.
+    ///     Creates a panel layout around a control.
     /// </summary>
     /// <param name="control">The control shown inside the panel.</param>
     /// <param name="title">The optional panel title.</param>
@@ -91,27 +92,27 @@ public sealed class PanelLayout : LayoutNode
     }
 
     /// <summary>
-    /// Gets the nested layout content.
+    ///     Gets the nested layout content.
     /// </summary>
     public required LayoutNode Content { get; init; }
 
     /// <summary>
-    /// Gets the optional panel title.
+    ///     Gets the optional panel title.
     /// </summary>
     public string? Title { get; init; }
 
     /// <summary>
-    /// Gets the frame border style.
+    ///     Gets the frame border style.
     /// </summary>
     public BorderStyle Border { get; init; }
 
     /// <summary>
-    /// Gets the inner panel padding.
+    ///     Gets the inner panel padding.
     /// </summary>
     public Thickness Padding { get; init; }
 
     /// <summary>
-    /// Gets the outer panel margin.
+    ///     Gets the outer panel margin.
     /// </summary>
     public Thickness Margin { get; init; }
 
@@ -134,5 +135,9 @@ public sealed class PanelLayout : LayoutNode
     }
 
     private LayoutNode GetContent()
-        => Content ?? throw new InvalidOperationException($"{nameof(PanelLayout)} requires {nameof(Content)} to be configured.");
+    {
+        return Content ??
+               throw new InvalidOperationException(
+                   $"{nameof(PanelLayout)} requires {nameof(Content)} to be configured.");
+    }
 }

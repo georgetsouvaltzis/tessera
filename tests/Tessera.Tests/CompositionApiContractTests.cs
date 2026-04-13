@@ -1,5 +1,3 @@
-using Tessera.Components.Primitives;
-using Tessera.Components.Styling;
 using System.ComponentModel;
 using System.Reflection;
 using System.Runtime.CompilerServices;
@@ -17,7 +15,7 @@ internal static class CompositionApiContractTests
         typeof(ColumnLayout),
         typeof(PanelLayout),
         typeof(CenterLayout),
-        typeof(LayoutSlot),
+        typeof(LayoutSlot)
     ];
 
     private static readonly string[] InternalizedCompositionTypes = [];
@@ -52,18 +50,25 @@ internal static class CompositionApiContractTests
         "Tessera.Layout.Dock",
         "Tessera.Layout.Overlay",
         "Tessera.Layout.Center",
-        "Tessera.Layout.Slot",
+        "Tessera.Layout.Slot"
     ];
 
     public static IEnumerable<TestCase> Cases()
     {
-        yield return new TestCase("CompositionApi_RootLayoutTypes_RemainDiscoverable", RootLayoutTypes_RemainDiscoverable);
-        yield return new TestCase("CompositionApi_KeyLayoutTypes_SupportObjectInitializerAssembly", KeyLayoutTypes_SupportObjectInitializerAssembly);
-        yield return new TestCase("CompositionApi_LayoutLength_SupportsImplicitFixedIntegers", LayoutLength_SupportsImplicitFixedIntegers);
-        yield return new TestCase("CompositionApi_RowAndColumnSizingHelpers_AreMarkedAdvanced", RowAndColumnSizingHelpers_AreMarkedAdvanced);
-        yield return new TestCase("CompositionApi_ScreenFromLayoutNode_IsMarkedAdvanced", ScreenFromLayoutNode_IsMarkedAdvanced);
-        yield return new TestCase("CompositionApi_InternalizedCompositionTypes_AreNotPublic", InternalizedCompositionTypes_AreNotPublic);
-        yield return new TestCase("CompositionApi_RemovedCompositionTypes_AreAbsent", RemovedCompositionTypes_AreAbsent);
+        yield return new TestCase("CompositionApi_RootLayoutTypes_RemainDiscoverable",
+            RootLayoutTypes_RemainDiscoverable);
+        yield return new TestCase("CompositionApi_KeyLayoutTypes_SupportObjectInitializerAssembly",
+            KeyLayoutTypes_SupportObjectInitializerAssembly);
+        yield return new TestCase("CompositionApi_LayoutLength_SupportsImplicitFixedIntegers",
+            LayoutLength_SupportsImplicitFixedIntegers);
+        yield return new TestCase("CompositionApi_RowAndColumnSizingHelpers_AreMarkedAdvanced",
+            RowAndColumnSizingHelpers_AreMarkedAdvanced);
+        yield return new TestCase("CompositionApi_ScreenFromLayoutNode_IsMarkedAdvanced",
+            ScreenFromLayoutNode_IsMarkedAdvanced);
+        yield return new TestCase("CompositionApi_InternalizedCompositionTypes_AreNotPublic",
+            InternalizedCompositionTypes_AreNotPublic);
+        yield return new TestCase("CompositionApi_RemovedCompositionTypes_AreAbsent",
+            RemovedCompositionTypes_AreAbsent);
     }
 
     private static Task RootLayoutTypes_RemainDiscoverable()
@@ -90,13 +95,10 @@ internal static class CompositionApiContractTests
 
     private static Task LayoutLength_SupportsImplicitFixedIntegers()
     {
-        var slot = new LayoutSlot
-        {
-            Content = new Label(),
-            Length = 6,
-        };
+        var slot = new LayoutSlot { Content = new Label(), Length = 6 };
 
-        TestAssert.True(slot.Length.Kind == LayoutLengthKind.Fixed, "Implicit integer conversion should produce a fixed layout length.");
+        TestAssert.True(slot.Length.Kind == LayoutLengthKind.Fixed,
+            "Implicit integer conversion should produce a fixed layout length.");
         TestAssert.Equal(6, slot.Length.Value, "Implicit integer conversion should preserve the requested fixed size.");
         return Task.CompletedTask;
     }
@@ -104,14 +106,20 @@ internal static class CompositionApiContractTests
     private static Task RowAndColumnSizingHelpers_AreMarkedAdvanced()
     {
         AssertMarkedAdvanced(typeof(RowLayout), nameof(RowLayout.AddAuto), [typeof(LayoutNode), typeof(Thickness)]);
-        AssertMarkedAdvanced(typeof(RowLayout), nameof(RowLayout.AddFixed), [typeof(LayoutNode), typeof(int), typeof(Thickness)]);
+        AssertMarkedAdvanced(typeof(RowLayout), nameof(RowLayout.AddFixed),
+            [typeof(LayoutNode), typeof(int), typeof(Thickness)]);
         AssertMarkedAdvanced(typeof(RowLayout), nameof(RowLayout.AddFill), [typeof(LayoutNode), typeof(Thickness)]);
-        AssertMarkedAdvanced(typeof(RowLayout), nameof(RowLayout.AddWeighted), [typeof(LayoutNode), typeof(int), typeof(Thickness)]);
+        AssertMarkedAdvanced(typeof(RowLayout), nameof(RowLayout.AddWeighted),
+            [typeof(LayoutNode), typeof(int), typeof(Thickness)]);
 
-        AssertMarkedAdvanced(typeof(ColumnLayout), nameof(ColumnLayout.AddAuto), [typeof(LayoutNode), typeof(Thickness)]);
-        AssertMarkedAdvanced(typeof(ColumnLayout), nameof(ColumnLayout.AddFixed), [typeof(LayoutNode), typeof(int), typeof(Thickness)]);
-        AssertMarkedAdvanced(typeof(ColumnLayout), nameof(ColumnLayout.AddFill), [typeof(LayoutNode), typeof(Thickness)]);
-        AssertMarkedAdvanced(typeof(ColumnLayout), nameof(ColumnLayout.AddWeighted), [typeof(LayoutNode), typeof(int), typeof(Thickness)]);
+        AssertMarkedAdvanced(typeof(ColumnLayout), nameof(ColumnLayout.AddAuto),
+            [typeof(LayoutNode), typeof(Thickness)]);
+        AssertMarkedAdvanced(typeof(ColumnLayout), nameof(ColumnLayout.AddFixed),
+            [typeof(LayoutNode), typeof(int), typeof(Thickness)]);
+        AssertMarkedAdvanced(typeof(ColumnLayout), nameof(ColumnLayout.AddFill),
+            [typeof(LayoutNode), typeof(Thickness)]);
+        AssertMarkedAdvanced(typeof(ColumnLayout), nameof(ColumnLayout.AddWeighted),
+            [typeof(LayoutNode), typeof(int), typeof(Thickness)]);
         return Task.CompletedTask;
     }
 
@@ -127,7 +135,7 @@ internal static class CompositionApiContractTests
 
         foreach (var typeName in InternalizedCompositionTypes)
         {
-            var type = assembly.GetType(typeName, throwOnError: false);
+            var type = assembly.GetType(typeName, false);
             TestAssert.True(type is not null, $"{typeName} should continue to exist as an internal bridge.");
             TestAssert.True(type!.IsNotPublic, $"{typeName} should no longer be public.");
         }
@@ -141,8 +149,9 @@ internal static class CompositionApiContractTests
 
         foreach (var typeName in RemovedCompositionTypes)
         {
-            var type = assembly.GetType(typeName, throwOnError: false);
-            TestAssert.True(type is null, $"{typeName} should be removed once the root path owns the behavior directly.");
+            var type = assembly.GetType(typeName, false);
+            TestAssert.True(type is null,
+                $"{typeName} should be removed once the root path owns the behavior directly.");
         }
 
         return Task.CompletedTask;
@@ -151,16 +160,20 @@ internal static class CompositionApiContractTests
     private static void AssertObjectInitializerShape(Type type, params string[] requiredProperties)
     {
         var constructor = type.GetConstructor(Type.EmptyTypes);
-        TestAssert.True(constructor is not null, $"{type.Name} should expose a parameterless constructor for object-initializer assembly.");
+        TestAssert.True(constructor is not null,
+            $"{type.Name} should expose a parameterless constructor for object-initializer assembly.");
 
         foreach (var propertyName in EnumerateRequiredPropertyNames(requiredProperties))
         {
             var property = type.GetProperty(propertyName, BindingFlags.Public | BindingFlags.Instance);
             TestAssert.True(property is not null, $"{type.Name} should expose a public {propertyName} property.");
-            TestAssert.True(property!.SetMethod is not null, $"{type.Name}.{propertyName} should be settable during object initialization.");
+            TestAssert.True(property!.SetMethod is not null,
+                $"{type.Name}.{propertyName} should be settable during object initialization.");
 
-            var requiredAttribute = (RequiredMemberAttribute?)Attribute.GetCustomAttribute(property, typeof(RequiredMemberAttribute));
-            TestAssert.True(requiredAttribute is not null, $"{type.Name}.{propertyName} should stay required for valid object-initializer assembly.");
+            var requiredAttribute =
+                (RequiredMemberAttribute?)Attribute.GetCustomAttribute(property, typeof(RequiredMemberAttribute));
+            TestAssert.True(requiredAttribute is not null,
+                $"{type.Name}.{propertyName} should stay required for valid object-initializer assembly.");
         }
     }
 
@@ -168,9 +181,11 @@ internal static class CompositionApiContractTests
     {
         var method = type.GetMethod(name, parameters);
         TestAssert.True(method is not null, $"{type.Name}.{name} should exist.");
-        var attribute = (EditorBrowsableAttribute?)Attribute.GetCustomAttribute(method!, typeof(EditorBrowsableAttribute));
+        var attribute =
+            (EditorBrowsableAttribute?)Attribute.GetCustomAttribute(method!, typeof(EditorBrowsableAttribute));
         TestAssert.True(attribute is not null, $"{type.Name}.{name} should be marked advanced.");
-        TestAssert.True(attribute!.State == EditorBrowsableState.Advanced, $"{type.Name}.{name} should stay out of default discovery.");
+        TestAssert.True(attribute!.State == EditorBrowsableState.Advanced,
+            $"{type.Name}.{name} should stay out of default discovery.");
     }
 
     private static IEnumerable<string> EnumerateRequiredPropertyNames(IEnumerable<string> requiredProperties)

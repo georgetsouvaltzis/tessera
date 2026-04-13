@@ -16,7 +16,8 @@ public sealed partial class HealthBoard
         }
 
         var title = Border == BorderStyle.None ? null : RenderTitle();
-        var content = FrameLayout.DrawFrameAndResolveContent(canvas, clipped, title, Border, Padding, ResolveBorderStyle());
+        var content =
+            FrameLayout.DrawFrameAndResolveContent(canvas, clipped, title, Border, Padding, ResolveBorderStyle());
         if (content.IsEmpty)
         {
             return;
@@ -59,7 +60,7 @@ public sealed partial class HealthBoard
             style = style.Merge(HoveredServiceStyle);
         }
 
-        if (index == _selectedIndex)
+        if (index == SelectedIndex)
         {
             style = style.Merge(SelectedServiceStyle);
             if (IsFocused)
@@ -82,7 +83,7 @@ public sealed partial class HealthBoard
         {
             HealthServiceSeverity.Degraded => DegradedServiceStyle,
             HealthServiceSeverity.Outage => OutageServiceStyle,
-            _ => HealthyServiceStyle,
+            _ => HealthyServiceStyle
         };
     }
 
@@ -116,12 +117,13 @@ public sealed partial class HealthBoard
         var acknowledged = service.IsAcknowledged && Glyphs.AcknowledgedGlyph.Length > 0
             ? string.Concat(" [", Glyphs.AcknowledgedGlyph, "]")
             : string.Empty;
-        return string.Concat(marker, Glyphs.MarkerSeparator, severityGlyph, Glyphs.MarkerSeparator, service.Name, summary, acknowledged);
+        return string.Concat(marker, Glyphs.MarkerSeparator, severityGlyph, Glyphs.MarkerSeparator, service.Name,
+            summary, acknowledged);
     }
 
     private string ResolveRowMarker(int index)
     {
-        if (index == _selectedIndex)
+        if (index == SelectedIndex)
         {
             return Glyphs.SelectedRowMarker;
         }
@@ -140,7 +142,7 @@ public sealed partial class HealthBoard
         {
             HealthServiceSeverity.Degraded => Glyphs.DegradedGlyph,
             HealthServiceSeverity.Outage => Glyphs.OutageGlyph,
-            _ => Glyphs.HealthyGlyph,
+            _ => Glyphs.HealthyGlyph
         };
     }
 

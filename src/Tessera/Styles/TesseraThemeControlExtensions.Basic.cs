@@ -1,9 +1,9 @@
-﻿using Tessera.Controls;
+using Tessera.Controls;
 
 namespace Tessera.Styles;
 
 /// <summary>
-/// Represents tessera theme control extensions basic apply extensions.
+///     Represents tessera theme control extensions basic apply extensions.
 /// </summary>
 public static class TesseraThemeControlExtensionsBasicApplyExtensions
 {
@@ -22,7 +22,7 @@ public static class TesseraThemeControlExtensionsBasicApplyExtensions
     }
 
     /// <summary>
-    /// Applies a resolved theme to a <see cref="Button"/>.
+    ///     Applies a resolved theme to a <see cref="Button" />.
     /// </summary>
     public static Button ApplyTheme(this Button control, TesseraTheme theme)
     {
@@ -41,7 +41,7 @@ public static class TesseraThemeControlExtensionsBasicApplyExtensions
     }
 
     /// <summary>
-    /// Resolves and applies hierarchical overrides to a <see cref="Button"/>.
+    ///     Resolves and applies hierarchical overrides to a <see cref="Button" />.
     /// </summary>
     public static Button ApplyTheme(
         this Button control,
@@ -55,7 +55,7 @@ public static class TesseraThemeControlExtensionsBasicApplyExtensions
     }
 
     /// <summary>
-    /// Applies a resolved theme to a <see cref="ListView{T}"/>.
+    ///     Applies a resolved theme to a <see cref="ListView{T}" />.
     /// </summary>
     public static ListView<T> ApplyTheme<T>(this ListView<T> control, TesseraTheme theme)
     {
@@ -72,7 +72,7 @@ public static class TesseraThemeControlExtensionsBasicApplyExtensions
     }
 
     /// <summary>
-    /// Resolves and applies hierarchical overrides to a <see cref="ListView{T}"/>.
+    ///     Resolves and applies hierarchical overrides to a <see cref="ListView{T}" />.
     /// </summary>
     public static ListView<T> ApplyTheme<T>(
         this ListView<T> control,
@@ -86,7 +86,7 @@ public static class TesseraThemeControlExtensionsBasicApplyExtensions
     }
 
     /// <summary>
-    /// Applies a resolved theme to a <see cref="StatusBar"/>.
+    ///     Applies a resolved theme to a <see cref="StatusBar" />.
     /// </summary>
     public static StatusBar ApplyTheme(this StatusBar control, TesseraTheme theme)
     {
@@ -100,7 +100,7 @@ public static class TesseraThemeControlExtensionsBasicApplyExtensions
     }
 
     /// <summary>
-    /// Resolves and applies hierarchical overrides to a <see cref="StatusBar"/>.
+    ///     Resolves and applies hierarchical overrides to a <see cref="StatusBar" />.
     /// </summary>
     public static StatusBar ApplyTheme(
         this StatusBar control,
@@ -114,7 +114,7 @@ public static class TesseraThemeControlExtensionsBasicApplyExtensions
     }
 
     /// <summary>
-    /// Applies a resolved theme to a <see cref="TextInput"/>.
+    ///     Applies a resolved theme to a <see cref="TextInput" />.
     /// </summary>
     public static TextInput ApplyTheme(this TextInput control, TesseraTheme theme)
     {
@@ -131,7 +131,7 @@ public static class TesseraThemeControlExtensionsBasicApplyExtensions
     }
 
     /// <summary>
-    /// Resolves and applies hierarchical overrides to a <see cref="TextInput"/>.
+    ///     Resolves and applies hierarchical overrides to a <see cref="TextInput" />.
     /// </summary>
     public static TextInput ApplyTheme(
         this TextInput control,
@@ -145,7 +145,7 @@ public static class TesseraThemeControlExtensionsBasicApplyExtensions
     }
 
     /// <summary>
-    /// Applies a resolved theme to a <see cref="Table"/>.
+    ///     Applies a resolved theme to a <see cref="Table" />.
     /// </summary>
     public static Table ApplyTheme(this Table control, TesseraTheme theme)
     {
@@ -165,7 +165,7 @@ public static class TesseraThemeControlExtensionsBasicApplyExtensions
     }
 
     /// <summary>
-    /// Resolves and applies hierarchical overrides to a <see cref="Table"/>.
+    ///     Resolves and applies hierarchical overrides to a <see cref="Table" />.
     /// </summary>
     public static Table ApplyTheme(
         this Table control,
@@ -179,7 +179,7 @@ public static class TesseraThemeControlExtensionsBasicApplyExtensions
     }
 
     /// <summary>
-    /// Applies a resolved theme to a <see cref="Tabs"/>.
+    ///     Applies a resolved theme to a <see cref="Tabs" />.
     /// </summary>
     public static Tabs ApplyTheme(this Tabs control, TesseraTheme theme)
     {
@@ -193,7 +193,7 @@ public static class TesseraThemeControlExtensionsBasicApplyExtensions
     }
 
     /// <summary>
-    /// Resolves and applies hierarchical overrides to a <see cref="Tabs"/>.
+    ///     Resolves and applies hierarchical overrides to a <see cref="Tabs" />.
     /// </summary>
     public static Tabs ApplyTheme(
         this Tabs control,
@@ -208,7 +208,7 @@ public static class TesseraThemeControlExtensionsBasicApplyExtensions
 }
 
 /// <summary>
-/// Represents tessera theme control extensions basic default extensions.
+///     Represents tessera theme control extensions basic default extensions.
 /// </summary>
 public static class TesseraThemeControlExtensionsBasicDefaultExtensions
 {
@@ -227,7 +227,7 @@ public static class TesseraThemeControlExtensionsBasicDefaultExtensions
     }
 
     /// <summary>
-    /// Applies theme defaults to a <see cref="Button"/> without overwriting explicit non-empty styles.
+    ///     Applies theme defaults to a <see cref="Button" /> without overwriting explicit non-empty styles.
     /// </summary>
     public static Button ApplyThemeDefaults(this Button control, TesseraTheme theme)
     {
@@ -239,18 +239,22 @@ public static class TesseraThemeControlExtensionsBasicDefaultExtensions
         control.FocusedLabelStyle = TesseraThemeControlExtensions.ApplyDefault(
             control.FocusedLabelStyle,
             control.LabelStyle.IsEmpty ? theme.Text.Primary.WithBold() : TesseraStyle.Empty);
-        control.DisabledLabelStyle = TesseraThemeControlExtensions.ApplyDefault(control.DisabledLabelStyle, theme.Text.Muted);
+        control.DisabledLabelStyle =
+            TesseraThemeControlExtensions.ApplyDefault(control.DisabledLabelStyle, theme.Text.Muted);
         control.SurfaceStyle = TesseraThemeControlExtensions.ApplyDefault(control.SurfaceStyle, buttonSurface);
-        control.FocusedSurfaceStyle = TesseraThemeControlExtensions.ApplyDefault(control.FocusedSurfaceStyle, buttonSurface);
+        control.FocusedSurfaceStyle =
+            TesseraThemeControlExtensions.ApplyDefault(control.FocusedSurfaceStyle, buttonSurface);
         control.PressedLabelStyle = TesseraThemeControlExtensions.ApplyDefault(
             control.PressedLabelStyle,
             theme.Text.Primary.WithBold());
-        control.PressedSurfaceStyle = TesseraThemeControlExtensions.ApplyDefault(control.PressedSurfaceStyle, ResolvePressedButtonSurface(theme, buttonSurface));
+        control.PressedSurfaceStyle = TesseraThemeControlExtensions.ApplyDefault(control.PressedSurfaceStyle,
+            ResolvePressedButtonSurface(theme, buttonSurface));
         return control;
     }
 
     /// <summary>
-    /// Resolves and applies hierarchical defaults to a <see cref="Button"/> without overwriting explicit non-empty styles.
+    ///     Resolves and applies hierarchical defaults to a <see cref="Button" /> without overwriting explicit non-empty
+    ///     styles.
     /// </summary>
     public static Button ApplyThemeDefaults(
         this Button control,
@@ -264,26 +268,31 @@ public static class TesseraThemeControlExtensionsBasicDefaultExtensions
     }
 
     /// <summary>
-    /// Applies theme defaults to a <see cref="ListView{T}"/> without overwriting explicit non-empty styles.
+    ///     Applies theme defaults to a <see cref="ListView{T}" /> without overwriting explicit non-empty styles.
     /// </summary>
     public static ListView<T> ApplyThemeDefaults<T>(this ListView<T> control, TesseraTheme theme)
     {
         ArgumentNullException.ThrowIfNull(control);
         ArgumentNullException.ThrowIfNull(theme);
 
-        control.DefaultRowStyle = TesseraThemeControlExtensions.ApplyDefault(control.DefaultRowStyle, theme.Text.Primary);
-        control.HoveredRowStyle = TesseraThemeControlExtensions.ApplyDefault(control.HoveredRowStyle, theme.Accent.Secondary);
+        control.DefaultRowStyle =
+            TesseraThemeControlExtensions.ApplyDefault(control.DefaultRowStyle, theme.Text.Primary);
+        control.HoveredRowStyle =
+            TesseraThemeControlExtensions.ApplyDefault(control.HoveredRowStyle, theme.Accent.Secondary);
         control.SelectedRowStyle = TesseraThemeControlExtensions.ApplyDefault(
             control.SelectedRowStyle,
             theme.Selection.Foreground.Merge(theme.Selection.Background));
         control.FocusMarker = TesseraThemeControlExtensions.ApplyDefault(control.FocusMarker, theme.Focus.Marker);
-        control.BorderStyleText = TesseraThemeControlExtensions.ApplyDefault(control.BorderStyleText, theme.Border.Default);
-        control.FocusedBorderStyleText = TesseraThemeControlExtensions.ApplyDefault(control.FocusedBorderStyleText, theme.Border.Focused.Merge(theme.Focus.Border));
+        control.BorderStyleText =
+            TesseraThemeControlExtensions.ApplyDefault(control.BorderStyleText, theme.Border.Default);
+        control.FocusedBorderStyleText = TesseraThemeControlExtensions.ApplyDefault(control.FocusedBorderStyleText,
+            theme.Border.Focused.Merge(theme.Focus.Border));
         return control;
     }
 
     /// <summary>
-    /// Resolves and applies hierarchical defaults to a <see cref="ListView{T}"/> without overwriting explicit non-empty styles.
+    ///     Resolves and applies hierarchical defaults to a <see cref="ListView{T}" /> without overwriting explicit non-empty
+    ///     styles.
     /// </summary>
     public static ListView<T> ApplyThemeDefaults<T>(
         this ListView<T> control,
@@ -297,7 +306,7 @@ public static class TesseraThemeControlExtensionsBasicDefaultExtensions
     }
 
     /// <summary>
-    /// Applies theme defaults to a <see cref="StatusBar"/> without overwriting explicit non-empty styles.
+    ///     Applies theme defaults to a <see cref="StatusBar" /> without overwriting explicit non-empty styles.
     /// </summary>
     public static StatusBar ApplyThemeDefaults(this StatusBar control, TesseraTheme theme)
     {
@@ -305,13 +314,15 @@ public static class TesseraThemeControlExtensionsBasicDefaultExtensions
         ArgumentNullException.ThrowIfNull(theme);
 
         control.LeftTextStyle = TesseraThemeControlExtensions.ApplyDefault(control.LeftTextStyle, theme.Text.Primary);
-        control.RightTextStyle = TesseraThemeControlExtensions.ApplyDefault(control.RightTextStyle, theme.Text.Secondary);
+        control.RightTextStyle =
+            TesseraThemeControlExtensions.ApplyDefault(control.RightTextStyle, theme.Text.Secondary);
         control.FillStyle = TesseraThemeControlExtensions.ApplyDefault(control.FillStyle, theme.Surface.Panel);
         return control;
     }
 
     /// <summary>
-    /// Resolves and applies hierarchical defaults to a <see cref="StatusBar"/> without overwriting explicit non-empty styles.
+    ///     Resolves and applies hierarchical defaults to a <see cref="StatusBar" /> without overwriting explicit non-empty
+    ///     styles.
     /// </summary>
     public static StatusBar ApplyThemeDefaults(
         this StatusBar control,
@@ -325,7 +336,7 @@ public static class TesseraThemeControlExtensionsBasicDefaultExtensions
     }
 
     /// <summary>
-    /// Applies theme defaults to a <see cref="TextInput"/> without overwriting explicit non-empty styles.
+    ///     Applies theme defaults to a <see cref="TextInput" /> without overwriting explicit non-empty styles.
     /// </summary>
     public static TextInput ApplyThemeDefaults(this TextInput control, TesseraTheme theme)
     {
@@ -333,16 +344,21 @@ public static class TesseraThemeControlExtensionsBasicDefaultExtensions
         ArgumentNullException.ThrowIfNull(theme);
 
         control.ValueTextStyle = TesseraThemeControlExtensions.ApplyDefault(control.ValueTextStyle, theme.Text.Primary);
-        control.PlaceholderTextStyle = TesseraThemeControlExtensions.ApplyDefault(control.PlaceholderTextStyle, theme.Text.Muted);
-        control.FocusedTitleStyle = TesseraThemeControlExtensions.ApplyDefault(control.FocusedTitleStyle, theme.Focus.Title);
+        control.PlaceholderTextStyle =
+            TesseraThemeControlExtensions.ApplyDefault(control.PlaceholderTextStyle, theme.Text.Muted);
+        control.FocusedTitleStyle =
+            TesseraThemeControlExtensions.ApplyDefault(control.FocusedTitleStyle, theme.Focus.Title);
         control.FocusMarker = TesseraThemeControlExtensions.ApplyDefault(control.FocusMarker, theme.Focus.Marker);
-        control.BorderStyleText = TesseraThemeControlExtensions.ApplyDefault(control.BorderStyleText, theme.Border.Default);
-        control.FocusedBorderStyleText = TesseraThemeControlExtensions.ApplyDefault(control.FocusedBorderStyleText, theme.Border.Focused.Merge(theme.Focus.Border));
+        control.BorderStyleText =
+            TesseraThemeControlExtensions.ApplyDefault(control.BorderStyleText, theme.Border.Default);
+        control.FocusedBorderStyleText = TesseraThemeControlExtensions.ApplyDefault(control.FocusedBorderStyleText,
+            theme.Border.Focused.Merge(theme.Focus.Border));
         return control;
     }
 
     /// <summary>
-    /// Resolves and applies hierarchical defaults to a <see cref="TextInput"/> without overwriting explicit non-empty styles.
+    ///     Resolves and applies hierarchical defaults to a <see cref="TextInput" /> without overwriting explicit non-empty
+    ///     styles.
     /// </summary>
     public static TextInput ApplyThemeDefaults(
         this TextInput control,
@@ -356,7 +372,7 @@ public static class TesseraThemeControlExtensionsBasicDefaultExtensions
     }
 
     /// <summary>
-    /// Applies theme defaults to a <see cref="Table"/> without overwriting explicit non-empty styles.
+    ///     Applies theme defaults to a <see cref="Table" /> without overwriting explicit non-empty styles.
     /// </summary>
     public static Table ApplyThemeDefaults(this Table control, TesseraTheme theme)
     {
@@ -364,21 +380,25 @@ public static class TesseraThemeControlExtensionsBasicDefaultExtensions
         ArgumentNullException.ThrowIfNull(theme);
 
         control.TitleStyle = TesseraThemeControlExtensions.ApplyDefault(control.TitleStyle, theme.Text.Secondary);
-        control.FocusedTitleStyle = TesseraThemeControlExtensions.ApplyDefault(control.FocusedTitleStyle, theme.Focus.Title);
+        control.FocusedTitleStyle =
+            TesseraThemeControlExtensions.ApplyDefault(control.FocusedTitleStyle, theme.Focus.Title);
         control.HeaderStyle = TesseraThemeControlExtensions.ApplyDefault(control.HeaderStyle, theme.Text.Secondary);
         control.RowStyle = TesseraThemeControlExtensions.ApplyDefault(control.RowStyle, theme.Text.Primary);
-        control.HoveredRowStyle = TesseraThemeControlExtensions.ApplyDefault(control.HoveredRowStyle, theme.Accent.Secondary);
+        control.HoveredRowStyle =
+            TesseraThemeControlExtensions.ApplyDefault(control.HoveredRowStyle, theme.Accent.Secondary);
         control.SelectedRowStyle = TesseraThemeControlExtensions.ApplyDefault(
             control.SelectedRowStyle,
             theme.Selection.Foreground.Merge(theme.Selection.Background));
         control.FocusMarker = TesseraThemeControlExtensions.ApplyDefault(control.FocusMarker, theme.Focus.Marker);
-        control.BorderStyleText = TesseraThemeControlExtensions.ApplyDefault(control.BorderStyleText, theme.Border.Default);
-        control.FocusedBorderStyleText = TesseraThemeControlExtensions.ApplyDefault(control.FocusedBorderStyleText, theme.Border.Focused.Merge(theme.Focus.Border));
+        control.BorderStyleText =
+            TesseraThemeControlExtensions.ApplyDefault(control.BorderStyleText, theme.Border.Default);
+        control.FocusedBorderStyleText = TesseraThemeControlExtensions.ApplyDefault(control.FocusedBorderStyleText,
+            theme.Border.Focused.Merge(theme.Focus.Border));
         return control;
     }
 
     /// <summary>
-    /// Resolves and applies hierarchical defaults to a <see cref="Table"/> without overwriting explicit non-empty styles.
+    ///     Resolves and applies hierarchical defaults to a <see cref="Table" /> without overwriting explicit non-empty styles.
     /// </summary>
     public static Table ApplyThemeDefaults(
         this Table control,
@@ -392,7 +412,7 @@ public static class TesseraThemeControlExtensionsBasicDefaultExtensions
     }
 
     /// <summary>
-    /// Applies theme defaults to a <see cref="Tabs"/> without overwriting explicit non-empty styles.
+    ///     Applies theme defaults to a <see cref="Tabs" /> without overwriting explicit non-empty styles.
     /// </summary>
     public static Tabs ApplyThemeDefaults(this Tabs control, TesseraTheme theme)
     {
@@ -400,13 +420,14 @@ public static class TesseraThemeControlExtensionsBasicDefaultExtensions
         ArgumentNullException.ThrowIfNull(theme);
 
         control.TitleStyle = TesseraThemeControlExtensions.ApplyDefault(control.TitleStyle, theme.Text.Secondary);
-        control.FocusedTitleStyle = TesseraThemeControlExtensions.ApplyDefault(control.FocusedTitleStyle, theme.Focus.Title);
+        control.FocusedTitleStyle =
+            TesseraThemeControlExtensions.ApplyDefault(control.FocusedTitleStyle, theme.Focus.Title);
         control.FocusMarker = TesseraThemeControlExtensions.ApplyDefault(control.FocusMarker, theme.Focus.Marker);
         return control;
     }
 
     /// <summary>
-    /// Resolves and applies hierarchical defaults to a <see cref="Tabs"/> without overwriting explicit non-empty styles.
+    ///     Resolves and applies hierarchical defaults to a <see cref="Tabs" /> without overwriting explicit non-empty styles.
     /// </summary>
     public static Tabs ApplyThemeDefaults(
         this Tabs control,

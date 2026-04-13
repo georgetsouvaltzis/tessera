@@ -5,52 +5,39 @@ using Tessera.Styles;
 namespace Tessera.Controls;
 
 /// <summary>
-/// Represents a selectable dashboard tile grid.
+///     Represents a selectable dashboard tile grid.
 /// </summary>
 public sealed partial class DashboardGrid : Control
 {
     private readonly List<DashboardTile> _tiles = [];
-    private int _selectedIndex;
     private int _hoveredIndex = -1;
+    private int _selectedIndex;
 
     /// <summary>
-    /// Occurs when selected tile changes.
+    ///     Gets or sets control title.
     /// </summary>
-    public event EventHandler<ListSelectionChangedEventArgs<DashboardTile>>? SelectionChanged;
+    public string Title { get; set; } = "Dashboard Grid";
 
     /// <summary>
-    /// Gets or sets control title.
+    ///     Gets or sets marker appended to title while focused.
     /// </summary>
-    public string Title
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = "Dashboard Grid";
+    public string FocusMarker { get; set; } = "*";
 
     /// <summary>
-    /// Gets or sets marker appended to title while focused.
-    /// </summary>
-    public string FocusMarker
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = "*";
-
-    /// <summary>
-    /// Gets or sets whether the focus marker should be rendered when focused.
+    ///     Gets or sets whether the focus marker should be rendered when focused.
     /// </summary>
     public bool ShowFocusMarker { get; set; } = true;
 
     /// <summary>
-    /// Gets or sets title style when not focused.
+    ///     Gets or sets title style when not focused.
     /// </summary>
     public TesseraStyle TitleStyleText { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets title style when not focused.
+    ///     Gets or sets title style when not focused.
     /// </summary>
     /// <remarks>
-    /// Canonical alias for cross-control title style naming consistency.
+    ///     Canonical alias for cross-control title style naming consistency.
     /// </remarks>
     public TesseraStyle TitleStyle
     {
@@ -59,15 +46,15 @@ public sealed partial class DashboardGrid : Control
     }
 
     /// <summary>
-    /// Gets or sets title style when focused.
+    ///     Gets or sets title style when focused.
     /// </summary>
     public TesseraStyle FocusedTitleStyleText { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets title style when focused.
+    ///     Gets or sets title style when focused.
     /// </summary>
     /// <remarks>
-    /// Canonical alias for cross-control title style naming consistency.
+    ///     Canonical alias for cross-control title style naming consistency.
     /// </remarks>
     public TesseraStyle FocusedTitleStyle
     {
@@ -76,67 +63,67 @@ public sealed partial class DashboardGrid : Control
     }
 
     /// <summary>
-    /// Gets or sets frame border style when not focused.
+    ///     Gets or sets frame border style when not focused.
     /// </summary>
     public TesseraStyle BorderStyleText { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets frame border style when focused.
+    ///     Gets or sets frame border style when focused.
     /// </summary>
     public TesseraStyle FocusedBorderStyleText { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets base tile style.
+    ///     Gets or sets base tile style.
     /// </summary>
     public TesseraStyle TileStyleText { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets style merged into selected tile text.
+    ///     Gets or sets style merged into selected tile text.
     /// </summary>
     public TesseraStyle SelectedTileStyleText { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets style merged into hovered tile text.
+    ///     Gets or sets style merged into hovered tile text.
     /// </summary>
     public TesseraStyle HoveredTileStyleText { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets style merged when the control is disabled.
+    ///     Gets or sets style merged when the control is disabled.
     /// </summary>
     public TesseraStyle DisabledTileStyleText { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets outer border style.
+    ///     Gets or sets outer border style.
     /// </summary>
     public BorderStyle Border { get; set; } = BorderStyle.SingleLine;
 
     /// <summary>
-    /// Gets or sets tile border style.
+    ///     Gets or sets tile border style.
     /// </summary>
     public BorderStyle TileBorder { get; set; } = BorderStyle.SingleLine;
 
     /// <summary>
-    /// Gets or sets inner padding.
+    ///     Gets or sets inner padding.
     /// </summary>
     public Thickness Padding { get; set; }
 
     /// <summary>
-    /// Gets configured tiles.
+    ///     Gets configured tiles.
     /// </summary>
     public IReadOnlyList<DashboardTile> Tiles => _tiles;
 
     /// <summary>
-    /// Gets selected tile id or <see langword="null" /> when there is no tile.
+    ///     Gets selected tile id or <see langword="null" /> when there is no tile.
     /// </summary>
     public string? SelectedTileId => SelectedItem?.Id;
 
     /// <summary>
-    /// Gets selected tile index or <c>-1</c> when there is no tile.
+    ///     Gets selected tile index or <c>-1</c> when there is no tile.
     /// </summary>
     public int SelectedIndex => _tiles.Count == 0 ? -1 : _selectedIndex;
 
     /// <summary>
-    /// Gets selected tile or <see langword="null" /> when there is no tile.
+    ///     Gets selected tile or <see langword="null" /> when there is no tile.
     /// </summary>
     public DashboardTile? SelectedItem => _tiles.Count == 0 ? null : _tiles[_selectedIndex];
 
@@ -150,7 +137,12 @@ public sealed partial class DashboardGrid : Control
     public override bool IsReadOnly { get; set; }
 
     /// <summary>
-    /// Replaces dashboard tiles.
+    ///     Occurs when selected tile changes.
+    /// </summary>
+    public event EventHandler<ListSelectionChangedEventArgs<DashboardTile>>? SelectionChanged;
+
+    /// <summary>
+    ///     Replaces dashboard tiles.
     /// </summary>
     /// <param name="tiles">Tile definitions.</param>
     public void SetTiles(IEnumerable<DashboardTile> tiles)
@@ -172,14 +164,17 @@ public sealed partial class DashboardGrid : Control
     }
 
     /// <summary>
-    /// Selects a tile by index.
+    ///     Selects a tile by index.
     /// </summary>
     /// <param name="index">Requested selected tile index.</param>
     /// <returns><see langword="true" /> when selection changed; otherwise <see langword="false" />.</returns>
-    public bool Select(int index) => SetSelectedIndex(index);
+    public bool Select(int index)
+    {
+        return SetSelectedIndex(index);
+    }
 
     /// <summary>
-    /// Sets selected tile by index with range clamping.
+    ///     Sets selected tile by index with range clamping.
     /// </summary>
     /// <param name="index">Requested selected tile index.</param>
     /// <returns><see langword="true" /> when selection changed; otherwise <see langword="false" />.</returns>
@@ -204,7 +199,7 @@ public sealed partial class DashboardGrid : Control
     }
 
     /// <summary>
-    /// Moves an existing tile.
+    ///     Moves an existing tile.
     /// </summary>
     /// <param name="tileId">Tile identifier.</param>
     /// <param name="column">Target column.</param>
@@ -242,7 +237,7 @@ public sealed partial class DashboardGrid : Control
     }
 
     /// <summary>
-    /// Resizes an existing tile.
+    ///     Resizes an existing tile.
     /// </summary>
     /// <param name="tileId">Tile identifier.</param>
     /// <param name="columnSpan">New column span. Must be greater than zero.</param>
@@ -250,7 +245,7 @@ public sealed partial class DashboardGrid : Control
     /// <returns><see langword="true" /> when tile size changed; otherwise <see langword="false" />.</returns>
     /// <exception cref="ArgumentException"><paramref name="tileId" /> is empty or whitespace.</exception>
     /// <exception cref="ArgumentOutOfRangeException">
-    /// <paramref name="columnSpan" /> or <paramref name="rowSpan" /> is less than one.
+    ///     <paramref name="columnSpan" /> or <paramref name="rowSpan" /> is less than one.
     /// </exception>
     public bool ResizeTile(string tileId, int columnSpan, int rowSpan)
     {
@@ -452,5 +447,4 @@ public sealed partial class DashboardGrid : Control
     {
         return tile with { };
     }
-
 }

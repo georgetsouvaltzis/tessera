@@ -6,11 +6,9 @@ namespace Tessera.Examples.TransitBoard;
 
 internal sealed class TransitChipStripControl : Control
 {
-    private readonly List<TransitChipItem> _items = [];
     private readonly List<(int Start, int End)> _hitZones = [];
+    private readonly List<TransitChipItem> _items = [];
     private int _selectedIndex;
-
-    public event EventHandler<TransitChipChangedEventArgs>? SelectionChanged;
 
     public string Title { get; set; } = string.Empty;
     public TesseraStyle TitleStyle { get; set; } = TesseraStyle.Empty;
@@ -20,7 +18,10 @@ internal sealed class TransitChipStripControl : Control
     public string FocusMarker { get; set; } = "◆";
     public bool SelectedSubtitleOnly { get; set; } = true;
 
-    public TransitChipItem? SelectedItem => _selectedIndex >= 0 && _selectedIndex < _items.Count ? _items[_selectedIndex] : null;
+    public TransitChipItem? SelectedItem =>
+        _selectedIndex >= 0 && _selectedIndex < _items.Count ? _items[_selectedIndex] : null;
+
+    public event EventHandler<TransitChipChangedEventArgs>? SelectionChanged;
 
     public void SetItems(IEnumerable<TransitChipItem> items)
     {
@@ -79,7 +80,8 @@ internal sealed class TransitChipStripControl : Control
             return Handle(message);
         }
 
-        if (pointer.Kind == PointerEventKind.Press && pointer.Button == PointerButton.Left && bounds.Contains(pointer.X, pointer.Y))
+        if (pointer.Kind == PointerEventKind.Press && pointer.Button == PointerButton.Left &&
+            bounds.Contains(pointer.X, pointer.Y))
         {
             RequestFocus();
             var lineY = bounds.Y + (string.IsNullOrEmpty(Title) ? 0 : 1);
@@ -153,7 +155,8 @@ internal sealed class TransitChipStripControl : Control
                 ? $" {item.Subtitle}"
                 : string.Empty;
             var rawLabel = $"{separator}[{item.Label}]{subtitleText}";
-            var renderedLabel = $"{separator}{Render(index == _selectedIndex ? item.PrimaryStyle : item.SecondaryStyle, $"[{item.Label}]")}{(subtitleText.Length == 0 ? string.Empty : Render(item.SecondaryStyle, subtitleText))}";
+            var renderedLabel =
+                $"{separator}{Render(index == _selectedIndex ? item.PrimaryStyle : item.SecondaryStyle, $"[{item.Label}]")}{(subtitleText.Length == 0 ? string.Empty : Render(item.SecondaryStyle, subtitleText))}";
             var width = Math.Min(rawLabel.Length, Math.Max(0, limit - x));
             if (width <= 0)
             {
@@ -184,7 +187,10 @@ internal sealed class TransitChipStripControl : Control
         return true;
     }
 
-    private static string Render(TesseraStyle style, string text) => style.IsEmpty ? text : style.Render(text);
+    private static string Render(TesseraStyle style, string text)
+    {
+        return style.IsEmpty ? text : style.Render(text);
+    }
 }
 
 internal sealed record TransitChipChangedEventArgs(TransitChipItem? PreviousItem, TransitChipItem? SelectedItem);

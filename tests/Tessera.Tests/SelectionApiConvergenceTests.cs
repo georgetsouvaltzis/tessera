@@ -15,7 +15,7 @@ public sealed class SelectionApiConvergenceTests
         [
             new StepperStep("intro", "Intro"),
             new StepperStep("config", "Config"),
-            new StepperStep("done", "Done"),
+            new StepperStep("done", "Done")
         ]);
 
         StepperCurrentStepChangedEventArgs? selectionChangedArgs = null;
@@ -43,7 +43,7 @@ public sealed class SelectionApiConvergenceTests
         [
             new WizardStep("intro", "Intro"),
             new WizardStep("config", "Config"),
-            new WizardStep("done", "Done"),
+            new WizardStep("done", "Done")
         ]);
 
         WizardStepChangedEventArgs? selectionChangedArgs = null;

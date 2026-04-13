@@ -63,7 +63,7 @@ public sealed partial class JumpList
 
     private void RaiseSelectionChangedIfNeeded(int previousIndex, JumpListItem? previousItem)
     {
-        if (previousIndex == _selectedIndex)
+        if (previousIndex == SelectedIndex)
         {
             return;
         }
@@ -77,7 +77,7 @@ public sealed partial class JumpList
             this,
             new ListSelectionChangedEventArgs<JumpListItem>(
                 previousIndex,
-                _selectedIndex,
+                SelectedIndex,
                 previousItem,
                 SelectedItem));
     }
@@ -87,7 +87,8 @@ public sealed partial class JumpList
         var marker = selected ? Glyphs.SelectedMarker : Glyphs.UnselectedMarker;
         var stateMarker = BuildStateMarker(item);
 
-        var builder = new StringBuilder(marker.Length + stateMarker.Length + Glyphs.MarkerSeparator.Length + item.Label.Length + 2);
+        var builder = new StringBuilder(marker.Length + stateMarker.Length + Glyphs.MarkerSeparator.Length +
+                                        item.Label.Length + 2);
         builder.Append(marker);
         builder.Append(' ');
         if (!string.IsNullOrEmpty(stateMarker))
@@ -136,7 +137,7 @@ public sealed partial class JumpList
             style = style.Merge(HoveredItemStyle);
         }
 
-        if (row == _selectedIndex)
+        if (row == SelectedIndex)
         {
             style = style.Merge(SelectedItemStyle);
             if (IsFocused)

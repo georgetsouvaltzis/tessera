@@ -1,13 +1,10 @@
-using Tessera.Components.Composition;
-using Tessera.Components.Primitives;
-using Tessera.Components.Styling;
-using System.Text;
 using NUnit.Framework;
-using Tessera;
+using System.Text;
+using Tessera.Core.Abstractions;
+using Tessera.Core.Commands;
+using Tessera.Core.Messages;
 using Tessera.Hosting;
 using Tessera.IntegrationFixtureApp;
-using Tessera.Core.Abstractions;
-using Tessera.Core.Messages;
 
 namespace Tessera.IntegrationTests;
 
@@ -19,7 +16,7 @@ public sealed class DecoderDrivenWorkspaceUxTests
     {
         var model = new CounterFixtureModel();
 
-        ApplyDecoded(model, "\u001b[A");
+        ApplyDecoded(model, "\e[A");
 
         Assert.That(model.Render().Frame.Content, Does.Contain("Count: 1"));
     }
@@ -29,7 +26,7 @@ public sealed class DecoderDrivenWorkspaceUxTests
     {
         var model = new CounterFixtureModel();
 
-        ApplyDecoded(model, "\u001b[B");
+        ApplyDecoded(model, "\e[B");
 
         Assert.That(model.Render().Frame.Content, Does.Contain("Count: -1"));
     }
@@ -41,7 +38,7 @@ public sealed class DecoderDrivenWorkspaceUxTests
 
         var result = ApplyDecoded(model, "q");
 
-        Assert.That(result, Is.EqualTo(Tessera.Core.Commands.Effects.Quit));
+        Assert.That(result, Is.EqualTo(Effects.Quit));
     }
 
     [Test]
@@ -49,7 +46,7 @@ public sealed class DecoderDrivenWorkspaceUxTests
     {
         var model = new CounterFixtureModel();
 
-        ApplyDecoded(model, "\u001bOA");
+        ApplyDecoded(model, "\eOA");
 
         Assert.That(model.Render().Frame.Content, Does.Contain("Count: 1"));
     }
@@ -63,10 +60,10 @@ public sealed class DecoderDrivenWorkspaceUxTests
 
         while (index < bytes.Length)
         {
-            var result = decoder.Decode(bytes.AsSpan(index), timeoutExpired: false);
+            var result = decoder.Decode(bytes.AsSpan(index), false);
             if (result.Consumed == 0)
             {
-                result = decoder.Decode(bytes.AsSpan(index), timeoutExpired: true);
+                result = decoder.Decode(bytes.AsSpan(index), true);
             }
 
             if (result.Consumed == 0)
@@ -118,7 +115,7 @@ public sealed class DecoderDrivenWorkspaceUxTests
                     Key.F10 => KeyCode.F10,
                     Key.F11 => KeyCode.F11,
                     Key.F12 => KeyCode.F12,
-                    _ => KeyCode.Unknown,
+                    _ => KeyCode.Unknown
                 },
                 key.Text,
                 key.Modifiers switch
@@ -133,15 +130,21 @@ public sealed class DecoderDrivenWorkspaceUxTests
                     ModifierKeys.Alt | ModifierKeys.Ctrl => KeyModifiers.Alt | KeyModifiers.Ctrl,
                     ModifierKeys.Alt | ModifierKeys.Meta => KeyModifiers.Alt | KeyModifiers.Meta,
                     ModifierKeys.Ctrl | ModifierKeys.Meta => KeyModifiers.Ctrl | KeyModifiers.Meta,
-                    ModifierKeys.Shift | ModifierKeys.Alt | ModifierKeys.Ctrl => KeyModifiers.Shift | KeyModifiers.Alt | KeyModifiers.Ctrl,
-                    ModifierKeys.Shift | ModifierKeys.Alt | ModifierKeys.Meta => KeyModifiers.Shift | KeyModifiers.Alt | KeyModifiers.Meta,
-                    ModifierKeys.Shift | ModifierKeys.Ctrl | ModifierKeys.Meta => KeyModifiers.Shift | KeyModifiers.Ctrl | KeyModifiers.Meta,
-                    ModifierKeys.Alt | ModifierKeys.Ctrl | ModifierKeys.Meta => KeyModifiers.Alt | KeyModifiers.Ctrl | KeyModifiers.Meta,
-                    ModifierKeys.Shift | ModifierKeys.Alt | ModifierKeys.Ctrl | ModifierKeys.Meta => KeyModifiers.Shift | KeyModifiers.Alt | KeyModifiers.Ctrl | KeyModifiers.Meta,
-                    _ => KeyModifiers.None,
+                    ModifierKeys.Shift | ModifierKeys.Alt | ModifierKeys.Ctrl => KeyModifiers.Shift | KeyModifiers.Alt |
+                        KeyModifiers.Ctrl,
+                    ModifierKeys.Shift | ModifierKeys.Alt | ModifierKeys.Meta => KeyModifiers.Shift | KeyModifiers.Alt |
+                        KeyModifiers.Meta,
+                    ModifierKeys.Shift | ModifierKeys.Ctrl | ModifierKeys.Meta => KeyModifiers.Shift |
+                        KeyModifiers.Ctrl | KeyModifiers.Meta,
+                    ModifierKeys.Alt | ModifierKeys.Ctrl | ModifierKeys.Meta => KeyModifiers.Alt | KeyModifiers.Ctrl |
+                        KeyModifiers.Meta,
+                    ModifierKeys.Shift | ModifierKeys.Alt | ModifierKeys.Ctrl | ModifierKeys.Meta =>
+                        KeyModifiers.Shift | KeyModifiers.Alt | KeyModifiers.Ctrl | KeyModifiers.Meta,
+                    _ => KeyModifiers.None
                 },
                 key.IsRepeat),
-            _ => throw new InvalidOperationException($"Unsupported decoded message for fixture model: {message.GetType().Name}"),
+            _ => throw new InvalidOperationException(
+                $"Unsupported decoded message for fixture model: {message.GetType().Name}")
         };
     }
 }

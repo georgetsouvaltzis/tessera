@@ -13,7 +13,7 @@ internal static class BenchmarkDataFactory
             {
                 Width = width,
                 IsSortable = true,
-                SortComparer = static (left, right) => string.CompareOrdinal(left, right),
+                SortComparer = static (left, right) => string.CompareOrdinal(left, right)
             };
         }
 

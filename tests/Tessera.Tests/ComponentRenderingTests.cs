@@ -1,5 +1,5 @@
-using Tessera.Components.Primitives;
 using System.Reflection;
+using Tessera.Components.Primitives;
 
 namespace Tessera.Tests;
 
@@ -9,13 +9,19 @@ internal static class ComponentRenderingTests
 
     public static IEnumerable<TestCase> Cases()
     {
-        yield return new TestCase("Components_Canvas_DrawBox_RendersFrameAndTitle", Canvas_DrawBox_RendersFrameAndTitle);
-        yield return new TestCase("Components_Canvas_WriteText_ClipsAndStopsAtLineBreaks", Canvas_WriteText_ClipsAndStopsAtLineBreaks);
-        yield return new TestCase("Components_Widgets_DrawProgressBar_RendersExpectedFill", Widgets_DrawProgressBar_RendersExpectedFill);
-        yield return new TestCase("Components_Widgets_DrawSparkline_MapsValuesToBlocks", Widgets_DrawSparkline_MapsValuesToBlocks);
+        yield return new TestCase("Components_Canvas_DrawBox_RendersFrameAndTitle",
+            Canvas_DrawBox_RendersFrameAndTitle);
+        yield return new TestCase("Components_Canvas_WriteText_ClipsAndStopsAtLineBreaks",
+            Canvas_WriteText_ClipsAndStopsAtLineBreaks);
+        yield return new TestCase("Components_Widgets_DrawProgressBar_RendersExpectedFill",
+            Widgets_DrawProgressBar_RendersExpectedFill);
+        yield return new TestCase("Components_Widgets_DrawSparkline_MapsValuesToBlocks",
+            Widgets_DrawSparkline_MapsValuesToBlocks);
         yield return new TestCase("Components_Widgets_DrawList_MarksSelectedRow", Widgets_DrawList_MarksSelectedRow);
-        yield return new TestCase("Components_Widgets_DrawCard_RendersAccentAndBody", Widgets_DrawCard_RendersAccentAndBody);
-        yield return new TestCase("Components_Widgets_DrawTable_RendersHeadersRowsAndSelection", Widgets_DrawTable_RendersHeadersRowsAndSelection);
+        yield return new TestCase("Components_Widgets_DrawCard_RendersAccentAndBody",
+            Widgets_DrawCard_RendersAccentAndBody);
+        yield return new TestCase("Components_Widgets_DrawTable_RendersHeadersRowsAndSelection",
+            Widgets_DrawTable_RendersHeadersRowsAndSelection);
     }
 
     private static Task Canvas_DrawBox_RendersFrameAndTitle()
@@ -53,9 +59,11 @@ internal static class ComponentRenderingTests
         var carriageReturnStopped = canvas.Render();
 
         // Assert
-        TestAssert.Equal("CDE...", clipped, "WriteText should clip negative x offsets without shifting visible characters.");
+        TestAssert.Equal("CDE...", clipped,
+            "WriteText should clip negative x offsets without shifting visible characters.");
         TestAssert.Equal("AB....", newlineStopped, "WriteText should stop at newline in fast text mode.");
-        TestAssert.Equal("AB....", carriageReturnStopped, "WriteText should stop at carriage return in fast text mode.");
+        TestAssert.Equal("AB....", carriageReturnStopped,
+            "WriteText should stop at carriage return in fast text mode.");
         return Task.CompletedTask;
     }
 
@@ -72,7 +80,8 @@ internal static class ComponentRenderingTests
         TestAssert.True(
             lines[0].Contains("[█████░░░░░]", StringComparison.Ordinal),
             "Progress bar should fill half of inner slots.");
-        TestAssert.True(lines[1].Contains("50%", StringComparison.Ordinal), "Progress bar should render label on second row.");
+        TestAssert.True(lines[1].Contains("50%", StringComparison.Ordinal),
+            "Progress bar should render label on second row.");
         return Task.CompletedTask;
     }
 
@@ -102,9 +111,12 @@ internal static class ComponentRenderingTests
         var lines = canvas.Render().Split('\n');
 
         // Assert
-        TestAssert.True(lines[0].StartsWith("  alpha", StringComparison.Ordinal), "Non-selected row should have default prefix.");
-        TestAssert.True(lines[1].StartsWith("› beta", StringComparison.Ordinal), "Selected row should have indicator prefix.");
-        TestAssert.True(lines[2].StartsWith("  gamma", StringComparison.Ordinal), "Non-selected row should have default prefix.");
+        TestAssert.True(lines[0].StartsWith("  alpha", StringComparison.Ordinal),
+            "Non-selected row should have default prefix.");
+        TestAssert.True(lines[1].StartsWith("› beta", StringComparison.Ordinal),
+            "Selected row should have indicator prefix.");
+        TestAssert.True(lines[2].StartsWith("  gamma", StringComparison.Ordinal),
+            "Non-selected row should have default prefix.");
         return Task.CompletedTask;
     }
 
@@ -138,28 +150,30 @@ internal static class ComponentRenderingTests
         [
             new[] { "CPU", "18%", "ok" },
             new[] { "Mem", "63%", "warn" },
-            new[] { "IO", "44%", "ok" },
+            new[] { "IO", "44%", "ok" }
         ];
 
         // Act
-        InvokeWidgets("DrawTable", canvas, new Rect(0, 0, 34, 8), headers, rows, 1, "Stats", BorderStyle.SingleLine, default(Thickness));
+        InvokeWidgets("DrawTable", canvas, new Rect(0, 0, 34, 8), headers, rows, 1, "Stats", BorderStyle.SingleLine,
+            default(Thickness));
         var output = canvas.Render();
 
         // Assert
         TestAssert.True(output.Contains(" Stats ", StringComparison.Ordinal), "Table should render title.");
         TestAssert.True(output.Contains("Metric", StringComparison.Ordinal), "Table should render header row.");
         TestAssert.True(output.Contains('┼'), "Table should render header divider intersections.");
-        TestAssert.True(output.Contains("› Mem", StringComparison.Ordinal), "Selected row should include selection prefix.");
+        TestAssert.True(output.Contains("› Mem", StringComparison.Ordinal),
+            "Selected row should include selection prefix.");
         return Task.CompletedTask;
     }
 
     private static void InvokeWidgets(string methodName, params object?[] arguments)
     {
-        var type = typeof(Canvas).Assembly.GetType("Tessera.Components.Primitives.Widgets", throwOnError: true)!;
+        var type = typeof(Canvas).Assembly.GetType("Tessera.Components.Primitives.Widgets", true)!;
         var method = type
             .GetMethods(BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic)
             .SingleOrDefault(candidate => string.Equals(candidate.Name, methodName, StringComparison.Ordinal)
-                && candidate.GetParameters().Length == arguments.Length);
+                                          && candidate.GetParameters().Length == arguments.Length);
         TestAssert.True(method is not null, $"Widgets.{methodName} should continue to exist as an internal bridge.");
         method!.Invoke(null, arguments);
     }

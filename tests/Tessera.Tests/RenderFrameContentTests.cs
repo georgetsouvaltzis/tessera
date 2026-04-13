@@ -1,5 +1,4 @@
 using NUnit.Framework;
-using Tessera.Core.Rendering;
 
 namespace Tessera.Tests;
 
@@ -27,7 +26,7 @@ public sealed class RenderFrameContentTests
     [Test]
     public void BuildRowsHeightClipKeepsBottomWrappedRows()
     {
-        var rows = RenderFrameContent.BuildRows("abcd\nefgh", width: 2, height: 2);
+        var rows = RenderFrameContent.BuildRows("abcd\nefgh", 2, 2);
 
         Assert.That(rows, Has.Count.EqualTo(2));
         Assert.That(RowText(rows[0]), Is.EqualTo("ef"));

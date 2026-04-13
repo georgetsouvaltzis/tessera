@@ -28,10 +28,7 @@ internal static class InteractionPointerParityDataInputTests
 
     private static Task MultiSelectMouseClickSelectsAndToggles()
     {
-        var control = new MultiSelect
-        {
-            IsFocused = true,
-        };
+        var control = new MultiSelect { IsFocused = true };
         control.SetItems(["alpha", "beta", "gamma"]);
 
         var handled = control.Handle(
@@ -40,17 +37,15 @@ internal static class InteractionPointerParityDataInputTests
 
         TestAssert.True(handled, "Mouse click should be handled.");
         TestAssert.Equal(1, control.SelectedIndex, "Mouse click should select clicked row.");
-        TestAssert.True(control.CheckedItems.Contains("beta", StringComparer.Ordinal), "Mouse click should toggle clicked checklist row.");
+        TestAssert.True(control.CheckedItems.Contains("beta", StringComparer.Ordinal),
+            "Mouse click should toggle clicked checklist row.");
         return Task.CompletedTask;
     }
 
     private static Task MultiSelectMouseHoverAppliesHoveredStyle()
     {
         var hoveredStyle = TesseraStyle.Empty.WithForeground(AnsiColor.Rgb(17, 34, 51));
-        var control = new MultiSelect
-        {
-            HoveredItemStyle = hoveredStyle,
-        };
+        var control = new MultiSelect { HoveredItemStyle = hoveredStyle };
         control.SetItems(["alpha", "beta", "gamma"]);
 
         var handled = control.Handle(
@@ -61,16 +56,14 @@ internal static class InteractionPointerParityDataInputTests
         var output = canvas.Render();
 
         TestAssert.True(handled, "Mouse motion should update hover state.");
-        TestAssert.True(output.Contains("38;2;17;34;51", StringComparison.Ordinal), "Hovered row should apply configured hovered style.");
+        TestAssert.True(output.Contains("38;2;17;34;51", StringComparison.Ordinal),
+            "Hovered row should apply configured hovered style.");
         return Task.CompletedTask;
     }
 
     private static Task RadioGroupMouseClickSelectsAndRaisesEvent()
     {
-        var control = new RadioGroup
-        {
-            IsFocused = true,
-        };
+        var control = new RadioGroup { IsFocused = true };
         control.SetItems(["low", "high"]);
         SelectionChangedEventArgs? args = null;
         control.SelectionChanged += (_, eventArgs) => args = eventArgs;
@@ -91,10 +84,7 @@ internal static class InteractionPointerParityDataInputTests
     private static Task RadioGroupMouseHoverAppliesHoveredStyle()
     {
         var hoveredStyle = TesseraStyle.Empty.WithForeground(AnsiColor.Rgb(61, 92, 123));
-        var control = new RadioGroup
-        {
-            HoveredItemStyle = hoveredStyle,
-        };
+        var control = new RadioGroup { HoveredItemStyle = hoveredStyle };
         control.SetItems(["low", "high"]);
 
         var handled = control.Handle(
@@ -105,7 +95,8 @@ internal static class InteractionPointerParityDataInputTests
         var output = canvas.Render();
 
         TestAssert.True(handled, "Mouse motion should update hover state.");
-        TestAssert.True(output.Contains("38;2;61;92;123", StringComparison.Ordinal), "Hovered row should apply configured hovered style.");
+        TestAssert.True(output.Contains("38;2;61;92;123", StringComparison.Ordinal),
+            "Hovered row should apply configured hovered style.");
         return Task.CompletedTask;
     }
 
@@ -117,17 +108,17 @@ internal static class InteractionPointerParityDataInputTests
         {
             Border = BorderStyle.None,
             HoveredRowStyle = hoveredRowStyle,
-            HoveredCellStyle = hoveredCellStyle,
+            HoveredCellStyle = hoveredCellStyle
         };
         grid.SetColumns(
         [
             new DataGridColumn("name", "Name"),
-            new DataGridColumn("state", "State"),
+            new DataGridColumn("state", "State")
         ]);
         grid.SetRows(
         [
             ["alpha", "open"],
-            ["beta", "done"],
+            ["beta", "done"]
         ]);
 
         var handled = grid.Handle(
@@ -138,8 +129,10 @@ internal static class InteractionPointerParityDataInputTests
         var output = canvas.Render();
 
         TestAssert.True(handled, "Mouse motion should update DataGrid hover state.");
-        TestAssert.True(output.Contains("48;2;10;20;30", StringComparison.Ordinal), "Hovered row style should be rendered.");
-        TestAssert.True(output.Contains("38;2;40;50;60", StringComparison.Ordinal), "Hovered cell style should be rendered.");
+        TestAssert.True(output.Contains("48;2;10;20;30", StringComparison.Ordinal),
+            "Hovered row style should be rendered.");
+        TestAssert.True(output.Contains("38;2;40;50;60", StringComparison.Ordinal),
+            "Hovered cell style should be rendered.");
         return Task.CompletedTask;
     }
 }

@@ -1,5 +1,5 @@
-using System.Diagnostics;
 using BenchmarkDotNet.Attributes;
+using System.Diagnostics;
 using Tessera.Components.Primitives;
 using Tessera.Controls;
 using Tessera.Styles;
@@ -13,17 +13,10 @@ public class SloLatencyBenchmarks
     private const int InputSamples = 128;
     private static readonly KeyPressed UpKey = new(Key.Up);
     private static readonly KeyPressed DownKey = new(Key.Down);
-    private readonly Rect _startupGridBounds = new(0, 0, 120, 24);
-    private readonly Rect _startupInspectorBounds = new(0, 24, 120, 10);
-    private readonly Rect _startupStatusBounds = new(0, 35, 120, 1);
-    private readonly ListView<string> _normalList = new(item => item)
-    {
-        Border = BorderStyle.SingleLine,
-        IsFocused = true,
-    };
 
-    private readonly Rect _normalBounds = new(0, 0, 120, 24);
-    private readonly Canvas _normalCanvas = new(120, 24);
+    private readonly Rect _heavyBounds = new(0, 0, 160, 40);
+    private readonly Canvas _heavyCanvas = new(160, 40);
+
     private readonly DataGrid _heavyGrid = new()
     {
         Border = BorderStyle.SingleLine,
@@ -37,11 +30,21 @@ public class SloLatencyBenchmarks
         SelectedCellStyle = TesseraStyle.Empty.WithBold().WithForeground(AnsiColor.BrightCyan),
         MutedStyle = TesseraStyle.Empty.WithDim().WithForeground(AnsiColor.BrightBlack),
         DisabledStyle = TesseraStyle.Empty.WithForeground(AnsiColor.BrightBlack),
-        MutedRowPredicate = static (rowIndex, _) => rowIndex % 3 == 0,
+        MutedRowPredicate = static (rowIndex, _) => rowIndex % 3 == 0
     };
 
-    private readonly Rect _heavyBounds = new(0, 0, 160, 40);
-    private readonly Canvas _heavyCanvas = new(160, 40);
+    private readonly Rect _normalBounds = new(0, 0, 120, 24);
+    private readonly Canvas _normalCanvas = new(120, 24);
+
+    private readonly ListView<string> _normalList = new(item => item)
+    {
+        Border = BorderStyle.SingleLine,
+        IsFocused = true
+    };
+
+    private readonly Rect _startupGridBounds = new(0, 0, 120, 24);
+    private readonly Rect _startupInspectorBounds = new(0, 24, 120, 10);
+    private readonly Rect _startupStatusBounds = new(0, 35, 120, 1);
 
     [GlobalSetup]
     public void Setup()
@@ -56,9 +59,9 @@ public class SloLatencyBenchmarks
         _ = _normalList.Handle(DownKey);
         _ = _normalList.Handle(UpKey);
 
-        _heavyGrid.SetColumns(BenchmarkDataFactory.CreateColumns(count: 12, width: 11));
-        _heavyGrid.SetRows(BenchmarkDataFactory.CreateRows(rowCount: 1_200, columnCount: 12, seed: 2026));
-        _heavyGrid.SelectCell(rowIndex: 320, columnIndex: 4);
+        _heavyGrid.SetColumns(BenchmarkDataFactory.CreateColumns(12, 11));
+        _heavyGrid.SetRows(BenchmarkDataFactory.CreateRows(1_200, 12, 2026));
+        _heavyGrid.SelectCell(320, 4);
     }
 
     [Benchmark(Description = "startup first-frame p95 (ms)")]
@@ -111,27 +114,16 @@ public class SloLatencyBenchmarks
 
     private long MeasureStartupFrameTicks()
     {
-        var grid = new DataGrid
-        {
-            Border = BorderStyle.SingleLine,
-            ShowHeader = true,
-        };
+        var grid = new DataGrid { Border = BorderStyle.SingleLine, ShowHeader = true };
 
-        grid.SetColumns(BenchmarkDataFactory.CreateColumns(count: 6, width: 14));
-        grid.SetRows(BenchmarkDataFactory.CreateRows(rowCount: 28, columnCount: 6, seed: 1337));
+        grid.SetColumns(BenchmarkDataFactory.CreateColumns(6, 14));
+        grid.SetRows(BenchmarkDataFactory.CreateRows(28, 6, 1337));
 
-        var inspector = new KeyValueList
-        {
-            Border = BorderStyle.SingleLine,
-        };
+        var inspector = new KeyValueList { Border = BorderStyle.SingleLine };
 
-        inspector.SetEntries(BenchmarkDataFactory.CreateInspectorEntries(count: 10));
+        inspector.SetEntries(BenchmarkDataFactory.CreateInspectorEntries(10));
 
-        var status = new StatusBar
-        {
-            LeftText = "Tessera benchmark",
-            RightText = "startup",
-        };
+        var status = new StatusBar { LeftText = "Tessera benchmark", RightText = "startup" };
 
         var canvas = new Canvas(_startupGridBounds.Width, _startupStatusBounds.Bottom + 1);
         var started = Stopwatch.GetTimestamp();
@@ -147,6 +139,6 @@ public class SloLatencyBenchmarks
         samples.Sort();
         var p95Index = (int)Math.Ceiling(samples.Length * 0.95) - 1;
         p95Index = Math.Clamp(p95Index, 0, samples.Length - 1);
-        return (samples[p95Index] * 1000d) / Stopwatch.Frequency;
+        return samples[p95Index] * 1000d / Stopwatch.Frequency;
     }
 }

@@ -10,6 +10,7 @@
   <PropertyGroup Condition="'$(Configuration)' == 'Release'">
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <TesseraAllowUnsafe>true</TesseraAllowUnsafe>
+      <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>
 
   <ItemGroup>

@@ -1,4 +1,3 @@
-
 namespace Tessera.Core.Rendering.Internal;
 
 internal static class AnsiFrameDiffer
@@ -71,7 +70,7 @@ internal static class AnsiFrameDiffer
         int endColumn,
         RenderFrameBuffer nextFrame)
     {
-        await writer.WriteAsync($"\u001b[{row + 1};{startColumn + 1}H").ConfigureAwait(false);
+        await writer.WriteAsync($"\e[{row + 1};{startColumn + 1}H").ConfigureAwait(false);
         var activeStyle = string.Empty;
 
         for (var column = startColumn; column < endColumn;)
@@ -89,7 +88,7 @@ internal static class AnsiFrameDiffer
             {
                 if (activeStyle.Length > 0)
                 {
-                    await writer.WriteAsync("\u001b[0m").ConfigureAwait(false);
+                    await writer.WriteAsync("\e[0m").ConfigureAwait(false);
                 }
 
                 if (nextStyle.Length > 0)
@@ -114,7 +113,7 @@ internal static class AnsiFrameDiffer
 
         if (activeStyle.Length > 0)
         {
-            await writer.WriteAsync("\u001b[0m").ConfigureAwait(false);
+            await writer.WriteAsync("\e[0m").ConfigureAwait(false);
         }
     }
 }

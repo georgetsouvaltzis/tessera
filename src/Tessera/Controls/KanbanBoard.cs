@@ -1,154 +1,172 @@
-﻿using Tessera.Components.Primitives;
+using Tessera.Components.Primitives;
 using Tessera.Components.Primitives.Internal;
 using Tessera.Controls.Internal;
 using Tessera.Layout;
 using Tessera.Styles;
+
 namespace Tessera.Controls;
+
 /// <summary>
-/// Lane-based kanban board control for dashboard workflows.
+///     Lane-based kanban board control for dashboard workflows.
 /// </summary>
 public sealed class KanbanBoard : Control
 {
     private readonly List<KanbanLane> _lanes = [];
-    private int _selectedLaneIndex = -1;
-    private int _selectedCardIndex = -1;
-    private int _hoveredLaneIndex = -1;
     private int _hoveredCardIndex = -1;
+    private int _hoveredLaneIndex = -1;
+
     /// <summary>
-    /// Represents selection changed.
+    ///     Represents title.
     /// </summary>
-    public event EventHandler<KanbanSelectionChangedEventArgs>? SelectionChanged;
+    public string Title { get; set; } = "Kanban Board";
+
     /// <summary>
-    /// Represents title.
+    ///     Represents focus marker.
     /// </summary>
-    public string Title
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = "Kanban Board";
+    public string FocusMarker { get; set; } = "*";
+
     /// <summary>
-    /// Represents focus marker.
-    /// </summary>
-    public string FocusMarker
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = "*";
-    /// <summary>
-    /// Gets or sets whether show focus marker.
+    ///     Gets or sets whether show focus marker.
     /// </summary>
     public bool ShowFocusMarker { get; set; } = true;
+
     /// <summary>
-    /// Represents selected card marker.
+    ///     Represents selected card marker.
     /// </summary>
-    public string SelectedCardMarker
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = "▸";
+    public string SelectedCardMarker { get; set; } = "▸";
+
     /// <summary>
-    /// Represents unselected card marker.
+    ///     Represents unselected card marker.
     /// </summary>
-    public string UnselectedCardMarker
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = " ";
+    public string UnselectedCardMarker { get; set; } = " ";
+
     /// <summary>
-    /// Gets or sets the title style.
+    ///     Gets or sets the title style.
     /// </summary>
     public TesseraStyle TitleStyle { get; set; } = TesseraStyle.Empty;
+
     /// <summary>
-    /// Gets or sets the focused title style.
+    ///     Gets or sets the focused title style.
     /// </summary>
     public TesseraStyle FocusedTitleStyle { get; set; } = TesseraStyle.Empty;
+
     /// <summary>
-    /// Gets or sets the lane header style.
+    ///     Gets or sets the lane header style.
     /// </summary>
     public TesseraStyle LaneHeaderStyle { get; set; } = TesseraStyle.Empty;
+
     /// <summary>
-    /// Gets or sets the selected lane header style.
+    ///     Gets or sets the selected lane header style.
     /// </summary>
     public TesseraStyle SelectedLaneHeaderStyle { get; set; } = TesseraStyle.Empty;
+
     /// <summary>
-    /// Gets or sets the card style.
+    ///     Gets or sets the card style.
     /// </summary>
     public TesseraStyle CardStyle { get; set; } = TesseraStyle.Empty;
+
     /// <summary>
-    /// Gets or sets the selected card style.
+    ///     Gets or sets the selected card style.
     /// </summary>
     public TesseraStyle SelectedCardStyle { get; set; } = TesseraStyle.Empty;
+
     /// <summary>
-    /// Gets or sets the focused card style.
+    ///     Gets or sets the focused card style.
     /// </summary>
     public TesseraStyle FocusedCardStyle { get; set; } = TesseraStyle.Empty;
+
     /// <summary>
-    /// Gets or sets the hovered card style.
+    ///     Gets or sets the hovered card style.
     /// </summary>
     public TesseraStyle HoveredCardStyle { get; set; } = TesseraStyle.Empty;
+
     /// <summary>
-    /// Gets or sets the disabled card style.
+    ///     Gets or sets the disabled card style.
     /// </summary>
     public TesseraStyle DisabledCardStyle { get; set; } = TesseraStyle.Empty;
+
     /// <summary>
-    /// Gets or sets the error card style.
+    ///     Gets or sets the error card style.
     /// </summary>
     public TesseraStyle ErrorCardStyle { get; set; } = TesseraStyle.Empty;
+
     /// <summary>
-    /// Gets or sets the border.
+    ///     Gets or sets the border.
     /// </summary>
     public BorderStyle Border { get; set; } = BorderStyle.SingleLine;
+
     /// <summary>
-    /// Gets or sets the padding.
+    ///     Gets or sets the padding.
     /// </summary>
     public Thickness Padding { get; set; }
+
     /// <summary>
-    /// Gets or sets the border style text.
+    ///     Gets or sets the border style text.
     /// </summary>
     public TesseraStyle BorderStyleText { get; set; } = TesseraStyle.Empty;
+
     /// <summary>
-    /// Gets or sets the focused border style text.
+    ///     Gets or sets the focused border style text.
     /// </summary>
     public TesseraStyle FocusedBorderStyleText { get; set; } = TesseraStyle.Empty;
+
     /// <summary>
-    /// Gets or sets whether has error.
+    ///     Gets or sets whether has error.
     /// </summary>
     public bool HasError { get; set; }
+
     /// <inheritdoc />
     public override bool IsFocused { get; set; }
+
     /// <inheritdoc />
     public override bool IsDisabled { get; set; }
+
     /// <inheritdoc />
     public override bool IsReadOnly { get; set; }
+
     /// <summary>
-    /// Represents lanes.
+    ///     Represents lanes.
     /// </summary>
     public IReadOnlyList<KanbanLane> Lanes => _lanes;
+
     /// <summary>
-    /// Represents selected lane index.
+    ///     Represents selected lane index.
     /// </summary>
-    public int SelectedLaneIndex => _selectedLaneIndex;
+    public int SelectedLaneIndex { get; private set; } = -1;
+
     /// <summary>
-    /// Represents selected card index.
+    ///     Represents selected card index.
     /// </summary>
-    public int SelectedCardIndex => _selectedCardIndex;
+    public int SelectedCardIndex { get; private set; } = -1;
+
     /// <summary>
-    /// Represents selected lane.
+    ///     Represents selected lane.
     /// </summary>
-    public KanbanLane? SelectedLane => _selectedLaneIndex >= 0 && _selectedLaneIndex < _lanes.Count ? _lanes[_selectedLaneIndex] : null;
+    public KanbanLane? SelectedLane =>
+        SelectedLaneIndex >= 0 && SelectedLaneIndex < _lanes.Count ? _lanes[SelectedLaneIndex] : null;
+
     /// <summary>
-    /// Represents selected card.
+    ///     Represents selected card.
     /// </summary>
-    public KanbanCard? SelectedCard => SelectedLane is { } lane && _selectedCardIndex >= 0 && _selectedCardIndex < lane.Count ? lane.Cards[_selectedCardIndex] : null;
+    public KanbanCard? SelectedCard =>
+        SelectedLane is { } lane && SelectedCardIndex >= 0 && SelectedCardIndex < lane.Count
+            ? lane.Cards[SelectedCardIndex]
+            : null;
+
     /// <summary>
-    /// Executes set lanes.
+    ///     Represents selection changed.
+    /// </summary>
+    public event EventHandler<KanbanSelectionChangedEventArgs>? SelectionChanged;
+
+    /// <summary>
+    ///     Executes set lanes.
     /// </summary>
     /// <param name="lanes">The lanes value.</param>
     public void SetLanes(IEnumerable<KanbanLane> lanes)
     {
         ArgumentNullException.ThrowIfNull(lanes);
-        var previousLaneIndex = _selectedLaneIndex;
-        var previousCardIndex = _selectedCardIndex;
+        var previousLaneIndex = SelectedLaneIndex;
+        var previousCardIndex = SelectedCardIndex;
         var previousLane = SelectedLane;
         var previousCard = SelectedCard;
         _lanes.Clear();
@@ -156,11 +174,13 @@ public sealed class KanbanBoard : Control
         {
             _lanes.Add(lane);
         }
+
         NormalizeSelection();
         RaiseSelectionChangedIfNeeded(previousLaneIndex, previousCardIndex, previousLane, previousCard);
     }
+
     /// <summary>
-    /// Executes set selected.
+    ///     Executes set selected.
     /// </summary>
     /// <param name="laneIndex">The lane index value.</param>
     /// <param name="cardIndex">The card index value.</param>
@@ -171,21 +191,24 @@ public sealed class KanbanBoard : Control
         {
             return false;
         }
+
         var normalizedLaneIndex = Math.Clamp(laneIndex, 0, _lanes.Count - 1);
         var normalizedCardIndex = ResolveCardIndex(_lanes[normalizedLaneIndex], cardIndex);
-        if (normalizedLaneIndex == _selectedLaneIndex && normalizedCardIndex == _selectedCardIndex)
+        if (normalizedLaneIndex == SelectedLaneIndex && normalizedCardIndex == SelectedCardIndex)
         {
             return false;
         }
-        var previousLaneIndex = _selectedLaneIndex;
-        var previousCardIndex = _selectedCardIndex;
+
+        var previousLaneIndex = SelectedLaneIndex;
+        var previousCardIndex = SelectedCardIndex;
         var previousLane = SelectedLane;
         var previousCard = SelectedCard;
-        _selectedLaneIndex = normalizedLaneIndex;
-        _selectedCardIndex = normalizedCardIndex;
+        SelectedLaneIndex = normalizedLaneIndex;
+        SelectedCardIndex = normalizedCardIndex;
         RaiseSelectionChangedIfNeeded(previousLaneIndex, previousCardIndex, previousLane, previousCard);
         return true;
     }
+
     /// <inheritdoc />
     public override bool Handle(Message message)
     {
@@ -193,32 +216,40 @@ public sealed class KanbanBoard : Control
         {
             return false;
         }
+
         if (key.Is(Key.Left) || key.IsCharacter('h'))
         {
             return MoveLane(-1);
         }
+
         if (key.Is(Key.Right) || key.IsCharacter('l'))
         {
             return MoveLane(1);
         }
+
         if (key.Is(Key.Up) || key.IsCharacter('k'))
         {
             return MoveCard(-1);
         }
+
         if (key.Is(Key.Down) || key.IsCharacter('j'))
         {
             return MoveCard(1);
         }
+
         if (key.Is(Key.Home) || key.Is(Key.PageUp))
         {
-            return SetSelected(0, _selectedCardIndex);
+            return SetSelected(0, SelectedCardIndex);
         }
+
         if (key.Is(Key.End) || key.Is(Key.PageDown))
         {
-            return SetSelected(_lanes.Count - 1, _selectedCardIndex);
+            return SetSelected(_lanes.Count - 1, SelectedCardIndex);
         }
+
         return false;
     }
+
     /// <inheritdoc />
     public override bool Handle(Message message, Rect bounds)
     {
@@ -226,37 +257,45 @@ public sealed class KanbanBoard : Control
         {
             return Handle(message);
         }
+
         if (IsDisabled || IsReadOnly)
         {
             return false;
         }
+
         var content = FrameLayout.ResolveContentRect(bounds, Border, Padding);
         if (content.IsEmpty)
         {
             return false;
         }
+
         if (pointer.Kind == PointerEventKind.Wheel)
         {
             if (pointer.Button == PointerButton.WheelDown)
             {
                 return MoveCard(1);
             }
+
             if (pointer.Button == PointerButton.WheelUp)
             {
                 return MoveCard(-1);
             }
+
             return false;
         }
+
         if (!content.Contains(pointer.X, pointer.Y))
         {
             return pointer.Kind is PointerEventKind.Motion or PointerEventKind.Press
-                && SetHovered(-1, -1);
+                   && SetHovered(-1, -1);
         }
+
         var hit = TryHitLaneCard(content, pointer.X, pointer.Y, out var laneIndex, out var cardIndex);
         if (pointer.Kind == PointerEventKind.Motion)
         {
             return hit && SetHovered(laneIndex, cardIndex);
         }
+
         if (pointer.Kind == PointerEventKind.Press && pointer.Button == PointerButton.Left)
         {
             RequestFocus();
@@ -265,11 +304,14 @@ public sealed class KanbanBoard : Control
             {
                 return changed;
             }
-            _ = SetSelected(laneIndex, cardIndex >= 0 ? cardIndex : _selectedCardIndex);
+
+            _ = SetSelected(laneIndex, cardIndex >= 0 ? cardIndex : SelectedCardIndex);
             return true;
         }
+
         return false;
     }
+
     /// <inheritdoc />
     public override void Render(Canvas canvas, Rect rect)
     {
@@ -278,6 +320,7 @@ public sealed class KanbanBoard : Control
         {
             return;
         }
+
         var content = FrameLayout.DrawFrameAndResolveContent(
             canvas,
             clipped,
@@ -289,11 +332,13 @@ public sealed class KanbanBoard : Control
         {
             return;
         }
+
         if (_lanes.Count == 0)
         {
             canvas.WriteText(content.X, content.Y, ApplyStyle("(no lanes)", LaneHeaderStyle), content.Width);
             return;
         }
+
         var lanesToRender = Math.Min(_lanes.Count, Math.Max(1, content.Width));
         var baseWidth = content.Width / lanesToRender;
         var remainder = content.Width % lanesToRender;
@@ -305,10 +350,12 @@ public sealed class KanbanBoard : Control
             {
                 continue;
             }
+
             RenderLane(canvas, new Rect(laneX, content.Y, laneWidth, content.Height), laneIndex);
             laneX += laneWidth;
         }
     }
+
     internal override LayoutMeasurement Measure(in Rect availableBounds)
     {
         var laneCount = Math.Max(1, Math.Min(3, _lanes.Count));
@@ -325,32 +372,37 @@ public sealed class KanbanBoard : Control
             Math.Clamp(width, 0, availableBounds.Width),
             Math.Clamp(height, 0, availableBounds.Height));
     }
+
     private void RenderLane(Canvas canvas, Rect laneRect, int laneIndex)
     {
         if (laneRect.IsEmpty)
         {
             return;
         }
+
         var lane = _lanes[laneIndex];
         var headerText = lane.Title;
-        canvas.WriteText(laneRect.X, laneRect.Y, ApplyStyle(headerText, ResolveLaneHeaderStyle(laneIndex)), laneRect.Width);
+        canvas.WriteText(laneRect.X, laneRect.Y, ApplyStyle(headerText, ResolveLaneHeaderStyle(laneIndex)),
+            laneRect.Width);
         if (laneRect.Height <= 1)
         {
             return;
         }
+
         var rowsAvailable = laneRect.Height - 1;
         if (lane.Count == 0)
         {
             canvas.WriteText(laneRect.X, laneRect.Y + 1, ApplyStyle("(empty)", CardStyle), laneRect.Width);
             return;
         }
+
         var cardRows = lane.Count > rowsAvailable
             ? Math.Max(0, rowsAvailable - 1)
             : Math.Min(rowsAvailable, lane.Count);
         for (var cardIndex = 0; cardIndex < cardRows; cardIndex++)
         {
             var card = lane.Cards[cardIndex];
-            var marker = laneIndex == _selectedLaneIndex && cardIndex == _selectedCardIndex
+            var marker = laneIndex == SelectedLaneIndex && cardIndex == SelectedCardIndex
                 ? SelectedCardMarker
                 : UnselectedCardMarker;
             var line = $"{marker} {card.Title}";
@@ -360,34 +412,41 @@ public sealed class KanbanBoard : Control
                 ApplyStyle(line, ResolveCardStyle(laneIndex, cardIndex, card)),
                 laneRect.Width);
         }
+
         if (lane.Count > cardRows && rowsAvailable > 0)
         {
             var remaining = lane.Count - cardRows;
             var overflowText = $"… +{remaining}";
-            canvas.WriteText(laneRect.X, laneRect.Bottom - 1, ApplyStyle(overflowText, LaneHeaderStyle), laneRect.Width);
+            canvas.WriteText(laneRect.X, laneRect.Bottom - 1, ApplyStyle(overflowText, LaneHeaderStyle),
+                laneRect.Width);
         }
     }
+
     private TesseraStyle ResolveLaneHeaderStyle(int laneIndex)
     {
         var style = LaneHeaderStyle;
-        if (laneIndex == _selectedLaneIndex)
+        if (laneIndex == SelectedLaneIndex)
         {
             style = style.Merge(SelectedLaneHeaderStyle);
         }
+
         if (IsDisabled)
         {
             style = style.Merge(DisabledCardStyle);
         }
+
         if (HasError)
         {
             style = style.Merge(ErrorCardStyle);
         }
+
         return style;
     }
+
     private TesseraStyle ResolveCardStyle(int laneIndex, int cardIndex, KanbanCard card)
     {
         var style = CardStyle;
-        var isSelected = laneIndex == _selectedLaneIndex && cardIndex == _selectedCardIndex;
+        var isSelected = laneIndex == SelectedLaneIndex && cardIndex == SelectedCardIndex;
         if (isSelected)
         {
             style = style.Merge(SelectedCardStyle);
@@ -396,24 +455,30 @@ public sealed class KanbanBoard : Control
                 style = style.Merge(FocusedCardStyle);
             }
         }
+
         if (laneIndex == _hoveredLaneIndex && cardIndex == _hoveredCardIndex)
         {
             style = style.Merge(HoveredCardStyle);
         }
+
         if (IsDisabled || card.IsDisabled)
         {
             style = style.Merge(DisabledCardStyle);
         }
+
         if (HasError || card.HasError)
         {
             style = style.Merge(ErrorCardStyle);
         }
+
         return style;
     }
+
     private string RenderTitle()
     {
         return ApplyStyle(FormatTitleText(), IsFocused ? FocusedTitleStyle : TitleStyle);
     }
+
     private string FormatTitleText()
     {
         if (string.IsNullOrEmpty(Title))
@@ -425,10 +490,12 @@ public sealed class KanbanBoard : Control
             ? $"{Title} {FocusMarker}"
             : Title;
     }
+
     private string FormatTitleForMeasure()
     {
         return ShowFocusMarker && !string.IsNullOrWhiteSpace(FocusMarker) ? $"{Title} {FocusMarker}" : Title;
     }
+
     private TesseraStyle ResolveBorderStyleText()
     {
         var style = BorderStyleText;
@@ -436,35 +503,41 @@ public sealed class KanbanBoard : Control
         {
             style = style.Merge(FocusedBorderStyleText);
         }
+
         if (IsDisabled)
         {
             style = style.Merge(DisabledCardStyle);
         }
+
         if (HasError)
         {
             style = style.Merge(ErrorCardStyle);
         }
+
         return style;
     }
+
     private void NormalizeSelection()
     {
         if (_lanes.Count == 0)
         {
-            _selectedLaneIndex = -1;
-            _selectedCardIndex = -1;
+            SelectedLaneIndex = -1;
+            SelectedCardIndex = -1;
             _hoveredLaneIndex = -1;
             _hoveredCardIndex = -1;
             return;
         }
-        if (_selectedLaneIndex < 0)
+
+        if (SelectedLaneIndex < 0)
         {
-            _selectedLaneIndex = 0;
+            SelectedLaneIndex = 0;
         }
-        else if (_selectedLaneIndex >= _lanes.Count)
+        else if (SelectedLaneIndex >= _lanes.Count)
         {
-            _selectedLaneIndex = _lanes.Count - 1;
+            SelectedLaneIndex = _lanes.Count - 1;
         }
-        _selectedCardIndex = ResolveCardIndex(_lanes[_selectedLaneIndex], _selectedCardIndex);
+
+        SelectedCardIndex = ResolveCardIndex(_lanes[SelectedLaneIndex], SelectedCardIndex);
         _hoveredLaneIndex = Math.Clamp(_hoveredLaneIndex, -1, _lanes.Count - 1);
         if (_hoveredLaneIndex >= 0)
         {
@@ -475,26 +548,31 @@ public sealed class KanbanBoard : Control
             _hoveredCardIndex = -1;
         }
     }
+
     private static int ResolveCardIndex(KanbanLane lane, int desiredCardIndex)
     {
         if (lane.Count == 0)
         {
             return -1;
         }
+
         return desiredCardIndex < 0
             ? 0
             : Math.Clamp(desiredCardIndex, 0, lane.Count - 1);
     }
+
     private bool MoveLane(int delta)
     {
         if (_lanes.Count == 0 || delta == 0)
         {
             return false;
         }
-        var laneIndex = _selectedLaneIndex < 0 ? 0 : _selectedLaneIndex;
+
+        var laneIndex = SelectedLaneIndex < 0 ? 0 : SelectedLaneIndex;
         var next = Math.Clamp(laneIndex + delta, 0, _lanes.Count - 1);
-        return SetSelected(next, _selectedCardIndex);
+        return SetSelected(next, SelectedCardIndex);
     }
+
     private bool MoveCard(int delta)
     {
         var lane = SelectedLane;
@@ -502,10 +580,12 @@ public sealed class KanbanBoard : Control
         {
             return false;
         }
-        var cardIndex = _selectedCardIndex < 0 ? 0 : _selectedCardIndex;
+
+        var cardIndex = SelectedCardIndex < 0 ? 0 : SelectedCardIndex;
         var next = Math.Clamp(cardIndex + delta, 0, lane.Count - 1);
-        return SetSelected(_selectedLaneIndex, next);
+        return SetSelected(SelectedLaneIndex, next);
     }
+
     private bool TryHitLaneCard(Rect content, int x, int y, out int laneIndex, out int cardIndex)
     {
         laneIndex = -1;
@@ -521,29 +601,35 @@ public sealed class KanbanBoard : Control
             {
                 continue;
             }
+
             var laneRect = new Rect(laneX, content.Y, laneWidth, content.Height);
             laneX += laneWidth;
             if (!laneRect.Contains(x, y))
             {
                 continue;
             }
+
             laneIndex = index;
             if (y == laneRect.Y)
             {
                 cardIndex = -1;
                 return true;
             }
+
             var row = y - (laneRect.Y + 1);
             if (row < 0 || row >= _lanes[index].Count)
             {
                 cardIndex = -1;
                 return true;
             }
+
             cardIndex = row;
             return true;
         }
+
         return false;
     }
+
     private bool SetHovered(int laneIndex, int cardIndex)
     {
         var changed = _hoveredLaneIndex != laneIndex || _hoveredCardIndex != cardIndex;
@@ -551,31 +637,34 @@ public sealed class KanbanBoard : Control
         _hoveredCardIndex = cardIndex;
         return changed;
     }
+
     private void RaiseSelectionChangedIfNeeded(
         int previousLaneIndex,
         int previousCardIndex,
         KanbanLane? previousLane,
         KanbanCard? previousCard)
     {
-        if (previousLaneIndex == _selectedLaneIndex
-            && previousCardIndex == _selectedCardIndex
+        if (previousLaneIndex == SelectedLaneIndex
+            && previousCardIndex == SelectedCardIndex
             && ReferenceEquals(previousLane, SelectedLane)
             && ReferenceEquals(previousCard, SelectedCard))
         {
             return;
         }
+
         SelectionChanged?.Invoke(
             this,
             new KanbanSelectionChangedEventArgs(
                 previousLaneIndex,
                 previousCardIndex,
-                _selectedLaneIndex,
-                _selectedCardIndex,
+                SelectedLaneIndex,
+                SelectedCardIndex,
                 previousLane,
                 previousCard,
                 SelectedLane,
                 SelectedCard));
     }
+
     private static string ApplyStyle(string text, TesseraStyle style)
     {
         return style.IsEmpty || string.IsNullOrEmpty(text)

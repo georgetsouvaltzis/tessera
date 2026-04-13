@@ -11,37 +11,37 @@ internal sealed class AnsiDiffRenderer(
     AnsiRendererOptions? options = null) : IProgramRenderer
 {
     private readonly AnsiRendererOptions _options = options ?? new AnsiRendererOptions();
-    private Stream? _output;
-    private StreamWriter? _writer;
-    private RenderFrameBuffer _previousFrame = RenderFrameBuffer.Empty;
-    private ScreenOutput _currentOutput = ScreenOutput.From(string.Empty);
-    private bool _initialized;
-    private bool _altScreen;
-    private bool _bracketedPaste;
-    private bool _focusReporting;
-    private MouseMode _mouseMode;
-    private CursorStyle? _cursorStyle;
-    private string? _cursorColor;
-    private string? _foregroundColor;
-    private string? _backgroundColor;
-    private TerminalProgress? _progress;
-    private int _keyboardEnhancementFlags;
     private readonly HashSet<int> _queriedModes = [];
-    private string? _windowTitle;
-    private string? _fontSpec;
-    private string? _iterm2Profile;
-    private int _width;
-    private int _height;
-    private bool _fullRepaintRequired;
+    private bool _altScreen;
+    private string? _backgroundColor;
+    private bool _bracketedPaste;
     private TerminalCapabilityProfile _capabilities = capabilities ?? TerminalCapabilityProfile.AllSupported;
+    private ScreenOutput _currentOutput = ScreenOutput.From(string.Empty);
+    private string? _cursorColor;
+    private CursorStyle? _cursorStyle;
+    private bool _focusReporting;
+    private string? _fontSpec;
+    private string? _foregroundColor;
+    private bool _fullRepaintRequired;
+    private int _height;
+    private bool _initialized;
+    private string? _iterm2Profile;
+    private int _keyboardEnhancementFlags;
+    private MouseMode _mouseMode;
+    private Stream? _output;
+    private RenderFrameBuffer _previousFrame = RenderFrameBuffer.Empty;
+    private TerminalProgress? _progress;
+    private int _width;
+    private string? _windowTitle;
+    private StreamWriter? _writer;
 
     public ValueTask InitializeAsync(Stream output, CancellationToken cancellationToken)
     {
         _output = output;
-        _writer = new StreamWriter(output, new UTF8Encoding(encoderShouldEmitUTF8Identifier: false), leaveOpen: true)
+        _writer = new StreamWriter(output, new UTF8Encoding(false), leaveOpen: true)
         {
             AutoFlush = false,
-            NewLine = "\n",
+            NewLine = "\n"
         };
         _initialized = true;
         _previousFrame = RenderFrameBuffer.Empty;
@@ -100,13 +100,13 @@ internal sealed class AnsiDiffRenderer(
 
         if (terminal.AltScreen != _altScreen)
         {
-            await _writer.WriteAsync(terminal.AltScreen ? "\u001b[?1049h" : "\u001b[?1049l")
+            await _writer.WriteAsync(terminal.AltScreen ? "\e[?1049h" : "\e[?1049l")
                 .ConfigureAwait(false);
             _altScreen = terminal.AltScreen;
             _previousFrame = RenderFrameBuffer.Empty;
             if (_keyboardEnhancementFlags != 0)
             {
-                await _writer.WriteAsync("\u001b[>0u").ConfigureAwait(false);
+                await _writer.WriteAsync("\e[>0u").ConfigureAwait(false);
                 _keyboardEnhancementFlags = 0;
             }
         }
@@ -114,7 +114,7 @@ internal sealed class AnsiDiffRenderer(
         var requestedBracketedPaste = terminal.EnableBracketedPaste && _capabilities.BracketedPaste;
         if (requestedBracketedPaste != _bracketedPaste)
         {
-            await _writer.WriteAsync(requestedBracketedPaste ? "\u001b[?2004h" : "\u001b[?2004l").ConfigureAwait(false);
+            await _writer.WriteAsync(requestedBracketedPaste ? "\e[?2004h" : "\e[?2004l").ConfigureAwait(false);
             _bracketedPaste = requestedBracketedPaste;
             if (requestedBracketedPaste)
             {
@@ -125,7 +125,7 @@ internal sealed class AnsiDiffRenderer(
         var requestedFocusReporting = terminal.EnableFocusReporting && _capabilities.FocusReporting;
         if (requestedFocusReporting != _focusReporting)
         {
-            await _writer.WriteAsync(requestedFocusReporting ? "\u001b[?1004h" : "\u001b[?1004l").ConfigureAwait(false);
+            await _writer.WriteAsync(requestedFocusReporting ? "\e[?1004h" : "\e[?1004l").ConfigureAwait(false);
             _focusReporting = requestedFocusReporting;
             if (requestedFocusReporting)
             {
@@ -136,7 +136,7 @@ internal sealed class AnsiDiffRenderer(
         var requestedSyncUpdates = terminal.EnableSynchronizedUpdates && _capabilities.SynchronizedUpdates;
         if (requestedSyncUpdates)
         {
-            await _writer.WriteAsync("\u001b[?2026h").ConfigureAwait(false);
+            await _writer.WriteAsync("\e[?2026h").ConfigureAwait(false);
             await QueryModeReportAsync(2026).ConfigureAwait(false);
         }
 
@@ -157,7 +157,7 @@ internal sealed class AnsiDiffRenderer(
         {
             if (terminal.WindowTitle is not null)
             {
-                await _writer.WriteAsync($"\u001b]2;{terminal.WindowTitle}\u0007").ConfigureAwait(false);
+                await _writer.WriteAsync($"\e]2;{terminal.WindowTitle}\a").ConfigureAwait(false);
             }
 
             _windowTitle = terminal.WindowTitle;
@@ -165,16 +165,17 @@ internal sealed class AnsiDiffRenderer(
 
         var requestedIterm2Profile = SanitizeIterm2Profile(terminal.Iterm2Profile);
         var requestedFontSpec = SanitizeFontSpec(terminal.FontSpec)
-            ?? BuildStructuredFontSpec(terminal.FontFamily, terminal.FontSize);
+                                ?? BuildStructuredFontSpec(terminal.FontFamily, terminal.FontSize);
         var shouldPreferIterm2Profile = _capabilities.SupportsIterm2ProfileRequests
-            && requestedIterm2Profile is not null;
+                                        && requestedIterm2Profile is not null;
         if (_capabilities.SupportsIterm2ProfileRequests)
         {
             if (!string.Equals(_iterm2Profile, requestedIterm2Profile, StringComparison.Ordinal))
             {
                 if (requestedIterm2Profile is not null)
                 {
-                    await _writer.WriteAsync($"\u001b]1337;SetProfile={requestedIterm2Profile}\u0007").ConfigureAwait(false);
+                    await _writer.WriteAsync($"\e]1337;SetProfile={requestedIterm2Profile}\a")
+                        .ConfigureAwait(false);
                 }
 
                 _iterm2Profile = requestedIterm2Profile;
@@ -191,7 +192,7 @@ internal sealed class AnsiDiffRenderer(
             {
                 if (requestedFontSpec is not null)
                 {
-                    await _writer.WriteAsync($"\u001b]50;{requestedFontSpec}\u0007").ConfigureAwait(false);
+                    await _writer.WriteAsync($"\e]50;{requestedFontSpec}\a").ConfigureAwait(false);
                 }
 
                 _fontSpec = requestedFontSpec;
@@ -205,7 +206,7 @@ internal sealed class AnsiDiffRenderer(
         var requestedKeyboardFlags = GetKeyboardEnhancementFlags(terminal.KeyboardEnhancements);
         if (requestedKeyboardFlags != _keyboardEnhancementFlags)
         {
-            await _writer.WriteAsync($"\u001b[>{requestedKeyboardFlags}u").ConfigureAwait(false);
+            await _writer.WriteAsync($"\e[>{requestedKeyboardFlags}u").ConfigureAwait(false);
             _keyboardEnhancementFlags = requestedKeyboardFlags;
         }
 
@@ -238,7 +239,7 @@ internal sealed class AnsiDiffRenderer(
 
         if (_fullRepaintRequired)
         {
-            await _writer.WriteAsync("\u001b[2J\u001b[H").ConfigureAwait(false);
+            await _writer.WriteAsync("\e[2J\e[H").ConfigureAwait(false);
             _previousFrame = RenderFrameBuffer.Empty;
             _fullRepaintRequired = false;
         }
@@ -255,17 +256,17 @@ internal sealed class AnsiDiffRenderer(
                 _cursorStyle = requestedCursorStyle;
             }
 
-            await _writer.WriteAsync("\u001b[?25h").ConfigureAwait(false);
-            await _writer.WriteAsync($"\u001b[{y + 1};{x + 1}H").ConfigureAwait(false);
+            await _writer.WriteAsync("\e[?25h").ConfigureAwait(false);
+            await _writer.WriteAsync($"\e[{y + 1};{x + 1}H").ConfigureAwait(false);
         }
         else
         {
-            await _writer.WriteAsync("\u001b[?25l").ConfigureAwait(false);
+            await _writer.WriteAsync("\e[?25l").ConfigureAwait(false);
         }
 
         if (requestedSyncUpdates)
         {
-            await _writer.WriteAsync("\u001b[?2026l").ConfigureAwait(false);
+            await _writer.WriteAsync("\e[?2026l").ConfigureAwait(false);
         }
 
         await _writer.FlushAsync(cancellationToken).ConfigureAwait(false);
@@ -287,52 +288,52 @@ internal sealed class AnsiDiffRenderer(
             return;
         }
 
-        await _writer.WriteAsync("\u001b[0m\u001b[?25h").ConfigureAwait(false);
+        await _writer.WriteAsync("\e[0m\e[?25h").ConfigureAwait(false);
         if (_cursorStyle is not null)
         {
-            await _writer.WriteAsync("\u001b[0 q").ConfigureAwait(false);
+            await _writer.WriteAsync("\e[0 q").ConfigureAwait(false);
             _cursorStyle = null;
         }
 
         if (_keyboardEnhancementFlags != 0)
         {
-            await _writer.WriteAsync("\u001b[>0u").ConfigureAwait(false);
+            await _writer.WriteAsync("\e[>0u").ConfigureAwait(false);
             _keyboardEnhancementFlags = 0;
         }
 
         if (_foregroundColor is not null)
         {
-            await _writer.WriteAsync("\u001b]110;\u001b\\").ConfigureAwait(false);
+            await _writer.WriteAsync("\e]110;\e\\").ConfigureAwait(false);
             _foregroundColor = null;
         }
 
         if (_backgroundColor is not null)
         {
-            await _writer.WriteAsync("\u001b]111;\u001b\\").ConfigureAwait(false);
+            await _writer.WriteAsync("\e]111;\e\\").ConfigureAwait(false);
             _backgroundColor = null;
         }
 
         if (_cursorColor is not null)
         {
-            await _writer.WriteAsync("\u001b]112;\u001b\\").ConfigureAwait(false);
+            await _writer.WriteAsync("\e]112;\e\\").ConfigureAwait(false);
             _cursorColor = null;
         }
 
         if (_progress is not null && _progress.Value.State != TerminalProgressState.None)
         {
-            await _writer.WriteAsync("\u001b]9;4;0\u001b\\").ConfigureAwait(false);
+            await _writer.WriteAsync("\e]9;4;0\e\\").ConfigureAwait(false);
             _progress = null;
         }
 
         if (_bracketedPaste)
         {
-            await _writer.WriteAsync("\u001b[?2004l").ConfigureAwait(false);
+            await _writer.WriteAsync("\e[?2004l").ConfigureAwait(false);
             _bracketedPaste = false;
         }
 
         if (_focusReporting)
         {
-            await _writer.WriteAsync("\u001b[?1004l").ConfigureAwait(false);
+            await _writer.WriteAsync("\e[?1004l").ConfigureAwait(false);
             _focusReporting = false;
         }
 
@@ -344,7 +345,7 @@ internal sealed class AnsiDiffRenderer(
 
         if (_altScreen)
         {
-            await _writer.WriteAsync("\u001b[?1049l").ConfigureAwait(false);
+            await _writer.WriteAsync("\e[?1049l").ConfigureAwait(false);
             _altScreen = false;
         }
 
@@ -389,6 +390,7 @@ internal sealed class AnsiDiffRenderer(
         {
             return;
         }
+
         await AnsiFrameDiffer.WriteAsync(_writer, _previousFrame, nextFrame, _width, _height).ConfigureAwait(false);
     }
 
@@ -444,7 +446,7 @@ internal sealed class AnsiDiffRenderer(
             return Task.CompletedTask;
         }
 
-        return _writer.WriteAsync($"\u001b[?{mode}$p");
+        return _writer.WriteAsync($"\e[?{mode}$p");
     }
 
     private int GetKeyboardEnhancementFlags(KeyboardEnhancementOptions options)
@@ -463,7 +465,7 @@ internal sealed class AnsiDiffRenderer(
         for (var index = 0; index < fontSpec.Length; index++)
         {
             var character = fontSpec[index];
-            if (character is '\u001b' or '\u0007' or '\\')
+            if (character is '\e' or '\a' or '\\')
             {
                 continue;
             }
@@ -490,7 +492,7 @@ internal sealed class AnsiDiffRenderer(
         for (var index = 0; index < profile.Length; index++)
         {
             var character = profile[index];
-            if (character is '\u001b' or '\u0007' or '\\' or ';')
+            if (character is '\e' or '\a' or '\\' or ';')
             {
                 continue;
             }

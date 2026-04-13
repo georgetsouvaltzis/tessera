@@ -1,29 +1,29 @@
 namespace Tessera.Controls;
 
 /// <summary>
-/// Represents a flat group of query rules combined by AND/OR.
+///     Represents a flat group of query rules combined by AND/OR.
 /// </summary>
 public sealed class QueryGroup
 {
     private readonly List<QueryRule> _rules = [];
 
     /// <summary>
-    /// Gets or sets whether group rules are combined with OR.
+    ///     Gets or sets whether group rules are combined with OR.
     /// </summary>
     public bool UseOr { get; set; }
 
     /// <summary>
-    /// Gets rules in this group.
+    ///     Gets rules in this group.
     /// </summary>
     public IReadOnlyList<QueryRule> Rules => _rules;
 
     /// <summary>
-    /// Gets number of rules in this group.
+    ///     Gets number of rules in this group.
     /// </summary>
     public int Count => _rules.Count;
 
     /// <summary>
-    /// Replaces rules in this group.
+    ///     Replaces rules in this group.
     /// </summary>
     /// <param name="rules">Rules to set.</param>
     public void SetRules(IEnumerable<QueryRule> rules)
@@ -37,7 +37,7 @@ public sealed class QueryGroup
     }
 
     /// <summary>
-    /// Adds a rule to this group.
+    ///     Adds a rule to this group.
     /// </summary>
     /// <param name="rule">Rule to add.</param>
     public void AddRule(QueryRule rule)
@@ -47,10 +47,10 @@ public sealed class QueryGroup
     }
 
     /// <summary>
-    /// Removes a rule by index.
+    ///     Removes a rule by index.
     /// </summary>
     /// <param name="index">Rule index.</param>
-    /// <returns><see langword="true"/> when removed.</returns>
+    /// <returns><see langword="true" /> when removed.</returns>
     public bool RemoveRuleAt(int index)
     {
         if ((uint)index >= (uint)_rules.Count)
@@ -63,7 +63,7 @@ public sealed class QueryGroup
     }
 
     /// <summary>
-    /// Clears all rules.
+    ///     Clears all rules.
     /// </summary>
     public void ClearRules()
     {

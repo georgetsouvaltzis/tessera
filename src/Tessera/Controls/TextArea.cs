@@ -1,4 +1,4 @@
-﻿using Tessera.Components.Primitives;
+using Tessera.Components.Primitives;
 using Tessera.Components.Primitives.Internal;
 using Tessera.Controls.Internal;
 using Tessera.Layout;
@@ -8,34 +8,26 @@ using Tessera.Widgets;
 namespace Tessera.Controls;
 
 /// <summary>
-/// Represents a multi-line text editor.
+///     Represents a multi-line text editor.
 /// </summary>
 public sealed class TextArea : Control
 {
-    private readonly ViewportModel _viewport = new();
     private readonly TextInputModel _input = new() { Multiline = true };
+    private readonly ViewportModel _viewport = new();
     private string _lastViewportValue = string.Empty;
 
     /// <summary>
-    /// Represents title.
+    ///     Represents title.
     /// </summary>
-    public string Title
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = "Text Area";
+    public string Title { get; set; } = "Text Area";
 
     /// <summary>
-    /// Represents focus marker.
+    ///     Represents focus marker.
     /// </summary>
-    public string FocusMarker
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = "*";
+    public string FocusMarker { get; set; } = "*";
 
     /// <summary>
-    /// Represents show focus marker.
+    ///     Represents show focus marker.
     /// </summary>
     public bool ShowFocusMarker
     {
@@ -44,7 +36,7 @@ public sealed class TextArea : Control
     } = true;
 
     /// <summary>
-    /// Represents title style.
+    ///     Represents title style.
     /// </summary>
     public TesseraStyle TitleStyle
     {
@@ -53,7 +45,7 @@ public sealed class TextArea : Control
     } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Represents focused title style.
+    ///     Represents focused title style.
     /// </summary>
     public TesseraStyle FocusedTitleStyle
     {
@@ -62,7 +54,7 @@ public sealed class TextArea : Control
     } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Represents value text style.
+    ///     Represents value text style.
     /// </summary>
     public TesseraStyle ValueTextStyle
     {
@@ -71,7 +63,7 @@ public sealed class TextArea : Control
     } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Represents disabled value text style.
+    ///     Represents disabled value text style.
     /// </summary>
     public TesseraStyle DisabledValueTextStyle
     {
@@ -80,7 +72,7 @@ public sealed class TextArea : Control
     } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the style applied to border glyphs when the control is not focused.
+    ///     Gets or sets the style applied to border glyphs when the control is not focused.
     /// </summary>
     public TesseraStyle BorderStyleText
     {
@@ -89,7 +81,7 @@ public sealed class TextArea : Control
     } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the style applied to border glyphs when the control is focused.
+    ///     Gets or sets the style applied to border glyphs when the control is focused.
     /// </summary>
     public TesseraStyle FocusedBorderStyleText
     {
@@ -98,12 +90,12 @@ public sealed class TextArea : Control
     } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Represents value.
+    ///     Represents value.
     /// </summary>
     public string Value => _input.Value;
 
     /// <summary>
-    /// Represents border.
+    ///     Represents border.
     /// </summary>
     public BorderStyle Border
     {
@@ -112,7 +104,7 @@ public sealed class TextArea : Control
     } = BorderStyle.SingleLine;
 
     /// <summary>
-    /// Represents padding.
+    ///     Represents padding.
     /// </summary>
     public Thickness Padding
     {
@@ -121,7 +113,7 @@ public sealed class TextArea : Control
     }
 
     /// <summary>
-    /// Represents show line numbers.
+    ///     Represents show line numbers.
     /// </summary>
     public bool ShowLineNumbers
     {
@@ -130,7 +122,7 @@ public sealed class TextArea : Control
     }
 
     /// <summary>
-    /// Represents wrap.
+    ///     Represents wrap.
     /// </summary>
     public bool Wrap
     {
@@ -146,17 +138,17 @@ public sealed class TextArea : Control
     }
 
     /// <summary>
-    /// Executes set value.
+    ///     Executes set value.
     /// </summary>
     /// <param name="value">The value value.</param>
     public void SetValue(string value)
     {
-        _input.SetValue(value ?? string.Empty);
+        _input.SetValue(value);
         SyncViewport();
     }
 
     /// <summary>
-    /// Executes clear.
+    ///     Executes clear.
     /// </summary>
     public void Clear()
     {

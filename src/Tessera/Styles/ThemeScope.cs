@@ -7,15 +7,16 @@ using Tessera.Controls;
 namespace Tessera.Styles;
 
 /// <summary>
-/// Provides helpers for applying a resolved <see cref="TesseraTheme" /> across multiple controls.
+///     Provides helpers for applying a resolved <see cref="TesseraTheme" /> across multiple controls.
 /// </summary>
 /// <remarks>
-/// This helper keeps existing per-control <c>ApplyTheme</c> extension methods as the source of truth and
-/// dispatches to them by runtime control type.
+///     This helper keeps existing per-control <c>ApplyTheme</c> extension methods as the source of truth and
+///     dispatches to them by runtime control type.
 /// </remarks>
 public static class ThemeScope
 {
     private static readonly ConcurrentDictionary<Type, Action<Control, TesseraTheme>?> ApplyThemeDispatchCache = new();
+
     private static readonly MethodInfo[] ApplyThemeMethods = typeof(ThemeScope)
         .Assembly
         .GetTypes()
@@ -25,11 +26,11 @@ public static class ThemeScope
             && type.Namespace == typeof(ThemeScope).Namespace
             && type.Name.StartsWith("TesseraThemeControlExtensions", StringComparison.Ordinal))
         .SelectMany(static type => type.GetMethods(BindingFlags.Public | BindingFlags.Static))
-        .Where(static method => method.IsDefined(typeof(ExtensionAttribute), inherit: false))
+        .Where(static method => method.IsDefined(typeof(ExtensionAttribute), false))
         .ToArray();
 
     /// <summary>
-    /// Applies <paramref name="theme" /> across the provided controls.
+    ///     Applies <paramref name="theme" /> across the provided controls.
     /// </summary>
     /// <param name="theme">Resolved theme to apply.</param>
     /// <param name="controls">Controls to update.</param>
@@ -41,7 +42,7 @@ public static class ThemeScope
     }
 
     /// <summary>
-    /// Applies <paramref name="theme" /> across a control sequence.
+    ///     Applies <paramref name="theme" /> across a control sequence.
     /// </summary>
     /// <param name="theme">Resolved theme to apply.</param>
     /// <param name="controls">Controls to update. <see langword="null" /> elements are ignored.</param>
@@ -59,7 +60,8 @@ public static class ThemeScope
                 continue;
             }
 
-            var dispatcher = ApplyThemeDispatchCache.GetOrAdd(control.GetType(), static type => BuildApplyThemeDispatcher(type));
+            var dispatcher =
+                ApplyThemeDispatchCache.GetOrAdd(control.GetType(), static type => BuildApplyThemeDispatcher(type));
             if (dispatcher is null)
             {
                 continue;

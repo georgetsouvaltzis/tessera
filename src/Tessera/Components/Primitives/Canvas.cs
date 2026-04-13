@@ -1,23 +1,29 @@
+using System.Text;
 using Tessera.Components.Primitives.Internal;
 using Tessera.Styles;
-using System.Text;
 
 namespace Tessera.Components.Primitives;
 
 /// <summary>
-/// Represents a mutable terminal drawing surface.
+///     Represents a mutable terminal drawing surface.
 /// </summary>
 /// <remarks>
-/// This is the low-level drawing primitive behind custom rendering and advanced component interop. Prefer root
-/// controls and layouts for normal application authoring.
+///     This is the low-level drawing primitive behind custom rendering and advanced component interop. Prefer root
+///     controls and layouts for normal application authoring.
 /// </remarks>
 public sealed class Canvas
 {
     private readonly char[]? _cells;
     private readonly CanvasGraphemeBuffer? _graphemeBuffer;
 
+    private char[] Cells => _cells ?? throw new InvalidOperationException("Fast canvas storage is not available.");
+
+    private CanvasGraphemeBuffer GraphemeBuffer => _graphemeBuffer
+                                                    ?? throw new InvalidOperationException(
+                                                        "Grapheme canvas storage is not available.");
+
     /// <summary>
-    /// Initializes a new canvas.
+    ///     Initializes a new canvas.
     /// </summary>
     /// <param name="width">The canvas width in cells.</param>
     /// <param name="height">The canvas height in cells.</param>
@@ -40,42 +46,42 @@ public sealed class Canvas
     }
 
     /// <summary>
-    /// Gets the canvas width in cells.
+    ///     Gets the canvas width in cells.
     /// </summary>
     public int Width { get; }
 
     /// <summary>
-    /// Gets the canvas height in cells.
+    ///     Gets the canvas height in cells.
     /// </summary>
     public int Height { get; }
 
     /// <summary>
-    /// Gets the text rendering mode used by the canvas.
+    ///     Gets the text rendering mode used by the canvas.
     /// </summary>
     public CanvasTextMode TextMode { get; }
 
     /// <summary>
-    /// Gets the full canvas bounds.
+    ///     Gets the full canvas bounds.
     /// </summary>
     public Rect Bounds => new(0, 0, Width, Height);
 
     /// <summary>
-    /// Clears the canvas with the supplied fill character.
+    ///     Clears the canvas with the supplied fill character.
     /// </summary>
     /// <param name="fill">The fill character.</param>
     public void Clear(char fill = ' ')
     {
         if (TextMode == CanvasTextMode.Fast)
         {
-            Array.Fill(_cells!, fill);
+            Array.Fill(Cells, fill);
             return;
         }
 
-        _graphemeBuffer!.Clear(fill);
+        GraphemeBuffer.Clear(fill);
     }
 
     /// <summary>
-    /// Writes a single cell.
+    ///     Writes a single cell.
     /// </summary>
     public void Set(int x, int y, char value)
     {
@@ -86,15 +92,15 @@ public sealed class Canvas
 
         if (TextMode == CanvasTextMode.Fast)
         {
-            _cells![(y * Width) + x] = value;
+            Cells[y * Width + x] = value;
             return;
         }
 
-        _graphemeBuffer!.Set(x, y, value);
+        GraphemeBuffer.Set(x, y, value);
     }
 
     /// <summary>
-    /// Reads a single cell.
+    ///     Reads a single cell.
     /// </summary>
     public char Get(int x, int y)
     {
@@ -105,14 +111,14 @@ public sealed class Canvas
 
         if (TextMode == CanvasTextMode.Fast)
         {
-            return _cells![(y * Width) + x];
+            return Cells[y * Width + x];
         }
 
-        return _graphemeBuffer!.Get(x, y);
+        return GraphemeBuffer.Get(x, y);
     }
 
     /// <summary>
-    /// Writes text starting at the supplied position.
+    ///     Writes text starting at the supplied position.
     /// </summary>
     public void WriteText(int x, int y, string text, int maxWidth = int.MaxValue)
     {
@@ -127,7 +133,7 @@ public sealed class Canvas
             return;
         }
 
-        _graphemeBuffer!.WriteText(x, y, text, maxWidth);
+        GraphemeBuffer.WriteText(x, y, text, maxWidth);
     }
 
     internal void WriteTextPadded(int x, int y, string? text, int width)
@@ -150,7 +156,7 @@ public sealed class Canvas
     {
         var cx = x;
         var written = 0;
-        var cells = _cells!;
+        var cells = Cells;
         var rowStart = y * Width;
         if (!string.IsNullOrEmpty(text))
         {
@@ -252,11 +258,11 @@ public sealed class Canvas
         }
 
         var rowStart = y * Width;
-        text.AsSpan(sourceStart, copyLength).CopyTo(_cells!.AsSpan(rowStart + targetX, copyLength));
+        text.AsSpan(sourceStart, copyLength).CopyTo(Cells.AsSpan(rowStart + targetX, copyLength));
     }
 
     /// <summary>
-    /// Draws a horizontal line.
+    ///     Draws a horizontal line.
     /// </summary>
     public void DrawHorizontalLine(int x, int y, int width, char value = '─')
     {
@@ -264,7 +270,7 @@ public sealed class Canvas
     }
 
     /// <summary>
-    /// Draws a vertical line.
+    ///     Draws a vertical line.
     /// </summary>
     public void DrawVerticalLine(int x, int y, int height, char value = '│')
     {
@@ -311,18 +317,18 @@ public sealed class Canvas
 
         if (TextMode == CanvasTextMode.Fast)
         {
-            Array.Fill(_cells!, fill, (y * Width) + start, end - start);
+            Array.Fill(Cells, fill, y * Width + start, end - start);
             return;
         }
 
         for (var cx = start; cx < end; cx++)
         {
-            _graphemeBuffer!.Set(cx, y, fill);
+            GraphemeBuffer.Set(cx, y, fill);
         }
     }
 
     /// <summary>
-    /// Draws a border box with an optional title.
+    ///     Draws a border box with an optional title.
     /// </summary>
     public void DrawBox(Rect rect, string? title = null, BorderStyle borderStyle = BorderStyle.SingleLine)
     {
@@ -342,7 +348,7 @@ public sealed class Canvas
             BorderStyle.Rounded => ('─', '│', '╭', '╮', '╰', '╯'),
             BorderStyle.Heavy => ('━', '┃', '┏', '┓', '┗', '┛'),
             BorderStyle.Ascii => ('-', '|', '+', '+', '+', '+'),
-            _ => ('─', '│', '┌', '┐', '└', '┘'),
+            _ => ('─', '│', '┌', '┐', '└', '┘')
         };
 
         DrawHorizontalLine(clipped.X + 1, clipped.Y, clipped.Width - 2, horizontal);
@@ -363,11 +369,12 @@ public sealed class Canvas
     }
 
     /// <summary>
-    /// Draws a border box with an optional title and optional border glyph style.
+    ///     Draws a border box with an optional title and optional border glyph style.
     /// </summary>
     /// <remarks>
-    /// Styled border rendering is applied only when <see cref="TextMode"/> is <see cref="CanvasTextMode.GraphemeAware"/>.
-    /// In fast mode, border style hooks are ignored to preserve allocation-free rendering behavior.
+    ///     Styled border rendering is applied only when <see cref="TextMode" /> is <see cref="CanvasTextMode.GraphemeAware" />
+    ///     .
+    ///     In fast mode, border style hooks are ignored to preserve allocation-free rendering behavior.
     /// </remarks>
     public void DrawBox(Rect rect, string? title, BorderStyle borderStyle, TesseraStyle borderStyleText)
     {
@@ -393,7 +400,7 @@ public sealed class Canvas
             BorderStyle.Rounded => ('─', '│', '╭', '╮', '╰', '╯'),
             BorderStyle.Heavy => ('━', '┃', '┏', '┓', '┗', '┛'),
             BorderStyle.Ascii => ('-', '|', '+', '+', '+', '+'),
-            _ => ('─', '│', '┌', '┐', '└', '┘'),
+            _ => ('─', '│', '┌', '┐', '└', '┘')
         };
         var styledHorizontal = RenderStyledGlyph(borderStyleText, horizontal);
         var styledVertical = RenderStyledGlyph(borderStyleText, vertical);
@@ -427,13 +434,13 @@ public sealed class Canvas
     }
 
     /// <summary>
-    /// Renders the canvas into a string frame.
+    ///     Renders the canvas into a string frame.
     /// </summary>
     public string Render()
     {
         return TextMode == CanvasTextMode.Fast
             ? RenderFast()
-            : _graphemeBuffer!.Render();
+            : GraphemeBuffer.Render();
     }
 
     private string RenderFast()
@@ -446,7 +453,7 @@ public sealed class Canvas
                 sb.Append('\n');
             }
 
-            sb.Append(_cells!, y * Width, Width);
+            sb.Append(Cells, y * Width, Width);
         }
 
         return sb.ToString();

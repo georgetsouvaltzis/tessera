@@ -1,4 +1,4 @@
-﻿using Tessera.Components.Primitives;
+using Tessera.Components.Primitives;
 using Tessera.Components.Primitives.Internal;
 using Tessera.Controls.Internal;
 using Tessera.Layout;
@@ -7,109 +7,104 @@ using Tessera.Styles;
 namespace Tessera.Controls;
 
 /// <summary>
-/// Represents an in-memory hierarchical explorer for directory/file-like nodes.
+///     Represents an in-memory hierarchical explorer for directory/file-like nodes.
 /// </summary>
 public sealed partial class FileExplorer : Control
 {
     private readonly List<FileExplorerItem> _roots = [];
     private readonly List<VisibleEntry> _visible = [];
-    private int _selectedVisibleIndex;
-    private int _scrollOffset;
     private int _hoveredVisibleIndex = -1;
+    private int _scrollOffset;
+    private int _selectedVisibleIndex;
 
     /// <summary>
-    /// Occurs when the selected node changes.
-    /// </summary>
-    public event EventHandler<FileExplorerSelectionChangedEventArgs>? SelectionChanged;
-
-    /// <summary>
-    /// Gets or sets the explorer title.
+    ///     Gets or sets the explorer title.
     /// </summary>
     public string Title { get; set; } = "File Explorer";
 
     /// <summary>
-    /// Gets or sets the marker appended to the title while focused.
+    ///     Gets or sets the marker appended to the title while focused.
     /// </summary>
     public string FocusMarker { get; set; } = "*";
 
     /// <summary>
-    /// Gets or sets whether the focus marker should be rendered.
+    ///     Gets or sets whether the focus marker should be rendered.
     /// </summary>
     public bool ShowFocusMarker { get; set; } = true;
 
     /// <summary>
-    /// Gets or sets title style when not focused.
+    ///     Gets or sets title style when not focused.
     /// </summary>
     public TesseraStyle TitleStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets title style when focused.
+    ///     Gets or sets title style when focused.
     /// </summary>
     public TesseraStyle FocusedTitleStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the style used for directory rows.
+    ///     Gets or sets the style used for directory rows.
     /// </summary>
     public TesseraStyle DirectoryStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the style used for file rows.
+    ///     Gets or sets the style used for file rows.
     /// </summary>
     public TesseraStyle FileStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the style merged into selected rows.
+    ///     Gets or sets the style merged into selected rows.
     /// </summary>
     public TesseraStyle SelectedStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the style merged into hovered rows.
+    ///     Gets or sets the style merged into hovered rows.
     /// </summary>
     public TesseraStyle HoveredStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the style used for muted/disabled output.
+    ///     Gets or sets the style used for muted/disabled output.
     /// </summary>
     public TesseraStyle MutedStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the style applied to border glyphs when the control is not focused.
+    ///     Gets or sets the style applied to border glyphs when the control is not focused.
     /// </summary>
     public TesseraStyle BorderStyleText { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the style applied to border glyphs when the control is focused.
+    ///     Gets or sets the style applied to border glyphs when the control is focused.
     /// </summary>
     public TesseraStyle FocusedBorderStyleText { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the border style.
+    ///     Gets or sets the border style.
     /// </summary>
     public BorderStyle Border { get; set; } = BorderStyle.SingleLine;
 
     /// <summary>
-    /// Gets or sets inner padding.
+    ///     Gets or sets inner padding.
     /// </summary>
     public Thickness Padding { get; set; }
 
     /// <summary>
-    /// Gets configured root nodes.
+    ///     Gets configured root nodes.
     /// </summary>
     public IReadOnlyList<FileExplorerItem> RootItems => _roots;
 
     /// <summary>
-    /// Gets the selected visible-row index.
-    /// Returns <c>-1</c> when no rows exist.
+    ///     Gets the selected visible-row index.
+    ///     Returns <c>-1</c> when no rows exist.
     /// </summary>
     public int SelectedIndex => _visible.Count == 0 ? -1 : _selectedVisibleIndex;
 
     /// <summary>
-    /// Gets the selected node path, when any.
+    ///     Gets the selected node path, when any.
     /// </summary>
     public string? SelectedPath => SelectedItem?.Path;
 
     /// <summary>
-    /// Gets the selected node, when any.
+    ///     Gets the selected node, when any.
     /// </summary>
     public FileExplorerItem? SelectedItem => _selectedVisibleIndex >= 0 && _selectedVisibleIndex < _visible.Count
         ? _visible[_selectedVisibleIndex].Item
@@ -117,13 +112,20 @@ public sealed partial class FileExplorer : Control
 
     /// <inheritdoc />
     public override bool IsFocused { get; set; }
+
     /// <inheritdoc />
     public override bool IsDisabled { get; set; }
+
     /// <inheritdoc />
     public override bool IsReadOnly { get; set; }
 
     /// <summary>
-    /// Replaces root explorer nodes.
+    ///     Occurs when the selected node changes.
+    /// </summary>
+    public event EventHandler<FileExplorerSelectionChangedEventArgs>? SelectionChanged;
+
+    /// <summary>
+    ///     Replaces root explorer nodes.
     /// </summary>
     /// <param name="items">Root nodes.</param>
     public void SetItems(IEnumerable<FileExplorerItem> items)
@@ -143,10 +145,10 @@ public sealed partial class FileExplorer : Control
     }
 
     /// <summary>
-    /// Selects a node by path, expanding ancestors when needed.
+    ///     Selects a node by path, expanding ancestors when needed.
     /// </summary>
     /// <param name="path">The path to select.</param>
-    /// <returns><see langword="true"/> when selection changed; otherwise <see langword="false"/>.</returns>
+    /// <returns><see langword="true" /> when selection changed; otherwise <see langword="false" />.</returns>
     public bool SelectPath(string path)
     {
         if (string.IsNullOrWhiteSpace(path))
@@ -173,23 +175,29 @@ public sealed partial class FileExplorer : Control
     }
 
     /// <summary>
-    /// Expands a directory by path.
+    ///     Expands a directory by path.
     /// </summary>
     /// <param name="path">The directory path to expand.</param>
-    /// <returns><see langword="true"/> when expansion changed state; otherwise <see langword="false"/>.</returns>
-    public bool ExpandPath(string path) => SetExpandedState(path, expanded: true);
+    /// <returns><see langword="true" /> when expansion changed state; otherwise <see langword="false" />.</returns>
+    public bool ExpandPath(string path)
+    {
+        return SetExpandedState(path, true);
+    }
 
     /// <summary>
-    /// Collapses a directory by path.
+    ///     Collapses a directory by path.
     /// </summary>
     /// <param name="path">The directory path to collapse.</param>
-    /// <returns><see langword="true"/> when collapse changed state; otherwise <see langword="false"/>.</returns>
-    public bool CollapsePath(string path) => SetExpandedState(path, expanded: false);
+    /// <returns><see langword="true" /> when collapse changed state; otherwise <see langword="false" />.</returns>
+    public bool CollapsePath(string path)
+    {
+        return SetExpandedState(path, false);
+    }
 
     /// <summary>
-    /// Toggles expansion of the selected node if it is a directory.
+    ///     Toggles expansion of the selected node if it is a directory.
     /// </summary>
-    /// <returns><see langword="true"/> when expansion changed state; otherwise <see langword="false"/>.</returns>
+    /// <returns><see langword="true" /> when expansion changed state; otherwise <see langword="false" />.</returns>
     public bool ToggleSelectedExpanded()
     {
         var selected = SelectedItem;
@@ -344,6 +352,7 @@ public sealed partial class FileExplorer : Control
             {
                 glyph = entry.Item.IsExpanded ? "▾" : "▸";
             }
+
             var style = entry.Item.IsDirectory ? DirectoryStyle : FileStyle;
             if (index == _hoveredVisibleIndex)
             {
@@ -371,7 +380,7 @@ public sealed partial class FileExplorer : Control
         for (var index = 0; index < _visible.Count; index++)
         {
             var entry = _visible[index];
-            var lineWidth = 4 + (entry.Depth * 2) + ControlTextLayout.MeasureDisplayWidth(entry.Item.Name);
+            var lineWidth = 4 + entry.Depth * 2 + ControlTextLayout.MeasureDisplayWidth(entry.Item.Name);
             width = Math.Max(width, lineWidth);
         }
 
@@ -473,7 +482,7 @@ public sealed partial class FileExplorer : Control
         var value = IsFocused && ShowFocusMarker && !string.IsNullOrWhiteSpace(FocusMarker)
             ? $"{Title} {FocusMarker}"
             : Title;
-        return ApplyStyle(value ?? string.Empty, IsFocused ? FocusedTitleStyle : TitleStyle);
+        return ApplyStyle(value, IsFocused ? FocusedTitleStyle : TitleStyle);
     }
 
     private TesseraStyle ResolveBorderStyleText()
@@ -500,7 +509,7 @@ public sealed partial class FileExplorer : Control
         _visible.Clear();
         for (var index = 0; index < _roots.Count; index++)
         {
-            AppendVisible(_roots[index], depth: 0, parentVisibleIndex: null);
+            AppendVisible(_roots[index], 0, null);
         }
 
         if (_visible.Count == 0)
@@ -584,5 +593,4 @@ public sealed partial class FileExplorer : Control
         _hoveredVisibleIndex = normalized;
         return true;
     }
-
 }

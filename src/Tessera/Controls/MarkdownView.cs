@@ -1,4 +1,4 @@
-﻿using Tessera.Components.Primitives;
+using Tessera.Components.Primitives;
 using Tessera.Components.Primitives.Internal;
 using Tessera.Controls.Internal;
 using Tessera.Layout;
@@ -8,7 +8,7 @@ using Tessera.Widgets;
 namespace Tessera.Controls;
 
 /// <summary>
-/// Represents a read-only markdown renderer.
+///     Represents a read-only markdown renderer.
 /// </summary>
 public sealed class MarkdownView : Control
 {
@@ -16,25 +16,17 @@ public sealed class MarkdownView : Control
     private string _markdown = string.Empty;
 
     /// <summary>
-    /// Represents title.
+    ///     Represents title.
     /// </summary>
-    public string Title
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = "Markdown";
+    public string Title { get; set; } = "Markdown";
 
     /// <summary>
-    /// Represents focus marker.
+    ///     Represents focus marker.
     /// </summary>
-    public string FocusMarker
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = "*";
+    public string FocusMarker { get; set; } = "*";
 
     /// <summary>
-    /// Represents show focus marker.
+    ///     Represents show focus marker.
     /// </summary>
     public bool ShowFocusMarker
     {
@@ -43,7 +35,7 @@ public sealed class MarkdownView : Control
     } = true;
 
     /// <summary>
-    /// Represents title style.
+    ///     Represents title style.
     /// </summary>
     public TesseraStyle TitleStyle
     {
@@ -52,7 +44,7 @@ public sealed class MarkdownView : Control
     } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Represents focused title style.
+    ///     Represents focused title style.
     /// </summary>
     public TesseraStyle FocusedTitleStyle
     {
@@ -61,7 +53,7 @@ public sealed class MarkdownView : Control
     } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Represents content style.
+    ///     Represents content style.
     /// </summary>
     public TesseraStyle ContentStyle
     {
@@ -70,7 +62,7 @@ public sealed class MarkdownView : Control
     } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets style applied to border glyphs when the control is not focused.
+    ///     Gets or sets style applied to border glyphs when the control is not focused.
     /// </summary>
     public TesseraStyle BorderStyleText
     {
@@ -79,7 +71,7 @@ public sealed class MarkdownView : Control
     } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets style merged into border glyphs while the control is focused.
+    ///     Gets or sets style merged into border glyphs while the control is focused.
     /// </summary>
     public TesseraStyle FocusedBorderStyleText
     {
@@ -88,7 +80,7 @@ public sealed class MarkdownView : Control
     } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Represents border.
+    ///     Represents border.
     /// </summary>
     public BorderStyle Border
     {
@@ -97,7 +89,7 @@ public sealed class MarkdownView : Control
     } = BorderStyle.SingleLine;
 
     /// <summary>
-    /// Represents padding.
+    ///     Represents padding.
     /// </summary>
     public Thickness Padding
     {
@@ -106,7 +98,7 @@ public sealed class MarkdownView : Control
     }
 
     /// <summary>
-    /// Represents wrap.
+    ///     Represents wrap.
     /// </summary>
     public bool Wrap
     {
@@ -115,7 +107,7 @@ public sealed class MarkdownView : Control
     }
 
     /// <summary>
-    /// Represents show line numbers.
+    ///     Represents show line numbers.
     /// </summary>
     public bool ShowLineNumbers
     {
@@ -131,12 +123,12 @@ public sealed class MarkdownView : Control
     }
 
     /// <summary>
-    /// Executes set markdown.
+    ///     Executes set markdown.
     /// </summary>
     /// <param name="markdown">The markdown value.</param>
     public void SetMarkdown(string markdown)
     {
-        _markdown = markdown ?? string.Empty;
+        _markdown = markdown;
         _viewport.SetLines(MarkdownLineRenderer.Render(_markdown));
     }
 

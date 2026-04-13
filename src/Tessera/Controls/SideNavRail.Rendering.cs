@@ -41,7 +41,8 @@ public sealed partial class SideNavRail
         var contentWidth = ControlTextLayout.MeasureDisplayWidth(FormatHeaderText());
         for (var index = 0; index < _items.Count; index++)
         {
-            contentWidth = Math.Max(contentWidth, ControlTextLayout.MeasureDisplayWidth(FormatItemLine(index, hovered: false, selected: false)));
+            contentWidth = Math.Max(contentWidth,
+                ControlTextLayout.MeasureDisplayWidth(FormatItemLine(index, false, false)));
         }
 
         var width = Math.Max(8, contentWidth) + Padding.Horizontal;
@@ -74,7 +75,7 @@ public sealed partial class SideNavRail
         var maxRows = Math.Min(_items.Count, content.Height - 1);
         for (var row = 0; row < maxRows; row++)
         {
-            var selected = row == _selectedIndex;
+            var selected = row == SelectedIndex;
             var hovered = row == _hoveredIndex;
             var line = FormatItemLine(row, hovered, selected);
             var style = ResolveItemStyle(row, hovered, selected);

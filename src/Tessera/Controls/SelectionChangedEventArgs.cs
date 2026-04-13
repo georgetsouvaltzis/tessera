@@ -1,12 +1,12 @@
-﻿namespace Tessera.Controls;
+namespace Tessera.Controls;
 
 /// <summary>
-/// Provides the selected string item for choice-style controls.
+///     Provides the selected string item for choice-style controls.
 /// </summary>
 public sealed class SelectionChangedEventArgs : EventArgs
 {
     /// <summary>
-    /// Executes selection changed event args.
+    ///     Executes selection changed event args.
     /// </summary>
     /// <param name="previousIndex">The previous index value.</param>
     /// <param name="selectedIndex">The selected index value.</param>
@@ -17,27 +17,27 @@ public sealed class SelectionChangedEventArgs : EventArgs
     {
         PreviousIndex = previousIndex;
         SelectedIndex = selectedIndex;
-        PreviousItem = previousItem ?? string.Empty;
-        SelectedItem = selectedItem ?? string.Empty;
+        PreviousItem = previousItem;
+        SelectedItem = selectedItem;
     }
 
     /// <summary>
-    /// Gets the previous index.
+    ///     Gets the previous index.
     /// </summary>
     public int PreviousIndex { get; }
 
     /// <summary>
-    /// Gets the selected index.
+    ///     Gets the selected index.
     /// </summary>
     public int SelectedIndex { get; }
 
     /// <summary>
-    /// Gets the previous item.
+    ///     Gets the previous item.
     /// </summary>
     public string PreviousItem { get; }
 
     /// <summary>
-    /// Gets the selected item.
+    ///     Gets the selected item.
     /// </summary>
     public string SelectedItem { get; }
 }

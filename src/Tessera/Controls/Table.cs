@@ -1,4 +1,4 @@
-﻿using System.Text;
+using System.Text;
 using Tessera.Components.Primitives;
 using Tessera.Controls.Internal;
 using Tessera.Layout;
@@ -7,32 +7,27 @@ using Tessera.Styles;
 namespace Tessera.Controls;
 
 /// <summary>
-/// Represents a tabular data viewer.
+///     Represents a tabular data viewer.
 /// </summary>
 public sealed class Table : Control
 {
-    private readonly List<IReadOnlyList<string>> _rows = [];
     private readonly IReadOnlyList<string> _columns;
+    private readonly List<IReadOnlyList<string>> _rows = [];
     private int _hoveredVisibleRow = -1;
     private int _selectedVisibleRow = -1;
 
     /// <summary>
-    /// Occurs when the selected visible row changes.
-    /// </summary>
-    public event EventHandler<ListSelectionChangedEventArgs<IReadOnlyList<string>>>? SelectionChanged;
-
-    /// <summary>
-    /// Executes table.
+    ///     Executes table.
     /// </summary>
     /// <param name="columns">The columns value.</param>
     /// <returns>The result of table.</returns>
     public Table(IReadOnlyList<string> columns)
     {
-        _columns = columns ?? Array.Empty<string>();
+        _columns = columns;
     }
 
     /// <summary>
-    /// Executes table.
+    ///     Executes table.
     /// </summary>
     /// <param name="columns">The columns value.</param>
     /// <returns>The result of table.</returns>
@@ -42,25 +37,17 @@ public sealed class Table : Control
     }
 
     /// <summary>
-    /// Represents title.
+    ///     Represents title.
     /// </summary>
-    public string Title
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = "Table";
+    public string Title { get; set; } = "Table";
 
     /// <summary>
-    /// Gets or sets the marker shown in the title when the control is focused.
+    ///     Gets or sets the marker shown in the title when the control is focused.
     /// </summary>
-    public string FocusMarker
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = "*";
+    public string FocusMarker { get; set; } = "*";
 
     /// <summary>
-    /// Gets or sets a value indicating whether the focus marker should be rendered in the title when focused.
+    ///     Gets or sets a value indicating whether the focus marker should be rendered in the title when focused.
     /// </summary>
     public bool ShowFocusMarker
     {
@@ -69,7 +56,7 @@ public sealed class Table : Control
     } = true;
 
     /// <summary>
-    /// Gets or sets the title style applied when the control is not focused.
+    ///     Gets or sets the title style applied when the control is not focused.
     /// </summary>
     public TesseraStyle TitleStyle
     {
@@ -78,7 +65,7 @@ public sealed class Table : Control
     } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the title style applied when the control is focused.
+    ///     Gets or sets the title style applied when the control is focused.
     /// </summary>
     public TesseraStyle FocusedTitleStyle
     {
@@ -87,7 +74,7 @@ public sealed class Table : Control
     } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the style applied to header rows.
+    ///     Gets or sets the style applied to header rows.
     /// </summary>
     public TesseraStyle HeaderStyle
     {
@@ -96,7 +83,7 @@ public sealed class Table : Control
     } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the style applied to non-selected, non-hovered data rows.
+    ///     Gets or sets the style applied to non-selected, non-hovered data rows.
     /// </summary>
     public TesseraStyle RowStyle
     {
@@ -105,7 +92,7 @@ public sealed class Table : Control
     } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the style merged into hovered data rows.
+    ///     Gets or sets the style merged into hovered data rows.
     /// </summary>
     public TesseraStyle HoveredRowStyle
     {
@@ -114,7 +101,7 @@ public sealed class Table : Control
     } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the style merged into selected data rows.
+    ///     Gets or sets the style merged into selected data rows.
     /// </summary>
     public TesseraStyle SelectedRowStyle
     {
@@ -123,7 +110,7 @@ public sealed class Table : Control
     } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the style applied to border glyphs when the control is not focused.
+    ///     Gets or sets the style applied to border glyphs when the control is not focused.
     /// </summary>
     public TesseraStyle BorderStyleText
     {
@@ -132,7 +119,7 @@ public sealed class Table : Control
     } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the style applied to border glyphs when the control is focused.
+    ///     Gets or sets the style applied to border glyphs when the control is focused.
     /// </summary>
     public TesseraStyle FocusedBorderStyleText
     {
@@ -141,7 +128,7 @@ public sealed class Table : Control
     } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the border style used for the table frame.
+    ///     Gets or sets the border style used for the table frame.
     /// </summary>
     public BorderStyle Border
     {
@@ -150,7 +137,7 @@ public sealed class Table : Control
     } = BorderStyle.SingleLine;
 
     /// <summary>
-    /// Gets or sets the inner padding applied to the table body.
+    ///     Gets or sets the inner padding applied to the table body.
     /// </summary>
     public Thickness Padding
     {
@@ -159,7 +146,7 @@ public sealed class Table : Control
     }
 
     /// <summary>
-    /// Represents page size.
+    ///     Represents page size.
     /// </summary>
     public int PageSize
     {
@@ -168,7 +155,7 @@ public sealed class Table : Control
     } = 8;
 
     /// <summary>
-    /// Represents page index.
+    ///     Represents page index.
     /// </summary>
     public int PageIndex
     {
@@ -177,7 +164,7 @@ public sealed class Table : Control
     }
 
     /// <summary>
-    /// Represents sort column.
+    ///     Represents sort column.
     /// </summary>
     public int SortColumn
     {
@@ -186,7 +173,7 @@ public sealed class Table : Control
     }
 
     /// <summary>
-    /// Represents sort descending.
+    ///     Represents sort descending.
     /// </summary>
     public bool SortDescending
     {
@@ -195,7 +182,7 @@ public sealed class Table : Control
     }
 
     /// <summary>
-    /// Gets the selected row index in the current visible page, or <c>-1</c> when no row is selected.
+    ///     Gets the selected row index in the current visible page, or <c>-1</c> when no row is selected.
     /// </summary>
     public int SelectedRowIndex
     {
@@ -209,7 +196,7 @@ public sealed class Table : Control
     }
 
     /// <summary>
-    /// Gets the currently selected row in the visible page, or <see langword="null"/> when no row is selected.
+    ///     Gets the currently selected row in the visible page, or <see langword="null" /> when no row is selected.
     /// </summary>
     public IReadOnlyList<string>? SelectedRow => TryGetSelectedRow(out var selectedRow) ? selectedRow : null;
 
@@ -221,10 +208,15 @@ public sealed class Table : Control
     }
 
     /// <summary>
-    /// Attempts to read the currently selected visible row.
+    ///     Occurs when the selected visible row changes.
     /// </summary>
-    /// <param name="selectedRow">Selected row values when available; otherwise <see langword="null"/>.</param>
-    /// <returns><see langword="true"/> when a selected row exists; otherwise <see langword="false"/>.</returns>
+    public event EventHandler<ListSelectionChangedEventArgs<IReadOnlyList<string>>>? SelectionChanged;
+
+    /// <summary>
+    ///     Attempts to read the currently selected visible row.
+    /// </summary>
+    /// <param name="selectedRow">Selected row values when available; otherwise <see langword="null" />.</param>
+    /// <returns><see langword="true" /> when a selected row exists; otherwise <see langword="false" />.</returns>
     public bool TryGetSelectedRow(out IReadOnlyList<string>? selectedRow)
     {
         var state = BuildState();
@@ -239,10 +231,10 @@ public sealed class Table : Control
     }
 
     /// <summary>
-    /// Sets the selected row index in the current visible page using bounds clamping.
+    ///     Sets the selected row index in the current visible page using bounds clamping.
     /// </summary>
     /// <param name="index">The requested visible-row index.</param>
-    /// <returns><see langword="true"/> when selection changed; otherwise <see langword="false"/>.</returns>
+    /// <returns><see langword="true" /> when selection changed; otherwise <see langword="false" />.</returns>
     public bool SetSelectedIndex(int index)
     {
         var state = BuildState();
@@ -256,7 +248,7 @@ public sealed class Table : Control
     }
 
     /// <summary>
-    /// Executes set rows.
+    ///     Executes set rows.
     /// </summary>
     /// <param name="rows">The rows value.</param>
     public void SetRows(IEnumerable<IReadOnlyList<string>> rows)
@@ -273,10 +265,10 @@ public sealed class Table : Control
     }
 
     /// <summary>
-    /// Appends a row to the current table data.
+    ///     Appends a row to the current table data.
     /// </summary>
     /// <param name="row">Row values aligned to table columns.</param>
-    /// <exception cref="ArgumentNullException"><paramref name="row"/> is <see langword="null"/>.</exception>
+    /// <exception cref="ArgumentNullException"><paramref name="row" /> is <see langword="null" />.</exception>
     public void AddRow(IReadOnlyList<string> row)
     {
         ArgumentNullException.ThrowIfNull(row);
@@ -286,12 +278,12 @@ public sealed class Table : Control
     }
 
     /// <summary>
-    /// Replaces an existing row at the specified index.
+    ///     Replaces an existing row at the specified index.
     /// </summary>
     /// <param name="index">Zero-based row index to replace.</param>
     /// <param name="row">Replacement row values aligned to table columns.</param>
-    /// <exception cref="ArgumentOutOfRangeException"><paramref name="index"/> is outside the current row range.</exception>
-    /// <exception cref="ArgumentNullException"><paramref name="row"/> is <see langword="null"/>.</exception>
+    /// <exception cref="ArgumentOutOfRangeException"><paramref name="index" /> is outside the current row range.</exception>
+    /// <exception cref="ArgumentNullException"><paramref name="row" /> is <see langword="null" />.</exception>
     public void ReplaceRow(int index, IReadOnlyList<string> row)
     {
         ArgumentNullException.ThrowIfNull(row);
@@ -302,10 +294,10 @@ public sealed class Table : Control
     }
 
     /// <summary>
-    /// Removes the row at the specified index.
+    ///     Removes the row at the specified index.
     /// </summary>
     /// <param name="index">Zero-based row index to remove.</param>
-    /// <exception cref="ArgumentOutOfRangeException"><paramref name="index"/> is outside the current row range.</exception>
+    /// <exception cref="ArgumentOutOfRangeException"><paramref name="index" /> is outside the current row range.</exception>
     public void RemoveRowAt(int index)
     {
         EnsureRowIndexInRange(index);
@@ -315,7 +307,7 @@ public sealed class Table : Control
     }
 
     /// <summary>
-    /// Removes all rows from the table.
+    ///     Removes all rows from the table.
     /// </summary>
     public void ClearRows()
     {
@@ -485,11 +477,11 @@ public sealed class Table : Control
         var availableWidth = Math.Max(_columns.Count, content.Width - separatorCount);
         var widths = ComputeColumnWidths(availableWidth, _columns.Count);
 
-        var header = BuildRowText(widths, _columns, selectedMarker: false);
+        var header = BuildRowText(widths, _columns, false);
         canvas.WriteText(content.X, content.Y, ApplyStyle(header, HeaderStyle), content.Width);
 
         var dividerY = content.Y + 1;
-        canvas.DrawHorizontalLine(content.X, dividerY, content.Width, '─');
+        canvas.DrawHorizontalLine(content.X, dividerY, content.Width);
         var separatorX = content.X;
         for (var index = 0; index < widths.Length - 1; index++)
         {
@@ -507,7 +499,7 @@ public sealed class Table : Control
             var isHovered = row == _hoveredVisibleRow;
             var isSelected = row == _selectedVisibleRow;
             var rowText = BuildRowText(widths, state.VisibleRows[row], markerRow);
-            var style = ResolveRowStyle(selected: isSelected, hovered: isHovered);
+            var style = ResolveRowStyle(isSelected, isHovered);
             canvas.WriteText(content.X, content.Y + 2 + row, ApplyStyle(rowText, style), content.Width);
         }
     }
@@ -529,7 +521,7 @@ public sealed class Table : Control
             }
         }
 
-        var width = Math.Max(8, (_columns.Count * Math.Max(3, widest)) + Math.Max(0, _columns.Count - 1));
+        var width = Math.Max(8, _columns.Count * Math.Max(3, widest) + Math.Max(0, _columns.Count - 1));
         var height = Math.Max(4, Math.Min(_rows.Count, Math.Max(1, PageSize)) + 3);
         return new LayoutMeasurement(
             Math.Clamp(width, 0, availableBounds.Width),
@@ -712,7 +704,7 @@ public sealed class Table : Control
         for (var column = 0; column < widths.Length; column++)
         {
             var width = widths[column];
-            var value = column < cells.Count ? cells[column] ?? string.Empty : string.Empty;
+            var value = column < cells.Count ? cells[column] : string.Empty;
             if (selectedMarker && column == 0 && width >= 2)
             {
                 value = string.Concat("› ", value);

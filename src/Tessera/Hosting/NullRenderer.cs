@@ -4,42 +4,60 @@ using Tessera.Internal;
 namespace Tessera.Hosting;
 
 /// <summary>
-/// Wraps the no-op renderer for advanced Tessera hosting scenarios.
+///     Wraps the no-op renderer for advanced Tessera hosting scenarios.
 /// </summary>
 [EditorBrowsable(EditorBrowsableState.Advanced)]
 public sealed class NullRenderer : IProgramRenderer
 {
-    private readonly global::Tessera.Core.Rendering.NullRenderer _inner = new();
+    private readonly Core.Rendering.NullRenderer _inner = new();
 
     /// <inheritdoc />
-    public ValueTask InitializeAsync(Stream output, CancellationToken cancellationToken) =>
-        _inner.InitializeAsync(output, cancellationToken);
+    public ValueTask InitializeAsync(Stream output, CancellationToken cancellationToken)
+    {
+        return _inner.InitializeAsync(output, cancellationToken);
+    }
 
     /// <inheritdoc />
-    public void Resize(int width, int height) => _inner.Resize(width, height);
+    public void Resize(int width, int height)
+    {
+        _inner.Resize(width, height);
+    }
 
     /// <inheritdoc />
-    public void UpdateCapabilities(TerminalCapabilityProfile capabilities) =>
+    public void UpdateCapabilities(TerminalCapabilityProfile capabilities)
+    {
         _inner.UpdateCapabilities(capabilities.ToCore());
+    }
 
     /// <inheritdoc />
-    public void Render(RenderOutput output) =>
+    public void Render(RenderOutput output)
+    {
         _inner.Render(output.ToCore());
+    }
 
     /// <inheritdoc />
-    public ValueTask WriteRawAsync(string content, CancellationToken cancellationToken) =>
-        _inner.WriteRawAsync(content, cancellationToken);
+    public ValueTask WriteRawAsync(string content, CancellationToken cancellationToken)
+    {
+        return _inner.WriteRawAsync(content, cancellationToken);
+    }
 
     /// <inheritdoc />
-    public ValueTask FlushAsync(CancellationToken cancellationToken) =>
-        _inner.FlushAsync(cancellationToken);
+    public ValueTask FlushAsync(CancellationToken cancellationToken)
+    {
+        return _inner.FlushAsync(cancellationToken);
+    }
 
     /// <inheritdoc />
-    public ValueTask ResetAsync(CancellationToken cancellationToken) =>
-        _inner.ResetAsync(cancellationToken);
+    public ValueTask ResetAsync(CancellationToken cancellationToken)
+    {
+        return _inner.ResetAsync(cancellationToken);
+    }
 
     /// <summary>
-    /// Disposes the renderer.
+    ///     Disposes the renderer.
     /// </summary>
-    public ValueTask DisposeAsync() => _inner.DisposeAsync();
+    public ValueTask DisposeAsync()
+    {
+        return _inner.DisposeAsync();
+    }
 }

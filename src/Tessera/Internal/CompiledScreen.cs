@@ -19,5 +19,8 @@ internal interface IScreenCompiler
 
 internal static class ScreenCompilationFactory
 {
-    public static IScreenCompiler CreateDefault() => new TesseraSceneCompiler();
+    public static IScreenCompiler CreateDefault()
+    {
+        return new TesseraSceneCompiler();
+    }
 }

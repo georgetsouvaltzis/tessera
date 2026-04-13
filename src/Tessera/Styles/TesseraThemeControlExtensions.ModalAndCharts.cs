@@ -1,14 +1,14 @@
-﻿using Tessera.Controls;
+using Tessera.Controls;
 
 namespace Tessera.Styles;
 
 /// <summary>
-/// Represents tessera theme control extensions modal and charts apply extensions.
+///     Represents tessera theme control extensions modal and charts apply extensions.
 /// </summary>
 public static class TesseraThemeControlExtensionsModalAndChartsApplyExtensions
 {
     /// <summary>
-    /// Executes apply theme.
+    ///     Executes apply theme.
     /// </summary>
     /// <param name="control">The control value.</param>
     /// <param name="theme">The theme value.</param>
@@ -28,7 +28,7 @@ public static class TesseraThemeControlExtensionsModalAndChartsApplyExtensions
     }
 
     /// <summary>
-    /// Executes apply theme.
+    ///     Executes apply theme.
     /// </summary>
     /// <param name="control">The control value.</param>
     /// <param name="overrides">The overrides value.</param>
@@ -46,7 +46,7 @@ public static class TesseraThemeControlExtensionsModalAndChartsApplyExtensions
     }
 
     /// <summary>
-    /// Executes apply theme.
+    ///     Executes apply theme.
     /// </summary>
     /// <param name="control">The control value.</param>
     /// <param name="theme">The theme value.</param>
@@ -66,7 +66,7 @@ public static class TesseraThemeControlExtensionsModalAndChartsApplyExtensions
     }
 
     /// <summary>
-    /// Executes apply theme.
+    ///     Executes apply theme.
     /// </summary>
     /// <param name="control">The control value.</param>
     /// <param name="overrides">The overrides value.</param>
@@ -84,7 +84,7 @@ public static class TesseraThemeControlExtensionsModalAndChartsApplyExtensions
     }
 
     /// <summary>
-    /// Executes apply theme.
+    ///     Executes apply theme.
     /// </summary>
     /// <param name="control">The control value.</param>
     /// <param name="theme">The theme value.</param>
@@ -103,7 +103,7 @@ public static class TesseraThemeControlExtensionsModalAndChartsApplyExtensions
     }
 
     /// <summary>
-    /// Executes apply theme.
+    ///     Executes apply theme.
     /// </summary>
     /// <param name="control">The control value.</param>
     /// <param name="overrides">The overrides value.</param>
@@ -121,7 +121,7 @@ public static class TesseraThemeControlExtensionsModalAndChartsApplyExtensions
     }
 
     /// <summary>
-    /// Executes apply theme.
+    ///     Executes apply theme.
     /// </summary>
     /// <param name="control">The control value.</param>
     /// <param name="theme">The theme value.</param>
@@ -140,7 +140,7 @@ public static class TesseraThemeControlExtensionsModalAndChartsApplyExtensions
     }
 
     /// <summary>
-    /// Executes apply theme.
+    ///     Executes apply theme.
     /// </summary>
     /// <param name="control">The control value.</param>
     /// <param name="overrides">The overrides value.</param>
@@ -158,7 +158,7 @@ public static class TesseraThemeControlExtensionsModalAndChartsApplyExtensions
     }
 
     /// <summary>
-    /// Executes apply theme.
+    ///     Executes apply theme.
     /// </summary>
     /// <param name="control">The control value.</param>
     /// <param name="theme">The theme value.</param>
@@ -176,7 +176,7 @@ public static class TesseraThemeControlExtensionsModalAndChartsApplyExtensions
     }
 
     /// <summary>
-    /// Executes apply theme.
+    ///     Executes apply theme.
     /// </summary>
     /// <param name="control">The control value.</param>
     /// <param name="overrides">The overrides value.</param>
@@ -194,7 +194,7 @@ public static class TesseraThemeControlExtensionsModalAndChartsApplyExtensions
     }
 
     /// <summary>
-    /// Executes apply theme.
+    ///     Executes apply theme.
     /// </summary>
     /// <param name="control">The control value.</param>
     /// <param name="theme">The theme value.</param>
@@ -215,7 +215,7 @@ public static class TesseraThemeControlExtensionsModalAndChartsApplyExtensions
     }
 
     /// <summary>
-    /// Executes apply theme.
+    ///     Executes apply theme.
     /// </summary>
     /// <param name="control">The control value.</param>
     /// <param name="overrides">The overrides value.</param>
@@ -234,12 +234,12 @@ public static class TesseraThemeControlExtensionsModalAndChartsApplyExtensions
 }
 
 /// <summary>
-/// Represents tessera theme control extensions modal and charts default extensions.
+///     Represents tessera theme control extensions modal and charts default extensions.
 /// </summary>
 public static class TesseraThemeControlExtensionsModalAndChartsDefaultExtensions
 {
     /// <summary>
-    /// Executes apply theme defaults.
+    ///     Executes apply theme defaults.
     /// </summary>
     /// <param name="control">The control value.</param>
     /// <param name="theme">The theme value.</param>
@@ -250,16 +250,19 @@ public static class TesseraThemeControlExtensionsModalAndChartsDefaultExtensions
         ArgumentNullException.ThrowIfNull(theme);
 
         control.TitleStyle = TesseraThemeControlExtensions.ApplyDefault(control.TitleStyle, theme.Text.Secondary);
-        control.FocusedTitleStyle = TesseraThemeControlExtensions.ApplyDefault(control.FocusedTitleStyle, theme.Focus.Title);
+        control.FocusedTitleStyle =
+            TesseraThemeControlExtensions.ApplyDefault(control.FocusedTitleStyle, theme.Focus.Title);
         control.FocusMarker = TesseraThemeControlExtensions.ApplyDefault(control.FocusMarker, theme.Focus.Marker);
         control.BodyTextStyle = TesseraThemeControlExtensions.ApplyDefault(control.BodyTextStyle, theme.Text.Primary);
-        control.BorderStyleText = TesseraThemeControlExtensions.ApplyDefault(control.BorderStyleText, theme.Border.Default);
-        control.FocusedBorderStyleText = TesseraThemeControlExtensions.ApplyDefault(control.FocusedBorderStyleText, theme.Border.Focused.Merge(theme.Focus.Border));
+        control.BorderStyleText =
+            TesseraThemeControlExtensions.ApplyDefault(control.BorderStyleText, theme.Border.Default);
+        control.FocusedBorderStyleText = TesseraThemeControlExtensions.ApplyDefault(control.FocusedBorderStyleText,
+            theme.Border.Focused.Merge(theme.Focus.Border));
         return control;
     }
 
     /// <summary>
-    /// Executes apply theme defaults.
+    ///     Executes apply theme defaults.
     /// </summary>
     /// <param name="control">The control value.</param>
     /// <param name="overrides">The overrides value.</param>
@@ -277,7 +280,7 @@ public static class TesseraThemeControlExtensionsModalAndChartsDefaultExtensions
     }
 
     /// <summary>
-    /// Executes apply theme defaults.
+    ///     Executes apply theme defaults.
     /// </summary>
     /// <param name="control">The control value.</param>
     /// <param name="theme">The theme value.</param>
@@ -288,16 +291,19 @@ public static class TesseraThemeControlExtensionsModalAndChartsDefaultExtensions
         ArgumentNullException.ThrowIfNull(theme);
 
         control.TitleStyle = TesseraThemeControlExtensions.ApplyDefault(control.TitleStyle, theme.Text.Secondary);
-        control.FocusedTitleStyle = TesseraThemeControlExtensions.ApplyDefault(control.FocusedTitleStyle, theme.Focus.Title);
+        control.FocusedTitleStyle =
+            TesseraThemeControlExtensions.ApplyDefault(control.FocusedTitleStyle, theme.Focus.Title);
         control.FocusMarker = TesseraThemeControlExtensions.ApplyDefault(control.FocusMarker, theme.Focus.Marker);
         control.BodyTextStyle = TesseraThemeControlExtensions.ApplyDefault(control.BodyTextStyle, theme.Text.Primary);
-        control.BorderStyleText = TesseraThemeControlExtensions.ApplyDefault(control.BorderStyleText, theme.Border.Default);
-        control.FocusedBorderStyleText = TesseraThemeControlExtensions.ApplyDefault(control.FocusedBorderStyleText, theme.Border.Focused.Merge(theme.Focus.Border));
+        control.BorderStyleText =
+            TesseraThemeControlExtensions.ApplyDefault(control.BorderStyleText, theme.Border.Default);
+        control.FocusedBorderStyleText = TesseraThemeControlExtensions.ApplyDefault(control.FocusedBorderStyleText,
+            theme.Border.Focused.Merge(theme.Focus.Border));
         return control;
     }
 
     /// <summary>
-    /// Executes apply theme defaults.
+    ///     Executes apply theme defaults.
     /// </summary>
     /// <param name="control">The control value.</param>
     /// <param name="overrides">The overrides value.</param>
@@ -315,7 +321,7 @@ public static class TesseraThemeControlExtensionsModalAndChartsDefaultExtensions
     }
 
     /// <summary>
-    /// Executes apply theme defaults.
+    ///     Executes apply theme defaults.
     /// </summary>
     /// <param name="control">The control value.</param>
     /// <param name="theme">The theme value.</param>
@@ -326,7 +332,8 @@ public static class TesseraThemeControlExtensionsModalAndChartsDefaultExtensions
         ArgumentNullException.ThrowIfNull(theme);
 
         control.TitleStyle = TesseraThemeControlExtensions.ApplyDefault(control.TitleStyle, theme.Text.Secondary);
-        control.FocusedTitleStyle = TesseraThemeControlExtensions.ApplyDefault(control.FocusedTitleStyle, theme.Focus.Title);
+        control.FocusedTitleStyle =
+            TesseraThemeControlExtensions.ApplyDefault(control.FocusedTitleStyle, theme.Focus.Title);
         control.FocusMarker = TesseraThemeControlExtensions.ApplyDefault(control.FocusMarker, theme.Focus.Marker);
         control.LabelStyle = TesseraThemeControlExtensions.ApplyDefault(control.LabelStyle, theme.Text.Primary);
         control.LegendStyle = TesseraThemeControlExtensions.ApplyDefault(control.LegendStyle, theme.Text.Secondary);
@@ -334,7 +341,7 @@ public static class TesseraThemeControlExtensionsModalAndChartsDefaultExtensions
     }
 
     /// <summary>
-    /// Executes apply theme defaults.
+    ///     Executes apply theme defaults.
     /// </summary>
     /// <param name="control">The control value.</param>
     /// <param name="overrides">The overrides value.</param>
@@ -352,7 +359,7 @@ public static class TesseraThemeControlExtensionsModalAndChartsDefaultExtensions
     }
 
     /// <summary>
-    /// Executes apply theme defaults.
+    ///     Executes apply theme defaults.
     /// </summary>
     /// <param name="control">The control value.</param>
     /// <param name="theme">The theme value.</param>
@@ -363,15 +370,17 @@ public static class TesseraThemeControlExtensionsModalAndChartsDefaultExtensions
         ArgumentNullException.ThrowIfNull(theme);
 
         control.TitleStyle = TesseraThemeControlExtensions.ApplyDefault(control.TitleStyle, theme.Text.Secondary);
-        control.FocusedTitleStyle = TesseraThemeControlExtensions.ApplyDefault(control.FocusedTitleStyle, theme.Focus.Title);
+        control.FocusedTitleStyle =
+            TesseraThemeControlExtensions.ApplyDefault(control.FocusedTitleStyle, theme.Focus.Title);
         control.FocusMarker = TesseraThemeControlExtensions.ApplyDefault(control.FocusMarker, theme.Focus.Marker);
         control.StatsStyle = TesseraThemeControlExtensions.ApplyDefault(control.StatsStyle, theme.Text.Secondary);
-        control.MetaTextStyle = TesseraThemeControlExtensions.ApplyDefault(control.MetaTextStyle, theme.Accent.Secondary);
+        control.MetaTextStyle =
+            TesseraThemeControlExtensions.ApplyDefault(control.MetaTextStyle, theme.Accent.Secondary);
         return control;
     }
 
     /// <summary>
-    /// Executes apply theme defaults.
+    ///     Executes apply theme defaults.
     /// </summary>
     /// <param name="control">The control value.</param>
     /// <param name="overrides">The overrides value.</param>
@@ -389,7 +398,7 @@ public static class TesseraThemeControlExtensionsModalAndChartsDefaultExtensions
     }
 
     /// <summary>
-    /// Executes apply theme defaults.
+    ///     Executes apply theme defaults.
     /// </summary>
     /// <param name="control">The control value.</param>
     /// <param name="theme">The theme value.</param>
@@ -400,14 +409,16 @@ public static class TesseraThemeControlExtensionsModalAndChartsDefaultExtensions
         ArgumentNullException.ThrowIfNull(theme);
 
         control.TitleStyle = TesseraThemeControlExtensions.ApplyDefault(control.TitleStyle, theme.Text.Secondary);
-        control.FocusedTitleStyle = TesseraThemeControlExtensions.ApplyDefault(control.FocusedTitleStyle, theme.Focus.Title);
+        control.FocusedTitleStyle =
+            TesseraThemeControlExtensions.ApplyDefault(control.FocusedTitleStyle, theme.Focus.Title);
         control.FocusMarker = TesseraThemeControlExtensions.ApplyDefault(control.FocusMarker, theme.Focus.Marker);
-        control.ValueLabelStyle = TesseraThemeControlExtensions.ApplyDefault(control.ValueLabelStyle, theme.Text.Primary);
+        control.ValueLabelStyle =
+            TesseraThemeControlExtensions.ApplyDefault(control.ValueLabelStyle, theme.Text.Primary);
         return control;
     }
 
     /// <summary>
-    /// Executes apply theme defaults.
+    ///     Executes apply theme defaults.
     /// </summary>
     /// <param name="control">The control value.</param>
     /// <param name="overrides">The overrides value.</param>
@@ -425,7 +436,7 @@ public static class TesseraThemeControlExtensionsModalAndChartsDefaultExtensions
     }
 
     /// <summary>
-    /// Executes apply theme defaults.
+    ///     Executes apply theme defaults.
     /// </summary>
     /// <param name="control">The control value.</param>
     /// <param name="theme">The theme value.</param>
@@ -436,17 +447,20 @@ public static class TesseraThemeControlExtensionsModalAndChartsDefaultExtensions
         ArgumentNullException.ThrowIfNull(theme);
 
         control.TitleStyle = TesseraThemeControlExtensions.ApplyDefault(control.TitleStyle, theme.Text.Secondary);
-        control.FocusedTitleStyle = TesseraThemeControlExtensions.ApplyDefault(control.FocusedTitleStyle, theme.Focus.Title);
+        control.FocusedTitleStyle =
+            TesseraThemeControlExtensions.ApplyDefault(control.FocusedTitleStyle, theme.Focus.Title);
         control.FocusMarker = TesseraThemeControlExtensions.ApplyDefault(control.FocusMarker, theme.Focus.Marker);
-        control.BorderStyleText = TesseraThemeControlExtensions.ApplyDefault(control.BorderStyleText, theme.Border.Default);
-        control.FocusedBorderStyleText = TesseraThemeControlExtensions.ApplyDefault(control.FocusedBorderStyleText, theme.Border.Focused.Merge(theme.Focus.Border));
+        control.BorderStyleText =
+            TesseraThemeControlExtensions.ApplyDefault(control.BorderStyleText, theme.Border.Default);
+        control.FocusedBorderStyleText = TesseraThemeControlExtensions.ApplyDefault(control.FocusedBorderStyleText,
+            theme.Border.Focused.Merge(theme.Focus.Border));
         control.KeyStyle = TesseraThemeControlExtensions.ApplyDefault(control.KeyStyle, theme.Text.Secondary);
         control.ValueStyle = TesseraThemeControlExtensions.ApplyDefault(control.ValueStyle, theme.Text.Primary);
         return control;
     }
 
     /// <summary>
-    /// Executes apply theme defaults.
+    ///     Executes apply theme defaults.
     /// </summary>
     /// <param name="control">The control value.</param>
     /// <param name="overrides">The overrides value.</param>

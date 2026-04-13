@@ -4,10 +4,10 @@ internal static class RenderFrameContent
 {
     public static List<RenderFrameRow> BuildRows(string content, int width, int height)
     {
-        List<RenderFrameRow>? rows = height > 0
+        var rows = height > 0
             ? null
             : new List<RenderFrameRow>(EstimateLineCount(content));
-        Queue<RenderFrameRow>? clippedRows = height > 0
+        var clippedRows = height > 0
             ? new Queue<RenderFrameRow>(height)
             : null;
 

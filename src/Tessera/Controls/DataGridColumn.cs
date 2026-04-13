@@ -1,38 +1,34 @@
 namespace Tessera.Controls;
 
 /// <summary>
-/// Represents one column definition in a <see cref="DataGrid" />.
+///     Represents one column definition in a <see cref="DataGrid" />.
 /// </summary>
 public sealed class DataGridColumn
 {
     /// <summary>
-    /// Initializes a new data-grid column.
+    ///     Initializes a new data-grid column.
     /// </summary>
     /// <param name="id">Stable column identifier.</param>
     /// <param name="header">Header text rendered for the column.</param>
     public DataGridColumn(string id, string header)
     {
-        Id = id ?? string.Empty;
-        Header = header ?? string.Empty;
+        Id = id;
+        Header = header;
     }
 
     /// <summary>
-    /// Gets the stable column identifier.
+    ///     Gets the stable column identifier.
     /// </summary>
     public string Id { get; }
 
     /// <summary>
-    /// Gets or sets the header text rendered for the column.
+    ///     Gets or sets the header text rendered for the column.
     /// </summary>
-    public string Header
-    {
-        get;
-        set => field = value ?? string.Empty;
-    }
+    public string Header { get; set; }
 
     /// <summary>
-    /// Gets or sets an optional fixed display width for this column.
-    /// Values less than or equal to zero are normalized to <see langword="null" />.
+    ///     Gets or sets an optional fixed display width for this column.
+    ///     Values less than or equal to zero are normalized to <see langword="null" />.
     /// </summary>
     public int? Width
     {
@@ -41,12 +37,12 @@ public sealed class DataGridColumn
     }
 
     /// <summary>
-    /// Gets or sets whether the column can participate in sort requests.
+    ///     Gets or sets whether the column can participate in sort requests.
     /// </summary>
     public bool IsSortable { get; set; }
 
     /// <summary>
-    /// Gets or sets the optional comparer used for built-in row sorting.
+    ///     Gets or sets the optional comparer used for built-in row sorting.
     /// </summary>
     public Comparison<string>? SortComparer { get; set; }
 }

@@ -35,7 +35,8 @@ internal sealed class TransitNoticeControl : Control
         canvas.WriteText(clipped.X, clipped.Y, Render(TitleStyle, Title), clipped.Width);
         if (clipped.Height > 1)
         {
-            canvas.WriteText(clipped.X, clipped.Y + 1, Render(DividerStyle, new string('─', clipped.Width)), clipped.Width);
+            canvas.WriteText(clipped.X, clipped.Y + 1, Render(DividerStyle, new string('─', clipped.Width)),
+                clipped.Width);
         }
 
         for (var index = 0; index < Math.Min(_items.Count, Math.Max(0, clipped.Height - 2)); index++)
@@ -46,12 +47,15 @@ internal sealed class TransitNoticeControl : Control
                 "amber" => WarningStyle,
                 "rose" => DelayStyle,
                 "mint" => SuccessStyle,
-                _ => SecondaryStyle,
+                _ => SecondaryStyle
             };
             var text = $"{Render(style, $"[{notice.Label}]")} {Render(PrimaryStyle, notice.Message)}";
             canvas.WriteText(clipped.X, clipped.Y + 2 + index, text, clipped.Width);
         }
     }
 
-    private static string Render(TesseraStyle style, string text) => style.IsEmpty ? text : style.Render(text);
+    private static string Render(TesseraStyle style, string text)
+    {
+        return style.IsEmpty ? text : style.Render(text);
+    }
 }

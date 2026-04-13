@@ -23,41 +23,42 @@ internal sealed class DockLayout : LayoutNode
     }
 
     /// <summary>
-    /// Gets the docked top content.
+    ///     Gets the docked top content.
     /// </summary>
     public LayoutSlot? Top { get; }
 
     /// <summary>
-    /// Gets the docked bottom content.
+    ///     Gets the docked bottom content.
     /// </summary>
     public LayoutSlot? Bottom { get; }
 
     /// <summary>
-    /// Gets the docked left content.
+    ///     Gets the docked left content.
     /// </summary>
     public LayoutSlot? Left { get; }
 
     /// <summary>
-    /// Gets the docked right content.
+    ///     Gets the docked right content.
     /// </summary>
     public LayoutSlot? Right { get; }
 
     /// <summary>
-    /// Gets the fill content.
+    ///     Gets the fill content.
     /// </summary>
     public LayoutSlot? Fill { get; }
 
     /// <summary>
-    /// Gets the gap inserted between docked regions.
+    ///     Gets the gap inserted between docked regions.
     /// </summary>
     public int Gap { get; }
 
     /// <summary>
-    /// Gets the layout padding.
+    ///     Gets the layout padding.
     /// </summary>
     public Thickness Padding { get; }
 
-    internal override LayoutMeasurement Measure(in Rect availableBounds) =>
-        LayoutArrangement.MeasureDock(this, availableBounds);
-
+    internal override LayoutMeasurement Measure(in Rect availableBounds)
+    {
+        return LayoutArrangement.MeasureDock(this, availableBounds);
+    }
 }

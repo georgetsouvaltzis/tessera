@@ -1,30 +1,99 @@
 using Tessera.Controls;
-using Tessera.Layout;
 using Tessera.Styles;
 
 namespace Tessera.Examples.DownloadCenter;
 
 internal sealed partial class DownloadCenterApp : TesseraApp
 {
-    private readonly TesseraTheme _theme = DownloadCenterTheme.Default;
-    private readonly DownloadCenterState _state = DownloadCenterState.CreateSeed();
-
-    private readonly DownloadHeroControl _hero = new() { Border = BorderStyle.Rounded, Padding = Thickness.Symmetric(1, 0) };
-    private readonly StatsCard _lanePulse = new() { Title = "Live Lanes", Border = BorderStyle.Rounded, Padding = Thickness.Symmetric(1, 0) };
-    private readonly StatsCard _pipePulse = new() { Title = "Throughput Crest", Border = BorderStyle.Rounded, Padding = Thickness.Symmetric(1, 0) };
-    private readonly StatsCard _retryPulse = new() { Title = "Retry Pressure", Border = BorderStyle.Rounded, Padding = Thickness.Symmetric(1, 0) };
-    private readonly TransferQueueControl _queue = new() { Title = "Grouped Jobs · F1", Border = BorderStyle.Rounded, Padding = Thickness.All(1), FocusMarker = "◈" };
-    private readonly Label _selectionCard = new() { Title = "Selected Transfer", Border = BorderStyle.Rounded, Padding = Thickness.All(1) };
-    private readonly ProgressBar _progress = new() { Title = "Seal Progress", Border = BorderStyle.Rounded, Padding = Thickness.All(1), FocusMarker = "◈" };
-    private readonly Label _runbook = new() { Title = "Action Bar", Border = BorderStyle.Rounded, Padding = Thickness.All(1) };
-    private readonly TelemetryChart _throughputChart = new(64) { Title = "throughput crest", Border = BorderStyle.Rounded, Padding = Thickness.All(1) };
-    private readonly TelemetryChart _retryChart = new(64) { Title = "retry turbulence", Border = BorderStyle.Rounded, Padding = Thickness.All(1) };
-    private readonly ActivityFeed _feed = new() { Title = "Transfer Feed · F2", Border = BorderStyle.Rounded, Padding = Thickness.All(1), FocusMarker = "◈", ShowTimestamp = true };
-    private readonly Button _pauseButton = new() { Text = "Pause/Resume", Description = "p", Padding = Thickness.All(1) };
-    private readonly Button _retryButton = new() { Text = "Retry Now", Description = "r", Padding = Thickness.All(1) };
     private readonly Button _boostButton = new() { Text = "Boost Lane", Description = "b", Padding = Thickness.All(1) };
-    private readonly Button _purgeButton = new() { Text = "Purge Done", Description = "u", Padding = Thickness.All(1) };
+
+    private readonly ActivityFeed _feed = new()
+    {
+        Title = "Transfer Feed · F2",
+        Border = BorderStyle.Rounded,
+        Padding = Thickness.All(1),
+        FocusMarker = "◈",
+        ShowTimestamp = true
+    };
+
     private readonly StatusBar _footer = new() { Fill = ' ' };
+
+    private readonly DownloadHeroControl _hero = new()
+    {
+        Border = BorderStyle.Rounded,
+        Padding = Thickness.Symmetric(1)
+    };
+
+    private readonly StatsCard _lanePulse = new()
+    {
+        Title = "Live Lanes",
+        Border = BorderStyle.Rounded,
+        Padding = Thickness.Symmetric(1)
+    };
+
+    private readonly Button _pauseButton =
+        new() { Text = "Pause/Resume", Description = "p", Padding = Thickness.All(1) };
+
+    private readonly StatsCard _pipePulse = new()
+    {
+        Title = "Throughput Crest",
+        Border = BorderStyle.Rounded,
+        Padding = Thickness.Symmetric(1)
+    };
+
+    private readonly ProgressBar _progress = new()
+    {
+        Title = "Seal Progress",
+        Border = BorderStyle.Rounded,
+        Padding = Thickness.All(1),
+        FocusMarker = "◈"
+    };
+
+    private readonly Button _purgeButton = new() { Text = "Purge Done", Description = "u", Padding = Thickness.All(1) };
+
+    private readonly TransferQueueControl _queue = new()
+    {
+        Title = "Grouped Jobs · F1",
+        Border = BorderStyle.Rounded,
+        Padding = Thickness.All(1),
+        FocusMarker = "◈"
+    };
+
+    private readonly Button _retryButton = new() { Text = "Retry Now", Description = "r", Padding = Thickness.All(1) };
+
+    private readonly TelemetryChart _retryChart = new(64)
+    {
+        Title = "retry turbulence",
+        Border = BorderStyle.Rounded,
+        Padding = Thickness.All(1)
+    };
+
+    private readonly StatsCard _retryPulse = new()
+    {
+        Title = "Retry Pressure",
+        Border = BorderStyle.Rounded,
+        Padding = Thickness.Symmetric(1)
+    };
+
+    private readonly Label _runbook =
+        new() { Title = "Action Bar", Border = BorderStyle.Rounded, Padding = Thickness.All(1) };
+
+    private readonly Label _selectionCard = new()
+    {
+        Title = "Selected Transfer",
+        Border = BorderStyle.Rounded,
+        Padding = Thickness.All(1)
+    };
+
+    private readonly DownloadCenterState _state = DownloadCenterState.CreateSeed();
+    private readonly TesseraTheme _theme = DownloadCenterTheme.Default;
+
+    private readonly TelemetryChart _throughputChart = new(64)
+    {
+        Title = "throughput crest",
+        Border = BorderStyle.Rounded,
+        Padding = Thickness.All(1)
+    };
 
     public DownloadCenterApp()
     {
@@ -33,8 +102,10 @@ internal sealed partial class DownloadCenterApp : TesseraApp
         SeedControls();
     }
 
-    public override TesseraEffect? Initialize() =>
-        TesseraEffects.Periodic(TimeSpan.FromMilliseconds(900), _ => new DownloadCenterTickMessage());
+    public override TesseraEffect? Initialize()
+    {
+        return TesseraEffects.Periodic(TimeSpan.FromMilliseconds(900), _ => new DownloadCenterTickMessage());
+    }
 
     public override TesseraEffect? Update(Message message)
     {
@@ -252,7 +323,7 @@ internal sealed partial class DownloadCenterApp : TesseraApp
 
     private static void ConfigureTelemetry(TelemetryChart chart, TesseraStyle fillStyle, string legend)
     {
-        chart.Options = new TelemetryChartOptions(ShowStats: true, Legend: legend, RenderMode: TelemetryChartRenderMode.Braille);
+        chart.Options = new TelemetryChartOptions(true, legend, TelemetryChartRenderMode.Braille);
         chart.TitleStyle = DownloadCenterTheme.Foreground(0xA5B4D4).WithBold();
         chart.FillStyle = fillStyle;
         chart.MetaStyle = DownloadCenterTheme.Foreground(0x6B7899);
@@ -263,7 +334,8 @@ internal sealed partial class DownloadCenterApp : TesseraApp
     private static void ConfigureAction(Button button, int foregroundRgb, int backgroundRgb)
     {
         var labelStyle = DownloadCenterTheme.Foreground(foregroundRgb).WithBold();
-        var surfaceStyle = DownloadCenterTheme.Foreground(foregroundRgb).Merge(DownloadCenterTheme.Background(backgroundRgb));
+        var surfaceStyle = DownloadCenterTheme.Foreground(foregroundRgb)
+            .Merge(DownloadCenterTheme.Background(backgroundRgb));
         button.LabelStyle = labelStyle;
         button.FocusedLabelStyle = labelStyle;
         button.PressedLabelStyle = labelStyle;

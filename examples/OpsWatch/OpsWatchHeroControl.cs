@@ -1,6 +1,5 @@
 using Tessera.Components.Primitives;
 using Tessera.Controls;
-using Tessera.Layout;
 using Tessera.Styles;
 
 namespace Tessera.Examples.OpsWatch;
@@ -88,8 +87,10 @@ internal sealed class OpsWatchHeroControl : Control
             return;
         }
 
-        WriteLine(canvas, content, 0, $"{ApplyStyle(Title.ToUpperInvariant(), TitleStyle)}  {ApplyStyle(ClockText, ClockStyle)}");
-        WriteLine(canvas, content, 1, $"{ApplyStyle($"[{FleetText}]", BadgeStyle)} {ApplyStyle($"[{ModeText}]", BadgeStyle)} {ApplyStyle($"[{RouteText}]", BadgeStyle)}");
+        WriteLine(canvas, content, 0,
+            $"{ApplyStyle(Title.ToUpperInvariant(), TitleStyle)}  {ApplyStyle(ClockText, ClockStyle)}");
+        WriteLine(canvas, content, 1,
+            $"{ApplyStyle($"[{FleetText}]", BadgeStyle)} {ApplyStyle($"[{ModeText}]", BadgeStyle)} {ApplyStyle($"[{RouteText}]", BadgeStyle)}");
         WriteLine(canvas, content, 2, $"{ApplyStyle(PressureText, MetaStyle)}  {ApplyStyle(CrewText, MetaStyle)}");
         WriteLine(canvas, content, 3, ApplyStyle(CommandText, CommandStyle));
     }

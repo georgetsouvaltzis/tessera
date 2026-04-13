@@ -1,12 +1,12 @@
 namespace Tessera.Controls;
 
 /// <summary>
-/// Provides selection details when a <see cref="TreeTable"/> row changes.
+///     Provides selection details when a <see cref="TreeTable" /> row changes.
 /// </summary>
 public sealed class TreeTableSelectionChangedEventArgs : EventArgs
 {
     /// <summary>
-    /// Initializes a new selection payload.
+    ///     Initializes a new selection payload.
     /// </summary>
     /// <param name="previousIndex">Previously selected visible index.</param>
     /// <param name="selectedIndex">Currently selected visible index.</param>
@@ -25,22 +25,22 @@ public sealed class TreeTableSelectionChangedEventArgs : EventArgs
     }
 
     /// <summary>
-    /// Gets the previously selected visible index.
+    ///     Gets the previously selected visible index.
     /// </summary>
     public int PreviousIndex { get; }
 
     /// <summary>
-    /// Gets the currently selected visible index.
+    ///     Gets the currently selected visible index.
     /// </summary>
     public int SelectedIndex { get; }
 
     /// <summary>
-    /// Gets the previously selected row.
+    ///     Gets the previously selected row.
     /// </summary>
     public TreeTableNode? PreviousItem { get; }
 
     /// <summary>
-    /// Gets the currently selected row.
+    ///     Gets the currently selected row.
     /// </summary>
     public TreeTableNode? SelectedItem { get; }
 }

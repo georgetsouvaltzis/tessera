@@ -1,4 +1,5 @@
 using System.ComponentModel;
+using Tessera.Core.Abstractions;
 using Tessera.Internal;
 using Tessera.Widgets.Internal;
 
@@ -25,6 +26,8 @@ internal sealed class TextInputModel
 
     public bool HasSelection => SelectionAnchor is int anchor && anchor != Cursor;
 
+    private TextInputBufferState State => new(Value, Cursor, SelectionAnchor);
+
     public void SetValue(string value)
     {
         Apply(TextInputBuffer.SetValue(State, value, MaxLength));
@@ -37,7 +40,7 @@ internal sealed class TextInputModel
         SelectionAnchor = null;
     }
 
-    public TextInputUpdateResult Update(global::Tessera.Core.Abstractions.IMessage message, TextInputKeyMap? keyMap = null)
+    public TextInputUpdateResult Update(IMessage message, TextInputKeyMap? keyMap = null)
     {
         return Update(TesseraMessageAdapter.ToPublic(message), keyMap);
     }
@@ -65,27 +68,29 @@ internal sealed class TextInputModel
                 return Apply(TextInputBuffer.InsertText(State, "\n", MaxLength));
             }
 
-            return new TextInputUpdateResult(Changed: false, Submitted: true);
+            return new TextInputUpdateResult(false, true);
         }
 
         if (keyMap.SelectAll.Matches(key))
         {
             SelectionAnchor = 0;
             Cursor = Value.Length;
-            return new TextInputUpdateResult(Changed: false, Submitted: false);
+            return new TextInputUpdateResult(false, false);
         }
 
         var extendSelection = key.Modifiers.HasFlag(ModifierKeys.Shift);
 
         if (keyMap.WordLeft.Matches(key))
         {
-            Apply(TextInputSelection.MoveCursor(State, TextInputSelection.FindWordBoundaryLeft(Value, Cursor), extendSelection));
+            Apply(TextInputSelection.MoveCursor(State, TextInputSelection.FindWordBoundaryLeft(Value, Cursor),
+                extendSelection));
             return default;
         }
 
         if (keyMap.WordRight.Matches(key))
         {
-            Apply(TextInputSelection.MoveCursor(State, TextInputSelection.FindWordBoundaryRight(Value, Cursor), extendSelection));
+            Apply(TextInputSelection.MoveCursor(State, TextInputSelection.FindWordBoundaryRight(Value, Cursor),
+                extendSelection));
             return default;
         }
 
@@ -103,13 +108,15 @@ internal sealed class TextInputModel
 
         if (Multiline && key.Key == Key.Up)
         {
-            Apply(TextInputSelection.MoveCursor(State, TextInputSelection.MoveVerticalLine(Value, Cursor, -1), extendSelection));
+            Apply(TextInputSelection.MoveCursor(State, TextInputSelection.MoveVerticalLine(Value, Cursor, -1),
+                extendSelection));
             return default;
         }
 
         if (Multiline && key.Key == Key.Down)
         {
-            Apply(TextInputSelection.MoveCursor(State, TextInputSelection.MoveVerticalLine(Value, Cursor, 1), extendSelection));
+            Apply(TextInputSelection.MoveCursor(State, TextInputSelection.MoveVerticalLine(Value, Cursor, 1),
+                extendSelection));
             return default;
         }
 
@@ -162,8 +169,6 @@ internal sealed class TextInputModel
         return TextInputFrameBuilder.Build(Value, Placeholder, Multiline, MaskInput, MaskCharacter, Cursor, width);
     }
 
-    private TextInputBufferState State => new(Value, Cursor, SelectionAnchor);
-
     private void Apply(TextInputBufferState state)
     {
         Value = state.Value;
@@ -174,6 +179,6 @@ internal sealed class TextInputModel
     private TextInputUpdateResult Apply((TextInputBufferState State, bool Changed) result)
     {
         Apply(result.State);
-        return new TextInputUpdateResult(result.Changed, Submitted: false);
+        return new TextInputUpdateResult(result.Changed, false);
     }
 }

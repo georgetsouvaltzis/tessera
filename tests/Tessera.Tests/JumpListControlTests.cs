@@ -12,16 +12,12 @@ public sealed class JumpListControlTests
     [Test]
     public void ControlsJumpListKeyboardSelectionRaisesSelectionChanged()
     {
-        var control = new JumpList
-        {
-            Border = BorderStyle.None,
-            IsFocused = true,
-        };
+        var control = new JumpList { Border = BorderStyle.None, IsFocused = true };
         control.SetItems(
         [
             new JumpListItem("a", "Alpha"),
             new JumpListItem("b", "Beta"),
-            new JumpListItem("c", "Gamma"),
+            new JumpListItem("c", "Gamma")
         ]);
 
         ListSelectionChangedEventArgs<JumpListItem>? args = null;
@@ -40,15 +36,11 @@ public sealed class JumpListControlTests
     [Test]
     public void ControlsJumpListActivationRaisesActivatedFromKeyboardAndPointer()
     {
-        var control = new JumpList
-        {
-            Border = BorderStyle.None,
-            IsFocused = true,
-        };
+        var control = new JumpList { Border = BorderStyle.None, IsFocused = true };
         control.SetItems(
         [
             new JumpListItem("a", "Alpha"),
-            new JumpListItem("b", "Beta"),
+            new JumpListItem("b", "Beta")
         ]);
 
         JumpListActivatedEventArgs? activated = null;
@@ -74,15 +66,12 @@ public sealed class JumpListControlTests
     [Test]
     public void ControlsJumpListPointerSelectionUpdatesSelectedItem()
     {
-        var control = new JumpList
-        {
-            Border = BorderStyle.None,
-        };
+        var control = new JumpList { Border = BorderStyle.None };
         control.SetItems(
         [
             new JumpListItem("a", "Alpha"),
             new JumpListItem("b", "Beta"),
-            new JumpListItem("c", "Gamma"),
+            new JumpListItem("c", "Gamma")
         ]);
 
         var handled = control.Handle(
@@ -106,12 +95,12 @@ public sealed class JumpListControlTests
             FocusedTitleStyle = TesseraStyle.Empty.WithForeground(AnsiColor.Rgb(77, 88, 99)),
             ItemStyle = TesseraStyle.Empty.WithForeground(AnsiColor.Rgb(10, 20, 30)),
             SelectedItemStyle = TesseraStyle.Empty.WithForeground(AnsiColor.Rgb(50, 60, 70)),
-            HoveredItemStyle = TesseraStyle.Empty.WithBackground(AnsiColor.Rgb(70, 80, 90)),
+            HoveredItemStyle = TesseraStyle.Empty.WithBackground(AnsiColor.Rgb(70, 80, 90))
         };
         control.SetItems(
         [
-            new JumpListItem("a", "Alpha", isPinned: true),
-            new JumpListItem("b", "Beta", isRecent: true),
+            new JumpListItem("a", "Alpha", true),
+            new JumpListItem("b", "Beta", isRecent: true)
         ]);
         _ = control.Handle(new PointerInput(PointerEventKind.Motion, PointerButton.None, 2, 2), new Rect(0, 0, 48, 8));
 
@@ -126,21 +115,18 @@ public sealed class JumpListControlTests
     [Test]
     public void ControlsJumpListDefaultRenderIsDeterministicAndMonochrome()
     {
-        var control = new JumpList
-        {
-            Border = BorderStyle.None,
-        };
+        var control = new JumpList { Border = BorderStyle.None };
         control.SetItems(
         [
-            new JumpListItem("a", "Alpha", isPinned: true),
-            new JumpListItem("b", "Beta", isRecent: true),
+            new JumpListItem("a", "Alpha", true),
+            new JumpListItem("b", "Beta", isRecent: true)
         ]);
 
         var first = Render(control, 48, 8);
         var second = Render(control, 48, 8);
 
         Assert.That(first, Is.EqualTo(second));
-        Assert.That(first.Contains("\u001b[", StringComparison.Ordinal), Is.False);
+        Assert.That(first.Contains("\e[", StringComparison.Ordinal), Is.False);
     }
 
     private static string Render(JumpList control, int width, int height)

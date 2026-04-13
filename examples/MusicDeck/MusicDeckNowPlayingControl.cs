@@ -1,6 +1,5 @@
 using Tessera.Components.Primitives;
 using Tessera.Controls;
-using Tessera.Layout;
 using Tessera.Styles;
 
 namespace Tessera.Examples.MusicDeck;
@@ -43,7 +42,8 @@ internal sealed class MusicDeckNowPlayingControl : Control
 
         WriteLine(canvas, content, 0, Render(TrackStyle, TrackTitle));
         WriteLine(canvas, content, 1, Render(ArtistStyle, ArtistLine));
-        WriteLine(canvas, content, 2, $"{Render(ChipStyle, $"[{SceneChip}]")} {Render(ChipStyle, $"[{DeviceChip}]")} {Render(ChipStyle, $"[{RoomChip}]")}");
+        WriteLine(canvas, content, 2,
+            $"{Render(ChipStyle, $"[{SceneChip}]")} {Render(ChipStyle, $"[{DeviceChip}]")} {Render(ChipStyle, $"[{RoomChip}]")}");
         WriteLine(canvas, content, 3, $"{Render(ProgressStyle, ProgressLine)}  {Render(SummaryStyle, RemainingLine)}");
         WriteLine(canvas, content, 4, Render(SummaryStyle, SummaryLine));
     }
@@ -58,5 +58,8 @@ internal sealed class MusicDeckNowPlayingControl : Control
         canvas.WriteText(content.X, content.Y + row, text, content.Width);
     }
 
-    private static string Render(TesseraStyle style, string text) => style.IsEmpty || string.IsNullOrEmpty(text) ? text : style.Render(text);
+    private static string Render(TesseraStyle style, string text)
+    {
+        return style.IsEmpty || string.IsNullOrEmpty(text) ? text : style.Render(text);
+    }
 }

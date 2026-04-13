@@ -7,107 +7,93 @@ using Tessera.Styles;
 namespace Tessera.Controls;
 
 /// <summary>
-/// Represents a selectable summary list of validation issues.
+///     Represents a selectable summary list of validation issues.
 /// </summary>
 public sealed class ValidationSummary : Control
 {
     private readonly List<ValidationIssue> _issues = [];
-    private int _selectedIndex = -1;
     private int _hoveredIndex = -1;
 
     /// <summary>
-    /// Occurs when <see cref="SelectedIndex" /> changes.
+    ///     Gets or sets the summary title.
     /// </summary>
-    public event EventHandler<ValidationSelectionChangedEventArgs>? SelectionChanged;
+    public string Title { get; set; } = "Validation";
 
     /// <summary>
-    /// Gets or sets the summary title.
+    ///     Gets or sets the marker shown in the title when focused.
     /// </summary>
-    public string Title
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = "Validation";
+    public string FocusMarker { get; set; } = "*";
 
     /// <summary>
-    /// Gets or sets the marker shown in the title when focused.
-    /// </summary>
-    public string FocusMarker
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = "*";
-
-    /// <summary>
-    /// Gets or sets a value indicating whether <see cref="FocusMarker" /> is shown while focused.
+    ///     Gets or sets a value indicating whether <see cref="FocusMarker" /> is shown while focused.
     /// </summary>
     public bool ShowFocusMarker { get; set; } = true;
 
     /// <summary>
-    /// Gets or sets the title style used when not focused.
+    ///     Gets or sets the title style used when not focused.
     /// </summary>
     public TesseraStyle TitleStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the title style used when focused.
+    ///     Gets or sets the title style used when focused.
     /// </summary>
     public TesseraStyle FocusedTitleStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the style applied to border glyphs when not focused.
+    ///     Gets or sets the style applied to border glyphs when not focused.
     /// </summary>
     public TesseraStyle BorderStyleText { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the style applied to border glyphs when focused.
+    ///     Gets or sets the style applied to border glyphs when focused.
     /// </summary>
     public TesseraStyle FocusedBorderStyleText { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the list border style.
+    ///     Gets or sets the list border style.
     /// </summary>
     public BorderStyle Border { get; set; } = BorderStyle.SingleLine;
 
     /// <summary>
-    /// Gets or sets inner padding for the issue list.
+    ///     Gets or sets inner padding for the issue list.
     /// </summary>
     public Thickness Padding { get; set; }
 
     /// <summary>
-    /// Gets or sets style used for rows before state/severity styles are merged.
+    ///     Gets or sets style used for rows before state/severity styles are merged.
     /// </summary>
     public TesseraStyle DefaultIssueStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets style merged into hovered rows.
+    ///     Gets or sets style merged into hovered rows.
     /// </summary>
     public TesseraStyle HoveredIssueStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets style merged into selected rows.
+    ///     Gets or sets style merged into selected rows.
     /// </summary>
     public TesseraStyle SelectedIssueStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets style merged into selected rows while the control is focused.
+    ///     Gets or sets style merged into selected rows while the control is focused.
     /// </summary>
     public TesseraStyle FocusedIssueStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets style merged into rows when the control is disabled.
+    ///     Gets or sets style merged into rows when the control is disabled.
     /// </summary>
     public TesseraStyle DisabledIssueStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets style merged into informational rows.
+    ///     Gets or sets style merged into informational rows.
     /// </summary>
     public TesseraStyle InfoSeverityStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets style merged into informational rows.
+    ///     Gets or sets style merged into informational rows.
     /// </summary>
     /// <remarks>
-    /// Alias for <see cref="InfoSeverityStyle"/> retained for style extension compatibility.
+    ///     Alias for <see cref="InfoSeverityStyle" /> retained for style extension compatibility.
     /// </remarks>
     public TesseraStyle InfoIssueStyle
     {
@@ -116,15 +102,15 @@ public sealed class ValidationSummary : Control
     }
 
     /// <summary>
-    /// Gets or sets style merged into warning rows.
+    ///     Gets or sets style merged into warning rows.
     /// </summary>
     public TesseraStyle WarningSeverityStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets style merged into warning rows.
+    ///     Gets or sets style merged into warning rows.
     /// </summary>
     /// <remarks>
-    /// Alias for <see cref="WarningSeverityStyle"/> retained for style extension compatibility.
+    ///     Alias for <see cref="WarningSeverityStyle" /> retained for style extension compatibility.
     /// </remarks>
     public TesseraStyle WarningIssueStyle
     {
@@ -133,15 +119,15 @@ public sealed class ValidationSummary : Control
     }
 
     /// <summary>
-    /// Gets or sets style merged into error rows.
+    ///     Gets or sets style merged into error rows.
     /// </summary>
     public TesseraStyle ErrorSeverityStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets style merged into error rows.
+    ///     Gets or sets style merged into error rows.
     /// </summary>
     /// <remarks>
-    /// Alias for <see cref="ErrorSeverityStyle"/> retained for style extension compatibility.
+    ///     Alias for <see cref="ErrorSeverityStyle" /> retained for style extension compatibility.
     /// </remarks>
     public TesseraStyle ErrorIssueStyle
     {
@@ -150,15 +136,15 @@ public sealed class ValidationSummary : Control
     }
 
     /// <summary>
-    /// Gets or sets style used for empty-state text.
+    ///     Gets or sets style used for empty-state text.
     /// </summary>
     public TesseraStyle EmptyStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets style merged into rows when disabled.
+    ///     Gets or sets style merged into rows when disabled.
     /// </summary>
     /// <remarks>
-    /// Alias for <see cref="DisabledIssueStyle"/> retained for style extension compatibility.
+    ///     Alias for <see cref="DisabledIssueStyle" /> retained for style extension compatibility.
     /// </remarks>
     public TesseraStyle DisabledStyle
     {
@@ -167,29 +153,25 @@ public sealed class ValidationSummary : Control
     }
 
     /// <summary>
-    /// Gets or sets the text rendered when no issues are available.
+    ///     Gets or sets the text rendered when no issues are available.
     /// </summary>
-    public string EmptyText
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = "(no issues)";
+    public string EmptyText { get; set; } = "(no issues)";
 
     /// <summary>
-    /// Gets current issues.
+    ///     Gets current issues.
     /// </summary>
     public IReadOnlyList<ValidationIssue> Issues => _issues;
 
     /// <summary>
-    /// Gets the selected issue index, or <c>-1</c> when there are no issues.
+    ///     Gets the selected issue index, or <c>-1</c> when there are no issues.
     /// </summary>
-    public int SelectedIndex => _selectedIndex;
+    public int SelectedIndex { get; private set; } = -1;
 
     /// <summary>
-    /// Gets the currently selected issue, if any.
+    ///     Gets the currently selected issue, if any.
     /// </summary>
-    public ValidationIssue? SelectedItem => _selectedIndex >= 0 && _selectedIndex < _issues.Count
-        ? _issues[_selectedIndex]
+    public ValidationIssue? SelectedItem => SelectedIndex >= 0 && SelectedIndex < _issues.Count
+        ? _issues[SelectedIndex]
         : null;
 
     /// <inheritdoc />
@@ -202,13 +184,18 @@ public sealed class ValidationSummary : Control
     public override bool IsReadOnly { get; set; }
 
     /// <summary>
-    /// Replaces all issues shown by the summary.
+    ///     Occurs when <see cref="SelectedIndex" /> changes.
+    /// </summary>
+    public event EventHandler<ValidationSelectionChangedEventArgs>? SelectionChanged;
+
+    /// <summary>
+    ///     Replaces all issues shown by the summary.
     /// </summary>
     /// <param name="issues">The issues to render.</param>
     public void SetIssues(IEnumerable<ValidationIssue> issues)
     {
         ArgumentNullException.ThrowIfNull(issues);
-        var previousIndex = _selectedIndex;
+        var previousIndex = SelectedIndex;
         var previousItem = SelectedItem;
 
         _issues.Clear();
@@ -219,13 +206,13 @@ public sealed class ValidationSummary : Control
 
         if (_issues.Count == 0)
         {
-            _selectedIndex = -1;
+            SelectedIndex = -1;
             _hoveredIndex = -1;
         }
         else
         {
-            var seed = _selectedIndex < 0 ? 0 : _selectedIndex;
-            _selectedIndex = Math.Clamp(seed, 0, _issues.Count - 1);
+            var seed = SelectedIndex < 0 ? 0 : SelectedIndex;
+            SelectedIndex = Math.Clamp(seed, 0, _issues.Count - 1);
             _hoveredIndex = Math.Clamp(_hoveredIndex, -1, _issues.Count - 1);
         }
 
@@ -233,25 +220,25 @@ public sealed class ValidationSummary : Control
     }
 
     /// <summary>
-    /// Clears all issues from the summary.
+    ///     Clears all issues from the summary.
     /// </summary>
     public void ClearIssues()
     {
-        if (_issues.Count == 0 && _selectedIndex == -1)
+        if (_issues.Count == 0 && SelectedIndex == -1)
         {
             return;
         }
 
-        var previousIndex = _selectedIndex;
+        var previousIndex = SelectedIndex;
         var previousItem = SelectedItem;
         _issues.Clear();
-        _selectedIndex = -1;
+        SelectedIndex = -1;
         _hoveredIndex = -1;
         RaiseSelectionChangedIfNeeded(previousIndex, previousItem);
     }
 
     /// <summary>
-    /// Sets the selected issue index using bounds clamping.
+    ///     Sets the selected issue index using bounds clamping.
     /// </summary>
     /// <param name="index">The requested index.</param>
     /// <returns><see langword="true" /> when selection changed; otherwise <see langword="false" />.</returns>
@@ -263,14 +250,14 @@ public sealed class ValidationSummary : Control
         }
 
         var clamped = Math.Clamp(index, 0, _issues.Count - 1);
-        if (clamped == _selectedIndex)
+        if (clamped == SelectedIndex)
         {
             return false;
         }
 
-        var previousIndex = _selectedIndex;
+        var previousIndex = SelectedIndex;
         var previousItem = SelectedItem;
-        _selectedIndex = clamped;
+        SelectedIndex = clamped;
         RaiseSelectionChangedIfNeeded(previousIndex, previousItem);
         return true;
     }
@@ -285,12 +272,12 @@ public sealed class ValidationSummary : Control
 
         if (key.Is(Key.Down) || key.IsCharacter('j'))
         {
-            return SetSelectedIndex(_selectedIndex + 1);
+            return SetSelectedIndex(SelectedIndex + 1);
         }
 
         if (key.Is(Key.Up) || key.IsCharacter('k'))
         {
-            return SetSelectedIndex(_selectedIndex - 1);
+            return SetSelectedIndex(SelectedIndex - 1);
         }
 
         if (key.Is(Key.Home))
@@ -349,12 +336,12 @@ public sealed class ValidationSummary : Control
         {
             if (pointer.Button == PointerButton.WheelDown)
             {
-                return SetSelectedIndex(_selectedIndex + 1) || changed;
+                return SetSelectedIndex(SelectedIndex + 1) || changed;
             }
 
             if (pointer.Button == PointerButton.WheelUp)
             {
-                return SetSelectedIndex(_selectedIndex - 1) || changed;
+                return SetSelectedIndex(SelectedIndex - 1) || changed;
             }
 
             return changed;
@@ -396,7 +383,8 @@ public sealed class ValidationSummary : Control
         }
 
         var title = Border == BorderStyle.None ? null : RenderTitle();
-        var content = FrameLayout.DrawFrameAndResolveContent(canvas, clipped, title, Border, Padding, ResolveBorderStyleText());
+        var content =
+            FrameLayout.DrawFrameAndResolveContent(canvas, clipped, title, Border, Padding, ResolveBorderStyleText());
         if (content.IsEmpty)
         {
             return;
@@ -414,11 +402,12 @@ public sealed class ValidationSummary : Control
         {
             var index = start + row;
             var issue = _issues[index];
-            var selected = index == _selectedIndex;
+            var selected = index == SelectedIndex;
             var hovered = index == _hoveredIndex;
             var marker = selected ? ">" : " ";
             var line = $"{marker} [{ResolveSeverityMarker(issue.Severity)}] {ResolveIssueText(issue)}";
-            canvas.WriteText(content.X, content.Y + row, ApplyStyle(line, ResolveRowStyle(issue, selected, hovered)), content.Width);
+            canvas.WriteText(content.X, content.Y + row, ApplyStyle(line, ResolveRowStyle(issue, selected, hovered)),
+                content.Width);
         }
     }
 
@@ -453,8 +442,8 @@ public sealed class ValidationSummary : Control
             return 0;
         }
 
-        var anchor = _selectedIndex < 0 ? 0 : _selectedIndex;
-        return Math.Clamp(anchor - (viewportHeight / 2), 0, Math.Max(0, _issues.Count - viewportHeight));
+        var anchor = SelectedIndex < 0 ? 0 : SelectedIndex;
+        return Math.Clamp(anchor - viewportHeight / 2, 0, Math.Max(0, _issues.Count - viewportHeight));
     }
 
     private int ResolveIndexFromPointer(Rect content, int pointerY)
@@ -482,14 +471,14 @@ public sealed class ValidationSummary : Control
 
     private void RaiseSelectionChangedIfNeeded(int previousIndex, ValidationIssue? previousItem)
     {
-        if (previousIndex == _selectedIndex && ReferenceEquals(previousItem, SelectedItem))
+        if (previousIndex == SelectedIndex && ReferenceEquals(previousItem, SelectedItem))
         {
             return;
         }
 
         SelectionChanged?.Invoke(
             this,
-            new ValidationSelectionChangedEventArgs(previousIndex, _selectedIndex, previousItem, SelectedItem));
+            new ValidationSelectionChangedEventArgs(previousIndex, SelectedIndex, previousItem, SelectedItem));
     }
 
     private string RenderTitle()
@@ -547,7 +536,7 @@ public sealed class ValidationSummary : Control
         {
             ValidationSeverity.Info => InfoSeverityStyle,
             ValidationSeverity.Warning => WarningSeverityStyle,
-            _ => ErrorSeverityStyle,
+            _ => ErrorSeverityStyle
         };
     }
 
@@ -568,13 +557,13 @@ public sealed class ValidationSummary : Control
         {
             ValidationSeverity.Info => 'I',
             ValidationSeverity.Warning => 'W',
-            _ => 'E',
+            _ => 'E'
         };
     }
 
     private static string ResolveIssueText(ValidationIssue issue)
     {
-        var message = issue.Message ?? string.Empty;
+        var message = issue.Message;
         if (string.IsNullOrWhiteSpace(issue.Field))
         {
             return message;

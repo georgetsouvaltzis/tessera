@@ -1,33 +1,33 @@
 namespace Tessera.Controls;
 
 /// <summary>
-/// Represents service health severity for <see cref="HealthService" /> rows.
+///     Represents service health severity for <see cref="HealthService" /> rows.
 /// </summary>
 public enum HealthServiceSeverity
 {
     /// <summary>
-    /// Service is operating normally.
+    ///     Service is operating normally.
     /// </summary>
     Healthy = 0,
 
     /// <summary>
-    /// Service is operating with reduced reliability.
+    ///     Service is operating with reduced reliability.
     /// </summary>
     Degraded = 1,
 
     /// <summary>
-    /// Service is unavailable or in outage state.
+    ///     Service is unavailable or in outage state.
     /// </summary>
-    Outage = 2,
+    Outage = 2
 }
 
 /// <summary>
-/// Represents one service row rendered by <see cref="HealthBoard" />.
+///     Represents one service row rendered by <see cref="HealthBoard" />.
 /// </summary>
 public sealed class HealthService
 {
     /// <summary>
-    /// Initializes a service health row.
+    ///     Initializes a service health row.
     /// </summary>
     /// <param name="id">Stable service identifier.</param>
     /// <param name="name">Display name.</param>
@@ -41,73 +41,56 @@ public sealed class HealthService
         string? summary = null,
         DateTimeOffset? observedAt = null)
     {
-        Id = id ?? string.Empty;
-        Name = name ?? string.Empty;
+        Id = id;
+        Name = name;
         Severity = severity;
         Summary = summary ?? string.Empty;
         ObservedAt = observedAt ?? DateTimeOffset.UtcNow;
     }
 
     /// <summary>
-    /// Gets or sets service identifier.
+    ///     Gets or sets service identifier.
     /// </summary>
-    public string Id
-    {
-        get;
-        set => field = value ?? string.Empty;
-    }
+    public string Id { get; set; }
 
     /// <summary>
-    /// Gets or sets service display name.
+    ///     Gets or sets service display name.
     /// </summary>
-    public string Name
-    {
-        get;
-        set => field = value ?? string.Empty;
-    }
+    public string Name { get; set; }
 
     /// <summary>
-    /// Gets or sets health severity.
+    ///     Gets or sets health severity.
     /// </summary>
     public HealthServiceSeverity Severity { get; set; }
 
     /// <summary>
-    /// Gets or sets optional status summary text.
+    ///     Gets or sets optional status summary text.
     /// </summary>
-    public string Summary
-    {
-        get;
-        set => field = value ?? string.Empty;
-    }
+    public string Summary { get; set; }
 
     /// <summary>
-    /// Gets or sets observed timestamp.
+    ///     Gets or sets observed timestamp.
     /// </summary>
     public DateTimeOffset ObservedAt { get; set; }
 
     /// <summary>
-    /// Gets or sets whether the service alert has been acknowledged.
+    ///     Gets or sets whether the service alert has been acknowledged.
     /// </summary>
     public bool IsAcknowledged { get; set; }
 
     /// <summary>
-    /// Gets or sets whether the row should render muted.
+    ///     Gets or sets whether the row should render muted.
     /// </summary>
     public bool IsMuted { get; set; }
 }
 
 /// <summary>
-/// Defines glyphs used by <see cref="HealthBoard" />.
+///     Defines glyphs used by <see cref="HealthBoard" />.
 /// </summary>
 public readonly record struct HealthBoardGlyphSet
 {
     /// <summary>
-    /// Gets the built-in glyph set.
-    /// </summary>
-    public static HealthBoardGlyphSet Default => new();
-
-    /// <summary>
-    /// Initializes a glyph set with built-in defaults.
+    ///     Initializes a glyph set with built-in defaults.
     /// </summary>
     public HealthBoardGlyphSet()
     {
@@ -122,7 +105,7 @@ public readonly record struct HealthBoardGlyphSet
     }
 
     /// <summary>
-    /// Initializes a glyph set.
+    ///     Initializes a glyph set.
     /// </summary>
     /// <param name="normalRowMarker">Marker for non-selected and non-hovered rows.</param>
     /// <param name="selectedRowMarker">Marker for selected rows.</param>
@@ -142,53 +125,58 @@ public readonly record struct HealthBoardGlyphSet
         string acknowledgedGlyph,
         string markerSeparator)
     {
-        NormalRowMarker = normalRowMarker ?? string.Empty;
-        SelectedRowMarker = selectedRowMarker ?? string.Empty;
-        HoveredRowMarker = hoveredRowMarker ?? string.Empty;
-        HealthyGlyph = healthyGlyph ?? string.Empty;
-        DegradedGlyph = degradedGlyph ?? string.Empty;
-        OutageGlyph = outageGlyph ?? string.Empty;
-        AcknowledgedGlyph = acknowledgedGlyph ?? string.Empty;
-        MarkerSeparator = markerSeparator ?? string.Empty;
+        NormalRowMarker = normalRowMarker;
+        SelectedRowMarker = selectedRowMarker;
+        HoveredRowMarker = hoveredRowMarker;
+        HealthyGlyph = healthyGlyph;
+        DegradedGlyph = degradedGlyph;
+        OutageGlyph = outageGlyph;
+        AcknowledgedGlyph = acknowledgedGlyph;
+        MarkerSeparator = markerSeparator;
     }
 
     /// <summary>
-    /// Gets the marker for non-selected and non-hovered rows.
+    ///     Gets the built-in glyph set.
+    /// </summary>
+    public static HealthBoardGlyphSet Default => new();
+
+    /// <summary>
+    ///     Gets the marker for non-selected and non-hovered rows.
     /// </summary>
     public string NormalRowMarker { get; init; }
 
     /// <summary>
-    /// Gets the marker for selected rows.
+    ///     Gets the marker for selected rows.
     /// </summary>
     public string SelectedRowMarker { get; init; }
 
     /// <summary>
-    /// Gets the marker for hovered rows.
+    ///     Gets the marker for hovered rows.
     /// </summary>
     public string HoveredRowMarker { get; init; }
 
     /// <summary>
-    /// Gets the glyph for healthy services.
+    ///     Gets the glyph for healthy services.
     /// </summary>
     public string HealthyGlyph { get; init; }
 
     /// <summary>
-    /// Gets the glyph for degraded services.
+    ///     Gets the glyph for degraded services.
     /// </summary>
     public string DegradedGlyph { get; init; }
 
     /// <summary>
-    /// Gets the glyph for outage services.
+    ///     Gets the glyph for outage services.
     /// </summary>
     public string OutageGlyph { get; init; }
 
     /// <summary>
-    /// Gets the glyph for acknowledged rows.
+    ///     Gets the glyph for acknowledged rows.
     /// </summary>
     public string AcknowledgedGlyph { get; init; }
 
     /// <summary>
-    /// Gets the separator between marker, status, and text segments.
+    ///     Gets the separator between marker, status, and text segments.
     /// </summary>
     public string MarkerSeparator { get; init; }
 }

@@ -1,6 +1,3 @@
-using Tessera.Components.Composition;
-using Tessera.Components.Primitives;
-using Tessera.Components.Styling;
 using System.Text;
 using Tessera.Core.Abstractions;
 using Tessera.Core.Input;
@@ -13,21 +10,31 @@ internal static class TerminalReaderBehaviorTests
     public static IEnumerable<TestCase> Cases()
     {
         yield return new TestCase("TerminalReader_BracketedPaste_AggregatesContent", BracketedPaste_AggregatesContent);
-        yield return new TestCase("TerminalReader_ChunkedStream_DecodesMixedSequences", ChunkedStream_DecodesMixedSequences);
-        yield return new TestCase("TerminalReader_SplitSgrMouseAcrossTimeout_DoesNotLeakCharacterFragments", SplitSgrMouseAcrossTimeout_DoesNotLeakCharacterFragments);
-        yield return new TestCase("TerminalReader_SplitSgrMouseFollowedByFilterText_DoesNotLeakMouseBytesIntoCharacters", SplitSgrMouseFollowedByFilterText_DoesNotLeakMouseBytesIntoCharacters);
-        yield return new TestCase("TerminalReader_SplitSgrMouseReleaseFollowedByFilterText_DoesNotLeakMouseBytesIntoCharacters", SplitSgrMouseReleaseFollowedByFilterText_DoesNotLeakMouseBytesIntoCharacters);
-        yield return new TestCase("TerminalReader_SplitCsiControlAcrossTimeout_DoesNotLeakCharacterFragments", SplitCsiControlAcrossTimeout_DoesNotLeakCharacterFragments);
-        yield return new TestCase("TerminalReader_TrailingEscape_EmitsEscapeAfterTimeout", TrailingEscape_EmitsEscapeAfterTimeout);
-        yield return new TestCase("TerminalReader_EscapeThenDelayedChar_EmitsEscapeThenChar", EscapeThenDelayedChar_EmitsEscapeThenChar);
-        yield return new TestCase("TerminalReader_EscapeThenImmediateChar_EmitsAltChar", EscapeThenImmediateChar_EmitsAltChar);
+        yield return new TestCase("TerminalReader_ChunkedStream_DecodesMixedSequences",
+            ChunkedStream_DecodesMixedSequences);
+        yield return new TestCase("TerminalReader_SplitSgrMouseAcrossTimeout_DoesNotLeakCharacterFragments",
+            SplitSgrMouseAcrossTimeout_DoesNotLeakCharacterFragments);
+        yield return new TestCase(
+            "TerminalReader_SplitSgrMouseFollowedByFilterText_DoesNotLeakMouseBytesIntoCharacters",
+            SplitSgrMouseFollowedByFilterText_DoesNotLeakMouseBytesIntoCharacters);
+        yield return new TestCase(
+            "TerminalReader_SplitSgrMouseReleaseFollowedByFilterText_DoesNotLeakMouseBytesIntoCharacters",
+            SplitSgrMouseReleaseFollowedByFilterText_DoesNotLeakMouseBytesIntoCharacters);
+        yield return new TestCase("TerminalReader_SplitCsiControlAcrossTimeout_DoesNotLeakCharacterFragments",
+            SplitCsiControlAcrossTimeout_DoesNotLeakCharacterFragments);
+        yield return new TestCase("TerminalReader_TrailingEscape_EmitsEscapeAfterTimeout",
+            TrailingEscape_EmitsEscapeAfterTimeout);
+        yield return new TestCase("TerminalReader_EscapeThenDelayedChar_EmitsEscapeThenChar",
+            EscapeThenDelayedChar_EmitsEscapeThenChar);
+        yield return new TestCase("TerminalReader_EscapeThenImmediateChar_EmitsAltChar",
+            EscapeThenImmediateChar_EmitsAltChar);
         yield return new TestCase("TerminalReader_CancelledWhileReadPending_Exits", CancelledWhileReadPending_Exits);
     }
 
     private static async Task BracketedPaste_AggregatesContent()
     {
         // Arrange
-        var stream = new MemoryStream(Encoding.UTF8.GetBytes("\u001b[200~hello\nworld\u001b[201~"));
+        var stream = new MemoryStream(Encoding.UTF8.GetBytes("\e[200~hello\nworld\e[201~"));
         var reader = new TerminalReader(stream, new EventDecoder(), TimeSpan.FromMilliseconds(10));
         var events = new List<IMessage>();
 
@@ -37,15 +44,16 @@ internal static class TerminalReaderBehaviorTests
         // Assert
         TestAssert.Equal(3, events.Count, "Reader should emit exactly three messages for bracketed paste");
         TestAssert.True(events[0] is PasteStartMsg, "First message should be PasteStartMsg.");
-        TestAssert.True(events[1] is PasteMsg { Content: "hello\nworld" }, "Second message should be aggregated PasteMsg.");
+        TestAssert.True(events[1] is PasteMsg { Content: "hello\nworld" },
+            "Second message should be aggregated PasteMsg.");
         TestAssert.True(events[2] is PasteEndMsg, "Third message should be PasteEndMsg.");
     }
 
     private static async Task ChunkedStream_DecodesMixedSequences()
     {
         // Arrange
-        var payload = Encoding.UTF8.GetBytes("\u001b[A\u001b[200~ab\ncd\u001b[201~\u001b[<26;4;6M");
-        var stream = new ChunkedReadStream(payload, maxChunkSize: 1);
+        var payload = Encoding.UTF8.GetBytes("\e[A\e[200~ab\ncd\e[201~\e[<26;4;6M");
+        var stream = new ChunkedReadStream(payload, 1);
         var reader = new TerminalReader(stream, new EventDecoder(), TimeSpan.FromMilliseconds(10));
         var events = new List<IMessage>();
 
@@ -64,7 +72,7 @@ internal static class TerminalReaderBehaviorTests
                 Button: MouseButton.Right,
                 X: 3,
                 Y: 5,
-                Modifiers: KeyModifiers.Ctrl | KeyModifiers.Alt,
+                Modifiers: KeyModifiers.Ctrl | KeyModifiers.Alt
             },
             "Fifth message should be Alt+Ctrl right-click mouse message.");
     }
@@ -91,8 +99,8 @@ internal static class TerminalReaderBehaviorTests
         // Arrange
         var stream = new TimedChunkReadStream(
         [
-            (Encoding.UTF8.GetBytes("\u001b[<26;4;"), 0),
-            (Encoding.UTF8.GetBytes("6M"), 35),
+            (Encoding.UTF8.GetBytes("\e[<26;4;"), 0),
+            (Encoding.UTF8.GetBytes("6M"), 35)
         ]);
         var reader = new TerminalReader(stream, new EventDecoder(), TimeSpan.FromMilliseconds(10));
         var events = new List<IMessage>();
@@ -108,7 +116,7 @@ internal static class TerminalReaderBehaviorTests
                 Button: MouseButton.Right,
                 X: 3,
                 Y: 5,
-                Modifiers: KeyModifiers.Ctrl | KeyModifiers.Alt,
+                Modifiers: KeyModifiers.Ctrl | KeyModifiers.Alt
             },
             "Split SGR mouse sequence should preserve right-click + ctrl/alt modifiers.");
         AssertNoCharacterLeak(events, "Split SGR mouse sequence should not emit character key fragments.");
@@ -119,8 +127,8 @@ internal static class TerminalReaderBehaviorTests
         // Arrange
         var stream = new TimedChunkReadStream(
         [
-            (Encoding.UTF8.GetBytes("\u001b[?1006;"), 0),
-            (Encoding.UTF8.GetBytes("1$y"), 35),
+            (Encoding.UTF8.GetBytes("\e[?1006;"), 0),
+            (Encoding.UTF8.GetBytes("1$y"), 35)
         ]);
         var reader = new TerminalReader(stream, new EventDecoder(), TimeSpan.FromMilliseconds(10));
         var events = new List<IMessage>();
@@ -141,9 +149,9 @@ internal static class TerminalReaderBehaviorTests
         // Arrange
         var stream = new TimedChunkReadStream(
         [
-            (Encoding.UTF8.GetBytes("\u001b[<26;4;"), 0),
+            (Encoding.UTF8.GetBytes("\e[<26;4;"), 0),
             (Encoding.UTF8.GetBytes("6M"), 35),
-            (Encoding.UTF8.GetBytes("be"), 0),
+            (Encoding.UTF8.GetBytes("be"), 0)
         ]);
         var reader = new TerminalReader(stream, new EventDecoder(), TimeSpan.FromMilliseconds(10));
         var events = new List<IMessage>();
@@ -159,7 +167,7 @@ internal static class TerminalReaderBehaviorTests
                 Button: MouseButton.Right,
                 X: 3,
                 Y: 5,
-                Modifiers: KeyModifiers.Ctrl | KeyModifiers.Alt,
+                Modifiers: KeyModifiers.Ctrl | KeyModifiers.Alt
             },
             "Split SGR mouse click should decode before typed filter text.");
         AssertCharacterTextAfterMouse(events, "be", "Filter text should remain clean after split mouse sequence.");
@@ -170,9 +178,9 @@ internal static class TerminalReaderBehaviorTests
         // Arrange
         var stream = new TimedChunkReadStream(
         [
-            (Encoding.UTF8.GetBytes("\u001b[<0;8;"), 0),
+            (Encoding.UTF8.GetBytes("\e[<0;8;"), 0),
             (Encoding.UTF8.GetBytes("3m"), 35),
-            (Encoding.UTF8.GetBytes("go"), 0),
+            (Encoding.UTF8.GetBytes("go"), 0)
         ]);
         var reader = new TerminalReader(stream, new EventDecoder(), TimeSpan.FromMilliseconds(10));
         var events = new List<IMessage>();
@@ -188,10 +196,11 @@ internal static class TerminalReaderBehaviorTests
                 Button: MouseButton.Left,
                 X: 7,
                 Y: 2,
-                Modifiers: KeyModifiers.None,
+                Modifiers: KeyModifiers.None
             },
             "Split SGR mouse release should decode before typed filter text.");
-        AssertCharacterTextAfterMouse(events, "go", "Filter text should remain clean after split mouse-release sequence.");
+        AssertCharacterTextAfterMouse(events, "go",
+            "Filter text should remain clean after split mouse-release sequence.");
     }
 
     private static async Task EscapeThenDelayedChar_EmitsEscapeThenChar()
@@ -243,7 +252,8 @@ internal static class TerminalReaderBehaviorTests
         await run.WaitAsync(TimeSpan.FromSeconds(1)).ConfigureAwait(false);
 
         // Assert
-        TestAssert.True(run.IsCompletedSuccessfully, "Reader should exit when cancellation is requested even if read is still pending.");
+        TestAssert.True(run.IsCompletedSuccessfully,
+            "Reader should exit when cancellation is requested even if read is still pending.");
     }
 
     private static void AssertNoCharacterLeak(List<IMessage> events, string message)
@@ -380,7 +390,8 @@ internal static class TerminalReaderBehaviorTests
             throw new NotSupportedException();
         }
 
-        public override async ValueTask<int> ReadAsync(Memory<byte> buffer, CancellationToken cancellationToken = default)
+        public override async ValueTask<int> ReadAsync(Memory<byte> buffer,
+            CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
             if (_chunkIndex >= chunks.Length)
@@ -421,7 +432,8 @@ internal static class TerminalReaderBehaviorTests
 
     private sealed class BlockingReadStream : Stream
     {
-        private readonly TaskCompletionSource<int> _pendingRead = new(TaskCreationOptions.RunContinuationsAsynchronously);
+        private readonly TaskCompletionSource<int> _pendingRead =
+            new(TaskCreationOptions.RunContinuationsAsynchronously);
 
         public override bool CanRead => true;
 

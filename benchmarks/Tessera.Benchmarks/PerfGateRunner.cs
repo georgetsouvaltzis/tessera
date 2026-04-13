@@ -1,7 +1,5 @@
 using System.Text.Json;
 
-using System.Diagnostics.CodeAnalysis;
-
 namespace Tessera.Benchmarks;
 
 internal static class PerfGateRunner
@@ -10,10 +8,11 @@ internal static class PerfGateRunner
     private const string BaselineSchema = "tessera-perf-gate-baseline-v1";
     private const int WarmupCount = 2;
     private const int MeasurementCount = 10;
+
     private static readonly JsonSerializerOptions JsonOptions = new()
     {
         PropertyNameCaseInsensitive = true,
-        WriteIndented = true,
+        WriteIndented = true
     };
 
     public static bool TryRun(string[] args, out int exitCode)
@@ -107,7 +106,7 @@ internal static class PerfGateRunner
                     var benchmarks = new SloLatencyBenchmarks();
                     benchmarks.Setup();
                     return benchmarks.InputLatencyHeavyP95Ms;
-                }),
+                })
         };
 
         var measurements = new Dictionary<string, PerfGateMeasurement>(scenarios.Length, StringComparer.Ordinal);
@@ -180,13 +179,14 @@ internal static class PerfGateRunner
                     MaxMeanMs = scenario.MaxMeanMs,
                     MaxAllocatedBytes = scenario.MaxAllocatedBytes,
                     Pass = false,
-                    FailureReason = "missing benchmark measurement",
+                    FailureReason = "missing benchmark measurement"
                 });
                 continue;
             }
 
             var meanPass = measurement.MeanMs <= scenario.MaxMeanMs;
-            var allocPass = !scenario.MaxAllocatedBytes.HasValue || measurement.AllocatedBytes <= scenario.MaxAllocatedBytes.Value;
+            var allocPass = !scenario.MaxAllocatedBytes.HasValue ||
+                            measurement.AllocatedBytes <= scenario.MaxAllocatedBytes.Value;
             var pass = meanPass && allocPass;
             if (!pass)
             {
@@ -201,7 +201,7 @@ internal static class PerfGateRunner
                 MaxMeanMs = scenario.MaxMeanMs,
                 MaxAllocatedBytes = scenario.MaxAllocatedBytes,
                 Pass = pass,
-                FailureReason = pass ? null : ResolveFailureReason(meanPass, allocPass),
+                FailureReason = pass ? null : ResolveFailureReason(meanPass, allocPass)
             });
         }
 
@@ -214,7 +214,7 @@ internal static class PerfGateRunner
             Runner = "direct-slo-runner",
             WarmupCount = WarmupCount,
             MeasurementCount = MeasurementCount,
-            ScenarioResults = scenarioResults,
+            ScenarioResults = scenarioResults
         };
     }
 
@@ -229,7 +229,7 @@ internal static class PerfGateRunner
                 BenchmarkId = scenario.BenchmarkId,
                 MaxMeanMs = scenario.MaxMeanMs,
                 MaxAllocatedBytes = scenario.MaxAllocatedBytes,
-                Pass = true,
+                Pass = true
             });
         }
 
@@ -242,7 +242,7 @@ internal static class PerfGateRunner
             Runner = "direct-slo-runner",
             WarmupCount = WarmupCount,
             MeasurementCount = MeasurementCount,
-            ScenarioResults = scenarioResults,
+            ScenarioResults = scenarioResults
         };
     }
 

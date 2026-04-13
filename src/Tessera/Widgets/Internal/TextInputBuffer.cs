@@ -10,7 +10,8 @@ internal static class TextInputBuffer
         return new TextInputBufferState(nextValue, Math.Clamp(state.Cursor, 0, nextValue.Length), null);
     }
 
-    public static (TextInputBufferState State, bool Changed) InsertText(TextInputBufferState state, string text, int maxLength)
+    public static (TextInputBufferState State, bool Changed) InsertText(TextInputBufferState state, string text,
+        int maxLength)
     {
         if (string.IsNullOrEmpty(text))
         {
@@ -47,11 +48,7 @@ internal static class TextInputBuffer
             return (state, false);
         }
 
-        return (state with
-        {
-            Value = state.Value.Remove(state.Cursor - 1, 1),
-            Cursor = state.Cursor - 1,
-        }, true);
+        return (state with { Value = state.Value.Remove(state.Cursor - 1, 1), Cursor = state.Cursor - 1 }, true);
     }
 
     public static (TextInputBufferState State, bool Changed) DeleteForward(TextInputBufferState state)
@@ -84,11 +81,7 @@ internal static class TextInputBuffer
             return (state, false);
         }
 
-        return (state with
-        {
-            Value = state.Value.Remove(start, state.Cursor - start),
-            Cursor = start,
-        }, true);
+        return (state with { Value = state.Value.Remove(start, state.Cursor - start), Cursor = start }, true);
     }
 
     public static (TextInputBufferState State, bool Changed) DeleteWordForward(TextInputBufferState state)

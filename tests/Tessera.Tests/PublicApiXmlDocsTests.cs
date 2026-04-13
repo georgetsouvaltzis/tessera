@@ -42,7 +42,7 @@ internal static class PublicApiXmlDocsTests
             "T:Tessera.ScreenOptions",
             "T:Tessera.Message",
             "T:Tessera.TesseraEffect",
-            "T:Tessera.TesseraEffects",
+            "T:Tessera.TesseraEffects"
         ];
 
         var docs = LoadDocumentation();
@@ -63,7 +63,7 @@ internal static class PublicApiXmlDocsTests
             "T:Tessera.TesseraRuntimeOptions",
             "T:Tessera.ScreenOptions",
             "T:Tessera.Message",
-            "T:Tessera.TesseraEffect",
+            "T:Tessera.TesseraEffect"
         ];
 
         var docs = LoadDocumentation();
@@ -93,7 +93,7 @@ internal static class PublicApiXmlDocsTests
             "M:Tessera.Screen.From(Tessera.Controls.Control)",
             "M:Tessera.ScreenContext.CreateCanvas(Tessera.Components.Primitives.CanvasTextMode)",
             "M:Tessera.TesseraEffects.Emit(Tessera.Message)",
-            "M:Tessera.TesseraEffects.Tick(System.TimeSpan,System.Func{System.DateTimeOffset,Tessera.Message})",
+            "M:Tessera.TesseraEffects.Tick(System.TimeSpan,System.Func{System.DateTimeOffset,Tessera.Message})"
         ];
 
         var docs = LoadDocumentation();
@@ -227,7 +227,7 @@ internal static class PublicApiXmlDocsTests
             "T:Tessera.Layout.ColumnLayout",
             "T:Tessera.Components.Primitives.Canvas",
             "T:Tessera.Thickness",
-            "T:Tessera.BorderStyle",
+            "T:Tessera.BorderStyle"
         ];
 
         var docs = LoadDocumentation();
@@ -256,7 +256,7 @@ internal static class PublicApiXmlDocsTests
             "M:Tessera.Controls.Sparkline.TrimToLast(System.Int32)",
             "P:Tessera.Controls.LineSeries.Capacity",
             "P:Tessera.Controls.ScatterPlot.Capacity",
-            "P:Tessera.Controls.LineSeries.ScaleMode",
+            "P:Tessera.Controls.LineSeries.ScaleMode"
         ];
 
         var docs = LoadDocumentation();
@@ -316,7 +316,7 @@ internal static class PublicApiXmlDocsTests
             "M:Tessera.Controls.QuickOpenOverlay.SetItems(System.Collections.Generic.IEnumerable{Tessera.Controls.QuickOpenItem})",
             "M:Tessera.Controls.QuickOpenOverlay.SetSelectedIndex(System.Int32)",
             "M:Tessera.Controls.QuickOpenOverlay.Open",
-            "M:Tessera.Controls.QuickOpenOverlay.Close",
+            "M:Tessera.Controls.QuickOpenOverlay.Close"
         ];
 
         var docs = LoadDocumentation();
@@ -362,7 +362,7 @@ internal static class PublicApiXmlDocsTests
             "M:Tessera.Controls.Sparkline.SetSamples(System.Collections.Generic.IEnumerable{System.Double})",
             "M:Tessera.Controls.Sparkline.Append(System.Double)",
             "P:Tessera.Controls.Spinner.Frames",
-            "M:Tessera.Controls.Spinner.SetFrames(System.Collections.Generic.IEnumerable{System.String})",
+            "M:Tessera.Controls.Spinner.SetFrames(System.Collections.Generic.IEnumerable{System.String})"
         ];
 
         var docs = LoadDocumentation();
@@ -388,13 +388,15 @@ internal static class PublicApiXmlDocsTests
         var member = docs.Root?
             .Element("members")?
             .Elements("member")
-            .SingleOrDefault(element => string.Equals((string?)element.Attribute("name"), memberName, StringComparison.Ordinal));
+            .SingleOrDefault(element =>
+                string.Equals((string?)element.Attribute("name"), memberName, StringComparison.Ordinal));
 
         TestAssert.True(member is not null, $"Expected XML documentation member {memberName}.");
 
         var tag = member!.Element(tagName);
         var content = tag?.Value?.Trim();
 
-        TestAssert.True(!string.IsNullOrWhiteSpace(content), $"{memberName} should include a non-empty <{tagName}> tag.");
+        TestAssert.True(!string.IsNullOrWhiteSpace(content),
+            $"{memberName} should include a non-empty <{tagName}> tag.");
     }
 }

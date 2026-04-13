@@ -12,19 +12,15 @@ public sealed class TaskRunnerPanelControlTests
     [Test]
     public void ControlsTaskRunnerPanelRendersStatusMarkersAndRows()
     {
-        var control = new TaskRunnerPanel
-        {
-            Border = BorderStyle.None,
-            ShowTimestamp = false,
-        };
+        var control = new TaskRunnerPanel { Border = BorderStyle.None, ShowTimestamp = false };
         control.SetItems(
         [
             new TaskRunItem("build", "Build", TaskRunStatus.Succeeded, "compiled"),
             new TaskRunItem("test", "Test", TaskRunStatus.Failed, "2 failed"),
-            new TaskRunItem("deploy", "Deploy", TaskRunStatus.Running, "publishing"),
+            new TaskRunItem("deploy", "Deploy", TaskRunStatus.Running, "publishing")
         ]);
 
-        var output = Render(control, width: 80, height: 4);
+        var output = Render(control, 80, 4);
 
         Assert.That(output.Contains("✓ OK Build - compiled", StringComparison.Ordinal), Is.True);
         Assert.That(output.Contains("✕ FAIL Test - 2 failed", StringComparison.Ordinal), Is.True);
@@ -34,17 +30,12 @@ public sealed class TaskRunnerPanelControlTests
     [Test]
     public void ControlsTaskRunnerPanelKeyboardAndPointerSelectionRaisesSelectionChanged()
     {
-        var control = new TaskRunnerPanel
-        {
-            Border = BorderStyle.None,
-            IsFocused = true,
-            ShowTimestamp = false,
-        };
+        var control = new TaskRunnerPanel { Border = BorderStyle.None, IsFocused = true, ShowTimestamp = false };
         control.SetItems(
         [
-            new TaskRunItem("build", "Build", TaskRunStatus.Queued),
-            new TaskRunItem("test", "Test", TaskRunStatus.Queued),
-            new TaskRunItem("deploy", "Deploy", TaskRunStatus.Queued),
+            new TaskRunItem("build", "Build"),
+            new TaskRunItem("test", "Test"),
+            new TaskRunItem("deploy", "Deploy")
         ]);
 
         var raised = 0;
@@ -56,7 +47,8 @@ public sealed class TaskRunnerPanelControlTests
         };
 
         var downHandled = control.Handle(new KeyPressed(Key.Down));
-        var clickHandled = control.Handle(new PointerInput(PointerEventKind.Press, PointerButton.Left, 2, 2), new Rect(0, 0, 64, 5));
+        var clickHandled = control.Handle(new PointerInput(PointerEventKind.Press, PointerButton.Left, 2, 2),
+            new Rect(0, 0, 64, 5));
 
         Assert.That(downHandled, Is.True);
         Assert.That(clickHandled, Is.True);
@@ -73,16 +65,17 @@ public sealed class TaskRunnerPanelControlTests
         {
             Border = BorderStyle.None,
             ShowTimestamp = false,
-            HoveredRowStyle = hoveredStyle,
+            HoveredRowStyle = hoveredStyle
         };
         control.SetItems(
         [
             new TaskRunItem("build", "Build"),
-            new TaskRunItem("test", "Test"),
+            new TaskRunItem("test", "Test")
         ]);
 
-        var handled = control.Handle(new PointerInput(PointerEventKind.Motion, PointerButton.None, 1, 1), new Rect(0, 0, 64, 4));
-        var output = Render(control, width: 64, height: 4);
+        var handled = control.Handle(new PointerInput(PointerEventKind.Motion, PointerButton.None, 1, 1),
+            new Rect(0, 0, 64, 4));
+        var output = Render(control, 64, 4);
 
         Assert.That(handled, Is.True);
         Assert.That(output.Contains("38;2;18;52;86", StringComparison.Ordinal), Is.True);
@@ -100,11 +93,11 @@ public sealed class TaskRunnerPanelControlTests
             BorderStyleText = TesseraStyle.Empty.WithForeground(AnsiColor.Rgb(10, 11, 12)),
             FocusedBorderStyleText = focusedBorderStyle,
             RunningStatusStyle = TesseraStyle.Empty.WithForeground(AnsiColor.Rgb(30, 40, 50)),
-            SelectedRowStyle = TesseraStyle.Empty.WithBackground(AnsiColor.Rgb(60, 70, 80)),
+            SelectedRowStyle = TesseraStyle.Empty.WithBackground(AnsiColor.Rgb(60, 70, 80))
         };
         control.SetItems([new TaskRunItem("deploy", "Deploy", TaskRunStatus.Running)]);
 
-        var output = Render(control, width: 48, height: 5);
+        var output = Render(control, 48, 5);
 
         Assert.That(output.Contains("38;2;30;40;50", StringComparison.Ordinal), Is.True);
         Assert.That(output.Contains("48;2;60;70;80", StringComparison.Ordinal), Is.True);
@@ -114,18 +107,14 @@ public sealed class TaskRunnerPanelControlTests
     [Test]
     public void ControlsTaskRunnerPanelRenderIsDeterministicWithoutStyles()
     {
-        var control = new TaskRunnerPanel
-        {
-            Border = BorderStyle.None,
-            ShowTimestamp = false,
-        };
+        var control = new TaskRunnerPanel { Border = BorderStyle.None, ShowTimestamp = false };
         control.SetItems([new TaskRunItem("build", "Build", TaskRunStatus.Succeeded, "done")]);
 
-        var first = Render(control, width: 32, height: 3);
-        var second = Render(control, width: 32, height: 3);
+        var first = Render(control, 32, 3);
+        var second = Render(control, 32, 3);
 
         Assert.That(first, Is.EqualTo(second));
-        Assert.That(first.Contains("\u001b[", StringComparison.Ordinal), Is.False);
+        Assert.That(first.Contains("\e[", StringComparison.Ordinal), Is.False);
     }
 
     private static string Render(TaskRunnerPanel control, int width, int height)

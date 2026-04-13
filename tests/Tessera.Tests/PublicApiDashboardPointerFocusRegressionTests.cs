@@ -1,6 +1,4 @@
 using NUnit.Framework;
-using Tessera;
-using Tessera.Components.Primitives;
 using Tessera.Controls;
 using Tessera.Layout;
 
@@ -39,14 +37,15 @@ public sealed class PublicApiDashboardPointerFocusRegressionTests
     [Test]
     public void PublicApiDashboardDefaultDoubleClickPressReleaseNonePressOnServicesRowChangesSelection()
     {
-        var target = ResolveServicesRowHitCoordinate(rowIndex: 1);
+        var target = ResolveServicesRowHitCoordinate(1);
         var app = new DashboardPointerFocusProbeApp();
         app.ConfigureRuntimeOptions(new TesseraRuntimeOptions());
 
         _ = app.UpdateRuntime(new WindowResized(120, 36));
         _ = app.RenderRuntime();
 
-        Assert.That(app.Services.SelectedIndex, Is.EqualTo(0), "Precondition: first service should be selected initially.");
+        Assert.That(app.Services.SelectedIndex, Is.EqualTo(0),
+            "Precondition: first service should be selected initially.");
 
         _ = app.UpdateRuntime(new PointerInput(PointerEventKind.Press, PointerButton.Left, target.X, target.Y));
         _ = app.UpdateRuntime(new PointerInput(PointerEventKind.Release, PointerButton.None, target.X, target.Y));
@@ -60,26 +59,28 @@ public sealed class PublicApiDashboardPointerFocusRegressionTests
             app.ServiceSelectionChanges,
             Is.GreaterThanOrEqualTo(1),
             "Service selection change event should fire when row selection changes.");
-        Assert.That(app.Navigation.SelectedIndex, Is.EqualTo(0), "Service row click flow should not switch dashboard tab.");
+        Assert.That(app.Navigation.SelectedIndex, Is.EqualTo(0),
+            "Service row click flow should not switch dashboard tab.");
     }
 
     [Test]
     public void PublicApiDashboardSingleClickPolicyFirstPressOnServicesRowChangesSelection()
     {
-        var target = ResolveServicesRowHitCoordinate(rowIndex: 1);
+        var target = ResolveServicesRowHitCoordinate(1);
         var app = new DashboardPointerFocusProbeApp();
         app.ConfigureRuntimeOptions(
             new TesseraRuntimeOptions
             {
                 PointerActivationPolicy = PointerActivationPolicy.SingleClick,
                 DoubleClickTimeout = TimeSpan.FromSeconds(5),
-                DoubleClickSlop = 1,
+                DoubleClickSlop = 1
             });
 
         _ = app.UpdateRuntime(new WindowResized(120, 36));
         _ = app.RenderRuntime();
 
-        Assert.That(app.Services.SelectedIndex, Is.EqualTo(0), "Precondition: first service should be selected initially.");
+        Assert.That(app.Services.SelectedIndex, Is.EqualTo(0),
+            "Precondition: first service should be selected initially.");
 
         _ = app.UpdateRuntime(new PointerInput(PointerEventKind.Press, PointerButton.Left, target.X, target.Y));
 
@@ -109,7 +110,7 @@ public sealed class PublicApiDashboardPointerFocusRegressionTests
                     {
                         PointerActivationPolicy = PointerActivationPolicy.SingleClick,
                         DoubleClickTimeout = TimeSpan.FromSeconds(5),
-                        DoubleClickSlop = 1,
+                        DoubleClickSlop = 1
                     });
 
                 _ = probe.UpdateRuntime(new WindowResized(width, height));
@@ -143,7 +144,7 @@ public sealed class PublicApiDashboardPointerFocusRegressionTests
                     {
                         PointerActivationPolicy = PointerActivationPolicy.SingleClick,
                         DoubleClickTimeout = TimeSpan.FromSeconds(5),
-                        DoubleClickSlop = 1,
+                        DoubleClickSlop = 1
                     });
 
                 _ = probe.UpdateRuntime(new WindowResized(width, height));
@@ -159,31 +160,18 @@ public sealed class PublicApiDashboardPointerFocusRegressionTests
             }
         }
 
-        throw new AssertionException($"Unable to resolve pointer coordinate that selects services row index {rowIndex}.");
+        throw new AssertionException(
+            $"Unable to resolve pointer coordinate that selects services row index {rowIndex}.");
     }
 
     private sealed class DashboardPointerFocusProbeApp : TesseraApp
     {
-        private readonly DashboardNavigationTabs _navigation = new("Overview", "Operations", "Audit")
-        {
-            Title = "Public API Dashboard",
-            FocusMarker = "◆",
-        };
-
-        private readonly ListView<string> _services = new(static name => name)
-        {
-            Title = "Services",
-            Border = BorderStyle.Rounded,
-            Padding = Thickness.All(1),
-            FocusMarker = "◆",
-        };
-
         private readonly Label _body = new()
         {
             Text = "Body",
             Title = "Body",
             Border = BorderStyle.Rounded,
-            Padding = Thickness.All(1),
+            Padding = Thickness.All(1)
         };
 
         private readonly Dialog _confirmDeploy = new()
@@ -192,26 +180,39 @@ public sealed class PublicApiDashboardPointerFocusRegressionTests
             BodyLines =
             [
                 "Deploy selected service?",
-                "Enter accepts, Esc cancels.",
-            ],
+                "Enter accepts, Esc cancels."
+            ]
         };
 
         public DashboardPointerFocusProbeApp()
         {
-            _services.SetItems(["API", "Worker", "Scheduler", "Gateway"]);
-            _navigation.SelectionChanged += (_, _) => NavigationSelectionChanges++;
-            _services.SelectionChanged += (_, _) => ServiceSelectionChanges++;
+            Services.SetItems(["API", "Worker", "Scheduler", "Gateway"]);
+            Navigation.SelectionChanged += (_, _) => NavigationSelectionChanges++;
+            Services.SelectionChanged += (_, _) => ServiceSelectionChanges++;
         }
 
-        public DashboardNavigationTabs Navigation => _navigation;
+        public DashboardNavigationTabs Navigation { get; } = new("Overview", "Operations", "Audit")
+        {
+            Title = "Public API Dashboard",
+            FocusMarker = "◆"
+        };
 
-        public ListView<string> Services => _services;
+        public ListView<string> Services { get; } = new(static name => name)
+        {
+            Title = "Services",
+            Border = BorderStyle.Rounded,
+            Padding = Thickness.All(1),
+            FocusMarker = "◆"
+        };
 
         public int NavigationSelectionChanges { get; private set; }
 
         public int ServiceSelectionChanges { get; private set; }
 
-        public override TesseraEffect? Update(Message message) => null;
+        public override TesseraEffect? Update(Message message)
+        {
+            return null;
+        }
 
         public override Screen Build(ScreenContext context)
         {
@@ -219,16 +220,16 @@ public sealed class PublicApiDashboardPointerFocusRegressionTests
             {
                 window.Gap(1);
                 window.Padding(1);
-                window.Header(1, _navigation);
-                window.Left(Math.Min(36, Math.Max(28, context.Width / 4)), _services);
-                window.Body(body => body.Center(_body, width: 24, height: 5));
+                window.Header(1, Navigation);
+                window.Left(Math.Min(36, Math.Max(28, context.Width / 4)), Services);
+                window.Body(body => body.Center(_body, 24, 5));
                 if (_confirmDeploy.IsVisible)
                 {
                     window.Overlay(new CenterLayout
                     {
                         Content = _confirmDeploy,
                         Width = Math.Min(60, Math.Max(44, context.Width - 8)),
-                        Height = 9,
+                        Height = 9
                     });
                 }
             });

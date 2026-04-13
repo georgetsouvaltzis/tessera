@@ -1,17 +1,12 @@
 namespace Tessera.Controls;
 
 /// <summary>
-/// Defines glyphs used by drop-down controls such as <see cref="Choice"/> and <see cref="ComboBox"/>.
+///     Defines glyphs used by drop-down controls such as <see cref="Choice" /> and <see cref="ComboBox" />.
 /// </summary>
 public readonly record struct DropdownGlyphSet
 {
     /// <summary>
-    /// Gets the default glyph set used by drop-down controls.
-    /// </summary>
-    public static DropdownGlyphSet Default => new();
-
-    /// <summary>
-    /// Initializes a new glyph set with standard drop-down markers.
+    ///     Initializes a new glyph set with standard drop-down markers.
     /// </summary>
     public DropdownGlyphSet()
     {
@@ -22,7 +17,7 @@ public readonly record struct DropdownGlyphSet
     }
 
     /// <summary>
-    /// Initializes a new glyph set.
+    ///     Initializes a new glyph set.
     /// </summary>
     /// <param name="collapsedIndicator">Indicator shown when the list is closed.</param>
     /// <param name="expandedIndicator">Indicator shown when the list is open.</param>
@@ -34,29 +29,34 @@ public readonly record struct DropdownGlyphSet
         string highlightedOptionMarker,
         string selectedOptionMarker)
     {
-        CollapsedIndicator = collapsedIndicator ?? string.Empty;
-        ExpandedIndicator = expandedIndicator ?? string.Empty;
-        HighlightedOptionMarker = highlightedOptionMarker ?? string.Empty;
-        SelectedOptionMarker = selectedOptionMarker ?? string.Empty;
+        CollapsedIndicator = collapsedIndicator;
+        ExpandedIndicator = expandedIndicator;
+        HighlightedOptionMarker = highlightedOptionMarker;
+        SelectedOptionMarker = selectedOptionMarker;
     }
 
     /// <summary>
-    /// Gets the indicator shown when the list is closed.
+    ///     Gets the default glyph set used by drop-down controls.
+    /// </summary>
+    public static DropdownGlyphSet Default => new();
+
+    /// <summary>
+    ///     Gets the indicator shown when the list is closed.
     /// </summary>
     public string CollapsedIndicator { get; init; }
 
     /// <summary>
-    /// Gets the indicator shown when the list is open.
+    ///     Gets the indicator shown when the list is open.
     /// </summary>
     public string ExpandedIndicator { get; init; }
 
     /// <summary>
-    /// Gets the marker shown for the highlighted option row.
+    ///     Gets the marker shown for the highlighted option row.
     /// </summary>
     public string HighlightedOptionMarker { get; init; }
 
     /// <summary>
-    /// Gets the marker shown for the selected option row.
+    ///     Gets the marker shown for the selected option row.
     /// </summary>
     public string SelectedOptionMarker { get; init; }
 }

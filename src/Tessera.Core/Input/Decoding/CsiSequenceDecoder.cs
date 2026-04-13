@@ -73,7 +73,7 @@ internal static class CsiSequenceDecoder
             'Q' => KeyCode.F2,
             'R' => KeyCode.F3,
             'S' => KeyCode.F4,
-            _ => KeyCode.Unknown,
+            _ => KeyCode.Unknown
         };
 
         return keyCode != KeyCode.Unknown;
@@ -105,7 +105,8 @@ internal static class CsiSequenceDecoder
     private static bool TryDecodeWindowSize(IReadOnlyList<int?> parameters, out IMessage? message)
     {
         message = null;
-        if (parameters.Count < 3 || parameters[0] != 8 || parameters[1] is not int rows || parameters[2] is not int cols)
+        if (parameters.Count < 3 || parameters[0] != 8 || parameters[1] is not int rows ||
+            parameters[2] is not int cols)
         {
             return false;
         }
@@ -131,7 +132,7 @@ internal static class CsiSequenceDecoder
             2 => ModeReportState.Reset,
             3 => ModeReportState.PermanentlySet,
             4 => ModeReportState.PermanentlyReset,
-            _ => ModeReportState.Unknown,
+            _ => ModeReportState.Unknown
         };
 
         message = new ModeReportMsg(mode, state);
@@ -144,7 +145,7 @@ internal static class CsiSequenceDecoder
         {
             'I' => new FocusInMsg(),
             'O' => new FocusOutMsg(),
-            _ => null,
+            _ => null
         };
 
         return message is not null;
@@ -161,7 +162,7 @@ internal static class CsiSequenceDecoder
             'D' => KeyCode.Left,
             'H' => KeyCode.Home,
             'F' => KeyCode.End,
-            _ => KeyCode.Unknown,
+            _ => KeyCode.Unknown
         };
 
         if (keyCode == KeyCode.Unknown)
@@ -188,7 +189,7 @@ internal static class CsiSequenceDecoder
             return DecoderCommon.TryCreateKeyMessageFromCodePoint(
                 modifyOtherKeyCodePoint,
                 DecoderCommon.ParseModifiers(parameters[1]),
-                eventType: null,
+                null,
                 out message);
         }
 
@@ -212,7 +213,7 @@ internal static class CsiSequenceDecoder
             21 => KeyCode.F10,
             23 => KeyCode.F11,
             24 => KeyCode.F12,
-            _ => KeyCode.Unknown,
+            _ => KeyCode.Unknown
         };
 
         if (keyCode == KeyCode.Unknown)

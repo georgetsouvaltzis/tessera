@@ -1,16 +1,16 @@
-using Tessera.Components.Primitives;
 using System.ComponentModel;
+using Tessera.Components.Primitives;
 
 namespace Tessera.Components.Composition;
 
 /// <summary>
-/// Defines the canvas component contract.
+///     Defines the canvas component contract.
 /// </summary>
 [EditorBrowsable(EditorBrowsableState.Advanced)]
 public interface ICanvasComponent
 {
     /// <summary>
-    /// Renders the component into the supplied canvas bounds.
+    ///     Renders the component into the supplied canvas bounds.
     /// </summary>
     /// <param name="canvas">The target canvas.</param>
     /// <param name="rect">The target bounds.</param>

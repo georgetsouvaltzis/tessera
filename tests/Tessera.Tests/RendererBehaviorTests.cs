@@ -1,10 +1,6 @@
-using Tessera.Components.Composition;
-using Tessera.Components.Primitives;
-using Tessera.Components.Styling;
 using System.Text;
 using Tessera.Core.Abstractions;
 using Tessera.Core.Rendering;
-using Tessera.Core.Terminal;
 
 namespace Tessera.Tests;
 
@@ -12,37 +8,56 @@ internal static class RendererBehaviorTests
 {
     public static IEnumerable<TestCase> Cases()
     {
-        yield return new TestCase("Renderer_MouseModeCellMotion_EmitsEnableSequences", MouseModeCellMotion_EmitsEnableSequences);
-        yield return new TestCase("Renderer_MouseModeAllMotion_EmitsEnableSequences", MouseModeAllMotion_EmitsEnableSequences);
+        yield return new TestCase("Renderer_MouseModeCellMotion_EmitsEnableSequences",
+            MouseModeCellMotion_EmitsEnableSequences);
+        yield return new TestCase("Renderer_MouseModeAllMotion_EmitsEnableSequences",
+            MouseModeAllMotion_EmitsEnableSequences);
         yield return new TestCase("Renderer_Reset_DisablesMouseModes", Reset_DisablesMouseModes);
-        yield return new TestCase("Renderer_UnsupportedCapabilities_SuppressModeSequences", UnsupportedCapabilities_SuppressModeSequences);
-        yield return new TestCase("Renderer_ModeReportQueries_EmittedForEnabledFeatures", ModeReportQueries_EmittedForEnabledFeatures);
-        yield return new TestCase("Renderer_ModeReportQueries_EmittedOncePerMode", ModeReportQueries_EmittedOncePerMode);
-        yield return new TestCase("Renderer_ModeReportQueries_ConfigurableDisable_SkipsModeQueries", ModeReportQueries_ConfigurableDisable_SkipsModeQueries);
-        yield return new TestCase("Renderer_ModeReportQueries_RepeatWhenOncePerModeDisabled", ModeReportQueries_RepeatWhenOncePerModeDisabled);
-        yield return new TestCase("Renderer_ModeReportsDisabled_SkipsModeQueries", ModeReportsDisabled_SkipsModeQueries);
+        yield return new TestCase("Renderer_UnsupportedCapabilities_SuppressModeSequences",
+            UnsupportedCapabilities_SuppressModeSequences);
+        yield return new TestCase("Renderer_ModeReportQueries_EmittedForEnabledFeatures",
+            ModeReportQueries_EmittedForEnabledFeatures);
+        yield return new TestCase("Renderer_ModeReportQueries_EmittedOncePerMode",
+            ModeReportQueries_EmittedOncePerMode);
+        yield return new TestCase("Renderer_ModeReportQueries_ConfigurableDisable_SkipsModeQueries",
+            ModeReportQueries_ConfigurableDisable_SkipsModeQueries);
+        yield return new TestCase("Renderer_ModeReportQueries_RepeatWhenOncePerModeDisabled",
+            ModeReportQueries_RepeatWhenOncePerModeDisabled);
+        yield return new TestCase("Renderer_ModeReportsDisabled_SkipsModeQueries",
+            ModeReportsDisabled_SkipsModeQueries);
         yield return new TestCase("Renderer_SynchronizedUpdates_WrapFrameOutput", SynchronizedUpdates_WrapFrameOutput);
-        yield return new TestCase("Renderer_SynchronizedUpdates_Disabled_DoesNotWrapFrameOutput", SynchronizedUpdates_Disabled_DoesNotWrapFrameOutput);
-        yield return new TestCase("Renderer_CursorStyle_EmitsDecscusrWhenCursorVisible", CursorStyle_EmitsDecscusrWhenCursorVisible);
-        yield return new TestCase("Renderer_CursorStyle_Unchanged_DoesNotRepeatSequence", CursorStyle_Unchanged_DoesNotRepeatSequence);
+        yield return new TestCase("Renderer_SynchronizedUpdates_Disabled_DoesNotWrapFrameOutput",
+            SynchronizedUpdates_Disabled_DoesNotWrapFrameOutput);
+        yield return new TestCase("Renderer_CursorStyle_EmitsDecscusrWhenCursorVisible",
+            CursorStyle_EmitsDecscusrWhenCursorVisible);
+        yield return new TestCase("Renderer_CursorStyle_Unchanged_DoesNotRepeatSequence",
+            CursorStyle_Unchanged_DoesNotRepeatSequence);
         yield return new TestCase("Renderer_Reset_RestoresDefaultCursorStyle", Reset_RestoresDefaultCursorStyle);
-        yield return new TestCase("Renderer_TerminalColors_EmitsOscColorSequences", TerminalColors_EmitsOscColorSequences);
+        yield return new TestCase("Renderer_TerminalColors_EmitsOscColorSequences",
+            TerminalColors_EmitsOscColorSequences);
         yield return new TestCase("Renderer_Progress_EmitsOscProgressSequences", Progress_EmitsOscProgressSequences);
-        yield return new TestCase("Renderer_KeyboardEnhancements_EmitsKittySequence", KeyboardEnhancements_EmitsKittySequence);
-        yield return new TestCase("Renderer_KeyboardEnhancements_CanDisableKittyBaseFlag", KeyboardEnhancements_CanDisableKittyBaseFlag);
+        yield return new TestCase("Renderer_KeyboardEnhancements_EmitsKittySequence",
+            KeyboardEnhancements_EmitsKittySequence);
+        yield return new TestCase("Renderer_KeyboardEnhancements_CanDisableKittyBaseFlag",
+            KeyboardEnhancements_CanDisableKittyBaseFlag);
         yield return new TestCase("Renderer_FontSpec_EmitsOsc50WhenChanged", FontSpec_EmitsOsc50WhenChanged);
-        yield return new TestCase("Renderer_FontSpec_NullIsNoOpAndSanitizesUnsafeChars", FontSpec_NullIsNoOpAndSanitizesUnsafeChars);
-        yield return new TestCase("Renderer_FontSpec_CapabilityDisabled_DoesNotEmitOsc50", FontSpec_CapabilityDisabled_DoesNotEmitOsc50);
+        yield return new TestCase("Renderer_FontSpec_NullIsNoOpAndSanitizesUnsafeChars",
+            FontSpec_NullIsNoOpAndSanitizesUnsafeChars);
+        yield return new TestCase("Renderer_FontSpec_CapabilityDisabled_DoesNotEmitOsc50",
+            FontSpec_CapabilityDisabled_DoesNotEmitOsc50);
         yield return new TestCase("Renderer_StructuredFontRequest_ComposesOsc50", StructuredFontRequest_ComposesOsc50);
-        yield return new TestCase("Renderer_ITerm2Profile_EmitsSetProfileAndSuppressesOsc50", ITerm2Profile_EmitsSetProfileAndSuppressesOsc50);
+        yield return new TestCase("Renderer_ITerm2Profile_EmitsSetProfileAndSuppressesOsc50",
+            ITerm2Profile_EmitsSetProfileAndSuppressesOsc50);
         yield return new TestCase("Renderer_CellDiff_UpdatesOnlyChangedCellRun", CellDiff_UpdatesOnlyChangedCellRun);
         yield return new TestCase("Renderer_CellDiff_ClearsShortenedLineTail", CellDiff_ClearsShortenedLineTail);
         yield return new TestCase("Renderer_Resize_ClipsToWidth", Resize_ClipsToWidth);
         yield return new TestCase("Renderer_Resize_HeightClip_KeepsBottomRows", Resize_HeightClip_KeepsBottomRows);
         yield return new TestCase("Renderer_Resize_WrapsLongLines", Resize_WrapsLongLines);
         yield return new TestCase("Renderer_Resize_WrapsWideRuneAtBoundary", Resize_WrapsWideRuneAtBoundary);
-        yield return new TestCase("Renderer_CellDiff_CombiningGrapheme_PatchesSingleColumn", CellDiff_CombiningGrapheme_PatchesSingleColumn);
-        yield return new TestCase("Renderer_CellBuffer_ClearsWideContinuation_WhenReplacingWithNarrowCells", CellBuffer_ClearsWideContinuation_WhenReplacingWithNarrowCells);
+        yield return new TestCase("Renderer_CellDiff_CombiningGrapheme_PatchesSingleColumn",
+            CellDiff_CombiningGrapheme_PatchesSingleColumn);
+        yield return new TestCase("Renderer_CellBuffer_ClearsWideContinuation_WhenReplacingWithNarrowCells",
+            CellBuffer_ClearsWideContinuation_WhenReplacingWithNarrowCells);
     }
 
     private static async Task MouseModeCellMotion_EmitsEnableSequences()
@@ -55,19 +70,16 @@ internal static class RendererBehaviorTests
         // Act
         renderer.Render(ScreenOutput.From("mouse") with
         {
-            Terminal = new TerminalOutput
-            {
-                MouseMode = MouseMode.CellMotion,
-            },
+            Terminal = new TerminalOutput { MouseMode = MouseMode.CellMotion }
         });
         await renderer.FlushAsync(CancellationToken.None);
         var rendered = ReadUtf8(output);
 
         // Assert
-        AssertContains(rendered, "\u001b[?1000h");
-        AssertContains(rendered, "\u001b[?1002h");
-        AssertContains(rendered, "\u001b[?1003l");
-        AssertContains(rendered, "\u001b[?1006h");
+        AssertContains(rendered, "\e[?1000h");
+        AssertContains(rendered, "\e[?1002h");
+        AssertContains(rendered, "\e[?1003l");
+        AssertContains(rendered, "\e[?1006h");
     }
 
     private static async Task MouseModeAllMotion_EmitsEnableSequences()
@@ -80,19 +92,16 @@ internal static class RendererBehaviorTests
         // Act
         renderer.Render(ScreenOutput.From("mouse") with
         {
-            Terminal = new TerminalOutput
-            {
-                MouseMode = MouseMode.AllMotion,
-            },
+            Terminal = new TerminalOutput { MouseMode = MouseMode.AllMotion }
         });
         await renderer.FlushAsync(CancellationToken.None);
         var rendered = ReadUtf8(output);
 
         // Assert
-        AssertContains(rendered, "\u001b[?1000h");
-        AssertContains(rendered, "\u001b[?1002l");
-        AssertContains(rendered, "\u001b[?1003h");
-        AssertContains(rendered, "\u001b[?1006h");
+        AssertContains(rendered, "\e[?1000h");
+        AssertContains(rendered, "\e[?1002l");
+        AssertContains(rendered, "\e[?1003h");
+        AssertContains(rendered, "\e[?1006h");
     }
 
     private static async Task Reset_DisablesMouseModes()
@@ -104,10 +113,7 @@ internal static class RendererBehaviorTests
 
         renderer.Render(ScreenOutput.From("mouse") with
         {
-            Terminal = new TerminalOutput
-            {
-                MouseMode = MouseMode.AllMotion,
-            },
+            Terminal = new TerminalOutput { MouseMode = MouseMode.AllMotion }
         });
         await renderer.FlushAsync(CancellationToken.None);
 
@@ -116,21 +122,21 @@ internal static class RendererBehaviorTests
         var rendered = ReadUtf8(output);
 
         // Assert
-        AssertContains(rendered, "\u001b[?1000l");
-        AssertContains(rendered, "\u001b[?1002l");
-        AssertContains(rendered, "\u001b[?1003l");
-        AssertContains(rendered, "\u001b[?1006l");
+        AssertContains(rendered, "\e[?1000l");
+        AssertContains(rendered, "\e[?1002l");
+        AssertContains(rendered, "\e[?1003l");
+        AssertContains(rendered, "\e[?1006l");
     }
 
     private static async Task UnsupportedCapabilities_SuppressModeSequences()
     {
         // Arrange
         await using var renderer = new AnsiDiffRenderer(new TerminalCapabilityProfile(
-            FocusReporting: false,
-            MouseReporting: false,
-            BracketedPaste: false,
-            SynchronizedUpdates: false,
-            ModeReports: false,
+            false,
+            false,
+            false,
+            false,
+            false,
             Source: "test"));
         await using var output = new MemoryStream();
         await renderer.InitializeAsync(output, CancellationToken.None);
@@ -143,22 +149,22 @@ internal static class RendererBehaviorTests
                 EnableBracketedPaste = true,
                 EnableFocusReporting = true,
                 EnableSynchronizedUpdates = true,
-                MouseMode = MouseMode.AllMotion,
-            },
+                MouseMode = MouseMode.AllMotion
+            }
         });
         await renderer.FlushAsync(CancellationToken.None);
         var rendered = ReadUtf8(output);
 
         // Assert
-        AssertDoesNotContain(rendered, "\u001b[?2004h");
-        AssertDoesNotContain(rendered, "\u001b[?1004h");
-        AssertDoesNotContain(rendered, "\u001b[?1000h");
-        AssertDoesNotContain(rendered, "\u001b[?1006h");
-        AssertDoesNotContain(rendered, "\u001b[?2026h");
-        AssertDoesNotContain(rendered, "\u001b[?2004$p");
-        AssertDoesNotContain(rendered, "\u001b[?1004$p");
-        AssertDoesNotContain(rendered, "\u001b[?1006$p");
-        AssertDoesNotContain(rendered, "\u001b[?2026$p");
+        AssertDoesNotContain(rendered, "\e[?2004h");
+        AssertDoesNotContain(rendered, "\e[?1004h");
+        AssertDoesNotContain(rendered, "\e[?1000h");
+        AssertDoesNotContain(rendered, "\e[?1006h");
+        AssertDoesNotContain(rendered, "\e[?2026h");
+        AssertDoesNotContain(rendered, "\e[?2004$p");
+        AssertDoesNotContain(rendered, "\e[?1004$p");
+        AssertDoesNotContain(rendered, "\e[?1006$p");
+        AssertDoesNotContain(rendered, "\e[?2026$p");
     }
 
     private static async Task ModeReportQueries_EmittedForEnabledFeatures()
@@ -176,17 +182,17 @@ internal static class RendererBehaviorTests
                 EnableBracketedPaste = true,
                 EnableFocusReporting = true,
                 EnableSynchronizedUpdates = true,
-                MouseMode = MouseMode.AllMotion,
-            },
+                MouseMode = MouseMode.AllMotion
+            }
         });
         await renderer.FlushAsync(CancellationToken.None);
         var rendered = ReadUtf8(output);
 
         // Assert
-        AssertContains(rendered, "\u001b[?2004$p");
-        AssertContains(rendered, "\u001b[?1004$p");
-        AssertContains(rendered, "\u001b[?2026$p");
-        AssertContains(rendered, "\u001b[?1006$p");
+        AssertContains(rendered, "\e[?2004$p");
+        AssertContains(rendered, "\e[?1004$p");
+        AssertContains(rendered, "\e[?2026$p");
+        AssertContains(rendered, "\e[?1006$p");
     }
 
     private static async Task ModeReportQueries_EmittedOncePerMode()
@@ -199,34 +205,25 @@ internal static class RendererBehaviorTests
         // Act
         renderer.Render(ScreenOutput.From("first") with
         {
-            Terminal = new TerminalOutput
-            {
-                EnableFocusReporting = true,
-            },
+            Terminal = new TerminalOutput { EnableFocusReporting = true }
         });
         await renderer.FlushAsync(CancellationToken.None);
         renderer.Render(ScreenOutput.From("second") with
         {
-            Terminal = new TerminalOutput
-            {
-                EnableFocusReporting = true,
-            },
+            Terminal = new TerminalOutput { EnableFocusReporting = true }
         });
         await renderer.FlushAsync(CancellationToken.None);
         var rendered = ReadUtf8(output);
 
         // Assert
-        AssertCount(rendered, "\u001b[?1004$p", 1);
+        AssertCount(rendered, "\e[?1004$p", 1);
     }
 
     private static async Task ModeReportQueries_ConfigurableDisable_SkipsModeQueries()
     {
         // Arrange
         await using var renderer = new AnsiDiffRenderer(
-            options: new AnsiRendererOptions
-            {
-                QueryModeReports = false,
-            });
+            options: new AnsiRendererOptions { QueryModeReports = false });
         await using var output = new MemoryStream();
         await renderer.InitializeAsync(output, CancellationToken.None);
 
@@ -238,17 +235,17 @@ internal static class RendererBehaviorTests
                 EnableBracketedPaste = true,
                 EnableFocusReporting = true,
                 EnableSynchronizedUpdates = true,
-                MouseMode = MouseMode.AllMotion,
-            },
+                MouseMode = MouseMode.AllMotion
+            }
         });
         await renderer.FlushAsync(CancellationToken.None);
         var rendered = ReadUtf8(output);
 
         // Assert
-        AssertContains(rendered, "\u001b[?2004h");
-        AssertContains(rendered, "\u001b[?1004h");
-        AssertContains(rendered, "\u001b[?1006h");
-        AssertContains(rendered, "\u001b[?2026h");
+        AssertContains(rendered, "\e[?2004h");
+        AssertContains(rendered, "\e[?1004h");
+        AssertContains(rendered, "\e[?1006h");
+        AssertContains(rendered, "\e[?2026h");
         AssertDoesNotContain(rendered, "$p");
     }
 
@@ -256,34 +253,25 @@ internal static class RendererBehaviorTests
     {
         // Arrange
         await using var renderer = new AnsiDiffRenderer(
-            options: new AnsiRendererOptions
-            {
-                QueryModeReportsOncePerMode = false,
-            });
+            options: new AnsiRendererOptions { QueryModeReportsOncePerMode = false });
         await using var output = new MemoryStream();
         await renderer.InitializeAsync(output, CancellationToken.None);
 
         // Act
         renderer.Render(ScreenOutput.From("sync-a") with
         {
-            Terminal = new TerminalOutput
-            {
-                EnableSynchronizedUpdates = true,
-            },
+            Terminal = new TerminalOutput { EnableSynchronizedUpdates = true }
         });
         await renderer.FlushAsync(CancellationToken.None);
         renderer.Render(ScreenOutput.From("sync-b") with
         {
-            Terminal = new TerminalOutput
-            {
-                EnableSynchronizedUpdates = true,
-            },
+            Terminal = new TerminalOutput { EnableSynchronizedUpdates = true }
         });
         await renderer.FlushAsync(CancellationToken.None);
         var rendered = ReadUtf8(output);
 
         // Assert
-        AssertCount(rendered, "\u001b[?2026$p", 2);
+        AssertCount(rendered, "\e[?2026$p", 2);
     }
 
     private static async Task ModeReportsDisabled_SkipsModeQueries()
@@ -302,17 +290,17 @@ internal static class RendererBehaviorTests
                 EnableBracketedPaste = true,
                 EnableFocusReporting = true,
                 EnableSynchronizedUpdates = true,
-                MouseMode = MouseMode.AllMotion,
-            },
+                MouseMode = MouseMode.AllMotion
+            }
         });
         await renderer.FlushAsync(CancellationToken.None);
         var rendered = ReadUtf8(output);
 
         // Assert
-        AssertContains(rendered, "\u001b[?2004h");
-        AssertContains(rendered, "\u001b[?1004h");
-        AssertContains(rendered, "\u001b[?1006h");
-        AssertContains(rendered, "\u001b[?2026h");
+        AssertContains(rendered, "\e[?2004h");
+        AssertContains(rendered, "\e[?1004h");
+        AssertContains(rendered, "\e[?1006h");
+        AssertContains(rendered, "\e[?2026h");
         AssertDoesNotContain(rendered, "$p");
     }
 
@@ -326,18 +314,15 @@ internal static class RendererBehaviorTests
         // Act
         renderer.Render(ScreenOutput.From("sync") with
         {
-            Terminal = new TerminalOutput
-            {
-                EnableSynchronizedUpdates = true,
-            },
+            Terminal = new TerminalOutput { EnableSynchronizedUpdates = true }
         });
         await renderer.FlushAsync(CancellationToken.None);
         var rendered = ReadUtf8(output);
 
         // Assert
-        AssertContains(rendered, "\u001b[?2026h");
-        AssertContains(rendered, "\u001b[?2026l");
-        AssertBefore(rendered, "\u001b[?2026h", "\u001b[?2026l");
+        AssertContains(rendered, "\e[?2026h");
+        AssertContains(rendered, "\e[?2026l");
+        AssertBefore(rendered, "\e[?2026h", "\e[?2026l");
     }
 
     private static async Task SynchronizedUpdates_Disabled_DoesNotWrapFrameOutput()
@@ -350,17 +335,14 @@ internal static class RendererBehaviorTests
         // Act
         renderer.Render(ScreenOutput.From("nosync") with
         {
-            Terminal = new TerminalOutput
-            {
-                EnableSynchronizedUpdates = false,
-            },
+            Terminal = new TerminalOutput { EnableSynchronizedUpdates = false }
         });
         await renderer.FlushAsync(CancellationToken.None);
         var rendered = ReadUtf8(output);
 
         // Assert
-        AssertDoesNotContain(rendered, "\u001b[?2026h");
-        AssertDoesNotContain(rendered, "\u001b[?2026l");
+        AssertDoesNotContain(rendered, "\e[?2026h");
+        AssertDoesNotContain(rendered, "\e[?2026l");
     }
 
     private static async Task CursorStyle_EmitsDecscusrWhenCursorVisible()
@@ -377,16 +359,16 @@ internal static class RendererBehaviorTests
             {
                 CursorX = 2,
                 CursorY = 1,
-                CursorStyle = CursorStyle.SteadyBar,
-            },
+                CursorStyle = CursorStyle.SteadyBar
+            }
         });
         await renderer.FlushAsync(CancellationToken.None);
         var rendered = ReadUtf8(output);
 
         // Assert
-        AssertContains(rendered, "\u001b[6 q");
-        AssertContains(rendered, "\u001b[?25h");
-        AssertContains(rendered, "\u001b[2;3H");
+        AssertContains(rendered, "\e[6 q");
+        AssertContains(rendered, "\e[?25h");
+        AssertContains(rendered, "\e[2;3H");
     }
 
     private static async Task CursorStyle_Unchanged_DoesNotRepeatSequence()
@@ -403,8 +385,8 @@ internal static class RendererBehaviorTests
             {
                 CursorX = 0,
                 CursorY = 0,
-                CursorStyle = CursorStyle.BlinkingUnderline,
-            },
+                CursorStyle = CursorStyle.BlinkingUnderline
+            }
         };
         renderer.Render(view);
         await renderer.FlushAsync(CancellationToken.None);
@@ -413,7 +395,7 @@ internal static class RendererBehaviorTests
         var rendered = ReadUtf8(output);
 
         // Assert
-        AssertCount(rendered, "\u001b[3 q", 1);
+        AssertCount(rendered, "\e[3 q", 1);
     }
 
     private static async Task Reset_RestoresDefaultCursorStyle()
@@ -428,8 +410,8 @@ internal static class RendererBehaviorTests
             {
                 CursorX = 0,
                 CursorY = 0,
-                CursorStyle = CursorStyle.SteadyUnderline,
-            },
+                CursorStyle = CursorStyle.SteadyUnderline
+            }
         });
         await renderer.FlushAsync(CancellationToken.None);
 
@@ -438,8 +420,8 @@ internal static class RendererBehaviorTests
         var rendered = ReadUtf8(output);
 
         // Assert
-        AssertContains(rendered, "\u001b[4 q");
-        AssertContains(rendered, "\u001b[0 q");
+        AssertContains(rendered, "\e[4 q");
+        AssertContains(rendered, "\e[0 q");
     }
 
     private static async Task TerminalColors_EmitsOscColorSequences()
@@ -456,20 +438,20 @@ internal static class RendererBehaviorTests
             {
                 ForegroundColor = "#112233",
                 BackgroundColor = "rgb:44/55/66",
-                CursorColor = "#abcdef",
-            },
+                CursorColor = "#abcdef"
+            }
         });
         await renderer.FlushAsync(CancellationToken.None);
         await renderer.ResetAsync(CancellationToken.None);
         var rendered = ReadUtf8(output);
 
         // Assert
-        AssertContains(rendered, "\u001b]10;#112233\u001b\\");
-        AssertContains(rendered, "\u001b]11;#445566\u001b\\");
-        AssertContains(rendered, "\u001b]12;#ABCDEF\u001b\\");
-        AssertContains(rendered, "\u001b]110;\u001b\\");
-        AssertContains(rendered, "\u001b]111;\u001b\\");
-        AssertContains(rendered, "\u001b]112;\u001b\\");
+        AssertContains(rendered, "\e]10;#112233\e\\");
+        AssertContains(rendered, "\e]11;#445566\e\\");
+        AssertContains(rendered, "\e]12;#ABCDEF\e\\");
+        AssertContains(rendered, "\e]110;\e\\");
+        AssertContains(rendered, "\e]111;\e\\");
+        AssertContains(rendered, "\e]112;\e\\");
     }
 
     private static async Task Progress_EmitsOscProgressSequences()
@@ -482,27 +464,24 @@ internal static class RendererBehaviorTests
         // Act
         renderer.Render(ScreenOutput.From("progress") with
         {
-            Terminal = new TerminalOutput
-            {
-                Progress = new TerminalProgress(TerminalProgressState.Warning, 61),
-            },
+            Terminal = new TerminalOutput { Progress = new TerminalProgress(TerminalProgressState.Warning, 61) }
         });
         await renderer.FlushAsync(CancellationToken.None);
         renderer.Render(ScreenOutput.From("progress") with
         {
             Terminal = new TerminalOutput
             {
-                Progress = new TerminalProgress(TerminalProgressState.Indeterminate, 0),
-            },
+                Progress = new TerminalProgress(TerminalProgressState.Indeterminate, 0)
+            }
         });
         await renderer.FlushAsync(CancellationToken.None);
         await renderer.ResetAsync(CancellationToken.None);
         var rendered = ReadUtf8(output);
 
         // Assert
-        AssertContains(rendered, "\u001b]9;4;4;61\u001b\\");
-        AssertContains(rendered, "\u001b]9;4;3\u001b\\");
-        AssertContains(rendered, "\u001b]9;4;0\u001b\\");
+        AssertContains(rendered, "\e]9;4;4;61\e\\");
+        AssertContains(rendered, "\e]9;4;3\e\\");
+        AssertContains(rendered, "\e]9;4;0\e\\");
     }
 
     private static async Task KeyboardEnhancements_EmitsKittySequence()
@@ -517,26 +496,23 @@ internal static class RendererBehaviorTests
         {
             Terminal = new TerminalOutput
             {
-                KeyboardEnhancements = new KeyboardEnhancementOptions { ReportEventTypes = true },
-            },
+                KeyboardEnhancements = new KeyboardEnhancementOptions { ReportEventTypes = true }
+            }
         });
         await renderer.FlushAsync(CancellationToken.None);
         await renderer.ResetAsync(CancellationToken.None);
         var rendered = ReadUtf8(output);
 
         // Assert
-        AssertContains(rendered, "\u001b[>3u");
-        AssertContains(rendered, "\u001b[>0u");
+        AssertContains(rendered, "\e[>3u");
+        AssertContains(rendered, "\e[>0u");
     }
 
     private static async Task KeyboardEnhancements_CanDisableKittyBaseFlag()
     {
         // Arrange
         await using var renderer = new AnsiDiffRenderer(
-            options: new AnsiRendererOptions
-            {
-                IncludeKittyKeyboardBaseFlag = false,
-            });
+            options: new AnsiRendererOptions { IncludeKittyKeyboardBaseFlag = false });
         await using var output = new MemoryStream();
         await renderer.InitializeAsync(output, CancellationToken.None);
 
@@ -545,17 +521,17 @@ internal static class RendererBehaviorTests
         {
             Terminal = new TerminalOutput
             {
-                KeyboardEnhancements = new KeyboardEnhancementOptions { ReportEventTypes = true },
-            },
+                KeyboardEnhancements = new KeyboardEnhancementOptions { ReportEventTypes = true }
+            }
         });
         await renderer.FlushAsync(CancellationToken.None);
         await renderer.ResetAsync(CancellationToken.None);
         var rendered = ReadUtf8(output);
 
         // Assert
-        AssertContains(rendered, "\u001b[>2u");
-        AssertContains(rendered, "\u001b[>0u");
-        AssertDoesNotContain(rendered, "\u001b[>3u");
+        AssertContains(rendered, "\e[>2u");
+        AssertContains(rendered, "\e[>0u");
+        AssertDoesNotContain(rendered, "\e[>3u");
     }
 
     private static async Task FontSpec_EmitsOsc50WhenChanged()
@@ -569,33 +545,24 @@ internal static class RendererBehaviorTests
         // Act
         renderer.Render(ScreenOutput.From("font-a") with
         {
-            Terminal = new TerminalOutput
-            {
-                FontSpec = "Iosevka Term 14",
-            },
+            Terminal = new TerminalOutput { FontSpec = "Iosevka Term 14" }
         });
         await renderer.FlushAsync(CancellationToken.None);
         renderer.Render(ScreenOutput.From("font-b") with
         {
-            Terminal = new TerminalOutput
-            {
-                FontSpec = "Iosevka Term 14",
-            },
+            Terminal = new TerminalOutput { FontSpec = "Iosevka Term 14" }
         });
         await renderer.FlushAsync(CancellationToken.None);
         renderer.Render(ScreenOutput.From("font-c") with
         {
-            Terminal = new TerminalOutput
-            {
-                FontSpec = "JetBrains Mono 13",
-            },
+            Terminal = new TerminalOutput { FontSpec = "JetBrains Mono 13" }
         });
         await renderer.FlushAsync(CancellationToken.None);
         var rendered = ReadUtf8(output);
 
         // Assert
-        AssertCount(rendered, "\u001b]50;Iosevka Term 14\u0007", 1);
-        AssertCount(rendered, "\u001b]50;JetBrains Mono 13\u0007", 1);
+        AssertCount(rendered, "\e]50;Iosevka Term 14\a", 1);
+        AssertCount(rendered, "\e]50;JetBrains Mono 13\a", 1);
     }
 
     private static async Task FontSpec_NullIsNoOpAndSanitizesUnsafeChars()
@@ -612,17 +579,14 @@ internal static class RendererBehaviorTests
         // Act
         renderer.Render(ScreenOutput.From("unsafe") with
         {
-            Terminal = new TerminalOutput
-            {
-                FontSpec = "Mon\\o\u0007\u001b[31m",
-            },
+            Terminal = new TerminalOutput { FontSpec = "Mon\\o\a\e[31m" }
         });
         await renderer.FlushAsync(CancellationToken.None);
         var rendered = ReadUtf8(output, marker);
 
         // Assert
-        AssertContains(rendered, "\u001b]50;Mono[31m\u0007");
-        AssertDoesNotContain(rendered, "\u001b]50;Mon\\o\u0007\u001b[31m\u0007");
+        AssertContains(rendered, "\e]50;Mono[31m\a");
+        AssertDoesNotContain(rendered, "\e]50;Mon\\o\a\e[31m\a");
     }
 
     private static async Task FontSpec_CapabilityDisabled_DoesNotEmitOsc50()
@@ -634,15 +598,12 @@ internal static class RendererBehaviorTests
 
         renderer.Render(ScreenOutput.From("font-disabled") with
         {
-            Terminal = new TerminalOutput
-            {
-                FontSpec = "Iosevka Term 14",
-            },
+            Terminal = new TerminalOutput { FontSpec = "Iosevka Term 14" }
         });
         await renderer.FlushAsync(CancellationToken.None);
         var rendered = ReadUtf8(output);
 
-        AssertDoesNotContain(rendered, "\u001b]50;");
+        AssertDoesNotContain(rendered, "\e]50;");
     }
 
     private static async Task StructuredFontRequest_ComposesOsc50()
@@ -654,16 +615,12 @@ internal static class RendererBehaviorTests
 
         renderer.Render(ScreenOutput.From("font-structured") with
         {
-            Terminal = new TerminalOutput
-            {
-                FontFamily = "JetBrains Mono",
-                FontSize = 13,
-            },
+            Terminal = new TerminalOutput { FontFamily = "JetBrains Mono", FontSize = 13 }
         });
         await renderer.FlushAsync(CancellationToken.None);
         var rendered = ReadUtf8(output);
 
-        AssertContains(rendered, "\u001b]50;JetBrains Mono 13\u0007");
+        AssertContains(rendered, "\e]50;JetBrains Mono 13\a");
     }
 
     private static async Task ITerm2Profile_EmitsSetProfileAndSuppressesOsc50()
@@ -678,17 +635,13 @@ internal static class RendererBehaviorTests
 
         renderer.Render(ScreenOutput.From("font-iterm") with
         {
-            Terminal = new TerminalOutput
-            {
-                Iterm2Profile = "Tes\\sera\u0007;\u001b[31m",
-                FontSpec = "Iosevka Term 14",
-            },
+            Terminal = new TerminalOutput { Iterm2Profile = "Tes\\sera\a;\e[31m", FontSpec = "Iosevka Term 14" }
         });
         await renderer.FlushAsync(CancellationToken.None);
         var rendered = ReadUtf8(output);
 
-        AssertContains(rendered, "\u001b]1337;SetProfile=Tessera[31m\u0007");
-        AssertDoesNotContain(rendered, "\u001b]50;");
+        AssertContains(rendered, "\e]1337;SetProfile=Tessera[31m\a");
+        AssertDoesNotContain(rendered, "\e]50;");
     }
 
     private static async Task CellDiff_UpdatesOnlyChangedCellRun()
@@ -707,9 +660,9 @@ internal static class RendererBehaviorTests
         var patch = ReadUtf8(output, marker);
 
         // Assert
-        AssertContains(patch, "\u001b[1;2H");
+        AssertContains(patch, "\e[1;2H");
         AssertContains(patch, "x");
-        AssertDoesNotContain(patch, "\u001b[1;1Haxc");
+        AssertDoesNotContain(patch, "\e[1;1Haxc");
     }
 
     private static async Task CellDiff_ClearsShortenedLineTail()
@@ -728,7 +681,7 @@ internal static class RendererBehaviorTests
         var patch = ReadUtf8(output, marker);
 
         // Assert
-        AssertContains(patch, "\u001b[1;3H");
+        AssertContains(patch, "\e[1;3H");
         AssertContains(patch, "   ");
     }
 
@@ -738,7 +691,7 @@ internal static class RendererBehaviorTests
         await using var renderer = new AnsiDiffRenderer();
         await using var output = new MemoryStream();
         await renderer.InitializeAsync(output, CancellationToken.None);
-        renderer.Resize(width: 3, height: 5);
+        renderer.Resize(3, 5);
 
         // Act
         renderer.Render(ScreenOutput.From("abcdef"));
@@ -756,7 +709,7 @@ internal static class RendererBehaviorTests
         await using var renderer = new AnsiDiffRenderer();
         await using var output = new MemoryStream();
         await renderer.InitializeAsync(output, CancellationToken.None);
-        renderer.Resize(width: 4, height: 2);
+        renderer.Resize(4, 2);
 
         // Act
         renderer.Render(ScreenOutput.From("row1\nrow2\nrow3"));
@@ -775,7 +728,7 @@ internal static class RendererBehaviorTests
         await using var renderer = new AnsiDiffRenderer();
         await using var output = new MemoryStream();
         await renderer.InitializeAsync(output, CancellationToken.None);
-        renderer.Resize(width: 4, height: 5);
+        renderer.Resize(4, 5);
 
         // Act
         renderer.Render(ScreenOutput.From("abcdefgh"));
@@ -783,9 +736,9 @@ internal static class RendererBehaviorTests
         var rendered = ReadUtf8(output);
 
         // Assert
-        AssertContains(rendered, "\u001b[1;1H");
+        AssertContains(rendered, "\e[1;1H");
         AssertContains(rendered, "abcd");
-        AssertContains(rendered, "\u001b[2;1H");
+        AssertContains(rendered, "\e[2;1H");
         AssertContains(rendered, "efgh");
     }
 
@@ -795,7 +748,7 @@ internal static class RendererBehaviorTests
         await using var renderer = new AnsiDiffRenderer();
         await using var output = new MemoryStream();
         await renderer.InitializeAsync(output, CancellationToken.None);
-        renderer.Resize(width: 3, height: 5);
+        renderer.Resize(3, 5);
 
         // Act
         renderer.Render(ScreenOutput.From("ab好"));
@@ -804,7 +757,7 @@ internal static class RendererBehaviorTests
 
         // Assert
         AssertContains(rendered, "ab");
-        AssertContains(rendered, "\u001b[2;1H");
+        AssertContains(rendered, "\e[2;1H");
         AssertContains(rendered, "好");
     }
 
@@ -824,7 +777,7 @@ internal static class RendererBehaviorTests
         var patch = ReadUtf8(output, marker);
 
         // Assert
-        AssertContains(patch, "\u001b[1;4H");
+        AssertContains(patch, "\e[1;4H");
         AssertContains(patch, "e\u0300");
     }
 
@@ -834,7 +787,7 @@ internal static class RendererBehaviorTests
         await using var renderer = new AnsiDiffRenderer();
         await using var output = new MemoryStream();
         await renderer.InitializeAsync(output, CancellationToken.None);
-        renderer.Resize(width: 3, height: 2);
+        renderer.Resize(3, 2);
         renderer.Render(ScreenOutput.From("好x"));
         await renderer.FlushAsync(CancellationToken.None);
         var marker = output.Length;
@@ -845,7 +798,7 @@ internal static class RendererBehaviorTests
         var patch = ReadUtf8(output, marker);
 
         // Assert
-        AssertContains(patch, "\u001b[1;1H");
+        AssertContains(patch, "\e[1;1H");
         AssertContains(patch, "ab ");
     }
 
@@ -918,7 +871,7 @@ internal static class RendererBehaviorTests
     private static string Escape(string text)
     {
         return text
-            .Replace("\u001b", "\\u001b", StringComparison.Ordinal)
+            .Replace("\e", "\\e", StringComparison.Ordinal)
             .Replace("\r", "\\r", StringComparison.Ordinal)
             .Replace("\n", "\\n", StringComparison.Ordinal);
     }

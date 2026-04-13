@@ -1,4 +1,4 @@
-﻿using Tessera.Components.Primitives;
+using Tessera.Components.Primitives;
 using Tessera.Controls.Internal;
 using Tessera.Layout;
 using Tessera.Styles;
@@ -6,7 +6,7 @@ using Tessera.Styles;
 namespace Tessera.Controls;
 
 /// <summary>
-/// Represents a single-choice group of radio options.
+///     Represents a single-choice group of radio options.
 /// </summary>
 public sealed class RadioGroup : Control
 {
@@ -14,30 +14,17 @@ public sealed class RadioGroup : Control
     private int _hoveredIndex = -1;
 
     /// <summary>
-    /// Represents selection changed.
+    ///     Represents title.
     /// </summary>
-    public event EventHandler<SelectionChangedEventArgs>? SelectionChanged;
+    public string Title { get; set; } = "Radio";
 
     /// <summary>
-    /// Represents title.
+    ///     Gets or sets the marker shown in the title when the control is focused.
     /// </summary>
-    public string Title
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = "Radio";
+    public string FocusMarker { get; set; } = "*";
 
     /// <summary>
-    /// Gets or sets the marker shown in the title when the control is focused.
-    /// </summary>
-    public string FocusMarker
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = "*";
-
-    /// <summary>
-    /// Gets or sets a value indicating whether the title focus marker should be rendered.
+    ///     Gets or sets a value indicating whether the title focus marker should be rendered.
     /// </summary>
     public bool ShowFocusMarker
     {
@@ -46,7 +33,7 @@ public sealed class RadioGroup : Control
     } = true;
 
     /// <summary>
-    /// Gets or sets the title style applied when not focused.
+    ///     Gets or sets the title style applied when not focused.
     /// </summary>
     public TesseraStyle TitleStyle
     {
@@ -55,7 +42,7 @@ public sealed class RadioGroup : Control
     } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the title style applied when focused.
+    ///     Gets or sets the title style applied when focused.
     /// </summary>
     public TesseraStyle FocusedTitleStyle
     {
@@ -64,7 +51,7 @@ public sealed class RadioGroup : Control
     } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the base style applied to item rows.
+    ///     Gets or sets the base style applied to item rows.
     /// </summary>
     public TesseraStyle ItemStyle
     {
@@ -73,7 +60,7 @@ public sealed class RadioGroup : Control
     } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the style merged into selected rows.
+    ///     Gets or sets the style merged into selected rows.
     /// </summary>
     public TesseraStyle SelectedItemStyle
     {
@@ -82,7 +69,7 @@ public sealed class RadioGroup : Control
     } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the style merged into hovered rows.
+    ///     Gets or sets the style merged into hovered rows.
     /// </summary>
     public TesseraStyle HoveredItemStyle
     {
@@ -91,7 +78,7 @@ public sealed class RadioGroup : Control
     } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the style merged when the control is disabled.
+    ///     Gets or sets the style merged when the control is disabled.
     /// </summary>
     public TesseraStyle DisabledItemStyle
     {
@@ -100,30 +87,22 @@ public sealed class RadioGroup : Control
     } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the marker shown for selected rows.
+    ///     Gets or sets the marker shown for selected rows.
     /// </summary>
-    public string SelectedMarker
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = "(•)";
+    public string SelectedMarker { get; set; } = "(•)";
 
     /// <summary>
-    /// Gets or sets the marker shown for unselected rows.
+    ///     Gets or sets the marker shown for unselected rows.
     /// </summary>
-    public string UnselectedMarker
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = "( )";
+    public string UnselectedMarker { get; set; } = "( )";
 
     /// <summary>
-    /// Gets or sets the selected index.
+    ///     Gets or sets the selected index.
     /// </summary>
     public int SelectedIndex { get; private set; }
 
     /// <summary>
-    /// Represents selected item.
+    ///     Represents selected item.
     /// </summary>
     public string SelectedItem =>
         SelectedIndex >= 0 && SelectedIndex < _items.Count
@@ -131,7 +110,12 @@ public sealed class RadioGroup : Control
             : string.Empty;
 
     /// <summary>
-    /// Executes set items.
+    ///     Represents selection changed.
+    /// </summary>
+    public event EventHandler<SelectionChangedEventArgs>? SelectionChanged;
+
+    /// <summary>
+    ///     Executes set items.
     /// </summary>
     /// <param name="items">The items value.</param>
     public void SetItems(IEnumerable<string> items)
@@ -174,7 +158,8 @@ public sealed class RadioGroup : Control
 
         if (changed && previousIndex != SelectedIndex)
         {
-            SelectionChanged?.Invoke(this, new SelectionChangedEventArgs(previousIndex, SelectedIndex, previousItem, SelectedItem));
+            SelectionChanged?.Invoke(this,
+                new SelectionChangedEventArgs(previousIndex, SelectedIndex, previousItem, SelectedItem));
         }
 
         return changed;
@@ -226,7 +211,8 @@ public sealed class RadioGroup : Control
         var previousIndex = SelectedIndex;
         var previousItem = SelectedItem;
         SelectedIndex = hovered;
-        SelectionChanged?.Invoke(this, new SelectionChangedEventArgs(previousIndex, SelectedIndex, previousItem, SelectedItem));
+        SelectionChanged?.Invoke(this,
+            new SelectionChangedEventArgs(previousIndex, SelectedIndex, previousItem, SelectedItem));
         return true;
     }
 
@@ -245,13 +231,14 @@ public sealed class RadioGroup : Control
         {
             var marker = row == SelectedIndex ? SelectedMarker : UnselectedMarker;
             var line = $"{marker} {_items[row]}";
-            canvas.WriteText(content.X, content.Y + row, ApplyStyle(line, ResolveItemStyle(row, row == _hoveredIndex)), content.Width);
+            canvas.WriteText(content.X, content.Y + row, ApplyStyle(line, ResolveItemStyle(row, row == _hoveredIndex)),
+                content.Width);
         }
     }
 
     internal override LayoutMeasurement Measure(in Rect availableBounds)
     {
-        var width = ControlTextLayout.MeasureDisplayWidth(FormatTitleText(includeFocusMarkerWhenUnfocused: true)) + 4;
+        var width = ControlTextLayout.MeasureDisplayWidth(FormatTitleText(true)) + 4;
         var markerWidth = Math.Max(
             ControlTextLayout.MeasureDisplayWidth(SelectedMarker),
             ControlTextLayout.MeasureDisplayWidth(UnselectedMarker));
@@ -268,7 +255,8 @@ public sealed class RadioGroup : Control
 
     private string FormatTitleText(bool includeFocusMarkerWhenUnfocused = false)
     {
-        if ((IsFocused || includeFocusMarkerWhenUnfocused) && ShowFocusMarker && !string.IsNullOrWhiteSpace(FocusMarker))
+        if ((IsFocused || includeFocusMarkerWhenUnfocused) && ShowFocusMarker &&
+            !string.IsNullOrWhiteSpace(FocusMarker))
         {
             return $"{Title} {FocusMarker}";
         }

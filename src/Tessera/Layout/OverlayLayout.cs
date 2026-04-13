@@ -15,7 +15,7 @@ internal sealed class OverlayLayout : LayoutNode
     }
 
     /// <summary>
-    /// Gets the overlay items in back-to-front order.
+    ///     Gets the overlay items in back-to-front order.
     /// </summary>
     public IReadOnlyList<LayoutNode> Items { get; }
 

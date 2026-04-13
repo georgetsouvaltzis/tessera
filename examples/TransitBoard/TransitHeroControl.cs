@@ -26,14 +26,16 @@ internal sealed class TransitHeroControl : Control
             return;
         }
 
-        WriteLine(canvas, clipped, 0, $"{Render(TitleStyle, Title.ToUpperInvariant())}  {Render(ClockStyle, ClockText)}");
+        WriteLine(canvas, clipped, 0,
+            $"{Render(TitleStyle, Title.ToUpperInvariant())}  {Render(ClockStyle, ClockText)}");
         WriteLine(canvas, clipped, 1, Render(SummaryStyle, SummaryText));
         WriteLine(canvas, clipped, 2, Render(AdvisoryStyle, AdvisoryText));
         WriteLine(canvas, clipped, 3, Render(NoticeStyle, NoticeText));
 
         if (clipped.Height > 4)
         {
-            canvas.WriteText(clipped.X, clipped.Bottom - 1, Render(DividerStyle, new string('─', clipped.Width)), clipped.Width);
+            canvas.WriteText(clipped.X, clipped.Bottom - 1, Render(DividerStyle, new string('─', clipped.Width)),
+                clipped.Width);
         }
     }
 
@@ -47,5 +49,8 @@ internal sealed class TransitHeroControl : Control
         canvas.WriteText(rect.X, rect.Y + row, text, rect.Width);
     }
 
-    private static string Render(TesseraStyle style, string text) => style.IsEmpty ? text : style.Render(text);
+    private static string Render(TesseraStyle style, string text)
+    {
+        return style.IsEmpty ? text : style.Render(text);
+    }
 }

@@ -12,16 +12,12 @@ public sealed class ResizablePaneGroupControlTests
     [Test]
     public void ControlsResizablePaneGroupKeyboardSelectionRaisesSelectionChanged()
     {
-        var control = new ResizablePaneGroup
-        {
-            Border = BorderStyle.None,
-            IsFocused = true,
-        };
+        var control = new ResizablePaneGroup { Border = BorderStyle.None, IsFocused = true };
         control.SetPanes(
         [
             new PaneSpec("left", title: "Left"),
             new PaneSpec("center", title: "Center"),
-            new PaneSpec("right", title: "Right"),
+            new PaneSpec("right", title: "Right")
         ]);
 
         ListSelectionChangedEventArgs<PaneSpec>? args = null;
@@ -45,7 +41,7 @@ public sealed class ResizablePaneGroupControlTests
         [
             new PaneSpec("left", title: "Left"),
             new PaneSpec("center", title: "Center"),
-            new PaneSpec("right", title: "Right"),
+            new PaneSpec("right", title: "Right")
         ]);
 
         Assert.That(control.SelectedIndex, Is.EqualTo(control.SelectedPaneIndex));
@@ -81,22 +77,18 @@ public sealed class ResizablePaneGroupControlTests
     {
         var first = new SpyPaneControl("first");
         var second = new SpyPaneControl("second");
-        var control = new ResizablePaneGroup
-        {
-            Border = BorderStyle.None,
-            IsFocused = true,
-        };
+        var control = new ResizablePaneGroup { Border = BorderStyle.None, IsFocused = true };
         control.SetPanes(
         [
             new PaneSpec("left", first),
-            new PaneSpec("right", second),
+            new PaneSpec("right", second)
         ]);
 
-        RenderControl(control, width: 64, height: 8);
+        RenderControl(control, 64, 8);
         var before = first.LastRenderBounds.Width;
 
         var handled = control.Handle(new KeyPressed(Key.Right, Modifiers: ModifierKeys.Ctrl));
-        RenderControl(control, width: 64, height: 8);
+        RenderControl(control, 64, 8);
         var after = first.LastRenderBounds.Width;
 
         Assert.That(handled, Is.True);
@@ -108,14 +100,11 @@ public sealed class ResizablePaneGroupControlTests
     {
         var first = new SpyPaneControl("first");
         var second = new SpyPaneControl("second");
-        var control = new ResizablePaneGroup
-        {
-            Border = BorderStyle.None,
-        };
+        var control = new ResizablePaneGroup { Border = BorderStyle.None };
         control.SetPanes(
         [
             new PaneSpec("left", first),
-            new PaneSpec("right", second),
+            new PaneSpec("right", second)
         ]);
 
         var bounds = new Rect(0, 0, 60, 8);
@@ -124,7 +113,8 @@ public sealed class ResizablePaneGroupControlTests
 
         var pressDivider = control.Handle(new PointerInput(PointerEventKind.Press, PointerButton.Left, 30, 2), bounds);
         var dragDivider = control.Handle(new PointerInput(PointerEventKind.Motion, PointerButton.None, 42, 2), bounds);
-        var releaseDivider = control.Handle(new PointerInput(PointerEventKind.Release, PointerButton.Left, 42, 2), bounds);
+        var releaseDivider =
+            control.Handle(new PointerInput(PointerEventKind.Release, PointerButton.Left, 42, 2), bounds);
 
         RenderControl(control, 60, 8);
         var after = first.LastRenderBounds.Width;
@@ -149,15 +139,15 @@ public sealed class ResizablePaneGroupControlTests
             FocusedBorderStyleText = TesseraStyle.Empty.WithForeground(AnsiColor.Rgb(44, 55, 66)),
             TitleStyleText = TesseraStyle.Empty.WithForeground(AnsiColor.Rgb(12, 23, 34)),
             FocusedTitleStyleText = TesseraStyle.Empty.WithForeground(AnsiColor.Rgb(90, 80, 70)),
-            DividerStyleText = TesseraStyle.Empty.WithForeground(AnsiColor.Rgb(10, 20, 30)),
+            DividerStyleText = TesseraStyle.Empty.WithForeground(AnsiColor.Rgb(10, 20, 30))
         };
         control.SetPanes(
         [
             new PaneSpec("left", title: "Left"),
-            new PaneSpec("right", title: "Right"),
+            new PaneSpec("right", title: "Right")
         ]);
 
-        var output = RenderControl(control, width: 56, height: 8);
+        var output = RenderControl(control, 56, 8);
 
         Assert.That(output.Contains("Resizable Pane Group *", StringComparison.Ordinal), Is.True);
         Assert.That(output.Contains("38;2;44;55;66", StringComparison.Ordinal), Is.True);
@@ -167,22 +157,19 @@ public sealed class ResizablePaneGroupControlTests
     [Test]
     public void ControlsResizablePaneGroupDefaultRenderIsDeterministicAndMonochrome()
     {
-        var control = new ResizablePaneGroup
-        {
-            Border = BorderStyle.None,
-        };
+        var control = new ResizablePaneGroup { Border = BorderStyle.None };
         control.SetPanes(
         [
             new PaneSpec("left", title: "Left"),
             new PaneSpec("right", title: "Right"),
-            new PaneSpec("tail", title: "Tail"),
+            new PaneSpec("tail", title: "Tail")
         ]);
 
-        var first = RenderControl(control, width: 56, height: 8);
-        var second = RenderControl(control, width: 56, height: 8);
+        var first = RenderControl(control, 56, 8);
+        var second = RenderControl(control, 56, 8);
 
         Assert.That(first, Is.EqualTo(second));
-        Assert.That(first.Contains("\u001b[", StringComparison.Ordinal), Is.False);
+        Assert.That(first.Contains("\e[", StringComparison.Ordinal), Is.False);
     }
 
     private static string RenderControl(ResizablePaneGroup control, int width, int height)
@@ -194,7 +181,7 @@ public sealed class ResizablePaneGroupControlTests
 
     private sealed class SpyPaneControl(string label) : Control
     {
-        public Rect LastRenderBounds { get; private set; } = new Rect(0, 0, 0, 0);
+        public Rect LastRenderBounds { get; private set; } = new(0, 0, 0, 0);
 
         public override void Render(Canvas canvas, Rect rect)
         {

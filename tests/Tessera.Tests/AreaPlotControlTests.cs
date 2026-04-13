@@ -1,6 +1,5 @@
 using NUnit.Framework;
 using Tessera.Components.Primitives;
-using Tessera.Components.Styling;
 using Tessera.Controls;
 using Tessera.Styles;
 
@@ -19,13 +18,13 @@ public sealed class AreaPlotControlTests
             MinValue = 0,
             MaxValue = 100,
             Options = new AreaPlotOptions(
-                FillGlyph: '.',
-                LineGlyph: '*',
-                ShowBaseline: false),
+                '.',
+                '*',
+                false)
         };
         control.SetSamples([0, 50, 100, 50]);
 
-        var output = Render(control, width: 4, height: 4);
+        var output = Render(control, 4, 4);
         var rows = output.Split('\n');
 
         Assert.That(rows.Length, Is.EqualTo(4));
@@ -37,7 +36,7 @@ public sealed class AreaPlotControlTests
     [Test]
     public void AreaPlotAppendAndSetSamplesHonorCapacityAndClear()
     {
-        var control = new AreaPlot(capacity: 3);
+        var control = new AreaPlot(3);
         control.SetSamples([1, 2, 3, 4, 5]);
         var expectedAfterSet = new[] { 3d, 4d, 5d };
         Assert.That(control.Samples, Is.EqualTo(expectedAfterSet));
@@ -60,11 +59,11 @@ public sealed class AreaPlotControlTests
                 ShowBaseline: true,
                 BaselineGlyph: '=',
                 ShowStats: true,
-                Legend: "mem"),
+                Legend: "mem")
         };
         control.SetSamples([10, 20, 30, 40]);
 
-        var output = Render(control, width: 28, height: 8);
+        var output = Render(control, 28, 8);
 
         Assert.That(output.Contains("min:10.0 max:40.0", StringComparison.Ordinal), Is.True);
         Assert.That(output.Contains("mem", StringComparison.Ordinal), Is.True);
@@ -82,11 +81,11 @@ public sealed class AreaPlotControlTests
             IsFocused = true,
             FocusMarker = "!",
             ShowFocusMarker = true,
-            FocusedTitleStyle = focusedTitle,
+            FocusedTitleStyle = focusedTitle
         };
         control.SetSamples([1, 2, 3, 4, 5]);
 
-        var output = Render(control, width: 28, height: 8);
+        var output = Render(control, 28, 8);
 
         Assert.That(output.Contains("Memory !", StringComparison.Ordinal), Is.True);
         Assert.That(output.Contains(focusedTitle.Render("Memory !"), StringComparison.Ordinal), Is.True);
@@ -104,11 +103,11 @@ public sealed class AreaPlotControlTests
             LineStyle = TesseraStyle.Empty.WithForeground(AnsiColor.BrightBlue),
             DisabledStyle = TesseraStyle.Empty.WithDim(),
             IsDisabled = true,
-            Options = new AreaPlotOptions(ShowBaseline: false),
+            Options = new AreaPlotOptions(ShowBaseline: false)
         };
         control.SetSamples([100]);
 
-        var output = Render(control, width: 1, height: 2);
+        var output = Render(control, 1, 2);
         var expectedLine = control.LineStyle.Merge(control.DisabledStyle).Render("▀");
 
         Assert.That(output.Contains(expectedLine, StringComparison.Ordinal), Is.True);

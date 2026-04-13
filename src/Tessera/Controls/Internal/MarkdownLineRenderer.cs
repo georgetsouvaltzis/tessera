@@ -10,7 +10,7 @@ internal static class MarkdownLineRenderer
         var inCode = false;
         foreach (var raw in lines)
         {
-            var line = raw ?? string.Empty;
+            var line = raw;
             var trimmed = line.TrimStart();
 
             if (trimmed.StartsWith("```", StringComparison.Ordinal))
@@ -44,7 +44,8 @@ internal static class MarkdownLineRenderer
                 continue;
             }
 
-            if (trimmed.StartsWith("- ", StringComparison.Ordinal) || trimmed.StartsWith("* ", StringComparison.Ordinal))
+            if (trimmed.StartsWith("- ", StringComparison.Ordinal) ||
+                trimmed.StartsWith("* ", StringComparison.Ordinal))
             {
                 output.Add($"• {trimmed[2..]}");
                 continue;

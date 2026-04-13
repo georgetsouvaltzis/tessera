@@ -1,5 +1,5 @@
-using System.Globalization;
 using NUnit.Framework;
+using System.Globalization;
 using Tessera.Components.Primitives;
 using Tessera.Controls;
 using Tessera.Styles;
@@ -14,25 +14,23 @@ public sealed class TraceViewerControlTests
     public void ControlsTraceViewerRendersSortedRowsSeverityAndDuration()
     {
         var day = new DateTimeOffset(2026, 3, 21, 9, 0, 0, TimeSpan.Zero);
-        var control = new TraceViewer
-        {
-            Border = BorderStyle.None,
-            TimeFormat = "HH:mm:ss",
-        };
+        var control = new TraceViewer { Border = BorderStyle.None, TimeFormat = "HH:mm:ss" };
         control.SetEntries(
         [
             new TraceEntry("b", day.AddMinutes(2), "Auth", "token validated", TraceSeverity.Info, 2.3),
             new TraceEntry("a", day.AddMinutes(1), "Gateway", "request accepted", TraceSeverity.Warning, 1.2),
-            new TraceEntry("c", day.AddMinutes(3), "Db", "timeout", TraceSeverity.Error, 14.8),
+            new TraceEntry("c", day.AddMinutes(3), "Db", "timeout", TraceSeverity.Error, 14.8)
         ]);
 
-        var output = Render(control, width: 96, height: 8);
+        var output = Render(control, 96, 8);
         var onePointTwo = 1.2.ToString("0.##", CultureInfo.CurrentCulture);
         var twoPointThree = 2.3.ToString("0.##", CultureInfo.CurrentCulture);
         var fourteenPointEight = 14.8.ToString("0.##", CultureInfo.CurrentCulture);
 
-        var first = output.IndexOf($"09:01:00 WRN Gateway: request accepted ({onePointTwo}ms)", StringComparison.Ordinal);
-        var second = output.IndexOf($"09:02:00 INF Auth: token validated ({twoPointThree}ms)", StringComparison.Ordinal);
+        var first = output.IndexOf($"09:01:00 WRN Gateway: request accepted ({onePointTwo}ms)",
+            StringComparison.Ordinal);
+        var second = output.IndexOf($"09:02:00 INF Auth: token validated ({twoPointThree}ms)",
+            StringComparison.Ordinal);
         var third = output.IndexOf($"09:03:00 ERR Db: timeout ({fourteenPointEight}ms)", StringComparison.Ordinal);
         Assert.That(first >= 0, Is.True);
         Assert.That(second > first, Is.True);
@@ -42,11 +40,7 @@ public sealed class TraceViewerControlTests
     [Test]
     public void ControlsTraceViewerKeyboardNavigationRaisesSelectionChanged()
     {
-        var control = new TraceViewer
-        {
-            IsFocused = true,
-            Border = BorderStyle.None,
-        };
+        var control = new TraceViewer { IsFocused = true, Border = BorderStyle.None };
         control.SetEntries(CreateEntries());
         TraceSelectionChangedEventArgs? args = null;
         control.SelectionChanged += (_, eventArgs) => args = eventArgs;
@@ -67,10 +61,7 @@ public sealed class TraceViewerControlTests
     [Test]
     public void ControlsTraceViewerPointerHoverClickAndWheelUpdateSelection()
     {
-        var control = new TraceViewer
-        {
-            Border = BorderStyle.SingleLine,
-        };
+        var control = new TraceViewer { Border = BorderStyle.SingleLine };
         control.SetEntries(CreateEntries());
         var bounds = new Rect(0, 0, 96, 8);
 
@@ -97,12 +88,12 @@ public sealed class TraceViewerControlTests
             ErrorRowStyle = TesseraStyle.Empty.WithForeground(AnsiColor.Rgb(101, 102, 103)),
             SelectedRowStyle = TesseraStyle.Empty.WithBold(),
             FocusedSelectedRowStyle = TesseraStyle.Empty.WithUnderline(),
-            HoveredRowStyle = TesseraStyle.Empty.WithBackground(AnsiColor.Rgb(10, 20, 30)),
+            HoveredRowStyle = TesseraStyle.Empty.WithBackground(AnsiColor.Rgb(10, 20, 30))
         };
         control.SetEntries(CreateEntries());
         _ = control.Handle(new PointerInput(PointerEventKind.Motion, PointerButton.None, 2, 1), new Rect(0, 0, 96, 6));
 
-        var output = Render(control, width: 96, height: 6);
+        var output = Render(control, 96, 6);
         Assert.That(output.Contains("38;2;91;92;93", StringComparison.Ordinal), Is.True);
         Assert.That(output.Contains("38;2;101;102;103", StringComparison.Ordinal), Is.True);
         Assert.That(
@@ -110,23 +101,22 @@ public sealed class TraceViewerControlTests
             || output.Contains(";1;", StringComparison.Ordinal)
             || output.Contains("[1m", StringComparison.Ordinal),
             Is.True);
-        Assert.That(output.Contains(";4;", StringComparison.Ordinal) || output.Contains("[4m", StringComparison.Ordinal), Is.True);
+        Assert.That(
+            output.Contains(";4;", StringComparison.Ordinal) || output.Contains("[4m", StringComparison.Ordinal),
+            Is.True);
     }
 
     [Test]
     public void ControlsTraceViewerDefaultRenderIsDeterministicAndMonochrome()
     {
-        var control = new TraceViewer
-        {
-            Border = BorderStyle.None,
-        };
+        var control = new TraceViewer { Border = BorderStyle.None };
         control.SetEntries(CreateEntries());
 
-        var first = Render(control, width: 96, height: 6);
-        var second = Render(control, width: 96, height: 6);
+        var first = Render(control, 96, 6);
+        var second = Render(control, 96, 6);
 
         Assert.That(first, Is.EqualTo(second));
-        Assert.That(first.Contains("\u001b[", StringComparison.Ordinal), Is.False);
+        Assert.That(first.Contains("\e[", StringComparison.Ordinal), Is.False);
     }
 
     private static IReadOnlyList<TraceEntry> CreateEntries()
@@ -136,7 +126,7 @@ public sealed class TraceViewerControlTests
         [
             new TraceEntry("a", day.AddMinutes(1), "Gateway", "request accepted", TraceSeverity.Warning, 1.2),
             new TraceEntry("b", day.AddMinutes(2), "Auth", "token validated", TraceSeverity.Info, 2.3),
-            new TraceEntry("c", day.AddMinutes(3), "Db", "timeout", TraceSeverity.Error, 14.8),
+            new TraceEntry("c", day.AddMinutes(3), "Db", "timeout", TraceSeverity.Error, 14.8)
         ];
     }
 

@@ -1,3 +1,4 @@
+using Tessera.Styles;
 
 namespace Tessera.Components.Primitives.Internal;
 
@@ -15,7 +16,8 @@ internal static class FrameLayout
         return ResolveInnerRect(bounds, border).Inset(padding);
     }
 
-    public static Rect DrawFrameAndResolveContent(Canvas canvas, Rect bounds, string? title, BorderStyle border, Thickness padding)
+    public static Rect DrawFrameAndResolveContent(Canvas canvas, Rect bounds, string? title, BorderStyle border,
+        Thickness padding)
     {
         if (border != BorderStyle.None)
         {
@@ -31,7 +33,7 @@ internal static class FrameLayout
         string? title,
         BorderStyle border,
         Thickness padding,
-        global::Tessera.Styles.TesseraStyle borderStyleText)
+        TesseraStyle borderStyleText)
     {
         if (border != BorderStyle.None)
         {

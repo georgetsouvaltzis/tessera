@@ -6,42 +6,22 @@ using Tessera.Styles;
 namespace Tessera.Controls;
 
 /// <summary>
-/// Represents a centered empty-data surface with optional action affordance.
+///     Represents a centered empty-data surface with optional action affordance.
 /// </summary>
 public sealed class EmptyState : Control
 {
-    private bool _hovered;
-
     /// <summary>
-    /// Occurs when the action is activated.
+    ///     Gets or sets the title text.
     /// </summary>
-    public event EventHandler? Activated;
+    public string Title { get; set; } = "Nothing here yet";
 
     /// <summary>
-    /// Occurs when the action is activated.
+    ///     Gets or sets the body text.
     /// </summary>
-    public event EventHandler? ActionInvoked;
+    public string Description { get; set; } = "There is no data to display.";
 
     /// <summary>
-    /// Gets or sets the title text.
-    /// </summary>
-    public string Title
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = "Nothing here yet";
-
-    /// <summary>
-    /// Gets or sets the body text.
-    /// </summary>
-    public string Description
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = "There is no data to display.";
-
-    /// <summary>
-    /// Gets or sets the body text.
+    ///     Gets or sets the body text.
     /// </summary>
     public string Body
     {
@@ -50,25 +30,17 @@ public sealed class EmptyState : Control
     }
 
     /// <summary>
-    /// Gets or sets optional hint text.
+    ///     Gets or sets optional hint text.
     /// </summary>
-    public string Hint
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = string.Empty;
+    public string Hint { get; set; } = string.Empty;
 
     /// <summary>
-    /// Gets or sets action label text.
+    ///     Gets or sets action label text.
     /// </summary>
-    public string ActionText
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = "Retry";
+    public string ActionText { get; set; } = "Retry";
 
     /// <summary>
-    /// Gets or sets action label text.
+    ///     Gets or sets action label text.
     /// </summary>
     public string ActionLabel
     {
@@ -77,85 +49,91 @@ public sealed class EmptyState : Control
     }
 
     /// <summary>
-    /// Gets or sets whether the action is visible and interactive.
+    ///     Gets or sets whether the action is visible and interactive.
     /// </summary>
     public bool ShowAction { get; set; } = true;
 
     /// <summary>
-    /// Gets or sets focus marker text.
+    ///     Gets or sets focus marker text.
     /// </summary>
-    public string FocusMarker
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = "*";
+    public string FocusMarker { get; set; } = "*";
 
     /// <summary>
-    /// Gets or sets whether focus marker should render while focused.
+    ///     Gets or sets whether focus marker should render while focused.
     /// </summary>
     public bool ShowFocusMarker { get; set; } = true;
 
     /// <summary>
-    /// Gets or sets default text style.
+    ///     Gets or sets default text style.
     /// </summary>
     public TesseraStyle DefaultStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets focused text style.
+    ///     Gets or sets focused text style.
     /// </summary>
     public TesseraStyle FocusedStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets hovered text style.
+    ///     Gets or sets hovered text style.
     /// </summary>
     public TesseraStyle HoveredStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets disabled text style.
+    ///     Gets or sets disabled text style.
     /// </summary>
     public TesseraStyle DisabledStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets action text style.
+    ///     Gets or sets action text style.
     /// </summary>
     public TesseraStyle ActionStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets title style.
+    ///     Gets or sets title style.
     /// </summary>
     public TesseraStyle TitleStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets focused title style.
+    ///     Gets or sets focused title style.
     /// </summary>
     public TesseraStyle FocusedTitleStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets body style.
+    ///     Gets or sets body style.
     /// </summary>
     public TesseraStyle DescriptionStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets hint style.
+    ///     Gets or sets hint style.
     /// </summary>
     public TesseraStyle HintStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets focused action style.
+    ///     Gets or sets focused action style.
     /// </summary>
     public TesseraStyle FocusedActionStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets hovered action style.
+    ///     Gets or sets hovered action style.
     /// </summary>
     public TesseraStyle HoveredActionStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets whether pointer is inside control bounds.
+    ///     Gets whether pointer is inside control bounds.
     /// </summary>
-    public bool IsHovered => _hovered;
+    public bool IsHovered { get; private set; }
 
     internal override bool CanFocus => ShowAction && !IsDisabled;
+
+    /// <summary>
+    ///     Occurs when the action is activated.
+    /// </summary>
+    public event EventHandler? Activated;
+
+    /// <summary>
+    ///     Occurs when the action is activated.
+    /// </summary>
+    public event EventHandler? ActionInvoked;
 
     /// <inheritdoc />
     public override bool Handle(Message message)
@@ -218,7 +196,7 @@ public sealed class EmptyState : Control
         }
 
         var y = clipped.Y;
-        if (TryWriteLine(canvas, clipped, ref y, RenderTitle(), ResolveTitleLineStyle(), includeActionStyles: false))
+        if (TryWriteLine(canvas, clipped, ref y, RenderTitle(), ResolveTitleLineStyle(), false))
         {
             return;
         }
@@ -228,7 +206,7 @@ public sealed class EmptyState : Control
             return;
         }
 
-        if (TryWriteLine(canvas, clipped, ref y, Hint, ResolveHintLineStyle(), includeActionStyles: false))
+        if (TryWriteLine(canvas, clipped, ref y, Hint, ResolveHintLineStyle(), false))
         {
             return;
         }
@@ -244,7 +222,7 @@ public sealed class EmptyState : Control
             ref y,
             RenderActionText(),
             ResolveActionLineStyle(),
-            includeActionStyles: true);
+            true);
     }
 
     internal override LayoutMeasurement Measure(in Rect availableBounds)
@@ -306,7 +284,7 @@ public sealed class EmptyState : Control
                 canvas.WriteText(
                     clipped.X,
                     y,
-                    ApplyStylePipeline(line, ResolveBodyLineStyle(), includeActionStyles: false),
+                    ApplyStylePipeline(line, ResolveBodyLineStyle(), false),
                     clipped.Width);
             }
 
@@ -429,7 +407,10 @@ public sealed class EmptyState : Control
         return y >= clipped.Bottom;
     }
 
-    private bool HasAction() => ShowAction && !string.IsNullOrWhiteSpace(ActionText);
+    private bool HasAction()
+    {
+        return ShowAction && !string.IsNullOrWhiteSpace(ActionText);
+    }
 
     private string RenderTitle()
     {
@@ -441,7 +422,10 @@ public sealed class EmptyState : Control
         return $"{Title} {FocusMarker}";
     }
 
-    private string RenderActionText() => $"[{ActionText}]";
+    private string RenderActionText()
+    {
+        return $"[{ActionText}]";
+    }
 
     private TesseraStyle ResolveTitleLineStyle()
     {
@@ -450,9 +434,15 @@ public sealed class EmptyState : Control
             : TitleStyle;
     }
 
-    private TesseraStyle ResolveBodyLineStyle() => DescriptionStyle;
+    private TesseraStyle ResolveBodyLineStyle()
+    {
+        return DescriptionStyle;
+    }
 
-    private TesseraStyle ResolveHintLineStyle() => HintStyle;
+    private TesseraStyle ResolveHintLineStyle()
+    {
+        return HintStyle;
+    }
 
     private TesseraStyle ResolveActionLineStyle()
     {
@@ -462,7 +452,7 @@ public sealed class EmptyState : Control
             style = style.IsEmpty ? FocusedActionStyle : style.Merge(FocusedActionStyle);
         }
 
-        if (_hovered && !HoveredActionStyle.IsEmpty)
+        if (IsHovered && !HoveredActionStyle.IsEmpty)
         {
             style = style.IsEmpty ? HoveredActionStyle : style.Merge(HoveredActionStyle);
         }
@@ -478,7 +468,7 @@ public sealed class EmptyState : Control
             styled = ApplyStyle(styled, FocusedStyle);
         }
 
-        if (_hovered)
+        if (IsHovered)
         {
             styled = ApplyStyle(styled, HoveredStyle);
         }
@@ -499,12 +489,12 @@ public sealed class EmptyState : Control
 
     private bool SetHovered(bool hovered)
     {
-        if (_hovered == hovered)
+        if (IsHovered == hovered)
         {
             return false;
         }
 
-        _hovered = hovered;
+        IsHovered = hovered;
         return true;
     }
 

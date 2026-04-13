@@ -8,125 +8,116 @@ using Tessera.Styles;
 namespace Tessera.Controls;
 
 /// <summary>
-/// Represents a read-only rich-text viewer for structured docs/help panes.
+///     Represents a read-only rich-text viewer for structured docs/help panes.
 /// </summary>
 public sealed class RichTextView : Control
 {
     private readonly List<List<RichTextSegment>> _lines = [];
-    private int _scrollOffset;
-    private int _lastContentWidth;
     private int _lastContentHeight;
+    private int _lastContentWidth;
 
     /// <summary>
-    /// Gets or sets the frame title.
+    ///     Gets or sets the frame title.
     /// </summary>
-    public string Title
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = "Rich Text";
+    public string Title { get; set; } = "Rich Text";
 
     /// <summary>
-    /// Gets or sets the marker appended to the title while focused.
+    ///     Gets or sets the marker appended to the title while focused.
     /// </summary>
-    public string FocusMarker
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = "*";
+    public string FocusMarker { get; set; } = "*";
 
     /// <summary>
-    /// Gets or sets a value indicating whether the focus marker is shown while focused.
+    ///     Gets or sets a value indicating whether the focus marker is shown while focused.
     /// </summary>
     public bool ShowFocusMarker { get; set; } = true;
 
     /// <summary>
-    /// Gets or sets style used for title text while not focused.
+    ///     Gets or sets style used for title text while not focused.
     /// </summary>
     public TesseraStyle TitleStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets style used for title text while focused.
+    ///     Gets or sets style used for title text while focused.
     /// </summary>
     public TesseraStyle FocusedTitleStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets style used for plain body text.
+    ///     Gets or sets style used for plain body text.
     /// </summary>
     public TesseraStyle TextStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets style used for headings.
+    ///     Gets or sets style used for headings.
     /// </summary>
     public TesseraStyle HeadingStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets style used for list markers.
+    ///     Gets or sets style used for list markers.
     /// </summary>
     public TesseraStyle ListMarkerStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets style used for quote markers.
+    ///     Gets or sets style used for quote markers.
     /// </summary>
     public TesseraStyle QuoteMarkerStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets style used for inline emphasis.
+    ///     Gets or sets style used for inline emphasis.
     /// </summary>
     public TesseraStyle EmphasisStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets style used for inline strong emphasis.
+    ///     Gets or sets style used for inline strong emphasis.
     /// </summary>
     public TesseraStyle StrongStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets style used for inline code text.
+    ///     Gets or sets style used for inline code text.
     /// </summary>
     public TesseraStyle InlineCodeStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets style merged into rendered text while <see cref="Control.IsDisabled"/> is <see langword="true"/>.
+    ///     Gets or sets style merged into rendered text while <see cref="Control.IsDisabled" /> is <see langword="true" />.
     /// </summary>
     public TesseraStyle DisabledStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the style applied to border glyphs when the control is not focused.
+    ///     Gets or sets the style applied to border glyphs when the control is not focused.
     /// </summary>
     public TesseraStyle BorderStyleText { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the style merged into border glyphs while the control is focused.
+    ///     Gets or sets the style merged into border glyphs while the control is focused.
     /// </summary>
     public TesseraStyle FocusedBorderStyleText { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets frame border style.
+    ///     Gets or sets frame border style.
     /// </summary>
     public BorderStyle Border { get; set; } = BorderStyle.SingleLine;
 
     /// <summary>
-    /// Gets or sets inner padding for content.
+    ///     Gets or sets inner padding for content.
     /// </summary>
     public Thickness Padding { get; set; }
 
     /// <summary>
-    /// Gets or sets a value indicating whether line wrapping is enabled.
+    ///     Gets or sets a value indicating whether line wrapping is enabled.
     /// </summary>
     public bool Wrap { get; set; } = true;
 
     /// <summary>
-    /// Gets the currently configured logical lines.
+    ///     Gets the currently configured logical lines.
     /// </summary>
     public IReadOnlyList<IReadOnlyList<RichTextSegment>> Lines => _lines;
 
     /// <summary>
-    /// Gets the current visual scroll offset (in rendered rows).
+    ///     Gets the current visual scroll offset (in rendered rows).
     /// </summary>
-    public int ScrollOffset => _scrollOffset;
+    public int ScrollOffset { get; private set; }
 
     /// <summary>
-    /// Sets all logical lines.
+    ///     Sets all logical lines.
     /// </summary>
     /// <param name="lines">The line collection to render.</param>
     public void SetLines(IEnumerable<IEnumerable<RichTextSegment>> lines)
@@ -151,11 +142,11 @@ public sealed class RichTextView : Control
             _lines.Add(renderedLine);
         }
 
-        _scrollOffset = 0;
+        ScrollOffset = 0;
     }
 
     /// <summary>
-    /// Replaces content from plain text where each input line becomes one plain rich-text line.
+    ///     Replaces content from plain text where each input line becomes one plain rich-text line.
     /// </summary>
     /// <param name="text">The plain text to load.</param>
     public void SetPlainText(string? text)
@@ -167,16 +158,16 @@ public sealed class RichTextView : Control
             _lines.Add([RichTextSegment.Plain(sourceLines[index])]);
         }
 
-        _scrollOffset = 0;
+        ScrollOffset = 0;
     }
 
     /// <summary>
-    /// Clears all lines.
+    ///     Clears all lines.
     /// </summary>
     public void Clear()
     {
         _lines.Clear();
-        _scrollOffset = 0;
+        ScrollOffset = 0;
     }
 
     /// <inheritdoc />
@@ -194,16 +185,16 @@ public sealed class RichTextView : Control
         switch (key.Key)
         {
             case Key.Up:
-                nextOffset = Math.Max(0, _scrollOffset - 1);
+                nextOffset = Math.Max(0, ScrollOffset - 1);
                 break;
             case Key.Down:
-                nextOffset = Math.Min(maxOffset, _scrollOffset + 1);
+                nextOffset = Math.Min(maxOffset, ScrollOffset + 1);
                 break;
             case Key.PageUp:
-                nextOffset = Math.Max(0, _scrollOffset - pageSize);
+                nextOffset = Math.Max(0, ScrollOffset - pageSize);
                 break;
             case Key.PageDown:
-                nextOffset = Math.Min(maxOffset, _scrollOffset + pageSize);
+                nextOffset = Math.Min(maxOffset, ScrollOffset + pageSize);
                 break;
             case Key.Home:
                 nextOffset = 0;
@@ -215,12 +206,12 @@ public sealed class RichTextView : Control
                 return false;
         }
 
-        if (nextOffset == _scrollOffset)
+        if (nextOffset == ScrollOffset)
         {
             return false;
         }
 
-        _scrollOffset = nextOffset;
+        ScrollOffset = nextOffset;
         return true;
     }
 
@@ -251,14 +242,14 @@ public sealed class RichTextView : Control
         _lastContentHeight = content.Height;
         var visualLines = BuildVisualLines(content.Width);
         var maxOffset = Math.Max(0, visualLines.Count - content.Height);
-        if (_scrollOffset > maxOffset)
+        if (ScrollOffset > maxOffset)
         {
-            _scrollOffset = maxOffset;
+            ScrollOffset = maxOffset;
         }
 
         for (var row = 0; row < content.Height; row++)
         {
-            var visualIndex = _scrollOffset + row;
+            var visualIndex = ScrollOffset + row;
             if (visualIndex < 0 || visualIndex >= visualLines.Count)
             {
                 continue;
@@ -325,7 +316,7 @@ public sealed class RichTextView : Control
             for (var segmentIndex = 0; segmentIndex < line.Count; segmentIndex++)
             {
                 var segment = line[segmentIndex];
-                var text = segment.Text ?? string.Empty;
+                var text = segment.Text;
                 if (text.Length == 0)
                 {
                     continue;
@@ -367,7 +358,7 @@ public sealed class RichTextView : Control
         for (var index = 0; index < line.Count && remaining > 0; index++)
         {
             var segment = line[index];
-            var text = segment.Text ?? string.Empty;
+            var text = segment.Text;
             if (text.Length == 0)
             {
                 continue;
@@ -393,7 +384,7 @@ public sealed class RichTextView : Control
         for (var index = 0; index < line.Count && remaining > 0; index++)
         {
             var segment = line[index];
-            var text = segment.Text ?? string.Empty;
+            var text = segment.Text;
             if (text.Length == 0)
             {
                 continue;
@@ -469,7 +460,7 @@ public sealed class RichTextView : Control
             RichTextStyleKind.Emphasis => style.Merge(EmphasisStyle),
             RichTextStyleKind.Strong => style.Merge(StrongStyle),
             RichTextStyleKind.InlineCode => style.Merge(InlineCodeStyle),
-            _ => style,
+            _ => style
         };
 
         if (IsDisabled)

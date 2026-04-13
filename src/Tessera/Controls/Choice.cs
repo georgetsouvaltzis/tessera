@@ -1,13 +1,13 @@
-﻿using Tessera.Controls.Internal;
 using Tessera.Components.Primitives;
 using Tessera.Components.Primitives.Internal;
+using Tessera.Controls.Internal;
 using Tessera.Layout;
 using Tessera.Styles;
 
 namespace Tessera.Controls;
 
 /// <summary>
-/// Represents a single-choice selector.
+///     Represents a single-choice selector.
 /// </summary>
 public sealed class Choice : Control
 {
@@ -15,95 +15,82 @@ public sealed class Choice : Control
     private bool _fieldHovered;
 
     /// <summary>
-    /// Occurs when the selected item changes.
+    ///     Gets or sets the selector title.
     /// </summary>
-    public event EventHandler<SelectionChangedEventArgs>? SelectionChanged;
+    public string Title { get; set; } = "Choice";
 
     /// <summary>
-    /// Gets or sets the selector title.
+    ///     Represents focus marker.
     /// </summary>
-    public string Title
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = "Choice";
+    public string FocusMarker { get; set; } = "*";
 
     /// <summary>
-    /// Represents focus marker.
-    /// </summary>
-    public string FocusMarker
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = "*";
-
-    /// <summary>
-    /// Gets or sets whether show focus marker.
+    ///     Gets or sets whether show focus marker.
     /// </summary>
     public bool ShowFocusMarker { get; set; } = true;
 
     /// <summary>
-    /// Gets or sets the title style.
+    ///     Gets or sets the title style.
     /// </summary>
     public TesseraStyle TitleStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the focused title style.
+    ///     Gets or sets the focused title style.
     /// </summary>
     public TesseraStyle FocusedTitleStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the value style.
+    ///     Gets or sets the value style.
     /// </summary>
     public TesseraStyle ValueStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the style merged into the field value when the pointer hovers the collapsed field row.
+    ///     Gets or sets the style merged into the field value when the pointer hovers the collapsed field row.
     /// </summary>
     public TesseraStyle HoveredValueStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the option style.
+    ///     Gets or sets the option style.
     /// </summary>
     public TesseraStyle OptionStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the selected option style.
+    ///     Gets or sets the selected option style.
     /// </summary>
     public TesseraStyle SelectedOptionStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the hovered option style.
+    ///     Gets or sets the hovered option style.
     /// </summary>
     public TesseraStyle HoveredOptionStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the muted style.
+    ///     Gets or sets the muted style.
     /// </summary>
     public TesseraStyle MutedStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the disabled style.
+    ///     Gets or sets the disabled style.
     /// </summary>
     public TesseraStyle DisabledStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the style applied to border glyphs when the control is not focused.
+    ///     Gets or sets the style applied to border glyphs when the control is not focused.
     /// </summary>
     public TesseraStyle BorderStyleText { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the style applied to border glyphs when the control is focused.
+    ///     Gets or sets the style applied to border glyphs when the control is focused.
     /// </summary>
     public TesseraStyle FocusedBorderStyleText { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets glyphs used to render field indicators and option markers.
+    ///     Gets or sets glyphs used to render field indicators and option markers.
     /// </summary>
     public DropdownGlyphSet Glyphs { get; set; } = DropdownGlyphSet.Default;
 
     /// <summary>
-    /// Gets or sets the field border style.
+    ///     Gets or sets the field border style.
     /// </summary>
     public BorderStyle Border
     {
@@ -112,7 +99,7 @@ public sealed class Choice : Control
     } = BorderStyle.SingleLine;
 
     /// <summary>
-    /// Gets or sets the inner padding applied to the selector.
+    ///     Gets or sets the inner padding applied to the selector.
     /// </summary>
     public Thickness Padding
     {
@@ -121,7 +108,7 @@ public sealed class Choice : Control
     }
 
     /// <summary>
-    /// Gets or sets the maximum number of visible items while open.
+    ///     Gets or sets the maximum number of visible items while open.
     /// </summary>
     public int MaxVisibleItems
     {
@@ -130,17 +117,17 @@ public sealed class Choice : Control
     } = 6;
 
     /// <summary>
-    /// Gets a value indicating whether the selector is currently open.
+    ///     Gets a value indicating whether the selector is currently open.
     /// </summary>
     public bool IsOpen { get; private set; }
 
     /// <summary>
-    /// Gets the current selected index.
+    ///     Gets the current selected index.
     /// </summary>
     public int SelectedIndex => _options.SelectedIndex;
 
     /// <summary>
-    /// Gets the current selected item.
+    ///     Gets the current selected item.
     /// </summary>
     public string SelectedItem => _options.SelectedItem;
 
@@ -166,14 +153,19 @@ public sealed class Choice : Control
     }
 
     /// <summary>
-    /// Replaces the available choice items.
+    ///     Occurs when the selected item changes.
+    /// </summary>
+    public event EventHandler<SelectionChangedEventArgs>? SelectionChanged;
+
+    /// <summary>
+    ///     Replaces the available choice items.
     /// </summary>
     /// <param name="items">The items to display.</param>
     public void SetItems(IEnumerable<string> items)
     {
         var previousIndex = SelectedIndex;
         var previousItem = SelectedItem;
-        _options.SetItems(items, selectFirstItemWhenUnset: true);
+        _options.SetItems(items, true);
         _fieldHovered = false;
         if (_options.Count == 0)
         {
@@ -184,10 +176,10 @@ public sealed class Choice : Control
     }
 
     /// <summary>
-    /// Sets the selected item index using bounds clamping.
+    ///     Sets the selected item index using bounds clamping.
     /// </summary>
     /// <param name="index">The requested index.</param>
-    /// <returns><see langword="true"/> when selection changed; otherwise <see langword="false"/>.</returns>
+    /// <returns><see langword="true" /> when selection changed; otherwise <see langword="false" />.</returns>
     public bool SetSelectedIndex(int index)
     {
         if (_options.Count == 0)
@@ -210,10 +202,10 @@ public sealed class Choice : Control
     }
 
     /// <summary>
-    /// Attempts to select the first item matching <paramref name="item"/> using ordinal comparison.
+    ///     Attempts to select the first item matching <paramref name="item" /> using ordinal comparison.
     /// </summary>
     /// <param name="item">The item value to select.</param>
-    /// <returns><see langword="true"/> when selection changed; otherwise <see langword="false"/>.</returns>
+    /// <returns><see langword="true" /> when selection changed; otherwise <see langword="false" />.</returns>
     public bool TrySetSelectedItem(string item)
     {
         if (item is null)
@@ -402,7 +394,8 @@ public sealed class Choice : Control
     internal override LayoutMeasurement Measure(in Rect availableBounds)
     {
         var selected = _options.Count == 0 ? "(empty)" : SelectedItem;
-        var width = ControlTextLayout.MeasureDisplayWidth($"{Glyphs.CollapsedIndicator} {selected}") + Padding.Horizontal;
+        var width = ControlTextLayout.MeasureDisplayWidth($"{Glyphs.CollapsedIndicator} {selected}") +
+                    Padding.Horizontal;
         var height = Padding.Vertical + 1;
         if (Border != BorderStyle.None)
         {
@@ -433,7 +426,8 @@ public sealed class Choice : Control
         }
 
         var visibleRows = Math.Min(Math.Max(1, MaxVisibleItems), content.Height - 1);
-        var start = OptionListViewport.ComputeWindowStart(_options.HighlightedVisibleIndex, visibleRows, _options.VisibleCount);
+        var start = OptionListViewport.ComputeWindowStart(_options.HighlightedVisibleIndex, visibleRows,
+            _options.VisibleCount);
         var end = Math.Min(_options.VisibleCount, start + visibleRows);
         var row = 0;
         for (var visibleIndex = start; visibleIndex < end; visibleIndex++, row++)
@@ -442,14 +436,16 @@ public sealed class Choice : Control
             var highlight = visibleIndex == _options.HighlightedVisibleIndex ? Glyphs.HighlightedOptionMarker : " ";
             var selectedMarker = itemIndex == _options.SelectedIndex ? Glyphs.SelectedOptionMarker : " ";
             var text = $"{highlight}{selectedMarker} {_options.Items[itemIndex]}";
-            canvas.WriteText(content.X, content.Y + 1 + row, ApplyStyle(text, ResolveOptionStyle(itemIndex, visibleIndex)), content.Width);
+            canvas.WriteText(content.X, content.Y + 1 + row,
+                ApplyStyle(text, ResolveOptionStyle(itemIndex, visibleIndex)), content.Width);
         }
     }
 
     private int RowToVisibleIndex(Rect content, int y)
     {
         return IsOpen
-            ? OptionListViewport.RowToVisibleIndex(content, y, MaxVisibleItems, _options.VisibleCount, _options.HighlightedVisibleIndex)
+            ? OptionListViewport.RowToVisibleIndex(content, y, MaxVisibleItems, _options.VisibleCount,
+                _options.HighlightedVisibleIndex)
             : -1;
     }
 
@@ -519,7 +515,8 @@ public sealed class Choice : Control
 
     private void RaiseSelectionChangedIfNeeded(int previousIndex, string previousItem)
     {
-        if (previousIndex == SelectedIndex && string.Equals(previousItem, SelectedItem, StringComparison.Ordinal))
+        if (previousIndex == SelectedIndex &&
+            string.Equals(previousItem, SelectedItem, StringComparison.Ordinal))
         {
             return;
         }
@@ -529,7 +526,8 @@ public sealed class Choice : Control
 
     private void RaiseSelectionChanged(int previousIndex, string previousItem)
     {
-        SelectionChanged?.Invoke(this, new SelectionChangedEventArgs(previousIndex, SelectedIndex, previousItem, SelectedItem));
+        SelectionChanged?.Invoke(this,
+            new SelectionChangedEventArgs(previousIndex, SelectedIndex, previousItem, SelectedItem));
     }
 
     private string RenderTitle()

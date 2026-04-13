@@ -11,18 +11,15 @@ public sealed class TableRowMutationApiTests
     [Test]
     public void ControlsTableAddRowAppendsRow()
     {
-        var table = new Table("Service", "State")
-        {
-            Border = BorderStyle.None,
-        };
+        var table = new Table("Service", "State") { Border = BorderStyle.None };
         table.SetRows(
         [
-            ["api", "healthy"],
+            ["api", "healthy"]
         ]);
 
         table.AddRow(["worker", "warning"]);
 
-        var output = Render(table, width: 48, height: 8);
+        var output = Render(table, 48, 8);
         Assert.That(output.Contains("api", StringComparison.Ordinal), Is.True);
         Assert.That(output.Contains("worker", StringComparison.Ordinal), Is.True);
     }
@@ -30,19 +27,16 @@ public sealed class TableRowMutationApiTests
     [Test]
     public void ControlsTableReplaceRowUpdatesRowAndValidatesArguments()
     {
-        var table = new Table("Service", "State")
-        {
-            Border = BorderStyle.None,
-        };
+        var table = new Table("Service", "State") { Border = BorderStyle.None };
         table.SetRows(
         [
             ["api", "healthy"],
-            ["worker", "healthy"],
+            ["worker", "healthy"]
         ]);
 
         table.ReplaceRow(1, ["worker", "degraded"]);
 
-        var output = Render(table, width: 48, height: 8);
+        var output = Render(table, 48, 8);
         Assert.That(output.Contains("degraded", StringComparison.Ordinal), Is.True);
         Assert.That(output.Contains("worker│healthy", StringComparison.Ordinal), Is.False);
 
@@ -60,19 +54,14 @@ public sealed class TableRowMutationApiTests
     [Test]
     public void ControlsTableRemoveRowAtRemovesRowAndNormalizesPage()
     {
-        var table = new Table("Name")
-        {
-            Border = BorderStyle.None,
-            IsFocused = true,
-            PageSize = 2,
-        };
+        var table = new Table("Name") { Border = BorderStyle.None, IsFocused = true, PageSize = 2 };
         table.SetRows(
         [
             ["row-0"],
             ["row-1"],
             ["row-2"],
             ["row-3"],
-            ["row-4"],
+            ["row-4"]
         ]);
 
         _ = table.Handle(new KeyPressed(Key.Character, "]"));
@@ -82,7 +71,7 @@ public sealed class TableRowMutationApiTests
         table.RemoveRowAt(4);
 
         Assert.That(table.PageIndex, Is.EqualTo(1), "Page index should clamp after row removal.");
-        var output = Render(table, width: 32, height: 8);
+        var output = Render(table, 32, 8);
         Assert.That(output.Contains("row-2", StringComparison.Ordinal), Is.True);
         Assert.That(output.Contains("row-3", StringComparison.Ordinal), Is.True);
         Assert.That(output.Contains("row-4", StringComparison.Ordinal), Is.False);
@@ -94,16 +83,12 @@ public sealed class TableRowMutationApiTests
     [Test]
     public void ControlsTableClearRowsClearsAndKeepsPointerHandlingSafe()
     {
-        var table = new Table("Name")
-        {
-            Border = BorderStyle.SingleLine,
-            PageSize = 2,
-        };
+        var table = new Table("Name") { Border = BorderStyle.SingleLine, PageSize = 2 };
         table.SetRows(
         [
             ["row-0"],
             ["row-1"],
-            ["row-2"],
+            ["row-2"]
         ]);
         var bounds = new Rect(0, 0, 40, 10);
 

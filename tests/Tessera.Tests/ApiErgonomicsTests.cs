@@ -1,5 +1,3 @@
-using Tessera.Components.Primitives;
-using Tessera.Components.Styling;
 using Tessera.Controls;
 
 namespace Tessera.Tests;
@@ -8,28 +6,45 @@ internal static class ApiErgonomicsTests
 {
     public static IEnumerable<TestCase> Cases()
     {
-        yield return new TestCase("ApiErgonomics_Thickness_UsesStandardSpacingVocabulary", Thickness_UsesStandardSpacingVocabulary);
-        yield return new TestCase("ApiErgonomics_RootTextInput_ConfiguresWithoutNestedInputAccess", RootTextInput_ConfiguresWithoutNestedInputAccess);
-        yield return new TestCase("ApiErgonomics_RootTextArea_ConfiguresWithoutNestedInputAccess", RootTextArea_ConfiguresWithoutNestedInputAccess);
-        yield return new TestCase("ApiErgonomics_RootListView_ExposesSelectionWithoutModelAccess", RootListView_ExposesSelectionWithoutModelAccess);
-        yield return new TestCase("ApiErgonomics_RootChoice_ConfiguresWithoutPostConstructionMutation", RootChoice_ConfiguresWithoutPostConstructionMutation);
-        yield return new TestCase("ApiErgonomics_RootComboBox_ExposesFilterWithoutNestedInputAccess", RootComboBox_ExposesFilterWithoutNestedInputAccess);
-        yield return new TestCase("ApiErgonomics_Table_ExposePageSizeWithoutInnerAccess", Table_ExposePageSizeWithoutInnerAccess);
-        yield return new TestCase("ApiErgonomics_Table_ExposesSortStateWithoutInnerAccess", Table_ExposesSortStateWithoutInnerAccess);
-        yield return new TestCase("ApiErgonomics_ActionEvents_EnableEventDrivenIntegration", ActionEvents_EnableEventDrivenIntegration);
-        yield return new TestCase("ApiErgonomics_ConsumeMethods_ExposeOneShotInteractionResults", ConsumeMethods_ExposeOneShotInteractionResults);
-        yield return new TestCase("ApiErgonomics_RootTextInput_ConfiguresWithoutCatalog", RootTextInput_ConfiguresWithoutCatalog);
-        yield return new TestCase("ApiErgonomics_RootMenuBar_ConfiguresWithoutCatalog", RootMenuBar_ConfiguresWithoutCatalog);
-        yield return new TestCase("ApiErgonomics_RootDialog_ConfiguresFrameWithoutLegacyBorderStyleName", RootDialog_ConfiguresFrameWithoutLegacyBorderStyleName);
-        yield return new TestCase("ApiErgonomics_RootModal_ConfiguresWithoutCatalog", RootModal_ConfiguresWithoutCatalog);
-        yield return new TestCase("ApiErgonomics_RootModal_ConfiguresFrameWithoutLegacyBorderStyleName", RootModal_ConfiguresFrameWithoutLegacyBorderStyleName);
-        yield return new TestCase("ApiErgonomics_SelectionMutators_ExposeSetSelectedIndexAcrossPrimaryControls", SelectionMutators_ExposeSetSelectedIndexAcrossPrimaryControls);
-        yield return new TestCase("ApiErgonomics_SelectionMutators_RetainLegacySelectCompatibilityWrappers", SelectionMutators_RetainLegacySelectCompatibilityWrappers);
+        yield return new TestCase("ApiErgonomics_Thickness_UsesStandardSpacingVocabulary",
+            Thickness_UsesStandardSpacingVocabulary);
+        yield return new TestCase("ApiErgonomics_RootTextInput_ConfiguresWithoutNestedInputAccess",
+            RootTextInput_ConfiguresWithoutNestedInputAccess);
+        yield return new TestCase("ApiErgonomics_RootTextArea_ConfiguresWithoutNestedInputAccess",
+            RootTextArea_ConfiguresWithoutNestedInputAccess);
+        yield return new TestCase("ApiErgonomics_RootListView_ExposesSelectionWithoutModelAccess",
+            RootListView_ExposesSelectionWithoutModelAccess);
+        yield return new TestCase("ApiErgonomics_RootChoice_ConfiguresWithoutPostConstructionMutation",
+            RootChoice_ConfiguresWithoutPostConstructionMutation);
+        yield return new TestCase("ApiErgonomics_RootComboBox_ExposesFilterWithoutNestedInputAccess",
+            RootComboBox_ExposesFilterWithoutNestedInputAccess);
+        yield return new TestCase("ApiErgonomics_Table_ExposePageSizeWithoutInnerAccess",
+            Table_ExposePageSizeWithoutInnerAccess);
+        yield return new TestCase("ApiErgonomics_Table_ExposesSortStateWithoutInnerAccess",
+            Table_ExposesSortStateWithoutInnerAccess);
+        yield return new TestCase("ApiErgonomics_ActionEvents_EnableEventDrivenIntegration",
+            ActionEvents_EnableEventDrivenIntegration);
+        yield return new TestCase("ApiErgonomics_ConsumeMethods_ExposeOneShotInteractionResults",
+            ConsumeMethods_ExposeOneShotInteractionResults);
+        yield return new TestCase("ApiErgonomics_RootTextInput_ConfiguresWithoutCatalog",
+            RootTextInput_ConfiguresWithoutCatalog);
+        yield return new TestCase("ApiErgonomics_RootMenuBar_ConfiguresWithoutCatalog",
+            RootMenuBar_ConfiguresWithoutCatalog);
+        yield return new TestCase("ApiErgonomics_RootDialog_ConfiguresFrameWithoutLegacyBorderStyleName",
+            RootDialog_ConfiguresFrameWithoutLegacyBorderStyleName);
+        yield return new TestCase("ApiErgonomics_RootModal_ConfiguresWithoutCatalog",
+            RootModal_ConfiguresWithoutCatalog);
+        yield return new TestCase("ApiErgonomics_RootModal_ConfiguresFrameWithoutLegacyBorderStyleName",
+            RootModal_ConfiguresFrameWithoutLegacyBorderStyleName);
+        yield return new TestCase("ApiErgonomics_SelectionMutators_ExposeSetSelectedIndexAcrossPrimaryControls",
+            SelectionMutators_ExposeSetSelectedIndexAcrossPrimaryControls);
+        yield return new TestCase("ApiErgonomics_SelectionMutators_RetainLegacySelectCompatibilityWrappers",
+            SelectionMutators_RetainLegacySelectCompatibilityWrappers);
     }
 
     private static Task Thickness_UsesStandardSpacingVocabulary()
     {
-        var spacing = Thickness.Symmetric(horizontal: 2, vertical: 1);
+        var spacing = Thickness.Symmetric(2, 1);
 
         TestAssert.Equal(2, spacing.Left, "Thickness should expose left spacing.");
         TestAssert.Equal(2, spacing.Right, "Thickness should expose right spacing.");
@@ -49,7 +64,7 @@ internal static class ApiErgonomicsTests
             MaxLength = 32,
             ClearOnSubmit = true,
             MaskInput = true,
-            MaskCharacter = '#',
+            MaskCharacter = '#'
         };
         input.SetValue("deploy");
 
@@ -65,12 +80,7 @@ internal static class ApiErgonomicsTests
 
     private static Task RootTextArea_ConfiguresWithoutNestedInputAccess()
     {
-        var area = new TextArea
-        {
-            Title = "Notes",
-            ShowLineNumbers = true,
-            Wrap = true,
-        };
+        var area = new TextArea { Title = "Notes", ShowLineNumbers = true, Wrap = true };
         area.SetValue("a\nb");
 
         TestAssert.Equal("Notes", area.Title, "Text area options should set title.");
@@ -82,11 +92,7 @@ internal static class ApiErgonomicsTests
 
     private static Task Table_ExposePageSizeWithoutInnerAccess()
     {
-        var table = new Table("Name", "Status")
-        {
-            Title = "Deployments",
-            PageSize = 6,
-        };
+        var table = new Table("Name", "Status") { Title = "Deployments", PageSize = 6 };
 
         TestAssert.Equal("Deployments", table.Title, "Table options should set title.");
         TestAssert.Equal(6, table.PageSize, "Table options should set page size.");
@@ -95,10 +101,7 @@ internal static class ApiErgonomicsTests
 
     private static Task RootListView_ExposesSelectionWithoutModelAccess()
     {
-        var list = new ListView<string>(item => item)
-        {
-            IsFocused = true,
-        };
+        var list = new ListView<string>(item => item) { IsFocused = true };
         list.SetItems(["one", "two", "three"]);
 
         list.Handle(new KeyPressed(Key.Down));
@@ -115,7 +118,7 @@ internal static class ApiErgonomicsTests
             Title = "Environment",
             IsFocused = true,
             Border = BorderStyle.None,
-            MaxVisibleItems = 4,
+            MaxVisibleItems = 4
         };
         choice.SetItems(["Development", "Production"]);
 
@@ -129,10 +132,7 @@ internal static class ApiErgonomicsTests
 
     private static Task RootComboBox_ExposesFilterWithoutNestedInputAccess()
     {
-        var combobox = new ComboBox
-        {
-            Placeholder = "type here",
-        };
+        var combobox = new ComboBox { Placeholder = "type here" };
 
         combobox.SetItems(["alpha", "beta"]);
         combobox.SetFilterText("be");
@@ -144,14 +144,11 @@ internal static class ApiErgonomicsTests
 
     private static Task Table_ExposesSortStateWithoutInnerAccess()
     {
-        var table = new Table("Name", "Status")
-        {
-            IsFocused = true,
-        };
+        var table = new Table("Name", "Status") { IsFocused = true };
         table.SetRows(
         [
             ["api", "ok"],
-            ["worker", "warn"],
+            ["worker", "warn"]
         ]);
 
         table.Handle(new KeyPressed(Key.Character, "c"));
@@ -164,35 +161,25 @@ internal static class ApiErgonomicsTests
 
     private static Task ConsumeMethods_ExposeOneShotInteractionResults()
     {
-        var button = new Button
-        {
-            IsFocused = true,
-        };
+        var button = new Button { IsFocused = true };
         button.Handle(new KeyPressed(Key.Enter));
 
-        var input = new TextInput
-        {
-            IsFocused = true,
-        };
+        var input = new TextInput { IsFocused = true };
         input.Handle(new KeyPressed(Key.Character, "x"));
         input.Handle(new KeyPressed(Key.Enter));
 
-        TestAssert.True(button.TryConsumeActivation(), "Button should expose one-shot activation consumption instead of requiring poll-style flags.");
-        TestAssert.True(input.TryConsumeSubmission(out var submitted), "Text input should expose one-shot submit consumption.");
+        TestAssert.True(button.TryConsumeActivation(),
+            "Button should expose one-shot activation consumption instead of requiring poll-style flags.");
+        TestAssert.True(input.TryConsumeSubmission(out var submitted),
+            "Text input should expose one-shot submit consumption.");
         TestAssert.Equal("x", submitted, "Consumed submit should preserve submitted text.");
         return Task.CompletedTask;
     }
 
     private static Task ActionEvents_EnableEventDrivenIntegration()
     {
-        var button = new Button
-        {
-            IsFocused = true,
-        };
-        var input = new TextInput
-        {
-            IsFocused = true,
-        };
+        var button = new Button { IsFocused = true };
+        var input = new TextInput { IsFocused = true };
         var buttonPressed = 0;
         string? submitted = null;
         button.Activated += (_, _) => buttonPressed++;
@@ -203,33 +190,29 @@ internal static class ApiErgonomicsTests
         input.Handle(new KeyPressed(Key.Enter));
 
         TestAssert.Equal(1, buttonPressed, "Button should expose an event-driven activation hook.");
-        TestAssert.Equal("x", submitted ?? string.Empty, "Text input should expose submitted text through an event payload.");
+        TestAssert.Equal("x", submitted ?? string.Empty,
+            "Text input should expose submitted text through an event payload.");
         return Task.CompletedTask;
     }
 
     private static Task RootTextInput_ConfiguresWithoutCatalog()
     {
-        var input = new TextInput
-        {
-            Title = "Search",
-        };
+        var input = new TextInput { Title = "Search" };
         input.SetValue("tea");
 
-        TestAssert.Equal("Search", input.Title, "Root text input should configure directly without a category catalog.");
+        TestAssert.Equal("Search", input.Title,
+            "Root text input should configure directly without a category catalog.");
         TestAssert.Equal("tea", input.Value, "Root text input should expose state without catalog indirection.");
         return Task.CompletedTask;
     }
 
     private static Task RootMenuBar_ConfiguresWithoutCatalog()
     {
-        var menu = new MenuBar
-        {
-            IsFocused = true,
-        };
+        var menu = new MenuBar { IsFocused = true };
         menu.SetItems(
         [
             new MenuItem("file", "File", 'f'),
-            new MenuItem("help", "Help", 'h'),
+            new MenuItem("help", "Help", 'h')
         ]);
 
         TestAssert.True(menu.IsFocused, "Root menu bar should configure directly without a category catalog.");
@@ -245,7 +228,7 @@ internal static class ApiErgonomicsTests
             IsVisible = true,
             Border = BorderStyle.Heavy,
             Padding = Thickness.All(1),
-            BodyLines = ["Delete item?"],
+            BodyLines = ["Delete item?"]
         };
 
         TestAssert.True(dialog.IsVisible, "Dialog options should set visibility.");
@@ -257,11 +240,7 @@ internal static class ApiErgonomicsTests
 
     private static Task RootModal_ConfiguresWithoutCatalog()
     {
-        var modal = new Modal
-        {
-            Title = "Confirm",
-            IsVisible = true,
-        };
+        var modal = new Modal { Title = "Confirm", IsVisible = true };
         modal.SetBodyLines(["ready"]);
 
         TestAssert.True(modal.IsVisible, "Root modal should configure directly without a category catalog.");
@@ -277,8 +256,8 @@ internal static class ApiErgonomicsTests
             Title = "Confirm",
             IsVisible = true,
             Border = BorderStyle.Ascii,
-            Padding = Thickness.Symmetric(horizontal: 2, vertical: 1),
-            BodyLines = ["ready"],
+            Padding = Thickness.Symmetric(2, 1),
+            BodyLines = ["ready"]
         };
 
         TestAssert.True(modal.IsVisible, "Modal options should set visibility.");
@@ -295,7 +274,7 @@ internal static class ApiErgonomicsTests
         [
             new TimelineEntry("a", "Build", "10:00"),
             new TimelineEntry("b", "Deploy", "10:05"),
-            new TimelineEntry("c", "Verify", "10:10"),
+            new TimelineEntry("c", "Verify", "10:10")
         ]);
 
         var traceStart = new DateTimeOffset(2026, 03, 22, 10, 0, 0, TimeSpan.Zero);
@@ -304,7 +283,7 @@ internal static class ApiErgonomicsTests
         [
             new TraceEntry("a", traceStart, "bootstrap", "begin"),
             new TraceEntry("b", traceStart.AddSeconds(1), "bootstrap", "step"),
-            new TraceEntry("c", traceStart.AddSeconds(2), "bootstrap", "end"),
+            new TraceEntry("c", traceStart.AddSeconds(2), "bootstrap", "end")
         ]);
 
         var process = new ProcessListView();
@@ -312,7 +291,7 @@ internal static class ApiErgonomicsTests
         [
             new ProcessListEntry(1, "api"),
             new ProcessListEntry(2, "worker"),
-            new ProcessListEntry(3, "jobs"),
+            new ProcessListEntry(3, "jobs")
         ]);
 
         var palette = new PaletteEditor();
@@ -320,7 +299,7 @@ internal static class ApiErgonomicsTests
         [
             new PaletteSwatch("base", "#111111"),
             new PaletteSwatch("accent", "#222222"),
-            new PaletteSwatch("focus", "#333333"),
+            new PaletteSwatch("focus", "#333333")
         ]);
 
         var toolbar = new Toolbar();
@@ -328,7 +307,7 @@ internal static class ApiErgonomicsTests
         [
             new ToolbarItem("home", "Home"),
             new ToolbarItem("logs", "Logs"),
-            new ToolbarItem("diag", "Diag"),
+            new ToolbarItem("diag", "Diag")
         ]);
 
         var paneTabs = new PaneTabs();
@@ -336,7 +315,7 @@ internal static class ApiErgonomicsTests
         [
             new PaneTabItem("home", "Home"),
             new PaneTabItem("ops", "Operations"),
-            new PaneTabItem("diag", "Diagnostics"),
+            new PaneTabItem("diag", "Diagnostics")
         ]);
 
         var tabs = new Tabs("Overview", "Logs", "Metrics");
@@ -366,14 +345,14 @@ internal static class ApiErgonomicsTests
         timeline.SetEntries(
         [
             new TimelineEntry("a", "Build", "10:00"),
-            new TimelineEntry("b", "Deploy", "10:05"),
+            new TimelineEntry("b", "Deploy", "10:05")
         ]);
 
         var process = new ProcessListView();
         process.SetEntries(
         [
             new ProcessListEntry(1, "api"),
-            new ProcessListEntry(2, "worker"),
+            new ProcessListEntry(2, "worker")
         ]);
 
         var tabs = new Tabs("A", "B", "C");

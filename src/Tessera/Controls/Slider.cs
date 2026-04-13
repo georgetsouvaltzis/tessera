@@ -1,4 +1,4 @@
-﻿using Tessera.Components.Primitives;
+using Tessera.Components.Primitives;
 using Tessera.Components.Primitives.Internal;
 using Tessera.Components.Styling;
 using Tessera.Controls.Internal;
@@ -8,34 +8,26 @@ using Tessera.Styles;
 namespace Tessera.Controls;
 
 /// <summary>
-/// Represents a bounded slider control.
+///     Represents a bounded slider control.
 /// </summary>
 public sealed class Slider : Control
 {
-    private bool _hovered;
-    private bool _dragging;
     private readonly WidgetStatePalette _statePalette = WidgetStatePalette.CreateDefault();
+    private bool _dragging;
+    private bool _hovered;
 
     /// <summary>
-    /// Represents title.
+    ///     Represents title.
     /// </summary>
-    public string Title
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = "Slider";
+    public string Title { get; set; } = "Slider";
 
     /// <summary>
-    /// Represents focus marker.
+    ///     Represents focus marker.
     /// </summary>
-    public string FocusMarker
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = "*";
+    public string FocusMarker { get; set; } = "*";
 
     /// <summary>
-    /// Represents show focus marker.
+    ///     Represents show focus marker.
     /// </summary>
     public bool ShowFocusMarker
     {
@@ -44,7 +36,7 @@ public sealed class Slider : Control
     } = true;
 
     /// <summary>
-    /// Represents title style.
+    ///     Represents title style.
     /// </summary>
     public TesseraStyle TitleStyle
     {
@@ -53,7 +45,7 @@ public sealed class Slider : Control
     } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Represents focused title style.
+    ///     Represents focused title style.
     /// </summary>
     public TesseraStyle FocusedTitleStyle
     {
@@ -62,7 +54,7 @@ public sealed class Slider : Control
     } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Represents value label style.
+    ///     Represents value label style.
     /// </summary>
     public TesseraStyle ValueLabelStyle
     {
@@ -71,7 +63,7 @@ public sealed class Slider : Control
     } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Represents fill style.
+    ///     Represents fill style.
     /// </summary>
     public TesseraStyle FillStyle
     {
@@ -80,7 +72,7 @@ public sealed class Slider : Control
     } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Represents track style.
+    ///     Represents track style.
     /// </summary>
     public TesseraStyle TrackStyle
     {
@@ -89,7 +81,7 @@ public sealed class Slider : Control
     } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Represents disabled style.
+    ///     Represents disabled style.
     /// </summary>
     public TesseraStyle DisabledStyle
     {
@@ -98,7 +90,7 @@ public sealed class Slider : Control
     } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the style applied to border glyphs when the control is not focused.
+    ///     Gets or sets the style applied to border glyphs when the control is not focused.
     /// </summary>
     public TesseraStyle BorderStyleText
     {
@@ -107,7 +99,7 @@ public sealed class Slider : Control
     } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the style applied to border glyphs when the control is focused.
+    ///     Gets or sets the style applied to border glyphs when the control is focused.
     /// </summary>
     public TesseraStyle FocusedBorderStyleText
     {
@@ -116,7 +108,7 @@ public sealed class Slider : Control
     } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Represents min.
+    ///     Represents min.
     /// </summary>
     public double Min
     {
@@ -125,7 +117,7 @@ public sealed class Slider : Control
     }
 
     /// <summary>
-    /// Represents max.
+    ///     Represents max.
     /// </summary>
     public double Max
     {
@@ -134,7 +126,7 @@ public sealed class Slider : Control
     } = 100.0;
 
     /// <summary>
-    /// Represents step.
+    ///     Represents step.
     /// </summary>
     public double Step
     {
@@ -143,7 +135,7 @@ public sealed class Slider : Control
     } = 1.0;
 
     /// <summary>
-    /// Represents value.
+    ///     Represents value.
     /// </summary>
     public double Value
     {
@@ -152,7 +144,7 @@ public sealed class Slider : Control
     }
 
     /// <summary>
-    /// Represents border.
+    ///     Represents border.
     /// </summary>
     public BorderStyle Border
     {
@@ -161,7 +153,7 @@ public sealed class Slider : Control
     } = BorderStyle.SingleLine;
 
     /// <summary>
-    /// Represents padding.
+    ///     Represents padding.
     /// </summary>
     public Thickness Padding
     {
@@ -191,10 +183,13 @@ public sealed class Slider : Control
     }
 
     /// <summary>
-    /// Executes set value.
+    ///     Executes set value.
     /// </summary>
     /// <param name="value)">The value value.</param>
-    public void SetValue(double value) => Value = Clamp(value);
+    public void SetValue(double value)
+    {
+        Value = Clamp(value);
+    }
 
     /// <inheritdoc />
     public override bool Handle(Message message)
@@ -283,7 +278,8 @@ public sealed class Slider : Control
             return changed || !AreClose(before, Value);
         }
 
-        if (pointer is { Kind: PointerEventKind.Press, Button: PointerButton.Left } && IsPointerOnBarRow(content, pointer.Y))
+        if (pointer is { Kind: PointerEventKind.Press, Button: PointerButton.Left } &&
+            IsPointerOnBarRow(content, pointer.Y))
         {
             _dragging = true;
             changed |= SetHovered(true);
@@ -392,9 +388,15 @@ public sealed class Slider : Control
         return Math.Clamp(value, Min, Max);
     }
 
-    private static bool AreClose(double left, double right) => Math.Abs(left - right) <= 0.000001;
+    private static bool AreClose(double left, double right)
+    {
+        return Math.Abs(left - right) <= 0.000001;
+    }
 
-    private Rect ResolveContentRect(Rect bounds) => FrameLayout.ResolveContentRect(bounds, Border, Padding);
+    private Rect ResolveContentRect(Rect bounds)
+    {
+        return FrameLayout.ResolveContentRect(bounds, Border, Padding);
+    }
 
     private static bool IsPointerOnBarRow(Rect content, int y)
     {
@@ -418,7 +420,7 @@ public sealed class Slider : Control
             ? 1.0
             : (double)(clampedX - barX) / Math.Max(1, barWidth - 1);
         var before = Value;
-        Value = Clamp(Min + ((Max - Min) * normalized));
+        Value = Clamp(Min + (Max - Min) * normalized);
         return !AreClose(before, Value);
     }
 

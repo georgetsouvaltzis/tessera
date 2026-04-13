@@ -92,8 +92,10 @@ public sealed class TesseraEffectsPeriodicApiErgonomicsTests
     {
         public int PeriodicUpdateCount { get; private set; }
 
-        public override TesseraEffect? Initialize() =>
-            TesseraEffects.Periodic(TimeSpan.FromMilliseconds(1), _ => new PeriodicPayloadMessage());
+        public override TesseraEffect? Initialize()
+        {
+            return TesseraEffects.Periodic(TimeSpan.FromMilliseconds(1), _ => new PeriodicPayloadMessage());
+        }
 
         public override TesseraEffect? Update(Message message)
         {
@@ -105,7 +107,10 @@ public sealed class TesseraEffectsPeriodicApiErgonomicsTests
             return null;
         }
 
-        public override Screen Build(ScreenContext context) => Screen.From("periodic");
+        public override Screen Build(ScreenContext context)
+        {
+            return Screen.From("periodic");
+        }
     }
 
     private sealed class PassiveUpdateApp : TesseraApp
@@ -128,13 +133,18 @@ public sealed class TesseraEffectsPeriodicApiErgonomicsTests
             return null;
         }
 
-        public override Screen Build(ScreenContext context) => Screen.From("passive");
+        public override Screen Build(ScreenContext context)
+        {
+            return Screen.From("passive");
+        }
     }
 
     private sealed class PeriodicWithAppEffectApp : TesseraApp
     {
-        public override TesseraEffect? Initialize() =>
-            TesseraEffects.Periodic(TimeSpan.FromMilliseconds(1), _ => new PeriodicPayloadMessage());
+        public override TesseraEffect? Initialize()
+        {
+            return TesseraEffects.Periodic(TimeSpan.FromMilliseconds(1), _ => new PeriodicPayloadMessage());
+        }
 
         public override TesseraEffect? Update(Message message)
         {
@@ -143,6 +153,9 @@ public sealed class TesseraEffectsPeriodicApiErgonomicsTests
                 : null;
         }
 
-        public override Screen Build(ScreenContext context) => Screen.From("batch");
+        public override Screen Build(ScreenContext context)
+        {
+            return Screen.From("batch");
+        }
     }
 }

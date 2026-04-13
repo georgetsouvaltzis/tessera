@@ -1,56 +1,182 @@
 using Tessera.Controls;
-using Tessera.Layout;
-using Tessera.Styles;
 
 namespace Tessera.Examples.DataWorkbench;
 
 internal sealed partial class DataWorkbenchApp : TesseraApp
 {
-    private DataWorkbenchPalette _palette = DataWorkbenchTheme.Default;
-    private readonly DataWorkbenchState _state = DataWorkbenchState.CreateSeed();
+    private readonly ActivityFeed _activity = new()
+    {
+        Title = "Investigation Feed · F4",
+        Border = BorderStyle.Rounded,
+        Padding = Thickness.All(1),
+        FocusMarker = "◆",
+        ShowTimestamp = true,
+        AutoFollow = true
+    };
 
-    private readonly DataWorkbenchHeaderControl _header = new() { Padding = Thickness.Symmetric(1, 0) };
-    private readonly StatsCard _slicePulse = new() { Title = "Slice Pulse", Border = BorderStyle.Rounded, Padding = Thickness.Symmetric(1, 0) };
-    private readonly StatsCard _velocityPulse = new() { Title = "Query Velocity", Border = BorderStyle.Rounded, Padding = Thickness.Symmetric(1, 0) };
-    private readonly StatsCard _comparePulse = new() { Title = "Compare Pocket", Border = BorderStyle.Rounded, Padding = Thickness.Symmetric(1, 0) };
-
-    private readonly PaneTabs _pageTabs = new() { Title = "Workspace", Border = BorderStyle.Rounded, Padding = Thickness.Symmetric(1, 0), FocusMarker = "◆" };
-    private readonly SideNavRail _sourceRail = new() { Title = "Sources · F1", Border = BorderStyle.Rounded, Padding = Thickness.All(1), FocusMarker = "◆" };
-    private readonly SearchBox _search = new() { Title = "Search Slice", Border = BorderStyle.Rounded, Padding = Thickness.All(1), FocusMarker = "◆", Placeholder = "search entity, owner, region, or narrative" };
-    private readonly QueryBuilder _query = new() { Title = "Rule Composer · Q", Border = BorderStyle.Rounded, Padding = Thickness.All(1), FocusMarker = "◆" };
-    private readonly DataGrid _results = new() { Title = "Result Grid · F2", Border = BorderStyle.Rounded, Padding = Thickness.All(1), FocusMarker = "◆", PageSize = 14 };
-    private readonly PaneTabs _inspectTabs = new() { Title = "Inspector", Border = BorderStyle.Rounded, Padding = Thickness.Symmetric(1, 0), FocusMarker = "◆" };
-    private readonly RichTextView _profileView = new() { Title = "Record Profile · F3", Border = BorderStyle.Rounded, Padding = Thickness.All(1), FocusMarker = "◆" };
-    private readonly JsonTreeView _jsonView = new() { Title = "JSON Payload · F3", Border = BorderStyle.Rounded, Padding = Thickness.All(1), FocusMarker = "◆" };
-    private readonly CommandOutput _traceView = new() { Title = "Trace Lens · F3", Border = BorderStyle.Rounded, Padding = Thickness.All(1), FocusMarker = "◆", AutoFollow = true, ShowTimestamp = false };
-
-    private readonly RichTextView _compareLeft = new() { Title = "Pinned Record", Border = BorderStyle.Rounded, Padding = Thickness.All(1) };
-    private readonly RichTextView _compareRight = new() { Title = "Current Record", Border = BorderStyle.Rounded, Padding = Thickness.All(1) };
-    private readonly RichTextView _compareSummary = new() { Title = "Compare Briefing", Border = BorderStyle.Rounded, Padding = Thickness.All(1) };
-
-    private readonly ActivityFeed _activity = new() { Title = "Investigation Feed · F4", Border = BorderStyle.Rounded, Padding = Thickness.All(1), FocusMarker = "◆", ShowTimestamp = true, AutoFollow = true };
-    private readonly CommandOutput _output = new() { Title = "Execution Lane · F4", Border = BorderStyle.Rounded, Padding = Thickness.All(1), FocusMarker = "◆", AutoFollow = true, ShowTimestamp = true };
-
-    private readonly SideNavRail _savedViews = new() { Title = "Saved Views", Border = BorderStyle.Rounded, Padding = Thickness.All(1), FocusMarker = "◆" };
-    private readonly RichTextView _savedPreview = new() { Title = "View Briefing", Border = BorderStyle.Rounded, Padding = Thickness.All(1) };
-    private readonly RichTextView _savedRunbook = new() { Title = "Re-entry Runbook", Border = BorderStyle.Rounded, Padding = Thickness.All(1) };
-
-    private readonly Button _runButton = new() { Text = "Run" };
-    private readonly Button _pinButton = new() { Text = "Pin" };
-    private readonly Button _saveButton = new() { Text = "Save" };
-    private readonly Button _exportButton = new() { Text = "Export" };
-    private readonly Button _clearButton = new() { Text = "Clear" };
     private readonly Button _citrineButton = new() { Text = "Citrine" };
+    private readonly Button _clearButton = new() { Text = "Clear" };
     private readonly Button _cobaltButton = new() { Text = "Cobalt" };
+
+    private readonly RichTextView _compareLeft =
+        new() { Title = "Pinned Record", Border = BorderStyle.Rounded, Padding = Thickness.All(1) };
+
+    private readonly StatsCard _comparePulse = new()
+    {
+        Title = "Compare Pocket",
+        Border = BorderStyle.Rounded,
+        Padding = Thickness.Symmetric(1)
+    };
+
+    private readonly RichTextView _compareRight =
+        new() { Title = "Current Record", Border = BorderStyle.Rounded, Padding = Thickness.All(1) };
+
+    private readonly RichTextView _compareSummary = new()
+    {
+        Title = "Compare Briefing",
+        Border = BorderStyle.Rounded,
+        Padding = Thickness.All(1)
+    };
+
     private readonly Button _emberButton = new() { Text = "Ember" };
+    private readonly Button _exportButton = new() { Text = "Export" };
 
     private readonly StatusBar _footer = new() { Fill = ' ' };
 
-    private string _sourceId = "fraud_signals";
+    private readonly DataWorkbenchHeaderControl _header = new() { Padding = Thickness.Symmetric(1) };
+
+    private readonly PaneTabs _inspectTabs = new()
+    {
+        Title = "Inspector",
+        Border = BorderStyle.Rounded,
+        Padding = Thickness.Symmetric(1),
+        FocusMarker = "◆"
+    };
+
+    private readonly JsonTreeView _jsonView = new()
+    {
+        Title = "JSON Payload · F3",
+        Border = BorderStyle.Rounded,
+        Padding = Thickness.All(1),
+        FocusMarker = "◆"
+    };
+
+    private readonly CommandOutput _output = new()
+    {
+        Title = "Execution Lane · F4",
+        Border = BorderStyle.Rounded,
+        Padding = Thickness.All(1),
+        FocusMarker = "◆",
+        AutoFollow = true,
+        ShowTimestamp = true
+    };
+
+    private readonly PaneTabs _pageTabs = new()
+    {
+        Title = "Workspace",
+        Border = BorderStyle.Rounded,
+        Padding = Thickness.Symmetric(1),
+        FocusMarker = "◆"
+    };
+
+    private readonly Button _pinButton = new() { Text = "Pin" };
+
+    private readonly RichTextView _profileView = new()
+    {
+        Title = "Record Profile · F3",
+        Border = BorderStyle.Rounded,
+        Padding = Thickness.All(1),
+        FocusMarker = "◆"
+    };
+
+    private readonly QueryBuilder _query = new()
+    {
+        Title = "Rule Composer · Q",
+        Border = BorderStyle.Rounded,
+        Padding = Thickness.All(1),
+        FocusMarker = "◆"
+    };
+
+    private readonly DataGrid _results = new()
+    {
+        Title = "Result Grid · F2",
+        Border = BorderStyle.Rounded,
+        Padding = Thickness.All(1),
+        FocusMarker = "◆",
+        PageSize = 14
+    };
+
+    private readonly Button _runButton = new() { Text = "Run" };
+    private readonly Button _saveButton = new() { Text = "Save" };
+
+    private readonly RichTextView _savedPreview =
+        new() { Title = "View Briefing", Border = BorderStyle.Rounded, Padding = Thickness.All(1) };
+
+    private readonly RichTextView _savedRunbook = new()
+    {
+        Title = "Re-entry Runbook",
+        Border = BorderStyle.Rounded,
+        Padding = Thickness.All(1)
+    };
+
+    private readonly SideNavRail _savedViews = new()
+    {
+        Title = "Saved Views",
+        Border = BorderStyle.Rounded,
+        Padding = Thickness.All(1),
+        FocusMarker = "◆"
+    };
+
+    private readonly SearchBox _search = new()
+    {
+        Title = "Search Slice",
+        Border = BorderStyle.Rounded,
+        Padding = Thickness.All(1),
+        FocusMarker = "◆",
+        Placeholder = "search entity, owner, region, or narrative"
+    };
+
+    private readonly StatsCard _slicePulse = new()
+    {
+        Title = "Slice Pulse",
+        Border = BorderStyle.Rounded,
+        Padding = Thickness.Symmetric(1)
+    };
+
+    private readonly SideNavRail _sourceRail = new()
+    {
+        Title = "Sources · F1",
+        Border = BorderStyle.Rounded,
+        Padding = Thickness.All(1),
+        FocusMarker = "◆"
+    };
+
+    private readonly DataWorkbenchState _state = DataWorkbenchState.CreateSeed();
+
+    private readonly CommandOutput _traceView = new()
+    {
+        Title = "Trace Lens · F3",
+        Border = BorderStyle.Rounded,
+        Padding = Thickness.All(1),
+        FocusMarker = "◆",
+        AutoFollow = true,
+        ShowTimestamp = false
+    };
+
+    private readonly StatsCard _velocityPulse = new()
+    {
+        Title = "Query Velocity",
+        Border = BorderStyle.Rounded,
+        Padding = Thickness.Symmetric(1)
+    };
+
+    private string? _inspectedRecordId;
     private DataWorkbenchPage _page = DataWorkbenchPage.Explore;
+    private DataWorkbenchPalette _palette = DataWorkbenchTheme.Default;
     private string? _pinnedRecordId;
     private string? _selectedSavedViewId;
-    private string? _inspectedRecordId;
+
+    private string _sourceId = "fraud_signals";
     private IReadOnlyList<WorkbenchRecord> _visibleRecords = [];
 
     public DataWorkbenchApp()
@@ -62,8 +188,10 @@ internal sealed partial class DataWorkbenchApp : TesseraApp
         _results.RequestFocus();
     }
 
-    public override TesseraEffect? Initialize() =>
-        TesseraEffects.Periodic(TimeSpan.FromMilliseconds(1400), _ => new DataWorkbenchTickMessage());
+    public override TesseraEffect? Initialize()
+    {
+        return TesseraEffects.Periodic(TimeSpan.FromMilliseconds(1400), _ => new DataWorkbenchTickMessage());
+    }
 
     public override TesseraEffect? Update(Message message)
     {
@@ -238,7 +366,7 @@ internal sealed partial class DataWorkbenchApp : TesseraApp
                 1 => DataWorkbenchPage.Compare,
                 2 => DataWorkbenchPage.History,
                 3 => DataWorkbenchPage.Saved,
-                _ => DataWorkbenchPage.Explore,
+                _ => DataWorkbenchPage.Explore
             };
         };
 
@@ -272,7 +400,7 @@ internal sealed partial class DataWorkbenchApp : TesseraApp
             new PaneTabItem("explore", "Explore"),
             new PaneTabItem("compare", "Compare"),
             new PaneTabItem("history", "History"),
-            new PaneTabItem("saved", "Saved Views"),
+            new PaneTabItem("saved", "Saved Views")
         ]);
         _pageTabs.SetSelectedIndex(0);
 
@@ -280,7 +408,7 @@ internal sealed partial class DataWorkbenchApp : TesseraApp
         [
             new PaneTabItem("profile", "Profile"),
             new PaneTabItem("json", "JSON"),
-            new PaneTabItem("trace", "Trace"),
+            new PaneTabItem("trace", "Trace")
         ]);
         _inspectTabs.SetSelectedIndex(0);
 
@@ -326,8 +454,10 @@ internal sealed partial class DataWorkbenchApp : TesseraApp
         _velocityPulse.SetItems(DataWorkbenchState.BuildVelocityItems(_visibleRecords));
         _comparePulse.SetItems(DataWorkbenchState.BuildCompareItems(PinnedRecord(), current));
 
-        _footer.LeftText = $"dataworkbench  {_palette.Label.ToLowerInvariant()}  {source.SourceTag}  rows {_visibleRecords.Count:00}  pinned {(PinnedRecord()?.Id ?? "none")}";
-        _footer.RightText = "1-4 pages  7/8/9 themes  / search  q rules  r run  p pin  b save  e export  F1/F2/F3/F4 focus";
+        _footer.LeftText =
+            $"dataworkbench  {_palette.Label.ToLowerInvariant()}  {source.SourceTag}  rows {_visibleRecords.Count:00}  pinned {PinnedRecord()?.Id ?? "none"}";
+        _footer.RightText =
+            "1-4 pages  7/8/9 themes  / search  q rules  r run  p pin  b save  e export  F1/F2/F3/F4 focus";
     }
 
     private void RefreshViews()
@@ -372,9 +502,11 @@ internal enum DataWorkbenchAction
     PinCompare,
     SaveView,
     ExportSlice,
-    ClearSearch,
+    ClearSearch
 }
 
 internal sealed record DataWorkbenchActionMessage(DataWorkbenchAction Action) : Message;
+
 internal sealed record DataWorkbenchThemeMessage(DataWorkbenchThemeKind Kind) : Message;
-internal sealed record DataWorkbenchTickMessage() : Message;
+
+internal sealed record DataWorkbenchTickMessage : Message;

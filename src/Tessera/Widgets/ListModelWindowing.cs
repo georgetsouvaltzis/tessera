@@ -24,7 +24,8 @@ internal static class ListModelWindowing
         offset = Math.Clamp(offset, 0, maxOffset);
     }
 
-    public static List<ListRow<T>> VisibleRows<T>(IReadOnlyList<T> allItems, IReadOnlyList<int> filteredIndexes, int offset, int pageSize, int selectedIndex)
+    public static List<ListRow<T>> VisibleRows<T>(IReadOnlyList<T> allItems, IReadOnlyList<int> filteredIndexes,
+        int offset, int pageSize, int selectedIndex)
     {
         var rows = new List<ListRow<T>>(Math.Max(1, pageSize));
         if (filteredIndexes.Count == 0 || pageSize <= 0)

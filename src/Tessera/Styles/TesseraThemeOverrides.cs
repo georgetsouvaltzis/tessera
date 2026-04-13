@@ -1,27 +1,29 @@
 namespace Tessera.Styles;
 
 /// <summary>
-/// Stores hierarchical theme overrides and resolves effective themes for controls.
+///     Stores hierarchical theme overrides and resolves effective themes for controls.
 /// </summary>
 /// <remarks>
-/// Precedence from lowest to highest:
-/// global theme, global state, control-type theme, control-type state, control-instance theme, control-instance state.
+///     Precedence from lowest to highest:
+///     global theme, global state, control-type theme, control-type state, control-instance theme, control-instance state.
 /// </remarks>
 public sealed class TesseraThemeOverrides
 {
-    private readonly Dictionary<Type, TesseraTheme> _controlTypeThemes = [];
+    private readonly Dictionary<object, Dictionary<TesseraThemeVisualState, TesseraTheme>> _controlInstanceStateThemes =
+        new(ReferenceEqualityComparer.Instance);
+
     private readonly Dictionary<object, TesseraTheme> _controlInstanceThemes = new(ReferenceEqualityComparer.Instance);
-    private readonly Dictionary<TesseraThemeVisualState, TesseraTheme> _globalStateThemes = [];
     private readonly Dictionary<Type, Dictionary<TesseraThemeVisualState, TesseraTheme>> _controlTypeStateThemes = [];
-    private readonly Dictionary<object, Dictionary<TesseraThemeVisualState, TesseraTheme>> _controlInstanceStateThemes = new(ReferenceEqualityComparer.Instance);
+    private readonly Dictionary<Type, TesseraTheme> _controlTypeThemes = [];
+    private readonly Dictionary<TesseraThemeVisualState, TesseraTheme> _globalStateThemes = [];
 
     /// <summary>
-    /// Gets or sets the global theme override.
+    ///     Gets or sets the global theme override.
     /// </summary>
     public TesseraTheme? GlobalTheme { get; set; }
 
     /// <summary>
-    /// Assigns a control-type override.
+    ///     Assigns a control-type override.
     /// </summary>
     /// <typeparam name="TControl">The control type.</typeparam>
     /// <param name="theme">The theme override.</param>
@@ -32,7 +34,7 @@ public sealed class TesseraThemeOverrides
     }
 
     /// <summary>
-    /// Assigns a control-instance override.
+    ///     Assigns a control-instance override.
     /// </summary>
     /// <param name="control">The control instance.</param>
     /// <param name="theme">The theme override.</param>
@@ -43,7 +45,7 @@ public sealed class TesseraThemeOverrides
     }
 
     /// <summary>
-    /// Assigns a global state override.
+    ///     Assigns a global state override.
     /// </summary>
     /// <param name="state">The visual state.</param>
     /// <param name="theme">The theme override.</param>
@@ -53,7 +55,7 @@ public sealed class TesseraThemeOverrides
     }
 
     /// <summary>
-    /// Assigns a control-type state override.
+    ///     Assigns a control-type state override.
     /// </summary>
     /// <typeparam name="TControl">The control type.</typeparam>
     /// <param name="state">The visual state.</param>
@@ -72,7 +74,7 @@ public sealed class TesseraThemeOverrides
     }
 
     /// <summary>
-    /// Assigns a control-instance state override.
+    ///     Assigns a control-instance state override.
     /// </summary>
     /// <param name="control">The control instance.</param>
     /// <param name="state">The visual state.</param>
@@ -90,13 +92,14 @@ public sealed class TesseraThemeOverrides
     }
 
     /// <summary>
-    /// Resolves the effective theme for a control and optional visual state.
+    ///     Resolves the effective theme for a control and optional visual state.
     /// </summary>
     /// <param name="control">The control instance.</param>
     /// <param name="baseTheme">The base theme.</param>
     /// <param name="state">The visual state.</param>
     /// <returns>The merged effective theme.</returns>
-    public TesseraTheme Resolve(object control, TesseraTheme baseTheme, TesseraThemeVisualState state = TesseraThemeVisualState.Default)
+    public TesseraTheme Resolve(object control, TesseraTheme baseTheme,
+        TesseraThemeVisualState state = TesseraThemeVisualState.Default)
     {
         ArgumentNullException.ThrowIfNull(control);
         ArgumentNullException.ThrowIfNull(baseTheme);

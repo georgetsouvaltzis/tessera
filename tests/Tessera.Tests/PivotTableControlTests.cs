@@ -1,6 +1,5 @@
 using NUnit.Framework;
 using Tessera.Components.Primitives;
-using Tessera.Components.Styling;
 using Tessera.Controls;
 
 namespace Tessera.Tests;
@@ -14,7 +13,7 @@ public sealed class PivotTableControlTests
     {
         var control = CreateSortableControl();
         var sorted = control.SortByColumn(0, PivotSortDirection.Ascending);
-        var output = Render(control, width: 48, height: 8);
+        var output = Render(control, 48, 8);
 
         Assert.That(sorted, Is.True);
         Assert.That(output.Contains("Row", StringComparison.Ordinal), Is.True);
@@ -52,7 +51,7 @@ public sealed class PivotTableControlTests
         control.SetCells(
         [
             new PivotTableCell("srv-a", "latency", "12"),
-            new PivotTableCell("srv-b", "latency", "4"),
+            new PivotTableCell("srv-b", "latency", "4")
         ]);
 
         PivotSortRequestedEventArgs? captured = null;
@@ -94,32 +93,28 @@ public sealed class PivotTableControlTests
     {
         var control = CreateSortableControl();
 
-        var first = Render(control, width: 48, height: 8);
-        var second = Render(control, width: 48, height: 8);
+        var first = Render(control, 48, 8);
+        var second = Render(control, 48, 8);
 
         Assert.That(first, Is.EqualTo(second));
-        Assert.That(first.Contains("\u001b[", StringComparison.Ordinal), Is.False);
+        Assert.That(first.Contains("\e[", StringComparison.Ordinal), Is.False);
     }
 
     private static PivotTable CreateSortableControl()
     {
-        var control = new PivotTable
-        {
-            Title = "Analytics",
-            Border = BorderStyle.SingleLine,
-        };
+        var control = new PivotTable { Title = "Analytics", Border = BorderStyle.SingleLine };
         control.SetColumns(
         [
             new PivotTableColumn("cpu", "CPU")
             {
                 IsSortable = true,
-                SortComparer = static (left, right) => ParseNumber(left).CompareTo(ParseNumber(right)),
+                SortComparer = static (left, right) => ParseNumber(left).CompareTo(ParseNumber(right))
             },
             new PivotTableColumn("mem", "MEM")
             {
                 IsSortable = true,
-                SortComparer = static (left, right) => ParseNumber(left).CompareTo(ParseNumber(right)),
-            },
+                SortComparer = static (left, right) => ParseNumber(left).CompareTo(ParseNumber(right))
+            }
         ]);
         control.SetRows(["srv-a", "srv-b", "srv-c"]);
         control.SetCells(
@@ -129,7 +124,7 @@ public sealed class PivotTableControlTests
             new PivotTableCell("srv-b", "cpu", "18"),
             new PivotTableCell("srv-b", "mem", "2048"),
             new PivotTableCell("srv-c", "cpu", "72"),
-            new PivotTableCell("srv-c", "mem", "1024"),
+            new PivotTableCell("srv-c", "mem", "1024")
         ]);
         return control;
     }

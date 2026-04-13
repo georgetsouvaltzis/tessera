@@ -37,11 +37,7 @@ internal static class InteractionPointerParity_NavigationExplorerTests
     private static Task Choice_FieldHoverStyle_IsRendered()
     {
         var hoverStyle = TesseraStyle.Empty.WithForeground(AnsiColor.Rgb(220, 121, 20));
-        var control = new Choice
-        {
-            Border = BorderStyle.None,
-            HoveredValueStyle = hoverStyle,
-        };
+        var control = new Choice { Border = BorderStyle.None, HoveredValueStyle = hoverStyle };
         control.SetItems(["alpha", "beta"]);
 
         var bounds = new Rect(0, 0, 32, 6);
@@ -52,18 +48,15 @@ internal static class InteractionPointerParity_NavigationExplorerTests
 
         TestAssert.True(changed, "Choice pointer motion over field should update hover state.");
         TestAssert.True(output.Contains('▾'), "Choice should render the field indicator.");
-        TestAssert.True(output.Contains(hoverStyle.ToEscapeSequence(), StringComparison.Ordinal), "Choice field hover style should render SGR sequence.");
+        TestAssert.True(output.Contains(hoverStyle.ToEscapeSequence(), StringComparison.Ordinal),
+            "Choice field hover style should render SGR sequence.");
         return Task.CompletedTask;
     }
 
     private static Task ComboBox_FieldHoverStyle_IsRendered()
     {
         var hoverStyle = TesseraStyle.Empty.WithForeground(AnsiColor.Rgb(200, 80, 40));
-        var control = new ComboBox
-        {
-            Border = BorderStyle.None,
-            HoveredValueStyle = hoverStyle,
-        };
+        var control = new ComboBox { Border = BorderStyle.None, HoveredValueStyle = hoverStyle };
         control.SetItems(["alpha", "beta"]);
 
         var bounds = new Rect(0, 0, 32, 6);
@@ -74,7 +67,8 @@ internal static class InteractionPointerParity_NavigationExplorerTests
 
         TestAssert.True(changed, "ComboBox pointer motion over field should update hover state.");
         TestAssert.True(output.Contains('▾'), "ComboBox should render the field indicator.");
-        TestAssert.True(output.Contains(hoverStyle.ToEscapeSequence(), StringComparison.Ordinal), "ComboBox field hover style should render SGR sequence.");
+        TestAssert.True(output.Contains(hoverStyle.ToEscapeSequence(), StringComparison.Ordinal),
+            "ComboBox field hover style should render SGR sequence.");
         return Task.CompletedTask;
     }
 
@@ -90,7 +84,7 @@ internal static class InteractionPointerParity_NavigationExplorerTests
             ShowFocusMarker = true,
             BorderStyleText = TesseraStyle.Empty.WithForeground(AnsiColor.Rgb(40, 40, 40)),
             FocusedBorderStyleText = focusedBorder,
-            Glyphs = new DropdownGlyphSet("v", "^", ">", "+"),
+            Glyphs = new DropdownGlyphSet("v", "^", ">", "+")
         };
         control.SetItems(["alpha", "beta"]);
         _ = control.Handle(new KeyPressed(Key.Down));
@@ -98,10 +92,14 @@ internal static class InteractionPointerParity_NavigationExplorerTests
         var first = Render(control, 40, 8, CanvasTextMode.GraphemeAware);
         var second = Render(control, 40, 8, CanvasTextMode.GraphemeAware);
 
-        TestAssert.True(first.Contains("Choice ◆", StringComparison.Ordinal), "Choice title should render custom focus marker.");
-        TestAssert.True(first.Contains("^ alpha", StringComparison.Ordinal), "Choice field should render custom expanded indicator.");
-        TestAssert.True(first.Contains(">+ alpha", StringComparison.Ordinal), "Choice options should render custom highlighted and selected markers.");
-        TestAssert.True(first.Contains(focusedBorder.Render("┌"), StringComparison.Ordinal), "Choice focused border style should render on border glyphs.");
+        TestAssert.True(first.Contains("Choice ◆", StringComparison.Ordinal),
+            "Choice title should render custom focus marker.");
+        TestAssert.True(first.Contains("^ alpha", StringComparison.Ordinal),
+            "Choice field should render custom expanded indicator.");
+        TestAssert.True(first.Contains(">+ alpha", StringComparison.Ordinal),
+            "Choice options should render custom highlighted and selected markers.");
+        TestAssert.True(first.Contains(focusedBorder.Render("┌"), StringComparison.Ordinal),
+            "Choice focused border style should render on border glyphs.");
         TestAssert.Equal(first, second, "Choice custom border/glyph render should be deterministic.");
         return Task.CompletedTask;
     }
@@ -120,7 +118,7 @@ internal static class InteractionPointerParity_NavigationExplorerTests
             BorderStyleText = TesseraStyle.Empty.WithForeground(AnsiColor.Rgb(40, 40, 40)),
             FocusedBorderStyleText = focusedBorder,
             HoveredValueStyle = hoverStyle,
-            Glyphs = new DropdownGlyphSet("v", "^", ">", "*"),
+            Glyphs = new DropdownGlyphSet("v", "^", ">", "*")
         };
         control.SetItems(["alpha", "beta"]);
         _ = control.Handle(new KeyPressed(Key.Down));
@@ -131,11 +129,15 @@ internal static class InteractionPointerParity_NavigationExplorerTests
         var first = Render(control, 40, 8, CanvasTextMode.GraphemeAware);
         var second = Render(control, 40, 8, CanvasTextMode.GraphemeAware);
 
-        TestAssert.True(first.Contains("Combo ◆", StringComparison.Ordinal), "ComboBox title should render custom focus marker.");
+        TestAssert.True(first.Contains("Combo ◆", StringComparison.Ordinal),
+            "ComboBox title should render custom focus marker.");
         TestAssert.True(first.Contains('^'), "ComboBox field should render custom expanded indicator.");
-        TestAssert.True(first.Contains(">* alpha", StringComparison.Ordinal), "ComboBox options should render custom highlighted and selected markers.");
-        TestAssert.True(first.Contains(focusedBorder.Render("┌"), StringComparison.Ordinal), "ComboBox focused border style should render on border glyphs.");
-        TestAssert.True(first.Contains(hoverStyle.ToEscapeSequence(), StringComparison.Ordinal), "ComboBox hovered field style should render SGR sequence.");
+        TestAssert.True(first.Contains(">* alpha", StringComparison.Ordinal),
+            "ComboBox options should render custom highlighted and selected markers.");
+        TestAssert.True(first.Contains(focusedBorder.Render("┌"), StringComparison.Ordinal),
+            "ComboBox focused border style should render on border glyphs.");
+        TestAssert.True(first.Contains(hoverStyle.ToEscapeSequence(), StringComparison.Ordinal),
+            "ComboBox hovered field style should render SGR sequence.");
         TestAssert.Equal(first, second, "ComboBox custom border/glyph render should be deterministic.");
         return Task.CompletedTask;
     }
@@ -143,11 +145,7 @@ internal static class InteractionPointerParity_NavigationExplorerTests
     private static Task FuzzyFinder_HoveredRowStyle_IsRendered()
     {
         var hoverStyle = TesseraStyle.Empty.WithForeground(AnsiColor.Rgb(180, 30, 210));
-        var control = new FuzzyFinder
-        {
-            Border = BorderStyle.None,
-            HoveredItemStyle = hoverStyle,
-        };
+        var control = new FuzzyFinder { Border = BorderStyle.None, HoveredItemStyle = hoverStyle };
         control.SetItems(["one", "two", "three"]);
 
         var bounds = new Rect(0, 0, 40, 6);
@@ -157,23 +155,21 @@ internal static class InteractionPointerParity_NavigationExplorerTests
         var output = canvas.Render();
 
         TestAssert.True(changed, "FuzzyFinder pointer motion should update hovered row.");
-        TestAssert.True(output.Contains("two", StringComparison.Ordinal), "FuzzyFinder should render hovered row label.");
-        TestAssert.True(output.Contains(hoverStyle.ToEscapeSequence(), StringComparison.Ordinal), "FuzzyFinder hovered row style should render SGR sequence.");
+        TestAssert.True(output.Contains("two", StringComparison.Ordinal),
+            "FuzzyFinder should render hovered row label.");
+        TestAssert.True(output.Contains(hoverStyle.ToEscapeSequence(), StringComparison.Ordinal),
+            "FuzzyFinder hovered row style should render SGR sequence.");
         return Task.CompletedTask;
     }
 
     private static Task FileExplorer_HoveredRowStyle_IsRendered()
     {
         var hoverStyle = TesseraStyle.Empty.WithForeground(AnsiColor.Rgb(70, 140, 230));
-        var control = new FileExplorer
-        {
-            Border = BorderStyle.None,
-            HoveredStyle = hoverStyle,
-        };
+        var control = new FileExplorer { Border = BorderStyle.None, HoveredStyle = hoverStyle };
         control.SetItems(
         [
-            new FileExplorerItem("src", isDirectory: true, path: "/src"),
-            new FileExplorerItem("README.md", isDirectory: false, path: "/README.md"),
+            new FileExplorerItem("src", true, "/src"),
+            new FileExplorerItem("README.md", false, "/README.md")
         ]);
 
         var bounds = new Rect(0, 0, 48, 6);
@@ -183,23 +179,21 @@ internal static class InteractionPointerParity_NavigationExplorerTests
         var output = canvas.Render();
 
         TestAssert.True(changed, "FileExplorer pointer motion should update hovered row.");
-        TestAssert.True(output.Contains("README.md", StringComparison.Ordinal), "FileExplorer should render hovered row label.");
-        TestAssert.True(output.Contains(hoverStyle.ToEscapeSequence(), StringComparison.Ordinal), "FileExplorer hovered row style should render SGR sequence.");
+        TestAssert.True(output.Contains("README.md", StringComparison.Ordinal),
+            "FileExplorer should render hovered row label.");
+        TestAssert.True(output.Contains(hoverStyle.ToEscapeSequence(), StringComparison.Ordinal),
+            "FileExplorer hovered row style should render SGR sequence.");
         return Task.CompletedTask;
     }
 
     private static Task TreeTable_HoveredRowStyle_IsRendered()
     {
         var hoverStyle = TesseraStyle.Empty.WithForeground(AnsiColor.Rgb(90, 210, 130));
-        var control = new TreeTable("Name")
-        {
-            Border = BorderStyle.None,
-            HoveredRowStyle = hoverStyle,
-        };
+        var control = new TreeTable("Name") { Border = BorderStyle.None, HoveredRowStyle = hoverStyle };
         control.SetItems(
         [
             new TreeTableNode("alpha", "alpha"),
-            new TreeTableNode("beta", "beta"),
+            new TreeTableNode("beta", "beta")
         ]);
 
         var bounds = new Rect(0, 0, 40, 6);
@@ -209,8 +203,10 @@ internal static class InteractionPointerParity_NavigationExplorerTests
         var output = canvas.Render();
 
         TestAssert.True(changed, "TreeTable pointer motion should update hovered row.");
-        TestAssert.True(output.Contains("beta", StringComparison.Ordinal), "TreeTable should render hovered row label.");
-        TestAssert.True(output.Contains(hoverStyle.ToEscapeSequence(), StringComparison.Ordinal), "TreeTable hovered row style should render SGR sequence.");
+        TestAssert.True(output.Contains("beta", StringComparison.Ordinal),
+            "TreeTable should render hovered row label.");
+        TestAssert.True(output.Contains(hoverStyle.ToEscapeSequence(), StringComparison.Ordinal),
+            "TreeTable hovered row style should render SGR sequence.");
         return Task.CompletedTask;
     }
 
@@ -221,12 +217,12 @@ internal static class InteractionPointerParity_NavigationExplorerTests
         {
             Border = BorderStyle.None,
             Title = string.Empty,
-            HoveredRowStyle = hoverStyle,
+            HoveredRowStyle = hoverStyle
         };
         control.SetRows(
         [
             ["svc-a", "ok"],
-            ["svc-b", "warn"],
+            ["svc-b", "warn"]
         ]);
 
         var bounds = new Rect(0, 0, 48, 7);
@@ -237,7 +233,8 @@ internal static class InteractionPointerParity_NavigationExplorerTests
 
         TestAssert.True(changed, "Table pointer motion should update hovered row.");
         TestAssert.True(output.Contains("svc-b", StringComparison.Ordinal), "Table should render hovered row label.");
-        TestAssert.True(output.Contains(hoverStyle.ToEscapeSequence(), StringComparison.Ordinal), "Table hovered row style should render SGR sequence.");
+        TestAssert.True(output.Contains(hoverStyle.ToEscapeSequence(), StringComparison.Ordinal),
+            "Table hovered row style should render SGR sequence.");
         return Task.CompletedTask;
     }
 

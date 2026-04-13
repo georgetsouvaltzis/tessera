@@ -7,146 +7,135 @@ using Tessera.Widgets;
 namespace Tessera.Controls;
 
 /// <summary>
-/// Represents an editable token-chip input control.
+///     Represents an editable token-chip input control.
 /// </summary>
 public sealed partial class TokenEditor : Control
 {
-    private readonly List<TokenItem> _tokens = [];
     private readonly TextInputModel _input = new();
-    private int _selectedTokenIndex = -1;
+    private readonly List<TokenItem> _tokens = [];
     private int _hoveredTokenIndex = -1;
 
     /// <summary>
-    /// Occurs when selected token changes.
+    ///     Initializes a token editor.
     /// </summary>
-    public event EventHandler<TokenEditorSelectionChangedEventArgs>? SelectionChanged;
-
-    /// <summary>
-    /// Occurs when the token collection changes.
-    /// </summary>
-    public event EventHandler<TokenEditorTokensChangedEventArgs>? TokensChanged;
-
-    /// <summary>
-    /// Control title rendered on the frame.
-    /// </summary>
-    public string Title
+    public TokenEditor()
     {
-        get;
-        set => field = value ?? string.Empty;
-    } = "Tokens";
+        Placeholder = "Add token...";
+    }
 
     /// <summary>
-    /// Marker appended to the title while focused.
+    ///     Control title rendered on the frame.
     /// </summary>
-    public string FocusMarker
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = "*";
+    public string Title { get; set; } = "Tokens";
 
     /// <summary>
-    /// Whether the focus marker is rendered while focused.
+    ///     Marker appended to the title while focused.
+    /// </summary>
+    public string FocusMarker { get; set; } = "*";
+
+    /// <summary>
+    ///     Whether the focus marker is rendered while focused.
     /// </summary>
     public bool ShowFocusMarker { get; set; } = true;
 
     /// <summary>
-    /// Placeholder rendered when input is empty.
+    ///     Placeholder rendered when input is empty.
     /// </summary>
     public string Placeholder
     {
         get => _input.Placeholder;
-        set => _input.Placeholder = value ?? string.Empty;
+        set => _input.Placeholder = value;
     }
 
     /// <summary>
-    /// Style applied to title while not focused.
+    ///     Style applied to title while not focused.
     /// </summary>
     public TesseraStyle TitleStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Style applied to title while focused.
+    ///     Style applied to title while focused.
     /// </summary>
     public TesseraStyle FocusedTitleStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Base style for token chips.
+    ///     Base style for token chips.
     /// </summary>
     public TesseraStyle TokenStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Style merged into selected token chips.
+    ///     Style merged into selected token chips.
     /// </summary>
     public TesseraStyle SelectedTokenStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Style merged into selected token chips while focused.
+    ///     Style merged into selected token chips while focused.
     /// </summary>
     public TesseraStyle FocusedSelectedTokenStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Style merged into hovered token chips.
+    ///     Style merged into hovered token chips.
     /// </summary>
     public TesseraStyle HoveredTokenStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Style merged into disabled chips and disabled control state.
+    ///     Style merged into disabled chips and disabled control state.
     /// </summary>
     public TesseraStyle DisabledTokenStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Style applied to editable input text.
+    ///     Style applied to editable input text.
     /// </summary>
     public TesseraStyle ValueTextStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Style applied to placeholder text.
+    ///     Style applied to placeholder text.
     /// </summary>
     public TesseraStyle PlaceholderTextStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Style applied to border glyphs while not focused.
+    ///     Style applied to border glyphs while not focused.
     /// </summary>
     public TesseraStyle BorderStyleText { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Style merged into border glyphs while focused.
+    ///     Style merged into border glyphs while focused.
     /// </summary>
     public TesseraStyle FocusedBorderStyleText { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Glyph set used for chip rendering.
+    ///     Glyph set used for chip rendering.
     /// </summary>
     public TokenEditorGlyphSet Glyphs { get; set; } = TokenEditorGlyphSet.Default;
 
     /// <summary>
-    /// Border style around the control.
+    ///     Border style around the control.
     /// </summary>
     public BorderStyle Border { get; set; } = BorderStyle.SingleLine;
 
     /// <summary>
-    /// Inner padding applied inside the frame.
+    ///     Inner padding applied inside the frame.
     /// </summary>
     public Thickness Padding { get; set; }
 
     /// <summary>
-    /// Configured tokens.
+    ///     Configured tokens.
     /// </summary>
     public IReadOnlyList<TokenItem> Tokens => _tokens;
 
     /// <summary>
-    /// Selected token index, or <c>-1</c> when no token is selected.
+    ///     Selected token index, or <c>-1</c> when no token is selected.
     /// </summary>
-    public int SelectedTokenIndex => _selectedTokenIndex;
+    public int SelectedTokenIndex { get; private set; } = -1;
 
     /// <summary>
-    /// Selected token, if any.
+    ///     Selected token, if any.
     /// </summary>
-    public TokenItem? SelectedToken => _selectedTokenIndex >= 0 && _selectedTokenIndex < _tokens.Count
-        ? _tokens[_selectedTokenIndex]
+    public TokenItem? SelectedToken => SelectedTokenIndex >= 0 && SelectedTokenIndex < _tokens.Count
+        ? _tokens[SelectedTokenIndex]
         : null;
 
     /// <summary>
-    /// Current input text value.
+    ///     Current input text value.
     /// </summary>
     public string InputValue => _input.Value;
 
@@ -160,22 +149,24 @@ public sealed partial class TokenEditor : Control
     public override bool IsReadOnly { get; set; }
 
     /// <summary>
-    /// Initializes a token editor.
+    ///     Occurs when selected token changes.
     /// </summary>
-    public TokenEditor()
-    {
-        Placeholder = "Add token...";
-    }
+    public event EventHandler<TokenEditorSelectionChangedEventArgs>? SelectionChanged;
 
     /// <summary>
-    /// Replaces all tokens.
+    ///     Occurs when the token collection changes.
+    /// </summary>
+    public event EventHandler<TokenEditorTokensChangedEventArgs>? TokensChanged;
+
+    /// <summary>
+    ///     Replaces all tokens.
     /// </summary>
     /// <param name="tokens">Tokens to render.</param>
     public void SetTokens(IEnumerable<TokenItem> tokens)
     {
         ArgumentNullException.ThrowIfNull(tokens);
         var previousTokens = SnapshotTokens();
-        var previousIndex = _selectedTokenIndex;
+        var previousIndex = SelectedTokenIndex;
         var previousToken = SelectedToken;
 
         _tokens.Clear();
@@ -186,12 +177,12 @@ public sealed partial class TokenEditor : Control
 
         if (_tokens.Count == 0)
         {
-            _selectedTokenIndex = -1;
+            SelectedTokenIndex = -1;
             _hoveredTokenIndex = -1;
         }
         else
         {
-            _selectedTokenIndex = previousIndex < 0
+            SelectedTokenIndex = previousIndex < 0
                 ? 0
                 : Math.Clamp(previousIndex, 0, _tokens.Count - 1);
             _hoveredTokenIndex = Math.Clamp(_hoveredTokenIndex, -1, _tokens.Count - 1);
@@ -202,7 +193,7 @@ public sealed partial class TokenEditor : Control
     }
 
     /// <summary>
-    /// Adds a token from text input.
+    ///     Adds a token from text input.
     /// </summary>
     /// <param name="value">Token text.</param>
     /// <returns><see langword="true" /> when token was added.</returns>
@@ -215,12 +206,12 @@ public sealed partial class TokenEditor : Control
         }
 
         var previousTokens = SnapshotTokens();
-        var previousIndex = _selectedTokenIndex;
+        var previousIndex = SelectedTokenIndex;
         var previousToken = SelectedToken;
         _tokens.Add(new TokenItem(normalized.ToString()));
-        if (_selectedTokenIndex < 0)
+        if (SelectedTokenIndex < 0)
         {
-            _selectedTokenIndex = 0;
+            SelectedTokenIndex = 0;
         }
 
         RaiseTokensChangedIfNeeded(previousTokens);
@@ -229,29 +220,29 @@ public sealed partial class TokenEditor : Control
     }
 
     /// <summary>
-    /// Removes the selected token.
+    ///     Removes the selected token.
     /// </summary>
     /// <returns><see langword="true" /> when a token was removed.</returns>
     public bool RemoveSelectedToken()
     {
-        if (_selectedTokenIndex < 0 || _selectedTokenIndex >= _tokens.Count)
+        if (SelectedTokenIndex < 0 || SelectedTokenIndex >= _tokens.Count)
         {
             return false;
         }
 
         var previousTokens = SnapshotTokens();
-        var previousIndex = _selectedTokenIndex;
+        var previousIndex = SelectedTokenIndex;
         var previousToken = SelectedToken;
-        _tokens.RemoveAt(_selectedTokenIndex);
+        _tokens.RemoveAt(SelectedTokenIndex);
 
         if (_tokens.Count == 0)
         {
-            _selectedTokenIndex = -1;
+            SelectedTokenIndex = -1;
             _hoveredTokenIndex = -1;
         }
         else
         {
-            _selectedTokenIndex = Math.Clamp(previousIndex, 0, _tokens.Count - 1);
+            SelectedTokenIndex = Math.Clamp(previousIndex, 0, _tokens.Count - 1);
             _hoveredTokenIndex = Math.Clamp(_hoveredTokenIndex, -1, _tokens.Count - 1);
         }
 
@@ -261,7 +252,7 @@ public sealed partial class TokenEditor : Control
     }
 
     /// <summary>
-    /// Sets selected token index.
+    ///     Sets selected token index.
     /// </summary>
     /// <param name="index">Selection index, or <c>-1</c> to clear selection.</param>
     /// <returns><see langword="true" /> when selection changed.</returns>
@@ -270,14 +261,14 @@ public sealed partial class TokenEditor : Control
         var normalized = _tokens.Count == 0
             ? -1
             : Math.Clamp(index, -1, _tokens.Count - 1);
-        if (normalized == _selectedTokenIndex)
+        if (normalized == SelectedTokenIndex)
         {
             return false;
         }
 
-        var previousIndex = _selectedTokenIndex;
+        var previousIndex = SelectedTokenIndex;
         var previousToken = SelectedToken;
-        _selectedTokenIndex = normalized;
+        SelectedTokenIndex = normalized;
         RaiseSelectionChangedIfNeeded(previousIndex, previousToken);
         return true;
     }
@@ -350,7 +341,7 @@ public sealed partial class TokenEditor : Control
         if (!insideRow)
         {
             return pointer.Kind is PointerEventKind.Motion or PointerEventKind.Press
-                && SetHoveredTokenIndex(-1);
+                   && SetHoveredTokenIndex(-1);
         }
 
         var hovered = HitTokenIndex(pointer.X, content);
@@ -377,7 +368,7 @@ public sealed partial class TokenEditor : Control
             return false;
         }
 
-        var current = _selectedTokenIndex < 0 ? 0 : _selectedTokenIndex;
+        var current = SelectedTokenIndex < 0 ? 0 : SelectedTokenIndex;
         var next = Math.Clamp(current + delta, 0, _tokens.Count - 1);
         return SetSelectedTokenIndex(next);
     }
@@ -401,7 +392,7 @@ public sealed partial class TokenEditor : Control
         var x = content.X;
         for (var index = 0; index < _tokens.Count; index++)
         {
-            var markerWidth = index == _selectedTokenIndex ? selectedMarkerWidth : unselectedMarkerWidth;
+            var markerWidth = index == SelectedTokenIndex ? selectedMarkerWidth : unselectedMarkerWidth;
             var valueWidth = ControlTextLayout.MeasureDisplayWidth(_tokens[index].Value);
             var width = markerWidth + markerSeparatorWidth + tokenPrefixWidth + valueWidth + tokenSuffixWidth;
             var separatorWidth = index < _tokens.Count - 1 ? tokenSeparatorWidth : 0;
@@ -464,7 +455,7 @@ public sealed partial class TokenEditor : Control
     private void RaiseSelectionChangedIfNeeded(int previousIndex, TokenItem? previousToken)
     {
         var selected = SelectedToken;
-        if (previousIndex == _selectedTokenIndex
+        if (previousIndex == SelectedTokenIndex
             && string.Equals(previousToken?.Value, selected?.Value, StringComparison.Ordinal)
             && previousToken?.IsDisabled == selected?.IsDisabled)
         {
@@ -473,7 +464,7 @@ public sealed partial class TokenEditor : Control
 
         SelectionChanged?.Invoke(
             this,
-            new TokenEditorSelectionChangedEventArgs(previousIndex, _selectedTokenIndex, previousToken, selected));
+            new TokenEditorSelectionChangedEventArgs(previousIndex, SelectedTokenIndex, previousToken, selected));
     }
 
     private static ReadOnlySpan<char> Trim(ReadOnlySpan<char> value)

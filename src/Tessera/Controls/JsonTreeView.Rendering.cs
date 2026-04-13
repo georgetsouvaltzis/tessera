@@ -31,7 +31,8 @@ public sealed partial class JsonTreeView
 
         if (_visible.Count == 0)
         {
-            canvas.WriteText(content.X, content.Y, ApplyStyle(EmptyText, ResolveRowStyle(null, selected: false, hovered: false)), content.Width);
+            canvas.WriteText(content.X, content.Y, ApplyStyle(EmptyText, ResolveRowStyle(null, false, false)),
+                content.Width);
             return;
         }
 
@@ -53,7 +54,7 @@ public sealed partial class JsonTreeView
         for (var index = 0; index < _visible.Count; index++)
         {
             var entry = _visible[index];
-            var rowWidth = ControlTextLayout.MeasureDisplayWidth(FormatLine(entry.Node, entry.Depth, selected: false));
+            var rowWidth = ControlTextLayout.MeasureDisplayWidth(FormatLine(entry.Node, entry.Depth, false));
             width = Math.Max(width, rowWidth + 2);
         }
 

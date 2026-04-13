@@ -8,7 +8,7 @@ internal enum DownloadCenterAction
     PauseResume,
     RetryNow,
     BoostLane,
-    PurgeCompleted,
+    PurgeCompleted
 }
 
 internal enum DownloadJobPhase
@@ -19,20 +19,19 @@ internal enum DownloadJobPhase
     Verifying,
     Completed,
     Failed,
-    Paused,
+    Paused
 }
 
 internal sealed class DownloadCenterState
 {
-    private readonly Random _random = new(2744);
-    private readonly DateTimeOffset _simulatedStartUtc = DateTimeOffset.UtcNow;
-    private readonly List<DownloadJob> _jobs;
     private readonly List<ActivityFeedItem> _feed = [];
-    private readonly List<double> _throughputTrend = [];
+    private readonly List<DownloadJob> _jobs;
+    private readonly Random _random = new(2744);
     private readonly List<double> _retryTrend = [];
-    private int _tick;
+    private readonly DateTimeOffset _simulatedStartUtc = DateTimeOffset.UtcNow;
+    private readonly List<double> _throughputTrend = [];
     private string _selectedJobId;
-    private string _lastAction = "holding orbital relay cadence";
+    private int _tick;
 
     private DownloadCenterState(List<DownloadJob> jobs)
     {
@@ -41,6 +40,28 @@ internal sealed class DownloadCenterState
         SeedFeed();
         SeedTrends();
     }
+
+    public IReadOnlyList<ActivityFeedItem> FeedItems => _feed;
+    public IReadOnlyList<double> ThroughputTrend => _throughputTrend;
+    public IReadOnlyList<double> RetryTrend => _retryTrend;
+    public static string ClockText => DateTimeOffset.UtcNow.ToString("HH:mm:ss 'UTC'", CultureInfo.InvariantCulture);
+    public string LastAction { get; private set; } = "holding orbital relay cadence";
+
+    public int ActiveCount =>
+        _jobs.Count(static job => job.Phase is DownloadJobPhase.Active or DownloadJobPhase.Verifying);
+
+    public int RetryCount =>
+        _jobs.Count(static job => job.Phase is DownloadJobPhase.Retrying or DownloadJobPhase.Failed);
+
+    public int CompletedCount => _jobs.Count(static job => job.Phase == DownloadJobPhase.Completed);
+
+    public double TotalThroughput => _jobs.Where(static job => job.Phase == DownloadJobPhase.Active)
+        .Sum(static job => job.ThroughputMbps);
+
+    public string SummaryBadge => $"{ActiveCount:00} live  {RetryCount:00} retry  {CompletedCount:00} done";
+    public string ThroughputBadge => $"{TotalThroughput:0} MB/s sustained";
+    public string PressureBadge => RetryCount > 0 ? $"{RetryCount:00} lanes unstable" : "all lanes aligned";
+    public DownloadJob SelectedJob => _jobs.First(job => job.Id == _selectedJobId);
 
     public static DownloadCenterState CreateSeed()
     {
@@ -52,32 +73,21 @@ internal sealed class DownloadCenterState
             new DownloadJob("mirror-snapshot.bin", "relay-dr-1", 1500, 0, 0, 0, DownloadJobPhase.Queued),
             new DownloadJob("drift-hotfix.pkg", "cdn-us-3", 340, 0, 0, 1, DownloadJobPhase.Retrying) { RetryTicks = 3 },
             new DownloadJob("shader-bundle.vpk", "cdn-eu-2", 290, 290, 0, 0, DownloadJobPhase.Completed),
-            new DownloadJob("capture-index.json", "edge-eu-4", 90, 90, 0, 3, DownloadJobPhase.Failed),
+            new DownloadJob("capture-index.json", "edge-eu-4", 90, 90, 0, 3, DownloadJobPhase.Failed)
         ]);
     }
-
-    public IReadOnlyList<ActivityFeedItem> FeedItems => _feed;
-    public IReadOnlyList<double> ThroughputTrend => _throughputTrend;
-    public IReadOnlyList<double> RetryTrend => _retryTrend;
-    public static string ClockText => DateTimeOffset.UtcNow.ToString("HH:mm:ss 'UTC'", CultureInfo.InvariantCulture);
-    public string LastAction => _lastAction;
-    public int ActiveCount => _jobs.Count(static job => job.Phase is DownloadJobPhase.Active or DownloadJobPhase.Verifying);
-    public int RetryCount => _jobs.Count(static job => job.Phase is DownloadJobPhase.Retrying or DownloadJobPhase.Failed);
-    public int CompletedCount => _jobs.Count(static job => job.Phase == DownloadJobPhase.Completed);
-    public double TotalThroughput => _jobs.Where(static job => job.Phase == DownloadJobPhase.Active).Sum(static job => job.ThroughputMbps);
-    public string SummaryBadge => $"{ActiveCount:00} live  {RetryCount:00} retry  {CompletedCount:00} done";
-    public string ThroughputBadge => $"{TotalThroughput:0} MB/s sustained";
-    public string PressureBadge => RetryCount > 0 ? $"{RetryCount:00} lanes unstable" : "all lanes aligned";
-    public DownloadJob SelectedJob => _jobs.First(job => job.Id == _selectedJobId);
 
     public IReadOnlyList<DownloadQueueSection> BuildSections()
     {
         return
         [
-            new DownloadQueueSection("Live", ActiveCount, BuildItems(DownloadJobPhase.Active, DownloadJobPhase.Verifying, DownloadJobPhase.Paused)),
-            new DownloadQueueSection("Retry", RetryCount, BuildItems(DownloadJobPhase.Retrying, DownloadJobPhase.Failed)),
-            new DownloadQueueSection("Ready", _jobs.Count(static job => job.Phase == DownloadJobPhase.Queued), BuildItems(DownloadJobPhase.Queued)),
-            new DownloadQueueSection("Done", CompletedCount, BuildItems(DownloadJobPhase.Completed)),
+            new DownloadQueueSection("Live", ActiveCount,
+                BuildItems(DownloadJobPhase.Active, DownloadJobPhase.Verifying, DownloadJobPhase.Paused)),
+            new DownloadQueueSection("Retry", RetryCount,
+                BuildItems(DownloadJobPhase.Retrying, DownloadJobPhase.Failed)),
+            new DownloadQueueSection("Ready", _jobs.Count(static job => job.Phase == DownloadJobPhase.Queued),
+                BuildItems(DownloadJobPhase.Queued)),
+            new DownloadQueueSection("Done", CompletedCount, BuildItems(DownloadJobPhase.Completed))
         ];
     }
 
@@ -103,20 +113,20 @@ internal sealed class DownloadCenterState
             [
                 new StatItem("Live", $"{ActiveCount:00}"),
                 new StatItem("Retry", $"{RetryCount:00}"),
-                new StatItem("Done", $"{CompletedCount:00}"),
+                new StatItem("Done", $"{CompletedCount:00}")
             ],
             "pipe" =>
             [
                 new StatItem("Now", $"{TotalThroughput:0} MB/s"),
                 new StatItem("Peak", $"{_throughputTrend.DefaultIfEmpty(0).Max():0} MB/s"),
-                new StatItem("ETA", FormatEta(SelectedJob)),
+                new StatItem("ETA", FormatEta(SelectedJob))
             ],
             _ =>
             [
                 new StatItem("Hot", $"{RetryCount:00}"),
                 new StatItem("Attempts", $"{_jobs.Sum(static job => job.Attempts):00}"),
-                new StatItem("Queue", $"{_jobs.Count(static job => job.Phase == DownloadJobPhase.Queued):00}"),
-            ],
+                new StatItem("Queue", $"{_jobs.Count(static job => job.Phase == DownloadJobPhase.Queued):00}")
+            ]
         };
     }
 
@@ -152,14 +162,16 @@ internal sealed class DownloadCenterState
                         job.Attempts++;
                         job.RetryTicks = _random.Next(2, 5);
                         job.ThroughputMbps = 0;
-                        PushFeed("relay", "retry", job.Name, "checksum drift detected, lane rewinding", ActivityFeedItemKind.Warning);
+                        PushFeed("relay", "retry", job.Name, "checksum drift detected, lane rewinding",
+                            ActivityFeedItemKind.Warning);
                     }
                     else if (job.CompletedMb >= job.SizeMb)
                     {
                         job.Phase = DownloadJobPhase.Verifying;
                         job.VerifyTicks = 2;
                         job.ThroughputMbps = 0;
-                        PushFeed("verifier", "seal", job.Name, "payload landed, digest verification armed", ActivityFeedItemKind.Info);
+                        PushFeed("verifier", "seal", job.Name, "payload landed, digest verification armed",
+                            ActivityFeedItemKind.Info);
                     }
 
                     liveBudget--;
@@ -169,7 +181,8 @@ internal sealed class DownloadCenterState
                     if (job.VerifyTicks <= 0)
                     {
                         job.Phase = DownloadJobPhase.Completed;
-                        PushFeed("relay", "complete", job.Name, "transfer sealed and mirrored to cache", ActivityFeedItemKind.Success);
+                        PushFeed("relay", "complete", job.Name, "transfer sealed and mirrored to cache",
+                            ActivityFeedItemKind.Success);
                     }
 
                     liveBudget--;
@@ -180,7 +193,8 @@ internal sealed class DownloadCenterState
                     {
                         job.Phase = DownloadJobPhase.Active;
                         job.ThroughputMbps = _random.Next(18, 42);
-                        PushFeed("relay", "resume", job.Name, "retry lane reopened with warmed socket pool", ActivityFeedItemKind.Info);
+                        PushFeed("relay", "resume", job.Name, "retry lane reopened with warmed socket pool",
+                            ActivityFeedItemKind.Info);
                         liveBudget--;
                     }
 
@@ -204,7 +218,8 @@ internal sealed class DownloadCenterState
 
             queued.Phase = DownloadJobPhase.Active;
             queued.ThroughputMbps = _random.Next(16, 38);
-            PushFeed("scheduler", "launch", queued.Name, "lane reserved and transfer primed", ActivityFeedItemKind.Info);
+            PushFeed("scheduler", "launch", queued.Name, "lane reserved and transfer primed",
+                ActivityFeedItemKind.Info);
             liveBudget--;
         }
 
@@ -222,15 +237,17 @@ internal sealed class DownloadCenterState
                 {
                     job.Phase = DownloadJobPhase.Paused;
                     job.ThroughputMbps = 0;
-                    _lastAction = $"paused {job.Name}";
-                    PushFeed("ops", "paused", job.Name, "lane frozen, sockets retained warm", ActivityFeedItemKind.Info);
+                    LastAction = $"paused {job.Name}";
+                    PushFeed("ops", "paused", job.Name, "lane frozen, sockets retained warm",
+                        ActivityFeedItemKind.Info);
                 }
                 else if (job.Phase == DownloadJobPhase.Paused)
                 {
                     job.Phase = DownloadJobPhase.Active;
                     job.ThroughputMbps = _random.Next(18, 44);
-                    _lastAction = $"resumed {job.Name}";
-                    PushFeed("ops", "resumed", job.Name, "lane reopened with priority slice", ActivityFeedItemKind.Success);
+                    LastAction = $"resumed {job.Name}";
+                    PushFeed("ops", "resumed", job.Name, "lane reopened with priority slice",
+                        ActivityFeedItemKind.Success);
                 }
 
                 break;
@@ -240,8 +257,9 @@ internal sealed class DownloadCenterState
                     job.Phase = DownloadJobPhase.Active;
                     job.ThroughputMbps = _random.Next(20, 46);
                     job.RetryTicks = 0;
-                    _lastAction = $"forced retry for {job.Name}";
-                    PushFeed("ops", "retried", job.Name, "manual retry cut ahead of backoff window", ActivityFeedItemKind.Warning);
+                    LastAction = $"forced retry for {job.Name}";
+                    PushFeed("ops", "retried", job.Name, "manual retry cut ahead of backoff window",
+                        ActivityFeedItemKind.Warning);
                 }
 
                 break;
@@ -249,8 +267,9 @@ internal sealed class DownloadCenterState
                 if (job.Phase == DownloadJobPhase.Active)
                 {
                     job.ThroughputMbps = Math.Min(88, job.ThroughputMbps + 18);
-                    _lastAction = $"boosted lane for {job.Name}";
-                    PushFeed("scheduler", "boosted", job.Name, "reserved fast lane and larger socket pool", ActivityFeedItemKind.Success);
+                    LastAction = $"boosted lane for {job.Name}";
+                    PushFeed("scheduler", "boosted", job.Name, "reserved fast lane and larger socket pool",
+                        ActivityFeedItemKind.Success);
                 }
 
                 break;
@@ -259,8 +278,9 @@ internal sealed class DownloadCenterState
                 if (removed > 0)
                 {
                     _selectedJobId = _jobs[0].Id;
-                    _lastAction = $"purged {removed:00} completed transfers";
-                    PushFeed("ops", "purged", "completed set", $"{removed:00} sealed jobs archived", ActivityFeedItemKind.Info);
+                    LastAction = $"purged {removed:00} completed transfers";
+                    PushFeed("ops", "purged", "completed set", $"{removed:00} sealed jobs archived",
+                        ActivityFeedItemKind.Info);
                 }
 
                 break;
@@ -278,7 +298,7 @@ internal sealed class DownloadCenterState
                 DownloadJobPhase.Retrying => 3,
                 DownloadJobPhase.Failed => 4,
                 DownloadJobPhase.Queued => 5,
-                _ => 6,
+                _ => 6
             })
             .ThenBy(static job => job.Name, StringComparer.Ordinal)
             .ToList();
@@ -302,25 +322,28 @@ internal sealed class DownloadCenterState
     private void SeedFeed()
     {
         PushFeed("relay", "sealed", "shader-bundle.vpk", "cache shadow already hot", ActivityFeedItemKind.Success);
-        PushFeed("scheduler", "queued", "mirror-snapshot.bin", "orbit lane reserved behind active crest", ActivityFeedItemKind.Info);
-        PushFeed("relay", "retry", "drift-hotfix.pkg", "integrity mismatch after segment 12", ActivityFeedItemKind.Warning);
+        PushFeed("scheduler", "queued", "mirror-snapshot.bin", "orbit lane reserved behind active crest",
+            ActivityFeedItemKind.Info);
+        PushFeed("relay", "retry", "drift-hotfix.pkg", "integrity mismatch after segment 12",
+            ActivityFeedItemKind.Warning);
     }
 
     private void SeedTrends()
     {
         for (var i = 0; i < 24; i++)
         {
-            AppendTrend(_throughputTrend, 160 + (i * 6));
+            AppendTrend(_throughputTrend, 160 + i * 6);
             AppendTrend(_retryTrend, i % 8 == 0 ? 34 : 18);
         }
     }
 
     private void PushFeed(string actor, string action, string target, string details, ActivityFeedItemKind kind)
     {
-        _feed.Insert(0, new ActivityFeedItem(actor, action, target, details, kind, _simulatedStartUtc.AddSeconds(_tick))
-        {
-            IsUnread = kind is ActivityFeedItemKind.Warning or ActivityFeedItemKind.Error,
-        });
+        _feed.Insert(0,
+            new ActivityFeedItem(actor, action, target, details, kind, _simulatedStartUtc.AddSeconds(_tick))
+            {
+                IsUnread = kind is ActivityFeedItemKind.Warning or ActivityFeedItemKind.Error
+            });
         if (_feed.Count > 48)
         {
             _feed.RemoveRange(48, _feed.Count - 48);
@@ -375,7 +398,8 @@ internal sealed class DownloadCenterState
 
 internal sealed class DownloadJob
 {
-    public DownloadJob(string name, string source, double sizeMb, double completedMb, double throughputMbps, int attempts, DownloadJobPhase phase)
+    public DownloadJob(string name, string source, double sizeMb, double completedMb, double throughputMbps,
+        int attempts, DownloadJobPhase phase)
     {
         Id = Guid.NewGuid().ToString("N", CultureInfo.InvariantCulture);
         Name = name;
@@ -397,7 +421,8 @@ internal sealed class DownloadJob
     public int RetryTicks { get; set; }
     public int VerifyTicks { get; set; }
     public DownloadJobPhase Phase { get; set; }
-    public double ProgressPercent => SizeMb <= 0 ? 0 : Math.Clamp((CompletedMb / SizeMb) * 100, 0, 100);
+    public double ProgressPercent => SizeMb <= 0 ? 0 : Math.Clamp(CompletedMb / SizeMb * 100, 0, 100);
+
     public string PhaseLabel => Phase switch
     {
         DownloadJobPhase.Active => "transferring",
@@ -406,6 +431,6 @@ internal sealed class DownloadJob
         DownloadJobPhase.Completed => "complete",
         DownloadJobPhase.Failed => "failed",
         DownloadJobPhase.Paused => "paused",
-        _ => "queued",
+        _ => "queued"
     };
 }

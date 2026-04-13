@@ -1,4 +1,4 @@
-﻿using Tessera.Components.Primitives;
+using Tessera.Components.Primitives;
 using Tessera.Components.Primitives.Internal;
 using Tessera.Components.Styling;
 using Tessera.Controls.Internal;
@@ -8,35 +8,27 @@ using Tessera.Styles;
 namespace Tessera.Controls;
 
 /// <summary>
-/// Represents an animated busy indicator.
+///     Represents an animated busy indicator.
 /// </summary>
 public sealed class Spinner : Control
 {
     private readonly List<string> _frames = ["|", "/", "-", "\\"];
     private readonly WidgetStatePalette _statePalette = WidgetStatePalette.CreateDefault();
-    private bool _hovered;
     private int _frameIndex;
+    private bool _hovered;
 
     /// <summary>
-    /// Represents title.
+    ///     Represents title.
     /// </summary>
-    public string Title
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = "Spinner";
+    public string Title { get; set; } = "Spinner";
 
     /// <summary>
-    /// Represents focus marker.
+    ///     Represents focus marker.
     /// </summary>
-    public string FocusMarker
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = "*";
+    public string FocusMarker { get; set; } = "*";
 
     /// <summary>
-    /// Represents show focus marker.
+    ///     Represents show focus marker.
     /// </summary>
     public bool ShowFocusMarker
     {
@@ -45,7 +37,7 @@ public sealed class Spinner : Control
     } = true;
 
     /// <summary>
-    /// Represents title style.
+    ///     Represents title style.
     /// </summary>
     public TesseraStyle TitleStyle
     {
@@ -54,7 +46,7 @@ public sealed class Spinner : Control
     } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Represents focused title style.
+    ///     Represents focused title style.
     /// </summary>
     public TesseraStyle FocusedTitleStyle
     {
@@ -63,7 +55,7 @@ public sealed class Spinner : Control
     } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Represents value style.
+    ///     Represents value style.
     /// </summary>
     public TesseraStyle ValueStyle
     {
@@ -72,7 +64,7 @@ public sealed class Spinner : Control
     } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Represents running value style.
+    ///     Represents running value style.
     /// </summary>
     public TesseraStyle RunningValueStyle
     {
@@ -81,7 +73,7 @@ public sealed class Spinner : Control
     } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Represents stopped value style.
+    ///     Represents stopped value style.
     /// </summary>
     public TesseraStyle StoppedValueStyle
     {
@@ -90,7 +82,7 @@ public sealed class Spinner : Control
     } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Represents disabled value style.
+    ///     Represents disabled value style.
     /// </summary>
     public TesseraStyle DisabledValueStyle
     {
@@ -99,7 +91,7 @@ public sealed class Spinner : Control
     } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the style applied to border glyphs when the control is not focused.
+    ///     Gets or sets the style applied to border glyphs when the control is not focused.
     /// </summary>
     public TesseraStyle BorderStyleText
     {
@@ -108,7 +100,7 @@ public sealed class Spinner : Control
     } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the style applied to border glyphs when the control is focused.
+    ///     Gets or sets the style applied to border glyphs when the control is focused.
     /// </summary>
     public TesseraStyle FocusedBorderStyleText
     {
@@ -117,21 +109,17 @@ public sealed class Spinner : Control
     } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Represents label.
+    ///     Represents label.
     /// </summary>
-    public string Label
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = "loading";
+    public string Label { get; set; } = "loading";
 
     /// <summary>
-    /// Gets the current animation frames used by the spinner.
+    ///     Gets the current animation frames used by the spinner.
     /// </summary>
     public IReadOnlyList<string> Frames => _frames;
 
     /// <summary>
-    /// Represents running.
+    ///     Represents running.
     /// </summary>
     public bool Running
     {
@@ -140,7 +128,7 @@ public sealed class Spinner : Control
     } = true;
 
     /// <summary>
-    /// Represents border.
+    ///     Represents border.
     /// </summary>
     public BorderStyle Border
     {
@@ -149,7 +137,7 @@ public sealed class Spinner : Control
     } = BorderStyle.SingleLine;
 
     /// <summary>
-    /// Represents padding.
+    ///     Represents padding.
     /// </summary>
     public Thickness Padding
     {
@@ -179,11 +167,11 @@ public sealed class Spinner : Control
     }
 
     /// <summary>
-    /// Replaces the animation frames used by the spinner.
+    ///     Replaces the animation frames used by the spinner.
     /// </summary>
     /// <param name="frames">A non-empty sequence of non-empty frame strings.</param>
-    /// <exception cref="ArgumentNullException"><paramref name="frames"/> is <see langword="null"/>.</exception>
-    /// <exception cref="ArgumentException"><paramref name="frames"/> is empty or contains an empty frame.</exception>
+    /// <exception cref="ArgumentNullException"><paramref name="frames" /> is <see langword="null" />.</exception>
+    /// <exception cref="ArgumentException"><paramref name="frames" /> is empty or contains an empty frame.</exception>
     public void SetFrames(IEnumerable<string> frames)
     {
         ArgumentNullException.ThrowIfNull(frames);
@@ -210,13 +198,16 @@ public sealed class Spinner : Control
     }
 
     /// <summary>
-    /// Executes set running.
+    ///     Executes set running.
     /// </summary>
     /// <param name="running">The running value.</param>
-    public void SetRunning(bool running) => Running = running;
+    public void SetRunning(bool running)
+    {
+        Running = running;
+    }
 
     /// <summary>
-    /// Executes advance.
+    ///     Executes advance.
     /// </summary>
     public void Advance()
     {
@@ -283,7 +274,8 @@ public sealed class Spinner : Control
             return changed;
         }
 
-        if (pointer.Kind == PointerEventKind.Wheel && Running && pointer.Button is PointerButton.WheelUp or PointerButton.WheelDown)
+        if (pointer.Kind == PointerEventKind.Wheel && Running &&
+            pointer.Button is PointerButton.WheelUp or PointerButton.WheelDown)
         {
             Advance();
             return true;
@@ -382,7 +374,10 @@ public sealed class Spinner : Control
             Math.Clamp(height, 0, availableBounds.Height));
     }
 
-    private Rect ResolveContentRect(Rect bounds) => FrameLayout.ResolveContentRect(bounds, Border, Padding);
+    private Rect ResolveContentRect(Rect bounds)
+    {
+        return FrameLayout.ResolveContentRect(bounds, Border, Padding);
+    }
 
     private bool SetHovered(bool hovered)
     {

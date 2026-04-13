@@ -3,13 +3,13 @@ using System.ComponentModel;
 namespace Tessera.Hosting;
 
 /// <summary>
-/// Represents the input decoder seam used by advanced Tessera hosting scenarios.
+///     Represents the input decoder seam used by advanced Tessera hosting scenarios.
 /// </summary>
 [EditorBrowsable(EditorBrowsableState.Advanced)]
 public interface IEventDecoder
 {
     /// <summary>
-    /// Attempts to decode terminal input bytes into a runtime event.
+    ///     Attempts to decode terminal input bytes into a runtime event.
     /// </summary>
     /// <param name="buffer">The unread input buffer.</param>
     /// <param name="timeoutExpired">Whether the caller's read timeout expired.</param>

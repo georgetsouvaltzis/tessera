@@ -1,6 +1,5 @@
 using NUnit.Framework;
 using Tessera.Components.Primitives;
-using Tessera.Controls;
 
 namespace Tessera.Tests;
 
@@ -8,14 +7,15 @@ namespace Tessera.Tests;
 public sealed class PublicApiDashboardNavigationDiagnosticsTests
 {
     [Test]
-    public void PublicApiDashboardNavigationDiagnosticsDashboardTabsPointerMotionDoesNotRaiseSelectionChangedOrMutateSelection()
+    public void
+        PublicApiDashboardNavigationDiagnosticsDashboardTabsPointerMotionDoesNotRaiseSelectionChangedOrMutateSelection()
     {
         var tabs = new DashboardNavigationTabs("Overview", "Operations", "Audit");
         var changes = 0;
         tabs.SelectionChanged += (_, _) => changes++;
 
         var handled = tabs.Handle(
-            new PointerInput(PointerEventKind.Motion, PointerButton.None, X: 14, Y: 0),
+            new PointerInput(PointerEventKind.Motion, PointerButton.None, 14, 0),
             new Rect(0, 0, 64, 1));
 
         Assert.That(handled, Is.True);
@@ -24,7 +24,8 @@ public sealed class PublicApiDashboardNavigationDiagnosticsTests
     }
 
     [Test]
-    public void PublicApiDashboardNavigationDiagnosticsDashboardTabsPointerMotionOutsideHeaderBoundsDoesNotRaiseSelectionChangedOrMutateSelection()
+    public void
+        PublicApiDashboardNavigationDiagnosticsDashboardTabsPointerMotionOutsideHeaderBoundsDoesNotRaiseSelectionChangedOrMutateSelection()
     {
         var tabs = new DashboardNavigationTabs("Overview", "Operations", "Audit");
         tabs.SetSelectedIndex(1);
@@ -32,7 +33,7 @@ public sealed class PublicApiDashboardNavigationDiagnosticsTests
         tabs.SelectionChanged += (_, _) => changes++;
 
         var handled = tabs.Handle(
-            new PointerInput(PointerEventKind.Motion, PointerButton.None, X: 22, Y: 14),
+            new PointerInput(PointerEventKind.Motion, PointerButton.None, 22, 14),
             new Rect(0, 0, 64, 1));
 
         Assert.That(handled, Is.False);
@@ -49,17 +50,13 @@ public sealed class PublicApiDashboardNavigationDiagnosticsTests
         tabs.SelectionChanged += (_, _) => changes++;
 
         var headerBounds = new Rect(0, 0, 120, 1);
-        var hoverCoordinates = new[]
-        {
-            (X: 6, Y: 8),
-            (X: 48, Y: 12),
-            (X: 24, Y: 20),
-        };
+        var hoverCoordinates = new[] { (X: 6, Y: 8), (X: 48, Y: 12), (X: 24, Y: 20) };
 
         for (var i = 0; i < hoverCoordinates.Length; i++)
         {
             var handled = tabs.Handle(
-                new PointerInput(PointerEventKind.Motion, PointerButton.None, hoverCoordinates[i].X, hoverCoordinates[i].Y),
+                new PointerInput(PointerEventKind.Motion, PointerButton.None, hoverCoordinates[i].X,
+                    hoverCoordinates[i].Y),
                 headerBounds);
 
             Assert.That(handled, Is.False);
@@ -76,7 +73,7 @@ public sealed class PublicApiDashboardNavigationDiagnosticsTests
         tabs.SelectionChanged += (_, _) => changes++;
 
         var handled = tabs.Handle(
-            new PointerInput(PointerEventKind.Wheel, PointerButton.WheelDown, X: 14, Y: 0),
+            new PointerInput(PointerEventKind.Wheel, PointerButton.WheelDown, 14, 0),
             new Rect(0, 0, 64, 1));
 
         Assert.That(handled, Is.True);
@@ -85,7 +82,8 @@ public sealed class PublicApiDashboardNavigationDiagnosticsTests
     }
 
     [Test]
-    public void PublicApiDashboardNavigationDiagnosticsRegressionHoverFloodOutsideHeaderDoesNotSwitchTabsOrRaiseSelectionChanged()
+    public void
+        PublicApiDashboardNavigationDiagnosticsRegressionHoverFloodOutsideHeaderDoesNotSwitchTabsOrRaiseSelectionChanged()
     {
         var tabs = new DashboardNavigationTabs("Overview", "Operations", "Audit");
         var changes = 0;
@@ -96,7 +94,7 @@ public sealed class PublicApiDashboardNavigationDiagnosticsTests
         changes = 0;
 
         var warmupHoverHandled = tabs.Handle(
-            new PointerInput(PointerEventKind.Motion, PointerButton.None, X: 20, Y: 0),
+            new PointerInput(PointerEventKind.Motion, PointerButton.None, 20, 0),
             headerBounds);
         Assert.That(warmupHoverHandled, Is.True);
         Assert.That(tabs.SelectedIndex, Is.EqualTo(1));
@@ -104,10 +102,10 @@ public sealed class PublicApiDashboardNavigationDiagnosticsTests
 
         for (var i = 0; i < 40; i++)
         {
-            var x = 8 + (i % 20);
-            var y = 6 + (i % 7);
+            var x = 8 + i % 20;
+            var y = 6 + i % 7;
             var handled = tabs.Handle(
-                new PointerInput(PointerEventKind.Motion, PointerButton.None, X: x, Y: y),
+                new PointerInput(PointerEventKind.Motion, PointerButton.None, x, y),
                 headerBounds);
 
             if (i == 0)
@@ -120,7 +118,8 @@ public sealed class PublicApiDashboardNavigationDiagnosticsTests
             }
 
             Assert.That(tabs.SelectedIndex, Is.EqualTo(1), $"Unexpected selected index mutation at iteration {i}.");
-            Assert.That(changes, Is.EqualTo(0), $"SelectionChanged should not fire for non-header hover at iteration {i}.");
+            Assert.That(changes, Is.EqualTo(0),
+                $"SelectionChanged should not fire for non-header hover at iteration {i}.");
         }
     }
 
@@ -132,7 +131,7 @@ public sealed class PublicApiDashboardNavigationDiagnosticsTests
         tabs.SelectionChanged += (_, _) => changes++;
 
         var handled = tabs.Handle(
-            new PointerInput(PointerEventKind.Press, PointerButton.Left, X: 14, Y: 0),
+            new PointerInput(PointerEventKind.Press, PointerButton.Left, 14, 0),
             new Rect(0, 0, 64, 1));
 
         Assert.That(handled, Is.True);

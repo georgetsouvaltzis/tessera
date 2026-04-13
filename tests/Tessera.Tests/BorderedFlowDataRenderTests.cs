@@ -33,7 +33,7 @@ internal static class BorderedFlowDataRenderTests
             Border = BorderStyle.SingleLine,
             BorderStyleText = borderStyle,
             FocusedBorderStyleText = focusedBorderStyle,
-            BodyLines = ["Are you sure?"],
+            BodyLines = ["Are you sure?"]
         };
 
         var canvas = new Canvas(48, 14, CanvasTextMode.GraphemeAware);
@@ -41,7 +41,8 @@ internal static class BorderedFlowDataRenderTests
         var output = canvas.Render();
 
         var merged = borderStyle.Merge(focusedBorderStyle);
-        TestAssert.True(output.Contains(merged.Render("┌"), StringComparison.Ordinal), "Dialog should render focused border glyphs with merged border styles.");
+        TestAssert.True(output.Contains(merged.Render("┌"), StringComparison.Ordinal),
+            "Dialog should render focused border glyphs with merged border styles.");
         return Task.CompletedTask;
     }
 
@@ -56,7 +57,7 @@ internal static class BorderedFlowDataRenderTests
             Border = BorderStyle.SingleLine,
             BorderStyleText = borderStyle,
             FocusedBorderStyleText = focusedBorderStyle,
-            BodyLines = ["Line A"],
+            BodyLines = ["Line A"]
         };
 
         var canvas = new Canvas(48, 14, CanvasTextMode.GraphemeAware);
@@ -64,7 +65,8 @@ internal static class BorderedFlowDataRenderTests
         var output = canvas.Render();
 
         var merged = borderStyle.Merge(focusedBorderStyle);
-        TestAssert.True(output.Contains(merged.Render("┌"), StringComparison.Ordinal), "Modal should render focused border glyphs with merged border styles.");
+        TestAssert.True(output.Contains(merged.Render("┌"), StringComparison.Ordinal),
+            "Modal should render focused border glyphs with merged border styles.");
         return Task.CompletedTask;
     }
 
@@ -77,12 +79,12 @@ internal static class BorderedFlowDataRenderTests
             IsFocused = true,
             Border = BorderStyle.SingleLine,
             BorderStyleText = borderStyle,
-            FocusedBorderStyleText = focusedBorderStyle,
+            FocusedBorderStyleText = focusedBorderStyle
         };
         list.SetEntries(
         [
             new KeyValueListEntry("Host", "localhost"),
-            new KeyValueListEntry("Port", "5432"),
+            new KeyValueListEntry("Port", "5432")
         ]);
 
         var canvas = new Canvas(48, 8, CanvasTextMode.GraphemeAware);
@@ -90,7 +92,8 @@ internal static class BorderedFlowDataRenderTests
         var output = canvas.Render();
 
         var merged = borderStyle.Merge(focusedBorderStyle);
-        TestAssert.True(output.Contains(merged.Render("┌"), StringComparison.Ordinal), "KeyValueList should render focused border glyphs with merged border styles.");
+        TestAssert.True(output.Contains(merged.Render("┌"), StringComparison.Ordinal),
+            "KeyValueList should render focused border glyphs with merged border styles.");
         return Task.CompletedTask;
     }
 
@@ -103,12 +106,12 @@ internal static class BorderedFlowDataRenderTests
             IsFocused = true,
             Border = BorderStyle.SingleLine,
             BorderStyleText = borderStyle,
-            FocusedBorderStyleText = focusedBorderStyle,
+            FocusedBorderStyleText = focusedBorderStyle
         };
         timeline.SetEntries(
         [
             new TimelineEntry("a", "Started", "09:00"),
-            new TimelineEntry("b", "Running", "09:05"),
+            new TimelineEntry("b", "Running", "09:05")
         ]);
 
         var canvas = new Canvas(48, 8, CanvasTextMode.GraphemeAware);
@@ -116,7 +119,8 @@ internal static class BorderedFlowDataRenderTests
         var output = canvas.Render();
 
         var merged = borderStyle.Merge(focusedBorderStyle);
-        TestAssert.True(output.Contains(merged.Render("┌"), StringComparison.Ordinal), "Timeline should render focused border glyphs with merged border styles.");
+        TestAssert.True(output.Contains(merged.Render("┌"), StringComparison.Ordinal),
+            "Timeline should render focused border glyphs with merged border styles.");
         return Task.CompletedTask;
     }
 }

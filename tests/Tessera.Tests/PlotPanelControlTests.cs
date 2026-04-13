@@ -15,7 +15,7 @@ public sealed class PlotPanelControlTests
         {
             Border = BorderStyle.SingleLine,
             Title = "P1",
-            Options = new LinePlotOptions(ShowLegend: false, ShowStats: false),
+            Options = new LinePlotOptions(ShowLegend: false, ShowStats: false)
         };
         first.SetSeries([new LineSeries("a", [1, 2, 3])]);
 
@@ -23,7 +23,7 @@ public sealed class PlotPanelControlTests
         {
             Border = BorderStyle.SingleLine,
             Title = "P2",
-            Options = new LinePlotOptions(ShowLegend: false, ShowStats: false),
+            Options = new LinePlotOptions(ShowLegend: false, ShowStats: false)
         };
         second.SetSeries([new LineSeries("b", [3, 2, 1])]);
 
@@ -31,11 +31,11 @@ public sealed class PlotPanelControlTests
         {
             Title = "Dashboard",
             Border = BorderStyle.SingleLine,
-            Options = new PlotPanelOptions(Columns: 2, Spacing: 1),
+            Options = new PlotPanelOptions(2)
         };
         panel.SetPlots([first, second]);
 
-        var output = RenderControl(panel, width: 72, height: 16);
+        var output = RenderControl(panel, 72, 16);
 
         Assert.That(output.Contains("Dashboard", StringComparison.Ordinal), Is.True);
         Assert.That(output.Contains("P1", StringComparison.Ordinal), Is.True);
@@ -45,13 +45,9 @@ public sealed class PlotPanelControlTests
     [Test]
     public void PlotPanelRenderEmptyTextShownWhenNoPlotsConfigured()
     {
-        var panel = new PlotPanel
-        {
-            EmptyText = "nothing",
-            Border = BorderStyle.SingleLine,
-        };
+        var panel = new PlotPanel { EmptyText = "nothing", Border = BorderStyle.SingleLine };
 
-        var output = RenderControl(panel, width: 30, height: 6);
+        var output = RenderControl(panel, 30, 6);
 
         Assert.That(output.Contains("nothing", StringComparison.Ordinal), Is.True);
     }
@@ -61,15 +57,11 @@ public sealed class PlotPanelControlTests
     {
         var left = new SpyControl();
         var right = new SpyControl();
-        var panel = new PlotPanel
-        {
-            Border = BorderStyle.None,
-            Options = new PlotPanelOptions(Columns: 2, Spacing: 0),
-        };
+        var panel = new PlotPanel { Border = BorderStyle.None, Options = new PlotPanelOptions(2, 0) };
         panel.SetPlots([left, right]);
 
         var handled = panel.Handle(
-            new PointerInput(PointerEventKind.Press, PointerButton.Left, X: 15, Y: 1),
+            new PointerInput(PointerEventKind.Press, PointerButton.Left, 15, 1),
             new Rect(0, 0, 20, 4));
 
         Assert.That(handled, Is.True);

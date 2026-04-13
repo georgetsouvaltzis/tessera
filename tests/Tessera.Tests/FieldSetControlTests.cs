@@ -16,7 +16,7 @@ public sealed class FieldSetControlTests
             Border = BorderStyle.None,
             SectionPrefix = "<",
             SectionSuffix = ">",
-            Title = "Account",
+            Title = "Account"
         };
         control.SetItems(["Username", "Password"]);
 
@@ -28,11 +28,7 @@ public sealed class FieldSetControlTests
     [Test]
     public void FieldSetKeyboardAndPointerSelectionRaisesEvent()
     {
-        var control = new FieldSet
-        {
-            IsFocused = true,
-            Border = BorderStyle.None,
-        };
+        var control = new FieldSet { IsFocused = true, Border = BorderStyle.None };
         control.SetItems(["One", "Two", "Three"]);
 
         ListSelectionChangedEventArgs<string>? lastArgs = null;
@@ -55,17 +51,14 @@ public sealed class FieldSetControlTests
     [Test]
     public void FieldSetDefaultRenderIsDeterministicAndMonochrome()
     {
-        var control = new FieldSet
-        {
-            Border = BorderStyle.None,
-        };
+        var control = new FieldSet { Border = BorderStyle.None };
         control.SetItems(["A", "B"]);
 
         var first = Render(control, 40, 3);
         var second = Render(control, 40, 3);
 
         Assert.That(first, Is.EqualTo(second));
-        Assert.That(first.Contains("\u001b[", StringComparison.Ordinal), Is.False);
+        Assert.That(first.Contains("\e[", StringComparison.Ordinal), Is.False);
     }
 
     private static string Render(FieldSet control, int width, int height)

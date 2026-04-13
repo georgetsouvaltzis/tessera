@@ -1,9 +1,5 @@
-using Tessera.Components.Composition;
-using Tessera.Components.Primitives;
-using Tessera.Components.Styling;
 using System.Text;
 using Tessera.Core.Abstractions;
-using Tessera.Core.Input;
 using Tessera.Core.Messages;
 
 namespace Tessera.Tests;
@@ -12,8 +8,10 @@ internal static class EventDecoderGoldenTests
 {
     public static IEnumerable<TestCase> Cases()
     {
-        yield return new TestCase("Decoder_ArrowAndNavigationKeys_Parse", ArrowAndNavigationSequences_ParseExpectedKeys);
-        yield return new TestCase("Decoder_EnhancedKeyboardSequences_Parse", EnhancedKeyboardSequences_ParseExpectedKeys);
+        yield return new TestCase("Decoder_ArrowAndNavigationKeys_Parse",
+            ArrowAndNavigationSequences_ParseExpectedKeys);
+        yield return new TestCase("Decoder_EnhancedKeyboardSequences_Parse",
+            EnhancedKeyboardSequences_ParseExpectedKeys);
         yield return new TestCase("Decoder_ControlByteKeys_Parse", ControlByteKeys_ParseExpectedKeys);
         yield return new TestCase("Decoder_AltControlSequences_Parse", AltControlSequences_ParseExpectedKeys);
         yield return new TestCase("Decoder_PasteBoundaryMarkers_Parse", PasteBoundaryMarkers_ParseExpectedMessages);
@@ -21,17 +19,23 @@ internal static class EventDecoderGoldenTests
         yield return new TestCase("Decoder_WindowResizeSequence_Parses", WindowResizeSequence_ParsesExpectedSize);
         yield return new TestCase("Decoder_ModeReportSequence_Parses", ModeReportSequence_ParsesExpectedMessage);
         yield return new TestCase("Decoder_MouseSequences_Parse", MouseSequences_ParseExpectedMessages);
-        yield return new TestCase("Decoder_MouseTopLeftCoordinates_Parse", MouseTopLeftCoordinates_ParseExpectedZeroBasedValues);
+        yield return new TestCase("Decoder_MouseTopLeftCoordinates_Parse",
+            MouseTopLeftCoordinates_ParseExpectedZeroBasedValues);
         yield return new TestCase("Decoder_MouseExtendedSequences_Parse", MouseExtendedSequences_ParseExpectedMessages);
-        yield return new TestCase("Decoder_OscSequences_ParseKnownCapabilityMessages", OscSequences_ParseKnownCapabilityMessages);
-        yield return new TestCase("Decoder_OscClipboardSequence_IgnoresTrailingSegments", OscClipboardSequence_IgnoresTrailingSegments);
+        yield return new TestCase("Decoder_OscSequences_ParseKnownCapabilityMessages",
+            OscSequences_ParseKnownCapabilityMessages);
+        yield return new TestCase("Decoder_OscClipboardSequence_IgnoresTrailingSegments",
+            OscClipboardSequence_IgnoresTrailingSegments);
         yield return new TestCase("Decoder_DcsCapabilityResponse_Parses", DcsCapabilityResponse_Parses);
-        yield return new TestCase("Decoder_DcsCapabilityResponse_InvalidHexFallsBackToRawText", DcsCapabilityResponse_InvalidHexFallsBackToRawText);
+        yield return new TestCase("Decoder_DcsCapabilityResponse_InvalidHexFallsBackToRawText",
+            DcsCapabilityResponse_InvalidHexFallsBackToRawText);
         yield return new TestCase("Decoder_KeyboardEnhancementReport_Parses", KeyboardEnhancementReport_Parses);
-        yield return new TestCase("Decoder_PartialCsi_RequestsMoreDataUntilTimeout", PartialCsi_RequestsMoreDataUntilTimeout);
+        yield return new TestCase("Decoder_PartialCsi_RequestsMoreDataUntilTimeout",
+            PartialCsi_RequestsMoreDataUntilTimeout);
         yield return new TestCase("Decoder_Utf8Rune_ParsesWithoutReplacement", Utf8Rune_ParsesWithoutReplacement);
         yield return new TestCase("Decoder_Utf8Partial_RequestsMoreData", Utf8Partial_RequestsMoreData);
-        yield return new TestCase("Decoder_UnknownSequence_ProducesUnknownMessage", UnknownSequence_ProducesUnknownMessage);
+        yield return new TestCase("Decoder_UnknownSequence_ProducesUnknownMessage",
+            UnknownSequence_ProducesUnknownMessage);
     }
 
     private static Task ArrowAndNavigationSequences_ParseExpectedKeys()
@@ -40,20 +44,20 @@ internal static class EventDecoderGoldenTests
         var decoder = new EventDecoder();
 
         // Act
-        var up = Decode(decoder, "\u001b[A");
-        var ctrlUp = Decode(decoder, "\u001b[1;5A");
-        var ctrlDelete = Decode(decoder, "\u001b[3;5~");
-        var pageUp = Decode(decoder, "\u001b[5~");
-        var pageDown = Decode(decoder, "\u001b[6~");
-        var home = Decode(decoder, "\u001bOH");
-        var end = Decode(decoder, "\u001bOF");
-        var backTab = Decode(decoder, "\u001b[Z");
-        var f1 = Decode(decoder, "\u001bOP");
-        var f4 = Decode(decoder, "\u001bOS");
-        var f5 = Decode(decoder, "\u001b[15~");
-        var ctrlF5 = Decode(decoder, "\u001b[15;5~");
-        var f12 = Decode(decoder, "\u001b[24~");
-        var altK = Decode(decoder, "\u001bk");
+        var up = Decode(decoder, "\e[A");
+        var ctrlUp = Decode(decoder, "\e[1;5A");
+        var ctrlDelete = Decode(decoder, "\e[3;5~");
+        var pageUp = Decode(decoder, "\e[5~");
+        var pageDown = Decode(decoder, "\e[6~");
+        var home = Decode(decoder, "\eOH");
+        var end = Decode(decoder, "\eOF");
+        var backTab = Decode(decoder, "\e[Z");
+        var f1 = Decode(decoder, "\eOP");
+        var f4 = Decode(decoder, "\eOS");
+        var f5 = Decode(decoder, "\e[15~");
+        var ctrlF5 = Decode(decoder, "\e[15;5~");
+        var f12 = Decode(decoder, "\e[24~");
+        var altK = Decode(decoder, "\ek");
 
         // Assert
         AssertKey(up, KeyCode.Up);
@@ -79,14 +83,14 @@ internal static class EventDecoderGoldenTests
         var decoder = new EventDecoder();
 
         // Act
-        var modifyOtherCtrlShiftA = Decode(decoder, "\u001b[27;6;97~");
-        var modifyOtherAltBracket = Decode(decoder, "\u001b[27;3;91~");
-        var csiUCtrlK = Decode(decoder, "\u001b[107;5u");
-        var csiUShiftTab = Decode(decoder, "\u001b[9;2u");
-        var csiUEscape = Decode(decoder, "\u001b[27;1u");
-        var csiURepeatK = Decode(decoder, "\u001b[107;5;2u");
-        var csiUReleaseK = Decode(decoder, "\u001b[107;5;3u");
-        var csiUReleaseKColon = Decode(decoder, "\u001b[107;5:3u");
+        var modifyOtherCtrlShiftA = Decode(decoder, "\e[27;6;97~");
+        var modifyOtherAltBracket = Decode(decoder, "\e[27;3;91~");
+        var csiUCtrlK = Decode(decoder, "\e[107;5u");
+        var csiUShiftTab = Decode(decoder, "\e[9;2u");
+        var csiUEscape = Decode(decoder, "\e[27;1u");
+        var csiURepeatK = Decode(decoder, "\e[107;5;2u");
+        var csiUReleaseK = Decode(decoder, "\e[107;5;3u");
+        var csiUReleaseKColon = Decode(decoder, "\e[107;5:3u");
 
         // Assert
         AssertKey(modifyOtherCtrlShiftA, KeyCode.Character, KeyModifiers.Shift | KeyModifiers.Ctrl, "a");
@@ -94,7 +98,7 @@ internal static class EventDecoderGoldenTests
         AssertKey(csiUCtrlK, KeyCode.Character, KeyModifiers.Ctrl, "k");
         AssertKey(csiUShiftTab, KeyCode.Tab, KeyModifiers.Shift);
         AssertKey(csiUEscape, KeyCode.Escape);
-        AssertKey(csiURepeatK, KeyCode.Character, KeyModifiers.Ctrl, "k", isRepeat: true);
+        AssertKey(csiURepeatK, KeyCode.Character, KeyModifiers.Ctrl, "k", true);
         AssertKeyRelease(csiUReleaseK, KeyCode.Character, KeyModifiers.Ctrl, "k");
         AssertKeyRelease(csiUReleaseKColon, KeyCode.Character, KeyModifiers.Ctrl, "k");
         return Task.CompletedTask;
@@ -106,9 +110,9 @@ internal static class EventDecoderGoldenTests
         var decoder = new EventDecoder();
 
         // Act
-        var ctrlA = decoder.Decode(new byte[] { 0x01 }, timeoutExpired: false);
-        var ctrlK = decoder.Decode(new byte[] { 0x0B }, timeoutExpired: false);
-        var ctrlBracket = decoder.Decode(new byte[] { 0x1D }, timeoutExpired: false);
+        var ctrlA = decoder.Decode(new byte[] { 0x01 }, false);
+        var ctrlK = decoder.Decode(new byte[] { 0x0B }, false);
+        var ctrlBracket = decoder.Decode(new byte[] { 0x1D }, false);
 
         // Assert
         AssertKey(ctrlA, KeyCode.Character, KeyModifiers.Ctrl, "a");
@@ -123,20 +127,21 @@ internal static class EventDecoderGoldenTests
         var decoder = new EventDecoder();
 
         // Act
-        var altBackspaceDel = decoder.Decode(new byte[] { 0x1B, 0x7F }, timeoutExpired: false);
-        var altBackspaceCtrlH = decoder.Decode(new byte[] { 0x1B, 0x08 }, timeoutExpired: false);
-        var altCtrlA = decoder.Decode(new byte[] { 0x1B, 0x01 }, timeoutExpired: false);
-        var altTab = decoder.Decode(new byte[] { 0x1B, 0x09 }, timeoutExpired: false);
-        var altEscapePending = decoder.Decode(new byte[] { 0x1B, 0x1B }, timeoutExpired: false);
-        var altEscape = decoder.Decode(new byte[] { 0x1B, 0x1B }, timeoutExpired: true);
-        var altUp = decoder.Decode(new byte[] { 0x1B, 0x1B, (byte)'[', (byte)'A' }, timeoutExpired: false);
+        var altBackspaceDel = decoder.Decode(new byte[] { 0x1B, 0x7F }, false);
+        var altBackspaceCtrlH = decoder.Decode(new byte[] { 0x1B, 0x08 }, false);
+        var altCtrlA = decoder.Decode(new byte[] { 0x1B, 0x01 }, false);
+        var altTab = decoder.Decode(new byte[] { 0x1B, 0x09 }, false);
+        var altEscapePending = decoder.Decode(new byte[] { 0x1B, 0x1B }, false);
+        var altEscape = decoder.Decode(new byte[] { 0x1B, 0x1B }, true);
+        var altUp = decoder.Decode(new byte[] { 0x1B, 0x1B, (byte)'[', (byte)'A' }, false);
 
         // Assert
         AssertKey(altBackspaceDel, KeyCode.Backspace, KeyModifiers.Alt);
         AssertKey(altBackspaceCtrlH, KeyCode.Backspace, KeyModifiers.Alt);
         AssertKey(altCtrlA, KeyCode.Character, KeyModifiers.Alt | KeyModifiers.Ctrl, "a");
         AssertKey(altTab, KeyCode.Tab, KeyModifiers.Alt);
-        TestAssert.True(altEscapePending.NeedMoreData, "Double escape should wait for timeout before resolving to alt+escape.");
+        TestAssert.True(altEscapePending.NeedMoreData,
+            "Double escape should wait for timeout before resolving to alt+escape.");
         AssertConsumed(altEscapePending, 0);
         AssertKey(altEscape, KeyCode.Escape, KeyModifiers.Alt);
         AssertKey(altUp, KeyCode.Up, KeyModifiers.Alt);
@@ -149,8 +154,8 @@ internal static class EventDecoderGoldenTests
         var decoder = new EventDecoder();
 
         // Act
-        var pasteStart = Decode(decoder, "\u001b[200~");
-        var pasteEnd = Decode(decoder, "\u001b[201~");
+        var pasteStart = Decode(decoder, "\e[200~");
+        var pasteEnd = Decode(decoder, "\e[201~");
 
         // Assert
         AssertMessageType<PasteStartMsg>(pasteStart);
@@ -164,8 +169,8 @@ internal static class EventDecoderGoldenTests
         var decoder = new EventDecoder();
 
         // Act
-        var focusIn = Decode(decoder, "\u001b[I");
-        var focusOut = Decode(decoder, "\u001b[O");
+        var focusIn = Decode(decoder, "\e[I");
+        var focusOut = Decode(decoder, "\e[O");
 
         // Assert
         AssertMessageType<FocusInMsg>(focusIn);
@@ -179,7 +184,7 @@ internal static class EventDecoderGoldenTests
         var decoder = new EventDecoder();
 
         // Act
-        var resize = Decode(decoder, "\u001b[8;24;80t");
+        var resize = Decode(decoder, "\e[8;24;80t");
 
         // Assert
         AssertConsumed(resize, 10);
@@ -197,8 +202,8 @@ internal static class EventDecoderGoldenTests
         var decoder = new EventDecoder();
 
         // Act
-        var syncEnabled = Decode(decoder, "\u001b[?2026;1$y");
-        var mouseUnsupported = Decode(decoder, "\u001b[?1006;0$y");
+        var syncEnabled = Decode(decoder, "\e[?2026;1$y");
+        var mouseUnsupported = Decode(decoder, "\e[?1006;0$y");
 
         // Assert
         AssertModeReport(syncEnabled, 2026, ModeReportState.Set);
@@ -212,14 +217,14 @@ internal static class EventDecoderGoldenTests
         var decoder = new EventDecoder();
 
         // Act
-        var sgrPress = Decode(decoder, "\u001b[<0;11;7M");
-        var sgrRelease = Decode(decoder, "\u001b[<0;11;7m");
-        var sgrMotion = Decode(decoder, "\u001b[<35;11;7M");
-        var sgrWheel = Decode(decoder, "\u001b[<65;11;7M");
-        var sgrCtrlClick = Decode(decoder, "\u001b[<16;11;7M");
+        var sgrPress = Decode(decoder, "\e[<0;11;7M");
+        var sgrRelease = Decode(decoder, "\e[<0;11;7m");
+        var sgrMotion = Decode(decoder, "\e[<35;11;7M");
+        var sgrWheel = Decode(decoder, "\e[<65;11;7M");
+        var sgrCtrlClick = Decode(decoder, "\e[<16;11;7M");
 
         var x10Bytes = new byte[] { 0x1B, (byte)'[', (byte)'M', (byte)' ', (byte)'+', (byte)'&' };
-        var x10Press = decoder.Decode(x10Bytes, timeoutExpired: false);
+        var x10Press = decoder.Decode(x10Bytes, false);
 
         // Assert
         AssertMouse<MouseClickMsg>(sgrPress, MouseEventType.Press, MouseButton.Left, 10, 6, KeyModifiers.None);
@@ -238,8 +243,9 @@ internal static class EventDecoderGoldenTests
         var decoder = new EventDecoder();
 
         // Act
-        var sgrTopLeft = Decode(decoder, "\u001b[<0;1;1M");
-        var x10TopLeft = decoder.Decode(new byte[] { 0x1B, (byte)'[', (byte)'M', (byte)' ', (byte)'!', (byte)'!' }, timeoutExpired: false);
+        var sgrTopLeft = Decode(decoder, "\e[<0;1;1M");
+        var x10TopLeft = decoder.Decode(new byte[] { 0x1B, (byte)'[', (byte)'M', (byte)' ', (byte)'!', (byte)'!' },
+            false);
 
         // Assert
         AssertMouse<MouseClickMsg>(sgrTopLeft, MouseEventType.Press, MouseButton.Left, 0, 0, KeyModifiers.None);
@@ -253,30 +259,30 @@ internal static class EventDecoderGoldenTests
         var decoder = new EventDecoder();
 
         // Act
-        var wheelLeft = Decode(decoder, "\u001b[<66;11;7M");
-        var wheelRight = Decode(decoder, "\u001b[<67;11;7M");
-        var backward = Decode(decoder, "\u001b[<128;11;7M");
-        var forward = Decode(decoder, "\u001b[<129;11;7M");
-        var button10 = Decode(decoder, "\u001b[<130;11;7M");
-        var button11 = Decode(decoder, "\u001b[<131;11;7M");
-        var button12 = Decode(decoder, "\u001b[<132;11;7M");
-        var button15 = Decode(decoder, "\u001b[<135;11;7M");
-        var dragBackward = Decode(decoder, "\u001b[<160;11;7M");
-        var dragButton12 = Decode(decoder, "\u001b[<164;11;7M");
-        var shiftAltRight = Decode(decoder, "\u001b[<14;11;7M");
-        var allModsWheelDown = Decode(decoder, "\u001b[<93;11;7M");
-        var motionReportedAsRelease = Decode(decoder, "\u001b[<35;11;7m");
+        var wheelLeft = Decode(decoder, "\e[<66;11;7M");
+        var wheelRight = Decode(decoder, "\e[<67;11;7M");
+        var backward = Decode(decoder, "\e[<128;11;7M");
+        var forward = Decode(decoder, "\e[<129;11;7M");
+        var button10 = Decode(decoder, "\e[<130;11;7M");
+        var button11 = Decode(decoder, "\e[<131;11;7M");
+        var button12 = Decode(decoder, "\e[<132;11;7M");
+        var button15 = Decode(decoder, "\e[<135;11;7M");
+        var dragBackward = Decode(decoder, "\e[<160;11;7M");
+        var dragButton12 = Decode(decoder, "\e[<164;11;7M");
+        var shiftAltRight = Decode(decoder, "\e[<14;11;7M");
+        var allModsWheelDown = Decode(decoder, "\e[<93;11;7M");
+        var motionReportedAsRelease = Decode(decoder, "\e[<35;11;7m");
 
         var x10ReleaseBytes = new byte[] { 0x1B, (byte)'[', (byte)'M', (byte)'#', (byte)'2', (byte)'(' };
-        var x10Release = decoder.Decode(x10ReleaseBytes, timeoutExpired: false);
+        var x10Release = decoder.Decode(x10ReleaseBytes, false);
         var x10WheelRightBytes = new byte[] { 0x1B, (byte)'[', (byte)'M', 99, (byte)'2', (byte)'(' };
-        var x10WheelRight = decoder.Decode(x10WheelRightBytes, timeoutExpired: false);
+        var x10WheelRight = decoder.Decode(x10WheelRightBytes, false);
         var x10BackwardDragBytes = new byte[] { 0x1B, (byte)'[', (byte)'M', 192, (byte)'2', (byte)'(' };
-        var x10BackwardDrag = decoder.Decode(x10BackwardDragBytes, timeoutExpired: false);
+        var x10BackwardDrag = decoder.Decode(x10BackwardDragBytes, false);
         var x10Button12Bytes = new byte[] { 0x1B, (byte)'[', (byte)'M', 164, (byte)'2', (byte)'(' };
-        var x10Button12 = decoder.Decode(x10Button12Bytes, timeoutExpired: false);
+        var x10Button12 = decoder.Decode(x10Button12Bytes, false);
         var x10ShiftAltRightBytes = new byte[] { 0x1B, (byte)'[', (byte)'M', 46, (byte)'2', (byte)'(' };
-        var x10ShiftAltRight = decoder.Decode(x10ShiftAltRightBytes, timeoutExpired: false);
+        var x10ShiftAltRight = decoder.Decode(x10ShiftAltRightBytes, false);
 
         // Assert
         AssertMouse<MouseWheelMsg>(wheelLeft, MouseEventType.Wheel, MouseButton.WheelLeft, 10, 6, KeyModifiers.None);
@@ -287,16 +293,24 @@ internal static class EventDecoderGoldenTests
         AssertMouse<MouseClickMsg>(button11, MouseEventType.Press, MouseButton.Button11, 10, 6, KeyModifiers.None);
         AssertMouse<MouseClickMsg>(button12, MouseEventType.Press, MouseButton.Button12, 10, 6, KeyModifiers.None);
         AssertMouse<MouseClickMsg>(button15, MouseEventType.Press, MouseButton.Button15, 10, 6, KeyModifiers.None);
-        AssertMouse<MouseMotionMsg>(dragBackward, MouseEventType.Motion, MouseButton.Backward, 10, 6, KeyModifiers.None);
-        AssertMouse<MouseMotionMsg>(dragButton12, MouseEventType.Motion, MouseButton.Button12, 10, 6, KeyModifiers.None);
-        AssertMouse<MouseClickMsg>(shiftAltRight, MouseEventType.Press, MouseButton.Right, 10, 6, KeyModifiers.Shift | KeyModifiers.Alt);
-        AssertMouse<MouseWheelMsg>(allModsWheelDown, MouseEventType.Wheel, MouseButton.WheelDown, 10, 6, KeyModifiers.Shift | KeyModifiers.Alt | KeyModifiers.Ctrl);
-        AssertMouse<MouseMotionMsg>(motionReportedAsRelease, MouseEventType.Motion, MouseButton.None, 10, 6, KeyModifiers.None);
+        AssertMouse<MouseMotionMsg>(dragBackward, MouseEventType.Motion, MouseButton.Backward, 10, 6,
+            KeyModifiers.None);
+        AssertMouse<MouseMotionMsg>(dragButton12, MouseEventType.Motion, MouseButton.Button12, 10, 6,
+            KeyModifiers.None);
+        AssertMouse<MouseClickMsg>(shiftAltRight, MouseEventType.Press, MouseButton.Right, 10, 6,
+            KeyModifiers.Shift | KeyModifiers.Alt);
+        AssertMouse<MouseWheelMsg>(allModsWheelDown, MouseEventType.Wheel, MouseButton.WheelDown, 10, 6,
+            KeyModifiers.Shift | KeyModifiers.Alt | KeyModifiers.Ctrl);
+        AssertMouse<MouseMotionMsg>(motionReportedAsRelease, MouseEventType.Motion, MouseButton.None, 10, 6,
+            KeyModifiers.None);
         AssertMouse<MouseReleaseMsg>(x10Release, MouseEventType.Release, MouseButton.None, 17, 7, KeyModifiers.None);
-        AssertMouse<MouseWheelMsg>(x10WheelRight, MouseEventType.Wheel, MouseButton.WheelRight, 17, 7, KeyModifiers.None);
-        AssertMouse<MouseMotionMsg>(x10BackwardDrag, MouseEventType.Motion, MouseButton.Backward, 17, 7, KeyModifiers.None);
+        AssertMouse<MouseWheelMsg>(x10WheelRight, MouseEventType.Wheel, MouseButton.WheelRight, 17, 7,
+            KeyModifiers.None);
+        AssertMouse<MouseMotionMsg>(x10BackwardDrag, MouseEventType.Motion, MouseButton.Backward, 17, 7,
+            KeyModifiers.None);
         AssertMouse<MouseClickMsg>(x10Button12, MouseEventType.Press, MouseButton.Button12, 17, 7, KeyModifiers.None);
-        AssertMouse<MouseClickMsg>(x10ShiftAltRight, MouseEventType.Press, MouseButton.Right, 17, 7, KeyModifiers.Shift | KeyModifiers.Alt);
+        AssertMouse<MouseClickMsg>(x10ShiftAltRight, MouseEventType.Press, MouseButton.Right, 17, 7,
+            KeyModifiers.Shift | KeyModifiers.Alt);
         return Task.CompletedTask;
     }
 
@@ -307,16 +321,25 @@ internal static class EventDecoderGoldenTests
 
         // Act
         var clipboard = decoder.Decode(
-            [0x1B, (byte)']', (byte)'5', (byte)'2', (byte)';', (byte)'c', (byte)';', (byte)'a', (byte)'G', (byte)'V', (byte)'s', (byte)'b', (byte)'G', (byte)'8', (byte)'=', 0x07],
-            timeoutExpired: false);
+            [
+                0x1B, (byte)']', (byte)'5', (byte)'2', (byte)';', (byte)'c', (byte)';', (byte)'a', (byte)'G', (byte)'V',
+                (byte)'s', (byte)'b', (byte)'G', (byte)'8', (byte)'=', 0x07
+            ],
+            false);
 
         var foreground = decoder.Decode(
-            [0x1B, (byte)']', (byte)'1', (byte)'0', (byte)';', (byte)'r', (byte)'g', (byte)'b', (byte)':', (byte)'a', (byte)'a', (byte)'/', (byte)'b', (byte)'b', (byte)'/', (byte)'c', (byte)'c', 0x1B, (byte)'\\'],
-            timeoutExpired: false);
+            [
+                0x1B, (byte)']', (byte)'1', (byte)'0', (byte)';', (byte)'r', (byte)'g', (byte)'b', (byte)':', (byte)'a',
+                (byte)'a', (byte)'/', (byte)'b', (byte)'b', (byte)'/', (byte)'c', (byte)'c', 0x1B, (byte)'\\'
+            ],
+            false);
 
         var background = decoder.Decode(
-            [0x1B, (byte)']', (byte)'1', (byte)'1', (byte)';', (byte)'#', (byte)'1', (byte)'1', (byte)'2', (byte)'2', (byte)'3', (byte)'3', 0x07],
-            timeoutExpired: false);
+            [
+                0x1B, (byte)']', (byte)'1', (byte)'1', (byte)';', (byte)'#', (byte)'1', (byte)'1', (byte)'2', (byte)'2',
+                (byte)'3', (byte)'3', 0x07
+            ],
+            false);
 
         // Assert
         AssertConsumed(clipboard, 16);
@@ -347,8 +370,11 @@ internal static class EventDecoderGoldenTests
 
         // Act
         var result = decoder.Decode(
-            [0x1B, (byte)'P', (byte)'1', (byte)'+', (byte)'r', (byte)'5', (byte)'4', (byte)'6', (byte)'3', (byte)'=', (byte)'3', (byte)'1', 0x1B, (byte)'\\'],
-            timeoutExpired: false);
+            [
+                0x1B, (byte)'P', (byte)'1', (byte)'+', (byte)'r', (byte)'5', (byte)'4', (byte)'6', (byte)'3', (byte)'=',
+                (byte)'3', (byte)'1', 0x1B, (byte)'\\'
+            ],
+            false);
 
         // Assert
         AssertConsumed(result, 14);
@@ -367,8 +393,12 @@ internal static class EventDecoderGoldenTests
 
         // Act
         var result = decoder.Decode(
-            [0x1B, (byte)']', (byte)'5', (byte)'2', (byte)';', (byte)'c', (byte)';', (byte)'a', (byte)'G', (byte)'V', (byte)'s', (byte)'b', (byte)'G', (byte)'8', (byte)'=', (byte)';', (byte)'i', (byte)'g', (byte)'n', (byte)'o', (byte)'r', (byte)'e', (byte)'d', 0x07],
-            timeoutExpired: false);
+            [
+                0x1B, (byte)']', (byte)'5', (byte)'2', (byte)';', (byte)'c', (byte)';', (byte)'a', (byte)'G', (byte)'V',
+                (byte)'s', (byte)'b', (byte)'G', (byte)'8', (byte)'=', (byte)';', (byte)'i', (byte)'g', (byte)'n',
+                (byte)'o', (byte)'r', (byte)'e', (byte)'d', 0x07
+            ],
+            false);
 
         // Assert
         AssertConsumed(result, 24);
@@ -387,8 +417,11 @@ internal static class EventDecoderGoldenTests
 
         // Act
         var result = decoder.Decode(
-            [0x1B, (byte)'P', (byte)'1', (byte)'+', (byte)'r', (byte)'Z', (byte)'Z', (byte)'=', (byte)'3', (byte)'1', 0x1B, (byte)'\\'],
-            timeoutExpired: false);
+            [
+                0x1B, (byte)'P', (byte)'1', (byte)'+', (byte)'r', (byte)'Z', (byte)'Z', (byte)'=', (byte)'3', (byte)'1',
+                0x1B, (byte)'\\'
+            ],
+            false);
 
         // Assert
         AssertConsumed(result, 12);
@@ -406,7 +439,7 @@ internal static class EventDecoderGoldenTests
         var decoder = new EventDecoder();
 
         // Act
-        var result = Decode(decoder, "\u001b[?3u");
+        var result = Decode(decoder, "\e[?3u");
 
         // Assert
         if (result.Message is not KeyboardEnhancementsMsg keyboard || keyboard.Flags != 3)
@@ -423,8 +456,8 @@ internal static class EventDecoderGoldenTests
         var decoder = new EventDecoder();
 
         // Act
-        var partial = Decode(decoder, "\u001b[1;", timeoutExpired: false);
-        var timedOutPartial = Decode(decoder, "\u001b[1;", timeoutExpired: true);
+        var partial = Decode(decoder, "\e[1;");
+        var timedOutPartial = Decode(decoder, "\e[1;", true);
 
         // Assert
         TestAssert.True(partial.NeedMoreData, "Partial CSI should request more data.");
@@ -440,7 +473,7 @@ internal static class EventDecoderGoldenTests
         var decoder = new EventDecoder();
 
         // Act
-        var unknown = Decode(decoder, "\u001b[999~");
+        var unknown = Decode(decoder, "\e[999~");
 
         // Assert
         AssertMessageType<UnknownInputMsg>(unknown);
@@ -467,8 +500,8 @@ internal static class EventDecoderGoldenTests
         var full = Encoding.UTF8.GetBytes("გ");
 
         // Act
-        var partial = decoder.Decode(full.AsSpan(0, 2), timeoutExpired: false);
-        var complete = decoder.Decode(full, timeoutExpired: false);
+        var partial = decoder.Decode(full.AsSpan(0, 2), false);
+        var complete = decoder.Decode(full, false);
 
         // Assert
         TestAssert.True(partial.NeedMoreData, "Partial UTF-8 rune should request more data.");
@@ -487,7 +520,8 @@ internal static class EventDecoderGoldenTests
     {
         if (result.Message is not T)
         {
-            throw new InvalidOperationException($"Expected {typeof(T).Name} but got {result.Message?.GetType().Name ?? "null"}.");
+            throw new InvalidOperationException(
+                $"Expected {typeof(T).Name} but got {result.Message?.GetType().Name ?? "null"}.");
         }
     }
 
@@ -508,7 +542,8 @@ internal static class EventDecoderGoldenTests
     {
         if (result.Message is not KeyPressMsg key)
         {
-            throw new InvalidOperationException($"Expected KeyPressMsg but got {result.Message?.GetType().Name ?? "null"}.");
+            throw new InvalidOperationException(
+                $"Expected KeyPressMsg but got {result.Message?.GetType().Name ?? "null"}.");
         }
 
         if (key.Code != keyCode
@@ -530,10 +565,12 @@ internal static class EventDecoderGoldenTests
     {
         if (result.Message is not KeyReleaseMsg key)
         {
-            throw new InvalidOperationException($"Expected KeyReleaseMsg but got {result.Message?.GetType().Name ?? "null"}.");
+            throw new InvalidOperationException(
+                $"Expected KeyReleaseMsg but got {result.Message?.GetType().Name ?? "null"}.");
         }
 
-        if (key.Code != keyCode || key.Modifiers != modifiers || !string.Equals(key.Text, text, StringComparison.Ordinal))
+        if (key.Code != keyCode || key.Modifiers != modifiers ||
+            !string.Equals(key.Text, text, StringComparison.Ordinal))
         {
             throw new InvalidOperationException(
                 $"Expected release(code={keyCode}, modifiers={modifiers}, text=\"{text}\") " +
@@ -552,7 +589,8 @@ internal static class EventDecoderGoldenTests
     {
         if (result.Message is not TMouse mouse)
         {
-            throw new InvalidOperationException($"Expected {typeof(TMouse).Name} but got {result.Message?.GetType().Name ?? "null"}.");
+            throw new InvalidOperationException(
+                $"Expected {typeof(TMouse).Name} but got {result.Message?.GetType().Name ?? "null"}.");
         }
 
         if (mouse.EventType != eventType
@@ -571,7 +609,8 @@ internal static class EventDecoderGoldenTests
     {
         if (result.Message is not ModeReportMsg report)
         {
-            throw new InvalidOperationException($"Expected ModeReportMsg but got {result.Message?.GetType().Name ?? "null"}.");
+            throw new InvalidOperationException(
+                $"Expected ModeReportMsg but got {result.Message?.GetType().Name ?? "null"}.");
         }
 
         if (report.Mode != mode || report.State != state)

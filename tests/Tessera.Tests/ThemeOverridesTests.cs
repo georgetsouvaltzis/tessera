@@ -1,4 +1,3 @@
-using Tessera.Controls;
 using Tessera.Styles;
 
 namespace Tessera.Tests;
@@ -49,8 +48,8 @@ internal static partial class ThemeOverridesTests
         {
             Text = new TesseraThemeTextTokens
             {
-                Primary = TesseraStyle.Empty.WithForeground(AnsiColor.Rgb(red, green, blue)),
-            },
+                Primary = TesseraStyle.Empty.WithForeground(AnsiColor.Rgb(red, green, blue))
+            }
         };
     }
 }

@@ -65,5 +65,4 @@ internal static class LayoutArrangement
             Math.Clamp(width + layout.Padding.Horizontal, 0, availableBounds.Width),
             Math.Clamp(height + layout.Padding.Vertical, 0, availableBounds.Height));
     }
-
 }

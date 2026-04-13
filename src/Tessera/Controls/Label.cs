@@ -1,4 +1,4 @@
-﻿using Tessera.Components.Primitives;
+using Tessera.Components.Primitives;
 using Tessera.Components.Primitives.Internal;
 using Tessera.Controls.Internal;
 using Tessera.Layout;
@@ -7,21 +7,17 @@ using Tessera.Styles;
 namespace Tessera.Controls;
 
 /// <summary>
-/// Represents read-only text content.
+///     Represents read-only text content.
 /// </summary>
 public sealed class Label : Control
 {
     /// <summary>
-    /// Represents text.
+    ///     Represents text.
     /// </summary>
-    public string Text
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = string.Empty;
+    public string Text { get; set; } = string.Empty;
 
     /// <summary>
-    /// Represents title.
+    ///     Represents title.
     /// </summary>
     public string? Title
     {
@@ -30,7 +26,7 @@ public sealed class Label : Control
     }
 
     /// <summary>
-    /// Represents border.
+    ///     Represents border.
     /// </summary>
     public BorderStyle Border
     {
@@ -39,7 +35,7 @@ public sealed class Label : Control
     } = BorderStyle.SingleLine;
 
     /// <summary>
-    /// Represents padding.
+    ///     Represents padding.
     /// </summary>
     public Thickness Padding
     {
@@ -48,7 +44,7 @@ public sealed class Label : Control
     }
 
     /// <summary>
-    /// Represents text style.
+    ///     Represents text style.
     /// </summary>
     public TesseraStyle TextStyle
     {
@@ -57,7 +53,7 @@ public sealed class Label : Control
     } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Represents title style.
+    ///     Represents title style.
     /// </summary>
     public TesseraStyle TitleStyle
     {
@@ -66,7 +62,7 @@ public sealed class Label : Control
     } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Represents focused title style.
+    ///     Represents focused title style.
     /// </summary>
     public TesseraStyle FocusedTitleStyle
     {
@@ -75,7 +71,7 @@ public sealed class Label : Control
     } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the style applied to border glyphs when the control is not focused.
+    ///     Gets or sets the style applied to border glyphs when the control is not focused.
     /// </summary>
     public TesseraStyle BorderStyleText
     {
@@ -84,7 +80,7 @@ public sealed class Label : Control
     } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the style applied to border glyphs when the control is focused.
+    ///     Gets or sets the style applied to border glyphs when the control is focused.
     /// </summary>
     public TesseraStyle FocusedBorderStyleText
     {
@@ -93,18 +89,18 @@ public sealed class Label : Control
     } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Represents horizontal alignment.
+    ///     Represents horizontal alignment.
     /// </summary>
-    public global::Tessera.Layout.HorizontalAlignment HorizontalAlignment
+    public HorizontalAlignment HorizontalAlignment
     {
         get;
         set;
     }
 
     /// <summary>
-    /// Represents vertical alignment.
+    ///     Represents vertical alignment.
     /// </summary>
-    public global::Tessera.Layout.VerticalAlignment VerticalAlignment
+    public VerticalAlignment VerticalAlignment
     {
         get;
         set;
@@ -183,9 +179,10 @@ public sealed class Label : Control
     {
         return HorizontalAlignment switch
         {
-            global::Tessera.Layout.HorizontalAlignment.Center => Math.Max(0, (availableWidth - ControlTextLayout.MeasureDisplayWidth(line)) / 2),
-            global::Tessera.Layout.HorizontalAlignment.Right => Math.Max(0, availableWidth - ControlTextLayout.MeasureDisplayWidth(line)),
-            _ => 0,
+            HorizontalAlignment.Center => Math.Max(0,
+                (availableWidth - ControlTextLayout.MeasureDisplayWidth(line)) / 2),
+            HorizontalAlignment.Right => Math.Max(0, availableWidth - ControlTextLayout.MeasureDisplayWidth(line)),
+            _ => 0
         };
     }
 
@@ -193,9 +190,9 @@ public sealed class Label : Control
     {
         return VerticalAlignment switch
         {
-            global::Tessera.Layout.VerticalAlignment.Center => Math.Max(0, (availableHeight - Math.Min(availableHeight, lineCount)) / 2),
-            global::Tessera.Layout.VerticalAlignment.Bottom => Math.Max(0, availableHeight - Math.Min(availableHeight, lineCount)),
-            _ => 0,
+            VerticalAlignment.Center => Math.Max(0, (availableHeight - Math.Min(availableHeight, lineCount)) / 2),
+            VerticalAlignment.Bottom => Math.Max(0, availableHeight - Math.Min(availableHeight, lineCount)),
+            _ => 0
         };
     }
 

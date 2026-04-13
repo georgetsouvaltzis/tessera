@@ -1,9 +1,11 @@
 using Tessera.Components.Styling;
+
 namespace Tessera.Controls.Internal;
 
 internal static class DatePickerStateResolver
 {
-    public static IReadOnlyCollection<WidgetVisualState> ResolveDayStates(bool focused, DateOnly selectedDate, DateOnly? hoveredDate, DateOnly date)
+    public static IReadOnlyCollection<WidgetVisualState> ResolveDayStates(bool focused, DateOnly selectedDate,
+        DateOnly? hoveredDate, DateOnly date)
     {
         var states = new List<WidgetVisualState>(5);
         if (date == selectedDate)

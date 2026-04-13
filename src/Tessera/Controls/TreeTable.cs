@@ -7,19 +7,19 @@ using Tessera.Styles;
 namespace Tessera.Controls;
 
 /// <summary>
-/// Represents a hierarchical table with expandable rows.
+///     Represents a hierarchical table with expandable rows.
 /// </summary>
 public sealed partial class TreeTable : Control
 {
     private readonly List<string> _columns = [];
     private readonly List<TreeTableNode> _roots = [];
     private readonly List<VisibleEntry> _visible = [];
-    private int _selectedVisibleIndex;
-    private int _scrollOffset;
     private int _hoveredVisibleIndex = -1;
+    private int _scrollOffset;
+    private int _selectedVisibleIndex;
 
     /// <summary>
-    /// Initializes a tree table with optional columns.
+    ///     Initializes a tree table with optional columns.
     /// </summary>
     /// <param name="columns">Column headers. The first column is the tree label column.</param>
     public TreeTable(IEnumerable<string>? columns = null)
@@ -28,7 +28,7 @@ public sealed partial class TreeTable : Control
     }
 
     /// <summary>
-    /// Initializes a tree table with optional columns.
+    ///     Initializes a tree table with optional columns.
     /// </summary>
     /// <param name="columns">Column headers. The first column is the tree label column.</param>
     public TreeTable(params string[] columns)
@@ -37,156 +37,127 @@ public sealed partial class TreeTable : Control
     }
 
     /// <summary>
-    /// Occurs when the selected row changes.
-    /// </summary>
-    public event EventHandler<TreeTableSelectionChangedEventArgs>? SelectionChanged;
-
-    /// <summary>
-    /// Gets or sets the table title.
+    ///     Gets or sets the table title.
     /// </summary>
     public string Title { get; set; } = "Tree Table";
 
     /// <summary>
-    /// Gets or sets the marker shown in the title while focused.
+    ///     Gets or sets the marker shown in the title while focused.
     /// </summary>
     public string FocusMarker { get; set; } = "*";
 
     /// <summary>
-    /// Gets or sets whether to render the focus marker when focused.
+    ///     Gets or sets whether to render the focus marker when focused.
     /// </summary>
     public bool ShowFocusMarker { get; set; } = true;
 
     /// <summary>
-    /// Gets or sets title style when not focused.
+    ///     Gets or sets title style when not focused.
     /// </summary>
     public TesseraStyle TitleStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets title style when focused.
+    ///     Gets or sets title style when focused.
     /// </summary>
     public TesseraStyle FocusedTitleStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets column header style.
+    ///     Gets or sets column header style.
     /// </summary>
     public TesseraStyle HeaderStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets style for branch rows.
+    ///     Gets or sets style for branch rows.
     /// </summary>
     public TesseraStyle BranchRowStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets style for leaf rows.
+    ///     Gets or sets style for leaf rows.
     /// </summary>
     public TesseraStyle LeafRowStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets style merged into selected rows.
+    ///     Gets or sets style merged into selected rows.
     /// </summary>
     public TesseraStyle SelectedRowStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets style merged into hovered rows.
+    ///     Gets or sets style merged into hovered rows.
     /// </summary>
     public TesseraStyle HoveredRowStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets style merged when disabled.
+    ///     Gets or sets style merged when disabled.
     /// </summary>
     public TesseraStyle MutedRowStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets style applied to border glyphs when the control is not focused.
+    ///     Gets or sets style applied to border glyphs when the control is not focused.
     /// </summary>
     public TesseraStyle BorderStyleText { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets style applied to border glyphs when the control is focused.
+    ///     Gets or sets style applied to border glyphs when the control is focused.
     /// </summary>
     public TesseraStyle FocusedBorderStyleText { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets text rendered between columns.
+    ///     Gets or sets text rendered between columns.
     /// </summary>
-    public string ColumnSeparatorText
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = " | ";
+    public string ColumnSeparatorText { get; set; } = " | ";
 
     /// <summary>
-    /// Gets or sets marker text rendered for selected rows.
+    ///     Gets or sets marker text rendered for selected rows.
     /// </summary>
-    public string SelectedRowMarker
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = ">";
+    public string SelectedRowMarker { get; set; } = ">";
 
     /// <summary>
-    /// Gets or sets marker text rendered for unselected rows.
+    ///     Gets or sets marker text rendered for unselected rows.
     /// </summary>
-    public string UnselectedRowMarker
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = " ";
+    public string UnselectedRowMarker { get; set; } = " ";
 
     /// <summary>
-    /// Gets or sets marker text rendered for expanded branch rows.
+    ///     Gets or sets marker text rendered for expanded branch rows.
     /// </summary>
-    public string ExpandedBranchMarker
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = "-";
+    public string ExpandedBranchMarker { get; set; } = "-";
 
     /// <summary>
-    /// Gets or sets marker text rendered for collapsed branch rows.
+    ///     Gets or sets marker text rendered for collapsed branch rows.
     /// </summary>
-    public string CollapsedBranchMarker
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = "+";
+    public string CollapsedBranchMarker { get; set; } = "+";
 
     /// <summary>
-    /// Gets or sets marker text rendered for leaf rows.
+    ///     Gets or sets marker text rendered for leaf rows.
     /// </summary>
-    public string LeafMarker
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = ".";
+    public string LeafMarker { get; set; } = ".";
 
     /// <summary>
-    /// Gets or sets border style.
+    ///     Gets or sets border style.
     /// </summary>
     public BorderStyle Border { get; set; } = BorderStyle.SingleLine;
 
     /// <summary>
-    /// Gets or sets inner padding.
+    ///     Gets or sets inner padding.
     /// </summary>
     public Thickness Padding { get; set; }
 
     /// <summary>
-    /// Gets configured column headers.
+    ///     Gets configured column headers.
     /// </summary>
     public IReadOnlyList<string> Columns => _columns;
 
     /// <summary>
-    /// Gets root rows.
+    ///     Gets root rows.
     /// </summary>
     public IReadOnlyList<TreeTableNode> RootItems => _roots;
 
     /// <summary>
-    /// Gets selected visible row index. Returns <c>-1</c> when no rows exist.
+    ///     Gets selected visible row index. Returns <c>-1</c> when no rows exist.
     /// </summary>
     public int SelectedIndex => _visible.Count == 0 ? -1 : _selectedVisibleIndex;
 
     /// <summary>
-    /// Gets selected row.
+    ///     Gets selected row.
     /// </summary>
     public TreeTableNode? SelectedItem => _selectedVisibleIndex >= 0 && _selectedVisibleIndex < _visible.Count
         ? _visible[_selectedVisibleIndex].Item
@@ -202,7 +173,12 @@ public sealed partial class TreeTable : Control
     public override bool IsReadOnly { get; set; }
 
     /// <summary>
-    /// Replaces column headers.
+    ///     Occurs when the selected row changes.
+    /// </summary>
+    public event EventHandler<TreeTableSelectionChangedEventArgs>? SelectionChanged;
+
+    /// <summary>
+    ///     Replaces column headers.
     /// </summary>
     /// <param name="columns">Column headers. Empty input falls back to a single <c>Name</c> column.</param>
     public void SetColumns(IEnumerable<string> columns)
@@ -226,7 +202,7 @@ public sealed partial class TreeTable : Control
     }
 
     /// <summary>
-    /// Replaces root rows.
+    ///     Replaces root rows.
     /// </summary>
     /// <param name="items">Root rows.</param>
     public void SetItems(IEnumerable<TreeTableNode> items)
@@ -257,9 +233,9 @@ public sealed partial class TreeTable : Control
     }
 
     /// <summary>
-    /// Toggles expansion for the selected branch row.
+    ///     Toggles expansion for the selected branch row.
     /// </summary>
-    /// <returns><see langword="true"/> when expansion changed; otherwise <see langword="false"/>.</returns>
+    /// <returns><see langword="true" /> when expansion changed; otherwise <see langword="false" />.</returns>
     public bool ToggleSelectedExpanded()
     {
         var selected = SelectedItem;
@@ -492,5 +468,4 @@ public sealed partial class TreeTable : Control
             Math.Clamp(width, 0, availableBounds.Width),
             Math.Clamp(height, 0, availableBounds.Height));
     }
-
 }

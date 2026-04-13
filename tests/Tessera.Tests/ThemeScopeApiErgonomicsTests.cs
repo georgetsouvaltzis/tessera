@@ -12,10 +12,7 @@ public sealed class ThemeScopeApiErgonomicsTests
     [Test]
     public void ThemeScopeApplyNullThemeThrows()
     {
-        var controls = new Control[]
-        {
-            new Button(),
-        };
+        var controls = new Control[] { new Button() };
 
         Assert.Throws<ArgumentNullException>(() => ThemeScope.Apply(null!, controls));
     }
@@ -35,7 +32,7 @@ public sealed class ThemeScopeApiErgonomicsTests
     public void ThemeScopeApplyEmptyAndUnsupportedControlsReturnZero()
     {
         var theme = TesseraThemes.Catppuccin();
-        var emptyApplied = ThemeScope.Apply(theme, Array.Empty<Control>());
+        var emptyApplied = ThemeScope.Apply(theme);
         var unsupportedApplied = ThemeScope.Apply(theme, new NoThemeControl());
         var nullElementApplied = ThemeScope.Apply(theme, (IEnumerable<Control?>)new Control?[] { null });
 

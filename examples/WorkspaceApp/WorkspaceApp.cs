@@ -6,36 +6,53 @@ namespace Tessera.Examples.WorkspaceApp;
 
 internal sealed class WorkspaceApp : TesseraApp
 {
+    private readonly Label _actionChip =
+        new() { Border = BorderStyle.None, HorizontalAlignment = HorizontalAlignment.Center };
+
+    private readonly TextArea _editor = new() { Title = "Launch Narrative", Padding = Thickness.All(1), Wrap = true };
+
+    private readonly Label _eyebrow =
+        new() { Border = BorderStyle.None, HorizontalAlignment = HorizontalAlignment.Center };
+
+    private readonly Control[] _focusOrder;
+    private readonly StatusBar _footer = new() { Fill = ' ' };
+
+    private readonly Label _headline =
+        new() { Border = BorderStyle.None, HorizontalAlignment = HorizontalAlignment.Center };
+
+    private readonly Label _insight = new()
+    {
+        Title = "Director Notes",
+        Border = BorderStyle.SingleLine,
+        Padding = Thickness.All(1)
+    };
+
+    private readonly Label _preview =
+        new() { Title = "Live Preview", Border = BorderStyle.SingleLine, Padding = Thickness.All(1) };
+
+    private readonly ProgressBar _readiness = new() { Title = "Readiness", Padding = Thickness.Symmetric(1) };
+    private readonly Button _reviewButton = new() { Text = "Send To Review", Padding = Thickness.Symmetric(2) };
+    private readonly Button _snapshotButton = new() { Text = "Save Snapshot", Padding = Thickness.Symmetric(2) };
+
+    private readonly Label _snapshotChip =
+        new() { Border = BorderStyle.None, HorizontalAlignment = HorizontalAlignment.Center };
+
     private readonly TesseraTheme _theme = WorkspaceTheme.Default;
-    private readonly Label _eyebrow = new() { Border = BorderStyle.None, HorizontalAlignment = HorizontalAlignment.Center };
-    private readonly Label _headline = new() { Border = BorderStyle.None, HorizontalAlignment = HorizontalAlignment.Center };
-    private readonly Label _viewChip = new() { Border = BorderStyle.None, HorizontalAlignment = HorizontalAlignment.Center };
-    private readonly Label _snapshotChip = new() { Border = BorderStyle.None, HorizontalAlignment = HorizontalAlignment.Center };
-    private readonly Label _actionChip = new() { Border = BorderStyle.None, HorizontalAlignment = HorizontalAlignment.Center };
+
+    private readonly Label _viewChip =
+        new() { Border = BorderStyle.None, HorizontalAlignment = HorizontalAlignment.Center };
+
     private readonly ListView<string> _views = new(static view => view)
     {
         Title = "Scenes",
-        Padding = Thickness.All(1),
+        Padding = Thickness.All(1)
     };
-    private readonly TextArea _editor = new()
-    {
-        Title = "Launch Narrative",
-        Padding = Thickness.All(1),
-        Wrap = true,
-    };
-    private readonly Label _preview = new() { Title = "Live Preview", Border = BorderStyle.SingleLine, Padding = Thickness.All(1) };
-    private readonly ProgressBar _readiness = new() { Title = "Readiness", Padding = Thickness.Symmetric(1, 0) };
-    private readonly Button _snapshotButton = new() { Text = "Save Snapshot", Padding = Thickness.Symmetric(2, 0) };
-    private readonly Button _reviewButton = new() { Text = "Send To Review", Padding = Thickness.Symmetric(2, 0) };
-    private readonly Label _insight = new() { Title = "Director Notes", Border = BorderStyle.SingleLine, Padding = Thickness.All(1) };
-    private readonly StatusBar _footer = new() { Fill = ' ' };
 
-    private readonly Control[] _focusOrder;
-    private string _selectedView = "Overview";
     private int _focusIndex;
-    private int _snapshotCount = 3;
-    private double _readinessValue = 0.42;
     private string _lastAction = "Draft opened";
+    private double _readinessValue = 0.42;
+    private string _selectedView = "Overview";
+    private int _snapshotCount = 3;
 
     public WorkspaceApp()
     {
@@ -85,14 +102,13 @@ internal sealed class WorkspaceApp : TesseraApp
                     column.Gap(1);
                     column.Auto(content => content.Center(_eyebrow));
                     column.Auto(content => content.Center(_headline));
-                    column.Fixed(1, ribbon => ribbon.Center(
-                        row => row.Row(chips =>
-                        {
-                            chips.Gap(2);
-                            chips.Auto(_viewChip);
-                            chips.Auto(_snapshotChip);
-                            chips.Auto(_actionChip);
-                        })));
+                    column.Fixed(1, ribbon => ribbon.Center(row => row.Row(chips =>
+                    {
+                        chips.Gap(2);
+                        chips.Auto(_viewChip);
+                        chips.Auto(_snapshotChip);
+                        chips.Auto(_actionChip);
+                    })));
                     column.Fill(main => main.Row(row =>
                     {
                         row.Fixed(leftWidth, _views, new Thickness(0, 0, 1, 0));
@@ -114,8 +130,8 @@ internal sealed class WorkspaceApp : TesseraApp
                         }), new Thickness(1, 0, 0, 0));
                     }));
                 }),
-                width: shellWidth,
-                height: shellHeight));
+                shellWidth,
+                shellHeight));
             window.Footer(1, _footer);
         });
     }
@@ -204,7 +220,8 @@ internal sealed class WorkspaceApp : TesseraApp
         var actionChip = Shorten(_lastAction, 24);
 
         _eyebrow.Text = "  WORKSPACE APP // MULTI-PANE STARTER  ";
-        _headline.Text = "A centered workstation shell with navigation, editing, preview, and one clear promotion path.";
+        _headline.Text =
+            "A centered workstation shell with navigation, editing, preview, and one clear promotion path.";
         _viewChip.Text = $"  view {_selectedView.ToLowerInvariant()}  ";
         _snapshotChip.Text = $"  snapshots {_snapshotCount:D2}  ";
         _actionChip.Text = $"  {actionChip.ToLowerInvariant()}  ";
@@ -252,7 +269,7 @@ internal sealed class WorkspaceApp : TesseraApp
     private enum WorkspaceAction
     {
         Snapshot,
-        SendToReview,
+        SendToReview
     }
 
     private sealed record WorkspaceActionMessage(WorkspaceAction Kind) : Message;

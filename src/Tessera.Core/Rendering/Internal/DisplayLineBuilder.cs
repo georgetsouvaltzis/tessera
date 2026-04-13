@@ -122,7 +122,8 @@ internal static class DisplayLineBuilder
         return new DisplayLine([.. cells], [.. styles]);
     }
 
-    private static void AddCell(List<string?> cells, List<string?> styles, string element, string activeStyle, int width)
+    private static void AddCell(List<string?> cells, List<string?> styles, string element, string activeStyle,
+        int width)
     {
         cells.Add(element);
         styles.Add(activeStyle);

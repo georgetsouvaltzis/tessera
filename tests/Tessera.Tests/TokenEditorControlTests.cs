@@ -16,7 +16,7 @@ public sealed class TokenEditorControlTests
         var events = new List<TokenEditorTokensChangedEventArgs>();
         control.TokensChanged += (_, args) => events.Add(args);
 
-        control.SetTokens([new TokenItem("one"), new TokenItem("two", isDisabled: true)]);
+        control.SetTokens([new TokenItem("one"), new TokenItem("two", true)]);
         var added = control.AddToken("three");
         _ = control.SetSelectedTokenIndex(2);
         var removed = control.RemoveSelectedToken();
@@ -82,11 +82,7 @@ public sealed class TokenEditorControlTests
     [Test]
     public void ControlsTokenEditorKeyboardInputNavigationAndDeleteWork()
     {
-        var control = new TokenEditor
-        {
-            IsFocused = true,
-            Border = BorderStyle.None,
-        };
+        var control = new TokenEditor { IsFocused = true, Border = BorderStyle.None };
 
         _ = control.Handle(new KeyPressed(Key.Character, "o"));
         _ = control.Handle(new KeyPressed(Key.Character, "p"));
@@ -110,12 +106,12 @@ public sealed class TokenEditorControlTests
         {
             Border = BorderStyle.None,
             Glyphs = new TokenEditorGlyphSet(
-                selectedMarker: ">",
-                unselectedMarker: ".",
-                tokenPrefix: "[",
-                tokenSuffix: "]",
-                markerSeparator: string.Empty,
-                tokenSeparator: " "),
+                ">",
+                ".",
+                "[",
+                "]",
+                string.Empty,
+                " ")
         };
         control.SetTokens([new TokenItem("a"), new TokenItem("b")]);
         var bounds = new Rect(0, 0, 40, 4);
@@ -140,18 +136,18 @@ public sealed class TokenEditorControlTests
             IsFocused = true,
             Border = BorderStyle.None,
             Glyphs = new TokenEditorGlyphSet(
-                selectedMarker: "S",
-                unselectedMarker: "U",
-                tokenPrefix: "<",
-                tokenSuffix: ">",
-                markerSeparator: ":",
-                tokenSeparator: "|"),
+                "S",
+                "U",
+                "<",
+                ">",
+                ":",
+                "|"),
             SelectedTokenStyle = TesseraStyle.Empty.WithBackground(AnsiColor.Rgb(11, 22, 33)),
             FocusedSelectedTokenStyle = TesseraStyle.Empty.WithBold(),
             HoveredTokenStyle = TesseraStyle.Empty.WithUnderline(),
-            DisabledTokenStyle = TesseraStyle.Empty.WithForeground(AnsiColor.Rgb(44, 55, 66)),
+            DisabledTokenStyle = TesseraStyle.Empty.WithForeground(AnsiColor.Rgb(44, 55, 66))
         };
-        control.SetTokens([new TokenItem("enabled"), new TokenItem("disabled", isDisabled: true)]);
+        control.SetTokens([new TokenItem("enabled"), new TokenItem("disabled", true)]);
         _ = control.SetSelectedTokenIndex(0);
         var bounds = new Rect(0, 0, 80, 4);
 
@@ -160,10 +156,14 @@ public sealed class TokenEditorControlTests
         control.Render(canvas, bounds);
         var output = canvas.Render();
 
-        TestAssert.True(output.Contains("S:<enabled>", StringComparison.Ordinal), "Selected token should render custom marker/prefix/suffix.");
-        TestAssert.True(output.Contains("U:<disabled>", StringComparison.Ordinal), "Unselected token should render custom marker/prefix/suffix.");
-        TestAssert.True(output.Contains("48;2;11;22;33", StringComparison.Ordinal), "Selected token style should render.");
-        TestAssert.True(output.Contains("38;2;44;55;66", StringComparison.Ordinal), "Disabled token style should render.");
+        TestAssert.True(output.Contains("S:<enabled>", StringComparison.Ordinal),
+            "Selected token should render custom marker/prefix/suffix.");
+        TestAssert.True(output.Contains("U:<disabled>", StringComparison.Ordinal),
+            "Unselected token should render custom marker/prefix/suffix.");
+        TestAssert.True(output.Contains("48;2;11;22;33", StringComparison.Ordinal),
+            "Selected token style should render.");
+        TestAssert.True(output.Contains("38;2;44;55;66", StringComparison.Ordinal),
+            "Disabled token style should render.");
         TestAssert.True(
             output.Contains(";4;", StringComparison.Ordinal)
             || output.Contains("[4m", StringComparison.Ordinal)
@@ -174,10 +174,7 @@ public sealed class TokenEditorControlTests
     [Test]
     public void ControlsTokenEditorDefaultRenderIsDeterministicAndMonochrome()
     {
-        var control = new TokenEditor
-        {
-            Border = BorderStyle.None,
-        };
+        var control = new TokenEditor { Border = BorderStyle.None };
         control.SetTokens([new TokenItem("one"), new TokenItem("two")]);
         var bounds = new Rect(0, 0, 40, 4);
         var firstCanvas = new Canvas(40, 4);
@@ -189,6 +186,7 @@ public sealed class TokenEditorControlTests
         var second = secondCanvas.Render();
 
         TestAssert.Equal(first, second, "Token editor render should be deterministic.");
-        TestAssert.True(!first.Contains("\u001b[", StringComparison.Ordinal), "Default token editor output should remain monochrome.");
+        TestAssert.True(!first.Contains("\e[", StringComparison.Ordinal),
+            "Default token editor output should remain monochrome.");
     }
 }

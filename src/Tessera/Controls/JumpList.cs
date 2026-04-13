@@ -5,142 +5,119 @@ using Tessera.Styles;
 namespace Tessera.Controls;
 
 /// <summary>
-/// Represents a selectable jump-list control with activation support.
+///     Represents a selectable jump-list control with activation support.
 /// </summary>
 public sealed partial class JumpList : Control
 {
     private readonly List<JumpListItem> _items = [];
-    private int _selectedIndex = -1;
     private int _hoveredIndex = -1;
 
     /// <summary>
-    /// Occurs when the selected item changes.
+    ///     Gets or sets control title.
     /// </summary>
-    public event EventHandler<ListSelectionChangedEventArgs<JumpListItem>>? SelectionChanged;
+    public string Title { get; set; } = "Jump List";
 
     /// <summary>
-    /// Occurs when an item is activated.
+    ///     Gets or sets marker appended to title while focused.
     /// </summary>
-    public event EventHandler<JumpListActivatedEventArgs>? Activated;
+    public string FocusMarker { get; set; } = "*";
 
     /// <summary>
-    /// Gets or sets control title.
-    /// </summary>
-    public string Title
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = "Jump List";
-
-    /// <summary>
-    /// Gets or sets marker appended to title while focused.
-    /// </summary>
-    public string FocusMarker
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = "*";
-
-    /// <summary>
-    /// Gets or sets whether focus marker should be rendered while focused.
+    ///     Gets or sets whether focus marker should be rendered while focused.
     /// </summary>
     public bool ShowFocusMarker { get; set; } = true;
 
     /// <summary>
-    /// Gets or sets glyphs used for row markers.
+    ///     Gets or sets glyphs used for row markers.
     /// </summary>
     public JumpListGlyphSet Glyphs { get; set; } = JumpListGlyphSet.Default;
 
     /// <summary>
-    /// Gets or sets title style while not focused.
+    ///     Gets or sets title style while not focused.
     /// </summary>
     public TesseraStyle TitleStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets title style while focused.
+    ///     Gets or sets title style while focused.
     /// </summary>
     public TesseraStyle FocusedTitleStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets border style while not focused.
+    ///     Gets or sets border style while not focused.
     /// </summary>
     public TesseraStyle BorderStyleText { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets border style while focused.
+    ///     Gets or sets border style while focused.
     /// </summary>
     public TesseraStyle FocusedBorderStyleText { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets base row style.
+    ///     Gets or sets base row style.
     /// </summary>
     public TesseraStyle ItemStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets style merged into selected row.
+    ///     Gets or sets style merged into selected row.
     /// </summary>
     public TesseraStyle SelectedItemStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets style merged into selected row while focused.
+    ///     Gets or sets style merged into selected row while focused.
     /// </summary>
     public TesseraStyle FocusedSelectedItemStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets style merged into hovered row.
+    ///     Gets or sets style merged into hovered row.
     /// </summary>
     public TesseraStyle HoveredItemStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets style merged into disabled rows.
+    ///     Gets or sets style merged into disabled rows.
     /// </summary>
     public TesseraStyle DisabledItemStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets style applied to pinned marker text.
+    ///     Gets or sets style applied to pinned marker text.
     /// </summary>
     public TesseraStyle PinnedMarkerStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets style applied to recent marker text.
+    ///     Gets or sets style applied to recent marker text.
     /// </summary>
     public TesseraStyle RecentMarkerStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets text shown when no items are available.
+    ///     Gets or sets text shown when no items are available.
     /// </summary>
-    public string EmptyText
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = "(no items)";
+    public string EmptyText { get; set; } = "(no items)";
 
     /// <summary>
-    /// Gets or sets border style.
+    ///     Gets or sets border style.
     /// </summary>
     public BorderStyle Border { get; set; } = BorderStyle.SingleLine;
 
     /// <summary>
-    /// Gets or sets control padding.
+    ///     Gets or sets control padding.
     /// </summary>
     public Thickness Padding { get; set; }
 
     /// <summary>
-    /// Gets configured items.
+    ///     Gets configured items.
     /// </summary>
     public IReadOnlyList<JumpListItem> Items => _items;
 
     /// <summary>
-    /// Gets selected index, or <c>-1</c> when no items are available.
+    ///     Gets selected index, or <c>-1</c> when no items are available.
     /// </summary>
-    public int SelectedIndex => _selectedIndex;
+    public int SelectedIndex { get; private set; } = -1;
 
     /// <summary>
-    /// Gets selected item, or <see langword="null" /> when no items are available.
+    ///     Gets selected item, or <see langword="null" /> when no items are available.
     /// </summary>
     public JumpListItem? SelectedItem =>
-        _selectedIndex >= 0 && _selectedIndex < _items.Count
-            ? _items[_selectedIndex]
+        SelectedIndex >= 0 && SelectedIndex < _items.Count
+            ? _items[SelectedIndex]
             : null;
 
     /// <inheritdoc />
@@ -153,13 +130,23 @@ public sealed partial class JumpList : Control
     public override bool IsReadOnly { get; set; }
 
     /// <summary>
-    /// Replaces jump-list items.
+    ///     Occurs when the selected item changes.
+    /// </summary>
+    public event EventHandler<ListSelectionChangedEventArgs<JumpListItem>>? SelectionChanged;
+
+    /// <summary>
+    ///     Occurs when an item is activated.
+    /// </summary>
+    public event EventHandler<JumpListActivatedEventArgs>? Activated;
+
+    /// <summary>
+    ///     Replaces jump-list items.
     /// </summary>
     /// <param name="items">Items in visual order.</param>
     public void SetItems(IEnumerable<JumpListItem> items)
     {
         ArgumentNullException.ThrowIfNull(items);
-        var previousIndex = _selectedIndex;
+        var previousIndex = SelectedIndex;
         var previousItem = SelectedItem;
         var selectedId = previousItem?.Id;
 
@@ -171,12 +158,12 @@ public sealed partial class JumpList : Control
 
         if (_items.Count == 0)
         {
-            _selectedIndex = -1;
+            SelectedIndex = -1;
             _hoveredIndex = -1;
         }
         else
         {
-            _selectedIndex = ResolveSelectedIndex(selectedId);
+            SelectedIndex = ResolveSelectedIndex(selectedId);
             _hoveredIndex = Math.Clamp(_hoveredIndex, -1, _items.Count - 1);
         }
 
@@ -184,7 +171,7 @@ public sealed partial class JumpList : Control
     }
 
     /// <summary>
-    /// Sets selected index using bounds clamping.
+    ///     Sets selected index using bounds clamping.
     /// </summary>
     /// <param name="index">Requested selected index.</param>
     /// <returns><see langword="true" /> when selection changed; otherwise <see langword="false" />.</returns>
@@ -196,14 +183,14 @@ public sealed partial class JumpList : Control
         }
 
         var clamped = Math.Clamp(index, 0, _items.Count - 1);
-        if (clamped == _selectedIndex)
+        if (clamped == SelectedIndex)
         {
             return false;
         }
 
-        var previousIndex = _selectedIndex;
+        var previousIndex = SelectedIndex;
         var previousItem = SelectedItem;
-        _selectedIndex = clamped;
+        SelectedIndex = clamped;
         RaiseSelectionChanged(previousIndex, previousItem);
         return true;
     }
@@ -218,12 +205,12 @@ public sealed partial class JumpList : Control
 
         if (key.Is(Key.Up) || key.IsCharacter('k'))
         {
-            return SetSelectedIndex(_selectedIndex - 1);
+            return SetSelectedIndex(SelectedIndex - 1);
         }
 
         if (key.Is(Key.Down) || key.IsCharacter('j'))
         {
-            return SetSelectedIndex(_selectedIndex + 1);
+            return SetSelectedIndex(SelectedIndex + 1);
         }
 
         if (key.Is(Key.Home))
@@ -343,7 +330,7 @@ public sealed partial class JumpList : Control
         for (var row = 0; row < visible; row++)
         {
             var item = _items[row];
-            var line = BuildLine(item, row == _selectedIndex);
+            var line = BuildLine(item, row == SelectedIndex);
             var style = ResolveRowStyle(item, row);
             canvas.WriteText(content.X, listTop + row, ApplyStyle(line, style), content.Width);
         }
@@ -351,19 +338,18 @@ public sealed partial class JumpList : Control
 
     private bool ActivateSelected()
     {
-        if (_selectedIndex < 0 || _selectedIndex >= _items.Count || IsReadOnly)
+        if (SelectedIndex < 0 || SelectedIndex >= _items.Count || IsReadOnly)
         {
             return false;
         }
 
-        var selected = _items[_selectedIndex];
+        var selected = _items[SelectedIndex];
         if (selected.IsDisabled)
         {
             return false;
         }
 
-        Activated?.Invoke(this, new JumpListActivatedEventArgs(_selectedIndex, selected));
+        Activated?.Invoke(this, new JumpListActivatedEventArgs(SelectedIndex, selected));
         return true;
     }
-
 }

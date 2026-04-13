@@ -14,7 +14,8 @@ public sealed partial class ActivityFeed
         var width = Math.Max(24, ControlTextLayout.MeasureDisplayWidth(MeasureTitle()) + 6);
         for (var index = 0; index < _items.Count; index++)
         {
-            width = Math.Max(width, ControlTextLayout.MeasureDisplayWidth(FormatLine(_items[index], selected: index == _selectedIndex)) + 2);
+            width = Math.Max(width,
+                ControlTextLayout.MeasureDisplayWidth(FormatLine(_items[index], index == SelectedIndex)) + 2);
         }
 
         var height = Math.Max(4, Math.Min(12, _items.Count + 2));
@@ -24,7 +25,8 @@ public sealed partial class ActivityFeed
             height += 2 + Padding.Vertical;
         }
 
-        return new LayoutMeasurement(Math.Clamp(width, 0, availableBounds.Width), Math.Clamp(height, 0, availableBounds.Height));
+        return new LayoutMeasurement(Math.Clamp(width, 0, availableBounds.Width),
+            Math.Clamp(height, 0, availableBounds.Height));
     }
 
     private bool SetHoveredIndex(int index)
@@ -47,7 +49,7 @@ public sealed partial class ActivityFeed
 
         var remove = _items.Count - MaxItems;
         _items.RemoveRange(0, remove);
-        _selectedIndex = _selectedIndex < 0 ? -1 : Math.Max(0, _selectedIndex - remove);
+        SelectedIndex = SelectedIndex < 0 ? -1 : Math.Max(0, SelectedIndex - remove);
         _hoveredIndex = _hoveredIndex < 0 ? -1 : Math.Max(0, _hoveredIndex - remove);
         _scrollOffset = Math.Max(0, _scrollOffset - remove);
     }
@@ -60,18 +62,18 @@ public sealed partial class ActivityFeed
             return;
         }
 
-        if (_selectedIndex < 0)
+        if (SelectedIndex < 0)
         {
-            _selectedIndex = 0;
+            SelectedIndex = 0;
         }
 
-        if (_selectedIndex < _scrollOffset)
+        if (SelectedIndex < _scrollOffset)
         {
-            _scrollOffset = _selectedIndex;
+            _scrollOffset = SelectedIndex;
         }
-        else if (_selectedIndex >= _scrollOffset + viewportRows)
+        else if (SelectedIndex >= _scrollOffset + viewportRows)
         {
-            _scrollOffset = _selectedIndex - viewportRows + 1;
+            _scrollOffset = SelectedIndex - viewportRows + 1;
         }
 
         _scrollOffset = Math.Clamp(_scrollOffset, 0, Math.Max(0, _items.Count - viewportRows));
@@ -81,17 +83,40 @@ public sealed partial class ActivityFeed
     {
         var item = _items[index];
         var style = ResolveKindStyle(item.Kind);
-        if (item.IsUnread) style = style.Merge(UnreadItemStyle);
-        if (item.IsMuted) style = style.Merge(MutedItemStyle);
-        if (item.HasError) style = style.Merge(ErrorItemStyle);
-        if (index == _hoveredIndex) style = style.Merge(HoveredItemStyle);
-        if (index == _selectedIndex)
+        if (item.IsUnread)
         {
-            style = style.Merge(SelectedItemStyle);
-            if (IsFocused) style = style.Merge(FocusedSelectedItemStyle);
+            style = style.Merge(UnreadItemStyle);
         }
 
-        if (IsDisabled) style = style.Merge(DisabledItemStyle);
+        if (item.IsMuted)
+        {
+            style = style.Merge(MutedItemStyle);
+        }
+
+        if (item.HasError)
+        {
+            style = style.Merge(ErrorItemStyle);
+        }
+
+        if (index == _hoveredIndex)
+        {
+            style = style.Merge(HoveredItemStyle);
+        }
+
+        if (index == SelectedIndex)
+        {
+            style = style.Merge(SelectedItemStyle);
+            if (IsFocused)
+            {
+                style = style.Merge(FocusedSelectedItemStyle);
+            }
+        }
+
+        if (IsDisabled)
+        {
+            style = style.Merge(DisabledItemStyle);
+        }
+
         return style;
     }
 
@@ -102,7 +127,7 @@ public sealed partial class ActivityFeed
             ActivityFeedItemKind.Success => SuccessItemStyle,
             ActivityFeedItemKind.Warning => WarningItemStyle,
             ActivityFeedItemKind.Error => ErrorItemStyle,
-            _ => InfoItemStyle,
+            _ => InfoItemStyle
         };
     }
 
@@ -161,7 +186,9 @@ public sealed partial class ActivityFeed
 
     private string RenderTitle()
     {
-        var title = IsFocused && ShowFocusMarker && !string.IsNullOrWhiteSpace(FocusMarker) ? $"{Title} {FocusMarker}" : Title;
+        var title = IsFocused && ShowFocusMarker && !string.IsNullOrWhiteSpace(FocusMarker)
+            ? $"{Title} {FocusMarker}"
+            : Title;
         return ApplyStyle(title, IsFocused ? FocusedTitleStyle : TitleStyle);
     }
 
@@ -176,9 +203,12 @@ public sealed partial class ActivityFeed
         {
             IsUnread = item.IsUnread,
             IsMuted = item.IsMuted,
-            HasError = item.HasError,
+            HasError = item.HasError
         };
     }
 
-    private static string ApplyStyle(string text, TesseraStyle style) => style.IsEmpty ? text : style.Render(text);
+    private static string ApplyStyle(string text, TesseraStyle style)
+    {
+        return style.IsEmpty ? text : style.Render(text);
+    }
 }

@@ -1,12 +1,13 @@
 namespace Tessera.Controls;
 
 /// <summary>
-/// Represents one persistent notification entry used by <see cref="Notifications" /> and <see cref="NotificationInbox" />.
+///     Represents one persistent notification entry used by <see cref="Notifications" /> and
+///     <see cref="NotificationInbox" />.
 /// </summary>
 public sealed class InboxItem
 {
     /// <summary>
-    /// Initializes an inbox item.
+    ///     Initializes an inbox item.
     /// </summary>
     /// <param name="id">Stable item identifier.</param>
     /// <param name="message">Primary message text.</param>
@@ -24,8 +25,8 @@ public sealed class InboxItem
         bool isRead = false,
         bool isPinned = false)
     {
-        Id = id ?? string.Empty;
-        Message = message ?? string.Empty;
+        Id = id;
+        Message = message;
         Level = level;
         CreatedAt = createdAt;
         Source = source ?? string.Empty;
@@ -34,45 +35,37 @@ public sealed class InboxItem
     }
 
     /// <summary>
-    /// Gets stable item identifier.
+    ///     Gets stable item identifier.
     /// </summary>
     public string Id { get; }
 
     /// <summary>
-    /// Gets or sets primary message text.
+    ///     Gets or sets primary message text.
     /// </summary>
-    public string Message
-    {
-        get;
-        set => field = value ?? string.Empty;
-    }
+    public string Message { get; set; }
 
     /// <summary>
-    /// Gets or sets semantic severity.
+    ///     Gets or sets semantic severity.
     /// </summary>
     public NotificationLevel Level { get; set; }
 
     /// <summary>
-    /// Gets or sets creation timestamp.
+    ///     Gets or sets creation timestamp.
     /// </summary>
     public DateTimeOffset CreatedAt { get; set; }
 
     /// <summary>
-    /// Gets or sets optional source/category text.
+    ///     Gets or sets optional source/category text.
     /// </summary>
-    public string Source
-    {
-        get;
-        set => field = value ?? string.Empty;
-    }
+    public string Source { get; set; }
 
     /// <summary>
-    /// Gets or sets whether item is read.
+    ///     Gets or sets whether item is read.
     /// </summary>
     public bool IsRead { get; set; }
 
     /// <summary>
-    /// Gets or sets whether item is pinned.
+    ///     Gets or sets whether item is pinned.
     /// </summary>
     public bool IsPinned { get; set; }
 }

@@ -12,15 +12,11 @@ public sealed class CalendarMonthViewControlTests
     [Test]
     public void CalendarMonthViewRenderShowsMonthWeekdayHeadersAndSelection()
     {
-        var control = new CalendarMonthView
-        {
-            Today = new DateOnly(2026, 3, 15),
-            ShowAdjacentMonthDays = true,
-        };
+        var control = new CalendarMonthView { Today = new DateOnly(2026, 3, 15), ShowAdjacentMonthDays = true };
         control.SetDisplayedMonth(new DateOnly(2026, 3, 1));
         control.SelectDate(new DateOnly(2026, 3, 15));
 
-        var output = Render(control, width: 36, height: 10);
+        var output = Render(control, 36, 10);
 
         Assert.That(output.Contains("March 2026", StringComparison.Ordinal), Is.True);
         Assert.That(output.Contains("Mo", StringComparison.Ordinal), Is.True);
@@ -30,10 +26,7 @@ public sealed class CalendarMonthViewControlTests
     [Test]
     public void CalendarMonthViewKeyboardNavigationChangesSelectionAndRaisesEvent()
     {
-        var control = new CalendarMonthView
-        {
-            IsFocused = true,
-        };
+        var control = new CalendarMonthView { IsFocused = true };
         control.SelectDate(new DateOnly(2026, 3, 15));
         DateOnly previous = default;
         DateOnly selected = default;
@@ -57,15 +50,12 @@ public sealed class CalendarMonthViewControlTests
     [Test]
     public void CalendarMonthViewPointerPressSelectsDay()
     {
-        var control = new CalendarMonthView
-        {
-            ShowAdjacentMonthDays = true,
-        };
+        var control = new CalendarMonthView { ShowAdjacentMonthDays = true };
         control.SetDisplayedMonth(new DateOnly(2026, 3, 1));
         control.SelectDate(new DateOnly(2026, 3, 1));
 
         var handled = control.Handle(
-            new PointerInput(PointerEventKind.Press, PointerButton.Left, X: 17, Y: 5),
+            new PointerInput(PointerEventKind.Press, PointerButton.Left, 17, 5),
             new Rect(0, 0, 36, 10));
 
         Assert.That(handled, Is.True);
@@ -81,11 +71,11 @@ public sealed class CalendarMonthViewControlTests
             IsFocused = true,
             Title = "Plan",
             FocusMarker = "!",
-            FocusedTitleStyle = style,
+            FocusedTitleStyle = style
         };
         control.SelectDate(new DateOnly(2026, 3, 15));
 
-        var output = Render(control, width: 36, height: 10);
+        var output = Render(control, 36, 10);
 
         Assert.That(output.Contains("38;2;101;202;77", StringComparison.Ordinal), Is.True);
         Assert.That(output.Contains("Plan !", StringComparison.Ordinal), Is.True);
@@ -107,7 +97,7 @@ public sealed class CalendarMonthViewControlTests
         var second = secondCanvas.Render();
 
         Assert.That(first, Is.EqualTo(second));
-        Assert.That(first.Contains("\u001b[", StringComparison.Ordinal), Is.False);
+        Assert.That(first.Contains("\e[", StringComparison.Ordinal), Is.False);
     }
 
     private static string Render(CalendarMonthView control, int width, int height)

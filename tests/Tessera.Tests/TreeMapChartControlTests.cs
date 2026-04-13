@@ -12,20 +12,15 @@ public sealed class TreeMapChartControlTests
     [Test]
     public void ControlsTreeMapChartRendersTitleCellsAndLabels()
     {
-        var control = new TreeMapChart
-        {
-            Title = "Capacity",
-            ShowLabels = true,
-            ShowLegend = true,
-        };
+        var control = new TreeMapChart { Title = "Capacity", ShowLabels = true, ShowLegend = true };
         control.SetNodes(
         [
             new TreeMapNode("services",
             [
                 new TreeMapNode("api", 50),
-                new TreeMapNode("worker", 30),
+                new TreeMapNode("worker", 30)
             ]),
-            new TreeMapNode("db", 20),
+            new TreeMapNode("db", 20)
         ]);
 
         var output = Render(control, 56, 14);
@@ -34,7 +29,8 @@ public sealed class TreeMapChartControlTests
         TestAssert.True(output.Contains("api", StringComparison.Ordinal), "TreeMap should render leaf labels.");
         TestAssert.True(output.Contains("db", StringComparison.Ordinal), "TreeMap should render all leaf nodes.");
         TestAssert.True(output.Contains("low", StringComparison.Ordinal), "TreeMap should render implicit legend.");
-        TestAssert.True(output.Contains('█') || output.Contains('▓') || output.Contains('▒') || output.Contains('░'), "TreeMap should render weighted fill glyphs.");
+        TestAssert.True(output.Contains('█') || output.Contains('▓') || output.Contains('▒') || output.Contains('░'),
+            "TreeMap should render weighted fill glyphs.");
     }
 
     [Test]
@@ -45,13 +41,13 @@ public sealed class TreeMapChartControlTests
             Border = BorderStyle.None,
             ShowLabels = false,
             ShowLegend = false,
-            IsFocused = true,
+            IsFocused = true
         };
         control.SetNodes(
         [
             new TreeMapNode("a", 10),
             new TreeMapNode("b", 10),
-            new TreeMapNode("c", 10),
+            new TreeMapNode("c", 10)
         ]);
         _ = Render(control, 30, 8);
 
@@ -59,7 +55,8 @@ public sealed class TreeMapChartControlTests
         control.SelectionChanged += (_, _) => events++;
 
         var keyHandled = control.Handle(new KeyPressed(Key.Right));
-        var pointerHandled = control.Handle(new PointerInput(PointerEventKind.Press, PointerButton.Left, 24, 2), new Rect(0, 0, 30, 8));
+        var pointerHandled = control.Handle(new PointerInput(PointerEventKind.Press, PointerButton.Left, 24, 2),
+            new Rect(0, 0, 30, 8));
 
         TestAssert.True(keyHandled, "Keyboard navigation should move selection.");
         TestAssert.True(pointerHandled, "Pointer press should select hit node.");
@@ -82,38 +79,38 @@ public sealed class TreeMapChartControlTests
             BorderStyleText = TesseraStyle.Empty.WithForeground(AnsiColor.Rgb(10, 10, 10)),
             FocusedBorderStyleText = focusedBorderStyle,
             PeakNodeStyle = peakStyle,
-            SelectedNodeStyle = selectedStyle,
+            SelectedNodeStyle = selectedStyle
         };
         control.SetNodes([new TreeMapNode("hot", 100), new TreeMapNode("cold", 10)]);
         _ = control.SetSelectedIndex(0);
 
         var output = Render(control, 26, 8, CanvasTextMode.GraphemeAware);
 
-        TestAssert.True(output.Contains("38;2;11;22;33", StringComparison.Ordinal), "Node style should emit ANSI foreground sequence.");
-        TestAssert.True(output.Contains("48;2;44;55;66", StringComparison.Ordinal), "Selected style should emit ANSI background sequence.");
-        TestAssert.True(output.Contains(focusedBorderStyle.Render("┌"), StringComparison.Ordinal), "Focused border style should apply to frame glyphs.");
+        TestAssert.True(output.Contains("38;2;11;22;33", StringComparison.Ordinal),
+            "Node style should emit ANSI foreground sequence.");
+        TestAssert.True(output.Contains("48;2;44;55;66", StringComparison.Ordinal),
+            "Selected style should emit ANSI background sequence.");
+        TestAssert.True(output.Contains(focusedBorderStyle.Render("┌"), StringComparison.Ordinal),
+            "Focused border style should apply to frame glyphs.");
     }
 
     [Test]
     public void ControlsTreeMapChartDefaultRenderIsDeterministicAndMonochrome()
     {
-        var control = new TreeMapChart
-        {
-            ShowLabels = false,
-            ShowLegend = false,
-        };
+        var control = new TreeMapChart { ShowLabels = false, ShowLegend = false };
         control.SetNodes(
         [
             new TreeMapNode("one", 1),
             new TreeMapNode("two", 2),
-            new TreeMapNode("three", 3),
+            new TreeMapNode("three", 3)
         ]);
 
         var first = Render(control, 24, 8);
         var second = Render(control, 24, 8);
 
         TestAssert.Equal(first, second, "TreeMap should render deterministically for identical state.");
-        TestAssert.True(!first.Contains("\u001b[", StringComparison.Ordinal), "Default TreeMap output should remain monochrome.");
+        TestAssert.True(!first.Contains("\e[", StringComparison.Ordinal),
+            "Default TreeMap output should remain monochrome.");
     }
 
     private static string Render(TreeMapChart control, int width, int height, CanvasTextMode mode = CanvasTextMode.Fast)

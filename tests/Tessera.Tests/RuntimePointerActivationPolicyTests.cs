@@ -1,6 +1,7 @@
 using NUnit.Framework;
 using Tessera.Controls;
 using Tessera.Layout;
+
 namespace Tessera.Tests;
 
 [TestFixture]
@@ -51,7 +52,7 @@ public sealed class RuntimePointerActivationPolicyTests
             {
                 PointerActivationPolicy = PointerActivationPolicy.DoubleClick,
                 DoubleClickTimeout = TimeSpan.FromSeconds(5),
-                DoubleClickSlop = 1,
+                DoubleClickSlop = 1
             });
 
         _ = app.UpdateRuntime(new PointerInput(PointerEventKind.Press, PointerButton.Left, 0, 0));
@@ -73,7 +74,7 @@ public sealed class RuntimePointerActivationPolicyTests
             {
                 PointerActivationPolicy = PointerActivationPolicy.DoubleClick,
                 DoubleClickTimeout = TimeSpan.FromSeconds(5),
-                DoubleClickSlop = 0,
+                DoubleClickSlop = 0
             });
 
         _ = app.UpdateRuntime(new PointerInput(PointerEventKind.Press, PointerButton.Left, 0, 0));
@@ -92,7 +93,7 @@ public sealed class RuntimePointerActivationPolicyTests
             {
                 PointerActivationPolicy = PointerActivationPolicy.SingleClick,
                 DoubleClickTimeout = TimeSpan.FromSeconds(5),
-                DoubleClickSlop = 1,
+                DoubleClickSlop = 1
             });
 
         _ = app.UpdateRuntime(new PointerInput(PointerEventKind.Press, PointerButton.Left, 1, 1));
@@ -123,7 +124,7 @@ public sealed class RuntimePointerActivationPolicyTests
             {
                 PointerActivationPolicy = PointerActivationPolicy.SingleClick,
                 DoubleClickTimeout = TimeSpan.FromSeconds(5),
-                DoubleClickSlop = 1,
+                DoubleClickSlop = 1
             });
 
         _ = app.UpdateRuntime(new PointerInput(PointerEventKind.Press, PointerButton.Left, 0, 0));
@@ -141,7 +142,7 @@ public sealed class RuntimePointerActivationPolicyTests
             {
                 PointerActivationPolicy = PointerActivationPolicy.DoubleClick,
                 DoubleClickTimeout = TimeSpan.FromSeconds(5),
-                DoubleClickSlop = 1,
+                DoubleClickSlop = 1
             });
 
         _ = app.UpdateRuntime(new PointerInput(PointerEventKind.Press, PointerButton.Left, 1, 1));
@@ -174,7 +175,7 @@ public sealed class RuntimePointerActivationPolicyTests
             {
                 PointerActivationPolicy = PointerActivationPolicy.DoubleClick,
                 DoubleClickTimeout = TimeSpan.FromSeconds(5),
-                DoubleClickSlop = 1,
+                DoubleClickSlop = 1
             });
 
         _ = app.UpdateRuntime(new PointerInput(PointerEventKind.Press, PointerButton.Left, 1, 1));
@@ -205,7 +206,7 @@ public sealed class RuntimePointerActivationPolicyTests
             {
                 PointerActivationPolicy = PointerActivationPolicy.DoubleClick,
                 DoubleClickTimeout = TimeSpan.FromSeconds(5),
-                DoubleClickSlop = 1,
+                DoubleClickSlop = 1
             });
 
         _ = app.UpdateRuntime(new PointerInput(PointerEventKind.Press, PointerButton.Left, 1, 1));
@@ -224,7 +225,7 @@ public sealed class RuntimePointerActivationPolicyTests
             {
                 PointerActivationPolicy = PointerActivationPolicy.DoubleClick,
                 DoubleClickTimeout = TimeSpan.FromSeconds(5),
-                DoubleClickSlop = 1,
+                DoubleClickSlop = 1
             });
 
         _ = app.UpdateRuntime(new PointerInput(PointerEventKind.Press, PointerButton.Left, 1, 1));
@@ -243,7 +244,7 @@ public sealed class RuntimePointerActivationPolicyTests
             {
                 PointerActivationPolicy = PointerActivationPolicy.DoubleClick,
                 DoubleClickTimeout = TimeSpan.FromSeconds(5),
-                DoubleClickSlop = 1,
+                DoubleClickSlop = 1
             });
 
         _ = app.UpdateRuntime(new PointerInput(PointerEventKind.Press, PointerButton.Left, 2, 2));
@@ -285,7 +286,7 @@ public sealed class RuntimePointerActivationPolicyTests
             {
                 PointerActivationPolicy = PointerActivationPolicy.SingleClick,
                 DoubleClickTimeout = TimeSpan.FromSeconds(5),
-                DoubleClickSlop = 1,
+                DoubleClickSlop = 1
             });
         _ = app.UpdateRuntime(new WindowResized(64, 6));
         _ = app.RenderRuntime();
@@ -328,7 +329,7 @@ public sealed class RuntimePointerActivationPolicyTests
                     {
                         PointerActivationPolicy = PointerActivationPolicy.SingleClick,
                         DoubleClickTimeout = TimeSpan.FromSeconds(5),
-                        DoubleClickSlop = 1,
+                        DoubleClickSlop = 1
                     });
                 _ = probe.UpdateRuntime(new WindowResized(width, height));
                 _ = probe.RenderRuntime();
@@ -358,7 +359,10 @@ public sealed class RuntimePointerActivationPolicyTests
             return null;
         }
 
-        public override Screen Build(ScreenContext context) => Screen.From("policy");
+        public override Screen Build(ScreenContext context)
+        {
+            return Screen.From("policy");
+        }
     }
 
     private sealed class CaptureMessageApp : TesseraApp
@@ -371,20 +375,36 @@ public sealed class RuntimePointerActivationPolicyTests
             return null;
         }
 
-        public override Screen Build(ScreenContext context) => Screen.From("capture");
+        public override Screen Build(ScreenContext context)
+        {
+            return Screen.From("capture");
+        }
     }
 
     private sealed class TabsInteractionApp : TesseraApp
     {
         public Tabs Tabs { get; } = new("Overview", "Operations", "Audit");
 
-        public override TesseraEffect? Update(Message message) => null;
+        public override TesseraEffect? Update(Message message)
+        {
+            return null;
+        }
 
-        public override Screen Build(ScreenContext context) => Screen.From(Tabs);
+        public override Screen Build(ScreenContext context)
+        {
+            return Screen.From(Tabs);
+        }
     }
 
     private sealed class FocusRoutingApp : TesseraApp
     {
+        public FocusRoutingApp()
+        {
+            LeftButton.Activated += (_, _) => LeftActivationCount++;
+            RightButton.Activated += (_, _) => RightActivationCount++;
+            LeftButton.RequestFocus();
+        }
+
         public Button LeftButton { get; } = new() { Text = "Left" };
 
         public Button RightButton { get; } = new() { Text = "Right" };
@@ -393,21 +413,14 @@ public sealed class RuntimePointerActivationPolicyTests
 
         public int RightActivationCount { get; private set; }
 
-        public FocusRoutingApp()
+        public override TesseraEffect? Update(Message message)
         {
-            LeftButton.Activated += (_, _) => LeftActivationCount++;
-            RightButton.Activated += (_, _) => RightActivationCount++;
-            LeftButton.RequestFocus();
+            return null;
         }
-
-        public override TesseraEffect? Update(Message message) => null;
 
         public override Screen Build(ScreenContext context)
         {
-            var row = new RowLayout
-            {
-                Gap = 2,
-            };
+            var row = new RowLayout { Gap = 2 };
             row.AddFixed(LeftButton, 12);
             row.AddFixed(RightButton, 12);
             return Screen.From(row);

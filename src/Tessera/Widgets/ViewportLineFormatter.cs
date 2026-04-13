@@ -24,7 +24,8 @@ internal static class ViewportLineFormatter
         return Math.Max(2, digits);
     }
 
-    public static string ClipLine(string line, bool wrap, int width, int xOffset, bool showLineNumbers, int lineNumberWidth)
+    public static string ClipLine(string line, bool wrap, int width, int xOffset, bool showLineNumbers,
+        int lineNumberWidth)
     {
         var availableWidth = showLineNumbers
             ? Math.Max(0, width - (lineNumberWidth + 2))
@@ -32,7 +33,8 @@ internal static class ViewportLineFormatter
         return FormatNoDecoration(line, wrap, availableWidth, xOffset);
     }
 
-    public static string DecorateLine(string line, bool showLineNumbers, int? highlightVisualLine, int visualIndex, int lineNumberWidth, int width)
+    public static string DecorateLine(string line, bool showLineNumbers, int? highlightVisualLine, int visualIndex,
+        int lineNumberWidth, int width)
     {
         if (!showLineNumbers && highlightVisualLine != visualIndex)
         {
@@ -44,7 +46,7 @@ internal static class ViewportLineFormatter
             return highlightVisualLine == visualIndex ? $"> {line}" : $"  {line}";
         }
 
-        var lineNumber = (visualIndex + 1).ToString(System.Globalization.CultureInfo.InvariantCulture).PadLeft(lineNumberWidth);
+        var lineNumber = (visualIndex + 1).ToString(CultureInfo.InvariantCulture).PadLeft(lineNumberWidth);
         var marker = highlightVisualLine == visualIndex ? ">" : " ";
         var prefix = $"{lineNumber}{marker} ";
         if (prefix.Length >= width)
@@ -109,7 +111,8 @@ internal static class ViewportLineFormatter
                 WritePrefix(destination, state.visualIndex, state.lineNumberWidth, state.isHighlighted);
                 if (state.contentLength > 0)
                 {
-                    state.line.AsSpan(state.sliceStart, state.contentLength).CopyTo(destination[(state.lineNumberWidth + 2)..]);
+                    state.line.AsSpan(state.sliceStart, state.contentLength)
+                        .CopyTo(destination[(state.lineNumberWidth + 2)..]);
                 }
             });
     }

@@ -1,4 +1,4 @@
-﻿using Tessera.Components.Primitives;
+using Tessera.Components.Primitives;
 using Tessera.Controls.Internal;
 using Tessera.Layout;
 using Tessera.Styles;
@@ -6,41 +6,28 @@ using Tessera.Styles;
 namespace Tessera.Controls;
 
 /// <summary>
-/// Represents a compact one-line paginator.
+///     Represents a compact one-line paginator.
 /// </summary>
 public sealed class Paginator : Control
 {
     private const string PreviousLabel = "Prev";
     private const string NextLabel = "Next";
-
-    private int _pageIndex;
     private int _pageCount = 1;
 
-    /// <summary>
-    /// Occurs when <see cref="PageIndex"/> changes.
-    /// </summary>
-    public event EventHandler<PageChangedEventArgs>? PageChanged;
+    private int _pageIndex;
 
     /// <summary>
-    /// Gets or sets the optional title shown before the pager labels.
+    ///     Gets or sets the optional title shown before the pager labels.
     /// </summary>
-    public string Title
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = string.Empty;
+    public string Title { get; set; } = string.Empty;
 
     /// <summary>
-    /// Gets or sets the marker shown in the title when the control is focused.
+    ///     Gets or sets the marker shown in the title when the control is focused.
     /// </summary>
-    public string FocusMarker
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = "*";
+    public string FocusMarker { get; set; } = "*";
 
     /// <summary>
-    /// Gets or sets a value indicating whether the focus marker should be rendered in the title when focused.
+    ///     Gets or sets a value indicating whether the focus marker should be rendered in the title when focused.
     /// </summary>
     public bool ShowFocusMarker
     {
@@ -49,7 +36,7 @@ public sealed class Paginator : Control
     } = true;
 
     /// <summary>
-    /// Gets or sets the title style applied when the control is not focused.
+    ///     Gets or sets the title style applied when the control is not focused.
     /// </summary>
     public TesseraStyle TitleStyle
     {
@@ -58,7 +45,7 @@ public sealed class Paginator : Control
     } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the title style applied when the control is focused.
+    ///     Gets or sets the title style applied when the control is focused.
     /// </summary>
     public TesseraStyle FocusedTitleStyle
     {
@@ -67,7 +54,7 @@ public sealed class Paginator : Control
     } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the base style used for pager labels.
+    ///     Gets or sets the base style used for pager labels.
     /// </summary>
     public TesseraStyle LabelStyle
     {
@@ -76,7 +63,7 @@ public sealed class Paginator : Control
     } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the style merged into the page label.
+    ///     Gets or sets the style merged into the page label.
     /// </summary>
     public TesseraStyle ActivePageLabelStyle
     {
@@ -85,7 +72,7 @@ public sealed class Paginator : Control
     } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the style merged into disabled navigation labels.
+    ///     Gets or sets the style merged into disabled navigation labels.
     /// </summary>
     public TesseraStyle DisabledNavigationLabelStyle
     {
@@ -94,7 +81,7 @@ public sealed class Paginator : Control
     } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the current page index (zero-based).
+    ///     Gets or sets the current page index (zero-based).
     /// </summary>
     public int PageIndex
     {
@@ -114,10 +101,10 @@ public sealed class Paginator : Control
     }
 
     /// <summary>
-    /// Gets or sets the total page count.
+    ///     Gets or sets the total page count.
     /// </summary>
     /// <remarks>
-    /// Values less than one are normalized to <c>1</c>.
+    ///     Values less than one are normalized to <c>1</c>.
     /// </remarks>
     public int PageCount
     {
@@ -147,20 +134,34 @@ public sealed class Paginator : Control
     }
 
     /// <summary>
-    /// Moves to the next page when possible.
+    ///     Occurs when <see cref="PageIndex" /> changes.
     /// </summary>
-    public void NextPage() => TrySetPage(_pageIndex + 1);
+    public event EventHandler<PageChangedEventArgs>? PageChanged;
 
     /// <summary>
-    /// Moves to the previous page when possible.
+    ///     Moves to the next page when possible.
     /// </summary>
-    public void PreviousPage() => TrySetPage(_pageIndex - 1);
+    public void NextPage()
+    {
+        TrySetPage(_pageIndex + 1);
+    }
 
     /// <summary>
-    /// Sets the current page index using bounds clamping.
+    ///     Moves to the previous page when possible.
+    /// </summary>
+    public void PreviousPage()
+    {
+        TrySetPage(_pageIndex - 1);
+    }
+
+    /// <summary>
+    ///     Sets the current page index using bounds clamping.
     /// </summary>
     /// <param name="pageIndex">The requested page index.</param>
-    public void SetPage(int pageIndex) => TrySetPage(pageIndex);
+    public void SetPage(int pageIndex)
+    {
+        TrySetPage(pageIndex);
+    }
 
     /// <inheritdoc />
     public override bool Handle(Message message)
@@ -266,10 +267,10 @@ public sealed class Paginator : Control
     internal override LayoutMeasurement Measure(in Rect availableBounds)
     {
         var width = ControlTextLayout.MeasureDisplayWidth(PreviousLabel)
-            + 2
-            + ControlTextLayout.MeasureDisplayWidth(CurrentPageLabel())
-            + 2
-            + ControlTextLayout.MeasureDisplayWidth(NextLabel);
+                    + 2
+                    + ControlTextLayout.MeasureDisplayWidth(CurrentPageLabel())
+                    + 2
+                    + ControlTextLayout.MeasureDisplayWidth(NextLabel);
         var title = FormatTitleText();
         if (!string.IsNullOrEmpty(title))
         {
@@ -300,11 +301,20 @@ public sealed class Paginator : Control
         return previous != _pageIndex;
     }
 
-    private bool CanMovePrevious() => _pageIndex > 0;
+    private bool CanMovePrevious()
+    {
+        return _pageIndex > 0;
+    }
 
-    private bool CanMoveNext() => _pageIndex < (_pageCount - 1);
+    private bool CanMoveNext()
+    {
+        return _pageIndex < _pageCount - 1;
+    }
 
-    private string CurrentPageLabel() => $"Page {_pageIndex + 1}/{_pageCount}";
+    private string CurrentPageLabel()
+    {
+        return $"Page {_pageIndex + 1}/{_pageCount}";
+    }
 
     private string FormatTitleText()
     {

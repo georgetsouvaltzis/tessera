@@ -1,14 +1,14 @@
-﻿using Tessera.Controls;
+using Tessera.Controls;
 
 namespace Tessera.Styles;
 
 /// <summary>
-/// Represents tessera theme control extensions data and flow apply extensions.
+///     Represents tessera theme control extensions data and flow apply extensions.
 /// </summary>
 public static class TesseraThemeControlExtensionsDataAndFlowApplyExtensions
 {
     /// <summary>
-    /// Applies a resolved theme to a <see cref="DataGrid"/>.
+    ///     Applies a resolved theme to a <see cref="DataGrid" />.
     /// </summary>
     public static DataGrid ApplyTheme(this DataGrid control, TesseraTheme theme)
     {
@@ -30,7 +30,7 @@ public static class TesseraThemeControlExtensionsDataAndFlowApplyExtensions
     }
 
     /// <summary>
-    /// Resolves and applies hierarchical overrides to a <see cref="DataGrid"/>.
+    ///     Resolves and applies hierarchical overrides to a <see cref="DataGrid" />.
     /// </summary>
     public static DataGrid ApplyTheme(
         this DataGrid control,
@@ -43,7 +43,7 @@ public static class TesseraThemeControlExtensionsDataAndFlowApplyExtensions
     }
 
     /// <summary>
-    /// Applies a resolved theme to a <see cref="TreeTable"/>.
+    ///     Applies a resolved theme to a <see cref="TreeTable" />.
     /// </summary>
     public static TreeTable ApplyTheme(this TreeTable control, TesseraTheme theme)
     {
@@ -65,7 +65,7 @@ public static class TesseraThemeControlExtensionsDataAndFlowApplyExtensions
     }
 
     /// <summary>
-    /// Resolves and applies hierarchical overrides to a <see cref="TreeTable"/>.
+    ///     Resolves and applies hierarchical overrides to a <see cref="TreeTable" />.
     /// </summary>
     public static TreeTable ApplyTheme(
         this TreeTable control,
@@ -78,7 +78,7 @@ public static class TesseraThemeControlExtensionsDataAndFlowApplyExtensions
     }
 
     /// <summary>
-    /// Applies a resolved theme to a <see cref="KeyValueList"/>.
+    ///     Applies a resolved theme to a <see cref="KeyValueList" />.
     /// </summary>
     public static KeyValueList ApplyTheme(this KeyValueList control, TesseraTheme theme)
     {
@@ -98,7 +98,7 @@ public static class TesseraThemeControlExtensionsDataAndFlowApplyExtensions
     }
 
     /// <summary>
-    /// Resolves and applies hierarchical overrides to a <see cref="KeyValueList"/>.
+    ///     Resolves and applies hierarchical overrides to a <see cref="KeyValueList" />.
     /// </summary>
     public static KeyValueList ApplyTheme(
         this KeyValueList control,
@@ -111,7 +111,7 @@ public static class TesseraThemeControlExtensionsDataAndFlowApplyExtensions
     }
 
     /// <summary>
-    /// Applies a resolved theme to an <see cref="EmptyState"/>.
+    ///     Applies a resolved theme to an <see cref="EmptyState" />.
     /// </summary>
     public static EmptyState ApplyTheme(this EmptyState control, TesseraTheme theme)
     {
@@ -131,7 +131,7 @@ public static class TesseraThemeControlExtensionsDataAndFlowApplyExtensions
     }
 
     /// <summary>
-    /// Resolves and applies hierarchical overrides to an <see cref="EmptyState"/>.
+    ///     Resolves and applies hierarchical overrides to an <see cref="EmptyState" />.
     /// </summary>
     public static EmptyState ApplyTheme(
         this EmptyState control,
@@ -144,7 +144,7 @@ public static class TesseraThemeControlExtensionsDataAndFlowApplyExtensions
     }
 
     /// <summary>
-    /// Applies a resolved theme to a <see cref="ValidationSummary"/>.
+    ///     Applies a resolved theme to a <see cref="ValidationSummary" />.
     /// </summary>
     public static ValidationSummary ApplyTheme(this ValidationSummary control, TesseraTheme theme)
     {
@@ -168,7 +168,7 @@ public static class TesseraThemeControlExtensionsDataAndFlowApplyExtensions
     }
 
     /// <summary>
-    /// Resolves and applies hierarchical overrides to a <see cref="ValidationSummary"/>.
+    ///     Resolves and applies hierarchical overrides to a <see cref="ValidationSummary" />.
     /// </summary>
     public static ValidationSummary ApplyTheme(
         this ValidationSummary control,
@@ -181,7 +181,7 @@ public static class TesseraThemeControlExtensionsDataAndFlowApplyExtensions
     }
 
     /// <summary>
-    /// Applies a resolved theme to a <see cref="Timeline"/>.
+    ///     Applies a resolved theme to a <see cref="Timeline" />.
     /// </summary>
     public static Timeline ApplyTheme(this Timeline control, TesseraTheme theme)
     {
@@ -204,7 +204,7 @@ public static class TesseraThemeControlExtensionsDataAndFlowApplyExtensions
     }
 
     /// <summary>
-    /// Resolves and applies hierarchical overrides to a <see cref="Timeline"/>.
+    ///     Resolves and applies hierarchical overrides to a <see cref="Timeline" />.
     /// </summary>
     public static Timeline ApplyTheme(
         this Timeline control,
@@ -217,7 +217,7 @@ public static class TesseraThemeControlExtensionsDataAndFlowApplyExtensions
     }
 
     /// <summary>
-    /// Applies a resolved theme to a <see cref="Stepper"/>.
+    ///     Applies a resolved theme to a <see cref="Stepper" />.
     /// </summary>
     public static Stepper ApplyTheme(this Stepper control, TesseraTheme theme)
     {
@@ -237,7 +237,7 @@ public static class TesseraThemeControlExtensionsDataAndFlowApplyExtensions
     }
 
     /// <summary>
-    /// Resolves and applies hierarchical overrides to a <see cref="Stepper"/>.
+    ///     Resolves and applies hierarchical overrides to a <see cref="Stepper" />.
     /// </summary>
     public static Stepper ApplyTheme(
         this Stepper control,
@@ -251,12 +251,12 @@ public static class TesseraThemeControlExtensionsDataAndFlowApplyExtensions
 }
 
 /// <summary>
-/// Represents tessera theme control extensions data and flow default extensions.
+///     Represents tessera theme control extensions data and flow default extensions.
 /// </summary>
 public static class TesseraThemeControlExtensionsDataAndFlowDefaultExtensions
 {
     /// <summary>
-    /// Applies theme defaults to a <see cref="DataGrid"/> without overwriting explicit non-empty styles.
+    ///     Applies theme defaults to a <see cref="DataGrid" /> without overwriting explicit non-empty styles.
     /// </summary>
     public static DataGrid ApplyThemeDefaults(this DataGrid control, TesseraTheme theme)
     {
@@ -264,23 +264,28 @@ public static class TesseraThemeControlExtensionsDataAndFlowDefaultExtensions
         ArgumentNullException.ThrowIfNull(theme);
 
         control.TitleStyle = TesseraThemeControlExtensions.ApplyDefault(control.TitleStyle, theme.Text.Secondary);
-        control.FocusedTitleStyle = TesseraThemeControlExtensions.ApplyDefault(control.FocusedTitleStyle, theme.Focus.Title);
+        control.FocusedTitleStyle =
+            TesseraThemeControlExtensions.ApplyDefault(control.FocusedTitleStyle, theme.Focus.Title);
         control.HeaderStyle = TesseraThemeControlExtensions.ApplyDefault(control.HeaderStyle, theme.Text.Secondary);
         control.RowStyle = TesseraThemeControlExtensions.ApplyDefault(control.RowStyle, theme.Text.Primary);
         control.SelectedRowStyle = TesseraThemeControlExtensions.ApplyDefault(
             control.SelectedRowStyle,
             theme.Selection.Foreground.Merge(theme.Selection.Background));
-        control.SelectedCellStyle = TesseraThemeControlExtensions.ApplyDefault(control.SelectedCellStyle, theme.Accent.Primary);
+        control.SelectedCellStyle =
+            TesseraThemeControlExtensions.ApplyDefault(control.SelectedCellStyle, theme.Accent.Primary);
         control.MutedStyle = TesseraThemeControlExtensions.ApplyDefault(control.MutedStyle, theme.Text.Muted);
         control.DisabledStyle = TesseraThemeControlExtensions.ApplyDefault(control.DisabledStyle, theme.Text.Muted);
-        control.BorderStyleText = TesseraThemeControlExtensions.ApplyDefault(control.BorderStyleText, theme.Border.Default);
-        control.FocusedBorderStyleText = TesseraThemeControlExtensions.ApplyDefault(control.FocusedBorderStyleText, theme.Border.Focused.Merge(theme.Focus.Border));
+        control.BorderStyleText =
+            TesseraThemeControlExtensions.ApplyDefault(control.BorderStyleText, theme.Border.Default);
+        control.FocusedBorderStyleText = TesseraThemeControlExtensions.ApplyDefault(control.FocusedBorderStyleText,
+            theme.Border.Focused.Merge(theme.Focus.Border));
         control.FocusMarker = TesseraThemeControlExtensions.ApplyDefault(control.FocusMarker, theme.Focus.Marker);
         return control;
     }
 
     /// <summary>
-    /// Resolves and applies hierarchical defaults to a <see cref="DataGrid"/> without overwriting explicit non-empty styles.
+    ///     Resolves and applies hierarchical defaults to a <see cref="DataGrid" /> without overwriting explicit non-empty
+    ///     styles.
     /// </summary>
     public static DataGrid ApplyThemeDefaults(
         this DataGrid control,
@@ -293,7 +298,7 @@ public static class TesseraThemeControlExtensionsDataAndFlowDefaultExtensions
     }
 
     /// <summary>
-    /// Applies theme defaults to a <see cref="TreeTable"/> without overwriting explicit non-empty styles.
+    ///     Applies theme defaults to a <see cref="TreeTable" /> without overwriting explicit non-empty styles.
     /// </summary>
     public static TreeTable ApplyThemeDefaults(this TreeTable control, TesseraTheme theme)
     {
@@ -301,23 +306,29 @@ public static class TesseraThemeControlExtensionsDataAndFlowDefaultExtensions
         ArgumentNullException.ThrowIfNull(theme);
 
         control.TitleStyle = TesseraThemeControlExtensions.ApplyDefault(control.TitleStyle, theme.Text.Secondary);
-        control.FocusedTitleStyle = TesseraThemeControlExtensions.ApplyDefault(control.FocusedTitleStyle, theme.Focus.Title);
+        control.FocusedTitleStyle =
+            TesseraThemeControlExtensions.ApplyDefault(control.FocusedTitleStyle, theme.Focus.Title);
         control.HeaderStyle = TesseraThemeControlExtensions.ApplyDefault(control.HeaderStyle, theme.Text.Secondary);
-        control.BranchRowStyle = TesseraThemeControlExtensions.ApplyDefault(control.BranchRowStyle, theme.Accent.Primary);
+        control.BranchRowStyle =
+            TesseraThemeControlExtensions.ApplyDefault(control.BranchRowStyle, theme.Accent.Primary);
         control.LeafRowStyle = TesseraThemeControlExtensions.ApplyDefault(control.LeafRowStyle, theme.Text.Primary);
-        control.HoveredRowStyle = TesseraThemeControlExtensions.ApplyDefault(control.HoveredRowStyle, theme.Accent.Secondary);
+        control.HoveredRowStyle =
+            TesseraThemeControlExtensions.ApplyDefault(control.HoveredRowStyle, theme.Accent.Secondary);
         control.SelectedRowStyle = TesseraThemeControlExtensions.ApplyDefault(
             control.SelectedRowStyle,
             theme.Selection.Foreground.Merge(theme.Selection.Background));
         control.MutedRowStyle = TesseraThemeControlExtensions.ApplyDefault(control.MutedRowStyle, theme.Text.Muted);
-        control.BorderStyleText = TesseraThemeControlExtensions.ApplyDefault(control.BorderStyleText, theme.Border.Default);
-        control.FocusedBorderStyleText = TesseraThemeControlExtensions.ApplyDefault(control.FocusedBorderStyleText, theme.Border.Focused.Merge(theme.Focus.Border));
+        control.BorderStyleText =
+            TesseraThemeControlExtensions.ApplyDefault(control.BorderStyleText, theme.Border.Default);
+        control.FocusedBorderStyleText = TesseraThemeControlExtensions.ApplyDefault(control.FocusedBorderStyleText,
+            theme.Border.Focused.Merge(theme.Focus.Border));
         control.FocusMarker = TesseraThemeControlExtensions.ApplyDefault(control.FocusMarker, theme.Focus.Marker);
         return control;
     }
 
     /// <summary>
-    /// Resolves and applies hierarchical defaults to a <see cref="TreeTable"/> without overwriting explicit non-empty styles.
+    ///     Resolves and applies hierarchical defaults to a <see cref="TreeTable" /> without overwriting explicit non-empty
+    ///     styles.
     /// </summary>
     public static TreeTable ApplyThemeDefaults(
         this TreeTable control,
@@ -330,7 +341,7 @@ public static class TesseraThemeControlExtensionsDataAndFlowDefaultExtensions
     }
 
     /// <summary>
-    /// Applies theme defaults to a <see cref="KeyValueList"/> without overwriting explicit non-empty styles.
+    ///     Applies theme defaults to a <see cref="KeyValueList" /> without overwriting explicit non-empty styles.
     /// </summary>
     public static KeyValueList ApplyThemeDefaults(this KeyValueList control, TesseraTheme theme)
     {
@@ -338,21 +349,25 @@ public static class TesseraThemeControlExtensionsDataAndFlowDefaultExtensions
         ArgumentNullException.ThrowIfNull(theme);
 
         control.TitleStyle = TesseraThemeControlExtensions.ApplyDefault(control.TitleStyle, theme.Text.Secondary);
-        control.FocusedTitleStyle = TesseraThemeControlExtensions.ApplyDefault(control.FocusedTitleStyle, theme.Focus.Title);
+        control.FocusedTitleStyle =
+            TesseraThemeControlExtensions.ApplyDefault(control.FocusedTitleStyle, theme.Focus.Title);
         control.KeyStyle = TesseraThemeControlExtensions.ApplyDefault(control.KeyStyle, theme.Text.Secondary);
         control.ValueStyle = TesseraThemeControlExtensions.ApplyDefault(control.ValueStyle, theme.Text.Primary);
         control.SelectedRowStyle = TesseraThemeControlExtensions.ApplyDefault(
             control.SelectedRowStyle,
             theme.Selection.Foreground.Merge(theme.Selection.Background));
         control.SeparatorStyle = TesseraThemeControlExtensions.ApplyDefault(control.SeparatorStyle, theme.Text.Muted);
-        control.BorderStyleText = TesseraThemeControlExtensions.ApplyDefault(control.BorderStyleText, theme.Border.Default);
-        control.FocusedBorderStyleText = TesseraThemeControlExtensions.ApplyDefault(control.FocusedBorderStyleText, theme.Border.Focused.Merge(theme.Focus.Border));
+        control.BorderStyleText =
+            TesseraThemeControlExtensions.ApplyDefault(control.BorderStyleText, theme.Border.Default);
+        control.FocusedBorderStyleText = TesseraThemeControlExtensions.ApplyDefault(control.FocusedBorderStyleText,
+            theme.Border.Focused.Merge(theme.Focus.Border));
         control.FocusMarker = TesseraThemeControlExtensions.ApplyDefault(control.FocusMarker, theme.Focus.Marker);
         return control;
     }
 
     /// <summary>
-    /// Resolves and applies hierarchical defaults to a <see cref="KeyValueList"/> without overwriting explicit non-empty styles.
+    ///     Resolves and applies hierarchical defaults to a <see cref="KeyValueList" /> without overwriting explicit non-empty
+    ///     styles.
     /// </summary>
     public static KeyValueList ApplyThemeDefaults(
         this KeyValueList control,
@@ -365,7 +380,7 @@ public static class TesseraThemeControlExtensionsDataAndFlowDefaultExtensions
     }
 
     /// <summary>
-    /// Applies theme defaults to an <see cref="EmptyState"/> without overwriting explicit non-empty styles.
+    ///     Applies theme defaults to an <see cref="EmptyState" /> without overwriting explicit non-empty styles.
     /// </summary>
     public static EmptyState ApplyThemeDefaults(this EmptyState control, TesseraTheme theme)
     {
@@ -373,19 +388,24 @@ public static class TesseraThemeControlExtensionsDataAndFlowDefaultExtensions
         ArgumentNullException.ThrowIfNull(theme);
 
         control.TitleStyle = TesseraThemeControlExtensions.ApplyDefault(control.TitleStyle, theme.Text.Secondary);
-        control.FocusedTitleStyle = TesseraThemeControlExtensions.ApplyDefault(control.FocusedTitleStyle, theme.Focus.Title);
-        control.DescriptionStyle = TesseraThemeControlExtensions.ApplyDefault(control.DescriptionStyle, theme.Text.Primary);
+        control.FocusedTitleStyle =
+            TesseraThemeControlExtensions.ApplyDefault(control.FocusedTitleStyle, theme.Focus.Title);
+        control.DescriptionStyle =
+            TesseraThemeControlExtensions.ApplyDefault(control.DescriptionStyle, theme.Text.Primary);
         control.HintStyle = TesseraThemeControlExtensions.ApplyDefault(control.HintStyle, theme.Text.Muted);
         control.ActionStyle = TesseraThemeControlExtensions.ApplyDefault(control.ActionStyle, theme.Accent.Primary);
-        control.FocusedActionStyle = TesseraThemeControlExtensions.ApplyDefault(control.FocusedActionStyle, theme.Focus.Ring.Merge(theme.Accent.Primary));
-        control.HoveredActionStyle = TesseraThemeControlExtensions.ApplyDefault(control.HoveredActionStyle, theme.Accent.Secondary);
+        control.FocusedActionStyle = TesseraThemeControlExtensions.ApplyDefault(control.FocusedActionStyle,
+            theme.Focus.Ring.Merge(theme.Accent.Primary));
+        control.HoveredActionStyle =
+            TesseraThemeControlExtensions.ApplyDefault(control.HoveredActionStyle, theme.Accent.Secondary);
         control.DisabledStyle = TesseraThemeControlExtensions.ApplyDefault(control.DisabledStyle, theme.Text.Muted);
         control.FocusMarker = TesseraThemeControlExtensions.ApplyDefault(control.FocusMarker, theme.Focus.Marker);
         return control;
     }
 
     /// <summary>
-    /// Resolves and applies hierarchical defaults to an <see cref="EmptyState"/> without overwriting explicit non-empty styles.
+    ///     Resolves and applies hierarchical defaults to an <see cref="EmptyState" /> without overwriting explicit non-empty
+    ///     styles.
     /// </summary>
     public static EmptyState ApplyThemeDefaults(
         this EmptyState control,
@@ -398,7 +418,7 @@ public static class TesseraThemeControlExtensionsDataAndFlowDefaultExtensions
     }
 
     /// <summary>
-    /// Applies theme defaults to a <see cref="ValidationSummary"/> without overwriting explicit non-empty styles.
+    ///     Applies theme defaults to a <see cref="ValidationSummary" /> without overwriting explicit non-empty styles.
     /// </summary>
     public static ValidationSummary ApplyThemeDefaults(this ValidationSummary control, TesseraTheme theme)
     {
@@ -406,25 +426,36 @@ public static class TesseraThemeControlExtensionsDataAndFlowDefaultExtensions
         ArgumentNullException.ThrowIfNull(theme);
 
         control.TitleStyle = TesseraThemeControlExtensions.ApplyDefault(control.TitleStyle, theme.Text.Secondary);
-        control.FocusedTitleStyle = TesseraThemeControlExtensions.ApplyDefault(control.FocusedTitleStyle, theme.Focus.Title);
-        control.DefaultIssueStyle = TesseraThemeControlExtensions.ApplyDefault(control.DefaultIssueStyle, theme.Text.Primary);
-        control.InfoSeverityStyle = TesseraThemeControlExtensions.ApplyDefault(control.InfoSeverityStyle, theme.State.Info);
-        control.WarningSeverityStyle = TesseraThemeControlExtensions.ApplyDefault(control.WarningSeverityStyle, theme.State.Warning);
-        control.ErrorSeverityStyle = TesseraThemeControlExtensions.ApplyDefault(control.ErrorSeverityStyle, theme.State.Error);
+        control.FocusedTitleStyle =
+            TesseraThemeControlExtensions.ApplyDefault(control.FocusedTitleStyle, theme.Focus.Title);
+        control.DefaultIssueStyle =
+            TesseraThemeControlExtensions.ApplyDefault(control.DefaultIssueStyle, theme.Text.Primary);
+        control.InfoSeverityStyle =
+            TesseraThemeControlExtensions.ApplyDefault(control.InfoSeverityStyle, theme.State.Info);
+        control.WarningSeverityStyle =
+            TesseraThemeControlExtensions.ApplyDefault(control.WarningSeverityStyle, theme.State.Warning);
+        control.ErrorSeverityStyle =
+            TesseraThemeControlExtensions.ApplyDefault(control.ErrorSeverityStyle, theme.State.Error);
         control.SelectedIssueStyle = TesseraThemeControlExtensions.ApplyDefault(
             control.SelectedIssueStyle,
             theme.Selection.Foreground.Merge(theme.Selection.Background));
-        control.FocusedIssueStyle = TesseraThemeControlExtensions.ApplyDefault(control.FocusedIssueStyle, theme.Focus.Ring);
-        control.HoveredIssueStyle = TesseraThemeControlExtensions.ApplyDefault(control.HoveredIssueStyle, theme.Accent.Secondary);
-        control.DisabledIssueStyle = TesseraThemeControlExtensions.ApplyDefault(control.DisabledIssueStyle, theme.Text.Muted);
-        control.BorderStyleText = TesseraThemeControlExtensions.ApplyDefault(control.BorderStyleText, theme.Border.Default);
-        control.FocusedBorderStyleText = TesseraThemeControlExtensions.ApplyDefault(control.FocusedBorderStyleText, theme.Border.Focused.Merge(theme.Focus.Border));
+        control.FocusedIssueStyle =
+            TesseraThemeControlExtensions.ApplyDefault(control.FocusedIssueStyle, theme.Focus.Ring);
+        control.HoveredIssueStyle =
+            TesseraThemeControlExtensions.ApplyDefault(control.HoveredIssueStyle, theme.Accent.Secondary);
+        control.DisabledIssueStyle =
+            TesseraThemeControlExtensions.ApplyDefault(control.DisabledIssueStyle, theme.Text.Muted);
+        control.BorderStyleText =
+            TesseraThemeControlExtensions.ApplyDefault(control.BorderStyleText, theme.Border.Default);
+        control.FocusedBorderStyleText = TesseraThemeControlExtensions.ApplyDefault(control.FocusedBorderStyleText,
+            theme.Border.Focused.Merge(theme.Focus.Border));
         control.FocusMarker = TesseraThemeControlExtensions.ApplyDefault(control.FocusMarker, theme.Focus.Marker);
         return control;
     }
 
     /// <summary>
-    /// Resolves and applies hierarchical defaults to a <see cref="ValidationSummary"/> without overwriting explicit non-empty styles.
+    ///     Resolves and applies hierarchical defaults to a <see cref="ValidationSummary" /> without overwriting explicit
+    ///     non-empty styles.
     /// </summary>
     public static ValidationSummary ApplyThemeDefaults(
         this ValidationSummary control,
@@ -437,7 +468,7 @@ public static class TesseraThemeControlExtensionsDataAndFlowDefaultExtensions
     }
 
     /// <summary>
-    /// Applies theme defaults to a <see cref="Timeline"/> without overwriting explicit non-empty styles.
+    ///     Applies theme defaults to a <see cref="Timeline" /> without overwriting explicit non-empty styles.
     /// </summary>
     public static Timeline ApplyThemeDefaults(this Timeline control, TesseraTheme theme)
     {
@@ -445,8 +476,10 @@ public static class TesseraThemeControlExtensionsDataAndFlowDefaultExtensions
         ArgumentNullException.ThrowIfNull(theme);
 
         control.TitleStyle = TesseraThemeControlExtensions.ApplyDefault(control.TitleStyle, theme.Text.Secondary);
-        control.FocusedTitleStyle = TesseraThemeControlExtensions.ApplyDefault(control.FocusedTitleStyle, theme.Focus.Title);
-        control.TimestampStyle = TesseraThemeControlExtensions.ApplyDefault(control.TimestampStyle, theme.Text.Secondary);
+        control.FocusedTitleStyle =
+            TesseraThemeControlExtensions.ApplyDefault(control.FocusedTitleStyle, theme.Focus.Title);
+        control.TimestampStyle =
+            TesseraThemeControlExtensions.ApplyDefault(control.TimestampStyle, theme.Text.Secondary);
         control.LabelStyle = TesseraThemeControlExtensions.ApplyDefault(control.LabelStyle, theme.Text.Primary);
         control.ContentStyle = TesseraThemeControlExtensions.ApplyDefault(control.ContentStyle, theme.Text.Primary);
         control.SelectedRowStyle = TesseraThemeControlExtensions.ApplyDefault(
@@ -455,14 +488,17 @@ public static class TesseraThemeControlExtensionsDataAndFlowDefaultExtensions
         control.SeparatorStyle = TesseraThemeControlExtensions.ApplyDefault(control.SeparatorStyle, theme.Text.Muted);
         control.MutedStyle = TesseraThemeControlExtensions.ApplyDefault(control.MutedStyle, theme.Text.Muted);
         control.DisabledStyle = TesseraThemeControlExtensions.ApplyDefault(control.DisabledStyle, theme.Text.Muted);
-        control.BorderStyleText = TesseraThemeControlExtensions.ApplyDefault(control.BorderStyleText, theme.Border.Default);
-        control.FocusedBorderStyleText = TesseraThemeControlExtensions.ApplyDefault(control.FocusedBorderStyleText, theme.Border.Focused.Merge(theme.Focus.Border));
+        control.BorderStyleText =
+            TesseraThemeControlExtensions.ApplyDefault(control.BorderStyleText, theme.Border.Default);
+        control.FocusedBorderStyleText = TesseraThemeControlExtensions.ApplyDefault(control.FocusedBorderStyleText,
+            theme.Border.Focused.Merge(theme.Focus.Border));
         control.FocusMarker = TesseraThemeControlExtensions.ApplyDefault(control.FocusMarker, theme.Focus.Marker);
         return control;
     }
 
     /// <summary>
-    /// Resolves and applies hierarchical defaults to a <see cref="Timeline"/> without overwriting explicit non-empty styles.
+    ///     Resolves and applies hierarchical defaults to a <see cref="Timeline" /> without overwriting explicit non-empty
+    ///     styles.
     /// </summary>
     public static Timeline ApplyThemeDefaults(
         this Timeline control,
@@ -475,7 +511,7 @@ public static class TesseraThemeControlExtensionsDataAndFlowDefaultExtensions
     }
 
     /// <summary>
-    /// Applies theme defaults to a <see cref="Stepper"/> without overwriting explicit non-empty styles.
+    ///     Applies theme defaults to a <see cref="Stepper" /> without overwriting explicit non-empty styles.
     /// </summary>
     public static Stepper ApplyThemeDefaults(this Stepper control, TesseraTheme theme)
     {
@@ -483,19 +519,25 @@ public static class TesseraThemeControlExtensionsDataAndFlowDefaultExtensions
         ArgumentNullException.ThrowIfNull(theme);
 
         control.TitleStyle = TesseraThemeControlExtensions.ApplyDefault(control.TitleStyle, theme.Text.Secondary);
-        control.FocusedTitleStyle = TesseraThemeControlExtensions.ApplyDefault(control.FocusedTitleStyle, theme.Focus.Title);
+        control.FocusedTitleStyle =
+            TesseraThemeControlExtensions.ApplyDefault(control.FocusedTitleStyle, theme.Focus.Title);
         control.StepTextStyle = TesseraThemeControlExtensions.ApplyDefault(control.StepTextStyle, theme.Text.Primary);
-        control.ActiveStepStyle = TesseraThemeControlExtensions.ApplyDefault(control.ActiveStepStyle, theme.Accent.Primary);
-        control.CompletedStepStyle = TesseraThemeControlExtensions.ApplyDefault(control.CompletedStepStyle, theme.State.Success);
-        control.PendingStepStyle = TesseraThemeControlExtensions.ApplyDefault(control.PendingStepStyle, theme.Text.Secondary);
+        control.ActiveStepStyle =
+            TesseraThemeControlExtensions.ApplyDefault(control.ActiveStepStyle, theme.Accent.Primary);
+        control.CompletedStepStyle =
+            TesseraThemeControlExtensions.ApplyDefault(control.CompletedStepStyle, theme.State.Success);
+        control.PendingStepStyle =
+            TesseraThemeControlExtensions.ApplyDefault(control.PendingStepStyle, theme.Text.Secondary);
         control.ConnectorStyle = TesseraThemeControlExtensions.ApplyDefault(control.ConnectorStyle, theme.Text.Muted);
-        control.DisabledStepStyle = TesseraThemeControlExtensions.ApplyDefault(control.DisabledStepStyle, theme.Text.Muted);
+        control.DisabledStepStyle =
+            TesseraThemeControlExtensions.ApplyDefault(control.DisabledStepStyle, theme.Text.Muted);
         control.FocusMarker = TesseraThemeControlExtensions.ApplyDefault(control.FocusMarker, theme.Focus.Marker);
         return control;
     }
 
     /// <summary>
-    /// Resolves and applies hierarchical defaults to a <see cref="Stepper"/> without overwriting explicit non-empty styles.
+    ///     Resolves and applies hierarchical defaults to a <see cref="Stepper" /> without overwriting explicit non-empty
+    ///     styles.
     /// </summary>
     public static Stepper ApplyThemeDefaults(
         this Stepper control,

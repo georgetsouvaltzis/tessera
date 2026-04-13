@@ -25,12 +25,12 @@ public sealed partial class SideNavRail
 
         if (key.Is(Key.Home))
         {
-            return SelectBoundary(forward: true);
+            return SelectBoundary(true);
         }
 
         if (key.Is(Key.End))
         {
-            return SelectBoundary(forward: false);
+            return SelectBoundary(false);
         }
 
         if (key.Is(Key.Left))
@@ -117,7 +117,7 @@ public sealed partial class SideNavRail
                 return changed;
             }
 
-            changed |= TrySetSelectedIndex(hovered, raiseEvent: true);
+            changed |= TrySetSelectedIndex(hovered, true);
             if (!IsReadOnly)
             {
                 changed |= ActivateSelection();

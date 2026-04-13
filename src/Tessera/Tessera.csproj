@@ -1,32 +1,32 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <ItemGroup>
-    <ProjectReference Include="..\Tessera.Core\Tessera.Core.csproj" />
-  </ItemGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\Tessera.Core\Tessera.Core.csproj" />
+    </ItemGroup>
 
-  <ItemGroup>
-    <None Include="..\..\README.md" Pack="true" PackagePath="\" Link="README.md" />
-    <None Include="..\..\LICENSE" Pack="true" PackagePath="\" Link="LICENSE" />
-  </ItemGroup>
+    <ItemGroup>
+        <None Include="..\..\README.md" Pack="true" PackagePath="\" Link="README.md" />
+        <None Include="..\..\LICENSE" Pack="true" PackagePath="\" Link="LICENSE" />
+    </ItemGroup>
 
-  <PropertyGroup>
-    <TargetFramework>net10.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
-    <IsPackable>true</IsPackable>
-    <GenerateDocumentationFile>true</GenerateDocumentationFile>
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <PackageId>Tessera</PackageId>
-    <Title>Tessera</Title>
-    <Description>Message-driven terminal UI framework for .NET with application-facing components and host APIs.</Description>
-    <Authors>George Tsouvaltzis</Authors>
-    <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <PackageTags>tui;terminal-ui;console;csharp;dotnet</PackageTags>
-    <PackageReadmeFile>README.md</PackageReadmeFile>
-    <RepositoryUrl>https://github.com/georgetsouvaltzis/tessera</RepositoryUrl>
-    <RepositoryType>git</RepositoryType>
-    <PackageProjectUrl>https://github.com/georgetsouvaltzis/tessera</PackageProjectUrl>
-    <PublishRepositoryUrl>true</PublishRepositoryUrl>
-  </PropertyGroup>
+    <PropertyGroup>
+        <TargetFramework>net10.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <IsPackable>true</IsPackable>
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
+        <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+        <PackageId>Tessera</PackageId>
+        <Title>Tessera</Title>
+        <Description>Message-driven terminal UI framework for .NET with application-facing components and host APIs.</Description>
+        <Authors>George Tsouvaltzis</Authors>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <PackageTags>tui;terminal-ui;console;csharp;dotnet</PackageTags>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
+        <RepositoryUrl>https://github.com/georgetsouvaltzis/tessera</RepositoryUrl>
+        <RepositoryType>git</RepositoryType>
+        <PackageProjectUrl>https://github.com/georgetsouvaltzis/tessera</PackageProjectUrl>
+        <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    </PropertyGroup>
 
 </Project>

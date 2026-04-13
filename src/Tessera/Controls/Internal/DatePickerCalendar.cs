@@ -1,5 +1,6 @@
 using Tessera.Components.Primitives;
 using Tessera.Components.Primitives.Internal;
+
 namespace Tessera.Controls.Internal;
 
 internal static class DatePickerCalendar
@@ -33,7 +34,7 @@ internal static class DatePickerCalendar
         var first = new DateOnly(currentMonth.Year, currentMonth.Month, 1);
         var startOffset = ((int)first.DayOfWeek + 6) % 7;
         var daysInMonth = DateTime.DaysInMonth(currentMonth.Year, currentMonth.Month);
-        var cell = (row * 7) + col;
+        var cell = row * 7 + col;
         var day = cell - startOffset + 1;
         if (day < 1 || day > daysInMonth)
         {

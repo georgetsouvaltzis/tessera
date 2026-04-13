@@ -1,4 +1,4 @@
-﻿using Tessera.Components.Primitives;
+using Tessera.Components.Primitives;
 using Tessera.Components.Primitives.Internal;
 using Tessera.Controls.Internal;
 using Tessera.Layout;
@@ -7,109 +7,103 @@ using Tessera.Styles;
 namespace Tessera.Controls;
 
 /// <summary>
-/// Represents an inspector-like key/value list with selectable rows.
+///     Represents an inspector-like key/value list with selectable rows.
 /// </summary>
 public sealed class KeyValueList : Control
 {
     private readonly List<KeyValueListEntry> _entries = [];
-    private int _selectedIndex = -1;
     private int _scrollOffset;
 
     /// <summary>
-    /// Occurs when <see cref="SelectedIndex"/> changes.
-    /// </summary>
-    public event EventHandler<KeyValueListSelectionChangedEventArgs>? SelectionChanged;
-
-    /// <summary>
-    /// Gets or sets list title.
+    ///     Gets or sets list title.
     /// </summary>
     public string Title { get; set; } = "Key/Value";
 
     /// <summary>
-    /// Gets or sets marker shown in title when focused.
+    ///     Gets or sets marker shown in title when focused.
     /// </summary>
     public string FocusMarker { get; set; } = "*";
 
     /// <summary>
-    /// Gets or sets whether focused title marker is rendered.
+    ///     Gets or sets whether focused title marker is rendered.
     /// </summary>
     public bool ShowFocusMarker { get; set; } = true;
 
     /// <summary>
-    /// Gets or sets title style when unfocused.
+    ///     Gets or sets title style when unfocused.
     /// </summary>
     public TesseraStyle TitleStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets title style when focused.
+    ///     Gets or sets title style when focused.
     /// </summary>
     public TesseraStyle FocusedTitleStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets border style.
+    ///     Gets or sets border style.
     /// </summary>
     public BorderStyle Border { get; set; } = BorderStyle.SingleLine;
 
     /// <summary>
-    /// Gets or sets inner padding.
+    ///     Gets or sets inner padding.
     /// </summary>
     public Thickness Padding { get; set; }
 
     /// <summary>
-    /// Gets or sets preferred key-column width.
+    ///     Gets or sets preferred key-column width.
     /// </summary>
     public int PreferredKeyColumnWidth { get; set; } = 20;
 
     /// <summary>
-    /// Gets or sets separator text between key and value.
+    ///     Gets or sets separator text between key and value.
     /// </summary>
     public string Separator { get; set; } = ":";
 
     /// <summary>
-    /// Gets or sets style for key text.
+    ///     Gets or sets style for key text.
     /// </summary>
     public TesseraStyle KeyStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets style for value text.
+    ///     Gets or sets style for value text.
     /// </summary>
     public TesseraStyle ValueStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets style for separator text.
+    ///     Gets or sets style for separator text.
     /// </summary>
     public TesseraStyle SeparatorStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets style merged into selected rows.
+    ///     Gets or sets style merged into selected rows.
     /// </summary>
     public TesseraStyle SelectedRowStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets style applied to border glyphs when the control is not focused.
+    ///     Gets or sets style applied to border glyphs when the control is not focused.
     /// </summary>
     public TesseraStyle BorderStyleText { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets style merged into border glyphs while the control is focused.
+    ///     Gets or sets style merged into border glyphs while the control is focused.
     /// </summary>
     public TesseraStyle FocusedBorderStyleText { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets current entries.
+    ///     Gets current entries.
     /// </summary>
     public IReadOnlyList<KeyValueListEntry> Entries => _entries;
 
     /// <summary>
-    /// Gets selected index or <c>-1</c> when empty.
+    ///     Gets selected index or <c>-1</c> when empty.
     /// </summary>
-    public int SelectedIndex => _selectedIndex;
+    public int SelectedIndex { get; private set; } = -1;
 
     /// <summary>
-    /// Gets selected entry.
+    ///     Gets selected entry.
     /// </summary>
-    public KeyValueListEntry? SelectedItem => _selectedIndex >= 0 && _selectedIndex < _entries.Count
-        ? _entries[_selectedIndex]
+    public KeyValueListEntry? SelectedItem => SelectedIndex >= 0 && SelectedIndex < _entries.Count
+        ? _entries[SelectedIndex]
         : null;
 
     /// <inheritdoc />
@@ -122,13 +116,18 @@ public sealed class KeyValueList : Control
     public override bool IsReadOnly { get; set; }
 
     /// <summary>
-    /// Replaces all entries.
+    ///     Occurs when <see cref="SelectedIndex" /> changes.
+    /// </summary>
+    public event EventHandler<KeyValueListSelectionChangedEventArgs>? SelectionChanged;
+
+    /// <summary>
+    ///     Replaces all entries.
     /// </summary>
     /// <param name="entries">Entries to render.</param>
     public void SetEntries(IEnumerable<KeyValueListEntry> entries)
     {
         ArgumentNullException.ThrowIfNull(entries);
-        var previousIndex = _selectedIndex;
+        var previousIndex = SelectedIndex;
         var previousItem = SelectedItem;
 
         _entries.Clear();
@@ -139,22 +138,23 @@ public sealed class KeyValueList : Control
 
         if (_entries.Count == 0)
         {
-            _selectedIndex = -1;
+            SelectedIndex = -1;
         }
         else
         {
-            var seedIndex = _selectedIndex < 0 ? 0 : _selectedIndex;
-            _selectedIndex = Math.Clamp(seedIndex, 0, _entries.Count - 1);
+            var seedIndex = SelectedIndex < 0 ? 0 : SelectedIndex;
+            SelectedIndex = Math.Clamp(seedIndex, 0, _entries.Count - 1);
         }
+
         _scrollOffset = 0;
         RaiseSelectionChangedIfNeeded(previousIndex, previousItem);
     }
 
     /// <summary>
-    /// Sets selected index with bounds clamping.
+    ///     Sets selected index with bounds clamping.
     /// </summary>
     /// <param name="index">Requested index.</param>
-    /// <returns><see langword="true"/> when selection changed; otherwise <see langword="false"/>.</returns>
+    /// <returns><see langword="true" /> when selection changed; otherwise <see langword="false" />.</returns>
     public bool SetSelectedIndex(int index)
     {
         if (_entries.Count == 0)
@@ -163,14 +163,14 @@ public sealed class KeyValueList : Control
         }
 
         var clamped = Math.Clamp(index, 0, _entries.Count - 1);
-        if (clamped == _selectedIndex)
+        if (clamped == SelectedIndex)
         {
             return false;
         }
 
-        var previousIndex = _selectedIndex;
+        var previousIndex = SelectedIndex;
         var previousItem = SelectedItem;
-        _selectedIndex = clamped;
+        SelectedIndex = clamped;
         RaiseSelectionChangedIfNeeded(previousIndex, previousItem);
         return true;
     }
@@ -185,12 +185,12 @@ public sealed class KeyValueList : Control
 
         if (key.Is(Key.Down) || key.IsCharacter('j'))
         {
-            return SetSelectedIndex(_selectedIndex + 1);
+            return SetSelectedIndex(SelectedIndex + 1);
         }
 
         if (key.Is(Key.Up) || key.IsCharacter('k'))
         {
-            return SetSelectedIndex(_selectedIndex - 1);
+            return SetSelectedIndex(SelectedIndex - 1);
         }
 
         if (key.Is(Key.Home))
@@ -224,12 +224,12 @@ public sealed class KeyValueList : Control
         {
             if (pointer.Button == PointerButton.WheelDown)
             {
-                return SetSelectedIndex(_selectedIndex + 1);
+                return SetSelectedIndex(SelectedIndex + 1);
             }
 
             if (pointer.Button == PointerButton.WheelUp)
             {
-                return SetSelectedIndex(_selectedIndex - 1);
+                return SetSelectedIndex(SelectedIndex - 1);
             }
 
             return false;
@@ -262,7 +262,8 @@ public sealed class KeyValueList : Control
         }
 
         var title = Border == BorderStyle.None ? null : RenderTitle();
-        var content = FrameLayout.DrawFrameAndResolveContent(canvas, clipped, title, Border, Padding, ResolveBorderStyleText());
+        var content =
+            FrameLayout.DrawFrameAndResolveContent(canvas, clipped, title, Border, Padding, ResolveBorderStyleText());
         if (content.IsEmpty)
         {
             return;
@@ -281,7 +282,7 @@ public sealed class KeyValueList : Control
         {
             var index = _scrollOffset + row;
             var entry = _entries[index];
-            var selected = index == _selectedIndex;
+            var selected = index == SelectedIndex;
             var keyStyle = selected ? KeyStyle.Merge(SelectedRowStyle) : KeyStyle;
             var valueStyle = selected ? ValueStyle.Merge(SelectedRowStyle) : ValueStyle;
             var separatorStyle = selected ? SeparatorStyle.Merge(SelectedRowStyle) : SeparatorStyle;
@@ -322,24 +323,24 @@ public sealed class KeyValueList : Control
         var text = IsFocused && ShowFocusMarker && !string.IsNullOrWhiteSpace(FocusMarker)
             ? $"{Title} {FocusMarker}"
             : Title;
-        return ApplyStyle(text ?? string.Empty, IsFocused ? FocusedTitleStyle : TitleStyle);
+        return ApplyStyle(text, IsFocused ? FocusedTitleStyle : TitleStyle);
     }
 
     private void EnsureSelectionVisible(int viewportHeight)
     {
-        if (viewportHeight <= 0 || _entries.Count == 0 || _selectedIndex < 0)
+        if (viewportHeight <= 0 || _entries.Count == 0 || SelectedIndex < 0)
         {
             _scrollOffset = 0;
             return;
         }
 
-        if (_selectedIndex < _scrollOffset)
+        if (SelectedIndex < _scrollOffset)
         {
-            _scrollOffset = _selectedIndex;
+            _scrollOffset = SelectedIndex;
         }
-        else if (_selectedIndex >= _scrollOffset + viewportHeight)
+        else if (SelectedIndex >= _scrollOffset + viewportHeight)
         {
-            _scrollOffset = _selectedIndex - viewportHeight + 1;
+            _scrollOffset = SelectedIndex - viewportHeight + 1;
         }
 
         _scrollOffset = Math.Clamp(_scrollOffset, 0, Math.Max(0, _entries.Count - viewportHeight));
@@ -347,14 +348,14 @@ public sealed class KeyValueList : Control
 
     private void RaiseSelectionChangedIfNeeded(int previousIndex, KeyValueListEntry? previousItem)
     {
-        if (previousIndex == _selectedIndex && ReferenceEquals(previousItem, SelectedItem))
+        if (previousIndex == SelectedIndex && ReferenceEquals(previousItem, SelectedItem))
         {
             return;
         }
 
         SelectionChanged?.Invoke(
             this,
-            new KeyValueListSelectionChangedEventArgs(previousIndex, _selectedIndex, previousItem, SelectedItem));
+            new KeyValueListSelectionChangedEventArgs(previousIndex, SelectedIndex, previousItem, SelectedItem));
     }
 
     private TesseraStyle ResolveBorderStyleText()
@@ -370,7 +371,7 @@ public sealed class KeyValueList : Control
 
     private static string PadRight(string text, int width)
     {
-        var safe = text ?? string.Empty;
+        var safe = text;
         var measured = ControlTextLayout.MeasureDisplayWidth(safe);
         return measured >= width
             ? safe

@@ -8,7 +8,8 @@ internal static class ViewportOffsets
         return Math.Clamp(requested, 0, maxY);
     }
 
-    public static int ClampX(bool wrap, bool showLineNumbers, int requested, int width, int visualLineCount, int maxVisualWidth)
+    public static int ClampX(bool wrap, bool showLineNumbers, int requested, int width, int visualLineCount,
+        int maxVisualWidth)
     {
         if (wrap)
         {

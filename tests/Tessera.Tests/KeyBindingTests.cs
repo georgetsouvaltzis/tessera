@@ -1,6 +1,3 @@
-using Tessera.Components.Composition;
-using Tessera.Components.Primitives;
-using Tessera.Components.Styling;
 using Tessera.Widgets;
 
 namespace Tessera.Tests;

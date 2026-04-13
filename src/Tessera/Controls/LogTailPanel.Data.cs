@@ -3,13 +3,13 @@ namespace Tessera.Controls;
 public sealed partial class LogTailPanel
 {
     /// <summary>
-    /// Replaces all log entries.
+    ///     Replaces all log entries.
     /// </summary>
     /// <param name="entries">Entries to render.</param>
     public void SetEntries(IEnumerable<LogEntry> entries)
     {
         ArgumentNullException.ThrowIfNull(entries);
-        var previousIndex = _selectedIndex;
+        var previousIndex = SelectedIndex;
         var previousItem = SelectedEntry?.Message ?? string.Empty;
         _entries.Clear();
         _entryBodyCache.Clear();
@@ -24,7 +24,7 @@ public sealed partial class LogTailPanel
                 new LogEntry(entry.Message, entry.Level, entry.Timestamp, entry.Source)
                 {
                     IsMuted = entry.IsMuted,
-                    HasError = entry.HasError,
+                    HasError = entry.HasError
                 });
         }
 
@@ -35,18 +35,18 @@ public sealed partial class LogTailPanel
     }
 
     /// <summary>
-    /// Appends one pre-built log entry.
+    ///     Appends one pre-built log entry.
     /// </summary>
     /// <param name="entry">Entry to append.</param>
     public void Append(LogEntry entry)
     {
         ArgumentNullException.ThrowIfNull(entry);
-        var previousIndex = _selectedIndex;
+        var previousIndex = SelectedIndex;
         var previousItem = SelectedEntry?.Message ?? string.Empty;
         var appendedEntry = new LogEntry(entry.Message, entry.Level, entry.Timestamp, entry.Source)
         {
             IsMuted = entry.IsMuted,
-            HasError = entry.HasError,
+            HasError = entry.HasError
         };
         _entries.Add(appendedEntry);
 
@@ -55,12 +55,12 @@ public sealed partial class LogTailPanel
         TrimToMaxEntries();
         if (_entries.Count == 0)
         {
-            _selectedIndex = -1;
+            SelectedIndex = -1;
             _hoveredIndex = -1;
         }
         else if (AutoFollow)
         {
-            _selectedIndex = _entries.Count - 1;
+            SelectedIndex = _entries.Count - 1;
             _hoveredIndex = Math.Clamp(_hoveredIndex, -1, _entries.Count - 1);
         }
         else
@@ -73,37 +73,38 @@ public sealed partial class LogTailPanel
     }
 
     /// <summary>
-    /// Appends one log entry from primitive values.
+    ///     Appends one log entry from primitive values.
     /// </summary>
     /// <param name="message">Message text.</param>
     /// <param name="level">Severity level.</param>
     /// <param name="timestamp">Optional timestamp.</param>
     /// <param name="source">Optional source label.</param>
-    public void Append(string message, LogLevel level = LogLevel.Info, DateTimeOffset? timestamp = null, string? source = null)
+    public void Append(string message, LogLevel level = LogLevel.Info, DateTimeOffset? timestamp = null,
+        string? source = null)
     {
         Append(new LogEntry(message, level, timestamp, source));
     }
 
     /// <summary>
-    /// Clears all entries.
+    ///     Clears all entries.
     /// </summary>
     public void Clear()
     {
-        var previousIndex = _selectedIndex;
+        var previousIndex = SelectedIndex;
         var previousItem = SelectedEntry?.Message ?? string.Empty;
         _entries.Clear();
         _entryBodyCache.Clear();
-        _selectedIndex = -1;
+        SelectedIndex = -1;
         _hoveredIndex = -1;
         _entryCacheDirty = false;
         RaiseSelectionChangedIfNeeded(previousIndex, previousItem);
     }
 
     /// <summary>
-    /// Sets selected row using bounds clamping.
+    ///     Sets selected row using bounds clamping.
     /// </summary>
     /// <param name="index">Requested index.</param>
-    /// <returns><see langword="true"/> when selection changed; otherwise <see langword="false"/>.</returns>
+    /// <returns><see langword="true" /> when selection changed; otherwise <see langword="false" />.</returns>
     public bool SetSelectedIndex(int index)
     {
         if (_entries.Count == 0)
@@ -112,14 +113,14 @@ public sealed partial class LogTailPanel
         }
 
         var clamped = Math.Clamp(index, 0, _entries.Count - 1);
-        if (clamped == _selectedIndex)
+        if (clamped == SelectedIndex)
         {
             return false;
         }
 
-        var previousIndex = _selectedIndex;
+        var previousIndex = SelectedIndex;
         var previousItem = SelectedEntry?.Message ?? string.Empty;
-        _selectedIndex = clamped;
+        SelectedIndex = clamped;
         _hoveredIndex = Math.Clamp(_hoveredIndex, -1, _entries.Count - 1);
         RaiseSelectionChangedIfNeeded(previousIndex, previousItem);
         return true;

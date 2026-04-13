@@ -6,140 +6,127 @@ using Tessera.Styles;
 namespace Tessera.Controls;
 
 /// <summary>
-/// Represents a navigable JSON inspection tree.
+///     Represents a navigable JSON inspection tree.
 /// </summary>
 public sealed partial class JsonTreeView : Control
 {
     private readonly List<JsonTreeNode> _roots = [];
     private readonly List<(JsonTreeNode Node, int Depth, int? ParentIndex)> _visible = [];
-    private int _selectedIndex;
     private int _hoveredIndex = -1;
+    private int _selectedIndex;
 
     /// <summary>
-    /// Occurs when selected node changes.
+    ///     Gets or sets title text.
     /// </summary>
-    public event EventHandler<JsonTreeSelectionChangedEventArgs>? SelectionChanged;
+    public string Title { get; set; } = "JSON";
 
     /// <summary>
-    /// Gets or sets title text.
+    ///     Gets or sets marker shown in title when focused.
     /// </summary>
-    public string Title
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = "JSON";
+    public string FocusMarker { get; set; } = "*";
 
     /// <summary>
-    /// Gets or sets marker shown in title when focused.
-    /// </summary>
-    public string FocusMarker
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = "*";
-
-    /// <summary>
-    /// Gets or sets a value indicating whether <see cref="FocusMarker" /> is shown while focused.
+    ///     Gets or sets a value indicating whether <see cref="FocusMarker" /> is shown while focused.
     /// </summary>
     public bool ShowFocusMarker { get; set; } = true;
 
     /// <summary>
-    /// Gets or sets title style when not focused.
+    ///     Gets or sets title style when not focused.
     /// </summary>
     public TesseraStyle TitleStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets title style when focused.
+    ///     Gets or sets title style when focused.
     /// </summary>
     public TesseraStyle FocusedTitleStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets border style when not focused.
+    ///     Gets or sets border style when not focused.
     /// </summary>
     public TesseraStyle BorderStyleText { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets border style when focused.
+    ///     Gets or sets border style when focused.
     /// </summary>
     public TesseraStyle FocusedBorderStyleText { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets style for container rows.
+    ///     Gets or sets style for container rows.
     /// </summary>
     public TesseraStyle ContainerStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets style for scalar value rows.
+    ///     Gets or sets style for scalar value rows.
     /// </summary>
     public TesseraStyle ValueStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets style merged into hovered rows.
+    ///     Gets or sets style merged into hovered rows.
     /// </summary>
     public TesseraStyle HoveredRowStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets style merged into selected rows.
+    ///     Gets or sets style merged into selected rows.
     /// </summary>
     public TesseraStyle SelectedRowStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets style merged into selected rows while focused.
+    ///     Gets or sets style merged into selected rows while focused.
     /// </summary>
     public TesseraStyle FocusedSelectedRowStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets style merged into rows while disabled.
+    ///     Gets or sets style merged into rows while disabled.
     /// </summary>
     public TesseraStyle DisabledStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets style for muted/empty text.
+    ///     Gets or sets style for muted/empty text.
     /// </summary>
     public TesseraStyle MutedStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets marker for expanded container nodes.
+    ///     Gets or sets marker for expanded container nodes.
     /// </summary>
     public string ExpandedMarker { get; set; } = "▼";
 
     /// <summary>
-    /// Gets or sets marker for collapsed container nodes.
+    ///     Gets or sets marker for collapsed container nodes.
     /// </summary>
     public string CollapsedMarker { get; set; } = "▶";
 
     /// <summary>
-    /// Gets or sets marker for scalar value nodes.
+    ///     Gets or sets marker for scalar value nodes.
     /// </summary>
     public string ValueMarker { get; set; } = "•";
 
     /// <summary>
-    /// Gets or sets text rendered when there are no nodes.
+    ///     Gets or sets text rendered when there are no nodes.
     /// </summary>
     public string EmptyText { get; set; } = "(empty)";
 
     /// <summary>
-    /// Gets or sets border style.
+    ///     Gets or sets border style.
     /// </summary>
     public BorderStyle Border { get; set; } = BorderStyle.SingleLine;
 
     /// <summary>
-    /// Gets or sets inner padding.
+    ///     Gets or sets inner padding.
     /// </summary>
     public Thickness Padding { get; set; }
 
     /// <summary>
-    /// Gets configured root nodes.
+    ///     Gets configured root nodes.
     /// </summary>
     public IReadOnlyList<JsonTreeNode> Roots => _roots;
 
     /// <summary>
-    /// Gets selected visible index, or <c>-1</c> when empty.
+    ///     Gets selected visible index, or <c>-1</c> when empty.
     /// </summary>
     public int SelectedIndex => _visible.Count == 0 ? -1 : _selectedIndex;
 
     /// <summary>
-    /// Gets selected node, or <see langword="null"/> when no selection.
+    ///     Gets selected node, or <see langword="null" /> when no selection.
     /// </summary>
     public JsonTreeNode? SelectedNode => _selectedIndex >= 0 && _selectedIndex < _visible.Count
         ? _visible[_selectedIndex].Node
@@ -155,7 +142,12 @@ public sealed partial class JsonTreeView : Control
     public override bool IsReadOnly { get; set; }
 
     /// <summary>
-    /// Replaces root nodes.
+    ///     Occurs when selected node changes.
+    /// </summary>
+    public event EventHandler<JsonTreeSelectionChangedEventArgs>? SelectionChanged;
+
+    /// <summary>
+    ///     Replaces root nodes.
     /// </summary>
     /// <param name="roots">Root nodes.</param>
     public void SetRoots(IEnumerable<JsonTreeNode> roots)
@@ -171,7 +163,7 @@ public sealed partial class JsonTreeView : Control
     }
 
     /// <summary>
-    /// Parses JSON and replaces tree roots.
+    ///     Parses JSON and replaces tree roots.
     /// </summary>
     /// <param name="json">JSON payload.</param>
     public void SetJson(string json)
@@ -181,11 +173,11 @@ public sealed partial class JsonTreeView : Control
     }
 
     /// <summary>
-    /// Attempts to parse JSON and replace tree roots.
+    ///     Attempts to parse JSON and replace tree roots.
     /// </summary>
     /// <param name="json">JSON payload.</param>
     /// <param name="error">Parsing error text, when parsing fails.</param>
-    /// <returns><see langword="true"/> on success; otherwise <see langword="false"/>.</returns>
+    /// <returns><see langword="true" /> on success; otherwise <see langword="false" />.</returns>
     public bool TrySetJson(string json, out string? error)
     {
         try
@@ -202,10 +194,10 @@ public sealed partial class JsonTreeView : Control
     }
 
     /// <summary>
-    /// Sets selected row using bounds clamping.
+    ///     Sets selected row using bounds clamping.
     /// </summary>
     /// <param name="index">Requested index.</param>
-    /// <returns><see langword="true"/> when selection changed; otherwise <see langword="false"/>.</returns>
+    /// <returns><see langword="true" /> when selection changed; otherwise <see langword="false" />.</returns>
     public bool SetSelectedIndex(int index)
     {
         if (_visible.Count == 0)
@@ -236,13 +228,41 @@ public sealed partial class JsonTreeView : Control
             return false;
         }
 
-        if (key.Is(Key.Down) || key.IsCharacter('j')) return SetSelectedIndex(_selectedIndex + 1);
-        if (key.Is(Key.Up) || key.IsCharacter('k')) return SetSelectedIndex(_selectedIndex - 1);
-        if (key.Is(Key.Home)) return SetSelectedIndex(0);
-        if (key.Is(Key.End)) return SetSelectedIndex(_visible.Count - 1);
-        if (key.Is(Key.Right) || key.IsCharacter('l')) return ExpandOrMoveChild();
-        if (key.Is(Key.Left) || key.IsCharacter('h')) return CollapseOrMoveParent();
-        if (key.Is(Key.Enter) || key.IsCharacter(' ')) return ToggleSelectedExpansion();
+        if (key.Is(Key.Down) || key.IsCharacter('j'))
+        {
+            return SetSelectedIndex(_selectedIndex + 1);
+        }
+
+        if (key.Is(Key.Up) || key.IsCharacter('k'))
+        {
+            return SetSelectedIndex(_selectedIndex - 1);
+        }
+
+        if (key.Is(Key.Home))
+        {
+            return SetSelectedIndex(0);
+        }
+
+        if (key.Is(Key.End))
+        {
+            return SetSelectedIndex(_visible.Count - 1);
+        }
+
+        if (key.Is(Key.Right) || key.IsCharacter('l'))
+        {
+            return ExpandOrMoveChild();
+        }
+
+        if (key.Is(Key.Left) || key.IsCharacter('h'))
+        {
+            return CollapseOrMoveParent();
+        }
+
+        if (key.Is(Key.Enter) || key.IsCharacter(' '))
+        {
+            return ToggleSelectedExpansion();
+        }
+
         return false;
     }
 
@@ -367,7 +387,7 @@ public sealed partial class JsonTreeView : Control
         _visible.Clear();
         foreach (var root in _roots)
         {
-            AppendVisible(root, depth: 0, parentIndex: null);
+            AppendVisible(root, 0, null);
         }
 
         if (_visible.Count == 0)
@@ -410,7 +430,7 @@ public sealed partial class JsonTreeView : Control
 
     private int ComputeWindowStart(int contentHeight)
     {
-        return Math.Clamp(_selectedIndex - (contentHeight / 2), 0, Math.Max(0, _visible.Count - contentHeight));
+        return Math.Clamp(_selectedIndex - contentHeight / 2, 0, Math.Max(0, _visible.Count - contentHeight));
     }
 
     private bool SetHoveredIndex(int index)
@@ -426,10 +446,7 @@ public sealed partial class JsonTreeView : Control
 
     private static JsonTreeNode Clone(JsonTreeNode node)
     {
-        var copy = new JsonTreeNode(node.Key, node.DisplayValue, node.Kind)
-        {
-            Expanded = node.Expanded,
-        };
+        var copy = new JsonTreeNode(node.Key, node.DisplayValue, node.Kind) { Expanded = node.Expanded };
         for (var index = 0; index < node.Children.Count; index++)
         {
             copy.Children.Add(Clone(node.Children[index]));

@@ -17,7 +17,7 @@ public sealed class HeatmapControlTests
             Title = "Utilization",
             ShowLegend = true,
             ShowRowLabels = true,
-            ShowColumnLabels = true,
+            ShowColumnLabels = true
         };
         control.SetMatrix(Matrix([1, 2, 3], [4, 5, 9]));
         control.SetRowLabels(["api", "db"]);
@@ -28,8 +28,10 @@ public sealed class HeatmapControlTests
         TestAssert.True(output.Contains(" Utilization ", StringComparison.Ordinal), "Heatmap should render title.");
         TestAssert.True(output.Contains("api", StringComparison.Ordinal), "Heatmap should render row labels.");
         TestAssert.True(output.Contains('n'), "Heatmap should render column label glyphs.");
-        TestAssert.True(output.Contains("low", StringComparison.Ordinal), "Heatmap should render implicit legend text.");
-        TestAssert.True(output.Contains('█') || output.Contains('▓') || output.Contains('▒') || output.Contains('░'), "Heatmap should render heat glyphs.");
+        TestAssert.True(output.Contains("low", StringComparison.Ordinal),
+            "Heatmap should render implicit legend text.");
+        TestAssert.True(output.Contains('█') || output.Contains('▓') || output.Contains('▒') || output.Contains('░'),
+            "Heatmap should render heat glyphs.");
     }
 
     [Test]
@@ -41,7 +43,7 @@ public sealed class HeatmapControlTests
             ShowLegend = false,
             ShowRowLabels = false,
             ShowColumnLabels = false,
-            IsFocused = true,
+            IsFocused = true
         };
         control.SetMatrix(Matrix([1, 2, 3], [4, 5, 6], [7, 8, 9]));
 
@@ -51,7 +53,7 @@ public sealed class HeatmapControlTests
         var downHandled = control.Handle(new KeyPressed(Key.Down));
         var rightHandled = control.Handle(new KeyPressed(Key.Right));
         var pointerHandled = control.Handle(
-            new PointerInput(PointerEventKind.Press, PointerButton.Left, X: 2, Y: 1),
+            new PointerInput(PointerEventKind.Press, PointerButton.Left, 2, 1),
             new Rect(0, 0, 8, 6));
 
         TestAssert.True(downHandled, "Down key should change selected row.");
@@ -79,34 +81,33 @@ public sealed class HeatmapControlTests
             PeakCellStyle = highStyle,
             SelectedCellStyle = selectedStyle,
             BorderStyleText = TesseraStyle.Empty.WithForeground(AnsiColor.Rgb(1, 2, 3)),
-            FocusedBorderStyleText = focusedBorderStyle,
+            FocusedBorderStyleText = focusedBorderStyle
         };
         control.SetMatrix(Matrix([1, 9]));
         _ = control.SetSelectedCell(0, 1);
 
         var output = Render(control, 24, 8, CanvasTextMode.GraphemeAware);
 
-        TestAssert.True(output.Contains("38;2;11;22;33", StringComparison.Ordinal), "Heatmap high cell style should render foreground ANSI sequence.");
-        TestAssert.True(output.Contains("48;2;44;55;66", StringComparison.Ordinal), "Heatmap selected style should render background ANSI sequence.");
-        TestAssert.True(output.Contains(focusedBorderStyle.Render("┌"), StringComparison.Ordinal), "Heatmap focused border style should render on frame glyphs.");
+        TestAssert.True(output.Contains("38;2;11;22;33", StringComparison.Ordinal),
+            "Heatmap high cell style should render foreground ANSI sequence.");
+        TestAssert.True(output.Contains("48;2;44;55;66", StringComparison.Ordinal),
+            "Heatmap selected style should render background ANSI sequence.");
+        TestAssert.True(output.Contains(focusedBorderStyle.Render("┌"), StringComparison.Ordinal),
+            "Heatmap focused border style should render on frame glyphs.");
     }
 
     [Test]
     public void ControlsHeatmapDefaultRenderIsDeterministicAndMonochrome()
     {
-        var control = new Heatmap
-        {
-            ShowLegend = false,
-            ShowRowLabels = false,
-            ShowColumnLabels = false,
-        };
+        var control = new Heatmap { ShowLegend = false, ShowRowLabels = false, ShowColumnLabels = false };
         control.SetMatrix(Matrix([1, 4, 9], [2, 5, 8]));
 
         var first = Render(control, 20, 8);
         var second = Render(control, 20, 8);
 
         TestAssert.Equal(first, second, "Heatmap should render deterministically for identical state.");
-        TestAssert.True(!first.Contains("\u001b[", StringComparison.Ordinal), "Default heatmap output should remain monochrome.");
+        TestAssert.True(!first.Contains("\e[", StringComparison.Ordinal),
+            "Default heatmap output should remain monochrome.");
     }
 
     [Test]
@@ -120,20 +121,22 @@ public sealed class HeatmapControlTests
             ShowLegend = true,
             ShowRowLabels = false,
             ShowColumnLabels = false,
-            LegendStyle = TesseraStyle.Empty.WithUnderline(),
+            LegendStyle = TesseraStyle.Empty.WithUnderline()
         };
         control.SetLegend(
         [
             new HeatmapLegend("cold", 0, 4.99, 'c', coldStyle),
-            new HeatmapLegend("hot", 5, 10, 'h', hotStyle),
+            new HeatmapLegend("hot", 5, 10, 'h', hotStyle)
         ]);
         control.SetMatrix(Matrix([1, 9]));
 
         var output = Render(control, 28, 6, CanvasTextMode.GraphemeAware);
 
-        TestAssert.True(output.Contains("cold", StringComparison.Ordinal), "Heatmap should render custom legend labels.");
+        TestAssert.True(output.Contains("cold", StringComparison.Ordinal),
+            "Heatmap should render custom legend labels.");
         TestAssert.True(output.Contains('h'), "Heatmap should render custom high-band glyph.");
-        TestAssert.True(output.Contains("38;2;200;90;30", StringComparison.Ordinal), "Heatmap should apply custom legend/cell style.");
+        TestAssert.True(output.Contains("38;2;200;90;30", StringComparison.Ordinal),
+            "Heatmap should apply custom legend/cell style.");
     }
 
     private static string Render(Heatmap control, int width, int height, CanvasTextMode mode = CanvasTextMode.Fast)

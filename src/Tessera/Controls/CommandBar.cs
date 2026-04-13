@@ -6,55 +6,42 @@ using Tessera.Styles;
 namespace Tessera.Controls;
 
 /// <summary>
-/// Represents a compact single-line command bar with keyboard and pointer activation.
+///     Represents a compact single-line command bar with keyboard and pointer activation.
 /// </summary>
 public sealed class CommandBar : Control
 {
     private readonly List<CommandBarItem> _items = [];
-    private int _selectedIndex;
     private int _hoveredIndex = -1;
+    private int _selectedIndex;
 
     /// <summary>
-    /// Occurs when a command is activated.
-    /// </summary>
-    public event EventHandler<CommandBarItemActivatedEventArgs>? ItemActivated;
-
-    /// <summary>
-    /// Gets the configured command items.
+    ///     Gets the configured command items.
     /// </summary>
     public IReadOnlyList<CommandBarItem> Items => _items;
 
     /// <summary>
-    /// Gets the currently selected command index.
-    /// Returns <c>-1</c> when no items are configured.
+    ///     Gets the currently selected command index.
+    ///     Returns <c>-1</c> when no items are configured.
     /// </summary>
     public int SelectedIndex => _items.Count == 0 ? -1 : _selectedIndex;
 
     /// <summary>
-    /// Gets the currently selected command item.
+    ///     Gets the currently selected command item.
     /// </summary>
     public CommandBarItem? SelectedItem => _items.Count == 0 ? null : _items[_selectedIndex];
 
     /// <summary>
-    /// Gets or sets the optional title shown before command entries.
+    ///     Gets or sets the optional title shown before command entries.
     /// </summary>
-    public string Title
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = string.Empty;
+    public string Title { get; set; } = string.Empty;
 
     /// <summary>
-    /// Gets or sets the marker shown in the title when the control is focused.
+    ///     Gets or sets the marker shown in the title when the control is focused.
     /// </summary>
-    public string FocusMarker
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = "*";
+    public string FocusMarker { get; set; } = "*";
 
     /// <summary>
-    /// Gets or sets a value indicating whether the title focus marker should be rendered.
+    ///     Gets or sets a value indicating whether the title focus marker should be rendered.
     /// </summary>
     public bool ShowFocusMarker
     {
@@ -63,7 +50,7 @@ public sealed class CommandBar : Control
     } = true;
 
     /// <summary>
-    /// Gets or sets the style applied to the title when not focused.
+    ///     Gets or sets the style applied to the title when not focused.
     /// </summary>
     public TesseraStyle TitleStyle
     {
@@ -72,7 +59,7 @@ public sealed class CommandBar : Control
     } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the style applied to the title when focused.
+    ///     Gets or sets the style applied to the title when focused.
     /// </summary>
     public TesseraStyle FocusedTitleStyle
     {
@@ -81,7 +68,7 @@ public sealed class CommandBar : Control
     } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the base style used for command labels.
+    ///     Gets or sets the base style used for command labels.
     /// </summary>
     public TesseraStyle ItemStyle
     {
@@ -90,7 +77,7 @@ public sealed class CommandBar : Control
     } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the style merged on top of <see cref="ItemStyle"/> for hovered commands.
+    ///     Gets or sets the style merged on top of <see cref="ItemStyle" /> for hovered commands.
     /// </summary>
     public TesseraStyle HoveredItemStyle
     {
@@ -99,7 +86,7 @@ public sealed class CommandBar : Control
     } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the style merged on top of <see cref="ItemStyle"/> for the selected command.
+    ///     Gets or sets the style merged on top of <see cref="ItemStyle" /> for the selected command.
     /// </summary>
     public TesseraStyle SelectedItemStyle
     {
@@ -108,7 +95,7 @@ public sealed class CommandBar : Control
     } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the style merged on top of <see cref="ItemStyle"/> for disabled commands.
+    ///     Gets or sets the style merged on top of <see cref="ItemStyle" /> for disabled commands.
     /// </summary>
     public TesseraStyle DisabledItemStyle
     {
@@ -117,7 +104,7 @@ public sealed class CommandBar : Control
     } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the style used for separators between command labels.
+    ///     Gets or sets the style used for separators between command labels.
     /// </summary>
     public TesseraStyle SeparatorStyle
     {
@@ -126,39 +113,27 @@ public sealed class CommandBar : Control
     } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the text used between command labels.
+    ///     Gets or sets the text used between command labels.
     /// </summary>
-    public string ItemSeparator
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = " ";
+    public string ItemSeparator { get; set; } = " ";
 
     /// <summary>
-    /// Gets or sets the text rendered in front of the selected command.
+    ///     Gets or sets the text rendered in front of the selected command.
     /// </summary>
-    public string SelectedPrefix
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = "[";
+    public string SelectedPrefix { get; set; } = "[";
 
     /// <summary>
-    /// Gets or sets the text rendered after the selected command.
+    ///     Gets or sets the text rendered after the selected command.
     /// </summary>
-    public string SelectedSuffix
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = "]";
+    public string SelectedSuffix { get; set; } = "]";
 
     /// <summary>
-    /// Gets the last activated command id.
+    ///     Gets the last activated command id.
     /// </summary>
     public string? LastActivatedItemId { get; private set; }
 
     /// <summary>
-    /// Gets or sets a value indicating whether the command bar currently owns focus.
+    ///     Gets or sets a value indicating whether the command bar currently owns focus.
     /// </summary>
     public override bool IsFocused
     {
@@ -167,7 +142,7 @@ public sealed class CommandBar : Control
     }
 
     /// <summary>
-    /// Gets or sets a value indicating whether the command bar should ignore interaction.
+    ///     Gets or sets a value indicating whether the command bar should ignore interaction.
     /// </summary>
     public override bool IsDisabled
     {
@@ -176,7 +151,7 @@ public sealed class CommandBar : Control
     }
 
     /// <summary>
-    /// Gets or sets a value indicating whether the command bar remains interactive but does not activate commands.
+    ///     Gets or sets a value indicating whether the command bar remains interactive but does not activate commands.
     /// </summary>
     public override bool IsReadOnly
     {
@@ -185,7 +160,12 @@ public sealed class CommandBar : Control
     }
 
     /// <summary>
-    /// Replaces the configured command items.
+    ///     Occurs when a command is activated.
+    /// </summary>
+    public event EventHandler<CommandBarItemActivatedEventArgs>? ItemActivated;
+
+    /// <summary>
+    ///     Replaces the configured command items.
     /// </summary>
     /// <param name="items">The command items to display.</param>
     public void SetItems(IEnumerable<CommandBarItem> items)
@@ -208,7 +188,7 @@ public sealed class CommandBar : Control
     }
 
     /// <summary>
-    /// Selects a command by index with bounds clamping.
+    ///     Selects a command by index with bounds clamping.
     /// </summary>
     /// <param name="index">The requested command index.</param>
     public void Select(int index)
@@ -222,9 +202,9 @@ public sealed class CommandBar : Control
     }
 
     /// <summary>
-    /// Activates the currently selected command.
+    ///     Activates the currently selected command.
     /// </summary>
-    /// <returns><see langword="true"/> when a command was activated; otherwise, <see langword="false"/>.</returns>
+    /// <returns><see langword="true" /> when a command was activated; otherwise, <see langword="false" />.</returns>
     public bool ActivateSelected()
     {
         if (_items.Count == 0 || IsReadOnly)
@@ -243,10 +223,13 @@ public sealed class CommandBar : Control
     }
 
     /// <summary>
-    /// Handles keyboard navigation and activation input.
+    ///     Handles keyboard navigation and activation input.
     /// </summary>
     /// <param name="message">The message to process.</param>
-    /// <returns><see langword="true"/> when the message changed selection or activated a command; otherwise, <see langword="false"/>.</returns>
+    /// <returns>
+    ///     <see langword="true" /> when the message changed selection or activated a command; otherwise,
+    ///     <see langword="false" />.
+    /// </returns>
     public override bool Handle(Message message)
     {
         if (!IsFocused || IsDisabled || _items.Count == 0 || message is not KeyPressed key)
@@ -304,11 +287,14 @@ public sealed class CommandBar : Control
     }
 
     /// <summary>
-    /// Handles pointer hover, wheel navigation, and click activation input.
+    ///     Handles pointer hover, wheel navigation, and click activation input.
     /// </summary>
     /// <param name="message">The message to process.</param>
     /// <param name="bounds">The current command-bar bounds.</param>
-    /// <returns><see langword="true"/> when the message changed state or activated a command; otherwise, <see langword="false"/>.</returns>
+    /// <returns>
+    ///     <see langword="true" /> when the message changed state or activated a command; otherwise,
+    ///     <see langword="false" />.
+    /// </returns>
     public override bool Handle(Message message, Rect bounds)
     {
         if (IsDisabled || _items.Count == 0 || message is not PointerInput pointer || bounds.IsEmpty)
@@ -365,7 +351,7 @@ public sealed class CommandBar : Control
     }
 
     /// <summary>
-    /// Renders the command bar into a single clipped row.
+    ///     Renders the command bar into a single clipped row.
     /// </summary>
     /// <param name="canvas">The target canvas.</param>
     /// <param name="rect">The bounds assigned to the command bar.</param>

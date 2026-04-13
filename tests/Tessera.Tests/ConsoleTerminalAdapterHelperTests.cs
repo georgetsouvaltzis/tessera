@@ -1,9 +1,5 @@
-using Tessera.Components.Composition;
-using Tessera.Components.Primitives;
-using Tessera.Components.Styling;
 using Tessera.Core.Abstractions;
 using Tessera.Core.Messages;
-using Tessera.Core.Terminal;
 
 namespace Tessera.Tests;
 
@@ -11,13 +7,15 @@ internal static class ConsoleTerminalAdapterHelperTests
 {
     public static IEnumerable<TestCase> Cases()
     {
-        yield return new TestCase("ConsoleTerminal_KeyMapper_MapsCtrlLetterToCharacterKey", KeyMapper_MapsCtrlLetterToCharacterKey);
-        yield return new TestCase("ConsoleTerminal_PasteBurstBuffer_CollapsesBurstIntoPaste", PasteBurstBuffer_CollapsesBurstIntoPaste);
+        yield return new TestCase("ConsoleTerminal_KeyMapper_MapsCtrlLetterToCharacterKey",
+            KeyMapper_MapsCtrlLetterToCharacterKey);
+        yield return new TestCase("ConsoleTerminal_PasteBurstBuffer_CollapsesBurstIntoPaste",
+            PasteBurstBuffer_CollapsesBurstIntoPaste);
     }
 
     private static Task KeyMapper_MapsCtrlLetterToCharacterKey()
     {
-        var key = new ConsoleKeyInfo('\u0001', ConsoleKey.A, shift: false, alt: false, control: true);
+        var key = new ConsoleKeyInfo('\u0001', ConsoleKey.A, false, false, true);
 
         var message = ConsoleKeyMessageMapper.Map(key) as KeyPressMsg;
 
@@ -53,7 +51,8 @@ internal static class ConsoleTerminalAdapterHelperTests
             throw new InvalidOperationException("Expected PasteMsg from burst flush.");
         }
 
-        TestAssert.True(paste.Content.Contains("alpha beta\ngamma", StringComparison.Ordinal), "Paste content should preserve characters and newline.");
+        TestAssert.True(paste.Content.Contains("alpha beta\ngamma", StringComparison.Ordinal),
+            "Paste content should preserve characters and newline.");
         return Task.CompletedTask;
     }
 }

@@ -77,7 +77,7 @@ public sealed partial class FileExplorer
     {
         var clone = new FileExplorerItem(source.Name, source.IsDirectory, source.Path)
         {
-            IsExpanded = source.IsExpanded,
+            IsExpanded = source.IsExpanded
         };
         for (var i = 0; i < source.Children.Count; i++)
         {

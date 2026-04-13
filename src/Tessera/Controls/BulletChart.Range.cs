@@ -1,28 +1,28 @@
 namespace Tessera.Controls;
 
 /// <summary>
-/// Classifies a bullet-chart range segment.
+///     Classifies a bullet-chart range segment.
 /// </summary>
 public enum BulletRangeKind
 {
     /// <summary>
-    /// Neutral range segment.
+    ///     Neutral range segment.
     /// </summary>
     Normal = 0,
 
     /// <summary>
-    /// Warning range segment.
+    ///     Warning range segment.
     /// </summary>
     Warning = 1,
 
     /// <summary>
-    /// Critical range segment.
+    ///     Critical range segment.
     /// </summary>
-    Critical = 2,
+    Critical = 2
 }
 
 /// <summary>
-/// Represents one range segment in a <see cref="BulletChart" />.
+///     Represents one range segment in a <see cref="BulletChart" />.
 /// </summary>
 /// <param name="Start">Range start value.</param>
 /// <param name="End">Range end value.</param>

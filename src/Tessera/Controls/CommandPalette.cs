@@ -8,111 +8,98 @@ using Tessera.Widgets;
 namespace Tessera.Controls;
 
 /// <summary>
-/// Represents a searchable command launcher overlay.
+///     Represents a searchable command launcher overlay.
 /// </summary>
 public sealed class CommandPalette : Control
 {
-    private readonly List<CommandPaletteItem> _items = [];
-    private readonly List<CommandPaletteRenderCache> _itemRenderCache = [];
     private readonly List<int> _allItemIndices = [];
     private readonly List<int> _filterSeedIndices = [];
     private readonly List<int> _filteredIndices = [];
+    private readonly List<CommandPaletteRenderCache> _itemRenderCache = [];
+    private readonly List<CommandPaletteItem> _items = [];
     private readonly TextInputModel _query = new();
-    private int _selectedFilteredIndex;
+    private long _consumedExecutionVersion;
+    private long _executionVersion;
+    private CommandPaletteGlyphSet _glyphs = CommandPaletteGlyphSet.Default;
     private int _hoveredFilteredIndex = -1;
     private string _lastFilter = string.Empty;
-    private long _executionVersion;
-    private long _consumedExecutionVersion;
-    private CommandPaletteGlyphSet _glyphs = CommandPaletteGlyphSet.Default;
+    private int _selectedFilteredIndex;
 
     /// <summary>
-    /// Occurs when a command is executed from the current filtered selection.
+    ///     Gets or sets the overlay title.
     /// </summary>
-    public event EventHandler<CommandPaletteItemExecutedEventArgs>? ItemExecuted;
+    public string Title { get; set; } = "Command Palette";
 
     /// <summary>
-    /// Gets or sets the overlay title.
+    ///     Gets or sets the marker appended to the title when focused and <see cref="ShowFocusMarker" /> is enabled.
     /// </summary>
-    public string Title
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = "Command Palette";
+    public string FocusMarker { get; set; } = "*";
 
     /// <summary>
-    /// Gets or sets the marker appended to the title when focused and <see cref="ShowFocusMarker"/> is enabled.
-    /// </summary>
-    public string FocusMarker
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = "*";
-
-    /// <summary>
-    /// Gets or sets a value indicating whether <see cref="FocusMarker"/> should be shown while focused.
+    ///     Gets or sets a value indicating whether <see cref="FocusMarker" /> should be shown while focused.
     /// </summary>
     /// <remarks>
-    /// Defaults to <see langword="false"/> to preserve existing command palette title rendering.
+    ///     Defaults to <see langword="false" /> to preserve existing command palette title rendering.
     /// </remarks>
     public bool ShowFocusMarker { get; set; }
 
     /// <summary>
-    /// Gets or sets style merged into the title when not focused.
+    ///     Gets or sets style merged into the title when not focused.
     /// </summary>
     public TesseraStyle TitleStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets style merged into the title when focused.
+    ///     Gets or sets style merged into the title when focused.
     /// </summary>
     public TesseraStyle FocusedTitleStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets style merged into query text when the placeholder is not visible.
+    ///     Gets or sets style merged into query text when the placeholder is not visible.
     /// </summary>
     public TesseraStyle QueryTextStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets style merged into placeholder text.
+    ///     Gets or sets style merged into placeholder text.
     /// </summary>
     public TesseraStyle PlaceholderTextStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets base style applied to command rows.
+    ///     Gets or sets base style applied to command rows.
     /// </summary>
     public TesseraStyle ItemStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets style merged into the selected command row.
+    ///     Gets or sets style merged into the selected command row.
     /// </summary>
     public TesseraStyle SelectedItemStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets style merged into hovered command rows.
+    ///     Gets or sets style merged into hovered command rows.
     /// </summary>
     public TesseraStyle HoveredItemStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets style merged into muted rows.
+    ///     Gets or sets style merged into muted rows.
     /// </summary>
     public TesseraStyle MutedItemStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets style merged when the control is disabled.
+    ///     Gets or sets style merged when the control is disabled.
     /// </summary>
     public TesseraStyle DisabledItemStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the style applied to border glyphs when not focused.
+    ///     Gets or sets the style applied to border glyphs when not focused.
     /// </summary>
     public TesseraStyle BorderStyleText { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the style applied to border glyphs when focused.
+    ///     Gets or sets the style applied to border glyphs when focused.
     /// </summary>
     public TesseraStyle FocusedBorderStyleText { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets glyphs used for query prompt and row markers.
+    ///     Gets or sets glyphs used for query prompt and row markers.
     /// </summary>
     public CommandPaletteGlyphSet Glyphs
     {
@@ -131,7 +118,7 @@ public sealed class CommandPalette : Control
     }
 
     /// <summary>
-    /// Gets or sets the frame border style for the overlay panel.
+    ///     Gets or sets the frame border style for the overlay panel.
     /// </summary>
     public BorderStyle Border
     {
@@ -140,7 +127,7 @@ public sealed class CommandPalette : Control
     } = BorderStyle.Rounded;
 
     /// <summary>
-    /// Gets or sets inner padding applied inside the overlay frame.
+    ///     Gets or sets inner padding applied inside the overlay frame.
     /// </summary>
     public Thickness Padding
     {
@@ -149,12 +136,12 @@ public sealed class CommandPalette : Control
     }
 
     /// <summary>
-    /// Gets a value indicating whether the palette is currently visible.
+    ///     Gets a value indicating whether the palette is currently visible.
     /// </summary>
     public bool IsVisible { get; private set; }
 
     /// <summary>
-    /// Gets or sets the maximum number of visible command rows.
+    ///     Gets or sets the maximum number of visible command rows.
     /// </summary>
     public int MaxVisibleItems
     {
@@ -163,21 +150,21 @@ public sealed class CommandPalette : Control
     } = 8;
 
     /// <summary>
-    /// Gets or sets the current query text.
+    ///     Gets or sets the current query text.
     /// </summary>
     public string QueryText
     {
         get => _query.Value;
-        set => SetQueryText(value ?? string.Empty);
+        set => SetQueryText(value);
     }
 
     /// <summary>
-    /// Gets the last executed command id.
+    ///     Gets the last executed command id.
     /// </summary>
     public string? LastExecutedItemId { get; private set; }
 
     /// <summary>
-    /// Gets the configured command entries.
+    ///     Gets the configured command entries.
     /// </summary>
     public IReadOnlyList<CommandPaletteItem> Items => _items;
 
@@ -189,7 +176,12 @@ public sealed class CommandPalette : Control
     }
 
     /// <summary>
-    /// Replaces the palette command entries.
+    ///     Occurs when a command is executed from the current filtered selection.
+    /// </summary>
+    public event EventHandler<CommandPaletteItemExecutedEventArgs>? ItemExecuted;
+
+    /// <summary>
+    ///     Replaces the palette command entries.
     /// </summary>
     /// <param name="items">The command entries to expose.</param>
     public void SetItems(IEnumerable<CommandPaletteItem> items)
@@ -212,12 +204,15 @@ public sealed class CommandPalette : Control
     }
 
     /// <summary>
-    /// Clears the current query text.
+    ///     Clears the current query text.
     /// </summary>
-    public void ClearQuery() => SetQueryText(string.Empty);
+    public void ClearQuery()
+    {
+        SetQueryText(string.Empty);
+    }
 
     /// <summary>
-    /// Opens the palette and requests focus.
+    ///     Opens the palette and requests focus.
     /// </summary>
     public void Open()
     {
@@ -232,7 +227,7 @@ public sealed class CommandPalette : Control
     }
 
     /// <summary>
-    /// Closes the palette.
+    ///     Closes the palette.
     /// </summary>
     public void Close()
     {
@@ -240,12 +235,12 @@ public sealed class CommandPalette : Control
     }
 
     /// <summary>
-    /// Replaces the current query text.
+    ///     Replaces the current query text.
     /// </summary>
     /// <param name="query">The query value.</param>
     public void SetQueryText(string query)
     {
-        _query.SetValue(query ?? string.Empty);
+        _query.SetValue(query);
         RefreshFilter();
     }
 
@@ -307,7 +302,8 @@ public sealed class CommandPalette : Control
     /// <inheritdoc />
     public override bool Handle(Message message, Rect bounds)
     {
-        if (!IsVisible || message is not PointerInput pointer || !TryResolveModal(bounds, out var modal, out var content))
+        if (!IsVisible || message is not PointerInput pointer ||
+            !TryResolveModal(bounds, out var modal, out var content))
         {
             return Handle(message);
         }
@@ -372,7 +368,7 @@ public sealed class CommandPalette : Control
     }
 
     /// <summary>
-    /// Executes try consume execution.
+    ///     Executes try consume execution.
     /// </summary>
     /// <param name="itemId">The item id value.</param>
     /// <returns><see langword="true" /> when try consume execution succeeds.</returns>
@@ -405,7 +401,8 @@ public sealed class CommandPalette : Control
         }
 
         var title = Border == BorderStyle.None ? null : RenderTitleText();
-        content = FrameLayout.DrawFrameAndResolveContent(canvas, modal, title, Border, Padding, ResolveBorderStyleText());
+        content = FrameLayout.DrawFrameAndResolveContent(canvas, modal, title, Border, Padding,
+            ResolveBorderStyleText());
 
         var queryPrompt = ResolveQueryPrompt();
         var queryWidth = Math.Max(1, content.Width - ControlTextLayout.MeasureDisplayWidth(queryPrompt));
@@ -416,7 +413,8 @@ public sealed class CommandPalette : Control
             queryStyle = queryStyle.Merge(DisabledItemStyle).Merge(MutedItemStyle);
         }
 
-        canvas.WriteText(content.X, content.Y, ApplyStyle(string.Concat(queryPrompt, frame.Text), queryStyle), content.Width);
+        canvas.WriteText(content.X, content.Y, ApplyStyle(string.Concat(queryPrompt, frame.Text), queryStyle),
+            content.Width);
         if (content.Height <= 1)
         {
             return;
@@ -436,7 +434,8 @@ public sealed class CommandPalette : Control
         {
             var itemIndex = _filteredIndices[filteredIndex];
             var rowText = ResolveRowText(_itemRenderCache[itemIndex], filteredIndex);
-            canvas.WriteText(content.X, content.Y + 1 + row, ApplyStyle(rowText, ResolveItemStyle(filteredIndex)), content.Width);
+            canvas.WriteText(content.X, content.Y + 1 + row, ApplyStyle(rowText, ResolveItemStyle(filteredIndex)),
+                content.Width);
         }
     }
 
@@ -450,8 +449,8 @@ public sealed class CommandPalette : Control
         }
 
         var canNarrow = filter.Length > 0
-            && _lastFilter.Length > 0
-            && filter.StartsWith(_lastFilter, StringComparison.OrdinalIgnoreCase);
+                        && _lastFilter.Length > 0
+                        && filter.StartsWith(_lastFilter, StringComparison.OrdinalIgnoreCase);
         if (canNarrow)
         {
             _filterSeedIndices.Clear();

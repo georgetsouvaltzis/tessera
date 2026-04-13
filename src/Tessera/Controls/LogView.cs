@@ -1,4 +1,4 @@
-﻿using Tessera.Components.Primitives;
+using Tessera.Components.Primitives;
 using Tessera.Components.Primitives.Internal;
 using Tessera.Controls.Internal;
 using Tessera.Layout;
@@ -8,16 +8,16 @@ using Tessera.Widgets;
 namespace Tessera.Controls;
 
 /// <summary>
-/// Represents a scrolling log viewer.
+///     Represents a scrolling log viewer.
 /// </summary>
 public sealed class LogView : Control
 {
-    private readonly ViewportModel _viewport = new();
     private readonly List<string> _entries = [];
+    private readonly ViewportModel _viewport = new();
     private string _filter = string.Empty;
 
     /// <summary>
-    /// Executes log view.
+    ///     Executes log view.
     /// </summary>
     /// <returns>The result of log view.</returns>
     public LogView()
@@ -26,25 +26,17 @@ public sealed class LogView : Control
     }
 
     /// <summary>
-    /// Represents title.
+    ///     Represents title.
     /// </summary>
-    public string Title
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = "Logs";
+    public string Title { get; set; } = "Logs";
 
     /// <summary>
-    /// Represents focus marker.
+    ///     Represents focus marker.
     /// </summary>
-    public string FocusMarker
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = "*";
+    public string FocusMarker { get; set; } = "*";
 
     /// <summary>
-    /// Represents show focus marker.
+    ///     Represents show focus marker.
     /// </summary>
     public bool ShowFocusMarker
     {
@@ -53,7 +45,7 @@ public sealed class LogView : Control
     } = true;
 
     /// <summary>
-    /// Represents title style.
+    ///     Represents title style.
     /// </summary>
     public TesseraStyle TitleStyle
     {
@@ -62,7 +54,7 @@ public sealed class LogView : Control
     } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Represents focused title style.
+    ///     Represents focused title style.
     /// </summary>
     public TesseraStyle FocusedTitleStyle
     {
@@ -71,7 +63,7 @@ public sealed class LogView : Control
     } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Represents entry style.
+    ///     Represents entry style.
     /// </summary>
     public TesseraStyle EntryStyle
     {
@@ -80,7 +72,7 @@ public sealed class LogView : Control
     } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Represents paused title style.
+    ///     Represents paused title style.
     /// </summary>
     public TesseraStyle PausedTitleStyle
     {
@@ -89,7 +81,7 @@ public sealed class LogView : Control
     } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets style applied to border glyphs when the control is not focused.
+    ///     Gets or sets style applied to border glyphs when the control is not focused.
     /// </summary>
     public TesseraStyle BorderStyleText
     {
@@ -98,7 +90,7 @@ public sealed class LogView : Control
     } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets style merged into border glyphs while the control is focused.
+    ///     Gets or sets style merged into border glyphs while the control is focused.
     /// </summary>
     public TesseraStyle FocusedBorderStyleText
     {
@@ -107,7 +99,7 @@ public sealed class LogView : Control
     } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Represents border.
+    ///     Represents border.
     /// </summary>
     public BorderStyle Border
     {
@@ -116,7 +108,7 @@ public sealed class LogView : Control
     } = BorderStyle.SingleLine;
 
     /// <summary>
-    /// Represents padding.
+    ///     Represents padding.
     /// </summary>
     public Thickness Padding
     {
@@ -125,7 +117,7 @@ public sealed class LogView : Control
     }
 
     /// <summary>
-    /// Represents auto scroll.
+    ///     Represents auto scroll.
     /// </summary>
     public bool AutoScroll
     {
@@ -134,7 +126,7 @@ public sealed class LogView : Control
     } = true;
 
     /// <summary>
-    /// Represents is paused.
+    ///     Represents is paused.
     /// </summary>
     public bool IsPaused
     {
@@ -143,7 +135,7 @@ public sealed class LogView : Control
     }
 
     /// <summary>
-    /// Represents count.
+    ///     Represents count.
     /// </summary>
     public int Count => _entries.Count;
 
@@ -155,7 +147,7 @@ public sealed class LogView : Control
     }
 
     /// <summary>
-    /// Executes append.
+    ///     Executes append.
     /// </summary>
     /// <param name="line">The line value.</param>
     public void Append(string line)
@@ -165,7 +157,7 @@ public sealed class LogView : Control
             return;
         }
 
-        var value = line ?? string.Empty;
+        var value = line;
         _entries.Add(value);
         if (!HasActiveFilter() || value.Contains(_filter, StringComparison.OrdinalIgnoreCase))
         {
@@ -179,7 +171,7 @@ public sealed class LogView : Control
     }
 
     /// <summary>
-    /// Executes clear.
+    ///     Executes clear.
     /// </summary>
     public void Clear()
     {
@@ -188,12 +180,12 @@ public sealed class LogView : Control
     }
 
     /// <summary>
-    /// Executes set filter.
+    ///     Executes set filter.
     /// </summary>
     /// <param name="filter">The filter value.</param>
     public void SetFilter(string filter)
     {
-        var normalized = filter ?? string.Empty;
+        var normalized = filter;
         if (string.Equals(_filter, normalized, StringComparison.Ordinal))
         {
             return;
@@ -282,7 +274,8 @@ public sealed class LogView : Control
 
     internal override LayoutMeasurement Measure(in Rect availableBounds)
     {
-        var width = Math.Max(18, ControlTextLayout.MeasureDisplayWidth(FormatTitleForMeasure()) + 4) + Padding.Horizontal;
+        var width = Math.Max(18, ControlTextLayout.MeasureDisplayWidth(FormatTitleForMeasure()) + 4) +
+                    Padding.Horizontal;
         var height = Math.Max(4, Padding.Vertical + 4);
         if (Border != BorderStyle.None)
         {

@@ -1,17 +1,12 @@
 namespace Tessera.Controls;
 
 /// <summary>
-/// Defines glyphs used by <see cref="SearchResultsView"/>.
+///     Defines glyphs used by <see cref="SearchResultsView" />.
 /// </summary>
 public readonly record struct SearchResultsGlyphSet
 {
     /// <summary>
-    /// Gets the default glyph set used by <see cref="SearchResultsView"/>.
-    /// </summary>
-    public static SearchResultsGlyphSet Default => new();
-
-    /// <summary>
-    /// Initializes a new glyph set with default markers.
+    ///     Initializes a new glyph set with default markers.
     /// </summary>
     public SearchResultsGlyphSet()
     {
@@ -23,7 +18,7 @@ public readonly record struct SearchResultsGlyphSet
     }
 
     /// <summary>
-    /// Initializes a new glyph set.
+    ///     Initializes a new glyph set.
     /// </summary>
     /// <param name="defaultRowMarker">Marker shown for normal rows.</param>
     /// <param name="hoveredRowMarker">Marker shown for hovered rows.</param>
@@ -37,35 +32,40 @@ public readonly record struct SearchResultsGlyphSet
         string matchMarker,
         string rankSeparator)
     {
-        DefaultRowMarker = defaultRowMarker ?? string.Empty;
-        HoveredRowMarker = hoveredRowMarker ?? string.Empty;
-        SelectedRowMarker = selectedRowMarker ?? string.Empty;
-        MatchMarker = matchMarker ?? string.Empty;
-        RankSeparator = rankSeparator ?? string.Empty;
+        DefaultRowMarker = defaultRowMarker;
+        HoveredRowMarker = hoveredRowMarker;
+        SelectedRowMarker = selectedRowMarker;
+        MatchMarker = matchMarker;
+        RankSeparator = rankSeparator;
     }
 
     /// <summary>
-    /// Gets the marker shown for normal rows.
+    ///     Gets the default glyph set used by <see cref="SearchResultsView" />.
+    /// </summary>
+    public static SearchResultsGlyphSet Default => new();
+
+    /// <summary>
+    ///     Gets the marker shown for normal rows.
     /// </summary>
     public string DefaultRowMarker { get; init; }
 
     /// <summary>
-    /// Gets the marker shown for hovered rows.
+    ///     Gets the marker shown for hovered rows.
     /// </summary>
     public string HoveredRowMarker { get; init; }
 
     /// <summary>
-    /// Gets the marker shown for selected rows.
+    ///     Gets the marker shown for selected rows.
     /// </summary>
     public string SelectedRowMarker { get; init; }
 
     /// <summary>
-    /// Gets the marker shown for rows matching the active query.
+    ///     Gets the marker shown for rows matching the active query.
     /// </summary>
     public string MatchMarker { get; init; }
 
     /// <summary>
-    /// Gets the separator between row rank and content.
+    ///     Gets the separator between row rank and content.
     /// </summary>
     public string RankSeparator { get; init; }
 }

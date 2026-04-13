@@ -3,7 +3,10 @@ using Tessera.Components.Primitives.Internal;
 
 namespace Tessera.Controls.Internal;
 
-internal sealed record TableRenderState(IReadOnlyList<IReadOnlyList<string>> VisibleRows, string Title, int VisibleRowCount);
+internal sealed record TableRenderState(
+    IReadOnlyList<IReadOnlyList<string>> VisibleRows,
+    string Title,
+    int VisibleRowCount);
 
 internal static class TableViewState
 {

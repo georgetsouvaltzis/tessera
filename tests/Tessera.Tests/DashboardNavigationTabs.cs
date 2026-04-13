@@ -1,4 +1,3 @@
-using Tessera;
 using Tessera.Components.Primitives;
 using Tessera.Controls;
 using Tessera.Layout;
@@ -16,20 +15,18 @@ internal sealed class DashboardNavigationTabs : Control
         _tabs.SelectionChanged += (_, args) => SelectionChanged?.Invoke(this, args);
     }
 
-    public event EventHandler<SelectionChangedEventArgs>? SelectionChanged;
-
     public int SelectedIndex => _tabs.SelectedIndex;
 
     public string Title
     {
         get => _tabs.Title;
-        set => _tabs.Title = value ?? string.Empty;
+        set => _tabs.Title = value;
     }
 
     public string FocusMarker
     {
         get => _tabs.FocusMarker;
-        set => _tabs.FocusMarker = value ?? string.Empty;
+        set => _tabs.FocusMarker = value;
     }
 
     public bool ShowFocusMarker
@@ -67,6 +64,8 @@ internal sealed class DashboardNavigationTabs : Control
         get => _tabs.IsReadOnly;
         set => _tabs.IsReadOnly = value;
     }
+
+    public event EventHandler<SelectionChangedEventArgs>? SelectionChanged;
 
     public void SetItems(IEnumerable<string> items)
     {

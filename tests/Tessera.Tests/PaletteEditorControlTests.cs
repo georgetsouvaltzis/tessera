@@ -17,17 +17,17 @@ public sealed class PaletteEditorControlTests
             Title = string.Empty,
             ColumnCount = 2,
             ShowHexCode = true,
-            ShowPreviewBlock = true,
+            ShowPreviewBlock = true
         };
         control.SetSwatches(
         [
             new PaletteSwatch("Mauve", "#CBA6F7"),
             new PaletteSwatch("Blue", "#89B4FA"),
             new PaletteSwatch("Teal", "#94E2D5"),
-            new PaletteSwatch("Peach", "#FAB387"),
+            new PaletteSwatch("Peach", "#FAB387")
         ]);
 
-        var output = Render(control, width: 64, height: 4);
+        var output = Render(control, 64, 4);
 
         Assert.That(output.Contains("Mauve #CBA6F7", StringComparison.Ordinal), Is.True);
         Assert.That(output.Contains("Blue #89B4FA", StringComparison.Ordinal), Is.True);
@@ -38,12 +38,7 @@ public sealed class PaletteEditorControlTests
     [Test]
     public void ControlsPaletteEditorKeyboardAndPointerSelectionRaisesSelectionChanged()
     {
-        var control = new PaletteEditor
-        {
-            Title = string.Empty,
-            ColumnCount = 2,
-            IsFocused = true,
-        };
+        var control = new PaletteEditor { Title = string.Empty, ColumnCount = 2, IsFocused = true };
         control.SetSwatches(CreateSwatches());
 
         var raised = 0;
@@ -78,14 +73,14 @@ public sealed class PaletteEditorControlTests
             HoveredSwatchStyle = TesseraStyle.Empty.WithBackground(AnsiColor.Rgb(7, 8, 9)),
             SelectedSwatchStyle = TesseraStyle.Empty.WithBold(),
             FocusedSelectedSwatchStyle = TesseraStyle.Empty.WithUnderline(),
-            PreviewSwatchStyle = TesseraStyle.Empty.WithForeground(AnsiColor.Rgb(11, 22, 33)),
+            PreviewSwatchStyle = TesseraStyle.Empty.WithForeground(AnsiColor.Rgb(11, 22, 33))
         };
         control.SetSwatches(CreateSwatches());
         _ = control.Handle(
             new PointerInput(PointerEventKind.Motion, PointerButton.None, 40, 0),
             new Rect(0, 0, 64, 4));
 
-        var output = Render(control, width: 64, height: 4);
+        var output = Render(control, 64, 4);
         Assert.That(output.Contains("38;2;11;22;33", StringComparison.Ordinal), Is.True);
         Assert.That(output.Contains("48;2;7;8;9", StringComparison.Ordinal), Is.True);
         Assert.That(
@@ -93,36 +88,30 @@ public sealed class PaletteEditorControlTests
             || output.Contains(";1;", StringComparison.Ordinal)
             || output.Contains("[1m", StringComparison.Ordinal),
             Is.True);
-        Assert.That(output.Contains(";4;", StringComparison.Ordinal) || output.Contains("[4m", StringComparison.Ordinal), Is.True);
+        Assert.That(
+            output.Contains(";4;", StringComparison.Ordinal) || output.Contains("[4m", StringComparison.Ordinal),
+            Is.True);
     }
 
     [Test]
     public void ControlsPaletteEditorDefaultRenderIsDeterministicAndMonochrome()
     {
-        var control = new PaletteEditor
-        {
-            Title = string.Empty,
-            ColumnCount = 2,
-        };
+        var control = new PaletteEditor { Title = string.Empty, ColumnCount = 2 };
         control.SetSwatches(CreateSwatches());
 
-        var first = Render(control, width: 64, height: 4);
-        var second = Render(control, width: 64, height: 4);
+        var first = Render(control, 64, 4);
+        var second = Render(control, 64, 4);
 
         Assert.That(first, Is.EqualTo(second));
-        Assert.That(first.Contains("\u001b[", StringComparison.Ordinal), Is.False);
+        Assert.That(first.Contains("\e[", StringComparison.Ordinal), Is.False);
     }
 
     [Test]
     public void ControlsPaletteEditorEmptyStateRendersConfiguredText()
     {
-        var control = new PaletteEditor
-        {
-            Title = string.Empty,
-            EmptyText = "(palette empty)",
-        };
+        var control = new PaletteEditor { Title = string.Empty, EmptyText = "(palette empty)" };
 
-        var output = Render(control, width: 40, height: 2);
+        var output = Render(control, 40, 2);
 
         Assert.That(output.Contains("(palette empty)", StringComparison.Ordinal), Is.True);
     }
@@ -134,7 +123,7 @@ public sealed class PaletteEditorControlTests
             new PaletteSwatch("Mauve", "#CBA6F7"),
             new PaletteSwatch("Blue", "#89B4FA"),
             new PaletteSwatch("Teal", "#94E2D5"),
-            new PaletteSwatch("Peach", "#FAB387"),
+            new PaletteSwatch("Peach", "#FAB387")
         ];
     }
 

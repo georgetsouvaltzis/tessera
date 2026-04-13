@@ -29,7 +29,7 @@ internal static class ThemeFoundationTests
 
     private static Task CatppuccinMocha_ProvidesExpectedKeyTokens()
     {
-        var theme = TesseraThemes.Catppuccin(CatppuccinVariant.Mocha);
+        var theme = TesseraThemes.Catppuccin();
 
         AssertForegroundRgb(theme.Text.Primary, 0xCD, 0xD6, 0xF4, "Catppuccin Mocha should set Text.Primary.");
         AssertForegroundRgb(theme.Border.Focused, 0x89, 0xB4, 0xFA, "Catppuccin Mocha should set Border.Focused.");
@@ -39,7 +39,7 @@ internal static class ThemeFoundationTests
 
     private static Task RosePineMain_ProvidesExpectedKeyTokens()
     {
-        var theme = TesseraThemes.RosePine(RosePineVariant.Main);
+        var theme = TesseraThemes.RosePine();
 
         AssertForegroundRgb(theme.Text.Primary, 0xE0, 0xDE, 0xF4, "Rosé Pine Main should set Text.Primary.");
         AssertForegroundRgb(theme.Focus.Border, 0x9C, 0xCF, 0xD8, "Rosé Pine Main should set Focus.Border.");
@@ -56,15 +56,8 @@ internal static class ThemeFoundationTests
 
         var theme = new TesseraTheme
         {
-            Text = new TesseraThemeTextTokens
-            {
-                Primary = customPrimary,
-            },
-            Focus = new TesseraThemeFocusTokens
-            {
-                Border = customFocusBorder,
-                Marker = customMarker,
-            },
+            Text = new TesseraThemeTextTokens { Primary = customPrimary },
+            Focus = new TesseraThemeFocusTokens { Border = customFocusBorder, Marker = customMarker }
         };
 
         TestAssert.Equal(customPrimary, theme.Text.Primary, "Custom theme should preserve Text.Primary overrides.");
@@ -76,21 +69,20 @@ internal static class ThemeFoundationTests
     private static Task RuntimeOptions_HoldsThemeWithoutSideEffects()
     {
         var theme = TesseraThemes.Catppuccin(CatppuccinVariant.Frappe);
-        var options = new TesseraRuntimeOptions
-        {
-            Theme = theme,
-        };
+        var options = new TesseraRuntimeOptions { Theme = theme };
 
-        TestAssert.ReferenceSame(theme, options.Theme!, "TesseraRuntimeOptions.Theme should hold the assigned theme reference.");
+        TestAssert.ReferenceSame(theme, options.Theme!,
+            "TesseraRuntimeOptions.Theme should hold the assigned theme reference.");
         TestAssert.Equal(60, options.MaxFps, "Theme assignment should not change MaxFps defaults.");
-        TestAssert.ReferenceSame(ScreenOptions.Empty, options.Screen, "Theme assignment should not replace Screen defaults.");
+        TestAssert.ReferenceSame(ScreenOptions.Empty, options.Screen,
+            "Theme assignment should not replace Screen defaults.");
         return Task.CompletedTask;
     }
 
     private static Task BuiltInThemes_ProvideDefaultFocusMarker()
     {
-        var catppuccin = TesseraThemes.Catppuccin(CatppuccinVariant.Mocha);
-        var rosePine = TesseraThemes.RosePine(RosePineVariant.Main);
+        var catppuccin = TesseraThemes.Catppuccin();
+        var rosePine = TesseraThemes.RosePine();
 
         TestAssert.Equal("*", catppuccin.Focus.Marker, "Catppuccin themes should set default focus marker.");
         TestAssert.Equal("*", rosePine.Focus.Marker, "Rosé Pine themes should set default focus marker.");
@@ -99,32 +91,18 @@ internal static class ThemeFoundationTests
 
     private static Task Merge_PreservesFocusMarkerWhenOverlayUnspecified()
     {
-        var baseTheme = new TesseraTheme
-        {
-            Focus = new TesseraThemeFocusTokens
-            {
-                Marker = ">>",
-            },
-        };
+        var baseTheme = new TesseraTheme { Focus = new TesseraThemeFocusTokens { Marker = ">>" } };
 
         var overrides = new TesseraThemeOverrides
         {
-            GlobalTheme = new TesseraTheme
-            {
-                Focus = new TesseraThemeFocusTokens(),
-            },
+            GlobalTheme = new TesseraTheme { Focus = new TesseraThemeFocusTokens() }
         };
 
         var resolvedUnspecified = overrides.Resolve(new Choice(), baseTheme);
-        TestAssert.Equal(">>", resolvedUnspecified.Focus.Marker, "Unspecified overlay marker should not clear base marker.");
+        TestAssert.Equal(">>", resolvedUnspecified.Focus.Marker,
+            "Unspecified overlay marker should not clear base marker.");
 
-        overrides.GlobalTheme = new TesseraTheme
-        {
-            Focus = new TesseraThemeFocusTokens
-            {
-                Marker = "::",
-            },
-        };
+        overrides.GlobalTheme = new TesseraTheme { Focus = new TesseraThemeFocusTokens { Marker = "::" } };
 
         var resolvedSpecified = overrides.Resolve(new Choice(), baseTheme);
         TestAssert.Equal("::", resolvedSpecified.Focus.Marker, "Specified overlay marker should override base marker.");

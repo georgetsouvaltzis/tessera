@@ -1,34 +1,26 @@
-﻿using Tessera.Components.Primitives;
+using Tessera.Components.Primitives;
 using Tessera.Layout;
 using Tessera.Styles;
 
 namespace Tessera.Controls;
 
 /// <summary>
-/// Represents a two-sided status strip.
+///     Represents a two-sided status strip.
 /// </summary>
 public sealed class StatusBar : Control
 {
     /// <summary>
-    /// Represents left text.
+    ///     Represents left text.
     /// </summary>
-    public string LeftText
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = string.Empty;
+    public string LeftText { get; set; } = string.Empty;
 
     /// <summary>
-    /// Represents right text.
+    ///     Represents right text.
     /// </summary>
-    public string RightText
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = string.Empty;
+    public string RightText { get; set; } = string.Empty;
 
     /// <summary>
-    /// Represents fill.
+    ///     Represents fill.
     /// </summary>
     public char Fill
     {
@@ -37,7 +29,7 @@ public sealed class StatusBar : Control
     } = ' ';
 
     /// <summary>
-    /// Gets or sets the style used for <see cref="LeftText"/>.
+    ///     Gets or sets the style used for <see cref="LeftText" />.
     /// </summary>
     public TesseraStyle LeftTextStyle
     {
@@ -46,7 +38,7 @@ public sealed class StatusBar : Control
     } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the style used for <see cref="RightText"/>.
+    ///     Gets or sets the style used for <see cref="RightText" />.
     /// </summary>
     public TesseraStyle RightTextStyle
     {
@@ -55,7 +47,7 @@ public sealed class StatusBar : Control
     } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the style used for the fill row generated from <see cref="Fill"/>.
+    ///     Gets or sets the style used for the fill row generated from <see cref="Fill" />.
     /// </summary>
     public TesseraStyle FillStyle
     {

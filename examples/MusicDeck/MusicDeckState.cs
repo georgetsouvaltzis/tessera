@@ -5,41 +5,57 @@ namespace Tessera.Examples.MusicDeck;
 internal sealed class MusicDeckState
 {
     private readonly List<MusicTrack> _queue;
-    private int _currentIndex;
-    private int _selectedIndex;
     private int _positionSeconds;
 
     private MusicDeckState(List<MusicTrack> queue)
     {
         _queue = queue;
-        _currentIndex = 0;
-        _selectedIndex = 0;
+        CurrentIndex = 0;
+        SelectedIndex = 0;
         _positionSeconds = 92;
     }
 
-    public static MusicDeckState CreateSeed()
-    {
-        return new MusicDeckState(
-        [
-            new MusicTrack("md-001", "Night Window", "Mina Vale", "Velvet Proof", "A late-room opener with tape hiss and warm plate reverb.", "04:26", 266, 92, "Am", 2024, "Studio A / ribbon chain", "warm low-end, close vocal, amber synth wash"),
-            new MusicTrack("md-002", "Slow Signal", "Mina Vale", "Velvet Proof", "A pulse-led bridge that keeps the room leaning forward.", "05:11", 311, 96, "Cm", 2024, "Sidecar print / tube bus", "percussion tucked, chorus blooms after bar 16"),
-            new MusicTrack("md-003", "Rose Static", "Lune Harbor", "Guest Cuts", "Guest vocal cameo with dry drums and soft brass ghosts.", "03:47", 227, 88, "F", 2023, "Live room / close mono", "intimate lead, wide ad-lib bed"),
-            new MusicTrack("md-004", "Afterglow Index", "Mina Vale", "Velvet Proof", "Instrumental sweep for transition and room reset.", "06:02", 362, 82, "Dm", 2024, "Half-speed print", "strings breathe, kick barely kisses"),
-            new MusicTrack("md-005", "Cedar Motel", "Vesper Choir", "Field Notes", "Dusty closer with spoken-note fragments and bowed bass.", "04:41", 281, 79, "Gm", 2022, "Hotel lounge overdub", "narrative outro, crowd noise tucked low"),
-        ]);
-    }
-
     public IReadOnlyList<MusicTrack> Queue => _queue;
-    public MusicTrack CurrentTrack => _queue[_currentIndex];
-    public MusicTrack SelectedTrack => _queue[_selectedIndex];
-    public int CurrentIndex => _currentIndex;
-    public int SelectedIndex => _selectedIndex;
+    public MusicTrack CurrentTrack => _queue[CurrentIndex];
+    public MusicTrack SelectedTrack => _queue[SelectedIndex];
+    public int CurrentIndex { get; private set; }
+
+    public int SelectedIndex { get; private set; }
+
     public bool IsPlaying { get; private set; } = true;
     public bool ShowingLinerNotes { get; private set; }
     public string DeckLabel => IsPlaying ? "Live take rolling" : "Needle lifted";
     public static string DeviceLabel => "PMC mains";
     public static string RoomLabel => "amber room";
     public string LastAction { get; private set; } = "settled into side A";
+
+    public double Progress =>
+        CurrentTrack.DurationSeconds <= 0 ? 0 : _positionSeconds / (double)CurrentTrack.DurationSeconds;
+
+    public string ProgressText => $"{FormatTime(_positionSeconds)} / {FormatTime(CurrentTrack.DurationSeconds)}";
+    public string RemainingText => $"-{FormatTime(Math.Max(0, CurrentTrack.DurationSeconds - _positionSeconds))}";
+
+    public static MusicDeckState CreateSeed()
+    {
+        return new MusicDeckState(
+        [
+            new MusicTrack("md-001", "Night Window", "Mina Vale", "Velvet Proof",
+                "A late-room opener with tape hiss and warm plate reverb.", "04:26", 266, 92, "Am", 2024,
+                "Studio A / ribbon chain", "warm low-end, close vocal, amber synth wash"),
+            new MusicTrack("md-002", "Slow Signal", "Mina Vale", "Velvet Proof",
+                "A pulse-led bridge that keeps the room leaning forward.", "05:11", 311, 96, "Cm", 2024,
+                "Sidecar print / tube bus", "percussion tucked, chorus blooms after bar 16"),
+            new MusicTrack("md-003", "Rose Static", "Lune Harbor", "Guest Cuts",
+                "Guest vocal cameo with dry drums and soft brass ghosts.", "03:47", 227, 88, "F", 2023,
+                "Live room / close mono", "intimate lead, wide ad-lib bed"),
+            new MusicTrack("md-004", "Afterglow Index", "Mina Vale", "Velvet Proof",
+                "Instrumental sweep for transition and room reset.", "06:02", 362, 82, "Dm", 2024, "Half-speed print",
+                "strings breathe, kick barely kisses"),
+            new MusicTrack("md-005", "Cedar Motel", "Vesper Choir", "Field Notes",
+                "Dusty closer with spoken-note fragments and bowed bass.", "04:41", 281, 79, "Gm", 2022,
+                "Hotel lounge overdub", "narrative outro, crowd noise tucked low")
+        ]);
+    }
 
     public void Tick()
     {
@@ -58,13 +74,15 @@ internal sealed class MusicDeckState
     public void TogglePlayPause()
     {
         IsPlaying = !IsPlaying;
-        LastAction = IsPlaying ? $"rolled {CurrentTrack.Title.ToLowerInvariant()}" : $"paused on {FormatTime(_positionSeconds)}";
+        LastAction = IsPlaying
+            ? $"rolled {CurrentTrack.Title.ToLowerInvariant()}"
+            : $"paused on {FormatTime(_positionSeconds)}";
     }
 
     public void Next()
     {
-        _currentIndex = (_currentIndex + 1) % _queue.Count;
-        _selectedIndex = _currentIndex;
+        CurrentIndex = (CurrentIndex + 1) % _queue.Count;
+        SelectedIndex = CurrentIndex;
         _positionSeconds = Math.Min(26, CurrentTrack.DurationSeconds / 8);
         IsPlaying = true;
         LastAction = $"cut to {CurrentTrack.Title.ToLowerInvariant()}";
@@ -72,8 +90,8 @@ internal sealed class MusicDeckState
 
     public void Previous()
     {
-        _currentIndex = (_currentIndex - 1 + _queue.Count) % _queue.Count;
-        _selectedIndex = _currentIndex;
+        CurrentIndex = (CurrentIndex - 1 + _queue.Count) % _queue.Count;
+        SelectedIndex = CurrentIndex;
         _positionSeconds = Math.Min(18, CurrentTrack.DurationSeconds / 10);
         IsPlaying = true;
         LastAction = $"back to {CurrentTrack.Title.ToLowerInvariant()}";
@@ -81,13 +99,13 @@ internal sealed class MusicDeckState
 
     public void MoveSelection(int delta)
     {
-        _selectedIndex = Math.Clamp(_selectedIndex + delta, 0, _queue.Count - 1);
+        SelectedIndex = Math.Clamp(SelectedIndex + delta, 0, _queue.Count - 1);
         LastAction = $"browsing {SelectedTrack.Title.ToLowerInvariant()}";
     }
 
     public void CueSelected()
     {
-        _currentIndex = _selectedIndex;
+        CurrentIndex = SelectedIndex;
         _positionSeconds = Math.Min(12, CurrentTrack.DurationSeconds / 12);
         IsPlaying = true;
         LastAction = $"cued {CurrentTrack.Title.ToLowerInvariant()}";
@@ -98,10 +116,6 @@ internal sealed class MusicDeckState
         ShowingLinerNotes = !ShowingLinerNotes;
         LastAction = ShowingLinerNotes ? "opened liner notes" : "returned to lyric sheet";
     }
-
-    public double Progress => CurrentTrack.DurationSeconds <= 0 ? 0 : _positionSeconds / (double)CurrentTrack.DurationSeconds;
-    public string ProgressText => $"{FormatTime(_positionSeconds)} / {FormatTime(CurrentTrack.DurationSeconds)}";
-    public string RemainingText => $"-{FormatTime(Math.Max(0, CurrentTrack.DurationSeconds - _positionSeconds))}";
 
     public string BuildQueueSummary()
     {
@@ -136,7 +150,7 @@ internal sealed class MusicDeckState
         [
             new StatItem("BPM", $"{CurrentTrack.Bpm}"),
             new StatItem("Key", CurrentTrack.Key),
-            new StatItem("Scene", DeckLabel),
+            new StatItem("Scene", DeckLabel)
         ];
     }
 
@@ -146,7 +160,7 @@ internal sealed class MusicDeckState
         [
             new StatItem("Album", CurrentTrack.Album),
             new StatItem("Print", CurrentTrack.SessionStamp),
-            new StatItem("Mood", CurrentTrack.MoodTag),
+            new StatItem("Mood", CurrentTrack.MoodTag)
         ];
     }
 

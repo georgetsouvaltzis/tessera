@@ -1,9 +1,6 @@
-using Tessera.Components.Composition;
-using Tessera.Components.Primitives;
-using Tessera.Components.Styling;
+using NUnit.Framework;
 using System.Diagnostics;
 using System.Text.RegularExpressions;
-using NUnit.Framework;
 
 namespace Tessera.IntegrationTests;
 
@@ -40,7 +37,8 @@ public sealed class TmuxSmokeIntegrationTests
             var decremented = await WaitForPaneContains(session, "Count: 0", TimeSpan.FromSeconds(3));
             StringAssert.Contains("Count: 0", decremented, "Down key should decrement the counter.");
 
-            Assert.That(PaneHasExamplesChildProcess(session), Is.True, "App process should be active before quit check.");
+            Assert.That(PaneHasExamplesChildProcess(session), Is.True,
+                "App process should be active before quit check.");
 
             SendKeys(session, "q");
             var quitObserved = await WaitForCondition(
@@ -215,11 +213,11 @@ public sealed class TmuxSmokeIntegrationTests
             RedirectStandardOutput = true,
             RedirectStandardError = true,
             UseShellExecute = false,
-            WorkingDirectory = RepoRoot,
+            WorkingDirectory = RepoRoot
         };
 
         using var process = Process.Start(startInfo)
-            ?? throw new InvalidOperationException($"Failed to start process: {fileName}");
+                            ?? throw new InvalidOperationException($"Failed to start process: {fileName}");
         var stdOut = process.StandardOutput.ReadToEnd();
         var stdErr = process.StandardError.ReadToEnd();
         process.WaitForExit();
@@ -228,7 +226,8 @@ public sealed class TmuxSmokeIntegrationTests
 
     private static string BuildAppRunCommand()
     {
-        var command = $"cd {QuoteForShell(RepoRoot)} && dotnet run --project {QuoteForShell(FixtureProjectPath)} --no-build; exec /bin/zsh -i";
+        var command =
+            $"cd {QuoteForShell(RepoRoot)} && dotnet run --project {QuoteForShell(FixtureProjectPath)} --no-build; exec /bin/zsh -i";
         return command.Replace("\\", "\\\\", StringComparison.Ordinal).Replace("\"", "\\\"", StringComparison.Ordinal);
     }
 
@@ -252,7 +251,8 @@ public sealed class TmuxSmokeIntegrationTests
             current = current.Parent;
         }
 
-        throw new InvalidOperationException("Could not locate Tessera.slnx from the integration test output directory.");
+        throw new InvalidOperationException(
+            "Could not locate Tessera.slnx from the integration test output directory.");
     }
 
     private sealed record CommandResult(int ExitCode, string StdOut, string StdErr);

@@ -1,62 +1,49 @@
-using Tessera.Widgets;
 using Tessera.Styles;
+using Tessera.Widgets;
 
 namespace Tessera.Controls;
 
 /// <summary>
-/// Represents a single-line input with in-place auto-complete suggestions.
+///     Represents a single-line input with in-place auto-complete suggestions.
 /// </summary>
 /// <remarks>
-/// Suggestions are filtered using case-insensitive substring matching against <see cref="Text" /> and ranked by earliest match position.
+///     Suggestions are filtered using case-insensitive substring matching against <see cref="Text" /> and ranked by
+///     earliest match position.
 /// </remarks>
 public sealed partial class AutocompleteInput : Control
 {
-    private readonly TextInputModel _input = new();
-    private readonly List<string> _suggestions = [];
     private readonly List<int> _filteredSuggestionIndices = [];
+    private readonly TextInputModel _input = new();
     private readonly List<(int SourceIndex, int MatchIndex)> _matchBuffer = [];
-    private int _selectedSuggestionIndex = -1;
+    private readonly List<string> _suggestions = [];
     private int _hoveredSuggestionIndex = -1;
 
     /// <summary>
-    /// Occurs when a suggestion is committed.
+    ///     Gets or sets the control title.
     /// </summary>
-    public event EventHandler<AutocompleteInputSuggestionCommittedEventArgs>? SuggestionCommitted;
+    public string Title { get; set; } = "Autocomplete";
 
     /// <summary>
-    /// Gets or sets the control title.
+    ///     Gets or sets marker appended to <see cref="Title" /> while focused.
     /// </summary>
-    public string Title
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = "Autocomplete";
+    public string FocusMarker { get; set; } = "*";
 
     /// <summary>
-    /// Gets or sets marker appended to <see cref="Title" /> while focused.
-    /// </summary>
-    public string FocusMarker
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = "*";
-
-    /// <summary>
-    /// Gets or sets a value indicating whether <see cref="FocusMarker" /> should be shown while focused.
+    ///     Gets or sets a value indicating whether <see cref="FocusMarker" /> should be shown while focused.
     /// </summary>
     public bool ShowFocusMarker { get; set; } = true;
 
     /// <summary>
-    /// Gets or sets placeholder text shown when <see cref="Text" /> is empty.
+    ///     Gets or sets placeholder text shown when <see cref="Text" /> is empty.
     /// </summary>
     public string Placeholder
     {
         get => _input.Placeholder;
-        set => _input.Placeholder = value ?? string.Empty;
+        set => _input.Placeholder = value;
     }
 
     /// <summary>
-    /// Gets or sets current input text.
+    ///     Gets or sets current input text.
     /// </summary>
     public string Text
     {
@@ -65,104 +52,104 @@ public sealed partial class AutocompleteInput : Control
     }
 
     /// <summary>
-    /// Gets configured suggestion values.
+    ///     Gets configured suggestion values.
     /// </summary>
     public IReadOnlyList<string> Suggestions => _suggestions;
 
     /// <summary>
-    /// Gets selected suggestion index in the current filtered suggestion list, or <c>-1</c>.
+    ///     Gets selected suggestion index in the current filtered suggestion list, or <c>-1</c>.
     /// </summary>
-    public int SelectedSuggestionIndex => _selectedSuggestionIndex;
+    public int SelectedSuggestionIndex { get; private set; } = -1;
 
     /// <summary>
-    /// Gets selected suggestion text, or <see langword="null"/> when no suggestion is selected.
+    ///     Gets selected suggestion text, or <see langword="null" /> when no suggestion is selected.
     /// </summary>
-    public string? SelectedSuggestion => TryGetSuggestion(_selectedSuggestionIndex, out var suggestion, out _)
+    public string? SelectedSuggestion => TryGetSuggestion(SelectedSuggestionIndex, out var suggestion, out _)
         ? suggestion
         : null;
 
     /// <summary>
-    /// Gets style used for title text when not focused.
+    ///     Gets style used for title text when not focused.
     /// </summary>
     public TesseraStyle TitleStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets style used for title text when focused.
+    ///     Gets style used for title text when focused.
     /// </summary>
     public TesseraStyle FocusedTitleStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets style used for input text.
+    ///     Gets style used for input text.
     /// </summary>
     public TesseraStyle InputTextStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets style used for placeholder text.
+    ///     Gets style used for placeholder text.
     /// </summary>
     public TesseraStyle PlaceholderTextStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets style applied to popup rows before suggestion state styles are merged.
+    ///     Gets style applied to popup rows before suggestion state styles are merged.
     /// </summary>
     public TesseraStyle PopupStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets style used for non-selected suggestions.
+    ///     Gets style used for non-selected suggestions.
     /// </summary>
     public TesseraStyle SuggestionStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets style merged for hovered suggestions.
+    ///     Gets style merged for hovered suggestions.
     /// </summary>
     public TesseraStyle HoveredSuggestionStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets style merged for selected suggestions.
+    ///     Gets style merged for selected suggestions.
     /// </summary>
     public TesseraStyle SelectedSuggestionStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets style merged for selected suggestions while focused.
+    ///     Gets style merged for selected suggestions while focused.
     /// </summary>
     public TesseraStyle FocusedSelectedSuggestionStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets style merged into all rendered text while disabled.
+    ///     Gets style merged into all rendered text while disabled.
     /// </summary>
     public TesseraStyle DisabledStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets style applied to border glyphs when not focused.
+    ///     Gets style applied to border glyphs when not focused.
     /// </summary>
     public TesseraStyle BorderStyleText { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets style applied to border glyphs when focused.
+    ///     Gets style applied to border glyphs when focused.
     /// </summary>
     public TesseraStyle FocusedBorderStyleText { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets style applied to commit hint marker.
+    ///     Gets style applied to commit hint marker.
     /// </summary>
     public TesseraStyle CommitMarkerStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets control border style.
+    ///     Gets or sets control border style.
     /// </summary>
     public BorderStyle Border { get; set; } = BorderStyle.SingleLine;
 
     /// <summary>
-    /// Gets or sets inner padding.
+    ///     Gets or sets inner padding.
     /// </summary>
     public Thickness Padding { get; set; }
 
     /// <summary>
-    /// Gets or sets maximum number of visible suggestion rows.
+    ///     Gets or sets maximum number of visible suggestion rows.
     /// </summary>
     public int MaxVisibleSuggestions { get; set; } = 5;
 
     /// <summary>
-    /// Gets or sets glyphs used by selected suggestion and commit hint markers.
+    ///     Gets or sets glyphs used by selected suggestion and commit hint markers.
     /// </summary>
     public AutocompleteInputGlyphSet Glyphs { get; set; } = AutocompleteInputGlyphSet.Default;
 
@@ -175,18 +162,25 @@ public sealed partial class AutocompleteInput : Control
     /// <inheritdoc />
     public override bool IsReadOnly { get; set; }
 
+    private bool IsPopupVisible => _filteredSuggestionIndices.Count > 0;
+
     /// <summary>
-    /// Replaces current input text.
+    ///     Occurs when a suggestion is committed.
+    /// </summary>
+    public event EventHandler<AutocompleteInputSuggestionCommittedEventArgs>? SuggestionCommitted;
+
+    /// <summary>
+    ///     Replaces current input text.
     /// </summary>
     /// <param name="text">Text to set.</param>
     public void SetText(string text)
     {
-        _input.SetValue(text ?? string.Empty);
+        _input.SetValue(text);
         RefreshFilteredSuggestions();
     }
 
     /// <summary>
-    /// Replaces source suggestion values.
+    ///     Replaces source suggestion values.
     /// </summary>
     /// <param name="suggestions">Suggestions used by auto-complete matching.</param>
     public void SetSuggestions(IEnumerable<string> suggestions)
@@ -203,31 +197,31 @@ public sealed partial class AutocompleteInput : Control
     }
 
     /// <summary>
-    /// Sets selected suggestion index within the current filtered suggestion list.
+    ///     Sets selected suggestion index within the current filtered suggestion list.
     /// </summary>
     /// <param name="index">Filtered suggestion index.</param>
-    /// <returns><see langword="true"/> when selection changed.</returns>
+    /// <returns><see langword="true" /> when selection changed.</returns>
     public bool SetSelectedSuggestionIndex(int index)
     {
         if (_filteredSuggestionIndices.Count == 0)
         {
-            _selectedSuggestionIndex = -1;
+            SelectedSuggestionIndex = -1;
             return false;
         }
 
         var clamped = Math.Clamp(index, 0, _filteredSuggestionIndices.Count - 1);
-        if (_selectedSuggestionIndex == clamped)
+        if (SelectedSuggestionIndex == clamped)
         {
             return false;
         }
 
-        _selectedSuggestionIndex = clamped;
+        SelectedSuggestionIndex = clamped;
         return true;
     }
 
     private bool CommitSelection()
     {
-        if (!TryGetSuggestion(_selectedSuggestionIndex, out var suggestion, out var sourceIndex))
+        if (!TryGetSuggestion(SelectedSuggestionIndex, out var suggestion, out var sourceIndex))
         {
             return false;
         }
@@ -235,7 +229,8 @@ public sealed partial class AutocompleteInput : Control
         var previous = _input.Value;
         _input.SetValue(suggestion);
         RefreshFilteredSuggestions();
-        SuggestionCommitted?.Invoke(this, new AutocompleteInputSuggestionCommittedEventArgs(suggestion, sourceIndex, previous));
+        SuggestionCommitted?.Invoke(this,
+            new AutocompleteInputSuggestionCommittedEventArgs(suggestion, sourceIndex, previous));
         return true;
     }
 
@@ -246,15 +241,15 @@ public sealed partial class AutocompleteInput : Control
             return false;
         }
 
-        var next = _selectedSuggestionIndex < 0
+        var next = SelectedSuggestionIndex < 0
             ? 0
-            : (_selectedSuggestionIndex + delta + _filteredSuggestionIndices.Count) % _filteredSuggestionIndices.Count;
+            : (SelectedSuggestionIndex + delta + _filteredSuggestionIndices.Count) % _filteredSuggestionIndices.Count;
         return SetSelectedSuggestionIndex(next);
     }
 
     private void RefreshFilteredSuggestions()
     {
-        var previousSelectedSource = TryGetSuggestion(_selectedSuggestionIndex, out _, out var sourceIndex)
+        var previousSelectedSource = TryGetSuggestion(SelectedSuggestionIndex, out _, out var sourceIndex)
             ? sourceIndex
             : -1;
 
@@ -292,7 +287,7 @@ public sealed partial class AutocompleteInput : Control
         }
 
         _hoveredSuggestionIndex = -1;
-        _selectedSuggestionIndex = ResolvePreferredSelectedIndex(previousSelectedSource);
+        SelectedSuggestionIndex = ResolvePreferredSelectedIndex(previousSelectedSource);
     }
 
     private int ResolvePreferredSelectedIndex(int previousSelectedSource)
@@ -312,8 +307,6 @@ public sealed partial class AutocompleteInput : Control
 
         return 0;
     }
-
-    private bool IsPopupVisible => _filteredSuggestionIndices.Count > 0;
 
     private bool TryGetSuggestion(int filteredIndex, out string suggestion, out int sourceIndex)
     {

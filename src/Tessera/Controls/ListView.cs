@@ -1,4 +1,4 @@
-﻿using Tessera.Components.Primitives;
+using Tessera.Components.Primitives;
 using Tessera.Components.Primitives.Internal;
 using Tessera.Controls.Internal;
 using Tessera.Layout;
@@ -8,7 +8,7 @@ using Tessera.Widgets;
 namespace Tessera.Controls;
 
 /// <summary>
-/// Represents a scrollable single-selection list.
+///     Represents a scrollable single-selection list.
 /// </summary>
 /// <typeparam name="T">The item type shown by the list.</typeparam>
 public sealed class ListView<T> : Control
@@ -17,7 +17,7 @@ public sealed class ListView<T> : Control
     private int? _hoveredFilteredIndex;
 
     /// <summary>
-    /// Initializes a new list view.
+    ///     Initializes a new list view.
     /// </summary>
     /// <param name="textSelector">Optional item-to-text projection.</param>
     public ListView(Func<T, string>? textSelector = null)
@@ -26,30 +26,17 @@ public sealed class ListView<T> : Control
     }
 
     /// <summary>
-    /// Occurs when the selected item changes.
+    ///     Gets or sets the list title.
     /// </summary>
-    public event EventHandler<ListSelectionChangedEventArgs<T>>? SelectionChanged;
+    public string Title { get; set; } = "List";
 
     /// <summary>
-    /// Gets or sets the list title.
+    ///     Gets or sets the marker shown in the title when the control is focused.
     /// </summary>
-    public string Title
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = "List";
+    public string FocusMarker { get; set; } = "*";
 
     /// <summary>
-    /// Gets or sets the marker shown in the title when the control is focused.
-    /// </summary>
-    public string FocusMarker
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = "*";
-
-    /// <summary>
-    /// Gets or sets a value indicating whether the focus marker should be rendered in the title when focused.
+    ///     Gets or sets a value indicating whether the focus marker should be rendered in the title when focused.
     /// </summary>
     public bool ShowFocusMarker
     {
@@ -58,7 +45,7 @@ public sealed class ListView<T> : Control
     } = true;
 
     /// <summary>
-    /// Gets or sets the title style applied when the control is not focused.
+    ///     Gets or sets the title style applied when the control is not focused.
     /// </summary>
     public TesseraStyle TitleStyle
     {
@@ -67,7 +54,7 @@ public sealed class ListView<T> : Control
     } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the title style applied when the control is focused.
+    ///     Gets or sets the title style applied when the control is focused.
     /// </summary>
     public TesseraStyle FocusedTitleStyle
     {
@@ -76,7 +63,7 @@ public sealed class ListView<T> : Control
     } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the style applied to border glyphs when the control is not focused.
+    ///     Gets or sets the style applied to border glyphs when the control is not focused.
     /// </summary>
     public TesseraStyle BorderStyleText
     {
@@ -85,7 +72,7 @@ public sealed class ListView<T> : Control
     } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the style applied to border glyphs when the control is focused.
+    ///     Gets or sets the style applied to border glyphs when the control is focused.
     /// </summary>
     public TesseraStyle FocusedBorderStyleText
     {
@@ -94,7 +81,7 @@ public sealed class ListView<T> : Control
     } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the list border style.
+    ///     Gets or sets the list border style.
     /// </summary>
     public BorderStyle Border
     {
@@ -103,7 +90,7 @@ public sealed class ListView<T> : Control
     } = BorderStyle.SingleLine;
 
     /// <summary>
-    /// Gets or sets the inner padding applied to the list body.
+    ///     Gets or sets the inner padding applied to the list body.
     /// </summary>
     public Thickness Padding
     {
@@ -112,7 +99,7 @@ public sealed class ListView<T> : Control
     }
 
     /// <summary>
-    /// Gets or sets the style used for unselected and non-hovered rows.
+    ///     Gets or sets the style used for unselected and non-hovered rows.
     /// </summary>
     public TesseraStyle DefaultRowStyle
     {
@@ -121,7 +108,7 @@ public sealed class ListView<T> : Control
     } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the style used for hovered rows.
+    ///     Gets or sets the style used for hovered rows.
     /// </summary>
     public TesseraStyle HoveredRowStyle
     {
@@ -130,7 +117,7 @@ public sealed class ListView<T> : Control
     } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the style used for selected rows.
+    ///     Gets or sets the style used for selected rows.
     /// </summary>
     public TesseraStyle SelectedRowStyle
     {
@@ -139,7 +126,7 @@ public sealed class ListView<T> : Control
     } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets row markers used during list rendering.
+    ///     Gets or sets row markers used during list rendering.
     /// </summary>
     public ListViewMarkerSet RowMarkers
     {
@@ -148,7 +135,7 @@ public sealed class ListView<T> : Control
     } = ListViewMarkerSet.Default;
 
     /// <summary>
-    /// Gets or sets how many items fit in a page-sized view.
+    ///     Gets or sets how many items fit in a page-sized view.
     /// </summary>
     public int PageSize
     {
@@ -157,17 +144,17 @@ public sealed class ListView<T> : Control
     }
 
     /// <summary>
-    /// Gets the number of currently visible items after filtering.
+    ///     Gets the number of currently visible items after filtering.
     /// </summary>
     public int Count => _model.Count;
 
     /// <summary>
-    /// Gets the current selected index.
+    ///     Gets the current selected index.
     /// </summary>
     public int SelectedIndex => _model.SelectedIndex;
 
     /// <summary>
-    /// Gets the currently selected item.
+    ///     Gets the currently selected item.
     /// </summary>
     public T? SelectedItem => _model.SelectedItem;
 
@@ -193,7 +180,12 @@ public sealed class ListView<T> : Control
     }
 
     /// <summary>
-    /// Replaces the items shown by the list.
+    ///     Occurs when the selected item changes.
+    /// </summary>
+    public event EventHandler<ListSelectionChangedEventArgs<T>>? SelectionChanged;
+
+    /// <summary>
+    ///     Replaces the items shown by the list.
     /// </summary>
     /// <param name="items">The items to display.</param>
     public void SetItems(IEnumerable<T> items)
@@ -205,19 +197,19 @@ public sealed class ListView<T> : Control
     }
 
     /// <summary>
-    /// Applies a filter string to the list items.
+    ///     Applies a filter string to the list items.
     /// </summary>
     /// <param name="filter">The filter string.</param>
     public void SetFilter(string filter)
     {
         var previousIndex = SelectedIndex;
         var previousItem = SelectedItem;
-        _model.SetFilter(filter ?? string.Empty);
+        _model.SetFilter(filter);
         RaiseSelectionChangedIfNeeded(previousIndex, previousItem);
     }
 
     /// <summary>
-    /// Sets the selected row index using bounds clamping.
+    ///     Sets the selected row index using bounds clamping.
     /// </summary>
     /// <param name="index">The requested index.</param>
     /// <returns><see langword="true" /> when selection changed; otherwise, <see langword="false" />.</returns>
@@ -231,7 +223,7 @@ public sealed class ListView<T> : Control
     }
 
     /// <summary>
-    /// Compatibility wrapper for selecting by index.
+    ///     Compatibility wrapper for selecting by index.
     /// </summary>
     /// <param name="index">The requested index.</param>
     /// <returns><see langword="true" /> when selection changed; otherwise, <see langword="false" />.</returns>
@@ -281,7 +273,7 @@ public sealed class ListView<T> : Control
 
         _model.PageSize = Math.Max(1, content.Height);
         var hoverChanged = pointer.Kind is PointerEventKind.Motion or PointerEventKind.Press
-            && SetHoveredByPointer(pointer.X, pointer.Y, content);
+                           && SetHoveredByPointer(pointer.X, pointer.Y, content);
 
         if (pointer.Kind == PointerEventKind.Motion)
         {
@@ -293,7 +285,8 @@ public sealed class ListView<T> : Control
             return hoverChanged || Handle(message);
         }
 
-        if (pointer is not { Kind: PointerEventKind.Press, Button: PointerButton.Left } click || !content.Contains(click.X, click.Y))
+        if (pointer is not { Kind: PointerEventKind.Press, Button: PointerButton.Left } click ||
+            !content.Contains(click.X, click.Y))
         {
             return false;
         }
@@ -342,7 +335,7 @@ public sealed class ListView<T> : Control
         var rows = _model.VisibleRows();
         if (rows.Count == 0 && content.Height > 0)
         {
-            canvas.WriteText(content.X, content.Y, ApplyRowStyle("(empty)", selected: false, hovered: false), content.Width);
+            canvas.WriteText(content.X, content.Y, ApplyRowStyle("(empty)", false, false), content.Width);
             return;
         }
 
@@ -371,7 +364,8 @@ public sealed class ListView<T> : Control
         var width = 0;
         for (var index = 0; index < rows.Count; index++)
         {
-            width = Math.Max(width, ControlTextLayout.MeasureDisplayWidth(_model.LabelFor(rows[index].Item)) + ResolveMarkerPrefixWidth());
+            width = Math.Max(width,
+                ControlTextLayout.MeasureDisplayWidth(_model.LabelFor(rows[index].Item)) + ResolveMarkerPrefixWidth());
         }
 
         width += Padding.Horizontal;
@@ -396,7 +390,8 @@ public sealed class ListView<T> : Control
             return;
         }
 
-        SelectionChanged?.Invoke(this, new ListSelectionChangedEventArgs<T>(previousIndex, SelectedIndex, previousItem, SelectedItem));
+        SelectionChanged?.Invoke(this,
+            new ListSelectionChangedEventArgs<T>(previousIndex, SelectedIndex, previousItem, SelectedItem));
     }
 
     private bool SetHoveredByPointer(int x, int y, Rect content)
@@ -487,5 +482,8 @@ public sealed class ListView<T> : Control
             : BorderStyleText;
     }
 
-    private static string DefaultText(T item) => item?.ToString() ?? string.Empty;
+    private static string DefaultText(T item)
+    {
+        return item?.ToString() ?? string.Empty;
+    }
 }

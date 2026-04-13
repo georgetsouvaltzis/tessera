@@ -15,7 +15,7 @@ public sealed class NotificationsSelectionChangedEventTests
         [
             new InboxItem("a", "alpha", NotificationLevel.Info, DateTimeOffset.UnixEpoch),
             new InboxItem("b", "beta", NotificationLevel.Warning, DateTimeOffset.UnixEpoch),
-            new InboxItem("c", "gamma", NotificationLevel.Error, DateTimeOffset.UnixEpoch),
+            new InboxItem("c", "gamma", NotificationLevel.Error, DateTimeOffset.UnixEpoch)
         ]);
 
         ListSelectionChangedEventArgs<InboxItem>? observed = null;
@@ -38,7 +38,7 @@ public sealed class NotificationsSelectionChangedEventTests
         control.SetItems(
         [
             new InboxItem("a", "alpha", NotificationLevel.Info, DateTimeOffset.UnixEpoch),
-            new InboxItem("b", "beta", NotificationLevel.Warning, DateTimeOffset.UnixEpoch),
+            new InboxItem("b", "beta", NotificationLevel.Warning, DateTimeOffset.UnixEpoch)
         ]);
 
         ListSelectionChangedEventArgs<InboxItem>? observed = null;
@@ -60,7 +60,7 @@ public sealed class NotificationsSelectionChangedEventTests
         control.SetItems(
         [
             new InboxItem("a", "alpha", NotificationLevel.Info, DateTimeOffset.UnixEpoch),
-            new InboxItem("b", "beta", NotificationLevel.Warning, DateTimeOffset.UnixEpoch),
+            new InboxItem("b", "beta", NotificationLevel.Warning, DateTimeOffset.UnixEpoch)
         ]);
         control.SetSelectedIndex(1);
 

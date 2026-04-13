@@ -1,12 +1,12 @@
 namespace Tessera.Controls;
 
 /// <summary>
-/// Provides token-selection transition data for <see cref="TokenEditor.SelectionChanged" />.
+///     Provides token-selection transition data for <see cref="TokenEditor.SelectionChanged" />.
 /// </summary>
 public sealed class TokenEditorSelectionChangedEventArgs : EventArgs
 {
     /// <summary>
-    /// Initializes selection change arguments.
+    ///     Initializes selection change arguments.
     /// </summary>
     /// <param name="previousIndex">Previously selected token index, or <c>-1</c>.</param>
     /// <param name="selectedIndex">Current selected token index, or <c>-1</c>.</param>
@@ -25,22 +25,22 @@ public sealed class TokenEditorSelectionChangedEventArgs : EventArgs
     }
 
     /// <summary>
-    /// Gets previously selected token index, or <c>-1</c> when none.
+    ///     Gets previously selected token index, or <c>-1</c> when none.
     /// </summary>
     public int PreviousIndex { get; }
 
     /// <summary>
-    /// Gets current selected token index, or <c>-1</c> when none.
+    ///     Gets current selected token index, or <c>-1</c> when none.
     /// </summary>
     public int SelectedIndex { get; }
 
     /// <summary>
-    /// Gets previously selected token, if any.
+    ///     Gets previously selected token, if any.
     /// </summary>
     public TokenItem? PreviousToken { get; }
 
     /// <summary>
-    /// Gets current selected token, if any.
+    ///     Gets current selected token, if any.
     /// </summary>
     public TokenItem? SelectedToken { get; }
 }

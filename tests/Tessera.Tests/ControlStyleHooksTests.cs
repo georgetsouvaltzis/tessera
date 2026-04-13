@@ -43,14 +43,14 @@ internal static class ControlStyleHooksTests
             RightText = "right",
             FillStyle = TesseraStyle.Empty.WithForeground(AnsiColor.BrightBlue),
             LeftTextStyle = TesseraStyle.Empty.WithBold().WithForeground(AnsiColor.BrightGreen),
-            RightTextStyle = TesseraStyle.Empty.WithUnderline().WithForeground(AnsiColor.BrightYellow),
+            RightTextStyle = TesseraStyle.Empty.WithUnderline().WithForeground(AnsiColor.BrightYellow)
         };
 
-        var output = Render(statusBar, width: 30, height: 1);
+        var output = Render(statusBar, 30, 1);
 
-        AssertContains(output, "\u001b[38;5;12m");
-        AssertContains(output, "\u001b[1;38;5;10m");
-        AssertContains(output, "\u001b[4;38;5;11m");
+        AssertContains(output, "\e[38;5;12m");
+        AssertContains(output, "\e[1;38;5;10m");
+        AssertContains(output, "\e[4;38;5;11m");
         return Task.CompletedTask;
     }
 
@@ -61,19 +61,19 @@ internal static class ControlStyleHooksTests
             Border = BorderStyle.None,
             DefaultRowStyle = TesseraStyle.Empty.WithForeground(AnsiColor.BrightCyan),
             HoveredRowStyle = TesseraStyle.Empty.WithUnderline().WithForeground(AnsiColor.BrightYellow),
-            SelectedRowStyle = TesseraStyle.Empty.WithBold().WithForeground(AnsiColor.BrightGreen),
+            SelectedRowStyle = TesseraStyle.Empty.WithBold().WithForeground(AnsiColor.BrightGreen)
         };
 
         list.SetItems(["alpha", "beta", "gamma"]);
         list.Handle(
-            new PointerInput(PointerEventKind.Motion, PointerButton.None, X: 1, Y: 1),
+            new PointerInput(PointerEventKind.Motion, PointerButton.None, 1, 1),
             new Rect(0, 0, 24, 3));
 
-        var output = Render(list, width: 24, height: 3);
+        var output = Render(list, 24, 3);
 
-        AssertContains(output, "\u001b[1;38;5;10m");
-        AssertContains(output, "\u001b[4;38;5;11m");
-        AssertContains(output, "\u001b[38;5;14m");
+        AssertContains(output, "\e[1;38;5;10m");
+        AssertContains(output, "\e[4;38;5;11m");
+        AssertContains(output, "\e[38;5;14m");
         return Task.CompletedTask;
     }
 
@@ -87,21 +87,21 @@ internal static class ControlStyleHooksTests
             FocusMarker = "!",
             ShowFocusMarker = true,
             FocusedTitleStyle = TesseraStyle.Empty.WithUnderline().WithForeground(AnsiColor.BrightMagenta),
-            TitleStyle = TesseraStyle.Empty.WithForeground(AnsiColor.BrightCyan),
+            TitleStyle = TesseraStyle.Empty.WithForeground(AnsiColor.BrightCyan)
         };
         list.SetItems(["alpha"]);
 
-        var focused = Render(list, width: 32, height: 4);
+        var focused = Render(list, 32, 4);
         AssertContains(focused, "Projects !");
-        AssertContains(focused, "\u001b[4;38;5;13m");
+        AssertContains(focused, "\e[4;38;5;13m");
 
         list.ShowFocusMarker = false;
-        var withoutMarker = Render(list, width: 32, height: 4);
+        var withoutMarker = Render(list, 32, 4);
         AssertNotContains(withoutMarker, "Projects !");
 
         list.IsFocused = false;
-        var unfocused = Render(list, width: 32, height: 4);
-        AssertContains(unfocused, "\u001b[38;5;14m");
+        var unfocused = Render(list, 32, 4);
+        AssertContains(unfocused, "\e[38;5;14m");
         return Task.CompletedTask;
     }
 
@@ -113,26 +113,26 @@ internal static class ControlStyleHooksTests
             LabelStyle = TesseraStyle.Empty.WithForeground(AnsiColor.BrightCyan),
             FocusedLabelStyle = TesseraStyle.Empty.WithUnderline(),
             DisabledLabelStyle = TesseraStyle.Empty.WithDim(),
-            PressedLabelStyle = TesseraStyle.Empty.WithForeground(AnsiColor.BrightMagenta),
+            PressedLabelStyle = TesseraStyle.Empty.WithForeground(AnsiColor.BrightMagenta)
         };
 
         button.IsFocused = true;
-        var focused = Render(button, width: 16, height: 1);
-        AssertContains(focused, "\u001b[4;38;5;14m");
+        var focused = Render(button, 16, 1);
+        AssertContains(focused, "\e[4;38;5;14m");
 
         button.IsFocused = false;
         button.IsDisabled = true;
-        var disabled = Render(button, width: 16, height: 1);
-        AssertContains(disabled, "\u001b[2;38;5;14m");
+        var disabled = Render(button, 16, 1);
+        AssertContains(disabled, "\e[2;38;5;14m");
 
         button.IsDisabled = false;
         button.IsFocused = true;
         _ = button.Handle(
-            new PointerInput(PointerEventKind.Press, PointerButton.Left, X: 1, Y: 0),
+            new PointerInput(PointerEventKind.Press, PointerButton.Left, 1, 0),
             new Rect(0, 0, 16, 1));
 
-        var pressed = Render(button, width: 16, height: 1);
-        AssertContains(pressed, "\u001b[4;38;5;13m");
+        var pressed = Render(button, 16, 1);
+        AssertContains(pressed, "\e[4;38;5;13m");
         return Task.CompletedTask;
     }
 
@@ -145,16 +145,16 @@ internal static class ControlStyleHooksTests
             Placeholder = "name",
             ValueTextStyle = TesseraStyle.Empty.WithForeground(AnsiColor.BrightGreen),
             PlaceholderTextStyle = TesseraStyle.Empty.WithDim().WithForeground(AnsiColor.BrightYellow),
-            FocusedTitleStyle = TesseraStyle.Empty.WithUnderline().WithForeground(AnsiColor.BrightMagenta),
+            FocusedTitleStyle = TesseraStyle.Empty.WithUnderline().WithForeground(AnsiColor.BrightMagenta)
         };
 
-        var placeholder = Render(input, width: 22, height: 3);
-        AssertContains(placeholder, "\u001b[4;38;5;13m");
-        AssertContains(placeholder, "\u001b[2;38;5;11m");
+        var placeholder = Render(input, 22, 3);
+        AssertContains(placeholder, "\e[4;38;5;13m");
+        AssertContains(placeholder, "\e[2;38;5;11m");
 
         input.SetValue("abc");
-        var value = Render(input, width: 22, height: 3);
-        AssertContains(value, "\u001b[38;5;10m");
+        var value = Render(input, 22, 3);
+        AssertContains(value, "\e[38;5;10m");
         return Task.CompletedTask;
     }
 
@@ -168,20 +168,20 @@ internal static class ControlStyleHooksTests
             FocusMarker = "!",
             ShowFocusMarker = true,
             FocusedTitleStyle = TesseraStyle.Empty.WithUnderline().WithForeground(AnsiColor.BrightMagenta),
-            TitleStyle = TesseraStyle.Empty.WithForeground(AnsiColor.BrightCyan),
+            TitleStyle = TesseraStyle.Empty.WithForeground(AnsiColor.BrightCyan)
         };
 
-        var focused = Render(input, width: 24, height: 3);
+        var focused = Render(input, 24, 3);
         AssertContains(focused, "Search !");
-        AssertContains(focused, "\u001b[4;38;5;13m");
+        AssertContains(focused, "\e[4;38;5;13m");
 
         input.ShowFocusMarker = false;
-        var withoutMarker = Render(input, width: 24, height: 3);
+        var withoutMarker = Render(input, 24, 3);
         AssertNotContains(withoutMarker, "Search !");
 
         input.IsFocused = false;
-        var unfocused = Render(input, width: 24, height: 3);
-        AssertContains(unfocused, "\u001b[38;5;14m");
+        var unfocused = Render(input, 24, 3);
+        AssertContains(unfocused, "\e[38;5;14m");
         return Task.CompletedTask;
     }
 
@@ -195,25 +195,25 @@ internal static class ControlStyleHooksTests
             FocusMarker = "!",
             ShowFocusMarker = true,
             FocusedTitleStyle = TesseraStyle.Empty.WithUnderline().WithForeground(AnsiColor.BrightMagenta),
-            TitleStyle = TesseraStyle.Empty.WithForeground(AnsiColor.BrightCyan),
+            TitleStyle = TesseraStyle.Empty.WithForeground(AnsiColor.BrightCyan)
         };
         table.SetRows(
         [
             ["A", "Open"],
-            ["B", "Done"],
+            ["B", "Done"]
         ]);
 
-        var focused = Render(table, width: 48, height: 8);
+        var focused = Render(table, 48, 8);
         AssertContains(focused, "Tasks !");
-        AssertContains(focused, "\u001b[4;38;5;13m");
+        AssertContains(focused, "\e[4;38;5;13m");
 
         table.ShowFocusMarker = false;
-        var withoutMarker = Render(table, width: 48, height: 8);
+        var withoutMarker = Render(table, 48, 8);
         AssertNotContains(withoutMarker, "Tasks !");
 
         table.IsFocused = false;
-        var unfocused = Render(table, width: 48, height: 8);
-        AssertContains(unfocused, "\u001b[38;5;14m");
+        var unfocused = Render(table, 48, 8);
+        AssertContains(unfocused, "\e[38;5;14m");
         return Task.CompletedTask;
     }
 
@@ -226,20 +226,20 @@ internal static class ControlStyleHooksTests
             FocusMarker = "!",
             ShowFocusMarker = true,
             FocusedTitleStyle = TesseraStyle.Empty.WithUnderline().WithForeground(AnsiColor.BrightMagenta),
-            TitleStyle = TesseraStyle.Empty.WithForeground(AnsiColor.BrightCyan),
+            TitleStyle = TesseraStyle.Empty.WithForeground(AnsiColor.BrightCyan)
         };
 
-        var focused = Render(tabs, width: 48, height: 1);
+        var focused = Render(tabs, 48, 1);
         AssertContains(focused, "Main !");
-        AssertContains(focused, "\u001b[4;38;5;13m");
+        AssertContains(focused, "\e[4;38;5;13m");
 
         tabs.ShowFocusMarker = false;
-        var withoutMarker = Render(tabs, width: 48, height: 1);
+        var withoutMarker = Render(tabs, 48, 1);
         AssertNotContains(withoutMarker, "Main !");
 
         tabs.IsFocused = false;
-        var unfocused = Render(tabs, width: 48, height: 1);
-        AssertContains(unfocused, "\u001b[38;5;14m");
+        var unfocused = Render(tabs, 48, 1);
+        AssertContains(unfocused, "\e[38;5;14m");
         return Task.CompletedTask;
     }
 
@@ -269,7 +269,7 @@ internal static class ControlStyleHooksTests
     private static string Escape(string text)
     {
         return text
-            .Replace("\u001b", "\\u001b", StringComparison.Ordinal)
+            .Replace("\e", "\\e", StringComparison.Ordinal)
             .Replace("\r", "\\r", StringComparison.Ordinal)
             .Replace("\n", "\\n", StringComparison.Ordinal);
     }

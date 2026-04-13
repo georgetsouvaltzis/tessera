@@ -1,4 +1,4 @@
-﻿using Tessera.Components.Primitives;
+using Tessera.Components.Primitives;
 using Tessera.Components.Primitives.Internal;
 using Tessera.Controls.Internal;
 using Tessera.Layout;
@@ -7,16 +7,12 @@ using Tessera.Styles;
 namespace Tessera.Controls;
 
 /// <summary>
-/// Represents a read-focused key/value property table with optional category grouping.
+///     Represents a read-focused key/value property table with optional category grouping.
 /// </summary>
 public sealed class PropertyGrid : Control
 {
     private readonly List<PropertyGridProperty> _properties = [];
-    private int _selectedIndex = -1;
     private int _scrollOffset;
-
-    /// <summary>Occurs when <see cref="SelectedIndex"/> changes.</summary>
-    public event EventHandler<PropertyGridSelectionChangedEventArgs>? SelectionChanged;
 
     /// <summary>Gets or sets the grid title.</summary>
     public string Title { get; set; } = "Property Grid";
@@ -79,26 +75,31 @@ public sealed class PropertyGrid : Control
     public IReadOnlyList<PropertyGridProperty> Properties => _properties;
 
     /// <summary>Gets the selected row index, or <c>-1</c> when the grid is empty.</summary>
-    public int SelectedIndex => _selectedIndex;
+    public int SelectedIndex { get; private set; } = -1;
 
     /// <summary>Gets the selected property row, when any.</summary>
-    public PropertyGridProperty? SelectedProperty => _selectedIndex >= 0 && _selectedIndex < _properties.Count
-        ? _properties[_selectedIndex]
+    public PropertyGridProperty? SelectedProperty => SelectedIndex >= 0 && SelectedIndex < _properties.Count
+        ? _properties[SelectedIndex]
         : null;
 
     /// <inheritdoc />
     public override bool IsFocused { get; set; }
+
     /// <inheritdoc />
     public override bool IsDisabled { get; set; }
+
     /// <inheritdoc />
     public override bool IsReadOnly { get; set; }
+
+    /// <summary>Occurs when <see cref="SelectedIndex" /> changes.</summary>
+    public event EventHandler<PropertyGridSelectionChangedEventArgs>? SelectionChanged;
 
     /// <summary>Replaces all property rows.</summary>
     /// <param name="properties">The properties to show.</param>
     public void SetProperties(IEnumerable<PropertyGridProperty> properties)
     {
         ArgumentNullException.ThrowIfNull(properties);
-        var previousIndex = _selectedIndex;
+        var previousIndex = SelectedIndex;
         var previousProperty = SelectedProperty;
 
         _properties.Clear();
@@ -109,20 +110,21 @@ public sealed class PropertyGrid : Control
 
         if (_properties.Count == 0)
         {
-            _selectedIndex = -1;
+            SelectedIndex = -1;
         }
         else
         {
-            var seedIndex = _selectedIndex < 0 ? 0 : _selectedIndex;
-            _selectedIndex = Math.Clamp(seedIndex, 0, _properties.Count - 1);
+            var seedIndex = SelectedIndex < 0 ? 0 : SelectedIndex;
+            SelectedIndex = Math.Clamp(seedIndex, 0, _properties.Count - 1);
         }
+
         _scrollOffset = 0;
         RaiseSelectionChangedIfNeeded(previousIndex, previousProperty);
     }
 
     /// <summary>Sets selected row index using bounds clamping.</summary>
     /// <param name="index">The requested selected index.</param>
-    /// <returns><see langword="true"/> when the selection changed; otherwise <see langword="false"/>.</returns>
+    /// <returns><see langword="true" /> when the selection changed; otherwise <see langword="false" />.</returns>
     public bool SetSelectedIndex(int index)
     {
         if (_properties.Count == 0)
@@ -131,14 +133,14 @@ public sealed class PropertyGrid : Control
         }
 
         var clamped = Math.Clamp(index, 0, _properties.Count - 1);
-        if (clamped == _selectedIndex)
+        if (clamped == SelectedIndex)
         {
             return false;
         }
 
-        var previousIndex = _selectedIndex;
+        var previousIndex = SelectedIndex;
         var previousProperty = SelectedProperty;
-        _selectedIndex = clamped;
+        SelectedIndex = clamped;
         RaiseSelectionChangedIfNeeded(previousIndex, previousProperty);
         return true;
     }
@@ -146,19 +148,20 @@ public sealed class PropertyGrid : Control
     /// <inheritdoc />
     public override bool Handle(Message message)
     {
-        if (IsDisabled || IsReadOnly || !IsFocused || _properties.Count == 0 || message is not KeyPressed key)
+        if (IsDisabled || IsReadOnly || !IsFocused || _properties.Count == 0 ||
+            message is not KeyPressed key)
         {
             return false;
         }
 
         if (key.Is(Key.Down) || key.IsCharacter('j'))
         {
-            return SetSelectedIndex(_selectedIndex + 1);
+            return SetSelectedIndex(SelectedIndex + 1);
         }
 
         if (key.Is(Key.Up) || key.IsCharacter('k'))
         {
-            return SetSelectedIndex(_selectedIndex - 1);
+            return SetSelectedIndex(SelectedIndex - 1);
         }
 
         if (key.Is(Key.Home))
@@ -192,12 +195,12 @@ public sealed class PropertyGrid : Control
         {
             if (pointer.Button == PointerButton.WheelDown)
             {
-                return SetSelectedIndex(_selectedIndex + 1);
+                return SetSelectedIndex(SelectedIndex + 1);
             }
 
             if (pointer.Button == PointerButton.WheelUp)
             {
-                return SetSelectedIndex(_selectedIndex - 1);
+                return SetSelectedIndex(SelectedIndex - 1);
             }
 
             return false;
@@ -299,8 +302,8 @@ public sealed class PropertyGrid : Control
 
     private void RenderHeader(Canvas canvas, Rect content, int keyWidth)
     {
-        var key = ApplyStyle(PadRight(HeaderKeyText ?? string.Empty, keyWidth), HeaderStyle);
-        var value = ApplyStyle(HeaderValueText ?? string.Empty, HeaderStyle);
+        var key = ApplyStyle(PadRight(HeaderKeyText, keyWidth), HeaderStyle);
+        var value = ApplyStyle(HeaderValueText, HeaderStyle);
         canvas.WriteText(content.X, content.Y, $"  {key} : {value}", content.Width);
     }
 
@@ -318,11 +321,10 @@ public sealed class PropertyGrid : Control
         }
 
         var property = _properties[display.PropertyIndex];
-        var selected = display.PropertyIndex == _selectedIndex;
+        var selected = display.PropertyIndex == SelectedIndex;
         var keyStyle = selected ? KeyStyle.Merge(SelectedRowStyle) : KeyStyle;
         var valueStyle = selected ? ValueStyle.Merge(SelectedRowStyle) : ValueStyle;
         var marker = selected ? SelectedMarker : UnselectedMarker;
-        marker ??= string.Empty;
 
         var keyLabel = ShowCategoryHeaders || string.IsNullOrWhiteSpace(property.Category)
             ? property.Name
@@ -337,7 +339,7 @@ public sealed class PropertyGrid : Control
         var title = IsFocused && ShowFocusMarker && !string.IsNullOrWhiteSpace(FocusMarker)
             ? $"{Title} {FocusMarker}"
             : Title;
-        return ApplyStyle(title ?? string.Empty, IsFocused ? FocusedTitleStyle : TitleStyle);
+        return ApplyStyle(title, IsFocused ? FocusedTitleStyle : TitleStyle);
     }
 
     private int ResolveKeyColumnWidth(int contentWidth)
@@ -358,10 +360,10 @@ public sealed class PropertyGrid : Control
                 && !string.IsNullOrEmpty(category)
                 && !string.Equals(category, previousCategory, StringComparison.Ordinal))
             {
-                rows.Add(new DisplayRow(PropertyIndex: -1, IsCategory: true, Category: category));
+                rows.Add(new DisplayRow(-1, true, category));
             }
 
-            rows.Add(new DisplayRow(PropertyIndex: i, IsCategory: false, Category: category));
+            rows.Add(new DisplayRow(i, false, category));
             previousCategory = category;
         }
 
@@ -370,7 +372,7 @@ public sealed class PropertyGrid : Control
 
     private void EnsureSelectionVisible(int visibleRows, IReadOnlyList<DisplayRow> rows)
     {
-        if (visibleRows <= 0 || rows.Count == 0 || _selectedIndex < 0)
+        if (visibleRows <= 0 || rows.Count == 0 || SelectedIndex < 0)
         {
             _scrollOffset = 0;
             return;
@@ -379,7 +381,7 @@ public sealed class PropertyGrid : Control
         var selectedDisplayIndex = -1;
         for (var i = 0; i < rows.Count; i++)
         {
-            if (rows[i].PropertyIndex == _selectedIndex)
+            if (rows[i].PropertyIndex == SelectedIndex)
             {
                 selectedDisplayIndex = i;
                 break;
@@ -406,14 +408,15 @@ public sealed class PropertyGrid : Control
 
     private void RaiseSelectionChangedIfNeeded(int previousIndex, PropertyGridProperty? previousProperty)
     {
-        if (previousIndex == _selectedIndex && ReferenceEquals(previousProperty, SelectedProperty))
+        if (previousIndex == SelectedIndex && ReferenceEquals(previousProperty, SelectedProperty))
         {
             return;
         }
 
         SelectionChanged?.Invoke(
             this,
-            new PropertyGridSelectionChangedEventArgs(previousIndex, _selectedIndex, previousProperty, SelectedProperty));
+            new PropertyGridSelectionChangedEventArgs(previousIndex, SelectedIndex, previousProperty,
+                SelectedProperty));
     }
 
     private static string PadRight(string text, int width)

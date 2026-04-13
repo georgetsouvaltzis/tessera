@@ -5,180 +5,149 @@ using Tessera.Styles;
 namespace Tessera.Controls;
 
 /// <summary>
-/// Represents a searchable overlay for quick item navigation and submission.
+///     Represents a searchable overlay for quick item navigation and submission.
 /// </summary>
 public sealed partial class QuickOpenOverlay : Control
 {
-    private readonly List<QuickOpenItem> _items = [];
     private readonly List<int> _filteredIndices = [];
-    private int _selectedFilteredIndex;
+    private readonly List<QuickOpenItem> _items = [];
     private int _hoveredFilteredIndex = -1;
-    private string _query = string.Empty;
+    private int _selectedFilteredIndex;
 
     /// <summary>
-    /// Occurs when the selected item is submitted.
+    ///     Gets or sets overlay title text.
     /// </summary>
-    public event EventHandler<QuickOpenOverlaySubmittedEventArgs>? Submitted;
+    public string Title { get; set; } = "Quick Open";
 
     /// <summary>
-    /// Occurs when the overlay is dismissed without submission.
+    ///     Gets or sets marker appended to title while focused and <see cref="ShowFocusMarker" /> is enabled.
     /// </summary>
-    public event EventHandler? Cancelled;
+    public string FocusMarker { get; set; } = "*";
 
     /// <summary>
-    /// Gets or sets overlay title text.
-    /// </summary>
-    public string Title
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = "Quick Open";
-
-    /// <summary>
-    /// Gets or sets marker appended to title while focused and <see cref="ShowFocusMarker" /> is enabled.
-    /// </summary>
-    public string FocusMarker
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = "*";
-
-    /// <summary>
-    /// Gets or sets a value indicating whether <see cref="FocusMarker" /> is rendered while focused.
+    ///     Gets or sets a value indicating whether <see cref="FocusMarker" /> is rendered while focused.
     /// </summary>
     public bool ShowFocusMarker { get; set; } = true;
 
     /// <summary>
-    /// Gets or sets fallback text rendered when no items are configured.
+    ///     Gets or sets fallback text rendered when no items are configured.
     /// </summary>
-    public string EmptyText
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = "(empty)";
+    public string EmptyText { get; set; } = "(empty)";
 
     /// <summary>
-    /// Gets or sets fallback text rendered when query filtering has no matches.
+    ///     Gets or sets fallback text rendered when query filtering has no matches.
     /// </summary>
-    public string NoMatchesText
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = "(no matches)";
+    public string NoMatchesText { get; set; } = "(no matches)";
 
     /// <summary>
-    /// Gets or sets query placeholder text.
+    ///     Gets or sets query placeholder text.
     /// </summary>
-    public string Placeholder
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = "Type to search...";
+    public string Placeholder { get; set; } = "Type to search...";
 
     /// <summary>
-    /// Gets or sets title style while not focused.
+    ///     Gets or sets title style while not focused.
     /// </summary>
     public TesseraStyle TitleStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets title style while focused.
+    ///     Gets or sets title style while focused.
     /// </summary>
     public TesseraStyle FocusedTitleStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets query style when query text is present.
+    ///     Gets or sets query style when query text is present.
     /// </summary>
     public TesseraStyle QueryTextStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets query style when placeholder is visible.
+    ///     Gets or sets query style when placeholder is visible.
     /// </summary>
     public TesseraStyle PlaceholderStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets base row style.
+    ///     Gets or sets base row style.
     /// </summary>
     public TesseraStyle ItemStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets selected row style.
+    ///     Gets or sets selected row style.
     /// </summary>
     public TesseraStyle SelectedItemStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets hovered row style.
+    ///     Gets or sets hovered row style.
     /// </summary>
     public TesseraStyle HoveredItemStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets match-marker style rendered when query is non-empty.
+    ///     Gets or sets match-marker style rendered when query is non-empty.
     /// </summary>
     public TesseraStyle MatchMarkerStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets style merged while disabled.
+    ///     Gets or sets style merged while disabled.
     /// </summary>
     public TesseraStyle DisabledStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets border glyph style while not focused.
+    ///     Gets or sets border glyph style while not focused.
     /// </summary>
     public TesseraStyle BorderStyleText { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets border glyph style while focused.
+    ///     Gets or sets border glyph style while focused.
     /// </summary>
     public TesseraStyle FocusedBorderStyleText { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets glyphs used by query and row rendering.
+    ///     Gets or sets glyphs used by query and row rendering.
     /// </summary>
     public QuickOpenOverlayGlyphSet Glyphs { get; set; } = QuickOpenOverlayGlyphSet.Default;
 
     /// <summary>
-    /// Gets or sets overlay border style.
+    ///     Gets or sets overlay border style.
     /// </summary>
     public BorderStyle BorderStyle { get; set; } = BorderStyle.Rounded;
 
     /// <summary>
-    /// Gets or sets inner padding applied inside the frame.
+    ///     Gets or sets inner padding applied inside the frame.
     /// </summary>
     public Thickness Padding { get; set; }
 
     /// <summary>
-    /// Gets or sets maximum visible rows.
+    ///     Gets or sets maximum visible rows.
     /// </summary>
     public int MaxVisibleItems { get; set; } = 9;
 
     /// <summary>
-    /// Gets a value indicating whether the overlay is open.
+    ///     Gets a value indicating whether the overlay is open.
     /// </summary>
     public bool IsOpen { get; private set; }
 
     /// <summary>
-    /// Gets the current query text.
+    ///     Gets the current query text.
     /// </summary>
-    public string Query => _query;
+    public string Query { get; private set; } = string.Empty;
 
     /// <summary>
-    /// Gets configured items.
+    ///     Gets configured items.
     /// </summary>
     public IReadOnlyList<QuickOpenItem> Items => _items;
 
     /// <summary>
-    /// Gets selected index within current filtered rows.
+    ///     Gets selected index within current filtered rows.
     /// </summary>
     public int SelectedIndex => _filteredIndices.Count == 0 ? -1 : _selectedFilteredIndex;
 
     /// <summary>
-    /// Gets the selected item.
+    ///     Gets the selected item.
     /// </summary>
     public QuickOpenItem? SelectedItem => _filteredIndices.Count == 0
         ? null
         : _items[_filteredIndices[_selectedFilteredIndex]];
 
     /// <summary>
-    /// Gets currently visible filtered row count.
+    ///     Gets currently visible filtered row count.
     /// </summary>
     public int FilteredCount => _filteredIndices.Count;
 
@@ -192,7 +161,17 @@ public sealed partial class QuickOpenOverlay : Control
     public override bool IsReadOnly { get; set; }
 
     /// <summary>
-    /// Replaces overlay items.
+    ///     Occurs when the selected item is submitted.
+    /// </summary>
+    public event EventHandler<QuickOpenOverlaySubmittedEventArgs>? Submitted;
+
+    /// <summary>
+    ///     Occurs when the overlay is dismissed without submission.
+    /// </summary>
+    public event EventHandler? Cancelled;
+
+    /// <summary>
+    ///     Replaces overlay items.
     /// </summary>
     /// <param name="items">Items to show.</param>
     public void SetItems(IEnumerable<QuickOpenItem> items)
@@ -209,17 +188,17 @@ public sealed partial class QuickOpenOverlay : Control
     }
 
     /// <summary>
-    /// Sets query text and refreshes filtering.
+    ///     Sets query text and refreshes filtering.
     /// </summary>
     /// <param name="query">Query text.</param>
     public void SetQuery(string query)
     {
-        _query = query ?? string.Empty;
+        Query = query;
         RefreshFilter();
     }
 
     /// <summary>
-    /// Sets selected filtered row index.
+    ///     Sets selected filtered row index.
     /// </summary>
     /// <param name="index">Target index.</param>
     /// <returns><see langword="true" /> when selection changed.</returns>
@@ -242,7 +221,7 @@ public sealed partial class QuickOpenOverlay : Control
     }
 
     /// <summary>
-    /// Opens the overlay.
+    ///     Opens the overlay.
     /// </summary>
     public void Open()
     {
@@ -252,7 +231,7 @@ public sealed partial class QuickOpenOverlay : Control
     }
 
     /// <summary>
-    /// Closes the overlay.
+    ///     Closes the overlay.
     /// </summary>
     public void Close()
     {
@@ -263,7 +242,7 @@ public sealed partial class QuickOpenOverlay : Control
     private void RefreshFilter()
     {
         _filteredIndices.Clear();
-        if (_query.Length == 0)
+        if (Query.Length == 0)
         {
             for (var index = 0; index < _items.Count; index++)
             {
@@ -275,9 +254,9 @@ public sealed partial class QuickOpenOverlay : Control
             for (var index = 0; index < _items.Count; index++)
             {
                 var item = _items[index];
-                if (item.Label.Contains(_query, StringComparison.OrdinalIgnoreCase)
-                    || item.Description.Contains(_query, StringComparison.OrdinalIgnoreCase)
-                    || item.Id.Contains(_query, StringComparison.OrdinalIgnoreCase))
+                if (item.Label.Contains(Query, StringComparison.OrdinalIgnoreCase)
+                    || item.Description.Contains(Query, StringComparison.OrdinalIgnoreCase)
+                    || item.Id.Contains(Query, StringComparison.OrdinalIgnoreCase))
                 {
                     _filteredIndices.Add(index);
                 }

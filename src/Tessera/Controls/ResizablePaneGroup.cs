@@ -5,64 +5,51 @@ using Tessera.Styles;
 namespace Tessera.Controls;
 
 /// <summary>
-/// Represents a bordered horizontal pane group with draggable splits.
+///     Represents a bordered horizontal pane group with draggable splits.
 /// </summary>
 public sealed partial class ResizablePaneGroup : Control
 {
     private readonly List<PaneSpec> _panes = [];
     private readonly List<double> _splitRatios = [];
-    private int _selectedPaneIndex;
     private int _dragDividerIndex = -1;
     private bool _isDraggingDivider;
+    private int _selectedPaneIndex;
 
     /// <summary>
-    /// Occurs when selected pane changes.
+    ///     Gets or sets group title.
     /// </summary>
-    public event EventHandler<ListSelectionChangedEventArgs<PaneSpec>>? SelectionChanged;
+    public string Title { get; set; } = "Resizable Pane Group";
 
     /// <summary>
-    /// Gets or sets group title.
+    ///     Gets or sets marker appended to title while focused.
     /// </summary>
-    public string Title
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = "Resizable Pane Group";
+    public string FocusMarker { get; set; } = "*";
 
     /// <summary>
-    /// Gets or sets marker appended to title while focused.
-    /// </summary>
-    public string FocusMarker
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = "*";
-
-    /// <summary>
-    /// Gets or sets whether focus marker should be shown when focused.
+    ///     Gets or sets whether focus marker should be shown when focused.
     /// </summary>
     public bool ShowFocusMarker { get; set; } = true;
 
     /// <summary>
-    /// Gets or sets border style while not focused.
+    ///     Gets or sets border style while not focused.
     /// </summary>
     public TesseraStyle BorderStyleText { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets border style while focused.
+    ///     Gets or sets border style while focused.
     /// </summary>
     public TesseraStyle FocusedBorderStyleText { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets title style while not focused.
+    ///     Gets or sets title style while not focused.
     /// </summary>
     public TesseraStyle TitleStyleText { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets title style while not focused.
+    ///     Gets or sets title style while not focused.
     /// </summary>
     /// <remarks>
-    /// Canonical alias for cross-control title style naming consistency.
+    ///     Canonical alias for cross-control title style naming consistency.
     /// </remarks>
     public TesseraStyle TitleStyle
     {
@@ -71,15 +58,15 @@ public sealed partial class ResizablePaneGroup : Control
     }
 
     /// <summary>
-    /// Gets or sets title style while focused.
+    ///     Gets or sets title style while focused.
     /// </summary>
     public TesseraStyle FocusedTitleStyleText { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets title style while focused.
+    ///     Gets or sets title style while focused.
     /// </summary>
     /// <remarks>
-    /// Canonical alias for cross-control title style naming consistency.
+    ///     Canonical alias for cross-control title style naming consistency.
     /// </remarks>
     public TesseraStyle FocusedTitleStyle
     {
@@ -88,42 +75,42 @@ public sealed partial class ResizablePaneGroup : Control
     }
 
     /// <summary>
-    /// Gets or sets divider style while not focused.
+    ///     Gets or sets divider style while not focused.
     /// </summary>
     public TesseraStyle DividerStyleText { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets divider style while focused.
+    ///     Gets or sets divider style while focused.
     /// </summary>
     public TesseraStyle FocusedDividerStyleText { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets pane text style.
+    ///     Gets or sets pane text style.
     /// </summary>
     public TesseraStyle PaneStyleText { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets selected pane text style.
+    ///     Gets or sets selected pane text style.
     /// </summary>
     public TesseraStyle SelectedPaneStyleText { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets style merged while disabled.
+    ///     Gets or sets style merged while disabled.
     /// </summary>
     public TesseraStyle DisabledStyleText { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets outer border style.
+    ///     Gets or sets outer border style.
     /// </summary>
     public BorderStyle Border { get; set; } = BorderStyle.SingleLine;
 
     /// <summary>
-    /// Gets or sets divider glyph. Use <c>'\0'</c> for orientation default.
+    ///     Gets or sets divider glyph. Use <c>'\0'</c> for orientation default.
     /// </summary>
     public char DividerGlyph { get; set; }
 
     /// <summary>
-    /// Gets or sets divider thickness in cells.
+    ///     Gets or sets divider thickness in cells.
     /// </summary>
     public int DividerThickness
     {
@@ -132,43 +119,43 @@ public sealed partial class ResizablePaneGroup : Control
     } = 1;
 
     /// <summary>
-    /// Gets or sets whether dividers are rendered.
+    ///     Gets or sets whether dividers are rendered.
     /// </summary>
     public bool ShowDividers { get; set; } = true;
 
     /// <summary>
-    /// Gets or sets inner padding.
+    ///     Gets or sets inner padding.
     /// </summary>
     public Thickness Padding { get; set; }
 
     /// <summary>
-    /// Gets configured panes.
+    ///     Gets configured panes.
     /// </summary>
     public IReadOnlyList<PaneSpec> Panes => _panes;
 
     /// <summary>
-    /// Gets selected pane index, or <c>-1</c> when no panes exist.
+    ///     Gets selected pane index, or <c>-1</c> when no panes exist.
     /// </summary>
     public int SelectedPaneIndex => _panes.Count == 0 ? -1 : _selectedPaneIndex;
 
     /// <summary>
-    /// Gets selected pane index, or <c>-1</c> when no panes exist.
+    ///     Gets selected pane index, or <c>-1</c> when no panes exist.
     /// </summary>
     /// <remarks>
-    /// Canonical selection alias for cross-control API consistency.
+    ///     Canonical selection alias for cross-control API consistency.
     /// </remarks>
     public int SelectedIndex => SelectedPaneIndex;
 
     /// <summary>
-    /// Gets selected pane.
+    ///     Gets selected pane.
     /// </summary>
     public PaneSpec? SelectedPane => _panes.Count == 0 ? null : _panes[_selectedPaneIndex];
 
     /// <summary>
-    /// Gets selected pane.
+    ///     Gets selected pane.
     /// </summary>
     /// <remarks>
-    /// Canonical selection alias for cross-control API consistency.
+    ///     Canonical selection alias for cross-control API consistency.
     /// </remarks>
     public PaneSpec? SelectedItem => SelectedPane;
 
@@ -182,7 +169,12 @@ public sealed partial class ResizablePaneGroup : Control
     public override bool IsReadOnly { get; set; }
 
     /// <summary>
-    /// Replaces pane definitions and resets split ratios to even layout.
+    ///     Occurs when selected pane changes.
+    /// </summary>
+    public event EventHandler<ListSelectionChangedEventArgs<PaneSpec>>? SelectionChanged;
+
+    /// <summary>
+    ///     Replaces pane definitions and resets split ratios to even layout.
     /// </summary>
     /// <param name="panes">Pane descriptors in visual order.</param>
     public void SetPanes(IEnumerable<PaneSpec> panes)
@@ -204,7 +196,7 @@ public sealed partial class ResizablePaneGroup : Control
     }
 
     /// <summary>
-    /// Sets selected pane by index.
+    ///     Sets selected pane by index.
     /// </summary>
     /// <param name="index">Requested selected pane index.</param>
     /// <returns><see langword="true" /> when selection changed; otherwise <see langword="false" />.</returns>
@@ -229,17 +221,20 @@ public sealed partial class ResizablePaneGroup : Control
     }
 
     /// <summary>
-    /// Sets selected pane by index.
+    ///     Sets selected pane by index.
     /// </summary>
     /// <param name="index">Requested selected pane index.</param>
     /// <returns><see langword="true" /> when selection changed; otherwise <see langword="false" />.</returns>
     /// <remarks>
-    /// Canonical selection mutator alias for cross-control API consistency.
+    ///     Canonical selection mutator alias for cross-control API consistency.
     /// </remarks>
-    public bool SetSelectedIndex(int index) => SetSelectedPaneIndex(index);
+    public bool SetSelectedIndex(int index)
+    {
+        return SetSelectedPaneIndex(index);
+    }
 
     /// <summary>
-    /// Sets split ratio for divider index.
+    ///     Sets split ratio for divider index.
     /// </summary>
     /// <param name="splitIndex">Divider index between pane <c>splitIndex</c> and <c>splitIndex+1</c>.</param>
     /// <param name="ratio">Target cumulative ratio in range [0,1].</param>
@@ -440,8 +435,8 @@ public sealed partial class ResizablePaneGroup : Control
         }
 
         var dividerCount = ShowDividers ? _splitRatios.Count : 0;
-        var availableWidth = Math.Max(1, layout.Content.Width - (dividerCount * DividerThickness));
-        var raw = pointerX - layout.Content.X - (_dragDividerIndex * DividerThickness);
+        var availableWidth = Math.Max(1, layout.Content.Width - dividerCount * DividerThickness);
+        var raw = pointerX - layout.Content.X - _dragDividerIndex * DividerThickness;
         var ratio = (double)raw / availableWidth;
         return SetSplitRatio(_dragDividerIndex, ratio);
     }
@@ -500,5 +495,4 @@ public sealed partial class ResizablePaneGroup : Control
             this,
             new ListSelectionChangedEventArgs<PaneSpec>(previousIndex, SelectedPaneIndex, previousPane, SelectedPane));
     }
-
 }

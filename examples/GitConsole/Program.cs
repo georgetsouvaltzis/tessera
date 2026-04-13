@@ -1,6 +1,4 @@
 using Tessera;
-using Tessera.Controls;
-
 using Tessera.Examples.GitConsole;
 
 var app = TesseraApplication.CreateBuilder()
@@ -15,7 +13,7 @@ var app = TesseraApplication.CreateBuilder()
             WindowTitle = "Tessera GitConsole",
             EnableFocusReporting = true,
             EnableBracketedPaste = true,
-            MouseTracking = MouseTrackingMode.AllMotion,
+            MouseTracking = MouseTrackingMode.AllMotion
         };
     })
     .Build();

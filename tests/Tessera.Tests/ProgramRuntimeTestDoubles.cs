@@ -1,10 +1,6 @@
-using Tessera.Components.Composition;
-using Tessera.Components.Primitives;
-using Tessera.Components.Styling;
 using System.Text;
 using Tessera.Core.Abstractions;
 using Tessera.Core.Commands;
-using Tessera.Core.Input;
 using Tessera.Core.Messages;
 using Tessera.Core.Rendering;
 using Tessera.Core.Terminal;
@@ -14,7 +10,10 @@ namespace Tessera.Tests;
 
 internal abstract class TestRuntimeModel
 {
-    public virtual Effect? Init() => null;
+    public virtual Effect? Init()
+    {
+        return null;
+    }
 
     public abstract Effect? Update(IMessage message);
 
@@ -32,28 +31,46 @@ internal static class TestDoubleAsync
 
 internal sealed class InitQuitModel : TestRuntimeModel
 {
-    public override Effect? Init() => Effects.Quit;
+    public override Effect? Init()
+    {
+        return Effects.Quit;
+    }
 
-    public override Effect? Update(IMessage message) => null;
+    public override Effect? Update(IMessage message)
+    {
+        return null;
+    }
 
-    public override ModelView Render() => ModelView.From("quit");
+    public override ModelView Render()
+    {
+        return ModelView.From("quit");
+    }
 }
 
 internal sealed class IdleModel : TestRuntimeModel
 {
-    public override Effect? Update(IMessage message) => null;
+    public override Effect? Update(IMessage message)
+    {
+        return null;
+    }
 
-    public override ModelView Render() => ModelView.From("idle");
+    public override ModelView Render()
+    {
+        return ModelView.From("idle");
+    }
 }
 
 internal sealed class SequenceModel : TestRuntimeModel
 {
     public List<int> Values { get; } = [];
 
-    public override Effect? Init() => Effects.Sequence(
-        Effects.FromMessage(new NumberMsg(1)),
-        Effects.FromMessage(new NumberMsg(2)),
-        Effects.Quit);
+    public override Effect? Init()
+    {
+        return Effects.Sequence(
+            Effects.FromMessage(new NumberMsg(1)),
+            Effects.FromMessage(new NumberMsg(2)),
+            Effects.Quit);
+    }
 
     public override Effect? Update(IMessage message)
     {
@@ -65,16 +82,22 @@ internal sealed class SequenceModel : TestRuntimeModel
         return null;
     }
 
-    public override ModelView Render() => ModelView.From("sequence");
+    public override ModelView Render()
+    {
+        return ModelView.From("sequence");
+    }
 }
 
 internal sealed class BatchModel : TestRuntimeModel
 {
     public int Count { get; private set; }
 
-    public override Effect? Init() => Effects.Batch(
-        Effects.FromMessage(new NumberMsg(1)),
-        Effects.FromMessage(new NumberMsg(2)));
+    public override Effect? Init()
+    {
+        return Effects.Batch(
+            Effects.FromMessage(new NumberMsg(1)),
+            Effects.FromMessage(new NumberMsg(2)));
+    }
 
     public override Effect? Update(IMessage message)
     {
@@ -90,7 +113,10 @@ internal sealed class BatchModel : TestRuntimeModel
         return null;
     }
 
-    public override ModelView Render() => ModelView.From("batch");
+    public override ModelView Render()
+    {
+        return ModelView.From("batch");
+    }
 }
 
 internal sealed class CommandErrorCaptureModel : TestRuntimeModel
@@ -99,7 +125,10 @@ internal sealed class CommandErrorCaptureModel : TestRuntimeModel
 
     public Exception? CapturedError { get; private set; }
 
-    public override Effect? Init() => _ => throw new InvalidOperationException(CommandFailureMessage);
+    public override Effect? Init()
+    {
+        return _ => throw new InvalidOperationException(CommandFailureMessage);
+    }
 
     public override Effect? Update(IMessage message)
     {
@@ -112,25 +141,40 @@ internal sealed class CommandErrorCaptureModel : TestRuntimeModel
         return null;
     }
 
-    public override ModelView Render() => ModelView.From("command-error-capture");
+    public override ModelView Render()
+    {
+        return ModelView.From("command-error-capture");
+    }
 }
 
 internal sealed class CommandFaultModel : TestRuntimeModel
 {
     public const string FailureMessage = "command-failure-for-tests";
 
-    public override Effect? Init() => _ => throw new InvalidOperationException(FailureMessage);
+    public override Effect? Init()
+    {
+        return _ => throw new InvalidOperationException(FailureMessage);
+    }
 
-    public override Effect? Update(IMessage message) => null;
+    public override Effect? Update(IMessage message)
+    {
+        return null;
+    }
 
-    public override ModelView Render() => ModelView.From("command-fault");
+    public override ModelView Render()
+    {
+        return ModelView.From("command-fault");
+    }
 }
 
 internal sealed class CommandRecoveryModel : TestRuntimeModel
 {
     public int? RecoveredValue { get; private set; }
 
-    public override Effect? Init() => _ => throw new InvalidOperationException(CommandFaultModel.FailureMessage);
+    public override Effect? Init()
+    {
+        return _ => throw new InvalidOperationException(CommandFaultModel.FailureMessage);
+    }
 
     public override Effect? Update(IMessage message)
     {
@@ -148,7 +192,10 @@ internal sealed class CommandRecoveryModel : TestRuntimeModel
         return null;
     }
 
-    public override ModelView Render() => ModelView.From("command-recovery");
+    public override ModelView Render()
+    {
+        return ModelView.From("command-recovery");
+    }
 }
 
 internal sealed class BurstUpdateModel : TestRuntimeModel
@@ -187,14 +234,20 @@ internal sealed class BurstUpdateModel : TestRuntimeModel
         return null;
     }
 
-    public override ModelView Render() => ModelView.From($"burst-{Count}");
+    public override ModelView Render()
+    {
+        return ModelView.From($"burst-{Count}");
+    }
 }
 
 internal sealed class ResizeTrackingModel : TestRuntimeModel
 {
     public List<(int W, int H)> Seen { get; } = [];
 
-    public override Effect? Init() => null;
+    public override Effect? Init()
+    {
+        return null;
+    }
 
     public override Effect? Update(IMessage message)
     {
@@ -210,14 +263,20 @@ internal sealed class ResizeTrackingModel : TestRuntimeModel
         return null;
     }
 
-    public override ModelView Render() => ModelView.From("resize");
+    public override ModelView Render()
+    {
+        return ModelView.From("resize");
+    }
 }
 
 internal sealed class CapabilityTrackingModel : TestRuntimeModel
 {
     public TerminalCapabilityProfile? Seen { get; private set; }
 
-    public override Effect? Init() => null;
+    public override Effect? Init()
+    {
+        return null;
+    }
 
     public override Effect? Update(IMessage message)
     {
@@ -230,14 +289,20 @@ internal sealed class CapabilityTrackingModel : TestRuntimeModel
         return null;
     }
 
-    public override ModelView Render() => ModelView.From("capabilities");
+    public override ModelView Render()
+    {
+        return ModelView.From("capabilities");
+    }
 }
 
 internal sealed class ColorProfileTrackingModel : TestRuntimeModel
 {
     public TerminalColorProfile Seen { get; private set; } = TerminalColorProfile.Unknown;
 
-    public override Effect? Init() => null;
+    public override Effect? Init()
+    {
+        return null;
+    }
 
     public override Effect? Update(IMessage message)
     {
@@ -250,14 +315,20 @@ internal sealed class ColorProfileTrackingModel : TestRuntimeModel
         return null;
     }
 
-    public override ModelView Render() => ModelView.From("color-profile");
+    public override ModelView Render()
+    {
+        return ModelView.From("color-profile");
+    }
 }
 
 internal sealed class CapabilityRefinementModel : TestRuntimeModel
 {
     public List<TerminalCapabilityProfile> Seen { get; } = [];
 
-    public override Effect? Init() => Effects.FromMessage(new ModeReportMsg(2026, ModeReportState.Reset));
+    public override Effect? Init()
+    {
+        return Effects.FromMessage(new ModeReportMsg(2026, ModeReportState.Reset));
+    }
 
     public override Effect? Update(IMessage message)
     {
@@ -273,14 +344,20 @@ internal sealed class CapabilityRefinementModel : TestRuntimeModel
         return null;
     }
 
-    public override ModelView Render() => ModelView.From("capability-refinement");
+    public override ModelView Render()
+    {
+        return ModelView.From("capability-refinement");
+    }
 }
 
 internal sealed class UnsupportedModeReportRefinementModel : TestRuntimeModel
 {
     public List<TerminalCapabilityProfile> Seen { get; } = [];
 
-    public override Effect? Init() => Effects.FromMessage(new ModeReportMsg(1006, ModeReportState.Unsupported));
+    public override Effect? Init()
+    {
+        return Effects.FromMessage(new ModeReportMsg(1006, ModeReportState.Unsupported));
+    }
 
     public override Effect? Update(IMessage message)
     {
@@ -296,20 +373,27 @@ internal sealed class UnsupportedModeReportRefinementModel : TestRuntimeModel
         return null;
     }
 
-    public override ModelView Render() => ModelView.From("capability-unsupported-refinement");
+    public override ModelView Render()
+    {
+        return ModelView.From("capability-unsupported-refinement");
+    }
 }
 
 internal sealed class CapabilityProbeTimeoutModel : TestRuntimeModel
 {
     private readonly TimeSpan _safetyQuitDelay;
-    public List<TerminalCapabilityProfile> Seen { get; } = [];
 
     public CapabilityProbeTimeoutModel(TimeSpan safetyQuitDelay)
     {
         _safetyQuitDelay = safetyQuitDelay;
     }
 
-    public override Effect? Init() => Effects.Tick(_safetyQuitDelay, _ => new QuitMsg());
+    public List<TerminalCapabilityProfile> Seen { get; } = [];
+
+    public override Effect? Init()
+    {
+        return Effects.Tick(_safetyQuitDelay, _ => new QuitMsg());
+    }
 
     public override Effect? Update(IMessage message)
     {
@@ -325,20 +409,24 @@ internal sealed class CapabilityProbeTimeoutModel : TestRuntimeModel
         return null;
     }
 
-    public override ModelView Render() => ModelView.From("capability-probe-timeout");
+    public override ModelView Render()
+    {
+        return ModelView.From("capability-probe-timeout");
+    }
 }
 
 internal sealed class CapabilityProbeResponseModel : TestRuntimeModel
 {
     private readonly TimeSpan _quitDelay;
     private readonly IReadOnlyList<ModeReportMsg> _reports;
-    public List<TerminalCapabilityProfile> Seen { get; } = [];
 
     public CapabilityProbeResponseModel(TimeSpan quitDelay, IReadOnlyList<ModeReportMsg> reports)
     {
         _quitDelay = quitDelay;
         _reports = reports;
     }
+
+    public List<TerminalCapabilityProfile> Seen { get; } = [];
 
     public override Effect? Init()
     {
@@ -362,7 +450,10 @@ internal sealed class CapabilityProbeResponseModel : TestRuntimeModel
         return null;
     }
 
-    public override ModelView Render() => ModelView.From("capability-probe-response");
+    public override ModelView Render()
+    {
+        return ModelView.From("capability-probe-response");
+    }
 }
 
 internal sealed class TimedQuitModel : TestRuntimeModel
@@ -374,11 +465,20 @@ internal sealed class TimedQuitModel : TestRuntimeModel
         _delay = delay;
     }
 
-    public override Effect? Init() => Effects.Tick(_delay, _ => new QuitMsg());
+    public override Effect? Init()
+    {
+        return Effects.Tick(_delay, _ => new QuitMsg());
+    }
 
-    public override Effect? Update(IMessage message) => null;
+    public override Effect? Update(IMessage message)
+    {
+        return null;
+    }
 
-    public override ModelView Render() => ModelView.From("timed-quit");
+    public override ModelView Render()
+    {
+        return ModelView.From("timed-quit");
+    }
 }
 
 internal sealed class TimedQuitProbeViewModel : TestRuntimeModel
@@ -390,20 +490,29 @@ internal sealed class TimedQuitProbeViewModel : TestRuntimeModel
         _delay = delay;
     }
 
-    public override Effect? Init() => Effects.Tick(_delay, _ => new QuitMsg());
-
-    public override Effect? Update(IMessage message) => null;
-
-    public override ModelView Render() => ModelView.From("timed-probe-view") with
+    public override Effect? Init()
     {
-        Terminal = new TerminalOutput
+        return Effects.Tick(_delay, _ => new QuitMsg());
+    }
+
+    public override Effect? Update(IMessage message)
+    {
+        return null;
+    }
+
+    public override ModelView Render()
+    {
+        return ModelView.From("timed-probe-view") with
         {
-            EnableBracketedPaste = true,
-            EnableFocusReporting = true,
-            EnableSynchronizedUpdates = true,
-            MouseMode = MouseMode.AllMotion,
-        },
-    };
+            Terminal = new TerminalOutput
+            {
+                EnableBracketedPaste = true,
+                EnableFocusReporting = true,
+                EnableSynchronizedUpdates = true,
+                MouseMode = MouseMode.AllMotion
+            }
+        };
+    }
 }
 
 internal sealed class ConcurrencyTrackingModel : TestRuntimeModel
@@ -461,7 +570,10 @@ internal sealed class ConcurrencyTrackingModel : TestRuntimeModel
         return null;
     }
 
-    public override ModelView Render() => ModelView.From("concurrency-tracking");
+    public override ModelView Render()
+    {
+        return ModelView.From("concurrency-tracking");
+    }
 
     private void TrackMax(int active)
     {
@@ -483,20 +595,32 @@ internal sealed class ConcurrencyTrackingModel : TestRuntimeModel
 
 internal sealed class RawOutputInitModel : TestRuntimeModel
 {
-    public override Effect? Init() => Effects.Sequence(
-        Effects.Raw("raw-sequence"),
-        Effects.Quit);
+    public override Effect? Init()
+    {
+        return Effects.Sequence(
+            Effects.Raw("raw-sequence"),
+            Effects.Quit);
+    }
 
-    public override Effect? Update(IMessage message) => null;
+    public override Effect? Update(IMessage message)
+    {
+        return null;
+    }
 
-    public override ModelView Render() => ModelView.From("raw-output");
+    public override ModelView Render()
+    {
+        return ModelView.From("raw-output");
+    }
 }
 
 internal sealed class MouseInterceptModel : TestRuntimeModel
 {
     public int Intercepted { get; private set; }
 
-    public override Effect? Init() => null;
+    public override Effect? Init()
+    {
+        return null;
+    }
 
     public override Effect? Update(IMessage message)
     {
@@ -509,13 +633,13 @@ internal sealed class MouseInterceptModel : TestRuntimeModel
         return null;
     }
 
-    public override ModelView Render() => ModelView.From("mouse-intercept") with
+    public override ModelView Render()
     {
-        Input = new InputHooks
+        return ModelView.From("mouse-intercept") with
         {
-            OnMouse = _ => Effects.FromMessage(new NumberMsg(7)),
-        },
-    };
+            Input = new InputHooks { OnMouse = _ => Effects.FromMessage(new NumberMsg(7)) }
+        };
+    }
 }
 
 internal sealed class CapabilityAwareRendererSpy : IProgramRenderer
@@ -552,9 +676,15 @@ internal sealed class CapabilityAwareRendererSpy : IProgramRenderer
         return ValueTask.CompletedTask;
     }
 
-    public ValueTask FlushAsync(CancellationToken cancellationToken) => TestDoubleAsync.Completed(cancellationToken);
+    public ValueTask FlushAsync(CancellationToken cancellationToken)
+    {
+        return TestDoubleAsync.Completed(cancellationToken);
+    }
 
-    public ValueTask ResetAsync(CancellationToken cancellationToken) => FlushAsync(cancellationToken);
+    public ValueTask ResetAsync(CancellationToken cancellationToken)
+    {
+        return FlushAsync(cancellationToken);
+    }
 
     public ValueTask DisposeAsync()
     {
@@ -609,7 +739,10 @@ internal sealed class RenderCountingRendererSpy : IProgramRenderer
         return ValueTask.CompletedTask;
     }
 
-    public ValueTask ResetAsync(CancellationToken cancellationToken) => TestDoubleAsync.Completed(cancellationToken);
+    public ValueTask ResetAsync(CancellationToken cancellationToken)
+    {
+        return TestDoubleAsync.Completed(cancellationToken);
+    }
 
     public ValueTask DisposeAsync()
     {
@@ -621,7 +754,10 @@ internal sealed record NumberMsg(int Value) : IMessage;
 
 internal sealed class QuitOnQModel : TestRuntimeModel
 {
-    public override Effect? Init() => null;
+    public override Effect? Init()
+    {
+        return null;
+    }
 
     public override Effect? Update(IMessage message)
     {
@@ -634,12 +770,17 @@ internal sealed class QuitOnQModel : TestRuntimeModel
         return null;
     }
 
-    public override ModelView Render() => ModelView.From("quit-on-q");
+    public override ModelView Render()
+    {
+        return ModelView.From("quit-on-q");
+    }
 }
 
 internal sealed class DisposeOrderingTerminalAdapter : ITerminalAdapter
 {
     private readonly CancelAwareInputStream _input = new();
+
+    public bool DisposeObservedCancellation { get; private set; }
 
     public Stream Input => _input;
 
@@ -649,15 +790,16 @@ internal sealed class DisposeOrderingTerminalAdapter : ITerminalAdapter
 
     public bool IsOutputInteractive => false;
 
-    public bool DisposeObservedCancellation { get; private set; }
-
     public ValueTask PrepareAsync(CancellationToken cancellationToken)
     {
         _ = cancellationToken;
         return ValueTask.CompletedTask;
     }
 
-    public ValueTask RestoreAsync(CancellationToken cancellationToken) => PrepareAsync(cancellationToken);
+    public ValueTask RestoreAsync(CancellationToken cancellationToken)
+    {
+        return PrepareAsync(cancellationToken);
+    }
 
     public ValueTask<TerminalSize> GetSizeAsync(CancellationToken cancellationToken)
     {
@@ -755,7 +897,10 @@ internal sealed class FakeTerminalAdapter : ITerminalAdapter
         return ValueTask.CompletedTask;
     }
 
-    public ValueTask RestoreAsync(CancellationToken cancellationToken) => PrepareAsync(cancellationToken);
+    public ValueTask RestoreAsync(CancellationToken cancellationToken)
+    {
+        return PrepareAsync(cancellationToken);
+    }
 
     public ValueTask<TerminalSize> GetSizeAsync(CancellationToken cancellationToken)
     {
@@ -763,7 +908,10 @@ internal sealed class FakeTerminalAdapter : ITerminalAdapter
         return ValueTask.FromResult(new TerminalSize(80, 24));
     }
 
-    public ValueTask DisposeAsync() => ValueTask.CompletedTask;
+    public ValueTask DisposeAsync()
+    {
+        return ValueTask.CompletedTask;
+    }
 }
 
 internal sealed class ResizingFakeTerminal : ITerminalAdapter
@@ -784,7 +932,10 @@ internal sealed class ResizingFakeTerminal : ITerminalAdapter
         return ValueTask.CompletedTask;
     }
 
-    public ValueTask RestoreAsync(CancellationToken cancellationToken) => PrepareAsync(cancellationToken);
+    public ValueTask RestoreAsync(CancellationToken cancellationToken)
+    {
+        return PrepareAsync(cancellationToken);
+    }
 
     public ValueTask<TerminalSize> GetSizeAsync(CancellationToken cancellationToken)
     {
@@ -795,7 +946,10 @@ internal sealed class ResizingFakeTerminal : ITerminalAdapter
             : ValueTask.FromResult(new TerminalSize(100, 40));
     }
 
-    public ValueTask DisposeAsync() => ValueTask.CompletedTask;
+    public ValueTask DisposeAsync()
+    {
+        return ValueTask.CompletedTask;
+    }
 }
 
 internal sealed class SignalDrivenFakeTerminal : ITerminalAdapter
@@ -822,7 +976,10 @@ internal sealed class SignalDrivenFakeTerminal : ITerminalAdapter
         return ValueTask.CompletedTask;
     }
 
-    public ValueTask RestoreAsync(CancellationToken cancellationToken) => PrepareAsync(cancellationToken);
+    public ValueTask RestoreAsync(CancellationToken cancellationToken)
+    {
+        return PrepareAsync(cancellationToken);
+    }
 
     public ValueTask<TerminalSize> GetSizeAsync(CancellationToken cancellationToken)
     {
@@ -833,6 +990,11 @@ internal sealed class SignalDrivenFakeTerminal : ITerminalAdapter
         }
     }
 
+    public ValueTask DisposeAsync()
+    {
+        return ValueTask.CompletedTask;
+    }
+
     public void SetSize(int width, int height)
     {
         lock (_sync)
@@ -840,13 +1002,13 @@ internal sealed class SignalDrivenFakeTerminal : ITerminalAdapter
             _size = new TerminalSize(width, height);
         }
     }
-
-    public ValueTask DisposeAsync() => ValueTask.CompletedTask;
 }
 
 internal sealed class InteractiveProbeTerminalAdapter : ITerminalAdapter
 {
     private readonly MemoryStream _output = new();
+
+    public string OutputText => Encoding.UTF8.GetString(_output.ToArray());
 
     public Stream Input { get; } = new MemoryStream();
 
@@ -856,15 +1018,16 @@ internal sealed class InteractiveProbeTerminalAdapter : ITerminalAdapter
 
     public bool IsOutputInteractive => true;
 
-    public string OutputText => Encoding.UTF8.GetString(_output.ToArray());
-
     public ValueTask PrepareAsync(CancellationToken cancellationToken)
     {
         _ = cancellationToken;
         return ValueTask.CompletedTask;
     }
 
-    public ValueTask RestoreAsync(CancellationToken cancellationToken) => PrepareAsync(cancellationToken);
+    public ValueTask RestoreAsync(CancellationToken cancellationToken)
+    {
+        return PrepareAsync(cancellationToken);
+    }
 
     public ValueTask<TerminalSize> GetSizeAsync(CancellationToken cancellationToken)
     {
@@ -872,7 +1035,10 @@ internal sealed class InteractiveProbeTerminalAdapter : ITerminalAdapter
         return ValueTask.FromResult(new TerminalSize(80, 24));
     }
 
-    public ValueTask DisposeAsync() => ValueTask.CompletedTask;
+    public ValueTask DisposeAsync()
+    {
+        return ValueTask.CompletedTask;
+    }
 }
 
 internal sealed class InteractiveInputTerminalAdapter : ITerminalAdapter
@@ -881,7 +1047,7 @@ internal sealed class InteractiveInputTerminalAdapter : ITerminalAdapter
 
     public InteractiveInputTerminalAdapter(string input)
     {
-        _input = new MemoryStream(Encoding.UTF8.GetBytes(input ?? string.Empty));
+        _input = new MemoryStream(Encoding.UTF8.GetBytes(input));
     }
 
     public Stream Input => _input;
@@ -898,7 +1064,10 @@ internal sealed class InteractiveInputTerminalAdapter : ITerminalAdapter
         return ValueTask.CompletedTask;
     }
 
-    public ValueTask RestoreAsync(CancellationToken cancellationToken) => PrepareAsync(cancellationToken);
+    public ValueTask RestoreAsync(CancellationToken cancellationToken)
+    {
+        return PrepareAsync(cancellationToken);
+    }
 
     public ValueTask<TerminalSize> GetSizeAsync(CancellationToken cancellationToken)
     {

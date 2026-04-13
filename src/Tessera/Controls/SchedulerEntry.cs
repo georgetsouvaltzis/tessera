@@ -1,12 +1,12 @@
 namespace Tessera.Controls;
 
 /// <summary>
-/// Represents one scheduled time entry in a <see cref="SchedulerTimeline" />.
+///     Represents one scheduled time entry in a <see cref="SchedulerTimeline" />.
 /// </summary>
 public sealed class SchedulerEntry
 {
     /// <summary>
-    /// Initializes a scheduler entry.
+    ///     Initializes a scheduler entry.
     /// </summary>
     /// <param name="id">Stable entry identifier.</param>
     /// <param name="title">Primary entry title text.</param>
@@ -22,8 +22,8 @@ public sealed class SchedulerEntry
         string? details = null,
         bool isMuted = false)
     {
-        Id = id ?? string.Empty;
-        Title = title ?? string.Empty;
+        Id = id;
+        Title = title;
         Start = start;
         End = end < start ? start : end;
         Details = details ?? string.Empty;
@@ -31,40 +31,32 @@ public sealed class SchedulerEntry
     }
 
     /// <summary>
-    /// Gets the stable entry identifier.
+    ///     Gets the stable entry identifier.
     /// </summary>
     public string Id { get; }
 
     /// <summary>
-    /// Gets or sets the primary entry title text.
+    ///     Gets or sets the primary entry title text.
     /// </summary>
-    public string Title
-    {
-        get;
-        set => field = value ?? string.Empty;
-    }
+    public string Title { get; set; }
 
     /// <summary>
-    /// Gets or sets entry start timestamp (inclusive).
+    ///     Gets or sets entry start timestamp (inclusive).
     /// </summary>
     public DateTimeOffset Start { get; set; }
 
     /// <summary>
-    /// Gets or sets entry end timestamp (exclusive).
+    ///     Gets or sets entry end timestamp (exclusive).
     /// </summary>
     public DateTimeOffset End { get; set; }
 
     /// <summary>
-    /// Gets or sets optional secondary details text.
+    ///     Gets or sets optional secondary details text.
     /// </summary>
-    public string Details
-    {
-        get;
-        set => field = value ?? string.Empty;
-    }
+    public string Details { get; set; }
 
     /// <summary>
-    /// Gets or sets whether this entry should render muted.
+    ///     Gets or sets whether this entry should render muted.
     /// </summary>
     public bool IsMuted { get; set; }
 }

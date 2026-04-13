@@ -1,6 +1,6 @@
+using NUnit.Framework;
 using System.Reflection;
 using System.Runtime.CompilerServices;
-using NUnit.Framework;
 using Tessera.Controls;
 using Tessera.Styles;
 
@@ -13,13 +13,7 @@ public sealed class ThemeFocusMarkerParityPolicyTests
     [Test]
     public void ThemeFocusMarkerApplyThemeMapsMarkerForPolicyControls()
     {
-        var theme = new TesseraTheme
-        {
-            Focus = new TesseraThemeFocusTokens
-            {
-                Marker = ">>",
-            },
-        };
+        var theme = new TesseraTheme { Focus = new TesseraThemeFocusTokens { Marker = ">>" } };
 
         foreach (var policy in ResolvePolicies())
         {
@@ -37,13 +31,7 @@ public sealed class ThemeFocusMarkerParityPolicyTests
     [Test]
     public void ThemeFocusMarkerApplyThemeDefaultsFillsEmptyAndPreservesExplicitForPolicyControls()
     {
-        var theme = new TesseraTheme
-        {
-            Focus = new TesseraThemeFocusTokens
-            {
-                Marker = "::",
-            },
-        };
+        var theme = new TesseraTheme { Focus = new TesseraThemeFocusTokens { Marker = "::" } };
 
         foreach (var policy in ResolvePolicies())
         {
@@ -74,14 +62,15 @@ public sealed class ThemeFocusMarkerParityPolicyTests
             .GetTypes()
             .Where(static type => type.IsSealed && type.IsAbstract)
             .SelectMany(static type => type.GetMethods(BindingFlags.Public | BindingFlags.Static))
-            .Where(static method => method.IsDefined(typeof(ExtensionAttribute), inherit: false))
+            .Where(static method => method.IsDefined(typeof(ExtensionAttribute), false))
             .ToArray();
-        var policies = new List<MarkerPolicy>(capacity: PolicyControlTypes.Length);
+        var policies = new List<MarkerPolicy>(PolicyControlTypes.Length);
 
         for (var index = 0; index < PolicyControlTypes.Length; index++)
         {
             var controlType = PolicyControlTypes[index];
-            var focusMarker = controlType.GetProperty(nameof(Choice.FocusMarker), BindingFlags.Public | BindingFlags.Instance);
+            var focusMarker =
+                controlType.GetProperty(nameof(Choice.FocusMarker), BindingFlags.Public | BindingFlags.Instance);
             if (focusMarker is null || focusMarker.PropertyType != typeof(string) || !focusMarker.CanWrite)
             {
                 continue;
@@ -141,7 +130,7 @@ public sealed class ThemeFocusMarkerParityPolicyTests
     [
         typeof(Choice),
         typeof(ComboBox),
-        typeof(TreeView),
+        typeof(TreeView)
     ];
 
     private sealed record MarkerPolicy(

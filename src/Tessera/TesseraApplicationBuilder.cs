@@ -1,24 +1,23 @@
 namespace Tessera;
 
 /// <summary>
-/// Builds a runnable Tessera application from a <see cref="TesseraApp"/> and runtime options.
+///     Builds a runnable Tessera application from a <see cref="TesseraApp" /> and runtime options.
 /// </summary>
 /// <remarks>
-/// Use this type when startup needs multiple steps or when you want a built <see cref="TesseraApplication"/>
-/// instance that can be controlled explicitly after creation.
+///     Use this type when startup needs multiple steps or when you want a built <see cref="TesseraApplication" />
+///     instance that can be controlled explicitly after creation.
 /// </remarks>
 public sealed class TesseraApplicationBuilder
 {
     private Func<TesseraApp>? _appFactory;
-    private readonly TesseraRuntimeOptions _runtime = new();
 
     /// <summary>
-    /// Gets the runtime options that will be applied to the built application.
+    ///     Gets the runtime options that will be applied to the built application.
     /// </summary>
-    public TesseraRuntimeOptions Runtime => _runtime;
+    public TesseraRuntimeOptions Runtime { get; } = new();
 
     /// <summary>
-    /// Configures the application to create a new <typeparamref name="TApp"/> instance when built.
+    ///     Configures the application to create a new <typeparamref name="TApp" /> instance when built.
     /// </summary>
     /// <typeparam name="TApp">The application type.</typeparam>
     /// <returns>The current builder.</returns>
@@ -30,7 +29,7 @@ public sealed class TesseraApplicationBuilder
     }
 
     /// <summary>
-    /// Configures the application to create its <see cref="TesseraApp"/> from the supplied factory.
+    ///     Configures the application to create its <see cref="TesseraApp" /> from the supplied factory.
     /// </summary>
     /// <param name="factory">The application factory.</param>
     /// <returns>The current builder.</returns>
@@ -41,7 +40,7 @@ public sealed class TesseraApplicationBuilder
     }
 
     /// <summary>
-    /// Configures the application to run the supplied <see cref="TesseraApp"/> instance.
+    ///     Configures the application to run the supplied <see cref="TesseraApp" /> instance.
     /// </summary>
     /// <param name="app">The application instance to run.</param>
     /// <returns>The current builder.</returns>
@@ -53,19 +52,19 @@ public sealed class TesseraApplicationBuilder
     }
 
     /// <summary>
-    /// Applies additional runtime configuration before the application is built.
+    ///     Applies additional runtime configuration before the application is built.
     /// </summary>
-    /// <param name="configure">The callback that mutates <see cref="Runtime"/>.</param>
+    /// <param name="configure">The callback that mutates <see cref="Runtime" />.</param>
     /// <returns>The current builder.</returns>
     public TesseraApplicationBuilder ConfigureRuntime(Action<TesseraRuntimeOptions> configure)
     {
         ArgumentNullException.ThrowIfNull(configure);
-        configure(_runtime);
+        configure(Runtime);
         return this;
     }
 
     /// <summary>
-    /// Builds a runnable <see cref="TesseraApplication"/>.
+    ///     Builds a runnable <see cref="TesseraApplication" />.
     /// </summary>
     /// <returns>The built application.</returns>
     /// <exception cref="InvalidOperationException">Thrown when no application has been configured.</exception>
@@ -76,6 +75,6 @@ public sealed class TesseraApplicationBuilder
             throw new InvalidOperationException("No TesseraApp factory configured. Call UseApp(...) before Build().");
         }
 
-        return new TesseraApplication(_appFactory(), _runtime);
+        return new TesseraApplication(_appFactory(), Runtime);
     }
 }

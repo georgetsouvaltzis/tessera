@@ -1,4 +1,4 @@
-﻿using Tessera.Components.Primitives;
+using Tessera.Components.Primitives;
 using Tessera.Components.Primitives.Internal;
 using Tessera.Controls.Internal;
 using Tessera.Layout;
@@ -7,102 +7,94 @@ using Tessera.Styles;
 namespace Tessera.Controls;
 
 /// <summary>
-/// Represents a hierarchical tree viewer.
+///     Represents a hierarchical tree viewer.
 /// </summary>
 public sealed class TreeView : Control
 {
     private readonly List<TreeItem> _roots = [];
     private readonly List<(TreeItem Node, int Depth, int? ParentVisibleIndex)> _visible = [];
-    private int _selectedIndex;
     private int _hoveredIndex = -1;
+    private int _selectedIndex;
 
     /// <summary>
-    /// Represents title.
+    ///     Represents title.
     /// </summary>
-    public string Title
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = "Tree";
+    public string Title { get; set; } = "Tree";
 
     /// <summary>
-    /// Represents focus marker.
+    ///     Represents focus marker.
     /// </summary>
-    public string FocusMarker
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = "*";
+    public string FocusMarker { get; set; } = "*";
 
     /// <summary>
-    /// Gets or sets whether show focus marker.
+    ///     Gets or sets whether show focus marker.
     /// </summary>
     public bool ShowFocusMarker { get; set; } = true;
 
     /// <summary>
-    /// Gets or sets the title style.
+    ///     Gets or sets the title style.
     /// </summary>
     public TesseraStyle TitleStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the focused title style.
+    ///     Gets or sets the focused title style.
     /// </summary>
     public TesseraStyle FocusedTitleStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the style applied to border glyphs when the control is not focused.
+    ///     Gets or sets the style applied to border glyphs when the control is not focused.
     /// </summary>
     public TesseraStyle BorderStyleText { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the style applied to border glyphs when the control is focused.
+    ///     Gets or sets the style applied to border glyphs when the control is focused.
     /// </summary>
     public TesseraStyle FocusedBorderStyleText { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the branch style.
+    ///     Gets or sets the branch style.
     /// </summary>
     public TesseraStyle BranchStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the leaf style.
+    ///     Gets or sets the leaf style.
     /// </summary>
     public TesseraStyle LeafStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the selected item style.
+    ///     Gets or sets the selected item style.
     /// </summary>
     public TesseraStyle SelectedItemStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the hovered item style.
+    ///     Gets or sets the hovered item style.
     /// </summary>
     public TesseraStyle HoveredItemStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the muted style.
+    ///     Gets or sets the muted style.
     /// </summary>
     public TesseraStyle MutedStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the disabled style.
+    ///     Gets or sets the disabled style.
     /// </summary>
     public TesseraStyle DisabledStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets glyphs used for branch and leaf markers.
+    ///     Gets or sets glyphs used for branch and leaf markers.
     /// </summary>
     public TreeViewGlyphSet Glyphs { get; set; } = TreeViewGlyphSet.Default;
 
     /// <summary>
-    /// Represents selected id.
+    ///     Represents selected id.
     /// </summary>
     public string? SelectedId => _selectedIndex >= 0 && _selectedIndex < _visible.Count
         ? _visible[_selectedIndex].Node.Id
         : null;
 
     /// <summary>
-    /// Represents border.
+    ///     Represents border.
     /// </summary>
     public BorderStyle Border
     {
@@ -111,7 +103,7 @@ public sealed class TreeView : Control
     } = BorderStyle.SingleLine;
 
     /// <summary>
-    /// Represents padding.
+    ///     Represents padding.
     /// </summary>
     public Thickness Padding
     {
@@ -141,7 +133,7 @@ public sealed class TreeView : Control
     }
 
     /// <summary>
-    /// Executes set items.
+    ///     Executes set items.
     /// </summary>
     /// <param name="items">The items value.</param>
     public void SetItems(IEnumerable<TreeItem> items)
@@ -312,7 +304,8 @@ public sealed class TreeView : Control
             canvas.WriteText(
                 content.X,
                 content.Y + row,
-                ApplyStyle($"{cursor} {indent}{marker} {node.Label}", ResolveRowStyle(node, index == _selectedIndex, index == _hoveredIndex)),
+                ApplyStyle($"{cursor} {indent}{marker} {node.Label}",
+                    ResolveRowStyle(node, index == _selectedIndex, index == _hoveredIndex)),
                 content.Width);
         }
     }
@@ -325,9 +318,9 @@ public sealed class TreeView : Control
             for (var index = 0; index < _visible.Count; index++)
             {
                 var entry = _visible[index];
-                var rowWidth = (entry.Depth * 2)
-                    + ResolveTreePrefixWidth(entry.Node)
-                    + ControlTextLayout.MeasureDisplayWidth(entry.Node.Label);
+                var rowWidth = entry.Depth * 2
+                               + ResolveTreePrefixWidth(entry.Node)
+                               + ControlTextLayout.MeasureDisplayWidth(entry.Node.Label);
                 width = Math.Max(width, rowWidth);
             }
         }
@@ -442,7 +435,7 @@ public sealed class TreeView : Control
 
     private int ComputeWindowStart(int contentHeight)
     {
-        return Math.Clamp(_selectedIndex - (contentHeight / 2), 0, Math.Max(0, _visible.Count - contentHeight));
+        return Math.Clamp(_selectedIndex - contentHeight / 2, 0, Math.Max(0, _visible.Count - contentHeight));
     }
 
     private bool SetHoveredIndex(int index)
@@ -458,10 +451,7 @@ public sealed class TreeView : Control
 
     private static TreeItem Clone(TreeItem item)
     {
-        var clone = new TreeItem(item.Id, item.Label, item.Children.Select(Clone))
-        {
-            Expanded = item.Expanded,
-        };
+        var clone = new TreeItem(item.Id, item.Label, item.Children.Select(Clone)) { Expanded = item.Expanded };
         return clone;
     }
 

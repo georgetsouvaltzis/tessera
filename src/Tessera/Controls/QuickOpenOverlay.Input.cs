@@ -45,12 +45,12 @@ public sealed partial class QuickOpenOverlay
 
         if (key.Is(Key.Backspace))
         {
-            if (_query.Length == 0)
+            if (Query.Length == 0)
             {
                 return false;
             }
 
-            _query = _query[..^1];
+            Query = Query[..^1];
             RefreshFilter();
             return true;
         }
@@ -59,7 +59,7 @@ public sealed partial class QuickOpenOverlay
             && key.Modifiers == ModifierKeys.None
             && !string.IsNullOrEmpty(key.Text))
         {
-            _query = string.Concat(_query, key.Text);
+            Query = string.Concat(Query, key.Text);
             RefreshFilter();
             return true;
         }
@@ -70,7 +70,8 @@ public sealed partial class QuickOpenOverlay
     /// <inheritdoc />
     public override bool Handle(Message message, Rect bounds)
     {
-        if (!IsOpen || IsDisabled || message is not PointerInput pointer || !TryResolveOverlay(bounds, out _, out var content))
+        if (!IsOpen || IsDisabled || message is not PointerInput pointer ||
+            !TryResolveOverlay(bounds, out _, out var content))
         {
             return Handle(message);
         }
@@ -169,7 +170,7 @@ public sealed partial class QuickOpenOverlay
         }
 
         var item = _items[_filteredIndices[Math.Clamp(_selectedFilteredIndex, 0, _filteredIndices.Count - 1)]];
-        Submitted?.Invoke(this, new QuickOpenOverlaySubmittedEventArgs(item, _query));
+        Submitted?.Invoke(this, new QuickOpenOverlaySubmittedEventArgs(item, Query));
         Close();
         return true;
     }

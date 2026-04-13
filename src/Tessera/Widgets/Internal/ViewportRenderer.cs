@@ -2,8 +2,7 @@ namespace Tessera.Widgets.Internal;
 
 internal static class ViewportRenderer
 {
-    [ThreadStatic]
-    private static List<string>? s_threadRenderBuffer;
+    [ThreadStatic] private static List<string>? s_threadRenderBuffer;
 
     public static IReadOnlyList<string> RenderLines(
         IReadOnlyList<string> visualLines,
@@ -46,7 +45,7 @@ internal static class ViewportRenderer
         }
 
         var lineNumberWidth = showLineNumbers
-            ? ViewportLineFormatter.ComputeLineNumberWidth(showLineNumbers: true, visualLineCount: visualLines.Count)
+            ? ViewportLineFormatter.ComputeLineNumberWidth(true, visualLines.Count)
             : 0;
         for (var i = 0; i < max; i++)
         {
@@ -100,7 +99,7 @@ internal static class ViewportRenderer
 
         for (var i = 0; i < max; i++)
         {
-            rendered.Add(ViewportLineFormatter.FormatNoDecoration(visualLines[start + i], wrap: false, width, xOffset));
+            rendered.Add(ViewportLineFormatter.FormatNoDecoration(visualLines[start + i], false, width, xOffset));
         }
     }
 }

@@ -45,7 +45,7 @@ public sealed partial class TokenEditor
         var width = Math.Max(20, ControlTextLayout.MeasureDisplayWidth(FormatTitleText()) + 4);
         for (var index = 0; index < _tokens.Count; index++)
         {
-            var markerWidth = index == _selectedTokenIndex ? selectedMarkerWidth : unselectedMarkerWidth;
+            var markerWidth = index == SelectedTokenIndex ? selectedMarkerWidth : unselectedMarkerWidth;
             width += markerSeparatorWidth + prefixWidth + suffixWidth + markerWidth;
             width += ControlTextLayout.MeasureDisplayWidth(_tokens[index].Value);
             if (index < _tokens.Count - 1)
@@ -94,8 +94,8 @@ public sealed partial class TokenEditor
         for (var index = 0; index < _tokens.Count && x < right; index++)
         {
             var token = _tokens[index];
-            var marker = index == _selectedTokenIndex ? glyphs.SelectedMarker : glyphs.UnselectedMarker;
-            var markerWidth = index == _selectedTokenIndex ? selectedMarkerWidth : unselectedMarkerWidth;
+            var marker = index == SelectedTokenIndex ? glyphs.SelectedMarker : glyphs.UnselectedMarker;
+            var markerWidth = index == SelectedTokenIndex ? selectedMarkerWidth : unselectedMarkerWidth;
             var valueWidth = ControlTextLayout.MeasureDisplayWidth(token.Value);
             var tokenWidth = markerWidth + markerSeparatorWidth + tokenPrefixWidth + valueWidth + tokenSuffixWidth;
             if (tokenWidth <= 0 || x + tokenWidth > right)
@@ -152,7 +152,7 @@ public sealed partial class TokenEditor
     private TesseraStyle ResolveTokenStyle(int index)
     {
         var style = TokenStyle;
-        if (index == _selectedTokenIndex)
+        if (index == SelectedTokenIndex)
         {
             style = style.Merge(SelectedTokenStyle);
             if (IsFocused)
@@ -237,10 +237,11 @@ public sealed partial class TokenEditor
         var glyphs = Glyphs;
         var selectedMarker = string.IsNullOrEmpty(glyphs.SelectedMarker) ? "●" : glyphs.SelectedMarker;
         var unselectedMarker = string.IsNullOrEmpty(glyphs.UnselectedMarker) ? "○" : glyphs.UnselectedMarker;
-        var prefix = glyphs.TokenPrefix ?? string.Empty;
-        var suffix = glyphs.TokenSuffix ?? string.Empty;
-        var markerSeparator = glyphs.MarkerSeparator ?? string.Empty;
-        var tokenSeparator = glyphs.TokenSeparator ?? string.Empty;
-        return new TokenEditorGlyphSet(selectedMarker, unselectedMarker, prefix, suffix, markerSeparator, tokenSeparator);
+        var prefix = glyphs.TokenPrefix;
+        var suffix = glyphs.TokenSuffix;
+        var markerSeparator = glyphs.MarkerSeparator;
+        var tokenSeparator = glyphs.TokenSeparator;
+        return new TokenEditorGlyphSet(selectedMarker, unselectedMarker, prefix, suffix, markerSeparator,
+            tokenSeparator);
     }
 }

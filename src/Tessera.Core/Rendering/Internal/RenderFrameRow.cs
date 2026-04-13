@@ -2,16 +2,8 @@ namespace Tessera.Core.Rendering.Internal;
 
 internal sealed class RenderFrameRow
 {
-    private const string ContinuationMarker = "\u0000";
+    private const string ContinuationMarker = "\0";
     private readonly RenderCell[] _cells;
-
-    private readonly struct RenderCell(string? text, string style, bool continuation, int width)
-    {
-        public string? Text { get; } = text;
-        public string Style { get; } = style;
-        public bool Continuation { get; } = continuation;
-        public int Width { get; } = width;
-    }
 
     private RenderFrameRow(RenderCell[] cells)
     {
@@ -88,9 +80,9 @@ internal sealed class RenderFrameRow
         var left = _cells[column];
         var right = other._cells[column];
         return left.Continuation == right.Continuation
-            && left.Width == right.Width
-            && string.Equals(left.Style, right.Style, StringComparison.Ordinal)
-            && string.Equals(left.Text, right.Text, StringComparison.Ordinal);
+               && left.Width == right.Width
+               && string.Equals(left.Style, right.Style, StringComparison.Ordinal)
+               && string.Equals(left.Text, right.Text, StringComparison.Ordinal);
     }
 
     public string? CellAt(int column)
@@ -121,5 +113,13 @@ internal sealed class RenderFrameRow
         }
 
         return _cells[column].Continuation ? 1 : Math.Max(1, _cells[column].Width);
+    }
+
+    private readonly struct RenderCell(string? text, string style, bool continuation, int width)
+    {
+        public string? Text { get; } = text;
+        public string Style { get; } = style;
+        public bool Continuation { get; } = continuation;
+        public int Width { get; } = width;
     }
 }

@@ -3,31 +3,17 @@ using Tessera.Styles;
 namespace Tessera.Controls;
 
 /// <summary>
-/// Represents a generic, explicitly configured data-entry form.
+///     Represents a generic, explicitly configured data-entry form.
 /// </summary>
 /// <typeparam name="TModel">Bound model type.</typeparam>
 public sealed partial class DataForm<TModel> : Control
     where TModel : class
 {
     private readonly List<DataFormField<TModel>> _fields = [];
-    private int _selectedIndex = -1;
     private int _hoveredIndex = -1;
-    private int _scrollOffset;
-    private int _lastViewportRows = 8;
-    private string _editBuffer = string.Empty;
     private bool _isDirty;
-    private bool _isEditing;
-    private string _lastCommitError = string.Empty;
-
-    /// <summary>
-    /// Occurs when selected field changes.
-    /// </summary>
-    public event EventHandler<DataFormSelectionChangedEventArgs<TModel>>? SelectionChanged;
-
-    /// <summary>
-    /// Occurs when current field commit is attempted.
-    /// </summary>
-    public event EventHandler<DataFormFieldCommittedEventArgs<TModel>>? FieldCommitted;
+    private int _lastViewportRows = 8;
+    private int _scrollOffset;
 
     /// <summary>Gets or sets title text.</summary>
     public string Title { get; set; } = "Data Form";
@@ -35,7 +21,7 @@ public sealed partial class DataForm<TModel> : Control
     /// <summary>Gets or sets marker appended to title while focused.</summary>
     public string FocusMarker { get; set; } = "*";
 
-    /// <summary>Gets or sets whether <see cref="FocusMarker"/> is rendered while focused.</summary>
+    /// <summary>Gets or sets whether <see cref="FocusMarker" /> is rendered while focused.</summary>
     public bool ShowFocusMarker { get; set; } = true;
 
     /// <summary>Gets or sets text shown when no fields are registered.</summary>
@@ -108,19 +94,20 @@ public sealed partial class DataForm<TModel> : Control
     public IReadOnlyList<DataFormField<TModel>> Fields => _fields;
 
     /// <summary>Gets selected field index, or <c>-1</c> when no fields exist.</summary>
-    public int SelectedIndex => _selectedIndex;
+    public int SelectedIndex { get; private set; } = -1;
 
     /// <summary>Gets selected field definition, if any.</summary>
-    public DataFormField<TModel>? SelectedField => _selectedIndex >= 0 && _selectedIndex < _fields.Count ? _fields[_selectedIndex] : null;
+    public DataFormField<TModel>? SelectedField =>
+        SelectedIndex >= 0 && SelectedIndex < _fields.Count ? _fields[SelectedIndex] : null;
 
     /// <summary>Gets current edit buffer for selected field.</summary>
-    public string EditBuffer => _editBuffer;
+    public string EditBuffer { get; private set; } = string.Empty;
 
     /// <summary>Gets whether the selected field is in explicit value-edit mode.</summary>
-    public bool IsEditing => _isEditing;
+    public bool IsEditing { get; private set; }
 
     /// <summary>Gets last commit error text.</summary>
-    public string LastCommitError => _lastCommitError;
+    public string LastCommitError { get; private set; } = string.Empty;
 
     /// <inheritdoc />
     public override bool IsFocused { get; set; }
@@ -132,36 +119,46 @@ public sealed partial class DataForm<TModel> : Control
     public override bool IsReadOnly { get; set; }
 
     /// <summary>
-    /// Sets bound model instance.
+    ///     Occurs when selected field changes.
+    /// </summary>
+    public event EventHandler<DataFormSelectionChangedEventArgs<TModel>>? SelectionChanged;
+
+    /// <summary>
+    ///     Occurs when current field commit is attempted.
+    /// </summary>
+    public event EventHandler<DataFormFieldCommittedEventArgs<TModel>>? FieldCommitted;
+
+    /// <summary>
+    ///     Sets bound model instance.
     /// </summary>
     /// <param name="model">Model instance to edit.</param>
     public void SetModel(TModel model)
     {
         Model = model ?? throw new ArgumentNullException(nameof(model));
-        _isEditing = false;
+        IsEditing = false;
         LoadBufferFromSelected();
     }
 
     /// <summary>
-    /// Clears bound model reference.
+    ///     Clears bound model reference.
     /// </summary>
     public void ClearModel()
     {
         Model = null;
-        _editBuffer = string.Empty;
+        EditBuffer = string.Empty;
         _isDirty = false;
-        _isEditing = false;
-        _lastCommitError = string.Empty;
+        IsEditing = false;
+        LastCommitError = string.Empty;
     }
 
     /// <summary>
-    /// Replaces all registered fields.
+    ///     Replaces all registered fields.
     /// </summary>
     /// <param name="fields">Field definitions.</param>
     public void SetFields(IEnumerable<DataFormField<TModel>> fields)
     {
         ArgumentNullException.ThrowIfNull(fields);
-        var previousIndex = _selectedIndex;
+        var previousIndex = SelectedIndex;
         var previousField = SelectedField;
         _fields.Clear();
         foreach (var field in fields.Where(static field => field is not null))
@@ -171,18 +168,18 @@ public sealed partial class DataForm<TModel> : Control
 
         if (_fields.Count == 0)
         {
-            _selectedIndex = -1;
+            SelectedIndex = -1;
             _hoveredIndex = -1;
             _scrollOffset = 0;
-            _editBuffer = string.Empty;
+            EditBuffer = string.Empty;
             _isDirty = false;
-            _isEditing = false;
+            IsEditing = false;
         }
         else
         {
-            _selectedIndex = Math.Clamp(_selectedIndex < 0 ? 0 : _selectedIndex, 0, _fields.Count - 1);
+            SelectedIndex = Math.Clamp(SelectedIndex < 0 ? 0 : SelectedIndex, 0, _fields.Count - 1);
             _hoveredIndex = Math.Clamp(_hoveredIndex, -1, _fields.Count - 1);
-            _isEditing = false;
+            IsEditing = false;
             EnsureSelectionVisible(_lastViewportRows);
             LoadBufferFromSelected();
         }
@@ -191,18 +188,18 @@ public sealed partial class DataForm<TModel> : Control
     }
 
     /// <summary>
-    /// Registers one field definition.
+    ///     Registers one field definition.
     /// </summary>
     /// <param name="field">Field definition.</param>
     public void RegisterField(DataFormField<TModel> field)
     {
         ArgumentNullException.ThrowIfNull(field);
-        var previousIndex = _selectedIndex;
+        var previousIndex = SelectedIndex;
         var previousField = SelectedField;
         _fields.Add(field);
-        if (_selectedIndex < 0)
+        if (SelectedIndex < 0)
         {
-            _selectedIndex = 0;
+            SelectedIndex = 0;
             LoadBufferFromSelected();
         }
 
@@ -211,7 +208,7 @@ public sealed partial class DataForm<TModel> : Control
     }
 
     /// <summary>
-    /// Registers one field using explicit getter/setter delegates.
+    ///     Registers one field using explicit getter/setter delegates.
     /// </summary>
     public DataFormField<TModel> RegisterField(
         string key,
@@ -228,9 +225,9 @@ public sealed partial class DataForm<TModel> : Control
     }
 
     /// <summary>
-    /// Selects field by index.
+    ///     Selects field by index.
     /// </summary>
-    /// <returns><see langword="true"/> when selection changed.</returns>
+    /// <returns><see langword="true" /> when selection changed.</returns>
     public bool SelectField(int index)
     {
         if (_fields.Count == 0)
@@ -239,16 +236,16 @@ public sealed partial class DataForm<TModel> : Control
         }
 
         var clamped = Math.Clamp(index, 0, _fields.Count - 1);
-        if (clamped == _selectedIndex)
+        if (clamped == SelectedIndex)
         {
             return false;
         }
 
-        var previousIndex = _selectedIndex;
+        var previousIndex = SelectedIndex;
         var previousField = SelectedField;
-        _selectedIndex = clamped;
-        _isEditing = false;
-        _lastCommitError = string.Empty;
+        SelectedIndex = clamped;
+        IsEditing = false;
+        LastCommitError = string.Empty;
         EnsureSelectionVisible(_lastViewportRows);
         LoadBufferFromSelected();
         RaiseSelectionChangedIfNeeded(previousIndex, previousField);
@@ -256,12 +253,12 @@ public sealed partial class DataForm<TModel> : Control
     }
 
     /// <summary>
-    /// Selects the first field with a matching <see cref="DataFormField{TModel}.Key"/>.
+    ///     Selects the first field with a matching <see cref="DataFormField{TModel}.Key" />.
     /// </summary>
     /// <param name="key">Stable field key to select.</param>
     /// <returns>
-    /// <see langword="true"/> when a matching field exists and selection changed;
-    /// otherwise <see langword="false"/>.
+    ///     <see langword="true" /> when a matching field exists and selection changed;
+    ///     otherwise <see langword="false" />.
     /// </returns>
     public bool SelectField(string key)
     {
@@ -279,26 +276,41 @@ public sealed partial class DataForm<TModel> : Control
     }
 
     /// <summary>Selects next field.</summary>
-    public bool NextField() => SelectField(_selectedIndex + 1);
+    public bool NextField()
+    {
+        return SelectField(SelectedIndex + 1);
+    }
 
     /// <summary>Selects previous field.</summary>
-    public bool PreviousField() => SelectField(_selectedIndex - 1);
+    public bool PreviousField()
+    {
+        return SelectField(SelectedIndex - 1);
+    }
 
     /// <summary>
-    /// Enters explicit value-edit mode for the selected field.
+    ///     Enters explicit value-edit mode for the selected field.
     /// </summary>
-    /// <returns><see langword="true"/> when edit mode was entered.</returns>
-    public bool BeginEdit() => BeginEditCore();
+    /// <returns><see langword="true" /> when edit mode was entered.</returns>
+    public bool BeginEdit()
+    {
+        return BeginEditCore();
+    }
 
     /// <summary>
-    /// Commits the current edit buffer into the model.
+    ///     Commits the current edit buffer into the model.
     /// </summary>
-    /// <returns><see langword="true"/> when commit was handled.</returns>
-    public bool Commit() => CommitCurrentField(out _);
+    /// <returns><see langword="true" /> when commit was handled.</returns>
+    public bool Commit()
+    {
+        return CommitCurrentField(out _);
+    }
 
     /// <summary>
-    /// Cancels the current edit session and restores the selected field value.
+    ///     Cancels the current edit session and restores the selected field value.
     /// </summary>
-    /// <returns><see langword="true"/> when edit mode was canceled.</returns>
-    public bool CancelEdit() => CancelCurrentEdit();
+    /// <returns><see langword="true" /> when edit mode was canceled.</returns>
+    public bool CancelEdit()
+    {
+        return CancelCurrentEdit();
+    }
 }

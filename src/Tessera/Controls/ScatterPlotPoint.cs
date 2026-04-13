@@ -1,12 +1,12 @@
 namespace Tessera.Controls;
 
 /// <summary>
-/// Represents one point in a <see cref="ScatterPlot"/>.
+///     Represents one point in a <see cref="ScatterPlot" />.
 /// </summary>
 public readonly record struct ScatterPlotPoint
 {
     /// <summary>
-    /// Initializes a new point.
+    ///     Initializes a new point.
     /// </summary>
     /// <param name="x">The X-axis value.</param>
     /// <param name="y">The Y-axis value.</param>
@@ -19,17 +19,17 @@ public readonly record struct ScatterPlotPoint
     }
 
     /// <summary>
-    /// Gets the X-axis value.
+    ///     Gets the X-axis value.
     /// </summary>
     public double X { get; init; }
 
     /// <summary>
-    /// Gets the Y-axis value.
+    ///     Gets the Y-axis value.
     /// </summary>
     public double Y { get; init; }
 
     /// <summary>
-    /// Gets the optional label shown near the point when enabled.
+    ///     Gets the optional label shown near the point when enabled.
     /// </summary>
     public string Label { get; init; }
 }

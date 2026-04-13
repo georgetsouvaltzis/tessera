@@ -1,12 +1,12 @@
 namespace Tessera.Controls;
 
 /// <summary>
-/// Represents one five-number summary series rendered by <see cref="BoxPlot" />.
+///     Represents one five-number summary series rendered by <see cref="BoxPlot" />.
 /// </summary>
 public sealed class BoxPlotSeries
 {
     /// <summary>
-    /// Initializes a box-plot series from five-number summary values.
+    ///     Initializes a box-plot series from five-number summary values.
     /// </summary>
     /// <param name="name">Series display name.</param>
     /// <param name="minimum">Minimum value (left whisker).</param>
@@ -22,7 +22,7 @@ public sealed class BoxPlotSeries
         double thirdQuartile,
         double maximum)
     {
-        Name = name ?? string.Empty;
+        Name = name;
         Minimum = minimum;
         FirstQuartile = firstQuartile;
         Median = median;
@@ -31,41 +31,37 @@ public sealed class BoxPlotSeries
     }
 
     /// <summary>
-    /// Gets or sets series display name.
+    ///     Gets or sets series display name.
     /// </summary>
-    public string Name
-    {
-        get;
-        set => field = value ?? string.Empty;
-    }
+    public string Name { get; set; }
 
     /// <summary>
-    /// Gets or sets minimum value (left whisker).
+    ///     Gets or sets minimum value (left whisker).
     /// </summary>
     public double Minimum { get; set; }
 
     /// <summary>
-    /// Gets or sets first quartile value.
+    ///     Gets or sets first quartile value.
     /// </summary>
     public double FirstQuartile { get; set; }
 
     /// <summary>
-    /// Gets or sets median value.
+    ///     Gets or sets median value.
     /// </summary>
     public double Median { get; set; }
 
     /// <summary>
-    /// Gets or sets third quartile value.
+    ///     Gets or sets third quartile value.
     /// </summary>
     public double ThirdQuartile { get; set; }
 
     /// <summary>
-    /// Gets or sets maximum value (right whisker).
+    ///     Gets or sets maximum value (right whisker).
     /// </summary>
     public double Maximum { get; set; }
 
     /// <summary>
-    /// Gets or sets whether row rendering should be muted.
+    ///     Gets or sets whether row rendering should be muted.
     /// </summary>
     public bool IsMuted { get; set; }
 }

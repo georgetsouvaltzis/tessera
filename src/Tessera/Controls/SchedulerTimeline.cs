@@ -1,4 +1,4 @@
-﻿using System.Globalization;
+using System.Globalization;
 using Tessera.Components.Primitives;
 using Tessera.Controls.Internal;
 using Tessera.Layout;
@@ -7,105 +7,92 @@ using Tessera.Styles;
 namespace Tessera.Controls;
 
 /// <summary>
-/// Represents a selectable scheduler timeline for planning and time-slot workflows.
+///     Represents a selectable scheduler timeline for planning and time-slot workflows.
 /// </summary>
 public sealed class SchedulerTimeline : Control
 {
     private readonly List<SchedulerEntry> _entries = [];
-    private int _selectedIndex;
-    private int _scrollOffset;
     private int _lastViewportRows = 8;
+    private int _scrollOffset;
+    private int _selectedIndex;
 
     /// <summary>
-    /// Occurs when scheduler selection changes.
+    ///     Gets or sets control title text.
     /// </summary>
-    public event EventHandler<SchedulerSelectionChangedEventArgs>? SelectionChanged;
+    public string Title { get; set; } = "Schedule";
 
     /// <summary>
-    /// Gets or sets control title text.
+    ///     Represents focus marker.
     /// </summary>
-    public string Title
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = "Schedule";
+    public string FocusMarker { get; set; } = "*";
 
     /// <summary>
-    /// Represents focus marker.
-    /// </summary>
-    public string FocusMarker
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = "*";
-
-    /// <summary>
-    /// Gets or sets whether show focus marker.
+    ///     Gets or sets whether show focus marker.
     /// </summary>
     public bool ShowFocusMarker { get; set; } = true;
 
     /// <summary>
-    /// Gets or sets the title style.
+    ///     Gets or sets the title style.
     /// </summary>
     public TesseraStyle TitleStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the focused title style.
+    ///     Gets or sets the focused title style.
     /// </summary>
     public TesseraStyle FocusedTitleStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the time text style.
+    ///     Gets or sets the time text style.
     /// </summary>
     public TesseraStyle TimeTextStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the entry text style.
+    ///     Gets or sets the entry text style.
     /// </summary>
     public TesseraStyle EntryTextStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the meta text style.
+    ///     Gets or sets the meta text style.
     /// </summary>
     public TesseraStyle MetaTextStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the selected row style.
+    ///     Gets or sets the selected row style.
     /// </summary>
     public TesseraStyle SelectedRowStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the muted row style.
+    ///     Gets or sets the muted row style.
     /// </summary>
     public TesseraStyle MutedRowStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the conflict row style.
+    ///     Gets or sets the conflict row style.
     /// </summary>
     public TesseraStyle ConflictRowStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the disabled style.
+    ///     Gets or sets the disabled style.
     /// </summary>
     public TesseraStyle DisabledStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the padding.
+    ///     Gets or sets the padding.
     /// </summary>
     public Thickness Padding { get; set; }
 
     /// <summary>
-    /// Gets or sets the page size.
+    ///     Gets or sets the page size.
     /// </summary>
     public int PageSize { get; set; } = 8;
 
     /// <summary>
-    /// Gets or sets whether show duration.
+    ///     Gets or sets whether show duration.
     /// </summary>
     public bool ShowDuration { get; set; } = true;
 
     /// <summary>
-    /// Represents time format.
+    ///     Represents time format.
     /// </summary>
     public string TimeFormat
     {
@@ -114,56 +101,42 @@ public sealed class SchedulerTimeline : Control
     } = "HH:mm";
 
     /// <summary>
-    /// Represents selected marker.
+    ///     Represents selected marker.
     /// </summary>
-    public string SelectedMarker
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = ">";
+    public string SelectedMarker { get; set; } = ">";
 
     /// <summary>
-    /// Represents unselected marker.
+    ///     Represents unselected marker.
     /// </summary>
-    public string UnselectedMarker
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = " ";
+    public string UnselectedMarker { get; set; } = " ";
 
     /// <summary>
-    /// Represents conflict marker.
+    ///     Represents conflict marker.
     /// </summary>
-    public string ConflictMarker
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = "!";
+    public string ConflictMarker { get; set; } = "!";
 
     /// <summary>
-    /// Represents empty text.
+    ///     Represents empty text.
     /// </summary>
-    public string EmptyText
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = "(no entries)";
+    public string EmptyText { get; set; } = "(no entries)";
 
     /// <summary>
-    /// Gets or sets the empty text style.
+    ///     Gets or sets the empty text style.
     /// </summary>
     public TesseraStyle EmptyTextStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Represents entries.
+    ///     Represents entries.
     /// </summary>
     public IReadOnlyList<SchedulerEntry> Entries => _entries;
+
     /// <summary>
-    /// Represents selected index.
+    ///     Represents selected index.
     /// </summary>
     public int SelectedIndex => _entries.Count == 0 ? -1 : _selectedIndex;
+
     /// <summary>
-    /// Represents selected entry.
+    ///     Represents selected entry.
     /// </summary>
     public SchedulerEntry? SelectedEntry => _entries.Count == 0 ? null : _entries[_selectedIndex];
 
@@ -177,7 +150,12 @@ public sealed class SchedulerTimeline : Control
     public override bool IsReadOnly { get; set; }
 
     /// <summary>
-    /// Replaces timeline entries and keeps deterministic sort by start/end/title.
+    ///     Occurs when scheduler selection changes.
+    /// </summary>
+    public event EventHandler<SchedulerSelectionChangedEventArgs>? SelectionChanged;
+
+    /// <summary>
+    ///     Replaces timeline entries and keeps deterministic sort by start/end/title.
     /// </summary>
     /// <param name="entries">Entries to show.</param>
     public void SetEntries(IEnumerable<SchedulerEntry> entries)
@@ -204,7 +182,7 @@ public sealed class SchedulerTimeline : Control
     }
 
     /// <summary>
-    /// Executes add entry.
+    ///     Executes add entry.
     /// </summary>
     /// <param name="entry">The entry value.</param>
     public void AddEntry(SchedulerEntry entry)
@@ -217,7 +195,7 @@ public sealed class SchedulerTimeline : Control
     }
 
     /// <summary>
-    /// Executes clear.
+    ///     Executes clear.
     /// </summary>
     public void Clear()
     {
@@ -230,7 +208,7 @@ public sealed class SchedulerTimeline : Control
     }
 
     /// <summary>
-    /// Selects an entry by index.
+    ///     Selects an entry by index.
     /// </summary>
     /// <param name="index">Requested entry index.</param>
     /// <returns><see langword="true" /> when selection changed; otherwise, <see langword="false" />.</returns>
@@ -240,7 +218,7 @@ public sealed class SchedulerTimeline : Control
     }
 
     /// <summary>
-    /// Sets the selected entry index using bounds clamping.
+    ///     Sets the selected entry index using bounds clamping.
     /// </summary>
     /// <param name="index">Requested entry index.</param>
     /// <returns><see langword="true" /> when selection changed; otherwise, <see langword="false" />.</returns>
@@ -261,7 +239,9 @@ public sealed class SchedulerTimeline : Control
         var previousEntry = _entries[previousIndex];
         _selectedIndex = next;
         EnsureSelectionVisible(_lastViewportRows);
-        SelectionChanged?.Invoke(this, new SchedulerSelectionChangedEventArgs(previousIndex, _selectedIndex, previousEntry, _entries[_selectedIndex]));
+        SelectionChanged?.Invoke(this,
+            new SchedulerSelectionChangedEventArgs(previousIndex, _selectedIndex, previousEntry,
+                _entries[_selectedIndex]));
         return true;
     }
 
@@ -378,7 +358,8 @@ public sealed class SchedulerTimeline : Control
         var y = content.Y;
         if (HasTitleRow())
         {
-            canvas.WriteText(content.X, y, ApplyStyle(FormatTitle(), ResolveStyle(IsFocused ? FocusedTitleStyle : TitleStyle)), content.Width);
+            canvas.WriteText(content.X, y,
+                ApplyStyle(FormatTitle(), ResolveStyle(IsFocused ? FocusedTitleStyle : TitleStyle)), content.Width);
             y++;
         }
 
@@ -411,7 +392,8 @@ public sealed class SchedulerTimeline : Control
         var width = 28;
         for (var index = 0; index < _entries.Count; index++)
         {
-            width = Math.Max(width, ControlTextLayout.MeasureDisplayWidth(BuildPlainEntryLine(_entries[index], selected: false, conflict: false)));
+            width = Math.Max(width,
+                ControlTextLayout.MeasureDisplayWidth(BuildPlainEntryLine(_entries[index], false, false)));
         }
 
         width = Math.Max(width, ControlTextLayout.MeasureDisplayWidth(FormatTitle()) + 2);
@@ -429,7 +411,9 @@ public sealed class SchedulerTimeline : Control
         var conflictToken = conflict ? ConflictMarker : " ";
         var timeText = BuildTimeRange(entry);
         var bodyText = BuildBody(entry);
-        var durationText = ShowDuration ? $" ({Math.Max(0, (int)Math.Round((entry.End - entry.Start).TotalMinutes, MidpointRounding.AwayFromZero))}m)" : string.Empty;
+        var durationText = ShowDuration
+            ? $" ({Math.Max(0, (int)Math.Round((entry.End - entry.Start).TotalMinutes, MidpointRounding.AwayFromZero))}m)"
+            : string.Empty;
 
         var rowStyle = ResolveRowStateStyle(entry, selected, conflict);
         var prefixStyled = ApplyStyle($"{prefix}{conflictToken} ", rowStyle);
@@ -448,7 +432,8 @@ public sealed class SchedulerTimeline : Control
 
     private string BuildTimeRange(SchedulerEntry entry)
     {
-        return $"{entry.Start.ToString(TimeFormat, CultureInfo.InvariantCulture)}-{entry.End.ToString(TimeFormat, CultureInfo.InvariantCulture)}";
+        return
+            $"{entry.Start.ToString(TimeFormat, CultureInfo.InvariantCulture)}-{entry.End.ToString(TimeFormat, CultureInfo.InvariantCulture)}";
     }
 
     private static string BuildBody(SchedulerEntry entry)
@@ -492,10 +477,11 @@ public sealed class SchedulerTimeline : Control
         var selectedIndex = SelectedIndex;
         var selectedEntry = SelectedEntry;
         var changed = previousIndex != selectedIndex
-            || !ReferenceEquals(previousEntry, selectedEntry);
+                      || !ReferenceEquals(previousEntry, selectedEntry);
         if (changed)
         {
-            SelectionChanged?.Invoke(this, new SchedulerSelectionChangedEventArgs(previousIndex, selectedIndex, previousEntry, selectedEntry));
+            SelectionChanged?.Invoke(this,
+                new SchedulerSelectionChangedEventArgs(previousIndex, selectedIndex, previousEntry, selectedEntry));
         }
     }
 

@@ -1,4 +1,5 @@
 using Tessera.Components.Primitives;
+
 namespace Tessera.Controls.Internal;
 
 internal static class TimePickerFields
@@ -31,17 +32,18 @@ internal static class TimePickerFields
             <= 2 => TimeField.Hour,
             <= 5 => TimeField.Minute,
             <= 8 => TimeField.Second,
-            _ => null,
+            _ => null
         };
     }
 
-    public static TimeOnly Adjust(TimeOnly value, TimeField activeField, int hourStep, int minuteStep, int secondStep, int direction)
+    public static TimeOnly Adjust(TimeOnly value, TimeField activeField, int hourStep, int minuteStep, int secondStep,
+        int direction)
     {
         var delta = activeField switch
         {
             TimeField.Hour => TimeSpan.FromHours(hourStep * direction),
             TimeField.Minute => TimeSpan.FromMinutes(minuteStep * direction),
-            _ => TimeSpan.FromSeconds(secondStep * direction),
+            _ => TimeSpan.FromSeconds(secondStep * direction)
         };
 
         return value.Add(delta);

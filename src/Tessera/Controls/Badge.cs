@@ -1,4 +1,4 @@
-﻿using Tessera.Components.Primitives;
+using Tessera.Components.Primitives;
 using Tessera.Components.Styling;
 using Tessera.Controls.Internal;
 using Tessera.Layout;
@@ -7,21 +7,17 @@ using Tessera.Styles;
 namespace Tessera.Controls;
 
 /// <summary>
-/// Represents a compact status badge with a semantic tone.
+///     Represents a compact status badge with a semantic tone.
 /// </summary>
 public sealed class Badge : Control
 {
     /// <summary>
-    /// Represents text.
+    ///     Represents text.
     /// </summary>
-    public string Text
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = "Badge";
+    public string Text { get; set; } = "Badge";
 
     /// <summary>
-    /// Represents show brackets.
+    ///     Represents show brackets.
     /// </summary>
     public bool ShowBrackets
     {
@@ -30,12 +26,12 @@ public sealed class Badge : Control
     } = true;
 
     /// <summary>
-    /// Gets or sets the tone.
+    ///     Gets or sets the tone.
     /// </summary>
     public BadgeTone Tone { get; set; }
 
     /// <summary>
-    /// Represents text style.
+    ///     Represents text style.
     /// </summary>
     public TesseraStyle TextStyle
     {
@@ -44,7 +40,7 @@ public sealed class Badge : Control
     } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Represents focused text style.
+    ///     Represents focused text style.
     /// </summary>
     public TesseraStyle FocusedTextStyle
     {
@@ -53,7 +49,7 @@ public sealed class Badge : Control
     } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Represents success text style.
+    ///     Represents success text style.
     /// </summary>
     public TesseraStyle SuccessTextStyle
     {
@@ -62,7 +58,7 @@ public sealed class Badge : Control
     } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Represents warning text style.
+    ///     Represents warning text style.
     /// </summary>
     public TesseraStyle WarningTextStyle
     {
@@ -71,7 +67,7 @@ public sealed class Badge : Control
     } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Represents error text style.
+    ///     Represents error text style.
     /// </summary>
     public TesseraStyle ErrorTextStyle
     {
@@ -96,7 +92,7 @@ public sealed class Badge : Control
             BadgeTone.Success => WidgetVisualState.Success,
             BadgeTone.Warning => WidgetVisualState.Warning,
             BadgeTone.Error => WidgetVisualState.Error,
-            _ => WidgetVisualState.Default,
+            _ => WidgetVisualState.Default
         };
         var palette = WidgetStatePalette.CreateDefault();
         var text = palette.Render(label, state);

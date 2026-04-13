@@ -67,7 +67,8 @@ public sealed partial class FuzzyFinder
             return;
         }
 
-        SelectionChanged?.Invoke(this, new FuzzyFinderSelectionChangedEventArgs(previousIndex, selectedIndex, previousItem, selectedItem));
+        SelectionChanged?.Invoke(this,
+            new FuzzyFinderSelectionChangedEventArgs(previousIndex, selectedIndex, previousItem, selectedItem));
     }
 
     private static bool TryScore(string query, string candidate, out int score, out int[] matchIndices)
@@ -137,7 +138,7 @@ public sealed partial class FuzzyFinder
     private static string BuildDisplayLabel(FuzzyFinderItem item)
     {
         return string.IsNullOrWhiteSpace(item.Description)
-            ? item.Label ?? string.Empty
+            ? item.Label
             : $"{item.Label} - {item.Description}";
     }
 

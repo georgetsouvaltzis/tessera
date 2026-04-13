@@ -1,12 +1,12 @@
 namespace Tessera.Controls;
 
 /// <summary>
-/// Provides selection details when a <see cref="KanbanBoard"/> selection changes.
+///     Provides selection details when a <see cref="KanbanBoard" /> selection changes.
 /// </summary>
 public sealed class KanbanSelectionChangedEventArgs : EventArgs
 {
     /// <summary>
-    /// Initializes a new selection payload.
+    ///     Initializes a new selection payload.
     /// </summary>
     /// <param name="previousLaneIndex">Previously selected lane index.</param>
     /// <param name="previousCardIndex">Previously selected card index within the lane.</param>
@@ -37,42 +37,42 @@ public sealed class KanbanSelectionChangedEventArgs : EventArgs
     }
 
     /// <summary>
-    /// Gets previously selected lane index.
+    ///     Gets previously selected lane index.
     /// </summary>
     public int PreviousLaneIndex { get; }
 
     /// <summary>
-    /// Gets previously selected card index.
+    ///     Gets previously selected card index.
     /// </summary>
     public int PreviousCardIndex { get; }
 
     /// <summary>
-    /// Gets currently selected lane index.
+    ///     Gets currently selected lane index.
     /// </summary>
     public int SelectedLaneIndex { get; }
 
     /// <summary>
-    /// Gets currently selected card index.
+    ///     Gets currently selected card index.
     /// </summary>
     public int SelectedCardIndex { get; }
 
     /// <summary>
-    /// Gets previously selected lane.
+    ///     Gets previously selected lane.
     /// </summary>
     public KanbanLane? PreviousLane { get; }
 
     /// <summary>
-    /// Gets previously selected card.
+    ///     Gets previously selected card.
     /// </summary>
     public KanbanCard? PreviousCard { get; }
 
     /// <summary>
-    /// Gets currently selected lane.
+    ///     Gets currently selected lane.
     /// </summary>
     public KanbanLane? SelectedLane { get; }
 
     /// <summary>
-    /// Gets currently selected card.
+    ///     Gets currently selected card.
     /// </summary>
     public KanbanCard? SelectedCard { get; }
 }

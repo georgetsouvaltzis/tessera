@@ -8,11 +8,9 @@ internal sealed class GitWorktreeControl : Control
 {
     private readonly List<GitWorktreeSection> _sections = [];
     private readonly List<GitFileEntry> _visibleItems = [];
-    private int _selectedIndex;
-    private int _scrollOffset;
     private int _lastViewportRows = 8;
-
-    public event EventHandler<GitWorktreeSelectionChangedEventArgs>? SelectionChanged;
+    private int _scrollOffset;
+    private int _selectedIndex;
 
     public string Title { get; set; } = "Worktree";
     public string FocusMarker { get; set; } = "◆";
@@ -34,7 +32,11 @@ internal sealed class GitWorktreeControl : Control
     public TesseraStyle RemovedStyle { get; set; } = TesseraStyle.Empty;
     public TesseraStyle EmptyStyle { get; set; } = TesseraStyle.Empty;
 
-    public GitFileEntry? SelectedItem => _selectedIndex >= 0 && _selectedIndex < _visibleItems.Count ? _visibleItems[_selectedIndex] : null;
+    public GitFileEntry? SelectedItem => _selectedIndex >= 0 && _selectedIndex < _visibleItems.Count
+        ? _visibleItems[_selectedIndex]
+        : null;
+
+    public event EventHandler<GitWorktreeSelectionChangedEventArgs>? SelectionChanged;
 
     public void SetSections(IEnumerable<GitWorktreeSection> sections)
     {
@@ -50,7 +52,10 @@ internal sealed class GitWorktreeControl : Control
             _visibleItems.AddRange(section.Items);
         }
 
-        _selectedIndex = previous is null ? 0 : Math.Max(0, _visibleItems.FindIndex(item => string.Equals(item.Id, previous.Id, StringComparison.Ordinal)));
+        _selectedIndex = previous is null
+            ? 0
+            : Math.Max(0,
+                _visibleItems.FindIndex(item => string.Equals(item.Id, previous.Id, StringComparison.Ordinal)));
         if (_visibleItems.Count == 0)
         {
             _selectedIndex = -1;
@@ -93,7 +98,8 @@ internal sealed class GitWorktreeControl : Control
 
         if (key.Is(Key.PageDown))
         {
-            return SetSelectedIndex(Math.Min(_visibleItems.Count - 1, _selectedIndex + Math.Max(1, _lastViewportRows - 2)));
+            return SetSelectedIndex(Math.Min(_visibleItems.Count - 1,
+                _selectedIndex + Math.Max(1, _lastViewportRows - 2)));
         }
 
         if (key.Is(Key.PageUp))
@@ -130,7 +136,8 @@ internal sealed class GitWorktreeControl : Control
             }
         }
 
-        if (pointer.Kind == PointerEventKind.Press && pointer.Button == PointerButton.Left && content.Contains(pointer.X, pointer.Y))
+        if (pointer.Kind == PointerEventKind.Press && pointer.Button == PointerButton.Left &&
+            content.Contains(pointer.X, pointer.Y))
         {
             RequestFocus();
             var index = HitTestIndex(pointer.Y, content);
@@ -196,7 +203,10 @@ internal sealed class GitWorktreeControl : Control
         return true;
     }
 
-    private Rect ResolveContentRect(Rect bounds) => bounds.Inset(1, 1).Inset(Padding);
+    private Rect ResolveContentRect(Rect bounds)
+    {
+        return bounds.Inset(1, 1).Inset(Padding);
+    }
 
     private int HitTestIndex(int pointerY, Rect content)
     {
@@ -227,6 +237,7 @@ internal sealed class GitWorktreeControl : Control
                 break;
             }
         }
+
         if (selectedRowIndex < 0)
         {
             _scrollOffset = 0;
@@ -252,7 +263,8 @@ internal sealed class GitWorktreeControl : Control
         var itemIndex = 0;
         foreach (var section in _sections)
         {
-            rows.Add(new GitWorktreeVisualRow(-1, Render(GroupStyle, $"{section.Title.ToUpperInvariant()} [{section.Items.Count:00}]")));
+            rows.Add(new GitWorktreeVisualRow(-1,
+                Render(GroupStyle, $"{section.Title.ToUpperInvariant()} [{section.Items.Count:00}]")));
             foreach (var item in section.Items)
             {
                 var selected = itemIndex == _selectedIndex;
@@ -273,11 +285,12 @@ internal sealed class GitWorktreeControl : Control
             GitChangeKind.Added => Render(AddedStyle, "A"),
             GitChangeKind.Deleted => Render(RemovedStyle, "D"),
             GitChangeKind.Renamed => Render(SecondaryStyle, "R"),
-            _ => Render(SecondaryStyle, "M"),
+            _ => Render(SecondaryStyle, "M")
         };
         var stage = item.IsStaged ? Render(StagedStyle, "STAGED") : Render(SecondaryStyle, "WORKTREE");
         var review = item.IsReviewCritical ? $" {Render(ReviewStyle, "HOT")}" : string.Empty;
-        var delta = $"{Render(AddedStyle, $"+{item.AddedLines:00}")} {Render(RemovedStyle, $"-{item.RemovedLines:00}")}";
+        var delta =
+            $"{Render(AddedStyle, $"+{item.AddedLines:00}")} {Render(RemovedStyle, $"-{item.RemovedLines:00}")}";
         var style = ResolveRowStyle(selected);
         return Render(style, $"{marker} {status} {path} {delta} {stage}{review}");
     }
@@ -288,7 +301,10 @@ internal sealed class GitWorktreeControl : Control
         return Render(IsFocused ? FocusedTitleStyle : TitleStyle, title);
     }
 
-    private TesseraStyle ResolveBorderStyle() => IsFocused ? BorderStyleText.Merge(FocusedBorderStyleText) : BorderStyleText;
+    private TesseraStyle ResolveBorderStyle()
+    {
+        return IsFocused ? BorderStyleText.Merge(FocusedBorderStyleText) : BorderStyleText;
+    }
 
     private TesseraStyle ResolveRowStyle(bool selected)
     {
@@ -300,12 +316,16 @@ internal sealed class GitWorktreeControl : Control
         return IsFocused ? SelectedRowStyle.Merge(FocusedSelectedRowStyle) : SelectedRowStyle;
     }
 
-    private static string Render(TesseraStyle style, string text) => style.IsEmpty ? text : style.Render(text);
+    private static string Render(TesseraStyle style, string text)
+    {
+        return style.IsEmpty ? text : style.Render(text);
+    }
 
     private sealed record GitWorktreeVisualRow(int ItemIndex, string Text);
 }
 
-internal sealed class GitWorktreeSelectionChangedEventArgs(GitFileEntry? previousItem, GitFileEntry? selectedItem) : EventArgs
+internal sealed class GitWorktreeSelectionChangedEventArgs(GitFileEntry? previousItem, GitFileEntry? selectedItem)
+    : EventArgs
 {
     public GitFileEntry? PreviousItem { get; } = previousItem;
     public GitFileEntry? SelectedItem { get; } = selectedItem;

@@ -1,4 +1,5 @@
-﻿using System.Globalization;
+using System.Globalization;
+using System.Text;
 using Tessera.Components.Primitives;
 using Tessera.Components.Primitives.Internal;
 using Tessera.Controls.Internal;
@@ -11,17 +12,6 @@ public sealed partial class TagInput
 {
     private const int MinimumInlineWidth = 1;
     private const int MinimumWrappedInputStartWidth = 4;
-
-    private readonly record struct FlowInlineElement(string Text, TesseraStyle Style, int Width);
-    private readonly record struct TagPlacement(int Index, int X, int Y, string Text, TesseraStyle Style, int Width);
-    private readonly record struct TextPlacement(int X, int Y, string Text, TesseraStyle Style, int Width);
-
-    private sealed class FlowLayoutResult
-    {
-        public List<TagPlacement> Tags { get; } = [];
-        public List<TextPlacement> TextRuns { get; } = [];
-        public int Height { get; set; } = 1;
-    }
 
     /// <inheritdoc />
     public override void Render(Canvas canvas, Rect rect)
@@ -50,7 +40,8 @@ public sealed partial class TagInput
     internal override LayoutMeasurement Measure(in Rect availableBounds)
     {
         var frameWidth = Math.Max(16, ControlTextLayout.MeasureDisplayWidth(FormatTitleText()) + 4);
-        var naturalTotalWidth = Math.Max(frameWidth, ResolveNaturalContentWidth() + Padding.Horizontal + ResolveBorderChrome());
+        var naturalTotalWidth = Math.Max(frameWidth,
+            ResolveNaturalContentWidth() + Padding.Horizontal + ResolveBorderChrome());
         var measuredWidth = availableBounds.Width > 0
             ? Math.Min(naturalTotalWidth, availableBounds.Width)
             : naturalTotalWidth;
@@ -169,7 +160,8 @@ public sealed partial class TagInput
             }
         }
 
-        result.Height = Math.Max(1, cursorY + (cursorX > 0 || result.TextRuns.Count == 0 && result.Tags.Count == 0 ? 1 : 0));
+        result.Height = Math.Max(1,
+            cursorY + (cursorX > 0 || (result.TextRuns.Count == 0 && result.Tags.Count == 0) ? 1 : 0));
         return result;
     }
 
@@ -224,7 +216,8 @@ public sealed partial class TagInput
         {
             if (!string.IsNullOrEmpty(caretGlyph))
             {
-                elements.Add(new FlowInlineElement(caretGlyph, caretStyle, ControlTextLayout.MeasureDisplayWidth(caretGlyph)));
+                elements.Add(new FlowInlineElement(caretGlyph, caretStyle,
+                    ControlTextLayout.MeasureDisplayWidth(caretGlyph)));
             }
 
             AppendTextElements(elements, Placeholder, inputStyle);
@@ -242,21 +235,25 @@ public sealed partial class TagInput
                 var end = start + element.Length;
                 if (!insertedCaret && !string.IsNullOrEmpty(caretGlyph) && cursor <= start)
                 {
-                    elements.Add(new FlowInlineElement(caretGlyph, caretStyle, ControlTextLayout.MeasureDisplayWidth(caretGlyph)));
+                    elements.Add(new FlowInlineElement(caretGlyph, caretStyle,
+                        ControlTextLayout.MeasureDisplayWidth(caretGlyph)));
                     insertedCaret = true;
                 }
 
-                elements.Add(new FlowInlineElement(element, inputStyle, ControlTextLayout.MeasureDisplayWidth(element)));
+                elements.Add(new FlowInlineElement(element, inputStyle,
+                    ControlTextLayout.MeasureDisplayWidth(element)));
                 if (!insertedCaret && !string.IsNullOrEmpty(caretGlyph) && cursor == end)
                 {
-                    elements.Add(new FlowInlineElement(caretGlyph, caretStyle, ControlTextLayout.MeasureDisplayWidth(caretGlyph)));
+                    elements.Add(new FlowInlineElement(caretGlyph, caretStyle,
+                        ControlTextLayout.MeasureDisplayWidth(caretGlyph)));
                     insertedCaret = true;
                 }
             }
 
             if (!insertedCaret && !string.IsNullOrEmpty(caretGlyph))
             {
-                elements.Add(new FlowInlineElement(caretGlyph, caretStyle, ControlTextLayout.MeasureDisplayWidth(caretGlyph)));
+                elements.Add(new FlowInlineElement(caretGlyph, caretStyle,
+                    ControlTextLayout.MeasureDisplayWidth(caretGlyph)));
             }
         }
 
@@ -346,7 +343,7 @@ public sealed partial class TagInput
     private TesseraStyle ResolveTagStyle(int tagIndex)
     {
         var style = TagStyle;
-        if (tagIndex == _selectedTagIndex)
+        if (tagIndex == SelectedTagIndex)
         {
             style = style.Merge(SelectedTagStyle);
             if (IsFocused)
@@ -483,7 +480,7 @@ public sealed partial class TagInput
             return text;
         }
 
-        var builder = new System.Text.StringBuilder();
+        var builder = new StringBuilder();
         var width = 0;
         var enumerator = StringInfo.GetTextElementEnumerator(text);
         while (enumerator.MoveNext())
@@ -511,5 +508,18 @@ public sealed partial class TagInput
 
         var enumerator = StringInfo.GetTextElementEnumerator(value);
         return enumerator.MoveNext() ? enumerator.GetTextElement() : value[0].ToString();
+    }
+
+    private readonly record struct FlowInlineElement(string Text, TesseraStyle Style, int Width);
+
+    private readonly record struct TagPlacement(int Index, int X, int Y, string Text, TesseraStyle Style, int Width);
+
+    private readonly record struct TextPlacement(int X, int Y, string Text, TesseraStyle Style, int Width);
+
+    private sealed class FlowLayoutResult
+    {
+        public List<TagPlacement> Tags { get; } = [];
+        public List<TextPlacement> TextRuns { get; } = [];
+        public int Height { get; set; } = 1;
     }
 }

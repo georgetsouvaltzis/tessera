@@ -1,83 +1,77 @@
-﻿using Tessera.Components.Primitives;
+using System.ComponentModel;
+using Tessera.Components.Primitives;
 using Tessera.Components.Primitives.Internal;
 using Tessera.Controls.Internal;
 using Tessera.Layout;
 using Tessera.Styles;
-using System.ComponentModel;
 
 namespace Tessera.Controls;
 
 /// <summary>
-/// Represents a horizontal menu bar that raises menu-item activation events.
+///     Represents a horizontal menu bar that raises menu-item activation events.
 /// </summary>
 public sealed class MenuBar : Control
 {
     private readonly List<MenuItem> _items = [];
-    private int _selectedIndex;
-    private int _hoveredIndex = -1;
     private long _activationVersion;
     private long _consumedActivationVersion;
+    private int _hoveredIndex = -1;
 
     /// <summary>
-    /// Occurs when a configured menu item is activated.
+    ///     Gets the currently selected menu index.
     /// </summary>
-    public event EventHandler<MenuItemActivatedEventArgs>? ItemActivated;
+    public int SelectedIndex { get; private set; }
 
     /// <summary>
-    /// Gets the currently selected menu index.
-    /// </summary>
-    public int SelectedIndex => _selectedIndex;
-
-    /// <summary>
-    /// Gets the configured menu items.
+    ///     Gets the configured menu items.
     /// </summary>
     public IReadOnlyList<MenuItem> Items => _items;
 
     /// <summary>
-    /// Gets or sets default style for menu items.
+    ///     Gets or sets default style for menu items.
     /// </summary>
     public TesseraStyle ItemStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets style merged into selected item labels.
+    ///     Gets or sets style merged into selected item labels.
     /// </summary>
     public TesseraStyle SelectedItemStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets style merged into hovered item labels.
+    ///     Gets or sets style merged into hovered item labels.
     /// </summary>
     public TesseraStyle HoveredItemStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets style merged into the selected item while focused.
+    ///     Gets or sets style merged into the selected item while focused.
     /// </summary>
     public TesseraStyle FocusedItemStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets style merged when the control is disabled.
+    ///     Gets or sets style merged when the control is disabled.
     /// </summary>
     public TesseraStyle DisabledItemStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the style applied to border glyphs when the control is not focused.
+    ///     Gets or sets the style applied to border glyphs when the control is not focused.
     /// </summary>
     public TesseraStyle BorderStyleText { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the style applied to border glyphs when the control is focused.
+    ///     Gets or sets the style applied to border glyphs when the control is focused.
     /// </summary>
     public TesseraStyle FocusedBorderStyleText { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets glyphs used for selected/hovered wrappers and shortcut delimiters.
+    ///     Gets or sets glyphs used for selected/hovered wrappers and shortcut delimiters.
     /// </summary>
     public MenuBarGlyphSet Glyphs { get; set; } = MenuBarGlyphSet.Default;
 
     /// <summary>
-    /// Gets or sets the optional frame border style.
+    ///     Gets or sets the optional frame border style.
     /// </summary>
     /// <remarks>
-    /// Defaults to <see cref="BorderStyle.None"/> to preserve previous single-row rendering.
+    ///     Defaults to <see cref="BorderStyle.None" /> to preserve previous single-row rendering.
     /// </remarks>
     public BorderStyle Border
     {
@@ -86,7 +80,7 @@ public sealed class MenuBar : Control
     } = BorderStyle.None;
 
     /// <summary>
-    /// Gets or sets inner padding applied inside the optional frame.
+    ///     Gets or sets inner padding applied inside the optional frame.
     /// </summary>
     public Thickness Padding
     {
@@ -116,12 +110,17 @@ public sealed class MenuBar : Control
     }
 
     /// <summary>
-    /// Gets or sets the last activated item id.
+    ///     Gets or sets the last activated item id.
     /// </summary>
     public string? LastActivatedItemId { get; private set; }
 
     /// <summary>
-    /// Replaces the configured menu items.
+    ///     Occurs when a configured menu item is activated.
+    /// </summary>
+    public event EventHandler<MenuItemActivatedEventArgs>? ItemActivated;
+
+    /// <summary>
+    ///     Replaces the configured menu items.
     /// </summary>
     /// <param name="items">The menu items to display. Item ids should remain stable and unique for activation handling.</param>
     public void SetItems(IEnumerable<MenuItem> items)
@@ -138,7 +137,7 @@ public sealed class MenuBar : Control
             _items.Add(item);
         }
 
-        _selectedIndex = Math.Clamp(_selectedIndex, 0, Math.Max(0, _items.Count - 1));
+        SelectedIndex = Math.Clamp(SelectedIndex, 0, Math.Max(0, _items.Count - 1));
         _hoveredIndex = -1;
     }
 
@@ -160,7 +159,7 @@ public sealed class MenuBar : Control
                     continue;
                 }
 
-                _selectedIndex = index;
+                SelectedIndex = index;
                 if (!IsReadOnly)
                 {
                     ActivateItem(_items[index]);
@@ -172,19 +171,19 @@ public sealed class MenuBar : Control
 
         if (key.Is(Key.Right) || key.IsCharacter('l'))
         {
-            _selectedIndex = (_selectedIndex + 1) % _items.Count;
+            SelectedIndex = (SelectedIndex + 1) % _items.Count;
             return true;
         }
 
         if (key.Is(Key.Left) || key.IsCharacter('h'))
         {
-            _selectedIndex = (_selectedIndex + _items.Count - 1) % _items.Count;
+            SelectedIndex = (SelectedIndex + _items.Count - 1) % _items.Count;
             return true;
         }
 
         if (!IsReadOnly && (key.Is(Key.Enter) || key.IsCharacter(' ')))
         {
-            ActivateItem(_items[_selectedIndex]);
+            ActivateItem(_items[SelectedIndex]);
             return true;
         }
 
@@ -221,13 +220,13 @@ public sealed class MenuBar : Control
         {
             if (pointer.Button == PointerButton.WheelDown)
             {
-                _selectedIndex = (_selectedIndex + 1) % _items.Count;
+                SelectedIndex = (SelectedIndex + 1) % _items.Count;
                 return true;
             }
 
             if (pointer.Button == PointerButton.WheelUp)
             {
-                _selectedIndex = (_selectedIndex + _items.Count - 1) % _items.Count;
+                SelectedIndex = (SelectedIndex + _items.Count - 1) % _items.Count;
                 return true;
             }
         }
@@ -243,15 +242,15 @@ public sealed class MenuBar : Control
             changed |= SetHoveredIndex(hovered);
             if (pointer.Button == PointerButton.Left && hovered >= 0)
             {
-                if (_selectedIndex != hovered)
+                if (SelectedIndex != hovered)
                 {
-                    _selectedIndex = hovered;
+                    SelectedIndex = hovered;
                     changed = true;
                 }
 
                 if (!IsReadOnly)
                 {
-                    ActivateItem(_items[_selectedIndex]);
+                    ActivateItem(_items[SelectedIndex]);
                     return true;
                 }
             }
@@ -261,10 +260,10 @@ public sealed class MenuBar : Control
     }
 
     /// <summary>
-    /// Attempts to consume a pending menu activation from the wrapped legacy component.
+    ///     Attempts to consume a pending menu activation from the wrapped legacy component.
     /// </summary>
     /// <param name="itemId">Receives the activated item id when available.</param>
-    /// <returns><see langword="true"/> when an activation was consumed; otherwise, <see langword="false"/>.</returns>
+    /// <returns><see langword="true" /> when an activation was consumed; otherwise, <see langword="false" />.</returns>
     [EditorBrowsable(EditorBrowsableState.Advanced)]
     public bool TryConsumeActivation(out string itemId)
     {
@@ -288,7 +287,8 @@ public sealed class MenuBar : Control
             return;
         }
 
-        var content = FrameLayout.DrawFrameAndResolveContent(canvas, clipped, null, Border, Padding, ResolveBorderStyleText());
+        var content =
+            FrameLayout.DrawFrameAndResolveContent(canvas, clipped, null, Border, Padding, ResolveBorderStyleText());
         if (content.IsEmpty || content.Height < 1)
         {
             return;
@@ -297,7 +297,7 @@ public sealed class MenuBar : Control
         var x = content.X;
         for (var index = 0; index < _items.Count && x < content.Right; index++)
         {
-            var rawLabel = FormatLabel(index, hovered: index == _hoveredIndex);
+            var rawLabel = FormatLabel(index, index == _hoveredIndex);
             canvas.WriteText(x, content.Y, ApplyStyle(rawLabel, ResolveItemStyle(index)), content.Right - x);
             x += ControlTextLayout.MeasureDisplayWidth(rawLabel) + 1;
         }
@@ -308,7 +308,7 @@ public sealed class MenuBar : Control
         var width = 0;
         for (var index = 0; index < _items.Count; index++)
         {
-            width += ControlTextLayout.MeasureDisplayWidth(FormatLabel(index, hovered: false));
+            width += ControlTextLayout.MeasureDisplayWidth(FormatLabel(index, false));
             if (index > 0)
             {
                 width++;
@@ -329,10 +329,10 @@ public sealed class MenuBar : Control
         var core = item.Shortcut == '\0'
             ? item.Text
             : string.Concat(item.Text, Glyphs.ShortcutOpen, item.Shortcut, Glyphs.ShortcutClose);
-        var label = index == _selectedIndex
+        var label = index == SelectedIndex
             ? string.Concat(Glyphs.SelectedPrefix, core, Glyphs.SelectedSuffix)
             : string.Concat(Glyphs.UnselectedPrefix, core, Glyphs.UnselectedSuffix);
-        return hovered && index != _selectedIndex
+        return hovered && index != SelectedIndex
             ? string.Concat(Glyphs.HoveredPrefix, core, Glyphs.HoveredSuffix)
             : label;
     }
@@ -342,7 +342,7 @@ public sealed class MenuBar : Control
         var cursor = content.X;
         for (var index = 0; index < _items.Count && cursor < content.Right; index++)
         {
-            var label = FormatLabel(index, hovered: false);
+            var label = FormatLabel(index, false);
             var width = ControlTextLayout.MeasureDisplayWidth(label);
             var end = cursor + width;
             if (x >= cursor && x < end)
@@ -370,7 +370,7 @@ public sealed class MenuBar : Control
     private TesseraStyle ResolveItemStyle(int index)
     {
         var style = ItemStyle;
-        if (index == _selectedIndex)
+        if (index == SelectedIndex)
         {
             style = style.Merge(SelectedItemStyle);
             if (IsFocused)

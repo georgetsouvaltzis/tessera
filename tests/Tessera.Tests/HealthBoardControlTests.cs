@@ -12,19 +12,15 @@ public sealed class HealthBoardControlTests
     [Test]
     public void ControlsHealthBoardRendersSeverityGlyphsAndSummary()
     {
-        var control = new HealthBoard
-        {
-            Border = BorderStyle.None,
-            Title = string.Empty,
-        };
+        var control = new HealthBoard { Border = BorderStyle.None, Title = string.Empty };
         control.SetServices(
         [
-            new HealthService("svc-auth", "Auth", HealthServiceSeverity.Healthy),
+            new HealthService("svc-auth", "Auth"),
             new HealthService("svc-cache", "Cache", HealthServiceSeverity.Degraded, "latency high"),
-            new HealthService("svc-api", "Api", HealthServiceSeverity.Outage, "timeout"),
+            new HealthService("svc-api", "Api", HealthServiceSeverity.Outage, "timeout")
         ]);
 
-        var output = Render(control, width: 80, height: 4);
+        var output = Render(control, 80, 4);
 
         Assert.That(output.Contains("OK Auth", StringComparison.Ordinal), Is.True);
         Assert.That(output.Contains("~ Cache - latency high", StringComparison.Ordinal), Is.True);
@@ -34,17 +30,12 @@ public sealed class HealthBoardControlTests
     [Test]
     public void ControlsHealthBoardKeyboardAndPointerSelectionRaisesSelectionChanged()
     {
-        var control = new HealthBoard
-        {
-            Border = BorderStyle.None,
-            IsFocused = true,
-            Title = string.Empty,
-        };
+        var control = new HealthBoard { Border = BorderStyle.None, IsFocused = true, Title = string.Empty };
         control.SetServices(
         [
             new HealthService("svc-a", "A"),
             new HealthService("svc-b", "B"),
-            new HealthService("svc-c", "C"),
+            new HealthService("svc-c", "C")
         ]);
 
         var raised = 0;
@@ -73,8 +64,8 @@ public sealed class HealthBoardControlTests
         var control = new HealthBoard();
         control.SetServices(
         [
-            new HealthService("svc-a", "Auth", HealthServiceSeverity.Healthy),
-            new HealthService("svc-b", "Billing", HealthServiceSeverity.Outage),
+            new HealthService("svc-a", "Auth"),
+            new HealthService("svc-b", "Billing", HealthServiceSeverity.Outage)
         ]);
 
         var first = control.Acknowledge("svc-b");
@@ -100,20 +91,17 @@ public sealed class HealthBoardControlTests
             FocusedTitleStyle = TesseraStyle.Empty.WithForeground(AnsiColor.Rgb(70, 80, 90)),
             DegradedServiceStyle = TesseraStyle.Empty.WithForeground(AnsiColor.Rgb(100, 110, 120)),
             OutageServiceStyle = TesseraStyle.Empty.WithForeground(AnsiColor.Rgb(130, 140, 150)),
-            SelectedServiceStyle = TesseraStyle.Empty.WithBackground(AnsiColor.Rgb(160, 170, 180)),
+            SelectedServiceStyle = TesseraStyle.Empty.WithBackground(AnsiColor.Rgb(160, 170, 180))
         };
         control.Glyphs = new HealthBoardGlyphSet(".", ">", "?", "+", "~", "#", "ack", "|");
         control.SetServices(
         [
             new HealthService("svc-auth", "Auth", HealthServiceSeverity.Degraded, "slow"),
-            new HealthService("svc-payments", "Payments", HealthServiceSeverity.Outage)
-            {
-                IsAcknowledged = true,
-            },
+            new HealthService("svc-payments", "Payments", HealthServiceSeverity.Outage) { IsAcknowledged = true }
         ]);
         _ = control.SetSelectedIndex(1);
 
-        var output = Render(control, width: 80, height: 8);
+        var output = Render(control, 80, 8);
 
         Assert.That(output.Contains("Health !", StringComparison.Ordinal), Is.True);
         Assert.That(output.Contains(".|~|Auth - slow", StringComparison.Ordinal), Is.True);
@@ -128,18 +116,14 @@ public sealed class HealthBoardControlTests
     [Test]
     public void ControlsHealthBoardDefaultRenderIsDeterministicAndMonochrome()
     {
-        var control = new HealthBoard
-        {
-            Border = BorderStyle.None,
-            Title = string.Empty,
-        };
+        var control = new HealthBoard { Border = BorderStyle.None, Title = string.Empty };
         control.SetServices([new HealthService("svc-auth", "Auth")]);
 
-        var first = Render(control, width: 48, height: 3);
-        var second = Render(control, width: 48, height: 3);
+        var first = Render(control, 48, 3);
+        var second = Render(control, 48, 3);
 
         Assert.That(first, Is.EqualTo(second));
-        Assert.That(first.Contains("\u001b[", StringComparison.Ordinal), Is.False);
+        Assert.That(first.Contains("\e[", StringComparison.Ordinal), Is.False);
     }
 
     private static string Render(HealthBoard control, int width, int height)

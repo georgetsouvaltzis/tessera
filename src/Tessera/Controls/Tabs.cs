@@ -1,4 +1,4 @@
-﻿using Tessera.Components.Primitives;
+using Tessera.Components.Primitives;
 using Tessera.Controls.Internal;
 using Tessera.Layout;
 using Tessera.Styles;
@@ -6,26 +6,25 @@ using Tessera.Styles;
 namespace Tessera.Controls;
 
 /// <summary>
-/// Represents a tab-strip for switching between named views.
+///     Represents a tab-strip for switching between named views.
 /// </summary>
 public sealed class Tabs : Control
 {
     private readonly List<string> _items = [];
-    private int _selectedIndex;
     private int _hoveredIndex = -1;
 
     /// <summary>
-    /// Executes tabs.
+    ///     Executes tabs.
     /// </summary>
     /// <param name="items">The items value.</param>
     /// <returns>The result of tabs.</returns>
     public Tabs(IEnumerable<string> items)
     {
-        SetItems(items ?? Array.Empty<string>());
+        SetItems(items);
     }
 
     /// <summary>
-    /// Executes tabs.
+    ///     Executes tabs.
     /// </summary>
     /// <param name="items">The items value.</param>
     /// <returns>The result of tabs.</returns>
@@ -35,40 +34,27 @@ public sealed class Tabs : Control
     }
 
     /// <summary>
-    /// Represents selection changed.
-    /// </summary>
-    public event EventHandler<SelectionChangedEventArgs>? SelectionChanged;
-
-    /// <summary>
-    /// Represents items.
+    ///     Represents items.
     /// </summary>
     public IReadOnlyList<string> Items => _items;
 
     /// <summary>
-    /// Represents selected index.
+    ///     Represents selected index.
     /// </summary>
-    public int SelectedIndex => _selectedIndex;
+    public int SelectedIndex { get; private set; }
 
     /// <summary>
-    /// Gets or sets the optional title shown before tab labels.
+    ///     Gets or sets the optional title shown before tab labels.
     /// </summary>
-    public string Title
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = string.Empty;
+    public string Title { get; set; } = string.Empty;
 
     /// <summary>
-    /// Gets or sets the marker shown in the title when the control is focused.
+    ///     Gets or sets the marker shown in the title when the control is focused.
     /// </summary>
-    public string FocusMarker
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = "*";
+    public string FocusMarker { get; set; } = "*";
 
     /// <summary>
-    /// Gets or sets a value indicating whether the focus marker should be rendered in the title when focused.
+    ///     Gets or sets a value indicating whether the focus marker should be rendered in the title when focused.
     /// </summary>
     public bool ShowFocusMarker
     {
@@ -77,7 +63,7 @@ public sealed class Tabs : Control
     } = true;
 
     /// <summary>
-    /// Gets or sets the title style applied when the control is not focused.
+    ///     Gets or sets the title style applied when the control is not focused.
     /// </summary>
     public TesseraStyle TitleStyle
     {
@@ -86,7 +72,7 @@ public sealed class Tabs : Control
     } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the title style applied when the control is focused.
+    ///     Gets or sets the title style applied when the control is focused.
     /// </summary>
     public TesseraStyle FocusedTitleStyle
     {
@@ -102,7 +88,12 @@ public sealed class Tabs : Control
     }
 
     /// <summary>
-    /// Executes set items.
+    ///     Represents selection changed.
+    /// </summary>
+    public event EventHandler<SelectionChangedEventArgs>? SelectionChanged;
+
+    /// <summary>
+    ///     Executes set items.
     /// </summary>
     /// <param name="items">The items value.</param>
     public void SetItems(IEnumerable<string> items)
@@ -112,19 +103,19 @@ public sealed class Tabs : Control
         _items.AddRange(items.Where(static item => item is not null));
         if (_items.Count == 0)
         {
-            _selectedIndex = 0;
+            SelectedIndex = 0;
             _hoveredIndex = -1;
             return;
         }
 
-        _selectedIndex = Math.Clamp(_selectedIndex, 0, _items.Count - 1);
+        SelectedIndex = Math.Clamp(SelectedIndex, 0, _items.Count - 1);
     }
 
     /// <summary>
-    /// Sets the selected tab index using bounds clamping.
+    ///     Sets the selected tab index using bounds clamping.
     /// </summary>
     /// <param name="index">Requested index.</param>
-    /// <returns><see langword="true"/> when selection changed; otherwise <see langword="false"/>.</returns>
+    /// <returns><see langword="true" /> when selection changed; otherwise <see langword="false" />.</returns>
     public bool SetSelectedIndex(int index)
     {
         if (_items.Count == 0)
@@ -136,14 +127,14 @@ public sealed class Tabs : Control
     }
 
     /// <summary>
-    /// Selects a tab by index.
+    ///     Selects a tab by index.
     /// </summary>
     /// <param name="index">Requested index.</param>
     public void Select(int index)
     {
         if (_items.Count == 0)
         {
-            _selectedIndex = 0;
+            SelectedIndex = 0;
             return;
         }
 
@@ -160,12 +151,12 @@ public sealed class Tabs : Control
 
         if (key.Is(Key.Right) || key.IsCharacter('l'))
         {
-            return TrySetSelectedIndex((_selectedIndex + 1) % _items.Count);
+            return TrySetSelectedIndex((SelectedIndex + 1) % _items.Count);
         }
 
         if (key.Is(Key.Left) || key.IsCharacter('h'))
         {
-            return TrySetSelectedIndex((_selectedIndex + _items.Count - 1) % _items.Count);
+            return TrySetSelectedIndex((SelectedIndex + _items.Count - 1) % _items.Count);
         }
 
         if (key.Key == Key.Character
@@ -206,12 +197,12 @@ public sealed class Tabs : Control
         {
             if (pointer.Button == PointerButton.WheelDown)
             {
-                return TrySetSelectedIndex((_selectedIndex + 1) % _items.Count);
+                return TrySetSelectedIndex((SelectedIndex + 1) % _items.Count);
             }
 
             if (pointer.Button == PointerButton.WheelUp)
             {
-                return TrySetSelectedIndex((_selectedIndex + _items.Count - 1) % _items.Count);
+                return TrySetSelectedIndex((SelectedIndex + _items.Count - 1) % _items.Count);
             }
         }
 
@@ -248,7 +239,7 @@ public sealed class Tabs : Control
 
         for (var index = 0; index < _items.Count && x < clipped.Right; index++)
         {
-            var label = FormatLabel(index, hovered: index == _hoveredIndex);
+            var label = FormatLabel(index, index == _hoveredIndex);
             canvas.WriteText(x, clipped.Y, label, clipped.Right - x);
             x += ControlTextLayout.MeasureDisplayWidth(label) + 1;
         }
@@ -259,7 +250,7 @@ public sealed class Tabs : Control
         var width = 0;
         for (var index = 0; index < _items.Count; index++)
         {
-            width += ControlTextLayout.MeasureDisplayWidth(FormatLabel(index, hovered: false));
+            width += ControlTextLayout.MeasureDisplayWidth(FormatLabel(index, false));
             if (index > 0)
             {
                 width++;
@@ -279,10 +270,10 @@ public sealed class Tabs : Control
 
     private string FormatLabel(int index, bool hovered)
     {
-        var label = index == _selectedIndex
+        var label = index == SelectedIndex
             ? $"[{index + 1}:{_items[index]}]"
             : $" {index + 1}:{_items[index]} ";
-        return hovered && index != _selectedIndex
+        return hovered && index != SelectedIndex
             ? $">{label.Trim()}<"
             : label;
     }
@@ -298,7 +289,7 @@ public sealed class Tabs : Control
 
         for (var index = 0; index < _items.Count && cursor < bounds.Right; index++)
         {
-            var label = FormatLabel(index, hovered: false);
+            var label = FormatLabel(index, false);
             var width = ControlTextLayout.MeasureDisplayWidth(label);
             var end = cursor + width;
             if (x >= cursor && x < end)
@@ -325,15 +316,16 @@ public sealed class Tabs : Control
 
     private bool TrySetSelectedIndex(int index)
     {
-        if (_items.Count == 0 || index == _selectedIndex)
+        if (_items.Count == 0 || index == SelectedIndex)
         {
             return false;
         }
 
-        var previousIndex = _selectedIndex;
+        var previousIndex = SelectedIndex;
         var previousTab = _items[previousIndex];
-        _selectedIndex = index;
-        SelectionChanged?.Invoke(this, new SelectionChangedEventArgs(previousIndex, _selectedIndex, previousTab, _items[_selectedIndex]));
+        SelectedIndex = index;
+        SelectionChanged?.Invoke(this,
+            new SelectionChangedEventArgs(previousIndex, SelectedIndex, previousTab, _items[SelectedIndex]));
         return true;
     }
 

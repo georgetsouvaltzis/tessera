@@ -59,7 +59,7 @@ public sealed partial class ToastCenter
         var rowCapacity = _items.Count == 0 ? 1 : Math.Min(_items.Count, ResolveVisibleCapacity());
         var width = _items.Count == 0
             ? 10
-            : _items.Max(static item => ControlTextLayout.MeasureDisplayWidth(FormatLine(item, selected: false)));
+            : _items.Max(static item => ControlTextLayout.MeasureDisplayWidth(FormatLine(item, false)));
         width = Math.Max(width, 10);
 
         var title = FormatTitleText();
@@ -125,7 +125,7 @@ public sealed partial class ToastCenter
             NotificationLevel.Success => SuccessItemStyle,
             NotificationLevel.Warning => WarningItemStyle,
             NotificationLevel.Error => ErrorItemStyle,
-            _ => InfoItemStyle,
+            _ => InfoItemStyle
         };
     }
 
@@ -137,7 +137,7 @@ public sealed partial class ToastCenter
             NotificationLevel.Success => "[+]",
             NotificationLevel.Warning => "[!]",
             NotificationLevel.Error => "[x]",
-            _ => "[i]",
+            _ => "[i]"
         };
         var muted = item.IsMuted ? "~ " : string.Empty;
         return $"{cursor}{level} {muted}{item.Message}";

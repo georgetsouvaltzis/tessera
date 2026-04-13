@@ -45,7 +45,7 @@ public sealed partial class LogTailPanel
         {
             var index = start + row;
             var entry = _entries[index];
-            var marker = index == _selectedIndex ? SelectedMarker : UnselectedMarker;
+            var marker = index == SelectedIndex ? SelectedMarker : UnselectedMarker;
             var body = _entryBodyCache[index];
             var style = ResolveEntryStyle(index, entry);
             var y = content.Y + row;
@@ -68,7 +68,8 @@ public sealed partial class LogTailPanel
 
     internal override LayoutMeasurement Measure(in Rect availableBounds)
     {
-        var markerWidth = Math.Max(ControlTextLayout.MeasureDisplayWidth(SelectedMarker), ControlTextLayout.MeasureDisplayWidth(UnselectedMarker));
+        var markerWidth = Math.Max(ControlTextLayout.MeasureDisplayWidth(SelectedMarker),
+            ControlTextLayout.MeasureDisplayWidth(UnselectedMarker));
         var width = Math.Max(24, ControlTextLayout.MeasureDisplayWidth(Title) + 4);
         EnsureEntryBodyCache();
         for (var index = 0; index < _entryBodyCache.Count; index++)
@@ -77,8 +78,11 @@ public sealed partial class LogTailPanel
             width = Math.Max(width, rowWidth + Padding.Horizontal + (Border == BorderStyle.None ? 0 : 2));
         }
 
-        var height = Math.Max(4, Math.Min(MaxEntries, Math.Max(1, _entries.Count)) + Padding.Vertical + (Border == BorderStyle.None ? 0 : 2));
-        return new LayoutMeasurement(Math.Clamp(width, 0, availableBounds.Width), Math.Clamp(height, 0, availableBounds.Height));
+        var height = Math.Max(4,
+            Math.Min(MaxEntries, Math.Max(1, _entries.Count)) + Padding.Vertical +
+            (Border == BorderStyle.None ? 0 : 2));
+        return new LayoutMeasurement(Math.Clamp(width, 0, availableBounds.Width),
+            Math.Clamp(height, 0, availableBounds.Height));
     }
 
     private string RenderTitle()
@@ -122,7 +126,7 @@ public sealed partial class LogTailPanel
             style = style.Merge(HoveredEntryStyle);
         }
 
-        if (index >= 0 && index == _selectedIndex)
+        if (index >= 0 && index == SelectedIndex)
         {
             style = style.Merge(SelectedEntryStyle);
             if (IsFocused)
@@ -140,7 +144,7 @@ public sealed partial class LogTailPanel
                 LogLevel.Warning => WarningEntryStyle,
                 LogLevel.Error => ErrorEntryStyle,
                 LogLevel.Critical => CriticalEntryStyle,
-                _ => InfoEntryStyle,
+                _ => InfoEntryStyle
             });
 
             if (entry.IsMuted)
@@ -207,7 +211,8 @@ public sealed partial class LogTailPanel
         if (ShowTimestamp)
         {
             Span<char> timestampBuffer = stackalloc char[8];
-            if (entry.Timestamp.TryFormat(timestampBuffer, out var written, "HH:mm:ss".AsSpan(), CultureInfo.InvariantCulture))
+            if (entry.Timestamp.TryFormat(timestampBuffer, out var written, "HH:mm:ss".AsSpan(),
+                    CultureInfo.InvariantCulture))
             {
                 builder.Append('[');
                 builder.Append(timestampBuffer[..written]);
@@ -240,7 +245,7 @@ public sealed partial class LogTailPanel
             LogLevel.Warning => "WRN",
             LogLevel.Error => "ERR",
             LogLevel.Critical => "CRT",
-            _ => "INF",
+            _ => "INF"
         };
     }
 

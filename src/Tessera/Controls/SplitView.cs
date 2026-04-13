@@ -6,46 +6,45 @@ using Tessera.Styles;
 namespace Tessera.Controls;
 
 /// <summary>
-/// Defines the axis used by <see cref="SplitView"/> to split its content area.
+///     Defines the axis used by <see cref="SplitView" /> to split its content area.
 /// </summary>
 public enum SplitViewOrientation
 {
     /// <summary>
-    /// Splits left/right using a vertical divider.
+    ///     Splits left/right using a vertical divider.
     /// </summary>
     Horizontal = 0,
 
     /// <summary>
-    /// Splits top/bottom using a horizontal divider.
+    ///     Splits top/bottom using a horizontal divider.
     /// </summary>
-    Vertical = 1,
+    Vertical = 1
 }
 
 /// <summary>
-/// Represents a two-pane split container with draggable divider and focus handoff.
+///     Represents a two-pane split container with draggable divider and focus handoff.
 /// </summary>
 public sealed class SplitView : Control
 {
-    private int _activePaneIndex;
     private bool _isDraggingDivider;
 
     /// <summary>
-    /// Gets or sets primary pane control.
+    ///     Gets or sets primary pane control.
     /// </summary>
     public Control? First { get; set; }
 
     /// <summary>
-    /// Gets or sets secondary pane control.
+    ///     Gets or sets secondary pane control.
     /// </summary>
     public Control? Second { get; set; }
 
     /// <summary>
-    /// Gets or sets split orientation.
+    ///     Gets or sets split orientation.
     /// </summary>
     public SplitViewOrientation Orientation { get; set; } = SplitViewOrientation.Horizontal;
 
     /// <summary>
-    /// Gets or sets ratio used by the first pane in range [0.05, 0.95].
+    ///     Gets or sets ratio used by the first pane in range [0.05, 0.95].
     /// </summary>
     public double Ratio
     {
@@ -54,22 +53,22 @@ public sealed class SplitView : Control
     } = 0.5d;
 
     /// <summary>
-    /// Gets or sets minimum size for first pane in cells.
+    ///     Gets or sets minimum size for first pane in cells.
     /// </summary>
     public int MinFirstSize { get; set; } = 4;
 
     /// <summary>
-    /// Gets or sets minimum size for second pane in cells.
+    ///     Gets or sets minimum size for second pane in cells.
     /// </summary>
     public int MinSecondSize { get; set; } = 4;
 
     /// <summary>
-    /// Gets or sets whether divider glyphs are rendered.
+    ///     Gets or sets whether divider glyphs are rendered.
     /// </summary>
     public bool ShowDivider { get; set; } = true;
 
     /// <summary>
-    /// Gets or sets divider thickness in cells.
+    ///     Gets or sets divider thickness in cells.
     /// </summary>
     public int DividerThickness
     {
@@ -78,49 +77,49 @@ public sealed class SplitView : Control
     } = 1;
 
     /// <summary>
-    /// Gets or sets divider glyph. Use <c>'\0'</c> to auto-select by orientation.
+    ///     Gets or sets divider glyph. Use <c>'\0'</c> to auto-select by orientation.
     /// </summary>
     public char DividerGlyph { get; set; }
 
     /// <summary>
-    /// Gets or sets border style.
+    ///     Gets or sets border style.
     /// </summary>
     public BorderStyle Border { get; set; } = BorderStyle.SingleLine;
 
     /// <summary>
-    /// Gets or sets content padding.
+    ///     Gets or sets content padding.
     /// </summary>
     public Thickness Padding { get; set; }
 
     /// <summary>
-    /// Gets or sets border style while not focused.
+    ///     Gets or sets border style while not focused.
     /// </summary>
     public TesseraStyle BorderStyleText { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets border style merged while focused.
+    ///     Gets or sets border style merged while focused.
     /// </summary>
     public TesseraStyle FocusedBorderStyleText { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets divider style while not focused.
+    ///     Gets or sets divider style while not focused.
     /// </summary>
     public TesseraStyle DividerStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets divider style merged while focused.
+    ///     Gets or sets divider style merged while focused.
     /// </summary>
     public TesseraStyle FocusedDividerStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets style merged while disabled.
+    ///     Gets or sets style merged while disabled.
     /// </summary>
     public TesseraStyle DisabledStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets index of pane that currently receives keyboard input (0 or 1).
+    ///     Gets index of pane that currently receives keyboard input (0 or 1).
     /// </summary>
-    public int ActivePaneIndex => _activePaneIndex;
+    public int ActivePaneIndex { get; private set; }
 
     /// <inheritdoc />
     public override bool IsFocused { get; set; }
@@ -144,7 +143,7 @@ public sealed class SplitView : Control
         {
             if (IsFocused && key.Is(Key.Tab))
             {
-                return SetActivePane(_activePaneIndex == 0 ? 1 : 0);
+                return SetActivePane(ActivePaneIndex == 0 ? 1 : 0);
             }
 
             if (IsFocused)
@@ -194,7 +193,8 @@ public sealed class SplitView : Control
             return false;
         }
 
-        if (ShowDivider && pointer.Button == PointerButton.Left && pointer.Kind == PointerEventKind.Press && layout.Divider.Contains(pointer.X, pointer.Y))
+        if (ShowDivider && pointer.Button == PointerButton.Left && pointer.Kind == PointerEventKind.Press &&
+            layout.Divider.Contains(pointer.X, pointer.Y))
         {
             _isDraggingDivider = true;
             RequestFocus();
@@ -262,7 +262,8 @@ public sealed class SplitView : Control
             return;
         }
 
-        var content = FrameLayout.DrawFrameAndResolveContent(canvas, clipped, null, Border, Padding, ResolveBorderStyle());
+        var content =
+            FrameLayout.DrawFrameAndResolveContent(canvas, clipped, null, Border, Padding, ResolveBorderStyle());
         if (!TryResolveLayout(content, out var layout))
         {
             return;
@@ -304,7 +305,9 @@ public sealed class SplitView : Control
             var firstSize = ResolvePaneSize(available, MinFirstSize, MinSecondSize);
             var secondSize = available - firstSize;
             var firstRect = new Rect(content.X, content.Y, firstSize, content.Height);
-            var dividerRect = divider == 0 ? new Rect(0, 0, 0, 0) : new Rect(firstRect.Right, content.Y, divider, content.Height);
+            var dividerRect = divider == 0
+                ? new Rect(0, 0, 0, 0)
+                : new Rect(firstRect.Right, content.Y, divider, content.Height);
             var secondRect = new Rect(firstRect.Right + divider, content.Y, secondSize, content.Height);
             layout = new SplitLayoutInfo(firstRect, secondRect, dividerRect);
             return true;
@@ -319,7 +322,9 @@ public sealed class SplitView : Control
         var topSize = ResolvePaneSize(availableHeight, MinFirstSize, MinSecondSize);
         var bottomSize = availableHeight - topSize;
         var topRect = new Rect(content.X, content.Y, content.Width, topSize);
-        var dividerRow = divider == 0 ? new Rect(0, 0, 0, 0) : new Rect(content.X, topRect.Bottom, content.Width, divider);
+        var dividerRow = divider == 0
+            ? new Rect(0, 0, 0, 0)
+            : new Rect(content.X, topRect.Bottom, content.Width, divider);
         var bottomRect = new Rect(content.X, topRect.Bottom + divider, content.Width, bottomSize);
         layout = new SplitLayoutInfo(topRect, bottomRect, dividerRow);
         return true;
@@ -346,11 +351,17 @@ public sealed class SplitView : Control
         {
             if (Orientation == SplitViewOrientation.Horizontal)
             {
-                for (var x = 0; x < divider.Width; x++) canvas.DrawVerticalLine(divider.X + x, divider.Y, divider.Height, glyph);
+                for (var x = 0; x < divider.Width; x++)
+                {
+                    canvas.DrawVerticalLine(divider.X + x, divider.Y, divider.Height, glyph);
+                }
             }
             else
             {
-                for (var y = 0; y < divider.Height; y++) canvas.DrawHorizontalLine(divider.X, divider.Y + y, divider.Width, glyph);
+                for (var y = 0; y < divider.Height; y++)
+                {
+                    canvas.DrawHorizontalLine(divider.X, divider.Y + y, divider.Width, glyph);
+                }
             }
 
             return;
@@ -358,7 +369,10 @@ public sealed class SplitView : Control
 
         for (var y = 0; y < divider.Height; y++)
         {
-            for (var x = 0; x < divider.Width; x++) canvas.WriteText(divider.X + x, divider.Y + y, token, 1);
+            for (var x = 0; x < divider.Width; x++)
+            {
+                canvas.WriteText(divider.X + x, divider.Y + y, token, 1);
+            }
         }
     }
 
@@ -398,7 +412,7 @@ public sealed class SplitView : Control
 
     private bool ForwardToActivePane(Message message)
     {
-        var target = _activePaneIndex == 0 ? First : Second;
+        var target = ActivePaneIndex == 0 ? First : Second;
         return target?.Handle(message) ?? false;
     }
 
@@ -410,20 +424,27 @@ public sealed class SplitView : Control
     private bool SetActivePane(int index)
     {
         var next = Math.Clamp(index, 0, 1);
-        if (_activePaneIndex == next)
+        if (ActivePaneIndex == next)
         {
             return false;
         }
 
-        _activePaneIndex = next;
+        ActivePaneIndex = next;
         ApplyPaneFocus();
         return true;
     }
 
     private void ApplyPaneFocus()
     {
-        if (First is not null) First.IsFocused = IsFocused && _activePaneIndex == 0;
-        if (Second is not null) Second.IsFocused = IsFocused && _activePaneIndex == 1;
+        if (First is not null)
+        {
+            First.IsFocused = IsFocused && ActivePaneIndex == 0;
+        }
+
+        if (Second is not null)
+        {
+            Second.IsFocused = IsFocused && ActivePaneIndex == 1;
+        }
     }
 
     private char ResolveDividerGlyph()

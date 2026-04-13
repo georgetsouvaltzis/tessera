@@ -1,4 +1,4 @@
-﻿using System.Globalization;
+using System.Globalization;
 using Tessera.Components.Primitives;
 using Tessera.Controls.Internal;
 using Tessera.Layout;
@@ -7,7 +7,7 @@ using Tessera.Styles;
 namespace Tessera.Controls;
 
 /// <summary>
-/// Represents a month-grid calendar control for planning workflows.
+///     Represents a month-grid calendar control for planning workflows.
 /// </summary>
 public sealed class CalendarMonthView : Control
 {
@@ -17,117 +17,131 @@ public sealed class CalendarMonthView : Control
     private DateOnly? _hoveredDate;
 
     /// <summary>
-    /// Occurs when the selected date changes.
+    ///     Gets or sets control title text.
     /// </summary>
-    public event EventHandler<CalendarDateSelectedEventArgs>? DateSelected;
+    public string Title { get; set; } = "Calendar";
 
     /// <summary>
-    /// Gets or sets control title text.
+    ///     Represents focus marker.
     /// </summary>
-    public string Title
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = "Calendar";
+    public string FocusMarker { get; set; } = "*";
 
     /// <summary>
-    /// Represents focus marker.
-    /// </summary>
-    public string FocusMarker
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = "*";
-
-    /// <summary>
-    /// Gets or sets whether show focus marker.
+    ///     Gets or sets whether show focus marker.
     /// </summary>
     public bool ShowFocusMarker { get; set; } = true;
+
     /// <summary>
-    /// Gets or sets the title style.
+    ///     Gets or sets the title style.
     /// </summary>
     public TesseraStyle TitleStyle { get; set; } = TesseraStyle.Empty;
+
     /// <summary>
-    /// Gets or sets the focused title style.
+    ///     Gets or sets the focused title style.
     /// </summary>
     public TesseraStyle FocusedTitleStyle { get; set; } = TesseraStyle.Empty;
+
     /// <summary>
-    /// Gets or sets the month header style.
+    ///     Gets or sets the month header style.
     /// </summary>
     public TesseraStyle MonthHeaderStyle { get; set; } = TesseraStyle.Empty;
+
     /// <summary>
-    /// Gets or sets the weekday header style.
+    ///     Gets or sets the weekday header style.
     /// </summary>
     public TesseraStyle WeekdayHeaderStyle { get; set; } = TesseraStyle.Empty;
+
     /// <summary>
-    /// Gets or sets the day style.
+    ///     Gets or sets the day style.
     /// </summary>
     public TesseraStyle DayStyle { get; set; } = TesseraStyle.Empty;
+
     /// <summary>
-    /// Gets or sets the outside month day style.
+    ///     Gets or sets the outside month day style.
     /// </summary>
     public TesseraStyle OutsideMonthDayStyle { get; set; } = TesseraStyle.Empty;
+
     /// <summary>
-    /// Gets or sets the today day style.
+    ///     Gets or sets the today day style.
     /// </summary>
     public TesseraStyle TodayDayStyle { get; set; } = TesseraStyle.Empty;
+
     /// <summary>
-    /// Gets or sets the selected day style.
+    ///     Gets or sets the selected day style.
     /// </summary>
     public TesseraStyle SelectedDayStyle { get; set; } = TesseraStyle.Empty;
+
     /// <summary>
-    /// Gets or sets the hovered day style.
+    ///     Gets or sets the hovered day style.
     /// </summary>
     public TesseraStyle HoveredDayStyle { get; set; } = TesseraStyle.Empty;
+
     /// <summary>
-    /// Gets or sets the disabled day style.
+    ///     Gets or sets the disabled day style.
     /// </summary>
     public TesseraStyle DisabledDayStyle { get; set; } = TesseraStyle.Empty;
+
     /// <summary>
-    /// Gets or sets the disabled style.
+    ///     Gets or sets the disabled style.
     /// </summary>
     public TesseraStyle DisabledStyle { get; set; } = TesseraStyle.Empty;
+
     /// <summary>
-    /// Gets or sets the padding.
+    ///     Gets or sets the padding.
     /// </summary>
     public Thickness Padding { get; set; }
+
     /// <summary>
-    /// Gets or sets the first day of week.
+    ///     Gets or sets the first day of week.
     /// </summary>
     public DayOfWeek FirstDayOfWeek { get; set; } = DayOfWeek.Monday;
+
     /// <summary>
-    /// Gets or sets whether show adjacent month days.
+    ///     Gets or sets whether show adjacent month days.
     /// </summary>
     public bool ShowAdjacentMonthDays { get; set; } = true;
+
     /// <summary>
-    /// Gets or sets the min date.
+    ///     Gets or sets the min date.
     /// </summary>
     public DateOnly? MinDate { get; set; }
+
     /// <summary>
-    /// Gets or sets the max date.
+    ///     Gets or sets the max date.
     /// </summary>
     public DateOnly? MaxDate { get; set; }
+
     /// <summary>
-    /// Gets or sets the today.
+    ///     Gets or sets the today.
     /// </summary>
     public DateOnly Today { get; set; } = DateOnly.FromDateTime(DateTime.UtcNow.Date);
+
     /// <summary>
-    /// Gets or sets the selected date.
+    ///     Gets or sets the selected date.
     /// </summary>
     public DateOnly SelectedDate { get; private set; } = DateOnly.FromDateTime(DateTime.UtcNow.Date);
+
     /// <summary>
-    /// Gets or sets the display month.
+    ///     Gets or sets the display month.
     /// </summary>
     public DateOnly DisplayMonth { get; private set; } = new(DateTime.UtcNow.Year, DateTime.UtcNow.Month, 1);
+
     /// <inheritdoc />
     public override bool IsFocused { get; set; }
+
     /// <inheritdoc />
     public override bool IsDisabled { get; set; }
+
     /// <inheritdoc />
     public override bool IsReadOnly { get; set; }
 
     /// <summary>
-    /// Selects a date and updates the displayed month to match.
+    ///     Occurs when the selected date changes.
+    /// </summary>
+    public event EventHandler<CalendarDateSelectedEventArgs>? DateSelected;
+
+    /// <summary>
+    ///     Selects a date and updates the displayed month to match.
     /// </summary>
     /// <param name="date">Date to select.</param>
     /// <returns><see langword="true" /> when selection changed; otherwise, <see langword="false" />.</returns>
@@ -151,7 +165,7 @@ public sealed class CalendarMonthView : Control
     }
 
     /// <summary>
-    /// Sets the displayed month while keeping selected date unchanged.
+    ///     Sets the displayed month while keeping selected date unchanged.
     /// </summary>
     /// <param name="month">Any date within the target month.</param>
     public void SetDisplayedMonth(DateOnly month)
@@ -160,7 +174,7 @@ public sealed class CalendarMonthView : Control
     }
 
     /// <summary>
-    /// Returns the 6x7 day-cell grid used for current rendering state.
+    ///     Returns the 6x7 day-cell grid used for current rendering state.
     /// </summary>
     /// <returns>Calendar day cells in row-major order.</returns>
     public IReadOnlyList<CalendarDayCell> GetVisibleCells()
@@ -322,7 +336,8 @@ public sealed class CalendarMonthView : Control
 
         var monthText = DisplayMonth.ToString("MMMM yyyy", CultureInfo.InvariantCulture);
         var monthX = Math.Max(layout.Content.X, layout.Content.Right - monthText.Length);
-        canvas.WriteText(monthX, layout.TopY, ApplyStyle(monthText, ResolveStyle(MonthHeaderStyle)), layout.Content.Right - monthX);
+        canvas.WriteText(monthX, layout.TopY, ApplyStyle(monthText, ResolveStyle(MonthHeaderStyle)),
+            layout.Content.Right - monthX);
     }
 
     private void RenderWeekdayHeaders(Canvas canvas, CalendarGridLayout layout)
@@ -331,7 +346,7 @@ public sealed class CalendarMonthView : Control
         {
             var dayOfWeek = (DayOfWeek)(((int)FirstDayOfWeek + column) % CalendarColumns);
             var label = GetDayLabel(dayOfWeek);
-            var x = layout.GridX + (column * layout.CellWidth);
+            var x = layout.GridX + column * layout.CellWidth;
             var text = layout.CellWidth <= 2
                 ? label[..1]
                 : label.PadRight(layout.CellWidth, ' ');
@@ -348,9 +363,9 @@ public sealed class CalendarMonthView : Control
         {
             for (var column = 0; column < CalendarColumns; column++)
             {
-                var index = (row * CalendarColumns) + column;
+                var index = row * CalendarColumns + column;
                 var cell = cells[index];
-                var x = layout.GridX + (column * layout.CellWidth);
+                var x = layout.GridX + column * layout.CellWidth;
                 var y = layout.GridStartY + row;
                 var hover = _hoveredDate.HasValue && _hoveredDate.Value == cell.Date;
                 var text = ResolveCellText(cell, hover, layout.CellWidth);
@@ -398,7 +413,7 @@ public sealed class CalendarMonthView : Control
         var first = new DateOnly(DisplayMonth.Year, DisplayMonth.Month, 1);
         var offset = GetDayOffset(first.DayOfWeek, FirstDayOfWeek);
         var start = first.AddDays(-offset);
-        date = start.AddDays((row * CalendarColumns) + column);
+        date = start.AddDays(row * CalendarColumns + column);
         return true;
     }
 
@@ -489,7 +504,8 @@ public sealed class CalendarMonthView : Control
 
     private string FormatTitle()
     {
-        if (!IsFocused || !ShowFocusMarker || string.IsNullOrWhiteSpace(FocusMarker) || string.IsNullOrEmpty(Title))
+        if (!IsFocused || !ShowFocusMarker || string.IsNullOrWhiteSpace(FocusMarker) ||
+            string.IsNullOrEmpty(Title))
         {
             return Title;
         }
@@ -530,7 +546,7 @@ public sealed class CalendarMonthView : Control
             DayOfWeek.Thursday => "Th",
             DayOfWeek.Friday => "Fr",
             DayOfWeek.Saturday => "Sa",
-            _ => "Su",
+            _ => "Su"
         };
     }
 

@@ -9,7 +9,7 @@ internal static class ControlTextLayout
 {
     public static string[] SplitLines(string text)
     {
-        var value = text ?? string.Empty;
+        var value = text;
         if (value.IndexOf('\r', StringComparison.Ordinal) < 0)
         {
             return value.Split('\n');

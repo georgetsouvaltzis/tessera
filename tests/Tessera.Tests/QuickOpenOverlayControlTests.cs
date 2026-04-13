@@ -1,6 +1,5 @@
 using NUnit.Framework;
 using Tessera.Components.Primitives;
-using Tessera.Components.Styling;
 using Tessera.Controls;
 using Tessera.Styles;
 
@@ -18,7 +17,7 @@ public sealed class QuickOpenOverlayControlTests
         [
             new QuickOpenItem("readme", "README.md", "docs"),
             new QuickOpenItem("roadmap", "widget-roadmap.md", "docs"),
-            new QuickOpenItem("build", "Tessera.slnx", "repo"),
+            new QuickOpenItem("build", "Tessera.slnx", "repo")
         ]);
         overlay.Open();
 
@@ -60,7 +59,7 @@ public sealed class QuickOpenOverlayControlTests
         overlay.SetItems(
         [
             new QuickOpenItem("readme", "README.md", "docs"),
-            new QuickOpenItem("roadmap", "widget-roadmap.md", "docs"),
+            new QuickOpenItem("roadmap", "widget-roadmap.md", "docs")
         ]);
         overlay.Open();
 
@@ -68,7 +67,7 @@ public sealed class QuickOpenOverlayControlTests
         overlay.Submitted += (_, args) => submitted = args;
 
         var handled = overlay.Handle(
-            new PointerInput(PointerEventKind.Press, PointerButton.Left, X: 20, Y: 7),
+            new PointerInput(PointerEventKind.Press, PointerButton.Left, 20, 7),
             new Rect(0, 0, 80, 24));
 
         Assert.That(handled, Is.True);
@@ -117,15 +116,12 @@ public sealed class QuickOpenOverlayControlTests
         var second = Render(overlay);
 
         Assert.That(first, Is.EqualTo(second));
-        Assert.That(first.Contains("\u001b[", StringComparison.Ordinal), Is.False);
+        Assert.That(first.Contains("\e[", StringComparison.Ordinal), Is.False);
     }
 
     private static QuickOpenOverlay CreateOverlay()
     {
-        return new QuickOpenOverlay
-        {
-            IsFocused = true,
-        };
+        return new QuickOpenOverlay { IsFocused = true };
     }
 
     private static string Render(QuickOpenOverlay overlay)

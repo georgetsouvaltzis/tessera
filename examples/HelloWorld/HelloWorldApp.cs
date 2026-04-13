@@ -6,21 +6,41 @@ namespace Tessera.Examples.HelloWorld;
 
 internal sealed class HelloWorldApp : TesseraApp
 {
-    private readonly Label _eyebrow = new() { Border = BorderStyle.None, HorizontalAlignment = HorizontalAlignment.Center };
-    private readonly Label _headline = new() { Border = BorderStyle.None, HorizontalAlignment = HorizontalAlignment.Center };
-    private readonly Label _subhead = new() { Border = BorderStyle.None, HorizontalAlignment = HorizontalAlignment.Center };
-    private readonly Label _centerChip = new() { Border = BorderStyle.None, HorizontalAlignment = HorizontalAlignment.Center };
-    private readonly Label _colorChip = new() { Border = BorderStyle.None, HorizontalAlignment = HorizontalAlignment.Center };
-    private readonly Label _runtimeChip = new() { Border = BorderStyle.None, HorizontalAlignment = HorizontalAlignment.Center };
-    private readonly Label _countChip = new() { Border = BorderStyle.None, HorizontalAlignment = HorizontalAlignment.Center };
-    private readonly Label _hint = new() { Border = BorderStyle.None, HorizontalAlignment = HorizontalAlignment.Center };
-    private readonly Button _incrementButton = new() { Text = "Spark +1", Padding = Thickness.Symmetric(3, 0) };
-    private readonly Button _resetButton = new() { Text = "Reset", Padding = Thickness.Symmetric(3, 0) };
-    private readonly StatusBar _footer = new() { Fill = ' ' };
+    private readonly Label _centerChip =
+        new() { Border = BorderStyle.None, HorizontalAlignment = HorizontalAlignment.Center };
+
+    private readonly Label _colorChip =
+        new() { Border = BorderStyle.None, HorizontalAlignment = HorizontalAlignment.Center };
+
+    private readonly Label _countChip =
+        new() { Border = BorderStyle.None, HorizontalAlignment = HorizontalAlignment.Center };
+
+    private readonly Label _eyebrow =
+        new() { Border = BorderStyle.None, HorizontalAlignment = HorizontalAlignment.Center };
 
     private readonly Control[] _focusOrder;
-    private int _focusIndex;
+    private readonly StatusBar _footer = new() { Fill = ' ' };
+
+    private readonly Label _headline =
+        new() { Border = BorderStyle.None, HorizontalAlignment = HorizontalAlignment.Center };
+
+    private readonly Label _hint = new()
+    {
+        Border = BorderStyle.None,
+        HorizontalAlignment = HorizontalAlignment.Center
+    };
+
+    private readonly Button _incrementButton = new() { Text = "Spark +1", Padding = Thickness.Symmetric(3) };
+    private readonly Button _resetButton = new() { Text = "Reset", Padding = Thickness.Symmetric(3) };
+
+    private readonly Label _runtimeChip =
+        new() { Border = BorderStyle.None, HorizontalAlignment = HorizontalAlignment.Center };
+
+    private readonly Label _subhead =
+        new() { Border = BorderStyle.None, HorizontalAlignment = HorizontalAlignment.Center };
+
     private int _count = 3;
+    private int _focusIndex;
 
     public HelloWorldApp()
     {
@@ -79,26 +99,24 @@ internal sealed class HelloWorldApp : TesseraApp
                     column.Auto(content => content.Center(_eyebrow));
                     column.Auto(content => content.Center(_headline));
                     column.Auto(content => content.Center(_subhead));
-                    column.Fixed(1, ribbon => ribbon.Center(
-                        row => row.Row(chips =>
-                        {
-                            chips.Gap(2);
-                            chips.Auto(_centerChip);
-                            chips.Auto(_colorChip);
-                            chips.Auto(_runtimeChip);
-                        })));
+                    column.Fixed(1, ribbon => ribbon.Center(row => row.Row(chips =>
+                    {
+                        chips.Gap(2);
+                        chips.Auto(_centerChip);
+                        chips.Auto(_colorChip);
+                        chips.Auto(_runtimeChip);
+                    })));
                     column.Auto(content => content.Center(_countChip));
-                    column.Fixed(3, actions => actions.Center(
-                        row => row.Row(buttons =>
-                        {
-                            buttons.Gap(2);
-                            buttons.Fixed(16, _incrementButton);
-                            buttons.Fixed(14, _resetButton);
-                        })));
+                    column.Fixed(3, actions => actions.Center(row => row.Row(buttons =>
+                    {
+                        buttons.Gap(2);
+                        buttons.Fixed(16, _incrementButton);
+                        buttons.Fixed(14, _resetButton);
+                    })));
                     column.Auto(content => content.Center(_hint));
                 }),
-                width: cardWidth,
-                height: cardHeight));
+                cardWidth,
+                cardHeight));
             window.Footer(1, _footer);
         });
     }

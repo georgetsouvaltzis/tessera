@@ -7,160 +7,138 @@ using Tessera.Styles;
 namespace Tessera.Controls;
 
 /// <summary>
-/// Represents a selectable search-results list with query markers and ranked rows.
+///     Represents a selectable search-results list with query markers and ranked rows.
 /// </summary>
 public sealed partial class SearchResultsView : Control
 {
     private readonly List<string> _items = [];
-    private int _selectedIndex = -1;
     private int _hoveredIndex = -1;
     private int _pressedIndex = -1;
 
     /// <summary>
-    /// Occurs when the selected row changes.
+    ///     Gets or sets the control title.
     /// </summary>
-    public event EventHandler<SelectionChangedEventArgs>? SelectionChanged;
+    public string Title { get; set; } = "Search Results";
 
     /// <summary>
-    /// Gets or sets the control title.
+    ///     Gets or sets marker text appended to <see cref="Title" /> when focused.
     /// </summary>
-    public string Title
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = "Search Results";
+    public string FocusMarker { get; set; } = "*";
 
     /// <summary>
-    /// Gets or sets marker text appended to <see cref="Title"/> when focused.
-    /// </summary>
-    public string FocusMarker
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = "*";
-
-    /// <summary>
-    /// Gets or sets whether <see cref="FocusMarker"/> is rendered while focused.
+    ///     Gets or sets whether <see cref="FocusMarker" /> is rendered while focused.
     /// </summary>
     public bool ShowFocusMarker { get; set; } = true;
 
     /// <summary>
-    /// Gets or sets the query used to mark matching rows.
+    ///     Gets or sets the query used to mark matching rows.
     /// </summary>
-    public string Query
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = string.Empty;
+    public string Query { get; set; } = string.Empty;
 
     /// <summary>
-    /// Gets or sets text shown when no results are available.
+    ///     Gets or sets text shown when no results are available.
     /// </summary>
-    public string EmptyText
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = "(no results)";
+    public string EmptyText { get; set; } = "(no results)";
 
     /// <summary>
-    /// Gets or sets whether rank prefixes are rendered for rows.
+    ///     Gets or sets whether rank prefixes are rendered for rows.
     /// </summary>
     public bool ShowRankMarker { get; set; } = true;
 
     /// <summary>
-    /// Gets or sets whether error style should be merged into rendered rows.
+    ///     Gets or sets whether error style should be merged into rendered rows.
     /// </summary>
     public bool HasError { get; set; }
 
     /// <summary>
-    /// Gets or sets the glyph set used to render row markers and match indicators.
+    ///     Gets or sets the glyph set used to render row markers and match indicators.
     /// </summary>
     public SearchResultsGlyphSet Glyphs { get; set; } = SearchResultsGlyphSet.Default;
 
     /// <summary>
-    /// Gets or sets title style when not focused.
+    ///     Gets or sets title style when not focused.
     /// </summary>
     public TesseraStyle TitleStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets title style when focused.
+    ///     Gets or sets title style when focused.
     /// </summary>
     public TesseraStyle FocusedTitleStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets style for normal rows.
+    ///     Gets or sets style for normal rows.
     /// </summary>
     public TesseraStyle DefaultRowStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets style merged into hovered rows.
+    ///     Gets or sets style merged into hovered rows.
     /// </summary>
     public TesseraStyle HoveredRowStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets style merged into selected rows.
+    ///     Gets or sets style merged into selected rows.
     /// </summary>
     public TesseraStyle SelectedRowStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets style merged into selected rows when focused.
+    ///     Gets or sets style merged into selected rows when focused.
     /// </summary>
     public TesseraStyle FocusedSelectedRowStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets style merged while rows are pressed.
+    ///     Gets or sets style merged while rows are pressed.
     /// </summary>
     public TesseraStyle PressedRowStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets style merged while disabled.
+    ///     Gets or sets style merged while disabled.
     /// </summary>
     public TesseraStyle DisabledRowStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets style merged while <see cref="HasError"/> is <see langword="true"/>.
+    ///     Gets or sets style merged while <see cref="HasError" /> is <see langword="true" />.
     /// </summary>
     public TesseraStyle ErrorRowStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the border style.
+    ///     Gets or sets the border style.
     /// </summary>
     public BorderStyle Border { get; set; } = BorderStyle.SingleLine;
 
     /// <summary>
-    /// Gets or sets inner padding.
+    ///     Gets or sets inner padding.
     /// </summary>
     public Thickness Padding { get; set; }
 
     /// <summary>
-    /// Gets or sets style applied to border glyphs when not focused.
+    ///     Gets or sets style applied to border glyphs when not focused.
     /// </summary>
     public TesseraStyle BorderStyleText { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets style applied to border glyphs when focused.
+    ///     Gets or sets style applied to border glyphs when focused.
     /// </summary>
     public TesseraStyle FocusedBorderStyleText { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets all rows currently shown by the control.
+    ///     Gets all rows currently shown by the control.
     /// </summary>
     public IReadOnlyList<string> Items => _items;
 
     /// <summary>
-    /// Gets the current selected row index, or <c>-1</c> when there are no rows.
+    ///     Gets the current selected row index, or <c>-1</c> when there are no rows.
     /// </summary>
-    public int SelectedIndex => _selectedIndex;
+    public int SelectedIndex { get; private set; } = -1;
 
     /// <summary>
-    /// Gets the currently selected row text.
+    ///     Gets the currently selected row text.
     /// </summary>
-    public string SelectedItem => _selectedIndex >= 0 && _selectedIndex < _items.Count
-        ? _items[_selectedIndex]
+    public string SelectedItem => SelectedIndex >= 0 && SelectedIndex < _items.Count
+        ? _items[SelectedIndex]
         : string.Empty;
 
     /// <summary>
-    /// Gets number of rows currently shown.
+    ///     Gets number of rows currently shown.
     /// </summary>
     public int Count => _items.Count;
 
@@ -174,30 +152,35 @@ public sealed partial class SearchResultsView : Control
     public override bool IsReadOnly { get; set; }
 
     /// <summary>
-    /// Replaces rows shown by the control.
+    ///     Occurs when the selected row changes.
+    /// </summary>
+    public event EventHandler<SelectionChangedEventArgs>? SelectionChanged;
+
+    /// <summary>
+    ///     Replaces rows shown by the control.
     /// </summary>
     /// <param name="items">Rows to render.</param>
     public void SetItems(IEnumerable<string> items)
     {
         ArgumentNullException.ThrowIfNull(items);
-        var previousIndex = _selectedIndex;
+        var previousIndex = SelectedIndex;
         var previousItem = SelectedItem;
 
         _items.Clear();
         foreach (var item in items)
         {
-            _items.Add(item ?? string.Empty);
+            _items.Add(item);
         }
 
         if (_items.Count == 0)
         {
-            _selectedIndex = -1;
+            SelectedIndex = -1;
             _hoveredIndex = -1;
             _pressedIndex = -1;
         }
         else
         {
-            _selectedIndex = _selectedIndex < 0 ? 0 : Math.Clamp(_selectedIndex, 0, _items.Count - 1);
+            SelectedIndex = SelectedIndex < 0 ? 0 : Math.Clamp(SelectedIndex, 0, _items.Count - 1);
             _hoveredIndex = Math.Clamp(_hoveredIndex, -1, _items.Count - 1);
             _pressedIndex = Math.Clamp(_pressedIndex, -1, _items.Count - 1);
         }
@@ -206,29 +189,29 @@ public sealed partial class SearchResultsView : Control
     }
 
     /// <summary>
-    /// Clears rows and resets selection state.
+    ///     Clears rows and resets selection state.
     /// </summary>
     public void ClearItems()
     {
-        if (_items.Count == 0 && _selectedIndex < 0)
+        if (_items.Count == 0 && SelectedIndex < 0)
         {
             return;
         }
 
-        var previousIndex = _selectedIndex;
+        var previousIndex = SelectedIndex;
         var previousItem = SelectedItem;
         _items.Clear();
-        _selectedIndex = -1;
+        SelectedIndex = -1;
         _hoveredIndex = -1;
         _pressedIndex = -1;
         RaiseSelectionChangedIfNeeded(previousIndex, previousItem);
     }
 
     /// <summary>
-    /// Attempts to set selected row index.
+    ///     Attempts to set selected row index.
     /// </summary>
     /// <param name="index">Index to select.</param>
-    /// <returns><see langword="true"/> when selection changed.</returns>
+    /// <returns><see langword="true" /> when selection changed.</returns>
     public bool SetSelectedIndex(int index)
     {
         if (_items.Count == 0)
@@ -237,14 +220,14 @@ public sealed partial class SearchResultsView : Control
         }
 
         var clamped = Math.Clamp(index, 0, _items.Count - 1);
-        if (clamped == _selectedIndex)
+        if (clamped == SelectedIndex)
         {
             return false;
         }
 
-        var previousIndex = _selectedIndex;
+        var previousIndex = SelectedIndex;
         var previousItem = SelectedItem;
-        _selectedIndex = clamped;
+        SelectedIndex = clamped;
         RaiseSelectionChangedIfNeeded(previousIndex, previousItem);
         return true;
     }
@@ -259,12 +242,12 @@ public sealed partial class SearchResultsView : Control
 
         if (key.Is(Key.Down) || key.IsCharacter('j'))
         {
-            return SetSelectedIndex(_selectedIndex + 1);
+            return SetSelectedIndex(SelectedIndex + 1);
         }
 
         if (key.Is(Key.Up) || key.IsCharacter('k'))
         {
-            return SetSelectedIndex(_selectedIndex - 1);
+            return SetSelectedIndex(SelectedIndex - 1);
         }
 
         if (key.Is(Key.Home))
@@ -308,12 +291,12 @@ public sealed partial class SearchResultsView : Control
         {
             if (pointer.Button == PointerButton.WheelDown)
             {
-                return SetSelectedIndex(_selectedIndex + 1);
+                return SetSelectedIndex(SelectedIndex + 1);
             }
 
             if (pointer.Button == PointerButton.WheelUp)
             {
-                return SetSelectedIndex(_selectedIndex - 1);
+                return SetSelectedIndex(SelectedIndex - 1);
             }
 
             return false;
@@ -364,13 +347,13 @@ public sealed partial class SearchResultsView : Control
 
         if (_items.Count == 0)
         {
-            canvas.WriteText(content.X, content.Y, ApplyRowStyle(EmptyText, selected: false, hovered: false, pressed: false), content.Width);
+            canvas.WriteText(content.X, content.Y, ApplyRowStyle(EmptyText, false, false, false), content.Width);
             return;
         }
 
         for (var row = 0; row < content.Height && row < _items.Count; row++)
         {
-            var selected = row == _selectedIndex;
+            var selected = row == SelectedIndex;
             var hovered = row == _hoveredIndex;
             var pressed = row == _pressedIndex;
             var marker = Glyphs.DefaultRowMarker;
@@ -386,7 +369,8 @@ public sealed partial class SearchResultsView : Control
             var rank = ShowRankMarker ? $"{row + 1}{Glyphs.RankSeparator} " : string.Empty;
             var match = HasQueryMatch(_items[row]) ? $"{Glyphs.MatchMarker} " : string.Empty;
             var text = $"{marker} {rank}{match}{_items[row]}";
-            canvas.WriteText(content.X, content.Y + row, ApplyRowStyle(text, selected, hovered, pressed), content.Width);
+            canvas.WriteText(content.X, content.Y + row, ApplyRowStyle(text, selected, hovered, pressed),
+                content.Width);
         }
     }
 
@@ -396,7 +380,9 @@ public sealed partial class SearchResultsView : Control
         for (var index = 0; index < _items.Count; index++)
         {
             var rank = ShowRankMarker ? $"{index + 1}{Glyphs.RankSeparator} " : string.Empty;
-            var itemWidth = ControlTextLayout.MeasureDisplayWidth($"{Glyphs.SelectedRowMarker} {rank}{Glyphs.MatchMarker} {_items[index]}");
+            var itemWidth =
+                ControlTextLayout.MeasureDisplayWidth(
+                    $"{Glyphs.SelectedRowMarker} {rank}{Glyphs.MatchMarker} {_items[index]}");
             width = Math.Max(width, itemWidth);
         }
 
@@ -415,5 +401,4 @@ public sealed partial class SearchResultsView : Control
             Math.Clamp(width, 0, availableBounds.Width),
             Math.Clamp(height, 0, availableBounds.Height));
     }
-
 }

@@ -1,12 +1,12 @@
 namespace Tessera.Controls;
 
 /// <summary>
-/// Represents an item rendered by <see cref="JumpList" />.
+///     Represents an item rendered by <see cref="JumpList" />.
 /// </summary>
 public sealed record JumpListItem
 {
     /// <summary>
-    /// Initializes a new jump-list item.
+    ///     Initializes a new jump-list item.
     /// </summary>
     /// <param name="id">Stable item identifier.</param>
     /// <param name="label">Primary item label.</param>
@@ -27,34 +27,34 @@ public sealed record JumpListItem
         }
 
         Id = id;
-        Label = label ?? string.Empty;
+        Label = label;
         IsPinned = isPinned;
         IsRecent = isRecent;
         IsDisabled = isDisabled;
     }
 
     /// <summary>
-    /// Gets item identifier.
+    ///     Gets item identifier.
     /// </summary>
     public string Id { get; init; }
 
     /// <summary>
-    /// Gets item label.
+    ///     Gets item label.
     /// </summary>
     public string Label { get; init; }
 
     /// <summary>
-    /// Gets a value indicating whether the item is pinned.
+    ///     Gets a value indicating whether the item is pinned.
     /// </summary>
     public bool IsPinned { get; init; }
 
     /// <summary>
-    /// Gets a value indicating whether the item is recent.
+    ///     Gets a value indicating whether the item is recent.
     /// </summary>
     public bool IsRecent { get; init; }
 
     /// <summary>
-    /// Gets a value indicating whether the item is disabled.
+    ///     Gets a value indicating whether the item is disabled.
     /// </summary>
     public bool IsDisabled { get; init; }
 }

@@ -19,12 +19,12 @@ public sealed class StatsCardBorderedStyleTests
             BorderStyleText = TesseraStyle.Empty.WithBackground(AnsiColor.Rgb(11, 22, 33)),
             FocusedBorderStyleText = TesseraStyle.Empty.WithForeground(AnsiColor.Rgb(44, 55, 66)),
             TitleStyle = TesseraStyle.Empty.WithForeground(AnsiColor.Rgb(10, 20, 30)),
-            FocusedTitleStyle = TesseraStyle.Empty.WithForeground(AnsiColor.Rgb(70, 80, 90)),
+            FocusedTitleStyle = TesseraStyle.Empty.WithForeground(AnsiColor.Rgb(70, 80, 90))
         };
         control.SetItems(
         [
             new StatItem("cpu", "43%"),
-            new StatItem("mem", "1.2G"),
+            new StatItem("mem", "1.2G")
         ]);
 
         control.IsFocused = false;
@@ -45,10 +45,7 @@ public sealed class StatsCardBorderedStyleTests
     [Test]
     public void ControlsStatsCardPointerPressRequestsFocusInsideBounds()
     {
-        var control = new StatsCard
-        {
-            Border = BorderStyle.None,
-        };
+        var control = new StatsCard { Border = BorderStyle.None };
         control.SetItems([new StatItem("cpu", "43%")]);
 
         var outside = control.Handle(
@@ -68,22 +65,18 @@ public sealed class StatsCardBorderedStyleTests
     [Test]
     public void ControlsStatsCardDefaultRenderIsDeterministicAndMonochrome()
     {
-        var control = new StatsCard
-        {
-            Border = BorderStyle.SingleLine,
-            Padding = new Thickness(1, 0, 1, 0),
-        };
+        var control = new StatsCard { Border = BorderStyle.SingleLine, Padding = new Thickness(1, 0, 1, 0) };
         control.SetItems(
         [
             new StatItem("cpu", "43%"),
-            new StatItem("mem", "1.2G"),
+            new StatItem("mem", "1.2G")
         ]);
 
         var first = Render(control, 40, 8);
         var second = Render(control, 40, 8);
 
         Assert.That(first, Is.EqualTo(second));
-        Assert.That(first.Contains("\u001b[", StringComparison.Ordinal), Is.False);
+        Assert.That(first.Contains("\e[", StringComparison.Ordinal), Is.False);
     }
 
     [Test]
@@ -94,19 +87,19 @@ public sealed class StatsCardBorderedStyleTests
             Text = new TesseraThemeTextTokens
             {
                 Secondary = TesseraStyle.Empty.WithForeground(AnsiColor.Rgb(11, 12, 13)),
-                Primary = TesseraStyle.Empty.WithForeground(AnsiColor.Rgb(14, 15, 16)),
+                Primary = TesseraStyle.Empty.WithForeground(AnsiColor.Rgb(14, 15, 16))
             },
             Focus = new TesseraThemeFocusTokens
             {
                 Title = TesseraStyle.Empty.WithForeground(AnsiColor.Rgb(17, 18, 19)),
                 Border = TesseraStyle.Empty.WithForeground(AnsiColor.Rgb(20, 21, 22)),
-                Marker = "!",
+                Marker = "!"
             },
             Border = new TesseraThemeBorderTokens
             {
                 Default = TesseraStyle.Empty.WithForeground(AnsiColor.Rgb(23, 24, 25)),
-                Focused = TesseraStyle.Empty.WithBackground(AnsiColor.Rgb(26, 27, 28)),
-            },
+                Focused = TesseraStyle.Empty.WithBackground(AnsiColor.Rgb(26, 27, 28))
+            }
         };
 
         var control = new StatsCard().ApplyTheme(theme);
@@ -129,27 +122,22 @@ public sealed class StatsCardBorderedStyleTests
             Text = new TesseraThemeTextTokens
             {
                 Secondary = TesseraStyle.Empty.WithForeground(AnsiColor.Rgb(1, 2, 3)),
-                Primary = TesseraStyle.Empty.WithForeground(AnsiColor.Rgb(4, 5, 6)),
+                Primary = TesseraStyle.Empty.WithForeground(AnsiColor.Rgb(4, 5, 6))
             },
             Focus = new TesseraThemeFocusTokens
             {
                 Title = TesseraStyle.Empty.WithForeground(AnsiColor.Rgb(7, 8, 9)),
                 Border = TesseraStyle.Empty.WithForeground(AnsiColor.Rgb(10, 11, 12)),
-                Marker = "!",
+                Marker = "!"
             },
             Border = new TesseraThemeBorderTokens
             {
                 Default = TesseraStyle.Empty.WithForeground(AnsiColor.Rgb(13, 14, 15)),
-                Focused = TesseraStyle.Empty.WithBackground(AnsiColor.Rgb(16, 17, 18)),
-            },
+                Focused = TesseraStyle.Empty.WithBackground(AnsiColor.Rgb(16, 17, 18))
+            }
         };
 
-        var control = new StatsCard
-        {
-            BorderStyleText = explicitStyle,
-            ValueStyle = explicitStyle,
-            FocusMarker = "#",
-        };
+        var control = new StatsCard { BorderStyleText = explicitStyle, ValueStyle = explicitStyle, FocusMarker = "#" };
 
         control.ApplyThemeDefaults(theme);
 

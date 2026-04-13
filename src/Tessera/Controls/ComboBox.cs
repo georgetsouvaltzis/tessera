@@ -1,6 +1,6 @@
-﻿using Tessera.Controls.Internal;
 using Tessera.Components.Primitives;
 using Tessera.Components.Primitives.Internal;
+using Tessera.Controls.Internal;
 using Tessera.Layout;
 using Tessera.Styles;
 using Tessera.Widgets;
@@ -8,136 +8,123 @@ using Tessera.Widgets;
 namespace Tessera.Controls;
 
 /// <summary>
-/// Represents a filterable single-selection control.
+///     Represents a filterable single-selection control.
 /// </summary>
 /// <remarks>
-/// Use this when the option list is too large for a simple choice control and users benefit from inline filtering.
+///     Use this when the option list is too large for a simple choice control and users benefit from inline filtering.
 /// </remarks>
 public sealed class ComboBox : Control
 {
-    private readonly SelectionListState _options = new();
     private readonly TextInputModel _input = new();
+    private readonly SelectionListState _options = new();
     private bool _fieldHovered;
 
     /// <summary>
-    /// Occurs when the selected item changes.
+    ///     Gets or sets the field title.
     /// </summary>
-    public event EventHandler<SelectionChangedEventArgs>? SelectionChanged;
+    public string Title { get; set; } = "ComboBox";
 
     /// <summary>
-    /// Gets or sets the field title.
+    ///     Represents focus marker.
     /// </summary>
-    public string Title
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = "ComboBox";
+    public string FocusMarker { get; set; } = "*";
 
     /// <summary>
-    /// Represents focus marker.
-    /// </summary>
-    public string FocusMarker
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = "*";
-
-    /// <summary>
-    /// Gets or sets whether show focus marker.
+    ///     Gets or sets whether show focus marker.
     /// </summary>
     public bool ShowFocusMarker { get; set; } = true;
 
     /// <summary>
-    /// Gets or sets the title style.
+    ///     Gets or sets the title style.
     /// </summary>
     public TesseraStyle TitleStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the focused title style.
+    ///     Gets or sets the focused title style.
     /// </summary>
     public TesseraStyle FocusedTitleStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the value text style.
+    ///     Gets or sets the value text style.
     /// </summary>
     public TesseraStyle ValueTextStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the placeholder text style.
+    ///     Gets or sets the placeholder text style.
     /// </summary>
     public TesseraStyle PlaceholderTextStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the style merged into the field value when the pointer hovers the field row.
+    ///     Gets or sets the style merged into the field value when the pointer hovers the field row.
     /// </summary>
     public TesseraStyle HoveredValueStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the option style.
+    ///     Gets or sets the option style.
     /// </summary>
     public TesseraStyle OptionStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the selected option style.
+    ///     Gets or sets the selected option style.
     /// </summary>
     public TesseraStyle SelectedOptionStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the hovered option style.
+    ///     Gets or sets the hovered option style.
     /// </summary>
     public TesseraStyle HoveredOptionStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the muted style.
+    ///     Gets or sets the muted style.
     /// </summary>
     public TesseraStyle MutedStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the disabled style.
+    ///     Gets or sets the disabled style.
     /// </summary>
     public TesseraStyle DisabledStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the style applied to border glyphs when the control is not focused.
+    ///     Gets or sets the style applied to border glyphs when the control is not focused.
     /// </summary>
     public TesseraStyle BorderStyleText { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the style applied to border glyphs when the control is focused.
+    ///     Gets or sets the style applied to border glyphs when the control is focused.
     /// </summary>
     public TesseraStyle FocusedBorderStyleText { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets glyphs used to render field indicators and option markers.
+    ///     Gets or sets glyphs used to render field indicators and option markers.
     /// </summary>
     public DropdownGlyphSet Glyphs { get; set; } = DropdownGlyphSet.Default;
 
     /// <summary>
-    /// Gets or sets the placeholder shown when no filter text is present.
+    ///     Gets or sets the placeholder shown when no filter text is present.
     /// </summary>
     public string Placeholder
     {
         get => _input.Placeholder;
-        set => _input.Placeholder = value ?? string.Empty;
+        set => _input.Placeholder = value;
     }
 
     /// <summary>
-    /// Gets the active filter text.
+    ///     Gets the active filter text.
     /// </summary>
     public string FilterText => _input.Value;
 
     /// <summary>
-    /// Gets the currently selected item.
+    ///     Gets the currently selected item.
     /// </summary>
     public string SelectedItem => _options.SelectedItem;
 
     /// <summary>
-    /// Gets a value indicating whether the drop-down list is open.
+    ///     Gets a value indicating whether the drop-down list is open.
     /// </summary>
     public bool IsOpen { get; private set; }
 
     /// <summary>
-    /// Gets or sets the maximum number of visible items while the list is open.
+    ///     Gets or sets the maximum number of visible items while the list is open.
     /// </summary>
     public int MaxVisibleItems
     {
@@ -146,7 +133,7 @@ public sealed class ComboBox : Control
     } = 6;
 
     /// <summary>
-    /// Gets or sets the field border style.
+    ///     Gets or sets the field border style.
     /// </summary>
     public BorderStyle Border
     {
@@ -155,7 +142,7 @@ public sealed class ComboBox : Control
     } = BorderStyle.SingleLine;
 
     /// <summary>
-    /// Gets or sets the inner padding applied to the field body.
+    ///     Gets or sets the inner padding applied to the field body.
     /// </summary>
     public Thickness Padding
     {
@@ -185,33 +172,38 @@ public sealed class ComboBox : Control
     }
 
     /// <summary>
-    /// Replaces the available selection items.
+    ///     Occurs when the selected item changes.
+    /// </summary>
+    public event EventHandler<SelectionChangedEventArgs>? SelectionChanged;
+
+    /// <summary>
+    ///     Replaces the available selection items.
     /// </summary>
     /// <param name="items">The items to display.</param>
     public void SetItems(IEnumerable<string> items)
     {
         var previousIndex = _options.SelectedIndex;
         var previousItem = _options.SelectedItem;
-        _options.SetItems(items, selectFirstItemWhenUnset: false);
+        _options.SetItems(items, false);
         _options.ApplyFilter(_input.Value);
         RaiseSelectionChangedIfNeeded(previousIndex, previousItem);
     }
 
     /// <summary>
-    /// Replaces the current filter text.
+    ///     Replaces the current filter text.
     /// </summary>
     /// <param name="value">The filter text to apply.</param>
     public void SetFilterText(string value)
     {
-        _input.SetValue(value ?? string.Empty);
+        _input.SetValue(value);
         _options.ApplyFilter(_input.Value);
     }
 
     /// <summary>
-    /// Sets the selected item index using bounds clamping.
+    ///     Sets the selected item index using bounds clamping.
     /// </summary>
     /// <param name="index">The requested index.</param>
-    /// <returns><see langword="true"/> when selection changed; otherwise <see langword="false"/>.</returns>
+    /// <returns><see langword="true" /> when selection changed; otherwise <see langword="false" />.</returns>
     public bool SetSelectedIndex(int index)
     {
         if (_options.Count == 0)
@@ -236,10 +228,10 @@ public sealed class ComboBox : Control
     }
 
     /// <summary>
-    /// Attempts to select the first item matching <paramref name="item"/> using ordinal comparison.
+    ///     Attempts to select the first item matching <paramref name="item" /> using ordinal comparison.
     /// </summary>
     /// <param name="item">The item value to select.</param>
-    /// <returns><see langword="true"/> when selection changed; otherwise <see langword="false"/>.</returns>
+    /// <returns><see langword="true" /> when selection changed; otherwise <see langword="false" />.</returns>
     public bool TrySetSelectedItem(string item)
     {
         if (item is null)
@@ -437,7 +429,8 @@ public sealed class ComboBox : Control
     internal override LayoutMeasurement Measure(in Rect availableBounds)
     {
         var fieldText = _input.BuildFrame(Math.Max(1, availableBounds.Width)).Text;
-        var width = ControlTextLayout.MeasureDisplayWidth($"{Glyphs.CollapsedIndicator} {fieldText}") + Padding.Horizontal;
+        var width = ControlTextLayout.MeasureDisplayWidth($"{Glyphs.CollapsedIndicator} {fieldText}") +
+                    Padding.Horizontal;
         var height = Padding.Vertical + 1;
         if (Border != BorderStyle.None)
         {
@@ -475,7 +468,8 @@ public sealed class ComboBox : Control
         }
 
         var visibleRows = Math.Min(Math.Max(1, MaxVisibleItems), content.Height - 1);
-        var start = OptionListViewport.ComputeWindowStart(_options.HighlightedVisibleIndex, visibleRows, _options.VisibleCount);
+        var start = OptionListViewport.ComputeWindowStart(_options.HighlightedVisibleIndex, visibleRows,
+            _options.VisibleCount);
         var end = Math.Min(_options.VisibleCount, start + visibleRows);
         var row = 0;
         for (var visibleIndex = start; visibleIndex < end; visibleIndex++, row++)
@@ -484,7 +478,8 @@ public sealed class ComboBox : Control
             var highlight = visibleIndex == _options.HighlightedVisibleIndex ? Glyphs.HighlightedOptionMarker : " ";
             var selectedMarker = itemIndex == _options.SelectedIndex ? Glyphs.SelectedOptionMarker : " ";
             var text = $"{highlight}{selectedMarker} {_options.Items[itemIndex]}";
-            canvas.WriteText(content.X, content.Y + 1 + row, ApplyStyle(text, ResolveOptionStyle(itemIndex, visibleIndex)), content.Width);
+            canvas.WriteText(content.X, content.Y + 1 + row,
+                ApplyStyle(text, ResolveOptionStyle(itemIndex, visibleIndex)), content.Width);
         }
     }
 
@@ -508,7 +503,8 @@ public sealed class ComboBox : Control
     private int RowToVisibleIndex(Rect content, int y)
     {
         return IsOpen
-            ? OptionListViewport.RowToVisibleIndex(content, y, MaxVisibleItems, _options.VisibleCount, _options.HighlightedVisibleIndex)
+            ? OptionListViewport.RowToVisibleIndex(content, y, MaxVisibleItems, _options.VisibleCount,
+                _options.HighlightedVisibleIndex)
             : -1;
     }
 
@@ -547,12 +543,14 @@ public sealed class ComboBox : Control
 
     private void RaiseSelectionChangedIfNeeded(int previousIndex, string previousItem)
     {
-        if (previousIndex == _options.SelectedIndex && string.Equals(previousItem, _options.SelectedItem, StringComparison.Ordinal))
+        if (previousIndex == _options.SelectedIndex &&
+            string.Equals(previousItem, _options.SelectedItem, StringComparison.Ordinal))
         {
             return;
         }
 
-        SelectionChanged?.Invoke(this, new SelectionChangedEventArgs(previousIndex, _options.SelectedIndex, previousItem, _options.SelectedItem));
+        SelectionChanged?.Invoke(this,
+            new SelectionChangedEventArgs(previousIndex, _options.SelectedIndex, previousItem, _options.SelectedItem));
     }
 
     private string RenderTitle()

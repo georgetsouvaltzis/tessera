@@ -1,14 +1,14 @@
-﻿using Tessera.Controls;
+using Tessera.Controls;
 
 namespace Tessera.Styles;
 
 /// <summary>
-/// Represents tessera theme control extensions dev ops and workflows apply extensions.
+///     Represents tessera theme control extensions dev ops and workflows apply extensions.
 /// </summary>
 public static class TesseraThemeControlExtensionsDevOpsAndWorkflowsApplyExtensions
 {
     /// <summary>
-    /// Applies resolved theme tokens to a <see cref="JsonTreeView" />.
+    ///     Applies resolved theme tokens to a <see cref="JsonTreeView" />.
     /// </summary>
     /// <param name="control">The control to mutate.</param>
     /// <param name="theme">The fully resolved theme tokens.</param>
@@ -34,7 +34,7 @@ public static class TesseraThemeControlExtensionsDevOpsAndWorkflowsApplyExtensio
     }
 
     /// <summary>
-    /// Resolves overrides and applies the resulting theme to a <see cref="JsonTreeView" />.
+    ///     Resolves overrides and applies the resulting theme to a <see cref="JsonTreeView" />.
     /// </summary>
     /// <param name="control">The control to mutate.</param>
     /// <param name="overrides">Theme override rules used to resolve effective tokens.</param>
@@ -52,7 +52,7 @@ public static class TesseraThemeControlExtensionsDevOpsAndWorkflowsApplyExtensio
     }
 
     /// <summary>
-    /// Applies resolved theme tokens to a <see cref="CommandOutput" />.
+    ///     Applies resolved theme tokens to a <see cref="CommandOutput" />.
     /// </summary>
     /// <param name="control">The control to mutate.</param>
     /// <param name="theme">The fully resolved theme tokens.</param>
@@ -80,7 +80,7 @@ public static class TesseraThemeControlExtensionsDevOpsAndWorkflowsApplyExtensio
     }
 
     /// <summary>
-    /// Resolves overrides and applies the resulting theme to a <see cref="CommandOutput" />.
+    ///     Resolves overrides and applies the resulting theme to a <see cref="CommandOutput" />.
     /// </summary>
     /// <param name="control">The control to mutate.</param>
     /// <param name="overrides">Theme override rules used to resolve effective tokens.</param>
@@ -98,7 +98,7 @@ public static class TesseraThemeControlExtensionsDevOpsAndWorkflowsApplyExtensio
     }
 
     /// <summary>
-    /// Applies resolved theme tokens to a <see cref="LogTailPanel" />.
+    ///     Applies resolved theme tokens to a <see cref="LogTailPanel" />.
     /// </summary>
     /// <param name="control">The control to mutate.</param>
     /// <param name="theme">The fully resolved theme tokens.</param>
@@ -129,7 +129,7 @@ public static class TesseraThemeControlExtensionsDevOpsAndWorkflowsApplyExtensio
     }
 
     /// <summary>
-    /// Resolves overrides and applies the resulting theme to a <see cref="LogTailPanel" />.
+    ///     Resolves overrides and applies the resulting theme to a <see cref="LogTailPanel" />.
     /// </summary>
     /// <param name="control">The control to mutate.</param>
     /// <param name="overrides">Theme override rules used to resolve effective tokens.</param>
@@ -147,7 +147,7 @@ public static class TesseraThemeControlExtensionsDevOpsAndWorkflowsApplyExtensio
     }
 
     /// <summary>
-    /// Applies resolved theme tokens to an <see cref="ActivityFeed" />.
+    ///     Applies resolved theme tokens to an <see cref="ActivityFeed" />.
     /// </summary>
     /// <param name="control">The control to mutate.</param>
     /// <param name="theme">The fully resolved theme tokens.</param>
@@ -178,7 +178,7 @@ public static class TesseraThemeControlExtensionsDevOpsAndWorkflowsApplyExtensio
     }
 
     /// <summary>
-    /// Resolves overrides and applies the resulting theme to an <see cref="ActivityFeed" />.
+    ///     Resolves overrides and applies the resulting theme to an <see cref="ActivityFeed" />.
     /// </summary>
     /// <param name="control">The control to mutate.</param>
     /// <param name="overrides">Theme override rules used to resolve effective tokens.</param>
@@ -196,7 +196,7 @@ public static class TesseraThemeControlExtensionsDevOpsAndWorkflowsApplyExtensio
     }
 
     /// <summary>
-    /// Applies resolved theme tokens to a <see cref="NotificationInbox" />.
+    ///     Applies resolved theme tokens to a <see cref="NotificationInbox" />.
     /// </summary>
     /// <param name="control">The control to mutate.</param>
     /// <param name="theme">The fully resolved theme tokens.</param>
@@ -225,7 +225,7 @@ public static class TesseraThemeControlExtensionsDevOpsAndWorkflowsApplyExtensio
     }
 
     /// <summary>
-    /// Resolves overrides and applies the resulting theme to a <see cref="NotificationInbox" />.
+    ///     Resolves overrides and applies the resulting theme to a <see cref="NotificationInbox" />.
     /// </summary>
     /// <param name="control">The control to mutate.</param>
     /// <param name="overrides">Theme override rules used to resolve effective tokens.</param>
@@ -243,7 +243,7 @@ public static class TesseraThemeControlExtensionsDevOpsAndWorkflowsApplyExtensio
     }
 
     /// <summary>
-    /// Applies resolved theme tokens to a <see cref="KeyBindingHelpDialog" />.
+    ///     Applies resolved theme tokens to a <see cref="KeyBindingHelpDialog" />.
     /// </summary>
     /// <param name="control">The control to mutate.</param>
     /// <param name="theme">The fully resolved theme tokens.</param>
@@ -268,7 +268,7 @@ public static class TesseraThemeControlExtensionsDevOpsAndWorkflowsApplyExtensio
     }
 
     /// <summary>
-    /// Resolves overrides and applies the resulting theme to a <see cref="KeyBindingHelpDialog" />.
+    ///     Resolves overrides and applies the resulting theme to a <see cref="KeyBindingHelpDialog" />.
     /// </summary>
     /// <param name="control">The control to mutate.</param>
     /// <param name="overrides">Theme override rules used to resolve effective tokens.</param>
@@ -286,7 +286,7 @@ public static class TesseraThemeControlExtensionsDevOpsAndWorkflowsApplyExtensio
     }
 
     /// <summary>
-    /// Applies resolved theme tokens to a <see cref="TraceViewer" />.
+    ///     Applies resolved theme tokens to a <see cref="TraceViewer" />.
     /// </summary>
     /// <param name="control">The control to mutate.</param>
     /// <param name="theme">The fully resolved theme tokens.</param>
@@ -317,7 +317,7 @@ public static class TesseraThemeControlExtensionsDevOpsAndWorkflowsApplyExtensio
     }
 
     /// <summary>
-    /// Resolves overrides and applies the resulting theme to a <see cref="TraceViewer" />.
+    ///     Resolves overrides and applies the resulting theme to a <see cref="TraceViewer" />.
     /// </summary>
     /// <param name="control">The control to mutate.</param>
     /// <param name="overrides">Theme override rules used to resolve effective tokens.</param>
@@ -335,7 +335,7 @@ public static class TesseraThemeControlExtensionsDevOpsAndWorkflowsApplyExtensio
     }
 
     /// <summary>
-    /// Applies resolved theme tokens to a <see cref="TaskRunnerPanel" />.
+    ///     Applies resolved theme tokens to a <see cref="TaskRunnerPanel" />.
     /// </summary>
     /// <param name="control">The control to mutate.</param>
     /// <param name="theme">The fully resolved theme tokens.</param>
@@ -364,7 +364,7 @@ public static class TesseraThemeControlExtensionsDevOpsAndWorkflowsApplyExtensio
     }
 
     /// <summary>
-    /// Resolves overrides and applies the resulting theme to a <see cref="TaskRunnerPanel" />.
+    ///     Resolves overrides and applies the resulting theme to a <see cref="TaskRunnerPanel" />.
     /// </summary>
     /// <param name="control">The control to mutate.</param>
     /// <param name="overrides">Theme override rules used to resolve effective tokens.</param>
@@ -383,12 +383,12 @@ public static class TesseraThemeControlExtensionsDevOpsAndWorkflowsApplyExtensio
 }
 
 /// <summary>
-/// Represents tessera theme control extensions dev ops and workflows default extensions.
+///     Represents tessera theme control extensions dev ops and workflows default extensions.
 /// </summary>
 public static class TesseraThemeControlExtensionsDevOpsAndWorkflowsDefaultExtensions
 {
     /// <summary>
-    /// Applies theme tokens to unset style members on a <see cref="JsonTreeView" />.
+    ///     Applies theme tokens to unset style members on a <see cref="JsonTreeView" />.
     /// </summary>
     /// <param name="control">The control to mutate.</param>
     /// <param name="theme">The fallback theme tokens.</param>
@@ -400,24 +400,30 @@ public static class TesseraThemeControlExtensionsDevOpsAndWorkflowsDefaultExtens
         ArgumentNullException.ThrowIfNull(theme);
 
         control.TitleStyle = TesseraThemeControlExtensions.ApplyDefault(control.TitleStyle, theme.Text.Secondary);
-        control.FocusedTitleStyle = TesseraThemeControlExtensions.ApplyDefault(control.FocusedTitleStyle, theme.Focus.Title);
-        control.ContainerStyle = TesseraThemeControlExtensions.ApplyDefault(control.ContainerStyle, theme.Text.Secondary);
+        control.FocusedTitleStyle =
+            TesseraThemeControlExtensions.ApplyDefault(control.FocusedTitleStyle, theme.Focus.Title);
+        control.ContainerStyle =
+            TesseraThemeControlExtensions.ApplyDefault(control.ContainerStyle, theme.Text.Secondary);
         control.ValueStyle = TesseraThemeControlExtensions.ApplyDefault(control.ValueStyle, theme.Text.Primary);
-        control.HoveredRowStyle = TesseraThemeControlExtensions.ApplyDefault(control.HoveredRowStyle, theme.Accent.Secondary);
+        control.HoveredRowStyle =
+            TesseraThemeControlExtensions.ApplyDefault(control.HoveredRowStyle, theme.Accent.Secondary);
         control.SelectedRowStyle = TesseraThemeControlExtensions.ApplyDefault(
             control.SelectedRowStyle,
             theme.Selection.Foreground.Merge(theme.Selection.Background));
-        control.FocusedSelectedRowStyle = TesseraThemeControlExtensions.ApplyDefault(control.FocusedSelectedRowStyle, theme.Focus.Ring);
+        control.FocusedSelectedRowStyle =
+            TesseraThemeControlExtensions.ApplyDefault(control.FocusedSelectedRowStyle, theme.Focus.Ring);
         control.DisabledStyle = TesseraThemeControlExtensions.ApplyDefault(control.DisabledStyle, theme.Text.Muted);
         control.MutedStyle = TesseraThemeControlExtensions.ApplyDefault(control.MutedStyle, theme.Text.Muted);
-        control.BorderStyleText = TesseraThemeControlExtensions.ApplyDefault(control.BorderStyleText, theme.Border.Default);
-        control.FocusedBorderStyleText = TesseraThemeControlExtensions.ApplyDefault(control.FocusedBorderStyleText, theme.Border.Focused.Merge(theme.Focus.Border));
+        control.BorderStyleText =
+            TesseraThemeControlExtensions.ApplyDefault(control.BorderStyleText, theme.Border.Default);
+        control.FocusedBorderStyleText = TesseraThemeControlExtensions.ApplyDefault(control.FocusedBorderStyleText,
+            theme.Border.Focused.Merge(theme.Focus.Border));
         control.FocusMarker = TesseraThemeControlExtensions.ApplyDefault(control.FocusMarker, theme.Focus.Marker);
         return control;
     }
 
     /// <summary>
-    /// Resolves overrides and applies default-only theme values to a <see cref="JsonTreeView" />.
+    ///     Resolves overrides and applies default-only theme values to a <see cref="JsonTreeView" />.
     /// </summary>
     /// <param name="control">The control to mutate.</param>
     /// <param name="overrides">Theme override rules used to resolve effective tokens.</param>
@@ -435,7 +441,7 @@ public static class TesseraThemeControlExtensionsDevOpsAndWorkflowsDefaultExtens
     }
 
     /// <summary>
-    /// Applies theme tokens to unset style members on a <see cref="CommandOutput" />.
+    ///     Applies theme tokens to unset style members on a <see cref="CommandOutput" />.
     /// </summary>
     /// <param name="control">The control to mutate.</param>
     /// <param name="theme">The fallback theme tokens.</param>
@@ -447,26 +453,32 @@ public static class TesseraThemeControlExtensionsDevOpsAndWorkflowsDefaultExtens
         ArgumentNullException.ThrowIfNull(theme);
 
         control.TitleStyle = TesseraThemeControlExtensions.ApplyDefault(control.TitleStyle, theme.Text.Secondary);
-        control.FocusedTitleStyle = TesseraThemeControlExtensions.ApplyDefault(control.FocusedTitleStyle, theme.Focus.Title);
+        control.FocusedTitleStyle =
+            TesseraThemeControlExtensions.ApplyDefault(control.FocusedTitleStyle, theme.Focus.Title);
         control.StdOutStyle = TesseraThemeControlExtensions.ApplyDefault(control.StdOutStyle, theme.Text.Primary);
         control.StdErrStyle = TesseraThemeControlExtensions.ApplyDefault(control.StdErrStyle, theme.State.Error);
         control.SystemStyle = TesseraThemeControlExtensions.ApplyDefault(control.SystemStyle, theme.Accent.Secondary);
-        control.HoveredLineStyle = TesseraThemeControlExtensions.ApplyDefault(control.HoveredLineStyle, theme.Accent.Secondary);
+        control.HoveredLineStyle =
+            TesseraThemeControlExtensions.ApplyDefault(control.HoveredLineStyle, theme.Accent.Secondary);
         control.SelectedLineStyle = TesseraThemeControlExtensions.ApplyDefault(
             control.SelectedLineStyle,
             theme.Selection.Foreground.Merge(theme.Selection.Background));
-        control.FocusedSelectedLineStyle = TesseraThemeControlExtensions.ApplyDefault(control.FocusedSelectedLineStyle, theme.Focus.Ring);
+        control.FocusedSelectedLineStyle =
+            TesseraThemeControlExtensions.ApplyDefault(control.FocusedSelectedLineStyle, theme.Focus.Ring);
         control.DisabledStyle = TesseraThemeControlExtensions.ApplyDefault(control.DisabledStyle, theme.Text.Muted);
-        control.TimestampStyle = TesseraThemeControlExtensions.ApplyDefault(control.TimestampStyle, theme.Text.Secondary);
+        control.TimestampStyle =
+            TesseraThemeControlExtensions.ApplyDefault(control.TimestampStyle, theme.Text.Secondary);
         control.EmptyStyle = TesseraThemeControlExtensions.ApplyDefault(control.EmptyStyle, theme.Text.Muted);
-        control.BorderStyleText = TesseraThemeControlExtensions.ApplyDefault(control.BorderStyleText, theme.Border.Default);
-        control.FocusedBorderStyleText = TesseraThemeControlExtensions.ApplyDefault(control.FocusedBorderStyleText, theme.Border.Focused.Merge(theme.Focus.Border));
+        control.BorderStyleText =
+            TesseraThemeControlExtensions.ApplyDefault(control.BorderStyleText, theme.Border.Default);
+        control.FocusedBorderStyleText = TesseraThemeControlExtensions.ApplyDefault(control.FocusedBorderStyleText,
+            theme.Border.Focused.Merge(theme.Focus.Border));
         control.FocusMarker = TesseraThemeControlExtensions.ApplyDefault(control.FocusMarker, theme.Focus.Marker);
         return control;
     }
 
     /// <summary>
-    /// Resolves overrides and applies default-only theme values to a <see cref="CommandOutput" />.
+    ///     Resolves overrides and applies default-only theme values to a <see cref="CommandOutput" />.
     /// </summary>
     /// <param name="control">The control to mutate.</param>
     /// <param name="overrides">Theme override rules used to resolve effective tokens.</param>
@@ -484,7 +496,7 @@ public static class TesseraThemeControlExtensionsDevOpsAndWorkflowsDefaultExtens
     }
 
     /// <summary>
-    /// Applies theme tokens to unset style members on a <see cref="LogTailPanel" />.
+    ///     Applies theme tokens to unset style members on a <see cref="LogTailPanel" />.
     /// </summary>
     /// <param name="control">The control to mutate.</param>
     /// <param name="theme">The fallback theme tokens.</param>
@@ -496,29 +508,39 @@ public static class TesseraThemeControlExtensionsDevOpsAndWorkflowsDefaultExtens
         ArgumentNullException.ThrowIfNull(theme);
 
         control.TitleStyle = TesseraThemeControlExtensions.ApplyDefault(control.TitleStyle, theme.Text.Secondary);
-        control.FocusedTitleStyle = TesseraThemeControlExtensions.ApplyDefault(control.FocusedTitleStyle, theme.Focus.Title);
+        control.FocusedTitleStyle =
+            TesseraThemeControlExtensions.ApplyDefault(control.FocusedTitleStyle, theme.Focus.Title);
         control.EntryStyle = TesseraThemeControlExtensions.ApplyDefault(control.EntryStyle, theme.Text.Primary);
-        control.HoveredEntryStyle = TesseraThemeControlExtensions.ApplyDefault(control.HoveredEntryStyle, theme.Accent.Secondary);
+        control.HoveredEntryStyle =
+            TesseraThemeControlExtensions.ApplyDefault(control.HoveredEntryStyle, theme.Accent.Secondary);
         control.SelectedEntryStyle = TesseraThemeControlExtensions.ApplyDefault(
             control.SelectedEntryStyle,
             theme.Selection.Foreground.Merge(theme.Selection.Background));
-        control.FocusedSelectedEntryStyle = TesseraThemeControlExtensions.ApplyDefault(control.FocusedSelectedEntryStyle, theme.Focus.Ring);
+        control.FocusedSelectedEntryStyle =
+            TesseraThemeControlExtensions.ApplyDefault(control.FocusedSelectedEntryStyle, theme.Focus.Ring);
         control.MutedEntryStyle = TesseraThemeControlExtensions.ApplyDefault(control.MutedEntryStyle, theme.Text.Muted);
         control.TraceEntryStyle = TesseraThemeControlExtensions.ApplyDefault(control.TraceEntryStyle, theme.Text.Muted);
-        control.DebugEntryStyle = TesseraThemeControlExtensions.ApplyDefault(control.DebugEntryStyle, theme.Text.Secondary);
+        control.DebugEntryStyle =
+            TesseraThemeControlExtensions.ApplyDefault(control.DebugEntryStyle, theme.Text.Secondary);
         control.InfoEntryStyle = TesseraThemeControlExtensions.ApplyDefault(control.InfoEntryStyle, theme.State.Info);
-        control.WarningEntryStyle = TesseraThemeControlExtensions.ApplyDefault(control.WarningEntryStyle, theme.State.Warning);
-        control.ErrorEntryStyle = TesseraThemeControlExtensions.ApplyDefault(control.ErrorEntryStyle, theme.State.Error);
-        control.CriticalEntryStyle = TesseraThemeControlExtensions.ApplyDefault(control.CriticalEntryStyle, theme.State.Error);
-        control.DisabledEntryStyle = TesseraThemeControlExtensions.ApplyDefault(control.DisabledEntryStyle, theme.Text.Muted);
-        control.BorderStyleText = TesseraThemeControlExtensions.ApplyDefault(control.BorderStyleText, theme.Border.Default);
-        control.FocusedBorderStyleText = TesseraThemeControlExtensions.ApplyDefault(control.FocusedBorderStyleText, theme.Border.Focused.Merge(theme.Focus.Border));
+        control.WarningEntryStyle =
+            TesseraThemeControlExtensions.ApplyDefault(control.WarningEntryStyle, theme.State.Warning);
+        control.ErrorEntryStyle =
+            TesseraThemeControlExtensions.ApplyDefault(control.ErrorEntryStyle, theme.State.Error);
+        control.CriticalEntryStyle =
+            TesseraThemeControlExtensions.ApplyDefault(control.CriticalEntryStyle, theme.State.Error);
+        control.DisabledEntryStyle =
+            TesseraThemeControlExtensions.ApplyDefault(control.DisabledEntryStyle, theme.Text.Muted);
+        control.BorderStyleText =
+            TesseraThemeControlExtensions.ApplyDefault(control.BorderStyleText, theme.Border.Default);
+        control.FocusedBorderStyleText = TesseraThemeControlExtensions.ApplyDefault(control.FocusedBorderStyleText,
+            theme.Border.Focused.Merge(theme.Focus.Border));
         control.FocusMarker = TesseraThemeControlExtensions.ApplyDefault(control.FocusMarker, theme.Focus.Marker);
         return control;
     }
 
     /// <summary>
-    /// Resolves overrides and applies default-only theme values to a <see cref="LogTailPanel" />.
+    ///     Resolves overrides and applies default-only theme values to a <see cref="LogTailPanel" />.
     /// </summary>
     /// <param name="control">The control to mutate.</param>
     /// <param name="overrides">Theme override rules used to resolve effective tokens.</param>
@@ -536,7 +558,7 @@ public static class TesseraThemeControlExtensionsDevOpsAndWorkflowsDefaultExtens
     }
 
     /// <summary>
-    /// Applies theme tokens to unset style members on an <see cref="ActivityFeed" />.
+    ///     Applies theme tokens to unset style members on an <see cref="ActivityFeed" />.
     /// </summary>
     /// <param name="control">The control to mutate.</param>
     /// <param name="theme">The fallback theme tokens.</param>
@@ -548,29 +570,39 @@ public static class TesseraThemeControlExtensionsDevOpsAndWorkflowsDefaultExtens
         ArgumentNullException.ThrowIfNull(theme);
 
         control.TitleStyle = TesseraThemeControlExtensions.ApplyDefault(control.TitleStyle, theme.Text.Secondary);
-        control.FocusedTitleStyle = TesseraThemeControlExtensions.ApplyDefault(control.FocusedTitleStyle, theme.Focus.Title);
+        control.FocusedTitleStyle =
+            TesseraThemeControlExtensions.ApplyDefault(control.FocusedTitleStyle, theme.Focus.Title);
         control.InfoItemStyle = TesseraThemeControlExtensions.ApplyDefault(control.InfoItemStyle, theme.State.Info);
-        control.SuccessItemStyle = TesseraThemeControlExtensions.ApplyDefault(control.SuccessItemStyle, theme.State.Success);
-        control.WarningItemStyle = TesseraThemeControlExtensions.ApplyDefault(control.WarningItemStyle, theme.State.Warning);
+        control.SuccessItemStyle =
+            TesseraThemeControlExtensions.ApplyDefault(control.SuccessItemStyle, theme.State.Success);
+        control.WarningItemStyle =
+            TesseraThemeControlExtensions.ApplyDefault(control.WarningItemStyle, theme.State.Warning);
         control.ErrorItemStyle = TesseraThemeControlExtensions.ApplyDefault(control.ErrorItemStyle, theme.State.Error);
-        control.HoveredItemStyle = TesseraThemeControlExtensions.ApplyDefault(control.HoveredItemStyle, theme.Accent.Secondary);
+        control.HoveredItemStyle =
+            TesseraThemeControlExtensions.ApplyDefault(control.HoveredItemStyle, theme.Accent.Secondary);
         control.SelectedItemStyle = TesseraThemeControlExtensions.ApplyDefault(
             control.SelectedItemStyle,
             theme.Selection.Foreground.Merge(theme.Selection.Background));
-        control.FocusedSelectedItemStyle = TesseraThemeControlExtensions.ApplyDefault(control.FocusedSelectedItemStyle, theme.Focus.Ring);
-        control.UnreadItemStyle = TesseraThemeControlExtensions.ApplyDefault(control.UnreadItemStyle, theme.Accent.Primary);
+        control.FocusedSelectedItemStyle =
+            TesseraThemeControlExtensions.ApplyDefault(control.FocusedSelectedItemStyle, theme.Focus.Ring);
+        control.UnreadItemStyle =
+            TesseraThemeControlExtensions.ApplyDefault(control.UnreadItemStyle, theme.Accent.Primary);
         control.MutedItemStyle = TesseraThemeControlExtensions.ApplyDefault(control.MutedItemStyle, theme.Text.Muted);
-        control.DisabledItemStyle = TesseraThemeControlExtensions.ApplyDefault(control.DisabledItemStyle, theme.Text.Muted);
-        control.TimestampStyle = TesseraThemeControlExtensions.ApplyDefault(control.TimestampStyle, theme.Text.Secondary);
+        control.DisabledItemStyle =
+            TesseraThemeControlExtensions.ApplyDefault(control.DisabledItemStyle, theme.Text.Muted);
+        control.TimestampStyle =
+            TesseraThemeControlExtensions.ApplyDefault(control.TimestampStyle, theme.Text.Secondary);
         control.EmptyStyle = TesseraThemeControlExtensions.ApplyDefault(control.EmptyStyle, theme.Text.Muted);
-        control.BorderStyleText = TesseraThemeControlExtensions.ApplyDefault(control.BorderStyleText, theme.Border.Default);
-        control.FocusedBorderStyleText = TesseraThemeControlExtensions.ApplyDefault(control.FocusedBorderStyleText, theme.Border.Focused.Merge(theme.Focus.Border));
+        control.BorderStyleText =
+            TesseraThemeControlExtensions.ApplyDefault(control.BorderStyleText, theme.Border.Default);
+        control.FocusedBorderStyleText = TesseraThemeControlExtensions.ApplyDefault(control.FocusedBorderStyleText,
+            theme.Border.Focused.Merge(theme.Focus.Border));
         control.FocusMarker = TesseraThemeControlExtensions.ApplyDefault(control.FocusMarker, theme.Focus.Marker);
         return control;
     }
 
     /// <summary>
-    /// Resolves overrides and applies default-only theme values to an <see cref="ActivityFeed" />.
+    ///     Resolves overrides and applies default-only theme values to an <see cref="ActivityFeed" />.
     /// </summary>
     /// <param name="control">The control to mutate.</param>
     /// <param name="overrides">Theme override rules used to resolve effective tokens.</param>
@@ -588,7 +620,7 @@ public static class TesseraThemeControlExtensionsDevOpsAndWorkflowsDefaultExtens
     }
 
     /// <summary>
-    /// Applies theme tokens to unset style members on a <see cref="NotificationInbox" />.
+    ///     Applies theme tokens to unset style members on a <see cref="NotificationInbox" />.
     /// </summary>
     /// <param name="control">The control to mutate.</param>
     /// <param name="theme">The fallback theme tokens.</param>
@@ -600,19 +632,25 @@ public static class TesseraThemeControlExtensionsDevOpsAndWorkflowsDefaultExtens
         ArgumentNullException.ThrowIfNull(theme);
 
         control.TitleStyle = TesseraThemeControlExtensions.ApplyDefault(control.TitleStyle, theme.Text.Secondary);
-        control.FocusedTitleStyle = TesseraThemeControlExtensions.ApplyDefault(control.FocusedTitleStyle, theme.Focus.Title);
+        control.FocusedTitleStyle =
+            TesseraThemeControlExtensions.ApplyDefault(control.FocusedTitleStyle, theme.Focus.Title);
         control.ItemStyle = TesseraThemeControlExtensions.ApplyDefault(control.ItemStyle, theme.Text.Primary);
         control.SelectedItemStyle = TesseraThemeControlExtensions.ApplyDefault(
             control.SelectedItemStyle,
             theme.Selection.Foreground.Merge(theme.Selection.Background));
-        control.HoveredItemStyle = TesseraThemeControlExtensions.ApplyDefault(control.HoveredItemStyle, theme.Accent.Secondary);
-        control.UnreadItemStyle = TesseraThemeControlExtensions.ApplyDefault(control.UnreadItemStyle, theme.Accent.Primary);
+        control.HoveredItemStyle =
+            TesseraThemeControlExtensions.ApplyDefault(control.HoveredItemStyle, theme.Accent.Secondary);
+        control.UnreadItemStyle =
+            TesseraThemeControlExtensions.ApplyDefault(control.UnreadItemStyle, theme.Accent.Primary);
         control.MutedItemStyle = TesseraThemeControlExtensions.ApplyDefault(control.MutedItemStyle, theme.Text.Muted);
         control.InfoItemStyle = TesseraThemeControlExtensions.ApplyDefault(control.InfoItemStyle, theme.State.Info);
-        control.SuccessItemStyle = TesseraThemeControlExtensions.ApplyDefault(control.SuccessItemStyle, theme.State.Success);
-        control.WarningItemStyle = TesseraThemeControlExtensions.ApplyDefault(control.WarningItemStyle, theme.State.Warning);
+        control.SuccessItemStyle =
+            TesseraThemeControlExtensions.ApplyDefault(control.SuccessItemStyle, theme.State.Success);
+        control.WarningItemStyle =
+            TesseraThemeControlExtensions.ApplyDefault(control.WarningItemStyle, theme.State.Warning);
         control.ErrorItemStyle = TesseraThemeControlExtensions.ApplyDefault(control.ErrorItemStyle, theme.State.Error);
-        control.PinnedItemStyle = TesseraThemeControlExtensions.ApplyDefault(control.PinnedItemStyle, theme.Accent.Primary);
+        control.PinnedItemStyle =
+            TesseraThemeControlExtensions.ApplyDefault(control.PinnedItemStyle, theme.Accent.Primary);
         control.DisabledStyle = TesseraThemeControlExtensions.ApplyDefault(control.DisabledStyle, theme.Text.Muted);
         control.EmptyTextStyle = TesseraThemeControlExtensions.ApplyDefault(control.EmptyTextStyle, theme.Text.Muted);
         control.FocusMarker = TesseraThemeControlExtensions.ApplyDefault(control.FocusMarker, theme.Focus.Marker);
@@ -620,7 +658,7 @@ public static class TesseraThemeControlExtensionsDevOpsAndWorkflowsDefaultExtens
     }
 
     /// <summary>
-    /// Resolves overrides and applies default-only theme values to a <see cref="NotificationInbox" />.
+    ///     Resolves overrides and applies default-only theme values to a <see cref="NotificationInbox" />.
     /// </summary>
     /// <param name="control">The control to mutate.</param>
     /// <param name="overrides">Theme override rules used to resolve effective tokens.</param>
@@ -638,7 +676,7 @@ public static class TesseraThemeControlExtensionsDevOpsAndWorkflowsDefaultExtens
     }
 
     /// <summary>
-    /// Applies theme tokens to unset style members on a <see cref="KeyBindingHelpDialog" />.
+    ///     Applies theme tokens to unset style members on a <see cref="KeyBindingHelpDialog" />.
     /// </summary>
     /// <param name="control">The control to mutate.</param>
     /// <param name="theme">The fallback theme tokens.</param>
@@ -650,15 +688,19 @@ public static class TesseraThemeControlExtensionsDevOpsAndWorkflowsDefaultExtens
         ArgumentNullException.ThrowIfNull(theme);
 
         control.TitleStyle = TesseraThemeControlExtensions.ApplyDefault(control.TitleStyle, theme.Text.Secondary);
-        control.FocusedTitleStyle = TesseraThemeControlExtensions.ApplyDefault(control.FocusedTitleStyle, theme.Focus.Title);
+        control.FocusedTitleStyle =
+            TesseraThemeControlExtensions.ApplyDefault(control.FocusedTitleStyle, theme.Focus.Title);
         control.GroupStyle = TesseraThemeControlExtensions.ApplyDefault(control.GroupStyle, theme.Text.Secondary);
         control.KeysStyle = TesseraThemeControlExtensions.ApplyDefault(control.KeysStyle, theme.Accent.Primary);
-        control.DescriptionStyle = TesseraThemeControlExtensions.ApplyDefault(control.DescriptionStyle, theme.Text.Primary);
+        control.DescriptionStyle =
+            TesseraThemeControlExtensions.ApplyDefault(control.DescriptionStyle, theme.Text.Primary);
         control.SelectedRowStyle = TesseraThemeControlExtensions.ApplyDefault(
             control.SelectedRowStyle,
             theme.Selection.Foreground.Merge(theme.Selection.Background));
-        control.HoveredRowStyle = TesseraThemeControlExtensions.ApplyDefault(control.HoveredRowStyle, theme.Accent.Secondary);
-        control.GlobalBindingStyle = TesseraThemeControlExtensions.ApplyDefault(control.GlobalBindingStyle, theme.State.Info);
+        control.HoveredRowStyle =
+            TesseraThemeControlExtensions.ApplyDefault(control.HoveredRowStyle, theme.Accent.Secondary);
+        control.GlobalBindingStyle =
+            TesseraThemeControlExtensions.ApplyDefault(control.GlobalBindingStyle, theme.State.Info);
         control.DisabledStyle = TesseraThemeControlExtensions.ApplyDefault(control.DisabledStyle, theme.Text.Muted);
         control.EmptyTextStyle = TesseraThemeControlExtensions.ApplyDefault(control.EmptyTextStyle, theme.Text.Muted);
         control.FocusMarker = TesseraThemeControlExtensions.ApplyDefault(control.FocusMarker, theme.Focus.Marker);
@@ -666,7 +708,7 @@ public static class TesseraThemeControlExtensionsDevOpsAndWorkflowsDefaultExtens
     }
 
     /// <summary>
-    /// Resolves overrides and applies default-only theme values to a <see cref="KeyBindingHelpDialog" />.
+    ///     Resolves overrides and applies default-only theme values to a <see cref="KeyBindingHelpDialog" />.
     /// </summary>
     /// <param name="control">The control to mutate.</param>
     /// <param name="overrides">Theme override rules used to resolve effective tokens.</param>
@@ -684,7 +726,7 @@ public static class TesseraThemeControlExtensionsDevOpsAndWorkflowsDefaultExtens
     }
 
     /// <summary>
-    /// Applies theme tokens to unset style members on a <see cref="TraceViewer" />.
+    ///     Applies theme tokens to unset style members on a <see cref="TraceViewer" />.
     /// </summary>
     /// <param name="control">The control to mutate.</param>
     /// <param name="theme">The fallback theme tokens.</param>
@@ -696,20 +738,27 @@ public static class TesseraThemeControlExtensionsDevOpsAndWorkflowsDefaultExtens
         ArgumentNullException.ThrowIfNull(theme);
 
         control.TitleStyle = TesseraThemeControlExtensions.ApplyDefault(control.TitleStyle, theme.Text.Secondary);
-        control.FocusedTitleStyle = TesseraThemeControlExtensions.ApplyDefault(control.FocusedTitleStyle, theme.Focus.Title);
-        control.BorderStyleText = TesseraThemeControlExtensions.ApplyDefault(control.BorderStyleText, theme.Border.Default);
-        control.FocusedBorderStyleText = TesseraThemeControlExtensions.ApplyDefault(control.FocusedBorderStyleText, theme.Border.Focused.Merge(theme.Focus.Border));
+        control.FocusedTitleStyle =
+            TesseraThemeControlExtensions.ApplyDefault(control.FocusedTitleStyle, theme.Focus.Title);
+        control.BorderStyleText =
+            TesseraThemeControlExtensions.ApplyDefault(control.BorderStyleText, theme.Border.Default);
+        control.FocusedBorderStyleText = TesseraThemeControlExtensions.ApplyDefault(control.FocusedBorderStyleText,
+            theme.Border.Focused.Merge(theme.Focus.Border));
         control.EntryStyle = TesseraThemeControlExtensions.ApplyDefault(control.EntryStyle, theme.Text.Primary);
         control.VerboseRowStyle = TesseraThemeControlExtensions.ApplyDefault(control.VerboseRowStyle, theme.Text.Muted);
         control.InfoRowStyle = TesseraThemeControlExtensions.ApplyDefault(control.InfoRowStyle, theme.State.Info);
-        control.WarningRowStyle = TesseraThemeControlExtensions.ApplyDefault(control.WarningRowStyle, theme.State.Warning);
+        control.WarningRowStyle =
+            TesseraThemeControlExtensions.ApplyDefault(control.WarningRowStyle, theme.State.Warning);
         control.ErrorRowStyle = TesseraThemeControlExtensions.ApplyDefault(control.ErrorRowStyle, theme.State.Error);
-        control.CriticalRowStyle = TesseraThemeControlExtensions.ApplyDefault(control.CriticalRowStyle, theme.State.Error);
+        control.CriticalRowStyle =
+            TesseraThemeControlExtensions.ApplyDefault(control.CriticalRowStyle, theme.State.Error);
         control.SelectedRowStyle = TesseraThemeControlExtensions.ApplyDefault(
             control.SelectedRowStyle,
             theme.Selection.Foreground.Merge(theme.Selection.Background));
-        control.FocusedSelectedRowStyle = TesseraThemeControlExtensions.ApplyDefault(control.FocusedSelectedRowStyle, theme.Focus.Ring);
-        control.HoveredRowStyle = TesseraThemeControlExtensions.ApplyDefault(control.HoveredRowStyle, theme.Accent.Secondary);
+        control.FocusedSelectedRowStyle =
+            TesseraThemeControlExtensions.ApplyDefault(control.FocusedSelectedRowStyle, theme.Focus.Ring);
+        control.HoveredRowStyle =
+            TesseraThemeControlExtensions.ApplyDefault(control.HoveredRowStyle, theme.Accent.Secondary);
         control.MutedRowStyle = TesseraThemeControlExtensions.ApplyDefault(control.MutedRowStyle, theme.Text.Muted);
         control.DisabledStyle = TesseraThemeControlExtensions.ApplyDefault(control.DisabledStyle, theme.Text.Muted);
         control.EmptyTextStyle = TesseraThemeControlExtensions.ApplyDefault(control.EmptyTextStyle, theme.Text.Muted);
@@ -718,7 +767,7 @@ public static class TesseraThemeControlExtensionsDevOpsAndWorkflowsDefaultExtens
     }
 
     /// <summary>
-    /// Resolves overrides and applies default-only theme values to a <see cref="TraceViewer" />.
+    ///     Resolves overrides and applies default-only theme values to a <see cref="TraceViewer" />.
     /// </summary>
     /// <param name="control">The control to mutate.</param>
     /// <param name="overrides">Theme override rules used to resolve effective tokens.</param>
@@ -736,7 +785,7 @@ public static class TesseraThemeControlExtensionsDevOpsAndWorkflowsDefaultExtens
     }
 
     /// <summary>
-    /// Applies theme tokens to unset style members on a <see cref="TaskRunnerPanel" />.
+    ///     Applies theme tokens to unset style members on a <see cref="TaskRunnerPanel" />.
     /// </summary>
     /// <param name="control">The control to mutate.</param>
     /// <param name="theme">The fallback theme tokens.</param>
@@ -748,27 +797,37 @@ public static class TesseraThemeControlExtensionsDevOpsAndWorkflowsDefaultExtens
         ArgumentNullException.ThrowIfNull(theme);
 
         control.TitleStyle = TesseraThemeControlExtensions.ApplyDefault(control.TitleStyle, theme.Text.Secondary);
-        control.FocusedTitleStyle = TesseraThemeControlExtensions.ApplyDefault(control.FocusedTitleStyle, theme.Focus.Title);
-        control.BorderStyleText = TesseraThemeControlExtensions.ApplyDefault(control.BorderStyleText, theme.Border.Default);
-        control.FocusedBorderStyleText = TesseraThemeControlExtensions.ApplyDefault(control.FocusedBorderStyleText, theme.Border.Focused.Merge(theme.Focus.Border));
+        control.FocusedTitleStyle =
+            TesseraThemeControlExtensions.ApplyDefault(control.FocusedTitleStyle, theme.Focus.Title);
+        control.BorderStyleText =
+            TesseraThemeControlExtensions.ApplyDefault(control.BorderStyleText, theme.Border.Default);
+        control.FocusedBorderStyleText = TesseraThemeControlExtensions.ApplyDefault(control.FocusedBorderStyleText,
+            theme.Border.Focused.Merge(theme.Focus.Border));
         control.RowStyle = TesseraThemeControlExtensions.ApplyDefault(control.RowStyle, theme.Text.Primary);
-        control.HoveredRowStyle = TesseraThemeControlExtensions.ApplyDefault(control.HoveredRowStyle, theme.Accent.Secondary);
+        control.HoveredRowStyle =
+            TesseraThemeControlExtensions.ApplyDefault(control.HoveredRowStyle, theme.Accent.Secondary);
         control.SelectedRowStyle = TesseraThemeControlExtensions.ApplyDefault(
             control.SelectedRowStyle,
             theme.Selection.Foreground.Merge(theme.Selection.Background));
-        control.FocusedSelectedRowStyle = TesseraThemeControlExtensions.ApplyDefault(control.FocusedSelectedRowStyle, theme.Focus.Ring);
-        control.DisabledRowStyle = TesseraThemeControlExtensions.ApplyDefault(control.DisabledRowStyle, theme.Text.Muted);
-        control.StatusMarkerStyle = TesseraThemeControlExtensions.ApplyDefault(control.StatusMarkerStyle, theme.Text.Secondary);
-        control.RunningStatusStyle = TesseraThemeControlExtensions.ApplyDefault(control.RunningStatusStyle, theme.State.Info);
-        control.SucceededStatusStyle = TesseraThemeControlExtensions.ApplyDefault(control.SucceededStatusStyle, theme.State.Success);
-        control.FailedStatusStyle = TesseraThemeControlExtensions.ApplyDefault(control.FailedStatusStyle, theme.State.Error);
+        control.FocusedSelectedRowStyle =
+            TesseraThemeControlExtensions.ApplyDefault(control.FocusedSelectedRowStyle, theme.Focus.Ring);
+        control.DisabledRowStyle =
+            TesseraThemeControlExtensions.ApplyDefault(control.DisabledRowStyle, theme.Text.Muted);
+        control.StatusMarkerStyle =
+            TesseraThemeControlExtensions.ApplyDefault(control.StatusMarkerStyle, theme.Text.Secondary);
+        control.RunningStatusStyle =
+            TesseraThemeControlExtensions.ApplyDefault(control.RunningStatusStyle, theme.State.Info);
+        control.SucceededStatusStyle =
+            TesseraThemeControlExtensions.ApplyDefault(control.SucceededStatusStyle, theme.State.Success);
+        control.FailedStatusStyle =
+            TesseraThemeControlExtensions.ApplyDefault(control.FailedStatusStyle, theme.State.Error);
         control.EmptyStyle = TesseraThemeControlExtensions.ApplyDefault(control.EmptyStyle, theme.Text.Muted);
         control.FocusMarker = TesseraThemeControlExtensions.ApplyDefault(control.FocusMarker, theme.Focus.Marker);
         return control;
     }
 
     /// <summary>
-    /// Resolves overrides and applies default-only theme values to a <see cref="TaskRunnerPanel" />.
+    ///     Resolves overrides and applies default-only theme values to a <see cref="TaskRunnerPanel" />.
     /// </summary>
     /// <param name="control">The control to mutate.</param>
     /// <param name="overrides">Theme override rules used to resolve effective tokens.</param>

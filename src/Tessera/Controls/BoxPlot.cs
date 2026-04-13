@@ -7,186 +7,160 @@ using Tessera.Styles;
 namespace Tessera.Controls;
 
 /// <summary>
-/// Represents a selectable multi-series box plot control.
+///     Represents a selectable multi-series box plot control.
 /// </summary>
 public sealed class BoxPlot : Control
 {
     private readonly List<BoxPlotSeries> _series = [];
-    private int _selectedSeries = -1;
     private int _hoveredSeries = -1;
-    private int _scrollOffset;
     private int _lastViewportRows = 8;
+    private int _scrollOffset;
 
     /// <summary>
-    /// Occurs when selected series changes.
+    ///     Gets or sets plot title text.
     /// </summary>
-    public event EventHandler<ListSelectionChangedEventArgs<BoxPlotSeries>>? SelectionChanged;
+    public string Title { get; set; } = "Box Plot";
 
     /// <summary>
-    /// Gets or sets plot title text.
+    ///     Gets or sets marker appended to title while focused.
     /// </summary>
-    public string Title
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = "Box Plot";
+    public string FocusMarker { get; set; } = "*";
 
     /// <summary>
-    /// Gets or sets marker appended to title while focused.
-    /// </summary>
-    public string FocusMarker
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = "*";
-
-    /// <summary>
-    /// Gets or sets a value indicating whether <see cref="FocusMarker" /> is rendered while focused.
+    ///     Gets or sets a value indicating whether <see cref="FocusMarker" /> is rendered while focused.
     /// </summary>
     public bool ShowFocusMarker { get; set; } = true;
 
     /// <summary>
-    /// Gets or sets text rendered when no series are configured.
+    ///     Gets or sets text rendered when no series are configured.
     /// </summary>
-    public string EmptyText
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = "(no series)";
+    public string EmptyText { get; set; } = "(no series)";
 
     /// <summary>
-    /// Gets or sets marker shown for selected rows.
+    ///     Gets or sets marker shown for selected rows.
     /// </summary>
-    public string SelectedMarker
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = ">";
+    public string SelectedMarker { get; set; } = ">";
 
     /// <summary>
-    /// Gets or sets marker shown for non-selected rows.
+    ///     Gets or sets marker shown for non-selected rows.
     /// </summary>
-    public string UnselectedMarker
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = " ";
+    public string UnselectedMarker { get; set; } = " ";
 
     /// <summary>
-    /// Gets or sets whisker glyph.
+    ///     Gets or sets whisker glyph.
     /// </summary>
     public char WhiskerGlyph { get; set; } = '─';
 
     /// <summary>
-    /// Gets or sets whisker cap glyph.
+    ///     Gets or sets whisker cap glyph.
     /// </summary>
     public char WhiskerCapGlyph { get; set; } = '┼';
 
     /// <summary>
-    /// Gets or sets quartile box glyph.
+    ///     Gets or sets quartile box glyph.
     /// </summary>
     public char QuartileGlyph { get; set; } = '═';
 
     /// <summary>
-    /// Gets or sets median glyph.
+    ///     Gets or sets median glyph.
     /// </summary>
     public char MedianGlyph { get; set; } = '│';
 
     /// <summary>
-    /// Gets or sets frame border style.
+    ///     Gets or sets frame border style.
     /// </summary>
     public BorderStyle Border { get; set; } = BorderStyle.SingleLine;
 
     /// <summary>
-    /// Gets or sets inner frame padding.
+    ///     Gets or sets inner frame padding.
     /// </summary>
     public Thickness Padding { get; set; }
 
     /// <summary>
-    /// Gets or sets title style while not focused.
+    ///     Gets or sets title style while not focused.
     /// </summary>
     public TesseraStyle TitleStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets title style while focused.
+    ///     Gets or sets title style while focused.
     /// </summary>
     public TesseraStyle FocusedTitleStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets border glyph style while not focused.
+    ///     Gets or sets border glyph style while not focused.
     /// </summary>
     public TesseraStyle BorderStyleText { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets border glyph style while focused.
+    ///     Gets or sets border glyph style while focused.
     /// </summary>
     public TesseraStyle FocusedBorderStyleText { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets base style for rendered series rows.
+    ///     Gets or sets base style for rendered series rows.
     /// </summary>
     public TesseraStyle SeriesStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets style merged into hovered rows.
+    ///     Gets or sets style merged into hovered rows.
     /// </summary>
     public TesseraStyle HoveredSeriesStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets style merged into selected rows.
+    ///     Gets or sets style merged into selected rows.
     /// </summary>
     public TesseraStyle SelectedSeriesStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets style merged into selected rows while focused.
+    ///     Gets or sets style merged into selected rows while focused.
     /// </summary>
     public TesseraStyle FocusedSelectedSeriesStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets style merged into quartile box glyphs.
+    ///     Gets or sets style merged into quartile box glyphs.
     /// </summary>
     public TesseraStyle QuartileStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets style merged into median glyphs.
+    ///     Gets or sets style merged into median glyphs.
     /// </summary>
     public TesseraStyle MedianStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets style merged into whisker glyphs.
+    ///     Gets or sets style merged into whisker glyphs.
     /// </summary>
     public TesseraStyle WhiskerStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets style merged into muted rows.
+    ///     Gets or sets style merged into muted rows.
     /// </summary>
     public TesseraStyle MutedSeriesStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets style merged while control is disabled.
+    ///     Gets or sets style merged while control is disabled.
     /// </summary>
     public TesseraStyle DisabledSeriesStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets style used for empty-state text.
+    ///     Gets or sets style used for empty-state text.
     /// </summary>
     public TesseraStyle EmptyStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets current plot series.
+    ///     Gets current plot series.
     /// </summary>
     public IReadOnlyList<BoxPlotSeries> Series => _series;
 
     /// <summary>
-    /// Gets selected series index, or <c>-1</c> when empty.
+    ///     Gets selected series index, or <c>-1</c> when empty.
     /// </summary>
-    public int SelectedSeriesIndex => _selectedSeries;
+    public int SelectedSeriesIndex { get; private set; } = -1;
 
     /// <summary>
-    /// Gets selected series, if any.
+    ///     Gets selected series, if any.
     /// </summary>
-    public BoxPlotSeries? SelectedSeries => _selectedSeries >= 0 && _selectedSeries < _series.Count
-        ? _series[_selectedSeries]
+    public BoxPlotSeries? SelectedSeries => SelectedSeriesIndex >= 0 && SelectedSeriesIndex < _series.Count
+        ? _series[SelectedSeriesIndex]
         : null;
 
     /// <inheritdoc />
@@ -199,13 +173,18 @@ public sealed class BoxPlot : Control
     public override bool IsReadOnly { get; set; }
 
     /// <summary>
-    /// Replaces current box-plot series.
+    ///     Occurs when selected series changes.
+    /// </summary>
+    public event EventHandler<ListSelectionChangedEventArgs<BoxPlotSeries>>? SelectionChanged;
+
+    /// <summary>
+    ///     Replaces current box-plot series.
     /// </summary>
     /// <param name="series">Series to render.</param>
     public void SetSeries(IEnumerable<BoxPlotSeries> series)
     {
         ArgumentNullException.ThrowIfNull(series);
-        var previousIndex = _selectedSeries;
+        var previousIndex = SelectedSeriesIndex;
         var previousSeries = SelectedSeries;
 
         _series.Clear();
@@ -219,7 +198,7 @@ public sealed class BoxPlot : Control
     }
 
     /// <summary>
-    /// Sets selected series index using bounds clamping.
+    ///     Sets selected series index using bounds clamping.
     /// </summary>
     /// <param name="index">Requested index.</param>
     /// <returns><see langword="true" /> when selection changed.</returns>
@@ -231,21 +210,21 @@ public sealed class BoxPlot : Control
         }
 
         var clamped = Math.Clamp(index, 0, _series.Count - 1);
-        if (clamped == _selectedSeries)
+        if (clamped == SelectedSeriesIndex)
         {
             return false;
         }
 
-        var previousIndex = _selectedSeries;
+        var previousIndex = SelectedSeriesIndex;
         var previousSeries = SelectedSeries;
-        _selectedSeries = clamped;
+        SelectedSeriesIndex = clamped;
         EnsureSelectionVisible(_lastViewportRows);
-        RaiseSelectionChanged(previousIndex, previousSeries, _selectedSeries, SelectedSeries);
+        RaiseSelectionChanged(previousIndex, previousSeries, SelectedSeriesIndex, SelectedSeries);
         return true;
     }
 
     /// <summary>
-    /// Compatibility wrapper for selecting by index.
+    ///     Compatibility wrapper for selecting by index.
     /// </summary>
     /// <param name="index">Requested index.</param>
     /// <returns><see langword="true" /> when selection changed.</returns>
@@ -255,14 +234,14 @@ public sealed class BoxPlot : Control
     }
 
     /// <summary>
-    /// Clears all series.
+    ///     Clears all series.
     /// </summary>
     public void Clear()
     {
-        var previousIndex = _selectedSeries;
+        var previousIndex = SelectedSeriesIndex;
         var previousSeries = SelectedSeries;
         _series.Clear();
-        _selectedSeries = -1;
+        SelectedSeriesIndex = -1;
         _hoveredSeries = -1;
         _scrollOffset = 0;
         RaiseSelectionChangedIfNeeded(previousIndex, previousSeries);
@@ -277,12 +256,36 @@ public sealed class BoxPlot : Control
         }
 
         var page = Math.Max(1, _lastViewportRows);
-        if (key.Is(Key.Down) || key.IsCharacter('j')) return SetSelectedSeries(_selectedSeries + 1);
-        if (key.Is(Key.Up) || key.IsCharacter('k')) return SetSelectedSeries(_selectedSeries - 1);
-        if (key.Is(Key.Home)) return SetSelectedSeries(0);
-        if (key.Is(Key.End)) return SetSelectedSeries(_series.Count - 1);
-        if (key.Is(Key.PageDown)) return SetSelectedSeries(_selectedSeries + page);
-        if (key.Is(Key.PageUp)) return SetSelectedSeries(_selectedSeries - page);
+        if (key.Is(Key.Down) || key.IsCharacter('j'))
+        {
+            return SetSelectedSeries(SelectedSeriesIndex + 1);
+        }
+
+        if (key.Is(Key.Up) || key.IsCharacter('k'))
+        {
+            return SetSelectedSeries(SelectedSeriesIndex - 1);
+        }
+
+        if (key.Is(Key.Home))
+        {
+            return SetSelectedSeries(0);
+        }
+
+        if (key.Is(Key.End))
+        {
+            return SetSelectedSeries(_series.Count - 1);
+        }
+
+        if (key.Is(Key.PageDown))
+        {
+            return SetSelectedSeries(SelectedSeriesIndex + page);
+        }
+
+        if (key.Is(Key.PageUp))
+        {
+            return SetSelectedSeries(SelectedSeriesIndex - page);
+        }
+
         return false;
     }
 
@@ -309,8 +312,15 @@ public sealed class BoxPlot : Control
 
         if (pointer.Kind == PointerEventKind.Wheel && _series.Count > 0)
         {
-            if (pointer.Button == PointerButton.WheelDown) return SetSelectedSeries(_selectedSeries + 1) || changed;
-            if (pointer.Button == PointerButton.WheelUp) return SetSelectedSeries(_selectedSeries - 1) || changed;
+            if (pointer.Button == PointerButton.WheelDown)
+            {
+                return SetSelectedSeries(SelectedSeriesIndex + 1) || changed;
+            }
+
+            if (pointer.Button == PointerButton.WheelUp)
+            {
+                return SetSelectedSeries(SelectedSeriesIndex - 1) || changed;
+            }
         }
 
         if (!inside)
@@ -414,7 +424,8 @@ public sealed class BoxPlot : Control
             Math.Clamp(height, 0, availableBounds.Height));
     }
 
-    private void DrawSeries(Canvas canvas, BoxPlotSeries series, int y, int plotX, int plotWidth, double min, double max, TesseraStyle rowStyle)
+    private void DrawSeries(Canvas canvas, BoxPlotSeries series, int y, int plotX, int plotWidth, double min,
+        double max, TesseraStyle rowStyle)
     {
         var normalized = NormalizeSeries(series);
         var whiskerLeft = MapToPlot(normalized.Minimum, min, max, plotX, plotWidth);
@@ -443,7 +454,7 @@ public sealed class BoxPlot : Control
             style = style.Merge(HoveredSeriesStyle);
         }
 
-        if (index == _selectedSeries)
+        if (index == SelectedSeriesIndex)
         {
             style = style.Merge(SelectedSeriesStyle);
             if (IsFocused)
@@ -462,7 +473,7 @@ public sealed class BoxPlot : Control
 
     private string BuildLabelPrefix(int index, BoxPlotSeries series)
     {
-        var marker = index == _selectedSeries ? SelectedMarker : UnselectedMarker;
+        var marker = index == SelectedSeriesIndex ? SelectedMarker : UnselectedMarker;
         return string.Concat(marker, " ", series.Name);
     }
 
@@ -488,8 +499,15 @@ public sealed class BoxPlot : Control
         for (var index = 0; index < _series.Count; index++)
         {
             var normalized = NormalizeSeries(_series[index]);
-            if (normalized.Minimum < min) min = normalized.Minimum;
-            if (normalized.Maximum > max) max = normalized.Maximum;
+            if (normalized.Minimum < min)
+            {
+                min = normalized.Minimum;
+            }
+
+            if (normalized.Maximum > max)
+            {
+                max = normalized.Maximum;
+            }
         }
 
         if (double.IsPositiveInfinity(min))
@@ -503,9 +521,13 @@ public sealed class BoxPlot : Control
         }
     }
 
-    private static (double Minimum, double FirstQuartile, double Median, double ThirdQuartile, double Maximum) NormalizeSeries(BoxPlotSeries series)
+    private static (double Minimum, double FirstQuartile, double Median, double ThirdQuartile, double Maximum)
+        NormalizeSeries(BoxPlotSeries series)
     {
-        var values = new[] { series.Minimum, series.FirstQuartile, series.Median, series.ThirdQuartile, series.Maximum };
+        var values = new[]
+        {
+            series.Minimum, series.FirstQuartile, series.Median, series.ThirdQuartile, series.Maximum
+        };
         Array.Sort(values);
         return (values[0], values[1], values[2], values[3], values[4]);
     }
@@ -518,7 +540,8 @@ public sealed class BoxPlot : Control
         }
 
         var normalized = Math.Clamp((value - min) / (max - min), 0d, 1d);
-        return plotX + Math.Clamp((int)Math.Round(normalized * (plotWidth - 1), MidpointRounding.AwayFromZero), 0, plotWidth - 1);
+        return plotX + Math.Clamp((int)Math.Round(normalized * (plotWidth - 1), MidpointRounding.AwayFromZero), 0,
+            plotWidth - 1);
     }
 
     private static void WriteLabel(Canvas canvas, int x, int y, int width, string text, TesseraStyle style)
@@ -592,13 +615,13 @@ public sealed class BoxPlot : Control
     {
         if (_series.Count == 0)
         {
-            _selectedSeries = -1;
+            SelectedSeriesIndex = -1;
             _hoveredSeries = -1;
             _scrollOffset = 0;
             return;
         }
 
-        _selectedSeries = Math.Clamp(_selectedSeries < 0 ? 0 : _selectedSeries, 0, _series.Count - 1);
+        SelectedSeriesIndex = Math.Clamp(SelectedSeriesIndex < 0 ? 0 : SelectedSeriesIndex, 0, _series.Count - 1);
         _hoveredSeries = Math.Clamp(_hoveredSeries, -1, _series.Count - 1);
         EnsureSelectionVisible(_lastViewportRows);
     }
@@ -611,18 +634,18 @@ public sealed class BoxPlot : Control
             return;
         }
 
-        if (_selectedSeries < 0)
+        if (SelectedSeriesIndex < 0)
         {
-            _selectedSeries = 0;
+            SelectedSeriesIndex = 0;
         }
 
-        if (_selectedSeries < _scrollOffset)
+        if (SelectedSeriesIndex < _scrollOffset)
         {
-            _scrollOffset = _selectedSeries;
+            _scrollOffset = SelectedSeriesIndex;
         }
-        else if (_selectedSeries >= _scrollOffset + viewportRows)
+        else if (SelectedSeriesIndex >= _scrollOffset + viewportRows)
         {
-            _scrollOffset = _selectedSeries - viewportRows + 1;
+            _scrollOffset = SelectedSeriesIndex - viewportRows + 1;
         }
 
         _scrollOffset = Math.Clamp(_scrollOffset, 0, Math.Max(0, _series.Count - viewportRows));
@@ -630,19 +653,21 @@ public sealed class BoxPlot : Control
 
     private void RaiseSelectionChangedIfNeeded(int previousIndex, BoxPlotSeries? previousSeries)
     {
-        if (previousIndex == _selectedSeries && IsSameSeries(previousSeries, SelectedSeries))
+        if (previousIndex == SelectedSeriesIndex && IsSameSeries(previousSeries, SelectedSeries))
         {
             return;
         }
 
-        RaiseSelectionChanged(previousIndex, previousSeries, _selectedSeries, SelectedSeries);
+        RaiseSelectionChanged(previousIndex, previousSeries, SelectedSeriesIndex, SelectedSeries);
     }
 
-    private void RaiseSelectionChanged(int previousIndex, BoxPlotSeries? previousSeries, int selectedIndex, BoxPlotSeries? selectedSeries)
+    private void RaiseSelectionChanged(int previousIndex, BoxPlotSeries? previousSeries, int selectedIndex,
+        BoxPlotSeries? selectedSeries)
     {
         SelectionChanged?.Invoke(
             this,
-            new ListSelectionChangedEventArgs<BoxPlotSeries>(previousIndex, selectedIndex, previousSeries, selectedSeries));
+            new ListSelectionChangedEventArgs<BoxPlotSeries>(previousIndex, selectedIndex, previousSeries,
+                selectedSeries));
     }
 
     private static bool IsSameSeries(BoxPlotSeries? left, BoxPlotSeries? right)
@@ -658,19 +683,18 @@ public sealed class BoxPlot : Control
         }
 
         return string.Equals(left.Name, right.Name, StringComparison.Ordinal)
-            && left.Minimum.Equals(right.Minimum)
-            && left.FirstQuartile.Equals(right.FirstQuartile)
-            && left.Median.Equals(right.Median)
-            && left.ThirdQuartile.Equals(right.ThirdQuartile)
-            && left.Maximum.Equals(right.Maximum);
+               && left.Minimum.Equals(right.Minimum)
+               && left.FirstQuartile.Equals(right.FirstQuartile)
+               && left.Median.Equals(right.Median)
+               && left.ThirdQuartile.Equals(right.ThirdQuartile)
+               && left.Maximum.Equals(right.Maximum);
     }
 
     private static BoxPlotSeries Clone(BoxPlotSeries series)
     {
-        return new BoxPlotSeries(series.Name, series.Minimum, series.FirstQuartile, series.Median, series.ThirdQuartile, series.Maximum)
-        {
-            IsMuted = series.IsMuted,
-        };
+        return new BoxPlotSeries(series.Name, series.Minimum, series.FirstQuartile, series.Median, series.ThirdQuartile,
+            series.Maximum)
+        { IsMuted = series.IsMuted };
     }
 
     private static string ApplyStyle(string text, TesseraStyle style)

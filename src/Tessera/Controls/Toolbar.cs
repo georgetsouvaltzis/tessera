@@ -6,7 +6,7 @@ using Tessera.Styles;
 namespace Tessera.Controls;
 
 /// <summary>
-/// Represents a compact single-line toolbar with keyboard and pointer selection.
+///     Represents a compact single-line toolbar with keyboard and pointer selection.
 /// </summary>
 public sealed class Toolbar : Control
 {
@@ -14,46 +14,33 @@ public sealed class Toolbar : Control
     private int _selectedIndex;
 
     /// <summary>
-    /// Occurs when the selected toolbar item changes.
-    /// </summary>
-    public event EventHandler<ToolbarSelectionChangedEventArgs>? SelectionChanged;
-
-    /// <summary>
-    /// Gets the configured toolbar items.
+    ///     Gets the configured toolbar items.
     /// </summary>
     public IReadOnlyList<ToolbarItem> Items => _items;
 
     /// <summary>
-    /// Gets the currently selected index.
-    /// Returns <c>-1</c> when no items are configured.
+    ///     Gets the currently selected index.
+    ///     Returns <c>-1</c> when no items are configured.
     /// </summary>
     public int SelectedIndex => _items.Count == 0 ? -1 : _selectedIndex;
 
     /// <summary>
-    /// Gets the currently selected item.
+    ///     Gets the currently selected item.
     /// </summary>
     public ToolbarItem? SelectedItem => _items.Count == 0 ? null : _items[_selectedIndex];
 
     /// <summary>
-    /// Gets or sets the optional title shown before item labels.
+    ///     Gets or sets the optional title shown before item labels.
     /// </summary>
-    public string Title
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = string.Empty;
+    public string Title { get; set; } = string.Empty;
 
     /// <summary>
-    /// Gets or sets the marker shown in the title when the control is focused.
+    ///     Gets or sets the marker shown in the title when the control is focused.
     /// </summary>
-    public string FocusMarker
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = "*";
+    public string FocusMarker { get; set; } = "*";
 
     /// <summary>
-    /// Gets or sets a value indicating whether the focus marker should be rendered when focused.
+    ///     Gets or sets a value indicating whether the focus marker should be rendered when focused.
     /// </summary>
     public bool ShowFocusMarker
     {
@@ -62,7 +49,7 @@ public sealed class Toolbar : Control
     } = true;
 
     /// <summary>
-    /// Gets or sets the title style applied when not focused.
+    ///     Gets or sets the title style applied when not focused.
     /// </summary>
     public TesseraStyle TitleStyle
     {
@@ -71,7 +58,7 @@ public sealed class Toolbar : Control
     } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the title style applied when focused.
+    ///     Gets or sets the title style applied when focused.
     /// </summary>
     public TesseraStyle FocusedTitleStyle
     {
@@ -80,16 +67,12 @@ public sealed class Toolbar : Control
     } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the separator text rendered between items.
+    ///     Gets or sets the separator text rendered between items.
     /// </summary>
-    public string Separator
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = " | ";
+    public string Separator { get; set; } = " | ";
 
     /// <summary>
-    /// Gets or sets the base style applied to item labels.
+    ///     Gets or sets the base style applied to item labels.
     /// </summary>
     public TesseraStyle ItemStyle
     {
@@ -98,7 +81,7 @@ public sealed class Toolbar : Control
     } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the style merged into the selected item label.
+    ///     Gets or sets the style merged into the selected item label.
     /// </summary>
     public TesseraStyle SelectedItemStyle
     {
@@ -107,7 +90,7 @@ public sealed class Toolbar : Control
     } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the style merged into the selected item when the toolbar has focus.
+    ///     Gets or sets the style merged into the selected item when the toolbar has focus.
     /// </summary>
     public TesseraStyle FocusedItemStyle
     {
@@ -116,7 +99,7 @@ public sealed class Toolbar : Control
     } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the style applied to separator text.
+    ///     Gets or sets the style applied to separator text.
     /// </summary>
     public TesseraStyle SeparatorStyle
     {
@@ -146,7 +129,12 @@ public sealed class Toolbar : Control
     }
 
     /// <summary>
-    /// Replaces the toolbar items.
+    ///     Occurs when the selected toolbar item changes.
+    /// </summary>
+    public event EventHandler<ToolbarSelectionChangedEventArgs>? SelectionChanged;
+
+    /// <summary>
+    ///     Replaces the toolbar items.
     /// </summary>
     /// <param name="items">The items to display in visual order.</param>
     public void SetItems(IEnumerable<ToolbarItem> items)
@@ -172,10 +160,10 @@ public sealed class Toolbar : Control
     }
 
     /// <summary>
-    /// Sets the selected toolbar item index using bounds clamping.
+    ///     Sets the selected toolbar item index using bounds clamping.
     /// </summary>
     /// <param name="index">Requested index.</param>
-    /// <returns><see langword="true"/> when selection changed; otherwise <see langword="false"/>.</returns>
+    /// <returns><see langword="true" /> when selection changed; otherwise <see langword="false" />.</returns>
     public bool SetSelectedIndex(int index)
     {
         if (_items.Count == 0)
@@ -349,7 +337,7 @@ public sealed class Toolbar : Control
 
     private string FormatItemLabel(int index)
     {
-        var label = _items[index].Label ?? string.Empty;
+        var label = _items[index].Label;
         return index == _selectedIndex
             ? $"[{label}]"
             : label;
@@ -370,7 +358,10 @@ public sealed class Toolbar : Control
         return RenderStyled(label, style);
     }
 
-    private string RenderSeparator(string separator) => RenderStyled(separator, SeparatorStyle);
+    private string RenderSeparator(string separator)
+    {
+        return RenderStyled(separator, SeparatorStyle);
+    }
 
     private static string RenderStyled(string text, TesseraStyle style)
     {

@@ -1,7 +1,7 @@
 namespace Tessera.Controls;
 
 /// <summary>
-/// Represents a single validation issue entry.
+///     Represents a single validation issue entry.
 /// </summary>
 /// <param name="Message">The validation message text.</param>
 /// <param name="Severity">The issue severity.</param>

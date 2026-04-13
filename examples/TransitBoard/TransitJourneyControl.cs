@@ -28,15 +28,18 @@ internal sealed class TransitJourneyControl : Control
         canvas.WriteText(clipped.X + 2, clipped.Y, Render(TitleStyle, Title), Math.Max(0, clipped.Width - 2));
         if (clipped.Height > 1)
         {
-            canvas.WriteText(clipped.X, clipped.Y + 1, Render(DividerStyle, new string('─', clipped.Width)), clipped.Width);
+            canvas.WriteText(clipped.X, clipped.Y + 1, Render(DividerStyle, new string('─', clipped.Width)),
+                clipped.Width);
         }
 
         if (Service is null)
         {
             if (clipped.Height > 2)
             {
-                canvas.WriteText(clipped.X + 2, clipped.Y + 2, Render(MutedStyle, "Select a service to view the station run."), Math.Max(0, clipped.Width - 2));
+                canvas.WriteText(clipped.X + 2, clipped.Y + 2,
+                    Render(MutedStyle, "Select a service to view the station run."), Math.Max(0, clipped.Width - 2));
             }
+
             return;
         }
 
@@ -48,10 +51,14 @@ internal sealed class TransitJourneyControl : Control
         {
             var call = Service.Calls[index];
             var marker = index == Service.Calls.Count - 1 ? "◆" : "•";
-            var text = $"{Render(AccentStyle, marker)} {Render(SecondaryStyle, call.Time.ToString("HH:mm", CultureInfo.InvariantCulture))}  {Render(PrimaryStyle, call.Stop)}";
+            var text =
+                $"{Render(AccentStyle, marker)} {Render(SecondaryStyle, call.Time.ToString("HH:mm", CultureInfo.InvariantCulture))}  {Render(PrimaryStyle, call.Stop)}";
             canvas.WriteText(clipped.X + 2, clipped.Y + 3 + index, text, Math.Max(0, clipped.Width - 2));
         }
     }
 
-    private static string Render(TesseraStyle style, string text) => style.IsEmpty ? text : style.Render(text);
+    private static string Render(TesseraStyle style, string text)
+    {
+        return style.IsEmpty ? text : style.Render(text);
+    }
 }

@@ -1,4 +1,4 @@
-﻿using Tessera.Components.Primitives;
+using Tessera.Components.Primitives;
 using Tessera.Components.Primitives.Internal;
 using Tessera.Components.Styling;
 using Tessera.Controls.Internal;
@@ -8,7 +8,7 @@ using Tessera.Styles;
 namespace Tessera.Controls;
 
 /// <summary>
-/// Represents a binary on/off control.
+///     Represents a binary on/off control.
 /// </summary>
 public sealed class Toggle : Control
 {
@@ -16,25 +16,17 @@ public sealed class Toggle : Control
     private bool _hovered;
 
     /// <summary>
-    /// Represents title.
+    ///     Represents title.
     /// </summary>
-    public string Title
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = "Toggle";
+    public string Title { get; set; } = "Toggle";
 
     /// <summary>
-    /// Represents focus marker.
+    ///     Represents focus marker.
     /// </summary>
-    public string FocusMarker
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = "*";
+    public string FocusMarker { get; set; } = "*";
 
     /// <summary>
-    /// Represents show focus marker.
+    ///     Represents show focus marker.
     /// </summary>
     public bool ShowFocusMarker
     {
@@ -43,7 +35,7 @@ public sealed class Toggle : Control
     } = true;
 
     /// <summary>
-    /// Represents title style.
+    ///     Represents title style.
     /// </summary>
     public TesseraStyle TitleStyle
     {
@@ -52,7 +44,7 @@ public sealed class Toggle : Control
     } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Represents focused title style.
+    ///     Represents focused title style.
     /// </summary>
     public TesseraStyle FocusedTitleStyle
     {
@@ -61,7 +53,7 @@ public sealed class Toggle : Control
     } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Represents value style.
+    ///     Represents value style.
     /// </summary>
     public TesseraStyle ValueStyle
     {
@@ -70,7 +62,7 @@ public sealed class Toggle : Control
     } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Represents on value style.
+    ///     Represents on value style.
     /// </summary>
     public TesseraStyle OnValueStyle
     {
@@ -79,7 +71,7 @@ public sealed class Toggle : Control
     } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Represents off value style.
+    ///     Represents off value style.
     /// </summary>
     public TesseraStyle OffValueStyle
     {
@@ -88,7 +80,7 @@ public sealed class Toggle : Control
     } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Represents disabled value style.
+    ///     Represents disabled value style.
     /// </summary>
     public TesseraStyle DisabledValueStyle
     {
@@ -97,7 +89,7 @@ public sealed class Toggle : Control
     } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the style applied to border glyphs when the control is not focused.
+    ///     Gets or sets the style applied to border glyphs when the control is not focused.
     /// </summary>
     public TesseraStyle BorderStyleText
     {
@@ -106,7 +98,7 @@ public sealed class Toggle : Control
     } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the style applied to border glyphs when the control is focused.
+    ///     Gets or sets the style applied to border glyphs when the control is focused.
     /// </summary>
     public TesseraStyle FocusedBorderStyleText
     {
@@ -115,25 +107,17 @@ public sealed class Toggle : Control
     } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Represents on text.
+    ///     Represents on text.
     /// </summary>
-    public string OnText
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = "ON";
+    public string OnText { get; set; } = "ON";
 
     /// <summary>
-    /// Represents off text.
+    ///     Represents off text.
     /// </summary>
-    public string OffText
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = "OFF";
+    public string OffText { get; set; } = "OFF";
 
     /// <summary>
-    /// Represents value.
+    ///     Represents value.
     /// </summary>
     public bool Value
     {
@@ -142,7 +126,7 @@ public sealed class Toggle : Control
     }
 
     /// <summary>
-    /// Represents border.
+    ///     Represents border.
     /// </summary>
     public BorderStyle Border
     {
@@ -151,7 +135,7 @@ public sealed class Toggle : Control
     } = BorderStyle.SingleLine;
 
     /// <summary>
-    /// Represents padding.
+    ///     Represents padding.
     /// </summary>
     public Thickness Padding
     {
@@ -181,10 +165,13 @@ public sealed class Toggle : Control
     }
 
     /// <summary>
-    /// Executes set value.
+    ///     Executes set value.
     /// </summary>
     /// <param name="value">The value value.</param>
-    public void SetValue(bool value) => Value = value;
+    public void SetValue(bool value)
+    {
+        Value = value;
+    }
 
     /// <inheritdoc />
     public override bool Handle(Message message)
@@ -351,14 +338,19 @@ public sealed class Toggle : Control
 
     internal override LayoutMeasurement Measure(in Rect availableBounds)
     {
-        var width = Math.Max(8, ControlTextLayout.MeasureDisplayWidth(FormatTitleForMeasure()) + Math.Max(OnText.Length, OffText.Length) + 6);
+        var width = Math.Max(8,
+            ControlTextLayout.MeasureDisplayWidth(FormatTitleForMeasure()) + Math.Max(OnText.Length, OffText.Length) +
+            6);
         var height = Border == BorderStyle.None ? 1 + Padding.Vertical : 3 + Padding.Vertical;
         return new LayoutMeasurement(
             Math.Clamp(width, 0, availableBounds.Width),
             Math.Clamp(height, 0, availableBounds.Height));
     }
 
-    private Rect ResolveContentRect(Rect bounds) => FrameLayout.ResolveContentRect(bounds, Border, Padding);
+    private Rect ResolveContentRect(Rect bounds)
+    {
+        return FrameLayout.ResolveContentRect(bounds, Border, Padding);
+    }
 
     private bool SetHovered(bool hovered)
     {

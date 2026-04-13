@@ -1,12 +1,12 @@
-﻿namespace Tessera.Controls;
+namespace Tessera.Controls;
 
 /// <summary>
-/// Provides the newly selected time value.
+///     Provides the newly selected time value.
 /// </summary>
 public sealed class TimeValueChangedEventArgs : EventArgs
 {
     /// <summary>
-    /// Executes time value changed event args.
+    ///     Executes time value changed event args.
     /// </summary>
     /// <param name="previousValue">The previous value value.</param>
     /// <param name="value">The value value.</param>
@@ -18,12 +18,12 @@ public sealed class TimeValueChangedEventArgs : EventArgs
     }
 
     /// <summary>
-    /// Gets the previous value.
+    ///     Gets the previous value.
     /// </summary>
     public TimeOnly PreviousValue { get; }
 
     /// <summary>
-    /// Gets the value.
+    ///     Gets the value.
     /// </summary>
     public TimeOnly Value { get; }
 }

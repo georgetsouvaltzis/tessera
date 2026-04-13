@@ -7,82 +7,74 @@ using Tessera.Styles;
 namespace Tessera.Controls;
 
 /// <summary>
-/// Represents a compact key-value statistics card.
+///     Represents a compact key-value statistics card.
 /// </summary>
 public sealed class StatsCard : Control
 {
     private readonly List<StatItem> _items = [];
 
     /// <summary>
-    /// Gets or sets the card title.
+    ///     Gets or sets the card title.
     /// </summary>
-    public string Title
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = "Stats";
+    public string Title { get; set; } = "Stats";
 
     /// <summary>
-    /// Gets or sets the marker shown in the title when focused.
+    ///     Gets or sets the marker shown in the title when focused.
     /// </summary>
-    public string FocusMarker
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = "*";
+    public string FocusMarker { get; set; } = "*";
 
     /// <summary>
-    /// Gets or sets whether the focused title marker should be rendered.
+    ///     Gets or sets whether the focused title marker should be rendered.
     /// </summary>
     public bool ShowFocusMarker { get; set; } = true;
 
     /// <summary>
-    /// Gets or sets the title style used when not focused.
+    ///     Gets or sets the title style used when not focused.
     /// </summary>
     public TesseraStyle TitleStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the title style used when focused.
+    ///     Gets or sets the title style used when focused.
     /// </summary>
     public TesseraStyle FocusedTitleStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the frame border style.
+    ///     Gets or sets the frame border style.
     /// </summary>
     public BorderStyle Border { get; set; } = BorderStyle.SingleLine;
 
     /// <summary>
-    /// Gets or sets inner content padding.
+    ///     Gets or sets inner content padding.
     /// </summary>
     public Thickness Padding { get; set; }
 
     /// <summary>
-    /// Gets or sets style applied to border glyphs when not focused.
+    ///     Gets or sets style applied to border glyphs when not focused.
     /// </summary>
     public TesseraStyle BorderStyleText { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets style merged into border glyphs while focused.
+    ///     Gets or sets style merged into border glyphs while focused.
     /// </summary>
     public TesseraStyle FocusedBorderStyleText { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets style used for item key text.
+    ///     Gets or sets style used for item key text.
     /// </summary>
     public TesseraStyle KeyStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets style used for item value text.
+    ///     Gets or sets style used for item value text.
     /// </summary>
     public TesseraStyle ValueStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets the current card items.
+    ///     Gets the current card items.
     /// </summary>
     public IReadOnlyList<StatItem> Items => _items;
 
     /// <summary>
-    /// Replaces the current card items.
+    ///     Replaces the current card items.
     /// </summary>
     /// <param name="items">The items to render.</param>
     public void SetItems(IEnumerable<StatItem> items)
@@ -92,19 +84,19 @@ public sealed class StatsCard : Control
         _items.Clear();
         foreach (var item in items)
         {
-            _items.Add(new StatItem(item.Label ?? string.Empty, item.Value ?? string.Empty));
+            _items.Add(new StatItem(item.Label, item.Value));
         }
     }
 
     /// <summary>
-    /// Sets or updates one statistic by label.
+    ///     Sets or updates one statistic by label.
     /// </summary>
     /// <param name="label">The item label.</param>
     /// <param name="value">The item value.</param>
     public void SetValue(string label, string value)
     {
-        var normalizedLabel = label ?? string.Empty;
-        var normalizedValue = value ?? string.Empty;
+        var normalizedLabel = label;
+        var normalizedValue = value;
         for (var i = 0; i < _items.Count; i++)
         {
             if (string.Equals(_items[i].Label, normalizedLabel, StringComparison.Ordinal))
@@ -260,6 +252,6 @@ public sealed class StatsCard : Control
 
     private static string ApplyStyle(string text, TesseraStyle style)
     {
-        return style.IsEmpty ? text : style.Render(text ?? string.Empty);
+        return style.IsEmpty ? text : style.Render(text);
     }
 }

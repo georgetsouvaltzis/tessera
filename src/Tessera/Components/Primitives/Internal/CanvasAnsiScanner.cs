@@ -5,7 +5,7 @@ internal static class CanvasAnsiScanner
     public static bool TryReadEscape(string text, int start, out int consumed)
     {
         consumed = 0;
-        if (start < 0 || start >= text.Length || text[start] != '\u001b' || start + 1 >= text.Length)
+        if (start < 0 || start >= text.Length || text[start] != '\e' || start + 1 >= text.Length)
         {
             return false;
         }
@@ -21,7 +21,7 @@ internal static class CanvasAnsiScanner
             var ch = text[cursor];
             if (ch >= '@' && ch <= '~')
             {
-                consumed = (cursor - start) + 1;
+                consumed = cursor - start + 1;
                 return true;
             }
 

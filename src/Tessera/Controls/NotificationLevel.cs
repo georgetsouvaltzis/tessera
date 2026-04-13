@@ -1,24 +1,27 @@
-﻿namespace Tessera.Controls;
+namespace Tessera.Controls;
 
 /// <summary>
-/// Defines the semantic severity of a notification entry.
+///     Defines the semantic severity of a notification entry.
 /// </summary>
 public enum NotificationLevel
 {
     /// <summary>
-    /// The informational state.
+    ///     The informational state.
     /// </summary>
     Info = 0,
+
     /// <summary>
-    /// The success state.
+    ///     The success state.
     /// </summary>
     Success = 1,
+
     /// <summary>
-    /// The warning state.
+    ///     The warning state.
     /// </summary>
     Warning = 2,
+
     /// <summary>
-    /// The error state.
+    ///     The error state.
     /// </summary>
-    Error = 3,
+    Error = 3
 }

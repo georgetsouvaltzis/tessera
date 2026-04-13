@@ -37,7 +37,8 @@ public sealed partial class AutocompleteInput
     internal override LayoutMeasurement Measure(in Rect availableBounds)
     {
         var width = Math.Max(16, ControlTextLayout.MeasureDisplayWidth(Title) + 6) + Padding.Horizontal;
-        var height = 1 + Padding.Vertical + ResolveVisibleSuggestionCount(Math.Max(0, availableBounds.Height - Padding.Vertical - 1));
+        var height = 1 + Padding.Vertical +
+                     ResolveVisibleSuggestionCount(Math.Max(0, availableBounds.Height - Padding.Vertical - 1));
         if (Border != BorderStyle.None)
         {
             width += 2;
@@ -65,7 +66,8 @@ public sealed partial class AutocompleteInput
         canvas.WriteText(content.X, content.Y, ApplyStyle(frame.Text, ResolveDisabledStyle(textStyle)), textWidth);
         if (commitWidth > 0)
         {
-            canvas.WriteText(content.X + textWidth, content.Y, ApplyStyle(commitMarker, ResolveDisabledStyle(CommitMarkerStyle)), commitWidth);
+            canvas.WriteText(content.X + textWidth, content.Y,
+                ApplyStyle(commitMarker, ResolveDisabledStyle(CommitMarkerStyle)), commitWidth);
         }
     }
 
@@ -86,7 +88,7 @@ public sealed partial class AutocompleteInput
         {
             var suggestion = _suggestions[_filteredSuggestionIndices[row]];
             var y = content.Y + 1 + row;
-            var selected = row == _selectedSuggestionIndex;
+            var selected = row == SelectedSuggestionIndex;
             var hovered = row == _hoveredSuggestionIndex;
             var prefix = selected
                 ? string.Concat(Glyphs.SuggestionMarker, Glyphs.MarkerSeparator)

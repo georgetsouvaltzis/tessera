@@ -48,18 +48,21 @@ internal sealed class IncidentHeroControl : Control
             return;
         }
 
-        var summaryLine = $"{Render(SeverityStyle, $" {Severity} ")}  {Render(StatusStyle, $" {Status} ")}  {Render(HighlightStyle, IncidentId)}  {Render(SummaryStyle, Summary)}";
+        var summaryLine =
+            $"{Render(SeverityStyle, $" {Severity} ")}  {Render(StatusStyle, $" {Status} ")}  {Render(HighlightStyle, IncidentId)}  {Render(SummaryStyle, Summary)}";
         WriteLine(canvas, content, 0, summaryLine);
 
         if (content.Height > 1)
         {
-            var opsLine = $"{Render(MetaStyle, $"{Service} / {Environment} / {Region}")}  {Render(HighlightStyle, $"owner {Owner}")}  {Render(HighlightStyle, Sla)}";
+            var opsLine =
+                $"{Render(MetaStyle, $"{Service} / {Environment} / {Region}")}  {Render(HighlightStyle, $"owner {Owner}")}  {Render(HighlightStyle, Sla)}";
             WriteLine(canvas, content, 1, opsLine);
         }
 
         if (content.Height > 2)
         {
-            WriteLine(canvas, content, 2, $"{Render(DetailStyle, "Bridge")}  {Render(MetaStyle, Channel)}  {Render(DetailStyle, "Phase")}  {Render(PhaseStyle, Phase)}");
+            WriteLine(canvas, content, 2,
+                $"{Render(DetailStyle, "Bridge")}  {Render(MetaStyle, Channel)}  {Render(DetailStyle, "Phase")}  {Render(PhaseStyle, Phase)}");
         }
 
         if (content.Height > 3)
@@ -78,5 +81,8 @@ internal sealed class IncidentHeroControl : Control
         canvas.WriteText(content.X, content.Y + row, text, content.Width);
     }
 
-    private static string Render(TesseraStyle style, string text) => style.IsEmpty ? text : style.Render(text);
+    private static string Render(TesseraStyle style, string text)
+    {
+        return style.IsEmpty ? text : style.Render(text);
+    }
 }

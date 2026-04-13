@@ -6,7 +6,7 @@ internal enum DataWorkbenchThemeKind
 {
     Citrine,
     Cobalt,
-    Ember,
+    Ember
 }
 
 internal sealed record DataWorkbenchPalette(
@@ -37,121 +37,121 @@ internal static class DataWorkbenchTheme
         DataWorkbenchThemeKind.Citrine,
         "Citrine",
         CreateTheme(
-            textPrimary: 0xFFF8ED,
-            textSecondary: 0xE7CE9C,
-            textMuted: 0x8E7A55,
-            inverseForeground: 0x120C05,
-            inverseBackground: 0xFFF8ED,
-            surfaceBase: 0x120C05,
-            surfacePanel: 0x1B1208,
-            surfaceOverlay: 0x24190D,
-            borderDefault: 0x6D5130,
-            borderStrong: 0xC68F4A,
-            borderFocused: 0xFFD98A,
-            borderError: 0xFF7A59,
-            success: 0x8EEFAF,
-            warning: 0xFFD26D,
-            error: 0xFF7A59,
-            info: 0x68C7FF,
-            accentPrimary: 0xFFD98A,
-            accentSecondary: 0x68C7FF,
-            selectionForeground: 0x120C05,
-            selectionBackground: 0xFFD98A),
-        HeroTitle: 0xFFF8ED,
-        HeroClock: 0x68C7FF,
-        HeroBadgeForeground: 0x120C05,
-        HeroBadgeBackground: 0xFFD98A,
-        HeroAccent: 0x8EEFAF,
-        FrameMuted: 0x6D5130,
-        FrameStrong: 0xC68F4A,
-        StatPrimary: 0xFFD98A,
-        StatSecondary: 0x68C7FF,
-        StatTertiary: 0x8EEFAF,
-        HighlightA: 0xFFD26D,
-        HighlightB: 0x68C7FF,
-        HighlightC: 0xFF7A59,
-        FooterChipForeground: 0x120C05,
-        FooterChipBackground: 0xFFD98A);
+            0xFFF8ED,
+            0xE7CE9C,
+            0x8E7A55,
+            0x120C05,
+            0xFFF8ED,
+            0x120C05,
+            0x1B1208,
+            0x24190D,
+            0x6D5130,
+            0xC68F4A,
+            0xFFD98A,
+            0xFF7A59,
+            0x8EEFAF,
+            0xFFD26D,
+            0xFF7A59,
+            0x68C7FF,
+            0xFFD98A,
+            0x68C7FF,
+            0x120C05,
+            0xFFD98A),
+        0xFFF8ED,
+        0x68C7FF,
+        0x120C05,
+        0xFFD98A,
+        0x8EEFAF,
+        0x6D5130,
+        0xC68F4A,
+        0xFFD98A,
+        0x68C7FF,
+        0x8EEFAF,
+        0xFFD26D,
+        0x68C7FF,
+        0xFF7A59,
+        0x120C05,
+        0xFFD98A);
 
     public static DataWorkbenchPalette Cobalt { get; } = new(
         DataWorkbenchThemeKind.Cobalt,
         "Cobalt",
         CreateTheme(
-            textPrimary: 0xF6F8FF,
-            textSecondary: 0xC1C9E8,
-            textMuted: 0x7080A7,
-            inverseForeground: 0x090F1E,
-            inverseBackground: 0xF6F8FF,
-            surfaceBase: 0x090F1E,
-            surfacePanel: 0x111A31,
-            surfaceOverlay: 0x18264B,
-            borderDefault: 0x31507D,
-            borderStrong: 0x5D8EF6,
-            borderFocused: 0x7CE7FF,
-            borderError: 0xFF8A76,
-            success: 0x8AF2C3,
-            warning: 0xFFD77D,
-            error: 0xFF8A76,
-            info: 0x7CE7FF,
-            accentPrimary: 0x5D8EF6,
-            accentSecondary: 0x7CE7FF,
-            selectionForeground: 0x090F1E,
-            selectionBackground: 0x7CE7FF),
-        HeroTitle: 0xF6F8FF,
-        HeroClock: 0x7CE7FF,
-        HeroBadgeForeground: 0x090F1E,
-        HeroBadgeBackground: 0x7CE7FF,
-        HeroAccent: 0x8AF2C3,
-        FrameMuted: 0x31507D,
-        FrameStrong: 0x5D8EF6,
-        StatPrimary: 0x7CE7FF,
-        StatSecondary: 0xB89BFF,
-        StatTertiary: 0x8AF2C3,
-        HighlightA: 0x5D8EF6,
-        HighlightB: 0xFFD77D,
-        HighlightC: 0xFF8A76,
-        FooterChipForeground: 0x090F1E,
-        FooterChipBackground: 0x7CE7FF);
+            0xF6F8FF,
+            0xC1C9E8,
+            0x7080A7,
+            0x090F1E,
+            0xF6F8FF,
+            0x090F1E,
+            0x111A31,
+            0x18264B,
+            0x31507D,
+            0x5D8EF6,
+            0x7CE7FF,
+            0xFF8A76,
+            0x8AF2C3,
+            0xFFD77D,
+            0xFF8A76,
+            0x7CE7FF,
+            0x5D8EF6,
+            0x7CE7FF,
+            0x090F1E,
+            0x7CE7FF),
+        0xF6F8FF,
+        0x7CE7FF,
+        0x090F1E,
+        0x7CE7FF,
+        0x8AF2C3,
+        0x31507D,
+        0x5D8EF6,
+        0x7CE7FF,
+        0xB89BFF,
+        0x8AF2C3,
+        0x5D8EF6,
+        0xFFD77D,
+        0xFF8A76,
+        0x090F1E,
+        0x7CE7FF);
 
     public static DataWorkbenchPalette Ember { get; } = new(
         DataWorkbenchThemeKind.Ember,
         "Ember",
         CreateTheme(
-            textPrimary: 0xFFF4F1,
-            textSecondary: 0xE8B8B0,
-            textMuted: 0x956D69,
-            inverseForeground: 0x160908,
-            inverseBackground: 0xFFF4F1,
-            surfaceBase: 0x160908,
-            surfacePanel: 0x21100E,
-            surfaceOverlay: 0x2D1814,
-            borderDefault: 0x75433A,
-            borderStrong: 0xD06F61,
-            borderFocused: 0xFFB59E,
-            borderError: 0xFF6A57,
-            success: 0x90E1A8,
-            warning: 0xFFC577,
-            error: 0xFF6A57,
-            info: 0x7AD7FF,
-            accentPrimary: 0xD06F61,
-            accentSecondary: 0xFFB59E,
-            selectionForeground: 0x160908,
-            selectionBackground: 0xFFB59E),
-        HeroTitle: 0xFFF4F1,
-        HeroClock: 0xFFC577,
-        HeroBadgeForeground: 0x160908,
-        HeroBadgeBackground: 0xFFB59E,
-        HeroAccent: 0x90E1A8,
-        FrameMuted: 0x75433A,
-        FrameStrong: 0xD06F61,
-        StatPrimary: 0xFFB59E,
-        StatSecondary: 0x7AD7FF,
-        StatTertiary: 0x90E1A8,
-        HighlightA: 0xFFC577,
-        HighlightB: 0xFFB59E,
-        HighlightC: 0xFF6A57,
-        FooterChipForeground: 0x160908,
-        FooterChipBackground: 0xFFB59E);
+            0xFFF4F1,
+            0xE8B8B0,
+            0x956D69,
+            0x160908,
+            0xFFF4F1,
+            0x160908,
+            0x21100E,
+            0x2D1814,
+            0x75433A,
+            0xD06F61,
+            0xFFB59E,
+            0xFF6A57,
+            0x90E1A8,
+            0xFFC577,
+            0xFF6A57,
+            0x7AD7FF,
+            0xD06F61,
+            0xFFB59E,
+            0x160908,
+            0xFFB59E),
+        0xFFF4F1,
+        0xFFC577,
+        0x160908,
+        0xFFB59E,
+        0x90E1A8,
+        0x75433A,
+        0xD06F61,
+        0xFFB59E,
+        0x7AD7FF,
+        0x90E1A8,
+        0xFFC577,
+        0xFFB59E,
+        0xFF6A57,
+        0x160908,
+        0xFFB59E);
 
     public static IReadOnlyList<DataWorkbenchPalette> All { get; } = [Citrine, Cobalt, Ember];
 
@@ -161,7 +161,7 @@ internal static class DataWorkbenchTheme
         {
             DataWorkbenchThemeKind.Cobalt => Cobalt,
             DataWorkbenchThemeKind.Ember => Ember,
-            _ => Citrine,
+            _ => Citrine
         };
     }
 
@@ -212,50 +212,55 @@ internal static class DataWorkbenchTheme
     {
         return new TesseraTheme
         {
-            Text = new TesseraThemeTextTokens
-            {
-                Primary = Foreground(textPrimary),
-                Secondary = Foreground(textSecondary),
-                Muted = Foreground(textMuted),
-                Inverse = ForegroundBackground(inverseForeground, inverseBackground),
-            },
-            Surface = new TesseraThemeSurfaceTokens
-            {
-                Base = Background(surfaceBase),
-                Panel = Background(surfacePanel),
-                Overlay = Background(surfaceOverlay),
-            },
-            Border = new TesseraThemeBorderTokens
-            {
-                Default = Foreground(borderDefault),
-                Strong = Foreground(borderStrong),
-                Focused = Foreground(borderFocused),
-                Error = Foreground(borderError),
-            },
-            State = new TesseraThemeStateTokens
-            {
-                Success = Foreground(success),
-                Warning = Foreground(warning),
-                Error = Foreground(error),
-                Info = Foreground(info),
-            },
-            Accent = new TesseraThemeAccentTokens
-            {
-                Primary = Foreground(accentPrimary),
-                Secondary = Foreground(accentSecondary),
-            },
+            Text =
+                new TesseraThemeTextTokens
+                {
+                    Primary = Foreground(textPrimary),
+                    Secondary = Foreground(textSecondary),
+                    Muted = Foreground(textMuted),
+                    Inverse = ForegroundBackground(inverseForeground, inverseBackground)
+                },
+            Surface =
+                new TesseraThemeSurfaceTokens
+                {
+                    Base = Background(surfaceBase),
+                    Panel = Background(surfacePanel),
+                    Overlay = Background(surfaceOverlay)
+                },
+            Border =
+                new TesseraThemeBorderTokens
+                {
+                    Default = Foreground(borderDefault),
+                    Strong = Foreground(borderStrong),
+                    Focused = Foreground(borderFocused),
+                    Error = Foreground(borderError)
+                },
+            State =
+                new TesseraThemeStateTokens
+                {
+                    Success = Foreground(success),
+                    Warning = Foreground(warning),
+                    Error = Foreground(error),
+                    Info = Foreground(info)
+                },
+            Accent =
+                new TesseraThemeAccentTokens
+                {
+                    Primary = Foreground(accentPrimary),
+                    Secondary = Foreground(accentSecondary)
+                },
             Selection = new TesseraThemeSelectionTokens
             {
                 Foreground = Foreground(selectionForeground),
-                Background = Background(selectionBackground),
+                Background = Background(selectionBackground)
             },
             Focus = new TesseraThemeFocusTokens
             {
                 Ring = Foreground(borderFocused),
                 Title = Foreground(borderFocused).WithBold(),
                 Border = Foreground(borderFocused).WithBold(),
-                Marker = "◆",
-            },
+                Marker = "◆"
+            }
         };
     }
 

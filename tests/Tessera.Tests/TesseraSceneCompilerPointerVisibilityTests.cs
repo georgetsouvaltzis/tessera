@@ -10,12 +10,9 @@ public sealed class TesseraSceneCompilerPointerVisibilityTests
     [Test]
     public void TesseraSceneCompilerHiddenDialogOverlayDoesNotInterceptPointerPress()
     {
-        var app = new OverlayPointerProbeApp(showDialog: false);
+        var app = new OverlayPointerProbeApp(false);
         app.ConfigureRuntimeOptions(
-            new TesseraRuntimeOptions
-            {
-                PointerActivationPolicy = PointerActivationPolicy.SingleClick,
-            });
+            new TesseraRuntimeOptions { PointerActivationPolicy = PointerActivationPolicy.SingleClick });
 
         _ = app.UpdateRuntime(new WindowResized(100, 30));
         _ = app.RenderRuntime();
@@ -31,12 +28,9 @@ public sealed class TesseraSceneCompilerPointerVisibilityTests
     [Test]
     public void TesseraSceneCompilerVisibleDialogOverlayContinuesToInterceptPointerPress()
     {
-        var app = new OverlayPointerProbeApp(showDialog: true);
+        var app = new OverlayPointerProbeApp(true);
         app.ConfigureRuntimeOptions(
-            new TesseraRuntimeOptions
-            {
-                PointerActivationPolicy = PointerActivationPolicy.SingleClick,
-            });
+            new TesseraRuntimeOptions { PointerActivationPolicy = PointerActivationPolicy.SingleClick });
 
         _ = app.UpdateRuntime(new WindowResized(100, 30));
         _ = app.RenderRuntime();
@@ -60,20 +54,23 @@ public sealed class TesseraSceneCompilerPointerVisibilityTests
                 Title = "Confirm",
                 BodyLines = ["Overlay"],
                 IsVisible = showDialog,
-                IsFocused = showDialog,
+                IsFocused = showDialog
             };
         }
 
         public int PointerPressCount => _probe.PointerPressCount;
 
-        public override TesseraEffect? Update(Message message) => null;
+        public override TesseraEffect? Update(Message message)
+        {
+            return null;
+        }
 
         public override Screen Build(ScreenContext context)
         {
             return Screen.Build(window =>
             {
                 window.Body(_probe);
-                window.Overlay(overlay => overlay.Center(_dialog, width: 40, height: 12));
+                window.Overlay(overlay => overlay.Center(_dialog, 40, 12));
             });
         }
     }

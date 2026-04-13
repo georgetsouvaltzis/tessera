@@ -33,7 +33,7 @@ internal static class EmptyStateControlTests
             Body = "Create one\nor import.",
             Hint = "Press N to create.",
             ActionLabel = "Create project",
-            ShowAction = true,
+            ShowAction = true
         };
         var canvas = new Canvas(44, 8);
 
@@ -41,32 +41,28 @@ internal static class EmptyStateControlTests
         var output = canvas.Render();
 
         TestAssert.True(output.Contains("No projects", StringComparison.Ordinal), "EmptyState should render title.");
-        TestAssert.True(output.Contains("Create one", StringComparison.Ordinal), "EmptyState should render body line one.");
-        TestAssert.True(output.Contains("or import.", StringComparison.Ordinal), "EmptyState should render body line two.");
-        TestAssert.True(output.Contains("Press N to create.", StringComparison.Ordinal), "EmptyState should render hint text.");
-        TestAssert.True(output.Contains("[Create project]", StringComparison.Ordinal), "EmptyState should render action label.");
+        TestAssert.True(output.Contains("Create one", StringComparison.Ordinal),
+            "EmptyState should render body line one.");
+        TestAssert.True(output.Contains("or import.", StringComparison.Ordinal),
+            "EmptyState should render body line two.");
+        TestAssert.True(output.Contains("Press N to create.", StringComparison.Ordinal),
+            "EmptyState should render hint text.");
+        TestAssert.True(output.Contains("[Create project]", StringComparison.Ordinal),
+            "EmptyState should render action label.");
         return Task.CompletedTask;
     }
 
     private static Task KeyboardActivation_EnterAndSpaceWhenFocused()
     {
-        var control = new EmptyState
-        {
-            IsFocused = true,
-            ShowAction = true,
-            ActionLabel = "Retry",
-        };
+        var control = new EmptyState { IsFocused = true, ShowAction = true, ActionLabel = "Retry" };
         var activationCount = 0;
         control.ActionInvoked += (_, _) => activationCount++;
 
         var enterHandled = control.Handle(new KeyPressed(Key.Enter));
         var spaceHandled = control.Handle(new KeyPressed(Key.Character, " "));
-        var unfocusedHandled = new EmptyState
-        {
-            IsFocused = false,
-            ShowAction = true,
-            ActionLabel = "Retry",
-        }.Handle(new KeyPressed(Key.Enter));
+        var unfocusedHandled =
+            new EmptyState { IsFocused = false, ShowAction = true, ActionLabel = "Retry" }.Handle(
+                new KeyPressed(Key.Enter));
 
         TestAssert.True(enterHandled, "Focused EmptyState should activate on enter.");
         TestAssert.True(spaceHandled, "Focused EmptyState should activate on space.");
@@ -77,11 +73,7 @@ internal static class EmptyStateControlTests
 
     private static Task PointerHoverAndClickInBounds_ActivatesAction()
     {
-        var control = new EmptyState
-        {
-            ShowAction = true,
-            ActionLabel = "Open wizard",
-        };
+        var control = new EmptyState { ShowAction = true, ActionLabel = "Open wizard" };
         var activationCount = 0;
         control.Activated += (_, _) => activationCount++;
         var bounds = new Rect(0, 0, 32, 6);
@@ -115,7 +107,7 @@ internal static class EmptyStateControlTests
             FocusedStyle = TesseraStyle.Empty.WithItalic(),
             HoveredStyle = TesseraStyle.Empty.WithForeground(AnsiColor.Rgb(7, 8, 9)),
             DisabledStyle = TesseraStyle.Empty.WithForeground(AnsiColor.Rgb(90, 91, 92)),
-            ActionStyle = TesseraStyle.Empty.WithForeground(AnsiColor.Rgb(10, 11, 12)).WithUnderline(),
+            ActionStyle = TesseraStyle.Empty.WithForeground(AnsiColor.Rgb(10, 11, 12)).WithUnderline()
         };
         var bounds = new Rect(0, 0, 40, 8);
         var hoverChanged = control.Handle(new PointerInput(PointerEventKind.Motion, PointerButton.None, 1, 1), bounds);
@@ -125,23 +117,22 @@ internal static class EmptyStateControlTests
         var output = canvas.Render();
 
         TestAssert.True(hoverChanged, "Pointer motion should update EmptyState hover state.");
-        TestAssert.True(output.Contains("48;2;1;2;3", StringComparison.Ordinal), "Default style should be present in rendered output.");
-        TestAssert.True(output.Contains(";3m", StringComparison.Ordinal), "Focused style should be present in rendered output.");
-        TestAssert.True(output.Contains("38;2;7;8;9", StringComparison.Ordinal), "Hovered style should be present in rendered output.");
-        TestAssert.True(output.Contains("38;2;90;91;92", StringComparison.Ordinal), "Disabled style should be present in rendered output.");
-        TestAssert.True(output.Contains("38;2;10;11;12", StringComparison.Ordinal), "Action style should be present in rendered output.");
+        TestAssert.True(output.Contains("48;2;1;2;3", StringComparison.Ordinal),
+            "Default style should be present in rendered output.");
+        TestAssert.True(output.Contains(";3m", StringComparison.Ordinal),
+            "Focused style should be present in rendered output.");
+        TestAssert.True(output.Contains("38;2;7;8;9", StringComparison.Ordinal),
+            "Hovered style should be present in rendered output.");
+        TestAssert.True(output.Contains("38;2;90;91;92", StringComparison.Ordinal),
+            "Disabled style should be present in rendered output.");
+        TestAssert.True(output.Contains("38;2;10;11;12", StringComparison.Ordinal),
+            "Action style should be present in rendered output.");
         return Task.CompletedTask;
     }
 
     private static Task Disabled_PreventsKeyboardAndPointerActivation()
     {
-        var control = new EmptyState
-        {
-            IsFocused = true,
-            IsDisabled = true,
-            ShowAction = true,
-            ActionLabel = "Create",
-        };
+        var control = new EmptyState { IsFocused = true, IsDisabled = true, ShowAction = true, ActionLabel = "Create" };
         var activationCount = 0;
         control.ActionInvoked += (_, _) => activationCount++;
 

@@ -98,7 +98,7 @@ public sealed class SelectionMutatorNormalizationTests
         tabs.Select(0);
         Assert.That(tabs.SelectedIndex, Is.EqualTo(0));
 
-        var empty = new Tabs(Array.Empty<string>());
+        var empty = new Tabs();
         empty.Select(5);
         Assert.That(empty.SelectedIndex, Is.EqualTo(0));
         Assert.That(empty.SetSelectedIndex(0), Is.False);
@@ -112,7 +112,7 @@ public sealed class SelectionMutatorNormalizationTests
         [
             new ToolbarItem("a", "A"),
             new ToolbarItem("b", "B"),
-            new ToolbarItem("c", "C"),
+            new ToolbarItem("c", "C")
         ]);
 
         Assert.That(control.SetSelectedIndex(99), Is.True);
@@ -129,8 +129,8 @@ public sealed class SelectionMutatorNormalizationTests
         control.SetTabs(
         [
             new PaneTabItem("home", "Home"),
-            new PaneTabItem("diag", "Diagnostics", isDisabled: true),
-            new PaneTabItem("ops", "Operations"),
+            new PaneTabItem("diag", "Diagnostics", true),
+            new PaneTabItem("ops", "Operations")
         ]);
 
         Assert.That(control.SetSelectedIndex(1), Is.False);
@@ -150,7 +150,7 @@ public sealed class SelectionMutatorNormalizationTests
         [
             new SchedulerEntry("a", "A", start, start.AddMinutes(5)),
             new SchedulerEntry("b", "B", start.AddMinutes(10), start.AddMinutes(15)),
-            new SchedulerEntry("c", "C", start.AddMinutes(20), start.AddMinutes(25)),
+            new SchedulerEntry("c", "C", start.AddMinutes(20), start.AddMinutes(25))
         ];
     }
 
@@ -160,7 +160,7 @@ public sealed class SelectionMutatorNormalizationTests
         [
             new TimelineEntry("a", "A", "10:00"),
             new TimelineEntry("b", "B", "10:05"),
-            new TimelineEntry("c", "C", "10:10"),
+            new TimelineEntry("c", "C", "10:10")
         ];
     }
 
@@ -171,7 +171,7 @@ public sealed class SelectionMutatorNormalizationTests
         [
             new TraceEntry("a", now.AddSeconds(1), "op-a", "first"),
             new TraceEntry("b", now.AddSeconds(2), "op-b", "second"),
-            new TraceEntry("c", now.AddSeconds(3), "op-c", "third"),
+            new TraceEntry("c", now.AddSeconds(3), "op-c", "third")
         ];
     }
 
@@ -181,7 +181,7 @@ public sealed class SelectionMutatorNormalizationTests
         [
             new ProcessListEntry(1, "alpha"),
             new ProcessListEntry(2, "beta"),
-            new ProcessListEntry(3, "gamma"),
+            new ProcessListEntry(3, "gamma")
         ];
     }
 
@@ -191,7 +191,7 @@ public sealed class SelectionMutatorNormalizationTests
         [
             new PaletteSwatch("base", "#111111"),
             new PaletteSwatch("accent", "#222222"),
-            new PaletteSwatch("focus", "#333333"),
+            new PaletteSwatch("focus", "#333333")
         ];
     }
 }

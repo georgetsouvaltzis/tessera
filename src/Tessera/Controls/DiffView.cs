@@ -7,34 +7,26 @@ using Tessera.Styles;
 namespace Tessera.Controls;
 
 /// <summary>
-/// Represents a scrollable line-level text diff viewer.
+///     Represents a scrollable line-level text diff viewer.
 /// </summary>
 public sealed class DiffView : Control
 {
     private readonly List<DiffLineEntry> _entries = [];
-    private int _selectedIndex;
     private int _scrollOffset;
+    private int _selectedIndex;
 
     /// <summary>
-    /// Gets or sets the optional title shown in the border.
+    ///     Gets or sets the optional title shown in the border.
     /// </summary>
-    public string Title
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = "Diff";
+    public string Title { get; set; } = "Diff";
 
     /// <summary>
-    /// Gets or sets the marker shown in the title when the control is focused.
+    ///     Gets or sets the marker shown in the title when the control is focused.
     /// </summary>
-    public string FocusMarker
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = "*";
+    public string FocusMarker { get; set; } = "*";
 
     /// <summary>
-    /// Gets or sets a value indicating whether the focus marker should be shown in the title.
+    ///     Gets or sets a value indicating whether the focus marker should be shown in the title.
     /// </summary>
     public bool ShowFocusMarker
     {
@@ -43,7 +35,7 @@ public sealed class DiffView : Control
     } = true;
 
     /// <summary>
-    /// Gets or sets the title style used when the control is not focused.
+    ///     Gets or sets the title style used when the control is not focused.
     /// </summary>
     public TesseraStyle TitleStyle
     {
@@ -52,7 +44,7 @@ public sealed class DiffView : Control
     } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the title style used when the control is focused.
+    ///     Gets or sets the title style used when the control is focused.
     /// </summary>
     public TesseraStyle FocusedTitleStyle
     {
@@ -61,7 +53,7 @@ public sealed class DiffView : Control
     } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the style applied to border glyphs when the control is not focused.
+    ///     Gets or sets the style applied to border glyphs when the control is not focused.
     /// </summary>
     public TesseraStyle BorderStyleText
     {
@@ -70,7 +62,7 @@ public sealed class DiffView : Control
     } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the style applied to border glyphs when the control is focused.
+    ///     Gets or sets the style applied to border glyphs when the control is focused.
     /// </summary>
     public TesseraStyle FocusedBorderStyleText
     {
@@ -79,7 +71,7 @@ public sealed class DiffView : Control
     } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the border style.
+    ///     Gets or sets the border style.
     /// </summary>
     public BorderStyle Border
     {
@@ -88,7 +80,7 @@ public sealed class DiffView : Control
     } = BorderStyle.SingleLine;
 
     /// <summary>
-    /// Gets or sets inner padding.
+    ///     Gets or sets inner padding.
     /// </summary>
     public Thickness Padding
     {
@@ -97,7 +89,7 @@ public sealed class DiffView : Control
     }
 
     /// <summary>
-    /// Gets or sets the visual diff mode.
+    ///     Gets or sets the visual diff mode.
     /// </summary>
     public DiffViewMode Mode
     {
@@ -106,18 +98,18 @@ public sealed class DiffView : Control
     } = DiffViewMode.Inline;
 
     /// <summary>
-    /// Gets the computed line-level entries.
+    ///     Gets the computed line-level entries.
     /// </summary>
     public IReadOnlyList<DiffLineEntry> Entries => _entries;
 
     /// <summary>
-    /// Gets the selected entry index.
-    /// Returns <c>-1</c> when no entries are available.
+    ///     Gets the selected entry index.
+    ///     Returns <c>-1</c> when no entries are available.
     /// </summary>
     public int SelectedIndex => _entries.Count == 0 ? -1 : _selectedIndex;
 
     /// <summary>
-    /// Gets or sets the header row style.
+    ///     Gets or sets the header row style.
     /// </summary>
     public TesseraStyle HeaderStyle
     {
@@ -126,7 +118,7 @@ public sealed class DiffView : Control
     } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the style for added entries.
+    ///     Gets or sets the style for added entries.
     /// </summary>
     public TesseraStyle AddedLineStyle
     {
@@ -135,7 +127,7 @@ public sealed class DiffView : Control
     } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the style for removed entries.
+    ///     Gets or sets the style for removed entries.
     /// </summary>
     public TesseraStyle RemovedLineStyle
     {
@@ -144,7 +136,7 @@ public sealed class DiffView : Control
     } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the style for unchanged entries.
+    ///     Gets or sets the style for unchanged entries.
     /// </summary>
     public TesseraStyle UnchangedLineStyle
     {
@@ -153,7 +145,7 @@ public sealed class DiffView : Control
     } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the style merged into the selected entry.
+    ///     Gets or sets the style merged into the selected entry.
     /// </summary>
     public TesseraStyle SelectedLineStyle
     {
@@ -183,19 +175,19 @@ public sealed class DiffView : Control
     }
 
     /// <summary>
-    /// Replaces old/new content and recalculates line-level entries.
+    ///     Replaces old/new content and recalculates line-level entries.
     /// </summary>
     /// <param name="oldText">Original content.</param>
     /// <param name="newText">Updated content.</param>
     public void SetTexts(string oldText, string newText)
     {
-        var oldLines = ControlTextLayout.SplitLines(oldText ?? string.Empty);
-        var newLines = ControlTextLayout.SplitLines(newText ?? string.Empty);
+        var oldLines = ControlTextLayout.SplitLines(oldText);
+        var newLines = ControlTextLayout.SplitLines(newText);
         RebuildEntries(oldLines, newLines);
     }
 
     /// <summary>
-    /// Toggles between <see cref="DiffViewMode.Inline"/> and <see cref="DiffViewMode.SideBySide"/>.
+    ///     Toggles between <see cref="DiffViewMode.Inline" /> and <see cref="DiffViewMode.SideBySide" />.
     /// </summary>
     public void ToggleMode()
     {
@@ -349,7 +341,7 @@ public sealed class DiffView : Control
             var raw = Mode == DiffViewMode.Inline
                 ? FormatInline(entry)
                 : DiffViewHelpers.FormatSideBySide(entry, content.Width);
-            var style = ResolveEntryStyle(entry.Kind, selected: index == _selectedIndex);
+            var style = ResolveEntryStyle(entry.Kind, index == _selectedIndex);
             canvas.WriteText(content.X, content.Y + row + 1, ApplyStyle(raw, style), content.Width);
         }
     }
@@ -434,7 +426,7 @@ public sealed class DiffView : Control
         {
             DiffLineKind.Added => $"+ {entry.NewLineNumber,4} {entry.NewText}",
             DiffLineKind.Removed => $"- {entry.OldLineNumber,4} {entry.OldText}",
-            _ => $"  {entry.OldLineNumber,4} {entry.OldText}",
+            _ => $"  {entry.OldLineNumber,4} {entry.OldText}"
         };
     }
 
@@ -444,7 +436,7 @@ public sealed class DiffView : Control
         {
             DiffLineKind.Added => AddedLineStyle,
             DiffLineKind.Removed => RemovedLineStyle,
-            _ => UnchangedLineStyle,
+            _ => UnchangedLineStyle
         };
 
         return selected ? style.Merge(SelectedLineStyle) : style;

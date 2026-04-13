@@ -62,11 +62,13 @@ internal sealed class GitRepoHeaderControl : Control
                 content,
                 1,
                 $"{Render(PathStyle, RepositoryPath)}  {Render(MetaStyle, $"{RemoteName}  ahead {Ahead:00}  behind {Behind:00}")}");
-            WriteLine(canvas, summaryContent, 0, $"{Render(HighlightStyle, "Last move")}  {Render(ActionStyle, LastAction)}");
+            WriteLine(canvas, summaryContent, 0,
+                $"{Render(HighlightStyle, "Last move")}  {Render(ActionStyle, LastAction)}");
             if (summaryContent.Height > 1)
             {
                 WriteLine(canvas, summaryContent, 1, Render(DetailStyle, LastActionDetail));
             }
+
             return;
         }
 
@@ -83,6 +85,7 @@ internal sealed class GitRepoHeaderControl : Control
                 1,
                 $"{Render(ActionStyle, LastAction)}  {Render(MetaStyle, $"{RemoteName} +{Ahead}/-{Behind}")}");
         }
+
         if (content.Height > 2)
         {
             WriteLine(canvas, content, 2, Render(DetailStyle, LastActionDetail));
@@ -99,5 +102,8 @@ internal sealed class GitRepoHeaderControl : Control
         canvas.WriteText(content.X, content.Y + row, text, content.Width);
     }
 
-    private static string Render(TesseraStyle style, string text) => style.IsEmpty ? text : style.Render(text);
+    private static string Render(TesseraStyle style, string text)
+    {
+        return style.IsEmpty ? text : style.Render(text);
+    }
 }

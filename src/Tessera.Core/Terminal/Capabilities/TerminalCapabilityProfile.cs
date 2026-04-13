@@ -3,7 +3,7 @@ using System.ComponentModel;
 namespace Tessera.Core.Terminal.Capabilities;
 
 /// <summary>
-/// Describes terminal capabilities discovered or assumed for the current session.
+///     Describes terminal capabilities discovered or assumed for the current session.
 /// </summary>
 /// <param name="FocusReporting">Whether focus-in and focus-out reports are available.</param>
 /// <param name="MouseReporting">Whether mouse reporting is available.</param>
@@ -25,7 +25,7 @@ public sealed record TerminalCapabilityProfile(
     string Source = "assumed-supported")
 {
     /// <summary>
-    /// Gets a capability profile where all currently modeled capabilities are available.
+    ///     Gets a capability profile where all currently modeled capabilities are available.
     /// </summary>
     public static TerminalCapabilityProfile AllSupported { get; } = new();
 }

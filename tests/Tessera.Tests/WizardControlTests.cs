@@ -19,17 +19,17 @@ public sealed class WizardControlTests
             ShowStepNumbers = true,
             ActiveMarker = ">",
             CompletedMarker = "✓",
-            PendingMarker = "·",
+            PendingMarker = "·"
         };
         wizard.SetSteps(
         [
-            new WizardStep("account", "Account", "Create credentials", isCompleted: true),
+            new WizardStep("account", "Account", "Create credentials", true),
             new WizardStep("profile", "Profile", "Fill profile"),
-            new WizardStep("confirm", "Confirm", "Review and submit"),
+            new WizardStep("confirm", "Confirm", "Review and submit")
         ]);
         _ = wizard.SelectStep(1);
 
-        var output = Render(wizard, width: 96, height: 6);
+        var output = Render(wizard, 96, 6);
 
         Assert.That(output.Contains("✓ 1. Account - Create credentials", StringComparison.Ordinal), Is.True);
         Assert.That(output.Contains("> 2. Profile - Fill profile", StringComparison.Ordinal), Is.True);
@@ -39,18 +39,13 @@ public sealed class WizardControlTests
     [Test]
     public void ControlsWizardKeyboardAndPointerNavigationRaisesStepChanged()
     {
-        var wizard = new Wizard
-        {
-            Border = BorderStyle.None,
-            Title = string.Empty,
-            IsFocused = true,
-        };
+        var wizard = new Wizard { Border = BorderStyle.None, Title = string.Empty, IsFocused = true };
         wizard.SetSteps(
         [
             new WizardStep("a", "Account"),
             new WizardStep("b", "Profile"),
             new WizardStep("c", "Confirm", isDisabled: true),
-            new WizardStep("d", "Done"),
+            new WizardStep("d", "Done")
         ]);
 
         var raised = 0;
@@ -82,23 +77,19 @@ public sealed class WizardControlTests
     [Test]
     public void ControlsWizardDefaultRenderIsDeterministicAndMonochrome()
     {
-        var wizard = new Wizard
-        {
-            Border = BorderStyle.None,
-            Title = string.Empty,
-        };
+        var wizard = new Wizard { Border = BorderStyle.None, Title = string.Empty };
         wizard.SetSteps(
         [
             new WizardStep("a", "Account"),
             new WizardStep("b", "Profile"),
-            new WizardStep("c", "Confirm"),
+            new WizardStep("c", "Confirm")
         ]);
 
-        var first = Render(wizard, width: 80, height: 5);
-        var second = Render(wizard, width: 80, height: 5);
+        var first = Render(wizard, 80, 5);
+        var second = Render(wizard, 80, 5);
 
         Assert.That(first, Is.EqualTo(second));
-        Assert.That(first.Contains("\u001b[", StringComparison.Ordinal), Is.False);
+        Assert.That(first.Contains("\e[", StringComparison.Ordinal), Is.False);
     }
 
     [Test]
@@ -112,17 +103,17 @@ public sealed class WizardControlTests
             ActiveStepStyle = TesseraStyle.Empty.WithBold(),
             FocusedActiveStepStyle = TesseraStyle.Empty.WithUnderline(),
             HoveredStepStyle = TesseraStyle.Empty.WithBackground(AnsiColor.Rgb(10, 20, 30)),
-            CompletedStepStyle = TesseraStyle.Empty.WithForeground(AnsiColor.Rgb(31, 32, 33)),
+            CompletedStepStyle = TesseraStyle.Empty.WithForeground(AnsiColor.Rgb(31, 32, 33))
         };
         wizard.SetSteps(
         [
             new WizardStep("a", "Account", isCompleted: true),
-            new WizardStep("b", "Profile"),
+            new WizardStep("b", "Profile")
         ]);
         _ = wizard.SelectStep(1);
         _ = wizard.Handle(new PointerInput(PointerEventKind.Motion, PointerButton.None, 2, 0), new Rect(0, 0, 80, 5));
 
-        var output = Render(wizard, width: 80, height: 5);
+        var output = Render(wizard, 80, 5);
         Assert.That(output.Contains("38;2;31;32;33", StringComparison.Ordinal), Is.True);
         Assert.That(output.Contains("48;2;10;20;30", StringComparison.Ordinal), Is.True);
         Assert.That(ContainsSgrParameter(output, "1"), Is.True);
@@ -141,7 +132,7 @@ public sealed class WizardControlTests
         var startIndex = 0;
         while (startIndex < text.Length)
         {
-            var escapeIndex = text.IndexOf("\u001b[", startIndex, StringComparison.Ordinal);
+            var escapeIndex = text.IndexOf("\e[", startIndex, StringComparison.Ordinal);
             if (escapeIndex < 0)
             {
                 return false;

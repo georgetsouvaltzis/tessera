@@ -1,5 +1,5 @@
-using Tessera.Core.Abstractions;
 using System.Text;
+using Tessera.Core.Abstractions;
 using Tessera.Core.Messages;
 using Tessera.Core.Rendering;
 using Tessera.Core.Terminal;
@@ -74,7 +74,8 @@ internal sealed class TesseraCapabilityProbe
         }
     }
 
-    public bool HandleTimeout(CapabilityProbeTimeoutMsg timeout, ref TerminalCapabilityProfile runtimeCapabilities, IProgramRenderer? renderer, Action<IMessage> send)
+    public bool HandleTimeout(CapabilityProbeTimeoutMsg timeout, ref TerminalCapabilityProfile runtimeCapabilities,
+        IProgramRenderer? renderer, Action<IMessage> send)
     {
         if (_state is null || _state.Id != timeout.ProbeId)
         {
@@ -98,11 +99,7 @@ internal sealed class TesseraCapabilityProbe
                 source += "+probe-timeout";
             }
 
-            runtimeCapabilities = runtimeCapabilities with
-            {
-                ModeReports = false,
-                Source = source,
-            };
+            runtimeCapabilities = runtimeCapabilities with { ModeReports = false, Source = source };
             renderer?.UpdateCapabilities(runtimeCapabilities);
             send(new TerminalCapabilitiesMsg(runtimeCapabilities));
             return true;
@@ -120,7 +117,7 @@ internal sealed class TesseraCapabilityProbe
                 1006 => next,
                 2004 => next with { BracketedPaste = false },
                 2026 => next with { SynchronizedUpdates = false },
-                _ => next,
+                _ => next
             };
         }
 
@@ -141,7 +138,8 @@ internal sealed class TesseraCapabilityProbe
         return true;
     }
 
-    public static bool TryApplyModeReport(TerminalCapabilityProfile current, ModeReportMsg report, out TerminalCapabilityProfile next)
+    public static bool TryApplyModeReport(TerminalCapabilityProfile current, ModeReportMsg report,
+        out TerminalCapabilityProfile next)
     {
         next = current;
         if (!TryClassifyModeReportState(report.State, out var supported, out var enabled))
@@ -170,7 +168,7 @@ internal sealed class TesseraCapabilityProbe
             1006 => current with { MouseReporting = supported || current.MouseReporting, ModeReports = true },
             2004 => current with { BracketedPaste = supported, ModeReports = true },
             2026 => current with { SynchronizedUpdates = supported, ModeReports = true },
-            _ => current,
+            _ => current
         };
 
         var source = updated.Source;
@@ -199,7 +197,8 @@ internal sealed class TesseraCapabilityProbe
         return next != current;
     }
 
-    public static bool TryRefineColorProfile(TerminalColorProfile current, CapabilityMsg capability, out TerminalColorProfile next)
+    public static bool TryRefineColorProfile(TerminalColorProfile current, CapabilityMsg capability,
+        out TerminalColorProfile next)
     {
         next = current;
         if (!string.Equals(capability.Name, "RGB", StringComparison.OrdinalIgnoreCase)
@@ -210,10 +209,10 @@ internal sealed class TesseraCapabilityProbe
 
         var value = (capability.Value ?? string.Empty).Trim();
         var enabled = value.Length == 0
-            || value == "1"
-            || value.Equals("true", StringComparison.OrdinalIgnoreCase)
-            || value.Equals("yes", StringComparison.OrdinalIgnoreCase)
-            || value.Equals("on", StringComparison.OrdinalIgnoreCase);
+                      || value == "1"
+                      || value.Equals("true", StringComparison.OrdinalIgnoreCase)
+                      || value.Equals("yes", StringComparison.OrdinalIgnoreCase)
+                      || value.Equals("on", StringComparison.OrdinalIgnoreCase);
         if (!enabled || current == TerminalColorProfile.TrueColor)
         {
             return false;
@@ -223,7 +222,8 @@ internal sealed class TesseraCapabilityProbe
         return true;
     }
 
-    private static async Task SendQueriesAsync(ITerminalAdapter terminal, IReadOnlyList<int> modes, CancellationToken token)
+    private static async Task SendQueriesAsync(ITerminalAdapter terminal, IReadOnlyList<int> modes,
+        CancellationToken token)
     {
         if (modes.Count == 0)
         {
@@ -233,7 +233,7 @@ internal sealed class TesseraCapabilityProbe
         var sequence = new StringBuilder(modes.Count * 10);
         foreach (var mode in modes)
         {
-            sequence.Append("\u001b[?");
+            sequence.Append("\e[?");
             sequence.Append(mode);
             sequence.Append("$p");
         }

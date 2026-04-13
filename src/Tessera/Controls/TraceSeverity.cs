@@ -1,32 +1,32 @@
 namespace Tessera.Controls;
 
 /// <summary>
-/// Identifies severity for a <see cref="TraceEntry" />.
+///     Identifies severity for a <see cref="TraceEntry" />.
 /// </summary>
 public enum TraceSeverity
 {
     /// <summary>
-    /// Verbose diagnostic output.
+    ///     Verbose diagnostic output.
     /// </summary>
     Verbose = 0,
 
     /// <summary>
-    /// Informational trace entry.
+    ///     Informational trace entry.
     /// </summary>
     Info = 1,
 
     /// <summary>
-    /// Warning trace entry.
+    ///     Warning trace entry.
     /// </summary>
     Warning = 2,
 
     /// <summary>
-    /// Error trace entry.
+    ///     Error trace entry.
     /// </summary>
     Error = 3,
 
     /// <summary>
-    /// Critical trace entry.
+    ///     Critical trace entry.
     /// </summary>
-    Critical = 4,
+    Critical = 4
 }

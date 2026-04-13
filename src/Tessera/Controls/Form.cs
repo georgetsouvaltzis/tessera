@@ -10,72 +10,36 @@ namespace Tessera.Controls;
 public sealed class Form : Control
 {
     private readonly List<FormField> _fields = [];
-    private int _selectedIndex = -1;
     private int _hoveredIndex = -1;
-    private int _scrollOffset;
     private int _lastViewportRows = 8;
-
-    /// <summary>Occurs when selected field changes.</summary>
-    public event EventHandler<ListSelectionChangedEventArgs<FormField>>? SelectionChanged;
+    private int _scrollOffset;
 
     /// <summary>Gets or sets form title text.</summary>
-    public string Title
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = "Form";
+    public string Title { get; set; } = "Form";
 
-    /// <summary>Gets or sets prefix rendered before <see cref="Title"/>.</summary>
-    public string TitlePrefix
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = string.Empty;
+    /// <summary>Gets or sets prefix rendered before <see cref="Title" />.</summary>
+    public string TitlePrefix { get; set; } = string.Empty;
 
-    /// <summary>Gets or sets suffix rendered after <see cref="Title"/>.</summary>
-    public string TitleSuffix
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = string.Empty;
+    /// <summary>Gets or sets suffix rendered after <see cref="Title" />.</summary>
+    public string TitleSuffix { get; set; } = string.Empty;
 
     /// <summary>Gets or sets marker appended to title while focused.</summary>
-    public string FocusMarker
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = "*";
+    public string FocusMarker { get; set; } = "*";
 
     /// <summary>Gets or sets whether focus marker is shown while focused.</summary>
     public bool ShowFocusMarker { get; set; } = true;
 
     /// <summary>Gets or sets selected-row marker.</summary>
-    public string SelectedMarker
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = ">";
+    public string SelectedMarker { get; set; } = ">";
 
     /// <summary>Gets or sets unselected-row marker.</summary>
-    public string UnselectedMarker
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = " ";
+    public string UnselectedMarker { get; set; } = " ";
 
     /// <summary>Gets or sets required-field marker.</summary>
-    public string RequiredMarker
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = "*";
+    public string RequiredMarker { get; set; } = "*";
 
     /// <summary>Gets or sets empty-state text.</summary>
-    public string EmptyText
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = "(no fields)";
+    public string EmptyText { get; set; } = "(no fields)";
 
     /// <summary>Gets or sets border style.</summary>
     public BorderStyle Border { get; set; } = BorderStyle.SingleLine;
@@ -123,10 +87,11 @@ public sealed class Form : Control
     public IReadOnlyList<FormField> Fields => _fields;
 
     /// <summary>Gets selected field index, or <c>-1</c> when empty.</summary>
-    public int SelectedIndex => _selectedIndex;
+    public int SelectedIndex { get; private set; } = -1;
 
     /// <summary>Gets selected field, if any.</summary>
-    public FormField? SelectedField => _selectedIndex >= 0 && _selectedIndex < _fields.Count ? _fields[_selectedIndex] : null;
+    public FormField? SelectedField =>
+        SelectedIndex >= 0 && SelectedIndex < _fields.Count ? _fields[SelectedIndex] : null;
 
     /// <inheritdoc />
     public override bool IsFocused { get; set; }
@@ -137,6 +102,9 @@ public sealed class Form : Control
     /// <inheritdoc />
     public override bool IsReadOnly { get; set; }
 
+    /// <summary>Occurs when selected field changes.</summary>
+    public event EventHandler<ListSelectionChangedEventArgs<FormField>>? SelectionChanged;
+
     /// <summary>Replaces all form fields.</summary>
     /// <param name="fields">Fields in visual order.</param>
     public void SetFields(IEnumerable<FormField> fields)
@@ -145,10 +113,11 @@ public sealed class Form : Control
         _fields.Clear();
         foreach (var field in fields.Where(static field => field is not null))
         {
-            _fields.Add(new FormField(field.Name, field.Label, field.Value, field.HelperText, field.IsRequired, field.IsDisabled));
+            _fields.Add(new FormField(field.Name, field.Label, field.Value, field.HelperText, field.IsRequired,
+                field.IsDisabled));
         }
 
-        _selectedIndex = ResolveFirstSelectable();
+        SelectedIndex = ResolveFirstSelectable();
         _hoveredIndex = -1;
         _scrollOffset = 0;
     }
@@ -161,12 +130,36 @@ public sealed class Form : Control
             return false;
         }
 
-        if (key.Is(Key.Down) || key.IsCharacter('j')) return MoveSelection(+1);
-        if (key.Is(Key.Up) || key.IsCharacter('k')) return MoveSelection(-1);
-        if (key.Is(Key.PageDown)) return MoveByViewport(+1);
-        if (key.Is(Key.PageUp)) return MoveByViewport(-1);
-        if (key.Is(Key.Home)) return SetSelectedIndex(ResolveFirstSelectable());
-        if (key.Is(Key.End)) return SetSelectedIndex(ResolveLastSelectable());
+        if (key.Is(Key.Down) || key.IsCharacter('j'))
+        {
+            return MoveSelection(+1);
+        }
+
+        if (key.Is(Key.Up) || key.IsCharacter('k'))
+        {
+            return MoveSelection(-1);
+        }
+
+        if (key.Is(Key.PageDown))
+        {
+            return MoveByViewport(+1);
+        }
+
+        if (key.Is(Key.PageUp))
+        {
+            return MoveByViewport(-1);
+        }
+
+        if (key.Is(Key.Home))
+        {
+            return SetSelectedIndex(ResolveFirstSelectable());
+        }
+
+        if (key.Is(Key.End))
+        {
+            return SetSelectedIndex(ResolveLastSelectable());
+        }
+
         return false;
     }
 
@@ -186,8 +179,16 @@ public sealed class Form : Control
 
         if (pointer.Kind == PointerEventKind.Wheel)
         {
-            if (pointer.Button == PointerButton.WheelDown) return MoveSelection(+1);
-            if (pointer.Button == PointerButton.WheelUp) return MoveSelection(-1);
+            if (pointer.Button == PointerButton.WheelDown)
+            {
+                return MoveSelection(+1);
+            }
+
+            if (pointer.Button == PointerButton.WheelUp)
+            {
+                return MoveSelection(-1);
+            }
+
             return false;
         }
 
@@ -255,7 +256,7 @@ public sealed class Form : Control
         for (var row = 0; row < visibleRows; row++)
         {
             var index = _scrollOffset + row;
-            var rowText = FormatFieldRow(_fields[index], selected: index == _selectedIndex);
+            var rowText = FormatFieldRow(_fields[index], index == SelectedIndex);
             canvas.WriteText(content.X, content.Y + row, rowText, content.Width);
         }
     }
@@ -266,7 +267,7 @@ public sealed class Form : Control
         var width = Math.Max(24, ControlTextLayout.MeasureDisplayWidth(MeasureTitle()) + 6);
         for (var i = 0; i < _fields.Count; i++)
         {
-            width = Math.Max(width, ControlTextLayout.MeasureDisplayWidth(FormatFieldRow(_fields[i], selected: true)));
+            width = Math.Max(width, ControlTextLayout.MeasureDisplayWidth(FormatFieldRow(_fields[i], true)));
         }
 
         var height = Math.Max(3, _fields.Count + 2);
@@ -288,7 +289,7 @@ public sealed class Form : Control
             ? ApplyStyle(RequiredMarker, ResolveRequiredStyle(selected, field.IsDisabled))
             : string.Empty;
 
-        var rowStyle = ResolveRowStyle(selected ? _selectedIndex : -1, field.IsDisabled);
+        var rowStyle = ResolveRowStyle(selected ? SelectedIndex : -1, field.IsDisabled);
         var label = ApplyStyle($"{field.Label}{required}", LabelStyle.Merge(rowStyle));
         var value = ApplyStyle(field.Value, ValueStyle.Merge(rowStyle));
         var markerText = ApplyStyle(marker, rowStyle);
@@ -302,16 +303,25 @@ public sealed class Form : Control
             return false;
         }
 
-        var index = _selectedIndex;
+        var index = SelectedIndex;
         if (index < 0)
         {
             index = direction > 0 ? -1 : _fields.Count;
         }
+
         for (var i = 0; i < _fields.Count; i++)
         {
             index += direction;
-            if (index < 0) index = _fields.Count - 1;
-            if (index >= _fields.Count) index = 0;
+            if (index < 0)
+            {
+                index = _fields.Count - 1;
+            }
+
+            if (index >= _fields.Count)
+            {
+                index = 0;
+            }
+
             if (!_fields[index].IsDisabled)
             {
                 return SetSelectedIndex(index);
@@ -324,22 +334,24 @@ public sealed class Form : Control
     private bool MoveByViewport(int direction)
     {
         var step = Math.Max(1, _lastViewportRows - 1);
-        var target = (_selectedIndex < 0 ? 0 : _selectedIndex) + (direction * step);
+        var target = (SelectedIndex < 0 ? 0 : SelectedIndex) + direction * step;
         return SetSelectedIndex(Math.Clamp(target, 0, _fields.Count - 1)) || MoveSelection(direction);
     }
 
     private bool SetSelectedIndex(int index)
     {
-        if (index < 0 || index >= _fields.Count || _fields[index].IsDisabled || _selectedIndex == index)
+        if (index < 0 || index >= _fields.Count || _fields[index].IsDisabled || SelectedIndex == index)
         {
             return false;
         }
 
-        var previousIndex = _selectedIndex;
+        var previousIndex = SelectedIndex;
         var previousItem = SelectedField;
-        _selectedIndex = index;
+        SelectedIndex = index;
         EnsureSelectionVisible(_lastViewportRows);
-        SelectionChanged?.Invoke(this, new ListSelectionChangedEventArgs<FormField>(previousIndex, _selectedIndex, previousItem, _fields[_selectedIndex]));
+        SelectionChanged?.Invoke(this,
+            new ListSelectionChangedEventArgs<FormField>(previousIndex, SelectedIndex, previousItem,
+                _fields[SelectedIndex]));
         return true;
     }
 
@@ -358,7 +370,10 @@ public sealed class Form : Control
     {
         for (var i = 0; i < _fields.Count; i++)
         {
-            if (!_fields[i].IsDisabled) return i;
+            if (!_fields[i].IsDisabled)
+            {
+                return i;
+            }
         }
 
         return -1;
@@ -368,7 +383,10 @@ public sealed class Form : Control
     {
         for (var i = _fields.Count - 1; i >= 0; i--)
         {
-            if (!_fields[i].IsDisabled) return i;
+            if (!_fields[i].IsDisabled)
+            {
+                return i;
+            }
         }
 
         return -1;
@@ -376,22 +394,22 @@ public sealed class Form : Control
 
     private void EnsureSelectionVisible(int viewportHeight)
     {
-        if (_selectedIndex < 0 || _fields.Count == 0)
+        if (SelectedIndex < 0 || _fields.Count == 0)
         {
             _scrollOffset = 0;
             return;
         }
 
         var viewport = Math.Max(1, viewportHeight);
-        if (_selectedIndex < _scrollOffset)
+        if (SelectedIndex < _scrollOffset)
         {
-            _scrollOffset = _selectedIndex;
+            _scrollOffset = SelectedIndex;
             return;
         }
 
-        if (_selectedIndex >= _scrollOffset + viewport)
+        if (SelectedIndex >= _scrollOffset + viewport)
         {
-            _scrollOffset = _selectedIndex - viewport + 1;
+            _scrollOffset = SelectedIndex - viewport + 1;
         }
     }
 
@@ -403,10 +421,13 @@ public sealed class Form : Control
             style = style.Merge(HoveredRowStyle);
         }
 
-        if (index >= 0 && index == _selectedIndex)
+        if (index >= 0 && index == SelectedIndex)
         {
             style = style.Merge(SelectedRowStyle);
-            if (IsFocused) style = style.Merge(FocusedSelectedRowStyle);
+            if (IsFocused)
+            {
+                style = style.Merge(FocusedSelectedRowStyle);
+            }
         }
 
         if (fieldDisabled || IsDisabled)
@@ -419,7 +440,7 @@ public sealed class Form : Control
 
     private TesseraStyle ResolveRequiredStyle(bool selected, bool fieldDisabled)
     {
-        var index = selected ? _selectedIndex : -1;
+        var index = selected ? SelectedIndex : -1;
         return RequiredMarkerStyle.Merge(ResolveRowStyle(index, fieldDisabled));
     }
 
@@ -429,12 +450,19 @@ public sealed class Form : Control
         return IsDisabled ? style.Merge(DisabledStyle) : style;
     }
 
-    private TesseraStyle ResolveEmptyStyle() => IsDisabled ? EmptyStyle.Merge(DisabledStyle) : EmptyStyle;
+    private TesseraStyle ResolveEmptyStyle()
+    {
+        return IsDisabled ? EmptyStyle.Merge(DisabledStyle) : EmptyStyle;
+    }
 
     private string RenderTitle()
     {
         var style = IsFocused ? FocusedTitleStyle : TitleStyle;
-        if (IsDisabled) style = style.Merge(DisabledStyle);
+        if (IsDisabled)
+        {
+            style = style.Merge(DisabledStyle);
+        }
+
         return ApplyStyle(MeasureTitle(), style);
     }
 
@@ -446,5 +474,8 @@ public sealed class Form : Control
             : title;
     }
 
-    private static string ApplyStyle(string value, TesseraStyle style) => style.IsEmpty ? value : style.Render(value);
+    private static string ApplyStyle(string value, TesseraStyle style)
+    {
+        return style.IsEmpty ? value : style.Render(value);
+    }
 }

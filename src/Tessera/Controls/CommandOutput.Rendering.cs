@@ -77,7 +77,7 @@ public sealed partial class CommandOutput
             style = style.Merge(HoveredLineStyle);
         }
 
-        if (lineIndex == _selectedIndex)
+        if (lineIndex == SelectedIndex)
         {
             style = style.Merge(SelectedLineStyle);
             if (IsFocused)
@@ -100,7 +100,7 @@ public sealed partial class CommandOutput
         {
             CommandOutputChannel.StdErr => StdErrStyle,
             CommandOutputChannel.System => SystemStyle,
-            _ => StdOutStyle,
+            _ => StdOutStyle
         };
     }
 
@@ -110,7 +110,7 @@ public sealed partial class CommandOutput
         {
             CommandOutputChannel.StdErr => "ERR",
             CommandOutputChannel.System => "SYS",
-            _ => "OUT",
+            _ => "OUT"
         };
         var payload = $"{channel} {line.Text}";
         if (!ShowTimestamp)

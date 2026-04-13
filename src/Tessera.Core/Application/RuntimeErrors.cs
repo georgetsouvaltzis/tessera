@@ -1,12 +1,12 @@
 namespace Tessera.Core.Application;
 
 /// <summary>
-/// Thrown when the Tessera runtime loop is interrupted before completing normally.
+///     Thrown when the Tessera runtime loop is interrupted before completing normally.
 /// </summary>
 public sealed class TesseraRuntimeInterruptedException : Exception
 {
     /// <summary>
-    /// Initializes the exception with the default interruption message.
+    ///     Initializes the exception with the default interruption message.
     /// </summary>
     public TesseraRuntimeInterruptedException()
         : base("Runtime interrupted.")
@@ -14,7 +14,7 @@ public sealed class TesseraRuntimeInterruptedException : Exception
     }
 
     /// <summary>
-    /// Initializes the exception with a custom interruption message.
+    ///     Initializes the exception with a custom interruption message.
     /// </summary>
     /// <param name="message">The message that describes the interruption.</param>
     public TesseraRuntimeInterruptedException(string message)
@@ -23,7 +23,7 @@ public sealed class TesseraRuntimeInterruptedException : Exception
     }
 
     /// <summary>
-    /// Initializes the exception with a custom message and inner exception.
+    ///     Initializes the exception with a custom message and inner exception.
     /// </summary>
     /// <param name="message">The message that describes the interruption.</param>
     /// <param name="innerException">The underlying cause of the interruption.</param>

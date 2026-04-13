@@ -169,7 +169,7 @@ public sealed partial class ToastCenter
 
     private int ComputeWindowStart(int rowCapacity)
     {
-        return Math.Clamp(_selectedIndex - (rowCapacity / 2), 0, Math.Max(0, _items.Count - rowCapacity));
+        return Math.Clamp(_selectedIndex - rowCapacity / 2, 0, Math.Max(0, _items.Count - rowCapacity));
     }
 
     private int ResolveRowCapacity(int contentHeight)

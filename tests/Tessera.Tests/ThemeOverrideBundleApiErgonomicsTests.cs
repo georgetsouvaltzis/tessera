@@ -14,7 +14,7 @@ public sealed class ThemeOverrideBundleApiErgonomicsTests
     {
         var theme = TesseraThemes.Catppuccin(CatppuccinVariant.Macchiato);
 
-        var bundle = TesseraThemeOverrideBundle.CreateDashboardBundle(theme, focusMarker: "◆");
+        var bundle = TesseraThemeOverrideBundle.CreateDashboardBundle(theme, "◆");
 
         Assert.That(bundle.Theme, Is.SameAs(theme));
         Assert.That(bundle.FocusMarker, Is.EqualTo("◆"));
@@ -32,7 +32,7 @@ public sealed class ThemeOverrideBundleApiErgonomicsTests
     public void ThemeApiErgonomicsListViewTableNotificationsLogViewApplyDashboardOverridesSetExpectedProperties()
     {
         var theme = TesseraThemes.RosePine(RosePineVariant.Moon);
-        var bundle = TesseraThemeOverrideBundle.CreateDashboardBundle(theme, focusMarker: "◆");
+        var bundle = TesseraThemeOverrideBundle.CreateDashboardBundle(theme, "◆");
 
         var listView = new ListView<string>(static value => value);
         var table = new Table("Name");
@@ -96,39 +96,31 @@ public sealed class ThemeOverrideBundleApiErgonomicsTests
     public void ThemeApiErgonomicsButtonDashboardOverridesLeaveButtonsBorderless()
     {
         var theme = TesseraThemes.Catppuccin(CatppuccinVariant.Macchiato);
-        var bundle = TesseraThemeOverrideBundle.CreateDashboardBundle(theme, focusMarker: "◆");
-        var button = new Button
-        {
-            Text = "Launch",
-        };
+        var bundle = TesseraThemeOverrideBundle.CreateDashboardBundle(theme, "◆");
+        var button = new Button { Text = "Launch" };
 
         button.ApplyDashboardOverrides(bundle);
 
-        Assert.That(button.Padding, Is.EqualTo(Thickness.Symmetric(1, 0)));
+        Assert.That(button.Padding, Is.EqualTo(Thickness.Symmetric(1)));
     }
 
     [Test]
     public void ThemePublicApiDashboardTableBundleApplyIsDeterministicAcrossRepeatedCalls()
     {
         var theme = TesseraThemes.Catppuccin(CatppuccinVariant.Macchiato);
-        var bundle = TesseraThemeOverrideBundle.CreateDashboardBundle(theme, focusMarker: "◆");
-        var table = new Table("Service", "State")
-        {
-            Border = BorderStyle.Rounded,
-            Title = "Metrics",
-            IsFocused = true,
-        };
+        var bundle = TesseraThemeOverrideBundle.CreateDashboardBundle(theme, "◆");
+        var table = new Table("Service", "State") { Border = BorderStyle.Rounded, Title = "Metrics", IsFocused = true };
         table.SetRows(
         [
             ["api", "Healthy"],
-            ["worker", "Warning"],
+            ["worker", "Warning"]
         ]);
 
         table.ApplyThemeAndDashboardOverrides(bundle);
-        var first = Render(table, width: 64, height: 10);
+        var first = Render(table, 64, 10);
 
         table.ApplyThemeAndDashboardOverrides(bundle);
-        var second = Render(table, width: 64, height: 10);
+        var second = Render(table, 64, 10);
 
         Assert.That(second, Is.EqualTo(first));
     }

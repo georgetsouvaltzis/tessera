@@ -1,4 +1,5 @@
-﻿using Tessera.Components.Primitives;
+using System.Globalization;
+using Tessera.Components.Primitives;
 using Tessera.Controls.Internal;
 using Tessera.Layout;
 using Tessera.Styles;
@@ -6,54 +7,46 @@ using Tessera.Styles;
 namespace Tessera.Controls;
 
 /// <summary>
-/// Represents a gauge-style metric control.
+///     Represents a gauge-style metric control.
 /// </summary>
 /// <remarks>
-/// Values render against the inclusive <see cref="MinValue"/> to <see cref="MaxValue"/> range
-/// and clamp when they fall outside that interval. Equal minimum and maximum values render as a flat range.
+///     Values render against the inclusive <see cref="MinValue" /> to <see cref="MaxValue" /> range
+///     and clamp when they fall outside that interval. Equal minimum and maximum values render as a flat range.
 /// </remarks>
 public sealed class Gauge : Control
 {
     /// <summary>
-    /// Gets or sets the gauge title.
+    ///     Gets or sets the gauge title.
     /// </summary>
-    public string Title
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = "Gauge";
+    public string Title { get; set; } = "Gauge";
 
     /// <summary>
-    /// Gets or sets the marker shown in the title when focused.
+    ///     Gets or sets the marker shown in the title when focused.
     /// </summary>
-    public string FocusMarker
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = "*";
+    public string FocusMarker { get; set; } = "*";
 
     /// <summary>
-    /// Gets or sets whether the focused title marker should be rendered.
+    ///     Gets or sets whether the focused title marker should be rendered.
     /// </summary>
     public bool ShowFocusMarker { get; set; } = true;
 
     /// <summary>
-    /// Gets or sets the title style used when not focused.
+    ///     Gets or sets the title style used when not focused.
     /// </summary>
     public TesseraStyle TitleStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the title style used when focused.
+    ///     Gets or sets the title style used when focused.
     /// </summary>
     public TesseraStyle FocusedTitleStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets style used for the value label text.
+    ///     Gets or sets style used for the value label text.
     /// </summary>
     public TesseraStyle ValueLabelStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the current value.
+    ///     Gets or sets the current value.
     /// </summary>
     public double Value
     {
@@ -62,7 +55,7 @@ public sealed class Gauge : Control
     }
 
     /// <summary>
-    /// Gets or sets the minimum value.
+    ///     Gets or sets the minimum value.
     /// </summary>
     public double MinValue
     {
@@ -71,7 +64,7 @@ public sealed class Gauge : Control
     }
 
     /// <summary>
-    /// Gets or sets the maximum value.
+    ///     Gets or sets the maximum value.
     /// </summary>
     public double MaxValue
     {
@@ -80,7 +73,7 @@ public sealed class Gauge : Control
     } = 100;
 
     /// <summary>
-    /// Gets or sets the optional label shown inside the gauge.
+    ///     Gets or sets the optional label shown inside the gauge.
     /// </summary>
     public string? Label
     {
@@ -106,10 +99,11 @@ public sealed class Gauge : Control
 
         var span = Math.Abs(MaxValue - MinValue) < double.Epsilon ? 1 : MaxValue - MinValue;
         var normalized = Math.Clamp((Value - MinValue) / span, 0, 1);
-        var label = Label ?? Value.ToString("0.##", System.Globalization.CultureInfo.InvariantCulture);
+        var label = Label ?? Value.ToString("0.##", CultureInfo.InvariantCulture);
         label = ApplyStyle(label, ValueLabelStyle);
         var barHeight = Math.Min(content.Height, 2);
-        global::Tessera.Components.Primitives.Widgets.DrawProgressBar(canvas, new Rect(content.X, content.Y, content.Width, barHeight), normalized, label);
+        Components.Primitives.Widgets.DrawProgressBar(canvas, new Rect(content.X, content.Y, content.Width, barHeight),
+            normalized, label);
     }
 
     internal override LayoutMeasurement Measure(in Rect availableBounds)

@@ -22,7 +22,8 @@ public sealed partial class QuickOpenOverlay
         }
 
         var title = BorderStyle == BorderStyle.None ? null : RenderTitle();
-        content = FrameLayout.DrawFrameAndResolveContent(canvas, overlay, title, BorderStyle, Padding, ResolveBorderStyle());
+        content = FrameLayout.DrawFrameAndResolveContent(canvas, overlay, title, BorderStyle, Padding,
+            ResolveBorderStyle());
         if (content.IsEmpty)
         {
             return;
@@ -55,13 +56,14 @@ public sealed partial class QuickOpenOverlay
             var item = _items[_filteredIndices[filteredIndex]];
             var rowStyle = ResolveRowStyle(filteredIndex);
             var marker = ResolveRowMarker(filteredIndex);
-            var hasQuery = _query.Length > 0;
+            var hasQuery = Query.Length > 0;
             var matchMarker = hasQuery
                 ? ApplyStyle(Glyphs.MatchMarker, MatchMarkerStyle.Merge(rowStyle))
                 : string.Empty;
             var summary = BuildSummary(item);
             var line = hasQuery
-                ? string.Concat(marker, Glyphs.MarkerSeparator, matchMarker, Glyphs.MarkerSeparator, ApplyStyle(summary, rowStyle))
+                ? string.Concat(marker, Glyphs.MarkerSeparator, matchMarker, Glyphs.MarkerSeparator,
+                    ApplyStyle(summary, rowStyle))
                 : string.Concat(marker, Glyphs.MarkerSeparator, ApplyStyle(summary, rowStyle));
             canvas.WriteText(content.X, content.Y + 1 + row, line, content.Width);
         }
@@ -70,8 +72,8 @@ public sealed partial class QuickOpenOverlay
     private void RenderQuery(Canvas canvas, Rect content)
     {
         var prompt = string.Concat(Glyphs.QueryPrompt, Glyphs.MarkerSeparator);
-        var visibleText = string.IsNullOrEmpty(_query) ? Placeholder : _query;
-        var queryStyle = string.IsNullOrEmpty(_query) ? PlaceholderStyle : QueryTextStyle;
+        var visibleText = string.IsNullOrEmpty(Query) ? Placeholder : Query;
+        var queryStyle = string.IsNullOrEmpty(Query) ? PlaceholderStyle : QueryTextStyle;
         if (IsDisabled)
         {
             queryStyle = queryStyle.Merge(DisabledStyle);

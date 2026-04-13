@@ -1,5 +1,4 @@
 using System.Diagnostics;
-using System.Text;
 using System.Text.Json;
 using Tessera.Controls;
 using Tessera.Hosting;
@@ -13,10 +12,8 @@ internal static class RuntimeEndToEndRunner
     private const int WarmupCount = 2;
     private const int MeasurementCount = 10;
     private const int InputEventsPerRun = 24;
-    private static readonly JsonSerializerOptions JsonOptions = new()
-    {
-        WriteIndented = true,
-    };
+
+    private static readonly JsonSerializerOptions JsonOptions = new() { WriteIndented = true };
 
     public static bool TryRun(string[] args, out int exitCode)
     {
@@ -85,7 +82,7 @@ internal static class RuntimeEndToEndRunner
             TotalRunP95Ms = ResolveP95(runSamples),
             MeanFlushCount = ResolveMean(flushSamples),
             MeanOutputBytes = ResolveMean(outputByteSamples),
-            DecodedInputsPerRun = decodedInputs,
+            DecodedInputsPerRun = decodedInputs
         };
     }
 
@@ -103,7 +100,7 @@ internal static class RuntimeEndToEndRunner
                 AdaptiveFramePacing = false,
                 MaxFps = 1000,
                 UseConsoleKeyEvents = false,
-                EnableResizeSignals = false,
+                EnableResizeSignals = false
             };
             var hosting = new TesseraHostingOptions
             {
@@ -112,7 +109,7 @@ internal static class RuntimeEndToEndRunner
                 Terminal = terminal,
                 EventDecoder = new EventDecoder(),
                 TerminalCapabilities = TerminalCapabilityProfile.AllSupported,
-                ColorProfile = TerminalColorProfile.TrueColor,
+                ColorProfile = TerminalColorProfile.TrueColor
             };
 
             var application = TesseraHost.CreateApplication(app, options, hosting);
@@ -220,11 +217,7 @@ internal static class RuntimeEndToEndRunner
 
     private sealed class RuntimeEndToEndProbeApp(int targetInputs) : TesseraApp
     {
-        private readonly Label _label = new()
-        {
-            Border = BorderStyle.Rounded,
-            Padding = Thickness.All(1),
-        };
+        private readonly Label _label = new() { Border = BorderStyle.Rounded, Padding = Thickness.All(1) };
 
         public int ProcessedInputs { get; private set; }
 
@@ -253,7 +246,7 @@ internal static class RuntimeEndToEndRunner
                 {
                     Content = _label,
                     Width = Math.Min(42, Math.Max(24, context.Width - 4)),
-                    Height = 5,
+                    Height = 5
                 });
             });
         }
@@ -261,8 +254,10 @@ internal static class RuntimeEndToEndRunner
 
     private sealed class ScriptedTerminalAdapter(byte[] payload) : ITerminalAdapter
     {
-        private readonly MemoryStream _input = new(payload, writable: false);
+        private readonly MemoryStream _input = new(payload, false);
         private readonly RetainedBufferStream _output = new();
+
+        public int OutputBytes => checked((int)_output.Length);
 
         public Stream Input => _input;
 
@@ -272,13 +267,20 @@ internal static class RuntimeEndToEndRunner
 
         public bool IsOutputInteractive => true;
 
-        public int OutputBytes => checked((int)_output.Length);
+        public ValueTask PrepareAsync(CancellationToken cancellationToken)
+        {
+            return ValueTask.CompletedTask;
+        }
 
-        public ValueTask PrepareAsync(CancellationToken cancellationToken) => ValueTask.CompletedTask;
+        public ValueTask RestoreAsync(CancellationToken cancellationToken)
+        {
+            return ValueTask.CompletedTask;
+        }
 
-        public ValueTask RestoreAsync(CancellationToken cancellationToken) => ValueTask.CompletedTask;
-
-        public ValueTask<TerminalSize> GetSizeAsync(CancellationToken cancellationToken) => ValueTask.FromResult(new TerminalSize(100, 24));
+        public ValueTask<TerminalSize> GetSizeAsync(CancellationToken cancellationToken)
+        {
+            return ValueTask.FromResult(new TerminalSize(100, 24));
+        }
 
         public ValueTask DisposeAsync()
         {
@@ -306,21 +308,40 @@ internal static class RuntimeEndToEndRunner
             set => _inner.Position = value;
         }
 
-        public override void Flush() => _inner.Flush();
+        public override void Flush()
+        {
+            _inner.Flush();
+        }
 
-        public override int Read(byte[] buffer, int offset, int count) => _inner.Read(buffer, offset, count);
+        public override int Read(byte[] buffer, int offset, int count)
+        {
+            return _inner.Read(buffer, offset, count);
+        }
 
-        public override long Seek(long offset, SeekOrigin origin) => _inner.Seek(offset, origin);
+        public override long Seek(long offset, SeekOrigin origin)
+        {
+            return _inner.Seek(offset, origin);
+        }
 
-        public override void SetLength(long value) => _inner.SetLength(value);
+        public override void SetLength(long value)
+        {
+            _inner.SetLength(value);
+        }
 
-        public override void Write(byte[] buffer, int offset, int count) => _inner.Write(buffer, offset, count);
+        public override void Write(byte[] buffer, int offset, int count)
+        {
+            _inner.Write(buffer, offset, count);
+        }
 
-        public override ValueTask WriteAsync(ReadOnlyMemory<byte> buffer, CancellationToken cancellationToken = default) =>
-            _inner.WriteAsync(buffer, cancellationToken);
+        public override ValueTask WriteAsync(ReadOnlyMemory<byte> buffer, CancellationToken cancellationToken = default)
+        {
+            return _inner.WriteAsync(buffer, cancellationToken);
+        }
 
-        public override Task FlushAsync(CancellationToken cancellationToken) => _inner.FlushAsync(cancellationToken);
-
+        public override Task FlushAsync(CancellationToken cancellationToken)
+        {
+            return _inner.FlushAsync(cancellationToken);
+        }
     }
 
     private sealed class MeasuringRenderer(RunStopwatch stopwatch) : IProgramRenderer
@@ -331,17 +352,30 @@ internal static class RuntimeEndToEndRunner
 
         public int FlushCount { get; private set; }
 
-        public ValueTask InitializeAsync(Stream output, CancellationToken cancellationToken) =>
-            _inner.InitializeAsync(output, cancellationToken);
+        public ValueTask InitializeAsync(Stream output, CancellationToken cancellationToken)
+        {
+            return _inner.InitializeAsync(output, cancellationToken);
+        }
 
-        public void Resize(int width, int height) => _inner.Resize(width, height);
+        public void Resize(int width, int height)
+        {
+            _inner.Resize(width, height);
+        }
 
-        public void UpdateCapabilities(TerminalCapabilityProfile capabilities) => _inner.UpdateCapabilities(capabilities);
+        public void UpdateCapabilities(TerminalCapabilityProfile capabilities)
+        {
+            _inner.UpdateCapabilities(capabilities);
+        }
 
-        public void Render(RenderOutput output) => _inner.Render(output);
+        public void Render(RenderOutput output)
+        {
+            _inner.Render(output);
+        }
 
-        public ValueTask WriteRawAsync(string content, CancellationToken cancellationToken) =>
-            _inner.WriteRawAsync(content, cancellationToken);
+        public ValueTask WriteRawAsync(string content, CancellationToken cancellationToken)
+        {
+            return _inner.WriteRawAsync(content, cancellationToken);
+        }
 
         public async ValueTask FlushAsync(CancellationToken cancellationToken)
         {
@@ -353,9 +387,15 @@ internal static class RuntimeEndToEndRunner
             }
         }
 
-        public ValueTask ResetAsync(CancellationToken cancellationToken) => _inner.ResetAsync(cancellationToken);
+        public ValueTask ResetAsync(CancellationToken cancellationToken)
+        {
+            return _inner.ResetAsync(cancellationToken);
+        }
 
-        public ValueTask DisposeAsync() => _inner.DisposeAsync();
+        public ValueTask DisposeAsync()
+        {
+            return _inner.DisposeAsync();
+        }
     }
 
     private sealed class RunStopwatch : IDisposable
@@ -364,11 +404,20 @@ internal static class RuntimeEndToEndRunner
 
         public double ElapsedMs => _stopwatch.Elapsed.TotalMilliseconds;
 
-        public void Start() => _stopwatch.Start();
+        public void Dispose()
+        {
+            _stopwatch.Stop();
+        }
 
-        public void Stop() => _stopwatch.Stop();
+        public void Start()
+        {
+            _stopwatch.Start();
+        }
 
-        public void Dispose() => _stopwatch.Stop();
+        public void Stop()
+        {
+            _stopwatch.Stop();
+        }
     }
 }
 

@@ -12,15 +12,12 @@ public sealed class DashboardGridControlTests
     [Test]
     public void ControlsDashboardGridKeyboardSelectionRaisesSelectionChanged()
     {
-        var control = new DashboardGrid
-        {
-            IsFocused = true,
-        };
+        var control = new DashboardGrid { IsFocused = true };
         control.SetTiles(
         [
             new DashboardTile("cpu", "CPU", 0, 0),
             new DashboardTile("mem", "Memory", 1, 0),
-            new DashboardTile("lat", "Latency", 0, 1),
+            new DashboardTile("lat", "Latency", 0, 1)
         ]);
 
         ListSelectionChangedEventArgs<DashboardTile>? args = null;
@@ -43,11 +40,11 @@ public sealed class DashboardGridControlTests
         control.SetTiles(
         [
             new DashboardTile("cpu", "CPU", 0, 0),
-            new DashboardTile("mem", "Memory", 1, 0),
+            new DashboardTile("mem", "Memory", 1, 0)
         ]);
 
         var handled = control.Handle(
-            new PointerInput(PointerEventKind.Press, PointerButton.Left, X: 28, Y: 3),
+            new PointerInput(PointerEventKind.Press, PointerButton.Left, 28, 3),
             new Rect(0, 0, 48, 12));
 
         Assert.That(handled, Is.True);
@@ -61,7 +58,7 @@ public sealed class DashboardGridControlTests
         control.SetTiles(
         [
             new DashboardTile("cpu", "CPU", 0, 0),
-            new DashboardTile("mem", "Memory", 1, 0),
+            new DashboardTile("mem", "Memory", 1, 0)
         ]);
 
         Assert.That(control.MoveTile("cpu", 1, 1), Is.True);
@@ -105,15 +102,15 @@ public sealed class DashboardGridControlTests
             FocusedBorderStyleText = TesseraStyle.Empty.WithForeground(AnsiColor.Rgb(30, 40, 50)),
             TitleStyleText = TesseraStyle.Empty.WithForeground(AnsiColor.Rgb(40, 50, 60)),
             FocusedTitleStyleText = TesseraStyle.Empty.WithForeground(AnsiColor.Rgb(60, 70, 80)),
-            SelectedTileStyleText = TesseraStyle.Empty.WithForeground(AnsiColor.Rgb(80, 90, 100)),
+            SelectedTileStyleText = TesseraStyle.Empty.WithForeground(AnsiColor.Rgb(80, 90, 100))
         };
         control.SetTiles(
         [
             new DashboardTile("cpu", "CPU", 0, 0, subtitle: "18%"),
-            new DashboardTile("mem", "Memory", 1, 0, subtitle: "2.8 GB"),
+            new DashboardTile("mem", "Memory", 1, 0, subtitle: "2.8 GB")
         ]);
 
-        var output = Render(control, width: 52, height: 12);
+        var output = Render(control, 52, 12);
 
         Assert.That(output.Contains("Dashboard Grid *", StringComparison.Ordinal), Is.True);
         Assert.That(output.Contains("38;2;30;40;50", StringComparison.Ordinal), Is.True);
@@ -128,14 +125,14 @@ public sealed class DashboardGridControlTests
         [
             new DashboardTile("cpu", "CPU", 0, 0),
             new DashboardTile("mem", "Memory", 1, 0),
-            new DashboardTile("lat", "Latency", 0, 1),
+            new DashboardTile("lat", "Latency", 0, 1)
         ]);
 
-        var first = Render(control, width: 52, height: 12);
-        var second = Render(control, width: 52, height: 12);
+        var first = Render(control, 52, 12);
+        var second = Render(control, 52, 12);
 
         Assert.That(first, Is.EqualTo(second));
-        Assert.That(first.Contains("\u001b[", StringComparison.Ordinal), Is.False);
+        Assert.That(first.Contains("\e[", StringComparison.Ordinal), Is.False);
     }
 
     private static string Render(DashboardGrid control, int width, int height)

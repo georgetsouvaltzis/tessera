@@ -1,17 +1,12 @@
 namespace Tessera.Controls;
 
 /// <summary>
-/// Defines glyphs used by <see cref="CommandPalette"/> for query and result row rendering.
+///     Defines glyphs used by <see cref="CommandPalette" /> for query and result row rendering.
 /// </summary>
 public readonly record struct CommandPaletteGlyphSet
 {
     /// <summary>
-    /// Gets the default glyph set used by command palettes.
-    /// </summary>
-    public static CommandPaletteGlyphSet Default => new();
-
-    /// <summary>
-    /// Initializes a new glyph set with built-in command palette markers.
+    ///     Initializes a new glyph set with built-in command palette markers.
     /// </summary>
     public CommandPaletteGlyphSet()
     {
@@ -23,7 +18,7 @@ public readonly record struct CommandPaletteGlyphSet
     }
 
     /// <summary>
-    /// Initializes a new glyph set.
+    ///     Initializes a new glyph set.
     /// </summary>
     /// <param name="queryPrompt">Prompt shown before the query input value.</param>
     /// <param name="normalRowMarker">Marker shown for unselected rows.</param>
@@ -37,35 +32,40 @@ public readonly record struct CommandPaletteGlyphSet
         string hoveredRowMarker,
         string markerSeparator)
     {
-        QueryPrompt = queryPrompt ?? string.Empty;
-        NormalRowMarker = normalRowMarker ?? string.Empty;
-        SelectedRowMarker = selectedRowMarker ?? string.Empty;
-        HoveredRowMarker = hoveredRowMarker ?? string.Empty;
-        MarkerSeparator = markerSeparator ?? string.Empty;
+        QueryPrompt = queryPrompt;
+        NormalRowMarker = normalRowMarker;
+        SelectedRowMarker = selectedRowMarker;
+        HoveredRowMarker = hoveredRowMarker;
+        MarkerSeparator = markerSeparator;
     }
 
     /// <summary>
-    /// Gets the prompt shown before the query input value.
+    ///     Gets the default glyph set used by command palettes.
+    /// </summary>
+    public static CommandPaletteGlyphSet Default => new();
+
+    /// <summary>
+    ///     Gets the prompt shown before the query input value.
     /// </summary>
     public string QueryPrompt { get; init; }
 
     /// <summary>
-    /// Gets the marker shown for unselected rows.
+    ///     Gets the marker shown for unselected rows.
     /// </summary>
     public string NormalRowMarker { get; init; }
 
     /// <summary>
-    /// Gets the marker shown for selected rows.
+    ///     Gets the marker shown for selected rows.
     /// </summary>
     public string SelectedRowMarker { get; init; }
 
     /// <summary>
-    /// Gets the marker shown for hovered rows.
+    ///     Gets the marker shown for hovered rows.
     /// </summary>
     public string HoveredRowMarker { get; init; }
 
     /// <summary>
-    /// Gets the separator between markers and row text.
+    ///     Gets the separator between markers and row text.
     /// </summary>
     public string MarkerSeparator { get; init; }
 }

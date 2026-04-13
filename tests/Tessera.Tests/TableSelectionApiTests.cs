@@ -11,14 +11,11 @@ public sealed class TableSelectionApiTests
     [Test]
     public void ControlsTableSelectionApisAreSafeWhenNoSelectionExists()
     {
-        var table = new Table("Name")
-        {
-            Border = BorderStyle.SingleLine,
-        };
+        var table = new Table("Name") { Border = BorderStyle.SingleLine };
         table.SetRows(
         [
             ["alpha"],
-            ["beta"],
+            ["beta"]
         ]);
 
         var hasSelectedRow = table.TryGetSelectedRow(out var selectedRow);
@@ -32,15 +29,12 @@ public sealed class TableSelectionApiTests
     [Test]
     public void ControlsTablePointerSelectionUpdatesPublicSelectionStateAndRaisesEvent()
     {
-        var table = new Table("Name")
-        {
-            Border = BorderStyle.SingleLine,
-        };
+        var table = new Table("Name") { Border = BorderStyle.SingleLine };
         table.SetRows(
         [
             ["alpha"],
             ["beta"],
-            ["gamma"],
+            ["gamma"]
         ]);
 
         ListSelectionChangedEventArgs<IReadOnlyList<string>>? latest = null;
@@ -75,14 +69,11 @@ public sealed class TableSelectionApiTests
     [Test]
     public void ControlsTableReSelectingSameRowDoesNotRaiseSelectionChangedAgain()
     {
-        var table = new Table("Name")
-        {
-            Border = BorderStyle.SingleLine,
-        };
+        var table = new Table("Name") { Border = BorderStyle.SingleLine };
         table.SetRows(
         [
             ["alpha"],
-            ["beta"],
+            ["beta"]
         ]);
 
         var raised = 0;
@@ -100,14 +91,11 @@ public sealed class TableSelectionApiTests
     [Test]
     public void ControlsTableClearRowsResetsSelectionApis()
     {
-        var table = new Table("Name")
-        {
-            Border = BorderStyle.SingleLine,
-        };
+        var table = new Table("Name") { Border = BorderStyle.SingleLine };
         table.SetRows(
         [
             ["alpha"],
-            ["beta"],
+            ["beta"]
         ]);
 
         _ = table.Handle(
@@ -126,15 +114,12 @@ public sealed class TableSelectionApiTests
     [Test]
     public void ControlsTableSetSelectedIndexSelectsRowAndRaisesEvent()
     {
-        var table = new Table("Name")
-        {
-            Border = BorderStyle.SingleLine,
-        };
+        var table = new Table("Name") { Border = BorderStyle.SingleLine };
         table.SetRows(
         [
             ["alpha"],
             ["beta"],
-            ["gamma"],
+            ["gamma"]
         ]);
 
         ListSelectionChangedEventArgs<IReadOnlyList<string>>? latest = null;
@@ -164,14 +149,11 @@ public sealed class TableSelectionApiTests
     [Test]
     public void ControlsTableSetSelectedIndexClampsAndNoopsWhenUnchanged()
     {
-        var table = new Table("Name")
-        {
-            Border = BorderStyle.SingleLine,
-        };
+        var table = new Table("Name") { Border = BorderStyle.SingleLine };
         table.SetRows(
         [
             ["alpha"],
-            ["beta"],
+            ["beta"]
         ]);
 
         var raised = 0;
@@ -191,10 +173,7 @@ public sealed class TableSelectionApiTests
     [Test]
     public void ControlsTableSetSelectedIndexReturnsFalseWhenNoVisibleRows()
     {
-        var table = new Table("Name")
-        {
-            Border = BorderStyle.SingleLine,
-        };
+        var table = new Table("Name") { Border = BorderStyle.SingleLine };
 
         var raised = 0;
         table.SelectionChanged += (_, _) => raised++;

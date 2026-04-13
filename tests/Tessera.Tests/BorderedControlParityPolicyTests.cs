@@ -1,6 +1,5 @@
 using System.Reflection;
 using System.Runtime.CompilerServices;
-using Tessera.Components.Primitives;
 using Tessera.Controls;
 using Tessera.Styles;
 
@@ -83,7 +82,7 @@ internal static class BorderedControlParityPolicyTests
         typeof(ValidationSummary),
         typeof(VirtualizedListView<>),
         typeof(Wizard),
-        typeof(HealthBoard),
+        typeof(HealthBoard)
     ];
 
     public static IEnumerable<TestCase> Cases()
@@ -111,10 +110,14 @@ internal static class BorderedControlParityPolicyTests
     private static Task BorderedControlManifest_MatchesPublicBorderedControls()
     {
         var discovered = DiscoverBorderedControlTypeNames();
-        var registered = new HashSet<string>(RegisteredBorderedControls.Select(static type => type.FullName ?? type.Name), StringComparer.Ordinal);
+        var registered =
+            new HashSet<string>(RegisteredBorderedControls.Select(static type => type.FullName ?? type.Name),
+                StringComparer.Ordinal);
 
-        var missing = discovered.Where(name => !registered.Contains(name)).OrderBy(static name => name, StringComparer.Ordinal).ToArray();
-        var stale = registered.Where(name => !discovered.Contains(name)).OrderBy(static name => name, StringComparer.Ordinal).ToArray();
+        var missing = discovered.Where(name => !registered.Contains(name))
+            .OrderBy(static name => name, StringComparer.Ordinal).ToArray();
+        var stale = registered.Where(name => !discovered.Contains(name))
+            .OrderBy(static name => name, StringComparer.Ordinal).ToArray();
 
         TestAssert.True(
             missing.Length == 0 && stale.Length == 0,
@@ -133,7 +136,8 @@ internal static class BorderedControlParityPolicyTests
 
         foreach (var controlType in borderedControls)
         {
-            var borderStyleProperty = controlType.GetProperty("BorderStyleText", BindingFlags.Instance | BindingFlags.Public);
+            var borderStyleProperty =
+                controlType.GetProperty("BorderStyleText", BindingFlags.Instance | BindingFlags.Public);
             if (borderStyleProperty?.PropertyType != typeof(TesseraStyle))
             {
                 missingBorderStyleText.Add(FormatTypeName(controlType));
@@ -143,7 +147,8 @@ internal static class BorderedControlParityPolicyTests
                 missingBorderStyleSetter.Add(FormatTypeName(controlType));
             }
 
-            var focusedBorderStyleProperty = controlType.GetProperty("FocusedBorderStyleText", BindingFlags.Instance | BindingFlags.Public);
+            var focusedBorderStyleProperty =
+                controlType.GetProperty("FocusedBorderStyleText", BindingFlags.Instance | BindingFlags.Public);
             if (focusedBorderStyleProperty?.PropertyType != typeof(TesseraStyle))
             {
                 missingFocusedBorderStyleText.Add(FormatTypeName(controlType));
@@ -242,17 +247,20 @@ internal static class BorderedControlParityPolicyTests
                 missingPrimaryVisualStyleHooks.Add(FormatTypeName(controlType));
             }
 
-            var titleStyleProperty = teaStyleProperties.FirstOrDefault(
-                static property => string.Equals(property.Name, "TitleStyle", StringComparison.Ordinal));
+            var titleStyleProperty = teaStyleProperties.FirstOrDefault(static property =>
+                string.Equals(property.Name, "TitleStyle", StringComparison.Ordinal));
             if (titleStyleProperty is not null
-                && teaStyleProperties.All(static property => !string.Equals(property.Name, "FocusedTitleStyle", StringComparison.Ordinal)))
+                && teaStyleProperties.All(static property =>
+                    !string.Equals(property.Name, "FocusedTitleStyle", StringComparison.Ordinal)))
             {
                 missingFocusedTitleCounterpart.Add(FormatTypeName(controlType));
             }
 
-            var hasFocusedStyleHook = teaStyleProperties.Any(
-                static property => property.Name.Contains("Focused", StringComparison.Ordinal));
-            var hasFocusMarkerHook = controlType.GetProperty("FocusMarker", BindingFlags.Instance | BindingFlags.Public)?.PropertyType == typeof(string);
+            var hasFocusedStyleHook = teaStyleProperties.Any(static property =>
+                property.Name.Contains("Focused", StringComparison.Ordinal));
+            var hasFocusMarkerHook =
+                controlType.GetProperty("FocusMarker", BindingFlags.Instance | BindingFlags.Public)?.PropertyType ==
+                typeof(string);
             if (!hasFocusedStyleHook && !hasFocusMarkerHook)
             {
                 missingFocusVisualHooks.Add(FormatTypeName(controlType));
@@ -277,7 +285,8 @@ internal static class BorderedControlParityPolicyTests
 
         foreach (var controlType in borderedControls)
         {
-            var focusMarkerProperty = controlType.GetProperty("FocusMarker", BindingFlags.Instance | BindingFlags.Public);
+            var focusMarkerProperty =
+                controlType.GetProperty("FocusMarker", BindingFlags.Instance | BindingFlags.Public);
             if (focusMarkerProperty?.PropertyType != typeof(string))
             {
                 continue;
@@ -288,7 +297,8 @@ internal static class BorderedControlParityPolicyTests
                 nonSettableFocusMarker.Add(FormatTypeName(controlType));
             }
 
-            var showFocusMarkerProperty = controlType.GetProperty("ShowFocusMarker", BindingFlags.Instance | BindingFlags.Public);
+            var showFocusMarkerProperty =
+                controlType.GetProperty("ShowFocusMarker", BindingFlags.Instance | BindingFlags.Public);
             if (showFocusMarkerProperty?.PropertyType != typeof(bool))
             {
                 missingShowFocusMarker.Add(FormatTypeName(controlType));
@@ -344,7 +354,8 @@ internal static class BorderedControlParityPolicyTests
             result.Add(type);
         }
 
-        result.Sort(static (left, right) => StringComparer.Ordinal.Compare(FormatTypeName(left), FormatTypeName(right)));
+        result.Sort(static (left, right) =>
+            StringComparer.Ordinal.Compare(FormatTypeName(left), FormatTypeName(right)));
         return [.. result];
     }
 
@@ -354,7 +365,7 @@ internal static class BorderedControlParityPolicyTests
             .GetTypes()
             .Where(static type => type.IsSealed && type.IsAbstract)
             .SelectMany(static type => type.GetMethods(BindingFlags.Public | BindingFlags.Static))
-            .Where(static method => method.IsDefined(typeof(ExtensionAttribute), inherit: false))
+            .Where(static method => method.IsDefined(typeof(ExtensionAttribute), false))
             .ToArray();
     }
 
@@ -423,7 +434,7 @@ internal static class BorderedControlParityPolicyTests
         if (controlType.IsGenericTypeDefinition)
         {
             return parameterType.IsGenericType
-                && parameterType.GetGenericTypeDefinition() == controlType;
+                   && parameterType.GetGenericTypeDefinition() == controlType;
         }
 
         return false;

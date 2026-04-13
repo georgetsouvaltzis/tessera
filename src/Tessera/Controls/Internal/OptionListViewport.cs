@@ -1,4 +1,5 @@
 using Tessera.Components.Primitives;
+
 namespace Tessera.Controls.Internal;
 
 internal static class OptionListViewport
@@ -26,7 +27,8 @@ internal static class OptionListViewport
         return start;
     }
 
-    public static int RowToVisibleIndex(Rect content, int y, int maxVisibleItems, int visibleCount, int highlightedVisibleIndex)
+    public static int RowToVisibleIndex(Rect content, int y, int maxVisibleItems, int visibleCount,
+        int highlightedVisibleIndex)
     {
         if (content.Height <= 1 || visibleCount == 0)
         {

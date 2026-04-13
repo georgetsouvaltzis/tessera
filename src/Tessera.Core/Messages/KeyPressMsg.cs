@@ -4,7 +4,7 @@ using Tessera.Core.Abstractions;
 namespace Tessera.Core.Messages;
 
 /// <summary>
-/// Represents a key press received from the terminal.
+///     Represents a key press received from the terminal.
 /// </summary>
 /// <param name="Code">The logical key code.</param>
 /// <param name="Text">The text payload produced by the key, when any.</param>
@@ -17,7 +17,7 @@ public sealed record KeyPressMsg(
     bool IsRepeat = false) : IMessage
 {
     /// <summary>
-    /// Checks whether the message matches a specific key code and modifier set.
+    ///     Checks whether the message matches a specific key code and modifier set.
     /// </summary>
     /// <param name="code">The expected key code.</param>
     /// <param name="modifiers">The expected modifiers.</param>
@@ -28,7 +28,7 @@ public sealed record KeyPressMsg(
     }
 
     /// <summary>
-    /// Checks whether the key press represents a specific character.
+    ///     Checks whether the key press represents a specific character.
     /// </summary>
     /// <param name="character">The expected character.</param>
     /// <param name="ignoreCase">Whether comparison should ignore casing.</param>
@@ -47,7 +47,7 @@ public sealed record KeyPressMsg(
     }
 
     /// <summary>
-    /// Checks whether the key press represents a specific character with a specific modifier set.
+    ///     Checks whether the key press represents a specific character with a specific modifier set.
     /// </summary>
     /// <param name="character">The expected character.</param>
     /// <param name="modifiers">The expected modifiers.</param>
@@ -59,7 +59,7 @@ public sealed record KeyPressMsg(
     }
 
     /// <summary>
-    /// Attempts to parse the key press as a decimal digit.
+    ///     Attempts to parse the key press as a decimal digit.
     /// </summary>
     /// <param name="oneBasedDigit">Receives the parsed digit when successful.</param>
     /// <returns><see langword="true" /> when the key press contains a single digit.</returns>
@@ -82,16 +82,31 @@ public sealed record KeyPressMsg(
     }
 
     /// <summary>
-    /// Formats the key press as a normalized keystroke string.
+    ///     Formats the key press as a normalized keystroke string.
     /// </summary>
     /// <returns>A lowercase keystroke representation such as <c>ctrl+c</c>.</returns>
     public string Keystroke()
     {
         var parts = new List<string>(4);
-        if (Modifiers.HasFlag(KeyModifiers.Ctrl)) parts.Add("ctrl");
-        if (Modifiers.HasFlag(KeyModifiers.Alt)) parts.Add("alt");
-        if (Modifiers.HasFlag(KeyModifiers.Shift)) parts.Add("shift");
-        if (Modifiers.HasFlag(KeyModifiers.Meta)) parts.Add("meta");
+        if (Modifiers.HasFlag(KeyModifiers.Ctrl))
+        {
+            parts.Add("ctrl");
+        }
+
+        if (Modifiers.HasFlag(KeyModifiers.Alt))
+        {
+            parts.Add("alt");
+        }
+
+        if (Modifiers.HasFlag(KeyModifiers.Shift))
+        {
+            parts.Add("shift");
+        }
+
+        if (Modifiers.HasFlag(KeyModifiers.Meta))
+        {
+            parts.Add("meta");
+        }
 
         var key = Code == KeyCode.Character
             ? Text
@@ -102,7 +117,11 @@ public sealed record KeyPressMsg(
         var sb = new StringBuilder();
         for (var i = 0; i < parts.Count; i++)
         {
-            if (i > 0) sb.Append('+');
+            if (i > 0)
+            {
+                sb.Append('+');
+            }
+
             sb.Append(parts[i]);
         }
 

@@ -8,7 +8,7 @@ internal static class SgrParser
     {
         currentStyle = state.ToEscapeSequence();
 
-        if (text[index] != '\u001b')
+        if (text[index] != '\e')
         {
             return false;
         }
@@ -62,7 +62,7 @@ internal static class SgrParser
         {
             if (char.IsDigit(ch))
             {
-                value = (value * 10) + (ch - '0');
+                value = value * 10 + (ch - '0');
                 hasValue = true;
                 continue;
             }

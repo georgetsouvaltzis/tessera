@@ -1,17 +1,21 @@
+using Tessera.Components.Primitives;
 using Tessera.Styles;
 
 namespace Tessera.Controls;
 
 public sealed partial class TreeTable
 {
-    private string RenderHeader() => string.Join(ResolveColumnSeparatorText(), _columns);
+    private string RenderHeader()
+    {
+        return string.Join(ResolveColumnSeparatorText(), _columns);
+    }
 
     private string RenderTitle()
     {
         var value = IsFocused && ShowFocusMarker && !string.IsNullOrWhiteSpace(FocusMarker)
             ? $"{Title} {FocusMarker}"
             : Title;
-        return ApplyStyle(value ?? string.Empty, IsFocused ? FocusedTitleStyle : TitleStyle);
+        return ApplyStyle(value, IsFocused ? FocusedTitleStyle : TitleStyle);
     }
 
     private bool ExpandOrMoveIntoChild()
@@ -81,7 +85,7 @@ public sealed partial class TreeTable
         _visible.Clear();
         for (var index = 0; index < _roots.Count; index++)
         {
-            AppendVisible(_roots[index], depth: 0, parentVisibleIndex: null);
+            AppendVisible(_roots[index], 0, null);
         }
 
         if (_visible.Count == 0)
@@ -148,10 +152,7 @@ public sealed partial class TreeTable
 
     private static TreeTableNode Clone(TreeTableNode source)
     {
-        var clone = new TreeTableNode(source.Id, source.Label, source.Values)
-        {
-            IsExpanded = source.IsExpanded,
-        };
+        var clone = new TreeTableNode(source.Id, source.Label, source.Values) { IsExpanded = source.IsExpanded };
         for (var index = 0; index < source.Children.Count; index++)
         {
             clone.AddChild(Clone(source.Children[index]));
@@ -183,13 +184,22 @@ public sealed partial class TreeTable
         return style;
     }
 
-    private string ResolveColumnSeparatorText() => ColumnSeparatorText;
+    private string ResolveColumnSeparatorText()
+    {
+        return ColumnSeparatorText;
+    }
 
-    private string ResolveSelectedRowMarkerText() => SelectedRowMarker;
+    private string ResolveSelectedRowMarkerText()
+    {
+        return SelectedRowMarker;
+    }
 
-    private string ResolveUnselectedRowMarkerText() => UnselectedRowMarker;
+    private string ResolveUnselectedRowMarkerText()
+    {
+        return UnselectedRowMarker;
+    }
 
-    private int RowToVisibleIndex(in global::Tessera.Components.Primitives.Rect content, int y)
+    private int RowToVisibleIndex(in Rect content, int y)
     {
         var row = y - content.Y;
         if (row <= 0)

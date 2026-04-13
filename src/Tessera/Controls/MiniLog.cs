@@ -1,18 +1,18 @@
-﻿using Tessera.Components.Primitives;
+using Tessera.Components.Primitives;
 using Tessera.Layout;
 using Tessera.Styles;
 
 namespace Tessera.Controls;
 
 /// <summary>
-/// Represents a compact scrolling log control.
+///     Represents a compact scrolling log control.
 /// </summary>
 public sealed class MiniLog : Control
 {
     private readonly List<string> _entries = [];
 
     /// <summary>
-    /// Creates a compact log with the provided entry capacity.
+    ///     Creates a compact log with the provided entry capacity.
     /// </summary>
     /// <param name="capacity">The maximum number of retained log lines.</param>
     public MiniLog(int capacity = 120)
@@ -21,30 +21,22 @@ public sealed class MiniLog : Control
     }
 
     /// <summary>
-    /// Gets the maximum number of retained log lines.
+    ///     Gets the maximum number of retained log lines.
     /// </summary>
     public int Capacity { get; }
 
     /// <summary>
-    /// Gets or sets the log title.
+    ///     Gets or sets the log title.
     /// </summary>
-    public string Title
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = "Mini Log";
+    public string Title { get; set; } = "Mini Log";
 
     /// <summary>
-    /// Gets or sets the marker shown in the title when the control is focused.
+    ///     Gets or sets the marker shown in the title when the control is focused.
     /// </summary>
-    public string FocusMarker
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = "*";
+    public string FocusMarker { get; set; } = "*";
 
     /// <summary>
-    /// Gets or sets a value indicating whether the focus marker should be rendered when focused.
+    ///     Gets or sets a value indicating whether the focus marker should be rendered when focused.
     /// </summary>
     public bool ShowFocusMarker
     {
@@ -53,7 +45,7 @@ public sealed class MiniLog : Control
     } = true;
 
     /// <summary>
-    /// Gets or sets the title style applied when the control is not focused.
+    ///     Gets or sets the title style applied when the control is not focused.
     /// </summary>
     public TesseraStyle TitleStyle
     {
@@ -62,7 +54,7 @@ public sealed class MiniLog : Control
     } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the title style applied when the control is focused.
+    ///     Gets or sets the title style applied when the control is focused.
     /// </summary>
     public TesseraStyle FocusedTitleStyle
     {
@@ -71,7 +63,7 @@ public sealed class MiniLog : Control
     } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the style applied to each rendered log line.
+    ///     Gets or sets the style applied to each rendered log line.
     /// </summary>
     public TesseraStyle EntryStyle
     {
@@ -80,12 +72,12 @@ public sealed class MiniLog : Control
     } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets the retained log lines.
+    ///     Gets the retained log lines.
     /// </summary>
     public IReadOnlyList<string> Entries => _entries;
 
     /// <summary>
-    /// Appends one log line.
+    ///     Appends one log line.
     /// </summary>
     /// <param name="line">The log line to append.</param>
     public void Append(string line)
@@ -134,9 +126,12 @@ public sealed class MiniLog : Control
     }
 
     /// <summary>
-    /// Clears all retained log lines.
+    ///     Clears all retained log lines.
     /// </summary>
-    public void Clear() => _entries.Clear();
+    public void Clear()
+    {
+        _entries.Clear();
+    }
 
     /// <inheritdoc />
     public override void Render(Canvas canvas, Rect rect)

@@ -1,4 +1,4 @@
-﻿using Tessera.Components.Primitives;
+using Tessera.Components.Primitives;
 using Tessera.Controls.Internal;
 using Tessera.Layout;
 using Tessera.Styles;
@@ -6,32 +6,24 @@ using Tessera.Styles;
 namespace Tessera.Controls;
 
 /// <summary>
-/// Represents a multi-section control that expands and collapses one section at a time.
+///     Represents a multi-section© control that expands and collapses one section at a time.
 /// </summary>
 public sealed class Accordion : Control
 {
     private readonly List<AccordionSection> _sections = [];
 
     /// <summary>
-    /// Represents title.
+    ///     Represents title.
     /// </summary>
-    public string Title
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = "Accordion";
+    public string Title { get; set; } = "Accordion";
 
     /// <summary>
-    /// Gets or sets the marker shown in the title when the control is focused.
+    ///     Gets or sets the marker shown in the title when the control is focused.
     /// </summary>
-    public string FocusMarker
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = "*";
+    public string FocusMarker { get; set; } = "*";
 
     /// <summary>
-    /// Gets or sets a value indicating whether the title focus marker should be rendered.
+    ///     Gets or sets a value indicating whether the title focus marker should be rendered.
     /// </summary>
     public bool ShowFocusMarker
     {
@@ -40,7 +32,7 @@ public sealed class Accordion : Control
     } = true;
 
     /// <summary>
-    /// Gets or sets the title style applied when the control is not focused.
+    ///     Gets or sets the title style applied when the control is not focused.
     /// </summary>
     public TesseraStyle TitleStyle
     {
@@ -49,7 +41,7 @@ public sealed class Accordion : Control
     } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the title style applied when the control is focused.
+    ///     Gets or sets the title style applied when the control is focused.
     /// </summary>
     public TesseraStyle FocusedTitleStyle
     {
@@ -58,7 +50,7 @@ public sealed class Accordion : Control
     } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the base style applied to section header rows.
+    ///     Gets or sets the base style applied to section header rows.
     /// </summary>
     public TesseraStyle ItemStyle
     {
@@ -67,7 +59,7 @@ public sealed class Accordion : Control
     } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the style merged into selected section rows.
+    ///     Gets or sets the style merged into selected section rows.
     /// </summary>
     public TesseraStyle SelectedItemStyle
     {
@@ -76,7 +68,7 @@ public sealed class Accordion : Control
     } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the style merged into expanded section rows.
+    ///     Gets or sets the style merged into expanded section rows.
     /// </summary>
     public TesseraStyle ExpandedItemStyle
     {
@@ -85,7 +77,7 @@ public sealed class Accordion : Control
     } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the style applied to expanded body lines.
+    ///     Gets or sets the style applied to expanded body lines.
     /// </summary>
     public TesseraStyle BodyStyle
     {
@@ -94,7 +86,7 @@ public sealed class Accordion : Control
     } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the style merged when the control is disabled.
+    ///     Gets or sets the style merged when the control is disabled.
     /// </summary>
     public TesseraStyle DisabledItemStyle
     {
@@ -103,53 +95,37 @@ public sealed class Accordion : Control
     } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the marker shown before the selected section.
+    ///     Gets or sets the marker shown before the selected section.
     /// </summary>
-    public string SelectedMarker
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = "›";
+    public string SelectedMarker { get; set; } = "›";
 
     /// <summary>
-    /// Gets or sets the marker shown before unselected sections.
+    ///     Gets or sets the marker shown before unselected sections.
     /// </summary>
-    public string UnselectedMarker
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = " ";
+    public string UnselectedMarker { get; set; } = " ";
 
     /// <summary>
-    /// Gets or sets the marker shown for expanded sections.
+    ///     Gets or sets the marker shown for expanded sections.
     /// </summary>
-    public string ExpandedMarker
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = "▾";
+    public string ExpandedMarker { get; set; } = "▾";
 
     /// <summary>
-    /// Gets or sets the marker shown for collapsed sections.
+    ///     Gets or sets the marker shown for collapsed sections.
     /// </summary>
-    public string CollapsedMarker
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = "▸";
+    public string CollapsedMarker { get; set; } = "▸";
 
     /// <summary>
-    /// Gets or sets the selected index.
+    ///     Gets or sets the selected index.
     /// </summary>
     public int SelectedIndex { get; private set; }
 
     /// <summary>
-    /// Represents sections.
+    ///     Represents sections.
     /// </summary>
     public IReadOnlyList<AccordionSection> Sections => _sections;
 
     /// <summary>
-    /// Executes set sections.
+    ///     Executes set sections.
     /// </summary>
     /// <param name="sections">The sections value.</param>
     public void SetSections(IEnumerable<AccordionSection> sections)
@@ -165,7 +141,7 @@ public sealed class Accordion : Control
     }
 
     /// <summary>
-    /// Executes move next.
+    ///     Executes move next.
     /// </summary>
     /// <returns><see langword="true" /> when move next succeeds.</returns>
     public bool MoveNext()
@@ -186,7 +162,7 @@ public sealed class Accordion : Control
     }
 
     /// <summary>
-    /// Executes move previous.
+    ///     Executes move previous.
     /// </summary>
     /// <returns><see langword="true" /> when move previous succeeds.</returns>
     public bool MovePrevious()
@@ -207,7 +183,7 @@ public sealed class Accordion : Control
     }
 
     /// <summary>
-    /// Executes toggle selected.
+    ///     Executes toggle selected.
     /// </summary>
     /// <returns><see langword="true" /> when toggle selected succeeds.</returns>
     public bool ToggleSelected()
@@ -265,7 +241,8 @@ public sealed class Accordion : Control
             var selected = index == SelectedIndex ? SelectedMarker : UnselectedMarker;
             var marker = section.Expanded ? ExpandedMarker : CollapsedMarker;
             var line = $"{selected} {marker} {section.Title}";
-            canvas.WriteText(content.X, content.Y + row, ApplyStyle(line, ResolveSectionStyle(index, section.Expanded)), content.Width);
+            canvas.WriteText(content.X, content.Y + row, ApplyStyle(line, ResolveSectionStyle(index, section.Expanded)),
+                content.Width);
             row++;
 
             if (!section.Expanded)
@@ -287,16 +264,16 @@ public sealed class Accordion : Control
 
     internal override LayoutMeasurement Measure(in Rect availableBounds)
     {
-        var width = ControlTextLayout.MeasureDisplayWidth(FormatTitleText(includeFocusMarkerWhenUnfocused: true)) + 4;
+        var width = ControlTextLayout.MeasureDisplayWidth(FormatTitleText(true)) + 4;
         var height = 2;
         var sectionPrefixWidth = Math.Max(
-                ControlTextLayout.MeasureDisplayWidth(SelectedMarker),
-                ControlTextLayout.MeasureDisplayWidth(UnselectedMarker))
-            + 1
-            + Math.Max(
-                ControlTextLayout.MeasureDisplayWidth(ExpandedMarker),
-                ControlTextLayout.MeasureDisplayWidth(CollapsedMarker))
-            + 1;
+                                     ControlTextLayout.MeasureDisplayWidth(SelectedMarker),
+                                     ControlTextLayout.MeasureDisplayWidth(UnselectedMarker))
+                                 + 1
+                                 + Math.Max(
+                                     ControlTextLayout.MeasureDisplayWidth(ExpandedMarker),
+                                     ControlTextLayout.MeasureDisplayWidth(CollapsedMarker))
+                                 + 1;
         for (var index = 0; index < _sections.Count; index++)
         {
             var section = _sections[index];
@@ -323,7 +300,8 @@ public sealed class Accordion : Control
 
     private string FormatTitleText(bool includeFocusMarkerWhenUnfocused = false)
     {
-        if ((IsFocused || includeFocusMarkerWhenUnfocused) && ShowFocusMarker && !string.IsNullOrWhiteSpace(FocusMarker))
+        if ((IsFocused || includeFocusMarkerWhenUnfocused) && ShowFocusMarker &&
+            !string.IsNullOrWhiteSpace(FocusMarker))
         {
             return $"{Title} {FocusMarker}";
         }

@@ -1,9 +1,7 @@
-using Tessera.Components.Composition;
-using Tessera.Components.Primitives;
-using Tessera.Components.Styling;
 using NUnit.Framework;
-using Tessera.IntegrationFixtureApp;
+using Tessera.Core.Commands;
 using Tessera.Core.Messages;
+using Tessera.IntegrationFixtureApp;
 
 namespace Tessera.IntegrationTests;
 
@@ -48,6 +46,6 @@ public sealed class WorkspaceUxIntegrationTests
 
         var result = model.Update(new KeyPressMsg(KeyCode.Character, "q"));
 
-        Assert.That(result, Is.EqualTo(Tessera.Core.Commands.Effects.Quit));
+        Assert.That(result, Is.EqualTo(Effects.Quit));
     }
 }

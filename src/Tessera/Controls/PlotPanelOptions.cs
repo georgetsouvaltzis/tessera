@@ -3,7 +3,7 @@ using System.ComponentModel;
 namespace Tessera.Controls;
 
 /// <summary>
-/// Defines advanced layout options for a <see cref="PlotPanel"/>.
+///     Defines advanced layout options for a <see cref="PlotPanel" />.
 /// </summary>
 [EditorBrowsable(EditorBrowsableState.Advanced)]
 public readonly record struct PlotPanelOptions(

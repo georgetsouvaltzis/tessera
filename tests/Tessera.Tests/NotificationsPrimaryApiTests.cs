@@ -14,7 +14,7 @@ public sealed class NotificationsPrimaryApiTests
         control.SetItems(
         [
             new InboxItem("a", "alpha", NotificationLevel.Info, DateTimeOffset.UnixEpoch),
-            new InboxItem("b", "beta", NotificationLevel.Warning, DateTimeOffset.UnixEpoch),
+            new InboxItem("b", "beta", NotificationLevel.Warning, DateTimeOffset.UnixEpoch)
         ]);
 
         var moved = control.SetSelectedIndex(1);
@@ -46,7 +46,7 @@ public sealed class NotificationsPrimaryApiTests
         control.SetItems(
         [
             new InboxItem("one", "one", NotificationLevel.Info, DateTimeOffset.UnixEpoch),
-            new InboxItem("two", "two", NotificationLevel.Info, DateTimeOffset.UnixEpoch),
+            new InboxItem("two", "two", NotificationLevel.Info, DateTimeOffset.UnixEpoch)
         ]);
 
         var clamped = control.SetSelectedIndex(999);
@@ -62,7 +62,7 @@ public sealed class NotificationsPrimaryApiTests
     [Test]
     public void NotificationsPrimaryApiSetItemsClonesInboundItems()
     {
-        var original = new InboxItem("item-1", "original", NotificationLevel.Info, DateTimeOffset.UnixEpoch, "ops", isRead: false);
+        var original = new InboxItem("item-1", "original", NotificationLevel.Info, DateTimeOffset.UnixEpoch, "ops");
         var control = new Notifications();
 
         control.SetItems([original]);
@@ -78,7 +78,7 @@ public sealed class NotificationsPrimaryApiTests
     [Test]
     public void NotificationsPrimaryApiAddClonesInboundItem()
     {
-        var original = new InboxItem("item-2", "before", NotificationLevel.Warning, DateTimeOffset.UnixEpoch, "ci", isRead: false);
+        var original = new InboxItem("item-2", "before", NotificationLevel.Warning, DateTimeOffset.UnixEpoch, "ci");
         var control = new Notifications();
 
         control.Add(original);
@@ -94,10 +94,7 @@ public sealed class NotificationsPrimaryApiTests
     [Test]
     public void NotificationsPrimaryApiPushRemainsCompatibleAndTrimsToMaxItems()
     {
-        var control = new Notifications
-        {
-            MaxItems = 2,
-        };
+        var control = new Notifications { MaxItems = 2 };
 
         control.Push("first", NotificationLevel.Info, "n1");
         control.Push("second", NotificationLevel.Warning, "n2");

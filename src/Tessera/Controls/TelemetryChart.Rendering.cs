@@ -6,6 +6,7 @@ namespace Tessera.Controls;
 public sealed partial class TelemetryChart
 {
     private static readonly char[] BlockFillGlyphs = [' ', '▁', '▂', '▃', '▄', '▅', '▆', '▇', '█'];
+
     private static readonly byte[] BrailleDotMasks =
     [
         0b00000001,
@@ -15,7 +16,7 @@ public sealed partial class TelemetryChart
         0b00001000,
         0b00010000,
         0b00100000,
-        0b10000000,
+        0b10000000
     ];
 
     private void RenderTelemetry(Canvas canvas, Rect plotArea, TelemetryChartRenderMode renderMode)
@@ -96,7 +97,7 @@ public sealed partial class TelemetryChart
         }
 
         var amount = sourcePosition - lowerIndex;
-        return _samples[lowerIndex] + ((_samples[upperIndex] - _samples[lowerIndex]) * amount);
+        return _samples[lowerIndex] + (_samples[upperIndex] - _samples[lowerIndex]) * amount;
     }
 
     private void RenderAreaRows(Canvas canvas, Rect plotArea, int[] levels)
@@ -128,7 +129,7 @@ public sealed partial class TelemetryChart
     private void RenderRibbonRows(Canvas canvas, Rect plotArea, int[] levels)
     {
         var style = ResolveStyled(FillStyle);
-        var thickness = Math.Clamp(Math.Max(3, (plotArea.Height * 8) / 5), 3, 8);
+        var thickness = Math.Clamp(Math.Max(3, plotArea.Height * 8 / 5), 3, 8);
         var rented = ArrayPool<char>.Shared.Rent(plotArea.Width);
         try
         {
@@ -172,7 +173,7 @@ public sealed partial class TelemetryChart
                 var cellY = subcellY / 4;
                 var localX = x % 2;
                 var localY = subcellY % 4;
-                masks[(cellY * plotArea.Width) + cellX] |= BrailleDotMasks[(localX * 4) + localY];
+                masks[cellY * plotArea.Width + cellX] |= BrailleDotMasks[localX * 4 + localY];
             }
         }
 
@@ -185,7 +186,7 @@ public sealed partial class TelemetryChart
                 var buffer = rented.AsSpan(0, plotArea.Width);
                 for (var column = 0; column < plotArea.Width; column++)
                 {
-                    var mask = masks[(row * plotArea.Width) + column];
+                    var mask = masks[row * plotArea.Width + column];
                     buffer[column] = mask == 0 ? ' ' : (char)(0x2800 + mask);
                 }
 

@@ -41,7 +41,7 @@ public sealed partial class SearchResultsView
     private bool HasQueryMatch(string value)
     {
         return !string.IsNullOrWhiteSpace(Query)
-            && value.Contains(Query, StringComparison.OrdinalIgnoreCase);
+               && value.Contains(Query, StringComparison.OrdinalIgnoreCase);
     }
 
     private string RenderTitle()
@@ -106,7 +106,7 @@ public sealed partial class SearchResultsView
 
     private void RaiseSelectionChangedIfNeeded(int previousIndex, string previousItem)
     {
-        if (previousIndex == _selectedIndex)
+        if (previousIndex == SelectedIndex)
         {
             return;
         }
@@ -115,7 +115,7 @@ public sealed partial class SearchResultsView
             this,
             new SelectionChangedEventArgs(
                 previousIndex,
-                _selectedIndex,
+                SelectedIndex,
                 previousItem,
                 SelectedItem));
     }

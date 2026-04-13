@@ -10,7 +10,7 @@ using Tessera.Styles;
 namespace Tessera.Controls;
 
 /// <summary>
-/// Represents a multi-series line plot control.
+///     Represents a multi-series line plot control.
 /// </summary>
 public sealed partial class LinePlot : Control
 {
@@ -18,121 +18,120 @@ public sealed partial class LinePlot : Control
     private readonly List<LineSeries> _series = [];
 
     /// <summary>
-    /// Gets or sets the plot title.
+    ///     Gets or sets the plot title.
     /// </summary>
-    public string Title
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = "Line Plot";
+    public string Title { get; set; } = "Line Plot";
 
     /// <summary>
-    /// Gets or sets the marker appended to the title while focused.
+    ///     Gets or sets the marker appended to the title while focused.
     /// </summary>
-    public string FocusMarker
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = "*";
+    public string FocusMarker { get; set; } = "*";
 
     /// <summary>
-    /// Gets or sets a value indicating whether the focus marker is rendered while focused.
+    ///     Gets or sets a value indicating whether the focus marker is rendered while focused.
     /// </summary>
     public bool ShowFocusMarker { get; set; } = true;
 
     /// <summary>
-    /// Gets or sets style used for the title when the control is not focused.
+    ///     Gets or sets style used for the title when the control is not focused.
     /// </summary>
     public TesseraStyle TitleStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets style used for the title when the control is focused.
+    ///     Gets or sets style used for the title when the control is focused.
     /// </summary>
     public TesseraStyle FocusedTitleStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets style used for stats text.
+    ///     Gets or sets style used for stats text.
     /// </summary>
     public TesseraStyle StatsStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets style used for legend text.
+    ///     Gets or sets style used for legend text.
     /// </summary>
     public TesseraStyle LegendStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets style used for axis labels and axis glyphs.
+    ///     Gets or sets style used for axis labels and axis glyphs.
     /// </summary>
     public TesseraStyle AxisStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets style used for optional grid lines.
+    ///     Gets or sets style used for optional grid lines.
     /// </summary>
     public TesseraStyle GridStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets style used for empty-state text.
+    ///     Gets or sets style used for empty-state text.
     /// </summary>
     public TesseraStyle EmptyTextStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets style merged into rendered output while <see cref="Control.IsDisabled"/> is <see langword="true"/>.
+    ///     Gets or sets style merged into rendered output while <see cref="Control.IsDisabled" /> is <see langword="true" />.
     /// </summary>
     public TesseraStyle DisabledStyle { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the style applied to border glyphs when the control is not focused.
+    ///     Gets or sets the style applied to border glyphs when the control is not focused.
     /// </summary>
     public TesseraStyle BorderStyleText { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the style applied to border glyphs when the control is focused.
+    ///     Gets or sets the style applied to border glyphs when the control is focused.
     /// </summary>
     public TesseraStyle FocusedBorderStyleText { get; set; } = TesseraStyle.Empty;
 
     /// <summary>
-    /// Gets or sets the frame border style.
+    ///     Gets or sets the frame border style.
     /// </summary>
     public BorderStyle Border { get; set; } = BorderStyle.SingleLine;
 
     /// <summary>
-    /// Gets or sets inner padding applied to plot content.
+    ///     Gets or sets inner padding applied to plot content.
     /// </summary>
     public Thickness Padding { get; set; }
 
     /// <summary>
-    /// Gets or sets optional explicit minimum value used for normalization.
+    ///     Gets or sets optional explicit minimum value used for normalization.
     /// </summary>
     public double? MinValue { get; set; }
 
     /// <summary>
-    /// Gets or sets optional explicit maximum value used for normalization.
+    ///     Gets or sets optional explicit maximum value used for normalization.
     /// </summary>
     public double? MaxValue { get; set; }
 
     /// <summary>
-    /// Gets or sets text shown when there are no plot series or sample points.
+    ///     Gets or sets text shown when there are no plot series or sample points.
     /// </summary>
-    public string EmptyText
-    {
-        get;
-        set => field = value ?? string.Empty;
-    } = EmptySeriesText;
+    public string EmptyText { get; set; } = EmptySeriesText;
 
     /// <summary>
-    /// Gets or sets advanced line-plot rendering options.
+    ///     Gets or sets advanced line-plot rendering options.
     /// </summary>
     [EditorBrowsable(EditorBrowsableState.Advanced)]
     public LinePlotOptions? Options { get; set; }
 
     /// <summary>
-    /// Enables or configures axis rendering for common scenarios without replacing <see cref="Options"/>.
+    ///     Gets the current line series collection.
     /// </summary>
-    /// <param name="showAxes"><see langword="true"/> to show axes; otherwise, <see langword="false"/>.</param>
-    /// <param name="xLabel">Optional X-axis label. When <see langword="null"/>, the existing value is preserved.</param>
-    /// <param name="sharedAxisLabel">Optional shared Y-axis label. When <see langword="null"/>, the existing value is preserved.</param>
-    /// <param name="normalizedAxisLabel">Optional normalized-axis label for normalized series. When <see langword="null"/>, the existing value is preserved.</param>
-    /// <returns>The current <see cref="LinePlot"/> instance for fluent chaining.</returns>
+    public IReadOnlyList<LineSeries> Series => _series;
+
+    /// <summary>
+    ///     Enables or configures axis rendering for common scenarios without replacing <see cref="Options" />.
+    /// </summary>
+    /// <param name="showAxes"><see langword="true" /> to show axes; otherwise, <see langword="false" />.</param>
+    /// <param name="xLabel">Optional X-axis label. When <see langword="null" />, the existing value is preserved.</param>
+    /// <param name="sharedAxisLabel">
+    ///     Optional shared Y-axis label. When <see langword="null" />, the existing value is
+    ///     preserved.
+    /// </param>
+    /// <param name="normalizedAxisLabel">
+    ///     Optional normalized-axis label for normalized series. When <see langword="null" />,
+    ///     the existing value is preserved.
+    /// </param>
+    /// <returns>The current <see cref="LinePlot" /> instance for fluent chaining.</returns>
     public LinePlot ConfigureAxes(
         bool showAxes = true,
         string? xLabel = null,
@@ -146,17 +145,17 @@ public sealed partial class LinePlot : Control
             XLabel = xLabel ?? options.XLabel,
             SharedAxisLabel = sharedAxisLabel ?? options.SharedAxisLabel,
             NormalizedAxisLabel = normalizedAxisLabel ?? options.NormalizedAxisLabel,
-            YLabel = sharedAxisLabel ?? options.YLabel,
+            YLabel = sharedAxisLabel ?? options.YLabel
         };
         Options = options;
         return this;
     }
 
     /// <summary>
-    /// Enables or disables grid rendering without replacing <see cref="Options"/>.
+    ///     Enables or disables grid rendering without replacing <see cref="Options" />.
     /// </summary>
-    /// <param name="showGrid"><see langword="true"/> to show grid lines; otherwise, <see langword="false"/>.</param>
-    /// <returns>The current <see cref="LinePlot"/> instance for fluent chaining.</returns>
+    /// <param name="showGrid"><see langword="true" /> to show grid lines; otherwise, <see langword="false" />.</param>
+    /// <returns>The current <see cref="LinePlot" /> instance for fluent chaining.</returns>
     public LinePlot ConfigureGrid(bool showGrid = true)
     {
         var options = Options ?? new LinePlotOptions();
@@ -165,10 +164,10 @@ public sealed partial class LinePlot : Control
     }
 
     /// <summary>
-    /// Enables or disables legend rendering without replacing <see cref="Options"/>.
+    ///     Enables or disables legend rendering without replacing <see cref="Options" />.
     /// </summary>
-    /// <param name="showLegend"><see langword="true"/> to show the legend; otherwise, <see langword="false"/>.</param>
-    /// <returns>The current <see cref="LinePlot"/> instance for fluent chaining.</returns>
+    /// <param name="showLegend"><see langword="true" /> to show the legend; otherwise, <see langword="false" />.</param>
+    /// <returns>The current <see cref="LinePlot" /> instance for fluent chaining.</returns>
     public LinePlot ConfigureLegend(bool showLegend = true)
     {
         var options = Options ?? new LinePlotOptions();
@@ -177,12 +176,7 @@ public sealed partial class LinePlot : Control
     }
 
     /// <summary>
-    /// Gets the current line series collection.
-    /// </summary>
-    public IReadOnlyList<LineSeries> Series => _series;
-
-    /// <summary>
-    /// Replaces the current series set.
+    ///     Replaces the current series set.
     /// </summary>
     /// <param name="series">The series to render.</param>
     public void SetSeries(IEnumerable<LineSeries> series)
@@ -197,7 +191,7 @@ public sealed partial class LinePlot : Control
     }
 
     /// <summary>
-    /// Adds one series to the plot.
+    ///     Adds one series to the plot.
     /// </summary>
     /// <param name="series">The series to add.</param>
     public void AddSeries(LineSeries series)
@@ -207,13 +201,13 @@ public sealed partial class LinePlot : Control
     }
 
     /// <summary>
-    /// Removes series by exact name match.
+    ///     Removes series by exact name match.
     /// </summary>
     /// <param name="name">The series name.</param>
-    /// <returns><see langword="true"/> if a series was removed; otherwise, <see langword="false"/>.</returns>
+    /// <returns><see langword="true" /> if a series was removed; otherwise, <see langword="false" />.</returns>
     public bool RemoveSeries(string name)
     {
-        var normalized = name ?? string.Empty;
+        var normalized = name;
         for (var i = 0; i < _series.Count; i++)
         {
             if (string.Equals(_series[i].Name, normalized, StringComparison.Ordinal))
@@ -227,14 +221,14 @@ public sealed partial class LinePlot : Control
     }
 
     /// <summary>
-    /// Appends one sample to the named series.
+    ///     Appends one sample to the named series.
     /// </summary>
     /// <param name="seriesName">The target series name.</param>
     /// <param name="sample">The sample value.</param>
-    /// <returns><see langword="true"/> when the series exists; otherwise, <see langword="false"/>.</returns>
+    /// <returns><see langword="true" /> when the series exists; otherwise, <see langword="false" />.</returns>
     public bool AppendSample(string seriesName, double sample)
     {
-        var normalized = seriesName ?? string.Empty;
+        var normalized = seriesName;
         for (var i = 0; i < _series.Count; i++)
         {
             if (!string.Equals(_series[i].Name, normalized, StringComparison.Ordinal))
@@ -250,7 +244,7 @@ public sealed partial class LinePlot : Control
     }
 
     /// <summary>
-    /// Removes all series and sample values.
+    ///     Removes all series and sample values.
     /// </summary>
     public void Clear()
     {
@@ -290,7 +284,7 @@ public sealed partial class LinePlot : Control
 
         var showStatsRow = options.ShowStats && content.Height >= 3;
         var showFooterRow = (options.ShowLegend || (options.ShowAxes && !string.IsNullOrWhiteSpace(options.XLabel)))
-            && content.Height >= (showStatsRow ? 4 : 3);
+                            && content.Height >= (showStatsRow ? 4 : 3);
 
         var plotTop = content.Y;
         var plotBottom = content.Bottom;
@@ -313,7 +307,8 @@ public sealed partial class LinePlot : Control
         var zoom = double.IsFinite(options.Zoom)
             ? Math.Clamp(options.Zoom, 0.1, 8.0)
             : 1.0;
-        var visibleCount = Math.Clamp((int)Math.Round(plot.Width / zoom, MidpointRounding.AwayFromZero), 1, maxSampleCount);
+        var visibleCount = Math.Clamp((int)Math.Round(plot.Width / zoom, MidpointRounding.AwayFromZero), 1,
+            maxSampleCount);
         var maxOffset = Math.Max(0, maxSampleCount - visibleCount);
         var offset = Math.Clamp(options.Offset, 0, maxOffset);
         if (!TryResolveVisibleRange(maxSampleCount, visibleCount, offset, out var min, out var max))
@@ -343,7 +338,8 @@ public sealed partial class LinePlot : Control
         }
 
         if (options.RenderMode is LinePlotRenderMode.Compact or LinePlotRenderMode.CompactBraille
-            && TryRenderCompactSeries(canvas, plotArea, maxSampleCount, visibleCount, offset, min, max, options.RenderMode))
+            && TryRenderCompactSeries(canvas, plotArea, maxSampleCount, visibleCount, offset, min, max,
+                options.RenderMode))
         {
             // Compact mode handles its own plot body for dense telemetry cards.
         }
@@ -351,6 +347,7 @@ public sealed partial class LinePlot : Control
         {
             RenderSeries(canvas, plotArea, maxSampleCount, visibleCount, offset, min, max);
         }
+
         if (options.ShowAxes && plot.Width >= 3 && plot.Height >= 3)
         {
             RenderAxisLabels(canvas, plot, options);
@@ -371,7 +368,8 @@ public sealed partial class LinePlot : Control
                 var xLabel = options.XLabel.Trim();
                 rightReserved = Math.Min(content.Width, xLabel.Length + 1);
                 var xLabelX = Math.Max(content.X, content.Right - xLabel.Length);
-                canvas.WriteText(xLabelX, footerY, ApplyStyle(xLabel, ResolveStyled(AxisStyle)), content.Right - xLabelX);
+                canvas.WriteText(xLabelX, footerY, ApplyStyle(xLabel, ResolveStyled(AxisStyle)),
+                    content.Right - xLabelX);
             }
 
             if (options.ShowLegend && content.Width - rightReserved > 0)
@@ -414,12 +412,14 @@ public sealed partial class LinePlot : Control
             Math.Clamp(height, 0, availableBounds.Height));
     }
 
-    private void RenderSeries(Canvas canvas, Rect plotArea, int maxSampleCount, int visibleCount, int offset, double min, double max)
+    private void RenderSeries(Canvas canvas, Rect plotArea, int maxSampleCount, int visibleCount, int offset,
+        double min, double max)
     {
         for (var seriesIndex = 0; seriesIndex < _series.Count; seriesIndex++)
         {
             var series = _series[seriesIndex];
-            if (!TryResolveSeriesScaleRange(series, maxSampleCount, visibleCount, offset, min, max, out var seriesMin, out var seriesMax))
+            if (!TryResolveSeriesScaleRange(series, maxSampleCount, visibleCount, offset, min, max, out var seriesMin,
+                    out var seriesMax))
             {
                 continue;
             }
@@ -449,7 +449,8 @@ public sealed partial class LinePlot : Control
                 }
 
                 var normalized = Math.Clamp((value - seriesMin) / range, 0d, 1d);
-                var y = plotArea.Bottom - 1 - (int)Math.Round(normalized * (plotArea.Height - 1), MidpointRounding.AwayFromZero);
+                var y = plotArea.Bottom - 1 -
+                        (int)Math.Round(normalized * (plotArea.Height - 1), MidpointRounding.AwayFromZero);
                 var x = visibleCount <= 1
                     ? plotArea.X
                     : plotArea.X + (int)Math.Round(
@@ -458,7 +459,8 @@ public sealed partial class LinePlot : Control
 
                 if (previousX >= 0)
                 {
-                    DrawConnection(canvas, previousX, previousY, x, y, horizontalGlyph, upwardGlyph, downwardGlyph, verticalGlyph);
+                    DrawConnection(canvas, previousX, previousY, x, y, horizontalGlyph, upwardGlyph, downwardGlyph,
+                        verticalGlyph);
                 }
 
                 WriteGlyph(canvas, x, y, series.PointGlyph, pointGlyph);
@@ -536,28 +538,36 @@ public sealed partial class LinePlot : Control
     private void RenderAxisLabels(Canvas canvas, Rect plot, LinePlotOptions options)
     {
         var axisStyle = ResolveStyled(AxisStyle);
-        var sharedAxisLabel = ResolveSharedAxisLabel(options);
-        var normalizedAxisLabel = HasSeriesScaleMode(LineSeriesScaleMode.Normalized)
+        var resolvedSharedLabel = ResolveSharedAxisLabel(options);
+        var sharedLabel = string.IsNullOrWhiteSpace(resolvedSharedLabel)
+            ? null
+            : resolvedSharedLabel;
+        var normalizedLabel = HasSeriesScaleMode(LineSeriesScaleMode.Normalized)
             ? options.NormalizedAxisLabel?.Trim()
             : null;
-        var rightReserved = string.IsNullOrWhiteSpace(normalizedAxisLabel) ? 0 : normalizedAxisLabel!.Length + 1;
+        if (string.IsNullOrWhiteSpace(normalizedLabel))
+        {
+            normalizedLabel = null;
+        }
 
-        if (!string.IsNullOrWhiteSpace(sharedAxisLabel))
+        var rightReserved = normalizedLabel is null ? 0 : normalizedLabel.Length + 1;
+
+        if (sharedLabel is not null)
         {
             canvas.WriteText(
                 plot.X + 1,
                 plot.Y,
-                ApplyStyle(sharedAxisLabel!, axisStyle),
+                ApplyStyle(sharedLabel, axisStyle),
                 Math.Max(0, plot.Width - 1 - rightReserved));
         }
 
-        if (!string.IsNullOrWhiteSpace(normalizedAxisLabel))
+        if (normalizedLabel is not null)
         {
-            var normalizedLabelX = Math.Max(plot.X + 1, plot.Right - normalizedAxisLabel!.Length);
+            var normalizedLabelX = Math.Max(plot.X + 1, plot.Right - normalizedLabel.Length);
             canvas.WriteText(
                 normalizedLabelX,
                 plot.Y,
-                ApplyStyle(normalizedAxisLabel, axisStyle),
+                ApplyStyle(normalizedLabel, axisStyle),
                 plot.Right - normalizedLabelX);
         }
     }
@@ -583,7 +593,8 @@ public sealed partial class LinePlot : Control
         }
     }
 
-    private bool TryResolveVisibleRange(int maxSampleCount, int visibleCount, int offset, out double min, out double max)
+    private bool TryResolveVisibleRange(int maxSampleCount, int visibleCount, int offset, out double min,
+        out double max)
     {
         min = MinValue ?? double.PositiveInfinity;
         max = MaxValue ?? double.NegativeInfinity;
@@ -785,7 +796,7 @@ public sealed partial class LinePlot : Control
 
         for (var x = Math.Min(x0, x1) + 1; x < Math.Max(x0, x1); x++)
         {
-            var y = y0 + ((x - x0) * dy / dx);
+            var y = y0 + (x - x0) * dy / dx;
             WriteGlyph(canvas, x, y, fallback, glyph);
         }
     }

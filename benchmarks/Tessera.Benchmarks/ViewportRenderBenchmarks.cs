@@ -10,15 +10,11 @@ public class ViewportRenderBenchmarks
     private const int FrameCount = 64;
     private static readonly KeyPressed UpKey = new(Key.Up);
     private static readonly KeyPressed DownKey = new(Key.Down);
-    private readonly LogView _logView = new()
-    {
-        Border = BorderStyle.SingleLine,
-        AutoScroll = false,
-        IsFocused = true,
-    };
 
     private readonly Rect _bounds = new(0, 0, 160, 42);
     private readonly Canvas _canvas = new(160, 42);
+
+    private readonly LogView _logView = new() { Border = BorderStyle.SingleLine, AutoScroll = false, IsFocused = true };
 
     [GlobalSetup]
     public void Setup()
@@ -33,13 +29,13 @@ public class ViewportRenderBenchmarks
     [Benchmark(Description = "viewport no-decoration render (log view)")]
     public int RenderViewportNoDecoration()
     {
-        return RenderViewportNoDecorationCore(materialize: true);
+        return RenderViewportNoDecorationCore(true);
     }
 
     [Benchmark(Description = "viewport no-decoration render-only (log view)")]
     public int RenderViewportNoDecorationOnly()
     {
-        return RenderViewportNoDecorationCore(materialize: false);
+        return RenderViewportNoDecorationCore(false);
     }
 
     private int RenderViewportNoDecorationCore(bool materialize)

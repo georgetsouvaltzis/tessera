@@ -1,20 +1,29 @@
+using System.Collections.Concurrent;
+using System.Reflection;
 using Tessera.Components.Primitives;
 using Tessera.Components.Primitives.Internal;
 using Tessera.Controls;
 using Tessera.Core.Abstractions;
 using Tessera.Layout;
 using Tessera.Styles;
-using System.Collections.Concurrent;
-using System.Reflection;
 
 namespace Tessera.Internal;
 
 internal sealed class TesseraSceneCompiler : IScreenCompiler
 {
-    private static readonly MethodInfo ListViewThemeDefaultsApplierFactoryMethodDefinition = ResolveListViewThemeDefaultsApplierFactoryMethodDefinition();
-    private static readonly ConcurrentDictionary<Type, Action<Control, TesseraTheme>> ListViewThemeDefaultsAppliers = new();
-    private static readonly MethodInfo ListViewThemeDefaultsWithOverridesApplierFactoryMethodDefinition = ResolveListViewThemeDefaultsWithOverridesApplierFactoryMethodDefinition();
-    private static readonly ConcurrentDictionary<Type, Action<Control, TesseraThemeOverrides, TesseraTheme, TesseraThemeVisualState>> ListViewThemeDefaultsWithOverridesAppliers = new();
+    private static readonly MethodInfo ListViewThemeDefaultsApplierFactoryMethodDefinition =
+        ResolveListViewThemeDefaultsApplierFactoryMethodDefinition();
+
+    private static readonly ConcurrentDictionary<Type, Action<Control, TesseraTheme>> ListViewThemeDefaultsAppliers =
+        new();
+
+    private static readonly MethodInfo ListViewThemeDefaultsWithOverridesApplierFactoryMethodDefinition =
+        ResolveListViewThemeDefaultsWithOverridesApplierFactoryMethodDefinition();
+
+    private static readonly
+        ConcurrentDictionary<Type, Action<Control, TesseraThemeOverrides, TesseraTheme, TesseraThemeVisualState>>
+        ListViewThemeDefaultsWithOverridesAppliers = new();
+
     private string? _focusedRegionId;
 
     public ScreenRenderResult Compile(ScreenContent content, ScreenContext context, ScreenOptions options)
@@ -25,7 +34,7 @@ internal sealed class TesseraSceneCompiler : IScreenCompiler
         {
             var textOutput = new ScreenOutput(ScreenFrame.From(content.Text ?? string.Empty))
             {
-                Terminal = options.ToTerminalOutput(),
+                Terminal = options.ToTerminalOutput()
             };
 
             return new ScreenRenderResult(textOutput, null);
@@ -57,10 +66,7 @@ internal sealed class TesseraSceneCompiler : IScreenCompiler
         interaction.Render(canvas);
         _focusedRegionId = interaction.FocusedRegionId;
 
-        var output = new ScreenOutput(ScreenFrame.From(canvas.Render()))
-        {
-            Terminal = options.ToTerminalOutput(),
-        };
+        var output = new ScreenOutput(ScreenFrame.From(canvas.Render())) { Terminal = options.ToTerminalOutput() };
 
         return new ScreenRenderResult(output, interaction.HasInteraction ? interaction : null);
     }
@@ -107,7 +113,7 @@ internal sealed class TesseraSceneCompiler : IScreenCompiler
                 }
 
                 return;
-            case global::Tessera.Layout.DockLayout dock:
+            case DockLayout dock:
                 ApplyThemeDefaults(dock.Top, theme);
                 ApplyThemeDefaults(dock.Bottom, theme);
                 ApplyThemeDefaults(dock.Left, theme);
@@ -126,7 +132,8 @@ internal sealed class TesseraSceneCompiler : IScreenCompiler
         }
     }
 
-    private static void ApplyThemeDefaults(LayoutNode layout, TesseraTheme theme, TesseraThemeOverrides overrides, bool hasTerminalFocus)
+    private static void ApplyThemeDefaults(LayoutNode layout, TesseraTheme theme, TesseraThemeOverrides overrides,
+        bool hasTerminalFocus)
     {
         switch (layout)
         {
@@ -168,7 +175,7 @@ internal sealed class TesseraSceneCompiler : IScreenCompiler
                 }
 
                 return;
-            case global::Tessera.Layout.DockLayout dock:
+            case DockLayout dock:
                 ApplyThemeDefaults(dock.Top, theme, overrides, hasTerminalFocus);
                 ApplyThemeDefaults(dock.Bottom, theme, overrides, hasTerminalFocus);
                 ApplyThemeDefaults(dock.Left, theme, overrides, hasTerminalFocus);
@@ -215,7 +222,8 @@ internal sealed class TesseraSceneCompiler : IScreenCompiler
         }
     }
 
-    private static void ApplyThemeDefaults(LayoutSlot? slot, TesseraTheme theme, TesseraThemeOverrides overrides, bool hasTerminalFocus)
+    private static void ApplyThemeDefaults(LayoutSlot? slot, TesseraTheme theme, TesseraThemeOverrides overrides,
+        bool hasTerminalFocus)
     {
         if (slot is not null)
         {
@@ -248,7 +256,8 @@ internal sealed class TesseraSceneCompiler : IScreenCompiler
         }
     }
 
-    private static void ApplyThemeDefaults(Control control, TesseraTheme theme, TesseraThemeOverrides overrides, bool hasTerminalFocus)
+    private static void ApplyThemeDefaults(Control control, TesseraTheme theme, TesseraThemeOverrides overrides,
+        bool hasTerminalFocus)
     {
         var state = ResolveVisualState(control, hasTerminalFocus);
 
@@ -284,7 +293,8 @@ internal sealed class TesseraSceneCompiler : IScreenCompiler
         }
 
         var itemType = controlType.GetGenericArguments()[0];
-        var applier = ListViewThemeDefaultsAppliers.GetOrAdd(itemType, static value => CreateListViewThemeDefaultsApplier(value));
+        var applier =
+            ListViewThemeDefaultsAppliers.GetOrAdd(itemType, static value => CreateListViewThemeDefaultsApplier(value));
         applier(control, theme);
     }
 
@@ -311,31 +321,35 @@ internal sealed class TesseraSceneCompiler : IScreenCompiler
     {
         var factory = ListViewThemeDefaultsApplierFactoryMethodDefinition.MakeGenericMethod(itemType);
         return (Action<Control, TesseraTheme>)(factory.Invoke(null, null)
-            ?? throw new InvalidOperationException("Failed to build ListView<T> theme applier delegate."));
+                                               ?? throw new InvalidOperationException(
+                                                   "Failed to build ListView<T> theme applier delegate."));
     }
 
-    private static Action<Control, TesseraThemeOverrides, TesseraTheme, TesseraThemeVisualState> CreateListViewThemeDefaultsWithOverridesApplier(
-        Type itemType)
+    private static Action<Control, TesseraThemeOverrides, TesseraTheme, TesseraThemeVisualState>
+        CreateListViewThemeDefaultsWithOverridesApplier(
+            Type itemType)
     {
         var factory = ListViewThemeDefaultsWithOverridesApplierFactoryMethodDefinition.MakeGenericMethod(itemType);
-        return (Action<Control, TesseraThemeOverrides, TesseraTheme, TesseraThemeVisualState>)(factory.Invoke(null, null)
+        return (Action<Control, TesseraThemeOverrides, TesseraTheme, TesseraThemeVisualState>)(factory.Invoke(null,
+                null)
             ?? throw new InvalidOperationException("Failed to build ListView<T> theme+override applier delegate."));
     }
 
     private static MethodInfo ResolveListViewThemeDefaultsApplierFactoryMethodDefinition()
     {
         return typeof(TesseraSceneCompiler).GetMethod(
-            nameof(CreateListViewThemeDefaultsApplierCore),
-            BindingFlags.Public | BindingFlags.Static)
-            ?? throw new InvalidOperationException("Unable to resolve ListView<T> theme applier factory method.");
+                   nameof(CreateListViewThemeDefaultsApplierCore),
+                   BindingFlags.Public | BindingFlags.Static)
+               ?? throw new InvalidOperationException("Unable to resolve ListView<T> theme applier factory method.");
     }
 
     private static MethodInfo ResolveListViewThemeDefaultsWithOverridesApplierFactoryMethodDefinition()
     {
         return typeof(TesseraSceneCompiler).GetMethod(
-            nameof(CreateListViewThemeDefaultsWithOverridesApplierCore),
-            BindingFlags.Public | BindingFlags.Static)
-            ?? throw new InvalidOperationException("Unable to resolve ListView<T> theme+override applier factory method.");
+                   nameof(CreateListViewThemeDefaultsWithOverridesApplierCore),
+                   BindingFlags.Public | BindingFlags.Static)
+               ?? throw new InvalidOperationException(
+                   "Unable to resolve ListView<T> theme+override applier factory method.");
     }
 
     public static Action<Control, TesseraTheme> CreateListViewThemeDefaultsApplierCore<TItem>()
@@ -349,7 +363,8 @@ internal sealed class TesseraSceneCompiler : IScreenCompiler
         };
     }
 
-    public static Action<Control, TesseraThemeOverrides, TesseraTheme, TesseraThemeVisualState> CreateListViewThemeDefaultsWithOverridesApplierCore<TItem>()
+    public static Action<Control, TesseraThemeOverrides, TesseraTheme, TesseraThemeVisualState>
+        CreateListViewThemeDefaultsWithOverridesApplierCore<TItem>()
     {
         return static (control, overrides, theme, state) =>
         {
@@ -379,9 +394,9 @@ internal sealed class TesseraSceneCompiler : IScreenCompiler
     {
         private readonly string? _previousFocusedRegionId;
         private readonly List<TesseraSceneRegion> _regions = [];
-        private string? _requestedFocusRegionId;
-        private long _requestedFocusOrder;
         private string? _implicitFocusRegionId;
+        private long _requestedFocusOrder;
+        private string? _requestedFocusRegionId;
 
         public TesseraSceneBuilder(string? previousFocusedRegionId)
         {
@@ -394,15 +409,18 @@ internal sealed class TesseraSceneCompiler : IScreenCompiler
             {
                 WindowLayout window => TryBuildWindow(window, bounds, path),
                 RowLayout row => TryBuildStack(true, AsReadOnlyList(row.Items), row.Gap, row.Padding, bounds, path),
-                ColumnLayout column => TryBuildStack(false, AsReadOnlyList(column.Items), column.Gap, column.Padding, bounds, path),
+                ColumnLayout column => TryBuildStack(false, AsReadOnlyList(column.Items), column.Gap, column.Padding,
+                    bounds, path),
                 CenterLayout center => TryBuildCenter(center, bounds, path),
                 PanelLayout panel => TryBuildPanel(panel, bounds, path),
                 OverlayLayout overlay => TryBuildOverlay(overlay, bounds, path),
-                global::Tessera.Layout.DockLayout dock => TryBuildDock(dock, bounds, path),
-                StackLayout stack => TryBuildStack(stack.IsHorizontal, stack.Children, stack.Gap, stack.Padding, bounds, path),
-                SplitLayout split => TryBuildStack(split.IsHorizontal, [split.First, split.Second], split.Gap, split.Padding, bounds, path),
+                DockLayout dock => TryBuildDock(dock, bounds, path),
+                StackLayout stack => TryBuildStack(stack.IsHorizontal, stack.Children, stack.Gap, stack.Padding, bounds,
+                    path),
+                SplitLayout split => TryBuildStack(split.IsHorizontal, [split.First, split.Second], split.Gap,
+                    split.Padding, bounds, path),
                 ComponentLayout component => TryBuildComponent(component, bounds, path),
-                _ => false,
+                _ => false
             };
         }
 
@@ -434,50 +452,56 @@ internal sealed class TesseraSceneCompiler : IScreenCompiler
 
             if (window.Header is { } header)
             {
-                var measured = ResolveSlotExtent(header, horizontal: false, working);
+                var measured = ResolveSlotExtent(header, false, working);
                 var outer = new Rect(working.X, working.Y, working.Width, measured);
                 if (!TryBuildDockSlot(header, outer, $"{path}/header"))
                 {
                     return false;
                 }
 
-                working = new Rect(working.X, working.Y + measured + window.Gap, working.Width, Math.Max(0, working.Height - measured - window.Gap));
+                working = new Rect(working.X, working.Y + measured + window.Gap, working.Width,
+                    Math.Max(0, working.Height - measured - window.Gap));
             }
 
             if (window.Footer is { } footer && !working.IsEmpty)
             {
-                var measured = ResolveSlotExtent(footer, horizontal: false, working);
-                var outer = new Rect(working.X, Math.Max(working.Y, working.Bottom - measured), working.Width, measured);
+                var measured = ResolveSlotExtent(footer, false, working);
+                var outer = new Rect(working.X, Math.Max(working.Y, working.Bottom - measured), working.Width,
+                    measured);
                 if (!TryBuildDockSlot(footer, outer, $"{path}/footer"))
                 {
                     return false;
                 }
 
-                working = new Rect(working.X, working.Y, working.Width, Math.Max(0, working.Height - measured - window.Gap));
+                working = new Rect(working.X, working.Y, working.Width,
+                    Math.Max(0, working.Height - measured - window.Gap));
             }
 
             if (window.Left is { } left && !working.IsEmpty)
             {
-                var measured = ResolveSlotExtent(left, horizontal: true, working);
+                var measured = ResolveSlotExtent(left, true, working);
                 var outer = new Rect(working.X, working.Y, measured, working.Height);
                 if (!TryBuildDockSlot(left, outer, $"{path}/left"))
                 {
                     return false;
                 }
 
-                working = new Rect(working.X + measured + window.Gap, working.Y, Math.Max(0, working.Width - measured - window.Gap), working.Height);
+                working = new Rect(working.X + measured + window.Gap, working.Y,
+                    Math.Max(0, working.Width - measured - window.Gap), working.Height);
             }
 
             if (window.Right is { } right && !working.IsEmpty)
             {
-                var measured = ResolveSlotExtent(right, horizontal: true, working);
-                var outer = new Rect(Math.Max(working.X, working.Right - measured), working.Y, measured, working.Height);
+                var measured = ResolveSlotExtent(right, true, working);
+                var outer = new Rect(Math.Max(working.X, working.Right - measured), working.Y, measured,
+                    working.Height);
                 if (!TryBuildDockSlot(right, outer, $"{path}/right"))
                 {
                     return false;
                 }
 
-                working = new Rect(working.X, working.Y, Math.Max(0, working.Width - measured - window.Gap), working.Height);
+                working = new Rect(working.X, working.Y, Math.Max(0, working.Width - measured - window.Gap),
+                    working.Height);
             }
 
             if (window.Body is { } body && !working.IsEmpty && !TryBuild(body, working, $"{path}/body"))
@@ -545,7 +569,7 @@ internal sealed class TesseraSceneCompiler : IScreenCompiler
             return TryBuild(center.Content, new Rect(x, y, width, height), $"{path}/center");
         }
 
-        private bool TryBuildDock(global::Tessera.Layout.DockLayout dock, in Rect bounds, string path)
+        private bool TryBuildDock(DockLayout dock, in Rect bounds, string path)
         {
             var inner = Rect.Intersect(bounds.Inset(dock.Padding), bounds);
             if (inner.IsEmpty)
@@ -557,56 +581,63 @@ internal sealed class TesseraSceneCompiler : IScreenCompiler
 
             if (dock.Top is { } top)
             {
-                var measured = ResolveSlotExtent(top, horizontal: false, working);
+                var measured = ResolveSlotExtent(top, false, working);
                 var outer = new Rect(working.X, working.Y, working.Width, measured);
                 if (!TryBuildDockSlot(top, outer, $"{path}/top"))
                 {
                     return false;
                 }
 
-                working = new Rect(working.X, working.Y + measured + dock.Gap, working.Width, Math.Max(0, working.Height - measured - dock.Gap));
+                working = new Rect(working.X, working.Y + measured + dock.Gap, working.Width,
+                    Math.Max(0, working.Height - measured - dock.Gap));
             }
 
             if (dock.Bottom is { } bottom && !working.IsEmpty)
             {
-                var measured = ResolveSlotExtent(bottom, horizontal: false, working);
-                var outer = new Rect(working.X, Math.Max(working.Y, working.Bottom - measured), working.Width, measured);
+                var measured = ResolveSlotExtent(bottom, false, working);
+                var outer = new Rect(working.X, Math.Max(working.Y, working.Bottom - measured), working.Width,
+                    measured);
                 if (!TryBuildDockSlot(bottom, outer, $"{path}/bottom"))
                 {
                     return false;
                 }
 
-                working = new Rect(working.X, working.Y, working.Width, Math.Max(0, working.Height - measured - dock.Gap));
+                working = new Rect(working.X, working.Y, working.Width,
+                    Math.Max(0, working.Height - measured - dock.Gap));
             }
 
             if (dock.Left is { } left && !working.IsEmpty)
             {
-                var measured = ResolveSlotExtent(left, horizontal: true, working);
+                var measured = ResolveSlotExtent(left, true, working);
                 var outer = new Rect(working.X, working.Y, measured, working.Height);
                 if (!TryBuildDockSlot(left, outer, $"{path}/left"))
                 {
                     return false;
                 }
 
-                working = new Rect(working.X + measured + dock.Gap, working.Y, Math.Max(0, working.Width - measured - dock.Gap), working.Height);
+                working = new Rect(working.X + measured + dock.Gap, working.Y,
+                    Math.Max(0, working.Width - measured - dock.Gap), working.Height);
             }
 
             if (dock.Right is { } right && !working.IsEmpty)
             {
-                var measured = ResolveSlotExtent(right, horizontal: true, working);
-                var outer = new Rect(Math.Max(working.X, working.Right - measured), working.Y, measured, working.Height);
+                var measured = ResolveSlotExtent(right, true, working);
+                var outer = new Rect(Math.Max(working.X, working.Right - measured), working.Y, measured,
+                    working.Height);
                 if (!TryBuildDockSlot(right, outer, $"{path}/right"))
                 {
                     return false;
                 }
 
-                working = new Rect(working.X, working.Y, Math.Max(0, working.Width - measured - dock.Gap), working.Height);
+                working = new Rect(working.X, working.Y, Math.Max(0, working.Width - measured - dock.Gap),
+                    working.Height);
             }
 
             return dock.Fill is null || working.IsEmpty || TryBuildDockSlot(dock.Fill, working, $"{path}/fill");
         }
 
-        private bool TryBuildStack(bool horizontal, IReadOnlyList<LayoutSlot> children, int gap, Thickness padding, in Rect bounds, string path)
+        private bool TryBuildStack(bool horizontal, IReadOnlyList<LayoutSlot> children, int gap, Thickness padding,
+            in Rect bounds, string path)
         {
             var inner = Rect.Intersect(bounds.Inset(padding), bounds);
             if (inner.IsEmpty || children.Count == 0)
@@ -668,7 +699,7 @@ internal sealed class TesseraSceneCompiler : IScreenCompiler
                         continue;
                     }
 
-                    var share = (remaining * weight) / totalWeight;
+                    var share = remaining * weight / totalWeight;
                     primarySizes[index] = share;
                     assigned += share;
                 }
@@ -698,12 +729,14 @@ internal sealed class TesseraSceneCompiler : IScreenCompiler
                 Rect childBounds;
                 if (horizontal)
                 {
-                    childBounds = new Rect(cursorX + margin.Left, inner.Y + margin.Top, Math.Max(0, primarySize), Math.Max(0, cross));
+                    childBounds = new Rect(cursorX + margin.Left, inner.Y + margin.Top, Math.Max(0, primarySize),
+                        Math.Max(0, cross));
                     cursorX += totalPrimary + gap;
                 }
                 else
                 {
-                    childBounds = new Rect(inner.X + margin.Left, cursorY + margin.Top, Math.Max(0, cross), Math.Max(0, primarySize));
+                    childBounds = new Rect(inner.X + margin.Left, cursorY + margin.Top, Math.Max(0, cross),
+                        Math.Max(0, primarySize));
                     cursorY += totalPrimary + gap;
                 }
 
@@ -810,7 +843,7 @@ internal sealed class TesseraSceneCompiler : IScreenCompiler
                 CommandPalette commandPalette => commandPalette.IsVisible,
                 KeyBindingHelpDialog keyBindingHelpDialog => keyBindingHelpDialog.IsVisible,
                 QuickOpenOverlay quickOpenOverlay => quickOpenOverlay.IsOpen,
-                _ => true,
+                _ => true
             };
         }
 
@@ -825,7 +858,7 @@ internal sealed class TesseraSceneCompiler : IScreenCompiler
                 LayoutLengthKind.Fixed => slot.Length.Value,
                 LayoutLengthKind.Weighted => Math.Max(0, (availablePrimary - marginPrimary) * slot.Length.Value),
                 LayoutLengthKind.Fill => Math.Max(0, availablePrimary - marginPrimary),
-                _ => measuredPrimary,
+                _ => measuredPrimary
             };
 
             return Math.Clamp(content + marginPrimary, 0, availablePrimary);
@@ -849,34 +882,15 @@ internal sealed class TesseraSceneCompiler : IScreenCompiler
             _regions = regions;
             _trackFocus = trackFocus;
             _renderOrder = BuildRenderOrder(regions);
-            FocusedRegionId = ResolveInitialFocus(previousFocusedRegionId, requestedFocusRegionId, requestedFocusOrder, implicitFocusRegionId);
-            ApplyFocus(FocusedRegionId, invokeFocus: false);
+            FocusedRegionId = ResolveInitialFocus(previousFocusedRegionId, requestedFocusRegionId, requestedFocusOrder,
+                implicitFocusRegionId);
+            ApplyFocus(FocusedRegionId, false);
             HasInteraction = HasInteractiveRegions(_regions);
         }
 
         public string? FocusedRegionId { get; private set; }
 
         public bool HasInteraction { get; }
-
-        public void Render(Canvas canvas)
-        {
-            if (_renderOrder is null)
-            {
-                for (var index = 0; index < _regions.Count; index++)
-                {
-                    var region = _regions[index];
-                    region.Render(canvas, region.Bounds);
-                }
-
-                return;
-            }
-
-            for (var orderIndex = 0; orderIndex < _renderOrder.Length; orderIndex++)
-            {
-                var region = _regions[_renderOrder[orderIndex]];
-                region.Render(canvas, region.Bounds);
-            }
-        }
 
         public bool Handle(Message message)
         {
@@ -903,11 +917,32 @@ internal sealed class TesseraSceneCompiler : IScreenCompiler
             return TryGetFocusedRegion(out var focused) && focused.Update is not null && focused.Update(message);
         }
 
+        public void Render(Canvas canvas)
+        {
+            if (_renderOrder is null)
+            {
+                for (var index = 0; index < _regions.Count; index++)
+                {
+                    var region = _regions[index];
+                    region.Render(canvas, region.Bounds);
+                }
+
+                return;
+            }
+
+            for (var orderIndex = 0; orderIndex < _renderOrder.Length; orderIndex++)
+            {
+                var region = _regions[_renderOrder[orderIndex]];
+                region.Render(canvas, region.Bounds);
+            }
+        }
+
         private bool UpdateMouse(PointerInput message)
         {
             var changed = false;
             var targetIndex = FindTopMostRegion(message.X, message.Y);
-            if (targetIndex < 0 && message.Kind == PointerEventKind.Wheel && TryGetFocusedRegionIndex(out var focusedIndex))
+            if (targetIndex < 0 && message.Kind == PointerEventKind.Wheel &&
+                TryGetFocusedRegionIndex(out var focusedIndex))
             {
                 targetIndex = focusedIndex;
             }
@@ -920,7 +955,7 @@ internal sealed class TesseraSceneCompiler : IScreenCompiler
             var target = _regions[targetIndex];
             if (ShouldApplyFocusOnPointer(message) && target.Focusable && target.FocusOnClick)
             {
-                changed |= ApplyFocus(target.Id, invokeFocus: true);
+                changed |= ApplyFocus(target.Id, true);
             }
 
             if (target.UpdateMouse is not null)
@@ -956,12 +991,14 @@ internal sealed class TesseraSceneCompiler : IScreenCompiler
             }
 
             var targetIndex = FindFocusableIndex(startIndex, step);
-            return targetIndex >= 0 && ApplyFocus(_regions[targetIndex].Id, invokeFocus: true);
+            return targetIndex >= 0 && ApplyFocus(_regions[targetIndex].Id, true);
         }
 
-        private string? ResolveInitialFocus(string? previousFocusedRegionId, string? requestedFocusRegionId, long requestedFocusOrder, string? implicitFocusRegionId)
+        private string? ResolveInitialFocus(string? previousFocusedRegionId, string? requestedFocusRegionId,
+            long requestedFocusOrder, string? implicitFocusRegionId)
         {
-            if (requestedFocusOrder > 0 && requestedFocusRegionId is not null && TryGetFocusableRegionIndex(requestedFocusRegionId, out _))
+            if (requestedFocusOrder > 0 && requestedFocusRegionId is not null &&
+                TryGetFocusableRegionIndex(requestedFocusRegionId, out _))
             {
                 return requestedFocusRegionId;
             }
@@ -1084,7 +1121,7 @@ internal sealed class TesseraSceneCompiler : IScreenCompiler
         {
             for (var offset = 1; offset <= _regions.Count; offset++)
             {
-                var index = startIndex + (offset * step);
+                var index = startIndex + offset * step;
                 if (index < 0)
                 {
                     index += _regions.Count;

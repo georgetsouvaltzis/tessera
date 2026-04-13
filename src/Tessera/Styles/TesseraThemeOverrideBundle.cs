@@ -1,11 +1,11 @@
 namespace Tessera.Styles;
 
 /// <summary>
-/// Precomputed control-level style overrides derived from a semantic <see cref="TesseraTheme" />.
+///     Precomputed control-level style overrides derived from a semantic <see cref="TesseraTheme" />.
 /// </summary>
 /// <remarks>
-/// Use this bundle to apply consistent instance overrides across multiple controls without repeating
-/// per-control style composition logic.
+///     Use this bundle to apply consistent instance overrides across multiple controls without repeating
+///     per-control style composition logic.
 /// </remarks>
 public sealed class TesseraThemeOverrideBundle
 {
@@ -30,108 +30,109 @@ public sealed class TesseraThemeOverrideBundle
         PressedActionLabelStyle = theme.Selection.Foreground.WithBold();
         ActionSurfaceStyle = theme.Surface.Overlay.IsEmpty ? theme.Surface.Panel : theme.Surface.Overlay;
         FocusedActionSurfaceStyle = ActionSurfaceStyle;
-        PressedActionSurfaceStyle = theme.Selection.Background.IsEmpty ? ActionSurfaceStyle : theme.Selection.Background;
+        PressedActionSurfaceStyle =
+            theme.Selection.Background.IsEmpty ? ActionSurfaceStyle : theme.Selection.Background;
         BodyTextStyle = theme.Text.Primary;
         EntryTextStyle = theme.Text.Secondary;
     }
 
     /// <summary>
-    /// Gets the theme used to derive all bundle styles.
+    ///     Gets the theme used to derive all bundle styles.
     /// </summary>
     public TesseraTheme Theme { get; }
 
     /// <summary>
-    /// Gets the focus marker text applied to controls that expose focus-marker APIs.
+    ///     Gets the focus marker text applied to controls that expose focus-marker APIs.
     /// </summary>
     public string FocusMarker { get; }
 
     /// <summary>
-    /// Gets the unfocused border text style override.
+    ///     Gets the unfocused border text style override.
     /// </summary>
     public TesseraStyle BorderStyleText { get; }
 
     /// <summary>
-    /// Gets the focused border text style override.
+    ///     Gets the focused border text style override.
     /// </summary>
     public TesseraStyle FocusedBorderStyleText { get; }
 
     /// <summary>
-    /// Gets the unfocused title style override.
+    ///     Gets the unfocused title style override.
     /// </summary>
     public TesseraStyle TitleStyle { get; }
 
     /// <summary>
-    /// Gets the focused title style override.
+    ///     Gets the focused title style override.
     /// </summary>
     public TesseraStyle FocusedTitleStyle { get; }
 
     /// <summary>
-    /// Gets the default list-like item style override.
+    ///     Gets the default list-like item style override.
     /// </summary>
     public TesseraStyle DefaultItemStyle { get; }
 
     /// <summary>
-    /// Gets the list/table header style override.
+    ///     Gets the list/table header style override.
     /// </summary>
     public TesseraStyle HeaderStyle { get; }
 
     /// <summary>
-    /// Gets the selected item/row style override.
+    ///     Gets the selected item/row style override.
     /// </summary>
     public TesseraStyle SelectedItemStyle { get; }
 
     /// <summary>
-    /// Gets the hovered item/row style override.
+    ///     Gets the hovered item/row style override.
     /// </summary>
     public TesseraStyle HoveredItemStyle { get; }
 
     /// <summary>
-    /// Gets the unread item style override used by notification-style controls.
+    ///     Gets the unread item style override used by notification-style controls.
     /// </summary>
     public TesseraStyle UnreadItemStyle { get; }
 
     /// <summary>
-    /// Gets the default action label style override for action controls.
+    ///     Gets the default action label style override for action controls.
     /// </summary>
     public TesseraStyle ActionLabelStyle { get; }
 
     /// <summary>
-    /// Gets the focused action label style override for action controls.
+    ///     Gets the focused action label style override for action controls.
     /// </summary>
     public TesseraStyle FocusedActionLabelStyle { get; }
 
     /// <summary>
-    /// Gets the pressed action label style override for action controls.
+    ///     Gets the pressed action label style override for action controls.
     /// </summary>
     public TesseraStyle PressedActionLabelStyle { get; }
 
     /// <summary>
-    /// Gets the default action body surface override for action controls.
+    ///     Gets the default action body surface override for action controls.
     /// </summary>
     public TesseraStyle ActionSurfaceStyle { get; }
 
     /// <summary>
-    /// Gets the focused action body surface override for action controls.
+    ///     Gets the focused action body surface override for action controls.
     /// </summary>
     public TesseraStyle FocusedActionSurfaceStyle { get; }
 
     /// <summary>
-    /// Gets the pressed action body surface override for action controls.
+    ///     Gets the pressed action body surface override for action controls.
     /// </summary>
     public TesseraStyle PressedActionSurfaceStyle { get; }
 
     /// <summary>
-    /// Gets the default body text style override.
+    ///     Gets the default body text style override.
     /// </summary>
     public TesseraStyle BodyTextStyle { get; }
 
     /// <summary>
-    /// Gets the default log/entry text style override.
+    ///     Gets the default log/entry text style override.
     /// </summary>
     public TesseraStyle EntryTextStyle { get; }
 
     /// <summary>
-    /// Creates a dashboard-oriented override bundle from a semantic theme.
+    ///     Creates a dashboard-oriented override bundle from a semantic theme.
     /// </summary>
     /// <param name="theme">The semantic theme source.</param>
     /// <param name="focusMarker">The focus marker to apply to controls that expose marker hooks.</param>

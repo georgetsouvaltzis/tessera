@@ -1,14 +1,16 @@
+using System.ComponentModel;
+
 namespace Tessera.Controls;
 
 /// <summary>
-/// Provides details when <see cref="GroupedListView{TGroup,TItem}" /> selection changes.
+///     Provides details when <see cref="GroupedListView{TGroup,TItem}" /> selection changes.
 /// </summary>
 /// <typeparam name="TGroup">The group-key type.</typeparam>
 /// <typeparam name="TItem">The item type.</typeparam>
 public sealed class GroupedListSelectionChangedEventArgs<TGroup, TItem> : EventArgs
 {
     /// <summary>
-    /// Initializes a new selection payload.
+    ///     Initializes a new selection payload.
     /// </summary>
     /// <param name="previousRowIndex">Previous visible-row index.</param>
     /// <param name="currentRowIndex">Current visible-row index.</param>
@@ -39,80 +41,80 @@ public sealed class GroupedListSelectionChangedEventArgs<TGroup, TItem> : EventA
     }
 
     /// <summary>
-    /// Gets previous visible-row index.
+    ///     Gets previous visible-row index.
     /// </summary>
     public int PreviousRowIndex { get; }
 
     /// <summary>
-    /// Gets selected visible-row index.
-    /// Compatibility alias for <see cref="SelectedRowIndex" />.
+    ///     Gets selected visible-row index.
+    ///     Compatibility alias for <see cref="SelectedRowIndex" />.
     /// </summary>
-    [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Advanced)]
+    [EditorBrowsable(EditorBrowsableState.Advanced)]
     public int CurrentRowIndex { get; }
 
     /// <summary>
-    /// Gets selected visible-row index.
-    /// Canonical property for selection access.
+    ///     Gets selected visible-row index.
+    ///     Canonical property for selection access.
     /// </summary>
     public int SelectedRowIndex => CurrentRowIndex;
 
     /// <summary>
-    /// Gets previous selected group index, when any.
+    ///     Gets previous selected group index, when any.
     /// </summary>
     public int? PreviousGroupIndex { get; }
 
     /// <summary>
-    /// Gets selected group index, when any.
-    /// Compatibility alias for <see cref="SelectedGroupIndex" />.
+    ///     Gets selected group index, when any.
+    ///     Compatibility alias for <see cref="SelectedGroupIndex" />.
     /// </summary>
-    [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Advanced)]
+    [EditorBrowsable(EditorBrowsableState.Advanced)]
     public int? CurrentGroupIndex { get; }
 
     /// <summary>
-    /// Gets selected group index, when any.
-    /// Canonical property for selection access.
+    ///     Gets selected group index, when any.
+    ///     Canonical property for selection access.
     /// </summary>
     public int? SelectedGroupIndex => CurrentGroupIndex;
 
     /// <summary>
-    /// Gets the group-key type carried by the owning grouped list.
+    ///     Gets the group-key type carried by the owning grouped list.
     /// </summary>
-    [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Advanced)]
+    [EditorBrowsable(EditorBrowsableState.Advanced)]
     public Type GroupKeyType => typeof(TGroup);
 
     /// <summary>
-    /// Gets previous selected item index within its group, when any.
+    ///     Gets previous selected item index within its group, when any.
     /// </summary>
     public int? PreviousItemIndex { get; }
 
     /// <summary>
-    /// Gets selected item index within its group, when any.
-    /// Compatibility alias for <see cref="SelectedItemIndex" />.
+    ///     Gets selected item index within its group, when any.
+    ///     Compatibility alias for <see cref="SelectedItemIndex" />.
     /// </summary>
-    [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Advanced)]
+    [EditorBrowsable(EditorBrowsableState.Advanced)]
     public int? CurrentItemIndex { get; }
 
     /// <summary>
-    /// Gets selected item index within its group, when any.
-    /// Canonical property for selection access.
+    ///     Gets selected item index within its group, when any.
+    ///     Canonical property for selection access.
     /// </summary>
     public int? SelectedItemIndex => CurrentItemIndex;
 
     /// <summary>
-    /// Gets previous selected item, when any.
+    ///     Gets previous selected item, when any.
     /// </summary>
     public TItem? PreviousItem { get; }
 
     /// <summary>
-    /// Gets selected item, when any.
-    /// Compatibility alias for <see cref="SelectedItem" />.
+    ///     Gets selected item, when any.
+    ///     Compatibility alias for <see cref="SelectedItem" />.
     /// </summary>
-    [System.ComponentModel.EditorBrowsable(System.ComponentModel.EditorBrowsableState.Advanced)]
+    [EditorBrowsable(EditorBrowsableState.Advanced)]
     public TItem? CurrentItem { get; }
 
     /// <summary>
-    /// Gets selected item, when any.
-    /// Canonical property for selection access.
+    ///     Gets selected item, when any.
+    ///     Canonical property for selection access.
     /// </summary>
     public TItem? SelectedItem => CurrentItem;
 }

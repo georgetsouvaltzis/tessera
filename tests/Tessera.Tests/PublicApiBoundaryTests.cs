@@ -1,21 +1,25 @@
 using System.Reflection;
 using System.Text.RegularExpressions;
-using Tessera;
 using Tessera.Styles;
 
 namespace Tessera.Tests;
 
 internal static class PublicApiBoundaryTests
 {
-    private static readonly Regex TesseraCoreImportRegex = new(@"(?m)^\s*using\s+.*Tessera\.Core.*;", RegexOptions.Compiled);
-    private static readonly Regex TesseraHostingImportRegex = new(@"(?m)^\s*using\s+.*Tessera\.Hosting.*;", RegexOptions.Compiled);
-    private static readonly Regex DependencyInjectionImportRegex = new(@"(?m)^\s*using\s+.*Microsoft\.Extensions\.DependencyInjection.*;", RegexOptions.Compiled);
+    private static readonly Regex TesseraCoreImportRegex =
+        new(@"(?m)^\s*using\s+.*Tessera\.Core.*;", RegexOptions.Compiled);
+
+    private static readonly Regex TesseraHostingImportRegex =
+        new(@"(?m)^\s*using\s+.*Tessera\.Hosting.*;", RegexOptions.Compiled);
+
+    private static readonly Regex DependencyInjectionImportRegex =
+        new(@"(?m)^\s*using\s+.*Microsoft\.Extensions\.DependencyInjection.*;", RegexOptions.Compiled);
 
     private static readonly string[] FlagshipExampleProjectPaths =
     [
         "examples/DataWorkbench/DataWorkbench.csproj",
         "examples/OpsWatch/OpsWatch.csproj",
-        "examples/GitConsole/GitConsole.csproj",
+        "examples/GitConsole/GitConsole.csproj"
     ];
 
     private static readonly string[] CoreImportAllowList =
@@ -25,7 +29,7 @@ internal static class PublicApiBoundaryTests
     private static readonly string[] OnboardingSourceRoots =
     [
         "src/Tessera/Controls",
-        "src/Tessera/Layout",
+        "src/Tessera/Layout"
     ];
 
     public static IEnumerable<TestCase> Cases()
@@ -173,7 +177,8 @@ internal static class PublicApiBoundaryTests
         var repoRoot = GetRepoRoot();
         var offenders = FlagshipExampleProjectPaths
             .Where(path => File.Exists(Path.Combine(repoRoot, path)))
-            .Where(path => File.ReadAllText(Path.Combine(repoRoot, path)).Contains("Tessera.Core.csproj", StringComparison.Ordinal))
+            .Where(path => File.ReadAllText(Path.Combine(repoRoot, path))
+                .Contains("Tessera.Core.csproj", StringComparison.Ordinal))
             .ToArray();
 
         TestAssert.True(
@@ -201,7 +206,8 @@ internal static class PublicApiBoundaryTests
                 leakedMembers.Add($"{type.FullName} (type)");
             }
 
-            const BindingFlags flags = BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.DeclaredOnly;
+            const BindingFlags flags = BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public |
+                                       BindingFlags.DeclaredOnly;
 
             foreach (var constructor in type.GetConstructors(flags))
             {
@@ -262,9 +268,11 @@ internal static class PublicApiBoundaryTests
             for (var parameterIndex = 0; parameterIndex < parameters.Length; parameterIndex++)
             {
                 var parameter = parameters[parameterIndex];
-                if (ContainsTesseraCoreType(parameter.ParameterType) || ContainsTesseraHostingType(parameter.ParameterType))
+                if (ContainsTesseraCoreType(parameter.ParameterType) ||
+                    ContainsTesseraHostingType(parameter.ParameterType))
                 {
-                    offenders.Add($"{nameof(ThemeScope)}.{method.Name}(...) param {parameter.Name}:{parameter.ParameterType.Name}");
+                    offenders.Add(
+                        $"{nameof(ThemeScope)}.{method.Name}(...) param {parameter.Name}:{parameter.ParameterType.Name}");
                 }
             }
         }
@@ -285,7 +293,7 @@ internal static class PublicApiBoundaryTests
     private static string GetRepoRoot()
     {
         var start = Path.GetDirectoryName(typeof(PublicApiBoundaryTests).Assembly.Location)
-            ?? AppContext.BaseDirectory;
+                    ?? AppContext.BaseDirectory;
         var directory = new DirectoryInfo(start);
 
         while (directory is not null)
@@ -355,7 +363,7 @@ internal static class PublicApiBoundaryTests
     {
         var @namespace = type.Namespace ?? string.Empty;
         return @namespace.Equals("Tessera", StringComparison.Ordinal)
-            || @namespace.StartsWith("Tessera.Controls", StringComparison.Ordinal)
-            || @namespace.StartsWith("Tessera.Layout", StringComparison.Ordinal);
+               || @namespace.StartsWith("Tessera.Controls", StringComparison.Ordinal)
+               || @namespace.StartsWith("Tessera.Layout", StringComparison.Ordinal);
     }
 }

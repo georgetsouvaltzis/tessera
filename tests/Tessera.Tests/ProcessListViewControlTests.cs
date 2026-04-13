@@ -17,16 +17,16 @@ public sealed class ProcessListViewControlTests
             Title = string.Empty,
             StatusHeaderText = "STATE",
             CpuHeaderText = "CPU%",
-            MemoryHeaderText = "MEM",
+            MemoryHeaderText = "MEM"
         };
         control.SetEntries(
         [
             new ProcessListEntry(101, "tea-worker", ProcessListStatus.Running, 12.5, 128.3),
             new ProcessListEntry(222, "tea-cache", ProcessListStatus.Sleeping, 0.4, 64.0),
-            new ProcessListEntry(333, "tea-sync", ProcessListStatus.Stopped, 0, 32.1),
+            new ProcessListEntry(333, "tea-sync", ProcessListStatus.Stopped, 0, 32.1)
         ]);
 
-        var output = Render(control, width: 100, height: 8);
+        var output = Render(control, 100, 8);
 
         Assert.That(output.Contains("STATE", StringComparison.Ordinal), Is.True);
         Assert.That(output.Contains("CPU%", StringComparison.Ordinal), Is.True);
@@ -41,17 +41,12 @@ public sealed class ProcessListViewControlTests
     [Test]
     public void ControlsProcessListViewKeyboardAndPointerSelectionRaisesSelectionChanged()
     {
-        var control = new ProcessListView
-        {
-            Border = BorderStyle.None,
-            Title = string.Empty,
-            IsFocused = true,
-        };
+        var control = new ProcessListView { Border = BorderStyle.None, Title = string.Empty, IsFocused = true };
         control.SetEntries(
         [
             new ProcessListEntry(101, "tea-worker", ProcessListStatus.Running, 12.5, 128.3),
             new ProcessListEntry(222, "tea-cache", ProcessListStatus.Sleeping, 0.4, 64.0),
-            new ProcessListEntry(333, "tea-sync", ProcessListStatus.Stopped, 0, 32.1),
+            new ProcessListEntry(333, "tea-sync", ProcessListStatus.Stopped, 0, 32.1)
         ]);
 
         var raised = 0;
@@ -77,22 +72,18 @@ public sealed class ProcessListViewControlTests
     [Test]
     public void ControlsProcessListViewDefaultRenderIsDeterministicAndMonochrome()
     {
-        var control = new ProcessListView
-        {
-            Border = BorderStyle.None,
-            Title = string.Empty,
-        };
+        var control = new ProcessListView { Border = BorderStyle.None, Title = string.Empty };
         control.SetEntries(
         [
             new ProcessListEntry(101, "tea-worker", ProcessListStatus.Running, 12.5, 128.3),
-            new ProcessListEntry(222, "tea-cache", ProcessListStatus.Sleeping, 0.4, 64.0),
+            new ProcessListEntry(222, "tea-cache", ProcessListStatus.Sleeping, 0.4, 64.0)
         ]);
 
-        var first = Render(control, width: 100, height: 6);
-        var second = Render(control, width: 100, height: 6);
+        var first = Render(control, 100, 6);
+        var second = Render(control, 100, 6);
 
         Assert.That(first, Is.EqualTo(second));
-        Assert.That(first.Contains("\u001b[", StringComparison.Ordinal), Is.False);
+        Assert.That(first.Contains("\e[", StringComparison.Ordinal), Is.False);
     }
 
     private static string Render(ProcessListView control, int width, int height)

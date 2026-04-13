@@ -8,6 +8,8 @@ namespace Tessera.Benchmarks;
 [MemoryDiagnoser]
 public class StyledHeavyOutputBenchmarks
 {
+    private readonly Rect _bounds = new(0, 0, 160, 40);
+
     private readonly DataGrid _grid = new()
     {
         Border = BorderStyle.SingleLine,
@@ -20,17 +22,15 @@ public class StyledHeavyOutputBenchmarks
         SelectedCellStyle = TesseraStyle.Empty.WithBold().WithForeground(AnsiColor.BrightCyan),
         MutedStyle = TesseraStyle.Empty.WithDim().WithForeground(AnsiColor.BrightBlack),
         DisabledStyle = TesseraStyle.Empty.WithForeground(AnsiColor.BrightBlack),
-        MutedRowPredicate = static (rowIndex, _) => rowIndex % 3 == 0,
+        MutedRowPredicate = static (rowIndex, _) => rowIndex % 3 == 0
     };
-
-    private readonly Rect _bounds = new(0, 0, 160, 40);
 
     [GlobalSetup]
     public void Setup()
     {
-        _grid.SetColumns(BenchmarkDataFactory.CreateColumns(count: 12, width: 11));
-        _grid.SetRows(BenchmarkDataFactory.CreateRows(rowCount: 1_200, columnCount: 12, seed: 2026));
-        _grid.SelectCell(rowIndex: 320, columnIndex: 4);
+        _grid.SetColumns(BenchmarkDataFactory.CreateColumns(12, 11));
+        _grid.SetRows(BenchmarkDataFactory.CreateRows(1_200, 12, 2026));
+        _grid.SelectCell(320, 4);
     }
 
     [Benchmark(Description = "styled-heavy output render")]

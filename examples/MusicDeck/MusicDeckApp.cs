@@ -1,26 +1,61 @@
 using Tessera.Controls;
-using Tessera.Layout;
 using Tessera.Styles;
 
 namespace Tessera.Examples.MusicDeck;
 
 internal sealed partial class MusicDeckApp : TesseraApp
 {
-    private readonly MusicDeckState _state = MusicDeckState.CreateSeed();
-    private readonly MusicDeckNowPlayingControl _nowPlaying = new() { Border = BorderStyle.Rounded, Padding = Thickness.All(1) };
-    private readonly MusicDeckQueueControl _queue = new() { Title = "Queue · F1", Border = BorderStyle.Rounded, Padding = Thickness.All(1) };
-    private readonly ProgressBar _progress = new() { Title = "Playback Drift", Border = BorderStyle.Rounded, Padding = Thickness.All(1), FocusMarker = "✦" };
     private readonly Button _backButton = new() { Text = "Back", Padding = Thickness.Symmetric(2, 1) };
-    private readonly Button _playPauseButton = new() { Text = "Pause", Padding = Thickness.Symmetric(2, 1) };
-    private readonly Button _nextButton = new() { Text = "Next", Padding = Thickness.Symmetric(2, 1) };
+
+    private readonly StatsCard _deckStats =
+        new() { Title = "Playback Stats", Border = BorderStyle.Rounded, Padding = Thickness.All(1) };
+
     private readonly Button _detailButton = new() { Text = "Notes", Padding = Thickness.Symmetric(2, 1) };
+    private readonly StatusBar _footer = new() { Fill = ' ' };
+
+    private readonly Label _lyrics = new()
+    {
+        Title = "Lyric Sheet · F2",
+        Border = BorderStyle.Rounded,
+        Padding = Thickness.Symmetric(2, 1)
+    };
+
+    private readonly Button _nextButton = new() { Text = "Next", Padding = Thickness.Symmetric(2, 1) };
+
+    private readonly MusicDeckNowPlayingControl _nowPlaying =
+        new() { Border = BorderStyle.Rounded, Padding = Thickness.All(1) };
+
+    private readonly Button _playPauseButton = new() { Text = "Pause", Padding = Thickness.Symmetric(2, 1) };
+
+    private readonly ProgressBar _progress = new()
+    {
+        Title = "Playback Drift",
+        Border = BorderStyle.Rounded,
+        Padding = Thickness.All(1),
+        FocusMarker = "✦"
+    };
+
+    private readonly MusicDeckQueueControl _queue = new()
+    {
+        Title = "Queue · F1",
+        Border = BorderStyle.Rounded,
+        Padding = Thickness.All(1)
+    };
+
+    private readonly Label _sessionMeta = new()
+    {
+        Title = "Session Notes",
+        Border = BorderStyle.Rounded,
+        Padding = Thickness.Symmetric(2, 1)
+    };
+
+    private readonly MusicDeckState _state = MusicDeckState.CreateSeed();
+
+    private readonly StatsCard _trackStats =
+        new() { Title = "Track Details", Border = BorderStyle.Rounded, Padding = Thickness.All(1) };
+
     private readonly Label _transportLeftSpacer = new() { Border = BorderStyle.None, Text = string.Empty };
     private readonly Label _transportRightSpacer = new() { Border = BorderStyle.None, Text = string.Empty };
-    private readonly StatsCard _deckStats = new() { Title = "Playback Stats", Border = BorderStyle.Rounded, Padding = Thickness.All(1) };
-    private readonly StatsCard _trackStats = new() { Title = "Track Details", Border = BorderStyle.Rounded, Padding = Thickness.All(1) };
-    private readonly Label _sessionMeta = new() { Title = "Session Notes", Border = BorderStyle.Rounded, Padding = Thickness.Symmetric(2, 1) };
-    private readonly Label _lyrics = new() { Title = "Lyric Sheet · F2", Border = BorderStyle.Rounded, Padding = Thickness.Symmetric(2, 1) };
-    private readonly StatusBar _footer = new() { Fill = ' ' };
 
     public MusicDeckApp()
     {
@@ -29,7 +64,10 @@ internal sealed partial class MusicDeckApp : TesseraApp
         _queue.RequestFocus();
     }
 
-    public override TesseraEffect? Initialize() => TesseraEffects.Periodic(TimeSpan.FromMilliseconds(1000), _ => new MusicDeckTickMessage());
+    public override TesseraEffect? Initialize()
+    {
+        return TesseraEffects.Periodic(TimeSpan.FromMilliseconds(1000), _ => new MusicDeckTickMessage());
+    }
 
     public override TesseraEffect? Update(Message message)
     {
@@ -153,8 +191,10 @@ internal sealed partial class MusicDeckApp : TesseraApp
         _sessionMeta.Text = _state.BuildMetaText();
         _lyrics.Title = _state.ShowingLinerNotes ? "Liner Notes · F2" : "Lyric Sheet · F2";
         _lyrics.Text = _state.BuildLyricsOrNotes();
-        _footer.LeftText = $"musicdeck  {_state.CurrentTrack.Artist}  {_state.CurrentTrack.Album}  {_state.ProgressText}";
-        _footer.RightText = "F1 queue  F2 notes  j/k browse  enter cue  space play/pause  p previous  n next  l swap sheet";
+        _footer.LeftText =
+            $"musicdeck  {_state.CurrentTrack.Artist}  {_state.CurrentTrack.Album}  {_state.ProgressText}";
+        _footer.RightText =
+            "F1 queue  F2 notes  j/k browse  enter cue  space play/pause  p previous  n next  l swap sheet";
     }
 
     private void ConfigureTheme()

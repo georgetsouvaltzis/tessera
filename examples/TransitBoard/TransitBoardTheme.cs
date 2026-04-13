@@ -6,7 +6,7 @@ internal enum TransitBoardThemeKind
 {
     Meridian,
     Harbor,
-    Afterglow,
+    Afterglow
 }
 
 internal sealed record TransitBoardPalette(
@@ -40,7 +40,7 @@ internal static class TransitBoardTheme
         {
             TransitBoardThemeKind.Harbor => CreateHarbor(),
             TransitBoardThemeKind.Afterglow => CreateAfterglow(),
-            _ => CreateMeridian(),
+            _ => CreateMeridian()
         };
     }
 
@@ -75,50 +75,52 @@ internal static class TransitBoardTheme
     {
         var theme = new TesseraTheme
         {
-            Text = new TesseraThemeTextTokens
-            {
-                Primary = Foreground(0xF3F4EF),
-                Secondary = Foreground(0xBFCFCE),
-                Muted = Foreground(0x708B8F),
-                Inverse = ForegroundBackground(0x081116, 0xF3F4EF),
-            },
-            Surface = new TesseraThemeSurfaceTokens
-            {
-                Base = Background(0x081116),
-                Panel = Background(0x0C181E),
-                Overlay = Background(0x0F2028),
-            },
-            Border = new TesseraThemeBorderTokens
-            {
-                Default = Foreground(0x274149),
-                Strong = Foreground(0x4A7A80),
-                Focused = Foreground(0x7BE4D4),
-                Error = Foreground(0xFF8A72),
-            },
-            State = new TesseraThemeStateTokens
-            {
-                Success = Foreground(0xA5F08F),
-                Warning = Foreground(0xFFD36E),
-                Error = Foreground(0xFF8A72),
-                Info = Foreground(0x80D6FF),
-            },
-            Accent = new TesseraThemeAccentTokens
-            {
-                Primary = Foreground(0x7BE4D4),
-                Secondary = Foreground(0x80D6FF),
-            },
-            Selection = new TesseraThemeSelectionTokens
-            {
-                Foreground = Foreground(0x081116),
-                Background = Background(0xF1F3E7),
-            },
+            Text =
+                new TesseraThemeTextTokens
+                {
+                    Primary = Foreground(0xF3F4EF),
+                    Secondary = Foreground(0xBFCFCE),
+                    Muted = Foreground(0x708B8F),
+                    Inverse = ForegroundBackground(0x081116, 0xF3F4EF)
+                },
+            Surface =
+                new TesseraThemeSurfaceTokens
+                {
+                    Base = Background(0x081116),
+                    Panel = Background(0x0C181E),
+                    Overlay = Background(0x0F2028)
+                },
+            Border =
+                new TesseraThemeBorderTokens
+                {
+                    Default = Foreground(0x274149),
+                    Strong = Foreground(0x4A7A80),
+                    Focused = Foreground(0x7BE4D4),
+                    Error = Foreground(0xFF8A72)
+                },
+            State =
+                new TesseraThemeStateTokens
+                {
+                    Success = Foreground(0xA5F08F),
+                    Warning = Foreground(0xFFD36E),
+                    Error = Foreground(0xFF8A72),
+                    Info = Foreground(0x80D6FF)
+                },
+            Accent =
+                new TesseraThemeAccentTokens { Primary = Foreground(0x7BE4D4), Secondary = Foreground(0x80D6FF) },
+            Selection =
+                new TesseraThemeSelectionTokens
+                {
+                    Foreground = Foreground(0x081116),
+                    Background = Background(0xF1F3E7)
+                },
             Focus = new TesseraThemeFocusTokens
             {
                 Ring = Foreground(0x7BE4D4).WithBold(),
                 Title = Foreground(0x7BE4D4).WithBold(),
                 Border = Foreground(0x7BE4D4).WithBold(),
-                Marker = "◆",
-            },
+                Marker = "◆"
+            }
         };
 
         return new TransitBoardPalette(
@@ -147,50 +149,52 @@ internal static class TransitBoardTheme
     {
         var theme = new TesseraTheme
         {
-            Text = new TesseraThemeTextTokens
-            {
-                Primary = Foreground(0xF9F2E7),
-                Secondary = Foreground(0xDCC9B8),
-                Muted = Foreground(0x857366),
-                Inverse = ForegroundBackground(0x140D0E, 0xF9F2E7),
-            },
-            Surface = new TesseraThemeSurfaceTokens
-            {
-                Base = Background(0x140D0E),
-                Panel = Background(0x1A1315),
-                Overlay = Background(0x21191C),
-            },
-            Border = new TesseraThemeBorderTokens
-            {
-                Default = Foreground(0x4F393B),
-                Strong = Foreground(0x8C6462),
-                Focused = Foreground(0xF7B37A),
-                Error = Foreground(0xFF7B67),
-            },
-            State = new TesseraThemeStateTokens
-            {
-                Success = Foreground(0x8DE0B4),
-                Warning = Foreground(0xF6C86E),
-                Error = Foreground(0xFF7B67),
-                Info = Foreground(0x79C7F2),
-            },
-            Accent = new TesseraThemeAccentTokens
-            {
-                Primary = Foreground(0xF7B37A),
-                Secondary = Foreground(0x79C7F2),
-            },
-            Selection = new TesseraThemeSelectionTokens
-            {
-                Foreground = Foreground(0x140D0E),
-                Background = Background(0xF9F2E7),
-            },
+            Text =
+                new TesseraThemeTextTokens
+                {
+                    Primary = Foreground(0xF9F2E7),
+                    Secondary = Foreground(0xDCC9B8),
+                    Muted = Foreground(0x857366),
+                    Inverse = ForegroundBackground(0x140D0E, 0xF9F2E7)
+                },
+            Surface =
+                new TesseraThemeSurfaceTokens
+                {
+                    Base = Background(0x140D0E),
+                    Panel = Background(0x1A1315),
+                    Overlay = Background(0x21191C)
+                },
+            Border =
+                new TesseraThemeBorderTokens
+                {
+                    Default = Foreground(0x4F393B),
+                    Strong = Foreground(0x8C6462),
+                    Focused = Foreground(0xF7B37A),
+                    Error = Foreground(0xFF7B67)
+                },
+            State =
+                new TesseraThemeStateTokens
+                {
+                    Success = Foreground(0x8DE0B4),
+                    Warning = Foreground(0xF6C86E),
+                    Error = Foreground(0xFF7B67),
+                    Info = Foreground(0x79C7F2)
+                },
+            Accent =
+                new TesseraThemeAccentTokens { Primary = Foreground(0xF7B37A), Secondary = Foreground(0x79C7F2) },
+            Selection =
+                new TesseraThemeSelectionTokens
+                {
+                    Foreground = Foreground(0x140D0E),
+                    Background = Background(0xF9F2E7)
+                },
             Focus = new TesseraThemeFocusTokens
             {
                 Ring = Foreground(0xF7B37A).WithBold(),
                 Title = Foreground(0xF7B37A).WithBold(),
                 Border = Foreground(0xF7B37A).WithBold(),
-                Marker = "◆",
-            },
+                Marker = "◆"
+            }
         };
 
         return new TransitBoardPalette(
@@ -219,50 +223,52 @@ internal static class TransitBoardTheme
     {
         var theme = new TesseraTheme
         {
-            Text = new TesseraThemeTextTokens
-            {
-                Primary = Foreground(0xF6EEFF),
-                Secondary = Foreground(0xC9B8E4),
-                Muted = Foreground(0x8171A0),
-                Inverse = ForegroundBackground(0x110A1D, 0xF6EEFF),
-            },
-            Surface = new TesseraThemeSurfaceTokens
-            {
-                Base = Background(0x110A1D),
-                Panel = Background(0x171024),
-                Overlay = Background(0x1D142A),
-            },
-            Border = new TesseraThemeBorderTokens
-            {
-                Default = Foreground(0x41325E),
-                Strong = Foreground(0x7562A0),
-                Focused = Foreground(0x64EAD6),
-                Error = Foreground(0xFF7AAE),
-            },
-            State = new TesseraThemeStateTokens
-            {
-                Success = Foreground(0x85F0B4),
-                Warning = Foreground(0xFFD86E),
-                Error = Foreground(0xFF7AAE),
-                Info = Foreground(0x6ED3FF),
-            },
-            Accent = new TesseraThemeAccentTokens
-            {
-                Primary = Foreground(0x64EAD6),
-                Secondary = Foreground(0x6ED3FF),
-            },
-            Selection = new TesseraThemeSelectionTokens
-            {
-                Foreground = Foreground(0x110A1D),
-                Background = Background(0xF6EEFF),
-            },
+            Text =
+                new TesseraThemeTextTokens
+                {
+                    Primary = Foreground(0xF6EEFF),
+                    Secondary = Foreground(0xC9B8E4),
+                    Muted = Foreground(0x8171A0),
+                    Inverse = ForegroundBackground(0x110A1D, 0xF6EEFF)
+                },
+            Surface =
+                new TesseraThemeSurfaceTokens
+                {
+                    Base = Background(0x110A1D),
+                    Panel = Background(0x171024),
+                    Overlay = Background(0x1D142A)
+                },
+            Border =
+                new TesseraThemeBorderTokens
+                {
+                    Default = Foreground(0x41325E),
+                    Strong = Foreground(0x7562A0),
+                    Focused = Foreground(0x64EAD6),
+                    Error = Foreground(0xFF7AAE)
+                },
+            State =
+                new TesseraThemeStateTokens
+                {
+                    Success = Foreground(0x85F0B4),
+                    Warning = Foreground(0xFFD86E),
+                    Error = Foreground(0xFF7AAE),
+                    Info = Foreground(0x6ED3FF)
+                },
+            Accent =
+                new TesseraThemeAccentTokens { Primary = Foreground(0x64EAD6), Secondary = Foreground(0x6ED3FF) },
+            Selection =
+                new TesseraThemeSelectionTokens
+                {
+                    Foreground = Foreground(0x110A1D),
+                    Background = Background(0xF6EEFF)
+                },
             Focus = new TesseraThemeFocusTokens
             {
                 Ring = Foreground(0x64EAD6).WithBold(),
                 Title = Foreground(0x64EAD6).WithBold(),
                 Border = Foreground(0x64EAD6).WithBold(),
-                Marker = "◆",
-            },
+                Marker = "◆"
+            }
         };
 
         return new TransitBoardPalette(

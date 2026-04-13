@@ -12,18 +12,14 @@ public sealed class KeyBindingHelpDialogControlTests
     [Test]
     public void KeyBindingHelpDialogRenderShowsGroupsAndRows()
     {
-        var control = new KeyBindingHelpDialog
-        {
-            IsVisible = true,
-            ShowGroups = true,
-        };
+        var control = new KeyBindingHelpDialog { IsVisible = true, ShowGroups = true };
         control.SetItems(
         [
-            new KeyBindingItem("Ctrl+P", "Open palette", "Global", isGlobal: true),
-            new KeyBindingItem("Ctrl+S", "Save file", "File"),
+            new KeyBindingItem("Ctrl+P", "Open palette", "Global", true),
+            new KeyBindingItem("Ctrl+S", "Save file", "File")
         ]);
 
-        var output = Render(control, width: 80, height: 8);
+        var output = Render(control, 80, 8);
 
         Assert.That(output.Contains("Keyboard Shortcuts", StringComparison.Ordinal), Is.True);
         Assert.That(output.Contains("[Global]", StringComparison.Ordinal), Is.True);
@@ -34,15 +30,11 @@ public sealed class KeyBindingHelpDialogControlTests
     [Test]
     public void KeyBindingHelpDialogKeyboardNavigationAndEscapeWork()
     {
-        var control = new KeyBindingHelpDialog
-        {
-            IsVisible = true,
-            IsFocused = true,
-        };
+        var control = new KeyBindingHelpDialog { IsVisible = true, IsFocused = true };
         control.SetItems(
         [
             new KeyBindingItem("Ctrl+P", "Open palette"),
-            new KeyBindingItem("Ctrl+S", "Save file"),
+            new KeyBindingItem("Ctrl+S", "Save file")
         ]);
 
         var moved = control.Handle(new KeyPressed(Key.Down));
@@ -57,21 +49,18 @@ public sealed class KeyBindingHelpDialogControlTests
     [Test]
     public void KeyBindingHelpDialogPointerSelectsRowAndOutsideClickHides()
     {
-        var control = new KeyBindingHelpDialog
-        {
-            IsVisible = true,
-        };
+        var control = new KeyBindingHelpDialog { IsVisible = true };
         control.SetItems(
         [
             new KeyBindingItem("Ctrl+P", "Open palette"),
-            new KeyBindingItem("Ctrl+S", "Save file"),
+            new KeyBindingItem("Ctrl+S", "Save file")
         ]);
 
         var selectHandled = control.Handle(
-            new PointerInput(PointerEventKind.Press, PointerButton.Left, X: 5, Y: 2),
+            new PointerInput(PointerEventKind.Press, PointerButton.Left, 5, 2),
             new Rect(0, 0, 72, 8));
         var hideHandled = control.Handle(
-            new PointerInput(PointerEventKind.Press, PointerButton.Left, X: 200, Y: 200),
+            new PointerInput(PointerEventKind.Press, PointerButton.Left, 200, 200),
             new Rect(0, 0, 72, 8));
 
         Assert.That(selectHandled, Is.True);
@@ -86,16 +75,16 @@ public sealed class KeyBindingHelpDialogControlTests
         var control = new KeyBindingHelpDialog
         {
             IsVisible = true,
-            SelectedRowStyle = TesseraStyle.Empty.WithForeground(AnsiColor.Rgb(24, 133, 240)),
+            SelectedRowStyle = TesseraStyle.Empty.WithForeground(AnsiColor.Rgb(24, 133, 240))
         };
         control.SetItems(
         [
             new KeyBindingItem("Ctrl+P", "Open palette"),
-            new KeyBindingItem("Ctrl+S", "Save file"),
+            new KeyBindingItem("Ctrl+S", "Save file")
         ]);
         control.Select(1);
 
-        var output = Render(control, width: 80, height: 8);
+        var output = Render(control, 80, 8);
 
         Assert.That(output.Contains("38;2;24;133;240", StringComparison.Ordinal), Is.True);
     }
@@ -103,14 +92,11 @@ public sealed class KeyBindingHelpDialogControlTests
     [Test]
     public void KeyBindingHelpDialogDefaultRenderIsDeterministicAndMonochrome()
     {
-        var control = new KeyBindingHelpDialog
-        {
-            IsVisible = true,
-        };
+        var control = new KeyBindingHelpDialog { IsVisible = true };
         control.SetItems(
         [
             new KeyBindingItem("Ctrl+P", "Open palette", "Global"),
-            new KeyBindingItem("Ctrl+S", "Save file", "File"),
+            new KeyBindingItem("Ctrl+S", "Save file", "File")
         ]);
         var bounds = new Rect(0, 0, 72, 8);
         var firstCanvas = new Canvas(72, 8);
@@ -122,7 +108,7 @@ public sealed class KeyBindingHelpDialogControlTests
         var second = secondCanvas.Render();
 
         Assert.That(first, Is.EqualTo(second));
-        Assert.That(first.Contains("\u001b[", StringComparison.Ordinal), Is.False);
+        Assert.That(first.Contains("\e[", StringComparison.Ordinal), Is.False);
     }
 
     private static string Render(KeyBindingHelpDialog control, int width, int height)

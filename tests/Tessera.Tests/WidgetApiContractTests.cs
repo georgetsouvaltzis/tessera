@@ -1,6 +1,3 @@
-using Tessera.Components.Primitives;
-using Tessera.Components.Styling;
-
 namespace Tessera.Tests;
 
 internal static class WidgetApiContractTests
@@ -21,12 +18,13 @@ internal static class WidgetApiContractTests
         "Tessera.Widgets.ViewportModel",
         "Tessera.Components.Styling.WidgetVisualState",
         "Tessera.Components.Styling.WidgetStatePalette",
-        "Tessera.Components.Styling.WidgetStateAppearance",
+        "Tessera.Components.Styling.WidgetStateAppearance"
     ];
 
     public static IEnumerable<TestCase> Cases()
     {
-        yield return new TestCase("WidgetApi_InternalizedWidgetTypes_AreNotPublic", InternalizedWidgetTypes_AreNotPublic);
+        yield return new TestCase("WidgetApi_InternalizedWidgetTypes_AreNotPublic",
+            InternalizedWidgetTypes_AreNotPublic);
     }
 
     private static Task InternalizedWidgetTypes_AreNotPublic()
@@ -35,7 +33,7 @@ internal static class WidgetApiContractTests
 
         foreach (var typeName in InternalizedWidgetTypes)
         {
-            var type = assembly.GetType(typeName, throwOnError: false);
+            var type = assembly.GetType(typeName, false);
             TestAssert.True(type is not null, $"{typeName} should continue to exist as an internal bridge.");
             TestAssert.True(type!.IsNotPublic, $"{typeName} should no longer be public.");
         }

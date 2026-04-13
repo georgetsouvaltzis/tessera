@@ -1,5 +1,5 @@
-using System.Threading.Channels;
 using System.Runtime.ExceptionServices;
+using System.Threading.Channels;
 using Tessera.Core.Abstractions;
 using Tessera.Core.Messages;
 
@@ -7,11 +7,11 @@ namespace Tessera.Core.Application.Internal;
 
 internal sealed class TesseraEffectScheduler : IDisposable
 {
-    private readonly TesseraRuntimeLoopOptions _options;
-    private readonly Action<IMessage> _send;
+    private readonly SemaphoreSlim? _effectConcurrencyGate;
     private readonly object _effectTaskLock = new();
     private readonly HashSet<Task> _effectTasks = [];
-    private readonly SemaphoreSlim? _effectConcurrencyGate;
+    private readonly TesseraRuntimeLoopOptions _options;
+    private readonly Action<IMessage> _send;
     private ExceptionDispatchInfo? _unhandledEffectException;
 
     public TesseraEffectScheduler(TesseraRuntimeLoopOptions options, Action<IMessage> send)
@@ -22,6 +22,15 @@ internal sealed class TesseraEffectScheduler : IDisposable
         _effectConcurrencyGate = maxConcurrentEffects == 0
             ? null
             : new SemaphoreSlim(maxConcurrentEffects, maxConcurrentEffects);
+    }
+
+    public void Dispose()
+    {
+        _effectConcurrencyGate?.Dispose();
+        lock (_effectTaskLock)
+        {
+            _effectTasks.Clear();
+        }
     }
 
     public async Task RunLoopAsync(ChannelReader<Effect> effects, CancellationToken token)
@@ -85,15 +94,6 @@ internal sealed class TesseraEffectScheduler : IDisposable
         }
     }
 
-    public void Dispose()
-    {
-        _effectConcurrencyGate?.Dispose();
-        lock (_effectTaskLock)
-        {
-            _effectTasks.Clear();
-        }
-    }
-
     private async Task ExecuteEffectAsync(Effect effect, CancellationToken token)
     {
         try
@@ -137,7 +137,7 @@ internal sealed class TesseraEffectScheduler : IDisposable
             _ = Interlocked.CompareExchange(
                 ref _unhandledEffectException,
                 ExceptionDispatchInfo.Capture(ex),
-                comparand: null);
+                null);
             _send(new InterruptMsg());
         }
     }
