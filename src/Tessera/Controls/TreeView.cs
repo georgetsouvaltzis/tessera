@@ -223,15 +223,12 @@ public sealed class TreeView : Control
 
         if (pointer.Kind == PointerEventKind.Wheel)
         {
-            if (pointer.Button == PointerButton.WheelDown)
+            return pointer.Button switch
             {
-                return MoveSelection(+1) || changed;
-            }
-
-            if (pointer.Button == PointerButton.WheelUp)
-            {
-                return MoveSelection(-1) || changed;
-            }
+                PointerButton.WheelDown => MoveSelection(+1) || changed,
+                PointerButton.WheelUp => MoveSelection(-1) || changed,
+                _ => changed || Handle(message)
+            };
         }
 
         if (!inside)
@@ -250,19 +247,19 @@ public sealed class TreeView : Control
             return SetHoveredIndex(hovered);
         }
 
-        if (pointer.Kind == PointerEventKind.Press && pointer.Button == PointerButton.Left && hovered >= 0)
+        if (pointer is not { Kind: PointerEventKind.Press, Button: PointerButton.Left } || hovered < 0)
         {
-            changed |= SetHoveredIndex(hovered);
-            if (_selectedIndex != hovered)
-            {
-                _selectedIndex = hovered;
-                changed = true;
-            }
+            return changed || Handle(message);
+        }
 
+        changed |= SetHoveredIndex(hovered);
+        if (_selectedIndex == hovered)
+        {
             return changed;
         }
 
-        return changed || Handle(message);
+        _selectedIndex = hovered;
+        return true;
     }
 
     /// <inheritdoc />
@@ -315,9 +312,8 @@ public sealed class TreeView : Control
         var width = Math.Max(12, Title.Length + 4);
         if (_visible.Count > 0)
         {
-            for (var index = 0; index < _visible.Count; index++)
+            foreach (var entry in _visible)
             {
-                var entry = _visible[index];
                 var rowWidth = entry.Depth * 2
                                + ResolveTreePrefixWidth(entry.Node)
                                + ControlTextLayout.MeasureDisplayWidth(entry.Node.Label);
@@ -366,13 +362,13 @@ public sealed class TreeView : Control
             return true;
         }
 
-        if (_selectedIndex + 1 < _visible.Count && _visible[_selectedIndex + 1].Depth > _visible[_selectedIndex].Depth)
+        if (_selectedIndex + 1 >= _visible.Count || _visible[_selectedIndex + 1].Depth <= _visible[_selectedIndex].Depth)
         {
-            _selectedIndex++;
-            return true;
+            return false;
         }
 
-        return false;
+        _selectedIndex++;
+        return true;
     }
 
     private bool CollapseOrMoveToParent()
@@ -385,21 +381,21 @@ public sealed class TreeView : Control
             return true;
         }
 
-        if (entry.ParentVisibleIndex is { } parent)
+        if (entry.ParentVisibleIndex is not { } parent)
         {
-            _selectedIndex = parent;
-            return true;
+            return false;
         }
 
-        return false;
+        _selectedIndex = parent;
+        return true;
     }
 
     private void RefreshVisible()
     {
         _visible.Clear();
-        for (var index = 0; index < _roots.Count; index++)
+        foreach (var root in _roots)
         {
-            AppendVisible(_roots[index], 0, null);
+            AppendVisible(root, 0, null);
         }
 
         if (_visible.Count == 0)
@@ -422,9 +418,9 @@ public sealed class TreeView : Control
             return;
         }
 
-        for (var index = 0; index < node.Children.Count; index++)
+        foreach (var child in node.Children)
         {
-            AppendVisible(node.Children[index], depth + 1, visibleIndex);
+            AppendVisible(child, depth + 1, visibleIndex);
         }
     }
 

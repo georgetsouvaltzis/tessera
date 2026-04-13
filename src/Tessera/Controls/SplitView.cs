@@ -139,38 +139,24 @@ public sealed class SplitView : Control
             return false;
         }
 
-        if (message is KeyPressed key)
+        if (message is not KeyPressed key || !IsFocused)
         {
-            if (IsFocused && key.Is(Key.Tab))
-            {
-                return SetActivePane(ActivePaneIndex == 0 ? 1 : 0);
-            }
-
-            if (IsFocused)
-            {
-                if (Orientation == SplitViewOrientation.Horizontal && key.Is(Key.Left, ModifierKeys.Ctrl))
-                {
-                    return SetRatio(Ratio - 0.05d);
-                }
-
-                if (Orientation == SplitViewOrientation.Horizontal && key.Is(Key.Right, ModifierKeys.Ctrl))
-                {
-                    return SetRatio(Ratio + 0.05d);
-                }
-
-                if (Orientation == SplitViewOrientation.Vertical && key.Is(Key.Up, ModifierKeys.Ctrl))
-                {
-                    return SetRatio(Ratio - 0.05d);
-                }
-
-                if (Orientation == SplitViewOrientation.Vertical && key.Is(Key.Down, ModifierKeys.Ctrl))
-                {
-                    return SetRatio(Ratio + 0.05d);
-                }
-            }
+            return ForwardToActivePane(message);
         }
 
-        return ForwardToActivePane(message);
+        if (key.Is(Key.Tab))
+        {
+            return SetActivePane(ActivePaneIndex == 0 ? 1 : 0);
+        }
+
+        return Orientation switch
+        {
+            SplitViewOrientation.Horizontal when key.Is(Key.Left, ModifierKeys.Ctrl) => SetRatio(Ratio - 0.05d),
+            SplitViewOrientation.Horizontal when key.Is(Key.Right, ModifierKeys.Ctrl) => SetRatio(Ratio + 0.05d),
+            SplitViewOrientation.Vertical when key.Is(Key.Up, ModifierKeys.Ctrl) => SetRatio(Ratio - 0.05d),
+            SplitViewOrientation.Vertical when key.Is(Key.Down, ModifierKeys.Ctrl) => SetRatio(Ratio + 0.05d),
+            _ => ForwardToActivePane(message)
+        };
     }
 
     /// <inheritdoc />
@@ -193,7 +179,7 @@ public sealed class SplitView : Control
             return false;
         }
 
-        if (ShowDivider && pointer.Button == PointerButton.Left && pointer.Kind == PointerEventKind.Press &&
+        if (ShowDivider && pointer is { Button: PointerButton.Left, Kind: PointerEventKind.Press } &&
             layout.Divider.Contains(pointer.X, pointer.Y))
         {
             _isDraggingDivider = true;
@@ -214,22 +200,17 @@ public sealed class SplitView : Control
 
         if (pointer.Kind == PointerEventKind.Wheel && layout.Divider.Contains(pointer.X, pointer.Y))
         {
-            if (pointer.Button == PointerButton.WheelDown)
+            return pointer.Button switch
             {
-                return SetRatio(Ratio + 0.05d);
-            }
-
-            if (pointer.Button == PointerButton.WheelUp)
-            {
-                return SetRatio(Ratio - 0.05d);
-            }
-
-            return false;
+                PointerButton.WheelDown => SetRatio(Ratio + 0.05d),
+                PointerButton.WheelUp => SetRatio(Ratio - 0.05d),
+                _ => false
+            };
         }
 
         if (layout.First.Contains(pointer.X, pointer.Y))
         {
-            if (pointer.Kind == PointerEventKind.Press && pointer.Button == PointerButton.Left)
+            if (pointer is { Kind: PointerEventKind.Press, Button: PointerButton.Left })
             {
                 RequestFocus();
             }
@@ -240,7 +221,7 @@ public sealed class SplitView : Control
 
         if (layout.Second.Contains(pointer.X, pointer.Y))
         {
-            if (pointer.Kind == PointerEventKind.Press && pointer.Button == PointerButton.Left)
+            if (pointer is { Kind: PointerEventKind.Press, Button: PointerButton.Left })
             {
                 RequestFocus();
             }
@@ -393,21 +374,11 @@ public sealed class SplitView : Control
         if (Orientation == SplitViewOrientation.Horizontal)
         {
             var total = layout.First.Width + layout.Second.Width;
-            if (total <= 0)
-            {
-                return false;
-            }
-
-            return SetRatio((pointer.X - layout.First.X + 1d) / total);
+            return total > 0 && SetRatio((pointer.X - layout.First.X + 1d) / total);
         }
 
         var totalHeight = layout.First.Height + layout.Second.Height;
-        if (totalHeight <= 0)
-        {
-            return false;
-        }
-
-        return SetRatio((pointer.Y - layout.First.Y + 1d) / totalHeight);
+        return totalHeight > 0 && SetRatio((pointer.Y - layout.First.Y + 1d) / totalHeight);
     }
 
     private bool ForwardToActivePane(Message message)
