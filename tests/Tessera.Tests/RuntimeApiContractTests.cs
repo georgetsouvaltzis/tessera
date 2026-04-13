@@ -98,7 +98,7 @@ internal static class RuntimeApiContractTests
 
         TestAssert.True(attribute is not null, $"{type.Name} should be explicitly marked as an advanced runtime seam.");
         TestAssert.True(
-            attribute!.State == EditorBrowsableState.Advanced,
+            TestAssert.NotNull(attribute).State == EditorBrowsableState.Advanced,
             $"{type.Name} should be hidden from default API discovery.");
         return Task.CompletedTask;
     }
@@ -130,12 +130,12 @@ internal static class RuntimeApiContractTests
         TestAssert.True(runAsync is not null, "TesseraApplication.RunAsync(app, options, token) should exist.");
 
         var builderAttribute =
-            (EditorBrowsableAttribute?)Attribute.GetCustomAttribute(createBuilder!, typeof(EditorBrowsableAttribute));
+            (EditorBrowsableAttribute?)Attribute.GetCustomAttribute(TestAssert.NotNull(createBuilder), typeof(EditorBrowsableAttribute));
         var applicationAttribute =
-            (EditorBrowsableAttribute?)Attribute.GetCustomAttribute(createApplication!,
+            (EditorBrowsableAttribute?)Attribute.GetCustomAttribute(TestAssert.NotNull(createApplication),
                 typeof(EditorBrowsableAttribute));
         var runAttribute =
-            (EditorBrowsableAttribute?)Attribute.GetCustomAttribute(runAsync!, typeof(EditorBrowsableAttribute));
+            (EditorBrowsableAttribute?)Attribute.GetCustomAttribute(TestAssert.NotNull(runAsync), typeof(EditorBrowsableAttribute));
         var legacyFactory =
             typeof(TesseraApplication).GetMethod("CreateProgram", BindingFlags.Public | BindingFlags.Static);
 
@@ -177,25 +177,25 @@ internal static class RuntimeApiContractTests
         TestAssert.True(colorProfile is not null, "TesseraHostingOptions.ColorProfile should exist.");
         TestAssert.True(colorProfileDetector is not null, "TesseraHostingOptions.ColorProfileDetector should exist.");
         TestAssert.True(eventDecoder is not null, "TesseraHostingOptions.EventDecoder should exist.");
-        TestAssert.True(messageFilter!.PropertyType == typeof(Func<TesseraApp, Message, Message>),
+        TestAssert.True(TestAssert.NotNull(messageFilter).PropertyType == typeof(Func<TesseraApp, Message, Message>),
             "TesseraHostingOptions.MessageFilter should use TesseraApp and Message, not core runtime types.");
-        TestAssert.True(mapEffectException!.PropertyType == typeof(Func<Exception, Message>),
+        TestAssert.True(TestAssert.NotNull(mapEffectException).PropertyType == typeof(Func<Exception, Message>),
             "TesseraHostingOptions.MapEffectException should use public Message contracts.");
-        TestAssert.True(renderer!.PropertyType == typeof(IProgramRenderer),
+        TestAssert.True(TestAssert.NotNull(renderer).PropertyType == typeof(IProgramRenderer),
             "TesseraHostingOptions.Renderer should use Tessera.Hosting contracts.");
-        TestAssert.True(rendererOptions!.PropertyType == typeof(AnsiRendererOptions),
+        TestAssert.True(TestAssert.NotNull(rendererOptions).PropertyType == typeof(AnsiRendererOptions),
             "TesseraHostingOptions.AnsiRendererOptions should use Tessera.Hosting contracts.");
-        TestAssert.True(terminal!.PropertyType == typeof(ITerminalAdapter),
+        TestAssert.True(TestAssert.NotNull(terminal).PropertyType == typeof(ITerminalAdapter),
             "TesseraHostingOptions.Terminal should use Tessera.Hosting contracts.");
-        TestAssert.True(terminalCapabilities!.PropertyType == typeof(TerminalCapabilityProfile),
+        TestAssert.True(TestAssert.NotNull(terminalCapabilities).PropertyType == typeof(TerminalCapabilityProfile),
             "TesseraHostingOptions.TerminalCapabilities should use Tessera.Hosting capability contracts.");
-        TestAssert.True(terminalCapabilityDetector!.PropertyType == typeof(Func<TerminalCapabilityProfile>),
+        TestAssert.True(TestAssert.NotNull(terminalCapabilityDetector).PropertyType == typeof(Func<TerminalCapabilityProfile>),
             "TesseraHostingOptions.TerminalCapabilityDetector should use Tessera.Hosting capability contracts.");
-        TestAssert.True(colorProfile!.PropertyType == typeof(TerminalColorProfile?),
+        TestAssert.True(TestAssert.NotNull(colorProfile).PropertyType == typeof(TerminalColorProfile?),
             "TesseraHostingOptions.ColorProfile should use Tessera.Hosting color contracts.");
-        TestAssert.True(colorProfileDetector!.PropertyType == typeof(Func<TerminalColorProfile>),
+        TestAssert.True(TestAssert.NotNull(colorProfileDetector).PropertyType == typeof(Func<TerminalColorProfile>),
             "TesseraHostingOptions.ColorProfileDetector should use Tessera.Hosting color contracts.");
-        TestAssert.True(eventDecoder!.PropertyType == typeof(IEventDecoder),
+        TestAssert.True(TestAssert.NotNull(eventDecoder).PropertyType == typeof(IEventDecoder),
             "TesseraHostingOptions.EventDecoder should use Tessera.Hosting contracts.");
         return Task.CompletedTask;
     }
@@ -300,16 +300,16 @@ internal static class RuntimeApiContractTests
         TestAssert.True(runAsync is not null, "TesseraHost.RunAsync should exist for advanced hosting.");
 
         var createAttribute =
-            (EditorBrowsableAttribute?)Attribute.GetCustomAttribute(createApplication!,
+            (EditorBrowsableAttribute?)Attribute.GetCustomAttribute(TestAssert.NotNull(createApplication),
                 typeof(EditorBrowsableAttribute));
         var runAttribute =
-            (EditorBrowsableAttribute?)Attribute.GetCustomAttribute(runAsync!, typeof(EditorBrowsableAttribute));
+            (EditorBrowsableAttribute?)Attribute.GetCustomAttribute(TestAssert.NotNull(runAsync), typeof(EditorBrowsableAttribute));
 
         TestAssert.True(createAttribute is not null, "TesseraHost.CreateApplication should be marked advanced.");
-        TestAssert.True(createAttribute!.State == EditorBrowsableState.Advanced,
+        TestAssert.True(TestAssert.NotNull(createAttribute).State == EditorBrowsableState.Advanced,
             "TesseraHost.CreateApplication should stay out of default discovery.");
         TestAssert.True(runAttribute is not null, "TesseraHost.RunAsync should be marked advanced.");
-        TestAssert.True(runAttribute!.State == EditorBrowsableState.Advanced,
+        TestAssert.True(TestAssert.NotNull(runAttribute).State == EditorBrowsableState.Advanced,
             "TesseraHost.RunAsync should stay out of default discovery.");
         return Task.CompletedTask;
     }
@@ -332,7 +332,7 @@ internal static class RuntimeApiContractTests
             if (typeName == "Tessera.Components.Primitives.Widgets")
             {
                 TestAssert.True(type is not null, $"{typeName} should continue to exist as an internal bridge.");
-                TestAssert.True(type!.IsNotPublic,
+                TestAssert.True(TestAssert.NotNull(type).IsNotPublic,
                     $"{typeName} should no longer be public once a root wrapper exists.");
                 continue;
             }

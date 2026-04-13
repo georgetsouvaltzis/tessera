@@ -53,11 +53,12 @@ internal static class TesseraAppFoundationTests
 
         var init = screen.Init();
         TestAssert.True(init is not null, "TesseraApp.Initialize should adapt to the runtime effect contract.");
+        var initialize = TestAssert.NotNull(init);
 
-        var message = await init!(CancellationToken.None);
+        var message = await initialize(CancellationToken.None);
         TestAssert.True(message is not null, "Custom messages should be wrapped for runtime delivery.");
 
-        screen.Update(message!);
+        screen.Update(TestAssert.NotNull(message));
         var rendered = screen.Render();
 
         TestAssert.Equal("booted", rendered.Frame.Content,
@@ -93,8 +94,9 @@ internal static class TesseraAppFoundationTests
 
         TestAssert.True(effect is not null,
             "Post should queue a follow-up effect when a control event emits a message.");
+        var queuedEffect = TestAssert.NotNull(effect);
 
-        var message = await effect!(CancellationToken.None);
+        var message = await queuedEffect(CancellationToken.None);
         TestAssert.True(message is not null, "Post should emit a follow-up message.");
         TestAssert.Equal(0, app.Count,
             "Post should not mutate app state until the queued message is processed by the runtime.");
@@ -126,7 +128,8 @@ internal static class TesseraAppFoundationTests
     private static Task TesseraRuntimeBridge_RuntimePath_DoesNotStoreLegacyProgramWrapper()
     {
         const string legacyTypeName = "Tessera.Core.Application.TesseraProgram";
-        var runtimeType = typeof(TesseraApplication).Assembly.GetType("Tessera.Internal.TesseraAppRuntime", true)!;
+        var runtimeType = TestAssert.NotNull(
+            typeof(TesseraApplication).Assembly.GetType("Tessera.Internal.TesseraAppRuntime", true));
         var fields = runtimeType.GetFields(BindingFlags.Instance | BindingFlags.NonPublic);
         var legacyField = fields.FirstOrDefault(field => field.FieldType.FullName == legacyTypeName);
 

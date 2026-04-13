@@ -20,7 +20,7 @@ internal static class ConsoleTerminalAdapterHelperTests
         var message = ConsoleKeyMessageMapper.Map(key) as KeyPressMsg;
 
         TestAssert.True(message is not null, "Control-letter should map to a key press message.");
-        TestAssert.True(message!.Code == KeyCode.Character, "Control-letter should stay on character key code.");
+        TestAssert.True(TestAssert.NotNull(message).Code == KeyCode.Character, "Control-letter should stay on character key code.");
         TestAssert.Equal("a", message.Text, "Control-letter should normalize to lower-case character text.");
         TestAssert.True(message.Modifiers == KeyModifiers.Ctrl, "Control-letter should keep ctrl modifier.");
         return Task.CompletedTask;

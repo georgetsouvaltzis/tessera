@@ -318,7 +318,7 @@ internal static class TesseraAppCompositionTests
 
         TestAssert.True(compiled is not null, "Rendering a root layout should capture an interactive screen snapshot.");
         TestAssert.True(
-            compiled!.GetType().FullName != "Tessera.Internal.LegacyCompiledScreen",
+            TestAssert.NotNull(compiled).GetType().FullName != "Tessera.Internal.LegacyCompiledScreen",
             "Root layout screens should compile through the new scene compiler instead of the legacy ScreenComposer bridge.");
         return Task.CompletedTask;
     }
@@ -437,10 +437,10 @@ internal static class TesseraAppCompositionTests
             TestAssert.True(method is not null,
                 $"{type.Name}.{name} legacy component overload should exist for advanced callers.");
             var attribute =
-                (EditorBrowsableAttribute?)Attribute.GetCustomAttribute(method!, typeof(EditorBrowsableAttribute));
+                (EditorBrowsableAttribute?)Attribute.GetCustomAttribute(TestAssert.NotNull(method), typeof(EditorBrowsableAttribute));
             TestAssert.True(attribute is not null,
                 $"{type.Name}.{name} legacy component overload should be marked advanced.");
-            TestAssert.True(attribute!.State == EditorBrowsableState.Advanced,
+            TestAssert.True(TestAssert.NotNull(attribute).State == EditorBrowsableState.Advanced,
                 $"{type.Name}.{name} legacy component overload should be hidden from the default path.");
         }
 
@@ -462,10 +462,10 @@ internal static class TesseraAppCompositionTests
             TestAssert.True(ctor is not null,
                 $"{type.Name} legacy component constructor should exist for advanced callers.");
             var attribute =
-                (EditorBrowsableAttribute?)Attribute.GetCustomAttribute(ctor!, typeof(EditorBrowsableAttribute));
+                (EditorBrowsableAttribute?)Attribute.GetCustomAttribute(TestAssert.NotNull(ctor), typeof(EditorBrowsableAttribute));
             TestAssert.True(attribute is not null,
                 $"{type.Name} legacy component constructor should be marked advanced.");
-            TestAssert.True(attribute!.State == EditorBrowsableState.Advanced,
+            TestAssert.True(TestAssert.NotNull(attribute).State == EditorBrowsableState.Advanced,
                 $"{type.Name} legacy component constructor should be hidden from the default path.");
         }
 
@@ -480,7 +480,7 @@ internal static class TesseraAppCompositionTests
             typeof(EditorBrowsableAttribute));
 
         TestAssert.True(canvasAttribute is not null, "ICanvasComponent should remain explicitly marked as advanced.");
-        TestAssert.True(canvasAttribute!.State == EditorBrowsableState.Advanced,
+        TestAssert.True(TestAssert.NotNull(canvasAttribute).State == EditorBrowsableState.Advanced,
             "ICanvasComponent should stay hidden from the default custom-widget path.");
 
         string[] contractNames =
@@ -520,7 +520,7 @@ internal static class TesseraAppCompositionTests
         {
             var type = assembly.GetType(typeName, false);
             TestAssert.True(type is not null, $"{typeName} should continue to exist as an internal bridge.");
-            TestAssert.True(type!.IsNotPublic, $"{typeName} should no longer be public on the root layout path.");
+            TestAssert.True(TestAssert.NotNull(type).IsNotPublic, $"{typeName} should no longer be public on the root layout path.");
         }
 
         return Task.CompletedTask;
@@ -530,7 +530,7 @@ internal static class TesseraAppCompositionTests
     {
         var type = typeof(LayoutSlot).Assembly.GetType("Tessera.Layout.ComponentLayout", false);
         TestAssert.True(type is not null, "ComponentLayout should continue to exist as an internal bridge leaf.");
-        TestAssert.True(type!.IsNotPublic, "ComponentLayout should no longer be public.");
+        TestAssert.True(TestAssert.NotNull(type).IsNotPublic, "ComponentLayout should no longer be public.");
         return Task.CompletedTask;
     }
 

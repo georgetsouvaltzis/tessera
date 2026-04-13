@@ -393,7 +393,7 @@ internal static class PublicApiXmlDocsTests
 
         TestAssert.True(member is not null, $"Expected XML documentation member {memberName}.");
 
-        var tag = member!.Element(tagName);
+        var tag = TestAssert.NotNull(member).Element(tagName);
         var content = tag?.Value?.Trim();
 
         TestAssert.True(!string.IsNullOrWhiteSpace(content),

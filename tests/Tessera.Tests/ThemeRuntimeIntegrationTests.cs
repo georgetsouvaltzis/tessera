@@ -30,8 +30,8 @@ internal static class ThemeRuntimeIntegrationTests
         _ = app.UpdateRuntime(new FocusChanged(false));
         _ = app.RenderRuntime();
 
-        TestAssert.ReferenceSame(theme, app.Context.Theme!, "Runtime options theme should propagate to ScreenContext.");
-        TestAssert.ReferenceSame(theme, app.LastBuildTheme!,
+        TestAssert.ReferenceSame(theme, TestAssert.NotNull(app.Context.Theme), "Runtime options theme should propagate to ScreenContext.");
+        TestAssert.ReferenceSame(theme, TestAssert.NotNull(app.LastBuildTheme),
             "Build should receive the runtime theme through ScreenContext.");
         TestAssert.True(app.Context.Width == 120 && app.Context.Height == 40,
             "Context size should still track resize updates.");

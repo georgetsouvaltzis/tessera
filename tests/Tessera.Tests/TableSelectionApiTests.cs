@@ -54,16 +54,16 @@ public sealed class TableSelectionApiTests
         Assert.That(raised, Is.EqualTo(1));
         Assert.That(table.SelectedRowIndex, Is.EqualTo(1));
         Assert.That(table.SelectedRow, Is.Not.Null);
-        Assert.That(table.SelectedRow![0], Is.EqualTo("beta"));
+        Assert.That(TestAssert.NotNull(table.SelectedRow)[0], Is.EqualTo("beta"));
         Assert.That(hasSelectedRow, Is.True);
         Assert.That(selectedRow, Is.Not.Null);
-        Assert.That(selectedRow![0], Is.EqualTo("beta"));
+        Assert.That(TestAssert.NotNull(selectedRow)[0], Is.EqualTo("beta"));
         Assert.That(latest, Is.Not.Null);
-        Assert.That(latest!.PreviousIndex, Is.EqualTo(-1));
+        Assert.That(TestAssert.NotNull(latest).PreviousIndex, Is.EqualTo(-1));
         Assert.That(latest.SelectedIndex, Is.EqualTo(1));
         Assert.That(latest.PreviousItem, Is.Null);
         Assert.That(latest.SelectedItem, Is.Not.Null);
-        Assert.That(latest.SelectedItem![0], Is.EqualTo("beta"));
+        Assert.That(TestAssert.NotNull(latest.SelectedItem)[0], Is.EqualTo("beta"));
     }
 
     [Test]
@@ -137,12 +137,12 @@ public sealed class TableSelectionApiTests
         Assert.That(raised, Is.EqualTo(1));
         Assert.That(table.SelectedRowIndex, Is.EqualTo(1));
         Assert.That(table.SelectedRow, Is.Not.Null);
-        Assert.That(table.SelectedRow![0], Is.EqualTo("beta"));
+        Assert.That(TestAssert.NotNull(table.SelectedRow)[0], Is.EqualTo("beta"));
         Assert.That(hasSelectedRow, Is.True);
         Assert.That(selectedRow, Is.Not.Null);
-        Assert.That(selectedRow![0], Is.EqualTo("beta"));
+        Assert.That(TestAssert.NotNull(selectedRow)[0], Is.EqualTo("beta"));
         Assert.That(latest, Is.Not.Null);
-        Assert.That(latest!.PreviousIndex, Is.EqualTo(-1));
+        Assert.That(TestAssert.NotNull(latest).PreviousIndex, Is.EqualTo(-1));
         Assert.That(latest.SelectedIndex, Is.EqualTo(1));
     }
 
@@ -167,7 +167,7 @@ public sealed class TableSelectionApiTests
         Assert.That(raised, Is.EqualTo(1));
         Assert.That(table.SelectedRowIndex, Is.EqualTo(1));
         Assert.That(table.SelectedRow, Is.Not.Null);
-        Assert.That(table.SelectedRow![0], Is.EqualTo("beta"));
+        Assert.That(TestAssert.NotNull(table.SelectedRow)[0], Is.EqualTo("beta"));
     }
 
     [Test]

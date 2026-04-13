@@ -137,7 +137,7 @@ internal static class CompositionApiContractTests
         {
             var type = assembly.GetType(typeName, false);
             TestAssert.True(type is not null, $"{typeName} should continue to exist as an internal bridge.");
-            TestAssert.True(type!.IsNotPublic, $"{typeName} should no longer be public.");
+            TestAssert.True(TestAssert.NotNull(type).IsNotPublic, $"{typeName} should no longer be public.");
         }
 
         return Task.CompletedTask;
@@ -167,7 +167,7 @@ internal static class CompositionApiContractTests
         {
             var property = type.GetProperty(propertyName, BindingFlags.Public | BindingFlags.Instance);
             TestAssert.True(property is not null, $"{type.Name} should expose a public {propertyName} property.");
-            TestAssert.True(property!.SetMethod is not null,
+            TestAssert.True(TestAssert.NotNull(property).SetMethod is not null,
                 $"{type.Name}.{propertyName} should be settable during object initialization.");
 
             var requiredAttribute =
@@ -182,9 +182,9 @@ internal static class CompositionApiContractTests
         var method = type.GetMethod(name, parameters);
         TestAssert.True(method is not null, $"{type.Name}.{name} should exist.");
         var attribute =
-            (EditorBrowsableAttribute?)Attribute.GetCustomAttribute(method!, typeof(EditorBrowsableAttribute));
+            (EditorBrowsableAttribute?)Attribute.GetCustomAttribute(TestAssert.NotNull(method), typeof(EditorBrowsableAttribute));
         TestAssert.True(attribute is not null, $"{type.Name}.{name} should be marked advanced.");
-        TestAssert.True(attribute!.State == EditorBrowsableState.Advanced,
+        TestAssert.True(TestAssert.NotNull(attribute).State == EditorBrowsableState.Advanced,
             $"{type.Name}.{name} should stay out of default discovery.");
     }
 

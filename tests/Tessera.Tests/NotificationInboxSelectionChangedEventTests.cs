@@ -25,7 +25,7 @@ public sealed class NotificationInboxSelectionChangedEventTests
 
         Assert.That(changed, Is.True);
         Assert.That(observed, Is.Not.Null);
-        Assert.That(observed!.PreviousIndex, Is.EqualTo(0));
+        Assert.That(TestAssert.NotNull(observed).PreviousIndex, Is.EqualTo(0));
         Assert.That(observed.SelectedIndex, Is.EqualTo(2));
         Assert.That(observed.PreviousItem?.Id, Is.EqualTo("a"));
         Assert.That(observed.SelectedItem?.Id, Is.EqualTo("c"));
@@ -47,7 +47,7 @@ public sealed class NotificationInboxSelectionChangedEventTests
         control.Clear();
 
         Assert.That(observed, Is.Not.Null);
-        Assert.That(observed!.PreviousIndex, Is.EqualTo(0));
+        Assert.That(TestAssert.NotNull(observed).PreviousIndex, Is.EqualTo(0));
         Assert.That(observed.SelectedIndex, Is.EqualTo(-1));
         Assert.That(observed.PreviousItem?.Id, Is.EqualTo("a"));
         Assert.That(observed.SelectedItem, Is.Null);
@@ -71,7 +71,7 @@ public sealed class NotificationInboxSelectionChangedEventTests
 
         Assert.That(removed, Is.True);
         Assert.That(observed, Is.Not.Null);
-        Assert.That(observed!.PreviousIndex, Is.EqualTo(1));
+        Assert.That(TestAssert.NotNull(observed).PreviousIndex, Is.EqualTo(1));
         Assert.That(observed.SelectedIndex, Is.EqualTo(0));
         Assert.That(observed.PreviousItem?.Id, Is.EqualTo("b"));
         Assert.That(observed.SelectedItem?.Id, Is.EqualTo("a"));

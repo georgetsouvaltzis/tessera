@@ -106,7 +106,7 @@ public sealed class ThemeOverridesRuntimeWiringTests
     {
         Assert.That(style.IsEmpty, Is.False, $"{message} Style should not be empty.");
         Assert.That(style.Foreground.HasValue, Is.True, $"{message} Foreground should be set.");
-        Assert.That(style.Foreground!.Value, Is.EqualTo(expected), message);
+        Assert.That(TestAssert.NotNull(style.Foreground), Is.EqualTo(expected), message);
     }
 
     private sealed class RuntimeProbeApp(Control control) : TesseraApp

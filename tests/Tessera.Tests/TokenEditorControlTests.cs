@@ -75,7 +75,7 @@ public sealed class TokenEditorControlTests
         Assert.That(control.Tokens[1].Value, Is.EqualTo("two"));
         Assert.That(control.SelectedTokenIndex, Is.EqualTo(1));
         Assert.That(lastEvent, Is.Not.Null);
-        Assert.That(lastEvent!.PreviousIndex, Is.EqualTo(2));
+        Assert.That(TestAssert.NotNull(lastEvent).PreviousIndex, Is.EqualTo(2));
         Assert.That(lastEvent.SelectedIndex, Is.EqualTo(1));
     }
 
@@ -124,7 +124,7 @@ public sealed class TokenEditorControlTests
         Assert.That(handled, Is.True);
         Assert.That(control.SelectedTokenIndex, Is.EqualTo(1));
         Assert.That(selectionChanged, Is.Not.Null);
-        Assert.That(selectionChanged!.SelectedIndex, Is.EqualTo(1));
+        Assert.That(TestAssert.NotNull(selectionChanged).SelectedIndex, Is.EqualTo(1));
         Assert.That(selectionChanged.SelectedToken?.Value, Is.EqualTo("b"));
     }
 

@@ -76,9 +76,9 @@ public sealed class SelectionChangedEventArgsAliasDiscoverabilityTests
         var property = type.GetProperty(propertyName, BindingFlags.Instance | BindingFlags.Public);
         Assert.That(property, Is.Not.Null, $"{type.Name}.{propertyName} should exist.");
 
-        var attribute = property!.GetCustomAttribute<EditorBrowsableAttribute>();
+        var attribute = TestAssert.NotNull(property).GetCustomAttribute<EditorBrowsableAttribute>();
         Assert.That(attribute, Is.Not.Null, $"{type.Name}.{propertyName} should define EditorBrowsable.");
-        Assert.That(attribute!.State, Is.EqualTo(EditorBrowsableState.Advanced),
+        Assert.That(TestAssert.NotNull(attribute).State, Is.EqualTo(EditorBrowsableState.Advanced),
             $"{type.Name}.{propertyName} should be Advanced.");
     }
 
@@ -87,7 +87,7 @@ public sealed class SelectionChangedEventArgsAliasDiscoverabilityTests
         var property = type.GetProperty(propertyName, BindingFlags.Instance | BindingFlags.Public);
         Assert.That(property, Is.Not.Null, $"{type.Name}.{propertyName} should exist.");
 
-        var attribute = property!.GetCustomAttribute<EditorBrowsableAttribute>();
+        var attribute = TestAssert.NotNull(property).GetCustomAttribute<EditorBrowsableAttribute>();
         Assert.That(attribute, Is.Null,
             $"{type.Name}.{propertyName} should remain discoverable without EditorBrowsable.");
     }

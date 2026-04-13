@@ -76,7 +76,7 @@ internal static class InteractionPointerParityDataInputTests
         TestAssert.Equal(1, control.SelectedIndex, "Mouse click should select clicked radio row.");
         TestAssert.Equal("high", control.SelectedItem, "Mouse click should expose selected item.");
         TestAssert.True(args is not null, "Mouse click should raise selection event on change.");
-        TestAssert.Equal(0, args!.PreviousIndex, "Selection event should expose previous index.");
+        TestAssert.Equal(0, TestAssert.NotNull(args).PreviousIndex, "Selection event should expose previous index.");
         TestAssert.Equal(1, args.SelectedIndex, "Selection event should expose new index.");
         return Task.CompletedTask;
     }

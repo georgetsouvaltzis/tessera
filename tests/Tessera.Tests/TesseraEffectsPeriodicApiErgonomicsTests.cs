@@ -18,10 +18,10 @@ public sealed class TesseraEffectsPeriodicApiErgonomicsTests
 
         for (var iteration = 1; iteration <= 3; iteration++)
         {
-            var emitted = await effect!(CancellationToken.None);
+            var emitted = await TestAssert.NotNull(effect)(CancellationToken.None);
             Assert.That(emitted, Is.TypeOf<TesseraPeriodicEffectMessage>());
 
-            effect = app.UpdateRuntime(emitted!);
+            effect = app.UpdateRuntime(TestAssert.NotNull(emitted));
             Assert.That(effect, Is.Not.Null);
             Assert.That(app.PeriodicUpdateCount, Is.EqualTo(iteration));
         }
@@ -34,11 +34,11 @@ public sealed class TesseraEffectsPeriodicApiErgonomicsTests
 
         var tick = TesseraEffects.Tick(TimeSpan.FromMilliseconds(1), _ => new TickPingMessage());
         var tickMessage = await tick(CancellationToken.None);
-        var tickFollowUp = app.UpdateRuntime(tickMessage!);
+        var tickFollowUp = app.UpdateRuntime(TestAssert.NotNull(tickMessage));
 
         var every = TesseraEffects.Every(TimeSpan.FromMilliseconds(1), _ => new EveryPingMessage());
         var everyMessage = await every(CancellationToken.None);
-        var everyFollowUp = app.UpdateRuntime(everyMessage!);
+        var everyFollowUp = app.UpdateRuntime(TestAssert.NotNull(everyMessage));
 
         Assert.That(tickFollowUp, Is.Null);
         Assert.That(everyFollowUp, Is.Null);
@@ -53,17 +53,17 @@ public sealed class TesseraEffectsPeriodicApiErgonomicsTests
         var initial = app.InitializeRuntime();
         Assert.That(initial, Is.Not.Null);
 
-        var periodicEnvelope = await initial!(CancellationToken.None);
-        var combinedEffect = app.UpdateRuntime(periodicEnvelope!);
+        var periodicEnvelope = await TestAssert.NotNull(initial)(CancellationToken.None);
+        var combinedEffect = app.UpdateRuntime(TestAssert.NotNull(periodicEnvelope));
         Assert.That(combinedEffect, Is.Not.Null);
 
         var coreCombined = TesseraEffectAdapter.ToCore(combinedEffect);
         Assert.That(coreCombined, Is.Not.Null);
 
-        var coreEnvelope = await coreCombined!(CancellationToken.None);
+        var coreEnvelope = await TestAssert.NotNull(coreCombined)(CancellationToken.None);
         Assert.That(coreEnvelope, Is.TypeOf<BatchMsg>());
 
-        var batch = (BatchMsg)coreEnvelope!;
+        var batch = (BatchMsg)TestAssert.NotNull(coreEnvelope);
         Assert.That(batch.Effects.Count, Is.EqualTo(2));
 
         var emittedMessages = new List<Message>();

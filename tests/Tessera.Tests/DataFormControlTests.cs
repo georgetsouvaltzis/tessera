@@ -69,7 +69,7 @@ public sealed class DataFormControlTests
         Assert.That(control.IsEditing, Is.False);
         Assert.That(model.Name, Is.EqualTo("Ada"));
         Assert.That(committed, Is.Not.Null);
-        Assert.That(committed!.Success, Is.True);
+        Assert.That(TestAssert.NotNull(committed).Success, Is.True);
         Assert.That(committed.PreviousValue, Is.EqualTo(string.Empty));
         Assert.That(committed.CommittedValue, Is.EqualTo("Ada"));
         Assert.That(committed.Field.Key, Is.EqualTo("name"));
@@ -146,7 +146,7 @@ public sealed class DataFormControlTests
         Assert.That(control.SelectedIndex, Is.EqualTo(2));
         Assert.That(control.SelectedField?.Key, Is.EqualTo("team"));
         Assert.That(changed, Is.Not.Null);
-        Assert.That(changed!.PreviousField?.Key, Is.EqualTo("name"));
+        Assert.That(TestAssert.NotNull(changed).PreviousField?.Key, Is.EqualTo("name"));
         Assert.That(changed.SelectedField?.Key, Is.EqualTo("team"));
     }
 
@@ -213,7 +213,7 @@ public sealed class DataFormControlTests
         Assert.That(commitHandled, Is.True);
         Assert.That(moveHandled, Is.True);
         Assert.That(committed, Is.Not.Null);
-        Assert.That(committed!.Success, Is.False);
+        Assert.That(TestAssert.NotNull(committed).Success, Is.False);
         Assert.That(control.IsEditing, Is.True);
         Assert.That(control.SelectedIndex, Is.EqualTo(0));
         Assert.That(control.LastCommitError, Is.EqualTo("min 3 chars"));

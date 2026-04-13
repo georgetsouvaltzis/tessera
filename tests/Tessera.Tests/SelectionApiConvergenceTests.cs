@@ -29,9 +29,9 @@ public sealed class SelectionApiConvergenceTests
 
         Assert.That(selectionChangedArgs, Is.Not.Null);
         Assert.That(currentStepChangedArgs, Is.Not.Null);
-        Assert.That(selectionChangedArgs!.SelectedIndex, Is.EqualTo(selectionChangedArgs.CurrentIndex));
+        Assert.That(TestAssert.NotNull(selectionChangedArgs).SelectedIndex, Is.EqualTo(selectionChangedArgs.CurrentIndex));
         Assert.That(selectionChangedArgs.SelectedStep, Is.SameAs(selectionChangedArgs.CurrentStep));
-        Assert.That(currentStepChangedArgs!.SelectedIndex, Is.EqualTo(currentStepChangedArgs.CurrentIndex));
+        Assert.That(TestAssert.NotNull(currentStepChangedArgs).SelectedIndex, Is.EqualTo(currentStepChangedArgs.CurrentIndex));
         Assert.That(currentStepChangedArgs.SelectedStep, Is.SameAs(currentStepChangedArgs.CurrentStep));
     }
 
@@ -57,9 +57,9 @@ public sealed class SelectionApiConvergenceTests
 
         Assert.That(selectionChangedArgs, Is.Not.Null);
         Assert.That(stepChangedArgs, Is.Not.Null);
-        Assert.That(selectionChangedArgs!.SelectedIndex, Is.EqualTo(selectionChangedArgs.CurrentIndex));
+        Assert.That(TestAssert.NotNull(selectionChangedArgs).SelectedIndex, Is.EqualTo(selectionChangedArgs.CurrentIndex));
         Assert.That(selectionChangedArgs.SelectedStep, Is.SameAs(selectionChangedArgs.CurrentStep));
-        Assert.That(stepChangedArgs!.SelectedIndex, Is.EqualTo(stepChangedArgs.CurrentIndex));
+        Assert.That(TestAssert.NotNull(stepChangedArgs).SelectedIndex, Is.EqualTo(stepChangedArgs.CurrentIndex));
         Assert.That(stepChangedArgs.SelectedStep, Is.SameAs(stepChangedArgs.CurrentStep));
     }
 }

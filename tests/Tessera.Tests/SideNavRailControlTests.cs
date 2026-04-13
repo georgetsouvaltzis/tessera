@@ -29,7 +29,7 @@ public sealed class SideNavRailControlTests
         Assert.That(rail.SelectedIndex, Is.EqualTo(2));
         Assert.That(rail.SelectedItem?.Id, Is.EqualTo("logs"));
         Assert.That(args, Is.Not.Null);
-        Assert.That(args!.PreviousIndex, Is.EqualTo(0));
+        Assert.That(TestAssert.NotNull(args).PreviousIndex, Is.EqualTo(0));
         Assert.That(args.SelectedIndex, Is.EqualTo(2));
         Assert.That(args.PreviousItem?.Id, Is.EqualTo("home"));
         Assert.That(args.SelectedItem?.Id, Is.EqualTo("logs"));
@@ -53,7 +53,7 @@ public sealed class SideNavRailControlTests
 
         Assert.That(handled, Is.True);
         Assert.That(activated, Is.Not.Null);
-        Assert.That(activated!.SelectedIndex, Is.EqualTo(1));
+        Assert.That(TestAssert.NotNull(activated).SelectedIndex, Is.EqualTo(1));
         Assert.That(activated.SelectedItem.Id, Is.EqualTo("metrics"));
     }
 
@@ -80,7 +80,7 @@ public sealed class SideNavRailControlTests
         Assert.That(rail.SelectedIndex, Is.EqualTo(1));
         Assert.That(rail.SelectedItem?.Id, Is.EqualTo("queue"));
         Assert.That(activated, Is.Not.Null);
-        Assert.That(activated!.SelectedItem.Id, Is.EqualTo("queue"));
+        Assert.That(TestAssert.NotNull(activated).SelectedItem.Id, Is.EqualTo("queue"));
     }
 
     [Test]

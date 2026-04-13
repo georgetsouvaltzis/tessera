@@ -71,7 +71,7 @@ internal static class ThemeFoundationTests
         var theme = TesseraThemes.Catppuccin(CatppuccinVariant.Frappe);
         var options = new TesseraRuntimeOptions { Theme = theme };
 
-        TestAssert.ReferenceSame(theme, options.Theme!,
+        TestAssert.ReferenceSame(theme, TestAssert.NotNull(options.Theme),
             "TesseraRuntimeOptions.Theme should hold the assigned theme reference.");
         TestAssert.Equal(60, options.MaxFps, "Theme assignment should not change MaxFps defaults.");
         TestAssert.ReferenceSame(ScreenOptions.Empty, options.Screen,
@@ -113,7 +113,7 @@ internal static class ThemeFoundationTests
     {
         TestAssert.True(!style.IsEmpty, $"{message} Style should not be empty.");
         TestAssert.True(style.Foreground is not null, $"{message} Foreground should be set.");
-        var foreground = style.Foreground!.Value;
+        var foreground = TestAssert.NotNull(style.Foreground);
         TestAssert.True(foreground.Mode == AnsiColorMode.Rgb, $"{message} Foreground should use RGB mode.");
         TestAssert.True(foreground.Red == red && foreground.Green == green && foreground.Blue == blue, message);
     }
@@ -122,7 +122,7 @@ internal static class ThemeFoundationTests
     {
         TestAssert.True(!style.IsEmpty, $"{message} Style should not be empty.");
         TestAssert.True(style.Background is not null, $"{message} Background should be set.");
-        var background = style.Background!.Value;
+        var background = TestAssert.NotNull(style.Background);
         TestAssert.True(background.Mode == AnsiColorMode.Rgb, $"{message} Background should use RGB mode.");
         TestAssert.True(background.Red == red && background.Green == green && background.Blue == blue, message);
     }

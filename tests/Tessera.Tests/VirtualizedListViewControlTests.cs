@@ -51,7 +51,7 @@ public sealed class VirtualizedListViewControlTests
         Assert.That(control.SelectedIndex, Is.EqualTo(3));
         Assert.That(control.SelectedItem, Is.EqualTo("d"));
         Assert.That(args, Is.Not.Null);
-        Assert.That(args!.SelectedIndex, Is.EqualTo(3));
+        Assert.That(TestAssert.NotNull(args).SelectedIndex, Is.EqualTo(3));
         Assert.That(args.SelectedItem, Is.EqualTo("d"));
     }
 

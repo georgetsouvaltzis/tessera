@@ -42,7 +42,7 @@ public sealed class JsonTreeViewControlTests
         Assert.That(collapse, Is.True);
         Assert.That(expand, Is.True);
         Assert.That(args, Is.Not.Null);
-        Assert.That(args!.CurrentIndex, Is.EqualTo(control.SelectedIndex));
+        Assert.That(TestAssert.NotNull(args).CurrentIndex, Is.EqualTo(control.SelectedIndex));
         Assert.That(collapsedOutput.Contains("▶ user: {...}", StringComparison.Ordinal), Is.True);
         Assert.That(collapsedOutput.Contains("name: \"anna\"", StringComparison.Ordinal), Is.False);
         Assert.That(expandedOutput.Contains("▼ user: {...}", StringComparison.Ordinal), Is.True);

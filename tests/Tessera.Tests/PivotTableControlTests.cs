@@ -65,7 +65,7 @@ public sealed class PivotTableControlTests
 
         Assert.That(result, Is.True);
         Assert.That(captured, Is.Not.Null);
-        Assert.That(captured!.ColumnIndex, Is.EqualTo(0));
+        Assert.That(TestAssert.NotNull(captured).ColumnIndex, Is.EqualTo(0));
         Assert.That(captured.Direction, Is.EqualTo(PivotSortDirection.Descending));
         Assert.That(control.SortColumnIndex, Is.EqualTo(0));
         Assert.That(control.SortDescending, Is.True);

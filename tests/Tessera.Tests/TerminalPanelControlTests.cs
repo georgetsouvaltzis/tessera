@@ -53,7 +53,7 @@ public sealed class TerminalPanelControlTests
         Assert.That(control.SelectedIndex, Is.EqualTo(2));
         Assert.That(control.SelectedLine?.Text, Is.EqualTo("third"));
         Assert.That(lastArgs, Is.Not.Null);
-        Assert.That(lastArgs!.PreviousIndex, Is.EqualTo(1));
+        Assert.That(TestAssert.NotNull(lastArgs).PreviousIndex, Is.EqualTo(1));
         Assert.That(lastArgs.SelectedIndex, Is.EqualTo(2));
         Assert.That(lastArgs.PreviousItem?.Text, Is.EqualTo("second"));
         Assert.That(lastArgs.SelectedItem?.Text, Is.EqualTo("third"));

@@ -29,7 +29,7 @@ public sealed class PaneTabsControlTests
         Assert.That(control.SelectedIndex, Is.EqualTo(2));
         Assert.That(control.SelectedItem?.Id, Is.EqualTo("diag"));
         Assert.That(args, Is.Not.Null);
-        Assert.That(args!.PreviousIndex, Is.EqualTo(0));
+        Assert.That(TestAssert.NotNull(args).PreviousIndex, Is.EqualTo(0));
         Assert.That(args.SelectedIndex, Is.EqualTo(2));
         Assert.That(args.PreviousItem?.Id, Is.EqualTo("home"));
         Assert.That(args.SelectedItem?.Id, Is.EqualTo("diag"));

@@ -595,7 +595,7 @@ internal static class AdvancedPrebuiltWidgetTests
         toolbar.Handle(new KeyPressed(Key.Right));
 
         TestAssert.True(args is not null, "Toolbar should raise selection changed when selected item changes.");
-        TestAssert.Equal(0, args!.PreviousIndex, "Toolbar event should report previous index.");
+        TestAssert.Equal(0, TestAssert.NotNull(args).PreviousIndex, "Toolbar event should report previous index.");
         TestAssert.Equal(1, args.SelectedIndex, "Toolbar event should report selected index.");
         TestAssert.Equal("new", args.PreviousItem?.Id ?? string.Empty, "Toolbar event should report previous item.");
         TestAssert.Equal("open", args.SelectedItem?.Id ?? string.Empty, "Toolbar event should report selected item.");
@@ -707,7 +707,7 @@ internal static class AdvancedPrebuiltWidgetTests
         table.Handle(new KeyPressed(Key.Down));
 
         TestAssert.True(args is not null, "TreeTable should raise selection-changed event when selection moves.");
-        TestAssert.Equal(0, args!.PreviousIndex, "TreeTable event should expose previous selected index.");
+        TestAssert.Equal(0, TestAssert.NotNull(args).PreviousIndex, "TreeTable event should expose previous selected index.");
         TestAssert.Equal(1, args.SelectedIndex, "TreeTable event should expose current selected index.");
         TestAssert.Equal("a", args.PreviousItem?.Id ?? string.Empty,
             "TreeTable event should expose previous selected item.");
@@ -843,7 +843,7 @@ internal static class AdvancedPrebuiltWidgetTests
         timeline.Handle(new KeyPressed(Key.Down));
 
         TestAssert.True(args is not null, "Timeline should raise selection changed when selection moves.");
-        TestAssert.Equal(0, args!.PreviousIndex, "Timeline event should expose previous index.");
+        TestAssert.Equal(0, TestAssert.NotNull(args).PreviousIndex, "Timeline event should expose previous index.");
         TestAssert.Equal(1, args.SelectedIndex, "Timeline event should expose selected index.");
         TestAssert.Equal("a", args.PreviousItem?.Id ?? string.Empty, "Timeline event should expose previous item.");
         TestAssert.Equal("b", args.SelectedItem?.Id ?? string.Empty, "Timeline event should expose selected item.");

@@ -29,7 +29,7 @@ public sealed class JumpListControlTests
         Assert.That(control.SelectedIndex, Is.EqualTo(1));
         Assert.That(control.SelectedItem?.Id, Is.EqualTo("b"));
         Assert.That(args, Is.Not.Null);
-        Assert.That(args!.PreviousIndex, Is.EqualTo(0));
+        Assert.That(TestAssert.NotNull(args).PreviousIndex, Is.EqualTo(0));
         Assert.That(args.SelectedIndex, Is.EqualTo(1));
     }
 
@@ -60,7 +60,7 @@ public sealed class JumpListControlTests
         Assert.That(pointerHandled, Is.True);
         Assert.That(activationCount, Is.EqualTo(2));
         Assert.That(activated, Is.Not.Null);
-        Assert.That(activated!.SelectedItem.Id, Is.EqualTo(control.SelectedItem?.Id));
+        Assert.That(TestAssert.NotNull(activated).SelectedItem.Id, Is.EqualTo(control.SelectedItem?.Id));
     }
 
     [Test]

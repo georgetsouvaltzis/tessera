@@ -40,7 +40,7 @@ public sealed class GroupedListViewControlTests
         Assert.That(end, Is.True);
         Assert.That(control.SelectedGroupIndex, Is.EqualTo(1));
         Assert.That(args, Is.Not.Null);
-        Assert.That(args!.CurrentGroupIndex, Is.EqualTo(control.SelectedGroupIndex));
+        Assert.That(TestAssert.NotNull(args).CurrentGroupIndex, Is.EqualTo(control.SelectedGroupIndex));
     }
 
     [Test]

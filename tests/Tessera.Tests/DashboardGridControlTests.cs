@@ -28,7 +28,7 @@ public sealed class DashboardGridControlTests
         Assert.That(handled, Is.True);
         Assert.That(control.SelectedTileId, Is.EqualTo("mem"));
         Assert.That(args, Is.Not.Null);
-        Assert.That(args!.PreviousIndex, Is.EqualTo(0));
+        Assert.That(TestAssert.NotNull(args).PreviousIndex, Is.EqualTo(0));
         Assert.That(args.SelectedIndex, Is.EqualTo(1));
         Assert.That(args.SelectedItem?.Id, Is.EqualTo("mem"));
     }

@@ -29,7 +29,7 @@ public sealed class DockWorkspaceControlTests
         Assert.That(control.SelectedIndex, Is.EqualTo(2));
         Assert.That(control.SelectedPane?.Id, Is.EqualTo("logs"));
         Assert.That(args, Is.Not.Null);
-        Assert.That(args!.PreviousIndex, Is.EqualTo(0));
+        Assert.That(TestAssert.NotNull(args).PreviousIndex, Is.EqualTo(0));
         Assert.That(args.SelectedIndex, Is.EqualTo(2));
         Assert.That(args.PreviousItem?.Id, Is.EqualTo("explorer"));
         Assert.That(args.SelectedItem?.Id, Is.EqualTo("logs"));

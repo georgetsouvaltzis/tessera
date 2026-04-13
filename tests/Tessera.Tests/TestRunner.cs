@@ -1,3 +1,6 @@
+using System.Diagnostics.CodeAnalysis;
+using System.Runtime.CompilerServices;
+
 namespace Tessera.Tests;
 
 public sealed record TestCase(string Name, Func<Task> Execute);
@@ -75,5 +78,34 @@ internal static class TestAssert
         {
             throw new InvalidOperationException(message);
         }
+    }
+
+    public static T NotNull<T>([NotNull] T? value, string? message = null)
+        where T : class
+    {
+        if (value is null)
+        {
+            throw new InvalidOperationException(message ?? "Expected non-null reference.");
+        }
+
+        return value;
+    }
+
+    public static T NotNull<T>(T? value, string? message = null)
+        where T : struct
+    {
+        if (!value.HasValue)
+        {
+            throw new InvalidOperationException(message ?? "Expected non-null value.");
+        }
+
+        return value.Value;
+    }
+
+    public static T NullRef<T>()
+        where T : class
+    {
+        object? value = null;
+        return Unsafe.As<object?, T>(ref value);
     }
 }

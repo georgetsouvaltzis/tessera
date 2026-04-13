@@ -44,7 +44,7 @@ public sealed class FieldSetControlTests
         Assert.That(control.SelectedIndex, Is.EqualTo(2));
         Assert.That(control.SelectedItem, Is.EqualTo("Three"));
         Assert.That(lastArgs, Is.Not.Null);
-        Assert.That(lastArgs!.PreviousIndex, Is.EqualTo(1));
+        Assert.That(TestAssert.NotNull(lastArgs).PreviousIndex, Is.EqualTo(1));
         Assert.That(lastArgs.SelectedIndex, Is.EqualTo(2));
     }
 

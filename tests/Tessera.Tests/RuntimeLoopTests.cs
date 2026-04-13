@@ -403,7 +403,7 @@ internal static class RuntimeLoopTests
 
         // Assert
         TestAssert.True(model.Seen is not null, "Program should emit TerminalCapabilitiesMsg.");
-        TestAssert.Equal(expected, model.Seen!, "Program should emit configured terminal capabilities.");
+        TestAssert.Equal(expected, TestAssert.NotNull(model.Seen), "Program should emit configured terminal capabilities.");
     }
 
     private static async Task EmitsColorProfileMessage()
@@ -452,7 +452,7 @@ internal static class RuntimeLoopTests
         await program.RunAsync();
 
         // Assert
-        TestAssert.Equal(expected, model.Seen!,
+        TestAssert.Equal(expected, TestAssert.NotNull(model.Seen),
             "Terminal capability detector delegate should override default detection.");
     }
 

@@ -30,7 +30,7 @@ public sealed class QuickOpenOverlayControlTests
         Assert.That(overlay.Handle(new KeyPressed(Key.Enter)), Is.True);
 
         Assert.That(submitted, Is.Not.Null);
-        Assert.That(submitted!.ItemId, Is.EqualTo("roadmap"));
+        Assert.That(TestAssert.NotNull(submitted).ItemId, Is.EqualTo("roadmap"));
         Assert.That(submitted.Query, Is.EqualTo("r"));
         Assert.That(overlay.IsOpen, Is.False);
     }
@@ -72,7 +72,7 @@ public sealed class QuickOpenOverlayControlTests
 
         Assert.That(handled, Is.True);
         Assert.That(submitted, Is.Not.Null);
-        Assert.That(submitted!.ItemId, Is.EqualTo("roadmap"));
+        Assert.That(TestAssert.NotNull(submitted).ItemId, Is.EqualTo("roadmap"));
         Assert.That(overlay.IsOpen, Is.False);
     }
 

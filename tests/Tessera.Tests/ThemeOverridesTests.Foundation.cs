@@ -40,7 +40,7 @@ internal static partial class ThemeOverridesTests
         overrides.SetControlInstanceState(button, TesseraThemeVisualState.Focused, BuildThemeWithPrimary(7, 8, 9));
 
         var resolved = overrides.Resolve(button, baseTheme, TesseraThemeVisualState.Focused);
-        var foreground = resolved.Text.Primary.Foreground!.Value;
+        var foreground = TestAssert.NotNull(resolved.Text.Primary.Foreground);
 
         TestAssert.True(
             foreground.Red == 7 && foreground.Green == 8 && foreground.Blue == 9,

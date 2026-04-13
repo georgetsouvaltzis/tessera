@@ -118,12 +118,12 @@ public sealed class LinePlotControlTests
             .ConfigureLegend(false);
 
         Assert.That(control.Options.HasValue, Is.True);
-        Assert.That(control.Options!.Value.ShowAxes, Is.True);
-        Assert.That(control.Options!.Value.ShowGrid, Is.True);
-        Assert.That(control.Options!.Value.ShowLegend, Is.False);
-        Assert.That(control.Options!.Value.XLabel, Is.EqualTo("time"));
-        Assert.That(control.Options!.Value.SharedAxisLabel, Is.EqualTo("req/s"));
-        Assert.That(control.Options!.Value.NormalizedAxisLabel, Is.EqualTo("norm"));
+        Assert.That(TestAssert.NotNull(control.Options).ShowAxes, Is.True);
+        Assert.That(TestAssert.NotNull(control.Options).ShowGrid, Is.True);
+        Assert.That(TestAssert.NotNull(control.Options).ShowLegend, Is.False);
+        Assert.That(TestAssert.NotNull(control.Options).XLabel, Is.EqualTo("time"));
+        Assert.That(TestAssert.NotNull(control.Options).SharedAxisLabel, Is.EqualTo("req/s"));
+        Assert.That(TestAssert.NotNull(control.Options).NormalizedAxisLabel, Is.EqualTo("norm"));
     }
 
     [Test]

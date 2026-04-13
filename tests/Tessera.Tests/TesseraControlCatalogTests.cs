@@ -308,9 +308,9 @@ internal static class TesseraControlCatalogTests
             var method = type.GetMethod(name, parameters);
             TestAssert.True(method is not null, $"{type.Name}.{name} should exist for advanced callers.");
             var attribute =
-                (EditorBrowsableAttribute?)Attribute.GetCustomAttribute(method!, typeof(EditorBrowsableAttribute));
+                (EditorBrowsableAttribute?)Attribute.GetCustomAttribute(TestAssert.NotNull(method), typeof(EditorBrowsableAttribute));
             TestAssert.True(attribute is not null, $"{type.Name}.{name} should be marked advanced.");
-            TestAssert.True(attribute!.State == EditorBrowsableState.Advanced,
+            TestAssert.True(TestAssert.NotNull(attribute).State == EditorBrowsableState.Advanced,
                 $"{type.Name}.{name} should be hidden from the default path.");
         }
 
@@ -325,7 +325,7 @@ internal static class TesseraControlCatalogTests
         {
             var type = assembly.GetType(typeName, false);
             TestAssert.True(type is not null, $"{typeName} should continue to exist as an internal bridge.");
-            TestAssert.True(type!.IsNotPublic, $"{typeName} should no longer be public once a root wrapper exists.");
+            TestAssert.True(TestAssert.NotNull(type).IsNotPublic, $"{typeName} should no longer be public once a root wrapper exists.");
         }
 
         return Task.CompletedTask;
@@ -353,7 +353,7 @@ internal static class TesseraControlCatalogTests
         {
             var type = assembly.GetType(typeName, false);
             TestAssert.True(type is not null, $"{typeName} should continue to exist as an internal bridge.");
-            TestAssert.True(type!.IsNotPublic, $"{typeName} should no longer be public once a root wrapper exists.");
+            TestAssert.True(TestAssert.NotNull(type).IsNotPublic, $"{typeName} should no longer be public once a root wrapper exists.");
         }
 
         return Task.CompletedTask;
@@ -423,7 +423,7 @@ internal static class TesseraControlCatalogTests
         var property = typeof(TimePicker).GetProperty(nameof(TimePicker.ActiveField));
 
         TestAssert.True(property is not null, "TimePicker.ActiveField should exist.");
-        TestAssert.True(property!.PropertyType == typeof(TimeField),
+        TestAssert.True(TestAssert.NotNull(property).PropertyType == typeof(TimeField),
             "TimePicker.ActiveField should stay on the root control contract.");
         return Task.CompletedTask;
     }

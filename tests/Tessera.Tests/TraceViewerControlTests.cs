@@ -54,7 +54,7 @@ public sealed class TraceViewerControlTests
         Assert.That(up, Is.True);
         Assert.That(control.SelectedIndex, Is.EqualTo(1));
         Assert.That(args, Is.Not.Null);
-        Assert.That(args!.SelectedIndex, Is.EqualTo(1));
+        Assert.That(TestAssert.NotNull(args).SelectedIndex, Is.EqualTo(1));
         Assert.That(args.SelectedEntry?.Operation, Is.EqualTo("Auth"));
     }
 

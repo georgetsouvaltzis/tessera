@@ -169,12 +169,13 @@ internal static class ComponentRenderingTests
 
     private static void InvokeWidgets(string methodName, params object?[] arguments)
     {
-        var type = typeof(Canvas).Assembly.GetType("Tessera.Components.Primitives.Widgets", true)!;
+        var type = TestAssert.NotNull(
+            typeof(Canvas).Assembly.GetType("Tessera.Components.Primitives.Widgets", true));
         var method = type
             .GetMethods(BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic)
             .SingleOrDefault(candidate => string.Equals(candidate.Name, methodName, StringComparison.Ordinal)
                                           && candidate.GetParameters().Length == arguments.Length);
         TestAssert.True(method is not null, $"Widgets.{methodName} should continue to exist as an internal bridge.");
-        method!.Invoke(null, arguments);
+        TestAssert.NotNull(method).Invoke(null, arguments);
     }
 }

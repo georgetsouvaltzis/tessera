@@ -47,7 +47,7 @@ public sealed class FormControlTests
         Assert.That(control.SelectedIndex, Is.EqualTo(0));
         Assert.That(control.SelectedField?.Name, Is.EqualTo("a"));
         Assert.That(lastArgs, Is.Not.Null);
-        Assert.That(lastArgs!.PreviousIndex, Is.EqualTo(2));
+        Assert.That(TestAssert.NotNull(lastArgs).PreviousIndex, Is.EqualTo(2));
         Assert.That(lastArgs.SelectedIndex, Is.EqualTo(0));
     }
 

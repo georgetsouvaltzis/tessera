@@ -41,7 +41,7 @@ public sealed class AutocompleteInputControlTests
 
         Assert.That(handled, Is.True);
         Assert.That(args, Is.Not.Null);
-        Assert.That(args!.Text, Is.EqualTo("bravo"));
+        Assert.That(TestAssert.NotNull(args).Text, Is.EqualTo("bravo"));
         Assert.That(args.SuggestionIndex, Is.EqualTo(2));
         Assert.That(args.PreviousText, Is.EqualTo("br"));
         Assert.That(control.Text, Is.EqualTo("bravo"));
@@ -64,7 +64,7 @@ public sealed class AutocompleteInputControlTests
         Assert.That(handled, Is.True);
         Assert.That(control.Text, Is.EqualTo("health"));
         Assert.That(args, Is.Not.Null);
-        Assert.That(args!.SuggestionIndex, Is.EqualTo(2));
+        Assert.That(TestAssert.NotNull(args).SuggestionIndex, Is.EqualTo(2));
     }
 
     [Test]

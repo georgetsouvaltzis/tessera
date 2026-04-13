@@ -199,7 +199,7 @@ internal static class ProductivityPrebuiltWidgetTests
         picker.Handle(new KeyPressed(Key.Right));
 
         TestAssert.True(args is not null, "Date picker should raise date changed when the selected date changes.");
-        TestAssert.Equal(new DateOnly(2026, 3, 8), args!.PreviousDate,
+        TestAssert.Equal(new DateOnly(2026, 3, 8), TestAssert.NotNull(args).PreviousDate,
             "Date picker event should expose the previous date.");
         TestAssert.Equal(new DateOnly(2026, 3, 9), args.SelectedDate,
             "Date picker event should expose the selected date.");
@@ -280,7 +280,7 @@ internal static class ProductivityPrebuiltWidgetTests
         picker.Handle(new KeyPressed(Key.Up));
 
         TestAssert.True(args is not null, "Time picker should raise value changed when the selected time changes.");
-        TestAssert.Equal(new TimeOnly(10, 0, 0), args!.PreviousValue,
+        TestAssert.Equal(new TimeOnly(10, 0, 0), TestAssert.NotNull(args).PreviousValue,
             "Time picker event should expose the previous value.");
         TestAssert.Equal(new TimeOnly(10, 5, 0), args.Value, "Time picker event should expose the current value.");
         return Task.CompletedTask;
@@ -359,7 +359,7 @@ internal static class ProductivityPrebuiltWidgetTests
         paginator.SetPage(2);
 
         TestAssert.True(args is not null, "Paginator should raise page changed when page index updates.");
-        TestAssert.Equal(0, args!.PreviousPageIndex, "Paginator event should expose previous page index.");
+        TestAssert.Equal(0, TestAssert.NotNull(args).PreviousPageIndex, "Paginator event should expose previous page index.");
         TestAssert.Equal(2, args.NewPageIndex, "Paginator event should expose new page index.");
         return Task.CompletedTask;
     }
@@ -414,7 +414,7 @@ internal static class ProductivityPrebuiltWidgetTests
         TestAssert.Equal(1, finder.ResultCount,
             "FuzzyFinder should keep only matching results for a restrictive query.");
         TestAssert.True(finder.SelectedItem is not null, "FuzzyFinder should keep a selected item when results exist.");
-        TestAssert.Equal("fuzzy", finder.SelectedItem!.Id, "FuzzyFinder should surface the matched item.");
+        TestAssert.Equal("fuzzy", TestAssert.NotNull(finder.SelectedItem).Id, "FuzzyFinder should surface the matched item.");
         return Task.CompletedTask;
     }
 
@@ -437,7 +437,7 @@ internal static class ProductivityPrebuiltWidgetTests
             "FuzzyFinder should raise selection-changed when highlight moves.");
         TestAssert.True(selectedArgs is not null,
             "FuzzyFinder should raise selected event when Enter activates a row.");
-        TestAssert.Equal("gamma", selectedArgs!.ItemId,
+        TestAssert.Equal("gamma", TestAssert.NotNull(selectedArgs).ItemId,
             "FuzzyFinder selected payload should include the selected item id.");
         TestAssert.True(
             string.Equals("gamma", finder.LastSelectedItemId, StringComparison.Ordinal),
@@ -478,7 +478,7 @@ internal static class ProductivityPrebuiltWidgetTests
         TestAssert.Equal(1, finder.SelectedIndex,
             "FuzzyFinder mouse press should map row coordinates to selected index.");
         TestAssert.True(selectedArgs is not null, "FuzzyFinder mouse press should raise item selected payload.");
-        TestAssert.Equal("two", selectedArgs!.ItemId, "FuzzyFinder mouse press should activate clicked item.");
+        TestAssert.Equal("two", TestAssert.NotNull(selectedArgs).ItemId, "FuzzyFinder mouse press should activate clicked item.");
         return Task.CompletedTask;
     }
 
@@ -552,7 +552,7 @@ internal static class ProductivityPrebuiltWidgetTests
         stepper.Handle(new KeyPressed(Key.End));
 
         TestAssert.True(args is not null, "Stepper should raise current-step changed when the current step changes.");
-        TestAssert.Equal(0, args!.PreviousIndex, "Stepper event should expose previous index.");
+        TestAssert.Equal(0, TestAssert.NotNull(args).PreviousIndex, "Stepper event should expose previous index.");
         TestAssert.Equal(2, args.CurrentIndex, "Stepper event should expose current index.");
         TestAssert.Equal("intro", args.PreviousStep?.Id ?? string.Empty,
             "Stepper event should expose previous step id.");
@@ -664,13 +664,13 @@ internal static class ProductivityPrebuiltWidgetTests
         grid.Handle(new KeyPressed(Key.Down));
 
         TestAssert.True(args is not null, "PropertyGrid should raise selection changed when selection updates.");
-        TestAssert.Equal(0, args!.PreviousIndex, "PropertyGrid event should expose previous index.");
+        TestAssert.Equal(0, TestAssert.NotNull(args).PreviousIndex, "PropertyGrid event should expose previous index.");
         TestAssert.Equal(1, args.CurrentIndex, "PropertyGrid event should expose current index.");
         TestAssert.True(args.PreviousProperty is not null, "PropertyGrid event should expose previous property.");
         TestAssert.True(args.CurrentProperty is not null, "PropertyGrid event should expose current property.");
-        TestAssert.Equal("User", args.PreviousProperty!.Name,
+        TestAssert.Equal("User", TestAssert.NotNull(args.PreviousProperty).Name,
             "PropertyGrid event previous property should match previous selection.");
-        TestAssert.Equal("Retries", args.CurrentProperty!.Name,
+        TestAssert.Equal("Retries", TestAssert.NotNull(args.CurrentProperty).Name,
             "PropertyGrid event current property should match new selection.");
         return Task.CompletedTask;
     }
@@ -784,13 +784,13 @@ internal static class ProductivityPrebuiltWidgetTests
         list.Handle(new KeyPressed(Key.Down));
 
         TestAssert.True(args is not null, "KeyValueList should raise selection changed when selection updates.");
-        TestAssert.Equal(0, args!.PreviousIndex, "KeyValueList event should expose previous index.");
+        TestAssert.Equal(0, TestAssert.NotNull(args).PreviousIndex, "KeyValueList event should expose previous index.");
         TestAssert.Equal(1, args.CurrentIndex, "KeyValueList event should expose current index.");
         TestAssert.True(args.PreviousItem is not null, "KeyValueList event should expose previous item.");
         TestAssert.True(args.CurrentItem is not null, "KeyValueList event should expose current item.");
-        TestAssert.Equal("User", args.PreviousItem!.Key,
+        TestAssert.Equal("User", TestAssert.NotNull(args.PreviousItem).Key,
             "KeyValueList previous item key should match previous selection.");
-        TestAssert.Equal("Retries", args.CurrentItem!.Key, "KeyValueList current item key should match new selection.");
+        TestAssert.Equal("Retries", TestAssert.NotNull(args.CurrentItem).Key, "KeyValueList current item key should match new selection.");
         return Task.CompletedTask;
     }
 
@@ -810,7 +810,7 @@ internal static class ProductivityPrebuiltWidgetTests
         TestAssert.True(changed, "KeyValueList click should update selected row.");
         TestAssert.Equal(1, list.SelectedIndex, "KeyValueList click should select row by pointer Y offset.");
         TestAssert.True(list.SelectedItem is not null, "KeyValueList should expose selected item after click.");
-        TestAssert.Equal("Port", list.SelectedItem!.Key, "KeyValueList click should select expected key.");
+        TestAssert.Equal("Port", TestAssert.NotNull(list.SelectedItem).Key, "KeyValueList click should select expected key.");
         return Task.CompletedTask;
     }
 
@@ -872,7 +872,7 @@ internal static class ProductivityPrebuiltWidgetTests
         TestAssert.Equal("ab", search.QueryText, "SearchBox should update query text from typed characters.");
         TestAssert.Equal(2, raised, "SearchBox should raise query changed once per mutation.");
         TestAssert.True(args is not null, "SearchBox should provide query changed payload.");
-        TestAssert.Equal("a", args!.PreviousQuery, "SearchBox query payload should expose previous query.");
+        TestAssert.Equal("a", TestAssert.NotNull(args).PreviousQuery, "SearchBox query payload should expose previous query.");
         TestAssert.Equal("ab", args.Query, "SearchBox query payload should expose current query.");
         return Task.CompletedTask;
     }
@@ -898,7 +898,7 @@ internal static class ProductivityPrebuiltWidgetTests
         TestAssert.Equal(1, search.CurrentMatchIndex ?? -1,
             "SearchBox should update current match index based on navigation.");
         TestAssert.True(args is not null, "SearchBox should expose navigation payload details.");
-        TestAssert.True(args!.Direction == SearchNavigationDirection.Previous,
+        TestAssert.True(TestAssert.NotNull(args).Direction == SearchNavigationDirection.Previous,
             "SearchBox should report previous direction on Shift+F3.");
         TestAssert.Equal(2, args.PreviousMatchIndex ?? -1, "SearchBox should report previous index before navigation.");
         TestAssert.Equal(1, args.CurrentMatchIndex ?? -1, "SearchBox should report current index after navigation.");

@@ -709,7 +709,7 @@ internal static class PrebuiltWidgetTests
         tabs.Handle(new KeyPressed(Key.Right));
 
         TestAssert.True(args is not null, "Tabs should raise selection changed when the selected tab changes.");
-        TestAssert.Equal(0, args!.PreviousIndex, "Tabs event should expose the previous index.");
+        TestAssert.Equal(0, TestAssert.NotNull(args).PreviousIndex, "Tabs event should expose the previous index.");
         TestAssert.Equal(1, args.SelectedIndex, "Tabs event should expose the selected index.");
         TestAssert.Equal("Overview", args.PreviousItem, "Tabs event should expose the previous tab label.");
         TestAssert.Equal("Data", args.SelectedItem, "Tabs event should expose the selected tab label.");
@@ -774,7 +774,7 @@ internal static class PrebuiltWidgetTests
         breadcrumb.Handle(new KeyPressed(Key.Right));
 
         TestAssert.True(args is not null, "Breadcrumb should raise selection changed when the selected item changes.");
-        TestAssert.Equal(0, args!.PreviousIndex, "Breadcrumb event should expose previous index.");
+        TestAssert.Equal(0, TestAssert.NotNull(args).PreviousIndex, "Breadcrumb event should expose previous index.");
         TestAssert.Equal(1, args.SelectedIndex, "Breadcrumb event should expose selected index.");
         TestAssert.Equal("home", args.PreviousItem?.Id ?? string.Empty,
             "Breadcrumb event should expose previous item.");
@@ -805,7 +805,7 @@ internal static class PrebuiltWidgetTests
         list.Handle(new KeyPressed(Key.Down));
 
         TestAssert.True(args is not null, "List should raise selection changed when the selected row changes.");
-        TestAssert.Equal(0, args!.PreviousIndex, "List event should expose the previous index.");
+        TestAssert.Equal(0, TestAssert.NotNull(args).PreviousIndex, "List event should expose the previous index.");
         TestAssert.Equal(1, args.SelectedIndex, "List event should expose the selected index.");
         TestAssert.Equal("one", args.PreviousItem ?? string.Empty, "List event should expose the previous item.");
         TestAssert.Equal("two", args.SelectedItem ?? string.Empty, "List event should expose the selected item.");
@@ -929,7 +929,7 @@ internal static class PrebuiltWidgetTests
         dropdown.Handle(new KeyPressed(Key.Enter));
 
         TestAssert.True(args is not null, "Dropdown should raise selection changed when the selected item changes.");
-        TestAssert.Equal("alpha", args!.PreviousItem, "Dropdown event should expose the previous item.");
+        TestAssert.Equal("alpha", TestAssert.NotNull(args).PreviousItem, "Dropdown event should expose the previous item.");
         TestAssert.Equal("beta", args.SelectedItem, "Dropdown event should expose the selected item.");
         return Task.CompletedTask;
     }
@@ -1012,7 +1012,7 @@ internal static class PrebuiltWidgetTests
         combobox.Handle(new KeyPressed(Key.Enter));
 
         TestAssert.True(args is not null, "Combobox should raise selection changed when the selected item changes.");
-        TestAssert.Equal("gamma", args!.SelectedItem, "Combobox event should expose the selected item.");
+        TestAssert.Equal("gamma", TestAssert.NotNull(args).SelectedItem, "Combobox event should expose the selected item.");
         return Task.CompletedTask;
     }
 
@@ -1854,7 +1854,7 @@ internal static class PrebuiltWidgetTests
 
         TestAssert.True(changed, "FileExplorer should select path when node exists.");
         TestAssert.True(args is not null, "FileExplorer should raise selection changed when selecting a path.");
-        TestAssert.Equal("/src", args!.PreviousPath ?? string.Empty, "FileExplorer event should expose previous path.");
+        TestAssert.Equal("/src", TestAssert.NotNull(args).PreviousPath ?? string.Empty, "FileExplorer event should expose previous path.");
         TestAssert.Equal("/src/app.cs", args.CurrentPath ?? string.Empty,
             "FileExplorer event should expose current path.");
         TestAssert.True(!explorer.SelectPath("/missing"), "FileExplorer should not change selection for unknown path.");
@@ -2188,7 +2188,7 @@ internal static class PrebuiltWidgetTests
         TestAssert.True(handledByHook,
             "DataGrid should allow external sort hook handling when comparer is not provided.");
         TestAssert.True(eventArgs is not null, "DataGrid should raise sort request event.");
-        TestAssert.Equal(0, eventArgs!.ColumnIndex, "DataGrid sort event should expose requested column.");
+        TestAssert.Equal(0, TestAssert.NotNull(eventArgs).ColumnIndex, "DataGrid sort event should expose requested column.");
         return Task.CompletedTask;
     }
 

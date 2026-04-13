@@ -35,7 +35,7 @@ internal static class WidgetApiContractTests
         {
             var type = assembly.GetType(typeName, false);
             TestAssert.True(type is not null, $"{typeName} should continue to exist as an internal bridge.");
-            TestAssert.True(type!.IsNotPublic, $"{typeName} should no longer be public.");
+            TestAssert.True(TestAssert.NotNull(type).IsNotPublic, $"{typeName} should no longer be public.");
         }
 
         return Task.CompletedTask;

@@ -47,7 +47,7 @@ public sealed class TableRowMutationApiTests
             () => table.ReplaceRow(99, ["x", "y"]),
             Throws.TypeOf<ArgumentOutOfRangeException>());
         Assert.That(
-            () => table.ReplaceRow(0, null!),
+            () => table.ReplaceRow(0, TestAssert.NullRef<IReadOnlyList<string>>()),
             Throws.TypeOf<ArgumentNullException>());
     }
 
@@ -113,7 +113,7 @@ public sealed class TableRowMutationApiTests
     public void ControlsTableAddRowValidatesArguments()
     {
         var table = new Table("Name");
-        Assert.That(() => table.AddRow(null!), Throws.TypeOf<ArgumentNullException>());
+        Assert.That(() => table.AddRow(TestAssert.NullRef<IReadOnlyList<string>>()), Throws.TypeOf<ArgumentNullException>());
     }
 
     private static string Render(Table table, int width, int height)

@@ -14,18 +14,15 @@ public sealed class ThemeScopeApiErgonomicsTests
     {
         var controls = new Control[] { new Button() };
 
-        Assert.Throws<ArgumentNullException>(() => ThemeScope.Apply(null!, controls));
+        Assert.Throws<ArgumentNullException>(() => ThemeScope.Apply(TestAssert.NullRef<TesseraTheme>(), controls));
     }
 
     [Test]
     public void ThemeScopeApplyNullControlsThrows()
     {
         var theme = TesseraThemes.Catppuccin();
-        Control[]? controls = null;
-        IEnumerable<Control?>? enumerableControls = null;
-
-        Assert.Throws<ArgumentNullException>(() => ThemeScope.Apply(theme, controls!));
-        Assert.Throws<ArgumentNullException>(() => ThemeScope.Apply(theme, enumerableControls!));
+        Assert.Throws<ArgumentNullException>(() => ThemeScope.Apply(theme, TestAssert.NullRef<Control[]>()));
+        Assert.Throws<ArgumentNullException>(() => ThemeScope.Apply(theme, TestAssert.NullRef<IEnumerable<Control?>>()));
     }
 
     [Test]
