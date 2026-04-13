@@ -3,20 +3,12 @@ using System.Text;
 
 namespace Tessera.Components.Primitives.Internal;
 
-internal sealed class CanvasGraphemeBuffer
+internal sealed class CanvasGraphemeBuffer(int width, int height)
 {
-    private readonly string?[] _cells;
-    private readonly bool[] _continuations;
-    private readonly int _height;
-    private readonly int _width;
-
-    public CanvasGraphemeBuffer(int width, int height)
-    {
-        _width = width;
-        _height = height;
-        _cells = new string?[width * height];
-        _continuations = new bool[width * height];
-    }
+    private readonly string?[] _cells = new string?[width * height];
+    private readonly bool[] _continuations = new bool[width * height];
+    private readonly int _height = height;
+    private readonly int _width = width;
 
     public void Clear(char fill = ' ')
     {

@@ -12,7 +12,7 @@ namespace Tessera.Controls;
 /// </remarks>
 public abstract class Control
 {
-    private static long s_focusRequestCounter;
+    private static long _sFocusRequestCounter;
     private long _focusRequestOrder;
     private bool _focusRequestPending;
 
@@ -50,7 +50,7 @@ public abstract class Control
     public void RequestFocus()
     {
         _focusRequestPending = true;
-        _focusRequestOrder = Interlocked.Increment(ref s_focusRequestCounter);
+        _focusRequestOrder = Interlocked.Increment(ref _sFocusRequestCounter);
     }
 
     /// <summary>

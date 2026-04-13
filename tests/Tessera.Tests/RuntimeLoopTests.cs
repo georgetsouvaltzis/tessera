@@ -1109,16 +1109,10 @@ internal static class RuntimeLoopTests
         }
     }
 
-    private sealed class TestRuntimeDriver
+    private sealed class TestRuntimeDriver(TestRuntimeModel screen, TesseraRuntimeLoopOptions? options = null)
     {
-        private readonly TesseraRuntimeLoop _runtime;
-        private readonly TestRuntimeModel _screen;
-
-        public TestRuntimeDriver(TestRuntimeModel screen, TesseraRuntimeLoopOptions? options = null)
-        {
-            _screen = screen ?? throw new ArgumentNullException(nameof(screen));
-            _runtime = new TesseraRuntimeLoop(screen.Init, screen.Update, screen.Render, options);
-        }
+        private readonly TesseraRuntimeLoop _runtime = new(screen.Init, screen.Update, screen.Render, options);
+        private readonly TestRuntimeModel _screen = screen;
 
         public void Send(IMessage message)
         {

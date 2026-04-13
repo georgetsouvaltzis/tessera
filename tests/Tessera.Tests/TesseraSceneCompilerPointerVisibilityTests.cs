@@ -42,21 +42,16 @@ public sealed class TesseraSceneCompilerPointerVisibilityTests
             "Visible overlays should keep blocking pointer passthrough to underlying controls.");
     }
 
-    private sealed class OverlayPointerProbeApp : TesseraApp
+    private sealed class OverlayPointerProbeApp(bool showDialog) : TesseraApp
     {
-        private readonly Dialog _dialog;
-        private readonly PointerProbeControl _probe = new();
-
-        public OverlayPointerProbeApp(bool showDialog)
+        private readonly Dialog _dialog = new()
         {
-            _dialog = new Dialog
-            {
-                Title = "Confirm",
-                BodyLines = ["Overlay"],
-                IsVisible = showDialog,
-                IsFocused = showDialog
-            };
-        }
+            Title = "Confirm",
+            BodyLines = ["Overlay"],
+            IsVisible = showDialog,
+            IsFocused = showDialog
+        };
+        private readonly PointerProbeControl _probe = new();
 
         public int PointerPressCount => _probe.PointerPressCount;
 

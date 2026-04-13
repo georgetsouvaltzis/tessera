@@ -121,14 +121,9 @@ internal static class ThemeRuntimeIntegrationTests
         }
     }
 
-    private sealed class ControlThemeProbeApp : TesseraApp
+    private sealed class ControlThemeProbeApp(Control control) : TesseraApp
     {
-        private readonly Control _control;
-
-        public ControlThemeProbeApp(Control control)
-        {
-            _control = control;
-        }
+        private readonly Control _control = control;
 
         public override TesseraEffect? Update(Message message)
         {

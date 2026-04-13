@@ -109,14 +109,9 @@ public sealed class ThemeOverridesRuntimeWiringTests
         Assert.That(style.Foreground!.Value, Is.EqualTo(expected), message);
     }
 
-    private sealed class RuntimeProbeApp : TesseraApp
+    private sealed class RuntimeProbeApp(Control control) : TesseraApp
     {
-        private readonly Control _control;
-
-        public RuntimeProbeApp(Control control)
-        {
-            _control = control;
-        }
+        private readonly Control _control = control;
 
         public override TesseraEffect? Update(Message message)
         {

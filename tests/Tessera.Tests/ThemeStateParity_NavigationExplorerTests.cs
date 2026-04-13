@@ -3,7 +3,7 @@ using Tessera.Styles;
 
 namespace Tessera.Tests;
 
-internal static class ThemeStateParity_NavigationExplorerTests
+internal static class ThemeStateParityNavigationExplorerTests
 {
     public static IEnumerable<TestCase> Cases()
     {

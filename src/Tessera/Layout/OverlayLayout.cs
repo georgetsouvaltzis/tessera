@@ -2,13 +2,8 @@ using Tessera.Components.Primitives;
 
 namespace Tessera.Layout;
 
-internal sealed class OverlayLayout : LayoutNode
+internal sealed class OverlayLayout(IReadOnlyList<LayoutNode> items) : LayoutNode
 {
-    public OverlayLayout(IReadOnlyList<LayoutNode> items)
-    {
-        Items = items ?? throw new ArgumentNullException(nameof(items));
-    }
-
     public OverlayLayout(params LayoutNode[] items)
         : this((IReadOnlyList<LayoutNode>)items)
     {
@@ -17,7 +12,7 @@ internal sealed class OverlayLayout : LayoutNode
     /// <summary>
     ///     Gets the overlay items in back-to-front order.
     /// </summary>
-    public IReadOnlyList<LayoutNode> Items { get; }
+    public IReadOnlyList<LayoutNode> Items { get; } = items ?? throw new ArgumentNullException(nameof(items));
 
     internal override LayoutMeasurement Measure(in Rect availableBounds)
     {

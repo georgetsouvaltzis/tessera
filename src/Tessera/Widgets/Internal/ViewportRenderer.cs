@@ -2,7 +2,7 @@ namespace Tessera.Widgets.Internal;
 
 internal static class ViewportRenderer
 {
-    [ThreadStatic] private static List<string>? s_threadRenderBuffer;
+    [ThreadStatic] private static List<string>? _sThreadRenderBuffer;
 
     public static IReadOnlyList<string> RenderLines(
         IReadOnlyList<string> visualLines,
@@ -15,7 +15,7 @@ internal static class ViewportRenderer
         int? highlightVisualLine,
         List<string>? target = null)
     {
-        var rendered = target ?? (s_threadRenderBuffer ??= []);
+        var rendered = target ?? (_sThreadRenderBuffer ??= []);
         rendered.Clear();
 
         if (visualLines.Count == 0)

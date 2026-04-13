@@ -558,14 +558,9 @@ internal static class TesseraAppCompositionTests
         return Task.CompletedTask;
     }
 
-    private sealed class TesseraAppDriver
+    private sealed class TesseraAppDriver(TesseraApp app)
     {
-        private readonly TesseraApp _app;
-
-        public TesseraAppDriver(TesseraApp app)
-        {
-            _app = app;
-        }
+        private readonly TesseraApp _app = app;
 
         public Effect? Update(IMessage message)
         {

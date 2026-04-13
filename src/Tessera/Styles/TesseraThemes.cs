@@ -234,36 +234,19 @@ public static class TesseraThemes
     }
 
     private readonly record struct Palette(
-        int baseSurface,
-        int panelSurface,
-        int overlaySurface,
-        int textPrimary,
-        int textSecondary,
-        int textMuted,
-        int borderDefault,
-        int borderStrong,
-        int focus,
-        int accentPrimary,
-        int accentSecondary,
-        int info,
-        int success,
-        int warning,
-        int error)
-    {
-        public int BaseSurface { get; } = baseSurface;
-        public int PanelSurface { get; } = panelSurface;
-        public int OverlaySurface { get; } = overlaySurface;
-        public int TextPrimary { get; } = textPrimary;
-        public int TextSecondary { get; } = textSecondary;
-        public int TextMuted { get; } = textMuted;
-        public int BorderDefault { get; } = borderDefault;
-        public int BorderStrong { get; } = borderStrong;
-        public int Focus { get; } = focus;
-        public int AccentPrimary { get; } = accentPrimary;
-        public int AccentSecondary { get; } = accentSecondary;
-        public int Info { get; } = info;
-        public int Success { get; } = success;
-        public int Warning { get; } = warning;
-        public int Error { get; } = error;
-    }
+        int BaseSurface,
+        int PanelSurface,
+        int OverlaySurface,
+        int TextPrimary,
+        int TextSecondary,
+        int TextMuted,
+        int BorderDefault,
+        int BorderStrong,
+        int Focus,
+        int AccentPrimary,
+        int AccentSecondary,
+        int Info,
+        int Success,
+        int Warning,
+        int Error);
 }

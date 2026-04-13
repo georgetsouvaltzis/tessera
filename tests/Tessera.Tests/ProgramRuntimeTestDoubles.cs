@@ -198,14 +198,9 @@ internal sealed class CommandRecoveryModel : TestRuntimeModel
     }
 }
 
-internal sealed class BurstUpdateModel : TestRuntimeModel
+internal sealed class BurstUpdateModel(int targetCount) : TestRuntimeModel
 {
-    private readonly int _targetCount;
-
-    public BurstUpdateModel(int targetCount)
-    {
-        _targetCount = Math.Max(1, targetCount);
-    }
+    private readonly int _targetCount = Math.Max(1, targetCount);
 
     public int Count { get; private set; }
 
@@ -379,14 +374,9 @@ internal sealed class UnsupportedModeReportRefinementModel : TestRuntimeModel
     }
 }
 
-internal sealed class CapabilityProbeTimeoutModel : TestRuntimeModel
+internal sealed class CapabilityProbeTimeoutModel(TimeSpan safetyQuitDelay) : TestRuntimeModel
 {
-    private readonly TimeSpan _safetyQuitDelay;
-
-    public CapabilityProbeTimeoutModel(TimeSpan safetyQuitDelay)
-    {
-        _safetyQuitDelay = safetyQuitDelay;
-    }
+    private readonly TimeSpan _safetyQuitDelay = safetyQuitDelay;
 
     public List<TerminalCapabilityProfile> Seen { get; } = [];
 
@@ -415,16 +405,11 @@ internal sealed class CapabilityProbeTimeoutModel : TestRuntimeModel
     }
 }
 
-internal sealed class CapabilityProbeResponseModel : TestRuntimeModel
+internal sealed class CapabilityProbeResponseModel(TimeSpan quitDelay, IReadOnlyList<ModeReportMsg> reports)
+    : TestRuntimeModel
 {
-    private readonly TimeSpan _quitDelay;
-    private readonly IReadOnlyList<ModeReportMsg> _reports;
-
-    public CapabilityProbeResponseModel(TimeSpan quitDelay, IReadOnlyList<ModeReportMsg> reports)
-    {
-        _quitDelay = quitDelay;
-        _reports = reports;
-    }
+    private readonly TimeSpan _quitDelay = quitDelay;
+    private readonly IReadOnlyList<ModeReportMsg> _reports = reports;
 
     public List<TerminalCapabilityProfile> Seen { get; } = [];
 
@@ -456,14 +441,9 @@ internal sealed class CapabilityProbeResponseModel : TestRuntimeModel
     }
 }
 
-internal sealed class TimedQuitModel : TestRuntimeModel
+internal sealed class TimedQuitModel(TimeSpan delay) : TestRuntimeModel
 {
-    private readonly TimeSpan _delay;
-
-    public TimedQuitModel(TimeSpan delay)
-    {
-        _delay = delay;
-    }
+    private readonly TimeSpan _delay = delay;
 
     public override Effect? Init()
     {
@@ -481,14 +461,9 @@ internal sealed class TimedQuitModel : TestRuntimeModel
     }
 }
 
-internal sealed class TimedQuitProbeViewModel : TestRuntimeModel
+internal sealed class TimedQuitProbeViewModel(TimeSpan delay) : TestRuntimeModel
 {
-    private readonly TimeSpan _delay;
-
-    public TimedQuitProbeViewModel(TimeSpan delay)
-    {
-        _delay = delay;
-    }
+    private readonly TimeSpan _delay = delay;
 
     public override Effect? Init()
     {
@@ -515,19 +490,13 @@ internal sealed class TimedQuitProbeViewModel : TestRuntimeModel
     }
 }
 
-internal sealed class ConcurrencyTrackingModel : TestRuntimeModel
+internal sealed class ConcurrencyTrackingModel(int commandCount, TimeSpan delay) : TestRuntimeModel
 {
-    private readonly int _commandCount;
-    private readonly TimeSpan _delay;
+    private readonly int _commandCount = Math.Max(1, commandCount);
+    private readonly TimeSpan _delay = delay;
     private int _activeCommands;
     private int _maxActiveCommands;
     private int _receivedMessages;
-
-    public ConcurrencyTrackingModel(int commandCount, TimeSpan delay)
-    {
-        _commandCount = Math.Max(1, commandCount);
-        _delay = delay;
-    }
 
     public int MaxActiveCommands => Volatile.Read(ref _maxActiveCommands);
 
@@ -952,15 +921,10 @@ internal sealed class ResizingFakeTerminal : ITerminalAdapter
     }
 }
 
-internal sealed class SignalDrivenFakeTerminal : ITerminalAdapter
+internal sealed class SignalDrivenFakeTerminal(TerminalSize initialSize) : ITerminalAdapter
 {
     private readonly object _sync = new();
-    private TerminalSize _size;
-
-    public SignalDrivenFakeTerminal(TerminalSize initialSize)
-    {
-        _size = initialSize;
-    }
+    private TerminalSize _size = initialSize;
 
     public Stream Input { get; } = new MemoryStream();
 
@@ -1041,14 +1005,9 @@ internal sealed class InteractiveProbeTerminalAdapter : ITerminalAdapter
     }
 }
 
-internal sealed class InteractiveInputTerminalAdapter : ITerminalAdapter
+internal sealed class InteractiveInputTerminalAdapter(string input) : ITerminalAdapter
 {
-    private readonly MemoryStream _input;
-
-    public InteractiveInputTerminalAdapter(string input)
-    {
-        _input = new MemoryStream(Encoding.UTF8.GetBytes(input));
-    }
+    private readonly MemoryStream _input = new(Encoding.UTF8.GetBytes(input));
 
     public Stream Input => _input;
 

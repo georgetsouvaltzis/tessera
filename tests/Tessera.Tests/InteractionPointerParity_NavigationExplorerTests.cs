@@ -4,7 +4,7 @@ using Tessera.Styles;
 
 namespace Tessera.Tests;
 
-internal static class InteractionPointerParity_NavigationExplorerTests
+internal static class InteractionPointerParityNavigationExplorerTests
 {
     public static IEnumerable<TestCase> Cases()
     {

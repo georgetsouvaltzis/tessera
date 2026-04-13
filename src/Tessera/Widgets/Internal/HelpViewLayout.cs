@@ -87,7 +87,7 @@ internal static class HelpViewLayout
             return string.Join("  |  ", chunks);
         }
 
-        const string Separator = "  |  ";
+        const string separator = "  |  ";
         var lines = new List<string>();
         var current = new StringBuilder(maxWidth);
         foreach (var chunk in chunks)
@@ -106,10 +106,10 @@ internal static class HelpViewLayout
                 continue;
             }
 
-            var candidateLength = current.Length + Separator.Length + chunk.Length;
+            var candidateLength = current.Length + separator.Length + chunk.Length;
             if (candidateLength <= maxWidth)
             {
-                current.Append(Separator);
+                current.Append(separator);
                 current.Append(chunk);
                 continue;
             }

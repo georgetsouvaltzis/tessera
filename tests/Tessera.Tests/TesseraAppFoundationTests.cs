@@ -178,14 +178,9 @@ internal static class TesseraAppFoundationTests
 
     private sealed record IncrementRequested : Message;
 
-    private sealed class TesseraAppDriver
+    private sealed class TesseraAppDriver(TesseraApp app)
     {
-        private readonly TesseraApp _app;
-
-        public TesseraAppDriver(TesseraApp app)
-        {
-            _app = app;
-        }
+        private readonly TesseraApp _app = app;
 
         public Effect? Init()
         {

@@ -168,12 +168,12 @@ public sealed class NUnitCaseAdapters
             yield return ToCaseData(testCase);
         }
 
-        foreach (var testCase in InteractionPointerParity_NavigationExplorerTests.Cases())
+        foreach (var testCase in InteractionPointerParityNavigationExplorerTests.Cases())
         {
             yield return ToCaseData(testCase);
         }
 
-        foreach (var testCase in ThemeStateParity_NavigationExplorerTests.Cases())
+        foreach (var testCase in ThemeStateParityNavigationExplorerTests.Cases())
         {
             yield return ToCaseData(testCase);
         }

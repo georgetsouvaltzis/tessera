@@ -390,18 +390,13 @@ internal sealed class TesseraSceneCompiler : IScreenCompiler
         return TesseraThemeVisualState.Default;
     }
 
-    private sealed class TesseraSceneBuilder
+    private sealed class TesseraSceneBuilder(string? previousFocusedRegionId)
     {
-        private readonly string? _previousFocusedRegionId;
+        private readonly string? _previousFocusedRegionId = previousFocusedRegionId;
         private readonly List<TesseraSceneRegion> _regions = [];
         private string? _implicitFocusRegionId;
         private long _requestedFocusOrder;
         private string? _requestedFocusRegionId;
-
-        public TesseraSceneBuilder(string? previousFocusedRegionId)
-        {
-            _previousFocusedRegionId = previousFocusedRegionId;
-        }
 
         public bool TryBuild(LayoutNode layout, in Rect bounds, string path)
         {
