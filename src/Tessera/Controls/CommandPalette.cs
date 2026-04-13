@@ -250,13 +250,11 @@ public sealed class CommandPalette : Control
 
         if (!IsVisible)
         {
-            if (message is KeyPressed key && key.IsCharacter('p', ModifierKeys.Ctrl))
+            return message switch
             {
-                Open();
-                return true;
-            }
-
-            return false;
+                KeyPressed key when key.IsCharacter('p', ModifierKeys.Ctrl) => OpenFromShortcut(),
+                _ => false
+            };
         }
 
         if (message is KeyPressed input)
@@ -286,13 +284,13 @@ public sealed class CommandPalette : Control
         }
 
         var inputResult = _query.Update(message);
-        if (inputResult.Changed)
+        if (!inputResult.Changed)
         {
-            RefreshFilter();
-            return true;
+            return inputResult.Submitted && ExecuteSelected();
         }
 
-        return inputResult.Submitted && ExecuteSelected();
+        RefreshFilter();
+        return true;
     }
 
     /// <inheritdoc />
@@ -313,28 +311,18 @@ public sealed class CommandPalette : Control
                 changed |= SetHoveredFilteredIndex(-1);
             }
 
-            if (pointer.Kind == PointerEventKind.Press && pointer.Button == PointerButton.Left)
+            if (pointer is not { Kind: PointerEventKind.Press, Button: PointerButton.Left })
             {
-                Close();
-                changed = true;
+                return changed;
             }
 
-            return changed;
+            Close();
+            return true;
         }
 
         if (pointer.Kind == PointerEventKind.Wheel && _filteredIndices.Count > 0)
         {
-            if (pointer.Button == PointerButton.WheelDown)
-            {
-                MoveNext();
-                return true;
-            }
-
-            if (pointer.Button == PointerButton.WheelUp)
-            {
-                MovePrevious();
-                return true;
-            }
+            return HandleWheel(pointer.Button, changed);
         }
 
         if (!content.Contains(pointer.X, pointer.Y))
@@ -348,19 +336,13 @@ public sealed class CommandPalette : Control
         }
 
         var hovered = RowToFilteredIndex(content, pointer.Y);
-        if (pointer.Kind == PointerEventKind.Motion)
+        return pointer.Kind switch
         {
-            return SetHoveredFilteredIndex(hovered);
-        }
-
-        if (pointer.Kind == PointerEventKind.Press && pointer.Button == PointerButton.Left && hovered >= 0)
-        {
-            changed |= SetHoveredFilteredIndex(hovered);
-            changed |= SetSelectedFilteredIndex(hovered);
-            changed |= ExecuteSelected();
-        }
-
-        return changed;
+            PointerEventKind.Motion => SetHoveredFilteredIndex(hovered),
+            PointerEventKind.Press when pointer is { Button: PointerButton.Left } && hovered >= 0
+                => HandlePress(hovered, changed),
+            _ => changed
+        };
     }
 
     /// <summary>
@@ -463,14 +445,8 @@ public sealed class CommandPalette : Control
             return;
         }
 
-        for (var index = 0; index < source.Count; index++)
-        {
-            var itemIndex = source[index];
-            if (_itemRenderCache[itemIndex].SearchText.Contains(filter, StringComparison.OrdinalIgnoreCase))
-            {
-                _filteredIndices.Add(itemIndex);
-            }
-        }
+        _filteredIndices.AddRange(source.Where(itemIndex =>
+            _itemRenderCache[itemIndex].SearchText.Contains(filter, StringComparison.OrdinalIgnoreCase)));
 
         _lastFilter = filter;
         ClampSelectionAndHover();
@@ -554,12 +530,7 @@ public sealed class CommandPalette : Control
             return row.SelectedRowText;
         }
 
-        if (filteredIndex == _hoveredFilteredIndex)
-        {
-            return row.HoveredRowText;
-        }
-
-        return row.NormalRowText;
+        return filteredIndex == _hoveredFilteredIndex ? row.HoveredRowText : row.NormalRowText;
     }
 
     private bool ExecuteSelected()
@@ -637,12 +608,9 @@ public sealed class CommandPalette : Control
 
     private string ResolveQueryPrompt()
     {
-        if (string.IsNullOrEmpty(_glyphs.QueryPrompt))
-        {
-            return string.Empty;
-        }
-
-        return string.Concat(_glyphs.QueryPrompt, _glyphs.MarkerSeparator);
+        return string.IsNullOrEmpty(_glyphs.QueryPrompt)
+            ? string.Empty
+            : string.Concat(_glyphs.QueryPrompt, _glyphs.MarkerSeparator);
     }
 
     private string FormatTitleText()
@@ -716,7 +684,6 @@ public sealed class CommandPalette : Control
 
     private readonly record struct CommandPaletteRenderCache(
         string SearchText,
-        string Summary,
         string NormalRowText,
         string SelectedRowText,
         string HoveredRowText)
@@ -729,10 +696,45 @@ public sealed class CommandPalette : Control
             var search = string.Concat(item.Title, "\n", item.Description, "\n", item.Id);
             return new CommandPaletteRenderCache(
                 search,
-                summary,
                 string.Concat(glyphs.NormalRowMarker, glyphs.MarkerSeparator, summary),
                 string.Concat(glyphs.SelectedRowMarker, glyphs.MarkerSeparator, summary),
                 string.Concat(glyphs.HoveredRowMarker, glyphs.MarkerSeparator, summary));
         }
+    }
+
+    private bool HandleWheel(PointerButton button, bool changed)
+    {
+        return button switch
+        {
+            PointerButton.WheelDown => MoveNextAndHandle(),
+            PointerButton.WheelUp => MovePreviousAndHandle(),
+            _ => changed
+        };
+    }
+
+    private bool HandlePress(int hovered, bool changed)
+    {
+        changed |= SetHoveredFilteredIndex(hovered);
+        changed |= SetSelectedFilteredIndex(hovered);
+        changed |= ExecuteSelected();
+        return changed;
+    }
+
+    private bool OpenFromShortcut()
+    {
+        Open();
+        return true;
+    }
+
+    private bool MoveNextAndHandle()
+    {
+        MoveNext();
+        return true;
+    }
+
+    private bool MovePreviousAndHandle()
+    {
+        MovePrevious();
+        return true;
     }
 }

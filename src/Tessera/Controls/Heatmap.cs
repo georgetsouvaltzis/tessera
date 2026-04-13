@@ -263,12 +263,7 @@ public sealed class Heatmap : Control
             return SetSelectedCell(0, 0);
         }
 
-        if (key.Is(Key.End))
-        {
-            return SetSelectedCell(RowCount - 1, ColumnCount - 1);
-        }
-
-        return false;
+        return key.Is(Key.End) && SetSelectedCell(RowCount - 1, ColumnCount - 1);
     }
 
     /// <inheritdoc />
@@ -294,16 +289,7 @@ public sealed class Heatmap : Control
 
         if (pointer.Kind == PointerEventKind.Wheel)
         {
-            var row = SelectedRow < 0 ? 0 : SelectedRow;
-            if (pointer.Button == PointerButton.WheelDown)
-            {
-                return SetSelectedCell(row + 1, SelectedColumn) || changed;
-            }
-
-            if (pointer.Button == PointerButton.WheelUp)
-            {
-                return SetSelectedCell(row - 1, SelectedColumn) || changed;
-            }
+            return HandleWheel(pointer.Button, changed);
         }
 
         if (!inside)
@@ -315,20 +301,13 @@ public sealed class Heatmap : Control
         var columnIndex = pointer.X - layout.Plot.X;
         rowIndex = rowIndex >= 0 && rowIndex < layout.VisibleRows ? rowIndex : -1;
         columnIndex = columnIndex >= 0 && columnIndex < layout.VisibleColumns ? columnIndex : -1;
-        if (pointer.Kind == PointerEventKind.Motion)
+        return pointer.Kind switch
         {
-            return SetHovered(rowIndex, columnIndex);
-        }
-
-        if (pointer.Kind == PointerEventKind.Press && pointer.Button == PointerButton.Left && rowIndex >= 0 &&
-            columnIndex >= 0)
-        {
-            RequestFocus();
-            changed |= SetHovered(rowIndex, columnIndex);
-            changed |= SetSelectedCell(rowIndex, columnIndex);
-        }
-
-        return changed;
+            PointerEventKind.Motion => SetHovered(rowIndex, columnIndex),
+            PointerEventKind.Press when pointer is { Button: PointerButton.Left } && rowIndex >= 0 && columnIndex >= 0
+                => HandlePress(rowIndex, columnIndex, changed),
+            _ => changed
+        };
     }
 
     /// <inheritdoc />
@@ -384,12 +363,14 @@ public sealed class Heatmap : Control
             }
         }
 
-        if (layout.RowLabelWidth > 0)
+        if (layout.RowLabelWidth <= 0)
         {
-            for (var r = 0; r < layout.VisibleRows; r++)
-            {
-                Write(canvas, layout.RowLabelX, layout.Plot.Y + r, RowLabel(r), headerStyle, layout.RowLabelWidth);
-            }
+            return;
+        }
+
+        for (var r = 0; r < layout.VisibleRows; r++)
+        {
+            Write(canvas, layout.RowLabelX, layout.Plot.Y + r, RowLabel(r), headerStyle, layout.RowLabelWidth);
         }
     }
 
@@ -425,11 +406,15 @@ public sealed class Heatmap : Control
         var width = layout.Plot.Right - layout.Plot.X;
         if (_legend.Count > 0)
         {
-            for (var i = 0; i < _legend.Count && x < layout.Plot.Right; i++)
+            foreach (var entry in _legend)
             {
-                var e = _legend[i];
-                var text = string.Concat(Glyph(e.Glyph), " ", e.Label, " ");
-                Write(canvas, x, layout.LegendY, text, ResolveStyle(LegendStyle.Merge(e.Style)),
+                if (x >= layout.Plot.Right)
+                {
+                    break;
+                }
+
+                var text = string.Concat(Glyph(entry.Glyph), " ", entry.Label, " ");
+                Write(canvas, x, layout.LegendY, text, ResolveStyle(LegendStyle.Merge(entry.Style)),
                     width - (x - layout.Plot.X));
                 x += text.Length;
             }
@@ -452,32 +437,21 @@ public sealed class Heatmap : Control
 
     private (char Glyph, TesseraStyle Style) ResolveBand(double value, double min, double max)
     {
-        for (var i = 0; i < _legend.Count; i++)
+        var legendIndex = _legend.FindIndex(entry => value >= entry.MinInclusive && value <= entry.MaxInclusive);
+        if (legendIndex >= 0)
         {
-            var e = _legend[i];
-            if (value >= e.MinInclusive && value <= e.MaxInclusive)
-            {
-                return (e.Glyph, e.Style);
-            }
+            var entry = _legend[legendIndex];
+            return (entry.Glyph, entry.Style);
         }
 
         var n = Math.Clamp((value - min) / (max - min), 0d, 1d);
-        if (n <= 0.25d)
+        return n switch
         {
-            return (LowGlyph, LowCellStyle);
-        }
-
-        if (n <= 0.5d)
-        {
-            return (MidGlyph, MidCellStyle);
-        }
-
-        if (n <= 0.75d)
-        {
-            return (HighGlyph, HighCellStyle);
-        }
-
-        return (PeakGlyph, PeakCellStyle);
+            <= 0.25d => (LowGlyph, LowCellStyle),
+            <= 0.5d => (MidGlyph, MidCellStyle),
+            <= 0.75d => (HighGlyph, HighCellStyle),
+            _ => (PeakGlyph, PeakCellStyle)
+        };
     }
 
     private TesseraStyle StateStyle(int row, int column)
@@ -491,10 +465,11 @@ public sealed class Heatmap : Control
         if (row == SelectedRow && column == SelectedColumn)
         {
             style = style.Merge(SelectedCellStyle);
-            if (IsFocused)
-            {
-                style = style.Merge(FocusedSelectedCellStyle);
-            }
+        }
+
+        if (row == SelectedRow && column == SelectedColumn && IsFocused)
+        {
+            style = style.Merge(FocusedSelectedCellStyle);
         }
 
         return style;
@@ -573,17 +548,16 @@ public sealed class Heatmap : Control
     {
         min = double.PositiveInfinity;
         max = double.NegativeInfinity;
-        for (var i = 0; i < _cells.Count; i++)
+        foreach (var value in _cells.Select(static cell => cell.Value))
         {
-            var v = _cells[i].Value;
-            if (v < min)
+            if (value < min)
             {
-                min = v;
+                min = value;
             }
 
-            if (v > max)
+            if (value > max)
             {
-                max = v;
+                max = value;
             }
         }
 
@@ -668,31 +642,22 @@ public sealed class Heatmap : Control
     {
         ArgumentNullException.ThrowIfNull(labels);
         target.Clear();
-        foreach (var label in labels)
-        {
-            target.Add(label);
-        }
+        target.AddRange(labels);
     }
 
     private static int MaxLabelWidth(List<string> labels)
     {
-        var max = 0;
-        for (var index = 0; index < labels.Count; index++)
-        {
-            max = Math.Max(max, ControlTextLayout.MeasureDisplayWidth(labels[index]));
-        }
-
-        return max;
+        return labels.Count == 0
+            ? 0
+            : labels.Max(static label => ControlTextLayout.MeasureDisplayWidth(label));
     }
 
     private static char HeaderGlyph(string label, int fallback)
     {
-        for (var index = 0; index < label.Length; index++)
+        var glyph = label.FirstOrDefault(static value => !char.IsWhiteSpace(value));
+        if (glyph != '\0')
         {
-            if (!char.IsWhiteSpace(label[index]))
-            {
-                return label[index];
-            }
+            return glyph;
         }
 
         return (char)('0' + (fallback + 1) % 10);
@@ -718,6 +683,25 @@ public sealed class Heatmap : Control
     private static void Write(Canvas canvas, int x, int y, string text, TesseraStyle style, int width)
     {
         canvas.WriteText(x, y, StyleText(text, style), width);
+    }
+
+    private bool HandleWheel(PointerButton button, bool changed)
+    {
+        var row = SelectedRow < 0 ? 0 : SelectedRow;
+        return button switch
+        {
+            PointerButton.WheelDown => SetSelectedCell(row + 1, SelectedColumn) || changed,
+            PointerButton.WheelUp => SetSelectedCell(row - 1, SelectedColumn) || changed,
+            _ => changed
+        };
+    }
+
+    private bool HandlePress(int rowIndex, int columnIndex, bool changed)
+    {
+        RequestFocus();
+        changed |= SetHovered(rowIndex, columnIndex);
+        changed |= SetSelectedCell(rowIndex, columnIndex);
+        return changed;
     }
 
     private readonly record struct PlotLayout(
