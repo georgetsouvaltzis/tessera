@@ -11,7 +11,7 @@ namespace Tessera.Controls;
 /// <typeparam name="T">Item type.</typeparam>
 public sealed class VirtualizedListView<T> : Control
 {
-    private static readonly IReadOnlyList<T> Empty = Array.Empty<T>();
+    private static readonly IReadOnlyList<T> Empty = [];
     private readonly Func<T, string> _textSelector;
     private int _hoveredIndex = -1;
     private IReadOnlyList<T> _items = Empty;

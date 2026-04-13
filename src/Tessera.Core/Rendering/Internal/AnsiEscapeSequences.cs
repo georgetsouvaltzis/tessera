@@ -39,7 +39,7 @@ internal static class AnsiEscapeSequences
 
     public static string Progress(TerminalProgress? progress)
     {
-        if (progress is not TerminalProgress current || current.State == TerminalProgressState.None)
+        if (progress is not { } current || current.State == TerminalProgressState.None)
         {
             return "\e]9;4;0\e\\";
         }

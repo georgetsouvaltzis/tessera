@@ -57,7 +57,7 @@ public sealed partial class TreeTable
             return true;
         }
 
-        return selected.ParentVisibleIndex is int parentIndex && SetSelectedVisibleIndex(parentIndex);
+        return selected.ParentVisibleIndex is { } parentIndex && SetSelectedVisibleIndex(parentIndex);
     }
 
     private bool SetSelectedVisibleIndex(int index)

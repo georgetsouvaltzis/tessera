@@ -454,7 +454,7 @@ public sealed partial class FileExplorer : Control
             return true;
         }
 
-        return selected.ParentVisibleIndex is int parent && SetSelectedVisibleIndex(parent);
+        return selected.ParentVisibleIndex is { } parent && SetSelectedVisibleIndex(parent);
     }
 
     private bool SetSelectedVisibleIndex(int index)

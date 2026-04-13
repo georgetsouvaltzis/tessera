@@ -385,7 +385,7 @@ public sealed class TreeView : Control
             return true;
         }
 
-        if (entry.ParentVisibleIndex is int parent)
+        if (entry.ParentVisibleIndex is { } parent)
         {
             _selectedIndex = parent;
             return true;

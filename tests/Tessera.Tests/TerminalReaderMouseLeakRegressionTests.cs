@@ -1,5 +1,4 @@
 using NUnit.Framework;
-using System.Text;
 using Tessera.Core.Abstractions;
 using Tessera.Core.Input;
 using Tessera.Core.Messages;
@@ -15,9 +14,9 @@ public sealed class TerminalReaderMouseLeakRegressionTests
     {
         var stream = new TimedChunkReadStream(
         [
-            (Encoding.UTF8.GetBytes("\e["), 0),
-            (Encoding.UTF8.GetBytes("<32;83;7M\e["), 35),
-            (Encoding.UTF8.GetBytes("<0;84;7M"), 35)
+            ("\e["u8.ToArray(), 0),
+            ("<32;83;7M\e["u8.ToArray(), 35),
+            ("<0;84;7M"u8.ToArray(), 35)
         ]);
         var reader = new TerminalReader(stream, new EventDecoder(), TimeSpan.FromMilliseconds(10));
         var events = new List<IMessage>();
@@ -43,10 +42,10 @@ public sealed class TerminalReaderMouseLeakRegressionTests
     {
         var stream = new TimedChunkReadStream(
         [
-            (Encoding.UTF8.GetBytes("\e"), 0),
-            (Encoding.UTF8.GetBytes("[<32;83;7M"), 35),
-            (Encoding.UTF8.GetBytes("\e"), 35),
-            (Encoding.UTF8.GetBytes("[<0;84;7M"), 35)
+            ("\e"u8.ToArray(), 0),
+            ("[<32;83;7M"u8.ToArray(), 35),
+            ("\e"u8.ToArray(), 35),
+            ("[<0;84;7M"u8.ToArray(), 35)
         ]);
         var reader = new TerminalReader(stream, new EventDecoder(), TimeSpan.FromMilliseconds(10));
         var events = new List<IMessage>();
@@ -72,8 +71,8 @@ public sealed class TerminalReaderMouseLeakRegressionTests
     {
         var stream = new TimedChunkReadStream(
         [
-            (new byte[] { 0x1B, (byte)'[', (byte)'M', (byte)' ' }, 0),
-            (new[] { (byte)'!', (byte)'!' }, 35)
+            ([0x1B, (byte)'[', (byte)'M', (byte)' '], 0),
+            ("!!"u8.ToArray(), 35)
         ]);
         var reader = new TerminalReader(stream, new EventDecoder(), TimeSpan.FromMilliseconds(10));
         var events = new List<IMessage>();
@@ -93,8 +92,8 @@ public sealed class TerminalReaderMouseLeakRegressionTests
     {
         var stream = new TimedChunkReadStream(
         [
-            (new byte[] { 0x1B, (byte)'[', (byte)'M', (byte)'C' }, 0),
-            (new[] { (byte)'!', (byte)'!' }, 35)
+            ([0x1B, (byte)'[', (byte)'M', (byte)'C'], 0),
+            ("!!"u8.ToArray(), 35)
         ]);
         var reader = new TerminalReader(stream, new EventDecoder(), TimeSpan.FromMilliseconds(10));
         var events = new List<IMessage>();

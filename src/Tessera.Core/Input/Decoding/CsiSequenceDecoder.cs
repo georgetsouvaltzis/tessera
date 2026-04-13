@@ -82,7 +82,7 @@ internal static class CsiSequenceDecoder
     private static bool TryDecodeBracketedPaste(IReadOnlyList<int?> parameters, out IMessage? message)
     {
         message = null;
-        if (parameters.Count == 0 || parameters[0] is not int code)
+        if (parameters.Count == 0 || parameters[0] is not { } code)
         {
             return false;
         }
@@ -105,8 +105,8 @@ internal static class CsiSequenceDecoder
     private static bool TryDecodeWindowSize(IReadOnlyList<int?> parameters, out IMessage? message)
     {
         message = null;
-        if (parameters.Count < 3 || parameters[0] != 8 || parameters[1] is not int rows ||
-            parameters[2] is not int cols)
+        if (parameters.Count < 3 || parameters[0] != 8 || parameters[1] is not { } rows ||
+            parameters[2] is not { } cols)
         {
             return false;
         }
@@ -119,8 +119,8 @@ internal static class CsiSequenceDecoder
     {
         message = null;
         if (parameters.Count < 2
-            || parameters[0] is not int mode
-            || parameters[1] is not int stateRaw)
+            || parameters[0] is not { } mode
+            || parameters[1] is not { } stateRaw)
         {
             return false;
         }
@@ -179,12 +179,12 @@ internal static class CsiSequenceDecoder
     private static bool TryDecodeCsiTildeKey(IReadOnlyList<int?> parameters, out IMessage? message)
     {
         message = null;
-        if (parameters.Count == 0 || parameters[0] is not int code)
+        if (parameters.Count == 0 || parameters[0] is not { } code)
         {
             return false;
         }
 
-        if (code == 27 && parameters.Count >= 3 && parameters[2] is int modifyOtherKeyCodePoint)
+        if (code == 27 && parameters.Count >= 3 && parameters[2] is { } modifyOtherKeyCodePoint)
         {
             return DecoderCommon.TryCreateKeyMessageFromCodePoint(
                 modifyOtherKeyCodePoint,
@@ -232,7 +232,7 @@ internal static class CsiSequenceDecoder
     private static bool TryDecodeCsiUnicodeKey(IReadOnlyList<int?> parameters, out IMessage? message)
     {
         message = null;
-        if (parameters.Count == 0 || parameters[0] is not int codePoint)
+        if (parameters.Count == 0 || parameters[0] is not { } codePoint)
         {
             return false;
         }

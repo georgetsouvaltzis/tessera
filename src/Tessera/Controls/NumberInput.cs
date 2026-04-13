@@ -215,7 +215,7 @@ public sealed class NumberInput : Control
     [EditorBrowsable(EditorBrowsableState.Advanced)]
     public bool TryConsumeSubmission(out double value)
     {
-        if (_submitVersion == _consumedSubmitVersion || LastSubmittedValue is not double submitted)
+        if (_submitVersion == _consumedSubmitVersion || LastSubmittedValue is not { } submitted)
         {
             value = default;
             return false;

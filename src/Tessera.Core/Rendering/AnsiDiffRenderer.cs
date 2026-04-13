@@ -247,9 +247,9 @@ internal sealed class AnsiDiffRenderer(
         var nextFrame = RenderFrameBuffer.FromContent(frame.Content, _width, _height);
         await WriteFrameDiffAsync(nextFrame).ConfigureAwait(false);
 
-        if (frame.CursorX is int x && frame.CursorY is int y)
+        if (frame.CursorX is { } x && frame.CursorY is { } y)
         {
-            if (frame.CursorStyle is CursorStyle requestedCursorStyle
+            if (frame.CursorStyle is { } requestedCursorStyle
                 && requestedCursorStyle != _cursorStyle)
             {
                 await WriteCursorStyleAsync(requestedCursorStyle).ConfigureAwait(false);

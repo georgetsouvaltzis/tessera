@@ -112,7 +112,7 @@ public sealed class BarChart : Control
     {
         var barsToRender = CreateRenderBars();
         var options = Options;
-        if (!LegendStyle.IsEmpty && options is BarChartOptions chartOptions &&
+        if (!LegendStyle.IsEmpty && options is { } chartOptions &&
             !string.IsNullOrWhiteSpace(chartOptions.Legend))
         {
             options = chartOptions with { Legend = ApplyStyle(chartOptions.Legend, LegendStyle) };

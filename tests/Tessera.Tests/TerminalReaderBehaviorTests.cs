@@ -34,7 +34,7 @@ internal static class TerminalReaderBehaviorTests
     private static async Task BracketedPaste_AggregatesContent()
     {
         // Arrange
-        var stream = new MemoryStream(Encoding.UTF8.GetBytes("\e[200~hello\nworld\e[201~"));
+        var stream = new MemoryStream("\e[200~hello\nworld\e[201~"u8.ToArray());
         var reader = new TerminalReader(stream, new EventDecoder(), TimeSpan.FromMilliseconds(10));
         var events = new List<IMessage>();
 
@@ -52,7 +52,7 @@ internal static class TerminalReaderBehaviorTests
     private static async Task ChunkedStream_DecodesMixedSequences()
     {
         // Arrange
-        var payload = Encoding.UTF8.GetBytes("\e[A\e[200~ab\ncd\e[201~\e[<26;4;6M");
+        var payload = "\e[A\e[200~ab\ncd\e[201~\e[<26;4;6M"u8.ToArray();
         var stream = new ChunkedReadStream(payload, 1);
         var reader = new TerminalReader(stream, new EventDecoder(), TimeSpan.FromMilliseconds(10));
         var events = new List<IMessage>();
@@ -80,7 +80,7 @@ internal static class TerminalReaderBehaviorTests
     private static async Task TrailingEscape_EmitsEscapeAfterTimeout()
     {
         // Arrange
-        var stream = new MemoryStream(new byte[] { 0x1B });
+        var stream = new MemoryStream([0x1B]);
         var reader = new TerminalReader(stream, new EventDecoder(), TimeSpan.FromMilliseconds(1));
         var events = new List<IMessage>();
 
@@ -99,8 +99,8 @@ internal static class TerminalReaderBehaviorTests
         // Arrange
         var stream = new TimedChunkReadStream(
         [
-            (Encoding.UTF8.GetBytes("\e[<26;4;"), 0),
-            (Encoding.UTF8.GetBytes("6M"), 35)
+            ("\e[<26;4;"u8.ToArray(), 0),
+            ("6M"u8.ToArray(), 35)
         ]);
         var reader = new TerminalReader(stream, new EventDecoder(), TimeSpan.FromMilliseconds(10));
         var events = new List<IMessage>();
@@ -127,8 +127,8 @@ internal static class TerminalReaderBehaviorTests
         // Arrange
         var stream = new TimedChunkReadStream(
         [
-            (Encoding.UTF8.GetBytes("\e[?1006;"), 0),
-            (Encoding.UTF8.GetBytes("1$y"), 35)
+            ("\e[?1006;"u8.ToArray(), 0),
+            ("1$y"u8.ToArray(), 35)
         ]);
         var reader = new TerminalReader(stream, new EventDecoder(), TimeSpan.FromMilliseconds(10));
         var events = new List<IMessage>();
@@ -149,9 +149,9 @@ internal static class TerminalReaderBehaviorTests
         // Arrange
         var stream = new TimedChunkReadStream(
         [
-            (Encoding.UTF8.GetBytes("\e[<26;4;"), 0),
-            (Encoding.UTF8.GetBytes("6M"), 35),
-            (Encoding.UTF8.GetBytes("be"), 0)
+            ("\e[<26;4;"u8.ToArray(), 0),
+            ("6M"u8.ToArray(), 35),
+            ("be"u8.ToArray(), 0)
         ]);
         var reader = new TerminalReader(stream, new EventDecoder(), TimeSpan.FromMilliseconds(10));
         var events = new List<IMessage>();
@@ -178,9 +178,9 @@ internal static class TerminalReaderBehaviorTests
         // Arrange
         var stream = new TimedChunkReadStream(
         [
-            (Encoding.UTF8.GetBytes("\e[<0;8;"), 0),
-            (Encoding.UTF8.GetBytes("3m"), 35),
-            (Encoding.UTF8.GetBytes("go"), 0)
+            ("\e[<0;8;"u8.ToArray(), 0),
+            ("3m"u8.ToArray(), 35),
+            ("go"u8.ToArray(), 0)
         ]);
         var reader = new TerminalReader(stream, new EventDecoder(), TimeSpan.FromMilliseconds(10));
         var events = new List<IMessage>();
@@ -207,7 +207,7 @@ internal static class TerminalReaderBehaviorTests
     {
         // Arrange
         var stream = new TimedChunkReadStream(
-            [(new byte[] { 0x1B }, 0), (Encoding.UTF8.GetBytes("i"), 35)]);
+            [([0x1B], 0), ("i"u8.ToArray(), 35)]);
         var reader = new TerminalReader(stream, new EventDecoder(), TimeSpan.FromMilliseconds(10));
         var events = new List<IMessage>();
 
@@ -226,7 +226,7 @@ internal static class TerminalReaderBehaviorTests
     {
         // Arrange
         var stream = new TimedChunkReadStream(
-            [(new byte[] { 0x1B }, 0), (Encoding.UTF8.GetBytes("i"), 0)]);
+            [([0x1B], 0), ("i"u8.ToArray(), 0)]);
         var reader = new TerminalReader(stream, new EventDecoder(), TimeSpan.FromMilliseconds(10));
         var events = new List<IMessage>();
 

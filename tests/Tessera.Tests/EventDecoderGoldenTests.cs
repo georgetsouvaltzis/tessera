@@ -110,9 +110,9 @@ internal static class EventDecoderGoldenTests
         var decoder = new EventDecoder();
 
         // Act
-        var ctrlA = decoder.Decode(new byte[] { 0x01 }, false);
-        var ctrlK = decoder.Decode(new byte[] { 0x0B }, false);
-        var ctrlBracket = decoder.Decode(new byte[] { 0x1D }, false);
+        var ctrlA = decoder.Decode([0x01], false);
+        var ctrlK = decoder.Decode([0x0B], false);
+        var ctrlBracket = decoder.Decode([0x1D], false);
 
         // Assert
         AssertKey(ctrlA, KeyCode.Character, KeyModifiers.Ctrl, "a");
@@ -127,13 +127,13 @@ internal static class EventDecoderGoldenTests
         var decoder = new EventDecoder();
 
         // Act
-        var altBackspaceDel = decoder.Decode(new byte[] { 0x1B, 0x7F }, false);
-        var altBackspaceCtrlH = decoder.Decode(new byte[] { 0x1B, 0x08 }, false);
-        var altCtrlA = decoder.Decode(new byte[] { 0x1B, 0x01 }, false);
-        var altTab = decoder.Decode(new byte[] { 0x1B, 0x09 }, false);
-        var altEscapePending = decoder.Decode(new byte[] { 0x1B, 0x1B }, false);
-        var altEscape = decoder.Decode(new byte[] { 0x1B, 0x1B }, true);
-        var altUp = decoder.Decode(new byte[] { 0x1B, 0x1B, (byte)'[', (byte)'A' }, false);
+        var altBackspaceDel = decoder.Decode([0x1B, 0x7F], false);
+        var altBackspaceCtrlH = decoder.Decode([0x1B, 0x08], false);
+        var altCtrlA = decoder.Decode([0x1B, 0x01], false);
+        var altTab = decoder.Decode([0x1B, 0x09], false);
+        var altEscapePending = decoder.Decode([0x1B, 0x1B], false);
+        var altEscape = decoder.Decode([0x1B, 0x1B], true);
+        var altUp = decoder.Decode([0x1B, 0x1B, (byte)'[', (byte)'A'], false);
 
         // Assert
         AssertKey(altBackspaceDel, KeyCode.Backspace, KeyModifiers.Alt);
@@ -244,7 +244,7 @@ internal static class EventDecoderGoldenTests
 
         // Act
         var sgrTopLeft = Decode(decoder, "\e[<0;1;1M");
-        var x10TopLeft = decoder.Decode(new byte[] { 0x1B, (byte)'[', (byte)'M', (byte)' ', (byte)'!', (byte)'!' },
+        var x10TopLeft = decoder.Decode([0x1B, (byte)'[', (byte)'M', (byte)' ', (byte)'!', (byte)'!'],
             false);
 
         // Assert
@@ -497,7 +497,7 @@ internal static class EventDecoderGoldenTests
     {
         // Arrange
         var decoder = new EventDecoder();
-        var full = Encoding.UTF8.GetBytes("გ");
+        var full = "გ"u8.ToArray();
 
         // Act
         var partial = decoder.Decode(full.AsSpan(0, 2), false);

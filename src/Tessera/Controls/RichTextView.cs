@@ -323,7 +323,7 @@ public sealed class RichTextView : Control
                     if (remaining == 0)
                     {
                         visualLines.Add(current);
-                        current = new List<RichTextSegment>();
+                        current = [];
                         remaining = clampedWidth;
                     }
 

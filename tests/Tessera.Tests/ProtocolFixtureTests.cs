@@ -188,7 +188,7 @@ internal static class ProtocolFixtureTests
     private static async Task TerminalReader_FocusPasteRoundTrip()
     {
         // Arrange
-        var payload = Encoding.UTF8.GetBytes("\e[I\e[200~hello\nγειά\e[201~\e[O");
+        var payload = "\e[I\e[200~hello\nγειά\e[201~\e[O"u8.ToArray();
         var stream = new ChunkedReadStream(payload, 2);
         var reader = new TerminalReader(stream, new EventDecoder(), TimeSpan.FromMilliseconds(10));
         var events = new List<IMessage>();
@@ -212,8 +212,8 @@ internal static class ProtocolFixtureTests
         var decoder = new EventDecoder();
 
         // Act
-        var altBackspace = decoder.Decode(new byte[] { 0x1B, 0x7F }, false);
-        var altTab = decoder.Decode(new byte[] { 0x1B, 0x09 }, false);
+        var altBackspace = decoder.Decode([0x1B, 0x7F], false);
+        var altTab = decoder.Decode([0x1B, 0x09], false);
         var focusIn = Decode(decoder, "\e[I");
 
         // Assert

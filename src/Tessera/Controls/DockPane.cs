@@ -74,7 +74,7 @@ public sealed class DockPane
     /// <summary>
     ///     Gets or sets pane body lines when <see cref="Content" /> is not provided.
     /// </summary>
-    public IReadOnlyList<string> Lines { get; set; } = Array.Empty<string>();
+    public IReadOnlyList<string> Lines { get; set; } = [];
 
     /// <summary>
     ///     Gets or sets optional child control rendered inside pane body.

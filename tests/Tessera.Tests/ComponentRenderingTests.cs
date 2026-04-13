@@ -148,9 +148,9 @@ internal static class ComponentRenderingTests
         var headers = new[] { "Metric", "Value", "Status" };
         IReadOnlyList<IReadOnlyList<string>> rows =
         [
-            new[] { "CPU", "18%", "ok" },
-            new[] { "Mem", "63%", "warn" },
-            new[] { "IO", "44%", "ok" }
+            ["CPU", "18%", "ok"],
+            ["Mem", "63%", "warn"],
+            ["IO", "44%", "ok"]
         ];
 
         // Act

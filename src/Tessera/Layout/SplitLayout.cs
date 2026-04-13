@@ -54,7 +54,7 @@ internal sealed class SplitLayout : LayoutNode
     {
         return LayoutArrangement.MeasureStack(
             IsHorizontal,
-            new[] { First, Second },
+            [First, Second],
             Gap,
             Padding,
             availableBounds);

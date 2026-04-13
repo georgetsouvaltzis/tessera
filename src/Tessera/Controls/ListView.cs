@@ -22,7 +22,7 @@ public sealed class ListView<T> : Control
     /// <param name="textSelector">Optional item-to-text projection.</param>
     public ListView(Func<T, string>? textSelector = null)
     {
-        _model = new ListModel<T>(Array.Empty<T>(), textSelector ?? DefaultText);
+        _model = new ListModel<T>([], textSelector ?? DefaultText);
     }
 
     /// <summary>

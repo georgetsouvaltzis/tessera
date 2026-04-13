@@ -385,7 +385,7 @@ public sealed class SearchBox : Control
 
     private string BuildMatchLabel()
     {
-        if (_matchCount is not int count || count <= 0)
+        if (_matchCount is not { } count || count <= 0)
         {
             return string.Empty;
         }

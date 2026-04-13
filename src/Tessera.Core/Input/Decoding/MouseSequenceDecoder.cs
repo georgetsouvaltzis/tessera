@@ -60,9 +60,9 @@ internal static class MouseSequenceDecoder
         message = null;
         if ((final != 'M' && final != 'm')
             || parameters.Count < 3
-            || parameters[0] is not int cb
-            || parameters[1] is not int cx
-            || parameters[2] is not int cy
+            || parameters[0] is not { } cb
+            || parameters[1] is not { } cx
+            || parameters[2] is not { } cy
             || cx <= 0
             || cy <= 0)
         {

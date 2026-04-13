@@ -460,12 +460,12 @@ public readonly record struct TesseraStyle
             AppendParameter(builder, ref hasAny, "27");
         }
 
-        if (style.Foreground is AnsiColor foreground)
+        if (style.Foreground is { } foreground)
         {
             AppendParameter(builder, ref hasAny, foreground.ToForegroundParameter());
         }
 
-        if (style.Background is AnsiColor background)
+        if (style.Background is { } background)
         {
             AppendParameter(builder, ref hasAny, background.ToBackgroundParameter());
         }

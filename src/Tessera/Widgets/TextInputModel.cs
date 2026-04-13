@@ -24,7 +24,7 @@ internal sealed class TextInputModel
 
     public bool Multiline { get; set; }
 
-    public bool HasSelection => SelectionAnchor is int anchor && anchor != Cursor;
+    public bool HasSelection => SelectionAnchor is { } anchor && anchor != Cursor;
 
     private TextInputBufferState State => new(Value, Cursor, SelectionAnchor);
 

@@ -295,7 +295,7 @@ internal sealed class TesseraCapabilityProbe
     {
         public Guid Id { get; } = id;
 
-        public HashSet<int> PendingModes { get; } = new(modes);
+        public HashSet<int> PendingModes { get; } = [.. modes];
 
         public HashSet<int> SupportedModes { get; } = [];
 

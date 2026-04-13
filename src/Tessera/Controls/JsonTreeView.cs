@@ -373,7 +373,7 @@ public sealed partial class JsonTreeView : Control
             return true;
         }
 
-        if (entry.ParentIndex is int parent)
+        if (entry.ParentIndex is { } parent)
         {
             return SetSelectedIndex(parent);
         }
