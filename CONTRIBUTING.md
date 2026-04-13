@@ -16,6 +16,7 @@ Release-facing changes should also be reflected in [CHANGELOG.md](CHANGELOG.md).
 
 - `.NET 10.0.103` SDK from [global.json](global.json)
 - a terminal with strong ANSI/CSI behavior for manual app checks
+- repo-local tools via `dotnet tool restore`
 
 ## Repo Layout
 
@@ -31,9 +32,11 @@ Release-facing changes should also be reflected in [CHANGELOG.md](CHANGELOG.md).
 Before asking for review, run:
 
 ```bash
+dotnet tool restore
 dotnet build Tessera.slnx
 dotnet build examples/Tessera.Examples.slnx
 dotnet test Tessera.slnx
+dotnet jb inspectcode Tessera.slnx -e=HINT --build
 dotnet run --project examples/DataWorkbench/DataWorkbench.csproj --no-build
 dotnet run --project examples/OpsWatch/OpsWatch.csproj --no-build
 dotnet run --project examples/GitConsole/GitConsole.csproj --no-build

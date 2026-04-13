@@ -34,9 +34,11 @@ If you can, verify against the current public baseline:
 Useful local checks before filing:
 
 ```bash
+dotnet tool restore
 dotnet build Tessera.slnx
 dotnet test Tessera.slnx
 dotnet build examples/Tessera.Examples.slnx
+dotnet jb inspectcode Tessera.slnx -e=HINT --build
 dotnet run --project examples/DataWorkbench/DataWorkbench.csproj --no-build
 dotnet run --project examples/OpsWatch/OpsWatch.csproj --no-build
 dotnet run --project examples/GitConsole/GitConsole.csproj --no-build
