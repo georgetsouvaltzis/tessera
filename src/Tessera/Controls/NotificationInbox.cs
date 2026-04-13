@@ -228,9 +228,9 @@ public sealed class NotificationInbox : Control
     /// </summary>
     public void MarkAllRead()
     {
-        for (var i = 0; i < _items.Count; i++)
+        foreach (var item in _items)
         {
-            _items[i].IsRead = true;
+            item.IsRead = true;
         }
     }
 
@@ -268,11 +268,6 @@ public sealed class NotificationInbox : Control
 
         if (_items.Count == 0)
         {
-            if (key.IsCharacter('c'))
-            {
-                return false;
-            }
-
             return false;
         }
 
@@ -309,13 +304,7 @@ public sealed class NotificationInbox : Control
 
         if (key.Is(Key.Enter) || key.IsCharacter(' '))
         {
-            if (_items[_selectedIndex].IsRead)
-            {
-                return false;
-            }
-
-            _items[_selectedIndex].IsRead = true;
-            return true;
+            return MarkSelectedRead();
         }
 
         if (key.IsCharacter('r'))
@@ -335,19 +324,9 @@ public sealed class NotificationInbox : Control
             return RemoveSelected();
         }
 
-        if (key.IsCharacter('a'))
-        {
-            MarkAllRead();
-            return true;
-        }
-
-        if (key.IsCharacter('c'))
-        {
-            Clear();
-            return true;
-        }
-
-        return false;
+        return key.IsCharacter('a')
+            ? MarkAllReadAndHandle()
+            : key.IsCharacter('c') && ClearAndHandle();
     }
 
     /// <inheritdoc />
@@ -372,27 +351,19 @@ public sealed class NotificationInbox : Control
         var inside = content.Contains(pointer.X, pointer.Y);
         if (!inside)
         {
-            if (pointer.Kind is PointerEventKind.Motion or PointerEventKind.Press)
+            if (pointer.Kind is not PointerEventKind.Motion and not PointerEventKind.Press)
             {
-                var changed = _hoveredIndex >= 0;
-                _hoveredIndex = -1;
-                return changed || Handle(message);
+                return Handle(message);
             }
 
-            return Handle(message);
+            var changed = _hoveredIndex >= 0;
+            _hoveredIndex = -1;
+            return changed || Handle(message);
         }
 
         if (pointer.Kind == PointerEventKind.Wheel && _items.Count > 0)
         {
-            if (pointer.Button == PointerButton.WheelDown)
-            {
-                return SetSelectedIndex(_selectedIndex + 1);
-            }
-
-            if (pointer.Button == PointerButton.WheelUp)
-            {
-                return SetSelectedIndex(_selectedIndex - 1);
-            }
+            return HandleWheel(pointer.Button);
         }
 
         if (_items.Count == 0 || pointer.Y < rowY)
@@ -407,28 +378,13 @@ public sealed class NotificationInbox : Control
             hovered = -1;
         }
 
-        if (pointer.Kind == PointerEventKind.Motion)
+        return pointer.Kind switch
         {
-            var changed = _hoveredIndex != hovered;
-            _hoveredIndex = hovered;
-            return changed;
-        }
-
-        if (pointer.Kind == PointerEventKind.Press && pointer.Button == PointerButton.Left && hovered >= 0)
-        {
-            RequestFocus();
-            var changed = SetSelectedIndex(hovered);
-            _hoveredIndex = hovered;
-            if (!_items[_selectedIndex].IsRead)
-            {
-                _items[_selectedIndex].IsRead = true;
-                changed = true;
-            }
-
-            return changed;
-        }
-
-        return Handle(message);
+            PointerEventKind.Motion => SetHoveredIndex(hovered),
+            PointerEventKind.Press when pointer is { Button: PointerButton.Left } && hovered >= 0
+                => HandlePress(hovered),
+            _ => Handle(message)
+        };
     }
 
     /// <inheritdoc />
@@ -482,10 +438,9 @@ public sealed class NotificationInbox : Control
     internal override LayoutMeasurement Measure(in Rect availableBounds)
     {
         var width = Math.Max(24, ControlTextLayout.MeasureDisplayWidth(FormatTitle()) + 2);
-        for (var i = 0; i < _items.Count; i++)
-        {
-            width = Math.Max(width, ControlTextLayout.MeasureDisplayWidth(BuildLine(_items[i], false)));
-        }
+        width = _items.Count == 0
+            ? width
+            : Math.Max(width, _items.Max(item => ControlTextLayout.MeasureDisplayWidth(BuildLine(item, false))));
 
         var height = (HasTitle() ? 1 : 0) + Math.Max(1, Math.Min(PageSize, Math.Max(_items.Count, 1)));
         width += Padding.Horizontal;
@@ -553,6 +508,55 @@ public sealed class NotificationInbox : Control
         _hoveredIndex = Math.Clamp(_hoveredIndex, -1, Math.Max(-1, _items.Count - 1));
         EnsureSelectionVisible(_lastViewportRows);
         RaiseSelectionChangedIfNeeded(previousIndex, previousItem);
+        return true;
+    }
+
+    private bool HandleWheel(PointerButton button)
+    {
+        return button switch
+        {
+            PointerButton.WheelDown => SetSelectedIndex(_selectedIndex + 1),
+            PointerButton.WheelUp => SetSelectedIndex(_selectedIndex - 1),
+            _ => false
+        };
+    }
+
+    private bool HandlePress(int hovered)
+    {
+        RequestFocus();
+        var changed = SetSelectedIndex(hovered);
+        changed |= SetHoveredIndex(hovered);
+        changed |= MarkSelectedRead();
+        return changed;
+    }
+
+    private bool SetHoveredIndex(int hovered)
+    {
+        var changed = _hoveredIndex != hovered;
+        _hoveredIndex = hovered;
+        return changed;
+    }
+
+    private bool MarkSelectedRead()
+    {
+        if (_items[_selectedIndex].IsRead)
+        {
+            return false;
+        }
+
+        _items[_selectedIndex].IsRead = true;
+        return true;
+    }
+
+    private bool ClearAndHandle()
+    {
+        Clear();
+        return true;
+    }
+
+    private bool MarkAllReadAndHandle()
+    {
+        MarkAllRead();
         return true;
     }
 

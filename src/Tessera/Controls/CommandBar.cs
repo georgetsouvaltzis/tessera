@@ -233,7 +233,7 @@ public sealed class CommandBar : Control
             return false;
         }
 
-        if (key.Modifiers == ModifierKeys.None && key.Key == Key.Character && key.Text.Length == 1)
+        if (key is { Modifiers: ModifierKeys.None, Key: Key.Character, Text.Length: 1 })
         {
             var shortcut = char.ToLowerInvariant(key.Text[0]);
             for (var index = 0; index < _items.Count; index++)
@@ -244,13 +244,13 @@ public sealed class CommandBar : Control
                 }
 
                 var changed = SetSelectedIndex(index);
-                if (!IsReadOnly && !_items[index].IsDisabled)
+                if (IsReadOnly || _items[index].IsDisabled)
                 {
-                    ActivateItem(_items[index]);
-                    return true;
+                    return changed;
                 }
 
-                return changed;
+                ActivateItem(_items[index]);
+                return true;
             }
         }
 
@@ -312,38 +312,16 @@ public sealed class CommandBar : Control
 
         if (pointer.Kind == PointerEventKind.Wheel)
         {
-            if (pointer.Button == PointerButton.WheelDown)
-            {
-                return MoveSelection(1);
-            }
-
-            if (pointer.Button == PointerButton.WheelUp)
-            {
-                return MoveSelection(-1);
-            }
+            return HandleWheel(pointer.Button, changed, message);
         }
 
         var hit = HitTestItemIndex(pointer.X, bounds);
-        if (pointer.Kind == PointerEventKind.Motion)
+        return pointer.Kind switch
         {
-            return SetHoveredIndex(hit);
-        }
-
-        if (pointer.Kind == PointerEventKind.Press && pointer.Button == PointerButton.Left)
-        {
-            changed |= SetHoveredIndex(hit);
-            if (hit >= 0)
-            {
-                changed |= SetSelectedIndex(hit);
-                if (!IsReadOnly && !_items[hit].IsDisabled)
-                {
-                    ActivateItem(_items[hit]);
-                    return true;
-                }
-            }
-        }
-
-        return changed || Handle(message);
+            PointerEventKind.Motion => SetHoveredIndex(hit),
+            PointerEventKind.Press when pointer is { Button: PointerButton.Left } => HandlePress(hit, changed, message),
+            _ => changed || Handle(message)
+        };
     }
 
     /// <summary>
@@ -482,12 +460,9 @@ public sealed class CommandBar : Control
         var core = item.Shortcut == '\0'
             ? item.Text
             : $"{item.Text}({item.Shortcut})";
-        if (index == _selectedIndex)
-        {
-            return $"{SelectedPrefix}{core}{SelectedSuffix}";
-        }
-
-        return $" {core} ";
+        return index == _selectedIndex
+            ? $"{SelectedPrefix}{core}{SelectedSuffix}"
+            : $" {core} ";
     }
 
     private TesseraStyle ResolveItemStyle(int index)
@@ -548,5 +523,33 @@ public sealed class CommandBar : Control
         }
 
         return -1;
+    }
+
+    private bool HandleWheel(PointerButton button, bool changed, Message message)
+    {
+        return button switch
+        {
+            PointerButton.WheelDown => MoveSelection(1),
+            PointerButton.WheelUp => MoveSelection(-1),
+            _ => changed || Handle(message)
+        };
+    }
+
+    private bool HandlePress(int hit, bool changed, Message message)
+    {
+        changed |= SetHoveredIndex(hit);
+        if (hit < 0)
+        {
+            return changed || Handle(message);
+        }
+
+        changed |= SetSelectedIndex(hit);
+        if (IsReadOnly || _items[hit].IsDisabled)
+        {
+            return changed || Handle(message);
+        }
+
+        ActivateItem(_items[hit]);
+        return true;
     }
 }
