@@ -307,12 +307,7 @@ public readonly record struct TesseraStyle
     /// </remarks>
     public string ToEscapeSequence()
     {
-        if (IsEmpty)
-        {
-            return string.Empty;
-        }
-
-        return GetSequences().OpenSequence;
+        return IsEmpty ? string.Empty : GetSequences().OpenSequence;
     }
 
     /// <summary>
@@ -359,32 +354,27 @@ public readonly record struct TesseraStyle
             hasAny = true;
         }
 
-        if (style.Bold is true)
+        static void AppendToggle(
+            StringBuilder builder,
+            ref bool hasAny,
+            bool? state,
+            string enabledParameter,
+            string disabledParameter)
         {
-            AppendParameter(builder, ref hasAny, "1");
-        }
-        else if (style.Bold is false)
-        {
-            AppendParameter(builder, ref hasAny, "22");
+            switch (state)
+            {
+                case true:
+                    AppendParameter(builder, ref hasAny, enabledParameter);
+                    break;
+                case false:
+                    AppendParameter(builder, ref hasAny, disabledParameter);
+                    break;
+            }
         }
 
-        if (style.Dim is true)
-        {
-            AppendParameter(builder, ref hasAny, "2");
-        }
-        else if (style.Dim is false)
-        {
-            AppendParameter(builder, ref hasAny, "22");
-        }
-
-        if (style.Italic is true)
-        {
-            AppendParameter(builder, ref hasAny, "3");
-        }
-        else if (style.Italic is false)
-        {
-            AppendParameter(builder, ref hasAny, "23");
-        }
+        AppendToggle(builder, ref hasAny, style.Bold, "1", "22");
+        AppendToggle(builder, ref hasAny, style.Dim, "2", "22");
+        AppendToggle(builder, ref hasAny, style.Italic, "3", "23");
 
         if (style.DoubleUnderline is true)
         {
@@ -400,41 +390,10 @@ public readonly record struct TesseraStyle
             AppendParameter(builder, ref hasAny, "24");
         }
 
-        if (style.Blink is true)
-        {
-            AppendParameter(builder, ref hasAny, "5");
-        }
-        else if (style.Blink is false)
-        {
-            AppendParameter(builder, ref hasAny, "25");
-        }
-
-        if (style.Strikethrough is true)
-        {
-            AppendParameter(builder, ref hasAny, "9");
-        }
-        else if (style.Strikethrough is false)
-        {
-            AppendParameter(builder, ref hasAny, "29");
-        }
-
-        if (style.Conceal is true)
-        {
-            AppendParameter(builder, ref hasAny, "8");
-        }
-        else if (style.Conceal is false)
-        {
-            AppendParameter(builder, ref hasAny, "28");
-        }
-
-        if (style.Overline is true)
-        {
-            AppendParameter(builder, ref hasAny, "53");
-        }
-        else if (style.Overline is false)
-        {
-            AppendParameter(builder, ref hasAny, "55");
-        }
+        AppendToggle(builder, ref hasAny, style.Blink, "5", "25");
+        AppendToggle(builder, ref hasAny, style.Strikethrough, "9", "29");
+        AppendToggle(builder, ref hasAny, style.Conceal, "8", "28");
+        AppendToggle(builder, ref hasAny, style.Overline, "53", "55");
 
         if (style.Encircled is true)
         {
@@ -451,14 +410,7 @@ public readonly record struct TesseraStyle
             AppendParameter(builder, ref hasAny, "54");
         }
 
-        if (style.Inverse is true)
-        {
-            AppendParameter(builder, ref hasAny, "7");
-        }
-        else if (style.Inverse is false)
-        {
-            AppendParameter(builder, ref hasAny, "27");
-        }
+        AppendToggle(builder, ref hasAny, style.Inverse, "7", "27");
 
         if (style.Foreground is { } foreground)
         {
@@ -470,12 +422,7 @@ public readonly record struct TesseraStyle
             AppendParameter(builder, ref hasAny, background.ToBackgroundParameter());
         }
 
-        if (!hasAny)
-        {
-            return string.Empty;
-        }
-
-        return string.Concat("\e[", builder.ToString(), "m");
+        return hasAny ? string.Concat("\e[", builder.ToString(), "m") : string.Empty;
     }
 
     private readonly record struct RenderSequences(string OpenSequence, string CloseSequence);

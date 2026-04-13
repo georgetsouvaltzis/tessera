@@ -101,16 +101,13 @@ internal sealed class BatchModel : TestRuntimeModel
 
     public override Effect? Update(IMessage message)
     {
-        if (message is NumberMsg)
+        if (message is not NumberMsg)
         {
-            Count++;
-            if (Count == 2)
-            {
-                return Effects.Quit;
-            }
+            return null;
         }
 
-        return null;
+        Count++;
+        return Count == 2 ? Effects.Quit : null;
     }
 
     public override ModelView Render()
@@ -132,13 +129,13 @@ internal sealed class CommandErrorCaptureModel : TestRuntimeModel
 
     public override Effect? Update(IMessage message)
     {
-        if (message is EffectErrorMsg error)
+        if (message is not EffectErrorMsg error)
         {
-            CapturedError = error.Exception;
-            return Effects.Quit;
+            return null;
         }
 
-        return null;
+        CapturedError = error.Exception;
+        return Effects.Quit;
     }
 
     public override ModelView Render()
@@ -178,18 +175,16 @@ internal sealed class CommandRecoveryModel : TestRuntimeModel
 
     public override Effect? Update(IMessage message)
     {
-        if (message is NumberMsg number)
+        switch (message)
         {
-            RecoveredValue = number.Value;
-            return Effects.Quit;
+            case NumberMsg number:
+                RecoveredValue = number.Value;
+                return Effects.Quit;
+            case EffectErrorMsg:
+                return Effects.Quit;
+            default:
+                return null;
         }
-
-        if (message is EffectErrorMsg)
-        {
-            return Effects.Quit;
-        }
-
-        return null;
     }
 
     public override ModelView Render()
@@ -217,16 +212,13 @@ internal sealed class BurstUpdateModel(int targetCount) : TestRuntimeModel
 
     public override Effect? Update(IMessage message)
     {
-        if (message is NumberMsg)
+        if (message is not NumberMsg)
         {
-            Count++;
-            if (Count >= _targetCount)
-            {
-                return Effects.Quit;
-            }
+            return null;
         }
 
-        return null;
+        Count++;
+        return Count >= _targetCount ? Effects.Quit : null;
     }
 
     public override ModelView Render()
@@ -246,16 +238,13 @@ internal sealed class ResizeTrackingModel : TestRuntimeModel
 
     public override Effect? Update(IMessage message)
     {
-        if (message is WindowSizeMsg ws)
+        if (message is not WindowSizeMsg ws)
         {
-            Seen.Add((ws.Width, ws.Height));
-            if (Seen.Count >= 2)
-            {
-                return Effects.Quit;
-            }
+            return null;
         }
 
-        return null;
+        Seen.Add((ws.Width, ws.Height));
+        return Seen.Count >= 2 ? Effects.Quit : null;
     }
 
     public override ModelView Render()
@@ -275,13 +264,13 @@ internal sealed class CapabilityTrackingModel : TestRuntimeModel
 
     public override Effect? Update(IMessage message)
     {
-        if (message is TerminalCapabilitiesMsg capabilities)
+        if (message is not TerminalCapabilitiesMsg capabilities)
         {
-            Seen = capabilities.Profile;
-            return Effects.Quit;
+            return null;
         }
 
-        return null;
+        Seen = capabilities.Profile;
+        return Effects.Quit;
     }
 
     public override ModelView Render()
@@ -301,13 +290,13 @@ internal sealed class ColorProfileTrackingModel : TestRuntimeModel
 
     public override Effect? Update(IMessage message)
     {
-        if (message is ColorProfileMsg colorProfile)
+        if (message is not ColorProfileMsg colorProfile)
         {
-            Seen = colorProfile.Profile;
-            return Effects.Quit;
+            return null;
         }
 
-        return null;
+        Seen = colorProfile.Profile;
+        return Effects.Quit;
     }
 
     public override ModelView Render()
@@ -327,16 +316,13 @@ internal sealed class CapabilityRefinementModel : TestRuntimeModel
 
     public override Effect? Update(IMessage message)
     {
-        if (message is TerminalCapabilitiesMsg capabilities)
+        if (message is not TerminalCapabilitiesMsg capabilities)
         {
-            Seen.Add(capabilities.Profile);
-            if (Seen.Count >= 2)
-            {
-                return Effects.Quit;
-            }
+            return null;
         }
 
-        return null;
+        Seen.Add(capabilities.Profile);
+        return Seen.Count >= 2 ? Effects.Quit : null;
     }
 
     public override ModelView Render()
@@ -356,16 +342,13 @@ internal sealed class UnsupportedModeReportRefinementModel : TestRuntimeModel
 
     public override Effect? Update(IMessage message)
     {
-        if (message is TerminalCapabilitiesMsg capabilities)
+        if (message is not TerminalCapabilitiesMsg capabilities)
         {
-            Seen.Add(capabilities.Profile);
-            if (Seen.Count >= 2)
-            {
-                return Effects.Quit;
-            }
+            return null;
         }
 
-        return null;
+        Seen.Add(capabilities.Profile);
+        return Seen.Count >= 2 ? Effects.Quit : null;
     }
 
     public override ModelView Render()
@@ -387,16 +370,15 @@ internal sealed class CapabilityProbeTimeoutModel(TimeSpan safetyQuitDelay) : Te
 
     public override Effect? Update(IMessage message)
     {
-        if (message is TerminalCapabilitiesMsg capabilities)
+        if (message is not TerminalCapabilitiesMsg capabilities)
         {
-            Seen.Add(capabilities.Profile);
-            if (capabilities.Profile.Source.Contains("+probe-timeout", StringComparison.Ordinal))
-            {
-                return Effects.Quit;
-            }
+            return null;
         }
 
-        return null;
+        Seen.Add(capabilities.Profile);
+        return capabilities.Profile.Source.Contains("+probe-timeout", StringComparison.Ordinal)
+            ? Effects.Quit
+            : null;
     }
 
     public override ModelView Render()
@@ -527,16 +509,13 @@ internal sealed class ConcurrencyTrackingModel(int commandCount, TimeSpan delay)
 
     public override Effect? Update(IMessage message)
     {
-        if (message is NumberMsg)
+        if (message is not NumberMsg)
         {
-            var received = Interlocked.Increment(ref _receivedMessages);
-            if (received >= _commandCount)
-            {
-                return Effects.Quit;
-            }
+            return null;
         }
 
-        return null;
+        var received = Interlocked.Increment(ref _receivedMessages);
+        return received >= _commandCount ? Effects.Quit : null;
     }
 
     public override ModelView Render()
@@ -593,13 +572,13 @@ internal sealed class MouseInterceptModel : TestRuntimeModel
 
     public override Effect? Update(IMessage message)
     {
-        if (message is NumberMsg)
+        if (message is not NumberMsg)
         {
-            Intercepted++;
-            return Effects.Quit;
+            return null;
         }
 
-        return null;
+        Intercepted++;
+        return Effects.Quit;
     }
 
     public override ModelView Render()
@@ -779,12 +758,9 @@ internal sealed class DisposeOrderingTerminalAdapter : ITerminalAdapter
     public ValueTask DisposeAsync()
     {
         DisposeObservedCancellation = _input.CancellationObserved;
-        if (!DisposeObservedCancellation)
-        {
-            throw new InvalidOperationException("Terminal disposed before input cancellation was observed.");
-        }
-
-        return ValueTask.CompletedTask;
+        return DisposeObservedCancellation
+            ? ValueTask.CompletedTask
+            : throw new InvalidOperationException("Terminal disposed before input cancellation was observed.");
     }
 
     private sealed class CancelAwareInputStream : Stream
@@ -1049,12 +1025,9 @@ internal sealed class QuitOnFirstByteDecoder : IEventDecoder
     {
         _ = timeoutExpired;
         Calls++;
-        if (buffer.IsEmpty)
-        {
-            return new DecodeResult(0, null, false);
-        }
-
-        return new DecodeResult(1, new QuitMsg(), false);
+        return buffer.IsEmpty
+            ? new DecodeResult(0, null, false)
+            : new DecodeResult(1, new QuitMsg(), false);
     }
 }
 
