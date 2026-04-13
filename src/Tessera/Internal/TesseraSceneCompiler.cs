@@ -76,7 +76,7 @@ internal sealed class TesseraSceneCompiler : IScreenCompiler
     {
         switch (layout)
         {
-            case ComponentLayout component when component.Control is { } control:
+            case ComponentLayout { Control: { } control }:
                 ApplyThemeDefaults(control, theme);
                 return;
             case WindowLayout window:
@@ -108,9 +108,9 @@ internal sealed class TesseraSceneCompiler : IScreenCompiler
                 ApplyThemeDefaults(panel.Content, theme);
                 return;
             case OverlayLayout overlay:
-                for (var index = 0; index < overlay.Items.Count; index++)
+                foreach (var item in overlay.Items)
                 {
-                    ApplyThemeDefaults(overlay.Items[index], theme);
+                    ApplyThemeDefaults(item, theme);
                 }
 
                 return;
@@ -138,7 +138,7 @@ internal sealed class TesseraSceneCompiler : IScreenCompiler
     {
         switch (layout)
         {
-            case ComponentLayout component when component.Control is { } control:
+            case ComponentLayout { Control: { } control }:
                 ApplyThemeDefaults(control, theme, overrides, hasTerminalFocus);
                 return;
             case WindowLayout window:
@@ -170,9 +170,9 @@ internal sealed class TesseraSceneCompiler : IScreenCompiler
                 ApplyThemeDefaults(panel.Content, theme, overrides, hasTerminalFocus);
                 return;
             case OverlayLayout overlay:
-                for (var index = 0; index < overlay.Items.Count; index++)
+                foreach (var item in overlay.Items)
                 {
-                    ApplyThemeDefaults(overlay.Items[index], theme, overrides, hasTerminalFocus);
+                    ApplyThemeDefaults(item, theme, overrides, hasTerminalFocus);
                 }
 
                 return;
@@ -648,9 +648,9 @@ internal sealed class TesseraSceneCompiler : IScreenCompiler
             var flexibleWeights = new int[children.Count];
             var remaining = Math.Max(0, primaryAvailable - gapTotal);
 
-            for (var index = 0; index < children.Count; index++)
+            foreach (var margin in children.Select(static child => child.Margin))
             {
-                var marginPrimary = horizontal ? children[index].Margin.Horizontal : children[index].Margin.Vertical;
+                var marginPrimary = horizontal ? margin.Horizontal : margin.Vertical;
                 remaining = Math.Max(0, remaining - marginPrimary);
             }
 
@@ -679,9 +679,9 @@ internal sealed class TesseraSceneCompiler : IScreenCompiler
             }
 
             var totalWeight = 0;
-            for (var index = 0; index < flexibleWeights.Length; index++)
+            foreach (var weight in flexibleWeights)
             {
-                totalWeight += flexibleWeights[index];
+                totalWeight += weight;
             }
 
             if (totalWeight > 0 && remaining > 0)
@@ -812,20 +812,21 @@ internal sealed class TesseraSceneCompiler : IScreenCompiler
                 setFocused,
                 null));
 
-            if (requestedFocus)
+            if (!requestedFocus)
             {
-                if (requestOrder > 0)
-                {
-                    if (_requestedFocusRegionId is null || requestOrder >= _requestedFocusOrder)
-                    {
-                        _requestedFocusRegionId = id;
-                        _requestedFocusOrder = requestOrder;
-                    }
-                }
-                else
-                {
-                    _implicitFocusRegionId = id;
-                }
+                return true;
+            }
+
+            if (requestOrder <= 0)
+            {
+                _implicitFocusRegionId = id;
+                return true;
+            }
+
+            if (_requestedFocusRegionId is null || requestOrder >= _requestedFocusOrder)
+            {
+                _requestedFocusRegionId = id;
+                _requestedFocusOrder = requestOrder;
             }
 
             return true;
@@ -894,43 +895,34 @@ internal sealed class TesseraSceneCompiler : IScreenCompiler
         {
             ArgumentNullException.ThrowIfNull(message);
 
-            if (message is KeyPressed key)
+            switch (message)
             {
-                if (key.Is(Key.Tab, ModifierKeys.Shift))
-                {
+                case KeyPressed key when key.Is(Key.Tab, ModifierKeys.Shift):
                     return FocusRelative(-1);
-                }
-
-                if (key.Is(Key.Tab))
-                {
+                case KeyPressed key when key.Is(Key.Tab):
                     return FocusRelative(1);
-                }
+                case PointerInput pointer:
+                    return UpdateMouse(pointer);
+                default:
+                    return TryGetFocusedRegion(out var focused) && focused.Update is not null && focused.Update(message);
             }
-
-            if (message is PointerInput pointer)
-            {
-                return UpdateMouse(pointer);
-            }
-
-            return TryGetFocusedRegion(out var focused) && focused.Update is not null && focused.Update(message);
         }
 
         public void Render(Canvas canvas)
         {
             if (_renderOrder is null)
             {
-                for (var index = 0; index < _regions.Count; index++)
+                foreach (var region in _regions)
                 {
-                    var region = _regions[index];
                     region.Render(canvas, region.Bounds);
                 }
 
                 return;
             }
 
-            for (var orderIndex = 0; orderIndex < _renderOrder.Length; orderIndex++)
+            foreach (var regionIndex in _renderOrder)
             {
-                var region = _regions[_renderOrder[orderIndex]];
+                var region = _regions[regionIndex];
                 region.Render(canvas, region.Bounds);
             }
         }
@@ -1061,9 +1053,8 @@ internal sealed class TesseraSceneCompiler : IScreenCompiler
 
         private static bool HasInteractiveRegions(IReadOnlyList<TesseraSceneRegion> regions)
         {
-            for (var index = 0; index < regions.Count; index++)
+            foreach (var region in regions)
             {
-                var region = regions[index];
                 if (region.Update is not null || region.UpdateMouse is not null || region.Focusable)
                 {
                     return true;
@@ -1142,11 +1133,13 @@ internal sealed class TesseraSceneCompiler : IScreenCompiler
         {
             for (var i = 0; i < _regions.Count; i++)
             {
-                if (_regions[i].Focusable && _regions[i].Id == regionId)
+                if (!_regions[i].Focusable || _regions[i].Id != regionId)
                 {
-                    index = i;
-                    return true;
+                    continue;
                 }
+
+                index = i;
+                return true;
             }
 
             index = -1;

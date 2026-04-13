@@ -343,13 +343,13 @@ public sealed class Table : Control
             return true;
         }
 
-        if (key.IsCharacter('c'))
+        if (!key.IsCharacter('c'))
         {
-            SortColumn = (SortColumn + 1) % _columns.Count;
-            return true;
+            return false;
         }
 
-        return false;
+        SortColumn = (SortColumn + 1) % _columns.Count;
+        return true;
     }
 
     /// <inheritdoc />
@@ -385,14 +385,15 @@ public sealed class Table : Control
         if (pointer.Kind == PointerEventKind.Wheel)
         {
             var previousPage = PageIndex;
-            if (pointer.Button == PointerButton.WheelDown)
+            switch (pointer.Button)
             {
-                PageIndex++;
-                NormalizePage();
-            }
-            else if (pointer.Button == PointerButton.WheelUp)
-            {
-                PageIndex = Math.Max(0, PageIndex - 1);
+                case PointerButton.WheelDown:
+                    PageIndex++;
+                    NormalizePage();
+                    break;
+                case PointerButton.WheelUp:
+                    PageIndex = Math.Max(0, PageIndex - 1);
+                    break;
             }
 
             NormalizeVisibleRowPointers(state.VisibleRowCount);
@@ -409,34 +410,36 @@ public sealed class Table : Control
             return SetHoveredVisibleRow(TableViewState.RowFromPointer(content, pointer.Y, state.VisibleRowCount));
         }
 
-        if (pointer.Kind == PointerEventKind.Press && pointer.Button == PointerButton.Left)
+        if (pointer is not { Kind: PointerEventKind.Press, Button: PointerButton.Left })
         {
-            var headerColumn = TableViewState.HeaderColumnFromPointer(pointer.X, content, _columns.Count);
-            if (pointer.Y == content.Y && headerColumn >= 0)
-            {
-                if (headerColumn == SortColumn)
-                {
-                    SortDescending = !SortDescending;
-                }
-                else
-                {
-                    SortColumn = headerColumn;
-                    SortDescending = false;
-                }
-
-                return true;
-            }
-
-            var row = TableViewState.RowFromPointer(content, pointer.Y, state.VisibleRowCount);
-            if (row >= 0)
-            {
-                var hoverChanged = SetHoveredVisibleRow(row);
-                var selectionChanged = SetSelectedVisibleRow(row, state);
-                return hoverChanged || selectionChanged;
-            }
+            return changed || Handle(message);
         }
 
-        return changed || Handle(message);
+        var headerColumn = TableViewState.HeaderColumnFromPointer(pointer.X, content, _columns.Count);
+        if (pointer.Y == content.Y && headerColumn >= 0)
+        {
+            if (headerColumn == SortColumn)
+            {
+                SortDescending = !SortDescending;
+            }
+            else
+            {
+                SortColumn = headerColumn;
+                SortDescending = false;
+            }
+
+            return true;
+        }
+
+        var row = TableViewState.RowFromPointer(content, pointer.Y, state.VisibleRowCount);
+        if (row < 0)
+        {
+            return changed || Handle(message);
+        }
+
+        var hoverChanged = SetHoveredVisibleRow(row);
+        var selectionChanged = SetSelectedVisibleRow(row, state);
+        return hoverChanged || selectionChanged;
     }
 
     /// <inheritdoc />
@@ -507,17 +510,16 @@ public sealed class Table : Control
     internal override LayoutMeasurement Measure(in Rect availableBounds)
     {
         var widest = 0;
-        for (var i = 0; i < _columns.Count; i++)
+        foreach (var column in _columns)
         {
-            widest = Math.Max(widest, _columns[i].Length);
+            widest = Math.Max(widest, column.Length);
         }
 
-        for (var rowIndex = 0; rowIndex < _rows.Count; rowIndex++)
+        foreach (var row in _rows)
         {
-            var row = _rows[rowIndex];
-            for (var cellIndex = 0; cellIndex < row.Count; cellIndex++)
+            foreach (var cell in row)
             {
-                widest = Math.Max(widest, row[cellIndex]?.Length ?? 0);
+                widest = Math.Max(widest, cell?.Length ?? 0);
             }
         }
 
@@ -566,12 +568,7 @@ public sealed class Table : Control
     {
         var safePageSize = Math.Max(1, PageSize);
         var start = PageIndex * safePageSize;
-        if (start >= _rows.Count)
-        {
-            return 0;
-        }
-
-        return Math.Min(safePageSize, _rows.Count - start);
+        return start >= _rows.Count ? 0 : Math.Min(safePageSize, _rows.Count - start);
     }
 
     private void EnsureRowIndexInRange(int index)
@@ -695,9 +692,9 @@ public sealed class Table : Control
     private static string BuildRowText(int[] widths, IReadOnlyList<string> cells, bool selectedMarker)
     {
         var totalWidth = 0;
-        for (var index = 0; index < widths.Length; index++)
+        foreach (var width in widths)
         {
-            totalWidth += widths[index];
+            totalWidth += width;
         }
 
         var builder = new StringBuilder(Math.Max(0, totalWidth + widths.Length - 1));
@@ -727,12 +724,7 @@ public sealed class Table : Control
             return string.Empty;
         }
 
-        if (text.Length >= width)
-        {
-            return text[..width];
-        }
-
-        return text.PadRight(width);
+        return text.Length >= width ? text[..width] : text.PadRight(width);
     }
 
     private static string ApplyStyle(string text, TesseraStyle style)
