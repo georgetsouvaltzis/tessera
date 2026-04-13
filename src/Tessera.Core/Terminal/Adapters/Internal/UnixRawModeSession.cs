@@ -403,7 +403,7 @@ internal sealed partial class UnixRawModeSession
     }
 
     [LibraryImport("libc", EntryPoint = "open", SetLastError = true)]
-    private static partial int Open(byte[] path, int flags);
+    private static partial int Open([In] byte[] path, int flags);
 
     [LibraryImport("libc", EntryPoint = "close", SetLastError = true)]
     private static partial int Close(int fd);
