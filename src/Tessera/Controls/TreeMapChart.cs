@@ -198,12 +198,7 @@ public sealed class TreeMapChart : Control
             return SetSelectedIndex(0);
         }
 
-        if (key.Is(Key.End))
-        {
-            return SetSelectedIndex(_leaves.Count - 1);
-        }
-
-        return false;
+        return key.Is(Key.End) && SetSelectedIndex(_leaves.Count - 1);
     }
 
     /// <inheritdoc />
@@ -221,35 +216,14 @@ public sealed class TreeMapChart : Control
         }
 
         var hit = FindHitIndex(pointer.X, pointer.Y);
-        if (pointer.Kind == PointerEventKind.Motion)
+        return pointer.Kind switch
         {
-            return SetHoveredIndex(hit);
-        }
-
-        if (pointer.Kind == PointerEventKind.Wheel && _leaves.Count > 0)
-        {
-            var current = SelectedIndex < 0 ? 0 : SelectedIndex;
-            if (pointer.Button == PointerButton.WheelDown)
-            {
-                return SetSelectedIndex(current + 1);
-            }
-
-            if (pointer.Button == PointerButton.WheelUp)
-            {
-                return SetSelectedIndex(current - 1);
-            }
-        }
-
-        if (pointer.Kind == PointerEventKind.Press && pointer.Button == PointerButton.Left && hit >= 0)
-        {
-            RequestFocus();
-            var changed = SetHoveredIndex(hit);
-            return SetSelectedIndex(hit) || changed;
-        }
-
-        return hit < 0
-               && pointer.Kind is PointerEventKind.Press or PointerEventKind.Release
-               && SetHoveredIndex(-1);
+            PointerEventKind.Motion => SetHoveredIndex(hit),
+            PointerEventKind.Wheel when _leaves.Count > 0 => HandleWheel(pointer.Button),
+            PointerEventKind.Press when pointer.Button == PointerButton.Left && hit >= 0 => HandlePress(hit),
+            PointerEventKind.Press or PointerEventKind.Release when hit < 0 => SetHoveredIndex(-1),
+            _ => false
+        };
     }
 
     /// <inheritdoc />
@@ -270,14 +244,13 @@ public sealed class TreeMapChart : Control
         }
 
         NormalizeSelection();
-        for (var index = 0; index < _rendered.Count; index++)
+        foreach (var node in _rendered)
         {
-            var node = _rendered[index];
             var (glyph, bandStyle) = ResolveBand(node.Weight, min, max);
             var stateStyle = ResolveStateStyle(node.LeafIndex);
             var fillStyle = ResolveStyle(NodeStyle.Merge(bandStyle).Merge(stateStyle));
             DrawFill(canvas, node.Bounds, glyph, fillStyle);
-            if (ShowLabels && node.Bounds.Width > 1 && node.Bounds.Height > 0)
+            if (ShowLabels && node.Bounds is { Width: > 1, Height: > 0 })
             {
                 WriteText(canvas, node.Bounds.X, node.Bounds.Y, node.Node.Name,
                     ResolveStyle(LabelStyle.Merge(stateStyle)), node.Bounds.Width);
@@ -302,12 +275,11 @@ public sealed class TreeMapChart : Control
 
     private void RenderLegend(Canvas canvas, int x, int y, int width)
     {
-        var start = x;
         var cursor = x;
-        LegendBand(canvas, start, ref cursor, y, width, LowGlyph, "low", LowNodeStyle);
-        LegendBand(canvas, start, ref cursor, y, width, MidGlyph, "mid", MidNodeStyle);
-        LegendBand(canvas, start, ref cursor, y, width, HighGlyph, "high", HighNodeStyle);
-        LegendBand(canvas, start, ref cursor, y, width, PeakGlyph, "peak", PeakNodeStyle);
+        LegendBand(canvas, x, ref cursor, y, width, LowGlyph, "low", LowNodeStyle);
+        LegendBand(canvas, x, ref cursor, y, width, MidGlyph, "mid", MidNodeStyle);
+        LegendBand(canvas, x, ref cursor, y, width, HighGlyph, "high", HighNodeStyle);
+        LegendBand(canvas, x, ref cursor, y, width, PeakGlyph, "peak", PeakNodeStyle);
     }
 
     private void LegendBand(Canvas canvas, int start, ref int cursor, int y, int width, char glyph, string label,
@@ -350,9 +322,8 @@ public sealed class TreeMapChart : Control
 
         min = double.PositiveInfinity;
         max = double.NegativeInfinity;
-        for (var index = 0; index < _rendered.Count; index++)
+        foreach (var weight in _rendered.Select(static node => node.Weight))
         {
-            var weight = _rendered[index].Weight;
             if (weight < min)
             {
                 min = weight;
@@ -380,84 +351,87 @@ public sealed class TreeMapChart : Control
     private static void LayoutRange(Rect bounds, List<LeafNode> leaves, int start, int count, bool horizontal,
         List<RenderedNode> output)
     {
-        if (count <= 0 || bounds.IsEmpty)
+        while (count > 0 && !bounds.IsEmpty)
         {
-            return;
-        }
-
-        if (count == 1 || (bounds.Width == 1 && bounds.Height == 1))
-        {
-            output.Add(new RenderedNode(leaves[start].Node, bounds, leaves[start].Weight, leaves[start].LeafIndex));
-            return;
-        }
-
-        var total = 0d;
-        for (var index = 0; index < count; index++)
-        {
-            total += Math.Max(0d, leaves[start + index].Weight);
-        }
-
-        if (total <= 0d)
-        {
-            output.Add(new RenderedNode(leaves[start].Node, bounds, leaves[start].Weight, leaves[start].LeafIndex));
-            return;
-        }
-
-        var split = start;
-        var leftWeight = 0d;
-        var half = total / 2d;
-        while (split < start + count - 1)
-        {
-            leftWeight += Math.Max(0d, leaves[split].Weight);
-            if (leftWeight >= half)
+            if (count == 1 || bounds is { Width: 1, Height: 1 })
             {
-                break;
+                output.Add(new RenderedNode(leaves[start].Node, bounds, leaves[start].Weight, leaves[start].LeafIndex));
+                return;
             }
 
-            split++;
-        }
+            var total = 0d;
+            for (var index = 0; index < count; index++)
+            {
+                total += Math.Max(0d, leaves[start + index].Weight);
+            }
 
-        var leftCount = split - start + 1;
-        if (leftCount <= 0 || leftCount >= count)
-        {
+            if (total <= 0d)
+            {
+                output.Add(new RenderedNode(leaves[start].Node, bounds, leaves[start].Weight, leaves[start].LeafIndex));
+                return;
+            }
+
+            var split = start;
+            var leftWeight = 0d;
+            var half = total / 2d;
+            while (split < start + count - 1)
+            {
+                leftWeight += Math.Max(0d, leaves[split].Weight);
+                if (leftWeight >= half)
+                {
+                    break;
+                }
+
+                split++;
+            }
+
+            var leftCount = split - start + 1;
+            if (leftCount <= 0 || leftCount >= count)
+            {
+                output.Add(new RenderedNode(leaves[start].Node, bounds, leaves[start].Weight, leaves[start].LeafIndex));
+                return;
+            }
+
+            if (horizontal && bounds.Width > 1)
+            {
+                var firstWidth =
+                    Math.Clamp((int)Math.Round(bounds.Width * (leftWeight / total), MidpointRounding.AwayFromZero), 1,
+                        bounds.Width - 1);
+                LayoutRange(new Rect(bounds.X, bounds.Y, firstWidth, bounds.Height), leaves, start, leftCount,
+                    !horizontal, output);
+                bounds = new Rect(bounds.X + firstWidth, bounds.Y, bounds.Width - firstWidth, bounds.Height);
+                start += leftCount;
+                count -= leftCount;
+                horizontal = !horizontal;
+                continue;
+            }
+
+            if (bounds.Height > 1)
+            {
+                var firstHeight =
+                    Math.Clamp((int)Math.Round(bounds.Height * (leftWeight / total), MidpointRounding.AwayFromZero), 1,
+                        bounds.Height - 1);
+                LayoutRange(new Rect(bounds.X, bounds.Y, bounds.Width, firstHeight), leaves, start, leftCount,
+                    !horizontal, output);
+                bounds = new Rect(bounds.X, bounds.Y + firstHeight, bounds.Width, bounds.Height - firstHeight);
+                start += leftCount;
+                count -= leftCount;
+                horizontal = !horizontal;
+                continue;
+            }
+
             output.Add(new RenderedNode(leaves[start].Node, bounds, leaves[start].Weight, leaves[start].LeafIndex));
             return;
         }
-
-        if (horizontal && bounds.Width > 1)
-        {
-            var firstWidth =
-                Math.Clamp((int)Math.Round(bounds.Width * (leftWeight / total), MidpointRounding.AwayFromZero), 1,
-                    bounds.Width - 1);
-            LayoutRange(new Rect(bounds.X, bounds.Y, firstWidth, bounds.Height), leaves, start, leftCount, !horizontal,
-                output);
-            LayoutRange(new Rect(bounds.X + firstWidth, bounds.Y, bounds.Width - firstWidth, bounds.Height), leaves,
-                start + leftCount, count - leftCount, !horizontal, output);
-            return;
-        }
-
-        if (bounds.Height > 1)
-        {
-            var firstHeight =
-                Math.Clamp((int)Math.Round(bounds.Height * (leftWeight / total), MidpointRounding.AwayFromZero), 1,
-                    bounds.Height - 1);
-            LayoutRange(new Rect(bounds.X, bounds.Y, bounds.Width, firstHeight), leaves, start, leftCount, !horizontal,
-                output);
-            LayoutRange(new Rect(bounds.X, bounds.Y + firstHeight, bounds.Width, bounds.Height - firstHeight), leaves,
-                start + leftCount, count - leftCount, !horizontal, output);
-            return;
-        }
-
-        output.Add(new RenderedNode(leaves[start].Node, bounds, leaves[start].Weight, leaves[start].LeafIndex));
     }
 
     private void RebuildLeaves()
     {
         _leaves.Clear();
         var index = 0;
-        for (var root = 0; root < _roots.Count; root++)
+        foreach (var root in _roots)
         {
-            CollectLeaves(_roots[root], ref index);
+            CollectLeaves(root, ref index);
         }
     }
 
@@ -475,18 +449,20 @@ public sealed class TreeMapChart : Control
         }
 
         var before = _leaves.Count;
-        for (var child = 0; child < node.Children.Count; child++)
+        foreach (var child in node.Children)
         {
-            CollectLeaves(node.Children[child], ref index);
+            CollectLeaves(child, ref index);
         }
 
-        if (_leaves.Count == before)
+        if (_leaves.Count > before)
         {
-            var weight = node.ResolveWeight();
-            if (weight > 0d)
-            {
-                _leaves.Add(new LeafNode(node, weight, index++));
-            }
+            return;
+        }
+
+        var resolvedWeight = node.ResolveWeight();
+        if (resolvedWeight > 0d)
+        {
+            _leaves.Add(new LeafNode(node, resolvedWeight, index++));
         }
     }
 
@@ -516,15 +492,11 @@ public sealed class TreeMapChart : Control
 
     private int FindHitIndex(int x, int y)
     {
-        for (var index = 0; index < _rendered.Count; index++)
-        {
-            if (_rendered[index].Bounds.Contains(x, y))
-            {
-                return _rendered[index].LeafIndex;
-            }
-        }
-
-        return -1;
+        return _rendered
+            .Where(node => node.Bounds.Contains(x, y))
+            .Select(static node => node.LeafIndex)
+            .DefaultIfEmpty(-1)
+            .First();
     }
 
     private bool SetHoveredIndex(int index)
@@ -541,22 +513,13 @@ public sealed class TreeMapChart : Control
     private (char Glyph, TesseraStyle Style) ResolveBand(double value, double min, double max)
     {
         var normalized = Math.Clamp((value - min) / (max - min), 0d, 1d);
-        if (normalized <= 0.25d)
+        return normalized switch
         {
-            return (LowGlyph, LowNodeStyle);
-        }
-
-        if (normalized <= 0.5d)
-        {
-            return (MidGlyph, MidNodeStyle);
-        }
-
-        if (normalized <= 0.75d)
-        {
-            return (HighGlyph, HighNodeStyle);
-        }
-
-        return (PeakGlyph, PeakNodeStyle);
+            <= 0.25d => (LowGlyph, LowNodeStyle),
+            <= 0.5d => (MidGlyph, MidNodeStyle),
+            <= 0.75d => (HighGlyph, HighNodeStyle),
+            _ => (PeakGlyph, PeakNodeStyle)
+        };
     }
 
     private TesseraStyle ResolveStateStyle(int leafIndex)
@@ -570,10 +533,11 @@ public sealed class TreeMapChart : Control
         if (leafIndex == SelectedIndex)
         {
             style = style.Merge(SelectedNodeStyle);
-            if (IsFocused)
-            {
-                style = style.Merge(FocusedSelectedNodeStyle);
-            }
+        }
+
+        if (leafIndex == SelectedIndex && IsFocused)
+        {
+            style = style.Merge(FocusedSelectedNodeStyle);
         }
 
         return style;
@@ -604,12 +568,30 @@ public sealed class TreeMapChart : Control
     private static TreeMapNode Clone(TreeMapNode node)
     {
         var clone = new TreeMapNode(node.Name, node.Value);
-        for (var index = 0; index < node.Children.Count; index++)
+        foreach (var child in node.Children)
         {
-            clone.Children.Add(Clone(node.Children[index]));
+            clone.Children.Add(Clone(child));
         }
 
         return clone;
+    }
+
+    private bool HandleWheel(PointerButton button)
+    {
+        var current = SelectedIndex < 0 ? 0 : SelectedIndex;
+        return button switch
+        {
+            PointerButton.WheelDown => SetSelectedIndex(current + 1),
+            PointerButton.WheelUp => SetSelectedIndex(current - 1),
+            _ => false
+        };
+    }
+
+    private bool HandlePress(int hit)
+    {
+        RequestFocus();
+        var changed = SetHoveredIndex(hit);
+        return SetSelectedIndex(hit) || changed;
     }
 
     private static void DrawFill(Canvas canvas, Rect bounds, char glyph, TesseraStyle style)

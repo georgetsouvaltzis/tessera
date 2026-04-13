@@ -207,17 +207,14 @@ public sealed partial class LinePlot : Control
     /// <returns><see langword="true" /> if a series was removed; otherwise, <see langword="false" />.</returns>
     public bool RemoveSeries(string name)
     {
-        var normalized = name;
-        for (var i = 0; i < _series.Count; i++)
+        var index = _series.FindIndex(series => string.Equals(series.Name, name, StringComparison.Ordinal));
+        if (index < 0)
         {
-            if (string.Equals(_series[i].Name, normalized, StringComparison.Ordinal))
-            {
-                _series.RemoveAt(i);
-                return true;
-            }
+            return false;
         }
 
-        return false;
+        _series.RemoveAt(index);
+        return true;
     }
 
     /// <summary>
@@ -228,19 +225,15 @@ public sealed partial class LinePlot : Control
     /// <returns><see langword="true" /> when the series exists; otherwise, <see langword="false" />.</returns>
     public bool AppendSample(string seriesName, double sample)
     {
-        var normalized = seriesName;
-        for (var i = 0; i < _series.Count; i++)
+        var series = _series.FirstOrDefault(series =>
+            string.Equals(series.Name, seriesName, StringComparison.Ordinal));
+        if (series is null)
         {
-            if (!string.Equals(_series[i].Name, normalized, StringComparison.Ordinal))
-            {
-                continue;
-            }
-
-            _series[i].Append(sample);
-            return true;
+            return false;
         }
 
-        return false;
+        series.Append(sample);
+        return true;
     }
 
     /// <summary>
@@ -318,7 +311,7 @@ public sealed partial class LinePlot : Control
         }
 
         var plotArea = plot;
-        if (options.ShowAxes && plot.Width >= 3 && plot.Height >= 3)
+        if (options.ShowAxes && plot is { Width: >= 3, Height: >= 3 })
         {
             var axisStyle = ResolveStyled(AxisStyle);
             DrawVerticalLine(canvas, plot.X, plot.Y, plot.Height, axisStyle, '│');
@@ -332,7 +325,7 @@ public sealed partial class LinePlot : Control
             return;
         }
 
-        if (options.ShowGrid && plotArea.Width >= 3 && plotArea.Height >= 2)
+        if (options.ShowGrid && plotArea is { Width: >= 3, Height: >= 2 })
         {
             DrawGrid(canvas, plotArea, ResolveStyled(GridStyle));
         }
@@ -348,7 +341,7 @@ public sealed partial class LinePlot : Control
             RenderSeries(canvas, plotArea, maxSampleCount, visibleCount, offset, min, max);
         }
 
-        if (options.ShowAxes && plot.Width >= 3 && plot.Height >= 3)
+        if (options.ShowAxes && plot is { Width: >= 3, Height: >= 3 })
         {
             RenderAxisLabels(canvas, plot, options);
         }
@@ -359,23 +352,25 @@ public sealed partial class LinePlot : Control
             canvas.WriteText(content.X, content.Y, ApplyStyle(stats, ResolveStyled(StatsStyle)), content.Width);
         }
 
-        if (showFooterRow)
+        if (!showFooterRow)
         {
-            var footerY = content.Bottom - 1;
-            var rightReserved = 0;
-            if (options.ShowAxes && !string.IsNullOrWhiteSpace(options.XLabel))
-            {
-                var xLabel = options.XLabel.Trim();
-                rightReserved = Math.Min(content.Width, xLabel.Length + 1);
-                var xLabelX = Math.Max(content.X, content.Right - xLabel.Length);
-                canvas.WriteText(xLabelX, footerY, ApplyStyle(xLabel, ResolveStyled(AxisStyle)),
-                    content.Right - xLabelX);
-            }
+            return;
+        }
 
-            if (options.ShowLegend && content.Width - rightReserved > 0)
-            {
-                RenderLegendRow(canvas, footerY, content.X, content.Width - rightReserved);
-            }
+        var footerY = content.Bottom - 1;
+        var rightReserved = 0;
+        if (options.ShowAxes && !string.IsNullOrWhiteSpace(options.XLabel))
+        {
+            var xLabel = options.XLabel.Trim();
+            rightReserved = Math.Min(content.Width, xLabel.Length + 1);
+            var xLabelX = Math.Max(content.X, content.Right - xLabel.Length);
+            canvas.WriteText(xLabelX, footerY, ApplyStyle(xLabel, ResolveStyled(AxisStyle)),
+                content.Right - xLabelX);
+        }
+
+        if (options.ShowLegend && content.Width - rightReserved > 0)
+        {
+            RenderLegendRow(canvas, footerY, content.X, content.Width - rightReserved);
         }
     }
 
@@ -401,12 +396,15 @@ public sealed partial class LinePlot : Control
 
         width += Padding.Horizontal;
         height += Padding.Vertical;
-        if (Border != BorderStyle.None)
+        if (Border == BorderStyle.None)
         {
-            width += 2;
-            height += 2;
+            return new LayoutMeasurement(
+                Math.Clamp(width, 0, availableBounds.Width),
+                Math.Clamp(height, 0, availableBounds.Height));
         }
 
+        width += 2;
+        height += 2;
         return new LayoutMeasurement(
             Math.Clamp(width, 0, availableBounds.Width),
             Math.Clamp(height, 0, availableBounds.Height));
@@ -415,9 +413,8 @@ public sealed partial class LinePlot : Control
     private void RenderSeries(Canvas canvas, Rect plotArea, int maxSampleCount, int visibleCount, int offset,
         double min, double max)
     {
-        for (var seriesIndex = 0; seriesIndex < _series.Count; seriesIndex++)
+        foreach (var series in _series)
         {
-            var series = _series[seriesIndex];
             if (!TryResolveSeriesScaleRange(series, maxSampleCount, visibleCount, offset, min, max, out var seriesMin,
                     out var seriesMax))
             {
@@ -480,14 +477,14 @@ public sealed partial class LinePlot : Control
         out double min,
         out double max)
     {
-        if (series.ScaleMode == LineSeriesScaleMode.Shared)
+        if (series.ScaleMode != LineSeriesScaleMode.Shared)
         {
-            min = sharedMin;
-            max = sharedMax;
-            return true;
+            return TryResolveSeriesVisibleRange(series, maxSampleCount, visibleCount, offset, out min, out max);
         }
 
-        return TryResolveSeriesVisibleRange(series, maxSampleCount, visibleCount, offset, out min, out max);
+        min = sharedMin;
+        max = sharedMax;
+        return true;
     }
 
     private static bool TryResolveSeriesVisibleRange(
@@ -561,15 +558,17 @@ public sealed partial class LinePlot : Control
                 Math.Max(0, plot.Width - 1 - rightReserved));
         }
 
-        if (normalizedLabel is not null)
+        if (normalizedLabel is null)
         {
-            var normalizedLabelX = Math.Max(plot.X + 1, plot.Right - normalizedLabel.Length);
-            canvas.WriteText(
-                normalizedLabelX,
-                plot.Y,
-                ApplyStyle(normalizedLabel, axisStyle),
-                plot.Right - normalizedLabelX);
+            return;
         }
+
+        var normalizedLabelX = Math.Max(plot.X + 1, plot.Right - normalizedLabel.Length);
+        canvas.WriteText(
+            normalizedLabelX,
+            plot.Y,
+            ApplyStyle(normalizedLabel, axisStyle),
+            plot.Right - normalizedLabelX);
     }
 
     private void RenderLegendRow(Canvas canvas, int y, int x, int width)
@@ -606,9 +605,8 @@ public sealed partial class LinePlot : Control
             for (var i = 0; i < visibleCount; i++)
             {
                 var globalIndex = offset + i;
-                for (var seriesIndex = 0; seriesIndex < _series.Count; seriesIndex++)
+                foreach (var series in _series)
                 {
-                    var series = _series[seriesIndex];
                     if (!TryGetSeriesValue(series, maxSampleCount, globalIndex, out var value))
                     {
                         continue;
@@ -664,13 +662,7 @@ public sealed partial class LinePlot : Control
 
     private int GetMaxSampleCount()
     {
-        var max = 0;
-        for (var i = 0; i < _series.Count; i++)
-        {
-            max = Math.Max(max, _series[i].Samples.Count);
-        }
-
-        return max;
+        return _series.Count == 0 ? 0 : _series.Max(static series => series.Samples.Count);
     }
 
     private int EstimateLegendWidth()
@@ -743,7 +735,7 @@ public sealed partial class LinePlot : Control
         var start = maxSampleCount - series.Samples.Count;
         if (globalIndex < start || globalIndex >= start + series.Samples.Count)
         {
-            value = default;
+            value = 0;
             return false;
         }
 
@@ -871,14 +863,6 @@ public sealed partial class LinePlot : Control
 
     private bool HasSeriesScaleMode(LineSeriesScaleMode mode)
     {
-        for (var i = 0; i < _series.Count; i++)
-        {
-            if (_series[i].ScaleMode == mode)
-            {
-                return true;
-            }
-        }
-
-        return false;
+        return _series.Any(series => series.ScaleMode == mode);
     }
 }
