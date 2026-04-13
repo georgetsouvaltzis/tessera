@@ -31,7 +31,7 @@ internal static class TestDoubleAsync
 
 internal sealed class InitQuitModel : TestRuntimeModel
 {
-    public override Effect? Init()
+    public override Effect Init()
     {
         return Effects.Quit;
     }
@@ -151,7 +151,7 @@ internal sealed class CommandFaultModel : TestRuntimeModel
 {
     public const string FailureMessage = "command-failure-for-tests";
 
-    public override Effect? Init()
+    public override Effect Init()
     {
         return _ => throw new InvalidOperationException(FailureMessage);
     }
@@ -171,7 +171,7 @@ internal sealed class CommandRecoveryModel : TestRuntimeModel
 {
     public int? RecoveredValue { get; private set; }
 
-    public override Effect? Init()
+    public override Effect Init()
     {
         return _ => throw new InvalidOperationException(CommandFaultModel.FailureMessage);
     }
